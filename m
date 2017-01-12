@@ -1,53 +1,49 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 00/13] crypto: copy AAD during encrypt for AEAD ciphers
-Date: Thu, 12 Jan 2017 22:57:28 +0800
-Message-ID: <20170112145728.GA15595@gondor.apana.org.au>
-References: <10526995.lyZ7Je1KMx@positron.chronox.de>
- <20170112061936.GA10325@gondor.apana.org.au>
- <31581301.kpbcu3havF@positron.chronox.de>
+From: Wei Yongjun <weiyj.lk@gmail.com>
+Subject: [PATCH -next] crypto: mediatek - make symbol of_crypto_id static
+Date: Thu, 12 Jan 2017 15:03:21 +0000
+Message-ID: <20170112150321.4187-1-weiyj.lk@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Cc: linux-crypto@vger.kernel.org
-To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:34689 "EHLO
-        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1750933AbdALO5s (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Jan 2017 09:57:48 -0500
-Content-Disposition: inline
-In-Reply-To: <31581301.kpbcu3havF@positron.chronox.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: linux-mediatek@lists.infradead.org, Wei Yongjun <weiyongjun1@huawei.com>,
+ linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ Ryder Lee <ryder.lee@mediatek.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jan 12, 2017 at 12:22:09PM +0100, Stephan Müller wrote:
-> 
-> When addressing the issue in the algif_aead code, and expect that over time 
-> the AEAD implementations will gain the copy operation, eventually we will copy 
-> the AAD twice. Of course, this could be prevented, if the algif_aead code 
-> somehow uses the same SGL for the src and dst AAD.
+From: Wei Yongjun <weiyongjun1@huawei.com>
 
-Why would you copy it twice? You copy everything before you start
-and then just do in-place crypto.
+Fixes the following sparse warning:
 
-> > BTW, why are you only doing the copy for encryption?
-> 
-> I was looking at the only AEAD implementation that does the copy operation: 
-> authenc. There, the copy operation is only performed for encryption. I was 
-> thinking a bit about why decryption was not covered. I think the answer is the 
-> following: for encryption, the AAD is definitely needed in the dst buffer as 
-> the dst buffer with the AAD must be sent to the recipient for decryption. The 
-> decryption and the associated authentication only works with the AAD. However, 
-> after decrypting, all the caller wants is the decrypted plaintext only. There 
-> is no further use of the AAD after the decryption step. Hence, copying the AAD 
-> to the dst buffer in the decryption step would not serve the caller.
+drivers/crypto/mediatek/mtk-platform.c:585:27: warning:
+ symbol 'of_crypto_id' was not declared. Should it be static?
 
-That's just the current implementation.  If we're going to make
-this an API then we should do it for both directions.
+Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
+---
+ drivers/crypto/mediatek/mtk-platform.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+diff --git a/drivers/crypto/mediatek/mtk-platform.c b/drivers/crypto/mediatek/mtk-platform.c
+index 286296f..a9c713d 100644
+--- a/drivers/crypto/mediatek/mtk-platform.c
++++ b/drivers/crypto/mediatek/mtk-platform.c
+@@ -582,7 +582,7 @@ static int mtk_crypto_remove(struct platform_device *pdev)
+ 	return 0;
+ }
+ 
+-const struct of_device_id of_crypto_id[] = {
++static const struct of_device_id of_crypto_id[] = {
+ 	{ .compatible = "mediatek,eip97-crypto" },
+ 	{},
+ };
