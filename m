@@ -1,84 +1,90 @@
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH v8 1/1] crypto: add virtio-crypto driver
-Date: Thu, 12 Jan 2017 16:23:16 +0200
-Message-ID: <20170112161729-mutt-send-email-mst@kernel.org>
-References: <1481767396-187748-1-git-send-email-arei.gonglei@huawei.com>
- <1481767396-187748-2-git-send-email-arei.gonglei@huawei.com>
- <e235caf4-f51c-dccf-4eb7-548d3fa71644@de.ibm.com>
- <33183CC9F5247A488A2544077AF19020DA182B83@DGGEMA505-MBX.china.huawei.com>
- <c4282723-2afb-1764-2431-ef41f7126371@de.ibm.com>
- <a8384ff8-ff65-c578-c338-e6d8ebf498c4@de.ibm.com>
+From: Josh Poimboeuf <jpoimboe@redhat.com>
+Subject: Re: x86-64: Maintain 16-byte stack alignment
+Date: Thu, 12 Jan 2017 08:49:14 -0600
+Message-ID: <20170112144914.qmc5lgocp6vfq3b6@treble>
+References: <20170110143340.GA3787@gondor.apana.org.au>
+ <20170110143913.GA3822@gondor.apana.org.au>
+ <CA+55aFyuUCr3aUBhFt6T3vKyZOskLyH8Kd_2jeFkPYxxvEaXEg@mail.gmail.com>
+ <20170112070534.GA14016@gondor.apana.org.au>
+ <20170112074601.GB30151@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "Gonglei (Arei)" <arei.gonglei@huawei.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>,
-        "virtualization@lists.linux-foundation.org"
-        <virtualization@lists.linux-foundation.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "Huangweidong (C)" <weidong.huang@huawei.com>,
-        Claudio Fontana <Claudio.Fontana@huawei.com>,
-        Luonengjun <luonengjun@huawei.com>,
-        "Hanweidong (Randy)" <hanweidong@huawei.com>,
-        "Xuquan (Quan Xu)" <xuquan8@huawei.com>,
-        "Wanzongshun (Vincent)" <wanzongshun@huawei.com>,
-        "stefanha@redhat.com" <ste
-To: Christian Borntraeger <borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andy Lutomirski <luto@kernel.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: Ingo Molnar <mingo@kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <a8384ff8-ff65-c578-c338-e6d8ebf498c4@de.ibm.com>
+In-Reply-To: <20170112074601.GB30151@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jan 12, 2017 at 03:10:25PM +0100, Christian Borntraeger wrote:
-> On 01/10/2017 01:56 PM, Christian Borntraeger wrote:
-> > On 01/10/2017 01:36 PM, Gonglei (Arei) wrote:
-> >> Hi,
-> >>
-> >>>
-> >>> On 12/15/2016 03:03 AM, Gonglei wrote:
-> >>> [...]
-> >>>> +
-> >>>> +static struct crypto_alg virtio_crypto_algs[] = { {
-> >>>> +	.cra_name = "cbc(aes)",
-> >>>> +	.cra_driver_name = "virtio_crypto_aes_cbc",
-> >>>> +	.cra_priority = 501,
-> >>>
-> >>>
-> >>> This is still higher than the hardware-accelerators (like intel aesni or the
-> >>> s390 cpacf functions or the arm hw). aesni and s390/cpacf are supported by the
-> >>> hardware virtualization and available to the guests. I do not see a way how
-> >>> virtio
-> >>> crypto can be faster than that (in the end it might be cpacf/aesni + overhead)
-> >>> instead it will very likely be slower.
-> >>> So we should use a number that is higher than software implementations but
-> >>> lower than the hw ones.
-> >>>
-> >>> Just grepping around, the software ones seem be be around 100 and the
-> >>> hardware
-> >>> ones around 200-400. So why was 150 not enough?
-> >>>
-> >> I didn't find a documentation about how we use the priority, and I assumed
-> >> people use virtio-crypto will configure hardware accelerators in the
-> >> host. So I choosed the number which bigger than aesni's priority.
+On Thu, Jan 12, 2017 at 08:46:01AM +0100, Ingo Molnar wrote:
+> 
+> * Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> 
+> > On Tue, Jan 10, 2017 at 09:05:28AM -0800, Linus Torvalds wrote:
+> > >
+> > > I'm pretty sure we have random asm code that may not maintain a
+> > > 16-byte stack alignment when it calls other code (including, in some
+> > > cases, calling C code).
+> > > 
+> > > So I'm not at all convinced that this is a good idea. We shouldn't
+> > > expect 16-byte alignment to be something trustworthy.
 > > 
-> > Yes, but the aesni driver will only bind if there is HW support in the guest.
-> > And if aesni is available in the guest (or the s390 aes function from cpacf)
-> > it will always be faster than the same in the host via virtio.So your priority
-> > should be smaller.
+> > So what if we audited all the x86 assembly code to fix this? Would
+> > it then be acceptable to do a 16-byte aligned stack?
 > 
+> Audits for small but deadly details that isn't checked automatically by tooling 
+> would inevitably bitrot again - and in this particular case there's a 50% chance 
+> that a new, buggy change would test out to be 'fine' on a kernel developer's own 
+> box - and break on different configs, different hw or with unrelated (and 
+> innocent) kernel changes, sometime later - spreading the pain unnecessarily.
 > 
-> any opinion on this? 
+> So my feeling is that we really need improved tooling for this (and yes, the GCC 
+> toolchain should have handled this correctly).
+> 
+> But fortunately we have related tooling in the kernel: could objtool handle this? 
+> My secret hope was always that objtool would grow into a kind of life insurance 
+> against toolchain bogosities (which is a must for things like livepatching or a 
+> DWARF unwinder - but I digress).
 
-Going forward, we might add an emulated aesni device and that might
-become slower than virtio. OTOH if or when this happens, we can solve it
-by adding a priority or a feature flag to virtio to raise its priority.
+Are we talking about entry code, or other asm code?  Because objtool
+audits *most* asm code, but entry code is way too specialized for
+objtool to understand.
 
-So I think I agree with Christian here, let's lower the priority.
-Gonglei, could you send a patch like this?
+(I do have a pending objtool rewrite which would make it very easy to
+ensure 16-byte stack alignment.  But again, objtool can only understand
+callable C or asm functions, not entry code.)
+
+Another approach would be to solve this problem with unwinder warnings,
+*if* there's enough test coverage.
+
+I recently made some changes to try to standardize the "end" of the
+stack, so that the stack pointer is always a certain value before
+calling into C code.  I also added some warnings to the unwinder to
+ensure that it always reaches that point on the stack.  So if the "end"
+of the stack were adjusted by a word by adding padding to pt_regs, the
+unwinder warnings could help preserve that.
+
+We could take that a step further by adding an unwinder check to ensure
+that *every* frame is 16-byte aligned if -mpreferred-stack-boundary=3
+isn't used.
+
+Yet another step would be to add a debug feature which does stack sanity
+checking from a periodic NMI, to flush out these unwinder warnings.
+
+(Though I've found that current 0-day and fuzzing efforts, combined with
+lockdep and perf's frequent unwinder usage, are already doing a great
+job at flushing out unwinder warnings.)
+
+The only question is if there would be enough test coverage,
+particularly with those versions of gcc which don't have
+-mpreferred-stack-boundary=3.
 
 -- 
-MST
+Josh
