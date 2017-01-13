@@ -1,94 +1,42 @@
-From: Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: Re: x86-64: Maintain 16-byte stack alignment
-Date: Thu, 12 Jan 2017 23:07:09 -0600
-Message-ID: <20170113050709.yrdtfet5d4sebubi@treble>
-References: <CALCETrVb-NyKJajGEsLOrQqQrQ7cRm4sqLRxNr_yVE2-mjiDrg@mail.gmail.com>
- <20170112140215.rh247gwk55fjzmg7@treble>
- <CA+55aFxP+V6Wbq5Xw_NOksiWouEMg4gjBJgeGa-qFyxDMnTmcA@mail.gmail.com>
- <CALCETrVz-wEFVUwrpS8-Ln9SWnsF5KxkqJC-Br6wJ+e0LGM9UA@mail.gmail.com>
- <20170112201511.yj5ekqmj76r2yv6t@treble>
- <CALCETrXom8aY2XhpAyOtAwQQYF7wftBHJE_px1xr0iRmcYEJoA@mail.gmail.com>
- <20170113031107.mgitq54fmjnrvi6f@treble>
- <CALCETrUFCFn-rKnr+NG3SU7J78ree9siJC=Kz8f_Bk6eG2HyPA@mail.gmail.com>
- <20170113042758.whof5fk6eu7myctq@treble>
- <CA+55aFzRrSwGxxfZk-RUEnsz=xhcSmOwE1CenfCPBWtsS9MwDw@mail.gmail.com>
+From: Gonglei <arei.gonglei@huawei.com>
+Subject: [PATCH] virtio-crypto: adjust priority of algorithm
+Date: Fri, 13 Jan 2017 14:25:41 +0800
+Message-ID: <1484288741-31100-1-git-send-email-arei.gonglei@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Andy Lutomirski <luto@kernel.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Andy Lutomirski <luto@amacapital.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:52346 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750789AbdAMFHM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 13 Jan 2017 00:07:12 -0500
-Content-Disposition: inline
-In-Reply-To: <CA+55aFzRrSwGxxfZk-RUEnsz=xhcSmOwE1CenfCPBWtsS9MwDw@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain
+Cc: <mst@redhat.com>, <herbert@gondor.apana.org.au>,
+        <borntraeger@de.ibm.com>, Gonglei <arei.gonglei@huawei.com>
+To: <virtualization@lists.linux-foundation.org>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jan 12, 2017 at 08:37:18PM -0800, Linus Torvalds wrote:
-> On Jan 12, 2017 8:28 PM, "Josh Poimboeuf" <jpoimboe@redhat.com> wrote:
-> 
-> 
-> The stack frame was always 16-byte aligned regardless of whether the
-> buf array size was even or odd.
-> 
-> 
-> Including with -fomit-frame-pointer?
-> 
-> With frame pointers, stack frames really are naturally 16 bytes, and then
-> keeping the frame 16-byte aligned is just a matter of making any extra
-> frame allocations or push/pop sequences that you do also be a multiple of
-> 16 bytes.
-> 
-> But *without* frame pointers, the"native" frame size is just 8 bytes, and a
-> function that doesn't need any other local storage and then calls another
-> function (think various trivial wrapper functions that just add an argument
-> and then munge the return value) would thus naturally cause the frame to
-> become misaligned.
-> 
-> So then the compiler actually needs to start adding useless instructions
-> just to keep the stack 16-byte aligned.
+Some hardware accelerators (like intel aseni or the s390
+cpacf functions) have lower priorities than virtio
+crypto, and those drivers are faster than the same in
+the host via virtio. So let's lower the priority of
+virtio-crypto's algorithm, make it's higher than sofeware
+implimentations but lower than the hardware ones.
 
-Disabling frame pointers didn't seem to help, but I finally got it to
-misalign with a different test case.  I think it had been aligning the
-array, so instead I made it push a register.
+Suggested-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Signed-off-by: Gonglei <arei.gonglei@huawei.com>
+---
+ drivers/crypto/virtio/virtio_crypto_algs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
-void otherfunc(void);
-
-static inline void bar(int f)
-{
-	register void *__sp asm(_ASM_SP);
-	asm volatile("call otherfunc" : "+r" (__sp) : "b"(f));
-}
-
-void foo(void)
-{
-	bar(5);
-}
-
-
-00000000000020f0 <foo>:
-    20f0:	55                   	push   %rbp
-    20f1:	48 89 e5             	mov    %rsp,%rbp
-    20f4:	53                   	push   %rbx
-    20f5:	bb 05 00 00 00       	mov    $0x5,%ebx
-    20fa:	e8 00 00 00 00       	callq  20ff <foo+0xf>
-			20fb: R_X86_64_PC32	otherfunc-0x4
-    20ff:	5b                   	pop    %rbx
-    2100:	5d                   	pop    %rbp
-    2101:	c3                   	retq   
-    2102:	0f 1f 40 00          	nopl   0x0(%rax)
-    2106:	66 2e 0f 1f 84 00 00 	nopw   %cs:0x0(%rax,%rax,1)
-    210d:	00 00 00 
-
+diff --git a/drivers/crypto/virtio/virtio_crypto_algs.c b/drivers/crypto/virtio/virtio_crypto_algs.c
+index 6f40a42..4de4740 100644
+--- a/drivers/crypto/virtio/virtio_crypto_algs.c
++++ b/drivers/crypto/virtio/virtio_crypto_algs.c
+@@ -498,7 +498,7 @@ void virtio_crypto_ablkcipher_finalize_req(
+ static struct crypto_alg virtio_crypto_algs[] = { {
+ 	.cra_name = "cbc(aes)",
+ 	.cra_driver_name = "virtio_crypto_aes_cbc",
+-	.cra_priority = 501,
++	.cra_priority = 150,
+ 	.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
+ 	.cra_blocksize = AES_BLOCK_SIZE,
+ 	.cra_ctxsize  = sizeof(struct virtio_crypto_ablkcipher_ctx),
 -- 
-Josh
+1.8.3.1
