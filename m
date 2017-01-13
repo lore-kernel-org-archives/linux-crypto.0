@@ -1,73 +1,48 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH] crypto: arm/aes - avoid reserved 'tt' mnemonic in asm code
-Date: Fri, 13 Jan 2017 08:33:26 +0000
-Message-ID: <1484296406-13224-1-git-send-email-ard.biesheuvel@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, herbert@gondor.apana.org.au,
-        arnd@arndb.de, Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f41.google.com ([74.125.82.41]:37778 "EHLO
-        mail-wm0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751222AbdAMIeg (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 13 Jan 2017 03:34:36 -0500
-Received: by mail-wm0-f41.google.com with SMTP id c206so60379002wme.0
-        for <linux-crypto@vger.kernel.org>; Fri, 13 Jan 2017 00:34:30 -0800 (PST)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: x86-64: Maintain 16-byte stack alignment
+Date: Fri, 13 Jan 2017 16:36:48 +0800
+Message-ID: <20170113083648.GA22022@gondor.apana.org.au>
+References: <CA+55aFyuUCr3aUBhFt6T3vKyZOskLyH8Kd_2jeFkPYxxvEaXEg@mail.gmail.com>
+ <20170111031124.GA4515@gondor.apana.org.au>
+ <CA+55aFxJOzMim_d-O2E2yip8JWo0NdYs_72sNwFKSkTjy8q0Sw@mail.gmail.com>
+ <CA+55aFzypqpMog8aTczWYok0MqOcMi4gGzCor6k-NdJzBoLWyQ@mail.gmail.com>
+ <20170111043541.GA4944@gondor.apana.org.au>
+ <CALCETrX_vWTWu=kh4Zawn2OuhPnLip8xTqBGjYU-BvpJ9=ruTg@mail.gmail.com>
+ <CALCETrVb-NyKJajGEsLOrQqQrQ7cRm4sqLRxNr_yVE2-mjiDrg@mail.gmail.com>
+ <20170112140215.rh247gwk55fjzmg7@treble>
+ <CA+55aFxP+V6Wbq5Xw_NOksiWouEMg4gjBJgeGa-qFyxDMnTmcA@mail.gmail.com>
+ <CALCETrVz-wEFVUwrpS8-Ln9SWnsF5KxkqJC-Br6wJ+e0LGM9UA@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andy Lutomirski <luto@kernel.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: Andy Lutomirski <luto@amacapital.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <CALCETrVz-wEFVUwrpS8-Ln9SWnsF5KxkqJC-Br6wJ+e0LGM9UA@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-The ARMv8-M architecture introduces 'tt' and 'ttt' instructions,
-which means we can no longer use 'tt' as a register alias on recent
-versions of binutils for ARM. So replace the alias with 'ttab'.
+On Thu, Jan 12, 2017 at 12:08:07PM -0800, Andy Lutomirski wrote:
+>
+> I think we have some inline functions that do asm volatile ("call
+> ..."), and I don't see any credible way of forcing alignment short of
+> generating an entirely new stack frame and aligning that.  Ick.  This
 
-Fixes: 81edb4262975 ("crypto: arm/aes - replace scalar AES cipher")
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
- arch/arm/crypto/aes-cipher-core.S | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+A straight asm call from C should always work because gcc keeps
+the stack aligned in the prologue.
 
-diff --git a/arch/arm/crypto/aes-cipher-core.S b/arch/arm/crypto/aes-cipher-core.S
-index b04261e1e068..c817a86c4ca8 100644
---- a/arch/arm/crypto/aes-cipher-core.S
-+++ b/arch/arm/crypto/aes-cipher-core.S
-@@ -18,7 +18,7 @@
- 	rounds		.req	r1
- 	in		.req	r2
- 	out		.req	r3
--	tt		.req	ip
-+	ttab		.req	ip
- 
- 	t0		.req	lr
- 	t1		.req	r2
-@@ -34,9 +34,9 @@
- 
- 	.macro		__load, out, in, idx
- 	.if		__LINUX_ARM_ARCH__ < 7 && \idx > 0
--	ldr		\out, [tt, \in, lsr #(8 * \idx) - 2]
-+	ldr		\out, [ttab, \in, lsr #(8 * \idx) - 2]
- 	.else
--	ldr		\out, [tt, \in, lsl #2]
-+	ldr		\out, [ttab, \in, lsl #2]
- 	.endif
- 	.endm
- 
-@@ -136,7 +136,7 @@
- 	eor		r6, r6, r10
- 	eor		r7, r7, r11
- 
--	__adrl		tt, \ttab
-+	__adrl		ttab, \ttab
- 
- 	tst		rounds, #2
- 	bne		1f
-@@ -146,7 +146,7 @@
- 
- 1:	subs		rounds, rounds, #4
- 	\round		r8, r9, r10, r11, r4, r5, r6, r7
--	__adrl		tt, \ltab, ls
-+	__adrl		ttab, \ltab, ls
- 	\round		r4, r5, r6, r7, r8, r9, r10, r11
- 	bhi		0b
- 
+The only problem with inline assembly is when you start pushing
+things onto the stack directly.
+
+Cheers,
 -- 
-2.7.4
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
