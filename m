@@ -1,42 +1,59 @@
-From: Gonglei <arei.gonglei@huawei.com>
-Subject: [PATCH] virtio-crypto: adjust priority of algorithm
-Date: Fri, 13 Jan 2017 14:25:41 +0800
-Message-ID: <1484288741-31100-1-git-send-email-arei.gonglei@huawei.com>
+From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
+Subject: [PATCH] crypto: testmgr - don't DMA map IV from stack in test_skcipher()
+Date: Fri, 13 Jan 2017 08:59:16 +0200
+Message-ID: <1484290756-20868-1-git-send-email-horia.geanta@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <mst@redhat.com>, <herbert@gondor.apana.org.au>,
-        <borntraeger@de.ibm.com>, Gonglei <arei.gonglei@huawei.com>
-To: <virtualization@lists.linux-foundation.org>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Cc: "David S. Miller" <davem@davemloft.net>,
+        <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-sn1nam01on0063.outbound.protection.outlook.com ([104.47.32.63]:30208
+        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751066AbdAMG70 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 13 Jan 2017 01:59:26 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Some hardware accelerators (like intel aseni or the s390
-cpacf functions) have lower priorities than virtio
-crypto, and those drivers are faster than the same in
-the host via virtio. So let's lower the priority of
-virtio-crypto's algorithm, make it's higher than sofeware
-implimentations but lower than the hardware ones.
+Fix the "DMA-API: device driver maps memory from stack" warning
+generated when crypto accelerators map the IV.
 
-Suggested-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Signed-off-by: Gonglei <arei.gonglei@huawei.com>
+Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 ---
- drivers/crypto/virtio/virtio_crypto_algs.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ crypto/testmgr.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/virtio/virtio_crypto_algs.c b/drivers/crypto/virtio/virtio_crypto_algs.c
-index 6f40a42..4de4740 100644
---- a/drivers/crypto/virtio/virtio_crypto_algs.c
-+++ b/drivers/crypto/virtio/virtio_crypto_algs.c
-@@ -498,7 +498,7 @@ void virtio_crypto_ablkcipher_finalize_req(
- static struct crypto_alg virtio_crypto_algs[] = { {
- 	.cra_name = "cbc(aes)",
- 	.cra_driver_name = "virtio_crypto_aes_cbc",
--	.cra_priority = 501,
-+	.cra_priority = 150,
- 	.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
- 	.cra_blocksize = AES_BLOCK_SIZE,
- 	.cra_ctxsize  = sizeof(struct virtio_crypto_ablkcipher_ctx),
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 500a5277cc22..64245aeef634 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -1081,12 +1081,16 @@ static int __test_skcipher(struct crypto_skcipher *tfm, int enc,
+ 	const char *e, *d;
+ 	struct tcrypt_result result;
+ 	void *data;
+-	char iv[MAX_IVLEN];
++	char *iv;
+ 	char *xbuf[XBUFSIZE];
+ 	char *xoutbuf[XBUFSIZE];
+ 	int ret = -ENOMEM;
+ 	unsigned int ivsize = crypto_skcipher_ivsize(tfm);
+ 
++	iv = kmalloc(MAX_IVLEN, GFP_KERNEL);
++	if (!iv)
++		return ret;
++
+ 	if (testmgr_alloc_buf(xbuf))
+ 		goto out_nobuf;
+ 
+@@ -1328,6 +1332,7 @@ static int __test_skcipher(struct crypto_skcipher *tfm, int enc,
+ out_nooutbuf:
+ 	testmgr_free_buf(xbuf);
+ out_nobuf:
++	kfree(iv);
+ 	return ret;
+ }
+ 
 -- 
-1.8.3.1
+2.4.4
