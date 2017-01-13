@@ -1,53 +1,43 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 00/13] crypto: copy AAD during encrypt for AEAD ciphers
-Date: Fri, 13 Jan 2017 18:23:39 +0800
-Message-ID: <20170113102339.GB23349@gondor.apana.org.au>
-References: <10526995.lyZ7Je1KMx@positron.chronox.de>
- <1604413.m50iU9qQPD@tauon.atsec.com>
- <20170112160629.GA19577@gondor.apana.org.au>
- <3463059.TVfkfLOfNf@tauon.atsec.com>
+Subject: Re: [PATCH v2 0/7] crypto: ARM/arm64 - AES and ChaCha20 updates for
+ v4.11
+Date: Fri, 13 Jan 2017 18:28:12 +0800
+Message-ID: <20170113102812.GA23446@gondor.apana.org.au>
+References: <1484152915-26517-1-git-send-email-ard.biesheuvel@linaro.org>
+ <20170112164504.GD20313@gondor.apana.org.au>
+ <CAKv+Gu9a5ZsWtT0XYczPBf54L7d5Whu5gG1eUOt8T-wms0orbg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Cc: linux-crypto@vger.kernel.org
-To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:45827 "EHLO
-        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751356AbdAMKXv (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 13 Jan 2017 05:23:51 -0500
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <3463059.TVfkfLOfNf@tauon.atsec.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <CAKv+Gu9a5ZsWtT0XYczPBf54L7d5Whu5gG1eUOt8T-wms0orbg@mail.gmail.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jan 12, 2017 at 05:37:33PM +0100, Stephan Müller wrote:
+On Thu, Jan 12, 2017 at 04:48:08PM +0000, Ard Biesheuvel wrote:
 >
-> I would not understand that statement.
+> Actually, patch #6 was the huge one not #7, and I don't see it in your tree yet.
 > 
-> With the patch mentioned above that I provided some weeks ago, we have the 
-> following scenario for an encryption (in case of decryption, it is almost 
-> identical, just the tag location is reversed):
+> https://git.kernel.org/cgit/linux/kernel/git/ardb/linux.git/commit/?h=crypto-arm-v4.11&id=cbf03b255f7c
 > 
-> user calls sendmsg with data buffer/IOVEC: AAD || PT
-> 	-> algif_aead turns this into the src SGL
-> 
-> user calls recvmsg with data buffer/IOVEC: CT || Tag
-> 	-> algif_aead creates the first SG entry in the dst SGL pointing to the 
-> AAD from the src SGL
-> 	-> algif_aead appends the user buffers to the dst SGL
-> 
-> 	-> algif_aead performs its operation and during that operation, only the 
-> CT and Tag parts are changed
-> 
-> I.e. with the pre-pending of the SG pointing to the AAD from the src SGL to 
-> the dst SGL we have a clean invocation of the kernel API.
+> The order does not matter, though, so could you please put it on top? Thanks.
 
-But that means you can never invoke the in-place path of the kernel
-API, which is the most optimised code path.
+OK I've applied it now and will push out soon.
 
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
