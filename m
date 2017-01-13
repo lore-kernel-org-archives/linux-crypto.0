@@ -1,31 +1,38 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/4] n2rng: add support for m5/m7 rng register layout
-Date: Fri, 13 Jan 2017 22:37:18 +0800
-Message-ID: <20170113143718.GB26101@gondor.apana.org.au>
-References: <1484247169-245086-1-git-send-email-shannon.nelson@oracle.com>
+Subject: Re: [PATCH -next] crypto: mediatek - make symbol of_crypto_id static
+Date: Fri, 13 Jan 2017 22:37:09 +0800
+Message-ID: <20170113143709.GA26101@gondor.apana.org.au>
+References: <20170112150321.4187-1-weiyj.lk@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, sparclinux@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: Shannon Nelson <shannon.nelson@oracle.com>
-Return-path: <sparclinux-owner@vger.kernel.org>
+Cc: Matthias Brugger <matthias.bgg@gmail.com>,
+        Ryder Lee <ryder.lee@mediatek.com>,
+        Wei Yongjun <weiyongjun1@huawei.com>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-mediatek@lists.infradead.org
+To: Wei Yongjun <weiyj.lk@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:44077 "EHLO
+        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1751482AbdAMOh1 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 13 Jan 2017 09:37:27 -0500
 Content-Disposition: inline
-In-Reply-To: <1484247169-245086-1-git-send-email-shannon.nelson@oracle.com>
-Sender: sparclinux-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20170112150321.4187-1-weiyj.lk@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jan 12, 2017 at 10:52:45AM -0800, Shannon Nelson wrote:
-> Commit c1e9b3b0eea1 ("hwrng: n2 - Attach on T5/M5, T7/M7 SPARC CPUs")
-> added config strings to enable the random number generator in the sparc
-> m5 and m7 platforms.  This worked fine for client LDoms, but not for the
-> primary LDom, or running on bare metal, because the actual rng hardware
-> layout changed and self-test would now fail, continually spewing error
-> messages on the console.
+On Thu, Jan 12, 2017 at 03:03:21PM +0000, Wei Yongjun wrote:
+> From: Wei Yongjun <weiyongjun1@huawei.com>
 > 
-> This patch series adds correct support for the new rng register layout,
-> and adds a limiter to the spewing of error messages.
+> Fixes the following sparse warning:
+> 
+> drivers/crypto/mediatek/mtk-platform.c:585:27: warning:
+>  symbol 'of_crypto_id' was not declared. Should it be static?
+> 
+> Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
