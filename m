@@ -1,32 +1,36 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: arm/aes - avoid reserved 'tt' mnemonic in asm
- code
-Date: Fri, 13 Jan 2017 22:37:34 +0800
-Message-ID: <20170113143734.GC26101@gondor.apana.org.au>
-References: <1484296406-13224-1-git-send-email-ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH v2] virtio-crypto: adjust priority of algorithm
+Date: Fri, 13 Jan 2017 22:37:42 +0800
+Message-ID: <20170113143742.GD26101@gondor.apana.org.au>
+References: <1484300056-35284-1-git-send-email-arei.gonglei@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        arnd@arndb.de
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: virtualization@lists.linux-foundation.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mst@redhat.com, borntraeger@de.ibm.com
+To: Gonglei <arei.gonglei@huawei.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:47059 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:47925 "EHLO
         helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751745AbdAMOhp (ORCPT
+        with ESMTP id S1751766AbdAMOhw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 13 Jan 2017 09:37:45 -0500
+        Fri, 13 Jan 2017 09:37:52 -0500
 Content-Disposition: inline
-In-Reply-To: <1484296406-13224-1-git-send-email-ard.biesheuvel@linaro.org>
+In-Reply-To: <1484300056-35284-1-git-send-email-arei.gonglei@huawei.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jan 13, 2017 at 08:33:26AM +0000, Ard Biesheuvel wrote:
-> The ARMv8-M architecture introduces 'tt' and 'ttt' instructions,
-> which means we can no longer use 'tt' as a register alias on recent
-> versions of binutils for ARM. So replace the alias with 'ttab'.
+On Fri, Jan 13, 2017 at 05:34:16PM +0800, Gonglei wrote:
+> Some hardware accelerators (like intel aesni or the s390
+> cpacf functions) have lower priorities than virtio
+> crypto, and those drivers are faster than the same in
+> the host via virtio. So let's lower the priority of
+> virtio-crypto's algorithm, make it's higher than software
+> implementations but lower than the hardware ones.
 > 
-> Fixes: 81edb4262975 ("crypto: arm/aes - replace scalar AES cipher")
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> Suggested-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> Signed-off-by: Gonglei <arei.gonglei@huawei.com>
+> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
 
 Patch applied.  Thanks.
 -- 
