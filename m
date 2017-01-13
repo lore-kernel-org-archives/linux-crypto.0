@@ -1,59 +1,73 @@
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Subject: Re: [PATCH] virtio-crypto: adjust priority of algorithm
-Date: Fri, 13 Jan 2017 09:28:29 +0100
-Message-ID: <874ee338-4dd6-8a2c-fb95-59bd784de026@de.ibm.com>
-References: <1484288741-31100-1-git-send-email-arei.gonglei@huawei.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, mst@redhat.com
-To: Gonglei <arei.gonglei@huawei.com>,
-	virtualization@lists.linux-foundation.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Return-path: <virtualization-bounces@lists.linux-foundation.org>
-In-Reply-To: <1484288741-31100-1-git-send-email-arei.gonglei@huawei.com>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/virtualization>,
-	<mailto:virtualization-request@lists.linux-foundation.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/virtualization/>
-List-Post: <mailto:virtualization@lists.linux-foundation.org>
-List-Help: <mailto:virtualization-request@lists.linux-foundation.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/virtualization>,
-	<mailto:virtualization-request@lists.linux-foundation.org?subject=subscribe>
-Sender: virtualization-bounces@lists.linux-foundation.org
-Errors-To: virtualization-bounces@lists.linux-foundation.org
-List-Id: linux-crypto.vger.kernel.org
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH] crypto: arm/aes - avoid reserved 'tt' mnemonic in asm code
+Date: Fri, 13 Jan 2017 08:33:26 +0000
+Message-ID: <1484296406-13224-1-git-send-email-ard.biesheuvel@linaro.org>
+Cc: linux-arm-kernel@lists.infradead.org, herbert@gondor.apana.org.au,
+        arnd@arndb.de, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wm0-f41.google.com ([74.125.82.41]:37778 "EHLO
+        mail-wm0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751222AbdAMIeg (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 13 Jan 2017 03:34:36 -0500
+Received: by mail-wm0-f41.google.com with SMTP id c206so60379002wme.0
+        for <linux-crypto@vger.kernel.org>; Fri, 13 Jan 2017 00:34:30 -0800 (PST)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-ACK. Whoever takes this patch might want to fixup 3 typos.
+The ARMv8-M architecture introduces 'tt' and 'ttt' instructions,
+which means we can no longer use 'tt' as a register alias on recent
+versions of binutils for ARM. So replace the alias with 'ttab'.
 
-On 01/13/2017 07:25 AM, Gonglei wrote:
+Fixes: 81edb4262975 ("crypto: arm/aes - replace scalar AES cipher")
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+ arch/arm/crypto/aes-cipher-core.S | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-> Some hardware accelerators (like intel aseni or the s390
-					aesni
-> cpacf functions) have lower priorities than virtio
-> crypto, and those drivers are faster than the same in
-> the host via virtio. So let's lower the priority of
-> virtio-crypto's algorithm, make it's higher than sofeware
-                                                   software
-> implimentations but lower than the hardware ones.
-  implementations
-> 
-> Suggested-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> Signed-off-by: Gonglei <arei.gonglei@huawei.com>
-> ---
->  drivers/crypto/virtio/virtio_crypto_algs.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/crypto/virtio/virtio_crypto_algs.c b/drivers/crypto/virtio/virtio_crypto_algs.c
-> index 6f40a42..4de4740 100644
-> --- a/drivers/crypto/virtio/virtio_crypto_algs.c
-> +++ b/drivers/crypto/virtio/virtio_crypto_algs.c
-> @@ -498,7 +498,7 @@ void virtio_crypto_ablkcipher_finalize_req(
->  static struct crypto_alg virtio_crypto_algs[] = { {
->  	.cra_name = "cbc(aes)",
->  	.cra_driver_name = "virtio_crypto_aes_cbc",
-> -	.cra_priority = 501,
-> +	.cra_priority = 150,
->  	.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
->  	.cra_blocksize = AES_BLOCK_SIZE,
->  	.cra_ctxsize  = sizeof(struct virtio_crypto_ablkcipher_ctx),
-> 
+diff --git a/arch/arm/crypto/aes-cipher-core.S b/arch/arm/crypto/aes-cipher-core.S
+index b04261e1e068..c817a86c4ca8 100644
+--- a/arch/arm/crypto/aes-cipher-core.S
++++ b/arch/arm/crypto/aes-cipher-core.S
+@@ -18,7 +18,7 @@
+ 	rounds		.req	r1
+ 	in		.req	r2
+ 	out		.req	r3
+-	tt		.req	ip
++	ttab		.req	ip
+ 
+ 	t0		.req	lr
+ 	t1		.req	r2
+@@ -34,9 +34,9 @@
+ 
+ 	.macro		__load, out, in, idx
+ 	.if		__LINUX_ARM_ARCH__ < 7 && \idx > 0
+-	ldr		\out, [tt, \in, lsr #(8 * \idx) - 2]
++	ldr		\out, [ttab, \in, lsr #(8 * \idx) - 2]
+ 	.else
+-	ldr		\out, [tt, \in, lsl #2]
++	ldr		\out, [ttab, \in, lsl #2]
+ 	.endif
+ 	.endm
+ 
+@@ -136,7 +136,7 @@
+ 	eor		r6, r6, r10
+ 	eor		r7, r7, r11
+ 
+-	__adrl		tt, \ttab
++	__adrl		ttab, \ttab
+ 
+ 	tst		rounds, #2
+ 	bne		1f
+@@ -146,7 +146,7 @@
+ 
+ 1:	subs		rounds, rounds, #4
+ 	\round		r8, r9, r10, r11, r4, r5, r6, r7
+-	__adrl		tt, \ltab, ls
++	__adrl		ttab, \ltab, ls
+ 	\round		r4, r5, r6, r7, r8, r9, r10, r11
+ 	bhi		0b
+ 
+-- 
+2.7.4
