@@ -1,39 +1,59 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] virtio-crypto: adjust priority of algorithm
-Date: Fri, 13 Jan 2017 22:37:42 +0800
-Message-ID: <20170113143742.GD26101@gondor.apana.org.au>
-References: <1484300056-35284-1-git-send-email-arei.gonglei@huawei.com>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Subject: Re: [PATCH v2 7/8] net: Rename TCA*BPF_DIGEST to ..._SHA256
+Date: Sat, 14 Jan 2017 00:08:30 +0100
+Message-ID: <58795DEE.3090403@iogearbox.net>
+References: <cover.1484090585.git.luto@kernel.org> <f284a4d87cde103cd78de64b8607e3c80a17e2e5.1484090585.git.luto@kernel.org> <58758169.2020408@iogearbox.net> <CALCETrUHenMS1iomFr7+YEy_M3zaotrWbfMe93=BmzCbzJ0fLw@mail.gmail.com> <5875F65A.4010904@iogearbox.net> <CALCETrVhuszdsfayLrBBkSzJ+A3m+hJjdZQWDj9FOg+2UB_ZBw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: virtualization@lists.linux-foundation.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mst@redhat.com, borntraeger@de.ibm.com
-To: Gonglei <arei.gonglei@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: Andy Lutomirski <luto@kernel.org>, Netdev <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Hannes Frederic Sowa <hannes@stressinduktion.org>,
+        Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Eric Biggers <ebiggers3@gmail.com>,
+        Tom Herbert <tom@herbertland.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Alexei Starovoitov <ast@kernel.org>
+To: Andy Lutomirski <luto@amacapital.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:47925 "EHLO
-        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751766AbdAMOhw (ORCPT
+Received: from www62.your-server.de ([213.133.104.62]:48748 "EHLO
+        www62.your-server.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751378AbdAMXIj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 13 Jan 2017 09:37:52 -0500
-Content-Disposition: inline
-In-Reply-To: <1484300056-35284-1-git-send-email-arei.gonglei@huawei.com>
+        Fri, 13 Jan 2017 18:08:39 -0500
+In-Reply-To: <CALCETrVhuszdsfayLrBBkSzJ+A3m+hJjdZQWDj9FOg+2UB_ZBw@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jan 13, 2017 at 05:34:16PM +0800, Gonglei wrote:
-> Some hardware accelerators (like intel aesni or the s390
-> cpacf functions) have lower priorities than virtio
-> crypto, and those drivers are faster than the same in
-> the host via virtio. So let's lower the priority of
-> virtio-crypto's algorithm, make it's higher than software
-> implementations but lower than the hardware ones.
-> 
-> Suggested-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> Signed-off-by: Gonglei <arei.gonglei@huawei.com>
-> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+On 01/11/2017 07:19 PM, Andy Lutomirski wrote:
+> On Wed, Jan 11, 2017 at 1:09 AM, Daniel Borkmann <daniel@iogearbox.net> wrote:
+[...]
+>> Ok. Sleeping over this a bit, how about a general rename into
+>> "prog_tag" for fdinfo and TCA_BPF_TAG resp. TCA_ACT_BPF_TAG for
+>> the netlink attributes, fwiw, it might reduce any assumptions on
+>> this being made? If this would be preferable, I could cook that
+>> patch against -net for renaming it?
+>
+> That would be fine with me.
+>
+> I think there are two reasonable approaches to computing the actual tag.
+>
+> 1. Use a standard, modern cryptographic hash.  SHA-256, SHA-512,
+> Blake2b, whatever.  SHA-1 is a bad choice in part because it's partly
+> broken and in part because the implementation in lib/ is a real mess
+> to use (as you noticed while writing the code).
+>
+> 2. Use whatever algorithm you like but make the tag so short that it's
+> obviously not collision-free.  48 or 64 bits is probably reasonable.
+>
+> The intermediate versions are just asking for trouble.
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Yeah agree, I've just sent a patch to rework this a bit and it got
+also reasonably small for net. Cleanups, if needed, can be done in
+net-next once that's pulled into it.
+
+Thanks,
+Daniel
