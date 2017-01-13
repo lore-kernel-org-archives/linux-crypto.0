@@ -1,41 +1,35 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 0/7] crypto: ARM/arm64 - AES and ChaCha20 updates for
- v4.11
-Date: Fri, 13 Jan 2017 18:28:12 +0800
-Message-ID: <20170113102812.GA23446@gondor.apana.org.au>
-References: <1484152915-26517-1-git-send-email-ard.biesheuvel@linaro.org>
- <20170112164504.GD20313@gondor.apana.org.au>
- <CAKv+Gu9a5ZsWtT0XYczPBf54L7d5Whu5gG1eUOt8T-wms0orbg@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/6] Add bulk skcipher requests to crypto API and
+ dm-crypt
+Date: Fri, 13 Jan 2017 18:41:28 +0800
+Message-ID: <20170113104128.GA23497@gondor.apana.org.au>
+References: <cover.1484215956.git.omosnacek@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, dm-devel@redhat.com,
+        Mike Snitzer <snitzer@redhat.com>,
+        Milan Broz <gmazyland@gmail.com>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        Binoy Jayan <binoy.jayan@linaro.org>
+To: Ondrej Mosnacek <omosnacek@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:33451 "EHLO
+        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1751356AbdAMKlh (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 13 Jan 2017 05:41:37 -0500
 Content-Disposition: inline
-In-Reply-To: <CAKv+Gu9a5ZsWtT0XYczPBf54L7d5Whu5gG1eUOt8T-wms0orbg@mail.gmail.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <cover.1484215956.git.omosnacek@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jan 12, 2017 at 04:48:08PM +0000, Ard Biesheuvel wrote:
->
-> Actually, patch #6 was the huge one not #7, and I don't see it in your tree yet.
+On Thu, Jan 12, 2017 at 01:59:52PM +0100, Ondrej Mosnacek wrote:
 > 
-> https://git.kernel.org/cgit/linux/kernel/git/ardb/linux.git/commit/?h=crypto-arm-v4.11&id=cbf03b255f7c
-> 
-> The order does not matter, though, so could you please put it on top? Thanks.
+> the goal of this patchset is to allow those skcipher API users that need to
+> process batches of small messages (especially dm-crypt) to do so efficiently.
 
-OK I've applied it now and will push out soon.
+Please explain why this can't be done with the existing framework
+using IV generators similar to the ones used for IPsec.
 
 Thanks,
 -- 
