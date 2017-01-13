@@ -1,40 +1,37 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [PATCH 1/2] crypto: aead AF_ALG - overhaul memory management
-Date: Fri, 13 Jan 2017 12:51:37 +0100
-Message-ID: <1629913.CiS9dHAudq@positron.chronox.de>
-References: <1486189.x0AQ4O6r2j@positron.chronox.de> <2278925.gEXngSfgVI@positron.chronox.de> <20170113112539.GA23928@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Salvatore Benedetto <salvatore.benedetto@intel.com>
+Subject: [PATCH] crypto: api - Clear CRYPTO_ALG_DEAD bit before registering an alg
+Date: Fri, 13 Jan 2017 11:54:08 +0000
+Message-ID: <1484308448-3225-1-git-send-email-salvatore.benedetto@intel.com>
+Cc: salvatore.benedetto@intel.com, linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:55550 "EHLO mail.eperm.de"
+Received: from mga11.intel.com ([192.55.52.93]:14863 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751498AbdAMLvq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 13 Jan 2017 06:51:46 -0500
-In-Reply-To: <20170113112539.GA23928@gondor.apana.org.au>
+        id S1751441AbdAMLzJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 13 Jan 2017 06:55:09 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Freitag, 13. Januar 2017, 19:25:39 CET schrieb Herbert Xu:
+Make sure CRYPTO_ALG_DEAD bit is cleared before proceeding with
+the algorithm registration. This fixes qat-dh registration when
+driver is restarted
 
-Hi Herbert,
+Signed-off-by: Salvatore Benedetto <salvatore.benedetto@intel.com>
+---
+ crypto/algapi.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-> On Fri, Jan 13, 2017 at 12:16:27PM +0100, Stephan Müller wrote:
-> > > If you're making a single call, what guarantees the ordering?
-> > 
-> > Technically, io_submit is the syscall that triggers the recvmsg. Are you
-> > saying that this syscall does not maintain ordering? At least the man page
-> > does not add any hints that it would not (unlike the lio_list man page).
-> 
-> The code certainly does.  But my point is that you can do the
-> same thing using the current API.  Just make your list be pairs
-> of write/read and it should work.
-
-How shall these pairs come into existence? The read/write system calls may 
-come at unspecified times with potentially dissimilar buffer lengths.
-
-
-Ciao
-Stephan
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index df939b5..1fad2a6 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -356,6 +356,7 @@ int crypto_register_alg(struct crypto_alg *alg)
+ 	struct crypto_larval *larval;
+ 	int err;
+ 
++	alg->cra_flags &= ~CRYPTO_ALG_DEAD;
+ 	err = crypto_check_alg(alg);
+ 	if (err)
+ 		return err;
+-- 
+2.7.4
