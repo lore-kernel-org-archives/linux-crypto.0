@@ -1,47 +1,50 @@
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Subject: Re: [BISECT] ARM build errors on GCC v6.2 (crypto: arm/aes - replace
- scalar AES cipher)
-Date: Sat, 14 Jan 2017 20:52:15 +0200
-Message-ID: <20170114185215.db7av7u2wujy764n@kozik-lap>
-References: <20170114142435.ashdj2xm5b3kzg2p@kozik-lap>
- <20170114182011.GX14217@n2100.armlinux.org.uk>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: Krzysztof Kozlowski <krzk@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        linux-next@vger.kernel.org, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-To: Russell King - ARM Linux <linux@armlinux.org.uk>
-Return-path: <linux-next-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20170114182011.GX14217@n2100.armlinux.org.uk>
-Sender: linux-next-owner@vger.kernel.org
+From: Nicolas Iooss <nicolas.iooss_linux@m4x.org>
+Subject: [PATCH 1/1] crypto: img-hash - use dma_data_direction when calling dma_map_sg
+Date: Sun, 15 Jan 2017 13:37:50 +0100
+Message-ID: <20170115123750.3010-1-nicolas.iooss_linux@m4x.org>
+Cc: linux-kernel@vger.kernel.org,
+        Nicolas Iooss <nicolas.iooss_linux@m4x.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sat, Jan 14, 2017 at 06:20:12PM +0000, Russell King - ARM Linux wrote:
-> On Sat, Jan 14, 2017 at 04:24:35PM +0200, Krzysztof Kozlowski wrote:
-> > Hi,
-> > 
-> > allyesconfig and multi_v7_defconfig fail to build on recent linux-next
-> > on GCC 6.2.0.
-> > 
-> > Errors:
-> > ../arch/arm/crypto/aes-cipher-core.S: Assembler messages:
-> > ../arch/arm/crypto/aes-cipher-core.S:21: Error: selected processor does not support `tt .req ip' in ARM mode
-> > ../arch/arm/crypto/aes-cipher-core.S:174: Error: ARM register expected -- `movw tt,#:lower16:crypto_ft_tab'
-> > ../arch/arm/crypto/aes-cipher-core.S:174: Error: ARM register expected -- `movt tt,#:upper16:crypto_ft_tab'
-> > 
-> > Compiler: arm-linux-gnueabi-gcc (Ubuntu 6.2.0-5ubuntu12) 6.2.0 20161005
-> 
-> It's worth pointing out that _assembler_ messages come from _binutils_
-> rather than _gcc_.   Please advise which version of _binutils_ you
-> are using.  Thanks.
+The fourth argument of dma_map_sg() and dma_unmap_sg() is an item of
+dma_data_direction enum. Function img_hash_xmit_dma() wrongly used
+DMA_MEM_TO_DEV, which is an item of dma_transfer_direction enum.
 
-Ah, yes, so the binutils 2.27 (Ubuntu package: 2.27-8ubuntu2).
+Replace DMA_MEM_TO_DEV (which value is 1) with DMA_TO_DEVICE (which
+value is fortunately also 1) when calling dma_map_sg() and
+dma_unmap_sg().
 
-However Ard mentioned that this is already fixed.
+Signed-off-by: Nicolas Iooss <nicolas.iooss_linux@m4x.org>
+---
+ drivers/crypto/img-hash.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Best regards,
-Krzysztof
+diff --git a/drivers/crypto/img-hash.c b/drivers/crypto/img-hash.c
+index a2e77b87485b..9b07f3d88feb 100644
+--- a/drivers/crypto/img-hash.c
++++ b/drivers/crypto/img-hash.c
+@@ -226,7 +226,7 @@ static int img_hash_xmit_dma(struct img_hash_dev *hdev, struct scatterlist *sg)
+ 	struct dma_async_tx_descriptor *desc;
+ 	struct img_hash_request_ctx *ctx = ahash_request_ctx(hdev->req);
+ 
+-	ctx->dma_ct = dma_map_sg(hdev->dev, sg, 1, DMA_MEM_TO_DEV);
++	ctx->dma_ct = dma_map_sg(hdev->dev, sg, 1, DMA_TO_DEVICE);
+ 	if (ctx->dma_ct == 0) {
+ 		dev_err(hdev->dev, "Invalid DMA sg\n");
+ 		hdev->err = -EINVAL;
+@@ -241,7 +241,7 @@ static int img_hash_xmit_dma(struct img_hash_dev *hdev, struct scatterlist *sg)
+ 	if (!desc) {
+ 		dev_err(hdev->dev, "Null DMA descriptor\n");
+ 		hdev->err = -EINVAL;
+-		dma_unmap_sg(hdev->dev, sg, 1, DMA_MEM_TO_DEV);
++		dma_unmap_sg(hdev->dev, sg, 1, DMA_TO_DEVICE);
+ 		return -EINVAL;
+ 	}
+ 	desc->callback = img_hash_dma_callback;
+-- 
+2.11.0
