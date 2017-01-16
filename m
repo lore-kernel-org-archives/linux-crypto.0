@@ -1,77 +1,63 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [PATCH 1/2] crypto: aead AF_ALG - overhaul memory management
-Date: Mon, 16 Jan 2017 14:41:06 +0100
-Message-ID: <6456701.gclSaKxeL3@positron.chronox.de>
-References: <1486189.x0AQ4O6r2j@positron.chronox.de> <2278925.gEXngSfgVI@positron.chronox.de> <20170113112539.GA23928@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
-Cc: linux-crypto@vger.kernel.org
+From: Nicholas Mc Guire <hofrat@osadl.org>
+Subject: [PATCH] crypto: camellia: add missing declarations
+Date: Mon, 16 Jan 2017 17:06:51 +0100
+Message-ID: <1484582811-3505-1-git-send-email-hofrat@osadl.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Nicholas Mc Guire <hofrat@osadl.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:55572 "EHLO mail.eperm.de"
+Received: from www.osadl.org ([62.245.132.105]:57611 "EHLO www.osadl.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751346AbdAPNlP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 16 Jan 2017 08:41:15 -0500
-In-Reply-To: <20170113112539.GA23928@gondor.apana.org.au>
+        id S1750863AbdAPQF5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 16 Jan 2017 11:05:57 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Freitag, 13. Januar 2017, 19:25:39 CET schrieb Herbert Xu:
+Add declarations for the camellia substitution box to allow a clean build.
 
-Hi Herbert,
+Signed-off-by: Nicholas Mc Guire <hofrat@osadl.org>
+---
+Problem reported by sparse
+arch/x86/crypto/camellia_glue.c:65:21: warning: symbol 'camellia_sp10011110' was not declared. Should it be static?
+arch/x86/crypto/camellia_glue.c:154:21: warning: symbol 'camellia_sp22000222' was not declared. Should it be static?
+arch/x86/crypto/camellia_glue.c:243:21: warning: symbol 'camellia_sp03303033' was not declared. Should it be static?
+arch/x86/crypto/camellia_glue.c:332:21: warning: symbol 'camellia_sp00444404' was not declared. Should it be static?
+arch/x86/crypto/camellia_glue.c:421:21: warning: symbol 'camellia_sp02220222' was not declared. Should it be static?
+arch/x86/crypto/camellia_glue.c:510:21: warning: symbol 'camellia_sp30333033' was not declared. Should it be static?
+arch/x86/crypto/camellia_glue.c:599:21: warning: symbol 'camellia_sp44044404' was not declared. Should it be static?
+arch/x86/crypto/camellia_glue.c:688:21: warning: symbol 'camellia_sp11101110' was not declared. Should it be static?
 
-> On Fri, Jan 13, 2017 at 12:16:27PM +0100, Stephan Müller wrote:
-> > > If you're making a single call, what guarantees the ordering?
-> > 
-> > Technically, io_submit is the syscall that triggers the recvmsg. Are you
-> > saying that this syscall does not maintain ordering? At least the man page
-> > does not add any hints that it would not (unlike the lio_list man page).
-> 
-> The code certainly does.  But my point is that you can do the
-> same thing using the current API.  Just make your list be pairs
-> of write/read and it should work.
+Patch was compile tested with: x86_64_defconfig +
+CONFIG_CRYPTO_CAMELLIA_X86_64=m
 
-Over the weekend I spend more time looking into the implementation of 
-io_submit and its data structures exchanged between user space and kernel 
-space.
+Patch is against 4.10-rc3 (localversion-next is next-20170116)
 
-During that review I was unable to find any way how an io_submit can be linked 
-to a sendmsg/sendpage operation. Therefore, I am unable to see how the 
-suggested TX/RX SGL pair can come into existence during sendmsg time.
+ arch/x86/include/asm/crypto/camellia.h | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-A TX/RX SGL pair can only come into existence during recvmsg that is triggered 
-by io_submit when the kernel learns about the amount of data it shall process. 
-That means that for sendmsg all the kernel can do is store the provided data 
-in a serial fashion in the TX SGL. During recvmsg, the kernel then takes the 
-required data from the TX SGL and processes it so that the output can be 
-stored in the RX SGL.
-
-Note, the kernel has to handle dissimilar sendmsg/recvmsg invocations, e.g. 
-sendmsg(16 bytes), sendmsg(20 bytes), sendmsg(12bytes), recvmsg(32bytes), 
-recvmsg(16 bytes). As we cannot link the sendmsg to the recvmsg calls, all the 
-kernel can do is to collect the data during sendmsg and process the parts 
-requested during recvmsg.
-
-With the patch set, I exactly do that. I have one TX SGL that is simply filled 
-with data as user space uses sendmsg to send data. At the time the recvmsg is 
-invoked and the kernel sees how much buffer the caller provides and thus knows 
-how much data it can process from the TX SGL (assuming that the kernel shall 
-fill the entire recvmsg buffer as much as possible), it performs the crypto 
-operation.
-
-After the kernel processed (parts of) the TX SGL data, it could now free up 
-the processed SGs in that SGL. That is already performed in the algif_skcipher 
-interface, but not in the algif_aead (there, the TX SGL is only freed after 
-all its components are processed). Please note that as I mentioned in the 
-intro part to the patch, I only tried to fix the RX SGL handling. If my 
-approach is accepted, I volunteer to port the algif_skcipher TX SGL handling 
-to algif_aead so that in algif_aead the TX SG entries are freed once they are 
-processed. Furthermore, I see that now there is huge code duplication 
-regarding the RX/TX SGL handling between algif_skcipher and algif_aead which 
-can than be handled with common service functions. But again, such work makes 
-only sense if the initial approach discussed above and presented with this 
-first patch set is accepted.
-
-Ciao
-Stephan
+diff --git a/arch/x86/include/asm/crypto/camellia.h b/arch/x86/include/asm/crypto/camellia.h
+index bb93333..1cb98f2 100644
+--- a/arch/x86/include/asm/crypto/camellia.h
++++ b/arch/x86/include/asm/crypto/camellia.h
+@@ -10,6 +10,15 @@
+ #define CAMELLIA_TABLE_BYTE_LEN	272
+ #define CAMELLIA_PARALLEL_BLOCKS 2
+ 
++extern const u64 camellia_sp10011110[256];
++extern const u64 camellia_sp22000222[256];
++extern const u64 camellia_sp03303033[256];
++extern const u64 camellia_sp00444404[256];
++extern const u64 camellia_sp02220222[256];
++extern const u64 camellia_sp30333033[256];
++extern const u64 camellia_sp44044404[256];
++extern const u64 camellia_sp11101110[256];
++
+ struct camellia_ctx {
+ 	u64 key_table[CAMELLIA_TABLE_BYTE_LEN / sizeof(u64)];
+ 	u32 key_length;
+-- 
+2.1.4
