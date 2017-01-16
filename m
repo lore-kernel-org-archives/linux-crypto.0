@@ -1,50 +1,65 @@
-From: Nicolas Iooss <nicolas.iooss_linux@m4x.org>
-Subject: [PATCH 1/1] crypto: img-hash - use dma_data_direction when calling dma_map_sg
-Date: Sun, 15 Jan 2017 13:37:50 +0100
-Message-ID: <20170115123750.3010-1-nicolas.iooss_linux@m4x.org>
-Cc: linux-kernel@vger.kernel.org,
-        Nicolas Iooss <nicolas.iooss_linux@m4x.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Binoy Jayan <binoy.jayan@linaro.org>
+Subject: Re: [RFC PATCH 6/6] dm-crypt: Add bulk crypto processing support
+Date: Mon, 16 Jan 2017 14:07:37 +0530
+Message-ID: <CAHv-k_92j=C8AOzfFzyuiJO=NXWh=zP3=N8MqdyqSUUZf9Hzzw@mail.gmail.com>
+References: <cover.1484215956.git.omosnacek@gmail.com> <75887e6759ac308a017c83b7fa377516dcd5e2a3.1484215956.git.omosnacek@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org, dm-devel@redhat.com,
+        Mike Snitzer <snitzer@redhat.com>,
+        Milan Broz <gmazyland@gmail.com>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        Mark Brown <broonie@kernel.org>, Arnd Bergmann <arnd@arndb.de>
+To: Ondrej Mosnacek <omosnacek@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-vk0-f51.google.com ([209.85.213.51]:34416 "EHLO
+        mail-vk0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751075AbdAPIho (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 16 Jan 2017 03:37:44 -0500
+Received: by mail-vk0-f51.google.com with SMTP id r136so69045672vke.1
+        for <linux-crypto@vger.kernel.org>; Mon, 16 Jan 2017 00:37:43 -0800 (PST)
+In-Reply-To: <75887e6759ac308a017c83b7fa377516dcd5e2a3.1484215956.git.omosnacek@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The fourth argument of dma_map_sg() and dma_unmap_sg() is an item of
-dma_data_direction enum. Function img_hash_xmit_dma() wrongly used
-DMA_MEM_TO_DEV, which is an item of dma_transfer_direction enum.
+Hi Ondrej,
 
-Replace DMA_MEM_TO_DEV (which value is 1) with DMA_TO_DEVICE (which
-value is fortunately also 1) when calling dma_map_sg() and
-dma_unmap_sg().
+On 12 January 2017 at 18:29, Ondrej Mosnacek <omosnacek@gmail.com> wrote:
+> This patch converts dm-crypt to use bulk requests when invoking skcipher
+> operations, allowing the crypto drivers to process multiple sectors at once,
+> while reducing the overhead caused by the small sector size.
+>
+> The new code detects if multiple sectors from a bio are contigously stored
+> within a single page (which should almost always be the case), and in such case
+> processes all these sectors via a single bulk request.
+>
+> Note that the bio can also consist of several (likely consecutive) pages, which
+> could be all bundled in a single request. However, since we need to specify an
+> upper bound on how many sectors we are going to send at once (and this bound
+> may affect the amount of memory allocated per single request), it is best to
+> just limit the request bundling to a single page.
 
-Signed-off-by: Nicolas Iooss <nicolas.iooss_linux@m4x.org>
----
- drivers/crypto/img-hash.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+The initial goal of our proposal was to process the encryption requests with the
+maximum possible block sizes with a hardware which has automated iv generation
+capabilities. But when it is done in software, and if the bulk
+requests are processed
+sequentially, one block at a time, the memory foot print could be
+reduced even if
+the bulk request exceeds a page. While your patch looks good, there
+are couple of
+drawbacks one of which is the maximum size of a bulk request is a page. This
+could limit the capability of the crypto hardware. If the whole bio is
+processed at
+once, which is what qualcomm's version of dm-req-crypt does, it achieves an even
+better performance.
 
-diff --git a/drivers/crypto/img-hash.c b/drivers/crypto/img-hash.c
-index a2e77b87485b..9b07f3d88feb 100644
---- a/drivers/crypto/img-hash.c
-+++ b/drivers/crypto/img-hash.c
-@@ -226,7 +226,7 @@ static int img_hash_xmit_dma(struct img_hash_dev *hdev, struct scatterlist *sg)
- 	struct dma_async_tx_descriptor *desc;
- 	struct img_hash_request_ctx *ctx = ahash_request_ctx(hdev->req);
- 
--	ctx->dma_ct = dma_map_sg(hdev->dev, sg, 1, DMA_MEM_TO_DEV);
-+	ctx->dma_ct = dma_map_sg(hdev->dev, sg, 1, DMA_TO_DEVICE);
- 	if (ctx->dma_ct == 0) {
- 		dev_err(hdev->dev, "Invalid DMA sg\n");
- 		hdev->err = -EINVAL;
-@@ -241,7 +241,7 @@ static int img_hash_xmit_dma(struct img_hash_dev *hdev, struct scatterlist *sg)
- 	if (!desc) {
- 		dev_err(hdev->dev, "Null DMA descriptor\n");
- 		hdev->err = -EINVAL;
--		dma_unmap_sg(hdev->dev, sg, 1, DMA_MEM_TO_DEV);
-+		dma_unmap_sg(hdev->dev, sg, 1, DMA_TO_DEVICE);
- 		return -EINVAL;
- 	}
- 	desc->callback = img_hash_dma_callback;
--- 
-2.11.0
+> Note that if the 'keycount' parameter of the cipher specification is set to a
+> value other than 1, dm-crypt still sends only one sector in each request, since
+> in such case the neighboring sectors are encrypted with different keys.
+
+This could be avoided if the key management is done at the crypto layer.
+
+Thanks,
+Binoy
