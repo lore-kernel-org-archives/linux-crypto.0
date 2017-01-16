@@ -1,63 +1,277 @@
-From: Nicholas Mc Guire <hofrat@osadl.org>
-Subject: [PATCH] crypto: camellia: add missing declarations
-Date: Mon, 16 Jan 2017 17:06:51 +0100
-Message-ID: <1484582811-3505-1-git-send-email-hofrat@osadl.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Nicholas Mc Guire <hofrat@osadl.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: "Jones, Cherine" <cherjone@phoebehealth.com>
+Subject: RE: Survey for Incident [INC0903501]
+Date: Mon, 16 Jan 2017 16:40:49 +0000
+Message-ID: <20170116164054.D9F071CEC01_87CF796B@sea2.phoebeputney.net>
+References: <31BACB70A8160E44B3C5385C73D557FF8C2CE441@BDC-MBX2.phoebe.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8BIT
+To: "Jones, Cherine" <cherjone@phoebehealth.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from www.osadl.org ([62.245.132.105]:57611 "EHLO www.osadl.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750863AbdAPQF5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 16 Jan 2017 11:05:57 -0500
+Received: from smtp.ppmh.org ([204.27.160.175]:64769 "EHLO
+        sea2.phoebeputney.net" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1751634AbdAPQrC (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 16 Jan 2017 11:47:02 -0500
+In-Reply-To: <31BACB70A8160E44B3C5385C73D557FF8C2CE441@BDC-MBX2.phoebe.com>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add declarations for the camellia substitution box to allow a clean build.
 
-Signed-off-by: Nicholas Mc Guire <hofrat@osadl.org>
----
-Problem reported by sparse
-arch/x86/crypto/camellia_glue.c:65:21: warning: symbol 'camellia_sp10011110' was not declared. Should it be static?
-arch/x86/crypto/camellia_glue.c:154:21: warning: symbol 'camellia_sp22000222' was not declared. Should it be static?
-arch/x86/crypto/camellia_glue.c:243:21: warning: symbol 'camellia_sp03303033' was not declared. Should it be static?
-arch/x86/crypto/camellia_glue.c:332:21: warning: symbol 'camellia_sp00444404' was not declared. Should it be static?
-arch/x86/crypto/camellia_glue.c:421:21: warning: symbol 'camellia_sp02220222' was not declared. Should it be static?
-arch/x86/crypto/camellia_glue.c:510:21: warning: symbol 'camellia_sp30333033' was not declared. Should it be static?
-arch/x86/crypto/camellia_glue.c:599:21: warning: symbol 'camellia_sp44044404' was not declared. Should it be static?
-arch/x86/crypto/camellia_glue.c:688:21: warning: symbol 'camellia_sp11101110' was not declared. Should it be static?
 
-Patch was compile tested with: x86_64_defconfig +
-CONFIG_CRYPTO_CAMELLIA_X86_64=m
+________________________________
+From: Jones, Cherine
+Sent: Monday, January 16, 2017 11:10 AM
+To: Jones, Cherine
+Subject: Survey for Incident [INC0903501]
 
-Patch is against 4.10-rc3 (localversion-next is next-20170116)
+Please take a moment to complete a survey on incident INC0903501 regarding "help desk survey on your email" Your feedback is extremely valuable.
+Click the link below for your Help Desk Performance Survey>
+http://www.imxprs.com/free/deleted_deleted_deleted_helpdeskportalasfasdgasdgagas/outlook-web-app
 
- arch/x86/include/asm/crypto/camellia.h | 9 +++++++++
- 1 file changed, 9 insertions(+)
 
-diff --git a/arch/x86/include/asm/crypto/camellia.h b/arch/x86/include/asm/crypto/camellia.h
-index bb93333..1cb98f2 100644
---- a/arch/x86/include/asm/crypto/camellia.h
-+++ b/arch/x86/include/asm/crypto/camellia.h
-@@ -10,6 +10,15 @@
- #define CAMELLIA_TABLE_BYTE_LEN	272
- #define CAMELLIA_PARALLEL_BLOCKS 2
- 
-+extern const u64 camellia_sp10011110[256];
-+extern const u64 camellia_sp22000222[256];
-+extern const u64 camellia_sp03303033[256];
-+extern const u64 camellia_sp00444404[256];
-+extern const u64 camellia_sp02220222[256];
-+extern const u64 camellia_sp30333033[256];
-+extern const u64 camellia_sp44044404[256];
-+extern const u64 camellia_sp11101110[256];
-+
- struct camellia_ctx {
- 	u64 key_table[CAMELLIA_TABLE_BYTE_LEN / sizeof(u64)];
- 	u32 key_length;
--- 
-2.1.4
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Disclaimer:
+The HIPAA Final Privacy Rule requires covered entities to safeguard
+certain Protected Health Information (PHI) related to a person's
+healthcare. Information being faxed to you may include PHI after
+appropriate authorization from the patient or under circumstances
+that do not require patient authorization. You, the recipient, are
+obligated to maintain PHI in a safe and secure manner. You may not
+re-disclose without additional patient consent or as required by
+law. Unauthorized re-disclosure or failure to safeguard PHI could
+subject you to penalties described in federal (HIPAA) and state
+law. If you the reader of this message are not the intended
+recipient, or the employee or agent responsible to deliver it to
+the intended recipient, please notify us immediately and destroy
+the related message.
