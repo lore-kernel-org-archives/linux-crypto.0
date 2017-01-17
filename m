@@ -1,57 +1,219 @@
-From: =?UTF-8?B?T25kcmVqIE1vc27DocSNZWs=?= <omosnacek@gmail.com>
-Subject: Re: [RFC PATCH 0/6] Add bulk skcipher requests to crypto API and dm-crypt
-Date: Tue, 17 Jan 2017 12:20:02 +0100
-Message-ID: <CAAUqJDsrFp2CczN5Gyy=rYLSDKi7=vQTQoyh=pE1kWue=c=fvw@mail.gmail.com>
-References: <cover.1484215956.git.omosnacek@gmail.com> <20170113104128.GA23497@gondor.apana.org.au>
- <CAAUqJDtqN-ugcaz4VhuW0fzLbmKt4db8ggrRmaAq_zFvO+9Lvw@mail.gmail.com> <20170113142959.GA24258@gondor.apana.org.au>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH] crypto: arm64/aes-blk - honour iv_out requirement in CBC and
+ CTR modes
+Date: Tue, 17 Jan 2017 13:46:29 +0000
+Message-ID: <1484660789-7036-1-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-crypto@vger.kernel.org, dm-devel@redhat.com,
-        Mike Snitzer <snitzer@redhat.com>,
-        Milan Broz <gmazyland@gmail.com>,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        Binoy Jayan <binoy.jayan@linaro.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-lf0-f67.google.com ([209.85.215.67]:36121 "EHLO
-        mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750747AbdAQLUZ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 Jan 2017 06:20:25 -0500
-Received: by mail-lf0-f67.google.com with SMTP id h65so15754869lfi.3
-        for <linux-crypto@vger.kernel.org>; Tue, 17 Jan 2017 03:20:24 -0800 (PST)
-In-Reply-To: <20170113142959.GA24258@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: linux-arm-kernel@lists.infradead.org,
+ Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: herbert@gondor.apana.org.au,
+	linux-crypto@vger.kernel.org
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-2017-01-13 15:29 GMT+01:00 Herbert Xu <herbert@gondor.apana.org.au>:
-> What if the driver had hardware support for generating these IVs?
-> With your scheme this cannot be supported at all.
+Update the ARMv8 Crypto Extensions and the plain NEON AES implementations
+in CBC and CTR modes to return the next IV back to the skcipher API client.
+This is necessary for chaining to work correctly.
 
-That's true... I'm starting to think that this isn't really a good
-idea. I was mainly trying to keep the door open for the random IV
-support and also to keep the multi-key stuff (which was really only
-intended for loop-AES partition support) out of the crypto API, but
-both of these can be probably solved in a better way...
+Note that for CTR, this is only done if the request is a round multiple of
+the block size, since otherwise, chaining is impossible anyway.
 
-> Getting the IVs back is not actually that hard.  We could simply
-> change the algorithm definition for the IV generator so that
-> the IVs are embedded in the plaintext and ciphertext.  For
-> example, you could declare it so that the for n sectors the
-> first n*ivsize bytes would be the IV, and the actual plaintext
-> or ciphertext would follow.
->
-> With such a definition you could either generate the IVs in dm-crypt
-> or have them generated in the IV generator.
+Cc: <stable@vger.kernel.org> # v3.16+
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+ arch/arm64/crypto/aes-modes.S | 88 ++++++++++----------
+ 1 file changed, 42 insertions(+), 46 deletions(-)
 
-That seems kind of hacky to me... but if that's what you prefer, then so be it.
-
-Cheers,
-Ondrej
-
->
-> Cheers,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+diff --git a/arch/arm64/crypto/aes-modes.S b/arch/arm64/crypto/aes-modes.S
+index c53dbeae79f2..838dad5c209f 100644
+--- a/arch/arm64/crypto/aes-modes.S
++++ b/arch/arm64/crypto/aes-modes.S
+@@ -193,15 +193,16 @@ AES_ENTRY(aes_cbc_encrypt)
+ 	cbz		w6, .Lcbcencloop
+ 
+ 	ld1		{v0.16b}, [x5]			/* get iv */
+-	enc_prepare	w3, x2, x5
++	enc_prepare	w3, x2, x6
+ 
+ .Lcbcencloop:
+ 	ld1		{v1.16b}, [x1], #16		/* get next pt block */
+ 	eor		v0.16b, v0.16b, v1.16b		/* ..and xor with iv */
+-	encrypt_block	v0, w3, x2, x5, w6
++	encrypt_block	v0, w3, x2, x6, w7
+ 	st1		{v0.16b}, [x0], #16
+ 	subs		w4, w4, #1
+ 	bne		.Lcbcencloop
++	st1		{v0.16b}, [x5]			/* return iv */
+ 	ret
+ AES_ENDPROC(aes_cbc_encrypt)
+ 
+@@ -211,7 +212,7 @@ AES_ENTRY(aes_cbc_decrypt)
+ 	cbz		w6, .LcbcdecloopNx
+ 
+ 	ld1		{v7.16b}, [x5]			/* get iv */
+-	dec_prepare	w3, x2, x5
++	dec_prepare	w3, x2, x6
+ 
+ .LcbcdecloopNx:
+ #if INTERLEAVE >= 2
+@@ -248,7 +249,7 @@ AES_ENTRY(aes_cbc_decrypt)
+ .Lcbcdecloop:
+ 	ld1		{v1.16b}, [x1], #16		/* get next ct block */
+ 	mov		v0.16b, v1.16b			/* ...and copy to v0 */
+-	decrypt_block	v0, w3, x2, x5, w6
++	decrypt_block	v0, w3, x2, x6, w7
+ 	eor		v0.16b, v0.16b, v7.16b		/* xor with iv => pt */
+ 	mov		v7.16b, v1.16b			/* ct is next iv */
+ 	st1		{v0.16b}, [x0], #16
+@@ -256,6 +257,7 @@ AES_ENTRY(aes_cbc_decrypt)
+ 	bne		.Lcbcdecloop
+ .Lcbcdecout:
+ 	FRAME_POP
++	st1		{v7.16b}, [x5]			/* return iv */
+ 	ret
+ AES_ENDPROC(aes_cbc_decrypt)
+ 
+@@ -267,24 +269,15 @@ AES_ENDPROC(aes_cbc_decrypt)
+ 
+ AES_ENTRY(aes_ctr_encrypt)
+ 	FRAME_PUSH
+-	cbnz		w6, .Lctrfirst		/* 1st time around? */
+-	umov		x5, v4.d[1]		/* keep swabbed ctr in reg */
+-	rev		x5, x5
+-#if INTERLEAVE >= 2
+-	cmn		w5, w4			/* 32 bit overflow? */
+-	bcs		.Lctrinc
+-	add		x5, x5, #1		/* increment BE ctr */
+-	b		.LctrincNx
+-#else
+-	b		.Lctrinc
+-#endif
+-.Lctrfirst:
++	cbz		w6, .Lctrnotfirst	/* 1st time around? */
+ 	enc_prepare	w3, x2, x6
+ 	ld1		{v4.16b}, [x5]
+-	umov		x5, v4.d[1]		/* keep swabbed ctr in reg */
+-	rev		x5, x5
++
++.Lctrnotfirst:
++	umov		x8, v4.d[1]		/* keep swabbed ctr in reg */
++	rev		x8, x8
+ #if INTERLEAVE >= 2
+-	cmn		w5, w4			/* 32 bit overflow? */
++	cmn		w8, w4			/* 32 bit overflow? */
+ 	bcs		.Lctrloop
+ .LctrloopNx:
+ 	subs		w4, w4, #INTERLEAVE
+@@ -292,11 +285,11 @@ AES_ENTRY(aes_ctr_encrypt)
+ #if INTERLEAVE == 2
+ 	mov		v0.8b, v4.8b
+ 	mov		v1.8b, v4.8b
+-	rev		x7, x5
+-	add		x5, x5, #1
++	rev		x7, x8
++	add		x8, x8, #1
+ 	ins		v0.d[1], x7
+-	rev		x7, x5
+-	add		x5, x5, #1
++	rev		x7, x8
++	add		x8, x8, #1
+ 	ins		v1.d[1], x7
+ 	ld1		{v2.16b-v3.16b}, [x1], #32	/* get 2 input blocks */
+ 	do_encrypt_block2x
+@@ -305,7 +298,7 @@ AES_ENTRY(aes_ctr_encrypt)
+ 	st1		{v0.16b-v1.16b}, [x0], #32
+ #else
+ 	ldr		q8, =0x30000000200000001	/* addends 1,2,3[,0] */
+-	dup		v7.4s, w5
++	dup		v7.4s, w8
+ 	mov		v0.16b, v4.16b
+ 	add		v7.4s, v7.4s, v8.4s
+ 	mov		v1.16b, v4.16b
+@@ -323,18 +316,12 @@ AES_ENTRY(aes_ctr_encrypt)
+ 	eor		v2.16b, v7.16b, v2.16b
+ 	eor		v3.16b, v5.16b, v3.16b
+ 	st1		{v0.16b-v3.16b}, [x0], #64
+-	add		x5, x5, #INTERLEAVE
++	add		x8, x8, #INTERLEAVE
+ #endif
+-	cbz		w4, .LctroutNx
+-.LctrincNx:
+-	rev		x7, x5
++	rev		x7, x8
+ 	ins		v4.d[1], x7
++	cbz		w4, .Lctrout
+ 	b		.LctrloopNx
+-.LctroutNx:
+-	sub		x5, x5, #1
+-	rev		x7, x5
+-	ins		v4.d[1], x7
+-	b		.Lctrout
+ .Lctr1x:
+ 	adds		w4, w4, #INTERLEAVE
+ 	beq		.Lctrout
+@@ -342,30 +329,39 @@ AES_ENTRY(aes_ctr_encrypt)
+ .Lctrloop:
+ 	mov		v0.16b, v4.16b
+ 	encrypt_block	v0, w3, x2, x6, w7
++
++	adds		x8, x8, #1		/* increment BE ctr */
++	rev		x7, x8
++	ins		v4.d[1], x7
++	bcs		.Lctrcarry		/* overflow? */
++
++.Lctrcarrydone:
+ 	subs		w4, w4, #1
+ 	bmi		.Lctrhalfblock		/* blocks < 0 means 1/2 block */
+ 	ld1		{v3.16b}, [x1], #16
+ 	eor		v3.16b, v0.16b, v3.16b
+ 	st1		{v3.16b}, [x0], #16
+-	beq		.Lctrout
+-.Lctrinc:
+-	adds		x5, x5, #1		/* increment BE ctr */
+-	rev		x7, x5
+-	ins		v4.d[1], x7
+-	bcc		.Lctrloop		/* no overflow? */
+-	umov		x7, v4.d[0]		/* load upper word of ctr  */
+-	rev		x7, x7			/* ... to handle the carry */
+-	add		x7, x7, #1
+-	rev		x7, x7
+-	ins		v4.d[0], x7
+-	b		.Lctrloop
++	bne		.Lctrloop
++
++.Lctrout:
++	st1		{v4.16b}, [x5]		/* return next CTR value */
++	FRAME_POP
++	ret
++
+ .Lctrhalfblock:
+ 	ld1		{v3.8b}, [x1]
+ 	eor		v3.8b, v0.8b, v3.8b
+ 	st1		{v3.8b}, [x0]
+-.Lctrout:
+ 	FRAME_POP
+ 	ret
++
++.Lctrcarry:
++	umov		x7, v4.d[0]		/* load upper word of ctr  */
++	rev		x7, x7			/* ... to handle the carry */
++	add		x7, x7, #1
++	rev		x7, x7
++	ins		v4.d[0], x7
++	b		.Lctrcarrydone
+ AES_ENDPROC(aes_ctr_encrypt)
+ 	.ltorg
+ 
+-- 
+2.7.4
