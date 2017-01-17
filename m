@@ -1,129 +1,390 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH 10/10] crypto: arm64/aes - replace scalar fallback with plain NEON fallback
-Date: Tue, 17 Jan 2017 15:22:37 +0000
-Message-ID: <1484666557-31458-11-git-send-email-ard.biesheuvel@linaro.org>
+Subject: [PATCH 09/10] crypto: arm64/aes-neon-blk - tweak performance for low end cores
+Date: Tue, 17 Jan 2017 15:22:36 +0000
+Message-ID: <1484666557-31458-10-git-send-email-ard.biesheuvel@linaro.org>
 References: <1484666557-31458-1-git-send-email-ard.biesheuvel@linaro.org>
 Cc: linux-arm-kernel@lists.infradead.org,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f48.google.com ([74.125.82.48]:35459 "EHLO
-        mail-wm0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750924AbdAQPX4 (ORCPT
+Received: from mail-wm0-f50.google.com ([74.125.82.50]:38586 "EHLO
+        mail-wm0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750920AbdAQPX4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Tue, 17 Jan 2017 10:23:56 -0500
-Received: by mail-wm0-f48.google.com with SMTP id r126so205377522wmr.0
-        for <linux-crypto@vger.kernel.org>; Tue, 17 Jan 2017 07:23:13 -0800 (PST)
+Received: by mail-wm0-f50.google.com with SMTP id r144so227526415wme.1
+        for <linux-crypto@vger.kernel.org>; Tue, 17 Jan 2017 07:23:11 -0800 (PST)
 In-Reply-To: <1484666557-31458-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The new bitsliced NEON implementation of AES uses a fallback in two
-places: CBC encryption (which is strictly sequential, whereas this
-driver can only operate efficiently on 8 blocks at a time), and the
-XTS tweak generation, which involves encrypting a single AES block
-with a different key schedule.
+The non-bitsliced AES implementation using the NEON is highly sensitive
+to micro-architectural details, and, as it turns out, the Cortex-A53 on
+the Raspberry Pi 3 is a core that can benefit from this code, given that
+its scalar AES performance is abysmal (32.9 cycles per byte).
 
-The plain (i.e., non-bitsliced) NEON code is more suitable as a fallback,
-given that it is faster than scalar on low end cores (which is what
-the NEON implementations target, since high end cores have dedicated
-instructions for AES), and shows similar behavior in terms of D-cache
-footprint and sensitivity to cache timing attacks. So switch the fallback
-handling to the plain NEON driver.
+The new bitsliced AES code manages 19.8 cycles per byte on this core,
+but can only operate on 8 blocks at a time, which is not supported by
+all chaining modes. With a bit of tweaking, we can get the plain NEON
+code to run at 24.0 cycles per byte, making it useful for sequential
+modes like CBC encryption. (Like bitsliced NEON, the plain NEON
+implementation does not use any lookup tables, which makes it easy on
+the D-cache, and invulnerable to cache timing attacks)
+
+So tweak the plain NEON AES code to use tbl instructions rather than
+shl/sri pairs, and to avoid the need to reload permutation vectors or
+other constants from memory in every round.
+
+To allow the ECB and CBC encrypt routines to be reused by the bitsliced
+NEON code in a subsequent patch, export them from the module.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm64/crypto/Kconfig           |  2 +-
- arch/arm64/crypto/aes-neonbs-glue.c | 38 ++++++++++++++------
- 2 files changed, 29 insertions(+), 11 deletions(-)
+ arch/arm64/crypto/aes-glue.c |   2 +
+ arch/arm64/crypto/aes-neon.S | 199 ++++++++------------
+ 2 files changed, 77 insertions(+), 124 deletions(-)
 
-diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
-index 5de75c3dcbd4..bed7feddfeed 100644
---- a/arch/arm64/crypto/Kconfig
-+++ b/arch/arm64/crypto/Kconfig
-@@ -86,7 +86,7 @@ config CRYPTO_AES_ARM64_BS
- 	tristate "AES in ECB/CBC/CTR/XTS modes using bit-sliced NEON algorithm"
- 	depends on KERNEL_MODE_NEON
- 	select CRYPTO_BLKCIPHER
--	select CRYPTO_AES_ARM64
-+	select CRYPTO_AES_ARM64_NEON_BLK
- 	select CRYPTO_SIMD
+diff --git a/arch/arm64/crypto/aes-glue.c b/arch/arm64/crypto/aes-glue.c
+index 8ee1fb7aaa4f..055bc3f61138 100644
+--- a/arch/arm64/crypto/aes-glue.c
++++ b/arch/arm64/crypto/aes-glue.c
+@@ -409,5 +409,7 @@ static int __init aes_init(void)
+ module_cpu_feature_match(AES, aes_init);
+ #else
+ module_init(aes_init);
++EXPORT_SYMBOL(neon_aes_ecb_encrypt);
++EXPORT_SYMBOL(neon_aes_cbc_encrypt);
+ #endif
+ module_exit(aes_exit);
+diff --git a/arch/arm64/crypto/aes-neon.S b/arch/arm64/crypto/aes-neon.S
+index 85f07ead7c5c..67c68462bc20 100644
+--- a/arch/arm64/crypto/aes-neon.S
++++ b/arch/arm64/crypto/aes-neon.S
+@@ -1,7 +1,7 @@
+ /*
+  * linux/arch/arm64/crypto/aes-neon.S - AES cipher for ARMv8 NEON
+  *
+- * Copyright (C) 2013 Linaro Ltd <ard.biesheuvel@linaro.org>
++ * Copyright (C) 2013 - 2017 Linaro Ltd. <ard.biesheuvel@linaro.org>
+  *
+  * This program is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License version 2 as
+@@ -25,9 +25,9 @@
+ 	/* preload the entire Sbox */
+ 	.macro		prepare, sbox, shiftrows, temp
+ 	adr		\temp, \sbox
+-	movi		v12.16b, #0x40
++	movi		v12.16b, #0x1b
+ 	ldr		q13, \shiftrows
+-	movi		v14.16b, #0x1b
++	ldr		q14, .Lror32by8
+ 	ld1		{v16.16b-v19.16b}, [\temp], #64
+ 	ld1		{v20.16b-v23.16b}, [\temp], #64
+ 	ld1		{v24.16b-v27.16b}, [\temp], #64
+@@ -50,37 +50,33 @@
  
- endif
-diff --git a/arch/arm64/crypto/aes-neonbs-glue.c b/arch/arm64/crypto/aes-neonbs-glue.c
-index 323dd76ae5f0..863e436ecf89 100644
---- a/arch/arm64/crypto/aes-neonbs-glue.c
-+++ b/arch/arm64/crypto/aes-neonbs-glue.c
-@@ -10,7 +10,6 @@
+ 	/* apply SubBytes transformation using the the preloaded Sbox */
+ 	.macro		sub_bytes, in
+-	sub		v9.16b, \in\().16b, v12.16b
++	sub		v9.16b, \in\().16b, v15.16b
+ 	tbl		\in\().16b, {v16.16b-v19.16b}, \in\().16b
+-	sub		v10.16b, v9.16b, v12.16b
++	sub		v10.16b, v9.16b, v15.16b
+ 	tbx		\in\().16b, {v20.16b-v23.16b}, v9.16b
+-	sub		v11.16b, v10.16b, v12.16b
++	sub		v11.16b, v10.16b, v15.16b
+ 	tbx		\in\().16b, {v24.16b-v27.16b}, v10.16b
+ 	tbx		\in\().16b, {v28.16b-v31.16b}, v11.16b
+ 	.endm
  
- #include <asm/neon.h>
- #include <crypto/aes.h>
--#include <crypto/cbc.h>
- #include <crypto/internal/simd.h>
- #include <crypto/internal/skcipher.h>
- #include <crypto/xts.h>
-@@ -42,7 +41,12 @@ asmlinkage void aesbs_xts_encrypt(u8 out[], u8 const in[], u8 const rk[],
- asmlinkage void aesbs_xts_decrypt(u8 out[], u8 const in[], u8 const rk[],
- 				  int rounds, int blocks, u8 iv[]);
- 
--asmlinkage void __aes_arm64_encrypt(u32 *rk, u8 *out, const u8 *in, int rounds);
-+/* borrowed from aes-neon-blk.ko */
-+asmlinkage void neon_aes_ecb_encrypt(u8 out[], u8 const in[], u32 const rk[],
-+				     int rounds, int blocks, int first);
-+asmlinkage void neon_aes_cbc_encrypt(u8 out[], u8 const in[], u32 const rk[],
-+				     int rounds, int blocks, u8 iv[],
-+				     int first);
- 
- struct aesbs_ctx {
- 	u8	rk[13 * (8 * AES_BLOCK_SIZE) + 32];
-@@ -140,16 +144,28 @@ static int aesbs_cbc_setkey(struct crypto_skcipher *tfm, const u8 *in_key,
- 	return 0;
- }
- 
--static void cbc_encrypt_one(struct crypto_skcipher *tfm, const u8 *src, u8 *dst)
-+static int cbc_encrypt(struct skcipher_request *req)
- {
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
- 	struct aesbs_cbc_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	struct skcipher_walk walk;
-+	int err, first = 1;
- 
--	__aes_arm64_encrypt(ctx->enc, dst, src, ctx->key.rounds);
--}
-+	err = skcipher_walk_virt(&walk, req, true);
- 
--static int cbc_encrypt(struct skcipher_request *req)
--{
--	return crypto_cbc_encrypt_walk(req, cbc_encrypt_one);
-+	kernel_neon_begin();
-+	while (walk.nbytes >= AES_BLOCK_SIZE) {
-+		unsigned int blocks = walk.nbytes / AES_BLOCK_SIZE;
-+
-+		/* fall back to the non-bitsliced NEON implementation */
-+		neon_aes_cbc_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
-+				     ctx->enc, ctx->key.rounds, blocks, walk.iv,
-+				     first);
-+		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
-+		first = 0;
-+	}
-+	kernel_neon_end();
-+	return err;
- }
- 
- static int cbc_decrypt(struct skcipher_request *req)
-@@ -254,9 +270,11 @@ static int __xts_crypt(struct skcipher_request *req,
- 
- 	err = skcipher_walk_virt(&walk, req, true);
- 
--	__aes_arm64_encrypt(ctx->twkey, walk.iv, walk.iv, ctx->key.rounds);
+ 	/* apply MixColumns transformation */
+-	.macro		mix_columns, in
+-	mul_by_x	v10.16b, \in\().16b, v9.16b, v14.16b
+-	rev32		v8.8h, \in\().8h
+-	eor		\in\().16b, v10.16b, \in\().16b
+-	shl		v9.4s, v8.4s, #24
+-	shl		v11.4s, \in\().4s, #24
+-	sri		v9.4s, v8.4s, #8
+-	sri		v11.4s, \in\().4s, #8
+-	eor		v9.16b, v9.16b, v8.16b
+-	eor		v10.16b, v10.16b, v9.16b
+-	eor		\in\().16b, v10.16b, v11.16b
+-	.endm
 -
- 	kernel_neon_begin();
++	.macro		mix_columns, in, enc
++	.if		\enc == 0
+ 	/* Inverse MixColumns: pre-multiply by { 5, 0, 4, 0 } */
+-	.macro		inv_mix_columns, in
+-	mul_by_x	v11.16b, \in\().16b, v10.16b, v14.16b
+-	mul_by_x	v11.16b, v11.16b, v10.16b, v14.16b
++	mul_by_x	v11.16b, \in\().16b, v10.16b, v12.16b
++	mul_by_x	v11.16b, v11.16b, v10.16b, v12.16b
+ 	eor		\in\().16b, \in\().16b, v11.16b
+ 	rev32		v11.8h, v11.8h
+ 	eor		\in\().16b, \in\().16b, v11.16b
+-	mix_columns	\in
++	.endif
 +
-+	neon_aes_ecb_encrypt(walk.iv, walk.iv, ctx->twkey,
-+			     ctx->key.rounds, 1, 1);
-+
- 	while (walk.nbytes >= AES_BLOCK_SIZE) {
- 		unsigned int blocks = walk.nbytes / AES_BLOCK_SIZE;
++	mul_by_x	v10.16b, \in\().16b, v9.16b, v12.16b
++	rev32		v8.8h, \in\().8h
++	eor		\in\().16b, \in\().16b, v10.16b
++	eor		v10.16b, v10.16b, v8.16b
++	eor		v11.16b, \in\().16b, v8.16b
++	tbl		v11.16b, {v11.16b}, v14.16b
++	eor		\in\().16b, v10.16b, v11.16b
+ 	.endm
  
+ 	.macro		do_block, enc, in, rounds, rk, rkp, i
+@@ -88,16 +84,13 @@
+ 	add		\rkp, \rk, #16
+ 	mov		\i, \rounds
+ 1111:	eor		\in\().16b, \in\().16b, v15.16b		/* ^round key */
++	movi		v15.16b, #0x40
+ 	tbl		\in\().16b, {\in\().16b}, v13.16b	/* ShiftRows */
+ 	sub_bytes	\in
+-	ld1		{v15.4s}, [\rkp], #16
+ 	subs		\i, \i, #1
++	ld1		{v15.4s}, [\rkp], #16
+ 	beq		2222f
+-	.if		\enc == 1
+-	mix_columns	\in
+-	.else
+-	inv_mix_columns	\in
+-	.endif
++	mix_columns	\in, \enc
+ 	b		1111b
+ 2222:	eor		\in\().16b, \in\().16b, v15.16b		/* ^round key */
+ 	.endm
+@@ -116,48 +109,48 @@
+ 	 */
+ 
+ 	.macro		sub_bytes_2x, in0, in1
+-	sub		v8.16b, \in0\().16b, v12.16b
+-	sub		v9.16b, \in1\().16b, v12.16b
++	sub		v8.16b, \in0\().16b, v15.16b
+ 	tbl		\in0\().16b, {v16.16b-v19.16b}, \in0\().16b
++	sub		v9.16b, \in1\().16b, v15.16b
+ 	tbl		\in1\().16b, {v16.16b-v19.16b}, \in1\().16b
+-	sub		v10.16b, v8.16b, v12.16b
+-	sub		v11.16b, v9.16b, v12.16b
++	sub		v10.16b, v8.16b, v15.16b
+ 	tbx		\in0\().16b, {v20.16b-v23.16b}, v8.16b
++	sub		v11.16b, v9.16b, v15.16b
+ 	tbx		\in1\().16b, {v20.16b-v23.16b}, v9.16b
+-	sub		v8.16b, v10.16b, v12.16b
+-	sub		v9.16b, v11.16b, v12.16b
++	sub		v8.16b, v10.16b, v15.16b
+ 	tbx		\in0\().16b, {v24.16b-v27.16b}, v10.16b
++	sub		v9.16b, v11.16b, v15.16b
+ 	tbx		\in1\().16b, {v24.16b-v27.16b}, v11.16b
+ 	tbx		\in0\().16b, {v28.16b-v31.16b}, v8.16b
+ 	tbx		\in1\().16b, {v28.16b-v31.16b}, v9.16b
+ 	.endm
+ 
+ 	.macro		sub_bytes_4x, in0, in1, in2, in3
+-	sub		v8.16b, \in0\().16b, v12.16b
++	sub		v8.16b, \in0\().16b, v15.16b
+ 	tbl		\in0\().16b, {v16.16b-v19.16b}, \in0\().16b
+-	sub		v9.16b, \in1\().16b, v12.16b
++	sub		v9.16b, \in1\().16b, v15.16b
+ 	tbl		\in1\().16b, {v16.16b-v19.16b}, \in1\().16b
+-	sub		v10.16b, \in2\().16b, v12.16b
++	sub		v10.16b, \in2\().16b, v15.16b
+ 	tbl		\in2\().16b, {v16.16b-v19.16b}, \in2\().16b
+-	sub		v11.16b, \in3\().16b, v12.16b
++	sub		v11.16b, \in3\().16b, v15.16b
+ 	tbl		\in3\().16b, {v16.16b-v19.16b}, \in3\().16b
+ 	tbx		\in0\().16b, {v20.16b-v23.16b}, v8.16b
+ 	tbx		\in1\().16b, {v20.16b-v23.16b}, v9.16b
+-	sub		v8.16b, v8.16b, v12.16b
++	sub		v8.16b, v8.16b, v15.16b
+ 	tbx		\in2\().16b, {v20.16b-v23.16b}, v10.16b
+-	sub		v9.16b, v9.16b, v12.16b
++	sub		v9.16b, v9.16b, v15.16b
+ 	tbx		\in3\().16b, {v20.16b-v23.16b}, v11.16b
+-	sub		v10.16b, v10.16b, v12.16b
++	sub		v10.16b, v10.16b, v15.16b
+ 	tbx		\in0\().16b, {v24.16b-v27.16b}, v8.16b
+-	sub		v11.16b, v11.16b, v12.16b
++	sub		v11.16b, v11.16b, v15.16b
+ 	tbx		\in1\().16b, {v24.16b-v27.16b}, v9.16b
+-	sub		v8.16b, v8.16b, v12.16b
++	sub		v8.16b, v8.16b, v15.16b
+ 	tbx		\in2\().16b, {v24.16b-v27.16b}, v10.16b
+-	sub		v9.16b, v9.16b, v12.16b
++	sub		v9.16b, v9.16b, v15.16b
+ 	tbx		\in3\().16b, {v24.16b-v27.16b}, v11.16b
+-	sub		v10.16b, v10.16b, v12.16b
++	sub		v10.16b, v10.16b, v15.16b
+ 	tbx		\in0\().16b, {v28.16b-v31.16b}, v8.16b
+-	sub		v11.16b, v11.16b, v12.16b
++	sub		v11.16b, v11.16b, v15.16b
+ 	tbx		\in1\().16b, {v28.16b-v31.16b}, v9.16b
+ 	tbx		\in2\().16b, {v28.16b-v31.16b}, v10.16b
+ 	tbx		\in3\().16b, {v28.16b-v31.16b}, v11.16b
+@@ -174,59 +167,32 @@
+ 	eor		\out1\().16b, \out1\().16b, \tmp1\().16b
+ 	.endm
+ 
+-	.macro		mix_columns_2x, in0, in1
+-	mul_by_x_2x	v8, v9, \in0, \in1, v10, v11, v14
+-	rev32		v10.8h, \in0\().8h
+-	rev32		v11.8h, \in1\().8h
+-	eor		\in0\().16b, v8.16b, \in0\().16b
+-	eor		\in1\().16b, v9.16b, \in1\().16b
+-	shl		v12.4s, v10.4s, #24
+-	shl		v13.4s, v11.4s, #24
+-	eor		v8.16b, v8.16b, v10.16b
+-	sri		v12.4s, v10.4s, #8
+-	shl		v10.4s, \in0\().4s, #24
+-	eor		v9.16b, v9.16b, v11.16b
+-	sri		v13.4s, v11.4s, #8
+-	shl		v11.4s, \in1\().4s, #24
+-	sri		v10.4s, \in0\().4s, #8
+-	eor		\in0\().16b, v8.16b, v12.16b
+-	sri		v11.4s, \in1\().4s, #8
+-	eor		\in1\().16b, v9.16b, v13.16b
+-	eor		\in0\().16b, v10.16b, \in0\().16b
+-	eor		\in1\().16b, v11.16b, \in1\().16b
+-	.endm
+-
+-	.macro		inv_mix_cols_2x, in0, in1
+-	mul_by_x_2x	v8, v9, \in0, \in1, v10, v11, v14
+-	mul_by_x_2x	v8, v9, v8, v9, v10, v11, v14
++	.macro		mix_columns_2x, in0, in1, enc
++	.if		\enc == 0
++	/* Inverse MixColumns: pre-multiply by { 5, 0, 4, 0 } */
++	mul_by_x_2x	v8, v9, \in0, \in1, v10, v11, v12
++	mul_by_x_2x	v8, v9, v8, v9, v10, v11, v12
+ 	eor		\in0\().16b, \in0\().16b, v8.16b
+-	eor		\in1\().16b, \in1\().16b, v9.16b
+ 	rev32		v8.8h, v8.8h
++	eor		\in1\().16b, \in1\().16b, v9.16b
+ 	rev32		v9.8h, v9.8h
+ 	eor		\in0\().16b, \in0\().16b, v8.16b
+ 	eor		\in1\().16b, \in1\().16b, v9.16b
+-	mix_columns_2x	\in0, \in1
+-	.endm
++	.endif
+ 
+-	.macro		inv_mix_cols_4x, in0, in1, in2, in3
+-	mul_by_x_2x	v8, v9, \in0, \in1, v10, v11, v14
+-	mul_by_x_2x	v10, v11, \in2, \in3, v12, v13, v14
+-	mul_by_x_2x	v8, v9, v8, v9, v12, v13, v14
+-	mul_by_x_2x	v10, v11, v10, v11, v12, v13, v14
++	mul_by_x_2x	v8, v9, \in0, \in1, v10, v11, v12
++	rev32		v10.8h, \in0\().8h
+ 	eor		\in0\().16b, \in0\().16b, v8.16b
++	rev32		v11.8h, \in1\().8h
+ 	eor		\in1\().16b, \in1\().16b, v9.16b
+-	eor		\in2\().16b, \in2\().16b, v10.16b
+-	eor		\in3\().16b, \in3\().16b, v11.16b
+-	rev32		v8.8h, v8.8h
+-	rev32		v9.8h, v9.8h
+-	rev32		v10.8h, v10.8h
+-	rev32		v11.8h, v11.8h
++	eor		v8.16b, v8.16b, v10.16b
++	eor		\in0\().16b, \in0\().16b, v10.16b
++	eor		v9.16b, v9.16b, v11.16b
++	eor		\in1\().16b, \in1\().16b, v11.16b
++	tbl		\in0\().16b, {\in0\().16b}, v14.16b
++	tbl		\in1\().16b, {\in1\().16b}, v14.16b
+ 	eor		\in0\().16b, \in0\().16b, v8.16b
+ 	eor		\in1\().16b, \in1\().16b, v9.16b
+-	eor		\in2\().16b, \in2\().16b, v10.16b
+-	eor		\in3\().16b, \in3\().16b, v11.16b
+-	mix_columns_2x	\in0, \in1
+-	mix_columns_2x	\in2, \in3
+ 	.endm
+ 
+ 	.macro		do_block_2x, enc, in0, in1 rounds, rk, rkp, i
+@@ -235,20 +201,14 @@
+ 	mov		\i, \rounds
+ 1111:	eor		\in0\().16b, \in0\().16b, v15.16b	/* ^round key */
+ 	eor		\in1\().16b, \in1\().16b, v15.16b	/* ^round key */
+-	sub_bytes_2x	\in0, \in1
++	movi		v15.16b, #0x40
+ 	tbl		\in0\().16b, {\in0\().16b}, v13.16b	/* ShiftRows */
+ 	tbl		\in1\().16b, {\in1\().16b}, v13.16b	/* ShiftRows */
+-	ld1		{v15.4s}, [\rkp], #16
++	sub_bytes_2x	\in0, \in1
+ 	subs		\i, \i, #1
++	ld1		{v15.4s}, [\rkp], #16
+ 	beq		2222f
+-	.if		\enc == 1
+-	mix_columns_2x	\in0, \in1
+-	ldr		q13, .LForward_ShiftRows
+-	.else
+-	inv_mix_cols_2x	\in0, \in1
+-	ldr		q13, .LReverse_ShiftRows
+-	.endif
+-	movi		v12.16b, #0x40
++	mix_columns_2x	\in0, \in1, \enc
+ 	b		1111b
+ 2222:	eor		\in0\().16b, \in0\().16b, v15.16b	/* ^round key */
+ 	eor		\in1\().16b, \in1\().16b, v15.16b	/* ^round key */
+@@ -262,23 +222,17 @@
+ 	eor		\in1\().16b, \in1\().16b, v15.16b	/* ^round key */
+ 	eor		\in2\().16b, \in2\().16b, v15.16b	/* ^round key */
+ 	eor		\in3\().16b, \in3\().16b, v15.16b	/* ^round key */
+-	sub_bytes_4x	\in0, \in1, \in2, \in3
++	movi		v15.16b, #0x40
+ 	tbl		\in0\().16b, {\in0\().16b}, v13.16b	/* ShiftRows */
+ 	tbl		\in1\().16b, {\in1\().16b}, v13.16b	/* ShiftRows */
+ 	tbl		\in2\().16b, {\in2\().16b}, v13.16b	/* ShiftRows */
+ 	tbl		\in3\().16b, {\in3\().16b}, v13.16b	/* ShiftRows */
+-	ld1		{v15.4s}, [\rkp], #16
++	sub_bytes_4x	\in0, \in1, \in2, \in3
+ 	subs		\i, \i, #1
++	ld1		{v15.4s}, [\rkp], #16
+ 	beq		2222f
+-	.if		\enc == 1
+-	mix_columns_2x	\in0, \in1
+-	mix_columns_2x	\in2, \in3
+-	ldr		q13, .LForward_ShiftRows
+-	.else
+-	inv_mix_cols_4x	\in0, \in1, \in2, \in3
+-	ldr		q13, .LReverse_ShiftRows
+-	.endif
+-	movi		v12.16b, #0x40
++	mix_columns_2x	\in0, \in1, \enc
++	mix_columns_2x	\in2, \in3, \enc
+ 	b		1111b
+ 2222:	eor		\in0\().16b, \in0\().16b, v15.16b	/* ^round key */
+ 	eor		\in1\().16b, \in1\().16b, v15.16b	/* ^round key */
+@@ -305,19 +259,7 @@
+ #include "aes-modes.S"
+ 
+ 	.text
+-	.align		4
+-.LForward_ShiftRows:
+-CPU_LE(	.byte		0x0, 0x5, 0xa, 0xf, 0x4, 0x9, 0xe, 0x3	)
+-CPU_LE(	.byte		0x8, 0xd, 0x2, 0x7, 0xc, 0x1, 0x6, 0xb	)
+-CPU_BE(	.byte		0xb, 0x6, 0x1, 0xc, 0x7, 0x2, 0xd, 0x8	)
+-CPU_BE(	.byte		0x3, 0xe, 0x9, 0x4, 0xf, 0xa, 0x5, 0x0	)
+-
+-.LReverse_ShiftRows:
+-CPU_LE(	.byte		0x0, 0xd, 0xa, 0x7, 0x4, 0x1, 0xe, 0xb	)
+-CPU_LE(	.byte		0x8, 0x5, 0x2, 0xf, 0xc, 0x9, 0x6, 0x3	)
+-CPU_BE(	.byte		0x3, 0x6, 0x9, 0xc, 0xf, 0x2, 0x5, 0x8	)
+-CPU_BE(	.byte		0xb, 0xe, 0x1, 0x4, 0x7, 0xa, 0xd, 0x0	)
+-
++	.align		6
+ .LForward_Sbox:
+ 	.byte		0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5
+ 	.byte		0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76
+@@ -385,3 +327,12 @@ CPU_BE(	.byte		0xb, 0xe, 0x1, 0x4, 0x7, 0xa, 0xd, 0x0	)
+ 	.byte		0xc8, 0xeb, 0xbb, 0x3c, 0x83, 0x53, 0x99, 0x61
+ 	.byte		0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6, 0x26
+ 	.byte		0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d
++
++.LForward_ShiftRows:
++	.octa		0x0b06010c07020d08030e09040f0a0500
++
++.LReverse_ShiftRows:
++	.octa		0x0306090c0f0205080b0e0104070a0d00
++
++.Lror32by8:
++	.octa		0x0c0f0e0d080b0a090407060500030201
 -- 
 2.7.4
