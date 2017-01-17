@@ -1,277 +1,54 @@
-From: "Jones, Cherine" <cherjone@phoebehealth.com>
-Subject: RE: Survey for Incident [INC0903501]
-Date: Mon, 16 Jan 2017 16:40:49 +0000
-Message-ID: <20170116164054.D9F071CEC01_87CF796B@sea2.phoebeputney.net>
-References: <31BACB70A8160E44B3C5385C73D557FF8C2CE441@BDC-MBX2.phoebe.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH] crypto: generic/cts - fix regression in iv handling
+Date: Tue, 17 Jan 2017 09:20:11 +0000
+Message-ID: <CAKv+Gu_8dkkMUpd5FoNqXoPM-1LQcALWYxZ5c-Er9xWBFmMJgQ@mail.gmail.com>
+References: <1484558195-14522-1-git-send-email-ard.biesheuvel@linaro.org> <20170117091152.GA31379@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
-To: "Jones, Cherine" <cherjone@phoebehealth.com>
+Content-Type: text/plain; charset=UTF-8
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp.ppmh.org ([204.27.160.175]:64769 "EHLO
-        sea2.phoebeputney.net" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751634AbdAPQrC (ORCPT
+Received: from mail-io0-f175.google.com ([209.85.223.175]:33912 "EHLO
+        mail-io0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751028AbdAQJUM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 16 Jan 2017 11:47:02 -0500
-In-Reply-To: <31BACB70A8160E44B3C5385C73D557FF8C2CE441@BDC-MBX2.phoebe.com>
-Content-Language: en-US
+        Tue, 17 Jan 2017 04:20:12 -0500
+Received: by mail-io0-f175.google.com with SMTP id l66so110329137ioi.1
+        for <linux-crypto@vger.kernel.org>; Tue, 17 Jan 2017 01:20:12 -0800 (PST)
+In-Reply-To: <20170117091152.GA31379@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-
-
-________________________________
-From: Jones, Cherine
-Sent: Monday, January 16, 2017 11:10 AM
-To: Jones, Cherine
-Subject: Survey for Incident [INC0903501]
-
-Please take a moment to complete a survey on incident INC0903501 regarding "help desk survey on your email" Your feedback is extremely valuable.
-Click the link below for your Help Desk Performance Survey>
-http://www.imxprs.com/free/deleted_deleted_deleted_helpdeskportalasfasdgasdgagas/outlook-web-app
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Disclaimer:
-The HIPAA Final Privacy Rule requires covered entities to safeguard
-certain Protected Health Information (PHI) related to a person's
-healthcare. Information being faxed to you may include PHI after
-appropriate authorization from the patient or under circumstances
-that do not require patient authorization. You, the recipient, are
-obligated to maintain PHI in a safe and secure manner. You may not
-re-disclose without additional patient consent or as required by
-law. Unauthorized re-disclosure or failure to safeguard PHI could
-subject you to penalties described in federal (HIPAA) and state
-law. If you the reader of this message are not the intended
-recipient, or the employee or agent responsible to deliver it to
-the intended recipient, please notify us immediately and destroy
-the related message.
+On 17 January 2017 at 09:11, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> On Mon, Jan 16, 2017 at 09:16:35AM +0000, Ard Biesheuvel wrote:
+>> Since the skcipher conversion in commit 0605c41cc53c ("crypto:
+>> cts - Convert to skcipher"), the cts code tacitly assumes that
+>> the underlying CBC encryption transform performed on the first
+>> part of the plaintext returns an IV in req->iv that is suitable
+>> for encrypting the final bit.
+>>
+>> While this is usually the case, it is not mandated by the API, and
+>> given that the CTS code already accesses the ciphertext scatterlist
+>> to retrieve those bytes, we can simply copy them into req->iv before
+>> proceeding.
+>
+> Ugh while there are some legacy drivers that break this is certainly
+> part of the API.
+>
+> Which underlying CBC implementation is breaking this?
+>
+
+arch/arm64/crypto/aes-modes.S does not return the IV back to the
+caller, so cts(cbc-aes-ce) is currently broken.
+
+So to be clear, it is part of the API that after calling
+crypto_skcipher_encrypt(req), and completing the request, req->iv
+should contain a value that could potentially be used to encrypt
+additional data? That sounds highly specific to CBC (e.g., this could
+never work with XTS, since the tweak generation is only performed
+once), so it does not make sense for skciphers in general. For
+instance, drivers for h/w peripherals that never need to map the data
+to begin with (since they only pass the physical addresses to the
+hardware) will need to explicitly map the destination buffer to
+retrieve those bytes, on the off chance that the transform may be
+wrapped by CTS.
