@@ -1,7 +1,9 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH 00/10] crypto - AES for ARM/arm64 updates for v4.11 (round #2)
-Date: Tue, 17 Jan 2017 15:22:27 +0000
-Message-ID: <1484666557-31458-1-git-send-email-ard.biesheuvel@linaro.org>
+Subject: [PATCH 01/10] crypto: arm64/aes-neon-bs - honour iv_out requirement
+ in CTR mode
+Date: Tue, 17 Jan 2017 15:22:28 +0000
+Message-ID: <1484666557-31458-2-git-send-email-ard.biesheuvel@linaro.org>
+References: <1484666557-31458-1-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
@@ -10,6 +12,7 @@ Cc: linux-arm-kernel@lists.infradead.org,
 To: linux-crypto@vger.kernel.org,
 	herbert@gondor.apana.org.au
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <1484666557-31458-1-git-send-email-ard.biesheuvel@linaro.org>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -21,59 +24,86 @@ Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-Patch #1 is a fix for the CBC chaining issue that was discussed on the
-mailing list. The driver itself is queued for v4.11, so this fix can go
-right on top.
+Update the new bitsliced NEON AES implementation in CTR mode to return
+the next IV back to the skcipher API client. This is necessary for
+chaining to work correctly.
 
-Patches #2 - #6 clear the cra_alignmasks of various drivers: all NEON
-capable CPUs can perform unaligned accesses, and the advantage of using
-the slightly faster aligned accessors (which only exist on ARM not arm64)
-is certainly outweighed by the cost of copying data to suitably aligned
-buffers.
+Note that this is only done if the request is a round multiple of the
+block size, since otherwise, chaining is impossible anyway.
 
-NOTE: patch #5 won't apply unless 'crypto: arm64/aes-blk - honour iv_out
-requirement in CBC and CTR modes' is applied first, which was sent out
-separately as a bugfix for v3.16 - v4.9. If this is a problem, this patch
-can wait.
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+ arch/arm64/crypto/aes-neonbs-core.S | 25 +++++++++++++-------
+ 1 file changed, 16 insertions(+), 9 deletions(-)
 
-Patch #7 and #8 are minor tweaks to the new scalar AES code.
-
-Patch #9 improves the performance of the plain NEON AES code, to make it
-more suitable as a fallback for the new bitsliced NEON code, which can
-only operate on 8 blocks in parallel, and needs another driver to perform
-CBC encryption or XTS tweak generation.
-
-Patch #10 updates the new bitsliced AES NEON code to switch to the plain
-NEON driver as a fallback.
-
-Patches #9 and #10 improve the performance of CBC encryption by ~35% on
-low end cores such as the Cortex-A53 that can be found in the Raspberry Pi3
-
-Ard Biesheuvel (10):
-  crypto: arm64/aes-neon-bs - honour iv_out requirement in CTR mode
-  crypto: arm/aes-ce - remove cra_alignmask
-  crypto: arm/chacha20 - remove cra_alignmask
-  crypto: arm64/aes-ce-ccm - remove cra_alignmask
-  crypto: arm64/aes-blk - remove cra_alignmask
-  crypto: arm64/chacha20 - remove cra_alignmask
-  crypto: arm64/aes - avoid literals for cross-module symbol references
-  crypto: arm64/aes - performance tweak
-  crypto: arm64/aes-neon-blk - tweak performance for low end cores
-  crypto: arm64/aes - replace scalar fallback with plain NEON fallback
-
- arch/arm/crypto/aes-ce-core.S          |  84 ++++-----
- arch/arm/crypto/aes-ce-glue.c          |  15 +-
- arch/arm/crypto/chacha20-neon-glue.c   |   1 -
- arch/arm64/crypto/Kconfig              |   2 +-
- arch/arm64/crypto/aes-ce-ccm-glue.c    |   1 -
- arch/arm64/crypto/aes-cipher-core.S    |  59 +++---
- arch/arm64/crypto/aes-glue.c           |  18 +-
- arch/arm64/crypto/aes-modes.S          |   8 +-
- arch/arm64/crypto/aes-neon.S           | 199 ++++++++------------
- arch/arm64/crypto/aes-neonbs-core.S    |  25 ++-
- arch/arm64/crypto/aes-neonbs-glue.c    |  38 +++-
- arch/arm64/crypto/chacha20-neon-glue.c |   1 -
- 12 files changed, 199 insertions(+), 252 deletions(-)
-
+diff --git a/arch/arm64/crypto/aes-neonbs-core.S b/arch/arm64/crypto/aes-neonbs-core.S
+index 8d0cdaa2768d..2ada12dd768e 100644
+--- a/arch/arm64/crypto/aes-neonbs-core.S
++++ b/arch/arm64/crypto/aes-neonbs-core.S
+@@ -874,12 +874,19 @@ CPU_LE(	rev		x8, x8		)
+ 	csel		x4, x4, xzr, pl
+ 	csel		x9, x9, xzr, le
+ 
++	tbnz		x9, #1, 0f
+ 	next_ctr	v1
++	tbnz		x9, #2, 0f
+ 	next_ctr	v2
++	tbnz		x9, #3, 0f
+ 	next_ctr	v3
++	tbnz		x9, #4, 0f
+ 	next_ctr	v4
++	tbnz		x9, #5, 0f
+ 	next_ctr	v5
++	tbnz		x9, #6, 0f
+ 	next_ctr	v6
++	tbnz		x9, #7, 0f
+ 	next_ctr	v7
+ 
+ 0:	mov		bskey, x2
+@@ -928,11 +935,11 @@ CPU_LE(	rev		x8, x8		)
+ 	eor		v5.16b, v5.16b, v15.16b
+ 	st1		{v5.16b}, [x0], #16
+ 
+-	next_ctr	v0
++8:	next_ctr	v0
+ 	cbnz		x4, 99b
+ 
+ 0:	st1		{v0.16b}, [x5]
+-8:	ldp		x29, x30, [sp], #16
++9:	ldp		x29, x30, [sp], #16
+ 	ret
+ 
+ 	/*
+@@ -941,23 +948,23 @@ CPU_LE(	rev		x8, x8		)
+ 	 */
+ 1:	cbz		x6, 8b
+ 	st1		{v1.16b}, [x5]
+-	b		8b
++	b		9b
+ 2:	cbz		x6, 8b
+ 	st1		{v4.16b}, [x5]
+-	b		8b
++	b		9b
+ 3:	cbz		x6, 8b
+ 	st1		{v6.16b}, [x5]
+-	b		8b
++	b		9b
+ 4:	cbz		x6, 8b
+ 	st1		{v3.16b}, [x5]
+-	b		8b
++	b		9b
+ 5:	cbz		x6, 8b
+ 	st1		{v7.16b}, [x5]
+-	b		8b
++	b		9b
+ 6:	cbz		x6, 8b
+ 	st1		{v2.16b}, [x5]
+-	b		8b
++	b		9b
+ 7:	cbz		x6, 8b
+ 	st1		{v5.16b}, [x5]
+-	b		8b
++	b		9b
+ ENDPROC(aesbs_ctr_encrypt)
 -- 
 2.7.4
