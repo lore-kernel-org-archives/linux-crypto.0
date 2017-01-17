@@ -1,132 +1,100 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH 05/10] crypto: arm64/aes-blk - remove cra_alignmask
-Date: Tue, 17 Jan 2017 15:22:32 +0000
-Message-ID: <1484666557-31458-6-git-send-email-ard.biesheuvel@linaro.org>
+Subject: [PATCH 08/10] crypto: arm64/aes - performance tweak
+Date: Tue, 17 Jan 2017 15:22:35 +0000
+Message-ID: <1484666557-31458-9-git-send-email-ard.biesheuvel@linaro.org>
 References: <1484666557-31458-1-git-send-email-ard.biesheuvel@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
 Cc: linux-arm-kernel@lists.infradead.org,
- Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: linux-crypto@vger.kernel.org,
-	herbert@gondor.apana.org.au
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wm0-f54.google.com ([74.125.82.54]:35379 "EHLO
+        mail-wm0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750918AbdAQPX4 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 17 Jan 2017 10:23:56 -0500
+Received: by mail-wm0-f54.google.com with SMTP id r126so205373708wmr.0
+        for <linux-crypto@vger.kernel.org>; Tue, 17 Jan 2017 07:23:08 -0800 (PST)
 In-Reply-To: <1484666557-31458-1-git-send-email-ard.biesheuvel@linaro.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Remove the unnecessary alignmask: it is much more efficient to deal with
-the misalignment in the core algorithm than relying on the crypto API to
-copy the data to a suitably aligned buffer.
+Shuffle some instructions around in the __hround macro to shave off
+0.1 cycles per byte on Cortex-A57.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
-NOTE: this won't apply unless 'crypto: arm64/aes-blk - honour iv_out
-requirement in CBC and CTR modes' is applied first, which was sent out
-separately as a bugfix for v3.16 - v4.9
+ arch/arm64/crypto/aes-cipher-core.S | 52 +++++++-------------
+ 1 file changed, 19 insertions(+), 33 deletions(-)
 
- arch/arm64/crypto/aes-glue.c  | 16 ++++++----------
- arch/arm64/crypto/aes-modes.S |  8 +++-----
- 2 files changed, 9 insertions(+), 15 deletions(-)
-
-diff --git a/arch/arm64/crypto/aes-glue.c b/arch/arm64/crypto/aes-glue.c
-index 5164aaf82c6a..8ee1fb7aaa4f 100644
---- a/arch/arm64/crypto/aes-glue.c
-+++ b/arch/arm64/crypto/aes-glue.c
-@@ -215,14 +215,15 @@ static int ctr_encrypt(struct skcipher_request *req)
- 		u8 *tsrc = walk.src.virt.addr;
+diff --git a/arch/arm64/crypto/aes-cipher-core.S b/arch/arm64/crypto/aes-cipher-core.S
+index cd58c61e6677..f2f9cc519309 100644
+--- a/arch/arm64/crypto/aes-cipher-core.S
++++ b/arch/arm64/crypto/aes-cipher-core.S
+@@ -20,46 +20,32 @@
+ 	tt		.req	x4
+ 	lt		.req	x2
  
- 		/*
--		 * Minimum alignment is 8 bytes, so if nbytes is <= 8, we need
--		 * to tell aes_ctr_encrypt() to only read half a block.
-+		 * Tell aes_ctr_encrypt() to process a tail block.
- 		 */
--		blocks = (nbytes <= 8) ? -1 : 1;
-+		blocks = -1;
+-	.macro		__hround, out0, out1, in0, in1, in2, in3, t0, t1, enc
+-	ldp		\out0, \out1, [rk], #8
+-
+-	ubfx		w13, \in0, #0, #8
+-	ubfx		w14, \in1, #8, #8
+-	ldr		w13, [tt, w13, uxtw #2]
+-	ldr		w14, [tt, w14, uxtw #2]
+-
++	.macro		__pair, enc, reg0, reg1, in0, in1e, in1d, shift
++	ubfx		\reg0, \in0, #\shift, #8
+ 	.if		\enc
+-	ubfx		w17, \in1, #0, #8
+-	ubfx		w18, \in2, #8, #8
++	ubfx		\reg1, \in1e, #\shift, #8
+ 	.else
+-	ubfx		w17, \in3, #0, #8
+-	ubfx		w18, \in0, #8, #8
++	ubfx		\reg1, \in1d, #\shift, #8
+ 	.endif
+-	ldr		w17, [tt, w17, uxtw #2]
+-	ldr		w18, [tt, w18, uxtw #2]
++	ldr		\reg0, [tt, \reg0, uxtw #2]
++	ldr		\reg1, [tt, \reg1, uxtw #2]
++	.endm
  
--		aes_ctr_encrypt(tail, tsrc, (u8 *)ctx->key_enc, rounds,
-+		aes_ctr_encrypt(tail, NULL, (u8 *)ctx->key_enc, rounds,
- 				blocks, walk.iv, first);
--		memcpy(tdst, tail, nbytes);
-+		if (tdst != tsrc)
-+			memcpy(tdst, tsrc, nbytes);
-+		crypto_xor(tdst, tail, nbytes);
- 		err = skcipher_walk_done(&walk, 0);
- 	}
- 	kernel_neon_end();
-@@ -282,7 +283,6 @@ static struct skcipher_alg aes_algs[] = { {
- 		.cra_flags		= CRYPTO_ALG_INTERNAL,
- 		.cra_blocksize		= AES_BLOCK_SIZE,
- 		.cra_ctxsize		= sizeof(struct crypto_aes_ctx),
--		.cra_alignmask		= 7,
- 		.cra_module		= THIS_MODULE,
- 	},
- 	.min_keysize	= AES_MIN_KEY_SIZE,
-@@ -298,7 +298,6 @@ static struct skcipher_alg aes_algs[] = { {
- 		.cra_flags		= CRYPTO_ALG_INTERNAL,
- 		.cra_blocksize		= AES_BLOCK_SIZE,
- 		.cra_ctxsize		= sizeof(struct crypto_aes_ctx),
--		.cra_alignmask		= 7,
- 		.cra_module		= THIS_MODULE,
- 	},
- 	.min_keysize	= AES_MIN_KEY_SIZE,
-@@ -315,7 +314,6 @@ static struct skcipher_alg aes_algs[] = { {
- 		.cra_flags		= CRYPTO_ALG_INTERNAL,
- 		.cra_blocksize		= 1,
- 		.cra_ctxsize		= sizeof(struct crypto_aes_ctx),
--		.cra_alignmask		= 7,
- 		.cra_module		= THIS_MODULE,
- 	},
- 	.min_keysize	= AES_MIN_KEY_SIZE,
-@@ -332,7 +330,6 @@ static struct skcipher_alg aes_algs[] = { {
- 		.cra_priority		= PRIO - 1,
- 		.cra_blocksize		= 1,
- 		.cra_ctxsize		= sizeof(struct crypto_aes_ctx),
--		.cra_alignmask		= 7,
- 		.cra_module		= THIS_MODULE,
- 	},
- 	.min_keysize	= AES_MIN_KEY_SIZE,
-@@ -350,7 +347,6 @@ static struct skcipher_alg aes_algs[] = { {
- 		.cra_flags		= CRYPTO_ALG_INTERNAL,
- 		.cra_blocksize		= AES_BLOCK_SIZE,
- 		.cra_ctxsize		= sizeof(struct crypto_aes_xts_ctx),
--		.cra_alignmask		= 7,
- 		.cra_module		= THIS_MODULE,
- 	},
- 	.min_keysize	= 2 * AES_MIN_KEY_SIZE,
-diff --git a/arch/arm64/crypto/aes-modes.S b/arch/arm64/crypto/aes-modes.S
-index 838dad5c209f..92b982a8b112 100644
---- a/arch/arm64/crypto/aes-modes.S
-+++ b/arch/arm64/crypto/aes-modes.S
-@@ -337,7 +337,7 @@ AES_ENTRY(aes_ctr_encrypt)
+-	ubfx		w15, \in2, #16, #8
+-	ubfx		w16, \in3, #24, #8
+-	ldr		w15, [tt, w15, uxtw #2]
+-	ldr		w16, [tt, w16, uxtw #2]
++	.macro		__hround, out0, out1, in0, in1, in2, in3, t0, t1, enc
++	ldp		\out0, \out1, [rk], #8
  
- .Lctrcarrydone:
- 	subs		w4, w4, #1
--	bmi		.Lctrhalfblock		/* blocks < 0 means 1/2 block */
-+	bmi		.Lctrtailblock		/* blocks <0 means tail block */
- 	ld1		{v3.16b}, [x1], #16
- 	eor		v3.16b, v0.16b, v3.16b
- 	st1		{v3.16b}, [x0], #16
-@@ -348,10 +348,8 @@ AES_ENTRY(aes_ctr_encrypt)
- 	FRAME_POP
- 	ret
+-	.if		\enc
+-	ubfx		\t0, \in3, #16, #8
+-	ubfx		\t1, \in0, #24, #8
+-	.else
+-	ubfx		\t0, \in1, #16, #8
+-	ubfx		\t1, \in2, #24, #8
+-	.endif
+-	ldr		\t0, [tt, \t0, uxtw #2]
+-	ldr		\t1, [tt, \t1, uxtw #2]
++	__pair		\enc, w13, w14, \in0, \in1, \in3, 0
++	__pair		\enc, w15, w16, \in1, \in2, \in0, 8
++	__pair		\enc, w17, w18, \in2, \in3, \in1, 16
++	__pair		\enc, \t0, \t1, \in3, \in0, \in2, 24
  
--.Lctrhalfblock:
--	ld1		{v3.8b}, [x1]
--	eor		v3.8b, v0.8b, v3.8b
--	st1		{v3.8b}, [x0]
-+.Lctrtailblock:
-+	st1		{v0.16b}, [x0]
- 	FRAME_POP
- 	ret
+ 	eor		\out0, \out0, w13
+-	eor		\out1, \out1, w17
+-	eor		\out0, \out0, w14, ror #24
+-	eor		\out1, \out1, w18, ror #24
+-	eor		\out0, \out0, w15, ror #16
+-	eor		\out1, \out1, \t0, ror #16
+-	eor		\out0, \out0, w16, ror #8
++	eor		\out1, \out1, w14
++	eor		\out0, \out0, w15, ror #24
++	eor		\out1, \out1, w16, ror #24
++	eor		\out0, \out0, w17, ror #16
++	eor		\out1, \out1, w18, ror #16
++	eor		\out0, \out0, \t0, ror #8
+ 	eor		\out1, \out1, \t1, ror #8
+ 	.endm
  
 -- 
 2.7.4
