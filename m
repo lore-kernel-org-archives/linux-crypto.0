@@ -1,15 +1,14 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH] crypto: arm64/aes-blk - honour iv_out requirement in CBC and
- CTR modes
-Date: Tue, 17 Jan 2017 13:46:29 +0000
-Message-ID: <1484660789-7036-1-git-send-email-ard.biesheuvel@linaro.org>
+Subject: [PATCH 00/10] crypto - AES for ARM/arm64 updates for v4.11 (round #2)
+Date: Tue, 17 Jan 2017 15:22:27 +0000
+Message-ID: <1484666557-31458-1-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Cc: linux-arm-kernel@lists.infradead.org,
  Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: herbert@gondor.apana.org.au,
-	linux-crypto@vger.kernel.org
+To: linux-crypto@vger.kernel.org,
+	herbert@gondor.apana.org.au
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
@@ -22,198 +21,59 @@ Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-Update the ARMv8 Crypto Extensions and the plain NEON AES implementations
-in CBC and CTR modes to return the next IV back to the skcipher API client.
-This is necessary for chaining to work correctly.
+Patch #1 is a fix for the CBC chaining issue that was discussed on the
+mailing list. The driver itself is queued for v4.11, so this fix can go
+right on top.
 
-Note that for CTR, this is only done if the request is a round multiple of
-the block size, since otherwise, chaining is impossible anyway.
+Patches #2 - #6 clear the cra_alignmasks of various drivers: all NEON
+capable CPUs can perform unaligned accesses, and the advantage of using
+the slightly faster aligned accessors (which only exist on ARM not arm64)
+is certainly outweighed by the cost of copying data to suitably aligned
+buffers.
 
-Cc: <stable@vger.kernel.org> # v3.16+
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
- arch/arm64/crypto/aes-modes.S | 88 ++++++++++----------
- 1 file changed, 42 insertions(+), 46 deletions(-)
+NOTE: patch #5 won't apply unless 'crypto: arm64/aes-blk - honour iv_out
+requirement in CBC and CTR modes' is applied first, which was sent out
+separately as a bugfix for v3.16 - v4.9. If this is a problem, this patch
+can wait.
 
-diff --git a/arch/arm64/crypto/aes-modes.S b/arch/arm64/crypto/aes-modes.S
-index c53dbeae79f2..838dad5c209f 100644
---- a/arch/arm64/crypto/aes-modes.S
-+++ b/arch/arm64/crypto/aes-modes.S
-@@ -193,15 +193,16 @@ AES_ENTRY(aes_cbc_encrypt)
- 	cbz		w6, .Lcbcencloop
- 
- 	ld1		{v0.16b}, [x5]			/* get iv */
--	enc_prepare	w3, x2, x5
-+	enc_prepare	w3, x2, x6
- 
- .Lcbcencloop:
- 	ld1		{v1.16b}, [x1], #16		/* get next pt block */
- 	eor		v0.16b, v0.16b, v1.16b		/* ..and xor with iv */
--	encrypt_block	v0, w3, x2, x5, w6
-+	encrypt_block	v0, w3, x2, x6, w7
- 	st1		{v0.16b}, [x0], #16
- 	subs		w4, w4, #1
- 	bne		.Lcbcencloop
-+	st1		{v0.16b}, [x5]			/* return iv */
- 	ret
- AES_ENDPROC(aes_cbc_encrypt)
- 
-@@ -211,7 +212,7 @@ AES_ENTRY(aes_cbc_decrypt)
- 	cbz		w6, .LcbcdecloopNx
- 
- 	ld1		{v7.16b}, [x5]			/* get iv */
--	dec_prepare	w3, x2, x5
-+	dec_prepare	w3, x2, x6
- 
- .LcbcdecloopNx:
- #if INTERLEAVE >= 2
-@@ -248,7 +249,7 @@ AES_ENTRY(aes_cbc_decrypt)
- .Lcbcdecloop:
- 	ld1		{v1.16b}, [x1], #16		/* get next ct block */
- 	mov		v0.16b, v1.16b			/* ...and copy to v0 */
--	decrypt_block	v0, w3, x2, x5, w6
-+	decrypt_block	v0, w3, x2, x6, w7
- 	eor		v0.16b, v0.16b, v7.16b		/* xor with iv => pt */
- 	mov		v7.16b, v1.16b			/* ct is next iv */
- 	st1		{v0.16b}, [x0], #16
-@@ -256,6 +257,7 @@ AES_ENTRY(aes_cbc_decrypt)
- 	bne		.Lcbcdecloop
- .Lcbcdecout:
- 	FRAME_POP
-+	st1		{v7.16b}, [x5]			/* return iv */
- 	ret
- AES_ENDPROC(aes_cbc_decrypt)
- 
-@@ -267,24 +269,15 @@ AES_ENDPROC(aes_cbc_decrypt)
- 
- AES_ENTRY(aes_ctr_encrypt)
- 	FRAME_PUSH
--	cbnz		w6, .Lctrfirst		/* 1st time around? */
--	umov		x5, v4.d[1]		/* keep swabbed ctr in reg */
--	rev		x5, x5
--#if INTERLEAVE >= 2
--	cmn		w5, w4			/* 32 bit overflow? */
--	bcs		.Lctrinc
--	add		x5, x5, #1		/* increment BE ctr */
--	b		.LctrincNx
--#else
--	b		.Lctrinc
--#endif
--.Lctrfirst:
-+	cbz		w6, .Lctrnotfirst	/* 1st time around? */
- 	enc_prepare	w3, x2, x6
- 	ld1		{v4.16b}, [x5]
--	umov		x5, v4.d[1]		/* keep swabbed ctr in reg */
--	rev		x5, x5
-+
-+.Lctrnotfirst:
-+	umov		x8, v4.d[1]		/* keep swabbed ctr in reg */
-+	rev		x8, x8
- #if INTERLEAVE >= 2
--	cmn		w5, w4			/* 32 bit overflow? */
-+	cmn		w8, w4			/* 32 bit overflow? */
- 	bcs		.Lctrloop
- .LctrloopNx:
- 	subs		w4, w4, #INTERLEAVE
-@@ -292,11 +285,11 @@ AES_ENTRY(aes_ctr_encrypt)
- #if INTERLEAVE == 2
- 	mov		v0.8b, v4.8b
- 	mov		v1.8b, v4.8b
--	rev		x7, x5
--	add		x5, x5, #1
-+	rev		x7, x8
-+	add		x8, x8, #1
- 	ins		v0.d[1], x7
--	rev		x7, x5
--	add		x5, x5, #1
-+	rev		x7, x8
-+	add		x8, x8, #1
- 	ins		v1.d[1], x7
- 	ld1		{v2.16b-v3.16b}, [x1], #32	/* get 2 input blocks */
- 	do_encrypt_block2x
-@@ -305,7 +298,7 @@ AES_ENTRY(aes_ctr_encrypt)
- 	st1		{v0.16b-v1.16b}, [x0], #32
- #else
- 	ldr		q8, =0x30000000200000001	/* addends 1,2,3[,0] */
--	dup		v7.4s, w5
-+	dup		v7.4s, w8
- 	mov		v0.16b, v4.16b
- 	add		v7.4s, v7.4s, v8.4s
- 	mov		v1.16b, v4.16b
-@@ -323,18 +316,12 @@ AES_ENTRY(aes_ctr_encrypt)
- 	eor		v2.16b, v7.16b, v2.16b
- 	eor		v3.16b, v5.16b, v3.16b
- 	st1		{v0.16b-v3.16b}, [x0], #64
--	add		x5, x5, #INTERLEAVE
-+	add		x8, x8, #INTERLEAVE
- #endif
--	cbz		w4, .LctroutNx
--.LctrincNx:
--	rev		x7, x5
-+	rev		x7, x8
- 	ins		v4.d[1], x7
-+	cbz		w4, .Lctrout
- 	b		.LctrloopNx
--.LctroutNx:
--	sub		x5, x5, #1
--	rev		x7, x5
--	ins		v4.d[1], x7
--	b		.Lctrout
- .Lctr1x:
- 	adds		w4, w4, #INTERLEAVE
- 	beq		.Lctrout
-@@ -342,30 +329,39 @@ AES_ENTRY(aes_ctr_encrypt)
- .Lctrloop:
- 	mov		v0.16b, v4.16b
- 	encrypt_block	v0, w3, x2, x6, w7
-+
-+	adds		x8, x8, #1		/* increment BE ctr */
-+	rev		x7, x8
-+	ins		v4.d[1], x7
-+	bcs		.Lctrcarry		/* overflow? */
-+
-+.Lctrcarrydone:
- 	subs		w4, w4, #1
- 	bmi		.Lctrhalfblock		/* blocks < 0 means 1/2 block */
- 	ld1		{v3.16b}, [x1], #16
- 	eor		v3.16b, v0.16b, v3.16b
- 	st1		{v3.16b}, [x0], #16
--	beq		.Lctrout
--.Lctrinc:
--	adds		x5, x5, #1		/* increment BE ctr */
--	rev		x7, x5
--	ins		v4.d[1], x7
--	bcc		.Lctrloop		/* no overflow? */
--	umov		x7, v4.d[0]		/* load upper word of ctr  */
--	rev		x7, x7			/* ... to handle the carry */
--	add		x7, x7, #1
--	rev		x7, x7
--	ins		v4.d[0], x7
--	b		.Lctrloop
-+	bne		.Lctrloop
-+
-+.Lctrout:
-+	st1		{v4.16b}, [x5]		/* return next CTR value */
-+	FRAME_POP
-+	ret
-+
- .Lctrhalfblock:
- 	ld1		{v3.8b}, [x1]
- 	eor		v3.8b, v0.8b, v3.8b
- 	st1		{v3.8b}, [x0]
--.Lctrout:
- 	FRAME_POP
- 	ret
-+
-+.Lctrcarry:
-+	umov		x7, v4.d[0]		/* load upper word of ctr  */
-+	rev		x7, x7			/* ... to handle the carry */
-+	add		x7, x7, #1
-+	rev		x7, x7
-+	ins		v4.d[0], x7
-+	b		.Lctrcarrydone
- AES_ENDPROC(aes_ctr_encrypt)
- 	.ltorg
- 
+Patch #7 and #8 are minor tweaks to the new scalar AES code.
+
+Patch #9 improves the performance of the plain NEON AES code, to make it
+more suitable as a fallback for the new bitsliced NEON code, which can
+only operate on 8 blocks in parallel, and needs another driver to perform
+CBC encryption or XTS tweak generation.
+
+Patch #10 updates the new bitsliced AES NEON code to switch to the plain
+NEON driver as a fallback.
+
+Patches #9 and #10 improve the performance of CBC encryption by ~35% on
+low end cores such as the Cortex-A53 that can be found in the Raspberry Pi3
+
+Ard Biesheuvel (10):
+  crypto: arm64/aes-neon-bs - honour iv_out requirement in CTR mode
+  crypto: arm/aes-ce - remove cra_alignmask
+  crypto: arm/chacha20 - remove cra_alignmask
+  crypto: arm64/aes-ce-ccm - remove cra_alignmask
+  crypto: arm64/aes-blk - remove cra_alignmask
+  crypto: arm64/chacha20 - remove cra_alignmask
+  crypto: arm64/aes - avoid literals for cross-module symbol references
+  crypto: arm64/aes - performance tweak
+  crypto: arm64/aes-neon-blk - tweak performance for low end cores
+  crypto: arm64/aes - replace scalar fallback with plain NEON fallback
+
+ arch/arm/crypto/aes-ce-core.S          |  84 ++++-----
+ arch/arm/crypto/aes-ce-glue.c          |  15 +-
+ arch/arm/crypto/chacha20-neon-glue.c   |   1 -
+ arch/arm64/crypto/Kconfig              |   2 +-
+ arch/arm64/crypto/aes-ce-ccm-glue.c    |   1 -
+ arch/arm64/crypto/aes-cipher-core.S    |  59 +++---
+ arch/arm64/crypto/aes-glue.c           |  18 +-
+ arch/arm64/crypto/aes-modes.S          |   8 +-
+ arch/arm64/crypto/aes-neon.S           | 199 ++++++++------------
+ arch/arm64/crypto/aes-neonbs-core.S    |  25 ++-
+ arch/arm64/crypto/aes-neonbs-glue.c    |  38 +++-
+ arch/arm64/crypto/chacha20-neon-glue.c |   1 -
+ 12 files changed, 199 insertions(+), 252 deletions(-)
+
 -- 
 2.7.4
