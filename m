@@ -1,56 +1,95 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC PATCH 0/6] Add bulk skcipher requests to crypto
- API and dm-crypt
-Date: Wed, 18 Jan 2017 12:48:28 +0800
-Message-ID: <20170118044828.GB4460@gondor.apana.org.au>
-References: <cover.1484215956.git.omosnacek@gmail.com>
-	<20170113104128.GA23497@gondor.apana.org.au>
-	<CAAUqJDtqN-ugcaz4VhuW0fzLbmKt4db8ggrRmaAq_zFvO+9Lvw@mail.gmail.com>
-	<20170113142959.GA24258@gondor.apana.org.au>
-	<CAAUqJDsrFp2CczN5Gyy=rYLSDKi7=vQTQoyh=pE1kWue=c=fvw@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Binoy Jayan <binoy.jayan@linaro.org>, Mike Snitzer <snitzer@redhat.com>,
-        dm-devel@redhat.com, Mikulas Patocka <mpatocka@redhat.com>,
-        linux-crypto@vger.kernel.org, Milan Broz <gmazyland@gmail.com>
-To: Ondrej =?utf-8?B?TW9zbsOhxI1law==?= <omosnacek@gmail.com>
-Return-path: <dm-devel-bounces@redhat.com>
-Content-Disposition: inline
-In-Reply-To: <CAAUqJDsrFp2CczN5Gyy=rYLSDKi7=vQTQoyh=pE1kWue=c=fvw@mail.gmail.com>
-List-Unsubscribe: <https://www.redhat.com/mailman/options/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
-List-Archive: <https://www.redhat.com/archives/dm-devel>
-List-Post: <mailto:dm-devel@redhat.com>
-List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
-List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=subscribe>
-Sender: dm-devel-bounces@redhat.com
-Errors-To: dm-devel-bounces@redhat.com
-List-Id: linux-crypto.vger.kernel.org
+From: Binoy Jayan <binoy.jayan@linaro.org>
+Subject: [RFC PATCH v3] IV Generation algorithms for dm-crypt
+Date: Wed, 18 Jan 2017 15:10:24 +0530
+Message-ID: <1484732425-10319-1-git-send-email-binoy.jayan@linaro.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, Mark Brown <broonie@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org,
+        Rajendra <rnayak@codeaurora.org>,
+        Milan Broz <gmazyland@gmail.com>, Gilad <gilad@benyossef.com>,
+        Binoy Jayan <binoy.jayan@linaro.org>
+To: Oded <oded.golombek@arm.com>, Ofir <Ofir.Drang@arm.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pg0-f41.google.com ([74.125.83.41]:35598 "EHLO
+        mail-pg0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751590AbdARJlX (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 18 Jan 2017 04:41:23 -0500
+Received: by mail-pg0-f41.google.com with SMTP id 194so3369722pgd.2
+        for <linux-crypto@vger.kernel.org>; Wed, 18 Jan 2017 01:40:35 -0800 (PST)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-T24gVHVlLCBKYW4gMTcsIDIwMTcgYXQgMTI6MjA6MDJQTSArMDEwMCwgT25kcmVqIE1vc27DocSN
-ZWsgd3JvdGU6Cj4gMjAxNy0wMS0xMyAxNToyOSBHTVQrMDE6MDAgSGVyYmVydCBYdSA8aGVyYmVy
-dEBnb25kb3IuYXBhbmEub3JnLmF1PjoKPiA+IFdoYXQgaWYgdGhlIGRyaXZlciBoYWQgaGFyZHdh
-cmUgc3VwcG9ydCBmb3IgZ2VuZXJhdGluZyB0aGVzZSBJVnM/Cj4gPiBXaXRoIHlvdXIgc2NoZW1l
-IHRoaXMgY2Fubm90IGJlIHN1cHBvcnRlZCBhdCBhbGwuCj4gCj4gVGhhdCdzIHRydWUuLi4gSSdt
-IHN0YXJ0aW5nIHRvIHRoaW5rIHRoYXQgdGhpcyBpc24ndCByZWFsbHkgYSBnb29kCj4gaWRlYS4g
-SSB3YXMgbWFpbmx5IHRyeWluZyB0byBrZWVwIHRoZSBkb29yIG9wZW4gZm9yIHRoZSByYW5kb20g
-SVYKPiBzdXBwb3J0IGFuZCBhbHNvIHRvIGtlZXAgdGhlIG11bHRpLWtleSBzdHVmZiAod2hpY2gg
-d2FzIHJlYWxseSBvbmx5Cj4gaW50ZW5kZWQgZm9yIGxvb3AtQUVTIHBhcnRpdGlvbiBzdXBwb3J0
-KSBvdXQgb2YgdGhlIGNyeXB0byBBUEksIGJ1dAo+IGJvdGggb2YgdGhlc2UgY2FuIGJlIHByb2Jh
-Ymx5IHNvbHZlZCBpbiBhIGJldHRlciB3YXkuLi4KCkFzIHlvdSBzYWlkIHRoYXQgdGhlIG11bHRp
-LWtleSBzdHVmZiBpcyBsZWdhY3ktb25seSBJIHRvbyB3b3VsZCBsaWtlCnRvIHNlZSBhIHdheSB0
-byBrZWVwIHRoYXQgY29tcGxleGl0eSBvdXQgb2YgdGhlIGNvbW1vbiBwYXRoLgoKPiA+IFdpdGgg
-c3VjaCBhIGRlZmluaXRpb24geW91IGNvdWxkIGVpdGhlciBnZW5lcmF0ZSB0aGUgSVZzIGluIGRt
-LWNyeXB0Cj4gPiBvciBoYXZlIHRoZW0gZ2VuZXJhdGVkIGluIHRoZSBJViBnZW5lcmF0b3IuCj4g
-Cj4gVGhhdCBzZWVtcyBraW5kIG9mIGhhY2t5IHRvIG1lLi4uIGJ1dCBpZiB0aGF0J3Mgd2hhdCB5
-b3UgcHJlZmVyLCB0aGVuIHNvIGJlIGl0LgoKSSdtIG9wZW4gdG8gb3RoZXIgcHJvcG9zYWxzLiAg
-VGhlIGJhc2ljIHJlcXVpcmVtZW50IGlzIHRvIGJlIGFibGUgdG8KcHJvY2VzcyBtdWx0aXBsZSBi
-bG9ja3MgYXMgb25lIGVudGl0eSBhdCB0aGUgZHJpdmVyIGxldmVsLCBwb3RlbnRpYWxseQpnZW5l
-cmF0aW5nIHRoZSBJVnMgdGhlcmUgdG9vLgoKSXQncyBlc3NlbnRpYWxseSB0aGUgZXF1aXZhbGVu
-dCB0byBmdWxsIElQc2VjIG9mZmxvYWQuCgpUaGFua3MsCi0tIApFbWFpbDogSGVyYmVydCBYdSA8
-aGVyYmVydEBnb25kb3IuYXBhbmEub3JnLmF1PgpIb21lIFBhZ2U6IGh0dHA6Ly9nb25kb3IuYXBh
-bmEub3JnLmF1L35oZXJiZXJ0LwpQR1AgS2V5OiBodHRwOi8vZ29uZG9yLmFwYW5hLm9yZy5hdS9+
-aGVyYmVydC9wdWJrZXkudHh0CgotLQpkbS1kZXZlbCBtYWlsaW5nIGxpc3QKZG0tZGV2ZWxAcmVk
-aGF0LmNvbQpodHRwczovL3d3dy5yZWRoYXQuY29tL21haWxtYW4vbGlzdGluZm8vZG0tZGV2ZWw=
+===============================================================================
+GENIV Template cipher
+===============================================================================
+
+Currently, the iv generation algorithms are implemented in dm-crypt.c. The goal
+is to move these algorithms from the dm layer to the kernel crypto layer by
+implementing them as template ciphers so they can be used in relation with
+algorithms like aes, and with multiple modes like cbc, ecb etc. As part of this
+patchset, the iv-generation code is moved from the dm layer to the crypto layer
+and adapt the dm-layer to send a whole 'bio' (as defined in the block layer)
+at a time. Each bio contains the in memory representation of physically
+contiguous disk blocks. Since the bio itself may not be contiguous in main
+memory, the dm layer sets up a chained scatterlist of these blocks split into
+physically contiguous segments in memory so that DMA can be performed.
+
+One challenge in doing so is that the IVs are generated based on a 512-byte
+sector number. This infact limits the block sizes to 512 bytes. But this should
+not be a problem if a hardware with iv generation support is used. The geniv
+itself splits the segments into sectors so it could choose the IV based on
+sector number. But it could be modelled in hardware effectively by not
+splitting up the segments in the bio.
+
+Another challenge faced is that dm-crypt has an option to use multiple keys.
+The key selection is done based on the sector number. If the whole bio is
+encrypted / decrypted with the same key, the encrypted volumes will not be
+compatible with the original dm-crypt [without the changes]. So, the key
+selection code is moved to crypto layer so the neighboring sectors are
+encrypted with a different key.
+
+The dm layer allocates space for iv. The hardware drivers can choose to make
+use of this space to generate their IVs sequentially or allocate it on their
+own. This can be moved to crypto layer too. Postponing this decision until
+the requirement to integrate milan's changes are clear.
+
+Interface to the crypto layer - include/crypto/geniv.h
+
+Revisions:
+
+v1: https://patchwork.kernel.org/patch/9439175
+v2: https://patchwork.kernel.org/patch/9471923
+
+v2 --> v3
+----------
+
+1. Moved iv algorithms in dm-crypt.c for control
+2. Key management code moved from dm layer to cryto layer
+   so that cipher instance selection can be made depending on key_index
+3. The revision v2 had scatterlist nodes created for every sector in the bio.
+   It is modified to create only once scatterlist node to reduce memory
+   foot print. Synchronous requests are processed sequentially. Asynchronous
+   requests are processed in parallel and is freed in the async callback.
+4. Changed allocation for sub-requests using mempool
+
+v1 --> v2
+----------
+
+1. dm-crypt changes to process larger block sizes (one segment in a bio)
+2. Incorporated changes w.r.t. comments from Herbert.
+
+Binoy Jayan (1):
+  crypto: Add IV generation algorithms
+
+ drivers/md/dm-crypt.c  | 1891 ++++++++++++++++++++++++++++++++++--------------
+ include/crypto/geniv.h |   47 ++
+ 2 files changed, 1399 insertions(+), 539 deletions(-)
+ create mode 100644 include/crypto/geniv.h
+
+-- 
+Binoy Jayan
