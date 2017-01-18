@@ -1,39 +1,38 @@
 From: Theodore Ts'o <tytso@mit.edu>
-Subject: Re: [PATCH 3/8] random: trigger random_ready callback upon crng_init
- == 1
-Date: Tue, 17 Jan 2017 23:12:50 -0500
-Message-ID: <20170118041250.x7wszcasd4dplj3h@thunk.org>
+Subject: Re: [PATCH 4/8] random: remove unused branch in hot code path
+Date: Tue, 17 Jan 2017 23:35:36 -0500
+Message-ID: <20170118043536.aeqmxfthmx4h33g7@thunk.org>
 References: <3254875.f5A5oHPdxF@positron.chronox.de>
- <3576149.HSfW5KObBF@positron.chronox.de>
+ <3380804.uZWydldqLU@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: 8bit
 Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
 To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from imap.thunk.org ([74.207.234.97]:55818 "EHLO imap.thunk.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750893AbdAREPi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 Jan 2017 23:15:38 -0500
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <3576149.HSfW5KObBF@positron.chronox.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <3380804.uZWydldqLU@positron.chronox.de>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Dec 27, 2016 at 11:39:57PM +0100, Stephan Müller wrote:
-> The random_ready callback mechanism is intended to replicate the
-> getrandom system call behavior to in-kernel users. As the getrandom
-> system call unblocks with crng_init == 1, trigger the random_ready
-> wakeup call at the same time.
+On Tue, Dec 27, 2016 at 11:40:23PM +0100, Stephan Müller wrote:
+> The variable ip is defined to be a __u64 which is always 8 bytes on any
+> architecture. Thus, the check for sizeof(ip) > 4 will always be true.
+> 
+> As the check happens in a hot code path, remove the branch.
 
-It was deliberate that random_ready would only get triggered with
-crng_init==2.
+The fact that it's a hot code path means the compiler will optimize it
+out, so the fact that it's on the hot code path is irrelevant.  The
+main issue is that on platforms with a 32-bit IP's, ip >> 32 will
+always be zero.  It might be that we can just do this via
 
-In general I'm assuming kernel callers really want real randomness (as
-opposed to using prandom), where as there's a lot of b.s. userspace
-users of kernel randomness (for things that really don't require
-cryptographic randomness, e.g., for salting Python dictionaries,
-systemd/udev using /dev/urandom for non-cryptographic, non-security
-applications etc.)
+#if BITS_PER_LONG == 32
+  ...
+#else
+  ...  
+#endif
 
-						- Ted
+I'm not sure that works for all platforms, though.  More research is
+needed...
+
+					- Ted
