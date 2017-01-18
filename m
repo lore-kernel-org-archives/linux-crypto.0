@@ -1,52 +1,69 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [PATCH 3/8] random: trigger random_ready callback upon crng_init == 1
-Date: Wed, 18 Jan 2017 18:09:14 +0100
-Message-ID: <1721766.rHn5SRrCCO@tauon.atsec.com>
-References: <3254875.f5A5oHPdxF@positron.chronox.de> <3576149.HSfW5KObBF@positron.chronox.de> <20170118041250.x7wszcasd4dplj3h@thunk.org>
+From: Binoy Jayan <binoy.jayan@linaro.org>
+Subject: Re: [RFC PATCH 0/6] Add bulk skcipher requests to crypto API and dm-crypt
+Date: Wed, 18 Jan 2017 22:39:45 +0530
+Message-ID: <CAHv-k_-gcj8t8xw_iCrbq-Tt0zQP+O0s+EDGm5OJQVWFuX37cw@mail.gmail.com>
+References: <cover.1484215956.git.omosnacek@gmail.com> <20170113104128.GA23497@gondor.apana.org.au>
+ <CAAUqJDtqN-ugcaz4VhuW0fzLbmKt4db8ggrRmaAq_zFvO+9Lvw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Theodore Ts'o <tytso@mit.edu>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org, dm-devel@redhat.com,
+        Mike Snitzer <snitzer@redhat.com>,
+        Milan Broz <gmazyland@gmail.com>,
+        Mikulas Patocka <mpatocka@redhat.com>
+To: =?UTF-8?B?T25kcmVqIE1vc27DocSNZWs=?= <omosnacek@gmail.com>,
+        Arnd Bergmann <arnd@arndb.de>, Mark Brown <broonie@kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:55586 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750874AbdARRKL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 18 Jan 2017 12:10:11 -0500
-In-Reply-To: <20170118041250.x7wszcasd4dplj3h@thunk.org>
+Received: from mail-ua0-f174.google.com ([209.85.217.174]:34849 "EHLO
+        mail-ua0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750950AbdARRKK (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 18 Jan 2017 12:10:10 -0500
+Received: by mail-ua0-f174.google.com with SMTP id y9so14219985uae.2
+        for <linux-crypto@vger.kernel.org>; Wed, 18 Jan 2017 09:09:47 -0800 (PST)
+In-Reply-To: <CAAUqJDtqN-ugcaz4VhuW0fzLbmKt4db8ggrRmaAq_zFvO+9Lvw@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 17. Januar 2017, 23:12:50 CET schrieb Theodore Ts'o:
+Hi Milan,
 
-Hi Theodore,
+On 13 January 2017 at 17:31, Ondrej Mosn=C3=A1=C4=8Dek <omosnacek@gmail.com=
+> wrote:
+> 2017-01-13 11:41 GMT+01:00 Herbert Xu <herbert@gondor.apana.org.au>:
+>> On Thu, Jan 12, 2017 at 01:59:52PM +0100, Ondrej Mosnacek wrote:
+>>> the goal of this patchset is to allow those skcipher API users that nee=
+d to
+>>> process batches of small messages (especially dm-crypt) to do so effici=
+ently.
+>>
+>> Please explain why this can't be done with the existing framework
+>> using IV generators similar to the ones used for IPsec.
+>
+> As I already mentioned in another thread, there are basically two reasons=
+:
+>
+> 1) Milan would like to add authenticated encryption support to
+> dm-crypt (see [1]) and as part of this change, a new random IV mode
+> would be introduced. This mode generates a random IV for each sector
+> write, includes it in the authenticated data and stores it in the
+> sector's metadata (in a separate part of the disk). In this case
+> dm-crypt will need to have control over the IV generation (or at least
+> be able to somehow retrieve it after the crypto operation... but
+> passing RNG responsibility to drivers doesn't seem to be a good idea
+> anyway).
+>
+> 2) With this API, drivers wouldn't have to provide implementations for
+> specific IV generation modes, and just implement bulk requests for the
+> common modes/algorithms (XTS, CBC, ...) while still getting
+> performance benefit.
 
-> On Tue, Dec 27, 2016 at 11:39:57PM +0100, Stephan Müller wrote:
-> > The random_ready callback mechanism is intended to replicate the
-> > getrandom system call behavior to in-kernel users. As the getrandom
-> > system call unblocks with crng_init == 1, trigger the random_ready
-> > wakeup call at the same time.
-> 
-> It was deliberate that random_ready would only get triggered with
-> crng_init==2.
-> 
-> In general I'm assuming kernel callers really want real randomness (as
-> opposed to using prandom), where as there's a lot of b.s. userspace
-> users of kernel randomness (for things that really don't require
-> cryptographic randomness, e.g., for salting Python dictionaries,
-> systemd/udev using /dev/urandom for non-cryptographic, non-security
-> applications etc.)
+I just sent out v3 for the dm-crypt changes I was working on. I
+came across your patches for authenticated encryption support.
+Although I haven't looked at it entirely, I was wondering how it could
+be put together including the points Ondrej was mentioning. Will look at
+it more. Please keep me in cc when you send out the next revision if
+that is possible.
 
-Users of getrandom want to ensure that they get random data from a DRNG that 
-is seeded, just like in-kernel users may want if they choose the callback-
-approach.
-
-I do not understand why there should be different treatment of in-kernel vs 
-user space callers in that respect.
-
-(And yes, I do not want to open a discussion whether crng_init==1 can 
-considered as a sufficiently seeded DRNG as such discussion will lead 
-nowhere.)
-
-Ciao
-Stephan
+Thanks,
+Binoy
