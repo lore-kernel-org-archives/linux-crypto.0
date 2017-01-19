@@ -1,10 +1,9 @@
 From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH 1/2] crypto: move CCP device driver to misc
-Date: Thu, 19 Jan 2017 13:10:54 -0600
-Message-ID: <5e6f9e9d-3a84-0aa4-d42a-c152fd75f884@amd.com>
+Subject: Re: [PATCH 0/2] Introduce AMD Secure Processor device
+Date: Thu, 19 Jan 2017 14:03:12 -0600
+Message-ID: <0442f536-221d-fcef-3009-4bc07403ccd8@amd.com>
 References: <148484927002.30852.10568570584817827556.stgit@brijesh-build-machine>
- <148484928147.30852.7911360215597694759.stgit@brijesh-build-machine>
- <20170119181811.GA30851@kroah.com>
+ <20170119182101.GB30851@kroah.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="windows-1252"; format=flowed
 Content-Transfer-Encoding: 7bit
@@ -16,70 +15,39 @@ Cc: <brijesh.singh@amd.com>, <thomas.lendacky@amd.com>,
         <umgwanakikbuti@gmail.com>
 To: Greg KH <gregkh@linuxfoundation.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170119181811.GA30851@kroah.com>
+In-Reply-To: <20170119182101.GB30851@kroah.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 Hi Greg,
 
-On 01/19/2017 12:18 PM, Greg KH wrote:
-> On Thu, Jan 19, 2017 at 01:08:01PM -0500, Brijesh Singh wrote:
->> The CCP device is part of the AMD Secure Processor, which is not dedicated
->> solely to crypto. Move the CCP device driver to the misc directory in
->> prepration for expanding the usage of the AMD Secure Processor. Leaving the
->> CCP cryptographic layer (the ccp-crypto* files) in their current directory.
+On 01/19/2017 12:21 PM, Greg KH wrote:
+> On Thu, Jan 19, 2017 at 01:07:50PM -0500, Brijesh Singh wrote:
+>> The CCP device (drivers/crypto/ccp/ccp.ko) is part of AMD Secure Processor,
+>> which is not dedicated solely to crypto. The AMD Secure Processor includes
+>> CCP and PSP (Platform Secure Processor) devices.
 >>
->> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
->> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
->> ---
->>  drivers/crypto/Kconfig              |   11
->>  drivers/crypto/Makefile             |    2
->>  drivers/crypto/ccp/Kconfig          |   21
->>  drivers/crypto/ccp/Makefile         |    9
->>  drivers/crypto/ccp/ccp-dev-v3.c     |  574 -----------
->>  drivers/crypto/ccp/ccp-dev-v5.c     | 1021 -------------------
->>  drivers/crypto/ccp/ccp-dev.c        |  588 -----------
->>  drivers/crypto/ccp/ccp-dev.h        |  647 ------------
->>  drivers/crypto/ccp/ccp-dmaengine.c  |  728 --------------
->>  drivers/crypto/ccp/ccp-ops.c        | 1876 -----------------------------------
->>  drivers/crypto/ccp/ccp-pci.c        |  354 -------
->>  drivers/crypto/ccp/ccp-platform.c   |  293 -----
->>  drivers/misc/Kconfig                |    1
->>  drivers/misc/Makefile               |    1
->>  drivers/misc/amd-sp/Kconfig         |   14
->>  drivers/misc/amd-sp/Makefile        |    8
->>  drivers/misc/amd-sp/ccp-dev-v3.c    |  574 +++++++++++
->>  drivers/misc/amd-sp/ccp-dev-v5.c    | 1021 +++++++++++++++++++
->>  drivers/misc/amd-sp/ccp-dev.c       |  588 +++++++++++
->>  drivers/misc/amd-sp/ccp-dev.h       |  647 ++++++++++++
->>  drivers/misc/amd-sp/ccp-dmaengine.c |  728 ++++++++++++++
->>  drivers/misc/amd-sp/ccp-ops.c       | 1876 +++++++++++++++++++++++++++++++++++
->>  drivers/misc/amd-sp/ccp-pci.c       |  354 +++++++
->>  drivers/misc/amd-sp/ccp-platform.c  |  293 +++++
->>  include/linux/ccp.h                 |    3
->>  25 files changed, 6111 insertions(+), 6121 deletions(-)
->>  delete mode 100644 drivers/crypto/ccp/ccp-dev-v3.c
->>  delete mode 100644 drivers/crypto/ccp/ccp-dev-v5.c
->>  delete mode 100644 drivers/crypto/ccp/ccp-dev.c
->>  delete mode 100644 drivers/crypto/ccp/ccp-dev.h
->>  delete mode 100644 drivers/crypto/ccp/ccp-dmaengine.c
->>  delete mode 100644 drivers/crypto/ccp/ccp-ops.c
->>  delete mode 100644 drivers/crypto/ccp/ccp-pci.c
->>  delete mode 100644 drivers/crypto/ccp/ccp-platform.c
->>  create mode 100644 drivers/misc/amd-sp/Kconfig
->>  create mode 100644 drivers/misc/amd-sp/Makefile
->>  create mode 100644 drivers/misc/amd-sp/ccp-dev-v3.c
->>  create mode 100644 drivers/misc/amd-sp/ccp-dev-v5.c
->>  create mode 100644 drivers/misc/amd-sp/ccp-dev.c
->>  create mode 100644 drivers/misc/amd-sp/ccp-dev.h
->>  create mode 100644 drivers/misc/amd-sp/ccp-dmaengine.c
->>  create mode 100644 drivers/misc/amd-sp/ccp-ops.c
->>  create mode 100644 drivers/misc/amd-sp/ccp-pci.c
->>  create mode 100644 drivers/misc/amd-sp/ccp-platform.c
+>> This patch series moves the CCP device driver to the misc directory and
+>> creates a framework that allows functional component of the AMD Secure
+>> Processor to be initialized and handled appropriately.
 >
-> Please create your patch with -M, to show this is a rename, or a change
-> with a rename.  Otherwise this is an impossible patch to review, would
-> you want to try to do it?
+> Why the misc directory?  I don't see the justification here...
 >
 
-Thanks for the tip, will re-generate the patches with -M.
+Since this driver is not solely for crypto purposes and do not fit in 
+any of the standard categories hence I thought of moving it into misc 
+directory. I am open to other suggestions unless Herbert is ok with 
+leaving it into crypto and allowing the addition of the Secure Processor 
+support.
+
+The patch series allows the CCP driver to support other Secure Processor 
+functions, e.g Secure Encrypted Virtualization (SEV) key management. In 
+past, I tried to add SEV support into existing CCP driver [1] but we 
+quickly learned that CCP driver should be moved outside the crypto 
+directory otherwise will end up adding non crypto code into 
+drivers/crypto directory. Once this cleanup is accepted then I can work 
+to add SEV support inside the CCP driver.
+
+[1] http://marc.info/?l=linux-kernel&m=147204118426151&w=2
+
+-Brijesh
