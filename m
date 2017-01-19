@@ -1,66 +1,77 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH] crypto: arm/aes-neonbs - fix issue with v2.22 and older assembler
-Date: Thu, 19 Jan 2017 12:23:32 +0000
-Message-ID: <1484828612-18956-1-git-send-email-ard.biesheuvel@linaro.org>
-Cc: arnd@arndb.de, paul.gortmaker@windriver.com,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
+From: =?UTF-8?B?T25kcmVqIE1vc27DocSNZWs=?= <omosnacek@gmail.com>
+Subject: Re: [RFC PATCH 0/6] Add bulk skcipher requests to crypto API and dm-crypt
+Date: Thu, 19 Jan 2017 15:21:37 +0100
+Message-ID: <CAAUqJDtZNGLW-PcPKJD5vdKMZqd6+sAKrbjqVbaVTQqWwZ4cGQ@mail.gmail.com>
+References: <cover.1484215956.git.omosnacek@gmail.com> <20170113104128.GA23497@gondor.apana.org.au>
+ <CAAUqJDtqN-ugcaz4VhuW0fzLbmKt4db8ggrRmaAq_zFvO+9Lvw@mail.gmail.com>
+ <20170113142959.GA24258@gondor.apana.org.au> <CAAUqJDsrFp2CczN5Gyy=rYLSDKi7=vQTQoyh=pE1kWue=c=fvw@mail.gmail.com>
+ <20170118044828.GB4460@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: linux-crypto@vger.kernel.org, dm-devel@redhat.com,
+        Mike Snitzer <snitzer@redhat.com>,
+        Milan Broz <gmazyland@gmail.com>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        Binoy Jayan <binoy.jayan@linaro.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f54.google.com ([74.125.82.54]:36659 "EHLO
-        mail-wm0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752194AbdASMYC (ORCPT
+Received: from mail-lf0-f65.google.com ([209.85.215.65]:34346 "EHLO
+        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752856AbdASOWK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 Jan 2017 07:24:02 -0500
-Received: by mail-wm0-f54.google.com with SMTP id c85so286278309wmi.1
-        for <linux-crypto@vger.kernel.org>; Thu, 19 Jan 2017 04:23:37 -0800 (PST)
+        Thu, 19 Jan 2017 09:22:10 -0500
+Received: by mail-lf0-f65.google.com with SMTP id q89so5601926lfi.1
+        for <linux-crypto@vger.kernel.org>; Thu, 19 Jan 2017 06:21:58 -0800 (PST)
+In-Reply-To: <20170118044828.GB4460@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The GNU assembler for ARM version 2.22 or older fails to infer the
-element size from the vmov instructions, and aborts the build in
-the following way;
+2017-01-18 5:48 GMT+01:00 Herbert Xu <herbert@gondor.apana.org.au>:
+> I'm open to other proposals.  The basic requirement is to be able to
+> process multiple blocks as one entity at the driver level, potentially
+> generating the IVs there too.
+>
+> It's essentially the equivalent to full IPsec offload.
 
-.../aes-neonbs-core.S: Assembler messages:
-.../aes-neonbs-core.S:817: Error: bad type for scalar -- `vmov q1h[1],r10'
-.../aes-neonbs-core.S:817: Error: bad type for scalar -- `vmov q1h[0],r9'
-.../aes-neonbs-core.S:817: Error: bad type for scalar -- `vmov q1l[1],r8'
-.../aes-neonbs-core.S:817: Error: bad type for scalar -- `vmov q1l[0],r7'
-.../aes-neonbs-core.S:818: Error: bad type for scalar -- `vmov q2h[1],r10'
-.../aes-neonbs-core.S:818: Error: bad type for scalar -- `vmov q2h[0],r9'
-.../aes-neonbs-core.S:818: Error: bad type for scalar -- `vmov q2l[1],r8'
-.../aes-neonbs-core.S:818: Error: bad type for scalar -- `vmov q2l[0],r7'
+Hm, I just looked at what the IPsec IV generation is actually doing
+and it seems to me that it's basically a crypto template that just
+somehow transforms the IV before it is passed to the child cipher... I
+thought for a while that you were implying that there already is some
+facility in the crypto API that allows submitting multiple messages +
+some initial sequence number that is auto-incremented and IVs are
+generated from the numbers. However, I could not find anything like
+that in the code, so now I think what you meant was just that I should
+somehow pull the actual IV generators into the crypto layer so that
+the IVs can be generated inside the hardware.
 
-Fix this by setting the element size explicitly, by replacing vmov with
-vmov.32.
+If all you had in mind is just an equivalent of the current IPsec IV
+generation (as I understood it), then my bulk request scheme can in
+fact support it (you'd just pass sector numbers as the IVs). Of
+course, it would require additional changes over my patchset,
+specifically the creation of crypto templates for the dm-crypt IV
+modes, so they can be implemented by drivers. However, I wanted to
+avoid this until the key management in dm-crypt is simplified...
 
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
-Please add to the cryptodev-2.6 queue for v4.11
+If we also want to let the drivers process an offset+count chunk of
+sectors while auto-incrementing the sector number, then something like
+Binoy's approach would indeed be necessary, where the IV generators
+would be just regular skciphers, taking the initial sector number as
+the IV (although a disadvantage would be hard-coded sector/message
+size). Note, though, that the generic implementation of such transform
+could still use bulk requests on the underlying cipher so that
+encryption/decryption is performed efficiently even if there are no
+optimized/HW drivers for the specific IV generator templates.
 
- arch/arm/crypto/aes-neonbs-core.S | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+I will now try to focus on the key management simplification and when
+it is accepted/rejected we can discuss further about the best
+approach.
 
-diff --git a/arch/arm/crypto/aes-neonbs-core.S b/arch/arm/crypto/aes-neonbs-core.S
-index c9477044fbba..12da247164d1 100644
---- a/arch/arm/crypto/aes-neonbs-core.S
-+++ b/arch/arm/crypto/aes-neonbs-core.S
-@@ -766,13 +766,13 @@ ENTRY(aesbs_cbc_decrypt)
- ENDPROC(aesbs_cbc_decrypt)
- 
- 	.macro		next_ctr, q
--	vmov		\q\()h[1], r10
-+	vmov.32		\q\()h[1], r10
- 	adds		r10, r10, #1
--	vmov		\q\()h[0], r9
-+	vmov.32		\q\()h[0], r9
- 	adcs		r9, r9, #0
--	vmov		\q\()l[1], r8
-+	vmov.32		\q\()l[1], r8
- 	adcs		r8, r8, #0
--	vmov		\q\()l[0], r7
-+	vmov.32		\q\()l[0], r7
- 	adc		r7, r7, #0
- 	vrev32.8	\q, \q
- 	.endm
--- 
-2.7.4
+Cheers,
+Ondrej
+
+>
+> Thanks,
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
