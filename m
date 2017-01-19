@@ -1,85 +1,66 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [RFC PATCH v3] crypto: Add IV generation algorithms
-Date: Thu, 19 Jan 2017 11:47:33 +0200
-Message-ID: <CAOtvUMenhgAuZXcsUPpOd5RfQh8XE9krve5YsFF3h-gK8KfDYQ@mail.gmail.com>
-References: <1484732425-10319-1-git-send-email-binoy.jayan@linaro.org>
-	<1484732425-10319-2-git-send-email-binoy.jayan@linaro.org>
-	<CAOtvUMfhethgZ8TarKGDumL1W5fgjwy1Hi7f88mmCCD6vJ_hLg@mail.gmail.com>
-	<CAHv-k_-7m_oiVgzB5a3_=R9+fouxUc6fyxSchGtxfUKP00eM4w@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Rajendra <rnayak@codeaurora.org>, Herbert Xu <herbert@gondor.apana.org.au>,
-        Oded <oded.golombek@arm.com>, Mike Snitzer <snitzer@redhat.com>,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
-        Milan Broz <gmazyland@gmail.com>, linux-raid@vger.kernel.org,
-        dm-devel@redhat.com, Mark Brown <broonie@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
-        Shaohua Li <shli@kernel.org>, "David S. Miller" <davem@davemloft.net>,
-        Alasdair Kergon <agk@redhat.com>, Ofir <Ofir.Drang@arm.com>
-To: Binoy Jayan <binoy.jayan@linaro.org>
-Return-path: <dm-devel-bounces@redhat.com>
-In-Reply-To: <CAHv-k_-7m_oiVgzB5a3_=R9+fouxUc6fyxSchGtxfUKP00eM4w@mail.gmail.com>
-List-Unsubscribe: <https://www.redhat.com/mailman/options/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
-List-Archive: <https://www.redhat.com/archives/dm-devel>
-List-Post: <mailto:dm-devel@redhat.com>
-List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
-List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=subscribe>
-Sender: dm-devel-bounces@redhat.com
-Errors-To: dm-devel-bounces@redhat.com
-List-Id: linux-crypto.vger.kernel.org
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH] crypto: arm/aes-neonbs - fix issue with v2.22 and older assembler
+Date: Thu, 19 Jan 2017 12:23:32 +0000
+Message-ID: <1484828612-18956-1-git-send-email-ard.biesheuvel@linaro.org>
+Cc: arnd@arndb.de, paul.gortmaker@windriver.com,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wm0-f54.google.com ([74.125.82.54]:36659 "EHLO
+        mail-wm0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752194AbdASMYC (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 19 Jan 2017 07:24:02 -0500
+Received: by mail-wm0-f54.google.com with SMTP id c85so286278309wmi.1
+        for <linux-crypto@vger.kernel.org>; Thu, 19 Jan 2017 04:23:37 -0800 (PST)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jan 19, 2017 at 6:42 AM, Binoy Jayan <binoy.jayan@linaro.org> wrote:
-> Hi Gilad,
->
-> On 18 January 2017 at 20:51, Gilad Ben-Yossef <gilad@benyossef.com> wrote:
->> I have some review comments and a bug report -
->
-> Thank you very much for testing this on ARM and for the comments.
+The GNU assembler for ARM version 2.22 or older fails to infer the
+element size from the vmov instructions, and aborts the build in
+the following way;
 
-My pleasure. Thanks for writing the code :-)
+.../aes-neonbs-core.S: Assembler messages:
+.../aes-neonbs-core.S:817: Error: bad type for scalar -- `vmov q1h[1],r10'
+.../aes-neonbs-core.S:817: Error: bad type for scalar -- `vmov q1h[0],r9'
+.../aes-neonbs-core.S:817: Error: bad type for scalar -- `vmov q1l[1],r8'
+.../aes-neonbs-core.S:817: Error: bad type for scalar -- `vmov q1l[0],r7'
+.../aes-neonbs-core.S:818: Error: bad type for scalar -- `vmov q2h[1],r10'
+.../aes-neonbs-core.S:818: Error: bad type for scalar -- `vmov q2h[0],r9'
+.../aes-neonbs-core.S:818: Error: bad type for scalar -- `vmov q2l[1],r8'
+.../aes-neonbs-core.S:818: Error: bad type for scalar -- `vmov q2l[0],r7'
 
->
->>> +       rinfo.iv_sector = ctx->cc_sector;
->>> +       rinfo.nents = nents;
->>> +       rinfo.iv = iv;
->>> +
->>> +       skcipher_request_set_crypt(req, dmreq->sg_in, dmreq->sg_out,
->>
->> Also, where do the scatterlist src2 and dst2 that you use
->> sg_set_page() get sg_init_table() called on?
->> I couldn't figure it out...
->
-> Thank you pointing this out. I missed out to add sg_init_table(src2, 1)
-> and sg_init_table(dst2, 1), but sg_set_page is used in geniv_iter_block.
-> This is probably the reason for the panic on ARM platform. However it
-> ran fine under qemu-x86. May be I should setup an arm platform too
-> for testing.
+Fix this by setting the element size explicitly, by replacing vmov with
+vmov.32.
 
-I tried adding sg_init_table() where I thought it was appropriate and
-it didn't resolve the issue.
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+Please add to the cryptodev-2.6 queue for v4.11
 
-For what it's worth, my guess is that the difference between our
-setups is not related to Arm but to other options or the storage I'm
-using.
+ arch/arm/crypto/aes-neonbs-core.S | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Are you using cryptd?
-
-Thanks,
-Gilad
-
->
-> Regards,
-> Binoy
-
-
-
+diff --git a/arch/arm/crypto/aes-neonbs-core.S b/arch/arm/crypto/aes-neonbs-core.S
+index c9477044fbba..12da247164d1 100644
+--- a/arch/arm/crypto/aes-neonbs-core.S
++++ b/arch/arm/crypto/aes-neonbs-core.S
+@@ -766,13 +766,13 @@ ENTRY(aesbs_cbc_decrypt)
+ ENDPROC(aesbs_cbc_decrypt)
+ 
+ 	.macro		next_ctr, q
+-	vmov		\q\()h[1], r10
++	vmov.32		\q\()h[1], r10
+ 	adds		r10, r10, #1
+-	vmov		\q\()h[0], r9
++	vmov.32		\q\()h[0], r9
+ 	adcs		r9, r9, #0
+-	vmov		\q\()l[1], r8
++	vmov.32		\q\()l[1], r8
+ 	adcs		r8, r8, #0
+-	vmov		\q\()l[0], r7
++	vmov.32		\q\()l[0], r7
+ 	adc		r7, r7, #0
+ 	vrev32.8	\q, \q
+ 	.endm
 -- 
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-"If you take a class in large-scale robotics, can you end up in a
-situation where the homework eats your dog?"
- -- Jean-Baptiste Queru
+2.7.4
