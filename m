@@ -1,63 +1,66 @@
-From: Binoy Jayan <binoy.jayan@linaro.org>
-Subject: Re: [RFC PATCH v3] crypto: Add IV generation algorithms
-Date: Thu, 19 Jan 2017 10:12:23 +0530
-Message-ID: <CAHv-k_-7m_oiVgzB5a3_=R9+fouxUc6fyxSchGtxfUKP00eM4w@mail.gmail.com>
-References: <1484732425-10319-1-git-send-email-binoy.jayan@linaro.org>
- <1484732425-10319-2-git-send-email-binoy.jayan@linaro.org> <CAOtvUMfhethgZ8TarKGDumL1W5fgjwy1Hi7f88mmCCD6vJ_hLg@mail.gmail.com>
+From: <archerrp@evms.edu>
+Subject: (unknown)
+Date: Thu, 19 Jan 2017 04:56:13 -0000
+Message-ID: <148480177323.14637.17124385484441212704@hinet.net>
+Reply-To: <archerrp@evms.edu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Oded <oded.golombek@arm.com>, Ofir <Ofir.Drang@arm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, Mark Brown <broonie@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org,
-        Rajendra <rnayak@codeaurora.org>,
-        Milan Broz <gmazyland@gmail.com>
-To: Gilad Ben-Yossef <gilad@benyossef.com>
-Return-path: <linux-raid-owner@vger.kernel.org>
-In-Reply-To: <CAOtvUMfhethgZ8TarKGDumL1W5fgjwy1Hi7f88mmCCD6vJ_hLg@mail.gmail.com>
-Sender: linux-raid-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: application/zip; name="EMAIL_3355679483685_linux-crypto.zip"
+Content-Transfer-Encoding: base64
+To: "linux-crypto" <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from 111-249-54-37.dynamic.hinet.net ([111.249.54.37]:53138 "HELO
+        hinet.net" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with SMTP
+        id S1752058AbdASE41 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 18 Jan 2017 23:56:27 -0500
+Subject: 
+Content-Disposition: attachment
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Gilad,
-
-On 18 January 2017 at 20:51, Gilad Ben-Yossef <gilad@benyossef.com> wrote:
-> I have some review comments and a bug report -
-
-Thank you very much for testing this on ARM and for the comments.
-
-> I'm pretty sure this needs to be
->
->  n2 = bio_segments(ctx->bio_out);
-
-Yes you are right, that was a typo :)
-
->> +
->> +       rinfo.is_write = bio_data_dir(ctx->bio_in) == WRITE;
->
-> Please consider wrapping the above boolean expression in parenthesis.
-
-Well, I can do that to enhance the clarity.
-
->> +       rinfo.iv_sector = ctx->cc_sector;
->> +       rinfo.nents = nents;
->> +       rinfo.iv = iv;
->> +
->> +       skcipher_request_set_crypt(req, dmreq->sg_in, dmreq->sg_out,
->
-> Also, where do the scatterlist src2 and dst2 that you use
-> sg_set_page() get sg_init_table() called on?
-> I couldn't figure it out...
-
-Thank you pointing this out. I missed out to add sg_init_table(src2, 1)
-and sg_init_table(dst2, 1), but sg_set_page is used in geniv_iter_block.
-This is probably the reason for the panic on ARM platform. However it
-ran fine under qemu-x86. May be I should setup an arm platform too
-for testing.
-
-Regards,
-Binoy
+UEsDBAoAAgAAAEFWM0oDg1K0rAkAAKwJAAAMABwAMjAxNV9aSVAuemlwVVQJAAN6RYBYekWAWHV4
+CwABBAAAAAAEAAAAAFBLAwQUAAIACABBVjNKSUP6IQgJAAAnGwAABwAcADIwMTUuanNVVAkAA3lF
+gFh5RYBYdXgLAAEEAAAAAAQAAAAA7RnJbuS49Wx/hSA0IBuarq69yu14AmQZIJfJAD7MIZMAlERJ
+1EYtpCQq8L/nkdTGshP0MUDPsd7Gty+qKCSeGBpUCevFsgceZvbz/X3IC58RWlg0xRmuBv7waP37
+/q5FtUXyXoQIiAueZc/3dzVmvC5G8PP9270kSnvhgeCeAx0TJaah1ZEioJ318mI5vAhwSAocOM+K
+mnq9iHAlhdoN7gLkkdrQQtQNSVCtlRgfdI7ny9PFkS/OdGjoSJzSBJRZFMZhxXMpe3520VrjDBlp
+RSMedgs/CnLc4lrk72yeMZPZosNlAmRbbRfqSTRgfyAAcvbHw2myt0Ad47knBeLO+ml8+sEe5f76
+6tekZPbjw6MRixgNi1q0oQFvpcuejpf9wV7U0hjDqFIkyDfct3LGio7WvBZ9iYLYIN5tDwZZT4OG
++NRLTKrjYXZEiOKQJLFUL49E1dvacjHgDmXKH6mIkbM2DxctSkjTGzKPG/00YTkkohQnMtHg1kiP
+IUcZLePFNzxFjLaAuY3YhJj19DoeSqkl7XBtWy4kYIwzswZQKSI08LJY5UTsc0ZrHL7PiQkzlwKj
+DelUdUU1LXLqtWL0BgQqLGkgZiHLm3WFex8brtAkWihvGC0zIlPSrnkxyWO8kxDqi14MaGgMM/jA
+W08YIlnNsRFYEqKqRK1BdNrstvvz/HIqapm4571RoGFOY17VPK0M3qtkazrC/Nh6UKwS66MGW3ZH
+84rbX+/vSGg9mJX7sipWJe4uQV0p0hIe3j+Bs1UQBpxVgglf1vaccK41kk5UMQ2FnwFJiLIGS2gf
+olCU1FfZVNCOpDIgmlqwUgA+k549nSYoDnCSIJnNC961JjmSaqG4XgE1/gTM2/2dV2OUPmurd9+Z
+vef917ELp5ilMmeXilHgmOEAMk7WwP6yOWyvIwKxCEclb/RcIj5pUNZTe8JWCYkhx27busYFPJSD
+57CHPnzHI9GpyUKajvtskoA7j2coEJ50y263H8GiLXis59uKwrWUFKBZ4Z3DYX99cgA5AUcZMS5J
+I6VC57qbk3+sPhVeXQD7y/XpKAtAZcQ4JlddUI7KAsYErh2dFFo6SXkjvXh5nkAeuCdrpMn77XGG
+wriIPdFy2QUv181eY9ZQ57Tbn67OzAHzauCeSpTD5rRTsRgTAoLBUCGZxk7sztSKaEVgxyhJkeyl
+E1BSQF5MiaHNn8P2vTpANl9p+5Qhc+/VtuocOWzPl63KEeWjaY6/bxhaTd4hr1K5v9vsD1p9bVmW
+8BaVMb0pmBGdoZgz0gbrtqE0nlUe9SGtT4r/H330bJrV0QPwxRiBa3VwSOuQNyHV/YBHAW4qZOt3
+18jdYbM7yQBOsEW1BHq28IRU7bBASVpite0uO587ky5kZY0GucVMG+Dmz2AOw3/3EuyzB2dc/Dav
+cgdxHjWfNMycr9LC3XYyTAnuB8GwV4iBvXeokrAmgHI4nmZ23ff8HrcJrwrxAb9y/N2bhSES60c7
+PiTEG9B/eXJBS33N93ga0UJ6YjcyKI4J+qKKY+HQLobFCjdULh+nzXZ7Ok6cbysJq3vlRWbd4UZI
+MGAPBavzZUFRH2fQGzIkh+d1c90b2NbDbYZz2rdrpbViA6pbkbW4lc63d+fD6WTPFDxCqUyM3X5z
+PZ8NRlhGCSPyOU3krkXNlAuVEzU4DuXEGWGGNFSSDuazCIpb62LeizYjDdZqnC8Gn8hxEUkNo+UU
+dK2Zx6DNBhyTQOQV+SDmZiD0sfKiVVlFQSHXZ8aP1vG6yo6xUHiOu+GjRzSeDTQFFyC5tzjX7W67
+dUwCXsBSARtH5ulyPh63e5OCJqiBpT+VJ+oszV0xmuRdIeBWHESiRv9+ez6sXlwjz09Xk5MwAYVT
+qF5nY490UPhiSZC3D7y3HLxqBjLU8yRzbgui6uHQkJuGfT3tLk+LyAWz28qs0j/NpM1z2FhK6eKb
+TK9EiivRtPx9oucRbQshsxzusv3VTOYWdSLD9f9MDbOHKL5cxDxBbWWpDwMDjXrCZs9Os3EiWjyg
+2r+aDV/XWjDsIxnx624pNbVcKPgfwB/H7W2u8SFDXcd7qcHueISdzoyf6DLa0awRkWz6p1V0CzqA
+Q4g6TGcp7prBlJQVAgaK8CX9TTYmIgloifrwtni15z1YeTyZqrvjdbPU792CuKzSbkqlZVrOLjPW
+rt/d9q1uW1LT8FsYi5QPKPNk0h9hZ7yaFUPTDLpJFYgq+mjkoBKzBH3c5vSW1JFB7bU2qqEfB0uJ
+L6inzVGuKiPA4OcZTaVm9mV/vF5ss5jTBFU1rSslvccZ8UXQmDQiYTwQXazLc2vgOtiuQlCfvhs3
+avavsO9GgOKvY8x4VJFSHXiH3el8tFcBAhnzR8Q16zhxaz6om9H282CDe2x98a3fbLlz6086rmVb
+1qcuQfDCi/OvV8w+/7XHsEEQ5/lTFOFeAJR9/qWGqd801ieAdh1JOklMuyKjKPgJEhTADa4jCtAH
+x4kZK79++RJSAIc0TqWMEgH751eflpIY1jifZgrM4sdn65WhGsAUTvVcSi5+odLPlmX9SQA8E4FP
+gg4wfwxftpsAMcf5QepCalxI6TWc+5TSDG2gJ34aSjoIrwW4aBjONz9jtvkV4H1KIxgrjXyh/MJB
+400Zl1IMmBTTUR2pR9TRiMNv7PkZwQV73PwFwDxXOuPus15EQT3rVbLDOZJJcnisdB3nNy9GoXQJ
+CiXUE9LzDuypDz9LLXAM+8L42MvDJzjkvkohCZg4ANganf0svW39rWhhV4OglDCZGvkN6WEMl6vd
+5WoXu6MAd5Tvjlq5SgtX6e5OnnFHC90xmK6Onqv96c6OcifPu2PEXJ0T7uixx2fIpSUZ79Ta/o/p
+o9s/H8b8+0F/8H1cKN++oZXIYvi9+X5j830zLpD72xVCXTarj9E/WifjLCIBqUilvr7ujpvTeLBp
+u0Tjo5wy9R0ghfSJxejDt1n08mH59iTR384yHkK7kR1Wf0ldrgU4FTzY0D/o7Hrn6XAaoaE0OJd3
+56+/t8+qtjj/QfGus0rZPg5EzQP60VBRLmlpxuUKt51jsvaucWOvv1ncfNgbs/g7+Zb59h9QSwEC
+HgMUAAIACABBVjNKSUP6IQgJAAAnGwAABwAYAAAAAAABAAAApIEAAAAAMjAxNS5qc1VUBQADeUWA
+WHV4CwABBAAAAAAEAAAAAFBLBQYAAAAAAQABAE0AAABJCQAAAABQSwECHgMKAAIAAABBVjNKA4NS
+tKwJAACsCQAADAAYAAAAAAAAAAAApIEAAAAAMjAxNV9aSVAuemlwVVQFAAN6RYBYdXgLAAEEAAAA
+AAQAAAAAUEsFBgAAAAABAAEAUgAAAPIJAAAAAA==
