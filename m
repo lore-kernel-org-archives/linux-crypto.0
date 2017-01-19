@@ -1,77 +1,45 @@
-From: =?UTF-8?B?T25kcmVqIE1vc27DocSNZWs=?= <omosnacek@gmail.com>
-Subject: Re: [RFC PATCH 0/6] Add bulk skcipher requests to crypto API and dm-crypt
-Date: Thu, 19 Jan 2017 15:21:37 +0100
-Message-ID: <CAAUqJDtZNGLW-PcPKJD5vdKMZqd6+sAKrbjqVbaVTQqWwZ4cGQ@mail.gmail.com>
-References: <cover.1484215956.git.omosnacek@gmail.com> <20170113104128.GA23497@gondor.apana.org.au>
- <CAAUqJDtqN-ugcaz4VhuW0fzLbmKt4db8ggrRmaAq_zFvO+9Lvw@mail.gmail.com>
- <20170113142959.GA24258@gondor.apana.org.au> <CAAUqJDsrFp2CczN5Gyy=rYLSDKi7=vQTQoyh=pE1kWue=c=fvw@mail.gmail.com>
- <20170118044828.GB4460@gondor.apana.org.au>
+From: Binoy Jayan <binoy.jayan@linaro.org>
+Subject: Re: [RFC PATCH v3] crypto: Add IV generation algorithms
+Date: Thu, 19 Jan 2017 20:33:50 +0530
+Message-ID: <CAHv-k_85e8d3_O50-DEynw=AXSfuFXfj4LT2cqVv2zqwMnG+Pw@mail.gmail.com>
+References: <1484732425-10319-1-git-send-email-binoy.jayan@linaro.org>
+ <1484732425-10319-2-git-send-email-binoy.jayan@linaro.org>
+ <CAOtvUMfhethgZ8TarKGDumL1W5fgjwy1Hi7f88mmCCD6vJ_hLg@mail.gmail.com>
+ <CAHv-k_-7m_oiVgzB5a3_=R9+fouxUc6fyxSchGtxfUKP00eM4w@mail.gmail.com> <CAOtvUMenhgAuZXcsUPpOd5RfQh8XE9krve5YsFF3h-gK8KfDYQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: linux-crypto@vger.kernel.org, dm-devel@redhat.com,
-        Mike Snitzer <snitzer@redhat.com>,
-        Milan Broz <gmazyland@gmail.com>,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        Binoy Jayan <binoy.jayan@linaro.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-lf0-f65.google.com ([209.85.215.65]:34346 "EHLO
-        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752856AbdASOWK (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 Jan 2017 09:22:10 -0500
-Received: by mail-lf0-f65.google.com with SMTP id q89so5601926lfi.1
-        for <linux-crypto@vger.kernel.org>; Thu, 19 Jan 2017 06:21:58 -0800 (PST)
-In-Reply-To: <20170118044828.GB4460@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: Oded <oded.golombek@arm.com>, Ofir <Ofir.Drang@arm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, Mark Brown <broonie@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org,
+        Rajendra <rnayak@codeaurora.org>,
+        Milan Broz <gmazyland@gmail.com>
+To: Gilad Ben-Yossef <gilad@benyossef.com>
+Return-path: <linux-raid-owner@vger.kernel.org>
+In-Reply-To: <CAOtvUMenhgAuZXcsUPpOd5RfQh8XE9krve5YsFF3h-gK8KfDYQ@mail.gmail.com>
+Sender: linux-raid-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-2017-01-18 5:48 GMT+01:00 Herbert Xu <herbert@gondor.apana.org.au>:
-> I'm open to other proposals.  The basic requirement is to be able to
-> process multiple blocks as one entity at the driver level, potentially
-> generating the IVs there too.
+Hi Gilad,
+
+On 19 January 2017 at 15:17, Gilad Ben-Yossef <gilad@benyossef.com> wrote:
+> I tried adding sg_init_table() where I thought it was appropriate and
+> it didn't resolve the issue.
 >
-> It's essentially the equivalent to full IPsec offload.
+> For what it's worth, my guess is that the difference between our
+> setups is not related to Arm but to other options or the storage I'm
+> using.
 
-Hm, I just looked at what the IPsec IV generation is actually doing
-and it seems to me that it's basically a crypto template that just
-somehow transforms the IV before it is passed to the child cipher... I
-thought for a while that you were implying that there already is some
-facility in the crypto API that allows submitting multiple messages +
-some initial sequence number that is auto-incremented and IVs are
-generated from the numbers. However, I could not find anything like
-that in the code, so now I think what you meant was just that I should
-somehow pull the actual IV generators into the crypto layer so that
-the IVs can be generated inside the hardware.
+I was able to reproduce this again on my qemu setup with a 1GB virtual
+disk. That is the same thing I do with the x86 setup as well.
 
-If all you had in mind is just an equivalent of the current IPsec IV
-generation (as I understood it), then my bulk request scheme can in
-fact support it (you'd just pass sector numbers as the IVs). Of
-course, it would require additional changes over my patchset,
-specifically the creation of crypto templates for the dm-crypt IV
-modes, so they can be implemented by drivers. However, I wanted to
-avoid this until the key management in dm-crypt is simplified...
+> Are you using cryptd?
 
-If we also want to let the drivers process an offset+count chunk of
-sectors while auto-incrementing the sector number, then something like
-Binoy's approach would indeed be necessary, where the IV generators
-would be just regular skciphers, taking the initial sector number as
-the IV (although a disadvantage would be hard-coded sector/message
-size). Note, though, that the generic implementation of such transform
-could still use bulk requests on the underlying cipher so that
-encryption/decryption is performed efficiently even if there are no
-optimized/HW drivers for the specific IV generator templates.
+You mean config CRYPTO_CRYPTD?
 
-I will now try to focus on the key management simplification and when
-it is accepted/rejected we can discuss further about the best
-approach.
-
-Cheers,
-Ondrej
-
->
-> Thanks,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+-Binoy
