@@ -1,69 +1,63 @@
 From: Binoy Jayan <binoy.jayan@linaro.org>
-Subject: Re: [RFC PATCH 0/6] Add bulk skcipher requests to crypto API and dm-crypt
-Date: Wed, 18 Jan 2017 22:39:45 +0530
-Message-ID: <CAHv-k_-gcj8t8xw_iCrbq-Tt0zQP+O0s+EDGm5OJQVWFuX37cw@mail.gmail.com>
-References: <cover.1484215956.git.omosnacek@gmail.com> <20170113104128.GA23497@gondor.apana.org.au>
- <CAAUqJDtqN-ugcaz4VhuW0fzLbmKt4db8ggrRmaAq_zFvO+9Lvw@mail.gmail.com>
+Subject: Re: [RFC PATCH v3] crypto: Add IV generation algorithms
+Date: Thu, 19 Jan 2017 10:12:23 +0530
+Message-ID: <CAHv-k_-7m_oiVgzB5a3_=R9+fouxUc6fyxSchGtxfUKP00eM4w@mail.gmail.com>
+References: <1484732425-10319-1-git-send-email-binoy.jayan@linaro.org>
+ <1484732425-10319-2-git-send-email-binoy.jayan@linaro.org> <CAOtvUMfhethgZ8TarKGDumL1W5fgjwy1Hi7f88mmCCD6vJ_hLg@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org, dm-devel@redhat.com,
-        Mike Snitzer <snitzer@redhat.com>,
-        Milan Broz <gmazyland@gmail.com>,
-        Mikulas Patocka <mpatocka@redhat.com>
-To: =?UTF-8?B?T25kcmVqIE1vc27DocSNZWs=?= <omosnacek@gmail.com>,
-        Arnd Bergmann <arnd@arndb.de>, Mark Brown <broonie@kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ua0-f174.google.com ([209.85.217.174]:34849 "EHLO
-        mail-ua0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750950AbdARRKK (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 18 Jan 2017 12:10:10 -0500
-Received: by mail-ua0-f174.google.com with SMTP id y9so14219985uae.2
-        for <linux-crypto@vger.kernel.org>; Wed, 18 Jan 2017 09:09:47 -0800 (PST)
-In-Reply-To: <CAAUqJDtqN-ugcaz4VhuW0fzLbmKt4db8ggrRmaAq_zFvO+9Lvw@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: Oded <oded.golombek@arm.com>, Ofir <Ofir.Drang@arm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, Mark Brown <broonie@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org,
+        Rajendra <rnayak@codeaurora.org>,
+        Milan Broz <gmazyland@gmail.com>
+To: Gilad Ben-Yossef <gilad@benyossef.com>
+Return-path: <linux-raid-owner@vger.kernel.org>
+In-Reply-To: <CAOtvUMfhethgZ8TarKGDumL1W5fgjwy1Hi7f88mmCCD6vJ_hLg@mail.gmail.com>
+Sender: linux-raid-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Milan,
+Hi Gilad,
 
-On 13 January 2017 at 17:31, Ondrej Mosn=C3=A1=C4=8Dek <omosnacek@gmail.com=
-> wrote:
-> 2017-01-13 11:41 GMT+01:00 Herbert Xu <herbert@gondor.apana.org.au>:
->> On Thu, Jan 12, 2017 at 01:59:52PM +0100, Ondrej Mosnacek wrote:
->>> the goal of this patchset is to allow those skcipher API users that nee=
-d to
->>> process batches of small messages (especially dm-crypt) to do so effici=
-ently.
->>
->> Please explain why this can't be done with the existing framework
->> using IV generators similar to the ones used for IPsec.
+On 18 January 2017 at 20:51, Gilad Ben-Yossef <gilad@benyossef.com> wrote:
+> I have some review comments and a bug report -
+
+Thank you very much for testing this on ARM and for the comments.
+
+> I'm pretty sure this needs to be
 >
-> As I already mentioned in another thread, there are basically two reasons=
-:
->
-> 1) Milan would like to add authenticated encryption support to
-> dm-crypt (see [1]) and as part of this change, a new random IV mode
-> would be introduced. This mode generates a random IV for each sector
-> write, includes it in the authenticated data and stores it in the
-> sector's metadata (in a separate part of the disk). In this case
-> dm-crypt will need to have control over the IV generation (or at least
-> be able to somehow retrieve it after the crypto operation... but
-> passing RNG responsibility to drivers doesn't seem to be a good idea
-> anyway).
->
-> 2) With this API, drivers wouldn't have to provide implementations for
-> specific IV generation modes, and just implement bulk requests for the
-> common modes/algorithms (XTS, CBC, ...) while still getting
-> performance benefit.
+>  n2 = bio_segments(ctx->bio_out);
 
-I just sent out v3 for the dm-crypt changes I was working on. I
-came across your patches for authenticated encryption support.
-Although I haven't looked at it entirely, I was wondering how it could
-be put together including the points Ondrej was mentioning. Will look at
-it more. Please keep me in cc when you send out the next revision if
-that is possible.
+Yes you are right, that was a typo :)
 
-Thanks,
+>> +
+>> +       rinfo.is_write = bio_data_dir(ctx->bio_in) == WRITE;
+>
+> Please consider wrapping the above boolean expression in parenthesis.
+
+Well, I can do that to enhance the clarity.
+
+>> +       rinfo.iv_sector = ctx->cc_sector;
+>> +       rinfo.nents = nents;
+>> +       rinfo.iv = iv;
+>> +
+>> +       skcipher_request_set_crypt(req, dmreq->sg_in, dmreq->sg_out,
+>
+> Also, where do the scatterlist src2 and dst2 that you use
+> sg_set_page() get sg_init_table() called on?
+> I couldn't figure it out...
+
+Thank you pointing this out. I missed out to add sg_init_table(src2, 1)
+and sg_init_table(dst2, 1), but sg_set_page is used in geniv_iter_block.
+This is probably the reason for the panic on ARM platform. However it
+ran fine under qemu-x86. May be I should setup an arm platform too
+for testing.
+
+Regards,
 Binoy
