@@ -1,67 +1,84 @@
-From: Cyrille Pitchen <cyrille.pitchen@atmel.com>
-Subject: Re: [PATCH 00/13] crypto: copy AAD during encrypt for AEAD ciphers
-Date: Fri, 20 Jan 2017 18:07:04 +0100
-Message-ID: <2a4fab23-3ea7-a0f7-7c30-55d301f51ec9@atmel.com>
-References: <10526995.lyZ7Je1KMx@positron.chronox.de>
- <1704568.lHqrOxcchT@positron.chronox.de>
- <20170113113324.GA24021@gondor.apana.org.au>
- <2829634.RJknVxGPvY@positron.chronox.de>
- <20170113113906.GA24096@gondor.apana.org.au>
+From: Greg KH <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH 0/2] Introduce AMD Secure Processor device
+Date: Fri, 20 Jan 2017 18:39:38 +0100
+Message-ID: <20170120173938.GA10177@kroah.com>
+References: <148484927002.30852.10568570584817827556.stgit@brijesh-build-machine>
+ <20170119182101.GB30851@kroah.com>
+ <0442f536-221d-fcef-3009-4bc07403ccd8@amd.com>
+ <20170120084530.GA25333@kroah.com>
+ <129bc948-6836-bf0f-832e-525f0805c549@amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 8bit
-Cc: <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        =?UTF-8?Q?Stephan_M=c3=bcller?= <smueller@chronox.de>
+Content-Type: text/plain; charset=us-ascii
+Cc: thomas.lendacky@amd.com, herbert@gondor.apana.org.au,
+        arnd@arndb.de, lambert.quentin@gmail.com, gary.hook@amd.com,
+        linux-kernel@vger.kernel.org, Julia.Lawall@lip6.fr,
+        weiyongjun1@huawei.com, linux-crypto@vger.kernel.org,
+        umgwanakikbuti@gmail.com
+To: Brijesh Singh <brijesh.singh@amd.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtpout.microchip.com ([198.175.253.82]:39094 "EHLO
-        email.microchip.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1752110AbdATRJM (ORCPT
+Received: from mail.linuxfoundation.org ([140.211.169.12]:35096 "EHLO
+        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751406AbdATRkq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Jan 2017 12:09:12 -0500
-In-Reply-To: <20170113113906.GA24096@gondor.apana.org.au>
+        Fri, 20 Jan 2017 12:40:46 -0500
+Content-Disposition: inline
+In-Reply-To: <129bc948-6836-bf0f-832e-525f0805c549@amd.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi all,
-
-Le 13/01/2017 à 12:39, Herbert Xu a écrit :
-> On Fri, Jan 13, 2017 at 12:36:56PM +0100, Stephan Müller wrote:
->>
->> I thought I understood that you would not want to see it in any 
->> implementation. But, ok, if you want to leave it.
+On Fri, Jan 20, 2017 at 09:40:49AM -0600, Brijesh Singh wrote:
 > 
-> If you remove it from authenc then authenc will be broken.
+> On 01/20/2017 02:45 AM, Greg KH wrote:
+> > On Thu, Jan 19, 2017 at 02:03:12PM -0600, Brijesh Singh wrote:
+> > > Hi Greg,
+> > > 
+> > > On 01/19/2017 12:21 PM, Greg KH wrote:
+> > > > On Thu, Jan 19, 2017 at 01:07:50PM -0500, Brijesh Singh wrote:
+> > > > > The CCP device (drivers/crypto/ccp/ccp.ko) is part of AMD Secure Processor,
+> > > > > which is not dedicated solely to crypto. The AMD Secure Processor includes
+> > > > > CCP and PSP (Platform Secure Processor) devices.
+> > > > > 
+> > > > > This patch series moves the CCP device driver to the misc directory and
+> > > > > creates a framework that allows functional component of the AMD Secure
+> > > > > Processor to be initialized and handled appropriately.
+> > > > 
+> > > > Why the misc directory?  I don't see the justification here...
+> > > > 
+> > > 
+> > > Since this driver is not solely for crypto purposes and do not fit in any of
+> > > the standard categories hence I thought of moving it into misc directory. I
+> > > am open to other suggestions unless Herbert is ok with leaving it into
+> > > crypto and allowing the addition of the Secure Processor support.
+> > > 
+> > > The patch series allows the CCP driver to support other Secure Processor
+> > > functions, e.g Secure Encrypted Virtualization (SEV) key management. In
+> > > past, I tried to add SEV support into existing CCP driver [1] but we quickly
+> > > learned that CCP driver should be moved outside the crypto directory
+> > > otherwise will end up adding non crypto code into drivers/crypto directory.
+> > > Once this cleanup is accepted then I can work to add SEV support inside the
+> > > CCP driver.
+> > > 
+> > > [1] http://marc.info/?l=linux-kernel&m=147204118426151&w=2
+> > 
+> > Ok, what type of interface will this driver have with userspace and/or
+> > other parts of the kernel?  Is there a misc char device burried in there
+> > somewhere (I couldn't find it in the big diff sent out), or is this
+> > driver just creating specific apis that other parts of the kernel will
+> > call if available?
+> > 
 > 
+> Eventually, the driver will export functions which will be used by KVM
+> to encrypt the guest memory and more. Additionally, If SEV device is
+> detected then driver will create a misc char device which can be used by
+> userspace to import/export certificates etc.
 
-Hence if the copy of the associated data is needed in the crypto/authenc.c
-driver, then I should also keep this copy in the drivers/crypto/atmel-aes.c
-for authenc(hmac(shaX),cbc-aes) algorithms [1], shouldn't I?
+Why create a new api for certificates, why not just use the existing
+kernel key handling for it?
 
-If so, should I keep the current not optimized implementation of
-atmel_aes_authenc_copy_assoc() or try to use the code extracted by Stephan
-from crypto/authenc.c using the null cipher as proposed in this thread?
+Having a random char device for something like this is going to be rough
+to approve, I'll wait for the patches before I start objecting really
+hard :)
 
-As said earlier in this thread, copying the associated data is not a so big
-deal when compared to the main crypto processing.
+thanks,
 
-For instance, with IPSec ESP with AES in CBC mode, the associated data
-layout should be:
-Security Parameters Index (SPI): 4 bytes
-Sequence Number: 4 bytes
-AES IV: 16 bytes
-
-So it's only a 24 byte copy.
-
-I've taken Stephan's other comments into account from his review of the
-atmel-authenc driver so I'm preparing a new series but I don't know what to
-do for the associated data copy.
-
-Please let me know what you recommend, thanks!
-
-Best regards,
-
-Cyrille
-
-
-[1] https://lkml.org/lkml/2016/12/22/306
+greg k-h
