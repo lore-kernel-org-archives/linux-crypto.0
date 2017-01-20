@@ -1,87 +1,70 @@
-From: Li Zhong <zhong@linux.vnet.ibm.com>
-Subject: [PATCH] crypto: vmx -- disable preemption to enable vsx in aes_ctr.c
-Date: Fri, 20 Jan 2017 16:35:33 +0800
-Message-ID: <1484901333.8207.11.camel@TP420>
+From: Greg KH <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH 0/2] Introduce AMD Secure Processor device
+Date: Fri, 20 Jan 2017 09:45:30 +0100
+Message-ID: <20170120084530.GA25333@kroah.com>
+References: <148484927002.30852.10568570584817827556.stgit@brijesh-build-machine>
+ <20170119182101.GB30851@kroah.com>
+ <0442f536-221d-fcef-3009-4bc07403ccd8@amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: leosilva@linux.vnet.ibm.com, pfsmorigo@linux.vnet.ibm.com,
-        herbert@gondor.apana.org.au
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: thomas.lendacky@amd.com, herbert@gondor.apana.org.au,
+        arnd@arndb.de, lambert.quentin@gmail.com, gary.hook@amd.com,
+        linux-kernel@vger.kernel.org, Julia.Lawall@lip6.fr,
+        weiyongjun1@huawei.com, linux-crypto@vger.kernel.org,
+        umgwanakikbuti@gmail.com
+To: Brijesh Singh <brijesh.singh@amd.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51143 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1751403AbdATIfm (ORCPT
+Received: from mail.linuxfoundation.org ([140.211.169.12]:45894 "EHLO
+        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751522AbdATIxb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Jan 2017 03:35:42 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id v0K8Z772104606
-        for <linux-crypto@vger.kernel.org>; Fri, 20 Jan 2017 03:35:41 -0500
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 283c3sxp13-1
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Fri, 20 Jan 2017 03:35:41 -0500
-Received: from localhost
-        by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-crypto@vger.kernel.org> from <zhong@linux.vnet.ibm.com>;
-        Fri, 20 Jan 2017 08:35:39 -0000
+        Fri, 20 Jan 2017 03:53:31 -0500
+Content-Disposition: inline
+In-Reply-To: <0442f536-221d-fcef-3009-4bc07403ccd8@amd.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Some preemptible check warnings were reported from enable_kernel_vsx(). This
-patch disables preemption in aes_ctr.c before enabling vsx, and they are now 
-consistent with other files in the same directory.
+On Thu, Jan 19, 2017 at 02:03:12PM -0600, Brijesh Singh wrote:
+> Hi Greg,
+> 
+> On 01/19/2017 12:21 PM, Greg KH wrote:
+> > On Thu, Jan 19, 2017 at 01:07:50PM -0500, Brijesh Singh wrote:
+> > > The CCP device (drivers/crypto/ccp/ccp.ko) is part of AMD Secure Processor,
+> > > which is not dedicated solely to crypto. The AMD Secure Processor includes
+> > > CCP and PSP (Platform Secure Processor) devices.
+> > > 
+> > > This patch series moves the CCP device driver to the misc directory and
+> > > creates a framework that allows functional component of the AMD Secure
+> > > Processor to be initialized and handled appropriately.
+> > 
+> > Why the misc directory?  I don't see the justification here...
+> > 
+> 
+> Since this driver is not solely for crypto purposes and do not fit in any of
+> the standard categories hence I thought of moving it into misc directory. I
+> am open to other suggestions unless Herbert is ok with leaving it into
+> crypto and allowing the addition of the Secure Processor support.
+> 
+> The patch series allows the CCP driver to support other Secure Processor
+> functions, e.g Secure Encrypted Virtualization (SEV) key management. In
+> past, I tried to add SEV support into existing CCP driver [1] but we quickly
+> learned that CCP driver should be moved outside the crypto directory
+> otherwise will end up adding non crypto code into drivers/crypto directory.
+> Once this cleanup is accepted then I can work to add SEV support inside the
+> CCP driver.
+> 
+> [1] http://marc.info/?l=linux-kernel&m=147204118426151&w=2
 
-Signed-off-by: Li Zhong <zhong@linux.vnet.ibm.com>
----
- drivers/crypto/vmx/aes_ctr.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+Ok, what type of interface will this driver have with userspace and/or
+other parts of the kernel?  Is there a misc char device burried in there
+somewhere (I couldn't find it in the big diff sent out), or is this
+driver just creating specific apis that other parts of the kernel will
+call if available?
 
-diff --git a/drivers/crypto/vmx/aes_ctr.c b/drivers/crypto/vmx/aes_ctr.c
-index 38ed10d..7cf6d31 100644
---- a/drivers/crypto/vmx/aes_ctr.c
-+++ b/drivers/crypto/vmx/aes_ctr.c
-@@ -80,11 +80,13 @@ static int p8_aes_ctr_setkey(struct crypto_tfm *tfm, const u8 *key,
- 	int ret;
- 	struct p8_aes_ctr_ctx *ctx = crypto_tfm_ctx(tfm);
- 
-+	preempt_disable();
- 	pagefault_disable();
- 	enable_kernel_vsx();
- 	ret = aes_p8_set_encrypt_key(key, keylen * 8, &ctx->enc_key);
- 	disable_kernel_vsx();
- 	pagefault_enable();
-+	preempt_enable();
- 
- 	ret += crypto_blkcipher_setkey(ctx->fallback, key, keylen);
- 	return ret;
-@@ -99,11 +101,13 @@ static void p8_aes_ctr_final(struct p8_aes_ctr_ctx *ctx,
- 	u8 *dst = walk->dst.virt.addr;
- 	unsigned int nbytes = walk->nbytes;
- 
-+	preempt_disable();
- 	pagefault_disable();
- 	enable_kernel_vsx();
- 	aes_p8_encrypt(ctrblk, keystream, &ctx->enc_key);
- 	disable_kernel_vsx();
- 	pagefault_enable();
-+	preempt_enable();
- 
- 	crypto_xor(keystream, src, nbytes);
- 	memcpy(dst, keystream, nbytes);
-@@ -132,6 +136,7 @@ static int p8_aes_ctr_crypt(struct blkcipher_desc *desc,
- 		blkcipher_walk_init(&walk, dst, src, nbytes);
- 		ret = blkcipher_walk_virt_block(desc, &walk, AES_BLOCK_SIZE);
- 		while ((nbytes = walk.nbytes) >= AES_BLOCK_SIZE) {
-+			preempt_disable();
- 			pagefault_disable();
- 			enable_kernel_vsx();
- 			aes_p8_ctr32_encrypt_blocks(walk.src.virt.addr,
-@@ -143,6 +148,7 @@ static int p8_aes_ctr_crypt(struct blkcipher_desc *desc,
- 						    walk.iv);
- 			disable_kernel_vsx();
- 			pagefault_enable();
-+			preempt_enable();
- 
- 			/* We need to update IV mostly for last bytes/round */
- 			inc = (nbytes & AES_BLOCK_MASK) / AES_BLOCK_SIZE;
+I think we need to see more code here, broken up into sane and
+reviewable pieces, before we could either say "No don't do that!" or
+"sure, let me go merge these!" :)
+
+thanks,
+
+greg k-h
