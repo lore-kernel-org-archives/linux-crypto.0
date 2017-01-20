@@ -1,675 +1,650 @@
 From: Nitin Kumbhar <nkumbhar@nvidia.com>
-Subject: [PATCH 5/6] crypto: testmgr: add ECDSA tests
-Date: Fri, 20 Jan 2017 17:06:00 +0530
-Message-ID: <1484912161-5932-6-git-send-email-nkumbhar@nvidia.com>
+Subject: [PATCH 1/6] crypto: ecc: separate out ecc and ecdh
+Date: Fri, 20 Jan 2017 17:05:56 +0530
+Message-ID: <1484912161-5932-2-git-send-email-nkumbhar@nvidia.com>
 References: <1484912161-5932-1-git-send-email-nkumbhar@nvidia.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: <linux-crypto@vger.kernel.org>, Nitin Kumbhar <nkumbhar@nvidia.com>
 To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from hqemgate16.nvidia.com ([216.228.121.65]:5467 "EHLO
+Received: from hqemgate16.nvidia.com ([216.228.121.65]:5444 "EHLO
         hqemgate16.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751833AbdATLg6 (ORCPT
+        with ESMTP id S1751658AbdATLg5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Jan 2017 06:36:58 -0500
+        Fri, 20 Jan 2017 06:36:57 -0500
 In-Reply-To: <1484912161-5932-1-git-send-email-nkumbhar@nvidia.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Update crypto test manager to include NIST ECDSA
-test vectors and various ECDSA tests. These include
-tests for ECDSA signing, ECDSA sign-verification,
-ECDSA signing and verifying generated signatures and
-invalidation of incorrect signatures.
+Add ECC operations i.e. vli and ecc point ops as a separate
+module under CRYPTO_ECC kconfig. This allows other ECC
+algorithms like ECDSA & ECIES to reuse these ops even when ECDH
+is disabled with CRYPTO_ECDH kconfig.
+
+With these changes, ECDH specific functions are consolidated
+as ECDH helper routines and ECC curves are moved to ECC specific
+files.
 
 Signed-off-by: Nitin Kumbhar <nkumbhar@nvidia.com>
 ---
- crypto/testmgr.c |  452 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
- crypto/testmgr.h |  140 +++++++++++++++++
- 2 files changed, 589 insertions(+), 3 deletions(-)
+ crypto/Kconfig          |    7 +++
+ crypto/Makefile         |    5 +-
+ crypto/ecc.c            |  133 ++++++++++++++--------------------------------
+ crypto/ecc.h            |   45 ++--------------
+ crypto/ecc_curve_defs.h |   51 ++++--------------
+ crypto/ecc_ecdh.h       |   54 +++++++++++++++++++
+ crypto/ecdh.c           |    4 +-
+ crypto/ecdh_helper.c    |   94 +++++++++++++++++++++++++++++++++
+ include/crypto/ecc.h    |   24 +++++++++
+ include/crypto/ecdh.h   |   10 +---
+ 10 files changed, 243 insertions(+), 184 deletions(-)
+ create mode 100644 crypto/ecc_ecdh.h
+ create mode 100644 include/crypto/ecc.h
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 98eb09782db8..a1db28cbc32d 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -5,6 +5,7 @@
-  * Copyright (c) 2002 Jean-Francois Dive <jef@linuxbe.org>
-  * Copyright (c) 2007 Nokia Siemens Networks
-  * Copyright (c) 2008 Herbert Xu <herbert@gondor.apana.org.au>
-+ * Copyright (c) 2017 NVIDIA Corporation
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 160f08e721cc..e240075d6f46 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -127,9 +127,16 @@ config CRYPTO_DH
+ 	help
+ 	  Generic implementation of the Diffie-Hellman algorithm.
+ 
++config CRYPTO_ECC
++	tristate "ECC functions"
++	help
++	  Implementation of ECC functions
++
++
+ config CRYPTO_ECDH
+ 	tristate "ECDH algorithm"
+ 	select CRYTPO_KPP
++	select CRYPTO_ECC
+ 	help
+ 	  Generic implementation of the ECDH algorithm
+ 
+diff --git a/crypto/Makefile b/crypto/Makefile
+index b8f0e3eb0791..827740a47a37 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -33,8 +33,9 @@ obj-$(CONFIG_CRYPTO_KPP2) += kpp.o
+ dh_generic-y := dh.o
+ dh_generic-y += dh_helper.o
+ obj-$(CONFIG_CRYPTO_DH) += dh_generic.o
+-ecdh_generic-y := ecc.o
+-ecdh_generic-y += ecdh.o
++
++obj-$(CONFIG_CRYPTO_ECC) += ecc.o
++ecdh_generic-y := ecdh.o
+ ecdh_generic-y += ecdh_helper.o
+ obj-$(CONFIG_CRYPTO_ECDH) += ecdh_generic.o
+ 
+diff --git a/crypto/ecc.c b/crypto/ecc.c
+index 414c78a9c214..a8c10e725138 100644
+--- a/crypto/ecc.c
++++ b/crypto/ecc.c
+@@ -1,6 +1,7 @@
+ /*
+  * Copyright (c) 2013, Kenneth MacKay
+  * All rights reserved.
++ * Copyright (c) 2017, NVIDIA Corporation. All Rights Reserved.
   *
-  * Updated RFC4106 AES-GCM testing.
-  *    Authors: Aidan O'Mahony (aidan.o.mahony@intel.com)
-@@ -2085,6 +2086,436 @@ static int alg_test_kpp(const struct alg_test_desc *desc, const char *driver,
- 	return err;
- }
+  * Redistribution and use in source and binary forms, with or without
+  * modification, are permitted provided that the following conditions are
+@@ -28,16 +29,54 @@
+ #include <linux/slab.h>
+ #include <linux/swab.h>
+ #include <linux/fips.h>
+-#include <crypto/ecdh.h>
  
-+static int do_test_ecdsa_verify(struct crypto_akcipher *tfm,
-+			      struct akcipher_testvec *vec)
-+{
-+	struct akcipher_request *req = NULL;
-+	u8 *r_str = NULL, *s_str = NULL;
-+	u8 *m_str = NULL;
-+	struct scatterlist src_tab[3], dst;
-+	struct tcrypt_result result;
-+	unsigned int outbuf_maxlen;
-+	u8 *outbuf = NULL;
-+	unsigned int nbytes;
-+	int err;
-+
-+	/* Alloc akcipher request */
-+	req = akcipher_request_alloc(tfm, GFP_KERNEL);
-+	if (!req)
-+		return -ENOMEM;
-+
-+	/* Set private key */
-+	err = crypto_akcipher_set_pub_key(tfm, vec->key, vec->key_len);
-+	if (err)
-+		goto error;
-+
-+	/*
-+	 * vec->c always contains k, R and S in that order. All are
-+	 * of same size and are equal to n i.e. the order of
-+	 * an elliptic curve.
-+	 */
-+	nbytes = vec->c_size / 3;
-+
-+	r_str = kzalloc(nbytes, GFP_KERNEL);
-+	s_str = kzalloc(nbytes, GFP_KERNEL);
-+	m_str = kzalloc(vec->m_size, GFP_KERNEL);
-+	if (!r_str || !s_str || !m_str) {
-+		err = -ENOMEM;
-+		goto error;
-+	}
-+	memcpy(r_str, (u8 *)vec->c + nbytes, nbytes);
-+	memcpy(s_str, (u8 *)vec->c + 2 * nbytes, nbytes);
-+	memcpy(m_str, vec->m, vec->m_size);
-+
-+	outbuf_maxlen = crypto_akcipher_maxsize(tfm);
-+	if (outbuf_maxlen < 0) {
-+		err = outbuf_maxlen;
-+		goto error;
-+	}
-+	outbuf = kzalloc(outbuf_maxlen, GFP_KERNEL);
-+	if (!outbuf) {
-+		err = -ENOMEM;
-+		goto error;
-+	}
-+
-+	/* Set src and dst buffers */
-+	sg_init_table(src_tab, 3);
-+	sg_set_buf(&src_tab[0], m_str, vec->m_size);
-+	sg_set_buf(&src_tab[1], r_str, nbytes);
-+	sg_set_buf(&src_tab[2], s_str, nbytes);
-+	sg_init_one(&dst, outbuf, outbuf_maxlen);
-+
-+	akcipher_request_set_crypt(req, src_tab, &dst,
-+				   vec->m_size + 2 * nbytes, outbuf_maxlen);
-+
-+	/* Set up result callback */
-+	init_completion(&result.completion);
-+	akcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-+				      tcrypt_complete, &result);
-+
-+	/* Run ecdsa verify operation on sig (r,s) */
-+	err = wait_async_op(&result, crypto_akcipher_verify(req));
-+	if (err) {
-+		pr_err("alg: ecdsa: verify(rs) test failed. err %d\n", err);
-+		goto error;
-+	}
-+error:
-+	akcipher_request_free(req);
-+	kfree(r_str);
-+	kfree(s_str);
-+	kfree(m_str);
-+	kfree(outbuf);
-+	return err;
-+}
-+
-+static int do_test_ecdsa_invalid_verify(struct crypto_akcipher *tfm,
-+					struct akcipher_testvec *vec)
-+{
-+	struct akcipher_request *req = NULL;
-+	u8 *r_str = NULL, *s_str = NULL;
-+	u8 *m_str = NULL;
-+	struct scatterlist src_tab[3], dst;
-+	struct tcrypt_result result;
-+	unsigned int outbuf_maxlen;
-+	u8 *outbuf = NULL;
-+	unsigned int nbytes;
-+	int err;
-+
-+	/* Alloc akcipher request */
-+	req = akcipher_request_alloc(tfm, GFP_KERNEL);
-+	if (!req)
-+		return -ENOMEM;
-+
-+	/* Set private key */
-+	err = crypto_akcipher_set_pub_key(tfm, vec->key, vec->key_len);
-+	if (err)
-+		goto error;
-+
-+	/*
-+	 * vec->c always contains k, R and S in that order. All are
-+	 * of same size and are equal to n i.e. the order of
-+	 * an elliptic curve.
-+	 */
-+	nbytes = vec->c_size / 3;
-+
-+	r_str = kzalloc(nbytes, GFP_KERNEL);
-+	s_str = kzalloc(nbytes, GFP_KERNEL);
-+	m_str = kzalloc(vec->m_size, GFP_KERNEL);
-+	if (!r_str || !s_str || !m_str) {
-+		err = -ENOMEM;
-+		goto error;
-+	}
-+	memcpy(r_str, (u8 *)vec->c + 1 * nbytes, nbytes);
-+	memcpy(s_str, (u8 *)vec->c + 2 * nbytes, nbytes);
-+	memcpy(m_str, vec->m, vec->m_size);
-+
-+	outbuf_maxlen = crypto_akcipher_maxsize(tfm);
-+	if (outbuf_maxlen < 0) {
-+		err = outbuf_maxlen;
-+		goto error;
-+	}
-+	outbuf = kzalloc(outbuf_maxlen, GFP_KERNEL);
-+	if (!outbuf) {
-+		err = -ENOMEM;
-+		goto error;
-+	}
-+
-+	/* Set src and dst buffers */
-+	sg_init_table(src_tab, 3);
-+	/* Intentionally set m_size to 8 to have invalid hash */
-+	sg_set_buf(&src_tab[0], m_str, 8);
-+	sg_set_buf(&src_tab[1], r_str, nbytes);
-+	sg_set_buf(&src_tab[2], s_str, nbytes);
-+	sg_init_one(&dst, outbuf, outbuf_maxlen);
-+
-+	akcipher_request_set_crypt(req, src_tab, &dst,
-+				   vec->m_size + 2 * nbytes, outbuf_maxlen);
-+
-+	/* Set up result callback */
-+	init_completion(&result.completion);
-+	akcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-+				      tcrypt_complete, &result);
-+
-+	/* Run ecdsa verify operation on sig (r,s) */
-+	err = wait_async_op(&result, crypto_akcipher_verify(req));
-+	if (err != -EBADMSG) {
-+		pr_err("alg: ecdsa: invalid verify test failed. err %d\n", err);
-+		goto error;
-+	}
-+	err = 0;
-+error:
-+	akcipher_request_free(req);
-+	kfree(r_str);
-+	kfree(s_str);
-+	kfree(m_str);
-+	kfree(outbuf);
-+	return err;
-+}
-+
-+static int do_test_ecdsa_sign_verify(struct crypto_akcipher *tfm,
-+				     struct akcipher_testvec *vec)
-+{
-+	struct akcipher_request *req = NULL;
-+	u8 *r_str = NULL, *s_str = NULL;
-+	u8 *m_str = NULL;
-+	struct scatterlist src_tab[3];
-+	struct scatterlist src, dst;
-+	struct tcrypt_result result;
-+	unsigned int outbuf_maxlen;
-+	void *outbuf = NULL;
-+	unsigned int nbytes;
-+	int err;
-+
-+	/* Alloc akcipher request */
-+	req = akcipher_request_alloc(tfm, GFP_KERNEL);
-+	if (!req)
-+		return -ENOMEM;
-+
-+	/* Set private key */
-+	err = crypto_akcipher_set_priv_key(tfm, vec->key, vec->key_len);
-+	if (err)
-+		goto error;
-+
-+	/* Set private key */
-+	err = crypto_akcipher_set_pub_key(tfm, vec->key, vec->key_len);
-+	if (err)
-+		goto error;
-+
-+	/*
-+	 * vec->c always contains k, R and S in that order. All are
-+	 * of same size and are equal to n i.e. the order of
-+	 * an elliptic curve.
-+	 */
-+	nbytes = vec->c_size / 3;
-+
-+	m_str = kzalloc(vec->m_size, GFP_KERNEL);
-+	if (!m_str) {
-+		err = -ENOMEM;
-+		goto error;
-+	}
-+	memcpy(m_str, vec->m, vec->m_size);
-+
-+	outbuf_maxlen = crypto_akcipher_maxsize(tfm);
-+	if (outbuf_maxlen < 0) {
-+		err = outbuf_maxlen;
-+		goto error;
-+	}
-+	outbuf = kzalloc(outbuf_maxlen, GFP_KERNEL);
-+	if (!outbuf) {
-+		err = -ENOMEM;
-+		goto error;
-+	}
-+
-+	sg_init_one(&src, m_str, vec->m_size);
-+	sg_init_one(&dst, outbuf, outbuf_maxlen);
-+
-+	akcipher_request_set_crypt(req, &src, &dst,
-+				   vec->m_size, outbuf_maxlen);
-+
-+	/* Set up result callback */
-+	init_completion(&result.completion);
-+	akcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-+				      tcrypt_complete, &result);
-+
-+	/* Run ecdsa sign operation on message digest */
-+	err = wait_async_op(&result, crypto_akcipher_sign(req));
-+	if (err) {
-+		pr_err("alg: ecdsa: sign test failed. err %d\n", err);
-+		goto error;
-+	}
-+
-+	/* verify that signature (r,s) is valid */
-+	if (req->dst_len != 2 * nbytes) {
-+		pr_err("alg: ecdsa: sign test failed. Invalid sig len\n");
-+		err = -EINVAL;
-+		goto error;
-+	}
-+
-+	/* output contains r and s */
-+	r_str = outbuf;
-+	s_str = (u8 *)outbuf + nbytes;
-+
-+	/* Set src and dst buffers */
-+	sg_init_table(src_tab, 3);
-+	sg_set_buf(&src_tab[0], m_str, vec->m_size);
-+	sg_set_buf(&src_tab[1], r_str, nbytes);
-+	sg_set_buf(&src_tab[2], s_str, nbytes);
-+	sg_init_one(&dst, outbuf, outbuf_maxlen);
-+
-+	akcipher_request_set_crypt(req, src_tab, &dst,
-+				   vec->m_size + 2 * nbytes, outbuf_maxlen);
-+
-+	/* Set up result callback */
-+	init_completion(&result.completion);
-+	akcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-+				      tcrypt_complete, &result);
-+
-+	/* Run ecdsa verify operation on sig (r,s) */
-+	err = wait_async_op(&result, crypto_akcipher_verify(req));
-+	if (err) {
-+		pr_err("alg: ecdsa: verify test failed. err %d\n", err);
-+		goto error;
-+	}
-+error:
-+	akcipher_request_free(req);
-+	kfree(m_str);
-+	kfree(outbuf);
-+	return err;
-+}
-+
-+static int do_test_ecdsa_sign(struct crypto_akcipher *tfm,
-+			      struct akcipher_testvec *vec)
-+{
-+	struct akcipher_request *req = NULL;
-+	u8 *r_str = NULL, *s_str = NULL;
-+	u8 *k_str = NULL, *m_str = NULL;
-+	struct scatterlist src, dst;
-+	struct tcrypt_result result;
-+	unsigned int outbuf_maxlen;
-+	void *outbuf = NULL;
-+	unsigned int nbytes;
-+	int err;
-+
-+	/* Alloc akcipher request */
-+	req = akcipher_request_alloc(tfm, GFP_KERNEL);
-+	if (!req)
-+		return -ENOMEM;
-+
-+	/* Set private key */
-+	err = crypto_akcipher_set_priv_key(tfm, vec->key, vec->key_len);
-+	if (err)
-+		goto error;
-+
-+	/*
-+	 * vec->c always contains k, R and S in that order. All are
-+	 * of same size and are equal to n i.e. the order of
-+	 * an elliptic curve.
-+	 */
-+	nbytes = vec->c_size / 3;
-+
-+	k_str = kzalloc(nbytes, GFP_KERNEL);
-+	r_str = kzalloc(nbytes, GFP_KERNEL);
-+	s_str = kzalloc(nbytes, GFP_KERNEL);
-+	m_str = kzalloc(vec->m_size, GFP_KERNEL);
-+	if (!k_str || !r_str || !s_str || !m_str) {
-+		err = -ENOMEM;
-+		goto error;
-+	}
-+	memcpy(k_str, (u8 *)vec->c + 0 * nbytes, nbytes);
-+	memcpy(r_str, (u8 *)vec->c + 1 * nbytes, nbytes);
-+	memcpy(s_str, (u8 *)vec->c + 2 * nbytes, nbytes);
-+	memcpy(m_str, vec->m, vec->m_size);
-+
-+	outbuf_maxlen = crypto_akcipher_maxsize(tfm);
-+	if (outbuf_maxlen < 0) {
-+		err = outbuf_maxlen;
-+		goto error;
-+	}
-+	outbuf = kzalloc(outbuf_maxlen, GFP_KERNEL);
-+	if (!outbuf) {
-+		err = -ENOMEM;
-+		goto error;
-+	}
-+
-+	/* Set src and dst buffers */
-+	sg_init_one(&src, m_str, vec->m_size);
-+	sg_init_one(&dst, outbuf, outbuf_maxlen);
-+
-+	akcipher_request_set_crypt(req, &src, &dst,
-+				   vec->m_size, outbuf_maxlen);
-+
-+	/* Set up result callback */
-+	init_completion(&result.completion);
-+	akcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-+				      tcrypt_complete, &result);
-+
-+	/* Set K in request for signing */
-+	req->info = k_str;
-+
-+	/* Run ecdsa sign operation on message digest */
-+	err = wait_async_op(&result, crypto_akcipher_sign(req));
-+	if (err) {
-+		pr_err("alg: ecdsa: sign(k) test failed. err %d\n", err);
-+		goto error;
-+	}
-+
-+	/* verify that signature (r,s) is valid */
-+	if (req->dst_len != 2 * nbytes) {
-+		pr_err("alg: ecdsa: sign(k) test failed. Invalid sig len\n");
-+		err = -EINVAL;
-+		goto error;
-+	}
-+
-+	if (memcmp(r_str, sg_virt(req->dst), nbytes)) {
-+		pr_err("alg: ecdsa: sign(k) test failed. Invalid sig(r)\n");
-+		err = -EINVAL;
-+		goto error;
-+	}
-+
-+	if (memcmp(s_str, (u8 *)sg_virt(req->dst) + nbytes, nbytes)) {
-+		pr_err("alg: ecdsa: sign(k) test failed. Invalid sig(s)\n");
-+		err = -EINVAL;
-+		goto error;
-+	}
-+error:
-+	akcipher_request_free(req);
-+	kfree(k_str);
-+	kfree(r_str);
-+	kfree(s_str);
-+	kfree(m_str);
-+	kfree(outbuf);
-+	return err;
-+}
-+
-+static int test_ecdsa_akcipher(struct crypto_akcipher *tfm, const char *alg,
-+		       struct akcipher_testvec *vecs, unsigned int tcount)
-+{
-+	int i, err = 0;
-+
-+	for (i = 0; i < tcount; i++) {
-+		err = do_test_ecdsa_verify(tfm, &vecs[i]);
-+		if (!err)
-+			continue;
-+
-+		pr_err("ecdsa: verify failed on vec %d, err=%d\n",
-+		       i + 1, err);
-+		goto exit;
-+	}
-+
-+	for (i = 0; i < tcount; i++) {
-+		err = do_test_ecdsa_invalid_verify(tfm, &vecs[i]);
-+		if (!err)
-+			continue;
-+
-+		pr_err("ecdsa: verify(invl) failed on vec %d, err=%d\n",
-+		       i + 1, err);
-+		goto exit;
-+	}
-+
-+	for (i = 0; i < tcount; i++) {
-+		err = do_test_ecdsa_sign_verify(tfm, &vecs[i]);
-+		if (!err)
-+			continue;
-+
-+		pr_err("ecdsa: sign/verify failed on vec %d, err=%d\n",
-+		       i + 1, err);
-+		goto exit;
-+	}
-+
-+	for (i = 0; i < tcount; i++) {
-+		err = do_test_ecdsa_sign(tfm, &vecs[i]);
-+		if (!err)
-+			continue;
-+
-+		pr_err("ecdsa: sign failed on vec %d, err=%d\n",
-+		       i + 1, err);
-+		goto exit;
-+	}
-+ exit:
-+	pr_info("test_ecdsa: %s\n", err ? "FAILED" : "PASSED");
-+	return err;
-+}
-+
- static int test_akcipher_one(struct crypto_akcipher *tfm,
- 			     struct akcipher_testvec *vecs)
- {
-@@ -2236,9 +2667,17 @@ static int alg_test_akcipher(const struct alg_test_desc *desc,
- 		       driver, PTR_ERR(tfm));
- 		return PTR_ERR(tfm);
- 	}
--	if (desc->suite.akcipher.vecs)
--		err = test_akcipher(tfm, desc->alg, desc->suite.akcipher.vecs,
--				    desc->suite.akcipher.count);
-+
-+	if (desc->suite.akcipher.vecs) {
-+		if (strncmp(desc->alg, "ecdsa", 5) == 0)
-+			err = test_ecdsa_akcipher(tfm, desc->alg,
-+						  desc->suite.akcipher.vecs,
-+						  desc->suite.akcipher.count);
-+		else
-+			err = test_akcipher(tfm, desc->alg,
-+					    desc->suite.akcipher.vecs,
-+					    desc->suite.akcipher.count);
-+	}
+ #include "ecc.h"
+-#include "ecc_curve_defs.h"
  
- 	crypto_free_akcipher(tfm);
- 	return err;
-@@ -2982,6 +3421,13 @@ static int alg_test_null(const struct alg_test_desc *desc,
- 			.kpp = __VECS(ecdh_tv_template)
- 		}
- 	}, {
-+		.alg = "ecdsa",
-+		.test = alg_test_akcipher,
-+		.fips_allowed = 1,
-+		.suite = {
-+			.akcipher = __VECS(ecdsa_tv_template)
-+		}
-+	}, {
- 		.alg = "gcm(aes)",
- 		.test = alg_test_aead,
- 		.fips_allowed = 1,
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 64595f067d72..00bb57f4707a 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -5,6 +5,7 @@
-  * Copyright (c) 2002 Jean-Francois Dive <jef@linuxbe.org>
-  * Copyright (c) 2007 Nokia Siemens Networks
-  * Copyright (c) 2008 Herbert Xu <herbert@gondor.apana.org.au>
-+ * Copyright (c) 2017 NVIDIA Corporation
-  *
-  * Updated RFC4106 AES-GCM testing. Some test vectors were taken from
-  * http://csrc.nist.gov/groups/ST/toolkit/BCM/documents/proposedmodes/
-@@ -755,6 +756,145 @@ struct kpp_testvec dh_tv_template[] = {
- 	}
- };
+ typedef struct {
+ 	u64 m_low;
+ 	u64 m_high;
+ } uint128_t;
  
-+/*
-+ * ECDSA NIST test vectors from SigGenComponent.txt file from
-+ * 186-3ecdsasiggencomponenttestvectors.zip for P-192 and P-256
-+ * elliptic curves.
-+ */
-+static struct akcipher_testvec ecdsa_tv_template[] = {
-+	{
-+#ifndef CONFIG_CRYPTO_FIPS
-+		/* [P-192,SHA-1] */
-+		.m =
-+		/* Msg / Hash */
-+		"\x92\x5b\xd6\xf4\x1c\x55\xbe\x3e"
-+		"\x49\xb7\x16\xe6\x1d\x42\x12\x3f"
-+		"\x42\x79\x80\x60",
-+		.m_size = 20,
-+		.key =
-+		/* version */
-+		"\x01"
-+		/* curve_id */
-+		"\x01"
-+		/* d */
-+		"\xf3\xd7\x60\xd6\x75\xf2\xcc\xeb"
-+		"\xf0\xd2\xfd\xb3\xb9\x41\x3f\xb0"
-+		"\xf8\x4f\x37\xd1\xb3\x37\x4f\xe1"
-+		/* Qx */
-+		"\xe6\x98\xcf\x5b\x2d\x2d\x98\x94"
-+		"\x4c\x49\xa2\x80\x6e\x09\x32\x64"
-+		"\xe7\xdb\x08\x0b\xa4\x8e\x00\x07"
-+		/* Qy */
-+		"\x77\x54\xd6\xe4\xf2\xd7\x1b\xc4"
-+		"\x98\x6d\xe2\x5d\x21\xba\x36\xa6"
-+		"\x4e\x41\x0b\xd0\x81\xb6\xfa\x76",
-+		.key_len = 74,
-+		.c =
-+		/* k */
-+		"\x25\x5f\x68\x89\xa2\x31\xbc\x57"
-+		"\x4d\x15\xc4\x12\xfb\x56\x45\x68"
-+		"\x83\x07\xa1\x43\x70\xbc\x0a\xcb"
-+		/* R */
-+		"\x3e\xa6\x58\x62\xb4\x98\x96\x1a"
-+		"\xf9\xf2\x5b\xec\x55\xf8\xdd\xff"
-+		"\x93\xd7\xd0\xbd\x62\xd9\x94\x69"
-+		/* S */
-+		"\x41\x9f\x1a\x0e\xc0\x5f\xcf\x73"
-+		"\x5b\x40\x21\x85\xbc\x02\xab\x44"
-+		"\x37\x90\x34\xa2\x65\x64\xba\x02",
-+		.c_size = 72,
-+	}, {
-+		/* [P-192,SHA-256] */
-+		.m =
-+		/* Msg / Hash */
-+		"\xd0\xd8\xc0\x99\xe0\xe2\xf7\xf8"
-+		"\x87\xe1\x6d\x11\xe1\xcc\x20\x43"
-+		"\xaf\xc0\x80\xdb\x47\x72\xfa\xe3"
-+		"\x95\xe5\xd1\x34\x7d\x31\xe8\x5a",
-+		.m_size = 32,
-+		.key =
-+		/* version */
-+		"\x01"
-+		/* curve_id */
-+		"\x01"
-+		/* d */
-+		"\x47\x7a\xf2\x5c\x86\xef\x09\x08"
-+		"\xa4\x9a\x47\x53\x06\xfc\x61\xbc"
-+		"\xa5\x6f\xdd\x7d\x2f\xd2\xed\x24"
-+		/* Qx */
-+		"\xdc\x14\xd4\xd8\x2e\x1e\x25\x2f"
-+		"\x66\x28\xaa\x80\xbc\x38\x6a\x07"
-+		"\x8a\x70\xb7\x74\x71\x2d\xf1\x9b"
-+		/* Qy */
-+		"\x98\x34\x57\x11\xb0\xdc\x3d\xff"
-+		"\xfc\xdc\xfe\xa2\x1c\x47\x9e\x4e"
-+		"\x82\x08\xfc\x7d\xd0\xc8\x54\x48",
-+		.key_len = 74,
-+		.c =
-+		/* k */
-+		"\x3e\x70\xc7\x86\xaf\xaa\x71\x7c"
-+		"\x68\x96\xc5\xc3\xec\xb8\x29\xa3"
-+		"\xfa\xf7\xa5\x36\xa2\x17\xc8\xa5"
-+		/* R */
-+		"\xf8\xef\x13\xa8\x86\xe6\x73\x85"
-+		"\xdf\x2e\x88\x99\x91\x9b\xc2\x90"
-+		"\xea\x1f\x36\xf4\xec\xba\x4a\x35"
-+		/* S */
-+		"\xc1\x82\x9e\x94\xb7\x58\x2c\x63"
-+		"\x8e\xd7\x15\x5a\x38\x47\x30\x9b"
-+		"\x1c\x11\x86\xac\x00\x00\xf5\x80",
-+		.c_size = 72,
-+	}, {
-+#endif
-+		/* [P-256,SHA-256] */
-+		.m =
-+		/* Msg / Hash */
-+		"\x56\xec\x33\xa1\xa6\xe7\xc4\xdb"
-+		"\x77\x03\x90\x1a\xfb\x2e\x1e\x4e"
-+		"\x50\x09\xfe\x04\x72\x89\xc5\xc2"
-+		"\x42\x13\x6c\xe3\xb7\xf6\xac\x44",
-+		.m_size = 32,
-+		.key =
-+		/* version */
-+		"\x01"
-+		/* curve_id */
-+		"\x02"
-+		/* d */
-+		"\x64\xb4\x72\xda\x6d\xa5\x54\xca"
-+		"\xac\x3e\x4e\x0b\x13\xc8\x44\x5b"
-+		"\x1a\x77\xf4\x59\xee\xa8\x4f\x1f"
-+		"\x58\x8b\x5f\x71\x3d\x42\x9b\x51"
-+		/* Qx */
-+		"\x83\xbf\x71\xc2\x46\xff\x59\x3c"
-+		"\x2f\xb1\xbf\x4b\xe9\x5d\x56\xd3"
-+		"\xcc\x8f\xdb\x48\xa2\xbf\x33\xf0"
-+		"\xf4\xc7\x5f\x07\x1c\xe9\xcb\x1c"
-+		/* Qy */
-+		"\xa9\x4c\x9a\xa8\x5c\xcd\x7c\xdc"
-+		"\x78\x4e\x40\xb7\x93\xca\xb7\x6d"
-+		"\xe0\x13\x61\x0e\x2c\xdb\x1f\x1a"
-+		"\xa2\xf9\x11\x88\xc6\x14\x40\xce",
-+		.key_len = 98,
-+		.c =
-+		/* k */
-+		"\xde\x68\x2a\x64\x87\x07\x67\xb9"
-+		"\x33\x5d\x4f\x82\x47\x62\x4a\x3b"
-+		"\x7f\x3c\xe9\xf9\x45\xf2\x80\xa2"
-+		"\x61\x6a\x90\x4b\xb1\xbb\xa1\x94"
-+		/* R */
-+		"\xac\xc2\xc8\x79\x6f\x5e\xbb\xca"
-+		"\x7a\x5a\x55\x6a\x1f\x6b\xfd\x2a"
-+		"\xed\x27\x95\x62\xd6\xe3\x43\x88"
-+		"\x5b\x79\x14\xb5\x61\x80\xac\xf3"
-+		/* S */
-+		"\x03\x89\x05\xcc\x2a\xda\xcd\x3c"
-+		"\x5a\x17\x6f\xe9\x18\xb2\x97\xef"
-+		"\x1c\x37\xf7\x2b\x26\x76\x6c\x78"
-+		"\xb2\xa6\x05\xca\x19\x78\xf7\x8b",
-+		.c_size = 96,
++/* NIST P-192 */
++static u64 nist_p192_g_x[] = { 0xF4FF0AFD82FF1012ull, 0x7CBF20EB43A18800ull,
++				0x188DA80EB03090F6ull };
++static u64 nist_p192_g_y[] = { 0x73F977A11E794811ull, 0x631011ED6B24CDD5ull,
++				0x07192B95FFC8DA78ull };
++static u64 nist_p192_p[] = { 0xFFFFFFFFFFFFFFFFull, 0xFFFFFFFFFFFFFFFEull,
++				0xFFFFFFFFFFFFFFFFull };
++static u64 nist_p192_n[] = { 0x146BC9B1B4D22831ull, 0xFFFFFFFF99DEF836ull,
++				0xFFFFFFFFFFFFFFFFull };
++static struct ecc_curve nist_p192 = {
++	.name = "nist_192",
++	.g = {
++		.x = nist_p192_g_x,
++		.y = nist_p192_g_y,
++		.ndigits = 3,
 +	},
++	.p = nist_p192_p,
++	.n = nist_p192_n
 +};
 +
- struct kpp_testvec ecdh_tv_template[] = {
- 	{
- #ifndef CONFIG_CRYPTO_FIPS
++/* NIST P-256 */
++static u64 nist_p256_g_x[] = { 0xF4A13945D898C296ull, 0x77037D812DEB33A0ull,
++				0xF8BCE6E563A440F2ull, 0x6B17D1F2E12C4247ull };
++static u64 nist_p256_g_y[] = { 0xCBB6406837BF51F5ull, 0x2BCE33576B315ECEull,
++				0x8EE7EB4A7C0F9E16ull, 0x4FE342E2FE1A7F9Bull };
++static u64 nist_p256_p[] = { 0xFFFFFFFFFFFFFFFFull, 0x00000000FFFFFFFFull,
++				0x0000000000000000ull, 0xFFFFFFFF00000001ull };
++static u64 nist_p256_n[] = { 0xF3B9CAC2FC632551ull, 0xBCE6FAADA7179E84ull,
++				0xFFFFFFFFFFFFFFFFull, 0xFFFFFFFF00000000ull };
++static struct ecc_curve nist_p256 = {
++	.name = "nist_256",
++	.g = {
++		.x = nist_p256_g_x,
++		.y = nist_p256_g_y,
++		.ndigits = 4,
++	},
++	.p = nist_p256_p,
++	.n = nist_p256_n
++};
++
+ static inline const struct ecc_curve *ecc_get_curve(unsigned int curve_id)
+ {
+ 	switch (curve_id) {
+@@ -926,93 +965,3 @@ int ecc_is_key_valid(unsigned int curve_id, unsigned int ndigits,
+ 
+ 	return 0;
+ }
+-
+-int ecdh_make_pub_key(unsigned int curve_id, unsigned int ndigits,
+-		      const u8 *private_key, unsigned int private_key_len,
+-		      u8 *public_key, unsigned int public_key_len)
+-{
+-	int ret = 0;
+-	struct ecc_point *pk;
+-	u64 priv[ndigits];
+-	unsigned int nbytes;
+-	const struct ecc_curve *curve = ecc_get_curve(curve_id);
+-
+-	if (!private_key || !curve) {
+-		ret = -EINVAL;
+-		goto out;
+-	}
+-
+-	ecc_swap_digits((const u64 *)private_key, priv, ndigits);
+-
+-	pk = ecc_alloc_point(ndigits);
+-	if (!pk) {
+-		ret = -ENOMEM;
+-		goto out;
+-	}
+-
+-	ecc_point_mult(pk, &curve->g, priv, NULL, curve->p, ndigits);
+-	if (ecc_point_is_zero(pk)) {
+-		ret = -EAGAIN;
+-		goto err_free_point;
+-	}
+-
+-	nbytes = ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
+-	ecc_swap_digits(pk->x, (u64 *)public_key, ndigits);
+-	ecc_swap_digits(pk->y, (u64 *)&public_key[nbytes], ndigits);
+-
+-err_free_point:
+-	ecc_free_point(pk);
+-out:
+-	return ret;
+-}
+-
+-int crypto_ecdh_shared_secret(unsigned int curve_id, unsigned int ndigits,
+-		       const u8 *private_key, unsigned int private_key_len,
+-		       const u8 *public_key, unsigned int public_key_len,
+-		       u8 *secret, unsigned int secret_len)
+-{
+-	int ret = 0;
+-	struct ecc_point *product, *pk;
+-	u64 priv[ndigits];
+-	u64 rand_z[ndigits];
+-	unsigned int nbytes;
+-	const struct ecc_curve *curve = ecc_get_curve(curve_id);
+-
+-	if (!private_key || !public_key || !curve) {
+-		ret = -EINVAL;
+-		goto out;
+-	}
+-
+-	nbytes = ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
+-
+-	get_random_bytes(rand_z, nbytes);
+-
+-	pk = ecc_alloc_point(ndigits);
+-	if (!pk) {
+-		ret = -ENOMEM;
+-		goto out;
+-	}
+-
+-	product = ecc_alloc_point(ndigits);
+-	if (!product) {
+-		ret = -ENOMEM;
+-		goto err_alloc_product;
+-	}
+-
+-	ecc_swap_digits((const u64 *)public_key, pk->x, ndigits);
+-	ecc_swap_digits((const u64 *)&public_key[nbytes], pk->y, ndigits);
+-	ecc_swap_digits((const u64 *)private_key, priv, ndigits);
+-
+-	ecc_point_mult(product, pk, priv, rand_z, curve->p, ndigits);
+-
+-	ecc_swap_digits(product->x, (u64 *)secret, ndigits);
+-
+-	if (ecc_point_is_zero(product))
+-		ret = -EFAULT;
+-
+-	ecc_free_point(product);
+-err_alloc_product:
+-	ecc_free_point(pk);
+-out:
+-	return ret;
+-}
+diff --git a/crypto/ecc.h b/crypto/ecc.h
+index 663d598c7406..5db82223d485 100644
+--- a/crypto/ecc.h
++++ b/crypto/ecc.h
+@@ -1,6 +1,7 @@
+ /*
+  * Copyright (c) 2013, Kenneth MacKay
+  * All rights reserved.
++ * Copyright (c) 2017, NVIDIA Corporation. All Rights Reserved.
+  *
+  * Redistribution and use in source and binary forms, with or without
+  * modification, are permitted provided that the following conditions are
+@@ -26,9 +27,9 @@
+ #ifndef _CRYPTO_ECC_H
+ #define _CRYPTO_ECC_H
+ 
+-#define ECC_MAX_DIGITS	4 /* 256 */
++#include <crypto/ecc.h>
+ 
+-#define ECC_DIGITS_TO_BYTES_SHIFT 3
++#include "ecc_curve_defs.h"
+ 
+ /**
+  * ecc_is_key_valid() - Validate a given ECDH private key
+@@ -42,42 +43,4 @@
+  */
+ int ecc_is_key_valid(unsigned int curve_id, unsigned int ndigits,
+ 		     const u8 *private_key, unsigned int private_key_len);
+-
+-/**
+- * ecdh_make_pub_key() - Compute an ECC public key
+- *
+- * @curve_id:		id representing the curve to use
+- * @private_key:	pregenerated private key for the given curve
+- * @private_key_len:	length of private_key
+- * @public_key:		buffer for storing the public key generated
+- * @public_key_len:	length of the public_key buffer
+- *
+- * Returns 0 if the public key was generated successfully, a negative value
+- * if an error occurred.
+- */
+-int ecdh_make_pub_key(const unsigned int curve_id, unsigned int ndigits,
+-		      const u8 *private_key, unsigned int private_key_len,
+-		      u8 *public_key, unsigned int public_key_len);
+-
+-/**
+- * crypto_ecdh_shared_secret() - Compute a shared secret
+- *
+- * @curve_id:		id representing the curve to use
+- * @private_key:	private key of part A
+- * @private_key_len:	length of private_key
+- * @public_key:		public key of counterpart B
+- * @public_key_len:	length of public_key
+- * @secret:		buffer for storing the calculated shared secret
+- * @secret_len:		length of the secret buffer
+- *
+- * Note: It is recommended that you hash the result of crypto_ecdh_shared_secret
+- * before using it for symmetric encryption or HMAC.
+- *
+- * Returns 0 if the shared secret was generated successfully, a negative value
+- * if an error occurred.
+- */
+-int crypto_ecdh_shared_secret(unsigned int curve_id, unsigned int ndigits,
+-		       const u8 *private_key, unsigned int private_key_len,
+-		       const u8 *public_key, unsigned int public_key_len,
+-		       u8 *secret, unsigned int secret_len);
+-#endif
++#endif /* _CRYPTO_ECC_H */
+diff --git a/crypto/ecc_curve_defs.h b/crypto/ecc_curve_defs.h
+index 03ae5f714028..baacf32bca16 100644
+--- a/crypto/ecc_curve_defs.h
++++ b/crypto/ecc_curve_defs.h
+@@ -1,3 +1,12 @@
++/*
++ * Copyright (c) 2017, NVIDIA Corporation. All Rights Reserved.
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the Free
++ * Software Foundation; either version 2 of the License, or (at your option)
++ * any later version.
++ */
++
+ #ifndef _CRYTO_ECC_CURVE_DEFS_H
+ #define _CRYTO_ECC_CURVE_DEFS_H
+ 
+@@ -14,44 +23,4 @@ struct ecc_curve {
+ 	u64 *n;
+ };
+ 
+-/* NIST P-192 */
+-static u64 nist_p192_g_x[] = { 0xF4FF0AFD82FF1012ull, 0x7CBF20EB43A18800ull,
+-				0x188DA80EB03090F6ull };
+-static u64 nist_p192_g_y[] = { 0x73F977A11E794811ull, 0x631011ED6B24CDD5ull,
+-				0x07192B95FFC8DA78ull };
+-static u64 nist_p192_p[] = { 0xFFFFFFFFFFFFFFFFull, 0xFFFFFFFFFFFFFFFEull,
+-				0xFFFFFFFFFFFFFFFFull };
+-static u64 nist_p192_n[] = { 0x146BC9B1B4D22831ull, 0xFFFFFFFF99DEF836ull,
+-				0xFFFFFFFFFFFFFFFFull };
+-static struct ecc_curve nist_p192 = {
+-	.name = "nist_192",
+-	.g = {
+-		.x = nist_p192_g_x,
+-		.y = nist_p192_g_y,
+-		.ndigits = 3,
+-	},
+-	.p = nist_p192_p,
+-	.n = nist_p192_n
+-};
+-
+-/* NIST P-256 */
+-static u64 nist_p256_g_x[] = { 0xF4A13945D898C296ull, 0x77037D812DEB33A0ull,
+-				0xF8BCE6E563A440F2ull, 0x6B17D1F2E12C4247ull };
+-static u64 nist_p256_g_y[] = { 0xCBB6406837BF51F5ull, 0x2BCE33576B315ECEull,
+-				0x8EE7EB4A7C0F9E16ull, 0x4FE342E2FE1A7F9Bull };
+-static u64 nist_p256_p[] = { 0xFFFFFFFFFFFFFFFFull, 0x00000000FFFFFFFFull,
+-				0x0000000000000000ull, 0xFFFFFFFF00000001ull };
+-static u64 nist_p256_n[] = { 0xF3B9CAC2FC632551ull, 0xBCE6FAADA7179E84ull,
+-				0xFFFFFFFFFFFFFFFFull, 0xFFFFFFFF00000000ull };
+-static struct ecc_curve nist_p256 = {
+-	.name = "nist_256",
+-	.g = {
+-		.x = nist_p256_g_x,
+-		.y = nist_p256_g_y,
+-		.ndigits = 4,
+-	},
+-	.p = nist_p256_p,
+-	.n = nist_p256_n
+-};
+-
+-#endif
++#endif /* _CRYTO_ECC_CURVE_DEFS_H */
+diff --git a/crypto/ecc_ecdh.h b/crypto/ecc_ecdh.h
+new file mode 100644
+index 000000000000..f77b1fe094c9
+--- /dev/null
++++ b/crypto/ecc_ecdh.h
+@@ -0,0 +1,54 @@
++/*
++ * Copyright (c) 2013, Kenneth MacKay. All rights reserved.
++ * Copyright (c) 2017, NVIDIA Corporation. All Rights Reserved.
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the Free
++ * Software Foundation; either version 2 of the License, or (at your option)
++ * any later version.
++ */
++
++#ifndef _CRYPTO_ECC_ECDH_H
++#define _CRYPTO_ECC_ECDH_H
++
++#include "ecc.h"
++
++/**
++ * ecdh_make_pub_key() - Compute an ECC public key
++ *
++ * @curve_id:		id representing the curve to use
++ * @private_key:	pregenerated private key for the given curve
++ * @private_key_len:	length of private_key
++ * @public_key:		buffer for storing the public key generated
++ * @public_key_len:	length of the public_key buffer
++ *
++ * Returns 0 if the public key was generated successfully, a negative value
++ * if an error occurred.
++ */
++int ecdh_make_pub_key(const unsigned int curve_id, unsigned int ndigits,
++		      const u8 *private_key, unsigned int private_key_len,
++		      u8 *public_key, unsigned int public_key_len);
++
++/**
++ * crypto_ecdh_shared_secret() - Compute a shared secret
++ *
++ * @curve_id:		id representing the curve to use
++ * @private_key:	private key of part A
++ * @private_key_len:	length of private_key
++ * @public_key:		public key of counterpart B
++ * @public_key_len:	length of public_key
++ * @secret:		buffer for storing the calculated shared secret
++ * @secret_len:		length of the secret buffer
++ *
++ * Note: It is recommended that you hash the result of crypto_ecdh_shared_secret
++ * before using it for symmetric encryption or HMAC.
++ *
++ * Returns 0 if the shared secret was generated successfully, a negative value
++ * if an error occurred.
++ */
++int crypto_ecdh_shared_secret(unsigned int curve_id, unsigned int ndigits,
++		       const u8 *private_key, unsigned int private_key_len,
++		       const u8 *public_key, unsigned int public_key_len,
++		       u8 *secret, unsigned int secret_len);
++
++#endif /* _CRYPTO_ECC_ECDH_H */
+diff --git a/crypto/ecdh.c b/crypto/ecdh.c
+index 3de289806d67..2b83ff3a4b9a 100644
+--- a/crypto/ecdh.c
++++ b/crypto/ecdh.c
+@@ -2,6 +2,7 @@
+  *
+  * Copyright (c) 2016, Intel Corporation
+  * Authors: Salvator Benedetto <salvatore.benedetto@intel.com>
++ * Copyright (c) 2017, NVIDIA Corporation.
+  *
+  * This program is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU General Public Licence
+@@ -14,7 +15,8 @@
+ #include <crypto/kpp.h>
+ #include <crypto/ecdh.h>
+ #include <linux/scatterlist.h>
+-#include "ecc.h"
++
++#include "ecc_ecdh.h"
+ 
+ struct ecdh_ctx {
+ 	unsigned int curve_id;
+diff --git a/crypto/ecdh_helper.c b/crypto/ecdh_helper.c
+index 3cd8a2414e60..b3857f3bfcee 100644
+--- a/crypto/ecdh_helper.c
++++ b/crypto/ecdh_helper.c
+@@ -1,6 +1,7 @@
+ /*
+  * Copyright (c) 2016, Intel Corporation
+  * Authors: Salvatore Benedetto <salvatore.benedetto@intel.com>
++ * Copyright (c) 2017, NVIDIA Corporation.
+  *
+  * This program is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU General Public Licence
+@@ -11,9 +12,12 @@
+ #include <linux/export.h>
+ #include <linux/err.h>
+ #include <linux/string.h>
++#include <linux/random.h>
+ #include <crypto/ecdh.h>
+ #include <crypto/kpp.h>
+ 
++#include "ecc_ecdh.h"
++
+ #define ECDH_KPP_SECRET_MIN_SIZE (sizeof(struct kpp_secret) + 2 * sizeof(short))
+ 
+ static inline u8 *ecdh_pack_data(void *dst, const void *src, size_t sz)
+@@ -28,6 +32,96 @@
+ 	return src + sz;
+ }
+ 
++int ecdh_make_pub_key(unsigned int curve_id, unsigned int ndigits,
++		      const u8 *private_key, unsigned int private_key_len,
++		      u8 *public_key, unsigned int public_key_len)
++{
++	int ret = 0;
++	struct ecc_point *pk;
++	u64 priv[ndigits];
++	unsigned int nbytes;
++	const struct ecc_curve *curve = ecc_get_curve(curve_id);
++
++	if (!private_key || !curve) {
++		ret = -EINVAL;
++		goto out;
++	}
++
++	ecc_swap_digits((const u64 *)private_key, priv, ndigits);
++
++	pk = ecc_alloc_point(ndigits);
++	if (!pk) {
++		ret = -ENOMEM;
++		goto out;
++	}
++
++	ecc_point_mult(pk, &curve->g, priv, NULL, curve->p, ndigits);
++	if (ecc_point_is_zero(pk)) {
++		ret = -EAGAIN;
++		goto err_free_point;
++	}
++
++	nbytes = ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
++	ecc_swap_digits(pk->x, (u64 *)public_key, ndigits);
++	ecc_swap_digits(pk->y, (u64 *)&public_key[nbytes], ndigits);
++
++err_free_point:
++	ecc_free_point(pk);
++out:
++	return ret;
++}
++
++int crypto_ecdh_shared_secret(unsigned int curve_id, unsigned int ndigits,
++		       const u8 *private_key, unsigned int private_key_len,
++		       const u8 *public_key, unsigned int public_key_len,
++		       u8 *secret, unsigned int secret_len)
++{
++	int ret = 0;
++	struct ecc_point *product, *pk;
++	u64 priv[ndigits];
++	u64 rand_z[ndigits];
++	unsigned int nbytes;
++	const struct ecc_curve *curve = ecc_get_curve(curve_id);
++
++	if (!private_key || !public_key || !curve) {
++		ret = -EINVAL;
++		goto out;
++	}
++
++	nbytes = ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
++
++	get_random_bytes(rand_z, nbytes);
++
++	pk = ecc_alloc_point(ndigits);
++	if (!pk) {
++		ret = -ENOMEM;
++		goto out;
++	}
++
++	product = ecc_alloc_point(ndigits);
++	if (!product) {
++		ret = -ENOMEM;
++		goto err_alloc_product;
++	}
++
++	ecc_swap_digits((const u64 *)public_key, pk->x, ndigits);
++	ecc_swap_digits((const u64 *)&public_key[nbytes], pk->y, ndigits);
++	ecc_swap_digits((const u64 *)private_key, priv, ndigits);
++
++	ecc_point_mult(product, pk, priv, rand_z, curve->p, ndigits);
++
++	ecc_swap_digits(product->x, (u64 *)secret, ndigits);
++
++	if (ecc_point_is_zero(product))
++		ret = -EFAULT;
++
++	ecc_free_point(product);
++err_alloc_product:
++	ecc_free_point(pk);
++out:
++	return ret;
++}
++
+ int crypto_ecdh_key_len(const struct ecdh *params)
+ {
+ 	return ECDH_KPP_SECRET_MIN_SIZE + params->key_size;
+diff --git a/include/crypto/ecc.h b/include/crypto/ecc.h
+new file mode 100644
+index 000000000000..27957f805fd6
+--- /dev/null
++++ b/include/crypto/ecc.h
+@@ -0,0 +1,24 @@
++/*
++ * Copyright (c) 2017, NVIDIA Corporation. All Rights Reserved.
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the Free
++ * Software Foundation; either version 2 of the License, or (at your option)
++ * any later version.
++ *
++ */
++
++#ifndef _CRYPTO_ECC_
++#define _CRYPTO_ECC_
++
++/* Curves IDs */
++#define ECC_CURVE_NIST_P192	0x0001
++#define ECC_CURVE_NIST_P256	0x0002
++
++#define ECC_MAX_DIGITS	4 /* 256 */
++
++#define ECC_DIGITS_TO_BYTES_SHIFT 3
++
++#define ECC_MAX_DIGIT_BYTES (ECC_MAX_DIGITS << ECC_DIGITS_TO_BYTES_SHIFT)
++
++#endif /* _CRYPTO_ECC_ */
+diff --git a/include/crypto/ecdh.h b/include/crypto/ecdh.h
+index 03a64f62ba7a..c8556305acad 100644
+--- a/include/crypto/ecdh.h
++++ b/include/crypto/ecdh.h
+@@ -3,6 +3,7 @@
+  *
+  * Copyright (c) 2016, Intel Corporation
+  * Authors: Salvatore Benedetto <salvatore.benedetto@intel.com>
++ * Copyright (c) 2017, NVIDIA Corporation.
+  *
+  * This program is free software; you can redistribute it and/or modify it
+  * under the terms of the GNU General Public License as published by the Free
+@@ -13,24 +14,19 @@
+ #ifndef _CRYPTO_ECDH_
+ #define _CRYPTO_ECDH_
+ 
++#include <crypto/ecc.h>
++
+ /**
+  * DOC: ECDH Helper Functions
+  *
+  * To use ECDH with the KPP cipher API, the following data structure and
+  * functions should be used.
+  *
+- * The ECC curves known to the ECDH implementation are specified in this
+- * header file.
+- *
+  * To use ECDH with KPP, the following functions should be used to operate on
+  * an ECDH private key. The packet private key that can be set with
+  * the KPP API function call of crypto_kpp_set_secret.
+  */
+ 
+-/* Curves IDs */
+-#define ECC_CURVE_NIST_P192	0x0001
+-#define ECC_CURVE_NIST_P256	0x0002
+-
+ /**
+  * struct ecdh - define an ECDH private key
+  *
 -- 
 1.7.6.3
