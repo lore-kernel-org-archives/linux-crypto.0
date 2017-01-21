@@ -1,4103 +1,544 @@
-From: Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
-Subject: [PATCH 1/4] lib: Update LZ4 compressor module
-Date: Sat, 21 Jan 2017 16:09:08 +0100
-Message-ID: <1485011351-7463-2-git-send-email-4sschmid@informatik.uni-hamburg.de>
-References: <1482259992-16680-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
- <1485011351-7463-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
-Cc: bongkyu.kim@lge.com, rsalvaterra@gmail.com,
-        sergey.senozhatsky@gmail.com, gregkh@linuxfoundation.org,
-        linux-kernel@vger.kernel.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net, linux-crypto@vger.kernel.org,
-        anton@enomsg.org, ccross@android.com, keescook@chromium.org,
-        tony.luck@intel.com, phillip@squashfs.org.uk,
+From: kbuild test robot <lkp@intel.com>
+Subject: Re: [PATCH 1/4] lib: Update LZ4 compressor module
+Date: Sat, 21 Jan 2017 23:56:28 +0800
+Message-ID: <201701212358.mtnWo78V%fengguang.wu@intel.com>
+References: <1485011351-7463-2-git-send-email-4sschmid@informatik.uni-hamburg.de>
+Mime-Version: 1.0
+Content-Type: multipart/mixed; boundary="MGYHOYXEY6WxJCY8"
+Cc: kbuild-all@01.org, akpm@linux-foundation.org, bongkyu.kim@lge.com,
+        rsalvaterra@gmail.com, sergey.senozhatsky@gmail.com,
+        gregkh@linuxfoundation.org, linux-kernel@vger.kernel.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, anton@enomsg.org, ccross@android.com,
+        keescook@chromium.org, tony.luck@intel.com,
+        phillip@squashfs.org.uk,
         Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
-To: akpm@linux-foundation.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1485011351-7463-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+To: Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga14.intel.com ([192.55.52.115]:57325 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750888AbdAUPtZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 21 Jan 2017 10:49:25 -0500
+Content-Disposition: inline
+In-Reply-To: <1485011351-7463-2-git-send-email-4sschmid@informatik.uni-hamburg.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-This patch updates LZ4 kernel module to LZ4 v1.7.3 by Yann Collet.
-The kernel module is inspired by the previous work by Chanho Min.
-The updated LZ4 module will not break existing code since there were alias
-methods added to ensure backwards compatibility.
 
-API changes:
+--MGYHOYXEY6WxJCY8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-New method LZ4_compress_fast which differs from the variant available
-in kernel by the new acceleration parameter,
-allowing to trade compression ratio for more compression speed
-and vice versa.
+Hi Sven,
 
-LZ4_decompress_fast is the respective decompression method, featuring a very
-fast decoder (multiple GB/s per core), able to reach RAM speed in multi-core
-systems. The decompressor allows to decompress data compressed with
-LZ4 fast as well as the LZ4 HC (high compression) algorithm.
+[auto build test ERROR on linus/master]
+[also build test ERROR on v4.10-rc4 next-20170120]
+[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
 
-Also the useful functions LZ4_decompress_safe_partial
-LZ4_compress_destsize were added. The latter reverses the logic by trying to
-compress as much data as possible from source to dest while the former aims
-to decompress partial blocks of data.
+url:    https://github.com/0day-ci/linux/commits/Sven-Schmidt/Update-LZ4-compressor-module/20170121-231418
+config: i386-randconfig-r0-201703 (attached as .config)
+compiler: gcc-5 (Debian 5.4.1-2) 5.4.1 20160904
+reproduce:
+        # save the attached .config to linux build tree
+        make ARCH=i386 
 
-A bunch of streaming functions were also added
-which allow compressig/decompressing data in multiple steps
-(so called "streaming mode").
+Note: the linux-review/Sven-Schmidt/Update-LZ4-compressor-module/20170121-231418 HEAD 0472409e2a1c442b51502961aa6d83b866218953 builds fine.
+      It only hurts bisectibility.
 
-The methods lz4_compress and lz4_decompress_unknownoutputsize
-are now known as LZ4_compress_default respectivley LZ4_decompress_safe.
-The old methods are still available for providing backwards compatibility.
+All errors (new ones prefixed by >>):
 
-Signed-off-by: Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
+   fs/pstore/platform.c: In function 'allocate_lz4':
+>> fs/pstore/platform.c:369:20: error: implicit declaration of function 'lz4_compressbound' [-Werror=implicit-function-declaration]
+     big_oops_buf_sz = lz4_compressbound(psinfo->bufsize);
+                       ^
+   cc1: some warnings being treated as errors
+
+vim +/lz4_compressbound +369 fs/pstore/platform.c
+
+8cfc8ddc Geliang Tang 2016-02-18  363  
+8cfc8ddc Geliang Tang 2016-02-18  364  	return outlen;
+8cfc8ddc Geliang Tang 2016-02-18  365  }
+8cfc8ddc Geliang Tang 2016-02-18  366  
+8cfc8ddc Geliang Tang 2016-02-18  367  static void allocate_lz4(void)
+8cfc8ddc Geliang Tang 2016-02-18  368  {
+8cfc8ddc Geliang Tang 2016-02-18 @369  	big_oops_buf_sz = lz4_compressbound(psinfo->bufsize);
+8cfc8ddc Geliang Tang 2016-02-18  370  	big_oops_buf = kmalloc(big_oops_buf_sz, GFP_KERNEL);
+8cfc8ddc Geliang Tang 2016-02-18  371  	if (big_oops_buf) {
+8cfc8ddc Geliang Tang 2016-02-18  372  		workspace = kmalloc(LZ4_MEM_COMPRESS, GFP_KERNEL);
+
+:::::: The code at line 369 was first introduced by commit
+:::::: 8cfc8ddc99df9509a46043b14af81f5c6a223eab pstore: add lzo/lz4 compression support
+
+:::::: TO: Geliang Tang <geliangtang@163.com>
+:::::: CC: Kees Cook <keescook@chromium.org>
+
 ---
- include/linux/lz4.h      |  581 +++++++++++++++++++++---
- lib/lz4/lz4_compress.c   | 1103 ++++++++++++++++++++++++++++++++--------------
- lib/lz4/lz4_decompress.c |  694 ++++++++++++++++++-----------
- lib/lz4/lz4defs.h        |  320 ++++++++------
- lib/lz4/lz4hc_compress.c |  855 ++++++++++++++++++++++-------------
- 5 files changed, 2477 insertions(+), 1076 deletions(-)
+0-DAY kernel test infrastructure                Open Source Technology Center
+https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
 
-diff --git a/include/linux/lz4.h b/include/linux/lz4.h
-index 6b784c5..5bd21c1 100644
---- a/include/linux/lz4.h
-+++ b/include/linux/lz4.h
-@@ -1,87 +1,546 @@
--#ifndef __LZ4_H__
--#define __LZ4_H__
--/*
-- * LZ4 Kernel Interface
-+/* LZ4 Kernel Interface
-  *
-  * Copyright (C) 2013, LG Electronics, Kyungsik Lee <kyungsik.lee@lge.com>
-+ * Copyright (C) 2016, Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
-  *
-  * This program is free software; you can redistribute it and/or modify
-  * it under the terms of the GNU General Public License version 2 as
-  * published by the Free Software Foundation.
-+ *
-+ * This file is based on the original header file
-+ * for LZ4 - Fast LZ compression algorithm.
-+ *
-+ * LZ4 - Fast LZ compression algorithm
-+ * Copyright (C) 2011-2016, Yann Collet.
-+ * BSD 2-Clause License (http://www.opensource.org/licenses/bsd-license.php)
-+ * Redistribution and use in source and binary forms, with or without
-+ * modification, are permitted provided that the following conditions are
-+ * met:
-+ *		* Redistributions of source code must retain the above copyright
-+ *		  notice, this list of conditions and the following disclaimer.
-+ *		* Redistributions in binary form must reproduce the above
-+ * copyright notice, this list of conditions and the following disclaimer
-+ * in the documentation and/or other materials provided with the
-+ * distribution.
-+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-+ * You can contact the author at :
-+ *	- LZ4 homepage : http://www.lz4.org
-+ *	- LZ4 source repository : https://github.com/lz4/lz4
-+ */
-+
-+#ifndef __LZ4_H__
-+#define __LZ4_H__
-+
-+#include <linux/types.h>
-+#include <linux/string.h>	 /* memset, memcpy */
-+
-+/*-************************************************************************
-+ *	CONSTANTS
-+ **************************************************************************/
-+/*
-+ * LZ4_MEMORY_USAGE :
-+ * Memory usage formula : N->2^N Bytes
-+ * (examples : 10 -> 1KB; 12 -> 4KB ; 16 -> 64KB; 20 -> 1MB; etc.)
-+ * Increasing memory usage improves compression ratio
-+ * Reduced memory usage can improve speed, due to cache effect
-+ * Default value is 14, for 16KB, which nicely fits into Intel x86 L1 cache
-+ */
-+#define LZ4_MEMORY_USAGE 10
-+
-+#define LZ4_MAX_INPUT_SIZE	0x7E000000 /* 2 113 929 216 bytes */
-+#define LZ4_COMPRESSBOUND(isize)	(\
-+	(unsigned int)(isize) > (unsigned int)LZ4_MAX_INPUT_SIZE \
-+	? 0 \
-+	: (isize) + ((isize)/255) + 16)
-+
-+#define LZ4_ACCELERATION_DEFAULT 1
-+#define LZ4_HASHLOG	 (LZ4_MEMORY_USAGE-2)
-+#define LZ4_HASHTABLESIZE (1 << LZ4_MEMORY_USAGE)
-+#define LZ4_HASH_SIZE_U32 (1 << LZ4_HASHLOG)
-+
-+#define LZ4HC_MIN_CLEVEL				3
-+#define LZ4HC_DEFAULT_CLEVEL		9
-+#define LZ4HC_MAX_CLEVEL				16
-+
-+#define LZ4HC_DICTIONARY_LOGSIZE 16
-+#define LZ4HC_MAXD (1<<LZ4HC_DICTIONARY_LOGSIZE)
-+#define LZ4HC_MAXD_MASK (LZ4HC_MAXD - 1)
-+#define LZ4HC_HASH_LOG (LZ4HC_DICTIONARY_LOGSIZE-1)
-+#define LZ4HC_HASHTABLESIZE (1 << LZ4HC_HASH_LOG)
-+#define LZ4HC_HASH_MASK (LZ4HC_HASHTABLESIZE - 1)
-+
-+/*-************************************************************************
-+ *	STREAMING CONSTANTS AND STRUCTURES
-+ **************************************************************************/
-+#define LZ4_STREAMSIZE_U64 ((1 << (LZ4_MEMORY_USAGE-3)) + 4)
-+#define LZ4_STREAMSIZE	(LZ4_STREAMSIZE_U64 * sizeof(unsigned long long))
-+
-+#define LZ4_STREAMHCSIZE        262192
-+#define LZ4_STREAMHCSIZE_SIZET (262192 / sizeof(size_t))
-+
-+#define LZ4_STREAMDECODESIZE_U64	4
-+#define LZ4_STREAMDECODESIZE		 (LZ4_STREAMDECODESIZE_U64 * \
-+	sizeof(unsigned long long))
-+
-+/*
-+ * LZ4_stream_t :
-+ * information structure to track an LZ4 stream.
-+ */
-+typedef struct {
-+		uint32_t hashTable[LZ4_HASH_SIZE_U32];
-+		uint32_t currentOffset;
-+		uint32_t initCheck;
-+		const uint8_t *dictionary;
-+		uint8_t *bufferStart;
-+		uint32_t dictSize;
-+} LZ4_stream_t_internal;
-+typedef union {
-+		unsigned long long table[LZ4_STREAMSIZE_U64];
-+		LZ4_stream_t_internal internal_donotuse;
-+} LZ4_stream_t;
-+
-+/*
-+ * LZ4_streamHC_t :
-+ * information structure to track an LZ4HC stream.
-+ */
-+typedef struct {
-+		unsigned int	 hashTable[LZ4HC_HASHTABLESIZE];
-+		unsigned short	 chainTable[LZ4HC_MAXD];
-+		/* next block to continue on current prefix */
-+		const unsigned char *end;
-+		/* All index relative to this position */
-+		const unsigned char *base;
-+		/* alternate base for extDict */
-+		const unsigned char *dictBase;
-+		/* below that point, need extDict */
-+		unsigned int	 dictLimit;
-+		/* below that point, no more dict */
-+		unsigned int	 lowLimit;
-+		/* index from which to continue dict update */
-+		unsigned int	 nextToUpdate;
-+		unsigned int	 compressionLevel;
-+} LZ4HC_CCtx_internal;
-+typedef union {
-+		size_t table[LZ4_STREAMHCSIZE_SIZET];
-+		LZ4HC_CCtx_internal internal_donotuse;
-+} LZ4_streamHC_t;
-+
-+/*
-+ * LZ4_streamDecode_t :
-+ * information structure to track an LZ4 stream during decompression.
-+ * init this structure using LZ4_setStreamDecode
-+ * (or memset()) before first use
-  */
--#define LZ4_MEM_COMPRESS	(16384)
--#define LZ4HC_MEM_COMPRESS	(262144 + (2 * sizeof(unsigned char *)))
-+typedef struct {
-+		const uint8_t *externalDict;
-+		size_t extDictSize;
-+		const uint8_t *prefixEnd;
-+		size_t prefixSize;
-+} LZ4_streamDecode_t_internal;
-+typedef union {
-+		unsigned long long table[LZ4_STREAMDECODESIZE_U64];
-+		LZ4_streamDecode_t_internal internal_donotuse;
-+} LZ4_streamDecode_t;
-+
-+/*-************************************************************************
-+ *	SIZE OF STATE
-+ **************************************************************************/
-+#define LZ4_MEM_COMPRESS	LZ4_STREAMSIZE
-+#define LZ4HC_MEM_COMPRESS	LZ4_STREAMHCSIZE
-+
-+/*-************************************************************************
-+ *	Compression Functions
-+ **************************************************************************/
- 
- /*
-- * lz4_compressbound()
-- * Provides the maximum size that LZ4 may output in a "worst case" scenario
-- * (input data not compressible)
-+ * LZ4_compressBound() :
-+ *	Provides the maximum size that LZ4 may output in a "worst case" scenario
-+ *	(input data not compressible)
-  */
--static inline size_t lz4_compressbound(size_t isize)
-+static inline int LZ4_compressBound(size_t isize)
- {
--	return isize + (isize / 255) + 16;
-+	return (int)LZ4_COMPRESSBOUND(isize);
- }
- 
- /*
-+ * LZ4_compress_default()
-+ *	Compresses 'sourceSize' bytes from buffer 'source'
-+ *	into already allocated 'dest' buffer of size 'maxOutputSize'.
-+ *	Compression is guaranteed to succeed if
-+ *	'maxOutputSize' >= LZ4_compressBound(inputSize).
-+ *	It also runs faster, so it's a recommended setting.
-+ *	If the function cannot compress 'source'
-+ *	into a more limited 'dest' budget,
-+ *	compression stops *immediately*,
-+ *	and the function result is zero.
-+ *	As a consequence, 'dest' content is not valid.
-+ *
-+ *	source       : source address of the original data
-+ *	dest         : output buffer address
-+ *                 of the compressed data
-+ *	inputSize    : Max supported value is
-+ *                 LZ4_MAX_INPUT_SIZE
-+ *	maxOutputSize: full or partial size of buffer 'dest'
-+ *                 (which must be already allocated)
-+ *	workmem      : address of the working memory.
-+ *                 This requires 'workmem' of size LZ4_MEM_COMPRESS.
-+ *	return       : the number of bytes written into buffer 'dest'
-+ *   (necessarily <= maxOutputSize) or 0 if compression fails
-+ */
-+int LZ4_compress_default(const char *source, char *dest, int inputSize,
-+	int maxOutputSize, void *wrkmem);
-+
-+/*
-+ * LZ4_compress_fast() :
-+ *	Same as LZ4_compress_default(),
-+ *	but allows to select an "acceleration" factor.
-+ *	The larger the acceleration value,
-+ *	the faster the algorithm,
-+ *	but also the lesser the compression.
-+ *	It's a trade-off. It can be fine tuned,
-+ *	with each successive value
-+ *	providing roughly +~3% to speed.
-+ *	An acceleration value of "1"
-+ *	is the same as regular LZ4_compress_default()
-+ *	Values <= 0 will be replaced by
-+ *	LZ4_ACCELERATION_DEFAULT, which is 1.
-+ */
-+int LZ4_compress_fast(const char *source, char *dest, int inputSize,
-+	int maxOutputSize, void *wrkmem, int acceleration);
-+
-+/*
-+ * LZ4_compress_destSize()
-+ * Reverse the logic, by compressing as much data as possible
-+ * from 'source' buffer into already allocated buffer 'dest'
-+ * of size 'targetDestSize'.
-+ * This function either compresses the entire 'source' content into 'dest'
-+ * if it's large enough, or fill 'dest' buffer completely with as much data as
-+ * ossible from 'source'.
-+ *
-+ *	source	      : source address of the original data
-+ *	dest	        : output buffer address of the compressed data
-+ *	inputSize	    : Max supported value is LZ4_MAX_INPUT_SIZE
-+ *	*sourceSizePtr: will be modified to indicate how many bytes where read
-+ *                  from 'source' to fill 'dest'.
-+ *                  New value is necessarily <= old value.
-+ *	workmem       : address of the working memory.
-+ *                  This requires 'workmem' of size LZ4_MEM_COMPRESS.
-+ *	return : Nb bytes written into 'dest' (necessarily <= targetDestSize)
-+			 or 0 if compression fails
-+ */
-+int LZ4_compress_destSize(const char *source, char *dest, int *sourceSizePtr,
-+	int targetDestSize, void *wrkmem);
-+
-+/*
-  * lz4_compress()
-- *	src     : source address of the original data
-- *	src_len : size of the original data
-- *	dst	: output buffer address of the compressed data
-- *		This requires 'dst' of size LZ4_COMPRESSBOUND.
-- *	dst_len : is the output size, which is returned after compress done
-- *	workmem : address of the working memory.
-- *		This requires 'workmem' of size LZ4_MEM_COMPRESS.
-- *	return  : Success if return 0
-- *		  Error if return (< 0)
-- *	note :  Destination buffer and workmem must be already allocated with
-+ *	src    : source address of the original data
-+ *	src_len: size of the original data
-+ *	dst    : output buffer address of the compressed data
-+ *           This requires 'dst' of size LZ4_COMPRESSBOUND.
-+ *	dst_len: is the output size, which is returned after compress done
-+ *	workmem: address of the working memory.
-+ *           This requires 'workmem' of size LZ4_MEM_COMPRESS.
-+ *	return	: Success if return 0
-+ *            Error if return (< 0)
-+ *	note :	Destination buffer and workmem must be already allocated with
-  *		the defined size.
-  */
--int lz4_compress(const unsigned char *src, size_t src_len,
--		unsigned char *dst, size_t *dst_len, void *wrkmem);
--
-- /*
--  * lz4hc_compress()
--  *	 src	 : source address of the original data
--  *	 src_len : size of the original data
--  *	 dst	 : output buffer address of the compressed data
--  *		This requires 'dst' of size LZ4_COMPRESSBOUND.
--  *	 dst_len : is the output size, which is returned after compress done
--  *	 workmem : address of the working memory.
--  *		This requires 'workmem' of size LZ4HC_MEM_COMPRESS.
--  *	 return  : Success if return 0
--  *		   Error if return (< 0)
--  *	 note :  Destination buffer and workmem must be already allocated with
--  *		 the defined size.
--  */
--int lz4hc_compress(const unsigned char *src, size_t src_len,
--		unsigned char *dst, size_t *dst_len, void *wrkmem);
--
--/*
-- * lz4_decompress()
-- *	src     : source address of the compressed data
-- *	src_len : is the input size, whcih is returned after decompress done
-- *	dest	: output buffer address of the decompressed data
-- *	actual_dest_len: is the size of uncompressed data, supposing it's known
-- *	return  : Success if return 0
-- *		  Error if return (< 0)
-- *	note :  Destination buffer must be already allocated.
-- *		slightly faster than lz4_decompress_unknownoutputsize()
-+int lz4_compress(const unsigned char *src, size_t src_len, unsigned char *dst,
-+	size_t *dst_len, void *wrkmem);
-+
-+/*-************************************************************************
-+ *	Decompression Functions
-+ **************************************************************************/
-+
-+/*
-+ * LZ4_decompress_fast()
-+ *	source      : source address of the compressed data
-+ *	dst         : output buffer address of the decompressed data
-+ *	originalSize: is the original and therefore uncompressed size
-+ *	return : the number of bytes read from the source buffer
-+ *           (in other words, the compressed size)
-+ *           If the source stream is detected malformed, the function will
-+ *           stop decoding and return a negative result.
-+ *           Destination buffer must be already allocated.
-+ *           Its size must be a minimum of 'originalSize' bytes.
-+ *	note   : This function fully respect memory boundaries
-+ *           for properly formed compressed data.
-+ *           It is a bit faster than LZ4_decompress_safe().
-+ *           However, it does not provide any protection against intentionally
-+ *           modified data stream (malicious input).
-+ *           Use this function in trusted environment only
-+ *           (data to decode comes from a trusted source).
-  */
--int lz4_decompress(const unsigned char *src, size_t *src_len,
--		unsigned char *dest, size_t actual_dest_len);
-+int LZ4_decompress_fast(const char *source, char *dest, int originalSize);
-+
-+/*
-+ * LZ4_decompress_safe()
-+ *	source             : source address of the compressed data
-+ *	dest               : output buffer address of the decompressed data
-+ *	compressedSize     : is the precise full size of the compressed block.
-+ *	maxDecompressedSize: is the size of destination buffer,
-+ *                       which must be already allocated.
-+ *	return : the number of bytes decompressed into destination buffer
-+ *           (necessarily <= maxDecompressedSize)
-+ *           If destination buffer is not large enough, decoding will stop
-+ *           and output an error code (<0).
-+ *           If the source stream is detected malformed, the function will
-+ *           stop decoding and return a negative result.
-+ *           This function is protected against buffer overflow exploits,
-+ *           including malicious data packets. It never writes outside
-+ *           output buffer, nor reads outside input buffer.
-+ */
-+int LZ4_decompress_safe(const char *source, char *dest, int compressedSize,
-+	int maxDecompressedSize);
-+
-+/*
-+ * LZ4_decompress_safe_partial() :
-+ * This function decompress a compressed block of size 'compressedSize'
-+ * at position 'source' into destination buffer 'dest'
-+ * of size 'maxDecompressedSize'.
-+ * The function tries to stop decompressing operation as soon as
-+ * 'targetOutputSize' has been reached, reducing decompression time.
-+ *
-+ *	source             : source address of the compressed data
-+ *	dest               : output buffer address of the decompressed data
-+ *	compressedSize     : is the precise full size of the compressed block.
-+ *	targetOutputSize   : the decompression operation will try
-+ *                       to stop as soon as 'targetOutputSize'
-+ *                       has been reached
-+ *	maxDecompressedSize: is the size of destination buffer,
-+ *                       which must be already allocated.
-+ *	return  : the number of bytes decoded in the destination buffer
-+ *            (necessarily <= maxDecompressedSize)
-+ *	Note    : this number can be < 'targetOutputSize' should the compressed
-+ *            block to decode be smaller. Always control how many bytes
-+ *            were decoded. If the source stream is detected malformed,
-+ *            the function will stop decoding and return a negative result.
-+ *            This function never writes outside of output buffer,
-+ *            and never reads outside of input buffer.
-+ *            It is therefore protected against malicious data packets
-+ */
-+int LZ4_decompress_safe_partial(const char *source, char *dest,
-+	int compressedSize, int targetOutputSize, int maxDecompressedSize);
-+
- 
- /*
-- * lz4_decompress_unknownoutputsize()
-+ * lz4_decompress_unknownoutputsize() :
-  *	src     : source address of the compressed data
-  *	src_len : is the input size, therefore the compressed size
-- *	dest	: output buffer address of the decompressed data
-+ *	dest    : output buffer address of the decompressed data
-  *	dest_len: is the max size of the destination buffer, which is
-- *			returned with actual size of decompressed data after
-- *			decompress done
-- *	return  : Success if return 0
-- *		  Error if return (< 0)
-- *	note :  Destination buffer must be already allocated.
-+ *            returned with actual size of decompressed data after
-+ *            decompress done
-+ * return: Success if return 0
-+ *         Error if return (< 0)
-+ * note:   Destination buffer must be already allocated.
-  */
- int lz4_decompress_unknownoutputsize(const unsigned char *src, size_t src_len,
--		unsigned char *dest, size_t *dest_len);
-+	unsigned char *dest, size_t *dest_len);
-+
-+/*
-+ * lz4_decompress() :
-+ *	src            : source address of the compressed data
-+ *	src_len        : is the input size,
-+ *                   which is returned after decompress done
-+ *	dest           : output buffer address of the decompressed data
-+ *	actual_dest_len: is the size of uncompressed data, supposing it's known
-+ *	return: Success if return 0
-+ *          Error if return (< 0)
-+ *	note  : Destination buffer must be already allocated.
-+ *          slightly faster than lz4_decompress_unknownoutputsize()
-+ */
-+int lz4_decompress(const unsigned char *src, size_t *src_len,
-+	unsigned char *dest, size_t actual_dest_len);
-+
-+/*-************************************************************************
-+ *	LZ4 HC Compression
-+ **************************************************************************/
-+
-+/*! LZ4_compress_HC() :
-+ * Compress data from `src` into `dst`, using the more powerful
-+ * but slower "HC" algorithm. dst` must be already allocated.
-+ * Compression is guaranteed to succeed if
-+ * `dstCapacity >= LZ4_compressBound(srcSize)
-+ * Max supported `srcSize` value is LZ4_MAX_INPUT_SIZE
-+ *
-+ *	src             : source address of the original data
-+ *	dst             : output buffer address of the compressed data
-+ *	srcSize         : Max supported value is LZ4_MAX_INPUT_SIZE
-+ *	dstCapacity     : full or partial size of buffer 'dst'
-+ *                    (which must be already allocated)
-+ *	compressionLevel: Recommended values are between 4 and 9, although any
-+ *                    value between 1 and LZ4HC_MAX_CLEVEL will work.
-+ *                    Values >LZ4HC_MAX_CLEVEL behave the same as 16.
-+ *	wrkmem          : address of the working memory.
-+ *                    This requires 'wrkmem' of size LZ4HC_MEM_COMPRESS.
-+ *	return : the number of bytes written into 'dst'
-+ *           or 0 if compression fails.
-+ */
-+int LZ4_compress_HC(const char *src, char *dst, int srcSize, int dstCapacity,
-+	int compressionLevel, void *wrkmem);
-+
-+/*
-+ * lz4hc_compress()
-+ *	src    : source address of the original data
-+ *	src_len: size of the original data
-+ *	dst    : output buffer address of the compressed data
-+ *           This requires 'dst' of size LZ4_COMPRESSBOUND.
-+ *	dst_len: is the output size, which is returned after compress done
-+ *	workmem: address of the working memory.
-+ *           This requires 'workmem' of size LZ4HC_MEM_COMPRESS.
-+ * return	: Success if return 0
-+ *          Error if return (< 0)
-+ * note   : Destination buffer and workmem must be already allocated with
-+ *          the defined size.
-+ */
-+int lz4hc_compress(const unsigned char *src, size_t src_len, unsigned char *dst,
-+	size_t *dst_len, void *wrkmem);
-+
-+/*
-+ *	These functions compress data in successive blocks of any size,
-+ *	using previous blocks as dictionary. One key assumption is that previous
-+ *	blocks (up to 64 KB) remain read-accessible while
-+ *	compressing next blocks.
-+ *	There is an exception for ring buffers, which can be smaller than 64 KB.
-+ *	Ring buffers scenario is automatically detected and handled by
-+ *	LZ4_compress_HC_continue().
-+ *	Before starting compression, state must be properly initialized,
-+ *	using LZ4_resetStreamHC().
-+ *	A first "fictional block" can then be designated as initial dictionary,
-+ *	using LZ4_loadDictHC() (Optional).
-+ *	Then, use LZ4_compress_HC_continue() to compress each successive block.
-+ *	Previous memory blocks (including initial dictionary when present) must
-+ *	remain accessible and unmodified during compression.
-+ *	'dst' buffer should be sized to handle worst case scenarios, using
-+ *	LZ4_compressBound(), to ensure operation success.
-+ *	If, for any reason, previous data blocks can't be preserved unmodified
-+ *	in memory during next compression block,
-+ *	you must save it to a safer memory space, using LZ4_saveDictHC().
-+ *	Return value of LZ4_saveDictHC() is the size of dictionary
-+ *	effectively saved into 'safeBuffer'.
-+ */
-+void LZ4_resetStreamHC(LZ4_streamHC_t *streamHCPtr, int compressionLevel);
-+int	LZ4_loadDictHC(LZ4_streamHC_t *streamHCPtr, const char *dictionary,
-+	int dictSize);
-+int LZ4_compress_HC_continue(LZ4_streamHC_t *streamHCPtr, const char *src,
-+	char *dst, int srcSize, int maxDstSize);
-+int LZ4_saveDictHC(LZ4_streamHC_t *streamHCPtr, char *safeBuffer,
-+	int maxDictSize);
-+
-+/*-*********************************************
-+ *	Streaming Compression Functions
-+ ***********************************************/
-+/*
-+ * LZ4_resetStream() :
-+ *	An LZ4_stream_t structure can be allocated once
-+ *	and re-used multiple times.
-+ *	Use this function to init an allocated `LZ4_stream_t` structure
-+ *	and start a new compression.
-+ */
-+void LZ4_resetStream(LZ4_stream_t *LZ4_stream);
-+
-+/*
-+ * LZ4_loadDict() :
-+ *	Use this function to load a static dictionary into LZ4_stream.
-+ *	Any previous data will be forgotten, only 'dictionary'
-+ *	will remain in memory.
-+ *	Loading a size of 0 is allowed.
-+ *	Return : dictionary size, in bytes (necessarily <= 64 KB)
-+ */
-+int LZ4_loadDict(LZ4_stream_t *streamPtr, const char *dictionary,
-+	int dictSize);
-+
-+/*
-+ * LZ4_compress_fast_continue() :
-+ *	Compress buffer content 'src',
-+ *	using data from previously compressed blocks
-+ *	as dictionary to improve compression ratio.
-+ *	Important : Previous data blocks are assumed to still
-+ *	be present and unmodified !
-+ *	'dst' buffer must be already allocated.
-+ *	If maxDstSize >= LZ4_compressBound(srcSize),
-+ *	compression is guaranteed to succeed, and runs faster.
-+ *	If not, and if compressed data cannot fit into 'dst' buffer size,
-+ *	compression stops, and function returns a zero.
-+ */
-+int LZ4_compress_fast_continue(LZ4_stream_t *streamPtr, const char *src,
-+	char *dst, int srcSize, int maxDstSize, int acceleration);
-+
-+/*
-+ * LZ4_saveDict() :
-+ *	If previously compressed data block is not guaranteed
-+ *	to remain available at its memory location,
-+ *	save it into a safer place (char *safeBuffer).
-+ *	Note : you don't need to call LZ4_loadDict() afterwards,
-+ *         dictionary is immediately usable, you can therefore call
-+ *         LZ4_compress_fast_continue().
-+ *	Return : saved dictionary size in bytes (necessarily <= dictSize),
-+ *           or 0 if error.
-+ */
-+int LZ4_saveDict(LZ4_stream_t *streamPtr, char *safeBuffer, int dictSize);
-+
-+/*
-+ * LZ4_setStreamDecode() :
-+ *	Use this function to instruct where to find the dictionary.
-+ *	Setting a size of 0 is allowed (same effect as reset).
-+ *	@return : 1 if OK, 0 if error
-+ */
-+int LZ4_setStreamDecode(LZ4_streamDecode_t *LZ4_streamDecode,
-+	const char *dictionary, int dictSize);
-+
-+/*
-+ * LZ4_decompress_*_continue() :
-+ *	These decoding functions allow decompression of multiple blocks
-+ *	in "streaming" mode.
-+ *	Previously decoded blocks *must* remain available at the memory position
-+ *	where they were decoded (up to 64 KB)
-+ *	In the case of a ring buffers, decoding buffer must be either :
-+ *    - Exactly same size as encoding buffer, with same update rule
-+ *      (block boundaries at same positions) In which case,
-+ *      the decoding & encoding ring buffer can have any size,
-+ *      including very small ones ( < 64 KB).
-+ *    - Larger than encoding buffer, by a minimum of maxBlockSize more bytes.
-+ *      maxBlockSize is implementation dependent.
-+ *      It's the maximum size you intend to compress into a single block.
-+ *      In which case, encoding and decoding buffers do not need
-+ *      to be synchronized, and encoding ring buffer can have any size,
-+ *      including small ones ( < 64 KB).
-+ *    - _At least_ 64 KB + 8 bytes + maxBlockSize.
-+ *      In which case, encoding and decoding buffers do not need to be
-+ *      synchronized, and encoding ring buffer can have any size,
-+ *      including larger than decoding buffer. W
-+ * Whenever these conditions are not possible, save the last 64KB of decoded
-+ * data into a safe buffer, and indicate where it is saved
-+ * using LZ4_setStreamDecode()
-+ */
-+int LZ4_decompress_safe_continue(LZ4_streamDecode_t *LZ4_streamDecode,
-+	const char *source, char *dest, int compressedSize,
-+	int maxDecompressedSize);
-+int LZ4_decompress_fast_continue(LZ4_streamDecode_t *LZ4_streamDecode,
-+	const char *source, char *dest, int originalSize);
-+
-+/*
-+ * LZ4_decompress_*_usingDict() :
-+ *	These decoding functions work the same as
-+ *	a combination of LZ4_setStreamDecode() followed by
-+ *	LZ4_decompress_*_continue()
-+ *	They are stand-alone, and don't need an LZ4_streamDecode_t structure.
-+ */
-+int LZ4_decompress_safe_usingDict(const char *source, char *dest,
-+	int compressedSize, int maxDecompressedSize, const char *dictStart,
-+	int dictSize);
-+int LZ4_decompress_fast_usingDict(const char *source, char *dest,
-+	int originalSize, const char *dictStart, int dictSize);
-+
- #endif
-diff --git a/lib/lz4/lz4_compress.c b/lib/lz4/lz4_compress.c
-index 28321d8..4cd6d1b 100644
---- a/lib/lz4/lz4_compress.c
-+++ b/lib/lz4/lz4_compress.c
-@@ -1,19 +1,16 @@
- /*
-  * LZ4 - Fast LZ compression algorithm
-- * Copyright (C) 2011-2012, Yann Collet.
-- * BSD 2-Clause License (http://www.opensource.org/licenses/bsd-license.php)
--
-+ * Copyright (C) 2011 - 2016, Yann Collet.
-+ * BSD 2 - Clause License (http://www.opensource.org/licenses/bsd - license.php)
-  * Redistribution and use in source and binary forms, with or without
-  * modification, are permitted provided that the following conditions are
-  * met:
-- *
-- *     * Redistributions of source code must retain the above copyright
-+ *		* Redistributions of source code must retain the above copyright
-  * notice, this list of conditions and the following disclaimer.
-- *     * Redistributions in binary form must reproduce the above
-+ *		* Redistributions in binary form must reproduce the above
-  * copyright notice, this list of conditions and the following disclaimer
-  * in the documentation and/or other materials provided with the
-  * distribution.
-- *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-@@ -25,417 +22,873 @@
-  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-- *
-  * You can contact the author at :
-- * - LZ4 homepage : http://fastcompression.blogspot.com/p/lz4.html
-- * - LZ4 source repository : http://code.google.com/p/lz4/
-+ *	- LZ4 homepage : http://www.lz4.org
-+ *	- LZ4 source repository : https://github.com/lz4/lz4
-  *
-- *  Changed for kernel use by:
-- *  Chanho Min <chanho.min@lge.com>
-+ *	Changed for kernel usage by:
-+ *	Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
-  */
- 
-+/*-************************************
-+ *	Dependencies
-+ **************************************/
-+#include <linux/lz4.h>
-+#include "lz4defs.h"
- #include <linux/module.h>
- #include <linux/kernel.h>
--#include <linux/lz4.h>
- #include <asm/unaligned.h>
--#include "lz4defs.h"
- 
--/*
-- * LZ4_compressCtx :
-- * -----------------
-- * Compress 'isize' bytes from 'source' into an output buffer 'dest' of
-- * maximum size 'maxOutputSize'.  * If it cannot achieve it, compression
-- * will stop, and result of the function will be zero.
-- * return : the number of bytes written in buffer 'dest', or 0 if the
-- * compression fails
-- */
--static inline int lz4_compressctx(void *ctx,
--		const char *source,
--		char *dest,
--		int isize,
--		int maxoutputsize)
-+/*-******************************
-+ *	Compression functions
-+ ********************************/
-+static U32 LZ4_hash4(U32 sequence, tableType_t const tableType)
- {
--	HTYPE *hashtable = (HTYPE *)ctx;
--	const u8 *ip = (u8 *)source;
--#if LZ4_ARCH64
--	const BYTE * const base = ip;
-+	if (tableType == byU16)
-+		return ((sequence * 2654435761U)
-+			>> ((MINMATCH*8) - (LZ4_HASHLOG + 1)));
-+	else
-+		return ((sequence * 2654435761U)
-+			>> ((MINMATCH*8) - LZ4_HASHLOG));
-+}
-+
-+static U32 LZ4_hash5(U64 sequence, tableType_t const tableType)
-+{
-+	const U32 hashLog = (tableType == byU16)
-+		? LZ4_HASHLOG + 1
-+		: LZ4_HASHLOG;
-+
-+#ifdef __LITTLE_ENDIAN__
-+	static const U64 prime5bytes = 889523592379ULL;
-+
-+	return (U32)(((sequence << 24) * prime5bytes) >> (64 - hashLog));
- #else
--	const int base = 0;
-+	static const U64 prime8bytes = 11400714785074694791ULL;
-+
-+	return (U32)(((sequence >> 24) * prime8bytes) >> (64 - hashLog));
- #endif
--	const u8 *anchor = ip;
--	const u8 *const iend = ip + isize;
--	const u8 *const mflimit = iend - MFLIMIT;
--	#define MATCHLIMIT (iend - LASTLITERALS)
--
--	u8 *op = (u8 *) dest;
--	u8 *const oend = op + maxoutputsize;
--	int length;
--	const int skipstrength = SKIPSTRENGTH;
--	u32 forwardh;
--	int lastrun;
--
--	/* Init */
--	if (isize < MINLENGTH)
--		goto _last_literals;
-+}
-+
-+static U32 LZ4_hashPosition(const void *p, tableType_t tableType)
-+{
-+#if LZ4_ARCH64
-+	if (tableType == byU32)
-+		return LZ4_hash5(LZ4_read_ARCH(p), tableType);
-+#endif
-+
-+	return LZ4_hash4(LZ4_read32(p), tableType);
-+}
-+
-+static void LZ4_putPositionOnHash(const BYTE *p, U32 h, void *tableBase,
-+	tableType_t const tableType, const BYTE *srcBase)
-+{
-+	switch (tableType) {
-+	case byPtr:
-+	{
-+		const BYTE **hashTable = (const BYTE **)tableBase;
-+
-+		hashTable[h] = p;
-+		return;
-+	}
-+	case byU32:
-+	{
-+		U32 *hashTable = (U32 *) tableBase;
-+
-+		hashTable[h] = (U32)(p - srcBase);
-+		return;
-+	}
-+	case byU16:
-+	{
-+		U16 *hashTable = (U16 *) tableBase;
-+
-+		hashTable[h] = (U16)(p - srcBase);
-+		return;
-+	}
-+	}
-+}
-+
-+static inline void LZ4_putPosition(const BYTE *p, void *tableBase,
-+	tableType_t tableType, const BYTE *srcBase)
-+{
-+	U32 const h = LZ4_hashPosition(p, tableType);
-+
-+	LZ4_putPositionOnHash(p, h, tableBase, tableType, srcBase);
-+}
-+
-+static const BYTE *LZ4_getPositionOnHash(U32 h, void *tableBase,
-+	tableType_t tableType, const BYTE *srcBase)
-+{
-+	if (tableType == byPtr) {
-+		const BYTE **hashTable = (const BYTE **) tableBase;
-+
-+		return hashTable[h];
-+	}
-+
-+	if (tableType == byU32) {
-+		const U32 * const hashTable = (U32 *) tableBase;
-+
-+		return hashTable[h] + srcBase;
-+	}
-+
-+	{
-+		/* default, to ensure a return */
-+		const U16 * const hashTable = (U16 *) tableBase;
-+		return hashTable[h] + srcBase;
-+	}
-+}
-+
-+static inline const BYTE *LZ4_getPosition(const BYTE *p, void *tableBase,
-+	tableType_t tableType, const BYTE *srcBase)
-+{
-+	U32 const h = LZ4_hashPosition(p, tableType);
-+
-+	return LZ4_getPositionOnHash(h, tableBase, tableType, srcBase);
-+}
-+
-+
-+/*
-+ * LZ4_compress_generic() :
-+ * inlined, to ensure branches are decided at compilation time
-+ */
-+static inline int LZ4_compress_generic(
-+	LZ4_stream_t_internal * const dictPtr,
-+	const char * const source,
-+	char * const dest,
-+	const int inputSize,
-+	const int maxOutputSize,
-+	const limitedOutput_directive outputLimited,
-+	const tableType_t tableType,
-+	const dict_directive dict,
-+	const dictIssue_directive dictIssue,
-+	const U32 acceleration)
-+{
-+	const BYTE *ip = (const BYTE *) source;
-+	const BYTE *base;
-+	const BYTE *lowLimit;
-+	const BYTE * const lowRefLimit = ip - dictPtr->dictSize;
-+	const BYTE * const dictionary = dictPtr->dictionary;
-+	const BYTE * const dictEnd = dictionary + dictPtr->dictSize;
-+	const size_t dictDelta = dictEnd - (const BYTE *)source;
-+	const BYTE *anchor = (const BYTE *) source;
-+	const BYTE * const iend = ip + inputSize;
-+	const BYTE * const mflimit = iend - MFLIMIT;
-+	const BYTE * const matchlimit = iend - LASTLITERALS;
-+
-+	BYTE *op = (BYTE *) dest;
-+	BYTE * const olimit = op + maxOutputSize;
-+
-+	U32 forwardH;
-+	size_t refDelta = 0;
-+
-+	/* Init conditions */
-+	if ((U32)inputSize > (U32)LZ4_MAX_INPUT_SIZE) {
-+		/* Unsupported inputSize, too large (or negative) */
-+		return 0;
-+	}
-+	switch (dict) {
-+	case noDict:
-+	default:
-+		base = (const BYTE *)source;
-+		lowLimit = (const BYTE *)source;
-+		break;
-+	case withPrefix64k:
-+		base = (const BYTE *)source - dictPtr->currentOffset;
-+		lowLimit = (const BYTE *)source - dictPtr->dictSize;
-+		break;
-+	case usingExtDict:
-+		base = (const BYTE *)source - dictPtr->currentOffset;
-+		lowLimit = (const BYTE *)source;
-+		break;
-+	}
-+
-+	if ((tableType == byU16)
-+		&& (inputSize >= LZ4_64Klimit)) {
-+		/* Size too large (not within 64K limit) */
-+		return 0;
-+	}
- 
--	memset((void *)hashtable, 0, LZ4_MEM_COMPRESS);
-+	if (inputSize < LZ4_minLength) {
-+		/* Input too small, no compression (all literals) */
-+		goto _last_literals;
-+	}
- 
- 	/* First Byte */
--	hashtable[LZ4_HASH_VALUE(ip)] = ip - base;
--	ip++;
--	forwardh = LZ4_HASH_VALUE(ip);
-+	LZ4_putPosition(ip, dictPtr->hashTable, tableType, base);
-+	ip++; forwardH = LZ4_hashPosition(ip, tableType);
- 
- 	/* Main Loop */
--	for (;;) {
--		int findmatchattempts = (1U << skipstrength) + 3;
--		const u8 *forwardip = ip;
--		const u8 *ref;
--		u8 *token;
-+	for ( ; ; ) {
-+		const BYTE *match;
-+		BYTE *token;
- 
- 		/* Find a match */
--		do {
--			u32 h = forwardh;
--			int step = findmatchattempts++ >> skipstrength;
--			ip = forwardip;
--			forwardip = ip + step;
--
--			if (unlikely(forwardip > mflimit))
--				goto _last_literals;
--
--			forwardh = LZ4_HASH_VALUE(forwardip);
--			ref = base + hashtable[h];
--			hashtable[h] = ip - base;
--		} while ((ref < ip - MAX_DISTANCE) || (A32(ref) != A32(ip)));
-+		{ const BYTE *forwardIp = ip;
-+			unsigned int step = 1;
-+			unsigned int searchMatchNb = acceleration
-+				<< LZ4_skipTrigger;
-+
-+			do {
-+				U32 const h = forwardH;
-+
-+				ip = forwardIp;
-+				forwardIp += step;
-+				step = (searchMatchNb++ >> LZ4_skipTrigger);
-+
-+				if (unlikely(forwardIp > mflimit))
-+					goto _last_literals;
-+
-+				match = LZ4_getPositionOnHash(h,
-+					dictPtr->hashTable,
-+					tableType, base);
-+				if (dict == usingExtDict) {
-+					if (match < (const BYTE *)source) {
-+						refDelta = dictDelta;
-+						lowLimit = dictionary;
-+					} else {
-+						refDelta = 0;
-+						lowLimit = (const BYTE *)source;
-+				}	 }
-+				forwardH = LZ4_hashPosition(forwardIp,
-+					tableType);
-+				LZ4_putPositionOnHash(ip, h, dictPtr->hashTable,
-+					tableType, base);
-+
-+			} while (((dictIssue == dictSmall)
-+					? (match < lowRefLimit)
-+					: 0)
-+				|| ((tableType == byU16)
-+					? 0
-+					: (match + MAX_DISTANCE < ip))
-+				|| (LZ4_read32(match + refDelta)
-+					!= LZ4_read32(ip)));
-+		}
- 
- 		/* Catch up */
--		while ((ip > anchor) && (ref > (u8 *)source) &&
--			unlikely(ip[-1] == ref[-1])) {
-+		while (((ip > anchor) & (match + refDelta > lowLimit))
-+			&& (unlikely(ip[-1] == match[refDelta - 1]))) {
- 			ip--;
--			ref--;
--		}
-+			match--;
-+			}
- 
--		/* Encode Literal length */
--		length = (int)(ip - anchor);
--		token = op++;
--		/* check output limit */
--		if (unlikely(op + length + (2 + 1 + LASTLITERALS) +
--			(length >> 8) > oend))
--			return 0;
-+		/* Encode Literals */
-+		{ unsigned const int litLength = (unsigned int)(ip - anchor);
- 
--		if (length >= (int)RUN_MASK) {
--			int len;
--			*token = (RUN_MASK << ML_BITS);
--			len = length - RUN_MASK;
--			for (; len > 254 ; len -= 255)
--				*op++ = 255;
--			*op++ = (u8)len;
--		} else
--			*token = (length << ML_BITS);
-+			token = op++;
-+			if ((outputLimited) &&
-+				/* Check output buffer overflow */
-+				(unlikely(op + litLength +
-+					(2 + 1 + LASTLITERALS) +
-+					(litLength/255) > olimit)))
-+				return 0;
-+			if (litLength >= RUN_MASK) {
-+				int len = (int)litLength - RUN_MASK;
-+
-+				*token = (RUN_MASK<<ML_BITS);
-+				for (; len >= 255 ; len -= 255)
-+					*op++ = 255;
-+				*op++ = (BYTE)len;
-+			} else
-+				*token = (BYTE)(litLength<<ML_BITS);
-+
-+			/* Copy Literals */
-+			LZ4_wildCopy(op, anchor, op + litLength);
-+			op += litLength;
-+		}
- 
--		/* Copy Literals */
--		LZ4_BLINDCOPY(anchor, op, length);
- _next_match:
- 		/* Encode Offset */
--		LZ4_WRITE_LITTLEENDIAN_16(op, (u16)(ip - ref));
-+		LZ4_writeLE16(op, (U16)(ip - match)); op += 2;
- 
--		/* Start Counting */
--		ip += MINMATCH;
--		/* MinMatch verified */
--		ref += MINMATCH;
--		anchor = ip;
--		while (likely(ip < MATCHLIMIT - (STEPSIZE - 1))) {
--			#if LZ4_ARCH64
--			u64 diff = A64(ref) ^ A64(ip);
--			#else
--			u32 diff = A32(ref) ^ A32(ip);
--			#endif
--			if (!diff) {
--				ip += STEPSIZE;
--				ref += STEPSIZE;
--				continue;
--			}
--			ip += LZ4_NBCOMMONBYTES(diff);
--			goto _endcount;
--		}
--		#if LZ4_ARCH64
--		if ((ip < (MATCHLIMIT - 3)) && (A32(ref) == A32(ip))) {
--			ip += 4;
--			ref += 4;
--		}
--		#endif
--		if ((ip < (MATCHLIMIT - 1)) && (A16(ref) == A16(ip))) {
--			ip += 2;
--			ref += 2;
--		}
--		if ((ip < MATCHLIMIT) && (*ref == *ip))
--			ip++;
--_endcount:
- 		/* Encode MatchLength */
--		length = (int)(ip - anchor);
--		/* Check output limit */
--		if (unlikely(op + (1 + LASTLITERALS) + (length >> 8) > oend))
--			return 0;
--		if (length >= (int)ML_MASK) {
--			*token += ML_MASK;
--			length -= ML_MASK;
--			for (; length > 509 ; length -= 510) {
--				*op++ = 255;
--				*op++ = 255;
--			}
--			if (length > 254) {
--				length -= 255;
--				*op++ = 255;
-+		{	 unsigned int matchCode;
-+
-+			if ((dict == usingExtDict)
-+				&& (lowLimit == dictionary)) {
-+				const BYTE *limit;
-+
-+				match += refDelta;
-+				limit = ip + (dictEnd - match);
-+				if (limit > matchlimit)
-+					limit = matchlimit;
-+				matchCode = LZ4_count(ip + MINMATCH,
-+					match + MINMATCH, limit);
-+				ip += MINMATCH + matchCode;
-+				if (ip == limit) {
-+					unsigned const int more = LZ4_count(ip,
-+						(const BYTE *)source,
-+						matchlimit);
-+
-+					matchCode += more;
-+					ip += more;
-+				}
-+			} else {
-+				matchCode = LZ4_count(ip + MINMATCH,
-+					match + MINMATCH, matchlimit);
-+				ip += MINMATCH + matchCode;
- 			}
--			*op++ = (u8)length;
--		} else
--			*token += length;
-+
-+			if (outputLimited &&
-+				/* Check output buffer overflow */
-+				(unlikely(op +
-+					(1 + LASTLITERALS) +
-+					(matchCode>>8) > olimit)))
-+				return 0;
-+			if (matchCode >= ML_MASK) {
-+				*token += ML_MASK;
-+				matchCode -= ML_MASK;
-+				LZ4_write32(op, 0xFFFFFFFF);
-+				while (matchCode >= 4*255) {
-+					op += 4;
-+					LZ4_write32(op, 0xFFFFFFFF);
-+					matchCode -= 4*255;
-+				}
-+				op += matchCode / 255;
-+				*op++ = (BYTE)(matchCode % 255);
-+			} else
-+				*token += (BYTE)(matchCode);
-+		}
-+
-+		anchor = ip;
- 
- 		/* Test end of chunk */
--		if (ip > mflimit) {
--			anchor = ip;
-+		if (ip > mflimit)
- 			break;
--		}
- 
- 		/* Fill table */
--		hashtable[LZ4_HASH_VALUE(ip-2)] = ip - 2 - base;
-+		LZ4_putPosition(ip - 2, dictPtr->hashTable, tableType, base);
- 
- 		/* Test next position */
--		ref = base + hashtable[LZ4_HASH_VALUE(ip)];
--		hashtable[LZ4_HASH_VALUE(ip)] = ip - base;
--		if ((ref > ip - (MAX_DISTANCE + 1)) && (A32(ref) == A32(ip))) {
-+		match = LZ4_getPosition(ip, dictPtr->hashTable,
-+			tableType, base);
-+		if (dict == usingExtDict) {
-+			if (match < (const BYTE *)source) {
-+				refDelta = dictDelta;
-+				lowLimit = dictionary;
-+			} else {
-+				refDelta = 0;
-+				lowLimit = (const BYTE *)source;
-+			}
-+		}
-+		LZ4_putPosition(ip, dictPtr->hashTable, tableType, base);
-+		if (((dictIssue == dictSmall) ? (match >= lowRefLimit) : 1)
-+			&& (match + MAX_DISTANCE >= ip)
-+			&& (LZ4_read32(match + refDelta) == LZ4_read32(ip))) {
- 			token = op++;
- 			*token = 0;
- 			goto _next_match;
- 		}
- 
- 		/* Prepare next loop */
--		anchor = ip++;
--		forwardh = LZ4_HASH_VALUE(ip);
-+		forwardH = LZ4_hashPosition(++ip, tableType);
- 	}
- 
- _last_literals:
- 	/* Encode Last Literals */
--	lastrun = (int)(iend - anchor);
--	if (((char *)op - dest) + lastrun + 1
--		+ ((lastrun + 255 - RUN_MASK) / 255) > (u32)maxoutputsize)
--		return 0;
--
--	if (lastrun >= (int)RUN_MASK) {
--		*op++ = (RUN_MASK << ML_BITS);
--		lastrun -= RUN_MASK;
--		for (; lastrun > 254 ; lastrun -= 255)
--			*op++ = 255;
--		*op++ = (u8)lastrun;
--	} else
--		*op++ = (lastrun << ML_BITS);
--	memcpy(op, anchor, iend - anchor);
--	op += iend - anchor;
-+	{	 size_t const lastRun = (size_t)(iend - anchor);
-+		if ((outputLimited) &&
-+			/* Check output buffer overflow */
-+			((op - (BYTE *)dest) + lastRun + 1 +
-+			((lastRun + 255 - RUN_MASK)/255) > (U32)maxOutputSize))
-+			return 0;
-+		if (lastRun >= RUN_MASK) {
-+			size_t accumulator = lastRun - RUN_MASK;
-+			*op++ = RUN_MASK << ML_BITS;
-+			for (; accumulator >= 255 ; accumulator -= 255)
-+				*op++ = 255;
-+			*op++ = (BYTE) accumulator;
-+		} else {
-+			*op++ = (BYTE)(lastRun<<ML_BITS);
-+		}
-+		memcpy(op, anchor, lastRun);
-+		op += lastRun;
-+	}
- 
- 	/* End */
--	return (int)(((char *)op) - dest);
-+	return (int) (((char *)op) - dest);
- }
- 
--static inline int lz4_compress64kctx(void *ctx,
--		const char *source,
--		char *dest,
--		int isize,
--		int maxoutputsize)
-+int LZ4_compress_fast_extState(void *state, const char *source, char *dest,
-+	int inputSize, int maxOutputSize, int acceleration)
- {
--	u16 *hashtable = (u16 *)ctx;
--	const u8 *ip = (u8 *) source;
--	const u8 *anchor = ip;
--	const u8 *const base = ip;
--	const u8 *const iend = ip + isize;
--	const u8 *const mflimit = iend - MFLIMIT;
--	#define MATCHLIMIT (iend - LASTLITERALS)
--
--	u8 *op = (u8 *) dest;
--	u8 *const oend = op + maxoutputsize;
--	int len, length;
--	const int skipstrength = SKIPSTRENGTH;
--	u32 forwardh;
--	int lastrun;
--
--	/* Init */
--	if (isize < MINLENGTH)
--		goto _last_literals;
-+	#if LZ4_ARCH64
-+	tableType_t tableType = byU32;
-+	#else
-+	tableType_t tableType = byPtr;
-+	#endif
-+
-+	LZ4_stream_t_internal *ctx = &((LZ4_stream_t *)state)->internal_donotuse;
-+
-+	LZ4_resetStream((LZ4_stream_t *)state);
-+
-+	if (acceleration < 1)
-+		acceleration = LZ4_ACCELERATION_DEFAULT;
-+
-+	if (maxOutputSize >= LZ4_compressBound(inputSize)) {
-+		if (inputSize < LZ4_64Klimit)
-+			return LZ4_compress_generic(ctx, source,
-+				dest, inputSize, 0,
-+				noLimit, byU16, noDict,
-+				noDictIssue, acceleration);
-+		else
-+			return LZ4_compress_generic(ctx, source,
-+				dest, inputSize, 0,
-+				noLimit, tableType, noDict,
-+				noDictIssue, acceleration);
-+	} else {
-+		if (inputSize < LZ4_64Klimit)
-+			return LZ4_compress_generic(ctx, source,
-+				dest, inputSize,
-+				maxOutputSize, limitedOutput, byU16, noDict,
-+				noDictIssue, acceleration);
-+		else
-+			return LZ4_compress_generic(ctx, source,
-+				dest, inputSize,
-+				maxOutputSize, limitedOutput, tableType, noDict,
-+				noDictIssue, acceleration);
-+	}
-+}
- 
--	memset((void *)hashtable, 0, LZ4_MEM_COMPRESS);
-+int LZ4_compress_fast(const char *source, char *dest, int inputSize,
-+	int maxOutputSize, void *wrkmem, int acceleration)
-+{
-+	return LZ4_compress_fast_extState(wrkmem, source, dest, inputSize,
-+		maxOutputSize, acceleration);
-+}
-+EXPORT_SYMBOL(LZ4_compress_fast);
-+
-+int LZ4_compress_default(const char *source, char *dest, int inputSize,
-+	int maxOutputSize, void *wrkmem)
-+{
-+	return LZ4_compress_fast(source, dest, inputSize,
-+		maxOutputSize, wrkmem, 1);
-+}
-+EXPORT_SYMBOL(LZ4_compress_default);
-+
-+/*-******************************
-+ *	*_destSize() variant
-+ ********************************/
-+
-+static int LZ4_compress_destSize_generic(
-+	LZ4_stream_t_internal * const ctx,
-+	const char * const src,
-+	char * const dst,
-+	int * const srcSizePtr,
-+	const int targetDstSize,
-+	const tableType_t tableType)
-+{
-+	const BYTE *ip = (const BYTE *) src;
-+	const BYTE *base = (const BYTE *) src;
-+	const BYTE *lowLimit = (const BYTE *) src;
-+	const BYTE *anchor = ip;
-+	const BYTE * const iend = ip + *srcSizePtr;
-+	const BYTE * const mflimit = iend - MFLIMIT;
-+	const BYTE * const matchlimit = iend - LASTLITERALS;
-+
-+	BYTE *op = (BYTE *) dst;
-+	BYTE * const oend = op + targetDstSize;
-+	BYTE * const oMaxLit = op + targetDstSize - 2 /* offset */
-+		- 8 /* because 8 + MINMATCH == MFLIMIT */ - 1 /* token */;
-+	BYTE * const oMaxMatch = op + targetDstSize
-+		- (LASTLITERALS + 1 /* token */);
-+	BYTE * const oMaxSeq = oMaxLit - 1 /* token */;
-+
-+	U32 forwardH;
-+
-+	/* Init conditions */
-+	/* Impossible to store anything */
-+	if (targetDstSize < 1)
-+		return 0;
-+	/* Unsupported input size, too large (or negative) */
-+	if ((U32)*srcSizePtr > (U32)LZ4_MAX_INPUT_SIZE)
-+		return 0;
-+	/* Size too large (not within 64K limit) */
-+	if ((tableType == byU16) && (*srcSizePtr >= LZ4_64Klimit))
-+		return 0;
-+	/* Input too small, no compression (all literals) */
-+	if (*srcSizePtr < LZ4_minLength)
-+		goto _last_literals;
- 
- 	/* First Byte */
--	ip++;
--	forwardh = LZ4_HASH64K_VALUE(ip);
-+	*srcSizePtr = 0;
-+	LZ4_putPosition(ip, ctx->hashTable, tableType, base);
-+	ip++; forwardH = LZ4_hashPosition(ip, tableType);
- 
- 	/* Main Loop */
--	for (;;) {
--		int findmatchattempts = (1U << skipstrength) + 3;
--		const u8 *forwardip = ip;
--		const u8 *ref;
--		u8 *token;
-+	for ( ; ; ) {
-+		const BYTE *match;
-+		BYTE *token;
- 
- 		/* Find a match */
--		do {
--			u32 h = forwardh;
--			int step = findmatchattempts++ >> skipstrength;
--			ip = forwardip;
--			forwardip = ip + step;
--
--			if (forwardip > mflimit)
--				goto _last_literals;
--
--			forwardh = LZ4_HASH64K_VALUE(forwardip);
--			ref = base + hashtable[h];
--			hashtable[h] = (u16)(ip - base);
--		} while (A32(ref) != A32(ip));
-+		{	 const BYTE *forwardIp = ip;
-+			unsigned int step = 1;
-+			unsigned int searchMatchNb = 1 << LZ4_skipTrigger;
-+
-+			do {
-+				U32 h = forwardH;
-+
-+				ip = forwardIp;
-+				forwardIp += step;
-+				step = (searchMatchNb++ >> LZ4_skipTrigger);
-+
-+				if (unlikely(forwardIp > mflimit))
-+					goto _last_literals;
-+
-+				match = LZ4_getPositionOnHash(h, ctx->hashTable,
-+					tableType, base);
-+				forwardH = LZ4_hashPosition(forwardIp,
-+					tableType);
-+				LZ4_putPositionOnHash(ip, h,
-+					ctx->hashTable, tableType,
-+					base);
-+
-+			} while (((tableType == byU16)
-+				? 0
-+				: (match + MAX_DISTANCE < ip))
-+				|| (LZ4_read32(match) != LZ4_read32(ip)));
-+		}
- 
- 		/* Catch up */
--		while ((ip > anchor) && (ref > (u8 *)source)
--			&& (ip[-1] == ref[-1])) {
--			ip--;
--			ref--;
--		}
-+		while ((ip > anchor)
-+			&& (match > lowLimit)
-+			&& (unlikely(ip[-1] == match[-1]))) {
-+			ip--; match--;
-+			}
- 
- 		/* Encode Literal length */
--		length = (int)(ip - anchor);
--		token = op++;
--		/* Check output limit */
--		if (unlikely(op + length + (2 + 1 + LASTLITERALS)
--			+ (length >> 8) > oend))
--			return 0;
--		if (length >= (int)RUN_MASK) {
--			*token = (RUN_MASK << ML_BITS);
--			len = length - RUN_MASK;
--			for (; len > 254 ; len -= 255)
--				*op++ = 255;
--			*op++ = (u8)len;
--		} else
--			*token = (length << ML_BITS);
-+		{	 unsigned int litLength = (unsigned int)(ip - anchor);
- 
--		/* Copy Literals */
--		LZ4_BLINDCOPY(anchor, op, length);
-+			token = op++;
-+			if (op + ((litLength + 240)/255)
-+				+ litLength > oMaxLit) {
-+				/* Not enough space for a last match */
-+				op--;
-+				goto _last_literals;
-+			}
-+			if (litLength >= RUN_MASK) {
-+				unsigned int len = litLength - RUN_MASK;
-+				*token = (RUN_MASK<<ML_BITS);
-+				for (; len >= 255 ; len -= 255)
-+					*op++ = 255;
-+				*op++ = (BYTE)len;
-+			} else
-+				*token = (BYTE)(litLength<<ML_BITS);
-+
-+			/* Copy Literals */
-+			LZ4_wildCopy(op, anchor, op + litLength);
-+			op += litLength;
-+		}
- 
- _next_match:
- 		/* Encode Offset */
--		LZ4_WRITE_LITTLEENDIAN_16(op, (u16)(ip - ref));
-+		LZ4_writeLE16(op, (U16)(ip - match)); op += 2;
- 
--		/* Start Counting */
--		ip += MINMATCH;
--		/* MinMatch verified */
--		ref += MINMATCH;
--		anchor = ip;
-+		/* Encode MatchLength */
-+		{	 size_t matchLength = LZ4_count(ip + MINMATCH,
-+			match + MINMATCH, matchlimit);
- 
--		while (ip < MATCHLIMIT - (STEPSIZE - 1)) {
--			#if LZ4_ARCH64
--			u64 diff = A64(ref) ^ A64(ip);
--			#else
--			u32 diff = A32(ref) ^ A32(ip);
--			#endif
--
--			if (!diff) {
--				ip += STEPSIZE;
--				ref += STEPSIZE;
--				continue;
-+			if (op + ((matchLength + 240)/255) > oMaxMatch) {
-+				/* Match description too long : reduce it */
-+				matchLength = (15 - 1) + (oMaxMatch - op) * 255;
- 			}
--			ip += LZ4_NBCOMMONBYTES(diff);
--			goto _endcount;
--		}
--		#if LZ4_ARCH64
--		if ((ip < (MATCHLIMIT - 3)) && (A32(ref) == A32(ip))) {
--			ip += 4;
--			ref += 4;
-+			ip += MINMATCH + matchLength;
-+
-+			if (matchLength >= ML_MASK) {
-+				*token += ML_MASK;
-+				matchLength -= ML_MASK;
-+				while (matchLength >= 255) {
-+					matchLength -= 255; *op++ = 255;
-+				}
-+				*op++ = (BYTE)matchLength;
-+			} else
-+				*token += (BYTE)(matchLength);
- 		}
--		#endif
--		if ((ip < (MATCHLIMIT - 1)) && (A16(ref) == A16(ip))) {
--			ip += 2;
--			ref += 2;
--		}
--		if ((ip < MATCHLIMIT) && (*ref == *ip))
--			ip++;
--_endcount:
- 
--		/* Encode MatchLength */
--		len = (int)(ip - anchor);
--		/* Check output limit */
--		if (unlikely(op + (1 + LASTLITERALS) + (len >> 8) > oend))
--			return 0;
--		if (len >= (int)ML_MASK) {
--			*token += ML_MASK;
--			len -= ML_MASK;
--			for (; len > 509 ; len -= 510) {
--				*op++ = 255;
--				*op++ = 255;
--			}
--			if (len > 254) {
--				len -= 255;
--				*op++ = 255;
--			}
--			*op++ = (u8)len;
--		} else
--			*token += len;
-+		anchor = ip;
- 
--		/* Test end of chunk */
--		if (ip > mflimit) {
--			anchor = ip;
-+		/* Test end of block */
-+		if (ip > mflimit)
-+			break;
-+		if (op > oMaxSeq)
- 			break;
--		}
- 
- 		/* Fill table */
--		hashtable[LZ4_HASH64K_VALUE(ip-2)] = (u16)(ip - 2 - base);
-+		LZ4_putPosition(ip - 2, ctx->hashTable, tableType, base);
- 
- 		/* Test next position */
--		ref = base + hashtable[LZ4_HASH64K_VALUE(ip)];
--		hashtable[LZ4_HASH64K_VALUE(ip)] = (u16)(ip - base);
--		if (A32(ref) == A32(ip)) {
--			token = op++;
--			*token = 0;
-+		match = LZ4_getPosition(ip, ctx->hashTable, tableType, base);
-+		LZ4_putPosition(ip, ctx->hashTable, tableType, base);
-+
-+		if ((match + MAX_DISTANCE >= ip)
-+			&& (LZ4_read32(match) == LZ4_read32(ip))) {
-+			token = op++; *token = 0;
- 			goto _next_match;
- 		}
- 
- 		/* Prepare next loop */
--		anchor = ip++;
--		forwardh = LZ4_HASH64K_VALUE(ip);
-+		forwardH = LZ4_hashPosition(++ip, tableType);
- 	}
- 
- _last_literals:
- 	/* Encode Last Literals */
--	lastrun = (int)(iend - anchor);
--	if (op + lastrun + 1 + (lastrun - RUN_MASK + 255) / 255 > oend)
--		return 0;
--	if (lastrun >= (int)RUN_MASK) {
--		*op++ = (RUN_MASK << ML_BITS);
--		lastrun -= RUN_MASK;
--		for (; lastrun > 254 ; lastrun -= 255)
--			*op++ = 255;
--		*op++ = (u8)lastrun;
--	} else
--		*op++ = (lastrun << ML_BITS);
--	memcpy(op, anchor, iend - anchor);
--	op += iend - anchor;
-+	{	 size_t lastRunSize = (size_t)(iend - anchor);
-+
-+		if (op + 1 /* token */
-+			+ ((lastRunSize + 240)/255) /* litLength */
-+			+ lastRunSize /* literals */ > oend) {
-+			/* adapt lastRunSize to fill 'dst' */
-+			lastRunSize	= (oend - op) - 1;
-+			lastRunSize -= (lastRunSize + 240)/255;
-+		}
-+		ip = anchor + lastRunSize;
-+
-+		if (lastRunSize >= RUN_MASK) {
-+			size_t accumulator = lastRunSize - RUN_MASK;
-+
-+			*op++ = RUN_MASK << ML_BITS;
-+			for (; accumulator >= 255 ; accumulator -= 255)
-+				*op++ = 255;
-+			*op++ = (BYTE) accumulator;
-+		} else {
-+			*op++ = (BYTE)(lastRunSize<<ML_BITS);
-+		}
-+		memcpy(op, anchor, lastRunSize);
-+		op += lastRunSize;
-+	}
-+
- 	/* End */
--	return (int)(((char *)op) - dest);
-+	*srcSizePtr = (int) (((const char *)ip) - src);
-+	return (int) (((char *)op) - dst);
- }
- 
--int lz4_compress(const unsigned char *src, size_t src_len,
--			unsigned char *dst, size_t *dst_len, void *wrkmem)
-+static int LZ4_compress_destSize_extState(LZ4_stream_t *state, const char *src,
-+	char *dst, int *srcSizePtr, int targetDstSize)
- {
--	int ret = -1;
--	int out_len = 0;
-+	#if LZ4_ARCH64
-+	tableType_t tableType = byU32;
-+	#else
-+	tableType_t tableType = byPtr;
-+	#endif
-+
-+	LZ4_resetStream(state);
-+
-+	if (targetDstSize >= LZ4_compressBound(*srcSizePtr)) {
-+		/* compression success is guaranteed */
-+		return LZ4_compress_fast_extState(
-+			state, src, dst, *srcSizePtr,
-+			targetDstSize, 1);
-+	} else {
-+		if (*srcSizePtr < LZ4_64Klimit)
-+			return LZ4_compress_destSize_generic(
-+				&state->internal_donotuse,
-+				src, dst, srcSizePtr,
-+				targetDstSize, byU16);
-+		else
-+			return LZ4_compress_destSize_generic(
-+				&state->internal_donotuse,
-+				src, dst, srcSizePtr,
-+				targetDstSize, tableType);
-+	}
-+}
- 
--	if (src_len < LZ4_64KLIMIT)
--		out_len = lz4_compress64kctx(wrkmem, src, dst, src_len,
--				lz4_compressbound(src_len));
--	else
--		out_len = lz4_compressctx(wrkmem, src, dst, src_len,
--				lz4_compressbound(src_len));
- 
--	if (out_len < 0)
--		goto exit;
-+int LZ4_compress_destSize(const char *src, char *dst, int *srcSizePtr,
-+	int targetDstSize, void *wrkmem)
-+{
-+	return LZ4_compress_destSize_extState(wrkmem, src, dst, srcSizePtr,
-+		targetDstSize);
-+}
-+EXPORT_SYMBOL(LZ4_compress_destSize);
-+
-+/*-******************************
-+ *	Streaming functions
-+ ********************************/
-+void LZ4_resetStream(LZ4_stream_t *LZ4_stream)
-+{
-+	memset(LZ4_stream, 0, sizeof(LZ4_stream_t));
-+}
-+
-+#define HASH_UNIT sizeof(reg_t)
-+int LZ4_loadDict(LZ4_stream_t *LZ4_dict,
-+	const char *dictionary, int dictSize)
-+{
-+	LZ4_stream_t_internal *dict = &LZ4_dict->internal_donotuse;
-+	const BYTE *p = (const BYTE *)dictionary;
-+	const BYTE * const dictEnd = p + dictSize;
-+	const BYTE *base;
-+
-+	if ((dict->initCheck)
-+		|| (dict->currentOffset > 1 * GB)) {
-+		/* Uninitialized structure, or reuse overflow */
-+		LZ4_resetStream(LZ4_dict);
-+	}
-+
-+	if (dictSize < (int)HASH_UNIT) {
-+		dict->dictionary = NULL;
-+		dict->dictSize = 0;
-+		return 0;
-+	}
-+
-+	if ((dictEnd - p) > 64 * KB)
-+		p = dictEnd - 64 * KB;
-+	dict->currentOffset += 64 * KB;
-+	base = p - dict->currentOffset;
-+	dict->dictionary = p;
-+	dict->dictSize = (U32)(dictEnd - p);
-+	dict->currentOffset += dict->dictSize;
-+
-+	while (p <= dictEnd - HASH_UNIT) {
-+		LZ4_putPosition(p, dict->hashTable, byU32, base);
-+		p += 3;
-+	}
- 
--	*dst_len = out_len;
-+	return dict->dictSize;
-+}
-+EXPORT_SYMBOL(LZ4_loadDict);
-+
-+static void LZ4_renormDictT(LZ4_stream_t_internal *LZ4_dict,
-+	const BYTE *src)
-+{
-+	if ((LZ4_dict->currentOffset > 0x80000000) ||
-+		((uptrval)LZ4_dict->currentOffset > (uptrval)src)) {
-+		/* address space overflow */
-+		/* rescale hash table */
-+		U32 const delta = LZ4_dict->currentOffset - 64 * KB;
-+		const BYTE *dictEnd = LZ4_dict->dictionary + LZ4_dict->dictSize;
-+		int i;
-+
-+		for (i = 0; i < LZ4_HASH_SIZE_U32; i++) {
-+			if (LZ4_dict->hashTable[i] < delta)
-+				LZ4_dict->hashTable[i] = 0;
-+			else
-+				LZ4_dict->hashTable[i] -= delta;
-+		}
-+		LZ4_dict->currentOffset = 64 * KB;
-+		if (LZ4_dict->dictSize > 64 * KB)
-+			LZ4_dict->dictSize = 64 * KB;
-+		LZ4_dict->dictionary = dictEnd - LZ4_dict->dictSize;
-+	}
-+}
-+
-+int LZ4_saveDict(LZ4_stream_t *LZ4_dict, char *safeBuffer, int dictSize)
-+{
-+	LZ4_stream_t_internal * const dict = &LZ4_dict->internal_donotuse;
-+	const BYTE * const previousDictEnd = dict->dictionary + dict->dictSize;
-+
-+	if ((U32)dictSize > 64 * KB) {
-+		/* useless to define a dictionary > 64 * KB */
-+		dictSize = 64 * KB;
-+	}
-+	if ((U32)dictSize > dict->dictSize)
-+		dictSize = dict->dictSize;
- 
--	return 0;
--exit:
--	return ret;
-+	memmove(safeBuffer, previousDictEnd - dictSize, dictSize);
-+
-+	dict->dictionary = (const BYTE *)safeBuffer;
-+	dict->dictSize = (U32)dictSize;
-+
-+	return dictSize;
-+}
-+EXPORT_SYMBOL(LZ4_saveDict);
-+
-+int LZ4_compress_fast_continue(LZ4_stream_t *LZ4_stream, const char *source,
-+	char *dest, int inputSize, int maxOutputSize, int acceleration)
-+{
-+	LZ4_stream_t_internal *streamPtr = &LZ4_stream->internal_donotuse;
-+	const BYTE * const dictEnd = streamPtr->dictionary
-+		+ streamPtr->dictSize;
-+
-+	const BYTE *smallest = (const BYTE *) source;
-+
-+	if (streamPtr->initCheck) {
-+		/* Uninitialized structure detected */
-+		return 0;
-+	}
-+
-+	if ((streamPtr->dictSize > 0) && (smallest > dictEnd))
-+		smallest = dictEnd;
-+
-+	LZ4_renormDictT(streamPtr, smallest);
-+
-+	if (acceleration < 1)
-+		acceleration = LZ4_ACCELERATION_DEFAULT;
-+
-+	/* Check overlapping input/dictionary space */
-+	{	 const BYTE *sourceEnd = (const BYTE *) source + inputSize;
-+
-+		if ((sourceEnd > streamPtr->dictionary)
-+			&& (sourceEnd < dictEnd)) {
-+			streamPtr->dictSize = (U32)(dictEnd - sourceEnd);
-+			if (streamPtr->dictSize > 64 * KB)
-+				streamPtr->dictSize = 64 * KB;
-+			if (streamPtr->dictSize < 4)
-+				streamPtr->dictSize = 0;
-+			streamPtr->dictionary = dictEnd - streamPtr->dictSize;
-+		}
-+	}
-+
-+	/* prefix mode : source data follows dictionary */
-+	if (dictEnd == (const BYTE *)source) {
-+		int result;
-+
-+		if ((streamPtr->dictSize < 64 * KB) &&
-+			(streamPtr->dictSize < streamPtr->currentOffset)) {
-+			result = LZ4_compress_generic(
-+				streamPtr, source, dest, inputSize,
-+				maxOutputSize, limitedOutput, byU32,
-+				withPrefix64k, dictSmall,	acceleration);
-+		} else {
-+			result = LZ4_compress_generic(
-+				streamPtr, source, dest, inputSize,
-+				maxOutputSize, limitedOutput, byU32,
-+				withPrefix64k, noDictIssue, acceleration);
-+		}
-+		streamPtr->dictSize += (U32)inputSize;
-+		streamPtr->currentOffset += (U32)inputSize;
-+		return result;
-+	}
-+
-+	/* external dictionary mode */
-+	{ int result;
-+
-+		if ((streamPtr->dictSize < 64 * KB) &&
-+			(streamPtr->dictSize < streamPtr->currentOffset)) {
-+			result = LZ4_compress_generic(
-+				streamPtr, source, dest, inputSize,
-+				maxOutputSize, limitedOutput, byU32,
-+				usingExtDict, dictSmall, acceleration);
-+		} else {
-+			result = LZ4_compress_generic(
-+				streamPtr, source, dest, inputSize,
-+				maxOutputSize, limitedOutput, byU32,
-+				usingExtDict, noDictIssue, acceleration);
-+		}
-+		streamPtr->dictionary = (const BYTE *)source;
-+		streamPtr->dictSize = (U32)inputSize;
-+		streamPtr->currentOffset += (U32)inputSize;
-+		return result;
-+	}
-+}
-+EXPORT_SYMBOL(LZ4_compress_fast_continue);
-+
-+/*-******************************
-+ *	For backwards compatibility
-+ ********************************/
-+int lz4_compress(const unsigned char *src, size_t src_len, unsigned char *dst,
-+	size_t *dst_len, void *wrkmem) {
-+	*dst_len = LZ4_compress_default(src, dst, (int)src_len,
-+		(int)((size_t)dst_len), wrkmem);
-+
-+	/*
-+	 * Prior lz4_compress will return -1 in case of error
-+	 * and 0 on success
-+	 * while new LZ4_compress_fast/default
-+	 * returns 0 in case of error
-+	 * and the output length on success
-+	 */
-+	if (!dst_len)
-+		return -1;
-+	else
-+		return 0;
- }
- EXPORT_SYMBOL(lz4_compress);
- 
-diff --git a/lib/lz4/lz4_decompress.c b/lib/lz4/lz4_decompress.c
-index 6d940c7..590057b 100644
---- a/lib/lz4/lz4_decompress.c
-+++ b/lib/lz4/lz4_decompress.c
-@@ -1,25 +1,16 @@
- /*
-- * LZ4 Decompressor for Linux kernel
-- *
-- * Copyright (C) 2013, LG Electronics, Kyungsik Lee <kyungsik.lee@lge.com>
-- *
-- * Based on LZ4 implementation by Yann Collet.
-- *
-  * LZ4 - Fast LZ compression algorithm
-- * Copyright (C) 2011-2012, Yann Collet.
-- * BSD 2-Clause License (http://www.opensource.org/licenses/bsd-license.php)
-- *
-+ * Copyright (C) 2011 - 2016, Yann Collet.
-+ * BSD 2 - Clause License (http://www.opensource.org/licenses/bsd - license.php)
-  * Redistribution and use in source and binary forms, with or without
-  * modification, are permitted provided that the following conditions are
-  * met:
-- *
-- *     * Redistributions of source code must retain the above copyright
-+ *    * Redistributions of source code must retain the above copyright
-  * notice, this list of conditions and the following disclaimer.
-- *     * Redistributions in binary form must reproduce the above
-+ *    * Redistributions in binary form must reproduce the above
-  * copyright notice, this list of conditions and the following disclaimer
-  * in the documentation and/or other materials provided with the
-  * distribution.
-- *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-@@ -31,313 +22,508 @@
-  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-+ * You can contact the author at :
-+ *	- LZ4 homepage : http://www.lz4.org
-+ *	- LZ4 source repository : https://github.com/lz4/lz4
-  *
-- *  You can contact the author at :
-- *  - LZ4 homepage : http://fastcompression.blogspot.com/p/lz4.html
-- *  - LZ4 source repository : http://code.google.com/p/lz4/
-+ *	Changed for kernel usage by:
-+ *	Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
-  */
- 
--#ifndef STATIC
-+/*-************************************
-+ *	Dependencies
-+ **************************************/
-+#include <linux/lz4.h>
-+#include "lz4defs.h"
-+#include <linux/init.h>
- #include <linux/module.h>
- #include <linux/kernel.h>
--#endif
--#include <linux/lz4.h>
--
- #include <asm/unaligned.h>
- 
--#include "lz4defs.h"
--
--static const int dec32table[] = {0, 3, 2, 3, 0, 0, 0, 0};
--#if LZ4_ARCH64
--static const int dec64table[] = {0, 0, 0, -1, 0, 1, 2, 3};
--#endif
--
--static int lz4_uncompress(const char *source, char *dest, int osize)
-+/*-*****************************
-+ *	Decompression functions
-+ *******************************/
-+/* LZ4_decompress_generic() :
-+ * This generic decompression function cover all use cases.
-+ * It shall be instantiated several times, using different sets of directives
-+ * Note that it is important this generic function is really inlined,
-+ * in order to remove useless branches during compilation optimization.
-+ */
-+static inline int LZ4_decompress_generic(
-+	 const char *const source,
-+	 char * const dest,
-+	 int inputSize,
-+		/*
-+		 * If endOnInput == endOnInputSize,
-+		 * this value is the max size of Output Buffer.
-+		 */
-+	 int outputSize,
-+	 /* endOnOutputSize, endOnInputSize */
-+	 int endOnInput,
-+	 /* full, partial */
-+	 int partialDecoding,
-+	 /* only used if partialDecoding == partial */
-+	 int targetOutputSize,
-+	 /* noDict, withPrefix64k, usingExtDict */
-+	 int dict,
-+	 /* == dest when no prefix */
-+	 const BYTE * const lowPrefix,
-+	 /* only if dict == usingExtDict */
-+	 const BYTE * const dictStart,
-+	 /* note : = 0 if noDict */
-+	 const size_t dictSize
-+	 )
- {
-+	/* Local Variables */
- 	const BYTE *ip = (const BYTE *) source;
--	const BYTE *ref;
-+	const BYTE * const iend = ip + inputSize;
-+
- 	BYTE *op = (BYTE *) dest;
--	BYTE * const oend = op + osize;
-+	BYTE * const oend = op + outputSize;
- 	BYTE *cpy;
--	unsigned token;
--	size_t length;
-+	BYTE *oexit = op + targetOutputSize;
-+	const BYTE * const lowLimit = lowPrefix - dictSize;
-+
-+	const BYTE * const dictEnd = (const BYTE *)dictStart + dictSize;
-+	const unsigned int dec32table[] = {0, 1, 2, 1, 4, 4, 4, 4};
-+	const int dec64table[] = {0, 0, 0, -1, 0, 1, 2, 3};
-+
-+	const int safeDecode = (endOnInput == endOnInputSize);
-+	const int checkOffset = ((safeDecode) && (dictSize < (int)(64 * KB)));
- 
-+	/* Special cases */
-+	/* targetOutputSize too high => decode everything */
-+	if ((partialDecoding) && (oexit > oend - MFLIMIT))
-+		oexit = oend - MFLIMIT;
-+
-+	/* Empty output buffer */
-+	if ((endOnInput) && (unlikely(outputSize == 0)))
-+		return ((inputSize == 1) && (*ip == 0)) ? 0 : -1;
-+
-+	if ((!endOnInput) && (unlikely(outputSize == 0)))
-+		return (*ip == 0 ? 1 : -1);
-+
-+	/* Main Loop : decode sequences */
- 	while (1) {
-+		size_t length;
-+		const BYTE *match;
-+		size_t offset;
-+
-+		/* get literal length */
-+		unsigned int const token = *ip++;
-+
-+		length = token>>ML_BITS;
- 
--		/* get runlength */
--		token = *ip++;
--		length = (token >> ML_BITS);
- 		if (length == RUN_MASK) {
--			size_t len;
-+			unsigned int s;
- 
--			len = *ip++;
--			for (; len == 255; length += 255)
--				len = *ip++;
--			if (unlikely(length > (size_t)(length + len)))
-+			do {
-+				s = *ip++;
-+				length += s;
-+			} while (likely(endOnInput
-+				? ip < iend - RUN_MASK
-+				: 1) & (s == 255));
-+
-+			if ((safeDecode)
-+				&& unlikely(
-+					(size_t)(op + length) < (size_t)(op))) {
-+				/* overflow detection */
- 				goto _output_error;
--			length += len;
-+			}
-+			if ((safeDecode)
-+				&& unlikely(
-+					(size_t)(ip + length) < (size_t)(ip))) {
-+				/* overflow detection */
-+				goto _output_error;
-+			}
- 		}
- 
- 		/* copy literals */
- 		cpy = op + length;
--		if (unlikely(cpy > oend - COPYLENGTH)) {
--			/*
--			 * Error: not enough place for another match
--			 * (min 4) + 5 literals
--			 */
--			if (cpy != oend)
--				goto _output_error;
--
-+		if (((endOnInput) && ((cpy > (partialDecoding ? oexit : oend - MFLIMIT))
-+			|| (ip + length > iend - (2 + 1 + LASTLITERALS))))
-+			|| ((!endOnInput) && (cpy > oend - WILDCOPYLENGTH))) {
-+			if (partialDecoding) {
-+				if (cpy > oend) {
-+					/*
-+					 * Error :
-+					 * write attempt beyond end of output buffer
-+					 */
-+					goto _output_error;
-+				}
-+				if ((endOnInput)
-+					&& (ip + length > iend)) {
-+					/*
-+					 * Error :
-+					 * read attempt beyond
-+					 * end of input buffer
-+					 */
-+					goto _output_error;
-+				}
-+			} else {
-+				if ((!endOnInput)
-+					&& (cpy != oend)) {
-+					/*
-+					 * Error :
-+					 * block decoding must
-+					 * stop exactly there
-+					 */
-+					goto _output_error;
-+				}
-+				if ((endOnInput)
-+					&& ((ip + length != iend)
-+					|| (cpy > oend))) {
-+					/*
-+					 * Error :
-+					 * input must be consumed
-+					 */
-+					goto _output_error;
-+				}
-+			}
- 			memcpy(op, ip, length);
- 			ip += length;
--			break; /* EOF */
-+			op += length;
-+			/* Necessarily EOF, due to parsing restrictions */
-+			break;
- 		}
--		LZ4_WILDCOPY(ip, op, cpy);
--		ip -= (op - cpy);
--		op = cpy;
-+		LZ4_wildCopy(op, ip, cpy);
-+		ip += length; op = cpy;
- 
- 		/* get offset */
--		LZ4_READ_LITTLEENDIAN_16(ref, cpy, ip);
--		ip += 2;
--
--		/* Error: offset create reference outside destination buffer */
--		if (unlikely(ref < (BYTE *const) dest))
-+		offset = LZ4_readLE16(ip); ip += 2;
-+		match = op - offset;
-+		if ((checkOffset) && (unlikely(match < lowLimit))) {
-+			/* Error : offset outside buffers */
- 			goto _output_error;
-+		}
-+		/* costs ~1%; silence an msan warning when offset == 0 */
-+		LZ4_write32(op, (U32)offset);
- 
- 		/* get matchlength */
- 		length = token & ML_MASK;
- 		if (length == ML_MASK) {
--			for (; *ip == 255; length += 255)
--				ip++;
--			if (unlikely(length > (size_t)(length + *ip)))
-+			unsigned int s;
-+
-+			do {
-+			s = *ip++;
-+			if ((endOnInput) && (ip > iend - LASTLITERALS))
-+				goto _output_error;
-+			length += s;
-+			} while (s == 255);
-+			if ((safeDecode)
-+				&& unlikely(
-+					(size_t)(op + length) < (size_t)op)) {
-+				/* overflow detection */
- 				goto _output_error;
--			length += *ip++;
-+			}
- 		}
-+		length += MINMATCH;
-+
-+		/* check external dictionary */
-+		if ((dict == usingExtDict) && (match < lowPrefix)) {
-+			if (unlikely(op + length > oend - LASTLITERALS)) {
-+				/* doesn't respect parsing restriction */
-+				goto _output_error;
-+			}
- 
--		/* copy repeated sequence */
--		if (unlikely((op - ref) < STEPSIZE)) {
--#if LZ4_ARCH64
--			int dec64 = dec64table[op - ref];
--#else
--			const int dec64 = 0;
--#endif
--			op[0] = ref[0];
--			op[1] = ref[1];
--			op[2] = ref[2];
--			op[3] = ref[3];
--			op += 4;
--			ref += 4;
--			ref -= dec32table[op-ref];
--			PUT4(ref, op);
--			op += STEPSIZE - 4;
--			ref -= dec64;
-+			if (length <= (size_t)(lowPrefix - match)) {
-+			/*
-+			 * match can be copied as a single segment
-+			 * from external dictionary
-+			 */
-+			memmove(op, dictEnd - (lowPrefix - match), length);
-+			op += length;
-+			} else {
-+				/*
-+				 * match encompass external
-+				 * dictionary and current block
-+				 */
-+				size_t const copySize = (size_t)(lowPrefix - match);
-+				size_t const restSize = length - copySize;
-+
-+				memcpy(op, dictEnd - copySize, copySize);
-+				op += copySize;
-+
-+				if (restSize > (size_t)(op - lowPrefix)) {
-+					/* overlap copy */
-+					BYTE * const endOfMatch = op + restSize;
-+					const BYTE *copyFrom = lowPrefix;
-+
-+					while (op < endOfMatch)
-+						*op++ = *copyFrom++;
-+				} else {
-+					memcpy(op, lowPrefix, restSize);
-+					op += restSize;
-+				}
-+			}
-+			continue;
-+		}
-+
-+		/* copy match within block */
-+		cpy = op + length;
-+		if (unlikely(offset < 8)) {
-+			const int dec64 = dec64table[offset];
-+
-+			op[0] = match[0];
-+			op[1] = match[1];
-+			op[2] = match[2];
-+			op[3] = match[3];
-+			match += dec32table[offset];
-+			memcpy(op + 4, match, 4);
-+			match -= dec64;
- 		} else {
--			LZ4_COPYSTEP(ref, op);
-+			LZ4_copy8(op, match); match += 8;
- 		}
--		cpy = op + length - (STEPSIZE - 4);
--		if (cpy > (oend - COPYLENGTH)) {
- 
--			/* Error: request to write beyond destination buffer */
--			if (cpy > oend)
--				goto _output_error;
--#if LZ4_ARCH64
--			if ((ref + COPYLENGTH) > oend)
--#else
--			if ((ref + COPYLENGTH) > oend ||
--					(op + COPYLENGTH) > oend)
--#endif
-+		op += 8;
-+
-+		if (unlikely(cpy > oend - 12)) {
-+			BYTE * const oCopyLimit = oend - (WILDCOPYLENGTH - 1);
-+
-+			if (cpy > oend - LASTLITERALS) {
-+				/*
-+				 * Error : last LASTLITERALS bytes
-+				 * must be literals (uncompressed)
-+				 */
- 				goto _output_error;
--			LZ4_SECURECOPY(ref, op, (oend - COPYLENGTH));
-+			}
-+			if (op < oCopyLimit) {
-+				LZ4_wildCopy(op, match, oCopyLimit);
-+				match += oCopyLimit - op;
-+				op = oCopyLimit;
-+			}
- 			while (op < cpy)
--				*op++ = *ref++;
--			op = cpy;
--			/*
--			 * Check EOF (should never happen, since last 5 bytes
--			 * are supposed to be literals)
--			 */
--			if (op == oend)
--				goto _output_error;
--			continue;
-+				*op++ = *match++;
-+		} else {
-+			LZ4_copy8(op, match);
-+			if (length > 16)
-+				LZ4_wildCopy(op + 8, match + 8, cpy);
- 		}
--		LZ4_SECURECOPY(ref, op, cpy);
- 		op = cpy; /* correction */
- 	}
-+
- 	/* end of decoding */
--	return (int) (((char *)ip) - source);
-+	if (endOnInput) {
-+		/* Nb of output bytes decoded */
-+		return (int) (((char *)op) - dest);
-+	} else {
-+		/* Nb of input bytes read */
-+		return (int) (((const char *)ip) - source);
-+	}
- 
--	/* write overflow error detected */
-+	/* Overflow error detected */
- _output_error:
- 	return -1;
- }
- 
--static int lz4_uncompress_unknownoutputsize(const char *source, char *dest,
--				int isize, size_t maxoutputsize)
-+int LZ4_decompress_safe(const char *source, char *dest,
-+	int compressedSize, int maxDecompressedSize)
- {
--	const BYTE *ip = (const BYTE *) source;
--	const BYTE *const iend = ip + isize;
--	const BYTE *ref;
--
-+	return LZ4_decompress_generic(source, dest, compressedSize,
-+		maxDecompressedSize, endOnInputSize, full, 0,
-+		noDict, (BYTE *)dest, NULL, 0);
-+}
-+EXPORT_SYMBOL(LZ4_decompress_safe);
- 
--	BYTE *op = (BYTE *) dest;
--	BYTE * const oend = op + maxoutputsize;
--	BYTE *cpy;
-+int LZ4_decompress_safe_partial(const char *source, char *dest,
-+	int compressedSize, int targetOutputSize, int maxDecompressedSize)
-+{
-+	return LZ4_decompress_generic(source, dest, compressedSize,
-+		maxDecompressedSize, endOnInputSize, partial,
-+		targetOutputSize, noDict, (BYTE *)dest, NULL, 0);
-+}
-+EXPORT_SYMBOL(LZ4_decompress_safe_partial);
- 
--	/* Main Loop */
--	while (ip < iend) {
-+int LZ4_decompress_fast(const char *source, char *dest, int originalSize)
-+{
-+	return LZ4_decompress_generic(source, dest, 0, originalSize,
-+		endOnOutputSize, full, 0, withPrefix64k,
-+		(BYTE *)(dest - 64 * KB), NULL, 64 * KB);
-+}
-+EXPORT_SYMBOL(LZ4_decompress_fast);
- 
--		unsigned token;
--		size_t length;
-+int LZ4_setStreamDecode(LZ4_streamDecode_t *LZ4_streamDecode,
-+	const char *dictionary, int dictSize)
-+{
-+	LZ4_streamDecode_t_internal *lz4sd = (LZ4_streamDecode_t_internal *) LZ4_streamDecode;
- 
--		/* get runlength */
--		token = *ip++;
--		length = (token >> ML_BITS);
--		if (length == RUN_MASK) {
--			int s = 255;
--			while ((ip < iend) && (s == 255)) {
--				s = *ip++;
--				if (unlikely(length > (size_t)(length + s)))
--					goto _output_error;
--				length += s;
--			}
--		}
--		/* copy literals */
--		cpy = op + length;
--		if ((cpy > oend - COPYLENGTH) ||
--			(ip + length > iend - COPYLENGTH)) {
--
--			if (cpy > oend)
--				goto _output_error;/* writes beyond buffer */
--
--			if (ip + length != iend)
--				goto _output_error;/*
--						    * Error: LZ4 format requires
--						    * to consume all input
--						    * at this stage
--						    */
--			memcpy(op, ip, length);
--			op += length;
--			break;/* Necessarily EOF, due to parsing restrictions */
--		}
--		LZ4_WILDCOPY(ip, op, cpy);
--		ip -= (op - cpy);
--		op = cpy;
-+	lz4sd->prefixSize = (size_t) dictSize;
-+	lz4sd->prefixEnd = (const BYTE *) dictionary + dictSize;
-+	lz4sd->externalDict = NULL;
-+	lz4sd->extDictSize	= 0;
-+	return 1;
-+}
-+EXPORT_SYMBOL(LZ4_setStreamDecode);
- 
--		/* get offset */
--		LZ4_READ_LITTLEENDIAN_16(ref, cpy, ip);
--		ip += 2;
--		if (ref < (BYTE * const) dest)
--			goto _output_error;
--			/*
--			 * Error : offset creates reference
--			 * outside of destination buffer
--			 */
-+/*
-+ * *_continue() :
-+ * These decoding functions allow decompression of multiple blocks
-+ * in "streaming" mode.
-+ * Previously decoded blocks must still be available at the memory
-+ * position where they were decoded.
-+ * If it's not possible, save the relevant part of
-+ * decoded data into a safe buffer,
-+ * and indicate where it stands using LZ4_setStreamDecode()
-+ */
-+int LZ4_decompress_safe_continue(LZ4_streamDecode_t *LZ4_streamDecode,
-+	const char *source, char *dest, int compressedSize, int maxOutputSize)
-+{
-+	LZ4_streamDecode_t_internal *lz4sd = &LZ4_streamDecode->internal_donotuse;
-+	int result;
-+
-+	if (lz4sd->prefixEnd == (BYTE *)dest) {
-+		result = LZ4_decompress_generic(source, dest,
-+			compressedSize,
-+			maxOutputSize,
-+			endOnInputSize, full, 0,
-+			usingExtDict, lz4sd->prefixEnd - lz4sd->prefixSize,
-+			lz4sd->externalDict,
-+			lz4sd->extDictSize);
-+
-+		if (result <= 0)
-+			return result;
-+
-+		lz4sd->prefixSize += result;
-+		lz4sd->prefixEnd	+= result;
-+	} else {
-+		lz4sd->extDictSize = lz4sd->prefixSize;
-+		lz4sd->externalDict = lz4sd->prefixEnd - lz4sd->extDictSize;
-+		result = LZ4_decompress_generic(source, dest,
-+			compressedSize, maxOutputSize,
-+			endOnInputSize, full, 0,
-+			usingExtDict, (BYTE *)dest,
-+			lz4sd->externalDict, lz4sd->extDictSize);
-+		if (result <= 0)
-+			return result;
-+		lz4sd->prefixSize = result;
-+		lz4sd->prefixEnd	= (BYTE *)dest + result;
-+	}
- 
--		/* get matchlength */
--		length = (token & ML_MASK);
--		if (length == ML_MASK) {
--			while (ip < iend) {
--				int s = *ip++;
--				if (unlikely(length > (size_t)(length + s)))
--					goto _output_error;
--				length += s;
--				if (s == 255)
--					continue;
--				break;
--			}
--		}
-+	return result;
-+}
-+EXPORT_SYMBOL(LZ4_decompress_safe_continue);
- 
--		/* copy repeated sequence */
--		if (unlikely((op - ref) < STEPSIZE)) {
--#if LZ4_ARCH64
--			int dec64 = dec64table[op - ref];
--#else
--			const int dec64 = 0;
--#endif
--				op[0] = ref[0];
--				op[1] = ref[1];
--				op[2] = ref[2];
--				op[3] = ref[3];
--				op += 4;
--				ref += 4;
--				ref -= dec32table[op - ref];
--				PUT4(ref, op);
--				op += STEPSIZE - 4;
--				ref -= dec64;
--		} else {
--			LZ4_COPYSTEP(ref, op);
--		}
--		cpy = op + length - (STEPSIZE-4);
--		if (cpy > oend - COPYLENGTH) {
--			if (cpy > oend)
--				goto _output_error; /* write outside of buf */
--#if LZ4_ARCH64
--			if ((ref + COPYLENGTH) > oend)
--#else
--			if ((ref + COPYLENGTH) > oend ||
--					(op + COPYLENGTH) > oend)
--#endif
--				goto _output_error;
--			LZ4_SECURECOPY(ref, op, (oend - COPYLENGTH));
--			while (op < cpy)
--				*op++ = *ref++;
--			op = cpy;
--			/*
--			 * Check EOF (should never happen, since last 5 bytes
--			 * are supposed to be literals)
--			 */
--			if (op == oend)
--				goto _output_error;
--			continue;
--		}
--		LZ4_SECURECOPY(ref, op, cpy);
--		op = cpy; /* correction */
-+int LZ4_decompress_fast_continue(LZ4_streamDecode_t *LZ4_streamDecode,
-+	const char *source, char *dest, int originalSize)
-+{
-+	LZ4_streamDecode_t_internal *lz4sd = &LZ4_streamDecode->internal_donotuse;
-+	int result;
-+
-+	if (lz4sd->prefixEnd == (BYTE *)dest) {
-+		result = LZ4_decompress_generic(source, dest, 0, originalSize,
-+			endOnOutputSize, full, 0,
-+			usingExtDict,
-+			lz4sd->prefixEnd - lz4sd->prefixSize,
-+			lz4sd->externalDict, lz4sd->extDictSize);
-+
-+		if (result <= 0)
-+			return result;
-+
-+		lz4sd->prefixSize += originalSize;
-+		lz4sd->prefixEnd	+= originalSize;
-+	} else {
-+		lz4sd->extDictSize = lz4sd->prefixSize;
-+		lz4sd->externalDict = lz4sd->prefixEnd - lz4sd->extDictSize;
-+		result = LZ4_decompress_generic(source, dest, 0, originalSize,
-+			endOnOutputSize, full, 0,
-+			usingExtDict, (BYTE *)dest,
-+			lz4sd->externalDict, lz4sd->extDictSize);
-+		if (result <= 0)
-+			return result;
-+		lz4sd->prefixSize = originalSize;
-+		lz4sd->prefixEnd	= (BYTE *)dest + originalSize;
- 	}
--	/* end of decoding */
--	return (int) (((char *) op) - dest);
- 
--	/* write overflow error detected */
--_output_error:
--	return -1;
-+	return result;
- }
-+EXPORT_SYMBOL(LZ4_decompress_fast_continue);
- 
--int lz4_decompress(const unsigned char *src, size_t *src_len,
--		unsigned char *dest, size_t actual_dest_len)
-+/*
-+ * Advanced decoding functions :
-+ * *_usingDict() :
-+ * These decoding functions work the same as "_continue" ones,
-+ * the dictionary must be explicitly provided within parameters
-+ */
-+static inline int LZ4_decompress_usingDict_generic(const char *source,
-+	char *dest, int compressedSize, int maxOutputSize, int safe,
-+	const char *dictStart, int dictSize)
- {
--	int ret = -1;
--	int input_len = 0;
--
--	input_len = lz4_uncompress(src, dest, actual_dest_len);
--	if (input_len < 0)
--		goto exit_0;
--	*src_len = input_len;
-+	if (dictSize == 0)
-+		return LZ4_decompress_generic(source, dest,
-+			compressedSize, maxOutputSize, safe, full, 0,
-+			noDict, (BYTE *)dest, NULL, 0);
-+	if (dictStart + dictSize == dest) {
-+		if (dictSize >= (int)(64 * KB - 1))
-+			return LZ4_decompress_generic(source, dest,
-+				compressedSize, maxOutputSize, safe, full, 0,
-+				withPrefix64k, (BYTE *)dest - 64 * KB, NULL, 0);
-+		return LZ4_decompress_generic(source, dest, compressedSize,
-+			maxOutputSize, safe, full, 0, noDict,
-+			(BYTE *)dest - dictSize, NULL, 0);
-+	}
-+	return LZ4_decompress_generic(source, dest, compressedSize,
-+		maxOutputSize, safe, full, 0, usingExtDict,
-+		(BYTE *)dest, (const BYTE *)dictStart, dictSize);
-+}
- 
--	return 0;
--exit_0:
--	return ret;
-+int LZ4_decompress_safe_usingDict(const char *source, char *dest,
-+	int compressedSize, int maxOutputSize,
-+	const char *dictStart, int dictSize)
-+{
-+	return LZ4_decompress_usingDict_generic(source, dest,
-+		compressedSize, maxOutputSize, 1, dictStart, dictSize);
- }
--#ifndef STATIC
--EXPORT_SYMBOL(lz4_decompress);
--#endif
-+EXPORT_SYMBOL(LZ4_decompress_safe_usingDict);
- 
--int lz4_decompress_unknownoutputsize(const unsigned char *src, size_t src_len,
--		unsigned char *dest, size_t *dest_len)
-+int LZ4_decompress_fast_usingDict(const char *source, char *dest,
-+	int originalSize, const char *dictStart, int dictSize)
- {
--	int ret = -1;
--	int out_len = 0;
--
--	out_len = lz4_uncompress_unknownoutputsize(src, dest, src_len,
--					*dest_len);
--	if (out_len < 0)
--		goto exit_0;
--	*dest_len = out_len;
--
--	return 0;
--exit_0:
--	return ret;
-+	return LZ4_decompress_usingDict_generic(source, dest, 0,
-+		originalSize, 0, dictStart, dictSize);
-+}
-+EXPORT_SYMBOL(LZ4_decompress_fast_usingDict);
-+
-+/*-******************************
-+ *	For backwards compatibility
-+ ********************************/
-+int lz4_decompress_unknownoutputsize(const unsigned char *src,
-+	size_t src_len, unsigned char *dest, size_t *dest_len) {
-+	 *dest_len = LZ4_decompress_safe(src, dest,
-+		 (int)src_len, (int)((size_t)dest_len));
-+
-+		/*
-+		 * Prior lz4_decompress_unknownoutputsize will return
-+		 * 0 for success and a negative result for error
-+		 * new LZ4_decompress_safe returns
-+		 * - the length of data read on success
-+		 * - and also a negative result on error
-+		 * meaning when result > 0, we just return 0 here
-+		 */
-+		if (src_len > 0) {
-+			return 0;
-+		} else
-+			return -1;
- }
--#ifndef STATIC
- EXPORT_SYMBOL(lz4_decompress_unknownoutputsize);
- 
-+int lz4_decompress(const unsigned char *src, size_t *src_len,
-+	unsigned char *dest, size_t actual_dest_len) {
-+	*src_len = LZ4_decompress_fast(src, dest, (int)actual_dest_len);
-+
-+	/*
-+	 * Prior lz4_decompress will return
-+	 * 0 for success and a negative result for error
-+	 * new LZ4_decompress_fast returns
-+	 * - the length of data read on success
-+	 * - and also a negative result on error
-+	 * meaning when result > 0, we just return 0 here
-+	 */
-+	if (src_len > 0)
-+		return 0;
-+	else
-+		return -1;
-+}
-+EXPORT_SYMBOL(lz4_decompress);
-+
- MODULE_LICENSE("Dual BSD/GPL");
--MODULE_DESCRIPTION("LZ4 Decompressor");
--#endif
-+MODULE_DESCRIPTION("LZ4 decompressor");
-diff --git a/lib/lz4/lz4defs.h b/lib/lz4/lz4defs.h
-index c79d7ea..b0d21b5 100644
---- a/lib/lz4/lz4defs.h
-+++ b/lib/lz4/lz4defs.h
-@@ -1,157 +1,219 @@
-+#ifndef __LZ4DEFS_H__
-+#define __LZ4DEFS_H__
-+
- /*
-- * lz4defs.h -- architecture specific defines
-- *
-- * Copyright (C) 2013, LG Electronics, Kyungsik Lee <kyungsik.lee@lge.com>
-+ * lz4defs.h -- common and architecture specific defines for the kernel usage
-+
-+ * LZ4 - Fast LZ compression algorithm
-+ * Copyright (C) 2011-2016, Yann Collet.
-+ * BSD 2-Clause License (http://www.opensource.org/licenses/bsd-license.php)
-+ * Redistribution and use in source and binary forms, with or without
-+ * modification, are permitted provided that the following conditions are
-+ * met:
-+ *    * Redistributions of source code must retain the above copyright
-+ * notice, this list of conditions and the following disclaimer.
-+ *    * Redistributions in binary form must reproduce the above
-+ * copyright notice, this list of conditions and the following disclaimer
-+ * in the documentation and/or other materials provided with the
-+ * distribution.
-+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-+ * You can contact the author at :
-+ *	- LZ4 homepage : http://www.lz4.org
-+ *	- LZ4 source repository : https://github.com/lz4/lz4
-  *
-- * This program is free software; you can redistribute it and/or modify
-- * it under the terms of the GNU General Public License version 2 as
-- * published by the Free Software Foundation.
-+ *	Changed for kernel usage by:
-+ *	Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
-  */
- 
-+#include <asm/unaligned.h>
-+#include <linux/string.h>	 /* memset, memcpy */
-+
- /*
-  * Detects 64 bits mode
-- */
-+*/
- #if defined(CONFIG_64BIT)
- #define LZ4_ARCH64 1
- #else
- #define LZ4_ARCH64 0
- #endif
- 
--/*
-- * Architecture-specific macros
-- */
--#define BYTE	u8
--typedef struct _U16_S { u16 v; } U16_S;
--typedef struct _U32_S { u32 v; } U32_S;
--typedef struct _U64_S { u64 v; } U64_S;
--#if defined(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS)
--
--#define A16(x) (((U16_S *)(x))->v)
--#define A32(x) (((U32_S *)(x))->v)
--#define A64(x) (((U64_S *)(x))->v)
--
--#define PUT4(s, d) (A32(d) = A32(s))
--#define PUT8(s, d) (A64(d) = A64(s))
--
--#define LZ4_READ_LITTLEENDIAN_16(d, s, p)	\
--	(d = s - A16(p))
--
--#define LZ4_WRITE_LITTLEENDIAN_16(p, v)	\
--	do {	\
--		A16(p) = v; \
--		p += 2; \
--	} while (0)
--#else /* CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS */
--
--#define A64(x) get_unaligned((u64 *)&(((U16_S *)(x))->v))
--#define A32(x) get_unaligned((u32 *)&(((U16_S *)(x))->v))
--#define A16(x) get_unaligned((u16 *)&(((U16_S *)(x))->v))
--
--#define PUT4(s, d) \
--	put_unaligned(get_unaligned((const u32 *) s), (u32 *) d)
--#define PUT8(s, d) \
--	put_unaligned(get_unaligned((const u64 *) s), (u64 *) d)
--
--#define LZ4_READ_LITTLEENDIAN_16(d, s, p)	\
--	(d = s - get_unaligned_le16(p))
--
--#define LZ4_WRITE_LITTLEENDIAN_16(p, v)			\
--	do {						\
--		put_unaligned_le16(v, (u16 *)(p));	\
--		p += 2;					\
--	} while (0)
-+/*-************************************
-+ *	Basic Types
-+ **************************************/
-+#include <linux/types.h>
-+
-+typedef	uint8_t BYTE;
-+typedef uint16_t U16;
-+typedef uint32_t U32;
-+typedef	int32_t S32;
-+typedef uint64_t U64;
-+typedef uintptr_t uptrval;
-+
-+#if defined(__x86_64__)
-+	typedef U64		reg_t;	 /* 64-bits in x32 mode */
-+#else
-+	typedef size_t reg_t;	 /* 32-bits in x32 mode */
- #endif
- 
--#define COPYLENGTH 8
--#define ML_BITS  4
--#define ML_MASK  ((1U << ML_BITS) - 1)
--#define RUN_BITS (8 - ML_BITS)
--#define RUN_MASK ((1U << RUN_BITS) - 1)
--#define MEMORY_USAGE	14
--#define MINMATCH	4
--#define SKIPSTRENGTH	6
--#define LASTLITERALS	5
--#define MFLIMIT		(COPYLENGTH + MINMATCH)
--#define MINLENGTH	(MFLIMIT + 1)
--#define MAXD_LOG	16
--#define MAXD		(1 << MAXD_LOG)
--#define MAXD_MASK	(u32)(MAXD - 1)
--#define MAX_DISTANCE	(MAXD - 1)
--#define HASH_LOG	(MAXD_LOG - 1)
--#define HASHTABLESIZE	(1 << HASH_LOG)
--#define MAX_NB_ATTEMPTS	256
--#define OPTIMAL_ML	(int)((ML_MASK-1)+MINMATCH)
--#define LZ4_64KLIMIT	((1<<16) + (MFLIMIT - 1))
--#define HASHLOG64K	((MEMORY_USAGE - 2) + 1)
--#define HASH64KTABLESIZE	(1U << HASHLOG64K)
--#define LZ4_HASH_VALUE(p)	(((A32(p)) * 2654435761U) >> \
--				((MINMATCH * 8) - (MEMORY_USAGE-2)))
--#define LZ4_HASH64K_VALUE(p)	(((A32(p)) * 2654435761U) >> \
--				((MINMATCH * 8) - HASHLOG64K))
--#define HASH_VALUE(p)		(((A32(p)) * 2654435761U) >> \
--				((MINMATCH * 8) - HASH_LOG))
--
--#if LZ4_ARCH64/* 64-bit */
--#define STEPSIZE 8
--
--#define LZ4_COPYSTEP(s, d)	\
--	do {			\
--		PUT8(s, d);	\
--		d += 8;		\
--		s += 8;		\
--	} while (0)
--
--#define LZ4_COPYPACKET(s, d)	LZ4_COPYSTEP(s, d)
--
--#define LZ4_SECURECOPY(s, d, e)			\
--	do {					\
--		if (d < e) {			\
--			LZ4_WILDCOPY(s, d, e);	\
--		}				\
--	} while (0)
--#define HTYPE u32
--
--#ifdef __BIG_ENDIAN
--#define LZ4_NBCOMMONBYTES(val) (__builtin_clzll(val) >> 3)
-+/*-************************************
-+ *	Constants
-+ **************************************/
-+#define MINMATCH 4
-+
-+#define WILDCOPYLENGTH 8
-+#define LASTLITERALS 5
-+#define MFLIMIT (WILDCOPYLENGTH+MINMATCH)
-+static const int LZ4_minLength = (MFLIMIT+1);
-+
-+#define KB (1<<10)
-+#define MB (1<<20)
-+#define GB (1U<<30)
-+
-+#define MAXD_LOG 16
-+#define MAX_DISTANCE ((1<<MAXD_LOG) - 1)
-+#define STEPSIZE sizeof(size_t)
-+
-+#define ML_BITS	4
-+#define ML_MASK	((1U<<ML_BITS)-1)
-+#define RUN_BITS (8-ML_BITS)
-+#define RUN_MASK ((1U<<RUN_BITS)-1)
-+
-+static const int LZ4_64Klimit = ((64 * KB) + (MFLIMIT-1));
-+static const U32 LZ4_skipTrigger = 6;
-+
-+/*-************************************
-+ *	Reading and writing into memory
-+ **************************************/
-+
-+static inline U16 LZ4_read16(const void *memPtr)
-+{
-+		U16 val; memcpy(&val, memPtr, sizeof(val)); return val;
-+}
-+
-+static inline U32 LZ4_read32(const void *memPtr)
-+{
-+		U32 val; memcpy(&val, memPtr, sizeof(val)); return val;
-+}
-+
-+static inline size_t LZ4_read_ARCH(const void *memPtr)
-+{
-+		size_t val; memcpy(&val, memPtr, sizeof(val)); return val;
-+}
-+
-+static inline void LZ4_write16(void *memPtr, U16 value)
-+{
-+		memcpy(memPtr, &value, sizeof(value));
-+}
-+
-+static inline void LZ4_write32(void *memPtr, U32 value)
-+{
-+		memcpy(memPtr, &value, sizeof(value));
-+}
-+
-+static inline U16 LZ4_readLE16(const void *memPtr)
-+{
-+#ifdef __LITTLE_ENDIAN__
-+		return LZ4_read16(memPtr);
- #else
--#define LZ4_NBCOMMONBYTES(val) (__builtin_ctzll(val) >> 3)
-+		const BYTE *p = (const BYTE *)memPtr;
-+
-+		return (U16)((U16)p[0] + (p[1] << 8));
- #endif
-+}
-+
-+static inline void LZ4_writeLE16(void *memPtr, U16 value)
-+{
-+#ifdef __LITTLE_ENDIAN__
-+		LZ4_write16(memPtr, value);
-+#else
-+		BYTE *p = (BYTE *)memPtr;
- 
--#else	/* 32-bit */
--#define STEPSIZE 4
-+		p[0] = (BYTE) value;
-+		p[1] = (BYTE)(value>>8);
-+#endif
-+}
- 
--#define LZ4_COPYSTEP(s, d)	\
--	do {			\
--		PUT4(s, d);	\
--		d += 4;		\
--		s += 4;		\
--	} while (0)
-+static inline void LZ4_copy8(void *dst, const void *src)
-+{
-+		memcpy(dst, src, 8);
-+}
- 
--#define LZ4_COPYPACKET(s, d)		\
--	do {				\
--		LZ4_COPYSTEP(s, d);	\
--		LZ4_COPYSTEP(s, d);	\
--	} while (0)
-+/*
-+ * customized variant of memcpy,
-+ * which can overwrite up to 7 bytes beyond dstEnd
-+ */
-+static inline void LZ4_wildCopy(void *dstPtr, const void *srcPtr, void *dstEnd)
-+{
-+		BYTE *d = (BYTE *)dstPtr;
-+		const BYTE *s = (const BYTE *)srcPtr;
-+		BYTE *const e = (BYTE *)dstEnd;
- 
--#define LZ4_SECURECOPY	LZ4_WILDCOPY
--#define HTYPE const u8*
-+		do { LZ4_copy8(d, s); d += 8; s += 8; } while (d < e);
-+}
- 
--#ifdef __BIG_ENDIAN
-+#if LZ4_ARCH64
-+#ifdef __BIG_ENDIAN__
-+#define LZ4_NBCOMMONBYTES(val) (__builtin_clzll(val) >> 3)
-+#else
-+#define LZ4_NBCOMMONBYTES(val) (__builtin_clzll(val) >> 3)
-+#endif
-+#else
-+#ifdef __BIG_ENDIAN__
- #define LZ4_NBCOMMONBYTES(val) (__builtin_clz(val) >> 3)
- #else
- #define LZ4_NBCOMMONBYTES(val) (__builtin_ctz(val) >> 3)
- #endif
-+#endif
- 
-+static inline unsigned int LZ4_count(const BYTE *pIn, const BYTE *pMatch,
-+	const BYTE *pInLimit)
-+{
-+	const BYTE *const pStart = pIn;
-+
-+	while (likely(pIn < pInLimit-(STEPSIZE-1))) {
-+		size_t diff = LZ4_read_ARCH(pMatch) ^ LZ4_read_ARCH(pIn);
-+
-+		if (!diff) {
-+			pIn += STEPSIZE;
-+			pMatch += STEPSIZE;
-+			continue;
-+		}
-+		pIn += LZ4_NBCOMMONBYTES(diff);
-+		return (unsigned int)(pIn - pStart);
-+	}
-+
-+#ifdef LZ4_ARCH64
-+	if ((pIn < (pInLimit-3))
-+		&& (LZ4_read32(pMatch) == LZ4_read32(pIn))) {
-+		pIn += 4; pMatch += 4;
-+	}
- #endif
-+	if ((pIn < (pInLimit-1))
-+		&& (LZ4_read16(pMatch) == LZ4_read16(pIn))) {
-+		pIn += 2; pMatch += 2;
-+	}
-+	if ((pIn < pInLimit) && (*pMatch == *pIn))
-+		pIn++;
-+	return (unsigned int)(pIn - pStart);
-+}
-+
-+typedef enum { noLimit = 0, limitedOutput = 1 } limitedOutput_directive;
-+typedef enum { byPtr, byU32, byU16 } tableType_t;
- 
--#define LZ4_WILDCOPY(s, d, e)		\
--	do {				\
--		LZ4_COPYPACKET(s, d);	\
--	} while (d < e)
--
--#define LZ4_BLINDCOPY(s, d, l)	\
--	do {	\
--		u8 *e = (d) + l;	\
--		LZ4_WILDCOPY(s, d, e);	\
--		d = e;	\
--	} while (0)
-+typedef enum { noDict = 0, withPrefix64k, usingExtDict } dict_directive;
-+typedef enum { noDictIssue = 0, dictSmall } dictIssue_directive;
-+
-+typedef enum { endOnOutputSize = 0, endOnInputSize = 1 } endCondition_directive;
-+typedef enum { full = 0, partial = 1 } earlyEnd_directive;
-+
-+#endif
-diff --git a/lib/lz4/lz4hc_compress.c b/lib/lz4/lz4hc_compress.c
-index f344f76..407fd33 100644
---- a/lib/lz4/lz4hc_compress.c
-+++ b/lib/lz4/lz4hc_compress.c
-@@ -1,19 +1,17 @@
- /*
-  * LZ4 HC - High Compression Mode of LZ4
-- * Copyright (C) 2011-2012, Yann Collet.
-- * BSD 2-Clause License (http://www.opensource.org/licenses/bsd-license.php)
-+ * Copyright (C) 2011-2015, Yann Collet.
-  *
-+ * BSD 2 - Clause License (http://www.opensource.org/licenses/bsd - license.php)
-  * Redistribution and use in source and binary forms, with or without
-  * modification, are permitted provided that the following conditions are
-  * met:
-- *
-- *     * Redistributions of source code must retain the above copyright
-+ *		* Redistributions of source code must retain the above copyright
-  * notice, this list of conditions and the following disclaimer.
-- *     * Redistributions in binary form must reproduce the above
-+ *		* Redistributions in binary form must reproduce the above
-  * copyright notice, this list of conditions and the following disclaimer
-  * in the documentation and/or other materials provided with the
-  * distribution.
-- *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-@@ -25,323 +23,353 @@
-  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-- *
-  * You can contact the author at :
-- * - LZ4 homepage : http://fastcompression.blogspot.com/p/lz4.html
-- * - LZ4 source repository : http://code.google.com/p/lz4/
-+ *	- LZ4 homepage : http://www.lz4.org
-+ *	- LZ4 source repository : https://github.com/lz4/lz4
-  *
-- *  Changed for kernel use by:
-- *  Chanho Min <chanho.min@lge.com>
-+ *	Changed for kernel usage by:
-+ *	Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
-  */
- 
--#include <linux/module.h>
--#include <linux/kernel.h>
-+/*-************************************
-+ *	Dependencies
-+ **************************************/
- #include <linux/lz4.h>
--#include <asm/unaligned.h>
- #include "lz4defs.h"
-+#include <linux/module.h>
-+#include <linux/kernel.h>
-+#include <linux/string.h> /* memset */
- 
--struct lz4hc_data {
--	const u8 *base;
--	HTYPE hashtable[HASHTABLESIZE];
--	u16 chaintable[MAXD];
--	const u8 *nexttoupdate;
--} __attribute__((__packed__));
-+/* *************************************
-+ *	Local Constants and types
-+ ***************************************/
- 
--static inline int lz4hc_init(struct lz4hc_data *hc4, const u8 *base)
-+#define OPTIMAL_ML (int)((ML_MASK - 1) + MINMATCH)
-+
-+#define HASH_FUNCTION(i)	(((i) * 2654435761U) \
-+	>> ((MINMATCH*8) - LZ4HC_HASH_LOG))
-+#define DELTANEXTU16(p)	chainTable[(U16)(p)] /* faster */
-+
-+static U32 LZ4HC_hashPtr(const void *ptr)
- {
--	memset((void *)hc4->hashtable, 0, sizeof(hc4->hashtable));
--	memset(hc4->chaintable, 0xFF, sizeof(hc4->chaintable));
--
--#if LZ4_ARCH64
--	hc4->nexttoupdate = base + 1;
--#else
--	hc4->nexttoupdate = base;
--#endif
--	hc4->base = base;
--	return 1;
-+	return HASH_FUNCTION(LZ4_read32(ptr));
-+}
-+
-+/**************************************
-+ *	HC Compression
-+ **************************************/
-+static void LZ4HC_init(LZ4HC_CCtx_internal *hc4, const BYTE *start)
-+{
-+	memset((void *)hc4->hashTable, 0, sizeof(hc4->hashTable));
-+	memset(hc4->chainTable, 0xFF, sizeof(hc4->chainTable));
-+	hc4->nextToUpdate = 64 * KB;
-+	hc4->base = start - 64 * KB;
-+	hc4->end = start;
-+	hc4->dictBase = start - 64 * KB;
-+	hc4->dictLimit = 64 * KB;
-+	hc4->lowLimit = 64 * KB;
- }
- 
- /* Update chains up to ip (excluded) */
--static inline void lz4hc_insert(struct lz4hc_data *hc4, const u8 *ip)
-+static inline void LZ4HC_Insert(LZ4HC_CCtx_internal *hc4,
-+	const BYTE *ip)
- {
--	u16 *chaintable = hc4->chaintable;
--	HTYPE *hashtable  = hc4->hashtable;
--#if LZ4_ARCH64
-+	U16 * const chainTable = hc4->chainTable;
-+	U32 * const hashTable	= hc4->hashTable;
- 	const BYTE * const base = hc4->base;
--#else
--	const int base = 0;
--#endif
-+	U32 const target = (U32)(ip - base);
-+	U32 idx = hc4->nextToUpdate;
-+
-+	while (idx < target) {
-+		U32 const h = LZ4HC_hashPtr(base + idx);
-+		size_t delta = idx - hashTable[h];
- 
--	while (hc4->nexttoupdate < ip) {
--		const u8 *p = hc4->nexttoupdate;
--		size_t delta = p - (hashtable[HASH_VALUE(p)] + base);
- 		if (delta > MAX_DISTANCE)
- 			delta = MAX_DISTANCE;
--		chaintable[(size_t)(p) & MAXD_MASK] = (u16)delta;
--		hashtable[HASH_VALUE(p)] = (p) - base;
--		hc4->nexttoupdate++;
--	}
--}
- 
--static inline size_t lz4hc_commonlength(const u8 *p1, const u8 *p2,
--		const u8 *const matchlimit)
--{
--	const u8 *p1t = p1;
--
--	while (p1t < matchlimit - (STEPSIZE - 1)) {
--#if LZ4_ARCH64
--		u64 diff = A64(p2) ^ A64(p1t);
--#else
--		u32 diff = A32(p2) ^ A32(p1t);
--#endif
--		if (!diff) {
--			p1t += STEPSIZE;
--			p2 += STEPSIZE;
--			continue;
--		}
--		p1t += LZ4_NBCOMMONBYTES(diff);
--		return p1t - p1;
--	}
--#if LZ4_ARCH64
--	if ((p1t < (matchlimit-3)) && (A32(p2) == A32(p1t))) {
--		p1t += 4;
--		p2 += 4;
--	}
--#endif
-+		DELTANEXTU16(idx) = (U16)delta;
- 
--	if ((p1t < (matchlimit - 1)) && (A16(p2) == A16(p1t))) {
--		p1t += 2;
--		p2 += 2;
-+		hashTable[h] = idx;
-+		idx++;
- 	}
--	if ((p1t < matchlimit) && (*p2 == *p1t))
--		p1t++;
--	return p1t - p1;
-+
-+	hc4->nextToUpdate = target;
- }
- 
--static inline int lz4hc_insertandfindbestmatch(struct lz4hc_data *hc4,
--		const u8 *ip, const u8 *const matchlimit, const u8 **matchpos)
-+static inline int LZ4HC_InsertAndFindBestMatch(
-+	LZ4HC_CCtx_internal *hc4, /* Index table will be updated */
-+	const BYTE *ip,
-+	const BYTE * const iLimit,
-+	const BYTE **matchpos,
-+	const int maxNbAttempts)
- {
--	u16 *const chaintable = hc4->chaintable;
--	HTYPE *const hashtable = hc4->hashtable;
--	const u8 *ref;
--#if LZ4_ARCH64
-+	U16 * const chainTable = hc4->chainTable;
-+	U32 * const HashTable = hc4->hashTable;
- 	const BYTE * const base = hc4->base;
--#else
--	const int base = 0;
--#endif
--	int nbattempts = MAX_NB_ATTEMPTS;
--	size_t repl = 0, ml = 0;
--	u16 delta;
-+	const BYTE * const dictBase = hc4->dictBase;
-+	const U32 dictLimit = hc4->dictLimit;
-+	const U32 lowLimit = (hc4->lowLimit + 64 * KB > (U32)(ip - base))
-+		? hc4->lowLimit
-+		: (U32)(ip - base) - (64 * KB - 1);
-+	U32 matchIndex;
-+	int nbAttempts = maxNbAttempts;
-+	size_t ml = 0;
- 
- 	/* HC4 match finder */
--	lz4hc_insert(hc4, ip);
--	ref = hashtable[HASH_VALUE(ip)] + base;
--
--	/* potential repetition */
--	if (ref >= ip-4) {
--		/* confirmed */
--		if (A32(ref) == A32(ip)) {
--			delta = (u16)(ip-ref);
--			repl = ml  = lz4hc_commonlength(ip + MINMATCH,
--					ref + MINMATCH, matchlimit) + MINMATCH;
--			*matchpos = ref;
--		}
--		ref -= (size_t)chaintable[(size_t)(ref) & MAXD_MASK];
--	}
-+	LZ4HC_Insert(hc4, ip);
-+	matchIndex = HashTable[LZ4HC_hashPtr(ip)];
-+
-+	while ((matchIndex >= lowLimit)
-+		&& (nbAttempts)) {
-+		nbAttempts--;
-+		if (matchIndex >= dictLimit) {
-+			const BYTE * const match = base + matchIndex;
-+
-+			if (*(match + ml) == *(ip + ml)
-+				&& (LZ4_read32(match) == LZ4_read32(ip))) {
-+				size_t const mlt = LZ4_count(ip + MINMATCH,
-+					match + MINMATCH, iLimit) + MINMATCH;
- 
--	while ((ref >= ip - MAX_DISTANCE) && nbattempts) {
--		nbattempts--;
--		if (*(ref + ml) == *(ip + ml)) {
--			if (A32(ref) == A32(ip)) {
--				size_t mlt =
--					lz4hc_commonlength(ip + MINMATCH,
--					ref + MINMATCH, matchlimit) + MINMATCH;
- 				if (mlt > ml) {
- 					ml = mlt;
--					*matchpos = ref;
-+					*matchpos = match;
-+				}
-+			}
-+		} else {
-+			const BYTE * const match = dictBase + matchIndex;
-+
-+			if (LZ4_read32(match) == LZ4_read32(ip)) {
-+				size_t mlt;
-+				const BYTE *vLimit = ip
-+					+ (dictLimit - matchIndex);
-+
-+				if (vLimit > iLimit)
-+					vLimit = iLimit;
-+				mlt = LZ4_count(ip + MINMATCH,
-+					match + MINMATCH, vLimit) + MINMATCH;
-+				if ((ip + mlt == vLimit)
-+					&& (vLimit < iLimit))
-+					mlt += LZ4_count(ip + mlt,
-+						base + dictLimit,
-+						iLimit);
-+				if (mlt > ml) {
-+					/* virtual matchpos */
-+					ml = mlt;
-+					*matchpos = base + matchIndex;
- 				}
- 			}
- 		}
--		ref -= (size_t)chaintable[(size_t)(ref) & MAXD_MASK];
--	}
--
--	/* Complete table */
--	if (repl) {
--		const BYTE *ptr = ip;
--		const BYTE *end;
--		end = ip + repl - (MINMATCH-1);
--		/* Pre-Load */
--		while (ptr < end - delta) {
--			chaintable[(size_t)(ptr) & MAXD_MASK] = delta;
--			ptr++;
--		}
--		do {
--			chaintable[(size_t)(ptr) & MAXD_MASK] = delta;
--			/* Head of chain */
--			hashtable[HASH_VALUE(ptr)] = (ptr) - base;
--			ptr++;
--		} while (ptr < end);
--		hc4->nexttoupdate = end;
-+		matchIndex -= DELTANEXTU16(matchIndex);
- 	}
- 
- 	return (int)ml;
- }
- 
--static inline int lz4hc_insertandgetwidermatch(struct lz4hc_data *hc4,
--	const u8 *ip, const u8 *startlimit, const u8 *matchlimit, int longest,
--	const u8 **matchpos, const u8 **startpos)
-+static inline int LZ4HC_InsertAndGetWiderMatch(
-+	LZ4HC_CCtx_internal *hc4,
-+	const BYTE * const ip,
-+	const BYTE * const iLowLimit,
-+	const BYTE * const iHighLimit,
-+	int longest,
-+	const BYTE **matchpos,
-+	const BYTE **startpos,
-+	const int maxNbAttempts)
- {
--	u16 *const chaintable = hc4->chaintable;
--	HTYPE *const hashtable = hc4->hashtable;
--#if LZ4_ARCH64
-+	U16 * const chainTable = hc4->chainTable;
-+	U32 * const HashTable = hc4->hashTable;
- 	const BYTE * const base = hc4->base;
--#else
--	const int base = 0;
--#endif
--	const u8 *ref;
--	int nbattempts = MAX_NB_ATTEMPTS;
--	int delta = (int)(ip - startlimit);
-+	const U32 dictLimit = hc4->dictLimit;
-+	const BYTE * const lowPrefixPtr = base + dictLimit;
-+	const U32 lowLimit = (hc4->lowLimit + 64 * KB > (U32)(ip - base))
-+		? hc4->lowLimit
-+		: (U32)(ip - base) - (64 * KB - 1);
-+	const BYTE * const dictBase = hc4->dictBase;
-+	U32	 matchIndex;
-+	int nbAttempts = maxNbAttempts;
-+	int delta = (int)(ip - iLowLimit);
- 
- 	/* First Match */
--	lz4hc_insert(hc4, ip);
--	ref = hashtable[HASH_VALUE(ip)] + base;
--
--	while ((ref >= ip - MAX_DISTANCE) && (ref >= hc4->base)
--		&& (nbattempts)) {
--		nbattempts--;
--		if (*(startlimit + longest) == *(ref - delta + longest)) {
--			if (A32(ref) == A32(ip)) {
--				const u8 *reft = ref + MINMATCH;
--				const u8 *ipt = ip + MINMATCH;
--				const u8 *startt = ip;
--
--				while (ipt < matchlimit-(STEPSIZE - 1)) {
--					#if LZ4_ARCH64
--					u64 diff = A64(reft) ^ A64(ipt);
--					#else
--					u32 diff = A32(reft) ^ A32(ipt);
--					#endif
--
--					if (!diff) {
--						ipt += STEPSIZE;
--						reft += STEPSIZE;
--						continue;
-+	LZ4HC_Insert(hc4, ip);
-+	matchIndex = HashTable[LZ4HC_hashPtr(ip)];
-+
-+	while ((matchIndex >= lowLimit)
-+		&& (nbAttempts)) {
-+		nbAttempts--;
-+		if (matchIndex >= dictLimit) {
-+			const BYTE *matchPtr = base + matchIndex;
-+
-+			if (*(iLowLimit + longest)
-+				== *(matchPtr - delta + longest)) {
-+				if (LZ4_read32(matchPtr) == LZ4_read32(ip)) {
-+					int mlt = MINMATCH +
-+						LZ4_count(ip + MINMATCH,
-+							matchPtr + MINMATCH,
-+							iHighLimit);
-+					int back = 0;
-+
-+					while ((ip + back > iLowLimit)
-+							 && (matchPtr + back > lowPrefixPtr)
-+							 && (ip[back - 1] == matchPtr[back - 1]))
-+						back--;
-+
-+					mlt -= back;
-+
-+					if (mlt > longest) {
-+						longest = (int)mlt;
-+						*matchpos = matchPtr + back;
-+						*startpos = ip + back;
- 					}
--					ipt += LZ4_NBCOMMONBYTES(diff);
--					goto _endcount;
--				}
--				#if LZ4_ARCH64
--				if ((ipt < (matchlimit - 3))
--					&& (A32(reft) == A32(ipt))) {
--					ipt += 4;
--					reft += 4;
--				}
--				ipt += 2;
--				#endif
--				if ((ipt < (matchlimit - 1))
--					&& (A16(reft) == A16(ipt))) {
--					reft += 2;
- 				}
--				if ((ipt < matchlimit) && (*reft == *ipt))
--					ipt++;
--_endcount:
--				reft = ref;
--
--				while ((startt > startlimit)
--					&& (reft > hc4->base)
--					&& (startt[-1] == reft[-1])) {
--					startt--;
--					reft--;
--				}
--
--				if ((ipt - startt) > longest) {
--					longest = (int)(ipt - startt);
--					*matchpos = reft;
--					*startpos = startt;
-+			}
-+		} else {
-+			const BYTE * const matchPtr = dictBase + matchIndex;
-+
-+			if (LZ4_read32(matchPtr) == LZ4_read32(ip)) {
-+				size_t mlt;
-+				int back = 0;
-+				const BYTE *vLimit = ip + (dictLimit - matchIndex);
-+
-+				if (vLimit > iHighLimit)
-+					vLimit = iHighLimit;
-+
-+				mlt = LZ4_count(ip + MINMATCH,
-+					matchPtr + MINMATCH, vLimit) + MINMATCH;
-+
-+				if ((ip + mlt == vLimit) && (vLimit < iHighLimit))
-+					mlt += LZ4_count(ip + mlt, base + dictLimit,
-+						iHighLimit);
-+				while ((ip + back > iLowLimit)
-+					&& (matchIndex + back > lowLimit)
-+					&& (ip[back - 1] == matchPtr[back - 1]))
-+					back--;
-+				mlt -= back;
-+				if ((int)mlt > longest) {
-+					longest = (int)mlt;
-+					*matchpos = base + matchIndex + back;
-+					*startpos = ip + back;
- 				}
- 			}
- 		}
--		ref -= (size_t)chaintable[(size_t)(ref) & MAXD_MASK];
-+		matchIndex -= DELTANEXTU16(matchIndex);
- 	}
-+
- 	return longest;
- }
- 
--static inline int lz4_encodesequence(const u8 **ip, u8 **op, const u8 **anchor,
--		int ml, const u8 *ref)
-+static inline int LZ4HC_encodeSequence(
-+	const BYTE **ip,
-+	BYTE **op,
-+	const BYTE **anchor,
-+	int matchLength,
-+	const BYTE * const match,
-+	limitedOutput_directive limitedOutputBuffer,
-+	BYTE *oend)
- {
--	int length, len;
--	u8 *token;
-+	int length;
-+	BYTE *token;
- 
- 	/* Encode Literal length */
- 	length = (int)(*ip - *anchor);
- 	token = (*op)++;
-+
-+	if ((limitedOutputBuffer)
-+		&& ((*op + (length>>8)
-+			+ length + (2 + 1 + LASTLITERALS)) > oend)) {
-+		/* Check output limit */
-+		return 1;
-+	}
- 	if (length >= (int)RUN_MASK) {
--		*token = (RUN_MASK << ML_BITS);
-+		int len;
-+
-+		*token = (RUN_MASK<<ML_BITS);
- 		len = length - RUN_MASK;
--		for (; len > 254 ; len -= 255)
-+		for (; len > 254 ; len -= 255) {
- 			*(*op)++ = 255;
--		*(*op)++ = (u8)len;
-+			*(*op)++ = (BYTE)len;
-+		}
- 	} else
--		*token = (length << ML_BITS);
-+		*token = (BYTE)(length<<ML_BITS);
- 
- 	/* Copy Literals */
--	LZ4_BLINDCOPY(*anchor, *op, length);
-+	LZ4_wildCopy(*op, *anchor, (*op) + length);
-+	*op += length;
- 
- 	/* Encode Offset */
--	LZ4_WRITE_LITTLEENDIAN_16(*op, (u16)(*ip - ref));
-+	LZ4_writeLE16(*op, (U16)(*ip - match)); *op += 2;
- 
- 	/* Encode MatchLength */
--	len = (int)(ml - MINMATCH);
--	if (len >= (int)ML_MASK) {
-+	length = (int)(matchLength - MINMATCH);
-+	if ((limitedOutputBuffer)
-+		&& (*op + (length>>8)
-+			+ (1 + LASTLITERALS) > oend)) {
-+		/* Check output limit */
-+		return 1;
-+	}
-+	if (length >= (int)ML_MASK) {
- 		*token += ML_MASK;
--		len -= ML_MASK;
--		for (; len > 509 ; len -= 510) {
-+		length -= ML_MASK;
-+		for (; length > 509 ; length -= 510) {
- 			*(*op)++ = 255;
- 			*(*op)++ = 255;
- 		}
--		if (len > 254) {
--			len -= 255;
-+		if (length > 254) {
-+			length -= 255;
- 			*(*op)++ = 255;
- 		}
--		*(*op)++ = (u8)len;
-+		*(*op)++ = (BYTE)length;
- 	} else
--		*token += len;
-+		*token += (BYTE)(length);
- 
- 	/* Prepare next loop */
--	*ip += ml;
-+	*ip += matchLength;
- 	*anchor = *ip;
- 
- 	return 0;
- }
- 
--static int lz4_compresshcctx(struct lz4hc_data *ctx,
--		const char *source,
--		char *dest,
--		int isize)
-+static int LZ4HC_compress_generic(
-+	LZ4HC_CCtx_internal *const ctx,
-+	const char * const source,
-+	char * const dest,
-+	int const inputSize,
-+	int const maxOutputSize,
-+	int compressionLevel,
-+	limitedOutput_directive limit
-+	)
- {
--	const u8 *ip = (const u8 *)source;
--	const u8 *anchor = ip;
--	const u8 *const iend = ip + isize;
--	const u8 *const mflimit = iend - MFLIMIT;
--	const u8 *const matchlimit = (iend - LASTLITERALS);
-+	const BYTE *ip = (const BYTE *) source;
-+	const BYTE *anchor = ip;
-+	const BYTE * const iend = ip + inputSize;
-+	const BYTE * const mflimit = iend - MFLIMIT;
-+	const BYTE * const matchlimit = (iend - LASTLITERALS);
- 
--	u8 *op = (u8 *)dest;
-+	BYTE *op = (BYTE *) dest;
-+	BYTE * const oend = op + maxOutputSize;
- 
-+	unsigned int maxNbAttempts;
- 	int ml, ml2, ml3, ml0;
--	const u8 *ref = NULL;
--	const u8 *start2 = NULL;
--	const u8 *ref2 = NULL;
--	const u8 *start3 = NULL;
--	const u8 *ref3 = NULL;
--	const u8 *start0;
--	const u8 *ref0;
--	int lastrun;
-+	const BYTE *ref = NULL;
-+	const BYTE *start2 = NULL;
-+	const BYTE *ref2 = NULL;
-+	const BYTE *start3 = NULL;
-+	const BYTE *ref3 = NULL;
-+	const BYTE *start0;
-+	const BYTE *ref0;
-+
-+	/* init */
-+	if (compressionLevel > LZ4HC_MAX_CLEVEL)
-+		compressionLevel = LZ4HC_MAX_CLEVEL;
-+	if (compressionLevel < 1)
-+		compressionLevel = LZ4HC_DEFAULT_CLEVEL;
-+	maxNbAttempts = 1 << (compressionLevel - 1);
-+	ctx->end += inputSize;
- 
- 	ip++;
- 
- 	/* Main Loop */
- 	while (ip < mflimit) {
--		ml = lz4hc_insertandfindbestmatch(ctx, ip, matchlimit, (&ref));
-+		ml = LZ4HC_InsertAndFindBestMatch(ctx, ip,
-+			matchlimit, (&ref), maxNbAttempts);
- 		if (!ml) {
- 			ip++;
- 			continue;
-@@ -351,46 +379,52 @@ static int lz4_compresshcctx(struct lz4hc_data *ctx,
- 		start0 = ip;
- 		ref0 = ref;
- 		ml0 = ml;
--_search2:
--		if (ip+ml < mflimit)
--			ml2 = lz4hc_insertandgetwidermatch(ctx, ip + ml - 2,
--				ip + 1, matchlimit, ml, &ref2, &start2);
-+
-+_Search2:
-+		if (ip + ml < mflimit)
-+			ml2 = LZ4HC_InsertAndGetWiderMatch(ctx,
-+				ip + ml - 2, ip + 0,
-+				matchlimit, ml, &ref2,
-+				&start2, maxNbAttempts);
- 		else
- 			ml2 = ml;
--		/* No better match */
-+
- 		if (ml2 == ml) {
--			lz4_encodesequence(&ip, &op, &anchor, ml, ref);
-+			/* No better match */
-+			if (LZ4HC_encodeSequence(&ip, &op,
-+				&anchor, ml, ref, limit, oend))
-+				return 0;
- 			continue;
- 		}
- 
- 		if (start0 < ip) {
--			/* empirical */
- 			if (start2 < ip + ml0) {
-+				/* empirical */
- 				ip = start0;
- 				ref = ref0;
- 				ml = ml0;
- 			}
- 		}
--		/*
--		 * Here, start0==ip
--		 * First Match too small : removed
--		 */
-+
-+		/* Here, start0 == ip */
- 		if ((start2 - ip) < 3) {
-+			/* First Match too small : removed */
- 			ml = ml2;
- 			ip = start2;
- 			ref = ref2;
--			goto _search2;
-+			goto _Search2;
- 		}
- 
--_search3:
-+_Search3:
- 		/*
--		 * Currently we have :
--		 * ml2 > ml1, and
--		 * ip1+3 <= ip2 (usually < ip1+ml1)
--		 */
-+		* Currently we have :
-+		* ml2 > ml1, and
-+		* ip1 + 3 <= ip2 (usually < ip1 + ml1)
-+		*/
- 		if ((start2 - ip) < OPTIMAL_ML) {
- 			int correction;
- 			int new_ml = ml;
-+
- 			if (new_ml > OPTIMAL_ML)
- 				new_ml = OPTIMAL_ML;
- 			if (ip + new_ml > start2 + ml2 - MINMATCH)
-@@ -403,39 +437,44 @@ static int lz4_compresshcctx(struct lz4hc_data *ctx,
- 			}
- 		}
- 		/*
--		 * Now, we have start2 = ip+new_ml,
--		 * with new_ml=min(ml, OPTIMAL_ML=18)
-+		 * Now, we have start2 = ip + new_ml,
-+		 * with new_ml = min(ml, OPTIMAL_ML = 18)
- 		 */
-+
- 		if (start2 + ml2 < mflimit)
--			ml3 = lz4hc_insertandgetwidermatch(ctx,
--				start2 + ml2 - 3, start2, matchlimit,
--				ml2, &ref3, &start3);
-+			ml3 = LZ4HC_InsertAndGetWiderMatch(ctx,
-+				start2 + ml2 - 3, start2,
-+				matchlimit, ml2, &ref3, &start3,
-+				maxNbAttempts);
- 		else
- 			ml3 = ml2;
- 
--		/* No better match : 2 sequences to encode */
- 		if (ml3 == ml2) {
-+			/* No better match : 2 sequences to encode */
- 			/* ip & ref are known; Now for ml */
--			if (start2 < ip+ml)
-+			if (start2 < ip + ml)
- 				ml = (int)(start2 - ip);
--
- 			/* Now, encode 2 sequences */
--			lz4_encodesequence(&ip, &op, &anchor, ml, ref);
-+			if (LZ4HC_encodeSequence(&ip, &op, &anchor,
-+				ml, ref, limit, oend))
-+				return 0;
- 			ip = start2;
--			lz4_encodesequence(&ip, &op, &anchor, ml2, ref2);
-+			if (LZ4HC_encodeSequence(&ip, &op, &anchor,
-+				ml2, ref2, limit, oend))
-+				return 0;
- 			continue;
- 		}
- 
--		/* Not enough space for match 2 : remove it */
- 		if (start3 < ip + ml + 3) {
--			/*
--			 * can write Seq1 immediately ==> Seq2 is removed,
--			 * so Seq3 becomes Seq1
--			 */
-+			/* Not enough space for match 2 : remove it */
- 			if (start3 >= (ip + ml)) {
-+				/* can write Seq1 immediately
-+				 * ==> Seq2 is removed,
-+				 * so Seq3 becomes Seq1
-+				 */
- 				if (start2 < ip + ml) {
--					int correction =
--						(int)(ip + ml - start2);
-+					int correction = (int)(ip + ml - start2);
-+
- 					start2 += correction;
- 					ref2 += correction;
- 					ml2 -= correction;
-@@ -446,35 +485,38 @@ static int lz4_compresshcctx(struct lz4hc_data *ctx,
- 					}
- 				}
- 
--				lz4_encodesequence(&ip, &op, &anchor, ml, ref);
--				ip  = start3;
-+				if (LZ4HC_encodeSequence(&ip, &op, &anchor,
-+					ml, ref, limit, oend))
-+					return 0;
-+				ip	= start3;
- 				ref = ref3;
--				ml  = ml3;
-+				ml	= ml3;
- 
- 				start0 = start2;
- 				ref0 = ref2;
- 				ml0 = ml2;
--				goto _search2;
-+				goto _Search2;
- 			}
- 
- 			start2 = start3;
- 			ref2 = ref3;
- 			ml2 = ml3;
--			goto _search3;
-+			goto _Search3;
- 		}
- 
- 		/*
--		 * OK, now we have 3 ascending matches; let's write at least
--		 * the first one ip & ref are known; Now for ml
--		 */
-+		* OK, now we have 3 ascending matches;
-+		* let's write at least the first one
-+		* ip & ref are known; Now for ml
-+		*/
- 		if (start2 < ip + ml) {
- 			if ((start2 - ip) < (int)ML_MASK) {
- 				int correction;
-+
- 				if (ml > OPTIMAL_ML)
- 					ml = OPTIMAL_ML;
- 				if (ip + ml > start2 + ml2 - MINMATCH)
--					ml = (int)(start2 - ip) + ml2
--						- MINMATCH;
-+					ml = (int)(start2 - ip) + ml2 - MINMATCH;
- 				correction = ml - (int)(start2 - ip);
- 				if (correction > 0) {
- 					start2 += correction;
-@@ -484,7 +526,9 @@ static int lz4_compresshcctx(struct lz4hc_data *ctx,
- 			} else
- 				ml = (int)(start2 - ip);
- 		}
--		lz4_encodesequence(&ip, &op, &anchor, ml, ref);
-+		if (LZ4HC_encodeSequence(&ip, &op, &anchor, ml,
-+			ref, limit, oend))
-+			return 0;
- 
- 		ip = start2;
- 		ref = ref2;
-@@ -494,46 +538,243 @@ static int lz4_compresshcctx(struct lz4hc_data *ctx,
- 		ref2 = ref3;
- 		ml2 = ml3;
- 
--		goto _search3;
-+		goto _Search3;
- 	}
- 
- 	/* Encode Last Literals */
--	lastrun = (int)(iend - anchor);
--	if (lastrun >= (int)RUN_MASK) {
--		*op++ = (RUN_MASK << ML_BITS);
--		lastrun -= RUN_MASK;
--		for (; lastrun > 254 ; lastrun -= 255)
--			*op++ = 255;
--		*op++ = (u8) lastrun;
--	} else
--		*op++ = (lastrun << ML_BITS);
--	memcpy(op, anchor, iend - anchor);
--	op += iend - anchor;
-+	{ int lastRun = (int)(iend - anchor);
-+
-+		if ((limit)
-+			&& (((char *)op - dest) + lastRun + 1
-+				+ ((lastRun + 255 - RUN_MASK)/255)
-+					> (U32)maxOutputSize)) {
-+			/* Check output limit */
-+			return 0;
-+		}
-+		if (lastRun >= (int)RUN_MASK) {
-+			*op++ = (RUN_MASK<<ML_BITS);
-+			lastRun -= RUN_MASK;
-+			for (; lastRun > 254 ; lastRun -= 255) {
-+				*op++ = 255;
-+				*op++ = (BYTE) lastRun;
-+			}
-+		} else
-+			*op++ = (BYTE)(lastRun<<ML_BITS);
-+		memcpy(op, anchor, iend - anchor);
-+		op += iend - anchor;
-+	}
-+
- 	/* End */
- 	return (int) (((char *)op) - dest);
- }
- 
--int lz4hc_compress(const unsigned char *src, size_t src_len,
--			unsigned char *dst, size_t *dst_len, void *wrkmem)
-+int LZ4_compress_HC_extStateHC(
-+	void *state,
-+	const char *src,
-+	char *dst,
-+	int srcSize,
-+	int maxDstSize,
-+	int compressionLevel)
- {
--	int ret = -1;
--	int out_len = 0;
-+	LZ4HC_CCtx_internal *ctx = &((LZ4_streamHC_t *)state)->internal_donotuse;
- 
--	struct lz4hc_data *hc4 = (struct lz4hc_data *)wrkmem;
--	lz4hc_init(hc4, (const u8 *)src);
--	out_len = lz4_compresshcctx((struct lz4hc_data *)hc4, (const u8 *)src,
--		(char *)dst, (int)src_len);
-+	if (((size_t)(state)&(sizeof(void *) - 1)) != 0) {
-+		/* Error : state is not aligned
-+		 * for pointers (32 or 64 bits)
-+		 */
-+		return 0;
-+	}
- 
--	if (out_len < 0)
--		goto exit;
-+	LZ4HC_init(ctx, (const BYTE *)src);
- 
--	*dst_len = out_len;
--	return 0;
-+	if (maxDstSize < LZ4_compressBound(srcSize))
-+		return LZ4HC_compress_generic(ctx, src, dst,
-+			srcSize, maxDstSize, compressionLevel, limitedOutput);
-+	else
-+		return LZ4HC_compress_generic(ctx, src, dst,
-+			srcSize, maxDstSize, compressionLevel, noLimit);
-+}
- 
--exit:
--	return ret;
-+int LZ4_compress_HC(const char *src, char *dst, int srcSize,
-+	int maxDstSize, int compressionLevel, void *wrkmem)
-+{
-+	return LZ4_compress_HC_extStateHC(wrkmem, src, dst,
-+		srcSize, maxDstSize, compressionLevel);
-+}
-+EXPORT_SYMBOL(LZ4_compress_HC);
-+
-+/*-******************************
-+ *	For backwards compatibility
-+ ********************************/
-+int lz4hc_compress(const unsigned char *src, size_t src_len,
-+	unsigned char *dst, size_t *dst_len, void *wrkmem)
-+{
-+	*dst_len = LZ4_compress_HC(src, dst, (int)src_len,
-+		(int)((size_t)dst_len), LZ4HC_DEFAULT_CLEVEL, wrkmem);
-+
-+	/*
-+	 * Prior lz4hc_compress will return -1 in case of error
-+	 * and 0 on success
-+	 * while new LZ4_compress_HC
-+	 * returns 0 in case of error
-+	 * and the output length on success
-+	 */
-+	if (!dst_len)
-+		return -1;
-+	else
-+		return 0;
- }
- EXPORT_SYMBOL(lz4hc_compress);
- 
-+/**************************************
-+ *	Streaming Functions
-+ **************************************/
-+void LZ4_resetStreamHC(LZ4_streamHC_t *LZ4_streamHCPtr, int compressionLevel)
-+{
-+	LZ4_streamHCPtr->internal_donotuse.base = NULL;
-+	LZ4_streamHCPtr->internal_donotuse.compressionLevel = (unsigned int)compressionLevel;
-+}
-+
-+int LZ4_loadDictHC(LZ4_streamHC_t *LZ4_streamHCPtr,
-+	const char *dictionary,
-+	int dictSize)
-+{
-+	LZ4HC_CCtx_internal *ctxPtr = &LZ4_streamHCPtr->internal_donotuse;
-+
-+	if (dictSize > 64 * KB) {
-+		dictionary += dictSize - 64 * KB;
-+		dictSize = 64 * KB;
-+	}
-+	LZ4HC_init(ctxPtr, (const BYTE *)dictionary);
-+	if (dictSize >= 4)
-+		LZ4HC_Insert(ctxPtr, (const BYTE *)dictionary + (dictSize - 3));
-+	ctxPtr->end = (const BYTE *)dictionary + dictSize;
-+	return dictSize;
-+}
-+EXPORT_SYMBOL(LZ4_loadDictHC);
-+
-+/* compression */
-+
-+static void LZ4HC_setExternalDict(
-+	LZ4HC_CCtx_internal *ctxPtr,
-+	const BYTE *newBlock)
-+{
-+	if (ctxPtr->end >= ctxPtr->base + 4) {
-+		/* Referencing remaining dictionary content */
-+		LZ4HC_Insert(ctxPtr, ctxPtr->end - 3);
-+	}
-+
-+	/*
-+	 * Only one memory segment for extDict,
-+	 * so any previous extDict is lost at this stage
-+	 */
-+	ctxPtr->lowLimit	= ctxPtr->dictLimit;
-+	ctxPtr->dictLimit = (U32)(ctxPtr->end - ctxPtr->base);
-+	ctxPtr->dictBase	= ctxPtr->base;
-+	ctxPtr->base = newBlock - ctxPtr->dictLimit;
-+	ctxPtr->end	= newBlock;
-+	/* match referencing will resume from there */
-+	ctxPtr->nextToUpdate = ctxPtr->dictLimit;
-+}
-+EXPORT_SYMBOL(LZ4HC_setExternalDict);
-+
-+static int LZ4_compressHC_continue_generic(
-+	LZ4_streamHC_t *LZ4_streamHCPtr,
-+	const char *source,
-+	char *dest,
-+	int inputSize,
-+	int maxOutputSize,
-+	limitedOutput_directive limit)
-+{
-+	LZ4HC_CCtx_internal *ctxPtr = &LZ4_streamHCPtr->internal_donotuse;
-+
-+	/* auto - init if forgotten */
-+	if (ctxPtr->base == NULL)
-+		LZ4HC_init(ctxPtr, (const BYTE *) source);
-+
-+	/* Check overflow */
-+	if ((size_t)(ctxPtr->end - ctxPtr->base) > 2 * GB) {
-+		size_t dictSize = (size_t)(ctxPtr->end - ctxPtr->base)
-+			- ctxPtr->dictLimit;
-+		if (dictSize > 64 * KB)
-+			dictSize = 64 * KB;
-+		LZ4_loadDictHC(LZ4_streamHCPtr,
-+			(const char *)(ctxPtr->end) - dictSize, (int)dictSize);
-+	}
-+
-+	/* Check if blocks follow each other */
-+	if ((const BYTE *)source != ctxPtr->end)
-+		LZ4HC_setExternalDict(ctxPtr, (const BYTE *)source);
-+
-+	/* Check overlapping input/dictionary space */
-+	{ const BYTE *sourceEnd = (const BYTE *) source + inputSize;
-+		const BYTE * const dictBegin = ctxPtr->dictBase + ctxPtr->lowLimit;
-+		const BYTE * const dictEnd = ctxPtr->dictBase + ctxPtr->dictLimit;
-+
-+		if ((sourceEnd > dictBegin)
-+			&& ((const BYTE *)source < dictEnd)) {
-+			if (sourceEnd > dictEnd)
-+				sourceEnd = dictEnd;
-+			ctxPtr->lowLimit = (U32)(sourceEnd - ctxPtr->dictBase);
-+
-+			if (ctxPtr->dictLimit - ctxPtr->lowLimit < 4)
-+				ctxPtr->lowLimit = ctxPtr->dictLimit;
-+		}
-+	}
-+
-+	return LZ4HC_compress_generic(ctxPtr, source, dest,
-+		inputSize, maxOutputSize, ctxPtr->compressionLevel, limit);
-+}
-+
-+int LZ4_compress_HC_continue(
-+	LZ4_streamHC_t *LZ4_streamHCPtr,
-+	const char *source,
-+	char *dest,
-+	int inputSize,
-+	int maxOutputSize)
-+{
-+	if (maxOutputSize < LZ4_compressBound(inputSize))
-+		return LZ4_compressHC_continue_generic(LZ4_streamHCPtr,
-+			source, dest, inputSize, maxOutputSize, limitedOutput);
-+	else
-+		return LZ4_compressHC_continue_generic(LZ4_streamHCPtr,
-+			source, dest, inputSize, maxOutputSize, noLimit);
-+}
-+EXPORT_SYMBOL(LZ4_compress_HC_continue);
-+
-+/* dictionary saving */
-+
-+int LZ4_saveDictHC(
-+	LZ4_streamHC_t *LZ4_streamHCPtr,
-+	char *safeBuffer,
-+	int dictSize)
-+{
-+	LZ4HC_CCtx_internal *const streamPtr = &LZ4_streamHCPtr->internal_donotuse;
-+	int const prefixSize = (int)(streamPtr->end
-+		- (streamPtr->base + streamPtr->dictLimit));
-+
-+	if (dictSize > 64 * KB)
-+		dictSize = 64 * KB;
-+	if (dictSize < 4)
-+		dictSize = 0;
-+	if (dictSize > prefixSize)
-+		dictSize = prefixSize;
-+
-+	memmove(safeBuffer, streamPtr->end - dictSize, dictSize);
-+
-+	{ U32 const endIndex = (U32)(streamPtr->end - streamPtr->base);
-+
-+		streamPtr->end = (const BYTE *)safeBuffer + dictSize;
-+		streamPtr->base = streamPtr->end - endIndex;
-+		streamPtr->dictLimit = endIndex - dictSize;
-+		streamPtr->lowLimit = endIndex - dictSize;
-+
-+		if (streamPtr->nextToUpdate < streamPtr->dictLimit)
-+			streamPtr->nextToUpdate = streamPtr->dictLimit;
-+	}
-+	return dictSize;
-+}
-+EXPORT_SYMBOL(LZ4_saveDictHC);
-+
- MODULE_LICENSE("Dual BSD/GPL");
--MODULE_DESCRIPTION("LZ4HC compressor");
-+MODULE_DESCRIPTION("LZ4 HC compressor");
--- 
-2.1.4
+--MGYHOYXEY6WxJCY8
+Content-Type: application/gzip
+Content-Disposition: attachment; filename=".config.gz"
+Content-Transfer-Encoding: base64
+
+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
+
+--MGYHOYXEY6WxJCY8--
