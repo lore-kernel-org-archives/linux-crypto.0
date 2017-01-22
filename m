@@ -1,73 +1,66 @@
-From: kbuild test robot <lkp@intel.com>
+From: Greg KH <gregkh@linuxfoundation.org>
 Subject: Re: [PATCH 1/4] lib: Update LZ4 compressor module
-Date: Sun, 22 Jan 2017 01:38:20 +0800
-Message-ID: <201701220138.lulmlSvI%fengguang.wu@intel.com>
-References: <1485011351-7463-2-git-send-email-4sschmid@informatik.uni-hamburg.de>
+Date: Sun, 22 Jan 2017 12:05:29 +0100
+Message-ID: <20170122110529.GB17972@kroah.com>
+References: <1482259992-16680-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
+ <1485011351-7463-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
+ <1485011351-7463-2-git-send-email-4sschmid@informatik.uni-hamburg.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: kbuild-all@01.org, akpm@linux-foundation.org, bongkyu.kim@lge.com,
+Cc: akpm@linux-foundation.org, bongkyu.kim@lge.com,
         rsalvaterra@gmail.com, sergey.senozhatsky@gmail.com,
-        gregkh@linuxfoundation.org, linux-kernel@vger.kernel.org,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, anton@enomsg.org, ccross@android.com,
-        keescook@chromium.org, tony.luck@intel.com,
-        phillip@squashfs.org.uk,
-        Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
+        linux-kernel@vger.kernel.org, herbert@gondor.apana.org.au,
+        davem@davemloft.net, linux-crypto@vger.kernel.org,
+        anton@enomsg.org, ccross@android.com, keescook@chromium.org,
+        tony.luck@intel.com, phillip@squashfs.org.uk
 To: Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.linuxfoundation.org ([140.211.169.12]:50498 "EHLO
+        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750985AbdAVLFU (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 22 Jan 2017 06:05:20 -0500
 Content-Disposition: inline
 In-Reply-To: <1485011351-7463-2-git-send-email-4sschmid@informatik.uni-hamburg.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Sven,
+On Sat, Jan 21, 2017 at 04:09:08PM +0100, Sven Schmidt wrote:
+> This patch updates LZ4 kernel module to LZ4 v1.7.3 by Yann Collet.
+> The kernel module is inspired by the previous work by Chanho Min.
+> The updated LZ4 module will not break existing code since there were alias
+> methods added to ensure backwards compatibility.
+> 
+> API changes:
+> 
+> New method LZ4_compress_fast which differs from the variant available
+> in kernel by the new acceleration parameter,
+> allowing to trade compression ratio for more compression speed
+> and vice versa.
+> 
+> LZ4_decompress_fast is the respective decompression method, featuring a very
+> fast decoder (multiple GB/s per core), able to reach RAM speed in multi-core
+> systems. The decompressor allows to decompress data compressed with
+> LZ4 fast as well as the LZ4 HC (high compression) algorithm.
+> 
+> Also the useful functions LZ4_decompress_safe_partial
+> LZ4_compress_destsize were added. The latter reverses the logic by trying to
+> compress as much data as possible from source to dest while the former aims
+> to decompress partial blocks of data.
+> 
+> A bunch of streaming functions were also added
+> which allow compressig/decompressing data in multiple steps
+> (so called "streaming mode").
+> 
+> The methods lz4_compress and lz4_decompress_unknownoutputsize
+> are now known as LZ4_compress_default respectivley LZ4_decompress_safe.
+> The old methods are still available for providing backwards compatibility.
+> 
+> Signed-off-by: Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
 
-[auto build test WARNING on linus/master]
-[also build test WARNING on v4.10-rc4 next-20170120]
-[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
+Please fix up so that it doesn't break the build as reported by the
+kbuild tool...
 
-url:    https://github.com/0day-ci/linux/commits/Sven-Schmidt/Update-LZ4-compressor-module/20170121-231418
-reproduce:
-        # apt-get install sparse
-        make ARCH=x86_64 allmodconfig
-        make C=1 CF=-D__CHECK_ENDIAN__
+thanks,
 
-
-sparse warnings: (new ones prefixed by >>)
-
-   include/linux/compiler.h:253:8: sparse: attribute 'no_sanitize_address': unknown attribute
->> lib/lz4/lz4_decompress.c:521:21: sparse: incompatible types for operation (>)
-   lib/lz4/lz4_decompress.c:521:21:    left side has type unsigned long [usertype] *src_len
-   lib/lz4/lz4_decompress.c:521:21:    right side has type int
-
-vim +521 lib/lz4/lz4_decompress.c
-
-   505				return -1;
-   506	}
-   507	EXPORT_SYMBOL(lz4_decompress_unknownoutputsize);
-   508	
-   509	int lz4_decompress(const unsigned char *src, size_t *src_len,
-   510		unsigned char *dest, size_t actual_dest_len) {
-   511		*src_len = LZ4_decompress_fast(src, dest, (int)actual_dest_len);
-   512	
-   513		/*
-   514		 * Prior lz4_decompress will return
-   515		 * 0 for success and a negative result for error
-   516		 * new LZ4_decompress_fast returns
-   517		 * - the length of data read on success
-   518		 * - and also a negative result on error
-   519		 * meaning when result > 0, we just return 0 here
-   520		 */
- > 521		if (src_len > 0)
-   522			return 0;
-   523		else
-   524			return -1;
-   525	}
-   526	EXPORT_SYMBOL(lz4_decompress);
-   527	
-   528	MODULE_LICENSE("Dual BSD/GPL");
-   529	MODULE_DESCRIPTION("LZ4 decompressor");
-
----
-0-DAY kernel test infrastructure                Open Source Technology Center
-https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+greg k-h
