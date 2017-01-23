@@ -1,34 +1,49 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: arm64/aes-blk - honour iv_out requirement in CBC
- and CTR modes
-Date: Mon, 23 Jan 2017 22:58:37 +0800
-Message-ID: <20170123145837.GC20806@gondor.apana.org.au>
-References: <1484660789-7036-1-git-send-email-ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH] crypto: tcrypt - Add debug prints
+Date: Mon, 23 Jan 2017 22:59:09 +0800
+Message-ID: <20170123145909.GD20806@gondor.apana.org.au>
+References: <1484747645-17463-1-git-send-email-rabin.vincent@axis.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: linux-crypto@vger.kernel.org, Rabin Vincent <rabinv@axis.com>
+To: Rabin Vincent <rabin.vincent@axis.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:44371 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:50007 "EHLO
         helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751032AbdAWO6y (ORCPT
+        with ESMTP id S1751237AbdAWO7U (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 23 Jan 2017 09:58:54 -0500
+        Mon, 23 Jan 2017 09:59:20 -0500
 Content-Disposition: inline
-In-Reply-To: <1484660789-7036-1-git-send-email-ard.biesheuvel@linaro.org>
+In-Reply-To: <1484747645-17463-1-git-send-email-rabin.vincent@axis.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jan 17, 2017 at 01:46:29PM +0000, Ard Biesheuvel wrote:
-> Update the ARMv8 Crypto Extensions and the plain NEON AES implementations
-> in CBC and CTR modes to return the next IV back to the skcipher API client.
-> This is necessary for chaining to work correctly.
+On Wed, Jan 18, 2017 at 02:54:05PM +0100, Rabin Vincent wrote:
+> From: Rabin Vincent <rabinv@axis.com>
 > 
-> Note that for CTR, this is only done if the request is a round multiple of
-> the block size, since otherwise, chaining is impossible anyway.
+> tcrypt is very tight-lipped when it succeeds, but a bit more feedback
+> would be useful when developing or debugging crypto drivers, especially
+> since even a successful run ends with the module failing to insert. Add
+> a couple of debug prints, which can be enabled with dynamic debug:
 > 
-> Cc: <stable@vger.kernel.org> # v3.16+
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> Before:
+> 
+>  # insmod tcrypt.ko mode=10
+>  insmod: can't insert 'tcrypt.ko': Resource temporarily unavailable
+> 
+> After:
+> 
+>  # insmod tcrypt.ko mode=10 dyndbg
+>  tcrypt: testing ecb(aes)
+>  tcrypt: testing cbc(aes)
+>  tcrypt: testing lrw(aes)
+>  tcrypt: testing xts(aes)
+>  tcrypt: testing ctr(aes)
+>  tcrypt: testing rfc3686(ctr(aes))
+>  tcrypt: all tests passed
+>  insmod: can't insert 'tcrypt.ko': Resource temporarily unavailable
+> 
+> Signed-off-by: Rabin Vincent <rabinv@axis.com>
 
 Patch applied.  Thanks.
 -- 
