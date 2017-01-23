@@ -1,18 +1,18 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v2 03/10] crypto: arm/chacha20 - remove cra_alignmask
-Date: Mon, 23 Jan 2017 14:05:19 +0000
-Message-ID: <1485180326-25612-4-git-send-email-ard.biesheuvel@linaro.org>
+Subject: [PATCH v2 06/10] crypto: arm64/chacha20 - remove cra_alignmask
+Date: Mon, 23 Jan 2017 14:05:22 +0000
+Message-ID: <1485180326-25612-7-git-send-email-ard.biesheuvel@linaro.org>
 References: <1485180326-25612-1-git-send-email-ard.biesheuvel@linaro.org>
 Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f50.google.com ([74.125.82.50]:34894 "EHLO
-        mail-wm0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751234AbdAWOFj (ORCPT
+Received: from mail-wm0-f44.google.com ([74.125.82.44]:35971 "EHLO
+        mail-wm0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750828AbdAWOFo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 23 Jan 2017 09:05:39 -0500
-Received: by mail-wm0-f50.google.com with SMTP id r126so134566502wmr.0
-        for <linux-crypto@vger.kernel.org>; Mon, 23 Jan 2017 06:05:38 -0800 (PST)
+        Mon, 23 Jan 2017 09:05:44 -0500
+Received: by mail-wm0-f44.google.com with SMTP id c85so134181823wmi.1
+        for <linux-crypto@vger.kernel.org>; Mon, 23 Jan 2017 06:05:43 -0800 (PST)
 In-Reply-To: <1485180326-25612-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
@@ -23,14 +23,14 @@ copy the data to a suitably aligned buffer.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm/crypto/chacha20-neon-glue.c | 1 -
+ arch/arm64/crypto/chacha20-neon-glue.c | 1 -
  1 file changed, 1 deletion(-)
 
-diff --git a/arch/arm/crypto/chacha20-neon-glue.c b/arch/arm/crypto/chacha20-neon-glue.c
-index 592f75ae4fa1..59a7be08e80c 100644
---- a/arch/arm/crypto/chacha20-neon-glue.c
-+++ b/arch/arm/crypto/chacha20-neon-glue.c
-@@ -94,7 +94,6 @@ static struct skcipher_alg alg = {
+diff --git a/arch/arm64/crypto/chacha20-neon-glue.c b/arch/arm64/crypto/chacha20-neon-glue.c
+index a7f2337d46cf..a7cd575ea223 100644
+--- a/arch/arm64/crypto/chacha20-neon-glue.c
++++ b/arch/arm64/crypto/chacha20-neon-glue.c
+@@ -93,7 +93,6 @@ static struct skcipher_alg alg = {
  	.base.cra_priority	= 300,
  	.base.cra_blocksize	= 1,
  	.base.cra_ctxsize	= sizeof(struct chacha20_ctx),
