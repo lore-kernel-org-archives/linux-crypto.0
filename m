@@ -1,122 +1,76 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v2 05/10] crypto: arm64/aes-blk - remove cra_alignmask
-Date: Mon, 23 Jan 2017 14:05:21 +0000
-Message-ID: <1485180326-25612-6-git-send-email-ard.biesheuvel@linaro.org>
-References: <1485180326-25612-1-git-send-email-ard.biesheuvel@linaro.org>
+Subject: [PATCH v2 00/10] crypto - AES for ARM/arm64 updates for v4.11 (round #2)
+Date: Mon, 23 Jan 2017 14:05:16 +0000
+Message-ID: <1485180326-25612-1-git-send-email-ard.biesheuvel@linaro.org>
 Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f53.google.com ([74.125.82.53]:38832 "EHLO
+Received: from mail-wm0-f53.google.com ([74.125.82.53]:36800 "EHLO
         mail-wm0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750828AbdAWOFm (ORCPT
+        with ESMTP id S1751113AbdAWOFc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 23 Jan 2017 09:05:42 -0500
-Received: by mail-wm0-f53.google.com with SMTP id r144so156906950wme.1
-        for <linux-crypto@vger.kernel.org>; Mon, 23 Jan 2017 06:05:42 -0800 (PST)
-In-Reply-To: <1485180326-25612-1-git-send-email-ard.biesheuvel@linaro.org>
+        Mon, 23 Jan 2017 09:05:32 -0500
+Received: by mail-wm0-f53.google.com with SMTP id c85so134172927wmi.1
+        for <linux-crypto@vger.kernel.org>; Mon, 23 Jan 2017 06:05:32 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Remove the unnecessary alignmask: it is much more efficient to deal with
-the misalignment in the core algorithm than relying on the crypto API to
-copy the data to a suitably aligned buffer.
+Patch #1 is a fix for the CBC chaining issue that was discussed on the
+mailing list. The driver itself is queued for v4.11, so this fix can go
+right on top.
 
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
- arch/arm64/crypto/aes-glue.c  | 16 ++++++----------
- arch/arm64/crypto/aes-modes.S |  8 +++-----
- 2 files changed, 9 insertions(+), 15 deletions(-)
+Patches #2 - #6 clear the cra_alignmasks of various drivers: all NEON
+capable CPUs can perform unaligned accesses, and the advantage of using
+the slightly faster aligned accessors (which only exist on ARM not arm64)
+is certainly outweighed by the cost of copying data to suitably aligned
+buffers.
 
-diff --git a/arch/arm64/crypto/aes-glue.c b/arch/arm64/crypto/aes-glue.c
-index 5164aaf82c6a..8ee1fb7aaa4f 100644
---- a/arch/arm64/crypto/aes-glue.c
-+++ b/arch/arm64/crypto/aes-glue.c
-@@ -215,14 +215,15 @@ static int ctr_encrypt(struct skcipher_request *req)
- 		u8 *tsrc = walk.src.virt.addr;
- 
- 		/*
--		 * Minimum alignment is 8 bytes, so if nbytes is <= 8, we need
--		 * to tell aes_ctr_encrypt() to only read half a block.
-+		 * Tell aes_ctr_encrypt() to process a tail block.
- 		 */
--		blocks = (nbytes <= 8) ? -1 : 1;
-+		blocks = -1;
- 
--		aes_ctr_encrypt(tail, tsrc, (u8 *)ctx->key_enc, rounds,
-+		aes_ctr_encrypt(tail, NULL, (u8 *)ctx->key_enc, rounds,
- 				blocks, walk.iv, first);
--		memcpy(tdst, tail, nbytes);
-+		if (tdst != tsrc)
-+			memcpy(tdst, tsrc, nbytes);
-+		crypto_xor(tdst, tail, nbytes);
- 		err = skcipher_walk_done(&walk, 0);
- 	}
- 	kernel_neon_end();
-@@ -282,7 +283,6 @@ static struct skcipher_alg aes_algs[] = { {
- 		.cra_flags		= CRYPTO_ALG_INTERNAL,
- 		.cra_blocksize		= AES_BLOCK_SIZE,
- 		.cra_ctxsize		= sizeof(struct crypto_aes_ctx),
--		.cra_alignmask		= 7,
- 		.cra_module		= THIS_MODULE,
- 	},
- 	.min_keysize	= AES_MIN_KEY_SIZE,
-@@ -298,7 +298,6 @@ static struct skcipher_alg aes_algs[] = { {
- 		.cra_flags		= CRYPTO_ALG_INTERNAL,
- 		.cra_blocksize		= AES_BLOCK_SIZE,
- 		.cra_ctxsize		= sizeof(struct crypto_aes_ctx),
--		.cra_alignmask		= 7,
- 		.cra_module		= THIS_MODULE,
- 	},
- 	.min_keysize	= AES_MIN_KEY_SIZE,
-@@ -315,7 +314,6 @@ static struct skcipher_alg aes_algs[] = { {
- 		.cra_flags		= CRYPTO_ALG_INTERNAL,
- 		.cra_blocksize		= 1,
- 		.cra_ctxsize		= sizeof(struct crypto_aes_ctx),
--		.cra_alignmask		= 7,
- 		.cra_module		= THIS_MODULE,
- 	},
- 	.min_keysize	= AES_MIN_KEY_SIZE,
-@@ -332,7 +330,6 @@ static struct skcipher_alg aes_algs[] = { {
- 		.cra_priority		= PRIO - 1,
- 		.cra_blocksize		= 1,
- 		.cra_ctxsize		= sizeof(struct crypto_aes_ctx),
--		.cra_alignmask		= 7,
- 		.cra_module		= THIS_MODULE,
- 	},
- 	.min_keysize	= AES_MIN_KEY_SIZE,
-@@ -350,7 +347,6 @@ static struct skcipher_alg aes_algs[] = { {
- 		.cra_flags		= CRYPTO_ALG_INTERNAL,
- 		.cra_blocksize		= AES_BLOCK_SIZE,
- 		.cra_ctxsize		= sizeof(struct crypto_aes_xts_ctx),
--		.cra_alignmask		= 7,
- 		.cra_module		= THIS_MODULE,
- 	},
- 	.min_keysize	= 2 * AES_MIN_KEY_SIZE,
-diff --git a/arch/arm64/crypto/aes-modes.S b/arch/arm64/crypto/aes-modes.S
-index 838dad5c209f..92b982a8b112 100644
---- a/arch/arm64/crypto/aes-modes.S
-+++ b/arch/arm64/crypto/aes-modes.S
-@@ -337,7 +337,7 @@ AES_ENTRY(aes_ctr_encrypt)
- 
- .Lctrcarrydone:
- 	subs		w4, w4, #1
--	bmi		.Lctrhalfblock		/* blocks < 0 means 1/2 block */
-+	bmi		.Lctrtailblock		/* blocks <0 means tail block */
- 	ld1		{v3.16b}, [x1], #16
- 	eor		v3.16b, v0.16b, v3.16b
- 	st1		{v3.16b}, [x0], #16
-@@ -348,10 +348,8 @@ AES_ENTRY(aes_ctr_encrypt)
- 	FRAME_POP
- 	ret
- 
--.Lctrhalfblock:
--	ld1		{v3.8b}, [x1]
--	eor		v3.8b, v0.8b, v3.8b
--	st1		{v3.8b}, [x0]
-+.Lctrtailblock:
-+	st1		{v0.16b}, [x0]
- 	FRAME_POP
- 	ret
- 
+NOTE: patch #5 won't apply unless 'crypto: arm64/aes-blk - honour iv_out
+requirement in CBC and CTR modes' is applied first, which was sent out
+separately as a bugfix for v3.16 - v4.9. If this is a problem, this patch
+can wait.
+
+Patch #7 and #8 are minor tweaks to the new scalar AES code.
+
+Patch #9 improves the performance of the plain NEON AES code, to make it
+more suitable as a fallback for the new bitsliced NEON code, which can
+only operate on 8 blocks in parallel, and needs another driver to perform
+CBC encryption or XTS tweak generation.
+
+Patch #10 updates the new bitsliced AES NEON code to switch to the plain
+NEON driver as a fallback.
+
+Patches #9 and #10 improve the performance of CBC encryption by ~35% on
+low end cores such as the Cortex-A53 that can be found in the Raspberry Pi3
+
+Changes since v1:
+- shave off another few cycles from the sequential AES NEON code (patch #9)
+
+Ard Biesheuvel (10):
+  crypto: arm64/aes-neon-bs - honour iv_out requirement in CTR mode
+  crypto: arm/aes-ce - remove cra_alignmask
+  crypto: arm/chacha20 - remove cra_alignmask
+  crypto: arm64/aes-ce-ccm - remove cra_alignmask
+  crypto: arm64/aes-blk - remove cra_alignmask
+  crypto: arm64/chacha20 - remove cra_alignmask
+  crypto: arm64/aes - avoid literals for cross-module symbol references
+  crypto: arm64/aes - performance tweak
+  crypto: arm64/aes-neon-blk - tweak performance for low end cores
+  crypto: arm64/aes - replace scalar fallback with plain NEON fallback
+
+ arch/arm/crypto/aes-ce-core.S          |  84 ++++----
+ arch/arm/crypto/aes-ce-glue.c          |  15 +-
+ arch/arm/crypto/chacha20-neon-glue.c   |   1 -
+ arch/arm64/crypto/Kconfig              |   2 +-
+ arch/arm64/crypto/aes-ce-ccm-glue.c    |   1 -
+ arch/arm64/crypto/aes-cipher-core.S    |  59 ++----
+ arch/arm64/crypto/aes-glue.c           |  18 +-
+ arch/arm64/crypto/aes-modes.S          |   8 +-
+ arch/arm64/crypto/aes-neon.S           | 210 ++++++++------------
+ arch/arm64/crypto/aes-neonbs-core.S    |  25 ++-
+ arch/arm64/crypto/aes-neonbs-glue.c    |  38 +++-
+ arch/arm64/crypto/chacha20-neon-glue.c |   1 -
+ 12 files changed, 203 insertions(+), 259 deletions(-)
+
 -- 
 2.7.4
