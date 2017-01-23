@@ -1,99 +1,59 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v2 08/10] crypto: arm64/aes - performance tweak
-Date: Mon, 23 Jan 2017 14:05:24 +0000
-Message-ID: <1485180326-25612-9-git-send-email-ard.biesheuvel@linaro.org>
+Subject: [PATCH v2 07/10] crypto: arm64/aes - avoid literals for cross-module symbol references
+Date: Mon, 23 Jan 2017 14:05:23 +0000
+Message-ID: <1485180326-25612-8-git-send-email-ard.biesheuvel@linaro.org>
 References: <1485180326-25612-1-git-send-email-ard.biesheuvel@linaro.org>
 Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f50.google.com ([74.125.82.50]:36021 "EHLO
-        mail-wm0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750828AbdAWOFr (ORCPT
+Received: from mail-wm0-f45.google.com ([74.125.82.45]:34995 "EHLO
+        mail-wm0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750828AbdAWOFp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 23 Jan 2017 09:05:47 -0500
-Received: by mail-wm0-f50.google.com with SMTP id c85so134184190wmi.1
-        for <linux-crypto@vger.kernel.org>; Mon, 23 Jan 2017 06:05:46 -0800 (PST)
+        Mon, 23 Jan 2017 09:05:45 -0500
+Received: by mail-wm0-f45.google.com with SMTP id r126so134571186wmr.0
+        for <linux-crypto@vger.kernel.org>; Mon, 23 Jan 2017 06:05:45 -0800 (PST)
 In-Reply-To: <1485180326-25612-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Shuffle some instructions around in the __hround macro to shave off
-0.1 cycles per byte on Cortex-A57.
+Using simple adrp/add pairs to refer to the AES lookup tables exposed by
+the generic AES driver (which could be loaded far away from this driver
+when KASLR is in effect) was unreliable at module load time before commit
+41c066f2c4d4 ("arm64: assembler: make adr_l work in modules under KASLR"),
+which is why the AES code used literals instead.
+
+So now we can get rid of the literals, and switch to the adr_l macro.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm64/crypto/aes-cipher-core.S | 52 +++++++-------------
- 1 file changed, 19 insertions(+), 33 deletions(-)
+ arch/arm64/crypto/aes-cipher-core.S | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
 diff --git a/arch/arm64/crypto/aes-cipher-core.S b/arch/arm64/crypto/aes-cipher-core.S
-index cd58c61e6677..f2f9cc519309 100644
+index 37590ab8121a..cd58c61e6677 100644
 --- a/arch/arm64/crypto/aes-cipher-core.S
 +++ b/arch/arm64/crypto/aes-cipher-core.S
-@@ -20,46 +20,32 @@
- 	tt		.req	x4
- 	lt		.req	x2
+@@ -89,8 +89,8 @@ CPU_BE(	rev		w8, w8		)
+ 	eor		w7, w7, w11
+ 	eor		w8, w8, w12
  
--	.macro		__hround, out0, out1, in0, in1, in2, in3, t0, t1, enc
--	ldp		\out0, \out1, [rk], #8
+-	ldr		tt, =\ttab
+-	ldr		lt, =\ltab
++	adr_l		tt, \ttab
++	adr_l		lt, \ltab
+ 
+ 	tbnz		rounds, #1, 1f
+ 
+@@ -111,9 +111,6 @@ CPU_BE(	rev		w8, w8		)
+ 	stp		w5, w6, [out]
+ 	stp		w7, w8, [out, #8]
+ 	ret
 -
--	ubfx		w13, \in0, #0, #8
--	ubfx		w14, \in1, #8, #8
--	ldr		w13, [tt, w13, uxtw #2]
--	ldr		w14, [tt, w14, uxtw #2]
--
-+	.macro		__pair, enc, reg0, reg1, in0, in1e, in1d, shift
-+	ubfx		\reg0, \in0, #\shift, #8
- 	.if		\enc
--	ubfx		w17, \in1, #0, #8
--	ubfx		w18, \in2, #8, #8
-+	ubfx		\reg1, \in1e, #\shift, #8
- 	.else
--	ubfx		w17, \in3, #0, #8
--	ubfx		w18, \in0, #8, #8
-+	ubfx		\reg1, \in1d, #\shift, #8
- 	.endif
--	ldr		w17, [tt, w17, uxtw #2]
--	ldr		w18, [tt, w18, uxtw #2]
-+	ldr		\reg0, [tt, \reg0, uxtw #2]
-+	ldr		\reg1, [tt, \reg1, uxtw #2]
-+	.endm
- 
--	ubfx		w15, \in2, #16, #8
--	ubfx		w16, \in3, #24, #8
--	ldr		w15, [tt, w15, uxtw #2]
--	ldr		w16, [tt, w16, uxtw #2]
-+	.macro		__hround, out0, out1, in0, in1, in2, in3, t0, t1, enc
-+	ldp		\out0, \out1, [rk], #8
- 
--	.if		\enc
--	ubfx		\t0, \in3, #16, #8
--	ubfx		\t1, \in0, #24, #8
--	.else
--	ubfx		\t0, \in1, #16, #8
--	ubfx		\t1, \in2, #24, #8
--	.endif
--	ldr		\t0, [tt, \t0, uxtw #2]
--	ldr		\t1, [tt, \t1, uxtw #2]
-+	__pair		\enc, w13, w14, \in0, \in1, \in3, 0
-+	__pair		\enc, w15, w16, \in1, \in2, \in0, 8
-+	__pair		\enc, w17, w18, \in2, \in3, \in1, 16
-+	__pair		\enc, \t0, \t1, \in3, \in0, \in2, 24
- 
- 	eor		\out0, \out0, w13
--	eor		\out1, \out1, w17
--	eor		\out0, \out0, w14, ror #24
--	eor		\out1, \out1, w18, ror #24
--	eor		\out0, \out0, w15, ror #16
--	eor		\out1, \out1, \t0, ror #16
--	eor		\out0, \out0, w16, ror #8
-+	eor		\out1, \out1, w14
-+	eor		\out0, \out0, w15, ror #24
-+	eor		\out1, \out1, w16, ror #24
-+	eor		\out0, \out0, w17, ror #16
-+	eor		\out1, \out1, w18, ror #16
-+	eor		\out0, \out0, \t0, ror #8
- 	eor		\out1, \out1, \t1, ror #8
+-	.align		4
+-	.ltorg
  	.endm
  
+ 	.align		5
 -- 
 2.7.4
