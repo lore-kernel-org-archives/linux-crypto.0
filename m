@@ -1,49 +1,44 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: tcrypt - Add debug prints
-Date: Mon, 23 Jan 2017 22:59:09 +0800
-Message-ID: <20170123145909.GD20806@gondor.apana.org.au>
-References: <1484747645-17463-1-git-send-email-rabin.vincent@axis.com>
+Subject: Re: [PATCH] crypto: arm/aes-neonbs - fix issue with v2.22 and older
+ assembler
+Date: Mon, 23 Jan 2017 22:59:39 +0800
+Message-ID: <20170123145939.GE20806@gondor.apana.org.au>
+References: <1484828612-18956-1-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, Rabin Vincent <rabinv@axis.com>
-To: Rabin Vincent <rabin.vincent@axis.com>
+Cc: linux-crypto@vger.kernel.org, arnd@arndb.de,
+        paul.gortmaker@windriver.com
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:50007 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:37581 "EHLO
         helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751237AbdAWO7U (ORCPT
+        with ESMTP id S1751083AbdAWO7w (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 23 Jan 2017 09:59:20 -0500
+        Mon, 23 Jan 2017 09:59:52 -0500
 Content-Disposition: inline
-In-Reply-To: <1484747645-17463-1-git-send-email-rabin.vincent@axis.com>
+In-Reply-To: <1484828612-18956-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jan 18, 2017 at 02:54:05PM +0100, Rabin Vincent wrote:
-> From: Rabin Vincent <rabinv@axis.com>
+On Thu, Jan 19, 2017 at 12:23:32PM +0000, Ard Biesheuvel wrote:
+> The GNU assembler for ARM version 2.22 or older fails to infer the
+> element size from the vmov instructions, and aborts the build in
+> the following way;
 > 
-> tcrypt is very tight-lipped when it succeeds, but a bit more feedback
-> would be useful when developing or debugging crypto drivers, especially
-> since even a successful run ends with the module failing to insert. Add
-> a couple of debug prints, which can be enabled with dynamic debug:
+> .../aes-neonbs-core.S: Assembler messages:
+> .../aes-neonbs-core.S:817: Error: bad type for scalar -- `vmov q1h[1],r10'
+> .../aes-neonbs-core.S:817: Error: bad type for scalar -- `vmov q1h[0],r9'
+> .../aes-neonbs-core.S:817: Error: bad type for scalar -- `vmov q1l[1],r8'
+> .../aes-neonbs-core.S:817: Error: bad type for scalar -- `vmov q1l[0],r7'
+> .../aes-neonbs-core.S:818: Error: bad type for scalar -- `vmov q2h[1],r10'
+> .../aes-neonbs-core.S:818: Error: bad type for scalar -- `vmov q2h[0],r9'
+> .../aes-neonbs-core.S:818: Error: bad type for scalar -- `vmov q2l[1],r8'
+> .../aes-neonbs-core.S:818: Error: bad type for scalar -- `vmov q2l[0],r7'
 > 
-> Before:
+> Fix this by setting the element size explicitly, by replacing vmov with
+> vmov.32.
 > 
->  # insmod tcrypt.ko mode=10
->  insmod: can't insert 'tcrypt.ko': Resource temporarily unavailable
-> 
-> After:
-> 
->  # insmod tcrypt.ko mode=10 dyndbg
->  tcrypt: testing ecb(aes)
->  tcrypt: testing cbc(aes)
->  tcrypt: testing lrw(aes)
->  tcrypt: testing xts(aes)
->  tcrypt: testing ctr(aes)
->  tcrypt: testing rfc3686(ctr(aes))
->  tcrypt: all tests passed
->  insmod: can't insert 'tcrypt.ko': Resource temporarily unavailable
-> 
-> Signed-off-by: Rabin Vincent <rabinv@axis.com>
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
 Patch applied.  Thanks.
 -- 
