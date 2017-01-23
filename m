@@ -1,57 +1,57 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC PATCH 0/6] Add bulk skcipher requests to crypto API and
- dm-crypt
-Date: Mon, 23 Jan 2017 21:04:52 +0800
-Message-ID: <20170123130452.GA17598@gondor.apana.org.au>
-References: <cover.1484215956.git.omosnacek@gmail.com>
- <20170113104128.GA23497@gondor.apana.org.au>
- <CAAUqJDtqN-ugcaz4VhuW0fzLbmKt4db8ggrRmaAq_zFvO+9Lvw@mail.gmail.com>
- <20170113142959.GA24258@gondor.apana.org.au>
- <CAAUqJDsrFp2CczN5Gyy=rYLSDKi7=vQTQoyh=pE1kWue=c=fvw@mail.gmail.com>
- <20170118044828.GB4460@gondor.apana.org.au>
- <CAAUqJDtZNGLW-PcPKJD5vdKMZqd6+sAKrbjqVbaVTQqWwZ4cGQ@mail.gmail.com>
+Subject: Re: [PATCH 00/13] crypto: copy AAD during encrypt for AEAD ciphers
+Date: Mon, 23 Jan 2017 21:10:12 +0800
+Message-ID: <20170123131012.GB17598@gondor.apana.org.au>
+References: <10526995.lyZ7Je1KMx@positron.chronox.de>
+ <1704568.lHqrOxcchT@positron.chronox.de>
+ <20170113113324.GA24021@gondor.apana.org.au>
+ <2829634.RJknVxGPvY@positron.chronox.de>
+ <20170113113906.GA24096@gondor.apana.org.au>
+ <2a4fab23-3ea7-a0f7-7c30-55d301f51ec9@atmel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: 8bit
-Cc: linux-crypto@vger.kernel.org, dm-devel@redhat.com,
-        Mike Snitzer <snitzer@redhat.com>,
-        Milan Broz <gmazyland@gmail.com>,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        Binoy Jayan <binoy.jayan@linaro.org>
-To: Ondrej =?utf-8?B?TW9zbsOhxI1law==?= <omosnacek@gmail.com>
+Cc: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>,
+        linux-crypto@vger.kernel.org
+To: Cyrille Pitchen <cyrille.pitchen@atmel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:60769 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:35139 "EHLO
         helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1750718AbdAWNFD (ORCPT
+        with ESMTP id S1750714AbdAWNKn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 23 Jan 2017 08:05:03 -0500
+        Mon, 23 Jan 2017 08:10:43 -0500
 Content-Disposition: inline
-In-Reply-To: <CAAUqJDtZNGLW-PcPKJD5vdKMZqd6+sAKrbjqVbaVTQqWwZ4cGQ@mail.gmail.com>
+In-Reply-To: <2a4fab23-3ea7-a0f7-7c30-55d301f51ec9@atmel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jan 19, 2017 at 03:21:37PM +0100, Ondrej MosnÃ¡Äek wrote:
+On Fri, Jan 20, 2017 at 06:07:04PM +0100, Cyrille Pitchen wrote:
+> Hi all,
 > 
-> Hm, I just looked at what the IPsec IV generation is actually doing
-> and it seems to me that it's basically a crypto template that just
-> somehow transforms the IV before it is passed to the child cipher... I
-> thought for a while that you were implying that there already is some
-> facility in the crypto API that allows submitting multiple messages +
-> some initial sequence number that is auto-incremented and IVs are
-> generated from the numbers. However, I could not find anything like
-> that in the code, so now I think what you meant was just that I should
-> somehow pull the actual IV generators into the crypto layer so that
-> the IVs can be generated inside the hardware.
+> Le 13/01/2017 à 12:39, Herbert Xu a écrit :
+> > On Fri, Jan 13, 2017 at 12:36:56PM +0100, Stephan Müller wrote:
+> >>
+> >> I thought I understood that you would not want to see it in any 
+> >> implementation. But, ok, if you want to leave it.
+> > 
+> > If you remove it from authenc then authenc will be broken.
+> > 
+> 
+> Hence if the copy of the associated data is needed in the crypto/authenc.c
+> driver, then I should also keep this copy in the drivers/crypto/atmel-aes.c
+> for authenc(hmac(shaX),cbc-aes) algorithms [1], shouldn't I?
+> 
+> If so, should I keep the current not optimized implementation of
+> atmel_aes_authenc_copy_assoc() or try to use the code extracted by Stephan
+> from crypto/authenc.c using the null cipher as proposed in this thread?
+> 
+> As said earlier in this thread, copying the associated data is not a so big
+> deal when compared to the main crypto processing.
 
-IPsec currently only deals with one packet at a time, but the
-point is that the IV generator handles everything transparently
-and the IV is actually part of the cipher text for the AEAD op.
+Please just ignore this for now.  We have not decided to require
+the copying of the AAD in the kernel API.
 
-IOW it would be trivial to extend our current IPsec IV generators
-to handle multiple packets as the IVs are embedded with the cipher
-text.
-
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
