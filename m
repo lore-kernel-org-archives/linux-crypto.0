@@ -1,65 +1,69 @@
-From: Rabin Vincent <rabin.vincent@axis.com>
-Subject: Re: [PATCH] crypto: tcrypt - Add mode to test specified algs
-Date: Mon, 23 Jan 2017 16:13:04 +0100
-Message-ID: <20170123151304.GA20450@axis.com>
-References: <1484756700-10019-1-git-send-email-rabin.vincent@axis.com>
- <20170123141403.GC19957@gondor.apana.org.au>
+From: Denys Vlasenko <dvlasenk@redhat.com>
+Subject: Re: [PATCH] x86/crypto: make constants readonly, allow linker to
+ merge them
+Date: Mon, 23 Jan 2017 16:21:11 +0100
+Message-ID: <eec46e0c-0205-4ba6-46ff-75e22d83214e@redhat.com>
+References: <20170119213304.18140-1-dvlasenk@redhat.com>
+ <alpine.DEB.2.20.1701200006100.5358@nanos>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from bastet.se.axis.com ([195.60.68.11]:44010 "EHLO
-        bastet.se.axis.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750705AbdAWPNH (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 23 Jan 2017 10:13:07 -0500
-Content-Disposition: inline
-In-Reply-To: <20170123141403.GC19957@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Xiaodong Liu <xiaodong.liu@intel.com>,
+        Megha Dey <megha.dey@intel.com>, linux-crypto@vger.kernel.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org
+To: Thomas Gleixner <tglx@linutronix.de>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <alpine.DEB.2.20.1701200006100.5358@nanos>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Jan 23, 2017 at 10:14:03PM +0800, Herbert Xu wrote:
-> On Wed, Jan 18, 2017 at 05:25:00PM +0100, Rabin Vincent wrote:
-> > From: Rabin Vincent <rabinv@axis.com>
-> > tcrypt offers a bunch of mode= values to test various (groups of)
-> > algorithms, but there is no way provided to test a subset of the
-> > algorithms.  This adds a new mode=2000 which interprets alg= as a
-> > colon-separated list of algorithms to test with alg_test().  Colon is
-> > used since the names may contain commas.
-> > 
-> > This is useful during driver development and also for regression testing
-> > to avoid the errors that are otherwise generated when attempting to test
-> > non-enabled algorithms.
-> > 
-> >  # insmod tcrypt.ko dyndbg mode=2000 alg="cbc(aes):ecb(aes):hmac(sha256):sha256:xts(aes)"
-> >  [  649.418569] tcrypt: testing cbc(aes)
-> >  [  649.420809] tcrypt: testing ecb(aes)
-> >  [  649.422627] tcrypt: testing hmac(sha256)
-> >  [  649.424861] tcrypt: testing sha256
-> >  [  649.426368] tcrypt: testing xts(aes)
-> >  [  649.430014] tcrypt: all tests passed
-> > 
-> > Signed-off-by: Rabin Vincent <rabinv@axis.com>
-> 
-> You can already do this with the existing mode=0 setting, no?
+On 01/20/2017 12:09 AM, Thomas Gleixner wrote:
+> On Thu, 19 Jan 2017, Denys Vlasenko wrote:
+>
+>> A lot of asm-optimized routines in arch/x86/crypto/ keep its
+>> constants in .data. This is wrong, they should be on .rodata.
+>>
+>> Mnay of these constants are the same in different modules.
+>> For example, 128-bit shuffle mask 0x000102030405060708090A0B0C0D0E0F
+>> exists in at least half a dozen places.
+>>
+>> There is a way to let linker merge them and use just one copy.
+>> The rules are as follows: mergeable objects of different sizes
+>> should not share sections. You can't put them all in one .rodata
+>> section, they will lose "mergeability".
+>>
+>> GCC puts its mergeable constants in ".rodata.cstSIZE" sections,
+>> or ".rodata.cstSIZE.<object_name>" if -fdata-sections is used.
+>> This patch does the same:
+>>
+>> 	.section .rodata.cst16.SHUF_MASK, "aM", @progbits, 16
+>>
+>> It is important that all data in such section consists of
+>> 16-byte elements, not larger ones, and there are no implicit
+>> use of one element from another.
+>>
+>> When this is not the case, use non-mergeable section:
+>>
+>> 	.section .rodata[.VAR_NAME], "a", @progbits
+>>
+>> This reduces .data by ~15 kbytes:
+>>
+>>     text    data     bss     dec      hex filename
+>> 11097415 2705840 2630712 16433967  fac32f vmlinux-prev.o
+>> 11112095 2690672 2630712 16433479  fac147 vmlinux.o
+>
+> And at the same time it increases text size by ~15k. The overall change in
+> total size is 488 byte reduction. Weird.
 
-That's what I thought so too, but that doesn't seem to be the case.  The
-mode=0 handling is this:
+Of course: the constants do need to go somewhere. They migrate to
+.rodata.blabla sections, which eventually got appended to read-only .text
 
-	switch (m) {
-	case 0:
-		if (alg) {
-			if (!crypto_has_alg(alg, type,
-					    mask ?: CRYPTO_ALG_TYPE_MASK))
-				ret = -ENOENT;
-			break;
-		}
+Without merging, if I would just move constants to .rodata,
+there would be no net size win at all.
 
-		for (i = 1; i < 200; i++)
-			ret += do_test(NULL, 0, 0, i);
-		break;
-
-So, if alg= is specified, after first checking if the specified alg is
-present, it just goes ahead and runs all the tests.  I'm not sure what
-mode=0 alg=foo is meant to be used for.
+I did not look deepper why the overall change is smaller than expected.
+It may be affected by changed padding. The linker is not too clever
+about it, and also IIRC we don't actually giving it the best options
+to sort sections during link time to pack them better.
