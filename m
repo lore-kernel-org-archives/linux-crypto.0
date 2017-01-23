@@ -1,46 +1,49 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: arm/aes-neonbs - fix issue with v2.22 and older
- assembler
-Date: Mon, 23 Jan 2017 22:59:39 +0800
-Message-ID: <20170123145939.GE20806@gondor.apana.org.au>
-References: <1484828612-18956-1-git-send-email-ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH] crypto: tcrypt - Add mode to test specified algs
+Date: Mon, 23 Jan 2017 22:14:03 +0800
+Message-ID: <20170123141403.GC19957@gondor.apana.org.au>
+References: <1484756700-10019-1-git-send-email-rabin.vincent@axis.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, arnd@arndb.de,
-        paul.gortmaker@windriver.com
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: linux-crypto@vger.kernel.org, Rabin Vincent <rabinv@axis.com>
+To: Rabin Vincent <rabin.vincent@axis.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:37581 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:41439 "EHLO
         helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751083AbdAWO7w (ORCPT
+        with ESMTP id S1751083AbdAWPAG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 23 Jan 2017 09:59:52 -0500
+        Mon, 23 Jan 2017 10:00:06 -0500
 Content-Disposition: inline
-In-Reply-To: <1484828612-18956-1-git-send-email-ard.biesheuvel@linaro.org>
+In-Reply-To: <1484756700-10019-1-git-send-email-rabin.vincent@axis.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jan 19, 2017 at 12:23:32PM +0000, Ard Biesheuvel wrote:
-> The GNU assembler for ARM version 2.22 or older fails to infer the
-> element size from the vmov instructions, and aborts the build in
-> the following way;
+On Wed, Jan 18, 2017 at 05:25:00PM +0100, Rabin Vincent wrote:
+> From: Rabin Vincent <rabinv@axis.com>
 > 
-> .../aes-neonbs-core.S: Assembler messages:
-> .../aes-neonbs-core.S:817: Error: bad type for scalar -- `vmov q1h[1],r10'
-> .../aes-neonbs-core.S:817: Error: bad type for scalar -- `vmov q1h[0],r9'
-> .../aes-neonbs-core.S:817: Error: bad type for scalar -- `vmov q1l[1],r8'
-> .../aes-neonbs-core.S:817: Error: bad type for scalar -- `vmov q1l[0],r7'
-> .../aes-neonbs-core.S:818: Error: bad type for scalar -- `vmov q2h[1],r10'
-> .../aes-neonbs-core.S:818: Error: bad type for scalar -- `vmov q2h[0],r9'
-> .../aes-neonbs-core.S:818: Error: bad type for scalar -- `vmov q2l[1],r8'
-> .../aes-neonbs-core.S:818: Error: bad type for scalar -- `vmov q2l[0],r7'
+> tcrypt offers a bunch of mode= values to test various (groups of)
+> algorithms, but there is no way provided to test a subset of the
+> algorithms.  This adds a new mode=2000 which interprets alg= as a
+> colon-separated list of algorithms to test with alg_test().  Colon is
+> used since the names may contain commas.
 > 
-> Fix this by setting the element size explicitly, by replacing vmov with
-> vmov.32.
+> This is useful during driver development and also for regression testing
+> to avoid the errors that are otherwise generated when attempting to test
+> non-enabled algorithms.
 > 
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+>  # insmod tcrypt.ko dyndbg mode=2000 alg="cbc(aes):ecb(aes):hmac(sha256):sha256:xts(aes)"
+>  [  649.418569] tcrypt: testing cbc(aes)
+>  [  649.420809] tcrypt: testing ecb(aes)
+>  [  649.422627] tcrypt: testing hmac(sha256)
+>  [  649.424861] tcrypt: testing sha256
+>  [  649.426368] tcrypt: testing xts(aes)
+>  [  649.430014] tcrypt: all tests passed
+> 
+> Signed-off-by: Rabin Vincent <rabinv@axis.com>
 
-Patch applied.  Thanks.
+You can already do this with the existing mode=0 setting, no?
+
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
