@@ -1,57 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/8] update mediatek crypto driver
-Date: Mon, 23 Jan 2017 23:01:35 +0800
-Message-ID: <20170123150135.GH20806@gondor.apana.org.au>
-References: <1484890875-57105-1-git-send-email-ryder.lee@mediatek.com>
+Subject: Re: [PATCH] crypto: vmx -- disable preemption to enable vsx in
+ aes_ctr.c
+Date: Mon, 23 Jan 2017 23:03:45 +0800
+Message-ID: <20170123150345.GA21071@gondor.apana.org.au>
+References: <1484901333.8207.11.camel@TP420>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-To: Ryder Lee <ryder.lee@mediatek.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org, leosilva@linux.vnet.ibm.com,
+        pfsmorigo@linux.vnet.ibm.com
+To: Li Zhong <zhong@linux.vnet.ibm.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:59063 "EHLO
+        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1750705AbdAWPFX (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 23 Jan 2017 10:05:23 -0500
 Content-Disposition: inline
-In-Reply-To: <1484890875-57105-1-git-send-email-ryder.lee@mediatek.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1484901333.8207.11.camel@TP420>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jan 20, 2017 at 01:41:07PM +0800, Ryder Lee wrote:
-> Hi,
+Li Zhong <zhong@linux.vnet.ibm.com> wrote:
+> Some preemptible check warnings were reported from enable_kernel_vsx(). This
+> patch disables preemption in aes_ctr.c before enabling vsx, and they are now 
+> consistent with other files in the same directory.
 > 
-> This series of patches is a global rework of the mtk driver.
-> Fix bug - incomplete DMA data transfer when SG buffer dst.len != src.len
-> 
-> It also updates some part of the code to make them more generic. For
-> instance the crypto request queue management supports both async block
-> cipher and AEAD requests, which allows us to add support the the GCM mode.
-> GMAC mode is not supported yet.
-> 
-> Current implementation was validated using the tcrypt
-> module running modes:
-> - 10: ecb(aes), cbc(aes), ctr(aes), rfc3686(ctr(aes))
-> - 35: gcm(aes)
-> - 2,6,11,12: sha1, sha2 family
-> 
-> tcrypt speed test was run with modes:
-> - 211: rfc4106(gcm(aes)), gcm(aes)
-> - 500: ecb(aes), cbc(aes), ctr(aes), rfc3686(ctr(aes))
-> - 403 ~ 406: sha1, sha2 family
-> 
-> IxChariot multiple pairs throughput 24 hours test:
-> - IPSec VPN
-> - MACSec
-> 
-> Ryder Lee (8):
->   crypto: mediatek - move HW control data to transformation context
->   crypto: mediatek - fix incorrect data transfer result
->   crypto: mediatek - make crypto request queue management more generic
->   crypto: mediatek - rework crypto request completion
->   crypto: mediatek - regroup functions by usage
->   crypto: mediatek - fix typo and indentation
->   crypto: mediatek - add support to CTR mode
->   crypto: mediatek - add support to GCM mode
+> Signed-off-by: Li Zhong <zhong@linux.vnet.ibm.com>
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
