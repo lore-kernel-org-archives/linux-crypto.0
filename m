@@ -1,40 +1,80 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [PATCH] crypto: doc - Fix hash export state information
-Date: Wed, 25 Jan 2017 17:18:05 +0100
-Message-ID: <5671933.EqcuFpxzUF@tauon.atsec.com>
-References: <1485359706-7184-1-git-send-email-rabin.vincent@axis.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        Rabin Vincent <rabinv@axis.com>
-To: Rabin Vincent <rabin.vincent@axis.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:55638 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751008AbdAYQSJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 25 Jan 2017 11:18:09 -0500
-In-Reply-To: <1485359706-7184-1-git-send-email-rabin.vincent@axis.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Rob Rice <rob.rice-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
+Subject: [PATCH v3 0/3] Add Broadcom SPU Crypto Driver
+Date: Wed, 25 Jan 2017 11:44:46 -0500
+Message-ID: <1485362689-11294-1-git-send-email-rob.rice@broadcom.com>
+Cc: Rob Rice <rob.rice-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
+To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+        "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
+        linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        bcm-kernel-feedback-list-dY08KVG/lbpWk0Htik3J/w@public.gmane.org,
+        Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>,
+        Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>,
+        linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Mittwoch, 25. Januar 2017, 16:55:06 CET schrieb Rabin Vincent:
+Changes in v3:
+- rebase to 4.10-rc3 in cryptodev-2.6 tree
+- in bindings doc, list all valid compatibility strings
+- rename DT nodes "crypto" rather than "spu-crypto"
+- include a separate DT node for each SPU hardware block. Previously,
+ there was a single SPU node listing a register range for each
+ hw block.
+- select hash algos in Kconfig. Driver HMAC implementation uses hash
+ sw algos for inner and outer hashes.
+- Fix crash for AES CCM decrypt when AAD and data are both empty
 
-Hi Rabin,
+Change in v2:
+- select CRYPTO_DES in Kconfig
 
-> From: Rabin Vincent <rabinv@axis.com>
-> 
-> The documentation states that crypto_ahash_reqsize() provides the size
-> of the state structure used by crypto_ahash_export().  But it's actually
-> crypto_ahash_statesize() which provides this size.
+The Broadcom SPU crypto driver provides access to SPU hardware
+for symmetric crypto offload. The driver supports ablkcipher,
+ahash, and aead operations. The driver supports several
+Broadcom SoCs with different revisions of the SPU hardware.
+The driver supports SPU-M and SPU2 hardware revisions, and
+a couple versions of each hw revision, each version with minor
+differences.
 
-ack for the statesize documentation addition.
+Rob Rice (3):
+  crypto: brcm: DT documentation for Broadcom SPU hardware
+  crypto: brcm: Add Broadcom SPU driver
+  arm64: dts: ns2: Add Broadcom SPU driver DT entry.
 
-In addition, can you please add crypto_ahash_statesize to Documentation/
-crypto/api-digest.rst.
+ .../devicetree/bindings/crypto/brcm,spu-crypto.txt |   22 +
+ arch/arm64/boot/dts/broadcom/ns2.dtsi              |   24 +
+ drivers/crypto/Kconfig                             |   15 +
+ drivers/crypto/Makefile                            |    2 +
+ drivers/crypto/bcm/Makefile                        |   15 +
+ drivers/crypto/bcm/cipher.c                        | 4955 ++++++++++++++++++++
+ drivers/crypto/bcm/cipher.h                        |  475 ++
+ drivers/crypto/bcm/spu.c                           | 1252 +++++
+ drivers/crypto/bcm/spu.h                           |  288 ++
+ drivers/crypto/bcm/spu2.c                          | 1402 ++++++
+ drivers/crypto/bcm/spu2.h                          |  228 +
+ drivers/crypto/bcm/spum.h                          |  174 +
+ drivers/crypto/bcm/util.c                          |  581 +++
+ drivers/crypto/bcm/util.h                          |  116 +
+ 14 files changed, 9549 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/brcm,spu-crypto.txt
+ create mode 100644 drivers/crypto/bcm/Makefile
+ create mode 100644 drivers/crypto/bcm/cipher.c
+ create mode 100644 drivers/crypto/bcm/cipher.h
+ create mode 100644 drivers/crypto/bcm/spu.c
+ create mode 100644 drivers/crypto/bcm/spu.h
+ create mode 100644 drivers/crypto/bcm/spu2.c
+ create mode 100644 drivers/crypto/bcm/spu2.h
+ create mode 100644 drivers/crypto/bcm/spum.h
+ create mode 100644 drivers/crypto/bcm/util.c
+ create mode 100644 drivers/crypto/bcm/util.h
 
-nack - The documentation is quite right for reqsize: it returns the *request 
-data structure* size as documented.
+-- 
+2.1.0
 
-Ciao
-Stephan
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
