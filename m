@@ -1,88 +1,76 @@
-From: Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
-Subject: Re: [PATCH v4 1/4] lib: Update LZ4 compressor module
-Date: Tue, 24 Jan 2017 17:48:02 +0100
-Message-ID: <20170124164802.GA1108@bierbaron.springfield.local>
-References: <1482259992-16680-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
- <1485113717-29261-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
- <1485113717-29261-2-git-send-email-4sschmid@informatik.uni-hamburg.de>
- <20170123162357.69f8b6a8717af086a03b512e@linux-foundation.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: bongkyu.kim@lge.com, rsalvaterra@gmail.com,
-        sergey.senozhatsky@gmail.com, gregkh@linuxfoundation.org,
-        linux-kernel@vger.kernel.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net, linux-crypto@vger.kernel.org,
-        anton@enomsg.org, ccross@android.com, keescook@chromium.org,
-        tony.luck@intel.com, phillip@squashfs.org.uk
-To: Andrew Morton <akpm@linux-foundation.org>
+From: Rabin Vincent <rabin.vincent@axis.com>
+Subject: [PATCH] crypto: doc - Fix hash export state information
+Date: Wed, 25 Jan 2017 16:55:06 +0100
+Message-ID: <1485359706-7184-1-git-send-email-rabin.vincent@axis.com>
+Cc: linux-crypto@vger.kernel.org, smueller@chronox.de,
+        Rabin Vincent <rabinv@axis.com>
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mxchg01.rrz.uni-hamburg.de ([134.100.38.111]:43817 "EHLO
-        mxchg01.rrz.uni-hamburg.de" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1750716AbdAXQ6L (ORCPT
+Received: from bastet.se.axis.com ([195.60.68.11]:41293 "EHLO
+        bastet.se.axis.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751429AbdAYPzK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 24 Jan 2017 11:58:11 -0500
-Content-Disposition: inline
-In-Reply-To: <20170123162357.69f8b6a8717af086a03b512e@linux-foundation.org>
+        Wed, 25 Jan 2017 10:55:10 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jan 23, 2017 at 04:23:57PM -0800, Andrew Morton wrote:
-> On Sun, 22 Jan 2017 20:35:14 +0100 Sven Schmidt <4sschmid@informatik.uni-hamburg.de> wrote:
-> 
-> > This patch updates LZ4 kernel module to LZ4 v1.7.3 by Yann Collet.
-> > The kernel module is inspired by the previous work by Chanho Min.
-> > The updated LZ4 module will not break existing code since there were alias
-> > methods added to ensure backwards compatibility.
-> > 
-> > API changes:
-> > 
-> > New method LZ4_compress_fast which differs from the variant available
-> > in kernel by the new acceleration parameter,
-> > allowing to trade compression ratio for more compression speed
-> > and vice versa.
-> > 
-> > LZ4_decompress_fast is the respective decompression method, featuring a very
-> > fast decoder (multiple GB/s per core), able to reach RAM speed in multi-core
-> > systems. The decompressor allows to decompress data compressed with
-> > LZ4 fast as well as the LZ4 HC (high compression) algorithm.
-> > 
-> > Also the useful functions LZ4_decompress_safe_partial
-> > LZ4_compress_destsize were added. The latter reverses the logic by trying to
-> > compress as much data as possible from source to dest while the former aims
-> > to decompress partial blocks of data.
-> > 
-> > A bunch of streaming functions were also added
-> > which allow compressig/decompressing data in multiple steps
-> > (so called "streaming mode").
-> > 
-> > The methods lz4_compress and lz4_decompress_unknownoutputsize
-> > are now known as LZ4_compress_default respectivley LZ4_decompress_safe.
-> > The old methods are still available for providing backwards compatibility.
-> > 
-> > ...
-> >
-> > +/*
-> > + * For backward compatibility
-> > + */
-> > +static inline int lz4_compressbound(size_t isize)
-> >  {
-> 
-> Do we actually need the back-compat wrappers?  After your other three
-> patches we have no callers, correct?  If so, we should go ahead and
-> eliminate such back-compatibility interfaces.
-> 
-> 
-> > -	return isize + (isize / 255) + 16;
-> > +	return LZ4_COMPRESSBOUND(isize);
-> >  }
-> 
+From: Rabin Vincent <rabinv@axis.com>
 
-Hey Andrew,
+The documentation states that crypto_ahash_reqsize() provides the size
+of the state structure used by crypto_ahash_export().  But it's actually
+crypto_ahash_statesize() which provides this size.
 
-you're absolutely right. Since I changed the callers to use the new functions, we do not need these wrappers anymore.
+Signed-off-by: Rabin Vincent <rabinv@axis.com>
+---
+ include/crypto/hash.h | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
-I will add a patch removing them and send an update.
-
-Thanks,
-
-Sven
+diff --git a/include/crypto/hash.h b/include/crypto/hash.h
+index 216a2b8..26ebbbc 100644
+--- a/include/crypto/hash.h
++++ b/include/crypto/hash.h
+@@ -329,6 +329,16 @@ static inline unsigned int crypto_ahash_digestsize(struct crypto_ahash *tfm)
+ 	return crypto_hash_alg_common(tfm)->digestsize;
+ }
+ 
++/**
++ * crypto_ahash_statesize() - obtain size of the ahash state
++ * @tfm: cipher handle
++ *
++ * Return the size of the ahash state. With the crypto_ahash_export
++ * function, the caller can export the state into a buffer whose size is
++ * defined with this function.
++ *
++ * Return: size of the ahash state
++ */
+ static inline unsigned int crypto_ahash_statesize(struct crypto_ahash *tfm)
+ {
+ 	return crypto_hash_alg_common(tfm)->statesize;
+@@ -365,16 +375,6 @@ static inline struct crypto_ahash *crypto_ahash_reqtfm(
+ 	return __crypto_ahash_cast(req->base.tfm);
+ }
+ 
+-/**
+- * crypto_ahash_reqsize() - obtain size of the request data structure
+- * @tfm: cipher handle
+- *
+- * Return the size of the ahash state size. With the crypto_ahash_export
+- * function, the caller can export the state into a buffer whose size is
+- * defined with this function.
+- *
+- * Return: size of the ahash state
+- */
+ static inline unsigned int crypto_ahash_reqsize(struct crypto_ahash *tfm)
+ {
+ 	return tfm->reqsize;
+@@ -453,7 +453,7 @@ int crypto_ahash_digest(struct ahash_request *req);
+  *
+  * This function exports the hash state of the ahash_request handle into the
+  * caller-allocated output buffer out which must have sufficient size (e.g. by
+- * calling crypto_ahash_reqsize).
++ * calling crypto_ahash_statesize).
+  *
+  * Return: 0 if the export was successful; < 0 if an error occurred
+  */
+-- 
+2.1.4
