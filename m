@@ -1,7 +1,7 @@
 From: Rob Rice <rob.rice@broadcom.com>
-Subject: [PATCH v3 3/3] arm64: dts: ns2: Add Broadcom SPU driver DT entry.
-Date: Wed, 25 Jan 2017 11:44:49 -0500
-Message-ID: <1485362689-11294-4-git-send-email-rob.rice@broadcom.com>
+Subject: [PATCH v3 1/3] crypto: brcm: DT documentation for Broadcom SPU hardware
+Date: Wed, 25 Jan 2017 11:44:47 -0500
+Message-ID: <1485362689-11294-2-git-send-email-rob.rice@broadcom.com>
 References: <1485362689-11294-1-git-send-email-rob.rice@broadcom.com>
 Cc: Rob Rice <rob.rice@broadcom.com>,
         Steve Lin <steven.lin1@broadcom.com>
@@ -20,70 +20,43 @@ In-Reply-To: <1485362689-11294-1-git-send-email-rob.rice@broadcom.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add Northstar2 device tree entry for Broadcom Secure Processing
-Unit (SPU) crypto hardware.
+Device tree documentation for Broadcom Secure Processing Unit
+(SPU) crypto hardware.
 
 Signed-off-by: Steve Lin <steven.lin1@broadcom.com>
 Signed-off-by: Rob Rice <rob.rice@broadcom.com>
 ---
- arch/arm64/boot/dts/broadcom/ns2.dtsi | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ .../devicetree/bindings/crypto/brcm,spu-crypto.txt | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/brcm,spu-crypto.txt
 
-diff --git a/arch/arm64/boot/dts/broadcom/ns2.dtsi b/arch/arm64/boot/dts/broadcom/ns2.dtsi
-index 4fcdeca..ec1a628 100644
---- a/arch/arm64/boot/dts/broadcom/ns2.dtsi
-+++ b/arch/arm64/boot/dts/broadcom/ns2.dtsi
-@@ -218,6 +218,12 @@
- 			brcm,use-bcm-hdr;
- 		};
- 
-+		crypto0: crypto@612d0000 {
-+			compatible = "brcm,spum-crypto";
-+			reg = <0x612d0000 0x900>;
-+			mboxes = <&pdc0 0>;
-+		};
+diff --git a/Documentation/devicetree/bindings/crypto/brcm,spu-crypto.txt b/Documentation/devicetree/bindings/crypto/brcm,spu-crypto.txt
+new file mode 100644
+index 0000000..29b6007
+--- /dev/null
++++ b/Documentation/devicetree/bindings/crypto/brcm,spu-crypto.txt
+@@ -0,0 +1,22 @@
++The Broadcom Secure Processing Unit (SPU) hardware supports symmetric
++cryptographic offload for Broadcom SoCs. A SoC may have multiple SPU hardware
++blocks.
 +
- 		pdc1: iproc-pdc1@612e0000 {
- 			compatible = "brcm,iproc-pdc-mbox";
- 			reg = <0x612e0000 0x445>;  /* PDC FS1 regs */
-@@ -227,6 +233,12 @@
- 			brcm,use-bcm-hdr;
- 		};
- 
-+		crypto1: crypto@612f0000 {
-+			compatible = "brcm,spum-crypto";
-+			reg = <0x612f0000 0x900>;
-+			mboxes = <&pdc1 0>;
-+		};
++Required properties:
++- compatible: Should be one of the following:
++  brcm,spum-crypto - for devices with SPU-M hardware
++  brcm,spu2-crypto - for devices with SPU2 hardware
++  brcm,spu2-v2-crypto - for devices with enhanced SPU2 hardware features like SHA3
++  and Rabin Fingerprint support
++  brcm,spum-nsp-crypto - for the Northstar Plus variant of the SPU-M hardware
 +
- 		pdc2: iproc-pdc2@61300000 {
- 			compatible = "brcm,iproc-pdc-mbox";
- 			reg = <0x61300000 0x445>;  /* PDC FS2 regs */
-@@ -236,6 +248,12 @@
- 			brcm,use-bcm-hdr;
- 		};
- 
-+		crypto2: crypto@61310000 {
-+			compatible = "brcm,spum-crypto";
-+			reg = <0x61310000 0x900>;
-+			mboxes = <&pdc2 0>;
-+		};
++- reg: Should contain SPU registers location and length.
++- mboxes: The mailbox channel to be used to communicate with the SPU.
++  Mailbox channels correspond to DMA rings on the device.
 +
- 		pdc3: iproc-pdc3@61320000 {
- 			compatible = "brcm,iproc-pdc-mbox";
- 			reg = <0x61320000 0x445>;  /* PDC FS3 regs */
-@@ -245,6 +263,12 @@
- 			brcm,use-bcm-hdr;
- 		};
- 
-+		crypto3: crypto@61330000 {
-+			compatible = "brcm,spum-crypto";
-+			reg = <0x61330000 0x900>;
-+			mboxes = <&pdc3 0>;
-+		};
-+
- 		dma0: dma@61360000 {
- 			compatible = "arm,pl330", "arm,primecell";
- 			reg = <0x61360000 0x1000>;
++Example:
++	crypto@612d0000 {
++		compatible = "brcm,spum-crypto";
++		reg = <0 0x612d0000 0 0x900>;
++		mboxes = <&pdc0 0>;
++	};
 -- 
 2.1.0
