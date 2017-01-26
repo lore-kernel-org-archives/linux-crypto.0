@@ -1,7 +1,7 @@
 From: Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
-Subject: [PATCH v5 4/5] fs/pstore: fs/squashfs: Change usage of LZ4 to work with new LZ4 version
-Date: Thu, 26 Jan 2017 08:57:34 +0100
-Message-ID: <1485417455-31726-5-git-send-email-4sschmid@informatik.uni-hamburg.de>
+Subject: [PATCH v5 3/5] crypto: Change LZ4 modules to work with new LZ4 module version
+Date: Thu, 26 Jan 2017 08:57:33 +0100
+Message-ID: <1485417455-31726-4-git-send-email-4sschmid@informatik.uni-hamburg.de>
 References: <1482259992-16680-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
  <1485417455-31726-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
 Cc: bongkyu.kim@lge.com, rsalvaterra@gmail.com,
@@ -12,101 +12,114 @@ Cc: bongkyu.kim@lge.com, rsalvaterra@gmail.com,
         tony.luck@intel.com,
         Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
 To: akpm@linux-foundation.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mxchg01.rrz.uni-hamburg.de ([134.100.38.111]:51582 "EHLO
+        mxchg01.rrz.uni-hamburg.de" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1752883AbdAZH6B (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 26 Jan 2017 02:58:01 -0500
 In-Reply-To: <1485417455-31726-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-This patch updates fs/pstore and fs/squashfs to use the updated
-functions from the new LZ4 module.
+This patch updates the crypto modules using LZ4 compression
+to work with the new LZ4 module version.
 
 Signed-off-by: Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
 ---
- fs/pstore/platform.c      | 14 +++++++-------
- fs/squashfs/lz4_wrapper.c | 12 ++++++------
- 2 files changed, 13 insertions(+), 13 deletions(-)
+ crypto/lz4.c   | 21 ++++++++-------------
+ crypto/lz4hc.c | 21 ++++++++-------------
+ 2 files changed, 16 insertions(+), 26 deletions(-)
 
-diff --git a/fs/pstore/platform.c b/fs/pstore/platform.c
-index 729677e..85c4c58 100644
---- a/fs/pstore/platform.c
-+++ b/fs/pstore/platform.c
-@@ -342,31 +342,31 @@ static int compress_lz4(const void *in, void *out, size_t inlen, size_t outlen)
+diff --git a/crypto/lz4.c b/crypto/lz4.c
+index 99c1b2c..40fd2c2 100644
+--- a/crypto/lz4.c
++++ b/crypto/lz4.c
+@@ -66,15 +66,13 @@ static void lz4_exit(struct crypto_tfm *tfm)
+ static int __lz4_compress_crypto(const u8 *src, unsigned int slen,
+ 				 u8 *dst, unsigned int *dlen, void *ctx)
  {
- 	int ret;
+-	size_t tmp_len = *dlen;
+-	int err;
++	int out_len = LZ4_compress_default(src, dst,
++		slen, (int)((size_t)dlen), ctx);
  
--	ret = lz4_compress(in, inlen, out, &outlen, workspace);
--	if (ret) {
-+	ret = LZ4_compress_default(in, out, inlen, outlen, workspace);
-+	if (!ret) {
- 		pr_err("lz4_compress error, ret = %d!\n", ret);
- 		return -EIO;
- 	}
+-	err = lz4_compress(src, slen, dst, &tmp_len, ctx);
+-
+-	if (err < 0)
++	if (!out_len)
+ 		return -EINVAL;
  
--	return outlen;
-+	return ret;
+-	*dlen = tmp_len;
++	*dlen = out_len;
+ 	return 0;
  }
  
- static int decompress_lz4(void *in, void *out, size_t inlen, size_t outlen)
+@@ -96,16 +94,13 @@ static int lz4_compress_crypto(struct crypto_tfm *tfm, const u8 *src,
+ static int __lz4_decompress_crypto(const u8 *src, unsigned int slen,
+ 				   u8 *dst, unsigned int *dlen, void *ctx)
  {
- 	int ret;
+-	int err;
+-	size_t tmp_len = *dlen;
+-	size_t __slen = slen;
++	int out_len = LZ4_decompress_safe(src, dst, slen, (int)((size_t)dlen));
  
--	ret = lz4_decompress_unknownoutputsize(in, inlen, out, &outlen);
--	if (ret) {
-+	ret = LZ4_decompress_safe(in, out, inlen, outlen);
-+	if (ret < 0) {
- 		pr_err("lz4_decompress error, ret = %d!\n", ret);
- 		return -EIO;
- 	}
+-	err = lz4_decompress_unknownoutputsize(src, __slen, dst, &tmp_len);
+-	if (err < 0)
++	if (out_len < 0)
+ 		return -EINVAL;
  
--	return outlen;
-+	return ret;
+-	*dlen = tmp_len;
+-	return err;
++	*dlen = out_len;
++	return out_len;
  }
  
- static void allocate_lz4(void)
+ static int lz4_sdecompress(struct crypto_scomp *tfm, const u8 *src,
+diff --git a/crypto/lz4hc.c b/crypto/lz4hc.c
+index 75ffc4a..6f16f96 100644
+--- a/crypto/lz4hc.c
++++ b/crypto/lz4hc.c
+@@ -65,15 +65,13 @@ static void lz4hc_exit(struct crypto_tfm *tfm)
+ static int __lz4hc_compress_crypto(const u8 *src, unsigned int slen,
+ 				   u8 *dst, unsigned int *dlen, void *ctx)
  {
--	big_oops_buf_sz = lz4_compressbound(psinfo->bufsize);
-+	big_oops_buf_sz = LZ4_compressBound(psinfo->bufsize);
- 	big_oops_buf = kmalloc(big_oops_buf_sz, GFP_KERNEL);
- 	if (big_oops_buf) {
- 		workspace = kmalloc(LZ4_MEM_COMPRESS, GFP_KERNEL);
-diff --git a/fs/squashfs/lz4_wrapper.c b/fs/squashfs/lz4_wrapper.c
-index ff4468b..95da653 100644
---- a/fs/squashfs/lz4_wrapper.c
-+++ b/fs/squashfs/lz4_wrapper.c
-@@ -97,7 +97,6 @@ static int lz4_uncompress(struct squashfs_sb_info *msblk, void *strm,
- 	struct squashfs_lz4 *stream = strm;
- 	void *buff = stream->input, *data;
- 	int avail, i, bytes = length, res;
--	size_t dest_len = output->length;
+-	size_t tmp_len = *dlen;
+-	int err;
++	int out_len = LZ4_compress_HC(src, dst, slen,
++		(int)((size_t)dlen), LZ4HC_DEFAULT_CLEVEL, ctx);
  
- 	for (i = 0; i < b; i++) {
- 		avail = min(bytes, msblk->devblksize - offset);
-@@ -108,12 +107,13 @@ static int lz4_uncompress(struct squashfs_sb_info *msblk, void *strm,
- 		put_bh(bh[i]);
- 	}
+-	err = lz4hc_compress(src, slen, dst, &tmp_len, ctx);
+-
+-	if (err < 0)
++	if (out_len == 0)
+ 		return -EINVAL;
  
--	res = lz4_decompress_unknownoutputsize(stream->input, length,
--					stream->output, &dest_len);
--	if (res)
-+	res = LZ4_decompress_safe(stream->input, stream->output,
-+		length, output->length);
-+
-+	if (res < 0)
- 		return -EIO;
- 
--	bytes = dest_len;
-+	bytes = res;
- 	data = squashfs_first_page(output);
- 	buff = stream->output;
- 	while (data) {
-@@ -128,7 +128,7 @@ static int lz4_uncompress(struct squashfs_sb_info *msblk, void *strm,
- 	}
- 	squashfs_finish_page(output);
- 
--	return dest_len;
-+	return res;
+-	*dlen = tmp_len;
++	*dlen = out_len;
+ 	return 0;
  }
  
- const struct squashfs_decompressor squashfs_lz4_comp_ops = {
+@@ -97,16 +95,13 @@ static int lz4hc_compress_crypto(struct crypto_tfm *tfm, const u8 *src,
+ static int __lz4hc_decompress_crypto(const u8 *src, unsigned int slen,
+ 				     u8 *dst, unsigned int *dlen, void *ctx)
+ {
+-	int err;
+-	size_t tmp_len = *dlen;
+-	size_t __slen = slen;
++	int out_len = LZ4_decompress_safe(src, dst, slen, (int)((size_t)dlen));
+ 
+-	err = lz4_decompress_unknownoutputsize(src, __slen, dst, &tmp_len);
+-	if (err < 0)
++	if (out_len < 0)
+ 		return -EINVAL;
+ 
+-	*dlen = tmp_len;
+-	return err;
++	*dlen = out_len;
++	return out_len;
+ }
+ 
+ static int lz4hc_sdecompress(struct crypto_scomp *tfm, const u8 *src,
 -- 
 2.1.4
