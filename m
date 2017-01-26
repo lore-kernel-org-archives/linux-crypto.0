@@ -1,121 +1,88 @@
-From: Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
-Subject: Re: [PATCH v5 0/5] Update LZ4 compressor module
-Date: Thu, 26 Jan 2017 15:15:37 +0100
-Message-ID: <20170126141537.GA7185@bierbaron.springfield.local>
-References: <1482259992-16680-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
- <1485417455-31726-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
- <20170126091953.GA2829@zzz>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: akpm@linux-foundation.org, bongkyu.kim@lge.com,
-        rsalvaterra@gmail.com, sergey.senozhatsky@gmail.com,
-        gregkh@linuxfoundation.org, linux-kernel@vger.kernel.org,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, anton@enomsg.org, ccross@android.com,
-        keescook@chromium.org, tony.luck@intel.com
-To: Eric Biggers <ebiggers3@gmail.com>
+From: Rabin Vincent <rabin.vincent@axis.com>
+Subject: [PATCHv2] crypto: doc - Fix hash export state information
+Date: Thu, 26 Jan 2017 16:33:00 +0100
+Message-ID: <1485444780-17201-1-git-send-email-rabin.vincent@axis.com>
+Cc: linux-crypto@vger.kernel.org, smueller@chronox.de,
+        Rabin Vincent <rabinv@axis.com>
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mxchg02.rrz.uni-hamburg.de ([134.100.38.112]:45707 "EHLO
-        mxchg02.rrz.uni-hamburg.de" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752030AbdAZOPq (ORCPT
+Received: from bastet.se.axis.com ([195.60.68.11]:50728 "EHLO
+        bastet.se.axis.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753907AbdAZPdp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 26 Jan 2017 09:15:46 -0500
-Content-Disposition: inline
-In-Reply-To: <20170126091953.GA2829@zzz>
+        Thu, 26 Jan 2017 10:33:45 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jan 26, 2017 at 01:19:53AM -0800, Eric Biggers wrote:
-> On Thu, Jan 26, 2017 at 08:57:30AM +0100, Sven Schmidt wrote:
-> > 
-> > This patchset is for updating the LZ4 compression module to a version based
-> > on LZ4 v1.7.3 allowing to use the fast compression algorithm aka LZ4 fast
-> > which provides an "acceleration" parameter as a tradeoff between
-> > high compression ratio and high compression speed.
-> > 
-> > We want to use LZ4 fast in order to support compression in lustre
-> > and (mostly, based on that) investigate data reduction techniques in behalf of
-> > storage systems.
-> > 
-> > Also, it will be useful for other users of LZ4 compression, as with LZ4 fast
-> > it is possible to enable applications to use fast and/or high compression
-> > depending on the usecase.
-> > For instance, ZRAM is offering a LZ4 backend and could benefit from an updated
-> > LZ4 in the kernel.
-> > 
->
+From: Rabin Vincent <rabinv@axis.com>
 
-Hey Eric,
+The documentation states that crypto_ahash_reqsize() provides the size
+of the state structure used by crypto_ahash_export().  But it's actually
+crypto_ahash_statesize() which provides this size.
+
+Signed-off-by: Rabin Vincent <rabinv@axis.com>
+---
+v2: Add crypto_ahash_statesize() to api-digest; don't remove doc for crypto_ahash_reqsize()
+
+ Documentation/crypto/api-digest.rst |  2 +-
+ include/crypto/hash.h               | 18 ++++++++++++------
+ 2 files changed, 13 insertions(+), 7 deletions(-)
+
+diff --git a/Documentation/crypto/api-digest.rst b/Documentation/crypto/api-digest.rst
+index 07356fa..7a1e670 100644
+--- a/Documentation/crypto/api-digest.rst
++++ b/Documentation/crypto/api-digest.rst
+@@ -14,7 +14,7 @@ Asynchronous Message Digest API
+    :doc: Asynchronous Message Digest API
  
-> Hi Sven,
-> 
-> [For some reason I didn't receive patch 1/5 and had to get it from patchwork...
-> I'm not sure why.  I'm subscribed to linux-crypto but not linux-kernel.]
-
-that's weird. I just experienced the first patch takes a little longer to get delivered because of its size.
-Please let me know if the problem occurs again.
+ .. kernel-doc:: include/crypto/hash.h
+-   :functions: crypto_alloc_ahash crypto_free_ahash crypto_ahash_init crypto_ahash_digestsize crypto_ahash_reqtfm crypto_ahash_reqsize crypto_ahash_setkey crypto_ahash_finup crypto_ahash_final crypto_ahash_digest crypto_ahash_export crypto_ahash_import
++   :functions: crypto_alloc_ahash crypto_free_ahash crypto_ahash_init crypto_ahash_digestsize crypto_ahash_reqtfm crypto_ahash_reqsize crypto_ahash_statesize crypto_ahash_setkey crypto_ahash_finup crypto_ahash_final crypto_ahash_digest crypto_ahash_export crypto_ahash_import
  
-> The proposed patch defines LZ4_MEMORY_USAGE to 10 which means that LZ4
-> compression will use a hash table of only 1024 bytes, containing only 256
-> entries, to find matches.  This differs from upstream LZ4 1.7.3, which uses
-> LZ4_MEMORY_USAGE of 14, as well as the previous LZ4 included in the Linux
-> kernel, both of which specify the hash table size to be 16384 bytes, containing
-> 4096 entries.
-> 
-> Given that varying the hash table size is a trade-off between memory usage,
-> speed, and compression ratio, is this an intentional difference and has it been
-> benchmarked?
-> 
-
-I believe I had some troubles with LZ4_MEMORY_USAGE of 14. But I may be wrong.
-I will test that again and eventually adapt that value.
-
-> Also, in lz4defs.h:
-> 
-> > #if defined(__x86_64__)
-> >        typedef U64             reg_t;   /* 64-bits in x32 mode */
-> > #else
-> >        typedef size_t reg_t;    /* 32-bits in x32 mode */
-> > #endif
-> 
-> Are you sure this really needed over just always using size_t?
->
-
-No, actually there's just one use of that value and the upstream version uses size_t instead of reg_t 
-in that particular place. So I will replace it with size_t.
+ Asynchronous Hash Request Handle
+ --------------------------------
+diff --git a/include/crypto/hash.h b/include/crypto/hash.h
+index 216a2b8..b5727bc 100644
+--- a/include/crypto/hash.h
++++ b/include/crypto/hash.h
+@@ -329,6 +329,16 @@ static inline unsigned int crypto_ahash_digestsize(struct crypto_ahash *tfm)
+ 	return crypto_hash_alg_common(tfm)->digestsize;
+ }
  
-> > #if LZ4_ARCH64
-> > #ifdef __BIG_ENDIAN__
-> > #define LZ4_NBCOMMONBYTES(val) (__builtin_clzll(val) >> 3)
-> > #else
-> > #define LZ4_NBCOMMONBYTES(val) (__builtin_clzll(val) >> 3)
-> > #endif
-> > #else
-> > #ifdef __BIG_ENDIAN__
-> > #define LZ4_NBCOMMONBYTES(val) (__builtin_clz(val) >> 3)
-> > #else
-> > #define LZ4_NBCOMMONBYTES(val) (__builtin_ctz(val) >> 3)
-> > #endif
-> > #endif
-> 
-> LZ4_NBCOMMONBYTES() is defined incorrectly for 64-bit little endian; it should
-> be using __builtin_ctzll().
-> 
-
-Indeed! Using the same values in if and else does not make sense at all.
-Thank you for pointing that one out. I will fix it.
-
-> Nit: can you also clean up the weird indentation (e.g. double tabs) in
-> lz4defs.h?
-> 
-> Thanks,
-> 
-> Eric
-> 
-
-I'm wondering why checkpatch does not point out this kind of styling problem?
-I did fix that in the other files but I think I missed lz4defs.h. Will fix the indentation.
-
-Thanks,
-
-Sven
++/**
++ * crypto_ahash_statesize() - obtain size of the ahash state
++ * @tfm: cipher handle
++ *
++ * Return the size of the ahash state. With the crypto_ahash_export()
++ * function, the caller can export the state into a buffer whose size is
++ * defined with this function.
++ *
++ * Return: size of the ahash state
++ */
+ static inline unsigned int crypto_ahash_statesize(struct crypto_ahash *tfm)
+ {
+ 	return crypto_hash_alg_common(tfm)->statesize;
+@@ -369,11 +379,7 @@ static inline struct crypto_ahash *crypto_ahash_reqtfm(
+  * crypto_ahash_reqsize() - obtain size of the request data structure
+  * @tfm: cipher handle
+  *
+- * Return the size of the ahash state size. With the crypto_ahash_export
+- * function, the caller can export the state into a buffer whose size is
+- * defined with this function.
+- *
+- * Return: size of the ahash state
++ * Return: size of the request data
+  */
+ static inline unsigned int crypto_ahash_reqsize(struct crypto_ahash *tfm)
+ {
+@@ -453,7 +459,7 @@ int crypto_ahash_digest(struct ahash_request *req);
+  *
+  * This function exports the hash state of the ahash_request handle into the
+  * caller-allocated output buffer out which must have sufficient size (e.g. by
+- * calling crypto_ahash_reqsize).
++ * calling crypto_ahash_statesize()).
+  *
+  * Return: 0 if the export was successful; < 0 if an error occurred
+  */
+-- 
+2.1.4
