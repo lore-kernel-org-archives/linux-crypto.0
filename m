@@ -1,64 +1,64 @@
 From: Cyrille Pitchen <cyrille.pitchen@atmel.com>
-Subject: [PATCH v3 05/12] crypto: atmel-sha: add atmel_sha_wait_for_data_ready()
-Date: Thu, 26 Jan 2017 17:07:50 +0100
-Message-ID: <6dfd52ed532de56f5bcc3857b8bd96029360089e.1485443478.git.cyrille.pitchen@atmel.com>
+Subject: [PATCH v3 10/12] crypto: atmel-aes: fix atmel_aes_handle_queue()
+Date: Thu, 26 Jan 2017 17:07:55 +0100
+Message-ID: <ae7f0ea6eba2040050948b91a40ca9bc1df2d8ee.1485443478.git.cyrille.pitchen@atmel.com>
 References: <cover.1485443478.git.cyrille.pitchen@atmel.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <smueller@chronox.de>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        Cyrille Pitchen <cyrille.pitchen@atmel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: smueller@chronox.de, Cyrille Pitchen <cyrille.pitchen@atmel.com>,
+ linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org
 To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <nicolas.ferre@atmel.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtpout.microchip.com ([198.175.253.82]:35469 "EHLO
-        email.microchip.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1752702AbdAZQNF (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 26 Jan 2017 11:13:05 -0500
+ <nicolas.ferre@atmel.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 In-Reply-To: <cover.1485443478.git.cyrille.pitchen@atmel.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-This patch simply defines a helper function to test the 'Data Ready' flag
-of the Status Register. It also gives a chance for the crypto request to
-be processed synchronously if this 'Data Ready' flag is already set when
-polling the Status Register. Indeed, running synchronously avoid the
-latency of the 'Data Ready' interrupt.
-
-When the 'Data Ready' flag has not been set yet, we enable the associated
-interrupt and resume processing the crypto request asynchronously from the
-'done' task just as before.
+This patch fixes the value returned by atmel_aes_handle_queue(), which
+could have been wrong previously when the crypto request was started
+synchronously but became asynchronous during the ctx->start() call.
 
 Signed-off-by: Cyrille Pitchen <cyrille.pitchen@atmel.com>
 ---
- drivers/crypto/atmel-sha.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ drivers/crypto/atmel-aes.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
-index b29a4e5bc404..be0d72cf4352 100644
---- a/drivers/crypto/atmel-sha.c
-+++ b/drivers/crypto/atmel-sha.c
-@@ -434,6 +434,19 @@ static void atmel_sha_write_ctrl(struct atmel_sha_dev *dd, int dma)
- 	atmel_sha_write(dd, SHA_MR, valmr);
+diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
+index 0e3d0d655b96..9fd2f63b8bc0 100644
+--- a/drivers/crypto/atmel-aes.c
++++ b/drivers/crypto/atmel-aes.c
+@@ -879,6 +879,7 @@ static int atmel_aes_handle_queue(struct atmel_aes_dev *dd,
+ 	struct crypto_async_request *areq, *backlog;
+ 	struct atmel_aes_base_ctx *ctx;
+ 	unsigned long flags;
++	bool start_async;
+ 	int err, ret = 0;
+ 
+ 	spin_lock_irqsave(&dd->lock, flags);
+@@ -904,10 +905,12 @@ static int atmel_aes_handle_queue(struct atmel_aes_dev *dd,
+ 
+ 	dd->areq = areq;
+ 	dd->ctx = ctx;
+-	dd->is_async = (areq != new_areq);
++	start_async = (areq != new_areq);
++	dd->is_async = start_async;
+ 
++	/* WARNING: ctx->start() MAY change dd->is_async. */
+ 	err = ctx->start(dd);
+-	return (dd->is_async) ? ret : err;
++	return (start_async) ? ret : err;
  }
  
-+static inline int atmel_sha_wait_for_data_ready(struct atmel_sha_dev *dd,
-+						atmel_sha_fn_t resume)
-+{
-+	u32 isr = atmel_sha_read(dd, SHA_ISR);
-+
-+	if (unlikely(isr & SHA_INT_DATARDY))
-+		return resume(dd);
-+
-+	dd->resume = resume;
-+	atmel_sha_write(dd, SHA_IER, SHA_INT_DATARDY);
-+	return -EINPROGRESS;
-+}
-+
- static int atmel_sha_xmit_cpu(struct atmel_sha_dev *dd, const u8 *buf,
- 			      size_t length, int final)
- {
+ 
 -- 
 2.7.4
