@@ -1,64 +1,171 @@
 From: Cyrille Pitchen <cyrille.pitchen@atmel.com>
-Subject: [PATCH v3 10/12] crypto: atmel-aes: fix atmel_aes_handle_queue()
-Date: Thu, 26 Jan 2017 17:07:55 +0100
-Message-ID: <ae7f0ea6eba2040050948b91a40ca9bc1df2d8ee.1485443478.git.cyrille.pitchen@atmel.com>
+Subject: [PATCH v3 12/12] crypto: atmel-sha: add verbose debug facilities to print hw register names
+Date: Thu, 26 Jan 2017 17:07:57 +0100
+Message-ID: <33888e88ae5f9107cea8993ec677ed628648520d.1485443478.git.cyrille.pitchen@atmel.com>
 References: <cover.1485443478.git.cyrille.pitchen@atmel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: smueller@chronox.de, Cyrille Pitchen <cyrille.pitchen@atmel.com>,
- linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain
+Cc: <smueller@chronox.de>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        Cyrille Pitchen <cyrille.pitchen@atmel.com>
 To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
- <nicolas.ferre@atmel.com>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+        <nicolas.ferre@atmel.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <cover.1485443478.git.cyrille.pitchen@atmel.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch fixes the value returned by atmel_aes_handle_queue(), which
-could have been wrong previously when the crypto request was started
-synchronously but became asynchronous during the ctx->start() call.
+When VERBOSE_DEBUG is defined and SHA_FLAGS_DUMP_REG flag is set in
+dd->flags, this patch prints the register names and values when performing
+IO accesses.
 
 Signed-off-by: Cyrille Pitchen <cyrille.pitchen@atmel.com>
 ---
- drivers/crypto/atmel-aes.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ drivers/crypto/atmel-sha.c | 110 ++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 108 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
-index 0e3d0d655b96..9fd2f63b8bc0 100644
---- a/drivers/crypto/atmel-aes.c
-+++ b/drivers/crypto/atmel-aes.c
-@@ -879,6 +879,7 @@ static int atmel_aes_handle_queue(struct atmel_aes_dev *dd,
- 	struct crypto_async_request *areq, *backlog;
- 	struct atmel_aes_base_ctx *ctx;
- 	unsigned long flags;
-+	bool start_async;
- 	int err, ret = 0;
+diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
+index cc5294dbead4..22d0c0c118da 100644
+--- a/drivers/crypto/atmel-sha.c
++++ b/drivers/crypto/atmel-sha.c
+@@ -51,6 +51,7 @@
+ #define SHA_FLAGS_INIT			BIT(4)
+ #define SHA_FLAGS_CPU			BIT(5)
+ #define SHA_FLAGS_DMA_READY		BIT(6)
++#define SHA_FLAGS_DUMP_REG	BIT(7)
  
- 	spin_lock_irqsave(&dd->lock, flags);
-@@ -904,10 +905,12 @@ static int atmel_aes_handle_queue(struct atmel_aes_dev *dd,
+ /* bits[11:8] are reserved. */
  
- 	dd->areq = areq;
- 	dd->ctx = ctx;
--	dd->is_async = (areq != new_areq);
-+	start_async = (areq != new_areq);
-+	dd->is_async = start_async;
+@@ -167,14 +168,118 @@ static struct atmel_sha_drv atmel_sha = {
+ 	.lock = __SPIN_LOCK_UNLOCKED(atmel_sha.lock),
+ };
  
-+	/* WARNING: ctx->start() MAY change dd->is_async. */
- 	err = ctx->start(dd);
--	return (dd->is_async) ? ret : err;
-+	return (start_async) ? ret : err;
++#ifdef VERBOSE_DEBUG
++static const char *atmel_sha_reg_name(u32 offset, char *tmp, size_t sz, bool wr)
++{
++	switch (offset) {
++	case SHA_CR:
++		return "CR";
++
++	case SHA_MR:
++		return "MR";
++
++	case SHA_IER:
++		return "IER";
++
++	case SHA_IDR:
++		return "IDR";
++
++	case SHA_IMR:
++		return "IMR";
++
++	case SHA_ISR:
++		return "ISR";
++
++	case SHA_MSR:
++		return "MSR";
++
++	case SHA_BCR:
++		return "BCR";
++
++	case SHA_REG_DIN(0):
++	case SHA_REG_DIN(1):
++	case SHA_REG_DIN(2):
++	case SHA_REG_DIN(3):
++	case SHA_REG_DIN(4):
++	case SHA_REG_DIN(5):
++	case SHA_REG_DIN(6):
++	case SHA_REG_DIN(7):
++	case SHA_REG_DIN(8):
++	case SHA_REG_DIN(9):
++	case SHA_REG_DIN(10):
++	case SHA_REG_DIN(11):
++	case SHA_REG_DIN(12):
++	case SHA_REG_DIN(13):
++	case SHA_REG_DIN(14):
++	case SHA_REG_DIN(15):
++		snprintf(tmp, sz, "IDATAR[%u]", (offset - SHA_REG_DIN(0)) >> 2);
++		break;
++
++	case SHA_REG_DIGEST(0):
++	case SHA_REG_DIGEST(1):
++	case SHA_REG_DIGEST(2):
++	case SHA_REG_DIGEST(3):
++	case SHA_REG_DIGEST(4):
++	case SHA_REG_DIGEST(5):
++	case SHA_REG_DIGEST(6):
++	case SHA_REG_DIGEST(7):
++	case SHA_REG_DIGEST(8):
++	case SHA_REG_DIGEST(9):
++	case SHA_REG_DIGEST(10):
++	case SHA_REG_DIGEST(11):
++	case SHA_REG_DIGEST(12):
++	case SHA_REG_DIGEST(13):
++	case SHA_REG_DIGEST(14):
++	case SHA_REG_DIGEST(15):
++		if (wr)
++			snprintf(tmp, sz, "IDATAR[%u]",
++				 16u + ((offset - SHA_REG_DIGEST(0)) >> 2));
++		else
++			snprintf(tmp, sz, "ODATAR[%u]",
++				 (offset - SHA_REG_DIGEST(0)) >> 2);
++		break;
++
++	case SHA_HW_VERSION:
++		return "HWVER";
++
++	default:
++		snprintf(tmp, sz, "0x%02x", offset);
++		break;
++	}
++
++	return tmp;
++}
++
++#endif /* VERBOSE_DEBUG */
++
+ static inline u32 atmel_sha_read(struct atmel_sha_dev *dd, u32 offset)
+ {
+-	return readl_relaxed(dd->io_base + offset);
++	u32 value = readl_relaxed(dd->io_base + offset);
++
++#ifdef VERBOSE_DEBUG
++	if (dd->flags & SHA_FLAGS_DUMP_REG) {
++		char tmp[16];
++
++		dev_vdbg(dd->dev, "read 0x%08x from %s\n", value,
++			 atmel_sha_reg_name(offset, tmp, sizeof(tmp), false));
++	}
++#endif /* VERBOSE_DEBUG */
++
++	return value;
  }
  
+ static inline void atmel_sha_write(struct atmel_sha_dev *dd,
+ 					u32 offset, u32 value)
+ {
++#ifdef VERBOSE_DEBUG
++	if (dd->flags & SHA_FLAGS_DUMP_REG) {
++		char tmp[16];
++
++		dev_vdbg(dd->dev, "write 0x%08x into %s\n", value,
++			 atmel_sha_reg_name(offset, tmp, sizeof(tmp), true));
++	}
++#endif /* VERBOSE_DEBUG */
++
+ 	writel_relaxed(value, dd->io_base + offset);
+ }
+ 
+@@ -183,7 +288,8 @@ static inline int atmel_sha_complete(struct atmel_sha_dev *dd, int err)
+ 	struct ahash_request *req = dd->req;
+ 
+ 	dd->flags &= ~(SHA_FLAGS_BUSY | SHA_FLAGS_FINAL | SHA_FLAGS_CPU |
+-		       SHA_FLAGS_DMA_READY | SHA_FLAGS_OUTPUT_READY);
++		       SHA_FLAGS_DMA_READY | SHA_FLAGS_OUTPUT_READY |
++		       SHA_FLAGS_DUMP_REG);
+ 
+ 	clk_disable(dd->iclk);
  
 -- 
 2.7.4
