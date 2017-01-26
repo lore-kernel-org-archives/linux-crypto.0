@@ -1,170 +1,40 @@
 From: Cyrille Pitchen <cyrille.pitchen@atmel.com>
-Subject: [PATCH v3 08/12] crypto: atmel-sha: add simple DMA transfers
-Date: Thu, 26 Jan 2017 17:07:53 +0100
-Message-ID: <8cf5b428228310b70e913a3abf0f1747a5962caf.1485443478.git.cyrille.pitchen@atmel.com>
+Subject: [PATCH v3 06/12] crypto: atmel-sha: add SHA_MR_MODE_IDATAR0
+Date: Thu, 26 Jan 2017 17:07:51 +0100
+Message-ID: <d4eaf0e1d89467a56469fe82d39e8aafce4dcc46.1485443478.git.cyrille.pitchen@atmel.com>
 References: <cover.1485443478.git.cyrille.pitchen@atmel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: smueller@chronox.de, Cyrille Pitchen <cyrille.pitchen@atmel.com>,
- linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain
+Cc: <smueller@chronox.de>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        Cyrille Pitchen <cyrille.pitchen@atmel.com>
 To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
- <nicolas.ferre@atmel.com>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+        <nicolas.ferre@atmel.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <cover.1485443478.git.cyrille.pitchen@atmel.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch adds a simple function to perform data transfer with the DMA
-controller.
+This patch defines an alias macro to SHA_MR_MODE_PDC, which is not suited
+for DMA usage.
 
 Signed-off-by: Cyrille Pitchen <cyrille.pitchen@atmel.com>
 ---
- drivers/crypto/atmel-sha.c | 116 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 116 insertions(+)
+ drivers/crypto/atmel-sha-regs.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
-index 58d9ca8ac0f2..a4fc60b67099 100644
---- a/drivers/crypto/atmel-sha.c
-+++ b/drivers/crypto/atmel-sha.c
-@@ -123,6 +123,9 @@ struct atmel_sha_ctx {
- struct atmel_sha_dma {
- 	struct dma_chan			*chan;
- 	struct dma_slave_config dma_conf;
-+	struct scatterlist	*sg;
-+	int			nents;
-+	unsigned int		last_sg_length;
- };
- 
- struct atmel_sha_dev {
-@@ -1321,6 +1324,119 @@ static irqreturn_t atmel_sha_irq(int irq, void *dev_id)
- }
- 
- 
-+/* DMA transfer functions */
-+
-+static bool atmel_sha_dma_check_aligned(struct atmel_sha_dev *dd,
-+					struct scatterlist *sg,
-+					size_t len)
-+{
-+	struct atmel_sha_dma *dma = &dd->dma_lch_in;
-+	struct ahash_request *req = dd->req;
-+	struct atmel_sha_reqctx *ctx = ahash_request_ctx(req);
-+	size_t bs = ctx->block_size;
-+	int nents;
-+
-+	for (nents = 0; sg; sg = sg_next(sg), ++nents) {
-+		if (!IS_ALIGNED(sg->offset, sizeof(u32)))
-+			return false;
-+
-+		/*
-+		 * This is the last sg, the only one that is allowed to
-+		 * have an unaligned length.
-+		 */
-+		if (len <= sg->length) {
-+			dma->nents = nents + 1;
-+			dma->last_sg_length = sg->length;
-+			sg->length = ALIGN(len, sizeof(u32));
-+			return true;
-+		}
-+
-+		/* All other sg lengths MUST be aligned to the block size. */
-+		if (!IS_ALIGNED(sg->length, bs))
-+			return false;
-+
-+		len -= sg->length;
-+	}
-+
-+	return false;
-+}
-+
-+static void atmel_sha_dma_callback2(void *data)
-+{
-+	struct atmel_sha_dev *dd = data;
-+	struct atmel_sha_dma *dma = &dd->dma_lch_in;
-+	struct scatterlist *sg;
-+	int nents;
-+
-+	dmaengine_terminate_all(dma->chan);
-+	dma_unmap_sg(dd->dev, dma->sg, dma->nents, DMA_TO_DEVICE);
-+
-+	sg = dma->sg;
-+	for (nents = 0; nents < dma->nents - 1; ++nents)
-+		sg = sg_next(sg);
-+	sg->length = dma->last_sg_length;
-+
-+	dd->is_async = true;
-+	(void)atmel_sha_wait_for_data_ready(dd, dd->resume);
-+}
-+
-+static int atmel_sha_dma_start(struct atmel_sha_dev *dd,
-+			       struct scatterlist *src,
-+			       size_t len,
-+			       atmel_sha_fn_t resume)
-+{
-+	struct atmel_sha_dma *dma = &dd->dma_lch_in;
-+	struct dma_slave_config *config = &dma->dma_conf;
-+	struct dma_chan *chan = dma->chan;
-+	struct dma_async_tx_descriptor *desc;
-+	dma_cookie_t cookie;
-+	unsigned int sg_len;
-+	int err;
-+
-+	dd->resume = resume;
-+
-+	/*
-+	 * dma->nents has already been initialized by
-+	 * atmel_sha_dma_check_aligned().
-+	 */
-+	dma->sg = src;
-+	sg_len = dma_map_sg(dd->dev, dma->sg, dma->nents, DMA_TO_DEVICE);
-+	if (!sg_len) {
-+		err = -ENOMEM;
-+		goto exit;
-+	}
-+
-+	config->src_maxburst = 16;
-+	config->dst_maxburst = 16;
-+	err = dmaengine_slave_config(chan, config);
-+	if (err)
-+		goto unmap_sg;
-+
-+	desc = dmaengine_prep_slave_sg(chan, dma->sg, sg_len, DMA_MEM_TO_DEV,
-+				       DMA_PREP_INTERRUPT | DMA_CTRL_ACK);
-+	if (!desc) {
-+		err = -ENOMEM;
-+		goto unmap_sg;
-+	}
-+
-+	desc->callback = atmel_sha_dma_callback2;
-+	desc->callback_param = dd;
-+	cookie = dmaengine_submit(desc);
-+	err = dma_submit_error(cookie);
-+	if (err)
-+		goto unmap_sg;
-+
-+	dma_async_issue_pending(chan);
-+
-+	return -EINPROGRESS;
-+
-+unmap_sg:
-+	dma_unmap_sg(dd->dev, dma->sg, dma->nents, DMA_TO_DEVICE);
-+exit:
-+	return atmel_sha_complete(dd, err);
-+}
-+
-+
- /* CPU transfer functions */
- 
- static int atmel_sha_cpu_transfer(struct atmel_sha_dev *dd)
+diff --git a/drivers/crypto/atmel-sha-regs.h b/drivers/crypto/atmel-sha-regs.h
+index deb0b0b15096..8d62d31eda08 100644
+--- a/drivers/crypto/atmel-sha-regs.h
++++ b/drivers/crypto/atmel-sha-regs.h
+@@ -16,6 +16,7 @@
+ #define SHA_MR_MODE_MANUAL		0x0
+ #define SHA_MR_MODE_AUTO		0x1
+ #define SHA_MR_MODE_PDC			0x2
++#define SHA_MR_MODE_IDATAR0		0x2
+ #define SHA_MR_PROCDLY			(1 << 4)
+ #define SHA_MR_UIHV			(1 << 5)
+ #define SHA_MR_UIEHV			(1 << 6)
 -- 
 2.7.4
