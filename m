@@ -1,8 +1,7 @@
 From: Cyrille Pitchen <cyrille.pitchen@atmel.com>
-Subject: [PATCH v3 04/12] crypto: atmel-sha: redefine SHA_FLAGS_SHA* flags to
- match SHA_MR_ALGO_SHA*
-Date: Thu, 26 Jan 2017 17:07:49 +0100
-Message-ID: <2229ffab0e305de0c77d35336aedfee86edcad94.1485443478.git.cyrille.pitchen@atmel.com>
+Subject: [PATCH v3 07/12] crypto: atmel-sha: add atmel_sha_cpu_start()
+Date: Thu, 26 Jan 2017 17:07:52 +0100
+Message-ID: <14bce182b9defe7bb4a41507901566825bc18b89.1485443478.git.cyrille.pitchen@atmel.com>
 References: <cover.1485443478.git.cyrille.pitchen@atmel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -25,122 +24,128 @@ Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch modifies the SHA_FLAGS_SHA* flags: those algo flags are now
-organized as values of a single bitfield instead of individual bits.
-This allows to reduce the number of bits needed to encode all possible
-values. Also the new values match the SHA_MR_ALGO_SHA* values hence
-the algorithm bitfield of the SHA_MR register could simply be set with:
-
-mr = (mr & ~SHA_FLAGS_ALGO_MASK) | (ctx->flags & SHA_FLAGS_ALGO_MASK)
+This patch adds a simple function to perform data transfer with PIO, hence
+handled by the CPU.
 
 Signed-off-by: Cyrille Pitchen <cyrille.pitchen@atmel.com>
 ---
- drivers/crypto/atmel-sha-regs.h |  1 +
- drivers/crypto/atmel-sha.c      | 45 +++++++++++++++++++++++++++++------------
- 2 files changed, 33 insertions(+), 13 deletions(-)
+ drivers/crypto/atmel-sha.c | 90 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 90 insertions(+)
 
-diff --git a/drivers/crypto/atmel-sha-regs.h b/drivers/crypto/atmel-sha-regs.h
-index e08897109cab..deb0b0b15096 100644
---- a/drivers/crypto/atmel-sha-regs.h
-+++ b/drivers/crypto/atmel-sha-regs.h
-@@ -19,6 +19,7 @@
- #define SHA_MR_PROCDLY			(1 << 4)
- #define SHA_MR_UIHV			(1 << 5)
- #define SHA_MR_UIEHV			(1 << 6)
-+#define SHA_MR_ALGO_MASK		GENMASK(10, 8)
- #define SHA_MR_ALGO_SHA1		(0 << 8)
- #define SHA_MR_ALGO_SHA256		(1 << 8)
- #define SHA_MR_ALGO_SHA384		(2 << 8)
 diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
-index 643d79a05dda..b29a4e5bc404 100644
+index be0d72cf4352..58d9ca8ac0f2 100644
 --- a/drivers/crypto/atmel-sha.c
 +++ b/drivers/crypto/atmel-sha.c
-@@ -51,14 +51,16 @@
- #define SHA_FLAGS_CPU			BIT(5)
- #define SHA_FLAGS_DMA_READY		BIT(6)
- 
-+/* bits[10:8] are reserved. */
-+#define SHA_FLAGS_ALGO_MASK	SHA_MR_ALGO_MASK
-+#define SHA_FLAGS_SHA1		SHA_MR_ALGO_SHA1
-+#define SHA_FLAGS_SHA256	SHA_MR_ALGO_SHA256
-+#define SHA_FLAGS_SHA384	SHA_MR_ALGO_SHA384
-+#define SHA_FLAGS_SHA512	SHA_MR_ALGO_SHA512
-+#define SHA_FLAGS_SHA224	SHA_MR_ALGO_SHA224
-+
- #define SHA_FLAGS_FINUP		BIT(16)
- #define SHA_FLAGS_SG		BIT(17)
--#define SHA_FLAGS_ALGO_MASK	GENMASK(22, 18)
--#define SHA_FLAGS_SHA1		BIT(18)
--#define SHA_FLAGS_SHA224	BIT(19)
--#define SHA_FLAGS_SHA256	BIT(20)
--#define SHA_FLAGS_SHA384	BIT(21)
--#define SHA_FLAGS_SHA512	BIT(22)
+@@ -64,6 +64,8 @@
  #define SHA_FLAGS_ERROR		BIT(23)
  #define SHA_FLAGS_PAD		BIT(24)
  #define SHA_FLAGS_RESTORE	BIT(25)
-@@ -264,7 +266,9 @@ static void atmel_sha_fill_padding(struct atmel_sha_reqctx *ctx, int length)
- 	bits[1] = cpu_to_be64(size[0] << 3);
- 	bits[0] = cpu_to_be64(size[1] << 3 | size[0] >> 61);
++#define SHA_FLAGS_IDATAR0	BIT(26)
++#define SHA_FLAGS_WAIT_DATARDY	BIT(27)
  
--	if (ctx->flags & (SHA_FLAGS_SHA384 | SHA_FLAGS_SHA512)) {
-+	switch (ctx->flags & SHA_FLAGS_ALGO_MASK) {
-+	case SHA_FLAGS_SHA384:
-+	case SHA_FLAGS_SHA512:
- 		index = ctx->bufcnt & 0x7f;
- 		padlen = (index < 112) ? (112 - index) : ((128+112) - index);
- 		*(ctx->buffer + ctx->bufcnt) = 0x80;
-@@ -272,7 +276,9 @@ static void atmel_sha_fill_padding(struct atmel_sha_reqctx *ctx, int length)
- 		memcpy(ctx->buffer + ctx->bufcnt + padlen, bits, 16);
- 		ctx->bufcnt += padlen + 16;
- 		ctx->flags |= SHA_FLAGS_PAD;
--	} else {
-+		break;
-+
-+	default:
- 		index = ctx->bufcnt & 0x3f;
- 		padlen = (index < 56) ? (56 - index) : ((64+56) - index);
- 		*(ctx->buffer + ctx->bufcnt) = 0x80;
-@@ -280,6 +286,7 @@ static void atmel_sha_fill_padding(struct atmel_sha_reqctx *ctx, int length)
- 		memcpy(ctx->buffer + ctx->bufcnt + padlen, &bits[1], 8);
- 		ctx->bufcnt += padlen + 8;
- 		ctx->flags |= SHA_FLAGS_PAD;
-+		break;
- 	}
+ #define SHA_OP_UPDATE	1
+ #define SHA_OP_FINAL	2
+@@ -141,6 +143,7 @@ struct atmel_sha_dev {
+ 	struct ahash_request	*req;
+ 	bool			is_async;
+ 	atmel_sha_fn_t		resume;
++	atmel_sha_fn_t		cpu_transfer_complete;
+ 
+ 	struct atmel_sha_dma	dma_lch_in;
+ 
+@@ -1317,6 +1320,93 @@ static irqreturn_t atmel_sha_irq(int irq, void *dev_id)
+ 	return IRQ_NONE;
  }
  
-@@ -828,16 +835,28 @@ static void atmel_sha_copy_ready_hash(struct ahash_request *req)
- 	if (!req->result)
- 		return;
- 
--	if (ctx->flags & SHA_FLAGS_SHA1)
-+	switch (ctx->flags & SHA_FLAGS_ALGO_MASK) {
-+	default:
-+	case SHA_FLAGS_SHA1:
- 		memcpy(req->result, ctx->digest, SHA1_DIGEST_SIZE);
--	else if (ctx->flags & SHA_FLAGS_SHA224)
-+		break;
 +
-+	case SHA_FLAGS_SHA224:
- 		memcpy(req->result, ctx->digest, SHA224_DIGEST_SIZE);
--	else if (ctx->flags & SHA_FLAGS_SHA256)
-+		break;
++/* CPU transfer functions */
 +
-+	case SHA_FLAGS_SHA256:
- 		memcpy(req->result, ctx->digest, SHA256_DIGEST_SIZE);
--	else if (ctx->flags & SHA_FLAGS_SHA384)
-+		break;
++static int atmel_sha_cpu_transfer(struct atmel_sha_dev *dd)
++{
++	struct ahash_request *req = dd->req;
++	struct atmel_sha_reqctx *ctx = ahash_request_ctx(req);
++	const u32 *words = (const u32 *)ctx->buffer;
++	size_t i, num_words;
++	u32 isr, din, din_inc;
 +
-+	case SHA_FLAGS_SHA384:
- 		memcpy(req->result, ctx->digest, SHA384_DIGEST_SIZE);
--	else
-+		break;
++	din_inc = (ctx->flags & SHA_FLAGS_IDATAR0) ? 0 : 1;
++	for (;;) {
++		/* Write data into the Input Data Registers. */
++		num_words = DIV_ROUND_UP(ctx->bufcnt, sizeof(u32));
++		for (i = 0, din = 0; i < num_words; ++i, din += din_inc)
++			atmel_sha_write(dd, SHA_REG_DIN(din), words[i]);
 +
-+	case SHA_FLAGS_SHA512:
- 		memcpy(req->result, ctx->digest, SHA512_DIGEST_SIZE);
-+		break;
++		ctx->offset += ctx->bufcnt;
++		ctx->total -= ctx->bufcnt;
++
++		if (!ctx->total)
++			break;
++
++		/*
++		 * Prepare next block:
++		 * Fill ctx->buffer now with the next data to be written into
++		 * IDATARx: it gives time for the SHA hardware to process
++		 * the current data so the SHA_INT_DATARDY flag might be set
++		 * in SHA_ISR when polling this register at the beginning of
++		 * the next loop.
++		 */
++		ctx->bufcnt = min_t(size_t, ctx->block_size, ctx->total);
++		scatterwalk_map_and_copy(ctx->buffer, ctx->sg,
++					 ctx->offset, ctx->bufcnt, 0);
++
++		/* Wait for hardware to be ready again. */
++		isr = atmel_sha_read(dd, SHA_ISR);
++		if (!(isr & SHA_INT_DATARDY)) {
++			/* Not ready yet. */
++			dd->resume = atmel_sha_cpu_transfer;
++			atmel_sha_write(dd, SHA_IER, SHA_INT_DATARDY);
++			return -EINPROGRESS;
++		}
 +	}
- }
- 
- static int atmel_sha_finish(struct ahash_request *req)
++
++	if (unlikely(!(ctx->flags & SHA_FLAGS_WAIT_DATARDY)))
++		return dd->cpu_transfer_complete(dd);
++
++	return atmel_sha_wait_for_data_ready(dd, dd->cpu_transfer_complete);
++}
++
++static int atmel_sha_cpu_start(struct atmel_sha_dev *dd,
++			       struct scatterlist *sg,
++			       unsigned int len,
++			       bool idatar0_only,
++			       bool wait_data_ready,
++			       atmel_sha_fn_t resume)
++{
++	struct ahash_request *req = dd->req;
++	struct atmel_sha_reqctx *ctx = ahash_request_ctx(req);
++
++	if (!len)
++		return resume(dd);
++
++	ctx->flags &= ~(SHA_FLAGS_IDATAR0 | SHA_FLAGS_WAIT_DATARDY);
++
++	if (idatar0_only)
++		ctx->flags |= SHA_FLAGS_IDATAR0;
++
++	if (wait_data_ready)
++		ctx->flags |= SHA_FLAGS_WAIT_DATARDY;
++
++	ctx->sg = sg;
++	ctx->total = len;
++	ctx->offset = 0;
++
++	/* Prepare the first block to be written. */
++	ctx->bufcnt = min_t(size_t, ctx->block_size, ctx->total);
++	scatterwalk_map_and_copy(ctx->buffer, ctx->sg,
++				 ctx->offset, ctx->bufcnt, 0);
++
++	dd->cpu_transfer_complete = resume;
++	return atmel_sha_cpu_transfer(dd);
++}
++
++
+ static void atmel_sha_unregister_algs(struct atmel_sha_dev *dd)
+ {
+ 	int i;
 -- 
 2.7.4
