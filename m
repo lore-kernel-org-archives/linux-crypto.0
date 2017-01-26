@@ -1,89 +1,112 @@
 From: Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
-Subject: [PATCH v5 0/5] Update LZ4 compressor module
-Date: Thu, 26 Jan 2017 08:57:30 +0100
-Message-ID: <1485417455-31726-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
+Subject: [PATCH v5 4/5] fs/pstore: fs/squashfs: Change usage of LZ4 to work with new LZ4 version
+Date: Thu, 26 Jan 2017 08:57:34 +0100
+Message-ID: <1485417455-31726-5-git-send-email-4sschmid@informatik.uni-hamburg.de>
 References: <1482259992-16680-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
+ <1485417455-31726-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
 Cc: bongkyu.kim@lge.com, rsalvaterra@gmail.com,
         sergey.senozhatsky@gmail.com, gregkh@linuxfoundation.org,
         linux-kernel@vger.kernel.org, herbert@gondor.apana.org.au,
         davem@davemloft.net, linux-crypto@vger.kernel.org,
         anton@enomsg.org, ccross@android.com, keescook@chromium.org,
-        tony.luck@intel.com
+        tony.luck@intel.com,
+        Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
 To: akpm@linux-foundation.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mxchg01.rrz.uni-hamburg.de ([134.100.38.111]:58196 "EHLO
-        mxchg01.rrz.uni-hamburg.de" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752819AbdAZH5u (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 26 Jan 2017 02:57:50 -0500
-In-Reply-To: <1482259992-16680-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1485417455-31726-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
+This patch updates fs/pstore and fs/squashfs to use the updated
+functions from the new LZ4 module.
 
-This patchset is for updating the LZ4 compression module to a version based
-on LZ4 v1.7.3 allowing to use the fast compression algorithm aka LZ4 fast
-which provides an "acceleration" parameter as a tradeoff between
-high compression ratio and high compression speed.
+Signed-off-by: Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
+---
+ fs/pstore/platform.c      | 14 +++++++-------
+ fs/squashfs/lz4_wrapper.c | 12 ++++++------
+ 2 files changed, 13 insertions(+), 13 deletions(-)
 
-We want to use LZ4 fast in order to support compression in lustre
-and (mostly, based on that) investigate data reduction techniques in behalf of
-storage systems.
-
-Also, it will be useful for other users of LZ4 compression, as with LZ4 fast
-it is possible to enable applications to use fast and/or high compression
-depending on the usecase.
-For instance, ZRAM is offering a LZ4 backend and could benefit from an updated
-LZ4 in the kernel.
-
-LZ4 homepage: http://www.lz4.org/
-LZ4 source repository: https://github.com/lz4/lz4
-Source version: 1.7.3
-
-Benchmark (taken from [1], Core i5-4300U @1.9GHz):
-----------------|--------------|----------------|----------
-Compressor      | Compression  | Decompression  | Ratio
-----------------|--------------|----------------|----------
-memcpy          |  4200 MB/s   |  4200 MB/s     | 1.000
-LZ4 fast 50     |  1080 MB/s   |  2650 MB/s     | 1.375
-LZ4 fast 17     |   680 MB/s   |  2220 MB/s     | 1.607
-LZ4 fast 5      |   475 MB/s   |  1920 MB/s     | 1.886
-LZ4 default     |   385 MB/s   |  1850 MB/s     | 2.101
-
-[1] http://fastcompression.blogspot.de/2015/04/sampling-or-faster-lz4.html
-fs/pstore: fs/squashfs: Change usage of LZ4 to work with new LZ4 version
-
-[PATCH 1/5] lib: Update LZ4 compressor module
-[PATCH 2/5] lib/decompress_unlz4: Change module to work with new LZ4 module version
-[PATCH 3/5] crypto: Change LZ4 modules to work with new LZ4 module version
-[PATCH 4/5] fs/pstore: fs/squashfs: Change usage of LZ4 to work with new LZ4 version
-[PATCH 5/5] lib/lz4: Remove back-compat wrappers
-
-v2:
-- Changed order of the patches since in the initial patchset the lz4.h was in the
-  last patch but was referenced by the other ones
-- Split lib/decompress_unlz4.c in an own patch
-- Fixed errors reported by the buildbot
-- Further refactorings
-- Added more appropriate copyright note to include/linux/lz4.h
-
-v3:
-- Adjusted the code to satisfy kernel coding style (checkpatch.pl)
-- Made sure the changes to LZ4 in Kernel (overflow checks etc.)
-  are included in the new module (they are)
-- Removed the second LZ4_compressBound function with related name but
-  different return type
-- Corrected version number (was LZ4 1.7.3)
-- Added missing LZ4 streaming functions
-
-v4:
-- Fixed kbuild errors
-- Re-added lz4_compressbound as alias for LZ4_compressBound
-  to ensure backwards compatibility
-- Wrapped LZ4_hash5 with check for LZ4_ARCH64 since it is only used there
-  and triggers an unused function warning when false
-
-v5:
-- Added a fifth patch to remove the back-compat wrappers introduced
-  to ensure bisectibility between the patches (the functions are no longer
-  needed since there's no callers left)
+diff --git a/fs/pstore/platform.c b/fs/pstore/platform.c
+index 729677e..85c4c58 100644
+--- a/fs/pstore/platform.c
++++ b/fs/pstore/platform.c
+@@ -342,31 +342,31 @@ static int compress_lz4(const void *in, void *out, size_t inlen, size_t outlen)
+ {
+ 	int ret;
+ 
+-	ret = lz4_compress(in, inlen, out, &outlen, workspace);
+-	if (ret) {
++	ret = LZ4_compress_default(in, out, inlen, outlen, workspace);
++	if (!ret) {
+ 		pr_err("lz4_compress error, ret = %d!\n", ret);
+ 		return -EIO;
+ 	}
+ 
+-	return outlen;
++	return ret;
+ }
+ 
+ static int decompress_lz4(void *in, void *out, size_t inlen, size_t outlen)
+ {
+ 	int ret;
+ 
+-	ret = lz4_decompress_unknownoutputsize(in, inlen, out, &outlen);
+-	if (ret) {
++	ret = LZ4_decompress_safe(in, out, inlen, outlen);
++	if (ret < 0) {
+ 		pr_err("lz4_decompress error, ret = %d!\n", ret);
+ 		return -EIO;
+ 	}
+ 
+-	return outlen;
++	return ret;
+ }
+ 
+ static void allocate_lz4(void)
+ {
+-	big_oops_buf_sz = lz4_compressbound(psinfo->bufsize);
++	big_oops_buf_sz = LZ4_compressBound(psinfo->bufsize);
+ 	big_oops_buf = kmalloc(big_oops_buf_sz, GFP_KERNEL);
+ 	if (big_oops_buf) {
+ 		workspace = kmalloc(LZ4_MEM_COMPRESS, GFP_KERNEL);
+diff --git a/fs/squashfs/lz4_wrapper.c b/fs/squashfs/lz4_wrapper.c
+index ff4468b..95da653 100644
+--- a/fs/squashfs/lz4_wrapper.c
++++ b/fs/squashfs/lz4_wrapper.c
+@@ -97,7 +97,6 @@ static int lz4_uncompress(struct squashfs_sb_info *msblk, void *strm,
+ 	struct squashfs_lz4 *stream = strm;
+ 	void *buff = stream->input, *data;
+ 	int avail, i, bytes = length, res;
+-	size_t dest_len = output->length;
+ 
+ 	for (i = 0; i < b; i++) {
+ 		avail = min(bytes, msblk->devblksize - offset);
+@@ -108,12 +107,13 @@ static int lz4_uncompress(struct squashfs_sb_info *msblk, void *strm,
+ 		put_bh(bh[i]);
+ 	}
+ 
+-	res = lz4_decompress_unknownoutputsize(stream->input, length,
+-					stream->output, &dest_len);
+-	if (res)
++	res = LZ4_decompress_safe(stream->input, stream->output,
++		length, output->length);
++
++	if (res < 0)
+ 		return -EIO;
+ 
+-	bytes = dest_len;
++	bytes = res;
+ 	data = squashfs_first_page(output);
+ 	buff = stream->output;
+ 	while (data) {
+@@ -128,7 +128,7 @@ static int lz4_uncompress(struct squashfs_sb_info *msblk, void *strm,
+ 	}
+ 	squashfs_finish_page(output);
+ 
+-	return dest_len;
++	return res;
+ }
+ 
+ const struct squashfs_decompressor squashfs_lz4_comp_ops = {
+-- 
+2.1.4
