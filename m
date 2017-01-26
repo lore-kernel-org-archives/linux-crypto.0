@@ -1,8 +1,8 @@
 From: Cyrille Pitchen <cyrille.pitchen@atmel.com>
-Subject: [PATCH v3 01/12] crypto: atmel-sha: create function to get an Atmel
- SHA device
-Date: Thu, 26 Jan 2017 17:07:46 +0100
-Message-ID: <952192a522f455e6b066b8e542a446764064869f.1485443478.git.cyrille.pitchen@atmel.com>
+Subject: [PATCH v3 03/12] crypto: atmel-sha: make atmel_sha_done_task more
+ generic
+Date: Thu, 26 Jan 2017 17:07:48 +0100
+Message-ID: <5989b03be520fc8e0f420fde675ced47ba0d33dc.1485443478.git.cyrille.pitchen@atmel.com>
 References: <cover.1485443478.git.cyrille.pitchen@atmel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -25,48 +25,82 @@ Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-This is a transitional patch: it creates the atmel_sha_find_dev() function,
-which will be used in further patches to share the source code responsible
-for finding a Atmel SHA device.
+This patch is a transitional patch. It updates atmel_sha_done_task() to
+make it more generic. Indeed, it adds a new .resume() member in the
+atmel_sha_dev structure. This hook is called from atmel_sha_done_task()
+to resume processing an asynchronous request.
 
 Signed-off-by: Cyrille Pitchen <cyrille.pitchen@atmel.com>
 ---
- drivers/crypto/atmel-sha.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
+ drivers/crypto/atmel-sha.c | 21 ++++++++++++++++-----
+ 1 file changed, 16 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
-index 97e34799e077..33a36e667547 100644
+index 2dbed8bb8d26..643d79a05dda 100644
 --- a/drivers/crypto/atmel-sha.c
 +++ b/drivers/crypto/atmel-sha.c
-@@ -260,11 +260,8 @@ static void atmel_sha_fill_padding(struct atmel_sha_reqctx *ctx, int length)
- 	}
+@@ -138,6 +138,7 @@ struct atmel_sha_dev {
+ 	struct crypto_queue	queue;
+ 	struct ahash_request	*req;
+ 	bool			is_async;
++	atmel_sha_fn_t		resume;
+ 
+ 	struct atmel_sha_dma	dma_lch_in;
+ 
+@@ -946,6 +947,8 @@ static int atmel_sha_handle_queue(struct atmel_sha_dev *dd,
+ 	return (start_async) ? ret : err;
  }
  
--static int atmel_sha_init(struct ahash_request *req)
-+static struct atmel_sha_dev *atmel_sha_find_dev(struct atmel_sha_ctx *tctx)
++static int atmel_sha_done(struct atmel_sha_dev *dd);
++
+ static int atmel_sha_start(struct atmel_sha_dev *dd)
  {
--	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
--	struct atmel_sha_ctx *tctx = crypto_ahash_ctx(tfm);
--	struct atmel_sha_reqctx *ctx = ahash_request_ctx(req);
- 	struct atmel_sha_dev *dd = NULL;
- 	struct atmel_sha_dev *tmp;
+ 	struct ahash_request *req = dd->req;
+@@ -960,6 +963,7 @@ static int atmel_sha_start(struct atmel_sha_dev *dd)
+ 	if (err)
+ 		goto err1;
  
-@@ -281,6 +278,16 @@ static int atmel_sha_init(struct ahash_request *req)
++	dd->resume = atmel_sha_done;
+ 	if (ctx->op == SHA_OP_UPDATE) {
+ 		err = atmel_sha_update_req(dd);
+ 		if (err != -EINPROGRESS && (ctx->flags & SHA_FLAGS_FINUP))
+@@ -1215,13 +1219,10 @@ static void atmel_sha_queue_task(unsigned long data)
+ 	atmel_sha_handle_queue(dd, NULL);
+ }
  
- 	spin_unlock_bh(&atmel_sha.lock);
+-static void atmel_sha_done_task(unsigned long data)
++static int atmel_sha_done(struct atmel_sha_dev *dd)
+ {
+-	struct atmel_sha_dev *dd = (struct atmel_sha_dev *)data;
+ 	int err = 0;
  
-+	return dd;
+-	dd->is_async = true;
+-
+ 	if (SHA_FLAGS_CPU & dd->flags) {
+ 		if (SHA_FLAGS_OUTPUT_READY & dd->flags) {
+ 			dd->flags &= ~SHA_FLAGS_OUTPUT_READY;
+@@ -1245,11 +1246,21 @@ static void atmel_sha_done_task(unsigned long data)
+ 				goto finish;
+ 		}
+ 	}
+-	return;
++	return err;
+ 
+ finish:
+ 	/* finish curent request */
+ 	atmel_sha_finish_req(dd->req, err);
++
++	return err;
 +}
 +
-+static int atmel_sha_init(struct ahash_request *req)
++static void atmel_sha_done_task(unsigned long data)
 +{
-+	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
-+	struct atmel_sha_ctx *tctx = crypto_ahash_ctx(tfm);
-+	struct atmel_sha_reqctx *ctx = ahash_request_ctx(req);
-+	struct atmel_sha_dev *dd = atmel_sha_find_dev(tctx);
++	struct atmel_sha_dev *dd = (struct atmel_sha_dev *)data;
 +
- 	ctx->dd = dd;
++	dd->is_async = true;
++	(void)dd->resume(dd);
+ }
  
- 	ctx->flags = 0;
+ static irqreturn_t atmel_sha_irq(int irq, void *dev_id)
 -- 
 2.7.4
