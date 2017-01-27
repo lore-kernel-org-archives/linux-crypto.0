@@ -1,7 +1,7 @@
 From: Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
-Subject: [PATCH v6 5/5] lib/lz4: Remove back-compat wrappers
-Date: Fri, 27 Jan 2017 23:02:04 +0100
-Message-ID: <1485554524-4844-6-git-send-email-4sschmid@informatik.uni-hamburg.de>
+Subject: [PATCH v6 3/5] crypto: Change LZ4 modules to work with new LZ4 module version
+Date: Fri, 27 Jan 2017 23:02:02 +0100
+Message-ID: <1485554524-4844-4-git-send-email-4sschmid@informatik.uni-hamburg.de>
 References: <1482259992-16680-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
  <1485554524-4844-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
 Cc: bongkyu.kim@lge.com, rsalvaterra@gmail.com,
@@ -13,248 +13,113 @@ Cc: bongkyu.kim@lge.com, rsalvaterra@gmail.com,
         Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
 To: akpm@linux-foundation.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailhost.informatik.uni-hamburg.de ([134.100.9.70]:36672 "EHLO
+Received: from mailhost.informatik.uni-hamburg.de ([134.100.9.70]:36650 "EHLO
         mailhost.informatik.uni-hamburg.de" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751727AbdA0WEl (ORCPT
+        by vger.kernel.org with ESMTP id S1751864AbdA0WEu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 27 Jan 2017 17:04:41 -0500
+        Fri, 27 Jan 2017 17:04:50 -0500
 In-Reply-To: <1485554524-4844-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch removes the functions introduced as wrappers for providing
-backwards compatibility to the prior LZ4 version.
-They're not needed anymore since there's no callers left.
+This patch updates the crypto modules using LZ4 compression
+to work with the new LZ4 module version.
 
 Signed-off-by: Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
 ---
- include/linux/lz4.h      | 73 ------------------------------------------------
- lib/lz4/lz4_compress.c   | 22 ---------------
- lib/lz4/lz4_decompress.c | 42 ----------------------------
- lib/lz4/lz4hc_compress.c | 23 ---------------
- 4 files changed, 160 deletions(-)
+ crypto/lz4.c   | 21 ++++++++-------------
+ crypto/lz4hc.c | 21 ++++++++-------------
+ 2 files changed, 16 insertions(+), 26 deletions(-)
 
-diff --git a/include/linux/lz4.h b/include/linux/lz4.h
-index ed59cb9..2844e6f 100644
---- a/include/linux/lz4.h
-+++ b/include/linux/lz4.h
-@@ -173,14 +173,6 @@ static inline int LZ4_compressBound(size_t isize)
+diff --git a/crypto/lz4.c b/crypto/lz4.c
+index 99c1b2c..40fd2c2 100644
+--- a/crypto/lz4.c
++++ b/crypto/lz4.c
+@@ -66,15 +66,13 @@ static void lz4_exit(struct crypto_tfm *tfm)
+ static int __lz4_compress_crypto(const u8 *src, unsigned int slen,
+ 				 u8 *dst, unsigned int *dlen, void *ctx)
+ {
+-	size_t tmp_len = *dlen;
+-	int err;
++	int out_len = LZ4_compress_default(src, dst,
++		slen, (int)((size_t)dlen), ctx);
+ 
+-	err = lz4_compress(src, slen, dst, &tmp_len, ctx);
+-
+-	if (err < 0)
++	if (!out_len)
+ 		return -EINVAL;
+ 
+-	*dlen = tmp_len;
++	*dlen = out_len;
+ 	return 0;
  }
  
- /*
-- * For backward compatibility
-- */
--static inline int lz4_compressbound(size_t isize)
--{
--	return LZ4_COMPRESSBOUND(isize);
--}
--
--/*
-  * LZ4_compress_default()
-  *	Compresses 'sourceSize' bytes from buffer 'source'
-  *	into already allocated 'dest' buffer of size 'maxOutputSize'.
-@@ -249,23 +241,6 @@ int LZ4_compress_fast(const char *source, char *dest, int inputSize,
- int LZ4_compress_destSize(const char *source, char *dest, int *sourceSizePtr,
- 	int targetDestSize, void *wrkmem);
+@@ -96,16 +94,13 @@ static int lz4_compress_crypto(struct crypto_tfm *tfm, const u8 *src,
+ static int __lz4_decompress_crypto(const u8 *src, unsigned int slen,
+ 				   u8 *dst, unsigned int *dlen, void *ctx)
+ {
+-	int err;
+-	size_t tmp_len = *dlen;
+-	size_t __slen = slen;
++	int out_len = LZ4_decompress_safe(src, dst, slen, (int)((size_t)dlen));
  
--/*
-- * lz4_compress()
-- *	src    : source address of the original data
-- *	src_len: size of the original data
-- *	dst    : output buffer address of the compressed data
-- *           This requires 'dst' of size LZ4_COMPRESSBOUND.
-- *	dst_len: is the output size, which is returned after compress done
-- *	workmem: address of the working memory.
-- *           This requires 'workmem' of size LZ4_MEM_COMPRESS.
-- *	return	: Success if return 0
-- *            Error if return (< 0)
-- *	note :	Destination buffer and workmem must be already allocated with
-- *		the defined size.
-- */
--int lz4_compress(const unsigned char *src, size_t src_len, unsigned char *dst,
--	size_t *dst_len, void *wrkmem);
--
- /*-************************************************************************
-  *	Decompression Functions
-  **************************************************************************/
-@@ -340,37 +315,6 @@ int LZ4_decompress_safe(const char *source, char *dest, int compressedSize,
- int LZ4_decompress_safe_partial(const char *source, char *dest,
- 	int compressedSize, int targetOutputSize, int maxDecompressedSize);
+-	err = lz4_decompress_unknownoutputsize(src, __slen, dst, &tmp_len);
+-	if (err < 0)
++	if (out_len < 0)
+ 		return -EINVAL;
  
--
--/*
-- * lz4_decompress_unknownoutputsize() :
-- *	src     : source address of the compressed data
-- *	src_len : is the input size, therefore the compressed size
-- *	dest    : output buffer address of the decompressed data
-- *	dest_len: is the max size of the destination buffer, which is
-- *            returned with actual size of decompressed data after
-- *            decompress done
-- * return: Success if return 0
-- *         Error if return (< 0)
-- * note:   Destination buffer must be already allocated.
-- */
--int lz4_decompress_unknownoutputsize(const unsigned char *src, size_t src_len,
--	unsigned char *dest, size_t *dest_len);
--
--/*
-- * lz4_decompress() :
-- *	src            : source address of the compressed data
-- *	src_len        : is the input size,
-- *                   which is returned after decompress done
-- *	dest           : output buffer address of the decompressed data
-- *	actual_dest_len: is the size of uncompressed data, supposing it's known
-- *	return: Success if return 0
-- *          Error if return (< 0)
-- *	note  : Destination buffer must be already allocated.
-- *          slightly faster than lz4_decompress_unknownoutputsize()
-- */
--int lz4_decompress(const unsigned char *src, size_t *src_len,
--	unsigned char *dest, size_t actual_dest_len);
--
- /*-************************************************************************
-  *	LZ4 HC Compression
-  **************************************************************************/
-@@ -399,23 +343,6 @@ int LZ4_compress_HC(const char *src, char *dst, int srcSize, int dstCapacity,
- 	int compressionLevel, void *wrkmem);
- 
- /*
-- * lz4hc_compress()
-- *	src    : source address of the original data
-- *	src_len: size of the original data
-- *	dst    : output buffer address of the compressed data
-- *           This requires 'dst' of size LZ4_COMPRESSBOUND.
-- *	dst_len: is the output size, which is returned after compress done
-- *	workmem: address of the working memory.
-- *           This requires 'workmem' of size LZ4HC_MEM_COMPRESS.
-- * return	: Success if return 0
-- *          Error if return (< 0)
-- * note   : Destination buffer and workmem must be already allocated with
-- *          the defined size.
-- */
--int lz4hc_compress(const unsigned char *src, size_t src_len, unsigned char *dst,
--	size_t *dst_len, void *wrkmem);
--
--/*
-  *	These functions compress data in successive blocks of any size,
-  *	using previous blocks as dictionary. One key assumption is that previous
-  *	blocks (up to 64 KB) remain read-accessible while
-diff --git a/lib/lz4/lz4_compress.c b/lib/lz4/lz4_compress.c
-index 295c71b..e78dbf3 100644
---- a/lib/lz4/lz4_compress.c
-+++ b/lib/lz4/lz4_compress.c
-@@ -872,27 +872,5 @@ int LZ4_compress_fast_continue(LZ4_stream_t *LZ4_stream, const char *source,
+-	*dlen = tmp_len;
+-	return err;
++	*dlen = out_len;
++	return out_len;
  }
- EXPORT_SYMBOL(LZ4_compress_fast_continue);
  
--/*-******************************
-- *	For backwards compatibility
-- ********************************/
--int lz4_compress(const unsigned char *src, size_t src_len, unsigned char *dst,
--	size_t *dst_len, void *wrkmem) {
--	*dst_len = LZ4_compress_default(src, dst, (int)src_len,
--		(int)((size_t)dst_len), wrkmem);
+ static int lz4_sdecompress(struct crypto_scomp *tfm, const u8 *src,
+diff --git a/crypto/lz4hc.c b/crypto/lz4hc.c
+index 75ffc4a..6f16f96 100644
+--- a/crypto/lz4hc.c
++++ b/crypto/lz4hc.c
+@@ -65,15 +65,13 @@ static void lz4hc_exit(struct crypto_tfm *tfm)
+ static int __lz4hc_compress_crypto(const u8 *src, unsigned int slen,
+ 				   u8 *dst, unsigned int *dlen, void *ctx)
+ {
+-	size_t tmp_len = *dlen;
+-	int err;
++	int out_len = LZ4_compress_HC(src, dst, slen,
++		(int)((size_t)dlen), LZ4HC_DEFAULT_CLEVEL, ctx);
+ 
+-	err = lz4hc_compress(src, slen, dst, &tmp_len, ctx);
 -
--	/*
--	 * Prior lz4_compress will return -1 in case of error
--	 * and 0 on success
--	 * while new LZ4_compress_fast/default
--	 * returns 0 in case of error
--	 * and the output length on success
--	 */
--	if (!dst_len)
--		return -1;
--	else
--		return 0;
--}
--EXPORT_SYMBOL(lz4_compress);
--
- MODULE_LICENSE("Dual BSD/GPL");
- MODULE_DESCRIPTION("LZ4 compressor");
-diff --git a/lib/lz4/lz4_decompress.c b/lib/lz4/lz4_decompress.c
-index 322ea3a..f97ee6d 100644
---- a/lib/lz4/lz4_decompress.c
-+++ b/lib/lz4/lz4_decompress.c
-@@ -485,47 +485,5 @@ int LZ4_decompress_fast_usingDict(const char *source, char *dest,
+-	if (err < 0)
++	if (out_len == 0)
+ 		return -EINVAL;
+ 
+-	*dlen = tmp_len;
++	*dlen = out_len;
+ 	return 0;
  }
- EXPORT_SYMBOL(LZ4_decompress_fast_usingDict);
  
--/*-******************************
-- *	For backwards compatibility
-- ********************************/
--int lz4_decompress_unknownoutputsize(const unsigned char *src,
--	size_t src_len, unsigned char *dest, size_t *dest_len) {
--	 *dest_len = LZ4_decompress_safe(src, dest,
--		 (int)src_len, (int)((size_t)dest_len));
--
--		/*
--		 * Prior lz4_decompress_unknownoutputsize will return
--		 * 0 for success and a negative result for error
--		 * new LZ4_decompress_safe returns
--		 * - the length of data read on success
--		 * - and also a negative result on error
--		 * meaning when result > 0, we just return 0 here
--		 */
--		if (src_len > 0)
--			return 0;
--		else
--			return -1;
--}
--EXPORT_SYMBOL(lz4_decompress_unknownoutputsize);
--
--int lz4_decompress(const unsigned char *src, size_t *src_len,
--	unsigned char *dest, size_t actual_dest_len) {
--	*src_len = LZ4_decompress_fast(src, dest, (int)actual_dest_len);
--
--	/*
--	 * Prior lz4_decompress will return
--	 * 0 for success and a negative result for error
--	 * new LZ4_decompress_fast returns
--	 * - the length of data read on success
--	 * - and also a negative result on error
--	 * meaning when result > 0, we just return 0 here
--	 */
--	if ((int)((size_t)src_len) > 0)
--		return 0;
--	else
--		return -1;
--}
--EXPORT_SYMBOL(lz4_decompress);
--
- MODULE_LICENSE("Dual BSD/GPL");
- MODULE_DESCRIPTION("LZ4 decompressor");
-diff --git a/lib/lz4/lz4hc_compress.c b/lib/lz4/lz4hc_compress.c
-index da8063c..a29dad0 100644
---- a/lib/lz4/lz4hc_compress.c
-+++ b/lib/lz4/lz4hc_compress.c
-@@ -753,28 +753,5 @@ int LZ4_saveDictHC(
+@@ -97,16 +95,13 @@ static int lz4hc_compress_crypto(struct crypto_tfm *tfm, const u8 *src,
+ static int __lz4hc_decompress_crypto(const u8 *src, unsigned int slen,
+ 				     u8 *dst, unsigned int *dlen, void *ctx)
+ {
+-	int err;
+-	size_t tmp_len = *dlen;
+-	size_t __slen = slen;
++	int out_len = LZ4_decompress_safe(src, dst, slen, (int)((size_t)dlen));
+ 
+-	err = lz4_decompress_unknownoutputsize(src, __slen, dst, &tmp_len);
+-	if (err < 0)
++	if (out_len < 0)
+ 		return -EINVAL;
+ 
+-	*dlen = tmp_len;
+-	return err;
++	*dlen = out_len;
++	return out_len;
  }
- EXPORT_SYMBOL(LZ4_saveDictHC);
  
--/*-******************************
-- *	For backwards compatibility
-- ********************************/
--int lz4hc_compress(const unsigned char *src, size_t src_len,
--	unsigned char *dst, size_t *dst_len, void *wrkmem)
--{
--	*dst_len = LZ4_compress_HC(src, dst, (int)src_len,
--		(int)((size_t)dst_len), LZ4HC_DEFAULT_CLEVEL, wrkmem);
--
--	/*
--	 * Prior lz4hc_compress will return -1 in case of error
--	 * and 0 on success
--	 * while new LZ4_compress_HC
--	 * returns 0 in case of error
--	 * and the output length on success
--	 */
--	if (!dst_len)
--		return -1;
--	else
--		return 0;
--}
--EXPORT_SYMBOL(lz4hc_compress);
--
- MODULE_LICENSE("Dual BSD/GPL");
- MODULE_DESCRIPTION("LZ4 HC compressor");
+ static int lz4hc_sdecompress(struct crypto_scomp *tfm, const u8 *src,
 -- 
 2.1.4
