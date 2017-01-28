@@ -1,81 +1,313 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v3 00/10] crypto - AES for ARM/arm64 updates for v4.11 (round #2)
-Date: Sat, 28 Jan 2017 23:25:29 +0000
-Message-ID: <1485645939-17126-1-git-send-email-ard.biesheuvel@linaro.org>
+Subject: [PATCH v3 02/10] crypto: arm/aes-ce - remove cra_alignmask
+Date: Sat, 28 Jan 2017 23:25:31 +0000
+Message-ID: <1485645939-17126-3-git-send-email-ard.biesheuvel@linaro.org>
+References: <1485645939-17126-1-git-send-email-ard.biesheuvel@linaro.org>
 Cc: linux-arm-kernel@lists.infradead.org, herbert@gondor.apana.org.au,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f49.google.com ([74.125.82.49]:38011 "EHLO
-        mail-wm0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751947AbdA1XZx (ORCPT
+Received: from mail-wm0-f42.google.com ([74.125.82.42]:35019 "EHLO
+        mail-wm0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751947AbdA1XZ6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 28 Jan 2017 18:25:53 -0500
-Received: by mail-wm0-f49.google.com with SMTP id r126so35376770wmr.1
-        for <linux-crypto@vger.kernel.org>; Sat, 28 Jan 2017 15:25:53 -0800 (PST)
+        Sat, 28 Jan 2017 18:25:58 -0500
+Received: by mail-wm0-f42.google.com with SMTP id r126so165099089wmr.0
+        for <linux-crypto@vger.kernel.org>; Sat, 28 Jan 2017 15:25:57 -0800 (PST)
+In-Reply-To: <1485645939-17126-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Patch #1 is a fix for the CBC chaining issue that was discussed on the
-mailing list. The driver itself is queued for v4.11, so this fix can go
-right on top.
+Remove the unnecessary alignmask: it is much more efficient to deal with
+the misalignment in the core algorithm than relying on the crypto API to
+copy the data to a suitably aligned buffer.
 
-Patches #2 - #6 clear the cra_alignmasks of various drivers: all NEON
-capable CPUs can perform unaligned accesses, and the advantage of using
-the slightly faster aligned accessors (which only exist on ARM not arm64)
-is certainly outweighed by the cost of copying data to suitably aligned
-buffers.
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+ arch/arm/crypto/aes-ce-core.S | 84 ++++++++++----------
+ arch/arm/crypto/aes-ce-glue.c | 15 ++--
+ 2 files changed, 47 insertions(+), 52 deletions(-)
 
-NOTE: patch #5 won't apply unless 'crypto: arm64/aes-blk - honour iv_out
-requirement in CBC and CTR modes' is applied first, which was sent out
-separately as a bugfix for v3.16 - v4.9. If this is a problem, this patch
-can wait.
-
-Patch #7 and #8 are minor tweaks to the new scalar AES code.
-
-Patch #9 improves the performance of the plain NEON AES code, to make it
-more suitable as a fallback for the new bitsliced NEON code, which can
-only operate on 8 blocks in parallel, and needs another driver to perform
-CBC encryption or XTS tweak generation.
-
-Patch #10 updates the new bitsliced AES NEON code to switch to the plain
-NEON driver as a fallback.
-
-Patches #9 and #10 improve the performance of CBC encryption by ~35% on
-low end cores such as the Cortex-A53 that can be found in the Raspberry Pi3
-
-Changes since v2:
-- use polynomial multiply NEON instruction for multiplication by x^2, this
-  eliminates 4 instructions from the decrypt path (#9)
-
-Changes since v1:
-- shave off another few cycles from the sequential AES NEON code (patch #9)
-
-Ard Biesheuvel (10):
-  crypto: arm64/aes-neon-bs - honour iv_out requirement in CTR mode
-  crypto: arm/aes-ce - remove cra_alignmask
-  crypto: arm/chacha20 - remove cra_alignmask
-  crypto: arm64/aes-ce-ccm - remove cra_alignmask
-  crypto: arm64/aes-blk - remove cra_alignmask
-  crypto: arm64/chacha20 - remove cra_alignmask
-  crypto: arm64/aes - avoid literals for cross-module symbol references
-  crypto: arm64/aes - performance tweak
-  crypto: arm64/aes-neon-blk - tweak performance for low end cores
-  crypto: arm64/aes - replace scalar fallback with plain NEON fallback
-
- arch/arm/crypto/aes-ce-core.S          |  84 ++++---
- arch/arm/crypto/aes-ce-glue.c          |  15 +-
- arch/arm/crypto/chacha20-neon-glue.c   |   1 -
- arch/arm64/crypto/Kconfig              |   2 +-
- arch/arm64/crypto/aes-ce-ccm-glue.c    |   1 -
- arch/arm64/crypto/aes-cipher-core.S    |  59 ++---
- arch/arm64/crypto/aes-glue.c           |  18 +-
- arch/arm64/crypto/aes-modes.S          |   8 +-
- arch/arm64/crypto/aes-neon.S           | 235 +++++++++-----------
- arch/arm64/crypto/aes-neonbs-core.S    |  25 ++-
- arch/arm64/crypto/aes-neonbs-glue.c    |  38 +++-
- arch/arm64/crypto/chacha20-neon-glue.c |   1 -
- 12 files changed, 224 insertions(+), 263 deletions(-)
-
+diff --git a/arch/arm/crypto/aes-ce-core.S b/arch/arm/crypto/aes-ce-core.S
+index 987aa632c9f0..ba8e6a32fdc9 100644
+--- a/arch/arm/crypto/aes-ce-core.S
++++ b/arch/arm/crypto/aes-ce-core.S
+@@ -169,19 +169,19 @@ ENTRY(ce_aes_ecb_encrypt)
+ .Lecbencloop3x:
+ 	subs		r4, r4, #3
+ 	bmi		.Lecbenc1x
+-	vld1.8		{q0-q1}, [r1, :64]!
+-	vld1.8		{q2}, [r1, :64]!
++	vld1.8		{q0-q1}, [r1]!
++	vld1.8		{q2}, [r1]!
+ 	bl		aes_encrypt_3x
+-	vst1.8		{q0-q1}, [r0, :64]!
+-	vst1.8		{q2}, [r0, :64]!
++	vst1.8		{q0-q1}, [r0]!
++	vst1.8		{q2}, [r0]!
+ 	b		.Lecbencloop3x
+ .Lecbenc1x:
+ 	adds		r4, r4, #3
+ 	beq		.Lecbencout
+ .Lecbencloop:
+-	vld1.8		{q0}, [r1, :64]!
++	vld1.8		{q0}, [r1]!
+ 	bl		aes_encrypt
+-	vst1.8		{q0}, [r0, :64]!
++	vst1.8		{q0}, [r0]!
+ 	subs		r4, r4, #1
+ 	bne		.Lecbencloop
+ .Lecbencout:
+@@ -195,19 +195,19 @@ ENTRY(ce_aes_ecb_decrypt)
+ .Lecbdecloop3x:
+ 	subs		r4, r4, #3
+ 	bmi		.Lecbdec1x
+-	vld1.8		{q0-q1}, [r1, :64]!
+-	vld1.8		{q2}, [r1, :64]!
++	vld1.8		{q0-q1}, [r1]!
++	vld1.8		{q2}, [r1]!
+ 	bl		aes_decrypt_3x
+-	vst1.8		{q0-q1}, [r0, :64]!
+-	vst1.8		{q2}, [r0, :64]!
++	vst1.8		{q0-q1}, [r0]!
++	vst1.8		{q2}, [r0]!
+ 	b		.Lecbdecloop3x
+ .Lecbdec1x:
+ 	adds		r4, r4, #3
+ 	beq		.Lecbdecout
+ .Lecbdecloop:
+-	vld1.8		{q0}, [r1, :64]!
++	vld1.8		{q0}, [r1]!
+ 	bl		aes_decrypt
+-	vst1.8		{q0}, [r0, :64]!
++	vst1.8		{q0}, [r0]!
+ 	subs		r4, r4, #1
+ 	bne		.Lecbdecloop
+ .Lecbdecout:
+@@ -226,10 +226,10 @@ ENTRY(ce_aes_cbc_encrypt)
+ 	vld1.8		{q0}, [r5]
+ 	prepare_key	r2, r3
+ .Lcbcencloop:
+-	vld1.8		{q1}, [r1, :64]!	@ get next pt block
++	vld1.8		{q1}, [r1]!		@ get next pt block
+ 	veor		q0, q0, q1		@ ..and xor with iv
+ 	bl		aes_encrypt
+-	vst1.8		{q0}, [r0, :64]!
++	vst1.8		{q0}, [r0]!
+ 	subs		r4, r4, #1
+ 	bne		.Lcbcencloop
+ 	vst1.8		{q0}, [r5]
+@@ -244,8 +244,8 @@ ENTRY(ce_aes_cbc_decrypt)
+ .Lcbcdecloop3x:
+ 	subs		r4, r4, #3
+ 	bmi		.Lcbcdec1x
+-	vld1.8		{q0-q1}, [r1, :64]!
+-	vld1.8		{q2}, [r1, :64]!
++	vld1.8		{q0-q1}, [r1]!
++	vld1.8		{q2}, [r1]!
+ 	vmov		q3, q0
+ 	vmov		q4, q1
+ 	vmov		q5, q2
+@@ -254,19 +254,19 @@ ENTRY(ce_aes_cbc_decrypt)
+ 	veor		q1, q1, q3
+ 	veor		q2, q2, q4
+ 	vmov		q6, q5
+-	vst1.8		{q0-q1}, [r0, :64]!
+-	vst1.8		{q2}, [r0, :64]!
++	vst1.8		{q0-q1}, [r0]!
++	vst1.8		{q2}, [r0]!
+ 	b		.Lcbcdecloop3x
+ .Lcbcdec1x:
+ 	adds		r4, r4, #3
+ 	beq		.Lcbcdecout
+ 	vmov		q15, q14		@ preserve last round key
+ .Lcbcdecloop:
+-	vld1.8		{q0}, [r1, :64]!	@ get next ct block
++	vld1.8		{q0}, [r1]!		@ get next ct block
+ 	veor		q14, q15, q6		@ combine prev ct with last key
+ 	vmov		q6, q0
+ 	bl		aes_decrypt
+-	vst1.8		{q0}, [r0, :64]!
++	vst1.8		{q0}, [r0]!
+ 	subs		r4, r4, #1
+ 	bne		.Lcbcdecloop
+ .Lcbcdecout:
+@@ -300,15 +300,15 @@ ENTRY(ce_aes_ctr_encrypt)
+ 	rev		ip, r6
+ 	add		r6, r6, #1
+ 	vmov		s11, ip
+-	vld1.8		{q3-q4}, [r1, :64]!
+-	vld1.8		{q5}, [r1, :64]!
++	vld1.8		{q3-q4}, [r1]!
++	vld1.8		{q5}, [r1]!
+ 	bl		aes_encrypt_3x
+ 	veor		q0, q0, q3
+ 	veor		q1, q1, q4
+ 	veor		q2, q2, q5
+ 	rev		ip, r6
+-	vst1.8		{q0-q1}, [r0, :64]!
+-	vst1.8		{q2}, [r0, :64]!
++	vst1.8		{q0-q1}, [r0]!
++	vst1.8		{q2}, [r0]!
+ 	vmov		s27, ip
+ 	b		.Lctrloop3x
+ .Lctr1x:
+@@ -318,10 +318,10 @@ ENTRY(ce_aes_ctr_encrypt)
+ 	vmov		q0, q6
+ 	bl		aes_encrypt
+ 	subs		r4, r4, #1
+-	bmi		.Lctrhalfblock		@ blocks < 0 means 1/2 block
+-	vld1.8		{q3}, [r1, :64]!
++	bmi		.Lctrtailblock		@ blocks < 0 means tail block
++	vld1.8		{q3}, [r1]!
+ 	veor		q3, q0, q3
+-	vst1.8		{q3}, [r0, :64]!
++	vst1.8		{q3}, [r0]!
+ 
+ 	adds		r6, r6, #1		@ increment BE ctr
+ 	rev		ip, r6
+@@ -333,10 +333,8 @@ ENTRY(ce_aes_ctr_encrypt)
+ 	vst1.8		{q6}, [r5]
+ 	pop		{r4-r6, pc}
+ 
+-.Lctrhalfblock:
+-	vld1.8		{d1}, [r1, :64]
+-	veor		d0, d0, d1
+-	vst1.8		{d0}, [r0, :64]
++.Lctrtailblock:
++	vst1.8		{q0}, [r0, :64]		@ return just the key stream
+ 	pop		{r4-r6, pc}
+ 
+ .Lctrcarry:
+@@ -405,8 +403,8 @@ ENTRY(ce_aes_xts_encrypt)
+ .Lxtsenc3x:
+ 	subs		r4, r4, #3
+ 	bmi		.Lxtsenc1x
+-	vld1.8		{q0-q1}, [r1, :64]!	@ get 3 pt blocks
+-	vld1.8		{q2}, [r1, :64]!
++	vld1.8		{q0-q1}, [r1]!		@ get 3 pt blocks
++	vld1.8		{q2}, [r1]!
+ 	next_tweak	q4, q3, q7, q6
+ 	veor		q0, q0, q3
+ 	next_tweak	q5, q4, q7, q6
+@@ -416,8 +414,8 @@ ENTRY(ce_aes_xts_encrypt)
+ 	veor		q0, q0, q3
+ 	veor		q1, q1, q4
+ 	veor		q2, q2, q5
+-	vst1.8		{q0-q1}, [r0, :64]!	@ write 3 ct blocks
+-	vst1.8		{q2}, [r0, :64]!
++	vst1.8		{q0-q1}, [r0]!		@ write 3 ct blocks
++	vst1.8		{q2}, [r0]!
+ 	vmov		q3, q5
+ 	teq		r4, #0
+ 	beq		.Lxtsencout
+@@ -426,11 +424,11 @@ ENTRY(ce_aes_xts_encrypt)
+ 	adds		r4, r4, #3
+ 	beq		.Lxtsencout
+ .Lxtsencloop:
+-	vld1.8		{q0}, [r1, :64]!
++	vld1.8		{q0}, [r1]!
+ 	veor		q0, q0, q3
+ 	bl		aes_encrypt
+ 	veor		q0, q0, q3
+-	vst1.8		{q0}, [r0, :64]!
++	vst1.8		{q0}, [r0]!
+ 	subs		r4, r4, #1
+ 	beq		.Lxtsencout
+ 	next_tweak	q3, q3, q7, q6
+@@ -456,8 +454,8 @@ ENTRY(ce_aes_xts_decrypt)
+ .Lxtsdec3x:
+ 	subs		r4, r4, #3
+ 	bmi		.Lxtsdec1x
+-	vld1.8		{q0-q1}, [r1, :64]!	@ get 3 ct blocks
+-	vld1.8		{q2}, [r1, :64]!
++	vld1.8		{q0-q1}, [r1]!		@ get 3 ct blocks
++	vld1.8		{q2}, [r1]!
+ 	next_tweak	q4, q3, q7, q6
+ 	veor		q0, q0, q3
+ 	next_tweak	q5, q4, q7, q6
+@@ -467,8 +465,8 @@ ENTRY(ce_aes_xts_decrypt)
+ 	veor		q0, q0, q3
+ 	veor		q1, q1, q4
+ 	veor		q2, q2, q5
+-	vst1.8		{q0-q1}, [r0, :64]!	@ write 3 pt blocks
+-	vst1.8		{q2}, [r0, :64]!
++	vst1.8		{q0-q1}, [r0]!		@ write 3 pt blocks
++	vst1.8		{q2}, [r0]!
+ 	vmov		q3, q5
+ 	teq		r4, #0
+ 	beq		.Lxtsdecout
+@@ -477,12 +475,12 @@ ENTRY(ce_aes_xts_decrypt)
+ 	adds		r4, r4, #3
+ 	beq		.Lxtsdecout
+ .Lxtsdecloop:
+-	vld1.8		{q0}, [r1, :64]!
++	vld1.8		{q0}, [r1]!
+ 	veor		q0, q0, q3
+ 	add		ip, r2, #32		@ 3rd round key
+ 	bl		aes_decrypt
+ 	veor		q0, q0, q3
+-	vst1.8		{q0}, [r0, :64]!
++	vst1.8		{q0}, [r0]!
+ 	subs		r4, r4, #1
+ 	beq		.Lxtsdecout
+ 	next_tweak	q3, q3, q7, q6
+diff --git a/arch/arm/crypto/aes-ce-glue.c b/arch/arm/crypto/aes-ce-glue.c
+index 8857531915bf..883b84d828c5 100644
+--- a/arch/arm/crypto/aes-ce-glue.c
++++ b/arch/arm/crypto/aes-ce-glue.c
+@@ -278,14 +278,15 @@ static int ctr_encrypt(struct skcipher_request *req)
+ 		u8 *tsrc = walk.src.virt.addr;
+ 
+ 		/*
+-		 * Minimum alignment is 8 bytes, so if nbytes is <= 8, we need
+-		 * to tell aes_ctr_encrypt() to only read half a block.
++		 * Tell aes_ctr_encrypt() to process a tail block.
+ 		 */
+-		blocks = (nbytes <= 8) ? -1 : 1;
++		blocks = -1;
+ 
+-		ce_aes_ctr_encrypt(tail, tsrc, (u8 *)ctx->key_enc,
++		ce_aes_ctr_encrypt(tail, NULL, (u8 *)ctx->key_enc,
+ 				   num_rounds(ctx), blocks, walk.iv);
+-		memcpy(tdst, tail, nbytes);
++		if (tdst != tsrc)
++			memcpy(tdst, tsrc, nbytes);
++		crypto_xor(tdst, tail, nbytes);
+ 		err = skcipher_walk_done(&walk, 0);
+ 	}
+ 	kernel_neon_end();
+@@ -345,7 +346,6 @@ static struct skcipher_alg aes_algs[] = { {
+ 		.cra_flags		= CRYPTO_ALG_INTERNAL,
+ 		.cra_blocksize		= AES_BLOCK_SIZE,
+ 		.cra_ctxsize		= sizeof(struct crypto_aes_ctx),
+-		.cra_alignmask		= 7,
+ 		.cra_module		= THIS_MODULE,
+ 	},
+ 	.min_keysize	= AES_MIN_KEY_SIZE,
+@@ -361,7 +361,6 @@ static struct skcipher_alg aes_algs[] = { {
+ 		.cra_flags		= CRYPTO_ALG_INTERNAL,
+ 		.cra_blocksize		= AES_BLOCK_SIZE,
+ 		.cra_ctxsize		= sizeof(struct crypto_aes_ctx),
+-		.cra_alignmask		= 7,
+ 		.cra_module		= THIS_MODULE,
+ 	},
+ 	.min_keysize	= AES_MIN_KEY_SIZE,
+@@ -378,7 +377,6 @@ static struct skcipher_alg aes_algs[] = { {
+ 		.cra_flags		= CRYPTO_ALG_INTERNAL,
+ 		.cra_blocksize		= 1,
+ 		.cra_ctxsize		= sizeof(struct crypto_aes_ctx),
+-		.cra_alignmask		= 7,
+ 		.cra_module		= THIS_MODULE,
+ 	},
+ 	.min_keysize	= AES_MIN_KEY_SIZE,
+@@ -396,7 +394,6 @@ static struct skcipher_alg aes_algs[] = { {
+ 		.cra_flags		= CRYPTO_ALG_INTERNAL,
+ 		.cra_blocksize		= AES_BLOCK_SIZE,
+ 		.cra_ctxsize		= sizeof(struct crypto_aes_xts_ctx),
+-		.cra_alignmask		= 7,
+ 		.cra_module		= THIS_MODULE,
+ 	},
+ 	.min_keysize	= 2 * AES_MIN_KEY_SIZE,
 -- 
 2.7.4
