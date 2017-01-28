@@ -1,119 +1,249 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v2 1/4] crypto: testmgr - add test cases for cbcmac(aes)
-Date: Sat, 28 Jan 2017 23:33:30 +0000
-Message-ID: <1485646413-17491-2-git-send-email-ard.biesheuvel@linaro.org>
+Subject: [PATCH v2 3/4] crypto: arm64/aes - add NEON and Crypto Extension
+ CBC-MAC driver
+Date: Sat, 28 Jan 2017 23:33:32 +0000
+Message-ID: <1485646413-17491-4-git-send-email-ard.biesheuvel@linaro.org>
 References: <1485646413-17491-1-git-send-email-ard.biesheuvel@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, herbert@gondor.apana.org.au,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: herbert@gondor.apana.org.au, linux-arm-kernel@lists.infradead.org,
+ Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f47.google.com ([74.125.82.47]:34076 "EHLO
-        mail-wm0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752120AbdA1Xeq (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 28 Jan 2017 18:34:46 -0500
-Received: by mail-wm0-f47.google.com with SMTP id r126so333047wmr.1
-        for <linux-crypto@vger.kernel.org>; Sat, 28 Jan 2017 15:34:00 -0800 (PST)
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 In-Reply-To: <1485646413-17491-1-git-send-email-ard.biesheuvel@linaro.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-In preparation of splitting off the CBC-MAC transform in the CCM
-driver into a separate algorithm, define some test cases for the
-AES incarnation of cbcmac.
+On ARMv8 implementations that do not support the Crypto Extensions,
+such as the Raspberry Pi 3, the CCM driver falls back to the generic
+table based AES implementation to perform the MAC part of the
+algorithm, which is slow and not time invariant. So add a CBCMAC
+implementation to the shared glue code between NEON AES and Crypto
+Extensions AES, so that it can be used instead now that the CCM
+driver has been updated to look for CBCMAC implementations other
+than the one it supplies itself.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- crypto/testmgr.c |  7 +++
- crypto/testmgr.h | 58 ++++++++++++++++++++
- 2 files changed, 65 insertions(+)
+ arch/arm64/crypto/aes-glue.c  | 107 ++++++++++++++++++++
+ arch/arm64/crypto/aes-modes.S |  22 ++++
+ 2 files changed, 129 insertions(+)
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 98eb09782db8..f9c378af3907 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -2514,6 +2514,13 @@ static const struct alg_test_desc alg_test_descs[] = {
- 			}
- 		}
- 	}, {
-+		.alg = "cbcmac(aes)",
-+		.fips_allowed = 1,
-+		.test = alg_test_hash,
-+		.suite = {
-+			.hash = __VECS(aes_cbcmac_tv_template)
-+		}
-+	}, {
- 		.alg = "ccm(aes)",
- 		.test = alg_test_aead,
- 		.fips_allowed = 1,
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 64595f067d72..ed6b09978611 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -3413,6 +3413,64 @@ static struct hash_testvec aes_cmac128_tv_template[] = {
- 	}
+diff --git a/arch/arm64/crypto/aes-glue.c b/arch/arm64/crypto/aes-glue.c
+index 055bc3f61138..3265a6e79a4e 100644
+--- a/arch/arm64/crypto/aes-glue.c
++++ b/arch/arm64/crypto/aes-glue.c
+@@ -11,6 +11,7 @@
+ #include <asm/neon.h>
+ #include <asm/hwcap.h>
+ #include <crypto/aes.h>
++#include <crypto/internal/hash.h>
+ #include <crypto/internal/simd.h>
+ #include <crypto/internal/skcipher.h>
+ #include <linux/module.h>
+@@ -31,6 +32,7 @@
+ #define aes_ctr_encrypt		ce_aes_ctr_encrypt
+ #define aes_xts_encrypt		ce_aes_xts_encrypt
+ #define aes_xts_decrypt		ce_aes_xts_decrypt
++#define aes_cbcmac_update	ce_aes_cbcmac_update
+ MODULE_DESCRIPTION("AES-ECB/CBC/CTR/XTS using ARMv8 Crypto Extensions");
+ #else
+ #define MODE			"neon"
+@@ -44,11 +46,13 @@ MODULE_DESCRIPTION("AES-ECB/CBC/CTR/XTS using ARMv8 Crypto Extensions");
+ #define aes_ctr_encrypt		neon_aes_ctr_encrypt
+ #define aes_xts_encrypt		neon_aes_xts_encrypt
+ #define aes_xts_decrypt		neon_aes_xts_decrypt
++#define aes_cbcmac_update	neon_aes_cbcmac_update
+ MODULE_DESCRIPTION("AES-ECB/CBC/CTR/XTS using ARMv8 NEON");
+ MODULE_ALIAS_CRYPTO("ecb(aes)");
+ MODULE_ALIAS_CRYPTO("cbc(aes)");
+ MODULE_ALIAS_CRYPTO("ctr(aes)");
+ MODULE_ALIAS_CRYPTO("xts(aes)");
++MODULE_ALIAS_CRYPTO("cbcmac(aes)");
+ #endif
+ 
+ MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
+@@ -75,11 +79,19 @@ asmlinkage void aes_xts_decrypt(u8 out[], u8 const in[], u8 const rk1[],
+ 				int rounds, int blocks, u8 const rk2[], u8 iv[],
+ 				int first);
+ 
++asmlinkage void aes_cbcmac_update(u8 const in[], u32 const rk[], int rounds,
++				  int blocks, u8 dg[], int skip_first_load);
++
+ struct crypto_aes_xts_ctx {
+ 	struct crypto_aes_ctx key1;
+ 	struct crypto_aes_ctx __aligned(8) key2;
  };
  
-+static struct hash_testvec aes_cbcmac_tv_template[] = {
-+	{
-+		.key		= "\x2b\x7e\x15\x16\x28\xae\xd2\xa6"
-+				  "\xab\xf7\x15\x88\x09\xcf\x4f\x3c",
-+		.plaintext	= "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96"
-+				  "\xe9\x3d\x7e\x11\x73\x93\x17\x2a",
-+		.digest		= "\x3a\xd7\x7b\xb4\x0d\x7a\x36\x60"
-+				  "\xa8\x9e\xca\xf3\x24\x66\xef\x97",
-+		.psize		= 16,
-+		.ksize		= 16,
-+	}, {
-+		.key		= "\x2b\x7e\x15\x16\x28\xae\xd2\xa6"
-+				  "\xab\xf7\x15\x88\x09\xcf\x4f\x3c",
-+		.plaintext	= "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96"
-+				  "\xe9\x3d\x7e\x11\x73\x93\x17\x2a"
-+				  "\xae\x2d\x8a\x57\x1e\x03\xac\x9c"
-+				  "\x9e\xb7\x6f\xac\x45\xaf\x8e\x51"
-+				  "\x30",
-+		.digest		= "\x9d\x0d\xd0\x63\xfb\xcb\x24\x43"
-+				  "\xf8\xf2\x76\x03\xac\x39\xb0\x9d",
-+		.psize		= 33,
-+		.ksize		= 16,
-+	}, {
-+		.key		= "\x2b\x7e\x15\x16\x28\xae\xd2\xa6"
-+				  "\xab\xf7\x15\x88\x09\xcf\x4f\x3c",
-+		.plaintext	= "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96"
-+				  "\xe9\x3d\x7e\x11\x73\x93\x17\x2a"
-+				  "\xae\x2d\x8a\x57\x1e\x03\xac\x9c"
-+				  "\x9e\xb7\x6f\xac\x45\xaf\x8e\x51"
-+				  "\x30\xc8\x1c\x46\xa3\x5c\xe4\x11"
-+				  "\xe5\xfb\xc1\x19\x1a\x0a\x52\xef"
-+				  "\xf6\x9f\x24\x45\xdf\x4f\x9b\x17"
-+				  "\xad\x2b\x41\x7b\xe6\x6c\x37",
-+		.digest		= "\xc0\x71\x73\xb8\xa0\x2c\x11\x7c"
-+				  "\xaf\xdc\xb2\xf8\x89\x32\xa3\x3a",
-+		.psize		= 63,
-+		.ksize		= 16,
-+	}, {
-+		.key		= "\x60\x3d\xeb\x10\x15\xca\x71\xbe"
-+				  "\x2b\x73\xae\xf0\x85\x7d\x77\x81"
-+				  "\x1f\x35\x2c\x07\x3b\x61\x08\xd7"
-+				  "\x2d\x98\x10\xa3\x09\x14\xdf\xf4",
-+		.plaintext	= "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96"
-+				  "\xe9\x3d\x7e\x11\x73\x93\x17\x2a"
-+				  "\xae\x2d\x8a\x57\x1e\x03\xac\x9c"
-+				  "\x9e\xb7\x6f\xac\x45\xaf\x8e\x51"
-+				  "\x30\xc8\x1c\x46\xa3\x5c\xe4\x11"
-+				  "\xe5\xfb\xc1\x19\x1a\x0a\x52\xef"
-+				  "\xf6\x9f\x24\x45\xdf\x4f\x9b\x17"
-+				  "\xad\x2b\x41\x7b\xe6\x6c\x37\x10"
-+				  "\x1c",
-+		.digest		= "\x6a\x4e\xdb\x21\x47\x51\xdf\x4f"
-+				  "\xa8\x4d\x4c\x10\x3b\x72\x7d\xd6",
-+		.psize		= 65,
-+		.ksize		= 32,
-+	}
++struct cbcmac_desc_ctx {
++	unsigned int len;
++	u8 dg[AES_BLOCK_SIZE];
 +};
 +
- static struct hash_testvec des3_ede_cmac64_tv_template[] = {
- /*
-  * From NIST Special Publication 800-38B, Three Key TDEA
+ static int skcipher_aes_setkey(struct crypto_skcipher *tfm, const u8 *in_key,
+ 			       unsigned int key_len)
+ {
+@@ -357,6 +369,94 @@ static struct skcipher_alg aes_algs[] = { {
+ 	.decrypt	= xts_decrypt,
+ } };
+ 
++static int cbcmac_setkey(struct crypto_shash *tfm,
++			 const u8 *in_key, unsigned int key_len)
++{
++	struct crypto_aes_ctx *ctx = crypto_shash_ctx(tfm);
++	int err;
++
++	err = aes_expandkey(ctx, in_key, key_len);
++	if (err)
++		crypto_shash_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
++
++	return err;
++}
++
++static int cbcmac_init(struct shash_desc *desc)
++{
++	struct cbcmac_desc_ctx *ctx = shash_desc_ctx(desc);
++
++	memset(ctx->dg, 0, AES_BLOCK_SIZE);
++	ctx->len = 0;
++
++	return 0;
++}
++
++static int cbcmac_update(struct shash_desc *desc, const u8 *p,
++			 unsigned int len)
++{
++	struct crypto_aes_ctx *tctx = crypto_shash_ctx(desc->tfm);
++	struct cbcmac_desc_ctx *ctx = shash_desc_ctx(desc);
++	int rounds = 6 + tctx->key_length / 4;
++	int queued = (ctx->len != 0);
++
++	while (ctx->len != 0 && len > 0) {
++		ctx->dg[ctx->len++] ^= *p++;
++		ctx->len %= AES_BLOCK_SIZE;
++		len--;
++	}
++
++	if (len >= AES_BLOCK_SIZE || (!ctx->len && queued)) {
++		int blocks = len / AES_BLOCK_SIZE;
++
++		kernel_neon_begin();
++		aes_cbcmac_update(p, tctx->key_enc, rounds, blocks, ctx->dg,
++				  queued);
++		kernel_neon_end();
++
++		p += blocks * AES_BLOCK_SIZE;
++		len %= AES_BLOCK_SIZE;
++	}
++
++	while (len--)
++		ctx->dg[ctx->len++] ^= *p++;
++
++	return 0;
++}
++
++static int cbcmac_final(struct shash_desc *desc, u8 *out)
++{
++	struct crypto_aes_ctx *tctx = crypto_shash_ctx(desc->tfm);
++	struct cbcmac_desc_ctx *ctx = shash_desc_ctx(desc);
++	int rounds = 6 + tctx->key_length / 4;
++
++	if (ctx->len) {
++		kernel_neon_begin();
++		aes_cbcmac_update(NULL, tctx->key_enc, rounds, 0, ctx->dg, 1);
++		kernel_neon_end();
++	}
++	memcpy(out, ctx->dg, AES_BLOCK_SIZE);
++
++	return 0;
++}
++
++static struct shash_alg cbcmac_alg = {
++	.base.cra_name		= "cbcmac(aes)",
++	.base.cra_driver_name	= "cbcmac-aes-" MODE,
++	.base.cra_priority	= PRIO,
++	.base.cra_flags		= CRYPTO_ALG_TYPE_SHASH,
++	.base.cra_blocksize	= 1,
++	.base.cra_ctxsize	= sizeof(struct crypto_aes_ctx),
++	.base.cra_module	= THIS_MODULE,
++
++	.digestsize		= AES_BLOCK_SIZE,
++	.init			= cbcmac_init,
++	.update			= cbcmac_update,
++	.final			= cbcmac_final,
++	.setkey			= cbcmac_setkey,
++	.descsize		= sizeof(struct cbcmac_desc_ctx),
++};
++
+ static struct simd_skcipher_alg *aes_simd_algs[ARRAY_SIZE(aes_algs)];
+ 
+ static void aes_exit(void)
+@@ -367,6 +467,7 @@ static void aes_exit(void)
+ 		if (aes_simd_algs[i])
+ 			simd_skcipher_free(aes_simd_algs[i]);
+ 
++	crypto_unregister_shash(&cbcmac_alg);
+ 	crypto_unregister_skciphers(aes_algs, ARRAY_SIZE(aes_algs));
+ }
+ 
+@@ -383,6 +484,10 @@ static int __init aes_init(void)
+ 	if (err)
+ 		return err;
+ 
++	err = crypto_register_shash(&cbcmac_alg);
++	if (err)
++		goto unregister_ciphers;
++
+ 	for (i = 0; i < ARRAY_SIZE(aes_algs); i++) {
+ 		if (!(aes_algs[i].base.cra_flags & CRYPTO_ALG_INTERNAL))
+ 			continue;
+@@ -402,6 +507,8 @@ static int __init aes_init(void)
+ 
+ unregister_simds:
+ 	aes_exit();
++unregister_ciphers:
++	crypto_unregister_skciphers(aes_algs, ARRAY_SIZE(aes_algs));
+ 	return err;
+ }
+ 
+diff --git a/arch/arm64/crypto/aes-modes.S b/arch/arm64/crypto/aes-modes.S
+index 92b982a8b112..f2bd43451885 100644
+--- a/arch/arm64/crypto/aes-modes.S
++++ b/arch/arm64/crypto/aes-modes.S
+@@ -525,3 +525,25 @@ AES_ENTRY(aes_xts_decrypt)
+ 	FRAME_POP
+ 	ret
+ AES_ENDPROC(aes_xts_decrypt)
++
++	/*
++	 * aes_cbcmac_update(u8 const in[], u32 const rk[], int rounds,
++	 *		     int blocks, u8 dg[], int skip_first_load)
++	 */
++AES_ENTRY(aes_cbcmac_update)
++	ld1		{v0.16b}, [x4]			/* get dg */
++	enc_prepare	w2, x1, x6
++	cbnz		w5, .Lcbcmacenc
++
++.Lcbcmacloop:
++	ld1		{v1.16b}, [x0], #16		/* get next pt block */
++	eor		v0.16b, v0.16b, v1.16b		/* ..and xor with dg */
++	sub		w3, w3, #1
++
++.Lcbcmacenc:
++	encrypt_block	v0, w2, x1, x5, w6
++	cbnz		w3, .Lcbcmacloop
++
++	st1		{v0.16b}, [x4]			/* return dg */
++	ret
++AES_ENDPROC(aes_cbcmac_update)
 -- 
 2.7.4
