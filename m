@@ -1,43 +1,81 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v3 03/10] crypto: arm/chacha20 - remove cra_alignmask
-Date: Sat, 28 Jan 2017 23:25:32 +0000
-Message-ID: <1485645939-17126-4-git-send-email-ard.biesheuvel@linaro.org>
-References: <1485645939-17126-1-git-send-email-ard.biesheuvel@linaro.org>
+Subject: [PATCH v3 00/10] crypto - AES for ARM/arm64 updates for v4.11 (round #2)
+Date: Sat, 28 Jan 2017 23:25:29 +0000
+Message-ID: <1485645939-17126-1-git-send-email-ard.biesheuvel@linaro.org>
 Cc: linux-arm-kernel@lists.infradead.org, herbert@gondor.apana.org.au,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f51.google.com ([74.125.82.51]:38045 "EHLO
-        mail-wm0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751947AbdA1X0A (ORCPT
+Received: from mail-wm0-f49.google.com ([74.125.82.49]:38011 "EHLO
+        mail-wm0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751947AbdA1XZx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 28 Jan 2017 18:26:00 -0500
-Received: by mail-wm0-f51.google.com with SMTP id r126so35378690wmr.1
-        for <linux-crypto@vger.kernel.org>; Sat, 28 Jan 2017 15:25:59 -0800 (PST)
-In-Reply-To: <1485645939-17126-1-git-send-email-ard.biesheuvel@linaro.org>
+        Sat, 28 Jan 2017 18:25:53 -0500
+Received: by mail-wm0-f49.google.com with SMTP id r126so35376770wmr.1
+        for <linux-crypto@vger.kernel.org>; Sat, 28 Jan 2017 15:25:53 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Remove the unnecessary alignmask: it is much more efficient to deal with
-the misalignment in the core algorithm than relying on the crypto API to
-copy the data to a suitably aligned buffer.
+Patch #1 is a fix for the CBC chaining issue that was discussed on the
+mailing list. The driver itself is queued for v4.11, so this fix can go
+right on top.
 
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
- arch/arm/crypto/chacha20-neon-glue.c | 1 -
- 1 file changed, 1 deletion(-)
+Patches #2 - #6 clear the cra_alignmasks of various drivers: all NEON
+capable CPUs can perform unaligned accesses, and the advantage of using
+the slightly faster aligned accessors (which only exist on ARM not arm64)
+is certainly outweighed by the cost of copying data to suitably aligned
+buffers.
 
-diff --git a/arch/arm/crypto/chacha20-neon-glue.c b/arch/arm/crypto/chacha20-neon-glue.c
-index 592f75ae4fa1..59a7be08e80c 100644
---- a/arch/arm/crypto/chacha20-neon-glue.c
-+++ b/arch/arm/crypto/chacha20-neon-glue.c
-@@ -94,7 +94,6 @@ static struct skcipher_alg alg = {
- 	.base.cra_priority	= 300,
- 	.base.cra_blocksize	= 1,
- 	.base.cra_ctxsize	= sizeof(struct chacha20_ctx),
--	.base.cra_alignmask	= 1,
- 	.base.cra_module	= THIS_MODULE,
- 
- 	.min_keysize		= CHACHA20_KEY_SIZE,
+NOTE: patch #5 won't apply unless 'crypto: arm64/aes-blk - honour iv_out
+requirement in CBC and CTR modes' is applied first, which was sent out
+separately as a bugfix for v3.16 - v4.9. If this is a problem, this patch
+can wait.
+
+Patch #7 and #8 are minor tweaks to the new scalar AES code.
+
+Patch #9 improves the performance of the plain NEON AES code, to make it
+more suitable as a fallback for the new bitsliced NEON code, which can
+only operate on 8 blocks in parallel, and needs another driver to perform
+CBC encryption or XTS tweak generation.
+
+Patch #10 updates the new bitsliced AES NEON code to switch to the plain
+NEON driver as a fallback.
+
+Patches #9 and #10 improve the performance of CBC encryption by ~35% on
+low end cores such as the Cortex-A53 that can be found in the Raspberry Pi3
+
+Changes since v2:
+- use polynomial multiply NEON instruction for multiplication by x^2, this
+  eliminates 4 instructions from the decrypt path (#9)
+
+Changes since v1:
+- shave off another few cycles from the sequential AES NEON code (patch #9)
+
+Ard Biesheuvel (10):
+  crypto: arm64/aes-neon-bs - honour iv_out requirement in CTR mode
+  crypto: arm/aes-ce - remove cra_alignmask
+  crypto: arm/chacha20 - remove cra_alignmask
+  crypto: arm64/aes-ce-ccm - remove cra_alignmask
+  crypto: arm64/aes-blk - remove cra_alignmask
+  crypto: arm64/chacha20 - remove cra_alignmask
+  crypto: arm64/aes - avoid literals for cross-module symbol references
+  crypto: arm64/aes - performance tweak
+  crypto: arm64/aes-neon-blk - tweak performance for low end cores
+  crypto: arm64/aes - replace scalar fallback with plain NEON fallback
+
+ arch/arm/crypto/aes-ce-core.S          |  84 ++++---
+ arch/arm/crypto/aes-ce-glue.c          |  15 +-
+ arch/arm/crypto/chacha20-neon-glue.c   |   1 -
+ arch/arm64/crypto/Kconfig              |   2 +-
+ arch/arm64/crypto/aes-ce-ccm-glue.c    |   1 -
+ arch/arm64/crypto/aes-cipher-core.S    |  59 ++---
+ arch/arm64/crypto/aes-glue.c           |  18 +-
+ arch/arm64/crypto/aes-modes.S          |   8 +-
+ arch/arm64/crypto/aes-neon.S           | 235 +++++++++-----------
+ arch/arm64/crypto/aes-neonbs-core.S    |  25 ++-
+ arch/arm64/crypto/aes-neonbs-glue.c    |  38 +++-
+ arch/arm64/crypto/chacha20-neon-glue.c |   1 -
+ 12 files changed, 224 insertions(+), 263 deletions(-)
+
 -- 
 2.7.4
