@@ -1,57 +1,87 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [PATCH] dm: switch dm-verity to async hash crypto API
-Date: Sun, 29 Jan 2017 09:39:20 +0200
-Message-ID: <CAOtvUMfx4xYQk7_NQTQsc0xxGnsKkQdGk97XY5vv2tE0aHLpfw@mail.gmail.com>
-References: <1485268704-31033-1-git-send-email-gilad@benyossef.com>
-	<CAAUqJDsC8BVnudsirn96O2qTHh4jMmYYe4YBiO83UW-PGfy+Qg@mail.gmail.com>
+From: Arkadiusz Miskiewicz <a.miskiewicz@gmail.com>
+Subject: 4.10 aesni-intel no longer having lrw/ablk_helper dependencies?
+Date: Sun, 29 Jan 2017 22:31:59 +0100
+Message-ID: <201701292231.59656.a.miskiewicz@gmail.com>
+Reply-To: arekm@maven.pl
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Mike Snitzer <snitzer@redhat.com>, gilad.benyossef@arm.com,
-        dm-devel@redhat.com, linux-crypto@vger.kernel.org,
-        Alasdair Kergon <agk@redhat.com>, Ofir <ofir.drang@arm.com>
-To: =?UTF-8?B?T25kcmVqIE1vc27DocSNZWs=?= <omosnacek+linux-crypto@gmail.com>
-Return-path: <dm-devel-bounces@redhat.com>
-In-Reply-To: <CAAUqJDsC8BVnudsirn96O2qTHh4jMmYYe4YBiO83UW-PGfy+Qg@mail.gmail.com>
-List-Unsubscribe: <https://www.redhat.com/mailman/options/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
-List-Archive: <https://www.redhat.com/archives/dm-devel>
-List-Post: <mailto:dm-devel@redhat.com>
-List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
-List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=subscribe>
-Sender: dm-devel-bounces@redhat.com
-Errors-To: dm-devel-bounces@redhat.com
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: Text/Plain;
+  charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-lf0-f53.google.com ([209.85.215.53]:33454 "EHLO
+        mail-lf0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750755AbdA2VcD (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 29 Jan 2017 16:32:03 -0500
+Received: by mail-lf0-f53.google.com with SMTP id x1so99145939lff.0
+        for <linux-crypto@vger.kernel.org>; Sun, 29 Jan 2017 13:32:03 -0800 (PST)
+Received: from xps.localnet (89-65-45-9.dynamic.chello.pl. [89.65.45.9])
+        by smtp.gmail.com with ESMTPSA id 206sm3182076ljf.35.2017.01.29.13.32.00
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Sun, 29 Jan 2017 13:32:00 -0800 (PST)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-SGkgT2RyZWosCgpPbiBUaHUsIEphbiAyNiwgMjAxNyBhdCAxOjM0IFBNLCBPbmRyZWogTW9zbsOh
-xI1lawo8b21vc25hY2VrK2xpbnV4LWNyeXB0b0BnbWFpbC5jb20+IHdyb3RlOgo+IEhpIEdpbGFk
-LAo+Cj4gMjAxNy0wMS0yNCAxNTozOCBHTVQrMDE6MDAgR2lsYWQgQmVuLVlvc3NlZiA8Z2lsYWRA
-YmVueW9zc2VmLmNvbT46Cj4+IC0gICAgICAgdi0+dGZtID0gY3J5cHRvX2FsbG9jX3NoYXNoKHYt
-PmFsZ19uYW1lLCAwLCAwKTsKPj4gKyAgICAgICB2LT50Zm0gPSBjcnlwdG9fYWxsb2NfYWhhc2go
-di0+YWxnX25hbWUsIDAsIENSWVBUT19BTEdfQVNZTkMpOwo+Cj4gSSBiZWxpZXZlIHlvdSBzaG91
-bGQgcGFzcyB6ZXJvIGFzIHRoZSBtYXNrIGhlcmUuIFdoZW4gZmxhZ3MgPT0gMCBhbmQKPiBtYXNr
-ID09IENSWVBUT19BTEdfQVNZTkMsIHlvdSBhcmUgYmFzaWNhbGx5IHNheWluZyAiSSB3YW50IG9u
-bHkgYWxncwo+IHRoYXQgaGF2ZSBmbGFncyAmIENSWVBUT19BTEdfQVNZTkMgPT0gMCIsIHdoaWNo
-IG1lYW5zIHlvdSBzaG91bGQgb25seQo+IGdldCBhaGFzaCB0Zm1zIHRoYXQgYXJlIGFsd2F5cyBz
-eW5jaHJvbm91cyAoc2VlIFsxXSkuIEhvd2V2ZXIsIHNpbmNlCj4geW91IHNldCBhIG5vbi1OVUxM
-IGNhbGxiYWNrIGluIHZlcml0eV9oYXNoX2luaXQsIEkgZG9uJ3QgdGhpbmsgdGhpcwo+IHdhcyB5
-b3VyIGludGVudGlvbi4gQnkgc2V0dGluZyB0aGUgbWFzayB0byB6ZXJvLCB5b3Ugc2hvdWxkIGJl
-IGFibGUgdG8KPiBnZXQgYWxzbyBhbiBhY3R1YWwgYXN5bmMgdGZtLgo+Cj4gVGhhbmtzLAo+IE9u
-ZHJlago+Cj4gWzFdIGh0dHBzOi8vbGttbC5vcmcvbGttbC8yMDE2LzEyLzEzLzkwNAoKVGhhbmsg
-eW91IHZlcnkgbXVjaCBmb3IgdGhlIHJldmlldy4KCkkgYW0gdGhlIGZpcnN0IHRvIGFkbWl0IHRo
-YXQgSSBmaW5kIHRoZSBDcnlwdG8gQVBJIHZlcnkgY3J5cHRpYyAocHVuCmludGVuZGVkKS4uLiA6
-LSkKCkkgYWN0dWFsbHkgZm9sbG93ZWQgdGhlIGV4YW1wbGUgaW4gRG9jdW1lbnRhdGlvbi9jcnlw
-dG8vYXBpLWludHJvLnR4dC4KSSBzZWUgbm93IHRoZSBleGFtcGxlIGlzCm5vdCBkb2luZyB3aGF0
-IEkgdGhvdWdoIGl0IHdhcyBkb2luZy4gVGhhbmsgeW91IGZvciBjbGFyaWZ5aW5nIHRoaXMuIEkK
-d2lsbCBzZW5kIG91dCBhIDJuZCB2ZXJzaW9uLgoKVGhlIHRoaW5nIEkgZmluZCBwdXp6bGluZyBp
-biB0aGlzIGlzIHRoYXQgSSBzYXcgYSBkaWZmZXJlbmNlIGluCmxhdGVuY3kgd2hlbiBhIGFzeW5j
-IGFsZ29yeXRobQpwcm92aWRlciBkcml2ZXIgd2l0aCBoaWdoIHByaW9yaXR5ICgzMDAwKSB3YXMg
-bG9hZGVkIHZzLiBub3QuIEJhc2VkIG9uCnlvdXIgZGVzY3JpcHRpb24gSSB3b3VsZApleHBlY3Qg
-dGhlIHBlcmZvcm1hbmNlIG5vdCB0byBjaGFuZ2UuIEkgd2lsbCByZXRlc3Qgd2l0aCB0aGUgY2hh
-bmdlCmFuZCB3aWxsIHB1Ymxpc2ggdGhlIHJlc3VsdHMuCgpUaGFua3MhCkdpbGFkCgoKCgotLSAK
-R2lsYWQgQmVuLVlvc3NlZgpDaGllZiBDb2ZmZWUgRHJpbmtlcgoKIklmIHlvdSB0YWtlIGEgY2xh
-c3MgaW4gbGFyZ2Utc2NhbGUgcm9ib3RpY3MsIGNhbiB5b3UgZW5kIHVwIGluIGEKc2l0dWF0aW9u
-IHdoZXJlIHRoZSBob21ld29yayBlYXRzIHlvdXIgZG9nPyIKIC0tIEplYW4tQmFwdGlzdGUgUXVl
-cnUKCi0tCmRtLWRldmVsIG1haWxpbmcgbGlzdApkbS1kZXZlbEByZWRoYXQuY29tCmh0dHBzOi8v
-d3d3LnJlZGhhdC5jb20vbWFpbG1hbi9saXN0aW5mby9kbS1kZXZlbA==
+Hi.
+
+[arekm@xps ~]$ modinfo --set-version 4.9.6 aesni-intel | grep depends
+depends:        glue_helper,aes-x86_64,lrw,cryptd,ablk_helper
+
+[arekm@xps ~]$ modinfo --set-version  4.10.0-rc5-00161-gfd694aaa46c7 aesni-
+intel |grep depends
+depends:        glue_helper,aes-x86_64,crypto_simd,cryptd
+
+With 4.10.0 lrw and ablk_helper are no longer in dependencies while
+aesni-intel seem to still need these. My luks encrypted rootfs fails to=20
+unlock. Initrd generation script only installs modules based on dependencie=
+s=20
+and that seems to be a reason for luks unlock failure with 4.10rc - some=20
+missing modules.
+
+=46ailure looks like that:
+$ insmod path/to/aesni-intel.ko
+dmesg gets logged:
+"AVX2 version of gcm_enc/dec engaged
+AES CTR mode by8 optimization enabled."
+and insmod reports that it cannot insert aesni-intel because of unresolved=
+=20
+symbol or unknown option but nothing more is logged in dmesg.
+
+4.9.x works fine.
+
+What did change/how to figure out deps now?
+
+Both modules exist:
+[arekm@xps ~]$ modinfo --set-version  4.10.0-rc5-00161-gfd694aaa46c7 lrw
+filename:       /lib/modules/4.10.0-rc5-00161-
+gfd694aaa46c7/kernel/crypto/lrw.ko.xz
+alias:          crypto-lrw
+alias:          lrw
+description:    LRW block cipher mode
+license:        GPL
+depends:        gf128mul
+intree:         Y
+vermagic:       4.10.0-rc5-00161-gfd694aaa46c7 SMP preempt mod_unload
+signat:         PKCS#7
+signer:
+sig_key:
+sig_hashalgo:   md4
+
+[arekm@xps ~]$ modinfo --set-version  4.10.0-rc5-00161-gfd694aaa46c7=20
+ablk_helper
+filename:       /lib/modules/4.10.0-rc5-00161-
+gfd694aaa46c7/kernel/crypto/ablk_helper.ko.xz
+license:        GPL
+depends:        cryptd
+intree:         Y
+vermagic:       4.10.0-rc5-00161-gfd694aaa46c7 SMP preempt mod_unload
+signat:         PKCS#7
+signer:
+sig_key:
+sig_hashalgo:   md4
+
+
+=2D-=20
+Arkadiusz Mi=C5=9Bkiewicz, arekm / ( maven.pl | pld-linux.org )
