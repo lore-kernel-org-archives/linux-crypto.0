@@ -1,60 +1,43 @@
-From: Gary R Hook <ghook@amd.com>
-Subject: Re: [PATCH 2/4] crypto: ccp - Set the start-of-command bit
-Date: Mon, 30 Jan 2017 11:59:23 -0600
-Message-ID: <a8e26c2b-2311-0d51-edc7-101034067b6e@amd.com>
-References: <20170130142414.8459.71539.stgit@taos>
- <20170130142834.8459.15278.stgit@taos>
+From: Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH v3 1/3] crypto: brcm: DT documentation for Broadcom SPU
+ hardware
+Date: Mon, 30 Jan 2017 14:18:17 -0600
+Message-ID: <20170130201817.hcawwnn2rapuguj4@rob-hp-laptop>
+References: <1485362689-11294-1-git-send-email-rob.rice@broadcom.com>
+ <1485362689-11294-2-git-send-email-rob.rice@broadcom.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>
-To: Gary R Hook <gary.hook@amd.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Mark Rutland <mark.rutland@arm.com>,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        bcm-kernel-feedback-list@broadcom.com,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Steve Lin <steven.lin1@broadcom.com>
+To: Rob Rice <rob.rice@broadcom.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-co1nam03on0077.outbound.protection.outlook.com ([104.47.40.77]:49671
-        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751406AbdA3R7x (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 30 Jan 2017 12:59:53 -0500
-In-Reply-To: <20170130142834.8459.15278.stgit@taos>
+Received: from mail-oi0-f66.google.com ([209.85.218.66]:35053 "EHLO
+        mail-oi0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752256AbdA3UST (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 30 Jan 2017 15:18:19 -0500
+Content-Disposition: inline
+In-Reply-To: <1485362689-11294-2-git-send-email-rob.rice@broadcom.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-It turns out that this change will negatively impact performance. Please 
-ignore.
-I will submit a V2 patch set.
-
-On 01/30/2017 08:28 AM, Gary R Hook wrote:
-> The start-of-command bit should be set for every sha
-> operation.
->
-> Signed-off-by: Gary R Hook <gary.hook@amd.com>
+On Wed, Jan 25, 2017 at 11:44:47AM -0500, Rob Rice wrote:
+> Device tree documentation for Broadcom Secure Processing Unit
+> (SPU) crypto hardware.
+> 
+> Signed-off-by: Steve Lin <steven.lin1@broadcom.com>
+> Signed-off-by: Rob Rice <rob.rice@broadcom.com>
 > ---
->  drivers/crypto/ccp/ccp-ops.c |    1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
-> index 50fae44..1a27af3 100644
-> --- a/drivers/crypto/ccp/ccp-ops.c
-> +++ b/drivers/crypto/ccp/ccp-ops.c
-> @@ -1077,6 +1077,7 @@ static int ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
->  		case CCP_SHA_TYPE_1:
->  		case CCP_SHA_TYPE_224:
->  		case CCP_SHA_TYPE_256:
-> +			op.soc = 1;
->  			memcpy(ctx.address + ioffset, init, ctx_size);
->  			break;
->  		default:
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
+>  .../devicetree/bindings/crypto/brcm,spu-crypto.txt | 22 ++++++++++++++++++++++
+>  1 file changed, 22 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/crypto/brcm,spu-crypto.txt
 
--- 
-This is my day job. Follow me at:
-IG/Twitter/Facebook: @grhookphoto
-IG/Twitter/Facebook: @grhphotographer
+Acked-by: Rob Herring <robh@kernel.org>
