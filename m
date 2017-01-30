@@ -1,7 +1,7 @@
 From: Gary R Hook <gary.hook@amd.com>
-Subject: [PATCH 3/4] crypto: ccp - Update the command queue on errors
-Date: Mon, 30 Jan 2017 08:28:43 -0600
-Message-ID: <20170130142843.8459.53690.stgit@taos>
+Subject: [PATCH 4/4] crypto: ccp - Simplify some buffer management routines
+Date: Mon, 30 Jan 2017 08:28:51 -0600
+Message-ID: <20170130142851.8459.77653.stgit@taos>
 References: <20170130142414.8459.71539.stgit@taos>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -10,47 +10,282 @@ Cc: <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>,
         <davem@davemloft.net>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-sn1nam02on0081.outbound.protection.outlook.com ([104.47.36.81]:35664
-        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
+Received: from mail-sn1nam01on0085.outbound.protection.outlook.com ([104.47.32.85]:10597
+        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752959AbdA3O3C (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 30 Jan 2017 09:29:02 -0500
+        id S1752959AbdA3O3O (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 30 Jan 2017 09:29:14 -0500
 In-Reply-To: <20170130142414.8459.71539.stgit@taos>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Move the command queue tail pointer when an error is
-detected. Always return the error.
+The reverse-get/set functions can be simplified by
+eliminating unused code.
+
 
 Signed-off-by: Gary R Hook <gary.hook@amd.com>
 ---
- drivers/crypto/ccp/ccp-dev-v5.c |    7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ drivers/crypto/ccp/ccp-ops.c |  142 +++++++++++++++++-------------------------
+ 1 file changed, 56 insertions(+), 86 deletions(-)
 
-diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
-index 5fb6c8c..d9e1876 100644
---- a/drivers/crypto/ccp/ccp-dev-v5.c
-+++ b/drivers/crypto/ccp/ccp-dev-v5.c
-@@ -250,17 +250,20 @@ static int ccp5_do_cmd(struct ccp5_desc *desc,
- 		ret = wait_event_interruptible(cmd_q->int_queue,
- 					       cmd_q->int_rcvd);
- 		if (ret || cmd_q->cmd_error) {
-+			/* Log the error and flush the queue by
-+			 * moving the head pointer
-+			 */
- 			if (cmd_q->cmd_error)
- 				ccp_log_error(cmd_q->ccp,
- 					      cmd_q->cmd_error);
--			/* A version 5 device doesn't use Job IDs... */
-+			iowrite32(tail, cmd_q->reg_head_lo);
- 			if (!ret)
- 				ret = -EIO;
- 		}
- 		cmd_q->int_rcvd = 0;
- 	}
- 
--	return 0;
-+	return ret;
+diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
+index 1a27af3..f426ba5 100644
+--- a/drivers/crypto/ccp/ccp-ops.c
++++ b/drivers/crypto/ccp/ccp-ops.c
+@@ -184,62 +184,46 @@ static void ccp_get_dm_area(struct ccp_dm_workarea *wa, unsigned int wa_offset,
  }
  
- static int ccp5_perform_aes(struct ccp_op *op)
+ static int ccp_reverse_set_dm_area(struct ccp_dm_workarea *wa,
++				   unsigned int wa_offset,
+ 				   struct scatterlist *sg,
+-				   unsigned int len, unsigned int se_len,
+-				   bool sign_extend)
++				   unsigned int sg_offset,
++				   unsigned int len)
+ {
+-	unsigned int nbytes, sg_offset, dm_offset, sb_len, i;
+-	u8 buffer[CCP_REVERSE_BUF_SIZE];
+-
+-	if (WARN_ON(se_len > sizeof(buffer)))
+-		return -EINVAL;
+-
+-	sg_offset = len;
+-	dm_offset = 0;
+-	nbytes = len;
+-	while (nbytes) {
+-		sb_len = min_t(unsigned int, nbytes, se_len);
+-		sg_offset -= sb_len;
+-
+-		scatterwalk_map_and_copy(buffer, sg, sg_offset, sb_len, 0);
+-		for (i = 0; i < sb_len; i++)
+-			wa->address[dm_offset + i] = buffer[sb_len - i - 1];
+-
+-		dm_offset += sb_len;
+-		nbytes -= sb_len;
+-
+-		if ((sb_len != se_len) && sign_extend) {
+-			/* Must sign-extend to nearest sign-extend length */
+-			if (wa->address[dm_offset - 1] & 0x80)
+-				memset(wa->address + dm_offset, 0xff,
+-				       se_len - sb_len);
+-		}
++	u8 *p, *q;
++
++	ccp_set_dm_area(wa, wa_offset, sg, sg_offset, len);
++
++	p = wa->address + wa_offset;
++	q = p + len - 1;
++	while (p < q) {
++		*p = *p ^ *q;
++		*q = *p ^ *q;
++		*p = *p ^ *q;
++		p++;
++		q--;
+ 	}
+-
+ 	return 0;
+ }
+ 
+ static void ccp_reverse_get_dm_area(struct ccp_dm_workarea *wa,
++				    unsigned int wa_offset,
+ 				    struct scatterlist *sg,
++				    unsigned int sg_offset,
+ 				    unsigned int len)
+ {
+-	unsigned int nbytes, sg_offset, dm_offset, sb_len, i;
+-	u8 buffer[CCP_REVERSE_BUF_SIZE];
+-
+-	sg_offset = 0;
+-	dm_offset = len;
+-	nbytes = len;
+-	while (nbytes) {
+-		sb_len = min_t(unsigned int, nbytes, sizeof(buffer));
+-		dm_offset -= sb_len;
+-
+-		for (i = 0; i < sb_len; i++)
+-			buffer[sb_len - i - 1] = wa->address[dm_offset + i];
+-		scatterwalk_map_and_copy(buffer, sg, sg_offset, sb_len, 1);
+-
+-		sg_offset += sb_len;
+-		nbytes -= sb_len;
++	u8 *p, *q;
++
++	p = wa->address + wa_offset;
++	q = p + len - 1;
++	while (p < q) {
++		*p = *p ^ *q;
++		*q = *p ^ *q;
++		*p = *p ^ *q;
++		p++;
++		q--;
+ 	}
++
++	ccp_get_dm_area(wa, wa_offset, sg, sg_offset, len);
+ }
+ 
+ static void ccp_free_data(struct ccp_data *data, struct ccp_cmd_queue *cmd_q)
+@@ -1262,8 +1246,7 @@ static int ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 	if (ret)
+ 		goto e_sb;
+ 
+-	ret = ccp_reverse_set_dm_area(&exp, rsa->exp, rsa->exp_len,
+-				      CCP_SB_BYTES, false);
++	ret = ccp_reverse_set_dm_area(&exp, 0, rsa->exp, 0, rsa->exp_len);
+ 	if (ret)
+ 		goto e_exp;
+ 	ret = ccp_copy_to_sb(cmd_q, &exp, op.jobid, op.sb_key,
+@@ -1281,16 +1264,12 @@ static int ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 	if (ret)
+ 		goto e_exp;
+ 
+-	ret = ccp_reverse_set_dm_area(&src, rsa->mod, rsa->mod_len,
+-				      CCP_SB_BYTES, false);
++	ret = ccp_reverse_set_dm_area(&src, 0, rsa->mod, 0, rsa->mod_len);
+ 	if (ret)
+ 		goto e_src;
+-	src.address += o_len;	/* Adjust the address for the copy operation */
+-	ret = ccp_reverse_set_dm_area(&src, rsa->src, rsa->src_len,
+-				      CCP_SB_BYTES, false);
++	ret = ccp_reverse_set_dm_area(&src, o_len, rsa->src, 0, rsa->src_len);
+ 	if (ret)
+ 		goto e_src;
+-	src.address -= o_len;	/* Reset the address to original value */
+ 
+ 	/* Prepare the output area for the operation */
+ 	ret = ccp_init_data(&dst, cmd_q, rsa->dst, rsa->mod_len,
+@@ -1315,7 +1294,7 @@ static int ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 		goto e_dst;
+ 	}
+ 
+-	ccp_reverse_get_dm_area(&dst.dm_wa, rsa->dst, rsa->mod_len);
++	ccp_reverse_get_dm_area(&dst.dm_wa, 0, rsa->dst, 0, rsa->mod_len);
+ 
+ e_dst:
+ 	ccp_free_data(&dst, cmd_q);
+@@ -1567,25 +1546,22 @@ static int ccp_run_ecc_mm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 	save = src.address;
+ 
+ 	/* Copy the ECC modulus */
+-	ret = ccp_reverse_set_dm_area(&src, ecc->mod, ecc->mod_len,
+-				      CCP_ECC_OPERAND_SIZE, false);
++	ret = ccp_reverse_set_dm_area(&src, 0, ecc->mod, 0, ecc->mod_len);
+ 	if (ret)
+ 		goto e_src;
+ 	src.address += CCP_ECC_OPERAND_SIZE;
+ 
+ 	/* Copy the first operand */
+-	ret = ccp_reverse_set_dm_area(&src, ecc->u.mm.operand_1,
+-				      ecc->u.mm.operand_1_len,
+-				      CCP_ECC_OPERAND_SIZE, false);
++	ret = ccp_reverse_set_dm_area(&src, 0, ecc->u.mm.operand_1, 0,
++				      ecc->u.mm.operand_1_len);
+ 	if (ret)
+ 		goto e_src;
+ 	src.address += CCP_ECC_OPERAND_SIZE;
+ 
+ 	if (ecc->function != CCP_ECC_FUNCTION_MINV_384BIT) {
+ 		/* Copy the second operand */
+-		ret = ccp_reverse_set_dm_area(&src, ecc->u.mm.operand_2,
+-					      ecc->u.mm.operand_2_len,
+-					      CCP_ECC_OPERAND_SIZE, false);
++		ret = ccp_reverse_set_dm_area(&src, 0, ecc->u.mm.operand_2, 0,
++					      ecc->u.mm.operand_2_len);
+ 		if (ret)
+ 			goto e_src;
+ 		src.address += CCP_ECC_OPERAND_SIZE;
+@@ -1624,7 +1600,8 @@ static int ccp_run_ecc_mm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 	}
+ 
+ 	/* Save the ECC result */
+-	ccp_reverse_get_dm_area(&dst, ecc->u.mm.result, CCP_ECC_MODULUS_BYTES);
++	ccp_reverse_get_dm_area(&dst, 0, ecc->u.mm.result, 0,
++				CCP_ECC_MODULUS_BYTES);
+ 
+ e_dst:
+ 	ccp_dm_free(&dst);
+@@ -1692,22 +1669,19 @@ static int ccp_run_ecc_pm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 	save = src.address;
+ 
+ 	/* Copy the ECC modulus */
+-	ret = ccp_reverse_set_dm_area(&src, ecc->mod, ecc->mod_len,
+-				      CCP_ECC_OPERAND_SIZE, false);
++	ret = ccp_reverse_set_dm_area(&src, 0, ecc->mod, 0, ecc->mod_len);
+ 	if (ret)
+ 		goto e_src;
+ 	src.address += CCP_ECC_OPERAND_SIZE;
+ 
+ 	/* Copy the first point X and Y coordinate */
+-	ret = ccp_reverse_set_dm_area(&src, ecc->u.pm.point_1.x,
+-				      ecc->u.pm.point_1.x_len,
+-				      CCP_ECC_OPERAND_SIZE, false);
++	ret = ccp_reverse_set_dm_area(&src, 0, ecc->u.pm.point_1.x, 0,
++				      ecc->u.pm.point_1.x_len);
+ 	if (ret)
+ 		goto e_src;
+ 	src.address += CCP_ECC_OPERAND_SIZE;
+-	ret = ccp_reverse_set_dm_area(&src, ecc->u.pm.point_1.y,
+-				      ecc->u.pm.point_1.y_len,
+-				      CCP_ECC_OPERAND_SIZE, false);
++	ret = ccp_reverse_set_dm_area(&src, 0, ecc->u.pm.point_1.y, 0,
++				      ecc->u.pm.point_1.y_len);
+ 	if (ret)
+ 		goto e_src;
+ 	src.address += CCP_ECC_OPERAND_SIZE;
+@@ -1718,15 +1692,13 @@ static int ccp_run_ecc_pm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 
+ 	if (ecc->function == CCP_ECC_FUNCTION_PADD_384BIT) {
+ 		/* Copy the second point X and Y coordinate */
+-		ret = ccp_reverse_set_dm_area(&src, ecc->u.pm.point_2.x,
+-					      ecc->u.pm.point_2.x_len,
+-					      CCP_ECC_OPERAND_SIZE, false);
++		ret = ccp_reverse_set_dm_area(&src, 0, ecc->u.pm.point_2.x, 0,
++					      ecc->u.pm.point_2.x_len);
+ 		if (ret)
+ 			goto e_src;
+ 		src.address += CCP_ECC_OPERAND_SIZE;
+-		ret = ccp_reverse_set_dm_area(&src, ecc->u.pm.point_2.y,
+-					      ecc->u.pm.point_2.y_len,
+-					      CCP_ECC_OPERAND_SIZE, false);
++		ret = ccp_reverse_set_dm_area(&src, 0, ecc->u.pm.point_2.y, 0,
++					      ecc->u.pm.point_2.y_len);
+ 		if (ret)
+ 			goto e_src;
+ 		src.address += CCP_ECC_OPERAND_SIZE;
+@@ -1736,19 +1708,17 @@ static int ccp_run_ecc_pm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 		src.address += CCP_ECC_OPERAND_SIZE;
+ 	} else {
+ 		/* Copy the Domain "a" parameter */
+-		ret = ccp_reverse_set_dm_area(&src, ecc->u.pm.domain_a,
+-					      ecc->u.pm.domain_a_len,
+-					      CCP_ECC_OPERAND_SIZE, false);
++		ret = ccp_reverse_set_dm_area(&src, 0, ecc->u.pm.domain_a, 0,
++					      ecc->u.pm.domain_a_len);
+ 		if (ret)
+ 			goto e_src;
+ 		src.address += CCP_ECC_OPERAND_SIZE;
+ 
+ 		if (ecc->function == CCP_ECC_FUNCTION_PMUL_384BIT) {
+ 			/* Copy the scalar value */
+-			ret = ccp_reverse_set_dm_area(&src, ecc->u.pm.scalar,
+-						      ecc->u.pm.scalar_len,
+-						      CCP_ECC_OPERAND_SIZE,
+-						      false);
++			ret = ccp_reverse_set_dm_area(&src, 0,
++						      ecc->u.pm.scalar, 0,
++						      ecc->u.pm.scalar_len);
+ 			if (ret)
+ 				goto e_src;
+ 			src.address += CCP_ECC_OPERAND_SIZE;
+@@ -1793,10 +1763,10 @@ static int ccp_run_ecc_pm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 	save = dst.address;
+ 
+ 	/* Save the ECC result X and Y coordinates */
+-	ccp_reverse_get_dm_area(&dst, ecc->u.pm.result.x,
++	ccp_reverse_get_dm_area(&dst, 0, ecc->u.pm.result.x, 0,
+ 				CCP_ECC_MODULUS_BYTES);
+ 	dst.address += CCP_ECC_OUTPUT_SIZE;
+-	ccp_reverse_get_dm_area(&dst, ecc->u.pm.result.y,
++	ccp_reverse_get_dm_area(&dst, 0, ecc->u.pm.result.y, 0,
+ 				CCP_ECC_MODULUS_BYTES);
+ 	dst.address += CCP_ECC_OUTPUT_SIZE;
+ 
