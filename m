@@ -1,91 +1,228 @@
-From: Florian Fainelli <f.fainelli@gmail.com>
-Subject: Re: [PATCH v3 0/3] Add Broadcom SPU Crypto Driver
-Date: Mon, 30 Jan 2017 15:35:54 -0800
-Message-ID: <6fe4cad2-6fc9-bd69-f5ad-67957335fe55@gmail.com>
-References: <1485362689-11294-1-git-send-email-rob.rice@broadcom.com>
+From: Dmitry Vyukov <dvyukov@google.com>
+Subject: crypto: NULL deref in sha512_mb_mgr_get_comp_job_avx2
+Date: Tue, 31 Jan 2017 14:16:31 +0100
+Message-ID: <CACT4Y+Z6_x2smshuSgQx0wA+g0H+5dJsF23UqYb9Z_WkDUvwcw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-To: Rob Rice <rob.rice@broadcom.com>, Herbert Xu
- <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>,
- Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, bcm-kernel-feedback-list@broadcom.com,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon
- <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <1485362689-11294-1-git-send-email-rob.rice@broadcom.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Content-Type: text/plain; charset=UTF-8
+Cc: syzkaller <syzkaller@googlegroups.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        David Miller <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        megha.dey@linux.intel.com, fenghua.yu@intel.com,
+        tim.c.chen@linux.intel.com
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 01/25/2017 08:44 AM, Rob Rice wrote:
-> Changes in v3:
-> - rebase to 4.10-rc3 in cryptodev-2.6 tree
-> - in bindings doc, list all valid compatibility strings
-> - rename DT nodes "crypto" rather than "spu-crypto"
-> - include a separate DT node for each SPU hardware block. Previously,
->  there was a single SPU node listing a register range for each
->  hw block.
-> - select hash algos in Kconfig. Driver HMAC implementation uses hash
->  sw algos for inner and outer hashes.
-> - Fix crash for AES CCM decrypt when AAD and data are both empty
-> 
-> Change in v2:
-> - select CRYPTO_DES in Kconfig
-> 
-> The Broadcom SPU crypto driver provides access to SPU hardware
-> for symmetric crypto offload. The driver supports ablkcipher,
-> ahash, and aead operations. The driver supports several
-> Broadcom SoCs with different revisions of the SPU hardware.
-> The driver supports SPU-M and SPU2 hardware revisions, and
-> a couple versions of each hw revision, each version with minor
-> differences.
+Hello,
 
-Herbert, can you take patches 1-2, and I will take patch 3 through my
-arm64-soc git pull requests? Thanks!!
+I am getting the following reports with low frequency while running
+syzkaller fuzzer. Unfortunately they are not reproducible and happen
+in a background thread, so it is difficult to extract any context on
+my side. I see only few such crashes per week, so most likely it is
+some hard to trigger data race. The following reports are from mmotm
+tree, commits 00e20cfc2bf04a0cbe1f5405f61c8426f43eee84 and
+fff7e71eac7788904753136f09bcad7471f7799e. Any ideas as to how this can
+happen?
 
-> 
-> Rob Rice (3):
->   crypto: brcm: DT documentation for Broadcom SPU hardware
->   crypto: brcm: Add Broadcom SPU driver
->   arm64: dts: ns2: Add Broadcom SPU driver DT entry.
-> 
->  .../devicetree/bindings/crypto/brcm,spu-crypto.txt |   22 +
->  arch/arm64/boot/dts/broadcom/ns2.dtsi              |   24 +
->  drivers/crypto/Kconfig                             |   15 +
->  drivers/crypto/Makefile                            |    2 +
->  drivers/crypto/bcm/Makefile                        |   15 +
->  drivers/crypto/bcm/cipher.c                        | 4955 ++++++++++++++++++++
->  drivers/crypto/bcm/cipher.h                        |  475 ++
->  drivers/crypto/bcm/spu.c                           | 1252 +++++
->  drivers/crypto/bcm/spu.h                           |  288 ++
->  drivers/crypto/bcm/spu2.c                          | 1402 ++++++
->  drivers/crypto/bcm/spu2.h                          |  228 +
->  drivers/crypto/bcm/spum.h                          |  174 +
->  drivers/crypto/bcm/util.c                          |  581 +++
->  drivers/crypto/bcm/util.h                          |  116 +
->  14 files changed, 9549 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/crypto/brcm,spu-crypto.txt
->  create mode 100644 drivers/crypto/bcm/Makefile
->  create mode 100644 drivers/crypto/bcm/cipher.c
->  create mode 100644 drivers/crypto/bcm/cipher.h
->  create mode 100644 drivers/crypto/bcm/spu.c
->  create mode 100644 drivers/crypto/bcm/spu.h
->  create mode 100644 drivers/crypto/bcm/spu2.c
->  create mode 100644 drivers/crypto/bcm/spu2.h
->  create mode 100644 drivers/crypto/bcm/spum.h
->  create mode 100644 drivers/crypto/bcm/util.c
->  create mode 100644 drivers/crypto/bcm/util.h
-> 
+BUG: unable to handle kernel NULL pointer dereference at 0000000000000060
+IP: [<ffffffff813fc09e>] sha512_mb_mgr_get_comp_job_avx2+0x6e/0xee
+arch/x86/crypto/sha512-mb/sha512_mb_mgr_flush_avx2.S:251
+PGD 1d2395067 [  220.874864] PUD 1d2860067
+Oops: 0002 [#1] SMP KASAN
+Dumping ftrace buffer:
+   (ftrace buffer empty)
+Modules linked in:
+CPU: 0 PID: 516 Comm: kworker/0:1 Not tainted 4.9.0 #4
+Hardware name: Google Google Compute Engine/Google Compute Engine,
+BIOS Google 01/01/2011
+Workqueue: crypto mcryptd_queue_worker
+task: ffff8801d9f346c0 task.stack: ffff8801d9f08000
+RIP: 0010:[<ffffffff813fc09e>]  [<ffffffff813fc09e>]
+sha512_mb_mgr_get_comp_job_avx2+0x6e/0xee
+arch/x86/crypto/sha512-mb/sha512_mb_mgr_flush_avx2.S:251
+RSP: 0018:ffff8801d9f0eef8  EFLAGS: 00010202
+RAX: 0000000000000000 RBX: ffff8801d7db1190 RCX: 0000000000000006
+RDX: 0000000000000001 RSI: ffff8801d9f34ee8 RDI: ffff8801d7db1040
+RBP: ffff8801d9f0f258 R08: 0000000100000000 R09: 0000000000000001
+R10: 0000000000000002 R11: 0000000000000003 R12: ffff8801d9f0f230
+R13: ffff8801c8bbc4e0 R14: ffff8801c8bbc530 R15: ffff8801d9f0ef70
+FS:  0000000000000000(0000) GS:ffff8801dc000000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000060 CR3: 00000001cc15a000 CR4: 00000000001406f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Stack:
+ ffff8801d7db1040 ffffffff813fa207 dffffc0000000000 ffffe8ffffc0f238
+ 0000000000000002 1ffff1003b3e1dea ffffe8ffffc0f218 ffff8801d9f0f190
+ 0000000000000282 ffffe8ffffc0f140 ffffe8ffffc0f220 0000000041b58ab3
+Call Trace:
+ [<ffffffff813fb407>] sha512_mb_update+0x2f7/0x4e0
+arch/x86/crypto/sha512-mb/sha512_mb.c:588
+ [<ffffffff8219d4ad>] crypto_ahash_update include/crypto/hash.h:512 [inline]
+ [<ffffffff8219d4ad>] ahash_mcryptd_update crypto/mcryptd.c:627 [inline]
+ [<ffffffff8219d4ad>] mcryptd_hash_update+0xcd/0x1c0 crypto/mcryptd.c:373
+ [<ffffffff8219c99f>] mcryptd_queue_worker+0xff/0x6a0 crypto/mcryptd.c:181
+ [<ffffffff81492960>] process_one_work+0xbd0/0x1c10 kernel/workqueue.c:2096
+ [<ffffffff81493bc3>] worker_thread+0x223/0x1990 kernel/workqueue.c:2230
+ [<ffffffff814abb33>] kthread+0x323/0x3e0 kernel/kthread.c:209
+ [<ffffffff8436fbaa>] ret_from_fork+0x2a/0x40 arch/x86/entry/entry_64.S:433
+Code: 49 0f 42 d3 48 f7 c2 f0 ff ff ff 0f 85 9a 00 00 00 48 83 e2 0f
+48 6b da 08 48 8d 9c 1f 48 01 00 00 48 8b 03 48 c7 03 00 00 00 00 <c7>
+40 60 02 00 00 00 48 8b 9f 40 01 00 00 48 c1 e3 08 48 09 d3
+RIP  [<ffffffff813fc09e>] sha512_mb_mgr_get_comp_job_avx2+0x6e/0xee
+arch/x86/crypto/sha512-mb/sha512_mb_mgr_flush_avx2.S:251
+ RSP <ffff8801d9f0eef8>
+CR2: 0000000000000060
+---[ end trace 139fd4cda5dfe2c4 ]---
 
+BUG: unable to handle kernel NULL pointer dereference at 0000000000000060
+IP: [<ffffffff813fc09e>] sha512_mb_mgr_get_comp_job_avx2+0x6e/0xee
+arch/x86/crypto/sha512-mb/sha512_mb_mgr_flush_avx2.S:251
+PGD 1c68ad067 [  624.973638] PUD 1d485a067
+Oops: 0002 [#1] SMP KASAN
+Dumping ftrace buffer:
+   (ftrace buffer empty)
+Modules linked in:
+CPU: 0 PID: 517 Comm: kworker/0:1 Not tainted 4.9.0 #3
+Hardware name: Google Google Compute Engine/Google Compute Engine,
+BIOS Google 01/01/2011
+Workqueue: crypto mcryptd_queue_worker
+task: ffff8801d9e64700 task.stack: ffff8801d9838000
+RIP: 0010:[<ffffffff813fc09e>]  [<ffffffff813fc09e>]
+sha512_mb_mgr_get_comp_job_avx2+0x6e/0xee
+arch/x86/crypto/sha512-mb/sha512_mb_mgr_flush_avx2.S:251
+RSP: 0018:ffff8801d983eef8  EFLAGS: 00010202
+RAX: 0000000000000000 RBX: ffff8801d7d96950 RCX: 0000000000000006
+RDX: 0000000000000001 RSI: ffff8801d9e64f28 RDI: ffff8801d7d96800
+RBP: ffff8801d983f258 R08: 0000000100000000 R09: 0000000000000001
+R10: 0000000000000002 R11: 0000000000000003 R12: ffff8801d983f230
+R13: ffff8801b67f5720 R14: ffff8801b67f5770 R15: ffff8801d983ef70
+FS:  0000000000000000(0000) GS:ffff8801dc000000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000060 CR3: 00000001cee58000 CR4: 00000000001406f0
+Stack:
+ ffff8801d7d96800 ffffffff813fa207 dffffc0000000000 ffffe8ffffc0f238
+ 0000000000000002 1ffff1003b307dea ffffe8ffffc0f218 ffff8801d983f190
+ 0000000000000282 ffffe8ffffc0f140 ffffe8ffffc0f220 0000000041b58ab3
+Call Trace:
+ [<ffffffff813fb407>] sha512_mb_update+0x2f7/0x4e0
+arch/x86/crypto/sha512-mb/sha512_mb.c:588
+ [<ffffffff8219cdad>] crypto_ahash_update include/crypto/hash.h:512 [inline]
+ [<ffffffff8219cdad>] ahash_mcryptd_update crypto/mcryptd.c:627 [inline]
+ [<ffffffff8219cdad>] mcryptd_hash_update+0xcd/0x1c0 crypto/mcryptd.c:373
+ [<ffffffff8219c29f>] mcryptd_queue_worker+0xff/0x6a0 crypto/mcryptd.c:181
+ [<ffffffff81492960>] process_one_work+0xbd0/0x1c10 kernel/workqueue.c:2096
+ [<ffffffff81493bc3>] worker_thread+0x223/0x1990 kernel/workqueue.c:2230
+ [<ffffffff814abb33>] kthread+0x323/0x3e0 kernel/kthread.c:209
+ [<ffffffff8436fbea>] ret_from_fork+0x2a/0x40 arch/x86/entry/entry_64.S:433
+Code: 49 0f 42 d3 48 f7 c2 f0 ff ff ff 0f 85 9a 00 00 00 48 83 e2 0f
+48 6b da 08 48 8d 9c 1f 48 01 00 00 48 8b 03 48 c7 03 00 00 00 00 <c7>
+40 60 02 00 00 00 48 8b 9f 40 01 00 00 48 c1 e3 08 48 09 d3
+RIP  [<ffffffff813fc09e>] sha512_mb_mgr_get_comp_job_avx2+0x6e/0xee
+arch/x86/crypto/sha512-mb/sha512_mb_mgr_flush_avx2.S:251
+ RSP <ffff8801d983eef8>
+CR2: 0000000000000060
+---[ end trace 76403e033556dcb7 ]---
 
--- 
-Florian
+BUG: unable to handle kernel NULL pointer dereference at 0000000000000060
+IP: [<ffffffff813fc09e>] sha512_mb_mgr_get_comp_job_avx2+0x6e/0xee
+arch/x86/crypto/sha512-mb/sha512_mb_mgr_flush_avx2.S:251
+PGD 1d6242067 [  226.248182] PUD 1d2093067
+Oops: 0002 [#1] SMP KASAN
+Dumping ftrace buffer:
+   (ftrace buffer empty)
+Modules linked in:
+CPU: 1 PID: 1788 Comm: kworker/1:2 Not tainted 4.9.0 #3
+Hardware name: Google Google Compute Engine/Google Compute Engine,
+BIOS Google 01/01/2011
+Workqueue: crypto mcryptd_queue_worker
+task: ffff8801cc3ee100 task.stack: ffff8801cd068000
+RIP: 0010:[<ffffffff813fc09e>]  [<ffffffff813fc09e>]
+sha512_mb_mgr_get_comp_job_avx2+0x6e/0xee
+arch/x86/crypto/sha512-mb/sha512_mb_mgr_flush_avx2.S:251
+RSP: 0018:ffff8801cd06eef8  EFLAGS: 00010202
+RAX: 0000000000000000 RBX: ffff8801d7dc3c10 RCX: 0000000000000006
+RDX: 0000000000000001 RSI: ffff8801cc3ee928 RDI: ffff8801d7dc3ac0
+RBP: ffff8801cd06f258 R08: 0000000100000000 R09: 0000000000000001
+R10: 0000000000000002 R11: 0000000000000003 R12: ffff8801cd06f230
+R13: ffff8801c6eb9aa0 R14: ffff8801c6eb9af0 R15: ffff8801cd06ef70
+FS:  0000000000000000(0000) GS:ffff8801dc100000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000060 CR3: 00000001d6201000 CR4: 00000000001406e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Stack:
+ ffff8801d7dc3ac0 ffffffff813fa207 dffffc0000000000 ffffe8ffffd0f238
+ 0000000000000002 1ffff10039a0ddea ffffe8ffffd0f218 ffff8801cd06f190
+ 0000000000000282 ffffe8ffffd0f140 ffffe8ffffd0f220 0000000041b58ab3
+Call Trace:
+ [<ffffffff813fb407>] sha512_mb_update+0x2f7/0x4e0
+arch/x86/crypto/sha512-mb/sha512_mb.c:588
+ [<ffffffff8219cdad>] crypto_ahash_update include/crypto/hash.h:512 [inline]
+ [<ffffffff8219cdad>] ahash_mcryptd_update crypto/mcryptd.c:627 [inline]
+ [<ffffffff8219cdad>] mcryptd_hash_update+0xcd/0x1c0 crypto/mcryptd.c:373
+ [<ffffffff8219c29f>] mcryptd_queue_worker+0xff/0x6a0 crypto/mcryptd.c:181
+ [<ffffffff81492960>] process_one_work+0xbd0/0x1c10 kernel/workqueue.c:2096
+ [<ffffffff81493bc3>] worker_thread+0x223/0x1990 kernel/workqueue.c:2230
+ [<ffffffff814abb33>] kthread+0x323/0x3e0 kernel/kthread.c:209
+ [<ffffffff8436fbea>] ret_from_fork+0x2a/0x40 arch/x86/entry/entry_64.S:433
+Code: 49 0f 42 d3 48 f7 c2 f0 ff ff ff 0f 85 9a 00 00 00 48 83 e2 0f
+48 6b da 08 48 8d 9c 1f 48 01 00 00 48 8b 03 48 c7 03 00 00 00 00 <c7>
+40 60 02 00 00 00 48 8b 9f 40 01 00 00 48 c1 e3 08 48 09 d3
+RIP  [<ffffffff813fc09e>] sha512_mb_mgr_get_comp_job_avx2+0x6e/0xee
+arch/x86/crypto/sha512-mb/sha512_mb_mgr_flush_avx2.S:251
+ RSP <ffff8801cd06eef8>
+CR2: 0000000000000060
+---[ end trace 47d3302a6c62cfbc ]---
+
+BUG: unable to handle kernel NULL pointer dereference at 0000000000000060
+IP: [<ffffffff813fc09e>] sha512_mb_mgr_get_comp_job_avx2+0x6e/0xee
+arch/x86/crypto/sha512-mb/sha512_mb_mgr_flush_avx2.S:251
+PGD 1ccad4067 [   32.785777] PUD 1cb96c067
+Oops: 0002 [#1] SMP KASAN
+Dumping ftrace buffer:
+   (ftrace buffer empty)
+Modules linked in:
+CPU: 1 PID: 3231 Comm: kworker/1:2 Not tainted 4.9.0 #3
+Hardware name: Google Google Compute Engine/Google Compute Engine,
+BIOS Google 01/01/2011
+Workqueue: crypto mcryptd_queue_worker
+task: ffff8801cf472700 task.stack: ffff8801ce848000
+RIP: 0010:[<ffffffff813fc09e>]  [<ffffffff813fc09e>]
+sha512_mb_mgr_get_comp_job_avx2+0x6e/0xee
+arch/x86/crypto/sha512-mb/sha512_mb_mgr_flush_avx2.S:251
+RSP: 0018:ffff8801ce84eef8  EFLAGS: 00010202
+RAX: 0000000000000000 RBX: ffff8801d7c82950 RCX: 0000000000000006
+RDX: 0000000000000001 RSI: ffff8801cf472f28 RDI: ffff8801d7c82800
+RBP: ffff8801ce84f258 R08: 0000000100000000 R09: 0000000000000001
+R10: 0000000000000002 R11: 0000000000000003 R12: ffff8801ce84f230
+R13: ffff8801c970e760 R14: ffff8801c970e7b0 R15: ffff8801ce84ef70
+FS:  0000000000000000(0000) GS:ffff8801dc100000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000060 CR3: 00000001ca654000 CR4: 00000000001406e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Stack:
+ ffff8801d7c82800 ffffffff813fa207 dffffc0000000000 ffffe8ffffd0f238
+ 0000000000000002 1ffff10039d09dea ffffe8ffffd0f218 ffff8801ce84f190
+ 0000000000000282 ffffe8ffffd0f140 ffffe8ffffd0f220 0000000041b58ab3
+Call Trace:
+ [<ffffffff813fb407>] sha512_mb_update+0x2f7/0x4e0
+arch/x86/crypto/sha512-mb/sha512_mb.c:588
+ [<ffffffff8219cdad>] crypto_ahash_update include/crypto/hash.h:512 [inline]
+ [<ffffffff8219cdad>] ahash_mcryptd_update crypto/mcryptd.c:627 [inline]
+ [<ffffffff8219cdad>] mcryptd_hash_update+0xcd/0x1c0 crypto/mcryptd.c:373
+ [<ffffffff8219c29f>] mcryptd_queue_worker+0xff/0x6a0 crypto/mcryptd.c:181
+ [<ffffffff81492960>] process_one_work+0xbd0/0x1c10 kernel/workqueue.c:2096
+ [<ffffffff81493bc3>] worker_thread+0x223/0x1990 kernel/workqueue.c:2230
+ [<ffffffff814abb33>] kthread+0x323/0x3e0 kernel/kthread.c:209
+ [<ffffffff8436fbea>] ret_from_fork+0x2a/0x40 arch/x86/entry/entry_64.S:433
+Code: 49 0f 42 d3 48 f7 c2 f0 ff ff ff 0f 85 9a 00 00 00 48 83 e2 0f
+48 6b da 08 48 8d 9c 1f 48 01 00 00 48 8b 03 48 c7 03 00 00 00 00 <c7>
+40 60 02 00 00 00 48 8b 9f 40 01 00 00 48 c1 e3 08 48 09 d3
+RIP  [<ffffffff813fc09e>] sha512_mb_mgr_get_comp_job_avx2+0x6e/0xee
+arch/x86/crypto/sha512-mb/sha512_mb_mgr_flush_avx2.S:251
+ RSP <ffff8801ce84eef8>
+CR2: 0000000000000060
+---[ end trace 3af8184eabd21203 ]---
