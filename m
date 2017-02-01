@@ -1,72 +1,79 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH -stable] crypto: ccm - deal with CTR ciphers that honour iv_out
-Date: Wed, 1 Feb 2017 20:08:09 +0000
-Message-ID: <CAKv+Gu9Em15JVQOo9civMMWOtwBR0R_a+K0P1Y-JOZJU5zPtnw@mail.gmail.com>
-References: <1485636005-5192-1-git-send-email-ard.biesheuvel@linaro.org>
+From: Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
+Subject: Re: [PATCH v6 1/5] lib: Update LZ4 compressor module
+Date: Wed, 1 Feb 2017 21:18:59 +0100
+Message-ID: <20170201201859.GA15641@bierbaron.springfield.local>
+References: <1482259992-16680-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
+ <1485554524-4844-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
+ <1485554524-4844-2-git-send-email-4sschmid@informatik.uni-hamburg.de>
+ <20170131152744.5bd2f3ba@lwn.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: akpm@linux-foundation.org, bongkyu.kim@lge.com,
+        rsalvaterra@gmail.com, sergey.senozhatsky@gmail.com,
+        gregkh@linuxfoundation.org, linux-kernel@vger.kernel.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, anton@enomsg.org, ccross@android.com,
+        keescook@chromium.org, tony.luck@intel.com,
+        4sschmid@informatik.uni-hamburg.de
+To: Jonathan Corbet <corbet@lwn.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-it0-f46.google.com ([209.85.214.46]:35117 "EHLO
-        mail-it0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750989AbdBAUIL (ORCPT
+Received: from mailhost.informatik.uni-hamburg.de ([134.100.9.70]:38208 "EHLO
+        mailhost.informatik.uni-hamburg.de" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1750945AbdBAUTN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Feb 2017 15:08:11 -0500
-Received: by mail-it0-f46.google.com with SMTP id 203so24982033ith.0
-        for <linux-crypto@vger.kernel.org>; Wed, 01 Feb 2017 12:08:10 -0800 (PST)
-In-Reply-To: <1485636005-5192-1-git-send-email-ard.biesheuvel@linaro.org>
+        Wed, 1 Feb 2017 15:19:13 -0500
+Content-Disposition: inline
+In-Reply-To: <20170131152744.5bd2f3ba@lwn.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 28 January 2017 at 20:40, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
-> The skcipher API mandates that chaining modes involving IVs calculate
-> an outgoing IV value that is suitable for encrypting additional blocks
-> of data. This means the CCM driver cannot assume that req->iv points to
-> the original IV value when it calls crypto_ccm_auth. So pass a copy to
-> the skcipher instead.
->
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> ---
->  crypto/ccm.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/crypto/ccm.c b/crypto/ccm.c
-> index b388ac6edfb9..8976ef9bc2e7 100644
-> --- a/crypto/ccm.c
-> +++ b/crypto/ccm.c
-> @@ -362,7 +362,7 @@ static int crypto_ccm_decrypt(struct aead_request *req)
->         unsigned int cryptlen = req->cryptlen;
->         u8 *authtag = pctx->auth_tag;
->         u8 *odata = pctx->odata;
-> -       u8 *iv = req->iv;
-> +       u8 iv[16];
->         int err;
->
->         cryptlen -= authsize;
-> @@ -378,6 +378,7 @@ static int crypto_ccm_decrypt(struct aead_request *req)
->         if (req->src != req->dst)
->                 dst = pctx->dst;
->
-> +       memcpy(iv, req->iv, sizeof(iv));
->         skcipher_request_set_tfm(skreq, ctx->ctr);
->         skcipher_request_set_callback(skreq, pctx->flags,
->                                       crypto_ccm_decrypt_done, req);
-> --
-> 2.7.4
->
+On Tue, Jan 31, 2017 at 03:27:44PM -0700, Jonathan Corbet wrote:
+> On Fri, 27 Jan 2017 23:02:00 +0100
+> Sven Schmidt <4sschmid@informatik.uni-hamburg.de> wrote:
+> 
+> I have one quick question...
+> 
+> >  /*
+> > + * LZ4_compress_default()
+> > + *	Compresses 'sourceSize' bytes from buffer 'source'
+> > + *	into already allocated 'dest' buffer of size 'maxOutputSize'.
+> > + *	Compression is guaranteed to succeed if
+> > + *	'maxOutputSize' >= LZ4_compressBound(inputSize).
+> > + *	It also runs faster, so it's a recommended setting.
+> > + *	If the function cannot compress 'source'
+> > + *	into a more limited 'dest' budget,
+> > + *	compression stops *immediately*,
+> > + *	and the function result is zero.
+> > + *	As a consequence, 'dest' content is not valid.
+> > + *
+> > + *	source       : source address of the original data
+> > + *	dest         : output buffer address
+> > + *                 of the compressed data
+> > + *	inputSize    : Max supported value is
+> > + *                 LZ4_MAX_INPUT_SIZE
+> > + *	maxOutputSize: full or partial size of buffer 'dest'
+> > + *                 (which must be already allocated)
+> > + *	workmem      : address of the working memory.
+> > + *                 This requires 'workmem' of size LZ4_MEM_COMPRESS.
+> > + *	return       : the number of bytes written into buffer 'dest'
+> > + *   (necessarily <= maxOutputSize) or 0 if compression fails
+> > + */
+> > +int LZ4_compress_default(const char *source, char *dest, int inputSize,
+> > +	int maxOutputSize, void *wrkmem);
+> 
+> Is there any chance you could format these as kerneldoc comments?  You're
+> not too far from it now, and that would allow the LZ4 interface to be
+> pulled into the documentation.
+> 
+> Thanks,
+> 
+> jon
 
-Herbert,
+Hi Jon,
 
-Could you please forward this patch to Linus as well? I noticed that the patch
-
-crypto: arm64/aes-blk - honour iv_out requirement in CBC and CTR modes
-
-is now in mainline, which means CCM is now broken on arm64, given that
-the iv_out requirement for CTR apparently isn't honored by *any*
-implementation, and CCM wrongly assumes that req->iv retains its value
-across the call into the CTR skcipher
+of course, that makes sense. I already checked the documentation and you're right, I'm not that far from it.
+Will do the necessary changes.
 
 Thanks,
-Ard.
+
+Sven
