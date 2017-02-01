@@ -1,91 +1,135 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: 4.10 aesni-intel no longer having lrw/ablk_helper dependencies?
-Date: Wed, 1 Feb 2017 22:17:39 +0800
-Message-ID: <20170201141739.GD32415@gondor.apana.org.au>
-References: <201701292231.59656.a.miskiewicz@gmail.com>
- <20170129234632.GA5253@zzz>
- <201701301742.35626.arekm@maven.pl>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH] crypto: arm64/crc32 - detect crc32 support in assembler
+Date: Wed, 1 Feb 2017 15:12:54 +0000
+Message-ID: <CAKv+Gu-Nx8=eAbrZz49mP9EzF9BhZ_E-q9Ebke8YH74QY1T3SQ@mail.gmail.com>
+References: <20170127104039.29351-1-mbrugger@suse.com> <CAKv+Gu8P3U6_u7FdRFSdDL9jdKaJQuqHbrQ-7Qu900f8R1voZw@mail.gmail.com>
+ <20170127105244.GF21144@arm.com> <CAKv+Gu_LcU3mSSMdrjks02ZuhHLhkYqNuZGOcTp1AmS8cpzCDg@mail.gmail.com>
+ <CAKv+Gu9gPAb-AMdbK32dXciX1mgh1sqSrxMAjB-ZGw7uAk2r2Q@mail.gmail.com> <5ebb24d2-81d4-53c7-0365-f35a0eb3588b@suse.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: Eric Biggers <ebiggers3@gmail.com>, linux-crypto@vger.kernel.org
-To: Arkadiusz =?utf-8?Q?Mi=C5=9Bkiewicz?= <arekm@maven.pl>
+Content-Type: text/plain; charset=UTF-8
+Cc: Will Deacon <will.deacon@arm.com>,
+        Matthias Brugger <mbrugger@suse.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Yazen Ghannam <yazen.ghannam@linaro.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org"
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Alexander Graf <agraf@suse.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:50845 "EHLO
-        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1750790AbdBAOSA (ORCPT
+Received: from mail-io0-f182.google.com ([209.85.223.182]:33338 "EHLO
+        mail-io0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751111AbdBAPMz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Feb 2017 09:18:00 -0500
-Content-Disposition: inline
-In-Reply-To: <201701301742.35626.arekm@maven.pl>
+        Wed, 1 Feb 2017 10:12:55 -0500
+Received: by mail-io0-f182.google.com with SMTP id v96so62315962ioi.0
+        for <linux-crypto@vger.kernel.org>; Wed, 01 Feb 2017 07:12:55 -0800 (PST)
+In-Reply-To: <5ebb24d2-81d4-53c7-0365-f35a0eb3588b@suse.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jan 30, 2017 at 05:42:35PM +0100, Arkadiusz Miśkiewicz wrote:
-> On Monday 30 of January 2017, Eric Biggers wrote:
-> 
-> > First, aesni-intel no longer includes an LRW implementation itself. 
-> > Instead, the generic LRW module must be selected.  Internally it will use
-> > the aesni-intel accelerated ECB algorithm if available.  So you need to
-> > make sure that the "lrw" module is included in the initrd if it's not
-> > already.
-> > 
-> > But I think the bigger problem is that aesni-intel couldn't be insmod'ed at
-> > all, which shouldn't happen.  The problem might actually be related to the
-> > "pcbc" algorithm.  Upon initialization, aesni-intel now tries to wrap
-> > "pcbc(__aes-aesni)" with the "fpu" template.  This will fail if the "pcbc"
-> > module hasn't been inserted.  I think this wasn't a problem before because
-> > the old code using ablk_helper instead of crypto_simd didn't try to find
-> > "pcbc" until someone asked for it, while now aesni-intel will try to find
-> > it immediately.  And since aesni-intel has no direct dependency on pcbc,
-> > I'm guessing what happened is that pcbc didn't end up in your initrd even
-> > though it may have been built.  (You can verify this by adding pcbc to
-> > your initrd and seeing if that works around the problem.)
-> 
-> (hardcoded) loading of pcbc fixed my problem, intel-aesni loaded fine and luks 
-> partition unlocked correctly.
+On 1 February 2017 at 13:58, Alexander Graf <agraf@suse.de> wrote:
+> On 02/01/2017 10:43 AM, Ard Biesheuvel wrote:
+>>
+>> On 1 February 2017 at 09:07, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+>> wrote:
+>>>
+>>> On 27 January 2017 at 10:52, Will Deacon <will.deacon@arm.com> wrote:
+>>>>
+>>>> On Fri, Jan 27, 2017 at 10:43:16AM +0000, Ard Biesheuvel wrote:
+>>>>>
+>>>>> On 27 January 2017 at 10:40, Matthias Brugger <mbrugger@suse.com>
+>>>>> wrote:
+>>>>>>
+>>>>>> Older compilers may not be able to detect the crc32 extended cpu type.
+>>>>>
+>>>>> What do you mean 'detect'? Could you describe the failure in more
+>>>>> detail
+>>>>> please?
+>>>>>
+>>>>>> Anyway only inline assembler code is used, which gets passed to the
+>>>>>> assembler. This patch moves the crc detection to the assembler.
+>>>>>>
+>>>>>> Suggested-by: Alexander Graf <agraf@suse.de>
+>>>>>> Signed-off-by: Matthias Brugger <mbrugger@suse.com>
+>>>>>> ---
+>>>>>>   arch/arm64/crypto/Makefile      | 2 --
+>>>>>>   arch/arm64/crypto/crc32-arm64.c | 3 +++
+>>>>>>   2 files changed, 3 insertions(+), 2 deletions(-)
+>>>>>>
+>>>>>> diff --git a/arch/arm64/crypto/Makefile b/arch/arm64/crypto/Makefile
+>>>>>> index aa8888d7b744..0d779dac75cd 100644
+>>>>>> --- a/arch/arm64/crypto/Makefile
+>>>>>> +++ b/arch/arm64/crypto/Makefile
+>>>>>> @@ -48,8 +48,6 @@ CFLAGS_aes-glue-ce.o  := -DUSE_V8_CRYPTO_EXTENSIONS
+>>>>>>
+>>>>>>   obj-$(CONFIG_CRYPTO_CRC32_ARM64) += crc32-arm64.o
+>>>>>>
+>>>>>> -CFLAGS_crc32-arm64.o   := -mcpu=generic+crc
+>>>>>> -
+>>>>>>   $(obj)/aes-glue-%.o: $(src)/aes-glue.c FORCE
+>>>>>>          $(call if_changed_rule,cc_o_c)
+>>>>>>
+>>>>>> diff --git a/arch/arm64/crypto/crc32-arm64.c
+>>>>>> b/arch/arm64/crypto/crc32-arm64.c
+>>>>>> index 6a37c3c6b11d..10f5dd075323 100644
+>>>>>> --- a/arch/arm64/crypto/crc32-arm64.c
+>>>>>> +++ b/arch/arm64/crypto/crc32-arm64.c
+>>>>>> @@ -29,6 +29,9 @@ MODULE_AUTHOR("Yazen Ghannam
+>>>>>> <yazen.ghannam@linaro.org>");
+>>>>>>   MODULE_DESCRIPTION("CRC32 and CRC32C using optional ARMv8
+>>>>>> instructions");
+>>>>>>   MODULE_LICENSE("GPL v2");
+>>>>>>
+>>>>>> +/* Request crc extension capabilities from the assembler */
+>>>>>> +asm(".arch_extension crc");
+>>>>>> +
+>>>>>
+>>>>> Will should confirm, but I think this is a recent feature in GAS for
+>>>>> AArch64, so this may break older toolchains as well.
+>>>>
+>>>> Yes, the .arch_extension directive isn't universally supported by
+>>>> AArch64
+>>>> gas so we can't rely on it unconditionally. The best bet is to check for
+>>>> the support and, if it's not present, then disable whatever feature
+>>>> relies
+>>>> on it. See the lseinstr variable in Makefile.
+>>>>
+>>> Actually, this driver has become somewhat redundant now that we have
+>>> an alternative that combines an implementation based on 64x64
+>>> polynomial multiplication with an implementation based on the CRC32
+>>> instructions.
+>>>
+>>> I will propose a patch that makes the latter usable when only the
+>>> CRC32 instructions are supported.
+>>
+>> ... although you still haven't explained what the actual problem is
+>> that you are trying to solve.
+>
+>
+>
+>
+> The problem is that in Leap 42.2 (as well as SLES12 SP2) we have a 4.8 based
+> system compiler, but recent binutils. That means that while our assembler is
+> happy to work with crc instructions, passing the -mcpu parameter to gcc
+> fails because gcc isn't aware of the flavor yet.
+>
+> That in turn means that we want to tell the assembler about feature
+> requirements rather than the compiler. Fortunately the ".arch_extension"
+> primitive allows you to do so.
+>
+> As far as checking for availability of it goes, I agree that it'd be nice to
+> check if ".arch_extension" is supported. But so would be to check if
+> -mcpu=generic+crc is supported. IMHO this patch doesn't make the current
+> non-checking situation any worse. But of course checking is always nicer
+> than not checking :)
+>
 
-Thanks for the report.  Does this patch fix the problem?
+Well, I am pretty sure binutils v2.25 and older are in wider use than
+GCC v4.8 and older, which means the runtime test would disable the CRC
+module altogether for a lot of users.
 
----8<---
-Subject: crypto: aesni - Fix failure when pcbc module is absent
-
-When aesni is built as a module together with pcbc, the pcbc module
-must be present for aesni to load.  However, the pcbc module may not
-be present for reasons such as its absence on initramfs.  This patch
-allows the aesni to function even if the pcbc module is enabled but
-not present.
-
-Reported-by: Arkadiusz Miśkiewicz <arekm@maven.pl>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index 7ad0ed7..93de8ea 100644
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -1089,9 +1089,9 @@ static void aesni_free_simds(void)
- 		    aesni_simd_skciphers[i]; i++)
- 		simd_skcipher_free(aesni_simd_skciphers[i]);
- 
--	for (i = 0; i < ARRAY_SIZE(aesni_simd_skciphers2) &&
--		    aesni_simd_skciphers2[i].simd; i++)
--		simd_skcipher_free(aesni_simd_skciphers2[i].simd);
-+	for (i = 0; i < ARRAY_SIZE(aesni_simd_skciphers2); i++)
-+		if (aesni_simd_skciphers2[i].simd)
-+			simd_skcipher_free(aesni_simd_skciphers2[i].simd);
- }
- 
- static int __init aesni_init(void)
-@@ -1172,7 +1172,7 @@ static int __init aesni_init(void)
- 		simd = simd_skcipher_create_compat(algname, drvname, basename);
- 		err = PTR_ERR(simd);
- 		if (IS_ERR(simd))
--			goto unregister_simds;
-+			continue;
- 
- 		aesni_simd_skciphers2[i].simd = simd;
- 	}
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+However, as I mentioned, we can also remove this driver once the PMULL
+based one is updated.
