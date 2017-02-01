@@ -1,79 +1,27 @@
-From: Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
-Subject: Re: [PATCH v6 1/5] lib: Update LZ4 compressor module
-Date: Wed, 1 Feb 2017 21:18:59 +0100
-Message-ID: <20170201201859.GA15641@bierbaron.springfield.local>
-References: <1482259992-16680-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
- <1485554524-4844-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
- <1485554524-4844-2-git-send-email-4sschmid@informatik.uni-hamburg.de>
- <20170131152744.5bd2f3ba@lwn.net>
+From: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Subject: =?utf-8?Q?=D0=9A=D0=9B=D0=98=D0=95=D0=9D=D0=A2=D0=A1=D0?=
+        =?utf-8?Q?=9A=D0=98=D0=95_=D0=91=D0=90=D0=97=D0=AB_=D1=82?=
+        =?utf-8?Q?=D0=B5=D0=BB_+79139230330_Skype=3A_prodawez390_?=
+        =?utf-8?Q?Email=3A_prodawez393=40gmail=2Ecom_=D0=A3=D0=B7?=
+        =?utf-8?Q?=D0=BD=D0=B0=D0=B9=D1=82=D0=B5_=D0=BF=D0=BE=D0?=
+        =?utf-8?Q?=B4=D1=80=D0=BE=D0=B1=D0=BD=D0=B5=D0=B5!?=
+Date: Thu, 2 Feb 2017 00:01:41 +0300
+Message-ID: <29D357DEB4604EFD21246DD1C5AA6FB6@vger.kernel.org>
+Reply-To: "linux-crypto@vger.kernel.org" <prodawez393@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: akpm@linux-foundation.org, bongkyu.kim@lge.com,
-        rsalvaterra@gmail.com, sergey.senozhatsky@gmail.com,
-        gregkh@linuxfoundation.org, linux-kernel@vger.kernel.org,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, anton@enomsg.org, ccross@android.com,
-        keescook@chromium.org, tony.luck@intel.com,
-        4sschmid@informatik.uni-hamburg.de
-To: Jonathan Corbet <corbet@lwn.net>
+Content-Type: text/plain; charset="utf-8";
+Content-Transfer-Encoding: 8BIT
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailhost.informatik.uni-hamburg.de ([134.100.9.70]:38208 "EHLO
-        mailhost.informatik.uni-hamburg.de" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1750945AbdBAUTN (ORCPT
+Received: from [103.229.83.250] ([103.229.83.250]:57121 "EHLO
+        cache.ttcnetwork.com" rhost-flags-FAIL-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1752220AbdBAUd4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Feb 2017 15:19:13 -0500
-Content-Disposition: inline
-In-Reply-To: <20170131152744.5bd2f3ba@lwn.net>
+        Wed, 1 Feb 2017 15:33:56 -0500
+Received: from 103.229.83.243 (localhost [IPv6:::1])
+        by cache.ttcnetwork.com (Postfix) with SMTP id B792B45D0299
+        for <linux-crypto@vger.kernel.org>; Wed,  1 Feb 2017 22:58:19 +0600 (BDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jan 31, 2017 at 03:27:44PM -0700, Jonathan Corbet wrote:
-> On Fri, 27 Jan 2017 23:02:00 +0100
-> Sven Schmidt <4sschmid@informatik.uni-hamburg.de> wrote:
-> 
-> I have one quick question...
-> 
-> >  /*
-> > + * LZ4_compress_default()
-> > + *	Compresses 'sourceSize' bytes from buffer 'source'
-> > + *	into already allocated 'dest' buffer of size 'maxOutputSize'.
-> > + *	Compression is guaranteed to succeed if
-> > + *	'maxOutputSize' >= LZ4_compressBound(inputSize).
-> > + *	It also runs faster, so it's a recommended setting.
-> > + *	If the function cannot compress 'source'
-> > + *	into a more limited 'dest' budget,
-> > + *	compression stops *immediately*,
-> > + *	and the function result is zero.
-> > + *	As a consequence, 'dest' content is not valid.
-> > + *
-> > + *	source       : source address of the original data
-> > + *	dest         : output buffer address
-> > + *                 of the compressed data
-> > + *	inputSize    : Max supported value is
-> > + *                 LZ4_MAX_INPUT_SIZE
-> > + *	maxOutputSize: full or partial size of buffer 'dest'
-> > + *                 (which must be already allocated)
-> > + *	workmem      : address of the working memory.
-> > + *                 This requires 'workmem' of size LZ4_MEM_COMPRESS.
-> > + *	return       : the number of bytes written into buffer 'dest'
-> > + *   (necessarily <= maxOutputSize) or 0 if compression fails
-> > + */
-> > +int LZ4_compress_default(const char *source, char *dest, int inputSize,
-> > +	int maxOutputSize, void *wrkmem);
-> 
-> Is there any chance you could format these as kerneldoc comments?  You're
-> not too far from it now, and that would allow the LZ4 interface to be
-> pulled into the documentation.
-> 
-> Thanks,
-> 
-> jon
-
-Hi Jon,
-
-of course, that makes sense. I already checked the documentation and you're right, I'm not that far from it.
-Will do the necessary changes.
-
-Thanks,
-
-Sven
+КЛИЕНТСКИЕ БАЗЫ тел +79139230330 Skype: prodawez390 Email: prodawez393@gmail.com Узнайте подробнее!
