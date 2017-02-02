@@ -1,39 +1,39 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH -stable] crypto: ccm - deal with CTR ciphers that honour iv_out
-Date: Thu, 2 Feb 2017 11:39:27 +0000
-Message-ID: <CAKv+Gu-SF1c0GZv08EG2B2vT6xcGOV7sK-NAruO6WF=BD8494w@mail.gmail.com>
-References: <1485636005-5192-1-git-send-email-ard.biesheuvel@linaro.org>
- <CAKv+Gu9Em15JVQOo9civMMWOtwBR0R_a+K0P1Y-JOZJU5zPtnw@mail.gmail.com>
- <20170202051300.GA4349@gondor.apana.org.au> <CAKv+Gu-fUAofB+_Td=bq=m2KsMoc7V3N+NffW5GTuo4fdCwRTw@mail.gmail.com>
- <20170202095352.GA4818@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 0/6] Add support for ECDSA algorithm
+Date: Thu, 2 Feb 2017 21:57:21 +0800
+Message-ID: <20170202135721.GA5289@gondor.apana.org.au>
+References: <1484912161-5932-1-git-send-email-nkumbhar@nvidia.com>
+ <20170123142417.GD19957@gondor.apana.org.au>
+ <113d3ef8-ef34-0651-71e7-be09ef55727e@nvidia.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org
+To: Nitin Kumbhar <nkumbhar@nvidia.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-io0-f169.google.com ([209.85.223.169]:33991 "EHLO
-        mail-io0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751019AbdBBLj2 (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:51139 "EHLO
+        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1751308AbdBBN5g (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Feb 2017 06:39:28 -0500
-Received: by mail-io0-f169.google.com with SMTP id l66so179591001ioi.1
-        for <linux-crypto@vger.kernel.org>; Thu, 02 Feb 2017 03:39:28 -0800 (PST)
-In-Reply-To: <20170202095352.GA4818@gondor.apana.org.au>
+        Thu, 2 Feb 2017 08:57:36 -0500
+Content-Disposition: inline
+In-Reply-To: <113d3ef8-ef34-0651-71e7-be09ef55727e@nvidia.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 2 February 2017 at 09:53, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> On Thu, Feb 02, 2017 at 08:01:47AM +0000, Ard Biesheuvel wrote:
->>
->> You are right: due to its construction, the CCM mode does not care
->> about the incremented counter because it clears the counter part of
->> the IV before encrypting the MAC. So this is caused by an optimization
->> in my code rather than the CCM code being incorrect.
->
-> OK so you will send me an update for the ARM64 code, right?
->
+On Thu, Jan 26, 2017 at 11:30:04AM +0530, Nitin Kumbhar wrote:
+> 
+> This ECDSA implementation is analogous to the RSA kernel implementation for
+> signature generation / verification. It extends ECC family of algorithms
+> like ECDH to support signature verification using akcipher. This will be
+> used in a way similar to RSA.
 
-Yes, on their way
+Yes but RSA had an in-kernel user in the form of module signature
+verification.  We don't add algorithms to the kernel without
+actual users.  So this patch-set needs to come with an actual
+in-kernel user of ECDSA.
 
 Thanks,
-Ard.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
