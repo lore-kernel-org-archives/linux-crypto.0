@@ -1,58 +1,224 @@
-From: Rob Rice <rob.rice-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
-Subject: Re: [PATCH v3 2/3] crypto: brcm: Add Broadcom SPU driver
-Date: Thu, 2 Feb 2017 10:11:57 -0500
-Message-ID: <E8AAEF8D-B4B1-4716-BDE2-A533EDA828A1@broadcom.com>
-References: <1485362689-11294-1-git-send-email-rob.rice@broadcom.com> <1485362689-11294-3-git-send-email-rob.rice@broadcom.com> <20170202140510.GB5289@gondor.apana.org.au>
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Cc: "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
-        linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        bcm-kernel-feedback-list-dY08KVG/lbpWk0Htik3J/w@public.gmane.org,
-        Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>,
-        Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>,
-        linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
-        Steve Lin <steven.lin1-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
-To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170202140510.GB5289-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH v2] crypto: algapi - make crypto_xor() and crypto_inc() alignment agnostic
+Date: Thu,  2 Feb 2017 15:56:28 +0000
+Message-ID: <1486050988-20407-1-git-send-email-ard.biesheuvel@linaro.org>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+        ebiggers3@gmail.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wm0-f50.google.com ([74.125.82.50]:36584 "EHLO
+        mail-wm0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751618AbdBBP4f (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 2 Feb 2017 10:56:35 -0500
+Received: by mail-wm0-f50.google.com with SMTP id c85so96611472wmi.1
+        for <linux-crypto@vger.kernel.org>; Thu, 02 Feb 2017 07:56:35 -0800 (PST)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Herbert,
+Instead of unconditionally forcing 4 byte alignment for all generic
+chaining modes that rely on crypto_xor() or crypto_inc() (which may
+result in unnecessary copying of data when the underlying hardware
+can perform unaligned accesses efficiently), make those functions
+deal with unaligned input explicitly, but only if the Kconfig symbol
+HAVE_EFFICIENT_UNALIGNED_ACCESS is set. This will allow us to drop
+the alignmasks from the CBC, CMAC, CTR, CTS, PCBC and SEQIV drivers.
 
+For crypto_inc(), this simply involves making the 4-byte stride
+conditional on HAVE_EFFICIENT_UNALIGNED_ACCESS being set, given that
+it typically operates on 16 byte buffers.
 
-> On Feb 2, 2017, at 9:05 AM, Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org> =
-wrote:
->=20
-> On Wed, Jan 25, 2017 at 11:44:48AM -0500, Rob Rice wrote:
->>=20
->> +static int ahash_export(struct ahash_request *req, void *out)
->> +{
->> +	const struct iproc_reqctx_s *rctx =3D ahash_request_ctx(req);
->> +
->> +	memcpy(out, rctx, offsetof(struct iproc_reqctx_s, msg_buf));
->> +	return 0;
->> +}
->=20
-> The reqctx data structure seems to contain a lot of info unrelated
-> to the hash state.  Can't we get away with just copying the hash
-> state (incr_hash) itself?
+For crypto_xor(), an algorithm is implemented that simply runs through
+the input using the largest strides possible if unaligned accesses are
+allowed. If they are not, an optimal sequence of memory accesses is
+emitted that takes the relative alignment of the input buffers into
+account, e.g., if the relative misalignment of dst and src is 4 bytes,
+the entire xor operation will be completed using 4 byte loads and stores
+(modulo unaligned bits at the start and end). Note that all expressions
+involving misalign are simply eliminated by the compiler when
+HAVE_EFFICIENT_UNALIGNED_ACCESS is defined.
 
-Yes, I see your point. I=E2=80=99ll whittle the export state down to =
-just what=E2=80=99s needed for the hash.
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
 
->=20
-> Cheers,
-> --=20
-> Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+I have greatly simplified the code, but it should still emit an optimal
+sequence of loads and stores depending on the misalignment.
 
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+ crypto/algapi.c | 65 +++++++++++++++-----
+ crypto/cbc.c    |  3 -
+ crypto/cmac.c   |  3 +-
+ crypto/ctr.c    |  2 +-
+ crypto/cts.c    |  3 -
+ crypto/pcbc.c   |  3 -
+ crypto/seqiv.c  |  2 -
+ 7 files changed, 50 insertions(+), 31 deletions(-)
+
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index df939b54b09f..e05ed1c5f5d1 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -961,32 +961,63 @@ void crypto_inc(u8 *a, unsigned int size)
+ 	__be32 *b = (__be32 *)(a + size);
+ 	u32 c;
+ 
+-	for (; size >= 4; size -= 4) {
+-		c = be32_to_cpu(*--b) + 1;
+-		*b = cpu_to_be32(c);
+-		if (c)
+-			return;
+-	}
++	if (IS_ENABLED(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS) ||
++	    !((unsigned long)b & (__alignof__(*b) - 1)))
++		for (; size >= 4; size -= 4) {
++			c = be32_to_cpu(*--b) + 1;
++			*b = cpu_to_be32(c);
++			if (c)
++				return;
++		}
+ 
+ 	crypto_inc_byte(a, size);
+ }
+ EXPORT_SYMBOL_GPL(crypto_inc);
+ 
+-static inline void crypto_xor_byte(u8 *a, const u8 *b, unsigned int size)
++void crypto_xor(u8 *dst, const u8 *src, unsigned int len)
+ {
+-	for (; size; size--)
+-		*a++ ^= *b++;
+-}
++	const int size = sizeof(unsigned long);
++	int delta = ((unsigned long)dst ^ (unsigned long)src) & (size - 1);
++	int misalign = 0;
++
++	if (!IS_ENABLED(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS) && delta) {
++		misalign = 1 << __ffs(delta);
++
++		/*
++		 * If we care about alignment, process as many bytes as
++		 * needed to advance dst and src to values whose alignments
++		 * equal their relative misalignment. This will allow us to
++		 * process the remainder of the input using optimal strides.
++		 */
++		while (((unsigned long)dst & (misalign - 1)) && len > 0) {
++			*dst++ ^= *src++;
++			len--;
++		}
++	}
+ 
+-void crypto_xor(u8 *dst, const u8 *src, unsigned int size)
+-{
+-	u32 *a = (u32 *)dst;
+-	u32 *b = (u32 *)src;
++	while (len >= size && !misalign) {
++		*(unsigned long *)dst ^= *(unsigned long *)src;
++		dst += size;
++		src += size;
++		len -= size;
++	}
+ 
+-	for (; size >= 4; size -= 4)
+-		*a++ ^= *b++;
++	while (IS_ENABLED(CONFIG_64BIT) && len >= 4 && !(misalign & 3)) {
++		*(u32 *)dst ^= *(u32 *)src;
++		dst += 4;
++		src += 4;
++		len -= 4;
++	}
++
++	while (len >= 2 && !(misalign & 1)) {
++		*(u16 *)dst ^= *(u16 *)src;
++		dst += 2;
++		src += 2;
++		len -= 2;
++	}
+ 
+-	crypto_xor_byte((u8 *)a, (u8 *)b, size);
++	while (len--)
++		*dst++ ^= *src++;
+ }
+ EXPORT_SYMBOL_GPL(crypto_xor);
+ 
+diff --git a/crypto/cbc.c b/crypto/cbc.c
+index 68f751a41a84..bc160a3186dc 100644
+--- a/crypto/cbc.c
++++ b/crypto/cbc.c
+@@ -145,9 +145,6 @@ static int crypto_cbc_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	inst->alg.base.cra_blocksize = alg->cra_blocksize;
+ 	inst->alg.base.cra_alignmask = alg->cra_alignmask;
+ 
+-	/* We access the data as u32s when xoring. */
+-	inst->alg.base.cra_alignmask |= __alignof__(u32) - 1;
+-
+ 	inst->alg.ivsize = alg->cra_blocksize;
+ 	inst->alg.min_keysize = alg->cra_cipher.cia_min_keysize;
+ 	inst->alg.max_keysize = alg->cra_cipher.cia_max_keysize;
+diff --git a/crypto/cmac.c b/crypto/cmac.c
+index 04080dca8f0c..16301f52858c 100644
+--- a/crypto/cmac.c
++++ b/crypto/cmac.c
+@@ -260,8 +260,7 @@ static int cmac_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	if (err)
+ 		goto out_free_inst;
+ 
+-	/* We access the data as u32s when xoring. */
+-	alignmask = alg->cra_alignmask | (__alignof__(u32) - 1);
++	alignmask = alg->cra_alignmask;
+ 	inst->alg.base.cra_alignmask = alignmask;
+ 	inst->alg.base.cra_priority = alg->cra_priority;
+ 	inst->alg.base.cra_blocksize = alg->cra_blocksize;
+diff --git a/crypto/ctr.c b/crypto/ctr.c
+index a9a7a44f2783..a4f4a8983169 100644
+--- a/crypto/ctr.c
++++ b/crypto/ctr.c
+@@ -209,7 +209,7 @@ static struct crypto_instance *crypto_ctr_alloc(struct rtattr **tb)
+ 	inst->alg.cra_flags = CRYPTO_ALG_TYPE_BLKCIPHER;
+ 	inst->alg.cra_priority = alg->cra_priority;
+ 	inst->alg.cra_blocksize = 1;
+-	inst->alg.cra_alignmask = alg->cra_alignmask | (__alignof__(u32) - 1);
++	inst->alg.cra_alignmask = alg->cra_alignmask;
+ 	inst->alg.cra_type = &crypto_blkcipher_type;
+ 
+ 	inst->alg.cra_blkcipher.ivsize = alg->cra_blocksize;
+diff --git a/crypto/cts.c b/crypto/cts.c
+index a1335d6c35fb..243f591dc409 100644
+--- a/crypto/cts.c
++++ b/crypto/cts.c
+@@ -374,9 +374,6 @@ static int crypto_cts_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	inst->alg.base.cra_blocksize = alg->base.cra_blocksize;
+ 	inst->alg.base.cra_alignmask = alg->base.cra_alignmask;
+ 
+-	/* We access the data as u32s when xoring. */
+-	inst->alg.base.cra_alignmask |= __alignof__(u32) - 1;
+-
+ 	inst->alg.ivsize = alg->base.cra_blocksize;
+ 	inst->alg.chunksize = crypto_skcipher_alg_chunksize(alg);
+ 	inst->alg.min_keysize = crypto_skcipher_alg_min_keysize(alg);
+diff --git a/crypto/pcbc.c b/crypto/pcbc.c
+index 11d248673ad4..29dd2b4a3b85 100644
+--- a/crypto/pcbc.c
++++ b/crypto/pcbc.c
+@@ -260,9 +260,6 @@ static int crypto_pcbc_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	inst->alg.base.cra_blocksize = alg->cra_blocksize;
+ 	inst->alg.base.cra_alignmask = alg->cra_alignmask;
+ 
+-	/* We access the data as u32s when xoring. */
+-	inst->alg.base.cra_alignmask |= __alignof__(u32) - 1;
+-
+ 	inst->alg.ivsize = alg->cra_blocksize;
+ 	inst->alg.min_keysize = alg->cra_cipher.cia_min_keysize;
+ 	inst->alg.max_keysize = alg->cra_cipher.cia_max_keysize;
+diff --git a/crypto/seqiv.c b/crypto/seqiv.c
+index c7049231861f..570b7d1aa0ca 100644
+--- a/crypto/seqiv.c
++++ b/crypto/seqiv.c
+@@ -153,8 +153,6 @@ static int seqiv_aead_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	if (IS_ERR(inst))
+ 		return PTR_ERR(inst);
+ 
+-	inst->alg.base.cra_alignmask |= __alignof__(u32) - 1;
+-
+ 	spawn = aead_instance_ctx(inst);
+ 	alg = crypto_spawn_aead_alg(spawn);
+ 
+-- 
+2.7.4
