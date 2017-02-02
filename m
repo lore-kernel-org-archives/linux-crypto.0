@@ -1,39 +1,48 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/6] Add support for ECDSA algorithm
-Date: Thu, 2 Feb 2017 21:57:21 +0800
-Message-ID: <20170202135721.GA5289@gondor.apana.org.au>
-References: <1484912161-5932-1-git-send-email-nkumbhar@nvidia.com>
- <20170123142417.GD19957@gondor.apana.org.au>
- <113d3ef8-ef34-0651-71e7-be09ef55727e@nvidia.com>
+From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Subject: Re: [PATCH v3 2/3] crypto: brcm: Add Broadcom SPU driver
+Date: Thu, 2 Feb 2017 22:05:10 +0800
+Message-ID: <20170202140510.GB5289@gondor.apana.org.au>
+References: <1485362689-11294-1-git-send-email-rob.rice@broadcom.com>
+ <1485362689-11294-3-git-send-email-rob.rice@broadcom.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org
-To: Nitin Kumbhar <nkumbhar@nvidia.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:51139 "EHLO
-        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751308AbdBBN5g (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Feb 2017 08:57:36 -0500
+Cc: "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
+        linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        bcm-kernel-feedback-list-dY08KVG/lbpWk0Htik3J/w@public.gmane.org,
+        Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>,
+        Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>,
+        linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+        Steve Lin <steven.lin1-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
+To: Rob Rice <rob.rice-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <113d3ef8-ef34-0651-71e7-be09ef55727e@nvidia.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1485362689-11294-3-git-send-email-rob.rice-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jan 26, 2017 at 11:30:04AM +0530, Nitin Kumbhar wrote:
-> 
-> This ECDSA implementation is analogous to the RSA kernel implementation for
-> signature generation / verification. It extends ECC family of algorithms
-> like ECDH to support signature verification using akcipher. This will be
-> used in a way similar to RSA.
+On Wed, Jan 25, 2017 at 11:44:48AM -0500, Rob Rice wrote:
+>
+> +static int ahash_export(struct ahash_request *req, void *out)
+> +{
+> +	const struct iproc_reqctx_s *rctx = ahash_request_ctx(req);
+> +
+> +	memcpy(out, rctx, offsetof(struct iproc_reqctx_s, msg_buf));
+> +	return 0;
+> +}
 
-Yes but RSA had an in-kernel user in the form of module signature
-verification.  We don't add algorithms to the kernel without
-actual users.  So this patch-set needs to come with an actual
-in-kernel user of ECDSA.
+The reqctx data structure seems to contain a lot of info unrelated
+to the hash state.  Can't we get away with just copying the hash
+state (incr_hash) itself?
 
-Thanks,
+Cheers,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
+Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
