@@ -1,179 +1,347 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH] crypto: generic/aes - drop alignment requirement
-Date: Thu,  2 Feb 2017 15:58:57 +0000
-Message-ID: <1486051137-20511-1-git-send-email-ard.biesheuvel@linaro.org>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-        ebiggers3@gmail.com
+From: Tim Chen <tim.c.chen@linux.intel.com>
+Subject: Re: crypto: NULL deref in sha512_mb_mgr_get_comp_job_avx2
+Date: Thu, 02 Feb 2017 08:00:31 -0800
+Message-ID: <1486051231.2833.56.camel@linux.intel.com>
+References: <CACT4Y+Z6_x2smshuSgQx0wA+g0H+5dJsF23UqYb9Z_WkDUvwcw@mail.gmail.com>
+         <20170201184502.GA11649@linux.intel.com>
+         <CACT4Y+bwD4ktMKVEkcmvJ_EuW834jAZbJfANxfyDKpmGXFxr4Q@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        David Miller <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        megha.dey@linux.intel.com, fenghua.yu@intel.com,
+        syzkaller <syzkaller@googlegroups.com>
+To: Dmitry Vyukov <dvyukov@google.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f41.google.com ([74.125.82.41]:37567 "EHLO
-        mail-wm0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752034AbdBBP7F (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Feb 2017 10:59:05 -0500
-Received: by mail-wm0-f41.google.com with SMTP id v77so93882471wmv.0
-        for <linux-crypto@vger.kernel.org>; Thu, 02 Feb 2017 07:59:04 -0800 (PST)
+Received: from mga04.intel.com ([192.55.52.120]:31923 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751036AbdBBQAd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 2 Feb 2017 11:00:33 -0500
+In-Reply-To: <CACT4Y+bwD4ktMKVEkcmvJ_EuW834jAZbJfANxfyDKpmGXFxr4Q@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The generic AES code exposes a 32-bit align mask, which forces all
-users of the code to use temporary buffers or take other measures to
-ensure the alignment requirement is adhered to, even on architectures
-that don't care about alignment for software algorithms such as this
-one.
+On Thu, 2017-02-02 at 11:58 +0100, Dmitry Vyukov wrote:
+> On Wed, Feb 1, 2017 at 7:45 PM, Tim Chen <tim.c.chen@linux.intel.com> wrote:
+> > 
+> > On Tue, Jan 31, 2017 at 02:16:31PM +0100, Dmitry Vyukov wrote:
+> > > 
+> > > Hello,
+> > > 
+> > > I am getting the following reports with low frequency while running
+> > > syzkaller fuzzer. Unfortunately they are not reproducible and happen
+> > > in a background thread, so it is difficult to extract any context on
+> > > my side. I see only few such crashes per week, so most likely it is
+> > > some hard to trigger data race. The following reports are from mmotm
+> > > tree, commits 00e20cfc2bf04a0cbe1f5405f61c8426f43eee84 and
+> > > fff7e71eac7788904753136f09bcad7471f7799e. Any ideas as to how this can
+> > > happen?
+> > > 
+> > > BUG: unable to handle kernel NULL pointer dereference at 0000000000000060
+> > > IP: [<ffffffff813fc09e>] sha512_mb_mgr_get_comp_job_avx2+0x6e/0xee
+> > > arch/x86/crypto/sha512-mb/sha512_mb_mgr_flush_avx2.S:251
+> > > PGD 1d2395067 [  220.874864] PUD 1d2860067
+> > > Oops: 0002 [#1] SMP KASAN
+> > > Dumping ftrace buffer:
+> > >    (ftrace buffer empty)
+> > > Modules linked in:
+> > > CPU: 0 PID: 516 Comm: kworker/0:1 Not tainted 4.9.0 #4
+> > > Hardware name: Google Google Compute Engine/Google Compute Engine,
+> > > BIOS Google 01/01/2011
+> > > Workqueue: crypto mcryptd_queue_worker
+> > > task: ffff8801d9f346c0 task.stack: ffff8801d9f08000
+> > > RIP: 0010:[<ffffffff813fc09e>]  [<ffffffff813fc09e>]
+> > > sha512_mb_mgr_get_comp_job_avx2+0x6e/0xee
+> > > arch/x86/crypto/sha512-mb/sha512_mb_mgr_flush_avx2.S:251
+> > > RSP: 0018:ffff8801d9f0eef8  EFLAGS: 00010202
+> > > RAX: 0000000000000000 RBX: ffff8801d7db1190 RCX: 0000000000000006
+> > > RDX: 0000000000000001 RSI: ffff8801d9f34ee8 RDI: ffff8801d7db1040
+> > > RBP: ffff8801d9f0f258 R08: 0000000100000000 R09: 0000000000000001
+> > > R10: 0000000000000002 R11: 0000000000000003 R12: ffff8801d9f0f230
+> > > R13: ffff8801c8bbc4e0 R14: ffff8801c8bbc530 R15: ffff8801d9f0ef70
+> > > FS:  0000000000000000(0000) GS:ffff8801dc000000(0000) knlGS:0000000000000000
+> > > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > > CR2: 0000000000000060 CR3: 00000001cc15a000 CR4: 00000000001406f0
+> > > DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> > > DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> > > Stack:
+> > >  ffff8801d7db1040 ffffffff813fa207 dffffc0000000000 ffffe8ffffc0f238
+> > >  0000000000000002 1ffff1003b3e1dea ffffe8ffffc0f218 ffff8801d9f0f190
+> > >  0000000000000282 ffffe8ffffc0f140 ffffe8ffffc0f220 0000000041b58ab3
+> > > Call Trace:
+> > >  [<ffffffff813fb407>] sha512_mb_update+0x2f7/0x4e0
+> > > arch/x86/crypto/sha512-mb/sha512_mb.c:588
+> > >  [<ffffffff8219d4ad>] crypto_ahash_update include/crypto/hash.h:512 [inline]
+> > >  [<ffffffff8219d4ad>] ahash_mcryptd_update crypto/mcryptd.c:627 [inline]
+> > >  [<ffffffff8219d4ad>] mcryptd_hash_update+0xcd/0x1c0 crypto/mcryptd.c:373
+> > >  [<ffffffff8219c99f>] mcryptd_queue_worker+0xff/0x6a0 crypto/mcryptd.c:181
+> > >  [<ffffffff81492960>] process_one_work+0xbd0/0x1c10 kernel/workqueue.c:2096
+> > >  [<ffffffff81493bc3>] worker_thread+0x223/0x1990 kernel/workqueue.c:2230
+> > >  [<ffffffff814abb33>] kthread+0x323/0x3e0 kernel/kthread.c:209
+> > >  [<ffffffff8436fbaa>] ret_from_fork+0x2a/0x40 arch/x86/entry/entry_64.S:433
+> > > Code: 49 0f 42 d3 48 f7 c2 f0 ff ff ff 0f 85 9a 00 00 00 48 83 e2 0f
+> > > 48 6b da 08 48 8d 9c 1f 48 01 00 00 48 8b 03 48 c7 03 00 00 00 00 <c7>
+> > > 40 60 02 00 00 00 48 8b 9f 40 01 00 00 48 c1 e3 08 48 09 d3
+> > > RIP  [<ffffffff813fc09e>] sha512_mb_mgr_get_comp_job_avx2+0x6e/0xee
+> > > arch/x86/crypto/sha512-mb/sha512_mb_mgr_flush_avx2.S:251
+> > >  RSP <ffff8801d9f0eef8>
+> > > CR2: 0000000000000060
+> > > ---[ end trace 139fd4cda5dfe2c4 ]---
+> > > 
+> > Dmitry,
+> > 
+> > One theory that Mehga and I have is that perhaps the flusher
+> > and regular computaion updates are stepping on each other.
+> > Can you try this patch and see if it helps?
+> 
+> No, for this one I can't. Sorry.
+> It happens with very low frequency and only one fuzzer that tests
+> mmotm tree. If/when this is committed, I can keep an eye on these
+> reports and notify if I still see them.
+> If you have a hypothesis as to how it happens, perhaps you could write
+> a test that provokes the crash and maybe add some sleeps to kernel
+> code or alter timeouts to increase probability.
+> 
 
-So drop the align mask, and fix the code to use get_unaligned_le32()
-where appropriate, which will resolve to whatever is optimal for the
-architecture.
+If this patch is merged, it will most likely go into Herbert's crypto-dev
+tree and not Andrew's mm tree for testing.  We will try to do the best
+on our side for testing to replicate the crash scenario.  
 
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
- crypto/aes_generic.c | 64 ++++++++++----------
- 1 file changed, 32 insertions(+), 32 deletions(-)
+Will it be possible to have one of your fuzzer run the crypto-dev tree 
+once the patch got merged there?  
 
-diff --git a/crypto/aes_generic.c b/crypto/aes_generic.c
-index 3dd101144a58..ca554d57d01e 100644
---- a/crypto/aes_generic.c
-+++ b/crypto/aes_generic.c
-@@ -54,6 +54,7 @@
- #include <linux/errno.h>
- #include <linux/crypto.h>
- #include <asm/byteorder.h>
-+#include <asm/unaligned.h>
- 
- static inline u8 byte(const u32 x, const unsigned n)
- {
-@@ -1216,7 +1217,6 @@ EXPORT_SYMBOL_GPL(crypto_il_tab);
- int crypto_aes_expand_key(struct crypto_aes_ctx *ctx, const u8 *in_key,
- 		unsigned int key_len)
- {
--	const __le32 *key = (const __le32 *)in_key;
- 	u32 i, t, u, v, w, j;
- 
- 	if (key_len != AES_KEYSIZE_128 && key_len != AES_KEYSIZE_192 &&
-@@ -1225,10 +1225,15 @@ int crypto_aes_expand_key(struct crypto_aes_ctx *ctx, const u8 *in_key,
- 
- 	ctx->key_length = key_len;
- 
--	ctx->key_dec[key_len + 24] = ctx->key_enc[0] = le32_to_cpu(key[0]);
--	ctx->key_dec[key_len + 25] = ctx->key_enc[1] = le32_to_cpu(key[1]);
--	ctx->key_dec[key_len + 26] = ctx->key_enc[2] = le32_to_cpu(key[2]);
--	ctx->key_dec[key_len + 27] = ctx->key_enc[3] = le32_to_cpu(key[3]);
-+	ctx->key_enc[0] = get_unaligned_le32(in_key);
-+	ctx->key_enc[1] = get_unaligned_le32(in_key + 4);
-+	ctx->key_enc[2] = get_unaligned_le32(in_key + 8);
-+	ctx->key_enc[3] = get_unaligned_le32(in_key + 12);
-+
-+	ctx->key_dec[key_len + 24] = ctx->key_enc[0];
-+	ctx->key_dec[key_len + 25] = ctx->key_enc[1];
-+	ctx->key_dec[key_len + 26] = ctx->key_enc[2];
-+	ctx->key_dec[key_len + 27] = ctx->key_enc[3];
- 
- 	switch (key_len) {
- 	case AES_KEYSIZE_128:
-@@ -1238,17 +1243,17 @@ int crypto_aes_expand_key(struct crypto_aes_ctx *ctx, const u8 *in_key,
- 		break;
- 
- 	case AES_KEYSIZE_192:
--		ctx->key_enc[4] = le32_to_cpu(key[4]);
--		t = ctx->key_enc[5] = le32_to_cpu(key[5]);
-+		ctx->key_enc[4] = get_unaligned_le32(in_key + 16);
-+		t = ctx->key_enc[5] = get_unaligned_le32(in_key + 20);
- 		for (i = 0; i < 8; ++i)
- 			loop6(i);
- 		break;
- 
- 	case AES_KEYSIZE_256:
--		ctx->key_enc[4] = le32_to_cpu(key[4]);
--		ctx->key_enc[5] = le32_to_cpu(key[5]);
--		ctx->key_enc[6] = le32_to_cpu(key[6]);
--		t = ctx->key_enc[7] = le32_to_cpu(key[7]);
-+		ctx->key_enc[4] = get_unaligned_le32(in_key + 16);
-+		ctx->key_enc[5] = get_unaligned_le32(in_key + 20);
-+		ctx->key_enc[6] = get_unaligned_le32(in_key + 24);
-+		t = ctx->key_enc[7] = get_unaligned_le32(in_key + 28);
- 		for (i = 0; i < 6; ++i)
- 			loop8(i);
- 		loop8tophalf(i);
-@@ -1329,16 +1334,14 @@ EXPORT_SYMBOL_GPL(crypto_aes_set_key);
- static void aes_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
- {
- 	const struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
--	const __le32 *src = (const __le32 *)in;
--	__le32 *dst = (__le32 *)out;
- 	u32 b0[4], b1[4];
- 	const u32 *kp = ctx->key_enc + 4;
- 	const int key_len = ctx->key_length;
- 
--	b0[0] = le32_to_cpu(src[0]) ^ ctx->key_enc[0];
--	b0[1] = le32_to_cpu(src[1]) ^ ctx->key_enc[1];
--	b0[2] = le32_to_cpu(src[2]) ^ ctx->key_enc[2];
--	b0[3] = le32_to_cpu(src[3]) ^ ctx->key_enc[3];
-+	b0[0] = ctx->key_enc[0] ^ get_unaligned_le32(in);
-+	b0[1] = ctx->key_enc[1] ^ get_unaligned_le32(in + 4);
-+	b0[2] = ctx->key_enc[2] ^ get_unaligned_le32(in + 8);
-+	b0[3] = ctx->key_enc[3] ^ get_unaligned_le32(in + 12);
- 
- 	if (key_len > 24) {
- 		f_nround(b1, b0, kp);
-@@ -1361,10 +1364,10 @@ static void aes_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
- 	f_nround(b1, b0, kp);
- 	f_lround(b0, b1, kp);
- 
--	dst[0] = cpu_to_le32(b0[0]);
--	dst[1] = cpu_to_le32(b0[1]);
--	dst[2] = cpu_to_le32(b0[2]);
--	dst[3] = cpu_to_le32(b0[3]);
-+	put_unaligned_le32(b0[0], out);
-+	put_unaligned_le32(b0[1], out + 4);
-+	put_unaligned_le32(b0[2], out + 8);
-+	put_unaligned_le32(b0[3], out + 12);
- }
- 
- /* decrypt a block of text */
-@@ -1401,16 +1404,14 @@ static void aes_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
- static void aes_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
- {
- 	const struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
--	const __le32 *src = (const __le32 *)in;
--	__le32 *dst = (__le32 *)out;
- 	u32 b0[4], b1[4];
- 	const int key_len = ctx->key_length;
- 	const u32 *kp = ctx->key_dec + 4;
- 
--	b0[0] = le32_to_cpu(src[0]) ^  ctx->key_dec[0];
--	b0[1] = le32_to_cpu(src[1]) ^  ctx->key_dec[1];
--	b0[2] = le32_to_cpu(src[2]) ^  ctx->key_dec[2];
--	b0[3] = le32_to_cpu(src[3]) ^  ctx->key_dec[3];
-+	b0[0] = ctx->key_dec[0] ^ get_unaligned_le32(in);
-+	b0[1] = ctx->key_dec[1] ^ get_unaligned_le32(in + 4);
-+	b0[2] = ctx->key_dec[2] ^ get_unaligned_le32(in + 8);
-+	b0[3] = ctx->key_dec[3] ^ get_unaligned_le32(in + 12);
- 
- 	if (key_len > 24) {
- 		i_nround(b1, b0, kp);
-@@ -1433,10 +1434,10 @@ static void aes_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
- 	i_nround(b1, b0, kp);
- 	i_lround(b0, b1, kp);
- 
--	dst[0] = cpu_to_le32(b0[0]);
--	dst[1] = cpu_to_le32(b0[1]);
--	dst[2] = cpu_to_le32(b0[2]);
--	dst[3] = cpu_to_le32(b0[3]);
-+	put_unaligned_le32(b0[0], out);
-+	put_unaligned_le32(b0[1], out + 4);
-+	put_unaligned_le32(b0[2], out + 8);
-+	put_unaligned_le32(b0[3], out + 12);
- }
- 
- static struct crypto_alg aes_alg = {
-@@ -1446,7 +1447,6 @@ static struct crypto_alg aes_alg = {
- 	.cra_flags		=	CRYPTO_ALG_TYPE_CIPHER,
- 	.cra_blocksize		=	AES_BLOCK_SIZE,
- 	.cra_ctxsize		=	sizeof(struct crypto_aes_ctx),
--	.cra_alignmask		=	3,
- 	.cra_module		=	THIS_MODULE,
- 	.cra_u			=	{
- 		.cipher = {
--- 
-2.7.4
+Thanks.
+
+Tim
+
+> 
+> 
+> > 
+> > --->8---
+> > 
+> > From: Tim Chen <tim.c.chen@linux.intel.com>
+> > Subject: [PATCH] crypto/sha512-mb: Protect sha512 mb ctx mgr access
+> > To: Herbert Xu <herbert@gondor.apana.org.au>, Dmitry Vyukov <dvyukov@google.com>
+> > Cc: Tim Chen <tim.c.chen@linux.intel.com>, David Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, megha.dey@linux.intel.com, fenghua.yu@intel.com
+> > 
+> > The flusher and regular multi-buffer computation via mcryptd may race with another.
+> > Add here a lock and turn off interrupt to to access multi-buffer
+> > computation state cstate->mgr before a round of computation. This should
+> > prevent the flusher code jumping in.
+> > 
+> > Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
+> > ---
+> >  arch/x86/crypto/sha512-mb/sha512_mb.c | 64 +++++++++++++++++++++++------------
+> >  1 file changed, 42 insertions(+), 22 deletions(-)
+> > 
+> > diff --git a/arch/x86/crypto/sha512-mb/sha512_mb.c b/arch/x86/crypto/sha512-mb/sha512_mb.c
+> > index d210174..f3c1c21 100644
+> > --- a/arch/x86/crypto/sha512-mb/sha512_mb.c
+> > +++ b/arch/x86/crypto/sha512-mb/sha512_mb.c
+> > @@ -221,7 +221,7 @@ static struct sha512_hash_ctx *sha512_ctx_mgr_resubmit
+> >  }
+> > 
+> >  static struct sha512_hash_ctx
+> > -               *sha512_ctx_mgr_get_comp_ctx(struct sha512_ctx_mgr *mgr)
+> > +               *sha512_ctx_mgr_get_comp_ctx(struct mcryptd_alg_cstate *cstate)
+> >  {
+> >         /*
+> >          * If get_comp_job returns NULL, there are no jobs complete.
+> > @@ -233,11 +233,17 @@ static struct sha512_hash_ctx
+> >          * Otherwise, all jobs currently being managed by the hash_ctx_mgr
+> >          * still need processing.
+> >          */
+> > +       struct sha512_ctx_mgr *mgr;
+> >         struct sha512_hash_ctx *ctx;
+> > +       unsigned long flags;
+> > 
+> > +       mgr = cstate->mgr;
+> > +       spin_lock_irqsave(&cstate->work_lock, flags);
+> >         ctx = (struct sha512_hash_ctx *)
+> >                                 sha512_job_mgr_get_comp_job(&mgr->mgr);
+> > -       return sha512_ctx_mgr_resubmit(mgr, ctx);
+> > +       ctx = sha512_ctx_mgr_resubmit(mgr, ctx);
+> > +       spin_unlock_irqrestore(&cstate->work_lock, flags);
+> > +       return ctx;
+> >  }
+> > 
+> >  static void sha512_ctx_mgr_init(struct sha512_ctx_mgr *mgr)
+> > @@ -246,12 +252,17 @@ static void sha512_ctx_mgr_init(struct sha512_ctx_mgr *mgr)
+> >  }
+> > 
+> >  static struct sha512_hash_ctx
+> > -                       *sha512_ctx_mgr_submit(struct sha512_ctx_mgr *mgr,
+> > +                       *sha512_ctx_mgr_submit(struct mcryptd_alg_cstate *cstate,
+> >                                           struct sha512_hash_ctx *ctx,
+> >                                           const void *buffer,
+> >                                           uint32_t len,
+> >                                           int flags)
+> >  {
+> > +       struct sha512_ctx_mgr *mgr;
+> > +       unsigned long irqflags;
+> > +
+> > +       mgr = cstate->mgr;
+> > +       spin_lock_irqsave(&cstate->work_lock, irqflags);
+> >         if (flags & (~HASH_ENTIRE)) {
+> >                 /*
+> >                  * User should not pass anything other than FIRST, UPDATE, or
+> > @@ -351,20 +362,26 @@ static struct sha512_hash_ctx
+> >                 }
+> >         }
+> > 
+> > -       return sha512_ctx_mgr_resubmit(mgr, ctx);
+> > +       ctx = sha512_ctx_mgr_resubmit(mgr, ctx);
+> > +       spin_unlock_irqrestore(&cstate->work_lock, irqflags);
+> > +       return ctx;
+> >  }
+> > 
+> > -static struct sha512_hash_ctx *sha512_ctx_mgr_flush(struct sha512_ctx_mgr *mgr)
+> > +static struct sha512_hash_ctx *sha512_ctx_mgr_flush(struct mcryptd_alg_cstate *cstate)
+> >  {
+> > +       struct sha512_ctx_mgr *mgr;
+> >         struct sha512_hash_ctx *ctx;
+> > +       unsigned long flags;
+> > 
+> > +       mgr = cstate->mgr;
+> > +       spin_lock_irqsave(&cstate->work_lock, flags);
+> >         while (1) {
+> >                 ctx = (struct sha512_hash_ctx *)
+> >                                         sha512_job_mgr_flush(&mgr->mgr);
+> > 
+> >                 /* If flush returned 0, there are no more jobs in flight. */
+> >                 if (!ctx)
+> > -                       return NULL;
+> > +                       break;
+> > 
+> >                 /*
+> >                  * If flush returned a job, resubmit the job to finish
+> > @@ -378,8 +395,10 @@ static struct sha512_hash_ctx *sha512_ctx_mgr_flush(struct sha512_ctx_mgr *mgr)
+> >                  * the sha512_ctx_mgr still need processing. Loop.
+> >                  */
+> >                 if (ctx)
+> > -                       return ctx;
+> > +                       break;
+> >         }
+> > +       spin_unlock_irqrestore(&cstate->work_lock, flags);
+> > +       return ctx;
+> >  }
+> > 
+> >  static int sha512_mb_init(struct ahash_request *areq)
+> > @@ -439,11 +458,11 @@ static int sha_finish_walk(struct mcryptd_hash_request_ctx **ret_rctx,
+> >                 sha_ctx = (struct sha512_hash_ctx *)
+> >                                                 ahash_request_ctx(&rctx->areq);
+> >                 kernel_fpu_begin();
+> > -               sha_ctx = sha512_ctx_mgr_submit(cstate->mgr, sha_ctx,
+> > +               sha_ctx = sha512_ctx_mgr_submit(cstate, sha_ctx,
+> >                                                 rctx->walk.data, nbytes, flag);
+> >                 if (!sha_ctx) {
+> >                         if (flush)
+> > -                               sha_ctx = sha512_ctx_mgr_flush(cstate->mgr);
+> > +                               sha_ctx = sha512_ctx_mgr_flush(cstate);
+> >                 }
+> >                 kernel_fpu_end();
+> >                 if (sha_ctx)
+> > @@ -471,11 +490,12 @@ static int sha_complete_job(struct mcryptd_hash_request_ctx *rctx,
+> >         struct sha512_hash_ctx *sha_ctx;
+> >         struct mcryptd_hash_request_ctx *req_ctx;
+> >         int ret;
+> > +       unsigned long flags;
+> > 
+> >         /* remove from work list */
+> > -       spin_lock(&cstate->work_lock);
+> > +       spin_lock_irqsave(&cstate->work_lock, flags);
+> >         list_del(&rctx->waiter);
+> > -       spin_unlock(&cstate->work_lock);
+> > +       spin_unlock_irqrestore(&cstate->work_lock, flags);
+> > 
+> >         if (irqs_disabled())
+> >                 rctx->complete(&req->base, err);
+> > @@ -486,14 +506,14 @@ static int sha_complete_job(struct mcryptd_hash_request_ctx *rctx,
+> >         }
+> > 
+> >         /* check to see if there are other jobs that are done */
+> > -       sha_ctx = sha512_ctx_mgr_get_comp_ctx(cstate->mgr);
+> > +       sha_ctx = sha512_ctx_mgr_get_comp_ctx(cstate);
+> >         while (sha_ctx) {
+> >                 req_ctx = cast_hash_to_mcryptd_ctx(sha_ctx);
+> >                 ret = sha_finish_walk(&req_ctx, cstate, false);
+> >                 if (req_ctx) {
+> > -                       spin_lock(&cstate->work_lock);
+> > +                       spin_lock_irqsave(&cstate->work_lock, flags);
+> >                         list_del(&req_ctx->waiter);
+> > -                       spin_unlock(&cstate->work_lock);
+> > +                       spin_unlock_irqrestore(&cstate->work_lock, flags);
+> > 
+> >                         req = cast_mcryptd_ctx_to_req(req_ctx);
+> >                         if (irqs_disabled())
+> > @@ -504,7 +524,7 @@ static int sha_complete_job(struct mcryptd_hash_request_ctx *rctx,
+> >                                 local_bh_enable();
+> >                         }
+> >                 }
+> > -               sha_ctx = sha512_ctx_mgr_get_comp_ctx(cstate->mgr);
+> > +               sha_ctx = sha512_ctx_mgr_get_comp_ctx(cstate);
+> >         }
+> > 
+> >         return 0;
+> > @@ -515,6 +535,7 @@ static void sha512_mb_add_list(struct mcryptd_hash_request_ctx *rctx,
+> >  {
+> >         unsigned long next_flush;
+> >         unsigned long delay = usecs_to_jiffies(FLUSH_INTERVAL);
+> > +       unsigned long flags;
+> > 
+> >         /* initialize tag */
+> >         rctx->tag.arrival = jiffies;    /* tag the arrival time */
+> > @@ -522,9 +543,9 @@ static void sha512_mb_add_list(struct mcryptd_hash_request_ctx *rctx,
+> >         next_flush = rctx->tag.arrival + delay;
+> >         rctx->tag.expire = next_flush;
+> > 
+> > -       spin_lock(&cstate->work_lock);
+> > +       spin_lock_irqsave(&cstate->work_lock, flags);
+> >         list_add_tail(&rctx->waiter, &cstate->work_list);
+> > -       spin_unlock(&cstate->work_lock);
+> > +       spin_unlock_irqrestore(&cstate->work_lock, flags);
+> > 
+> >         mcryptd_arm_flusher(cstate, delay);
+> >  }
+> > @@ -565,7 +586,7 @@ static int sha512_mb_update(struct ahash_request *areq)
+> >         sha_ctx = (struct sha512_hash_ctx *) ahash_request_ctx(areq);
+> >         sha512_mb_add_list(rctx, cstate);
+> >         kernel_fpu_begin();
+> > -       sha_ctx = sha512_ctx_mgr_submit(cstate->mgr, sha_ctx, rctx->walk.data,
+> > +       sha_ctx = sha512_ctx_mgr_submit(cstate, sha_ctx, rctx->walk.data,
+> >                                                         nbytes, HASH_UPDATE);
+> >         kernel_fpu_end();
+> > 
+> > @@ -628,7 +649,7 @@ static int sha512_mb_finup(struct ahash_request *areq)
+> >         sha512_mb_add_list(rctx, cstate);
+> > 
+> >         kernel_fpu_begin();
+> > -       sha_ctx = sha512_ctx_mgr_submit(cstate->mgr, sha_ctx, rctx->walk.data,
+> > +       sha_ctx = sha512_ctx_mgr_submit(cstate, sha_ctx, rctx->walk.data,
+> >                                                                 nbytes, flag);
+> >         kernel_fpu_end();
+> > 
+> > @@ -677,8 +698,7 @@ static int sha512_mb_final(struct ahash_request *areq)
+> >         /* flag HASH_FINAL and 0 data size */
+> >         sha512_mb_add_list(rctx, cstate);
+> >         kernel_fpu_begin();
+> > -       sha_ctx = sha512_ctx_mgr_submit(cstate->mgr, sha_ctx, &data, 0,
+> > -                                                               HASH_LAST);
+> > +       sha_ctx = sha512_ctx_mgr_submit(cstate, sha_ctx, &data, 0, HASH_LAST);
+> >         kernel_fpu_end();
+> > 
+> >         /* check if anything is returned */
+> > @@ -940,7 +960,7 @@ static unsigned long sha512_mb_flusher(struct mcryptd_alg_cstate *cstate)
+> >                         break;
+> >                 kernel_fpu_begin();
+> >                 sha_ctx = (struct sha512_hash_ctx *)
+> > -                                       sha512_ctx_mgr_flush(cstate->mgr);
+> > +                                       sha512_ctx_mgr_flush(cstate);
+> >                 kernel_fpu_end();
+> >                 if (!sha_ctx) {
+> >                         pr_err("sha512_mb error: nothing got flushed for"
+> > --
+> > 2.5.5
+> > 
