@@ -1,22 +1,24 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH 1/2] crypto: arm64/aes - don't use IV buffer to return final keystream block
-Date: Thu,  2 Feb 2017 11:38:55 +0000
-Message-ID: <1486035536-895-1-git-send-email-ard.biesheuvel@linaro.org>
+Subject: [PATCH 2/2] crypto: arm/aes - don't use IV buffer to return final keystream block
+Date: Thu,  2 Feb 2017 11:38:56 +0000
+Message-ID: <1486035536-895-2-git-send-email-ard.biesheuvel@linaro.org>
+References: <1486035536-895-1-git-send-email-ard.biesheuvel@linaro.org>
 Cc: linux-arm-kernel@lists.infradead.org,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f53.google.com ([74.125.82.53]:38297 "EHLO
-        mail-wm0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751019AbdBBLjF (ORCPT
+Received: from mail-wm0-f50.google.com ([74.125.82.50]:37125 "EHLO
+        mail-wm0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751019AbdBBLjJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Feb 2017 06:39:05 -0500
-Received: by mail-wm0-f53.google.com with SMTP id r141so84925555wmg.1
-        for <linux-crypto@vger.kernel.org>; Thu, 02 Feb 2017 03:39:05 -0800 (PST)
+        Thu, 2 Feb 2017 06:39:09 -0500
+Received: by mail-wm0-f50.google.com with SMTP id v77so83711243wmv.0
+        for <linux-crypto@vger.kernel.org>; Thu, 02 Feb 2017 03:39:08 -0800 (PST)
+In-Reply-To: <1486035536-895-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The arm64 bit sliced AES core code uses the IV buffer to pass the final
+The ARM bit sliced AES core code uses the IV buffer to pass the final
 keystream block back to the glue code if the input is not a multiple of
 the block size, so that the asm code does not have to deal with anything
 except 16 byte blocks. This is done under the assumption that the outgoing
@@ -32,128 +34,72 @@ So use a separate buffer to return the final keystream block.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
-Note that this patch includes the fix
+ arch/arm/crypto/aes-neonbs-core.S | 16 +++++++++-------
+ arch/arm/crypto/aes-neonbs-glue.c |  9 +++++----
+ 2 files changed, 14 insertions(+), 11 deletions(-)
 
-crypto: arm64/aes-neon-bs - honour iv_out requirement in CTR mode
-
-which I sent out earlier.
-
- arch/arm64/crypto/aes-neonbs-core.S | 37 ++++++++++++--------
- arch/arm64/crypto/aes-neonbs-glue.c |  9 ++---
- 2 files changed, 28 insertions(+), 18 deletions(-)
-
-diff --git a/arch/arm64/crypto/aes-neonbs-core.S b/arch/arm64/crypto/aes-neonbs-core.S
-index 8d0cdaa2768d..ca0472500433 100644
---- a/arch/arm64/crypto/aes-neonbs-core.S
-+++ b/arch/arm64/crypto/aes-neonbs-core.S
-@@ -853,13 +853,15 @@ ENDPROC(aesbs_xts_decrypt)
+diff --git a/arch/arm/crypto/aes-neonbs-core.S b/arch/arm/crypto/aes-neonbs-core.S
+index c9477044fbba..2764edc56467 100644
+--- a/arch/arm/crypto/aes-neonbs-core.S
++++ b/arch/arm/crypto/aes-neonbs-core.S
+@@ -779,14 +779,15 @@ ENDPROC(aesbs_cbc_decrypt)
  
  	/*
  	 * aesbs_ctr_encrypt(u8 out[], u8 const in[], u8 const rk[],
--	 *		     int rounds, int blocks, u8 iv[], bool final)
-+	 *		     int rounds, int blocks, u8 iv[], u8 final[])
+-	 *		     int rounds, int blocks, u8 ctr[], bool final)
++	 *		     int rounds, int blocks, u8 ctr[], u8 final[])
  	 */
  ENTRY(aesbs_ctr_encrypt)
- 	stp		x29, x30, [sp, #-16]!
- 	mov		x29, sp
+ 	mov		ip, sp
+ 	push		{r4-r10, lr}
  
--	add		x4, x4, x6		// do one extra block if final
-+	cmp		x6, #0
-+	cset		x10, ne
-+	add		x4, x4, x10		// do one extra block if final
+ 	ldm		ip, {r5-r7}		// load args 4-6
+-	add		r5, r5, r7		// one extra block if final == 1
++	teq		r7, #0
++	addne		r5, r5, #1		// one extra block if final != 0
  
- 	ldp		x7, x8, [x5]
- 	ld1		{v0.16b}, [x5]
-@@ -874,19 +876,26 @@ CPU_LE(	rev		x8, x8		)
- 	csel		x4, x4, xzr, pl
- 	csel		x9, x9, xzr, le
+ 	vld1.8		{q0}, [r6]		// load counter
+ 	vrev32.8	q1, q0
+@@ -865,19 +866,20 @@ ENTRY(aesbs_ctr_encrypt)
+ 	veor		q2, q2, q14
+ 	vst1.8		{q2}, [r0]!
+ 	teq		r4, #0			// skip last block if 'final'
+-	W(bne)		4f
++	W(bne)		5f
+ 3:	veor		q5, q5, q15
+ 	vst1.8		{q5}, [r0]!
  
-+	tbnz		x9, #1, 0f
- 	next_ctr	v1
-+	tbnz		x9, #2, 0f
- 	next_ctr	v2
-+	tbnz		x9, #3, 0f
- 	next_ctr	v3
-+	tbnz		x9, #4, 0f
- 	next_ctr	v4
-+	tbnz		x9, #5, 0f
- 	next_ctr	v5
-+	tbnz		x9, #6, 0f
- 	next_ctr	v6
-+	tbnz		x9, #7, 0f
- 	next_ctr	v7
+-	next_ctr	q0
++4:	next_ctr	q0
  
- 0:	mov		bskey, x2
- 	mov		rounds, x3
- 	bl		aesbs_encrypt8
+ 	subs		r5, r5, #8
+ 	bgt		99b
  
--	lsr		x9, x9, x6		// disregard the extra block
-+	lsr		x9, x9, x10		// disregard the extra block
- 	tbnz		x9, #0, 0f
- 
- 	ld1		{v8.16b}, [x1], #16
-@@ -928,36 +937,36 @@ CPU_LE(	rev		x8, x8		)
- 	eor		v5.16b, v5.16b, v15.16b
- 	st1		{v5.16b}, [x0], #16
- 
--	next_ctr	v0
-+8:	next_ctr	v0
- 	cbnz		x4, 99b
- 
- 0:	st1		{v0.16b}, [x5]
--8:	ldp		x29, x30, [sp], #16
-+	ldp		x29, x30, [sp], #16
- 	ret
- 
- 	/*
--	 * If we are handling the tail of the input (x6 == 1), return the
--	 * final keystream block back to the caller via the IV buffer.
-+	 * If we are handling the tail of the input (x6 != NULL), return the
-+	 * final keystream block back to the caller.
- 	 */
- 1:	cbz		x6, 8b
--	st1		{v1.16b}, [x5]
-+	st1		{v1.16b}, [x6]
- 	b		8b
- 2:	cbz		x6, 8b
--	st1		{v4.16b}, [x5]
-+	st1		{v4.16b}, [x6]
- 	b		8b
- 3:	cbz		x6, 8b
--	st1		{v6.16b}, [x5]
-+	st1		{v6.16b}, [x6]
- 	b		8b
- 4:	cbz		x6, 8b
--	st1		{v3.16b}, [x5]
-+	st1		{v3.16b}, [x6]
- 	b		8b
- 5:	cbz		x6, 8b
--	st1		{v7.16b}, [x5]
-+	st1		{v7.16b}, [x6]
- 	b		8b
- 6:	cbz		x6, 8b
--	st1		{v2.16b}, [x5]
-+	st1		{v2.16b}, [x6]
- 	b		8b
- 7:	cbz		x6, 8b
--	st1		{v5.16b}, [x5]
-+	st1		{v5.16b}, [x6]
- 	b		8b
+-	vmov		q5, q0
+-
+-4:	vst1.8		{q5}, [r6]
++	vst1.8		{q0}, [r6]
+ 	pop		{r4-r10, pc}
++
++5:	vst1.8		{q5}, [r4]
++	b		4b
  ENDPROC(aesbs_ctr_encrypt)
-diff --git a/arch/arm64/crypto/aes-neonbs-glue.c b/arch/arm64/crypto/aes-neonbs-glue.c
-index 863e436ecf89..db2501d93550 100644
---- a/arch/arm64/crypto/aes-neonbs-glue.c
-+++ b/arch/arm64/crypto/aes-neonbs-glue.c
-@@ -34,7 +34,7 @@ asmlinkage void aesbs_cbc_decrypt(u8 out[], u8 const in[], u8 const rk[],
+ 
+ 	.macro		next_tweak, out, in, const, tmp
+diff --git a/arch/arm/crypto/aes-neonbs-glue.c b/arch/arm/crypto/aes-neonbs-glue.c
+index e262f99a44d3..2920b96dbd36 100644
+--- a/arch/arm/crypto/aes-neonbs-glue.c
++++ b/arch/arm/crypto/aes-neonbs-glue.c
+@@ -35,7 +35,7 @@ asmlinkage void aesbs_cbc_decrypt(u8 out[], u8 const in[], u8 const rk[],
  				  int rounds, int blocks, u8 iv[]);
  
  asmlinkage void aesbs_ctr_encrypt(u8 out[], u8 const in[], u8 const rk[],
--				  int rounds, int blocks, u8 iv[], bool final);
-+				  int rounds, int blocks, u8 iv[], u8 final[]);
+-				  int rounds, int blocks, u8 ctr[], bool final);
++				  int rounds, int blocks, u8 ctr[], u8 final[]);
  
  asmlinkage void aesbs_xts_encrypt(u8 out[], u8 const in[], u8 const rk[],
  				  int rounds, int blocks, u8 iv[]);
-@@ -201,6 +201,7 @@ static int ctr_encrypt(struct skcipher_request *req)
+@@ -186,6 +186,7 @@ static int ctr_encrypt(struct skcipher_request *req)
  	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
  	struct aesbs_ctx *ctx = crypto_skcipher_ctx(tfm);
  	struct skcipher_walk walk;
@@ -161,7 +107,7 @@ index 863e436ecf89..db2501d93550 100644
  	int err;
  
  	err = skcipher_walk_virt(&walk, req, true);
-@@ -208,12 +209,12 @@ static int ctr_encrypt(struct skcipher_request *req)
+@@ -193,12 +194,12 @@ static int ctr_encrypt(struct skcipher_request *req)
  	kernel_neon_begin();
  	while (walk.nbytes > 0) {
  		unsigned int blocks = walk.nbytes / AES_BLOCK_SIZE;
@@ -176,7 +122,7 @@ index 863e436ecf89..db2501d93550 100644
  		}
  
  		aesbs_ctr_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
-@@ -225,7 +226,7 @@ static int ctr_encrypt(struct skcipher_request *req)
+@@ -210,7 +211,7 @@ static int ctr_encrypt(struct skcipher_request *req)
  
  			if (dst != src)
  				memcpy(dst, src, walk.total % AES_BLOCK_SIZE);
