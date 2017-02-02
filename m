@@ -1,8 +1,8 @@
 From: Gary R Hook <ghook@amd.com>
-Subject: Re: [PATCH] crypto: ccp: Fix DMA operations when IOMMU is enabled
-Date: Thu, 2 Feb 2017 11:14:10 -0600
-Message-ID: <13ad85ce-3012-da68-2478-e0ea00e49095@amd.com>
-References: <20170127212845.27618.32169.stgit@taos>
+Subject: Re: [PATCH] crypto: ccp: Fix double add when creating new DMA command
+Date: Thu, 2 Feb 2017 11:15:33 -0600
+Message-ID: <d9669420-2e7e-9a56-8b52-2fdf6d17d5a7@amd.com>
+References: <20170127230904.31399.58184.stgit@taos>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 7bit
@@ -10,46 +10,92 @@ Cc: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
         "davem@davemloft.net" <davem@davemloft.net>
 To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-sn1nam02on0057.outbound.protection.outlook.com ([104.47.36.57]:17829
-        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
+Received: from mail-by2nam01on0074.outbound.protection.outlook.com ([104.47.34.74]:7360
+        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751477AbdBBRPR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Feb 2017 12:15:17 -0500
-In-Reply-To: <20170127212845.27618.32169.stgit@taos>
+        id S1751698AbdBBRPw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 2 Feb 2017 12:15:52 -0500
+In-Reply-To: <20170127230904.31399.58184.stgit@taos>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 01/27/2017 03:28 PM, Gary R Hook wrote:
-> An I/O page fault occurs when the IOMMU is enabled on a
-> system that supports the v5 CCP.  DMA operations use a
-> Request ID value that does not match what is expected by
-> the IOMMU, resulting in the I/O page fault.  Setting the
-> Request ID value to 0 corrects this issue.
+On 01/27/2017 05:09 PM, Gary R Hook wrote:
+> Eliminate a double-add by creating a new list to manage
+> command descriptors when created; move the descriptor to
+> the pending list when the command is submitted.
 
 Herbert,
 
-Hoping to get some 4.10 love on this patch, plus one other. Do we see
-a possibility at this late date?
+Another patch that could use some 4.10 love. Possible?
 
+Thanks,
+Gary
+
+>
 >
 > Signed-off-by: Gary R Hook <gary.hook@amd.com>
 > ---
->  drivers/crypto/ccp/ccp-dev-v5.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  drivers/crypto/ccp/ccp-dev.h       |    1 +
+>  drivers/crypto/ccp/ccp-dmaengine.c |    6 +++++-
+>  2 files changed, 6 insertions(+), 1 deletion(-)
 >
-> diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
-> index e2ce819..612898b 100644
-> --- a/drivers/crypto/ccp/ccp-dev-v5.c
-> +++ b/drivers/crypto/ccp/ccp-dev-v5.c
-> @@ -959,7 +959,7 @@ static irqreturn_t ccp5_irq_handler(int irq, void *data)
->  static void ccp5_config(struct ccp_device *ccp)
->  {
->  	/* Public side */
-> -	iowrite32(0x00001249, ccp->io_regs + CMD5_REQID_CONFIG_OFFSET);
-> +	iowrite32(0x0, ccp->io_regs + CMD5_REQID_CONFIG_OFFSET);
+> diff --git a/drivers/crypto/ccp/ccp-dev.h b/drivers/crypto/ccp/ccp-dev.h
+> index 830f35e..649e561 100644
+> --- a/drivers/crypto/ccp/ccp-dev.h
+> +++ b/drivers/crypto/ccp/ccp-dev.h
+> @@ -238,6 +238,7 @@ struct ccp_dma_chan {
+>  	struct ccp_device *ccp;
+>
+>  	spinlock_t lock;
+> +	struct list_head created;
+>  	struct list_head pending;
+>  	struct list_head active;
+>  	struct list_head complete;
+> diff --git a/drivers/crypto/ccp/ccp-dmaengine.c b/drivers/crypto/ccp/ccp-dmaengine.c
+> index 6553912..e5d9278 100644
+> --- a/drivers/crypto/ccp/ccp-dmaengine.c
+> +++ b/drivers/crypto/ccp/ccp-dmaengine.c
+> @@ -63,6 +63,7 @@ static void ccp_free_chan_resources(struct dma_chan *dma_chan)
+>  	ccp_free_desc_resources(chan->ccp, &chan->complete);
+>  	ccp_free_desc_resources(chan->ccp, &chan->active);
+>  	ccp_free_desc_resources(chan->ccp, &chan->pending);
+> +	ccp_free_desc_resources(chan->ccp, &chan->created);
+>
+>  	spin_unlock_irqrestore(&chan->lock, flags);
 >  }
+> @@ -273,6 +274,7 @@ static dma_cookie_t ccp_tx_submit(struct dma_async_tx_descriptor *tx_desc)
+>  	spin_lock_irqsave(&chan->lock, flags);
 >
->  static void ccp5other_config(struct ccp_device *ccp)
+>  	cookie = dma_cookie_assign(tx_desc);
+> +	list_del(&desc->entry);
+>  	list_add_tail(&desc->entry, &chan->pending);
+>
+>  	spin_unlock_irqrestore(&chan->lock, flags);
+> @@ -426,7 +428,7 @@ static struct ccp_dma_desc *ccp_create_desc(struct dma_chan *dma_chan,
+>
+>  	spin_lock_irqsave(&chan->lock, sflags);
+>
+> -	list_add_tail(&desc->entry, &chan->pending);
+> +	list_add_tail(&desc->entry, &chan->created);
+>
+>  	spin_unlock_irqrestore(&chan->lock, sflags);
+>
+> @@ -610,6 +612,7 @@ static int ccp_terminate_all(struct dma_chan *dma_chan)
+>  	/*TODO: Purge the complete list? */
+>  	ccp_free_desc_resources(chan->ccp, &chan->active);
+>  	ccp_free_desc_resources(chan->ccp, &chan->pending);
+> +	ccp_free_desc_resources(chan->ccp, &chan->created);
+>
+>  	spin_unlock_irqrestore(&chan->lock, flags);
+>
+> @@ -679,6 +682,7 @@ int ccp_dmaengine_register(struct ccp_device *ccp)
+>  		chan->ccp = ccp;
+>
+>  		spin_lock_init(&chan->lock);
+> +		INIT_LIST_HEAD(&chan->created);
+>  		INIT_LIST_HEAD(&chan->pending);
+>  		INIT_LIST_HEAD(&chan->active);
+>  		INIT_LIST_HEAD(&chan->complete);
 >
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
