@@ -1,478 +1,491 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v3] crypto: aes - add generic time invariant AES cipher
-Date: Thu,  2 Feb 2017 16:37:40 +0000
-Message-ID: <1486053460-7526-1-git-send-email-ard.biesheuvel@linaro.org>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-        ebiggers3@gmail.com
+From: Matthias Brugger <mbrugger@suse.com>
+Subject: Re: [PATCH] crypto: arm64/crc32 - merge CRC32 and PMULL instruction
+ based drivers
+Date: Thu, 2 Feb 2017 17:47:12 +0100
+Message-ID: <0b8e15f1-e37b-dcf5-3df8-584bba8363cb@suse.com>
+References: <1485963340-25297-1-git-send-email-ard.biesheuvel@linaro.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: will.deacon@arm.com, herbert@gondor.apana.org.au,
+        yazen.ghannam@linaro.org, steve.capper@linaro.org, agraf@suse.de
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wj0-f172.google.com ([209.85.210.172]:36496 "EHLO
-        mail-wj0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751876AbdBBQhs (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Feb 2017 11:37:48 -0500
-Received: by mail-wj0-f172.google.com with SMTP id n2so4395360wjq.3
-        for <linux-crypto@vger.kernel.org>; Thu, 02 Feb 2017 08:37:47 -0800 (PST)
+Received: from smtp.nue.novell.com ([195.135.221.5]:57882 "EHLO
+        smtp.nue.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751298AbdBBQr3 (ORCPT
+        <rfc822;groupwise-linux-crypto@vger.kernel.org:0:0>);
+        Thu, 2 Feb 2017 11:47:29 -0500
+In-Reply-To: <1485963340-25297-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Lookup table based AES is sensitive to timing attacks, which is due to
-the fact that such table lookups are data dependent, and the fact that
-8 KB worth of tables covers a significant number of cachelines on any
-architecture, resulting in an exploitable correlation between the key
-and the processing time for known plaintexts.
 
-For network facing algorithms such as CTR, CCM or GCM, this presents a
-security risk, which is why arch specific AES ports are typically time
-invariant, either through the use of special instructions, or by using
-SIMD algorithms that don't rely on table lookups.
 
-For generic code, this is difficult to achieve without losing too much
-performance, but we can improve the situation significantly by switching
-to an implementation that only needs 256 bytes of table data (the actual
-S-box itself), which can be prefetched at the start of each block to
-eliminate data dependent latencies.
+On 02/01/2017 04:35 PM, Ard Biesheuvel wrote:
+> The PMULL based CRC32 implementation already contains code based on the
+> separate, optional CRC32 instructions to fallback to when operating on
+> small quantities of data. We can expose these routines directly on systems
+> that lack the 64x64 PMULL instructions but do implement the CRC32 ones,
+> which makes the driver that is based solely on those CRC32 instructions
+> redundant. So remove it.
+>
+> Note that this aligns arm64 with ARM, whose accelerated CRC32 driver
+> also combines the CRC32 extension based and the PMULL based versions.
+>
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> ---
+>
+> This is a meaningful patch by itself imho, but also fixes the issue reported
+> by Matthias where their v4.8 based GCC does not understand the -mcpu=generic+crc
+> command line option, resulting in failed builds.
+>
 
-This code encrypts at ~25 cycles per byte on ARM Cortex-A57 (while the
-ordinary generic AES driver manages 18 cycles per byte on this
-hardware). Decryption is substantially slower.
+This patch fixes the issue, thanks.
+Tested-by: Matthias Brugger <mbrugger@suse.com>
 
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
-Sending this out as a separate patch since the CCM/CBCMAC series that this
-was part of has not actually changed, and does not really depend on this
-patch at all.
-
-I have included a decrypt() and a setkey() routine, which allows this driver
-to be used as a replacement for the generic AES code. However, the lookup
-tables exposed by the generic AES driver are used in a couple of other places
-as well.
-
- crypto/Kconfig  |  17 +
- crypto/Makefile |   1 +
- crypto/aes_ti.c | 375 ++++++++++++++++++++
- 3 files changed, 393 insertions(+)
-
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index e8269d1b0282..5a51b877277e 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -896,6 +896,23 @@ config CRYPTO_AES
- 
- 	  See <http://csrc.nist.gov/CryptoToolkit/aes/> for more information.
- 
-+config CRYPTO_AES_TI
-+	tristate "Fixed time AES cipher"
-+	select CRYPTO_ALGAPI
-+	help
-+	  This is a generic implementation of AES that attempts to eliminate
-+	  data dependent latencies as much as possible without affecting
-+	  performance too much. It is intended for use by the generic CCM
-+	  and GCM drivers, and other CTR or CMAC/XCBC based modes that rely
-+	  solely on encryption (although decryption is supported as well, but
-+	  with a more dramatic performance hit)
-+
-+	  Instead of using 16 lookup tables of 1 KB each, (8 for encryption and
-+	  8 for decryption), this implementation only uses just two S-boxes of
-+	  256 bytes each, and attempts to eliminate data dependent latencies by
-+	  prefetching the entire table into the cache at the start of each
-+	  block.
-+
- config CRYPTO_AES_586
- 	tristate "AES cipher algorithms (i586)"
- 	depends on (X86 || UML_X86) && !64BIT
-diff --git a/crypto/Makefile b/crypto/Makefile
-index b8f0e3eb0791..bcd834536163 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -99,6 +99,7 @@ obj-$(CONFIG_CRYPTO_TWOFISH) += twofish_generic.o
- obj-$(CONFIG_CRYPTO_TWOFISH_COMMON) += twofish_common.o
- obj-$(CONFIG_CRYPTO_SERPENT) += serpent_generic.o
- obj-$(CONFIG_CRYPTO_AES) += aes_generic.o
-+obj-$(CONFIG_CRYPTO_AES_TI) += aes_ti.o
- obj-$(CONFIG_CRYPTO_CAMELLIA) += camellia_generic.o
- obj-$(CONFIG_CRYPTO_CAST_COMMON) += cast_common.o
- obj-$(CONFIG_CRYPTO_CAST5) += cast5_generic.o
-diff --git a/crypto/aes_ti.c b/crypto/aes_ti.c
-new file mode 100644
-index 000000000000..92644fd1ac19
---- /dev/null
-+++ b/crypto/aes_ti.c
-@@ -0,0 +1,375 @@
-+/*
-+ * Scalar fixed time AES core transform
-+ *
-+ * Copyright (C) 2017 Linaro Ltd <ard.biesheuvel@linaro.org>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ */
-+
-+#include <crypto/aes.h>
-+#include <linux/crypto.h>
-+#include <linux/module.h>
-+#include <asm/unaligned.h>
-+
-+/*
-+ * Emit the sbox as volatile const to prevent the compiler from doing
-+ * constant folding on sbox references involving fixed indexes.
-+ */
-+static volatile const u8 __cacheline_aligned __aesti_sbox[] = {
-+	0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5,
-+	0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
-+	0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0,
-+	0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0,
-+	0xb7, 0xfd, 0x93, 0x26, 0x36, 0x3f, 0xf7, 0xcc,
-+	0x34, 0xa5, 0xe5, 0xf1, 0x71, 0xd8, 0x31, 0x15,
-+	0x04, 0xc7, 0x23, 0xc3, 0x18, 0x96, 0x05, 0x9a,
-+	0x07, 0x12, 0x80, 0xe2, 0xeb, 0x27, 0xb2, 0x75,
-+	0x09, 0x83, 0x2c, 0x1a, 0x1b, 0x6e, 0x5a, 0xa0,
-+	0x52, 0x3b, 0xd6, 0xb3, 0x29, 0xe3, 0x2f, 0x84,
-+	0x53, 0xd1, 0x00, 0xed, 0x20, 0xfc, 0xb1, 0x5b,
-+	0x6a, 0xcb, 0xbe, 0x39, 0x4a, 0x4c, 0x58, 0xcf,
-+	0xd0, 0xef, 0xaa, 0xfb, 0x43, 0x4d, 0x33, 0x85,
-+	0x45, 0xf9, 0x02, 0x7f, 0x50, 0x3c, 0x9f, 0xa8,
-+	0x51, 0xa3, 0x40, 0x8f, 0x92, 0x9d, 0x38, 0xf5,
-+	0xbc, 0xb6, 0xda, 0x21, 0x10, 0xff, 0xf3, 0xd2,
-+	0xcd, 0x0c, 0x13, 0xec, 0x5f, 0x97, 0x44, 0x17,
-+	0xc4, 0xa7, 0x7e, 0x3d, 0x64, 0x5d, 0x19, 0x73,
-+	0x60, 0x81, 0x4f, 0xdc, 0x22, 0x2a, 0x90, 0x88,
-+	0x46, 0xee, 0xb8, 0x14, 0xde, 0x5e, 0x0b, 0xdb,
-+	0xe0, 0x32, 0x3a, 0x0a, 0x49, 0x06, 0x24, 0x5c,
-+	0xc2, 0xd3, 0xac, 0x62, 0x91, 0x95, 0xe4, 0x79,
-+	0xe7, 0xc8, 0x37, 0x6d, 0x8d, 0xd5, 0x4e, 0xa9,
-+	0x6c, 0x56, 0xf4, 0xea, 0x65, 0x7a, 0xae, 0x08,
-+	0xba, 0x78, 0x25, 0x2e, 0x1c, 0xa6, 0xb4, 0xc6,
-+	0xe8, 0xdd, 0x74, 0x1f, 0x4b, 0xbd, 0x8b, 0x8a,
-+	0x70, 0x3e, 0xb5, 0x66, 0x48, 0x03, 0xf6, 0x0e,
-+	0x61, 0x35, 0x57, 0xb9, 0x86, 0xc1, 0x1d, 0x9e,
-+	0xe1, 0xf8, 0x98, 0x11, 0x69, 0xd9, 0x8e, 0x94,
-+	0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf,
-+	0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68,
-+	0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16,
-+};
-+
-+static volatile const u8 __cacheline_aligned __aesti_inv_sbox[] = {
-+	0x52, 0x09, 0x6a, 0xd5, 0x30, 0x36, 0xa5, 0x38,
-+	0xbf, 0x40, 0xa3, 0x9e, 0x81, 0xf3, 0xd7, 0xfb,
-+	0x7c, 0xe3, 0x39, 0x82, 0x9b, 0x2f, 0xff, 0x87,
-+	0x34, 0x8e, 0x43, 0x44, 0xc4, 0xde, 0xe9, 0xcb,
-+	0x54, 0x7b, 0x94, 0x32, 0xa6, 0xc2, 0x23, 0x3d,
-+	0xee, 0x4c, 0x95, 0x0b, 0x42, 0xfa, 0xc3, 0x4e,
-+	0x08, 0x2e, 0xa1, 0x66, 0x28, 0xd9, 0x24, 0xb2,
-+	0x76, 0x5b, 0xa2, 0x49, 0x6d, 0x8b, 0xd1, 0x25,
-+	0x72, 0xf8, 0xf6, 0x64, 0x86, 0x68, 0x98, 0x16,
-+	0xd4, 0xa4, 0x5c, 0xcc, 0x5d, 0x65, 0xb6, 0x92,
-+	0x6c, 0x70, 0x48, 0x50, 0xfd, 0xed, 0xb9, 0xda,
-+	0x5e, 0x15, 0x46, 0x57, 0xa7, 0x8d, 0x9d, 0x84,
-+	0x90, 0xd8, 0xab, 0x00, 0x8c, 0xbc, 0xd3, 0x0a,
-+	0xf7, 0xe4, 0x58, 0x05, 0xb8, 0xb3, 0x45, 0x06,
-+	0xd0, 0x2c, 0x1e, 0x8f, 0xca, 0x3f, 0x0f, 0x02,
-+	0xc1, 0xaf, 0xbd, 0x03, 0x01, 0x13, 0x8a, 0x6b,
-+	0x3a, 0x91, 0x11, 0x41, 0x4f, 0x67, 0xdc, 0xea,
-+	0x97, 0xf2, 0xcf, 0xce, 0xf0, 0xb4, 0xe6, 0x73,
-+	0x96, 0xac, 0x74, 0x22, 0xe7, 0xad, 0x35, 0x85,
-+	0xe2, 0xf9, 0x37, 0xe8, 0x1c, 0x75, 0xdf, 0x6e,
-+	0x47, 0xf1, 0x1a, 0x71, 0x1d, 0x29, 0xc5, 0x89,
-+	0x6f, 0xb7, 0x62, 0x0e, 0xaa, 0x18, 0xbe, 0x1b,
-+	0xfc, 0x56, 0x3e, 0x4b, 0xc6, 0xd2, 0x79, 0x20,
-+	0x9a, 0xdb, 0xc0, 0xfe, 0x78, 0xcd, 0x5a, 0xf4,
-+	0x1f, 0xdd, 0xa8, 0x33, 0x88, 0x07, 0xc7, 0x31,
-+	0xb1, 0x12, 0x10, 0x59, 0x27, 0x80, 0xec, 0x5f,
-+	0x60, 0x51, 0x7f, 0xa9, 0x19, 0xb5, 0x4a, 0x0d,
-+	0x2d, 0xe5, 0x7a, 0x9f, 0x93, 0xc9, 0x9c, 0xef,
-+	0xa0, 0xe0, 0x3b, 0x4d, 0xae, 0x2a, 0xf5, 0xb0,
-+	0xc8, 0xeb, 0xbb, 0x3c, 0x83, 0x53, 0x99, 0x61,
-+	0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6, 0x26,
-+	0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d,
-+};
-+
-+static u32 mul_by_x(u32 w)
-+{
-+	u32 x = w & 0x7f7f7f7f;
-+	u32 y = w & 0x80808080;
-+
-+	/* multiply by polynomial 'x' (0b10) in GF(2^8) */
-+	return (x << 1) ^ (y >> 7) * 0x1b;
-+}
-+
-+static u32 mul_by_x2(u32 w)
-+{
-+	u32 x = w & 0x3f3f3f3f;
-+	u32 y = w & 0x80808080;
-+	u32 z = w & 0x40404040;
-+
-+	/* multiply by polynomial 'x^2' (0b100) in GF(2^8) */
-+	return (x << 2) ^ (y >> 7) * 0x36 ^ (z >> 6) * 0x1b;
-+}
-+
-+static u32 mix_columns(u32 x)
-+{
-+	/*
-+	 * Perform the following matrix multiplication in GF(2^8)
-+	 *
-+	 * | 0x2 0x3 0x1 0x1 |   | x[0] |
-+	 * | 0x1 0x2 0x3 0x1 |   | x[1] |
-+	 * | 0x1 0x1 0x2 0x3 | x | x[2] |
-+	 * | 0x3 0x1 0x1 0x3 |   | x[3] |
-+	 */
-+	u32 y = mul_by_x(x) ^ ror32(x, 16);
-+
-+	return y ^ ror32(x ^ y, 8);
-+}
-+
-+static u32 inv_mix_columns(u32 x)
-+{
-+	/*
-+	 * Perform the following matrix multiplication in GF(2^8)
-+	 *
-+	 * | 0xe 0xb 0xd 0x9 |   | x[0] |
-+	 * | 0x9 0xe 0xb 0xd |   | x[1] |
-+	 * | 0xd 0x9 0xe 0xb | x | x[2] |
-+	 * | 0xb 0xd 0x9 0xe |   | x[3] |
-+	 *
-+	 * which can conveniently be reduced to
-+	 *
-+	 * | 0x2 0x3 0x1 0x1 |   | 0x5 0x0 0x4 0x0 |   | x[0] |
-+	 * | 0x1 0x2 0x3 0x1 |   | 0x0 0x5 0x0 0x4 |   | x[1] |
-+	 * | 0x1 0x1 0x2 0x3 | x | 0x4 0x0 0x5 0x0 | x | x[2] |
-+	 * | 0x3 0x1 0x1 0x2 |   | 0x0 0x4 0x0 0x5 |   | x[3] |
-+	 */
-+	u32 y = mul_by_x2(x);
-+
-+	return mix_columns(x ^ y ^ ror32(y, 16));
-+}
-+
-+static __always_inline u32 subshift(u32 in[], int pos)
-+{
-+	return (__aesti_sbox[in[pos] & 0xff]) ^
-+	       (__aesti_sbox[(in[(pos + 1) % 4] >>  8) & 0xff] <<  8) ^
-+	       (__aesti_sbox[(in[(pos + 2) % 4] >> 16) & 0xff] << 16) ^
-+	       (__aesti_sbox[(in[(pos + 3) % 4] >> 24) & 0xff] << 24);
-+}
-+
-+static __always_inline u32 inv_subshift(u32 in[], int pos)
-+{
-+	return (__aesti_inv_sbox[in[pos] & 0xff]) ^
-+	       (__aesti_inv_sbox[(in[(pos + 3) % 4] >>  8) & 0xff] <<  8) ^
-+	       (__aesti_inv_sbox[(in[(pos + 2) % 4] >> 16) & 0xff] << 16) ^
-+	       (__aesti_inv_sbox[(in[(pos + 1) % 4] >> 24) & 0xff] << 24);
-+}
-+
-+static u32 subw(u32 in)
-+{
-+	return (__aesti_sbox[in & 0xff]) ^
-+	       (__aesti_sbox[(in >>  8) & 0xff] <<  8) ^
-+	       (__aesti_sbox[(in >> 16) & 0xff] << 16) ^
-+	       (__aesti_sbox[(in >> 24) & 0xff] << 24);
-+}
-+
-+static int aesti_expand_key(struct crypto_aes_ctx *ctx, const u8 *in_key,
-+			    unsigned int key_len)
-+{
-+	u32 kwords = key_len / sizeof(u32);
-+	u32 rc, i, j;
-+
-+	if (key_len != AES_KEYSIZE_128 &&
-+	    key_len != AES_KEYSIZE_192 &&
-+	    key_len != AES_KEYSIZE_256)
-+		return -EINVAL;
-+
-+	ctx->key_length = key_len;
-+
-+	for (i = 0; i < kwords; i++)
-+		ctx->key_enc[i] = get_unaligned_le32(in_key + i * sizeof(u32));
-+
-+	for (i = 0, rc = 1; i < 10; i++, rc = mul_by_x(rc)) {
-+		u32 *rki = ctx->key_enc + (i * kwords);
-+		u32 *rko = rki + kwords;
-+
-+		rko[0] = ror32(subw(rki[kwords - 1]), 8) ^ rc ^ rki[0];
-+		rko[1] = rko[0] ^ rki[1];
-+		rko[2] = rko[1] ^ rki[2];
-+		rko[3] = rko[2] ^ rki[3];
-+
-+		if (key_len == 24) {
-+			if (i >= 7)
-+				break;
-+			rko[4] = rko[3] ^ rki[4];
-+			rko[5] = rko[4] ^ rki[5];
-+		} else if (key_len == 32) {
-+			if (i >= 6)
-+				break;
-+			rko[4] = subw(rko[3]) ^ rki[4];
-+			rko[5] = rko[4] ^ rki[5];
-+			rko[6] = rko[5] ^ rki[6];
-+			rko[7] = rko[6] ^ rki[7];
-+		}
-+	}
-+
-+	/*
-+	 * Generate the decryption keys for the Equivalent Inverse Cipher.
-+	 * This involves reversing the order of the round keys, and applying
-+	 * the Inverse Mix Columns transformation to all but the first and
-+	 * the last one.
-+	 */
-+	ctx->key_dec[0] = ctx->key_enc[key_len + 24];
-+	ctx->key_dec[1] = ctx->key_enc[key_len + 25];
-+	ctx->key_dec[2] = ctx->key_enc[key_len + 26];
-+	ctx->key_dec[3] = ctx->key_enc[key_len + 27];
-+
-+	for (i = 4, j = key_len + 20; j > 0; i += 4, j -= 4) {
-+		ctx->key_dec[i]     = inv_mix_columns(ctx->key_enc[j]);
-+		ctx->key_dec[i + 1] = inv_mix_columns(ctx->key_enc[j + 1]);
-+		ctx->key_dec[i + 2] = inv_mix_columns(ctx->key_enc[j + 2]);
-+		ctx->key_dec[i + 3] = inv_mix_columns(ctx->key_enc[j + 3]);
-+	}
-+
-+	ctx->key_dec[i]     = ctx->key_enc[0];
-+	ctx->key_dec[i + 1] = ctx->key_enc[1];
-+	ctx->key_dec[i + 2] = ctx->key_enc[2];
-+	ctx->key_dec[i + 3] = ctx->key_enc[3];
-+
-+	return 0;
-+}
-+
-+static int aesti_set_key(struct crypto_tfm *tfm, const u8 *in_key,
-+			 unsigned int key_len)
-+{
-+	struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
-+	int err;
-+
-+	err = aesti_expand_key(ctx, in_key, key_len);
-+	if (err)
-+		return err;
-+
-+	/*
-+	 * In order to force the compiler to emit data independent Sbox lookups
-+	 * at the start of each block, xor the first round key with values at
-+	 * fixed indexes in the Sbox. This will need to be repeated each time
-+	 * the key is used, which will pull the entire Sbox into the D-cache
-+	 * before any data dependent Sbox lookups are performed.
-+	 */
-+	ctx->key_enc[0] ^= __aesti_sbox[ 0] ^ __aesti_sbox[128];
-+	ctx->key_enc[1] ^= __aesti_sbox[32] ^ __aesti_sbox[160];
-+	ctx->key_enc[2] ^= __aesti_sbox[64] ^ __aesti_sbox[192];
-+	ctx->key_enc[3] ^= __aesti_sbox[96] ^ __aesti_sbox[224];
-+
-+	ctx->key_dec[0] ^= __aesti_inv_sbox[ 0] ^ __aesti_inv_sbox[128];
-+	ctx->key_dec[1] ^= __aesti_inv_sbox[32] ^ __aesti_inv_sbox[160];
-+	ctx->key_dec[2] ^= __aesti_inv_sbox[64] ^ __aesti_inv_sbox[192];
-+	ctx->key_dec[3] ^= __aesti_inv_sbox[96] ^ __aesti_inv_sbox[224];
-+
-+	return 0;
-+}
-+
-+static void aesti_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
-+{
-+	const struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
-+	const u32 *rkp = ctx->key_enc + 4;
-+	int rounds = 6 + ctx->key_length / 4;
-+	u32 st0[4], st1[4];
-+	int round;
-+
-+	st0[0] = ctx->key_enc[0] ^ get_unaligned_le32(in);
-+	st0[1] = ctx->key_enc[1] ^ get_unaligned_le32(in + 4);
-+	st0[2] = ctx->key_enc[2] ^ get_unaligned_le32(in + 8);
-+	st0[3] = ctx->key_enc[3] ^ get_unaligned_le32(in + 12);
-+
-+	st0[0] ^= __aesti_sbox[ 0] ^ __aesti_sbox[128];
-+	st0[1] ^= __aesti_sbox[32] ^ __aesti_sbox[160];
-+	st0[2] ^= __aesti_sbox[64] ^ __aesti_sbox[192];
-+	st0[3] ^= __aesti_sbox[96] ^ __aesti_sbox[224];
-+
-+	for (round = 0;; round += 2, rkp += 8) {
-+		st1[0] = mix_columns(subshift(st0, 0)) ^ rkp[0];
-+		st1[1] = mix_columns(subshift(st0, 1)) ^ rkp[1];
-+		st1[2] = mix_columns(subshift(st0, 2)) ^ rkp[2];
-+		st1[3] = mix_columns(subshift(st0, 3)) ^ rkp[3];
-+
-+		if (round == rounds - 2)
-+			break;
-+
-+		st0[0] = mix_columns(subshift(st1, 0)) ^ rkp[4];
-+		st0[1] = mix_columns(subshift(st1, 1)) ^ rkp[5];
-+		st0[2] = mix_columns(subshift(st1, 2)) ^ rkp[6];
-+		st0[3] = mix_columns(subshift(st1, 3)) ^ rkp[7];
-+	}
-+
-+	put_unaligned_le32(subshift(st1, 0) ^ rkp[4], out);
-+	put_unaligned_le32(subshift(st1, 1) ^ rkp[5], out + 4);
-+	put_unaligned_le32(subshift(st1, 2) ^ rkp[6], out + 8);
-+	put_unaligned_le32(subshift(st1, 3) ^ rkp[7], out + 12);
-+}
-+
-+static void aesti_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
-+{
-+	const struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
-+	const u32 *rkp = ctx->key_dec + 4;
-+	int rounds = 6 + ctx->key_length / 4;
-+	u32 st0[4], st1[4];
-+	int round;
-+
-+	st0[0] = ctx->key_dec[0] ^ get_unaligned_le32(in);
-+	st0[1] = ctx->key_dec[1] ^ get_unaligned_le32(in + 4);
-+	st0[2] = ctx->key_dec[2] ^ get_unaligned_le32(in + 8);
-+	st0[3] = ctx->key_dec[3] ^ get_unaligned_le32(in + 12);
-+
-+	st0[0] ^= __aesti_inv_sbox[ 0] ^ __aesti_inv_sbox[128];
-+	st0[1] ^= __aesti_inv_sbox[32] ^ __aesti_inv_sbox[160];
-+	st0[2] ^= __aesti_inv_sbox[64] ^ __aesti_inv_sbox[192];
-+	st0[3] ^= __aesti_inv_sbox[96] ^ __aesti_inv_sbox[224];
-+
-+	for (round = 0;; round += 2, rkp += 8) {
-+		st1[0] = inv_mix_columns(inv_subshift(st0, 0)) ^ rkp[0];
-+		st1[1] = inv_mix_columns(inv_subshift(st0, 1)) ^ rkp[1];
-+		st1[2] = inv_mix_columns(inv_subshift(st0, 2)) ^ rkp[2];
-+		st1[3] = inv_mix_columns(inv_subshift(st0, 3)) ^ rkp[3];
-+
-+		if (round == rounds - 2)
-+			break;
-+
-+		st0[0] = inv_mix_columns(inv_subshift(st1, 0)) ^ rkp[4];
-+		st0[1] = inv_mix_columns(inv_subshift(st1, 1)) ^ rkp[5];
-+		st0[2] = inv_mix_columns(inv_subshift(st1, 2)) ^ rkp[6];
-+		st0[3] = inv_mix_columns(inv_subshift(st1, 3)) ^ rkp[7];
-+	}
-+
-+	put_unaligned_le32(inv_subshift(st1, 0) ^ rkp[4], out);
-+	put_unaligned_le32(inv_subshift(st1, 1) ^ rkp[5], out + 4);
-+	put_unaligned_le32(inv_subshift(st1, 2) ^ rkp[6], out + 8);
-+	put_unaligned_le32(inv_subshift(st1, 3) ^ rkp[7], out + 12);
-+}
-+
-+static struct crypto_alg aes_alg = {
-+	.cra_name			= "aes",
-+	.cra_driver_name		= "aes-fixed-time",
-+	.cra_priority			= 100 + 1,
-+	.cra_flags			= CRYPTO_ALG_TYPE_CIPHER,
-+	.cra_blocksize			= AES_BLOCK_SIZE,
-+	.cra_ctxsize			= sizeof(struct crypto_aes_ctx),
-+	.cra_module			= THIS_MODULE,
-+
-+	.cra_cipher.cia_min_keysize	= AES_MIN_KEY_SIZE,
-+	.cra_cipher.cia_max_keysize	= AES_MAX_KEY_SIZE,
-+	.cra_cipher.cia_setkey		= aesti_set_key,
-+	.cra_cipher.cia_encrypt		= aesti_encrypt,
-+	.cra_cipher.cia_decrypt		= aesti_decrypt
-+};
-+
-+static int __init aes_init(void)
-+{
-+	return crypto_register_alg(&aes_alg);
-+}
-+
-+static void __exit aes_fini(void)
-+{
-+	crypto_unregister_alg(&aes_alg);
-+}
-+
-+module_init(aes_init);
-+module_exit(aes_fini);
-+
-+MODULE_DESCRIPTION("Generic fixed time AES");
-+MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
-+MODULE_LICENSE("GPL v2");
--- 
-2.7.4
+>  arch/arm64/configs/defconfig      |   1 -
+>  arch/arm64/crypto/Kconfig         |   9 +-
+>  arch/arm64/crypto/Makefile        |   4 -
+>  arch/arm64/crypto/crc32-arm64.c   | 290 --------------------
+>  arch/arm64/crypto/crc32-ce-glue.c |  49 +++-
+>  5 files changed, 41 insertions(+), 312 deletions(-)
+>
+> diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
+> index 33b744d54739..6fc6f5a2a6e5 100644
+> --- a/arch/arm64/configs/defconfig
+> +++ b/arch/arm64/configs/defconfig
+> @@ -516,4 +516,3 @@ CONFIG_CRYPTO_GHASH_ARM64_CE=y
+>  CONFIG_CRYPTO_AES_ARM64_CE_CCM=y
+>  CONFIG_CRYPTO_AES_ARM64_CE_BLK=y
+>  # CONFIG_CRYPTO_AES_ARM64_NEON_BLK is not set
+> -CONFIG_CRYPTO_CRC32_ARM64=y
+> diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
+> index bed7feddfeed..d92293747d63 100644
+> --- a/arch/arm64/crypto/Kconfig
+> +++ b/arch/arm64/crypto/Kconfig
+> @@ -37,8 +37,8 @@ config CRYPTO_CRCT10DIF_ARM64_CE
+>  	select CRYPTO_HASH
+>
+>  config CRYPTO_CRC32_ARM64_CE
+> -	tristate "CRC32 and CRC32C digest algorithms using PMULL instructions"
+> -	depends on KERNEL_MODE_NEON && CRC32
+> +	tristate "CRC32 and CRC32C digest algorithms using ARMv8 extensions"
+> +	depends on CRC32
+>  	select CRYPTO_HASH
+>
+>  config CRYPTO_AES_ARM64
+> @@ -71,11 +71,6 @@ config CRYPTO_AES_ARM64_NEON_BLK
+>  	select CRYPTO_AES
+>  	select CRYPTO_SIMD
+>
+> -config CRYPTO_CRC32_ARM64
+> -	tristate "CRC32 and CRC32C using optional ARMv8 instructions"
+> -	depends on ARM64
+> -	select CRYPTO_HASH
+> -
+>  config CRYPTO_CHACHA20_NEON
+>  	tristate "NEON accelerated ChaCha20 symmetric cipher"
+>  	depends on KERNEL_MODE_NEON
+> diff --git a/arch/arm64/crypto/Makefile b/arch/arm64/crypto/Makefile
+> index d1ae1b9cbe70..b5edc5918c28 100644
+> --- a/arch/arm64/crypto/Makefile
+> +++ b/arch/arm64/crypto/Makefile
+> @@ -55,10 +55,6 @@ AFLAGS_aes-neon.o	:= -DINTERLEAVE=4
+>
+>  CFLAGS_aes-glue-ce.o	:= -DUSE_V8_CRYPTO_EXTENSIONS
+>
+> -obj-$(CONFIG_CRYPTO_CRC32_ARM64) += crc32-arm64.o
+> -
+> -CFLAGS_crc32-arm64.o	:= -mcpu=generic+crc
+> -
+>  $(obj)/aes-glue-%.o: $(src)/aes-glue.c FORCE
+>  	$(call if_changed_rule,cc_o_c)
+>
+> diff --git a/arch/arm64/crypto/crc32-arm64.c b/arch/arm64/crypto/crc32-arm64.c
+> deleted file mode 100644
+> index 6a37c3c6b11d..000000000000
+> --- a/arch/arm64/crypto/crc32-arm64.c
+> +++ /dev/null
+> @@ -1,290 +0,0 @@
+> -/*
+> - * crc32-arm64.c - CRC32 and CRC32C using optional ARMv8 instructions
+> - *
+> - * Module based on crypto/crc32c_generic.c
+> - *
+> - * CRC32 loop taken from Ed Nevill's Hadoop CRC patch
+> - * http://mail-archives.apache.org/mod_mbox/hadoop-common-dev/201406.mbox/%3C1403687030.3355.19.camel%40localhost.localdomain%3E
+> - *
+> - * Using inline assembly instead of intrinsics in order to be backwards
+> - * compatible with older compilers.
+> - *
+> - * Copyright (C) 2014 Linaro Ltd <yazen.ghannam@linaro.org>
+> - *
+> - * This program is free software; you can redistribute it and/or modify
+> - * it under the terms of the GNU General Public License version 2 as
+> - * published by the Free Software Foundation.
+> - */
+> -
+> -#include <linux/unaligned/access_ok.h>
+> -#include <linux/cpufeature.h>
+> -#include <linux/init.h>
+> -#include <linux/kernel.h>
+> -#include <linux/module.h>
+> -#include <linux/string.h>
+> -
+> -#include <crypto/internal/hash.h>
+> -
+> -MODULE_AUTHOR("Yazen Ghannam <yazen.ghannam@linaro.org>");
+> -MODULE_DESCRIPTION("CRC32 and CRC32C using optional ARMv8 instructions");
+> -MODULE_LICENSE("GPL v2");
+> -
+> -#define CRC32X(crc, value) __asm__("crc32x %w[c], %w[c], %x[v]":[c]"+r"(crc):[v]"r"(value))
+> -#define CRC32W(crc, value) __asm__("crc32w %w[c], %w[c], %w[v]":[c]"+r"(crc):[v]"r"(value))
+> -#define CRC32H(crc, value) __asm__("crc32h %w[c], %w[c], %w[v]":[c]"+r"(crc):[v]"r"(value))
+> -#define CRC32B(crc, value) __asm__("crc32b %w[c], %w[c], %w[v]":[c]"+r"(crc):[v]"r"(value))
+> -#define CRC32CX(crc, value) __asm__("crc32cx %w[c], %w[c], %x[v]":[c]"+r"(crc):[v]"r"(value))
+> -#define CRC32CW(crc, value) __asm__("crc32cw %w[c], %w[c], %w[v]":[c]"+r"(crc):[v]"r"(value))
+> -#define CRC32CH(crc, value) __asm__("crc32ch %w[c], %w[c], %w[v]":[c]"+r"(crc):[v]"r"(value))
+> -#define CRC32CB(crc, value) __asm__("crc32cb %w[c], %w[c], %w[v]":[c]"+r"(crc):[v]"r"(value))
+> -
+> -static u32 crc32_arm64_le_hw(u32 crc, const u8 *p, unsigned int len)
+> -{
+> -	s64 length = len;
+> -
+> -	while ((length -= sizeof(u64)) >= 0) {
+> -		CRC32X(crc, get_unaligned_le64(p));
+> -		p += sizeof(u64);
+> -	}
+> -
+> -	/* The following is more efficient than the straight loop */
+> -	if (length & sizeof(u32)) {
+> -		CRC32W(crc, get_unaligned_le32(p));
+> -		p += sizeof(u32);
+> -	}
+> -	if (length & sizeof(u16)) {
+> -		CRC32H(crc, get_unaligned_le16(p));
+> -		p += sizeof(u16);
+> -	}
+> -	if (length & sizeof(u8))
+> -		CRC32B(crc, *p);
+> -
+> -	return crc;
+> -}
+> -
+> -static u32 crc32c_arm64_le_hw(u32 crc, const u8 *p, unsigned int len)
+> -{
+> -	s64 length = len;
+> -
+> -	while ((length -= sizeof(u64)) >= 0) {
+> -		CRC32CX(crc, get_unaligned_le64(p));
+> -		p += sizeof(u64);
+> -	}
+> -
+> -	/* The following is more efficient than the straight loop */
+> -	if (length & sizeof(u32)) {
+> -		CRC32CW(crc, get_unaligned_le32(p));
+> -		p += sizeof(u32);
+> -	}
+> -	if (length & sizeof(u16)) {
+> -		CRC32CH(crc, get_unaligned_le16(p));
+> -		p += sizeof(u16);
+> -	}
+> -	if (length & sizeof(u8))
+> -		CRC32CB(crc, *p);
+> -
+> -	return crc;
+> -}
+> -
+> -#define CHKSUM_BLOCK_SIZE	1
+> -#define CHKSUM_DIGEST_SIZE	4
+> -
+> -struct chksum_ctx {
+> -	u32 key;
+> -};
+> -
+> -struct chksum_desc_ctx {
+> -	u32 crc;
+> -};
+> -
+> -static int chksum_init(struct shash_desc *desc)
+> -{
+> -	struct chksum_ctx *mctx = crypto_shash_ctx(desc->tfm);
+> -	struct chksum_desc_ctx *ctx = shash_desc_ctx(desc);
+> -
+> -	ctx->crc = mctx->key;
+> -
+> -	return 0;
+> -}
+> -
+> -/*
+> - * Setting the seed allows arbitrary accumulators and flexible XOR policy
+> - * If your algorithm starts with ~0, then XOR with ~0 before you set
+> - * the seed.
+> - */
+> -static int chksum_setkey(struct crypto_shash *tfm, const u8 *key,
+> -			 unsigned int keylen)
+> -{
+> -	struct chksum_ctx *mctx = crypto_shash_ctx(tfm);
+> -
+> -	if (keylen != sizeof(mctx->key)) {
+> -		crypto_shash_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
+> -		return -EINVAL;
+> -	}
+> -	mctx->key = get_unaligned_le32(key);
+> -	return 0;
+> -}
+> -
+> -static int chksum_update(struct shash_desc *desc, const u8 *data,
+> -			 unsigned int length)
+> -{
+> -	struct chksum_desc_ctx *ctx = shash_desc_ctx(desc);
+> -
+> -	ctx->crc = crc32_arm64_le_hw(ctx->crc, data, length);
+> -	return 0;
+> -}
+> -
+> -static int chksumc_update(struct shash_desc *desc, const u8 *data,
+> -			 unsigned int length)
+> -{
+> -	struct chksum_desc_ctx *ctx = shash_desc_ctx(desc);
+> -
+> -	ctx->crc = crc32c_arm64_le_hw(ctx->crc, data, length);
+> -	return 0;
+> -}
+> -
+> -static int chksum_final(struct shash_desc *desc, u8 *out)
+> -{
+> -	struct chksum_desc_ctx *ctx = shash_desc_ctx(desc);
+> -
+> -	put_unaligned_le32(ctx->crc, out);
+> -	return 0;
+> -}
+> -
+> -static int chksumc_final(struct shash_desc *desc, u8 *out)
+> -{
+> -	struct chksum_desc_ctx *ctx = shash_desc_ctx(desc);
+> -
+> -	put_unaligned_le32(~ctx->crc, out);
+> -	return 0;
+> -}
+> -
+> -static int __chksum_finup(u32 crc, const u8 *data, unsigned int len, u8 *out)
+> -{
+> -	put_unaligned_le32(crc32_arm64_le_hw(crc, data, len), out);
+> -	return 0;
+> -}
+> -
+> -static int __chksumc_finup(u32 crc, const u8 *data, unsigned int len, u8 *out)
+> -{
+> -	put_unaligned_le32(~crc32c_arm64_le_hw(crc, data, len), out);
+> -	return 0;
+> -}
+> -
+> -static int chksum_finup(struct shash_desc *desc, const u8 *data,
+> -			unsigned int len, u8 *out)
+> -{
+> -	struct chksum_desc_ctx *ctx = shash_desc_ctx(desc);
+> -
+> -	return __chksum_finup(ctx->crc, data, len, out);
+> -}
+> -
+> -static int chksumc_finup(struct shash_desc *desc, const u8 *data,
+> -			unsigned int len, u8 *out)
+> -{
+> -	struct chksum_desc_ctx *ctx = shash_desc_ctx(desc);
+> -
+> -	return __chksumc_finup(ctx->crc, data, len, out);
+> -}
+> -
+> -static int chksum_digest(struct shash_desc *desc, const u8 *data,
+> -			 unsigned int length, u8 *out)
+> -{
+> -	struct chksum_ctx *mctx = crypto_shash_ctx(desc->tfm);
+> -
+> -	return __chksum_finup(mctx->key, data, length, out);
+> -}
+> -
+> -static int chksumc_digest(struct shash_desc *desc, const u8 *data,
+> -			 unsigned int length, u8 *out)
+> -{
+> -	struct chksum_ctx *mctx = crypto_shash_ctx(desc->tfm);
+> -
+> -	return __chksumc_finup(mctx->key, data, length, out);
+> -}
+> -
+> -static int crc32_cra_init(struct crypto_tfm *tfm)
+> -{
+> -	struct chksum_ctx *mctx = crypto_tfm_ctx(tfm);
+> -
+> -	mctx->key = 0;
+> -	return 0;
+> -}
+> -
+> -static int crc32c_cra_init(struct crypto_tfm *tfm)
+> -{
+> -	struct chksum_ctx *mctx = crypto_tfm_ctx(tfm);
+> -
+> -	mctx->key = ~0;
+> -	return 0;
+> -}
+> -
+> -static struct shash_alg crc32_alg = {
+> -	.digestsize		=	CHKSUM_DIGEST_SIZE,
+> -	.setkey			=	chksum_setkey,
+> -	.init			=	chksum_init,
+> -	.update			=	chksum_update,
+> -	.final			=	chksum_final,
+> -	.finup			=	chksum_finup,
+> -	.digest			=	chksum_digest,
+> -	.descsize		=	sizeof(struct chksum_desc_ctx),
+> -	.base			=	{
+> -		.cra_name		=	"crc32",
+> -		.cra_driver_name	=	"crc32-arm64-hw",
+> -		.cra_priority		=	300,
+> -		.cra_blocksize		=	CHKSUM_BLOCK_SIZE,
+> -		.cra_alignmask		=	0,
+> -		.cra_ctxsize		=	sizeof(struct chksum_ctx),
+> -		.cra_module		=	THIS_MODULE,
+> -		.cra_init		=	crc32_cra_init,
+> -	}
+> -};
+> -
+> -static struct shash_alg crc32c_alg = {
+> -	.digestsize		=	CHKSUM_DIGEST_SIZE,
+> -	.setkey			=	chksum_setkey,
+> -	.init			=	chksum_init,
+> -	.update			=	chksumc_update,
+> -	.final			=	chksumc_final,
+> -	.finup			=	chksumc_finup,
+> -	.digest			=	chksumc_digest,
+> -	.descsize		=	sizeof(struct chksum_desc_ctx),
+> -	.base			=	{
+> -		.cra_name		=	"crc32c",
+> -		.cra_driver_name	=	"crc32c-arm64-hw",
+> -		.cra_priority		=	300,
+> -		.cra_blocksize		=	CHKSUM_BLOCK_SIZE,
+> -		.cra_alignmask		=	0,
+> -		.cra_ctxsize		=	sizeof(struct chksum_ctx),
+> -		.cra_module		=	THIS_MODULE,
+> -		.cra_init		=	crc32c_cra_init,
+> -	}
+> -};
+> -
+> -static int __init crc32_mod_init(void)
+> -{
+> -	int err;
+> -
+> -	err = crypto_register_shash(&crc32_alg);
+> -
+> -	if (err)
+> -		return err;
+> -
+> -	err = crypto_register_shash(&crc32c_alg);
+> -
+> -	if (err) {
+> -		crypto_unregister_shash(&crc32_alg);
+> -		return err;
+> -	}
+> -
+> -	return 0;
+> -}
+> -
+> -static void __exit crc32_mod_exit(void)
+> -{
+> -	crypto_unregister_shash(&crc32_alg);
+> -	crypto_unregister_shash(&crc32c_alg);
+> -}
+> -
+> -module_cpu_feature_match(CRC32, crc32_mod_init);
+> -module_exit(crc32_mod_exit);
+> diff --git a/arch/arm64/crypto/crc32-ce-glue.c b/arch/arm64/crypto/crc32-ce-glue.c
+> index 8594127d5e01..eccb1ae90064 100644
+> --- a/arch/arm64/crypto/crc32-ce-glue.c
+> +++ b/arch/arm64/crypto/crc32-ce-glue.c
+> @@ -72,6 +72,24 @@ static int crc32_pmull_init(struct shash_desc *desc)
+>  	return 0;
+>  }
+>
+> +static int crc32_update(struct shash_desc *desc, const u8 *data,
+> +			unsigned int length)
+> +{
+> +	u32 *crc = shash_desc_ctx(desc);
+> +
+> +	*crc = crc32_armv8_le(*crc, data, length);
+> +	return 0;
+> +}
+> +
+> +static int crc32c_update(struct shash_desc *desc, const u8 *data,
+> +			 unsigned int length)
+> +{
+> +	u32 *crc = shash_desc_ctx(desc);
+> +
+> +	*crc = crc32c_armv8_le(*crc, data, length);
+> +	return 0;
+> +}
+> +
+>  static int crc32_pmull_update(struct shash_desc *desc, const u8 *data,
+>  			 unsigned int length)
+>  {
+> @@ -156,7 +174,7 @@ static int crc32c_pmull_final(struct shash_desc *desc, u8 *out)
+>  static struct shash_alg crc32_pmull_algs[] = { {
+>  	.setkey			= crc32_pmull_setkey,
+>  	.init			= crc32_pmull_init,
+> -	.update			= crc32_pmull_update,
+> +	.update			= crc32_update,
+>  	.final			= crc32_pmull_final,
+>  	.descsize		= sizeof(u32),
+>  	.digestsize		= sizeof(u32),
+> @@ -171,7 +189,7 @@ static struct shash_alg crc32_pmull_algs[] = { {
+>  }, {
+>  	.setkey			= crc32_pmull_setkey,
+>  	.init			= crc32_pmull_init,
+> -	.update			= crc32c_pmull_update,
+> +	.update			= crc32c_update,
+>  	.final			= crc32c_pmull_final,
+>  	.descsize		= sizeof(u32),
+>  	.digestsize		= sizeof(u32),
+> @@ -187,14 +205,20 @@ static struct shash_alg crc32_pmull_algs[] = { {
+>
+>  static int __init crc32_pmull_mod_init(void)
+>  {
+> -	if (elf_hwcap & HWCAP_CRC32) {
+> -		fallback_crc32 = crc32_armv8_le;
+> -		fallback_crc32c = crc32c_armv8_le;
+> -	} else {
+> -		fallback_crc32 = crc32_le;
+> -		fallback_crc32c = __crc32c_le;
+> +	if (IS_ENABLED(CONFIG_KERNEL_MODE_NEON) && (elf_hwcap & HWCAP_PMULL)) {
+> +		crc32_pmull_algs[0].update = crc32_pmull_update;
+> +		crc32_pmull_algs[1].update = crc32c_pmull_update;
+> +
+> +		if (elf_hwcap & HWCAP_CRC32) {
+> +			fallback_crc32 = crc32_armv8_le;
+> +			fallback_crc32c = crc32c_armv8_le;
+> +		} else {
+> +			fallback_crc32 = crc32_le;
+> +			fallback_crc32c = __crc32c_le;
+> +		}
+> +	} else if (!(elf_hwcap & HWCAP_CRC32)) {
+> +		return -ENODEV;
+>  	}
+> -
+>  	return crypto_register_shashes(crc32_pmull_algs,
+>  				       ARRAY_SIZE(crc32_pmull_algs));
+>  }
+> @@ -205,7 +229,12 @@ static void __exit crc32_pmull_mod_exit(void)
+>  				  ARRAY_SIZE(crc32_pmull_algs));
+>  }
+>
+> -module_cpu_feature_match(PMULL, crc32_pmull_mod_init);
+> +static const struct cpu_feature crc32_cpu_feature[] = {
+> +	{ cpu_feature(CRC32) }, { cpu_feature(PMULL) }, { }
+> +};
+> +MODULE_DEVICE_TABLE(cpu, crc32_cpu_feature);
+> +
+> +module_init(crc32_pmull_mod_init);
+>  module_exit(crc32_pmull_mod_exit);
+>
+>  MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
+>
