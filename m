@@ -1,334 +1,189 @@
-From: Dmitry Vyukov <dvyukov@google.com>
-Subject: Re: crypto: NULL deref in sha512_mb_mgr_get_comp_job_avx2
-Date: Thu, 2 Feb 2017 11:58:17 +0100
-Message-ID: <CACT4Y+bwD4ktMKVEkcmvJ_EuW834jAZbJfANxfyDKpmGXFxr4Q@mail.gmail.com>
-References: <CACT4Y+Z6_x2smshuSgQx0wA+g0H+5dJsF23UqYb9Z_WkDUvwcw@mail.gmail.com>
- <20170201184502.GA11649@linux.intel.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        David Miller <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        megha.dey@linux.intel.com, fenghua.yu@intel.com,
-        syzkaller <syzkaller@googlegroups.com>
-To: tim.c.chen@linux.intel.com
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH 1/2] crypto: arm64/aes - don't use IV buffer to return final keystream block
+Date: Thu,  2 Feb 2017 11:38:55 +0000
+Message-ID: <1486035536-895-1-git-send-email-ard.biesheuvel@linaro.org>
+Cc: linux-arm-kernel@lists.infradead.org,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ua0-f171.google.com ([209.85.217.171]:34645 "EHLO
-        mail-ua0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751020AbdBBK6i (ORCPT
+Received: from mail-wm0-f53.google.com ([74.125.82.53]:38297 "EHLO
+        mail-wm0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751019AbdBBLjF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Feb 2017 05:58:38 -0500
-Received: by mail-ua0-f171.google.com with SMTP id 35so8514754uak.1
-        for <linux-crypto@vger.kernel.org>; Thu, 02 Feb 2017 02:58:38 -0800 (PST)
-In-Reply-To: <20170201184502.GA11649@linux.intel.com>
+        Thu, 2 Feb 2017 06:39:05 -0500
+Received: by mail-wm0-f53.google.com with SMTP id r141so84925555wmg.1
+        for <linux-crypto@vger.kernel.org>; Thu, 02 Feb 2017 03:39:05 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Feb 1, 2017 at 7:45 PM, Tim Chen <tim.c.chen@linux.intel.com> wrote:
-> On Tue, Jan 31, 2017 at 02:16:31PM +0100, Dmitry Vyukov wrote:
->> Hello,
->>
->> I am getting the following reports with low frequency while running
->> syzkaller fuzzer. Unfortunately they are not reproducible and happen
->> in a background thread, so it is difficult to extract any context on
->> my side. I see only few such crashes per week, so most likely it is
->> some hard to trigger data race. The following reports are from mmotm
->> tree, commits 00e20cfc2bf04a0cbe1f5405f61c8426f43eee84 and
->> fff7e71eac7788904753136f09bcad7471f7799e. Any ideas as to how this can
->> happen?
->>
->> BUG: unable to handle kernel NULL pointer dereference at 0000000000000060
->> IP: [<ffffffff813fc09e>] sha512_mb_mgr_get_comp_job_avx2+0x6e/0xee
->> arch/x86/crypto/sha512-mb/sha512_mb_mgr_flush_avx2.S:251
->> PGD 1d2395067 [  220.874864] PUD 1d2860067
->> Oops: 0002 [#1] SMP KASAN
->> Dumping ftrace buffer:
->>    (ftrace buffer empty)
->> Modules linked in:
->> CPU: 0 PID: 516 Comm: kworker/0:1 Not tainted 4.9.0 #4
->> Hardware name: Google Google Compute Engine/Google Compute Engine,
->> BIOS Google 01/01/2011
->> Workqueue: crypto mcryptd_queue_worker
->> task: ffff8801d9f346c0 task.stack: ffff8801d9f08000
->> RIP: 0010:[<ffffffff813fc09e>]  [<ffffffff813fc09e>]
->> sha512_mb_mgr_get_comp_job_avx2+0x6e/0xee
->> arch/x86/crypto/sha512-mb/sha512_mb_mgr_flush_avx2.S:251
->> RSP: 0018:ffff8801d9f0eef8  EFLAGS: 00010202
->> RAX: 0000000000000000 RBX: ffff8801d7db1190 RCX: 0000000000000006
->> RDX: 0000000000000001 RSI: ffff8801d9f34ee8 RDI: ffff8801d7db1040
->> RBP: ffff8801d9f0f258 R08: 0000000100000000 R09: 0000000000000001
->> R10: 0000000000000002 R11: 0000000000000003 R12: ffff8801d9f0f230
->> R13: ffff8801c8bbc4e0 R14: ffff8801c8bbc530 R15: ffff8801d9f0ef70
->> FS:  0000000000000000(0000) GS:ffff8801dc000000(0000) knlGS:0000000000000000
->> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->> CR2: 0000000000000060 CR3: 00000001cc15a000 CR4: 00000000001406f0
->> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
->> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
->> Stack:
->>  ffff8801d7db1040 ffffffff813fa207 dffffc0000000000 ffffe8ffffc0f238
->>  0000000000000002 1ffff1003b3e1dea ffffe8ffffc0f218 ffff8801d9f0f190
->>  0000000000000282 ffffe8ffffc0f140 ffffe8ffffc0f220 0000000041b58ab3
->> Call Trace:
->>  [<ffffffff813fb407>] sha512_mb_update+0x2f7/0x4e0
->> arch/x86/crypto/sha512-mb/sha512_mb.c:588
->>  [<ffffffff8219d4ad>] crypto_ahash_update include/crypto/hash.h:512 [inline]
->>  [<ffffffff8219d4ad>] ahash_mcryptd_update crypto/mcryptd.c:627 [inline]
->>  [<ffffffff8219d4ad>] mcryptd_hash_update+0xcd/0x1c0 crypto/mcryptd.c:373
->>  [<ffffffff8219c99f>] mcryptd_queue_worker+0xff/0x6a0 crypto/mcryptd.c:181
->>  [<ffffffff81492960>] process_one_work+0xbd0/0x1c10 kernel/workqueue.c:2096
->>  [<ffffffff81493bc3>] worker_thread+0x223/0x1990 kernel/workqueue.c:2230
->>  [<ffffffff814abb33>] kthread+0x323/0x3e0 kernel/kthread.c:209
->>  [<ffffffff8436fbaa>] ret_from_fork+0x2a/0x40 arch/x86/entry/entry_64.S:433
->> Code: 49 0f 42 d3 48 f7 c2 f0 ff ff ff 0f 85 9a 00 00 00 48 83 e2 0f
->> 48 6b da 08 48 8d 9c 1f 48 01 00 00 48 8b 03 48 c7 03 00 00 00 00 <c7>
->> 40 60 02 00 00 00 48 8b 9f 40 01 00 00 48 c1 e3 08 48 09 d3
->> RIP  [<ffffffff813fc09e>] sha512_mb_mgr_get_comp_job_avx2+0x6e/0xee
->> arch/x86/crypto/sha512-mb/sha512_mb_mgr_flush_avx2.S:251
->>  RSP <ffff8801d9f0eef8>
->> CR2: 0000000000000060
->> ---[ end trace 139fd4cda5dfe2c4 ]---
->>
->
-> Dmitry,
->
-> One theory that Mehga and I have is that perhaps the flusher
-> and regular computaion updates are stepping on each other.
-> Can you try this patch and see if it helps?
+The arm64 bit sliced AES core code uses the IV buffer to pass the final
+keystream block back to the glue code if the input is not a multiple of
+the block size, so that the asm code does not have to deal with anything
+except 16 byte blocks. This is done under the assumption that the outgoing
+IV is meaningless anyway in this case, given that chaining is no longer
+possible under these circumstances.
 
+However, as it turns out, the CCM driver does expect the IV to retain
+a value that is equal to the original IV except for the counter value,
+and even interprets byte zero as a length indicator, which may result
+in memory corruption if the IV is overwritten with something else.
 
-No, for this one I can't. Sorry.
-It happens with very low frequency and only one fuzzer that tests
-mmotm tree. If/when this is committed, I can keep an eye on these
-reports and notify if I still see them.
-If you have a hypothesis as to how it happens, perhaps you could write
-a test that provokes the crash and maybe add some sleeps to kernel
-code or alter timeouts to increase probability.
+So use a separate buffer to return the final keystream block.
 
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+Note that this patch includes the fix
 
+crypto: arm64/aes-neon-bs - honour iv_out requirement in CTR mode
 
-> --->8---
->
-> From: Tim Chen <tim.c.chen@linux.intel.com>
-> Subject: [PATCH] crypto/sha512-mb: Protect sha512 mb ctx mgr access
-> To: Herbert Xu <herbert@gondor.apana.org.au>, Dmitry Vyukov <dvyukov@google.com>
-> Cc: Tim Chen <tim.c.chen@linux.intel.com>, David Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, megha.dey@linux.intel.com, fenghua.yu@intel.com
->
-> The flusher and regular multi-buffer computation via mcryptd may race with another.
-> Add here a lock and turn off interrupt to to access multi-buffer
-> computation state cstate->mgr before a round of computation. This should
-> prevent the flusher code jumping in.
->
-> Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
-> ---
->  arch/x86/crypto/sha512-mb/sha512_mb.c | 64 +++++++++++++++++++++++------------
->  1 file changed, 42 insertions(+), 22 deletions(-)
->
-> diff --git a/arch/x86/crypto/sha512-mb/sha512_mb.c b/arch/x86/crypto/sha512-mb/sha512_mb.c
-> index d210174..f3c1c21 100644
-> --- a/arch/x86/crypto/sha512-mb/sha512_mb.c
-> +++ b/arch/x86/crypto/sha512-mb/sha512_mb.c
-> @@ -221,7 +221,7 @@ static struct sha512_hash_ctx *sha512_ctx_mgr_resubmit
->  }
->
->  static struct sha512_hash_ctx
-> -               *sha512_ctx_mgr_get_comp_ctx(struct sha512_ctx_mgr *mgr)
-> +               *sha512_ctx_mgr_get_comp_ctx(struct mcryptd_alg_cstate *cstate)
->  {
->         /*
->          * If get_comp_job returns NULL, there are no jobs complete.
-> @@ -233,11 +233,17 @@ static struct sha512_hash_ctx
->          * Otherwise, all jobs currently being managed by the hash_ctx_mgr
->          * still need processing.
->          */
-> +       struct sha512_ctx_mgr *mgr;
->         struct sha512_hash_ctx *ctx;
-> +       unsigned long flags;
->
-> +       mgr = cstate->mgr;
-> +       spin_lock_irqsave(&cstate->work_lock, flags);
->         ctx = (struct sha512_hash_ctx *)
->                                 sha512_job_mgr_get_comp_job(&mgr->mgr);
-> -       return sha512_ctx_mgr_resubmit(mgr, ctx);
-> +       ctx = sha512_ctx_mgr_resubmit(mgr, ctx);
-> +       spin_unlock_irqrestore(&cstate->work_lock, flags);
-> +       return ctx;
->  }
->
->  static void sha512_ctx_mgr_init(struct sha512_ctx_mgr *mgr)
-> @@ -246,12 +252,17 @@ static void sha512_ctx_mgr_init(struct sha512_ctx_mgr *mgr)
->  }
->
->  static struct sha512_hash_ctx
-> -                       *sha512_ctx_mgr_submit(struct sha512_ctx_mgr *mgr,
-> +                       *sha512_ctx_mgr_submit(struct mcryptd_alg_cstate *cstate,
->                                           struct sha512_hash_ctx *ctx,
->                                           const void *buffer,
->                                           uint32_t len,
->                                           int flags)
->  {
-> +       struct sha512_ctx_mgr *mgr;
-> +       unsigned long irqflags;
-> +
-> +       mgr = cstate->mgr;
-> +       spin_lock_irqsave(&cstate->work_lock, irqflags);
->         if (flags & (~HASH_ENTIRE)) {
->                 /*
->                  * User should not pass anything other than FIRST, UPDATE, or
-> @@ -351,20 +362,26 @@ static struct sha512_hash_ctx
->                 }
->         }
->
-> -       return sha512_ctx_mgr_resubmit(mgr, ctx);
-> +       ctx = sha512_ctx_mgr_resubmit(mgr, ctx);
-> +       spin_unlock_irqrestore(&cstate->work_lock, irqflags);
-> +       return ctx;
->  }
->
-> -static struct sha512_hash_ctx *sha512_ctx_mgr_flush(struct sha512_ctx_mgr *mgr)
-> +static struct sha512_hash_ctx *sha512_ctx_mgr_flush(struct mcryptd_alg_cstate *cstate)
->  {
-> +       struct sha512_ctx_mgr *mgr;
->         struct sha512_hash_ctx *ctx;
-> +       unsigned long flags;
->
-> +       mgr = cstate->mgr;
-> +       spin_lock_irqsave(&cstate->work_lock, flags);
->         while (1) {
->                 ctx = (struct sha512_hash_ctx *)
->                                         sha512_job_mgr_flush(&mgr->mgr);
->
->                 /* If flush returned 0, there are no more jobs in flight. */
->                 if (!ctx)
-> -                       return NULL;
-> +                       break;
->
->                 /*
->                  * If flush returned a job, resubmit the job to finish
-> @@ -378,8 +395,10 @@ static struct sha512_hash_ctx *sha512_ctx_mgr_flush(struct sha512_ctx_mgr *mgr)
->                  * the sha512_ctx_mgr still need processing. Loop.
->                  */
->                 if (ctx)
-> -                       return ctx;
-> +                       break;
->         }
-> +       spin_unlock_irqrestore(&cstate->work_lock, flags);
-> +       return ctx;
->  }
->
->  static int sha512_mb_init(struct ahash_request *areq)
-> @@ -439,11 +458,11 @@ static int sha_finish_walk(struct mcryptd_hash_request_ctx **ret_rctx,
->                 sha_ctx = (struct sha512_hash_ctx *)
->                                                 ahash_request_ctx(&rctx->areq);
->                 kernel_fpu_begin();
-> -               sha_ctx = sha512_ctx_mgr_submit(cstate->mgr, sha_ctx,
-> +               sha_ctx = sha512_ctx_mgr_submit(cstate, sha_ctx,
->                                                 rctx->walk.data, nbytes, flag);
->                 if (!sha_ctx) {
->                         if (flush)
-> -                               sha_ctx = sha512_ctx_mgr_flush(cstate->mgr);
-> +                               sha_ctx = sha512_ctx_mgr_flush(cstate);
->                 }
->                 kernel_fpu_end();
->                 if (sha_ctx)
-> @@ -471,11 +490,12 @@ static int sha_complete_job(struct mcryptd_hash_request_ctx *rctx,
->         struct sha512_hash_ctx *sha_ctx;
->         struct mcryptd_hash_request_ctx *req_ctx;
->         int ret;
-> +       unsigned long flags;
->
->         /* remove from work list */
-> -       spin_lock(&cstate->work_lock);
-> +       spin_lock_irqsave(&cstate->work_lock, flags);
->         list_del(&rctx->waiter);
-> -       spin_unlock(&cstate->work_lock);
-> +       spin_unlock_irqrestore(&cstate->work_lock, flags);
->
->         if (irqs_disabled())
->                 rctx->complete(&req->base, err);
-> @@ -486,14 +506,14 @@ static int sha_complete_job(struct mcryptd_hash_request_ctx *rctx,
->         }
->
->         /* check to see if there are other jobs that are done */
-> -       sha_ctx = sha512_ctx_mgr_get_comp_ctx(cstate->mgr);
-> +       sha_ctx = sha512_ctx_mgr_get_comp_ctx(cstate);
->         while (sha_ctx) {
->                 req_ctx = cast_hash_to_mcryptd_ctx(sha_ctx);
->                 ret = sha_finish_walk(&req_ctx, cstate, false);
->                 if (req_ctx) {
-> -                       spin_lock(&cstate->work_lock);
-> +                       spin_lock_irqsave(&cstate->work_lock, flags);
->                         list_del(&req_ctx->waiter);
-> -                       spin_unlock(&cstate->work_lock);
-> +                       spin_unlock_irqrestore(&cstate->work_lock, flags);
->
->                         req = cast_mcryptd_ctx_to_req(req_ctx);
->                         if (irqs_disabled())
-> @@ -504,7 +524,7 @@ static int sha_complete_job(struct mcryptd_hash_request_ctx *rctx,
->                                 local_bh_enable();
->                         }
->                 }
-> -               sha_ctx = sha512_ctx_mgr_get_comp_ctx(cstate->mgr);
-> +               sha_ctx = sha512_ctx_mgr_get_comp_ctx(cstate);
->         }
->
->         return 0;
-> @@ -515,6 +535,7 @@ static void sha512_mb_add_list(struct mcryptd_hash_request_ctx *rctx,
->  {
->         unsigned long next_flush;
->         unsigned long delay = usecs_to_jiffies(FLUSH_INTERVAL);
-> +       unsigned long flags;
->
->         /* initialize tag */
->         rctx->tag.arrival = jiffies;    /* tag the arrival time */
-> @@ -522,9 +543,9 @@ static void sha512_mb_add_list(struct mcryptd_hash_request_ctx *rctx,
->         next_flush = rctx->tag.arrival + delay;
->         rctx->tag.expire = next_flush;
->
-> -       spin_lock(&cstate->work_lock);
-> +       spin_lock_irqsave(&cstate->work_lock, flags);
->         list_add_tail(&rctx->waiter, &cstate->work_list);
-> -       spin_unlock(&cstate->work_lock);
-> +       spin_unlock_irqrestore(&cstate->work_lock, flags);
->
->         mcryptd_arm_flusher(cstate, delay);
->  }
-> @@ -565,7 +586,7 @@ static int sha512_mb_update(struct ahash_request *areq)
->         sha_ctx = (struct sha512_hash_ctx *) ahash_request_ctx(areq);
->         sha512_mb_add_list(rctx, cstate);
->         kernel_fpu_begin();
-> -       sha_ctx = sha512_ctx_mgr_submit(cstate->mgr, sha_ctx, rctx->walk.data,
-> +       sha_ctx = sha512_ctx_mgr_submit(cstate, sha_ctx, rctx->walk.data,
->                                                         nbytes, HASH_UPDATE);
->         kernel_fpu_end();
->
-> @@ -628,7 +649,7 @@ static int sha512_mb_finup(struct ahash_request *areq)
->         sha512_mb_add_list(rctx, cstate);
->
->         kernel_fpu_begin();
-> -       sha_ctx = sha512_ctx_mgr_submit(cstate->mgr, sha_ctx, rctx->walk.data,
-> +       sha_ctx = sha512_ctx_mgr_submit(cstate, sha_ctx, rctx->walk.data,
->                                                                 nbytes, flag);
->         kernel_fpu_end();
->
-> @@ -677,8 +698,7 @@ static int sha512_mb_final(struct ahash_request *areq)
->         /* flag HASH_FINAL and 0 data size */
->         sha512_mb_add_list(rctx, cstate);
->         kernel_fpu_begin();
-> -       sha_ctx = sha512_ctx_mgr_submit(cstate->mgr, sha_ctx, &data, 0,
-> -                                                               HASH_LAST);
-> +       sha_ctx = sha512_ctx_mgr_submit(cstate, sha_ctx, &data, 0, HASH_LAST);
->         kernel_fpu_end();
->
->         /* check if anything is returned */
-> @@ -940,7 +960,7 @@ static unsigned long sha512_mb_flusher(struct mcryptd_alg_cstate *cstate)
->                         break;
->                 kernel_fpu_begin();
->                 sha_ctx = (struct sha512_hash_ctx *)
-> -                                       sha512_ctx_mgr_flush(cstate->mgr);
-> +                                       sha512_ctx_mgr_flush(cstate);
->                 kernel_fpu_end();
->                 if (!sha_ctx) {
->                         pr_err("sha512_mb error: nothing got flushed for"
-> --
-> 2.5.5
->
+which I sent out earlier.
+
+ arch/arm64/crypto/aes-neonbs-core.S | 37 ++++++++++++--------
+ arch/arm64/crypto/aes-neonbs-glue.c |  9 ++---
+ 2 files changed, 28 insertions(+), 18 deletions(-)
+
+diff --git a/arch/arm64/crypto/aes-neonbs-core.S b/arch/arm64/crypto/aes-neonbs-core.S
+index 8d0cdaa2768d..ca0472500433 100644
+--- a/arch/arm64/crypto/aes-neonbs-core.S
++++ b/arch/arm64/crypto/aes-neonbs-core.S
+@@ -853,13 +853,15 @@ ENDPROC(aesbs_xts_decrypt)
+ 
+ 	/*
+ 	 * aesbs_ctr_encrypt(u8 out[], u8 const in[], u8 const rk[],
+-	 *		     int rounds, int blocks, u8 iv[], bool final)
++	 *		     int rounds, int blocks, u8 iv[], u8 final[])
+ 	 */
+ ENTRY(aesbs_ctr_encrypt)
+ 	stp		x29, x30, [sp, #-16]!
+ 	mov		x29, sp
+ 
+-	add		x4, x4, x6		// do one extra block if final
++	cmp		x6, #0
++	cset		x10, ne
++	add		x4, x4, x10		// do one extra block if final
+ 
+ 	ldp		x7, x8, [x5]
+ 	ld1		{v0.16b}, [x5]
+@@ -874,19 +876,26 @@ CPU_LE(	rev		x8, x8		)
+ 	csel		x4, x4, xzr, pl
+ 	csel		x9, x9, xzr, le
+ 
++	tbnz		x9, #1, 0f
+ 	next_ctr	v1
++	tbnz		x9, #2, 0f
+ 	next_ctr	v2
++	tbnz		x9, #3, 0f
+ 	next_ctr	v3
++	tbnz		x9, #4, 0f
+ 	next_ctr	v4
++	tbnz		x9, #5, 0f
+ 	next_ctr	v5
++	tbnz		x9, #6, 0f
+ 	next_ctr	v6
++	tbnz		x9, #7, 0f
+ 	next_ctr	v7
+ 
+ 0:	mov		bskey, x2
+ 	mov		rounds, x3
+ 	bl		aesbs_encrypt8
+ 
+-	lsr		x9, x9, x6		// disregard the extra block
++	lsr		x9, x9, x10		// disregard the extra block
+ 	tbnz		x9, #0, 0f
+ 
+ 	ld1		{v8.16b}, [x1], #16
+@@ -928,36 +937,36 @@ CPU_LE(	rev		x8, x8		)
+ 	eor		v5.16b, v5.16b, v15.16b
+ 	st1		{v5.16b}, [x0], #16
+ 
+-	next_ctr	v0
++8:	next_ctr	v0
+ 	cbnz		x4, 99b
+ 
+ 0:	st1		{v0.16b}, [x5]
+-8:	ldp		x29, x30, [sp], #16
++	ldp		x29, x30, [sp], #16
+ 	ret
+ 
+ 	/*
+-	 * If we are handling the tail of the input (x6 == 1), return the
+-	 * final keystream block back to the caller via the IV buffer.
++	 * If we are handling the tail of the input (x6 != NULL), return the
++	 * final keystream block back to the caller.
+ 	 */
+ 1:	cbz		x6, 8b
+-	st1		{v1.16b}, [x5]
++	st1		{v1.16b}, [x6]
+ 	b		8b
+ 2:	cbz		x6, 8b
+-	st1		{v4.16b}, [x5]
++	st1		{v4.16b}, [x6]
+ 	b		8b
+ 3:	cbz		x6, 8b
+-	st1		{v6.16b}, [x5]
++	st1		{v6.16b}, [x6]
+ 	b		8b
+ 4:	cbz		x6, 8b
+-	st1		{v3.16b}, [x5]
++	st1		{v3.16b}, [x6]
+ 	b		8b
+ 5:	cbz		x6, 8b
+-	st1		{v7.16b}, [x5]
++	st1		{v7.16b}, [x6]
+ 	b		8b
+ 6:	cbz		x6, 8b
+-	st1		{v2.16b}, [x5]
++	st1		{v2.16b}, [x6]
+ 	b		8b
+ 7:	cbz		x6, 8b
+-	st1		{v5.16b}, [x5]
++	st1		{v5.16b}, [x6]
+ 	b		8b
+ ENDPROC(aesbs_ctr_encrypt)
+diff --git a/arch/arm64/crypto/aes-neonbs-glue.c b/arch/arm64/crypto/aes-neonbs-glue.c
+index 863e436ecf89..db2501d93550 100644
+--- a/arch/arm64/crypto/aes-neonbs-glue.c
++++ b/arch/arm64/crypto/aes-neonbs-glue.c
+@@ -34,7 +34,7 @@ asmlinkage void aesbs_cbc_decrypt(u8 out[], u8 const in[], u8 const rk[],
+ 				  int rounds, int blocks, u8 iv[]);
+ 
+ asmlinkage void aesbs_ctr_encrypt(u8 out[], u8 const in[], u8 const rk[],
+-				  int rounds, int blocks, u8 iv[], bool final);
++				  int rounds, int blocks, u8 iv[], u8 final[]);
+ 
+ asmlinkage void aesbs_xts_encrypt(u8 out[], u8 const in[], u8 const rk[],
+ 				  int rounds, int blocks, u8 iv[]);
+@@ -201,6 +201,7 @@ static int ctr_encrypt(struct skcipher_request *req)
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+ 	struct aesbs_ctx *ctx = crypto_skcipher_ctx(tfm);
+ 	struct skcipher_walk walk;
++	u8 buf[AES_BLOCK_SIZE];
+ 	int err;
+ 
+ 	err = skcipher_walk_virt(&walk, req, true);
+@@ -208,12 +209,12 @@ static int ctr_encrypt(struct skcipher_request *req)
+ 	kernel_neon_begin();
+ 	while (walk.nbytes > 0) {
+ 		unsigned int blocks = walk.nbytes / AES_BLOCK_SIZE;
+-		bool final = (walk.total % AES_BLOCK_SIZE) != 0;
++		u8 *final = (walk.total % AES_BLOCK_SIZE) ? buf : NULL;
+ 
+ 		if (walk.nbytes < walk.total) {
+ 			blocks = round_down(blocks,
+ 					    walk.stride / AES_BLOCK_SIZE);
+-			final = false;
++			final = NULL;
+ 		}
+ 
+ 		aesbs_ctr_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
+@@ -225,7 +226,7 @@ static int ctr_encrypt(struct skcipher_request *req)
+ 
+ 			if (dst != src)
+ 				memcpy(dst, src, walk.total % AES_BLOCK_SIZE);
+-			crypto_xor(dst, walk.iv, walk.total % AES_BLOCK_SIZE);
++			crypto_xor(dst, final, walk.total % AES_BLOCK_SIZE);
+ 
+ 			err = skcipher_walk_done(&walk, 0);
+ 			break;
+-- 
+2.7.4
