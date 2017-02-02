@@ -1,78 +1,89 @@
-From: Anup Patel <anup.patel-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
-Subject: [PATCH 0/6] Broadcom SBA RAID support
-Date: Thu,  2 Feb 2017 10:17:10 +0530
-Message-ID: <1486010836-25228-1-git-send-email-anup.patel@broadcom.com>
-Cc: Dan Williams <dan.j.williams-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-        Ray Jui <rjui-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
-        Scott Branden <sbranden-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
-        Jon Mason <jonmason-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
-        Rob Rice <rob.rice-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
-        bcm-kernel-feedback-list-dY08KVG/lbpWk0Htik3J/w@public.gmane.org, dmaengine-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
-        linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        linux-raid-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Anup Patel <anup.patel-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
-To: Vinod Koul <vinod.koul-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
-        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-        "David S . Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-        Jassi Brar <jassisinghbrar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Anup Patel <anup.patel@broadcom.com>
+Subject: [PATCH 1/6] mailbox: Add new API mbox_channel_device() for clients
+Date: Thu,  2 Feb 2017 10:17:11 +0530
+Message-ID: <1486010836-25228-2-git-send-email-anup.patel@broadcom.com>
+References: <1486010836-25228-1-git-send-email-anup.patel@broadcom.com>
+Cc: Dan Williams <dan.j.williams@intel.com>,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        Jon Mason <jonmason@broadcom.com>,
+        Rob Rice <rob.rice@broadcom.com>,
+        bcm-kernel-feedback-list@broadcom.com, dmaengine@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-raid@vger.kernel.org, Anup Patel <anup.patel@broadcom.com>
+To: Vinod Koul <vinod.koul@intel.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Jassi Brar <jassisinghbrar@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1486010836-25228-1-git-send-email-anup.patel@broadcom.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The Broadcom SBA RAID is a stream-based device which provides
-RAID5/6 offload.
+The remote processor can have DMAENGINE capabilities and client
+can pass data to be processed via main memory. In such cases,
+the client will require DMAble memory for remote processor.
 
-It requires a SoC specific ring manager (such as Broadcom FlexRM
-ring manager) to provide ring-based programming interface. Due to
-this, the Broadcom SBA RAID driver (mailbox client) implements
-DMA device having one DMA channel using a set of mailbox channels
-provided by Broadcom SoC specific ring manager driver (mailbox
-controller).
+This patch adds new API mbox_channel_device() which can be
+used by clients to get struct device pointer of underlying
+mailbox controller. This struct device pointer of mailbox
+controller can be used by clients to allocate DMAble memory
+for remote processor.
 
-Important limitations of Broadcom SBA RAID hardware are:
-1. Requires disk position instead of disk coefficient 
-2. Supports only 30 PQ disk coefficients
+Signed-off-by: Anup Patel <anup.patel@broadcom.com>
+Reviewed-by: Scott Branden <scott.branden@broadcom.com>
+Reviewed-by: Ray Jui <ray.jui@broadcom.com>
+---
+ drivers/mailbox/mailbox.c      | 21 +++++++++++++++++++++
+ include/linux/mailbox_client.h |  1 +
+ 2 files changed, 22 insertions(+)
 
-To address limitation #1, we have added raid_gflog table which
-will help driver convert disk coefficient to disk position. To
-address limitation #2, we have extended Linux Async Tx APIs to
-check for available PQ coefficients before doing PQ offload.
-
-This patchset is based on Linux-4.10-rc6 and depends on patchset
-"[PATCH v4 0/2] Broadcom FlexRM ring manager support"
-
-It is also available at sba-raid-v1 branch of
-https://github.com/Broadcom/arm64-linux.git
-
-Anup Patel (6):
-  mailbox: Add new API mbox_channel_device() for clients
-  lib/raid6: Add log-of-2 table for RAID6 HW requiring disk position
-  async_tx: Handle DMA devices having support for fewer PQ coefficients
-  async_tx: Fix DMA_PREP_FENCE usage in do_async_gen_syndrome()
-  dmaengine: Add Broadcom SBA RAID driver
-  dt-bindings: Add DT bindings document for Broadcom SBA RAID driver
-
- .../devicetree/bindings/dma/brcm,iproc-sba.txt     |   29 +
- crypto/async_tx/async_pq.c                         |    8 +-
- crypto/async_tx/async_raid6_recov.c                |   12 +-
- drivers/dma/Kconfig                                |   13 +
- drivers/dma/Makefile                               |    1 +
- drivers/dma/bcm-sba-raid.c                         | 1309 ++++++++++++++++++++
- drivers/mailbox/mailbox.c                          |   21 +
- include/linux/dmaengine.h                          |   19 +
- include/linux/mailbox_client.h                     |    1 +
- include/linux/raid/pq.h                            |    4 +
- lib/raid6/mktables.c                               |   20 +
- 11 files changed, 1432 insertions(+), 5 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/dma/brcm,iproc-sba.txt
- create mode 100644 drivers/dma/bcm-sba-raid.c
-
+diff --git a/drivers/mailbox/mailbox.c b/drivers/mailbox/mailbox.c
+index 4671f8a..d4380fc 100644
+--- a/drivers/mailbox/mailbox.c
++++ b/drivers/mailbox/mailbox.c
+@@ -281,6 +281,27 @@ int mbox_send_message(struct mbox_chan *chan, void *mssg)
+ EXPORT_SYMBOL_GPL(mbox_send_message);
+ 
+ /**
++ * mbox_channel_device - Get device pointer of a mailbox channel.
++ * @chan: Mailbox channel assigned to this client.
++ *
++ * The remote processor can have DMAENGINE capabilities and client
++ * can pass data to be processed via main memory. In such cases,
++ * the client will require struct device pointer of the mailbox
++ * channel to map/unmap/allocate/free DMAble memory.
++ *
++ * Return: Pointer to the struct device of mailbox channel.
++ *	   ERR_PTR on failure.
++ */
++struct device *mbox_channel_device(struct mbox_chan *chan)
++{
++	if (!chan || !chan->cl)
++		return ERR_PTR(-EINVAL);
++
++	return chan->mbox->dev;
++}
++EXPORT_SYMBOL_GPL(mbox_channel_device);
++
++/**
+  * mbox_request_channel - Request a mailbox channel.
+  * @cl: Identity of the client requesting the channel.
+  * @index: Index of mailbox specifier in 'mboxes' property.
+diff --git a/include/linux/mailbox_client.h b/include/linux/mailbox_client.h
+index 4434871..3daffad 100644
+--- a/include/linux/mailbox_client.h
++++ b/include/linux/mailbox_client.h
+@@ -40,6 +40,7 @@ struct mbox_client {
+ 	void (*tx_done)(struct mbox_client *cl, void *mssg, int r);
+ };
+ 
++struct device *mbox_channel_device(struct mbox_chan *chan);
+ struct mbox_chan *mbox_request_channel_byname(struct mbox_client *cl,
+ 					      const char *name);
+ struct mbox_chan *mbox_request_channel(struct mbox_client *cl, int index);
 -- 
 2.7.4
-
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
