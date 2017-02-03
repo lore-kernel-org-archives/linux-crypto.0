@@ -1,60 +1,42 @@
-From: Nitin Kumbhar <nkumbhar@nvidia.com>
-Subject: Re: [PATCH 0/6] Add support for ECDSA algorithm
-Date: Fri, 3 Feb 2017 16:46:50 +0530
-Message-ID: <fd0c8ea7-dd8e-854b-e09a-9859e54735a6@nvidia.com>
-References: <1484912161-5932-1-git-send-email-nkumbhar@nvidia.com>
- <20170123142417.GD19957@gondor.apana.org.au>
- <113d3ef8-ef34-0651-71e7-be09ef55727e@nvidia.com>
- <20170202135721.GA5289@gondor.apana.org.au>
+From: Jassi Brar <jassisinghbrar@gmail.com>
+Subject: Re: [PATCH 1/6] mailbox: Add new API mbox_channel_device() for clients
+Date: Fri, 3 Feb 2017 17:35:42 +0530
+Message-ID: <CABb+yY1yKnFN-6=+xhZzcYrXNBe5eATthwOoHdvDrLmQzpEZ-Q@mail.gmail.com>
+References: <1486010836-25228-1-git-send-email-anup.patel@broadcom.com> <1486010836-25228-2-git-send-email-anup.patel@broadcom.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: <nkumbhar@nvidia.com>, <davem@davemloft.net>,
-        <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from hqemgate15.nvidia.com ([216.228.121.64]:14586 "EHLO
-        hqemgate15.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752514AbdBCLRC (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 3 Feb 2017 06:17:02 -0500
-In-Reply-To: <20170202135721.GA5289@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: Vinod Koul <vinod.koul@intel.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        Jon Mason <jonmason@broadcom.com>,
+        Rob Rice <rob.rice@broadcom.com>,
+        BCM Kernel Feedback <bcm-kernel-feedback-list@broadcom.com>,
+        dmaengine@vger.kernel.org,
+        Devicetree List <devicetree@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org"
+        <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-crypto@vger.kernel.org, linux-raid@vger.kernel.org
+To: Anup Patel <anup.patel@broadcom.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1486010836-25228-2-git-send-email-anup.patel@broadcom.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hello Herbert,
-
-On 2/2/2017 7:27 PM, Herbert Xu wrote:
-> On Thu, Jan 26, 2017 at 11:30:04AM +0530, Nitin Kumbhar wrote:
->>
->> This ECDSA implementation is analogous to the RSA kernel implementation for
->> signature generation / verification. It extends ECC family of algorithms
->> like ECDH to support signature verification using akcipher. This will be
->> used in a way similar to RSA.
+On Thu, Feb 2, 2017 at 10:17 AM, Anup Patel <anup.patel@broadcom.com> wrote:
+> The remote processor can have DMAENGINE capabilities and client
+> can pass data to be processed via main memory. In such cases,
+> the client will require DMAble memory for remote processor.
 >
-> Yes but RSA had an in-kernel user in the form of module signature
-> verification.  We don't add algorithms to the kernel without
-> actual users.  So this patch-set needs to come with an actual
-> in-kernel user of ECDSA.
-
-If this is about ECC in kernel then ECDSA extends ECDH which is from ECC 
-and already part of kernel.
-
-If none of the above are sufficient for now then let these patches come 
-along with a consumer or let kernel add ECDSA based on akcipher as part 
-of a crypto engine.
-
-Nonetheless, how about rest of the vli and ECC patches?
-
-> Thanks,
+> This patch adds new API mbox_channel_device() which can be
+> used by clients to get struct device pointer of underlying
+> mailbox controller. This struct device pointer of mailbox
+> controller can be used by clients to allocate DMAble memory
+> for remote processor.
 >
-
-Regards,
-- Nitin
-
------------------------------------------------------------------------------------
-This email message is for the sole use of the intended recipient(s) and may contain
-confidential information.  Any unauthorized review, use, disclosure or distribution
-is prohibited.  If you are not the intended recipient, please contact the sender by
-reply email and destroy all copies of the original message.
------------------------------------------------------------------------------------
+IIUC, DT already provides a way for what you need.
