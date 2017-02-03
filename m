@@ -1,460 +1,369 @@
 From: Nitin Kumbhar <nkumbhar@nvidia.com>
-Subject: [PATCH v2 5/6] crypto: testmgr: add ECDSA tests
-Date: Fri, 3 Feb 2017 16:42:54 +0530
-Message-ID: <1486120375-13070-6-git-send-email-nkumbhar@nvidia.com>
+Subject: [PATCH v2 6/6] crypto: tcrypt: add ECDSA test modes
+Date: Fri, 3 Feb 2017 16:42:55 +0530
+Message-ID: <1486120375-13070-7-git-send-email-nkumbhar@nvidia.com>
 References: <1486120375-13070-1-git-send-email-nkumbhar@nvidia.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: <linux-crypto@vger.kernel.org>, Nitin Kumbhar <nkumbhar@nvidia.com>
 To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from hqemgate14.nvidia.com ([216.228.121.143]:5642 "EHLO
-        hqemgate14.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752254AbdBCLNJ (ORCPT
+Received: from hqemgate15.nvidia.com ([216.228.121.64]:14399 "EHLO
+        hqemgate15.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752391AbdBCLNL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 3 Feb 2017 06:13:09 -0500
+        Fri, 3 Feb 2017 06:13:11 -0500
 In-Reply-To: <1486120375-13070-1-git-send-email-nkumbhar@nvidia.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Update crypto test manager to include NIST ECDSA
-test vectors and various ECDSA tests. These include
-tests for ECDSA signing, ECDSA sign-verification,
-ECDSA signing and verifying generated signatures and
-invalidation of incorrect signatures.
+Update tcrypt module to include a new ECDSA test
+modes. It includes:
+
+tcrypt.ko mode=560 for ECDSA sign/verify validation.
+tcrypt.ko mode=561 for ECDSA sign/verify op perf in cycles.
+tcrypt.ko mode=561 sec=<seconds> for number of ECDSA sign
+  verify ops in given time.
 
 Signed-off-by: Nitin Kumbhar <nkumbhar@nvidia.com>
 ---
- crypto/testmgr.c |  330 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
- crypto/testmgr.h |  140 +++++++++++++++++++++++
- 2 files changed, 467 insertions(+), 3 deletions(-)
+ crypto/tcrypt.c |  250 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ crypto/tcrypt.h |  122 +++++++++++++++++++++++++++
+ 2 files changed, 368 insertions(+), 4 deletions(-)
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 98eb09782db8..bed448e005b1 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -5,6 +5,7 @@
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index 9a11f3c2bf98..1723c6ef5b4f 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -7,6 +7,7 @@
+  * Copyright (c) 2002 James Morris <jmorris@intercode.com.au>
   * Copyright (c) 2002 Jean-Francois Dive <jef@linuxbe.org>
   * Copyright (c) 2007 Nokia Siemens Networks
-  * Copyright (c) 2008 Herbert Xu <herbert@gondor.apana.org.au>
 + * Copyright (c) 2017 NVIDIA Corporation
   *
   * Updated RFC4106 AES-GCM testing.
   *    Authors: Aidan O'Mahony (aidan.o.mahony@intel.com)
-@@ -2085,6 +2086,314 @@ static int alg_test_kpp(const struct alg_test_desc *desc, const char *driver,
- 	return err;
+@@ -27,6 +28,7 @@
+ #include <crypto/aead.h>
+ #include <crypto/hash.h>
+ #include <crypto/skcipher.h>
++#include <crypto/akcipher.h>
+ #include <linux/err.h>
+ #include <linux/fips.h>
+ #include <linux/init.h>
+@@ -46,10 +48,12 @@
+ #define TVMEMSIZE	4
+ 
+ /*
+-* Used by test_cipher_speed()
+-*/
+-#define ENCRYPT 1
+-#define DECRYPT 0
++ * Used by test_cipher_speed()
++ */
++#define DECRYPT		0
++#define ENCRYPT		1
++#define SIGN		2
++#define VERIFY		3
+ 
+ #define MAX_DIGEST_SIZE		64
+ 
+@@ -996,6 +1000,223 @@ static void test_cipher_speed(const char *algo, int enc, unsigned int secs,
+ 				   false);
  }
  
-+#define ECDSA_TEST_VALID_VERIFY		0
-+#define ECDSA_TEST_INVALID_VERIFY	1
-+#define ECDSA_TEST_SIGN_VERIFY		2
-+#define ECDSA_TEST_SIGN			3
-+
-+static int __do_test_ecdsa_verify(struct crypto_akcipher *tfm,
-+				  struct akcipher_testvec *vec, int test)
++static inline int do_one_akcipher_op(struct akcipher_request *r, int ret)
 +{
-+	struct akcipher_request *req = NULL;
-+	u8 *r_str = NULL, *s_str = NULL;
-+	u8 *m_str = NULL;
-+	struct scatterlist src_tab[3], dst;
-+	struct tcrypt_result result;
-+	unsigned int outbuf_maxlen;
-+	u8 *outbuf = NULL;
-+	unsigned int nbytes;
-+	int err, m_size;
++	if (ret == -EINPROGRESS || ret == -EBUSY) {
++		struct tcrypt_result *tr = r->base.data;
 +
-+	/* Alloc akcipher request */
-+	req = akcipher_request_alloc(tfm, GFP_KERNEL);
-+	if (!req)
-+		return -ENOMEM;
-+
-+	/* Set private key */
-+	err = crypto_akcipher_set_pub_key(tfm, vec->key, vec->key_len);
-+	if (err)
-+		goto error;
-+
-+	/*
-+	 * vec->c always contains k, R and S in that order. All are
-+	 * of same size and are equal to n i.e. the order of
-+	 * an elliptic curve.
-+	 */
-+	nbytes = vec->c_size / 3;
-+
-+	r_str = kzalloc(nbytes, GFP_KERNEL);
-+	s_str = kzalloc(nbytes, GFP_KERNEL);
-+	m_str = kzalloc(vec->m_size, GFP_KERNEL);
-+	if (!r_str || !s_str || !m_str) {
-+		err = -ENOMEM;
-+		goto error;
++		wait_for_completion(&tr->completion);
++		reinit_completion(&tr->completion);
++		ret = tr->err;
 +	}
-+	memcpy(r_str, (u8 *)vec->c + 1 * nbytes, nbytes);
-+	memcpy(s_str, (u8 *)vec->c + 2 * nbytes, nbytes);
-+	memcpy(m_str, vec->m, vec->m_size);
-+
-+	outbuf_maxlen = crypto_akcipher_maxsize(tfm);
-+	if (outbuf_maxlen < 0) {
-+		err = outbuf_maxlen;
-+		goto error;
-+	}
-+	outbuf = kzalloc(outbuf_maxlen, GFP_KERNEL);
-+	if (!outbuf) {
-+		err = -ENOMEM;
-+		goto error;
-+	}
-+
-+	/* Intentionally set m_size to 8 to test invalid hash */
-+	m_size = test == ECDSA_TEST_VALID_VERIFY ? vec->m_size : 8;
-+
-+	/* Set src and dst buffers */
-+	sg_init_table(src_tab, 3);
-+	sg_set_buf(&src_tab[0], m_str, m_size);
-+	sg_set_buf(&src_tab[1], r_str, nbytes);
-+	sg_set_buf(&src_tab[2], s_str, nbytes);
-+	sg_init_one(&dst, outbuf, outbuf_maxlen);
-+
-+	akcipher_request_set_crypt(req, src_tab, &dst,
-+				   vec->m_size + 2 * nbytes, outbuf_maxlen);
-+
-+	/* Set up result callback */
-+	init_completion(&result.completion);
-+	akcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-+				      tcrypt_complete, &result);
-+
-+	/* Run ecdsa verify operation on sig (r,s) */
-+	err = wait_async_op(&result, crypto_akcipher_verify(req));
-+error:
-+	akcipher_request_free(req);
-+	kfree(r_str);
-+	kfree(s_str);
-+	kfree(m_str);
-+	kfree(outbuf);
-+	return err;
++	return ret;
 +}
 +
-+static int do_test_ecdsa_verify(struct crypto_akcipher *tfm,
-+				struct akcipher_testvec *vec)
++static int test_akcipher_jiffies(struct akcipher_request *r, int op, int secs)
 +{
-+	int err;
++	unsigned long start, end;
++	int count, ret;
 +
-+	err = __do_test_ecdsa_verify(tfm, vec, ECDSA_TEST_VALID_VERIFY);
-+	if (err)
-+		pr_err("alg: ecdsa: verify(rs) test failed. err %d\n", err);
++	for (start = jiffies, end = start + secs * HZ, count = 0;
++	     time_before(jiffies, end); count++) {
 +
-+	return err;
-+}
-+
-+static int do_test_ecdsa_invalid_verify(struct crypto_akcipher *tfm,
-+					struct akcipher_testvec *vec)
-+{
-+	int err;
-+
-+	err = __do_test_ecdsa_verify(tfm, vec, ECDSA_TEST_INVALID_VERIFY);
-+	if (err != -EBADMSG) {
-+		pr_err("alg: ecdsa: invalid verify test failed. err %d\n", err);
-+		return err;
-+	}
-+
-+	return 0;
-+}
-+
-+static int __do_test_ecdsa_sign_verify(struct crypto_akcipher *tfm,
-+				       struct akcipher_testvec *vec,
-+				       int test)
-+{
-+	struct akcipher_request *req = NULL;
-+	u8 *r_str = NULL, *s_str = NULL;
-+	u8 *sig_r = NULL, *sig_s = NULL;
-+	u8 *m_str = NULL, *k_str = NULL;
-+	struct scatterlist src_tab[3];
-+	struct scatterlist src, dst;
-+	struct tcrypt_result result;
-+	unsigned int outbuf_maxlen;
-+	void *outbuf = NULL;
-+	unsigned int nbytes;
-+	int err;
-+
-+	/* Alloc akcipher request */
-+	req = akcipher_request_alloc(tfm, GFP_KERNEL);
-+	if (!req)
-+		return -ENOMEM;
-+
-+	/* Set private key */
-+	err = crypto_akcipher_set_priv_key(tfm, vec->key, vec->key_len);
-+	if (err)
-+		goto error;
-+
-+	/* Set pub key */
-+	err = crypto_akcipher_set_pub_key(tfm, vec->key, vec->key_len);
-+	if (err)
-+		goto error;
-+
-+	/*
-+	 * vec->c always contains k, R and S in that order. All are
-+	 * of same size and are equal to n i.e. the order of
-+	 * an elliptic curve.
-+	 */
-+	nbytes = vec->c_size / 3;
-+
-+	k_str = kzalloc(nbytes, GFP_KERNEL);
-+	r_str = kzalloc(nbytes, GFP_KERNEL);
-+	s_str = kzalloc(nbytes, GFP_KERNEL);
-+	m_str = kzalloc(vec->m_size, GFP_KERNEL);
-+	if (!k_str || !r_str || !s_str || !m_str) {
-+		err = -ENOMEM;
-+		goto error;
-+	}
-+	memcpy(k_str, (u8 *)vec->c + 0 * nbytes, nbytes);
-+	memcpy(r_str, (u8 *)vec->c + 1 * nbytes, nbytes);
-+	memcpy(s_str, (u8 *)vec->c + 2 * nbytes, nbytes);
-+	memcpy(m_str, vec->m, vec->m_size);
-+
-+	outbuf_maxlen = crypto_akcipher_maxsize(tfm);
-+	if (outbuf_maxlen < 0) {
-+		err = outbuf_maxlen;
-+		goto error;
-+	}
-+	outbuf = kzalloc(outbuf_maxlen, GFP_KERNEL);
-+	if (!outbuf) {
-+		err = -ENOMEM;
-+		goto error;
-+	}
-+
-+	sg_init_one(&src, m_str, vec->m_size);
-+	sg_init_one(&dst, outbuf, outbuf_maxlen);
-+
-+	akcipher_request_set_crypt(req, &src, &dst,
-+				   vec->m_size, outbuf_maxlen);
-+
-+	/* Set up result callback */
-+	init_completion(&result.completion);
-+	akcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-+				      tcrypt_complete, &result);
-+
-+	/* Set K in request for signing */
-+	if (test == ECDSA_TEST_SIGN)
-+		req->info = k_str;
-+
-+	/* Run ecdsa sign operation on message digest */
-+	err = wait_async_op(&result, crypto_akcipher_sign(req));
-+	if (err)
-+		goto error;
-+
-+	/* verify that signature (r,s) is valid */
-+	if (req->dst_len != 2 * nbytes) {
-+		err = -EINVAL;
-+		goto error;
-+	}
-+
-+	/* outbuf contains r and s */
-+	sig_r = outbuf;
-+	sig_s = (u8 *)outbuf + nbytes;
-+
-+	if (test == ECDSA_TEST_SIGN) {
-+		/* compare r & s */
-+		if (memcmp(r_str, sig_r, nbytes) ||
-+		    memcmp(s_str, sig_s, nbytes)) {
-+			err = -EINVAL;
-+			goto error;
++		switch (op) {
++		case SIGN:
++			ret = do_one_akcipher_op(r, crypto_akcipher_sign(r));
++			break;
++		case VERIFY:
++			ret = do_one_akcipher_op(r, crypto_akcipher_verify(r));
++			break;
++		default:
++			ret = -EINVAL;
++			break;
 +		}
-+	} else {
-+		/* Set src and dst buffers */
-+		sg_init_table(src_tab, 3);
-+		sg_set_buf(&src_tab[0], m_str, vec->m_size);
-+		sg_set_buf(&src_tab[1], sig_r, nbytes);
-+		sg_set_buf(&src_tab[2], sig_s, nbytes);
-+		sg_init_one(&dst, outbuf, outbuf_maxlen);
-+
-+		akcipher_request_set_crypt(req, src_tab, &dst,
-+					   vec->m_size + 2 * nbytes,
-+					   outbuf_maxlen);
-+
-+		/* Set up result callback */
-+		init_completion(&result.completion);
-+		akcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-+					      tcrypt_complete, &result);
-+
-+		/* Run ecdsa verify operation on sig (r,s) */
-+		err = wait_async_op(&result, crypto_akcipher_verify(req));
-+		if (err)
-+			goto error;
++		if (ret)
++			return ret;
 +	}
 +
-+error:
-+	akcipher_request_free(req);
-+	kfree(k_str);
-+	kfree(r_str);
-+	kfree(s_str);
-+	kfree(m_str);
-+	kfree(outbuf);
-+	return err;
-+}
-+
-+static int do_test_ecdsa_sign_verify(struct crypto_akcipher *tfm,
-+				     struct akcipher_testvec *vec)
-+{
-+	int err;
-+
-+	err = __do_test_ecdsa_sign_verify(tfm, vec, ECDSA_TEST_SIGN_VERIFY);
-+	if (err)
-+		pr_err("alg: ecdsa: sign/verify test failed. err %d\n", err);
-+
-+	return err;
-+}
-+
-+static int do_test_ecdsa_sign(struct crypto_akcipher *tfm,
-+			      struct akcipher_testvec *vec)
-+{
-+	int err;
-+
-+	err = __do_test_ecdsa_sign_verify(tfm, vec, ECDSA_TEST_SIGN);
-+	if (err)
-+		pr_err("alg: ecdsa: sign test failed. err %d\n", err);
-+
-+	return err;
-+}
-+
-+static int test_ecdsa_akcipher(struct crypto_akcipher *tfm, const char *alg,
-+		       struct akcipher_testvec *vecs, unsigned int tcount)
-+{
-+	int i, err = 0;
-+
-+	for (i = 0; i < tcount; i++) {
-+		err = do_test_ecdsa_verify(tfm, &vecs[i]);
-+		if (!err)
-+			continue;
-+
-+		return err;
-+	}
-+
-+	for (i = 0; i < tcount; i++) {
-+		err = do_test_ecdsa_invalid_verify(tfm, &vecs[i]);
-+		if (!err)
-+			continue;
-+
-+		return err;
-+	}
-+
-+	for (i = 0; i < tcount; i++) {
-+		err = do_test_ecdsa_sign_verify(tfm, &vecs[i]);
-+		if (!err)
-+			continue;
-+
-+		return err;
-+	}
-+
-+	for (i = 0; i < tcount; i++) {
-+		err = do_test_ecdsa_sign(tfm, &vecs[i]);
-+		if (!err)
-+			continue;
-+
-+		return err;
-+	}
-+
++	pr_info("%d operations in %d seconds\n", count, secs);
 +	return 0;
 +}
 +
- static int test_akcipher_one(struct crypto_akcipher *tfm,
- 			     struct akcipher_testvec *vecs)
- {
-@@ -2236,9 +2545,17 @@ static int alg_test_akcipher(const struct alg_test_desc *desc,
- 		       driver, PTR_ERR(tfm));
- 		return PTR_ERR(tfm);
- 	}
--	if (desc->suite.akcipher.vecs)
--		err = test_akcipher(tfm, desc->alg, desc->suite.akcipher.vecs,
--				    desc->suite.akcipher.count);
++static int test_akcipher_cycles(struct akcipher_request *r, int op)
++{
++	unsigned long cycles = 0;
++	int ret = 0;
++	int i;
 +
-+	if (desc->suite.akcipher.vecs) {
-+		if (strncmp(desc->alg, "ecdsa", 5) == 0)
-+			err = test_ecdsa_akcipher(tfm, desc->alg,
-+						  desc->suite.akcipher.vecs,
-+						  desc->suite.akcipher.count);
++	/* Warm-up run. */
++	for (i = 0; i < 4; i++) {
++		switch (op) {
++		case SIGN:
++			ret = do_one_akcipher_op(r, crypto_akcipher_sign(r));
++			break;
++		case VERIFY:
++			ret = do_one_akcipher_op(r, crypto_akcipher_verify(r));
++			break;
++		default:
++			ret = -EINVAL;
++			break;
++		}
++		if (ret)
++			goto out;
++	}
++
++	/* The real thing. */
++	for (i = 0; i < 8; i++) {
++		cycles_t start, end;
++
++		start = get_cycles();
++		switch (op) {
++		case SIGN:
++			ret = do_one_akcipher_op(r, crypto_akcipher_sign(r));
++			break;
++		case VERIFY:
++			ret = do_one_akcipher_op(r, crypto_akcipher_verify(r));
++			break;
++		default:
++			ret = -EINVAL;
++			break;
++		}
++		end = get_cycles();
++
++		if (ret)
++			goto out;
++
++		cycles += end - start;
++	}
++out:
++	if (ret == 0)
++		pr_info("1 operation in %lu cycles\n", (cycles + 4) / 8);
++
++	return ret;
++}
++
++static void test_akcipher_speed(const char *algo, int op, unsigned int secs,
++				struct akcipher_speed_template *template,
++				unsigned int tcount, u8 *keysize)
++{
++	unsigned int ret, i, j;
++	struct tcrypt_result tresult;
++	const char *key;
++	struct akcipher_request *req;
++	struct crypto_akcipher *tfm;
++	unsigned int m_size = 0;
++	unsigned int nbytes = 0;
++	const char *o;
++
++	if (op == SIGN)
++		o = "sign";
++	else if (op == VERIFY)
++		o = "verify";
++	else
++		return;
++
++	tfm = crypto_alloc_akcipher(algo, 0, 0);
++	if (IS_ERR(tfm)) {
++		pr_err("failed to load transform for %s: %ld\n", algo,
++		       PTR_ERR(tfm));
++		return;
++	}
++
++	req = akcipher_request_alloc(tfm, GFP_KERNEL);
++	if (!req) {
++		pr_err("tcrypt: akcipher: Failed to allocate request for %s\n",
++		       algo);
++		goto out;
++	}
++
++	init_completion(&tresult.completion);
++	akcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
++				      tcrypt_complete, &tresult);
++
++	i = 0;
++	do {
++		struct scatterlist sg[TVMEMSIZE];
++
++		memset(tvmem[0], 0xff, PAGE_SIZE);
++
++		/* set key */
++		key = tvmem[0];
++		for (j = 0; j < tcount; j++) {
++			if (template[j].key_len == *keysize) {
++				key = template[j].key;
++				break;
++			}
++		}
++
++		ret = crypto_akcipher_set_pub_key(tfm, key, *keysize);
++		if (ret) {
++			pr_err("set_pub_key() failed\n");
++			goto out_free_req;
++		}
++
++		ret = crypto_akcipher_set_priv_key(tfm, key, *keysize);
++		if (ret) {
++			pr_err("set_priv_key() failed\n");
++			goto out_free_req;
++		}
++
++		/* set up src/dst buffs */
++		sg_init_table(sg, TVMEMSIZE);
++		if (op == SIGN) {
++			m_size = template[j].m_size;
++			nbytes = template[j].c_size / 3;
++
++			memcpy(tvmem[0], template[j].m, m_size);
++
++			sg_set_buf(&sg[0], tvmem[0], m_size);
++			akcipher_request_set_crypt(req, sg, sg,
++						   m_size, PAGE_SIZE);
++		} else if (op == VERIFY) {
++			m_size = template[j].m_size;
++			nbytes = template[j].c_size / 3;
++
++			memcpy(tvmem[0], template[j].m, m_size);
++			memcpy(tvmem[1], (u8 *)(template[j].c) + nbytes,
++			       nbytes);
++			memcpy(tvmem[2], (u8 *)(template[j].c) + 2 * nbytes,
++			       nbytes);
++
++			sg_set_buf(&sg[0], tvmem[0], m_size);
++			sg_set_buf(&sg[1], tvmem[1], nbytes);
++			sg_set_buf(&sg[2], tvmem[2], nbytes);
++
++			akcipher_request_set_crypt(req, sg, sg,
++						   m_size + 2 * nbytes,
++						   PAGE_SIZE);
++		} else {
++			pr_err("invalid op\n");
++			ret = -EINVAL;
++			goto out_free_req;
++		}
++
++
++		pr_info("\ntesting speed of %s (%s) %s with keysize %d\n",
++			algo, get_driver_name(crypto_akcipher, tfm), o,
++			nbytes * 8);
++
++		if (secs)
++			ret = test_akcipher_jiffies(req, op, secs);
 +		else
-+			err = test_akcipher(tfm, desc->alg,
-+					    desc->suite.akcipher.vecs,
-+					    desc->suite.akcipher.count);
-+	}
- 
- 	crypto_free_akcipher(tfm);
- 	return err;
-@@ -2982,6 +3299,13 @@ static int alg_test_null(const struct alg_test_desc *desc,
- 			.kpp = __VECS(ecdh_tv_template)
- 		}
- 	}, {
-+		.alg = "ecdsa",
-+		.test = alg_test_akcipher,
-+		.fips_allowed = 1,
-+		.suite = {
-+			.akcipher = __VECS(ecdsa_tv_template)
++			ret = test_akcipher_cycles(req, op);
++
++		if (ret) {
++			pr_err("%s() failed\n", o);
++			break;
 +		}
-+	}, {
- 		.alg = "gcm(aes)",
- 		.test = alg_test_aead,
- 		.fips_allowed = 1,
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 64595f067d72..00bb57f4707a 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -5,6 +5,7 @@
++
++		i++;
++		keysize++;
++
++	} while (*keysize);
++
++out_free_req:
++	akcipher_request_free(req);
++out:
++	crypto_free_akcipher(tfm);
++}
++
+ static void test_available(void)
+ {
+ 	char **name = check;
+@@ -2039,6 +2260,27 @@ static int do_test(const char *alg, u32 type, u32 mask, int m)
+ 				   speed_template_8_32);
+ 		break;
+ 
++	case 560:
++		ret += tcrypt_test("ecdsa");
++		break;
++
++	case 561:
++#ifndef CONFIG_CRYPTO_FIPS
++		test_akcipher_speed("ecdsa", SIGN, sec,
++				    ecdsa_speed_template, ECDSA_SPEED_VECTORS,
++				    akc_speed_template_P192);
++		test_akcipher_speed("ecdsa", VERIFY, sec,
++				    ecdsa_speed_template, ECDSA_SPEED_VECTORS,
++				    akc_speed_template_P192);
++#endif
++		test_akcipher_speed("ecdsa", SIGN, sec,
++				    ecdsa_speed_template, ECDSA_SPEED_VECTORS,
++				    akc_speed_template_P256);
++		test_akcipher_speed("ecdsa", VERIFY, sec,
++				    ecdsa_speed_template, ECDSA_SPEED_VECTORS,
++				    akc_speed_template_P256);
++		break;
++
+ 	case 1000:
+ 		test_available();
+ 		break;
+diff --git a/crypto/tcrypt.h b/crypto/tcrypt.h
+index f0bfee1bb293..bd6a4b1cbcbe 100644
+--- a/crypto/tcrypt.h
++++ b/crypto/tcrypt.h
+@@ -7,6 +7,7 @@
+  * Copyright (c) 2002 James Morris <jmorris@intercode.com.au>
   * Copyright (c) 2002 Jean-Francois Dive <jef@linuxbe.org>
   * Copyright (c) 2007 Nokia Siemens Networks
-  * Copyright (c) 2008 Herbert Xu <herbert@gondor.apana.org.au>
 + * Copyright (c) 2017 NVIDIA Corporation
   *
-  * Updated RFC4106 AES-GCM testing. Some test vectors were taken from
-  * http://csrc.nist.gov/groups/ST/toolkit/BCM/documents/proposedmodes/
-@@ -755,6 +756,145 @@ struct kpp_testvec dh_tv_template[] = {
- 	}
+  * This program is free software; you can redistribute it and/or modify it
+  * under the terms of the GNU General Public License as published by the Free
+@@ -17,6 +18,16 @@
+ #ifndef _CRYPTO_TCRYPT_H
+ #define _CRYPTO_TCRYPT_H
+ 
++struct akcipher_speed_template {
++	unsigned char *key;
++	unsigned char *m;
++	unsigned char *c;
++	unsigned int key_len;
++	unsigned int m_size;
++	unsigned int c_size;
++	bool public_key_vec;
++};
++
+ struct cipher_speed_template {
+ 	const char *key;
+ 	unsigned int klen;
+@@ -48,6 +59,117 @@ struct hash_speed {
  };
  
-+/*
-+ * ECDSA NIST test vectors from SigGenComponent.txt file from
-+ * 186-3ecdsasiggencomponenttestvectors.zip for P-192 and P-256
-+ * elliptic curves.
+ /*
++ * ECDSA test vectors.
 + */
-+static struct akcipher_testvec ecdsa_tv_template[] = {
++#ifdef CONFIG_CRYPTO_FIPS
++#define ECDSA_SPEED_VECTORS	1
++#else
++#define ECDSA_SPEED_VECTORS	2
++#endif
++
++static struct akcipher_speed_template ecdsa_speed_template[] = {
 +	{
 +#ifndef CONFIG_CRYPTO_FIPS
-+		/* [P-192,SHA-1] */
-+		.m =
-+		/* Msg / Hash */
-+		"\x92\x5b\xd6\xf4\x1c\x55\xbe\x3e"
-+		"\x49\xb7\x16\xe6\x1d\x42\x12\x3f"
-+		"\x42\x79\x80\x60",
-+		.m_size = 20,
-+		.key =
-+		/* version */
-+		"\x01"
-+		/* curve_id */
-+		"\x01"
-+		/* d */
-+		"\xf3\xd7\x60\xd6\x75\xf2\xcc\xeb"
-+		"\xf0\xd2\xfd\xb3\xb9\x41\x3f\xb0"
-+		"\xf8\x4f\x37\xd1\xb3\x37\x4f\xe1"
-+		/* Qx */
-+		"\xe6\x98\xcf\x5b\x2d\x2d\x98\x94"
-+		"\x4c\x49\xa2\x80\x6e\x09\x32\x64"
-+		"\xe7\xdb\x08\x0b\xa4\x8e\x00\x07"
-+		/* Qy */
-+		"\x77\x54\xd6\xe4\xf2\xd7\x1b\xc4"
-+		"\x98\x6d\xe2\x5d\x21\xba\x36\xa6"
-+		"\x4e\x41\x0b\xd0\x81\xb6\xfa\x76",
-+		.key_len = 74,
-+		.c =
-+		/* k */
-+		"\x25\x5f\x68\x89\xa2\x31\xbc\x57"
-+		"\x4d\x15\xc4\x12\xfb\x56\x45\x68"
-+		"\x83\x07\xa1\x43\x70\xbc\x0a\xcb"
-+		/* R */
-+		"\x3e\xa6\x58\x62\xb4\x98\x96\x1a"
-+		"\xf9\xf2\x5b\xec\x55\xf8\xdd\xff"
-+		"\x93\xd7\xd0\xbd\x62\xd9\x94\x69"
-+		/* S */
-+		"\x41\x9f\x1a\x0e\xc0\x5f\xcf\x73"
-+		"\x5b\x40\x21\x85\xbc\x02\xab\x44"
-+		"\x37\x90\x34\xa2\x65\x64\xba\x02",
-+		.c_size = 72,
-+	}, {
 +		/* [P-192,SHA-256] */
 +		.m =
 +		/* Msg / Hash */
@@ -546,8 +455,17 @@ index 64595f067d72..00bb57f4707a 100644
 +	},
 +};
 +
- struct kpp_testvec ecdh_tv_template[] = {
- 	{
- #ifndef CONFIG_CRYPTO_FIPS
++/*
++ * AKCipher speed tests
++ */
++#ifndef CONFIG_CRYPTO_FIPS
++static u8 akc_speed_template_P192[] = {74, 0};
++#endif
++static u8 akc_speed_template_P256[] = {98, 0};
++
++/*
+  * Cipher speed tests
+  */
+ static u8 speed_template_8[] = {8, 0};
 -- 
 1.7.6.3
