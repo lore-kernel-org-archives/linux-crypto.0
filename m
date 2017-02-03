@@ -1,8 +1,10 @@
 From: Rob Rice <rob.rice@broadcom.com>
-Subject: [PATCH v4 0/3] Add Broadcom SPU Crypto Driver
-Date: Fri,  3 Feb 2017 12:55:31 -0500
-Message-ID: <1486144534-44887-1-git-send-email-rob.rice@broadcom.com>
-Cc: Rob Rice <rob.rice@broadcom.com>
+Subject: [PATCH v4 3/3] arm64: dts: ns2: Add Broadcom SPU driver DT entry.
+Date: Fri,  3 Feb 2017 12:55:34 -0500
+Message-ID: <1486144534-44887-4-git-send-email-rob.rice@broadcom.com>
+References: <1486144534-44887-1-git-send-email-rob.rice@broadcom.com>
+Cc: Rob Rice <rob.rice@broadcom.com>,
+        Steve Lin <steven.lin1@broadcom.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         Rob Herring <robh+dt@kernel.org>,
@@ -14,70 +16,74 @@ To: Herbert Xu <herbert@gondor.apana.org.au>,
         Will Deacon <will.deacon@arm.com>,
         linux-arm-kernel@lists.infradead.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1486144534-44887-1-git-send-email-rob.rice@broadcom.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Changes in v4:
-- Added Rob Herring's Acked-by to patch 1/3 for bindings doc
-- In response to Herbert's comment, in ahash_export() and 
-  ahash_import(), only copy the hash state, not state params
-  related to cipher or aead algos. 
-- Noticed that hmac_offset in iproc_reqctx_s and spu_hash_params
-  wasn't really used. So removed.
+Add Northstar2 device tree entry for Broadcom Secure Processing
+Unit (SPU) crypto hardware.
 
-Changes in v3:
-- rebase to 4.10-rc3 in cryptodev-2.6 tree
-- in bindings doc, list all valid compatibility strings
-- rename DT nodes "crypto" rather than "spu-crypto"
-- include a separate DT node for each SPU hardware block. Previously,
- there was a single SPU node listing a register range for each
- hw block.
-- select hash algos in Kconfig. Driver HMAC implementation uses hash
- sw algos for inner and outer hashes.
-- Fix crash for AES CCM decrypt when AAD and data are both empty
+Signed-off-by: Steve Lin <steven.lin1@broadcom.com>
+Signed-off-by: Rob Rice <rob.rice@broadcom.com>
+---
+ arch/arm64/boot/dts/broadcom/ns2.dtsi | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-Change in v2:
-- select CRYPTO_DES in Kconfig
-
-The Broadcom SPU crypto driver provides access to SPU hardware
-for symmetric crypto offload. The driver supports ablkcipher,
-ahash, and aead operations. The driver supports several
-Broadcom SoCs with different revisions of the SPU hardware.
-The driver supports SPU-M and SPU2 hardware revisions, and
-a couple versions of each hw revision, each version with minor
-differences.
-
-Rob Rice (3):
-  crypto: brcm: DT documentation for Broadcom SPU hardware
-  crypto: brcm: Add Broadcom SPU driver
-  arm64: dts: ns2: Add Broadcom SPU driver DT entry.
-
- .../devicetree/bindings/crypto/brcm,spu-crypto.txt |   22 +
- arch/arm64/boot/dts/broadcom/ns2.dtsi              |   24 +
- drivers/crypto/Kconfig                             |   15 +
- drivers/crypto/Makefile                            |    2 +
- drivers/crypto/bcm/Makefile                        |   15 +
- drivers/crypto/bcm/cipher.c                        | 4964 ++++++++++++++++++++
- drivers/crypto/bcm/cipher.h                        |  483 ++
- drivers/crypto/bcm/spu.c                           | 1251 +++++
- drivers/crypto/bcm/spu.h                           |  287 ++
- drivers/crypto/bcm/spu2.c                          | 1401 ++++++
- drivers/crypto/bcm/spu2.h                          |  228 +
- drivers/crypto/bcm/spum.h                          |  174 +
- drivers/crypto/bcm/util.c                          |  581 +++
- drivers/crypto/bcm/util.h                          |  116 +
- 14 files changed, 9563 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/crypto/brcm,spu-crypto.txt
- create mode 100644 drivers/crypto/bcm/Makefile
- create mode 100644 drivers/crypto/bcm/cipher.c
- create mode 100644 drivers/crypto/bcm/cipher.h
- create mode 100644 drivers/crypto/bcm/spu.c
- create mode 100644 drivers/crypto/bcm/spu.h
- create mode 100644 drivers/crypto/bcm/spu2.c
- create mode 100644 drivers/crypto/bcm/spu2.h
- create mode 100644 drivers/crypto/bcm/spum.h
- create mode 100644 drivers/crypto/bcm/util.c
- create mode 100644 drivers/crypto/bcm/util.h
-
+diff --git a/arch/arm64/boot/dts/broadcom/ns2.dtsi b/arch/arm64/boot/dts/broadcom/ns2.dtsi
+index 4fcdeca..ec1a628 100644
+--- a/arch/arm64/boot/dts/broadcom/ns2.dtsi
++++ b/arch/arm64/boot/dts/broadcom/ns2.dtsi
+@@ -218,6 +218,12 @@
+ 			brcm,use-bcm-hdr;
+ 		};
+ 
++		crypto0: crypto@612d0000 {
++			compatible = "brcm,spum-crypto";
++			reg = <0x612d0000 0x900>;
++			mboxes = <&pdc0 0>;
++		};
++
+ 		pdc1: iproc-pdc1@612e0000 {
+ 			compatible = "brcm,iproc-pdc-mbox";
+ 			reg = <0x612e0000 0x445>;  /* PDC FS1 regs */
+@@ -227,6 +233,12 @@
+ 			brcm,use-bcm-hdr;
+ 		};
+ 
++		crypto1: crypto@612f0000 {
++			compatible = "brcm,spum-crypto";
++			reg = <0x612f0000 0x900>;
++			mboxes = <&pdc1 0>;
++		};
++
+ 		pdc2: iproc-pdc2@61300000 {
+ 			compatible = "brcm,iproc-pdc-mbox";
+ 			reg = <0x61300000 0x445>;  /* PDC FS2 regs */
+@@ -236,6 +248,12 @@
+ 			brcm,use-bcm-hdr;
+ 		};
+ 
++		crypto2: crypto@61310000 {
++			compatible = "brcm,spum-crypto";
++			reg = <0x61310000 0x900>;
++			mboxes = <&pdc2 0>;
++		};
++
+ 		pdc3: iproc-pdc3@61320000 {
+ 			compatible = "brcm,iproc-pdc-mbox";
+ 			reg = <0x61320000 0x445>;  /* PDC FS3 regs */
+@@ -245,6 +263,12 @@
+ 			brcm,use-bcm-hdr;
+ 		};
+ 
++		crypto3: crypto@61330000 {
++			compatible = "brcm,spum-crypto";
++			reg = <0x61330000 0x900>;
++			mboxes = <&pdc3 0>;
++		};
++
+ 		dma0: dma@61360000 {
+ 			compatible = "arm,pl330", "arm,primecell";
+ 			reg = <0x61360000 0x1000>;
 -- 
 2.1.0
