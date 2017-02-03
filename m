@@ -1,527 +1,688 @@
 From: Nitin Kumbhar <nkumbhar@nvidia.com>
-Subject: [PATCH v2 3/6] crypto: ecc: export vli and ecc ops
-Date: Fri, 3 Feb 2017 16:42:52 +0530
-Message-ID: <1486120375-13070-4-git-send-email-nkumbhar@nvidia.com>
+Subject: [PATCH v2 4/6] crypto: ecdsa: add ECDSA SW implementation
+Date: Fri, 3 Feb 2017 16:42:53 +0530
+Message-ID: <1486120375-13070-5-git-send-email-nkumbhar@nvidia.com>
 References: <1486120375-13070-1-git-send-email-nkumbhar@nvidia.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: <linux-crypto@vger.kernel.org>, Nitin Kumbhar <nkumbhar@nvidia.com>
 To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from hqemgate14.nvidia.com ([216.228.121.143]:5638 "EHLO
-        hqemgate14.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752253AbdBCLNF (ORCPT
+Received: from hqemgate16.nvidia.com ([216.228.121.65]:17674 "EHLO
+        hqemgate16.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752263AbdBCLNH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 3 Feb 2017 06:13:05 -0500
+        Fri, 3 Feb 2017 06:13:07 -0500
 In-Reply-To: <1486120375-13070-1-git-send-email-nkumbhar@nvidia.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Export vli and ECC related functions so that these can
-be used by all ECC algorithm modules like ECDH, ECDSA and ECIES.
+This adds support for ECDSA algorithm. This implementation supports
+sign and verify functions for ECDSA algorithm using akcipher. As ECDSA
+is a signing algorithm dummy functions are added for encrypt() and
+decrypt().
+
+Helper routines for parsing public and private ECC keys for ECDSA are
+added as well.
 
 Signed-off-by: Nitin Kumbhar <nkumbhar@nvidia.com>
 ---
- crypto/ecc.c |  115 +++++++++++++++++++++++++++++++++++++---------------------
- crypto/ecc.h |   56 ++++++++++++++++++++++++++++
- 2 files changed, 130 insertions(+), 41 deletions(-)
+ crypto/Kconfig            |    7 +
+ crypto/Makefile           |    3 +
+ crypto/ecdsa.c            |  362 +++++++++++++++++++++++++++++++++++++++++++++
+ crypto/ecdsa_helper.c     |  116 +++++++++++++++
+ include/crypto/akcipher.h |    5 +-
+ include/crypto/ecdsa.h    |   81 ++++++++++
+ 6 files changed, 573 insertions(+), 1 deletions(-)
+ create mode 100644 crypto/ecdsa.c
+ create mode 100644 crypto/ecdsa_helper.c
+ create mode 100644 include/crypto/ecdsa.h
 
-diff --git a/crypto/ecc.c b/crypto/ecc.c
-index 1b8e8d248859..04aaa5b37aa6 100644
---- a/crypto/ecc.c
-+++ b/crypto/ecc.c
-@@ -77,7 +77,7 @@
- 	.n = nist_p256_n
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index e240075d6f46..1c5c236b3bbc 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -140,6 +140,13 @@ config CRYPTO_ECDH
+ 	help
+ 	  Generic implementation of the ECDH algorithm
+ 
++config CRYPTO_ECDSA
++	tristate "ECDSA algorithm"
++	select CRYPTO_AKCIPHER
++	select CRYPTO_ECC
++	help
++	  Generic implementation of the ECDSA algorithm
++
+ config CRYPTO_MANAGER
+ 	tristate "Cryptographic algorithm manager"
+ 	select CRYPTO_MANAGER2
+diff --git a/crypto/Makefile b/crypto/Makefile
+index 827740a47a37..9c13eb2ade6a 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -38,6 +38,9 @@ obj-$(CONFIG_CRYPTO_ECC) += ecc.o
+ ecdh_generic-y := ecdh.o
+ ecdh_generic-y += ecdh_helper.o
+ obj-$(CONFIG_CRYPTO_ECDH) += ecdh_generic.o
++ecdsa_generic-y := ecdsa.o
++ecdsa_generic-y += ecdsa_helper.o
++obj-$(CONFIG_CRYPTO_ECDSA) += ecdsa_generic.o
+ 
+ $(obj)/rsapubkey-asn1.o: $(obj)/rsapubkey-asn1.c $(obj)/rsapubkey-asn1.h
+ $(obj)/rsaprivkey-asn1.o: $(obj)/rsaprivkey-asn1.c $(obj)/rsaprivkey-asn1.h
+diff --git a/crypto/ecdsa.c b/crypto/ecdsa.c
+new file mode 100644
+index 000000000000..178528ec65d2
+--- /dev/null
++++ b/crypto/ecdsa.c
+@@ -0,0 +1,362 @@
++/*
++ * ECDSA generic algorithm
++ *
++ * Copyright (c) 2017, NVIDIA Corporation. All Rights Reserved.
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the Free
++ * Software Foundation; either version 2 of the License, or (at your option)
++ * any later version.
++ *
++ */
++
++#include <linux/module.h>
++#include <linux/scatterlist.h>
++#include <crypto/rng.h>
++#include <crypto/internal/akcipher.h>
++#include <crypto/akcipher.h>
++#include <crypto/ecdsa.h>
++
++#include "ecc.h"
++
++struct ecdsa_ctx {
++	unsigned int curve_id;
++	unsigned int ndigits;
++	u64 private_key[ECC_MAX_DIGITS];
++	u64 public_key[2 * ECC_MAX_DIGITS];
++};
++
++static inline struct ecdsa_ctx *ecdsa_get_ctx(struct crypto_akcipher *tfm)
++{
++	return akcipher_tfm_ctx(tfm);
++}
++
++static void ecdsa_parse_msg_hash(struct akcipher_request *req, u64 *msg,
++				 unsigned int ndigits)
++{
++	unsigned int nbytes = ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
++	unsigned int hash_len, hash_off;
++	unsigned char *hash, *msg_ptr;
++	int i;
++
++	/*
++	 * If hash_len == nbytes:
++	 *	copy nbytes from req
++	 * If hash_len > nbytes:
++	 *	copy left most nbytes from hash ignoring LSBs
++	 * If hash_len < nbytes:
++	 *	copy hash_len from req and zero remaining bytes
++	 *	(nbytes - hash_len)
++	 */
++	hash_len = req->src[0].length;
++	hash_off = hash_len <= nbytes ? 0 : hash_len - nbytes;
++
++	msg_ptr = (unsigned char *)msg;
++	hash = sg_virt(&req->src[0]);
++
++	for (i = hash_off; i < hash_len; i++)
++		*msg_ptr++ = hash[i];
++	for (; i < nbytes; i++)
++		*msg_ptr++ = 0;
++}
++
++static int ecdsa_get_rnd_bytes(u8 *rdata, unsigned int dlen)
++{
++	int err;
++
++	err = crypto_get_default_rng();
++	if (err)
++		return err;
++
++	err = crypto_rng_get_bytes(crypto_default_rng, rdata, dlen);
++	crypto_put_default_rng();
++	return err;
++}
++
++int ecdsa_sign(struct akcipher_request *req)
++{
++	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
++	struct ecdsa_ctx *ctx = ecdsa_get_ctx(tfm);
++	unsigned int ndigits = ctx->ndigits;
++	unsigned int nbytes = ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
++	unsigned int curve_id = ctx->curve_id;
++	const struct ecc_curve *curve = ecc_get_curve(curve_id);
++	struct ecc_point *x1y1 = NULL;
++	u64 z[ndigits], d[ndigits];
++	u64 k[ndigits], k_inv[ndigits];
++	u64 r[ndigits], s[ndigits];
++	u64 dr[ndigits], zdr[ndigits];
++	u8 *r_ptr, *s_ptr;
++	int err;
++
++	if (req->dst_len < 2 * nbytes) {
++		req->dst_len = 2 * nbytes;
++		return -EINVAL;
++	}
++
++	if (!curve)
++		return -EINVAL;
++
++	ecdsa_parse_msg_hash(req, z, ndigits);
++
++	/* d */
++	vli_set(d, (const u64 *)ctx->private_key, ndigits);
++
++	/* k */
++	err = ecdsa_get_rnd_bytes((u8 *)k, nbytes);
++	if (err)
++		return err;
++
++#if defined(CONFIG_CRYPTO_MANAGER2)
++	if (req->info)
++		vli_copy_from_buf(k, ndigits, req->info, nbytes);
++#endif
++
++	x1y1 = ecc_alloc_point(ndigits);
++	if (!x1y1)
++		return -ENOMEM;
++
++	/* (x1, y1) = k x G */
++	ecc_point_mult(x1y1, &curve->g, k, NULL, curve->p, ndigits);
++
++	/* r = x1 mod n */
++	vli_mod(r, x1y1->x, curve->n, ndigits);
++
++	/* k^-1 */
++	vli_mod_inv(k_inv, k, curve->n, ndigits);
++
++	/* d . r mod n */
++	vli_mod_mult(dr, d, r, curve->n, ndigits);
++
++	/* z + dr mod n */
++	vli_mod_add(zdr, z, dr, curve->n, ndigits);
++
++	/* k^-1 . ( z + dr) mod n */
++	vli_mod_mult(s, k_inv, zdr, curve->n, ndigits);
++
++	/* write signature (r,s) in dst */
++	r_ptr = sg_virt(req->dst);
++	s_ptr = (u8 *)sg_virt(req->dst) + nbytes;
++
++	vli_copy_to_buf(r_ptr, nbytes, r, ndigits);
++	vli_copy_to_buf(s_ptr, nbytes, s, ndigits);
++
++	req->dst_len = 2 * nbytes;
++
++	ecc_free_point(x1y1);
++	return 0;
++}
++
++int ecdsa_verify(struct akcipher_request *req)
++{
++	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
++	struct ecdsa_ctx *ctx = ecdsa_get_ctx(tfm);
++	unsigned int ndigits = ctx->ndigits;
++	unsigned int nbytes = ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
++	unsigned int curve_id = ctx->curve_id;
++	const struct ecc_curve *curve = ecc_get_curve(curve_id);
++	struct ecc_point *x1y1 = NULL, *x2y2 = NULL, *Q = NULL;
++	u64 r[ndigits], s[ndigits], v[ndigits];
++	u64 z[ndigits], w[ndigits];
++	u64 u1[ndigits], u2[ndigits];
++	u64 x1[ndigits], x2[ndigits];
++	u64 y1[ndigits], y2[ndigits];
++	u64 *ctx_qx, *ctx_qy;
++	int ret;
++
++	if (!curve)
++		return -EINVAL;
++
++	x1y1 = ecc_alloc_point(ndigits);
++	x2y2 = ecc_alloc_point(ndigits);
++	Q = ecc_alloc_point(ndigits);
++	if (!x1y1 || !x2y2 || !Q) {
++		ret = -ENOMEM;
++		goto exit;
++	}
++
++	ecdsa_parse_msg_hash(req, z, ndigits);
++
++	/* Signature r,s */
++	vli_copy_from_buf(r, ndigits, sg_virt(&req->src[1]), nbytes);
++	vli_copy_from_buf(s, ndigits, sg_virt(&req->src[2]), nbytes);
++
++	/* w = s^-1 mod n */
++	vli_mod_inv(w, s, curve->n, ndigits);
++
++	/* u1 = zw mod n */
++	vli_mod_mult(u1, z, w, curve->n, ndigits);
++
++	/* u2 = rw mod n */
++	vli_mod_mult(u2, r, w, curve->n, ndigits);
++
++	/* u1 . G */
++	ecc_point_mult(x1y1, &curve->g, u1, NULL, curve->p, ndigits);
++
++	/* Q=(Qx,Qy) */
++	ctx_qx = ctx->public_key;
++	ctx_qy = ctx_qx + ECC_MAX_DIGITS;
++	vli_set(Q->x, ctx_qx, ndigits);
++	vli_set(Q->y, ctx_qy, ndigits);
++
++	/* u2 x Q */
++	ecc_point_mult(x2y2, Q, u2, NULL, curve->p, ndigits);
++
++	vli_set(x1, x1y1->x, ndigits);
++	vli_set(y1, x1y1->y, ndigits);
++	vli_set(x2, x2y2->x, ndigits);
++	vli_set(y2, x2y2->y, ndigits);
++
++	/* x1y1 + x2y2 => P + Q; P + Q in x2 y2 */
++	ecc_point_add(x1, y1, x2, y2, curve->p, ndigits);
++
++	/* v = x mod n */
++	vli_mod(v, x2, curve->n, ndigits);
++
++	/* validate signature */
++	ret = vli_cmp(v, r, ndigits) == 0 ? 0 : -EBADMSG;
++ exit:
++	ecc_free_point(x1y1);
++	ecc_free_point(x2y2);
++	ecc_free_point(Q);
++	return ret;
++}
++
++int ecdsa_dummy_enc(struct akcipher_request *req)
++{
++	return -EINVAL;
++}
++
++int ecdsa_dummy_dec(struct akcipher_request *req)
++{
++	return -EINVAL;
++}
++
++int ecdsa_set_pub_key(struct crypto_akcipher *tfm, const void *key,
++		      unsigned int keylen)
++{
++	struct ecdsa_ctx *ctx = ecdsa_get_ctx(tfm);
++	struct ecdsa params;
++	unsigned int ndigits;
++	unsigned int nbytes;
++	u8 *params_qx, *params_qy;
++	u64 *ctx_qx, *ctx_qy;
++	int err = 0;
++
++	if (crypto_ecdsa_parse_pub_key(key, keylen, &params))
++		return -EINVAL;
++
++	ndigits = ecdsa_supported_curve(params.curve_id);
++	if (!ndigits)
++		return -EINVAL;
++
++	err = ecc_is_pub_key_valid(params.curve_id, ndigits,
++				   params.key, params.key_size);
++	if (err)
++		return err;
++
++	ctx->curve_id = params.curve_id;
++	ctx->ndigits = ndigits;
++	nbytes = ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
++
++	params_qx = params.key;
++	params_qy = params_qx + ECC_MAX_DIGIT_BYTES;
++
++	ctx_qx = ctx->public_key;
++	ctx_qy = ctx_qx + ECC_MAX_DIGITS;
++
++	vli_copy_from_buf(ctx_qx, ndigits, params_qx, nbytes);
++	vli_copy_from_buf(ctx_qy, ndigits, params_qy, nbytes);
++
++	memset(&params, 0, sizeof(params));
++	return 0;
++}
++
++int ecdsa_set_priv_key(struct crypto_akcipher *tfm, const void *key,
++		       unsigned int keylen)
++{
++	struct ecdsa_ctx *ctx = ecdsa_get_ctx(tfm);
++	struct ecdsa params;
++	unsigned int ndigits;
++	unsigned int nbytes;
++
++	if (crypto_ecdsa_parse_priv_key(key, keylen, &params))
++		return -EINVAL;
++
++	ndigits = ecdsa_supported_curve(params.curve_id);
++	if (!ndigits)
++		return -EINVAL;
++
++	ctx->curve_id = params.curve_id;
++	ctx->ndigits = ndigits;
++	nbytes = ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
++
++	if (ecc_is_key_valid(ctx->curve_id, ctx->ndigits,
++			     (const u8 *)params.key, params.key_size) < 0)
++		return -EINVAL;
++
++	vli_copy_from_buf(ctx->private_key, ndigits, params.key, nbytes);
++
++	memset(&params, 0, sizeof(params));
++	return 0;
++}
++
++int ecdsa_max_size(struct crypto_akcipher *tfm)
++{
++	struct ecdsa_ctx *ctx = ecdsa_get_ctx(tfm);
++	int nbytes = ctx->ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
++
++	/* For r,s */
++	return 2 * nbytes;
++}
++
++int ecdsa_init_tfm(struct crypto_akcipher *tfm)
++{
++	return 0;
++}
++
++void ecdsa_exit_tfm(struct crypto_akcipher *tfm)
++{
++}
++
++static struct akcipher_alg ecdsa_alg = {
++	.sign		= ecdsa_sign,
++	.verify		= ecdsa_verify,
++	.encrypt	= ecdsa_dummy_enc,
++	.decrypt	= ecdsa_dummy_dec,
++	.set_priv_key	= ecdsa_set_priv_key,
++	.set_pub_key	= ecdsa_set_pub_key,
++	.max_size	= ecdsa_max_size,
++	.init		= ecdsa_init_tfm,
++	.exit		= ecdsa_exit_tfm,
++	.base = {
++		.cra_name	= "ecdsa",
++		.cra_driver_name = "ecdsa-generic",
++		.cra_priority	= 100,
++		.cra_module	= THIS_MODULE,
++		.cra_ctxsize	= sizeof(struct ecdsa_ctx),
++	},
++};
++
++static int ecdsa_init(void)
++{
++	int ret;
++
++	ret = crypto_register_akcipher(&ecdsa_alg);
++	if (ret)
++		pr_err("ecdsa alg register failed. err:%d\n", ret);
++	return ret;
++}
++
++static void ecdsa_exit(void)
++{
++	crypto_unregister_akcipher(&ecdsa_alg);
++}
++
++module_init(ecdsa_init);
++module_exit(ecdsa_exit);
++
++MODULE_ALIAS_CRYPTO("ecdsa");
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("ECDSA Generic Algorithm");
++MODULE_AUTHOR("NVIDIA Corporation");
+diff --git a/crypto/ecdsa_helper.c b/crypto/ecdsa_helper.c
+new file mode 100644
+index 000000000000..d31eb54431a9
+--- /dev/null
++++ b/crypto/ecdsa_helper.c
+@@ -0,0 +1,116 @@
++/*
++ * ECDSA helper routines
++ *
++ * Copyright (c) 2017, NVIDIA Corporation. All Rights Reserved.
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the Free
++ * Software Foundation; either version 2 of the License, or (at your option)
++ * any later version.
++ *
++ */
++
++#include <linux/kernel.h>
++#include <linux/export.h>
++#include <linux/err.h>
++#include <linux/string.h>
++#include <crypto/ecdsa.h>
++
++#include "ecc.h"
++
++#define ECDSA_KEY_MIN_SIZE	(1 + 1 + 24) /* ver + cid + n (P-192) */
++
++unsigned int ecdsa_supported_curve(unsigned int curve_id)
++{
++	switch (curve_id) {
++	case ECC_CURVE_NIST_P192: return 3;
++	case ECC_CURVE_NIST_P256: return 4;
++	default: return 0;
++	}
++}
++
++static inline u8 *ecdsa_pack_data(void *dst, const void *src, size_t sz)
++{
++	memcpy(dst, src, sz);
++	return dst + sz;
++}
++
++static inline const u8 *ecdsa_unpack_data(void *dst, const void *src, size_t sz)
++{
++	memcpy(dst, src, sz);
++	return src + sz;
++}
++
++int crypto_ecdsa_parse_pub_key(const char *buf, unsigned int len,
++			       struct ecdsa *params)
++{
++	unsigned char version;
++	unsigned int ndigits;
++	unsigned int nbytes;
++	const u8 *ptr = buf;
++	u8 *qx, *qy;
++
++	if (unlikely(!buf) || len < ECDSA_KEY_MIN_SIZE)
++		return -EINVAL;
++
++	ptr = ecdsa_unpack_data(&version, ptr, sizeof(version));
++	if (version != 1)
++		return -EINVAL;
++
++	ptr = ecdsa_unpack_data(&params->curve_id, ptr,
++				sizeof(params->curve_id));
++
++	ndigits = ecdsa_supported_curve(params->curve_id);
++	if (!ndigits)
++		return -EINVAL;
++
++	nbytes = ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
++
++	/* skip private key */
++	ptr = ecdsa_unpack_data(&params->key, ptr, nbytes);
++
++	/* copy public key */
++	qx = params->key;
++	qy = qx + ECC_MAX_DIGIT_BYTES;
++
++	ptr = ecdsa_unpack_data(qx, ptr, nbytes);
++	ptr = ecdsa_unpack_data(qy, ptr, nbytes);
++
++	params->key_size = 2 * nbytes;
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(crypto_ecdsa_parse_pub_key);
++
++int crypto_ecdsa_parse_priv_key(const char *buf, unsigned int len,
++				struct ecdsa *params)
++{
++	unsigned char version;
++	unsigned int ndigits;
++	unsigned int nbytes;
++	const u8 *ptr = buf;
++
++	if (unlikely(!buf) || len < ECDSA_KEY_MIN_SIZE)
++		return -EINVAL;
++
++	ptr = ecdsa_unpack_data(&version, ptr, sizeof(version));
++	if (version != 1)
++		return -EINVAL;
++
++	ptr = ecdsa_unpack_data(&params->curve_id, ptr,
++				sizeof(params->curve_id));
++
++	ndigits = ecdsa_supported_curve(params->curve_id);
++	if (!ndigits)
++		return -EINVAL;
++
++	nbytes = ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
++
++	params->key_size = nbytes;
++
++	/* copy private key */
++	ptr = ecdsa_unpack_data(&params->key, ptr, nbytes);
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(crypto_ecdsa_parse_priv_key);
+diff --git a/include/crypto/akcipher.h b/include/crypto/akcipher.h
+index c37cc59e9bf2..6b34e9043a6f 100644
+--- a/include/crypto/akcipher.h
++++ b/include/crypto/akcipher.h
+@@ -3,6 +3,7 @@
+  *
+  * Copyright (c) 2015, Intel Corporation
+  * Authors: Tadeusz Struk <tadeusz.struk@intel.com>
++ * Copyright (c) 2017, NVIDIA Corporation. All Rights Reserved.
+  *
+  * This program is free software; you can redistribute it and/or modify it
+  * under the terms of the GNU General Public License as published by the Free
+@@ -27,6 +28,7 @@
+  *		result.
+  *		In case of error where the dst sgl size was insufficient,
+  *		it will be updated to the size required for the operation.
++ * @info:	Any request specific data needed to process the request.
+  * @__ctx:	Start of private context data
+  */
+ struct akcipher_request {
+@@ -35,6 +37,7 @@ struct akcipher_request {
+ 	struct scatterlist *dst;
+ 	unsigned int src_len;
+ 	unsigned int dst_len;
++	void *info;
+ 	void *__ctx[] CRYPTO_MINALIGN_ATTR;
  };
  
--static inline const struct ecc_curve *ecc_get_curve(unsigned int curve_id)
-+const struct ecc_curve *ecc_get_curve(unsigned int curve_id)
+@@ -193,7 +196,7 @@ static inline void crypto_free_akcipher(struct crypto_akcipher *tfm)
  {
- 	switch (curve_id) {
- 	/* In FIPS mode only allow P256 and higher */
-@@ -89,6 +89,7 @@
- 		return NULL;
- 	}
- }
-+EXPORT_SYMBOL_GPL(ecc_get_curve);
- 
- static u64 *ecc_alloc_digits_space(unsigned int ndigits)
- {
-@@ -105,7 +106,7 @@ static void ecc_free_digits_space(u64 *space)
- 	kzfree(space);
- }
- 
--static struct ecc_point *ecc_alloc_point(unsigned int ndigits)
-+struct ecc_point *ecc_alloc_point(unsigned int ndigits)
- {
- 	struct ecc_point *p = kmalloc(sizeof(*p), GFP_KERNEL);
- 
-@@ -130,8 +131,9 @@ static void ecc_free_digits_space(u64 *space)
- 	kfree(p);
- 	return NULL;
- }
-+EXPORT_SYMBOL_GPL(ecc_alloc_point);
- 
--static void ecc_free_point(struct ecc_point *p)
-+void ecc_free_point(struct ecc_point *p)
- {
- 	if (!p)
- 		return;
-@@ -140,17 +142,19 @@ static void ecc_free_point(struct ecc_point *p)
- 	kzfree(p->y);
- 	kzfree(p);
- }
-+EXPORT_SYMBOL_GPL(ecc_free_point);
- 
--static void vli_clear(u64 *vli, unsigned int ndigits)
-+void vli_clear(u64 *vli, unsigned int ndigits)
- {
- 	int i;
- 
- 	for (i = 0; i < ndigits; i++)
- 		vli[i] = 0;
- }
-+EXPORT_SYMBOL_GPL(vli_clear);
- 
- /* Returns true if vli == 0, false otherwise. */
--static bool vli_is_zero(const u64 *vli, unsigned int ndigits)
-+bool vli_is_zero(const u64 *vli, unsigned int ndigits)
- {
- 	int i;
- 
-@@ -161,15 +165,17 @@ static bool vli_is_zero(const u64 *vli, unsigned int ndigits)
- 
- 	return true;
- }
-+EXPORT_SYMBOL_GPL(vli_is_zero);
- 
- /* Returns nonzero if bit bit of vli is set. */
--static u64 vli_test_bit(const u64 *vli, unsigned int bit)
-+u64 vli_test_bit(const u64 *vli, unsigned int bit)
- {
- 	return (vli[bit / 64] & ((u64)1 << (bit % 64)));
- }
-+EXPORT_SYMBOL_GPL(vli_test_bit);
- 
- /* Counts the number of 64-bit "digits" in vli. */
--static unsigned int vli_num_digits(const u64 *vli, unsigned int ndigits)
-+unsigned int vli_num_digits(const u64 *vli, unsigned int ndigits)
- {
- 	int i;
- 
-@@ -181,9 +187,10 @@ static unsigned int vli_num_digits(const u64 *vli, unsigned int ndigits)
- 
- 	return (i + 1);
- }
-+EXPORT_SYMBOL_GPL(vli_num_digits);
- 
- /* Counts the number of bits required for vli. */
--static unsigned int vli_num_bits(const u64 *vli, unsigned int ndigits)
-+unsigned int vli_num_bits(const u64 *vli, unsigned int ndigits)
- {
- 	unsigned int i, num_digits;
- 	u64 digit;
-@@ -198,15 +205,17 @@ static unsigned int vli_num_bits(const u64 *vli, unsigned int ndigits)
- 
- 	return ((num_digits - 1) * 64 + i);
- }
-+EXPORT_SYMBOL_GPL(vli_num_bits);
- 
- /* Sets dest = src. */
--static void vli_set(u64 *dest, const u64 *src, unsigned int ndigits)
-+void vli_set(u64 *dest, const u64 *src, unsigned int ndigits)
- {
- 	int i;
- 
- 	for (i = 0; i < ndigits; i++)
- 		dest[i] = src[i];
- }
-+EXPORT_SYMBOL_GPL(vli_set);
- 
- /* Copy from vli to buf.
-  * For buffers smaller than vli: copy only LSB nbytes from vli.
-@@ -225,6 +234,7 @@ void vli_copy_to_buf(u8 *dst_buf, unsigned int buf_len,
- 	for (; i < buf_len; i++)
- 		dst_buf[i] = 0;
- }
-+EXPORT_SYMBOL_GPL(vli_copy_to_buf);
- 
- /* Copy from buffer to vli.
-  * For buffers smaller than vli: fill up remaining vli with zeroes.
-@@ -243,9 +253,10 @@ void vli_copy_from_buf(u64 *dst_vli, unsigned int ndigits,
- 	for (; i < nbytes; i++)
- 		vli[i] = 0;
- }
-+EXPORT_SYMBOL_GPL(vli_copy_from_buf);
- 
- /* Returns sign of left - right. */
--static int vli_cmp(const u64 *left, const u64 *right, unsigned int ndigits)
-+int vli_cmp(const u64 *left, const u64 *right, unsigned int ndigits)
- {
- 	int i;
- 
-@@ -258,12 +269,13 @@ static int vli_cmp(const u64 *left, const u64 *right, unsigned int ndigits)
- 
- 	return 0;
- }
-+EXPORT_SYMBOL_GPL(vli_cmp);
- 
- /* Computes result = in << c, returning carry. Can modify in place
-  * (if result == in). 0 < shift < 64.
-  */
--static u64 vli_lshift(u64 *result, const u64 *in, unsigned int shift,
--		      unsigned int ndigits)
-+u64 vli_lshift(u64 *result, const u64 *in, unsigned int shift,
-+	       unsigned int ndigits)
- {
- 	u64 carry = 0;
- 	int i;
-@@ -277,9 +289,10 @@ static u64 vli_lshift(u64 *result, const u64 *in, unsigned int shift,
- 
- 	return carry;
- }
-+EXPORT_SYMBOL_GPL(vli_lshift);
- 
- /* Computes vli = vli >> 1. */
--static void vli_rshift1(u64 *vli, unsigned int ndigits)
-+void vli_rshift1(u64 *vli, unsigned int ndigits)
- {
- 	u64 *end = vli;
- 	u64 carry = 0;
-@@ -292,10 +305,11 @@ static void vli_rshift1(u64 *vli, unsigned int ndigits)
- 		carry = temp << 63;
- 	}
- }
-+EXPORT_SYMBOL_GPL(vli_rshift1);
- 
- /* Computes result = left + right, returning carry. Can modify in place. */
--static u64 vli_add(u64 *result, const u64 *left, const u64 *right,
--		   unsigned int ndigits)
-+u64 vli_add(u64 *result, const u64 *left, const u64 *right,
-+	    unsigned int ndigits)
- {
- 	u64 carry = 0;
- 	int i;
-@@ -312,10 +326,11 @@ static u64 vli_add(u64 *result, const u64 *left, const u64 *right,
- 
- 	return carry;
- }
-+EXPORT_SYMBOL_GPL(vli_add);
- 
- /* Computes result = left - right, returning borrow. Can modify in place. */
--static u64 vli_sub(u64 *result, const u64 *left, const u64 *right,
--		   unsigned int ndigits)
-+u64 vli_sub(u64 *result, const u64 *left, const u64 *right,
-+	    unsigned int ndigits)
- {
- 	u64 borrow = 0;
- 	int i;
-@@ -332,6 +347,7 @@ static u64 vli_sub(u64 *result, const u64 *left, const u64 *right,
- 
- 	return borrow;
- }
-+EXPORT_SYMBOL_GPL(vli_sub);
- 
- static uint128_t mul_64_64(u64 left, u64 right)
- {
-@@ -368,8 +384,8 @@ static uint128_t add_128_128(uint128_t a, uint128_t b)
- 	return result;
- }
- 
--static void vli_mult(u64 *result, const u64 *left, const u64 *right,
--		     unsigned int ndigits)
-+void vli_mult(u64 *result, const u64 *left, const u64 *right,
-+	      unsigned int ndigits)
- {
- 	uint128_t r01 = { 0, 0 };
- 	u64 r2 = 0;
-@@ -403,8 +419,9 @@ static void vli_mult(u64 *result, const u64 *left, const u64 *right,
- 
- 	result[ndigits * 2 - 1] = r01.m_low;
- }
-+EXPORT_SYMBOL_GPL(vli_mult);
- 
--static void vli_square(u64 *result, const u64 *left, unsigned int ndigits)
-+void vli_square(u64 *result, const u64 *left, unsigned int ndigits)
- {
- 	uint128_t r01 = { 0, 0 };
- 	u64 r2 = 0;
-@@ -442,12 +459,13 @@ static void vli_square(u64 *result, const u64 *left, unsigned int ndigits)
- 
- 	result[ndigits * 2 - 1] = r01.m_low;
- }
-+EXPORT_SYMBOL_GPL(vli_square);
- 
- /* Computes result = (left + right) % mod.
-  * Assumes that left < mod and right < mod, result != mod.
-  */
--static void vli_mod_add(u64 *result, const u64 *left, const u64 *right,
--			const u64 *mod, unsigned int ndigits)
-+void vli_mod_add(u64 *result, const u64 *left, const u64 *right,
-+		 const u64 *mod, unsigned int ndigits)
- {
- 	u64 carry;
- 
-@@ -459,12 +477,13 @@ static void vli_mod_add(u64 *result, const u64 *left, const u64 *right,
- 	if (carry || vli_cmp(result, mod, ndigits) >= 0)
- 		vli_sub(result, result, mod, ndigits);
- }
-+EXPORT_SYMBOL_GPL(vli_mod_add);
- 
- /* Computes result = (left - right) % mod.
-  * Assumes that left < mod and right < mod, result != mod.
-  */
--static void vli_mod_sub(u64 *result, const u64 *left, const u64 *right,
--			const u64 *mod, unsigned int ndigits)
-+void vli_mod_sub(u64 *result, const u64 *left, const u64 *right,
-+		 const u64 *mod, unsigned int ndigits)
- {
- 	u64 borrow = vli_sub(result, left, right, ndigits);
- 
-@@ -475,6 +494,7 @@ static void vli_mod_sub(u64 *result, const u64 *left, const u64 *right,
- 	if (borrow)
- 		vli_add(result, result, mod, ndigits);
- }
-+EXPORT_SYMBOL_GPL(vli_mod_sub);
- 
- /* Computes result = input % mod.
-  * Assumes that input < mod, result != mod.
-@@ -487,6 +507,7 @@ void vli_mod(u64 *result, const u64 *input, const u64 *mod,
- 	else
- 		vli_set(result, input, ndigits);
- }
-+EXPORT_SYMBOL_GPL(vli_mod);
- 
- /* Print vli in big-endian format.
-  * The bytes are printed in hex.
-@@ -507,6 +528,7 @@ void vli_print(char *vli_name, const u64 *vli, unsigned int ndigits)
- 
- 	pr_info("%20s(BigEnd)=%s\n", vli_name, buf);
- }
-+EXPORT_SYMBOL_GPL(vli_print);
- 
- /* Computes result = (left * right) % mod.
-  * Assumes that left < mod and right < mod, result != mod.
-@@ -552,6 +574,7 @@ void vli_mod_mult(u64 *result, const u64 *left, const u64 *right,
- 			vli_sub(aa, aa, t1, ndigits);
- 	}
- }
-+EXPORT_SYMBOL_GPL(vli_mod_mult);
- 
- /* Computes p_result = p_product % curve_p.
-  * See algorithm 5 and 6 from
-@@ -663,8 +686,8 @@ static void vli_mmod_fast_256(u64 *result, const u64 *product,
- /* Computes result = product % curve_prime
-  *  from http://www.nsa.gov/ia/_files/nist-routines.pdf
- */
--static bool vli_mmod_fast(u64 *result, u64 *product,
--			  const u64 *curve_prime, unsigned int ndigits)
-+bool vli_mmod_fast(u64 *result, u64 *product,
-+		   const u64 *curve_prime, unsigned int ndigits)
- {
- 	u64 tmp[2 * ndigits];
- 
-@@ -682,34 +705,37 @@ static bool vli_mmod_fast(u64 *result, u64 *product,
- 
- 	return true;
- }
-+EXPORT_SYMBOL_GPL(vli_mmod_fast);
- 
- /* Computes result = (left * right) % curve_prime. */
--static void vli_mod_mult_fast(u64 *result, const u64 *left, const u64 *right,
--			      const u64 *curve_prime, unsigned int ndigits)
-+void vli_mod_mult_fast(u64 *result, const u64 *left, const u64 *right,
-+		       const u64 *curve_prime, unsigned int ndigits)
- {
- 	u64 product[2 * ndigits];
- 
- 	vli_mult(product, left, right, ndigits);
- 	vli_mmod_fast(result, product, curve_prime, ndigits);
- }
-+EXPORT_SYMBOL_GPL(vli_mod_mult_fast);
- 
- /* Computes result = left^2 % curve_prime. */
--static void vli_mod_square_fast(u64 *result, const u64 *left,
--				const u64 *curve_prime, unsigned int ndigits)
-+void vli_mod_square_fast(u64 *result, const u64 *left,
-+			 const u64 *curve_prime, unsigned int ndigits)
- {
- 	u64 product[2 * ndigits];
- 
- 	vli_square(product, left, ndigits);
- 	vli_mmod_fast(result, product, curve_prime, ndigits);
- }
-+EXPORT_SYMBOL_GPL(vli_mod_square_fast);
- 
- #define EVEN(vli) (!(vli[0] & 1))
- /* Computes result = (1 / p_input) % mod. All VLIs are the same size.
-  * See "From Euclid's GCD to Montgomery Multiplication to the Great Divide"
-  * https://labs.oracle.com/techrep/2001/smli_tr-2001-95.pdf
-  */
--static void vli_mod_inv(u64 *result, const u64 *input, const u64 *mod,
--			unsigned int ndigits)
-+void vli_mod_inv(u64 *result, const u64 *input, const u64 *mod,
-+		 unsigned int ndigits)
- {
- 	u64 a[ndigits], b[ndigits];
- 	u64 u[ndigits], v[ndigits];
-@@ -781,23 +807,25 @@ static void vli_mod_inv(u64 *result, const u64 *input, const u64 *mod,
- 
- 	vli_set(result, u, ndigits);
- }
-+EXPORT_SYMBOL_GPL(vli_mod_inv);
- 
- /* ------ Point operations ------ */
- 
- /* Returns true if p_point is the point at infinity, false otherwise. */
--static bool ecc_point_is_zero(const struct ecc_point *point)
-+bool ecc_point_is_zero(const struct ecc_point *point)
- {
- 	return (vli_is_zero(point->x, point->ndigits) &&
- 		vli_is_zero(point->y, point->ndigits));
- }
-+EXPORT_SYMBOL_GPL(ecc_point_is_zero);
- 
- /* Point multiplication algorithm using Montgomery's ladder with co-Z
-  * coordinates. From http://eprint.iacr.org/2011/338.pdf
-  */
- 
- /* Double in place */
--static void ecc_point_double_jacobian(u64 *x1, u64 *y1, u64 *z1,
--				      u64 *curve_prime, unsigned int ndigits)
-+void ecc_point_double_jacobian(u64 *x1, u64 *y1, u64 *z1,
-+			       u64 *curve_prime, unsigned int ndigits)
- {
- 	/* t1 = x, t2 = y, t3 = z */
- 	u64 t4[ndigits];
-@@ -857,6 +885,7 @@ static void ecc_point_double_jacobian(u64 *x1, u64 *y1, u64 *z1,
- 	vli_set(z1, y1, ndigits);
- 	vli_set(y1, t4, ndigits);
- }
-+EXPORT_SYMBOL_GPL(ecc_point_double_jacobian);
- 
- /* Modify (x1, y1) => (x1 * z^2, y1 * z^3) */
- static void apply_z(u64 *x1, u64 *y1, u64 *z, u64 *curve_prime,
-@@ -1045,11 +1074,12 @@ void ecc_point_add(u64 *x1, u64 *y1, u64 *x2, u64 *y2, u64 *curve_prime,
- 	vli_mod_mult_fast(t5, t5, t7,  curve_prime, ndigits);
- 	vli_set(x2, t5, ndigits);
- }
-+EXPORT_SYMBOL_GPL(ecc_point_add);
- 
--static void ecc_point_mult(struct ecc_point *result,
--			   const struct ecc_point *point, const u64 *scalar,
--			   u64 *initial_z, u64 *curve_prime,
--			   unsigned int ndigits)
-+void ecc_point_mult(struct ecc_point *result,
-+		    const struct ecc_point *point, const u64 *scalar,
-+		    u64 *initial_z, u64 *curve_prime,
-+		    unsigned int ndigits)
- {
- 	/* R0 and R1 */
- 	u64 rx[2][ndigits];
-@@ -1100,15 +1130,16 @@ static void ecc_point_mult(struct ecc_point *result,
- 	vli_set(result->x, rx[0], ndigits);
- 	vli_set(result->y, ry[0], ndigits);
- }
-+EXPORT_SYMBOL_GPL(ecc_point_mult);
- 
--static inline void ecc_swap_digits(const u64 *in, u64 *out,
--				   unsigned int ndigits)
-+void ecc_swap_digits(const u64 *in, u64 *out, unsigned int ndigits)
- {
- 	int i;
- 
- 	for (i = 0; i < ndigits; i++)
- 		out[i] = __swab64(in[ndigits - 1 - i]);
- }
-+EXPORT_SYMBOL_GPL(ecc_swap_digits);
- 
- int ecc_is_key_valid(unsigned int curve_id, unsigned int ndigits,
- 		     const u8 *private_key, unsigned int private_key_len)
-@@ -1133,6 +1164,7 @@ int ecc_is_key_valid(unsigned int curve_id, unsigned int ndigits,
- 
- 	return 0;
- }
-+EXPORT_SYMBOL_GPL(ecc_is_key_valid);
- 
- int ecc_is_pub_key_valid(unsigned int curve_id, unsigned int ndigits,
- 			 const u8 *pub_key, unsigned int pub_key_len)
-@@ -1154,3 +1186,4 @@ int ecc_is_pub_key_valid(unsigned int curve_id, unsigned int ndigits,
- 
- 	return 0;
- }
-+EXPORT_SYMBOL_GPL(ecc_is_pub_key_valid);
-diff --git a/crypto/ecc.h b/crypto/ecc.h
-index 40f930d54c29..f947bf9a9d1e 100644
---- a/crypto/ecc.h
-+++ b/crypto/ecc.h
-@@ -31,6 +31,59 @@
- 
- #include "ecc_curve_defs.h"
- 
-+const struct ecc_curve *ecc_get_curve(unsigned int curve_id);
-+struct ecc_point *ecc_alloc_point(unsigned int ndigits);
-+void ecc_free_point(struct ecc_point *p);
+ 	struct akcipher_request *req;
+ 
+-	req = kmalloc(sizeof(*req) + crypto_akcipher_reqsize(tfm), gfp);
++	req = kzalloc(sizeof(*req) + crypto_akcipher_reqsize(tfm), gfp);
+ 	if (likely(req))
+ 		akcipher_request_set_tfm(req, tfm);
+ 
+diff --git a/include/crypto/ecdsa.h b/include/crypto/ecdsa.h
+new file mode 100644
+index 000000000000..6923d0268770
+--- /dev/null
++++ b/include/crypto/ecdsa.h
+@@ -0,0 +1,81 @@
++/*
++ * ECC parameters for ECDSA
++ *
++ * Copyright (c) 2017, NVIDIA Corporation. All Rights Reserved.
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the Free
++ * Software Foundation; either version 2 of the License, or (at your option)
++ * any later version.
++ *
++ */
 +
-+void vli_clear(u64 *vli, unsigned int ndigits);
-+bool vli_is_zero(const u64 *vli, unsigned int ndigits);
-+unsigned int vli_num_digits(const u64 *vli, unsigned int ndigits);
-+unsigned int vli_num_bits(const u64 *vli, unsigned int ndigits);
-+void vli_set(u64 *dest, const u64 *src, unsigned int ndigits);
-+void vli_copy_to_buf(u8 *dst_buf, unsigned int buf_len,
-+		     const u64 *src_vli, unsigned int ndigits);
-+void vli_copy_from_buf(u64 *dst_vli, unsigned int ndigits,
-+		       const u8 *src_buf, unsigned int buf_len);
-+int vli_cmp(const u64 *left, const u64 *right, unsigned int ndigits);
-+u64 vli_lshift(u64 *result, const u64 *in, unsigned int shift,
-+	       unsigned int ndigits);
-+void vli_rshift1(u64 *vli, unsigned int ndigits);
-+u64 vli_add(u64 *result, const u64 *left, const u64 *right,
-+	    unsigned int ndigits);
-+u64 vli_sub(u64 *result, const u64 *left, const u64 *right,
-+	    unsigned int ndigits);
-+void vli_mult(u64 *result, const u64 *left, const u64 *right,
-+	      unsigned int ndigits);
-+void vli_square(u64 *result, const u64 *left, unsigned int ndigits);
-+void vli_mod_add(u64 *result, const u64 *left, const u64 *right,
-+		 const u64 *mod, unsigned int ndigits);
-+void vli_mod_sub(u64 *result, const u64 *left, const u64 *right,
-+		 const u64 *mod, unsigned int ndigits);
-+void vli_mod(u64 *result, const u64 *input, const u64 *mod,
-+	     unsigned int ndigits);
-+void vli_print(char *vli_name, const u64 *vli, unsigned int ndigits);
-+void vli_mod_mult(u64 *result, const u64 *left, const u64 *right,
-+		  const u64 *mod, unsigned int ndigits);
-+bool vli_mmod_fast(u64 *result, u64 *product,
-+		   const u64 *curve_prime, unsigned int ndigits);
-+void vli_mod_mult_fast(u64 *result, const u64 *left, const u64 *right,
-+		       const u64 *curve_prime, unsigned int ndigits);
-+void vli_mod_square_fast(u64 *result, const u64 *left,
-+			 const u64 *curve_prime, unsigned int ndigits);
-+void vli_mod_inv(u64 *result, const u64 *input, const u64 *mod,
-+		 unsigned int ndigits);
++#ifndef _CRYPTO_ECDSA_
++#define _CRYPTO_ECDSA_
 +
-+bool ecc_point_is_zero(const struct ecc_point *point);
-+void ecc_point_double_jacobian(u64 *x1, u64 *y1, u64 *z1,
-+			       u64 *curve_prime, unsigned int ndigits);
-+void ecc_point_add(u64 *x1, u64 *y1, u64 *x2, u64 *y2, u64 *curve_prime,
-+		   unsigned int ndigits);
-+void ecc_point_mult(struct ecc_point *result,
-+		    const struct ecc_point *point, const u64 *scalar,
-+		    u64 *initial_z, u64 *curve_prime,
-+		    unsigned int ndigits);
-+void ecc_swap_digits(const u64 *in, u64 *out, unsigned int ndigits);
++#include <crypto/ecc.h>
 +
- /**
-  * ecc_is_key_valid() - Validate a given ECC private key
-  *
-@@ -43,4 +96,7 @@
-  */
- int ecc_is_key_valid(unsigned int curve_id, unsigned int ndigits,
- 		     const u8 *private_key, unsigned int private_key_len);
-+int ecc_is_pub_key_valid(unsigned int curve_id, unsigned int ndigits,
-+			 const u8 *pub_key, unsigned int pub_key_len);
++/**
++ * DOC: ECDSA Helper Functions
++ *
++ * To use ECDSA as a akcipher, following functions should be used
++ * along with ECDSA private/public keys. The keys are mentioned as
++ * a packet private-public key and can be set with API functions
++ * crypto_akcipher_set_priv_key() & crypto_akcipher_set_pub_key().
++ */
 +
- #endif /* _CRYPTO_ECC_H */
++/**
++ * struct ecdsa - define an ECDSA private or public key
++ *
++ * @curve_id:	ECC curve id the keys are based on
++ * @key:	Private or public ECDSA key. Private key shall be a valid
++ *		number as per curve's prime. Public key is expressed by
++ *		valid affine coordinates Qx & Qy.
++ * @key_size:	Size of ECDSA private/public key
++ */
++struct ecdsa {
++	unsigned char curve_id;
++	unsigned char key[2 * ECC_MAX_DIGIT_BYTES];
++	unsigned short key_size;
++};
++
++/**
++ * crypto_ecdsa_parse_pub_key() - parse and obtain ECDSA public key
++ * @buf:	Buffer holding ECDDA packet key that should be parsed
++ *		to get ECDSA public key
++ * @len:	Length of the packet private-public key buffer
++ * @params:	Buffer allocated by the caller that is filled with
++ *		ECDSA public key
++ *
++ * This routine parses packet key from @buf and obtains version, curve id,
++ * private key and public key. It checks for correct version and supported
++ * curve id. It copies public key from the public key location in given
++ * ECDSA packet key to @params.
++ *
++ * Return:	-EINVAL on errors, 0 on success
++ */
++int crypto_ecdsa_parse_pub_key(const char *buf, unsigned int len,
++			       struct ecdsa *params);
++
++/**
++ * crypto_ecdsa_parse_priv_key() - parse and obtain ECDSA private key
++ * @buf:	Buffer holding ECDDA packet key that should be parsed
++ *		to get ECDSA private key
++ * @len:	Length of the packet private-public key buffer
++ * @params:	Buffer allocated by the caller that is filled with
++ *		ECDSA private key
++ *
++ * Return:	-EINVAL on errors, 0 on success
++ */
++int crypto_ecdsa_parse_priv_key(const char *buf, unsigned int len,
++				struct ecdsa *params);
++
++/**
++ * ecdsa_supported_curve() - check supported curve
++ * @curve_id:	ECC curve id as defined by kernel
++ *
++ * Return:	0 for un-supported curve, ECC DIGITS for curve on success
++ */
++unsigned int ecdsa_supported_curve(unsigned int curve_id);
++
++#endif /* _CRYPTO_ECDSA_ */
 -- 
 1.7.6.3
