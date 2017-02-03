@@ -1,34 +1,40 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCHv2] crypto: doc - Fix hash export state information
-Date: Fri, 3 Feb 2017 18:20:46 +0800
-Message-ID: <20170203102046.GB2632@gondor.apana.org.au>
-References: <1485444780-17201-1-git-send-email-rabin.vincent@axis.com>
+Subject: Re: [PATCH 0/8] Bug fixes
+Date: Fri, 3 Feb 2017 18:21:13 +0800
+Message-ID: <20170203102113.GD2632@gondor.apana.org.au>
+References: <cover.1485501428.git.harsh@chelsio.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, smueller@chronox.de,
-        Rabin Vincent <rabinv@axis.com>
-To: Rabin Vincent <rabin.vincent@axis.com>
+Cc: linux-crypto@vger.kernel.org, hariprasad@chelsio.com,
+        netdev@vger.kernel.org, arjun@chelsio.com, atul.gupta@chelsio.com
+To: Harsh Jain <harsh@chelsio.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:47179 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:41081 "EHLO
         helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1752808AbdBCKU5 (ORCPT
+        with ESMTP id S1752875AbdBCKVW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 3 Feb 2017 05:20:57 -0500
+        Fri, 3 Feb 2017 05:21:22 -0500
 Content-Disposition: inline
-In-Reply-To: <1485444780-17201-1-git-send-email-rabin.vincent@axis.com>
+In-Reply-To: <cover.1485501428.git.harsh@chelsio.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jan 26, 2017 at 04:33:00PM +0100, Rabin Vincent wrote:
-> From: Rabin Vincent <rabinv@axis.com>
+On Fri, Jan 27, 2017 at 04:09:04PM +0530, Harsh Jain wrote:
+> This patch series is based on Herbert's cryptodev-2.6 tree and depends on 
+> patch series "Bug Fixes for 4.10". It includes Bug Fixes.
 > 
-> The documentation states that crypto_ahash_reqsize() provides the size
-> of the state structure used by crypto_ahash_export().  But it's actually
-> crypto_ahash_statesize() which provides this size.
-> 
-> Signed-off-by: Rabin Vincent <rabinv@axis.com>
+> Atul Gupta (2)
+>   crypto:chcr-Change flow IDs
+>   crypto:chcr- Fix wrong typecasting
+> Harsh Jain (8):
+>   crypto:chcr- Fix key length for RFC4106
+>   crypto:chcr-fix itnull.cocci warnings
+>   crypto:chcr- Use cipher instead of Block Cipher in gcm setkey
+>   crypto:chcr: Change cra_flags for cipher algos
+>   crypto:chcr- Change algo priority
+>   crypto:chcr-Fix Smatch Complaint
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
