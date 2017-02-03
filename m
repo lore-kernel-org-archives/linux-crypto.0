@@ -1,89 +1,169 @@
-From: Dan Williams <dan.j.williams-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 3/6] async_tx: Handle DMA devices having support for fewer
- PQ coefficients
-Date: Fri, 3 Feb 2017 10:42:11 -0800
-Message-ID: <CAPcyv4icg74StGOjsOpYCDb9x02rrvSrkv6O66WtbSvhOwxYnw@mail.gmail.com>
-References: <1486010836-25228-1-git-send-email-anup.patel@broadcom.com>
- <1486010836-25228-4-git-send-email-anup.patel@broadcom.com>
- <CAPcyv4gBFu7skx_8cvsaL0sL5=44DMcWY_EjWSCfaNd8oh=Svw@mail.gmail.com> <CAALAos8HEjPhdM0cibTVB==WsanktBx87e8b8diVsNm1EmCQHQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Vinod Koul <vinod.koul-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
-        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-        "David S . Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-        Jassi Brar <jassisinghbrar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        Ray Jui <rjui-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
-        Scott Branden <sbranden-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
-        Jon Mason <jonmason-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
-        Rob Rice <rob.rice-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
-        BCM Kernel Feedback <bcm-kernel-feedback-list-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
-        "dmaengine-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <dmaengine-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Device Tree <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        "linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org"
-        <linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>,
-        "linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        linux-raid <linux-raid-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Anup Patel <anup.patel-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAALAos8HEjPhdM0cibTVB==WsanktBx87e8b8diVsNm1EmCQHQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] crypto: improve gcc optimization flags for serpent and wp512
+Date: Fri,  3 Feb 2017 23:33:23 +0100
+Message-ID: <20170203223334.3888507-1-arnd@arndb.de>
+Cc: kernel-build-reports@lists.linaro.org,
+        Arnd Bergmann <arnd@arndb.de>,
+        Ralf Baechle <ralf@linux-mips.org>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mout.kundenserver.de ([212.227.17.10]:52195 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752635AbdBCWd6 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 3 Feb 2017 17:33:58 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Feb 3, 2017 at 2:59 AM, Anup Patel <anup.patel-dY08KVG/lbpWk0Htik3J/w@public.gmane.org> wrote:
->
->
-> On Thu, Feb 2, 2017 at 11:31 AM, Dan Williams <dan.j.williams-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-> wrote:
->>
->> On Wed, Feb 1, 2017 at 8:47 PM, Anup Patel <anup.patel-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
->> wrote:
->> > The DMAENGINE framework assumes that if PQ offload is supported by a
->> > DMA device then all 256 PQ coefficients are supported. This assumption
->> > does not hold anymore because we now have BCM-SBA-RAID offload engine
->> > which supports PQ offload with limited number of PQ coefficients.
->> >
->> > This patch extends async_tx APIs to handle DMA devices with support
->> > for fewer PQ coefficients.
->> >
->> > Signed-off-by: Anup Patel <anup.patel-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
->> > Reviewed-by: Scott Branden <scott.branden-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
->> > ---
->> >  crypto/async_tx/async_pq.c          |  3 +++
->> >  crypto/async_tx/async_raid6_recov.c | 12 ++++++++++--
->> >  include/linux/dmaengine.h           | 19 +++++++++++++++++++
->> >  include/linux/raid/pq.h             |  3 +++
->> >  4 files changed, 35 insertions(+), 2 deletions(-)
->>
->> So, I hate the way async_tx does these checks on each operation, and
->> it's ok for me to say that because it's my fault. Really it's md that
->> should be validating engine offload capabilities once at the beginning
->> of time. I'd rather we move in that direction than continue to pile
->> onto a bad design.
->
->
-> Yes, indeed. All async_tx APIs have lot of checks and for high throughput
-> RAID offload engine these checks can add some overhead.
->
-> I think doing checks in Linux md would be certainly better but this would
-> mean lot of changes in Linux md as well as remove checks in async_tx.
->
-> Also, async_tx APIs should not find DMA channel on its own instead it
-> should rely on Linux md to provide DMA channel pointer as parameter.
->
-> It's better to do checks cleanup in async_tx as separate patchset and
-> keep this patchset simple.
+An ancient gcc bug (first reported in 2003) has apparently resurfaced
+on MIPS, where kernelci.org reports an overly large stack frame in the
+whirlpool hash algorithm:
 
-That's been the problem with async_tx being broken like this for
-years. Once you get this "small / simple" patch upstream, that
-arguably makes async_tx a little bit worse, there is no longer any
-motivation to fix the underlying issues. If you care about the long
-term health of raid offload and are enabling new hardware support you
-should first tackle the known problems with it before adding new
-features.
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+crypto/wp512.c:987:1: warning: the frame size of 1112 bytes is larger than 1024 bytes [-Wframe-larger-than=]
+
+With some testing in different configurations, I'm seeing large
+variations in stack frames size up to 1500 bytes for what should have
+around 300 bytes at most. I also checked the reference implementation,
+which is essentially the same code but also comes with some test and
+benchmarking infrastructure.
+
+It seems that recent compiler versions on at least arm, arm64 and powerpc
+have a partial fix for this problem, but enabling "-fsched-pressure", but
+even with that fix they suffer from the issue to a certain degree. Some
+testing on arm64 shows that the time needed to hash a given amount of
+data is roughly proportional to the stack frame size here, which makes
+sense given that the wp512 implementation is doing lots of loads for
+table lookups, and the problem with the overly large stack is a result
+of doing a lot more loads and stores for spilled registers (as seen from
+inspecting the object code).
+
+Disabling -fschedule-insns consistently fixes the problem for wp512,
+in my collection of cross-compilers, the results are consistently better
+or identical when comparing the stack sizes in this function, though
+some architectures (notable x86) have schedule-insns disabled by
+default.
+
+The four columns are:
+default: -O2
+press:	 -O2 -fsched-pressure
+nopress: -O2 -fschedule-insns -fno-sched-pressure
+nosched: -O2 -no-schedule-insns (disables sched-pressure)
+
+				default	press	nopress	nosched
+alpha-linux-gcc-4.9.3		1136	848	1136	176
+am33_2.0-linux-gcc-4.9.3	2100	2076	2100	2104
+arm-linux-gnueabi-gcc-4.9.3	848	848	1048	352
+cris-linux-gcc-4.9.3		272	272	272	272
+frv-linux-gcc-4.9.3		1128	1000	1128	280
+hppa64-linux-gcc-4.9.3		1128	336	1128	184
+hppa-linux-gcc-4.9.3		644	308	644	276
+i386-linux-gcc-4.9.3		352	352	352	352
+m32r-linux-gcc-4.9.3		720	656	720	268
+microblaze-linux-gcc-4.9.3	1108	604	1108	256
+mips64-linux-gcc-4.9.3		1328	592	1328	208
+mips-linux-gcc-4.9.3		1096	624	1096	240
+powerpc64-linux-gcc-4.9.3	1088	432	1088	160
+powerpc-linux-gcc-4.9.3		1080	584	1080	224
+s390-linux-gcc-4.9.3		456	456	624	360
+sh3-linux-gcc-4.9.3		292	292	292	292
+sparc64-linux-gcc-4.9.3		992	240	992	208
+sparc-linux-gcc-4.9.3		680	592	680	312
+x86_64-linux-gcc-4.9.3		224	240	272	224
+xtensa-linux-gcc-4.9.3		1152	704	1152	304
+
+aarch64-linux-gcc-7.0.0		224	224	1104	208
+arm-linux-gnueabi-gcc-7.0.1	824	824	1048	352
+mips-linux-gcc-7.0.0		1120	648	1120	272
+x86_64-linux-gcc-7.0.1		240	240	304	240
+
+arm-linux-gnueabi-gcc-4.4.7	840			392
+arm-linux-gnueabi-gcc-4.5.4	784	728	784	320
+arm-linux-gnueabi-gcc-4.6.4	736	728	736	304
+arm-linux-gnueabi-gcc-4.7.4	944	784	944	352
+arm-linux-gnueabi-gcc-4.8.5	464	464	760	352
+arm-linux-gnueabi-gcc-4.9.3	848	848	1048	352
+arm-linux-gnueabi-gcc-5.3.1	824	824	1064	336
+arm-linux-gnueabi-gcc-6.1.1	808	808	1056	344
+arm-linux-gnueabi-gcc-7.0.1	824	824	1048	352
+
+Trying the same test for serpent-generic, the picture is a bit different,
+and while -fno-schedule-insns is generally better here than the default,
+-fsched-pressure wins overall, so I picked that instead.
+
+				default	press	nopress	nosched
+alpha-linux-gcc-4.9.3		1392	864	1392	960
+am33_2.0-linux-gcc-4.9.3	536	524	536	528
+arm-linux-gnueabi-gcc-4.9.3	552	552	776	536
+cris-linux-gcc-4.9.3		528	528	528	528
+frv-linux-gcc-4.9.3		536	400	536	504
+hppa64-linux-gcc-4.9.3		524	208	524	480
+hppa-linux-gcc-4.9.3		768	472	768	508
+i386-linux-gcc-4.9.3		564	564	564	564
+m32r-linux-gcc-4.9.3		712	576	712	532
+microblaze-linux-gcc-4.9.3	724	392	724	512
+mips64-linux-gcc-4.9.3		720	384	720	496
+mips-linux-gcc-4.9.3		728	384	728	496
+powerpc64-linux-gcc-4.9.3	704	304	704	480
+powerpc-linux-gcc-4.9.3		704	296	704	480
+s390-linux-gcc-4.9.3		560	560	592	536
+sh3-linux-gcc-4.9.3		540	540	540	540
+sparc64-linux-gcc-4.9.3		544	352	544	496
+sparc-linux-gcc-4.9.3		544	344	544	496
+x86_64-linux-gcc-4.9.3		528	536	576	528
+xtensa-linux-gcc-4.9.3		752	544	752	544
+
+aarch64-linux-gcc-7.0.0		432	432	656	480
+arm-linux-gnueabi-gcc-7.0.1	616	616	808	536
+mips-linux-gcc-7.0.0		720	464	720	488
+x86_64-linux-gcc-7.0.1		536	528	600	536
+
+arm-linux-gnueabi-gcc-4.4.7	592			440
+arm-linux-gnueabi-gcc-4.5.4	776	448	776	544
+arm-linux-gnueabi-gcc-4.6.4	776	448	776	544
+arm-linux-gnueabi-gcc-4.7.4	768	448	768	544
+arm-linux-gnueabi-gcc-4.8.5	488	488	776	544
+arm-linux-gnueabi-gcc-4.9.3	552	552	776	536
+arm-linux-gnueabi-gcc-5.3.1	552	552	776	536
+arm-linux-gnueabi-gcc-6.1.1	560	560	776	536
+arm-linux-gnueabi-gcc-7.0.1	616	616	808	536
+
+I did not do any runtime tests with serpent, so it is possible that stack
+frame size does not directly correlate with runtime performance here and
+it actually makes things worse, but it's more likely to help here, and
+the reduced stack frame size is probably enough reason to apply the patch,
+especially given that the crypto code is often used in deep call chains.
+
+Link: https://kernelci.org/build/id/58797d7559b5149efdf6c3a9/logs/
+Link: http://www.larc.usp.br/~pbarreto/WhirlpoolPage.html
+Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=11488
+Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=79149
+Cc: Ralf Baechle <ralf@linux-mips.org>
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ crypto/Makefile | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/crypto/Makefile b/crypto/Makefile
+index b8f0e3eb0791..aa10a4db41de 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -75,6 +75,7 @@ obj-$(CONFIG_CRYPTO_SHA256) += sha256_generic.o
+ obj-$(CONFIG_CRYPTO_SHA512) += sha512_generic.o
+ obj-$(CONFIG_CRYPTO_SHA3) += sha3_generic.o
+ obj-$(CONFIG_CRYPTO_WP512) += wp512.o
++CFLAGS_wp512.o := $(call cc-option,-fno-schedule-insns)  # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=79149
+ obj-$(CONFIG_CRYPTO_TGR192) += tgr192.o
+ obj-$(CONFIG_CRYPTO_GF128MUL) += gf128mul.o
+ obj-$(CONFIG_CRYPTO_ECB) += ecb.o
+@@ -98,6 +99,7 @@ obj-$(CONFIG_CRYPTO_BLOWFISH_COMMON) += blowfish_common.o
+ obj-$(CONFIG_CRYPTO_TWOFISH) += twofish_generic.o
+ obj-$(CONFIG_CRYPTO_TWOFISH_COMMON) += twofish_common.o
+ obj-$(CONFIG_CRYPTO_SERPENT) += serpent_generic.o
++CFLAGS_serpent_generic.o := $(call cc-option,-fsched-pressure)  # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=79149
+ obj-$(CONFIG_CRYPTO_AES) += aes_generic.o
+ obj-$(CONFIG_CRYPTO_CAMELLIA) += camellia_generic.o
+ obj-$(CONFIG_CRYPTO_CAST_COMMON) += cast_common.o
+-- 
+2.9.0
