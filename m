@@ -1,78 +1,248 @@
 From: Nitin Kumbhar <nkumbhar@nvidia.com>
-Subject: [PATCH v2 0/6] Add support for ECDSA algorithm
-Date: Fri, 3 Feb 2017 16:42:49 +0530
-Message-ID: <1486120375-13070-1-git-send-email-nkumbhar@nvidia.com>
+Subject: [PATCH v2 2/6] crypto: ecc: add vli and ecc ops
+Date: Fri, 3 Feb 2017 16:42:51 +0530
+Message-ID: <1486120375-13070-3-git-send-email-nkumbhar@nvidia.com>
+References: <1486120375-13070-1-git-send-email-nkumbhar@nvidia.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: <linux-crypto@vger.kernel.org>, Nitin Kumbhar <nkumbhar@nvidia.com>
 To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from hqemgate15.nvidia.com ([216.228.121.64]:14386 "EHLO
-        hqemgate15.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752200AbdBCLND (ORCPT
+Received: from hqemgate14.nvidia.com ([216.228.121.143]:5633 "EHLO
+        hqemgate14.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752223AbdBCLNF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 3 Feb 2017 06:13:03 -0500
+        Fri, 3 Feb 2017 06:13:05 -0500
+In-Reply-To: <1486120375-13070-1-git-send-email-nkumbhar@nvidia.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello,
+Add functions to copy vli from buffers, to print vli in
+big endian format, for vli mod and mod multiplication ops,
+ecc point addition and ecc pub key validation.
 
-This patch series adds support for Elliptic Curve Digital Signature
-Algorithm (ECDSA). To reuse existing ECC functionality, which is
-added as part of ECDH, it separates out ECC and ECDH so that
-only ECC functionality is available for ECDSA even when ECDH is in
-a disabled state.
+Signed-off-by: Nitin Kumbhar <nkumbhar@nvidia.com>
+---
+ crypto/ecc.c |  189 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 189 insertions(+), 0 deletions(-)
 
-Patch #1 restructures ECC and ECDH code such that ECC is not
-dependent on ECDH config.
-
-Patches #2 & #3 add vli and ecc functions which are required
-for other Elliptic curve algorithms like ECDSA and ECIES.
-
-Patch #4 adds support for ECDSA. This has been validated for P192
-and P256 elliptic curves.
-
-Patches #5 and #6 add ECDSA tests to validate ECDSA functionality
-and measure ECDSA performance.
-
-Changes in v2:
-* Added ecc_is_pub_key_valid() for public key validation
-* Use crypto_rng_get_bytes() to get random bytes
-* Add documentation in ecdsa.h for ECDSA keys and related APIs
-* Reorg ECDSA sign and verity tests to reuse code
-
-Nitin Kumbhar (6):
-  crypto: ecc: separate out ecc and ecdh
-  crypto: ecc: add vli and ecc ops
-  crypto: ecc: export vli and ecc ops
-  crypto: ecdsa: add ECDSA SW implementation
-  crypto: testmgr: add ECDSA tests
-  crypto: tcrypt: add ECDSA test modes
-
- crypto/Kconfig            |   14 ++
- crypto/Makefile           |    8 +-
- crypto/ecc.c              |  421 +++++++++++++++++++++++++++++++-------------
- crypto/ecc.h              |  101 +++++++-----
- crypto/ecc_curve_defs.h   |   51 +-----
- crypto/ecc_ecdh.h         |   54 ++++++
- crypto/ecdh.c             |    4 +-
- crypto/ecdh_helper.c      |   94 ++++++++++
- crypto/ecdsa.c            |  362 ++++++++++++++++++++++++++++++++++++++
- crypto/ecdsa_helper.c     |  116 +++++++++++++
- crypto/tcrypt.c           |  250 ++++++++++++++++++++++++++-
- crypto/tcrypt.h           |  122 +++++++++++++
- crypto/testmgr.c          |  330 +++++++++++++++++++++++++++++++++++-
- crypto/testmgr.h          |  140 +++++++++++++++
- include/crypto/akcipher.h |    5 +-
- include/crypto/ecc.h      |   24 +++
- include/crypto/ecdh.h     |   10 +-
- include/crypto/ecdsa.h    |   81 +++++++++
- 18 files changed, 1962 insertions(+), 225 deletions(-)
- create mode 100644 crypto/ecc_ecdh.h
- create mode 100644 crypto/ecdsa.c
- create mode 100644 crypto/ecdsa_helper.c
- create mode 100644 include/crypto/ecc.h
- create mode 100644 include/crypto/ecdsa.h
-
+diff --git a/crypto/ecc.c b/crypto/ecc.c
+index a8c10e725138..1b8e8d248859 100644
+--- a/crypto/ecc.c
++++ b/crypto/ecc.c
+@@ -208,6 +208,42 @@ static void vli_set(u64 *dest, const u64 *src, unsigned int ndigits)
+ 		dest[i] = src[i];
+ }
+ 
++/* Copy from vli to buf.
++ * For buffers smaller than vli: copy only LSB nbytes from vli.
++ * For buffers larger than vli : fill up remaining buf with zeroes.
++ */
++void vli_copy_to_buf(u8 *dst_buf, unsigned int buf_len,
++		     const u64 *src_vli, unsigned int ndigits)
++{
++	unsigned int nbytes = ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
++	u8 *vli = (u8 *)src_vli;
++	int i;
++
++	for (i = 0; i < buf_len && i < nbytes; i++)
++		dst_buf[i] = vli[i];
++
++	for (; i < buf_len; i++)
++		dst_buf[i] = 0;
++}
++
++/* Copy from buffer to vli.
++ * For buffers smaller than vli: fill up remaining vli with zeroes.
++ * For buffers larger than vli : copy only LSB nbytes to vli.
++ */
++void vli_copy_from_buf(u64 *dst_vli, unsigned int ndigits,
++		       const u8 *src_buf, unsigned int buf_len)
++{
++	unsigned int nbytes = ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
++	u8 *vli = (u8 *)dst_vli;
++	int i;
++
++	for (i = 0; i < buf_len && i < nbytes; i++)
++		vli[i] = src_buf[i];
++
++	for (; i < nbytes; i++)
++		vli[i] = 0;
++}
++
+ /* Returns sign of left - right. */
+ static int vli_cmp(const u64 *left, const u64 *right, unsigned int ndigits)
+ {
+@@ -440,6 +476,83 @@ static void vli_mod_sub(u64 *result, const u64 *left, const u64 *right,
+ 		vli_add(result, result, mod, ndigits);
+ }
+ 
++/* Computes result = input % mod.
++ * Assumes that input < mod, result != mod.
++ */
++void vli_mod(u64 *result, const u64 *input, const u64 *mod,
++	     unsigned int ndigits)
++{
++	if (vli_cmp(input, mod, ndigits) >= 0)
++		vli_sub(result, input, mod, ndigits);
++	else
++		vli_set(result, input, ndigits);
++}
++
++/* Print vli in big-endian format.
++ * The bytes are printed in hex.
++ */
++void vli_print(char *vli_name, const u64 *vli, unsigned int ndigits)
++{
++	int nbytes = ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
++	int buf_size = 2 * ECC_MAX_DIGIT_BYTES + 1;
++	unsigned char *c, buf[buf_size];
++	int i, j;
++
++	c = (unsigned char *)vli;
++
++	for (i = nbytes - 1, j = 0; i >= 0 && j < buf_size; i--, j += 2)
++		snprintf(&buf[j], 3, "%02x", *(c + i));
++
++	buf[j] = '\0';
++
++	pr_info("%20s(BigEnd)=%s\n", vli_name, buf);
++}
++
++/* Computes result = (left * right) % mod.
++ * Assumes that left < mod and right < mod, result != mod.
++ * Uses:
++ *	(a * b) % m = ((a % m) * (b % m)) % m
++ *	(a * b) % m = (a + a + ... + a) % m = b modular additions of (a % m)
++ */
++void vli_mod_mult(u64 *result, const u64 *left, const u64 *right,
++		  const u64 *mod, unsigned int ndigits)
++{
++	u64 t1[ndigits], mm[ndigits];
++	u64 aa[ndigits], bb[ndigits];
++
++	vli_clear(result, ndigits);
++	vli_set(aa, left, ndigits);
++	vli_set(bb, right, ndigits);
++	vli_set(mm, mod, ndigits);
++
++	/* aa = aa % mm */
++	vli_mod(aa, aa, mm, ndigits);
++
++	/* bb = bb % mm */
++	vli_mod(bb, bb, mm, ndigits);
++
++	while (!vli_is_zero(bb, ndigits)) {
++
++		/* if bb is odd i.e. 0th bit set then add
++		 * aa i.e. result = (result + aa) % mm
++		 */
++		if (vli_test_bit(bb, 0))
++			vli_mod_add(result, result, aa, mm, ndigits);
++
++		/* bb = bb / 2 = bb >> 1 */
++		vli_rshift1(bb, ndigits);
++
++		/* aa = (aa * 2) % mm */
++		vli_sub(t1, mm, aa, ndigits);
++		if (vli_cmp(aa, t1, ndigits) == -1)
++			/* if aa < t1 then aa = aa * 2 = aa << 1*/
++			vli_lshift(aa, aa, 1, ndigits);
++		else
++			/* if aa >= t1 then aa = aa - t1 */
++			vli_sub(aa, aa, t1, ndigits);
++	}
++}
++
+ /* Computes p_result = p_product % curve_p.
+  * See algorithm 5 and 6 from
+  * http://www.isys.uni-klu.ac.at/PDF/2001-0126-MT.pdf
+@@ -878,6 +991,61 @@ static void xycz_add_c(u64 *x1, u64 *y1, u64 *x2, u64 *y2, u64 *curve_prime,
+ 	vli_set(x1, t7, ndigits);
+ }
+ 
++/* Point addition.
++ * Add 2 distinct points on elliptic curve to get a new point.
++ *
++ * P = (x1,y1)and Q = (x2, y2) then P + Q = (x3,y3) where
++ * x3 = ((y2-y1)/(x2-x1))^2 - x1 - x2
++ * y3 = ((y2-y1)/(x2-x1))(x1-x3) - y1
++ *
++ * Q => P + Q
++ */
++void ecc_point_add(u64 *x1, u64 *y1, u64 *x2, u64 *y2, u64 *curve_prime,
++		   unsigned int ndigits)
++{
++	/* t1 = X1, t2 = Y1, t3 = X2, t4 = Y2 */
++	u64 t5[ndigits];
++	u64 t6[ndigits];
++	u64 t7[ndigits];
++
++	/* t6 = x2 - x1 */
++	vli_mod_sub(t6, x2, x1, curve_prime, ndigits);
++	/* t6 = (x2 - x1)^2 = A */
++	vli_mod_square_fast(t6, t6, curve_prime, ndigits);
++	vli_mod_inv(t7, t6, curve_prime, ndigits);
++	/* t5 = x2 - x1 */
++	vli_mod_sub(t5, x2, x1, curve_prime, ndigits);
++	/* t5 = (x2 - x1)^2 = A */
++	vli_mod_square_fast(t5, t5, curve_prime, ndigits);
++	/* t1 = x1*A = B = x1*(x2-x1)^2*/
++	vli_mod_mult_fast(x1, x1, t5, curve_prime, ndigits);
++	/* t3 = x2*A = C = x2*(x2-x1)^2*/
++	vli_mod_mult_fast(x2, x2, t5, curve_prime, ndigits);
++	/* t4 = y2 - y1 */
++	vli_mod_sub(y2, y2, y1, curve_prime, ndigits);
++	/* t5 = (y2 - y1)^2 = D */
++	vli_mod_square_fast(t5, y2, curve_prime, ndigits);
++
++	/* t5 = D - B = (y2 - y1)^2 - x1*(x2-x1)^2 */
++	vli_mod_sub(t5, t5, x1, curve_prime, ndigits);
++	/* t5 = D - B - C = x3 = (y2 - y1)^2 - x1*(x2-x1)^2 - x2*(x2-x1)^2*/
++	vli_mod_sub(t5, t5, x2, curve_prime, ndigits);
++
++	/* t3 = C - B = x2*(x2-x1)^2 - x1*(x2-x1)^2 */
++	vli_mod_sub(x2, x2, x1, curve_prime, ndigits);
++	/* t2 = y1*(C - B) = y1*(x2*(x2-x1)^2 - x1*(x2-x1)^2)*/
++	vli_mod_mult_fast(y1, y1, x2, curve_prime, ndigits);
++	/* t3 = B - x3 = x1*(x2-x1)^2 - x3*/
++	vli_mod_sub(x2, x1, t5, curve_prime, ndigits);
++	/* t4 = (y2 - y1)*(B - x3)  = (y2 - y1)*(x1*(x2-x1)^2 - x3)*/
++	vli_mod_mult_fast(y2, y2, x2, curve_prime, ndigits);
++	/* t4 = y3 = ((y2 - y1)*(x1*(x2-x1)^2 - x3)) - y1*/
++	vli_mod_sub(y2, y2, y1, curve_prime, ndigits);
++
++	vli_mod_mult_fast(t5, t5, t7,  curve_prime, ndigits);
++	vli_set(x2, t5, ndigits);
++}
++
+ static void ecc_point_mult(struct ecc_point *result,
+ 			   const struct ecc_point *point, const u64 *scalar,
+ 			   u64 *initial_z, u64 *curve_prime,
+@@ -965,3 +1133,24 @@ int ecc_is_key_valid(unsigned int curve_id, unsigned int ndigits,
+ 
+ 	return 0;
+ }
++
++int ecc_is_pub_key_valid(unsigned int curve_id, unsigned int ndigits,
++			 const u8 *pub_key, unsigned int pub_key_len)
++{
++	const struct ecc_curve *curve = ecc_get_curve(curve_id);
++	int nbytes = ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
++	struct ecc_point p;
++
++	if (!pub_key || pub_key_len != 2 * nbytes)
++		return -EINVAL;
++
++	p.x = (u64 *)pub_key;
++	p.y = (u64 *)(pub_key + ECC_MAX_DIGIT_BYTES);
++	p.ndigits = ndigits;
++
++	if (vli_cmp(curve->p, p.x, ndigits) != 1 ||
++	    vli_cmp(curve->p, p.y, ndigits) != 1)
++		return -EINVAL;
++
++	return 0;
++}
 -- 
 1.7.6.3
