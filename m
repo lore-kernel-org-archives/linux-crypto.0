@@ -1,64 +1,122 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v3 0/3] crypto: time invariant AES for CCM (and CMAC/XCBC)
-Date: Fri,  3 Feb 2017 14:49:34 +0000
-Message-ID: <1486133377-23290-1-git-send-email-ard.biesheuvel@linaro.org>
+Subject: [PATCH v3 1/3] crypto: testmgr - add test cases for cbcmac(aes)
+Date: Fri,  3 Feb 2017 14:49:35 +0000
+Message-ID: <1486133377-23290-2-git-send-email-ard.biesheuvel@linaro.org>
+References: <1486133377-23290-1-git-send-email-ard.biesheuvel@linaro.org>
 Cc: linux-arm-kernel@lists.infradead.org,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
         ebiggers3@gmail.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f44.google.com ([74.125.82.44]:37986 "EHLO
-        mail-wm0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752169AbdBCOtq (ORCPT
+Received: from mail-wm0-f53.google.com ([74.125.82.53]:38017 "EHLO
+        mail-wm0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752388AbdBCOtt (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 3 Feb 2017 09:49:46 -0500
-Received: by mail-wm0-f44.google.com with SMTP id r141so30862133wmg.1
-        for <linux-crypto@vger.kernel.org>; Fri, 03 Feb 2017 06:49:46 -0800 (PST)
+        Fri, 3 Feb 2017 09:49:49 -0500
+Received: by mail-wm0-f53.google.com with SMTP id r141so30863727wmg.1
+        for <linux-crypto@vger.kernel.org>; Fri, 03 Feb 2017 06:49:48 -0800 (PST)
+In-Reply-To: <1486133377-23290-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This series is primarily directed at improving the performance and security
-of CCM on the Rasperry Pi 3. This involves splitting the MAC handling of
-CCM into a separate driver so that we can efficiently replace it by something
-else using the ordinary algo resolution machinery.
+In preparation of splitting off the CBC-MAC transform in the CCM
+driver into a separate algorithm, define some test cases for the
+AES incarnation of cbcmac.
 
-Patch #1 adds some testcases for cbcmac(aes), which will be introduced later.
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+ crypto/testmgr.c |  7 +++
+ crypto/testmgr.h | 60 ++++++++++++++++++++
+ 2 files changed, 67 insertions(+)
 
-Patch #2 replaces the open coded CBC MAC hashing routines in the CCM driver
-with calls to a cbcmac() hash, and implements a template for producing such
-cbcmac transforms. This eliminates all the fuzzy scatterwalk code as well.
-
-Patch #3 implements cbcmac(aes) using NEON on arm64, and CMAC/XCBC at the
-same time, since it is trivially implemented reusing the same core transform
-
-Changes since v2:
-- dropped fixed time generic AES patch, this is only vaguely related, and can
-  be discussed separately
-- add CMAC and XCBC code to patch #3
-- fix stack corruption bug in patch #2
-- move patch #2 to use crypto_xor() for the cbcmac transform (which either needs
-  an alignmask, or the updated alignment agnostic crypto_xor() code whose v2
-  was sent out yesterday)
-
-Changes since v1:
-- remove ilen, and add missing flags assignment (#2)
-- deal with zero cryptlen (#2)
-- use correctly sized dg[] array in desc ctx (#3, #4)
-- fix bug in update routine (#3)
-- various other tweaks
-
-Ard Biesheuvel (3):
-  crypto: testmgr - add test cases for cbcmac(aes)
-  crypto: ccm - switch to separate cbcmac driver
-  crypto: arm64/aes - add NEON/Crypto Extensions CBCMAC/CMAC/XCBC driver
-
- arch/arm64/crypto/aes-glue.c  | 240 +++++++++++-
- arch/arm64/crypto/aes-modes.S |  29 +-
- crypto/Kconfig                |   1 +
- crypto/ccm.c                  | 381 +++++++++++++-------
- crypto/testmgr.c              |   7 +
- crypto/testmgr.h              |  60 +++
- 6 files changed, 579 insertions(+), 139 deletions(-)
-
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 98eb09782db8..f9c378af3907 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -2514,6 +2514,13 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 			}
+ 		}
+ 	}, {
++		.alg = "cbcmac(aes)",
++		.fips_allowed = 1,
++		.test = alg_test_hash,
++		.suite = {
++			.hash = __VECS(aes_cbcmac_tv_template)
++		}
++	}, {
+ 		.alg = "ccm(aes)",
+ 		.test = alg_test_aead,
+ 		.fips_allowed = 1,
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index 64595f067d72..f85e51cf7dcc 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -3413,6 +3413,66 @@ static struct hash_testvec aes_cmac128_tv_template[] = {
+ 	}
+ };
+ 
++static struct hash_testvec aes_cbcmac_tv_template[] = {
++	{
++		.key		= "\x2b\x7e\x15\x16\x28\xae\xd2\xa6"
++				  "\xab\xf7\x15\x88\x09\xcf\x4f\x3c",
++		.plaintext	= "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96"
++				  "\xe9\x3d\x7e\x11\x73\x93\x17\x2a",
++		.digest		= "\x3a\xd7\x7b\xb4\x0d\x7a\x36\x60"
++				  "\xa8\x9e\xca\xf3\x24\x66\xef\x97",
++		.psize		= 16,
++		.ksize		= 16,
++	}, {
++		.key		= "\x2b\x7e\x15\x16\x28\xae\xd2\xa6"
++				  "\xab\xf7\x15\x88\x09\xcf\x4f\x3c",
++		.plaintext	= "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96"
++				  "\xe9\x3d\x7e\x11\x73\x93\x17\x2a"
++				  "\xae\x2d\x8a\x57\x1e\x03\xac\x9c"
++				  "\x9e\xb7\x6f\xac\x45\xaf\x8e\x51"
++				  "\x30",
++		.digest		= "\x9d\x0d\xd0\x63\xfb\xcb\x24\x43"
++				  "\xf8\xf2\x76\x03\xac\x39\xb0\x9d",
++		.psize		= 33,
++		.ksize		= 16,
++		.np		= 2,
++		.tap		= { 7, 26 },
++	}, {
++		.key		= "\x2b\x7e\x15\x16\x28\xae\xd2\xa6"
++				  "\xab\xf7\x15\x88\x09\xcf\x4f\x3c",
++		.plaintext	= "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96"
++				  "\xe9\x3d\x7e\x11\x73\x93\x17\x2a"
++				  "\xae\x2d\x8a\x57\x1e\x03\xac\x9c"
++				  "\x9e\xb7\x6f\xac\x45\xaf\x8e\x51"
++				  "\x30\xc8\x1c\x46\xa3\x5c\xe4\x11"
++				  "\xe5\xfb\xc1\x19\x1a\x0a\x52\xef"
++				  "\xf6\x9f\x24\x45\xdf\x4f\x9b\x17"
++				  "\xad\x2b\x41\x7b\xe6\x6c\x37",
++		.digest		= "\xc0\x71\x73\xb8\xa0\x2c\x11\x7c"
++				  "\xaf\xdc\xb2\xf8\x89\x32\xa3\x3a",
++		.psize		= 63,
++		.ksize		= 16,
++	}, {
++		.key		= "\x60\x3d\xeb\x10\x15\xca\x71\xbe"
++				  "\x2b\x73\xae\xf0\x85\x7d\x77\x81"
++				  "\x1f\x35\x2c\x07\x3b\x61\x08\xd7"
++				  "\x2d\x98\x10\xa3\x09\x14\xdf\xf4",
++		.plaintext	= "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96"
++				  "\xe9\x3d\x7e\x11\x73\x93\x17\x2a"
++				  "\xae\x2d\x8a\x57\x1e\x03\xac\x9c"
++				  "\x9e\xb7\x6f\xac\x45\xaf\x8e\x51"
++				  "\x30\xc8\x1c\x46\xa3\x5c\xe4\x11"
++				  "\xe5\xfb\xc1\x19\x1a\x0a\x52\xef"
++				  "\xf6\x9f\x24\x45\xdf\x4f\x9b\x17"
++				  "\xad\x2b\x41\x7b\xe6\x6c\x37\x10"
++				  "\x1c",
++		.digest		= "\x6a\x4e\xdb\x21\x47\x51\xdf\x4f"
++				  "\xa8\x4d\x4c\x10\x3b\x72\x7d\xd6",
++		.psize		= 65,
++		.ksize		= 32,
++	}
++};
++
+ static struct hash_testvec des3_ede_cmac64_tv_template[] = {
+ /*
+  * From NIST Special Publication 800-38B, Three Key TDEA
 -- 
 2.7.4
