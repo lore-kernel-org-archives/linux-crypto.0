@@ -1,169 +1,77 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH] crypto: improve gcc optimization flags for serpent and wp512
-Date: Fri,  3 Feb 2017 23:33:23 +0100
-Message-ID: <20170203223334.3888507-1-arnd@arndb.de>
-Cc: kernel-build-reports@lists.linaro.org,
-        Arnd Bergmann <arnd@arndb.de>,
-        Ralf Baechle <ralf@linux-mips.org>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
+From: Yisheng Xie <xieyisheng1@huawei.com>
+Subject: Re: [PATCH resend 4.9] hw_random: Don't use a stack buffer in
+ add_early_randomness()
+Date: Sat, 4 Feb 2017 11:47:38 +0800
+Message-ID: <b0545f55-3b3c-35af-c9f6-bc63cf169d2d@huawei.com>
+References: <4169224b6858d1cf149f1a73f8a03603fa19076d.1476638125.git.luto@kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Cc: Jens Axboe <axboe@fb.com>, Matt Mullins <mmullins@mmlx.us>,
+        Xishi Qiu <qiuxishi@huawei.com>,
+        Hanjun Guo <guohanjun@huawei.com>
+To: Andy Lutomirski <luto@kernel.org>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Rusty Russell <rusty@rustcorp.com.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.10]:52195 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752635AbdBCWd6 (ORCPT
+Received: from szxga03-in.huawei.com ([119.145.14.66]:33213 "EHLO
+        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753413AbdBDDr6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 3 Feb 2017 17:33:58 -0500
+        Fri, 3 Feb 2017 22:47:58 -0500
+In-Reply-To: <4169224b6858d1cf149f1a73f8a03603fa19076d.1476638125.git.luto@kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-An ancient gcc bug (first reported in 2003) has apparently resurfaced
-on MIPS, where kernelci.org reports an overly large stack frame in the
-whirlpool hash algorithm:
+Hi Andy,
 
-crypto/wp512.c:987:1: warning: the frame size of 1112 bytes is larger than 1024 bytes [-Wframe-larger-than=]
+On 2016/10/18 1:06, Andy Lutomirski wrote:
+> hw_random carefully avoids using a stack buffer except in
+> add_early_randomness().  This causes a crash in virtio_rng if
+> CONFIG_VMAP_STACK=y.
+I try to understand this patch, but I do not know why it will cause
+a crash in virtio_rng with CONFIG_VMAP_STACK=y?
+Could you please give me more info. about it.
 
-With some testing in different configurations, I'm seeing large
-variations in stack frames size up to 1500 bytes for what should have
-around 300 bytes at most. I also checked the reference implementation,
-which is essentially the same code but also comes with some test and
-benchmarking infrastructure.
+Really thanks for that!
+Yisheng Xie.
 
-It seems that recent compiler versions on at least arm, arm64 and powerpc
-have a partial fix for this problem, but enabling "-fsched-pressure", but
-even with that fix they suffer from the issue to a certain degree. Some
-testing on arm64 shows that the time needed to hash a given amount of
-data is roughly proportional to the stack frame size here, which makes
-sense given that the wp512 implementation is doing lots of loads for
-table lookups, and the problem with the overly large stack is a result
-of doing a lot more loads and stores for spilled registers (as seen from
-inspecting the object code).
-
-Disabling -fschedule-insns consistently fixes the problem for wp512,
-in my collection of cross-compilers, the results are consistently better
-or identical when comparing the stack sizes in this function, though
-some architectures (notable x86) have schedule-insns disabled by
-default.
-
-The four columns are:
-default: -O2
-press:	 -O2 -fsched-pressure
-nopress: -O2 -fschedule-insns -fno-sched-pressure
-nosched: -O2 -no-schedule-insns (disables sched-pressure)
-
-				default	press	nopress	nosched
-alpha-linux-gcc-4.9.3		1136	848	1136	176
-am33_2.0-linux-gcc-4.9.3	2100	2076	2100	2104
-arm-linux-gnueabi-gcc-4.9.3	848	848	1048	352
-cris-linux-gcc-4.9.3		272	272	272	272
-frv-linux-gcc-4.9.3		1128	1000	1128	280
-hppa64-linux-gcc-4.9.3		1128	336	1128	184
-hppa-linux-gcc-4.9.3		644	308	644	276
-i386-linux-gcc-4.9.3		352	352	352	352
-m32r-linux-gcc-4.9.3		720	656	720	268
-microblaze-linux-gcc-4.9.3	1108	604	1108	256
-mips64-linux-gcc-4.9.3		1328	592	1328	208
-mips-linux-gcc-4.9.3		1096	624	1096	240
-powerpc64-linux-gcc-4.9.3	1088	432	1088	160
-powerpc-linux-gcc-4.9.3		1080	584	1080	224
-s390-linux-gcc-4.9.3		456	456	624	360
-sh3-linux-gcc-4.9.3		292	292	292	292
-sparc64-linux-gcc-4.9.3		992	240	992	208
-sparc-linux-gcc-4.9.3		680	592	680	312
-x86_64-linux-gcc-4.9.3		224	240	272	224
-xtensa-linux-gcc-4.9.3		1152	704	1152	304
-
-aarch64-linux-gcc-7.0.0		224	224	1104	208
-arm-linux-gnueabi-gcc-7.0.1	824	824	1048	352
-mips-linux-gcc-7.0.0		1120	648	1120	272
-x86_64-linux-gcc-7.0.1		240	240	304	240
-
-arm-linux-gnueabi-gcc-4.4.7	840			392
-arm-linux-gnueabi-gcc-4.5.4	784	728	784	320
-arm-linux-gnueabi-gcc-4.6.4	736	728	736	304
-arm-linux-gnueabi-gcc-4.7.4	944	784	944	352
-arm-linux-gnueabi-gcc-4.8.5	464	464	760	352
-arm-linux-gnueabi-gcc-4.9.3	848	848	1048	352
-arm-linux-gnueabi-gcc-5.3.1	824	824	1064	336
-arm-linux-gnueabi-gcc-6.1.1	808	808	1056	344
-arm-linux-gnueabi-gcc-7.0.1	824	824	1048	352
-
-Trying the same test for serpent-generic, the picture is a bit different,
-and while -fno-schedule-insns is generally better here than the default,
--fsched-pressure wins overall, so I picked that instead.
-
-				default	press	nopress	nosched
-alpha-linux-gcc-4.9.3		1392	864	1392	960
-am33_2.0-linux-gcc-4.9.3	536	524	536	528
-arm-linux-gnueabi-gcc-4.9.3	552	552	776	536
-cris-linux-gcc-4.9.3		528	528	528	528
-frv-linux-gcc-4.9.3		536	400	536	504
-hppa64-linux-gcc-4.9.3		524	208	524	480
-hppa-linux-gcc-4.9.3		768	472	768	508
-i386-linux-gcc-4.9.3		564	564	564	564
-m32r-linux-gcc-4.9.3		712	576	712	532
-microblaze-linux-gcc-4.9.3	724	392	724	512
-mips64-linux-gcc-4.9.3		720	384	720	496
-mips-linux-gcc-4.9.3		728	384	728	496
-powerpc64-linux-gcc-4.9.3	704	304	704	480
-powerpc-linux-gcc-4.9.3		704	296	704	480
-s390-linux-gcc-4.9.3		560	560	592	536
-sh3-linux-gcc-4.9.3		540	540	540	540
-sparc64-linux-gcc-4.9.3		544	352	544	496
-sparc-linux-gcc-4.9.3		544	344	544	496
-x86_64-linux-gcc-4.9.3		528	536	576	528
-xtensa-linux-gcc-4.9.3		752	544	752	544
-
-aarch64-linux-gcc-7.0.0		432	432	656	480
-arm-linux-gnueabi-gcc-7.0.1	616	616	808	536
-mips-linux-gcc-7.0.0		720	464	720	488
-x86_64-linux-gcc-7.0.1		536	528	600	536
-
-arm-linux-gnueabi-gcc-4.4.7	592			440
-arm-linux-gnueabi-gcc-4.5.4	776	448	776	544
-arm-linux-gnueabi-gcc-4.6.4	776	448	776	544
-arm-linux-gnueabi-gcc-4.7.4	768	448	768	544
-arm-linux-gnueabi-gcc-4.8.5	488	488	776	544
-arm-linux-gnueabi-gcc-4.9.3	552	552	776	536
-arm-linux-gnueabi-gcc-5.3.1	552	552	776	536
-arm-linux-gnueabi-gcc-6.1.1	560	560	776	536
-arm-linux-gnueabi-gcc-7.0.1	616	616	808	536
-
-I did not do any runtime tests with serpent, so it is possible that stack
-frame size does not directly correlate with runtime performance here and
-it actually makes things worse, but it's more likely to help here, and
-the reduced stack frame size is probably enough reason to apply the patch,
-especially given that the crypto code is often used in deep call chains.
-
-Link: https://kernelci.org/build/id/58797d7559b5149efdf6c3a9/logs/
-Link: http://www.larc.usp.br/~pbarreto/WhirlpoolPage.html
-Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=11488
-Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=79149
-Cc: Ralf Baechle <ralf@linux-mips.org>
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- crypto/Makefile | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/crypto/Makefile b/crypto/Makefile
-index b8f0e3eb0791..aa10a4db41de 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -75,6 +75,7 @@ obj-$(CONFIG_CRYPTO_SHA256) += sha256_generic.o
- obj-$(CONFIG_CRYPTO_SHA512) += sha512_generic.o
- obj-$(CONFIG_CRYPTO_SHA3) += sha3_generic.o
- obj-$(CONFIG_CRYPTO_WP512) += wp512.o
-+CFLAGS_wp512.o := $(call cc-option,-fno-schedule-insns)  # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=79149
- obj-$(CONFIG_CRYPTO_TGR192) += tgr192.o
- obj-$(CONFIG_CRYPTO_GF128MUL) += gf128mul.o
- obj-$(CONFIG_CRYPTO_ECB) += ecb.o
-@@ -98,6 +99,7 @@ obj-$(CONFIG_CRYPTO_BLOWFISH_COMMON) += blowfish_common.o
- obj-$(CONFIG_CRYPTO_TWOFISH) += twofish_generic.o
- obj-$(CONFIG_CRYPTO_TWOFISH_COMMON) += twofish_common.o
- obj-$(CONFIG_CRYPTO_SERPENT) += serpent_generic.o
-+CFLAGS_serpent_generic.o := $(call cc-option,-fsched-pressure)  # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=79149
- obj-$(CONFIG_CRYPTO_AES) += aes_generic.o
- obj-$(CONFIG_CRYPTO_CAMELLIA) += camellia_generic.o
- obj-$(CONFIG_CRYPTO_CAST_COMMON) += cast_common.o
--- 
-2.9.0
+> 
+> Reported-by: Matt Mullins <mmullins@mmlx.us>
+> Tested-by: Matt Mullins <mmullins@mmlx.us>
+> Fixes: d3cc7996473a ("hwrng: fetch randomness only after device init")
+> Signed-off-by: Andy Lutomirski <luto@kernel.org>
+> ---
+> 
+> This fixes a crash in 4.9-rc1.
+> 
+> resending because I typoed the git send-email command.  I stealthily added
+> Matt's Tested-by, too.
+> 
+>  drivers/char/hw_random/core.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+> index 9203f2d130c0..340f96e44642 100644
+> --- a/drivers/char/hw_random/core.c
+> +++ b/drivers/char/hw_random/core.c
+> @@ -84,14 +84,14 @@ static size_t rng_buffer_size(void)
+>  
+>  static void add_early_randomness(struct hwrng *rng)
+>  {
+> -	unsigned char bytes[16];
+>  	int bytes_read;
+> +	size_t size = min_t(size_t, 16, rng_buffer_size());
+>  
+>  	mutex_lock(&reading_mutex);
+> -	bytes_read = rng_get_data(rng, bytes, sizeof(bytes), 1);
+> +	bytes_read = rng_get_data(rng, rng_buffer, size, 1);
+>  	mutex_unlock(&reading_mutex);
+>  	if (bytes_read > 0)
+> -		add_device_randomness(bytes, bytes_read);
+> +		add_device_randomness(rng_buffer, bytes_read);
+>  }
+>  
+>  static inline void cleanup_rng(struct kref *kref)
+> 
