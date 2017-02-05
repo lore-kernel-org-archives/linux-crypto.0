@@ -1,193 +1,261 @@
-From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: [RFC PATCH] crypto: algapi - make crypto_xor() and crypto_inc()
- alignment agnostic
-Date: Sat, 4 Feb 2017 19:05:27 -0800
-Message-ID: <20170205030527.GA21055@zzz>
-References: <1485785489-5116-1-git-send-email-ard.biesheuvel@linaro.org>
- <20170202064716.GB582@zzz>
- <CAHmME9qtX64rp-bXfb7-vM-vsBd18186MNZ4G9KonLYhsM5uEg@mail.gmail.com>
- <CAHmME9pwhWrXLEXyrPKueFwoVexEVNvSxN=FDFLsi+gHowE2Ww@mail.gmail.com>
+From: Vinod Koul <vinod.koul-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 5/6] dmaengine: Add Broadcom SBA RAID driver
+Date: Sun, 5 Feb 2017 11:36:57 +0530
+Message-ID: <20170205060657.GV19244@localhost>
+References: <1486010836-25228-1-git-send-email-anup.patel@broadcom.com>
+ <1486010836-25228-6-git-send-email-anup.patel@broadcom.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:33859 "EHLO
-        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751053AbdBEDFc (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 4 Feb 2017 22:05:32 -0500
-Received: by mail-pf0-f196.google.com with SMTP id y143so4336117pfb.1
-        for <linux-crypto@vger.kernel.org>; Sat, 04 Feb 2017 19:05:32 -0800 (PST)
+Cc: Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
+        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+        "David S . Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+        Jassi Brar <jassisinghbrar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        Dan Williams <dan.j.williams-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+        Ray Jui <rjui-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
+        Scott Branden <sbranden-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
+        Jon Mason <jonmason-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
+        Rob Rice <rob.rice-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
+        bcm-kernel-feedback-list-dY08KVG/lbpWk0Htik3J/w@public.gmane.org, dmaengine-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+        linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-raid-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Anup Patel <anup.patel-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <CAHmME9pwhWrXLEXyrPKueFwoVexEVNvSxN=FDFLsi+gHowE2Ww@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1486010836-25228-6-git-send-email-anup.patel-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Sun, Feb 05, 2017 at 12:10:53AM +0100, Jason A. Donenfeld wrote:
-> Another thing that might be helpful is that you can let gcc decide on
-> the alignment, and then optimize appropriately. Check out what we do
-> with siphash:
-> 
-> https://git.kernel.org/cgit/linux/kernel/git/davem/net-next.git/tree/include/linux/siphash.h#n76
-> 
-> static inline u64 siphash(const void *data, size_t len, const
-> siphash_key_t *key)
-> {
-> #ifndef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
->         if (!IS_ALIGNED((unsigned long)data, SIPHASH_ALIGNMENT))
->                 return __siphash_unaligned(data, len, key);
-> #endif
->         return ___siphash_aligned(data, len, key);
-> }
-> 
-> With this trick, we fall through to the fast alignment-assuming code,
-> if gcc can prove that the address is inlined. This is often the case
-> when passing structs, or when passing buffers that have
-> __aligned(BLOCKSIZE). It proves to be a very useful optimization on
-> some platforms.
+On Thu, Feb 02, 2017 at 10:17:15AM +0530, Anup Patel wrote:
+> +config BCM_SBA_RAID
+> +        tristate "Broadcom SBA RAID engine support"
+> +        depends on (ARM64 && MAILBOX && RAID6_PQ) || COMPILE_TEST
+> +        select DMA_ENGINE
+> +        select DMA_ENGINE_RAID
+> +	select ASYNC_TX_ENABLE_CHANNEL_SWITCH
+> +	default ARCH_BCM_IPROC
 
-Yes, this is a good idea.  Though it seems that usually at least one of the two
-pointers passed to crypto_xor() will have alignment unknown to the compiler,
-sometimes the length is constant which inlining can help a lot for.  For
-example, if someone does crypto_xor(foo, bar, 16) on x86_64 or ARM64, we'd
-really like it to turn into just a few instructions like this:
+whats with the funny alignement?
 
-	mov    (%rsi),%rax
-	xor    %rax,(%rdi)
-	mov    0x8(%rsi),%rax
-	xor    %rax,0x8(%rdi)
+> +/* SBA command related defines */
+> +#define SBA_TYPE_SHIFT					48
+> +#define SBA_TYPE_MASK					0x3
+> +#define SBA_TYPE_A					0x0
+> +#define SBA_TYPE_B					0x2
+> +#define SBA_TYPE_C					0x3
+> +#define SBA_USER_DEF_SHIFT				32
+> +#define SBA_USER_DEF_MASK				0xffff
+> +#define SBA_R_MDATA_SHIFT				24
+> +#define SBA_R_MDATA_MASK				0xff
+> +#define SBA_C_MDATA_MS_SHIFT				18
+> +#define SBA_C_MDATA_MS_MASK				0x3
+> +#define SBA_INT_SHIFT					17
+> +#define SBA_INT_MASK					0x1
+> +#define SBA_RESP_SHIFT					16
+> +#define SBA_RESP_MASK					0x1
+> +#define SBA_C_MDATA_SHIFT				8
+> +#define SBA_C_MDATA_MASK				0xff
+> +#define SBA_CMD_SHIFT					0
+> +#define SBA_CMD_MASK					0xf
+> +#define SBA_CMD_ZERO_ALL_BUFFERS			0x8
+> +#define SBA_CMD_LOAD_BUFFER				0x9
+> +#define SBA_CMD_XOR					0xa
+> +#define SBA_CMD_GALOIS_XOR				0xb
+> +#define SBA_CMD_ZERO_BUFFER				0x4
+> +#define SBA_CMD_WRITE_BUFFER				0xc
 
-So how about inlining crypto_xor() if CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS or
-the pointers are long-aligned, otherwise calling an out-of-line function
-__crypto_xor_unaligned() that handles all the cases with weird alignment.
-Something like the following patch:
+Try using BIT and GENMAST for hardware descriptions
 
-(Note: exactly how __crypto_xor_unaligned() is implemented is still debatable;
-it could be more similar to Ard's proposal, or it could use the unaligned access
-helpers.)
+> +
+> +/* SBA C_MDATA helper macros */
+> +#define SBA_C_MDATA_LOAD_VAL(__bnum0)		((__bnum0) & 0x3)
+> +#define SBA_C_MDATA_WRITE_VAL(__bnum0)		((__bnum0) & 0x3)
+> +#define SBA_C_MDATA_XOR_VAL(__bnum1, __bnum0)			\
+> +			({	u32 __v = ((__bnum0) & 0x3);	\
+> +				__v |= ((__bnum1) & 0x3) << 2;	\
+> +				__v;				\
+> +			})
+> +#define SBA_C_MDATA_PQ_VAL(__dnum, __bnum1, __bnum0)		\
+> +			({	u32 __v = ((__bnum0) & 0x3);	\
+> +				__v |= ((__bnum1) & 0x3) << 2;	\
+> +				__v |= ((__dnum) & 0x1f) << 5;	\
+> +				__v;				\
+> +			})
 
-diff --git a/crypto/algapi.c b/crypto/algapi.c
-index df939b54b09f..a0591db3f13a 100644
---- a/crypto/algapi.c
-+++ b/crypto/algapi.c
-@@ -972,23 +972,69 @@ void crypto_inc(u8 *a, unsigned int size)
- }
- EXPORT_SYMBOL_GPL(crypto_inc);
- 
--static inline void crypto_xor_byte(u8 *a, const u8 *b, unsigned int size)
-+#ifndef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
-+void __crypto_xor_unaligned(u8 *dst, const u8 *src, unsigned int len)
- {
--	for (; size; size--)
--		*a++ ^= *b++;
--}
-+	unsigned long delta = (unsigned long)dst ^ (unsigned long)src;
- 
--void crypto_xor(u8 *dst, const u8 *src, unsigned int size)
--{
--	u32 *a = (u32 *)dst;
--	u32 *b = (u32 *)src;
-+	/* Handle relative misalignment */
-+	if (delta % sizeof(unsigned long)) {
-+
-+		/* 1-byte relative misalignment? */
-+		if (delta & 1) {
-+			while (len--)
-+				*dst++ ^= *src++;
-+			return;
-+		}
- 
--	for (; size >= 4; size -= 4)
--		*a++ ^= *b++;
-+		/* 2-byte relative misalignment? */
-+		if ((delta & 2) || sizeof(unsigned long) == 4) {
-+			if ((unsigned long)dst % __alignof__(u16) && len) {
-+				*dst++ ^= *src++;
-+				len--;
-+			}
-+			while (len >= 2) {
-+				*(u16 *)dst ^= *(u16 *)src;
-+				dst += 2, src += 2, len -= 2;
-+			}
-+			if (len)
-+				*dst ^= *src;
-+			return;
-+		}
-+
-+		/* 4-byte relative misalignment? */
-+		while ((unsigned long)dst % __alignof__(u32) && len) {
-+			*dst++ ^= *src++;
-+			len--;
-+		}
-+		while (len >= 4) {
-+			*(u32 *)dst ^= *(u32 *)src;
-+			dst += 4, src += 4, len -= 4;
-+		}
-+		while (len--)
-+			*dst++ ^= *src++;
-+		return;
-+	}
-+
-+	/* No relative misalignment; use word accesses */
-+
-+	while ((unsigned long)dst % __alignof__(unsigned long) && len) {
-+		*dst++ ^= *src++;
-+		len--;
-+	}
-+
-+	while (len >= sizeof(unsigned long)) {
-+		*(unsigned long *)dst ^= *(unsigned long *)src;
-+		dst += sizeof(unsigned long);
-+		src += sizeof(unsigned long);
-+		len -= sizeof(unsigned long);
-+	}
- 
--	crypto_xor_byte((u8 *)a, (u8 *)b, size);
-+	while (len--)
-+		*dst++ ^= *src++;
- }
--EXPORT_SYMBOL_GPL(crypto_xor);
-+EXPORT_SYMBOL_GPL(__crypto_xor_unaligned);
-+#endif /* !CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS */
- 
- unsigned int crypto_alg_extsize(struct crypto_alg *alg)
- {
-diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
-index 404e9558e879..718145c5eaca 100644
---- a/include/crypto/algapi.h
-+++ b/include/crypto/algapi.h
-@@ -191,9 +191,29 @@ static inline unsigned int crypto_queue_len(struct crypto_queue *queue)
- 	return queue->qlen;
- }
- 
--/* These functions require the input/output to be aligned as u32. */
- void crypto_inc(u8 *a, unsigned int size);
--void crypto_xor(u8 *dst, const u8 *src, unsigned int size);
-+
-+void __crypto_xor_unaligned(u8 *dst, const u8 *src, unsigned int len);
-+
-+static inline void crypto_xor(u8 *dst, const u8 *src, unsigned int len)
-+{
-+	if (IS_ENABLED(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS) ||
-+	    (((unsigned long)dst | (unsigned long)src) %
-+	     __alignof__(unsigned long) == 0))
-+	{
-+		while (len >= sizeof(unsigned long)) {
-+			*(unsigned long *)dst ^= *(unsigned long *)src;
-+			dst += sizeof(unsigned long);
-+			src += sizeof(unsigned long);
-+			len -= sizeof(unsigned long);
-+		}
-+
-+		while (len--)
-+			*dst++ ^= *src++;
-+		return;
-+	}
-+	return __crypto_xor_unaligned(dst, src, len);
-+}
- 
- int blkcipher_walk_done(struct blkcipher_desc *desc,
- 			struct blkcipher_walk *walk, int err);
+ah why are we usig complex macros, why can't these be simple functions..
+
+> +#define SBA_C_MDATA_LS(__c_mdata_val)	((__c_mdata_val) & 0xff)
+> +#define SBA_C_MDATA_MS(__c_mdata_val)	(((__c_mdata_val) >> 8) & 0x3)
+> +
+> +/* Driver helper macros */
+> +#define to_sba_request(tx)		\
+> +	container_of(tx, struct sba_request, tx)
+> +#define to_sba_device(dchan)		\
+> +	container_of(dchan, struct sba_device, dma_chan)
+> +
+> +enum sba_request_state {
+> +	SBA_REQUEST_STATE_FREE = 1,
+> +	SBA_REQUEST_STATE_ALLOCED = 2,
+> +	SBA_REQUEST_STATE_PENDING = 3,
+> +	SBA_REQUEST_STATE_ACTIVE = 4,
+> +	SBA_REQUEST_STATE_COMPLETED = 5,
+> +	SBA_REQUEST_STATE_ABORTED = 6,
+
+whats up with a very funny indentation setting, we use 8 chars.
+
+Please re-read the Documentation/process/coding-style.rst
+
+> +static int sba_alloc_chan_resources(struct dma_chan *dchan)
+> +{
+> +	/*
+> +	 * We only have one channel so we have pre-alloced
+> +	 * channel resources. Over here we just return number
+> +	 * of free request.
+> +	 */
+> +	return sba_free_request_count(to_sba_device(dchan));
+> +}
+
+essentially you are not doing much, so you can skip it. Its an optional
+call.
+
+> +static void sba_free_chan_resources(struct dma_chan *dchan)
+> +{
+> +	/*
+> +	 * Channel resources are pre-alloced so we just free-up
+> +	 * whatever we can so that we can re-use pre-alloced
+> +	 * channel resources next time.
+> +	 */
+> +	sba_cleanup_inflight_requests(to_sba_device(dchan));
+
+well this one checks for pending requests as well, which shouldn't be there
+when freeing a channel, something seems not quite right here..
+
+> +static int sba_send_mbox_request(struct sba_device *sba,
+> +				 struct sba_request *req)
+> +{
+> +	int mchans_idx, ret = 0;
+> +
+> +	/* Select mailbox channel in round-robin fashion */
+> +	mchans_idx = atomic_inc_return(&sba->mchans_current);
+> +	mchans_idx = mchans_idx % sba->mchans_count;
+> +
+> +	/* Send batch message for the request */
+> +	req->bmsg.batch.msgs_queued = 0;
+> +	ret = mbox_send_message(sba->mchans[mchans_idx], &req->bmsg);
+> +	if (ret < 0) {
+> +		dev_info(sba->dev, "channel %d message %d (total %d)",
+> +			 mchans_idx, req->bmsg.batch.msgs_queued,
+> +			 req->bmsg.batch.msgs_count);
+
+dev_err?
+
+> +		dev_err(sba->dev, "send message failed with error %d", ret);
+> +		return ret;
+> +	}
+> +	ret = req->bmsg.error;
+> +	if (ret < 0) {
+> +		dev_info(sba->dev,
+> +			 "mbox channel %d message %d (total %d)",
+> +			 mchans_idx, req->bmsg.batch.msgs_queued,
+> +			 req->bmsg.batch.msgs_count);
+
+same here
+
+> +static dma_cookie_t sba_tx_submit(struct dma_async_tx_descriptor *tx)
+> +{
+> +	unsigned long flags;
+> +	dma_cookie_t cookie;
+> +	struct sba_request *req;
+> +	struct sba_device *sba;
+> +
+> +	if (unlikely(!tx))
+> +		return -EINVAL;
+> +
+> +	sba = to_sba_device(tx->chan);
+> +	req = to_sba_request(tx);
+> +
+> +	/* Assign cookie and mark request pending */
+> +	spin_lock_irqsave(&sba->reqs_lock, flags);
+> +	cookie = dma_cookie_assign(tx);
+> +	_sba_pending_request(sba, req);
+> +	spin_unlock_irqrestore(&sba->reqs_lock, flags);
+> +
+> +	/* Try to submit pending request */
+> +	sba_issue_pending(&sba->dma_chan);
+
+Nope, thats wrong, caller needs to call .issue_pending for that
+
+> +static enum dma_status sba_tx_status(struct dma_chan *dchan,
+> +				     dma_cookie_t cookie,
+> +				     struct dma_tx_state *txstate)
+> +{
+> +	int mchan_idx;
+> +	enum dma_status ret;
+> +	struct sba_device *sba = to_sba_device(dchan);
+> +
+> +	ret = dma_cookie_status(dchan, cookie, txstate);
+> +	if (ret == DMA_COMPLETE)
+> +		return ret;
+> +
+> +	for (mchan_idx = 0; mchan_idx < sba->mchans_count; mchan_idx++)
+> +		mbox_client_peek_data(sba->mchans[mchan_idx]);
+
+what is this achieving?
+
+> +static struct dma_async_tx_descriptor *
+> +sba_prep_dma_memcpy(struct dma_chan *dchan, dma_addr_t dst, dma_addr_t src,
+> +		    size_t len, unsigned long flags)
+> +{
+> +	size_t msg_len;
+> +	dma_addr_t msg_offset = 0;
+> +	unsigned int msgs_count = 0, cmds_count, cmds_idx = 0;
+> +	struct sba_device *sba = to_sba_device(dchan);
+> +	struct sba_request *req = NULL;
+> +
+> +	/* Sanity checks */
+> +	if (unlikely(len > sba->req_size))
+> +		return NULL;
+
+why is that an error, you can create multiple txn of max length
+
+> +static int sba_async_register(struct sba_device *sba)
+> +{
+> +	int ret;
+> +	struct dma_device *dma_dev = &sba->dma_dev;
+> +
+> +	/* Initialize DMA channel cookie */
+> +	sba->dma_chan.device = dma_dev;
+> +	dma_cookie_init(&sba->dma_chan);
+> +
+> +	/* Initialize DMA device capability mask */
+> +	dma_cap_zero(dma_dev->cap_mask);
+> +	dma_cap_set(DMA_MEMCPY, dma_dev->cap_mask);
+> +	dma_cap_set(DMA_XOR, dma_dev->cap_mask);
+> +	dma_cap_set(DMA_PQ, dma_dev->cap_mask);
+> +
+> +	/*
+> +	 * Set mailbox channel device as the base device of
+> +	 * our dma_device because the actual memory accesses
+> +	 * will be done by mailbox controller
+> +	 */
+> +	dma_dev->dev = sba->mbox_dev;
+> +
+> +	/* Set base prep routines */
+> +	dma_dev->device_alloc_chan_resources = sba_alloc_chan_resources;
+> +	dma_dev->device_free_chan_resources = sba_free_chan_resources;
+> +	dma_dev->device_issue_pending = sba_issue_pending;
+> +	dma_dev->device_tx_status = sba_tx_status;
+
+Please add terminate callback support, also add the capabilities, we need to
+advertise that and use in clients
+
+Also you can simplify bunch of code by using virt-chan support for managing
+channels and descriptors
+
+-- 
+~Vinod
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
