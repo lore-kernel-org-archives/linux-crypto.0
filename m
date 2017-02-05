@@ -1,261 +1,113 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v3] crypto: algapi - make crypto_xor() and crypto_inc() alignment agnostic
-Date: Sun,  5 Feb 2017 10:06:12 +0000
-Message-ID: <1486289172-18604-1-git-send-email-ard.biesheuvel@linaro.org>
-Cc: herbert@gondor.apana.org.au, Jason@zx2c4.com,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: linux-crypto@vger.kernel.org, ebiggers3@gmail.com
+From: Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
+Subject: [PATCH v7 0/5] Update LZ4 compressor module
+Date: Sun,  5 Feb 2017 20:09:03 +0100
+Message-ID: <1486321748-19085-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
+References: <1482259992-16680-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
+Cc: bongkyu.kim@lge.com, rsalvaterra@gmail.com,
+        sergey.senozhatsky@gmail.com, gregkh@linuxfoundation.org,
+        linux-kernel@vger.kernel.org, herbert@gondor.apana.org.au,
+        davem@davemloft.net, linux-crypto@vger.kernel.org,
+        anton@enomsg.org, ccross@android.com, keescook@chromium.org,
+        tony.luck@intel.com
+To: akpm@linux-foundation.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wr0-f175.google.com ([209.85.128.175]:33754 "EHLO
-        mail-wr0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751774AbdBEKGn (ORCPT
+Received: from mailhost.informatik.uni-hamburg.de ([134.100.9.70]:34967 "EHLO
+        mailhost.informatik.uni-hamburg.de" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1751532AbdBETL4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 5 Feb 2017 05:06:43 -0500
-Received: by mail-wr0-f175.google.com with SMTP id i10so8975911wrb.0
-        for <linux-crypto@vger.kernel.org>; Sun, 05 Feb 2017 02:06:42 -0800 (PST)
+        Sun, 5 Feb 2017 14:11:56 -0500
+In-Reply-To: <1482259992-16680-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Instead of unconditionally forcing 4 byte alignment for all generic
-chaining modes that rely on crypto_xor() or crypto_inc() (which may
-result in unnecessary copying of data when the underlying hardware
-can perform unaligned accesses efficiently), make those functions
-deal with unaligned input explicitly, but only if the Kconfig symbol
-HAVE_EFFICIENT_UNALIGNED_ACCESS is set. This will allow us to drop
-the alignmasks from the CBC, CMAC, CTR, CTS, PCBC and SEQIV drivers.
 
-For crypto_inc(), this simply involves making the 4-byte stride
-conditional on HAVE_EFFICIENT_UNALIGNED_ACCESS being set, given that
-it typically operates on 16 byte buffers.
+This patchset is for updating the LZ4 compression module to a version based
+on LZ4 v1.7.3 allowing to use the fast compression algorithm aka LZ4 fast
+which provides an "acceleration" parameter as a tradeoff between
+high compression ratio and high compression speed.
 
-For crypto_xor(), an algorithm is implemented that simply runs through
-the input using the largest strides possible if unaligned accesses are
-allowed. If they are not, an optimal sequence of memory accesses is
-emitted that takes the relative alignment of the input buffers into
-account, e.g., if the relative misalignment of dst and src is 4 bytes,
-the entire xor operation will be completed using 4 byte loads and stores
-(modulo unaligned bits at the start and end). Note that all expressions
-involving misalign are simply eliminated by the compiler when
-HAVE_EFFICIENT_UNALIGNED_ACCESS is defined.
+We want to use LZ4 fast in order to support compression in lustre
+and (mostly, based on that) investigate data reduction techniques in behalf of
+storage systems.
 
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
-v3: fix thinko in processing of unaligned leading chunk
-    inline common case where the input size is a constant multiple of the word
-    size on architectures with h/w handling of unaligned accesses
+Also, it will be useful for other users of LZ4 compression, as with LZ4 fast
+it is possible to enable applications to use fast and/or high compression
+depending on the usecase.
+For instance, ZRAM is offering a LZ4 backend and could benefit from an updated
+LZ4 in the kernel.
 
- crypto/algapi.c         | 68 ++++++++++++++------
- crypto/cbc.c            |  3 -
- crypto/cmac.c           |  3 +-
- crypto/ctr.c            |  2 +-
- crypto/cts.c            |  3 -
- crypto/pcbc.c           |  3 -
- crypto/seqiv.c          |  2 -
- include/crypto/algapi.h | 20 +++++-
- 8 files changed, 70 insertions(+), 34 deletions(-)
+LZ4 homepage: http://www.lz4.org/
+LZ4 source repository: https://github.com/lz4/lz4
+Source version: 1.7.3
 
-diff --git a/crypto/algapi.c b/crypto/algapi.c
-index 1fad2a6b3bbb..6b52e8f0b95f 100644
---- a/crypto/algapi.c
-+++ b/crypto/algapi.c
-@@ -962,34 +962,66 @@ void crypto_inc(u8 *a, unsigned int size)
- 	__be32 *b = (__be32 *)(a + size);
- 	u32 c;
- 
--	for (; size >= 4; size -= 4) {
--		c = be32_to_cpu(*--b) + 1;
--		*b = cpu_to_be32(c);
--		if (c)
--			return;
--	}
-+	if (IS_ENABLED(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS) ||
-+	    !((unsigned long)b & (__alignof__(*b) - 1)))
-+		for (; size >= 4; size -= 4) {
-+			c = be32_to_cpu(*--b) + 1;
-+			*b = cpu_to_be32(c);
-+			if (c)
-+				return;
-+		}
- 
- 	crypto_inc_byte(a, size);
- }
- EXPORT_SYMBOL_GPL(crypto_inc);
- 
--static inline void crypto_xor_byte(u8 *a, const u8 *b, unsigned int size)
-+void __crypto_xor(u8 *dst, const u8 *src, unsigned int len)
- {
--	for (; size; size--)
--		*a++ ^= *b++;
--}
-+	int relalign = 0;
-+
-+	if (!IS_ENABLED(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS)) {
-+		int size = sizeof(unsigned long);
-+		int d = ((unsigned long)dst ^ (unsigned long)src) & (size - 1);
-+
-+		relalign = d ? 1 << __ffs(d) : size;
-+
-+		/*
-+		 * If we care about alignment, process as many bytes as
-+		 * needed to advance dst and src to values whose alignments
-+		 * equal their relative alignment. This will allow us to
-+		 * process the remainder of the input using optimal strides.
-+		 */
-+		while (((unsigned long)dst & (relalign - 1)) && len > 0) {
-+			*dst++ ^= *src++;
-+			len--;
-+		}
-+	}
- 
--void crypto_xor(u8 *dst, const u8 *src, unsigned int size)
--{
--	u32 *a = (u32 *)dst;
--	u32 *b = (u32 *)src;
-+	while (IS_ENABLED(CONFIG_64BIT) && len >= 8 && !(relalign & 7)) {
-+		*(u64 *)dst ^= *(u64 *)src;
-+		dst += 8;
-+		src += 8;
-+		len -= 8;
-+	}
- 
--	for (; size >= 4; size -= 4)
--		*a++ ^= *b++;
-+	while (len >= 4 && !(relalign & 3)) {
-+		*(u32 *)dst ^= *(u32 *)src;
-+		dst += 4;
-+		src += 4;
-+		len -= 4;
-+	}
-+
-+	while (len >= 2 && !(relalign & 1)) {
-+		*(u16 *)dst ^= *(u16 *)src;
-+		dst += 2;
-+		src += 2;
-+		len -= 2;
-+	}
- 
--	crypto_xor_byte((u8 *)a, (u8 *)b, size);
-+	while (len--)
-+		*dst++ ^= *src++;
- }
--EXPORT_SYMBOL_GPL(crypto_xor);
-+EXPORT_SYMBOL_GPL(__crypto_xor);
- 
- unsigned int crypto_alg_extsize(struct crypto_alg *alg)
- {
-diff --git a/crypto/cbc.c b/crypto/cbc.c
-index 68f751a41a84..bc160a3186dc 100644
---- a/crypto/cbc.c
-+++ b/crypto/cbc.c
-@@ -145,9 +145,6 @@ static int crypto_cbc_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	inst->alg.base.cra_blocksize = alg->cra_blocksize;
- 	inst->alg.base.cra_alignmask = alg->cra_alignmask;
- 
--	/* We access the data as u32s when xoring. */
--	inst->alg.base.cra_alignmask |= __alignof__(u32) - 1;
--
- 	inst->alg.ivsize = alg->cra_blocksize;
- 	inst->alg.min_keysize = alg->cra_cipher.cia_min_keysize;
- 	inst->alg.max_keysize = alg->cra_cipher.cia_max_keysize;
-diff --git a/crypto/cmac.c b/crypto/cmac.c
-index 04080dca8f0c..16301f52858c 100644
---- a/crypto/cmac.c
-+++ b/crypto/cmac.c
-@@ -260,8 +260,7 @@ static int cmac_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	if (err)
- 		goto out_free_inst;
- 
--	/* We access the data as u32s when xoring. */
--	alignmask = alg->cra_alignmask | (__alignof__(u32) - 1);
-+	alignmask = alg->cra_alignmask;
- 	inst->alg.base.cra_alignmask = alignmask;
- 	inst->alg.base.cra_priority = alg->cra_priority;
- 	inst->alg.base.cra_blocksize = alg->cra_blocksize;
-diff --git a/crypto/ctr.c b/crypto/ctr.c
-index a9a7a44f2783..a4f4a8983169 100644
---- a/crypto/ctr.c
-+++ b/crypto/ctr.c
-@@ -209,7 +209,7 @@ static struct crypto_instance *crypto_ctr_alloc(struct rtattr **tb)
- 	inst->alg.cra_flags = CRYPTO_ALG_TYPE_BLKCIPHER;
- 	inst->alg.cra_priority = alg->cra_priority;
- 	inst->alg.cra_blocksize = 1;
--	inst->alg.cra_alignmask = alg->cra_alignmask | (__alignof__(u32) - 1);
-+	inst->alg.cra_alignmask = alg->cra_alignmask;
- 	inst->alg.cra_type = &crypto_blkcipher_type;
- 
- 	inst->alg.cra_blkcipher.ivsize = alg->cra_blocksize;
-diff --git a/crypto/cts.c b/crypto/cts.c
-index a1335d6c35fb..243f591dc409 100644
---- a/crypto/cts.c
-+++ b/crypto/cts.c
-@@ -374,9 +374,6 @@ static int crypto_cts_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	inst->alg.base.cra_blocksize = alg->base.cra_blocksize;
- 	inst->alg.base.cra_alignmask = alg->base.cra_alignmask;
- 
--	/* We access the data as u32s when xoring. */
--	inst->alg.base.cra_alignmask |= __alignof__(u32) - 1;
--
- 	inst->alg.ivsize = alg->base.cra_blocksize;
- 	inst->alg.chunksize = crypto_skcipher_alg_chunksize(alg);
- 	inst->alg.min_keysize = crypto_skcipher_alg_min_keysize(alg);
-diff --git a/crypto/pcbc.c b/crypto/pcbc.c
-index 11d248673ad4..29dd2b4a3b85 100644
---- a/crypto/pcbc.c
-+++ b/crypto/pcbc.c
-@@ -260,9 +260,6 @@ static int crypto_pcbc_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	inst->alg.base.cra_blocksize = alg->cra_blocksize;
- 	inst->alg.base.cra_alignmask = alg->cra_alignmask;
- 
--	/* We access the data as u32s when xoring. */
--	inst->alg.base.cra_alignmask |= __alignof__(u32) - 1;
--
- 	inst->alg.ivsize = alg->cra_blocksize;
- 	inst->alg.min_keysize = alg->cra_cipher.cia_min_keysize;
- 	inst->alg.max_keysize = alg->cra_cipher.cia_max_keysize;
-diff --git a/crypto/seqiv.c b/crypto/seqiv.c
-index c7049231861f..570b7d1aa0ca 100644
---- a/crypto/seqiv.c
-+++ b/crypto/seqiv.c
-@@ -153,8 +153,6 @@ static int seqiv_aead_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	if (IS_ERR(inst))
- 		return PTR_ERR(inst);
- 
--	inst->alg.base.cra_alignmask |= __alignof__(u32) - 1;
--
- 	spawn = aead_instance_ctx(inst);
- 	alg = crypto_spawn_aead_alg(spawn);
- 
-diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
-index 404e9558e879..ebe4ded0c55d 100644
---- a/include/crypto/algapi.h
-+++ b/include/crypto/algapi.h
-@@ -191,9 +191,25 @@ static inline unsigned int crypto_queue_len(struct crypto_queue *queue)
- 	return queue->qlen;
- }
- 
--/* These functions require the input/output to be aligned as u32. */
- void crypto_inc(u8 *a, unsigned int size);
--void crypto_xor(u8 *dst, const u8 *src, unsigned int size);
-+void __crypto_xor(u8 *dst, const u8 *src, unsigned int size);
-+
-+static inline void crypto_xor(u8 *dst, const u8 *src, unsigned int size)
-+{
-+	if (IS_ENABLED(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS) &&
-+	    __builtin_constant_p(size) &&
-+	    (size % sizeof(unsigned long)) == 0) {
-+		unsigned long *d = (unsigned long *)dst;
-+		unsigned long *s = (unsigned long *)src;
-+
-+		while (size > 0) {
-+			*d++ ^= *s++;
-+			size -= sizeof(unsigned long);
-+		}
-+	} else {
-+		__crypto_xor(dst, src, size);
-+	}
-+}
- 
- int blkcipher_walk_done(struct blkcipher_desc *desc,
- 			struct blkcipher_walk *walk, int err);
--- 
-2.7.4
+Benchmark (taken from [1], Core i5-4300U @1.9GHz):
+----------------|--------------|----------------|----------
+Compressor      | Compression  | Decompression  | Ratio
+----------------|--------------|----------------|----------
+memcpy          |  4200 MB/s   |  4200 MB/s     | 1.000
+LZ4 fast 50     |  1080 MB/s   |  2650 MB/s     | 1.375
+LZ4 fast 17     |   680 MB/s   |  2220 MB/s     | 1.607
+LZ4 fast 5      |   475 MB/s   |  1920 MB/s     | 1.886
+LZ4 default     |   385 MB/s   |  1850 MB/s     | 2.101
+
+[1] http://fastcompression.blogspot.de/2015/04/sampling-or-faster-lz4.html
+
+[PATCH 1/5] lib: Update LZ4 compressor module
+[PATCH 2/5] lib/decompress_unlz4: Change module to work with new LZ4 module version
+[PATCH 3/5] crypto: Change LZ4 modules to work with new LZ4 module version
+[PATCH 4/5] fs/pstore: fs/squashfs: Change usage of LZ4 to work with new LZ4 version
+[PATCH 5/5] lib/lz4: Remove back-compat wrappers
+
+Changes:
+v7:
+- Fixed errors reported by the Smatch tool
+- Changed function documentation comments in lz4.h to match kernel-doc style
+- Fixed a misbehaviour of LZ4HC caused by the wrong level of indentation
+  concerning two for loops introduced after I refactored the code style using
+  checkpatch.pl (upstream LZ4 put dozens of stuff in just one line, gnah)
+- Updated the crypto tests for LZ4 since they did fail for the new code
+  and hence zram did fail to allocate memory for LZ4
+
+v6:
+- Fixed LZ4_NBCOMMONBYTES() for 64-bit little endian
+- Reset LZ4_MEMORY_USAGE to 14 (which is the value used in
+  upstream LZ4 as well as the previous kernel module)
+- Fixed that weird double-indentation in lz4defs.h and lz4.h
+- Adjusted general styling issues in lz4defs.h
+  (e.g. lines consisting of more than one instruction)
+- Removed the architecture-dependent typedef to reg_t
+  since upstream LZ4 is just using size_t and that works fine
+- Changed error messages in pstore/platform.c:
+  * LZ4_compress_default always returns 0 in case of an error
+    (no need to print the return value)
+  * LZ4_decompress_safe returns a negative error message
+    (return value _does_ matter)
+
+v5:
+- Added a fifth patch to remove the back-compat wrappers introduced
+  to ensure bisectibility between the patches (the functions are no longer
+  needed since there's no callers left)
+
+v4:
+- Fixed kbuild errors
+- Re-added lz4_compressbound as alias for LZ4_compressBound
+  to ensure backwards compatibility
+- Wrapped LZ4_hash5 with check for LZ4_ARCH64 since it is only used there
+  and triggers an unused function warning when false
+
+v3:
+- Adjusted the code to satisfy kernel coding style (checkpatch.pl)
+- Made sure the changes to LZ4 in Kernel (overflow checks etc.)
+  are included in the new module (they are)
+- Removed the second LZ4_compressBound function with related name but
+  different return type
+- Corrected version number (was LZ4 1.7.3)
+- Added missing LZ4 streaming functions
+
+v2:
+- Changed order of the patches since in the initial patchset the lz4.h was in the
+  last patch but was referenced by the other ones
+- Split lib/decompress_unlz4.c in an own patch
+- Fixed errors reported by the buildbot
+- Further refactorings
+- Added more appropriate copyright note to include/linux/lz4.h
