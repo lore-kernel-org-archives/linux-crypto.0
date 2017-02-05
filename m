@@ -1,7 +1,7 @@
 From: Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
-Subject: [PATCH v7 4/5] fs/pstore: fs/squashfs: Change usage of LZ4 to work with new LZ4 version
-Date: Sun,  5 Feb 2017 20:09:07 +0100
-Message-ID: <1486321748-19085-5-git-send-email-4sschmid@informatik.uni-hamburg.de>
+Subject: [PATCH v7 5/5] lib/lz4: Remove back-compat wrappers
+Date: Sun,  5 Feb 2017 20:09:08 +0100
+Message-ID: <1486321748-19085-6-git-send-email-4sschmid@informatik.uni-hamburg.de>
 References: <1482259992-16680-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
  <1486321748-19085-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
 Cc: bongkyu.kim@lge.com, rsalvaterra@gmail.com,
@@ -12,112 +12,240 @@ Cc: bongkyu.kim@lge.com, rsalvaterra@gmail.com,
         tony.luck@intel.com,
         Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
 To: akpm@linux-foundation.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailhost.informatik.uni-hamburg.de ([134.100.9.70]:35093 "EHLO
-        mailhost.informatik.uni-hamburg.de" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751532AbdBETMM (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 5 Feb 2017 14:12:12 -0500
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1486321748-19085-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-This patch updates fs/pstore and fs/squashfs to use the updated
-functions from the new LZ4 module.
+This patch removes the functions introduced as wrappers for providing
+backwards compatibility to the prior LZ4 version.
+They're not needed anymore since there's no callers left.
 
 Signed-off-by: Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
 ---
- fs/pstore/platform.c      | 22 +++++++++++++---------
- fs/squashfs/lz4_wrapper.c | 12 ++++++------
- 2 files changed, 19 insertions(+), 15 deletions(-)
+ include/linux/lz4.h      | 69 ------------------------------------------------
+ lib/lz4/lz4_compress.c   | 22 ---------------
+ lib/lz4/lz4_decompress.c | 42 -----------------------------
+ lib/lz4/lz4hc_compress.c | 23 ----------------
+ 4 files changed, 156 deletions(-)
 
-diff --git a/fs/pstore/platform.c b/fs/pstore/platform.c
-index 729677e..efab7b6 100644
---- a/fs/pstore/platform.c
-+++ b/fs/pstore/platform.c
-@@ -342,31 +342,35 @@ static int compress_lz4(const void *in, void *out, size_t inlen, size_t outlen)
- {
- 	int ret;
- 
--	ret = lz4_compress(in, inlen, out, &outlen, workspace);
--	if (ret) {
--		pr_err("lz4_compress error, ret = %d!\n", ret);
-+	ret = LZ4_compress_default(in, out, inlen, outlen, workspace);
-+	if (!ret) {
-+		pr_err("LZ4_compress_default error; compression failed!\n");
- 		return -EIO;
- 	}
- 
--	return outlen;
-+	return ret;
+diff --git a/include/linux/lz4.h b/include/linux/lz4.h
+index 1b7ab2a..a3912d7 100644
+--- a/include/linux/lz4.h
++++ b/include/linux/lz4.h
+@@ -173,18 +173,6 @@ static inline int LZ4_compressBound(size_t isize)
  }
  
- static int decompress_lz4(void *in, void *out, size_t inlen, size_t outlen)
- {
- 	int ret;
+ /**
+- * lz4_compressbound() - For backwards compatibility; see LZ4_compressBound
+- * @isize: Size of the input data
+- *
+- * Return: Max. size LZ4 may output in a "worst case" szenario
+- *	(data not compressible)
+- */
+-static inline int lz4_compressbound(size_t isize)
+-{
+-	return LZ4_COMPRESSBOUND(isize);
+-}
+-
+-/**
+  * LZ4_compress_default() - Compress data from source to dest
+  * @source: source address of the original data
+  * @dest: output buffer address of the compressed data
+@@ -257,20 +245,6 @@ int LZ4_compress_fast(const char *source, char *dest, int inputSize,
+ int LZ4_compress_destSize(const char *source, char *dest, int *sourceSizePtr,
+ 	int targetDestSize, void *wrkmem);
  
--	ret = lz4_decompress_unknownoutputsize(in, inlen, out, &outlen);
--	if (ret) {
--		pr_err("lz4_decompress error, ret = %d!\n", ret);
-+	ret = LZ4_decompress_safe(in, out, inlen, outlen);
-+	if (ret < 0) {
-+		/*
-+		 * LZ4_decompress_safe will return an error code
-+		 * (< 0) if decompression failed
-+		 */
-+		pr_err("LZ4_decompress_safe error, ret = %d!\n", ret);
- 		return -EIO;
- 	}
+-/*
+- * lz4_compress() - For backward compatibility, see LZ4_compress_default
+- * @src: source address of the original data
+- * @src_len: size of the original data
+- * @dst: output buffer address of the compressed data. This requires 'dst'
+- *	of size LZ4_COMPRESSBOUND
+- * @dst_len: is the output size, which is returned after compress done
+- * @workmem: address of the working memory.
+- *
+- * Return: Success if return 0, Error if return < 0
+- */
+-int lz4_compress(const unsigned char *src, size_t src_len, unsigned char *dst,
+-	size_t *dst_len, void *wrkmem);
+-
+ /*-************************************************************************
+  *	Decompression Functions
+  **************************************************************************/
+@@ -346,34 +320,6 @@ int LZ4_decompress_safe(const char *source, char *dest, int compressedSize,
+ int LZ4_decompress_safe_partial(const char *source, char *dest,
+ 	int compressedSize, int targetOutputSize, int maxDecompressedSize);
  
--	return outlen;
-+	return ret;
+-/*
+- * lz4_decompress_unknownoutputsize() - For backwards compatibility,
+- *	see LZ4_decompress_safe
+- * @src: source address of the compressed data
+- * @src_len: is the input size, therefore the compressed size
+- * @dest: output buffer address of the decompressed data
+- *	which must be already allocated
+- * @dest_len: is the max size of the destination buffer, which is
+- *	returned with actual size of decompressed data after decompress done
+- *
+- * Return: Success if return 0, Error if return (< 0)
+- */
+-int lz4_decompress_unknownoutputsize(const unsigned char *src, size_t src_len,
+-	unsigned char *dest, size_t *dest_len);
+-
+-/**
+- * lz4_decompress() - For backwards cocmpatibility, see LZ4_decompress_fast
+- * @src: source address of the compressed data
+- * @src_len: is the input size, which is returned after decompress done
+- * @dest: output buffer address of the decompressed data,
+- *	which must be already allocated
+- * @actual_dest_len: is the size of uncompressed data, supposing it's known
+- *
+- * Return: Success if return 0, Error if return (< 0)
+- */
+-int lz4_decompress(const unsigned char *src, size_t *src_len,
+-	unsigned char *dest, size_t actual_dest_len);
+-
+ /*-************************************************************************
+  *	LZ4 HC Compression
+  **************************************************************************/
+@@ -401,21 +347,6 @@ int LZ4_compress_HC(const char *src, char *dst, int srcSize, int dstCapacity,
+ 	int compressionLevel, void *wrkmem);
+ 
+ /**
+- * lz4hc_compress() - For backwards compatibility, see LZ4_compress_HC
+- * @src: source address of the original data
+- * @src_len: size of the original data
+- * @dst: output buffer address of the compressed data. This requires 'dst'
+- *	of size LZ4_COMPRESSBOUND.
+- * @dst_len: is the output size, which is returned after compress done
+- * @wrkmem: address of the working memory.
+- *	This requires 'workmem' of size LZ4HC_MEM_COMPRESS.
+- *
+- * Return	: Success if return 0, Error if return (< 0)
+- */
+-int lz4hc_compress(const unsigned char *src, size_t src_len, unsigned char *dst,
+-	size_t *dst_len, void *wrkmem);
+-
+-/**
+  * LZ4_resetStreamHC() - Init an allocated 'LZ4_streamHC_t' structure
+  * @streamHCPtr: pointer to the 'LZ4_streamHC_t' structure
+  * @compressionLevel: Recommended values are between 4 and 9, although any
+diff --git a/lib/lz4/lz4_compress.c b/lib/lz4/lz4_compress.c
+index 6aa7ac3..697dbda 100644
+--- a/lib/lz4/lz4_compress.c
++++ b/lib/lz4/lz4_compress.c
+@@ -883,27 +883,5 @@ int LZ4_compress_fast_continue(LZ4_stream_t *LZ4_stream, const char *source,
  }
+ EXPORT_SYMBOL(LZ4_compress_fast_continue);
  
- static void allocate_lz4(void)
- {
--	big_oops_buf_sz = lz4_compressbound(psinfo->bufsize);
-+	big_oops_buf_sz = LZ4_compressBound(psinfo->bufsize);
- 	big_oops_buf = kmalloc(big_oops_buf_sz, GFP_KERNEL);
- 	if (big_oops_buf) {
- 		workspace = kmalloc(LZ4_MEM_COMPRESS, GFP_KERNEL);
-diff --git a/fs/squashfs/lz4_wrapper.c b/fs/squashfs/lz4_wrapper.c
-index ff4468b..95da653 100644
---- a/fs/squashfs/lz4_wrapper.c
-+++ b/fs/squashfs/lz4_wrapper.c
-@@ -97,7 +97,6 @@ static int lz4_uncompress(struct squashfs_sb_info *msblk, void *strm,
- 	struct squashfs_lz4 *stream = strm;
- 	void *buff = stream->input, *data;
- 	int avail, i, bytes = length, res;
--	size_t dest_len = output->length;
- 
- 	for (i = 0; i < b; i++) {
- 		avail = min(bytes, msblk->devblksize - offset);
-@@ -108,12 +107,13 @@ static int lz4_uncompress(struct squashfs_sb_info *msblk, void *strm,
- 		put_bh(bh[i]);
- 	}
- 
--	res = lz4_decompress_unknownoutputsize(stream->input, length,
--					stream->output, &dest_len);
--	if (res)
-+	res = LZ4_decompress_safe(stream->input, stream->output,
-+		length, output->length);
-+
-+	if (res < 0)
- 		return -EIO;
- 
--	bytes = dest_len;
-+	bytes = res;
- 	data = squashfs_first_page(output);
- 	buff = stream->output;
- 	while (data) {
-@@ -128,7 +128,7 @@ static int lz4_uncompress(struct squashfs_sb_info *msblk, void *strm,
- 	}
- 	squashfs_finish_page(output);
- 
--	return dest_len;
-+	return res;
+-/*-******************************
+- *	For backwards compatibility
+- ********************************/
+-int lz4_compress(const unsigned char *src, size_t src_len, unsigned char *dst,
+-	size_t *dst_len, void *wrkmem) {
+-	*dst_len = LZ4_compress_default(src, dst, src_len,
+-		*dst_len, wrkmem);
+-
+-	/*
+-	 * Prior lz4_compress will return -1 in case of error
+-	 * and 0 on success
+-	 * while new LZ4_compress_fast/default
+-	 * returns 0 in case of error
+-	 * and the output length on success
+-	 */
+-	if (!*dst_len)
+-		return -1;
+-	else
+-		return 0;
+-}
+-EXPORT_SYMBOL(lz4_compress);
+-
+ MODULE_LICENSE("Dual BSD/GPL");
+ MODULE_DESCRIPTION("LZ4 compressor");
+diff --git a/lib/lz4/lz4_decompress.c b/lib/lz4/lz4_decompress.c
+index fd665ca..9bf9182 100644
+--- a/lib/lz4/lz4_decompress.c
++++ b/lib/lz4/lz4_decompress.c
+@@ -483,47 +483,5 @@ int LZ4_decompress_fast_usingDict(const char *source, char *dest,
  }
+ EXPORT_SYMBOL(LZ4_decompress_fast_usingDict);
  
- const struct squashfs_decompressor squashfs_lz4_comp_ops = {
+-/*-******************************
+- *	For backwards compatibility
+- ********************************/
+-int lz4_decompress_unknownoutputsize(const unsigned char *src,
+-	size_t src_len, unsigned char *dest, size_t *dest_len) {
+-	*dest_len = LZ4_decompress_safe(src, dest,
+-		src_len, *dest_len);
+-
+-	/*
+-	 * Prior lz4_decompress_unknownoutputsize will return
+-	 * 0 for success and a negative result for error
+-	 * new LZ4_decompress_safe returns
+-	 * - the length of data read on success
+-	 * - and also a negative result on error
+-	 * meaning when result > 0, we just return 0 here
+-	 */
+-	if (src_len > 0)
+-		return 0;
+-	else
+-		return -1;
+-}
+-EXPORT_SYMBOL(lz4_decompress_unknownoutputsize);
+-
+-int lz4_decompress(const unsigned char *src, size_t *src_len,
+-	unsigned char *dest, size_t actual_dest_len) {
+-	*src_len = LZ4_decompress_fast(src, dest, actual_dest_len);
+-
+-	/*
+-	 * Prior lz4_decompress will return
+-	 * 0 for success and a negative result for error
+-	 * new LZ4_decompress_fast returns
+-	 * - the length of data read on success
+-	 * - and also a negative result on error
+-	 * meaning when result > 0, we just return 0 here
+-	 */
+-	if (*src_len > 0)
+-		return 0;
+-	else
+-		return -1;
+-}
+-EXPORT_SYMBOL(lz4_decompress);
+-
+ MODULE_LICENSE("Dual BSD/GPL");
+ MODULE_DESCRIPTION("LZ4 decompressor");
+diff --git a/lib/lz4/lz4hc_compress.c b/lib/lz4/lz4hc_compress.c
+index f1d4662..8363292 100644
+--- a/lib/lz4/lz4hc_compress.c
++++ b/lib/lz4/lz4hc_compress.c
+@@ -765,28 +765,5 @@ int LZ4_saveDictHC(
+ }
+ EXPORT_SYMBOL(LZ4_saveDictHC);
+ 
+-/*-******************************
+- *	For backwards compatibility
+- ********************************/
+-int lz4hc_compress(const unsigned char *src, size_t src_len,
+-	unsigned char *dst, size_t *dst_len, void *wrkmem)
+-{
+-	*dst_len = LZ4_compress_HC(src, dst, src_len,
+-		*dst_len, LZ4HC_DEFAULT_CLEVEL, wrkmem);
+-
+-	/*
+-	 * Prior lz4hc_compress will return -1 in case of error
+-	 * and 0 on success
+-	 * while new LZ4_compress_HC
+-	 * returns 0 in case of error
+-	 * and the output length on success
+-	 */
+-	if (!*dst_len)
+-		return -1;
+-	else
+-		return 0;
+-}
+-EXPORT_SYMBOL(lz4hc_compress);
+-
+ MODULE_LICENSE("Dual BSD/GPL");
+ MODULE_DESCRIPTION("LZ4 HC compressor");
 -- 
 2.1.4
