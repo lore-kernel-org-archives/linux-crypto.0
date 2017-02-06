@@ -1,666 +1,305 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH v3 2/3] crypto: ccm - switch to separate cbcmac driver
-Date: Mon, 6 Feb 2017 10:52:53 +0000
-Message-ID: <CAKv+Gu_zj9t8s1kSaj45YXYkODEF1xNOEGXNAM+fM9D9KdGxXQ@mail.gmail.com>
-References: <1486133377-23290-1-git-send-email-ard.biesheuvel@linaro.org> <1486133377-23290-3-git-send-email-ard.biesheuvel@linaro.org>
+From: Anup Patel <anup.patel@broadcom.com>
+Subject: Re: [PATCH 5/6] dmaengine: Add Broadcom SBA RAID driver
+Date: Mon, 6 Feb 2017 17:31:15 +0530
+Message-ID: <CAALAos9FxwKuF+qtqViybZ8APZNYt-PWLnTfJs64xtoyYB5NZQ@mail.gmail.com>
+References: <1486010836-25228-1-git-send-email-anup.patel@broadcom.com>
+ <1486010836-25228-6-git-send-email-anup.patel@broadcom.com> <20170205060657.GV19244@localhost>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: "linux-arm-kernel@lists.infradead.org"
-        <linux-arm-kernel@lists.infradead.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+Cc: Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Eric Biggers <ebiggers3@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-it0-f48.google.com ([209.85.214.48]:38652 "EHLO
-        mail-it0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750950AbdBFKwz (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 6 Feb 2017 05:52:55 -0500
-Received: by mail-it0-f48.google.com with SMTP id c7so54125580itd.1
-        for <linux-crypto@vger.kernel.org>; Mon, 06 Feb 2017 02:52:55 -0800 (PST)
-In-Reply-To: <1486133377-23290-3-git-send-email-ard.biesheuvel@linaro.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+        "David S . Miller" <davem@davemloft.net>,
+        Jassi Brar <jassisinghbrar@gmail.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        Jon Mason <jonmason@broadcom.com>,
+        Rob Rice <rob.rice@broadcom.com>,
+        BCM Kernel Feedback <bcm-kernel-feedback-list@broadcom.com>,
+        dmaengine@vger.kernel.org,
+        Device Tree <devicetree@vger.kernel.org>,
+        Linux ARM Kernel <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel <linux-kernel@vger.kernel.org>,
+        linux-crypto@vger.kernel.org,
+        linux-raid <linux-raid@vger.kernel.org>
+To: Vinod Koul <vinod.koul@intel.com>
+Return-path: <linux-raid-owner@vger.kernel.org>
+In-Reply-To: <20170205060657.GV19244@localhost>
+Sender: linux-raid-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 3 February 2017 at 14:49, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
-> Update the generic CCM driver to defer CBC-MAC processing to a
-> dedicated CBC-MAC ahash transform rather than open coding this
-> transform (and much of the associated scatterwalk plumbing) in
-> the CCM driver itself.
+On Sun, Feb 5, 2017 at 11:36 AM, Vinod Koul <vinod.koul@intel.com> wrote:
+> On Thu, Feb 02, 2017 at 10:17:15AM +0530, Anup Patel wrote:
+>> +config BCM_SBA_RAID
+>> +        tristate "Broadcom SBA RAID engine support"
+>> +        depends on (ARM64 && MAILBOX && RAID6_PQ) || COMPILE_TEST
+>> +        select DMA_ENGINE
+>> +        select DMA_ENGINE_RAID
+>> +     select ASYNC_TX_ENABLE_CHANNEL_SWITCH
+>> +     default ARCH_BCM_IPROC
 >
-> This cleans up the code considerably, but more importantly, it allows
-> the use of alternative CBC-MAC implementations that don't suffer from
-> performance degradation due to significant setup time (e.g., the NEON
-> based AES code needs to enable/disable the NEON, and load the S-box
-> into 16 SIMD registers, which cannot be amortized over the entire input
-> when using the cipher interface)
->
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> ---
->  crypto/Kconfig |   1 +
->  crypto/ccm.c   | 381 +++++++++++++-------
->  2 files changed, 245 insertions(+), 137 deletions(-)
->
-> diff --git a/crypto/Kconfig b/crypto/Kconfig
-> index 160f08e721cc..e8269d1b0282 100644
-> --- a/crypto/Kconfig
-> +++ b/crypto/Kconfig
-> @@ -263,6 +263,7 @@ comment "Authenticated Encryption with Associated Data"
->  config CRYPTO_CCM
->         tristate "CCM support"
->         select CRYPTO_CTR
-> +       select CRYPTO_HASH
->         select CRYPTO_AEAD
->         help
->           Support for Counter with CBC MAC. Required for IPsec.
-> diff --git a/crypto/ccm.c b/crypto/ccm.c
-> index 26b924d1e582..52e307807ff6 100644
-> --- a/crypto/ccm.c
-> +++ b/crypto/ccm.c
-> @@ -11,6 +11,7 @@
->   */
->
->  #include <crypto/internal/aead.h>
-> +#include <crypto/internal/hash.h>
->  #include <crypto/internal/skcipher.h>
->  #include <crypto/scatterwalk.h>
->  #include <linux/err.h>
-> @@ -23,11 +24,11 @@
->
->  struct ccm_instance_ctx {
->         struct crypto_skcipher_spawn ctr;
-> -       struct crypto_spawn cipher;
-> +       struct crypto_ahash_spawn mac;
->  };
->
->  struct crypto_ccm_ctx {
-> -       struct crypto_cipher *cipher;
-> +       struct crypto_ahash *mac;
->         struct crypto_skcipher *ctr;
->  };
->
-> @@ -44,15 +45,22 @@ struct crypto_rfc4309_req_ctx {
->
->  struct crypto_ccm_req_priv_ctx {
->         u8 odata[16];
-> -       u8 idata[16];
->         u8 auth_tag[16];
-> -       u32 ilen;
->         u32 flags;
->         struct scatterlist src[3];
->         struct scatterlist dst[3];
->         struct skcipher_request skreq;
->  };
->
-> +struct cbcmac_tfm_ctx {
-> +       struct crypto_cipher *child;
-> +};
-> +
-> +struct cbcmac_desc_ctx {
-> +       unsigned int len;
-> +       u8 dg[];
+> whats with the funny alignement?
 
-This should be
+Sure, I will use tabs here.
 
-u8 dg[] CRYPTO_MINALIGN_ATTR;
+>
+>> +/* SBA command related defines */
+>> +#define SBA_TYPE_SHIFT                                       48
+>> +#define SBA_TYPE_MASK                                        0x3
+>> +#define SBA_TYPE_A                                   0x0
+>> +#define SBA_TYPE_B                                   0x2
+>> +#define SBA_TYPE_C                                   0x3
+>> +#define SBA_USER_DEF_SHIFT                           32
+>> +#define SBA_USER_DEF_MASK                            0xffff
+>> +#define SBA_R_MDATA_SHIFT                            24
+>> +#define SBA_R_MDATA_MASK                             0xff
+>> +#define SBA_C_MDATA_MS_SHIFT                         18
+>> +#define SBA_C_MDATA_MS_MASK                          0x3
+>> +#define SBA_INT_SHIFT                                        17
+>> +#define SBA_INT_MASK                                 0x1
+>> +#define SBA_RESP_SHIFT                                       16
+>> +#define SBA_RESP_MASK                                        0x1
+>> +#define SBA_C_MDATA_SHIFT                            8
+>> +#define SBA_C_MDATA_MASK                             0xff
+>> +#define SBA_CMD_SHIFT                                        0
+>> +#define SBA_CMD_MASK                                 0xf
+>> +#define SBA_CMD_ZERO_ALL_BUFFERS                     0x8
+>> +#define SBA_CMD_LOAD_BUFFER                          0x9
+>> +#define SBA_CMD_XOR                                  0xa
+>> +#define SBA_CMD_GALOIS_XOR                           0xb
+>> +#define SBA_CMD_ZERO_BUFFER                          0x4
+>> +#define SBA_CMD_WRITE_BUFFER                         0xc
+>
+> Try using BIT and GENMAST for hardware descriptions
 
+Sure, will do.
 
+>
+>> +
+>> +/* SBA C_MDATA helper macros */
+>> +#define SBA_C_MDATA_LOAD_VAL(__bnum0)                ((__bnum0) & 0x3)
+>> +#define SBA_C_MDATA_WRITE_VAL(__bnum0)               ((__bnum0) & 0x3)
+>> +#define SBA_C_MDATA_XOR_VAL(__bnum1, __bnum0)                        \
+>> +                     ({      u32 __v = ((__bnum0) & 0x3);    \
+>> +                             __v |= ((__bnum1) & 0x3) << 2;  \
+>> +                             __v;                            \
+>> +                     })
+>> +#define SBA_C_MDATA_PQ_VAL(__dnum, __bnum1, __bnum0)         \
+>> +                     ({      u32 __v = ((__bnum0) & 0x3);    \
+>> +                             __v |= ((__bnum1) & 0x3) << 2;  \
+>> +                             __v |= ((__dnum) & 0x1f) << 5;  \
+>> +                             __v;                            \
+>> +                     })
+>
+> ah why are we usig complex macros, why can't these be simple functions..
 
-> +};
-> +
->  static inline struct crypto_ccm_req_priv_ctx *crypto_ccm_reqctx(
->         struct aead_request *req)
->  {
-> @@ -84,7 +92,7 @@ static int crypto_ccm_setkey(struct crypto_aead *aead, const u8 *key,
->  {
->         struct crypto_ccm_ctx *ctx = crypto_aead_ctx(aead);
->         struct crypto_skcipher *ctr = ctx->ctr;
-> -       struct crypto_cipher *tfm = ctx->cipher;
-> +       struct crypto_ahash *mac = ctx->mac;
->         int err = 0;
+"static inline functions" seemed too complicated here because most of
+these macros are two lines of c-code.
+
+Do you still insist on using "static inline functions"?
+
 >
->         crypto_skcipher_clear_flags(ctr, CRYPTO_TFM_REQ_MASK);
-> @@ -96,11 +104,11 @@ static int crypto_ccm_setkey(struct crypto_aead *aead, const u8 *key,
->         if (err)
->                 goto out;
+>> +#define SBA_C_MDATA_LS(__c_mdata_val)        ((__c_mdata_val) & 0xff)
+>> +#define SBA_C_MDATA_MS(__c_mdata_val)        (((__c_mdata_val) >> 8) & 0x3)
+>> +
+>> +/* Driver helper macros */
+>> +#define to_sba_request(tx)           \
+>> +     container_of(tx, struct sba_request, tx)
+>> +#define to_sba_device(dchan)         \
+>> +     container_of(dchan, struct sba_device, dma_chan)
+>> +
+>> +enum sba_request_state {
+>> +     SBA_REQUEST_STATE_FREE = 1,
+>> +     SBA_REQUEST_STATE_ALLOCED = 2,
+>> +     SBA_REQUEST_STATE_PENDING = 3,
+>> +     SBA_REQUEST_STATE_ACTIVE = 4,
+>> +     SBA_REQUEST_STATE_COMPLETED = 5,
+>> +     SBA_REQUEST_STATE_ABORTED = 6,
 >
-> -       crypto_cipher_clear_flags(tfm, CRYPTO_TFM_REQ_MASK);
-> -       crypto_cipher_set_flags(tfm, crypto_aead_get_flags(aead) &
-> +       crypto_ahash_clear_flags(mac, CRYPTO_TFM_REQ_MASK);
-> +       crypto_ahash_set_flags(mac, crypto_aead_get_flags(aead) &
->                                     CRYPTO_TFM_REQ_MASK);
-> -       err = crypto_cipher_setkey(tfm, key, keylen);
-> -       crypto_aead_set_flags(aead, crypto_cipher_get_flags(tfm) &
-> +       err = crypto_ahash_setkey(mac, key, keylen);
-> +       crypto_aead_set_flags(aead, crypto_ahash_get_flags(mac) &
->                               CRYPTO_TFM_RES_MASK);
+> whats up with a very funny indentation setting, we use 8 chars.
 >
->  out:
-> @@ -167,119 +175,61 @@ static int format_adata(u8 *adata, unsigned int a)
->         return len;
->  }
+> Please re-read the Documentation/process/coding-style.rst
+
+I have double checked this enum. The indentation is fine
+and as-per coding style. Am I missing anything else?
+
 >
-> -static void compute_mac(struct crypto_cipher *tfm, u8 *data, int n,
-> -                      struct crypto_ccm_req_priv_ctx *pctx)
-> -{
-> -       unsigned int bs = 16;
-> -       u8 *odata = pctx->odata;
-> -       u8 *idata = pctx->idata;
-> -       int datalen, getlen;
-> -
-> -       datalen = n;
-> -
-> -       /* first time in here, block may be partially filled. */
-> -       getlen = bs - pctx->ilen;
-> -       if (datalen >= getlen) {
-> -               memcpy(idata + pctx->ilen, data, getlen);
-> -               crypto_xor(odata, idata, bs);
-> -               crypto_cipher_encrypt_one(tfm, odata, odata);
-> -               datalen -= getlen;
-> -               data += getlen;
-> -               pctx->ilen = 0;
-> -       }
-> -
-> -       /* now encrypt rest of data */
-> -       while (datalen >= bs) {
-> -               crypto_xor(odata, data, bs);
-> -               crypto_cipher_encrypt_one(tfm, odata, odata);
-> -
-> -               datalen -= bs;
-> -               data += bs;
-> -       }
-> -
-> -       /* check and see if there's leftover data that wasn't
-> -        * enough to fill a block.
-> -        */
-> -       if (datalen) {
-> -               memcpy(idata + pctx->ilen, data, datalen);
-> -               pctx->ilen += datalen;
-> -       }
-> -}
-> -
-> -static void get_data_to_compute(struct crypto_cipher *tfm,
-> -                              struct crypto_ccm_req_priv_ctx *pctx,
-> -                              struct scatterlist *sg, unsigned int len)
-> -{
-> -       struct scatter_walk walk;
-> -       u8 *data_src;
-> -       int n;
-> -
-> -       scatterwalk_start(&walk, sg);
-> -
-> -       while (len) {
-> -               n = scatterwalk_clamp(&walk, len);
-> -               if (!n) {
-> -                       scatterwalk_start(&walk, sg_next(walk.sg));
-> -                       n = scatterwalk_clamp(&walk, len);
-> -               }
-> -               data_src = scatterwalk_map(&walk);
-> -
-> -               compute_mac(tfm, data_src, n, pctx);
-> -               len -= n;
-> -
-> -               scatterwalk_unmap(data_src);
-> -               scatterwalk_advance(&walk, n);
-> -               scatterwalk_done(&walk, 0, len);
-> -               if (len)
-> -                       crypto_yield(pctx->flags);
-> -       }
-> -
-> -       /* any leftover needs padding and then encrypted */
-> -       if (pctx->ilen) {
-> -               int padlen;
-> -               u8 *odata = pctx->odata;
-> -               u8 *idata = pctx->idata;
-> -
-> -               padlen = 16 - pctx->ilen;
-> -               memset(idata + pctx->ilen, 0, padlen);
-> -               crypto_xor(odata, idata, 16);
-> -               crypto_cipher_encrypt_one(tfm, odata, odata);
-> -               pctx->ilen = 0;
-> -       }
-> -}
-> -
->  static int crypto_ccm_auth(struct aead_request *req, struct scatterlist *plain,
->                            unsigned int cryptlen)
->  {
-> +       struct crypto_ccm_req_priv_ctx *pctx = crypto_ccm_reqctx(req);
->         struct crypto_aead *aead = crypto_aead_reqtfm(req);
->         struct crypto_ccm_ctx *ctx = crypto_aead_ctx(aead);
-> -       struct crypto_ccm_req_priv_ctx *pctx = crypto_ccm_reqctx(req);
-> -       struct crypto_cipher *cipher = ctx->cipher;
-> +       AHASH_REQUEST_ON_STACK(ahreq, ctx->mac);
->         unsigned int assoclen = req->assoclen;
-> -       u8 *odata = pctx->odata;
-> -       u8 *idata = pctx->idata;
-> -       int err;
-> +       struct scatterlist sg[3];
-> +       u8 odata[16];
-> +       u8 idata[16];
-> +       int ilen, err;
+>> +static int sba_alloc_chan_resources(struct dma_chan *dchan)
+>> +{
+>> +     /*
+>> +      * We only have one channel so we have pre-alloced
+>> +      * channel resources. Over here we just return number
+>> +      * of free request.
+>> +      */
+>> +     return sba_free_request_count(to_sba_device(dchan));
+>> +}
 >
->         /* format control data for input */
->         err = format_input(odata, req, cryptlen);
->         if (err)
->                 goto out;
+> essentially you are not doing much, so you can skip it. Its an optional
+> call.
+
+Sure, will do.
+
 >
-> -       /* encrypt first block to use as start in computing mac  */
-> -       crypto_cipher_encrypt_one(cipher, odata, odata);
-> +       sg_init_table(sg, 3);
-> +       sg_set_buf(&sg[0], odata, 16);
+>> +static void sba_free_chan_resources(struct dma_chan *dchan)
+>> +{
+>> +     /*
+>> +      * Channel resources are pre-alloced so we just free-up
+>> +      * whatever we can so that we can re-use pre-alloced
+>> +      * channel resources next time.
+>> +      */
+>> +     sba_cleanup_inflight_requests(to_sba_device(dchan));
 >
->         /* format associated data and compute into mac */
->         if (assoclen) {
-> -               pctx->ilen = format_adata(idata, assoclen);
-> -               get_data_to_compute(cipher, pctx, req->src, req->assoclen);
-> +               ilen = format_adata(idata, assoclen);
-> +               sg_set_buf(&sg[1], idata, ilen);
-> +               sg_chain(sg, 3, req->src);
->         } else {
-> -               pctx->ilen = 0;
-> +               ilen = 0;
-> +               sg_chain(sg, 2, req->src);
->         }
+> well this one checks for pending requests as well, which shouldn't be there
+> when freeing a channel, something seems not quite right here..
 >
-> -       /* compute plaintext into mac */
-> -       if (cryptlen)
-> -               get_data_to_compute(cipher, pctx, plain, cryptlen);
-> +       ahash_request_set_tfm(ahreq, ctx->mac);
-> +       ahash_request_set_callback(ahreq, pctx->flags, NULL, NULL);
-> +       ahash_request_set_crypt(ahreq, sg, NULL, assoclen + ilen + 16);
-> +       err = crypto_ahash_init(ahreq);
-> +       if (err)
-> +               goto out;
-> +       err = crypto_ahash_update(ahreq);
-> +       if (err)
-> +               goto out;
+>> +static int sba_send_mbox_request(struct sba_device *sba,
+>> +                              struct sba_request *req)
+>> +{
+>> +     int mchans_idx, ret = 0;
+>> +
+>> +     /* Select mailbox channel in round-robin fashion */
+>> +     mchans_idx = atomic_inc_return(&sba->mchans_current);
+>> +     mchans_idx = mchans_idx % sba->mchans_count;
+>> +
+>> +     /* Send batch message for the request */
+>> +     req->bmsg.batch.msgs_queued = 0;
+>> +     ret = mbox_send_message(sba->mchans[mchans_idx], &req->bmsg);
+>> +     if (ret < 0) {
+>> +             dev_info(sba->dev, "channel %d message %d (total %d)",
+>> +                      mchans_idx, req->bmsg.batch.msgs_queued,
+>> +                      req->bmsg.batch.msgs_count);
 >
-> +       /* we need to pad the MAC input to a round multiple of the block size */
-> +       ilen = 16 - (assoclen + ilen) % 16;
-> +       if (ilen < 16) {
-> +               memset(idata, 0, ilen);
-> +               sg_init_table(sg, 2);
-> +               sg_set_buf(&sg[0], idata, ilen);
-> +               if (plain)
-> +                       sg_chain(sg, 2, plain);
-> +               plain = sg;
-> +               cryptlen += ilen;
-> +       }
-> +
-> +       ahash_request_set_crypt(ahreq, plain, pctx->odata, cryptlen);
-> +       err = crypto_ahash_finup(ahreq);
->  out:
->         return err;
->  }
-> @@ -453,21 +403,21 @@ static int crypto_ccm_init_tfm(struct crypto_aead *tfm)
->         struct aead_instance *inst = aead_alg_instance(tfm);
->         struct ccm_instance_ctx *ictx = aead_instance_ctx(inst);
->         struct crypto_ccm_ctx *ctx = crypto_aead_ctx(tfm);
-> -       struct crypto_cipher *cipher;
-> +       struct crypto_ahash *mac;
->         struct crypto_skcipher *ctr;
->         unsigned long align;
->         int err;
+> dev_err?
+
+Sure, will use dev_err.
+
 >
-> -       cipher = crypto_spawn_cipher(&ictx->cipher);
-> -       if (IS_ERR(cipher))
-> -               return PTR_ERR(cipher);
-> +       mac = crypto_spawn_ahash(&ictx->mac);
-> +       if (IS_ERR(mac))
-> +               return PTR_ERR(mac);
+>> +             dev_err(sba->dev, "send message failed with error %d", ret);
+>> +             return ret;
+>> +     }
+>> +     ret = req->bmsg.error;
+>> +     if (ret < 0) {
+>> +             dev_info(sba->dev,
+>> +                      "mbox channel %d message %d (total %d)",
+>> +                      mchans_idx, req->bmsg.batch.msgs_queued,
+>> +                      req->bmsg.batch.msgs_count);
 >
->         ctr = crypto_spawn_skcipher(&ictx->ctr);
->         err = PTR_ERR(ctr);
->         if (IS_ERR(ctr))
-> -               goto err_free_cipher;
-> +               goto err_free_mac;
+> same here
+
+OK.
+
 >
-> -       ctx->cipher = cipher;
-> +       ctx->mac = mac;
->         ctx->ctr = ctr;
+>> +static dma_cookie_t sba_tx_submit(struct dma_async_tx_descriptor *tx)
+>> +{
+>> +     unsigned long flags;
+>> +     dma_cookie_t cookie;
+>> +     struct sba_request *req;
+>> +     struct sba_device *sba;
+>> +
+>> +     if (unlikely(!tx))
+>> +             return -EINVAL;
+>> +
+>> +     sba = to_sba_device(tx->chan);
+>> +     req = to_sba_request(tx);
+>> +
+>> +     /* Assign cookie and mark request pending */
+>> +     spin_lock_irqsave(&sba->reqs_lock, flags);
+>> +     cookie = dma_cookie_assign(tx);
+>> +     _sba_pending_request(sba, req);
+>> +     spin_unlock_irqrestore(&sba->reqs_lock, flags);
+>> +
+>> +     /* Try to submit pending request */
+>> +     sba_issue_pending(&sba->dma_chan);
 >
->         align = crypto_aead_alignmask(tfm);
-> @@ -479,8 +429,8 @@ static int crypto_ccm_init_tfm(struct crypto_aead *tfm)
+> Nope, thats wrong, caller needs to call .issue_pending for that
+
+This was giving minor performance improvement but I will
+remove this since its against API usage.
+
 >
->         return 0;
+>> +static enum dma_status sba_tx_status(struct dma_chan *dchan,
+>> +                                  dma_cookie_t cookie,
+>> +                                  struct dma_tx_state *txstate)
+>> +{
+>> +     int mchan_idx;
+>> +     enum dma_status ret;
+>> +     struct sba_device *sba = to_sba_device(dchan);
+>> +
+>> +     ret = dma_cookie_status(dchan, cookie, txstate);
+>> +     if (ret == DMA_COMPLETE)
+>> +             return ret;
+>> +
+>> +     for (mchan_idx = 0; mchan_idx < sba->mchans_count; mchan_idx++)
+>> +             mbox_client_peek_data(sba->mchans[mchan_idx]);
 >
-> -err_free_cipher:
-> -       crypto_free_cipher(cipher);
-> +err_free_mac:
-> +       crypto_free_ahash(mac);
->         return err;
->  }
+> what is this achieving?
+
+The mbox_client_peek_data() is a hint to mailbox controller driver
+to check for available messages.
+
+This gives good performance improvement when some DMA client
+code is polling using tx_status() callback.
+
 >
-> @@ -488,7 +438,7 @@ static void crypto_ccm_exit_tfm(struct crypto_aead *tfm)
->  {
->         struct crypto_ccm_ctx *ctx = crypto_aead_ctx(tfm);
+>> +static struct dma_async_tx_descriptor *
+>> +sba_prep_dma_memcpy(struct dma_chan *dchan, dma_addr_t dst, dma_addr_t src,
+>> +                 size_t len, unsigned long flags)
+>> +{
+>> +     size_t msg_len;
+>> +     dma_addr_t msg_offset = 0;
+>> +     unsigned int msgs_count = 0, cmds_count, cmds_idx = 0;
+>> +     struct sba_device *sba = to_sba_device(dchan);
+>> +     struct sba_request *req = NULL;
+>> +
+>> +     /* Sanity checks */
+>> +     if (unlikely(len > sba->req_size))
+>> +             return NULL;
 >
-> -       crypto_free_cipher(ctx->cipher);
-> +       crypto_free_ahash(ctx->mac);
->         crypto_free_skcipher(ctx->ctr);
->  }
+> why is that an error, you can create multiple txn of max length
+
+Sure, I will extend driver to create multiple txn when
+"len > req->size"
+
 >
-> @@ -496,7 +446,7 @@ static void crypto_ccm_free(struct aead_instance *inst)
->  {
->         struct ccm_instance_ctx *ctx = aead_instance_ctx(inst);
+>> +static int sba_async_register(struct sba_device *sba)
+>> +{
+>> +     int ret;
+>> +     struct dma_device *dma_dev = &sba->dma_dev;
+>> +
+>> +     /* Initialize DMA channel cookie */
+>> +     sba->dma_chan.device = dma_dev;
+>> +     dma_cookie_init(&sba->dma_chan);
+>> +
+>> +     /* Initialize DMA device capability mask */
+>> +     dma_cap_zero(dma_dev->cap_mask);
+>> +     dma_cap_set(DMA_MEMCPY, dma_dev->cap_mask);
+>> +     dma_cap_set(DMA_XOR, dma_dev->cap_mask);
+>> +     dma_cap_set(DMA_PQ, dma_dev->cap_mask);
+>> +
+>> +     /*
+>> +      * Set mailbox channel device as the base device of
+>> +      * our dma_device because the actual memory accesses
+>> +      * will be done by mailbox controller
+>> +      */
+>> +     dma_dev->dev = sba->mbox_dev;
+>> +
+>> +     /* Set base prep routines */
+>> +     dma_dev->device_alloc_chan_resources = sba_alloc_chan_resources;
+>> +     dma_dev->device_free_chan_resources = sba_free_chan_resources;
+>> +     dma_dev->device_issue_pending = sba_issue_pending;
+>> +     dma_dev->device_tx_status = sba_tx_status;
 >
-> -       crypto_drop_spawn(&ctx->cipher);
-> +       crypto_drop_ahash(&ctx->mac);
->         crypto_drop_skcipher(&ctx->ctr);
->         kfree(inst);
->  }
-> @@ -505,12 +455,13 @@ static int crypto_ccm_create_common(struct crypto_template *tmpl,
->                                     struct rtattr **tb,
->                                     const char *full_name,
->                                     const char *ctr_name,
-> -                                   const char *cipher_name)
-> +                                   const char *mac_name)
->  {
->         struct crypto_attr_type *algt;
->         struct aead_instance *inst;
->         struct skcipher_alg *ctr;
-> -       struct crypto_alg *cipher;
-> +       struct crypto_alg *mac_alg;
-> +       struct hash_alg_common *mac;
->         struct ccm_instance_ctx *ictx;
->         int err;
+> Please add terminate callback support, also add the capabilities, we need to
+> advertise that and use in clients
+
+OK, I will add terminate callback.
+
 >
-> @@ -521,25 +472,26 @@ static int crypto_ccm_create_common(struct crypto_template *tmpl,
->         if ((algt->type ^ CRYPTO_ALG_TYPE_AEAD) & algt->mask)
->                 return -EINVAL;
->
-> -       cipher = crypto_alg_mod_lookup(cipher_name,  CRYPTO_ALG_TYPE_CIPHER,
-> -                                      CRYPTO_ALG_TYPE_MASK);
-> -       if (IS_ERR(cipher))
-> -               return PTR_ERR(cipher);
-> +       mac_alg = crypto_find_alg(mac_name, &crypto_ahash_type,
-> +                                 CRYPTO_ALG_TYPE_HASH,
-> +                                 CRYPTO_ALG_TYPE_AHASH_MASK |
-> +                                 CRYPTO_ALG_ASYNC);
-> +       if (IS_ERR(mac_alg))
-> +               return PTR_ERR(mac_alg);
->
-> +       mac = __crypto_hash_alg_common(mac_alg);
->         err = -EINVAL;
-> -       if (cipher->cra_blocksize != 16)
-> -               goto out_put_cipher;
-> +       if (mac->digestsize != 16)
-> +               goto out_put_mac;
->
->         inst = kzalloc(sizeof(*inst) + sizeof(*ictx), GFP_KERNEL);
->         err = -ENOMEM;
->         if (!inst)
-> -               goto out_put_cipher;
-> +               goto out_put_mac;
->
->         ictx = aead_instance_ctx(inst);
-> -
-> -       err = crypto_init_spawn(&ictx->cipher, cipher,
-> -                               aead_crypto_instance(inst),
-> -                               CRYPTO_ALG_TYPE_MASK);
-> +       err = crypto_init_ahash_spawn(&ictx->mac, mac,
-> +                                     aead_crypto_instance(inst));
->         if (err)
->                 goto err_free_inst;
->
-> @@ -548,7 +500,7 @@ static int crypto_ccm_create_common(struct crypto_template *tmpl,
->                                    crypto_requires_sync(algt->type,
->                                                         algt->mask));
->         if (err)
-> -               goto err_drop_cipher;
-> +               goto err_drop_mac;
->
->         ctr = crypto_spawn_skcipher_alg(&ictx->ctr);
->
-> @@ -564,16 +516,16 @@ static int crypto_ccm_create_common(struct crypto_template *tmpl,
->         err = -ENAMETOOLONG;
->         if (snprintf(inst->alg.base.cra_driver_name, CRYPTO_MAX_ALG_NAME,
->                      "ccm_base(%s,%s)", ctr->base.cra_driver_name,
-> -                    cipher->cra_driver_name) >= CRYPTO_MAX_ALG_NAME)
-> +                    mac->base.cra_driver_name) >= CRYPTO_MAX_ALG_NAME)
->                 goto err_drop_ctr;
->
->         memcpy(inst->alg.base.cra_name, full_name, CRYPTO_MAX_ALG_NAME);
->
->         inst->alg.base.cra_flags = ctr->base.cra_flags & CRYPTO_ALG_ASYNC;
-> -       inst->alg.base.cra_priority = (cipher->cra_priority +
-> +       inst->alg.base.cra_priority = (mac->base.cra_priority +
->                                        ctr->base.cra_priority) / 2;
->         inst->alg.base.cra_blocksize = 1;
-> -       inst->alg.base.cra_alignmask = cipher->cra_alignmask |
-> +       inst->alg.base.cra_alignmask = mac->base.cra_alignmask |
->                                        ctr->base.cra_alignmask |
->                                        (__alignof__(u32) - 1);
->         inst->alg.ivsize = 16;
-> @@ -593,23 +545,24 @@ static int crypto_ccm_create_common(struct crypto_template *tmpl,
->         if (err)
->                 goto err_drop_ctr;
->
-> -out_put_cipher:
-> -       crypto_mod_put(cipher);
-> +out_put_mac:
-> +       crypto_mod_put(mac_alg);
->         return err;
->
->  err_drop_ctr:
->         crypto_drop_skcipher(&ictx->ctr);
-> -err_drop_cipher:
-> -       crypto_drop_spawn(&ictx->cipher);
-> +err_drop_mac:
-> +       crypto_drop_ahash(&ictx->mac);
->  err_free_inst:
->         kfree(inst);
-> -       goto out_put_cipher;
-> +       goto out_put_mac;
->  }
->
->  static int crypto_ccm_create(struct crypto_template *tmpl, struct rtattr **tb)
->  {
->         const char *cipher_name;
->         char ctr_name[CRYPTO_MAX_ALG_NAME];
-> +       char mac_name[CRYPTO_MAX_ALG_NAME];
->         char full_name[CRYPTO_MAX_ALG_NAME];
->
->         cipher_name = crypto_attr_alg_name(tb[1]);
-> @@ -620,12 +573,16 @@ static int crypto_ccm_create(struct crypto_template *tmpl, struct rtattr **tb)
->                      cipher_name) >= CRYPTO_MAX_ALG_NAME)
->                 return -ENAMETOOLONG;
->
-> +       if (snprintf(mac_name, CRYPTO_MAX_ALG_NAME, "cbcmac(%s)",
-> +                    cipher_name) >= CRYPTO_MAX_ALG_NAME)
-> +               return -ENAMETOOLONG;
-> +
->         if (snprintf(full_name, CRYPTO_MAX_ALG_NAME, "ccm(%s)", cipher_name) >=
->             CRYPTO_MAX_ALG_NAME)
->                 return -ENAMETOOLONG;
->
->         return crypto_ccm_create_common(tmpl, tb, full_name, ctr_name,
-> -                                       cipher_name);
-> +                                       mac_name);
->  }
->
->  static struct crypto_template crypto_ccm_tmpl = {
-> @@ -899,14 +856,161 @@ static struct crypto_template crypto_rfc4309_tmpl = {
->         .module = THIS_MODULE,
->  };
->
-> +static int crypto_cbcmac_digest_setkey(struct crypto_shash *parent,
-> +                                    const u8 *inkey, unsigned int keylen)
-> +{
-> +       struct cbcmac_tfm_ctx *ctx = crypto_shash_ctx(parent);
-> +
-> +       return crypto_cipher_setkey(ctx->child, inkey, keylen);
-> +}
-> +
-> +static int crypto_cbcmac_digest_init(struct shash_desc *pdesc)
-> +{
-> +       struct cbcmac_desc_ctx *ctx = shash_desc_ctx(pdesc);
-> +       int bs = crypto_shash_digestsize(pdesc->tfm);
-> +
-> +       ctx->len = 0;
-> +       memset(ctx->dg, 0, bs);
-> +
-> +       return 0;
-> +}
-> +
-> +static int crypto_cbcmac_digest_update(struct shash_desc *pdesc, const u8 *p,
-> +                                      unsigned int len)
-> +{
-> +       struct crypto_shash *parent = pdesc->tfm;
-> +       struct cbcmac_tfm_ctx *tctx = crypto_shash_ctx(parent);
-> +       struct cbcmac_desc_ctx *ctx = shash_desc_ctx(pdesc);
-> +       struct crypto_cipher *tfm = tctx->child;
-> +       int bs = crypto_shash_digestsize(parent);
-> +
-> +       while (len > 0) {
-> +               unsigned int l = min(len, bs - ctx->len);
-> +
-> +               crypto_xor(ctx->dg + ctx->len, p, l);
-> +               ctx->len +=l;
-> +               len -= l;
-> +               p += l;
-> +
-> +               if (ctx->len == bs) {
-> +                       crypto_cipher_encrypt_one(tfm, ctx->dg, ctx->dg);
-> +                       ctx->len = 0;
-> +               }
-> +       }
-> +
-> +       return 0;
-> +}
-> +
-> +static int crypto_cbcmac_digest_final(struct shash_desc *pdesc, u8 *out)
-> +{
-> +       struct crypto_shash *parent = pdesc->tfm;
-> +       struct cbcmac_tfm_ctx *tctx = crypto_shash_ctx(parent);
-> +       struct cbcmac_desc_ctx *ctx = shash_desc_ctx(pdesc);
-> +       struct crypto_cipher *tfm = tctx->child;
-> +       int bs = crypto_shash_digestsize(parent);
-> +
-> +       if (ctx->len)
-> +               crypto_cipher_encrypt_one(tfm, out, ctx->dg);
-> +       else
-> +               memcpy(out, ctx->dg, bs);
-> +
-> +       return 0;
-> +}
-> +
-> +static int cbcmac_init_tfm(struct crypto_tfm *tfm)
-> +{
-> +       struct crypto_cipher *cipher;
-> +       struct crypto_instance *inst = (void *)tfm->__crt_alg;
-> +       struct crypto_spawn *spawn = crypto_instance_ctx(inst);
-> +       struct cbcmac_tfm_ctx *ctx = crypto_tfm_ctx(tfm);
-> +
-> +       cipher = crypto_spawn_cipher(spawn);
-> +       if (IS_ERR(cipher))
-> +               return PTR_ERR(cipher);
-> +
-> +       ctx->child = cipher;
-> +
-> +       return 0;
-> +};
-> +
-> +static void cbcmac_exit_tfm(struct crypto_tfm *tfm)
-> +{
-> +       struct cbcmac_tfm_ctx *ctx = crypto_tfm_ctx(tfm);
-> +       crypto_free_cipher(ctx->child);
-> +}
-> +
-> +static int cbcmac_create(struct crypto_template *tmpl, struct rtattr **tb)
-> +{
-> +       struct shash_instance *inst;
-> +       struct crypto_alg *alg;
-> +       int err;
-> +
-> +       err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_SHASH);
-> +       if (err)
-> +               return err;
-> +
-> +       alg = crypto_get_attr_alg(tb, CRYPTO_ALG_TYPE_CIPHER,
-> +                                 CRYPTO_ALG_TYPE_MASK);
-> +       if (IS_ERR(alg))
-> +               return PTR_ERR(alg);
-> +
-> +       inst = shash_alloc_instance("cbcmac", alg);
-> +       err = PTR_ERR(inst);
-> +       if (IS_ERR(inst))
-> +               goto out_put_alg;
-> +
-> +       err = crypto_init_spawn(shash_instance_ctx(inst), alg,
-> +                               shash_crypto_instance(inst),
-> +                               CRYPTO_ALG_TYPE_MASK);
-> +       if (err)
-> +               goto out_free_inst;
-> +
-> +       inst->alg.base.cra_priority = alg->cra_priority;
-> +       inst->alg.base.cra_blocksize = 1;
-> +
-> +       inst->alg.digestsize = alg->cra_blocksize;
-> +       inst->alg.descsize = sizeof(struct cbcmac_desc_ctx) +
-> +                            alg->cra_blocksize;
-> +
-> +       inst->alg.base.cra_ctxsize = sizeof(struct cbcmac_tfm_ctx);
-> +       inst->alg.base.cra_init = cbcmac_init_tfm;
-> +       inst->alg.base.cra_exit = cbcmac_exit_tfm;
-> +
-> +       inst->alg.init = crypto_cbcmac_digest_init;
-> +       inst->alg.update = crypto_cbcmac_digest_update;
-> +       inst->alg.final = crypto_cbcmac_digest_final;
-> +       inst->alg.setkey = crypto_cbcmac_digest_setkey;
-> +
-> +       err = shash_register_instance(tmpl, inst);
-> +
-> +out_free_inst:
-> +       if (err)
-> +               shash_free_instance(shash_crypto_instance(inst));
-> +
-> +out_put_alg:
-> +       crypto_mod_put(alg);
-> +       return err;
-> +}
-> +
-> +static struct crypto_template crypto_cbcmac_tmpl = {
-> +       .name = "cbcmac",
-> +       .create = cbcmac_create,
-> +       .free = shash_free_instance,
-> +       .module = THIS_MODULE,
-> +};
-> +
->  static int __init crypto_ccm_module_init(void)
->  {
->         int err;
->
-> -       err = crypto_register_template(&crypto_ccm_base_tmpl);
-> +       err = crypto_register_template(&crypto_cbcmac_tmpl);
->         if (err)
->                 goto out;
->
-> +       err = crypto_register_template(&crypto_ccm_base_tmpl);
-> +       if (err)
-> +               goto out_undo_cbcmac;
-> +
->         err = crypto_register_template(&crypto_ccm_tmpl);
->         if (err)
->                 goto out_undo_base;
-> @@ -922,6 +1026,8 @@ static int __init crypto_ccm_module_init(void)
->         crypto_unregister_template(&crypto_ccm_tmpl);
->  out_undo_base:
->         crypto_unregister_template(&crypto_ccm_base_tmpl);
-> +out_undo_cbcmac:
-> +       crypto_register_template(&crypto_cbcmac_tmpl);
->         goto out;
->  }
->
-> @@ -930,6 +1036,7 @@ static void __exit crypto_ccm_module_exit(void)
->         crypto_unregister_template(&crypto_rfc4309_tmpl);
->         crypto_unregister_template(&crypto_ccm_tmpl);
->         crypto_unregister_template(&crypto_ccm_base_tmpl);
-> +       crypto_unregister_template(&crypto_cbcmac_tmpl);
->  }
->
->  module_init(crypto_ccm_module_init);
-> --
-> 2.7.4
->
+> Also you can simplify bunch of code by using virt-chan support for managing
+> channels and descriptors
+
+OK, I will surely explore virt-chan.
+
+Regards,
+Anup
