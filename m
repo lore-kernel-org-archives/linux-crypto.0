@@ -1,305 +1,80 @@
-From: Anup Patel <anup.patel@broadcom.com>
-Subject: Re: [PATCH 5/6] dmaengine: Add Broadcom SBA RAID driver
-Date: Mon, 6 Feb 2017 17:31:15 +0530
-Message-ID: <CAALAos9FxwKuF+qtqViybZ8APZNYt-PWLnTfJs64xtoyYB5NZQ@mail.gmail.com>
-References: <1486010836-25228-1-git-send-email-anup.patel@broadcom.com>
- <1486010836-25228-6-git-send-email-anup.patel@broadcom.com> <20170205060657.GV19244@localhost>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Jassi Brar <jassisinghbrar@gmail.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Ray Jui <rjui@broadcom.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        Jon Mason <jonmason@broadcom.com>,
-        Rob Rice <rob.rice@broadcom.com>,
-        BCM Kernel Feedback <bcm-kernel-feedback-list@broadcom.com>,
-        dmaengine@vger.kernel.org,
-        Device Tree <devicetree@vger.kernel.org>,
-        Linux ARM Kernel <linux-arm-kernel@lists.infradead.org>,
-        Linux Kernel <linux-kernel@vger.kernel.org>,
-        linux-crypto@vger.kernel.org,
-        linux-raid <linux-raid@vger.kernel.org>
-To: Vinod Koul <vinod.koul@intel.com>
-Return-path: <linux-raid-owner@vger.kernel.org>
-In-Reply-To: <20170205060657.GV19244@localhost>
-Sender: linux-raid-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH 1/2] crypto: atmel - refine Kconfig dependencies
+Date: Mon,  6 Feb 2017 13:32:15 +0100
+Message-ID: <20170206123240.1698839-1-arnd@arndb.de>
+Cc: Cyrille Pitchen <cyrille.pitchen@atmel.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mout.kundenserver.de ([217.72.192.75]:63115 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751468AbdBFMdG (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 6 Feb 2017 07:33:06 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Feb 5, 2017 at 11:36 AM, Vinod Koul <vinod.koul@intel.com> wrote:
-> On Thu, Feb 02, 2017 at 10:17:15AM +0530, Anup Patel wrote:
->> +config BCM_SBA_RAID
->> +        tristate "Broadcom SBA RAID engine support"
->> +        depends on (ARM64 && MAILBOX && RAID6_PQ) || COMPILE_TEST
->> +        select DMA_ENGINE
->> +        select DMA_ENGINE_RAID
->> +     select ASYNC_TX_ENABLE_CHANNEL_SWITCH
->> +     default ARCH_BCM_IPROC
->
-> whats with the funny alignement?
+With the new authenc support, we get a harmless Kconfig warning:
 
-Sure, I will use tabs here.
+warning: (CRYPTO_DEV_ATMEL_AUTHENC) selects CRYPTO_DEV_ATMEL_SHA which has unmet direct dependencies (CRYPTO && CRYPTO_HW && ARCH_AT91)
 
->
->> +/* SBA command related defines */
->> +#define SBA_TYPE_SHIFT                                       48
->> +#define SBA_TYPE_MASK                                        0x3
->> +#define SBA_TYPE_A                                   0x0
->> +#define SBA_TYPE_B                                   0x2
->> +#define SBA_TYPE_C                                   0x3
->> +#define SBA_USER_DEF_SHIFT                           32
->> +#define SBA_USER_DEF_MASK                            0xffff
->> +#define SBA_R_MDATA_SHIFT                            24
->> +#define SBA_R_MDATA_MASK                             0xff
->> +#define SBA_C_MDATA_MS_SHIFT                         18
->> +#define SBA_C_MDATA_MS_MASK                          0x3
->> +#define SBA_INT_SHIFT                                        17
->> +#define SBA_INT_MASK                                 0x1
->> +#define SBA_RESP_SHIFT                                       16
->> +#define SBA_RESP_MASK                                        0x1
->> +#define SBA_C_MDATA_SHIFT                            8
->> +#define SBA_C_MDATA_MASK                             0xff
->> +#define SBA_CMD_SHIFT                                        0
->> +#define SBA_CMD_MASK                                 0xf
->> +#define SBA_CMD_ZERO_ALL_BUFFERS                     0x8
->> +#define SBA_CMD_LOAD_BUFFER                          0x9
->> +#define SBA_CMD_XOR                                  0xa
->> +#define SBA_CMD_GALOIS_XOR                           0xb
->> +#define SBA_CMD_ZERO_BUFFER                          0x4
->> +#define SBA_CMD_WRITE_BUFFER                         0xc
->
-> Try using BIT and GENMAST for hardware descriptions
+The problem is that each of the options has slightly different dependencies,
+although they all seem to want the same thing: allow building for real AT91
+targets that actually have the hardware, and possibly for compile testing.
 
-Sure, will do.
+This makes all four options consistent: instead of depending on a particular
+dmaengine implementation, we depend on the ARM platform, CONFIG_COMPILE_TEST
+as an alternative when that is turned off. This makes the 'select' statements
+work correctly.
 
->
->> +
->> +/* SBA C_MDATA helper macros */
->> +#define SBA_C_MDATA_LOAD_VAL(__bnum0)                ((__bnum0) & 0x3)
->> +#define SBA_C_MDATA_WRITE_VAL(__bnum0)               ((__bnum0) & 0x3)
->> +#define SBA_C_MDATA_XOR_VAL(__bnum1, __bnum0)                        \
->> +                     ({      u32 __v = ((__bnum0) & 0x3);    \
->> +                             __v |= ((__bnum1) & 0x3) << 2;  \
->> +                             __v;                            \
->> +                     })
->> +#define SBA_C_MDATA_PQ_VAL(__dnum, __bnum1, __bnum0)         \
->> +                     ({      u32 __v = ((__bnum0) & 0x3);    \
->> +                             __v |= ((__bnum1) & 0x3) << 2;  \
->> +                             __v |= ((__dnum) & 0x1f) << 5;  \
->> +                             __v;                            \
->> +                     })
->
-> ah why are we usig complex macros, why can't these be simple functions..
+Fixes: 89a82ef87e01 ("crypto: atmel-authenc - add support to authenc(hmac(shaX), Y(aes)) modes")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ drivers/crypto/Kconfig | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-"static inline functions" seemed too complicated here because most of
-these macros are two lines of c-code.
-
-Do you still insist on using "static inline functions"?
-
->
->> +#define SBA_C_MDATA_LS(__c_mdata_val)        ((__c_mdata_val) & 0xff)
->> +#define SBA_C_MDATA_MS(__c_mdata_val)        (((__c_mdata_val) >> 8) & 0x3)
->> +
->> +/* Driver helper macros */
->> +#define to_sba_request(tx)           \
->> +     container_of(tx, struct sba_request, tx)
->> +#define to_sba_device(dchan)         \
->> +     container_of(dchan, struct sba_device, dma_chan)
->> +
->> +enum sba_request_state {
->> +     SBA_REQUEST_STATE_FREE = 1,
->> +     SBA_REQUEST_STATE_ALLOCED = 2,
->> +     SBA_REQUEST_STATE_PENDING = 3,
->> +     SBA_REQUEST_STATE_ACTIVE = 4,
->> +     SBA_REQUEST_STATE_COMPLETED = 5,
->> +     SBA_REQUEST_STATE_ABORTED = 6,
->
-> whats up with a very funny indentation setting, we use 8 chars.
->
-> Please re-read the Documentation/process/coding-style.rst
-
-I have double checked this enum. The indentation is fine
-and as-per coding style. Am I missing anything else?
-
->
->> +static int sba_alloc_chan_resources(struct dma_chan *dchan)
->> +{
->> +     /*
->> +      * We only have one channel so we have pre-alloced
->> +      * channel resources. Over here we just return number
->> +      * of free request.
->> +      */
->> +     return sba_free_request_count(to_sba_device(dchan));
->> +}
->
-> essentially you are not doing much, so you can skip it. Its an optional
-> call.
-
-Sure, will do.
-
->
->> +static void sba_free_chan_resources(struct dma_chan *dchan)
->> +{
->> +     /*
->> +      * Channel resources are pre-alloced so we just free-up
->> +      * whatever we can so that we can re-use pre-alloced
->> +      * channel resources next time.
->> +      */
->> +     sba_cleanup_inflight_requests(to_sba_device(dchan));
->
-> well this one checks for pending requests as well, which shouldn't be there
-> when freeing a channel, something seems not quite right here..
->
->> +static int sba_send_mbox_request(struct sba_device *sba,
->> +                              struct sba_request *req)
->> +{
->> +     int mchans_idx, ret = 0;
->> +
->> +     /* Select mailbox channel in round-robin fashion */
->> +     mchans_idx = atomic_inc_return(&sba->mchans_current);
->> +     mchans_idx = mchans_idx % sba->mchans_count;
->> +
->> +     /* Send batch message for the request */
->> +     req->bmsg.batch.msgs_queued = 0;
->> +     ret = mbox_send_message(sba->mchans[mchans_idx], &req->bmsg);
->> +     if (ret < 0) {
->> +             dev_info(sba->dev, "channel %d message %d (total %d)",
->> +                      mchans_idx, req->bmsg.batch.msgs_queued,
->> +                      req->bmsg.batch.msgs_count);
->
-> dev_err?
-
-Sure, will use dev_err.
-
->
->> +             dev_err(sba->dev, "send message failed with error %d", ret);
->> +             return ret;
->> +     }
->> +     ret = req->bmsg.error;
->> +     if (ret < 0) {
->> +             dev_info(sba->dev,
->> +                      "mbox channel %d message %d (total %d)",
->> +                      mchans_idx, req->bmsg.batch.msgs_queued,
->> +                      req->bmsg.batch.msgs_count);
->
-> same here
-
-OK.
-
->
->> +static dma_cookie_t sba_tx_submit(struct dma_async_tx_descriptor *tx)
->> +{
->> +     unsigned long flags;
->> +     dma_cookie_t cookie;
->> +     struct sba_request *req;
->> +     struct sba_device *sba;
->> +
->> +     if (unlikely(!tx))
->> +             return -EINVAL;
->> +
->> +     sba = to_sba_device(tx->chan);
->> +     req = to_sba_request(tx);
->> +
->> +     /* Assign cookie and mark request pending */
->> +     spin_lock_irqsave(&sba->reqs_lock, flags);
->> +     cookie = dma_cookie_assign(tx);
->> +     _sba_pending_request(sba, req);
->> +     spin_unlock_irqrestore(&sba->reqs_lock, flags);
->> +
->> +     /* Try to submit pending request */
->> +     sba_issue_pending(&sba->dma_chan);
->
-> Nope, thats wrong, caller needs to call .issue_pending for that
-
-This was giving minor performance improvement but I will
-remove this since its against API usage.
-
->
->> +static enum dma_status sba_tx_status(struct dma_chan *dchan,
->> +                                  dma_cookie_t cookie,
->> +                                  struct dma_tx_state *txstate)
->> +{
->> +     int mchan_idx;
->> +     enum dma_status ret;
->> +     struct sba_device *sba = to_sba_device(dchan);
->> +
->> +     ret = dma_cookie_status(dchan, cookie, txstate);
->> +     if (ret == DMA_COMPLETE)
->> +             return ret;
->> +
->> +     for (mchan_idx = 0; mchan_idx < sba->mchans_count; mchan_idx++)
->> +             mbox_client_peek_data(sba->mchans[mchan_idx]);
->
-> what is this achieving?
-
-The mbox_client_peek_data() is a hint to mailbox controller driver
-to check for available messages.
-
-This gives good performance improvement when some DMA client
-code is polling using tx_status() callback.
-
->
->> +static struct dma_async_tx_descriptor *
->> +sba_prep_dma_memcpy(struct dma_chan *dchan, dma_addr_t dst, dma_addr_t src,
->> +                 size_t len, unsigned long flags)
->> +{
->> +     size_t msg_len;
->> +     dma_addr_t msg_offset = 0;
->> +     unsigned int msgs_count = 0, cmds_count, cmds_idx = 0;
->> +     struct sba_device *sba = to_sba_device(dchan);
->> +     struct sba_request *req = NULL;
->> +
->> +     /* Sanity checks */
->> +     if (unlikely(len > sba->req_size))
->> +             return NULL;
->
-> why is that an error, you can create multiple txn of max length
-
-Sure, I will extend driver to create multiple txn when
-"len > req->size"
-
->
->> +static int sba_async_register(struct sba_device *sba)
->> +{
->> +     int ret;
->> +     struct dma_device *dma_dev = &sba->dma_dev;
->> +
->> +     /* Initialize DMA channel cookie */
->> +     sba->dma_chan.device = dma_dev;
->> +     dma_cookie_init(&sba->dma_chan);
->> +
->> +     /* Initialize DMA device capability mask */
->> +     dma_cap_zero(dma_dev->cap_mask);
->> +     dma_cap_set(DMA_MEMCPY, dma_dev->cap_mask);
->> +     dma_cap_set(DMA_XOR, dma_dev->cap_mask);
->> +     dma_cap_set(DMA_PQ, dma_dev->cap_mask);
->> +
->> +     /*
->> +      * Set mailbox channel device as the base device of
->> +      * our dma_device because the actual memory accesses
->> +      * will be done by mailbox controller
->> +      */
->> +     dma_dev->dev = sba->mbox_dev;
->> +
->> +     /* Set base prep routines */
->> +     dma_dev->device_alloc_chan_resources = sba_alloc_chan_resources;
->> +     dma_dev->device_free_chan_resources = sba_free_chan_resources;
->> +     dma_dev->device_issue_pending = sba_issue_pending;
->> +     dma_dev->device_tx_status = sba_tx_status;
->
-> Please add terminate callback support, also add the capabilities, we need to
-> advertise that and use in clients
-
-OK, I will add terminate callback.
-
->
-> Also you can simplify bunch of code by using virt-chan support for managing
-> channels and descriptors
-
-OK, I will surely explore virt-chan.
-
-Regards,
-Anup
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index 74824612d3e9..f60de152a90d 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -417,7 +417,8 @@ config CRYPTO_DEV_BFIN_CRC
+ 
+ config CRYPTO_DEV_ATMEL_AUTHENC
+ 	tristate "Support for Atmel IPSEC/SSL hw accelerator"
+-	depends on (ARCH_AT91 && HAS_DMA) || COMPILE_TEST
++	depends on HAS_DMA
++	depends on ARCH_AT91 || COMPILE_TEST
+ 	select CRYPTO_AUTHENC
+ 	select CRYPTO_DEV_ATMEL_AES
+ 	select CRYPTO_DEV_ATMEL_SHA
+@@ -430,7 +431,7 @@ config CRYPTO_DEV_ATMEL_AUTHENC
+ config CRYPTO_DEV_ATMEL_AES
+ 	tristate "Support for Atmel AES hw accelerator"
+ 	depends on HAS_DMA
+-	depends on AT_XDMAC || AT_HDMAC || COMPILE_TEST
++	depends on ARCH_AT91 || COMPILE_TEST
+ 	select CRYPTO_AES
+ 	select CRYPTO_AEAD
+ 	select CRYPTO_BLKCIPHER
+@@ -444,7 +445,7 @@ config CRYPTO_DEV_ATMEL_AES
+ 
+ config CRYPTO_DEV_ATMEL_TDES
+ 	tristate "Support for Atmel DES/TDES hw accelerator"
+-	depends on ARCH_AT91
++	depends on ARCH_AT91 || COMPILE_TEST
+ 	select CRYPTO_DES
+ 	select CRYPTO_BLKCIPHER
+ 	help
+@@ -457,7 +458,7 @@ config CRYPTO_DEV_ATMEL_TDES
+ 
+ config CRYPTO_DEV_ATMEL_SHA
+ 	tristate "Support for Atmel SHA hw accelerator"
+-	depends on ARCH_AT91
++	depends on ARCH_AT91 || COMPILE_TEST
+ 	select CRYPTO_HASH
+ 	help
+ 	  Some Atmel processors have SHA1/SHA224/SHA256/SHA384/SHA512
+-- 
+2.9.0
