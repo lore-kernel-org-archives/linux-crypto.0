@@ -1,120 +1,146 @@
-From: Vinod Koul <vinod.koul@intel.com>
-Subject: Re: [PATCH 5/6] dmaengine: Add Broadcom SBA RAID driver
-Date: Mon, 6 Feb 2017 22:24:00 +0530
-Message-ID: <20170206165400.GD19244@localhost>
-References: <1486010836-25228-1-git-send-email-anup.patel@broadcom.com>
- <1486010836-25228-6-git-send-email-anup.patel@broadcom.com>
- <20170205060657.GV19244@localhost>
- <CAALAos9FxwKuF+qtqViybZ8APZNYt-PWLnTfJs64xtoyYB5NZQ@mail.gmail.com>
+From: kbuild test robot <lkp@intel.com>
+Subject: Re: crypto: atmel - Fix authenc compile test warnings
+Date: Tue, 7 Feb 2017 00:58:58 +0800
+Message-ID: <201702070003.jTWzwRF2%fengguang.wu@intel.com>
+References: <20170206090340.GA9531@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Jassi Brar <jassisinghbrar@gmail.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Ray Jui <rjui@broadcom.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        Jon Mason <jonmason@broadcom.com>,
-        Rob Rice <rob.rice@broadcom.com>,
-        BCM Kernel Feedback <bcm-kernel-feedback-list@broadcom.com>,
-        dmaengine@vger.kernel.org,
-        Device Tree <devicetree@vger.kernel.org>,
-        Linux ARM Kernel <linux-arm-kernel@lists.infradead.org>,
-        Linux Kernel <linux-kernel@vger.kernel.org>,
-        linux-crypto@vger.kernel.org,
-        linux-raid <linux-raid@vger.kernel.org>
-To: Anup Patel <anup.patel@broadcom.com>
+Cc: kbuild-all@01.org, Stephen Rothwell <sfr@canb.auug.org.au>,
+        linux-next@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Cyrille Pitchen <cyrille.pitchen@atmel.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <CAALAos9FxwKuF+qtqViybZ8APZNYt-PWLnTfJs64xtoyYB5NZQ@mail.gmail.com>
+In-Reply-To: <20170206090340.GA9531@gondor.apana.org.au>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Feb 06, 2017 at 05:31:15PM +0530, Anup Patel wrote:
+Hi Herbert,
 
-> >> +
-> >> +/* SBA C_MDATA helper macros */
-> >> +#define SBA_C_MDATA_LOAD_VAL(__bnum0)                ((__bnum0) & 0x3)
-> >> +#define SBA_C_MDATA_WRITE_VAL(__bnum0)               ((__bnum0) & 0x3)
-> >> +#define SBA_C_MDATA_XOR_VAL(__bnum1, __bnum0)                        \
-> >> +                     ({      u32 __v = ((__bnum0) & 0x3);    \
-> >> +                             __v |= ((__bnum1) & 0x3) << 2;  \
-> >> +                             __v;                            \
-> >> +                     })
-> >> +#define SBA_C_MDATA_PQ_VAL(__dnum, __bnum1, __bnum0)         \
-> >> +                     ({      u32 __v = ((__bnum0) & 0x3);    \
-> >> +                             __v |= ((__bnum1) & 0x3) << 2;  \
-> >> +                             __v |= ((__dnum) & 0x1f) << 5;  \
-> >> +                             __v;                            \
-> >> +                     })
-> >
-> > ah why are we usig complex macros, why can't these be simple functions..
-> 
-> "static inline functions" seemed too complicated here because most of
-> these macros are two lines of c-code.
+[auto build test WARNING on cryptodev/master]
+[also build test WARNING on v4.10-rc7 next-20170206]
+[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
 
-and thats where I have an issue with this. Macros for simple things is fine
-but not for couple of line of logic!
+url:    https://github.com/0day-ci/linux/commits/Herbert-Xu/crypto-atmel-Fix-authenc-compile-test-warnings/20170206-171201
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+reproduce:
+        # apt-get install sparse
+        make ARCH=x86_64 allmodconfig
+        make C=1 CF=-D__CHECK_ENDIAN__
 
-> 
-> Do you still insist on using "static inline functions"?
 
-Yes
+sparse warnings: (new ones prefixed by >>)
 
-> 
-> >
-> >> +#define SBA_C_MDATA_LS(__c_mdata_val)        ((__c_mdata_val) & 0xff)
-> >> +#define SBA_C_MDATA_MS(__c_mdata_val)        (((__c_mdata_val) >> 8) & 0x3)
-> >> +
-> >> +/* Driver helper macros */
-> >> +#define to_sba_request(tx)           \
-> >> +     container_of(tx, struct sba_request, tx)
-> >> +#define to_sba_device(dchan)         \
-> >> +     container_of(dchan, struct sba_device, dma_chan)
-> >> +
-> >> +enum sba_request_state {
-> >> +     SBA_REQUEST_STATE_FREE = 1,
-> >> +     SBA_REQUEST_STATE_ALLOCED = 2,
-> >> +     SBA_REQUEST_STATE_PENDING = 3,
-> >> +     SBA_REQUEST_STATE_ACTIVE = 4,
-> >> +     SBA_REQUEST_STATE_COMPLETED = 5,
-> >> +     SBA_REQUEST_STATE_ABORTED = 6,
-> >
-> > whats up with a very funny indentation setting, we use 8 chars.
-> >
-> > Please re-read the Documentation/process/coding-style.rst
-> 
-> I have double checked this enum. The indentation is fine
-> and as-per coding style. Am I missing anything else?
+   include/linux/compiler.h:253:8: sparse: attribute 'no_sanitize_address': unknown attribute
+>> drivers/crypto/atmel-tdes.c:157:25: sparse: incompatible types in comparison expression (different type sizes)
+   drivers/crypto/atmel-tdes.c:528:25: sparse: incompatible types in comparison expression (different type sizes)
+   drivers/crypto/atmel-tdes.c:529:25: sparse: incompatible types in comparison expression (different type sizes)
+   In file included from drivers/crypto/atmel-tdes.c:17:0:
+   drivers/crypto/atmel-tdes.c: In function 'atmel_tdes_sg_copy':
+   include/linux/kernel.h:753:16: warning: comparison of distinct pointer types lacks a cast
+     (void) (&min1 == &min2);   \
+                   ^
+   include/linux/kernel.h:756:2: note: in expansion of macro '__min'
+     __min(typeof(x), typeof(y),   \
+     ^~~~~
+   drivers/crypto/atmel-tdes.c:157:11: note: in expansion of macro 'min'
+      count = min(count, buflen);
+              ^~~
+   In file included from include/linux/printk.h:6:0,
+                    from include/linux/kernel.h:13,
+                    from drivers/crypto/atmel-tdes.c:17:
+   drivers/crypto/atmel-tdes.c: In function 'atmel_tdes_crypt_pdc_stop':
+   include/linux/kern_levels.h:4:18: warning: format '%u' expects argument of type 'unsigned int', but argument 2 has type 'size_t {aka long unsigned int}' [-Wformat=]
+    #define KERN_SOH "\001"  /* ASCII Start Of Header */
+                     ^
+   include/linux/kern_levels.h:10:18: note: in expansion of macro 'KERN_SOH'
+    #define KERN_ERR KERN_SOH "3" /* error conditions */
+                     ^~~~~~~~
+   include/linux/printk.h:292:9: note: in expansion of macro 'KERN_ERR'
+     printk(KERN_ERR pr_fmt(fmt), ##__VA_ARGS__)
+            ^~~~~~~~
+   drivers/crypto/atmel-tdes.c:339:4: note: in expansion of macro 'pr_err'
+       pr_err("not all data converted: %u\n", count);
+       ^~~~~~
+   drivers/crypto/atmel-tdes.c: In function 'atmel_tdes_buff_init':
+   drivers/crypto/atmel-tdes.c:364:26: warning: format '%d' expects argument of type 'int', but argument 3 has type 'size_t {aka long unsigned int}' [-Wformat=]
+      dev_err(dd->dev, "dma %d bytes error\n", dd->buflen);
+                             ^
+   drivers/crypto/atmel-tdes.c:372:26: warning: format '%d' expects argument of type 'int', but argument 3 has type 'size_t {aka long unsigned int}' [-Wformat=]
+      dev_err(dd->dev, "dma %d bytes error\n", dd->buflen);
+                             ^
+   In file included from drivers/crypto/atmel-tdes.c:17:0:
+   drivers/crypto/atmel-tdes.c: In function 'atmel_tdes_crypt_start':
+   include/linux/kernel.h:753:16: warning: comparison of distinct pointer types lacks a cast
+     (void) (&min1 == &min2);   \
+                   ^
+   include/linux/kernel.h:756:2: note: in expansion of macro '__min'
+     __min(typeof(x), typeof(y),   \
+     ^~~~~
+   drivers/crypto/atmel-tdes.c:528:11: note: in expansion of macro 'min'
+      count = min(dd->total, sg_dma_len(dd->in_sg));
+              ^~~
+   include/linux/kernel.h:753:16: warning: comparison of distinct pointer types lacks a cast
+     (void) (&min1 == &min2);   \
+                   ^
+   include/linux/kernel.h:756:2: note: in expansion of macro '__min'
+     __min(typeof(x), typeof(y),   \
+     ^~~~~
+   drivers/crypto/atmel-tdes.c:529:11: note: in expansion of macro 'min'
+      count = min(count, sg_dma_len(dd->out_sg));
+              ^~~
+   In file included from include/linux/printk.h:6:0,
+                    from include/linux/kernel.h:13,
+                    from drivers/crypto/atmel-tdes.c:17:
+   drivers/crypto/atmel-tdes.c: In function 'atmel_tdes_crypt_dma_stop':
+   include/linux/kern_levels.h:4:18: warning: format '%u' expects argument of type 'unsigned int', but argument 2 has type 'size_t {aka long unsigned int}' [-Wformat=]
+    #define KERN_SOH "\001"  /* ASCII Start Of Header */
+                     ^
+   include/linux/kern_levels.h:10:18: note: in expansion of macro 'KERN_SOH'
+    #define KERN_ERR KERN_SOH "3" /* error conditions */
+                     ^~~~~~~~
+   include/linux/printk.h:292:9: note: in expansion of macro 'KERN_ERR'
+     printk(KERN_ERR pr_fmt(fmt), ##__VA_ARGS__)
+            ^~~~~~~~
+   drivers/crypto/atmel-tdes.c:664:5: note: in expansion of macro 'pr_err'
+        pr_err("not all data converted: %u\n", count);
+        ^~~~~~
 
-Somehow the initial indent doesnt seem to be 8 chars to me.
+vim +157 drivers/crypto/atmel-tdes.c
 
-> >> +static enum dma_status sba_tx_status(struct dma_chan *dchan,
-> >> +                                  dma_cookie_t cookie,
-> >> +                                  struct dma_tx_state *txstate)
-> >> +{
-> >> +     int mchan_idx;
-> >> +     enum dma_status ret;
-> >> +     struct sba_device *sba = to_sba_device(dchan);
-> >> +
-> >> +     ret = dma_cookie_status(dchan, cookie, txstate);
-> >> +     if (ret == DMA_COMPLETE)
-> >> +             return ret;
-> >> +
-> >> +     for (mchan_idx = 0; mchan_idx < sba->mchans_count; mchan_idx++)
-> >> +             mbox_client_peek_data(sba->mchans[mchan_idx]);
-> >
-> > what is this achieving?
-> 
-> The mbox_client_peek_data() is a hint to mailbox controller driver
-> to check for available messages.
-> 
-> This gives good performance improvement when some DMA client
-> code is polling using tx_status() callback.
+13802005 Nicolas Royer 2012-07-01  141  	struct list_head	dev_list;
+13802005 Nicolas Royer 2012-07-01  142  	spinlock_t		lock;
+13802005 Nicolas Royer 2012-07-01  143  };
+13802005 Nicolas Royer 2012-07-01  144  
+13802005 Nicolas Royer 2012-07-01  145  static struct atmel_tdes_drv atmel_tdes = {
+13802005 Nicolas Royer 2012-07-01  146  	.dev_list = LIST_HEAD_INIT(atmel_tdes.dev_list),
+13802005 Nicolas Royer 2012-07-01  147  	.lock = __SPIN_LOCK_UNLOCKED(atmel_tdes.lock),
+13802005 Nicolas Royer 2012-07-01  148  };
+13802005 Nicolas Royer 2012-07-01  149  
+13802005 Nicolas Royer 2012-07-01  150  static int atmel_tdes_sg_copy(struct scatterlist **sg, size_t *offset,
+13802005 Nicolas Royer 2012-07-01  151  			void *buf, size_t buflen, size_t total, int out)
+13802005 Nicolas Royer 2012-07-01  152  {
+13802005 Nicolas Royer 2012-07-01  153  	unsigned int count, off = 0;
+13802005 Nicolas Royer 2012-07-01  154  
+13802005 Nicolas Royer 2012-07-01  155  	while (buflen && total) {
+13802005 Nicolas Royer 2012-07-01  156  		count = min((*sg)->length - *offset, total);
+13802005 Nicolas Royer 2012-07-01 @157  		count = min(count, buflen);
+13802005 Nicolas Royer 2012-07-01  158  
+13802005 Nicolas Royer 2012-07-01  159  		if (!count)
+13802005 Nicolas Royer 2012-07-01  160  			return off;
+13802005 Nicolas Royer 2012-07-01  161  
+13802005 Nicolas Royer 2012-07-01  162  		scatterwalk_map_and_copy(buf + off, *sg, *offset, count, out);
+13802005 Nicolas Royer 2012-07-01  163  
+13802005 Nicolas Royer 2012-07-01  164  		off += count;
+13802005 Nicolas Royer 2012-07-01  165  		buflen -= count;
 
-Then why do it before and then check status.
+:::::: The code at line 157 was first introduced by commit
+:::::: 13802005d8f2db244ec1f5d7f6923de8f7a463db crypto: atmel - add Atmel DES/TDES driver
 
--- 
-~Vinod
+:::::: TO: Nicolas Royer <nicolas@eukrea.com>
+:::::: CC: Herbert Xu <herbert@gondor.apana.org.au>
+
+---
+0-DAY kernel test infrastructure                Open Source Technology Center
+https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
