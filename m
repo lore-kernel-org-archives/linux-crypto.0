@@ -1,74 +1,71 @@
-From: George Cherian <george.cherian@cavium.com>
-Subject: [PATCH v6 3/3] drivers: crypto: Enable CPT options crypto for build
-Date: Tue, 7 Feb 2017 14:51:15 +0000
-Message-ID: <1486479075-1813-4-git-send-email-george.cherian@cavium.com>
-References: <1486479075-1813-1-git-send-email-george.cherian@cavium.com>
+From: Vinod Koul <vinod.koul@intel.com>
+Subject: Re: [PATCH v2 2/5] async_tx: Handle DMA devices having support for
+ fewer PQ coefficients
+Date: Tue, 7 Feb 2017 22:12:08 +0530
+Message-ID: <20170207164207.GI19244@localhost>
+References: <1486455406-11202-1-git-send-email-anup.patel@broadcom.com>
+ <1486455406-11202-3-git-send-email-anup.patel@broadcom.com>
+ <CAPcyv4gbV1yf52JrejW+Dn3wOPn7Er+8HWdu2qsW0+Qm+cRr9g@mail.gmail.com>
+ <CAALAos_yhXufdt79KWY0eugjF5oyJ8+NcPh2E-dEXnSQu2WhhA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <david.daney@cavium.com>, <clabbe.montjoie@gmail.com>,
-        <smueller@chronox.de>, <levinsasha928@gmail.com>,
-        <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        George Cherian <george.cherian@cavium.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+Content-Type: text/plain; charset=us-ascii
+Cc: Dan Williams <dan.j.williams@intel.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Jassi Brar <jassisinghbrar@gmail.com>,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        Jon Mason <jonmason@broadcom.com>,
+        Rob Rice <rob.rice@broadcom.com>,
+        BCM Kernel Feedback <bcm-kernel-feedback-list@broadcom.com>,
+        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
+        Device Tree <devicetree@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org"
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        linux-crypto@vger.kernel.org,
+        linux-raid <linux-raid@vger.kernel.org>
+To: Anup Patel <anup.patel@broadcom.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1486479075-1813-1-git-send-email-george.cherian@cavium.com>
+Content-Disposition: inline
+In-Reply-To: <CAALAos_yhXufdt79KWY0eugjF5oyJ8+NcPh2E-dEXnSQu2WhhA@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add the CPT options in crypto Kconfig and update the
-crypto Makefile
+On Tue, Feb 07, 2017 at 02:32:15PM +0530, Anup Patel wrote:
+> On Tue, Feb 7, 2017 at 1:57 PM, Dan Williams <dan.j.williams@intel.com> wrote:
+> > On Tue, Feb 7, 2017 at 12:16 AM, Anup Patel <anup.patel@broadcom.com> wrote:
+> >> The DMAENGINE framework assumes that if PQ offload is supported by a
+> >> DMA device then all 256 PQ coefficients are supported. This assumption
+> >> does not hold anymore because we now have BCM-SBA-RAID offload engine
+> >> which supports PQ offload with limited number of PQ coefficients.
+> >>
+> >> This patch extends async_tx APIs to handle DMA devices with support
+> >> for fewer PQ coefficients.
+> >>
+> >> Signed-off-by: Anup Patel <anup.patel@broadcom.com>
+> >> Reviewed-by: Scott Branden <scott.branden@broadcom.com>
+> >
+> > I don't like this approach. Define an interface for md to query the
+> > offload engine once at the beginning of time. We should not be adding
+> > any new extensions to async_tx.
+> 
+> Even if we do capability checks in Linux MD, we still need a way
+> for DMAENGINE drivers to advertise number of PQ coefficients
+> handled by the HW.
 
-Update the MAINTAINERS file too.
+If the question is only for advertising caps, then why not do as done
+for dma_get_slave_caps(). you can add dma_get_pq_caps() so that clients (md)
+in this case would know the HW capability.
 
-Signed-off-by: George Cherian <george.cherian@cavium.com>
-Reviewed-by: David Daney <david.daney@cavium.com>
----
- MAINTAINERS             | 7 +++++++
- drivers/crypto/Kconfig  | 1 +
- drivers/crypto/Makefile | 1 +
- 3 files changed, 9 insertions(+)
+> I agree capability checks should be done once in Linux MD but I don't
+> see why this has to be part of BCM-SBA-RAID driver patches. We need
+> separate patchsets to address limitations of async_tx framework.
+> 
+> Regards,
+> Anup
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 187b961..386fc34 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2990,6 +2990,13 @@ W:     http://www.cavium.com
- S:     Supported
- F:     drivers/net/ethernet/cavium/liquidio/
- 
-+CAVIUM OCTEON-TX CRYPTO DRIVER
-+M:	George Cherian <george.cherian@cavium.com>
-+L:	linux-crypto@vger.kernel.org
-+W:	http://www.cavium.com
-+S:	Supported
-+F:	drivers/crypto/cavium/cpt/
-+
- CC2520 IEEE-802.15.4 RADIO DRIVER
- M:	Varka Bhadram <varkabhadram@gmail.com>
- L:	linux-wpan@vger.kernel.org
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 7956478..1603ac3 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -484,6 +484,7 @@ config CRYPTO_DEV_MXS_DCP
- 	  will be called mxs-dcp.
- 
- source "drivers/crypto/qat/Kconfig"
-+source "drivers/crypto/cavium/cpt/Kconfig"
- 
- config CRYPTO_DEV_QCE
- 	tristate "Qualcomm crypto engine accelerator"
-diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
-index bc53cb8..7add7fd 100644
---- a/drivers/crypto/Makefile
-+++ b/drivers/crypto/Makefile
-@@ -3,6 +3,7 @@ obj-$(CONFIG_CRYPTO_DEV_ATMEL_SHA) += atmel-sha.o
- obj-$(CONFIG_CRYPTO_DEV_ATMEL_TDES) += atmel-tdes.o
- obj-$(CONFIG_CRYPTO_DEV_BFIN_CRC) += bfin_crc.o
- obj-$(CONFIG_CRYPTO_DEV_CCP) += ccp/
-+obj-$(CONFIG_CRYPTO_DEV_CPT) += cavium/cpt/
- obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM) += caam/
- obj-$(CONFIG_CRYPTO_DEV_GEODE) += geode-aes.o
- obj-$(CONFIG_CRYPTO_DEV_HIFN_795X) += hifn_795x.o
 -- 
-2.1.4
+~Vinod
