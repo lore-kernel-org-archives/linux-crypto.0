@@ -1,143 +1,90 @@
 From: Anup Patel <anup.patel@broadcom.com>
-Subject: Re: [PATCH 5/6] dmaengine: Add Broadcom SBA RAID driver
-Date: Tue, 7 Feb 2017 11:32:23 +0530
-Message-ID: <CAALAos8W13Xcxw+VpkvJWNNEiO6_6Hri0EheASHqOzCKagDYzA@mail.gmail.com>
-References: <1486010836-25228-1-git-send-email-anup.patel@broadcom.com>
- <1486010836-25228-6-git-send-email-anup.patel@broadcom.com>
- <20170205060657.GV19244@localhost> <CAALAos9FxwKuF+qtqViybZ8APZNYt-PWLnTfJs64xtoyYB5NZQ@mail.gmail.com>
- <20170206165400.GD19244@localhost>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Jassi Brar <jassisinghbrar@gmail.com>,
-        Dan Williams <dan.j.williams@intel.com>,
+Subject: [PATCH v2 0/5] Broadcom SBA RAID support
+Date: Tue,  7 Feb 2017 13:46:41 +0530
+Message-ID: <1486455406-11202-1-git-send-email-anup.patel@broadcom.com>
+Cc: Dan Williams <dan.j.williams@intel.com>,
         Ray Jui <rjui@broadcom.com>,
         Scott Branden <sbranden@broadcom.com>,
         Jon Mason <jonmason@broadcom.com>,
         Rob Rice <rob.rice@broadcom.com>,
-        BCM Kernel Feedback <bcm-kernel-feedback-list@broadcom.com>,
-        dmaengine@vger.kernel.org,
-        Device Tree <devicetree@vger.kernel.org>,
-        Linux ARM Kernel <linux-arm-kernel@lists.infradead.org>,
-        Linux Kernel <linux-kernel@vger.kernel.org>,
-        linux-crypto@vger.kernel.org,
-        linux-raid <linux-raid@vger.kernel.org>
-To: Vinod Koul <vinod.koul@intel.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170206165400.GD19244@localhost>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+        bcm-kernel-feedback-list@broadcom.com, dmaengine@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-raid@vger.kernel.org, Anup Patel <anup.patel@broadcom.com>
+To: Vinod Koul <vinod.koul@intel.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Jassi Brar <jassisinghbrar@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-qk0-f175.google.com ([209.85.220.175]:34691 "EHLO
+        mail-qk0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753097AbdBGIRL (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 7 Feb 2017 03:17:11 -0500
+Received: by mail-qk0-f175.google.com with SMTP id s186so80581773qkb.1
+        for <linux-crypto@vger.kernel.org>; Tue, 07 Feb 2017 00:17:11 -0800 (PST)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Feb 6, 2017 at 10:24 PM, Vinod Koul <vinod.koul@intel.com> wrote:
-> On Mon, Feb 06, 2017 at 05:31:15PM +0530, Anup Patel wrote:
->
->> >> +
->> >> +/* SBA C_MDATA helper macros */
->> >> +#define SBA_C_MDATA_LOAD_VAL(__bnum0)                ((__bnum0) & 0x3)
->> >> +#define SBA_C_MDATA_WRITE_VAL(__bnum0)               ((__bnum0) & 0x3)
->> >> +#define SBA_C_MDATA_XOR_VAL(__bnum1, __bnum0)                        \
->> >> +                     ({      u32 __v = ((__bnum0) & 0x3);    \
->> >> +                             __v |= ((__bnum1) & 0x3) << 2;  \
->> >> +                             __v;                            \
->> >> +                     })
->> >> +#define SBA_C_MDATA_PQ_VAL(__dnum, __bnum1, __bnum0)         \
->> >> +                     ({      u32 __v = ((__bnum0) & 0x3);    \
->> >> +                             __v |= ((__bnum1) & 0x3) << 2;  \
->> >> +                             __v |= ((__dnum) & 0x1f) << 5;  \
->> >> +                             __v;                            \
->> >> +                     })
->> >
->> > ah why are we usig complex macros, why can't these be simple functions..
->>
->> "static inline functions" seemed too complicated here because most of
->> these macros are two lines of c-code.
->
-> and thats where I have an issue with this. Macros for simple things is fine
-> but not for couple of line of logic!
->
->>
->> Do you still insist on using "static inline functions"?
->
-> Yes
+The Broadcom SBA RAID is a stream-based device which provides
+RAID5/6 offload.
 
-Sure, will use "static inline functions" instead these macros.
+It requires a SoC specific ring manager (such as Broadcom FlexRM
+ring manager) to provide ring-based programming interface. Due to
+this, the Broadcom SBA RAID driver (mailbox client) implements
+DMA device having one DMA channel using a set of mailbox channels
+provided by Broadcom SoC specific ring manager driver (mailbox
+controller).
 
->
->>
->> >
->> >> +#define SBA_C_MDATA_LS(__c_mdata_val)        ((__c_mdata_val) & 0xff)
->> >> +#define SBA_C_MDATA_MS(__c_mdata_val)        (((__c_mdata_val) >> 8) & 0x3)
->> >> +
->> >> +/* Driver helper macros */
->> >> +#define to_sba_request(tx)           \
->> >> +     container_of(tx, struct sba_request, tx)
->> >> +#define to_sba_device(dchan)         \
->> >> +     container_of(dchan, struct sba_device, dma_chan)
->> >> +
->> >> +enum sba_request_state {
->> >> +     SBA_REQUEST_STATE_FREE = 1,
->> >> +     SBA_REQUEST_STATE_ALLOCED = 2,
->> >> +     SBA_REQUEST_STATE_PENDING = 3,
->> >> +     SBA_REQUEST_STATE_ACTIVE = 4,
->> >> +     SBA_REQUEST_STATE_COMPLETED = 5,
->> >> +     SBA_REQUEST_STATE_ABORTED = 6,
->> >
->> > whats up with a very funny indentation setting, we use 8 chars.
->> >
->> > Please re-read the Documentation/process/coding-style.rst
->>
->> I have double checked this enum. The indentation is fine
->> and as-per coding style. Am I missing anything else?
->
-> Somehow the initial indent doesnt seem to be 8 chars to me.
->
->> >> +static enum dma_status sba_tx_status(struct dma_chan *dchan,
->> >> +                                  dma_cookie_t cookie,
->> >> +                                  struct dma_tx_state *txstate)
->> >> +{
->> >> +     int mchan_idx;
->> >> +     enum dma_status ret;
->> >> +     struct sba_device *sba = to_sba_device(dchan);
->> >> +
->> >> +     ret = dma_cookie_status(dchan, cookie, txstate);
->> >> +     if (ret == DMA_COMPLETE)
->> >> +             return ret;
->> >> +
->> >> +     for (mchan_idx = 0; mchan_idx < sba->mchans_count; mchan_idx++)
->> >> +             mbox_client_peek_data(sba->mchans[mchan_idx]);
->> >
->> > what is this achieving?
->>
->> The mbox_client_peek_data() is a hint to mailbox controller driver
->> to check for available messages.
->>
->> This gives good performance improvement when some DMA client
->> code is polling using tx_status() callback.
->
-> Then why do it before and then check status.
+Important limitations of Broadcom SBA RAID hardware are:
+1. Requires disk position instead of disk coefficient 
+2. Supports only 30 PQ disk coefficients
 
-If there was a work completed when mbox_client_peek_data()
-is called then sba_receive_message() will be called immediately
-by mailbox controller driver.
+To address limitation #1, we have added raid_gflog table which
+will help driver convert disk coefficient to disk position. To
+address limitation #2, we have extended Linux Async Tx APIs to
+check for available PQ coefficients before doing PQ offload.
 
-We are doing dma_cookie_complete() in sba_receive_message()
-so if mbox_client_peek_data() is called before dma_cookie_status()
-then dma_cookie_status() will see correct state of cookie.
+This patchset is based on Linux-4.10-rc2 and depends on patchset
+"[PATCH v4 0/2] Broadcom FlexRM ring manager support"
 
-Also, I explored virt-dma APIs for BCM-SBA-RAID driver. The virt-dma
-implements tasklet based bottom-half for each virt-dma-channel. This
-bottom-half is not required for BCM-FS4-RAID driver because its a
-mailbox client driver and the mailbox controller driver already implements
-bottom-half for each mailbox channel.
+It is also available at sba-raid-v2 branch of
+https://github.com/Broadcom/arm64-linux.git
 
-If we still go ahead and use virt-dma in BCM-FS4-RAID driver then we
-will have two bottom-halfs in-action one in mailbox controller driver and
-another in BCM-FS4-RAID driver which in-turn will add bottom-half
-scheduling overhead thereby reducing performance of BCM-FS4-RAID
-driver.
+Changes since v1:
+ - Droped patch to add mbox_channel_device() API
+ - Used GENMASK and BIT macros wherever possible in bcm-sba-raid driver
+ - Replaced C_MDATA macros with static inline functions in
+   bcm-sba-raid driver
+ - Removed sba_alloc_chan_resources() callback in bcm-sba-raid driver
+ - Used dev_err() instead of dev_info() wherever applicable
+ - Removed call to sba_issue_pending() from sba_tx_submit() in
+   bcm-sba-raid driver
+ - Implemented SBA request chaning for handling (len > sba->req_size)
+   in bcm-sba-raid driver
+ - Implemented device_terminate_all() callback in bcm-sba-raid driver
 
-Regards,
-Anup
+Anup Patel (5):
+  lib/raid6: Add log-of-2 table for RAID6 HW requiring disk position
+  async_tx: Handle DMA devices having support for fewer PQ coefficients
+  async_tx: Fix DMA_PREP_FENCE usage in do_async_gen_syndrome()
+  dmaengine: Add Broadcom SBA RAID driver
+  dt-bindings: Add DT bindings document for Broadcom SBA RAID driver
+
+ .../devicetree/bindings/dma/brcm,iproc-sba.txt     |   29 +
+ crypto/async_tx/async_pq.c                         |    8 +-
+ crypto/async_tx/async_raid6_recov.c                |   12 +-
+ drivers/dma/Kconfig                                |   13 +
+ drivers/dma/Makefile                               |    1 +
+ drivers/dma/bcm-sba-raid.c                         | 1470 ++++++++++++++++++++
+ include/linux/dmaengine.h                          |   19 +
+ include/linux/raid/pq.h                            |    4 +
+ lib/raid6/mktables.c                               |   20 +
+ 9 files changed, 1571 insertions(+), 5 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/dma/brcm,iproc-sba.txt
+ create mode 100644 drivers/dma/bcm-sba-raid.c
+
+-- 
+2.7.4
