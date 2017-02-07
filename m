@@ -1,67 +1,104 @@
-From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: [bug report] crypto: atmel-sha - update request queue management to
- make it more generic
-Date: Tue, 7 Feb 2017 13:56:14 +0300
-Message-ID: <20170207105614.GA7777@mwanda>
+From: Colin King <colin.king@canonical.com>
+Subject: [PATCH] crypto: atmel-sha: use %zu for size_t print format specifier
+Date: Tue,  7 Feb 2017 12:11:51 +0000
+Message-ID: <20170207121151.19326-1-colin.king@canonical.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: cyrille.pitchen@atmel.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from userp1040.oracle.com ([156.151.31.81]:50250 "EHLO
-        userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751094AbdBGK4c (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 7 Feb 2017 05:56:32 -0500
-Content-Disposition: inline
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
+Return-path: <kernel-janitors-owner@vger.kernel.org>
+Sender: kernel-janitors-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hello Cyrille Pitchen,
+From: Colin Ian King <colin.king@canonical.com>
 
-The patch a29af939b24d: "crypto: atmel-sha - update request queue
-management to make it more generic" from Jan 26, 2017, leads to the
-following static checker warning:
+The size_t types should be using %zu as a format specifier rather
+than %d and %u.
 
-	drivers/crypto/atmel-sha.c:673 atmel_sha_xmit_dma()
-	error: we previously assumed 'in_desc' could be null (see line 670)
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ drivers/crypto/atmel-sha.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-drivers/crypto/atmel-sha.c
-   652  
-   653          dmaengine_slave_config(dd->dma_lch_in.chan, &dd->dma_lch_in.dma_conf);
-   654  
-   655          if (length2) {
-   656                  sg_init_table(sg, 2);
-   657                  sg_dma_address(&sg[0]) = dma_addr1;
-   658                  sg_dma_len(&sg[0]) = length1;
-   659                  sg_dma_address(&sg[1]) = dma_addr2;
-   660                  sg_dma_len(&sg[1]) = length2;
-   661                  in_desc = dmaengine_prep_slave_sg(dd->dma_lch_in.chan, sg, 2,
-   662                          DMA_MEM_TO_DEV, DMA_PREP_INTERRUPT | DMA_CTRL_ACK);
-   663          } else {
-   664                  sg_init_table(sg, 1);
-   665                  sg_dma_address(&sg[0]) = dma_addr1;
-   666                  sg_dma_len(&sg[0]) = length1;
-   667                  in_desc = dmaengine_prep_slave_sg(dd->dma_lch_in.chan, sg, 1,
-   668                          DMA_MEM_TO_DEV, DMA_PREP_INTERRUPT | DMA_CTRL_ACK);
-   669          }
-   670          if (!in_desc)
-   671                  atmel_sha_complete(dd, -EINVAL);
+diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
+index 22d0c0c..b081e78 100644
+--- a/drivers/crypto/atmel-sha.c
++++ b/drivers/crypto/atmel-sha.c
+@@ -568,7 +568,7 @@ static int atmel_sha_xmit_cpu(struct atmel_sha_dev *dd, const u8 *buf,
+ 	int count, len32;
+ 	const u32 *buffer = (const u32 *)buf;
+ 
+-	dev_dbg(dd->dev, "xmit_cpu: digcnt: 0x%llx 0x%llx, length: %d, final: %d\n",
++	dev_dbg(dd->dev, "xmit_cpu: digcnt: 0x%llx 0x%llx, length: %zu, final: %d\n",
+ 		ctx->digcnt[1], ctx->digcnt[0], length, final);
+ 
+ 	atmel_sha_write_ctrl(dd, 0);
+@@ -597,7 +597,7 @@ static int atmel_sha_xmit_pdc(struct atmel_sha_dev *dd, dma_addr_t dma_addr1,
+ 	struct atmel_sha_reqctx *ctx = ahash_request_ctx(dd->req);
+ 	int len32;
+ 
+-	dev_dbg(dd->dev, "xmit_pdc: digcnt: 0x%llx 0x%llx, length: %d, final: %d\n",
++	dev_dbg(dd->dev, "xmit_pdc: digcnt: 0x%llx 0x%llx, length: %zu, final: %d\n",
+ 		ctx->digcnt[1], ctx->digcnt[0], length1, final);
+ 
+ 	len32 = DIV_ROUND_UP(length1, sizeof(u32));
+@@ -644,7 +644,7 @@ static int atmel_sha_xmit_dma(struct atmel_sha_dev *dd, dma_addr_t dma_addr1,
+ 	struct dma_async_tx_descriptor	*in_desc;
+ 	struct scatterlist sg[2];
+ 
+-	dev_dbg(dd->dev, "xmit_dma: digcnt: 0x%llx 0x%llx, length: %d, final: %d\n",
++	dev_dbg(dd->dev, "xmit_dma: digcnt: 0x%llx 0x%llx, length: %zu, final: %d\n",
+ 		ctx->digcnt[1], ctx->digcnt[0], length1, final);
+ 
+ 	dd->dma_lch_in.dma_conf.src_maxburst = 16;
+@@ -723,7 +723,7 @@ static int atmel_sha_xmit_dma_map(struct atmel_sha_dev *dd,
+ 	ctx->dma_addr = dma_map_single(dd->dev, ctx->buffer,
+ 				ctx->buflen + ctx->block_size, DMA_TO_DEVICE);
+ 	if (dma_mapping_error(dd->dev, ctx->dma_addr)) {
+-		dev_err(dd->dev, "dma %u bytes error\n", ctx->buflen +
++		dev_err(dd->dev, "dma %zu bytes error\n", ctx->buflen +
+ 				ctx->block_size);
+ 		atmel_sha_complete(dd, -EINVAL);
+ 	}
+@@ -744,7 +744,7 @@ static int atmel_sha_update_dma_slow(struct atmel_sha_dev *dd)
+ 
+ 	final = (ctx->flags & SHA_FLAGS_FINUP) && !ctx->total;
+ 
+-	dev_dbg(dd->dev, "slow: bufcnt: %u, digcnt: 0x%llx 0x%llx, final: %d\n",
++	dev_dbg(dd->dev, "slow: bufcnt: %zu, digcnt: 0x%llx 0x%llx, final: %d\n",
+ 		 ctx->bufcnt, ctx->digcnt[1], ctx->digcnt[0], final);
+ 
+ 	if (final)
+@@ -772,7 +772,7 @@ static int atmel_sha_update_dma_start(struct atmel_sha_dev *dd)
+ 	if (ctx->bufcnt || ctx->offset)
+ 		return atmel_sha_update_dma_slow(dd);
+ 
+-	dev_dbg(dd->dev, "fast: digcnt: 0x%llx 0x%llx, bufcnt: %u, total: %u\n",
++	dev_dbg(dd->dev, "fast: digcnt: 0x%llx 0x%llx, bufcnt: %zu, total: %u\n",
+ 		ctx->digcnt[1], ctx->digcnt[0], ctx->bufcnt, ctx->total);
+ 
+ 	sg = ctx->sg;
+@@ -814,7 +814,7 @@ static int atmel_sha_update_dma_start(struct atmel_sha_dev *dd)
+ 		ctx->dma_addr = dma_map_single(dd->dev, ctx->buffer,
+ 			ctx->buflen + ctx->block_size, DMA_TO_DEVICE);
+ 		if (dma_mapping_error(dd->dev, ctx->dma_addr)) {
+-			dev_err(dd->dev, "dma %u bytes error\n",
++			dev_err(dd->dev, "dma %zu bytes error\n",
+ 				ctx->buflen + ctx->block_size);
+ 			atmel_sha_complete(dd, -EINVAL);
+ 		}
+@@ -994,7 +994,7 @@ static int atmel_sha_finish(struct ahash_request *req)
+ 	if (ctx->digcnt[0] || ctx->digcnt[1])
+ 		atmel_sha_copy_ready_hash(req);
+ 
+-	dev_dbg(dd->dev, "digcnt: 0x%llx 0x%llx, bufcnt: %d\n", ctx->digcnt[1],
++	dev_dbg(dd->dev, "digcnt: 0x%llx 0x%llx, bufcnt: %zu\n", ctx->digcnt[1],
+ 		ctx->digcnt[0], ctx->bufcnt);
+ 
+ 	return 0;
+-- 
+2.10.2
 
-Did you mean return atmel_sha_complete(dd, -EINVAL);???  That patch
-change a bunch of returns to just call atmel_sha_complete().  Someone
-should probably review it again to make sure there aren't other bugs
-as well.
-
-   672  
-   673          in_desc->callback = atmel_sha_dma_callback;
-                ^^^^^^^^^^^^^^^^^
-NULL dereference.
-
-   674          in_desc->callback_param = dd;
-   675  
-   676          atmel_sha_write_ctrl(dd, 1);
-   677  
-
-regards,
-dan carpenter
