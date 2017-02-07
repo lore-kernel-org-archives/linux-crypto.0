@@ -1,55 +1,143 @@
-From: David Daney <david.daney@cavium.com>
-Subject: [PATCH] hwrng: cavium: Use per device name to allow for multiple devices.
-Date: Mon, 6 Feb 2017 14:28:46 -0800
-Message-ID: <20170206222846.22493-1-david.daney@cavium.com>
+From: Anup Patel <anup.patel@broadcom.com>
+Subject: Re: [PATCH 5/6] dmaengine: Add Broadcom SBA RAID driver
+Date: Tue, 7 Feb 2017 11:32:23 +0530
+Message-ID: <CAALAos8W13Xcxw+VpkvJWNNEiO6_6Hri0EheASHqOzCKagDYzA@mail.gmail.com>
+References: <1486010836-25228-1-git-send-email-anup.patel@broadcom.com>
+ <1486010836-25228-6-git-send-email-anup.patel@broadcom.com>
+ <20170205060657.GV19244@localhost> <CAALAos9FxwKuF+qtqViybZ8APZNYt-PWLnTfJs64xtoyYB5NZQ@mail.gmail.com>
+ <20170206165400.GD19244@localhost>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <linux-kernel@vger.kernel.org>,
-        Omer Khaliq <okhaliq@caviumnetworks.com>,
-        Ananth Jasty <Ananth.Jasty@cavium.com>,
-        David Daney <david.daney@cavium.com>
-To: <linux-crypto@vger.kernel.org>, Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2nam02on0060.outbound.protection.outlook.com ([104.47.38.60]:51360
-        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752411AbdBFW25 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 6 Feb 2017 17:28:57 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Jassi Brar <jassisinghbrar@gmail.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        Jon Mason <jonmason@broadcom.com>,
+        Rob Rice <rob.rice@broadcom.com>,
+        BCM Kernel Feedback <bcm-kernel-feedback-list@broadcom.com>,
+        dmaengine@vger.kernel.org,
+        Device Tree <devicetree@vger.kernel.org>,
+        Linux ARM Kernel <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel <linux-kernel@vger.kernel.org>,
+        linux-crypto@vger.kernel.org,
+        linux-raid <linux-raid@vger.kernel.org>
+To: Vinod Koul <vinod.koul@intel.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20170206165400.GD19244@localhost>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Systems containing the Cavium HW RNG may have one device per NUMA
-node.  A typical configuration is a 2-node NUMA system, which results
-in 2 RNG devices.  The hwrng subsystem refuses (and rightly so) to
-register more than one device with he same name, so we get failure
-messages on these systems.
+On Mon, Feb 6, 2017 at 10:24 PM, Vinod Koul <vinod.koul@intel.com> wrote:
+> On Mon, Feb 06, 2017 at 05:31:15PM +0530, Anup Patel wrote:
+>
+>> >> +
+>> >> +/* SBA C_MDATA helper macros */
+>> >> +#define SBA_C_MDATA_LOAD_VAL(__bnum0)                ((__bnum0) & 0x3)
+>> >> +#define SBA_C_MDATA_WRITE_VAL(__bnum0)               ((__bnum0) & 0x3)
+>> >> +#define SBA_C_MDATA_XOR_VAL(__bnum1, __bnum0)                        \
+>> >> +                     ({      u32 __v = ((__bnum0) & 0x3);    \
+>> >> +                             __v |= ((__bnum1) & 0x3) << 2;  \
+>> >> +                             __v;                            \
+>> >> +                     })
+>> >> +#define SBA_C_MDATA_PQ_VAL(__dnum, __bnum1, __bnum0)         \
+>> >> +                     ({      u32 __v = ((__bnum0) & 0x3);    \
+>> >> +                             __v |= ((__bnum1) & 0x3) << 2;  \
+>> >> +                             __v |= ((__dnum) & 0x1f) << 5;  \
+>> >> +                             __v;                            \
+>> >> +                     })
+>> >
+>> > ah why are we usig complex macros, why can't these be simple functions..
+>>
+>> "static inline functions" seemed too complicated here because most of
+>> these macros are two lines of c-code.
+>
+> and thats where I have an issue with this. Macros for simple things is fine
+> but not for couple of line of logic!
+>
+>>
+>> Do you still insist on using "static inline functions"?
+>
+> Yes
 
-Make the hwrng name unique by including the underlying device name.
-Also remove spaces from the name to make it possible to switch devices
-via the sysfs knobs.
+Sure, will use "static inline functions" instead these macros.
 
-Signed-off-by: David Daney <david.daney@cavium.com>
----
- drivers/char/hw_random/cavium-rng-vf.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+>
+>>
+>> >
+>> >> +#define SBA_C_MDATA_LS(__c_mdata_val)        ((__c_mdata_val) & 0xff)
+>> >> +#define SBA_C_MDATA_MS(__c_mdata_val)        (((__c_mdata_val) >> 8) & 0x3)
+>> >> +
+>> >> +/* Driver helper macros */
+>> >> +#define to_sba_request(tx)           \
+>> >> +     container_of(tx, struct sba_request, tx)
+>> >> +#define to_sba_device(dchan)         \
+>> >> +     container_of(dchan, struct sba_device, dma_chan)
+>> >> +
+>> >> +enum sba_request_state {
+>> >> +     SBA_REQUEST_STATE_FREE = 1,
+>> >> +     SBA_REQUEST_STATE_ALLOCED = 2,
+>> >> +     SBA_REQUEST_STATE_PENDING = 3,
+>> >> +     SBA_REQUEST_STATE_ACTIVE = 4,
+>> >> +     SBA_REQUEST_STATE_COMPLETED = 5,
+>> >> +     SBA_REQUEST_STATE_ABORTED = 6,
+>> >
+>> > whats up with a very funny indentation setting, we use 8 chars.
+>> >
+>> > Please re-read the Documentation/process/coding-style.rst
+>>
+>> I have double checked this enum. The indentation is fine
+>> and as-per coding style. Am I missing anything else?
+>
+> Somehow the initial indent doesnt seem to be 8 chars to me.
+>
+>> >> +static enum dma_status sba_tx_status(struct dma_chan *dchan,
+>> >> +                                  dma_cookie_t cookie,
+>> >> +                                  struct dma_tx_state *txstate)
+>> >> +{
+>> >> +     int mchan_idx;
+>> >> +     enum dma_status ret;
+>> >> +     struct sba_device *sba = to_sba_device(dchan);
+>> >> +
+>> >> +     ret = dma_cookie_status(dchan, cookie, txstate);
+>> >> +     if (ret == DMA_COMPLETE)
+>> >> +             return ret;
+>> >> +
+>> >> +     for (mchan_idx = 0; mchan_idx < sba->mchans_count; mchan_idx++)
+>> >> +             mbox_client_peek_data(sba->mchans[mchan_idx]);
+>> >
+>> > what is this achieving?
+>>
+>> The mbox_client_peek_data() is a hint to mailbox controller driver
+>> to check for available messages.
+>>
+>> This gives good performance improvement when some DMA client
+>> code is polling using tx_status() callback.
+>
+> Then why do it before and then check status.
 
-diff --git a/drivers/char/hw_random/cavium-rng-vf.c b/drivers/char/hw_random/cavium-rng-vf.c
-index 066ae0e..dd1007a 100644
---- a/drivers/char/hw_random/cavium-rng-vf.c
-+++ b/drivers/char/hw_random/cavium-rng-vf.c
-@@ -57,7 +57,11 @@ static int cavium_rng_probe_vf(struct	pci_dev		*pdev,
- 		return -ENOMEM;
- 	}
- 
--	rng->ops.name    = "cavium rng";
-+	rng->ops.name = devm_kasprintf(&pdev->dev, GFP_KERNEL,
-+				       "cavium-rng-%s", dev_name(&pdev->dev));
-+	if (!rng->ops.name)
-+		return -ENOMEM;
-+
- 	rng->ops.read    = cavium_rng_read;
- 	rng->ops.quality = 1000;
- 
--- 
-1.8.3.1
+If there was a work completed when mbox_client_peek_data()
+is called then sba_receive_message() will be called immediately
+by mailbox controller driver.
+
+We are doing dma_cookie_complete() in sba_receive_message()
+so if mbox_client_peek_data() is called before dma_cookie_status()
+then dma_cookie_status() will see correct state of cookie.
+
+Also, I explored virt-dma APIs for BCM-SBA-RAID driver. The virt-dma
+implements tasklet based bottom-half for each virt-dma-channel. This
+bottom-half is not required for BCM-FS4-RAID driver because its a
+mailbox client driver and the mailbox controller driver already implements
+bottom-half for each mailbox channel.
+
+If we still go ahead and use virt-dma in BCM-FS4-RAID driver then we
+will have two bottom-halfs in-action one in mailbox controller driver and
+another in BCM-FS4-RAID driver which in-turn will add bottom-half
+scheduling overhead thereby reducing performance of BCM-FS4-RAID
+driver.
+
+Regards,
+Anup
