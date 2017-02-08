@@ -1,62 +1,71 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [RFC PATCH v4] IV Generation algorithms for dm-crypt
-Date: Wed, 8 Feb 2017 09:32:42 +0200
-Message-ID: <CAOtvUMcN8s886978vE6T=AE79KkZsLBnXsmhewnb5PB0UyAG3A@mail.gmail.com>
-References: <1486463731-6224-1-git-send-email-binoy.jayan@linaro.org>
+From: Anup Patel <anup.patel@broadcom.com>
+Subject: Re: [PATCH v2 2/5] async_tx: Handle DMA devices having support for
+ fewer PQ coefficients
+Date: Wed, 8 Feb 2017 14:27:23 +0530
+Message-ID: <CAALAos9ovab4x=waRgM7G2adRC7syHMkY0Rhf-UPB_+h4w3yNQ@mail.gmail.com>
+References: <1486455406-11202-1-git-send-email-anup.patel@broadcom.com>
+ <1486455406-11202-3-git-send-email-anup.patel@broadcom.com>
+ <CAPcyv4gbV1yf52JrejW+Dn3wOPn7Er+8HWdu2qsW0+Qm+cRr9g@mail.gmail.com>
+ <CAALAos_yhXufdt79KWY0eugjF5oyJ8+NcPh2E-dEXnSQu2WhhA@mail.gmail.com> <CAPcyv4hK_1f8bryq6smPQy7vTnP+QEzmT9wnAEE1xpxq7EAnjQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: Oded <oded.golombek@arm.com>, Ofir <Ofir.Drang@arm.com>,
+Cc: Vinod Koul <vinod.koul@intel.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, Mark Brown <broonie@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org,
-        Rajendra <rnayak@codeaurora.org>,
-        Milan Broz <gmazyland@gmail.com>
-To: Binoy Jayan <binoy.jayan@linaro.org>
-Return-path: <linux-raid-owner@vger.kernel.org>
-In-Reply-To: <1486463731-6224-1-git-send-email-binoy.jayan@linaro.org>
-Sender: linux-raid-owner@vger.kernel.org
+        "David S . Miller" <davem@davemloft.net>,
+        Jassi Brar <jassisinghbrar@gmail.com>,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        Jon Mason <jonmason@broadcom.com>,
+        Rob Rice <rob.rice@broadcom.com>,
+        BCM Kernel Feedback <bcm-kernel-feedback-list@broadcom.com>,
+        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
+        Device Tree <devicetree@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org"
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        linux-crypto@vger.kernel.org,
+        linux-raid <linux-raid@vger.kernel.org>
+To: Dan Williams <dan.j.williams@intel.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <CAPcyv4hK_1f8bryq6smPQy7vTnP+QEzmT9wnAEE1xpxq7EAnjQ@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Feb 7, 2017 at 12:35 PM, Binoy Jayan <binoy.jayan@linaro.org> wrote:
-> ===============================================================================
-> dm-crypt optimization for larger block sizes
-> ===============================================================================
+On Tue, Feb 7, 2017 at 11:46 PM, Dan Williams <dan.j.williams@intel.com> wrote:
+> On Tue, Feb 7, 2017 at 1:02 AM, Anup Patel <anup.patel@broadcom.com> wrote:
+>> On Tue, Feb 7, 2017 at 1:57 PM, Dan Williams <dan.j.williams@intel.com> wrote:
+>>> On Tue, Feb 7, 2017 at 12:16 AM, Anup Patel <anup.patel@broadcom.com> wrote:
+>>>> The DMAENGINE framework assumes that if PQ offload is supported by a
+>>>> DMA device then all 256 PQ coefficients are supported. This assumption
+>>>> does not hold anymore because we now have BCM-SBA-RAID offload engine
+>>>> which supports PQ offload with limited number of PQ coefficients.
+>>>>
+>>>> This patch extends async_tx APIs to handle DMA devices with support
+>>>> for fewer PQ coefficients.
+>>>>
+>>>> Signed-off-by: Anup Patel <anup.patel@broadcom.com>
+>>>> Reviewed-by: Scott Branden <scott.branden@broadcom.com>
+>>>
+>>> I don't like this approach. Define an interface for md to query the
+>>> offload engine once at the beginning of time. We should not be adding
+>>> any new extensions to async_tx.
+>>
+>> Even if we do capability checks in Linux MD, we still need a way
+>> for DMAENGINE drivers to advertise number of PQ coefficients
+>> handled by the HW.
+>>
+>> I agree capability checks should be done once in Linux MD but I don't
+>> see why this has to be part of BCM-SBA-RAID driver patches. We need
+>> separate patchsets to address limitations of async_tx framework.
 >
-> Currently, the iv generation algorithms are implemented in dm-crypt.c. The goal
-> is to move these algorithms from the dm layer to the kernel crypto layer by
-> implementing them as template ciphers so they can be used in relation with
-> algorithms like aes, and with multiple modes like cbc, ecb etc. As part of this
-> patchset, the iv-generation code is moved from the dm layer to the crypto layer
-> and adapt the dm-layer to send a whole 'bio' (as defined in the block layer)
-> at a time. Each bio contains the in memory representation of physically
-> contiguous disk blocks. Since the bio itself may not be contiguous in main
-> memory, the dm layer sets up a chained scatterlist of these blocks split into
-> physically contiguous segments in memory so that DMA can be performed.
-...
-> Binoy Jayan (1):
->   crypto: Add IV generation algorithms
->
->  drivers/md/dm-crypt.c  | 1894 ++++++++++++++++++++++++++++++++++--------------
->  include/crypto/geniv.h |   47 ++
->  2 files changed, 1402 insertions(+), 539 deletions(-)
->  create mode 100644 include/crypto/geniv.h
+> Right, separate enabling before we pile on new hardware support to a
+> known broken framework.
 
-Ran Bonnie++ on it last night  (Luks mode, plain64, Qemu Virt platform
-Arm64) and it works just fine.
+Linux Async Tx not broken framework. The issue is:
+1. Its not complete enough
+2. Its not optimized for very high through-put offload engines
 
-Tested-by: Gilad Ben-Yossef <gilad@benyossef.com>
-
-Gilad
-
--- 
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-"If you take a class in large-scale robotics, can you end up in a
-situation where the homework eats your dog?"
- -- Jean-Baptiste Queru
+Regards,
+Anup
