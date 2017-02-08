@@ -1,74 +1,91 @@
-From: Gary R Hook <gary.hook@amd.com>
-Subject: [PATCH] crypto: ccp - Set the AES size field for all modes
-Date: Wed, 8 Feb 2017 13:07:06 -0600
-Message-ID: <20170208190706.7984.97805.stgit@taos>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: [PATCH v2 0/2] crypto: AF_ALG memory management fix
+Date: Wed, 08 Feb 2017 21:14:26 +0100
+Message-ID: <2626546.tAxUg930Nc@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>
-To: <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn3nam01on0070.outbound.protection.outlook.com ([104.47.33.70]:13120
-        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751014AbdBHTI7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 8 Feb 2017 14:08:59 -0500
+Received: from mail.eperm.de ([89.247.134.16]:55806 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751405AbdBHUQ1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 8 Feb 2017 15:16:27 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Ensure that the size field is correctly populated for
-all AES modes.
+Hi Herbert,
 
-Signed-off-by: Gary R Hook <gary.hook@amd.com>
----
- drivers/crypto/ccp/ccp-dev-v5.c |    3 +--
- drivers/crypto/ccp/ccp-dev.h    |    1 +
- drivers/crypto/ccp/ccp-ops.c    |    8 ++++++++
- 3 files changed, 10 insertions(+), 2 deletions(-)
+Changes v2:
+* import fix from Harsh Jain <harsh@chelsio.com> to remove SG
+  from list before freeing
+* fix return code used for ki_complete to match AIO behavior
+  with sync behavior
+* rename variable list -> tsgl_list
+* update the algif_aead patch to include a dynamic TX SGL
+  allocation similar to what algif_skcipher does. This allows
+  concurrent continuous read/write operations to the extent
+  you requested. Although I have not implemented "pairs of
+  TX/RX SGLs" as I think that is even more overhead, the
+  implementation conceptually defines such pairs. The recvmsg
+  call defines how much from the input data is processed.
+  The caller can have arbitrary number of sendmsg calls
+  where the data is added to the TX SGL before an recvmsg
+  asks the kernel to process a given amount (or all) of the
+  TX SGL.
 
-diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
-index 612898b..9c6ff8b8 100644
---- a/drivers/crypto/ccp/ccp-dev-v5.c
-+++ b/drivers/crypto/ccp/ccp-dev-v5.c
-@@ -284,8 +284,7 @@ static int ccp5_perform_aes(struct ccp_op *op)
- 	CCP_AES_ENCRYPT(&function) = op->u.aes.action;
- 	CCP_AES_MODE(&function) = op->u.aes.mode;
- 	CCP_AES_TYPE(&function) = op->u.aes.type;
--	if (op->u.aes.mode == CCP_AES_MODE_CFB)
--		CCP_AES_SIZE(&function) = 0x7f;
-+	CCP_AES_SIZE(&function) = op->u.aes.size;
- 
- 	CCP5_CMD_FUNCTION(&desc) = function.raw;
- 
-diff --git a/drivers/crypto/ccp/ccp-dev.h b/drivers/crypto/ccp/ccp-dev.h
-index 649e561..2b5c01f 100644
---- a/drivers/crypto/ccp/ccp-dev.h
-+++ b/drivers/crypto/ccp/ccp-dev.h
-@@ -467,6 +467,7 @@ struct ccp_aes_op {
- 	enum ccp_aes_type type;
- 	enum ccp_aes_mode mode;
- 	enum ccp_aes_action action;
-+	unsigned int size;
- };
- 
- struct ccp_xts_aes_op {
-diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
-index 50fae44..6878160 100644
---- a/drivers/crypto/ccp/ccp-ops.c
-+++ b/drivers/crypto/ccp/ccp-ops.c
-@@ -692,6 +692,14 @@ static int ccp_run_aes_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
- 			goto e_ctx;
- 		}
- 	}
-+	switch (aes->mode) {
-+	case CCP_AES_MODE_CFB: /* CFB128 only */
-+	case CCP_AES_MODE_CTR:
-+		op.u.aes.size = AES_BLOCK_SIZE * BITS_PER_BYTE - 1;
-+		break;
-+	default:
-+		op.u.aes.size = 0;
-+	}
- 
- 	/* Prepare the input and output data workareas. For in-place
- 	 * operations we need to set the dma direction to BIDIRECTIONAL
+With the changes, you will see a lot of code duplication now
+as I deliberately tried to use the same struct and variable names,
+the same function names and even the same oder of functions.
+If you agree to this patch, I volunteer to provide a followup
+patch that will extract the code duplication into common
+functions.
+
+Please find attached memory management updates to
+
+- simplify the code: the old AIO memory management is very
+  complex and seemingly very fragile -- the update now
+  eliminates all reported bugs in the skcipher and AEAD
+  interfaces which allowed the kernel to be crashed by
+  an unprivileged user
+
+- streamline the code: there is one code path for AIO and sync
+  operation; the code between algif_skcipher and algif_aead
+  is very similar (if that patch set is accepted, I volunteer
+  to reduce code duplication by moving service operations
+  into af_alg.c and to further unify the TX SGL handling)
+
+- unify the AIO and sync operation which only differ in the
+  kernel crypto API callback and whether to wait for the
+  crypto operation or not
+
+- fix all reported bugs regarding the handling of multiple
+  IOCBs.
+
+The following testing was performed:
+
+- stress testing to verify that no memleaks exist
+
+- testing using Tadeusz Struck AIO test tool (see
+  https://github.com/tstruk/afalg_async_test) -- the AEAD test
+  is not applicable any more due to the changed user space
+  interface; the skcipher test works once the user space
+  interface change is honored in the test code
+
+- using the libkcapi test suite, all tests including the
+  originally failing ones (AIO with multiple IOCBs) work now --
+  the current libkcapi code artificially limits the AEAD
+  operation to one IOCB. After altering the libkcapi code
+  to allow multiple IOCBs, the testing works flawless.
+
+Stephan Mueller (2):
+  crypto: skcipher AF_ALG - overhaul memory management
+  crypto: aead AF_ALG - overhaul memory management
+
+ crypto/algif_aead.c     | 668 +++++++++++++++++++++++++-----------------------
+ crypto/algif_skcipher.c | 472 ++++++++++++++--------------------
+ 2 files changed, 544 insertions(+), 596 deletions(-)
+
+-- 
+2.9.3
