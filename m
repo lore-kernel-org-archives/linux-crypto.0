@@ -1,78 +1,74 @@
-From: Dan Williams <dan.j.williams@intel.com>
-Subject: Re: [PATCH v2 2/5] async_tx: Handle DMA devices having support for
- fewer PQ coefficients
-Date: Wed, 8 Feb 2017 08:24:59 -0800
-Message-ID: <CAPcyv4iFJXxvJFrUs2jtwP9GX5NcJ8LiEDHeZ5b1fwjCAToe5w@mail.gmail.com>
-References: <1486455406-11202-1-git-send-email-anup.patel@broadcom.com>
- <1486455406-11202-3-git-send-email-anup.patel@broadcom.com>
- <CAPcyv4gbV1yf52JrejW+Dn3wOPn7Er+8HWdu2qsW0+Qm+cRr9g@mail.gmail.com>
- <CAALAos_yhXufdt79KWY0eugjF5oyJ8+NcPh2E-dEXnSQu2WhhA@mail.gmail.com>
- <CAPcyv4hK_1f8bryq6smPQy7vTnP+QEzmT9wnAEE1xpxq7EAnjQ@mail.gmail.com> <CAALAos9ovab4x=waRgM7G2adRC7syHMkY0Rhf-UPB_+h4w3yNQ@mail.gmail.com>
+From: Gary R Hook <gary.hook@amd.com>
+Subject: [PATCH] crypto: ccp - Set the AES size field for all modes
+Date: Wed, 8 Feb 2017 13:07:06 -0600
+Message-ID: <20170208190706.7984.97805.stgit@taos>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Vinod Koul <vinod.koul@intel.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Jassi Brar <jassisinghbrar@gmail.com>,
-        Ray Jui <rjui@broadcom.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        Jon Mason <jonmason@broadcom.com>,
-        Rob Rice <rob.rice@broadcom.com>,
-        BCM Kernel Feedback <bcm-kernel-feedback-list@broadcom.com>,
-        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
-        Device Tree <devicetree@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org"
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        linux-crypto@vger.kernel.org,
-        linux-raid <linux-raid@vger.kernel.org>
-To: Anup Patel <anup.patel@broadcom.com>
-Return-path: <linux-raid-owner@vger.kernel.org>
-In-Reply-To: <CAALAos9ovab4x=waRgM7G2adRC7syHMkY0Rhf-UPB_+h4w3yNQ@mail.gmail.com>
-Sender: linux-raid-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>
+To: <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-bn3nam01on0070.outbound.protection.outlook.com ([104.47.33.70]:13120
+        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751014AbdBHTI7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 8 Feb 2017 14:08:59 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Feb 8, 2017 at 12:57 AM, Anup Patel <anup.patel@broadcom.com> wrote:
-> On Tue, Feb 7, 2017 at 11:46 PM, Dan Williams <dan.j.williams@intel.com> wrote:
->> On Tue, Feb 7, 2017 at 1:02 AM, Anup Patel <anup.patel@broadcom.com> wrote:
->>> On Tue, Feb 7, 2017 at 1:57 PM, Dan Williams <dan.j.williams@intel.com> wrote:
->>>> On Tue, Feb 7, 2017 at 12:16 AM, Anup Patel <anup.patel@broadcom.com> wrote:
->>>>> The DMAENGINE framework assumes that if PQ offload is supported by a
->>>>> DMA device then all 256 PQ coefficients are supported. This assumption
->>>>> does not hold anymore because we now have BCM-SBA-RAID offload engine
->>>>> which supports PQ offload with limited number of PQ coefficients.
->>>>>
->>>>> This patch extends async_tx APIs to handle DMA devices with support
->>>>> for fewer PQ coefficients.
->>>>>
->>>>> Signed-off-by: Anup Patel <anup.patel@broadcom.com>
->>>>> Reviewed-by: Scott Branden <scott.branden@broadcom.com>
->>>>
->>>> I don't like this approach. Define an interface for md to query the
->>>> offload engine once at the beginning of time. We should not be adding
->>>> any new extensions to async_tx.
->>>
->>> Even if we do capability checks in Linux MD, we still need a way
->>> for DMAENGINE drivers to advertise number of PQ coefficients
->>> handled by the HW.
->>>
->>> I agree capability checks should be done once in Linux MD but I don't
->>> see why this has to be part of BCM-SBA-RAID driver patches. We need
->>> separate patchsets to address limitations of async_tx framework.
->>
->> Right, separate enabling before we pile on new hardware support to a
->> known broken framework.
->
-> Linux Async Tx not broken framework. The issue is:
-> 1. Its not complete enough
-> 2. Its not optimized for very high through-put offload engines
+Ensure that the size field is correctly populated for
+all AES modes.
 
-I'm not understanding your point. I'm nak'ing this change to add yet
-more per-transaction capability checking to async_tx. I don't like the
-DMA_HAS_FEWER_PQ_COEF flag, especially since it is equal to
-DMA_HAS_PQ_CONTINUE. I'm not asking for all of async_tx's problems to
-be fixed before this new hardware support, I'm simply saying we should
-start the process of moving offload-engine capability checking to the
-raid code.
+Signed-off-by: Gary R Hook <gary.hook@amd.com>
+---
+ drivers/crypto/ccp/ccp-dev-v5.c |    3 +--
+ drivers/crypto/ccp/ccp-dev.h    |    1 +
+ drivers/crypto/ccp/ccp-ops.c    |    8 ++++++++
+ 3 files changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
+index 612898b..9c6ff8b8 100644
+--- a/drivers/crypto/ccp/ccp-dev-v5.c
++++ b/drivers/crypto/ccp/ccp-dev-v5.c
+@@ -284,8 +284,7 @@ static int ccp5_perform_aes(struct ccp_op *op)
+ 	CCP_AES_ENCRYPT(&function) = op->u.aes.action;
+ 	CCP_AES_MODE(&function) = op->u.aes.mode;
+ 	CCP_AES_TYPE(&function) = op->u.aes.type;
+-	if (op->u.aes.mode == CCP_AES_MODE_CFB)
+-		CCP_AES_SIZE(&function) = 0x7f;
++	CCP_AES_SIZE(&function) = op->u.aes.size;
+ 
+ 	CCP5_CMD_FUNCTION(&desc) = function.raw;
+ 
+diff --git a/drivers/crypto/ccp/ccp-dev.h b/drivers/crypto/ccp/ccp-dev.h
+index 649e561..2b5c01f 100644
+--- a/drivers/crypto/ccp/ccp-dev.h
++++ b/drivers/crypto/ccp/ccp-dev.h
+@@ -467,6 +467,7 @@ struct ccp_aes_op {
+ 	enum ccp_aes_type type;
+ 	enum ccp_aes_mode mode;
+ 	enum ccp_aes_action action;
++	unsigned int size;
+ };
+ 
+ struct ccp_xts_aes_op {
+diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
+index 50fae44..6878160 100644
+--- a/drivers/crypto/ccp/ccp-ops.c
++++ b/drivers/crypto/ccp/ccp-ops.c
+@@ -692,6 +692,14 @@ static int ccp_run_aes_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 			goto e_ctx;
+ 		}
+ 	}
++	switch (aes->mode) {
++	case CCP_AES_MODE_CFB: /* CFB128 only */
++	case CCP_AES_MODE_CTR:
++		op.u.aes.size = AES_BLOCK_SIZE * BITS_PER_BYTE - 1;
++		break;
++	default:
++		op.u.aes.size = 0;
++	}
+ 
+ 	/* Prepare the input and output data workareas. For in-place
+ 	 * operations we need to set the dma direction to BIDIRECTIONAL
