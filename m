@@ -1,71 +1,61 @@
-From: Anup Patel <anup.patel@broadcom.com>
-Subject: Re: [PATCH v2 2/5] async_tx: Handle DMA devices having support for
- fewer PQ coefficients
-Date: Wed, 8 Feb 2017 14:27:23 +0530
-Message-ID: <CAALAos9ovab4x=waRgM7G2adRC7syHMkY0Rhf-UPB_+h4w3yNQ@mail.gmail.com>
-References: <1486455406-11202-1-git-send-email-anup.patel@broadcom.com>
- <1486455406-11202-3-git-send-email-anup.patel@broadcom.com>
- <CAPcyv4gbV1yf52JrejW+Dn3wOPn7Er+8HWdu2qsW0+Qm+cRr9g@mail.gmail.com>
- <CAALAos_yhXufdt79KWY0eugjF5oyJ8+NcPh2E-dEXnSQu2WhhA@mail.gmail.com> <CAPcyv4hK_1f8bryq6smPQy7vTnP+QEzmT9wnAEE1xpxq7EAnjQ@mail.gmail.com>
+From: Nicholas Mc Guire <der.herr@hofr.at>
+Subject: [PATCH] crypto: arm/aes-ce: assign err return conditionally
+Date: Wed,  8 Feb 2017 14:36:19 +0100
+Message-ID: <1486560979-25240-1-git-send-email-der.herr@hofr.at>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Vinod Koul <vinod.koul@intel.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Jassi Brar <jassisinghbrar@gmail.com>,
-        Ray Jui <rjui@broadcom.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        Jon Mason <jonmason@broadcom.com>,
-        Rob Rice <rob.rice@broadcom.com>,
-        BCM Kernel Feedback <bcm-kernel-feedback-list@broadcom.com>,
-        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
-        Device Tree <devicetree@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org"
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        linux-crypto@vger.kernel.org,
-        linux-raid <linux-raid@vger.kernel.org>
-To: Dan Williams <dan.j.williams@intel.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAPcyv4hK_1f8bryq6smPQy7vTnP+QEzmT9wnAEE1xpxq7EAnjQ@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: linux-kernel@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
+ Nicholas Mc Guire <der.herr@hofr.at>, linux-crypto@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, linux-arm-kernel@lists.infradead.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Feb 7, 2017 at 11:46 PM, Dan Williams <dan.j.williams@intel.com> wrote:
-> On Tue, Feb 7, 2017 at 1:02 AM, Anup Patel <anup.patel@broadcom.com> wrote:
->> On Tue, Feb 7, 2017 at 1:57 PM, Dan Williams <dan.j.williams@intel.com> wrote:
->>> On Tue, Feb 7, 2017 at 12:16 AM, Anup Patel <anup.patel@broadcom.com> wrote:
->>>> The DMAENGINE framework assumes that if PQ offload is supported by a
->>>> DMA device then all 256 PQ coefficients are supported. This assumption
->>>> does not hold anymore because we now have BCM-SBA-RAID offload engine
->>>> which supports PQ offload with limited number of PQ coefficients.
->>>>
->>>> This patch extends async_tx APIs to handle DMA devices with support
->>>> for fewer PQ coefficients.
->>>>
->>>> Signed-off-by: Anup Patel <anup.patel@broadcom.com>
->>>> Reviewed-by: Scott Branden <scott.branden@broadcom.com>
->>>
->>> I don't like this approach. Define an interface for md to query the
->>> offload engine once at the beginning of time. We should not be adding
->>> any new extensions to async_tx.
->>
->> Even if we do capability checks in Linux MD, we still need a way
->> for DMAENGINE drivers to advertise number of PQ coefficients
->> handled by the HW.
->>
->> I agree capability checks should be done once in Linux MD but I don't
->> see why this has to be part of BCM-SBA-RAID driver patches. We need
->> separate patchsets to address limitations of async_tx framework.
->
-> Right, separate enabling before we pile on new hardware support to a
-> known broken framework.
+As the err value is not used unless there was an error it can be assigned
+conditionally here. 
 
-Linux Async Tx not broken framework. The issue is:
-1. Its not complete enough
-2. Its not optimized for very high through-put offload engines
+Signed-off-by: Nicholas Mc Guire <der.herr@hofr.at>
+---
 
-Regards,
-Anup
+Not sure if this is really relevant and worth changing, effectively it
+is practically no change as gcc would move the err = PTR_ERR(simd); 
+below unregister_simds: anyway (based on inspection of .lst/.s files)
+- so it is more of an adjust C-level to object level for readability.
+
+Patch was compile-tested with multi_v7_defconfig 
+(implies CONFIG_CRYPTO_AES_ARM_CE=m) 
+
+Patch is against 4.10-rc7 (localversion-next is next-20170208)
+
+ arch/arm/crypto/aes-ce-glue.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/crypto/aes-ce-glue.c b/arch/arm/crypto/aes-ce-glue.c
+index 883b84d..8f65030 100644
+--- a/arch/arm/crypto/aes-ce-glue.c
++++ b/arch/arm/crypto/aes-ce-glue.c
+@@ -437,9 +437,10 @@ static int __init aes_init(void)
+ 		drvname = aes_algs[i].base.cra_driver_name + 2;
+ 		basename = aes_algs[i].base.cra_driver_name;
+ 		simd = simd_skcipher_create_compat(algname, drvname, basename);
+-		err = PTR_ERR(simd);
+-		if (IS_ERR(simd))
++		if (IS_ERR(simd)) {
++			err = PTR_ERR(simd);
+ 			goto unregister_simds;
++		}
+ 
+ 		aes_simd_algs[i] = simd;
+ 	}
+-- 
+2.1.4
