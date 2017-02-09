@@ -1,95 +1,88 @@
-From: Dan Williams <dan.j.williams@intel.com>
-Subject: Re: [PATCH v2 2/5] async_tx: Handle DMA devices having support for
- fewer PQ coefficients
-Date: Thu, 9 Feb 2017 08:44:02 -0800
-Message-ID: <CAPcyv4gDq+our1+sAPShBru-qvebo+Zvk0crgSUNXucHGQwZ1Q@mail.gmail.com>
-References: <1486455406-11202-1-git-send-email-anup.patel@broadcom.com>
- <1486455406-11202-3-git-send-email-anup.patel@broadcom.com>
- <CAPcyv4gbV1yf52JrejW+Dn3wOPn7Er+8HWdu2qsW0+Qm+cRr9g@mail.gmail.com>
- <CAALAos_yhXufdt79KWY0eugjF5oyJ8+NcPh2E-dEXnSQu2WhhA@mail.gmail.com>
- <CAPcyv4hK_1f8bryq6smPQy7vTnP+QEzmT9wnAEE1xpxq7EAnjQ@mail.gmail.com>
- <CAALAos9ovab4x=waRgM7G2adRC7syHMkY0Rhf-UPB_+h4w3yNQ@mail.gmail.com>
- <CAPcyv4iFJXxvJFrUs2jtwP9GX5NcJ8LiEDHeZ5b1fwjCAToe5w@mail.gmail.com> <CAALAos-ua6hVpUqjnJSQ=ysSOKrN67toiT3J808uHC4A_ZV3mg@mail.gmail.com>
+From: Cyrille Pitchen <cyrille.pitchen@atmel.com>
+Subject: [PATCH next 0/2] crypto: atmel-sha: fix error management
+Date: Thu, 9 Feb 2017 17:51:19 +0100
+Message-ID: <cover.1486655562.git.cyrille.pitchen@atmel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Vinod Koul <vinod.koul@intel.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Jassi Brar <jassisinghbrar@gmail.com>,
-        Ray Jui <rjui@broadcom.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        Jon Mason <jonmason@broadcom.com>,
-        Rob Rice <rob.rice@broadcom.com>,
-        BCM Kernel Feedback <bcm-kernel-feedback-list@broadcom.com>,
-        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
-        Device Tree <devicetree@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org"
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        linux-crypto@vger.kernel.org,
-        linux-raid <linux-raid@vger.kernel.org>
-To: Anup Patel <anup.patel@broadcom.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAALAos-ua6hVpUqjnJSQ=ysSOKrN67toiT3J808uHC4A_ZV3mg@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Cyrille Pitchen <cyrille.pitchen@atmel.com>, dan.carpenter@oracle.com,
+ linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+ <nicolas.ferre@atmel.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Feb 9, 2017 at 1:29 AM, Anup Patel <anup.patel@broadcom.com> wrote:
-> On Wed, Feb 8, 2017 at 9:54 PM, Dan Williams <dan.j.williams@intel.com> wrote:
->> On Wed, Feb 8, 2017 at 12:57 AM, Anup Patel <anup.patel@broadcom.com> wrote:
->>> On Tue, Feb 7, 2017 at 11:46 PM, Dan Williams <dan.j.williams@intel.com> wrote:
->>>> On Tue, Feb 7, 2017 at 1:02 AM, Anup Patel <anup.patel@broadcom.com> wrote:
->>>>> On Tue, Feb 7, 2017 at 1:57 PM, Dan Williams <dan.j.williams@intel.com> wrote:
->>>>>> On Tue, Feb 7, 2017 at 12:16 AM, Anup Patel <anup.patel@broadcom.com> wrote:
->>>>>>> The DMAENGINE framework assumes that if PQ offload is supported by a
->>>>>>> DMA device then all 256 PQ coefficients are supported. This assumption
->>>>>>> does not hold anymore because we now have BCM-SBA-RAID offload engine
->>>>>>> which supports PQ offload with limited number of PQ coefficients.
->>>>>>>
->>>>>>> This patch extends async_tx APIs to handle DMA devices with support
->>>>>>> for fewer PQ coefficients.
->>>>>>>
->>>>>>> Signed-off-by: Anup Patel <anup.patel@broadcom.com>
->>>>>>> Reviewed-by: Scott Branden <scott.branden@broadcom.com>
->>>>>>
->>>>>> I don't like this approach. Define an interface for md to query the
->>>>>> offload engine once at the beginning of time. We should not be adding
->>>>>> any new extensions to async_tx.
->>>>>
->>>>> Even if we do capability checks in Linux MD, we still need a way
->>>>> for DMAENGINE drivers to advertise number of PQ coefficients
->>>>> handled by the HW.
->>>>>
->>>>> I agree capability checks should be done once in Linux MD but I don't
->>>>> see why this has to be part of BCM-SBA-RAID driver patches. We need
->>>>> separate patchsets to address limitations of async_tx framework.
->>>>
->>>> Right, separate enabling before we pile on new hardware support to a
->>>> known broken framework.
->>>
->>> Linux Async Tx not broken framework. The issue is:
->>> 1. Its not complete enough
->>> 2. Its not optimized for very high through-put offload engines
->>
->> I'm not understanding your point. I'm nak'ing this change to add yet
->> more per-transaction capability checking to async_tx. I don't like the
->> DMA_HAS_FEWER_PQ_COEF flag, especially since it is equal to
->> DMA_HAS_PQ_CONTINUE. I'm not asking for all of async_tx's problems to
->> be fixed before this new hardware support, I'm simply saying we should
->> start the process of moving offload-engine capability checking to the
->> raid code.
->
-> The DMA_HAS_FEWER_PQ_COEF is not equal to
-> DMA_HAS_PQ_CONTINUE.
+Hi all,
 
-#define DMA_HAS_PQ_CONTINUE (1 << 15
-#define DMA_HAS_FEWER_PQ_COEF (1 << 15)
+this series is based on next-20170209.
 
-> I will try to drop this patch and take care of unsupported PQ
-> coefficients in BCM-SBA-RAID driver itself even if this means
-> doing some computations in BCM-SBA-RAID driver itself.
+The first patch fixes a bug reported by Dan Carpenter. I didn't put a
+Fixes tag since the buggy patch is only in linux-next for now so its
+commit ID is likely to change when entering Linus' tree.
+It fixes a wrong 'sed' command: many "return -EINVAL;" lines should have
+been replaced by "return atmel_sha_complete(dd, -EINVAL);" but instead
+were replaced by direct calls of "atmel_sha_complete(dd, -EINVAL);".
+My bad, sorry for that!
 
-That should be nak'd as well, please do capability detection in a
-routine that is common to all raid engines.
+The second patch fixes the way error cases are handled from
+atmel_sha_start(). For instance, when atmel_sha_update_req() returned an
+error, atmel_sha_final_req() may have been called after anyway. This issue
+was present even before my rework of the request queue management, which
+introduced atmel_sha_start(), so I guess this is a long time issue.
+
+Finally, for driver maintainance purpose, I'm preparing other patches to
+fix the very same and very unlikely issue in both atmel-aes.c and
+atmel-sha.c:
+
+atmel_{aes|sha}_hw_init() may fail, for instance if clk_enable() fails.
+If so, atmel_{aes|sha}_complete() is called to release the hardware and
+report the error. Indeed this _complete() function should be called to
+report and handle any error. However it also incondionnally calls
+clk_disable(). Hence the following sequence may be buggy:
+
+err = atmel_{aes|sha}_hw_init(dd); /* clk_enable() may have failed. */
+if (err)
+	return atmel_{aes|sha}_hw_init(dd, err);
+	/* clk_disable() is called anyway. */
+
+I didn't finalize my fixes yet for this unlikely bug. Besides the bug was
+already present in v4.9 and before, so before introducing
+atmel_sha_complete().
+
+from atmel_sha_handle_queue(), the older sequence was:
+
+	err = atmel_sha_hw_init(dd);
+
+	if (err)
+		goto err1;
+
+	[...]
+
+err1:
+	if (err != -EINPROGRESS)
+		/* done_task will not finish it, so do it here */
+		atmel_sha_finish_req(req, err);
+
+Best regards,
+
+Cyrille
+
+Cyrille Pitchen (2):
+  crypto: atmel-sha: fix missing "return" instructions
+  crypto: atmel-sha: fix error management in atmel_sha_start()
+
+ drivers/crypto/atmel-sha.c | 37 +++++++++++++++++++++++++++----------
+ 1 file changed, 27 insertions(+), 10 deletions(-)
+
+-- 
+2.7.4
