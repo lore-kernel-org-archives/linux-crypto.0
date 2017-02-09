@@ -1,98 +1,54 @@
-From: Cyrille Pitchen <cyrille.pitchen@atmel.com>
-Subject: [PATCH next 2/2] crypto: atmel-sha: fix error management in
- atmel_sha_start()
-Date: Thu, 9 Feb 2017 17:51:21 +0100
-Message-ID: <3852cb16370171988f6669b3bac98b06477bacb6.1486655562.git.cyrille.pitchen@atmel.com>
-References: <cover.1486655562.git.cyrille.pitchen@atmel.com>
+From: David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH -next] crypto: asymmetric_keys - Fix error return code on failure
+Date: Thu, 09 Feb 2017 16:57:56 +0000
+Message-ID: <27512.1486659476@warthog.procyon.org.uk>
+References: <20170209155724.19737-1-weiyj.lk@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Cyrille Pitchen <cyrille.pitchen@atmel.com>, dan.carpenter@oracle.com,
- linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
- <nicolas.ferre@atmel.com>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <cover.1486655562.git.cyrille.pitchen@atmel.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Cc: dhowells@redhat.com, Herbert Xu <herbert@gondor.apana.org.au>,
+        Wei Yongjun <weiyongjun1@huawei.com>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+To: Wei Yongjun <weiyj.lk@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:53502 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753503AbdBIQ6X (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 9 Feb 2017 11:58:23 -0500
+In-Reply-To: <20170209155724.19737-1-weiyj.lk@gmail.com>
+Content-ID: <27511.1486659476.1@warthog.procyon.org.uk>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-This patch clarifies and fixes how errors should be handled by
-atmel_sha_start().
+Wei Yongjun <weiyj.lk@gmail.com> wrote:
 
-For update operations, the previous code wrongly assumed that
-(err != -EINPROGRESS) implies (err == 0). It's wrong because that doesn't
-take the error cases (err < 0) into account.
+> --- a/crypto/asymmetric_keys/public_key.c
+> +++ b/crypto/asymmetric_keys/public_key.c
+> @@ -184,8 +184,10 @@ static int software_key_eds_op(struct kernel_pkey_params *params,
+>  		return PTR_ERR(tfm);
+>  
+>  	req = akcipher_request_alloc(tfm, GFP_KERNEL);
+> -	if (!req)
+> +	if (!req) {
+> +		ret = -ENOMEM;
 
-This patch also adds many comments to detail all the possible returned
-values and what should be done in each case.
+Ummm...  What should I apply your patch to?
 
-Especially, when an error occurs, since atmel_sha_complete() has already
-been called, hence releasing the hardware, atmel_sha_start() must not call
-atmel_sha_finish_req() later otherwise atmel_sha_complete() would be
-called a second time.
+>  		goto error_free_tfm;
+> +	}
+>  
+>  	if (pkey->key_is_private)
+>  		ret = crypto_akcipher_set_priv_key(tfm,
+> @@ -268,8 +270,10 @@ int public_key_verify_signature(const struct public_key *pkey,
+>  		return PTR_ERR(tfm);
+>  
+>  	req = akcipher_request_alloc(tfm, GFP_KERNEL);
+> -	if (!req)
+> +	if (!req) {
+> +		ret = -ENOMEM;
+>  		goto error_free_tfm;
 
-Signed-off-by: Cyrille Pitchen <cyrille.pitchen@atmel.com>
----
- drivers/crypto/atmel-sha.c | 27 ++++++++++++++++++++++-----
- 1 file changed, 22 insertions(+), 5 deletions(-)
+This shouldn't be necessary.  ret should already be -ENOMEM from
+initialisation of the variable at the top of the function.
 
-diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
-index d6c3d9529d36..0d207dac9aa2 100644
---- a/drivers/crypto/atmel-sha.c
-+++ b/drivers/crypto/atmel-sha.c
-@@ -1106,22 +1106,39 @@ static int atmel_sha_start(struct atmel_sha_dev *dd)
- 						ctx->op, req->nbytes);
- 
- 	err = atmel_sha_hw_init(dd);
--
- 	if (err)
--		goto err1;
-+		return atmel_sha_complete(dd, err);
-+
-+	/*
-+	 * atmel_sha_update_req() and atmel_sha_final_req() can return either:
-+	 *  -EINPROGRESS: the hardware is busy and the SHA driver will resume
-+	 *                its job later in the done_task.
-+	 *                This is the main path.
-+	 *
-+	 * 0: the SHA driver can continue its job then release the hardware
-+	 *    later, if needed, with atmel_sha_finish_req().
-+	 *    This is the alternate path.
-+	 *
-+	 * < 0: an error has occurred so atmel_sha_complete(dd, err) has already
-+	 *      been called, hence the hardware has been released.
-+	 *      The SHA driver must stop its job without calling
-+	 *      atmel_sha_finish_req(), otherwise atmel_sha_complete() would be
-+	 *      called a second time.
-+	 *
-+	 * Please note that currently, atmel_sha_final_req() never returns 0.
-+	 */
- 
- 	dd->resume = atmel_sha_done;
- 	if (ctx->op == SHA_OP_UPDATE) {
- 		err = atmel_sha_update_req(dd);
--		if (err != -EINPROGRESS && (ctx->flags & SHA_FLAGS_FINUP))
-+		if (!err && (ctx->flags & SHA_FLAGS_FINUP))
- 			/* no final() after finup() */
- 			err = atmel_sha_final_req(dd);
- 	} else if (ctx->op == SHA_OP_FINAL) {
- 		err = atmel_sha_final_req(dd);
- 	}
- 
--err1:
--	if (err != -EINPROGRESS)
-+	if (!err)
- 		/* done_task will not finish it, so do it here */
- 		atmel_sha_finish_req(req, err);
- 
--- 
-2.7.4
+David
