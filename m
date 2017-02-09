@@ -1,53 +1,42 @@
-From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: [PATCH v7 0/5] Update LZ4 compressor module
-Date: Wed, 8 Feb 2017 16:24:36 -0800
-Message-ID: <20170209002436.GA103792@gmail.com>
-References: <1482259992-16680-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
- <1486321748-19085-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
- <20170208233121.GA16728@bbox>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [PATCH] Revert "hwrng: core - zeroize buffers with random data"
+Date: Wed, 8 Feb 2017 17:57:23 -0800
+Message-ID: <CA+55aFwBdG42kk8J0t2tufHE=OUk4qWXEkFyySNgU3Ru2TA-tQ@mail.gmail.com>
+References: <20170208002331.29408-1-david.daney@cavium.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Sven Schmidt <4sschmid@informatik.uni-hamburg.de>,
-        akpm@linux-foundation.org, bongkyu.kim@lge.com,
-        rsalvaterra@gmail.com, sergey.senozhatsky@gmail.com,
-        gregkh@linuxfoundation.org, linux-kernel@vger.kernel.org,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, anton@enomsg.org, ccross@android.com,
-        keescook@chromium.org, tony.luck@intel.com
-To: Minchan Kim <minchan@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Stephan Mueller <smueller@chronox.de>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: David Daney <david.daney@cavium.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pg0-f67.google.com ([74.125.83.67]:33781 "EHLO
-        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752002AbdBIAYj (ORCPT
+Received: from mail-ot0-f195.google.com ([74.125.82.195]:33672 "EHLO
+        mail-ot0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751059AbdBIB5l (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 8 Feb 2017 19:24:39 -0500
-Content-Disposition: inline
-In-Reply-To: <20170208233121.GA16728@bbox>
+        Wed, 8 Feb 2017 20:57:41 -0500
+In-Reply-To: <20170208002331.29408-1-david.daney@cavium.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Feb 09, 2017 at 08:31:21AM +0900, Minchan Kim wrote:
-> 
-> Today, I did zram-lz4 performance test with fio in current mmotm and
-> found it makes regression about 20%.
-> 
+Stephan, Herbert? The zeroes in /dev/hwrng output are obviously
+complete crap, so there's something badly wrong somewhere.
 
-This may or may not be the cause of the specific regression you're observing,
-but I just noticed that the proposed patch drops a lot of FORCEINLINE
-annotations from upstream LZ4.  The FORCEINLINE's are there for a reason,
-especially for the main decompression and compression functions which are
-basically "templates" that take in different sets of constant parameters, and
-should be left in.  We should #define FORCEINLINE to __always_inline somewhere,
-or just do a s/FORCEINLINE/__always_inline/g.
+The locking, for example, is completely buggered. There's even a
+comment about it, but that comment makes the correct observation of
+"but y'know: randomness". But the memset() also being outside the lock
+makes a complete joke of the whole thing.
 
-Note that the upstream LZ4 code is very carefully optimized, so we should not,
-in general, be changing things like when functions are force-inlined, what the
-hash table size is, etc.
+Is the hwrng thing even worth maintaining? Compared to something like
+/dev/urandom, it clearly does not do a very good job.
 
-[Also, for some reason linux-crypto is apparently still not receiving patch 1/5
-in the series.  It's missing from the linux-crypto archive at
-http://www.spinics.net/lists/linux-crypto/, so it's not just me.]
+So I'm inclined to take the revert, but I'm also somewhat inclined to
+simply mark this crud broken when we have other things that clearly do
+a lot better.
 
-Thanks!
+              Linus
 
-Eric
+On Tue, Feb 7, 2017 at 4:23 PM, David Daney <david.daney@cavium.com> wrote:
+> This reverts commit 2cc751545854d7bd7eedf4d7e377bb52e176cd07.
