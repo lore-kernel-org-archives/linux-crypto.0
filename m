@@ -1,13 +1,12 @@
 From: Eric Biggers <ebiggers3@gmail.com>
 Subject: Re: [PATCH v7 0/5] Update LZ4 compressor module
-Date: Thu, 9 Feb 2017 10:20:24 -0800
-Message-ID: <20170209182024.GA92711@gmail.com>
+Date: Thu, 9 Feb 2017 10:29:14 -0800
+Message-ID: <20170209182914.GB92711@gmail.com>
 References: <1482259992-16680-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
  <1486321748-19085-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
  <20170208233121.GA16728@bbox>
  <20170209002436.GA103792@gmail.com>
- <20170209052425.GA4678@zzz>
- <20170209110540.GC3575@bierbaron.springfield.local>
+ <20170209110211.GB3575@bierbaron.springfield.local>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: Minchan Kim <minchan@kernel.org>, akpm@linux-foundation.org,
@@ -18,43 +17,35 @@ Cc: Minchan Kim <minchan@kernel.org>, akpm@linux-foundation.org,
         anton@enomsg.org, ccross@android.com, keescook@chromium.org,
         tony.luck@intel.com
 To: Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pg0-f68.google.com ([74.125.83.68]:33450 "EHLO
+        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751463AbdBISbe (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 9 Feb 2017 13:31:34 -0500
 Content-Disposition: inline
-In-Reply-To: <20170209110540.GC3575@bierbaron.springfield.local>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20170209110211.GB3575@bierbaron.springfield.local>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Feb 09, 2017 at 12:05:40PM +0100, Sven Schmidt wrote:
-> > Because of how LZ4_ARCH64 is defined, it needs to be '#if LZ4_ARCH64'.
+On Thu, Feb 09, 2017 at 12:02:11PM +0100, Sven Schmidt wrote:
 > > 
-> > But I also think the way upstream LZ4 does 64-bit detection could have just been
-> > left as-is; it has a function which gets inlined:
+> > [Also, for some reason linux-crypto is apparently still not receiving patch 1/5
+> > in the series.  It's missing from the linux-crypto archive at
+> > http://www.spinics.net/lists/linux-crypto/, so it's not just me.]
 > > 
-> > 	static unsigned LZ4_64bits(void) { return sizeof(void*)==8; }
-> > 
-> > Eric
 > 
-> does this apply for LZ4_isLittleEndian() as well? As a reminder:
-> 	
-> 	static unsigned LZ4_isLittleEndian(void)
-> 	{
-> 		/* don't use static : performance detrimental */
-> 		const union { U32 u; BYTE c[4]; } one = { 1 };
+> I don't really know what to do about this. I think the matter is the size of the E-Mail.
+> Are there filters or something like that? Since in linux-kernel the patch seems to get delivered.
+> I could otherwise CC you if you wish.
 > 
-> 		return one.c[0];
-> 	}
-> 
-> It is surely easier to read and understand using these functions in favor of the macros.
 
-Yes, it makes sense to retain LZ4_isLittleEndian() too, mainly so that the call
-sites don't need to be changed and we have less chance of introducing bugs.
+If I'm not mistaken, David Miller is the admin of the mail server on
+vger.kernel.org, and he already happens to be Cc'ed on this thread, so maybe he
+can answer as to why linux-crypto may be configured differently?
 
-I also believe the *implementation* of LZ4_isLittleEndian() using the union
-"hack" to detecting endianness works fine and will get optimized correctly,
-though we could replace it with an #ifdef __LITTLE_ENDIAN__ if we wanted to.  (I
-am sure that upstream LZ4 would do that if it was guaranteed to work, but
-upstream LZ4 needs to detect endianness reliably across many more different
-compilers, compiler versions, and platforms than the Linux kernel does, and
-there is no standard preprocessor macro for doing so.)
+Anyway, since the patch did make it to linux-kernel anyone can still download it
+from patchwork if they know where to look:
+https://patchwork.kernel.org/patch/9556271/
 
 Eric
