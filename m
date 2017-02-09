@@ -1,7 +1,8 @@
 From: Gary R Hook <gary.hook@amd.com>
-Subject: [PATCH v2 2/3] crypto: ccp - Update the command queue on errors
-Date: Thu, 9 Feb 2017 15:49:57 -0600
-Message-ID: <20170209214957.11781.30020.stgit@taos>
+Subject: [PATCH v2 1/3] crypto: ccp - Change mode for detailed CCP init
+ messages
+Date: Thu, 9 Feb 2017 15:49:48 -0600
+Message-ID: <20170209214948.11781.67524.stgit@taos>
 References: <20170209214704.11781.28640.stgit@taos>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -10,47 +11,51 @@ Cc: <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>,
         <davem@davemloft.net>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-cys01nam02on0069.outbound.protection.outlook.com ([104.47.37.69]:51472
-        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
+Received: from mail-bn3nam01on0066.outbound.protection.outlook.com ([104.47.33.66]:39601
+        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752301AbdBIVvK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1752263AbdBIVvK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Thu, 9 Feb 2017 16:51:10 -0500
 In-Reply-To: <20170209214704.11781.28640.stgit@taos>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Move the command queue tail pointer when an error is
-detected. Always return the error.
+The CCP initialization messages only need to be sent to
+syslog in debug mode.
+
 
 Signed-off-by: Gary R Hook <gary.hook@amd.com>
 ---
- drivers/crypto/ccp/ccp-dev-v5.c |    7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ drivers/crypto/ccp/ccp-dev-v5.c |    5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
-index 5fb6c8c..d9e1876 100644
+index e2ce819..5fb6c8c 100644
 --- a/drivers/crypto/ccp/ccp-dev-v5.c
 +++ b/drivers/crypto/ccp/ccp-dev-v5.c
-@@ -250,17 +250,20 @@ static int ccp5_do_cmd(struct ccp5_desc *desc,
- 		ret = wait_event_interruptible(cmd_q->int_queue,
- 					       cmd_q->int_rcvd);
- 		if (ret || cmd_q->cmd_error) {
-+			/* Log the error and flush the queue by
-+			 * moving the head pointer
-+			 */
- 			if (cmd_q->cmd_error)
- 				ccp_log_error(cmd_q->ccp,
- 					      cmd_q->cmd_error);
--			/* A version 5 device doesn't use Job IDs... */
-+			iowrite32(tail, cmd_q->reg_head_lo);
- 			if (!ret)
- 				ret = -EIO;
- 		}
- 		cmd_q->int_rcvd = 0;
+@@ -532,7 +532,7 @@ static int ccp_find_lsb_regions(struct ccp_cmd_queue *cmd_q, u64 status)
+ 		status >>= LSB_REGION_WIDTH;
  	}
+ 	queues = bitmap_weight(cmd_q->lsbmask, MAX_LSB_CNT);
+-	dev_info(cmd_q->ccp->dev, "Queue %d can access %d LSB regions\n",
++	dev_dbg(cmd_q->ccp->dev, "Queue %d can access %d LSB regions\n",
+ 		 cmd_q->id, queues);
  
--	return 0;
-+	return ret;
- }
+ 	return queues ? 0 : -EINVAL;
+@@ -574,7 +574,7 @@ static int ccp_find_and_assign_lsb_to_q(struct ccp_device *ccp,
+ 					 */
+ 					cmd_q->lsb = bitno;
+ 					bitmap_clear(lsb_pub, bitno, 1);
+-					dev_info(ccp->dev,
++					dev_dbg(ccp->dev,
+ 						 "Queue %d gets LSB %d\n",
+ 						 i, bitno);
+ 					break;
+@@ -732,7 +732,6 @@ static int ccp5_init(struct ccp_device *ccp)
+ 		ret = -EIO;
+ 		goto e_pool;
+ 	}
+-	dev_notice(dev, "%u command queues available\n", ccp->cmd_q_count);
  
- static int ccp5_perform_aes(struct ccp_op *op)
+ 	/* Turn off the queues and disable interrupts until ready */
+ 	for (i = 0; i < ccp->cmd_q_count; i++) {
