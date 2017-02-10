@@ -1,100 +1,74 @@
 From: Anup Patel <anup.patel@broadcom.com>
-Subject: [PATCH v3 1/4] lib/raid6: Add log-of-2 table for RAID6 HW requiring
- disk position
-Date: Fri, 10 Feb 2017 14:37:05 +0530
-Message-ID: <1486717628-17580-2-git-send-email-anup.patel@broadcom.com>
+Subject: [PATCH v3 4/4] dt-bindings: Add DT bindings document for Broadcom SBA RAID driver
+Date: Fri, 10 Feb 2017 14:37:08 +0530
+Message-ID: <1486717628-17580-5-git-send-email-anup.patel@broadcom.com>
 References: <1486717628-17580-1-git-send-email-anup.patel@broadcom.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: devicetree@vger.kernel.org, Anup Patel <anup.patel@broadcom.com>,
- Scott Branden <sbranden@broadcom.com>, Jon Mason <jonmason@broadcom.com>,
- Ray Jui <rjui@broadcom.com>, linux-kernel@vger.kernel.org,
- linux-raid@vger.kernel.org, bcm-kernel-feedback-list@broadcom.com,
- linux-crypto@vger.kernel.org, Rob Rice <rob.rice@broadcom.com>,
- dmaengine@vger.kernel.org, Dan Williams <dan.j.williams@intel.com>,
- linux-arm-kernel@lists.infradead.org
-To: Vinod Koul <vinod.koul@intel.com>, Rob Herring <robh+dt@kernel.org>,
- Mark Rutland <mark.rutland@arm.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S . Miller" <davem@davemloft.net>,
- Jassi Brar <jassisinghbrar@gmail.com>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Cc: Dan Williams <dan.j.williams@intel.com>,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        Jon Mason <jonmason@broadcom.com>,
+        Rob Rice <rob.rice@broadcom.com>,
+        bcm-kernel-feedback-list@broadcom.com, dmaengine@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-raid@vger.kernel.org, Anup Patel <anup.patel@broadcom.com>
+To: Vinod Koul <vinod.koul@intel.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Jassi Brar <jassisinghbrar@gmail.com>
+Return-path: <linux-raid-owner@vger.kernel.org>
 In-Reply-To: <1486717628-17580-1-git-send-email-anup.patel@broadcom.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Sender: linux-raid-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The raid6_gfexp table represents {2}^n values for 0 <= n < 256. The
-Linux async_tx framework pass values from raid6_gfexp as coefficients
-for each source to prep_dma_pq() callback of DMA channel with PQ
-capability. This creates problem for RAID6 offload engines (such as
-Broadcom SBA) which take disk position (i.e. log of {2}) instead of
-multiplicative cofficients from raid6_gfexp table.
-
-This patch adds raid6_gflog table having log-of-2 value for any given
-x such that 0 <= x < 256. For any given disk coefficient x, the
-corresponding disk position is given by raid6_gflog[x]. The RAID6
-offload engine driver can use this newly added raid6_gflog table to
-get disk position from multiplicative coefficient.
+This patch adds the DT bindings document for newly added Broadcom
+SBA RAID driver.
 
 Signed-off-by: Anup Patel <anup.patel@broadcom.com>
-Reviewed-by: Scott Branden <scott.branden@broadcom.com>
 Reviewed-by: Ray Jui <ray.jui@broadcom.com>
+Reviewed-by: Scott Branden <scott.branden@broadcom.com>
 ---
- include/linux/raid/pq.h |  1 +
- lib/raid6/mktables.c    | 20 ++++++++++++++++++++
- 2 files changed, 21 insertions(+)
+ .../devicetree/bindings/dma/brcm,iproc-sba.txt     | 29 ++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/dma/brcm,iproc-sba.txt
 
-diff --git a/include/linux/raid/pq.h b/include/linux/raid/pq.h
-index 4d57bba..30f9453 100644
---- a/include/linux/raid/pq.h
-+++ b/include/linux/raid/pq.h
-@@ -142,6 +142,7 @@ int raid6_select_algo(void);
- extern const u8 raid6_gfmul[256][256] __attribute__((aligned(256)));
- extern const u8 raid6_vgfmul[256][32] __attribute__((aligned(256)));
- extern const u8 raid6_gfexp[256]      __attribute__((aligned(256)));
-+extern const u8 raid6_gflog[256]      __attribute__((aligned(256)));
- extern const u8 raid6_gfinv[256]      __attribute__((aligned(256)));
- extern const u8 raid6_gfexi[256]      __attribute__((aligned(256)));
- 
-diff --git a/lib/raid6/mktables.c b/lib/raid6/mktables.c
-index 39787db..e824d08 100644
---- a/lib/raid6/mktables.c
-+++ b/lib/raid6/mktables.c
-@@ -125,6 +125,26 @@ int main(int argc, char *argv[])
- 	printf("EXPORT_SYMBOL(raid6_gfexp);\n");
- 	printf("#endif\n");
- 
-+	/* Compute log-of-2 table */
-+	printf("\nconst u8 __attribute__((aligned(256)))\n"
-+	       "raid6_gflog[256] =\n" "{\n");
-+	for (i = 0; i < 256; i += 8) {
-+		printf("\t");
-+		for (j = 0; j < 8; j++) {
-+			v = 255;
-+			for (k = 0; k < 256; k++)
-+				if (exptbl[k] == (i + j)) {
-+					v = k;
-+					break;
-+				}
-+			printf("0x%02x,%c", v, (j == 7) ? '\n' : ' ');
-+		}
-+	}
-+	printf("};\n");
-+	printf("#ifdef __KERNEL__\n");
-+	printf("EXPORT_SYMBOL(raid6_gflog);\n");
-+	printf("#endif\n");
+diff --git a/Documentation/devicetree/bindings/dma/brcm,iproc-sba.txt b/Documentation/devicetree/bindings/dma/brcm,iproc-sba.txt
+new file mode 100644
+index 0000000..092913a
+--- /dev/null
++++ b/Documentation/devicetree/bindings/dma/brcm,iproc-sba.txt
+@@ -0,0 +1,29 @@
++* Broadcom SBA RAID engine
 +
- 	/* Compute inverse table x^-1 == x^254 */
- 	printf("\nconst u8 __attribute__((aligned(256)))\n"
- 	       "raid6_gfinv[256] =\n" "{\n");
++Required properties:
++- compatible: Should be one of the following
++	      "brcm,iproc-sba"
++	      "brcm,iproc-sba-v2"
++  The "brcm,iproc-sba" has support for only 6 PQ coefficients
++  The "brcm,iproc-sba-v2" has support for only 30 PQ coefficients
++- mboxes: List of phandle and mailbox channel specifiers
++
++Example:
++
++raid_mbox: mbox@67400000 {
++	...
++	#mbox-cells = <3>;
++	...
++};
++
++raid0 {
++	compatible = "brcm,iproc-sba-v2";
++	mboxes = <&raid_mbox 0 0x1 0xffff>,
++		 <&raid_mbox 1 0x1 0xffff>,
++		 <&raid_mbox 2 0x1 0xffff>,
++		 <&raid_mbox 3 0x1 0xffff>,
++		 <&raid_mbox 4 0x1 0xffff>,
++		 <&raid_mbox 5 0x1 0xffff>,
++		 <&raid_mbox 6 0x1 0xffff>,
++		 <&raid_mbox 7 0x1 0xffff>;
++};
 -- 
 2.7.4
+
