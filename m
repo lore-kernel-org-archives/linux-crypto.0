@@ -1,142 +1,53 @@
-From: Anup Patel <anup.patel@broadcom.com>
-Subject: Re: [PATCH v2 2/5] async_tx: Handle DMA devices having support for
- fewer PQ coefficients
-Date: Fri, 10 Feb 2017 08:54:16 +0530
-Message-ID: <CAALAos-LzJG+2fMunWPYgqEXoiy9pbHvN_Mad=bPiskZ71rHmQ@mail.gmail.com>
-References: <1486455406-11202-1-git-send-email-anup.patel@broadcom.com>
- <1486455406-11202-3-git-send-email-anup.patel@broadcom.com>
- <CAPcyv4gbV1yf52JrejW+Dn3wOPn7Er+8HWdu2qsW0+Qm+cRr9g@mail.gmail.com>
- <CAALAos_yhXufdt79KWY0eugjF5oyJ8+NcPh2E-dEXnSQu2WhhA@mail.gmail.com>
- <CAPcyv4hK_1f8bryq6smPQy7vTnP+QEzmT9wnAEE1xpxq7EAnjQ@mail.gmail.com>
- <CAALAos9ovab4x=waRgM7G2adRC7syHMkY0Rhf-UPB_+h4w3yNQ@mail.gmail.com>
- <CAPcyv4iFJXxvJFrUs2jtwP9GX5NcJ8LiEDHeZ5b1fwjCAToe5w@mail.gmail.com>
- <CAALAos-ua6hVpUqjnJSQ=ysSOKrN67toiT3J808uHC4A_ZV3mg@mail.gmail.com>
- <CAPcyv4gDq+our1+sAPShBru-qvebo+Zvk0crgSUNXucHGQwZ1Q@mail.gmail.com>
+From: David Miller <davem@davemloft.net>
+Subject: Re: [PATCH v7 0/5] Update LZ4 compressor module
+Date: Thu, 09 Feb 2017 22:57:15 -0500 (EST)
+Message-ID: <20170209.225715.34351834998363822.davem@davemloft.net>
+References: <20170209002436.GA103792@gmail.com>
+        <20170209110211.GB3575@bierbaron.springfield.local>
+        <20170209182914.GB92711@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Cc: Mark Rutland <mark.rutland@arm.com>,
- Device Tree <devicetree@vger.kernel.org>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- Scott Branden <sbranden@broadcom.com>, Vinod Koul <vinod.koul@intel.com>,
- Ray Jui <rjui@broadcom.com>, Jassi Brar <jassisinghbrar@gmail.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- linux-raid <linux-raid@vger.kernel.org>, Jon Mason <jonmason@broadcom.com>,
- Rob Herring <robh+dt@kernel.org>,
- BCM Kernel Feedback <bcm-kernel-feedback-list@broadcom.com>,
- linux-crypto@vger.kernel.org, Rob Rice <rob.rice@broadcom.com>,
- "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
- "David S . Miller" <davem@davemloft.net>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
-To: Dan Williams <dan.j.williams@intel.com>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <CAPcyv4gDq+our1+sAPShBru-qvebo+Zvk0crgSUNXucHGQwZ1Q@mail.gmail.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: 4sschmid@informatik.uni-hamburg.de, minchan@kernel.org,
+        akpm@linux-foundation.org, bongkyu.kim@lge.com,
+        rsalvaterra@gmail.com, sergey.senozhatsky@gmail.com,
+        gregkh@linuxfoundation.org, linux-kernel@vger.kernel.org,
+        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        anton@enomsg.org, ccross@android.com, keescook@chromium.org,
+        tony.luck@intel.com
+To: ebiggers3@gmail.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from shards.monkeyblade.net ([184.105.139.130]:58586 "EHLO
+        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751077AbdBJEVB (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 9 Feb 2017 23:21:01 -0500
+In-Reply-To: <20170209182914.GB92711@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Feb 9, 2017 at 10:14 PM, Dan Williams <dan.j.williams@intel.com> wrote:
-> On Thu, Feb 9, 2017 at 1:29 AM, Anup Patel <anup.patel@broadcom.com> wrote:
->> On Wed, Feb 8, 2017 at 9:54 PM, Dan Williams <dan.j.williams@intel.com> wrote:
->>> On Wed, Feb 8, 2017 at 12:57 AM, Anup Patel <anup.patel@broadcom.com> wrote:
->>>> On Tue, Feb 7, 2017 at 11:46 PM, Dan Williams <dan.j.williams@intel.com> wrote:
->>>>> On Tue, Feb 7, 2017 at 1:02 AM, Anup Patel <anup.patel@broadcom.com> wrote:
->>>>>> On Tue, Feb 7, 2017 at 1:57 PM, Dan Williams <dan.j.williams@intel.com> wrote:
->>>>>>> On Tue, Feb 7, 2017 at 12:16 AM, Anup Patel <anup.patel@broadcom.com> wrote:
->>>>>>>> The DMAENGINE framework assumes that if PQ offload is supported by a
->>>>>>>> DMA device then all 256 PQ coefficients are supported. This assumption
->>>>>>>> does not hold anymore because we now have BCM-SBA-RAID offload engine
->>>>>>>> which supports PQ offload with limited number of PQ coefficients.
->>>>>>>>
->>>>>>>> This patch extends async_tx APIs to handle DMA devices with support
->>>>>>>> for fewer PQ coefficients.
->>>>>>>>
->>>>>>>> Signed-off-by: Anup Patel <anup.patel@broadcom.com>
->>>>>>>> Reviewed-by: Scott Branden <scott.branden@broadcom.com>
->>>>>>>
->>>>>>> I don't like this approach. Define an interface for md to query the
->>>>>>> offload engine once at the beginning of time. We should not be adding
->>>>>>> any new extensions to async_tx.
->>>>>>
->>>>>> Even if we do capability checks in Linux MD, we still need a way
->>>>>> for DMAENGINE drivers to advertise number of PQ coefficients
->>>>>> handled by the HW.
->>>>>>
->>>>>> I agree capability checks should be done once in Linux MD but I don't
->>>>>> see why this has to be part of BCM-SBA-RAID driver patches. We need
->>>>>> separate patchsets to address limitations of async_tx framework.
->>>>>
->>>>> Right, separate enabling before we pile on new hardware support to a
->>>>> known broken framework.
->>>>
->>>> Linux Async Tx not broken framework. The issue is:
->>>> 1. Its not complete enough
->>>> 2. Its not optimized for very high through-put offload engines
->>>
->>> I'm not understanding your point. I'm nak'ing this change to add yet
->>> more per-transaction capability checking to async_tx. I don't like the
->>> DMA_HAS_FEWER_PQ_COEF flag, especially since it is equal to
->>> DMA_HAS_PQ_CONTINUE. I'm not asking for all of async_tx's problems to
->>> be fixed before this new hardware support, I'm simply saying we should
->>> start the process of moving offload-engine capability checking to the
->>> raid code.
->>
->> The DMA_HAS_FEWER_PQ_COEF is not equal to
->> DMA_HAS_PQ_CONTINUE.
->
-> #define DMA_HAS_PQ_CONTINUE (1 << 15
-> #define DMA_HAS_FEWER_PQ_COEF (1 << 15)
+From: Eric Biggers <ebiggers3@gmail.com>
+Date: Thu, 9 Feb 2017 10:29:14 -0800
 
-You are only looking at the values of these flags.
+> On Thu, Feb 09, 2017 at 12:02:11PM +0100, Sven Schmidt wrote:
+>> > 
+>> > [Also, for some reason linux-crypto is apparently still not receiving patch 1/5
+>> > in the series.  It's missing from the linux-crypto archive at
+>> > http://www.spinics.net/lists/linux-crypto/, so it's not just me.]
+>> > 
+>> 
+>> I don't really know what to do about this. I think the matter is the size of the E-Mail.
+>> Are there filters or something like that? Since in linux-kernel the patch seems to get delivered.
+>> I could otherwise CC you if you wish.
+>> 
+> 
+> If I'm not mistaken, David Miller is the admin of the mail server on
+> vger.kernel.org, and he already happens to be Cc'ed on this thread, so maybe he
+> can answer as to why linux-crypto may be configured differently?
+> 
+> Anyway, since the patch did make it to linux-kernel anyone can still download it
+> from patchwork if they know where to look:
+> https://patchwork.kernel.org/patch/9556271/
 
-The semantics of both these flags are different and both
-flags are set in different members of "struct dma_device"
-The DMA_HAS_PQ_CONTINUE is set in "max_pq" whereas
-DMA_HAS_FEWER_PQ_COEF is set in "max_pqcoef".
-
-When DMA_HAS_PQ_CONTINUE is set in "max_pq", it
-means that PQ HW is capable of taking P & Q computed
-previous txn as input. If DMA_HAS_PQ_CONTINUE is
-not supported the async_pq() will pass P & Q computed
-by previous txn as sources with coef as g^0.
-
-When DMA_HAS_FEWER_PQ_COEF is set in "max_pqcoef",
-it means the PQ HW is not capable of handling all 256 coefs.
-
->
->> I will try to drop this patch and take care of unsupported PQ
->> coefficients in BCM-SBA-RAID driver itself even if this means
->> doing some computations in BCM-SBA-RAID driver itself.
->
-> That should be nak'd as well, please do capability detection in a
-> routine that is common to all raid engines.
-
-Thanks for NAKing this patch.
-
-This motivated me to find clean work-around for handling
-unsupported PQ coefs in BCM-SBA-RAID driver.
-
-Let's assume max number of PQ coefs supported by PQ HW
-is m coefs. Now for any coef n > m, we can use RAID6 math
-to get g^n = (g^m)*(g^m)*....*(g^k) where k <= m.
-
-Using the above fact, we can create chained txn for each
-source of PQ request in BCM-SBA-RAID driver where each
-txn will only compute PQ from one source using above
-described RAID6 math. Also, each txn in chained txn will
-depend on output of previous txn because we are computing
-PQ from one source at a time.
-
-I will drop this patch and send updated BCM-SBA-RAID
-driver with above described work-around for handling
-unsupported PQ coefs.
-
-Regards,
-Anup
+I've increased the maxlength parameter for linux-cryto so this doesn't
+happen again.
