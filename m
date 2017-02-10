@@ -1,67 +1,46 @@
-From: "weiyongjun (A)" <weiyongjun1@huawei.com>
-Subject: RE: [PATCH -next] crypto: asymmetric_keys - Fix error return code
- on failure
-Date: Fri, 10 Feb 2017 02:11:26 +0000
-Message-ID: <6AADFAC011213A4C87B956458587ADB475DC1D@SZXEMI508-MBX.china.huawei.com>
-References: <20170209155724.19737-1-weiyj.lk@gmail.com>
- <27512.1486659476@warthog.procyon.org.uk>
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: Re: linux-next: build warnings after merge of the crypto tree
+Date: Fri, 10 Feb 2017 14:12:51 +1100
+Message-ID: <20170210141251.03b39b40@canb.auug.org.au>
+References: <20170206122837.0226fb89@canb.auug.org.au>
+        <20170206090340.GA9531@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="Windows-1252"
-Content-Transfer-Encoding: 8BIT
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: David Howells <dhowells@redhat.com>,
-        Wei Yongjun <weiyj.lk@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from szxga01-in.huawei.com ([58.251.152.64]:59743 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751058AbdBJCRw (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 9 Feb 2017 21:17:52 -0500
-In-Reply-To: <27512.1486659476@warthog.procyon.org.uk>
-Content-Language: zh-CN
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-next@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Cyrille Pitchen <cyrille.pitchen@atmel.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20170206090340.GA9531@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi David,
+Hi Herbert,
 
-> > --- a/crypto/asymmetric_keys/public_key.c
-> > +++ b/crypto/asymmetric_keys/public_key.c
-> > @@ -184,8 +184,10 @@ static int software_key_eds_op(struct
-> kernel_pkey_params *params,
-> >  		return PTR_ERR(tfm);
-> >
-> >  	req = akcipher_request_alloc(tfm, GFP_KERNEL);
-> > -	if (!req)
-> > +	if (!req) {
-> > +		ret = -ENOMEM;
+On Mon, 6 Feb 2017 17:03:40 +0800 Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+> On Mon, Feb 06, 2017 at 12:28:37PM +1100, Stephen Rothwell wrote:
+> > 
+> > After merging the crypto tree, today's linux-next build (x86_64
+> > allmodconfig) produced these warnings:
+> > 
+> > warning: (CRYPTO_DEV_ATMEL_AUTHENC) selects CRYPTO_DEV_ATMEL_SHA which has unmet direct dependencies (CRYPTO && CRYPTO_HW && ARCH_AT91)
+> > warning: (CRYPTO_DEV_ATMEL_AUTHENC) selects CRYPTO_DEV_ATMEL_SHA which has unmet direct dependencies (CRYPTO && CRYPTO_HW && ARCH_AT91)
+> > 
+> > Introduced by commit
+> > 
+> >   89a82ef87e01 ("crypto: atmel-authenc - add support to authenc(hmac(shaX), Y(aes)) modes")
+> > 
+> > In file included from include/linux/printk.h:329:0,
+> >                  from include/linux/kernel.h:13,
+> >                  from drivers/crypto/atmel-sha.c:17:  
 > 
-> Ummm...  What should I apply your patch to?
+> This patch should fix both issues.  Thanks,
 
-This one introduced by patch " KEYS: Implement encrypt, decrypt and sign for software asymmetric key".
+I am still getting these warnings ... I have seen no updates to the
+crypot tree since Feb 2.
 
-> 
-> >  		goto error_free_tfm;
-> > +	}
-> >
-> >  	if (pkey->key_is_private)
-> >  		ret = crypto_akcipher_set_priv_key(tfm,
-> > @@ -268,8 +270,10 @@ int public_key_verify_signature(const struct
-> public_key *pkey,
-> >  		return PTR_ERR(tfm);
-> >
-> >  	req = akcipher_request_alloc(tfm, GFP_KERNEL);
-> > -	if (!req)
-> > +	if (!req) {
-> > +		ret = -ENOMEM;
-> >  		goto error_free_tfm;
-> 
-> This shouldn't be necessary.  ret should already be -ENOMEM from
-> initialisation of the variable at the top of the function.
-
-Introduced by patch " KEYS: Provide software public key query function", ret have
-been overwritten to 0 after ret = software_key_determine_akcipher(...).
-
-Regards,
-Wei Yongjun
+-- 
+Cheers,
+Stephen Rothwell
