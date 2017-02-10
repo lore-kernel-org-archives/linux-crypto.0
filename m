@@ -1,7 +1,7 @@
 From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH 11/12] crypto: caam - abstract ahash request double buffering
-Date: Fri, 10 Feb 2017 14:07:24 +0200
-Message-ID: <1486728445-13047-12-git-send-email-horia.geanta@nxp.com>
+Subject: [PATCH 02/12] crypto: caam - check return code of dma_set_mask_and_coherent()
+Date: Fri, 10 Feb 2017 14:07:15 +0200
+Message-ID: <1486728445-13047-3-git-send-email-horia.geanta@nxp.com>
 References: <1486728445-13047-1-git-send-email-horia.geanta@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
@@ -13,175 +13,83 @@ Cc: "David S. Miller" <davem@davemloft.net>,
         <linux-crypto@vger.kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-dm3nam03on0082.outbound.protection.outlook.com ([104.47.41.82]:59616
-        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
+Received: from mail-cys01nam02on0063.outbound.protection.outlook.com ([104.47.37.63]:35008
+        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753350AbdBJMIK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 10 Feb 2017 07:08:10 -0500
+        id S1753303AbdBJMHu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 10 Feb 2017 07:07:50 -0500
 In-Reply-To: <1486728445-13047-1-git-send-email-horia.geanta@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-caamhash uses double buffering for holding previous/current
-and next chunks (data smaller than block size) to be hashed.
-
-Add (inline) functions to abstract this mechanism.
+Setting the dma mask could fail, thus make sure it succeeds
+before going further.
 
 Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 ---
- drivers/crypto/caam/caamhash.c | 77 ++++++++++++++++++++++++++----------------
- 1 file changed, 48 insertions(+), 29 deletions(-)
+ drivers/crypto/caam/ctrl.c | 15 ++++++++++-----
+ drivers/crypto/caam/jr.c   | 19 ++++++++++++++-----
+ 2 files changed, 24 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index 6c6c005f417b..b37d555a80d0 100644
---- a/drivers/crypto/caam/caamhash.c
-+++ b/drivers/crypto/caam/caamhash.c
-@@ -137,6 +137,31 @@ struct caam_export_state {
- 	int (*finup)(struct ahash_request *req);
- };
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index 8957ec952212..f825e3765a4b 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -586,13 +586,18 @@ static int caam_probe(struct platform_device *pdev)
+ 			      JRSTART_JR1_START | JRSTART_JR2_START |
+ 			      JRSTART_JR3_START);
  
-+static inline void switch_buf(struct caam_hash_state *state)
-+{
-+	state->current_buf ^= 1;
-+}
-+
-+static inline u8 *current_buf(struct caam_hash_state *state)
-+{
-+	return state->current_buf ? state->buf_1 : state->buf_0;
-+}
-+
-+static inline u8 *alt_buf(struct caam_hash_state *state)
-+{
-+	return state->current_buf ? state->buf_0 : state->buf_1;
-+}
-+
-+static inline int *current_buflen(struct caam_hash_state *state)
-+{
-+	return state->current_buf ? &state->buflen_1 : &state->buflen_0;
-+}
-+
-+static inline int *alt_buflen(struct caam_hash_state *state)
-+{
-+	return state->current_buf ? &state->buflen_0 : &state->buflen_1;
-+}
-+
- /* Common job descriptor seq in/out ptr routines */
+-	if (sizeof(dma_addr_t) == sizeof(u64))
++	if (sizeof(dma_addr_t) == sizeof(u64)) {
+ 		if (of_device_is_compatible(nprop, "fsl,sec-v5.0"))
+-			dma_set_mask_and_coherent(dev, DMA_BIT_MASK(40));
++			ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(40));
+ 		else
+-			dma_set_mask_and_coherent(dev, DMA_BIT_MASK(36));
+-	else
+-		dma_set_mask_and_coherent(dev, DMA_BIT_MASK(32));
++			ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(36));
++	} else {
++		ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(32));
++	}
++	if (ret) {
++		dev_err(dev, "dma_set_mask_and_coherent failed (%d)\n", ret);
++		goto iounmap_ctrl;
++	}
  
- /* Map state->caam_ctx, and append seq_out_ptr command that points to it */
-@@ -695,11 +720,10 @@ static int ahash_update_ctx(struct ahash_request *req)
- 	struct device *jrdev = ctx->jrdev;
- 	gfp_t flags = (req->base.flags & (CRYPTO_TFM_REQ_MAY_BACKLOG |
- 		       CRYPTO_TFM_REQ_MAY_SLEEP)) ? GFP_KERNEL : GFP_ATOMIC;
--	u8 *buf = state->current_buf ? state->buf_1 : state->buf_0;
--	int *buflen = state->current_buf ? &state->buflen_1 : &state->buflen_0;
--	u8 *next_buf = state->current_buf ? state->buf_0 : state->buf_1;
--	int *next_buflen = state->current_buf ? &state->buflen_0 :
--			   &state->buflen_1, last_buflen;
-+	u8 *buf = current_buf(state);
-+	int *buflen = current_buflen(state);
-+	u8 *next_buf = alt_buf(state);
-+	int *next_buflen = alt_buflen(state), last_buflen;
- 	int in_len = *buflen + req->nbytes, to_hash;
- 	u32 *desc;
- 	int src_nents, mapped_nents, sec4_sg_bytes, sec4_sg_src_index;
-@@ -771,7 +795,7 @@ static int ahash_update_ctx(struct ahash_request *req)
- 				cpu_to_caam32(SEC4_SG_LEN_FIN);
- 		}
+ 	/*
+ 	 * Detect and enable JobRs
+diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
+index c8604dfadbf5..27631000b9f8 100644
+--- a/drivers/crypto/caam/jr.c
++++ b/drivers/crypto/caam/jr.c
+@@ -498,13 +498,22 @@ static int caam_jr_probe(struct platform_device *pdev)
  
--		state->current_buf = !state->current_buf;
-+		switch_buf(state);
+ 	jrpriv->rregs = (struct caam_job_ring __iomem __force *)ctrl;
  
- 		desc = edesc->hw_desc;
+-	if (sizeof(dma_addr_t) == sizeof(u64))
++	if (sizeof(dma_addr_t) == sizeof(u64)) {
+ 		if (of_device_is_compatible(nprop, "fsl,sec-v5.0-job-ring"))
+-			dma_set_mask_and_coherent(jrdev, DMA_BIT_MASK(40));
++			error = dma_set_mask_and_coherent(jrdev,
++							  DMA_BIT_MASK(40));
+ 		else
+-			dma_set_mask_and_coherent(jrdev, DMA_BIT_MASK(36));
+-	else
+-		dma_set_mask_and_coherent(jrdev, DMA_BIT_MASK(32));
++			error = dma_set_mask_and_coherent(jrdev,
++							  DMA_BIT_MASK(36));
++	} else {
++		error = dma_set_mask_and_coherent(jrdev, DMA_BIT_MASK(32));
++	}
++	if (error) {
++		dev_err(jrdev, "dma_set_mask_and_coherent failed (%d)\n",
++			error);
++		iounmap(ctrl);
++		return error;
++	}
  
-@@ -829,10 +853,9 @@ static int ahash_final_ctx(struct ahash_request *req)
- 	struct device *jrdev = ctx->jrdev;
- 	gfp_t flags = (req->base.flags & (CRYPTO_TFM_REQ_MAY_BACKLOG |
- 		       CRYPTO_TFM_REQ_MAY_SLEEP)) ? GFP_KERNEL : GFP_ATOMIC;
--	u8 *buf = state->current_buf ? state->buf_1 : state->buf_0;
--	int buflen = state->current_buf ? state->buflen_1 : state->buflen_0;
--	int last_buflen = state->current_buf ? state->buflen_0 :
--			  state->buflen_1;
-+	u8 *buf = current_buf(state);
-+	int buflen = *current_buflen(state);
-+	int last_buflen = *alt_buflen(state);
- 	u32 *desc;
- 	int sec4_sg_bytes, sec4_sg_src_index;
- 	int digestsize = crypto_ahash_digestsize(ahash);
-@@ -908,10 +931,9 @@ static int ahash_finup_ctx(struct ahash_request *req)
- 	struct device *jrdev = ctx->jrdev;
- 	gfp_t flags = (req->base.flags & (CRYPTO_TFM_REQ_MAY_BACKLOG |
- 		       CRYPTO_TFM_REQ_MAY_SLEEP)) ? GFP_KERNEL : GFP_ATOMIC;
--	u8 *buf = state->current_buf ? state->buf_1 : state->buf_0;
--	int buflen = state->current_buf ? state->buflen_1 : state->buflen_0;
--	int last_buflen = state->current_buf ? state->buflen_0 :
--			  state->buflen_1;
-+	u8 *buf = current_buf(state);
-+	int buflen = *current_buflen(state);
-+	int last_buflen = *alt_buflen(state);
- 	u32 *desc;
- 	int sec4_sg_src_index;
- 	int src_nents, mapped_nents;
-@@ -1075,8 +1097,8 @@ static int ahash_final_no_ctx(struct ahash_request *req)
- 	struct device *jrdev = ctx->jrdev;
- 	gfp_t flags = (req->base.flags & (CRYPTO_TFM_REQ_MAY_BACKLOG |
- 		       CRYPTO_TFM_REQ_MAY_SLEEP)) ? GFP_KERNEL : GFP_ATOMIC;
--	u8 *buf = state->current_buf ? state->buf_1 : state->buf_0;
--	int buflen = state->current_buf ? state->buflen_1 : state->buflen_0;
-+	u8 *buf = current_buf(state);
-+	int buflen = *current_buflen(state);
- 	u32 *desc;
- 	int digestsize = crypto_ahash_digestsize(ahash);
- 	struct ahash_edesc *edesc;
-@@ -1136,11 +1158,10 @@ static int ahash_update_no_ctx(struct ahash_request *req)
- 	struct device *jrdev = ctx->jrdev;
- 	gfp_t flags = (req->base.flags & (CRYPTO_TFM_REQ_MAY_BACKLOG |
- 		       CRYPTO_TFM_REQ_MAY_SLEEP)) ? GFP_KERNEL : GFP_ATOMIC;
--	u8 *buf = state->current_buf ? state->buf_1 : state->buf_0;
--	int *buflen = state->current_buf ? &state->buflen_1 : &state->buflen_0;
--	u8 *next_buf = state->current_buf ? state->buf_0 : state->buf_1;
--	int *next_buflen = state->current_buf ? &state->buflen_0 :
--			   &state->buflen_1;
-+	u8 *buf = current_buf(state);
-+	int *buflen = current_buflen(state);
-+	u8 *next_buf = alt_buf(state);
-+	int *next_buflen = alt_buflen(state);
- 	int in_len = *buflen + req->nbytes, to_hash;
- 	int sec4_sg_bytes, src_nents, mapped_nents;
- 	struct ahash_edesc *edesc;
-@@ -1200,7 +1221,7 @@ static int ahash_update_no_ctx(struct ahash_request *req)
- 						 *next_buflen, 0);
- 		}
- 
--		state->current_buf = !state->current_buf;
-+		switch_buf(state);
- 
- 		desc = edesc->hw_desc;
- 
-@@ -1263,10 +1284,9 @@ static int ahash_finup_no_ctx(struct ahash_request *req)
- 	struct device *jrdev = ctx->jrdev;
- 	gfp_t flags = (req->base.flags & (CRYPTO_TFM_REQ_MAY_BACKLOG |
- 		       CRYPTO_TFM_REQ_MAY_SLEEP)) ? GFP_KERNEL : GFP_ATOMIC;
--	u8 *buf = state->current_buf ? state->buf_1 : state->buf_0;
--	int buflen = state->current_buf ? state->buflen_1 : state->buflen_0;
--	int last_buflen = state->current_buf ? state->buflen_0 :
--			  state->buflen_1;
-+	u8 *buf = current_buf(state);
-+	int buflen = *current_buflen(state);
-+	int last_buflen = *alt_buflen(state);
- 	u32 *desc;
- 	int sec4_sg_bytes, sec4_sg_src_index, src_nents, mapped_nents;
- 	int digestsize = crypto_ahash_digestsize(ahash);
-@@ -1356,9 +1376,8 @@ static int ahash_update_first(struct ahash_request *req)
- 	struct device *jrdev = ctx->jrdev;
- 	gfp_t flags = (req->base.flags & (CRYPTO_TFM_REQ_MAY_BACKLOG |
- 		       CRYPTO_TFM_REQ_MAY_SLEEP)) ? GFP_KERNEL : GFP_ATOMIC;
--	u8 *next_buf = state->current_buf ? state->buf_1 : state->buf_0;
--	int *next_buflen = state->current_buf ?
--		&state->buflen_1 : &state->buflen_0;
-+	u8 *next_buf = current_buf(state);
-+	int *next_buflen = current_buflen(state);
- 	int to_hash;
- 	u32 *desc;
- 	int src_nents, mapped_nents;
+ 	/* Identify the interrupt */
+ 	jrpriv->irq = irq_of_parse_and_map(nprop, 0);
 -- 
 2.4.4
