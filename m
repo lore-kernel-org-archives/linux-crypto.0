@@ -1,7 +1,7 @@
 From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH 05/12] crypto: caam - check sg_count() return value
-Date: Fri, 10 Feb 2017 14:07:18 +0200
-Message-ID: <1486728445-13047-6-git-send-email-horia.geanta@nxp.com>
+Subject: [PATCH 08/12] crypto: caam - don't dma_map key for hash algorithms
+Date: Fri, 10 Feb 2017 14:07:21 +0200
+Message-ID: <1486728445-13047-9-git-send-email-horia.geanta@nxp.com>
 References: <1486728445-13047-1-git-send-email-horia.geanta@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
@@ -13,117 +13,75 @@ Cc: "David S. Miller" <davem@davemloft.net>,
         <linux-crypto@vger.kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-sn1nam01on0057.outbound.protection.outlook.com ([104.47.32.57]:32433
-        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
+Received: from mail-cys01nam02on0076.outbound.protection.outlook.com ([104.47.37.76]:25999
+        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752339AbdBJMH7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1753299AbdBJMH7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Fri, 10 Feb 2017 07:07:59 -0500
 In-Reply-To: <1486728445-13047-1-git-send-email-horia.geanta@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-sg_count() internally calls sg_nents_for_len(), which could fail
-in case the required number of bytes is larger than the total
-bytes in the S/G.
+Shared descriptors for hash algorithms are small enough
+for (split) keys to be inlined in all cases.
+Since driver already does this, all what's left is to remove
+unused ctx->key_dma.
 
-Thus, add checks to validate the input.
-
+Fixes: 045e36780f115 ("crypto: caam - ahash hmac support")
 Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 ---
- drivers/crypto/caam/caamalg.c | 44 +++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 42 insertions(+), 2 deletions(-)
+ drivers/crypto/caam/caamhash.c | 18 +-----------------
+ 1 file changed, 1 insertion(+), 17 deletions(-)
 
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index 05d4690351b9..ed8a04412767 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -1335,13 +1335,31 @@ static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
+diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
+index e58639ea53b1..117bbd8c08d4 100644
+--- a/drivers/crypto/caam/caamhash.c
++++ b/drivers/crypto/caam/caamhash.c
+@@ -109,7 +109,6 @@ struct caam_hash_ctx {
+ 	dma_addr_t sh_desc_digest_dma;
+ 	struct device *jrdev;
+ 	u8 key[CAAM_MAX_HASH_KEY_SIZE];
+-	dma_addr_t key_dma;
+ 	int ctx_len;
+ 	struct alginfo adata;
+ };
+@@ -420,7 +419,6 @@ static int ahash_setkey(struct crypto_ahash *ahash,
+ 			const u8 *key, unsigned int keylen)
+ {
+ 	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
+-	struct device *jrdev = ctx->jrdev;
+ 	int blocksize = crypto_tfm_alg_blocksize(&ahash->base);
+ 	int digestsize = crypto_ahash_digestsize(ahash);
+ 	int ret;
+@@ -448,28 +446,14 @@ static int ahash_setkey(struct crypto_ahash *ahash,
+ 	if (ret)
+ 		goto bad_free_key;
  
- 	if (unlikely(req->dst != req->src)) {
- 		src_nents = sg_count(req->src, req->assoclen + req->cryptlen);
-+		if (unlikely(src_nents < 0)) {
-+			dev_err(jrdev, "Insufficient bytes (%d) in src S/G\n",
-+				req->assoclen + req->cryptlen);
-+			return ERR_PTR(src_nents);
-+		}
-+
- 		dst_nents = sg_count(req->dst,
- 				     req->assoclen + req->cryptlen +
- 					(encrypt ? authsize : (-authsize)));
-+		if (unlikely(dst_nents < 0)) {
-+			dev_err(jrdev, "Insufficient bytes (%d) in dst S/G\n",
-+				req->assoclen + req->cryptlen +
-+				(encrypt ? authsize : (-authsize)));
-+			return ERR_PTR(dst_nents);
-+		}
- 	} else {
- 		src_nents = sg_count(req->src,
- 				     req->assoclen + req->cryptlen +
- 					(encrypt ? authsize : 0));
-+		if (unlikely(src_nents < 0)) {
-+			dev_err(jrdev, "Insufficient bytes (%d) in src S/G\n",
-+				req->assoclen + req->cryptlen +
-+				(encrypt ? authsize : 0));
-+			return ERR_PTR(src_nents);
-+		}
- 	}
+-	ctx->key_dma = dma_map_single(jrdev, ctx->key, ctx->adata.keylen_pad,
+-				      DMA_TO_DEVICE);
+-	if (dma_mapping_error(jrdev, ctx->key_dma)) {
+-		dev_err(jrdev, "unable to map key i/o memory\n");
+-		ret = -ENOMEM;
+-		goto error_free_key;
+-	}
+ #ifdef DEBUG
+ 	print_hex_dump(KERN_ERR, "ctx.key@"__stringify(__LINE__)": ",
+ 		       DUMP_PREFIX_ADDRESS, 16, 4, ctx->key,
+ 		       ctx->adata.keylen_pad, 1);
+ #endif
  
- 	/* Check if data are contiguous. */
-@@ -1609,9 +1627,20 @@ static struct ablkcipher_edesc *ablkcipher_edesc_alloc(struct ablkcipher_request
- 	int sec4_sg_index;
- 
- 	src_nents = sg_count(req->src, req->nbytes);
-+	if (unlikely(src_nents < 0)) {
-+		dev_err(jrdev, "Insufficient bytes (%d) in src S/G\n",
-+			req->nbytes);
-+		return ERR_PTR(src_nents);
-+	}
- 
--	if (req->dst != req->src)
-+	if (req->dst != req->src) {
- 		dst_nents = sg_count(req->dst, req->nbytes);
-+		if (unlikely(dst_nents < 0)) {
-+			dev_err(jrdev, "Insufficient bytes (%d) in dst S/G\n",
-+				req->nbytes);
-+			return ERR_PTR(dst_nents);
-+		}
-+	}
- 
- 	if (likely(req->src == req->dst)) {
- 		sgc = dma_map_sg(jrdev, req->src, src_nents ? : 1,
-@@ -1807,6 +1836,11 @@ static struct ablkcipher_edesc *ablkcipher_giv_edesc_alloc(
- 	int sec4_sg_index;
- 
- 	src_nents = sg_count(req->src, req->nbytes);
-+	if (unlikely(src_nents < 0)) {
-+		dev_err(jrdev, "Insufficient bytes (%d) in src S/G\n",
-+			req->nbytes);
-+		return ERR_PTR(src_nents);
-+	}
- 
- 	if (likely(req->src == req->dst)) {
- 		sgc = dma_map_sg(jrdev, req->src, src_nents ? : 1,
-@@ -1826,6 +1860,12 @@ static struct ablkcipher_edesc *ablkcipher_giv_edesc_alloc(
- 		}
- 
- 		dst_nents = sg_count(req->dst, req->nbytes);
-+		if (unlikely(dst_nents < 0)) {
-+			dev_err(jrdev, "Insufficient bytes (%d) in dst S/G\n",
-+				req->nbytes);
-+			return ERR_PTR(dst_nents);
-+		}
-+
- 		sgc = dma_map_sg(jrdev, req->dst, dst_nents ? : 1,
- 				 DMA_FROM_DEVICE);
- 		if (unlikely(!sgc)) {
-@@ -1914,7 +1954,7 @@ static int ablkcipher_givencrypt(struct skcipher_givcrypt_request *creq)
- 	struct crypto_ablkcipher *ablkcipher = crypto_ablkcipher_reqtfm(req);
- 	struct caam_ctx *ctx = crypto_ablkcipher_ctx(ablkcipher);
- 	struct device *jrdev = ctx->jrdev;
--	bool iv_contig;
-+	bool iv_contig = false;
- 	u32 *desc;
- 	int ret = 0;
- 
+-	ret = ahash_set_sh_desc(ahash);
+-	if (ret) {
+-		dma_unmap_single(jrdev, ctx->key_dma, ctx->adata.keylen_pad,
+-				 DMA_TO_DEVICE);
+-	}
+-
+- error_free_key:
+ 	kfree(hashed_key);
+-	return ret;
++	return ahash_set_sh_desc(ahash);
+  bad_free_key:
+ 	kfree(hashed_key);
+ 	crypto_ahash_set_flags(ahash, CRYPTO_TFM_RES_BAD_KEY_LEN);
 -- 
 2.4.4
