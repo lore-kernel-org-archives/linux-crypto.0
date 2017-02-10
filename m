@@ -1,7 +1,7 @@
 From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH 03/12] crypto: caam - fix JR IO mapping if one fails
-Date: Fri, 10 Feb 2017 14:07:16 +0200
-Message-ID: <1486728445-13047-4-git-send-email-horia.geanta@nxp.com>
+Subject: [PATCH 11/12] crypto: caam - abstract ahash request double buffering
+Date: Fri, 10 Feb 2017 14:07:24 +0200
+Message-ID: <1486728445-13047-12-git-send-email-horia.geanta@nxp.com>
 References: <1486728445-13047-1-git-send-email-horia.geanta@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
@@ -13,82 +13,175 @@ Cc: "David S. Miller" <davem@davemloft.net>,
         <linux-crypto@vger.kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-dm3nam03on0060.outbound.protection.outlook.com ([104.47.41.60]:50819
+Received: from mail-dm3nam03on0082.outbound.protection.outlook.com ([104.47.41.82]:59616
         "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753304AbdBJMHv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 10 Feb 2017 07:07:51 -0500
+        id S1753350AbdBJMIK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 10 Feb 2017 07:08:10 -0500
 In-Reply-To: <1486728445-13047-1-git-send-email-horia.geanta@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
+caamhash uses double buffering for holding previous/current
+and next chunks (data smaller than block size) to be hashed.
 
-If one of the JRs failed at init, the next JR used
-the failed JR's IO space. The patch fixes this bug.
+Add (inline) functions to abstract this mechanism.
 
-Signed-off-by: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
 Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 ---
- drivers/crypto/caam/ctrl.c | 17 +++++++++--------
- 1 file changed, 9 insertions(+), 8 deletions(-)
+ drivers/crypto/caam/caamhash.c | 77 ++++++++++++++++++++++++++----------------
+ 1 file changed, 48 insertions(+), 29 deletions(-)
 
-diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index f825e3765a4b..579f8263c479 100644
---- a/drivers/crypto/caam/ctrl.c
-+++ b/drivers/crypto/caam/ctrl.c
-@@ -308,10 +308,8 @@ static int caam_remove(struct platform_device *pdev)
- 	ctrl = (struct caam_ctrl __iomem *)ctrlpriv->ctrl;
+diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
+index 6c6c005f417b..b37d555a80d0 100644
+--- a/drivers/crypto/caam/caamhash.c
++++ b/drivers/crypto/caam/caamhash.c
+@@ -137,6 +137,31 @@ struct caam_export_state {
+ 	int (*finup)(struct ahash_request *req);
+ };
  
- 	/* Remove platform devices for JobRs */
--	for (ring = 0; ring < ctrlpriv->total_jobrs; ring++) {
--		if (ctrlpriv->jrpdev[ring])
--			of_device_unregister(ctrlpriv->jrpdev[ring]);
--	}
-+	for (ring = 0; ring < ctrlpriv->total_jobrs; ring++)
-+		of_device_unregister(ctrlpriv->jrpdev[ring]);
++static inline void switch_buf(struct caam_hash_state *state)
++{
++	state->current_buf ^= 1;
++}
++
++static inline u8 *current_buf(struct caam_hash_state *state)
++{
++	return state->current_buf ? state->buf_1 : state->buf_0;
++}
++
++static inline u8 *alt_buf(struct caam_hash_state *state)
++{
++	return state->current_buf ? state->buf_0 : state->buf_1;
++}
++
++static inline int *current_buflen(struct caam_hash_state *state)
++{
++	return state->current_buf ? &state->buflen_1 : &state->buflen_0;
++}
++
++static inline int *alt_buflen(struct caam_hash_state *state)
++{
++	return state->current_buf ? &state->buflen_0 : &state->buflen_1;
++}
++
+ /* Common job descriptor seq in/out ptr routines */
  
- 	/* De-initialize RNG state handles initialized by this driver. */
- 	if (ctrlpriv->rng4_sh_init)
-@@ -423,7 +421,7 @@ DEFINE_SIMPLE_ATTRIBUTE(caam_fops_u64_ro, caam_debugfs_u64_get, NULL, "%llu\n");
- /* Probe routine for CAAM top (controller) level */
- static int caam_probe(struct platform_device *pdev)
- {
--	int ret, ring, rspec, gen_sk, ent_delay = RTSDCTL_ENT_DLY_MIN;
-+	int ret, ring, ridx, rspec, gen_sk, ent_delay = RTSDCTL_ENT_DLY_MIN;
- 	u64 caam_id;
- 	struct device *dev;
- 	struct device_node *nprop, *np;
-@@ -618,6 +616,7 @@ static int caam_probe(struct platform_device *pdev)
- 	}
+ /* Map state->caam_ctx, and append seq_out_ptr command that points to it */
+@@ -695,11 +720,10 @@ static int ahash_update_ctx(struct ahash_request *req)
+ 	struct device *jrdev = ctx->jrdev;
+ 	gfp_t flags = (req->base.flags & (CRYPTO_TFM_REQ_MAY_BACKLOG |
+ 		       CRYPTO_TFM_REQ_MAY_SLEEP)) ? GFP_KERNEL : GFP_ATOMIC;
+-	u8 *buf = state->current_buf ? state->buf_1 : state->buf_0;
+-	int *buflen = state->current_buf ? &state->buflen_1 : &state->buflen_0;
+-	u8 *next_buf = state->current_buf ? state->buf_0 : state->buf_1;
+-	int *next_buflen = state->current_buf ? &state->buflen_0 :
+-			   &state->buflen_1, last_buflen;
++	u8 *buf = current_buf(state);
++	int *buflen = current_buflen(state);
++	u8 *next_buf = alt_buf(state);
++	int *next_buflen = alt_buflen(state), last_buflen;
+ 	int in_len = *buflen + req->nbytes, to_hash;
+ 	u32 *desc;
+ 	int src_nents, mapped_nents, sec4_sg_bytes, sec4_sg_src_index;
+@@ -771,7 +795,7 @@ static int ahash_update_ctx(struct ahash_request *req)
+ 				cpu_to_caam32(SEC4_SG_LEN_FIN);
+ 		}
  
- 	ring = 0;
-+	ridx = 0;
- 	ctrlpriv->total_jobrs = 0;
- 	for_each_available_child_of_node(nprop, np)
- 		if (of_device_is_compatible(np, "fsl,sec-v4.0-job-ring") ||
-@@ -625,17 +624,19 @@ static int caam_probe(struct platform_device *pdev)
- 			ctrlpriv->jrpdev[ring] =
- 				of_platform_device_create(np, NULL, dev);
- 			if (!ctrlpriv->jrpdev[ring]) {
--				pr_warn("JR%d Platform device creation error\n",
--					ring);
-+				pr_warn("JR physical index %d: Platform device creation error\n",
-+					ridx);
-+				ridx++;
- 				continue;
- 			}
- 			ctrlpriv->jr[ring] = (struct caam_job_ring __iomem __force *)
- 					     ((__force uint8_t *)ctrl +
--					     (ring + JR_BLOCK_NUMBER) *
-+					     (ridx + JR_BLOCK_NUMBER) *
- 					      BLOCK_OFFSET
- 					     );
- 			ctrlpriv->total_jobrs++;
- 			ring++;
-+			ridx++;
- 	}
+-		state->current_buf = !state->current_buf;
++		switch_buf(state);
  
- 	/* Check to see if QI present. If so, enable */
+ 		desc = edesc->hw_desc;
+ 
+@@ -829,10 +853,9 @@ static int ahash_final_ctx(struct ahash_request *req)
+ 	struct device *jrdev = ctx->jrdev;
+ 	gfp_t flags = (req->base.flags & (CRYPTO_TFM_REQ_MAY_BACKLOG |
+ 		       CRYPTO_TFM_REQ_MAY_SLEEP)) ? GFP_KERNEL : GFP_ATOMIC;
+-	u8 *buf = state->current_buf ? state->buf_1 : state->buf_0;
+-	int buflen = state->current_buf ? state->buflen_1 : state->buflen_0;
+-	int last_buflen = state->current_buf ? state->buflen_0 :
+-			  state->buflen_1;
++	u8 *buf = current_buf(state);
++	int buflen = *current_buflen(state);
++	int last_buflen = *alt_buflen(state);
+ 	u32 *desc;
+ 	int sec4_sg_bytes, sec4_sg_src_index;
+ 	int digestsize = crypto_ahash_digestsize(ahash);
+@@ -908,10 +931,9 @@ static int ahash_finup_ctx(struct ahash_request *req)
+ 	struct device *jrdev = ctx->jrdev;
+ 	gfp_t flags = (req->base.flags & (CRYPTO_TFM_REQ_MAY_BACKLOG |
+ 		       CRYPTO_TFM_REQ_MAY_SLEEP)) ? GFP_KERNEL : GFP_ATOMIC;
+-	u8 *buf = state->current_buf ? state->buf_1 : state->buf_0;
+-	int buflen = state->current_buf ? state->buflen_1 : state->buflen_0;
+-	int last_buflen = state->current_buf ? state->buflen_0 :
+-			  state->buflen_1;
++	u8 *buf = current_buf(state);
++	int buflen = *current_buflen(state);
++	int last_buflen = *alt_buflen(state);
+ 	u32 *desc;
+ 	int sec4_sg_src_index;
+ 	int src_nents, mapped_nents;
+@@ -1075,8 +1097,8 @@ static int ahash_final_no_ctx(struct ahash_request *req)
+ 	struct device *jrdev = ctx->jrdev;
+ 	gfp_t flags = (req->base.flags & (CRYPTO_TFM_REQ_MAY_BACKLOG |
+ 		       CRYPTO_TFM_REQ_MAY_SLEEP)) ? GFP_KERNEL : GFP_ATOMIC;
+-	u8 *buf = state->current_buf ? state->buf_1 : state->buf_0;
+-	int buflen = state->current_buf ? state->buflen_1 : state->buflen_0;
++	u8 *buf = current_buf(state);
++	int buflen = *current_buflen(state);
+ 	u32 *desc;
+ 	int digestsize = crypto_ahash_digestsize(ahash);
+ 	struct ahash_edesc *edesc;
+@@ -1136,11 +1158,10 @@ static int ahash_update_no_ctx(struct ahash_request *req)
+ 	struct device *jrdev = ctx->jrdev;
+ 	gfp_t flags = (req->base.flags & (CRYPTO_TFM_REQ_MAY_BACKLOG |
+ 		       CRYPTO_TFM_REQ_MAY_SLEEP)) ? GFP_KERNEL : GFP_ATOMIC;
+-	u8 *buf = state->current_buf ? state->buf_1 : state->buf_0;
+-	int *buflen = state->current_buf ? &state->buflen_1 : &state->buflen_0;
+-	u8 *next_buf = state->current_buf ? state->buf_0 : state->buf_1;
+-	int *next_buflen = state->current_buf ? &state->buflen_0 :
+-			   &state->buflen_1;
++	u8 *buf = current_buf(state);
++	int *buflen = current_buflen(state);
++	u8 *next_buf = alt_buf(state);
++	int *next_buflen = alt_buflen(state);
+ 	int in_len = *buflen + req->nbytes, to_hash;
+ 	int sec4_sg_bytes, src_nents, mapped_nents;
+ 	struct ahash_edesc *edesc;
+@@ -1200,7 +1221,7 @@ static int ahash_update_no_ctx(struct ahash_request *req)
+ 						 *next_buflen, 0);
+ 		}
+ 
+-		state->current_buf = !state->current_buf;
++		switch_buf(state);
+ 
+ 		desc = edesc->hw_desc;
+ 
+@@ -1263,10 +1284,9 @@ static int ahash_finup_no_ctx(struct ahash_request *req)
+ 	struct device *jrdev = ctx->jrdev;
+ 	gfp_t flags = (req->base.flags & (CRYPTO_TFM_REQ_MAY_BACKLOG |
+ 		       CRYPTO_TFM_REQ_MAY_SLEEP)) ? GFP_KERNEL : GFP_ATOMIC;
+-	u8 *buf = state->current_buf ? state->buf_1 : state->buf_0;
+-	int buflen = state->current_buf ? state->buflen_1 : state->buflen_0;
+-	int last_buflen = state->current_buf ? state->buflen_0 :
+-			  state->buflen_1;
++	u8 *buf = current_buf(state);
++	int buflen = *current_buflen(state);
++	int last_buflen = *alt_buflen(state);
+ 	u32 *desc;
+ 	int sec4_sg_bytes, sec4_sg_src_index, src_nents, mapped_nents;
+ 	int digestsize = crypto_ahash_digestsize(ahash);
+@@ -1356,9 +1376,8 @@ static int ahash_update_first(struct ahash_request *req)
+ 	struct device *jrdev = ctx->jrdev;
+ 	gfp_t flags = (req->base.flags & (CRYPTO_TFM_REQ_MAY_BACKLOG |
+ 		       CRYPTO_TFM_REQ_MAY_SLEEP)) ? GFP_KERNEL : GFP_ATOMIC;
+-	u8 *next_buf = state->current_buf ? state->buf_1 : state->buf_0;
+-	int *next_buflen = state->current_buf ?
+-		&state->buflen_1 : &state->buflen_0;
++	u8 *next_buf = current_buf(state);
++	int *next_buflen = current_buflen(state);
+ 	int to_hash;
+ 	u32 *desc;
+ 	int src_nents, mapped_nents;
 -- 
 2.4.4
