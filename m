@@ -1,53 +1,90 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: [PATCH v7 0/5] Update LZ4 compressor module
-Date: Thu, 09 Feb 2017 22:57:15 -0500 (EST)
-Message-ID: <20170209.225715.34351834998363822.davem@davemloft.net>
-References: <20170209002436.GA103792@gmail.com>
-        <20170209110211.GB3575@bierbaron.springfield.local>
-        <20170209182914.GB92711@gmail.com>
+From: Anup Patel <anup.patel@broadcom.com>
+Subject: [PATCH v3 0/4] Broadcom SBA RAID support
+Date: Fri, 10 Feb 2017 14:37:04 +0530
+Message-ID: <1486717628-17580-1-git-send-email-anup.patel@broadcom.com>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: 4sschmid@informatik.uni-hamburg.de, minchan@kernel.org,
-        akpm@linux-foundation.org, bongkyu.kim@lge.com,
-        rsalvaterra@gmail.com, sergey.senozhatsky@gmail.com,
-        gregkh@linuxfoundation.org, linux-kernel@vger.kernel.org,
-        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        anton@enomsg.org, ccross@android.com, keescook@chromium.org,
-        tony.luck@intel.com
-To: ebiggers3@gmail.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from shards.monkeyblade.net ([184.105.139.130]:58586 "EHLO
-        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751077AbdBJEVB (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 9 Feb 2017 23:21:01 -0500
-In-Reply-To: <20170209182914.GB92711@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: devicetree@vger.kernel.org, Anup Patel <anup.patel@broadcom.com>,
+ Scott Branden <sbranden@broadcom.com>, Jon Mason <jonmason@broadcom.com>,
+ Ray Jui <rjui@broadcom.com>, linux-kernel@vger.kernel.org,
+ linux-raid@vger.kernel.org, bcm-kernel-feedback-list@broadcom.com,
+ linux-crypto@vger.kernel.org, Rob Rice <rob.rice@broadcom.com>,
+ dmaengine@vger.kernel.org, Dan Williams <dan.j.williams@intel.com>,
+ linux-arm-kernel@lists.infradead.org
+To: Vinod Koul <vinod.koul@intel.com>, Rob Herring <robh+dt@kernel.org>,
+ Mark Rutland <mark.rutland@arm.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S . Miller" <davem@davemloft.net>,
+ Jassi Brar <jassisinghbrar@gmail.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-From: Eric Biggers <ebiggers3@gmail.com>
-Date: Thu, 9 Feb 2017 10:29:14 -0800
+The Broadcom SBA RAID is a stream-based device which provides
+RAID5/6 offload.
 
-> On Thu, Feb 09, 2017 at 12:02:11PM +0100, Sven Schmidt wrote:
->> > 
->> > [Also, for some reason linux-crypto is apparently still not receiving patch 1/5
->> > in the series.  It's missing from the linux-crypto archive at
->> > http://www.spinics.net/lists/linux-crypto/, so it's not just me.]
->> > 
->> 
->> I don't really know what to do about this. I think the matter is the size of the E-Mail.
->> Are there filters or something like that? Since in linux-kernel the patch seems to get delivered.
->> I could otherwise CC you if you wish.
->> 
-> 
-> If I'm not mistaken, David Miller is the admin of the mail server on
-> vger.kernel.org, and he already happens to be Cc'ed on this thread, so maybe he
-> can answer as to why linux-crypto may be configured differently?
-> 
-> Anyway, since the patch did make it to linux-kernel anyone can still download it
-> from patchwork if they know where to look:
-> https://patchwork.kernel.org/patch/9556271/
+It requires a SoC specific ring manager (such as Broadcom FlexRM
+ring manager) to provide ring-based programming interface. Due to
+this, the Broadcom SBA RAID driver (mailbox client) implements
+DMA device having one DMA channel using a set of mailbox channels
+provided by Broadcom SoC specific ring manager driver (mailbox
+controller).
 
-I've increased the maxlength parameter for linux-cryto so this doesn't
-happen again.
+The Broadcom SBA RAID hardware requires PQ disk position instead
+of PQ disk coefficient. To address this, we have added raid_gflog
+table which will help driver to convert PQ disk coefficient to PQ
+disk position.
+
+This patchset is based on Linux-4.10-rc2 and depends on patchset
+"[PATCH v4 0/2] Broadcom FlexRM ring manager support"
+
+It is also available at sba-raid-v3 branch of
+https://github.com/Broadcom/arm64-linux.git
+
+Changes since v2:
+ - Droped patch to handle DMA devices having support for fewer
+   PQ coefficients in Linux Async Tx
+ - Added work-around in bcm-sba-raid driver to handle unsupported
+   PQ coefficients using multiple SBA requests
+
+Changes since v1:
+ - Droped patch to add mbox_channel_device() API
+ - Used GENMASK and BIT macros wherever possible in bcm-sba-raid driver
+ - Replaced C_MDATA macros with static inline functions in
+   bcm-sba-raid driver
+ - Removed sba_alloc_chan_resources() callback in bcm-sba-raid driver
+ - Used dev_err() instead of dev_info() wherever applicable
+ - Removed call to sba_issue_pending() from sba_tx_submit() in
+   bcm-sba-raid driver
+ - Implemented SBA request chaning for handling (len > sba->req_size)
+   in bcm-sba-raid driver
+ - Implemented device_terminate_all() callback in bcm-sba-raid driver
+
+Anup Patel (4):
+  lib/raid6: Add log-of-2 table for RAID6 HW requiring disk position
+  async_tx: Fix DMA_PREP_FENCE usage in do_async_gen_syndrome()
+  dmaengine: Add Broadcom SBA RAID driver
+  dt-bindings: Add DT bindings document for Broadcom SBA RAID driver
+
+ .../devicetree/bindings/dma/brcm,iproc-sba.txt     |   29 +
+ crypto/async_tx/async_pq.c                         |    5 +-
+ drivers/dma/Kconfig                                |   13 +
+ drivers/dma/Makefile                               |    1 +
+ drivers/dma/bcm-sba-raid.c                         | 1711 ++++++++++++++++++++
+ include/linux/raid/pq.h                            |    1 +
+ lib/raid6/mktables.c                               |   20 +
+ 7 files changed, 1777 insertions(+), 3 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/dma/brcm,iproc-sba.txt
+ create mode 100644 drivers/dma/bcm-sba-raid.c
+
+-- 
+2.7.4
