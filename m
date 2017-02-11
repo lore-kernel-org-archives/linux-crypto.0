@@ -1,31 +1,36 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: linux-next: build warnings after merge of the crypto tree
-Date: Sat, 11 Feb 2017 18:56:21 +0800
-Message-ID: <20170211105621.GJ855@gondor.apana.org.au>
-References: <20170206122837.0226fb89@canb.auug.org.au>
- <20170206090340.GA9531@gondor.apana.org.au>
- <20170210141251.03b39b40@canb.auug.org.au>
+Subject: Re: [PATCH] hwrng: cavium: Use per device name to allow for multiple
+ devices.
+Date: Sat, 11 Feb 2017 18:56:46 +0800
+Message-ID: <20170211105646.GK855@gondor.apana.org.au>
+References: <20170206222846.22493-1-david.daney@cavium.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-next@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Cyrille Pitchen <cyrille.pitchen@atmel.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: linux-crypto@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
+        linux-kernel@vger.kernel.org,
+        Omer Khaliq <okhaliq@caviumnetworks.com>,
+        Ananth Jasty <Ananth.Jasty@cavium.com>
+To: David Daney <david.daney@cavium.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20170210141251.03b39b40@canb.auug.org.au>
+In-Reply-To: <20170206222846.22493-1-david.daney@cavium.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Feb 10, 2017 at 02:12:51PM +1100, Stephen Rothwell wrote:
->
-> I am still getting these warnings ... I have seen no updates to the
-> crypot tree since Feb 2.
+On Mon, Feb 06, 2017 at 02:28:46PM -0800, David Daney wrote:
+> Systems containing the Cavium HW RNG may have one device per NUMA
+> node.  A typical configuration is a 2-node NUMA system, which results
+> in 2 RNG devices.  The hwrng subsystem refuses (and rightly so) to
+> register more than one device with he same name, so we get failure
+> messages on these systems.
+> 
+> Make the hwrng name unique by including the underlying device name.
+> Also remove spaces from the name to make it possible to switch devices
+> via the sysfs knobs.
+> 
+> Signed-off-by: David Daney <david.daney@cavium.com>
 
-Sorry Stephen.  I have now applied Arnd's fixes for this problem
-and it should be pushed out.
-
-Cheers,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
