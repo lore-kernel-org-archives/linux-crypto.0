@@ -1,35 +1,43 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: improve gcc optimization flags for serpent and
- wp512
-Date: Sat, 11 Feb 2017 18:54:55 +0800
-Message-ID: <20170211105455.GG855@gondor.apana.org.au>
-References: <20170203223334.3888507-1-arnd@arndb.de>
+Subject: Re: [PATCH v6 0/3] Add Support for Cavium Cryptographic Acceleration
+ Unit
+Date: Sat, 11 Feb 2017 18:57:07 +0800
+Message-ID: <20170211105707.GL855@gondor.apana.org.au>
+References: <1486479075-1813-1-git-send-email-george.cherian@cavium.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-        kernel-build-reports@lists.linaro.org,
-        Ralf Baechle <ralf@linux-mips.org>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Arnd Bergmann <arnd@arndb.de>
+Cc: davem@davemloft.net, david.daney@cavium.com,
+        clabbe.montjoie@gmail.com, smueller@chronox.de,
+        levinsasha928@gmail.com, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+To: George Cherian <george.cherian@cavium.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
 Received: from helcar.hengli.com.au ([209.40.204.226]:36097 "EHLO
         helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1750778AbdBKS56 (ORCPT
+        with ESMTP id S1751014AbdBKS7E (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 11 Feb 2017 13:57:58 -0500
+        Sat, 11 Feb 2017 13:59:04 -0500
 Content-Disposition: inline
-In-Reply-To: <20170203223334.3888507-1-arnd@arndb.de>
+In-Reply-To: <1486479075-1813-1-git-send-email-george.cherian@cavium.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Feb 03, 2017 at 11:33:23PM +0100, Arnd Bergmann wrote:
-> An ancient gcc bug (first reported in 2003) has apparently resurfaced
-> on MIPS, where kernelci.org reports an overly large stack frame in the
-> whirlpool hash algorithm:
+On Tue, Feb 07, 2017 at 02:51:12PM +0000, George Cherian wrote:
+> This series adds the support for Cavium Cryptographic Accelerarion Unit (CPT) 
+> CPT is available in Cavium's Octeon-Tx SoC series.                            
+>                                                                               
+> The series was tested with ecryptfs and dm-crypt for in kernel cryptographic
+> offload operations. This driver needs a firmware to work, I will be sending the
+> firmware to linux-firmware once the driver is accepted.
 > 
-> crypto/wp512.c:987:1: warning: the frame size of 1112 bytes is larger than 1024 bytes [-Wframe-larger-than=]
+> Cahnges v5 -> v6
+> 	-- Addressed Sasha Levin's comments.
+> 		- Remove open coding of hlist_for_each_entry_safe, instead use
+> 		  the same.
+> 		- Remove the direct access of hlist members
+> 		- Remove unwanted argument checks.
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
