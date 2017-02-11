@@ -1,36 +1,36 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] hwrng: cavium: Use per device name to allow for multiple
- devices.
-Date: Sat, 11 Feb 2017 18:56:46 +0800
-Message-ID: <20170211105646.GK855@gondor.apana.org.au>
-References: <20170206222846.22493-1-david.daney@cavium.com>
+Subject: Re: [PATCH v4 0/3] Add Broadcom SPU Crypto Driver
+Date: Sat, 11 Feb 2017 18:54:04 +0800
+Message-ID: <20170211105404.GF855@gondor.apana.org.au>
+References: <1486144534-44887-1-git-send-email-rob.rice@broadcom.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
         linux-kernel@vger.kernel.org,
-        Omer Khaliq <okhaliq@caviumnetworks.com>,
-        Ananth Jasty <Ananth.Jasty@cavium.com>
-To: David Daney <david.daney@cavium.com>
+        bcm-kernel-feedback-list@broadcom.com,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        linux-arm-kernel@lists.infradead.org
+To: Rob Rice <rob.rice@broadcom.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20170206222846.22493-1-david.daney@cavium.com>
+In-Reply-To: <1486144534-44887-1-git-send-email-rob.rice@broadcom.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Feb 06, 2017 at 02:28:46PM -0800, David Daney wrote:
-> Systems containing the Cavium HW RNG may have one device per NUMA
-> node.  A typical configuration is a 2-node NUMA system, which results
-> in 2 RNG devices.  The hwrng subsystem refuses (and rightly so) to
-> register more than one device with he same name, so we get failure
-> messages on these systems.
-> 
-> Make the hwrng name unique by including the underlying device name.
-> Also remove spaces from the name to make it possible to switch devices
-> via the sysfs knobs.
-> 
-> Signed-off-by: David Daney <david.daney@cavium.com>
+On Fri, Feb 03, 2017 at 12:55:31PM -0500, Rob Rice wrote:
+> Changes in v4:
+> - Added Rob Herring's Acked-by to patch 1/3 for bindings doc
+> - In response to Herbert's comment, in ahash_export() and 
+>   ahash_import(), only copy the hash state, not state params
+>   related to cipher or aead algos. 
+> - Noticed that hmac_offset in iproc_reqctx_s and spu_hash_params
+>   wasn't really used. So removed.
 
-Patch applied.  Thanks.
+Patches 1-2 applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
