@@ -1,35 +1,41 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: crypto: NULL deref in sha512_mb_mgr_get_comp_job_avx2
-Date: Sat, 11 Feb 2017 18:50:44 +0800
-Message-ID: <20170211105043.GA855@gondor.apana.org.au>
-References: <CACT4Y+Z6_x2smshuSgQx0wA+g0H+5dJsF23UqYb9Z_WkDUvwcw@mail.gmail.com>
- <20170201184502.GA11649@linux.intel.com>
+Subject: Re: [PATCH v3 0/3] crypto: time invariant AES for CCM (and CMAC/XCBC)
+Date: Sat, 11 Feb 2017 18:53:39 +0800
+Message-ID: <20170211105339.GE855@gondor.apana.org.au>
+References: <1486133377-23290-1-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Dmitry Vyukov <dvyukov@google.com>,
-        David Miller <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        megha.dey@linux.intel.com, fenghua.yu@intel.com,
-        syzkaller <syzkaller@googlegroups.com>
-To: Tim Chen <tim.c.chen@linux.intel.com>
+Cc: linux-crypto@vger.kernel.org, ebiggers3@gmail.com,
+        linux-arm-kernel@lists.infradead.org
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
 Received: from helcar.hengli.com.au ([209.40.204.226]:36097 "EHLO
         helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1750989AbdBKS7d (ORCPT
+        with ESMTP id S1751596AbdBKS7u (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 11 Feb 2017 13:59:33 -0500
+        Sat, 11 Feb 2017 13:59:50 -0500
 Content-Disposition: inline
-In-Reply-To: <20170201184502.GA11649@linux.intel.com>
+In-Reply-To: <1486133377-23290-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Feb 01, 2017 at 10:45:02AM -0800, Tim Chen wrote:
->
-> One theory that Mehga and I have is that perhaps the flusher
-> and regular computaion updates are stepping on each other. 
-> Can you try this patch and see if it helps?
+On Fri, Feb 03, 2017 at 02:49:34PM +0000, Ard Biesheuvel wrote:
+> This series is primarily directed at improving the performance and security
+> of CCM on the Rasperry Pi 3. This involves splitting the MAC handling of
+> CCM into a separate driver so that we can efficiently replace it by something
+> else using the ordinary algo resolution machinery.
+> 
+> Patch #1 adds some testcases for cbcmac(aes), which will be introduced later.
+> 
+> Patch #2 replaces the open coded CBC MAC hashing routines in the CCM driver
+> with calls to a cbcmac() hash, and implements a template for producing such
+> cbcmac transforms. This eliminates all the fuzzy scatterwalk code as well.
+> 
+> Patch #3 implements cbcmac(aes) using NEON on arm64, and CMAC/XCBC at the
+> same time, since it is trivially implemented reusing the same core transform
 
-Patch applied.  Thanks.
+All applied.  Please send any fixups on top of these patches.
+Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
