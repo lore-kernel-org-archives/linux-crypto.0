@@ -1,33 +1,36 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: generic/aes - drop alignment requirement
-Date: Sat, 11 Feb 2017 18:52:00 +0800
-Message-ID: <20170211105200.GC855@gondor.apana.org.au>
-References: <1486051137-20511-1-git-send-email-ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH] crypto: arm64/crc32 - merge CRC32 and PMULL instruction
+ based drivers
+Date: Sat, 11 Feb 2017 18:51:02 +0800
+Message-ID: <20170211105102.GB855@gondor.apana.org.au>
+References: <1485963340-25297-1-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, ebiggers3@gmail.com
+Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        will.deacon@arm.com, yazen.ghannam@linaro.org,
+        steve.capper@linaro.org, agraf@suse.de, mbrugger@suse.com
 To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
 Received: from helcar.hengli.com.au ([209.40.204.226]:36097 "EHLO
         helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1750994AbdBKTAI (ORCPT
+        with ESMTP id S1750966AbdBKTAM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 11 Feb 2017 14:00:08 -0500
+        Sat, 11 Feb 2017 14:00:12 -0500
 Content-Disposition: inline
-In-Reply-To: <1486051137-20511-1-git-send-email-ard.biesheuvel@linaro.org>
+In-Reply-To: <1485963340-25297-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Feb 02, 2017 at 03:58:57PM +0000, Ard Biesheuvel wrote:
-> The generic AES code exposes a 32-bit align mask, which forces all
-> users of the code to use temporary buffers or take other measures to
-> ensure the alignment requirement is adhered to, even on architectures
-> that don't care about alignment for software algorithms such as this
-> one.
+On Wed, Feb 01, 2017 at 03:35:40PM +0000, Ard Biesheuvel wrote:
+> The PMULL based CRC32 implementation already contains code based on the
+> separate, optional CRC32 instructions to fallback to when operating on
+> small quantities of data. We can expose these routines directly on systems
+> that lack the 64x64 PMULL instructions but do implement the CRC32 ones,
+> which makes the driver that is based solely on those CRC32 instructions
+> redundant. So remove it.
 > 
-> So drop the align mask, and fix the code to use get_unaligned_le32()
-> where appropriate, which will resolve to whatever is optimal for the
-> architecture.
+> Note that this aligns arm64 with ARM, whose accelerated CRC32 driver
+> also combines the CRC32 extension based and the PMULL based versions.
 > 
 > Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
