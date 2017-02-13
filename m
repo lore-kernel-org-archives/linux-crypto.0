@@ -1,184 +1,298 @@
-From: Minchan Kim <minchan@kernel.org>
-Subject: Re: [PATCH v7 0/5] Update LZ4 compressor module
-Date: Mon, 13 Feb 2017 09:03:24 +0900
-Message-ID: <20170213000324.GA5379@bbox>
-References: <20170210001311.GA25078@bbox>
- <1486898178-17125-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
+From: Anup Patel <anup.patel@broadcom.com>
+Subject: Re: [PATCH v3 3/4] dmaengine: Add Broadcom SBA RAID driver
+Date: Mon, 13 Feb 2017 14:43:51 +0530
+Message-ID: <CAALAos-dThk-h09Yox5AN37po3OqR1oReoZPfqjZVqTqVkCxUA@mail.gmail.com>
+References: <1486717628-17580-1-git-send-email-anup.patel@broadcom.com>
+ <1486717628-17580-4-git-send-email-anup.patel@broadcom.com> <CAPcyv4hE5gDiHhfaiHDHbhA2xKa45UdzKcSxnQXK-W92sr3Z1g@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Cc: <ebiggers3@gmail.com>, <akpm@linux-foundation.org>,
-        <bongkyu.kim@lge.com>, <rsalvaterra@gmail.com>,
-        <sergey.senozhatsky@gmail.com>, <gregkh@linuxfoundation.org>,
-        <linux-kernel@vger.kernel.org>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
-        <anton@enomsg.org>, <ccross@android.com>, <keescook@chromium.org>,
-        <tony.luck@intel.com>
-To: Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from LGEAMRELO12.lge.com ([156.147.23.52]:60361 "EHLO
-        lgeamrelo12.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751229AbdBMADa (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 12 Feb 2017 19:03:30 -0500
-In-Reply-To: <1486898178-17125-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
-Content-Disposition: inline
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: Vinod Koul <vinod.koul@intel.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Jassi Brar <jassisinghbrar@gmail.com>,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        Jon Mason <jonmason@broadcom.com>,
+        Rob Rice <rob.rice@broadcom.com>,
+        BCM Kernel Feedback <bcm-kernel-feedback-list@broadcom.com>,
+        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
+        Device Tree <devicetree@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org"
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        linux-crypto@vger.kernel.org,
+        linux-raid <linux-raid@vger.kernel.org>
+To: Dan Williams <dan.j.williams@intel.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <CAPcyv4hE5gDiHhfaiHDHbhA2xKa45UdzKcSxnQXK-W92sr3Z1g@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Sven,
+On Fri, Feb 10, 2017 at 11:20 PM, Dan Williams <dan.j.williams@intel.com> wrote:
+> On Fri, Feb 10, 2017 at 1:07 AM, Anup Patel <anup.patel@broadcom.com> wrote:
+>> The Broadcom stream buffer accelerator (SBA) provides offloading
+>> capabilities for RAID operations. This SBA offload engine is
+>> accessible via Broadcom SoC specific ring manager.
+>>
+>> This patch adds Broadcom SBA RAID driver which provides one
+>> DMA device with RAID capabilities using one or more Broadcom
+>> SoC specific ring manager channels. The SBA RAID driver in its
+>> current shape implements memcpy, xor, and pq operations.
+>>
+>> Signed-off-by: Anup Patel <anup.patel@broadcom.com>
+>> Reviewed-by: Ray Jui <ray.jui@broadcom.com>
+>> ---
+>>  drivers/dma/Kconfig        |   13 +
+>>  drivers/dma/Makefile       |    1 +
+>>  drivers/dma/bcm-sba-raid.c | 1711 ++++++++++++++++++++++++++++++++++++++++++++
+>>  3 files changed, 1725 insertions(+)
+>>  create mode 100644 drivers/dma/bcm-sba-raid.c
+>>
+>> diff --git a/drivers/dma/Kconfig b/drivers/dma/Kconfig
+>> index 263495d..bf8fb84 100644
+>> --- a/drivers/dma/Kconfig
+>> +++ b/drivers/dma/Kconfig
+>> @@ -99,6 +99,19 @@ config AXI_DMAC
+>>           controller is often used in Analog Device's reference designs for FPGA
+>>           platforms.
+>>
+>> +config BCM_SBA_RAID
+>> +       tristate "Broadcom SBA RAID engine support"
+>> +       depends on (ARM64 && MAILBOX && RAID6_PQ) || COMPILE_TEST
+>> +       select DMA_ENGINE
+>> +       select DMA_ENGINE_RAID
+>> +       select ASYNC_TX_ENABLE_CHANNEL_SWITCH
+>
+> ASYNC_TX_ENABLE_CHANNEL_SWITCH violates the DMA mapping API and
+> Russell has warned it's especially problematic on ARM [1].  If you
+> need channel switching for this offload engine to be useful then you
+> need to move DMA mapping and channel switching responsibilities to MD
+> itself.
+>
+> [1]: http://lists.infradead.org/pipermail/linux-arm-kernel/2011-January/036753.html
 
-On Sun, Feb 12, 2017 at 12:16:17PM +0100, Sven Schmidt wrote:
-> 
-> 
-> 
-> On 02/10/2017 01:13 AM, Minchan Kim wrote:
-> > Hello Sven,
-> >
-> > On Thu, Feb 09, 2017 at 11:56:17AM +0100, Sven Schmidt wrote:
-> >> Hey Minchan,
-> >>
-> >> On Thu, Feb 09, 2017 at 08:31:21AM +0900, Minchan Kim wrote:
-> >>> Hello Sven,
-> >>>
-> >>> On Sun, Feb 05, 2017 at 08:09:03PM +0100, Sven Schmidt wrote:
-> >>>>
-> >>>> This patchset is for updating the LZ4 compression module to a version based
-> >>>> on LZ4 v1.7.3 allowing to use the fast compression algorithm aka LZ4 fast
-> >>>> which provides an "acceleration" parameter as a tradeoff between
-> >>>> high compression ratio and high compression speed.
-> >>>>
-> >>>> We want to use LZ4 fast in order to support compression in lustre
-> >>>> and (mostly, based on that) investigate data reduction techniques in behalf of
-> >>>> storage systems.
-> >>>>
-> >>>> Also, it will be useful for other users of LZ4 compression, as with LZ4 fast
-> >>>> it is possible to enable applications to use fast and/or high compression
-> >>>> depending on the usecase.
-> >>>> For instance, ZRAM is offering a LZ4 backend and could benefit from an updated
-> >>>> LZ4 in the kernel.
-> >>>>
-> >>>> LZ4 homepage: http://www.lz4.org/
-> >>>> LZ4 source repository: https://github.com/lz4/lz4
-> >>>> Source version: 1.7.3
-> >>>>
-> >>>> Benchmark (taken from [1], Core i5-4300U @1.9GHz):
-> >>>> ----------------|--------------|----------------|----------
-> >>>> Compressor      | Compression  | Decompression  | Ratio
-> >>>> ----------------|--------------|----------------|----------
-> >>>> memcpy          |  4200 MB/s   |  4200 MB/s     | 1.000
-> >>>> LZ4 fast 50     |  1080 MB/s   |  2650 MB/s     | 1.375
-> >>>> LZ4 fast 17     |   680 MB/s   |  2220 MB/s     | 1.607
-> >>>> LZ4 fast 5      |   475 MB/s   |  1920 MB/s     | 1.886
-> >>>> LZ4 default     |   385 MB/s   |  1850 MB/s     | 2.101
-> >>>>
-> >>>> [1] http://fastcompression.blogspot.de/2015/04/sampling-or-faster-lz4.html
-> >>>>
-> >>>> [PATCH 1/5] lib: Update LZ4 compressor module
-> >>>> [PATCH 2/5] lib/decompress_unlz4: Change module to work with new LZ4 module version
-> >>>> [PATCH 3/5] crypto: Change LZ4 modules to work with new LZ4 module version
-> >>>> [PATCH 4/5] fs/pstore: fs/squashfs: Change usage of LZ4 to work with new LZ4 version
-> >>>> [PATCH 5/5] lib/lz4: Remove back-compat wrappers
-> >>>
-> >>> Today, I did zram-lz4 performance test with fio in current mmotm and
-> >>> found it makes regression about 20%.
-> >>>
-> >>> "lz4-update" means current mmots(git://git.cmpxchg.org/linux-mmots.git) so
-> >>> applied your 5 patches. (But now sure current mmots has recent uptodate
-> >>> patches)
-> >>> "revert" means I reverted your 5 patches in current mmots.
-> >>>
-> >>>                      revert    lz4-update
-> >>>
-> >>>       seq-write       1547       1339      86.55%
-> >>>      rand-write      22775      19381      85.10%
-> >>>        seq-read       7035       5589      79.45%
-> >>>       rand-read      78556      68479      87.17%
-> >>>    mixed-seq(R)       1305       1066      81.69%
-> >>>    mixed-seq(W)       1205        984      81.66%
-> >>>   mixed-rand(R)      17421      14993      86.06%
-> >>>   mixed-rand(W)      17391      14968      86.07%
-> >>
-> >> which parts of the output (as well as units) are these values exactly?
-> >> I did not work with fio until now, so I think I might ask before misinterpreting my results.
-> >
-> > It is IOPS.
-> >
-> >>  
-> >>> My fio description file
-> >>>
-> >>> [global]
-> >>> bs=4k
-> >>> ioengine=sync
-> >>> size=100m
-> >>> numjobs=1
-> >>> group_reporting
-> >>> buffer_compress_percentage=30
-> >>> scramble_buffers=0
-> >>> filename=/dev/zram0
-> >>> loops=10
-> >>> fsync_on_close=1
-> >>>
-> >>> [seq-write]
-> >>> bs=64k
-> >>> rw=write
-> >>> stonewall
-> >>>
-> >>> [rand-write]
-> >>> rw=randwrite
-> >>> stonewall
-> >>>
-> >>> [seq-read]
-> >>> bs=64k
-> >>> rw=read
-> >>> stonewall
-> >>>
-> >>> [rand-read]
-> >>> rw=randread
-> >>> stonewall
-> >>>
-> >>> [mixed-seq]
-> >>> bs=64k
-> >>> rw=rw
-> >>> stonewall
-> >>>
-> >>> [mixed-rand]
-> >>> rw=randrw
-> >>> stonewall
-> >>>
-> >>
-> >> Great, this makes it easy for me to reproduce your test.
-> >
-> > If you have trouble to reproduce, feel free to ask me. I'm happy to test it. :)
-> >
-> > Thanks!
-> >
-> 
-> Hi Minchan,
-> 
-> I will send an updated patch as a reply to this E-Mail. Would be really grateful If you'd test it and provide feedback!
-> The patch should be applied to the current mmots tree.
-> 
-> In fact, the updated LZ4 _is_ slower than the current one in kernel. But I was not able to reproduce such large regressions
-> as you did. I now tried to define FORCE_INLINE as Eric suggested. I also inlined some functions which weren't in upstream LZ4,
-> but are defined as macros in the current kernel LZ4. The approach to replace LZ4_ARCH64 with the function call _seemed_ to behave
-> worse than the macro, so I withdrew the change.
-> 
-> The main difference is, that I replaced the read32/read16/write... etc. functions using memcpy with the other ones defined 
-> in upstream LZ4 (which can be switched using a macro). 
-> The comment of the author stated, that they're as fast as the memcpy variants (or faster), but not as portable
-> (which does not matter since we're not dependent for multiple compilers).
-> 
-> In my tests, this version is mostly as fast as the current kernel LZ4.
+Actually driver works fine with/without
+ASYNC_TX_ENABLE_CHANNEL_SWITCH enabled
+so I am fine with removing dependency on this config option.
 
-With a patch you sent, I cannot see enhancement so I wanted to dig in and
-found how I was really careless.
+>
+>
+> [..]
+>> diff --git a/drivers/dma/bcm-sba-raid.c b/drivers/dma/bcm-sba-raid.c
+>> new file mode 100644
+>> index 0000000..bab9918
+>> --- /dev/null
+>> +++ b/drivers/dma/bcm-sba-raid.c
+>> @@ -0,0 +1,1711 @@
+>> +/*
+>> + * Copyright (C) 2017 Broadcom
+>> + *
+>> + * This program is free software; you can redistribute it and/or modify
+>> + * it under the terms of the GNU General Public License version 2 as
+>> + * published by the Free Software Foundation.
+>> + */
+>> +
+>> +/*
+>> + * Broadcom SBA RAID Driver
+>> + *
+>> + * The Broadcom stream buffer accelerator (SBA) provides offloading
+>> + * capabilities for RAID operations. The SBA offload engine is accessible
+>> + * via Broadcom SoC specific ring manager. Two or more offload engines
+>> + * can share same Broadcom SoC specific ring manager due to this Broadcom
+>> + * SoC specific ring manager driver is implemented as a mailbox controller
+>> + * driver and offload engine drivers are implemented as mallbox clients.
+>> + *
+>> + * Typically, Broadcom SoC specific ring manager will implement larger
+>> + * number of hardware rings over one or more SBA hardware devices. By
+>> + * design, the internal buffer size of SBA hardware device is limited
+>> + * but all offload operations supported by SBA can be broken down into
+>> + * multiple small size requests and executed parallely on multiple SBA
+>> + * hardware devices for achieving high through-put.
+>> + *
+>> + * The Broadcom SBA RAID driver does not require any register programming
+>> + * except submitting request to SBA hardware device via mailbox channels.
+>> + * This driver implements a DMA device with one DMA channel using a set
+>> + * of mailbox channels provided by Broadcom SoC specific ring manager
+>> + * driver. To exploit parallelism (as described above), all DMA request
+>> + * coming to SBA RAID DMA channel are broken down to smaller requests
+>> + * and submitted to multiple mailbox channels in round-robin fashion.
+>> + * For having more SBA DMA channels, we can create more SBA device nodes
+>> + * in Broadcom SoC specific DTS based on number of hardware rings supported
+>> + * by Broadcom SoC ring manager.
+>> + */
+>> +
+>> +#include <linux/bitops.h>
+>> +#include <linux/dma-mapping.h>
+>> +#include <linux/dmaengine.h>
+>> +#include <linux/list.h>
+>> +#include <linux/mailbox_client.h>
+>> +#include <linux/mailbox/brcm-message.h>
+>> +#include <linux/module.h>
+>> +#include <linux/of_device.h>
+>> +#include <linux/slab.h>
+>> +#include <linux/raid/pq.h>
+>> +
+>> +#include "dmaengine.h"
+>> +
+>> +/* SBA command helper macros */
+>> +#define SBA_DEC(_d, _s, _m)            (((_d) >> (_s)) & (_m))
+>> +#define SBA_ENC(_d, _v, _s, _m)                                        \
+>> +               do {                                            \
+>> +                       (_d) &= ~((u64)(_m) << (_s));           \
+>> +                       (_d) |= (((u64)(_v) & (_m)) << (_s));   \
+>> +               } while (0)
+>
+> Reusing a macro argument multiple times is problematic, consider
+> SBA_ENC(..., arg++, ...), and hiding assignments in a macro make this
+> hard to read. The compiler should inline it properly if you just make
+> this a function that returns a value. You could also mark it __pure.
 
-I have tested both test with CONFIG_KASAN. OMG. With disabling it, I don't
-see any regression any more. So, I'm really really *sorry* about noise and
-wasting your time. However, I am curious why KASAN makes such difference.
+OK, I will make SBA_ENC as "static inline __pure" function.
 
-The reason I tested new updated lz4 is description says lz4 fast and
-want to use it in zram. How can I do that? and How faster it is compared
-to old?
+>
+> [..]
+>> +
+>> +static struct sba_request *sba_alloc_request(struct sba_device *sba)
+>> +{
+>> +       unsigned long flags;
+>> +       struct sba_request *req = NULL;
+>> +
+>> +       spin_lock_irqsave(&sba->reqs_lock, flags);
+>> +
+>> +       if (!list_empty(&sba->reqs_free_list)) {
+>> +               req = list_first_entry(&sba->reqs_free_list,
+>> +                                      struct sba_request,
+>> +                                      node);
+>
+> You could use list_first_entry_or_null() here.
 
-Thanks for you work!
+OK, will use this.
+
+>
+> [..]
+>> +
+>> +/* Note: Must be called with sba->reqs_lock held */
+>> +static void _sba_pending_request(struct sba_device *sba,
+>> +                                struct sba_request *req)
+>> +{
+>
+> You can validate the locking assumptions here with
+> lockdep_assert_head(sba->reqs_lock).
+
+OK, will try this.
+
+>
+> [..]
+>> +
+>> +static void sba_cleanup_nonpending_requests(struct sba_device *sba)
+>> +{
+>> +       unsigned long flags;
+>> +       struct sba_request *req, *req1;
+>> +
+>> +       spin_lock_irqsave(&sba->reqs_lock, flags);
+>> +
+>> +       /* Freeup all alloced request */
+>> +       list_for_each_entry_safe(req, req1, &sba->reqs_alloc_list, node) {
+>> +               _sba_free_request(sba, req);
+>> +       }
+>> +
+>> +       /* Freeup all received request */
+>> +       list_for_each_entry_safe(req, req1, &sba->reqs_received_list, node) {
+>> +               _sba_free_request(sba, req);
+>> +       }
+>> +
+>> +       /* Freeup all completed request */
+>> +       list_for_each_entry_safe(req, req1, &sba->reqs_completed_list, node) {
+>> +               _sba_free_request(sba, req);
+>> +       }
+>> +
+>> +       /* Set all active requests as aborted */
+>> +       list_for_each_entry_safe(req, req1, &sba->reqs_active_list, node) {
+>> +               _sba_abort_request(sba, req);
+>> +       }
+>
+> In some parts of the driver you leave off unneeded braces like the for
+> loop in sba_prep_dma_pq(), and in some case you include them. I'd say
+> remove them if they're not necessary, but either way make it
+> consistent across the driver.
+
+I think I relied too much on checkpatch.pl to catch this
+kind of coding-style issues.
+
+I will fix this. Thanks for catching.
+
+>
+> [..]
+>> +
+>> +static struct dma_async_tx_descriptor *
+>> +sba_prep_dma_pq(struct dma_chan *dchan, dma_addr_t *dst, dma_addr_t *src,
+>> +               u32 src_cnt, const u8 *scf, size_t len, unsigned long flags)
+>> +{
+>> +       u32 i, dst_q_index;
+>> +       size_t req_len;
+>> +       bool slow = false;
+>> +       dma_addr_t off = 0;
+>> +       dma_addr_t *dst_p = NULL, *dst_q = NULL;
+>> +       struct sba_device *sba = to_sba_device(dchan);
+>> +       struct sba_request *first = NULL, *req;
+>> +
+>> +       /* Sanity checks */
+>> +       if (unlikely(src_cnt > sba->max_pq_srcs))
+>> +               return NULL;
+>> +       for (i = 0; i < src_cnt; i++)
+>> +               if (sba->max_pq_coefs <= raid6_gflog[scf[i]])
+>> +                       slow = true;
+>
+> Thanks, yes, I do think this is cleaner here than in async_tx itself.
+>
+> [..]
+>> +static void sba_receive_message(struct mbox_client *cl, void *msg)
+>> +{
+>> +       unsigned long flags;
+>> +       struct brcm_message *m = msg;
+>> +       struct sba_request *req = m->ctx, *req1;
+>> +       struct sba_device *sba = req->sba;
+>> +
+>> +       /* Error count if message has error */
+>> +       if (m->error < 0) {
+>> +               dev_err(sba->dev, "%s got message with error %d",
+>> +                       dma_chan_name(&sba->dma_chan), m->error);
+>> +       }
+>> +
+>> +       /* Mark request as received */
+>> +       sba_received_request(req);
+>> +
+>> +       /* Wait for all chained requests to be completed */
+>> +       if (atomic_dec_return(&req->first->next_pending_count))
+>> +               goto done;
+>> +
+>> +       /* Point to first request */
+>> +       req = req->first;
+>> +
+>> +       /* Update request */
+>> +       if (req->state == SBA_REQUEST_STATE_RECEIVED)
+>> +               sba_dma_tx_actions(req);
+>> +       else
+>> +               sba_free_chained_requests(req);
+>> +
+>> +       spin_lock_irqsave(&sba->reqs_lock, flags);
+>> +
+>> +       /* Re-check all completed request waiting for 'ack' */
+>> +       list_for_each_entry_safe(req, req1, &sba->reqs_completed_list, node) {
+>> +               spin_unlock_irqrestore(&sba->reqs_lock, flags);
+>> +               sba_dma_tx_actions(req);
+>
+> You've now required all callback paths to be hardirq safe whereas
+> previously the callbacks only assumed softirq exclusion. Have you run
+> this with CONFIG_PROVE_LOCKING enabled?
+
+We have run stress tests on driver with multiple threads
+trying to submit txn.
+
+I will certainly try CONFIG_PROVE_LOCKING to be
+double sure.
+
+Thanks,
+Anup
