@@ -1,74 +1,48 @@
-From: Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
-Subject: Re: [PATCH] lz4: fix performance regressions
-Date: Mon, 13 Feb 2017 12:53:49 +0100
-Message-ID: <20170213115349.GA22510@bierbaron.springfield.local>
-References: <20170210001311.GA25078@bbox>
- <1486898178-17125-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
- <1486898178-17125-2-git-send-email-4sschmid@informatik.uni-hamburg.de>
- <20170212130508.GA27710@1wt.eu>
- <20170212152000.GA24704@bierbaron.springfield.local>
- <20170212214117.GA30583@1wt.eu>
+From: Russell King <rmk+kernel@armlinux.org.uk>
+Subject: [PATCH] hw_random: update help description for omap-rng
+Date: Mon, 13 Feb 2017 12:04:08 +0000
+Message-ID: <E1cdFMW-0004yZ-OB@rmk-PC.armlinux.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: minchan@kernel.org, ebiggers3@gmail.com, akpm@linux-foundation.org,
-        bongkyu.kim@lge.com, rsalvaterra@gmail.com,
-        sergey.senozhatsky@gmail.com, gregkh@linuxfoundation.org,
-        linux-kernel@vger.kernel.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net, linux-crypto@vger.kernel.org,
-        anton@enomsg.org, ccross@android.com, keescook@chromium.org,
-        tony.luck@intel.com
-To: Willy Tarreau <w@1wt.eu>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Cc: Matt Mackall <mpm@selenic.com>, linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        Romain Perier <romain.perier@free-electrons.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailhost.informatik.uni-hamburg.de ([134.100.9.70]:59909 "EHLO
-        mailhost.informatik.uni-hamburg.de" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752336AbdBMLx7 (ORCPT
+Received: from pandora.armlinux.org.uk ([78.32.30.218]:45048 "EHLO
+        pandora.armlinux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752986AbdBMMER (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 13 Feb 2017 06:53:59 -0500
+        Mon, 13 Feb 2017 07:04:17 -0500
 Content-Disposition: inline
-In-Reply-To: <20170212214117.GA30583@1wt.eu>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Feb 12, 2017 at 10:41:17PM +0100, Willy Tarreau wrote:
-> On Sun, Feb 12, 2017 at 04:20:00PM +0100, Sven Schmidt wrote:
-> > On Sun, Feb 12, 2017 at 02:05:08PM +0100, Willy Tarreau wrote:
-> > > Hi Sven,
-> > > 
-> > > On Sun, Feb 12, 2017 at 12:16:18PM +0100, Sven Schmidt wrote:
-> > > > Fix performance regressions compared to current kernel LZ4
-> > > 
-> > > Your patch contains mostly style cleanups which certainly are welcome
-> > > but make the whole patch hard to review. These cleanups would have been
-> > > better into a separate, preliminary patch IMHO.
-> > > 
-> > > Regards,
-> > > Willy
-> > 
-> > Hi Willy,
-> > 
-> > the problem was, I wanted to compare my version to the upstream LZ4 to find bugs (as with my last patch version: wrong indentation in LZ4HC 
-> > in two for loops). But since the LZ4 code is a pain to read, I made additional style cleanups "on the way".
-> 
-> Oh I can easily understand!
-> 
-> > Hope you can manage to review the patch though, because it is difficult to separate the cleanups now.
-> 
-> When I need to split a patch into pieces, usually what I do is that I
-> revert it, re-apply it without committing, then "git add -p", validate
-> all the hunks to be taken as the first patch (ie here the cleanups),
-> commit, then commit the rest as a separate one. It seems to me that the
-> fix is in the last few hunks though I'm not sure yet.
-> 
-> Thanks,
-> Willy
+omap-rng also supports Marvell Armada 7k/8k SoCs, but no mention of this
+is made in the help text, despite the dependency being added. Explicitly
+mention these SoCs in the help description so people know that it covers
+more than just TI SoCs.
 
-Hi Willy,
+Fixes: 383212425c92 ("hwrng: omap - Add device variant for SafeXcel IP-76 found in Armada 8K")
+Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
+---
+ drivers/char/hw_random/Kconfig | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-I didn't know about this 'trick' until now. Thanks for sharing it! I gave it a short try recently, that's really cool!
-
-Since the problem discussed in this branch of this thread seems to be solved (see Minchans E-Mail), I won't split the patches, though.
-Or is there an actual need for doing so? I will send an updated patchset (containing these patches + the other ones suggested by Eric) later.
-
-Regards,
-
-Sven
+diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+index ceff2fc524b1..0cafe08919c9 100644
+--- a/drivers/char/hw_random/Kconfig
++++ b/drivers/char/hw_random/Kconfig
+@@ -172,8 +172,8 @@ config HW_RANDOM_OMAP
+ 	default HW_RANDOM
+  	---help---
+  	  This driver provides kernel-side support for the Random Number
+-	  Generator hardware found on OMAP16xx, OMAP2/3/4/5 and AM33xx/AM43xx
+-	  multimedia processors.
++	  Generator hardware found on OMAP16xx, OMAP2/3/4/5, AM33xx/AM43xx
++	  multimedia processors, and Marvell Armada 7k/8k SoCs.
+ 
+ 	  To compile this driver as a module, choose M here: the
+ 	  module will be called omap-rng.
+-- 
+2.7.4
