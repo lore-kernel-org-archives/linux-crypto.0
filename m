@@ -1,220 +1,75 @@
-From: Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
-Subject: Re: [PATCH v7 0/5] Update LZ4 compressor module
-Date: Mon, 13 Feb 2017 13:08:41 +0100
-Message-ID: <20170213120841.GB22510@bierbaron.springfield.local>
+From: Willy Tarreau <w@1wt.eu>
+Subject: Re: [PATCH] lz4: fix performance regressions
+Date: Mon, 13 Feb 2017 14:37:03 +0100
+Message-ID: <20170213133703.GC31635@1wt.eu>
 References: <20170210001311.GA25078@bbox>
  <1486898178-17125-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
- <20170213000324.GA5379@bbox>
+ <1486898178-17125-2-git-send-email-4sschmid@informatik.uni-hamburg.de>
+ <20170212130508.GA27710@1wt.eu>
+ <20170212152000.GA24704@bierbaron.springfield.local>
+ <20170212214117.GA30583@1wt.eu>
+ <20170213115349.GA22510@bierbaron.springfield.local>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: ebiggers3@gmail.com, akpm@linux-foundation.org,
+Cc: minchan@kernel.org, ebiggers3@gmail.com, akpm@linux-foundation.org,
         bongkyu.kim@lge.com, rsalvaterra@gmail.com,
         sergey.senozhatsky@gmail.com, gregkh@linuxfoundation.org,
         linux-kernel@vger.kernel.org, herbert@gondor.apana.org.au,
         davem@davemloft.net, linux-crypto@vger.kernel.org,
         anton@enomsg.org, ccross@android.com, keescook@chromium.org,
         tony.luck@intel.com
-To: Minchan Kim <minchan@kernel.org>
+To: Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailhost.informatik.uni-hamburg.de ([134.100.9.70]:63509 "EHLO
-        mailhost.informatik.uni-hamburg.de" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752559AbdBMMIt (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 13 Feb 2017 07:08:49 -0500
+Received: from wtarreau.pck.nerim.net ([62.212.114.60]:39160 "EHLO 1wt.eu"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751662AbdBMNhh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 13 Feb 2017 08:37:37 -0500
 Content-Disposition: inline
-In-Reply-To: <20170213000324.GA5379@bbox>
+In-Reply-To: <20170213115349.GA22510@bierbaron.springfield.local>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Feb 13, 2017 at 09:03:24AM +0900, Minchan Kim wrote:
-> Hi Sven,
+On Mon, Feb 13, 2017 at 12:53:49PM +0100, Sven Schmidt wrote:
+> On Sun, Feb 12, 2017 at 10:41:17PM +0100, Willy Tarreau wrote:
+> > On Sun, Feb 12, 2017 at 04:20:00PM +0100, Sven Schmidt wrote:
+> > > On Sun, Feb 12, 2017 at 02:05:08PM +0100, Willy Tarreau wrote:
+> > > > Hi Sven,
+> > > > 
+> > > > On Sun, Feb 12, 2017 at 12:16:18PM +0100, Sven Schmidt wrote:
+> > > > > Fix performance regressions compared to current kernel LZ4
+> > > > 
+> > > > Your patch contains mostly style cleanups which certainly are welcome
+> > > > but make the whole patch hard to review. These cleanups would have been
+> > > > better into a separate, preliminary patch IMHO.
+> > > > 
+> > > > Regards,
+> > > > Willy
+> > > 
+> > > Hi Willy,
+> > > 
+> > > the problem was, I wanted to compare my version to the upstream LZ4 to find bugs (as with my last patch version: wrong indentation in LZ4HC 
+> > > in two for loops). But since the LZ4 code is a pain to read, I made additional style cleanups "on the way".
+> > 
+> > Oh I can easily understand!
+> > 
+> > > Hope you can manage to review the patch though, because it is difficult to separate the cleanups now.
+> > 
+> > When I need to split a patch into pieces, usually what I do is that I
+> > revert it, re-apply it without committing, then "git add -p", validate
+> > all the hunks to be taken as the first patch (ie here the cleanups),
+> > commit, then commit the rest as a separate one. It seems to me that the
+> > fix is in the last few hunks though I'm not sure yet.
+> > 
+> > Thanks,
+> > Willy
 > 
-> On Sun, Feb 12, 2017 at 12:16:17PM +0100, Sven Schmidt wrote:
-> > 
-> > 
-> > 
-> > On 02/10/2017 01:13 AM, Minchan Kim wrote:
-> > > Hello Sven,
-> > >
-> > > On Thu, Feb 09, 2017 at 11:56:17AM +0100, Sven Schmidt wrote:
-> > >> Hey Minchan,
-> > >>
-> > >> On Thu, Feb 09, 2017 at 08:31:21AM +0900, Minchan Kim wrote:
-> > >>> Hello Sven,
-> > >>>
-> > >>> On Sun, Feb 05, 2017 at 08:09:03PM +0100, Sven Schmidt wrote:
-> > >>>>
-> > >>>> This patchset is for updating the LZ4 compression module to a version based
-> > >>>> on LZ4 v1.7.3 allowing to use the fast compression algorithm aka LZ4 fast
-> > >>>> which provides an "acceleration" parameter as a tradeoff between
-> > >>>> high compression ratio and high compression speed.
-> > >>>>
-> > >>>> We want to use LZ4 fast in order to support compression in lustre
-> > >>>> and (mostly, based on that) investigate data reduction techniques in behalf of
-> > >>>> storage systems.
-> > >>>>
-> > >>>> Also, it will be useful for other users of LZ4 compression, as with LZ4 fast
-> > >>>> it is possible to enable applications to use fast and/or high compression
-> > >>>> depending on the usecase.
-> > >>>> For instance, ZRAM is offering a LZ4 backend and could benefit from an updated
-> > >>>> LZ4 in the kernel.
-> > >>>>
-> > >>>> LZ4 homepage: http://www.lz4.org/
-> > >>>> LZ4 source repository: https://github.com/lz4/lz4
-> > >>>> Source version: 1.7.3
-> > >>>>
-> > >>>> Benchmark (taken from [1], Core i5-4300U @1.9GHz):
-> > >>>> ----------------|--------------|----------------|----------
-> > >>>> Compressor      | Compression  | Decompression  | Ratio
-> > >>>> ----------------|--------------|----------------|----------
-> > >>>> memcpy          |  4200 MB/s   |  4200 MB/s     | 1.000
-> > >>>> LZ4 fast 50     |  1080 MB/s   |  2650 MB/s     | 1.375
-> > >>>> LZ4 fast 17     |   680 MB/s   |  2220 MB/s     | 1.607
-> > >>>> LZ4 fast 5      |   475 MB/s   |  1920 MB/s     | 1.886
-> > >>>> LZ4 default     |   385 MB/s   |  1850 MB/s     | 2.101
-> > >>>>
-> > >>>> [1] http://fastcompression.blogspot.de/2015/04/sampling-or-faster-lz4.html
-> > >>>>
-> > >>>> [PATCH 1/5] lib: Update LZ4 compressor module
-> > >>>> [PATCH 2/5] lib/decompress_unlz4: Change module to work with new LZ4 module version
-> > >>>> [PATCH 3/5] crypto: Change LZ4 modules to work with new LZ4 module version
-> > >>>> [PATCH 4/5] fs/pstore: fs/squashfs: Change usage of LZ4 to work with new LZ4 version
-> > >>>> [PATCH 5/5] lib/lz4: Remove back-compat wrappers
-> > >>>
-> > >>> Today, I did zram-lz4 performance test with fio in current mmotm and
-> > >>> found it makes regression about 20%.
-> > >>>
-> > >>> "lz4-update" means current mmots(git://git.cmpxchg.org/linux-mmots.git) so
-> > >>> applied your 5 patches. (But now sure current mmots has recent uptodate
-> > >>> patches)
-> > >>> "revert" means I reverted your 5 patches in current mmots.
-> > >>>
-> > >>>                      revert    lz4-update
-> > >>>
-> > >>>       seq-write       1547       1339      86.55%
-> > >>>      rand-write      22775      19381      85.10%
-> > >>>        seq-read       7035       5589      79.45%
-> > >>>       rand-read      78556      68479      87.17%
-> > >>>    mixed-seq(R)       1305       1066      81.69%
-> > >>>    mixed-seq(W)       1205        984      81.66%
-> > >>>   mixed-rand(R)      17421      14993      86.06%
-> > >>>   mixed-rand(W)      17391      14968      86.07%
-> > >>
-> > >> which parts of the output (as well as units) are these values exactly?
-> > >> I did not work with fio until now, so I think I might ask before misinterpreting my results.
-> > >
-> > > It is IOPS.
-> > >
-> > >>  
-> > >>> My fio description file
-> > >>>
-> > >>> [global]
-> > >>> bs=4k
-> > >>> ioengine=sync
-> > >>> size=100m
-> > >>> numjobs=1
-> > >>> group_reporting
-> > >>> buffer_compress_percentage=30
-> > >>> scramble_buffers=0
-> > >>> filename=/dev/zram0
-> > >>> loops=10
-> > >>> fsync_on_close=1
-> > >>>
-> > >>> [seq-write]
-> > >>> bs=64k
-> > >>> rw=write
-> > >>> stonewall
-> > >>>
-> > >>> [rand-write]
-> > >>> rw=randwrite
-> > >>> stonewall
-> > >>>
-> > >>> [seq-read]
-> > >>> bs=64k
-> > >>> rw=read
-> > >>> stonewall
-> > >>>
-> > >>> [rand-read]
-> > >>> rw=randread
-> > >>> stonewall
-> > >>>
-> > >>> [mixed-seq]
-> > >>> bs=64k
-> > >>> rw=rw
-> > >>> stonewall
-> > >>>
-> > >>> [mixed-rand]
-> > >>> rw=randrw
-> > >>> stonewall
-> > >>>
-> > >>
-> > >> Great, this makes it easy for me to reproduce your test.
-> > >
-> > > If you have trouble to reproduce, feel free to ask me. I'm happy to test it. :)
-> > >
-> > > Thanks!
-> > >
-> > 
-> > Hi Minchan,
-> > 
-> > I will send an updated patch as a reply to this E-Mail. Would be really grateful If you'd test it and provide feedback!
-> > The patch should be applied to the current mmots tree.
-> > 
-> > In fact, the updated LZ4 _is_ slower than the current one in kernel. But I was not able to reproduce such large regressions
-> > as you did. I now tried to define FORCE_INLINE as Eric suggested. I also inlined some functions which weren't in upstream LZ4,
-> > but are defined as macros in the current kernel LZ4. The approach to replace LZ4_ARCH64 with the function call _seemed_ to behave
-> > worse than the macro, so I withdrew the change.
-> > 
-> > The main difference is, that I replaced the read32/read16/write... etc. functions using memcpy with the other ones defined 
-> > in upstream LZ4 (which can be switched using a macro). 
-> > The comment of the author stated, that they're as fast as the memcpy variants (or faster), but not as portable
-> > (which does not matter since we're not dependent for multiple compilers).
-> > 
-> > In my tests, this version is mostly as fast as the current kernel LZ4.
+> Hi Willy,
 > 
-> With a patch you sent, I cannot see enhancement so I wanted to dig in and
-> found how I was really careless.
+> I didn't know about this 'trick' until now. Thanks for sharing it! I gave it a short try recently, that's really cool!
 > 
-> I have tested both test with CONFIG_KASAN. OMG. With disabling it, I don't
-> see any regression any more. So, I'm really really *sorry* about noise and
-> wasting your time. However, I am curious why KASAN makes such difference.
-> 
+> Since the problem discussed in this branch of this thread seems to be solved (see Minchans E-Mail), I won't split the patches, though.
+> Or is there an actual need for doing so? I will send an updated patchset (containing these patches + the other ones suggested by Eric) later.
 
-Hey Minchan,
+It's probably too late for this time, but keep it in mind for next time :-)
 
-I'm glad to hear that! Nevertheless, the changes discussed here made some differences in my own tests (I believe it got a bit
-faster now) and we have the functions properly inlined, where this makes sense. Also, I added the '-O3' C-flag as Eric suggested.
-So, this was not really a waste of time, I think.
-
-> The reason I tested new updated lz4 is description says lz4 fast and
-> want to use it in zram. How can I do that? and How faster it is compared
-> to old?
->
-
-Unfortunately, in the current implementation (in crypto/lz4.c, which is used by zram) I'm setting the acceleration parameter 
-(which is the paramer making the compression 'fast', see LZ4_compress_fast) to 1 (which is the default) since I did not know how this
-patchset is accepted and this equals the behaviour currently available in kernel.
-
-Basically, the logic is 'higher acceleration = faster compression = lower compression ratio' and vice versa. 
-I included some benchmarks in my patch 0/5 E-Mail taken from the official LZ4:
-
-> > >>>> ----------------|--------------|----------------|----------
-> > >>>> Compressor      | Compression  | Decompression  | Ratio
-> > >>>> ----------------|--------------|----------------|----------
-> > >>>> memcpy          |  4200 MB/s   |  4200 MB/s     | 1.000
-> > >>>> LZ4 fast 50     |  1080 MB/s   |  2650 MB/s     | 1.375
-> > >>>> LZ4 fast 17     |   680 MB/s   |  2220 MB/s     | 1.607
-> > >>>> LZ4 fast 5      |   475 MB/s   |  1920 MB/s     | 1.886
-> > >>>> LZ4 default     |   385 MB/s   |  1850 MB/s     | 2.101
-> > >>>>
-
-fast 50 means: acceleration=50, default: acceleration=1.
-
-Besides the proposed patchset, I tried to implement a module parameter in crypto/lz4.c to set the acceleration factor.
-In my tests, the module parameter works out great.
-But I think this is subject to a future, separate patch. Especially since I had to 'work around' the crypto/testmgr.c, 
-which only tests acceleration=1 and there's no limit for acceleration.  
-
-Thanks for your help,
-
-Sven
+willy
