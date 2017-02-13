@@ -1,75 +1,56 @@
-From: Willy Tarreau <w@1wt.eu>
-Subject: Re: [PATCH] lz4: fix performance regressions
-Date: Mon, 13 Feb 2017 14:37:03 +0100
-Message-ID: <20170213133703.GC31635@1wt.eu>
-References: <20170210001311.GA25078@bbox>
- <1486898178-17125-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
- <1486898178-17125-2-git-send-email-4sschmid@informatik.uni-hamburg.de>
- <20170212130508.GA27710@1wt.eu>
- <20170212152000.GA24704@bierbaron.springfield.local>
- <20170212214117.GA30583@1wt.eu>
- <20170213115349.GA22510@bierbaron.springfield.local>
+From: Jon Mason <jon.mason@broadcom.com>
+Subject: Re: [PATCH v4 0/3] Add Broadcom SPU Crypto Driver
+Date: Mon, 13 Feb 2017 10:11:40 -0500
+Message-ID: <CAC3K-4orafSfvi-1E5+sS_c7_2nbU3tzk-QMaJg555q40a-GGg@mail.gmail.com>
+References: <1486144534-44887-1-git-send-email-rob.rice@broadcom.com>
+ <20170211105404.GF855@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: minchan@kernel.org, ebiggers3@gmail.com, akpm@linux-foundation.org,
-        bongkyu.kim@lge.com, rsalvaterra@gmail.com,
-        sergey.senozhatsky@gmail.com, gregkh@linuxfoundation.org,
-        linux-kernel@vger.kernel.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net, linux-crypto@vger.kernel.org,
-        anton@enomsg.org, ccross@android.com, keescook@chromium.org,
-        tony.luck@intel.com
-To: Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from wtarreau.pck.nerim.net ([62.212.114.60]:39160 "EHLO 1wt.eu"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751662AbdBMNhh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 13 Feb 2017 08:37:37 -0500
-Content-Disposition: inline
-In-Reply-To: <20170213115349.GA22510@bierbaron.springfield.local>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Mark Rutland <mark.rutland@arm.com>,
+ "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
+ <devicetree@vger.kernel.org>, Rob Rice <rob.rice@broadcom.com>,
+ Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>,
+ Rob Herring <robh+dt@kernel.org>,
+ BCM Kernel Feedback <bcm-kernel-feedback-list@broadcom.com>,
+ linux-crypto@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+ Florian Fainelli <f.fainelli@gmail.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20170211105404.GF855@gondor.apana.org.au>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Feb 13, 2017 at 12:53:49PM +0100, Sven Schmidt wrote:
-> On Sun, Feb 12, 2017 at 10:41:17PM +0100, Willy Tarreau wrote:
-> > On Sun, Feb 12, 2017 at 04:20:00PM +0100, Sven Schmidt wrote:
-> > > On Sun, Feb 12, 2017 at 02:05:08PM +0100, Willy Tarreau wrote:
-> > > > Hi Sven,
-> > > > 
-> > > > On Sun, Feb 12, 2017 at 12:16:18PM +0100, Sven Schmidt wrote:
-> > > > > Fix performance regressions compared to current kernel LZ4
-> > > > 
-> > > > Your patch contains mostly style cleanups which certainly are welcome
-> > > > but make the whole patch hard to review. These cleanups would have been
-> > > > better into a separate, preliminary patch IMHO.
-> > > > 
-> > > > Regards,
-> > > > Willy
-> > > 
-> > > Hi Willy,
-> > > 
-> > > the problem was, I wanted to compare my version to the upstream LZ4 to find bugs (as with my last patch version: wrong indentation in LZ4HC 
-> > > in two for loops). But since the LZ4 code is a pain to read, I made additional style cleanups "on the way".
-> > 
-> > Oh I can easily understand!
-> > 
-> > > Hope you can manage to review the patch though, because it is difficult to separate the cleanups now.
-> > 
-> > When I need to split a patch into pieces, usually what I do is that I
-> > revert it, re-apply it without committing, then "git add -p", validate
-> > all the hunks to be taken as the first patch (ie here the cleanups),
-> > commit, then commit the rest as a separate one. It seems to me that the
-> > fix is in the last few hunks though I'm not sure yet.
-> > 
-> > Thanks,
-> > Willy
-> 
-> Hi Willy,
-> 
-> I didn't know about this 'trick' until now. Thanks for sharing it! I gave it a short try recently, that's really cool!
-> 
-> Since the problem discussed in this branch of this thread seems to be solved (see Minchans E-Mail), I won't split the patches, though.
-> Or is there an actual need for doing so? I will send an updated patchset (containing these patches + the other ones suggested by Eric) later.
+On Sat, Feb 11, 2017 at 5:54 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> On Fri, Feb 03, 2017 at 12:55:31PM -0500, Rob Rice wrote:
+>> Changes in v4:
+>> - Added Rob Herring's Acked-by to patch 1/3 for bindings doc
+>> - In response to Herbert's comment, in ahash_export() and
+>>   ahash_import(), only copy the hash state, not state params
+>>   related to cipher or aead algos.
+>> - Noticed that hmac_offset in iproc_reqctx_s and spu_hash_params
+>>   wasn't really used. So removed.
+>
+> Patches 1-2 applied.  Thanks.
 
-It's probably too late for this time, but keep it in mind for next time :-)
+Thanks Herbert!
 
-willy
+Florian, could you please include patch #3 in your DT branch?
+
+Thanks,
+Jon
+
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
