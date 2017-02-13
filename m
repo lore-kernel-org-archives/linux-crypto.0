@@ -1,56 +1,48 @@
-From: Jon Mason <jon.mason@broadcom.com>
-Subject: Re: [PATCH v4 0/3] Add Broadcom SPU Crypto Driver
-Date: Mon, 13 Feb 2017 10:11:40 -0500
-Message-ID: <CAC3K-4orafSfvi-1E5+sS_c7_2nbU3tzk-QMaJg555q40a-GGg@mail.gmail.com>
-References: <1486144534-44887-1-git-send-email-rob.rice@broadcom.com>
- <20170211105404.GF855@gondor.apana.org.au>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: Qualcomm QCE driver: XTS setkey only allows 128 bit AES
+Date: Mon, 13 Feb 2017 16:30:04 +0100
+Message-ID: <1690729.u0Mf5VzSsv@tauon.atsec.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Mark Rutland <mark.rutland@arm.com>,
- "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
- <devicetree@vger.kernel.org>, Rob Rice <rob.rice@broadcom.com>,
- Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>,
- Rob Herring <robh+dt@kernel.org>,
- BCM Kernel Feedback <bcm-kernel-feedback-list@broadcom.com>,
- linux-crypto@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- "David S. Miller" <davem@davemloft.net>,
- linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
- Florian Fainelli <f.fainelli@gmail.com>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20170211105404.GF855@gondor.apana.org.au>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Transfer-Encoding: 7Bit
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:56338 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752333AbdBMPaR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 13 Feb 2017 10:30:17 -0500
+Received: from tauon.atsec.com (mail.eperm.de [89.247.134.16])
+        by mail.eperm.de (Postfix) with ESMTPSA id 59C62181CF33
+        for <linux-crypto@vger.kernel.org>; Mon, 13 Feb 2017 16:30:05 +0100 (CET)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Feb 11, 2017 at 5:54 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> On Fri, Feb 03, 2017 at 12:55:31PM -0500, Rob Rice wrote:
->> Changes in v4:
->> - Added Rob Herring's Acked-by to patch 1/3 for bindings doc
->> - In response to Herbert's comment, in ahash_export() and
->>   ahash_import(), only copy the hash state, not state params
->>   related to cipher or aead algos.
->> - Noticed that hmac_offset in iproc_reqctx_s and spu_hash_params
->>   wasn't really used. So removed.
->
-> Patches 1-2 applied.  Thanks.
+Hi,
 
-Thanks Herbert!
+The Qualcomm QCE driver implementation defines:
 
-Florian, could you please include patch #3 in your DT branch?
+                .flags          = QCE_ALG_AES | QCE_MODE_XTS,
+                .name           = "xts(aes)",
+                .drv_name       = "xts-aes-qce",
+                .blocksize      = AES_BLOCK_SIZE,
+                .ivsize         = AES_BLOCK_SIZE,
+                .min_keysize    = AES_MIN_KEY_SIZE,
+                .max_keysize    = AES_MAX_KEY_SIZE,
 
-Thanks,
-Jon
+and
 
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+        alg->cra_ablkcipher.min_keysize = def->min_keysize;
+        alg->cra_ablkcipher.max_keysize = def->max_keysize;
+        alg->cra_ablkcipher.setkey = qce_ablkcipher_setkey;
+
+Thus, this driver has the limits of 128 to 256 bits for the key. Furthermore, 
+the common setkey function is used.
+
+May I ask how the key for AES XTS is supposed to be handled here considering 
+that the kernel crypto API expects that the AES key and the tweak key is set 
+via one setkey call. I.e. the setkey should expect 256 through 512 bits.
+
+Thanks.
+
+Ciao
+Stephan
