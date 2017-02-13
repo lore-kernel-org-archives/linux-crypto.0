@@ -1,45 +1,58 @@
-From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: crypto: NULL deref in sha512_mb_mgr_get_comp_job_avx2
-Date: Mon, 13 Feb 2017 09:20:48 -0800
-Message-ID: <1487006448.2833.94.camel@linux.intel.com>
-References: <CACT4Y+Z6_x2smshuSgQx0wA+g0H+5dJsF23UqYb9Z_WkDUvwcw@mail.gmail.com>
-         <20170201184502.GA11649@linux.intel.com>
-         <20170211105043.GA855@gondor.apana.org.au>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [PATCH v3] crypto: algapi - make crypto_xor() and crypto_inc()
+ alignment agnostic
+Date: Mon, 13 Feb 2017 22:55:20 +0100
+Message-ID: <CAHmME9o9Rg2bcb1dibAyTUCSYGuzicSU__62P_G9G8ARJkgs=Q@mail.gmail.com>
+References: <1486289172-18604-1-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-Cc: Dmitry Vyukov <dvyukov@google.com>,
-        David Miller <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        megha.dey@linux.intel.com, fenghua.yu@intel.com,
-        syzkaller <syzkaller@googlegroups.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Eric Biggers <ebiggers3@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:27752 "EHLO mga03.intel.com"
+Received: from frisell.zx2c4.com ([192.95.5.64]:58169 "EHLO frisell.zx2c4.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752252AbdBMRUu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 13 Feb 2017 12:20:50 -0500
-In-Reply-To: <20170211105043.GA855@gondor.apana.org.au>
+        id S1753095AbdBMVzX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 13 Feb 2017 16:55:23 -0500
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 9c3b807a
+        for <linux-crypto@vger.kernel.org>;
+        Mon, 13 Feb 2017 21:41:14 +0000 (UTC)
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id dafb15f9 (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128:NO)
+        for <linux-crypto@vger.kernel.org>;
+        Mon, 13 Feb 2017 21:41:14 +0000 (UTC)
+Received: by mail-oi0-f53.google.com with SMTP id s203so58990253oie.1
+        for <linux-crypto@vger.kernel.org>; Mon, 13 Feb 2017 13:55:21 -0800 (PST)
+In-Reply-To: <1486289172-18604-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, 2017-02-11 at 18:50 +0800, Herbert Xu wrote:
-> On Wed, Feb 01, 2017 at 10:45:02AM -0800, Tim Chen wrote:
-> > 
-> > 
-> > One theory that Mehga and I have is that perhaps the flusher
-> > and regular computaion updates are stepping on each other. 
-> > Can you try this patch and see if it helps?
-> Patch applied.  Thanks.
+On Sun, Feb 5, 2017 at 11:06 AM, Ard Biesheuvel
+<ard.biesheuvel@linaro.org> wrote:
+> +       if (IS_ENABLED(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS) ||
+> +           !((unsigned long)b & (__alignof__(*b) - 1)))
 
-Herbert,
+Why not simply use the IS_ALIGNED macro?
 
-Megha is now able to create a test set up that produce
-similar problem reported by Dmitry.  This patch did not
-completely fix it.  So maybe you can hold off on merging
-this patch to the mainline till we can develop a more
-complete fix.
+Also, are you might consider checking to see if this is a constant, so
+that you can avoid an unnecessary branch. Alternatively, if you want
+to use the branch, I'd be interested in you writing back saying, "I
+tested both cases, and branching is faster than always using the slow
+unaligned path."
+> +               while (((unsigned long)dst & (relalign - 1)) && len > 0) {
 
-Thanks.
+IS_ALIGNED
 
-Tim
+> +static inline void crypto_xor(u8 *dst, const u8 *src, unsigned int size)
+> +{
+> +       if (IS_ENABLED(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS) &&
+> +           __builtin_constant_p(size) &&
+> +           (size % sizeof(unsigned long)) == 0) {
+
+You can expand this condition to be:
+
+if ( (is_constant(size) && size%sizeof(ulong)==0) &&
+(efficient_unaligned || (is_constant(dst) && is_constant(src) &&
+is_aligned(dst) && is_aligned(src))) )
+
+It might seem complex, but it all gets compiled out.
