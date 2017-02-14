@@ -1,60 +1,54 @@
-From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: [bug report] crypto: cavium - Add Support for Octeon-tx CPT Engine
-Date: Tue, 14 Feb 2017 11:28:49 +0300
-Message-ID: <20170214082848.GA12537@mwanda>
+From: George Cherian <george.cherian@cavium.com>
+Subject: [PATCH] drivers: crypto: cpt: cpt_bind_vq_to_grp could return an error code
+Date: Tue, 14 Feb 2017 09:23:17 +0000
+Message-ID: <1487064197-1659-1-git-send-email-george.cherian@cavium.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: george.cherian@cavium.com
+Content-Type: text/plain
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        George Cherian <george.cherian@cavium.com>
+To: herbert@gondor.apana.org.au, davem@davemloft.net,
+        dan.carpenter@oracle.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from aserp1040.oracle.com ([141.146.126.69]:38751 "EHLO
-        aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750859AbdBNI3B (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 14 Feb 2017 03:29:01 -0500
-Content-Disposition: inline
+Received: from mail-by2nam03on0077.outbound.protection.outlook.com ([104.47.42.77]:64960
+        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752418AbdBNJX7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 14 Feb 2017 04:23:59 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello George Cherian,
+cpt_bind_vq_to_grp() could return an error code. However, it currently
+returns a u8. This produce the static checker warning.
 
-The patch 9e2c7d99941d: "crypto: cavium - Add Support for Octeon-tx
-CPT Engine" from Feb 7, 2017, leads to the following static checker
-warning:
+drivers/crypto/cavium/cpt/cptpf_mbox.c:70 cpt_bind_vq_to_grp() warn: signedness bug returning '(-22)'
 
-	drivers/crypto/cavium/cpt/cptpf_mbox.c:70 cpt_bind_vq_to_grp()
-	warn: signedness bug returning '(-22)'
+Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
+Signed-off-by: George Cherian <george.cherian@cavium.com>
+---
+ drivers/crypto/cavium/cpt/cptpf_mbox.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-drivers/crypto/cavium/cpt/cptpf_mbox.c
-    62  static u8 cpt_bind_vq_to_grp(struct cpt_device *cpt, u8 q, u8 grp)
-               ^^
-    63  {
-    64          struct microcode *mcode = cpt->mcode;
-    65          union cptx_pf_qx_ctl pf_qx_ctl;
-    66          struct device *dev = &cpt->pdev->dev;
-    67  
-    68          if (q >= CPT_MAX_VF_NUM) {
-    69                  dev_err(dev, "Queues are more than cores in the group");
-    70                  return -EINVAL;
-                        ^^^^^^^^^^^^^^^
-    71          }
-    72          if (grp >= CPT_MAX_CORE_GROUPS) {
-    73                  dev_err(dev, "Request group is more than possible groups");
-    74                  return -EINVAL;
-                        ^^^^^^^^^^^^^^^
-    75          }
-    76          if (grp >= cpt->next_mc_idx) {
-    77                  dev_err(dev, "Request group is higher than available functional groups");
-    78                  return -EINVAL;
-                        ^^^^^^^^^^^^^^^
-    79          }
-    80          pf_qx_ctl.u = cpt_read_csr64(cpt->reg_base, CPTX_PF_QX_CTL(0, q));
-    81          pf_qx_ctl.s.grp = mcode[grp].group;
-    82          cpt_write_csr64(cpt->reg_base, CPTX_PF_QX_CTL(0, q), pf_qx_ctl.u);
-    83          dev_dbg(dev, "VF %d TYPE %s", q, (mcode[grp].is_ae ? "AE" : "SE"));
-    84  
-    85          return mcode[grp].is_ae ? AE_TYPES : SE_TYPES;
-    86  }
-
-regards,
-dan carpenter
+diff --git a/drivers/crypto/cavium/cpt/cptpf_mbox.c b/drivers/crypto/cavium/cpt/cptpf_mbox.c
+index 5818b41..20f2c6e 100644
+--- a/drivers/crypto/cavium/cpt/cptpf_mbox.c
++++ b/drivers/crypto/cavium/cpt/cptpf_mbox.c
+@@ -59,7 +59,7 @@ static void cpt_cfg_vq_priority(struct cpt_device *cpt, int vf, u32 pri)
+ 	cpt_write_csr64(cpt->reg_base, CPTX_PF_QX_CTL(0, vf), pf_qx_ctl.u);
+ }
+ 
+-static u8 cpt_bind_vq_to_grp(struct cpt_device *cpt, u8 q, u8 grp)
++static int cpt_bind_vq_to_grp(struct cpt_device *cpt, u8 q, u8 grp)
+ {
+ 	struct microcode *mcode = cpt->mcode;
+ 	union cptx_pf_qx_ctl pf_qx_ctl;
+@@ -90,7 +90,7 @@ static void cpt_handle_mbox_intr(struct cpt_device *cpt, int vf)
+ {
+ 	struct cpt_vf_info *vfx = &cpt->vfinfo[vf];
+ 	struct cpt_mbox mbx = {};
+-	u8 vftype;
++	int vftype;
+ 	struct device *dev = &cpt->pdev->dev;
+ 	/*
+ 	 * MBOX[0] contains msg
+-- 
+2.1.4
