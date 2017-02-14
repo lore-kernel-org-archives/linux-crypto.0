@@ -1,67 +1,60 @@
 From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: [bug report] crypto: brcm - Add Broadcom SPU driver
-Date: Tue, 14 Feb 2017 10:55:52 +0300
-Message-ID: <20170214075552.GA27050@mwanda>
+Subject: [bug report] crypto: cavium - Add Support for Octeon-tx CPT Engine
+Date: Tue, 14 Feb 2017 11:28:49 +0300
+Message-ID: <20170214082848.GA12537@mwanda>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org
-To: rob.rice@broadcom.com
+To: george.cherian@cavium.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from userp1040.oracle.com ([156.151.31.81]:39783 "EHLO
-        userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751830AbdBNH4S (ORCPT
+Received: from aserp1040.oracle.com ([141.146.126.69]:38751 "EHLO
+        aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750859AbdBNI3B (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 14 Feb 2017 02:56:18 -0500
+        Tue, 14 Feb 2017 03:29:01 -0500
 Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello Rob Rice,
+Hello George Cherian,
 
-The patch 9d12ba86f818: "crypto: brcm - Add Broadcom SPU driver" from
-Feb 3, 2017, leads to the following static checker warning:
+The patch 9e2c7d99941d: "crypto: cavium - Add Support for Octeon-tx
+CPT Engine" from Feb 7, 2017, leads to the following static checker
+warning:
 
-	drivers/crypto/bcm/cipher.c:2340 ahash_finup()
-	warn: 'tmpbuf' was already freed.
+	drivers/crypto/cavium/cpt/cptpf_mbox.c:70 cpt_bind_vq_to_grp()
+	warn: signedness bug returning '(-22)'
 
-drivers/crypto/bcm/cipher.c
-  2316                  /* Copy data from req scatterlist to tmp buffer */
-  2317                  gfp = (req->base.flags & (CRYPTO_TFM_REQ_MAY_BACKLOG |
-  2318                         CRYPTO_TFM_REQ_MAY_SLEEP)) ? GFP_KERNEL : GFP_ATOMIC;
-  2319                  tmpbuf = kmalloc(req->nbytes, gfp);
-  2320                  if (!tmpbuf) {
-  2321                          ret = -ENOMEM;
-  2322                          goto ahash_finup_exit;
-  2323                  }
-  2324  
-  2325                  if (sg_copy_to_buffer(req->src, nents, tmpbuf, req->nbytes) !=
-  2326                                  req->nbytes) {
-  2327                          ret = -EINVAL;
-  2328                          goto ahash_finup_free;
-  2329                  }
-  2330  
-  2331                  /* Call synchronous update */
-  2332                  ret = crypto_shash_finup(ctx->shash, tmpbuf, req->nbytes,
-  2333                                           req->result);
-  2334                  kfree(tmpbuf);
-                        ^^^^^^^^^^^^^
-  2335          } else {
-  2336                  /* Otherwise call the internal function which uses SPU hw */
-  2337                  return __ahash_finup(req);
-  2338          }
-  2339  ahash_finup_free:
-  2340          kfree(tmpbuf);
-                ^^^^^^^^^^^^^
-I'm only working a 30 minutes per day to keep a hand in.  I'm not
-sending patches this month.
-
-  2341  
-  2342  ahash_finup_exit:
-  2343          /* Done with hash, can deallocate it now */
-  2344          crypto_free_shash(ctx->shash->tfm);
-  2345          kfree(ctx->shash);
-  2346          return ret;
-  2347  }
+drivers/crypto/cavium/cpt/cptpf_mbox.c
+    62  static u8 cpt_bind_vq_to_grp(struct cpt_device *cpt, u8 q, u8 grp)
+               ^^
+    63  {
+    64          struct microcode *mcode = cpt->mcode;
+    65          union cptx_pf_qx_ctl pf_qx_ctl;
+    66          struct device *dev = &cpt->pdev->dev;
+    67  
+    68          if (q >= CPT_MAX_VF_NUM) {
+    69                  dev_err(dev, "Queues are more than cores in the group");
+    70                  return -EINVAL;
+                        ^^^^^^^^^^^^^^^
+    71          }
+    72          if (grp >= CPT_MAX_CORE_GROUPS) {
+    73                  dev_err(dev, "Request group is more than possible groups");
+    74                  return -EINVAL;
+                        ^^^^^^^^^^^^^^^
+    75          }
+    76          if (grp >= cpt->next_mc_idx) {
+    77                  dev_err(dev, "Request group is higher than available functional groups");
+    78                  return -EINVAL;
+                        ^^^^^^^^^^^^^^^
+    79          }
+    80          pf_qx_ctl.u = cpt_read_csr64(cpt->reg_base, CPTX_PF_QX_CTL(0, q));
+    81          pf_qx_ctl.s.grp = mcode[grp].group;
+    82          cpt_write_csr64(cpt->reg_base, CPTX_PF_QX_CTL(0, q), pf_qx_ctl.u);
+    83          dev_dbg(dev, "VF %d TYPE %s", q, (mcode[grp].is_ae ? "AE" : "SE"));
+    84  
+    85          return mcode[grp].is_ae ? AE_TYPES : SE_TYPES;
+    86  }
 
 regards,
 dan carpenter
