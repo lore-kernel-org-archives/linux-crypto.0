@@ -1,145 +1,211 @@
-From: Eric Biggers <ebiggers@google.com>
-Subject: [PATCH 3/4] crypto: gf128mul - rename the byte overflow tables
-Date: Tue, 14 Feb 2017 13:43:29 -0800
-Message-ID: <20170214214330.99845-4-ebiggers@google.com>
-References: <20170214214330.99845-1-ebiggers@google.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Biggers <ebiggers@google.com>,
-        Alex Cope <alexcope@google.com>
-To: linux-crypto@vger.kernel.org
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH v2 1/2] crypto: arm/aes-neonbs - resolve fallback cipher at runtime
+Date: Tue, 14 Feb 2017 21:51:01 +0000
+Message-ID: <1487109062-3419-1-git-send-email-ard.biesheuvel@linaro.org>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-it0-f41.google.com ([209.85.214.41]:36257 "EHLO
-        mail-it0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753311AbdBNVqE (ORCPT
+Received: from mail-wm0-f42.google.com ([74.125.82.42]:37748 "EHLO
+        mail-wm0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752651AbdBNVv1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 14 Feb 2017 16:46:04 -0500
-Received: by mail-it0-f41.google.com with SMTP id c7so52110279itd.1
-        for <linux-crypto@vger.kernel.org>; Tue, 14 Feb 2017 13:46:04 -0800 (PST)
-In-Reply-To: <20170214214330.99845-1-ebiggers@google.com>
+        Tue, 14 Feb 2017 16:51:27 -0500
+Received: by mail-wm0-f42.google.com with SMTP id v77so27575028wmv.0
+        for <linux-crypto@vger.kernel.org>; Tue, 14 Feb 2017 13:51:26 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Though the GF(2^128) byte overflow tables were named the "lle" and "bbe"
-tables, they are not actually tied to these element formats
-specifically, but rather to particular a "bit endianness".  For example,
-the bbe table is actually used for both bbe and ble multiplication.
-Therefore, rename the tables to "le" and "be" and update the comment to
-explain this.
+Currently, the bit sliced NEON AES code for ARM has a link time
+dependency on the scalar ARM asm implementation, which it uses as a
+fallback to perform CBC encryption and the encryption of the initial
+XTS tweak.
 
-Cc: Alex Cope <alexcope@google.com>
-Signed-off-by: Eric Biggers <ebiggers@google.com>
+The bit sliced NEON code is both fast and time invariant, which makes
+it a reasonable default on hardware that supports it. However, the
+ARM asm code it pulls in is not time invariant, and due to the way it
+is linked in, cannot be overridden by the new generic time invariant
+driver. In fact, it will not be used at all, given that the ARM asm
+code registers itself as a cipher with a priority that exceeds the
+priority of the fixed time cipher.
+
+So remove the link time dependency, and allocate the fallback cipher
+via the crypto API. Note that this requires this driver's module_init
+call to be replaced with late_initcall, so that the (possibly generic)
+fallback cipher is guaranteed to be available when the builtin test
+is performed at registration time.
+
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- crypto/gf128mul.c | 49 ++++++++++++++++++++++++++++++++-----------------
- 1 file changed, 32 insertions(+), 17 deletions(-)
+v2: remove spurious change from aesbs_xts_setkey()
 
-diff --git a/crypto/gf128mul.c b/crypto/gf128mul.c
-index c050cf6f5aa9..1fde1c79ffa5 100644
---- a/crypto/gf128mul.c
-+++ b/crypto/gf128mul.c
-@@ -88,31 +88,46 @@
- 	q(0xf8), q(0xf9), q(0xfa), q(0xfb), q(0xfc), q(0xfd), q(0xfe), q(0xff) \
+ arch/arm/crypto/Kconfig           |  2 +-
+ arch/arm/crypto/aes-neonbs-glue.c | 60 +++++++++++++++-----
+ 2 files changed, 46 insertions(+), 16 deletions(-)
+
+diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
+index a8fce93137fb..b9adedcc5b2e 100644
+--- a/arch/arm/crypto/Kconfig
++++ b/arch/arm/crypto/Kconfig
+@@ -73,7 +73,7 @@ config CRYPTO_AES_ARM_BS
+ 	depends on KERNEL_MODE_NEON
+ 	select CRYPTO_BLKCIPHER
+ 	select CRYPTO_SIMD
+-	select CRYPTO_AES_ARM
++	select CRYPTO_AES
+ 	help
+ 	  Use a faster and more secure NEON based implementation of AES in CBC,
+ 	  CTR and XTS modes
+diff --git a/arch/arm/crypto/aes-neonbs-glue.c b/arch/arm/crypto/aes-neonbs-glue.c
+index 2920b96dbd36..c76377961444 100644
+--- a/arch/arm/crypto/aes-neonbs-glue.c
++++ b/arch/arm/crypto/aes-neonbs-glue.c
+@@ -42,9 +42,6 @@ asmlinkage void aesbs_xts_encrypt(u8 out[], u8 const in[], u8 const rk[],
+ asmlinkage void aesbs_xts_decrypt(u8 out[], u8 const in[], u8 const rk[],
+ 				  int rounds, int blocks, u8 iv[]);
+ 
+-asmlinkage void __aes_arm_encrypt(const u32 rk[], int rounds, const u8 in[],
+-				  u8 out[]);
+-
+ struct aesbs_ctx {
+ 	int	rounds;
+ 	u8	rk[13 * (8 * AES_BLOCK_SIZE) + 32] __aligned(AES_BLOCK_SIZE);
+@@ -52,12 +49,12 @@ struct aesbs_ctx {
+ 
+ struct aesbs_cbc_ctx {
+ 	struct aesbs_ctx	key;
+-	u32			enc[AES_MAX_KEYLENGTH_U32];
++	struct crypto_cipher	*enc_tfm;
+ };
+ 
+ struct aesbs_xts_ctx {
+ 	struct aesbs_ctx	key;
+-	u32			twkey[AES_MAX_KEYLENGTH_U32];
++	struct crypto_cipher	*tweak_tfm;
+ };
+ 
+ static int aesbs_setkey(struct crypto_skcipher *tfm, const u8 *in_key,
+@@ -132,20 +129,18 @@ static int aesbs_cbc_setkey(struct crypto_skcipher *tfm, const u8 *in_key,
+ 
+ 	ctx->key.rounds = 6 + key_len / 4;
+ 
+-	memcpy(ctx->enc, rk.key_enc, sizeof(ctx->enc));
+-
+ 	kernel_neon_begin();
+ 	aesbs_convert_key(ctx->key.rk, rk.key_enc, ctx->key.rounds);
+ 	kernel_neon_end();
+ 
+-	return 0;
++	return crypto_cipher_setkey(ctx->enc_tfm, in_key, key_len);
  }
  
--/*	Given the value i in 0..255 as the byte overflow when a field element
--    in GHASH is multiplied by x^8, this function will return the values that
--    are generated in the lo 16-bit word of the field value by applying the
--    modular polynomial. The values lo_byte and hi_byte are returned via the
--    macro xp_fun(lo_byte, hi_byte) so that the values can be assembled into
--    memory as required by a suitable definition of this macro operating on
--    the table above
--*/
-+/*
-+ * Given a value i in 0..255 as the byte overflow when a field element
-+ * in GF(2^128) is multiplied by x^8, the following macro returns the
-+ * 16-bit value that must be XOR-ed into the low-degree end of the
-+ * product to reduce it modulo the polynomial x^128 + x^7 + x^2 + x + 1.
-+ *
-+ * There are two versions of the macro, and hence two tables: one for
-+ * the "be" convention where the highest-order bit is the coefficient of
-+ * the highest-degree polynomial term, and one for the "le" convention
-+ * where the highest-order bit is the coefficient of the lowest-degree
-+ * polynomial term.  In both cases the values are stored in CPU byte
-+ * endianness such that the coefficients are ordered consistently across
-+ * bytes, i.e. in the "be" table bits 15..0 of the stored value
-+ * correspond to the coefficients of x^15..x^0, and in the "le" table
-+ * bits 15..0 correspond to the coefficients of x^0..x^15.
-+ *
-+ * Therefore, provided that the appropriate byte endianness conversions
-+ * are done by the multiplication functions (and these must be in place
-+ * anyway to support both little endian and big endian CPUs), the "be"
-+ * table can be used for multiplications of both "bbe" and "ble"
-+ * elements, and the "le" table can be used for multiplications of both
-+ * "lle" and "lbe" elements.
-+ */
- 
--#define xda_bbe(i) ( \
-+#define xda_be(i) ( \
- 	(i & 0x80 ? 0x4380 : 0) ^ (i & 0x40 ? 0x21c0 : 0) ^ \
- 	(i & 0x20 ? 0x10e0 : 0) ^ (i & 0x10 ? 0x0870 : 0) ^ \
- 	(i & 0x08 ? 0x0438 : 0) ^ (i & 0x04 ? 0x021c : 0) ^ \
- 	(i & 0x02 ? 0x010e : 0) ^ (i & 0x01 ? 0x0087 : 0) \
- )
- 
--#define xda_lle(i) ( \
-+#define xda_le(i) ( \
- 	(i & 0x80 ? 0xe100 : 0) ^ (i & 0x40 ? 0x7080 : 0) ^ \
- 	(i & 0x20 ? 0x3840 : 0) ^ (i & 0x10 ? 0x1c20 : 0) ^ \
- 	(i & 0x08 ? 0x0e10 : 0) ^ (i & 0x04 ? 0x0708 : 0) ^ \
- 	(i & 0x02 ? 0x0384 : 0) ^ (i & 0x01 ? 0x01c2 : 0) \
- )
- 
--static const u16 gf128mul_table_lle[256] = gf128mul_dat(xda_lle);
--static const u16 gf128mul_table_bbe[256] = gf128mul_dat(xda_bbe);
-+static const u16 gf128mul_table_le[256] = gf128mul_dat(xda_le);
-+static const u16 gf128mul_table_be[256] = gf128mul_dat(xda_be);
- 
- /*
-  * The following functions multiply a field element by x or by x^8 in
-@@ -125,7 +140,7 @@ static void gf128mul_x_lle(be128 *r, const be128 *x)
+ static void cbc_encrypt_one(struct crypto_skcipher *tfm, const u8 *src, u8 *dst)
  {
- 	u64 a = be64_to_cpu(x->a);
- 	u64 b = be64_to_cpu(x->b);
--	u64 _tt = gf128mul_table_lle[(b << 7) & 0xff];
-+	u64 _tt = gf128mul_table_le[(b << 7) & 0xff];
+ 	struct aesbs_cbc_ctx *ctx = crypto_skcipher_ctx(tfm);
  
- 	r->b = cpu_to_be64((b >> 1) | (a << 63));
- 	r->a = cpu_to_be64((a >> 1) ^ (_tt << 48));
-@@ -135,7 +150,7 @@ static void gf128mul_x_bbe(be128 *r, const be128 *x)
+-	__aes_arm_encrypt(ctx->enc, ctx->key.rounds, src, dst);
++	crypto_cipher_encrypt_one(ctx->enc_tfm, dst, src);
+ }
+ 
+ static int cbc_encrypt(struct skcipher_request *req)
+@@ -181,6 +176,23 @@ static int cbc_decrypt(struct skcipher_request *req)
+ 	return err;
+ }
+ 
++static int cbc_init(struct crypto_tfm *tfm)
++{
++	struct aesbs_cbc_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	ctx->enc_tfm = crypto_alloc_cipher("aes", 0, 0);
++	if (IS_ERR(ctx->enc_tfm))
++		return PTR_ERR(ctx->enc_tfm);
++	return 0;
++}
++
++static void cbc_exit(struct crypto_tfm *tfm)
++{
++	struct aesbs_cbc_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	crypto_free_cipher(ctx->enc_tfm);
++}
++
+ static int ctr_encrypt(struct skcipher_request *req)
  {
- 	u64 a = be64_to_cpu(x->a);
- 	u64 b = be64_to_cpu(x->b);
--	u64 _tt = gf128mul_table_bbe[a >> 63];
-+	u64 _tt = gf128mul_table_be[a >> 63];
- 
- 	r->a = cpu_to_be64((a << 1) | (b >> 63));
- 	r->b = cpu_to_be64((b << 1) ^ _tt);
-@@ -145,7 +160,7 @@ void gf128mul_x_ble(be128 *r, const be128 *x)
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+@@ -228,7 +240,6 @@ static int aesbs_xts_setkey(struct crypto_skcipher *tfm, const u8 *in_key,
+ 			    unsigned int key_len)
  {
- 	u64 a = le64_to_cpu(x->a);
- 	u64 b = le64_to_cpu(x->b);
--	u64 _tt = gf128mul_table_bbe[b >> 63];
-+	u64 _tt = gf128mul_table_be[b >> 63];
+ 	struct aesbs_xts_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	struct crypto_aes_ctx rk;
+ 	int err;
  
- 	r->a = cpu_to_le64((a << 1) ^ _tt);
- 	r->b = cpu_to_le64((b << 1) | (a >> 63));
-@@ -156,7 +171,7 @@ static void gf128mul_x8_lle(be128 *x)
- {
- 	u64 a = be64_to_cpu(x->a);
- 	u64 b = be64_to_cpu(x->b);
--	u64 _tt = gf128mul_table_lle[b & 0xff];
-+	u64 _tt = gf128mul_table_le[b & 0xff];
+ 	err = xts_verify_key(tfm, in_key, key_len);
+@@ -236,15 +247,30 @@ static int aesbs_xts_setkey(struct crypto_skcipher *tfm, const u8 *in_key,
+ 		return err;
  
- 	x->b = cpu_to_be64((b >> 8) | (a << 56));
- 	x->a = cpu_to_be64((a >> 8) ^ (_tt << 48));
-@@ -166,7 +181,7 @@ static void gf128mul_x8_bbe(be128 *x)
- {
- 	u64 a = be64_to_cpu(x->a);
- 	u64 b = be64_to_cpu(x->b);
--	u64 _tt = gf128mul_table_bbe[a >> 56];
-+	u64 _tt = gf128mul_table_be[a >> 56];
+ 	key_len /= 2;
+-	err = crypto_aes_expand_key(&rk, in_key + key_len, key_len);
++	err = crypto_cipher_setkey(ctx->tweak_tfm, in_key + key_len, key_len);
+ 	if (err)
+ 		return err;
  
- 	x->a = cpu_to_be64((a << 8) | (b >> 56));
- 	x->b = cpu_to_be64((b << 8) ^ _tt);
+-	memcpy(ctx->twkey, rk.key_enc, sizeof(ctx->twkey));
+-
+ 	return aesbs_setkey(tfm, in_key, key_len);
+ }
+ 
++static int xts_init(struct crypto_tfm *tfm)
++{
++	struct aesbs_xts_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	ctx->tweak_tfm = crypto_alloc_cipher("aes", 0, 0);
++	if (IS_ERR(ctx->tweak_tfm))
++		return PTR_ERR(ctx->tweak_tfm);
++	return 0;
++}
++
++static void xts_exit(struct crypto_tfm *tfm)
++{
++	struct aesbs_xts_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	crypto_free_cipher(ctx->tweak_tfm);
++}
++
+ static int __xts_crypt(struct skcipher_request *req,
+ 		       void (*fn)(u8 out[], u8 const in[], u8 const rk[],
+ 				  int rounds, int blocks, u8 iv[]))
+@@ -256,7 +282,7 @@ static int __xts_crypt(struct skcipher_request *req,
+ 
+ 	err = skcipher_walk_virt(&walk, req, true);
+ 
+-	__aes_arm_encrypt(ctx->twkey, ctx->key.rounds, walk.iv, walk.iv);
++	crypto_cipher_encrypt_one(ctx->tweak_tfm, walk.iv, walk.iv);
+ 
+ 	kernel_neon_begin();
+ 	while (walk.nbytes >= AES_BLOCK_SIZE) {
+@@ -309,6 +335,8 @@ static struct skcipher_alg aes_algs[] = { {
+ 	.base.cra_ctxsize	= sizeof(struct aesbs_cbc_ctx),
+ 	.base.cra_module	= THIS_MODULE,
+ 	.base.cra_flags		= CRYPTO_ALG_INTERNAL,
++	.base.cra_init		= cbc_init,
++	.base.cra_exit		= cbc_exit,
+ 
+ 	.min_keysize		= AES_MIN_KEY_SIZE,
+ 	.max_keysize		= AES_MAX_KEY_SIZE,
+@@ -342,6 +370,8 @@ static struct skcipher_alg aes_algs[] = { {
+ 	.base.cra_ctxsize	= sizeof(struct aesbs_xts_ctx),
+ 	.base.cra_module	= THIS_MODULE,
+ 	.base.cra_flags		= CRYPTO_ALG_INTERNAL,
++	.base.cra_init		= xts_init,
++	.base.cra_exit		= xts_exit,
+ 
+ 	.min_keysize		= 2 * AES_MIN_KEY_SIZE,
+ 	.max_keysize		= 2 * AES_MAX_KEY_SIZE,
+@@ -402,5 +432,5 @@ static int __init aes_init(void)
+ 	return err;
+ }
+ 
+-module_init(aes_init);
++late_initcall(aes_init);
+ module_exit(aes_exit);
 -- 
-2.11.0.483.g087da7b7c-goog
+2.7.4
