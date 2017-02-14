@@ -1,73 +1,67 @@
-From: Anup Patel <anup.patel@broadcom.com>
-Subject: [PATCH v4 4/4] dt-bindings: Add DT bindings document for Broadcom SBA RAID driver
-Date: Tue, 14 Feb 2017 12:21:52 +0530
-Message-ID: <1487055112-5185-5-git-send-email-anup.patel@broadcom.com>
-References: <1487055112-5185-1-git-send-email-anup.patel@broadcom.com>
-Cc: Dan Williams <dan.j.williams@intel.com>,
-        Ray Jui <rjui@broadcom.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        Jon Mason <jonmason@broadcom.com>,
-        Rob Rice <rob.rice@broadcom.com>,
-        bcm-kernel-feedback-list@broadcom.com, dmaengine@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-raid@vger.kernel.org, Anup Patel <anup.patel@broadcom.com>
-To: Vinod Koul <vinod.koul@intel.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Jassi Brar <jassisinghbrar@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1487055112-5185-1-git-send-email-anup.patel@broadcom.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: [bug report] crypto: brcm - Add Broadcom SPU driver
+Date: Tue, 14 Feb 2017 10:55:52 +0300
+Message-ID: <20170214075552.GA27050@mwanda>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: rob.rice@broadcom.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from userp1040.oracle.com ([156.151.31.81]:39783 "EHLO
+        userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751830AbdBNH4S (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 14 Feb 2017 02:56:18 -0500
+Content-Disposition: inline
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-This patch adds the DT bindings document for newly added Broadcom
-SBA RAID driver.
+Hello Rob Rice,
 
-Signed-off-by: Anup Patel <anup.patel@broadcom.com>
-Reviewed-by: Ray Jui <ray.jui@broadcom.com>
-Reviewed-by: Scott Branden <scott.branden@broadcom.com>
----
- .../devicetree/bindings/dma/brcm,iproc-sba.txt     | 29 ++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/dma/brcm,iproc-sba.txt
+The patch 9d12ba86f818: "crypto: brcm - Add Broadcom SPU driver" from
+Feb 3, 2017, leads to the following static checker warning:
 
-diff --git a/Documentation/devicetree/bindings/dma/brcm,iproc-sba.txt b/Documentation/devicetree/bindings/dma/brcm,iproc-sba.txt
-new file mode 100644
-index 0000000..092913a
---- /dev/null
-+++ b/Documentation/devicetree/bindings/dma/brcm,iproc-sba.txt
-@@ -0,0 +1,29 @@
-+* Broadcom SBA RAID engine
-+
-+Required properties:
-+- compatible: Should be one of the following
-+	      "brcm,iproc-sba"
-+	      "brcm,iproc-sba-v2"
-+  The "brcm,iproc-sba" has support for only 6 PQ coefficients
-+  The "brcm,iproc-sba-v2" has support for only 30 PQ coefficients
-+- mboxes: List of phandle and mailbox channel specifiers
-+
-+Example:
-+
-+raid_mbox: mbox@67400000 {
-+	...
-+	#mbox-cells = <3>;
-+	...
-+};
-+
-+raid0 {
-+	compatible = "brcm,iproc-sba-v2";
-+	mboxes = <&raid_mbox 0 0x1 0xffff>,
-+		 <&raid_mbox 1 0x1 0xffff>,
-+		 <&raid_mbox 2 0x1 0xffff>,
-+		 <&raid_mbox 3 0x1 0xffff>,
-+		 <&raid_mbox 4 0x1 0xffff>,
-+		 <&raid_mbox 5 0x1 0xffff>,
-+		 <&raid_mbox 6 0x1 0xffff>,
-+		 <&raid_mbox 7 0x1 0xffff>;
-+};
--- 
-2.7.4
+	drivers/crypto/bcm/cipher.c:2340 ahash_finup()
+	warn: 'tmpbuf' was already freed.
+
+drivers/crypto/bcm/cipher.c
+  2316                  /* Copy data from req scatterlist to tmp buffer */
+  2317                  gfp = (req->base.flags & (CRYPTO_TFM_REQ_MAY_BACKLOG |
+  2318                         CRYPTO_TFM_REQ_MAY_SLEEP)) ? GFP_KERNEL : GFP_ATOMIC;
+  2319                  tmpbuf = kmalloc(req->nbytes, gfp);
+  2320                  if (!tmpbuf) {
+  2321                          ret = -ENOMEM;
+  2322                          goto ahash_finup_exit;
+  2323                  }
+  2324  
+  2325                  if (sg_copy_to_buffer(req->src, nents, tmpbuf, req->nbytes) !=
+  2326                                  req->nbytes) {
+  2327                          ret = -EINVAL;
+  2328                          goto ahash_finup_free;
+  2329                  }
+  2330  
+  2331                  /* Call synchronous update */
+  2332                  ret = crypto_shash_finup(ctx->shash, tmpbuf, req->nbytes,
+  2333                                           req->result);
+  2334                  kfree(tmpbuf);
+                        ^^^^^^^^^^^^^
+  2335          } else {
+  2336                  /* Otherwise call the internal function which uses SPU hw */
+  2337                  return __ahash_finup(req);
+  2338          }
+  2339  ahash_finup_free:
+  2340          kfree(tmpbuf);
+                ^^^^^^^^^^^^^
+I'm only working a 30 minutes per day to keep a hand in.  I'm not
+sending patches this month.
+
+  2341  
+  2342  ahash_finup_exit:
+  2343          /* Done with hash, can deallocate it now */
+  2344          crypto_free_shash(ctx->shash->tfm);
+  2345          kfree(ctx->shash);
+  2346          return ret;
+  2347  }
+
+regards,
+dan carpenter
