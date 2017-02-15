@@ -1,74 +1,47 @@
-From: Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
-Subject: [PATCH v8 2/5] lib/decompress_unlz4: Change module to work with new LZ4 module version
-Date: Wed, 15 Feb 2017 19:16:35 +0100
-Message-ID: <1487182598-15351-3-git-send-email-4sschmid@informatik.uni-hamburg.de>
-References: <1482259992-16680-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
- <1487182598-15351-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
-Cc: bongkyu.kim@lge.com, rsalvaterra@gmail.com,
-        sergey.senozhatsky@gmail.com, gregkh@linuxfoundation.org,
-        linux-kernel@vger.kernel.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net, linux-crypto@vger.kernel.org,
-        anton@enomsg.org, ccross@android.com, keescook@chromium.org,
-        tony.luck@intel.com,
-        Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
-To: akpm@linux-foundation.org
+From: Gary R Hook <gary.hook@amd.com>
+Subject: [PATCH 0/3] Support new function in the newer CCP
+Date: Wed, 15 Feb 2017 15:55:46 -0600
+Message-ID: <20170215214954.26536.76736.stgit@taos>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailhost.informatik.uni-hamburg.de ([134.100.9.70]:39704 "EHLO
-        mailhost.informatik.uni-hamburg.de" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751729AbdBOSRa (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 15 Feb 2017 13:17:30 -0500
-In-Reply-To: <1487182598-15351-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
+Received: from mail-sn1nam02on0064.outbound.protection.outlook.com ([104.47.36.64]:26240
+        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1750806AbdBOVzy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 15 Feb 2017 16:55:54 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Update the unlz4 wrapper to work with the updated LZ4 kernel module
-version.
+The following series implements new function in a version 5
+coprocessor. New features are:
+ - Support for SHA-2 384-bit and 512-bit hashing
+ - Support for AES GCM encryption
+ - Support for 3DES encryption
 
-Signed-off-by: Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
 ---
- lib/decompress_unlz4.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
 
-diff --git a/lib/decompress_unlz4.c b/lib/decompress_unlz4.c
-index 036fc88..1b0baf3 100644
---- a/lib/decompress_unlz4.c
-+++ b/lib/decompress_unlz4.c
-@@ -72,7 +72,7 @@ STATIC inline int INIT unlz4(u8 *input, long in_len,
- 		error("NULL input pointer and missing fill function");
- 		goto exit_1;
- 	} else {
--		inp = large_malloc(lz4_compressbound(uncomp_chunksize));
-+		inp = large_malloc(LZ4_compressBound(uncomp_chunksize));
- 		if (!inp) {
- 			error("Could not allocate input buffer");
- 			goto exit_1;
-@@ -136,7 +136,7 @@ STATIC inline int INIT unlz4(u8 *input, long in_len,
- 			inp += 4;
- 			size -= 4;
- 		} else {
--			if (chunksize > lz4_compressbound(uncomp_chunksize)) {
-+			if (chunksize > LZ4_compressBound(uncomp_chunksize)) {
- 				error("chunk length is longer than allocated");
- 				goto exit_2;
- 			}
-@@ -152,11 +152,14 @@ STATIC inline int INIT unlz4(u8 *input, long in_len,
- 			out_len -= dest_len;
- 		} else
- 			dest_len = out_len;
--		ret = lz4_decompress(inp, &chunksize, outp, dest_len);
-+
-+		ret = LZ4_decompress_fast(inp, outp, dest_len);
-+		chunksize = ret;
- #else
- 		dest_len = uncomp_chunksize;
--		ret = lz4_decompress_unknownoutputsize(inp, chunksize, outp,
--				&dest_len);
-+
-+		ret = LZ4_decompress_safe(inp, outp, chunksize, dest_len);
-+		dest_len = ret;
- #endif
- 		if (ret < 0) {
- 			error("Decoding failed");
--- 
-2.1.4
+Gary R Hook (3):
+      crypto: ccp - Add SHA-2 384-/512-/bit support
+      crypto: ccp - Add support for AES GCM on v5 CCPs
+      crypto: ccp - Add 3DES function on v5 CCPs
+
+
+ drivers/crypto/ccp/Makefile                |    3 
+ drivers/crypto/ccp/ccp-crypto-aes-galois.c |  257 ++++++++++++++
+ drivers/crypto/ccp/ccp-crypto-des3.c       |  254 ++++++++++++++
+ drivers/crypto/ccp/ccp-crypto-main.c       |   30 ++
+ drivers/crypto/ccp/ccp-crypto-sha.c        |   22 +
+ drivers/crypto/ccp/ccp-crypto.h            |   44 ++
+ drivers/crypto/ccp/ccp-dev-v3.c            |    1 
+ drivers/crypto/ccp/ccp-dev-v5.c            |   54 +++
+ drivers/crypto/ccp/ccp-dev.h               |   14 +
+ drivers/crypto/ccp/ccp-ops.c               |  522 ++++++++++++++++++++++++++++
+ include/linux/ccp.h                        |   68 ++++
+ 11 files changed, 1263 insertions(+), 6 deletions(-)
+ create mode 100644 drivers/crypto/ccp/ccp-crypto-aes-galois.c
+ create mode 100644 drivers/crypto/ccp/ccp-crypto-des3.c
