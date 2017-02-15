@@ -1,143 +1,152 @@
-From: Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 2/3] crypto: cavium/cptpf: switch to pci_alloc_irq_vectors
-Date: Wed, 15 Feb 2017 08:18:42 +0100
-Message-ID: <20170215071843.30108-3-hch@lst.de>
-References: <20170215071843.30108-1-hch@lst.de>
-Cc: David Daney <david.daney@cavium.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: George Cherian <george.cherian@cavium.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170215071843.30108-1-hch@lst.de>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Dan Williams <dan.j.williams-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH v4 3/4] dmaengine: Add Broadcom SBA RAID driver
+Date: Tue, 14 Feb 2017 23:25:56 -0800
+Message-ID: <CAPcyv4h83vgeB82KmEEFV196MsWdteRqypY5_tcSyaMM_QwYMA@mail.gmail.com>
+References: <1487055112-5185-1-git-send-email-anup.patel@broadcom.com>
+ <1487055112-5185-4-git-send-email-anup.patel@broadcom.com>
+ <CAPcyv4g5PU1EQWq-SCbt0QB=vSaMyafqa-ThJifDxEoQha-6Hw@mail.gmail.com>
+ <CAALAos_=TN_ZfeJbRQEwuc+t5zaxKVgrgEMNPQQu8K8Q8+8F6A@mail.gmail.com>
+ <CAPcyv4jckb=sbocr3W43NZ2YyUVLbDdhbCAhLfgQwh-bRuvjYQ@mail.gmail.com> <CAALAos-txDCs3QZ4HGBNicOD8t49NPT6E8RpjVMccMn1D-UTgQ@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: Vinod Koul <vinod.koul-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
+        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+        "David S . Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+        Jassi Brar <jassisinghbrar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        Ray Jui <rjui-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
+        Scott Branden <sbranden-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
+        Jon Mason <jonmason-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
+        Rob Rice <rob.rice-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
+        BCM Kernel Feedback <bcm-kernel-feedback-list-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
+        "dmaengine-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <dmaengine-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        Device Tree <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        "linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org"
+        <linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>,
+        "linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-raid <linux-raid-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Anup Patel <anup.patel-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CAALAos-txDCs3QZ4HGBNicOD8t49NPT6E8RpjVMccMn1D-UTgQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-pci_enable_msix has been long deprecated, but this driver adds a new
-instance.  Convert it to pci_alloc_irq_vectors and greatly simplify
-the code.
+On Tue, Feb 14, 2017 at 11:03 PM, Anup Patel <anup.patel-dY08KVG/lbpWk0Htik3J/w@public.gmane.org> wrote:
+> On Wed, Feb 15, 2017 at 12:13 PM, Dan Williams <dan.j.williams-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org> wrote:
+>> On Tue, Feb 14, 2017 at 10:25 PM, Anup Patel <anup.patel-dY08KVG/lbpWk0Htik3J/w@public.gmane.org> wrote:
+>>> On Tue, Feb 14, 2017 at 10:04 PM, Dan Williams <dan.j.williams-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org> wrote:
+>>>> On Mon, Feb 13, 2017 at 10:51 PM, Anup Patel <anup.patel-dY08KVG/lbpWk0Htik3J/w@public.gmane.org> wrote:
+>>>>> The Broadcom stream buffer accelerator (SBA) provides offloading
+>>>>> capabilities for RAID operations. This SBA offload engine is
+>>>>> accessible via Broadcom SoC specific ring manager.
+>>>>>
+>>>>> This patch adds Broadcom SBA RAID driver which provides one
+>>>>> DMA device with RAID capabilities using one or more Broadcom
+>>>>> SoC specific ring manager channels. The SBA RAID driver in its
+>>>>> current shape implements memcpy, xor, and pq operations.
+>>>>>
+>>>>> Signed-off-by: Anup Patel <anup.patel-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
+>>>>> Reviewed-by: Ray Jui <ray.jui-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
+>>>>> ---
+>>>>>  drivers/dma/Kconfig        |   13 +
+>>>>>  drivers/dma/Makefile       |    1 +
+>>>>>  drivers/dma/bcm-sba-raid.c | 1694 ++++++++++++++++++++++++++++++++++++++++++++
+>>>>>  3 files changed, 1708 insertions(+)
+>>>>>  create mode 100644 drivers/dma/bcm-sba-raid.c
+>>>>>
+>>>>> diff --git a/drivers/dma/Kconfig b/drivers/dma/Kconfig
+>>>>> index 263495d..bf8fb84 100644
+>>>>> --- a/drivers/dma/Kconfig
+>>>>> +++ b/drivers/dma/Kconfig
+>>>>> @@ -99,6 +99,19 @@ config AXI_DMAC
+>>>>>           controller is often used in Analog Device's reference designs for FPGA
+>>>>>           platforms.
+>>>>>
+>>>>> +config BCM_SBA_RAID
+>>>>> +       tristate "Broadcom SBA RAID engine support"
+>>>>> +       depends on (ARM64 && MAILBOX && RAID6_PQ) || COMPILE_TEST
+>>>>> +       select DMA_ENGINE
+>>>>> +       select DMA_ENGINE_RAID
+>>>>> +       select ASYNC_TX_ENABLE_CHANNEL_SWITCH
+>>>>
+>>>> I thought you agreed to drop this. Its usage is broken.
+>>>
+>>> If ASYNC_TX_ENABLE_CHANNEL_SWITCH is not selected
+>>> then async_dma_find_channel() will only try to find channel
+>>> with DMA_ASYNC_TX capability.
+>>>
+>>> The DMA_ASYNC_TX capability is set by
+>>> dma_async_device_register() when all Async Tx
+>>> capabilities are supported by a DMA devices namely
+>>> DMA_INTERRUPT, DMA_MEMCPY, DMA_XOR,
+>>> DMA_XOR_VAL, DMA_PQ, and DMA_PQ_VAL.
+>>>
+>>> We only support DMA_MEMCPY, DMA_XOR, and
+>>> DMA_PQ capabilities in BCM-SBA-RAID driver so
+>>> DMA_ASYNC_TX capability is never set for the
+>>> DMA device registered by BCM-SBA-RAID driver.
+>>>
+>>> Due to above, if ASYNC_TX_ENABLE_CHANNEL_SWITCH
+>>> is not selected then Async Tx APIs fail to find DMA
+>>> channel provided by BCM-SBA-RAID hence the
+>>> option ASYNC_TX_ENABLE_CHANNEL_SWITCH is
+>>> required for BCM-SBA-RAID.
+>>>
+>>> The DMA mappings are violated by channel switching
+>>> only if we switch form DMA channel A to DMA channel
+>>> B and both these DMA channels have different underlying
+>>> "struct device". In most of the cases DMA mappings
+>>> are not violated because DMA channels having
+>>> Async Tx capabilities are provided using same
+>>> underlying "struct device".
+>>
+>> No, fix the infrastructure. Do not put local hack in your driver for
+>> this global problem [1].
+>
+> There is no hack in the driver. We need
+> ASYNC_TX_ENABLE_CHANNEL_SWITCH
+> based on current state of dmaengine framework.
+>
+> The framework should be fixed as separate patchset.
+>
+> We have other RAID drivers such as xgene-dma and
+> mv_xor_v2 who also require
+> ASYNC_TX_ENABLE_CHANNEL_SWITCH due
+> to same reason.
+>
+> Fixing the framework and improving framework is
+> a ongoing process. I don't see why that should
+> stop this patchset.
+>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/crypto/cavium/cpt/cptpf.h      |  5 ---
- drivers/crypto/cavium/cpt/cptpf_main.c | 58 ++++++----------------------------
- 2 files changed, 10 insertions(+), 53 deletions(-)
+Because this driver is turning on a dangerous compile time option and
+is not using the functionality. If this silicon IP block appears in
+another product in the future paired with another DMA engine then the
+assumptions about a safe/single dma-device is violated.
 
-diff --git a/drivers/crypto/cavium/cpt/cptpf.h b/drivers/crypto/cavium/cpt/cptpf.h
-index 8a2a8e538da4..c0556c5f63c9 100644
---- a/drivers/crypto/cavium/cpt/cptpf.h
-+++ b/drivers/crypto/cavium/cpt/cptpf.h
-@@ -51,11 +51,6 @@ struct cpt_device {
- 	struct cpt_vf_info vfinfo[CPT_MAX_VF_NUM]; /* Per VF info */
- 
- 	void __iomem *reg_base; /* Register start address */
--	/* MSI-X */
--	u8 num_vec;
--	bool msix_enabled;
--	struct msix_entry msix_entries[CPT_PF_MSIX_VECTORS];
--	bool irq_allocated[CPT_PF_MSIX_VECTORS];
- 	struct pci_dev *pdev; /* pci device handle */
- 
- 	struct microcode mcode[CPT_MAX_CORE_GROUPS];
-diff --git a/drivers/crypto/cavium/cpt/cptpf_main.c b/drivers/crypto/cavium/cpt/cptpf_main.c
-index 682d57a11a75..4119c40e7c4b 100644
---- a/drivers/crypto/cavium/cpt/cptpf_main.c
-+++ b/drivers/crypto/cavium/cpt/cptpf_main.c
-@@ -332,26 +332,6 @@ static int cpt_ucode_load(struct cpt_device *cpt)
- 	return ret;
- }
- 
--static int cpt_enable_msix(struct cpt_device *cpt)
--{
--	int i, ret;
--
--	cpt->num_vec = CPT_PF_MSIX_VECTORS;
--
--	for (i = 0; i < cpt->num_vec; i++)
--		cpt->msix_entries[i].entry = i;
--
--	ret = pci_enable_msix(cpt->pdev, cpt->msix_entries, cpt->num_vec);
--	if (ret) {
--		dev_err(&cpt->pdev->dev, "Request for #%d msix vectors failed\n",
--			cpt->num_vec);
--		return ret;
--	}
--
--	cpt->msix_enabled = 1;
--	return 0;
--}
--
- static irqreturn_t cpt_mbx0_intr_handler(int irq, void *cpt_irq)
- {
- 	struct cpt_device *cpt = (struct cpt_device *)cpt_irq;
-@@ -361,26 +341,6 @@ static irqreturn_t cpt_mbx0_intr_handler(int irq, void *cpt_irq)
- 	return IRQ_HANDLED;
- }
- 
--static void cpt_disable_msix(struct cpt_device *cpt)
--{
--	if (cpt->msix_enabled) {
--		pci_disable_msix(cpt->pdev);
--		cpt->msix_enabled = 0;
--		cpt->num_vec = 0;
--	}
--}
--
--static void cpt_free_all_interrupts(struct cpt_device *cpt)
--{
--	int irq;
--
--	for (irq = 0; irq < cpt->num_vec; irq++) {
--		if (cpt->irq_allocated[irq])
--			free_irq(cpt->msix_entries[irq].vector, cpt);
--		cpt->irq_allocated[irq] = false;
--	}
--}
--
- static void cpt_reset(struct cpt_device *cpt)
- {
- 	cpt_write_csr64(cpt->reg_base, CPTX_PF_RESET(0), 1);
-@@ -506,32 +466,34 @@ static int cpt_register_interrupts(struct cpt_device *cpt)
- 	struct device *dev = &cpt->pdev->dev;
- 
- 	/* Enable MSI-X */
--	ret = cpt_enable_msix(cpt);
--	if (ret)
-+	ret = pci_alloc_irq_vectors(cpt->pdev, CPT_PF_MSIX_VECTORS,
-+			CPT_PF_MSIX_VECTORS, PCI_IRQ_MSIX);
-+	if (ret < 0) {
-+		dev_err(&cpt->pdev->dev, "Request for #%d msix vectors failed\n",
-+			CPT_PF_MSIX_VECTORS);
- 		return ret;
-+	}
- 
- 	/* Register mailbox interrupt handlers */
--	ret = request_irq(cpt->msix_entries[CPT_PF_INT_VEC_E_MBOXX(0)].vector,
-+	ret = request_irq(pci_irq_vector(cpt->pdev, CPT_PF_INT_VEC_E_MBOXX(0)),
- 			  cpt_mbx0_intr_handler, 0, "CPT Mbox0", cpt);
- 	if (ret)
- 		goto fail;
- 
--	cpt->irq_allocated[CPT_PF_INT_VEC_E_MBOXX(0)] = true;
--
- 	/* Enable mailbox interrupt */
- 	cpt_enable_mbox_interrupts(cpt);
- 	return 0;
- 
- fail:
- 	dev_err(dev, "Request irq failed\n");
--	cpt_free_all_interrupts(cpt);
-+	pci_disable_msix(cpt->pdev);
- 	return ret;
- }
- 
- static void cpt_unregister_interrupts(struct cpt_device *cpt)
- {
--	cpt_free_all_interrupts(cpt);
--	cpt_disable_msix(cpt);
-+	free_irq(pci_irq_vector(cpt->pdev, CPT_PF_INT_VEC_E_MBOXX(0)), cpt);
-+	pci_disable_msix(cpt->pdev);
- }
- 
- static int cpt_sriov_init(struct cpt_device *cpt, int num_vfs)
--- 
-2.11.0
+The realization of how async_tx was breaking DMA mapping api
+assumptions came after some of these dma-drivers were added to the
+kernel. We should stop making the problem worse.
+
+I should have submitted a patch like the below at the time we
+discovered this problem, but unfortunately it languished when I
+stopped maintaining the iop-adma and ioat drivers.
+
+diff --git a/drivers/dma/Kconfig b/drivers/dma/Kconfig
+index 263495d0adbd..6b30eb9ad125 100644
+--- a/drivers/dma/Kconfig
++++ b/drivers/dma/Kconfig
+@@ -35,6 +35,7 @@ comment "DMA Devices"
+
+ #core
+ config ASYNC_TX_ENABLE_CHANNEL_SWITCH
++       depends on BROKEN
+        bool
+
+ config ARCH_HAS_ASYNC_TX_FIND_CHANNEL
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
