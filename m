@@ -1,45 +1,28 @@
-From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: [bug report] crypto: cavium - Add the Virtual Function driver for CPT
-Date: Wed, 15 Feb 2017 11:39:09 +0300
-Message-ID: <20170215083909.GA12892@mwanda>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: Re: [PATCH v3 0/2] crypto: AF_ALG memory management fix
+Date: Wed, 15 Feb 2017 09:47:19 +0100
+Message-ID: <2976339.VnMoFl3GdB@positron.chronox.de>
+References: <1652737.cgCBfDoNyd@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8BIT
 Cc: linux-crypto@vger.kernel.org
-To: george.cherian@cavium.com
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from aserp1040.oracle.com ([141.146.126.69]:23040 "EHLO
-        aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750817AbdBOIj0 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 15 Feb 2017 03:39:26 -0500
-Content-Disposition: inline
+Received: from mail.eperm.de ([89.247.134.16]:59646 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751348AbdBOIrX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 15 Feb 2017 03:47:23 -0500
+In-Reply-To: <1652737.cgCBfDoNyd@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello George Cherian,
+Am Montag, 13. Februar 2017, 11:04:50 CET schrieb Stephan Müller:
 
-This is a semi-automatic email about new static checker warnings.
+Hi Herbert,
 
-The patch c694b233295b: "crypto: cavium - Add the Virtual Function 
-driver for CPT" from Feb 7, 2017, leads to the following Smatch 
-complaint:
+as I just saw that you marked my patch with changes requested in patchwork, 
+may I ask which changes should be applied?
 
-drivers/crypto/cavium/cpt/cptvf_reqmanager.c:333 do_post_process()
-	 warn: variable dereferenced before check 'cptvf' (see line 331)
-
-drivers/crypto/cavium/cpt/cptvf_reqmanager.c
-   330	{
-   331		struct pci_dev *pdev = cptvf->pdev;
-                                       ^^^^^^^^^^^
-Dereference.
-
-   332	
-   333		if (!info || !cptvf) {
-                              ^^^^^
-Check is too late.
-
-   334			dev_err(&pdev->dev, "Input params are incorrect for post processing\n");
-   335			return;
-
-regards,
-dan carpenter
+Ciao
+Stephan
