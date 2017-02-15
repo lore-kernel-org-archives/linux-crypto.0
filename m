@@ -1,28 +1,36 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [PATCH v3 0/2] crypto: AF_ALG memory management fix
-Date: Wed, 15 Feb 2017 09:47:19 +0100
-Message-ID: <2976339.VnMoFl3GdB@positron.chronox.de>
-References: <1652737.cgCBfDoNyd@positron.chronox.de>
+From: George Cherian <gcherian@caviumnetworks.com>
+Subject: Re: crypto/cavium MSI-X fixups
+Date: Wed, 15 Feb 2017 14:47:09 +0530
+Message-ID: <58A41C95.2090408@caviumnetworks.com>
+References: <20170215071843.30108-1-hch@lst.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
-Cc: linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:59646 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751348AbdBOIrX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 15 Feb 2017 03:47:23 -0500
-In-Reply-To: <1652737.cgCBfDoNyd@positron.chronox.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: David Daney <david.daney@cavium.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Christoph Hellwig <hch@lst.de>,
+        George Cherian <george.cherian@cavium.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20170215071843.30108-1-hch@lst.de>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Montag, 13. Februar 2017, 11:04:50 CET schrieb Stephan Müller:
+Hi Christoph,
 
-Hi Herbert,
 
-as I just saw that you marked my patch with changes requested in patchwork, 
-may I ask which changes should be applied?
+On 02/15/2017 12:48 PM, Christoph Hellwig wrote:
+> Hi George,
+>
+> your commit "crypto: cavium - Add Support for Octeon-tx CPT Engine"
+> add a new caller to pci_enable_msix.  This API has long been deprecated
+> so this series switches it to use pci_alloc_irq_vectors instead.
+>
+> Can you please test it and make sure it goes in before the end of the
+> merge window so that no more users of the old API hit mainline?
 
-Ciao
-Stephan
+Yes the changes works well.
+Acked-by: George Cherian <george.cherian@cavium.com>
+
+for the series.
+>
