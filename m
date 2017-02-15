@@ -1,32 +1,32 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 2/2] crypto: ccm - drop unnecessary minimum 32-bit
- alignment
-Date: Wed, 15 Feb 2017 13:34:31 +0800
-Message-ID: <20170215053431.GF14043@gondor.apana.org.au>
-References: <1486841122-1686-1-git-send-email-ard.biesheuvel@linaro.org>
- <1486841122-1686-2-git-send-email-ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH] hw_random: update help description for omap-rng
+Date: Wed, 15 Feb 2017 13:34:41 +0800
+Message-ID: <20170215053441.GG14043@gondor.apana.org.au>
+References: <E1cdFMW-0004yZ-OB@rmk-PC.armlinux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Romain Perier <romain.perier@free-electrons.com>,
+        Matt Mackall <mpm@selenic.com>, linux-crypto@vger.kernel.org
+To: Russell King <rmk+kernel@armlinux.org.uk>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:36471 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:35447 "EHLO
         helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1750722AbdBOFei (ORCPT
+        with ESMTP id S1750722AbdBOFfA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 15 Feb 2017 00:34:38 -0500
+        Wed, 15 Feb 2017 00:35:00 -0500
 Content-Disposition: inline
-In-Reply-To: <1486841122-1686-2-git-send-email-ard.biesheuvel@linaro.org>
+In-Reply-To: <E1cdFMW-0004yZ-OB@rmk-PC.armlinux.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Feb 11, 2017 at 07:25:22PM +0000, Ard Biesheuvel wrote:
-> The CCM driver forces 32-bit alignment even if the underlying ciphers
-> don't care about alignment. This is because crypto_xor() used to require
-> this, but since this is no longer the case, drop the hardcoded minimum
-> of 32 bits.
+On Mon, Feb 13, 2017 at 12:04:08PM +0000, Russell King wrote:
+> omap-rng also supports Marvell Armada 7k/8k SoCs, but no mention of this
+> is made in the help text, despite the dependency being added. Explicitly
+> mention these SoCs in the help description so people know that it covers
+> more than just TI SoCs.
 > 
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> Fixes: 383212425c92 ("hwrng: omap - Add device variant for SafeXcel IP-76 found in Armada 8K")
+> Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
 
 Patch applied.  Thanks.
 -- 
