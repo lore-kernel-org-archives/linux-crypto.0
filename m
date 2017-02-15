@@ -1,400 +1,1014 @@
 From: Mahipal Challa <mahipalreddy2006@gmail.com>
-Subject: [RFC PATCH v2 3/3] crypto: zip - Add Compression/Decompression statistics
-Date: Wed, 15 Feb 2017 10:45:10 +0530
-Message-ID: <1487135710-9692-4-git-send-email-Mahipal.Challa@cavium.com>
+Subject: [RFC PATCH v2 2/3] crypto: zip - Wire-up Compression / decompression HW offload
+Date: Wed, 15 Feb 2017 10:45:09 +0530
+Message-ID: <1487135710-9692-3-git-send-email-Mahipal.Challa@cavium.com>
 References: <1487135710-9692-1-git-send-email-Mahipal.Challa@cavium.com>
 Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org, Jan.Glauber@cavium.com,
         Vishnu.Nair@cavium.com, pathreya@cavium.com,
         Mahipal.Challa@cavium.com, Jan Glauber <jglauber@cavium.com>
 To: herbert@gondor.apana.org.au
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pg0-f65.google.com ([74.125.83.65]:35294 "EHLO
+        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751617AbdBOFPf (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 15 Feb 2017 00:15:35 -0500
 In-Reply-To: <1487135710-9692-1-git-send-email-Mahipal.Challa@cavium.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Add statistics for compression/decompression hardware offload
-under debugfs.
+This contains changes for adding compression/decompression h/w offload
+functionality for both DEFLATE and LZS.
 
 Signed-off-by: Mahipal Challa <Mahipal.Challa@cavium.com>
 Signed-off-by: Jan Glauber <jglauber@cavium.com>
 ---
- drivers/crypto/cavium/zip/zip_deflate.c |  10 ++
- drivers/crypto/cavium/zip/zip_inflate.c |  12 ++
- drivers/crypto/cavium/zip/zip_main.c    | 234 ++++++++++++++++++++++++++++++++
- drivers/crypto/cavium/zip/zip_main.h    |  15 ++
- 4 files changed, 271 insertions(+)
+ drivers/crypto/cavium/zip/Makefile      |   5 +-
+ drivers/crypto/cavium/zip/zip_crypto.c  | 314 ++++++++++++++++++++++++++++++++
+ drivers/crypto/cavium/zip/zip_crypto.h  |   2 +
+ drivers/crypto/cavium/zip/zip_deflate.c | 190 +++++++++++++++++++
+ drivers/crypto/cavium/zip/zip_deflate.h |  62 +++++++
+ drivers/crypto/cavium/zip/zip_device.c  |   1 +
+ drivers/crypto/cavium/zip/zip_inflate.c | 211 +++++++++++++++++++++
+ drivers/crypto/cavium/zip/zip_inflate.h |  62 +++++++
+ drivers/crypto/cavium/zip/zip_main.c    |  57 ------
+ 9 files changed, 846 insertions(+), 58 deletions(-)
 
-diff --git a/drivers/crypto/cavium/zip/zip_deflate.c b/drivers/crypto/cavium/zip/zip_deflate.c
-index b02789c..9a944b8 100644
---- a/drivers/crypto/cavium/zip/zip_deflate.c
-+++ b/drivers/crypto/cavium/zip/zip_deflate.c
-@@ -122,12 +122,19 @@ int zip_deflate(struct zip_operation *zip_ops, struct zip_state *s,
- 	/* Prepares zip command based on the input parameters */
- 	prepare_zip_command(zip_ops, s, zip_cmd);
- 
-+	atomic64_add(zip_ops->input_len, &zip_dev->stats.comp_in_bytes);
- 	/* Loads zip command into command queues and rings door bell */
- 	queue = zip_load_instr(zip_cmd, zip_dev);
- 
-+	/* Stats update for compression requests submitted */
-+	atomic64_inc(&zip_dev->stats.comp_req_submit);
+diff --git a/drivers/crypto/cavium/zip/Makefile b/drivers/crypto/cavium/zip/Makefile
+index 2c07508..b2f3baaf 100644
+--- a/drivers/crypto/cavium/zip/Makefile
++++ b/drivers/crypto/cavium/zip/Makefile
+@@ -5,4 +5,7 @@
+ obj-$(CONFIG_CRYPTO_DEV_CAVIUM_ZIP) += thunderx_zip.o
+ thunderx_zip-y := zip_main.o    \
+                   zip_device.o  \
+-                  zip_mem.o
++                  zip_crypto.o  \
++                  zip_mem.o     \
++                  zip_deflate.o \
++                  zip_inflate.o
+diff --git a/drivers/crypto/cavium/zip/zip_crypto.c b/drivers/crypto/cavium/zip/zip_crypto.c
+new file mode 100644
+index 0000000..1ceaa34
+--- /dev/null
++++ b/drivers/crypto/cavium/zip/zip_crypto.c
+@@ -0,0 +1,314 @@
++/***********************license start************************************
++ * Copyright (c) 2003-2017 Cavium, Inc.
++ * All rights reserved.
++ *
++ * License: one of 'Cavium License' or 'GNU General Public License Version 2'
++ *
++ * This file is provided under the terms of the Cavium License (see below)
++ * or under the terms of GNU General Public License, Version 2, as
++ * published by the Free Software Foundation. When using or redistributing
++ * this file, you may do so under either license.
++ *
++ * Cavium License:  Redistribution and use in source and binary forms, with
++ * or without modification, are permitted provided that the following
++ * conditions are met:
++ *
++ *  * Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ *
++ *  * Redistributions in binary form must reproduce the above
++ *    copyright notice, this list of conditions and the following
++ *    disclaimer in the documentation and/or other materials provided
++ *    with the distribution.
++ *
++ *  * Neither the name of Cavium Inc. nor the names of its contributors may be
++ *    used to endorse or promote products derived from this software without
++ *    specific prior written permission.
++ *
++ * This Software, including technical data, may be subject to U.S. export
++ * control laws, including the U.S. Export Administration Act and its
++ * associated regulations, and may be subject to export or import
++ * regulations in other countries.
++ *
++ * TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE SOFTWARE IS PROVIDED "AS IS"
++ * AND WITH ALL FAULTS AND CAVIUM INC. MAKES NO PROMISES, REPRESENTATIONS
++ * OR WARRANTIES, EITHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, WITH
++ * RESPECT TO THE SOFTWARE, INCLUDING ITS CONDITION, ITS CONFORMITY TO ANY
++ * REPRESENTATION OR DESCRIPTION, OR THE EXISTENCE OF ANY LATENT OR PATENT
++ * DEFECTS, AND CAVIUM SPECIFICALLY DISCLAIMS ALL IMPLIED (IF ANY)
++ * WARRANTIES OF TITLE, MERCHANTABILITY, NONINFRINGEMENT, FITNESS FOR A
++ * PARTICULAR PURPOSE, LACK OF VIRUSES, ACCURACY OR COMPLETENESS, QUIET
++ * ENJOYMENT, QUIET POSSESSION OR CORRESPONDENCE TO DESCRIPTION. THE
++ * ENTIRE  RISK ARISING OUT OF USE OR PERFORMANCE OF THE SOFTWARE LIES
++ * WITH YOU.
++ ***********************license end**************************************/
 +
- 	while (!result_ptr->s.compcode)
- 		continue;
- 
-+	/* Stats update for compression requests completed */
-+	atomic64_inc(&zip_dev->stats.comp_req_complete);
++#include "zip_crypto.h"
 +
- 	zip_ops->compcode = result_ptr->s.compcode;
- 	switch (zip_ops->compcode) {
- 	case ZIP_CMD_NOTDONE:
-@@ -175,6 +182,9 @@ int zip_deflate(struct zip_operation *zip_ops, struct zip_state *s,
- 		zip_err("Unknown Format:%d\n", zip_ops->format);
- 	}
- 
-+	atomic64_add(result_ptr->s.totalbyteswritten,
-+		     &zip_dev->stats.comp_out_bytes);
-+
- 	/* Update output_len */
- 	if (zip_ops->output_len < result_ptr->s.totalbyteswritten) {
- 		/* Dynamic stop && strm->output_len < zipconstants[onfsize] */
-diff --git a/drivers/crypto/cavium/zip/zip_inflate.c b/drivers/crypto/cavium/zip/zip_inflate.c
-index 5f43a8c..50cbdd8 100644
---- a/drivers/crypto/cavium/zip/zip_inflate.c
-+++ b/drivers/crypto/cavium/zip/zip_inflate.c
-@@ -135,12 +135,20 @@ int zip_inflate(struct zip_operation *zip_ops, struct zip_state *s,
- 	/* Prepare inflate zip command */
- 	prepare_inflate_zcmd(zip_ops, s, zip_cmd);
- 
-+	atomic64_add(zip_ops->input_len, &zip_dev->stats.decomp_in_bytes);
-+
- 	/* Load inflate command to zip queue and ring the doorbell */
- 	queue = zip_load_instr(zip_cmd, zip_dev);
- 
-+	/* Decompression requests submitted stats update */
-+	atomic64_inc(&zip_dev->stats.decomp_req_submit);
-+
- 	while (!result_ptr->s.compcode)
- 		continue;
- 
-+	/* Decompression requests completed stats update */
-+	atomic64_inc(&zip_dev->stats.decomp_req_complete);
-+
- 	zip_ops->compcode = result_ptr->s.compcode;
- 	switch (zip_ops->compcode) {
- 	case ZIP_CMD_NOTDONE:
-@@ -157,6 +165,7 @@ int zip_inflate(struct zip_operation *zip_ops, struct zip_state *s,
- 
- 	default:
- 		zip_dbg("Instruction failed. Code = %d\n", zip_ops->compcode);
-+		atomic64_inc(&zip_dev->stats.decomp_bad_reqs);
- 		zip_update_cmd_bufs(zip_dev, queue);
- 		return ZIP_ERROR;
- 	}
-@@ -169,6 +178,9 @@ int zip_inflate(struct zip_operation *zip_ops, struct zip_state *s,
- 
- 	zip_ops->csum = result_ptr->s.adler32;
- 
-+	atomic64_add(result_ptr->s.totalbyteswritten,
-+		     &zip_dev->stats.decomp_out_bytes);
-+
- 	if (zip_ops->output_len < result_ptr->s.totalbyteswritten) {
- 		zip_err("output_len (%d) < total bytes written (%d)\n",
- 			zip_ops->output_len, result_ptr->s.totalbyteswritten);
-diff --git a/drivers/crypto/cavium/zip/zip_main.c b/drivers/crypto/cavium/zip/zip_main.c
-index dd5814a..0951e20 100644
---- a/drivers/crypto/cavium/zip/zip_main.c
-+++ b/drivers/crypto/cavium/zip/zip_main.c
-@@ -451,6 +451,228 @@ static void zip_unregister_compression_device(void)
- 	crypto_unregister_scomp(&zip_scomp_lzs);
- }
- 
-+/*
-+ * debugfs functions
-+ */
-+#ifdef CONFIG_DEBUG_FS
-+#include <linux/debugfs.h>
-+
-+/* Displays ZIP device statistics */
-+static int zip_show_stats(struct seq_file *s, void *unused)
++static void zip_static_init_zip_ops(struct zip_operation *zip_ops,
++				    int lzs_flag)
 +{
-+	u64 val = 0ull;
-+	u64 avg_chunk = 0ull, avg_cr = 0ull;
-+	u32 q = 0;
++	zip_ops->flush        = ZIP_FLUSH_FINISH;
 +
-+	int index  = 0;
-+	struct zip_device *zip;
-+	struct zip_stats  *st;
++	/* equivalent to level 6 of opensource zlib */
++	zip_ops->speed          = 1;
 +
-+	for (index = 0; index < MAX_ZIP_DEVICES; index++) {
-+		if (zip_dev[index]) {
-+			zip = zip_dev[index];
-+			st  = &zip->stats;
-+
-+			/* Get all the pending requests */
-+			for (q = 0; q < ZIP_NUM_QUEUES; q++) {
-+				val = zip_reg_read((zip->reg_base +
-+						    ZIP_DBG_COREX_STA(q)));
-+				val = (val >> 32);
-+				val = val & 0xffffff;
-+				atomic64_add(val, &st->pending_req);
-+			}
-+
-+			avg_chunk = (atomic64_read(&st->comp_in_bytes) /
-+				     atomic64_read(&st->comp_req_complete));
-+			avg_cr = (atomic64_read(&st->comp_in_bytes) /
-+				  atomic64_read(&st->comp_out_bytes));
-+			seq_printf(s, "        ZIP Device %d Stats\n"
-+				      "-----------------------------------\n"
-+				      "Comp Req Submitted        : \t%ld\n"
-+				      "Comp Req Completed        : \t%ld\n"
-+				      "Compress In Bytes         : \t%ld\n"
-+				      "Compressed Out Bytes      : \t%ld\n"
-+				      "Average Chunk size        : \t%llu\n"
-+				      "Average Compression ratio : \t%llu\n"
-+				      "Decomp Req Submitted      : \t%ld\n"
-+				      "Decomp Req Completed      : \t%ld\n"
-+				      "Decompress In Bytes       : \t%ld\n"
-+				      "Decompressed Out Bytes    : \t%ld\n"
-+				      "Decompress Bad requests   : \t%ld\n"
-+				      "Pending Req               : \t%ld\n"
-+					"---------------------------------\n",
-+				       index,
-+				       atomic64_read(&st->comp_req_submit),
-+				       atomic64_read(&st->comp_req_complete),
-+				       atomic64_read(&st->comp_in_bytes),
-+				       atomic64_read(&st->comp_out_bytes),
-+				       avg_chunk,
-+				       avg_cr,
-+				       atomic64_read(&st->decomp_req_submit),
-+				       atomic64_read(&st->decomp_req_complete),
-+				       atomic64_read(&st->decomp_in_bytes),
-+				       atomic64_read(&st->decomp_out_bytes),
-+				       atomic64_read(&st->decomp_bad_reqs),
-+				       atomic64_read(&st->pending_req));
-+
-+			/* Reset pending requests  count */
-+			atomic64_set(&st->pending_req, 0);
-+		}
++	if (!lzs_flag) {
++		zip_ops->ccode		= 0; /* Auto Huffman */
++		zip_ops->lzs_flag	= 0;
++		zip_ops->format		= ZLIB_FORMAT;
++	} else {
++		zip_ops->ccode		= 3; /* LZS Encoding */
++		zip_ops->lzs_flag	= 1;
++		zip_ops->format		= LZS_FORMAT;
 +	}
-+	return 0;
++	zip_ops->begin_file   = 1;
++	zip_ops->history_len  = 0;
++	zip_ops->end_file     = 1;
++	zip_ops->compcode     = 0;
++	zip_ops->csum	      = 1; /* Adler checksum desired */
 +}
 +
-+/* Clears stats data */
-+static int zip_clear_stats(struct seq_file *s, void *unused)
++int zip_ctx_init(struct zip_kernel_ctx *zip_ctx, int lzs_flag)
 +{
-+	int index = 0;
++	struct zip_operation  *comp_ctx   = &zip_ctx->zip_comp;
++	struct zip_operation  *decomp_ctx = &zip_ctx->zip_decomp;
 +
-+	for (index = 0; index < MAX_ZIP_DEVICES; index++) {
-+		if (zip_dev[index]) {
-+			memset(&zip_dev[index]->stats, 0,
-+			       sizeof(struct zip_state));
-+			seq_printf(s, "Cleared stats for zip %d\n", index);
-+		}
-+	}
++	zip_static_init_zip_ops(comp_ctx, lzs_flag);
++	zip_static_init_zip_ops(decomp_ctx, lzs_flag);
 +
-+	return 0;
-+}
-+
-+static struct zip_registers zipregs[64] = {
-+	{"ZIP_CMD_CTL        ",  0x0000ull},
-+	{"ZIP_THROTTLE       ",  0x0010ull},
-+	{"ZIP_CONSTANTS      ",  0x00A0ull},
-+	{"ZIP_QUE0_MAP       ",  0x1400ull},
-+	{"ZIP_QUE1_MAP       ",  0x1408ull},
-+	{"ZIP_QUE_ENA        ",  0x0500ull},
-+	{"ZIP_QUE_PRI        ",  0x0508ull},
-+	{"ZIP_QUE0_DONE      ",  0x2000ull},
-+	{"ZIP_QUE1_DONE      ",  0x2008ull},
-+	{"ZIP_QUE0_DOORBELL  ",  0x4000ull},
-+	{"ZIP_QUE1_DOORBELL  ",  0x4008ull},
-+	{"ZIP_QUE0_SBUF_ADDR ",  0x1000ull},
-+	{"ZIP_QUE1_SBUF_ADDR ",  0x1008ull},
-+	{"ZIP_QUE0_SBUF_CTL  ",  0x1200ull},
-+	{"ZIP_QUE1_SBUF_CTL  ",  0x1208ull},
-+	{ NULL, 0}
-+};
-+
-+/* Prints registers' contents */
-+static int zip_print_regs(struct seq_file *s, void *unused)
-+{
-+	u64 val = 0;
-+	int i = 0, index = 0;
-+
-+	for (index = 0; index < MAX_ZIP_DEVICES; index++) {
-+		if (zip_dev[index]) {
-+			seq_printf(s, "--------------------------------\n"
-+				      "     ZIP Device %d Registers\n"
-+				      "--------------------------------\n",
-+				      index);
-+
-+			i = 0;
-+
-+			while (zipregs[i].reg_name) {
-+				val = zip_reg_read((zip_dev[index]->reg_base +
-+						    zipregs[i].reg_offset));
-+				seq_printf(s, "%s: 0x%016llx\n",
-+					   zipregs[i].reg_name, val);
-+				i++;
-+			}
-+		}
-+	}
-+	return 0;
-+}
-+
-+static int zip_stats_open(struct inode *inode, struct file *file)
-+{
-+	return single_open(file, zip_show_stats, NULL);
-+}
-+
-+static const struct file_operations zip_stats_fops = {
-+	.owner = THIS_MODULE,
-+	.open  = zip_stats_open,
-+	.read  = seq_read,
-+};
-+
-+static int zip_clear_open(struct inode *inode, struct file *file)
-+{
-+	return single_open(file, zip_clear_stats, NULL);
-+}
-+
-+static const struct file_operations zip_clear_fops = {
-+	.owner = THIS_MODULE,
-+	.open  = zip_clear_open,
-+	.read  = seq_read,
-+};
-+
-+static int zip_regs_open(struct inode *inode, struct file *file)
-+{
-+	return single_open(file, zip_print_regs, NULL);
-+}
-+
-+static const struct file_operations zip_regs_fops = {
-+	.owner = THIS_MODULE,
-+	.open  = zip_regs_open,
-+	.read  = seq_read,
-+};
-+
-+/* Root directory for thunderx_zip debugfs entry */
-+static struct dentry *zip_debugfs_root;
-+
-+static int __init zip_debugfs_init(void)
-+{
-+	struct dentry *zip_stats, *zip_clear, *zip_regs;
-+
-+	if (!debugfs_initialized())
-+		return -ENODEV;
-+
-+	zip_debugfs_root = debugfs_create_dir("thunderx_zip", NULL);
-+	if (!zip_debugfs_root)
++	comp_ctx->input  = zip_data_buf_alloc(MAX_INPUT_BUFFER_SIZE);
++	if (!comp_ctx->input)
 +		return -ENOMEM;
 +
-+	/* Creating files for entries inside thunderx_zip directory */
-+	zip_stats = debugfs_create_file("zip_stats", 0444,
-+					zip_debugfs_root,
-+					NULL, &zip_stats_fops);
-+	if (!zip_stats)
-+		goto failed_to_create;
++	comp_ctx->output = zip_data_buf_alloc(MAX_OUTPUT_BUFFER_SIZE);
++	if (!comp_ctx->output)
++		goto err_comp_input;
 +
-+	zip_clear = debugfs_create_file("zip_clear", 0444,
-+					zip_debugfs_root,
-+					NULL, &zip_clear_fops);
-+	if (!zip_clear)
-+		goto failed_to_create;
++	decomp_ctx->input  = zip_data_buf_alloc(MAX_INPUT_BUFFER_SIZE);
++	if (!decomp_ctx->input)
++		goto err_comp_output;
 +
-+	zip_regs = debugfs_create_file("zip_regs", 0444,
-+				       zip_debugfs_root,
-+				       NULL, &zip_regs_fops);
-+	if (!zip_regs)
-+		goto failed_to_create;
++	decomp_ctx->output = zip_data_buf_alloc(MAX_OUTPUT_BUFFER_SIZE);
++	if (!decomp_ctx->output)
++		goto err_decomp_input;
 +
 +	return 0;
 +
-+failed_to_create:
-+	debugfs_remove_recursive(zip_debugfs_root);
-+	return -ENOENT;
++err_decomp_input:
++	zip_data_buf_free(decomp_ctx->input, MAX_INPUT_BUFFER_SIZE);
++
++err_comp_output:
++	zip_data_buf_free(comp_ctx->output, MAX_OUTPUT_BUFFER_SIZE);
++
++err_comp_input:
++	zip_data_buf_free(comp_ctx->input, MAX_INPUT_BUFFER_SIZE);
++
++	return -ENOMEM;
 +}
 +
-+static void __exit zip_debugfs_exit(void)
++void zip_ctx_exit(struct zip_kernel_ctx *zip_ctx)
 +{
-+	debugfs_remove_recursive(zip_debugfs_root);
++	struct zip_operation  *comp_ctx   = &zip_ctx->zip_comp;
++	struct zip_operation  *dec_ctx = &zip_ctx->zip_decomp;
++
++	zip_data_buf_free(comp_ctx->input, MAX_INPUT_BUFFER_SIZE);
++	zip_data_buf_free(comp_ctx->output, MAX_OUTPUT_BUFFER_SIZE);
++
++	zip_data_buf_free(dec_ctx->input, MAX_INPUT_BUFFER_SIZE);
++	zip_data_buf_free(dec_ctx->output, MAX_OUTPUT_BUFFER_SIZE);
 +}
 +
-+#else
-+static int __init zip_debugfs_init(void)
++int zip_compress(const u8 *src, unsigned int slen,
++		 u8 *dst, unsigned int *dlen,
++		 struct zip_kernel_ctx *zip_ctx)
 +{
-+	return 0;
-+}
++	struct zip_operation  *zip_ops   = NULL;
++	struct zip_state      zip_state;
++	struct zip_device     *zip = NULL;
++	int ret;
 +
-+static void __exit zip_debugfs_exit(void) { }
++	if (!zip_ctx || !src || !dst || !dlen)
++		return -ENOMEM;
 +
-+#endif
-+/* debugfs - end */
++	zip = zip_get_device(zip_get_node_id());
++	if (!zip)
++		return -ENODEV;
 +
- static int __init zip_init_module(void)
- {
- 	int ret;
-@@ -470,8 +692,18 @@ static int __init zip_init_module(void)
- 		goto err_pci_unregister;
- 	}
- 
-+	/* comp-decomp statistics are handled with debugfs interface */
-+	ret = zip_debugfs_init();
-+	if (ret < 0) {
-+		zip_err("ZIP: debugfs initialization failed\n");
-+		goto err_crypto_unregister;
++	memset(&zip_state, 0, sizeof(struct zip_state));
++	zip_ops = &zip_ctx->zip_comp;
++
++	zip_ops->input_len  = slen;
++	zip_ops->output_len = *dlen;
++	memcpy(zip_ops->input, src, slen);
++
++	ret = zip_deflate(zip_ops, &zip_state, zip);
++
++	if (!ret) {
++		*dlen = zip_ops->output_len;
++		memcpy(dst, zip_ops->output, *dlen);
 +	}
 +
- 	return ret;
- 
-+err_crypto_unregister:
-+	zip_unregister_compression_device();
++	return ret;
++}
 +
- err_pci_unregister:
- 	pci_unregister_driver(&zip_driver);
- 	return ret;
-@@ -479,6 +711,8 @@ static int __init zip_init_module(void)
- 
- static void __exit zip_cleanup_module(void)
- {
-+	zip_debugfs_exit();
++int zip_decompress(const u8 *src, unsigned int slen,
++		   u8 *dst, unsigned int *dlen,
++		   struct zip_kernel_ctx *zip_ctx)
++{
++	struct zip_operation  *zip_ops   = NULL;
++	struct zip_state      zip_state;
++	struct zip_device     *zip = NULL;
++	int ret;
 +
- 	/* Unregister from the kernel crypto interface */
- 	zip_unregister_compression_device();
- 
-diff --git a/drivers/crypto/cavium/zip/zip_main.h b/drivers/crypto/cavium/zip/zip_main.h
-index 1775c77..64e051f 100644
---- a/drivers/crypto/cavium/zip/zip_main.h
-+++ b/drivers/crypto/cavium/zip/zip_main.h
-@@ -68,6 +68,20 @@ struct zip_registers {
- 	u64   reg_offset;
- };
- 
-+/* ZIP Compression - Decompression stats */
-+struct zip_stats {
-+	atomic64_t    comp_req_submit;
-+	atomic64_t    comp_req_complete;
-+	atomic64_t    decomp_req_submit;
-+	atomic64_t    decomp_req_complete;
-+	atomic64_t    pending_req;
-+	atomic64_t    comp_in_bytes;
-+	atomic64_t    comp_out_bytes;
-+	atomic64_t    decomp_in_bytes;
-+	atomic64_t    decomp_out_bytes;
-+	atomic64_t    decomp_bad_reqs;
-+};
++	if (!zip_ctx || !src || !dst || !dlen)
++		return -ENOMEM;
 +
- /* ZIP Instruction Queue */
- struct zip_iq {
- 	u64        *sw_head;
-@@ -93,6 +107,7 @@ struct zip_device {
- 	u64               ctxsize;
++	zip = zip_get_device(zip_get_node_id());
++	if (!zip)
++		return -ENODEV;
++
++	memset(&zip_state, 0, sizeof(struct zip_state));
++	zip_ops = &zip_ctx->zip_decomp;
++	memcpy(zip_ops->input, src, slen);
++
++	/* Work around for a bug in zlib which needs an extra bytes sometimes */
++	if (zip_ops->ccode != 3) /* Not LZS Encoding */
++		zip_ops->input[slen++] = 0;
++
++	zip_ops->input_len  = slen;
++	zip_ops->output_len = *dlen;
++
++	ret = zip_inflate(zip_ops, &zip_state, zip);
++
++	if (!ret) {
++		*dlen = zip_ops->output_len;
++		memcpy(dst, zip_ops->output, *dlen);
++	}
++
++	return ret;
++}
++
++/* Legacy Compress framework start */
++int zip_alloc_comp_ctx_deflate(struct crypto_tfm *tfm)
++{
++	int ret;
++	struct zip_kernel_ctx *zip_ctx = crypto_tfm_ctx(tfm);
++
++	ret = zip_ctx_init(zip_ctx, 0);
++
++	return ret;
++}
++
++int zip_alloc_comp_ctx_lzs(struct crypto_tfm *tfm)
++{
++	int ret;
++	struct zip_kernel_ctx *zip_ctx = crypto_tfm_ctx(tfm);
++
++	ret = zip_ctx_init(zip_ctx, 1);
++
++	return ret;
++}
++
++void zip_free_comp_ctx(struct crypto_tfm *tfm)
++{
++	struct zip_kernel_ctx *zip_ctx = crypto_tfm_ctx(tfm);
++
++	zip_ctx_exit(zip_ctx);
++}
++
++int  zip_comp_compress(struct crypto_tfm *tfm,
++		       const u8 *src, unsigned int slen,
++		       u8 *dst, unsigned int *dlen)
++{
++	int ret;
++	struct zip_kernel_ctx *zip_ctx = crypto_tfm_ctx(tfm);
++
++	ret = zip_compress(src, slen, dst, dlen, zip_ctx);
++
++	return ret;
++}
++
++int  zip_comp_decompress(struct crypto_tfm *tfm,
++			 const u8 *src, unsigned int slen,
++			 u8 *dst, unsigned int *dlen)
++{
++	int ret;
++	struct zip_kernel_ctx *zip_ctx = crypto_tfm_ctx(tfm);
++
++	ret = zip_decompress(src, slen, dst, dlen, zip_ctx);
++
++	return ret;
++} /* Legacy compress framework end */
++
++/* SCOMP framework start */
++void *zip_alloc_scomp_ctx_deflate(struct crypto_scomp *tfm)
++{
++	int ret;
++	struct zip_kernel_ctx *zip_ctx;
++
++	zip_ctx = kzalloc(sizeof(*zip_ctx), GFP_KERNEL);
++	if (!zip_ctx)
++		return ERR_PTR(-ENOMEM);
++
++	ret = zip_ctx_init(zip_ctx, 0);
++
++	if (ret) {
++		kzfree(zip_ctx);
++		return ERR_PTR(ret);
++	}
++
++	return zip_ctx;
++}
++
++void *zip_alloc_scomp_ctx_lzs(struct crypto_scomp *tfm)
++{
++	int ret;
++	struct zip_kernel_ctx *zip_ctx;
++
++	zip_ctx = kzalloc(sizeof(*zip_ctx), GFP_KERNEL);
++	if (!zip_ctx)
++		return ERR_PTR(-ENOMEM);
++
++	ret = zip_ctx_init(zip_ctx, 1);
++
++	if (ret) {
++		kzfree(zip_ctx);
++		return ERR_PTR(ret);
++	}
++
++	return zip_ctx;
++}
++
++void zip_free_scomp_ctx(struct crypto_scomp *tfm, void *ctx)
++{
++	struct zip_kernel_ctx *zip_ctx = ctx;
++
++	zip_ctx_exit(zip_ctx);
++	kzfree(zip_ctx);
++}
++
++int zip_scomp_compress(struct crypto_scomp *tfm,
++		       const u8 *src, unsigned int slen,
++		       u8 *dst, unsigned int *dlen, void *ctx)
++{
++	int ret;
++	struct zip_kernel_ctx *zip_ctx  = ctx;
++
++	ret = zip_compress(src, slen, dst, dlen, zip_ctx);
++
++	return ret;
++}
++
++int zip_scomp_decompress(struct crypto_scomp *tfm,
++			 const u8 *src, unsigned int slen,
++			 u8 *dst, unsigned int *dlen, void *ctx)
++{
++	int ret;
++	struct zip_kernel_ctx *zip_ctx = ctx;
++
++	ret = zip_decompress(src, slen, dst, dlen, zip_ctx);
++
++	return ret;
++} /* SCOMP framework end */
++
+diff --git a/drivers/crypto/cavium/zip/zip_crypto.h b/drivers/crypto/cavium/zip/zip_crypto.h
+index 2d91b05..b59ddfc 100644
+--- a/drivers/crypto/cavium/zip/zip_crypto.h
++++ b/drivers/crypto/cavium/zip/zip_crypto.h
+@@ -49,6 +49,8 @@
+ #include <linux/crypto.h>
+ #include <crypto/internal/scompress.h>
+ #include "common.h"
++#include "zip_deflate.h"
++#include "zip_inflate.h"
  
- 	struct zip_iq     iq[ZIP_MAX_NUM_QUEUES];
-+	struct zip_stats  stats;
- };
+ struct zip_kernel_ctx {
+ 	struct zip_operation zip_comp;
+diff --git a/drivers/crypto/cavium/zip/zip_deflate.c b/drivers/crypto/cavium/zip/zip_deflate.c
+new file mode 100644
+index 0000000..b02789c
+--- /dev/null
++++ b/drivers/crypto/cavium/zip/zip_deflate.c
+@@ -0,0 +1,190 @@
++/***********************license start************************************
++ * Copyright (c) 2003-2017 Cavium, Inc.
++ * All rights reserved.
++ *
++ * License: one of 'Cavium License' or 'GNU General Public License Version 2'
++ *
++ * This file is provided under the terms of the Cavium License (see below)
++ * or under the terms of GNU General Public License, Version 2, as
++ * published by the Free Software Foundation. When using or redistributing
++ * this file, you may do so under either license.
++ *
++ * Cavium License:  Redistribution and use in source and binary forms, with
++ * or without modification, are permitted provided that the following
++ * conditions are met:
++ *
++ *  * Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ *
++ *  * Redistributions in binary form must reproduce the above
++ *    copyright notice, this list of conditions and the following
++ *    disclaimer in the documentation and/or other materials provided
++ *    with the distribution.
++ *
++ *  * Neither the name of Cavium Inc. nor the names of its contributors may be
++ *    used to endorse or promote products derived from this software without
++ *    specific prior written permission.
++ *
++ * This Software, including technical data, may be subject to U.S. export
++ * control laws, including the U.S. Export Administration Act and its
++ * associated regulations, and may be subject to export or import
++ * regulations in other countries.
++ *
++ * TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE SOFTWARE IS PROVIDED "AS IS"
++ * AND WITH ALL FAULTS AND CAVIUM INC. MAKES NO PROMISES, REPRESENTATIONS
++ * OR WARRANTIES, EITHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, WITH
++ * RESPECT TO THE SOFTWARE, INCLUDING ITS CONDITION, ITS CONFORMITY TO ANY
++ * REPRESENTATION OR DESCRIPTION, OR THE EXISTENCE OF ANY LATENT OR PATENT
++ * DEFECTS, AND CAVIUM SPECIFICALLY DISCLAIMS ALL IMPLIED (IF ANY)
++ * WARRANTIES OF TITLE, MERCHANTABILITY, NONINFRINGEMENT, FITNESS FOR A
++ * PARTICULAR PURPOSE, LACK OF VIRUSES, ACCURACY OR COMPLETENESS, QUIET
++ * ENJOYMENT, QUIET POSSESSION OR CORRESPONDENCE TO DESCRIPTION. THE
++ * ENTIRE  RISK ARISING OUT OF USE OR PERFORMANCE OF THE SOFTWARE LIES
++ * WITH YOU.
++ ***********************license end**************************************/
++
++#include <linux/delay.h>
++#include <linux/sched.h>
++
++#include "common.h"
++#include "zip_deflate.h"
++
++/* Prepares the deflate zip command */
++static int prepare_zip_command(struct zip_operation *zip_ops,
++			       struct zip_state *s, union zip_inst_s *zip_cmd)
++{
++	union zip_zres_s *result_ptr = &s->result;
++
++	memset(zip_cmd, 0, sizeof(s->zip_cmd));
++	memset(result_ptr, 0, sizeof(s->result));
++
++	/* IWORD #0 */
++	/* History gather */
++	zip_cmd->s.hg = 0;
++	/* compression enable = 1 for deflate */
++	zip_cmd->s.ce = 1;
++	/* sf (sync flush) */
++	zip_cmd->s.sf = 1;
++	/* ef (end of file) */
++	if (zip_ops->flush == ZIP_FLUSH_FINISH) {
++		zip_cmd->s.ef = 1;
++		zip_cmd->s.sf = 0;
++	}
++
++	zip_cmd->s.cc = zip_ops->ccode;
++	/* ss (compression speed/storage) */
++	zip_cmd->s.ss = zip_ops->speed;
++
++	/* IWORD #1 */
++	/* adler checksum */
++	zip_cmd->s.adlercrc32 = zip_ops->csum;
++	zip_cmd->s.historylength = zip_ops->history_len;
++	zip_cmd->s.dg = 0;
++
++	/* IWORD # 6 and 7 - compression input/history pointer */
++	zip_cmd->s.inp_ptr_addr.s.addr  = __pa(zip_ops->input);
++	zip_cmd->s.inp_ptr_ctl.s.length = (zip_ops->input_len +
++					   zip_ops->history_len);
++	zip_cmd->s.ds = 0;
++
++	/* IWORD # 8 and 9 - Output pointer */
++	zip_cmd->s.out_ptr_addr.s.addr  = __pa(zip_ops->output);
++	zip_cmd->s.out_ptr_ctl.s.length = zip_ops->output_len;
++	/* maximum number of output-stream bytes that can be written */
++	zip_cmd->s.totaloutputlength    = zip_ops->output_len;
++
++	/* IWORD # 10 and 11 - Result pointer */
++	zip_cmd->s.res_ptr_addr.s.addr = __pa(result_ptr);
++	/* Clearing completion code */
++	result_ptr->s.compcode = 0;
++
++	return 0;
++}
++
++/**
++ * zip_deflate - API to offload deflate operation to hardware
++ * @zip_ops: Pointer to zip operation structure
++ * @s:       Pointer to the structure representing zip state
++ * @zip_dev: Pointer to zip device structure
++ *
++ * This function prepares the zip deflate command and submits it to the zip
++ * engine for processing.
++ *
++ * Return: 0 if successful or error code
++ */
++int zip_deflate(struct zip_operation *zip_ops, struct zip_state *s,
++		struct zip_device *zip_dev)
++{
++	union zip_inst_s *zip_cmd = &s->zip_cmd;
++	union zip_zres_s *result_ptr = &s->result;
++	u32 queue;
++
++	/* Prepares zip command based on the input parameters */
++	prepare_zip_command(zip_ops, s, zip_cmd);
++
++	/* Loads zip command into command queues and rings door bell */
++	queue = zip_load_instr(zip_cmd, zip_dev);
++
++	while (!result_ptr->s.compcode)
++		continue;
++
++	zip_ops->compcode = result_ptr->s.compcode;
++	switch (zip_ops->compcode) {
++	case ZIP_CMD_NOTDONE:
++		zip_dbg("Zip instruction not yet completed");
++		return ZIP_ERROR;
++
++	case ZIP_CMD_SUCCESS:
++		zip_dbg("Zip instruction completed successfully");
++		zip_update_cmd_bufs(zip_dev, queue);
++		break;
++
++	case ZIP_CMD_DTRUNC:
++		zip_dbg("Output Truncate error");
++		/* Returning ZIP_ERROR to avoid copy to user */
++		return ZIP_ERROR;
++
++	default:
++		zip_err("Zip instruction failed. Code:%d", zip_ops->compcode);
++		return ZIP_ERROR;
++	}
++
++	/* Update the CRC depending on the format */
++	switch (zip_ops->format) {
++	case RAW_FORMAT:
++		zip_dbg("RAW Format: %d ", zip_ops->format);
++		/* Get checksum from engine, need to feed it again */
++		zip_ops->csum = result_ptr->s.adler32;
++		break;
++
++	case ZLIB_FORMAT:
++		zip_dbg("ZLIB Format: %d ", zip_ops->format);
++		zip_ops->csum = result_ptr->s.adler32;
++		break;
++
++	case GZIP_FORMAT:
++		zip_dbg("GZIP Format: %d ", zip_ops->format);
++		zip_ops->csum = result_ptr->s.crc32;
++		break;
++
++	case LZS_FORMAT:
++		zip_dbg("LZS Format: %d ", zip_ops->format);
++		break;
++
++	default:
++		zip_err("Unknown Format:%d\n", zip_ops->format);
++	}
++
++	/* Update output_len */
++	if (zip_ops->output_len < result_ptr->s.totalbyteswritten) {
++		/* Dynamic stop && strm->output_len < zipconstants[onfsize] */
++		zip_err("output_len (%d) < total bytes written(%d)\n",
++			zip_ops->output_len, result_ptr->s.totalbyteswritten);
++		zip_ops->output_len = 0;
++
++	} else {
++		zip_ops->output_len = result_ptr->s.totalbyteswritten;
++	}
++
++	return 0;
++}
+diff --git a/drivers/crypto/cavium/zip/zip_deflate.h b/drivers/crypto/cavium/zip/zip_deflate.h
+new file mode 100644
+index 0000000..1d32e76
+--- /dev/null
++++ b/drivers/crypto/cavium/zip/zip_deflate.h
+@@ -0,0 +1,62 @@
++/***********************license start************************************
++ * Copyright (c) 2003-2017 Cavium, Inc.
++ * All rights reserved.
++ *
++ * License: one of 'Cavium License' or 'GNU General Public License Version 2'
++ *
++ * This file is provided under the terms of the Cavium License (see below)
++ * or under the terms of GNU General Public License, Version 2, as
++ * published by the Free Software Foundation. When using or redistributing
++ * this file, you may do so under either license.
++ *
++ * Cavium License:  Redistribution and use in source and binary forms, with
++ * or without modification, are permitted provided that the following
++ * conditions are met:
++ *
++ *  * Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ *
++ *  * Redistributions in binary form must reproduce the above
++ *    copyright notice, this list of conditions and the following
++ *    disclaimer in the documentation and/or other materials provided
++ *    with the distribution.
++ *
++ *  * Neither the name of Cavium Inc. nor the names of its contributors may be
++ *    used to endorse or promote products derived from this software without
++ *    specific prior written permission.
++ *
++ * This Software, including technical data, may be subject to U.S. export
++ * control laws, including the U.S. Export Administration Act and its
++ * associated regulations, and may be subject to export or import
++ * regulations in other countries.
++ *
++ * TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE SOFTWARE IS PROVIDED "AS IS"
++ * AND WITH ALL FAULTS AND CAVIUM INC. MAKES NO PROMISES, REPRESENTATIONS
++ * OR WARRANTIES, EITHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, WITH
++ * RESPECT TO THE SOFTWARE, INCLUDING ITS CONDITION, ITS CONFORMITY TO ANY
++ * REPRESENTATION OR DESCRIPTION, OR THE EXISTENCE OF ANY LATENT OR PATENT
++ * DEFECTS, AND CAVIUM SPECIFICALLY DISCLAIMS ALL IMPLIED (IF ANY)
++ * WARRANTIES OF TITLE, MERCHANTABILITY, NONINFRINGEMENT, FITNESS FOR A
++ * PARTICULAR PURPOSE, LACK OF VIRUSES, ACCURACY OR COMPLETENESS, QUIET
++ * ENJOYMENT, QUIET POSSESSION OR CORRESPONDENCE TO DESCRIPTION. THE
++ * ENTIRE  RISK ARISING OUT OF USE OR PERFORMANCE OF THE SOFTWARE LIES
++ * WITH YOU.
++ ***********************license end**************************************/
++
++#ifndef __ZIP_DEFLATE_H__
++#define __ZIP_DEFLATE_H__
++
++/**
++ * zip_deflate - API to offload deflate operation to hardware
++ * @zip_ops: Pointer to zip operation structure
++ * @s:       Pointer to the structure representing zip state
++ * @zip_dev: Pointer to the structure representing zip device
++ *
++ * This function prepares the zip deflate command and submits it to the zip
++ * engine by ringing the doorbell.
++ *
++ * Return: 0 if successful or error code
++ */
++int zip_deflate(struct zip_operation *zip_ops, struct zip_state *s,
++		struct zip_device *zip_dev);
++#endif
+diff --git a/drivers/crypto/cavium/zip/zip_device.c b/drivers/crypto/cavium/zip/zip_device.c
+index e980f08..ccf21fb 100644
+--- a/drivers/crypto/cavium/zip/zip_device.c
++++ b/drivers/crypto/cavium/zip/zip_device.c
+@@ -44,6 +44,7 @@
+  ***********************license end**************************************/
  
- /* Prototypes */
+ #include "common.h"
++#include "zip_deflate.h"
+ 
+ /**
+  * zip_cmd_queue_consumed - Calculates the space consumed in the command queue.
+diff --git a/drivers/crypto/cavium/zip/zip_inflate.c b/drivers/crypto/cavium/zip/zip_inflate.c
+new file mode 100644
+index 0000000..5f43a8c
+--- /dev/null
++++ b/drivers/crypto/cavium/zip/zip_inflate.c
+@@ -0,0 +1,211 @@
++/***********************license start************************************
++ * Copyright (c) 2003-2017 Cavium, Inc.
++ * All rights reserved.
++ *
++ * License: one of 'Cavium License' or 'GNU General Public License Version 2'
++ *
++ * This file is provided under the terms of the Cavium License (see below)
++ * or under the terms of GNU General Public License, Version 2, as
++ * published by the Free Software Foundation. When using or redistributing
++ * this file, you may do so under either license.
++ *
++ * Cavium License:  Redistribution and use in source and binary forms, with
++ * or without modification, are permitted provided that the following
++ * conditions are met:
++ *
++ *  * Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ *
++ *  * Redistributions in binary form must reproduce the above
++ *    copyright notice, this list of conditions and the following
++ *    disclaimer in the documentation and/or other materials provided
++ *    with the distribution.
++ *
++ *  * Neither the name of Cavium Inc. nor the names of its contributors may be
++ *    used to endorse or promote products derived from this software without
++ *    specific prior written permission.
++ *
++ * This Software, including technical data, may be subject to U.S. export
++ * control laws, including the U.S. Export Administration Act and its
++ * associated regulations, and may be subject to export or import
++ * regulations in other countries.
++ *
++ * TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE SOFTWARE IS PROVIDED "AS IS"
++ * AND WITH ALL FAULTS AND CAVIUM INC. MAKES NO PROMISES, REPRESENTATIONS
++ * OR WARRANTIES, EITHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, WITH
++ * RESPECT TO THE SOFTWARE, INCLUDING ITS CONDITION, ITS CONFORMITY TO ANY
++ * REPRESENTATION OR DESCRIPTION, OR THE EXISTENCE OF ANY LATENT OR PATENT
++ * DEFECTS, AND CAVIUM SPECIFICALLY DISCLAIMS ALL IMPLIED (IF ANY)
++ * WARRANTIES OF TITLE, MERCHANTABILITY, NONINFRINGEMENT, FITNESS FOR A
++ * PARTICULAR PURPOSE, LACK OF VIRUSES, ACCURACY OR COMPLETENESS, QUIET
++ * ENJOYMENT, QUIET POSSESSION OR CORRESPONDENCE TO DESCRIPTION. THE
++ * ENTIRE  RISK ARISING OUT OF USE OR PERFORMANCE OF THE SOFTWARE LIES
++ * WITH YOU.
++ ***********************license end**************************************/
++
++#include <linux/delay.h>
++#include <linux/sched.h>
++
++#include "common.h"
++#include "zip_inflate.h"
++
++static int prepare_inflate_zcmd(struct zip_operation *zip_ops,
++				struct zip_state *s, union zip_inst_s *zip_cmd)
++{
++	union zip_zres_s *result_ptr = &s->result;
++
++	memset(zip_cmd, 0, sizeof(s->zip_cmd));
++	memset(result_ptr, 0, sizeof(s->result));
++
++	/* IWORD#0 */
++
++	/* Decompression History Gather list - no gather list */
++	zip_cmd->s.hg = 0;
++	/* For decompression, CE must be 0x0. */
++	zip_cmd->s.ce = 0;
++	/* For decompression, SS must be 0x0. */
++	zip_cmd->s.ss = 0;
++	/* For decompression, SF should always be set. */
++	zip_cmd->s.sf = 1;
++
++	/* Begin File */
++	if (zip_ops->begin_file == 0)
++		zip_cmd->s.bf = 0;
++	else
++		zip_cmd->s.bf = 1;
++
++	zip_cmd->s.ef = 1;
++	/* 0: for Deflate decompression, 3: for LZS decompression */
++	zip_cmd->s.cc = zip_ops->ccode;
++
++	/* IWORD #1*/
++
++	/* adler checksum */
++	zip_cmd->s.adlercrc32 = zip_ops->csum;
++
++	/*
++	 * HISTORYLENGTH must be 0x0 for any ZIP decompress operation.
++	 * History data is added to a decompression operation via IWORD3.
++	 */
++	zip_cmd->s.historylength = 0;
++	zip_cmd->s.ds = 0;
++
++	/* IWORD # 8 and 9 - Output pointer */
++	zip_cmd->s.out_ptr_addr.s.addr  = __pa(zip_ops->output);
++	zip_cmd->s.out_ptr_ctl.s.length = zip_ops->output_len;
++
++	/* Maximum number of output-stream bytes that can be written */
++	zip_cmd->s.totaloutputlength    = zip_ops->output_len;
++
++	zip_dbg("Data Direct Input case ");
++
++	/* IWORD # 6 and 7 - input pointer */
++	zip_cmd->s.dg = 0;
++	zip_cmd->s.inp_ptr_addr.s.addr  = __pa((u8 *)zip_ops->input);
++	zip_cmd->s.inp_ptr_ctl.s.length = zip_ops->input_len;
++
++	/* IWORD # 10 and 11 - Result pointer */
++	zip_cmd->s.res_ptr_addr.s.addr = __pa(result_ptr);
++
++	/* Clearing completion code */
++	result_ptr->s.compcode = 0;
++
++	/* Returning 0 for time being.*/
++	return 0;
++}
++
++/**
++ * zip_inflate - API to offload inflate operation to hardware
++ * @zip_ops: Pointer to zip operation structure
++ * @s:       Pointer to the structure representing zip state
++ * @zip_dev: Pointer to zip device structure
++ *
++ * This function prepares the zip inflate command and submits it to the zip
++ * engine for processing.
++ *
++ * Return: 0 if successful or error code
++ */
++int zip_inflate(struct zip_operation *zip_ops, struct zip_state *s,
++		struct zip_device *zip_dev)
++{
++	union zip_inst_s *zip_cmd    = &s->zip_cmd;
++	union zip_zres_s  *result_ptr = &s->result;
++	u32 queue;
++
++	/* Prepare inflate zip command */
++	prepare_inflate_zcmd(zip_ops, s, zip_cmd);
++
++	/* Load inflate command to zip queue and ring the doorbell */
++	queue = zip_load_instr(zip_cmd, zip_dev);
++
++	while (!result_ptr->s.compcode)
++		continue;
++
++	zip_ops->compcode = result_ptr->s.compcode;
++	switch (zip_ops->compcode) {
++	case ZIP_CMD_NOTDONE:
++		zip_dbg("Zip Instruction not yet completed\n");
++		return ZIP_ERROR;
++
++	case ZIP_CMD_SUCCESS:
++		zip_dbg("Zip Instruction completed successfully\n");
++		break;
++
++	case ZIP_CMD_DYNAMIC_STOP:
++		zip_dbg(" Dynamic stop Initiated\n");
++		break;
++
++	default:
++		zip_dbg("Instruction failed. Code = %d\n", zip_ops->compcode);
++		zip_update_cmd_bufs(zip_dev, queue);
++		return ZIP_ERROR;
++	}
++
++	zip_update_cmd_bufs(zip_dev, queue);
++
++	if ((zip_ops->ccode == 3) && (zip_ops->flush == 4) &&
++	    (zip_ops->compcode != ZIP_CMD_DYNAMIC_STOP))
++		result_ptr->s.ef = 1;
++
++	zip_ops->csum = result_ptr->s.adler32;
++
++	if (zip_ops->output_len < result_ptr->s.totalbyteswritten) {
++		zip_err("output_len (%d) < total bytes written (%d)\n",
++			zip_ops->output_len, result_ptr->s.totalbyteswritten);
++		zip_ops->output_len = 0;
++	} else {
++		zip_ops->output_len = result_ptr->s.totalbyteswritten;
++	}
++
++	zip_ops->bytes_read = result_ptr->s.totalbytesread;
++	zip_ops->bits_processed = result_ptr->s.totalbitsprocessed;
++	zip_ops->end_file = result_ptr->s.ef;
++	if (zip_ops->end_file) {
++		switch (zip_ops->format) {
++		case RAW_FORMAT:
++			zip_dbg("RAW Format: %d ", zip_ops->format);
++			/* Get checksum from engine */
++			zip_ops->csum = result_ptr->s.adler32;
++			break;
++
++		case ZLIB_FORMAT:
++			zip_dbg("ZLIB Format: %d ", zip_ops->format);
++			zip_ops->csum = result_ptr->s.adler32;
++			break;
++
++		case GZIP_FORMAT:
++			zip_dbg("GZIP Format: %d ", zip_ops->format);
++			zip_ops->csum = result_ptr->s.crc32;
++			break;
++
++		case LZS_FORMAT:
++			zip_dbg("LZS Format: %d ", zip_ops->format);
++			break;
++
++		default:
++			zip_err("Format error:%d\n", zip_ops->format);
++		}
++	}
++
++	return 0;
++}
+diff --git a/drivers/crypto/cavium/zip/zip_inflate.h b/drivers/crypto/cavium/zip/zip_inflate.h
+new file mode 100644
+index 0000000..6b20f17
+--- /dev/null
++++ b/drivers/crypto/cavium/zip/zip_inflate.h
+@@ -0,0 +1,62 @@
++/***********************license start************************************
++ * Copyright (c) 2003-2017 Cavium, Inc.
++ * All rights reserved.
++ *
++ * License: one of 'Cavium License' or 'GNU General Public License Version 2'
++ *
++ * This file is provided under the terms of the Cavium License (see below)
++ * or under the terms of GNU General Public License, Version 2, as
++ * published by the Free Software Foundation. When using or redistributing
++ * this file, you may do so under either license.
++ *
++ * Cavium License:  Redistribution and use in source and binary forms, with
++ * or without modification, are permitted provided that the following
++ * conditions are met:
++ *
++ *  * Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ *
++ *  * Redistributions in binary form must reproduce the above
++ *    copyright notice, this list of conditions and the following
++ *    disclaimer in the documentation and/or other materials provided
++ *    with the distribution.
++ *
++ *  * Neither the name of Cavium Inc. nor the names of its contributors may be
++ *    used to endorse or promote products derived from this software without
++ *    specific prior written permission.
++ *
++ * This Software, including technical data, may be subject to U.S. export
++ * control laws, including the U.S. Export Administration Act and its
++ * associated regulations, and may be subject to export or import
++ * regulations in other countries.
++ *
++ * TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE SOFTWARE IS PROVIDED "AS IS"
++ * AND WITH ALL FAULTS AND CAVIUM INC. MAKES NO PROMISES, REPRESENTATIONS
++ * OR WARRANTIES, EITHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, WITH
++ * RESPECT TO THE SOFTWARE, INCLUDING ITS CONDITION, ITS CONFORMITY TO ANY
++ * REPRESENTATION OR DESCRIPTION, OR THE EXISTENCE OF ANY LATENT OR PATENT
++ * DEFECTS, AND CAVIUM SPECIFICALLY DISCLAIMS ALL IMPLIED (IF ANY)
++ * WARRANTIES OF TITLE, MERCHANTABILITY, NONINFRINGEMENT, FITNESS FOR A
++ * PARTICULAR PURPOSE, LACK OF VIRUSES, ACCURACY OR COMPLETENESS, QUIET
++ * ENJOYMENT, QUIET POSSESSION OR CORRESPONDENCE TO DESCRIPTION. THE
++ * ENTIRE  RISK ARISING OUT OF USE OR PERFORMANCE OF THE SOFTWARE LIES
++ * WITH YOU.
++ ***********************license end**************************************/
++
++#ifndef __ZIP_INFLATE_H__
++#define __ZIP_INFLATE_H__
++
++/**
++ * zip_inflate - API to offload inflate operation to hardware
++ * @zip_ops: Pointer to zip operation structure
++ * @s:       Pointer to the structure representing zip state
++ * @zip_dev: Pointer to the structure representing zip device
++ *
++ * This function prepares the zip inflate command and submits it to the zip
++ * engine for processing.
++ *
++ * Return: 0 if successful or error code
++ */
++int zip_inflate(struct zip_operation *zip_ops, struct zip_state *s,
++		struct zip_device *zip_dev);
++#endif
+diff --git a/drivers/crypto/cavium/zip/zip_main.c b/drivers/crypto/cavium/zip/zip_main.c
+index 89ea360..dd5814a 100644
+--- a/drivers/crypto/cavium/zip/zip_main.c
++++ b/drivers/crypto/cavium/zip/zip_main.c
+@@ -339,63 +339,6 @@ static void zip_remove(struct pci_dev *pdev)
+ 	zip_dev[zip->index] = NULL;
+ }
+ 
+-/* Dummy Functions */
+-int  zip_alloc_comp_ctx_deflate(struct crypto_tfm *tfm)
+-{
+-	return 0;
+-}
+-
+-int  zip_alloc_comp_ctx_lzs(struct crypto_tfm *tfm)
+-{
+-	return 0;
+-}
+-
+-void zip_free_comp_ctx(struct crypto_tfm *tfm)
+-{
+-}
+-
+-int  zip_comp_compress(struct crypto_tfm *tfm,
+-		       const u8 *src, unsigned int slen,
+-		       u8 *dst, unsigned int *dlen)
+-{
+-	return 0;
+-}
+-
+-int  zip_comp_decompress(struct crypto_tfm *tfm,
+-			 const u8 *src, unsigned int slen,
+-			 u8 *dst, unsigned int *dlen)
+-{
+-	return 0;
+-}
+-
+-void *zip_alloc_scomp_ctx_deflate(struct crypto_scomp *tfm)
+-{
+-	return NULL;
+-}
+-
+-void *zip_alloc_scomp_ctx_lzs(struct crypto_scomp *tfm)
+-{
+-	return NULL;
+-}
+-
+-void  zip_free_scomp_ctx(struct crypto_scomp *tfm, void *zip_ctx)
+-{
+-}
+-
+-int   zip_scomp_compress(struct crypto_scomp *tfm,
+-			 const u8 *src, unsigned int slen,
+-			 u8 *dst, unsigned int *dlen, void *ctx)
+-{
+-	return 0;
+-}
+-
+-int   zip_scomp_decompress(struct crypto_scomp *tfm,
+-			   const u8 *src, unsigned int slen,
+-			   u8 *dst, unsigned int *dlen, void *ctx)
+-{
+-	return 0;
+-}
+-
+ /* PCI Sub-System Interface */
+ static struct pci_driver zip_driver = {
+ 	.name	    =  DRV_NAME,
 -- 
 1.8.3.1
