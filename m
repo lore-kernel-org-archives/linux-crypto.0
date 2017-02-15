@@ -1,7 +1,7 @@
 From: Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
-Subject: [PATCH v8 4/5] fs/pstore: fs/squashfs: Change usage of LZ4 to work with new LZ4 version
-Date: Wed, 15 Feb 2017 19:16:37 +0100
-Message-ID: <1487182598-15351-5-git-send-email-4sschmid@informatik.uni-hamburg.de>
+Subject: [PATCH v8 3/5] crypto: Change LZ4 modules to work with new LZ4 module version
+Date: Wed, 15 Feb 2017 19:16:36 +0100
+Message-ID: <1487182598-15351-4-git-send-email-4sschmid@informatik.uni-hamburg.de>
 References: <1482259992-16680-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
  <1487182598-15351-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
 Cc: bongkyu.kim@lge.com, rsalvaterra@gmail.com,
@@ -12,107 +12,287 @@ Cc: bongkyu.kim@lge.com, rsalvaterra@gmail.com,
         tony.luck@intel.com,
         Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
 To: akpm@linux-foundation.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mailhost.informatik.uni-hamburg.de ([134.100.9.70]:39750 "EHLO
+        mailhost.informatik.uni-hamburg.de" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1751654AbdBOSRl (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 15 Feb 2017 13:17:41 -0500
 In-Reply-To: <1487182598-15351-1-git-send-email-4sschmid@informatik.uni-hamburg.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Update fs/pstore and fs/squashfs to use the updated functions from the new
-LZ4 module.
+Update the crypto modules using LZ4 compression as well as the test cases
+in testmgr.h to work with the new LZ4 module version.
 
 Signed-off-by: Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
 ---
- fs/pstore/platform.c      | 22 +++++++++++++---------
- fs/squashfs/lz4_wrapper.c | 12 ++++++------
- 2 files changed, 19 insertions(+), 15 deletions(-)
+ crypto/lz4.c     |  23 ++++-----
+ crypto/lz4hc.c   |  23 ++++-----
+ crypto/testmgr.h | 142 +++++++++++++++++++++++++++++++++++++++----------------
+ 3 files changed, 120 insertions(+), 68 deletions(-)
 
-diff --git a/fs/pstore/platform.c b/fs/pstore/platform.c
-index 729677e..efab7b6 100644
---- a/fs/pstore/platform.c
-+++ b/fs/pstore/platform.c
-@@ -342,31 +342,35 @@ static int compress_lz4(const void *in, void *out, size_t inlen, size_t outlen)
+diff --git a/crypto/lz4.c b/crypto/lz4.c
+index 99c1b2c..71eff9b 100644
+--- a/crypto/lz4.c
++++ b/crypto/lz4.c
+@@ -66,15 +66,13 @@ static void lz4_exit(struct crypto_tfm *tfm)
+ static int __lz4_compress_crypto(const u8 *src, unsigned int slen,
+ 				 u8 *dst, unsigned int *dlen, void *ctx)
  {
- 	int ret;
+-	size_t tmp_len = *dlen;
+-	int err;
++	int out_len = LZ4_compress_default(src, dst,
++		slen, *dlen, ctx);
  
--	ret = lz4_compress(in, inlen, out, &outlen, workspace);
--	if (ret) {
--		pr_err("lz4_compress error, ret = %d!\n", ret);
-+	ret = LZ4_compress_default(in, out, inlen, outlen, workspace);
-+	if (!ret) {
-+		pr_err("LZ4_compress_default error; compression failed!\n");
- 		return -EIO;
- 	}
+-	err = lz4_compress(src, slen, dst, &tmp_len, ctx);
+-
+-	if (err < 0)
++	if (!out_len)
+ 		return -EINVAL;
  
--	return outlen;
-+	return ret;
+-	*dlen = tmp_len;
++	*dlen = out_len;
+ 	return 0;
  }
  
- static int decompress_lz4(void *in, void *out, size_t inlen, size_t outlen)
+@@ -96,16 +94,13 @@ static int lz4_compress_crypto(struct crypto_tfm *tfm, const u8 *src,
+ static int __lz4_decompress_crypto(const u8 *src, unsigned int slen,
+ 				   u8 *dst, unsigned int *dlen, void *ctx)
  {
- 	int ret;
+-	int err;
+-	size_t tmp_len = *dlen;
+-	size_t __slen = slen;
++	int out_len = LZ4_decompress_safe(src, dst, slen, *dlen);
  
--	ret = lz4_decompress_unknownoutputsize(in, inlen, out, &outlen);
--	if (ret) {
--		pr_err("lz4_decompress error, ret = %d!\n", ret);
-+	ret = LZ4_decompress_safe(in, out, inlen, outlen);
-+	if (ret < 0) {
-+		/*
-+		 * LZ4_decompress_safe will return an error code
-+		 * (< 0) if decompression failed
-+		 */
-+		pr_err("LZ4_decompress_safe error, ret = %d!\n", ret);
- 		return -EIO;
- 	}
+-	err = lz4_decompress_unknownoutputsize(src, __slen, dst, &tmp_len);
+-	if (err < 0)
+-		return -EINVAL;
++	if (out_len < 0)
++		return out_len;
  
--	return outlen;
-+	return ret;
+-	*dlen = tmp_len;
+-	return err;
++	*dlen = out_len;
++	return 0;
  }
  
- static void allocate_lz4(void)
+ static int lz4_sdecompress(struct crypto_scomp *tfm, const u8 *src,
+diff --git a/crypto/lz4hc.c b/crypto/lz4hc.c
+index 75ffc4a..03a34a8 100644
+--- a/crypto/lz4hc.c
++++ b/crypto/lz4hc.c
+@@ -65,15 +65,13 @@ static void lz4hc_exit(struct crypto_tfm *tfm)
+ static int __lz4hc_compress_crypto(const u8 *src, unsigned int slen,
+ 				   u8 *dst, unsigned int *dlen, void *ctx)
  {
--	big_oops_buf_sz = lz4_compressbound(psinfo->bufsize);
-+	big_oops_buf_sz = LZ4_compressBound(psinfo->bufsize);
- 	big_oops_buf = kmalloc(big_oops_buf_sz, GFP_KERNEL);
- 	if (big_oops_buf) {
- 		workspace = kmalloc(LZ4_MEM_COMPRESS, GFP_KERNEL);
-diff --git a/fs/squashfs/lz4_wrapper.c b/fs/squashfs/lz4_wrapper.c
-index ff4468b..95da653 100644
---- a/fs/squashfs/lz4_wrapper.c
-+++ b/fs/squashfs/lz4_wrapper.c
-@@ -97,7 +97,6 @@ static int lz4_uncompress(struct squashfs_sb_info *msblk, void *strm,
- 	struct squashfs_lz4 *stream = strm;
- 	void *buff = stream->input, *data;
- 	int avail, i, bytes = length, res;
--	size_t dest_len = output->length;
+-	size_t tmp_len = *dlen;
+-	int err;
++	int out_len = LZ4_compress_HC(src, dst, slen,
++		*dlen, LZ4HC_DEFAULT_CLEVEL, ctx);
  
- 	for (i = 0; i < b; i++) {
- 		avail = min(bytes, msblk->devblksize - offset);
-@@ -108,12 +107,13 @@ static int lz4_uncompress(struct squashfs_sb_info *msblk, void *strm,
- 		put_bh(bh[i]);
- 	}
+-	err = lz4hc_compress(src, slen, dst, &tmp_len, ctx);
+-
+-	if (err < 0)
++	if (!out_len)
+ 		return -EINVAL;
  
--	res = lz4_decompress_unknownoutputsize(stream->input, length,
--					stream->output, &dest_len);
--	if (res)
-+	res = LZ4_decompress_safe(stream->input, stream->output,
-+		length, output->length);
+-	*dlen = tmp_len;
++	*dlen = out_len;
+ 	return 0;
+ }
+ 
+@@ -97,16 +95,13 @@ static int lz4hc_compress_crypto(struct crypto_tfm *tfm, const u8 *src,
+ static int __lz4hc_decompress_crypto(const u8 *src, unsigned int slen,
+ 				     u8 *dst, unsigned int *dlen, void *ctx)
+ {
+-	int err;
+-	size_t tmp_len = *dlen;
+-	size_t __slen = slen;
++	int out_len = LZ4_decompress_safe(src, dst, slen, *dlen);
+ 
+-	err = lz4_decompress_unknownoutputsize(src, __slen, dst, &tmp_len);
+-	if (err < 0)
+-		return -EINVAL;
++	if (out_len < 0)
++		return out_len;
+ 
+-	*dlen = tmp_len;
+-	return err;
++	*dlen = out_len;
++	return 0;
+ }
+ 
+ static int lz4hc_sdecompress(struct crypto_scomp *tfm, const u8 *src,
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index 9b656be..98d4be0 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -34498,31 +34498,62 @@ static struct hash_testvec bfin_crc_tv_template[] = {
+ 
+ static struct comp_testvec lz4_comp_tv_template[] = {
+ 	{
+-		.inlen	= 70,
+-		.outlen	= 45,
+-		.input	= "Join us now and share the software "
+-			  "Join us now and share the software ",
+-		.output = "\xf0\x10\x4a\x6f\x69\x6e\x20\x75"
+-			  "\x73\x20\x6e\x6f\x77\x20\x61\x6e"
+-			  "\x64\x20\x73\x68\x61\x72\x65\x20"
+-			  "\x74\x68\x65\x20\x73\x6f\x66\x74"
+-			  "\x77\x0d\x00\x0f\x23\x00\x0b\x50"
+-			  "\x77\x61\x72\x65\x20",
++		.inlen	= 255,
++		.outlen	= 218,
++		.input	= "LZ4 is lossless compression algorithm, providing"
++			 " compression speed at 400 MB/s per core, scalable "
++			 "with multi-cores CPU. It features an extremely fast "
++			 "decoder, with speed in multiple GB/s per core, "
++			 "typically reaching RAM speed limits on multi-core "
++			 "systems.",
++		.output	= "\xf9\x21\x4c\x5a\x34\x20\x69\x73\x20\x6c\x6f\x73\x73"
++			  "\x6c\x65\x73\x73\x20\x63\x6f\x6d\x70\x72\x65\x73\x73"
++			  "\x69\x6f\x6e\x20\x61\x6c\x67\x6f\x72\x69\x74\x68\x6d"
++			  "\x2c\x20\x70\x72\x6f\x76\x69\x64\x69\x6e\x67\x21\x00"
++			  "\xf0\x21\x73\x70\x65\x65\x64\x20\x61\x74\x20\x34\x30"
++			  "\x30\x20\x4d\x42\x2f\x73\x20\x70\x65\x72\x20\x63\x6f"
++			  "\x72\x65\x2c\x20\x73\x63\x61\x6c\x61\x62\x6c\x65\x20"
++			  "\x77\x69\x74\x68\x20\x6d\x75\x6c\x74\x69\x2d\x1a\x00"
++			  "\xf0\x00\x73\x20\x43\x50\x55\x2e\x20\x49\x74\x20\x66"
++			  "\x65\x61\x74\x75\x11\x00\xf2\x0b\x61\x6e\x20\x65\x78"
++			  "\x74\x72\x65\x6d\x65\x6c\x79\x20\x66\x61\x73\x74\x20"
++			  "\x64\x65\x63\x6f\x64\x65\x72\x2c\x3d\x00\x02\x67\x00"
++			  "\x22\x69\x6e\x46\x00\x5a\x70\x6c\x65\x20\x47\x6c\x00"
++			  "\xf0\x00\x74\x79\x70\x69\x63\x61\x6c\x6c\x79\x20\x72"
++			  "\x65\x61\x63\x68\xa7\x00\x33\x52\x41\x4d\x38\x00\x83"
++			  "\x6c\x69\x6d\x69\x74\x73\x20\x6f\x3f\x00\x01\x85\x00"
++			  "\x90\x20\x73\x79\x73\x74\x65\x6d\x73\x2e",
 +
-+	if (res < 0)
- 		return -EIO;
+ 	},
+ };
  
--	bytes = dest_len;
-+	bytes = res;
- 	data = squashfs_first_page(output);
- 	buff = stream->output;
- 	while (data) {
-@@ -128,7 +128,7 @@ static int lz4_uncompress(struct squashfs_sb_info *msblk, void *strm,
- 	}
- 	squashfs_finish_page(output);
+ static struct comp_testvec lz4_decomp_tv_template[] = {
+ 	{
+-		.inlen	= 45,
+-		.outlen	= 70,
+-		.input  = "\xf0\x10\x4a\x6f\x69\x6e\x20\x75"
+-			  "\x73\x20\x6e\x6f\x77\x20\x61\x6e"
+-			  "\x64\x20\x73\x68\x61\x72\x65\x20"
+-			  "\x74\x68\x65\x20\x73\x6f\x66\x74"
+-			  "\x77\x0d\x00\x0f\x23\x00\x0b\x50"
+-			  "\x77\x61\x72\x65\x20",
+-		.output	= "Join us now and share the software "
+-			  "Join us now and share the software ",
++		.inlen	= 218,
++		.outlen	= 255,
++		.input	= "\xf9\x21\x4c\x5a\x34\x20\x69\x73\x20\x6c\x6f\x73\x73"
++			  "\x6c\x65\x73\x73\x20\x63\x6f\x6d\x70\x72\x65\x73\x73"
++			  "\x69\x6f\x6e\x20\x61\x6c\x67\x6f\x72\x69\x74\x68\x6d"
++			  "\x2c\x20\x70\x72\x6f\x76\x69\x64\x69\x6e\x67\x21\x00"
++			  "\xf0\x21\x73\x70\x65\x65\x64\x20\x61\x74\x20\x34\x30"
++			  "\x30\x20\x4d\x42\x2f\x73\x20\x70\x65\x72\x20\x63\x6f"
++			  "\x72\x65\x2c\x20\x73\x63\x61\x6c\x61\x62\x6c\x65\x20"
++			  "\x77\x69\x74\x68\x20\x6d\x75\x6c\x74\x69\x2d\x1a\x00"
++			  "\xf0\x00\x73\x20\x43\x50\x55\x2e\x20\x49\x74\x20\x66"
++			  "\x65\x61\x74\x75\x11\x00\xf2\x0b\x61\x6e\x20\x65\x78"
++			  "\x74\x72\x65\x6d\x65\x6c\x79\x20\x66\x61\x73\x74\x20"
++			  "\x64\x65\x63\x6f\x64\x65\x72\x2c\x3d\x00\x02\x67\x00"
++			  "\x22\x69\x6e\x46\x00\x5a\x70\x6c\x65\x20\x47\x6c\x00"
++			  "\xf0\x00\x74\x79\x70\x69\x63\x61\x6c\x6c\x79\x20\x72"
++			  "\x65\x61\x63\x68\xa7\x00\x33\x52\x41\x4d\x38\x00\x83"
++			  "\x6c\x69\x6d\x69\x74\x73\x20\x6f\x3f\x00\x01\x85\x00"
++			  "\x90\x20\x73\x79\x73\x74\x65\x6d\x73\x2e",
++		.output	= "LZ4 is lossless compression algorithm, providing"
++			 " compression speed at 400 MB/s per core, scalable "
++			 "with multi-cores CPU. It features an extremely fast "
++			 "decoder, with speed in multiple GB/s per core, "
++			 "typically reaching RAM speed limits on multi-core "
++			 "systems.",
+ 	},
+ };
  
--	return dest_len;
-+	return res;
- }
+@@ -34531,31 +34562,62 @@ static struct comp_testvec lz4_decomp_tv_template[] = {
  
- const struct squashfs_decompressor squashfs_lz4_comp_ops = {
+ static struct comp_testvec lz4hc_comp_tv_template[] = {
+ 	{
+-		.inlen	= 70,
+-		.outlen	= 45,
+-		.input	= "Join us now and share the software "
+-			  "Join us now and share the software ",
+-		.output = "\xf0\x10\x4a\x6f\x69\x6e\x20\x75"
+-			  "\x73\x20\x6e\x6f\x77\x20\x61\x6e"
+-			  "\x64\x20\x73\x68\x61\x72\x65\x20"
+-			  "\x74\x68\x65\x20\x73\x6f\x66\x74"
+-			  "\x77\x0d\x00\x0f\x23\x00\x0b\x50"
+-			  "\x77\x61\x72\x65\x20",
++		.inlen	= 255,
++		.outlen	= 216,
++		.input	= "LZ4 is lossless compression algorithm, providing"
++			 " compression speed at 400 MB/s per core, scalable "
++			 "with multi-cores CPU. It features an extremely fast "
++			 "decoder, with speed in multiple GB/s per core, "
++			 "typically reaching RAM speed limits on multi-core "
++			 "systems.",
++		.output = "\xf9\x21\x4c\x5a\x34\x20\x69\x73\x20\x6c\x6f\x73\x73"
++			  "\x6c\x65\x73\x73\x20\x63\x6f\x6d\x70\x72\x65\x73\x73"
++			  "\x69\x6f\x6e\x20\x61\x6c\x67\x6f\x72\x69\x74\x68\x6d"
++			  "\x2c\x20\x70\x72\x6f\x76\x69\x64\x69\x6e\x67\x21\x00"
++			  "\xf0\x21\x73\x70\x65\x65\x64\x20\x61\x74\x20\x34\x30"
++			  "\x30\x20\x4d\x42\x2f\x73\x20\x70\x65\x72\x20\x63\x6f"
++			  "\x72\x65\x2c\x20\x73\x63\x61\x6c\x61\x62\x6c\x65\x20"
++			  "\x77\x69\x74\x68\x20\x6d\x75\x6c\x74\x69\x2d\x1a\x00"
++			  "\xf0\x00\x73\x20\x43\x50\x55\x2e\x20\x49\x74\x20\x66"
++			  "\x65\x61\x74\x75\x11\x00\xf2\x0b\x61\x6e\x20\x65\x78"
++			  "\x74\x72\x65\x6d\x65\x6c\x79\x20\x66\x61\x73\x74\x20"
++			  "\x64\x65\x63\x6f\x64\x65\x72\x2c\x3d\x00\x02\x67\x00"
++			  "\x22\x69\x6e\x46\x00\x5a\x70\x6c\x65\x20\x47\x6c\x00"
++			  "\xf0\x00\x74\x79\x70\x69\x63\x61\x6c\x6c\x79\x20\x72"
++			  "\x65\x61\x63\x68\xa7\x00\x33\x52\x41\x4d\x38\x00\x97"
++			  "\x6c\x69\x6d\x69\x74\x73\x20\x6f\x6e\x85\x00\x90\x20"
++			  "\x73\x79\x73\x74\x65\x6d\x73\x2e",
++
+ 	},
+ };
+ 
+ static struct comp_testvec lz4hc_decomp_tv_template[] = {
+ 	{
+-		.inlen	= 45,
+-		.outlen	= 70,
+-		.input  = "\xf0\x10\x4a\x6f\x69\x6e\x20\x75"
+-			  "\x73\x20\x6e\x6f\x77\x20\x61\x6e"
+-			  "\x64\x20\x73\x68\x61\x72\x65\x20"
+-			  "\x74\x68\x65\x20\x73\x6f\x66\x74"
+-			  "\x77\x0d\x00\x0f\x23\x00\x0b\x50"
+-			  "\x77\x61\x72\x65\x20",
+-		.output	= "Join us now and share the software "
+-			  "Join us now and share the software ",
++		.inlen	= 216,
++		.outlen	= 255,
++		.input	= "\xf9\x21\x4c\x5a\x34\x20\x69\x73\x20\x6c\x6f\x73\x73"
++			  "\x6c\x65\x73\x73\x20\x63\x6f\x6d\x70\x72\x65\x73\x73"
++			  "\x69\x6f\x6e\x20\x61\x6c\x67\x6f\x72\x69\x74\x68\x6d"
++			  "\x2c\x20\x70\x72\x6f\x76\x69\x64\x69\x6e\x67\x21\x00"
++			  "\xf0\x21\x73\x70\x65\x65\x64\x20\x61\x74\x20\x34\x30"
++			  "\x30\x20\x4d\x42\x2f\x73\x20\x70\x65\x72\x20\x63\x6f"
++			  "\x72\x65\x2c\x20\x73\x63\x61\x6c\x61\x62\x6c\x65\x20"
++			  "\x77\x69\x74\x68\x20\x6d\x75\x6c\x74\x69\x2d\x1a\x00"
++			  "\xf0\x00\x73\x20\x43\x50\x55\x2e\x20\x49\x74\x20\x66"
++			  "\x65\x61\x74\x75\x11\x00\xf2\x0b\x61\x6e\x20\x65\x78"
++			  "\x74\x72\x65\x6d\x65\x6c\x79\x20\x66\x61\x73\x74\x20"
++			  "\x64\x65\x63\x6f\x64\x65\x72\x2c\x3d\x00\x02\x67\x00"
++			  "\x22\x69\x6e\x46\x00\x5a\x70\x6c\x65\x20\x47\x6c\x00"
++			  "\xf0\x00\x74\x79\x70\x69\x63\x61\x6c\x6c\x79\x20\x72"
++			  "\x65\x61\x63\x68\xa7\x00\x33\x52\x41\x4d\x38\x00\x97"
++			  "\x6c\x69\x6d\x69\x74\x73\x20\x6f\x6e\x85\x00\x90\x20"
++			  "\x73\x79\x73\x74\x65\x6d\x73\x2e",
++		.output	= "LZ4 is lossless compression algorithm, providing"
++			 " compression speed at 400 MB/s per core, scalable "
++			 "with multi-cores CPU. It features an extremely fast "
++			 "decoder, with speed in multiple GB/s per core, "
++			 "typically reaching RAM speed limits on multi-core "
++			 "systems.",
+ 	},
+ };
+ 
 -- 
 2.1.4
