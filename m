@@ -1,74 +1,36 @@
-From: Anup Patel <anup.patel@broadcom.com>
-Subject: [PATCH v5 4/4] dt-bindings: Add DT bindings document for Broadcom SBA RAID driver
-Date: Thu, 16 Feb 2017 12:18:15 +0530
-Message-ID: <1487227695-965-5-git-send-email-anup.patel@broadcom.com>
-References: <1487227695-965-1-git-send-email-anup.patel@broadcom.com>
-Cc: Dan Williams <dan.j.williams@intel.com>,
-        Ray Jui <rjui@broadcom.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        Jon Mason <jonmason@broadcom.com>,
-        Rob Rice <rob.rice@broadcom.com>,
-        bcm-kernel-feedback-list@broadcom.com, dmaengine@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-raid@vger.kernel.org, Anup Patel <anup.patel@broadcom.com>
-To: Vinod Koul <vinod.koul@intel.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Jassi Brar <jassisinghbrar@gmail.com>
-Return-path: <linux-raid-owner@vger.kernel.org>
-In-Reply-To: <1487227695-965-1-git-send-email-anup.patel@broadcom.com>
-Sender: linux-raid-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v3 0/2] crypto: AF_ALG memory management fix
+Date: Thu, 16 Feb 2017 20:10:21 +0800
+Message-ID: <20170216121021.GA18940@gondor.apana.org.au>
+References: <1652737.cgCBfDoNyd@positron.chronox.de>
+ <2976339.VnMoFl3GdB@positron.chronox.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Cc: linux-crypto@vger.kernel.org
+To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:34467 "EHLO
+        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1753434AbdBPMKh (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Feb 2017 07:10:37 -0500
+Content-Disposition: inline
+In-Reply-To: <2976339.VnMoFl3GdB@positron.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-This patch adds the DT bindings document for newly added Broadcom
-SBA RAID driver.
+On Wed, Feb 15, 2017 at 09:47:19AM +0100, Stephan Müller wrote:
+> 
+> as I just saw that you marked my patch with changes requested in patchwork, 
+> may I ask which changes should be applied?
 
-Signed-off-by: Anup Patel <anup.patel@broadcom.com>
-Reviewed-by: Ray Jui <ray.jui@broadcom.com>
-Reviewed-by: Scott Branden <scott.branden@broadcom.com>
----
- .../devicetree/bindings/dma/brcm,iproc-sba.txt     | 29 ++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/dma/brcm,iproc-sba.txt
+I thought we agreed that we would not do the TX offset thing and
+keep the existing semantics of consuming all TX data given an RX
+request.
 
-diff --git a/Documentation/devicetree/bindings/dma/brcm,iproc-sba.txt b/Documentation/devicetree/bindings/dma/brcm,iproc-sba.txt
-new file mode 100644
-index 0000000..092913a
---- /dev/null
-+++ b/Documentation/devicetree/bindings/dma/brcm,iproc-sba.txt
-@@ -0,0 +1,29 @@
-+* Broadcom SBA RAID engine
-+
-+Required properties:
-+- compatible: Should be one of the following
-+	      "brcm,iproc-sba"
-+	      "brcm,iproc-sba-v2"
-+  The "brcm,iproc-sba" has support for only 6 PQ coefficients
-+  The "brcm,iproc-sba-v2" has support for only 30 PQ coefficients
-+- mboxes: List of phandle and mailbox channel specifiers
-+
-+Example:
-+
-+raid_mbox: mbox@67400000 {
-+	...
-+	#mbox-cells = <3>;
-+	...
-+};
-+
-+raid0 {
-+	compatible = "brcm,iproc-sba-v2";
-+	mboxes = <&raid_mbox 0 0x1 0xffff>,
-+		 <&raid_mbox 1 0x1 0xffff>,
-+		 <&raid_mbox 2 0x1 0xffff>,
-+		 <&raid_mbox 3 0x1 0xffff>,
-+		 <&raid_mbox 4 0x1 0xffff>,
-+		 <&raid_mbox 5 0x1 0xffff>,
-+		 <&raid_mbox 6 0x1 0xffff>,
-+		 <&raid_mbox 7 0x1 0xffff>;
-+};
+Cheers,
 -- 
-2.7.4
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
