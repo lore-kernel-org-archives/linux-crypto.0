@@ -1,36 +1,47 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [PATCH v3 0/2] crypto: AF_ALG memory management fix
-Date: Thu, 16 Feb 2017 13:55:55 +0100
-Message-ID: <1562177.Y0EmCeTO2L@tauon.atsec.com>
-References: <1652737.cgCBfDoNyd@positron.chronox.de> <2976339.VnMoFl3GdB@positron.chronox.de> <20170216121021.GA18940@gondor.apana.org.au>
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: [bug report] crypto: cavium - Add the Virtual Function driver for CPT
+Date: Thu, 16 Feb 2017 23:18:11 +0300
+Message-ID: <20170216201811.GA4898@mwanda>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: george.cherian@cavium.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:59666 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754622AbdBPM4D (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Feb 2017 07:56:03 -0500
-In-Reply-To: <20170216121021.GA18940@gondor.apana.org.au>
+Received: from userp1040.oracle.com ([156.151.31.81]:48789 "EHLO
+        userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932740AbdBPUS7 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Feb 2017 15:18:59 -0500
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Donnerstag, 16. Februar 2017, 20:10:21 CET schrieb Herbert Xu:
+Hello George Cherian,
 
-Hi Herbert,
+This is a semi-automatic email about new static checker warnings.
 
-> On Wed, Feb 15, 2017 at 09:47:19AM +0100, Stephan Müller wrote:
-> > as I just saw that you marked my patch with changes requested in
-> > patchwork,
-> > may I ask which changes should be applied?
-> 
-> I thought we agreed that we would not do the TX offset thing and
-> keep the existing semantics of consuming all TX data given an RX
-> request.
+The patch c694b233295b: "crypto: cavium - Add the Virtual Function
+driver for CPT" from Feb 7, 2017, leads to the following Smatch
+complaint:
 
-Ok, will do.
+drivers/crypto/cavium/cpt/cptvf_main.c:899 cptvf_remove()
+	 error: we previously assumed 'cptvf' could be null (see line 895)
 
-Ciao
-Stephan
+drivers/crypto/cavium/cpt/cptvf_main.c
+   894	
+   895		if (!cptvf)
+                     ^^^^^
+Check for NULL.
+
+   896			dev_err(&pdev->dev, "Invalid CPT-VF device\n");
+   897	
+   898		/* Convey DOWN to PF */
+   899		if (cptvf_send_vf_down(cptvf)) {
+                                       ^^^^^
+Oops inside function.
+
+   900			dev_err(&pdev->dev, "PF not responding to DOWN msg");
+   901		} else {
+
+regards,
+dan carpenter
