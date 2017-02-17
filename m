@@ -1,176 +1,368 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH] crypto: Fix next IV issue for CTS template
-Date: Fri, 17 Feb 2017 10:42:26 +0000
-Message-ID: <94677E4B-A9D5-4EEA-87B3-43F01F4DE332@linaro.org>
-References: <1487303262-5602-1-git-send-email-Libo.Wang@arm.com> <CAKv+Gu8s6PrAv9ZMGa_TsRn2UYKoo8KhqERU0NZPjfBhMDK88Q@mail.gmail.com> <20170217091724.GA28198@arm.com> <486E1F1E-8905-45C5-9AD7-9DB3E33CA338@linaro.org> <20170217100643.GB28198@arm.com>
-Mime-Version: 1.0 (1.0)
-Content-Type: text/plain;
-        charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Cc: Libo.Wang@arm.com, Herbert Xu <herbert@gondor.apana.org.au>,
+From: Jiri Slaby <jslaby@suse.cz>
+Subject: [PATCH 06/10] x86: crypto, annotate local functions
+Date: Fri, 17 Feb 2017 11:47:53 +0100
+Message-ID: <20170217104757.28588-6-jslaby@suse.cz>
+References: <20170217104757.28588-1-jslaby@suse.cz>
+Cc: tglx@linutronix.de, hpa@zytor.com, x86@kernel.org,
+        jpoimboe@redhat.com, linux-kernel@vger.kernel.org,
+        Jiri Slaby <jslaby@suse.cz>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Ofir.Drang@arm.com, nd@arm.com
-To: Dennis Chen <dennis.chen@arm.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f48.google.com ([74.125.82.48]:35412 "EHLO
-        mail-wm0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755335AbdBQKm3 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 17 Feb 2017 05:42:29 -0500
-Received: by mail-wm0-f48.google.com with SMTP id v186so11025009wmd.0
-        for <linux-crypto@vger.kernel.org>; Fri, 17 Feb 2017 02:42:29 -0800 (PST)
-In-Reply-To: <20170217100643.GB28198@arm.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+        linux-crypto@vger.kernel.org
+To: mingo@redhat.com
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20170217104757.28588-1-jslaby@suse.cz>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
+Use the newly added ENTRY_LOCAL to annotate starts of all functions
+which do not have ".globl" annotation, but their ends are annotated by
+ENDPROC. This is needed to balance ENDPROC for tools that are about to
+generate debuginfo.
 
-> On 17 Feb 2017, at 10:06, Dennis Chen <dennis.chen@arm.com> wrote:
->=20
->> On Fri, Feb 17, 2017 at 09:23:00AM +0000, Ard Biesheuvel wrote:
->>=20
->>> On 17 Feb 2017, at 09:17, Dennis Chen <dennis.chen@arm.com> wrote:
->>>=20
->>> Hello Ard,
->>> Morning!
->>>> On Fri, Feb 17, 2017 at 07:12:46AM +0000, Ard Biesheuvel wrote:
->>>> Hello Libo,
->>>>=20
->>>>> On 17 February 2017 at 03:47,  <Libo.Wang@arm.com> wrote:
->>>>> From: Libo Wang <Libo Wang@arm.com>
->>>>>=20
->>>>> CTS template assumes underlying CBC algorithm will carry out next IV f=
-or
->>>>> further process.But some implementations of CBC algorithm in kernel br=
-eak
->>>>> this assumption, for example, some hardware crypto drivers ignore next=
- IV
->>>>> for performance consider, inthis case, tcry cts(cbc(aes)) test case wi=
-ll
->>>>> fail. This patch is trying to fix it by getting next IV information re=
-ady
->>>>> before last two blocks processed.
->>>>>=20
->>>>> Signed-off-by: Libo Wang <libo.wang@arm.com>
->>>>> Signed-off-by: Dennis Chen <dennis.chen@arm.com>
->>>>=20
->>>> Which algorithms in particular break this assumption? I recently fixed
->>>> some ARM accelerated software drivers for this reason. If there are
->>>> others, we should fix those rather than try to fix it in the CTS
->>>> driver.
->>>>=20
->>> There're some ARM HW accelerated drivers which are not upstream yet(IP l=
-icense)
->>> breaks this assumption. The current CTS template requires the underlying=
- CBC=20
->>> algorithm always fill the next IV, but in some cases like CBC standalone=
- mode,=20
->>> it doesn't need to fill the next IV, so apparently it will induce perfor=
-mance
->>> degrade from the point of drivers, that's why we fix it in the CTS templ=
-ate,except
->>> that it will also mitigate the potential defect of other HW-based CBC dr=
-ivers.=20
->>=20
->> You should fix this in the driver, not in the cts code.
->>=20
-> Ah, we're open for the change, but is it better to give the reason to fix i=
-t in the driver
-> instead of in cts code?=20
+Signed-off-by: Jiri Slaby <jslaby@suse.cz>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: <x86@kernel.org>
+Cc: <linux-crypto@vger.kernel.org>
+---
+ arch/x86/crypto/aesni-intel_asm.S            | 29 ++++++++++------------------
+ arch/x86/crypto/camellia-aesni-avx-asm_64.S  | 10 +++++-----
+ arch/x86/crypto/camellia-aesni-avx2-asm_64.S | 10 +++++-----
+ arch/x86/crypto/cast5-avx-x86_64-asm_64.S    |  4 ++--
+ arch/x86/crypto/cast6-avx-x86_64-asm_64.S    |  4 ++--
+ arch/x86/crypto/ghash-clmulni-intel_asm.S    |  2 +-
+ arch/x86/crypto/serpent-avx-x86_64-asm_64.S  |  4 ++--
+ arch/x86/crypto/serpent-avx2-asm_64.S        |  4 ++--
+ arch/x86/crypto/twofish-avx-x86_64-asm_64.S  |  4 ++--
+ 9 files changed, 31 insertions(+), 40 deletions(-)
 
-Because it is the h/w driver that violates the api.
-
-Please search the list: I discussed this with Herbert very recently
-
->>>>=20
->>>>> ---
->>>>> crypto/cts.c | 29 +++++++++++++++++++++++++----
->>>>> 1 file changed, 25 insertions(+), 4 deletions(-)
->>>>>=20
->>>>> diff --git a/crypto/cts.c b/crypto/cts.c
->>>>> index a1335d6..712164b 100644
->>>>> --- a/crypto/cts.c
->>>>> +++ b/crypto/cts.c
->>>>> @@ -154,6 +154,7 @@ static int crypto_cts_encrypt(struct skcipher_requ=
-est *req)
->>>>>       unsigned int nbytes =3D req->cryptlen;
->>>>>       int cbc_blocks =3D (nbytes + bsize - 1) / bsize - 1;
->>>>>       unsigned int offset;
->>>>> +       int ret =3D 0;
->>>>>=20
->>>>>       skcipher_request_set_tfm(subreq, ctx->child);
->>>>>=20
->>>>> @@ -174,8 +175,17 @@ static int crypto_cts_encrypt(struct skcipher_req=
-uest *req)
->>>>>       skcipher_request_set_crypt(subreq, req->src, req->dst,
->>>>>                                  offset, req->iv);
->>>>>=20
->>>>> -       return crypto_skcipher_encrypt(subreq) ?:
->>>>> -              cts_cbc_encrypt(req);
->>>>> +       /* process CBC blocks */
->>>>> +       ret =3D crypto_skcipher_encrypt(subreq);
->>>>> +       /* process last two blocks */
->>>>> +       if (!ret) {
->>>>=20
->>>> What happens if an async driver returns -EINPROGRESS here?
->>> For this case, the CTS will return -EINPROGRESS directly.
->>>=20
->>=20
->> I see. But how do you handle the missing out IV when the async call compl=
-etes?
->>=20
-> Not quite understand here, is there some logic inconsistent of the change h=
-ere comparing the
-> original one to handle this case? We think it will have the same result if=
- the fix is in driver layer.
->=20
-> Thanks,
-> Dennis=20
->>=20
->>>>=20
->>>>> +               /* Get IVn-1 back */
->>>>> +               scatterwalk_map_and_copy(req->iv, req->dst, (offset - b=
-size), bsize, 0);
->>>>> +               /* Continue last two blocks */
->>>>> +               return cts_cbc_encrypt(req);
->>>>> +       }
->>>>> +
->>>>> +       return ret;
->>>>> }
->>>>>=20
->>>>> static int cts_cbc_decrypt(struct skcipher_request *req)
->>>>> @@ -248,6 +258,8 @@ static int crypto_cts_decrypt(struct skcipher_requ=
-est *req)
->>>>>       int cbc_blocks =3D (nbytes + bsize - 1) / bsize - 1;
->>>>>       unsigned int offset;
->>>>>       u8 *space;
->>>>> +       int ret =3D 0;
->>>>> +       u8 iv_next[bsize];
->>>>>=20
->>>>>       skcipher_request_set_tfm(subreq, ctx->child);
->>>>>=20
->>>>> @@ -277,8 +289,17 @@ static int crypto_cts_decrypt(struct skcipher_req=
-uest *req)
->>>>>       skcipher_request_set_crypt(subreq, req->src, req->dst,
->>>>>                                  offset, req->iv);
->>>>>=20
->>>>> -       return crypto_skcipher_decrypt(subreq) ?:
->>>>> -              cts_cbc_decrypt(req);
->>>>> +       /* process last two blocks */
->>>>> +       scatterwalk_map_and_copy(iv_next, req->src, (offset - bsize), b=
-size, 0);
->>>>> +       ret =3D crypto_skcipher_decrypt(subreq);
->>>>> +       if (!ret) {
->>>>> +               /* Set Next IV */
->>>>> +               subreq->iv =3D iv_next;
->>>>> +               /* process last two blocks */
->>>>> +               return cts_cbc_decrypt(req);
->>>>> +       }
->>>>> +
->>>>> +       return ret;
->>>>> }
->>>>>=20
->>>>> static int crypto_cts_init_tfm(struct crypto_skcipher *tfm)
->>>>> --
->>>>> 1.8.3.1
->>>>>=20
+diff --git a/arch/x86/crypto/aesni-intel_asm.S b/arch/x86/crypto/aesni-intel_asm.S
+index 3c465184ff8a..624e4303d0fb 100644
+--- a/arch/x86/crypto/aesni-intel_asm.S
++++ b/arch/x86/crypto/aesni-intel_asm.S
+@@ -1746,7 +1746,7 @@ ENDPROC(aesni_gcm_enc)
+ 
+ .align 4
+ _key_expansion_128:
+-_key_expansion_256a:
++ENTRY_LOCAL(_key_expansion_256a)
+ 	pshufd $0b11111111, %xmm1, %xmm1
+ 	shufps $0b00010000, %xmm0, %xmm4
+ 	pxor %xmm4, %xmm0
+@@ -1759,8 +1759,7 @@ _key_expansion_256a:
+ ENDPROC(_key_expansion_128)
+ ENDPROC(_key_expansion_256a)
+ 
+-.align 4
+-_key_expansion_192a:
++ENTRY_LOCAL(_key_expansion_192a)
+ 	pshufd $0b01010101, %xmm1, %xmm1
+ 	shufps $0b00010000, %xmm0, %xmm4
+ 	pxor %xmm4, %xmm0
+@@ -1784,8 +1783,7 @@ _key_expansion_192a:
+ 	ret
+ ENDPROC(_key_expansion_192a)
+ 
+-.align 4
+-_key_expansion_192b:
++ENTRY_LOCAL(_key_expansion_192b)
+ 	pshufd $0b01010101, %xmm1, %xmm1
+ 	shufps $0b00010000, %xmm0, %xmm4
+ 	pxor %xmm4, %xmm0
+@@ -1804,8 +1802,7 @@ _key_expansion_192b:
+ 	ret
+ ENDPROC(_key_expansion_192b)
+ 
+-.align 4
+-_key_expansion_256b:
++ENTRY_LOCAL(_key_expansion_256b)
+ 	pshufd $0b10101010, %xmm1, %xmm1
+ 	shufps $0b00010000, %xmm2, %xmm4
+ 	pxor %xmm4, %xmm2
+@@ -1968,8 +1965,7 @@ ENDPROC(aesni_enc)
+  *	KEY
+  *	TKEYP (T1)
+  */
+-.align 4
+-_aesni_enc1:
++ENTRY_LOCAL(_aesni_enc1)
+ 	movaps (KEYP), KEY		# key
+ 	mov KEYP, TKEYP
+ 	pxor KEY, STATE		# round 0
+@@ -2032,8 +2028,7 @@ ENDPROC(_aesni_enc1)
+  *	KEY
+  *	TKEYP (T1)
+  */
+-.align 4
+-_aesni_enc4:
++ENTRY_LOCAL(_aesni_enc4)
+ 	movaps (KEYP), KEY		# key
+ 	mov KEYP, TKEYP
+ 	pxor KEY, STATE1		# round 0
+@@ -2160,8 +2155,7 @@ ENDPROC(aesni_dec)
+  *	KEY
+  *	TKEYP (T1)
+  */
+-.align 4
+-_aesni_dec1:
++ENTRY_LOCAL(_aesni_dec1)
+ 	movaps (KEYP), KEY		# key
+ 	mov KEYP, TKEYP
+ 	pxor KEY, STATE		# round 0
+@@ -2224,8 +2218,7 @@ ENDPROC(_aesni_dec1)
+  *	KEY
+  *	TKEYP (T1)
+  */
+-.align 4
+-_aesni_dec4:
++ENTRY_LOCAL(_aesni_dec4)
+ 	movaps (KEYP), KEY		# key
+ 	mov KEYP, TKEYP
+ 	pxor KEY, STATE1		# round 0
+@@ -2591,8 +2584,7 @@ ENDPROC(aesni_cbc_dec)
+  *	INC:	== 1, in little endian
+  *	BSWAP_MASK == endian swapping mask
+  */
+-.align 4
+-_aesni_inc_init:
++ENTRY_LOCAL(_aesni_inc_init)
+ 	movaps .Lbswap_mask, BSWAP_MASK
+ 	movaps IV, CTR
+ 	PSHUFB_XMM BSWAP_MASK CTR
+@@ -2617,8 +2609,7 @@ ENDPROC(_aesni_inc_init)
+  *	CTR:	== output IV, in little endian
+  *	TCTR_LOW: == lower qword of CTR
+  */
+-.align 4
+-_aesni_inc:
++ENTRY_LOCAL(_aesni_inc)
+ 	paddq INC, CTR
+ 	add $1, TCTR_LOW
+ 	jnc .Linc_low
+diff --git a/arch/x86/crypto/camellia-aesni-avx-asm_64.S b/arch/x86/crypto/camellia-aesni-avx-asm_64.S
+index f7c495e2863c..f203607da5d0 100644
+--- a/arch/x86/crypto/camellia-aesni-avx-asm_64.S
++++ b/arch/x86/crypto/camellia-aesni-avx-asm_64.S
+@@ -188,7 +188,7 @@
+  * larger and would only be 0.5% faster (on sandy-bridge).
+  */
+ .align 8
+-roundsm16_x0_x1_x2_x3_x4_x5_x6_x7_y0_y1_y2_y3_y4_y5_y6_y7_cd:
++ENTRY_LOCAL(roundsm16_x0_x1_x2_x3_x4_x5_x6_x7_y0_y1_y2_y3_y4_y5_y6_y7_cd)
+ 	roundsm16(%xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
+ 		  %xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14, %xmm15,
+ 		  %rcx, (%r9));
+@@ -196,7 +196,7 @@ roundsm16_x0_x1_x2_x3_x4_x5_x6_x7_y0_y1_y2_y3_y4_y5_y6_y7_cd:
+ ENDPROC(roundsm16_x0_x1_x2_x3_x4_x5_x6_x7_y0_y1_y2_y3_y4_y5_y6_y7_cd)
+ 
+ .align 8
+-roundsm16_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab:
++ENTRY_LOCAL(roundsm16_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab)
+ 	roundsm16(%xmm4, %xmm5, %xmm6, %xmm7, %xmm0, %xmm1, %xmm2, %xmm3,
+ 		  %xmm12, %xmm13, %xmm14, %xmm15, %xmm8, %xmm9, %xmm10, %xmm11,
+ 		  %rax, (%r9));
+@@ -721,7 +721,7 @@ ENDPROC(roundsm16_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab)
+ .text
+ 
+ .align 8
+-__camellia_enc_blk16:
++ENTRY_LOCAL(__camellia_enc_blk16)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rax: temporary storage, 256 bytes
+@@ -808,7 +808,7 @@ __camellia_enc_blk16:
+ ENDPROC(__camellia_enc_blk16)
+ 
+ .align 8
+-__camellia_dec_blk16:
++ENTRY_LOCAL(__camellia_dec_blk16)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rax: temporary storage, 256 bytes
+@@ -1119,7 +1119,7 @@ ENDPROC(camellia_ctr_16way)
+ 	vpxor tmp, iv, iv;
+ 
+ .align 8
+-camellia_xts_crypt_16way:
++ENTRY_LOCAL(camellia_xts_crypt_16way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst (16 blocks)
+diff --git a/arch/x86/crypto/camellia-aesni-avx2-asm_64.S b/arch/x86/crypto/camellia-aesni-avx2-asm_64.S
+index eee5b3982cfd..e7aaf121db74 100644
+--- a/arch/x86/crypto/camellia-aesni-avx2-asm_64.S
++++ b/arch/x86/crypto/camellia-aesni-avx2-asm_64.S
+@@ -227,7 +227,7 @@
+  * larger and would only marginally faster.
+  */
+ .align 8
+-roundsm32_x0_x1_x2_x3_x4_x5_x6_x7_y0_y1_y2_y3_y4_y5_y6_y7_cd:
++ENTRY_LOCAL(roundsm32_x0_x1_x2_x3_x4_x5_x6_x7_y0_y1_y2_y3_y4_y5_y6_y7_cd)
+ 	roundsm32(%ymm0, %ymm1, %ymm2, %ymm3, %ymm4, %ymm5, %ymm6, %ymm7,
+ 		  %ymm8, %ymm9, %ymm10, %ymm11, %ymm12, %ymm13, %ymm14, %ymm15,
+ 		  %rcx, (%r9));
+@@ -235,7 +235,7 @@ roundsm32_x0_x1_x2_x3_x4_x5_x6_x7_y0_y1_y2_y3_y4_y5_y6_y7_cd:
+ ENDPROC(roundsm32_x0_x1_x2_x3_x4_x5_x6_x7_y0_y1_y2_y3_y4_y5_y6_y7_cd)
+ 
+ .align 8
+-roundsm32_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab:
++ENTRY_LOCAL(roundsm32_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab)
+ 	roundsm32(%ymm4, %ymm5, %ymm6, %ymm7, %ymm0, %ymm1, %ymm2, %ymm3,
+ 		  %ymm12, %ymm13, %ymm14, %ymm15, %ymm8, %ymm9, %ymm10, %ymm11,
+ 		  %rax, (%r9));
+@@ -764,7 +764,7 @@ ENDPROC(roundsm32_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab)
+ .text
+ 
+ .align 8
+-__camellia_enc_blk32:
++ENTRY_LOCAL(__camellia_enc_blk32)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rax: temporary storage, 512 bytes
+@@ -851,7 +851,7 @@ __camellia_enc_blk32:
+ ENDPROC(__camellia_enc_blk32)
+ 
+ .align 8
+-__camellia_dec_blk32:
++ENTRY_LOCAL(__camellia_dec_blk32)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rax: temporary storage, 512 bytes
+@@ -1226,7 +1226,7 @@ ENDPROC(camellia_ctr_32way)
+ 	vpxor tmp1, iv, iv;
+ 
+ .align 8
+-camellia_xts_crypt_32way:
++ENTRY_LOCAL(camellia_xts_crypt_32way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst (32 blocks)
+diff --git a/arch/x86/crypto/cast5-avx-x86_64-asm_64.S b/arch/x86/crypto/cast5-avx-x86_64-asm_64.S
+index b4a8806234ea..76b5ca62c84d 100644
+--- a/arch/x86/crypto/cast5-avx-x86_64-asm_64.S
++++ b/arch/x86/crypto/cast5-avx-x86_64-asm_64.S
+@@ -224,7 +224,7 @@
+ .text
+ 
+ .align 16
+-__cast5_enc_blk16:
++ENTRY_LOCAL(__cast5_enc_blk16)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	RL1: blocks 1 and 2
+@@ -296,7 +296,7 @@ __cast5_enc_blk16:
+ ENDPROC(__cast5_enc_blk16)
+ 
+ .align 16
+-__cast5_dec_blk16:
++ENTRY_LOCAL(__cast5_dec_blk16)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	RL1: encrypted blocks 1 and 2
+diff --git a/arch/x86/crypto/cast6-avx-x86_64-asm_64.S b/arch/x86/crypto/cast6-avx-x86_64-asm_64.S
+index 952d3156a933..d5eca2c0c4f6 100644
+--- a/arch/x86/crypto/cast6-avx-x86_64-asm_64.S
++++ b/arch/x86/crypto/cast6-avx-x86_64-asm_64.S
+@@ -262,7 +262,7 @@
+ .text
+ 
+ .align 8
+-__cast6_enc_blk8:
++ENTRY_LOCAL(__cast6_enc_blk8)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: blocks
+@@ -308,7 +308,7 @@ __cast6_enc_blk8:
+ ENDPROC(__cast6_enc_blk8)
+ 
+ .align 8
+-__cast6_dec_blk8:
++ENTRY_LOCAL(__cast6_dec_blk8)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: encrypted blocks
+diff --git a/arch/x86/crypto/ghash-clmulni-intel_asm.S b/arch/x86/crypto/ghash-clmulni-intel_asm.S
+index f94375a8dcd1..5a63c73463b3 100644
+--- a/arch/x86/crypto/ghash-clmulni-intel_asm.S
++++ b/arch/x86/crypto/ghash-clmulni-intel_asm.S
+@@ -47,7 +47,7 @@
+  *	T2
+  *	T3
+  */
+-__clmul_gf128mul_ble:
++ENTRY_LOCAL(__clmul_gf128mul_ble)
+ 	movaps DATA, T1
+ 	pshufd $0b01001110, DATA, T2
+ 	pshufd $0b01001110, SHASH, T3
+diff --git a/arch/x86/crypto/serpent-avx-x86_64-asm_64.S b/arch/x86/crypto/serpent-avx-x86_64-asm_64.S
+index 2925077f8c6a..856fe0ccb262 100644
+--- a/arch/x86/crypto/serpent-avx-x86_64-asm_64.S
++++ b/arch/x86/crypto/serpent-avx-x86_64-asm_64.S
+@@ -570,7 +570,7 @@
+ 	transpose_4x4(x0, x1, x2, x3, t0, t1, t2)
+ 
+ .align 8
+-__serpent_enc_blk8_avx:
++ENTRY_LOCAL(__serpent_enc_blk8_avx)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: blocks
+@@ -624,7 +624,7 @@ __serpent_enc_blk8_avx:
+ ENDPROC(__serpent_enc_blk8_avx)
+ 
+ .align 8
+-__serpent_dec_blk8_avx:
++ENTRY_LOCAL(__serpent_dec_blk8_avx)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: encrypted blocks
+diff --git a/arch/x86/crypto/serpent-avx2-asm_64.S b/arch/x86/crypto/serpent-avx2-asm_64.S
+index d67888f2a52a..b73e11d94489 100644
+--- a/arch/x86/crypto/serpent-avx2-asm_64.S
++++ b/arch/x86/crypto/serpent-avx2-asm_64.S
+@@ -566,7 +566,7 @@
+ 	transpose_4x4(x0, x1, x2, x3, t0, t1, t2)
+ 
+ .align 8
+-__serpent_enc_blk16:
++ENTRY_LOCAL(__serpent_enc_blk16)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: plaintext
+@@ -620,7 +620,7 @@ __serpent_enc_blk16:
+ ENDPROC(__serpent_enc_blk16)
+ 
+ .align 8
+-__serpent_dec_blk16:
++ENTRY_LOCAL(__serpent_dec_blk16)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: ciphertext
+diff --git a/arch/x86/crypto/twofish-avx-x86_64-asm_64.S b/arch/x86/crypto/twofish-avx-x86_64-asm_64.S
+index b3f49d286348..59d635935c8e 100644
+--- a/arch/x86/crypto/twofish-avx-x86_64-asm_64.S
++++ b/arch/x86/crypto/twofish-avx-x86_64-asm_64.S
+@@ -249,7 +249,7 @@
+ 	vpxor		x3, wkey, x3;
+ 
+ .align 8
+-__twofish_enc_blk8:
++ENTRY_LOCAL(__twofish_enc_blk8)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: blocks
+@@ -291,7 +291,7 @@ __twofish_enc_blk8:
+ ENDPROC(__twofish_enc_blk8)
+ 
+ .align 8
+-__twofish_dec_blk8:
++ENTRY_LOCAL(__twofish_dec_blk8)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	RC1, RD1, RA1, RB1, RC2, RD2, RA2, RB2: encrypted blocks
+-- 
+2.11.1
