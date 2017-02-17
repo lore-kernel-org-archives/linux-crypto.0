@@ -1,56 +1,44 @@
-From: Harald Freudenberger <freude@linux.vnet.ibm.com>
-Subject: crypto: hang in crypto_larval_lookup
-Date: Fri, 17 Feb 2017 18:50:27 +0100
-Message-ID: <02b80c39-0fd5-b7bd-39da-07e5d71abbad@linux.vnet.ibm.com>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: Re: BUG: af_alg bind fails for 50 % request from userspace for hash algo
+Date: Fri, 17 Feb 2017 23:25:45 +0100
+Message-ID: <2078437.67e00qAA34@positron.chronox.de>
+References: <4fae9b51-ce64-f380-def3-f91f7bffc244@chelsio.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au,
-        Martin Schwidefsky <schwidefsky@de.ibm.com>
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org
+To: Harsh Jain <Harsh@chelsio.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50341 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S934271AbdBQVQQ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 17 Feb 2017 16:16:16 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id v1HHmkiC015188
-        for <linux-crypto@vger.kernel.org>; Fri, 17 Feb 2017 12:50:39 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 28nwc7wtfu-1
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Fri, 17 Feb 2017 12:50:38 -0500
-Received: from localhost
-        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-crypto@vger.kernel.org> from <freude@linux.vnet.ibm.com>;
-        Fri, 17 Feb 2017 17:50:36 -0000
+Received: from mail.eperm.de ([89.247.134.16]:59698 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S935000AbdBQWZt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 17 Feb 2017 17:25:49 -0500
+In-Reply-To: <4fae9b51-ce64-f380-def3-f91f7bffc244@chelsio.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Am Mittwoch, 15. Februar 2017, 22:12:16 CET schrieb Harsh Jain:
 
-Hello all
+Hi Harsh,
 
-I am currently following a hang at modprobe aes_s390 where
-crypto_register_alg() does not come back for the xts(aes) algorithm.
+> Hi Herbert/Stephen,
+> 
+> When I try to run 100 application which calculates sha384 digest from
+> userspace, nearly 50 applications fail in bind system call with error
+> ENOENT.
+> 
+> "crypto_alg_mod_lookup" in api.c call fails in kernel space. Issue comes in
+> 1st try only(Seems some relation with crypto test executions).  If I
+> execute same test again issue didn't reproduce.
 
-The registration is waiting forever in algapi.c crypto_wait_for_test() but
-the completion never occurs. The cryptomgr is triggering a test via
-kthread_run to invoce cryptomgr_probe and this thread is calling the
-create() function of the xts template (file xts.c). Following this thread
-it comes down to api.c crypto_larval_lookup(name="aes") which is first
-requesting the module "crypto-aes" via request_module() successful and then
-blocking forever in requesting the module "crypto-aes-all".
+I can concur that once in a while I see an ENOENT too for hashes. Let me try 
+to investigate that.
+> 
+> Regards
+> 
+> Harsh Jain
 
-The xts(aes) has at registration CRYPTO_ALG_NEED_FALLBACK flag on.
 
-This problem is seen since about 6 weeks now, first only on the linux next
-kernel. Now it appers on the 4.10-rc kernels as well. And I still have no
-idea on how this could be fixed or what's wrong with just the xts
-registration (ecb, cbc, ctr work fine).
-
-Any ideas or hints?
-Thank's in advance.
-
-regards
-Harald Freudenberger
+Ciao
+Stephan
