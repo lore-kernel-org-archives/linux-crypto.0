@@ -1,44 +1,104 @@
 From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: BUG: af_alg bind fails for 50 % request from userspace for hash algo
-Date: Fri, 17 Feb 2017 23:25:45 +0100
-Message-ID: <2078437.67e00qAA34@positron.chronox.de>
-References: <4fae9b51-ce64-f380-def3-f91f7bffc244@chelsio.com>
+Subject: [PATCH v5 0/2] crypto: AF_ALG memory management fix
+Date: Fri, 17 Feb 2017 23:31:17 +0100
+Message-ID: <2523592.mde6d2a8Lg@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org
-To: Harsh Jain <Harsh@chelsio.com>
+Cc: linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:59698 "EHLO mail.eperm.de"
+Received: from mail.eperm.de ([89.247.134.16]:59710 "EHLO mail.eperm.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S935000AbdBQWZt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 17 Feb 2017 17:25:49 -0500
-In-Reply-To: <4fae9b51-ce64-f380-def3-f91f7bffc244@chelsio.com>
+        id S935102AbdBQWe6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 17 Feb 2017 17:34:58 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Mittwoch, 15. Februar 2017, 22:12:16 CET schrieb Harsh Jain:
+Hi Herbert,
 
-Hi Harsh,
+Changes v5:
+* use list_for_each_entry_safe in aead_count_tsgl
 
-> Hi Herbert/Stephen,
-> 
-> When I try to run 100 application which calculates sha384 digest from
-> userspace, nearly 50 applications fail in bind system call with error
-> ENOENT.
-> 
-> "crypto_alg_mod_lookup" in api.c call fails in kernel space. Issue comes in
-> 1st try only(Seems some relation with crypto test executions).  If I
-> execute same test again issue didn't reproduce.
+Changes v4:
+* replace ctx->processed with a maintenance of a private recvmsg
+  TX SGL
+* algif_skcipher: rename skcipher_sg_list into skcipher_tsgl to make
+  it consistent with algif_aead to prepare for a code consolidation
 
-I can concur that once in a while I see an ENOENT too for hashes. Let me try 
-to investigate that.
-> 
-> Regards
-> 
-> Harsh Jain
+Changes v3:
+* in *_pull_tsgl: make sure ctx->processed cannot be less than zero
+* perform fuzzing of all input parameters with bogus values
 
+Changes v2:
+* import fix from Harsh Jain <harsh@chelsio.com> to remove SG
+  from list before freeing
+* fix return code used for ki_complete to match AIO behavior
+  with sync behavior
+* rename variable list -> tsgl_list
+* update the algif_aead patch to include a dynamic TX SGL
+  allocation similar to what algif_skcipher does. This allows
+  concurrent continuous read/write operations to the extent
+  you requested. Although I have not implemented "pairs of
+  TX/RX SGLs" as I think that is even more overhead, the
+  implementation conceptually defines such pairs. The recvmsg
+  call defines how much from the input data is processed.
+  The caller can have arbitrary number of sendmsg calls
+  where the data is added to the TX SGL before an recvmsg
+  asks the kernel to process a given amount (or all) of the
+  TX SGL.
 
-Ciao
-Stephan
+With the changes, you will see a lot of code duplication now
+as I deliberately tried to use the same struct and variable names,
+the same function names and even the same oder of functions.
+If you agree to this patch, I volunteer to provide a followup
+patch that will extract the code duplication into common
+functions.
+
+Please find attached memory management updates to
+
+- simplify the code: the old AIO memory management is very
+  complex and seemingly very fragile -- the update now
+  eliminates all reported bugs in the skcipher and AEAD
+  interfaces which allowed the kernel to be crashed by
+  an unprivileged user
+
+- streamline the code: there is one code path for AIO and sync
+  operation; the code between algif_skcipher and algif_aead
+  is very similar (if that patch set is accepted, I volunteer
+  to reduce code duplication by moving service operations
+  into af_alg.c and to further unify the TX SGL handling)
+
+- unify the AIO and sync operation which only differ in the
+  kernel crypto API callback and whether to wait for the
+  crypto operation or not
+
+- fix all reported bugs regarding the handling of multiple
+  IOCBs.
+
+The following testing was performed:
+
+- stress testing to verify that no memleaks exist
+
+- testing using Tadeusz Struck AIO test tool (see
+  https://github.com/tstruk/afalg_async_test) -- the AEAD test
+  is not applicable any more due to the changed user space
+  interface; the skcipher test works once the user space
+  interface change is honored in the test code
+
+- using the libkcapi test suite, all tests including the
+  originally failing ones (AIO with multiple IOCBs) work now --
+  the current libkcapi code artificially limits the AEAD
+  operation to one IOCB. After altering the libkcapi code
+  to allow multiple IOCBs, the testing works flawless.
+
+Stephan Mueller (2):
+  crypto: skcipher AF_ALG - overhaul memory management
+  crypto: aead AF_ALG - overhaul memory management
+
+ crypto/algif_aead.c     | 702 ++++++++++++++++++++++++++----------------------
+ crypto/algif_skcipher.c | 540 +++++++++++++++++--------------------
+ 2 files changed, 637 insertions(+), 605 deletions(-)
+
+-- 
+2.9.3
