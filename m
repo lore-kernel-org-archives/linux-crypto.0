@@ -1,368 +1,96 @@
 From: Jiri Slaby <jslaby@suse.cz>
-Subject: [PATCH 06/10] x86: crypto, annotate local functions
-Date: Fri, 17 Feb 2017 11:47:53 +0100
-Message-ID: <20170217104757.28588-6-jslaby@suse.cz>
+Subject: [PATCH 08/10] x86: assembly, annotate aliases
+Date: Fri, 17 Feb 2017 11:47:55 +0100
+Message-ID: <20170217104757.28588-8-jslaby@suse.cz>
 References: <20170217104757.28588-1-jslaby@suse.cz>
-Cc: tglx@linutronix.de, hpa@zytor.com, x86@kernel.org,
-        jpoimboe@redhat.com, linux-kernel@vger.kernel.org,
-        Jiri Slaby <jslaby@suse.cz>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: Juergen Gross <jgross@suse.com>, hpa@zytor.com,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ Boris Ostrovsky <boris.ostrovsky@oracle.com>, x86@kernel.org,
+ linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+ jpoimboe@redhat.com, xen-devel@lists.xenproject.org, tglx@linutronix.de,
+ Jiri Slaby <jslaby@suse.cz>, "David S. Miller" <davem@davemloft.net>
 To: mingo@redhat.com
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <xen-devel-bounces@lists.xen.org>
 In-Reply-To: <20170217104757.28588-1-jslaby@suse.cz>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.xen.org/cgi-bin/mailman/options/xen-devel>,
+ <mailto:xen-devel-request@lists.xen.org?subject=unsubscribe>
+List-Post: <mailto:xen-devel@lists.xen.org>
+List-Help: <mailto:xen-devel-request@lists.xen.org?subject=help>
+List-Subscribe: <https://lists.xen.org/cgi-bin/mailman/listinfo/xen-devel>,
+ <mailto:xen-devel-request@lists.xen.org?subject=subscribe>
+Errors-To: xen-devel-bounces@lists.xen.org
+Sender: "Xen-devel" <xen-devel-bounces@lists.xen.org>
 List-Id: linux-crypto.vger.kernel.org
 
-Use the newly added ENTRY_LOCAL to annotate starts of all functions
-which do not have ".globl" annotation, but their ends are annotated by
-ENDPROC. This is needed to balance ENDPROC for tools that are about to
-generate debuginfo.
-
-Signed-off-by: Jiri Slaby <jslaby@suse.cz>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: <x86@kernel.org>
-Cc: <linux-crypto@vger.kernel.org>
----
- arch/x86/crypto/aesni-intel_asm.S            | 29 ++++++++++------------------
- arch/x86/crypto/camellia-aesni-avx-asm_64.S  | 10 +++++-----
- arch/x86/crypto/camellia-aesni-avx2-asm_64.S | 10 +++++-----
- arch/x86/crypto/cast5-avx-x86_64-asm_64.S    |  4 ++--
- arch/x86/crypto/cast6-avx-x86_64-asm_64.S    |  4 ++--
- arch/x86/crypto/ghash-clmulni-intel_asm.S    |  2 +-
- arch/x86/crypto/serpent-avx-x86_64-asm_64.S  |  4 ++--
- arch/x86/crypto/serpent-avx2-asm_64.S        |  4 ++--
- arch/x86/crypto/twofish-avx-x86_64-asm_64.S  |  4 ++--
- 9 files changed, 31 insertions(+), 40 deletions(-)
-
-diff --git a/arch/x86/crypto/aesni-intel_asm.S b/arch/x86/crypto/aesni-intel_asm.S
-index 3c465184ff8a..624e4303d0fb 100644
---- a/arch/x86/crypto/aesni-intel_asm.S
-+++ b/arch/x86/crypto/aesni-intel_asm.S
-@@ -1746,7 +1746,7 @@ ENDPROC(aesni_gcm_enc)
- 
- .align 4
- _key_expansion_128:
--_key_expansion_256a:
-+ENTRY_LOCAL(_key_expansion_256a)
- 	pshufd $0b11111111, %xmm1, %xmm1
- 	shufps $0b00010000, %xmm0, %xmm4
- 	pxor %xmm4, %xmm0
-@@ -1759,8 +1759,7 @@ _key_expansion_256a:
- ENDPROC(_key_expansion_128)
- ENDPROC(_key_expansion_256a)
- 
--.align 4
--_key_expansion_192a:
-+ENTRY_LOCAL(_key_expansion_192a)
- 	pshufd $0b01010101, %xmm1, %xmm1
- 	shufps $0b00010000, %xmm0, %xmm4
- 	pxor %xmm4, %xmm0
-@@ -1784,8 +1783,7 @@ _key_expansion_192a:
- 	ret
- ENDPROC(_key_expansion_192a)
- 
--.align 4
--_key_expansion_192b:
-+ENTRY_LOCAL(_key_expansion_192b)
- 	pshufd $0b01010101, %xmm1, %xmm1
- 	shufps $0b00010000, %xmm0, %xmm4
- 	pxor %xmm4, %xmm0
-@@ -1804,8 +1802,7 @@ _key_expansion_192b:
- 	ret
- ENDPROC(_key_expansion_192b)
- 
--.align 4
--_key_expansion_256b:
-+ENTRY_LOCAL(_key_expansion_256b)
- 	pshufd $0b10101010, %xmm1, %xmm1
- 	shufps $0b00010000, %xmm2, %xmm4
- 	pxor %xmm4, %xmm2
-@@ -1968,8 +1965,7 @@ ENDPROC(aesni_enc)
-  *	KEY
-  *	TKEYP (T1)
-  */
--.align 4
--_aesni_enc1:
-+ENTRY_LOCAL(_aesni_enc1)
- 	movaps (KEYP), KEY		# key
- 	mov KEYP, TKEYP
- 	pxor KEY, STATE		# round 0
-@@ -2032,8 +2028,7 @@ ENDPROC(_aesni_enc1)
-  *	KEY
-  *	TKEYP (T1)
-  */
--.align 4
--_aesni_enc4:
-+ENTRY_LOCAL(_aesni_enc4)
- 	movaps (KEYP), KEY		# key
- 	mov KEYP, TKEYP
- 	pxor KEY, STATE1		# round 0
-@@ -2160,8 +2155,7 @@ ENDPROC(aesni_dec)
-  *	KEY
-  *	TKEYP (T1)
-  */
--.align 4
--_aesni_dec1:
-+ENTRY_LOCAL(_aesni_dec1)
- 	movaps (KEYP), KEY		# key
- 	mov KEYP, TKEYP
- 	pxor KEY, STATE		# round 0
-@@ -2224,8 +2218,7 @@ ENDPROC(_aesni_dec1)
-  *	KEY
-  *	TKEYP (T1)
-  */
--.align 4
--_aesni_dec4:
-+ENTRY_LOCAL(_aesni_dec4)
- 	movaps (KEYP), KEY		# key
- 	mov KEYP, TKEYP
- 	pxor KEY, STATE1		# round 0
-@@ -2591,8 +2584,7 @@ ENDPROC(aesni_cbc_dec)
-  *	INC:	== 1, in little endian
-  *	BSWAP_MASK == endian swapping mask
-  */
--.align 4
--_aesni_inc_init:
-+ENTRY_LOCAL(_aesni_inc_init)
- 	movaps .Lbswap_mask, BSWAP_MASK
- 	movaps IV, CTR
- 	PSHUFB_XMM BSWAP_MASK CTR
-@@ -2617,8 +2609,7 @@ ENDPROC(_aesni_inc_init)
-  *	CTR:	== output IV, in little endian
-  *	TCTR_LOW: == lower qword of CTR
-  */
--.align 4
--_aesni_inc:
-+ENTRY_LOCAL(_aesni_inc)
- 	paddq INC, CTR
- 	add $1, TCTR_LOW
- 	jnc .Linc_low
-diff --git a/arch/x86/crypto/camellia-aesni-avx-asm_64.S b/arch/x86/crypto/camellia-aesni-avx-asm_64.S
-index f7c495e2863c..f203607da5d0 100644
---- a/arch/x86/crypto/camellia-aesni-avx-asm_64.S
-+++ b/arch/x86/crypto/camellia-aesni-avx-asm_64.S
-@@ -188,7 +188,7 @@
-  * larger and would only be 0.5% faster (on sandy-bridge).
-  */
- .align 8
--roundsm16_x0_x1_x2_x3_x4_x5_x6_x7_y0_y1_y2_y3_y4_y5_y6_y7_cd:
-+ENTRY_LOCAL(roundsm16_x0_x1_x2_x3_x4_x5_x6_x7_y0_y1_y2_y3_y4_y5_y6_y7_cd)
- 	roundsm16(%xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
- 		  %xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14, %xmm15,
- 		  %rcx, (%r9));
-@@ -196,7 +196,7 @@ roundsm16_x0_x1_x2_x3_x4_x5_x6_x7_y0_y1_y2_y3_y4_y5_y6_y7_cd:
- ENDPROC(roundsm16_x0_x1_x2_x3_x4_x5_x6_x7_y0_y1_y2_y3_y4_y5_y6_y7_cd)
- 
- .align 8
--roundsm16_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab:
-+ENTRY_LOCAL(roundsm16_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab)
- 	roundsm16(%xmm4, %xmm5, %xmm6, %xmm7, %xmm0, %xmm1, %xmm2, %xmm3,
- 		  %xmm12, %xmm13, %xmm14, %xmm15, %xmm8, %xmm9, %xmm10, %xmm11,
- 		  %rax, (%r9));
-@@ -721,7 +721,7 @@ ENDPROC(roundsm16_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab)
- .text
- 
- .align 8
--__camellia_enc_blk16:
-+ENTRY_LOCAL(__camellia_enc_blk16)
- 	/* input:
- 	 *	%rdi: ctx, CTX
- 	 *	%rax: temporary storage, 256 bytes
-@@ -808,7 +808,7 @@ __camellia_enc_blk16:
- ENDPROC(__camellia_enc_blk16)
- 
- .align 8
--__camellia_dec_blk16:
-+ENTRY_LOCAL(__camellia_dec_blk16)
- 	/* input:
- 	 *	%rdi: ctx, CTX
- 	 *	%rax: temporary storage, 256 bytes
-@@ -1119,7 +1119,7 @@ ENDPROC(camellia_ctr_16way)
- 	vpxor tmp, iv, iv;
- 
- .align 8
--camellia_xts_crypt_16way:
-+ENTRY_LOCAL(camellia_xts_crypt_16way)
- 	/* input:
- 	 *	%rdi: ctx, CTX
- 	 *	%rsi: dst (16 blocks)
-diff --git a/arch/x86/crypto/camellia-aesni-avx2-asm_64.S b/arch/x86/crypto/camellia-aesni-avx2-asm_64.S
-index eee5b3982cfd..e7aaf121db74 100644
---- a/arch/x86/crypto/camellia-aesni-avx2-asm_64.S
-+++ b/arch/x86/crypto/camellia-aesni-avx2-asm_64.S
-@@ -227,7 +227,7 @@
-  * larger and would only marginally faster.
-  */
- .align 8
--roundsm32_x0_x1_x2_x3_x4_x5_x6_x7_y0_y1_y2_y3_y4_y5_y6_y7_cd:
-+ENTRY_LOCAL(roundsm32_x0_x1_x2_x3_x4_x5_x6_x7_y0_y1_y2_y3_y4_y5_y6_y7_cd)
- 	roundsm32(%ymm0, %ymm1, %ymm2, %ymm3, %ymm4, %ymm5, %ymm6, %ymm7,
- 		  %ymm8, %ymm9, %ymm10, %ymm11, %ymm12, %ymm13, %ymm14, %ymm15,
- 		  %rcx, (%r9));
-@@ -235,7 +235,7 @@ roundsm32_x0_x1_x2_x3_x4_x5_x6_x7_y0_y1_y2_y3_y4_y5_y6_y7_cd:
- ENDPROC(roundsm32_x0_x1_x2_x3_x4_x5_x6_x7_y0_y1_y2_y3_y4_y5_y6_y7_cd)
- 
- .align 8
--roundsm32_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab:
-+ENTRY_LOCAL(roundsm32_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab)
- 	roundsm32(%ymm4, %ymm5, %ymm6, %ymm7, %ymm0, %ymm1, %ymm2, %ymm3,
- 		  %ymm12, %ymm13, %ymm14, %ymm15, %ymm8, %ymm9, %ymm10, %ymm11,
- 		  %rax, (%r9));
-@@ -764,7 +764,7 @@ ENDPROC(roundsm32_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab)
- .text
- 
- .align 8
--__camellia_enc_blk32:
-+ENTRY_LOCAL(__camellia_enc_blk32)
- 	/* input:
- 	 *	%rdi: ctx, CTX
- 	 *	%rax: temporary storage, 512 bytes
-@@ -851,7 +851,7 @@ __camellia_enc_blk32:
- ENDPROC(__camellia_enc_blk32)
- 
- .align 8
--__camellia_dec_blk32:
-+ENTRY_LOCAL(__camellia_dec_blk32)
- 	/* input:
- 	 *	%rdi: ctx, CTX
- 	 *	%rax: temporary storage, 512 bytes
-@@ -1226,7 +1226,7 @@ ENDPROC(camellia_ctr_32way)
- 	vpxor tmp1, iv, iv;
- 
- .align 8
--camellia_xts_crypt_32way:
-+ENTRY_LOCAL(camellia_xts_crypt_32way)
- 	/* input:
- 	 *	%rdi: ctx, CTX
- 	 *	%rsi: dst (32 blocks)
-diff --git a/arch/x86/crypto/cast5-avx-x86_64-asm_64.S b/arch/x86/crypto/cast5-avx-x86_64-asm_64.S
-index b4a8806234ea..76b5ca62c84d 100644
---- a/arch/x86/crypto/cast5-avx-x86_64-asm_64.S
-+++ b/arch/x86/crypto/cast5-avx-x86_64-asm_64.S
-@@ -224,7 +224,7 @@
- .text
- 
- .align 16
--__cast5_enc_blk16:
-+ENTRY_LOCAL(__cast5_enc_blk16)
- 	/* input:
- 	 *	%rdi: ctx, CTX
- 	 *	RL1: blocks 1 and 2
-@@ -296,7 +296,7 @@ __cast5_enc_blk16:
- ENDPROC(__cast5_enc_blk16)
- 
- .align 16
--__cast5_dec_blk16:
-+ENTRY_LOCAL(__cast5_dec_blk16)
- 	/* input:
- 	 *	%rdi: ctx, CTX
- 	 *	RL1: encrypted blocks 1 and 2
-diff --git a/arch/x86/crypto/cast6-avx-x86_64-asm_64.S b/arch/x86/crypto/cast6-avx-x86_64-asm_64.S
-index 952d3156a933..d5eca2c0c4f6 100644
---- a/arch/x86/crypto/cast6-avx-x86_64-asm_64.S
-+++ b/arch/x86/crypto/cast6-avx-x86_64-asm_64.S
-@@ -262,7 +262,7 @@
- .text
- 
- .align 8
--__cast6_enc_blk8:
-+ENTRY_LOCAL(__cast6_enc_blk8)
- 	/* input:
- 	 *	%rdi: ctx, CTX
- 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: blocks
-@@ -308,7 +308,7 @@ __cast6_enc_blk8:
- ENDPROC(__cast6_enc_blk8)
- 
- .align 8
--__cast6_dec_blk8:
-+ENTRY_LOCAL(__cast6_dec_blk8)
- 	/* input:
- 	 *	%rdi: ctx, CTX
- 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: encrypted blocks
-diff --git a/arch/x86/crypto/ghash-clmulni-intel_asm.S b/arch/x86/crypto/ghash-clmulni-intel_asm.S
-index f94375a8dcd1..5a63c73463b3 100644
---- a/arch/x86/crypto/ghash-clmulni-intel_asm.S
-+++ b/arch/x86/crypto/ghash-clmulni-intel_asm.S
-@@ -47,7 +47,7 @@
-  *	T2
-  *	T3
-  */
--__clmul_gf128mul_ble:
-+ENTRY_LOCAL(__clmul_gf128mul_ble)
- 	movaps DATA, T1
- 	pshufd $0b01001110, DATA, T2
- 	pshufd $0b01001110, SHASH, T3
-diff --git a/arch/x86/crypto/serpent-avx-x86_64-asm_64.S b/arch/x86/crypto/serpent-avx-x86_64-asm_64.S
-index 2925077f8c6a..856fe0ccb262 100644
---- a/arch/x86/crypto/serpent-avx-x86_64-asm_64.S
-+++ b/arch/x86/crypto/serpent-avx-x86_64-asm_64.S
-@@ -570,7 +570,7 @@
- 	transpose_4x4(x0, x1, x2, x3, t0, t1, t2)
- 
- .align 8
--__serpent_enc_blk8_avx:
-+ENTRY_LOCAL(__serpent_enc_blk8_avx)
- 	/* input:
- 	 *	%rdi: ctx, CTX
- 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: blocks
-@@ -624,7 +624,7 @@ __serpent_enc_blk8_avx:
- ENDPROC(__serpent_enc_blk8_avx)
- 
- .align 8
--__serpent_dec_blk8_avx:
-+ENTRY_LOCAL(__serpent_dec_blk8_avx)
- 	/* input:
- 	 *	%rdi: ctx, CTX
- 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: encrypted blocks
-diff --git a/arch/x86/crypto/serpent-avx2-asm_64.S b/arch/x86/crypto/serpent-avx2-asm_64.S
-index d67888f2a52a..b73e11d94489 100644
---- a/arch/x86/crypto/serpent-avx2-asm_64.S
-+++ b/arch/x86/crypto/serpent-avx2-asm_64.S
-@@ -566,7 +566,7 @@
- 	transpose_4x4(x0, x1, x2, x3, t0, t1, t2)
- 
- .align 8
--__serpent_enc_blk16:
-+ENTRY_LOCAL(__serpent_enc_blk16)
- 	/* input:
- 	 *	%rdi: ctx, CTX
- 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: plaintext
-@@ -620,7 +620,7 @@ __serpent_enc_blk16:
- ENDPROC(__serpent_enc_blk16)
- 
- .align 8
--__serpent_dec_blk16:
-+ENTRY_LOCAL(__serpent_dec_blk16)
- 	/* input:
- 	 *	%rdi: ctx, CTX
- 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: ciphertext
-diff --git a/arch/x86/crypto/twofish-avx-x86_64-asm_64.S b/arch/x86/crypto/twofish-avx-x86_64-asm_64.S
-index b3f49d286348..59d635935c8e 100644
---- a/arch/x86/crypto/twofish-avx-x86_64-asm_64.S
-+++ b/arch/x86/crypto/twofish-avx-x86_64-asm_64.S
-@@ -249,7 +249,7 @@
- 	vpxor		x3, wkey, x3;
- 
- .align 8
--__twofish_enc_blk8:
-+ENTRY_LOCAL(__twofish_enc_blk8)
- 	/* input:
- 	 *	%rdi: ctx, CTX
- 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: blocks
-@@ -291,7 +291,7 @@ __twofish_enc_blk8:
- ENDPROC(__twofish_enc_blk8)
- 
- .align 8
--__twofish_dec_blk8:
-+ENTRY_LOCAL(__twofish_dec_blk8)
- 	/* input:
- 	 *	%rdi: ctx, CTX
- 	 *	RC1, RD1, RA1, RB1, RC2, RD2, RA2, RB2: encrypted blocks
--- 
-2.11.1
+X2tleV9leHBhbnNpb25fMTI4IGlzIGFuIGFsaWFzIHRvIF9rZXlfZXhwYW5zaW9uXzI1NmEsIF9f
+bWVtY3B5IHRvCm1lbWNweSwgeGVuX3N5c2NhbGwzMl90YXJnZXQgdG8geGVuX3N5c2VudGVyX3Rh
+cmdldCwgYW5kIHNvIG9uLiBBbm5vdGF0ZQp0aGVtIGFsbCB1c2luZyB0aGUgbmV3IEVOVFJZX0FM
+SUFTIGFuZCBFTlRSWV9MT0NBTF9BTElBUy4gVGhpcyB3aWxsIG1ha2UKdGhlIHRvb2xzIGdlbmVy
+YXRpbmcgdGhlIGRlYnVnaW5mbyBoYXBweS4KClNpZ25lZC1vZmYtYnk6IEppcmkgU2xhYnkgPGpz
+bGFieUBzdXNlLmN6PgpDYzogSGVyYmVydCBYdSA8aGVyYmVydEBnb25kb3IuYXBhbmEub3JnLmF1
+PgpDYzogIkRhdmlkIFMuIE1pbGxlciIgPGRhdmVtQGRhdmVtbG9mdC5uZXQ+CkNjOiBUaG9tYXMg
+R2xlaXhuZXIgPHRnbHhAbGludXRyb25peC5kZT4KQ2M6IEluZ28gTW9sbmFyIDxtaW5nb0ByZWRo
+YXQuY29tPgpDYzogIkguIFBldGVyIEFudmluIiA8aHBhQHp5dG9yLmNvbT4KQ2M6IDx4ODZAa2Vy
+bmVsLm9yZz4KQ2M6IEJvcmlzIE9zdHJvdnNreSA8Ym9yaXMub3N0cm92c2t5QG9yYWNsZS5jb20+
+CkNjOiBKdWVyZ2VuIEdyb3NzIDxqZ3Jvc3NAc3VzZS5jb20+CkNjOiA8bGludXgtY3J5cHRvQHZn
+ZXIua2VybmVsLm9yZz4KQ2M6IDx4ZW4tZGV2ZWxAbGlzdHMueGVucHJvamVjdC5vcmc+Ci0tLQog
+YXJjaC94ODYvY3J5cHRvL2Flc25pLWludGVsX2FzbS5TIHwgNSArKy0tLQogYXJjaC94ODYvbGli
+L21lbWNweV82NC5TICAgICAgICAgIHwgNCArKy0tCiBhcmNoL3g4Ni9saWIvbWVtbW92ZV82NC5T
+ICAgICAgICAgfCA0ICsrLS0KIGFyY2gveDg2L2xpYi9tZW1zZXRfNjQuUyAgICAgICAgICB8IDQg
+KystLQogYXJjaC94ODYveGVuL3hlbi1hc21fNjQuUyAgICAgICAgIHwgNCArKy0tCiA1IGZpbGVz
+IGNoYW5nZWQsIDEwIGluc2VydGlvbnMoKyksIDExIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBh
+L2FyY2gveDg2L2NyeXB0by9hZXNuaS1pbnRlbF9hc20uUyBiL2FyY2gveDg2L2NyeXB0by9hZXNu
+aS1pbnRlbF9hc20uUwppbmRleCA2MjRlNDMwM2QwZmIuLjZhMGYyNWJlMWE1NiAxMDA2NDQKLS0t
+IGEvYXJjaC94ODYvY3J5cHRvL2Flc25pLWludGVsX2FzbS5TCisrKyBiL2FyY2gveDg2L2NyeXB0
+by9hZXNuaS1pbnRlbF9hc20uUwpAQCAtMTc0NCw4ICsxNzQ0LDcgQEAgRU5EUFJPQyhhZXNuaV9n
+Y21fZW5jKQogI2VuZGlmCiAKIAotLmFsaWduIDQKLV9rZXlfZXhwYW5zaW9uXzEyODoKK0VOVFJZ
+X0xPQ0FMX0FMSUFTKF9rZXlfZXhwYW5zaW9uXzEyOCkKIEVOVFJZX0xPQ0FMKF9rZXlfZXhwYW5z
+aW9uXzI1NmEpCiAJcHNodWZkICQwYjExMTExMTExLCAleG1tMSwgJXhtbTEKIAlzaHVmcHMgJDBi
+MDAwMTAwMDAsICV4bW0wLCAleG1tNApAQCAtMTc1Niw4ICsxNzU1LDggQEAgRU5UUllfTE9DQUwo
+X2tleV9leHBhbnNpb25fMjU2YSkKIAltb3ZhcHMgJXhtbTAsIChUS0VZUCkKIAlhZGQgJDB4MTAs
+IFRLRVlQCiAJcmV0Ci1FTkRQUk9DKF9rZXlfZXhwYW5zaW9uXzEyOCkKIEVORFBST0MoX2tleV9l
+eHBhbnNpb25fMjU2YSkKK0VORF9BTElBUyhfa2V5X2V4cGFuc2lvbl8xMjgpCiAKIEVOVFJZX0xP
+Q0FMKF9rZXlfZXhwYW5zaW9uXzE5MmEpCiAJcHNodWZkICQwYjAxMDEwMTAxLCAleG1tMSwgJXht
+bTEKZGlmZiAtLWdpdCBhL2FyY2gveDg2L2xpYi9tZW1jcHlfNjQuUyBiL2FyY2gveDg2L2xpYi9t
+ZW1jcHlfNjQuUwppbmRleCA3Nzk3ODJmNTgzMjQuLmM5YWM1NDgyMmU4NyAxMDA2NDQKLS0tIGEv
+YXJjaC94ODYvbGliL21lbWNweV82NC5TCisrKyBiL2FyY2gveDg2L2xpYi9tZW1jcHlfNjQuUwpA
+QCAtMjYsNyArMjYsNyBAQAogICogT3V0cHV0OgogICogcmF4IG9yaWdpbmFsIGRlc3RpbmF0aW9u
+CiAgKi8KLUVOVFJZKF9fbWVtY3B5KQorRU5UUllfQUxJQVMoX19tZW1jcHkpCiBFTlRSWShtZW1j
+cHkpCiAJQUxURVJOQVRJVkVfMiAiam1wIG1lbWNweV9vcmlnIiwgIiIsIFg4Nl9GRUFUVVJFX1JF
+UF9HT09ELCBcCiAJCSAgICAgICJqbXAgbWVtY3B5X2VybXMiLCBYODZfRkVBVFVSRV9FUk1TCkBA
+IC00MCw3ICs0MCw3IEBAIEVOVFJZKG1lbWNweSkKIAlyZXAgbW92c2IKIAlyZXQKIEVORFBST0Mo
+bWVtY3B5KQotRU5EUFJPQyhfX21lbWNweSkKK0VORF9BTElBUyhfX21lbWNweSkKIEVYUE9SVF9T
+WU1CT0wobWVtY3B5KQogRVhQT1JUX1NZTUJPTChfX21lbWNweSkKIApkaWZmIC0tZ2l0IGEvYXJj
+aC94ODYvbGliL21lbW1vdmVfNjQuUyBiL2FyY2gveDg2L2xpYi9tZW1tb3ZlXzY0LlMKaW5kZXgg
+MTVkZTg2Y2QxNWIwLi43NmY1NGJhM2RkMjYgMTAwNjQ0Ci0tLSBhL2FyY2gveDg2L2xpYi9tZW1t
+b3ZlXzY0LlMKKysrIGIvYXJjaC94ODYvbGliL21lbW1vdmVfNjQuUwpAQCAtMjUsNyArMjUsNyBA
+QAogICovCiAud2VhayBtZW1tb3ZlCiAKLUVOVFJZKG1lbW1vdmUpCitFTlRSWV9BTElBUyhtZW1t
+b3ZlKQogRU5UUlkoX19tZW1tb3ZlKQogCiAJLyogSGFuZGxlIG1vcmUgMzIgYnl0ZXMgaW4gbG9v
+cCAqLwpAQCAtMjA3LDYgKzIwNyw2IEBAIEVOVFJZKF9fbWVtbW92ZSkKIDEzOgogCXJldHEKIEVO
+RFBST0MoX19tZW1tb3ZlKQotRU5EUFJPQyhtZW1tb3ZlKQorRU5EX0FMSUFTKG1lbW1vdmUpCiBF
+WFBPUlRfU1lNQk9MKF9fbWVtbW92ZSkKIEVYUE9SVF9TWU1CT0wobWVtbW92ZSkKZGlmZiAtLWdp
+dCBhL2FyY2gveDg2L2xpYi9tZW1zZXRfNjQuUyBiL2FyY2gveDg2L2xpYi9tZW1zZXRfNjQuUwpp
+bmRleCA1NWI5NWRiMzBhNjEuLmJlNmM0NzA1ZWM1MSAxMDA2NDQKLS0tIGEvYXJjaC94ODYvbGli
+L21lbXNldF82NC5TCisrKyBiL2FyY2gveDg2L2xpYi9tZW1zZXRfNjQuUwpAQCAtMTgsNyArMTgs
+NyBAQAogICoKICAqIHJheCAgIG9yaWdpbmFsIGRlc3RpbmF0aW9uCiAgKi8KLUVOVFJZKG1lbXNl
+dCkKK0VOVFJZX0FMSUFTKG1lbXNldCkKIEVOVFJZKF9fbWVtc2V0KQogCS8qCiAJICogU29tZSBD
+UFVzIHN1cHBvcnQgZW5oYW5jZWQgUkVQIE1PVlNCL1NUT1NCIGZlYXR1cmUuIEl0IGlzIHJlY29t
+bWVuZGVkCkBAIC00Miw4ICs0Miw4IEBAIEVOVFJZKF9fbWVtc2V0KQogCXJlcCBzdG9zYgogCW1v
+dnEgJXI5LCVyYXgKIAlyZXQKLUVORFBST0MobWVtc2V0KQogRU5EUFJPQyhfX21lbXNldCkKK0VO
+RF9BTElBUyhtZW1zZXQpCiBFWFBPUlRfU1lNQk9MKG1lbXNldCkKIEVYUE9SVF9TWU1CT0woX19t
+ZW1zZXQpCiAKZGlmZiAtLWdpdCBhL2FyY2gveDg2L3hlbi94ZW4tYXNtXzY0LlMgYi9hcmNoL3g4
+Ni94ZW4veGVuLWFzbV82NC5TCmluZGV4IGQ2MTdiZWE3NjAzOS4uNGIwZmU3NDlmMTBjIDEwMDY0
+NAotLS0gYS9hcmNoL3g4Ni94ZW4veGVuLWFzbV82NC5TCisrKyBiL2FyY2gveDg2L3hlbi94ZW4t
+YXNtXzY0LlMKQEAgLTExNywxMyArMTE3LDEzIEBAIEVORFBST0MoeGVuX3N5c2VudGVyX3Rhcmdl
+dCkKIAogI2Vsc2UgLyogIUNPTkZJR19JQTMyX0VNVUxBVElPTiAqLwogCi1FTlRSWSh4ZW5fc3lz
+Y2FsbDMyX3RhcmdldCkKK0VOVFJZX0FMSUFTKHhlbl9zeXNjYWxsMzJfdGFyZ2V0KQogRU5UUlko
+eGVuX3N5c2VudGVyX3RhcmdldCkKIAlsZWEgMTYoJXJzcCksICVyc3AJLyogc3RyaXAgJXJjeCwg
+JXIxMSAqLwogCW1vdiAkLUVOT1NZUywgJXJheAogCXB1c2hxICQwCiAJam1wIGh5cGVyY2FsbF9p
+cmV0Ci1FTkRQUk9DKHhlbl9zeXNjYWxsMzJfdGFyZ2V0KQogRU5EUFJPQyh4ZW5fc3lzZW50ZXJf
+dGFyZ2V0KQorRU5EX0FMSUFTKHhlbl9zeXNjYWxsMzJfdGFyZ2V0KQogCiAjZW5kaWYJLyogQ09O
+RklHX0lBMzJfRU1VTEFUSU9OICovCi0tIAoyLjExLjEKCgpfX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fXwpYZW4tZGV2ZWwgbWFpbGluZyBsaXN0Clhlbi1kZXZl
+bEBsaXN0cy54ZW4ub3JnCmh0dHBzOi8vbGlzdHMueGVuLm9yZy94ZW4tZGV2ZWwK
