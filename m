@@ -1,96 +1,56 @@
-From: Jiri Slaby <jslaby@suse.cz>
-Subject: [PATCH 08/10] x86: assembly, annotate aliases
-Date: Fri, 17 Feb 2017 11:47:55 +0100
-Message-ID: <20170217104757.28588-8-jslaby@suse.cz>
+From: Juergen Gross <jgross@suse.com>
+Subject: Re: [PATCH 08/10] x86: assembly, annotate aliases
+Date: Fri, 17 Feb 2017 12:52:30 +0100
+Message-ID: <2d17929a-c0d0-319e-f432-bac8d98aea2a@suse.com>
 References: <20170217104757.28588-1-jslaby@suse.cz>
+ <20170217104757.28588-8-jslaby@suse.cz>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Juergen Gross <jgross@suse.com>, hpa@zytor.com,
- Herbert Xu <herbert@gondor.apana.org.au>,
- Boris Ostrovsky <boris.ostrovsky@oracle.com>, x86@kernel.org,
- linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
- jpoimboe@redhat.com, xen-devel@lists.xenproject.org, tglx@linutronix.de,
- Jiri Slaby <jslaby@suse.cz>, "David S. Miller" <davem@davemloft.net>
-To: mingo@redhat.com
-Return-path: <xen-devel-bounces@lists.xen.org>
-In-Reply-To: <20170217104757.28588-1-jslaby@suse.cz>
-List-Unsubscribe: <https://lists.xen.org/cgi-bin/mailman/options/xen-devel>,
- <mailto:xen-devel-request@lists.xen.org?subject=unsubscribe>
-List-Post: <mailto:xen-devel@lists.xen.org>
-List-Help: <mailto:xen-devel-request@lists.xen.org?subject=help>
-List-Subscribe: <https://lists.xen.org/cgi-bin/mailman/listinfo/xen-devel>,
- <mailto:xen-devel-request@lists.xen.org?subject=subscribe>
-Errors-To: xen-devel-bounces@lists.xen.org
-Sender: "Xen-devel" <xen-devel-bounces@lists.xen.org>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Cc: tglx@linutronix.de, hpa@zytor.com, x86@kernel.org,
+        jpoimboe@redhat.com, linux-kernel@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        linux-crypto@vger.kernel.org, xen-devel@lists.xenproject.org
+To: Jiri Slaby <jslaby@suse.cz>, mingo@redhat.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:49856 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S933780AbdBQLwf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 17 Feb 2017 06:52:35 -0500
+In-Reply-To: <20170217104757.28588-8-jslaby@suse.cz>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-X2tleV9leHBhbnNpb25fMTI4IGlzIGFuIGFsaWFzIHRvIF9rZXlfZXhwYW5zaW9uXzI1NmEsIF9f
-bWVtY3B5IHRvCm1lbWNweSwgeGVuX3N5c2NhbGwzMl90YXJnZXQgdG8geGVuX3N5c2VudGVyX3Rh
-cmdldCwgYW5kIHNvIG9uLiBBbm5vdGF0ZQp0aGVtIGFsbCB1c2luZyB0aGUgbmV3IEVOVFJZX0FM
-SUFTIGFuZCBFTlRSWV9MT0NBTF9BTElBUy4gVGhpcyB3aWxsIG1ha2UKdGhlIHRvb2xzIGdlbmVy
-YXRpbmcgdGhlIGRlYnVnaW5mbyBoYXBweS4KClNpZ25lZC1vZmYtYnk6IEppcmkgU2xhYnkgPGpz
-bGFieUBzdXNlLmN6PgpDYzogSGVyYmVydCBYdSA8aGVyYmVydEBnb25kb3IuYXBhbmEub3JnLmF1
-PgpDYzogIkRhdmlkIFMuIE1pbGxlciIgPGRhdmVtQGRhdmVtbG9mdC5uZXQ+CkNjOiBUaG9tYXMg
-R2xlaXhuZXIgPHRnbHhAbGludXRyb25peC5kZT4KQ2M6IEluZ28gTW9sbmFyIDxtaW5nb0ByZWRo
-YXQuY29tPgpDYzogIkguIFBldGVyIEFudmluIiA8aHBhQHp5dG9yLmNvbT4KQ2M6IDx4ODZAa2Vy
-bmVsLm9yZz4KQ2M6IEJvcmlzIE9zdHJvdnNreSA8Ym9yaXMub3N0cm92c2t5QG9yYWNsZS5jb20+
-CkNjOiBKdWVyZ2VuIEdyb3NzIDxqZ3Jvc3NAc3VzZS5jb20+CkNjOiA8bGludXgtY3J5cHRvQHZn
-ZXIua2VybmVsLm9yZz4KQ2M6IDx4ZW4tZGV2ZWxAbGlzdHMueGVucHJvamVjdC5vcmc+Ci0tLQog
-YXJjaC94ODYvY3J5cHRvL2Flc25pLWludGVsX2FzbS5TIHwgNSArKy0tLQogYXJjaC94ODYvbGli
-L21lbWNweV82NC5TICAgICAgICAgIHwgNCArKy0tCiBhcmNoL3g4Ni9saWIvbWVtbW92ZV82NC5T
-ICAgICAgICAgfCA0ICsrLS0KIGFyY2gveDg2L2xpYi9tZW1zZXRfNjQuUyAgICAgICAgICB8IDQg
-KystLQogYXJjaC94ODYveGVuL3hlbi1hc21fNjQuUyAgICAgICAgIHwgNCArKy0tCiA1IGZpbGVz
-IGNoYW5nZWQsIDEwIGluc2VydGlvbnMoKyksIDExIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBh
-L2FyY2gveDg2L2NyeXB0by9hZXNuaS1pbnRlbF9hc20uUyBiL2FyY2gveDg2L2NyeXB0by9hZXNu
-aS1pbnRlbF9hc20uUwppbmRleCA2MjRlNDMwM2QwZmIuLjZhMGYyNWJlMWE1NiAxMDA2NDQKLS0t
-IGEvYXJjaC94ODYvY3J5cHRvL2Flc25pLWludGVsX2FzbS5TCisrKyBiL2FyY2gveDg2L2NyeXB0
-by9hZXNuaS1pbnRlbF9hc20uUwpAQCAtMTc0NCw4ICsxNzQ0LDcgQEAgRU5EUFJPQyhhZXNuaV9n
-Y21fZW5jKQogI2VuZGlmCiAKIAotLmFsaWduIDQKLV9rZXlfZXhwYW5zaW9uXzEyODoKK0VOVFJZ
-X0xPQ0FMX0FMSUFTKF9rZXlfZXhwYW5zaW9uXzEyOCkKIEVOVFJZX0xPQ0FMKF9rZXlfZXhwYW5z
-aW9uXzI1NmEpCiAJcHNodWZkICQwYjExMTExMTExLCAleG1tMSwgJXhtbTEKIAlzaHVmcHMgJDBi
-MDAwMTAwMDAsICV4bW0wLCAleG1tNApAQCAtMTc1Niw4ICsxNzU1LDggQEAgRU5UUllfTE9DQUwo
-X2tleV9leHBhbnNpb25fMjU2YSkKIAltb3ZhcHMgJXhtbTAsIChUS0VZUCkKIAlhZGQgJDB4MTAs
-IFRLRVlQCiAJcmV0Ci1FTkRQUk9DKF9rZXlfZXhwYW5zaW9uXzEyOCkKIEVORFBST0MoX2tleV9l
-eHBhbnNpb25fMjU2YSkKK0VORF9BTElBUyhfa2V5X2V4cGFuc2lvbl8xMjgpCiAKIEVOVFJZX0xP
-Q0FMKF9rZXlfZXhwYW5zaW9uXzE5MmEpCiAJcHNodWZkICQwYjAxMDEwMTAxLCAleG1tMSwgJXht
-bTEKZGlmZiAtLWdpdCBhL2FyY2gveDg2L2xpYi9tZW1jcHlfNjQuUyBiL2FyY2gveDg2L2xpYi9t
-ZW1jcHlfNjQuUwppbmRleCA3Nzk3ODJmNTgzMjQuLmM5YWM1NDgyMmU4NyAxMDA2NDQKLS0tIGEv
-YXJjaC94ODYvbGliL21lbWNweV82NC5TCisrKyBiL2FyY2gveDg2L2xpYi9tZW1jcHlfNjQuUwpA
-QCAtMjYsNyArMjYsNyBAQAogICogT3V0cHV0OgogICogcmF4IG9yaWdpbmFsIGRlc3RpbmF0aW9u
-CiAgKi8KLUVOVFJZKF9fbWVtY3B5KQorRU5UUllfQUxJQVMoX19tZW1jcHkpCiBFTlRSWShtZW1j
-cHkpCiAJQUxURVJOQVRJVkVfMiAiam1wIG1lbWNweV9vcmlnIiwgIiIsIFg4Nl9GRUFUVVJFX1JF
-UF9HT09ELCBcCiAJCSAgICAgICJqbXAgbWVtY3B5X2VybXMiLCBYODZfRkVBVFVSRV9FUk1TCkBA
-IC00MCw3ICs0MCw3IEBAIEVOVFJZKG1lbWNweSkKIAlyZXAgbW92c2IKIAlyZXQKIEVORFBST0Mo
-bWVtY3B5KQotRU5EUFJPQyhfX21lbWNweSkKK0VORF9BTElBUyhfX21lbWNweSkKIEVYUE9SVF9T
-WU1CT0wobWVtY3B5KQogRVhQT1JUX1NZTUJPTChfX21lbWNweSkKIApkaWZmIC0tZ2l0IGEvYXJj
-aC94ODYvbGliL21lbW1vdmVfNjQuUyBiL2FyY2gveDg2L2xpYi9tZW1tb3ZlXzY0LlMKaW5kZXgg
-MTVkZTg2Y2QxNWIwLi43NmY1NGJhM2RkMjYgMTAwNjQ0Ci0tLSBhL2FyY2gveDg2L2xpYi9tZW1t
-b3ZlXzY0LlMKKysrIGIvYXJjaC94ODYvbGliL21lbW1vdmVfNjQuUwpAQCAtMjUsNyArMjUsNyBA
-QAogICovCiAud2VhayBtZW1tb3ZlCiAKLUVOVFJZKG1lbW1vdmUpCitFTlRSWV9BTElBUyhtZW1t
-b3ZlKQogRU5UUlkoX19tZW1tb3ZlKQogCiAJLyogSGFuZGxlIG1vcmUgMzIgYnl0ZXMgaW4gbG9v
-cCAqLwpAQCAtMjA3LDYgKzIwNyw2IEBAIEVOVFJZKF9fbWVtbW92ZSkKIDEzOgogCXJldHEKIEVO
-RFBST0MoX19tZW1tb3ZlKQotRU5EUFJPQyhtZW1tb3ZlKQorRU5EX0FMSUFTKG1lbW1vdmUpCiBF
-WFBPUlRfU1lNQk9MKF9fbWVtbW92ZSkKIEVYUE9SVF9TWU1CT0wobWVtbW92ZSkKZGlmZiAtLWdp
-dCBhL2FyY2gveDg2L2xpYi9tZW1zZXRfNjQuUyBiL2FyY2gveDg2L2xpYi9tZW1zZXRfNjQuUwpp
-bmRleCA1NWI5NWRiMzBhNjEuLmJlNmM0NzA1ZWM1MSAxMDA2NDQKLS0tIGEvYXJjaC94ODYvbGli
-L21lbXNldF82NC5TCisrKyBiL2FyY2gveDg2L2xpYi9tZW1zZXRfNjQuUwpAQCAtMTgsNyArMTgs
-NyBAQAogICoKICAqIHJheCAgIG9yaWdpbmFsIGRlc3RpbmF0aW9uCiAgKi8KLUVOVFJZKG1lbXNl
-dCkKK0VOVFJZX0FMSUFTKG1lbXNldCkKIEVOVFJZKF9fbWVtc2V0KQogCS8qCiAJICogU29tZSBD
-UFVzIHN1cHBvcnQgZW5oYW5jZWQgUkVQIE1PVlNCL1NUT1NCIGZlYXR1cmUuIEl0IGlzIHJlY29t
-bWVuZGVkCkBAIC00Miw4ICs0Miw4IEBAIEVOVFJZKF9fbWVtc2V0KQogCXJlcCBzdG9zYgogCW1v
-dnEgJXI5LCVyYXgKIAlyZXQKLUVORFBST0MobWVtc2V0KQogRU5EUFJPQyhfX21lbXNldCkKK0VO
-RF9BTElBUyhtZW1zZXQpCiBFWFBPUlRfU1lNQk9MKG1lbXNldCkKIEVYUE9SVF9TWU1CT0woX19t
-ZW1zZXQpCiAKZGlmZiAtLWdpdCBhL2FyY2gveDg2L3hlbi94ZW4tYXNtXzY0LlMgYi9hcmNoL3g4
-Ni94ZW4veGVuLWFzbV82NC5TCmluZGV4IGQ2MTdiZWE3NjAzOS4uNGIwZmU3NDlmMTBjIDEwMDY0
-NAotLS0gYS9hcmNoL3g4Ni94ZW4veGVuLWFzbV82NC5TCisrKyBiL2FyY2gveDg2L3hlbi94ZW4t
-YXNtXzY0LlMKQEAgLTExNywxMyArMTE3LDEzIEBAIEVORFBST0MoeGVuX3N5c2VudGVyX3Rhcmdl
-dCkKIAogI2Vsc2UgLyogIUNPTkZJR19JQTMyX0VNVUxBVElPTiAqLwogCi1FTlRSWSh4ZW5fc3lz
-Y2FsbDMyX3RhcmdldCkKK0VOVFJZX0FMSUFTKHhlbl9zeXNjYWxsMzJfdGFyZ2V0KQogRU5UUlko
-eGVuX3N5c2VudGVyX3RhcmdldCkKIAlsZWEgMTYoJXJzcCksICVyc3AJLyogc3RyaXAgJXJjeCwg
-JXIxMSAqLwogCW1vdiAkLUVOT1NZUywgJXJheAogCXB1c2hxICQwCiAJam1wIGh5cGVyY2FsbF9p
-cmV0Ci1FTkRQUk9DKHhlbl9zeXNjYWxsMzJfdGFyZ2V0KQogRU5EUFJPQyh4ZW5fc3lzZW50ZXJf
-dGFyZ2V0KQorRU5EX0FMSUFTKHhlbl9zeXNjYWxsMzJfdGFyZ2V0KQogCiAjZW5kaWYJLyogQ09O
-RklHX0lBMzJfRU1VTEFUSU9OICovCi0tIAoyLjExLjEKCgpfX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fXwpYZW4tZGV2ZWwgbWFpbGluZyBsaXN0Clhlbi1kZXZl
-bEBsaXN0cy54ZW4ub3JnCmh0dHBzOi8vbGlzdHMueGVuLm9yZy94ZW4tZGV2ZWwK
+On 17/02/17 11:47, Jiri Slaby wrote:
+> _key_expansion_128 is an alias to _key_expansion_256a, __memcpy to
+> memcpy, xen_syscall32_target to xen_sysenter_target, and so on. Annotate
+> them all using the new ENTRY_ALIAS and ENTRY_LOCAL_ALIAS. This will make
+> the tools generating the debuginfo happy.
+> 
+> Signed-off-by: Jiri Slaby <jslaby@suse.cz>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Ingo Molnar <mingo@redhat.com>
+> Cc: "H. Peter Anvin" <hpa@zytor.com>
+> Cc: <x86@kernel.org>
+> Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+> Cc: Juergen Gross <jgross@suse.com>
+> Cc: <linux-crypto@vger.kernel.org>
+> Cc: <xen-devel@lists.xenproject.org>
+> ---
+>  arch/x86/crypto/aesni-intel_asm.S | 5 ++---
+>  arch/x86/lib/memcpy_64.S          | 4 ++--
+>  arch/x86/lib/memmove_64.S         | 4 ++--
+>  arch/x86/lib/memset_64.S          | 4 ++--
+>  arch/x86/xen/xen-asm_64.S         | 4 ++--
+>  5 files changed, 10 insertions(+), 11 deletions(-)
+
+Xen parts:
+
+Reviewed-by: Juergen Gross <jgross@suse.com>
+
+
+Juergen
