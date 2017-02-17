@@ -1,220 +1,129 @@
-From: Joe Perches <joe@perches.com>
-Subject: [PATCH 00/35] treewide trivial patches converting
-	pr_warning to pr_warn
-Date: Thu, 16 Feb 2017 23:11:13 -0800
-Message-ID: <cover.1487314666.git.joe@perches.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH] crypto: Fix next IV issue for CTS template
+Date: Fri, 17 Feb 2017 07:12:46 +0000
+Message-ID: <CAKv+Gu8s6PrAv9ZMGa_TsRn2UYKoo8KhqERU0NZPjfBhMDK88Q@mail.gmail.com>
+References: <1487303262-5602-1-git-send-email-Libo.Wang@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: linux-ia64@vger.kernel.org, linux-sh@vger.kernel.org,
- netdev@vger.kernel.org, linux-input@vger.kernel.org,
- adi-buildroot-devel@lists.sourceforge.net, amd-gfx@lists.freedesktop.org,
- dri-devel@lists.freedesktop.org, linux-alpha@vger.kernel.org,
- sparclinux@vger.kernel.org
-To: Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Karol Herbst <karolherbst@gmail.com>, Pekka Paalanen <ppaalanen@gmail.com>,
- Richard Weinberger <richard@nod.at>, Fabio Estevam <fabio.estevam@nxp.com>,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linuxppc-dev@lists.ozlabs.org, tboot-devel@lists.sourceforge.net,
- nouveau@lists.freedesktop.org, oprofile-list@lists.sf.net,
- sfi-devel@simplefirmware.org, xen-devel@lists.xenproject.org,
- linux-acpi@vger.kernel.org, drbd-dev@lists.linbit.com,
- virtualization@lists.linux-foundation.org, linux-crypto@vger.kernel.org,
- linux-ide@vger.kernel.org, gigaset307x-common@lists.sourceforge.net,
- linux-media@vger.kernel.org, linux-omap@vger.kernel.org,
- linux-mtd@lists.infradead.org, devicetree@vger.kernel.org,
- acpi4asus-user@lists.sourceforge.net, platform-driver-x86@vger.kernel.org,
- linux-scsi@vger.kernel.org, lin
-Return-path: <xen-devel-bounces@lists.xen.org>
-List-Unsubscribe: <https://lists.xen.org/cgi-bin/mailman/options/xen-devel>,
- <mailto:xen-devel-request@lists.xen.org?subject=unsubscribe>
-List-Post: <mailto:xen-devel@lists.xen.org>
-List-Help: <mailto:xen-devel-request@lists.xen.org?subject=help>
-List-Subscribe: <https://lists.xen.org/cgi-bin/mailman/listinfo/xen-devel>,
- <mailto:xen-devel-request@lists.xen.org?subject=subscribe>
-Errors-To: xen-devel-bounces@lists.xen.org
-Sender: "Xen-devel" <xen-devel-bounces@lists.xen.org>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Ofir.Drang@arm.com, Dennis Chen <dennis.chen@arm.com>
+To: Libo.Wang@arm.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-it0-f47.google.com ([209.85.214.47]:34431 "EHLO
+        mail-it0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932635AbdBQHMs (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 17 Feb 2017 02:12:48 -0500
+Received: by mail-it0-f47.google.com with SMTP id k200so11167691itb.1
+        for <linux-crypto@vger.kernel.org>; Thu, 16 Feb 2017 23:12:47 -0800 (PST)
+In-Reply-To: <1487303262-5602-1-git-send-email-Libo.Wang@arm.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-VGhlcmUgYXJlIH40MzAwIHVzZXMgb2YgcHJfd2FybiBhbmQgfjI1MCB1c2VzIG9mIHRoZSBvbGRl
-cgpwcl93YXJuaW5nIGluIHRoZSBrZXJuZWwgc291cmNlIHRyZWUuCgpNYWtlIHRoZSB1c2Ugb2Yg
-cHJfd2FybiBjb25zaXN0ZW50IGFjcm9zcyBhbGwga2VybmVsIGZpbGVzLgoKVGhpcyBleGNsdWRl
-cyBhbGwgZmlsZXMgaW4gdG9vbHMvIGFzIHRoZXJlIGlzIGEgc2VwYXJhdGUKZGVmaW5lIHByX3dh
-cm5pbmcgZm9yIHRoYXQgZGlyZWN0b3J5IHRyZWUgYW5kIHByX3dhcm4gaXMKbm90IHVzZWQgaW4g
-dG9vbHMvLgoKRG9uZSB3aXRoICdzZWQgcy9cYnByX3dhcm5pbmdcYi9wcl93YXJuLycgYW5kIHNv
-bWUgZW1hY3NpbmcuCgpNaXNjZWxsYW5lYToKCm8gQ29hbGVzY2UgZm9ybWF0cyBhbmQgcmVhbGln
-biBhcmd1bWVudHMKClNvbWUgZmlsZXMgbm90IGNvbXBpbGVkIC0gbm8gY3Jvc3MtY29tcGlsZXJz
-CgpKb2UgUGVyY2hlcyAoMzUpOgogIGFscGhhOiBDb252ZXJ0IHJlbWFpbmluZyB1c2VzIG9mIHBy
-X3dhcm5pbmcgdG8gcHJfd2FybgogIEFSTTogZXA5M3h4OiBDb252ZXJ0IHJlbWFpbmluZyB1c2Vz
-IG9mIHByX3dhcm5pbmcgdG8gcHJfd2FybgogIGFybTY0OiBDb252ZXJ0IHJlbWFpbmluZyB1c2Vz
-IG9mIHByX3dhcm5pbmcgdG8gcHJfd2FybgogIGFyY2gvYmxhY2tmaW46IENvbnZlcnQgcmVtYWlu
-aW5nIHVzZXMgb2YgcHJfd2FybmluZyB0byBwcl93YXJuCiAgaWE2NDogQ29udmVydCByZW1haW5p
-bmcgdXNlIG9mIHByX3dhcm5pbmcgdG8gcHJfd2FybgogIHBvd2VycGM6IENvbnZlcnQgcmVtYWlu
-aW5nIHVzZXMgb2YgcHJfd2FybmluZyB0byBwcl93YXJuCiAgc2g6IENvbnZlcnQgcmVtYWluaW5n
-IHVzZXMgb2YgcHJfd2FybmluZyB0byBwcl93YXJuCiAgc3BhcmM6IENvbnZlcnQgcmVtYWluaW5n
-IHVzZSBvZiBwcl93YXJuaW5nIHRvIHByX3dhcm4KICB4ODY6IENvbnZlcnQgcmVtYWluaW5nIHVz
-ZXMgb2YgcHJfd2FybmluZyB0byBwcl93YXJuCiAgZHJpdmVycy9hY3BpOiBDb252ZXJ0IHJlbWFp
-bmluZyB1c2VzIG9mIHByX3dhcm5pbmcgdG8gcHJfd2FybgogIGJsb2NrL2RyYmQ6IENvbnZlcnQg
-cmVtYWluaW5nIHVzZXMgb2YgcHJfd2FybmluZyB0byBwcl93YXJuCiAgZ2Ryb206IENvbnZlcnQg
-cmVtYWluaW5nIHVzZXMgb2YgcHJfd2FybmluZyB0byBwcl93YXJuCiAgZHJpdmVycy9jaGFyOiBD
-b252ZXJ0IHJlbWFpbmluZyB1c2Ugb2YgcHJfd2FybmluZyB0byBwcl93YXJuCiAgY2xvY2tzb3Vy
-Y2U6IENvbnZlcnQgcmVtYWluaW5nIHVzZSBvZiBwcl93YXJuaW5nIHRvIHByX3dhcm4KICBkcml2
-ZXJzL2NyeXB0bzogQ29udmVydCByZW1haW5pbmcgdXNlcyBvZiBwcl93YXJuaW5nIHRvIHByX3dh
-cm4KICBmbWM6IENvbnZlcnQgcmVtYWluaW5nIHVzZSBvZiBwcl93YXJuaW5nIHRvIHByX3dhcm4K
-ICBkcml2ZXJzL2dwdTogQ29udmVydCByZW1haW5pbmcgdXNlcyBvZiBwcl93YXJuaW5nIHRvIHBy
-X3dhcm4KICBkcml2ZXJzL2lkZTogQ29udmVydCByZW1haW5pbmcgdXNlcyBvZiBwcl93YXJuaW5n
-IHRvIHByX3dhcm4KICBkcml2ZXJzL2lucHV0OiBDb252ZXJ0IHJlbWFpbmluZyB1c2VzIG9mIHBy
-X3dhcm5pbmcgdG8gcHJfd2FybgogIGRyaXZlcnMvaXNkbjogQ29udmVydCByZW1haW5pbmcgdXNl
-cyBvZiBwcl93YXJuaW5nIHRvIHByX3dhcm4KICBkcml2ZXJzL21hY2ludG9zaDogQ29udmVydCBy
-ZW1haW5pbmcgdXNlcyBvZiBwcl93YXJuaW5nIHRvIHByX3dhcm4KICBkcml2ZXJzL21lZGlhOiBD
-b252ZXJ0IHJlbWFpbmluZyB1c2Ugb2YgcHJfd2FybmluZyB0byBwcl93YXJuCiAgZHJpdmVycy9t
-ZmQ6IENvbnZlcnQgcmVtYWluaW5nIHVzZXMgb2YgcHJfd2FybmluZyB0byBwcl93YXJuCiAgZHJp
-dmVycy9tdGQ6IENvbnZlcnQgcmVtYWluaW5nIHVzZXMgb2YgcHJfd2FybmluZyB0byBwcl93YXJu
-CiAgZHJpdmVycy9vZjogQ29udmVydCByZW1haW5pbmcgdXNlcyBvZiBwcl93YXJuaW5nIHRvIHBy
-X3dhcm4KICBkcml2ZXJzL29wcm9maWxlOiBDb252ZXJ0IHJlbWFpbmluZyB1c2VzIG9mIHByX3dh
-cm5pbmcgdG8gcHJfd2FybgogIGRyaXZlcnMvcGxhdGZvcm06IENvbnZlcnQgcmVtYWluaW5nIHVz
-ZXMgb2YgcHJfd2FybmluZyB0byBwcl93YXJuCiAgZHJpdmVycy9yYXBpZGlvOiBDb252ZXJ0IHJl
-bWFpbmluZyB1c2Ugb2YgcHJfd2FybmluZyB0byBwcl93YXJuCiAgZHJpdmVycy9zY3NpOiBDb252
-ZXJ0IHJlbWFpbmluZyB1c2Ugb2YgcHJfd2FybmluZyB0byBwcl93YXJuCiAgZHJpdmVycy9zaDog
-Q29udmVydCByZW1haW5pbmcgdXNlIG9mIHByX3dhcm5pbmcgdG8gcHJfd2FybgogIGRyaXZlcnMv
-dHR5OiBDb252ZXJ0IHJlbWFpbmluZyB1c2VzIG9mIHByX3dhcm5pbmcgdG8gcHJfd2FybgogIGRy
-aXZlcnMvdmlkZW86IENvbnZlcnQgcmVtYWluaW5nIHVzZXMgb2YgcHJfd2FybmluZyB0byBwcl93
-YXJuCiAga2VybmVsL3RyYWNlOiBDb252ZXJ0IHJlbWFpbmluZyB1c2VzIG9mIHByX3dhcm5pbmcg
-dG8gcHJfd2FybgogIGxpYjogQ29udmVydCByZW1haW5pbmcgdXNlcyBvZiBwcl93YXJuaW5nIHRv
-IHByX3dhcm4KICBzb3VuZC9zb2M6IENvbnZlcnQgcmVtYWluaW5nIHVzZXMgb2YgcHJfd2Fybmlu
-ZyB0byBwcl93YXJuCgogYXJjaC9hbHBoYS9rZXJuZWwvcGVyZl9ldmVudC5jICAgICAgICAgICAg
-ICAgICAgICAgfCAgNCArLQogYXJjaC9hcm0vbWFjaC1lcDkzeHgvY29yZS5jICAgICAgICAgICAg
-ICAgICAgICAgICAgfCAgNCArLQogYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9zeXNjYWxsLmggICAg
-ICAgICAgICAgICAgICAgfCAgOCArKy0tCiBhcmNoL2FybTY0L2tlcm5lbC9od19icmVha3BvaW50
-LmMgICAgICAgICAgICAgICAgICB8ICA4ICsrLS0KIGFyY2gvYXJtNjQva2VybmVsL3NtcC5jICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDQgKy0KIGFyY2gvYmxhY2tmaW4va2VybmVsL25t
-aS5jICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDIgKy0KIGFyY2gvYmxhY2tmaW4va2VybmVs
-L3B0cmFjZS5jICAgICAgICAgICAgICAgICAgICAgIHwgIDIgKy0KIGFyY2gvYmxhY2tmaW4vbWFj
-aC1iZjUzMy9ib2FyZHMvc3RhbXAuYyAgICAgICAgICAgIHwgIDIgKy0KIGFyY2gvYmxhY2tmaW4v
-bWFjaC1iZjUzNy9ib2FyZHMvY21fYmY1MzdlLmMgICAgICAgIHwgIDIgKy0KIGFyY2gvYmxhY2tm
-aW4vbWFjaC1iZjUzNy9ib2FyZHMvY21fYmY1Mzd1LmMgICAgICAgIHwgIDIgKy0KIGFyY2gvYmxh
-Y2tmaW4vbWFjaC1iZjUzNy9ib2FyZHMvc3RhbXAuYyAgICAgICAgICAgIHwgIDIgKy0KIGFyY2gv
-YmxhY2tmaW4vbWFjaC1iZjUzNy9ib2FyZHMvdGNtX2JmNTM3LmMgICAgICAgIHwgIDIgKy0KIGFy
-Y2gvYmxhY2tmaW4vbWFjaC1iZjU2MS9ib2FyZHMvY21fYmY1NjEuYyAgICAgICAgIHwgIDIgKy0K
-IGFyY2gvYmxhY2tmaW4vbWFjaC1iZjU2MS9ib2FyZHMvZXpraXQuYyAgICAgICAgICAgIHwgIDIg
-Ky0KIGFyY2gvYmxhY2tmaW4vbW0vaXNyYW0tZHJpdmVyLmMgICAgICAgICAgICAgICAgICAgIHwg
-IDQgKy0KIGFyY2gvaWE2NC9rZXJuZWwvc2V0dXAuYyAgICAgICAgICAgICAgICAgICAgICAgICAg
-IHwgIDYgKy0tCiBhcmNoL3Bvd2VycGMva2VybmVsL3BjaS1jb21tb24uYyAgICAgICAgICAgICAg
-ICAgICB8ICA0ICstCiBhcmNoL3Bvd2VycGMvbW0vaW5pdF82NC5jICAgICAgICAgICAgICAgICAg
-ICAgICAgICB8ICA1ICstLQogYXJjaC9wb3dlcnBjL21tL21lbS5jICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgfCAgMyArLQogYXJjaC9wb3dlcnBjL3BsYXRmb3Jtcy81MTJ4L21wYzUxMnhf
-c2hhcmVkLmMgICAgICAgfCAgNCArLQogYXJjaC9wb3dlcnBjL3BsYXRmb3Jtcy84NXh4L3NvY3Jh
-dGVzX2ZwZ2FfcGljLmMgICAgfCAgNyArKy0tCiBhcmNoL3Bvd2VycGMvcGxhdGZvcm1zLzg2eHgv
-bXBjODZ4eF9ocGNuLmMgICAgICAgICB8ICAyICstCiBhcmNoL3Bvd2VycGMvcGxhdGZvcm1zL3Bh
-c2VtaS9kbWFfbGliLmMgICAgICAgICAgICB8ICA0ICstCiBhcmNoL3Bvd2VycGMvcGxhdGZvcm1z
-L3Bvd2VybnYvb3BhbC5jICAgICAgICAgICAgICB8ICA4ICsrLS0KIGFyY2gvcG93ZXJwYy9wbGF0
-Zm9ybXMvcG93ZXJudi9wY2ktaW9kYS5jICAgICAgICAgIHwgMTAgKystLS0KIGFyY2gvcG93ZXJw
-Yy9wbGF0Zm9ybXMvcHMzL2RldmljZS1pbml0LmMgICAgICAgICAgIHwgMTQgKysrLS0tLQogYXJj
-aC9wb3dlcnBjL3BsYXRmb3Jtcy9wczMvbW0uYyAgICAgICAgICAgICAgICAgICAgfCAgNCArLQog
-YXJjaC9wb3dlcnBjL3BsYXRmb3Jtcy9wczMvb3MtYXJlYS5jICAgICAgICAgICAgICAgfCAgMiAr
-LQogYXJjaC9wb3dlcnBjL3BsYXRmb3Jtcy9wc2VyaWVzL2lvbW11LmMgICAgICAgICAgICAgfCAg
-OCArKy0tCiBhcmNoL3Bvd2VycGMvcGxhdGZvcm1zL3BzZXJpZXMvc2V0dXAuYyAgICAgICAgICAg
-ICB8ICA0ICstCiBhcmNoL3Bvd2VycGMvc3lzZGV2L2ZzbF9wY2kuYyAgICAgICAgICAgICAgICAg
-ICAgICB8ICA5ICsrLS0tCiBhcmNoL3Bvd2VycGMvc3lzZGV2L21waWMuYyAgICAgICAgICAgICAg
-ICAgICAgICAgICB8IDEwICsrLS0tCiBhcmNoL3Bvd2VycGMvc3lzZGV2L3hpY3MvaWNwLW5hdGl2
-ZS5jICAgICAgICAgICAgICB8IDEwICsrLS0tCiBhcmNoL3Bvd2VycGMvc3lzZGV2L3hpY3MvaWNz
-LW9wYWwuYyAgICAgICAgICAgICAgICB8ICA0ICstCiBhcmNoL3Bvd2VycGMvc3lzZGV2L3hpY3Mv
-aWNzLXJ0YXMuYyAgICAgICAgICAgICAgICB8ICA0ICstCiBhcmNoL3Bvd2VycGMvc3lzZGV2L3hp
-Y3MveGljcy1jb21tb24uYyAgICAgICAgICAgICB8ICA4ICsrLS0KIGFyY2gvc2gvYm9hcmRzL21h
-Y2gtc2RrNzc4Ni9ubWkuYyAgICAgICAgICAgICAgICAgIHwgIDIgKy0KIGFyY2gvc2gvZHJpdmVy
-cy9wY2kvZml4dXBzLXNkazc3ODYuYyAgICAgICAgICAgICAgIHwgIDIgKy0KIGFyY2gvc2gva2Vy
-bmVsL2lvX3RyYXBwZWQuYyAgICAgICAgICAgICAgICAgICAgICAgIHwgIDIgKy0KIGFyY2gvc2gv
-a2VybmVsL3NldHVwLmMgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDIgKy0KIGFyY2gv
-c2gvbW0vY29uc2lzdGVudC5jICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDUgKy0tCiBh
-cmNoL3NwYXJjL2tlcm5lbC9zbXBfNjQuYyAgICAgICAgICAgICAgICAgICAgICAgICB8ICA1ICst
-LQogYXJjaC94ODYva2VybmVsL2FtZF9nYXJ0XzY0LmMgICAgICAgICAgICAgICAgICAgICAgfCAx
-MiArKy0tLS0KIGFyY2gveDg2L2tlcm5lbC9hcGljL2FwaWMuYyAgICAgICAgICAgICAgICAgICAg
-ICAgIHwgNDYgKysrKysrKysrKy0tLS0tLS0tLS0tLQogYXJjaC94ODYva2VybmVsL2FwaWMvYXBp
-Y19ub29wLmMgICAgICAgICAgICAgICAgICAgfCAgMiArLQogYXJjaC94ODYva2VybmVsL3NldHVw
-X3BlcmNwdS5jICAgICAgICAgICAgICAgICAgICAgfCAgNCArLQogYXJjaC94ODYva2VybmVsL3Ri
-b290LmMgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAxNSArKysrLS0tCiBhcmNoL3g4Ni9r
-ZXJuZWwvdHNjX3N5bmMuYyAgICAgICAgICAgICAgICAgICAgICAgICB8ICA4ICsrLS0KIGFyY2gv
-eDg2L21tL2ttbWlvLmMgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDggKystLQog
-YXJjaC94ODYvbW0vbW1pby1tb2QuYyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgNSAr
-LS0KIGFyY2gveDg2L21tL251bWEuYyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwg
-MTIgKysrLS0tCiBhcmNoL3g4Ni9tbS9udW1hX2VtdWxhdGlvbi5jICAgICAgICAgICAgICAgICAg
-ICAgICB8ICA2ICstLQogYXJjaC94ODYvbW0vdGVzdG1taW90cmFjZS5jICAgICAgICAgICAgICAg
-ICAgICAgICAgfCAgNSArLS0KIGFyY2gveDg2L29wcm9maWxlL29wX3g4Nl9tb2RlbC5oICAgICAg
-ICAgICAgICAgICAgIHwgIDYgKy0tCiBhcmNoL3g4Ni9wbGF0Zm9ybS9vbHBjL29scGMteG8xNS1z
-Y2kuYyAgICAgICAgICAgICB8ICAyICstCiBhcmNoL3g4Ni9wbGF0Zm9ybS9zZmkvc2ZpLmMgICAg
-ICAgICAgICAgICAgICAgICAgICB8ICAzICstCiBhcmNoL3g4Ni94ZW4vZGVidWdmcy5jICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICB8ICAyICstCiBhcmNoL3g4Ni94ZW4vc2V0dXAuYyAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICB8ICAyICstCiBkcml2ZXJzL2FjcGkvYXBlaS9hcGVp
-LWJhc2UuYyAgICAgICAgICAgICAgICAgICAgICB8IDMyICsrKysrKystLS0tLS0tLQogZHJpdmVy
-cy9hY3BpL2FwZWkvZWluai5jICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgNCArLQogZHJp
-dmVycy9hY3BpL2FwZWkvZXJzdC1kYmcuYyAgICAgICAgICAgICAgICAgICAgICAgfCAgNCArLQog
-ZHJpdmVycy9hY3BpL2FwZWkvZ2hlcy5jICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAzMCAr
-KysrKysrLS0tLS0tLQogZHJpdmVycy9hY3BpL2FwZWkvaGVzdC5jICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgfCAxMCArKy0tLQogZHJpdmVycy9hY3BpL3Jlc291cmNlLmMgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgfCAgNCArLQogZHJpdmVycy9ibG9jay9kcmJkL2RyYmRfbmwuYyAgICAg
-ICAgICAgICAgICAgICAgICAgfCAxMyArKystLS0KIGRyaXZlcnMvY2Ryb20vZ2Ryb20uYyAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDQgKy0KIGRyaXZlcnMvY2hhci92aXJ0aW9fY29u
-c29sZS5jICAgICAgICAgICAgICAgICAgICAgIHwgIDIgKy0KIGRyaXZlcnMvY2xvY2tzb3VyY2Uv
-c2Ftc3VuZ19wd21fdGltZXIuYyAgICAgICAgICAgIHwgIDQgKy0KIGRyaXZlcnMvY3J5cHRvL24y
-X2NvcmUuYyAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgMTIgKysrLS0tCiBkcml2ZXJzL2Zt
-Yy9mbWMtZmFrZWRldi5jICAgICAgICAgICAgICAgICAgICAgICAgICB8ICAyICstCiBkcml2ZXJz
-L2dwdS9kcm0vYW1kL3Bvd2VycGxheS9od21nci9zbXU3X2h3bWdyLmMgICB8ICAyICstCiBkcml2
-ZXJzL2dwdS9kcm0vYW1kL3Bvd2VycGxheS9pbmMvcHBfZGVidWcuaCAgICAgICB8ICAyICstCiBk
-cml2ZXJzL2dwdS9kcm0vYW1kL3Bvd2VycGxheS9zbXVtZ3IvZmlqaV9zbWMuYyAgICB8ICA0ICst
-CiBkcml2ZXJzL2dwdS9kcm0vYW1kL3Bvd2VycGxheS9zbXVtZ3IvaWNlbGFuZF9zbWMuYyB8IDE0
-ICsrKy0tLS0KIC4uLi9ncHUvZHJtL2FtZC9wb3dlcnBsYXkvc211bWdyL3BvbGFyaXMxMF9zbWMu
-YyAgIHwgIDQgKy0KIGRyaXZlcnMvZ3B1L2RybS9hbWQvcG93ZXJwbGF5L3NtdW1nci90b25nYV9z
-bWMuYyAgIHwgIDQgKy0KIGRyaXZlcnMvaWRlL3R4NDkzOGlkZS5jICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIHwgIDIgKy0KIGRyaXZlcnMvaWRlL3R4NDkzOWlkZS5jICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIHwgIDUgKy0tCiBkcml2ZXJzL2lucHV0L2dhbWVwb3J0L2dhbWVwb3J0LmMg
-ICAgICAgICAgICAgICAgICB8ICA0ICstCiBkcml2ZXJzL2lucHV0L2pveXN0aWNrL2dhbWVjb24u
-YyAgICAgICAgICAgICAgICAgICB8ICAzICstCiBkcml2ZXJzL2lucHV0L21pc2MvYXBhbmVsLmMg
-ICAgICAgICAgICAgICAgICAgICAgICB8ICAzICstCiBkcml2ZXJzL2lucHV0L21pc2MveGVuLWti
-ZGZyb250LmMgICAgICAgICAgICAgICAgICB8ICA4ICsrLS0KIGRyaXZlcnMvaW5wdXQvc2VyaW8v
-c2VyaW8uYyAgICAgICAgICAgICAgICAgICAgICAgIHwgIDggKystLQogZHJpdmVycy9pc2RuL2dp
-Z2FzZXQvaW50ZXJmYWNlLmMgICAgICAgICAgICAgICAgICAgfCAgMiArLQogZHJpdmVycy9pc2Ru
-L2hhcmR3YXJlL21JU0ROL2F2bWZyaXR6LmMgICAgICAgICAgICAgfCAxNyArKysrLS0tLQogZHJp
-dmVycy9pc2RuL2hhcmR3YXJlL21JU0ROL2hmY211bHRpLmMgICAgICAgICAgICAgfCAgOCArKy0t
-CiBkcml2ZXJzL2lzZG4vaGFyZHdhcmUvbUlTRE4vaGZjcGNpLmMgICAgICAgICAgICAgICB8ICA0
-ICstCiBkcml2ZXJzL2lzZG4vaGFyZHdhcmUvbUlTRE4vaGZjc3VzYi5jICAgICAgICAgICAgICB8
-ICA0ICstCiBkcml2ZXJzL2lzZG4vaGFyZHdhcmUvbUlTRE4vbUlTRE5pcGFjLmMgICAgICAgICAg
-ICB8ICA0ICstCiBkcml2ZXJzL2lzZG4vaGFyZHdhcmUvbUlTRE4vbUlTRE5pc2FyLmMgICAgICAg
-ICAgICB8IDEwICsrLS0tCiBkcml2ZXJzL2lzZG4vaGFyZHdhcmUvbUlTRE4vbmV0amV0LmMgICAg
-ICAgICAgICAgICB8ICA4ICsrLS0KIGRyaXZlcnMvaXNkbi9oYXJkd2FyZS9tSVNETi93NjY5Mi5j
-ICAgICAgICAgICAgICAgIHwgMTIgKysrLS0tCiBkcml2ZXJzL2lzZG4vbUlTRE4vaHdjaGFubmVs
-LmMgICAgICAgICAgICAgICAgICAgICB8ICA4ICsrLS0KIGRyaXZlcnMvbWFjaW50b3NoL3dpbmRm
-YXJtX2ZjdV9jb250cm9scy5jICAgICAgICAgIHwgIDUgKy0tCiBkcml2ZXJzL21hY2ludG9zaC93
-aW5kZmFybV9sbTg3X3NlbnNvci5jICAgICAgICAgICB8ICA0ICstCiBkcml2ZXJzL21hY2ludG9z
-aC93aW5kZmFybV9wbTcyLmMgICAgICAgICAgICAgICAgICB8IDIyICsrKysrLS0tLS0tCiBkcml2
-ZXJzL21hY2ludG9zaC93aW5kZmFybV9ybTMxLmMgICAgICAgICAgICAgICAgICB8ICA2ICstLQog
-ZHJpdmVycy9tZWRpYS9wbGF0Zm9ybS9zaF92b3UuYyAgICAgICAgICAgICAgICAgICAgfCAgNCAr
-LQogZHJpdmVycy9tZmQvZGI4NTAwLXByY211LmMgICAgICAgICAgICAgICAgICAgICAgICAgfCAg
-MiArLQogZHJpdmVycy9tZmQvc3RhMngxMS1tZmQuYyAgICAgICAgICAgICAgICAgICAgICAgICAg
-fCAgNCArLQogZHJpdmVycy9tZmQvdHdsNDAzMC1wb3dlci5jICAgICAgICAgICAgICAgICAgICAg
-ICAgfCAgNyArLS0tCiBkcml2ZXJzL210ZC9jaGlwcy9jZmlfY21kc2V0XzAwMDIuYyAgICAgICAg
-ICAgICAgICB8IDEyICsrKystLQogZHJpdmVycy9tdGQvbmFuZC9jbXgyNzBfbmFuZC5jICAgICAg
-ICAgICAgICAgICAgICAgfCAgNCArLQogZHJpdmVycy9tdGQvb2ZwYXJ0LmMgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgfCAgNCArLQogZHJpdmVycy9vZi9mZHQuYyAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgfCAyMCArKysrKy0tLS0tCiBkcml2ZXJzL29wcm9maWxlL29w
-cm9maWxlX3BlcmYuYyAgICAgICAgICAgICAgICAgICB8ICA4ICsrLS0KIGRyaXZlcnMvcGxhdGZv
-cm0veDg2L2FzdXMtbGFwdG9wLmMgICAgICAgICAgICAgICAgIHwgIDIgKy0KIGRyaXZlcnMvcGxh
-dGZvcm0veDg2L2VlZXBjLWxhcHRvcC5jICAgICAgICAgICAgICAgIHwgIDIgKy0KIGRyaXZlcnMv
-cGxhdGZvcm0veDg2L2ludGVsX29ha3RyYWlsLmMgICAgICAgICAgICAgIHwgMTAgKystLS0KIGRy
-aXZlcnMvcmFwaWRpby9yaW8tc3lzZnMuYyAgICAgICAgICAgICAgICAgICAgICAgIHwgIDQgKy0K
-IGRyaXZlcnMvc2NzaS9hMzAwMC5jICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDIg
-Ky0KIGRyaXZlcnMvc2gvaW50Yy9jb3JlLmMgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwg
-IDQgKy0KIGRyaXZlcnMvdHR5L2h2Yy9odmNzLmMgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IHwgIDIgKy0KIGRyaXZlcnMvdHR5L3R0eV9pby5jICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIHwgIDQgKy0KIGRyaXZlcnMvdmlkZW8vZmJkZXYvYXR5L3JhZGVvbl9iYXNlLmMgICAgICAg
-ICAgICAgIHwgIDQgKy0KIGRyaXZlcnMvdmlkZW8vZmJkZXYvY29yZS9mYm1vbi5jICAgICAgICAg
-ICAgICAgICAgIHwgIDQgKy0KIGRyaXZlcnMvdmlkZW8vZmJkZXYvcHhhZmIuYyAgICAgICAgICAg
-ICAgICAgICAgICAgIHwgIDcgKystLQoga2VybmVsL3RyYWNlL3RyYWNlX2JlbmNobWFyay5jICAg
-ICAgICAgICAgICAgICAgICAgfCAgNCArLQogbGliL2NwdV9ybWFwLmMgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgfCAgMiArLQogbGliL2RtYS1kZWJ1Zy5jICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgfCAgMiArLQogc291bmQvc29jL2ZzbC9pbXgtYXVkbXV4
-LmMgICAgICAgICAgICAgICAgICAgICAgICAgfCAgNiArLS0KIHNvdW5kL3NvYy9zYW1zdW5nL3Mz
-Yy1pMnMtdjIuYyAgICAgICAgICAgICAgICAgICAgIHwgIDYgKy0tCiAxMjIgZmlsZXMgY2hhbmdl
-ZCwgMzY3IGluc2VydGlvbnMoKyksIDM5NyBkZWxldGlvbnMoLSkKCi0tIAoyLjEwLjAucmMyLjEu
-ZzA1MzQzNWMKCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-XwpYZW4tZGV2ZWwgbWFpbGluZyBsaXN0Clhlbi1kZXZlbEBsaXN0cy54ZW4ub3JnCmh0dHBzOi8v
-bGlzdHMueGVuLm9yZy94ZW4tZGV2ZWwK
+Hello Libo,
+
+On 17 February 2017 at 03:47,  <Libo.Wang@arm.com> wrote:
+> From: Libo Wang <Libo Wang@arm.com>
+>
+> CTS template assumes underlying CBC algorithm will carry out next IV for
+> further process.But some implementations of CBC algorithm in kernel break
+> this assumption, for example, some hardware crypto drivers ignore next IV
+> for performance consider, inthis case, tcry cts(cbc(aes)) test case will
+> fail. This patch is trying to fix it by getting next IV information ready
+> before last two blocks processed.
+>
+> Signed-off-by: Libo Wang <libo.wang@arm.com>
+> Signed-off-by: Dennis Chen <dennis.chen@arm.com>
+
+Which algorithms in particular break this assumption? I recently fixed
+some ARM accelerated software drivers for this reason. If there are
+others, we should fix those rather than try to fix it in the CTS
+driver.
+
+> ---
+>  crypto/cts.c | 29 +++++++++++++++++++++++++----
+>  1 file changed, 25 insertions(+), 4 deletions(-)
+>
+> diff --git a/crypto/cts.c b/crypto/cts.c
+> index a1335d6..712164b 100644
+> --- a/crypto/cts.c
+> +++ b/crypto/cts.c
+> @@ -154,6 +154,7 @@ static int crypto_cts_encrypt(struct skcipher_request=
+ *req)
+>         unsigned int nbytes =3D req->cryptlen;
+>         int cbc_blocks =3D (nbytes + bsize - 1) / bsize - 1;
+>         unsigned int offset;
+> +       int ret =3D 0;
+>
+>         skcipher_request_set_tfm(subreq, ctx->child);
+>
+> @@ -174,8 +175,17 @@ static int crypto_cts_encrypt(struct skcipher_reques=
+t *req)
+>         skcipher_request_set_crypt(subreq, req->src, req->dst,
+>                                    offset, req->iv);
+>
+> -       return crypto_skcipher_encrypt(subreq) ?:
+> -              cts_cbc_encrypt(req);
+> +       /* process CBC blocks */
+> +       ret =3D crypto_skcipher_encrypt(subreq);
+> +       /* process last two blocks */
+> +       if (!ret) {
+
+What happens if an async driver returns -EINPROGRESS here?
+
+> +               /* Get IVn-1 back */
+> +               scatterwalk_map_and_copy(req->iv, req->dst, (offset - bsi=
+ze), bsize, 0);
+> +               /* Continue last two blocks */
+> +               return cts_cbc_encrypt(req);
+> +       }
+> +
+> +       return ret;
+>  }
+>
+>  static int cts_cbc_decrypt(struct skcipher_request *req)
+> @@ -248,6 +258,8 @@ static int crypto_cts_decrypt(struct skcipher_request=
+ *req)
+>         int cbc_blocks =3D (nbytes + bsize - 1) / bsize - 1;
+>         unsigned int offset;
+>         u8 *space;
+> +       int ret =3D 0;
+> +       u8 iv_next[bsize];
+>
+>         skcipher_request_set_tfm(subreq, ctx->child);
+>
+> @@ -277,8 +289,17 @@ static int crypto_cts_decrypt(struct skcipher_reques=
+t *req)
+>         skcipher_request_set_crypt(subreq, req->src, req->dst,
+>                                    offset, req->iv);
+>
+> -       return crypto_skcipher_decrypt(subreq) ?:
+> -              cts_cbc_decrypt(req);
+> +       /* process last two blocks */
+> +       scatterwalk_map_and_copy(iv_next, req->src, (offset - bsize), bsi=
+ze, 0);
+> +       ret =3D crypto_skcipher_decrypt(subreq);
+> +       if (!ret) {
+> +               /* Set Next IV */
+> +               subreq->iv =3D iv_next;
+> +               /* process last two blocks */
+> +               return cts_cbc_decrypt(req);
+> +       }
+> +
+> +       return ret;
+>  }
+>
+>  static int crypto_cts_init_tfm(struct crypto_skcipher *tfm)
+> --
+> 1.8.3.1
+>
+> IMPORTANT NOTICE: The contents of this email and any attachments are conf=
+idential and may also be privileged. If you are not the intended recipient,=
+ please notify the sender immediately and do not disclose the contents to a=
+ny other person, use it for any purpose, or store or copy the information i=
+n any medium. Thank you.
+
+Please configure your email client so it doesn't spit out these.
