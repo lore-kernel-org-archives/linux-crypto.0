@@ -1,56 +1,53 @@
-From: Juergen Gross <jgross@suse.com>
-Subject: Re: [PATCH 08/10] x86: assembly, annotate aliases
-Date: Fri, 17 Feb 2017 12:52:30 +0100
-Message-ID: <2d17929a-c0d0-319e-f432-bac8d98aea2a@suse.com>
-References: <20170217104757.28588-1-jslaby@suse.cz>
- <20170217104757.28588-8-jslaby@suse.cz>
+From: "Rafael J. Wysocki" <rafael-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Subject: Re: [PATCH 00/35] treewide trivial patches converting pr_warning to pr_warn
+Date: Fri, 17 Feb 2017 13:27:00 +0100
+Message-ID: <CAJZ5v0gNcGtnXpE1n6LSq7ey+UDKx+oQfmTg0_PgFwzB0Dd_5A@mail.gmail.com>
+References: <cover.1487314666.git.joe@perches.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: tglx@linutronix.de, hpa@zytor.com, x86@kernel.org,
-        jpoimboe@redhat.com, linux-kernel@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        linux-crypto@vger.kernel.org, xen-devel@lists.xenproject.org
-To: Jiri Slaby <jslaby@suse.cz>, mingo@redhat.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:49856 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S933780AbdBQLwf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 17 Feb 2017 06:52:35 -0500
-In-Reply-To: <20170217104757.28588-8-jslaby@suse.cz>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: Alexander Shishkin <alexander.shishkin-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>,
+        Karol Herbst <karolherbst-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        Pekka Paalanen <ppaalanen-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        Richard Weinberger <richard-/L3Ra7n9ekc@public.gmane.org>,
+        Fabio Estevam <fabio.estevam-3arQi8VN3Tc@public.gmane.org>,
+        Linux Kernel Mailing List <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        "linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org"
+        <linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>,
+        linuxppc-dev <linuxppc-dev-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org>,
+        tboot-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org, nouveau-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org,
+        oprofile-list-TtF/mJH4Jtrk1uMJSBkQmQ@public.gmane.org, sfi-devel-yLnuTTp1/kvcsJTPyzm5gB2eb7JE58TQ@public.gmane.org,
+        xen-devel-GuqFBffKawtpuQazS67q72D2FQJk+8+b@public.gmane.org,
+        ACPI Devel Maling List <linux-acpi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        drbd-dev-cunTk1MwBs8qoQakbn7OcQ@public.gmane.org,
+        virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org,
+        linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-ide-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        gigaset307x-common-5NWGOfrQmneRv+LV9MX5uv+2+P5yyue3@public.gmane.org
+To: Joe Perches <joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <cover.1487314666.git.joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 17/02/17 11:47, Jiri Slaby wrote:
-> _key_expansion_128 is an alias to _key_expansion_256a, __memcpy to
-> memcpy, xen_syscall32_target to xen_sysenter_target, and so on. Annotate
-> them all using the new ENTRY_ALIAS and ENTRY_LOCAL_ALIAS. This will make
-> the tools generating the debuginfo happy.
-> 
-> Signed-off-by: Jiri Slaby <jslaby@suse.cz>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Ingo Molnar <mingo@redhat.com>
-> Cc: "H. Peter Anvin" <hpa@zytor.com>
-> Cc: <x86@kernel.org>
-> Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>
-> Cc: Juergen Gross <jgross@suse.com>
-> Cc: <linux-crypto@vger.kernel.org>
-> Cc: <xen-devel@lists.xenproject.org>
-> ---
->  arch/x86/crypto/aesni-intel_asm.S | 5 ++---
->  arch/x86/lib/memcpy_64.S          | 4 ++--
->  arch/x86/lib/memmove_64.S         | 4 ++--
->  arch/x86/lib/memset_64.S          | 4 ++--
->  arch/x86/xen/xen-asm_64.S         | 4 ++--
->  5 files changed, 10 insertions(+), 11 deletions(-)
+On Fri, Feb 17, 2017 at 8:11 AM, Joe Perches <joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org> wrote:
+> There are ~4300 uses of pr_warn and ~250 uses of the older
+> pr_warning in the kernel source tree.
+>
+> Make the use of pr_warn consistent across all kernel files.
+>
+> This excludes all files in tools/ as there is a separate
+> define pr_warning for that directory tree and pr_warn is
+> not used in tools/.
+>
+> Done with 'sed s/\bpr_warning\b/pr_warn/' and some emacsing.
 
-Xen parts:
+Sorry about asking if that has been asked already.
 
-Reviewed-by: Juergen Gross <jgross@suse.com>
+Wouldn't it be slightly less intrusive to simply redefined
+pr_warning() as a synonym for pr_warn()?
 
-
-Juergen
+Thanks,
+Rafael
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
