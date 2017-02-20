@@ -1,114 +1,75 @@
-From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Subject: Re: [PATCH 2/2] hwrng: meson: add clock handling to driver
-Date: Mon, 20 Feb 2017 17:07:23 +0530
-Message-ID: <CANc+2y6hYB_raW0TigeMbBm8C3JXEUUnSOTjNLcSs9FESQNTXg@mail.gmail.com>
-References: <00b2a4cc-686e-0cc0-43e8-552b70a1e868@gmail.com> <eff6bfbe-3257-5d74-35c7-226a29c61fcb@gmail.com>
+From: Milan Broz <gmazyland@gmail.com>
+Subject: Re: [PATCH v3] dm: switch dm-verity to async hash crypto API
+Date: Mon, 20 Feb 2017 13:51:24 +0100
+Message-ID: <1e21d973-b345-54a9-8115-cc3e30364051@gmail.com>
+References: <1487508367-16036-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Kevin Hilman <khilman@baylibre.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Neil Armstrong <narmstrong@baylibre.com>,
-        linux-amlogic@lists.infradead.org, linux-crypto@vger.kernel.org
-To: Heiner Kallweit <hkallweit1@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: linux-crypto@vger.kernel.org, gilad.benyossef@arm.com,
+        Ofir Drang <ofir.drang@arm.com>,
+        Eric Biggers <ebiggers3@gmail.com>,
+        =?UTF-8?B?T25kcmVqIE1vc27DocSNZWs=?=
+        <omosnacek+linux-crypto@gmail.com>
+To: Gilad Ben-Yossef <gilad@benyossef.com>, dm-devel@redhat.com,
+        Alasdair Kergon <agk@redhat.com>,
+        MIKE Snitzer <snitzer@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-yb0-f194.google.com ([209.85.213.194]:35325 "EHLO
-        mail-yb0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752752AbdBTLhZ (ORCPT
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:33836 "EHLO
+        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751330AbdBTMv1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 20 Feb 2017 06:37:25 -0500
-Received: by mail-yb0-f194.google.com with SMTP id u130so2100854ybb.2
-        for <linux-crypto@vger.kernel.org>; Mon, 20 Feb 2017 03:37:24 -0800 (PST)
-In-Reply-To: <eff6bfbe-3257-5d74-35c7-226a29c61fcb@gmail.com>
+        Mon, 20 Feb 2017 07:51:27 -0500
+Received: by mail-wm0-f66.google.com with SMTP id c85so14214848wmi.1
+        for <linux-crypto@vger.kernel.org>; Mon, 20 Feb 2017 04:51:26 -0800 (PST)
+In-Reply-To: <1487508367-16036-1-git-send-email-gilad@benyossef.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 20 February 2017 at 02:05, Heiner Kallweit <hkallweit1@gmail.com> wrote:
-> Add handling of RNG0 clock to the driver.
->
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+On 02/19/2017 01:46 PM, Gilad Ben-Yossef wrote:
+> Use of the synchronous digest API limits dm-verity to using pure
+> CPU based algorithm providers and rules out the use of off CPU
+> algorithm providers which are normally asynchronous by nature,
+> potentially freeing CPU cycles.
+> 
+> This can reduce performance per Watt in situations such as during
+> boot time when a lot of concurrent file accesses are made to the
+> protected volume.
+> 
+> Move DM_VERITY to the asynchronous hash API.
+> 
+> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+> CC: Eric Biggers <ebiggers3@gmail.com>
+> CC: Ondrej Mosnáček <omosnacek+linux-crypto@gmail.com>
+> CC: Milan Broz <gmazyland@gmail.com>
 > ---
->  drivers/char/hw_random/meson-rng.c | 27 ++++++++++++++++++++++++++-
->  1 file changed, 26 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/char/hw_random/meson-rng.c b/drivers/char/hw_random/meson-rng.c
-> index 119d6984..1f586e48 100644
-> --- a/drivers/char/hw_random/meson-rng.c
-> +++ b/drivers/char/hw_random/meson-rng.c
-> @@ -62,6 +62,7 @@
->  #include <linux/slab.h>
->  #include <linux/types.h>
->  #include <linux/of.h>
-> +#include <linux/clk.h>
->
->  #define RNG_DATA 0x00
->
-> @@ -69,6 +70,7 @@ struct meson_rng_data {
->         void __iomem *base;
->         struct platform_device *pdev;
->         struct hwrng rng;
-> +       struct clk *core_clk;
->  };
->
->  static int meson_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
-> @@ -86,6 +88,7 @@ static int meson_rng_probe(struct platform_device *pdev)
->         struct device *dev = &pdev->dev;
->         struct meson_rng_data *data;
->         struct resource *res;
-> +       int ret;
+> 
+> The patch was tested on an Armv7 based dual core Zynq ZC706 development
+> board with SHA256-asm, SHA256-neon synchronous providers with no visible
+> degradation of performance, with cryptd based asynchronous versions of the 
+> same and with an off tree Arm CryptoCell asynchronous provider.
+> 
+> Changes from v2:
+> 
+> - Use completion to potentially wait also on crypto_ahash_init() as it
+>   may finish asynchronously as well in some drivers, such as cryptd, as
+>   discovered by Milan Broz.
 
-Variable ret is not used. It can be removed.
+This version survived my simple veritysetup test (in cryptsetup package)
+with forced async path so I think it is ok for 4.12 queue...
 
->         data = devm_kzalloc(dev, sizeof(*data), GFP_KERNEL);
->         if (!data)
-> @@ -98,12 +101,33 @@ static int meson_rng_probe(struct platform_device *pdev)
->         if (IS_ERR(data->base))
->                 return PTR_ERR(data->base);
->
-> +       data->core_clk = devm_clk_get(dev, "core");
-> +       if (IS_ERR(data->core_clk))
-> +               return PTR_ERR(data->core_clk);
-> +
-> +       ret = clk_prepare_enable(data->core_clk);
-> +       if (ret)
-> +               return ret;
-> +
->         data->rng.name = pdev->name;
->         data->rng.read = meson_rng_read;
->
->         platform_set_drvdata(pdev, data);
->
-> -       return devm_hwrng_register(dev, &data->rng);
-> +       ret = devm_hwrng_register(dev, &data->rng);
-> +       if (ret)
-> +               clk_disable_unprepare(data->core_clk);
-> +
-> +       return ret;
-> +}
-> +
-> +static int meson_rng_remove(struct platform_device *pdev)
-> +{
-> +       struct meson_rng_data *data = platform_get_drvdata(pdev);
-> +
-> +       clk_disable_unprepare(data->core_clk);
-> +
-> +       return 0;
->  }
+Thanks,
+Milan
 
-In .remove clock gets disabled before the hwrng_unregister is called.
-The device node '/dev/hwrng' could be accessed while meson_rng_remove
-is called which could lead to problems. Instead of devm_hwrng_register
-use hwrng_register in .probe and call hwrng_unregister in .remove.
 
->  static const struct of_device_id meson_rng_of_match[] = {
-> @@ -114,6 +138,7 @@ MODULE_DEVICE_TABLE(of, meson_rng_of_match);
->
->  static struct platform_driver meson_rng_driver = {
->         .probe  = meson_rng_probe,
-> +       .remove = meson_rng_remove,
->         .driver = {
->                 .name = "meson-rng",
->                 .of_match_table = meson_rng_of_match,
-> --
-> 2.11.1
->
->
+> - Use sg_init_one() where apropriate as pointed out by Milan Broz.
+> 
+> Changes from v1:
+> 
+> - Use a 0 mask to allocate crypto alg indicating we welcome async algo 
+>   providers, as suggested by Ondrej Mosnáček.
+> - Fix use of un-initialized completion when using async provider for IO
+>   blocks hashing
+> - Pass flag indicating we are OK with crypto provider backlog
+> - Re-factor checking for need to wait into a common function
+> 
