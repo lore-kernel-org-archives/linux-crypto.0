@@ -1,7 +1,7 @@
 From: Ryder Lee <ryder.lee@mediatek.com>
-Subject: [PATCH 9/9] crypto: mediatek - add support to OFB mode and CFB128 mode
-Date: Mon, 20 Feb 2017 17:27:02 +0800
-Message-ID: <1487582822-30393-10-git-send-email-ryder.lee@mediatek.com>
+Subject: [PATCH 7/9] crypto: mediatek - add mtk_aes_gcm_tag_verify()
+Date: Mon, 20 Feb 2017 17:27:00 +0800
+Message-ID: <1487582822-30393-8-git-send-email-ryder.lee@mediatek.com>
 References: <1487582822-30393-1-git-send-email-ryder.lee@mediatek.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -9,161 +9,116 @@ Cc: <linux-mediatek@lists.infradead.org>,
         <linux-crypto@vger.kernel.org>, Ryder Lee <ryder.lee@mediatek.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailgw01.mediatek.com ([210.61.82.183]:50594 "EHLO
-        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1752421AbdBTJ1W (ORCPT
+Received: from mailgw02.mediatek.com ([210.61.82.184]:9078 "EHLO
+        mailgw02.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1752450AbdBTJ1S (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 20 Feb 2017 04:27:22 -0500
+        Mon, 20 Feb 2017 04:27:18 -0500
 In-Reply-To: <1487582822-30393-1-git-send-email-ryder.lee@mediatek.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch adds support to OFB mode and CFB128 mode.
+This patch adds mtk_aes_gcm_tag_verify() which is used to compare
+authenticated tag.
 
 Signed-off-by: Ryder Lee <ryder.lee@mediatek.com>
 ---
- drivers/crypto/mediatek/mtk-aes.c | 84 ++++++++++++++++++++++++++++++++++++---
- 1 file changed, 78 insertions(+), 6 deletions(-)
+ drivers/crypto/mediatek/mtk-aes.c      | 24 ++++++++++++++++++++++--
+ drivers/crypto/mediatek/mtk-platform.h |  2 ++
+ 2 files changed, 24 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/crypto/mediatek/mtk-aes.c b/drivers/crypto/mediatek/mtk-aes.c
-index 9e845e8..c2bdfb9 100644
+index 6a0180d..8f3efa5 100644
 --- a/drivers/crypto/mediatek/mtk-aes.c
 +++ b/drivers/crypto/mediatek/mtk-aes.c
-@@ -25,7 +25,7 @@
+@@ -70,6 +70,8 @@
+ #define AES_FLAGS_ENCRYPT	BIT(4)
+ #define AES_FLAGS_BUSY		BIT(5)
  
- #define AES_CT_CTRL_HDR		cpu_to_le32(0x00220000)
- 
--/* AES-CBC/ECB/CTR command token */
-+/* AES-CBC/ECB/CTR/OFB/CFB command token */
- #define AES_CMD0		cpu_to_le32(0x05000000)
- #define AES_CMD1		cpu_to_le32(0x2d060000)
- #define AES_CMD2		cpu_to_le32(0xe4a63806)
-@@ -52,6 +52,8 @@
- /* AES transform information word 1 fields */
- #define AES_TFM_ECB		cpu_to_le32(0x0 << 0)
- #define AES_TFM_CBC		cpu_to_le32(0x1 << 0)
-+#define AES_TFM_OFB		cpu_to_le32(0x4 << 0)
-+#define AES_TFM_CFB128		cpu_to_le32(0x5 << 0)
- #define AES_TFM_CTR_INIT	cpu_to_le32(0x2 << 0)	/* init counter to 1 */
- #define AES_TFM_CTR_LOAD	cpu_to_le32(0x6 << 0)	/* load/reuse counter */
- #define AES_TFM_3IV		cpu_to_le32(0x7 << 5)	/* using IV 0-2 */
-@@ -60,13 +62,15 @@
- #define AES_TFM_ENC_HASH	cpu_to_le32(0x1 << 17)
- 
- /* AES flags */
--#define AES_FLAGS_CIPHER_MSK	GENMASK(2, 0)
-+#define AES_FLAGS_CIPHER_MSK	GENMASK(4, 0)
- #define AES_FLAGS_ECB		BIT(0)
- #define AES_FLAGS_CBC		BIT(1)
- #define AES_FLAGS_CTR		BIT(2)
--#define AES_FLAGS_GCM		BIT(3)
--#define AES_FLAGS_ENCRYPT	BIT(4)
--#define AES_FLAGS_BUSY		BIT(5)
-+#define AES_FLAGS_OFB		BIT(3)
-+#define AES_FLAGS_CFB128	BIT(4)
-+#define AES_FLAGS_GCM		BIT(5)
-+#define AES_FLAGS_ENCRYPT	BIT(6)
-+#define AES_FLAGS_BUSY		BIT(7)
- 
- #define AES_AUTH_TAG_ERR	cpu_to_le32(BIT(26))
- 
-@@ -412,7 +416,7 @@ static int mtk_aes_map(struct mtk_cryp *cryp, struct mtk_aes_rec *aes)
- 	return mtk_aes_complete(cryp, aes, -EINVAL);
- }
- 
--/* Initialize transform information of CBC/ECB/CTR mode */
-+/* Initialize transform information of CBC/ECB/CTR/OFB/CFB mode */
- static void mtk_aes_info_init(struct mtk_cryp *cryp, struct mtk_aes_rec *aes,
- 			      size_t len)
- {
-@@ -441,6 +445,12 @@ static void mtk_aes_info_init(struct mtk_cryp *cryp, struct mtk_aes_rec *aes,
- 	case AES_FLAGS_CTR:
- 		info->tfm[1] = AES_TFM_CTR_LOAD;
- 		goto ctr;
-+	case AES_FLAGS_OFB:
-+		info->tfm[1] = AES_TFM_OFB;
-+		break;
-+	case AES_FLAGS_CFB128:
-+		info->tfm[1] = AES_TFM_CFB128;
-+		break;
- 
- 	default:
- 		/* Should not happen... */
-@@ -699,6 +709,26 @@ static int mtk_aes_ctr_decrypt(struct ablkcipher_request *req)
- 	return mtk_aes_crypt(req, AES_FLAGS_CTR);
- }
- 
-+static int mtk_aes_ofb_encrypt(struct ablkcipher_request *req)
-+{
-+	return mtk_aes_crypt(req, AES_FLAGS_ENCRYPT | AES_FLAGS_OFB);
-+}
++#define AES_AUTH_TAG_ERR	cpu_to_le32(BIT(26))
 +
-+static int mtk_aes_ofb_decrypt(struct ablkcipher_request *req)
-+{
-+	return mtk_aes_crypt(req, AES_FLAGS_OFB);
-+}
-+
-+static int mtk_aes_cfb_encrypt(struct ablkcipher_request *req)
-+{
-+	return mtk_aes_crypt(req, AES_FLAGS_ENCRYPT | AES_FLAGS_CFB128);
-+}
-+
-+static int mtk_aes_cfb_decrypt(struct ablkcipher_request *req)
-+{
-+	return mtk_aes_crypt(req, AES_FLAGS_CFB128);
-+}
-+
- static int mtk_aes_cra_init(struct crypto_tfm *tfm)
- {
- 	struct mtk_aes_ctx *ctx = crypto_tfm_ctx(tfm);
-@@ -794,6 +824,48 @@ static int mtk_aes_ctr_cra_init(struct crypto_tfm *tfm)
- 		.decrypt	= mtk_aes_ctr_decrypt,
+ /**
+  * Command token(CT) is a set of hardware instructions that
+  * are used to control engine's processing flow of AES.
+@@ -306,6 +308,9 @@ static int mtk_aes_xmit(struct mtk_cryp *cryp, struct mtk_aes_rec *aes)
  	}
- },
+ 	res->hdr |= MTK_DESC_LAST;
+ 
++	/* Pointer to current result descriptor */
++	ring->res_prev = res;
++
+ 	/* Prepare enough space for authenticated tag */
+ 	if (aes->flags & AES_FLAGS_GCM)
+ 		res->hdr += AES_BLOCK_SIZE;
+@@ -799,6 +804,19 @@ static int mtk_aes_ctr_cra_init(struct crypto_tfm *tfm)
+ 	return container_of(ctx, struct mtk_aes_gcm_ctx, base);
+ }
+ 
++/*
++ * Engine will verify and compare tag automatically, so we just need
++ * to check returned status which stored in the result descriptor.
++ */
++static int mtk_aes_gcm_tag_verify(struct mtk_cryp *cryp,
++				  struct mtk_aes_rec *aes)
 +{
-+	.cra_name		= "ofb(aes)",
-+	.cra_driver_name	= "ofb-aes-mtk",
-+	.cra_priority		= 400,
-+	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER |
-+				  CRYPTO_ALG_ASYNC,
-+	.cra_init		= mtk_aes_cra_init,
-+	.cra_blocksize		= 1,
-+	.cra_ctxsize		= sizeof(struct mtk_aes_ctx),
-+	.cra_alignmask		= 0xf,
-+	.cra_type		= &crypto_ablkcipher_type,
-+	.cra_module		= THIS_MODULE,
-+	.cra_u.ablkcipher = {
-+		.min_keysize	= AES_MIN_KEY_SIZE,
-+		.max_keysize	= AES_MAX_KEY_SIZE,
-+		.ivsize		= AES_BLOCK_SIZE,
-+		.setkey		= mtk_aes_setkey,
-+		.encrypt	= mtk_aes_ofb_encrypt,
-+		.decrypt	= mtk_aes_ofb_decrypt,
-+	}
-+},
-+{
-+	.cra_name		= "cfb(aes)",
-+	.cra_driver_name	= "cfb-aes-mtk",
-+	.cra_priority		= 400,
-+	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER |
-+				  CRYPTO_ALG_ASYNC,
-+	.cra_init		= mtk_aes_cra_init,
-+	.cra_blocksize		= 1,
-+	.cra_ctxsize		= sizeof(struct mtk_aes_ctx),
-+	.cra_alignmask		= 0xf,
-+	.cra_type		= &crypto_ablkcipher_type,
-+	.cra_module		= THIS_MODULE,
-+	.cra_u.ablkcipher = {
-+		.min_keysize	= AES_MIN_KEY_SIZE,
-+		.max_keysize	= AES_MAX_KEY_SIZE,
-+		.ivsize		= AES_BLOCK_SIZE,
-+		.setkey		= mtk_aes_setkey,
-+		.encrypt	= mtk_aes_cfb_encrypt,
-+		.decrypt	= mtk_aes_cfb_decrypt,
-+	}
-+},
++	u32 status = cryp->ring[aes->id]->res_prev->ct;
++
++	return mtk_aes_complete(cryp, aes, (status & AES_AUTH_TAG_ERR) ?
++				-EBADMSG : 0);
++}
++
+ /* Initialize transform information of GCM mode */
+ static void mtk_aes_gcm_info_init(struct mtk_cryp *cryp,
+ 				  struct mtk_aes_rec *aes,
+@@ -902,6 +920,8 @@ static int mtk_aes_gcm_start(struct mtk_cryp *cryp, struct mtk_aes_rec *aes)
+ 
+ 	if (aes->flags & AES_FLAGS_ENCRYPT) {
+ 		u32 tag[4];
++
++		aes->resume = mtk_aes_transfer_complete;
+ 		/* Compute total process length. */
+ 		aes->total = len + gctx->authsize;
+ 		/* Compute text length. */
+@@ -909,10 +929,10 @@ static int mtk_aes_gcm_start(struct mtk_cryp *cryp, struct mtk_aes_rec *aes)
+ 		/* Hardware will append authenticated tag to output buffer */
+ 		scatterwalk_map_and_copy(tag, req->dst, len, gctx->authsize, 1);
+ 	} else {
++		aes->resume = mtk_aes_gcm_tag_verify;
+ 		aes->total = len;
+ 		gctx->textlen = req->cryptlen - gctx->authsize;
+ 	}
+-	aes->resume = mtk_aes_transfer_complete;
+ 
+ 	return mtk_aes_gcm_dma(cryp, aes, req->src, req->dst, len);
+ }
+@@ -925,7 +945,7 @@ static int mtk_aes_gcm_crypt(struct aead_request *req, u64 mode)
+ 	rctx->mode = AES_FLAGS_GCM | mode;
+ 
+ 	return mtk_aes_handle_queue(ctx->cryp, !!(mode & AES_FLAGS_ENCRYPT),
+-								&req->base);
++				    &req->base);
+ }
+ 
+ static void mtk_gcm_setkey_done(struct crypto_async_request *req, int err)
+diff --git a/drivers/crypto/mediatek/mtk-platform.h b/drivers/crypto/mediatek/mtk-platform.h
+index cc98c2c..303c152 100644
+--- a/drivers/crypto/mediatek/mtk-platform.h
++++ b/drivers/crypto/mediatek/mtk-platform.h
+@@ -88,6 +88,7 @@ struct mtk_desc {
+  * @cmd_dma:	DMA address of command descriptor ring
+  * @res_base:	pointer to result descriptor ring base
+  * @res_next:	pointer to the next result descriptor
++ * @res_prev:	pointer to the previous result descriptor
+  * @res_dma:	DMA address of result descriptor ring
+  *
+  * A descriptor ring is a circular buffer that is used to manage
+@@ -100,6 +101,7 @@ struct mtk_ring {
+ 	dma_addr_t cmd_dma;
+ 	struct mtk_desc *res_base;
+ 	struct mtk_desc *res_next;
++	struct mtk_desc *res_prev;
+ 	dma_addr_t res_dma;
  };
  
- static inline struct mtk_aes_gcm_ctx *
 -- 
 1.9.1
