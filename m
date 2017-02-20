@@ -1,7 +1,7 @@
 From: Ryder Lee <ryder.lee@mediatek.com>
-Subject: [PATCH 6/9] crypto: mediatek - fix error handling in mtk_aes_complete()
-Date: Mon, 20 Feb 2017 17:26:59 +0800
-Message-ID: <1487582822-30393-7-git-send-email-ryder.lee@mediatek.com>
+Subject: [PATCH 5/9] crypto: mediatek - add queue_task tasklet
+Date: Mon, 20 Feb 2017 17:26:58 +0800
+Message-ID: <1487582822-30393-6-git-send-email-ryder.lee@mediatek.com>
 References: <1487582822-30393-1-git-send-email-ryder.lee@mediatek.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -9,142 +9,189 @@ Cc: <linux-mediatek@lists.infradead.org>,
         <linux-crypto@vger.kernel.org>, Ryder Lee <ryder.lee@mediatek.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailgw02.mediatek.com ([210.61.82.184]:8779 "EHLO
-        mailgw02.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1752447AbdBTJ1S (ORCPT
+Received: from mailgw01.mediatek.com ([210.61.82.183]:60294 "EHLO
+        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1752443AbdBTJ1P (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 20 Feb 2017 04:27:18 -0500
+        Mon, 20 Feb 2017 04:27:15 -0500
 In-Reply-To: <1487582822-30393-1-git-send-email-ryder.lee@mediatek.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch fixes how errors should be handled by mtk_aes_complete().
+This patch adds 'queue_task' to dequeue crypto requset. This will help to
+avoid directly calling mtk_aes_handle_queue() / mtk_sha_handle_queue()
+from done tasklet or error handler.
+
+In order to avoid confusion, the new code properly renames DMA completion
+"task" to "done_task".
 
 Signed-off-by: Ryder Lee <ryder.lee@mediatek.com>
 ---
- drivers/crypto/mediatek/mtk-aes.c | 39 +++++++++++++++++++++++----------------
- 1 file changed, 23 insertions(+), 16 deletions(-)
+ drivers/crypto/mediatek/mtk-aes.c      | 20 ++++++++++++++++----
+ drivers/crypto/mediatek/mtk-platform.h | 12 ++++++++----
+ drivers/crypto/mediatek/mtk-sha.c      | 19 +++++++++++++++----
+ 3 files changed, 39 insertions(+), 12 deletions(-)
 
 diff --git a/drivers/crypto/mediatek/mtk-aes.c b/drivers/crypto/mediatek/mtk-aes.c
-index 140e9a3..6a0180d 100644
+index 21f3e59..140e9a3 100644
 --- a/drivers/crypto/mediatek/mtk-aes.c
 +++ b/drivers/crypto/mediatek/mtk-aes.c
-@@ -248,6 +248,17 @@ static inline void mtk_aes_restore_sg(const struct mtk_aes_dma *dma)
- 	sg->length += dma->remainder;
- }
+@@ -533,7 +533,8 @@ static int mtk_aes_complete(struct mtk_cryp *cryp, struct mtk_aes_rec *aes)
+ 	aes->areq->complete(aes->areq, 0);
  
-+static inline int mtk_aes_complete(struct mtk_cryp *cryp,
-+				   struct mtk_aes_rec *aes,
-+				   int err)
-+{
-+	aes->flags &= ~AES_FLAGS_BUSY;
-+	aes->areq->complete(aes->areq, err);
-+	/* Handle new request */
+ 	/* Handle new request */
+-	return mtk_aes_handle_queue(cryp, aes->id, NULL);
 +	tasklet_schedule(&aes->queue_task);
-+	return err;
-+}
-+
- /*
-  * Write descriptors for processing. This will configure the engine, load
-  * the transform information and then start the packet processing.
-@@ -352,7 +363,7 @@ static int mtk_aes_map(struct mtk_cryp *cryp, struct mtk_aes_rec *aes)
- 	ctx->ct_dma = dma_map_single(cryp->dev, &ctx->ct, sizeof(ctx->ct),
- 				     DMA_TO_DEVICE);
- 	if (unlikely(dma_mapping_error(cryp->dev, ctx->ct_dma)))
--		return -EINVAL;
-+		goto exit;
- 
- 	ctx->tfm_dma = dma_map_single(cryp->dev, &ctx->tfm, sizeof(ctx->tfm),
- 				      DMA_TO_DEVICE);
-@@ -389,8 +400,8 @@ static int mtk_aes_map(struct mtk_cryp *cryp, struct mtk_aes_rec *aes)
- tfm_map_err:
- 	dma_unmap_single(cryp->dev, ctx->ct_dma, sizeof(ctx->ct),
- 			 DMA_TO_DEVICE);
--
--	return -EINVAL;
-+exit:
-+	return mtk_aes_complete(cryp, aes, -EINVAL);
- }
- 
- /* Initialize transform information of CBC/ECB/CTR mode */
-@@ -467,7 +478,7 @@ static int mtk_aes_dma(struct mtk_cryp *cryp, struct mtk_aes_rec *aes,
- 		padlen = mtk_aes_padlen(len);
- 
- 		if (len + padlen > AES_BUF_SIZE)
--			return -ENOMEM;
-+			return mtk_aes_complete(cryp, aes, -ENOMEM);
- 
- 		if (!src_aligned) {
- 			sg_copy_to_buffer(src, sg_nents(src), aes->buf, len);
-@@ -527,14 +538,10 @@ static int mtk_aes_handle_queue(struct mtk_cryp *cryp, u8 id,
- 	return ctx->start(cryp, aes);
- }
- 
--static int mtk_aes_complete(struct mtk_cryp *cryp, struct mtk_aes_rec *aes)
-+static int mtk_aes_transfer_complete(struct mtk_cryp *cryp,
-+				     struct mtk_aes_rec *aes)
- {
--	aes->flags &= ~AES_FLAGS_BUSY;
--	aes->areq->complete(aes->areq, 0);
--
--	/* Handle new request */
--	tasklet_schedule(&aes->queue_task);
--	return 0;
-+	return mtk_aes_complete(cryp, aes, 0);
++	return 0;
  }
  
  static int mtk_aes_start(struct mtk_cryp *cryp, struct mtk_aes_rec *aes)
-@@ -543,7 +550,7 @@ static int mtk_aes_start(struct mtk_cryp *cryp, struct mtk_aes_rec *aes)
- 	struct mtk_aes_reqctx *rctx = ablkcipher_request_ctx(req);
+@@ -1094,6 +1095,13 @@ static void mtk_aes_gcm_exit(struct crypto_aead *aead)
+ 	},
+ };
  
- 	mtk_aes_set_mode(aes, rctx);
--	aes->resume = mtk_aes_complete;
-+	aes->resume = mtk_aes_transfer_complete;
++static void mtk_aes_queue_task(unsigned long data)
++{
++	struct mtk_aes_rec *aes = (struct mtk_aes_rec *)data;
++
++	mtk_aes_handle_queue(aes->cryp, aes->id, NULL);
++}
++
+ static void mtk_aes_done_task(unsigned long data)
+ {
+ 	struct mtk_aes_rec *aes = (struct mtk_aes_rec *)data;
+@@ -1116,7 +1124,7 @@ static irqreturn_t mtk_aes_irq(int irq, void *dev_id)
+ 		mtk_aes_write(cryp, RDR_THRESH(aes->id),
+ 			      MTK_RDR_PROC_THRESH | MTK_RDR_PROC_MODE);
  
- 	return mtk_aes_dma(cryp, aes, req->src, req->dst, req->nbytes);
- }
-@@ -568,7 +575,7 @@ static int mtk_aes_ctr_transfer(struct mtk_cryp *cryp, struct mtk_aes_rec *aes)
- 	/* Check for transfer completion. */
- 	cctx->offset += aes->total;
- 	if (cctx->offset >= req->nbytes)
--		return mtk_aes_complete(cryp, aes);
-+		return mtk_aes_transfer_complete(cryp, aes);
- 
- 	/* Compute data length. */
- 	datalen = req->nbytes - cctx->offset;
-@@ -602,7 +609,6 @@ static int mtk_aes_ctr_transfer(struct mtk_cryp *cryp, struct mtk_aes_rec *aes)
- 		cctx->iv[3] = cpu_to_be32(ctr);
- 		crypto_inc((u8 *)cctx->iv, AES_BLOCK_SIZE);
+-		tasklet_schedule(&aes->task);
++		tasklet_schedule(&aes->done_task);
+ 	} else {
+ 		dev_warn(cryp->dev, "AES interrupt when no active requests.\n");
  	}
--	aes->resume = mtk_aes_ctr_transfer;
+@@ -1149,7 +1157,9 @@ static int mtk_aes_record_init(struct mtk_cryp *cryp)
+ 		spin_lock_init(&aes[i]->lock);
+ 		crypto_init_queue(&aes[i]->queue, AES_QUEUE_SIZE);
  
- 	return mtk_aes_dma(cryp, aes, src, dst, datalen);
- }
-@@ -618,6 +624,7 @@ static int mtk_aes_ctr_start(struct mtk_cryp *cryp, struct mtk_aes_rec *aes)
- 	memcpy(cctx->iv, req->info, AES_BLOCK_SIZE);
- 	cctx->offset = 0;
- 	aes->total = 0;
-+	aes->resume = mtk_aes_ctr_transfer;
- 
- 	return mtk_aes_ctr_transfer(cryp, aes);
- }
-@@ -859,7 +866,7 @@ static int mtk_aes_gcm_dma(struct mtk_cryp *cryp, struct mtk_aes_rec *aes,
- 
- 	if (!src_aligned || !dst_aligned) {
- 		if (aes->total > AES_BUF_SIZE)
--			return -ENOMEM;
-+			return mtk_aes_complete(cryp, aes, -ENOMEM);
- 
- 		if (!src_aligned) {
- 			sg_copy_to_buffer(src, sg_nents(src), aes->buf, len);
-@@ -905,7 +912,7 @@ static int mtk_aes_gcm_start(struct mtk_cryp *cryp, struct mtk_aes_rec *aes)
- 		aes->total = len;
- 		gctx->textlen = req->cryptlen - gctx->authsize;
+-		tasklet_init(&aes[i]->task, mtk_aes_done_task,
++		tasklet_init(&aes[i]->queue_task, mtk_aes_queue_task,
++			     (unsigned long)aes[i]);
++		tasklet_init(&aes[i]->done_task, mtk_aes_done_task,
+ 			     (unsigned long)aes[i]);
  	}
--	aes->resume = mtk_aes_complete;
-+	aes->resume = mtk_aes_transfer_complete;
  
- 	return mtk_aes_gcm_dma(cryp, aes, req->src, req->dst, len);
+@@ -1173,7 +1183,9 @@ static void mtk_aes_record_free(struct mtk_cryp *cryp)
+ 	int i;
+ 
+ 	for (i = 0; i < MTK_REC_NUM; i++) {
+-		tasklet_kill(&cryp->aes[i]->task);
++		tasklet_kill(&cryp->aes[i]->done_task);
++		tasklet_kill(&cryp->aes[i]->queue_task);
++
+ 		free_page((unsigned long)cryp->aes[i]->buf);
+ 		kfree(cryp->aes[i]);
+ 	}
+diff --git a/drivers/crypto/mediatek/mtk-platform.h b/drivers/crypto/mediatek/mtk-platform.h
+index 218e30d..cc98c2c 100644
+--- a/drivers/crypto/mediatek/mtk-platform.h
++++ b/drivers/crypto/mediatek/mtk-platform.h
+@@ -128,7 +128,8 @@ struct mtk_aes_dma {
+  * @cryp:	pointer to Cryptographic device
+  * @queue:	crypto request queue
+  * @areq:	pointer to async request
+- * @task:	the tasklet is use in AES interrupt
++ * @done_task:	the tasklet is use in AES interrupt
++ * @queue_task:	the tasklet is used to dequeue request
+  * @ctx:	pointer to current context
+  * @src:	the structure that holds source sg list info
+  * @dst:	the structure that holds destination sg list info
+@@ -147,7 +148,8 @@ struct mtk_aes_rec {
+ 	struct mtk_cryp *cryp;
+ 	struct crypto_queue queue;
+ 	struct crypto_async_request *areq;
+-	struct tasklet_struct task;
++	struct tasklet_struct done_task;
++	struct tasklet_struct queue_task;
+ 	struct mtk_aes_base_ctx *ctx;
+ 	struct mtk_aes_dma src;
+ 	struct mtk_aes_dma dst;
+@@ -171,7 +173,8 @@ struct mtk_aes_rec {
+  * @cryp:	pointer to Cryptographic device
+  * @queue:	crypto request queue
+  * @req:	pointer to ahash request
+- * @task:	the tasklet is use in SHA interrupt
++ * @done_task:	the tasklet is use in SHA interrupt
++ * @queue_task:	the tasklet is used to dequeue request
+  * @id:		the current use of ring
+  * @flags:	it's describing SHA operation state
+  * @lock:	the async queue lock
+@@ -182,7 +185,8 @@ struct mtk_sha_rec {
+ 	struct mtk_cryp *cryp;
+ 	struct crypto_queue queue;
+ 	struct ahash_request *req;
+-	struct tasklet_struct task;
++	struct tasklet_struct done_task;
++	struct tasklet_struct queue_task;
+ 
+ 	u8 id;
+ 	unsigned long flags;
+diff --git a/drivers/crypto/mediatek/mtk-sha.c b/drivers/crypto/mediatek/mtk-sha.c
+index 0884d62..dd3582b 100644
+--- a/drivers/crypto/mediatek/mtk-sha.c
++++ b/drivers/crypto/mediatek/mtk-sha.c
+@@ -661,7 +661,7 @@ static void mtk_sha_finish_req(struct mtk_cryp *cryp,
+ 	sha->req->base.complete(&sha->req->base, err);
+ 
+ 	/* Handle new request */
+-	mtk_sha_handle_queue(cryp, sha->id - MTK_RING2, NULL);
++	tasklet_schedule(&sha->queue_task);
+ }
+ 
+ static int mtk_sha_handle_queue(struct mtk_cryp *cryp, u8 id,
+@@ -1183,6 +1183,13 @@ static void mtk_sha_cra_exit(struct crypto_tfm *tfm)
+ },
+ };
+ 
++static void mtk_sha_queue_task(unsigned long data)
++{
++	struct mtk_sha_rec *sha = (struct mtk_sha_rec *)data;
++
++	mtk_sha_handle_queue(sha->cryp, sha->id - MTK_RING2, NULL);
++}
++
+ static void mtk_sha_done_task(unsigned long data)
+ {
+ 	struct mtk_sha_rec *sha = (struct mtk_sha_rec *)data;
+@@ -1205,7 +1212,7 @@ static irqreturn_t mtk_sha_irq(int irq, void *dev_id)
+ 		mtk_sha_write(cryp, RDR_THRESH(sha->id),
+ 			      MTK_RDR_PROC_THRESH | MTK_RDR_PROC_MODE);
+ 
+-		tasklet_schedule(&sha->task);
++		tasklet_schedule(&sha->done_task);
+ 	} else {
+ 		dev_warn(cryp->dev, "SHA interrupt when no active requests.\n");
+ 	}
+@@ -1231,7 +1238,9 @@ static int mtk_sha_record_init(struct mtk_cryp *cryp)
+ 		spin_lock_init(&sha[i]->lock);
+ 		crypto_init_queue(&sha[i]->queue, SHA_QUEUE_SIZE);
+ 
+-		tasklet_init(&sha[i]->task, mtk_sha_done_task,
++		tasklet_init(&sha[i]->queue_task, mtk_sha_queue_task,
++			     (unsigned long)sha[i]);
++		tasklet_init(&sha[i]->done_task, mtk_sha_done_task,
+ 			     (unsigned long)sha[i]);
+ 	}
+ 
+@@ -1254,7 +1263,9 @@ static void mtk_sha_record_free(struct mtk_cryp *cryp)
+ 	int i;
+ 
+ 	for (i = 0; i < MTK_REC_NUM; i++) {
+-		tasklet_kill(&cryp->sha[i]->task);
++		tasklet_kill(&cryp->sha[i]->done_task);
++		tasklet_kill(&cryp->sha[i]->queue_task);
++
+ 		kfree(cryp->sha[i]);
+ 	}
  }
 -- 
 1.9.1
