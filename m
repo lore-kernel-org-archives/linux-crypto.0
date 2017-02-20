@@ -1,197 +1,106 @@
-From: "Nair, Vishnu" <Vishnu.Nair@cavium.com>
-Subject: Re: [RFC PATCH v1 1/1] mm: zswap - Add crypto acomp/scomp framework
- support
-Date: Mon, 20 Feb 2017 09:52:57 +0000
-Message-ID: <MWHPR07MB2943F04F607146A954D404E3955E0@MWHPR07MB2943.namprd07.prod.outlook.com>
-References: <1487086821-5880-1-git-send-email-Mahipal.Challa@cavium.com>
- <1487086821-5880-2-git-send-email-Mahipal.Challa@cavium.com>
- <CAC8qmcCt8VEX6QSSL35isN-nEvH-AJ2MAJHZy0TigxftsQN2jA@mail.gmail.com>
- <58A45E4A.8080508@caviumnetworks.com>,<20170215221208.GA820@silv-gc1.ir.intel.com>
+From: Jerome Brunet <jbrunet@baylibre.com>
+Subject: Re: [PATCH 1/2] hwrng: meson: expose RNG0 clock via DT
+Date: Mon, 20 Feb 2017 11:07:23 +0100
+Message-ID: <1487585243.3734.3.camel@baylibre.com>
+References: <00b2a4cc-686e-0cc0-43e8-552b70a1e868@gmail.com>
+         <a02b078d-9171-cf66-d5d8-84259f9f9a88@gmail.com>
 Mime-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="_000_MWHPR07MB2943F04F607146A954D404E3955E0MWHPR07MB2943namp_"
-Cc: Seth Jennings <sjenning@redhat.com>, Mahipal Challa
-	<mahipalreddy2006@gmail.com>, "herbert@gondor.apana.org.au"
-	<herbert@gondor.apana.org.au>, "davem@davemloft.net" <davem@davemloft.net>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, LKML
-	<linux-kernel@vger.kernel.org>, Linux-MM <linux-mm@kvack.org>, "Challa,
- Mahipal" <Mahipal.Challa@cavium.com>
-To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>, "Narayana, Prasad Athreya"
-	<Prasad.Athreya@cavium.com>
-Return-path: <owner-linux-mm@kvack.org>
-In-Reply-To: <20170215221208.GA820@silv-gc1.ir.intel.com>
-Content-Language: en-US
-Sender: owner-linux-mm@kvack.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Cc: linux-amlogic@lists.infradead.org, linux-crypto@vger.kernel.org,
+        Neil Armstrong <narmstrong@baylibre.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>,
+        Kevin Hilman <khilman@baylibre.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wm0-f52.google.com ([74.125.82.52]:38407 "EHLO
+        mail-wm0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751232AbdBTKH0 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 20 Feb 2017 05:07:26 -0500
+Received: by mail-wm0-f52.google.com with SMTP id r141so48292197wmg.1
+        for <linux-crypto@vger.kernel.org>; Mon, 20 Feb 2017 02:07:26 -0800 (PST)
+In-Reply-To: <a02b078d-9171-cf66-d5d8-84259f9f9a88@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
---_000_MWHPR07MB2943F04F607146A954D404E3955E0MWHPR07MB2943namp_
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+On Sun, 2017-02-19 at 21:33 +0100, Heiner Kallweit wrote:
+> Expose the RNG0 clock via DT.
+> 
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> ---
+>  arch/arm64/boot/dts/amlogic/meson-gx.dtsi   | 2 +-
+>  arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi | 5 +++++
+>  include/dt-bindings/clock/gxbb-clkc.h       | 1 +
+>  3 files changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/boot/dts/amlogic/meson-gx.dtsi
+> b/arch/arm64/boot/dts/amlogic/meson-gx.dtsi
+> index 5d995f77..620495a4 100644
+> --- a/arch/arm64/boot/dts/amlogic/meson-gx.dtsi
+> +++ b/arch/arm64/boot/dts/amlogic/meson-gx.dtsi
+> @@ -380,7 +380,7 @@
+>  			#size-cells = <2>;
+>  			ranges = <0x0 0x0 0x0 0xc8834000 0x0
+> 0x2000>;
+>  
+> -			rng {
+> +			hwrng: rng {
+>  				compatible = "amlogic,meson-rng";
+>  				reg = <0x0 0x0 0x0 0x4>;
+>  			};
+> diff --git a/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi
+> b/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi
+> index 04b3324b..a375cb21 100644
+> --- a/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi
+> +++ b/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi
+> @@ -524,3 +524,8 @@
+>  &vpu {
+>  	compatible = "amlogic,meson-gxbb-vpu", "amlogic,meson-gx-
+> vpu";
+>  };
+> +
+> +&hwrng {
+> +	clocks = <&clkc CLKID_RNG0>;
+> +	clock-names = "core";
+> +};
+> diff --git a/include/dt-bindings/clock/gxbb-clkc.h b/include/dt-
+> bindings/clock/gxbb-clkc.h
+> index 692846c7..473676b1 100644
+> --- a/include/dt-bindings/clock/gxbb-clkc.h
+> +++ b/include/dt-bindings/clock/gxbb-clkc.h
+> @@ -15,6 +15,7 @@
+>  #define CLKID_SPI		34
+>  #define CLKID_I2C		22
+>  #define CLKID_SAR_ADC		23
+> +#define CLKID_RNG0		25
 
->This assumption is not correct. An asynchronous implementation, when
->it finishes processing a request, will call acomp_request_complete() which
->in turn calls the callback.
->If the callback is set to NULL, this function will dereference a NULL
->pointer.
+Shouldn't you comment out the corresponding "define" in
+drivers/clk/meson/gxbb.h ?
 
+I don't know if it is rule, but we usually "expose" the clock (moving
+the define from drivers/clk/meson/gxbb.h to include/dt-
+bindings/clock/gxbb-clkc.h) in a dedicated patch, with the subject
+starting with "clk: gxbb: expose foobar clock". It helps the
+maintainers of the subsystem to give their ack.
 
-This would leave us with the option of waiting in zswap until completion. H=
-ere we had a doubt.
+For this to happen, please remember the patch should be sent to them as
+well. Here you are missing the clock and dt guys:
+* Stephen Boyd <sboyd@codeaurora.org>
+* Michael Turquette <mturquette@baylibre.com>
+* linux-clk@vger.kernel.org
+* devicetree@vger.kernel.org
 
-If we go ahead with an implementation similar to the one found in crypto/te=
-stmgr.c, the private data(result) which is registered via 'acomp_request_se=
-t_callback()' is coming from stack. Do you see this as a potential problem =
-for an acutal asynchronus algorithm due to the context from which callback =
-is called? Do we have to use per-cpu dynamic allocation?
+scripts/get_maintainer.pl can help you finding all people your patch
+should be sent to.
 
+The remaining part of this patch involves DT, so the subject should
+start with "ARM64: dts: meson-gx:"
+You also need to add devicetree@vger.kernel.org in CC.
 
-Thanks,
-Vishnu
+Apart from these minor remarks, the patchset looks good to me.
+Thx !
 
-
-________________________________
-From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Sent: Thursday, February 16, 2017 3:42 AM
-To: Narayana, Prasad Athreya
-Cc: Seth Jennings; Mahipal Challa; herbert@gondor.apana.org.au; davem@davem=
-loft.net; linux-crypto@vger.kernel.org; LKML; Linux-MM; Narayana, Prasad At=
-hreya; Nair, Vishnu; Challa, Mahipal; Nair, Vishnu
-Subject: Re: [RFC PATCH v1 1/1] mm: zswap - Add crypto acomp/scomp framewor=
-k support
-
-On Wed, Feb 15, 2017 at 07:27:30PM +0530, Narayana Prasad Athreya wrote:
-> > I assume all of these crypto_acomp_[compress|decompress] calls are
-> > actually synchronous,
-> > not asynchronous as the name suggests.  Otherwise, this would blow up
-> > quite spectacularly
-> > since all the resources we use in the call get derefed/unmapped below.
-> >
-> > Could an async algorithm be implement/used that would break this assump=
-tion?
->
-> The callback is set to NULL using acomp_request_set_callback(). This impl=
-ies
-> synchronous mode of operation. So the underlying implementation must
-> complete the operation synchronously.
-This assumption is not correct. An asynchronous implementation, when
-it finishes processing a request, will call acomp_request_complete() which
-in turn calls the callback.
-If the callback is set to NULL, this function will dereference a NULL
-pointer.
-
-Regards,
-
---
-Giovanni
-
---_000_MWHPR07MB2943F04F607146A954D404E3955E0MWHPR07MB2943namp_
-Content-Type: text/html; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-
-<html>
-<head>
-<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Diso-8859-=
-1">
-<style type=3D"text/css" style=3D"display:none;"><!-- P {margin-top:0;margi=
-n-bottom:0;} --></style>
-</head>
-<body dir=3D"ltr">
-<div id=3D"divtagdefaultwrapper" style=3D"font-size:12pt;color:#000000;font=
--family:Calibri,Arial,Helvetica,sans-serif;" dir=3D"ltr">
-<p><font size=3D"2"><span style=3D"font-size:10pt;">&gt;This assumption is =
-not correct. An asynchronous implementation, when<br>
-&gt;it finishes processing a request, will call acomp_request_complete() wh=
-ich<br>
-&gt;in turn calls the callback.<br>
-&gt;If the callback is set to NULL, this function will dereference a NULL<b=
-r>
-&gt;pointer.</span></font></p>
-<p><font size=3D"2"><span style=3D"font-size:10pt;"><br>
-</span></font></p>
-<p><font size=3D"2"><span style=3D"font-size:10pt;"></span></font>This woul=
-d leave us with the option of waiting in zswap until completion. Here we ha=
-d a doubt.
-<br>
-</p>
-<p>If we go ahead with an implementation similar to the one found in crypto=
-/testmgr.c, the private data(result) which is registered via '<span>acomp_r=
-equest_set_callback</span>()' is coming from stack. Do you see this as a po=
-tential problem for an acutal asynchronus
- algorithm due to the context from which callback is called? Do we have to =
-use per-cpu dynamic allocation?
-<br>
-</p>
-<p><br>
-</p>
-<div id=3D"Signature">
-<div id=3D"divtagdefaultwrapper" style=3D"font-size:12pt; color:#000000; ba=
-ckground-color:#FFFFFF; font-family:Calibri,Arial,Helvetica,sans-serif">
-<div name=3D"divtagdefaultwrapper" style=3D"font-family:Calibri,Arial,Helve=
-tica,sans-serif; font-size:; margin:0">
-Thanks,<br>
-Vishnu <br>
-</div>
-</div>
-</div>
-<br>
-<br>
-<div style=3D"color: rgb(0, 0, 0);">
-<div>
-<hr tabindex=3D"-1" style=3D"display:inline-block; width:98%">
-<div id=3D"x_divRplyFwdMsg" dir=3D"ltr"><font style=3D"font-size:11pt" face=
-=3D"Calibri, sans-serif" color=3D"#000000"><b>From:</b> Giovanni Cabiddu &l=
-t;giovanni.cabiddu@intel.com&gt;<br>
-<b>Sent:</b> Thursday, February 16, 2017 3:42 AM<br>
-<b>To:</b> Narayana, Prasad Athreya<br>
-<b>Cc:</b> Seth Jennings; Mahipal Challa; herbert@gondor.apana.org.au; dave=
-m@davemloft.net; linux-crypto@vger.kernel.org; LKML; Linux-MM; Narayana, Pr=
-asad Athreya; Nair, Vishnu; Challa, Mahipal; Nair, Vishnu<br>
-<b>Subject:</b> Re: [RFC PATCH v1 1/1] mm: zswap - Add crypto acomp/scomp f=
-ramework support</font>
-<div>&nbsp;</div>
-</div>
-</div>
-<font size=3D"2"><span style=3D"font-size:10pt;">
-<div class=3D"PlainText">On Wed, Feb 15, 2017 at 07:27:30PM &#43;0530, Nara=
-yana Prasad Athreya wrote:<br>
-&gt; &gt; I assume all of these crypto_acomp_[compress|decompress] calls ar=
-e<br>
-&gt; &gt; actually synchronous,<br>
-&gt; &gt; not asynchronous as the name suggests.&nbsp; Otherwise, this woul=
-d blow up<br>
-&gt; &gt; quite spectacularly<br>
-&gt; &gt; since all the resources we use in the call get derefed/unmapped b=
-elow.<br>
-&gt; &gt; <br>
-&gt; &gt; Could an async algorithm be implement/used that would break this =
-assumption?<br>
-&gt; <br>
-&gt; The callback is set to NULL using acomp_request_set_callback(). This i=
-mplies<br>
-&gt; synchronous mode of operation. So the underlying implementation must<b=
-r>
-&gt; complete the operation synchronously.<br>
-This assumption is not correct. An asynchronous implementation, when<br>
-it finishes processing a request, will call acomp_request_complete() which<=
-br>
-in turn calls the callback.<br>
-If the callback is set to NULL, this function will dereference a NULL<br>
-pointer.<br>
-<br>
-Regards,<br>
-<br>
--- <br>
-Giovanni <br>
-</div>
-</span></font></div>
-</div>
-</body>
-</html>
-
---_000_MWHPR07MB2943F04F607146A954D404E3955E0MWHPR07MB2943namp_--
-
---
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+>  #define CLKID_ETH		36
+>  #define CLKID_USB0		50
+>  #define CLKID_USB1		51
