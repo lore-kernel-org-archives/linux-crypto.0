@@ -1,10 +1,9 @@
 From: Neil Armstrong <narmstrong-rdvid1DuHRBWk0Htik3J/w@public.gmane.org>
-Subject: Re: [PATCH v2 2/3] ARM64: dts: meson-gx: add clock CLKID_RNG0 to
- hwrng node
-Date: Tue, 21 Feb 2017 13:20:44 -0800
-Message-ID: <a80f9487-b385-b886-5a4c-e8f5da506b7f@baylibre.com>
+Subject: Re: [PATCH v2 3/3] hwrng: meson: add clock handling to driver
+Date: Tue, 21 Feb 2017 13:21:47 -0800
+Message-ID: <afe93bb2-30de-233d-ed58-d77c018a6d33@baylibre.com>
 References: <daf765e2-1a60-8dea-fee0-8af6ddecdf8e@gmail.com>
- <8bf052e3-de8f-dbdf-be76-369a7bb1ed15@gmail.com>
+ <989cf7bf-b7ea-0b41-510b-6eab403f0185@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
@@ -17,86 +16,85 @@ To: Heiner Kallweit <hkallweit1-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
         Stephen Boyd <sboyd-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>,
         Michael Turquette <mturquette-rdvid1DuHRBWk0Htik3J/w@public.gmane.org>
 Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <8bf052e3-de8f-dbdf-be76-369a7bb1ed15-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <989cf7bf-b7ea-0b41-510b-6eab403f0185-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 02/21/2017 12:18 PM, Heiner Kallweit wrote:
-> Add clock CLKID_RNG0 to HW randon number generator node and
-> extend the DT binding documentation accordingly.
+On 02/21/2017 12:26 PM, Heiner Kallweit wrote:
+> Add handling of RNG0 clock to the driver.
 > 
 > Signed-off-by: Heiner Kallweit <hkallweit1-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 > ---
 > v2:
-> - splitted first version of patch into two
-> - add DT binding documentation
-
-Hi Heiner,
-
-Can you move the dt-bindings to a separate patch ?
-
-> - mention that clock is optional
-> - replace spaces with tabs in DT binding example
+> - consider that clock is optional
+> - use managed call to clk_disable_unprepare to ensure that
+>   cleaning up is done in the right order if driver is removed
 > ---
->  Documentation/devicetree/bindings/rng/amlogic,meson-rng.txt | 8 ++++++--
->  arch/arm64/boot/dts/amlogic/meson-gx.dtsi                   | 2 +-
->  arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi                 | 5 +++++
->  3 files changed, 12 insertions(+), 3 deletions(-)
+>  drivers/char/hw_random/meson-rng.c | 22 ++++++++++++++++++++++
+>  1 file changed, 22 insertions(+)
 > 
-> diff --git a/Documentation/devicetree/bindings/rng/amlogic,meson-rng.txt b/Documentation/devicetree/bindings/rng/amlogic,meson-rng.txt
-> index 202f2d09..4c012a04 100644
-> --- a/Documentation/devicetree/bindings/rng/amlogic,meson-rng.txt
-> +++ b/Documentation/devicetree/bindings/rng/amlogic,meson-rng.txt
-> @@ -5,10 +5,14 @@ Required properties:
+> diff --git a/drivers/char/hw_random/meson-rng.c b/drivers/char/hw_random/meson-rng.c
+> index 119d6984..2e23be80 100644
+> --- a/drivers/char/hw_random/meson-rng.c
+> +++ b/drivers/char/hw_random/meson-rng.c
+> @@ -62,6 +62,7 @@
+>  #include <linux/slab.h>
+>  #include <linux/types.h>
+>  #include <linux/of.h>
+> +#include <linux/clk.h>
 >  
->  - compatible : should be "amlogic,meson-rng"
->  - reg : Specifies base physical address and size of the registers.
-> +- clocks : Optional core clock
-> +- clock-names: Name of core clock, must be "core"
-
-Please put these in a separate "Optional Properties" :
-
-Optional Properties:
-- clocks : phandle to the following named clocks
-- clock-names: Name of core clock, must be "core"
-
+>  #define RNG_DATA 0x00
 >  
->  Example:
->  
->  rng {
-> -        compatible = "amlogic,meson-rng";
-> -        reg = <0x0 0xc8834000 0x0 0x4>;
-> +	compatible = "amlogic,meson-rng";
-> +	reg = <0x0 0xc8834000 0x0 0x4>;
-> +	clocks = <&clkc CLKID_RNG0>;
-> +	clock-names = "core";
+> @@ -69,6 +70,7 @@ struct meson_rng_data {
+>  	void __iomem *base;
+>  	struct platform_device *pdev;
+>  	struct hwrng rng;
+> +	struct clk *core_clk;
 >  };
-> diff --git a/arch/arm64/boot/dts/amlogic/meson-gx.dtsi b/arch/arm64/boot/dts/amlogic/meson-gx.dtsi
-> index 5d995f77..620495a4 100644
-> --- a/arch/arm64/boot/dts/amlogic/meson-gx.dtsi
-> +++ b/arch/arm64/boot/dts/amlogic/meson-gx.dtsi
-> @@ -380,7 +380,7 @@
->  			#size-cells = <2>;
->  			ranges = <0x0 0x0 0x0 0xc8834000 0x0 0x2000>;
 >  
-> -			rng {
-> +			hwrng: rng {
->  				compatible = "amlogic,meson-rng";
->  				reg = <0x0 0x0 0x0 0x4>;
->  			};
-> diff --git a/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi b/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi
-> index 04b3324b..a375cb21 100644
-> --- a/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi
-> +++ b/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi
-> @@ -524,3 +524,8 @@
->  &vpu {
->  	compatible = "amlogic,meson-gxbb-vpu", "amlogic,meson-gx-vpu";
->  };
+>  static int meson_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
+> @@ -81,11 +83,17 @@ static int meson_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
+>  	return sizeof(u32);
+>  }
+>  
+> +static void meson_rng_clk_disable(void *clk)
+> +{
+> +	clk_disable_unprepare(clk);
+> +}
 > +
-> +&hwrng {
-> +	clocks = <&clkc CLKID_RNG0>;
-> +	clock-names = "core";
-> +};
+>  static int meson_rng_probe(struct platform_device *pdev)
+>  {
+>  	struct device *dev = &pdev->dev;
+>  	struct meson_rng_data *data;
+>  	struct resource *res;
+> +	int ret;
+>  
+>  	data = devm_kzalloc(dev, sizeof(*data), GFP_KERNEL);
+>  	if (!data)
+> @@ -98,6 +106,20 @@ static int meson_rng_probe(struct platform_device *pdev)
+>  	if (IS_ERR(data->base))
+>  		return PTR_ERR(data->base);
+>  
+> +	data->core_clk = devm_clk_get(dev, "core");
+> +	if (IS_ERR(data->core_clk))
+> +		data->core_clk = NULL;
+> +
+> +	if (data->core_clk) {
+
+This "if" is useless, if core_clk is NULL, this will work also.
+
+> +		ret = clk_prepare_enable(data->core_clk);
+> +		if (ret)
+> +			return ret;
+> +		ret = devm_add_action_or_reset(dev, meson_rng_clk_disable,
+> +					       data->core_clk);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +
+>  	data->rng.name = pdev->name;
+>  	data->rng.read = meson_rng_read;
+>  
 > 
 
 --
