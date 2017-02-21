@@ -1,47 +1,71 @@
-From: Neil Armstrong <narmstrong@baylibre.com>
-Subject: Re: [PATCH 0/2] hwrng: meson: add clock handling
-Date: Tue, 21 Feb 2017 02:58:14 +0100
-Message-ID: <cac8bb2c-1a78-c710-ee12-46532c3d8d2e@baylibre.com>
-References: <00b2a4cc-686e-0cc0-43e8-552b70a1e868@gmail.com>
+From: David Daney <ddaney@caviumnetworks.com>
+Subject: Re: crypto/cavium MSI-X fixups
+Date: Tue, 21 Feb 2017 09:36:04 -0800
+Message-ID: <52c432c9-4dc1-861e-5556-0db2f4a42c98@caviumnetworks.com>
+References: <20170215071843.30108-1-hch@lst.de>
+ <58A41C95.2090408@caviumnetworks.com> <20170219173223.GA4682@lst.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: linux-amlogic@lists.infradead.org, linux-crypto@vger.kernel.org
-To: Heiner Kallweit <hkallweit1@gmail.com>,
-        Kevin Hilman <khilman@baylibre.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
+Cc: George Cherian <george.cherian@cavium.com>,
+        David Daney <david.daney@cavium.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Christoph Hellwig <hch@lst.de>,
+        George Cherian <gcherian@caviumnetworks.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pg0-f48.google.com ([74.125.83.48]:36249 "EHLO
-        mail-pg0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750925AbdBUB62 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 20 Feb 2017 20:58:28 -0500
-Received: by mail-pg0-f48.google.com with SMTP id s67so15627375pgb.3
-        for <linux-crypto@vger.kernel.org>; Mon, 20 Feb 2017 17:58:28 -0800 (PST)
-In-Reply-To: <00b2a4cc-686e-0cc0-43e8-552b70a1e868@gmail.com>
+Received: from mail-bl2nam02on0089.outbound.protection.outlook.com ([104.47.38.89]:20704
+        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751177AbdBURgL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 21 Feb 2017 12:36:11 -0500
+In-Reply-To: <20170219173223.GA4682@lst.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 02/19/2017 09:30 PM, Heiner Kallweit wrote:
-> The HW randon number generator requires a clock and we shouldn't rely
-> on the boot loader to enable it.
-> 
-> Heiner Kallweit (2):
->   hwrng: meson: expose RNG0 clock via DT
->   hwrng: meson: add clock handling to driver
-> 
->  arch/arm64/boot/dts/amlogic/meson-gx.dtsi   |  2 +-
->  arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi |  5 +++++
->  drivers/char/hw_random/meson-rng.c          | 27 ++++++++++++++++++++++++++-
->  include/dt-bindings/clock/gxbb-clkc.h       |  1 +
->  4 files changed, 33 insertions(+), 2 deletions(-)
-> 
+On 02/19/2017 09:32 AM, Christoph Hellwig wrote:
+> Herbert,
+>
+> any comment?  I'd really like to avoid introducing new pci_enable_msix
+> users in this merge window..
 
-Hi Heiner,
+Hi Cristoph,
 
-Thanks for the fix, but can you also update the dt-bindings document ?
-Documentation/devicetree/bindings/rng/amlogic,meson-rng.txt
+With respect to pci_enable_msix(), what do you recommend as a 
+replacement?  For the crypto/cavium driver, you recommend 
+pci_alloc_irq_vectors(), which works well if the required MSI-X indexes 
+are contiguous starting at zero.   What would be used for a device that 
+has 184 MSI-X, but only a sparse subset (fewer than half) of these are 
+required for the driver operation.  It would waste system resources to 
+use an API that forces us to allocate 184 when only 80 are required.
 
-I also think this clock should be optional, to keep driver working using old bindings, set the core_clk to NULL if not available, clock_prepare_enable and clock_disable_unprepare won't fail with a NULL clock
+Currently pci_enable_msix() allows an arbitrary set of MSI-X to be 
+requested, which exactly fits the requirements of our (non 
+crypto/cavium) hardware.
 
-Neil
+Thanks in advance for any insight you can provide,
+David Daney
+
+
+>
+> On Wed, Feb 15, 2017 at 02:47:09PM +0530, George Cherian wrote:
+>> Hi Christoph,
+>>
+>>
+>> On 02/15/2017 12:48 PM, Christoph Hellwig wrote:
+>>> Hi George,
+>>>
+>>> your commit "crypto: cavium - Add Support for Octeon-tx CPT Engine"
+>>> add a new caller to pci_enable_msix.  This API has long been deprecated
+>>> so this series switches it to use pci_alloc_irq_vectors instead.
+>>>
+>>> Can you please test it and make sure it goes in before the end of the
+>>> merge window so that no more users of the old API hit mainline?
+>>
+>> Yes the changes works well.
+>> Acked-by: George Cherian <george.cherian@cavium.com>
+>>
+>> for the series.
+>>>
+> ---end quoted text---
+>
