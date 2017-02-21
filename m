@@ -1,99 +1,105 @@
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH v2 3/3] hwrng: meson: add clock handling to driver
-Date: Tue, 21 Feb 2017 21:26:20 +0100
-Message-ID: <989cf7bf-b7ea-0b41-510b-6eab403f0185@gmail.com>
+From: Neil Armstrong <narmstrong-rdvid1DuHRBWk0Htik3J/w@public.gmane.org>
+Subject: Re: [PATCH v2 2/3] ARM64: dts: meson-gx: add clock CLKID_RNG0 to
+ hwrng node
+Date: Tue, 21 Feb 2017 13:20:44 -0800
+Message-ID: <a80f9487-b385-b886-5a4c-e8f5da506b7f@baylibre.com>
 References: <daf765e2-1a60-8dea-fee0-8af6ddecdf8e@gmail.com>
+ <8bf052e3-de8f-dbdf-be76-369a7bb1ed15@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Cc: linux-clk@vger.kernel.org, devicetree@vger.kernel.org
-To: Jerome Brunet <jbrunet@baylibre.com>,
-        Kevin Hilman <khilman@baylibre.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Neil Armstrong <narmstrong@baylibre.com>,
-        linux-amlogic@lists.infradead.org, linux-crypto@vger.kernel.org,
-        Stephen Boyd <sboyd@codeaurora.org>,
-        Michael Turquette <mturquette@baylibre.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:33900 "EHLO
-        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751161AbdBUU0b (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Feb 2017 15:26:31 -0500
-In-Reply-To: <daf765e2-1a60-8dea-fee0-8af6ddecdf8e@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: linux-clk-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Heiner Kallweit <hkallweit1-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        Jerome Brunet <jbrunet-rdvid1DuHRBWk0Htik3J/w@public.gmane.org>,
+        Kevin Hilman <khilman-rdvid1DuHRBWk0Htik3J/w@public.gmane.org>,
+        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+        linux-amlogic-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        Stephen Boyd <sboyd-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>,
+        Michael Turquette <mturquette-rdvid1DuHRBWk0Htik3J/w@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <8bf052e3-de8f-dbdf-be76-369a7bb1ed15-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-Add handling of RNG0 clock to the driver.
+On 02/21/2017 12:18 PM, Heiner Kallweit wrote:
+> Add clock CLKID_RNG0 to HW randon number generator node and
+> extend the DT binding documentation accordingly.
+> 
+> Signed-off-by: Heiner Kallweit <hkallweit1-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+> v2:
+> - splitted first version of patch into two
+> - add DT binding documentation
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
-v2:
-- consider that clock is optional
-- use managed call to clk_disable_unprepare to ensure that
-  cleaning up is done in the right order if driver is removed
----
- drivers/char/hw_random/meson-rng.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+Hi Heiner,
 
-diff --git a/drivers/char/hw_random/meson-rng.c b/drivers/char/hw_random/meson-rng.c
-index 119d6984..2e23be80 100644
---- a/drivers/char/hw_random/meson-rng.c
-+++ b/drivers/char/hw_random/meson-rng.c
-@@ -62,6 +62,7 @@
- #include <linux/slab.h>
- #include <linux/types.h>
- #include <linux/of.h>
-+#include <linux/clk.h>
- 
- #define RNG_DATA 0x00
- 
-@@ -69,6 +70,7 @@ struct meson_rng_data {
- 	void __iomem *base;
- 	struct platform_device *pdev;
- 	struct hwrng rng;
-+	struct clk *core_clk;
- };
- 
- static int meson_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
-@@ -81,11 +83,17 @@ static int meson_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
- 	return sizeof(u32);
- }
- 
-+static void meson_rng_clk_disable(void *clk)
-+{
-+	clk_disable_unprepare(clk);
-+}
-+
- static int meson_rng_probe(struct platform_device *pdev)
- {
- 	struct device *dev = &pdev->dev;
- 	struct meson_rng_data *data;
- 	struct resource *res;
-+	int ret;
- 
- 	data = devm_kzalloc(dev, sizeof(*data), GFP_KERNEL);
- 	if (!data)
-@@ -98,6 +106,20 @@ static int meson_rng_probe(struct platform_device *pdev)
- 	if (IS_ERR(data->base))
- 		return PTR_ERR(data->base);
- 
-+	data->core_clk = devm_clk_get(dev, "core");
-+	if (IS_ERR(data->core_clk))
-+		data->core_clk = NULL;
-+
-+	if (data->core_clk) {
-+		ret = clk_prepare_enable(data->core_clk);
-+		if (ret)
-+			return ret;
-+		ret = devm_add_action_or_reset(dev, meson_rng_clk_disable,
-+					       data->core_clk);
-+		if (ret)
-+			return ret;
-+	}
-+
- 	data->rng.name = pdev->name;
- 	data->rng.read = meson_rng_read;
- 
--- 
-2.11.1
+Can you move the dt-bindings to a separate patch ?
+
+> - mention that clock is optional
+> - replace spaces with tabs in DT binding example
+> ---
+>  Documentation/devicetree/bindings/rng/amlogic,meson-rng.txt | 8 ++++++--
+>  arch/arm64/boot/dts/amlogic/meson-gx.dtsi                   | 2 +-
+>  arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi                 | 5 +++++
+>  3 files changed, 12 insertions(+), 3 deletions(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/rng/amlogic,meson-rng.txt b/Documentation/devicetree/bindings/rng/amlogic,meson-rng.txt
+> index 202f2d09..4c012a04 100644
+> --- a/Documentation/devicetree/bindings/rng/amlogic,meson-rng.txt
+> +++ b/Documentation/devicetree/bindings/rng/amlogic,meson-rng.txt
+> @@ -5,10 +5,14 @@ Required properties:
+>  
+>  - compatible : should be "amlogic,meson-rng"
+>  - reg : Specifies base physical address and size of the registers.
+> +- clocks : Optional core clock
+> +- clock-names: Name of core clock, must be "core"
+
+Please put these in a separate "Optional Properties" :
+
+Optional Properties:
+- clocks : phandle to the following named clocks
+- clock-names: Name of core clock, must be "core"
+
+>  
+>  Example:
+>  
+>  rng {
+> -        compatible = "amlogic,meson-rng";
+> -        reg = <0x0 0xc8834000 0x0 0x4>;
+> +	compatible = "amlogic,meson-rng";
+> +	reg = <0x0 0xc8834000 0x0 0x4>;
+> +	clocks = <&clkc CLKID_RNG0>;
+> +	clock-names = "core";
+>  };
+> diff --git a/arch/arm64/boot/dts/amlogic/meson-gx.dtsi b/arch/arm64/boot/dts/amlogic/meson-gx.dtsi
+> index 5d995f77..620495a4 100644
+> --- a/arch/arm64/boot/dts/amlogic/meson-gx.dtsi
+> +++ b/arch/arm64/boot/dts/amlogic/meson-gx.dtsi
+> @@ -380,7 +380,7 @@
+>  			#size-cells = <2>;
+>  			ranges = <0x0 0x0 0x0 0xc8834000 0x0 0x2000>;
+>  
+> -			rng {
+> +			hwrng: rng {
+>  				compatible = "amlogic,meson-rng";
+>  				reg = <0x0 0x0 0x0 0x4>;
+>  			};
+> diff --git a/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi b/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi
+> index 04b3324b..a375cb21 100644
+> --- a/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi
+> +++ b/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi
+> @@ -524,3 +524,8 @@
+>  &vpu {
+>  	compatible = "amlogic,meson-gxbb-vpu", "amlogic,meson-gx-vpu";
+>  };
+> +
+> +&hwrng {
+> +	clocks = <&clkc CLKID_RNG0>;
+> +	clock-names = "core";
+> +};
+> 
+
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
