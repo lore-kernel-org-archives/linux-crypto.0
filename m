@@ -1,75 +1,47 @@
-From: Milan Broz <gmazyland@gmail.com>
-Subject: Re: [PATCH v3] dm: switch dm-verity to async hash crypto API
-Date: Mon, 20 Feb 2017 13:51:24 +0100
-Message-ID: <1e21d973-b345-54a9-8115-cc3e30364051@gmail.com>
-References: <1487508367-16036-1-git-send-email-gilad@benyossef.com>
+From: Neil Armstrong <narmstrong@baylibre.com>
+Subject: Re: [PATCH 0/2] hwrng: meson: add clock handling
+Date: Tue, 21 Feb 2017 02:58:14 +0100
+Message-ID: <cac8bb2c-1a78-c710-ee12-46532c3d8d2e@baylibre.com>
+References: <00b2a4cc-686e-0cc0-43e8-552b70a1e868@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: linux-crypto@vger.kernel.org, gilad.benyossef@arm.com,
-        Ofir Drang <ofir.drang@arm.com>,
-        Eric Biggers <ebiggers3@gmail.com>,
-        =?UTF-8?B?T25kcmVqIE1vc27DocSNZWs=?=
-        <omosnacek+linux-crypto@gmail.com>
-To: Gilad Ben-Yossef <gilad@benyossef.com>, dm-devel@redhat.com,
-        Alasdair Kergon <agk@redhat.com>,
-        MIKE Snitzer <snitzer@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Cc: linux-amlogic@lists.infradead.org, linux-crypto@vger.kernel.org
+To: Heiner Kallweit <hkallweit1@gmail.com>,
+        Kevin Hilman <khilman@baylibre.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:33836 "EHLO
-        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751330AbdBTMv1 (ORCPT
+Received: from mail-pg0-f48.google.com ([74.125.83.48]:36249 "EHLO
+        mail-pg0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750925AbdBUB62 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 20 Feb 2017 07:51:27 -0500
-Received: by mail-wm0-f66.google.com with SMTP id c85so14214848wmi.1
-        for <linux-crypto@vger.kernel.org>; Mon, 20 Feb 2017 04:51:26 -0800 (PST)
-In-Reply-To: <1487508367-16036-1-git-send-email-gilad@benyossef.com>
+        Mon, 20 Feb 2017 20:58:28 -0500
+Received: by mail-pg0-f48.google.com with SMTP id s67so15627375pgb.3
+        for <linux-crypto@vger.kernel.org>; Mon, 20 Feb 2017 17:58:28 -0800 (PST)
+In-Reply-To: <00b2a4cc-686e-0cc0-43e8-552b70a1e868@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 02/19/2017 01:46 PM, Gilad Ben-Yossef wrote:
-> Use of the synchronous digest API limits dm-verity to using pure
-> CPU based algorithm providers and rules out the use of off CPU
-> algorithm providers which are normally asynchronous by nature,
-> potentially freeing CPU cycles.
+On 02/19/2017 09:30 PM, Heiner Kallweit wrote:
+> The HW randon number generator requires a clock and we shouldn't rely
+> on the boot loader to enable it.
 > 
-> This can reduce performance per Watt in situations such as during
-> boot time when a lot of concurrent file accesses are made to the
-> protected volume.
+> Heiner Kallweit (2):
+>   hwrng: meson: expose RNG0 clock via DT
+>   hwrng: meson: add clock handling to driver
 > 
-> Move DM_VERITY to the asynchronous hash API.
+>  arch/arm64/boot/dts/amlogic/meson-gx.dtsi   |  2 +-
+>  arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi |  5 +++++
+>  drivers/char/hw_random/meson-rng.c          | 27 ++++++++++++++++++++++++++-
+>  include/dt-bindings/clock/gxbb-clkc.h       |  1 +
+>  4 files changed, 33 insertions(+), 2 deletions(-)
 > 
-> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
-> CC: Eric Biggers <ebiggers3@gmail.com>
-> CC: Ondrej Mosnáček <omosnacek+linux-crypto@gmail.com>
-> CC: Milan Broz <gmazyland@gmail.com>
-> ---
-> 
-> The patch was tested on an Armv7 based dual core Zynq ZC706 development
-> board with SHA256-asm, SHA256-neon synchronous providers with no visible
-> degradation of performance, with cryptd based asynchronous versions of the 
-> same and with an off tree Arm CryptoCell asynchronous provider.
-> 
-> Changes from v2:
-> 
-> - Use completion to potentially wait also on crypto_ahash_init() as it
->   may finish asynchronously as well in some drivers, such as cryptd, as
->   discovered by Milan Broz.
 
-This version survived my simple veritysetup test (in cryptsetup package)
-with forced async path so I think it is ok for 4.12 queue...
+Hi Heiner,
 
-Thanks,
-Milan
+Thanks for the fix, but can you also update the dt-bindings document ?
+Documentation/devicetree/bindings/rng/amlogic,meson-rng.txt
 
+I also think this clock should be optional, to keep driver working using old bindings, set the core_clk to NULL if not available, clock_prepare_enable and clock_disable_unprepare won't fail with a NULL clock
 
-> - Use sg_init_one() where apropriate as pointed out by Milan Broz.
-> 
-> Changes from v1:
-> 
-> - Use a 0 mask to allocate crypto alg indicating we welcome async algo 
->   providers, as suggested by Ondrej Mosnáček.
-> - Fix use of un-initialized completion when using async provider for IO
->   blocks hashing
-> - Pass flag indicating we are OK with crypto provider backlog
-> - Re-factor checking for need to wait into a common function
-> 
+Neil
