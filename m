@@ -1,71 +1,66 @@
-From: David Daney <ddaney@caviumnetworks.com>
-Subject: Re: crypto/cavium MSI-X fixups
-Date: Tue, 21 Feb 2017 09:36:04 -0800
-Message-ID: <52c432c9-4dc1-861e-5556-0db2f4a42c98@caviumnetworks.com>
-References: <20170215071843.30108-1-hch@lst.de>
- <58A41C95.2090408@caviumnetworks.com> <20170219173223.GA4682@lst.de>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH v2 1/3] clk: meson-gxbb: expose clock CLKID_RNG0
+Date: Tue, 21 Feb 2017 21:11:38 +0100
+Message-ID: <daf765e2-1a60-8dea-fee0-8af6ddecdf8e@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Cc: George Cherian <george.cherian@cavium.com>,
-        David Daney <david.daney@cavium.com>,
+Cc: linux-clk@vger.kernel.org, devicetree@vger.kernel.org
+To: Jerome Brunet <jbrunet@baylibre.com>,
+        Kevin Hilman <khilman@baylibre.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Christoph Hellwig <hch@lst.de>,
-        George Cherian <gcherian@caviumnetworks.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2nam02on0089.outbound.protection.outlook.com ([104.47.38.89]:20704
-        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751177AbdBURgL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Feb 2017 12:36:11 -0500
-In-Reply-To: <20170219173223.GA4682@lst.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+        Neil Armstrong <narmstrong@baylibre.com>,
+        linux-amlogic@lists.infradead.org, linux-crypto@vger.kernel.org,
+        Stephen Boyd <sboyd@codeaurora.org>,
+        Michael Turquette <mturquette@baylibre.com>
+Return-path: <linux-clk-owner@vger.kernel.org>
+Sender: linux-clk-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 02/19/2017 09:32 AM, Christoph Hellwig wrote:
-> Herbert,
->
-> any comment?  I'd really like to avoid introducing new pci_enable_msix
-> users in this merge window..
+Expose clock CLKID_RNG0 which is needed for the HW random number generator.
 
-Hi Cristoph,
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+---
+v2:
+- added clk and DT maintainers
+- split exposing the clock and using it in DT into two patches
+- comment out clock definition in drivers/clk/meson/gxbb.h
+- silently move CLKID_SPI to the right place
+---
+ drivers/clk/meson/gxbb.h              | 2 +-
+ include/dt-bindings/clock/gxbb-clkc.h | 3 ++-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
-With respect to pci_enable_msix(), what do you recommend as a 
-replacement?  For the crypto/cavium driver, you recommend 
-pci_alloc_irq_vectors(), which works well if the required MSI-X indexes 
-are contiguous starting at zero.   What would be used for a device that 
-has 184 MSI-X, but only a sparse subset (fewer than half) of these are 
-required for the driver operation.  It would waste system resources to 
-use an API that forces us to allocate 184 when only 80 are required.
+diff --git a/drivers/clk/meson/gxbb.h b/drivers/clk/meson/gxbb.h
+index 8ee2022c..cbd62e46 100644
+--- a/drivers/clk/meson/gxbb.h
++++ b/drivers/clk/meson/gxbb.h
+@@ -193,7 +193,7 @@
+ /* CLKID_I2C */
+ /* #define CLKID_SAR_ADC */
+ #define CLKID_SMART_CARD	  24
+-#define CLKID_RNG0		  25
++/* CLKID_RNG0 */
+ #define CLKID_UART0		  26
+ #define CLKID_SDHC		  27
+ #define CLKID_STREAM		  28
+diff --git a/include/dt-bindings/clock/gxbb-clkc.h b/include/dt-bindings/clock/gxbb-clkc.h
+index 692846c7..63f4c2c4 100644
+--- a/include/dt-bindings/clock/gxbb-clkc.h
++++ b/include/dt-bindings/clock/gxbb-clkc.h
+@@ -12,9 +12,10 @@
+ #define CLKID_FCLK_DIV4		6
+ #define CLKID_CLK81		12
+ #define CLKID_MPLL2		15
+-#define CLKID_SPI		34
+ #define CLKID_I2C		22
+ #define CLKID_SAR_ADC		23
++#define CLKID_RNG0		25
++#define CLKID_SPI		34
+ #define CLKID_ETH		36
+ #define CLKID_USB0		50
+ #define CLKID_USB1		51
+-- 
+2.11.1
 
-Currently pci_enable_msix() allows an arbitrary set of MSI-X to be 
-requested, which exactly fits the requirements of our (non 
-crypto/cavium) hardware.
 
-Thanks in advance for any insight you can provide,
-David Daney
-
-
->
-> On Wed, Feb 15, 2017 at 02:47:09PM +0530, George Cherian wrote:
->> Hi Christoph,
->>
->>
->> On 02/15/2017 12:48 PM, Christoph Hellwig wrote:
->>> Hi George,
->>>
->>> your commit "crypto: cavium - Add Support for Octeon-tx CPT Engine"
->>> add a new caller to pci_enable_msix.  This API has long been deprecated
->>> so this series switches it to use pci_alloc_irq_vectors instead.
->>>
->>> Can you please test it and make sure it goes in before the end of the
->>> merge window so that no more users of the old API hit mainline?
->>
->> Yes the changes works well.
->> Acked-by: George Cherian <george.cherian@cavium.com>
->>
->> for the series.
->>>
-> ---end quoted text---
->
