@@ -1,54 +1,54 @@
-From: Nicolas Porcel <nicolasporcel06@gmail.com>
-Subject: crypto: xts: regression in 4.10
-Date: Wed, 22 Feb 2017 00:17:17 +0100
-Message-ID: <20170221231717.GA7186@nicolas-laptop>
+From: Binoy Jayan <binoy.jayan@linaro.org>
+Subject: Re: [RFC PATCH v4] IV Generation algorithms for dm-crypt
+Date: Wed, 22 Feb 2017 11:42:28 +0530
+Message-ID: <CAHv-k_8rgArzV2uQ64h1ZTNRpssX1jMf=RwuPoBmsjQ0FhCsWA@mail.gmail.com>
+References: <1486463731-6224-1-git-send-email-binoy.jayan@linaro.org> <CAOtvUMcN8s886978vE6T=AE79KkZsLBnXsmhewnb5PB0UyAG3A@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-To: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wr0-f174.google.com ([209.85.128.174]:35408 "EHLO
-        mail-wr0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752819AbdBUXRZ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Feb 2017 18:17:25 -0500
-Received: by mail-wr0-f174.google.com with SMTP id s27so44519862wrb.2
-        for <linux-crypto@vger.kernel.org>; Tue, 21 Feb 2017 15:17:23 -0800 (PST)
-Content-Disposition: inline
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: Oded <oded.golombek@arm.com>, Ofir <Ofir.Drang@arm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, Mark Brown <broonie@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org,
+        Rajendra <rnayak@codeaurora.org>,
+        Milan Broz <gmazyland@gmail.com>
+To: Gilad Ben-Yossef <gilad@benyossef.com>
+Return-path: <linux-raid-owner@vger.kernel.org>
+In-Reply-To: <CAOtvUMcN8s886978vE6T=AE79KkZsLBnXsmhewnb5PB0UyAG3A@mail.gmail.com>
+Sender: linux-raid-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hello,
+Hi Herbert,
 
-I am using aes-xts-plain64 with LUKS headers to crypt the root. In 4.10,
-the partition cannot be opened and I have the following errors when
-booting:
+On 8 February 2017 at 13:02, Gilad Ben-Yossef <gilad@benyossef.com> wrote:
+> On Tue, Feb 7, 2017 at 12:35 PM, Binoy Jayan <binoy.jayan@linaro.org> wrote:
+>> ===============================================================================
+>> dm-crypt optimization for larger block sizes
+>> ===============================================================================
+>>
+>> Currently, the iv generation algorithms are implemented in dm-crypt.c. The goal
+>> is to move these algorithms from the dm layer to the kernel crypto layer by
+>> implementing them as template ciphers so they can be used in relation with
+>> algorithms like aes, and with multiple modes like cbc, ecb etc. As part of this
+>> patchset, the iv-generation code is moved from the dm layer to the crypto layer
+>> and adapt the dm-layer to send a whole 'bio' (as defined in the block layer)
+>> at a time. Each bio contains the in memory representation of physically
+>> contiguous disk blocks. Since the bio itself may not be contiguous in main
+>> memory, the dm layer sets up a chained scatterlist of these blocks split into
+>> physically contiguous segments in memory so that DMA can be performed.
 
-    device-mapper: table: 253:0: crypt: Error allocating crypto tfm
-    device-mapper: ioctl: error adding target to table
-    device-mapper: reload ioctl on  failed: No such file or directory
-    Failed to setup dm-crypt key mapping for device /dev/mmcblk0p2
-    Check that the kernel supports aes-xts-plain64 cipher (check syslog for more info)
+> Ran Bonnie++ on it last night  (Luks mode, plain64, Qemu Virt platform
+> Arm64) and it works just fine.
+>
+> Tested-by: Gilad Ben-Yossef <gilad@benyossef.com>
 
-I found that this commit is responsible for the regression (reverting it
-solves the problem):
+I was wondering if this is near to be ready for submission (apart from
+the testmgr.c
+changes) or I need to make some changes to make it similar to the IPSec offload?
 
-> commit f1c131b45410a202eb45cc55980a7a9e4e4b4f40
-> Author: Herbert Xu <herbert@gondor.apana.org.au>
-> Date:   Tue Nov 22 20:08:19 2016 +0800
-> 
->     crypto: xts - Convert to skcipher
-
-Some precision: I am using the vanilla kernel source for 4.10. The aes,
-xts and dm-crypt modules are directly compiled in the kernel and not as
-modules. I also had the same problem with kernel 4.10-rc*.
-
-Is it a known issue? I found 1 related email with no answer on the
-dm-crypt mailing. If this is a regression, I can start digging, although
-any guidance would be greatly appreciated.
-
-Thank you in advance,
-
-Best regards,
-
--- 
-Nicolas Porcel
+Thanks,
+Binoy
