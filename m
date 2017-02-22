@@ -1,42 +1,65 @@
-From: Christoph Hellwig <hch@lst.de>
-Subject: Re: crypto/cavium MSI-X fixups
-Date: Wed, 22 Feb 2017 08:27:52 +0100
-Message-ID: <20170222072752.GA18643@lst.de>
-References: <20170215071843.30108-1-hch@lst.de> <58A41C95.2090408@caviumnetworks.com> <20170219173223.GA4682@lst.de> <52c432c9-4dc1-861e-5556-0db2f4a42c98@caviumnetworks.com>
+From: Milan Broz <gmazyland@gmail.com>
+Subject: Re: crypto: xts: regression in 4.10
+Date: Wed, 22 Feb 2017 12:31:30 +0100
+Message-ID: <fb8a2f22-053e-7b30-6f0f-58158c832ad5@gmail.com>
+References: <20170221231717.GA7186@nicolas-laptop>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Christoph Hellwig <hch@lst.de>,
-        George Cherian <gcherian@caviumnetworks.com>,
-        George Cherian <george.cherian@cavium.com>,
-        David Daney <david.daney@cavium.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: David Daney <ddaney@caviumnetworks.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+To: Nicolas Porcel <nicolasporcel06@gmail.com>,
+        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from verein.lst.de ([213.95.11.211]:41466 "EHLO newverein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754004AbdBVH1y (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Feb 2017 02:27:54 -0500
-Content-Disposition: inline
-In-Reply-To: <52c432c9-4dc1-861e-5556-0db2f4a42c98@caviumnetworks.com>
+Received: from mail-wr0-f196.google.com ([209.85.128.196]:34075 "EHLO
+        mail-wr0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932264AbdBVLbd (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 22 Feb 2017 06:31:33 -0500
+Received: by mail-wr0-f196.google.com with SMTP id 89so1122275wrr.1
+        for <linux-crypto@vger.kernel.org>; Wed, 22 Feb 2017 03:31:32 -0800 (PST)
+In-Reply-To: <20170221231717.GA7186@nicolas-laptop>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Feb 21, 2017 at 09:36:04AM -0800, David Daney wrote:
-> With respect to pci_enable_msix(), what do you recommend as a replacement?  
+On 02/22/2017 12:17 AM, Nicolas Porcel wrote:
+> Hello,
+> 
+> I am using aes-xts-plain64 with LUKS headers to crypt the root. In 4.10,
+> the partition cannot be opened and I have the following errors when
+> booting:
+> 
+>     device-mapper: table: 253:0: crypt: Error allocating crypto tfm
+>     device-mapper: ioctl: error adding target to table
+>     device-mapper: reload ioctl on  failed: No such file or directory
+>     Failed to setup dm-crypt key mapping for device /dev/mmcblk0p2
+>     Check that the kernel supports aes-xts-plain64 cipher (check syslog for more info)
+> 
+> I found that this commit is responsible for the regression (reverting it
+> solves the problem):
+> 
+>> commit f1c131b45410a202eb45cc55980a7a9e4e4b4f40
+>> Author: Herbert Xu <herbert@gondor.apana.org.au>
+>> Date:   Tue Nov 22 20:08:19 2016 +0800
+>>
+>>     crypto: xts - Convert to skcipher
+> 
+> Some precision: I am using the vanilla kernel source for 4.10. The aes,
+> xts and dm-crypt modules are directly compiled in the kernel and not as
+> modules. I also had the same problem with kernel 4.10-rc*.
 
-pci_alloc_irq_vectors.  In fact I have a tree ready for after -rc1
-that removes pci_enable_msix() entirely.
+Kernel 4.10 works with LUKS and XTS in general (otherwise I would scream much earlier:-)
 
-> For the crypto/cavium driver, you recommend pci_alloc_irq_vectors(), which 
-> works well if the required MSI-X indexes are contiguous starting at zero.   
-> What would be used for a device that has 184 MSI-X, but only a sparse 
-> subset (fewer than half) of these are required for the driver operation.  
-> It would waste system resources to use an API that forces us to allocate 
-> 184 when only 80 are required.
+I guess either there is a bug in some specific dependency missing
+dependency in kernel config. Could you send your kernel .config that fails?
 
-Currently we don't have a good API for that.  I've not been through all
-users of pci_enable_msix_{range,exact} yet, but so far I've only found
-one user not using all vectors from 0 to some limit.  Depending how many
-such users we have and how they'll look I will have to look into an API
-to support that use case.
+Do you have ECB mode compiled-in as well?
+
+(See commit description, shouldn't XTS now select ECB as well? This seems to me
+like a bug...)
+ 
+> Is it a known issue? I found 1 related email with no answer on the
+> dm-crypt mailing. If this is a regression, I can start digging, although
+> any guidance would be greatly appreciated.
+
+What mail on dmcrypt list? I do not see any recent mail.
+
+Milan
