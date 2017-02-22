@@ -1,54 +1,71 @@
-From: Binoy Jayan <binoy.jayan@linaro.org>
-Subject: Re: [RFC PATCH v4] IV Generation algorithms for dm-crypt
-Date: Wed, 22 Feb 2017 11:42:28 +0530
-Message-ID: <CAHv-k_8rgArzV2uQ64h1ZTNRpssX1jMf=RwuPoBmsjQ0FhCsWA@mail.gmail.com>
-References: <1486463731-6224-1-git-send-email-binoy.jayan@linaro.org> <CAOtvUMcN8s886978vE6T=AE79KkZsLBnXsmhewnb5PB0UyAG3A@mail.gmail.com>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH v3 1/3] clk: meson-gxbb: expose clock CLKID_RNG0
+Date: Wed, 22 Feb 2017 07:55:24 +0100
+Message-ID: <4e2d12e5-f75b-3ac6-a3f7-18e8a8b7283b@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Oded <oded.golombek@arm.com>, Ofir <Ofir.Drang@arm.com>,
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: linux-clk@vger.kernel.org, devicetree@vger.kernel.org
+To: Jerome Brunet <jbrunet@baylibre.com>,
+        Kevin Hilman <khilman@baylibre.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, Mark Brown <broonie@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org,
-        Rajendra <rnayak@codeaurora.org>,
-        Milan Broz <gmazyland@gmail.com>
-To: Gilad Ben-Yossef <gilad@benyossef.com>
-Return-path: <linux-raid-owner@vger.kernel.org>
-In-Reply-To: <CAOtvUMcN8s886978vE6T=AE79KkZsLBnXsmhewnb5PB0UyAG3A@mail.gmail.com>
-Sender: linux-raid-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+        Neil Armstrong <narmstrong@baylibre.com>,
+        linux-amlogic@lists.infradead.org, linux-crypto@vger.kernel.org,
+        Stephen Boyd <sboyd@codeaurora.org>,
+        Michael Turquette <mturquette@baylibre.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:35408 "EHLO
+        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751349AbdBVGzf (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 22 Feb 2017 01:55:35 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
+Expose clock CLKID_RNG0 which is needed for the HW random number generator.
 
-On 8 February 2017 at 13:02, Gilad Ben-Yossef <gilad@benyossef.com> wrote:
-> On Tue, Feb 7, 2017 at 12:35 PM, Binoy Jayan <binoy.jayan@linaro.org> wrote:
->> ===============================================================================
->> dm-crypt optimization for larger block sizes
->> ===============================================================================
->>
->> Currently, the iv generation algorithms are implemented in dm-crypt.c. The goal
->> is to move these algorithms from the dm layer to the kernel crypto layer by
->> implementing them as template ciphers so they can be used in relation with
->> algorithms like aes, and with multiple modes like cbc, ecb etc. As part of this
->> patchset, the iv-generation code is moved from the dm layer to the crypto layer
->> and adapt the dm-layer to send a whole 'bio' (as defined in the block layer)
->> at a time. Each bio contains the in memory representation of physically
->> contiguous disk blocks. Since the bio itself may not be contiguous in main
->> memory, the dm layer sets up a chained scatterlist of these blocks split into
->> physically contiguous segments in memory so that DMA can be performed.
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+---
+v2:
+- added clk and DT maintainers
+- split exposing the clock and using it in DT into two patches
+- comment out clock definition in drivers/clk/meson/gxbb.h
+- silently move CLKID_SPI to the right place
+v3:
+- no changes
+---
+ drivers/clk/meson/gxbb.h              | 2 +-
+ include/dt-bindings/clock/gxbb-clkc.h | 3 ++-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
-> Ran Bonnie++ on it last night  (Luks mode, plain64, Qemu Virt platform
-> Arm64) and it works just fine.
->
-> Tested-by: Gilad Ben-Yossef <gilad@benyossef.com>
-
-I was wondering if this is near to be ready for submission (apart from
-the testmgr.c
-changes) or I need to make some changes to make it similar to the IPSec offload?
-
-Thanks,
-Binoy
+diff --git a/drivers/clk/meson/gxbb.h b/drivers/clk/meson/gxbb.h
+index 8ee2022c..cbd62e46 100644
+--- a/drivers/clk/meson/gxbb.h
++++ b/drivers/clk/meson/gxbb.h
+@@ -193,7 +193,7 @@
+ /* CLKID_I2C */
+ /* #define CLKID_SAR_ADC */
+ #define CLKID_SMART_CARD	  24
+-#define CLKID_RNG0		  25
++/* CLKID_RNG0 */
+ #define CLKID_UART0		  26
+ #define CLKID_SDHC		  27
+ #define CLKID_STREAM		  28
+diff --git a/include/dt-bindings/clock/gxbb-clkc.h b/include/dt-bindings/clock/gxbb-clkc.h
+index 692846c7..63f4c2c4 100644
+--- a/include/dt-bindings/clock/gxbb-clkc.h
++++ b/include/dt-bindings/clock/gxbb-clkc.h
+@@ -12,9 +12,10 @@
+ #define CLKID_FCLK_DIV4		6
+ #define CLKID_CLK81		12
+ #define CLKID_MPLL2		15
+-#define CLKID_SPI		34
+ #define CLKID_I2C		22
+ #define CLKID_SAR_ADC		23
++#define CLKID_RNG0		25
++#define CLKID_SPI		34
+ #define CLKID_ETH		36
+ #define CLKID_USB0		50
+ #define CLKID_USB1		51
+-- 
+2.11.1
