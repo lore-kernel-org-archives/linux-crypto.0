@@ -1,60 +1,95 @@
-From: David Daney <ddaney.cavm@gmail.com>
-Subject: Re: crypto/cavium MSI-X fixups
-Date: Wed, 22 Feb 2017 09:45:01 -0800
-Message-ID: <939dab85-383d-845b-b6db-51567a01cb97@gmail.com>
-References: <20170215071843.30108-1-hch@lst.de>
- <58A41C95.2090408@caviumnetworks.com> <20170219173223.GA4682@lst.de>
- <52c432c9-4dc1-861e-5556-0db2f4a42c98@caviumnetworks.com>
- <20170222072752.GA18643@lst.de>
+From: Marcelo Cerri <marcelo.cerri@canonical.com>
+Subject: Re: crypto: xts: regression in 4.10
+Date: Wed, 22 Feb 2017 14:42:09 -0300
+Message-ID: <20170222174209.GA20626@gallifrey>
+References: <20170221231717.GA7186@nicolas-laptop>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: George Cherian <gcherian@caviumnetworks.com>,
-        George Cherian <george.cherian@cavium.com>,
-        David Daney <david.daney@cavium.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Christoph Hellwig <hch@lst.de>,
-        David Daney <ddaney@caviumnetworks.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="azLHFNyN32YCQGCU"
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
+To: Nicolas Porcel <nicolasporcel06@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pg0-f66.google.com ([74.125.83.66]:33740 "EHLO
-        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932223AbdBVRpD (ORCPT
+Received: from mail-qk0-f180.google.com ([209.85.220.180]:36395 "EHLO
+        mail-qk0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754252AbdBVRso (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Feb 2017 12:45:03 -0500
-In-Reply-To: <20170222072752.GA18643@lst.de>
+        Wed, 22 Feb 2017 12:48:44 -0500
+Received: by mail-qk0-f180.google.com with SMTP id x71so9751167qkb.3
+        for <linux-crypto@vger.kernel.org>; Wed, 22 Feb 2017 09:48:43 -0800 (PST)
+Content-Disposition: inline
+In-Reply-To: <20170221231717.GA7186@nicolas-laptop>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 02/21/2017 11:27 PM, Christoph Hellwig wrote:
-> On Tue, Feb 21, 2017 at 09:36:04AM -0800, David Daney wrote:
->> With respect to pci_enable_msix(), what do you recommend as a replacement?
->
-> pci_alloc_irq_vectors.  In fact I have a tree ready for after -rc1
-> that removes pci_enable_msix() entirely.
 
-I would like to see something that handles the case of this driver that 
-I am attempting to get merged:
+--azLHFNyN32YCQGCU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+What XTS implementations do you have available on /proc/crypto after the
+error?
+
+Some drivers that allocate fallback implementations using the older API
+started to fail after the generic templates were converted to skcipher.
 
 
-https://lkml.org/lkml/2017/2/15/1209
+On Wed, Feb 22, 2017 at 12:17:17AM +0100, Nicolas Porcel wrote:
+> Hello,
+>=20
+> I am using aes-xts-plain64 with LUKS headers to crypt the root. In 4.10,
+> the partition cannot be opened and I have the following errors when
+> booting:
+>=20
+>     device-mapper: table: 253:0: crypt: Error allocating crypto tfm
+>     device-mapper: ioctl: error adding target to table
+>     device-mapper: reload ioctl on  failed: No such file or directory
+>     Failed to setup dm-crypt key mapping for device /dev/mmcblk0p2
+>     Check that the kernel supports aes-xts-plain64 cipher (check syslog f=
+or more info)
+>=20
+> I found that this commit is responsible for the regression (reverting it
+> solves the problem):
+>=20
+> > commit f1c131b45410a202eb45cc55980a7a9e4e4b4f40
+> > Author: Herbert Xu <herbert@gondor.apana.org.au>
+> > Date:   Tue Nov 22 20:08:19 2016 +0800
+> >=20
+> >     crypto: xts - Convert to skcipher
+>=20
+> Some precision: I am using the vanilla kernel source for 4.10. The aes,
+> xts and dm-crypt modules are directly compiled in the kernel and not as
+> modules. I also had the same problem with kernel 4.10-rc*.
+>=20
+> Is it a known issue? I found 1 related email with no answer on the
+> dm-crypt mailing. If this is a regression, I can start digging, although
+> any guidance would be greatly appreciated.
+>=20
+> Thank you in advance,
+>=20
+> Best regards,
+>=20
+> --=20
+> Nicolas Porcel
+
+--=20
+Regards,
+Marcelo
 
 
->
->> For the crypto/cavium driver, you recommend pci_alloc_irq_vectors(), which
->> works well if the required MSI-X indexes are contiguous starting at zero.
->> What would be used for a device that has 184 MSI-X, but only a sparse
->> subset (fewer than half) of these are required for the driver operation.
->> It would waste system resources to use an API that forces us to allocate
->> 184 when only 80 are required.
->
-> Currently we don't have a good API for that.  I've not been through all
-> users of pci_enable_msix_{range,exact} yet, but so far I've only found
-> one user not using all vectors from 0 to some limit.  Depending how many
-> such users we have and how they'll look I will have to look into an API
-> to support that use case.
->
+--azLHFNyN32YCQGCU
+Content-Type: application/pgp-signature; name="signature.asc"
 
-See the patch above for the case that doesn't use 0..UPPER_LIMIT
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-David Daney
+iQEcBAABCAAGBQJYrc1xAAoJEM8aS8c01e1HKdoIALuD+LT1GUWdnarNN9VP2FLs
+Sy6g6GnnpTnIHLm+3mlqWLDwJAvd3BtswGxjKjVKXbk5B4tKlYiSuawS153UEcs0
+YXtRJqcSnkJfc7IwAP/Iqzhru2sTnE+yfOE1UFMMQPn/YILuuAHcBsmeVjldLPwn
+lEfnkZUSyYVneA08eyx04HDurSWPtGNtuB3y/BbXAncPJCZneFId43AOZkj3aVcM
+I+5K/I3H/B6iM/a2tiuYQqVqY9AI0fK/r9+CJLfFOfDwCnwBRgKfS4JCrK0bchNz
+fwxHazauOm5OR+J81h0djnrifD1M2n7QsEEULtT1d0xtRCLOtrIQn2xpTF9VBBU=
+=SHKd
+-----END PGP SIGNATURE-----
+
+--azLHFNyN32YCQGCU--
