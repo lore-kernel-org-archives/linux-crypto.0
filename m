@@ -1,60 +1,67 @@
-From: Nicolas Porcel <nicolasporcel06@gmail.com>
-Subject: Re: crypto: xts: regression in 4.10
-Date: Thu, 23 Feb 2017 00:02:08 +0100
-Message-ID: <20170222230208.GA5049@nicolas-laptop>
-References: <20170221231717.GA7186@nicolas-laptop>
- <fb8a2f22-053e-7b30-6f0f-58158c832ad5@gmail.com>
+From: Jon Mason <jon.mason-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
+Subject: Re: [PATCH 1/1] ARM: dts: NSP: Add crypto (SPU) to dtsi
+Date: Wed, 22 Feb 2017 18:32:15 -0500
+Message-ID: <CAC3K-4oaFiP43wGWTqqeB-Hcr0Ov07Xu1RONCi+NAXqf9hr2-g@mail.gmail.com>
+References: <1487798543-34229-1-git-send-email-steven.lin1@broadcom.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
-To: Milan Broz <gmazyland@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:36663 "EHLO
-        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933833AbdBVXDk (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Feb 2017 18:03:40 -0500
-Received: by mail-wm0-f66.google.com with SMTP id r18so2950394wmd.3
-        for <linux-crypto@vger.kernel.org>; Wed, 22 Feb 2017 15:02:16 -0800 (PST)
-Content-Disposition: inline
-In-Reply-To: <fb8a2f22-053e-7b30-6f0f-58158c832ad5@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        Russell King <linux-I+IVW8TIWO2tmTQ+vhA3Yw@public.gmane.org>,
+        Ray Jui <ray.jui-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
+        Scott Branden <scott.branden-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
+        Florian Fainelli <f.fainelli-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
+        BCM Kernel Feedback <bcm-kernel-feedback-list-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
+        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
+        <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        linux-arm-kernel <linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>,
+        open list <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        Rob Rice <rob.rice-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve Lin <steven.lin1-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1487798543-34229-1-git-send-email-steven.lin1-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Feb 22, 2017 at 12:31:30PM +0100, Milan Broz wrote:
-> Kernel 4.10 works with LUKS and XTS in general (otherwise I would scream much earlier:-)
+On Wed, Feb 22, 2017 at 4:22 PM, Steve Lin <steven.lin1-dY08KVG/lbpWk0Htik3J/w@public.gmane.org> wrote:
+> Adds crypto hardware (SPU) to Northstar Plus device tree file.
+>
+> Signed-off-by: Steve Lin <steven.lin1-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
 
-I was surprised that it was still broken in the mainline release. All
-the other regressions I had have been fixed. Also, I guess LUKS with
-aes-xts is quite standard.
+Looks good to me!
 
-> I guess either there is a bug in some specific dependency missing
-> dependency in kernel config. Could you send your kernel .config that fails?
-> 
-> Do you have ECB mode compiled-in as well?
+Acked-by: Jon Mason <jon.mason-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
 
-Nice guess. I had ECB enabled as a module, and I don't think it was
-present in the initramfs. Compiling it in the kernel solves the problem.
-Thanks for the clue!
-
-I now have the xts(ecb(aes-generic)) driver appearing in /proc/crypto.
-I had no xts driver before.
-
-I don't think it's necessary now to copy my kernel config. Also, it's
-quite minimalist: make defconfig with a few drivers I need, mostly compiled
-in the kernel.
-
-> (See commit description, shouldn't XTS now select ECB as well? This seems to me
-> like a bug...)
-
-I was actually confused by the message, I thought it would fallback to
-the old implementation. I guess the XTS module should select ECB if
-that's not the case. Should I submit a patch for that? Or maybe it would
-be easier if a maintainer directly makes the change?
-
-> What mail on dmcrypt list? I do not see any recent mail.
-
-It was a mail from 2012, I should be more careful with search engines...
-
--- 
-Nicolas Porcel
+>
+> ---
+> Code changes for this addition were submitted previously by Rob
+> Rice: https://git.kernel.org/cgit/linux/kernel/git/herbert/cryptodev-2.6.git/commit/?id=9d12ba86f818aa9cfe9f01b750336aa441f2ffa2
+> ---
+>  arch/arm/boot/dts/bcm-nsp.dtsi | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>
+> diff --git a/arch/arm/boot/dts/bcm-nsp.dtsi b/arch/arm/boot/dts/bcm-nsp.dtsi
+> index b6142bd..9bac0c8 100644
+> --- a/arch/arm/boot/dts/bcm-nsp.dtsi
+> +++ b/arch/arm/boot/dts/bcm-nsp.dtsi
+> @@ -241,6 +241,12 @@
+>                         brcm,nand-has-wp;
+>                 };
+>
+> +               crypto@2f000 {
+> +                       compatible = "brcm,spum-nsp-crypto";
+> +                       reg = <0x2f000 0x900>;
+> +                       mboxes = <&mailbox 0>;
+> +               };
+> +
+>                 gpiob: gpio@30000 {
+>                         compatible = "brcm,iproc-nsp-gpio", "brcm,iproc-gpio";
+>                         reg = <0x30000 0x50>;
+> --
+> 2.1.0
+>
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
