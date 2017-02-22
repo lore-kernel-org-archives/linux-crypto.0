@@ -1,78 +1,60 @@
-From: Marcelo Cerri <marcelo.cerri@canonical.com>
-Subject: Re: [PATCH 1/2] crypto: vmx - Use skcipher for cbc fallback
-Date: Wed, 22 Feb 2017 19:17:00 -0300
-Message-ID: <20170222221700.GA19026@gallifrey>
-References: <20170222180015.27573-1-pfsmorigo@linux.vnet.ibm.com>
- <20170222191819.GB20626@gallifrey>
+From: Nicolas Porcel <nicolasporcel06@gmail.com>
+Subject: Re: crypto: xts: regression in 4.10
+Date: Thu, 23 Feb 2017 00:02:08 +0100
+Message-ID: <20170222230208.GA5049@nicolas-laptop>
+References: <20170221231717.GA7186@nicolas-laptop>
+ <fb8a2f22-053e-7b30-6f0f-58158c832ad5@gmail.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="mYCpIKhGyMATD0i+"
-Cc: linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
+Content-Type: text/plain; charset=utf-8
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
+To: Milan Broz <gmazyland@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-qk0-f177.google.com ([209.85.220.177]:36413 "EHLO
-        mail-qk0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933406AbdBVWRd (ORCPT
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:36663 "EHLO
+        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933833AbdBVXDk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Feb 2017 17:17:33 -0500
-Received: by mail-qk0-f177.google.com with SMTP id x71so16530979qkb.3
-        for <linux-crypto@vger.kernel.org>; Wed, 22 Feb 2017 14:17:05 -0800 (PST)
+        Wed, 22 Feb 2017 18:03:40 -0500
+Received: by mail-wm0-f66.google.com with SMTP id r18so2950394wmd.3
+        for <linux-crypto@vger.kernel.org>; Wed, 22 Feb 2017 15:02:16 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <20170222191819.GB20626@gallifrey>
+In-Reply-To: <fb8a2f22-053e-7b30-6f0f-58158c832ad5@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+On Wed, Feb 22, 2017 at 12:31:30PM +0100, Milan Broz wrote:
+> Kernel 4.10 works with LUKS and XTS in general (otherwise I would scream much earlier:-)
 
---mYCpIKhGyMATD0i+
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I was surprised that it was still broken in the mainline release. All
+the other regressions I had have been fixed. Also, I guess LUKS with
+aes-xts is quite standard.
 
-Hi Hebert,
+> I guess either there is a bug in some specific dependency missing
+> dependency in kernel config. Could you send your kernel .config that fails?
+> 
+> Do you have ECB mode compiled-in as well?
 
-On Wed, Feb 22, 2017 at 04:18:19PM -0300, Marcelo Cerri wrote:
-> Hi Paulo.
->=20
-> On Wed, Feb 22, 2017 at 03:00:15PM -0300, Paulo Flabiano Smorigo wrote:
-> > =20
-> >  	if (in_interrupt()) {
-> > -		ret =3D crypto_blkcipher_encrypt(&fallback_desc, dst, src,
-> > -					       nbytes);
-> > +		SKCIPHER_REQUEST_ON_STACK(req, ctx->fallback);
-> > +		skcipher_request_set_tfm(req, ctx->fallback);
-> > +		skcipher_request_set_callback(req, desc->flags, NULL, NULL);
-> > +		skcipher_request_set_crypt(req, src, dst, nbytes, desc->info);
-> > +		ret =3D crypto_skcipher_encrypt(req);
-> > +		skcipher_request_zero(req);
->=20
-> Probably you have to wait for the completion here before proceeding.
->=20
-> Check Documentation/crypto/api-samples.rst
->=20
+Nice guess. I had ECB enabled as a module, and I don't think it was
+present in the initramfs. Compiling it in the kernel solves the problem.
+Thanks for the clue!
 
-I noticed you used a similar approach in arch/s390/crypto/aes_s390.c
-(commit 64e2680).
+I now have the xts(ecb(aes-generic)) driver appearing in /proc/crypto.
+I had no xts driver before.
 
-How do you ensure the skcipher operation will not be asynchronous?=20
+I don't think it's necessary now to copy my kernel config. Also, it's
+quite minimalist: make defconfig with a few drivers I need, mostly compiled
+in the kernel.
 
---=20
-Regards,
-Marcelo
+> (See commit description, shouldn't XTS now select ECB as well? This seems to me
+> like a bug...)
 
+I was actually confused by the message, I thought it would fallback to
+the old implementation. I guess the XTS module should select ECB if
+that's not the case. Should I submit a patch for that? Or maybe it would
+be easier if a maintainer directly makes the change?
 
---mYCpIKhGyMATD0i+
-Content-Type: application/pgp-signature; name="signature.asc"
+> What mail on dmcrypt list? I do not see any recent mail.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+It was a mail from 2012, I should be more careful with search engines...
 
-iQEcBAABCAAGBQJYrg3cAAoJEM8aS8c01e1HJfEIAIi+DzhRhSAmIGTgoSyh7tTS
-NYQ7IKBIaHxWAm0XCt2oSNN63UFPuPkNzuouPkNc6BeD9ssixWG9rX/w2xVJZ+R7
-fKL618o1bq9ubr4dhw/b1JWIJ0XuAQhTSOEJdtz6uMAaKKpMQg5cfH4kQFWkAD5F
-yXAr0wQU60y0OfYbrMavgRIEO+yxVtZAUrPnTER1uz1hWwVrloPsntHIuLRBoHMu
-iETHCzj8ZkcrBXaJ6ud5P4G/mLvHVWX3gHvt/zqrCRt0riC7S7B9EA+RG5iNvFJE
-lQEb5ZWo7YCVqjqDbY+9vIp7o5Emf+4YcGPmTkOg/LH6co01mFjiA9b3XAMDew8=
-=YcEm
------END PGP SIGNATURE-----
-
---mYCpIKhGyMATD0i+--
+-- 
+Nicolas Porcel
