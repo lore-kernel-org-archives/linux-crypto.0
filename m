@@ -1,45 +1,35 @@
-From: Milan Broz <gmazyland@gmail.com>
-Subject: [PATCH] crypto: Add ECB dependency for XTS mode
-Date: Thu, 23 Feb 2017 08:38:26 +0100
-Message-ID: <20170223073826.19066-1-gmazyland@gmail.com>
-References: <20170221231717.GA7186@nicolas-laptop>
-Cc: herbert@gondor.apana.org.au, nicolasporcel06@gmail.com,
-        Milan Broz <gmazyland@gmail.com>
-To: linux-crypto@vger.kernel.org
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 1/2] crypto: vmx - Use skcipher for cbc fallback
+Date: Thu, 23 Feb 2017 19:21:56 +0800
+Message-ID: <20170223112156.GA14038@gondor.apana.org.au>
+References: <20170222221700.GA19026@gallifrey>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: Marcelo Cerri <marcelo.cerri@canonical.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wr0-f193.google.com ([209.85.128.193]:35029 "EHLO
-        mail-wr0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750952AbdBWHkU (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:59639 "EHLO
+        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1751191AbdBWLWF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 Feb 2017 02:40:20 -0500
-Received: by mail-wr0-f193.google.com with SMTP id q39so2894040wrb.2
-        for <linux-crypto@vger.kernel.org>; Wed, 22 Feb 2017 23:39:36 -0800 (PST)
-In-Reply-To: <20170221231717.GA7186@nicolas-laptop>
+        Thu, 23 Feb 2017 06:22:05 -0500
+Content-Disposition: inline
+In-Reply-To: <20170222221700.GA19026@gallifrey>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Since the
-   commit f1c131b45410a202eb45cc55980a7a9e4e4b4f40
-   crypto: xts - Convert to skcipher
-the XTS mode is based on ECB, so the mode must select
-ECB otherwise it can fail to initialize.
+Marcelo Cerri <marcelo.cerri@canonical.com> wrote:
+>
+> I noticed you used a similar approach in arch/s390/crypto/aes_s390.c
+> (commit 64e2680).
+> 
+> How do you ensure the skcipher operation will not be asynchronous? 
 
-Signed-off-by: Milan Broz <gmazyland@gmail.com>
----
- crypto/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
+You need to set the bit CRYPTO_ALG_ASYNC in the mask field when
+allocating the algorithm to ensure that it's synchronous.
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 160f08e721cc..9c245eb0dd83 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -374,6 +374,7 @@ config CRYPTO_XTS
- 	select CRYPTO_BLKCIPHER
- 	select CRYPTO_MANAGER
- 	select CRYPTO_GF128MUL
-+	select CRYPTO_ECB
- 	help
- 	  XTS: IEEE1619/D16 narrow block cipher use with aes-xts-plain,
- 	  key size 256, 384 or 512 bits. This implementation currently
+Cheers,
 -- 
-2.11.0
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
