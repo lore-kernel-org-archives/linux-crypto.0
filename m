@@ -1,93 +1,262 @@
-From: Rob Herring <robh-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-Subject: Re: [PATCH 00/35] treewide trivial patches converting pr_warning to
- pr_warn
-Date: Thu, 23 Feb 2017 09:28:23 -0600
-Message-ID: <CAL_JsqLTaq-QLTqfyDO8EVJYpgeUx1e4J0Fo2NvfFWqVoiVedQ@mail.gmail.com>
-References: <cover.1487314666.git.joe@perches.com>
+From: Harald Freudenberger <freude@linux.vnet.ibm.com>
+Subject: Re: crypto: hang in crypto_larval_lookup
+Date: Thu, 23 Feb 2017 17:02:37 +0100
+Message-ID: <d7cc7cd8-3632-2508-9931-a5e0875a54cd@linux.vnet.ibm.com>
+References: <02b80c39-0fd5-b7bd-39da-07e5d71abbad@linux.vnet.ibm.com>
+ <20170223111957.GA14000@gondor.apana.org.au>
+ <20170223113909.GA14090@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: "linux-fbdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-fbdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
- linux-ia64-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, SH-Linux <linux-sh-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
- Alexander Shishkin <alexander.shishkin-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>,
- nouveau-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org, Linux-ALSA <alsa-devel-K7yf7f+aM1XWsZ/bQMPhNw@public.gmane.org>,
- dri-devel <dri-devel-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org>,
- virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org,
- "linux-ide-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-ide-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
- "linux-mtd-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org" <linux-mtd-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>,
- sparclinux-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, drbd-dev-cunTk1MwBs8qoQakbn7OcQ@public.gmane.org,
- linux-scsi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Richard Weinberger <richard-/L3Ra7n9ekc@public.gmane.org>,
- sfi-devel-yLnuTTp1/kvcsJTPyzm5gB2eb7JE58TQ@public.gmane.org, amd-gfx-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org,
- "linux-acpi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-acpi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
- tboot-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org, oprofile-list-TtF/mJH4Jtrk1uMJSBkQmQ@public.gmane.org,
- "linux-input-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-input-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
- xen-devel-GuqFBffKawtpuQazS67q72D2FQJk+8+b@public.gmane.org,
- "linux-media@vger.k
-To: Joe Perches <joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org>
-Return-path: <amd-gfx-bounces-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org>
-In-Reply-To: <cover.1487314666.git.joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org>
-List-Unsubscribe: <https://lists.freedesktop.org/mailman/options/amd-gfx>,
- <mailto:amd-gfx-request-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org?subject=unsubscribe>
-List-Archive: <https://lists.freedesktop.org/archives/amd-gfx>
-List-Post: <mailto:amd-gfx-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org>
-List-Help: <mailto:amd-gfx-request-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.freedesktop.org/mailman/listinfo/amd-gfx>,
- <mailto:amd-gfx-request-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org?subject=subscribe>
-Errors-To: amd-gfx-bounces-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org
-Sender: "amd-gfx" <amd-gfx-bounces-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, schwidefsky@de.ibm.com
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59427 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1750828AbdBWQCl (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 23 Feb 2017 11:02:41 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id v1NFsg8q070017
+        for <linux-crypto@vger.kernel.org>; Thu, 23 Feb 2017 11:02:40 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 28sw9b7ywa-1
+        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Thu, 23 Feb 2017 11:02:40 -0500
+Received: from localhost
+        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-crypto@vger.kernel.org> from <freude@linux.vnet.ibm.com>;
+        Thu, 23 Feb 2017 16:02:38 -0000
+In-Reply-To: <20170223113909.GA14090@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-T24gRnJpLCBGZWIgMTcsIDIwMTcgYXQgMToxMSBBTSwgSm9lIFBlcmNoZXMgPGpvZUBwZXJjaGVz
-LmNvbT4gd3JvdGU6Cj4gVGhlcmUgYXJlIH40MzAwIHVzZXMgb2YgcHJfd2FybiBhbmQgfjI1MCB1
-c2VzIG9mIHRoZSBvbGRlcgo+IHByX3dhcm5pbmcgaW4gdGhlIGtlcm5lbCBzb3VyY2UgdHJlZS4K
-Pgo+IE1ha2UgdGhlIHVzZSBvZiBwcl93YXJuIGNvbnNpc3RlbnQgYWNyb3NzIGFsbCBrZXJuZWwg
-ZmlsZXMuCj4KPiBUaGlzIGV4Y2x1ZGVzIGFsbCBmaWxlcyBpbiB0b29scy8gYXMgdGhlcmUgaXMg
-YSBzZXBhcmF0ZQo+IGRlZmluZSBwcl93YXJuaW5nIGZvciB0aGF0IGRpcmVjdG9yeSB0cmVlIGFu
-ZCBwcl93YXJuIGlzCj4gbm90IHVzZWQgaW4gdG9vbHMvLgo+Cj4gRG9uZSB3aXRoICdzZWQgcy9c
-YnByX3dhcm5pbmdcYi9wcl93YXJuLycgYW5kIHNvbWUgZW1hY3NpbmcuCj4KPiBNaXNjZWxsYW5l
-YToKPgo+IG8gQ29hbGVzY2UgZm9ybWF0cyBhbmQgcmVhbGlnbiBhcmd1bWVudHMKPgo+IFNvbWUg
-ZmlsZXMgbm90IGNvbXBpbGVkIC0gbm8gY3Jvc3MtY29tcGlsZXJzCj4KPiBKb2UgUGVyY2hlcyAo
-MzUpOgo+ICAgYWxwaGE6IENvbnZlcnQgcmVtYWluaW5nIHVzZXMgb2YgcHJfd2FybmluZyB0byBw
-cl93YXJuCj4gICBBUk06IGVwOTN4eDogQ29udmVydCByZW1haW5pbmcgdXNlcyBvZiBwcl93YXJu
-aW5nIHRvIHByX3dhcm4KPiAgIGFybTY0OiBDb252ZXJ0IHJlbWFpbmluZyB1c2VzIG9mIHByX3dh
-cm5pbmcgdG8gcHJfd2Fybgo+ICAgYXJjaC9ibGFja2ZpbjogQ29udmVydCByZW1haW5pbmcgdXNl
-cyBvZiBwcl93YXJuaW5nIHRvIHByX3dhcm4KPiAgIGlhNjQ6IENvbnZlcnQgcmVtYWluaW5nIHVz
-ZSBvZiBwcl93YXJuaW5nIHRvIHByX3dhcm4KPiAgIHBvd2VycGM6IENvbnZlcnQgcmVtYWluaW5n
-IHVzZXMgb2YgcHJfd2FybmluZyB0byBwcl93YXJuCj4gICBzaDogQ29udmVydCByZW1haW5pbmcg
-dXNlcyBvZiBwcl93YXJuaW5nIHRvIHByX3dhcm4KPiAgIHNwYXJjOiBDb252ZXJ0IHJlbWFpbmlu
-ZyB1c2Ugb2YgcHJfd2FybmluZyB0byBwcl93YXJuCj4gICB4ODY6IENvbnZlcnQgcmVtYWluaW5n
-IHVzZXMgb2YgcHJfd2FybmluZyB0byBwcl93YXJuCj4gICBkcml2ZXJzL2FjcGk6IENvbnZlcnQg
-cmVtYWluaW5nIHVzZXMgb2YgcHJfd2FybmluZyB0byBwcl93YXJuCj4gICBibG9jay9kcmJkOiBD
-b252ZXJ0IHJlbWFpbmluZyB1c2VzIG9mIHByX3dhcm5pbmcgdG8gcHJfd2Fybgo+ICAgZ2Ryb206
-IENvbnZlcnQgcmVtYWluaW5nIHVzZXMgb2YgcHJfd2FybmluZyB0byBwcl93YXJuCj4gICBkcml2
-ZXJzL2NoYXI6IENvbnZlcnQgcmVtYWluaW5nIHVzZSBvZiBwcl93YXJuaW5nIHRvIHByX3dhcm4K
-PiAgIGNsb2Nrc291cmNlOiBDb252ZXJ0IHJlbWFpbmluZyB1c2Ugb2YgcHJfd2FybmluZyB0byBw
-cl93YXJuCj4gICBkcml2ZXJzL2NyeXB0bzogQ29udmVydCByZW1haW5pbmcgdXNlcyBvZiBwcl93
-YXJuaW5nIHRvIHByX3dhcm4KPiAgIGZtYzogQ29udmVydCByZW1haW5pbmcgdXNlIG9mIHByX3dh
-cm5pbmcgdG8gcHJfd2Fybgo+ICAgZHJpdmVycy9ncHU6IENvbnZlcnQgcmVtYWluaW5nIHVzZXMg
-b2YgcHJfd2FybmluZyB0byBwcl93YXJuCj4gICBkcml2ZXJzL2lkZTogQ29udmVydCByZW1haW5p
-bmcgdXNlcyBvZiBwcl93YXJuaW5nIHRvIHByX3dhcm4KPiAgIGRyaXZlcnMvaW5wdXQ6IENvbnZl
-cnQgcmVtYWluaW5nIHVzZXMgb2YgcHJfd2FybmluZyB0byBwcl93YXJuCj4gICBkcml2ZXJzL2lz
-ZG46IENvbnZlcnQgcmVtYWluaW5nIHVzZXMgb2YgcHJfd2FybmluZyB0byBwcl93YXJuCj4gICBk
-cml2ZXJzL21hY2ludG9zaDogQ29udmVydCByZW1haW5pbmcgdXNlcyBvZiBwcl93YXJuaW5nIHRv
-IHByX3dhcm4KPiAgIGRyaXZlcnMvbWVkaWE6IENvbnZlcnQgcmVtYWluaW5nIHVzZSBvZiBwcl93
-YXJuaW5nIHRvIHByX3dhcm4KPiAgIGRyaXZlcnMvbWZkOiBDb252ZXJ0IHJlbWFpbmluZyB1c2Vz
-IG9mIHByX3dhcm5pbmcgdG8gcHJfd2Fybgo+ICAgZHJpdmVycy9tdGQ6IENvbnZlcnQgcmVtYWlu
-aW5nIHVzZXMgb2YgcHJfd2FybmluZyB0byBwcl93YXJuCj4gICBkcml2ZXJzL29mOiBDb252ZXJ0
-IHJlbWFpbmluZyB1c2VzIG9mIHByX3dhcm5pbmcgdG8gcHJfd2Fybgo+ICAgZHJpdmVycy9vcHJv
-ZmlsZTogQ29udmVydCByZW1haW5pbmcgdXNlcyBvZiBwcl93YXJuaW5nIHRvIHByX3dhcm4KPiAg
-IGRyaXZlcnMvcGxhdGZvcm06IENvbnZlcnQgcmVtYWluaW5nIHVzZXMgb2YgcHJfd2FybmluZyB0
-byBwcl93YXJuCj4gICBkcml2ZXJzL3JhcGlkaW86IENvbnZlcnQgcmVtYWluaW5nIHVzZSBvZiBw
-cl93YXJuaW5nIHRvIHByX3dhcm4KPiAgIGRyaXZlcnMvc2NzaTogQ29udmVydCByZW1haW5pbmcg
-dXNlIG9mIHByX3dhcm5pbmcgdG8gcHJfd2Fybgo+ICAgZHJpdmVycy9zaDogQ29udmVydCByZW1h
-aW5pbmcgdXNlIG9mIHByX3dhcm5pbmcgdG8gcHJfd2Fybgo+ICAgZHJpdmVycy90dHk6IENvbnZl
-cnQgcmVtYWluaW5nIHVzZXMgb2YgcHJfd2FybmluZyB0byBwcl93YXJuCj4gICBkcml2ZXJzL3Zp
-ZGVvOiBDb252ZXJ0IHJlbWFpbmluZyB1c2VzIG9mIHByX3dhcm5pbmcgdG8gcHJfd2Fybgo+ICAg
-a2VybmVsL3RyYWNlOiBDb252ZXJ0IHJlbWFpbmluZyB1c2VzIG9mIHByX3dhcm5pbmcgdG8gcHJf
-d2Fybgo+ICAgbGliOiBDb252ZXJ0IHJlbWFpbmluZyB1c2VzIG9mIHByX3dhcm5pbmcgdG8gcHJf
-d2Fybgo+ICAgc291bmQvc29jOiBDb252ZXJ0IHJlbWFpbmluZyB1c2VzIG9mIHByX3dhcm5pbmcg
-dG8gcHJfd2FybgoKV2hlcmUncyB0aGUgcmVtb3ZhbCBvZiBwcl93YXJuaW5nIHNvIHdlIGRvbid0
-IGhhdmUgbW9yZSBzbmVhayBpbj8KClJvYgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fXwphbWQtZ2Z4IG1haWxpbmcgbGlzdAphbWQtZ2Z4QGxpc3RzLmZyZWVk
-ZXNrdG9wLm9yZwpodHRwczovL2xpc3RzLmZyZWVkZXNrdG9wLm9yZy9tYWlsbWFuL2xpc3RpbmZv
-L2FtZC1nZngK
+On 02/23/2017 12:39 PM, Herbert Xu wrote:
+> On Thu, Feb 23, 2017 at 07:19:57PM +0800, Herbert Xu wrote:
+>> Harald Freudenberger <freude@linux.vnet.ibm.com> wrote:
+>>> Hello all
+>>>
+>>> I am currently following a hang at modprobe aes_s390 where
+>>> crypto_register_alg() does not come back for the xts(aes) algorithm.
+>>>
+>>> The registration is waiting forever in algapi.c crypto_wait_for_test() but
+>>> the completion never occurs. The cryptomgr is triggering a test via
+>>> kthread_run to invoce cryptomgr_probe and this thread is calling the
+>>> create() function of the xts template (file xts.c). Following this thread
+>>> it comes down to api.c crypto_larval_lookup(name="aes") which is first
+>>> requesting the module "crypto-aes" via request_module() successful and then
+>>> blocking forever in requesting the module "crypto-aes-all".
+>>>
+>>> The xts(aes) has at registration CRYPTO_ALG_NEED_FALLBACK flag on.
+>>>
+>>> This problem is seen since about 6 weeks now, first only on the linux next
+>>> kernel. Now it appers on the 4.10-rc kernels as well. And I still have no
+>>> idea on how this could be fixed or what's wrong with just the xts
+>>> registration (ecb, cbc, ctr work fine).
+>>>
+>>> Any ideas or hints?
+>> Sorry, my fault.  I should've converted all the fallback users of
+>> the old blkcipher interface over to skcipher before converting the
+>> core algorithms to skcipher.
+>>
+>> I'll send a patch.
+> Hmm, actually looks like I did convert this one :)
+>
+> Do you have ECB enabled in your configuration? XTS doesn't work
+> without it.  Currently the Kconfig is missing a select on ECB so
+> it could stop the generic XTS from loading.
+>
+> However, you seem to be stuck on straight AES which quite strange.
+> The reason is that s390 crypto registers AES as the first thing so
+> it should already be available.
+>
+> The fact that it hangs is expected because it's trying to find
+> an acceptable AES implementation and in doing so it's loading
+> s390-aes again.
+>
+> So we need to get to the bottom of why there is no acceptable
+> "aes" registered.  Can you check /proc/crypto to see if the simple
+> aes cipher is correctly registered (passing the selftest) after
+> it hangs?
+>
+> You could also print out the type/mask in crypto_larval_lookup
+> to see if perhaps the caller is asking for something unreasonable.
+>
+> Thanks,
+Thanks for your help, here is cat /proc/crypto:
+name         : xts(aes)
+driver       :
+module       : kernel
+priority     : -1
+refcnt       : 3
+selftest     : passed
+internal     : no
+type         : larval
+flags        : 0x415
+
+name         : xts(aes)
+driver       : xts-aes-s390
+module       : kernel
+priority     : 400
+refcnt       : 1
+selftest     : passed
+internal     : no
+type         : larval
+flags        : 0x514
+
+name         : xts(aes)
+driver       : xts-aes-s390
+module       : aes_s390
+priority     : 400
+refcnt       : 4
+selftest     : unknown
+internal     : no
+type         : blkcipher
+blocksize    : 16
+min keysize  : 32
+max keysize  : 64
+ivsize       : 16
+geniv        : <default>
+
+...
+
+name         : ecb(aes)
+driver       : ecb(aes-s390)
+module       : kernel
+priority     : 300
+refcnt       : 1
+selftest     : passed
+internal     : no
+type         : blkcipher
+blocksize    : 16
+min keysize  : 16
+max keysize  : 32
+ivsize       : 0
+geniv        : <default>
+
+name         : ecb(aes)
+driver       : ecb-aes-s390
+module       : aes_s390
+priority     : 400
+refcnt       : 1
+selftest     : passed
+internal     : no
+type         : blkcipher
+blocksize    : 16
+min keysize  : 16
+max keysize  : 32
+ivsize       : 0
+geniv        : <default>
+
+name         : aes
+driver       : aes-s390
+module       : aes_s390
+priority     : 300
+refcnt       : 1
+selftest     : passed
+internal     : no
+type         : cipher
+blocksize    : 16
+min keysize  : 16
+max keysize  : 32
+...
+
+at the time where the modprobe hangs.
+
+And here is some syslog output (I added some printks for debugging) maybe
+it may give you some hints about whats going on during the modprobe:
+Feb 23 16:52:08 r35lp49 kernel:   crypto_larval_lookup calling crypto_alg_lookup()
+Feb 23 16:52:08 r35lp49 kernel: ->__crypto_alg_lookup(name=aes)
+Feb 23 16:52:08 r35lp49 kernel:   crypto_alg_get(alg.cra_name=aes) alg=0000000000f2dd68 alg.cra_refcnt=2
+Feb 23 16:52:08 r35lp49 kernel:   crypto_mod_get(alg.cra_name=aes alg=0000000000f2dd68 alg.cra_driver_name=aes-generic alg.cra_module.name=(null))
+Feb 23 16:52:08 r35lp49 kernel: <-__crypto_alg_lookup(name=aes) alg=0000000000f2dd68
+Feb 23 16:52:08 r35lp49 kernel: <-crypto_larval_lookup(name=aes) alg=0000000000f2dd68
+Feb 23 16:52:08 r35lp49 kernel:   crypto_mod_put(alg.cra_name=aes alg=0000000000f2dd68 alg.cra_driver_name=aes-generic, alg.cra_module.name=(null))
+Feb 23 16:52:08 r35lp49 kernel:   crypto_alg_put(alg.cra_name=aes alg=0000000000f2dd68 alg.cra_refcnt=2)
+Feb 23 16:52:08 r35lp49 kernel:   crypto_mod_put(alg.cra_name=aes alg=000003ff80178480 alg.cra_driver_name=aes-s390, alg.cra_module.name=aes_s390)
+Feb 23 16:52:08 r35lp49 kernel:   crypto_alg_put(alg.cra_name=aes alg=000003ff80178480 alg.cra_refcnt=2)
+Feb 23 16:52:08 r35lp49 kernel:   crypto_mod_put(alg.cra_name=cbc(aes) alg=00000000b92d3548 alg.cra_driver_name=cbc(aes-s390), alg.cra_module.name=(null))
+Feb 23 16:52:08 r35lp49 kernel:   crypto_alg_put(alg.cra_name=cbc(aes) alg=00000000b92d3548 alg.cra_refcnt=4)
+Feb 23 16:52:08 r35lp49 kernel:   crypto_alg_get(alg.cra_name=cbc(aes)) alg=00000000b92d3548 alg.cra_refcnt=4
+Feb 23 16:52:08 r35lp49 kernel:   crypto_mod_get(alg.cra_name=cbc(aes) alg=00000000b92d3548 alg.cra_driver_name=cbc(aes-s390) alg.cra_module.name=(null))
+Feb 23 16:52:08 r35lp49 kernel:   crypto_alg_put(alg.cra_name=cbc(aes) alg=00000000b92d4598 alg.cra_refcnt=1)
+Feb 23 16:52:08 r35lp49 kernel:   crypto_mod_put(alg.cra_name=cbc(aes) alg=00000000b92d3548 alg.cra_driver_name=cbc(aes-s390), alg.cra_module.name=(null))
+Feb 23 16:52:08 r35lp49 kernel:   crypto_alg_put(alg.cra_name=cbc(aes) alg=00000000b92d3548 alg.cra_refcnt=4)
+Feb 23 16:52:08 r35lp49 kernel:   crypto_mod_put(alg.cra_name=cbc(aes) alg=00000000b92d3548 alg.cra_driver_name=cbc(aes-s390), alg.cra_module.name=(null))
+Feb 23 16:52:08 r35lp49 kernel:   crypto_alg_put(alg.cra_name=cbc(aes) alg=00000000b92d3548 alg.cra_refcnt=3)
+Feb 23 16:52:08 r35lp49 kernel:   crypto_alg_put(alg.cra_name=cbc(aes) alg=00000000b92d3858 alg.cra_refcnt=3)
+Feb 23 16:52:08 r35lp49 kernel: <-cryptomgr_probe(data=00000000b8b5d698)
+Feb 23 16:52:08 r35lp49 kernel:   crypto_alg_get(alg.cra_name=cbc(aes)) alg=00000000b92d3548 alg.cra_refcnt=3
+Feb 23 16:52:08 r35lp49 kernel:   crypto_mod_get(alg.cra_name=cbc(aes) alg=00000000b92d3548 alg.cra_driver_name=cbc(aes-s390) alg.cra_module.name=(null))
+Feb 23 16:52:08 r35lp49 kernel:   crypto_mod_put(alg.cra_name=cbc(aes) alg=00000000b92d3858 alg.cra_driver_name=, alg.cra_module.name=(null))
+Feb 23 16:52:08 r35lp49 kernel:   crypto_alg_put(alg.cra_name=cbc(aes) alg=00000000b92d3858 alg.cra_refcnt=2)
+Feb 23 16:52:08 r35lp49 kernel:   crypto_alg_put(alg.cra_name=cbc(aes) alg=00000000b92d3858 alg.cra_refcnt=1)
+Feb 23 16:52:08 r35lp49 kernel:   crypto_mod_put(alg.cra_name=cbc(aes) alg=00000000b92d3548 alg.cra_driver_name=cbc(aes-s390), alg.cra_module.name=(null))
+Feb 23 16:52:08 r35lp49 kernel:   crypto_alg_put(alg.cra_name=cbc(aes) alg=00000000b92d3548 alg.cra_refcnt=3)
+Feb 23 16:52:08 r35lp49 kernel:   crypto_alg_get(alg.cra_name=aes) alg=000003ff80178480 alg.cra_refcnt=2
+Feb 23 16:52:08 r35lp49 kernel:   crypto_mod_get(alg.cra_name=aes alg=000003ff80178480 alg.cra_driver_name=aes-s390 alg.cra_module.name=aes_s390)
+Feb 23 16:52:08 r35lp49 kernel:   crypto_alg_mod_lookup(name=aes)
+Feb 23 16:52:08 r35lp49 kernel: ->crypto_larval_lookup(name=aes)
+Feb 23 16:52:08 r35lp49 kernel:   crypto_larval_lookup calling crypto_alg_lookup()
+Feb 23 16:52:08 r35lp49 kernel: ->__crypto_alg_lookup(name=aes)
+Feb 23 16:52:08 r35lp49 kernel:   crypto_alg_get(alg.cra_name=aes) alg=0000000000f2dd68 alg.cra_refcnt=2
+Feb 23 16:52:08 r35lp49 kernel:   crypto_mod_get(alg.cra_name=aes alg=0000000000f2dd68 alg.cra_driver_name=aes-generic alg.cra_module.name=(null))
+Feb 23 16:52:08 r35lp49 kernel: <-__crypto_alg_lookup(name=aes) alg=0000000000f2dd68
+Feb 23 16:52:08 r35lp49 kernel: <-crypto_larval_lookup(name=aes) alg=0000000000f2dd68
+Feb 23 16:52:08 r35lp49 kernel:   crypto_mod_put(alg.cra_name=aes alg=0000000000f2dd68 alg.cra_driver_name=aes-generic, alg.cra_module.name=(null))
+Feb 23 16:52:08 r35lp49 kernel:   crypto_alg_put(alg.cra_name=aes alg=0000000000f2dd68 alg.cra_refcnt=2)
+Feb 23 16:52:08 r35lp49 kernel:   crypto_mod_put(alg.cra_name=aes alg=000003ff80178480 alg.cra_driver_name=aes-s390, alg.cra_module.name=aes_s390)
+Feb 23 16:52:08 r35lp49 kernel:   crypto_alg_put(alg.cra_name=aes alg=000003ff80178480 alg.cra_refcnt=2)
+Feb 23 16:52:08 r35lp49 kernel:   crypto_mod_put(alg.cra_name=cbc(aes) alg=00000000b92d3548 alg.cra_driver_name=cbc(aes-s390), alg.cra_module.name=(null))
+Feb 23 16:52:08 r35lp49 kernel:   crypto_alg_put(alg.cra_name=cbc(aes) alg=00000000b92d3548 alg.cra_refcnt=2)
+Feb 23 16:52:08 r35lp49 kernel:   crypto_mod_put(alg.cra_name=cbc(aes) alg=000003ff80178240 alg.cra_driver_name=cbc-aes-s390, alg.cra_module.name=aes_s390)
+Feb 23 16:52:08 r35lp49 kernel:   crypto_alg_put(alg.cra_name=cbc(aes) alg=000003ff80178240 alg.cra_refcnt=4)
+Feb 23 16:52:08 r35lp49 kernel:   crypto_mod_put(alg.cra_name=cbc(aes) alg=000003ff80178240 alg.cra_driver_name=cbc-aes-s390, alg.cra_module.name=aes_s390)
+Feb 23 16:52:08 r35lp49 kernel:   crypto_alg_put(alg.cra_name=cbc(aes) alg=000003ff80178240 alg.cra_refcnt=3)
+Feb 23 16:52:08 r35lp49 kernel:   crypto_alg_put(alg.cra_name=cbc(aes) alg=00000000b92d4248 alg.cra_refcnt=1)
+Feb 23 16:52:08 r35lp49 kernel:   crypto_mod_put(alg.cra_name=cbc(aes) alg=000003ff80178240 alg.cra_driver_name=cbc-aes-s390, alg.cra_module.name=aes_s390)
+Feb 23 16:52:08 r35lp49 kernel:   crypto_alg_put(alg.cra_name=cbc(aes) alg=000003ff80178240 alg.cra_refcnt=2)
+Feb 23 16:52:08 r35lp49 kernel:   crypto_alg_get(alg.cra_name=xts(aes)) alg=000003ff80178120 alg.cra_refcnt=2
+Feb 23 16:52:08 r35lp49 kernel:   crypto_mod_get(alg.cra_name=xts(aes) alg=000003ff80178120 alg.cra_driver_name=xts-aes-s390 alg.cra_module.name=aes_s390)
+Feb 23 16:52:08 r35lp49 kernel:   cryptomgr_notify(data=000003ff80178120)
+Feb 23 16:52:08 r35lp49 kernel:   crypto_alg_mod_lookup(name=xts-aes-s390)
+Feb 23 16:52:08 r35lp49 kernel: ->crypto_larval_lookup(name=xts-aes-s390)
+Feb 23 16:52:08 r35lp49 kernel:   crypto_larval_lookup calling crypto_alg_lookup()
+Feb 23 16:52:08 r35lp49 kernel: ->__crypto_alg_lookup(name=xts-aes-s390)
+Feb 23 16:52:08 r35lp49 kernel:   crypto_alg_get(alg.cra_name=xts(aes)) alg=000003ff80178120 alg.cra_refcnt=3
+Feb 23 16:52:08 r35lp49 kernel:   crypto_mod_get(alg.cra_name=xts(aes) alg=000003ff80178120 alg.cra_driver_name=xts-aes-s390 alg.cra_module.name=aes_s390)
+Feb 23 16:52:08 r35lp49 kernel: <-__crypto_alg_lookup(name=xts-aes-s390) alg=000003ff80178120
+Feb 23 16:52:08 r35lp49 kernel: <-crypto_larval_lookup(name=xts-aes-s390) alg=000003ff80178120
+Feb 23 16:52:08 r35lp49 kernel:   crypto_alg_get(alg.cra_name=xts(aes)) alg=000003ff80178120 alg.cra_refcnt=4
+Feb 23 16:52:08 r35lp49 kernel:   crypto_mod_get(alg.cra_name=xts(aes) alg=000003ff80178120 alg.cra_driver_name=xts-aes-s390 alg.cra_module.name=aes_s390)
+Feb 23 16:52:08 r35lp49 kernel:   crypto_alg_mod_lookup(name=xts(aes))
+Feb 23 16:52:08 r35lp49 kernel: ->crypto_larval_lookup(name=xts(aes))
+Feb 23 16:52:08 r35lp49 kernel:   crypto_larval_lookup calling crypto_alg_lookup()
+Feb 23 16:52:08 r35lp49 kernel: ->__crypto_alg_lookup(name=xts(aes))
+Feb 23 16:52:08 r35lp49 kernel: <-__crypto_alg_lookup(name=xts(aes)) alg=          (null)
+Feb 23 16:52:08 r35lp49 kernel:   crypto_larval_lookup calling request_module(crypto-xts(aes))
+Feb 23 16:52:08 r35lp49 kernel:   crypto_larval_lookup calling crypto_alg_lookup(xts(aes))
+Feb 23 16:52:08 r35lp49 kernel: ->__crypto_alg_lookup(name=xts(aes))
+Feb 23 16:52:08 r35lp49 kernel: <-__crypto_alg_lookup(name=xts(aes)) alg=          (null)
+Feb 23 16:52:08 r35lp49 kernel:   crypto_larval_lookup calling crypto_larval_add(xts(aes))
+Feb 23 16:52:08 r35lp49 kernel: ->__crypto_alg_lookup(name=xts(aes))
+Feb 23 16:52:08 r35lp49 kernel: <-__crypto_alg_lookup(name=xts(aes)) alg=          (null)
+Feb 23 16:52:08 r35lp49 kernel: <-crypto_larval_lookup(name=xts(aes)) alg=00000000b92d48e8
+Feb 23 16:52:08 r35lp49 kernel:   cryptomgr_notify(data=00000000b92d48e8)
+Feb 23 16:52:08 r35lp49 kernel:   cryptomgr_schedule_probe(larval=00000000b92d48e8 larval.alg=00000000b92d48e8)
+Feb 23 16:52:08 r35lp49 kernel:   crypto_alg_get(alg.cra_name=xts(aes)) alg=00000000b92d48e8 alg.cra_refcnt=3
+Feb 23 16:52:08 r35lp49 kernel: ->cryptomgr_probe(data=00000000b8b5d698 param.larval=00000000b92d48e8 param.larval.alg=00000000b92d48e8)
+Feb 23 16:52:08 r35lp49 kernel: ->__crypto_lookup_template(xts)
+Feb 23 16:52:08 r35lp49 kernel: <-__crypto_lookup_template() tmpl=0000000000f2dc00
+Feb 23 16:52:08 r35lp49 kernel:   cryptomgr_probe(data=00000000b8b5d698) tmpl=0000000000f2dc00 tmpl.create=00000000006e00b8 err=-11
+Feb 23 16:52:08 r35lp49 kernel: ->create(tmpl.name=xts)
+Feb 23 16:52:08 r35lp49 kernel:   crypto_alg_mod_lookup(name=aes)
+Feb 23 16:52:08 r35lp49 kernel: ->crypto_larval_lookup(name=aes)
+Feb 23 16:52:08 r35lp49 kernel:   crypto_larval_lookup calling crypto_alg_lookup()
+Feb 23 16:52:08 r35lp49 kernel: ->__crypto_alg_lookup(name=aes)
+Feb 23 16:52:08 r35lp49 kernel: <-__crypto_alg_lookup(name=aes) alg=          (null)
+Feb 23 16:52:08 r35lp49 kernel:   crypto_larval_lookup calling request_module(crypto-aes)
+Feb 23 16:52:08 r35lp49 kernel:   crypto_larval_lookup calling request_module(crypto-aes-all)
+--- modprobe aes_s390 hang ---
+
+regards H.Freudenberger
