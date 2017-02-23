@@ -1,41 +1,45 @@
-From: Colin King <colin.king@canonical.com>
-Subject: [PATCH] crypto: brcm: fix spelling mistake: "genereate" -> "generate"
-Date: Wed, 22 Feb 2017 23:51:38 +0000
-Message-ID: <20170222235138.8531-1-colin.king@canonical.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Cc: linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Rob Rice <rob.rice@broadcom.com>,
-        Steve Lin <steven.lin1@broadcom.com>,
-        linux-crypto@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Milan Broz <gmazyland@gmail.com>
+Subject: [PATCH] crypto: Add ECB dependency for XTS mode
+Date: Thu, 23 Feb 2017 08:38:26 +0100
+Message-ID: <20170223073826.19066-1-gmazyland@gmail.com>
+References: <20170221231717.GA7186@nicolas-laptop>
+Cc: herbert@gondor.apana.org.au, nicolasporcel06@gmail.com,
+        Milan Broz <gmazyland@gmail.com>
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wr0-f193.google.com ([209.85.128.193]:35029 "EHLO
+        mail-wr0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750952AbdBWHkU (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 23 Feb 2017 02:40:20 -0500
+Received: by mail-wr0-f193.google.com with SMTP id q39so2894040wrb.2
+        for <linux-crypto@vger.kernel.org>; Wed, 22 Feb 2017 23:39:36 -0800 (PST)
+In-Reply-To: <20170221231717.GA7186@nicolas-laptop>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Colin Ian King <colin.king@canonical.com>
+Since the
+   commit f1c131b45410a202eb45cc55980a7a9e4e4b4f40
+   crypto: xts - Convert to skcipher
+the XTS mode is based on ECB, so the mode must select
+ECB otherwise it can fail to initialize.
 
-trivial fix to spelling mistake in pr_err message
-
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
+Signed-off-by: Milan Broz <gmazyland@gmail.com>
 ---
- drivers/crypto/bcm/util.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ crypto/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/crypto/bcm/util.c b/drivers/crypto/bcm/util.c
-index 0502f46..430c557 100644
---- a/drivers/crypto/bcm/util.c
-+++ b/drivers/crypto/bcm/util.c
-@@ -312,7 +312,7 @@ int do_shash(unsigned char *name, unsigned char *result,
- 	}
- 	rc = crypto_shash_final(&sdesc->shash, result);
- 	if (rc)
--		pr_err("%s: Could not genereate %s hash", __func__, name);
-+		pr_err("%s: Could not generate %s hash", __func__, name);
- 
- do_shash_err:
- 	crypto_free_shash(hash);
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 160f08e721cc..9c245eb0dd83 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -374,6 +374,7 @@ config CRYPTO_XTS
+ 	select CRYPTO_BLKCIPHER
+ 	select CRYPTO_MANAGER
+ 	select CRYPTO_GF128MUL
++	select CRYPTO_ECB
+ 	help
+ 	  XTS: IEEE1619/D16 narrow block cipher use with aes-xts-plain,
+ 	  key size 256, 384 or 512 bits. This implementation currently
 -- 
-2.10.2
+2.11.0
