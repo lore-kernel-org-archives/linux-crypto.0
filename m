@@ -1,114 +1,166 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: authenc: crash if key is not set
-Date: Fri, 24 Feb 2017 21:24:34 +0100
-Message-ID: <13796038.esLDiIrSPd@positron.chronox.de>
+From: Marcelo Cerri <marcelo.cerri@canonical.com>
+Subject: Re: crypto: hang in crypto_larval_lookup
+Date: Fri, 24 Feb 2017 20:44:00 -0300
+Message-ID: <20170224234400.GA2758@gallifrey>
+References: <02b80c39-0fd5-b7bd-39da-07e5d71abbad@linux.vnet.ibm.com>
+ <20170223111957.GA14000@gondor.apana.org.au>
+ <20170223113909.GA14090@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="GvXjxJ+pjyke8COw"
+Cc: Harald Freudenberger <freude@linux.vnet.ibm.com>,
+        linux-crypto@vger.kernel.org, schwidefsky@de.ibm.com
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:59788 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751232AbdBXUYo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 24 Feb 2017 15:24:44 -0500
+Received: from mail-qk0-f175.google.com ([209.85.220.175]:34205 "EHLO
+        mail-qk0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751334AbdBXXoJ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 24 Feb 2017 18:44:09 -0500
+Received: by mail-qk0-f175.google.com with SMTP id s186so31768218qkb.1
+        for <linux-crypto@vger.kernel.org>; Fri, 24 Feb 2017 15:44:08 -0800 (PST)
+Content-Disposition: inline
+In-Reply-To: <20170223113909.GA14090@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
 
-I am working on fuzzing the AF_ALG interface.
+--GvXjxJ+pjyke8COw
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-The fuzzer reliably triggered the following type of bug when I use 
-authenc(hmac(sha256),cbc(aes)) or other types of authenc() but do not call 
-setkey.
+On Thu, Feb 23, 2017 at 07:39:09PM +0800, Herbert Xu wrote:
+> On Thu, Feb 23, 2017 at 07:19:57PM +0800, Herbert Xu wrote:
+> > Harald Freudenberger <freude@linux.vnet.ibm.com> wrote:
+> > >=20
+> > > Hello all
+> > >=20
+> > > I am currently following a hang at modprobe aes_s390 where
+> > > crypto_register_alg() does not come back for the xts(aes) algorithm.
+> > >=20
+> > > The registration is waiting forever in algapi.c crypto_wait_for_test(=
+) but
+> > > the completion never occurs. The cryptomgr is triggering a test via
+> > > kthread_run to invoce cryptomgr_probe and this thread is calling the
+> > > create() function of the xts template (file xts.c). Following this th=
+read
+> > > it comes down to api.c crypto_larval_lookup(name=3D"aes") which is fi=
+rst
+> > > requesting the module "crypto-aes" via request_module() successful an=
+d then
+> > > blocking forever in requesting the module "crypto-aes-all".
+> > >=20
+> > > The xts(aes) has at registration CRYPTO_ALG_NEED_FALLBACK flag on.
+> > >=20
+> > > This problem is seen since about 6 weeks now, first only on the linux=
+ next
+> > > kernel. Now it appers on the 4.10-rc kernels as well. And I still hav=
+e no
+> > > idea on how this could be fixed or what's wrong with just the xts
+> > > registration (ecb, cbc, ctr work fine).
+> > >=20
+> > > Any ideas or hints?
+> >=20
+> > Sorry, my fault.  I should've converted all the fallback users of
+> > the old blkcipher interface over to skcipher before converting the
+> > core algorithms to skcipher.
+> >=20
+> > I'll send a patch.
+>=20
+> Hmm, actually looks like I did convert this one :)
+>=20
+> Do you have ECB enabled in your configuration? XTS doesn't work
+> without it.  Currently the Kconfig is missing a select on ECB so
+> it could stop the generic XTS from loading.
+>=20
+> However, you seem to be stuck on straight AES which quite strange.
+> The reason is that s390 crypto registers AES as the first thing so
+> it should already be available.
+>=20
+> The fact that it hangs is expected because it's trying to find
+> an acceptable AES implementation and in doing so it's loading
+> s390-aes again.
+>=20
+> So we need to get to the bottom of why there is no acceptable
+> "aes" registered.  Can you check /proc/crypto to see if the simple
+> aes cipher is correctly registered (passing the selftest) after
+> it hangs?
 
-Note, it works with gcm or ccm.
+This is probably caused by the way that the xts template is handling the
+underline algorithm selection.
 
-Is that bug similar in nature as the algif_skcipher and algif_hash bugs that 
-were fixed with the *nokey functions?
+In the create function in crypto/xts.c:
 
-[ 3417.581670] BUG: unable to handle kernel NULL pointer dereference at 
-0000000000000008
-[ 3417.582004] IP: skcipher_walk_skcipher+0x18/0xc0
-[ 3417.582004] PGD 7a487067 
-[ 3417.582004] PUD 7b1a5067 
-[ 3417.582004] PMD 0 
+	static int create(struct crypto_template *tmpl, struct rtattr **tb)
+	{
+	...
+		crypto_set_skcipher_spawn(&ctx->spawn, skcipher_crypto_instance(inst));
+		err =3D crypto_grab_skcipher(&ctx->spawn, cipher_name, 0,
+					   crypto_requires_sync(algt->type,
+								algt->mask));
+		if (err =3D=3D -ENOENT) {
+			err =3D -ENAMETOOLONG;
+			if (snprintf(ctx->name, CRYPTO_MAX_ALG_NAME, "ecb(%s)",
+				     cipher_name) >=3D CRYPTO_MAX_ALG_NAME)
+				goto err_free_inst;
 
-[ 3417.582004] Oops: 0000 [#13] SMP
-[ 3417.582004] Modules linked in: algif_aead authenc ansi_cprng algif_rng ccm 
-gcm crypto_user des3_ede_x86_64 des_generic algif_hash algif_akcipher(E) 
-algif_skcipher(E) af_alg ip6t_rpfilter ip6t_REJECT nf_reject_ipv6 
-nf_conntrack_ipv6 nf_defrag_ipv6 nf_conntrack_ipv4 nf_defrag_ipv4 xt_conntrack 
-nf_conntrack ip_set nfnetlink ebtable_broute bridge stp llc ebtable_nat 
-ip6table_raw ip6table_security ip6table_mangle iptable_raw iptable_security 
-iptable_mangle ebtable_filter ebtables ip6table_filter ip6_tables 
-crct10dif_pclmul crc32_pclmul ghash_clmulni_intel pcspkr i2c_piix4 
-virtio_balloon virtio_net acpi_cpufreq sch_fq_codel virtio_blk virtio_console 
-crc32c_intel serio_raw virtio_pci virtio_ring virtio [last unloaded: 
-algif_aead]
-[ 3417.582004] CPU: 0 PID: 13092 Comm: kcapi Tainted: G      D     E   4.10.0-
-rc3+ #371
-[ 3417.582004] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 
-1.9.3-1.fc25 04/01/2014
-[ 3417.582004] task: ffff931bfbd55940 task.stack: ffffa53e008ec000
-[ 3417.582004] RIP: 0010:skcipher_walk_skcipher+0x18/0xc0
-[ 3417.582004] RSP: 0018:ffffa53e008efb60 EFLAGS: 00010246
-[ 3417.582004] RAX: 0000000000000000 RBX: ffffa53e008efba0 RCX: 
-0000000000000000
-[ 3417.582004] RDX: ffff931bfa70f828 RSI: ffff931bfb0b7c28 RDI: 
-ffffa53e008efba0
-[ 3417.582004] RBP: ffffa53e008efb80 R08: 0000000000000000 R09: 
-0000000000000000
-[ 3417.582004] R10: ffffffffab809f80 R11: ffff931bfb0b7ca8 R12: 
-0000000000000001
-[ 3417.582004] R13: ffff931bfb0b7c28 R14: ffff931bfb2a0548 R15: 
-0000000000000000
-[ 3417.582004] FS:  00007f0f47460700(0000) GS:ffff931bffc00000(0000) knlGS:
-0000000000000000
-[ 3417.582004] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[ 3417.582004] CR2: 0000000000000008 CR3: 000000007b113000 CR4: 
-00000000003406f0
-[ 3417.582004] Call Trace:
-[ 3417.582004]  ? skcipher_walk_virt+0x1e/0x40
-[ 3417.582004]  cbc_decrypt+0x31/0xa0
-[ 3417.582004]  ? sha1_avx2_finup+0x15/0x20
-[ 3417.582004]  ? crypto_shash_finup+0x1f/0x30
-[ 3417.582004]  ? hmac_finup+0x9b/0xb0
-[ 3417.582004]  ? shash_ahash_finup+0x43/0x90
-[ 3417.582004]  ? shash_ahash_digest+0xf0/0xf0
-[ 3417.582004]  simd_skcipher_decrypt+0xb7/0xc0
-[ 3417.582004]  crypto_authenc_decrypt_tail.isra.3+0xf0/0x100 [authenc]
-[ 3417.582004]  crypto_authenc_decrypt+0x87/0x90 [authenc]
-[ 3417.582004]  aead_recvmsg+0x633/0x650 [algif_aead]
-[ 3417.582004]  ? selinux_socket_recvmsg+0x23/0x30
-[ 3417.582004]  ? security_socket_recvmsg+0x4b/0x70
-[ 3417.582004]  sock_recvmsg+0x3d/0x50
-[ 3417.582004]  sock_read_iter+0x86/0xc0
-[ 3417.582004]  __vfs_read+0xbf/0x110
-[ 3417.582004]  vfs_read+0x96/0x130
-[ 3417.582004]  SyS_read+0x46/0xa0
-[ 3417.582004]  entry_SYSCALL_64_fastpath+0x1e/0xad
-[ 3417.582004] RIP: 0033:0x7f0f46f77bd0
-[ 3417.582004] RSP: 002b:00007ffed6bbd278 EFLAGS: 00000246 ORIG_RAX: 
-0000000000000000
-[ 3417.582004] RAX: ffffffffffffffda RBX: 0000000000000006 RCX: 
-00007f0f46f77bd0
-[ 3417.582004] RDX: 0000000000001000 RSI: 00007ffed6bbe330 RDI: 
-0000000000000006
-[ 3417.582004] RBP: 00007ffed6bbbfa0 R08: 00000000025c6530 R09: 
-0000000000000000
-[ 3417.582004] R10: 0000000000000001 R11: 0000000000000246 R12: 
-00007ffed6bbc1f8
-[ 3417.582004] R13: 00007ffed6bbbf10 R14: 00007ffed6bbf4d0 R15: 
-0000000000000000
-[ 3417.582004] Code: ff ff ff e9 16 ff ff ff 90 66 2e 0f 1f 84 00 00 00 00 00 
-0f 1f 44 00 00 48 8b 46 10 48 8b 56 40 55 8b 8f 84 00 00 00 48 89 47 20 <8b> 
-40 08 48 89 e5 83 e1 ef 89 47 28 48 8b 46 18 48 89 47 38 8b 
-[ 3417.582004] RIP: skcipher_walk_skcipher+0x18/0xc0 RSP: ffffa53e008efb60
-[ 3417.582004] CR2: 0000000000000008
-[ 3417.582004] ---[ end trace 2a142ea12ab5141a ]---
+			err =3D crypto_grab_skcipher(&ctx->spawn, ctx->name, 0,
+						   crypto_requires_sync(algt->type,
+									algt->mask));
+		}
+	...
+
+Then when the aes_s390 driver tries to allocate its fallback based on
+its name ("xts(aes)"), the xts template will first look for an skcipher
+"aes" algorithm, that doesn't exist. And because of that
+crypto_larval_lookup will try to load the correspondent alias. Also,
+since the template does not use the requested flag
+CRYPTO_ALG_NEED_FALLBACK when it selects the underline algorithm, the
+-all alias is also requested.
+
+A simple workaround is to try the ecb algorithm before the original
+algorithm. However this still can lead to the same problem when no ecb
+implementation is available, not even by the driver itself.
+
+Another improvement that can be useful is to honor the requested
+CRYPTO_ALG_NEED_FALLBACK flag when selecting the underline algorithm.
+It's very likely that the aes_s390 driver will end up using the
+following chain of fallback algorithms:
+
+xts-aes-s390 -> xts(ecb-aes-s390) -> xts(ecb(aes-s390)) ->
+xts(ecb(aes-generic))
+
+A similar scenario occurs for the vmx-crypto driver.
+
+>=20
+> You could also print out the type/mask in crypto_larval_lookup
+> to see if perhaps the caller is asking for something unreasonable.
+>=20
+> Thanks,
+> --=20
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/1111
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
+--=20
+Regards,
+Marcelo
 
 
-Ciao
-Stephan
+--GvXjxJ+pjyke8COw
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEcBAABCAAGBQJYsMVAAAoJEM8aS8c01e1HnvkH/Rtr3yRt9r2hUXPluD3RFa9E
+Let5KoJEOFUGb+ScITFkplqzX8QK/7RMITC2Z6f0YlAFEQCq1TxQu1S6Ho+61K0h
+DN5rkj8aAkN1Nvj7uFl0lVT/GfEfdhD2m/tKWKbadOYOfvF/3EwMV9yzrlS4OFkq
+JVaYv49zf/Y8pF5bHdeXRyudwGDOMyrdGOmLIi5RNrJGMJGvYCeifwOsj+41d5+C
+uos0pxQILb0z9lXlKs0wAQevaVjsQL7695PISX080AEs5yyCkP+klc2jx4hOHZ0p
+MS8SBGEtQ16N5CQJKPR0564R/xaEchSTY7CPypeBfxY3PNhf9PE/YEQEqGjORbE=
+=AF3m
+-----END PGP SIGNATURE-----
+
+--GvXjxJ+pjyke8COw--
