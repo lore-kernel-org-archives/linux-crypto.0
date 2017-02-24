@@ -1,128 +1,114 @@
-From: Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>
-Subject: [PATCH v2 2/2] crypto: vmx - Use skcipher for xts fallback
-Date: Fri, 24 Feb 2017 11:27:34 -0300
-Message-ID: <20170224142734.16188-1-pfsmorigo@linux.vnet.ibm.com>
-References: <20170222192004.GC20626@gallifrey>
-Cc: benh@kernel.crashing.org, paulus@samba.org, mpe@ellerman.id.au,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>
-To: linux-kernel@vger.kernel.org
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: authenc: crash if key is not set
+Date: Fri, 24 Feb 2017 21:24:34 +0100
+Message-ID: <13796038.esLDiIrSPd@positron.chronox.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45408 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1751298AbdBXO2X (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 24 Feb 2017 09:28:23 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id v1OEOiRa098959
-        for <linux-crypto@vger.kernel.org>; Fri, 24 Feb 2017 09:28:22 -0500
-Received: from e24smtp01.br.ibm.com (e24smtp01.br.ibm.com [32.104.18.85])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 28teq1ube1-1
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Fri, 24 Feb 2017 09:28:22 -0500
-Received: from localhost
-        by e24smtp01.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-crypto@vger.kernel.org> from <pfsmorigo@linux.vnet.ibm.com>;
-        Fri, 24 Feb 2017 11:28:20 -0300
-In-Reply-To: <20170222192004.GC20626@gallifrey>
+Received: from mail.eperm.de ([89.247.134.16]:59788 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751232AbdBXUYo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 24 Feb 2017 15:24:44 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Signed-off-by: Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>
----
- drivers/crypto/vmx/aes_xts.c | 30 +++++++++++++++---------------
- 1 file changed, 15 insertions(+), 15 deletions(-)
+Hi Herbert,
 
-diff --git a/drivers/crypto/vmx/aes_xts.c b/drivers/crypto/vmx/aes_xts.c
-index 24353ec3..a1e653a 100644
---- a/drivers/crypto/vmx/aes_xts.c
-+++ b/drivers/crypto/vmx/aes_xts.c
-@@ -28,11 +28,12 @@
- #include <crypto/aes.h>
- #include <crypto/scatterwalk.h>
- #include <crypto/xts.h>
-+#include <crypto/skcipher.h>
- 
- #include "aesp8-ppc.h"
- 
- struct p8_aes_xts_ctx {
--	struct crypto_blkcipher *fallback;
-+	struct crypto_skcipher *fallback;
- 	struct aes_key enc_key;
- 	struct aes_key dec_key;
- 	struct aes_key tweak_key;
-@@ -41,7 +42,7 @@ struct p8_aes_xts_ctx {
- static int p8_aes_xts_init(struct crypto_tfm *tfm)
- {
- 	const char *alg;
--	struct crypto_blkcipher *fallback;
-+	struct crypto_skcipher *fallback;
- 	struct p8_aes_xts_ctx *ctx = crypto_tfm_ctx(tfm);
- 
- 	if (!(alg = crypto_tfm_alg_name(tfm))) {
-@@ -49,8 +50,8 @@ static int p8_aes_xts_init(struct crypto_tfm *tfm)
- 		return -ENOENT;
- 	}
- 
--	fallback =
--		crypto_alloc_blkcipher(alg, 0, CRYPTO_ALG_NEED_FALLBACK);
-+	fallback = crypto_alloc_skcipher(alg, 0,
-+			CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK);
- 	if (IS_ERR(fallback)) {
- 		printk(KERN_ERR
- 			"Failed to allocate transformation for '%s': %ld\n",
-@@ -60,9 +61,9 @@ static int p8_aes_xts_init(struct crypto_tfm *tfm)
- 	printk(KERN_INFO "Using '%s' as fallback implementation.\n",
- 		crypto_tfm_alg_driver_name((struct crypto_tfm *) fallback));
- 
--	crypto_blkcipher_set_flags(
-+	crypto_skcipher_set_flags(
- 		fallback,
--		crypto_blkcipher_get_flags((struct crypto_blkcipher *)tfm));
-+		crypto_skcipher_get_flags((struct crypto_skcipher *)tfm));
- 	ctx->fallback = fallback;
- 
- 	return 0;
-@@ -73,7 +74,7 @@ static void p8_aes_xts_exit(struct crypto_tfm *tfm)
- 	struct p8_aes_xts_ctx *ctx = crypto_tfm_ctx(tfm);
- 
- 	if (ctx->fallback) {
--		crypto_free_blkcipher(ctx->fallback);
-+		crypto_free_skcipher(ctx->fallback);
- 		ctx->fallback = NULL;
- 	}
- }
-@@ -98,7 +99,7 @@ static int p8_aes_xts_setkey(struct crypto_tfm *tfm, const u8 *key,
- 	pagefault_enable();
- 	preempt_enable();
- 
--	ret += crypto_blkcipher_setkey(ctx->fallback, key, keylen);
-+	ret += crypto_skcipher_setkey(ctx->fallback, key, keylen);
- 	return ret;
- }
- 
-@@ -113,15 +114,14 @@ static int p8_aes_xts_crypt(struct blkcipher_desc *desc,
- 	struct blkcipher_walk walk;
- 	struct p8_aes_xts_ctx *ctx =
- 		crypto_tfm_ctx(crypto_blkcipher_tfm(desc->tfm));
--	struct blkcipher_desc fallback_desc = {
--		.tfm = ctx->fallback,
--		.info = desc->info,
--		.flags = desc->flags
--	};
- 
- 	if (in_interrupt()) {
--		ret = enc ? crypto_blkcipher_encrypt(&fallback_desc, dst, src, nbytes) :
--                            crypto_blkcipher_decrypt(&fallback_desc, dst, src, nbytes);
-+		SKCIPHER_REQUEST_ON_STACK(req, ctx->fallback);
-+		skcipher_request_set_tfm(req, ctx->fallback);
-+		skcipher_request_set_callback(req, desc->flags, NULL, NULL);
-+		skcipher_request_set_crypt(req, src, dst, nbytes, desc->info);
-+		ret = enc? crypto_skcipher_encrypt(req) : crypto_skcipher_decrypt(req);
-+		skcipher_request_zero(req);
- 	} else {
- 		preempt_disable();
- 		pagefault_disable();
--- 
-2.7.4
+I am working on fuzzing the AF_ALG interface.
+
+The fuzzer reliably triggered the following type of bug when I use 
+authenc(hmac(sha256),cbc(aes)) or other types of authenc() but do not call 
+setkey.
+
+Note, it works with gcm or ccm.
+
+Is that bug similar in nature as the algif_skcipher and algif_hash bugs that 
+were fixed with the *nokey functions?
+
+[ 3417.581670] BUG: unable to handle kernel NULL pointer dereference at 
+0000000000000008
+[ 3417.582004] IP: skcipher_walk_skcipher+0x18/0xc0
+[ 3417.582004] PGD 7a487067 
+[ 3417.582004] PUD 7b1a5067 
+[ 3417.582004] PMD 0 
+
+[ 3417.582004] Oops: 0000 [#13] SMP
+[ 3417.582004] Modules linked in: algif_aead authenc ansi_cprng algif_rng ccm 
+gcm crypto_user des3_ede_x86_64 des_generic algif_hash algif_akcipher(E) 
+algif_skcipher(E) af_alg ip6t_rpfilter ip6t_REJECT nf_reject_ipv6 
+nf_conntrack_ipv6 nf_defrag_ipv6 nf_conntrack_ipv4 nf_defrag_ipv4 xt_conntrack 
+nf_conntrack ip_set nfnetlink ebtable_broute bridge stp llc ebtable_nat 
+ip6table_raw ip6table_security ip6table_mangle iptable_raw iptable_security 
+iptable_mangle ebtable_filter ebtables ip6table_filter ip6_tables 
+crct10dif_pclmul crc32_pclmul ghash_clmulni_intel pcspkr i2c_piix4 
+virtio_balloon virtio_net acpi_cpufreq sch_fq_codel virtio_blk virtio_console 
+crc32c_intel serio_raw virtio_pci virtio_ring virtio [last unloaded: 
+algif_aead]
+[ 3417.582004] CPU: 0 PID: 13092 Comm: kcapi Tainted: G      D     E   4.10.0-
+rc3+ #371
+[ 3417.582004] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 
+1.9.3-1.fc25 04/01/2014
+[ 3417.582004] task: ffff931bfbd55940 task.stack: ffffa53e008ec000
+[ 3417.582004] RIP: 0010:skcipher_walk_skcipher+0x18/0xc0
+[ 3417.582004] RSP: 0018:ffffa53e008efb60 EFLAGS: 00010246
+[ 3417.582004] RAX: 0000000000000000 RBX: ffffa53e008efba0 RCX: 
+0000000000000000
+[ 3417.582004] RDX: ffff931bfa70f828 RSI: ffff931bfb0b7c28 RDI: 
+ffffa53e008efba0
+[ 3417.582004] RBP: ffffa53e008efb80 R08: 0000000000000000 R09: 
+0000000000000000
+[ 3417.582004] R10: ffffffffab809f80 R11: ffff931bfb0b7ca8 R12: 
+0000000000000001
+[ 3417.582004] R13: ffff931bfb0b7c28 R14: ffff931bfb2a0548 R15: 
+0000000000000000
+[ 3417.582004] FS:  00007f0f47460700(0000) GS:ffff931bffc00000(0000) knlGS:
+0000000000000000
+[ 3417.582004] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 3417.582004] CR2: 0000000000000008 CR3: 000000007b113000 CR4: 
+00000000003406f0
+[ 3417.582004] Call Trace:
+[ 3417.582004]  ? skcipher_walk_virt+0x1e/0x40
+[ 3417.582004]  cbc_decrypt+0x31/0xa0
+[ 3417.582004]  ? sha1_avx2_finup+0x15/0x20
+[ 3417.582004]  ? crypto_shash_finup+0x1f/0x30
+[ 3417.582004]  ? hmac_finup+0x9b/0xb0
+[ 3417.582004]  ? shash_ahash_finup+0x43/0x90
+[ 3417.582004]  ? shash_ahash_digest+0xf0/0xf0
+[ 3417.582004]  simd_skcipher_decrypt+0xb7/0xc0
+[ 3417.582004]  crypto_authenc_decrypt_tail.isra.3+0xf0/0x100 [authenc]
+[ 3417.582004]  crypto_authenc_decrypt+0x87/0x90 [authenc]
+[ 3417.582004]  aead_recvmsg+0x633/0x650 [algif_aead]
+[ 3417.582004]  ? selinux_socket_recvmsg+0x23/0x30
+[ 3417.582004]  ? security_socket_recvmsg+0x4b/0x70
+[ 3417.582004]  sock_recvmsg+0x3d/0x50
+[ 3417.582004]  sock_read_iter+0x86/0xc0
+[ 3417.582004]  __vfs_read+0xbf/0x110
+[ 3417.582004]  vfs_read+0x96/0x130
+[ 3417.582004]  SyS_read+0x46/0xa0
+[ 3417.582004]  entry_SYSCALL_64_fastpath+0x1e/0xad
+[ 3417.582004] RIP: 0033:0x7f0f46f77bd0
+[ 3417.582004] RSP: 002b:00007ffed6bbd278 EFLAGS: 00000246 ORIG_RAX: 
+0000000000000000
+[ 3417.582004] RAX: ffffffffffffffda RBX: 0000000000000006 RCX: 
+00007f0f46f77bd0
+[ 3417.582004] RDX: 0000000000001000 RSI: 00007ffed6bbe330 RDI: 
+0000000000000006
+[ 3417.582004] RBP: 00007ffed6bbbfa0 R08: 00000000025c6530 R09: 
+0000000000000000
+[ 3417.582004] R10: 0000000000000001 R11: 0000000000000246 R12: 
+00007ffed6bbc1f8
+[ 3417.582004] R13: 00007ffed6bbbf10 R14: 00007ffed6bbf4d0 R15: 
+0000000000000000
+[ 3417.582004] Code: ff ff ff e9 16 ff ff ff 90 66 2e 0f 1f 84 00 00 00 00 00 
+0f 1f 44 00 00 48 8b 46 10 48 8b 56 40 55 8b 8f 84 00 00 00 48 89 47 20 <8b> 
+40 08 48 89 e5 83 e1 ef 89 47 28 48 8b 46 18 48 89 47 38 8b 
+[ 3417.582004] RIP: skcipher_walk_skcipher+0x18/0xc0 RSP: ffffa53e008efb60
+[ 3417.582004] CR2: 0000000000000008
+[ 3417.582004] ---[ end trace 2a142ea12ab5141a ]---
+
+
+Ciao
+Stephan
