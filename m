@@ -1,96 +1,79 @@
-From: <delaware.orders@nationalcorp.com>
-Subject: 56836 linux-crypto
-Date: Sun, 26 Feb 2017 01:57:26 -0000
-Message-ID: <148807424631.30105.1944560509768943320@zaural.ru>
-Reply-To: <delaware.orders@nationalcorp.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [v2 PATCH] crypto: xts - Propagate NEED_FALLBACK bit
+Date: Sun, 26 Feb 2017 12:24:10 +0800
+Message-ID: <20170226042410.GA29329@gondor.apana.org.au>
+References: <02b80c39-0fd5-b7bd-39da-07e5d71abbad@linux.vnet.ibm.com>
+ <20170223111957.GA14000@gondor.apana.org.au>
+ <20170223113909.GA14090@gondor.apana.org.au>
+ <20170224234400.GA2758@gallifrey>
+ <20170225151707.GA28667@gondor.apana.org.au>
+ <20170225192022.GA18004@gallifrey>
+ <20170226042235.GA29266@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: application/zip; name="10542721.zip"
-Content-Transfer-Encoding: base64
-To: "linux-crypto" <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Harald Freudenberger <freude@linux.vnet.ibm.com>,
+        linux-crypto@vger.kernel.org, schwidefsky@de.ibm.com
+To: Marcelo Cerri <marcelo.cerri@canonical.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ws49.247.50.zone94.zaural.ru ([94.50.247.49]:55645 "HELO
-        zaural.ru" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with SMTP
-        id S1751889AbdBZB6B (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 25 Feb 2017 20:58:01 -0500
-Content-Disposition: attachment
+Received: from helcar.hengli.com.au ([209.40.204.226]:36911 "EHLO
+        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1750923AbdBZEYY (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 25 Feb 2017 23:24:24 -0500
+Content-Disposition: inline
+In-Reply-To: <20170226042235.GA29266@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-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
+When we're used as a fallback algorithm, we should propagate
+the NEED_FALLBACK bit when searching for the underlying ECB mode.
+
+This just happens to fix a hang too because otherwise the search
+may end up loading the same module that triggered this XTS creation.
+
+Fixes: f1c131b45410 ("crypto: xts - Convert to skcipher")
+Reported-by: Harald Freudenberger <freude@linux.vnet.ibm.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/crypto/xts.c b/crypto/xts.c
+index 410a2e2..baeb34d 100644
+--- a/crypto/xts.c
++++ b/crypto/xts.c
+@@ -463,6 +463,7 @@ static int create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	struct xts_instance_ctx *ctx;
+ 	struct skcipher_alg *alg;
+ 	const char *cipher_name;
++	u32 mask;
+ 	int err;
+ 
+ 	algt = crypto_get_attr_type(tb);
+@@ -483,18 +484,19 @@ static int create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	ctx = skcipher_instance_ctx(inst);
+ 
+ 	crypto_set_skcipher_spawn(&ctx->spawn, skcipher_crypto_instance(inst));
+-	err = crypto_grab_skcipher(&ctx->spawn, cipher_name, 0,
+-				   crypto_requires_sync(algt->type,
+-							algt->mask));
++
++	mask = crypto_requires_off(algt->type, algt->mask,
++				   CRYPTO_ALG_NEED_FALLBACK |
++				   CRYPTO_ALG_ASYNC);
++
++	err = crypto_grab_skcipher(&ctx->spawn, cipher_name, 0, mask);
+ 	if (err == -ENOENT) {
+ 		err = -ENAMETOOLONG;
+ 		if (snprintf(ctx->name, CRYPTO_MAX_ALG_NAME, "ecb(%s)",
+ 			     cipher_name) >= CRYPTO_MAX_ALG_NAME)
+ 			goto err_free_inst;
+ 
+-		err = crypto_grab_skcipher(&ctx->spawn, ctx->name, 0,
+-					   crypto_requires_sync(algt->type,
+-								algt->mask));
++		err = crypto_grab_skcipher(&ctx->spawn, ctx->name, 0, mask);
+ 	}
+ 
+ 	if (err)
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
