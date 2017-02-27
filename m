@@ -1,32 +1,29 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/2] crypto: CRYPTO_DEV_ATMEL_TDES and
- CRYPTO_DEV_ATMEL_SHA should depend on HAS_DMA
-Date: Mon, 27 Feb 2017 18:37:56 +0800
-Message-ID: <20170227103756.GC31739@gondor.apana.org.au>
-References: <1487932059-31522-1-git-send-email-geert@linux-m68k.org>
+Subject: Re: [PATCH] crypto: cavium: fix leak on curr if curr->head fails to
+ be allocated
+Date: Mon, 27 Feb 2017 18:37:40 +0800
+Message-ID: <20170227103740.GB31739@gondor.apana.org.au>
+References: <20170217155743.31525-1-colin.king@canonical.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S . Miller" <davem@davemloft.net>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: George Cherian <george.cherian@cavium.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Colin King <colin.king@canonical.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1487932059-31522-1-git-send-email-geert@linux-m68k.org>
+In-Reply-To: <20170217155743.31525-1-colin.king@canonical.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Feb 24, 2017 at 11:27:38AM +0100, Geert Uytterhoeven wrote:
-> If NO_DMA=y:
+On Fri, Feb 17, 2017 at 03:57:43PM +0000, Colin King wrote:
+> From: Colin Ian King <colin.king@canonical.com>
 > 
->     ERROR: "bad_dma_ops" [drivers/crypto/atmel-tdes.ko] undefined!
->     ERROR: "bad_dma_ops" [drivers/crypto/atmel-sha.ko] undefined!
+> The exit path when curr->head cannot be allocated fails to kfree the
+> earlier allocated curr.  Fix this by kfree'ing it.
 > 
-> Add dependencies on HAS_DMA to fix this.
-> 
-> Fixes: ceb4afb3086ab08f ("crypto: atmel - refine Kconfig dependencies")
-> Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> Signed-off-by: Colin Ian King <colin.king@canonical.com>
 
 Patch applied.  Thanks.
 -- 
