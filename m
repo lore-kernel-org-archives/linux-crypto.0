@@ -1,57 +1,47 @@
-From: Neil Armstrong <narmstrong@baylibre.com>
-Subject: Re: [PATCH v3 1/3] clk: meson-gxbb: expose clock CLKID_RNG0
-Date: Mon, 27 Feb 2017 05:28:49 -0800
-Message-ID: <80bc00c9-dc3b-5aeb-89a0-8b427dca9b34@baylibre.com>
-References: <4e2d12e5-f75b-3ac6-a3f7-18e8a8b7283b@gmail.com>
+From: Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH v5 4/4] dt-bindings: Add DT bindings document for
+ Broadcom SBA RAID driver
+Date: Mon, 27 Feb 2017 08:47:38 -0600
+Message-ID: <20170227144738.szmppcir6bvav4bb@rob-hp-laptop>
+References: <1487227695-965-1-git-send-email-anup.patel@broadcom.com>
+ <1487227695-965-5-git-send-email-anup.patel@broadcom.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: linux-clk@vger.kernel.org, devicetree@vger.kernel.org
-To: Heiner Kallweit <hkallweit1@gmail.com>,
-        Jerome Brunet <jbrunet@baylibre.com>,
-        Kevin Hilman <khilman@baylibre.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-amlogic@lists.infradead.org, linux-crypto@vger.kernel.org,
-        Stephen Boyd <sboyd@codeaurora.org>,
-        Michael Turquette <mturquette@baylibre.com>
-Return-path: <linux-clk-owner@vger.kernel.org>
-In-Reply-To: <4e2d12e5-f75b-3ac6-a3f7-18e8a8b7283b@gmail.com>
-Sender: linux-clk-owner@vger.kernel.org
+Cc: Mark Rutland <mark.rutland@arm.com>, devicetree@vger.kernel.org,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ Scott Branden <sbranden@broadcom.com>, Vinod Koul <vinod.koul@intel.com>,
+ Ray Jui <rjui@broadcom.com>, Jassi Brar <jassisinghbrar@gmail.com>,
+ linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
+ Jon Mason <jonmason@broadcom.com>, bcm-kernel-feedback-list@broadcom.com,
+ linux-crypto@vger.kernel.org, Rob Rice <rob.rice@broadcom.com>,
+ dmaengine@vger.kernel.org, Dan Williams <dan.j.williams@intel.com>,
+ "David S . Miller" <davem@davemloft.net>, linux-arm-kernel@lists.infradead.org
+To: Anup Patel <anup.patel@broadcom.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <1487227695-965-5-git-send-email-anup.patel@broadcom.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 02/21/2017 10:55 PM, Heiner Kallweit wrote:
-> Expose clock CLKID_RNG0 which is needed for the HW random number generator.
+On Thu, Feb 16, 2017 at 12:18:15PM +0530, Anup Patel wrote:
+> This patch adds the DT bindings document for newly added Broadcom
+> SBA RAID driver.
 > 
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> Signed-off-by: Anup Patel <anup.patel@broadcom.com>
+> Reviewed-by: Ray Jui <ray.jui@broadcom.com>
+> Reviewed-by: Scott Branden <scott.branden@broadcom.com>
 > ---
-> v2:
-> - added clk and DT maintainers
-> - split exposing the clock and using it in DT into two patches
-> - comment out clock definition in drivers/clk/meson/gxbb.h
-> - silently move CLKID_SPI to the right place
-> v3:
-> - no changes
-> ---
->  drivers/clk/meson/gxbb.h              | 2 +-
->  include/dt-bindings/clock/gxbb-clkc.h | 3 ++-
->  2 files changed, 3 insertions(+), 2 deletions(-)
-> 
+>  .../devicetree/bindings/dma/brcm,iproc-sba.txt     | 29 ++++++++++++++++++++++
+>  1 file changed, 29 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/dma/brcm,iproc-sba.txt
 
-
-Hi Heiner,
-
-This looks all good to me, but you should always send a cover letter for each revisions
-of the patchset.
-
-Using "git send-email" along the "--cover-letter" of "get format-patch" feature would
-also help send them in a row with a up-to-date cover letter.
-
-For the third patch, it may be good to also add the same to the GXL dtsi, no ?
-
-Anyway :
-
-Reviewed-by: Neil Armstrong <narmstrong@baylibre.com>
-
-Thanks,
-Neil
-
+Acked-by: Rob Herring <robh@kernel.org>
