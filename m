@@ -1,36 +1,31 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: cavium/cpt: Fix couple of static checker errors
-Date: Mon, 27 Feb 2017 18:36:59 +0800
-Message-ID: <20170227103659.GA31739@gondor.apana.org.au>
-References: <1487162539-29269-1-git-send-email-george.cherian@cavium.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, dan.carpenter@oracle.com,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: George Cherian <george.cherian@cavium.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:32869 "EHLO
-        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751620AbdB0K7S (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 Feb 2017 05:59:18 -0500
-Content-Disposition: inline
-In-Reply-To: <1487162539-29269-1-git-send-email-george.cherian@cavium.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
+Subject: [PATCH v2 0/2] Propagate fallback bit for cbc and ctr
+Date: Mon, 27 Feb 2017 09:38:24 -0300
+Message-ID: <1488199106-16061-1-git-send-email-marcelo.cerri@canonical.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Feb 15, 2017 at 12:42:19PM +0000, George Cherian wrote:
-> Fix the following smatch errors
-> cptvf_reqmanager.c:333 do_post_process() warn: variable dereferenced
-> before check 'cptvf'
-> cptvf_main.c:825 cptvf_remove() error: we previously assumed 'cptvf'
-> could be null
-> 
-> Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
-> Signed-off-by: George Cherian <george.cherian@cavium.com>
+Hi Hebert,
 
-Patch applied.  Thanks.
+For v2:
+
+- fixed the memory leakage in cbc.
+- included crypto/algapi.h in crypto/cbc.c for crypto_requires_off();
+- ERR_CAST instead PTR_ERR in ctr.
+- Also propagated the fallback bit for rfc3686.
+
+Marcelo Henrique Cerri (2):
+  crypto: cbc - Propagate NEED_FALLBACK bit
+  crypto: ctr - Propagate NEED_FALLBACK bit
+
+ crypto/cbc.c | 15 +++++++++++++--
+ crypto/ctr.c | 23 ++++++++++++++++++-----
+ 2 files changed, 31 insertions(+), 7 deletions(-)
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.7.4
