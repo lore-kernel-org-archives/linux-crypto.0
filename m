@@ -1,29 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: cavium: fix leak on curr if curr->head fails to
- be allocated
-Date: Mon, 27 Feb 2017 18:37:40 +0800
-Message-ID: <20170227103740.GB31739@gondor.apana.org.au>
-References: <20170217155743.31525-1-colin.king@canonical.com>
+Subject: Re: [PATCH] crypto: cavium/cpt: Fix couple of static checker errors
+Date: Mon, 27 Feb 2017 18:36:59 +0800
+Message-ID: <20170227103659.GA31739@gondor.apana.org.au>
+References: <1487162539-29269-1-git-send-email-george.cherian@cavium.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: George Cherian <george.cherian@cavium.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: Colin King <colin.king@canonical.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: davem@davemloft.net, dan.carpenter@oracle.com,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: George Cherian <george.cherian@cavium.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:32869 "EHLO
+        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1751620AbdB0K7S (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 27 Feb 2017 05:59:18 -0500
 Content-Disposition: inline
-In-Reply-To: <20170217155743.31525-1-colin.king@canonical.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1487162539-29269-1-git-send-email-george.cherian@cavium.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Feb 17, 2017 at 03:57:43PM +0000, Colin King wrote:
-> From: Colin Ian King <colin.king@canonical.com>
+On Wed, Feb 15, 2017 at 12:42:19PM +0000, George Cherian wrote:
+> Fix the following smatch errors
+> cptvf_reqmanager.c:333 do_post_process() warn: variable dereferenced
+> before check 'cptvf'
+> cptvf_main.c:825 cptvf_remove() error: we previously assumed 'cptvf'
+> could be null
 > 
-> The exit path when curr->head cannot be allocated fails to kfree the
-> earlier allocated curr.  Fix this by kfree'ing it.
-> 
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
+> Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
+> Signed-off-by: George Cherian <george.cherian@cavium.com>
 
 Patch applied.  Thanks.
 -- 
