@@ -1,96 +1,132 @@
-From: Laura Abbott <labbott@redhat.com>
-Subject: [PATCH] crypto: Pad aes_ccm_enc_tv_template vector
-Date: Tue, 28 Feb 2017 14:07:25 -0800
-Message-ID: <1488319645-29129-1-git-send-email-labbott@redhat.com>
-Cc: Laura Abbott <labbott@redhat.com>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: Re: Problem with RSA test from testmgr
+Date: Tue, 28 Feb 2017 23:35:04 +0100
+Message-ID: <9482066.IEBbAWS9B8@positron.chronox.de>
+References: <20170228155953.GA1732@Red> <1836837.jAzr4JNxJu@tauon.atsec.com> <20170228164553.GA2155@Red>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8BIT
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Corentin Labbe <clabbe.montjoie@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-qk0-f172.google.com ([209.85.220.172]:36861 "EHLO
-        mail-qk0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751767AbdB1WQH (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Feb 2017 17:16:07 -0500
-Received: by mail-qk0-f172.google.com with SMTP id n186so40540573qkb.3
-        for <linux-crypto@vger.kernel.org>; Tue, 28 Feb 2017 14:15:56 -0800 (PST)
+Received: from mail.eperm.de ([89.247.134.16]:35508 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751552AbdB1Wfg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 28 Feb 2017 17:35:36 -0500
+In-Reply-To: <20170228164553.GA2155@Red>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Running with KASAN and crypto tests currently gives
+Am Dienstag, 28. Februar 2017, 17:45:53 CET schrieb Corentin Labbe:
 
- BUG: KASAN: global-out-of-bounds in __test_aead+0x9d9/0x2200 at addr ffffffff8212fca0
- Read of size 16 by task cryptomgr_test/1107
- Address belongs to variable 0xffffffff8212fca0
- CPU: 0 PID: 1107 Comm: cryptomgr_test Not tainted 4.10.0+ #45
- Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.9.1-1.fc24 04/01/2014
- Call Trace:
-  dump_stack+0x63/0x8a
-  kasan_report.part.1+0x4a7/0x4e0
-  ? __test_aead+0x9d9/0x2200
-  ? crypto_ccm_init_crypt+0x218/0x3c0 [ccm]
-  kasan_report+0x20/0x30
-  check_memory_region+0x13c/0x1a0
-  memcpy+0x23/0x50
-  __test_aead+0x9d9/0x2200
-  ? kasan_unpoison_shadow+0x35/0x50
-  ? alg_test_akcipher+0xf0/0xf0
-  ? crypto_skcipher_init_tfm+0x2e3/0x310
-  ? crypto_spawn_tfm2+0x37/0x60
-  ? crypto_ccm_init_tfm+0xa9/0xd0 [ccm]
-  ? crypto_aead_init_tfm+0x7b/0x90
-  ? crypto_alloc_tfm+0xc4/0x190
-  test_aead+0x28/0xc0
-  alg_test_aead+0x54/0xd0
-  alg_test+0x1eb/0x3d0
-  ? alg_find_test+0x90/0x90
-  ? __sched_text_start+0x8/0x8
-  ? __wake_up_common+0x70/0xb0
-  cryptomgr_test+0x4d/0x60
-  kthread+0x173/0x1c0
-  ? crypto_acomp_scomp_free_ctx+0x60/0x60
-  ? kthread_create_on_node+0xa0/0xa0
-  ret_from_fork+0x2c/0x40
- Memory state around the buggy address:
-  ffffffff8212fb80: 00 00 00 00 01 fa fa fa fa fa fa fa 00 00 00 00
-  ffffffff8212fc00: 00 01 fa fa fa fa fa fa 00 00 00 00 01 fa fa fa
- >ffffffff8212fc80: fa fa fa fa 00 05 fa fa fa fa fa fa 00 00 00 00
-                                   ^
-  ffffffff8212fd00: 01 fa fa fa fa fa fa fa 00 00 00 00 01 fa fa fa
-  ffffffff8212fd80: fa fa fa fa 00 00 00 00 00 05 fa fa fa fa fa fa
+Hi Corentin,
 
-This always happens on the same IV which is less than 16 bytes.
+> On Tue, Feb 28, 2017 at 05:08:35PM +0100, Stephan Müller wrote:
+> > Am Dienstag, 28. Februar 2017, 16:59:53 CET schrieb Corentin Labbe:
+> > 
+> > Hi Corentin,
+> > 
+> > > hello
+> > > 
+> > > I work on the sun8i-ce crypto accelerator and I have some problem with
+> > > the
+> > > RSA part.
+> > > 
+> > > The RSA register fail at the first RSA test (encrypt 512bit) with this
+> > > output: [ 8480.146843] alg: akcipher: encrypt test failed. Invalid
+> > > output
+> > > [ 8480.146871] 00000000: 6e 7c 8a 75 e7 30 80 d1 5e ab 9b db a2 cf ed db
+> > > [ 8480.146897] 00000010: c9 b2 db 43 bd 9a b9 75 27 f3 73 d9 73 b7 81 8c
+> > > [ 8480.146921] 00000020: 49 e8 45 fc 43 44 f5 6d f0 f7 b8 f2 ae 6b ae 49
+> > > [ 8480.146946] 00000030: 1b 8e 50 c6 88 4e 99 09 78 14 f2 5d 99 c3 7f f9
+> > > [ 8480.146995] alg: akcipher: test 1 failed for rsa-sun8i-ce, err=-22
+> > > 
+> > > But with the same parameters (msg, n, e) openssl give me exactly this
+> > > output.
+> > > 
+> > > So what I miss for made it work ?
+> > > In which format testmgr expect the output data ?
+> > 
+> > The output should be simply the binary string from the modular
+> > exponentiation operation.
+> > 
+> > What I am wondering is: the output logged above is not found in the
+> > expected values of testmgr.h. Which input data or test vectors do you
+> > use?
+> > 
+> > Ciao
+> > Stephan
+> 
+> I use the first test from rsa_tv_template in crypto/testmgr.h
+> The test fail on the encrypt operation.
+> 
+> I have put below the openssl program that give me the same output than my
+> hardware accelerator with the same parameters.
 
-Per Ard,
+I would think the issue is that the OpenSSL BIGNUM lib has some issues: when 
+calculating m^e mod n, m has to be equal to the key size. The kernel's MPI 
+code handles the case where m is smaller than the key size.
 
-"CCM IVs are 16 bytes, but due to the way they are constructed
-internally, the final couple of bytes of input IV are dont-cares.
+Note, in your code below, ptext is the 8 bytes from ptext_ex plus trailing 
+zeroes whereas the kernel uses just the 8 bytes.
 
-Apparently, we do read all 16 bytes, which triggers the KASAN errors."
+It seems that your implementation has the same issue.
 
-Fix this by padding the IV with null bytes to be at least 16 bytes.
+What about the following test: change vector->m to be 64 bytes (i.e. 
+RSA_size(key) in size in testmgr.h and check the output of crypto/rsa.c, 
+openssl's output with the app below and your RSA hardware.
+> 
+> Regards
+> 
+> 
+> #include <stdio.h>
+> #include <string.h>
+> #include <openssl/crypto.h>
+> #include <openssl/err.h>
+> #include <openssl/bn.h>
+> #include <openssl/rsa.h>
+> 
+> static const unsigned char n[] =
+> "\x00\xAA\x36\xAB\xCE\x88\xAC\xFD\xFF\x55\x52\x3C\x7F\xC4\x52\x3F"
+> "\x90\xEF\xA0\x0D\xF3\x77\x4A\x25\x9F\x2E\x62\xB4\xC5\xD9\x9C\xB5"
+> "\xAD\xB3\x00\xA0\x28\x5E\x53\x01\x93\x0E\x0C\x70\xFB\x68\x76\x93"
+> "\x9C\xE6\x16\xCE\x62\x4A\x11\xE0\x08\x6D\x34\x1E\xBC\xAC\xA0\xA1"
+> "\xF5";
+> static const unsigned char e[] = "\x11";
+> 
+> int main(int argc, char *argv[])
+> {
+> 	static unsigned char ptext_ex[] = "\x54\x85\x9b\x34\x2c\x49\xea\x2a";
+> 	RSA *key;
+> 	int num, i;
+> 	int plen = sizeof(ptext_ex) - 1;
+> 	unsigned char *ctext = malloc(256);
+> 	unsigned char *ptext = malloc(256);
+> 	unsigned char *ptextp = malloc(256);
+> 
+> 	CRYPTO_malloc_debug_init();
+> 	CRYPTO_dbg_set_options(V_CRYPTO_MDEBUG_ALL);
+>         CRYPTO_mem_ctrl(CRYPTO_MEM_CHECK_ON);
+> 
+> 	memset(ptextp, 0, 256);
+> 	memcpy(ptextp, ptext_ex, plen);
+> 
+> 	key = RSA_new();
+> 
+> 	key->n = BN_bin2bn(n, sizeof(n)-1, key->n);
+> 	key->e = BN_bin2bn(e, sizeof(e)-1, key->e);
+> 
+> 	num = RSA_public_encrypt(RSA_size(key), ptextp, ctext, key,
+> RSA_NO_PADDING);
+> 
+> 	printf("Result %d plen=%d\n", num, plen);
+> 	for (i = 0; i < num; i++)
+> 		printf("%02x ", ctext[i]);
+> 	printf("\n");
+> 	return 0;
+> }
 
-Fixes: 0bc5a6c5c79a ("crypto: testmgr - Disable rfc4309 test and convert
-test vectors")
-Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Signed-off-by: Laura Abbott <labbott@redhat.com>
----
- crypto/testmgr.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 006ecc4..03f4731 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -22691,7 +22691,7 @@ static struct aead_testvec aes_ccm_enc_tv_template[] = {
- 			  "\x09\x75\x9a\x9b\x3c\x9b\x27\x39",
- 		.klen	= 32,
- 		.iv	= "\x03\xf9\xd9\x4e\x63\xb5\x3d\x9d"
--			  "\x43\xf6\x1e\x50",
-+			  "\x43\xf6\x1e\x50\0\0\0\0",
- 		.assoc	= "\x57\xf5\x6b\x8b\x57\x5c\x3d\x3b"
- 			  "\x13\x02\x01\x0c\x83\x4c\x96\x35"
- 			  "\x8e\xd6\x39\xcf\x7d\x14\x9b\x94"
--- 
-2.7.4
+Ciao
+Stephan
