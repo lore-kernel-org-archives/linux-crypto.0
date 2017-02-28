@@ -1,48 +1,39 @@
-From: Rob Herring <robh@kernel.org>
-Subject: Re: [PATCH v3 2/4] ARM64: dts: meson-gx: add clock to DT binding
- documentation for hwrng
-Date: Mon, 27 Feb 2017 16:34:49 -0600
-Message-ID: <20170227223449.f24ppbk3wx4gguc4@rob-hp-laptop>
-References: <4e2d12e5-f75b-3ac6-a3f7-18e8a8b7283b@gmail.com>
- <86db7397-8355-0d07-5180-c78d6cd06c84@gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: ccm - move cbcmac input off the stack
+Date: Tue, 28 Feb 2017 17:33:03 +0800
+Message-ID: <20170228093303.GA3476@gondor.apana.org.au>
+References: <1488209456-7653-1-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Jerome Brunet <jbrunet@baylibre.com>,
-        Kevin Hilman <khilman@baylibre.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Neil Armstrong <narmstrong@baylibre.com>,
-        linux-amlogic@lists.infradead.org, linux-crypto@vger.kernel.org,
-        Stephen Boyd <sboyd@codeaurora.org>,
-        Michael Turquette <mturquette@baylibre.com>,
-        linux-clk@vger.kernel.org, devicetree@vger.kernel.org
-To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: linux-crypto@vger.kernel.org, johannes@sipsolutions.net
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ot0-f195.google.com ([74.125.82.195]:35969 "EHLO
-        mail-ot0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751465AbdB0Wfk (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:33827 "EHLO
+        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1751332AbdB1JdN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 Feb 2017 17:35:40 -0500
+        Tue, 28 Feb 2017 04:33:13 -0500
 Content-Disposition: inline
-In-Reply-To: <86db7397-8355-0d07-5180-c78d6cd06c84@gmail.com>
+In-Reply-To: <1488209456-7653-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Feb 22, 2017 at 07:59:08AM +0100, Heiner Kallweit wrote:
-> Add clock to DT binding documentation.
+On Mon, Feb 27, 2017 at 03:30:56PM +0000, Ard Biesheuvel wrote:
+> Commit f15f05b0a5de ("crypto: ccm - switch to separate cbcmac driver")
+> refactored the CCM driver to allow separate implementations of the
+> underlying MAC to be provided by a platform. However, in doing so, it
+> moved some data from the linear region to the stack, which violates the
+> SG constraints when the stack is virtually mapped.
 > 
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-> ---
-> v2:
-> - splitted first version of patch into two
-> - add DT binding documentation
-> - mention that clock is optional
-> - replace spaces with tabs in DT binding example
-> v3:
-> - splitted DT extension and binding documentation update into two patches
-> ---
->  Documentation/devicetree/bindings/rng/amlogic,meson-rng.txt | 11 +++++++++--
->  1 file changed, 9 insertions(+), 2 deletions(-)
+> So move idata/odata back to the request ctx struct, of which we can
+> reasonably expect that it has been allocated using kmalloc() et al.
+> 
+> Reported-by: Johannes Berg <johannes@sipsolutions.net>
+> Fixes: f15f05b0a5de ("crypto: ccm - switch to separate cbcmac driver")
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-Now the subject should really be: "dt-bindings: rng: ..."
-
-Acked-by: Rob Herring <robh@kernel.org>
+Patch applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
