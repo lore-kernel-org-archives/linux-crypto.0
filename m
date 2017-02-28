@@ -1,47 +1,109 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+From: Corentin Labbe <clabbe.montjoie@gmail.com>
 Subject: Re: Problem with RSA test from testmgr
-Date: Tue, 28 Feb 2017 17:08:35 +0100
-Message-ID: <1836837.jAzr4JNxJu@tauon.atsec.com>
+Date: Tue, 28 Feb 2017 17:45:53 +0100
+Message-ID: <20170228164553.GA2155@Red>
 References: <20170228155953.GA1732@Red>
+ <1836837.jAzr4JNxJu@tauon.atsec.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org
-To: Corentin Labbe <clabbe.montjoie@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170228155953.GA1732@Red>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wr0-f182.google.com ([209.85.128.182]:33883 "EHLO
+        mail-wr0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751248AbdB1QqD (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 28 Feb 2017 11:46:03 -0500
+Content-Disposition: inline
+In-Reply-To: <1836837.jAzr4JNxJu@tauon.atsec.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 28. Februar 2017, 16:59:53 CET schrieb Corentin Labbe:
-
-Hi Corentin,
-
-> hello
+On Tue, Feb 28, 2017 at 05:08:35PM +0100, Stephan Müller wrote:
+> Am Dienstag, 28. Februar 2017, 16:59:53 CET schrieb Corentin Labbe:
 > 
-> I work on the sun8i-ce crypto accelerator and I have some problem with the
-> RSA part.
+> Hi Corentin,
 > 
-> The RSA register fail at the first RSA test (encrypt 512bit) with this
-> output: [ 8480.146843] alg: akcipher: encrypt test failed. Invalid output
-> [ 8480.146871] 00000000: 6e 7c 8a 75 e7 30 80 d1 5e ab 9b db a2 cf ed db
-> [ 8480.146897] 00000010: c9 b2 db 43 bd 9a b9 75 27 f3 73 d9 73 b7 81 8c
-> [ 8480.146921] 00000020: 49 e8 45 fc 43 44 f5 6d f0 f7 b8 f2 ae 6b ae 49
-> [ 8480.146946] 00000030: 1b 8e 50 c6 88 4e 99 09 78 14 f2 5d 99 c3 7f f9
-> [ 8480.146995] alg: akcipher: test 1 failed for rsa-sun8i-ce, err=-22
+> > hello
+> > 
+> > I work on the sun8i-ce crypto accelerator and I have some problem with the
+> > RSA part.
+> > 
+> > The RSA register fail at the first RSA test (encrypt 512bit) with this
+> > output: [ 8480.146843] alg: akcipher: encrypt test failed. Invalid output
+> > [ 8480.146871] 00000000: 6e 7c 8a 75 e7 30 80 d1 5e ab 9b db a2 cf ed db
+> > [ 8480.146897] 00000010: c9 b2 db 43 bd 9a b9 75 27 f3 73 d9 73 b7 81 8c
+> > [ 8480.146921] 00000020: 49 e8 45 fc 43 44 f5 6d f0 f7 b8 f2 ae 6b ae 49
+> > [ 8480.146946] 00000030: 1b 8e 50 c6 88 4e 99 09 78 14 f2 5d 99 c3 7f f9
+> > [ 8480.146995] alg: akcipher: test 1 failed for rsa-sun8i-ce, err=-22
+> > 
+> > But with the same parameters (msg, n, e) openssl give me exactly this
+> > output.
+> > 
+> > So what I miss for made it work ?
+> > In which format testmgr expect the output data ?
 > 
-> But with the same parameters (msg, n, e) openssl give me exactly this
-> output.
+> The output should be simply the binary string from the modular exponentiation 
+> operation.
 > 
-> So what I miss for made it work ?
-> In which format testmgr expect the output data ?
+> What I am wondering is: the output logged above is not found in the expected 
+> values of testmgr.h. Which input data or test vectors do you use?
+> 
+> Ciao
+> Stephan
 
-The output should be simply the binary string from the modular exponentiation 
-operation.
+I use the first test from rsa_tv_template in crypto/testmgr.h
+The test fail on the encrypt operation.
 
-What I am wondering is: the output logged above is not found in the expected 
-values of testmgr.h. Which input data or test vectors do you use?
+I have put below the openssl program that give me the same output than my hardware accelerator with the same parameters.
 
-Ciao
-Stephan
+Regards
+
+
+#include <stdio.h>
+#include <string.h>
+#include <openssl/crypto.h>
+#include <openssl/err.h>
+#include <openssl/bn.h>
+#include <openssl/rsa.h>
+
+static const unsigned char n[] =
+"\x00\xAA\x36\xAB\xCE\x88\xAC\xFD\xFF\x55\x52\x3C\x7F\xC4\x52\x3F"
+"\x90\xEF\xA0\x0D\xF3\x77\x4A\x25\x9F\x2E\x62\xB4\xC5\xD9\x9C\xB5"
+"\xAD\xB3\x00\xA0\x28\x5E\x53\x01\x93\x0E\x0C\x70\xFB\x68\x76\x93"
+"\x9C\xE6\x16\xCE\x62\x4A\x11\xE0\x08\x6D\x34\x1E\xBC\xAC\xA0\xA1"
+"\xF5";
+static const unsigned char e[] = "\x11";
+
+int main(int argc, char *argv[])
+{
+	static unsigned char ptext_ex[] = "\x54\x85\x9b\x34\x2c\x49\xea\x2a";
+	RSA *key;
+	int num, i;
+	int plen = sizeof(ptext_ex) - 1;
+	unsigned char *ctext = malloc(256);
+	unsigned char *ptext = malloc(256);
+	unsigned char *ptextp = malloc(256);
+
+	CRYPTO_malloc_debug_init();
+	CRYPTO_dbg_set_options(V_CRYPTO_MDEBUG_ALL);
+        CRYPTO_mem_ctrl(CRYPTO_MEM_CHECK_ON);
+
+	memset(ptextp, 0, 256);
+	memcpy(ptextp, ptext_ex, plen);
+
+	key = RSA_new();
+
+	key->n = BN_bin2bn(n, sizeof(n)-1, key->n);
+	key->e = BN_bin2bn(e, sizeof(e)-1, key->e);
+
+	num = RSA_public_encrypt(RSA_size(key), ptextp, ctext, key, RSA_NO_PADDING);
+
+	printf("Result %d plen=%d\n", num, plen);
+	for (i = 0; i < num; i++)
+		printf("%02x ", ctext[i]);
+	printf("\n");
+	return 0;
+}
