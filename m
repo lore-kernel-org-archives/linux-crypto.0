@@ -1,123 +1,38 @@
-From: Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>
-Subject: [PATCH v3 2/2] crypto: vmx - Use skcipher for xts fallback
-Date: Wed,  1 Mar 2017 11:00:00 -0300
-Message-ID: <20170301140000.23033-1-pfsmorigo@linux.vnet.ibm.com>
-References: <20170224142734.16188-1-pfsmorigo@linux.vnet.ibm.com>
-Cc: herbert@gondor.apana.org.au, paulus@samba.org, linux-crypto@vger.kernel.org,
- Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>,
- linuxppc-dev@lists.ozlabs.org, davem@davemloft.net
-To: linux-kernel@vger.kernel.org
-Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
-In-Reply-To: <20170224142734.16188-1-pfsmorigo@linux.vnet.ibm.com>
-List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
-List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
-List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
-List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
-List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
-Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
-Sender: "Linuxppc-dev"
- <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: Re: Problem with RSA test from testmgr
+Date: Wed, 01 Mar 2017 16:07:17 +0100
+Message-ID: <45107561.YcGaMWr4ZQ@tauon.atsec.com>
+References: <20170228155953.GA1732@Red> <9482066.IEBbAWS9B8@positron.chronox.de> <20170301120414.GA18217@Red>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8BIT
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Corentin Labbe <clabbe.montjoie@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20170301120414.GA18217@Red>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Signed-off-by: Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>
----
- drivers/crypto/vmx/aes_xts.c | 32 ++++++++++++++++----------------
- 1 file changed, 16 insertions(+), 16 deletions(-)
+Am Mittwoch, 1. März 2017, 13:04:14 CET schrieb Corentin Labbe:
 
-diff --git a/drivers/crypto/vmx/aes_xts.c b/drivers/crypto/vmx/aes_xts.c
-index 24353ec3..6adc929 100644
---- a/drivers/crypto/vmx/aes_xts.c
-+++ b/drivers/crypto/vmx/aes_xts.c
-@@ -28,11 +28,12 @@
- #include <crypto/aes.h>
- #include <crypto/scatterwalk.h>
- #include <crypto/xts.h>
-+#include <crypto/skcipher.h>
- 
- #include "aesp8-ppc.h"
- 
- struct p8_aes_xts_ctx {
--	struct crypto_blkcipher *fallback;
-+	struct crypto_skcipher *fallback;
- 	struct aes_key enc_key;
- 	struct aes_key dec_key;
- 	struct aes_key tweak_key;
-@@ -41,7 +42,7 @@ struct p8_aes_xts_ctx {
- static int p8_aes_xts_init(struct crypto_tfm *tfm)
- {
- 	const char *alg;
--	struct crypto_blkcipher *fallback;
-+	struct crypto_skcipher *fallback;
- 	struct p8_aes_xts_ctx *ctx = crypto_tfm_ctx(tfm);
- 
- 	if (!(alg = crypto_tfm_alg_name(tfm))) {
-@@ -49,8 +50,8 @@ static int p8_aes_xts_init(struct crypto_tfm *tfm)
- 		return -ENOENT;
- 	}
- 
--	fallback =
--		crypto_alloc_blkcipher(alg, 0, CRYPTO_ALG_NEED_FALLBACK);
-+	fallback = crypto_alloc_skcipher(alg, 0,
-+			CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK);
- 	if (IS_ERR(fallback)) {
- 		printk(KERN_ERR
- 			"Failed to allocate transformation for '%s': %ld\n",
-@@ -58,11 +59,11 @@ static int p8_aes_xts_init(struct crypto_tfm *tfm)
- 		return PTR_ERR(fallback);
- 	}
- 	printk(KERN_INFO "Using '%s' as fallback implementation.\n",
--		crypto_tfm_alg_driver_name((struct crypto_tfm *) fallback));
-+		crypto_skcipher_driver_name(fallback));
- 
--	crypto_blkcipher_set_flags(
-+	crypto_skcipher_set_flags(
- 		fallback,
--		crypto_blkcipher_get_flags((struct crypto_blkcipher *)tfm));
-+		crypto_skcipher_get_flags((struct crypto_skcipher *)tfm));
- 	ctx->fallback = fallback;
- 
- 	return 0;
-@@ -73,7 +74,7 @@ static void p8_aes_xts_exit(struct crypto_tfm *tfm)
- 	struct p8_aes_xts_ctx *ctx = crypto_tfm_ctx(tfm);
- 
- 	if (ctx->fallback) {
--		crypto_free_blkcipher(ctx->fallback);
-+		crypto_free_skcipher(ctx->fallback);
- 		ctx->fallback = NULL;
- 	}
- }
-@@ -98,7 +99,7 @@ static int p8_aes_xts_setkey(struct crypto_tfm *tfm, const u8 *key,
- 	pagefault_enable();
- 	preempt_enable();
- 
--	ret += crypto_blkcipher_setkey(ctx->fallback, key, keylen);
-+	ret += crypto_skcipher_setkey(ctx->fallback, key, keylen);
- 	return ret;
- }
- 
-@@ -113,15 +114,14 @@ static int p8_aes_xts_crypt(struct blkcipher_desc *desc,
- 	struct blkcipher_walk walk;
- 	struct p8_aes_xts_ctx *ctx =
- 		crypto_tfm_ctx(crypto_blkcipher_tfm(desc->tfm));
--	struct blkcipher_desc fallback_desc = {
--		.tfm = ctx->fallback,
--		.info = desc->info,
--		.flags = desc->flags
--	};
- 
- 	if (in_interrupt()) {
--		ret = enc ? crypto_blkcipher_encrypt(&fallback_desc, dst, src, nbytes) :
--                            crypto_blkcipher_decrypt(&fallback_desc, dst, src, nbytes);
-+		SKCIPHER_REQUEST_ON_STACK(req, ctx->fallback);
-+		skcipher_request_set_tfm(req, ctx->fallback);
-+		skcipher_request_set_callback(req, desc->flags, NULL, NULL);
-+		skcipher_request_set_crypt(req, src, dst, nbytes, desc->info);
-+		ret = enc? crypto_skcipher_encrypt(req) : crypto_skcipher_decrypt(req);
-+		skcipher_request_zero(req);
- 	} else {
- 		preempt_disable();
- 		pagefault_disable();
--- 
-2.9.3
+Hi Corentin,
+
+> 
+> I got the following:
+> 
+> [    1.086228] alg: akcipher: encrypt test failed. Invalid output
+> [    1.092196] 00000000: 6e 7c 8a 75 e7 30 80 d1 5e ab 9b db a2 cf ed db
+> [    1.098882] 00000010: c9 b2 db 43 bd 9a b9 75 27 f3 73 d9 73 b7 81 8c
+> [    1.105524] 00000020: 49 e8 45 fc 43 44 f5 6d f0 f7 b8 f2 ae 6b ae 49
+> [    1.112090] 00000030: 1b 8e 50 c6 88 4e 99 09 78 14 f2 5d 99 c3 7f f9
+> [    1.118747] alg: akcipher: test 1 failed for rsa-generic, err=-22
+> (Exactly the output of my hardare and openssl test)
+> 
+> So the problem is just that my hardware does not handle non-padded data.
+
+I guess the best course of action would be to patch the test vector to use the 
+padded data.
+
+Ciao
+Stephan
