@@ -1,69 +1,75 @@
 From: Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>
-Subject: [PATCH v3 1/2] crypto: vmx - Use skcipher for cbc fallback
-Date: Wed,  1 Mar 2017 10:58:20 -0300
-Message-ID: <20170301135820.20670-1-pfsmorigo@linux.vnet.ibm.com>
-References: <20170226192107.GA7129@gallifrey>
-Cc: benh@kernel.crashing.org, paulus@samba.org, mpe@ellerman.id.au,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>
+Subject: [PATCH v3 2/2] crypto: vmx - Use skcipher for xts fallback
+Date: Wed,  1 Mar 2017 11:00:00 -0300
+Message-ID: <20170301140000.23033-1-pfsmorigo@linux.vnet.ibm.com>
+References: <20170224142734.16188-1-pfsmorigo@linux.vnet.ibm.com>
+Cc: herbert@gondor.apana.org.au, paulus@samba.org, linux-crypto@vger.kernel.org,
+ Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>,
+ linuxppc-dev@lists.ozlabs.org, davem@davemloft.net
 To: linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170226192107.GA7129@gallifrey>
-Sender: linux-kernel-owner@vger.kernel.org
+Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+In-Reply-To: <20170224142734.16188-1-pfsmorigo@linux.vnet.ibm.com>
+List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
+List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
+List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
+List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
+List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
+Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+Sender: "Linuxppc-dev"
+ <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
 List-Id: linux-crypto.vger.kernel.org
 
 Signed-off-by: Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>
 ---
- drivers/crypto/vmx/aes_cbc.c | 47 ++++++++++++++++++++++----------------------
- 1 file changed, 24 insertions(+), 23 deletions(-)
+ drivers/crypto/vmx/aes_xts.c | 32 ++++++++++++++++----------------
+ 1 file changed, 16 insertions(+), 16 deletions(-)
 
-diff --git a/drivers/crypto/vmx/aes_cbc.c b/drivers/crypto/vmx/aes_cbc.c
-index 94ad5c0..72a26eb 100644
---- a/drivers/crypto/vmx/aes_cbc.c
-+++ b/drivers/crypto/vmx/aes_cbc.c
-@@ -27,11 +27,12 @@
- #include <asm/switch_to.h>
+diff --git a/drivers/crypto/vmx/aes_xts.c b/drivers/crypto/vmx/aes_xts.c
+index 24353ec3..6adc929 100644
+--- a/drivers/crypto/vmx/aes_xts.c
++++ b/drivers/crypto/vmx/aes_xts.c
+@@ -28,11 +28,12 @@
  #include <crypto/aes.h>
  #include <crypto/scatterwalk.h>
+ #include <crypto/xts.h>
 +#include <crypto/skcipher.h>
  
  #include "aesp8-ppc.h"
  
- struct p8_aes_cbc_ctx {
+ struct p8_aes_xts_ctx {
 -	struct crypto_blkcipher *fallback;
 +	struct crypto_skcipher *fallback;
  	struct aes_key enc_key;
  	struct aes_key dec_key;
- };
-@@ -39,7 +40,7 @@ struct p8_aes_cbc_ctx {
- static int p8_aes_cbc_init(struct crypto_tfm *tfm)
+ 	struct aes_key tweak_key;
+@@ -41,7 +42,7 @@ struct p8_aes_xts_ctx {
+ static int p8_aes_xts_init(struct crypto_tfm *tfm)
  {
  	const char *alg;
 -	struct crypto_blkcipher *fallback;
 +	struct crypto_skcipher *fallback;
- 	struct p8_aes_cbc_ctx *ctx = crypto_tfm_ctx(tfm);
+ 	struct p8_aes_xts_ctx *ctx = crypto_tfm_ctx(tfm);
  
  	if (!(alg = crypto_tfm_alg_name(tfm))) {
-@@ -47,8 +48,9 @@ static int p8_aes_cbc_init(struct crypto_tfm *tfm)
+@@ -49,8 +50,8 @@ static int p8_aes_xts_init(struct crypto_tfm *tfm)
  		return -ENOENT;
  	}
  
 -	fallback =
--	    crypto_alloc_blkcipher(alg, 0, CRYPTO_ALG_NEED_FALLBACK);
+-		crypto_alloc_blkcipher(alg, 0, CRYPTO_ALG_NEED_FALLBACK);
 +	fallback = crypto_alloc_skcipher(alg, 0,
 +			CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK);
-+
  	if (IS_ERR(fallback)) {
  		printk(KERN_ERR
- 		       "Failed to allocate transformation for '%s': %ld\n",
-@@ -56,11 +58,12 @@ static int p8_aes_cbc_init(struct crypto_tfm *tfm)
+ 			"Failed to allocate transformation for '%s': %ld\n",
+@@ -58,11 +59,11 @@ static int p8_aes_xts_init(struct crypto_tfm *tfm)
  		return PTR_ERR(fallback);
  	}
  	printk(KERN_INFO "Using '%s' as fallback implementation.\n",
--	       crypto_tfm_alg_driver_name((struct crypto_tfm *) fallback));
+-		crypto_tfm_alg_driver_name((struct crypto_tfm *) fallback));
 +		crypto_skcipher_driver_name(fallback));
-+
  
 -	crypto_blkcipher_set_flags(
 +	crypto_skcipher_set_flags(
@@ -73,8 +79,8 @@ index 94ad5c0..72a26eb 100644
  	ctx->fallback = fallback;
  
  	return 0;
-@@ -71,7 +74,7 @@ static void p8_aes_cbc_exit(struct crypto_tfm *tfm)
- 	struct p8_aes_cbc_ctx *ctx = crypto_tfm_ctx(tfm);
+@@ -73,7 +74,7 @@ static void p8_aes_xts_exit(struct crypto_tfm *tfm)
+ 	struct p8_aes_xts_ctx *ctx = crypto_tfm_ctx(tfm);
  
  	if (ctx->fallback) {
 -		crypto_free_blkcipher(ctx->fallback);
@@ -82,7 +88,7 @@ index 94ad5c0..72a26eb 100644
  		ctx->fallback = NULL;
  	}
  }
-@@ -91,7 +94,7 @@ static int p8_aes_cbc_setkey(struct crypto_tfm *tfm, const u8 *key,
+@@ -98,7 +99,7 @@ static int p8_aes_xts_setkey(struct crypto_tfm *tfm, const u8 *key,
  	pagefault_enable();
  	preempt_enable();
  
@@ -91,9 +97,9 @@ index 94ad5c0..72a26eb 100644
  	return ret;
  }
  
-@@ -103,15 +106,14 @@ static int p8_aes_cbc_encrypt(struct blkcipher_desc *desc,
+@@ -113,15 +114,14 @@ static int p8_aes_xts_crypt(struct blkcipher_desc *desc,
  	struct blkcipher_walk walk;
- 	struct p8_aes_cbc_ctx *ctx =
+ 	struct p8_aes_xts_ctx *ctx =
  		crypto_tfm_ctx(crypto_blkcipher_tfm(desc->tfm));
 -	struct blkcipher_desc fallback_desc = {
 -		.tfm = ctx->fallback,
@@ -102,35 +108,13 @@ index 94ad5c0..72a26eb 100644
 -	};
  
  	if (in_interrupt()) {
--		ret = crypto_blkcipher_encrypt(&fallback_desc, dst, src,
--					       nbytes);
+-		ret = enc ? crypto_blkcipher_encrypt(&fallback_desc, dst, src, nbytes) :
+-                            crypto_blkcipher_decrypt(&fallback_desc, dst, src, nbytes);
 +		SKCIPHER_REQUEST_ON_STACK(req, ctx->fallback);
 +		skcipher_request_set_tfm(req, ctx->fallback);
 +		skcipher_request_set_callback(req, desc->flags, NULL, NULL);
 +		skcipher_request_set_crypt(req, src, dst, nbytes, desc->info);
-+		ret = crypto_skcipher_encrypt(req);
-+		skcipher_request_zero(req);
- 	} else {
- 		preempt_disable();
- 		pagefault_disable();
-@@ -144,15 +146,14 @@ static int p8_aes_cbc_decrypt(struct blkcipher_desc *desc,
- 	struct blkcipher_walk walk;
- 	struct p8_aes_cbc_ctx *ctx =
- 		crypto_tfm_ctx(crypto_blkcipher_tfm(desc->tfm));
--	struct blkcipher_desc fallback_desc = {
--		.tfm = ctx->fallback,
--		.info = desc->info,
--		.flags = desc->flags
--	};
- 
- 	if (in_interrupt()) {
--		ret = crypto_blkcipher_decrypt(&fallback_desc, dst, src,
--					       nbytes);
-+		SKCIPHER_REQUEST_ON_STACK(req, ctx->fallback);
-+		skcipher_request_set_tfm(req, ctx->fallback);
-+		skcipher_request_set_callback(req, desc->flags, NULL, NULL);
-+		skcipher_request_set_crypt(req, src, dst, nbytes, desc->info);
-+		ret = crypto_skcipher_decrypt(req);
++		ret = enc? crypto_skcipher_encrypt(req) : crypto_skcipher_decrypt(req);
 +		skcipher_request_zero(req);
  	} else {
  		preempt_disable();
