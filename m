@@ -1,38 +1,67 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: Problem with RSA test from testmgr
-Date: Wed, 01 Mar 2017 16:07:17 +0100
-Message-ID: <45107561.YcGaMWr4ZQ@tauon.atsec.com>
-References: <20170228155953.GA1732@Red> <9482066.IEBbAWS9B8@positron.chronox.de> <20170301120414.GA18217@Red>
+From: Milan Broz <gmazyland@gmail.com>
+Subject: Re: [RFC PATCH v4] IV Generation algorithms for dm-crypt
+Date: Wed, 1 Mar 2017 16:38:09 +0100
+Message-ID: <c835926e-c2bd-8a52-34db-6c605301bc2b@gmail.com>
+References: <1486463731-6224-1-git-send-email-binoy.jayan@linaro.org>
+ <CAOtvUMcN8s886978vE6T=AE79KkZsLBnXsmhewnb5PB0UyAG3A@mail.gmail.com>
+ <CAHv-k_8rgArzV2uQ64h1ZTNRpssX1jMf=RwuPoBmsjQ0FhCsWA@mail.gmail.com>
+ <68f70534-a309-46ba-a84d-8acc1e6620e5@gmail.com>
+ <CAOtvUMf3c0fUjABmbfMrbs0W4gyhKVZyc_tZH3rQg65zF18YMg@mail.gmail.com>
+ <b563eb97-82ba-69d2-c4c5-66bc716a7507@gmail.com>
+ <CAOtvUMePYT7OJDKL7i0y3y6Jvqsxyx6Je6g9aGKVq6PLZ_-Z8w@mail.gmail.com>
+ <2aef6e54-805f-e09b-ae66-c198f8c05335@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: Corentin Labbe <clabbe.montjoie@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170301120414.GA18217@Red>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: Binoy Jayan <binoy.jayan@linaro.org>, Oded <oded.golombek@arm.com>,
+        Ofir <Ofir.Drang@arm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, Mark Brown <broonie@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org,
+        Rajendra <rnayak@codeaurora.org>,
+        Ondrej Mosnacek <omosnace@redhat.com>
+To: Gilad Ben-Yossef <gilad@benyossef.com>
+Return-path: <linux-raid-owner@vger.kernel.org>
+In-Reply-To: <2aef6e54-805f-e09b-ae66-c198f8c05335@gmail.com>
+Sender: linux-raid-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Am Mittwoch, 1. März 2017, 13:04:14 CET schrieb Corentin Labbe:
 
-Hi Corentin,
-
+On 03/01/2017 02:04 PM, Milan Broz wrote:
+> On 03/01/2017 01:42 PM, Gilad Ben-Yossef wrote:
+> ...
 > 
-> I got the following:
+>> I can certainly understand if you don't wont to take the patch until
+>> we have results with
+>> dm-crypt itself but the difference between 8 separate invocation of
+>> the engine for 512
+>> bytes of XTS and a single invocation for 4KB are pretty big.
 > 
-> [    1.086228] alg: akcipher: encrypt test failed. Invalid output
-> [    1.092196] 00000000: 6e 7c 8a 75 e7 30 80 d1 5e ab 9b db a2 cf ed db
-> [    1.098882] 00000010: c9 b2 db 43 bd 9a b9 75 27 f3 73 d9 73 b7 81 8c
-> [    1.105524] 00000020: 49 e8 45 fc 43 44 f5 6d f0 f7 b8 f2 ae 6b ae 49
-> [    1.112090] 00000030: 1b 8e 50 c6 88 4e 99 09 78 14 f2 5d 99 c3 7f f9
-> [    1.118747] alg: akcipher: test 1 failed for rsa-generic, err=-22
-> (Exactly the output of my hardare and openssl test)
+> Yes, I know it. But the same can be achieved if we just implement
+> 4k sector encryption in dmcrypt. It is incompatible with LUKS1
+> (but next LUKS version will support it) but I think this is not
+> a problem for now.
 > 
-> So the problem is just that my hardware does not handle non-padded data.
+> If the underlying device supports atomic write of 4k sectors, then
+> there should not be a problem.
+> 
+> This is one of the speed-up I would like to compare with the IV approach,
+> because everyone should benefit from 4k sectors in the end.
+> And no crypto API changes are needed here.
+> 
+> (I have an old patch for this, so I will try to revive it.)
 
-I guess the best course of action would be to patch the test vector to use the 
-padded data.
+If anyone interested, simple experimental patch for larger sector size
+(up to the page size) for dmcrypt is in this branch:
 
-Ciao
-Stephan
+http://git.kernel.org/cgit/linux/kernel/git/mbroz/linux.git/log/?h=dm-crypt-4k-sector
+
+It would be nice to check what performance gain could be provided
+by this simple approach.
+
+Milan
