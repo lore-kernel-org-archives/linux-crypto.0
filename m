@@ -1,101 +1,139 @@
-From: Ondrej Mosnacek <omosnace@redhat.com>
-Subject: Re: [RFC PATCH v4] IV Generation algorithms for dm-crypt
-Date: Wed, 1 Mar 2017 14:21:51 +0100
-Message-ID: <CAFqZXNugEK0do+BYC061i4CidMVgg8_BZue8gUVa2g7_RYsAEw@mail.gmail.com>
-References: <1486463731-6224-1-git-send-email-binoy.jayan@linaro.org>
- <CAOtvUMcN8s886978vE6T=AE79KkZsLBnXsmhewnb5PB0UyAG3A@mail.gmail.com>
- <CAHv-k_8rgArzV2uQ64h1ZTNRpssX1jMf=RwuPoBmsjQ0FhCsWA@mail.gmail.com>
- <68f70534-a309-46ba-a84d-8acc1e6620e5@gmail.com> <CAOtvUMf3c0fUjABmbfMrbs0W4gyhKVZyc_tZH3rQg65zF18YMg@mail.gmail.com>
- <b563eb97-82ba-69d2-c4c5-66bc716a7507@gmail.com> <CAOtvUMePYT7OJDKL7i0y3y6Jvqsxyx6Je6g9aGKVq6PLZ_-Z8w@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Milan Broz <gmazyland@gmail.com>,
-        Binoy Jayan <binoy.jayan@linaro.org>,
-        Oded <oded.golombek@arm.com>, Ofir <Ofir.Drang@arm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, Mark Brown <broonie@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org,
-        Rajendra <rnayak@codeaurora.org>
-To: Gilad Ben-Yossef <gilad@benyossef.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-oi0-f47.google.com ([209.85.218.47]:34058 "EHLO
-        mail-oi0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751529AbdCANWZ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Mar 2017 08:22:25 -0500
-Received: by mail-oi0-f47.google.com with SMTP id m124so22019161oig.1
-        for <linux-crypto@vger.kernel.org>; Wed, 01 Mar 2017 05:21:52 -0800 (PST)
-In-Reply-To: <CAOtvUMePYT7OJDKL7i0y3y6Jvqsxyx6Je6g9aGKVq6PLZ_-Z8w@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>
+Subject: [PATCH v3 1/2] crypto: vmx - Use skcipher for cbc fallback
+Date: Wed,  1 Mar 2017 10:58:20 -0300
+Message-ID: <20170301135820.20670-1-pfsmorigo@linux.vnet.ibm.com>
+References: <20170226192107.GA7129@gallifrey>
+Cc: benh@kernel.crashing.org, paulus@samba.org, mpe@ellerman.id.au,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>
+To: linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20170226192107.GA7129@gallifrey>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-2017-03-01 13:42 GMT+01:00 Gilad Ben-Yossef <gilad@benyossef.com>:
-> It really is an observation about overhead of context switches between
-> dm-crypt and
-> whatever/wherever you handle crypto - be it an off CPU hardware engine
-> or a bunch
-> of parallel kernel threads running on other cores. You really want to
-> burst as much as
-> possible.
+Signed-off-by: Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>
+---
+ drivers/crypto/vmx/aes_cbc.c | 47 ++++++++++++++++++++++----------------------
+ 1 file changed, 24 insertions(+), 23 deletions(-)
 
-[...]
-
->> For XTS you need just simple linear IV. No problem with that, implementation
->> in crypto API and hw is trivial.
->>
->> But for compatible IV (that provides compatibility with loopAES and very old TrueCrypt),
->> these should be never ever implemented again anywhere.
->
->>
->> Specifically "tcw" is broken, insecure and provided here just to help people to migrate
->> from old Truecrypt containers. Even Truecrypt followers removed it from the codebase.
->> (It is basically combination of IV and slight modification of CBC mode. All
->> recent version switched to XTS and plain IV.)
->>
->> So building abstraction over something known to be broken and that is now intentionally
->> isolated inside dmcrypt is, in my opinion, really not a good idea.
->>
->
-> I don't think anyone is interested in these modes. How do you support
-> XTS and essiv in
-> a generic way without supporting this broken modes is not something
-> I'm clear on though.
-
-Wouldn't adopting a bulk request API (something like what I tried to
-do here [1]) that allows users to supply multiple messages, each with
-their own IV, fulfill this purpose? That way, we wouldn't need to
-introduce any new modes into Crypto API and the drivers/accelerators
-would only need to provide bulk implementations of common modes
-(xts(aes), cbc(aes), ...) to provide better performance for dm-crypt
-(and possibly other users, too).
-
-I'm not sure how exactly these crypto accelerators work, but wouldn't
-it help if the drivers simply get more messages (in our case sectors)
-in a single call? I wonder, would (efficiently) supporting such a
-scheme require changes in the HW itself or could it be achieved just
-by modifying driver code (let's say specifically for your CryptoCell
-accelerator)?
-
-Thanks,
-Ondrej
-
-[1] https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg23007.html
-
->
-> Thanks,
-> Gilad
->
->
->
-> --
-> Gilad Ben-Yossef
-> Chief Coffee Drinker
->
-> "If you take a class in large-scale robotics, can you end up in a
-> situation where the homework eats your dog?"
->  -- Jean-Baptiste Queru
+diff --git a/drivers/crypto/vmx/aes_cbc.c b/drivers/crypto/vmx/aes_cbc.c
+index 94ad5c0..72a26eb 100644
+--- a/drivers/crypto/vmx/aes_cbc.c
++++ b/drivers/crypto/vmx/aes_cbc.c
+@@ -27,11 +27,12 @@
+ #include <asm/switch_to.h>
+ #include <crypto/aes.h>
+ #include <crypto/scatterwalk.h>
++#include <crypto/skcipher.h>
+ 
+ #include "aesp8-ppc.h"
+ 
+ struct p8_aes_cbc_ctx {
+-	struct crypto_blkcipher *fallback;
++	struct crypto_skcipher *fallback;
+ 	struct aes_key enc_key;
+ 	struct aes_key dec_key;
+ };
+@@ -39,7 +40,7 @@ struct p8_aes_cbc_ctx {
+ static int p8_aes_cbc_init(struct crypto_tfm *tfm)
+ {
+ 	const char *alg;
+-	struct crypto_blkcipher *fallback;
++	struct crypto_skcipher *fallback;
+ 	struct p8_aes_cbc_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+ 	if (!(alg = crypto_tfm_alg_name(tfm))) {
+@@ -47,8 +48,9 @@ static int p8_aes_cbc_init(struct crypto_tfm *tfm)
+ 		return -ENOENT;
+ 	}
+ 
+-	fallback =
+-	    crypto_alloc_blkcipher(alg, 0, CRYPTO_ALG_NEED_FALLBACK);
++	fallback = crypto_alloc_skcipher(alg, 0,
++			CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK);
++
+ 	if (IS_ERR(fallback)) {
+ 		printk(KERN_ERR
+ 		       "Failed to allocate transformation for '%s': %ld\n",
+@@ -56,11 +58,12 @@ static int p8_aes_cbc_init(struct crypto_tfm *tfm)
+ 		return PTR_ERR(fallback);
+ 	}
+ 	printk(KERN_INFO "Using '%s' as fallback implementation.\n",
+-	       crypto_tfm_alg_driver_name((struct crypto_tfm *) fallback));
++		crypto_skcipher_driver_name(fallback));
++
+ 
+-	crypto_blkcipher_set_flags(
++	crypto_skcipher_set_flags(
+ 		fallback,
+-		crypto_blkcipher_get_flags((struct crypto_blkcipher *)tfm));
++		crypto_skcipher_get_flags((struct crypto_skcipher *)tfm));
+ 	ctx->fallback = fallback;
+ 
+ 	return 0;
+@@ -71,7 +74,7 @@ static void p8_aes_cbc_exit(struct crypto_tfm *tfm)
+ 	struct p8_aes_cbc_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+ 	if (ctx->fallback) {
+-		crypto_free_blkcipher(ctx->fallback);
++		crypto_free_skcipher(ctx->fallback);
+ 		ctx->fallback = NULL;
+ 	}
+ }
+@@ -91,7 +94,7 @@ static int p8_aes_cbc_setkey(struct crypto_tfm *tfm, const u8 *key,
+ 	pagefault_enable();
+ 	preempt_enable();
+ 
+-	ret += crypto_blkcipher_setkey(ctx->fallback, key, keylen);
++	ret += crypto_skcipher_setkey(ctx->fallback, key, keylen);
+ 	return ret;
+ }
+ 
+@@ -103,15 +106,14 @@ static int p8_aes_cbc_encrypt(struct blkcipher_desc *desc,
+ 	struct blkcipher_walk walk;
+ 	struct p8_aes_cbc_ctx *ctx =
+ 		crypto_tfm_ctx(crypto_blkcipher_tfm(desc->tfm));
+-	struct blkcipher_desc fallback_desc = {
+-		.tfm = ctx->fallback,
+-		.info = desc->info,
+-		.flags = desc->flags
+-	};
+ 
+ 	if (in_interrupt()) {
+-		ret = crypto_blkcipher_encrypt(&fallback_desc, dst, src,
+-					       nbytes);
++		SKCIPHER_REQUEST_ON_STACK(req, ctx->fallback);
++		skcipher_request_set_tfm(req, ctx->fallback);
++		skcipher_request_set_callback(req, desc->flags, NULL, NULL);
++		skcipher_request_set_crypt(req, src, dst, nbytes, desc->info);
++		ret = crypto_skcipher_encrypt(req);
++		skcipher_request_zero(req);
+ 	} else {
+ 		preempt_disable();
+ 		pagefault_disable();
+@@ -144,15 +146,14 @@ static int p8_aes_cbc_decrypt(struct blkcipher_desc *desc,
+ 	struct blkcipher_walk walk;
+ 	struct p8_aes_cbc_ctx *ctx =
+ 		crypto_tfm_ctx(crypto_blkcipher_tfm(desc->tfm));
+-	struct blkcipher_desc fallback_desc = {
+-		.tfm = ctx->fallback,
+-		.info = desc->info,
+-		.flags = desc->flags
+-	};
+ 
+ 	if (in_interrupt()) {
+-		ret = crypto_blkcipher_decrypt(&fallback_desc, dst, src,
+-					       nbytes);
++		SKCIPHER_REQUEST_ON_STACK(req, ctx->fallback);
++		skcipher_request_set_tfm(req, ctx->fallback);
++		skcipher_request_set_callback(req, desc->flags, NULL, NULL);
++		skcipher_request_set_crypt(req, src, dst, nbytes, desc->info);
++		ret = crypto_skcipher_decrypt(req);
++		skcipher_request_zero(req);
+ 	} else {
+ 		preempt_disable();
+ 		pagefault_disable();
+-- 
+2.9.3
