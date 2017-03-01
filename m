@@ -1,132 +1,118 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: Problem with RSA test from testmgr
-Date: Tue, 28 Feb 2017 23:35:04 +0100
-Message-ID: <9482066.IEBbAWS9B8@positron.chronox.de>
-References: <20170228155953.GA1732@Red> <1836837.jAzr4JNxJu@tauon.atsec.com> <20170228164553.GA2155@Red>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: Re: [RFC PATCH v4] IV Generation algorithms for dm-crypt
+Date: Wed, 1 Mar 2017 10:30:20 +0200
+Message-ID: <CAOtvUMf3c0fUjABmbfMrbs0W4gyhKVZyc_tZH3rQg65zF18YMg@mail.gmail.com>
+References: <1486463731-6224-1-git-send-email-binoy.jayan@linaro.org>
+	<CAOtvUMcN8s886978vE6T=AE79KkZsLBnXsmhewnb5PB0UyAG3A@mail.gmail.com>
+	<CAHv-k_8rgArzV2uQ64h1ZTNRpssX1jMf=RwuPoBmsjQ0FhCsWA@mail.gmail.com>
+	<68f70534-a309-46ba-a84d-8acc1e6620e5@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: Corentin Labbe <clabbe.montjoie@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:35508 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751552AbdB1Wfg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Feb 2017 17:35:36 -0500
-In-Reply-To: <20170228164553.GA2155@Red>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Binoy Jayan <binoy.jayan@linaro.org>, Rajendra <rnayak@codeaurora.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>, Oded <oded.golombek@arm.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+        Ondrej Mosnacek <omosnace@redhat.com>, linux-raid@vger.kernel.org,
+        dm-devel@redhat.com, Mark Brown <broonie@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
+        Shaohua Li <shli@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+        Alasdair Kergon <agk@redhat.com>, Ofir <Ofir.Drang@arm.com>
+To: Milan Broz <gmazyland@gmail.com>
+Return-path: <dm-devel-bounces@redhat.com>
+In-Reply-To: <68f70534-a309-46ba-a84d-8acc1e6620e5@gmail.com>
+List-Unsubscribe: <https://www.redhat.com/mailman/options/dm-devel>,
+	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
+List-Archive: <https://www.redhat.com/archives/dm-devel>
+List-Post: <mailto:dm-devel@redhat.com>
+List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
+List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
+	<mailto:dm-devel-request@redhat.com?subject=subscribe>
+Sender: dm-devel-bounces@redhat.com
+Errors-To: dm-devel-bounces@redhat.com
+List-Id: linux-crypto.vger.kernel.org
 
-Am Dienstag, 28. Februar 2017, 17:45:53 CET schrieb Corentin Labbe:
+On Tue, Feb 28, 2017 at 11:05 PM, Milan Broz <gmazyland@gmail.com> wrote:
+>
+> On 02/22/2017 07:12 AM, Binoy Jayan wrote:
+> >
+> > I was wondering if this is near to be ready for submission (apart from
+> > the testmgr.c
+> > changes) or I need to make some changes to make it similar to the IPSec offload?
+>
+> I just tried this and except it registers the IV for every new device again, it works...
+> (After a while you have many duplicate entries in /proc/crypto.)
+>
+> But I would like to see some summary why such a big patch is needed in the first place.
+> (During an internal discussions seems that people are already lost in mails and
+> patches here, so Ondra promised me to send some summary mail soon here.)
+>
+> IIRC the first initial problem was dmcrypt performance on some embedded
+> crypto processors that are not able to cope with small crypto requests effectively.
+>
+>
+> Do you have some real performance numbers that proves that such a patch is adequate?
+>
+> I would really like to see the performance issue fixed but I am really not sure
+> this approach works for everyone. It would be better to avoid repeating this exercise later.
+> IIRC Ondra's "bulk" mode, despite rejected, shows that there is a potential
+> to speedup things even for crypt drivers that do not support own IV generators.
+>
 
-Hi Corentin,
+AFAIK the problem that we are trying to solve is that if the IV is
+generated outside the crypto API
+domain than you are forced to have an invocation of the crypto API per
+each block because you
+need to provide the IV for each block.
 
-> On Tue, Feb 28, 2017 at 05:08:35PM +0100, Stephan Müller wrote:
-> > Am Dienstag, 28. Februar 2017, 16:59:53 CET schrieb Corentin Labbe:
-> > 
-> > Hi Corentin,
-> > 
-> > > hello
-> > > 
-> > > I work on the sun8i-ce crypto accelerator and I have some problem with
-> > > the
-> > > RSA part.
-> > > 
-> > > The RSA register fail at the first RSA test (encrypt 512bit) with this
-> > > output: [ 8480.146843] alg: akcipher: encrypt test failed. Invalid
-> > > output
-> > > [ 8480.146871] 00000000: 6e 7c 8a 75 e7 30 80 d1 5e ab 9b db a2 cf ed db
-> > > [ 8480.146897] 00000010: c9 b2 db 43 bd 9a b9 75 27 f3 73 d9 73 b7 81 8c
-> > > [ 8480.146921] 00000020: 49 e8 45 fc 43 44 f5 6d f0 f7 b8 f2 ae 6b ae 49
-> > > [ 8480.146946] 00000030: 1b 8e 50 c6 88 4e 99 09 78 14 f2 5d 99 c3 7f f9
-> > > [ 8480.146995] alg: akcipher: test 1 failed for rsa-sun8i-ce, err=-22
-> > > 
-> > > But with the same parameters (msg, n, e) openssl give me exactly this
-> > > output.
-> > > 
-> > > So what I miss for made it work ?
-> > > In which format testmgr expect the output data ?
-> > 
-> > The output should be simply the binary string from the modular
-> > exponentiation operation.
-> > 
-> > What I am wondering is: the output logged above is not found in the
-> > expected values of testmgr.h. Which input data or test vectors do you
-> > use?
-> > 
-> > Ciao
-> > Stephan
-> 
-> I use the first test from rsa_tv_template in crypto/testmgr.h
-> The test fail on the encrypt operation.
-> 
-> I have put below the openssl program that give me the same output than my
-> hardware accelerator with the same parameters.
+By putting the IV generation responsibility in the Crypto API we open
+the way to do a single invocation
+of the crypto API for a whole sequence of blocks.
 
-I would think the issue is that the OpenSSL BIGNUM lib has some issues: when 
-calculating m^e mod n, m has to be equal to the key size. The kernel's MPI 
-code handles the case where m is smaller than the key size.
+For software implementation of XTS this doesn't matter much - but for
+hardware based XTS providers
+that can do the IV generation themselves it's the difference between a
+sequence of small invocation,
+with all the overhead that that entails  and a single big invocatio -
+and this can be big.
 
-Note, in your code below, ptext is the 8 bytes from ptext_ex plus trailing 
-zeroes whereas the kernel uses just the 8 bytes.
+This lead some vendors to ship hacked up versions of dm-crypt to match
+the specific crypto hardware
+they were using, or so I've heard at least - didn't see the code myself.
 
-It seems that your implementation has the same issue.
+I believe Binoy is trying to address this in a generic upstream worthy
+way instead.
 
-What about the following test: change vector->m to be 64 bytes (i.e. 
-RSA_size(key) in size in testmgr.h and check the output of crypto/rsa.c, 
-openssl's output with the app below and your RSA hardware.
-> 
-> Regards
-> 
-> 
-> #include <stdio.h>
-> #include <string.h>
-> #include <openssl/crypto.h>
-> #include <openssl/err.h>
-> #include <openssl/bn.h>
-> #include <openssl/rsa.h>
-> 
-> static const unsigned char n[] =
-> "\x00\xAA\x36\xAB\xCE\x88\xAC\xFD\xFF\x55\x52\x3C\x7F\xC4\x52\x3F"
-> "\x90\xEF\xA0\x0D\xF3\x77\x4A\x25\x9F\x2E\x62\xB4\xC5\xD9\x9C\xB5"
-> "\xAD\xB3\x00\xA0\x28\x5E\x53\x01\x93\x0E\x0C\x70\xFB\x68\x76\x93"
-> "\x9C\xE6\x16\xCE\x62\x4A\x11\xE0\x08\x6D\x34\x1E\xBC\xAC\xA0\xA1"
-> "\xF5";
-> static const unsigned char e[] = "\x11";
-> 
-> int main(int argc, char *argv[])
-> {
-> 	static unsigned char ptext_ex[] = "\x54\x85\x9b\x34\x2c\x49\xea\x2a";
-> 	RSA *key;
-> 	int num, i;
-> 	int plen = sizeof(ptext_ex) - 1;
-> 	unsigned char *ctext = malloc(256);
-> 	unsigned char *ptext = malloc(256);
-> 	unsigned char *ptextp = malloc(256);
-> 
-> 	CRYPTO_malloc_debug_init();
-> 	CRYPTO_dbg_set_options(V_CRYPTO_MDEBUG_ALL);
->         CRYPTO_mem_ctrl(CRYPTO_MEM_CHECK_ON);
-> 
-> 	memset(ptextp, 0, 256);
-> 	memcpy(ptextp, ptext_ex, plen);
-> 
-> 	key = RSA_new();
-> 
-> 	key->n = BN_bin2bn(n, sizeof(n)-1, key->n);
-> 	key->e = BN_bin2bn(e, sizeof(e)-1, key->e);
-> 
-> 	num = RSA_public_encrypt(RSA_size(key), ptextp, ctext, key,
-> RSA_NO_PADDING);
-> 
-> 	printf("Result %d plen=%d\n", num, plen);
-> 	for (i = 0; i < num; i++)
-> 		printf("%02x ", ctext[i]);
-> 	printf("\n");
-> 	return 0;
-> }
+Anyway, you are only supposed to see s difference when using a
+hardware based XTS provider algo
+that supports IV generation.
+
+> I like the patch is now contained inside dmcrypt, but it still exposes IVs that
+> are designed just for old, insecure, compatibility-only containers.
+>
+> I really do not think every compatible crap must be accessible through crypto API.
+> (I wrote the dmcrypt lrw and tcw compatibility IVs and I would never do that this way
+> if I know it is accessible outside of dmcrypt internals...)
+> Even the ESSIV is something that was born to fix predictive IVs (CBC watermarking
+> attacks) for disk encryption only, no reason to expose it outside of disk encryption.
+>
+
+The point is that you have more than one implementation of these
+"compatible crap" - the
+software implementation that you wrote and potentially multiple
+hardware implementations
+and putting this in the crypto API domain is the way to abstract this
+so you use the one
+that works best of your platform.
+
+Thanks,
+Gilad
 
 
-Ciao
-Stephan
+-- 
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+"If you take a class in large-scale robotics, can you end up in a
+situation where the homework eats your dog?"
+ -- Jean-Baptiste Queru
