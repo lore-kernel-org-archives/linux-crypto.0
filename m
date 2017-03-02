@@ -1,8 +1,8 @@
 From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: [RFC PATCH v2 07/32] x86/efi: Access EFI data as encrypted when SEV
- is active
-Date: Thu, 2 Mar 2017 10:13:21 -0500
-Message-ID: <148846760142.2349.8522516472305792434.stgit__12218.2652623907$1488468668$gmane$org@brijesh-build-machine>
+Subject: [RFC PATCH v2 08/32] x86: Use PAGE_KERNEL protection for ioremap of
+ memory page
+Date: Thu, 2 Mar 2017 10:13:32 -0500
+Message-ID: <148846761276.2349.4899767672892365544.stgit__41469.597319565$1488468683$gmane$org@brijesh-build-machine>
 References: <148846752022.2349.13667498174822419498.stgit@brijesh-build-machine>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -22,78 +22,109 @@ To: <simon.guinot@sequanux.org>, <linux-efi@vger.kernel.org>,
         <dyoung@redhat.com>, <thomas.lendacky@amd.com>, <jroedel@suse.de>,
         <keescook@chromium.org>, <arnd@arndb.de>, <toshi
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-sn1nam02on0088.outbound.protection.outlook.com ([104.47.36.88]:53145
-        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
+Received: from mail-dm3nam03on0078.outbound.protection.outlook.com ([104.47.41.78]:24608
+        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753304AbdCBPaA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Mar 2017 10:30:00 -0500
+        id S1753064AbdCBP37 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 2 Mar 2017 10:29:59 -0500
 In-Reply-To: <148846752022.2349.13667498174822419498.stgit@brijesh-build-machine>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 From: Tom Lendacky <thomas.lendacky@amd.com>
 
-EFI data is encrypted when the kernel is run under SEV. Update the
-page table references to be sure the EFI memory areas are accessed
-encrypted.
+In order for memory pages to be properly mapped when SEV is active, we
+need to use the PAGE_KERNEL protection attribute as the base protection.
+This will insure that memory mapping of, e.g. ACPI tables, receives the
+proper mapping attributes.
 
 Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
-Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- arch/x86/platform/efi/efi_64.c |   15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+ arch/x86/mm/ioremap.c |    8 ++++++++
+ include/linux/mm.h    |    1 +
+ kernel/resource.c     |   40 ++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 49 insertions(+)
 
-diff --git a/arch/x86/platform/efi/efi_64.c b/arch/x86/platform/efi/efi_64.c
-index 2d8674d..9a76ed8 100644
---- a/arch/x86/platform/efi/efi_64.c
-+++ b/arch/x86/platform/efi/efi_64.c
-@@ -45,6 +45,7 @@
- #include <asm/realmode.h>
- #include <asm/time.h>
- #include <asm/pgalloc.h>
-+#include <asm/mem_encrypt.h>
- 
- /*
-  * We allocate runtime services regions bottom-up, starting from -4G, i.e.
-@@ -286,7 +287,10 @@ int __init efi_setup_page_tables(unsigned long pa_memmap, unsigned num_pages)
- 	 * as trim_bios_range() will reserve the first page and isolate it away
- 	 * from memory allocators anyway.
- 	 */
--	if (kernel_map_pages_in_pgd(pgd, 0x0, 0x0, 1, _PAGE_RW)) {
-+	pf = _PAGE_RW;
-+	if (sev_active())
-+		pf |= _PAGE_ENC;
-+	if (kernel_map_pages_in_pgd(pgd, 0x0, 0x0, 1, pf)) {
- 		pr_err("Failed to create 1:1 mapping for the first page!\n");
- 		return 1;
+diff --git a/arch/x86/mm/ioremap.c b/arch/x86/mm/ioremap.c
+index c400ab5..481c999 100644
+--- a/arch/x86/mm/ioremap.c
++++ b/arch/x86/mm/ioremap.c
+@@ -151,7 +151,15 @@ static void __iomem *__ioremap_caller(resource_size_t phys_addr,
+ 		pcm = new_pcm;
  	}
-@@ -329,6 +333,9 @@ static void __init __map_region(efi_memory_desc_t *md, u64 va)
- 	if (!(md->attribute & EFI_MEMORY_WB))
- 		flags |= _PAGE_PCD;
  
-+	if (sev_active())
-+		flags |= _PAGE_ENC;
++	/*
++	 * If the page being mapped is in memory and SEV is active then
++	 * make sure the memory encryption attribute is enabled in the
++	 * resulting mapping.
++	 */
+ 	prot = PAGE_KERNEL_IO;
++	if (sev_active() && page_is_mem(pfn))
++		prot = __pgprot(pgprot_val(prot) | _PAGE_ENC);
 +
- 	pfn = md->phys_addr >> PAGE_SHIFT;
- 	if (kernel_map_pages_in_pgd(pgd, pfn, va, md->num_pages, flags))
- 		pr_warn("Error mapping PA 0x%llx -> VA 0x%llx!\n",
-@@ -455,6 +462,9 @@ static int __init efi_update_mem_attr(struct mm_struct *mm, efi_memory_desc_t *m
- 	if (!(md->attribute & EFI_MEMORY_RO))
- 		pf |= _PAGE_RW;
- 
-+	if (sev_active())
-+		pf |= _PAGE_ENC;
-+
- 	return efi_update_mappings(md, pf);
+ 	switch (pcm) {
+ 	case _PAGE_CACHE_MODE_UC:
+ 	default:
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index b84615b..825df27 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -445,6 +445,7 @@ static inline int get_page_unless_zero(struct page *page)
  }
  
-@@ -506,6 +516,9 @@ void __init efi_runtime_update_mappings(void)
- 			(md->type != EFI_RUNTIME_SERVICES_CODE))
- 			pf |= _PAGE_RW;
+ extern int page_is_ram(unsigned long pfn);
++extern int page_is_mem(unsigned long pfn);
  
-+		if (sev_active())
-+			pf |= _PAGE_ENC;
-+
- 		efi_update_mappings(md, pf);
- 	}
+ enum {
+ 	REGION_INTERSECTS,
+diff --git a/kernel/resource.c b/kernel/resource.c
+index 9b5f044..db56ba3 100644
+--- a/kernel/resource.c
++++ b/kernel/resource.c
+@@ -518,6 +518,46 @@ int __weak page_is_ram(unsigned long pfn)
  }
+ EXPORT_SYMBOL_GPL(page_is_ram);
+ 
++/*
++ * This function returns true if the target memory is marked as
++ * IORESOURCE_MEM and IORESOUCE_BUSY and described as other than
++ * IORES_DESC_NONE (e.g. IORES_DESC_ACPI_TABLES).
++ */
++static int walk_mem_range(unsigned long start_pfn, unsigned long nr_pages)
++{
++	struct resource res;
++	unsigned long pfn, end_pfn;
++	u64 orig_end;
++	int ret = -1;
++
++	res.start = (u64) start_pfn << PAGE_SHIFT;
++	res.end = ((u64)(start_pfn + nr_pages) << PAGE_SHIFT) - 1;
++	res.flags = IORESOURCE_MEM | IORESOURCE_BUSY;
++	orig_end = res.end;
++	while ((res.start < res.end) &&
++		(find_next_iomem_res(&res, IORES_DESC_NONE, true) >= 0)) {
++		pfn = (res.start + PAGE_SIZE - 1) >> PAGE_SHIFT;
++		end_pfn = (res.end + 1) >> PAGE_SHIFT;
++		if (end_pfn > pfn)
++			ret = (res.desc != IORES_DESC_NONE) ? 1 : 0;
++		if (ret)
++			break;
++		res.start = res.end + 1;
++		res.end = orig_end;
++	}
++	return ret;
++}
++
++/*
++ * This generic page_is_mem() returns true if specified address is
++ * registered as memory in iomem_resource list.
++ */
++int __weak page_is_mem(unsigned long pfn)
++{
++	return walk_mem_range(pfn, 1) == 1;
++}
++EXPORT_SYMBOL_GPL(page_is_mem);
++
+ /**
+  * region_intersects() - determine intersection of region with known resources
+  * @start: region start address
