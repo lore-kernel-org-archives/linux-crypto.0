@@ -1,7 +1,7 @@
 From: Gary R Hook <gary.hook@amd.com>
-Subject: [PATCH V2 1/3] crypto: ccp - Add SHA-2 384- and 512-bit support
-Date: Thu, 2 Mar 2017 15:26:39 -0600
-Message-ID: <20170302212639.30959.6341.stgit@taos>
+Subject: [PATCH V2 2/3] crypto: ccp - Enable support for AES GCM on v5 CCPs
+Date: Thu, 2 Mar 2017 15:26:54 -0600
+Message-ID: <20170302212654.30959.31.stgit@taos>
 References: <20170302212331.30959.44149.stgit@taos>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -10,221 +10,721 @@ Cc: <thomas.lendacky@amd.com>, <gary.hook@amd.com>,
         <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2nam03on0078.outbound.protection.outlook.com ([104.47.42.78]:6784
-        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
+Received: from mail-dm3nam03on0071.outbound.protection.outlook.com ([104.47.41.71]:59200
+        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751065AbdCBV1u (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Mar 2017 16:27:50 -0500
+        id S1751185AbdCBV1v (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 2 Mar 2017 16:27:51 -0500
 In-Reply-To: <20170302212331.30959.44149.stgit@taos>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Incorporate 384-bit and 512-bit hashing for a version 5 CCP
-device
-
+A version 5 device provides the primitive commands
+required for AES GCM. This patch adds support for
+en/decryption.
 
 Signed-off-by: Gary R Hook <gary.hook@amd.com>
 ---
- drivers/crypto/ccp/ccp-crypto-sha.c |   22 +++++++++++
- drivers/crypto/ccp/ccp-crypto.h     |    8 ++--
- drivers/crypto/ccp/ccp-ops.c        |   72 +++++++++++++++++++++++++++++++++++
- include/linux/ccp.h                 |    2 +
- 4 files changed, 101 insertions(+), 3 deletions(-)
+ drivers/crypto/ccp/Makefile                |    1 
+ drivers/crypto/ccp/ccp-crypto-aes-galois.c |  257 ++++++++++++++++++++++++++++
+ drivers/crypto/ccp/ccp-crypto-main.c       |   12 +
+ drivers/crypto/ccp/ccp-crypto.h            |   14 ++
+ drivers/crypto/ccp/ccp-dev-v5.c            |    2 
+ drivers/crypto/ccp/ccp-dev.h               |    1 
+ drivers/crypto/ccp/ccp-ops.c               |  252 +++++++++++++++++++++++++++
+ include/linux/ccp.h                        |    9 +
+ 8 files changed, 548 insertions(+)
+ create mode 100644 drivers/crypto/ccp/ccp-crypto-aes-galois.c
 
-diff --git a/drivers/crypto/ccp/ccp-crypto-sha.c b/drivers/crypto/ccp/ccp-crypto-sha.c
-index 84a652b..6b46eea 100644
---- a/drivers/crypto/ccp/ccp-crypto-sha.c
-+++ b/drivers/crypto/ccp/ccp-crypto-sha.c
-@@ -146,6 +146,12 @@ static int ccp_do_sha_update(struct ahash_request *req, unsigned int nbytes,
- 	case CCP_SHA_TYPE_256:
- 		rctx->cmd.u.sha.ctx_len = SHA256_DIGEST_SIZE;
- 		break;
-+	case CCP_SHA_TYPE_384:
-+		rctx->cmd.u.sha.ctx_len = SHA384_DIGEST_SIZE;
+diff --git a/drivers/crypto/ccp/Makefile b/drivers/crypto/ccp/Makefile
+index 346ceb8..9ca1722 100644
+--- a/drivers/crypto/ccp/Makefile
++++ b/drivers/crypto/ccp/Makefile
+@@ -12,4 +12,5 @@ ccp-crypto-objs := ccp-crypto-main.o \
+ 		   ccp-crypto-aes.o \
+ 		   ccp-crypto-aes-cmac.o \
+ 		   ccp-crypto-aes-xts.o \
++		   ccp-crypto-aes-galois.o \
+ 		   ccp-crypto-sha.o
+diff --git a/drivers/crypto/ccp/ccp-crypto-aes-galois.c b/drivers/crypto/ccp/ccp-crypto-aes-galois.c
+new file mode 100644
+index 0000000..8bc18c9
+--- /dev/null
++++ b/drivers/crypto/ccp/ccp-crypto-aes-galois.c
+@@ -0,0 +1,257 @@
++/*
++ * AMD Cryptographic Coprocessor (CCP) AES GCM crypto API support
++ *
++ * Copyright (C) 2016 Advanced Micro Devices, Inc.
++ *
++ * Author: Gary R Hook <gary.hook@amd.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ */
++
++#include <linux/module.h>
++#include <linux/sched.h>
++#include <linux/delay.h>
++#include <linux/scatterlist.h>
++#include <linux/crypto.h>
++#include <crypto/internal/aead.h>
++#include <crypto/algapi.h>
++#include <crypto/aes.h>
++#include <crypto/ctr.h>
++#include <crypto/scatterwalk.h>
++#include <linux/delay.h>
++
++#include "ccp-crypto.h"
++
++#define	AES_GCM_IVSIZE	12
++
++static int ccp_aes_gcm_complete(struct crypto_async_request *async_req, int ret)
++{
++	return ret;
++}
++
++static int ccp_aes_gcm_setkey(struct crypto_aead *tfm, const u8 *key,
++			      unsigned int key_len)
++{
++	struct ccp_ctx *ctx = crypto_aead_ctx(tfm);
++
++	switch (key_len) {
++	case AES_KEYSIZE_128:
++		ctx->u.aes.type = CCP_AES_TYPE_128;
 +		break;
-+	case CCP_SHA_TYPE_512:
-+		rctx->cmd.u.sha.ctx_len = SHA512_DIGEST_SIZE;
++	case AES_KEYSIZE_192:
++		ctx->u.aes.type = CCP_AES_TYPE_192;
 +		break;
- 	default:
- 		/* Should never get here */
- 		break;
-@@ -393,6 +399,22 @@ struct ccp_sha_def {
- 		.digest_size	= SHA256_DIGEST_SIZE,
- 		.block_size	= SHA256_BLOCK_SIZE,
- 	},
-+	{
-+		.version	= CCP_VERSION(5, 0),
-+		.name		= "sha384",
-+		.drv_name	= "sha384-ccp",
-+		.type		= CCP_SHA_TYPE_384,
-+		.digest_size	= SHA384_DIGEST_SIZE,
-+		.block_size	= SHA384_BLOCK_SIZE,
++	case AES_KEYSIZE_256:
++		ctx->u.aes.type = CCP_AES_TYPE_256;
++		break;
++	default:
++		crypto_aead_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
++		return -EINVAL;
++	}
++
++	ctx->u.aes.mode = CCP_AES_MODE_GCM;
++	ctx->u.aes.key_len = key_len;
++
++	memcpy(ctx->u.aes.key, key, key_len);
++	sg_init_one(&ctx->u.aes.key_sg, ctx->u.aes.key, key_len);
++
++	return 0;
++}
++
++static int ccp_aes_gcm_setauthsize(struct crypto_aead *tfm,
++				   unsigned int authsize)
++{
++	return 0;
++}
++
++static int ccp_aes_gcm_crypt(struct aead_request *req, bool encrypt)
++{
++	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
++	struct ccp_ctx *ctx = crypto_aead_ctx(tfm);
++	struct ccp_aes_req_ctx *rctx = aead_request_ctx(req);
++	struct scatterlist *iv_sg = NULL;
++	unsigned int iv_len = 0;
++	int i;
++	int ret = 0;
++
++	if (!ctx->u.aes.key_len)
++		return -EINVAL;
++
++	if (ctx->u.aes.mode != CCP_AES_MODE_GCM)
++		return -EINVAL;
++
++	if (!req->iv)
++		return -EINVAL;
++
++	/*
++	 * 5 parts:
++	 *   plaintext/ciphertext input
++	 *   AAD
++	 *   key
++	 *   IV
++	 *   Destination+tag buffer
++	 */
++
++	/* According to the way AES GCM has been implemented here,
++	 * per RFC 4106 it seems, the provided IV is fixed at 12 bytes,
++	 * occupies the beginning of the IV array. Write a 32-bit
++	 * integer after that (bytes 13-16) with a value of "1".
++	 */
++	memcpy(rctx->iv, req->iv, AES_GCM_IVSIZE);
++	for (i = 0; i < 3; i++)
++		rctx->iv[i + AES_GCM_IVSIZE] = 0;
++	rctx->iv[AES_BLOCK_SIZE - 1] = 1;
++
++	/* Set up a scatterlist for the IV */
++	iv_sg = &rctx->iv_sg;
++	iv_len = AES_BLOCK_SIZE;
++	sg_init_one(iv_sg, rctx->iv, iv_len);
++
++	/* The AAD + plaintext are concatenated in the src buffer */
++	memset(&rctx->cmd, 0, sizeof(rctx->cmd));
++	INIT_LIST_HEAD(&rctx->cmd.entry);
++	rctx->cmd.engine = CCP_ENGINE_AES;
++	rctx->cmd.u.aes.type = ctx->u.aes.type;
++	rctx->cmd.u.aes.mode = ctx->u.aes.mode;
++	rctx->cmd.u.aes.action =
++		(encrypt) ? CCP_AES_ACTION_ENCRYPT : CCP_AES_ACTION_DECRYPT;
++	rctx->cmd.u.aes.key = &ctx->u.aes.key_sg;
++	rctx->cmd.u.aes.key_len = ctx->u.aes.key_len;
++	rctx->cmd.u.aes.iv = iv_sg;
++	rctx->cmd.u.aes.iv_len = iv_len;
++	rctx->cmd.u.aes.src = req->src;
++	rctx->cmd.u.aes.src_len = req->cryptlen;
++	rctx->cmd.u.aes.aad_len = req->assoclen;
++
++	/* The cipher text + the tag are in the dst buffer */
++	rctx->cmd.u.aes.dst = req->dst;
++
++	ret = ccp_crypto_enqueue_request(&req->base, &rctx->cmd);
++
++	return ret;
++}
++
++static int ccp_aes_gcm_encrypt(struct aead_request *req)
++{
++	return ccp_aes_gcm_crypt(req, true);
++}
++
++static int ccp_aes_gcm_decrypt(struct aead_request *req)
++{
++	return ccp_aes_gcm_crypt(req, false);
++}
++
++static int ccp_aes_gcm_cra_init(struct crypto_aead *tfm)
++{
++	struct ccp_ctx *ctx = crypto_aead_ctx(tfm);
++
++	ctx->complete = ccp_aes_gcm_complete;
++	ctx->u.aes.key_len = 0;
++
++	crypto_aead_set_reqsize(tfm, sizeof(struct ccp_aes_req_ctx));
++
++	return 0;
++}
++
++static void ccp_aes_gcm_cra_exit(struct crypto_tfm *tfm)
++{
++}
++
++static struct aead_alg ccp_aes_gcm_defaults = {
++	.setkey = ccp_aes_gcm_setkey,
++	.setauthsize = ccp_aes_gcm_setauthsize,
++	.encrypt = ccp_aes_gcm_encrypt,
++	.decrypt = ccp_aes_gcm_decrypt,
++	.init = ccp_aes_gcm_cra_init,
++	.ivsize = AES_GCM_IVSIZE,
++	.maxauthsize = AES_BLOCK_SIZE,
++	.base = {
++		.cra_flags	= CRYPTO_ALG_TYPE_ABLKCIPHER |
++				  CRYPTO_ALG_ASYNC |
++				  CRYPTO_ALG_KERN_DRIVER_ONLY |
++				  CRYPTO_ALG_NEED_FALLBACK,
++		.cra_blocksize	= AES_BLOCK_SIZE,
++		.cra_ctxsize	= sizeof(struct ccp_ctx),
++		.cra_priority	= CCP_CRA_PRIORITY,
++		.cra_type	= &crypto_ablkcipher_type,
++		.cra_exit	= ccp_aes_gcm_cra_exit,
++		.cra_module	= THIS_MODULE,
 +	},
++};
++
++struct ccp_aes_aead_def {
++	enum ccp_aes_mode mode;
++	unsigned int version;
++	const char *name;
++	const char *driver_name;
++	unsigned int blocksize;
++	unsigned int ivsize;
++	struct aead_alg *alg_defaults;
++};
++
++static struct ccp_aes_aead_def aes_aead_algs[] = {
 +	{
++		.mode		= CCP_AES_MODE_GHASH,
 +		.version	= CCP_VERSION(5, 0),
-+		.name		= "sha512",
-+		.drv_name	= "sha512-ccp",
-+		.type		= CCP_SHA_TYPE_512,
-+		.digest_size	= SHA512_DIGEST_SIZE,
-+		.block_size	= SHA512_BLOCK_SIZE,
++		.name		= "gcm(aes)",
++		.driver_name	= "gcm-aes-ccp",
++		.blocksize	= 1,
++		.ivsize		= AES_BLOCK_SIZE,
++		.alg_defaults	= &ccp_aes_gcm_defaults,
 +	},
- };
++};
++
++static int ccp_register_aes_aead(struct list_head *head,
++				 const struct ccp_aes_aead_def *def)
++{
++	struct ccp_crypto_aead *ccp_aead;
++	struct aead_alg *alg;
++	int ret;
++
++	ccp_aead = kzalloc(sizeof(*ccp_aead), GFP_KERNEL);
++	if (!ccp_aead)
++		return -ENOMEM;
++
++	INIT_LIST_HEAD(&ccp_aead->entry);
++
++	ccp_aead->mode = def->mode;
++
++	/* Copy the defaults and override as necessary */
++	alg = &ccp_aead->alg;
++	*alg = *def->alg_defaults;
++	snprintf(alg->base.cra_name, CRYPTO_MAX_ALG_NAME, "%s", def->name);
++	snprintf(alg->base.cra_driver_name, CRYPTO_MAX_ALG_NAME, "%s",
++		 def->driver_name);
++	alg->base.cra_blocksize = def->blocksize;
++	alg->base.cra_ablkcipher.ivsize = def->ivsize;
++
++	ret = crypto_register_aead(alg);
++	if (ret) {
++		pr_err("%s ablkcipher algorithm registration error (%d)\n",
++		       alg->base.cra_name, ret);
++		kfree(ccp_aead);
++		return ret;
++	}
++
++	list_add(&ccp_aead->entry, head);
++
++	return 0;
++}
++
++int ccp_register_aes_aeads(struct list_head *head)
++{
++	int i, ret;
++	unsigned int ccpversion = ccp_version();
++
++	for (i = 0; i < ARRAY_SIZE(aes_aead_algs); i++) {
++		if (aes_aead_algs[i].version > ccpversion)
++			continue;
++		ret = ccp_register_aes_aead(head, &aes_aead_algs[i]);
++		if (ret)
++			return ret;
++	}
++
++	return 0;
++}
+diff --git a/drivers/crypto/ccp/ccp-crypto-main.c b/drivers/crypto/ccp/ccp-crypto-main.c
+index e0380e5..a33b8d6 100644
+--- a/drivers/crypto/ccp/ccp-crypto-main.c
++++ b/drivers/crypto/ccp/ccp-crypto-main.c
+@@ -36,6 +36,7 @@
+ /* List heads for the supported algorithms */
+ static LIST_HEAD(hash_algs);
+ static LIST_HEAD(cipher_algs);
++static LIST_HEAD(aead_algs);
  
- static int ccp_register_hmac_alg(struct list_head *head,
+ /* For any tfm, requests for that tfm must be returned on the order
+  * received.  With multiple queues available, the CCP can process more
+@@ -335,6 +336,10 @@ static int ccp_register_algs(void)
+ 		ret = ccp_register_aes_xts_algs(&cipher_algs);
+ 		if (ret)
+ 			return ret;
++
++		ret = ccp_register_aes_aeads(&aead_algs);
++		if (ret)
++			return ret;
+ 	}
+ 
+ 	if (!sha_disable) {
+@@ -350,6 +355,7 @@ static void ccp_unregister_algs(void)
+ {
+ 	struct ccp_crypto_ahash_alg *ahash_alg, *ahash_tmp;
+ 	struct ccp_crypto_ablkcipher_alg *ablk_alg, *ablk_tmp;
++	struct ccp_crypto_aead *aead_alg, *aead_tmp;
+ 
+ 	list_for_each_entry_safe(ahash_alg, ahash_tmp, &hash_algs, entry) {
+ 		crypto_unregister_ahash(&ahash_alg->alg);
+@@ -362,6 +368,12 @@ static void ccp_unregister_algs(void)
+ 		list_del(&ablk_alg->entry);
+ 		kfree(ablk_alg);
+ 	}
++
++	list_for_each_entry_safe(aead_alg, aead_tmp, &aead_algs, entry) {
++		crypto_unregister_aead(&aead_alg->alg);
++		list_del(&aead_alg->entry);
++		kfree(aead_alg);
++	}
+ }
+ 
+ static int ccp_crypto_init(void)
 diff --git a/drivers/crypto/ccp/ccp-crypto.h b/drivers/crypto/ccp/ccp-crypto.h
-index 8335b32..95cce27 100644
+index 95cce27..34da62d 100644
 --- a/drivers/crypto/ccp/ccp-crypto.h
 +++ b/drivers/crypto/ccp/ccp-crypto.h
-@@ -137,9 +137,11 @@ struct ccp_aes_cmac_exp_ctx {
- 	u8 buf[AES_BLOCK_SIZE];
+@@ -19,6 +19,8 @@
+ #include <linux/ccp.h>
+ #include <crypto/algapi.h>
+ #include <crypto/aes.h>
++#include <crypto/internal/aead.h>
++#include <crypto/aead.h>
+ #include <crypto/ctr.h>
+ #include <crypto/hash.h>
+ #include <crypto/sha.h>
+@@ -33,6 +35,14 @@ struct ccp_crypto_ablkcipher_alg {
+ 	struct crypto_alg alg;
  };
  
--/***** SHA related defines *****/
--#define MAX_SHA_CONTEXT_SIZE	SHA256_DIGEST_SIZE
--#define MAX_SHA_BLOCK_SIZE	SHA256_BLOCK_SIZE
-+/* SHA-related defines
-+ * These values must be large enough to accommodate any variant
-+ */
-+#define MAX_SHA_CONTEXT_SIZE	SHA512_DIGEST_SIZE
-+#define MAX_SHA_BLOCK_SIZE	SHA512_BLOCK_SIZE
++struct ccp_crypto_aead {
++	struct list_head entry;
++
++	u32 mode;
++
++	struct aead_alg alg;
++};
++
+ struct ccp_crypto_ahash_alg {
+ 	struct list_head entry;
  
- struct ccp_sha_ctx {
- 	struct scatterlist opad_sg;
+@@ -95,6 +105,9 @@ struct ccp_aes_req_ctx {
+ 	struct scatterlist iv_sg;
+ 	u8 iv[AES_BLOCK_SIZE];
+ 
++	struct scatterlist tag_sg;
++	u8 tag[AES_BLOCK_SIZE];
++
+ 	/* Fields used for RFC3686 requests */
+ 	u8 *rfc3686_info;
+ 	u8 rfc3686_iv[AES_BLOCK_SIZE];
+@@ -212,6 +225,7 @@ struct scatterlist *ccp_crypto_sg_table_add(struct sg_table *table,
+ int ccp_register_aes_algs(struct list_head *head);
+ int ccp_register_aes_cmac_algs(struct list_head *head);
+ int ccp_register_aes_xts_algs(struct list_head *head);
++int ccp_register_aes_aeads(struct list_head *head);
+ int ccp_register_sha_algs(struct list_head *head);
+ 
+ #endif
+diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
+index d9e1876..d44a738 100644
+--- a/drivers/crypto/ccp/ccp-dev-v5.c
++++ b/drivers/crypto/ccp/ccp-dev-v5.c
+@@ -289,6 +289,8 @@ static int ccp5_perform_aes(struct ccp_op *op)
+ 	CCP_AES_TYPE(&function) = op->u.aes.type;
+ 	if (op->u.aes.mode == CCP_AES_MODE_CFB)
+ 		CCP_AES_SIZE(&function) = 0x7f;
++	if ((op->u.aes.mode == CCP_AES_MODE_GCTR) && op->eom)
++		CCP_AES_SIZE(&function) = op->u.aes.size;
+ 
+ 	CCP5_CMD_FUNCTION(&desc) = function.raw;
+ 
+diff --git a/drivers/crypto/ccp/ccp-dev.h b/drivers/crypto/ccp/ccp-dev.h
+index 830f35e..8f313e6 100644
+--- a/drivers/crypto/ccp/ccp-dev.h
++++ b/drivers/crypto/ccp/ccp-dev.h
+@@ -466,6 +466,7 @@ struct ccp_aes_op {
+ 	enum ccp_aes_type type;
+ 	enum ccp_aes_mode mode;
+ 	enum ccp_aes_action action;
++	unsigned int size;
+ };
+ 
+ struct ccp_xts_aes_op {
 diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
-index efac3d5..213a752 100644
+index 213a752..83c8cf7 100644
 --- a/drivers/crypto/ccp/ccp-ops.c
 +++ b/drivers/crypto/ccp/ccp-ops.c
-@@ -41,6 +41,20 @@
- 	cpu_to_be32(SHA256_H6), cpu_to_be32(SHA256_H7),
- };
+@@ -600,6 +600,255 @@ static int ccp_run_aes_cmac_cmd(struct ccp_cmd_queue *cmd_q,
+ 	return ret;
+ }
  
-+static const __be64 ccp_sha384_init[SHA512_DIGEST_SIZE / sizeof(__be64)] = {
-+	cpu_to_be64(SHA384_H0), cpu_to_be64(SHA384_H1),
-+	cpu_to_be64(SHA384_H2), cpu_to_be64(SHA384_H3),
-+	cpu_to_be64(SHA384_H4), cpu_to_be64(SHA384_H5),
-+	cpu_to_be64(SHA384_H6), cpu_to_be64(SHA384_H7),
-+};
++static int ccp_run_aes_gcm_cmd(struct ccp_cmd_queue *cmd_q,
++			       struct ccp_cmd *cmd)
++{
++	struct ccp_aes_engine *aes = &cmd->u.aes;
++	struct ccp_dm_workarea key, ctx, final_wa, tag;
++	struct ccp_data src, dst;
++	struct ccp_data aad;
++	struct ccp_op op;
 +
-+static const __be64 ccp_sha512_init[SHA512_DIGEST_SIZE / sizeof(__be64)] = {
-+	cpu_to_be64(SHA512_H0), cpu_to_be64(SHA512_H1),
-+	cpu_to_be64(SHA512_H2), cpu_to_be64(SHA512_H3),
-+	cpu_to_be64(SHA512_H4), cpu_to_be64(SHA512_H5),
-+	cpu_to_be64(SHA512_H6), cpu_to_be64(SHA512_H7),
-+};
++	unsigned long long *final;
++	unsigned int dm_offset;
++	unsigned int ilen;
++	bool in_place = true; /* Default value */
++	int ret;
 +
- #define	CCP_NEW_JOBID(ccp)	((ccp->vdata->version == CCP_VERSION(3, 0)) ? \
- 					ccp_gen_jobid(ccp) : 0)
- 
-@@ -947,6 +961,18 @@ static int ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
- 			return -EINVAL;
- 		block_size = SHA256_BLOCK_SIZE;
- 		break;
-+	case CCP_SHA_TYPE_384:
-+		if (cmd_q->ccp->vdata->version < CCP_VERSION(4, 0)
-+		    || sha->ctx_len < SHA384_DIGEST_SIZE)
-+			return -EINVAL;
-+		block_size = SHA384_BLOCK_SIZE;
-+		break;
-+	case CCP_SHA_TYPE_512:
-+		if (cmd_q->ccp->vdata->version < CCP_VERSION(4, 0)
-+		    || sha->ctx_len < SHA512_DIGEST_SIZE)
-+			return -EINVAL;
-+		block_size = SHA512_BLOCK_SIZE;
-+		break;
- 	default:
- 		return -EINVAL;
- 	}
-@@ -1034,6 +1060,21 @@ static int ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
- 		sb_count = 1;
- 		ooffset = ioffset = 0;
- 		break;
-+	case CCP_SHA_TYPE_384:
-+		digest_size = SHA384_DIGEST_SIZE;
-+		init = (void *) ccp_sha384_init;
-+		ctx_size = SHA512_DIGEST_SIZE;
-+		sb_count = 2;
-+		ioffset = 0;
-+		ooffset = 2 * CCP_SB_BYTES - SHA384_DIGEST_SIZE;
-+		break;
-+	case CCP_SHA_TYPE_512:
-+		digest_size = SHA512_DIGEST_SIZE;
-+		init = (void *) ccp_sha512_init;
-+		ctx_size = SHA512_DIGEST_SIZE;
-+		sb_count = 2;
-+		ooffset = ioffset = 0;
-+		break;
- 	default:
- 		ret = -EINVAL;
- 		goto e_data;
-@@ -1052,6 +1093,11 @@ static int ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
- 	op.u.sha.type = sha->type;
- 	op.u.sha.msg_bits = sha->msg_bits;
- 
-+	/* For SHA1/224/256 the context fits in a single (32-byte) SB entry;
-+	 * SHA384/512 require 2 adjacent SB slots, with the right half in the
-+	 * first slot, and the left half in the second. Each portion must then
-+	 * be in little endian format: use the 256-bit byte swap option.
++	struct scatterlist *p_inp, sg_inp[2];
++	struct scatterlist *p_tag, sg_tag[2];
++	struct scatterlist *p_outp, sg_outp[2];
++	struct scatterlist *p_aad;
++
++	if (!aes->iv)
++		return -EINVAL;
++
++	if (!((aes->key_len == AES_KEYSIZE_128) ||
++		(aes->key_len == AES_KEYSIZE_192) ||
++		(aes->key_len == AES_KEYSIZE_256)))
++		return -EINVAL;
++
++	if (!aes->key) /* Gotta have a key SGL */
++		return -EINVAL;
++
++	/* First, decompose the source buffer into AAD & PT,
++	 * and the destination buffer into AAD, CT & tag, or
++	 * the input into CT & tag.
++	 * It is expected that the input and output SGs will
++	 * be valid, even if the AAD and input lengths are 0.
 +	 */
- 	ret = ccp_init_dm_workarea(&ctx, cmd_q, sb_count * CCP_SB_BYTES,
- 				   DMA_BIDIRECTIONAL);
- 	if (ret)
-@@ -1063,6 +1109,13 @@ static int ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
- 		case CCP_SHA_TYPE_256:
- 			memcpy(ctx.address + ioffset, init, ctx_size);
- 			break;
-+		case CCP_SHA_TYPE_384:
-+		case CCP_SHA_TYPE_512:
-+			memcpy(ctx.address + ctx_size / 2, init,
-+			       ctx_size / 2);
-+			memcpy(ctx.address, init + ctx_size / 2,
-+			       ctx_size / 2);
-+			break;
- 		default:
- 			ret = -EINVAL;
- 			goto e_ctx;
-@@ -1129,6 +1182,15 @@ static int ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
- 					sha->ctx, 0,
- 					digest_size);
- 			break;
-+		case CCP_SHA_TYPE_384:
-+		case CCP_SHA_TYPE_512:
-+			ccp_get_dm_area(&ctx, 0,
-+					sha->ctx, LSB_ITEM_SIZE - ooffset,
-+					LSB_ITEM_SIZE);
-+			ccp_get_dm_area(&ctx, LSB_ITEM_SIZE + ooffset,
-+					sha->ctx, 0,
-+					LSB_ITEM_SIZE - ooffset);
-+			break;
- 		default:
- 			ret = -EINVAL;
- 			goto e_ctx;
-@@ -1166,6 +1228,16 @@ static int ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
- 			       ctx.address + ooffset,
- 			       digest_size);
- 			break;
-+		case CCP_SHA_TYPE_384:
-+		case CCP_SHA_TYPE_512:
-+			memcpy(hmac_buf + block_size,
-+			       ctx.address + LSB_ITEM_SIZE + ooffset,
-+			       LSB_ITEM_SIZE);
-+			memcpy(hmac_buf + block_size +
-+			       (LSB_ITEM_SIZE - ooffset),
-+			       ctx.address,
-+			       LSB_ITEM_SIZE);
-+			break;
- 		default:
- 			ret = -EINVAL;
- 			goto e_ctx;
++	p_aad = aes->src;
++	p_inp = scatterwalk_ffwd(sg_inp, aes->src, aes->aad_len);
++	p_outp = scatterwalk_ffwd(sg_outp, aes->dst, aes->aad_len);
++	if (aes->action == CCP_AES_ACTION_ENCRYPT) {
++		ilen = aes->src_len;
++		p_tag = scatterwalk_ffwd(sg_tag, p_outp, ilen);
++	} else {
++		/* Input length for decryption includes tag */
++		ilen = aes->src_len - AES_BLOCK_SIZE;
++		p_tag = scatterwalk_ffwd(sg_tag, p_inp, ilen);
++	}
++
++	memset(&op, 0, sizeof(op));
++	op.cmd_q = cmd_q;
++	op.jobid = CCP_NEW_JOBID(cmd_q->ccp);
++	op.sb_key = cmd_q->sb_key; /* Pre-allocated */
++	op.sb_ctx = cmd_q->sb_ctx; /* Pre-allocated */
++	op.init = 1;
++	op.u.aes.type = aes->type;
++
++	/* Copy the key to the LSB */
++	ret = ccp_init_dm_workarea(&key, cmd_q,
++				   CCP_AES_CTX_SB_COUNT * CCP_SB_BYTES,
++				   DMA_TO_DEVICE);
++	if (ret)
++		return ret;
++
++	dm_offset = CCP_SB_BYTES - aes->key_len;
++	ccp_set_dm_area(&key, dm_offset, aes->key, 0, aes->key_len);
++	ret = ccp_copy_to_sb(cmd_q, &key, op.jobid, op.sb_key,
++			     CCP_PASSTHRU_BYTESWAP_256BIT);
++	if (ret) {
++		cmd->engine_error = cmd_q->cmd_error;
++		goto e_key;
++	}
++
++	/* Copy the context (IV) to the LSB.
++	 * There is an assumption here that the IV is 96 bits in length, plus
++	 * a nonce of 32 bits. If no IV is present, use a zeroed buffer.
++	 */
++	ret = ccp_init_dm_workarea(&ctx, cmd_q,
++				   CCP_AES_CTX_SB_COUNT * CCP_SB_BYTES,
++				   DMA_BIDIRECTIONAL);
++	if (ret)
++		goto e_key;
++
++	dm_offset = CCP_AES_CTX_SB_COUNT * CCP_SB_BYTES - aes->iv_len;
++	ccp_set_dm_area(&ctx, dm_offset, aes->iv, 0, aes->iv_len);
++
++	ret = ccp_copy_to_sb(cmd_q, &ctx, op.jobid, op.sb_ctx,
++			     CCP_PASSTHRU_BYTESWAP_256BIT);
++	if (ret) {
++		cmd->engine_error = cmd_q->cmd_error;
++		goto e_ctx;
++	}
++
++	op.init = 1;
++	if (aes->aad_len > 0) {
++		/* Step 1: Run a GHASH over the Additional Authenticated Data */
++		ret = ccp_init_data(&aad, cmd_q, p_aad, aes->aad_len,
++				    AES_BLOCK_SIZE,
++				    DMA_TO_DEVICE);
++		if (ret)
++			goto e_ctx;
++
++		op.u.aes.mode = CCP_AES_MODE_GHASH;
++		op.u.aes.action = CCP_AES_GHASHAAD;
++
++		while (aad.sg_wa.bytes_left) {
++			ccp_prepare_data(&aad, NULL, &op, AES_BLOCK_SIZE, true);
++
++			ret = cmd_q->ccp->vdata->perform->aes(&op);
++			if (ret) {
++				cmd->engine_error = cmd_q->cmd_error;
++				goto e_aad;
++			}
++
++			ccp_process_data(&aad, NULL, &op);
++			op.init = 0;
++		}
++	}
++
++	op.u.aes.mode = CCP_AES_MODE_GCTR;
++	op.u.aes.action = aes->action;
++
++	if (ilen > 0) {
++		/* Step 2: Run a GCTR over the plaintext */
++		in_place = (sg_virt(p_inp) == sg_virt(p_outp)) ? true : false;
++
++		ret = ccp_init_data(&src, cmd_q, p_inp, ilen,
++				    AES_BLOCK_SIZE,
++				    in_place ? DMA_BIDIRECTIONAL
++					     : DMA_TO_DEVICE);
++		if (ret)
++			goto e_ctx;
++
++		if (in_place) {
++			dst = src;
++		} else {
++			ret = ccp_init_data(&dst, cmd_q, p_outp, ilen,
++					    AES_BLOCK_SIZE, DMA_FROM_DEVICE);
++			if (ret)
++				goto e_src;
++		}
++
++		op.soc = 0;
++		op.eom = 0;
++		op.init = 1;
++		while (src.sg_wa.bytes_left) {
++			ccp_prepare_data(&src, &dst, &op, AES_BLOCK_SIZE, true);
++			if (!src.sg_wa.bytes_left) {
++				unsigned int nbytes = aes->src_len
++						      % AES_BLOCK_SIZE;
++
++				if (nbytes) {
++					op.eom = 1;
++					op.u.aes.size = (nbytes * 8) - 1;
++				}
++			}
++
++			ret = cmd_q->ccp->vdata->perform->aes(&op);
++			if (ret) {
++				cmd->engine_error = cmd_q->cmd_error;
++				goto e_dst;
++			}
++
++			ccp_process_data(&src, &dst, &op);
++			op.init = 0;
++		}
++	}
++
++	/* Step 3: Update the IV portion of the context with the original IV */
++	ret = ccp_copy_from_sb(cmd_q, &ctx, op.jobid, op.sb_ctx,
++			       CCP_PASSTHRU_BYTESWAP_256BIT);
++	if (ret) {
++		cmd->engine_error = cmd_q->cmd_error;
++		goto e_dst;
++	}
++
++	ccp_set_dm_area(&ctx, dm_offset, aes->iv, 0, aes->iv_len);
++
++	ret = ccp_copy_to_sb(cmd_q, &ctx, op.jobid, op.sb_ctx,
++			     CCP_PASSTHRU_BYTESWAP_256BIT);
++	if (ret) {
++		cmd->engine_error = cmd_q->cmd_error;
++		goto e_dst;
++	}
++
++	/* Step 4: Concatenate the lengths of the AAD and source, and
++	 * hash that 16 byte buffer.
++	 */
++	ret = ccp_init_dm_workarea(&final_wa, cmd_q, AES_BLOCK_SIZE,
++				   DMA_BIDIRECTIONAL);
++	if (ret)
++		goto e_dst;
++	final = (unsigned long long *) final_wa.address;
++	final[0] = cpu_to_be64(aes->aad_len * 8);
++	final[1] = cpu_to_be64(ilen * 8);
++
++	op.u.aes.mode = CCP_AES_MODE_GHASH;
++	op.u.aes.action = CCP_AES_GHASHFINAL;
++	op.src.type = CCP_MEMTYPE_SYSTEM;
++	op.src.u.dma.address = final_wa.dma.address;
++	op.src.u.dma.length = AES_BLOCK_SIZE;
++	op.dst.type = CCP_MEMTYPE_SYSTEM;
++	op.dst.u.dma.address = final_wa.dma.address;
++	op.dst.u.dma.length = AES_BLOCK_SIZE;
++	op.eom = 1;
++	op.u.aes.size = 0;
++	ret = cmd_q->ccp->vdata->perform->aes(&op);
++	if (ret)
++		goto e_dst;
++
++	if (aes->action == CCP_AES_ACTION_ENCRYPT) {
++		/* Put the ciphered tag after the ciphertext. */
++		ccp_get_dm_area(&final_wa, 0, p_tag, 0, AES_BLOCK_SIZE);
++	} else {
++		/* Does this ciphered tag match the input? */
++		ret = ccp_init_dm_workarea(&tag, cmd_q, AES_BLOCK_SIZE,
++					   DMA_BIDIRECTIONAL);
++		if (ret)
++			goto e_tag;
++		ccp_set_dm_area(&tag, 0, p_tag, 0, AES_BLOCK_SIZE);
++
++		ret = memcmp(tag.address, final_wa.address, AES_BLOCK_SIZE);
++		ccp_dm_free(&tag);
++	}
++
++e_tag:
++	ccp_dm_free(&final_wa);
++
++e_dst:
++	if (aes->src_len && !in_place)
++		ccp_free_data(&dst, cmd_q);
++
++e_src:
++	if (aes->src_len)
++		ccp_free_data(&src, cmd_q);
++
++e_aad:
++	if (aes->aad_len)
++		ccp_free_data(&aad, cmd_q);
++
++e_ctx:
++	ccp_dm_free(&ctx);
++
++e_key:
++	ccp_dm_free(&key);
++
++	return ret;
++}
++
+ static int ccp_run_aes_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ {
+ 	struct ccp_aes_engine *aes = &cmd->u.aes;
+@@ -613,6 +862,9 @@ static int ccp_run_aes_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 	if (aes->mode == CCP_AES_MODE_CMAC)
+ 		return ccp_run_aes_cmac_cmd(cmd_q, cmd);
+ 
++	if (aes->mode == CCP_AES_MODE_GCM)
++		return ccp_run_aes_gcm_cmd(cmd_q, cmd);
++
+ 	if (!((aes->key_len == AES_KEYSIZE_128) ||
+ 	      (aes->key_len == AES_KEYSIZE_192) ||
+ 	      (aes->key_len == AES_KEYSIZE_256)))
 diff --git a/include/linux/ccp.h b/include/linux/ccp.h
-index c71dd8f..90a1fbe 100644
+index 90a1fbe..6f78295 100644
 --- a/include/linux/ccp.h
 +++ b/include/linux/ccp.h
-@@ -249,6 +249,8 @@ enum ccp_sha_type {
- 	CCP_SHA_TYPE_1 = 1,
- 	CCP_SHA_TYPE_224,
- 	CCP_SHA_TYPE_256,
-+	CCP_SHA_TYPE_384,
-+	CCP_SHA_TYPE_512,
- 	CCP_SHA_TYPE__LAST,
+@@ -123,6 +123,10 @@ enum ccp_aes_mode {
+ 	CCP_AES_MODE_CFB,
+ 	CCP_AES_MODE_CTR,
+ 	CCP_AES_MODE_CMAC,
++	CCP_AES_MODE_GHASH,
++	CCP_AES_MODE_GCTR,
++	CCP_AES_MODE_GCM,
++	CCP_AES_MODE_GMAC,
+ 	CCP_AES_MODE__LAST,
  };
  
+@@ -137,6 +141,9 @@ enum ccp_aes_action {
+ 	CCP_AES_ACTION_ENCRYPT,
+ 	CCP_AES_ACTION__LAST,
+ };
++/* Overloaded field */
++#define	CCP_AES_GHASHAAD	CCP_AES_ACTION_DECRYPT
++#define	CCP_AES_GHASHFINAL	CCP_AES_ACTION_ENCRYPT
+ 
+ /**
+  * struct ccp_aes_engine - CCP AES operation
+@@ -181,6 +188,8 @@ struct ccp_aes_engine {
+ 	struct scatterlist *cmac_key;	/* K1/K2 cmac key required for
+ 					 * final cmac cmd */
+ 	u32 cmac_key_len;	/* In bytes */
++
++	u32 aad_len;		/* In bytes */
+ };
+ 
+ /***** XTS-AES engine *****/
