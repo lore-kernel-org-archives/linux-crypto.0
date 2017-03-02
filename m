@@ -1,8 +1,7 @@
 From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: [RFC PATCH v2 01/32] x86: Add the Secure Encrypted Virtualization
- CPU feature
-Date: Thu, 2 Mar 2017 10:12:09 -0500
-Message-ID: <148846752953.2349.17505492128445909591.stgit__4069.84168007529$1488470060$gmane$org@brijesh-build-machine>
+Subject: [RFC PATCH v2 23/32] kvm: introduce KVM_MEMORY_ENCRYPT_OP ioctl
+Date: Thu, 2 Mar 2017 10:17:11 -0500
+Message-ID: <148846783136.2349.9362218518503742320.stgit__4019.44241389192$1488470079$gmane$org@brijesh-build-machine>
 References: <148846752022.2349.13667498174822419498.stgit@brijesh-build-machine>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -22,105 +21,78 @@ To: <simon.guinot@sequanux.org>, <linux-efi@vger.kernel.org>,
         <dyoung@redhat.com>, <thomas.lendacky@amd.com>, <jroedel@suse.de>,
         <keescook@chromium.org>, <arnd@arndb.de>, <toshi
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-sn1nam01on0085.outbound.protection.outlook.com ([104.47.32.85]:3554
-        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
+Received: from mail-sn1nam02on0078.outbound.protection.outlook.com ([104.47.36.78]:53633
+        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752444AbdCBPwQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Mar 2017 10:52:16 -0500
+        id S1753205AbdCBPwB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 2 Mar 2017 10:52:01 -0500
 In-Reply-To: <148846752022.2349.13667498174822419498.stgit@brijesh-build-machine>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Tom Lendacky <thomas.lendacky@amd.com>
+If hardware supports encrypting then KVM_MEMORY_ENCRYPT_OP ioctl can
+be used by qemu to issue platform specific memory encryption commands.
 
-Update the CPU features to include identifying and reporting on the
-Secure Encrypted Virtualization (SEV) feature.  SME is identified by
-CPUID 0x8000001f, but requires BIOS support to enable it (set bit 23 of
-MSR_K8_SYSCFG and set bit 0 of MSR_K7_HWCR).  Only show the SEV feature
-as available if reported by CPUID and enabled by BIOS.
-
-Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- arch/x86/include/asm/cpufeatures.h |    1 +
- arch/x86/include/asm/msr-index.h   |    2 ++
- arch/x86/kernel/cpu/amd.c          |   22 ++++++++++++++++++----
- arch/x86/kernel/cpu/scattered.c    |    1 +
- 4 files changed, 22 insertions(+), 4 deletions(-)
+ arch/x86/include/asm/kvm_host.h |    2 ++
+ arch/x86/kvm/x86.c              |   12 ++++++++++++
+ include/uapi/linux/kvm.h        |    2 ++
+ 3 files changed, 16 insertions(+)
 
-diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-index b1a4468..9907579 100644
---- a/arch/x86/include/asm/cpufeatures.h
-+++ b/arch/x86/include/asm/cpufeatures.h
-@@ -188,6 +188,7 @@
-  */
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index bff1f15..62651ad 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1033,6 +1033,8 @@ struct kvm_x86_ops {
+ 	void (*cancel_hv_timer)(struct kvm_vcpu *vcpu);
  
- #define X86_FEATURE_SME		( 7*32+ 0) /* AMD Secure Memory Encryption */
-+#define X86_FEATURE_SEV		( 7*32+ 1) /* AMD Secure Encrypted Virtualization */
- #define X86_FEATURE_CPB		( 7*32+ 2) /* AMD Core Performance Boost */
- #define X86_FEATURE_EPB		( 7*32+ 3) /* IA32_ENERGY_PERF_BIAS support */
- #define X86_FEATURE_CAT_L3	( 7*32+ 4) /* Cache Allocation Technology L3 */
-diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-index e2d0503..e8b3b28 100644
---- a/arch/x86/include/asm/msr-index.h
-+++ b/arch/x86/include/asm/msr-index.h
-@@ -361,6 +361,8 @@
- #define MSR_K7_PERFCTR3			0xc0010007
- #define MSR_K7_CLK_CTL			0xc001001b
- #define MSR_K7_HWCR			0xc0010015
-+#define MSR_K7_HWCR_SMMLOCK_BIT		0
-+#define MSR_K7_HWCR_SMMLOCK		BIT_ULL(MSR_K7_HWCR_SMMLOCK_BIT)
- #define MSR_K7_FID_VID_CTL		0xc0010041
- #define MSR_K7_FID_VID_STATUS		0xc0010042
- 
-diff --git a/arch/x86/kernel/cpu/amd.c b/arch/x86/kernel/cpu/amd.c
-index 6bddda3..675958e 100644
---- a/arch/x86/kernel/cpu/amd.c
-+++ b/arch/x86/kernel/cpu/amd.c
-@@ -617,10 +617,13 @@ static void early_init_amd(struct cpuinfo_x86 *c)
- 		set_cpu_bug(c, X86_BUG_AMD_E400);
- 
- 	/*
--	 * BIOS support is required for SME. If BIOS has enabld SME then
--	 * adjust x86_phys_bits by the SME physical address space reduction
--	 * value. If BIOS has not enabled SME then don't advertise the
--	 * feature (set in scattered.c).
-+	 * BIOS support is required for SME and SEV.
-+	 *   For SME: If BIOS has enabled SME then adjust x86_phys_bits by
-+	 *	      the SME physical address space reduction value.
-+	 *	      If BIOS has not enabled SME then don't advertise the
-+	 *	      SME feature (set in scattered.c).
-+	 *   For SEV: If BIOS has not enabled SEV then don't advertise the
-+	 *            SEV feature (set in scattered.c).
- 	 */
- 	if (c->extended_cpuid_level >= 0x8000001f) {
- 		if (cpu_has(c, X86_FEATURE_SME)) {
-@@ -637,6 +640,17 @@ static void early_init_amd(struct cpuinfo_x86 *c)
- 				clear_cpu_cap(c, X86_FEATURE_SME);
- 			}
- 		}
+ 	void (*setup_mce)(struct kvm_vcpu *vcpu);
 +
-+		if (cpu_has(c, X86_FEATURE_SEV)) {
-+			u64 syscfg, hwcr;
-+
-+			/* Check if SEV is enabled */
-+			rdmsrl(MSR_K8_SYSCFG, syscfg);
-+			rdmsrl(MSR_K7_HWCR, hwcr);
-+			if (!(syscfg & MSR_K8_SYSCFG_MEM_ENCRYPT) ||
-+			    !(hwcr & MSR_K7_HWCR_SMMLOCK))
-+				clear_cpu_cap(c, X86_FEATURE_SEV);
-+		}
- 	}
- }
- 
-diff --git a/arch/x86/kernel/cpu/scattered.c b/arch/x86/kernel/cpu/scattered.c
-index cabda87..c3f58d9 100644
---- a/arch/x86/kernel/cpu/scattered.c
-+++ b/arch/x86/kernel/cpu/scattered.c
-@@ -31,6 +31,7 @@ static const struct cpuid_bit cpuid_bits[] = {
- 	{ X86_FEATURE_CPB,		CPUID_EDX,  9, 0x80000007, 0 },
- 	{ X86_FEATURE_PROC_FEEDBACK,    CPUID_EDX, 11, 0x80000007, 0 },
- 	{ X86_FEATURE_SME,		CPUID_EAX,  0, 0x8000001f, 0 },
-+	{ X86_FEATURE_SEV,		CPUID_EAX,  1, 0x8000001f, 0 },
- 	{ 0, 0, 0, 0, 0 }
++	int (*memory_encryption_op)(struct kvm *kvm, void __user *argp);
  };
  
+ struct kvm_arch_async_pf {
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 2099df8..6a737e9 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3926,6 +3926,14 @@ static int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 	return r;
+ }
+ 
++static int kvm_vm_ioctl_memory_encryption_op(struct kvm *kvm, void __user *argp)
++{
++	if (kvm_x86_ops->memory_encryption_op)
++		return kvm_x86_ops->memory_encryption_op(kvm, argp);
++
++	return -ENOTTY;
++}
++
+ long kvm_arch_vm_ioctl(struct file *filp,
+ 		       unsigned int ioctl, unsigned long arg)
+ {
+@@ -4189,6 +4197,10 @@ long kvm_arch_vm_ioctl(struct file *filp,
+ 		r = kvm_vm_ioctl_enable_cap(kvm, &cap);
+ 		break;
+ 	}
++	case KVM_MEMORY_ENCRYPT_OP: {
++		r = kvm_vm_ioctl_memory_encryption_op(kvm, argp);
++		break;
++	}
+ 	default:
+ 		r = kvm_vm_ioctl_assigned_device(kvm, ioctl, arg);
+ 	}
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index cac48ed..fef7d83 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1281,6 +1281,8 @@ struct kvm_s390_ucas_mapping {
+ #define KVM_S390_GET_IRQ_STATE	  _IOW(KVMIO, 0xb6, struct kvm_s390_irq_state)
+ /* Available with KVM_CAP_X86_SMM */
+ #define KVM_SMI                   _IO(KVMIO,   0xb7)
++/* Memory Encryption Commands */
++#define KVM_MEMORY_ENCRYPT_OP	  _IOWR(KVMIO, 0xb8, unsigned long)
+ 
+ #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
+ #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
