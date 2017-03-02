@@ -1,8 +1,8 @@
 From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: [RFC PATCH v2 29/32] kvm: svm: Add support for SEV DEBUG_DECRYPT
+Subject: [RFC PATCH v2 25/32] kvm: svm: Add support for SEV LAUNCH_START
  command
-Date: Thu, 2 Mar 2017 10:18:17 -0500
-Message-ID: <148846789744.2349.167641684941925238.stgit__36115.9142376438$1488470678$gmane$org@brijesh-build-machine>
+Date: Thu, 2 Mar 2017 10:17:35 -0500
+Message-ID: <148846785574.2349.2756610033917941226.stgit__24935.385262552$1488470688$gmane$org@brijesh-build-machine>
 References: <148846752022.2349.13667498174822419498.stgit@brijesh-build-machine>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -22,113 +22,377 @@ To: <simon.guinot@sequanux.org>, <linux-efi@vger.kernel.org>,
         <dyoung@redhat.com>, <thomas.lendacky@amd.com>, <jroedel@suse.de>,
         <keescook@chromium.org>, <arnd@arndb.de>, <toshi
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2nam02on0040.outbound.protection.outlook.com ([104.47.38.40]:43952
-        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
+Received: from mail-sn1nam01on0040.outbound.protection.outlook.com ([104.47.32.40]:27407
+        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751768AbdCBPfA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1752650AbdCBPfA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Thu, 2 Mar 2017 10:35:00 -0500
 In-Reply-To: <148846752022.2349.13667498174822419498.stgit@brijesh-build-machine>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The command is used to decrypt guest memory region for debug purposes.
+The command is used to bootstrap SEV guest from unencrypted boot images.
+The command creates a new VM encryption key (VEK) using the guest owner's
+public DH certificates, and session data. The VEK will be used to encrypt
+the guest memory.
 
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- arch/x86/kvm/svm.c |   76 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 76 insertions(+)
+ arch/x86/kvm/svm.c |  302 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 301 insertions(+), 1 deletion(-)
 
 diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index 977aa22..ce8819a 100644
+index fb63398..b5fa8c0 100644
 --- a/arch/x86/kvm/svm.c
 +++ b/arch/x86/kvm/svm.c
-@@ -5986,6 +5986,78 @@ static int sev_guest_status(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 	return ret;
+@@ -37,6 +37,7 @@
+ #include <linux/amd-iommu.h>
+ #include <linux/hashtable.h>
+ #include <linux/psp-sev.h>
++#include <linux/file.h>
+ 
+ #include <asm/apic.h>
+ #include <asm/perf_event.h>
+@@ -497,6 +498,10 @@ static inline bool gif_set(struct vcpu_svm *svm)
+ /* Secure Encrypted Virtualization */
+ static unsigned int max_sev_asid;
+ static unsigned long *sev_asid_bitmap;
++static void sev_deactivate_handle(struct kvm *kvm);
++static void sev_decommission_handle(struct kvm *kvm);
++static int sev_asid_new(void);
++static void sev_asid_free(int asid);
+ 
+ static bool kvm_sev_enabled(void)
+ {
+@@ -1534,6 +1539,17 @@ static inline int avic_free_vm_id(int id)
+ 	return 0;
  }
  
-+static int __sev_dbg_decrypt_page(struct kvm *kvm, unsigned long src,
-+		void *dst, int *error)
++static void sev_vm_destroy(struct kvm *kvm)
++{
++	if (!sev_guest(kvm))
++		return;
++
++	/* release the firmware resources */
++	sev_deactivate_handle(kvm);
++	sev_decommission_handle(kvm);
++	sev_asid_free(sev_get_asid(kvm));
++}
++
+ static void avic_vm_destroy(struct kvm *kvm)
+ {
+ 	unsigned long flags;
+@@ -1551,6 +1567,12 @@ static void avic_vm_destroy(struct kvm *kvm)
+ 	spin_unlock_irqrestore(&svm_vm_data_hash_lock, flags);
+ }
+ 
++static void svm_vm_destroy(struct kvm *kvm)
++{
++	avic_vm_destroy(kvm);
++	sev_vm_destroy(kvm);
++}
++
+ static int avic_vm_init(struct kvm *kvm)
+ {
+ 	unsigned long flags;
+@@ -5502,6 +5524,282 @@ static inline void avic_post_state_restore(struct kvm_vcpu *vcpu)
+ 	avic_handle_ldr_update(vcpu);
+ }
+ 
++static int sev_asid_new(void)
++{
++	int pos;
++
++	if (!max_sev_asid)
++		return -EINVAL;
++
++	pos = find_first_zero_bit(sev_asid_bitmap, max_sev_asid);
++	if (pos >= max_sev_asid)
++		return -EBUSY;
++
++	set_bit(pos, sev_asid_bitmap);
++	return pos + 1;
++}
++
++static void sev_asid_free(int asid)
++{
++	int cpu, pos;
++	struct svm_cpu_data *sd;
++
++	pos = asid - 1;
++	clear_bit(pos, sev_asid_bitmap);
++
++	for_each_possible_cpu(cpu) {
++		sd = per_cpu(svm_data, cpu);
++		sd->sev_vmcbs[pos] = NULL;
++	}
++}
++
++static int sev_issue_cmd(struct kvm *kvm, int id, void *data, int *error)
 +{
 +	int ret;
-+	struct page **inpages;
-+	struct sev_data_dbg *data;
-+	unsigned long npages;
++	struct fd f;
++	int fd = sev_get_fd(kvm);
++
++	f = fdget(fd);
++	if (!f.file)
++		return -EBADF;
++
++	ret = sev_issue_cmd_external_user(f.file, id, data, 0, error);
++	fdput(f);
++
++	return ret;
++}
++
++static void sev_decommission_handle(struct kvm *kvm)
++{
++	int ret, error;
++	struct sev_data_decommission *data;
++
++	data = kzalloc(sizeof(*data), GFP_KERNEL);
++	if (!data)
++		return;
++
++	data->handle = sev_get_handle(kvm);
++	ret = sev_guest_decommission(data, &error);
++	if (ret)
++		pr_err("SEV: DECOMMISSION %d (%#x)\n", ret, error);
++
++	kfree(data);
++}
++
++static void sev_deactivate_handle(struct kvm *kvm)
++{
++	int ret, error;
++	struct sev_data_deactivate *data;
++
++	data = kzalloc(sizeof(*data), GFP_KERNEL);
++	if (!data)
++		return;
++
++	data->handle = sev_get_handle(kvm);
++	ret = sev_guest_deactivate(data, &error);
++	if (ret) {
++		pr_err("SEV: DEACTIVATE %d (%#x)\n", ret, error);
++		goto buffer_free;
++	}
++
++	wbinvd_on_all_cpus();
++
++	ret = sev_guest_df_flush(&error);
++	if (ret)
++		pr_err("SEV: DF_FLUSH %d (%#x)\n", ret, error);
++
++buffer_free:
++	kfree(data);
++}
++
++static int sev_activate_asid(unsigned int handle, int asid, int *error)
++{
++	int ret;
++	struct sev_data_activate *data;
++
++	wbinvd_on_all_cpus();
++
++	ret = sev_guest_df_flush(error);
++	if (ret) {
++		pr_err("SEV: DF_FLUSH %d (%#x)\n", ret, *error);
++		return ret;
++	}
 +
 +	data = kzalloc(sizeof(*data), GFP_KERNEL);
 +	if (!data)
 +		return -ENOMEM;
 +
-+	inpages = sev_pin_memory(src, PAGE_SIZE, &npages);
-+	if (!inpages) {
-+		ret = -ENOMEM;
-+		goto err_1;
-+	}
-+
-+	data->handle = sev_get_handle(kvm);
-+	data->dst_addr = __psp_pa(dst);
-+	data->src_addr = __sev_page_pa(inpages[0]);
-+	data->length = PAGE_SIZE;
-+
-+	ret = sev_issue_cmd(kvm, SEV_CMD_DBG_DECRYPT, data, error);
++	data->handle = handle;
++	data->asid   = asid;
++	ret = sev_guest_activate(data, error);
 +	if (ret)
-+		printk(KERN_ERR "SEV: DEBUG_DECRYPT %d (%#010x)\n",
-+				ret, *error);
-+	sev_unpin_memory(inpages, npages);
-+err_1:
++		pr_err("SEV: ACTIVATE %d (%#x)\n", ret, *error);
++
 +	kfree(data);
 +	return ret;
 +}
 +
-+static int sev_dbg_decrypt(struct kvm *kvm, struct kvm_sev_cmd *argp)
++static int sev_pre_start(struct kvm *kvm, int *asid)
 +{
-+	void *data;
-+	int ret, offset, len;
-+	struct kvm_sev_dbg debug;
++	int ret;
 +
-+	if (!sev_guest(kvm))
-+		return -ENOTTY;
-+
-+	if (copy_from_user(&debug, (void *)argp->data,
-+				sizeof(struct kvm_sev_dbg)))
-+		return -EFAULT;
-+	/*
-+	 * TODO: add support for decrypting length which crosses the
-+	 * page boundary.
++	/* If guest has active SEV handle then deactivate before creating the
++	 * encryption context.
 +	 */
-+	offset = debug.src_addr & (PAGE_SIZE - 1);
-+	if (offset + debug.length > PAGE_SIZE)
-+		return -EINVAL;
++	if (sev_guest(kvm)) {
++		sev_deactivate_handle(kvm);
++		sev_decommission_handle(kvm);
++		*asid = sev_get_asid(kvm);  /* reuse the asid */
++		ret = 0;
++	} else {
++		/* Allocate new asid for this launch */
++		ret = sev_asid_new();
++		if (ret < 0) {
++			pr_err("SEV: failed to get free asid\n");
++			return ret;
++		}
++		*asid = ret;
++		ret = 0;
++	}
 +
-+	data = (void *) get_zeroed_page(GFP_KERNEL);
-+	if (!data)
-+		return -ENOMEM;
-+
-+	/* decrypt full page */
-+	ret = __sev_dbg_decrypt_page(kvm, debug.src_addr & PAGE_MASK,
-+			data, &argp->error);
-+	if (ret)
-+		goto err_1;
-+
-+	/* we have decrypted full page but copy request length */
-+	len = min_t(size_t, (PAGE_SIZE - offset), debug.length);
-+	if (copy_to_user((uint8_t *)debug.dst_addr, data + offset, len))
-+		ret = -EFAULT;
-+err_1:
-+	free_page((unsigned long)data);
 +	return ret;
 +}
 +
- static int amd_memory_encryption_cmd(struct kvm *kvm, void __user *argp)
- {
- 	int r = -ENOTTY;
-@@ -6013,6 +6085,10 @@ static int amd_memory_encryption_cmd(struct kvm *kvm, void __user *argp)
- 		r = sev_guest_status(kvm, &sev_cmd);
- 		break;
- 	}
-+	case KVM_SEV_DBG_DECRYPT: {
-+		r = sev_dbg_decrypt(kvm, &sev_cmd);
++static int sev_post_start(struct kvm *kvm, int asid, int handle,
++			int sev_fd, int *error)
++{
++	int ret;
++
++	/* activate asid */
++	ret = sev_activate_asid(handle, asid, error);
++	if (ret)
++		return ret;
++
++	kvm->arch.sev_info.handle = handle;
++	kvm->arch.sev_info.asid = asid;
++	kvm->arch.sev_info.sev_fd = sev_fd;
++
++	return 0;
++}
++
++static int sev_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
++{
++	int ret, asid = 0;
++	void *dh_cert_addr = NULL;
++	void *session_addr = NULL;
++	struct kvm_sev_launch_start params;
++	struct sev_data_launch_start *start;
++	int *error = &argp->error;
++	struct fd f;
++
++	f = fdget(argp->sev_fd);
++	if (!f.file)
++		return -EBADF;
++
++	/* Get parameter from the user */
++	ret = -EFAULT;
++	if (copy_from_user(&params, (void *)argp->data,
++				sizeof(struct kvm_sev_launch_start)))
++		goto err_1;
++
++	ret = -ENOMEM;
++	start = kzalloc(sizeof(*start), GFP_KERNEL);
++	if (!start)
++		goto err_1;
++
++	ret = sev_pre_start(kvm, &asid);
++	if (ret)
++		goto err_2;
++
++	start->handle = params.handle;
++	start->policy = params.policy;
++
++	/* Copy DH certificate from userspace */
++	if (params.dh_cert_length && params.dh_cert_data) {
++		dh_cert_addr = kmalloc(params.dh_cert_length, GFP_KERNEL);
++		if (!dh_cert_addr) {
++			ret = -EFAULT;
++			goto err_3;
++		}
++		if (copy_from_user(dh_cert_addr, (void *)params.dh_cert_data,
++				params.dh_cert_length)) {
++			ret = -EFAULT;
++			goto err_3;
++		}
++
++		start->dh_cert_address = __psp_pa(dh_cert_addr);
++		start->dh_cert_length = params.dh_cert_length;
++	}
++
++	/* Copy session data from userspace */
++	if (params.session_length && params.session_data) {
++		session_addr = kmalloc(params.dh_cert_length, GFP_KERNEL);
++		if (!session_addr) {
++			ret = -EFAULT;
++			goto err_3;
++		}
++		if (copy_from_user(session_addr, (void *)params.session_data,
++				params.session_length)) {
++			ret = -EFAULT;
++			goto err_3;
++		}
++		start->session_data_address = __psp_pa(session_addr);
++		start->session_data_length = params.session_length;
++	}
++
++	/* launch start */
++	ret = sev_issue_cmd_external_user(f.file, SEV_CMD_LAUNCH_START,
++					  start, 0, error);
++	if (ret) {
++		pr_err("SEV: LAUNCH_START ret=%d (%#010x)\n", ret, *error);
++		goto err_3;
++	}
++
++	ret = sev_post_start(kvm, asid, start->handle, argp->sev_fd, error);
++	if (ret)
++		goto err_3;
++
++	params.handle = start->handle;
++	if (copy_to_user((void *) argp->data, &params,
++				sizeof(struct kvm_sev_launch_start)))
++		ret = -EFAULT;
++err_3:
++	if (ret && asid) /* free asid if we have encountered error */
++		sev_asid_free(asid);
++	kfree(dh_cert_addr);
++	kfree(session_addr);
++err_2:
++	kfree(start);
++err_1:
++	fdput(f);
++	return ret;
++}
++
++static int amd_memory_encryption_cmd(struct kvm *kvm, void __user *argp)
++{
++	int r = -ENOTTY;
++	struct kvm_sev_cmd sev_cmd;
++
++	if (copy_from_user(&sev_cmd, argp, sizeof(struct kvm_sev_cmd)))
++		return -EFAULT;
++
++	mutex_lock(&kvm->lock);
++
++	switch (sev_cmd.id) {
++	case KVM_SEV_LAUNCH_START: {
++		r = sev_launch_start(kvm, &sev_cmd);
 +		break;
 +	}
- 	default:
- 		break;
- 	}
++	default:
++		break;
++	}
++
++	mutex_unlock(&kvm->lock);
++	if (copy_to_user(argp, &sev_cmd, sizeof(struct kvm_sev_cmd)))
++		r = -EFAULT;
++	return r;
++}
++
+ static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
+ 	.cpu_has_kvm_support = has_svm,
+ 	.disabled_by_bios = is_disabled,
+@@ -5518,7 +5816,7 @@ static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
+ 	.vcpu_reset = svm_vcpu_reset,
+ 
+ 	.vm_init = avic_vm_init,
+-	.vm_destroy = avic_vm_destroy,
++	.vm_destroy = svm_vm_destroy,
+ 
+ 	.prepare_guest_switch = svm_prepare_guest_switch,
+ 	.vcpu_load = svm_vcpu_load,
+@@ -5617,6 +5915,8 @@ static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
+ 	.pmu_ops = &amd_pmu_ops,
+ 	.deliver_posted_interrupt = svm_deliver_avic_intr,
+ 	.update_pi_irte = svm_update_pi_irte,
++
++	.memory_encryption_op = amd_memory_encryption_cmd,
+ };
+ 
+ static int __init svm_init(void)
