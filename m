@@ -1,163 +1,230 @@
-From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: [RFC PATCH v2 17/32] x86: kvmclock: Clear encryption attribute when
- SEV is active
-Date: Thu, 2 Mar 2017 10:15:48 -0500
-Message-ID: <148846774841.2349.10333552865190947646.stgit__43670.4953936443$1488488767$gmane$org@brijesh-build-machine>
-References: <148846752022.2349.13667498174822419498.stgit@brijesh-build-machine>
+From: Gary R Hook <gary.hook@amd.com>
+Subject: [PATCH V2 1/3] crypto: ccp - Add SHA-2 384- and 512-bit support
+Date: Thu, 2 Mar 2017 15:26:39 -0600
+Message-ID: <20170302212639.30959.6341.stgit@taos>
+References: <20170302212331.30959.44149.stgit@taos>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-To: <simon.guinot@sequanux.org>, <linux-efi@vger.kernel.org>,
-        <brijesh.singh@amd.com>, <kvm@vger.kernel.org>,
-        <rkrcmar@redhat.com>, <matt@codeblueprint.co.uk>,
-        <linux-pci@vger.kernel.org>, <linus.walleij@linaro.org>,
-        <gary.hook@amd.com>, <linux-mm@kvack.org>,
-        <paul.gortmaker@windriver.com>, <hpa@zytor.com>, <cl@linux.com>,
-        <dan.j.williams@intel.com>, <aarcange@redhat.com>,
-        <sfr@canb.auug.org.au>, <andriy.shevchenko@linux.intel.com>,
-        <herbert@gondor.apana.org.au>, <bhe@redhat.com>,
-        <xemul@parallels.com>, <joro@8bytes.org>, <x86@kernel.org>,
-        <peterz@infradead.org>, <piotr.luc@intel.com>, <mingo@redhat.com>,
-        <msalter@redhat.com>, <ross.zwisler@linux.intel.com>, <bp@suse.de>,
-        <dyoung@redhat.com>, <thomas.lendacky@amd.com>, <jroedel@suse.de>,
-        <keescook@chromium.org>, <arnd@arndb.de>, <toshi
+Cc: <thomas.lendacky@amd.com>, <gary.hook@amd.com>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2nam03on0079.outbound.protection.outlook.com ([104.47.42.79]:19147
+Received: from mail-by2nam03on0078.outbound.protection.outlook.com ([104.47.42.78]:6784
         "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1750743AbdCBVF7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Mar 2017 16:05:59 -0500
-In-Reply-To: <148846752022.2349.13667498174822419498.stgit@brijesh-build-machine>
+        id S1751065AbdCBV1u (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 2 Mar 2017 16:27:50 -0500
+In-Reply-To: <20170302212331.30959.44149.stgit@taos>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The guest physical memory area holding the struct pvclock_wall_clock and
-struct pvclock_vcpu_time_info are shared with the hypervisor. Hypervisor
-periodically updates the contents of the memory. When SEV is active we must
-clear the encryption attributes of the shared memory pages so that both
-hypervisor and guest can access the data.
+Incorporate 384-bit and 512-bit hashing for a version 5 CCP
+device
 
-Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+
+Signed-off-by: Gary R Hook <gary.hook@amd.com>
 ---
- arch/x86/kernel/kvmclock.c |   65 ++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 56 insertions(+), 9 deletions(-)
+ drivers/crypto/ccp/ccp-crypto-sha.c |   22 +++++++++++
+ drivers/crypto/ccp/ccp-crypto.h     |    8 ++--
+ drivers/crypto/ccp/ccp-ops.c        |   72 +++++++++++++++++++++++++++++++++++
+ include/linux/ccp.h                 |    2 +
+ 4 files changed, 101 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/kernel/kvmclock.c b/arch/x86/kernel/kvmclock.c
-index 278de4f..3b38b3d 100644
---- a/arch/x86/kernel/kvmclock.c
-+++ b/arch/x86/kernel/kvmclock.c
-@@ -27,6 +27,7 @@
- #include <linux/sched.h>
- #include <linux/sched/clock.h>
+diff --git a/drivers/crypto/ccp/ccp-crypto-sha.c b/drivers/crypto/ccp/ccp-crypto-sha.c
+index 84a652b..6b46eea 100644
+--- a/drivers/crypto/ccp/ccp-crypto-sha.c
++++ b/drivers/crypto/ccp/ccp-crypto-sha.c
+@@ -146,6 +146,12 @@ static int ccp_do_sha_update(struct ahash_request *req, unsigned int nbytes,
+ 	case CCP_SHA_TYPE_256:
+ 		rctx->cmd.u.sha.ctx_len = SHA256_DIGEST_SIZE;
+ 		break;
++	case CCP_SHA_TYPE_384:
++		rctx->cmd.u.sha.ctx_len = SHA384_DIGEST_SIZE;
++		break;
++	case CCP_SHA_TYPE_512:
++		rctx->cmd.u.sha.ctx_len = SHA512_DIGEST_SIZE;
++		break;
+ 	default:
+ 		/* Should never get here */
+ 		break;
+@@ -393,6 +399,22 @@ struct ccp_sha_def {
+ 		.digest_size	= SHA256_DIGEST_SIZE,
+ 		.block_size	= SHA256_BLOCK_SIZE,
+ 	},
++	{
++		.version	= CCP_VERSION(5, 0),
++		.name		= "sha384",
++		.drv_name	= "sha384-ccp",
++		.type		= CCP_SHA_TYPE_384,
++		.digest_size	= SHA384_DIGEST_SIZE,
++		.block_size	= SHA384_BLOCK_SIZE,
++	},
++	{
++		.version	= CCP_VERSION(5, 0),
++		.name		= "sha512",
++		.drv_name	= "sha512-ccp",
++		.type		= CCP_SHA_TYPE_512,
++		.digest_size	= SHA512_DIGEST_SIZE,
++		.block_size	= SHA512_BLOCK_SIZE,
++	},
+ };
  
-+#include <asm/mem_encrypt.h>
- #include <asm/x86_init.h>
- #include <asm/reboot.h>
+ static int ccp_register_hmac_alg(struct list_head *head,
+diff --git a/drivers/crypto/ccp/ccp-crypto.h b/drivers/crypto/ccp/ccp-crypto.h
+index 8335b32..95cce27 100644
+--- a/drivers/crypto/ccp/ccp-crypto.h
++++ b/drivers/crypto/ccp/ccp-crypto.h
+@@ -137,9 +137,11 @@ struct ccp_aes_cmac_exp_ctx {
+ 	u8 buf[AES_BLOCK_SIZE];
+ };
  
-@@ -44,7 +45,7 @@ early_param("no-kvmclock", parse_no_kvmclock);
+-/***** SHA related defines *****/
+-#define MAX_SHA_CONTEXT_SIZE	SHA256_DIGEST_SIZE
+-#define MAX_SHA_BLOCK_SIZE	SHA256_BLOCK_SIZE
++/* SHA-related defines
++ * These values must be large enough to accommodate any variant
++ */
++#define MAX_SHA_CONTEXT_SIZE	SHA512_DIGEST_SIZE
++#define MAX_SHA_BLOCK_SIZE	SHA512_BLOCK_SIZE
  
- /* The hypervisor will put information about time periodically here */
- static struct pvclock_vsyscall_time_info *hv_clock;
--static struct pvclock_wall_clock wall_clock;
-+static struct pvclock_wall_clock *wall_clock;
+ struct ccp_sha_ctx {
+ 	struct scatterlist opad_sg;
+diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
+index efac3d5..213a752 100644
+--- a/drivers/crypto/ccp/ccp-ops.c
++++ b/drivers/crypto/ccp/ccp-ops.c
+@@ -41,6 +41,20 @@
+ 	cpu_to_be32(SHA256_H6), cpu_to_be32(SHA256_H7),
+ };
  
- struct pvclock_vsyscall_time_info *pvclock_pvti_cpu0_va(void)
- {
-@@ -62,15 +63,18 @@ static void kvm_get_wallclock(struct timespec *now)
- 	int low, high;
- 	int cpu;
- 
--	low = (int)__pa_symbol(&wall_clock);
--	high = ((u64)__pa_symbol(&wall_clock) >> 32);
-+	if (!wall_clock)
-+		return;
++static const __be64 ccp_sha384_init[SHA512_DIGEST_SIZE / sizeof(__be64)] = {
++	cpu_to_be64(SHA384_H0), cpu_to_be64(SHA384_H1),
++	cpu_to_be64(SHA384_H2), cpu_to_be64(SHA384_H3),
++	cpu_to_be64(SHA384_H4), cpu_to_be64(SHA384_H5),
++	cpu_to_be64(SHA384_H6), cpu_to_be64(SHA384_H7),
++};
 +
-+	low = (int)slow_virt_to_phys(wall_clock);
-+	high = ((u64)slow_virt_to_phys(wall_clock) >> 32);
++static const __be64 ccp_sha512_init[SHA512_DIGEST_SIZE / sizeof(__be64)] = {
++	cpu_to_be64(SHA512_H0), cpu_to_be64(SHA512_H1),
++	cpu_to_be64(SHA512_H2), cpu_to_be64(SHA512_H3),
++	cpu_to_be64(SHA512_H4), cpu_to_be64(SHA512_H5),
++	cpu_to_be64(SHA512_H6), cpu_to_be64(SHA512_H7),
++};
++
+ #define	CCP_NEW_JOBID(ccp)	((ccp->vdata->version == CCP_VERSION(3, 0)) ? \
+ 					ccp_gen_jobid(ccp) : 0)
  
- 	native_write_msr(msr_kvm_wall_clock, low, high);
- 
- 	cpu = get_cpu();
- 
- 	vcpu_time = &hv_clock[cpu].pvti;
--	pvclock_read_wallclock(&wall_clock, vcpu_time, now);
-+	pvclock_read_wallclock(wall_clock, vcpu_time, now);
- 
- 	put_cpu();
- }
-@@ -246,11 +250,40 @@ static void kvm_shutdown(void)
- 	native_machine_shutdown();
- }
- 
-+static phys_addr_t kvm_memblock_alloc(phys_addr_t size, phys_addr_t align)
-+{
-+	phys_addr_t mem;
-+
-+	mem = memblock_alloc(size, align);
-+	if (!mem)
-+		return 0;
-+
-+	/* When SEV is active clear the encryption attributes of the pages */
-+	if (sev_active()) {
-+		if (early_set_memory_decrypted(__va(mem), size))
-+			goto e_free;
-+	}
-+
-+	return mem;
-+e_free:
-+	memblock_free(mem, size);
-+	return 0;
-+}
-+
-+static void kvm_memblock_free(phys_addr_t addr, phys_addr_t size)
-+{
-+	/* When SEV is active restore the encryption attributes of the pages */
-+	if (sev_active())
-+		early_set_memory_encrypted(__va(addr), size);
-+
-+	memblock_free(addr, size);
-+}
-+
- void __init kvmclock_init(void)
- {
- 	struct pvclock_vcpu_time_info *vcpu_time;
--	unsigned long mem;
--	int size, cpu;
-+	unsigned long mem, mem_wall_clock;
-+	int size, cpu, wall_clock_size;
- 	u8 flags;
- 
- 	size = PAGE_ALIGN(sizeof(struct pvclock_vsyscall_time_info)*NR_CPUS);
-@@ -267,15 +300,29 @@ void __init kvmclock_init(void)
- 	printk(KERN_INFO "kvm-clock: Using msrs %x and %x",
- 		msr_kvm_system_time, msr_kvm_wall_clock);
- 
--	mem = memblock_alloc(size, PAGE_SIZE);
--	if (!mem)
-+	wall_clock_size = PAGE_ALIGN(sizeof(struct pvclock_wall_clock));
-+	mem_wall_clock = kvm_memblock_alloc(wall_clock_size, PAGE_SIZE);
-+	if (!mem_wall_clock)
- 		return;
-+
-+	wall_clock = __va(mem_wall_clock);
-+	memset(wall_clock, 0, wall_clock_size);
-+
-+	mem = kvm_memblock_alloc(size, PAGE_SIZE);
-+	if (!mem) {
-+		kvm_memblock_free(mem_wall_clock, wall_clock_size);
-+		wall_clock = NULL;
-+		return;
-+	}
-+
- 	hv_clock = __va(mem);
- 	memset(hv_clock, 0, size);
- 
- 	if (kvm_register_clock("primary cpu clock")) {
- 		hv_clock = NULL;
--		memblock_free(mem, size);
-+		kvm_memblock_free(mem, size);
-+		kvm_memblock_free(mem_wall_clock, wall_clock_size);
-+		wall_clock = NULL;
- 		return;
+@@ -947,6 +961,18 @@ static int ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 			return -EINVAL;
+ 		block_size = SHA256_BLOCK_SIZE;
+ 		break;
++	case CCP_SHA_TYPE_384:
++		if (cmd_q->ccp->vdata->version < CCP_VERSION(4, 0)
++		    || sha->ctx_len < SHA384_DIGEST_SIZE)
++			return -EINVAL;
++		block_size = SHA384_BLOCK_SIZE;
++		break;
++	case CCP_SHA_TYPE_512:
++		if (cmd_q->ccp->vdata->version < CCP_VERSION(4, 0)
++		    || sha->ctx_len < SHA512_DIGEST_SIZE)
++			return -EINVAL;
++		block_size = SHA512_BLOCK_SIZE;
++		break;
+ 	default:
+ 		return -EINVAL;
  	}
+@@ -1034,6 +1060,21 @@ static int ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 		sb_count = 1;
+ 		ooffset = ioffset = 0;
+ 		break;
++	case CCP_SHA_TYPE_384:
++		digest_size = SHA384_DIGEST_SIZE;
++		init = (void *) ccp_sha384_init;
++		ctx_size = SHA512_DIGEST_SIZE;
++		sb_count = 2;
++		ioffset = 0;
++		ooffset = 2 * CCP_SB_BYTES - SHA384_DIGEST_SIZE;
++		break;
++	case CCP_SHA_TYPE_512:
++		digest_size = SHA512_DIGEST_SIZE;
++		init = (void *) ccp_sha512_init;
++		ctx_size = SHA512_DIGEST_SIZE;
++		sb_count = 2;
++		ooffset = ioffset = 0;
++		break;
+ 	default:
+ 		ret = -EINVAL;
+ 		goto e_data;
+@@ -1052,6 +1093,11 @@ static int ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 	op.u.sha.type = sha->type;
+ 	op.u.sha.msg_bits = sha->msg_bits;
+ 
++	/* For SHA1/224/256 the context fits in a single (32-byte) SB entry;
++	 * SHA384/512 require 2 adjacent SB slots, with the right half in the
++	 * first slot, and the left half in the second. Each portion must then
++	 * be in little endian format: use the 256-bit byte swap option.
++	 */
+ 	ret = ccp_init_dm_workarea(&ctx, cmd_q, sb_count * CCP_SB_BYTES,
+ 				   DMA_BIDIRECTIONAL);
+ 	if (ret)
+@@ -1063,6 +1109,13 @@ static int ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 		case CCP_SHA_TYPE_256:
+ 			memcpy(ctx.address + ioffset, init, ctx_size);
+ 			break;
++		case CCP_SHA_TYPE_384:
++		case CCP_SHA_TYPE_512:
++			memcpy(ctx.address + ctx_size / 2, init,
++			       ctx_size / 2);
++			memcpy(ctx.address, init + ctx_size / 2,
++			       ctx_size / 2);
++			break;
+ 		default:
+ 			ret = -EINVAL;
+ 			goto e_ctx;
+@@ -1129,6 +1182,15 @@ static int ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 					sha->ctx, 0,
+ 					digest_size);
+ 			break;
++		case CCP_SHA_TYPE_384:
++		case CCP_SHA_TYPE_512:
++			ccp_get_dm_area(&ctx, 0,
++					sha->ctx, LSB_ITEM_SIZE - ooffset,
++					LSB_ITEM_SIZE);
++			ccp_get_dm_area(&ctx, LSB_ITEM_SIZE + ooffset,
++					sha->ctx, 0,
++					LSB_ITEM_SIZE - ooffset);
++			break;
+ 		default:
+ 			ret = -EINVAL;
+ 			goto e_ctx;
+@@ -1166,6 +1228,16 @@ static int ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 			       ctx.address + ooffset,
+ 			       digest_size);
+ 			break;
++		case CCP_SHA_TYPE_384:
++		case CCP_SHA_TYPE_512:
++			memcpy(hmac_buf + block_size,
++			       ctx.address + LSB_ITEM_SIZE + ooffset,
++			       LSB_ITEM_SIZE);
++			memcpy(hmac_buf + block_size +
++			       (LSB_ITEM_SIZE - ooffset),
++			       ctx.address,
++			       LSB_ITEM_SIZE);
++			break;
+ 		default:
+ 			ret = -EINVAL;
+ 			goto e_ctx;
+diff --git a/include/linux/ccp.h b/include/linux/ccp.h
+index c71dd8f..90a1fbe 100644
+--- a/include/linux/ccp.h
++++ b/include/linux/ccp.h
+@@ -249,6 +249,8 @@ enum ccp_sha_type {
+ 	CCP_SHA_TYPE_1 = 1,
+ 	CCP_SHA_TYPE_224,
+ 	CCP_SHA_TYPE_256,
++	CCP_SHA_TYPE_384,
++	CCP_SHA_TYPE_512,
+ 	CCP_SHA_TYPE__LAST,
+ };
  
