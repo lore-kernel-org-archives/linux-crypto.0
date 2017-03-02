@@ -1,8 +1,8 @@
 From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: [RFC PATCH v2 25/32] kvm: svm: Add support for SEV LAUNCH_START
- command
-Date: Thu, 2 Mar 2017 10:17:35 -0500
-Message-ID: <148846785574.2349.2756610033917941226.stgit__24935.385262552$1488470688$gmane$org@brijesh-build-machine>
+Subject: [RFC PATCH v2 20/32] crypto: ccp: Add Platform Security Processor
+ (PSP) interface support
+Date: Thu, 2 Mar 2017 10:16:32 -0500
+Message-ID: <148846779224.2349.7159735938287530197.stgit__26499.357869807$1488470709$gmane$org@brijesh-build-machine>
 References: <148846752022.2349.13667498174822419498.stgit@brijesh-build-machine>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -22,377 +22,508 @@ To: <simon.guinot@sequanux.org>, <linux-efi@vger.kernel.org>,
         <dyoung@redhat.com>, <thomas.lendacky@amd.com>, <jroedel@suse.de>,
         <keescook@chromium.org>, <arnd@arndb.de>, <toshi
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-sn1nam01on0040.outbound.protection.outlook.com ([104.47.32.40]:27407
-        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
+Received: from mail-bl2nam02on0088.outbound.protection.outlook.com ([104.47.38.88]:58608
+        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752650AbdCBPfA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1752631AbdCBPfA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Thu, 2 Mar 2017 10:35:00 -0500
 In-Reply-To: <148846752022.2349.13667498174822419498.stgit@brijesh-build-machine>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The command is used to bootstrap SEV guest from unencrypted boot images.
-The command creates a new VM encryption key (VEK) using the guest owner's
-public DH certificates, and session data. The VEK will be used to encrypt
-the guest memory.
+AMD Platform Security Processor (PSP) is a dedicated processor that
+provides the support for encrypting the guest memory in a Secure Encrypted
+Virtualiztion (SEV) mode, along with software-based Tursted Executation
+Environment (TEE) to enable the third-party tursted applications.
 
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- arch/x86/kvm/svm.c |  302 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 301 insertions(+), 1 deletion(-)
+ drivers/crypto/ccp/Kconfig   |    7 +
+ drivers/crypto/ccp/Makefile  |    1 
+ drivers/crypto/ccp/psp-dev.c |  211 ++++++++++++++++++++++++++++++++++++++++++
+ drivers/crypto/ccp/psp-dev.h |  102 ++++++++++++++++++++
+ drivers/crypto/ccp/sp-dev.c  |   16 +++
+ drivers/crypto/ccp/sp-dev.h  |   34 +++++++
+ drivers/crypto/ccp/sp-pci.c  |    4 +
+ 7 files changed, 374 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/crypto/ccp/psp-dev.c
+ create mode 100644 drivers/crypto/ccp/psp-dev.h
 
-diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index fb63398..b5fa8c0 100644
---- a/arch/x86/kvm/svm.c
-+++ b/arch/x86/kvm/svm.c
-@@ -37,6 +37,7 @@
- #include <linux/amd-iommu.h>
- #include <linux/hashtable.h>
- #include <linux/psp-sev.h>
-+#include <linux/file.h>
- 
- #include <asm/apic.h>
- #include <asm/perf_event.h>
-@@ -497,6 +498,10 @@ static inline bool gif_set(struct vcpu_svm *svm)
- /* Secure Encrypted Virtualization */
- static unsigned int max_sev_asid;
- static unsigned long *sev_asid_bitmap;
-+static void sev_deactivate_handle(struct kvm *kvm);
-+static void sev_decommission_handle(struct kvm *kvm);
-+static int sev_asid_new(void);
-+static void sev_asid_free(int asid);
- 
- static bool kvm_sev_enabled(void)
- {
-@@ -1534,6 +1539,17 @@ static inline int avic_free_vm_id(int id)
- 	return 0;
- }
- 
-+static void sev_vm_destroy(struct kvm *kvm)
-+{
-+	if (!sev_guest(kvm))
-+		return;
+diff --git a/drivers/crypto/ccp/Kconfig b/drivers/crypto/ccp/Kconfig
+index bc08f03..59c207e 100644
+--- a/drivers/crypto/ccp/Kconfig
++++ b/drivers/crypto/ccp/Kconfig
+@@ -34,4 +34,11 @@ config CRYPTO_DEV_CCP
+ 	  Provides the interface to use the AMD Cryptographic Coprocessor
+ 	  which can be used to offload encryption operations such as SHA,
+ 	  AES and more.
 +
-+	/* release the firmware resources */
-+	sev_deactivate_handle(kvm);
-+	sev_decommission_handle(kvm);
-+	sev_asid_free(sev_get_asid(kvm));
++config CRYPTO_DEV_PSP
++	bool "Platform Security Processor interface"
++	default y
++	help
++	 Provide the interface for AMD Platform Security Processor (PSP) device.
++
+ endif
+diff --git a/drivers/crypto/ccp/Makefile b/drivers/crypto/ccp/Makefile
+index 8127e18..12e569d 100644
+--- a/drivers/crypto/ccp/Makefile
++++ b/drivers/crypto/ccp/Makefile
+@@ -6,6 +6,7 @@ ccp-$(CONFIG_CRYPTO_DEV_CCP) += ccp-dev.o \
+ 	    ccp-dev-v3.o \
+ 	    ccp-dev-v5.o \
+ 	    ccp-dmaengine.o
++ccp-$(CONFIG_CRYPTO_DEV_PSP) += psp-dev.o
+ 
+ obj-$(CONFIG_CRYPTO_DEV_CCP_CRYPTO) += ccp-crypto.o
+ ccp-crypto-objs := ccp-crypto-main.o \
+diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
+new file mode 100644
+index 0000000..6f64aa7
+--- /dev/null
++++ b/drivers/crypto/ccp/psp-dev.c
+@@ -0,0 +1,211 @@
++/*
++ * AMD Platform Security Processor (PSP) interface
++ *
++ * Copyright (C) 2016 Advanced Micro Devices, Inc.
++ *
++ * Author: Brijesh Singh <brijesh.singh@amd.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ */
++
++#include <linux/module.h>
++#include <linux/kernel.h>
++#include <linux/kthread.h>
++#include <linux/sched.h>
++#include <linux/interrupt.h>
++#include <linux/spinlock.h>
++#include <linux/spinlock_types.h>
++#include <linux/types.h>
++#include <linux/mutex.h>
++#include <linux/delay.h>
++#include <linux/hw_random.h>
++#include <linux/ccp.h>
++
++#include "sp-dev.h"
++#include "psp-dev.h"
++
++static LIST_HEAD(psp_devs);
++static DEFINE_SPINLOCK(psp_devs_lock);
++
++const struct psp_vdata psp_entry = {
++	.offset = 0x10500,
++};
++
++void psp_add_device(struct psp_device *psp)
++{
++	unsigned long flags;
++
++	spin_lock_irqsave(&psp_devs_lock, flags);
++
++	list_add_tail(&psp->entry, &psp_devs);
++
++	spin_unlock_irqrestore(&psp_devs_lock, flags);
 +}
 +
- static void avic_vm_destroy(struct kvm *kvm)
- {
- 	unsigned long flags;
-@@ -1551,6 +1567,12 @@ static void avic_vm_destroy(struct kvm *kvm)
- 	spin_unlock_irqrestore(&svm_vm_data_hash_lock, flags);
- }
- 
-+static void svm_vm_destroy(struct kvm *kvm)
++void psp_del_device(struct psp_device *psp)
 +{
-+	avic_vm_destroy(kvm);
-+	sev_vm_destroy(kvm);
++	unsigned long flags;
++
++	spin_lock_irqsave(&psp_devs_lock, flags);
++
++	list_del(&psp->entry);
++	spin_unlock_irqrestore(&psp_devs_lock, flags);
 +}
 +
- static int avic_vm_init(struct kvm *kvm)
- {
- 	unsigned long flags;
-@@ -5502,6 +5524,282 @@ static inline void avic_post_state_restore(struct kvm_vcpu *vcpu)
- 	avic_handle_ldr_update(vcpu);
- }
- 
-+static int sev_asid_new(void)
++static struct psp_device *psp_alloc_struct(struct sp_device *sp)
 +{
-+	int pos;
++	struct device *dev = sp->dev;
++	struct psp_device *psp;
 +
-+	if (!max_sev_asid)
-+		return -EINVAL;
++	psp = devm_kzalloc(dev, sizeof(*psp), GFP_KERNEL);
++	if (!psp)
++		return NULL;
 +
-+	pos = find_first_zero_bit(sev_asid_bitmap, max_sev_asid);
-+	if (pos >= max_sev_asid)
-+		return -EBUSY;
++	psp->dev = dev;
++	psp->sp = sp;
 +
-+	set_bit(pos, sev_asid_bitmap);
-+	return pos + 1;
++	snprintf(psp->name, sizeof(psp->name), "psp-%u", sp->ord);
++
++	return psp;
 +}
 +
-+static void sev_asid_free(int asid)
++irqreturn_t psp_irq_handler(int irq, void *data)
 +{
-+	int cpu, pos;
-+	struct svm_cpu_data *sd;
++	unsigned int status;
++	irqreturn_t ret = IRQ_HANDLED;
++	struct psp_device *psp = data;
 +
-+	pos = asid - 1;
-+	clear_bit(pos, sev_asid_bitmap);
++	/* read the interrupt status */
++	status = ioread32(psp->io_regs + PSP_P2CMSG_INTSTS);
 +
-+	for_each_possible_cpu(cpu) {
-+		sd = per_cpu(svm_data, cpu);
-+		sd->sev_vmcbs[pos] = NULL;
++	/* invoke subdevice interrupt handlers */
++	if (status) {
++		if (psp->sev_irq_handler)
++			ret = psp->sev_irq_handler(irq, psp->sev_irq_data);
 +	}
-+}
 +
-+static int sev_issue_cmd(struct kvm *kvm, int id, void *data, int *error)
-+{
-+	int ret;
-+	struct fd f;
-+	int fd = sev_get_fd(kvm);
-+
-+	f = fdget(fd);
-+	if (!f.file)
-+		return -EBADF;
-+
-+	ret = sev_issue_cmd_external_user(f.file, id, data, 0, error);
-+	fdput(f);
++	/* clear the interrupt status */
++	iowrite32(status, psp->io_regs + PSP_P2CMSG_INTSTS);
 +
 +	return ret;
 +}
 +
-+static void sev_decommission_handle(struct kvm *kvm)
++static int psp_init(struct psp_device *psp)
 +{
-+	int ret, error;
-+	struct sev_data_decommission *data;
++	psp_add_device(psp);
 +
-+	data = kzalloc(sizeof(*data), GFP_KERNEL);
-+	if (!data)
-+		return;
-+
-+	data->handle = sev_get_handle(kvm);
-+	ret = sev_guest_decommission(data, &error);
-+	if (ret)
-+		pr_err("SEV: DECOMMISSION %d (%#x)\n", ret, error);
-+
-+	kfree(data);
-+}
-+
-+static void sev_deactivate_handle(struct kvm *kvm)
-+{
-+	int ret, error;
-+	struct sev_data_deactivate *data;
-+
-+	data = kzalloc(sizeof(*data), GFP_KERNEL);
-+	if (!data)
-+		return;
-+
-+	data->handle = sev_get_handle(kvm);
-+	ret = sev_guest_deactivate(data, &error);
-+	if (ret) {
-+		pr_err("SEV: DEACTIVATE %d (%#x)\n", ret, error);
-+		goto buffer_free;
-+	}
-+
-+	wbinvd_on_all_cpus();
-+
-+	ret = sev_guest_df_flush(&error);
-+	if (ret)
-+		pr_err("SEV: DF_FLUSH %d (%#x)\n", ret, error);
-+
-+buffer_free:
-+	kfree(data);
-+}
-+
-+static int sev_activate_asid(unsigned int handle, int asid, int *error)
-+{
-+	int ret;
-+	struct sev_data_activate *data;
-+
-+	wbinvd_on_all_cpus();
-+
-+	ret = sev_guest_df_flush(error);
-+	if (ret) {
-+		pr_err("SEV: DF_FLUSH %d (%#x)\n", ret, *error);
-+		return ret;
-+	}
-+
-+	data = kzalloc(sizeof(*data), GFP_KERNEL);
-+	if (!data)
-+		return -ENOMEM;
-+
-+	data->handle = handle;
-+	data->asid   = asid;
-+	ret = sev_guest_activate(data, error);
-+	if (ret)
-+		pr_err("SEV: ACTIVATE %d (%#x)\n", ret, *error);
-+
-+	kfree(data);
-+	return ret;
-+}
-+
-+static int sev_pre_start(struct kvm *kvm, int *asid)
-+{
-+	int ret;
-+
-+	/* If guest has active SEV handle then deactivate before creating the
-+	 * encryption context.
-+	 */
-+	if (sev_guest(kvm)) {
-+		sev_deactivate_handle(kvm);
-+		sev_decommission_handle(kvm);
-+		*asid = sev_get_asid(kvm);  /* reuse the asid */
-+		ret = 0;
-+	} else {
-+		/* Allocate new asid for this launch */
-+		ret = sev_asid_new();
-+		if (ret < 0) {
-+			pr_err("SEV: failed to get free asid\n");
-+			return ret;
-+		}
-+		*asid = ret;
-+		ret = 0;
-+	}
-+
-+	return ret;
-+}
-+
-+static int sev_post_start(struct kvm *kvm, int asid, int handle,
-+			int sev_fd, int *error)
-+{
-+	int ret;
-+
-+	/* activate asid */
-+	ret = sev_activate_asid(handle, asid, error);
-+	if (ret)
-+		return ret;
-+
-+	kvm->arch.sev_info.handle = handle;
-+	kvm->arch.sev_info.asid = asid;
-+	kvm->arch.sev_info.sev_fd = sev_fd;
++	sev_dev_init(psp);
 +
 +	return 0;
 +}
 +
-+static int sev_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
++int psp_dev_init(struct sp_device *sp)
 +{
-+	int ret, asid = 0;
-+	void *dh_cert_addr = NULL;
-+	void *session_addr = NULL;
-+	struct kvm_sev_launch_start params;
-+	struct sev_data_launch_start *start;
-+	int *error = &argp->error;
-+	struct fd f;
-+
-+	f = fdget(argp->sev_fd);
-+	if (!f.file)
-+		return -EBADF;
-+
-+	/* Get parameter from the user */
-+	ret = -EFAULT;
-+	if (copy_from_user(&params, (void *)argp->data,
-+				sizeof(struct kvm_sev_launch_start)))
-+		goto err_1;
++	struct device *dev = sp->dev;
++	struct psp_device *psp;
++	int ret;
 +
 +	ret = -ENOMEM;
-+	start = kzalloc(sizeof(*start), GFP_KERNEL);
-+	if (!start)
-+		goto err_1;
++	psp = psp_alloc_struct(sp);
++	if (!psp)
++		goto e_err;
++	sp->psp_data = psp;
 +
-+	ret = sev_pre_start(kvm, &asid);
-+	if (ret)
-+		goto err_2;
-+
-+	start->handle = params.handle;
-+	start->policy = params.policy;
-+
-+	/* Copy DH certificate from userspace */
-+	if (params.dh_cert_length && params.dh_cert_data) {
-+		dh_cert_addr = kmalloc(params.dh_cert_length, GFP_KERNEL);
-+		if (!dh_cert_addr) {
-+			ret = -EFAULT;
-+			goto err_3;
-+		}
-+		if (copy_from_user(dh_cert_addr, (void *)params.dh_cert_data,
-+				params.dh_cert_length)) {
-+			ret = -EFAULT;
-+			goto err_3;
-+		}
-+
-+		start->dh_cert_address = __psp_pa(dh_cert_addr);
-+		start->dh_cert_length = params.dh_cert_length;
++	psp->vdata = (struct psp_vdata *)sp->dev_data->psp_vdata;
++	if (!psp->vdata) {
++		ret = -ENODEV;
++		dev_err(dev, "missing driver data\n");
++		goto e_err;
 +	}
 +
-+	/* Copy session data from userspace */
-+	if (params.session_length && params.session_data) {
-+		session_addr = kmalloc(params.dh_cert_length, GFP_KERNEL);
-+		if (!session_addr) {
-+			ret = -EFAULT;
-+			goto err_3;
-+		}
-+		if (copy_from_user(session_addr, (void *)params.session_data,
-+				params.session_length)) {
-+			ret = -EFAULT;
-+			goto err_3;
-+		}
-+		start->session_data_address = __psp_pa(session_addr);
-+		start->session_data_length = params.session_length;
-+	}
++	psp->io_regs = sp->io_map + psp->vdata->offset;
 +
-+	/* launch start */
-+	ret = sev_issue_cmd_external_user(f.file, SEV_CMD_LAUNCH_START,
-+					  start, 0, error);
++	/* Disable and clear interrupts until ready */
++	iowrite32(0, psp->io_regs + PSP_P2CMSG_INTEN);
++	iowrite32(0xffffffff, psp->io_regs + PSP_P2CMSG_INTSTS);
++
++	dev_dbg(dev, "requesting an IRQ ...\n");
++	/* Request an irq */
++	ret = sp_request_psp_irq(psp->sp, psp_irq_handler, psp->name, psp);
 +	if (ret) {
-+		pr_err("SEV: LAUNCH_START ret=%d (%#010x)\n", ret, *error);
-+		goto err_3;
++		dev_err(dev, "psp: unable to allocate an IRQ\n");
++		goto e_err;
 +	}
 +
-+	ret = sev_post_start(kvm, asid, start->handle, argp->sev_fd, error);
-+	if (ret)
-+		goto err_3;
++	sp_set_psp_master(sp);
 +
-+	params.handle = start->handle;
-+	if (copy_to_user((void *) argp->data, &params,
-+				sizeof(struct kvm_sev_launch_start)))
-+		ret = -EFAULT;
-+err_3:
-+	if (ret && asid) /* free asid if we have encountered error */
-+		sev_asid_free(asid);
-+	kfree(dh_cert_addr);
-+	kfree(session_addr);
-+err_2:
-+	kfree(start);
-+err_1:
-+	fdput(f);
++	dev_dbg(dev, "initializing psp\n");
++	ret = psp_init(psp);
++	if (ret) {
++		dev_err(dev, "failed to init psp\n");
++		goto e_irq;
++	}
++
++	/* Enable interrupt */
++	dev_dbg(dev, "Enabling interrupts ...\n");
++	iowrite32(7, psp->io_regs + PSP_P2CMSG_INTEN);
++
++	dev_notice(dev, "psp enabled\n");
++
++	return 0;
++
++e_irq:
++	sp_free_psp_irq(psp->sp, psp);
++e_err:
++	sp->psp_data = NULL;
++
++	dev_notice(dev, "psp initialization failed\n");
++
 +	return ret;
 +}
 +
-+static int amd_memory_encryption_cmd(struct kvm *kvm, void __user *argp)
++void psp_dev_destroy(struct sp_device *sp)
 +{
-+	int r = -ENOTTY;
-+	struct kvm_sev_cmd sev_cmd;
++	struct psp_device *psp = sp->psp_data;
 +
-+	if (copy_from_user(&sev_cmd, argp, sizeof(struct kvm_sev_cmd)))
-+		return -EFAULT;
++	sev_dev_destroy(psp);
 +
-+	mutex_lock(&kvm->lock);
++	sp_free_psp_irq(sp, psp);
 +
-+	switch (sev_cmd.id) {
-+	case KVM_SEV_LAUNCH_START: {
-+		r = sev_launch_start(kvm, &sev_cmd);
-+		break;
-+	}
-+	default:
-+		break;
-+	}
-+
-+	mutex_unlock(&kvm->lock);
-+	if (copy_to_user(argp, &sev_cmd, sizeof(struct kvm_sev_cmd)))
-+		r = -EFAULT;
-+	return r;
++	psp_del_device(psp);
 +}
 +
- static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
- 	.cpu_has_kvm_support = has_svm,
- 	.disabled_by_bios = is_disabled,
-@@ -5518,7 +5816,7 @@ static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
- 	.vcpu_reset = svm_vcpu_reset,
- 
- 	.vm_init = avic_vm_init,
--	.vm_destroy = avic_vm_destroy,
-+	.vm_destroy = svm_vm_destroy,
- 
- 	.prepare_guest_switch = svm_prepare_guest_switch,
- 	.vcpu_load = svm_vcpu_load,
-@@ -5617,6 +5915,8 @@ static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
- 	.pmu_ops = &amd_pmu_ops,
- 	.deliver_posted_interrupt = svm_deliver_avic_intr,
- 	.update_pi_irte = svm_update_pi_irte,
++int psp_dev_resume(struct sp_device *sp)
++{
++	sev_dev_resume(sp->psp_data);
++	return 0;
++}
 +
-+	.memory_encryption_op = amd_memory_encryption_cmd,
++int psp_dev_suspend(struct sp_device *sp, pm_message_t state)
++{
++	sev_dev_suspend(sp->psp_data, state);
++	return 0;
++}
++
++int psp_request_sev_irq(struct psp_device *psp, irq_handler_t handler,
++			void *data)
++{
++	psp->sev_irq_data = data;
++	psp->sev_irq_handler = handler;
++
++	return 0;
++}
++
++int psp_free_sev_irq(struct psp_device *psp, void *data)
++{
++	if (psp->sev_irq_handler) {
++		psp->sev_irq_data = NULL;
++		psp->sev_irq_handler = NULL;
++	}
++
++	return 0;
++}
++
++struct psp_device *psp_get_master_device(void)
++{
++	struct sp_device *sp = sp_get_psp_master_device();
++
++	return sp ? sp->psp_data : NULL;
++}
+diff --git a/drivers/crypto/ccp/psp-dev.h b/drivers/crypto/ccp/psp-dev.h
+new file mode 100644
+index 0000000..bbd3d96
+--- /dev/null
++++ b/drivers/crypto/ccp/psp-dev.h
+@@ -0,0 +1,102 @@
++/*
++ * AMD Platform Security Processor (PSP) interface driver
++ *
++ * Copyright (C) 2016 Advanced Micro Devices, Inc.
++ *
++ * Author: Brijesh Singh <brijesh.singh@amd.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ */
++
++#ifndef __PSP_DEV_H__
++#define __PSP_DEV_H__
++
++#include <linux/device.h>
++#include <linux/pci.h>
++#include <linux/spinlock.h>
++#include <linux/mutex.h>
++#include <linux/list.h>
++#include <linux/wait.h>
++#include <linux/dmapool.h>
++#include <linux/hw_random.h>
++#include <linux/bitops.h>
++#include <linux/interrupt.h>
++#include <linux/irqreturn.h>
++#include <linux/dmaengine.h>
++
++#include "sp-dev.h"
++
++#define PSP_P2CMSG_INTEN		0x0110
++#define PSP_P2CMSG_INTSTS		0x0114
++
++#define PSP_C2PMSG_ATTR_0		0x0118
++#define PSP_C2PMSG_ATTR_1		0x011c
++#define PSP_C2PMSG_ATTR_2		0x0120
++#define PSP_C2PMSG_ATTR_3		0x0124
++#define PSP_P2CMSG_ATTR_0		0x0128
++
++#define PSP_CMDRESP_CMD_SHIFT		16
++#define PSP_CMDRESP_IOC			BIT(0)
++#define PSP_CMDRESP_RESP		BIT(31)
++#define PSP_CMDRESP_ERR_MASK		0xffff
++
++#define MAX_PSP_NAME_LEN		16
++
++struct psp_device {
++	struct list_head entry;
++
++	struct psp_vdata *vdata;
++	char name[MAX_PSP_NAME_LEN];
++
++	struct device *dev;
++	struct sp_device *sp;
++
++	void __iomem *io_regs;
++
++	irq_handler_t sev_irq_handler;
++	void *sev_irq_data;
++
++	void *sev_data;
++};
++
++void psp_add_device(struct psp_device *psp);
++void psp_del_device(struct psp_device *psp);
++
++int psp_request_sev_irq(struct psp_device *psp, irq_handler_t handler,
++			void *data);
++int psp_free_sev_irq(struct psp_device *psp, void *data);
++
++struct psp_device *psp_get_master_device(void);
++
++#ifdef CONFIG_AMD_SEV
++
++int sev_dev_init(struct psp_device *psp);
++void sev_dev_destroy(struct psp_device *psp);
++int sev_dev_resume(struct psp_device *psp);
++int sev_dev_suspend(struct psp_device *psp, pm_message_t state);
++
++#else
++
++static inline int sev_dev_init(struct psp_device *psp)
++{
++	return -ENODEV;
++}
++
++static inline void sev_dev_destroy(struct psp_device *psp) { }
++
++static inline int sev_dev_resume(struct psp_device *psp)
++{
++	return -ENODEV;
++}
++
++static inline int sev_dev_suspend(struct psp_device *psp, pm_message_t state)
++{
++	return -ENODEV;
++}
++
++#endif /* __AMD_SEV_H */
++
++#endif /* __PSP_DEV_H */
++
+diff --git a/drivers/crypto/ccp/sp-dev.c b/drivers/crypto/ccp/sp-dev.c
+index e47fb8e..975a435 100644
+--- a/drivers/crypto/ccp/sp-dev.c
++++ b/drivers/crypto/ccp/sp-dev.c
+@@ -212,6 +212,8 @@ int sp_init(struct sp_device *sp)
+ 	if (sp->dev_data->ccp_vdata)
+ 		ccp_dev_init(sp);
+ 
++	if (sp->dev_data->psp_vdata)
++		psp_dev_init(sp);
+ 	return 0;
+ }
+ 
+@@ -220,6 +222,9 @@ void sp_destroy(struct sp_device *sp)
+ 	if (sp->dev_data->ccp_vdata)
+ 		ccp_dev_destroy(sp);
+ 
++	if (sp->dev_data->psp_vdata)
++		psp_dev_destroy(sp);
++
+ 	sp_del_device(sp);
+ }
+ 
+@@ -233,6 +238,12 @@ int sp_suspend(struct sp_device *sp, pm_message_t state)
+ 			return ret;
+ 	}
+ 
++	if (sp->dev_data->psp_vdata) {
++		ret = psp_dev_suspend(sp, state);
++		if (ret)
++			return ret;
++	}
++
+ 	return 0;
+ }
+ 
+@@ -246,6 +257,11 @@ int sp_resume(struct sp_device *sp)
+ 			return ret;
+ 	}
+ 
++	if (sp->dev_data->psp_vdata) {
++		ret = psp_dev_resume(sp);
++		if (ret)
++			return ret;
++	}
+ 	return 0;
+ }
+ 
+diff --git a/drivers/crypto/ccp/sp-dev.h b/drivers/crypto/ccp/sp-dev.h
+index 9a8a8f8..aeff7a0 100644
+--- a/drivers/crypto/ccp/sp-dev.h
++++ b/drivers/crypto/ccp/sp-dev.h
+@@ -40,12 +40,18 @@ struct ccp_vdata {
+ 	const unsigned int offset;
  };
  
- static int __init svm_init(void)
++struct psp_vdata {
++	const unsigned int version;
++	const struct psp_actions *perform;
++	const unsigned int offset;
++};
++
+ /* Structure to hold SP device data */
+ struct sp_dev_data {
+ 	const unsigned int bar;
+ 
+ 	const struct ccp_vdata *ccp_vdata;
+-	const void *psp_vdata;
++	const struct psp_vdata *psp_vdata;
+ };
+ 
+ struct sp_device {
+@@ -137,4 +143,30 @@ static inline int ccp_dev_resume(struct sp_device *sp)
+ 
+ #endif	/* CONFIG_CRYPTO_DEV_CCP */
+ 
++#ifdef CONFIG_CRYPTO_DEV_PSP
++
++int psp_dev_init(struct sp_device *sp);
++void psp_dev_destroy(struct sp_device *sp);
++
++int psp_dev_suspend(struct sp_device *sp, pm_message_t state);
++int psp_dev_resume(struct sp_device *sp);
++#else /* !CONFIG_CRYPTO_DEV_CCP */
++
++static inline int psp_dev_init(struct sp_device *sp)
++{
++	return 0;
++}
++static inline void psp_dev_destroy(struct sp_device *sp) { }
++
++static inline int psp_dev_suspend(struct sp_device *sp, pm_message_t state)
++{
++	return 0;
++}
++static inline int psp_dev_resume(struct sp_device *sp)
++{
++	return 0;
++}
++
++#endif /* CONFIG_CRYPTO_DEV_CCP */
++
+ #endif
+diff --git a/drivers/crypto/ccp/sp-pci.c b/drivers/crypto/ccp/sp-pci.c
+index 0960e2d..4999662 100644
+--- a/drivers/crypto/ccp/sp-pci.c
++++ b/drivers/crypto/ccp/sp-pci.c
+@@ -271,6 +271,7 @@ static int sp_pci_resume(struct pci_dev *pdev)
+ extern struct ccp_vdata ccpv3_pci;
+ extern struct ccp_vdata ccpv5a;
+ extern struct ccp_vdata ccpv5b;
++extern struct psp_vdata psp_entry;
+ 
+ static const struct sp_dev_data dev_data[] = {
+ 	{
+@@ -284,6 +285,9 @@ static const struct sp_dev_data dev_data[] = {
+ #ifdef CONFIG_CRYPTO_DEV_CCP
+ 		.ccp_vdata = &ccpv5a,
+ #endif
++#ifdef CONFIG_CRYPTO_DEV_PSP
++		.psp_vdata = &psp_entry
++#endif
+ 	},
+ 	{
+ 		.bar = 2,
