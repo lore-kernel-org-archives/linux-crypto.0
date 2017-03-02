@@ -1,8 +1,8 @@
 From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: [RFC PATCH v2 28/32] kvm: svm: Add support for SEV GUEST_STATUS
- command
-Date: Thu, 2 Mar 2017 10:18:07 -0500
-Message-ID: <148846788726.2349.3437191329307712811.stgit__22891.0215468661$1488470779$gmane$org@brijesh-build-machine>
+Subject: [RFC PATCH v2 26/32] kvm: svm: Add support for SEV
+ LAUNCH_UPDATE_DATA command
+Date: Thu, 2 Mar 2017 10:17:47 -0500
+Message-ID: <148846786714.2349.17724971671841396908.stgit__25299.4950431914$1488470940$gmane$org@brijesh-build-machine>
 References: <148846752022.2349.13667498174822419498.stgit@brijesh-build-machine>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -22,72 +22,200 @@ To: <simon.guinot@sequanux.org>, <linux-efi@vger.kernel.org>,
         <dyoung@redhat.com>, <thomas.lendacky@amd.com>, <jroedel@suse.de>,
         <keescook@chromium.org>, <arnd@arndb.de>, <toshi
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2nam01on0075.outbound.protection.outlook.com ([104.47.34.75]:41376
-        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
+Received: from mail-by2nam03on0042.outbound.protection.outlook.com ([104.47.42.42]:30518
+        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751995AbdCBPfh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Mar 2017 10:35:37 -0500
+        id S1751930AbdCBPfA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 2 Mar 2017 10:35:00 -0500
 In-Reply-To: <148846752022.2349.13667498174822419498.stgit@brijesh-build-machine>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The command is used for querying the SEV guest status.
+The command is used for encrypting the guest memory region using the VM
+encryption key (VEK) created from LAUNCH_START.
 
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- arch/x86/kvm/svm.c |   37 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 37 insertions(+)
+ arch/x86/kvm/svm.c |  150 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 150 insertions(+)
 
 diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index c108064..977aa22 100644
+index b5fa8c0..62c2b22 100644
 --- a/arch/x86/kvm/svm.c
 +++ b/arch/x86/kvm/svm.c
-@@ -5953,6 +5953,39 @@ static int sev_launch_finish(struct kvm *kvm, struct kvm_sev_cmd *argp)
+@@ -38,6 +38,8 @@
+ #include <linux/hashtable.h>
+ #include <linux/psp-sev.h>
+ #include <linux/file.h>
++#include <linux/pagemap.h>
++#include <linux/swap.h>
+ 
+ #include <asm/apic.h>
+ #include <asm/perf_event.h>
+@@ -502,6 +504,7 @@ static void sev_deactivate_handle(struct kvm *kvm);
+ static void sev_decommission_handle(struct kvm *kvm);
+ static int sev_asid_new(void);
+ static void sev_asid_free(int asid);
++#define __sev_page_pa(x) ((page_to_pfn(x) << PAGE_SHIFT) | sme_me_mask)
+ 
+ static bool kvm_sev_enabled(void)
+ {
+@@ -5775,6 +5778,149 @@ static int sev_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
  	return ret;
  }
  
-+static int sev_guest_status(struct kvm *kvm, struct kvm_sev_cmd *argp)
++static struct page **sev_pin_memory(unsigned long uaddr, unsigned long ulen,
++				    unsigned long *n)
 +{
-+	int ret;
-+	struct kvm_sev_guest_status params;
-+	struct sev_data_guest_status *data;
++	struct page **pages;
++	int first, last;
++	unsigned long npages, pinned;
++
++	/* Get number of pages */
++	first = (uaddr & PAGE_MASK) >> PAGE_SHIFT;
++	last = ((uaddr + ulen - 1) & PAGE_MASK) >> PAGE_SHIFT;
++	npages = (last - first + 1);
++
++	pages = kzalloc(npages * sizeof(struct page *), GFP_KERNEL);
++	if (!pages)
++		return NULL;
++
++	/* pin the user virtual address */
++	down_read(&current->mm->mmap_sem);
++	pinned = get_user_pages_fast(uaddr, npages, 1, pages);
++	up_read(&current->mm->mmap_sem);
++	if (pinned != npages) {
++		printk(KERN_ERR "SEV: failed to pin  %ld pages (got %ld)\n",
++				npages, pinned);
++		goto err;
++	}
++
++	*n = npages;
++	return pages;
++err:
++	if (pinned > 0)
++		release_pages(pages, pinned, 0);
++	kfree(pages);
++
++	return NULL;
++}
++
++static void sev_unpin_memory(struct page **pages, unsigned long npages)
++{
++	release_pages(pages, npages, 0);
++	kfree(pages);
++}
++
++static void sev_clflush_pages(struct page *pages[], int num_pages)
++{
++	unsigned long i;
++	uint8_t *page_virtual;
++
++	if (num_pages == 0 || pages == NULL)
++		return;
++
++	for (i = 0; i < num_pages; i++) {
++		page_virtual = kmap_atomic(pages[i]);
++		clflush_cache_range(page_virtual, PAGE_SIZE);
++		kunmap_atomic(page_virtual);
++	}
++}
++
++static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
++{
++	struct page **inpages;
++	unsigned long uaddr, ulen;
++	int i, len, ret, offset;
++	unsigned long nr_pages;
++	struct kvm_sev_launch_update_data params;
++	struct sev_data_launch_update_data *data;
 +
 +	if (!sev_guest(kvm))
-+		return -ENOTTY;
++		return -EINVAL;
 +
-+	if (copy_from_user(&params, (void *) argp->data,
-+				sizeof(struct kvm_sev_guest_status)))
-+		return -EFAULT;
-+
-+	data = kzalloc(sizeof(*data), GFP_KERNEL);
-+	if (!data)
-+		return -ENOMEM;
-+
-+	data->handle = sev_get_handle(kvm);
-+	ret = sev_issue_cmd(kvm, SEV_CMD_GUEST_STATUS, data, &argp->error);
-+	if (ret)
++	/* Get the parameters from the user */
++	ret = -EFAULT;
++	if (copy_from_user(&params, (void *)argp->data,
++			sizeof(struct kvm_sev_launch_update_data)))
 +		goto err_1;
 +
-+	params.policy = data->policy;
-+	params.state = data->state;
++	uaddr = params.address;
++	ulen = params.length;
 +
-+	if (copy_to_user((void *) argp->data, &params,
-+				sizeof(struct kvm_sev_guest_status)))
-+		ret = -EFAULT;
-+err_1:
++	data = kzalloc(sizeof(*data), GFP_KERNEL);
++	if (!data) {
++		ret = -ENOMEM;
++		goto err_1;
++	}
++
++	/* pin user pages */
++	inpages = sev_pin_memory(params.address, params.length, &nr_pages);
++	if (!inpages) {
++		ret = -ENOMEM;
++		goto err_2;
++	}
++
++	/* invalidate the cache line for these pages to ensure that DRAM
++	 * has recent content before calling the SEV commands to perform
++	 * the encryption.
++	 */
++	sev_clflush_pages(inpages, nr_pages);
++
++	/* the array of pages returned by get_user_pages() is a page-aligned
++	 * memory. Since the user buffer is probably not page-aligned, we need
++	 * to calculate the offset within a page for first update entry.
++	 */
++	offset = uaddr & (PAGE_SIZE - 1);
++	len = min_t(size_t, (PAGE_SIZE - offset), ulen);
++	ulen -= len;
++
++	/* update first page -
++	 * special care need to be taken for the first page because we might
++	 * be dealing with offset within the page
++	 */
++	data->handle = sev_get_handle(kvm);
++	data->length = len;
++	data->address = __sev_page_pa(inpages[0]) + offset;
++	ret = sev_issue_cmd(kvm, SEV_CMD_LAUNCH_UPDATE_DATA,
++			data, &argp->error);
++	if (ret)
++		goto err_3;
++
++	/* update remaining pages */
++	for (i = 1; i < nr_pages; i++) {
++
++		len = min_t(size_t, PAGE_SIZE, ulen);
++		ulen -= len;
++		data->length = len;
++		data->address = __sev_page_pa(inpages[i]);
++		ret = sev_issue_cmd(kvm, SEV_CMD_LAUNCH_UPDATE_DATA,
++					data, &argp->error);
++		if (ret)
++			goto err_3;
++	}
++
++	/* mark pages dirty */
++	for (i = 0; i < nr_pages; i++) {
++		set_page_dirty_lock(inpages[i]);
++		mark_page_accessed(inpages[i]);
++	}
++err_3:
++	sev_unpin_memory(inpages, nr_pages);
++err_2:
 +	kfree(data);
++err_1:
 +	return ret;
 +}
 +
  static int amd_memory_encryption_cmd(struct kvm *kvm, void __user *argp)
  {
  	int r = -ENOTTY;
-@@ -5976,6 +6009,10 @@ static int amd_memory_encryption_cmd(struct kvm *kvm, void __user *argp)
- 		r = sev_launch_finish(kvm, &sev_cmd);
+@@ -5790,6 +5936,10 @@ static int amd_memory_encryption_cmd(struct kvm *kvm, void __user *argp)
+ 		r = sev_launch_start(kvm, &sev_cmd);
  		break;
  	}
-+	case KVM_SEV_GUEST_STATUS: {
-+		r = sev_guest_status(kvm, &sev_cmd);
++	case KVM_SEV_LAUNCH_UPDATE_DATA: {
++		r = sev_launch_update_data(kvm, &sev_cmd);
 +		break;
 +	}
  	default:
