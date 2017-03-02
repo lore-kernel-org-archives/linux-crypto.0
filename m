@@ -1,8 +1,7 @@
 From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: [RFC PATCH v2 18/32] kvm: svm: Use the hardware provided GPA
- instead of page walk
-Date: Thu, 2 Mar 2017 10:16:05 -0500
-Message-ID: <148846776540.2349.3123530065053870721.stgit__48135.5423843071$1488470085$gmane$org@brijesh-build-machine>
+Subject: [RFC PATCH v2 22/32] kvm: svm: prepare to reserve asid for SEV guest
+Date: Thu, 2 Mar 2017 10:16:56 -0500
+Message-ID: <148846781666.2349.1816322796563357670.stgit__11192.3443772413$1488470185$gmane$org@brijesh-build-machine>
 References: <148846752022.2349.13667498174822419498.stgit@brijesh-build-machine>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -22,206 +21,51 @@ To: <simon.guinot@sequanux.org>, <linux-efi@vger.kernel.org>,
         <dyoung@redhat.com>, <thomas.lendacky@amd.com>, <jroedel@suse.de>,
         <keescook@chromium.org>, <arnd@arndb.de>, <toshi
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-sn1nam01on0065.outbound.protection.outlook.com ([104.47.32.65]:3104
-        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
+Received: from mail-bn3nam01on0087.outbound.protection.outlook.com ([104.47.33.87]:52544
+        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753149AbdCBPwB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1753362AbdCBPwB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Thu, 2 Mar 2017 10:52:01 -0500
 In-Reply-To: <148846752022.2349.13667498174822419498.stgit@brijesh-build-machine>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Tom Lendacky <thomas.lendacky@amd.com>
+In current implementation, asid allocation starts from 1, this patch
+adds a min_asid variable in svm_vcpu structure to allow starting asid
+from something other than 1.
 
-When a guest causes a NPF which requires emulation, KVM sometimes walks
-the guest page tables to translate the GVA to a GPA. This is unnecessary
-most of the time on AMD hardware since the hardware provides the GPA in
-EXITINFO2.
-
-The only exception cases involve string operations involving rep or
-operations that use two memory locations. With rep, the GPA will only be
-the value of the initial NPF and with dual memory locations we won't know
-which memory address was translated into EXITINFO2.
-
-Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
-Reviewed-by: Borislav Petkov <bp@suse.de>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/include/asm/kvm_emulate.h |    1 +
- arch/x86/include/asm/kvm_host.h    |    3 ++
- arch/x86/kvm/emulate.c             |   20 +++++++++++++---
- arch/x86/kvm/svm.c                 |    2 ++
- arch/x86/kvm/x86.c                 |   45 ++++++++++++++++++++++++++++--------
- 5 files changed, 57 insertions(+), 14 deletions(-)
+ arch/x86/kvm/svm.c |    4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/include/asm/kvm_emulate.h b/arch/x86/include/asm/kvm_emulate.h
-index e9cd7be..3e8c287 100644
---- a/arch/x86/include/asm/kvm_emulate.h
-+++ b/arch/x86/include/asm/kvm_emulate.h
-@@ -441,5 +441,6 @@ int emulator_task_switch(struct x86_emulate_ctxt *ctxt,
- int emulate_int_real(struct x86_emulate_ctxt *ctxt, int irq);
- void emulator_invalidate_register_cache(struct x86_emulate_ctxt *ctxt);
- void emulator_writeback_register_cache(struct x86_emulate_ctxt *ctxt);
-+bool emulator_can_use_gpa(struct x86_emulate_ctxt *ctxt);
- 
- #endif /* _ASM_X86_KVM_X86_EMULATE_H */
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 37326b5..bff1f15 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -668,6 +668,9 @@ struct kvm_vcpu_arch {
- 
- 	int pending_ioapic_eoi;
- 	int pending_external_vector;
-+
-+	/* GPA available (AMD only) */
-+	bool gpa_available;
- };
- 
- struct kvm_lpage_info {
-diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-index cedbba0..45c7306 100644
---- a/arch/x86/kvm/emulate.c
-+++ b/arch/x86/kvm/emulate.c
-@@ -173,6 +173,7 @@
- #define NearBranch  ((u64)1 << 52)  /* Near branches */
- #define No16	    ((u64)1 << 53)  /* No 16 bit operand */
- #define IncSP       ((u64)1 << 54)  /* SP is incremented before ModRM calc */
-+#define TwoMemOp    ((u64)1 << 55)  /* Instruction has two memory operand */
- 
- #define DstXacc     (DstAccLo | SrcAccHi | SrcWrite)
- 
-@@ -4298,7 +4299,7 @@ static const struct opcode group1[] = {
- };
- 
- static const struct opcode group1A[] = {
--	I(DstMem | SrcNone | Mov | Stack | IncSP, em_pop), N, N, N, N, N, N, N,
-+	I(DstMem | SrcNone | Mov | Stack | IncSP | TwoMemOp, em_pop), N, N, N, N, N, N, N,
- };
- 
- static const struct opcode group2[] = {
-@@ -4336,7 +4337,7 @@ static const struct opcode group5[] = {
- 	I(SrcMemFAddr | ImplicitOps,		em_call_far),
- 	I(SrcMem | NearBranch,			em_jmp_abs),
- 	I(SrcMemFAddr | ImplicitOps,		em_jmp_far),
--	I(SrcMem | Stack,			em_push), D(Undefined),
-+	I(SrcMem | Stack | TwoMemOp,		em_push), D(Undefined),
- };
- 
- static const struct opcode group6[] = {
-@@ -4556,8 +4557,8 @@ static const struct opcode opcode_table[256] = {
- 	/* 0xA0 - 0xA7 */
- 	I2bv(DstAcc | SrcMem | Mov | MemAbs, em_mov),
- 	I2bv(DstMem | SrcAcc | Mov | MemAbs | PageTable, em_mov),
--	I2bv(SrcSI | DstDI | Mov | String, em_mov),
--	F2bv(SrcSI | DstDI | String | NoWrite, em_cmp_r),
-+	I2bv(SrcSI | DstDI | Mov | String | TwoMemOp, em_mov),
-+	F2bv(SrcSI | DstDI | String | NoWrite | TwoMemOp, em_cmp_r),
- 	/* 0xA8 - 0xAF */
- 	F2bv(DstAcc | SrcImm | NoWrite, em_test),
- 	I2bv(SrcAcc | DstDI | Mov | String, em_mov),
-@@ -5671,3 +5672,14 @@ void emulator_writeback_register_cache(struct x86_emulate_ctxt *ctxt)
- {
- 	writeback_registers(ctxt);
- }
-+
-+bool emulator_can_use_gpa(struct x86_emulate_ctxt *ctxt)
-+{
-+	if (ctxt->rep_prefix && (ctxt->d & String))
-+		return false;
-+
-+	if (ctxt->d & TwoMemOp)
-+		return false;
-+
-+	return true;
-+}
 diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index 36d61ff..b581499 100644
+index b581499..8d8fe62 100644
 --- a/arch/x86/kvm/svm.c
 +++ b/arch/x86/kvm/svm.c
-@@ -4184,6 +4184,8 @@ static int handle_exit(struct kvm_vcpu *vcpu)
+@@ -507,6 +507,7 @@ struct svm_cpu_data {
+ 	u64 asid_generation;
+ 	u32 max_asid;
+ 	u32 next_asid;
++	u32 min_asid;
+ 	struct kvm_ldttss_desc *tss_desc;
  
- 	trace_kvm_exit(exit_code, vcpu, KVM_ISA_SVM);
+ 	struct page *save_area;
+@@ -763,6 +764,7 @@ static int svm_hardware_enable(void)
+ 	sd->asid_generation = 1;
+ 	sd->max_asid = cpuid_ebx(SVM_CPUID_FUNC) - 1;
+ 	sd->next_asid = sd->max_asid + 1;
++	sd->min_asid = 1;
  
-+	vcpu->arch.gpa_available = (exit_code == SVM_EXIT_NPF);
-+
- 	if (!is_cr_intercept(svm, INTERCEPT_CR0_WRITE))
- 		vcpu->arch.cr0 = svm->vmcb->save.cr0;
- 	if (npt_enabled)
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 9e6a593..2099df8 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4465,6 +4465,21 @@ int kvm_write_guest_virt_system(struct x86_emulate_ctxt *ctxt,
- }
- EXPORT_SYMBOL_GPL(kvm_write_guest_virt_system);
- 
-+static int vcpu_is_mmio_gpa(struct kvm_vcpu *vcpu, unsigned long gva,
-+			    gpa_t gpa, bool write)
-+{
-+	/* For APIC access vmexit */
-+	if ((gpa & PAGE_MASK) == APIC_DEFAULT_PHYS_BASE)
-+		return 1;
-+
-+	if (vcpu_match_mmio_gpa(vcpu, gpa)) {
-+		trace_vcpu_match_mmio(gva, gpa, write, true);
-+		return 1;
-+	}
-+
-+	return 0;
-+}
-+
- static int vcpu_mmio_gva_to_gpa(struct kvm_vcpu *vcpu, unsigned long gva,
- 				gpa_t *gpa, struct x86_exception *exception,
- 				bool write)
-@@ -4491,16 +4506,7 @@ static int vcpu_mmio_gva_to_gpa(struct kvm_vcpu *vcpu, unsigned long gva,
- 	if (*gpa == UNMAPPED_GVA)
- 		return -1;
- 
--	/* For APIC access vmexit */
--	if ((*gpa & PAGE_MASK) == APIC_DEFAULT_PHYS_BASE)
--		return 1;
--
--	if (vcpu_match_mmio_gpa(vcpu, *gpa)) {
--		trace_vcpu_match_mmio(gva, *gpa, write, true);
--		return 1;
--	}
--
--	return 0;
-+	return vcpu_is_mmio_gpa(vcpu, gva, *gpa, write);
- }
- 
- int emulator_write_phys(struct kvm_vcpu *vcpu, gpa_t gpa,
-@@ -4597,6 +4603,22 @@ static int emulator_read_write_onepage(unsigned long addr, void *val,
- 	int handled, ret;
- 	bool write = ops->write;
- 	struct kvm_mmio_fragment *frag;
-+	struct x86_emulate_ctxt *ctxt = &vcpu->arch.emulate_ctxt;
-+
-+	/*
-+	 * If the exit was due to a NPF we may already have a GPA.
-+	 * If the GPA is present, use it to avoid the GVA to GPA table walk.
-+	 * Note, this cannot be used on string operations since string
-+	 * operation using rep will only have the initial GPA from the NPF
-+	 * occurred.
-+	 */
-+	if (vcpu->arch.gpa_available &&
-+	    emulator_can_use_gpa(ctxt) &&
-+	    vcpu_is_mmio_gpa(vcpu, addr, exception->address, write) &&
-+	    (addr & ~PAGE_MASK) == (exception->address & ~PAGE_MASK)) {
-+		gpa = exception->address;
-+		goto mmio;
-+	}
- 
- 	ret = vcpu_mmio_gva_to_gpa(vcpu, addr, &gpa, exception, write);
- 
-@@ -5613,6 +5635,9 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu,
+ 	native_store_gdt(&gdt_descr);
+ 	gdt = (struct desc_struct *)gdt_descr.address;
+@@ -2026,7 +2028,7 @@ static void new_asid(struct vcpu_svm *svm, struct svm_cpu_data *sd)
+ {
+ 	if (sd->next_asid > sd->max_asid) {
+ 		++sd->asid_generation;
+-		sd->next_asid = 1;
++		sd->next_asid = sd->min_asid;
+ 		svm->vmcb->control.tlb_ctl = TLB_CONTROL_FLUSH_ALL_ASID;
  	}
  
- restart:
-+	/* Save the faulting GPA (cr2) in the address field */
-+	ctxt->exception.address = cr2;
-+
- 	r = x86_emulate_insn(ctxt);
- 
- 	if (r == EMULATION_INTERCEPTED)
