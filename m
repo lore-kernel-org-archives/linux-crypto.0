@@ -1,8 +1,7 @@
 From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: [RFC PATCH v2 14/32] x86: mm: Provide support to use memblock when
- spliting large pages
-Date: Thu, 2 Mar 2017 10:15:15 -0500
-Message-ID: <148846771545.2349.9373586041426414252.stgit__19876.9389921383$1488473589$gmane$org@brijesh-build-machine>
+Subject: [RFC PATCH v2 10/32] x86: DMA support for SEV memory encryption
+Date: Thu, 2 Mar 2017 10:14:25 -0500
+Message-ID: <148846766532.2349.4832844575566575886.stgit__7575.88629280708$1488473992$gmane$org@brijesh-build-machine>
 References: <148846752022.2349.13667498174822419498.stgit@brijesh-build-machine>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -22,148 +21,121 @@ To: <simon.guinot@sequanux.org>, <linux-efi@vger.kernel.org>,
         <dyoung@redhat.com>, <thomas.lendacky@amd.com>, <jroedel@suse.de>,
         <keescook@chromium.org>, <arnd@arndb.de>, <toshi
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-dm3nam03on0050.outbound.protection.outlook.com ([104.47.41.50]:1516
-        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
+Received: from mail-bn3nam01on0086.outbound.protection.outlook.com ([104.47.33.86]:19463
+        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1750787AbdCBQvW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Mar 2017 11:51:22 -0500
+        id S1752770AbdCBQ7N (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 2 Mar 2017 11:59:13 -0500
 In-Reply-To: <148846752022.2349.13667498174822419498.stgit@brijesh-build-machine>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-If kernel_maps_pages_in_pgd is called early in boot process to change the
-memory attributes then it fails to allocate memory when spliting large
-pages. The patch extends the cpa_data to provide the support to use
-memblock_alloc when slab allocator is not available.
+From: Tom Lendacky <thomas.lendacky@amd.com>
 
-The feature will be used in Secure Encrypted Virtualization (SEV) mode,
-where we may need to change the memory region attributes in early boot
-process.
+DMA access to memory mapped as encrypted while SEV is active can not be
+encrypted during device write or decrypted during device read. In order
+for DMA to properly work when SEV is active, the swiotlb bounce buffers
+must be used.
 
-Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 ---
- arch/x86/mm/pageattr.c |   51 ++++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 42 insertions(+), 9 deletions(-)
+ arch/x86/mm/mem_encrypt.c |   77 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 77 insertions(+)
 
-diff --git a/arch/x86/mm/pageattr.c b/arch/x86/mm/pageattr.c
-index 46cc89d..9e4ab3b 100644
---- a/arch/x86/mm/pageattr.c
-+++ b/arch/x86/mm/pageattr.c
-@@ -14,6 +14,7 @@
- #include <linux/gfp.h>
- #include <linux/pci.h>
- #include <linux/vmalloc.h>
-+#include <linux/memblock.h>
- 
- #include <asm/e820/api.h>
- #include <asm/processor.h>
-@@ -37,6 +38,7 @@ struct cpa_data {
- 	int		flags;
- 	unsigned long	pfn;
- 	unsigned	force_split : 1;
-+	unsigned	force_memblock :1;
- 	int		curpage;
- 	struct page	**pages;
- };
-@@ -627,9 +629,8 @@ try_preserve_large_page(pte_t *kpte, unsigned long address,
- 
- static int
- __split_large_page(struct cpa_data *cpa, pte_t *kpte, unsigned long address,
--		   struct page *base)
-+		  pte_t *pbase, unsigned long new_pfn)
- {
--	pte_t *pbase = (pte_t *)page_address(base);
- 	unsigned long ref_pfn, pfn, pfninc = 1;
- 	unsigned int i, level;
- 	pte_t *tmp;
-@@ -646,7 +647,7 @@ __split_large_page(struct cpa_data *cpa, pte_t *kpte, unsigned long address,
- 		return 1;
- 	}
- 
--	paravirt_alloc_pte(&init_mm, page_to_pfn(base));
-+	paravirt_alloc_pte(&init_mm, new_pfn);
- 
- 	switch (level) {
- 	case PG_LEVEL_2M:
-@@ -707,7 +708,8 @@ __split_large_page(struct cpa_data *cpa, pte_t *kpte, unsigned long address,
- 	 * pagetable protections, the actual ptes set above control the
- 	 * primary protection behavior:
- 	 */
--	__set_pmd_pte(kpte, address, mk_pte(base, __pgprot(_KERNPG_TABLE)));
-+	__set_pmd_pte(kpte, address,
-+		native_make_pte((new_pfn << PAGE_SHIFT) + _KERNPG_TABLE));
- 
- 	/*
- 	 * Intel Atom errata AAH41 workaround.
-@@ -723,21 +725,50 @@ __split_large_page(struct cpa_data *cpa, pte_t *kpte, unsigned long address,
- 	return 0;
- }
- 
-+static pte_t *try_alloc_pte(struct cpa_data *cpa, unsigned long *pfn)
-+{
-+	unsigned long phys;
-+	struct page *base;
+diff --git a/arch/x86/mm/mem_encrypt.c b/arch/x86/mm/mem_encrypt.c
+index 090419b..7df5f4c 100644
+--- a/arch/x86/mm/mem_encrypt.c
++++ b/arch/x86/mm/mem_encrypt.c
+@@ -197,8 +197,81 @@ void __init sme_early_init(void)
+ 	/* Update the protection map with memory encryption mask */
+ 	for (i = 0; i < ARRAY_SIZE(protection_map); i++)
+ 		protection_map[i] = pgprot_encrypted(protection_map[i]);
 +
-+	if (cpa->force_memblock) {
-+		phys = memblock_alloc(PAGE_SIZE, PAGE_SIZE);
-+		if (!phys)
-+			return NULL;
-+		*pfn = phys >> PAGE_SHIFT;
-+		return (pte_t *)__va(phys);
++	if (sev_active())
++		swiotlb_force = SWIOTLB_FORCE;
++}
++
++static void *sme_alloc(struct device *dev, size_t size, dma_addr_t *dma_handle,
++		       gfp_t gfp, unsigned long attrs)
++{
++	unsigned long dma_mask;
++	unsigned int order;
++	struct page *page;
++	void *vaddr = NULL;
++
++	dma_mask = dma_alloc_coherent_mask(dev, gfp);
++	order = get_order(size);
++
++	gfp &= ~__GFP_ZERO;
++
++	page = alloc_pages_node(dev_to_node(dev), gfp, order);
++	if (page) {
++		dma_addr_t addr;
++
++		/*
++		 * Since we will be clearing the encryption bit, check the
++		 * mask with it already cleared.
++		 */
++		addr = phys_to_dma(dev, page_to_phys(page)) & ~sme_me_mask;
++		if ((addr + size) > dma_mask) {
++			__free_pages(page, get_order(size));
++		} else {
++			vaddr = page_address(page);
++			*dma_handle = addr;
++		}
 +	}
 +
-+	base = alloc_pages(GFP_KERNEL | __GFP_NOTRACK, 0);
-+	if (!base)
++	if (!vaddr)
++		vaddr = swiotlb_alloc_coherent(dev, size, dma_handle, gfp);
++
++	if (!vaddr)
 +		return NULL;
-+	*pfn = page_to_pfn(base);
-+	return (pte_t *)page_address(base);
-+}
 +
-+static void try_free_pte(struct cpa_data *cpa, pte_t *pte)
-+{
-+	if (cpa->force_memblock)
-+		memblock_free(__pa(pte), PAGE_SIZE);
-+	else
-+		__free_page((struct page *)pte);
-+}
++	/* Clear the SME encryption bit for DMA use if not swiotlb area */
++	if (!is_swiotlb_buffer(dma_to_phys(dev, *dma_handle))) {
++		set_memory_decrypted((unsigned long)vaddr, 1 << order);
++		*dma_handle &= ~sme_me_mask;
++	}
 +
- static int split_large_page(struct cpa_data *cpa, pte_t *kpte,
- 			    unsigned long address)
- {
--	struct page *base;
-+	pte_t *new_pte;
-+	unsigned long new_pfn;
- 
- 	if (!debug_pagealloc_enabled())
- 		spin_unlock(&cpa_lock);
--	base = alloc_pages(GFP_KERNEL | __GFP_NOTRACK, 0);
-+	new_pte = try_alloc_pte(cpa, &new_pfn);
- 	if (!debug_pagealloc_enabled())
- 		spin_lock(&cpa_lock);
--	if (!base)
-+	if (!new_pte)
- 		return -ENOMEM;
- 
--	if (__split_large_page(cpa, kpte, address, base))
--		__free_page(base);
-+	if (__split_large_page(cpa, kpte, address, new_pte, new_pfn))
-+		try_free_pte(cpa, new_pte);
- 
- 	return 0;
++	return vaddr;
  }
-@@ -2035,6 +2066,7 @@ int kernel_map_pages_in_pgd(pgd_t *pgd, u64 pfn, unsigned long address,
- 			    unsigned numpages, unsigned long page_flags)
+ 
++static void sme_free(struct device *dev, size_t size, void *vaddr,
++		     dma_addr_t dma_handle, unsigned long attrs)
++{
++	/* Set the SME encryption bit for re-use if not swiotlb area */
++	if (!is_swiotlb_buffer(dma_to_phys(dev, dma_handle)))
++		set_memory_encrypted((unsigned long)vaddr,
++				     1 << get_order(size));
++
++	swiotlb_free_coherent(dev, size, vaddr, dma_handle);
++}
++
++static struct dma_map_ops sme_dma_ops = {
++	.alloc                  = sme_alloc,
++	.free                   = sme_free,
++	.map_page               = swiotlb_map_page,
++	.unmap_page             = swiotlb_unmap_page,
++	.map_sg                 = swiotlb_map_sg_attrs,
++	.unmap_sg               = swiotlb_unmap_sg_attrs,
++	.sync_single_for_cpu    = swiotlb_sync_single_for_cpu,
++	.sync_single_for_device = swiotlb_sync_single_for_device,
++	.sync_sg_for_cpu        = swiotlb_sync_sg_for_cpu,
++	.sync_sg_for_device     = swiotlb_sync_sg_for_device,
++	.mapping_error          = swiotlb_dma_mapping_error,
++};
++
+ /* Architecture __weak replacement functions */
+ void __init mem_encrypt_init(void)
  {
- 	int retval = -EINVAL;
-+	int use_memblock = !slab_is_available();
+@@ -208,6 +281,10 @@ void __init mem_encrypt_init(void)
+ 	/* Call into SWIOTLB to update the SWIOTLB DMA buffers */
+ 	swiotlb_update_mem_attributes();
  
- 	struct cpa_data cpa = {
- 		.vaddr = &address,
-@@ -2044,6 +2076,7 @@ int kernel_map_pages_in_pgd(pgd_t *pgd, u64 pfn, unsigned long address,
- 		.mask_set = __pgprot(0),
- 		.mask_clr = __pgprot(0),
- 		.flags = 0,
-+		.force_memblock = use_memblock,
- 	};
++	/* Use SEV DMA operations if SEV is active */
++	if (sev_active())
++		dma_ops = &sme_dma_ops;
++
+ 	pr_info("AMD Secure Memory Encryption (SME) active\n");
+ }
  
- 	if (!(__supported_pte_mask & _PAGE_NX))
