@@ -1,8 +1,8 @@
 From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: [RFC PATCH v2 09/32] x86: Change early_ioremap to early_memremap
- for BOOT data
-Date: Thu, 2 Mar 2017 10:13:53 -0500
-Message-ID: <148846763334.2349.9327692408737971533.stgit__49494.7970648811$1488468646$gmane$org@brijesh-build-machine>
+Subject: [RFC PATCH v2 07/32] x86/efi: Access EFI data as encrypted when SEV
+ is active
+Date: Thu, 2 Mar 2017 10:13:21 -0500
+Message-ID: <148846760142.2349.8522516472305792434.stgit__12218.2652623907$1488468668$gmane$org@brijesh-build-machine>
 References: <148846752022.2349.13667498174822419498.stgit@brijesh-build-machine>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -22,116 +22,78 @@ To: <simon.guinot@sequanux.org>, <linux-efi@vger.kernel.org>,
         <dyoung@redhat.com>, <thomas.lendacky@amd.com>, <jroedel@suse.de>,
         <keescook@chromium.org>, <arnd@arndb.de>, <toshi
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-dm3nam03on0072.outbound.protection.outlook.com ([104.47.41.72]:52663
-        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
+Received: from mail-sn1nam02on0088.outbound.protection.outlook.com ([104.47.36.88]:53145
+        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753134AbdCBPaL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Mar 2017 10:30:11 -0500
+        id S1753304AbdCBPaA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 2 Mar 2017 10:30:00 -0500
 In-Reply-To: <148846752022.2349.13667498174822419498.stgit@brijesh-build-machine>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 From: Tom Lendacky <thomas.lendacky@amd.com>
 
-In order to map BOOT data with the proper encryption bit, the
-early_ioremap() function calls are changed to early_memremap() calls.
-This allows the proper access for both SME and SEV.
+EFI data is encrypted when the kernel is run under SEV. Update the
+page table references to be sure the EFI memory areas are accessed
+encrypted.
 
 Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- arch/x86/kernel/acpi/boot.c |    4 ++--
- arch/x86/kernel/mpparse.c   |   10 +++++-----
- drivers/sfi/sfi_core.c      |    6 +++---
- 3 files changed, 10 insertions(+), 10 deletions(-)
+ arch/x86/platform/efi/efi_64.c |   15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kernel/acpi/boot.c b/arch/x86/kernel/acpi/boot.c
-index 35174c6..468c25a 100644
---- a/arch/x86/kernel/acpi/boot.c
-+++ b/arch/x86/kernel/acpi/boot.c
-@@ -124,7 +124,7 @@ char *__init __acpi_map_table(unsigned long phys, unsigned long size)
- 	if (!phys || !size)
- 		return NULL;
- 
--	return early_ioremap(phys, size);
-+	return early_memremap(phys, size);
- }
- 
- void __init __acpi_unmap_table(char *map, unsigned long size)
-@@ -132,7 +132,7 @@ void __init __acpi_unmap_table(char *map, unsigned long size)
- 	if (!map || !size)
- 		return;
- 
--	early_iounmap(map, size);
-+	early_memunmap(map, size);
- }
- 
- #ifdef CONFIG_X86_LOCAL_APIC
-diff --git a/arch/x86/kernel/mpparse.c b/arch/x86/kernel/mpparse.c
-index 0d904d7..fd37f39 100644
---- a/arch/x86/kernel/mpparse.c
-+++ b/arch/x86/kernel/mpparse.c
-@@ -436,9 +436,9 @@ static unsigned long __init get_mpc_size(unsigned long physptr)
- 	struct mpc_table *mpc;
- 	unsigned long size;
- 
--	mpc = early_ioremap(physptr, PAGE_SIZE);
-+	mpc = early_memremap(physptr, PAGE_SIZE);
- 	size = mpc->length;
--	early_iounmap(mpc, PAGE_SIZE);
-+	early_memunmap(mpc, PAGE_SIZE);
- 	apic_printk(APIC_VERBOSE, "  mpc: %lx-%lx\n", physptr, physptr + size);
- 
- 	return size;
-@@ -450,7 +450,7 @@ static int __init check_physptr(struct mpf_intel *mpf, unsigned int early)
- 	unsigned long size;
- 
- 	size = get_mpc_size(mpf->physptr);
--	mpc = early_ioremap(mpf->physptr, size);
-+	mpc = early_memremap(mpf->physptr, size);
- 	/*
- 	 * Read the physical hardware table.  Anything here will
- 	 * override the defaults.
-@@ -461,10 +461,10 @@ static int __init check_physptr(struct mpf_intel *mpf, unsigned int early)
- #endif
- 		pr_err("BIOS bug, MP table errors detected!...\n");
- 		pr_cont("... disabling SMP support. (tell your hw vendor)\n");
--		early_iounmap(mpc, size);
-+		early_memunmap(mpc, size);
- 		return -1;
- 	}
--	early_iounmap(mpc, size);
-+	early_memunmap(mpc, size);
- 
- 	if (early)
- 		return -1;
-diff --git a/drivers/sfi/sfi_core.c b/drivers/sfi/sfi_core.c
-index 296db7a..d00ae3f 100644
---- a/drivers/sfi/sfi_core.c
-+++ b/drivers/sfi/sfi_core.c
-@@ -92,7 +92,7 @@ static struct sfi_table_simple *syst_va __read_mostly;
- static u32 sfi_use_ioremap __read_mostly;
+diff --git a/arch/x86/platform/efi/efi_64.c b/arch/x86/platform/efi/efi_64.c
+index 2d8674d..9a76ed8 100644
+--- a/arch/x86/platform/efi/efi_64.c
++++ b/arch/x86/platform/efi/efi_64.c
+@@ -45,6 +45,7 @@
+ #include <asm/realmode.h>
+ #include <asm/time.h>
+ #include <asm/pgalloc.h>
++#include <asm/mem_encrypt.h>
  
  /*
-- * sfi_un/map_memory calls early_ioremap/iounmap which is a __init function
-+ * sfi_un/map_memory calls early_memremap/memunmap which is a __init function
-  * and introduces section mismatch. So use __ref to make it calm.
-  */
- static void __iomem * __ref sfi_map_memory(u64 phys, u32 size)
-@@ -103,7 +103,7 @@ static void __iomem * __ref sfi_map_memory(u64 phys, u32 size)
- 	if (sfi_use_ioremap)
- 		return ioremap_cache(phys, size);
- 	else
--		return early_ioremap(phys, size);
-+		return early_memremap(phys, size);
+  * We allocate runtime services regions bottom-up, starting from -4G, i.e.
+@@ -286,7 +287,10 @@ int __init efi_setup_page_tables(unsigned long pa_memmap, unsigned num_pages)
+ 	 * as trim_bios_range() will reserve the first page and isolate it away
+ 	 * from memory allocators anyway.
+ 	 */
+-	if (kernel_map_pages_in_pgd(pgd, 0x0, 0x0, 1, _PAGE_RW)) {
++	pf = _PAGE_RW;
++	if (sev_active())
++		pf |= _PAGE_ENC;
++	if (kernel_map_pages_in_pgd(pgd, 0x0, 0x0, 1, pf)) {
+ 		pr_err("Failed to create 1:1 mapping for the first page!\n");
+ 		return 1;
+ 	}
+@@ -329,6 +333,9 @@ static void __init __map_region(efi_memory_desc_t *md, u64 va)
+ 	if (!(md->attribute & EFI_MEMORY_WB))
+ 		flags |= _PAGE_PCD;
+ 
++	if (sev_active())
++		flags |= _PAGE_ENC;
++
+ 	pfn = md->phys_addr >> PAGE_SHIFT;
+ 	if (kernel_map_pages_in_pgd(pgd, pfn, va, md->num_pages, flags))
+ 		pr_warn("Error mapping PA 0x%llx -> VA 0x%llx!\n",
+@@ -455,6 +462,9 @@ static int __init efi_update_mem_attr(struct mm_struct *mm, efi_memory_desc_t *m
+ 	if (!(md->attribute & EFI_MEMORY_RO))
+ 		pf |= _PAGE_RW;
+ 
++	if (sev_active())
++		pf |= _PAGE_ENC;
++
+ 	return efi_update_mappings(md, pf);
  }
  
- static void __ref sfi_unmap_memory(void __iomem *virt, u32 size)
-@@ -114,7 +114,7 @@ static void __ref sfi_unmap_memory(void __iomem *virt, u32 size)
- 	if (sfi_use_ioremap)
- 		iounmap(virt);
- 	else
--		early_iounmap(virt, size);
-+		early_memunmap(virt, size);
- }
+@@ -506,6 +516,9 @@ void __init efi_runtime_update_mappings(void)
+ 			(md->type != EFI_RUNTIME_SERVICES_CODE))
+ 			pf |= _PAGE_RW;
  
- static void sfi_print_table_header(unsigned long long pa,
++		if (sev_active())
++			pf |= _PAGE_ENC;
++
+ 		efi_update_mappings(md, pf);
+ 	}
+ }
