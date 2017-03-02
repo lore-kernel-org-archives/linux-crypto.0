@@ -1,81 +1,70 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: Pad aes_ccm_enc_tv_template vector
-Date: Wed, 1 Mar 2017 19:52:20 +0800
-Message-ID: <20170301115220.GC11489@gondor.apana.org.au>
-References: <1488319645-29129-1-git-send-email-labbott@redhat.com>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: Problem with RSA test from testmgr
+Date: Wed, 1 Mar 2017 18:15:13 -0800
+Message-ID: <122aa2a3-e478-1a68-083a-273ceabaf2fb@intel.com>
+References: <20170228155953.GA1732@Red> <1836837.jAzr4JNxJu@tauon.atsec.com>
+ <20170228164553.GA2155@Red> <9482066.IEBbAWS9B8@positron.chronox.de>
+ <20170301120414.GA18217@Red>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: Laura Abbott <labbott@redhat.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1488319645-29129-1-git-send-email-labbott@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Corentin Labbe <clabbe.montjoie@gmail.com>,
+        =?UTF-8?Q?Stephan_M=c3=bcller?= <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga05.intel.com ([192.55.52.43]:6196 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753511AbdCBCPi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 1 Mar 2017 21:15:38 -0500
+In-Reply-To: <20170301120414.GA18217@Red>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Feb 28, 2017 at 02:07:25PM -0800, Laura Abbott wrote:
-> Running with KASAN and crypto tests currently gives
+Hi Corentin,
+On 03/01/2017 04:04 AM, Corentin Labbe wrote:
+>> I would think the issue is that the OpenSSL BIGNUM lib has some issues: when 
+>> calculating m^e mod n, m has to be equal to the key size. The kernel's MPI 
+>> code handles the case where m is smaller than the key size.
+>>
+>> Note, in your code below, ptext is the 8 bytes from ptext_ex plus trailing 
+>> zeroes whereas the kernel uses just the 8 bytes.
+>>
+>> It seems that your implementation has the same issue.
+>>
+>> What about the following test: change vector->m to be 64 bytes (i.e. 
+>> RSA_size(key) in size in testmgr.h and check the output of crypto/rsa.c, 
+>> openssl's output with the app below and your RSA hardware.
+> I got the following:
 > 
->  BUG: KASAN: global-out-of-bounds in __test_aead+0x9d9/0x2200 at addr ffffffff8212fca0
->  Read of size 16 by task cryptomgr_test/1107
->  Address belongs to variable 0xffffffff8212fca0
->  CPU: 0 PID: 1107 Comm: cryptomgr_test Not tainted 4.10.0+ #45
->  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.9.1-1.fc24 04/01/2014
->  Call Trace:
->   dump_stack+0x63/0x8a
->   kasan_report.part.1+0x4a7/0x4e0
->   ? __test_aead+0x9d9/0x2200
->   ? crypto_ccm_init_crypt+0x218/0x3c0 [ccm]
->   kasan_report+0x20/0x30
->   check_memory_region+0x13c/0x1a0
->   memcpy+0x23/0x50
->   __test_aead+0x9d9/0x2200
->   ? kasan_unpoison_shadow+0x35/0x50
->   ? alg_test_akcipher+0xf0/0xf0
->   ? crypto_skcipher_init_tfm+0x2e3/0x310
->   ? crypto_spawn_tfm2+0x37/0x60
->   ? crypto_ccm_init_tfm+0xa9/0xd0 [ccm]
->   ? crypto_aead_init_tfm+0x7b/0x90
->   ? crypto_alloc_tfm+0xc4/0x190
->   test_aead+0x28/0xc0
->   alg_test_aead+0x54/0xd0
->   alg_test+0x1eb/0x3d0
->   ? alg_find_test+0x90/0x90
->   ? __sched_text_start+0x8/0x8
->   ? __wake_up_common+0x70/0xb0
->   cryptomgr_test+0x4d/0x60
->   kthread+0x173/0x1c0
->   ? crypto_acomp_scomp_free_ctx+0x60/0x60
->   ? kthread_create_on_node+0xa0/0xa0
->   ret_from_fork+0x2c/0x40
->  Memory state around the buggy address:
->   ffffffff8212fb80: 00 00 00 00 01 fa fa fa fa fa fa fa 00 00 00 00
->   ffffffff8212fc00: 00 01 fa fa fa fa fa fa 00 00 00 00 01 fa fa fa
->  >ffffffff8212fc80: fa fa fa fa 00 05 fa fa fa fa fa fa 00 00 00 00
->                                    ^
->   ffffffff8212fd00: 01 fa fa fa fa fa fa fa 00 00 00 00 01 fa fa fa
->   ffffffff8212fd80: fa fa fa fa 00 00 00 00 00 05 fa fa fa fa fa fa
+> [    1.086228] alg: akcipher: encrypt test failed. Invalid output
+> [    1.092196] 00000000: 6e 7c 8a 75 e7 30 80 d1 5e ab 9b db a2 cf ed db
+> [    1.098882] 00000010: c9 b2 db 43 bd 9a b9 75 27 f3 73 d9 73 b7 81 8c
+> [    1.105524] 00000020: 49 e8 45 fc 43 44 f5 6d f0 f7 b8 f2 ae 6b ae 49
+> [    1.112090] 00000030: 1b 8e 50 c6 88 4e 99 09 78 14 f2 5d 99 c3 7f f9
+> [    1.118747] alg: akcipher: test 1 failed for rsa-generic, err=-22
+> (Exactly the output of my hardare and openssl test)
 > 
-> This always happens on the same IV which is less than 16 bytes.
-> 
-> Per Ard,
-> 
-> "CCM IVs are 16 bytes, but due to the way they are constructed
-> internally, the final couple of bytes of input IV are dont-cares.
-> 
-> Apparently, we do read all 16 bytes, which triggers the KASAN errors."
-> 
-> Fix this by padding the IV with null bytes to be at least 16 bytes.
-> 
-> Fixes: 0bc5a6c5c79a ("crypto: testmgr - Disable rfc4309 test and convert
-> test vectors")
-> Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> Signed-off-by: Laura Abbott <labbott@redhat.com>
+> So the problem is just that my hardware does not handle non-padded data.
 
-Patch applied.  Thanks.
+The difference between openssl's RSA_private_decrypt() and the akcipher api
+is that openssl only takes only one size, flen, for both src and dst buffers,
+so in your test app you need to do something like this:
+
+	memset(ptextp, 0, 256);
+	memcpy(ptextp + 64 - 8, ptext_ex, plen);
+
+	key = RSA_new();
+
+	key->n = BN_bin2bn(n, sizeof(n)-1, key->n);
+	key->e = BN_bin2bn(e, sizeof(e)-1, key->e);
+
+	num = RSA_public_encrypt(RSA_size(key), ptextp, ctext, key, RSA_NO_PADDING);
+
+The akcipher API has separate sizes for both the src and dst. It is the length of the
+scatterlist in the akcipher_request. If a HW can't handle different buffers lengths
+then its driver needs to add the padding internally.
+
+Thanks,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Tadeusz
