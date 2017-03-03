@@ -1,51 +1,56 @@
-From: Milan Broz <gmazyland@gmail.com>
-Subject: Re: [PATCH] crypto: Add ECB dependency for XTS mode
-Date: Fri, 3 Mar 2017 07:25:21 +0100
-Message-ID: <02f80ce3-4c85-78ea-7b15-4467a2ae5be4@gmail.com>
-References: <20170221231717.GA7186@nicolas-laptop>
- <20170223073826.19066-1-gmazyland@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-2
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
-To: stable@vger.kernel.org
-Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <20170223073826.19066-1-gmazyland@gmail.com>
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Daniel Axtens <dja@axtens.net>
+Subject: [PATCH] crypto: powerpc - Fix initialisation of crc32c context
+Date: Fri,  3 Mar 2017 17:56:55 +1100
+Message-ID: <20170303065655.7317-1-dja@axtens.net>
+Cc: anton@samba.org, Daniel Axtens <dja@axtens.net>
+To: linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pf0-f196.google.com ([209.85.192.196]:36003 "EHLO
+        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751250AbdCCG5i (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 3 Mar 2017 01:57:38 -0500
+Received: by mail-pf0-f196.google.com with SMTP id j5so9070892pfb.3
+        for <linux-crypto@vger.kernel.org>; Thu, 02 Mar 2017 22:57:06 -0800 (PST)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Patch below should be backported to 4.10 stable
-(only 4.10, older kernels are ok).
-We have reports some systems fail to boot from LUKS now
-(missing ecb module in initramdisk) ...
+Turning on crypto self-tests on a POWER8 shows:
 
-Upstream commit is 12cb3a1c4184f891d965d1f39f8cfcc9ef617647
+    alg: hash: Test 1 failed for crc32c-vpmsum
+    00000000: ff ff ff ff
 
-Thanks,
-Milan
+Comparing the code with the Intel CRC32c implementation on which
+ours is based shows that we are doing an init with 0, not ~0
+as CRC32c requires.
 
-On 02/23/2017 08:38 AM, Milan Broz wrote:
-> Since the
->    commit f1c131b45410a202eb45cc55980a7a9e4e4b4f40
->    crypto: xts - Convert to skcipher
-> the XTS mode is based on ECB, so the mode must select
-> ECB otherwise it can fail to initialize.
-> 
-> Signed-off-by: Milan Broz <gmazyland@gmail.com>
-> ---
->  crypto/Kconfig | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/crypto/Kconfig b/crypto/Kconfig
-> index 160f08e721cc..9c245eb0dd83 100644
-> --- a/crypto/Kconfig
-> +++ b/crypto/Kconfig
-> @@ -374,6 +374,7 @@ config CRYPTO_XTS
->  	select CRYPTO_BLKCIPHER
->  	select CRYPTO_MANAGER
->  	select CRYPTO_GF128MUL
-> +	select CRYPTO_ECB
->  	help
->  	  XTS: IEEE1619/D16 narrow block cipher use with aes-xts-plain,
->  	  key size 256, 384 or 512 bits. This implementation currently
-> 
+This probably wasn't caught because btrfs does its own weird
+open-coded initialisation.
+
+Initialise our internal context to ~0 on init.
+
+This makes the self-tests pass, and btrfs continues to work.
+
+Fixes: 6dd7a82cc54e ("crypto: powerpc - Add POWER8 optimised crc32c")
+Cc: Anton Blanchard <anton@samba.org>
+Cc: stable@vger.kernel.org
+Signed-off-by: Daniel Axtens <dja@axtens.net>
+---
+ arch/powerpc/crypto/crc32c-vpmsum_glue.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/powerpc/crypto/crc32c-vpmsum_glue.c b/arch/powerpc/crypto/crc32c-vpmsum_glue.c
+index 9fa046d56eba..411994551afc 100644
+--- a/arch/powerpc/crypto/crc32c-vpmsum_glue.c
++++ b/arch/powerpc/crypto/crc32c-vpmsum_glue.c
+@@ -52,7 +52,7 @@ static int crc32c_vpmsum_cra_init(struct crypto_tfm *tfm)
+ {
+ 	u32 *key = crypto_tfm_ctx(tfm);
+ 
+-	*key = 0;
++	*key = ~0;
+ 
+ 	return 0;
+ }
+-- 
+2.9.3
