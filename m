@@ -1,65 +1,51 @@
-From: Gary R Hook <ghook@amd.com>
-Subject: Re: [PATCH V2 0/3] Series short description
-Date: Thu, 2 Mar 2017 15:29:48 -0600
-Message-ID: <db068e9a-e058-edb0-06e8-a07bddd37476@amd.com>
-References: <20170302212331.30959.44149.stgit@taos>
+From: Milan Broz <gmazyland@gmail.com>
+Subject: Re: [PATCH] crypto: Add ECB dependency for XTS mode
+Date: Fri, 3 Mar 2017 07:25:21 +0100
+Message-ID: <02f80ce3-4c85-78ea-7b15-4467a2ae5be4@gmail.com>
+References: <20170221231717.GA7186@nicolas-laptop>
+ <20170223073826.19066-1-gmazyland@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Type: text/plain; charset=iso-8859-2
 Content-Transfer-Encoding: 7bit
-Cc: "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>
-To: "Hook, Gary" <Gary.Hook@amd.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-sn1nam01on0053.outbound.protection.outlook.com ([104.47.32.53]:63855
-        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1750709AbdCCFOi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 3 Mar 2017 00:14:38 -0500
-In-Reply-To: <20170302212331.30959.44149.stgit@taos>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
+To: stable@vger.kernel.org
+Return-path: <stable-owner@vger.kernel.org>
+In-Reply-To: <20170223073826.19066-1-gmazyland@gmail.com>
+Sender: stable-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 03/02/2017 03:26 PM, Hook, Gary wrote:
-> The following series:
-> - Move verbose init messages to debug mode
-> - Update the queue pointers in the event of an error
-> - Simplify buffer management and eliminate an unused option
+Patch below should be backported to 4.10 stable
+(only 4.10, older kernels are ok).
+We have reports some systems fail to boot from LUKS now
+(missing ecb module in initramdisk) ...
 
-*sigh* That Subject line is supposed to read "Minor CCP improvements and 
-clean-up".
+Upstream commit is 12cb3a1c4184f891d965d1f39f8cfcc9ef617647
 
+Thanks,
+Milan
 
->
+On 02/23/2017 08:38 AM, Milan Broz wrote:
+> Since the
+>    commit f1c131b45410a202eb45cc55980a7a9e4e4b4f40
+>    crypto: xts - Convert to skcipher
+> the XTS mode is based on ECB, so the mode must select
+> ECB otherwise it can fail to initialize.
+> 
+> Signed-off-by: Milan Broz <gmazyland@gmail.com>
 > ---
->
-> Gary R Hook (3):
->       crypto: ccp - Add SHA-2 384- and 512-bit support
->       crypto: ccp - Enable support for AES GCM on v5 CCPs
->       crypto: ccp - Enable 3DES function on v5 CCPs
->
->
->  drivers/crypto/ccp/Makefile                |    2
->  drivers/crypto/ccp/ccp-crypto-aes-galois.c |  257 ++++++++++++++
->  drivers/crypto/ccp/ccp-crypto-des3.c       |  254 ++++++++++++++
->  drivers/crypto/ccp/ccp-crypto-main.c       |   22 +
->  drivers/crypto/ccp/ccp-crypto-sha.c        |   22 +
->  drivers/crypto/ccp/ccp-crypto.h            |   44 ++
->  drivers/crypto/ccp/ccp-dev-v3.c            |    1
->  drivers/crypto/ccp/ccp-dev-v5.c            |   56 +++
->  drivers/crypto/ccp/ccp-dev.h               |   15 +
->  drivers/crypto/ccp/ccp-ops.c               |  522
-> ++++++++++++++++++++++++++++
->  include/linux/ccp.h                        |   68 ++++
->  11 files changed, 1257 insertions(+), 6 deletions(-)
->  create mode 100644 drivers/crypto/ccp/ccp-crypto-aes-galois.c
->  create mode 100644 drivers/crypto/ccp/ccp-crypto-des3.c
->
-> --
-> Signature
-
--- 
-This is my day job. Follow me at:
-IG/Twitter/Facebook: @grhookphoto
-IG/Twitter/Facebook: @grhphotographer
+>  crypto/Kconfig | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/crypto/Kconfig b/crypto/Kconfig
+> index 160f08e721cc..9c245eb0dd83 100644
+> --- a/crypto/Kconfig
+> +++ b/crypto/Kconfig
+> @@ -374,6 +374,7 @@ config CRYPTO_XTS
+>  	select CRYPTO_BLKCIPHER
+>  	select CRYPTO_MANAGER
+>  	select CRYPTO_GF128MUL
+> +	select CRYPTO_ECB
+>  	help
+>  	  XTS: IEEE1619/D16 narrow block cipher use with aes-xts-plain,
+>  	  key size 256, 384 or 512 bits. This implementation currently
+> 
