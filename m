@@ -1,65 +1,67 @@
-From: Nathan Royce <nroycea+kernel@gmail.com>
-Subject: Re: XTS Crypto Not Found In /proc/crypto Even After Compiled for 4.10.1.
-Date: Fri, 3 Mar 2017 08:08:44 -0600
-Message-ID: <CALaQ_hpCsPtAPM8irV6WnSYCT1z6uh-410++kSj1jEb+egK_4w@mail.gmail.com>
-References: <CALaQ_hoafES-K1ds-XUPC6h4VnHX_ebym4LYjeuq1jHdbLYuDQ@mail.gmail.com>
- <20170303120432.GA26540@gondor.apana.org.au>
+From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
+Subject: [RFC 0/7] crypto: caam - add Queue Interface (QI) support
+Date: Fri, 3 Mar 2017 16:52:06 +0200
+Message-ID: <1488552733-20806-1-git-send-email-horia.geanta@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Krzysztof Kozlowski <k.kozlowski@samsung.com>,
-        Marek Szyprowski <m.szyprowski@samsung.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170303120432.GA26540@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: linux-arm-kernel@lists.infradead.org,
+ Claudiu Manoil <claudiu.manoil@nxp.com>,
+ Cristian Stoica <cristian.stoica@nxp.com>, Dan Douglass <dan.douglass@nxp.com>,
+ linux-crypto@vger.kernel.org, Vakul Garg <vakul@nxp.com>,
+ Alexandru Porosanu <alexandru.porosanu@nxp.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>, Scott Wood <oss@buserror.net>,
+ Roy Pledge <roy.pledge@nxp.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-Yup, when I disabled the s5p driver, xts DID show in the /proc/crypto list.
-
-Heh, I was about to ask if it was something I should push towards
-another maintainer for s5p stuff, but found you listed in that as
-well.
-If I am incorrect in that assumption, do let me know whom else I
-should make aware of this issue.
-Also let me know if you would like the rest of the kernel panic. Maybe
-you already have enough to go on and don't need it.
-
-Thanks for all that clarity.
-
-On Fri, Mar 3, 2017 at 6:04 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> On Fri, Mar 03, 2017 at 04:36:18AM -0600, Nathan Royce wrote:
->> I do have ECB selected as well:
->> DM_CRYPT=y
->> CRYPTO_ECB=y
->> CRYPTO_XTS=y
->>
->> name         : ecb(aes)
->> driver       : ecb-aes-s5p
->> module       : kernel
->> priority     : 100
->> refcnt       : 1
->> selftest     : passed
->> internal     : no
->> type         : ablkcipher
->> async        : yes
->> blocksize    : 16
->> min keysize  : 16
->> max keysize  : 32
->> ivsize       : 0
->> geniv        : <default>
->> //still no "xts" can be found in the list
->
-> Weird.  So you can't find any instances of xts in /proc/crypto
-> at all? Even if the self-test fails it should still register an
-> entry there...
->
-> In any case, I think disabling the s5p driver should work at
-> least.
->
-> Cheers,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+VGhlIHBhdGNoc2V0IGFkZHMgc3VwcG9ydCBmb3IgQ0FBTSBRdWV1ZSBJbnRlcmZhY2UgKFFJKSwg
+dGhlIGFkZGl0aW9uYWwKaW50ZXJmYWNlIChiZXNpZGVzIGpvYiByaW5nKSBhdmFpbGFibGUgZm9y
+IHN1Ym1pdHRpbmcgam9icyB0byB0aGUgZW5naW5lCm9uIHBsYXRmb3JtcyBoYXZpbmcgRFBBQSAo
+RGF0YXBhdGggQWNjZWxlcmF0aW9uIEFyY2hpdGVjdHVyZSkuCgpQYXRjaGVzIDEtNCBhcmUgUU1h
+biBkZXBlbmRlbmNpZXMuCkkgd291bGQgcHJlZmVyIHRvIHRha2UgdGhlbSB0aHJvdWdoIHRoZSBj
+cnlwdG8gdHJlZSwKYnV0IEkgYW0gb3BlbiB0byBzdWdnZXN0aW9ucy4KClBhdGNoIDUgYWRkcyBh
+IG1pc3NpbmcgZG91YmxlIGluY2x1c2lvbiBndWFyZCBpbiBkZXNjX2NvbnN0ci5oLgoKUGF0Y2gg
+NiBhZGRzIHRoZSBjYWFtL3FpIGpvYiBzdWJtaXNzaW9uIGJhY2tlbmQuCgpQYXRjaCA3IGFkZHMg
+YWxnb3JpdGhtcyAoYWJsa2NpcGhlciBhbmQgYXV0aGVuYykgdGhhdCBydW4gb24gdG9wCm9mIGNh
+YW0vcWkuIEZvciBub3csIHRoZWlyIHByaW9yaXR5IGlzIHNldCBsb3dlciB0aGFuIGNhYW0vanIu
+CgpUaGFua3MsCkhvcmlhCgpIb3JpYSBHZWFudMSDICg3KToKICBzb2MvcW1hbjogZXhwb3J0IHZv
+bGF0aWxlIGRlcXVldWUgcmVsYXRlZCBzdHJ1Y3RzCiAgc29jL3FtYW46IGFkZCBkZWRpY2F0ZWQg
+Y2hhbm5lbCBJRCBmb3IgQ0FBTQogIHNvYy9xbWFuOiBleHBvcnQgbm9uLXByb2dyYW1tYWJsZSBG
+UUQgZmllbGRzIHF1ZXJ5CiAgc29jL3FtYW46IGFkZCBoZWxwZXIgZnVuY3Rpb25zIG5lZWRlZCBi
+eSBjYWFtL3FpIGRyaXZlcgogIGNyeXB0bzogY2FhbSAtIGF2b2lkIGRvdWJsZSBpbmNsdXNpb24g
+aW4gZGVzY19jb25zdHIuaAogIGNyeXB0bzogY2FhbSAtIGFkZCBRdWV1ZSBJbnRlcmZhY2UgKFFJ
+KSBiYWNrZW5kIHN1cHBvcnQKICBjcnlwdG86IGNhYW0vcWkgLSBhZGQgYWJsa2NpcGhlciBhbmQg
+YXV0aGVuYyBhbGdvcml0aG1zCgogZHJpdmVycy9jcnlwdG8vY2FhbS9LY29uZmlnICAgICAgICAg
+ICAgIHwgICAyMCArLQogZHJpdmVycy9jcnlwdG8vY2FhbS9NYWtlZmlsZSAgICAgICAgICAgIHwg
+ICAgNSArCiBkcml2ZXJzL2NyeXB0by9jYWFtL2NhYW1hbGcuYyAgICAgICAgICAgfCAgICA5ICst
+CiBkcml2ZXJzL2NyeXB0by9jYWFtL2NhYW1hbGdfZGVzYy5jICAgICAgfCAgIDc3ICstCiBkcml2
+ZXJzL2NyeXB0by9jYWFtL2NhYW1hbGdfZGVzYy5oICAgICAgfCAgIDE1ICstCiBkcml2ZXJzL2Ny
+eXB0by9jYWFtL2NhYW1hbGdfcWkuYyAgICAgICAgfCAyMzg3ICsrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysKIGRyaXZlcnMvY3J5cHRvL2NhYW0vY3RybC5jICAgICAgICAgICAgICB8ICAg
+NTggKy0KIGRyaXZlcnMvY3J5cHRvL2NhYW0vZGVzY19jb25zdHIuaCAgICAgICB8ICAgIDUgKwog
+ZHJpdmVycy9jcnlwdG8vY2FhbS9pbnRlcm4uaCAgICAgICAgICAgIHwgICAyNCArCiBkcml2ZXJz
+L2NyeXB0by9jYWFtL3FpLmMgICAgICAgICAgICAgICAgfCAgODA1ICsrKysrKysrKysrCiBkcml2
+ZXJzL2NyeXB0by9jYWFtL3FpLmggICAgICAgICAgICAgICAgfCAgMjAxICsrKwogZHJpdmVycy9j
+cnlwdG8vY2FhbS9zZ19zd19xbS5oICAgICAgICAgIHwgIDEwNyArKwogZHJpdmVycy9zb2MvZnNs
+L3FibWFuL3FtYW4uYyAgICAgICAgICAgIHwgICAyMCArLQogZHJpdmVycy9zb2MvZnNsL3FibWFu
+L3FtYW5fY2Nzci5jICAgICAgIHwgICAgNiArLQogZHJpdmVycy9zb2MvZnNsL3FibWFuL3FtYW5f
+cHJpdi5oICAgICAgIHwgICA5NyAtLQogZHJpdmVycy9zb2MvZnNsL3FibWFuL3FtYW5fdGVzdF9z
+dGFzaC5jIHwgICAgNSArLQogaW5jbHVkZS9zb2MvZnNsL3FtYW4uaCAgICAgICAgICAgICAgICAg
+IHwgIDE1NCArKwogMTcgZmlsZXMgY2hhbmdlZCwgMzgzOSBpbnNlcnRpb25zKCspLCAxNTYgZGVs
+ZXRpb25zKC0pCiBjcmVhdGUgbW9kZSAxMDA2NDQgZHJpdmVycy9jcnlwdG8vY2FhbS9jYWFtYWxn
+X3FpLmMKIGNyZWF0ZSBtb2RlIDEwMDY0NCBkcml2ZXJzL2NyeXB0by9jYWFtL3FpLmMKIGNyZWF0
+ZSBtb2RlIDEwMDY0NCBkcml2ZXJzL2NyeXB0by9jYWFtL3FpLmgKIGNyZWF0ZSBtb2RlIDEwMDY0
+NCBkcml2ZXJzL2NyeXB0by9jYWFtL3NnX3N3X3FtLmgKCi0tIAoyLjQuNAoKCl9fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmxpbnV4LWFybS1rZXJuZWwgbWFp
+bGluZyBsaXN0CmxpbnV4LWFybS1rZXJuZWxAbGlzdHMuaW5mcmFkZWFkLm9yZwpodHRwOi8vbGlz
+dHMuaW5mcmFkZWFkLm9yZy9tYWlsbWFuL2xpc3RpbmZvL2xpbnV4LWFybS1rZXJuZWwK
