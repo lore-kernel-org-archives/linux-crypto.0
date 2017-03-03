@@ -1,96 +1,54 @@
-From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [RFC PATCH v2 06/32] x86/pci: Use memremap when walking setup
- data
-Date: Fri, 3 Mar 2017 15:15:34 -0600
-Message-ID: <df526224-0a4b-abc6-6377-efbca77284b1@amd.com>
+From: Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [RFC PATCH v2 00/32] x86: Secure Encrypted Virtualization (AMD)
+Date: Fri, 3 Mar 2017 15:15:30 -0600
+Message-ID: <d1ded08e-1a53-4762-84af-c5979bf9ed32@amd.com>
 References: <148846752022.2349.13667498174822419498.stgit@brijesh-build-machine>
- <148846759008.2349.8274808454274279039.stgit@brijesh-build-machine>
- <20170303204209.GA31767@bhelgaas-glaptop.roam.corp.google.com>
+ <20170303203323.GA5305@bhelgaas-glaptop.roam.corp.google.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="windows-1252"; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: <simon.guinot@sequanux.org>, <linux-efi@vger.kernel.org>,
-	<kvm@vger.kernel.org>, <rkrcmar@redhat.com>, <matt@codeblueprint.co.uk>,
-	<linux-pci@vger.kernel.org>, <linus.walleij@linaro.org>, <gary.hook@amd.com>,
-	<linux-mm@kvack.org>, <paul.gortmaker@windriver.com>, <hpa@zytor.com>,
-	<cl@linux.com>, <dan.j.williams@intel.com>, <aarcange@redhat.com>,
-	<sfr@canb.auug.org.au>, <andriy.shevchenko@linux.intel.com>,
-	<herbert@gondor.apana.org.au>, <bhe@redhat.com>, <xemul@parallels.com>,
-	<joro@8bytes.org>, <x86@kernel.org>, <peterz@infradead.org>,
-	<piotr.luc@intel.com>, <mingo@redhat.com>, <msalter@redhat.com>,
-	<ross.zwisler@linux.intel.com>, <bp@suse.de>, <dyoung@redhat.com>,
-	<jroedel@suse.de>, <keescook@chromium.org>, <arnd@arndb.de>,
-	<toshi.kani@hpe.com>, <mathieu.desnoyers@efficios.com>, <luto@kernel.org>,
-	<devel@linuxdriverproject.org>, <bhelgaas@google.com>, <tglx@linutronix.de>
-To: Bjorn Helgaas <helgaas@kernel.org>, Brijesh Singh <brijesh.singh@amd.com>
+Cc: <brijesh.singh@amd.com>, <simon.guinot@sequanux.org>,
+	<linux-efi@vger.kernel.org>, <kvm@vger.kernel.org>, <rkrcmar@redhat.com>,
+	<matt@codeblueprint.co.uk>, <linux-pci@vger.kernel.org>,
+	<linus.walleij@linaro.org>, <gary.hook@amd.com>, <linux-mm@kvack.org>,
+	<paul.gortmaker@windriver.com>, <hpa@zytor.com>, <cl@linux.com>,
+	<dan.j.williams@intel.com>, <aarcange@redhat.com>, <sfr@canb.auug.org.au>,
+	<andriy.shevchenko@linux.intel.com>, <herbert@gondor.apana.org.au>,
+	<bhe@redhat.com>, <xemul@parallels.com>, <joro@8bytes.org>, <x86@kernel.org>,
+	<peterz@infradead.org>, <piotr.luc@intel.com>, <mingo@redhat.com>,
+	<msalter@redhat.com>, <ross.zwisler@linux.intel.com>, <bp@suse.de>,
+	<dyoung@redhat.com>, <thomas.lendacky@amd.com>, <jroedel@suse.de>,
+	<keescook@chromium.org>, <arnd@arndb.de>, <toshi.kani@hpe.com>,
+	<mathieu.desnoyers@efficios.com>, <luto@kernel.org>,
+	<devel@linuxdriverproj
+To: Bjorn Helgaas <helgaas@kernel.org>
 Return-path: <owner-linux-mm@kvack.org>
-In-Reply-To: <20170303204209.GA31767@bhelgaas-glaptop.roam.corp.google.com>
+In-Reply-To: <20170303203323.GA5305@bhelgaas-glaptop.roam.corp.google.com>
 Sender: owner-linux-mm@kvack.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 3/3/2017 2:42 PM, Bjorn Helgaas wrote:
-> On Thu, Mar 02, 2017 at 10:13:10AM -0500, Brijesh Singh wrote:
->> From: Tom Lendacky <thomas.lendacky@amd.com>
->>
->> The use of ioremap will force the setup data to be mapped decrypted even
->> though setup data is encrypted.  Switch to using memremap which will be
->> able to perform the proper mapping.
->
-> How should callers decide whether to use ioremap() or memremap()?
->
-> memremap() existed before SME and SEV, and this code is used even if
-> SME and SEV aren't supported, so the rationale for this change should
-> not need the decryption argument.
+Hi Bjorn,
 
-When SME or SEV is active an ioremap() will remove the encryption bit
-from the pagetable entry when it is mapped.  This allows MMIO, which
-doesn't support SME/SEV, to be performed successfully.  So my take is
-that ioremap() should be used for MMIO and memremap() for pages in RAM.
-
+On 03/03/2017 02:33 PM, Bjorn Helgaas wrote:
+> On Thu, Mar 02, 2017 at 10:12:01AM -0500, Brijesh Singh wrote:
+>> This RFC series provides support for AMD's new Secure Encrypted Virtualization
+>> (SEV) feature. This RFC is build upon Secure Memory Encryption (SME) RFCv4 [1].
 >
->> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
->> ---
->>  arch/x86/pci/common.c |    4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/arch/x86/pci/common.c b/arch/x86/pci/common.c
->> index a4fdfa7..0b06670 100644
->> --- a/arch/x86/pci/common.c
->> +++ b/arch/x86/pci/common.c
->> @@ -691,7 +691,7 @@ int pcibios_add_device(struct pci_dev *dev)
->>
->>  	pa_data = boot_params.hdr.setup_data;
->>  	while (pa_data) {
->> -		data = ioremap(pa_data, sizeof(*rom));
->> +		data = memremap(pa_data, sizeof(*rom), MEMREMAP_WB);
+> What kernel version is this series based on?
 >
-> I can't quite connect the dots here.  ioremap() on x86 would do
-> ioremap_nocache().  memremap(MEMREMAP_WB) would do arch_memremap_wb(),
-> which is ioremap_cache().  Is making a cacheable mapping the important
-> difference?
 
-The memremap(MEMREMAP_WB) will actually check to see if it can perform
-a __va(pa_data) in try_ram_remap() and then fallback to the
-arch_memremap_wb().  So it's actually the __va() vs the ioremap_cache()
-that is the difference.
+This patch series is based off of the master branch of tip.
+   Commit a27cb9e1b2b4 ("Merge branch 'WIP.sched/core'")
+   Tom's RFC v4 patches (http://marc.info/?l=linux-mm&m=148725973013686&w=2)
 
-Thanks,
-Tom
+Accidentally, I ended up rebasing SEV RFCv2 patches from updated SME v4 
+instead of original SME v4. So you may need to apply patch [1]
 
->
->>  		if (!data)
->>  			return -ENOMEM;
->>
->> @@ -710,7 +710,7 @@ int pcibios_add_device(struct pci_dev *dev)
->>  			}
->>  		}
->>  		pa_data = data->next;
->> -		iounmap(data);
->> +		memunmap(data);
->>  	}
->>  	set_dma_domain_ops(dev);
->>  	set_dev_domain_options(dev);
->>
+[1] http://marc.info/?l=linux-mm&m=148857523132253&w=2
+
+Optionally, I have posted the full git tree here [2]
+
+[2] https://github.com/codomania/tip/branches
 
 --
 To unsubscribe, send a message with 'unsubscribe linux-mm' in
