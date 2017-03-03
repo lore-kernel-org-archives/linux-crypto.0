@@ -1,56 +1,93 @@
-From: Daniel Axtens <dja@axtens.net>
-Subject: [PATCH] crypto: powerpc - Fix initialisation of crc32c context
-Date: Fri,  3 Mar 2017 17:56:55 +1100
-Message-ID: <20170303065655.7317-1-dja@axtens.net>
-Cc: anton@samba.org, Daniel Axtens <dja@axtens.net>
-To: linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: XTS Crypto Not Found In /proc/crypto Even After Compiled for
+ 4.10.1.
+Date: Fri, 3 Mar 2017 12:02:10 +0800
+Message-ID: <20170303040210.GA24737@gondor.apana.org.au>
+References: <CALaQ_hoZ6wh-H_NNoT80r6kthvFpL05zNWr7upVqispknXMEvg@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Krzysztof Kozlowski <k.kozlowski@samsung.com>,
+        Marek Szyprowski <m.szyprowski@samsung.com>
+To: Nathan Royce <nroycea+kernel@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:36003 "EHLO
-        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751250AbdCCG5i (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:57933 "EHLO
+        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1751332AbdCCG5j (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 3 Mar 2017 01:57:38 -0500
-Received: by mail-pf0-f196.google.com with SMTP id j5so9070892pfb.3
-        for <linux-crypto@vger.kernel.org>; Thu, 02 Mar 2017 22:57:06 -0800 (PST)
+        Fri, 3 Mar 2017 01:57:39 -0500
+Content-Disposition: inline
+In-Reply-To: <CALaQ_hoZ6wh-H_NNoT80r6kthvFpL05zNWr7upVqispknXMEvg@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Turning on crypto self-tests on a POWER8 shows:
+On Thu, Mar 02, 2017 at 05:35:30PM -0600, Nathan Royce wrote:
+> ARM ODroid XU4
+> 
+> $ cat /proc/config.gz | gunzip | grep XTS
+> CONFIG_CRYPTO_XTS=y
+> 
+> $ grep xts /proc/crypto
+> //4.9.13
+> name         : xts(aes)
+> driver       : xts(aes-generic)
+> //4.10.1
+> <blank>
+> //cbc can be found though
+> 
+> CRYPTTAB:
+> cryptswap1 UUID=<sanitized> /dev/urandom
+> swap,offset=2048,cipher=aes-xts-plain64:sha512,size=512,nofail
+> 
+> FSTAB:
+> /dev/mapper/cryptswap1 none swap sw 0 0
+> 
+> Boot Log:
+> [   10.535985] ------------[ cut here ]------------
+> [   10.539252] WARNING: CPU: 0 PID: 0 at crypto/skcipher.c:430
+> skcipher_walk_first+0x13c/0x14c
+> [   10.547542] Modules linked in: xor xor_neon aes_arm zlib_deflate
+> dm_crypt raid6_pq nfsd auth_rpcgss oid_registry nfs_acl lockd grace sunrpc
+> ip_tables x_tables
+> [   10.561716] CPU: 0 PID: 0 Comm: swapper/0 Not tainted 4.10.1-dirty #1
+> [   10.568049] Hardware name: SAMSUNG EXYNOS (Flattened Device Tree)
+> [   10.574171] [<c010eb54>] (unwind_backtrace) from [<c010b408>]
+> (show_stack+0x10/0x14)
+> [   10.581893] [<c010b408>] (show_stack) from [<c036772c>]
+> (dump_stack+0x84/0x98)
+> [   10.589073] [<c036772c>] (dump_stack) from [<c011bb20>]
+> (__warn+0xe8/0x100)
+> [   10.595975] [<c011bb20>] (__warn) from [<c011bc30>]
+> (warn_slowpath_null+0x20/0x28)
+> [   10.603546] [<c011bc30>] (warn_slowpath_null) from [<c0329a48>]
+> (skcipher_walk_first+0x13c/0x14c)
+> [   10.612390] [<c0329a48>] (skcipher_walk_first) from [<c0329b30>]
+> (skcipher_walk_virt+0x1c/0x38)
+> [   10.621056] [<c0329b30>] (skcipher_walk_virt) from [<c0330ed0>]
+> (post_crypt+0x38/0x1c4)
+> [   10.629022] [<c0330ed0>] (post_crypt) from [<c0331470>]
+> (decrypt_done+0x4c/0x54)
+> [   10.636389] [<c0331470>] (decrypt_done) from [<c05a03f0>]
+> (s5p_aes_complete+0x70/0xfc)
+> [   10.644274] [<c05a03f0>] (s5p_aes_complete) from [<c05a05b0>]
+> (s5p_aes_interrupt+0x134/0x1a0)
+> [   10.652771] [<c05a05b0>] (s5p_aes_interrupt) from [<c016dc3c>]
+> (__handle_irq_event_percpu+0x9c/0x124)
 
-    alg: hash: Test 1 failed for crc32c-vpmsum
-    00000000: ff ff ff ff
+This looks like a bug in the s5p driver.  It's calling the completion
+function straight from the IRQ handler, which is triggering the
+sanity check in skcipher_walk_first.
 
-Comparing the code with the Intel CRC32c implementation on which
-ours is based shows that we are doing an init with 0, not ~0
-as CRC32c requires.
+The s5p driver needs to schedule a tasklet to call the completion
+function.
 
-This probably wasn't caught because btrfs does its own weird
-open-coded initialisation.
+Do you have crypto self-test enabled? If so it should've caught
+this at run-time.  Otherwise you can disable the s5p driver until
+it's fixed.
 
-Initialise our internal context to ~0 on init.
-
-This makes the self-tests pass, and btrfs continues to work.
-
-Fixes: 6dd7a82cc54e ("crypto: powerpc - Add POWER8 optimised crc32c")
-Cc: Anton Blanchard <anton@samba.org>
-Cc: stable@vger.kernel.org
-Signed-off-by: Daniel Axtens <dja@axtens.net>
----
- arch/powerpc/crypto/crc32c-vpmsum_glue.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/powerpc/crypto/crc32c-vpmsum_glue.c b/arch/powerpc/crypto/crc32c-vpmsum_glue.c
-index 9fa046d56eba..411994551afc 100644
---- a/arch/powerpc/crypto/crc32c-vpmsum_glue.c
-+++ b/arch/powerpc/crypto/crc32c-vpmsum_glue.c
-@@ -52,7 +52,7 @@ static int crc32c_vpmsum_cra_init(struct crypto_tfm *tfm)
- {
- 	u32 *key = crypto_tfm_ctx(tfm);
- 
--	*key = 0;
-+	*key = ~0;
- 
- 	return 0;
- }
+Cheers,
 -- 
-2.9.3
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
