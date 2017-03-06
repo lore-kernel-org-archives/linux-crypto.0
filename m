@@ -1,76 +1,79 @@
-From: Anup Patel <anup.patel@broadcom.com>
-Subject: [PATCH v6 2/4] async_tx: Fix DMA_PREP_FENCE usage in do_async_gen_syndrome()
-Date: Mon,  6 Mar 2017 15:13:26 +0530
-Message-ID: <1488793408-25592-3-git-send-email-anup.patel@broadcom.com>
+From: Anup Patel <anup.patel-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
+Subject: [PATCH v6 4/4] dt-bindings: Add DT bindings document for Broadcom SBA RAID driver
+Date: Mon,  6 Mar 2017 15:13:28 +0530
+Message-ID: <1488793408-25592-5-git-send-email-anup.patel@broadcom.com>
 References: <1488793408-25592-1-git-send-email-anup.patel@broadcom.com>
-Cc: Dan Williams <dan.j.williams@intel.com>,
-        Ray Jui <rjui@broadcom.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        Jon Mason <jonmason@broadcom.com>,
-        Rob Rice <rob.rice@broadcom.com>,
-        bcm-kernel-feedback-list@broadcom.com, dmaengine@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-raid@vger.kernel.org, Anup Patel <anup.patel@broadcom.com>
-To: Vinod Koul <vinod.koul@intel.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Jassi Brar <jassisinghbrar@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-qk0-f179.google.com ([209.85.220.179]:33371 "EHLO
-        mail-qk0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754122AbdCFJob (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 6 Mar 2017 04:44:31 -0500
-Received: by mail-qk0-f179.google.com with SMTP id y76so13133938qkb.0
-        for <linux-crypto@vger.kernel.org>; Mon, 06 Mar 2017 01:44:16 -0800 (PST)
-In-Reply-To: <1488793408-25592-1-git-send-email-anup.patel@broadcom.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: Dan Williams <dan.j.williams-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+        Ray Jui <rjui-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
+        Scott Branden <sbranden-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
+        Jon Mason <jonmason-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
+        Rob Rice <rob.rice-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
+        bcm-kernel-feedback-list-dY08KVG/lbpWk0Htik3J/w@public.gmane.org, dmaengine-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+        linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-raid-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Anup Patel <anup.patel-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
+To: Vinod Koul <vinod.koul-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
+        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+        "David S . Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+        Jassi Brar <jassisinghbrar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1488793408-25592-1-git-send-email-anup.patel-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-The DMA_PREP_FENCE is to be used when preparing Tx descriptor if output
-of Tx descriptor is to be used by next/dependent Tx descriptor.
+This patch adds the DT bindings document for newly added Broadcom
+SBA RAID driver.
 
-The DMA_PREP_FENSE will not be set correctly in do_async_gen_syndrome()
-when calling dma->device_prep_dma_pq() under following conditions:
-1. ASYNC_TX_FENCE not set in submit->flags
-2. DMA_PREP_FENCE not set in dma_flags
-3. src_cnt (= (disks - 2)) is greater than dma_maxpq(dma, dma_flags)
-
-This patch fixes DMA_PREP_FENCE usage in do_async_gen_syndrome() taking
-inspiration from do_async_xor() implementation.
-
-Signed-off-by: Anup Patel <anup.patel@broadcom.com>
-Reviewed-by: Ray Jui <ray.jui@broadcom.com>
-Reviewed-by: Scott Branden <scott.branden@broadcom.com>
+Acked-by: Rob Herring <robh-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Reviewed-by: Ray Jui <ray.jui-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
+Reviewed-by: Scott Branden <scott.branden-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
+Signed-off-by: Anup Patel <anup.patel-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>
 ---
- crypto/async_tx/async_pq.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ .../devicetree/bindings/dma/brcm,iproc-sba.txt     | 29 ++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/dma/brcm,iproc-sba.txt
 
-diff --git a/crypto/async_tx/async_pq.c b/crypto/async_tx/async_pq.c
-index f83de99..56bd612 100644
---- a/crypto/async_tx/async_pq.c
-+++ b/crypto/async_tx/async_pq.c
-@@ -62,9 +62,6 @@ do_async_gen_syndrome(struct dma_chan *chan,
- 	dma_addr_t dma_dest[2];
- 	int src_off = 0;
- 
--	if (submit->flags & ASYNC_TX_FENCE)
--		dma_flags |= DMA_PREP_FENCE;
--
- 	while (src_cnt > 0) {
- 		submit->flags = flags_orig;
- 		pq_src_cnt = min(src_cnt, dma_maxpq(dma, dma_flags));
-@@ -83,6 +80,8 @@ do_async_gen_syndrome(struct dma_chan *chan,
- 			if (cb_fn_orig)
- 				dma_flags |= DMA_PREP_INTERRUPT;
- 		}
-+		if (submit->flags & ASYNC_TX_FENCE)
-+			dma_flags |= DMA_PREP_FENCE;
- 
- 		/* Drivers force forward progress in case they can not provide
- 		 * a descriptor
+diff --git a/Documentation/devicetree/bindings/dma/brcm,iproc-sba.txt b/Documentation/devicetree/bindings/dma/brcm,iproc-sba.txt
+new file mode 100644
+index 0000000..092913a
+--- /dev/null
++++ b/Documentation/devicetree/bindings/dma/brcm,iproc-sba.txt
+@@ -0,0 +1,29 @@
++* Broadcom SBA RAID engine
++
++Required properties:
++- compatible: Should be one of the following
++	      "brcm,iproc-sba"
++	      "brcm,iproc-sba-v2"
++  The "brcm,iproc-sba" has support for only 6 PQ coefficients
++  The "brcm,iproc-sba-v2" has support for only 30 PQ coefficients
++- mboxes: List of phandle and mailbox channel specifiers
++
++Example:
++
++raid_mbox: mbox@67400000 {
++	...
++	#mbox-cells = <3>;
++	...
++};
++
++raid0 {
++	compatible = "brcm,iproc-sba-v2";
++	mboxes = <&raid_mbox 0 0x1 0xffff>,
++		 <&raid_mbox 1 0x1 0xffff>,
++		 <&raid_mbox 2 0x1 0xffff>,
++		 <&raid_mbox 3 0x1 0xffff>,
++		 <&raid_mbox 4 0x1 0xffff>,
++		 <&raid_mbox 5 0x1 0xffff>,
++		 <&raid_mbox 6 0x1 0xffff>,
++		 <&raid_mbox 7 0x1 0xffff>;
++};
 -- 
 2.7.4
+
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
