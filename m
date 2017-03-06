@@ -1,317 +1,249 @@
-From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [RFC PATCH v2 01/32] x86: Add the Secure Encrypted
- Virtualization CPU feature
-Date: Mon, 6 Mar 2017 13:11:03 -0500
-Message-ID: <148882363019.12034.4647462304803229954.stgit@brijesh-build-machine>
-References: <20170304101113.k6ontjjbljanm6tv@pd.tnic>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: Re: XTS Crypto Not Found In /proc/crypto Even After Compiled for
+ 4.10.1.
+Date: Mon, 6 Mar 2017 19:35:11 +0200
+Message-ID: <20170306173511.6w3e47v4vomu7yv4@kozik-lap>
+References: <CALaQ_hpC4G6CaxZAFvwNG3gFjc5Dj1C7zB6b_WQjGeYhbArHKw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: linux-efi@vger.kernel.org, brijesh.singh@amd.com, kvm@vger.kernel.org,
- rkrcmar@redhat.com, matt@codeblueprint.co.uk, linux-pci@vger.kernel.org,
- linus.walleij@linaro.org, gary.hook@amd.com, linux-mm@kvack.org, hpa@zytor.com,
- cl@linux.com, tglx@linutronix.de, aarcange@redhat.com, sfr@canb.auug.org.au,
- mchehab@kernel.org, simon.guinot@sequanux.org, bhe@redhat.com,
- xemul@parallels.com, joro@8bytes.org, x86@kernel.org, peterz@infradead.org,
- piotr.luc@intel.com, mingo@redhat.com, msalter@redhat.com,
- ross.zwisler@linux.intel.com, labbott@fedoraproject.org, dyoung@redhat.com,
- thomas.lendacky@amd.com, jroedel@suse.de, keescook@chromium.org, arnd@arndb.de,
- toshi.kani@hpe.com, mathieu.desnoyers@efficios.com, luto@kernel.org,
- pbonzini@redhat.com, bhelgaas@google.com, dan.j.williams@intel.com,
- andriy.shevchenko@linux.intel.com, akpm@linux-foundation.org,
- herbert@gondor.apana.org.au, t
-To: <bp@suse.de>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-In-Reply-To: <20170304101113.k6ontjjbljanm6tv@pd.tnic>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Marek Szyprowski <m.szyprowski@samsung.com>
+To: Nathan Royce <nroycea+kernel@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wm0-f45.google.com ([74.125.82.45]:35193 "EHLO
+        mail-wm0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932273AbdCFSrV (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 6 Mar 2017 13:47:21 -0500
+Content-Disposition: inline
+In-Reply-To: <CALaQ_hpC4G6CaxZAFvwNG3gFjc5Dj1C7zB6b_WQjGeYhbArHKw@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 03/04/2017 04:11 AM, Borislav Petkov wrote:
-> On Fri, Mar 03, 2017 at 03:01:23PM -0600, Brijesh Singh wrote:
+On Mon, Mar 06, 2017 at 10:18:45AM -0600, Nathan Royce wrote:
+> I tried the patch you submitted, however it also fails for the most part.
 > 
-> This looks like a wraparound...
-> 
-> $ test-apply.sh /tmp/brijesh.singh.delta
-> checking file Documentation/admin-guide/kernel-parameters.txt
-> Hunk #1 succeeded at 2144 (offset -9 lines).
-> checking file Documentation/x86/amd-memory-encryption.txt
-> patch: **** malformed patch at line 23: DRAM from physical
-> 
-> Yap.
-> 
-> Looks like exchange or your mail client decided to do some patch editing
-> on its own.
-> 
-> Please send it to yourself first and try applying.
-> 
+> "For the most part" because "xts" is now found.
+> $ grep xts /proc/crypto
+> name         : xts(aes)
+> driver       : xts(ecb-aes-s5p)
 
-Sending it through stg mail to avoid line wrapping. Please let me know if something
-is still messed up. I have tried applying it and it seems to apply okay.
+Ah, so probably I did not fix the original issue but some other... or
+maybe there are multiple issues.
 
----
- Documentation/admin-guide/kernel-parameters.txt |    4 +--
- Documentation/x86/amd-memory-encryption.txt     |   33 +++++++++++++----------
- arch/x86/include/asm/cpufeature.h               |    7 +----
- arch/x86/include/asm/cpufeatures.h              |    6 +---
- arch/x86/include/asm/disabled-features.h        |    3 +-
- arch/x86/include/asm/required-features.h        |    3 +-
- arch/x86/kernel/cpu/amd.c                       |   23 ++++++++++++++++
- arch/x86/kernel/cpu/common.c                    |   23 ----------------
- arch/x86/kernel/cpu/scattered.c                 |    1 +
- 9 files changed, 50 insertions(+), 53 deletions(-)
+Could you attach your config and any other essential reproduction steps (unusual settings?).
 
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index 91c40fa..b91e2495 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -2153,8 +2153,8 @@
- 			mem_encrypt=on:		Activate SME
- 			mem_encrypt=off:	Do not activate SME
- 
--			Refer to the SME documentation for details on when
--			memory encryption can be activated.
-+			Refer to Documentation/x86/amd-memory-encryption.txt
-+			for details on when memory encryption can be activated.
- 
- 	mem_sleep_default=	[SUSPEND] Default system suspend mode:
- 			s2idle  - Suspend-To-Idle
-diff --git a/Documentation/x86/amd-memory-encryption.txt b/Documentation/x86/amd-memory-encryption.txt
-index 0938e89..0b72ff2 100644
---- a/Documentation/x86/amd-memory-encryption.txt
-+++ b/Documentation/x86/amd-memory-encryption.txt
-@@ -7,9 +7,9 @@ DRAM.  SME can therefore be used to protect the contents of DRAM from physical
- attacks on the system.
- 
- A page is encrypted when a page table entry has the encryption bit set (see
--below how to determine the position of the bit).  The encryption bit can be
--specified in the cr3 register, allowing the PGD table to be encrypted. Each
--successive level of page tables can also be encrypted.
-+below on how to determine its position).  The encryption bit can be specified
-+in the cr3 register, allowing the PGD table to be encrypted. Each successive
-+level of page tables can also be encrypted.
- 
- Support for SME can be determined through the CPUID instruction. The CPUID
- function 0x8000001f reports information related to SME:
-@@ -17,13 +17,14 @@ function 0x8000001f reports information related to SME:
- 	0x8000001f[eax]:
- 		Bit[0] indicates support for SME
- 	0x8000001f[ebx]:
--		Bit[5:0]  pagetable bit number used to activate memory
--			  encryption
--		Bit[11:6] reduction in physical address space, in bits, when
--			  memory encryption is enabled (this only affects system
--			  physical addresses, not guest physical addresses)
--
--If support for SME is present, MSR 0xc00100010 (SYS_CFG) can be used to
-+		Bits[5:0]  pagetable bit number used to activate memory
-+			   encryption
-+		Bits[11:6] reduction in physical address space, in bits, when
-+			   memory encryption is enabled (this only affects
-+			   system physical addresses, not guest physical
-+			   addresses)
-+
-+If support for SME is present, MSR 0xc00100010 (MSR_K8_SYSCFG) can be used to
- determine if SME is enabled and/or to enable memory encryption:
- 
- 	0xc0010010:
-@@ -41,7 +42,7 @@ The state of SME in the Linux kernel can be documented as follows:
- 	  The CPU supports SME (determined through CPUID instruction).
- 
- 	- Enabled:
--	  Supported and bit 23 of the SYS_CFG MSR is set.
-+	  Supported and bit 23 of MSR_K8_SYSCFG is set.
- 
- 	- Active:
- 	  Supported, Enabled and the Linux kernel is actively applying
-@@ -51,7 +52,9 @@ The state of SME in the Linux kernel can be documented as follows:
- SME can also be enabled and activated in the BIOS. If SME is enabled and
- activated in the BIOS, then all memory accesses will be encrypted and it will
- not be necessary to activate the Linux memory encryption support.  If the BIOS
--merely enables SME (sets bit 23 of the SYS_CFG MSR), then Linux can activate
--memory encryption.  However, if BIOS does not enable SME, then Linux will not
--attempt to activate memory encryption, even if configured to do so by default
--or the mem_encrypt=on command line parameter is specified.
-+merely enables SME (sets bit 23 of the MSR_K8_SYSCFG), then Linux can activate
-+memory encryption by default (CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT=y) or
-+by supplying mem_encrypt=on on the kernel command line.  However, if BIOS does
-+not enable SME, then Linux will not be able to activate memory encryption, even
-+if configured to do so by default or the mem_encrypt=on command line parameter
-+is specified.
-diff --git a/arch/x86/include/asm/cpufeature.h b/arch/x86/include/asm/cpufeature.h
-index ea2de6a..d59c15c 100644
---- a/arch/x86/include/asm/cpufeature.h
-+++ b/arch/x86/include/asm/cpufeature.h
-@@ -28,7 +28,6 @@ enum cpuid_leafs
- 	CPUID_8000_000A_EDX,
- 	CPUID_7_ECX,
- 	CPUID_8000_0007_EBX,
--	CPUID_8000_001F_EAX,
- };
- 
- #ifdef CONFIG_X86_FEATURE_NAMES
-@@ -79,9 +78,8 @@ extern const char * const x86_bug_flags[NBUGINTS*32];
- 	   CHECK_BIT_IN_MASK_WORD(REQUIRED_MASK, 15, feature_bit) ||	\
- 	   CHECK_BIT_IN_MASK_WORD(REQUIRED_MASK, 16, feature_bit) ||	\
- 	   CHECK_BIT_IN_MASK_WORD(REQUIRED_MASK, 17, feature_bit) ||	\
--	   CHECK_BIT_IN_MASK_WORD(REQUIRED_MASK, 18, feature_bit) ||	\
- 	   REQUIRED_MASK_CHECK					  ||	\
--	   BUILD_BUG_ON_ZERO(NCAPINTS != 19))
-+	   BUILD_BUG_ON_ZERO(NCAPINTS != 18))
- 
- #define DISABLED_MASK_BIT_SET(feature_bit)				\
- 	 ( CHECK_BIT_IN_MASK_WORD(DISABLED_MASK,  0, feature_bit) ||	\
-@@ -102,9 +100,8 @@ extern const char * const x86_bug_flags[NBUGINTS*32];
- 	   CHECK_BIT_IN_MASK_WORD(DISABLED_MASK, 15, feature_bit) ||	\
- 	   CHECK_BIT_IN_MASK_WORD(DISABLED_MASK, 16, feature_bit) ||	\
- 	   CHECK_BIT_IN_MASK_WORD(DISABLED_MASK, 17, feature_bit) ||	\
--	   CHECK_BIT_IN_MASK_WORD(DISABLED_MASK, 18, feature_bit) ||	\
- 	   DISABLED_MASK_CHECK					  ||	\
--	   BUILD_BUG_ON_ZERO(NCAPINTS != 19))
-+	   BUILD_BUG_ON_ZERO(NCAPINTS != 18))
- 
- #define cpu_has(c, bit)							\
- 	(__builtin_constant_p(bit) && REQUIRED_MASK_BIT_SET(bit) ? 1 :	\
-diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-index 331fb81..b1a4468 100644
---- a/arch/x86/include/asm/cpufeatures.h
-+++ b/arch/x86/include/asm/cpufeatures.h
-@@ -12,7 +12,7 @@
- /*
-  * Defines x86 CPU feature bits
-  */
--#define NCAPINTS	19	/* N 32-bit words worth of info */
-+#define NCAPINTS	18	/* N 32-bit words worth of info */
- #define NBUGINTS	1	/* N 32-bit bug flags */
- 
- /*
-@@ -187,6 +187,7 @@
-  * Reuse free bits when adding new feature flags!
-  */
- 
-+#define X86_FEATURE_SME		( 7*32+ 0) /* AMD Secure Memory Encryption */
- #define X86_FEATURE_CPB		( 7*32+ 2) /* AMD Core Performance Boost */
- #define X86_FEATURE_EPB		( 7*32+ 3) /* IA32_ENERGY_PERF_BIAS support */
- #define X86_FEATURE_CAT_L3	( 7*32+ 4) /* Cache Allocation Technology L3 */
-@@ -296,9 +297,6 @@
- #define X86_FEATURE_SUCCOR	(17*32+1) /* Uncorrectable error containment and recovery */
- #define X86_FEATURE_SMCA	(17*32+3) /* Scalable MCA */
- 
--/* AMD-defined CPU features, CPUID level 0x8000001f (eax), word 18 */
--#define X86_FEATURE_SME		(18*32+0) /* Secure Memory Encryption */
--
- /*
-  * BUG word(s)
-  */
-diff --git a/arch/x86/include/asm/disabled-features.h b/arch/x86/include/asm/disabled-features.h
-index 8b45e08..85599ad 100644
---- a/arch/x86/include/asm/disabled-features.h
-+++ b/arch/x86/include/asm/disabled-features.h
-@@ -57,7 +57,6 @@
- #define DISABLED_MASK15	0
- #define DISABLED_MASK16	(DISABLE_PKU|DISABLE_OSPKE)
- #define DISABLED_MASK17	0
--#define DISABLED_MASK18	0
--#define DISABLED_MASK_CHECK BUILD_BUG_ON_ZERO(NCAPINTS != 19)
-+#define DISABLED_MASK_CHECK BUILD_BUG_ON_ZERO(NCAPINTS != 18)
- 
- #endif /* _ASM_X86_DISABLED_FEATURES_H */
-diff --git a/arch/x86/include/asm/required-features.h b/arch/x86/include/asm/required-features.h
-index 6847d85..fac9a5c 100644
---- a/arch/x86/include/asm/required-features.h
-+++ b/arch/x86/include/asm/required-features.h
-@@ -100,7 +100,6 @@
- #define REQUIRED_MASK15	0
- #define REQUIRED_MASK16	0
- #define REQUIRED_MASK17	0
--#define REQUIRED_MASK18	0
--#define REQUIRED_MASK_CHECK BUILD_BUG_ON_ZERO(NCAPINTS != 19)
-+#define REQUIRED_MASK_CHECK BUILD_BUG_ON_ZERO(NCAPINTS != 18)
- 
- #endif /* _ASM_X86_REQUIRED_FEATURES_H */
-diff --git a/arch/x86/kernel/cpu/amd.c b/arch/x86/kernel/cpu/amd.c
-index 35a5d5d..6bddda3 100644
---- a/arch/x86/kernel/cpu/amd.c
-+++ b/arch/x86/kernel/cpu/amd.c
-@@ -615,6 +615,29 @@ static void early_init_amd(struct cpuinfo_x86 *c)
- 	 */
- 	if (cpu_has_amd_erratum(c, amd_erratum_400))
- 		set_cpu_bug(c, X86_BUG_AMD_E400);
-+
-+	/*
-+	 * BIOS support is required for SME. If BIOS has enabld SME then
-+	 * adjust x86_phys_bits by the SME physical address space reduction
-+	 * value. If BIOS has not enabled SME then don't advertise the
-+	 * feature (set in scattered.c).
-+	 */
-+	if (c->extended_cpuid_level >= 0x8000001f) {
-+		if (cpu_has(c, X86_FEATURE_SME)) {
-+			u64 msr;
-+
-+			/* Check if SME is enabled */
-+			rdmsrl(MSR_K8_SYSCFG, msr);
-+			if (msr & MSR_K8_SYSCFG_MEM_ENCRYPT) {
-+				unsigned int ebx;
-+
-+				ebx = cpuid_ebx(0x8000001f);
-+				c->x86_phys_bits -= (ebx >> 6) & 0x3f;
-+			} else {
-+				clear_cpu_cap(c, X86_FEATURE_SME);
-+			}
-+		}
-+	}
- }
- 
- static void init_amd_k8(struct cpuinfo_x86 *c)
-diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
-index 358208d7..c188ae5 100644
---- a/arch/x86/kernel/cpu/common.c
-+++ b/arch/x86/kernel/cpu/common.c
-@@ -763,29 +763,6 @@ void get_cpu_cap(struct cpuinfo_x86 *c)
- 	if (c->extended_cpuid_level >= 0x8000000a)
- 		c->x86_capability[CPUID_8000_000A_EDX] = cpuid_edx(0x8000000a);
- 
--	if (c->extended_cpuid_level >= 0x8000001f) {
--		cpuid(0x8000001f, &eax, &ebx, &ecx, &edx);
--
--		/* SME feature support */
--		if ((c->x86_vendor == X86_VENDOR_AMD) && (eax & 0x01)) {
--			u64 msr;
--
--			/*
--			 * For SME, BIOS support is required. If BIOS has
--			 * enabled SME adjust x86_phys_bits by the SME
--			 * physical address space reduction value. If BIOS
--			 * has not enabled SME don't advertise the feature.
--			 */
--			rdmsrl(MSR_K8_SYSCFG, msr);
--			if (msr & MSR_K8_SYSCFG_MEM_ENCRYPT)
--				c->x86_phys_bits -= (ebx >> 6) & 0x3f;
--			else
--				eax &= ~0x01;
--		}
--
--		c->x86_capability[CPUID_8000_001F_EAX] = eax;
--	}
--
- 	init_scattered_cpuid_features(c);
- 
- 	/*
-diff --git a/arch/x86/kernel/cpu/scattered.c b/arch/x86/kernel/cpu/scattered.c
-index d979406..cabda87 100644
---- a/arch/x86/kernel/cpu/scattered.c
-+++ b/arch/x86/kernel/cpu/scattered.c
-@@ -30,6 +30,7 @@ static const struct cpuid_bit cpuid_bits[] = {
- 	{ X86_FEATURE_HW_PSTATE,	CPUID_EDX,  7, 0x80000007, 0 },
- 	{ X86_FEATURE_CPB,		CPUID_EDX,  9, 0x80000007, 0 },
- 	{ X86_FEATURE_PROC_FEEDBACK,    CPUID_EDX, 11, 0x80000007, 0 },
-+	{ X86_FEATURE_SME,		CPUID_EAX,  0, 0x8000001f, 0 },
- 	{ 0, 0, 0, 0, 0 }
- };
+I saw you tried v4.10.1, could you try just v4.10?
+
+Best regards,
+Krzysztof
+
+> 
+> Fail:
+> *****
+> [   21.057756] xor: using function: neon (352.000 MB/sec)
+> [   21.064243] Unable to handle kernel NULL pointer dereference at
+> virtual address 00000004
+> [   21.070966] pgd = c0004000
+> [   21.073599] [00000004] *pgd=00000000
+> [   21.077165] Internal error: Oops: 17 [#1] SMP ARM
+> [   21.081836] Modules linked in: xor aes_arm xor_neon zlib_deflate
+> raid6_pq nfsd auth_rpcgss oid_registry nfs_acl lockd grace sunrpc
+> ip_tables x_tables
+> [   21.095239] CPU: 5 PID: 121 Comm: irq/69-10830000 Not tainted 4.10.1-dirty #1
+> [   21.102288] Hardware name: SAMSUNG EXYNOS (Flattened Device Tree)
+> [   21.108355] task: ee3e3700 task.stack: edcf6000
+> [   21.112821] PC is at post_crypt+0x1b4/0x1c4
+> [   21.116972] LR is at post_crypt+0x1a8/0x1c4
+> [   21.121131] pc : [<c0335c68>]    lr : [<c0335c5c>]    psr: 200c0093
+> [   21.121131] sp : edcf7e68  ip : ec59dcf4  fp : 117ce9ac
+> [   21.132576] r10: 244525e3  r9 : c0c0540c  r8 : ec59dc00
+> [   21.137768] r7 : 00000000  r6 : 00000400  r5 : 00000000  r4 : 00000000
+> [   21.144267] r3 : ef49fcde  r2 : 00000200  r1 : 00000200  r0 : 00000000
+> [   21.150768] Flags: nzCv  IRQs off  FIQs on  Mode SVC_32  ISA ARM
+> Segment none
+> [   21.157964] Control: 10c5387d  Table: 6618c06a  DAC: 00000051
+> [   21.163677] Process irq/69-10830000 (pid: 121, stack limit = 0xedcf6218)
+> [   21.170350] Stack: (0xedcf7e68 to 0xedcf8000)
+> [   21.174684] 7e60:                   ef49fcdc ec93f200 ef49fcdc
+> ec93f200 ec59dddc 00000400
+> [   21.182853] 7e80: 00000000 00000000 00000400 00000000 ef49fcdc
+> c01100fc 00000000 00000000
+> [   21.190983] 7ea0: 00000000 00000000 00000000 c0110f80 00000010
+> 00000010 0000000f 00040a01
+> [   21.199128] 7ec0: 00000000 ec59dc00 c0c0540c 00000000 00000000
+> 600c0013 00000002 00000000
+> [   21.207274] 7ee0: ee889d20 c033608c eea21c90 c05a80d0 eea21ce8
+> eea21c90 0000000c 00040a01
+> [   21.215418] 7f00: eea21ce8 eea21c90 0000000c 00000000 eea21ce8
+> c05a8290 00000000 00000001
+> [   21.223564] 7f20: eea2a600 eea8a400 eea8a400 eea2a600 c016ee68
+> c0c0540c 00000000 c016ee84
+> [   21.231710] 7f40: edcf6000 eea2a624 eea8a400 c016f198 eea2a640
+> 00000000 c016ef7c 00040a01
+> [   21.239868] 7f60: 00000000 eeb58280 edcf6000 00000000 eea2a640
+> eea2a600 c016f04c eeb582a8
+> [   21.248000] 7f80: ee889d20 c0138710 edcf6000 eea2a640 c0138608
+> 00000000 00000000 00000000
+> [   21.256145] 7fa0: 00000000 00000000 00000000 c0107a38 00000000
+> 00000000 00000000 00000000
+> [   21.264291] 7fc0: 00000000 00000000 00000000 00000000 00000000
+> 00000000 00000000 00000000
+> [   21.272428] 7fe0: 00000000 00000000 00000000 00000000 00000013
+> 00000000 00000000 00000000
+> [   21.280580] [<c0335c68>] (post_crypt) from [<c033608c>]
+> (decrypt_done+0x4c/0x54)
+> [   21.287946] [<c033608c>] (decrypt_done) from [<c05a80d0>]
+> (s5p_aes_complete+0x70/0xfc)
+> [   21.295845] [<c05a80d0>] (s5p_aes_complete) from [<c05a8290>]
+> (s5p_aes_interrupt+0x134/0x1a0)
+> [   21.304323] [<c05a8290>] (s5p_aes_interrupt) from [<c016ee84>]
+> (irq_thread_fn+0x1c/0x54)
+> [   21.312378] [<c016ee84>] (irq_thread_fn) from [<c016f198>]
+> (irq_thread+0x14c/0x204)
+> [   21.320004] [<c016f198>] (irq_thread) from [<c0138710>] (kthread+0x108/0x138)
+> [   21.327109] [<c0138710>] (kthread) from [<c0107a38>]
+> (ret_from_fork+0x14/0x3c)
+> [   21.334300] Code: eb0114aa e598c118 e58d001c e1a04000 (e5906004)
+> [   21.340363] ---[ end trace e87f375304ecdd42 ]---
+> [   21.344961] genirq: exiting task "irq/69-10830000" (121) is an
+> active IRQ thread (irq 69)
+> [   21.870157] irq 69: nobody cared (try booting with the "irqpoll" option)
+> [   21.875435] CPU: 0 PID: 0 Comm: swapper/0 Tainted: G      D
+> 4.10.1-dirty #1
+> [   21.883027] Hardware name: SAMSUNG EXYNOS (Flattened Device Tree)
+> [   21.889134] [<c010eb54>] (unwind_backtrace) from [<c010b408>]
+> (show_stack+0x10/0x14)
+> [   21.896826] [<c010b408>] (show_stack) from [<c036c34c>]
+> (dump_stack+0x84/0x98)
+> [   21.904015] [<c036c34c>] (dump_stack) from [<c01706cc>]
+> (__report_bad_irq+0x2c/0xcc)
+> [   21.911716] [<c01706cc>] (__report_bad_irq) from [<c0170ad0>]
+> (note_interrupt+0x28c/0x2dc)
+> [   21.919948] [<c0170ad0>] (note_interrupt) from [<c016dd20>]
+> (handle_irq_event_percpu+0x5c/0x7c)
+> [   21.928614] [<c016dd20>] (handle_irq_event_percpu) from
+> [<c016dd78>] (handle_irq_event+0x38/0x5c)
+> [   21.937451] [<c016dd78>] (handle_irq_event) from [<c0171470>]
+> (handle_fasteoi_irq+0xb8/0x190)
+> [   21.945944] [<c0171470>] (handle_fasteoi_irq) from [<c016cf70>]
+> (generic_handle_irq+0x24/0x34)
+> [   21.954522] [<c016cf70>] (generic_handle_irq) from [<c016d48c>]
+> (__handle_domain_irq+0x5c/0xb4)
+> [   21.963188] [<c016d48c>] (__handle_domain_irq) from [<c01014e8>]
+> (gic_handle_irq+0x38/0x74)
+> [   21.971505] [<c01014e8>] (gic_handle_irq) from [<c010bf8c>]
+> (__irq_svc+0x6c/0x90)
+> [   21.978953] Exception stack(0xc0c01e68 to 0xc0c01eb0)
+> [   21.983975] 1e60:                   00200102 c0c5cec0 00000000
+> 00000000 00000040 00000000
+> [   21.992127] 1e80: c0c00000 00000001 c0c02080 c0c00000 00000000
+> efffc7c0 c0c01f00 c0c01eb8
+> [   22.000271] 1ea0: c0120b58 c01206d4 600e0113 ffffffff
+> [   22.005299] [<c010bf8c>] (__irq_svc) from [<c01206d4>]
+> (__do_softirq+0x90/0x21c)
+> [   22.012667] [<c01206d4>] (__do_softirq) from [<c0120b58>]
+> (irq_exit+0xd8/0x140)
+> [   22.019945] [<c0120b58>] (irq_exit) from [<c016d490>]
+> (__handle_domain_irq+0x60/0xb4)
+> [   22.027743] [<c016d490>] (__handle_domain_irq) from [<c01014e8>]
+> (gic_handle_irq+0x38/0x74)
+> [   22.036061] [<c01014e8>] (gic_handle_irq) from [<c010bf8c>]
+> (__irq_svc+0x6c/0x90)
+> [   22.043510] Exception stack(0xc0c01f38 to 0xc0c01f80)
+> [   22.048529] 1f20:
+>     00000001 00000000
+> [   22.056685] 1f40: 00000000 c0114e60 c0c00000 c0c05490 c0c0542c
+> c0b4ff88 c0c01f90 00000000
+> [   22.064832] 1f60: 00000000 efffc7c0 600e0013 c0c01f88 c0108480
+> c0108484 600e0013 ffffffff
+> [   22.072978] [<c010bf8c>] (__irq_svc) from [<c0108484>]
+> (arch_cpu_idle+0x38/0x3c)
+> [   22.080347] [<c0108484>] (arch_cpu_idle) from [<c015da70>]
+> (do_idle+0x164/0x1f8)
+> [   22.087708] [<c015da70>] (do_idle) from [<c015dda0>]
+> (cpu_startup_entry+0x18/0x1c)
+> [   22.095258] [<c015dda0>] (cpu_startup_entry) from [<c0b00c74>]
+> (start_kernel+0x374/0x394)
+> [   22.103389] handlers:
+> [   22.105635] [<c016dde8>] irq_default_primary_handler threaded
+> [<c05a815c>] s5p_aes_interrupt
+> [   22.114046] Disabling IRQ #69
+> [   23.496638] Btrfs loaded, crc32c=crc32c-generic
+> *****
+> Do I need to add "irqpoll" to my u-boot boot config now?
+> 
+> Yeah, the mailing list bounced my original email because I wasn't
+> using plain-text, but my full post shows in Herbert's reply.
+> 
+> On Sun, Mar 5, 2017 at 11:16 AM, Krzysztof Kozlowski <krzk@kernel.org> wrote:
+> > On Fri, Mar 03, 2017 at 12:02:10PM +0800, Herbert Xu wrote:
+> >> On Thu, Mar 02, 2017 at 05:35:30PM -0600, Nathan Royce wrote:
+> >> > ARM ODroid XU4
+> >> >
+> >> > $ cat /proc/config.gz | gunzip | grep XTS
+> >> > CONFIG_CRYPTO_XTS=y
+> >> >
+> >> > $ grep xts /proc/crypto
+> >> > //4.9.13
+> >> > name         : xts(aes)
+> >> > driver       : xts(aes-generic)
+> >> > //4.10.1
+> >> > <blank>
+> >> > //cbc can be found though
+> >> >
+> >> > CRYPTTAB:
+> >> > cryptswap1 UUID=<sanitized> /dev/urandom
+> >> > swap,offset=2048,cipher=aes-xts-plain64:sha512,size=512,nofail
+> >> >
+> >> > FSTAB:
+> >> > /dev/mapper/cryptswap1 none swap sw 0 0
+> >> >
+> >> > Boot Log:
+> >> > [   10.535985] ------------[ cut here ]------------
+> >> > [   10.539252] WARNING: CPU: 0 PID: 0 at crypto/skcipher.c:430
+> >> > skcipher_walk_first+0x13c/0x14c
+> >> > [   10.547542] Modules linked in: xor xor_neon aes_arm zlib_deflate
+> >> > dm_crypt raid6_pq nfsd auth_rpcgss oid_registry nfs_acl lockd grace sunrpc
+> >> > ip_tables x_tables
+> >> > [   10.561716] CPU: 0 PID: 0 Comm: swapper/0 Not tainted 4.10.1-dirty #1
+> >> > [   10.568049] Hardware name: SAMSUNG EXYNOS (Flattened Device Tree)
+> >> > [   10.574171] [<c010eb54>] (unwind_backtrace) from [<c010b408>]
+> >> > (show_stack+0x10/0x14)
+> >> > [   10.581893] [<c010b408>] (show_stack) from [<c036772c>]
+> >> > (dump_stack+0x84/0x98)
+> >> > [   10.589073] [<c036772c>] (dump_stack) from [<c011bb20>]
+> >> > (__warn+0xe8/0x100)
+> >> > [   10.595975] [<c011bb20>] (__warn) from [<c011bc30>]
+> >> > (warn_slowpath_null+0x20/0x28)
+> >> > [   10.603546] [<c011bc30>] (warn_slowpath_null) from [<c0329a48>]
+> >> > (skcipher_walk_first+0x13c/0x14c)
+> >> > [   10.612390] [<c0329a48>] (skcipher_walk_first) from [<c0329b30>]
+> >> > (skcipher_walk_virt+0x1c/0x38)
+> >> > [   10.621056] [<c0329b30>] (skcipher_walk_virt) from [<c0330ed0>]
+> >> > (post_crypt+0x38/0x1c4)
+> >> > [   10.629022] [<c0330ed0>] (post_crypt) from [<c0331470>]
+> >> > (decrypt_done+0x4c/0x54)
+> >> > [   10.636389] [<c0331470>] (decrypt_done) from [<c05a03f0>]
+> >> > (s5p_aes_complete+0x70/0xfc)
+> >> > [   10.644274] [<c05a03f0>] (s5p_aes_complete) from [<c05a05b0>]
+> >> > (s5p_aes_interrupt+0x134/0x1a0)
+> >> > [   10.652771] [<c05a05b0>] (s5p_aes_interrupt) from [<c016dc3c>]
+> >> > (__handle_irq_event_percpu+0x9c/0x124)
+> >>
+> >> This looks like a bug in the s5p driver.  It's calling the completion
+> >> function straight from the IRQ handler, which is triggering the
+> >> sanity check in skcipher_walk_first.
+> >>
+> >> The s5p driver needs to schedule a tasklet to call the completion
+> >> function.
+> >
+> > Tasklet... or threaded IRQ handler maybe? I sent a fix.
+> >
+> > BTW, I subscribe the crypto list but I could not find the original email
+> > there.
+> >
+> > Best regards,
+> > Krzysztof
+> >
