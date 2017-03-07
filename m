@@ -1,62 +1,62 @@
-From: Ingo Molnar <mingo@kernel.org>
-Subject: Re: [PATCH v3] MIPS: Fix build breakage caused by header file changes
-Date: Tue, 7 Mar 2017 11:34:52 +0100
-Message-ID: <20170307103452.GA13056@gmail.com>
-References: <1488827635-7708-1-git-send-email-linux@roeck-us.net>
- <20170306232019.GG2878@jhogan-linux.le.imgtec.org>
- <20170307073805.GB15693@gmail.com>
- <20170307093850.GD996@jhogan-linux.le.imgtec.org>
+From: Borislav Petkov <bp@suse.de>
+Subject: Re: [RFC PATCH v2 05/32] x86: Use encrypted access of BOOT related
+ data with SEV
+Date: Tue, 7 Mar 2017 12:09:25 +0100
+Message-ID: <20170307110925.zmo7gsflxhui4k7e@pd.tnic>
+References: <148846752022.2349.13667498174822419498.stgit@brijesh-build-machine>
+ <148846757895.2349.561582698953591240.stgit@brijesh-build-machine>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Guenter Roeck <linux@roeck-us.net>,
-        Ralf Baechle <ralf@linux-mips.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-mips@linux-mips.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org,
-        Linus Torvalds <torvalds@linux-foundation.org>
-To: James Hogan <james.hogan@imgtec.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:34666 "EHLO
-        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751766AbdCGKf3 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 7 Mar 2017 05:35:29 -0500
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: simon.guinot@sequanux.org, linux-efi@vger.kernel.org,
+	kvm@vger.kernel.org, rkrcmar@redhat.com, matt@codeblueprint.co.uk,
+	linux-pci@vger.kernel.org, linus.walleij@linaro.org,
+	gary.hook@amd.com, linux-mm@kvack.org, paul.gortmaker@windriver.com,
+	hpa@zytor.com, cl@linux.com, dan.j.williams@intel.com,
+	aarcange@redhat.com, sfr@canb.auug.org.au,
+	andriy.shevchenko@linux.intel.com, herbert@gondor.apana.org.au,
+	bhe@redhat.com, xemul@parallels.com, joro@8bytes.org,
+	x86@kernel.org, peterz@infradead.org, piotr.luc@intel.com,
+	mingo@redhat.com, msalter@redhat.com, ross.zwisler@linux.intel.com,
+	dyoung@redhat.com, thomas.lendacky@amd.com, jroedel@suse.de,
+	keescook@chromium.org, arnd@arndb.de, toshi.kani@hpe.com,
+	mathieu.desnoyers@efficios.com, luto@kernel.org,
+	devel@linuxdriverproject.org, bhelgaas@google.com,
+	tglx@linutronix.de, mchehab@kernel.org, iamjoonsoo.kim@lge.com,
+	labbott@fedo
+To: Brijesh Singh <brijesh.singh@amd.com>
+Return-path: <owner-linux-mm@kvack.org>
 Content-Disposition: inline
-In-Reply-To: <20170307093850.GD996@jhogan-linux.le.imgtec.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <148846757895.2349.561582698953591240.stgit@brijesh-build-machine>
+Sender: owner-linux-mm@kvack.org
+List-Id: linux-crypto.vger.kernel.org
 
-
-* James Hogan <james.hogan@imgtec.com> wrote:
-
-> Hi Ingo,
+On Thu, Mar 02, 2017 at 10:12:59AM -0500, Brijesh Singh wrote:
+> From: Tom Lendacky <thomas.lendacky@amd.com>
 > 
-> On Tue, Mar 07, 2017 at 08:38:05AM +0100, Ingo Molnar wrote:
-> > Just a quick question: is your MIPS build fix going to be merged and sent to 
-> > Linus? I can apply it too, and send it to Linus later today, together with a few 
-> > other sched.h header related build fixes.
-> 
-> One for Ralf...
+> When Secure Encrypted Virtualization (SEV) is active, BOOT data (such as
+> EFI related data, setup data) is encrypted and needs to be accessed as
+> such when mapped. Update the architecture override in early_memremap to
+> keep the encryption attribute when mapping this data.
 
-Ralf, what's your preference?
+This could also explain why persistent memory needs to be accessed
+decrypted with SEV.
 
-> > Assuming it's all properly tested - my limited MIPS defconfig builds worked fine - 
-> > but MIPS has a lot of build variations.
-> 
-> If you have a branch with other generic fixes I'm happy to push it to
-> our MIPS buildbot too to double check.
+In general, what the difference in that aspect is in respect to SME. And
+I'd write that in the comment over the function. And not say "E820 areas
+are checked in making this determination." because that is visible but
+say *why* we need to check those ranges and determine access depending
+on their type.
 
-So I have not applied your patch yet (can do it with ack from Ralf), but all the 
-other fixes that are pending can be found in:
+-- 
+Regards/Gruss,
+    Boris.
 
-  git git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git core/urgent
+SUSE Linux GmbH, GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
+-- 
 
-It's these commits:
-
- bb35e4515411 drivers/char/nwbutton: Fix build breakage caused by include file reshuffling
- 80aa1a54f054 h8300: Fix build breakage caused by header file changes
- 1fbdbcea8005 avr32: Fix build error caused by include file reshuffling
-
-Thanks,
-
-	Ingo
+--
+To unsubscribe, send a message with 'unsubscribe linux-mm' in
+the body to majordomo@kvack.org.  For more info on Linux MM,
+see: http://www.linux-mm.org/ .
+Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
