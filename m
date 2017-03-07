@@ -1,106 +1,87 @@
-From: Borislav Petkov <bp@suse.de>
-Subject: Re: [RFC PATCH v2 07/32] x86/efi: Access EFI data as encrypted when
- SEV is active
-Date: Tue, 7 Mar 2017 12:57:30 +0100
-Message-ID: <20170307115730.rmsmluv42m5xnylf@pd.tnic>
-References: <148846752022.2349.13667498174822419498.stgit@brijesh-build-machine>
- <148846760142.2349.8522516472305792434.stgit@brijesh-build-machine>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: simon.guinot@sequanux.org, linux-efi@vger.kernel.org,
-	kvm@vger.kernel.org, rkrcmar@redhat.com, matt@codeblueprint.co.uk,
-	linux-pci@vger.kernel.org, linus.walleij@linaro.org,
-	gary.hook@amd.com, linux-mm@kvack.org, paul.gortmaker@windriver.com,
-	hpa@zytor.com, cl@linux.com, dan.j.williams@intel.com,
-	aarcange@redhat.com, sfr@canb.auug.org.au,
-	andriy.shevchenko@linux.intel.com, herbert@gondor.apana.org.au,
-	bhe@redhat.com, xemul@parallels.com, joro@8bytes.org,
-	x86@kernel.org, peterz@infradead.org, piotr.luc@intel.com,
-	mingo@redhat.com, msalter@redhat.com, ross.zwisler@linux.intel.com,
-	dyoung@redhat.com, thomas.lendacky@amd.com, jroedel@suse.de,
-	keescook@chromium.org, arnd@arndb.de, toshi.kani@hpe.com,
-	mathieu.desnoyers@efficios.com, luto@kernel.org,
-	devel@linuxdriverproject.org, bhelgaas@google.com,
-	tglx@linutronix.de, mchehab@kernel.org, iamjoonsoo.kim@lge.com,
-	labbott@fedo
-To: Brijesh Singh <brijesh.singh@amd.com>,
-	Matt Fleming <matt@codeblueprint.co.uk>
-Return-path: <owner-linux-mm@kvack.org>
-Content-Disposition: inline
-In-Reply-To: <148846760142.2349.8522516472305792434.stgit@brijesh-build-machine>
-Sender: owner-linux-mm@kvack.org
-List-Id: linux-crypto.vger.kernel.org
+From: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+Subject: [PATCH 4/4] hwrng: omap - move clock related code to omap_rng_probe()
+Date: Tue,  7 Mar 2017 15:14:49 +0100
+Message-ID: <1488896089-17586-5-git-send-email-thomas.petazzoni@free-electrons.com>
+References: <1488896089-17586-1-git-send-email-thomas.petazzoni@free-electrons.com>
+Cc: linux-crypto@vger.kernel.org, romain.perier@collabora.com,
+        Jason Cooper <jason@lakedaemon.net>,
+        Andrew Lunn <andrew@lunn.ch>,
+        Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+        Gregory Clement <gregory.clement@free-electrons.com>,
+        Nadav Haklai <nadavh@marvell.com>,
+        Hanna Hawa <hannah@marvell.com>,
+        Yehuda Yitschak <yehuday@marvell.com>,
+        Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+To: Deepak Saxena <dsaxena@plexity.net>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.free-electrons.com ([62.4.15.54]:58592 "EHLO
+        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755144AbdCGOQa (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 7 Mar 2017 09:16:30 -0500
+In-Reply-To: <1488896089-17586-1-git-send-email-thomas.petazzoni@free-electrons.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Mar 02, 2017 at 10:13:21AM -0500, Brijesh Singh wrote:
-> From: Tom Lendacky <thomas.lendacky@amd.com>
-> 
-> EFI data is encrypted when the kernel is run under SEV. Update the
-> page table references to be sure the EFI memory areas are accessed
-> encrypted.
-> 
-> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+Currently, the code that takes a reference to the clock and enables it
+is located inside of_get_omap_rng_device_details(), called only when
+probing through the Device Tree.
 
-This SOB chain looks good.
+However, there is nothing that makes this clock logic dependent on the
+Device Tree, so it makes more sense to have it in omap_rng_probe()
+directly.
 
-> ---
->  arch/x86/platform/efi/efi_64.c |   15 ++++++++++++++-
->  1 file changed, 14 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/platform/efi/efi_64.c b/arch/x86/platform/efi/efi_64.c
-> index 2d8674d..9a76ed8 100644
-> --- a/arch/x86/platform/efi/efi_64.c
-> +++ b/arch/x86/platform/efi/efi_64.c
-> @@ -45,6 +45,7 @@
->  #include <asm/realmode.h>
->  #include <asm/time.h>
->  #include <asm/pgalloc.h>
-> +#include <asm/mem_encrypt.h>
->  
->  /*
->   * We allocate runtime services regions bottom-up, starting from -4G, i.e.
-> @@ -286,7 +287,10 @@ int __init efi_setup_page_tables(unsigned long pa_memmap, unsigned num_pages)
->  	 * as trim_bios_range() will reserve the first page and isolate it away
->  	 * from memory allocators anyway.
->  	 */
-> -	if (kernel_map_pages_in_pgd(pgd, 0x0, 0x0, 1, _PAGE_RW)) {
-> +	pf = _PAGE_RW;
-> +	if (sev_active())
-> +		pf |= _PAGE_ENC;
-> +	if (kernel_map_pages_in_pgd(pgd, 0x0, 0x0, 1, pf)) {
->  		pr_err("Failed to create 1:1 mapping for the first page!\n");
->  		return 1;
->  	}
-> @@ -329,6 +333,9 @@ static void __init __map_region(efi_memory_desc_t *md, u64 va)
->  	if (!(md->attribute & EFI_MEMORY_WB))
->  		flags |= _PAGE_PCD;
->  
-> +	if (sev_active())
-> +		flags |= _PAGE_ENC;
-> +
+Moreover, we make sure to bail out if we can't enable the clock. Indeed,
+while the clock is optional, if a clock is present, we really want to
+succeed in enabling it. And we fix the error message to fit on one line,
+so that it is grep-friendly.
 
-So I'm wondering if we could avoid this sprinkling of _PAGE_ENC in the
-EFI code by defining something like __supported_pte_mask but called
-__efi_base_page_flags or so which has _PAGE_ENC cleared in the SME case,
-i.e., when baremetal and has it set in the SEV case.
+Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+---
+ drivers/char/hw_random/omap-rng.c | 22 ++++++++++++----------
+ 1 file changed, 12 insertions(+), 10 deletions(-)
 
-Then we could simply OR in __efi_base_page_flags which the SME/SEV code
-will set appropriately early enough.
-
-Hmm.
-
-Matt, what do you think?
-
+diff --git a/drivers/char/hw_random/omap-rng.c b/drivers/char/hw_random/omap-rng.c
+index b1ad125..74d11ae 100644
+--- a/drivers/char/hw_random/omap-rng.c
++++ b/drivers/char/hw_random/omap-rng.c
+@@ -398,16 +398,6 @@ static int of_get_omap_rng_device_details(struct omap_rng_dev *priv,
+ 			return err;
+ 		}
+ 
+-		priv->clk = devm_clk_get(&pdev->dev, NULL);
+-		if (IS_ERR(priv->clk) && PTR_ERR(priv->clk) == -EPROBE_DEFER)
+-			return -EPROBE_DEFER;
+-		if (!IS_ERR(priv->clk)) {
+-			err = clk_prepare_enable(priv->clk);
+-			if (err)
+-				dev_err(&pdev->dev, "unable to enable the clk, "
+-						    "err = %d\n", err);
+-		}
+-
+ 		/*
+ 		 * On OMAP4, enabling the shutdown_oflo interrupt is
+ 		 * done in the interrupt mask register. There is no
+@@ -478,6 +468,18 @@ static int omap_rng_probe(struct platform_device *pdev)
+ 		goto err_ioremap;
+ 	}
+ 
++	priv->clk = devm_clk_get(&pdev->dev, NULL);
++	if (IS_ERR(priv->clk) && PTR_ERR(priv->clk) == -EPROBE_DEFER)
++		return -EPROBE_DEFER;
++	if (!IS_ERR(priv->clk)) {
++		ret = clk_prepare_enable(priv->clk);
++		if (ret) {
++			dev_err(&pdev->dev,
++				"Unable to enable the clk: %d\n", ret);
++			goto err_register;
++		}
++	}
++
+ 	ret = (dev->of_node) ? of_get_omap_rng_device_details(priv, pdev) :
+ 				get_omap_rng_device_details(priv);
+ 	if (ret)
 -- 
-Regards/Gruss,
-    Boris.
-
-SUSE Linux GmbH, GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
--- 
-
---
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+2.7.4
