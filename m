@@ -1,72 +1,50 @@
-From: Ingo Molnar <mingo@kernel.org>
-Subject: Re: [PATCH v3] MIPS: Fix build breakage caused by header file changes
-Date: Tue, 7 Mar 2017 08:38:05 +0100
-Message-ID: <20170307073805.GB15693@gmail.com>
-References: <1488827635-7708-1-git-send-email-linux@roeck-us.net>
- <20170306232019.GG2878@jhogan-linux.le.imgtec.org>
+From: Mr Obama Basolle <shreeshsinghbhardwaj@gmail.com>
+Subject: Mutual Cooperation! Thank you.
+Date: Tue, 7 Mar 2017 10:26:59 +0100
+Message-ID: <CALtzSFNVYO4_Z0Lmo2hvnh14AzfQc8WiR9h5O+Yei_KqWCKTyA@mail.gmail.com>
+Reply-To: obama.basolle@yahoo.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: Guenter Roeck <linux@roeck-us.net>,
-        Ralf Baechle <ralf@linux-mips.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-mips@linux-mips.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org,
-        Linus Torvalds <torvalds@linux-foundation.org>
-To: James Hogan <james.hogan@imgtec.com>
-Return-path: <linux-mips-bounce@linux-mips.org>
-Content-Disposition: inline
-In-Reply-To: <20170306232019.GG2878@jhogan-linux.le.imgtec.org>
-Sender: linux-mips-bounce@linux-mips.org
-Errors-to: linux-mips-bounce@linux-mips.org
-List-help: <mailto:ecartis@linux-mips.org?Subject=help>
-List-unsubscribe: <mailto:ecartis@linux-mips.org?subject=unsubscribe%20linux-mips>
-List-software: Ecartis version 1.0.0
-List-subscribe: <mailto:ecartis@linux-mips.org?subject=subscribe%20linux-mips>
-List-owner: <mailto:ralf@linux-mips.org>
-List-post: <mailto:linux-mips@linux-mips.org>
-List-archive: <http://www.linux-mips.org/archives/linux-mips/>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+To: undisclosed-recipients:;
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-qk0-f196.google.com ([209.85.220.196]:33085 "EHLO
+        mail-qk0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754738AbdCGJ1E (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 7 Mar 2017 04:27:04 -0500
+Received: by mail-qk0-f196.google.com with SMTP id j127so32841599qke.0
+        for <linux-crypto@vger.kernel.org>; Tue, 07 Mar 2017 01:27:00 -0800 (PST)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
+-- 
+Dear Friend,
 
-* James Hogan <james.hogan@imgtec.com> wrote:
+I know that this message will come to you as a surprise. I am the
+Auditing and Accounting section manager with African Development Bank,
+Ouagadougou Burkina faso. I Hope that you will not expose or betray
+this trust and confident that I am about to repose on you for the
+mutual benefit of our both families.
 
-> Hi Guenter,
-> 
-> On Mon, Mar 06, 2017 at 11:13:55AM -0800, Guenter Roeck wrote:
-> > Since commit f3ac60671954 ("sched/headers: Move task-stack related
-> > APIs from <linux/sched.h> to <linux/sched/task_stack.h>") and commit
-> > f780d89a0e82 ("sched/headers: Remove <asm/ptrace.h> from
-> > <linux/sched.h>"), various mips builds fail as follows.
-> > 
-> > arch/mips/kernel/smp-mt.c: In function ‘vsmp_boot_secondary’:
-> > arch/mips/include/asm/processor.h:384:41: error:
-> > 	implicit declaration of function ‘task_stack_page’
-> > 
-> > In file included from
-> > 	/opt/buildbot/slave/hwmon-testing/build/arch/mips/kernel/pm.c:
-> > arch/mips/include/asm/fpu.h: In function '__own_fpu':
-> > arch/mips/include/asm/processor.h:385:31: error:
-> > 	invalid application of 'sizeof' to incomplete type 'struct pt_regs'
-> 
-> This one is in an inline function, so I think it'd affect multiple
-> includes of <asm/fpu.h> even if __own_fpu isn't used, so I think the
-> following patch which adds the include ptrace.h in fpu.h is more robust
-> than adding to the individual c files affected:
-> https://patchwork.linux-mips.org/patch/15386/
-> 
-> Admitedly it could probably have a more specific subject line since
-> there are more similar errors.
+I need your urgent assistance in transferring the sum of($39.5)million
+to your account within 10 or 14 banking days. This money has been
+dormant for years in our Bank without claim.I want the bank to release
+the money to you as the nearest person to our deceased customer late
+George small. who died along with his supposed next of kin in an air
+crash since 31st October 1999.
 
-Just a quick question: is your MIPS build fix going to be merged and sent to 
-Linus? I can apply it too, and send it to Linus later today, together with a few 
-other sched.h header related build fixes.
+I don't want the money to go into government treasury as an abandoned
+fund. So this is the reason why I am contacting you so that the bank
+can release the money to you as the next of kin to the deceased
+customer. Please I would like you to keep this proposal as atop secret
+and delete it if you are not interested.
 
-Assuming it's all properly tested - my limited MIPS defconfig builds worked fine - 
-but MIPS has a lot of build variations.
+Upon receipt of your reply, I will give you full details on how the
+business will be executed and also note that you will have 40% of the
+above mentioned sum if you agree to handle this business with me.
 
-Either way is fine to me.
+I am expecting your urgent response as soon as you receive my message.
 
-Thanks,
+Best Regard,
 
-	Ingo
+Auditor Mr Obama Basolle.
