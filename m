@@ -1,84 +1,202 @@
-From: Borislav Petkov <bp@suse.de>
-Subject: Re: [RFC PATCH v2 04/32] KVM: SVM: Add SEV feature definitions to KVM
-Date: Tue, 7 Mar 2017 01:50:53 +0100
-Message-ID: <20170307005053.izjygz6mcebo5hza@pd.tnic>
-References: <148846752022.2349.13667498174822419498.stgit@brijesh-build-machine>
- <148846756856.2349.18360437323368784256.stgit@brijesh-build-machine>
+From: Guenter Roeck <linux@roeck-us.net>
+Subject: Re: [PATCH v3] MIPS: Fix build breakage caused by header file changes
+Date: Mon, 6 Mar 2017 19:30:05 -0800
+Message-ID: <146eef7a-44dd-48ff-3f09-0b342d844bd6@roeck-us.net>
+References: <1488827635-7708-1-git-send-email-linux@roeck-us.net>
+ <20170306232019.GG2878@jhogan-linux.le.imgtec.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Cc: simon.guinot@sequanux.org, linux-efi@vger.kernel.org,
-	kvm@vger.kernel.org, rkrcmar@redhat.com, matt@codeblueprint.co.uk,
-	linux-pci@vger.kernel.org, linus.walleij@linaro.org,
-	gary.hook@amd.com, linux-mm@kvack.org, paul.gortmaker@windriver.com,
-	hpa@zytor.com, cl@linux.com, dan.j.williams@intel.com,
-	aarcange@redhat.com, sfr@canb.auug.org.au,
-	andriy.shevchenko@linux.intel.com, herbert@gondor.apana.org.au,
-	bhe@redhat.com, xemul@parallels.com, joro@8bytes.org,
-	x86@kernel.org, peterz@infradead.org, piotr.luc@intel.com,
-	mingo@redhat.com, msalter@redhat.com, ross.zwisler@linux.intel.com,
-	dyoung@redhat.com, thomas.lendacky@amd.com, jroedel@suse.de,
-	keescook@chromium.org, arnd@arndb.de, toshi.kani@hpe.com,
-	mathieu.desnoyers@efficios.com, luto@kernel.org,
-	devel@linuxdriverproject.org, bhelgaas@google.com,
-	tglx@linutronix.de, mchehab@kernel.org, iamjoonsoo.kim@lge.com,
-	labbott@fedo
-To: Brijesh Singh <brijesh.singh@amd.com>
-Return-path: <owner-linux-mm@kvack.org>
-Content-Disposition: inline
-In-Reply-To: <148846756856.2349.18360437323368784256.stgit@brijesh-build-machine>
-Sender: owner-linux-mm@kvack.org
+Cc: Ralf Baechle <ralf@linux-mips.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-mips@linux-mips.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, Ingo Molnar <mingo@kernel.org>
+To: James Hogan <james.hogan@imgtec.com>
+Return-path: <linux-mips-bounce@linux-mips.org>
+In-Reply-To: <20170306232019.GG2878@jhogan-linux.le.imgtec.org>
+Sender: linux-mips-bounce@linux-mips.org
+Errors-to: linux-mips-bounce@linux-mips.org
+List-help: <mailto:ecartis@linux-mips.org?Subject=help>
+List-unsubscribe: <mailto:ecartis@linux-mips.org?subject=unsubscribe%20linux-mips>
+List-software: Ecartis version 1.0.0
+List-subscribe: <mailto:ecartis@linux-mips.org?subject=subscribe%20linux-mips>
+List-owner: <mailto:ralf@linux-mips.org>
+List-post: <mailto:linux-mips@linux-mips.org>
+List-archive: <http://www.linux-mips.org/archives/linux-mips/>
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Mar 02, 2017 at 10:12:48AM -0500, Brijesh Singh wrote:
-> From: Tom Lendacky <thomas.lendacky@amd.com>
-> 
-> Define a new KVM CPU feature for Secure Encrypted Virtualization (SEV).
-> The kernel will check for the presence of this feature to determine if
-> it is running with SEV active.
-> 
-> Define the SEV enable bit for the VMCB control structure. The hypervisor
-> will use this bit to enable SEV in the guest.
-> 
-> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
-> ---
->  arch/x86/include/asm/svm.h           |    1 +
->  arch/x86/include/uapi/asm/kvm_para.h |    1 +
->  2 files changed, 2 insertions(+)
-> 
-> diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
-> index 2aca535..fba2a7b 100644
-> --- a/arch/x86/include/asm/svm.h
-> +++ b/arch/x86/include/asm/svm.h
-> @@ -137,6 +137,7 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
->  #define SVM_VM_CR_SVM_DIS_MASK  0x0010ULL
->  
->  #define SVM_NESTED_CTL_NP_ENABLE	BIT(0)
-> +#define SVM_NESTED_CTL_SEV_ENABLE	BIT(1)
->  
->  struct __attribute__ ((__packed__)) vmcb_seg {
->  	u16 selector;
-> diff --git a/arch/x86/include/uapi/asm/kvm_para.h b/arch/x86/include/uapi/asm/kvm_para.h
-> index 1421a65..bc2802f 100644
-> --- a/arch/x86/include/uapi/asm/kvm_para.h
-> +++ b/arch/x86/include/uapi/asm/kvm_para.h
-> @@ -24,6 +24,7 @@
->  #define KVM_FEATURE_STEAL_TIME		5
->  #define KVM_FEATURE_PV_EOI		6
->  #define KVM_FEATURE_PV_UNHALT		7
-> +#define KVM_FEATURE_SEV			8
+On 03/06/2017 03:20 PM, James Hogan wrote:
+> Hi Guenter,
+>
+> On Mon, Mar 06, 2017 at 11:13:55AM -0800, Guenter Roeck wrote:
+>> Since commit f3ac60671954 ("sched/headers: Move task-stack related
+>> APIs from <linux/sched.h> to <linux/sched/task_stack.h>") and commit
+>> f780d89a0e82 ("sched/headers: Remove <asm/ptrace.h> from
+>> <linux/sched.h>"), various mips builds fail as follows.
+>>
+>> arch/mips/kernel/smp-mt.c: In function ‘vsmp_boot_secondary’:
+>> arch/mips/include/asm/processor.h:384:41: error:
+>> 	implicit declaration of function ‘task_stack_page’
+>>
+>> In file included from
+>> 	/opt/buildbot/slave/hwmon-testing/build/arch/mips/kernel/pm.c:
+>> arch/mips/include/asm/fpu.h: In function '__own_fpu':
+>> arch/mips/include/asm/processor.h:385:31: error:
+>> 	invalid application of 'sizeof' to incomplete type 'struct pt_regs'
+>
+> This one is in an inline function, so I think it'd affect multiple
+> includes of <asm/fpu.h> even if __own_fpu isn't used, so I think the
+> following patch which adds the include ptrace.h in fpu.h is more robust
+> than adding to the individual c files affected:
+> https://patchwork.linux-mips.org/patch/15386/
+>
+Agreed.
 
-This looks like it needs documenting in Documentation/virtual/kvm/cpuid.txt
+> Admitedly it could probably have a more specific subject line since
+> there are more similar errors.
 
--- 
-Regards/Gruss,
-    Boris.
+Does that fix all compile problems ? Seems to me that we'll still need
 
-SUSE Linux GmbH, GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
--- 
+-#include <linux/sched.h>
++#include <linux/sched/task_stack.h>
 
---
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+or did you prepare a patch for this as well ?
+
+Thanks,
+Guenter
+
+>
+> Cheers
+> James
+>
+>>
+>> arch/mips/netlogic/common/smp.c: In function 'nlm_boot_secondary':
+>> arch/mips/netlogic/common/smp.c:157:2: error:
+>> 	implicit declaration of function 'task_stack_page'
+>>
+>> and more similar errors.
+>>
+>> Fixes: f3ac60671954 ("sched/headers: Move task-stack related APIs ...")
+>> Fixes: f780d89a0e82 ("sched/headers: Remove <asm/ptrace.h> from ...")
+>> Cc: Ingo Molnar <mingo@kernel.org>
+>> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+>> ---
+>> v3: Catch more build errors
+>>
+>>  arch/mips/cavium-octeon/cpu.c                  | 3 ++-
+>>  arch/mips/cavium-octeon/crypto/octeon-crypto.c | 1 +
+>>  arch/mips/cavium-octeon/smp.c                  | 2 +-
+>>  arch/mips/kernel/pm.c                          | 1 +
+>>  arch/mips/kernel/smp-mt.c                      | 2 +-
+>>  arch/mips/netlogic/common/smp.c                | 1 +
+>>  arch/mips/netlogic/xlp/cop2-ex.c               | 3 ++-
+>>  arch/mips/power/cpu.c                          | 1 +
+>>  8 files changed, 10 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/arch/mips/cavium-octeon/cpu.c b/arch/mips/cavium-octeon/cpu.c
+>> index a5b427909b5c..b826b7a87c57 100644
+>> --- a/arch/mips/cavium-octeon/cpu.c
+>> +++ b/arch/mips/cavium-octeon/cpu.c
+>> @@ -10,7 +10,8 @@
+>>  #include <linux/irqflags.h>
+>>  #include <linux/notifier.h>
+>>  #include <linux/prefetch.h>
+>> -#include <linux/sched.h>
+>> +#include <linux/ptrace.h>
+>> +#include <linux/sched/task_stack.h>
+>>
+>>  #include <asm/cop2.h>
+>>  #include <asm/current.h>
+>> diff --git a/arch/mips/cavium-octeon/crypto/octeon-crypto.c b/arch/mips/cavium-octeon/crypto/octeon-crypto.c
+>> index 4d22365844af..cfb4a146cf17 100644
+>> --- a/arch/mips/cavium-octeon/crypto/octeon-crypto.c
+>> +++ b/arch/mips/cavium-octeon/crypto/octeon-crypto.c
+>> @@ -9,6 +9,7 @@
+>>  #include <asm/cop2.h>
+>>  #include <linux/export.h>
+>>  #include <linux/interrupt.h>
+>> +#include <linux/sched/task_stack.h>
+>>
+>>  #include "octeon-crypto.h"
+>>
+>> diff --git a/arch/mips/cavium-octeon/smp.c b/arch/mips/cavium-octeon/smp.c
+>> index 4b94b7fbafa3..d475c0146347 100644
+>> --- a/arch/mips/cavium-octeon/smp.c
+>> +++ b/arch/mips/cavium-octeon/smp.c
+>> @@ -10,8 +10,8 @@
+>>  #include <linux/smp.h>
+>>  #include <linux/interrupt.h>
+>>  #include <linux/kernel_stat.h>
+>> -#include <linux/sched.h>
+>>  #include <linux/sched/hotplug.h>
+>> +#include <linux/sched/task_stack.h>
+>>  #include <linux/init.h>
+>>  #include <linux/export.h>
+>>
+>> diff --git a/arch/mips/kernel/pm.c b/arch/mips/kernel/pm.c
+>> index dc814892133c..fab05022ab39 100644
+>> --- a/arch/mips/kernel/pm.c
+>> +++ b/arch/mips/kernel/pm.c
+>> @@ -11,6 +11,7 @@
+>>
+>>  #include <linux/cpu_pm.h>
+>>  #include <linux/init.h>
+>> +#include <linux/ptrace.h>
+>>
+>>  #include <asm/dsp.h>
+>>  #include <asm/fpu.h>
+>> diff --git a/arch/mips/kernel/smp-mt.c b/arch/mips/kernel/smp-mt.c
+>> index e077ea3e11fb..effc1ed18954 100644
+>> --- a/arch/mips/kernel/smp-mt.c
+>> +++ b/arch/mips/kernel/smp-mt.c
+>> @@ -18,7 +18,7 @@
+>>   * Copyright (C) 2006 Ralf Baechle (ralf@linux-mips.org)
+>>   */
+>>  #include <linux/kernel.h>
+>> -#include <linux/sched.h>
+>> +#include <linux/sched/task_stack.h>
+>>  #include <linux/cpumask.h>
+>>  #include <linux/interrupt.h>
+>>  #include <linux/irqchip/mips-gic.h>
+>> diff --git a/arch/mips/netlogic/common/smp.c b/arch/mips/netlogic/common/smp.c
+>> index 10d86d54880a..9035558920c1 100644
+>> --- a/arch/mips/netlogic/common/smp.c
+>> +++ b/arch/mips/netlogic/common/smp.c
+>> @@ -37,6 +37,7 @@
+>>  #include <linux/init.h>
+>>  #include <linux/smp.h>
+>>  #include <linux/irq.h>
+>> +#include <linux/sched/task_stack.h>
+>>
+>>  #include <asm/mmu_context.h>
+>>
+>> diff --git a/arch/mips/netlogic/xlp/cop2-ex.c b/arch/mips/netlogic/xlp/cop2-ex.c
+>> index 52bc5de42005..d990b7fc84aa 100644
+>> --- a/arch/mips/netlogic/xlp/cop2-ex.c
+>> +++ b/arch/mips/netlogic/xlp/cop2-ex.c
+>> @@ -13,7 +13,8 @@
+>>  #include <linux/irqflags.h>
+>>  #include <linux/notifier.h>
+>>  #include <linux/prefetch.h>
+>> -#include <linux/sched.h>
+>> +#include <linux/ptrace.h>
+>> +#include <linux/sched/task_stack.h>
+>>
+>>  #include <asm/cop2.h>
+>>  #include <asm/current.h>
+>> diff --git a/arch/mips/power/cpu.c b/arch/mips/power/cpu.c
+>> index 2129e67723ff..6ecccc26bf7f 100644
+>> --- a/arch/mips/power/cpu.c
+>> +++ b/arch/mips/power/cpu.c
+>> @@ -7,6 +7,7 @@
+>>   * Author: Hu Hongbing <huhb@lemote.com>
+>>   *	   Wu Zhangjin <wuzhangjin@gmail.com>
+>>   */
+>> +#include <linux/ptrace.h>
+>>  #include <asm/sections.h>
+>>  #include <asm/fpu.h>
+>>  #include <asm/dsp.h>
+>> --
+>> 2.7.4
+>>
+>>
