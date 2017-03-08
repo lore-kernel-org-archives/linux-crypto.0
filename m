@@ -1,56 +1,41 @@
-From: Romain Perier <romain.perier@collabora.com>
-Subject: Re: [PATCH 0/4] hwrng: omap - fixes and improvements
-Date: Wed, 8 Mar 2017 09:37:17 +0100
-Message-ID: <bfada3f4-b8b6-16e3-ec65-79469a194b70@collabora.com>
-References: <1488896089-17586-1-git-send-email-thomas.petazzoni@free-electrons.com>
+From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Subject: Re: [PATCH 9/9] crypto: mediatek - add support to OFB mode and
+ CFB128 mode
+Date: Wed, 8 Mar 2017 18:48:40 +0800
+Message-ID: <20170308104840.GA5069@gondor.apana.org.au>
+References: <1487582822-30393-1-git-send-email-ryder.lee@mediatek.com>
+ <1487582822-30393-10-git-send-email-ryder.lee@mediatek.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Cc: linux-crypto@vger.kernel.org, Jason Cooper <jason@lakedaemon.net>,
-        Andrew Lunn <andrew@lunn.ch>,
-        Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-        Gregory Clement <gregory.clement@free-electrons.com>,
-        Nadav Haklai <nadavh@marvell.com>,
-        Hanna Hawa <hannah@marvell.com>,
-        Yehuda Yitschak <yehuday@marvell.com>
-To: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-        Deepak Saxena <dsaxena@plexity.net>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from bhuna.collabora.co.uk ([46.235.227.227]:33387 "EHLO
-        bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751840AbdCHKdC (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 8 Mar 2017 05:33:02 -0500
-In-Reply-To: <1488896089-17586-1-git-send-email-thomas.petazzoni@free-electrons.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: linux-mediatek-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Ryder Lee <ryder.lee-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>
+Return-path: <linux-mediatek-bounces+glpam-linux-mediatek=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <1487582822-30393-10-git-send-email-ryder.lee-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-mediatek>,
+ <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-mediatek/>
+List-Post: <mailto:linux-mediatek-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+List-Help: <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-mediatek>,
+ <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=subscribe>
+Sender: "Linux-mediatek" <linux-mediatek-bounces-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+Errors-To: linux-mediatek-bounces+glpam-linux-mediatek=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hello,
+On Mon, Feb 20, 2017 at 05:27:02PM +0800, Ryder Lee wrote:
+> This patch adds support to OFB mode and CFB128 mode.
+> 
+> Signed-off-by: Ryder Lee <ryder.lee-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>
 
+In general we do not add any algorithms that
 
-Le 07/03/2017 à 15:14, Thomas Petazzoni a écrit :
-> Hello,
->
-> This small patch series brings a few fixes and improvements to the
-> omap_rng driver. The first fix is particularly important, as it fixes
-> using the driver built as a module on SoCs that require a clock for
-> the IP to work properly.
->
-> Thanks,
->
-> Thomas
->
-> Thomas Petazzoni (4):
->   hwrng: omap - write registers after enabling the clock
->   hwrng: omap - use devm_clk_get() instead of of_clk_get()
->   hwrng: omap - Do not access INTMASK_REG on EIP76
->   hwrng: omap - move clock related code to omap_rng_probe()
->
->  drivers/char/hw_random/omap-rng.c | 36 +++++++++++++++++++++++++-----------
->  1 file changed, 25 insertions(+), 11 deletions(-)
+1) have no in-kernel users;
+2) and/or have no software implementations.
 
-For the whole series,
-
-Reviewed-by: Romain Perier <romain.perier@collabora.com>
+Thanks,
+-- 
+Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
