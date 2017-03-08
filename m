@@ -1,49 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: powerpc - Fix initialisation of crc32c context
-Date: Wed, 8 Mar 2017 16:47:10 +0800
-Message-ID: <20170308084710.GA4867@gondor.apana.org.au>
-References: <20170303065655.7317-1-dja@axtens.net>
+Subject: Re: [PATCH] crypto: s5p-sss - Fix completing crypto request in IRQ
+ handler
+Date: Wed, 8 Mar 2017 16:47:45 +0800
+Message-ID: <20170308084745.GA4883@gondor.apana.org.au>
+References: <20170305171407.839-1-krzk@kernel.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: dja@axtens.net, linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
- anton@samba.org
-To: Daniel Axtens <dja@axtens.net>
-Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+Cc: "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Nathan Royce <nroycea+kernel@gmail.com>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20170303065655.7317-1-dja@axtens.net>
-List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
-List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
-List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
-List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
-List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
-Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
-Sender: "Linuxppc-dev"
- <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+In-Reply-To: <20170305171407.839-1-krzk@kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Daniel Axtens <dja@axtens.net> wrote:
-> Turning on crypto self-tests on a POWER8 shows:
+On Sun, Mar 05, 2017 at 07:14:07PM +0200, Krzysztof Kozlowski wrote:
+> In a regular interrupt handler driver was finishing the crypt/decrypt
+> request by calling complete on crypto request.  This is disallowed since
+> converting to skcipher in commit b286d8b1a690 ("crypto: skcipher - Add
+> skcipher walk interface") and causes a warning:
+> 	WARNING: CPU: 0 PID: 0 at crypto/skcipher.c:430 skcipher_walk_first+0x13c/0x14c
 > 
->    alg: hash: Test 1 failed for crc32c-vpmsum
->    00000000: ff ff ff ff
+> The interrupt is marked shared but in fact there are no other users
+> sharing it.  Thus the simplest solution seems to be to just use a
+> threaded interrupt handler, after converting it to oneshot.
 > 
-> Comparing the code with the Intel CRC32c implementation on which
-> ours is based shows that we are doing an init with 0, not ~0
-> as CRC32c requires.
-> 
-> This probably wasn't caught because btrfs does its own weird
-> open-coded initialisation.
-> 
-> Initialise our internal context to ~0 on init.
-> 
-> This makes the self-tests pass, and btrfs continues to work.
-> 
-> Fixes: 6dd7a82cc54e ("crypto: powerpc - Add POWER8 optimised crc32c")
-> Cc: Anton Blanchard <anton@samba.org>
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Daniel Axtens <dja@axtens.net>
+> Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
 
 Patch applied.  Thanks.
 -- 
