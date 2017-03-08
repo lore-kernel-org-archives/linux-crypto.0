@@ -1,70 +1,56 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 5/8] crypto:chcr: Change cra_flags for cipher algos
-Date: Wed, 8 Mar 2017 18:21:08 +0800
-Message-ID: <20170308102108.GA5000@gondor.apana.org.au>
-References: <cover.1485501428.git.harsh@chelsio.com>
- <19591395286ea8addca8affa595eabd951fda7ff.1485501429.git.harsh@chelsio.com>
- <CAFXBA=mkKinfgLT0vRSXjyW7Lt0V-6o0ud3bdzLZjxqF1je+sg@mail.gmail.com>
+From: Romain Perier <romain.perier@collabora.com>
+Subject: Re: [PATCH 0/4] hwrng: omap - fixes and improvements
+Date: Wed, 8 Mar 2017 09:37:17 +0100
+Message-ID: <bfada3f4-b8b6-16e3-ec65-79469a194b70@collabora.com>
+References: <1488896089-17586-1-git-send-email-thomas.petazzoni@free-electrons.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Harsh Jain <harshjain.prof@gmail.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Cc: linux-crypto@vger.kernel.org, Jason Cooper <jason@lakedaemon.net>,
+        Andrew Lunn <andrew@lunn.ch>,
+        Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+        Gregory Clement <gregory.clement@free-electrons.com>,
+        Nadav Haklai <nadavh@marvell.com>,
+        Hanna Hawa <hannah@marvell.com>,
+        Yehuda Yitschak <yehuday@marvell.com>
+To: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+        Deepak Saxena <dsaxena@plexity.net>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:52309 "EHLO
-        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751750AbdCHKVn (ORCPT
+Received: from bhuna.collabora.co.uk ([46.235.227.227]:33387 "EHLO
+        bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751840AbdCHKdC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 8 Mar 2017 05:21:43 -0500
-Content-Disposition: inline
-In-Reply-To: <CAFXBA=mkKinfgLT0vRSXjyW7Lt0V-6o0ud3bdzLZjxqF1je+sg@mail.gmail.com>
+        Wed, 8 Mar 2017 05:33:02 -0500
+In-Reply-To: <1488896089-17586-1-git-send-email-thomas.petazzoni@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Mar 08, 2017 at 03:28:26PM +0530, Harsh Jain wrote:
+Hello,
+
+
+Le 07/03/2017 à 15:14, Thomas Petazzoni a écrit :
+> Hello,
 >
-> If I try above patch on 4.9.13 stable kernel. Kernel  stops executing
-> tests for cbc(aes), Same is working fine on cryptodev-2.6 latest tree.
-> It seems below patch set has changed the behavior.
-> 
-> 
-> crypto: testmgr - Do not test internal algorithms
-
-On older kernels each ablkcipher gets an geniv instantiated on top
-of it.  Therefore the ablkcipher itself is never tested, only the
-geniv is tested.
-
-We have since got rid of the geniv and now test the ablkcipher
-directly.
-
-There was a period where we didn't generate a geniv but I forgot
-to also remove the below chunk which skipped testing the ablkcipher.
-
-> diff --git a/crypto/algboss.c b/crypto/algboss.c
-> index 6e39d9c..ccb85e1 100644
-> --- a/crypto/algboss.c
-> +++ b/crypto/algboss.c
-> @@ -247,12 +247,8 @@ static int cryptomgr_schedule_test(struct crypto_alg *alg)
-> memcpy(param->alg, alg->cra_name, sizeof(param->alg));
-> type = alg->cra_flags;
-> - /* This piece of crap needs to disappear into per-type test hooks. */
-> - if (!((type ^ CRYPTO_ALG_TYPE_BLKCIPHER) &
-> - CRYPTO_ALG_TYPE_BLKCIPHER_MASK) && !(type & CRYPTO_ALG_GENIV) &&
-> - ((alg->cra_flags & CRYPTO_ALG_TYPE_MASK) ==
-> - CRYPTO_ALG_TYPE_BLKCIPHER ? alg->cra_blkcipher.ivsize :
-> - alg->cra_ablkcipher.ivsize))
-> + /* Do not test internal algorithms. */
-> + if (type & CRYPTO_ALG_INTERNAL)
-> type |= CRYPTO_ALG_TESTED;
+> This small patch series brings a few fixes and improvements to the
+> omap_rng driver. The first fix is particularly important, as it fixes
+> using the driver built as a module on SoCs that require a clock for
+> the IP to work properly.
 >
-> Its bit confusing for me. Are we supposed to declared it as
-> "CRYPTO_ALG_TYPE_BLKCIPHER" for older kernels.
+> Thanks,
+>
+> Thomas
+>
+> Thomas Petazzoni (4):
+>   hwrng: omap - write registers after enabling the clock
+>   hwrng: omap - use devm_clk_get() instead of of_clk_get()
+>   hwrng: omap - Do not access INTMASK_REG on EIP76
+>   hwrng: omap - move clock related code to omap_rng_probe()
+>
+>  drivers/char/hw_random/omap-rng.c | 36 +++++++++++++++++++++++++-----------
+>  1 file changed, 25 insertions(+), 11 deletions(-)
 
-It should definitely be ABLKCIPHER in your case.
+For the whole series,
 
-Even if the test is skipped your driver should still work.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Reviewed-by: Romain Perier <romain.perier@collabora.com>
