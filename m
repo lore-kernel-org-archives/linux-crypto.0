@@ -1,38 +1,54 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 0/2] Propagate fallback bit for cbc and ctr
-Date: Thu, 9 Mar 2017 18:47:52 +0800
-Message-ID: <20170309104752.GG7185@gondor.apana.org.au>
-References: <1488199106-16061-1-git-send-email-marcelo.cerri@canonical.com>
+Subject: Re: [PATCH v2 2/2] crypto: algapi - annotate expected branch
+ behavior in crypto_inc()
+Date: Thu, 9 Mar 2017 18:46:34 +0800
+Message-ID: <20170309104634.GC7185@gondor.apana.org.au>
+References: <1487109062-3419-1-git-send-email-ard.biesheuvel@linaro.org>
+ <1487109062-3419-2-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:55541 "EHLO
+        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S932845AbdCISS3 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 9 Mar 2017 13:18:29 -0500
 Content-Disposition: inline
-In-Reply-To: <1488199106-16061-1-git-send-email-marcelo.cerri@canonical.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1487109062-3419-2-git-send-email-ard.biesheuvel@linaro.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Feb 27, 2017 at 09:38:24AM -0300, Marcelo Henrique Cerri wrote:
-> Hi Hebert,
+On Tue, Feb 14, 2017 at 09:51:02PM +0000, Ard Biesheuvel wrote:
+> To prevent unnecessary branching, mark the exit condition of the
+> primary loop as likely(), given that a carry in a 32-bit counter
+> occurs very rarely.
 > 
-> For v2:
+> On arm64, the resulting code is emitted by GCC as
 > 
-> - fixed the memory leakage in cbc.
-> - included crypto/algapi.h in crypto/cbc.c for crypto_requires_off();
-> - ERR_CAST instead PTR_ERR in ctr.
-> - Also propagated the fallback bit for rfc3686.
+>      9a8:   cmp     w1, #0x3
+>      9ac:   add     x3, x0, w1, uxtw
+>      9b0:   b.ls    9e0 <crypto_inc+0x38>
+>      9b4:   ldr     w2, [x3,#-4]!
+>      9b8:   rev     w2, w2
+>      9bc:   add     w2, w2, #0x1
+>      9c0:   rev     w4, w2
+>      9c4:   str     w4, [x3]
+>      9c8:   cbz     w2, 9d0 <crypto_inc+0x28>
+>      9cc:   ret
 > 
-> Marcelo Henrique Cerri (2):
->   crypto: cbc - Propagate NEED_FALLBACK bit
->   crypto: ctr - Propagate NEED_FALLBACK bit
+> where the two remaining branch conditions (one for size < 4 and one for
+> the carry) are statically predicted as non-taken, resulting in optimal
+> execution in the vast majority of cases.
 > 
->  crypto/cbc.c | 15 +++++++++++++--
->  crypto/ctr.c | 23 ++++++++++++++++++-----
->  2 files changed, 31 insertions(+), 7 deletions(-)
+> Also, replace the open coded alignment test with IS_ALIGNED().
+> 
+> Cc: Jason A. Donenfeld <Jason@zx2c4.com>
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
