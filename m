@@ -1,8 +1,8 @@
 From: Ryder Lee <ryder.lee-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>
-Subject: [PATCH v1 6/8] crypto: mediatek - fix error handling in
- mtk_aes_complete()
-Date: Thu, 9 Mar 2017 10:11:17 +0800
-Message-ID: <1489025479-48036-7-git-send-email-ryder.lee@mediatek.com>
+Subject: [PATCH v1 2/8] crypto: mediatek - add MTK_* prefix and correct
+ annotations.
+Date: Thu, 9 Mar 2017 10:11:13 +0800
+Message-ID: <1489025479-48036-3-git-send-email-ryder.lee@mediatek.com>
 References: <1489025479-48036-1-git-send-email-ryder.lee@mediatek.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -23,133 +23,236 @@ Sender: "Linux-mediatek" <linux-mediatek-bounces-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7
 Errors-To: linux-mediatek-bounces+glpam-linux-mediatek=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch fixes how errors should be handled by mtk_aes_complete().
+Dummy patch to add MTK_* prefix to ring enum and fix incorrect annotations.
 
 Signed-off-by: Ryder Lee <ryder.lee-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>
 ---
- drivers/crypto/mediatek/mtk-aes.c | 39 +++++++++++++++++++++++----------------
- 1 file changed, 23 insertions(+), 16 deletions(-)
+ drivers/crypto/mediatek/mtk-aes.c      | 12 ++++++------
+ drivers/crypto/mediatek/mtk-platform.c | 12 ++++++------
+ drivers/crypto/mediatek/mtk-platform.h | 26 +++++++++++++-------------
+ drivers/crypto/mediatek/mtk-sha.c      | 14 +++++++-------
+ 4 files changed, 32 insertions(+), 32 deletions(-)
 
 diff --git a/drivers/crypto/mediatek/mtk-aes.c b/drivers/crypto/mediatek/mtk-aes.c
-index 140e9a3..6a0180d 100644
+index e67881f..b57b68f 100644
 --- a/drivers/crypto/mediatek/mtk-aes.c
 +++ b/drivers/crypto/mediatek/mtk-aes.c
-@@ -248,6 +248,17 @@ static inline void mtk_aes_restore_sg(const struct mtk_aes_dma *dma)
- 	sg->length += dma->remainder;
- }
+@@ -1152,8 +1152,8 @@ static int mtk_aes_record_init(struct mtk_cryp *cryp)
+ 	}
  
-+static inline int mtk_aes_complete(struct mtk_cryp *cryp,
-+				   struct mtk_aes_rec *aes,
-+				   int err)
-+{
-+	aes->flags &= ~AES_FLAGS_BUSY;
-+	aes->areq->complete(aes->areq, err);
-+	/* Handle new request */
-+	tasklet_schedule(&aes->queue_task);
-+	return err;
-+}
-+
- /*
-  * Write descriptors for processing. This will configure the engine, load
-  * the transform information and then start the packet processing.
-@@ -352,7 +363,7 @@ static int mtk_aes_map(struct mtk_cryp *cryp, struct mtk_aes_rec *aes)
- 	ctx->ct_dma = dma_map_single(cryp->dev, &ctx->ct, sizeof(ctx->ct),
- 				     DMA_TO_DEVICE);
- 	if (unlikely(dma_mapping_error(cryp->dev, ctx->ct_dma)))
--		return -EINVAL;
-+		goto exit;
+ 	/* Link to ring0 and ring1 respectively */
+-	aes[0]->id = RING0;
+-	aes[1]->id = RING1;
++	aes[0]->id = MTK_RING0;
++	aes[1]->id = MTK_RING1;
  
- 	ctx->tfm_dma = dma_map_single(cryp->dev, &ctx->tfm, sizeof(ctx->tfm),
- 				      DMA_TO_DEVICE);
-@@ -389,8 +400,8 @@ static int mtk_aes_map(struct mtk_cryp *cryp, struct mtk_aes_rec *aes)
- tfm_map_err:
- 	dma_unmap_single(cryp->dev, ctx->ct_dma, sizeof(ctx->ct),
- 			 DMA_TO_DEVICE);
--
--	return -EINVAL;
-+exit:
-+	return mtk_aes_complete(cryp, aes, -EINVAL);
- }
+ 	return 0;
  
- /* Initialize transform information of CBC/ECB/CTR mode */
-@@ -467,7 +478,7 @@ static int mtk_aes_dma(struct mtk_cryp *cryp, struct mtk_aes_rec *aes,
- 		padlen = mtk_aes_padlen(len);
+@@ -1221,14 +1221,14 @@ int mtk_cipher_alg_register(struct mtk_cryp *cryp)
+ 	if (ret)
+ 		goto err_record;
  
- 		if (len + padlen > AES_BUF_SIZE)
--			return -ENOMEM;
-+			return mtk_aes_complete(cryp, aes, -ENOMEM);
+-	ret = devm_request_irq(cryp->dev, cryp->irq[RING0], mtk_aes_irq,
++	ret = devm_request_irq(cryp->dev, cryp->irq[MTK_RING0], mtk_aes_irq,
+ 			       0, "mtk-aes", cryp->aes[0]);
+ 	if (ret) {
+ 		dev_err(cryp->dev, "unable to request AES irq.\n");
+ 		goto err_res;
+ 	}
  
- 		if (!src_aligned) {
- 			sg_copy_to_buffer(src, sg_nents(src), aes->buf, len);
-@@ -527,14 +538,10 @@ static int mtk_aes_handle_queue(struct mtk_cryp *cryp, u8 id,
- 	return ctx->start(cryp, aes);
- }
+-	ret = devm_request_irq(cryp->dev, cryp->irq[RING1], mtk_aes_irq,
++	ret = devm_request_irq(cryp->dev, cryp->irq[MTK_RING1], mtk_aes_irq,
+ 			       0, "mtk-aes", cryp->aes[1]);
+ 	if (ret) {
+ 		dev_err(cryp->dev, "unable to request AES irq.\n");
+@@ -1236,8 +1236,8 @@ int mtk_cipher_alg_register(struct mtk_cryp *cryp)
+ 	}
  
--static int mtk_aes_complete(struct mtk_cryp *cryp, struct mtk_aes_rec *aes)
-+static int mtk_aes_transfer_complete(struct mtk_cryp *cryp,
-+				     struct mtk_aes_rec *aes)
+ 	/* Enable ring0 and ring1 interrupt */
+-	mtk_aes_write(cryp, AIC_ENABLE_SET(RING0), MTK_IRQ_RDR0);
+-	mtk_aes_write(cryp, AIC_ENABLE_SET(RING1), MTK_IRQ_RDR1);
++	mtk_aes_write(cryp, AIC_ENABLE_SET(MTK_RING0), MTK_IRQ_RDR0);
++	mtk_aes_write(cryp, AIC_ENABLE_SET(MTK_RING1), MTK_IRQ_RDR1);
+ 
+ 	spin_lock(&mtk_aes.lock);
+ 	list_add_tail(&cryp->aes_list, &mtk_aes.dev_list);
+diff --git a/drivers/crypto/mediatek/mtk-platform.c b/drivers/crypto/mediatek/mtk-platform.c
+index a9c713d..50de335 100644
+--- a/drivers/crypto/mediatek/mtk-platform.c
++++ b/drivers/crypto/mediatek/mtk-platform.c
+@@ -334,7 +334,7 @@ static int mtk_packet_engine_setup(struct mtk_cryp *cryp)
+ 	/* Enable the 4 rings for the packet engines. */
+ 	mtk_desc_ring_link(cryp, 0xf);
+ 
+-	for (i = 0; i < RING_MAX; i++) {
++	for (i = 0; i < MTK_RING_MAX; i++) {
+ 		mtk_cmd_desc_ring_setup(cryp, i, &cap);
+ 		mtk_res_desc_ring_setup(cryp, i, &cap);
+ 	}
+@@ -359,7 +359,7 @@ static int mtk_aic_cap_check(struct mtk_cryp *cryp, int hw)
  {
--	aes->flags &= ~AES_FLAGS_BUSY;
--	aes->areq->complete(aes->areq, 0);
--
--	/* Handle new request */
--	tasklet_schedule(&aes->queue_task);
--	return 0;
-+	return mtk_aes_complete(cryp, aes, 0);
+ 	u32 val;
+ 
+-	if (hw == RING_MAX)
++	if (hw == MTK_RING_MAX)
+ 		val = readl(cryp->base + AIC_G_VERSION);
+ 	else
+ 		val = readl(cryp->base + AIC_VERSION(hw));
+@@ -368,7 +368,7 @@ static int mtk_aic_cap_check(struct mtk_cryp *cryp, int hw)
+ 	if (val != MTK_AIC_VER11 && val != MTK_AIC_VER12)
+ 		return -ENXIO;
+ 
+-	if (hw == RING_MAX)
++	if (hw == MTK_RING_MAX)
+ 		val = readl(cryp->base + AIC_G_OPTIONS);
+ 	else
+ 		val = readl(cryp->base + AIC_OPTIONS(hw));
+@@ -389,7 +389,7 @@ static int mtk_aic_init(struct mtk_cryp *cryp, int hw)
+ 		return err;
+ 
+ 	/* Disable all interrupts and set initial configuration */
+-	if (hw == RING_MAX) {
++	if (hw == MTK_RING_MAX) {
+ 		writel(0, cryp->base + AIC_G_ENABLE_CTRL);
+ 		writel(0, cryp->base + AIC_G_POL_CTRL);
+ 		writel(0, cryp->base + AIC_G_TYPE_CTRL);
+@@ -431,7 +431,7 @@ static void mtk_desc_dma_free(struct mtk_cryp *cryp)
+ {
+ 	int i;
+ 
+-	for (i = 0; i < RING_MAX; i++) {
++	for (i = 0; i < MTK_RING_MAX; i++) {
+ 		dma_free_coherent(cryp->dev, MTK_DESC_RING_SZ,
+ 				  cryp->ring[i]->res_base,
+ 				  cryp->ring[i]->res_dma);
+@@ -447,7 +447,7 @@ static int mtk_desc_ring_alloc(struct mtk_cryp *cryp)
+ 	struct mtk_ring **ring = cryp->ring;
+ 	int i, err = ENOMEM;
+ 
+-	for (i = 0; i < RING_MAX; i++) {
++	for (i = 0; i < MTK_RING_MAX; i++) {
+ 		ring[i] = kzalloc(sizeof(**ring), GFP_KERNEL);
+ 		if (!ring[i])
+ 			goto err_cleanup;
+diff --git a/drivers/crypto/mediatek/mtk-platform.h b/drivers/crypto/mediatek/mtk-platform.h
+index d2a1db6..3bbe9b0 100644
+--- a/drivers/crypto/mediatek/mtk-platform.h
++++ b/drivers/crypto/mediatek/mtk-platform.h
+@@ -38,14 +38,14 @@
+  * Ring 2/3 are used by SHA.
+  */
+ enum {
+-	RING0 = 0,
+-	RING1,
+-	RING2,
+-	RING3,
+-	RING_MAX,
++	MTK_RING0,
++	MTK_RING1,
++	MTK_RING2,
++	MTK_RING3,
++	MTK_RING_MAX
+ };
+ 
+-#define MTK_REC_NUM		(RING_MAX / 2)
++#define MTK_REC_NUM		(MTK_RING_MAX / 2)
+ #define MTK_IRQ_NUM		5
+ 
+ /**
+@@ -137,7 +137,7 @@ struct mtk_aes_dma {
+  * @resume:	pointer to resume function
+  * @total:	request buffer length
+  * @buf:	pointer to page buffer
+- * @id:		record identification
++ * @id:		the current use of ring
+  * @flags:	it's describing AES operation state
+  * @lock:	the async queue lock
+  *
+@@ -172,9 +172,9 @@ struct mtk_aes_rec {
+  * @queue:	crypto request queue
+  * @req:	pointer to ahash request
+  * @task:	the tasklet is use in SHA interrupt
+- * @id:		record identification
++ * @id:		the current use of ring
+  * @flags:	it's describing SHA operation state
+- * @lock:	the ablkcipher queue lock
++ * @lock:	the async queue lock
+  *
+  * Structure used to record SHA execution state.
+  */
+@@ -197,9 +197,9 @@ struct mtk_sha_rec {
+  * @clk_ethif:	pointer to ethif clock
+  * @clk_cryp:	pointer to crypto clock
+  * @irq:	global system and rings IRQ
+- * @ring:	pointer to execution state of AES
+- * @aes:	pointer to execution state of SHA
+- * @sha:	each execution record map to a ring
++ * @ring:	pointer to descriptor rings
++ * @aes:	pointer to operation record of AES
++ * @sha:	pointer to operation record of SHA
+  * @aes_list:	device list of AES
+  * @sha_list:	device list of SHA
+  * @tmp:	pointer to temporary buffer for internal use
+@@ -215,7 +215,7 @@ struct mtk_cryp {
+ 	struct clk *clk_cryp;
+ 	int irq[MTK_IRQ_NUM];
+ 
+-	struct mtk_ring *ring[RING_MAX];
++	struct mtk_ring *ring[MTK_RING_MAX];
+ 	struct mtk_aes_rec *aes[MTK_REC_NUM];
+ 	struct mtk_sha_rec *sha[MTK_REC_NUM];
+ 
+diff --git a/drivers/crypto/mediatek/mtk-sha.c b/drivers/crypto/mediatek/mtk-sha.c
+index 1fb98f6..b4f0c62 100644
+--- a/drivers/crypto/mediatek/mtk-sha.c
++++ b/drivers/crypto/mediatek/mtk-sha.c
+@@ -694,7 +694,7 @@ static void mtk_sha_finish_req(struct mtk_cryp *cryp,
+ 	sha->req->base.complete(&sha->req->base, err);
+ 
+ 	/* Handle new request */
+-	mtk_sha_handle_queue(cryp, sha->id - RING2, NULL);
++	mtk_sha_handle_queue(cryp, sha->id - MTK_RING2, NULL);
  }
  
- static int mtk_aes_start(struct mtk_cryp *cryp, struct mtk_aes_rec *aes)
-@@ -543,7 +550,7 @@ static int mtk_aes_start(struct mtk_cryp *cryp, struct mtk_aes_rec *aes)
- 	struct mtk_aes_reqctx *rctx = ablkcipher_request_ctx(req);
- 
- 	mtk_aes_set_mode(aes, rctx);
--	aes->resume = mtk_aes_complete;
-+	aes->resume = mtk_aes_transfer_complete;
- 
- 	return mtk_aes_dma(cryp, aes, req->src, req->dst, req->nbytes);
- }
-@@ -568,7 +575,7 @@ static int mtk_aes_ctr_transfer(struct mtk_cryp *cryp, struct mtk_aes_rec *aes)
- 	/* Check for transfer completion. */
- 	cctx->offset += aes->total;
- 	if (cctx->offset >= req->nbytes)
--		return mtk_aes_complete(cryp, aes);
-+		return mtk_aes_transfer_complete(cryp, aes);
- 
- 	/* Compute data length. */
- 	datalen = req->nbytes - cctx->offset;
-@@ -602,7 +609,6 @@ static int mtk_aes_ctr_transfer(struct mtk_cryp *cryp, struct mtk_aes_rec *aes)
- 		cctx->iv[3] = cpu_to_be32(ctr);
- 		crypto_inc((u8 *)cctx->iv, AES_BLOCK_SIZE);
+ static int mtk_sha_handle_queue(struct mtk_cryp *cryp, u8 id,
+@@ -1269,8 +1269,8 @@ static int mtk_sha_record_init(struct mtk_cryp *cryp)
  	}
--	aes->resume = mtk_aes_ctr_transfer;
  
- 	return mtk_aes_dma(cryp, aes, src, dst, datalen);
- }
-@@ -618,6 +624,7 @@ static int mtk_aes_ctr_start(struct mtk_cryp *cryp, struct mtk_aes_rec *aes)
- 	memcpy(cctx->iv, req->info, AES_BLOCK_SIZE);
- 	cctx->offset = 0;
- 	aes->total = 0;
-+	aes->resume = mtk_aes_ctr_transfer;
+ 	/* Link to ring2 and ring3 respectively */
+-	sha[0]->id = RING2;
+-	sha[1]->id = RING3;
++	sha[0]->id = MTK_RING2;
++	sha[1]->id = MTK_RING3;
  
- 	return mtk_aes_ctr_transfer(cryp, aes);
- }
-@@ -859,7 +866,7 @@ static int mtk_aes_gcm_dma(struct mtk_cryp *cryp, struct mtk_aes_rec *aes,
+ 	cryp->rec = 1;
  
- 	if (!src_aligned || !dst_aligned) {
- 		if (aes->total > AES_BUF_SIZE)
--			return -ENOMEM;
-+			return mtk_aes_complete(cryp, aes, -ENOMEM);
+@@ -1343,14 +1343,14 @@ int mtk_hash_alg_register(struct mtk_cryp *cryp)
+ 	if (err)
+ 		goto err_record;
  
- 		if (!src_aligned) {
- 			sg_copy_to_buffer(src, sg_nents(src), aes->buf, len);
-@@ -905,7 +912,7 @@ static int mtk_aes_gcm_start(struct mtk_cryp *cryp, struct mtk_aes_rec *aes)
- 		aes->total = len;
- 		gctx->textlen = req->cryptlen - gctx->authsize;
+-	err = devm_request_irq(cryp->dev, cryp->irq[RING2], mtk_sha_irq,
++	err = devm_request_irq(cryp->dev, cryp->irq[MTK_RING2], mtk_sha_irq,
+ 			       0, "mtk-sha", cryp->sha[0]);
+ 	if (err) {
+ 		dev_err(cryp->dev, "unable to request sha irq0.\n");
+ 		goto err_res;
  	}
--	aes->resume = mtk_aes_complete;
-+	aes->resume = mtk_aes_transfer_complete;
  
- 	return mtk_aes_gcm_dma(cryp, aes, req->src, req->dst, len);
- }
+-	err = devm_request_irq(cryp->dev, cryp->irq[RING3], mtk_sha_irq,
++	err = devm_request_irq(cryp->dev, cryp->irq[MTK_RING3], mtk_sha_irq,
+ 			       0, "mtk-sha", cryp->sha[1]);
+ 	if (err) {
+ 		dev_err(cryp->dev, "unable to request sha irq1.\n");
+@@ -1358,8 +1358,8 @@ int mtk_hash_alg_register(struct mtk_cryp *cryp)
+ 	}
+ 
+ 	/* Enable ring2 and ring3 interrupt for hash */
+-	mtk_sha_write(cryp, AIC_ENABLE_SET(RING2), MTK_IRQ_RDR2);
+-	mtk_sha_write(cryp, AIC_ENABLE_SET(RING3), MTK_IRQ_RDR3);
++	mtk_sha_write(cryp, AIC_ENABLE_SET(MTK_RING2), MTK_IRQ_RDR2);
++	mtk_sha_write(cryp, AIC_ENABLE_SET(MTK_RING3), MTK_IRQ_RDR3);
+ 
+ 	cryp->tmp = dma_alloc_coherent(cryp->dev, SHA_TMP_BUF_SIZE,
+ 					&cryp->tmp_dma, GFP_KERNEL);
 -- 
 1.9.1
