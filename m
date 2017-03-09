@@ -1,38 +1,37 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/4] crypto: gf128mul cleanups
-Date: Thu, 9 Mar 2017 18:46:09 +0800
-Message-ID: <20170309104609.GA7185@gondor.apana.org.au>
-References: <20170214214330.99845-1-ebiggers@google.com>
+Subject: Re: [PATCH 0/2] crypto: constify test vectors
+Date: Thu, 9 Mar 2017 18:47:38 +0800
+Message-ID: <20170309104738.GF7185@gondor.apana.org.au>
+References: <20170224234659.89423-1-ebiggers3@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org,
-        "David S . Miller" <davem@davemloft.net>
-To: Eric Biggers <ebiggers@google.com>
+        "David S . Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org, Eric Biggers <ebiggers@google.com>
+To: Eric Biggers <ebiggers3@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
 Received: from helcar.hengli.com.au ([209.40.204.226]:55541 "EHLO
         helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S932866AbdCISSo (ORCPT
+        with ESMTP id S932290AbdCISSW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 9 Mar 2017 13:18:44 -0500
+        Thu, 9 Mar 2017 13:18:22 -0500
 Content-Disposition: inline
-In-Reply-To: <20170214214330.99845-1-ebiggers@google.com>
+In-Reply-To: <20170224234659.89423-1-ebiggers3@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Feb 14, 2017 at 01:43:26PM -0800, Eric Biggers wrote:
-> This patchset makes a few cleanups to the generic GF(2^128) multiplication code
-> to make it slightly easier to understand and modify.  No functional changes are
-> intended.
+On Fri, Feb 24, 2017 at 03:46:57PM -0800, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
 > 
-> Eric Biggers (4):
->   crypto: gf128mul - fix some comments
->   crypto: gf128mul - remove xx() macro
->   crypto: gf128mul - rename the byte overflow tables
->   crypto: gf128mul - constify 4k and 64k multiplication tables
+> These two patches mark all the cryptographic test vectors as 'const'.
+> This has several potential advantages and moves a large amount of data
+> from .data to .rodata when the tests are enabled.  The second patch does
+> the real work; the first just prepares for it by updating a function to
+> take a const buffer argument.
 > 
->  crypto/gf128mul.c         | 86 +++++++++++++++++++++++++++--------------------
->  include/crypto/gf128mul.h | 32 +++++++++---------
->  2 files changed, 67 insertions(+), 51 deletions(-)
+> Eric Biggers (2):
+>   crypto: kpp - constify buffer passed to crypto_kpp_set_secret()
+>   crypto: testmgr - constify all test vectors
 
 All applied.  Thanks.
 -- 
