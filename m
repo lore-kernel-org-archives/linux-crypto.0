@@ -1,7 +1,7 @@
 From: Ryder Lee <ryder.lee-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>
-Subject: [PATCH v1 4/8] crypto: mediatek - simplify descriptor ring management
-Date: Thu, 9 Mar 2017 10:11:15 +0800
-Message-ID: <1489025479-48036-5-git-send-email-ryder.lee@mediatek.com>
+Subject: [PATCH v1 1/8] crypto: mediatek - rework interrupt handler
+Date: Thu, 9 Mar 2017 10:11:12 +0800
+Message-ID: <1489025479-48036-2-git-send-email-ryder.lee@mediatek.com>
 References: <1489025479-48036-1-git-send-email-ryder.lee@mediatek.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -22,181 +22,292 @@ Sender: "Linux-mediatek" <linux-mediatek-bounces-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7
 Errors-To: linux-mediatek-bounces+glpam-linux-mediatek=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch replaces cmd_pos/res_pos with pointer cmd_next/res_next.
-
-In old code, we must to add one to shift ring to the next segment, and
-then use this value to caculate current offset from ring base for each
-DMA operation. Now these pointers helps us to simplify flow, so we just
-need to move pointers and check the boundaries of ring.
+This patch removes redundant task that used to handle interrupt
+from ring manager, so that the same task/handler can be shared.
+It also uses aes->id and sha-id to distinguish interrupt sources.
 
 Signed-off-by: Ryder Lee <ryder.lee-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>
 ---
- drivers/crypto/mediatek/mtk-aes.c      | 14 ++++++++------
- drivers/crypto/mediatek/mtk-platform.c |  3 +++
- drivers/crypto/mediatek/mtk-platform.h |  8 ++++----
- drivers/crypto/mediatek/mtk-sha.c      | 35 ++++++++++++++++++----------------
- 4 files changed, 34 insertions(+), 26 deletions(-)
+ drivers/crypto/mediatek/mtk-aes.c      | 73 +++++++++++-----------------------
+ drivers/crypto/mediatek/mtk-platform.h |  4 ++
+ drivers/crypto/mediatek/mtk-sha.c      | 73 ++++++++++------------------------
+ 3 files changed, 49 insertions(+), 101 deletions(-)
 
 diff --git a/drivers/crypto/mediatek/mtk-aes.c b/drivers/crypto/mediatek/mtk-aes.c
-index b57b68f..21f3e59 100644
+index 3a47cdb..e67881f 100644
 --- a/drivers/crypto/mediatek/mtk-aes.c
 +++ b/drivers/crypto/mediatek/mtk-aes.c
-@@ -262,7 +262,7 @@ static int mtk_aes_xmit(struct mtk_cryp *cryp, struct mtk_aes_rec *aes)
- 
- 	/* Write command descriptors */
- 	for (nents = 0; nents < slen; ++nents, ssg = sg_next(ssg)) {
--		cmd = ring->cmd_base + ring->cmd_pos;
-+		cmd = ring->cmd_next;
- 		cmd->hdr = MTK_DESC_BUF_LEN(ssg->length);
- 		cmd->buf = cpu_to_le32(sg_dma_address(ssg));
- 
-@@ -274,22 +274,24 @@ static int mtk_aes_xmit(struct mtk_cryp *cryp, struct mtk_aes_rec *aes)
- 			cmd->tfm = cpu_to_le32(aes->ctx->tfm_dma);
- 		}
- 
--		if (++ring->cmd_pos == MTK_DESC_NUM)
--			ring->cmd_pos = 0;
-+		/* Shift ring buffer and check boundary */
-+		if (++ring->cmd_next == ring->cmd_base + MTK_DESC_NUM)
-+			ring->cmd_next = ring->cmd_base;
- 	}
- 	cmd->hdr |= MTK_DESC_LAST;
- 
- 	/* Prepare result descriptors */
- 	for (nents = 0; nents < dlen; ++nents, dsg = sg_next(dsg)) {
--		res = ring->res_base + ring->res_pos;
-+		res = ring->res_next;
- 		res->hdr = MTK_DESC_BUF_LEN(dsg->length);
- 		res->buf = cpu_to_le32(sg_dma_address(dsg));
- 
- 		if (nents == 0)
- 			res->hdr |= MTK_DESC_FIRST;
- 
--		if (++ring->res_pos == MTK_DESC_NUM)
--			ring->res_pos = 0;
-+		/* Shift ring buffer and check boundary */
-+		if (++ring->res_next == ring->res_base + MTK_DESC_NUM)
-+			ring->res_next = ring->res_base;
- 	}
- 	res->hdr |= MTK_DESC_LAST;
- 
-diff --git a/drivers/crypto/mediatek/mtk-platform.c b/drivers/crypto/mediatek/mtk-platform.c
-index 50de335..b6ecc28 100644
---- a/drivers/crypto/mediatek/mtk-platform.c
-+++ b/drivers/crypto/mediatek/mtk-platform.c
-@@ -465,6 +465,9 @@ static int mtk_desc_ring_alloc(struct mtk_cryp *cryp)
- 					   GFP_KERNEL);
- 		if (!ring[i]->res_base)
- 			goto err_cleanup;
-+
-+		ring[i]->cmd_next = ring[i]->cmd_base;
-+		ring[i]->res_next = ring[i]->res_base;
- 	}
- 	return 0;
- 
-diff --git a/drivers/crypto/mediatek/mtk-platform.h b/drivers/crypto/mediatek/mtk-platform.h
-index 78ce54e..218e30d 100644
---- a/drivers/crypto/mediatek/mtk-platform.h
-+++ b/drivers/crypto/mediatek/mtk-platform.h
-@@ -84,11 +84,11 @@ struct mtk_desc {
- /**
-  * struct mtk_ring - Descriptor ring
-  * @cmd_base:	pointer to command descriptor ring base
-+ * @cmd_next:	pointer to the next command descriptor
-  * @cmd_dma:	DMA address of command descriptor ring
-- * @cmd_pos:	current position in the command descriptor ring
-  * @res_base:	pointer to result descriptor ring base
-+ * @res_next:	pointer to the next result descriptor
-  * @res_dma:	DMA address of result descriptor ring
-- * @res_pos:	current position in the result descriptor ring
-  *
-  * A descriptor ring is a circular buffer that is used to manage
-  * one or more descriptors. There are two type of descriptor rings;
-@@ -96,11 +96,11 @@ struct mtk_desc {
-  */
- struct mtk_ring {
- 	struct mtk_desc *cmd_base;
-+	struct mtk_desc *cmd_next;
- 	dma_addr_t cmd_dma;
--	u32 cmd_pos;
- 	struct mtk_desc *res_base;
-+	struct mtk_desc *res_next;
- 	dma_addr_t res_dma;
--	u32 res_pos;
+@@ -1092,55 +1092,26 @@ static void mtk_aes_gcm_exit(struct crypto_aead *aead)
+ 	},
  };
  
- /**
-diff --git a/drivers/crypto/mediatek/mtk-sha.c b/drivers/crypto/mediatek/mtk-sha.c
-index ef6fb20..0884d62 100644
---- a/drivers/crypto/mediatek/mtk-sha.c
-+++ b/drivers/crypto/mediatek/mtk-sha.c
-@@ -152,6 +152,21 @@ static inline void mtk_sha_write(struct mtk_cryp *cryp,
- 	writel_relaxed(value, cryp->base + offset);
+-static void mtk_aes_enc_task(unsigned long data)
++static void mtk_aes_done_task(unsigned long data)
+ {
+-	struct mtk_cryp *cryp = (struct mtk_cryp *)data;
+-	struct mtk_aes_rec *aes = cryp->aes[0];
++	struct mtk_aes_rec *aes = (struct mtk_aes_rec *)data;
++	struct mtk_cryp *cryp = aes->cryp;
+ 
+ 	mtk_aes_unmap(cryp, aes);
+ 	aes->resume(cryp, aes);
  }
  
-+static inline void mtk_sha_ring_shift(struct mtk_ring *ring,
-+				      struct mtk_desc **cmd_curr,
-+				      struct mtk_desc **res_curr,
-+				      int *count)
-+{
-+	*cmd_curr = ring->cmd_next++;
-+	*res_curr = ring->res_next++;
-+	(*count)++;
-+
-+	if (ring->cmd_next == ring->cmd_base + MTK_DESC_NUM) {
-+		ring->cmd_next = ring->cmd_base;
-+		ring->res_next = ring->res_base;
-+	}
-+}
-+
- static struct mtk_cryp *mtk_sha_find_dev(struct mtk_sha_ctx *tctx)
+-static void mtk_aes_dec_task(unsigned long data)
++static irqreturn_t mtk_aes_irq(int irq, void *dev_id)
  {
- 	struct mtk_cryp *cryp = NULL;
-@@ -426,8 +441,7 @@ static int mtk_sha_xmit(struct mtk_cryp *cryp, struct mtk_sha_rec *sha,
- {
- 	struct mtk_sha_reqctx *ctx = ahash_request_ctx(sha->req);
- 	struct mtk_ring *ring = cryp->ring[sha->id];
--	struct mtk_desc *cmd = ring->cmd_base + ring->cmd_pos;
--	struct mtk_desc *res = ring->res_base + ring->res_pos;
-+	struct mtk_desc *cmd, *res;
- 	int err, count = 0;
+-	struct mtk_cryp *cryp = (struct mtk_cryp *)data;
+-	struct mtk_aes_rec *aes = cryp->aes[1];
++	struct mtk_aes_rec *aes  = (struct mtk_aes_rec *)dev_id;
++	struct mtk_cryp *cryp = aes->cryp;
++	u32 val = mtk_aes_read(cryp, RDR_STAT(aes->id));
  
- 	err = mtk_sha_info_update(cryp, sha, len1, len2);
-@@ -435,6 +449,8 @@ static int mtk_sha_xmit(struct mtk_cryp *cryp, struct mtk_sha_rec *sha,
- 		return err;
+-	mtk_aes_unmap(cryp, aes);
+-	aes->resume(cryp, aes);
+-}
+-
+-static irqreturn_t mtk_aes_enc_irq(int irq, void *dev_id)
+-{
+-	struct mtk_cryp *cryp = (struct mtk_cryp *)dev_id;
+-	struct mtk_aes_rec *aes = cryp->aes[0];
+-	u32 val = mtk_aes_read(cryp, RDR_STAT(RING0));
+-
+-	mtk_aes_write(cryp, RDR_STAT(RING0), val);
+-
+-	if (likely(AES_FLAGS_BUSY & aes->flags)) {
+-		mtk_aes_write(cryp, RDR_PROC_COUNT(RING0), MTK_CNT_RST);
+-		mtk_aes_write(cryp, RDR_THRESH(RING0),
+-			      MTK_RDR_PROC_THRESH | MTK_RDR_PROC_MODE);
+-
+-		tasklet_schedule(&aes->task);
+-	} else {
+-		dev_warn(cryp->dev, "AES interrupt when no active requests.\n");
+-	}
+-	return IRQ_HANDLED;
+-}
+-
+-static irqreturn_t mtk_aes_dec_irq(int irq, void *dev_id)
+-{
+-	struct mtk_cryp *cryp = (struct mtk_cryp *)dev_id;
+-	struct mtk_aes_rec *aes = cryp->aes[1];
+-	u32 val = mtk_aes_read(cryp, RDR_STAT(RING1));
+-
+-	mtk_aes_write(cryp, RDR_STAT(RING1), val);
++	mtk_aes_write(cryp, RDR_STAT(aes->id), val);
  
- 	/* Fill in the command/result descriptors */
-+	mtk_sha_ring_shift(ring, &cmd, &res, &count);
+ 	if (likely(AES_FLAGS_BUSY & aes->flags)) {
+-		mtk_aes_write(cryp, RDR_PROC_COUNT(RING1), MTK_CNT_RST);
+-		mtk_aes_write(cryp, RDR_THRESH(RING1),
++		mtk_aes_write(cryp, RDR_PROC_COUNT(aes->id), MTK_CNT_RST);
++		mtk_aes_write(cryp, RDR_THRESH(aes->id),
+ 			      MTK_RDR_PROC_THRESH | MTK_RDR_PROC_MODE);
+ 
+ 		tasklet_schedule(&aes->task);
+@@ -1171,14 +1142,18 @@ static int mtk_aes_record_init(struct mtk_cryp *cryp)
+ 		if (!aes[i]->buf)
+ 			goto err_cleanup;
+ 
+-		aes[i]->id = i;
++		aes[i]->cryp = cryp;
+ 
+ 		spin_lock_init(&aes[i]->lock);
+ 		crypto_init_queue(&aes[i]->queue, AES_QUEUE_SIZE);
 +
- 	res->hdr = MTK_DESC_FIRST | MTK_DESC_BUF_LEN(len1);
- 	cmd->hdr = MTK_DESC_FIRST | MTK_DESC_BUF_LEN(len1) |
- 		   MTK_DESC_CT_LEN(ctx->ct_size);
-@@ -443,25 +459,12 @@ static int mtk_sha_xmit(struct mtk_cryp *cryp, struct mtk_sha_rec *sha,
- 	cmd->ct_hdr = ctx->ct_hdr;
- 	cmd->tfm = cpu_to_le32(ctx->tfm_dma);
- 
--	if (++ring->cmd_pos == MTK_DESC_NUM)
--		ring->cmd_pos = 0;
--
--	ring->res_pos = ring->cmd_pos;
--	count++;
--
- 	if (len2) {
--		cmd = ring->cmd_base + ring->cmd_pos;
--		res = ring->res_base + ring->res_pos;
-+		mtk_sha_ring_shift(ring, &cmd, &res, &count);
- 
- 		res->hdr = MTK_DESC_BUF_LEN(len2);
- 		cmd->hdr = MTK_DESC_BUF_LEN(len2);
- 		cmd->buf = cpu_to_le32(addr2);
--
--		if (++ring->cmd_pos == MTK_DESC_NUM)
--			ring->cmd_pos = 0;
--
--		ring->res_pos = ring->cmd_pos;
--		count++;
++		tasklet_init(&aes[i]->task, mtk_aes_done_task,
++			     (unsigned long)aes[i]);
  	}
  
- 	cmd->hdr |= MTK_DESC_LAST;
+-	tasklet_init(&aes[0]->task, mtk_aes_enc_task, (unsigned long)cryp);
+-	tasklet_init(&aes[1]->task, mtk_aes_dec_task, (unsigned long)cryp);
++	/* Link to ring0 and ring1 respectively */
++	aes[0]->id = RING0;
++	aes[1]->id = RING1;
+ 
+ 	return 0;
+ 
+@@ -1246,19 +1221,17 @@ int mtk_cipher_alg_register(struct mtk_cryp *cryp)
+ 	if (ret)
+ 		goto err_record;
+ 
+-	/* Ring0 is use by encryption record */
+-	ret = devm_request_irq(cryp->dev, cryp->irq[RING0], mtk_aes_enc_irq,
+-			       IRQF_TRIGGER_LOW, "mtk-aes", cryp);
++	ret = devm_request_irq(cryp->dev, cryp->irq[RING0], mtk_aes_irq,
++			       0, "mtk-aes", cryp->aes[0]);
+ 	if (ret) {
+-		dev_err(cryp->dev, "unable to request AES encryption irq.\n");
++		dev_err(cryp->dev, "unable to request AES irq.\n");
+ 		goto err_res;
+ 	}
+ 
+-	/* Ring1 is use by decryption record */
+-	ret = devm_request_irq(cryp->dev, cryp->irq[RING1], mtk_aes_dec_irq,
+-			       IRQF_TRIGGER_LOW, "mtk-aes", cryp);
++	ret = devm_request_irq(cryp->dev, cryp->irq[RING1], mtk_aes_irq,
++			       0, "mtk-aes", cryp->aes[1]);
+ 	if (ret) {
+-		dev_err(cryp->dev, "unable to request AES decryption irq.\n");
++		dev_err(cryp->dev, "unable to request AES irq.\n");
+ 		goto err_res;
+ 	}
+ 
+diff --git a/drivers/crypto/mediatek/mtk-platform.h b/drivers/crypto/mediatek/mtk-platform.h
+index ed6d871..d2a1db6 100644
+--- a/drivers/crypto/mediatek/mtk-platform.h
++++ b/drivers/crypto/mediatek/mtk-platform.h
+@@ -125,6 +125,7 @@ struct mtk_aes_dma {
+ 
+ /**
+  * struct mtk_aes_rec - AES operation record
++ * @cryp:	pointer to Cryptographic device
+  * @queue:	crypto request queue
+  * @areq:	pointer to async request
+  * @task:	the tasklet is use in AES interrupt
+@@ -143,6 +144,7 @@ struct mtk_aes_dma {
+  * Structure used to record AES execution state.
+  */
+ struct mtk_aes_rec {
++	struct mtk_cryp *cryp;
+ 	struct crypto_queue queue;
+ 	struct crypto_async_request *areq;
+ 	struct tasklet_struct task;
+@@ -166,6 +168,7 @@ struct mtk_aes_rec {
+ 
+ /**
+  * struct mtk_sha_rec - SHA operation record
++ * @cryp:	pointer to Cryptographic device
+  * @queue:	crypto request queue
+  * @req:	pointer to ahash request
+  * @task:	the tasklet is use in SHA interrupt
+@@ -176,6 +179,7 @@ struct mtk_aes_rec {
+  * Structure used to record SHA execution state.
+  */
+ struct mtk_sha_rec {
++	struct mtk_cryp *cryp;
+ 	struct crypto_queue queue;
+ 	struct ahash_request *req;
+ 	struct tasklet_struct task;
+diff --git a/drivers/crypto/mediatek/mtk-sha.c b/drivers/crypto/mediatek/mtk-sha.c
+index 55e3805..1fb98f6 100644
+--- a/drivers/crypto/mediatek/mtk-sha.c
++++ b/drivers/crypto/mediatek/mtk-sha.c
+@@ -1216,60 +1216,31 @@ static void mtk_sha_cra_exit(struct crypto_tfm *tfm)
+ },
+ };
+ 
+-static void mtk_sha_task0(unsigned long data)
++static void mtk_sha_done_task(unsigned long data)
+ {
+-	struct mtk_cryp *cryp = (struct mtk_cryp *)data;
+-	struct mtk_sha_rec *sha = cryp->sha[0];
++	struct mtk_sha_rec *sha = (struct mtk_sha_rec *)data;
++	struct mtk_cryp *cryp = sha->cryp;
+ 
+ 	mtk_sha_unmap(cryp, sha);
+ 	mtk_sha_complete(cryp, sha);
+ }
+ 
+-static void mtk_sha_task1(unsigned long data)
++static irqreturn_t mtk_sha_irq(int irq, void *dev_id)
+ {
+-	struct mtk_cryp *cryp = (struct mtk_cryp *)data;
+-	struct mtk_sha_rec *sha = cryp->sha[1];
++	struct mtk_sha_rec *sha = (struct mtk_sha_rec *)dev_id;
++	struct mtk_cryp *cryp = sha->cryp;
++	u32 val = mtk_sha_read(cryp, RDR_STAT(sha->id));
+ 
+-	mtk_sha_unmap(cryp, sha);
+-	mtk_sha_complete(cryp, sha);
+-}
+-
+-static irqreturn_t mtk_sha_ring2_irq(int irq, void *dev_id)
+-{
+-	struct mtk_cryp *cryp = (struct mtk_cryp *)dev_id;
+-	struct mtk_sha_rec *sha = cryp->sha[0];
+-	u32 val = mtk_sha_read(cryp, RDR_STAT(RING2));
+-
+-	mtk_sha_write(cryp, RDR_STAT(RING2), val);
++	mtk_sha_write(cryp, RDR_STAT(sha->id), val);
+ 
+ 	if (likely((SHA_FLAGS_BUSY & sha->flags))) {
+-		mtk_sha_write(cryp, RDR_PROC_COUNT(RING2), MTK_CNT_RST);
+-		mtk_sha_write(cryp, RDR_THRESH(RING2),
++		mtk_sha_write(cryp, RDR_PROC_COUNT(sha->id), MTK_CNT_RST);
++		mtk_sha_write(cryp, RDR_THRESH(sha->id),
+ 			      MTK_RDR_PROC_THRESH | MTK_RDR_PROC_MODE);
+ 
+ 		tasklet_schedule(&sha->task);
+ 	} else {
+-		dev_warn(cryp->dev, "AES interrupt when no active requests.\n");
+-	}
+-	return IRQ_HANDLED;
+-}
+-
+-static irqreturn_t mtk_sha_ring3_irq(int irq, void *dev_id)
+-{
+-	struct mtk_cryp *cryp = (struct mtk_cryp *)dev_id;
+-	struct mtk_sha_rec *sha = cryp->sha[1];
+-	u32 val = mtk_sha_read(cryp, RDR_STAT(RING3));
+-
+-	mtk_sha_write(cryp, RDR_STAT(RING3), val);
+-
+-	if (likely((SHA_FLAGS_BUSY & sha->flags))) {
+-		mtk_sha_write(cryp, RDR_PROC_COUNT(RING3), MTK_CNT_RST);
+-		mtk_sha_write(cryp, RDR_THRESH(RING3),
+-			      MTK_RDR_PROC_THRESH | MTK_RDR_PROC_MODE);
+-
+-		tasklet_schedule(&sha->task);
+-	} else {
+-		dev_warn(cryp->dev, "AES interrupt when no active requests.\n");
++		dev_warn(cryp->dev, "SHA interrupt when no active requests.\n");
+ 	}
+ 	return IRQ_HANDLED;
+ }
+@@ -1288,14 +1259,18 @@ static int mtk_sha_record_init(struct mtk_cryp *cryp)
+ 		if (!sha[i])
+ 			goto err_cleanup;
+ 
+-		sha[i]->id = i + RING2;
++		sha[i]->cryp = cryp;
+ 
+ 		spin_lock_init(&sha[i]->lock);
+ 		crypto_init_queue(&sha[i]->queue, SHA_QUEUE_SIZE);
++
++		tasklet_init(&sha[i]->task, mtk_sha_done_task,
++			     (unsigned long)sha[i]);
+ 	}
+ 
+-	tasklet_init(&sha[0]->task, mtk_sha_task0, (unsigned long)cryp);
+-	tasklet_init(&sha[1]->task, mtk_sha_task1, (unsigned long)cryp);
++	/* Link to ring2 and ring3 respectively */
++	sha[0]->id = RING2;
++	sha[1]->id = RING3;
+ 
+ 	cryp->rec = 1;
+ 
+@@ -1368,19 +1343,15 @@ int mtk_hash_alg_register(struct mtk_cryp *cryp)
+ 	if (err)
+ 		goto err_record;
+ 
+-	/* Ring2 is use by SHA record0 */
+-	err = devm_request_irq(cryp->dev, cryp->irq[RING2],
+-			       mtk_sha_ring2_irq, IRQF_TRIGGER_LOW,
+-			       "mtk-sha", cryp);
++	err = devm_request_irq(cryp->dev, cryp->irq[RING2], mtk_sha_irq,
++			       0, "mtk-sha", cryp->sha[0]);
+ 	if (err) {
+ 		dev_err(cryp->dev, "unable to request sha irq0.\n");
+ 		goto err_res;
+ 	}
+ 
+-	/* Ring3 is use by SHA record1 */
+-	err = devm_request_irq(cryp->dev, cryp->irq[RING3],
+-			       mtk_sha_ring3_irq, IRQF_TRIGGER_LOW,
+-			       "mtk-sha", cryp);
++	err = devm_request_irq(cryp->dev, cryp->irq[RING3], mtk_sha_irq,
++			       0, "mtk-sha", cryp->sha[1]);
+ 	if (err) {
+ 		dev_err(cryp->dev, "unable to request sha irq1.\n");
+ 		goto err_res;
 -- 
 1.9.1
