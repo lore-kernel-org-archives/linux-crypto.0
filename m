@@ -1,85 +1,31 @@
-From: Borislav Petkov <bp@suse.de>
-Subject: Re: [RFC PATCH v2 12/32] x86: Add early boot support when running
- with SEV active
-Date: Thu, 9 Mar 2017 17:29:42 +0100
-Message-ID: <20170309162942.jwtb3l33632zhbaz@pd.tnic>
-References: <148846752022.2349.13667498174822419498.stgit@brijesh-build-machine>
- <148846768878.2349.15757532025749214650.stgit@brijesh-build-machine>
- <20170309140748.tg67yo2jmc5ahck3@pd.tnic>
- <5d62b16f-16ef-1bd7-1551-f0c4c43573f4@redhat.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: brcm: fix spelling mistake: "genereate" ->
+ "generate"
+Date: Thu, 9 Mar 2017 18:47:27 +0800
+Message-ID: <20170309104727.GE7185@gondor.apana.org.au>
+References: <20170222235138.8531-1-colin.king@canonical.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: Brijesh Singh <brijesh.singh@amd.com>, simon.guinot@sequanux.org,
-	linux-efi@vger.kernel.org, kvm@vger.kernel.org, rkrcmar@redhat.com,
-	matt@codeblueprint.co.uk, linux-pci@vger.kernel.org,
-	linus.walleij@linaro.org, gary.hook@amd.com, linux-mm@kvack.org,
-	paul.gortmaker@windriver.com, hpa@zytor.com, cl@linux.com,
-	dan.j.williams@intel.com, aarcange@redhat.com, sfr@canb.auug.org.au,
-	andriy.shevchenko@linux.intel.com, herbert@gondor.apana.org.au,
-	bhe@redhat.com, xemul@parallels.com, joro@8bytes.org,
-	x86@kernel.org, peterz@infradead.org, piotr.luc@intel.com,
-	mingo@redhat.com, msalter@redhat.com, ross.zwisler@linux.intel.com,
-	dyoung@redhat.com, thomas.lendacky@amd.com, jroedel@suse.de,
-	keescook@chromium.org, arnd@arndb.de, toshi.kani@hpe.com,
-	mathieu.desnoyers@efficios.com, luto@kernel.org,
-	devel@linuxdriverproject.org, bhelgaas@google.com,
-	tglx@linutronix.de, mchehab@kernel.org
-To: Paolo Bonzini <pbonzini@redhat.com>
-Return-path: <owner-linux-mm@kvack.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: "David S . Miller" <davem@davemloft.net>,
+        Rob Rice <rob.rice@broadcom.com>,
+        Steve Lin <steven.lin1@broadcom.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Colin King <colin.king@canonical.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <5d62b16f-16ef-1bd7-1551-f0c4c43573f4@redhat.com>
-Sender: owner-linux-mm@kvack.org
+In-Reply-To: <20170222235138.8531-1-colin.king@canonical.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Mar 09, 2017 at 05:13:33PM +0100, Paolo Bonzini wrote:
-> This is not how you check if running under a hypervisor; you should
-> check the HYPERVISOR bit, i.e. bit 31 of cpuid(1).ecx.  This in turn
-> tells you if leaf 0x40000000 is valid.
-
-Ah, good point, I already do that in the microcode loader :)
-
-        /*
-         * CPUID(1).ECX[31]: reserved for hypervisor use. This is still not
-         * completely accurate as xen pv guests don't see that CPUID bit set but
-         * that's good enough as they don't land on the BSP path anyway.
-         */
-        if (native_cpuid_ecx(1) & BIT(31))
-                return *res;
-
-> That said, the main issue with this function is that it hardcodes the
-> behavior for KVM.  It is possible that another hypervisor defines its
-> 0x40000001 leaf in such a way that KVM_FEATURE_SEV has a different meaning.
+On Wed, Feb 22, 2017 at 11:51:38PM +0000, Colin King wrote:
+> From: Colin Ian King <colin.king@canonical.com>
 > 
-> Instead, AMD should define a "well-known" bit in its own space (i.e.
-> 0x800000xx) that is only used by hypervisors that support SEV.  This is
-> similar to how Intel defined one bit in leaf 1 to say "is leaf
-> 0x40000000 valid".
+> trivial fix to spelling mistake in pr_err message
 > 
-> > +	if (eax > 0x40000000) {
-> > +		eax = 0x40000001;
-> > +		ecx = 0;
-> > +		native_cpuid(&eax, &ebx, &ecx, &edx);
-> > +		if (!(eax & BIT(KVM_FEATURE_SEV)))
-> > +			goto out;
-> > +
-> > +		eax = 0x8000001f;
-> > +		ecx = 0;
-> > +		native_cpuid(&eax, &ebx, &ecx, &edx);
-> > +		if (!(eax & 1))
+> Signed-off-by: Colin Ian King <colin.king@canonical.com>
 
-Right, so this is testing CPUID_0x8000001f_ECX(0)[0], SME. Why not
-simply set that bit for the guest too, in kvm?
-
+Patch applied.  Thanks.
 -- 
-Regards/Gruss,
-    Boris.
-
-SUSE Linux GmbH, GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
--- 
-
---
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
