@@ -1,47 +1,40 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 1/2] crypto: arm/aes-neonbs - resolve fallback cipher
- at runtime
-Date: Thu, 9 Mar 2017 18:46:26 +0800
-Message-ID: <20170309104626.GB7185@gondor.apana.org.au>
-References: <1487109062-3419-1-git-send-email-ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH 0/4] crypto: gf128mul cleanups
+Date: Thu, 9 Mar 2017 18:46:09 +0800
+Message-ID: <20170309104609.GA7185@gondor.apana.org.au>
+References: <20170214214330.99845-1-ebiggers@google.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: linux-crypto@vger.kernel.org,
+        "David S . Miller" <davem@davemloft.net>
+To: Eric Biggers <ebiggers@google.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
 Received: from helcar.hengli.com.au ([209.40.204.226]:55541 "EHLO
         helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S932920AbdCISSh (ORCPT
+        with ESMTP id S932866AbdCISSo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 9 Mar 2017 13:18:37 -0500
+        Thu, 9 Mar 2017 13:18:44 -0500
 Content-Disposition: inline
-In-Reply-To: <1487109062-3419-1-git-send-email-ard.biesheuvel@linaro.org>
+In-Reply-To: <20170214214330.99845-1-ebiggers@google.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Feb 14, 2017 at 09:51:01PM +0000, Ard Biesheuvel wrote:
-> Currently, the bit sliced NEON AES code for ARM has a link time
-> dependency on the scalar ARM asm implementation, which it uses as a
-> fallback to perform CBC encryption and the encryption of the initial
-> XTS tweak.
+On Tue, Feb 14, 2017 at 01:43:26PM -0800, Eric Biggers wrote:
+> This patchset makes a few cleanups to the generic GF(2^128) multiplication code
+> to make it slightly easier to understand and modify.  No functional changes are
+> intended.
 > 
-> The bit sliced NEON code is both fast and time invariant, which makes
-> it a reasonable default on hardware that supports it. However, the
-> ARM asm code it pulls in is not time invariant, and due to the way it
-> is linked in, cannot be overridden by the new generic time invariant
-> driver. In fact, it will not be used at all, given that the ARM asm
-> code registers itself as a cipher with a priority that exceeds the
-> priority of the fixed time cipher.
+> Eric Biggers (4):
+>   crypto: gf128mul - fix some comments
+>   crypto: gf128mul - remove xx() macro
+>   crypto: gf128mul - rename the byte overflow tables
+>   crypto: gf128mul - constify 4k and 64k multiplication tables
 > 
-> So remove the link time dependency, and allocate the fallback cipher
-> via the crypto API. Note that this requires this driver's module_init
-> call to be replaced with late_initcall, so that the (possibly generic)
-> fallback cipher is guaranteed to be available when the builtin test
-> is performed at registration time.
-> 
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+>  crypto/gf128mul.c         | 86 +++++++++++++++++++++++++++--------------------
+>  include/crypto/gf128mul.h | 32 +++++++++---------
+>  2 files changed, 67 insertions(+), 51 deletions(-)
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
