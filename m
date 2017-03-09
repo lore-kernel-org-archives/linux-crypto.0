@@ -1,51 +1,44 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 2/2] crypto: algapi - annotate expected branch
- behavior in crypto_inc()
-Date: Thu, 9 Mar 2017 18:46:34 +0800
-Message-ID: <20170309104634.GC7185@gondor.apana.org.au>
+Subject: Re: [PATCH v2 1/2] crypto: arm/aes-neonbs - resolve fallback cipher
+ at runtime
+Date: Thu, 9 Mar 2017 18:46:26 +0800
+Message-ID: <20170309104626.GB7185@gondor.apana.org.au>
 References: <1487109062-3419-1-git-send-email-ard.biesheuvel@linaro.org>
- <1487109062-3419-2-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>
+Cc: linux-crypto@vger.kernel.org
 To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
 Received: from helcar.hengli.com.au ([209.40.204.226]:55541 "EHLO
         helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S932845AbdCISS3 (ORCPT
+        with ESMTP id S932920AbdCISSh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 9 Mar 2017 13:18:29 -0500
+        Thu, 9 Mar 2017 13:18:37 -0500
 Content-Disposition: inline
-In-Reply-To: <1487109062-3419-2-git-send-email-ard.biesheuvel@linaro.org>
+In-Reply-To: <1487109062-3419-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Feb 14, 2017 at 09:51:02PM +0000, Ard Biesheuvel wrote:
-> To prevent unnecessary branching, mark the exit condition of the
-> primary loop as likely(), given that a carry in a 32-bit counter
-> occurs very rarely.
+On Tue, Feb 14, 2017 at 09:51:01PM +0000, Ard Biesheuvel wrote:
+> Currently, the bit sliced NEON AES code for ARM has a link time
+> dependency on the scalar ARM asm implementation, which it uses as a
+> fallback to perform CBC encryption and the encryption of the initial
+> XTS tweak.
 > 
-> On arm64, the resulting code is emitted by GCC as
+> The bit sliced NEON code is both fast and time invariant, which makes
+> it a reasonable default on hardware that supports it. However, the
+> ARM asm code it pulls in is not time invariant, and due to the way it
+> is linked in, cannot be overridden by the new generic time invariant
+> driver. In fact, it will not be used at all, given that the ARM asm
+> code registers itself as a cipher with a priority that exceeds the
+> priority of the fixed time cipher.
 > 
->      9a8:   cmp     w1, #0x3
->      9ac:   add     x3, x0, w1, uxtw
->      9b0:   b.ls    9e0 <crypto_inc+0x38>
->      9b4:   ldr     w2, [x3,#-4]!
->      9b8:   rev     w2, w2
->      9bc:   add     w2, w2, #0x1
->      9c0:   rev     w4, w2
->      9c4:   str     w4, [x3]
->      9c8:   cbz     w2, 9d0 <crypto_inc+0x28>
->      9cc:   ret
+> So remove the link time dependency, and allocate the fallback cipher
+> via the crypto API. Note that this requires this driver's module_init
+> call to be replaced with late_initcall, so that the (possibly generic)
+> fallback cipher is guaranteed to be available when the builtin test
+> is performed at registration time.
 > 
-> where the two remaining branch conditions (one for size < 4 and one for
-> the carry) are statically predicted as non-taken, resulting in optimal
-> execution in the vast majority of cases.
-> 
-> Also, replace the open coded alignment test with IS_ALIGNED().
-> 
-> Cc: Jason A. Donenfeld <Jason@zx2c4.com>
 > Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
 Patch applied.  Thanks.
