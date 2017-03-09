@@ -1,40 +1,63 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: testmgr - don't DMA map IV from stack in
- test_skcipher()
-Date: Thu, 9 Mar 2017 12:18:51 +0800
-Message-ID: <20170309041851.GA6012@gondor.apana.org.au>
-References: <1484290756-20868-1-git-send-email-horia.geanta@nxp.com>
- <20170113084620.GF22022@gondor.apana.org.au>
- <DB4PR04MB08477C25A41104FA6D879D07982E0@DB4PR04MB0847.eurprd04.prod.outlook.com>
+From: Fabien Dessenne <fabien.dessenne@st.com>
+Subject: [PATCH] crypto: doc - fix typo (struct sdesc)
+Date: Thu, 9 Mar 2017 10:40:05 +0100
+Message-ID: <1489052405-405-1-git-send-email-fabien.dessenne@st.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
+Content-Type: text/plain
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:34663 "EHLO
-        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1750763AbdCIET0 (ORCPT
+Received: from mx08-00178001.pphosted.com ([91.207.212.93]:52251 "EHLO
+        mx07-00178001.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1753635AbdCIJkf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 8 Mar 2017 23:19:26 -0500
-Content-Disposition: inline
-In-Reply-To: <DB4PR04MB08477C25A41104FA6D879D07982E0@DB4PR04MB0847.eurprd04.prod.outlook.com>
+        Thu, 9 Mar 2017 04:40:35 -0500
+Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
+        by mx08-00178001.pphosted.com (8.16.0.11/8.16.0.11) with SMTP id v299Qgpp015135
+        for <linux-crypto@vger.kernel.org>; Thu, 9 Mar 2017 10:40:11 +0100
+Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
+        by mx08-.pphosted.com with ESMTP id 28yu0h4d81-1
+        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Thu, 09 Mar 2017 10:40:11 +0100
+Received: from zeta.dmz-eu.st.com (zeta.dmz-eu.st.com [164.129.230.9])
+        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 2DC9634
+        for <linux-crypto@vger.kernel.org>; Thu,  9 Mar 2017 09:40:10 +0000 (GMT)
+Received: from Webmail-eu.st.com (Safex1hubcas23.st.com [10.75.90.46])
+        by zeta.dmz-eu.st.com (STMicroelectronics) with ESMTP id E2B562670
+        for <linux-crypto@vger.kernel.org>; Thu,  9 Mar 2017 09:40:10 +0000 (GMT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Mar 08, 2017 at 01:04:14PM +0000, Horia Geantă wrote:
->
-> Since changing the API and converting the users looks pretty lengthy,
-> would it be acceptable to fix tcrypt for now?
-> Indeed, I've missed updating test_skcipher_speed, I can add this in v2.
+Add missing " " in api-samples.rst
 
-Might as well leave it there because at least it reminds us to
-fix the problem.  With the API as it is any new kernel user could
-potentially provide us with an IV off the stack.
+Signed-off-by: Fabien Dessenne <fabien.dessenne@st.com>
+---
+ Documentation/crypto/api-samples.rst | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Cheers,
+diff --git a/Documentation/crypto/api-samples.rst b/Documentation/crypto/api-samples.rst
+index 0a10819..d021fd9 100644
+--- a/Documentation/crypto/api-samples.rst
++++ b/Documentation/crypto/api-samples.rst
+@@ -155,9 +155,9 @@ Code Example For Use of Operational State Memory With SHASH
+         char ctx[];
+     };
+ 
+-    static struct sdescinit_sdesc(struct crypto_shash *alg)
++    static struct sdesc init_sdesc(struct crypto_shash *alg)
+     {
+-        struct sdescsdesc;
++        struct sdesc sdesc;
+         int size;
+ 
+         size = sizeof(struct shash_desc) + crypto_shash_descsize(alg);
+@@ -172,7 +172,7 @@ Code Example For Use of Operational State Memory With SHASH
+     static int calc_hash(struct crypto_shashalg,
+                  const unsigned chardata, unsigned int datalen,
+                  unsigned chardigest) {
+-        struct sdescsdesc;
++        struct sdesc sdesc;
+         int ret;
+ 
+         sdesc = init_sdesc(alg);
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.7.4
