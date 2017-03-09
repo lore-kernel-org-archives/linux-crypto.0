@@ -1,80 +1,55 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: s5p-sss - Fix spinlock recursion on LRW(AES)
-Date: Thu, 9 Mar 2017 18:48:11 +0800
-Message-ID: <20170309104811.GH7185@gondor.apana.org.au>
-References: <20170308211420.5372-1-krzk@kernel.org>
+Subject: Re: [RFC PATCH v2 0/3] Cavium ThunderX ZIP driver
+Date: Thu, 9 Mar 2017 18:46:54 +0800
+Message-ID: <20170309104654.GD7185@gondor.apana.org.au>
+References: <1487135710-9692-1-git-send-email-Mahipal.Challa@cavium.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Cc: davem@davemloft.net, Vladimir Zapolskiy <vz@mleia.com>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Nathan Royce <nroycea+kernel@gmail.com>,
-        "# v4 . 10 . x : 07de4bc88c crypto : s5p-sss - Fix completing"
-        <stable@vger.kernel.org>
-To: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Jan.Glauber@cavium.com,
+        Vishnu.Nair@cavium.com, pathreya@cavium.com,
+        Mahipal.Challa@cavium.com
+To: Mahipal Challa <mahipalreddy2006@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20170308211420.5372-1-krzk@kernel.org>
+In-Reply-To: <1487135710-9692-1-git-send-email-Mahipal.Challa@cavium.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Mar 08, 2017 at 11:14:20PM +0200, Krzysztof Kozlowski wrote:
-> Running TCRYPT with LRW compiled causes spinlock recursion:
+On Wed, Feb 15, 2017 at 10:45:07AM +0530, Mahipal Challa wrote:
+> Hi Herbert,
 > 
->     testing speed of async lrw(aes) (lrw(ecb-aes-s5p)) encryption
->     tcrypt: test 0 (256 bit key, 16 byte blocks): 19007 operations in 1 seconds (304112 bytes)
->     tcrypt: test 1 (256 bit key, 64 byte blocks): 15753 operations in 1 seconds (1008192 bytes)
->     tcrypt: test 2 (256 bit key, 256 byte blocks): 14293 operations in 1 seconds (3659008 bytes)
->     tcrypt: test 3 (256 bit key, 1024 byte blocks): 11906 operations in 1 seconds (12191744 bytes)
->     tcrypt: test 4 (256 bit key, 8192 byte blocks):
->     BUG: spinlock recursion on CPU#1, irq/84-10830000/89
->      lock: 0xeea99a68, .magic: dead4ead, .owner: irq/84-10830000/89, .owner_cpu: 1
->     CPU: 1 PID: 89 Comm: irq/84-10830000 Not tainted 4.11.0-rc1-00001-g897ca6d0800d #559
->     Hardware name: SAMSUNG EXYNOS (Flattened Device Tree)
->     [<c010e1ec>] (unwind_backtrace) from [<c010ae1c>] (show_stack+0x10/0x14)
->     [<c010ae1c>] (show_stack) from [<c03449c0>] (dump_stack+0x78/0x8c)
->     [<c03449c0>] (dump_stack) from [<c015de68>] (do_raw_spin_lock+0x11c/0x120)
->     [<c015de68>] (do_raw_spin_lock) from [<c0720110>] (_raw_spin_lock_irqsave+0x20/0x28)
->     [<c0720110>] (_raw_spin_lock_irqsave) from [<c0572ca0>] (s5p_aes_crypt+0x2c/0xb4)
->     [<c0572ca0>] (s5p_aes_crypt) from [<bf1d8aa4>] (do_encrypt+0x78/0xb0 [lrw])
->     [<bf1d8aa4>] (do_encrypt [lrw]) from [<bf1d8b00>] (encrypt_done+0x24/0x54 [lrw])
->     [<bf1d8b00>] (encrypt_done [lrw]) from [<c05732a0>] (s5p_aes_complete+0x60/0xcc)
->     [<c05732a0>] (s5p_aes_complete) from [<c0573440>] (s5p_aes_interrupt+0x134/0x1a0)
->     [<c0573440>] (s5p_aes_interrupt) from [<c01667c4>] (irq_thread_fn+0x1c/0x54)
->     [<c01667c4>] (irq_thread_fn) from [<c0166a98>] (irq_thread+0x12c/0x1e0)
->     [<c0166a98>] (irq_thread) from [<c0136a28>] (kthread+0x108/0x138)
->     [<c0136a28>] (kthread) from [<c0107778>] (ret_from_fork+0x14/0x3c)
+> This series adds support for hardware accelerated compression & decompression
+> as found on ThunderX (arm64) SOCs.
 > 
-> Interrupt handling routine was calling req->base.complete() under
-> spinlock.  In most cases this wasn't fatal but when combined with some
-> of the cipher modes (like LRW) this caused recursion - starting the new
-> encryption (s5p_aes_crypt()) while still holding the spinlock from
-> previous round (s5p_aes_complete()).
+> As per your suggestion, we've switched to the new crypto acomp/scomp interface.
 > 
-> Beside that, the s5p_aes_interrupt() error handling path could execute
-> two completions in case of error for RX and TX blocks.
+> To test the ZIP driver, we modified the kernel's ZSWAP to use acomp API's.
 > 
-> Rewrite the interrupt handling routine and the completion by:
+> Performance numbers from ZSWAP look promising.
+> The "average time" for compressing a 4KB page:
 > 
-> 1. Splitting the operations on scatterlist copies from
->    s5p_aes_complete() into separate s5p_sg_done(). This still should be
->    done under lock.
->    The s5p_aes_complete() now only calls req->base.complete() and it has
->    to be called outside of lock.
+> Compression Software    : 278 usec
+> Compression HW deflate  :  17 usec
+> Compression HW LZS      :  11 usec
 > 
-> 2. Moving the s5p_aes_complete() out of spinlock critical sections.
->    In interrupt service routine s5p_aes_interrupts(), it appeared in few
->    places, including error paths inside other functions called from ISR.
->    This code was not so obvious to read so simplify it by putting the
->    s5p_aes_complete() only within ISR level.
+> Decompression Software  : 20 usec
+> Decompression HW deflate:  8 usec
+> Decompression HW LZS    :  6 usec
 > 
-> Reported-by: Nathan Royce <nroycea+kernel@gmail.com>
-> Cc: <stable@vger.kernel.org> # v4.10.x: 07de4bc88c crypto: s5p-sss - Fix completing
-> Cc: <stable@vger.kernel.org> # v4.10.x
-> Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
+> Addressed the review comments from the RFC v1.
+>  - Added acomp/scomp crypto interface support.
+>  - Improved the error handling.
+>  - ZIP command completion codes are renamed suitably.
+>  - Removed some un-used code.
+>  - raw_smp_processor_id() replaced with smp_processor_id().
+>  - Some more miscellaneous changes. 
+> 
+> Patches are on top of "kernel/git/herbert/crypto-2.6.git" repository
+> 
+> Please provide your feedback.
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
