@@ -1,50 +1,48 @@
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Subject: Re: XTS Crypto Not Found In /proc/crypto Even After Compiled for
- 4.10.1.
-Date: Wed, 8 Mar 2017 23:15:43 +0200
-Message-ID: <20170308211543.euqexxlhdgpfcdjk@kozik-lap>
-References: <CALaQ_hpC4G6CaxZAFvwNG3gFjc5Dj1C7zB6b_WQjGeYhbArHKw@mail.gmail.com>
- <20170306173511.6w3e47v4vomu7yv4@kozik-lap>
- <CALaQ_hqhFjb60rJ2AgBnYgyNCPQ7fH5BdOOCeaMiankQR0VwqQ@mail.gmail.com>
- <20170308174542.2rydwxmrb3oehyrc@kozik-lap>
+From: Ryder Lee <ryder.lee-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>
+Subject: [PATCH v1 0/8] improve performances on mediatek crypto driver
+Date: Thu, 9 Mar 2017 10:11:11 +0800
+Message-ID: <1489025479-48036-1-git-send-email-ryder.lee@mediatek.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Marek Szyprowski <m.szyprowski@samsung.com>
-To: Nathan Royce <nroycea+kernel@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:35804 "EHLO
-        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751698AbdCHWZA (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 8 Mar 2017 17:25:00 -0500
-Content-Disposition: inline
-In-Reply-To: <20170308174542.2rydwxmrb3oehyrc@kozik-lap>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Ryder Lee <ryder.lee-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>, linux-mediatek-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+ linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Return-path: <linux-mediatek-bounces+glpam-linux-mediatek=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-mediatek>,
+ <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-mediatek/>
+List-Post: <mailto:linux-mediatek-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+List-Help: <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-mediatek>,
+ <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=subscribe>
+Sender: "Linux-mediatek" <linux-mediatek-bounces-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+Errors-To: linux-mediatek-bounces+glpam-linux-mediatek=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Mar 08, 2017 at 07:45:42PM +0200, Krzysztof Kozlowski wrote:
-> On Mon, Mar 06, 2017 at 03:29:48PM -0600, Nathan Royce wrote:
-> > OK, I just tried 4.10.0 and the output is looking the same.
-> > 
-> > I can't say my setup is all that odd. The cryptographic use is only
-> > with the swap partition found in my original email (seen in Herbert's
-> > reply).
-> 
-> You have quite specific/customized config and compilation flags.
-> I doubt that it causes the issue but at least the config is unusable on
-> anything other then XU3/XU4.
-> 
-> Anyway I reproduced some of the issues with tcrypt on Odroid U3 on v4.10
-> and v4.11-rc1, with regular exynos defconfig plus some more crypto
-> algorithms:
-> 1. Without my patch: the original warning.
-> 2. With my patch:
+Hi all,
 
-I sent a fix. At least for spin lock recursion in tcrypt.
+Some patches of this series improve the performances whereas others
+clean up code and refine data structure to make it more efficient
 
-Could you give it a try?
+Changes since v1:
+- drop OFB and CFB patch
 
-Best regards,
-Krzysztof
+Ryder Lee (8):
+  crypto: mediatek - rework interrupt handler
+  crypto: mediatek - add MTK_* prefix and correct annotations.
+  crypto: mediatek - make mtk_sha_xmit() more generic
+  crypto: mediatek - simplify descriptor ring management
+  crypto: mediatek - add queue_task tasklet
+  crypto: mediatek - fix error handling in mtk_aes_complete()
+  crypto: mediatek - add mtk_aes_gcm_tag_verify()
+  crypto: mediatek - make hardware operation flow more efficient
+
+ drivers/crypto/mediatek/mtk-aes.c      | 421 +++++++++++++++++----------------
+ drivers/crypto/mediatek/mtk-platform.c |  15 +-
+ drivers/crypto/mediatek/mtk-platform.h |  56 +++--
+ drivers/crypto/mediatek/mtk-sha.c      | 309 +++++++++---------------
+ 4 files changed, 369 insertions(+), 432 deletions(-)
+
+-- 
+1.9.1
