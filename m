@@ -1,108 +1,44 @@
-From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [RFC PATCH v2 12/32] x86: Add early boot support when running
- with SEV active
-Date: Fri, 10 Mar 2017 10:35:30 -0600
-Message-ID: <1fe1e177-f588-fe5a-dc13-e9fde00e8958@amd.com>
-References: <148846752022.2349.13667498174822419498.stgit@brijesh-build-machine>
- <148846768878.2349.15757532025749214650.stgit@brijesh-build-machine>
- <20170309140748.tg67yo2jmc5ahck3@pd.tnic>
- <5d62b16f-16ef-1bd7-1551-f0c4c43573f4@redhat.com>
- <20170309162942.jwtb3l33632zhbaz@pd.tnic>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: Re: XTS Crypto Not Found In /proc/crypto Even After Compiled for
+ 4.10.1.
+Date: Fri, 10 Mar 2017 20:06:40 +0200
+Message-ID: <20170310180640.dnacw53vqrqji2xo@kozik-lap>
+References: <CALaQ_hpC4G6CaxZAFvwNG3gFjc5Dj1C7zB6b_WQjGeYhbArHKw@mail.gmail.com>
+ <20170306173511.6w3e47v4vomu7yv4@kozik-lap>
+ <CALaQ_hqhFjb60rJ2AgBnYgyNCPQ7fH5BdOOCeaMiankQR0VwqQ@mail.gmail.com>
+ <20170308174542.2rydwxmrb3oehyrc@kozik-lap>
+ <20170308211543.euqexxlhdgpfcdjk@kozik-lap>
+ <CALaQ_hrikH8Q8ug9WTgnYR3UwSCip1DZtkkjj2NCLJVqcKQdZA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: <brijesh.singh@amd.com>, <simon.guinot@sequanux.org>,
-	<linux-efi@vger.kernel.org>, <kvm@vger.kernel.org>, <rkrcmar@redhat.com>,
-	<matt@codeblueprint.co.uk>, <linux-pci@vger.kernel.org>,
-	<linus.walleij@linaro.org>, <gary.hook@amd.com>, <linux-mm@kvack.org>,
-	<paul.gortmaker@windriver.com>, <hpa@zytor.com>, <cl@linux.com>,
-	<dan.j.williams@intel.com>, <aarcange@redhat.com>, <sfr@canb.auug.org.au>,
-	<andriy.shevchenko@linux.intel.com>, <herbert@gondor.apana.org.au>,
-	<bhe@redhat.com>, <xemul@parallels.com>, <joro@8bytes.org>, <x86@kernel.org>,
-	<peterz@infradead.org>, <piotr.luc@intel.com>, <mingo@redhat.com>,
-	<msalter@redhat.com>, <ross.zwisler@linux.intel.com>, <dyoung@redhat.com>,
-	<thomas.lendacky@amd.com>, <jroedel@suse.de>, <keescook@chromium.org>,
-	<arnd@arndb.de>, <toshi.kani@hpe.com>, <mathieu.desnoyers@efficios.com>,
-	<luto@kernel.org>, <devel@linuxdriverproject.org>, <bhel
-To: Borislav Petkov <bp@suse.de>, Paolo Bonzini <pbonzini@redhat.com>
-Return-path: <owner-linux-mm@kvack.org>
-In-Reply-To: <20170309162942.jwtb3l33632zhbaz@pd.tnic>
-Sender: owner-linux-mm@kvack.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Marek Szyprowski <m.szyprowski@samsung.com>
+To: Nathan Royce <nroycea+kernel@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wr0-f194.google.com ([209.85.128.194]:36708 "EHLO
+        mail-wr0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933100AbdCJSGv (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 10 Mar 2017 13:06:51 -0500
+Content-Disposition: inline
+In-Reply-To: <CALaQ_hrikH8Q8ug9WTgnYR3UwSCip1DZtkkjj2NCLJVqcKQdZA@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Boris and Paolo,
+On Thu, Mar 09, 2017 at 05:16:35AM -0600, Nathan Royce wrote:
+> Gave it a try on 4.10.1, but still to no avail:
 
-On 03/09/2017 10:29 AM, Borislav Petkov wrote:
-> On Thu, Mar 09, 2017 at 05:13:33PM +0100, Paolo Bonzini wrote:
->> This is not how you check if running under a hypervisor; you should
->> check the HYPERVISOR bit, i.e. bit 31 of cpuid(1).ecx.  This in turn
->> tells you if leaf 0x40000000 is valid.
->
-> Ah, good point, I already do that in the microcode loader :)
->
->         /*
->          * CPUID(1).ECX[31]: reserved for hypervisor use. This is still not
->          * completely accurate as xen pv guests don't see that CPUID bit set but
->          * that's good enough as they don't land on the BSP path anyway.
->          */
->         if (native_cpuid_ecx(1) & BIT(31))
->                 return *res;
->
->> That said, the main issue with this function is that it hardcodes the
->> behavior for KVM.  It is possible that another hypervisor defines its
->> 0x40000001 leaf in such a way that KVM_FEATURE_SEV has a different meaning.
->>
->> Instead, AMD should define a "well-known" bit in its own space (i.e.
->> 0x800000xx) that is only used by hypervisors that support SEV.  This is
->> similar to how Intel defined one bit in leaf 1 to say "is leaf
->> 0x40000000 valid".
->>
->>> +	if (eax > 0x40000000) {
->>> +		eax = 0x40000001;
->>> +		ecx = 0;
->>> +		native_cpuid(&eax, &ebx, &ecx, &edx);
->>> +		if (!(eax & BIT(KVM_FEATURE_SEV)))
->>> +			goto out;
->>> +
->>> +		eax = 0x8000001f;
->>> +		ecx = 0;
->>> +		native_cpuid(&eax, &ebx, &ecx, &edx);
->>> +		if (!(eax & 1))
->
-> Right, so this is testing CPUID_0x8000001f_ECX(0)[0], SME. Why not
-> simply set that bit for the guest too, in kvm?
->
+(...)
 
-CPUID_8000_001F[EAX] indicates whether the feature is supported.
-CPUID_0x8000001F[EAX]:
-  * Bit 0 - SME supported
-  * Bit 1 - SEV supported
-  * Bit 3 - SEV-ES supported
+> Also for the sake of testing, I did not add any FLAGS for compilation this time.
 
-We can use MSR_K8_SYSCFG[MemEncryptionModeEnc] to check if memory encryption is enabled.
-Currently, KVM returns zero when guest OS read MSR_K8_SYSCFG. I can update my patch sets
-to set this bit for SEV enabled guests.
+Damn, I am fixing bugs around but not the one you are hitting. Can you
+also check if exynos_defconfig (+XTS + any other needed setting sfor
+you) also has this issue?
 
-We could update this patch to use the below logic:
+I want to reproduce it but my setup does not use cryptswap. Probably I
+will have to set it up.
 
-  * CPUID(0) - Check for AuthenticAMD
-  * CPID(1) - Check if under hypervisor
-  * CPUID(0x80000000) - Check for highest supported leaf
-  * CPUID(0x8000001F).EAX - Check for SME and SEV support
-  * rdmsr (MSR_K8_SYSCFG)[MemEncryptionModeEnc] - Check if SMEE is set
-
-
-Paolo,
-
-One question, do we need "AuthenticAMD" check when we are running under hypervisor ?
-I was looking at qemu code and found that qemu exposes parameters to change the CPU
-vendor id. The above check will fail if user changes the vendor id while launching
-the SEV guest.
-
--Brijesh
-
---
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+Best regards,
+Krzysztof
