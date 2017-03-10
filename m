@@ -1,118 +1,108 @@
-From: Ondrej Mosnacek <omosnace@redhat.com>
-Subject: dm-crypt IV generation (summary)
-Date: Fri, 10 Mar 2017 14:44:26 +0100
-Message-ID: <CAFqZXNs0=6+PvpGq3weRwCJkUOfSn06i_fD6ZuvXo_0rms9zeA@mail.gmail.com>
+From: Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [RFC PATCH v2 12/32] x86: Add early boot support when running
+ with SEV active
+Date: Fri, 10 Mar 2017 10:35:30 -0600
+Message-ID: <1fe1e177-f588-fe5a-dc13-e9fde00e8958@amd.com>
+References: <148846752022.2349.13667498174822419498.stgit@brijesh-build-machine>
+ <148846768878.2349.15757532025749214650.stgit@brijesh-build-machine>
+ <20170309140748.tg67yo2jmc5ahck3@pd.tnic>
+ <5d62b16f-16ef-1bd7-1551-f0c4c43573f4@redhat.com>
+ <20170309162942.jwtb3l33632zhbaz@pd.tnic>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-crypto@vger.kernel.org, dm-devel@redhat.com,
-        Mike Snitzer <snitzer@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Binoy Jayan <binoy.jayan@linaro.org>,
-        Gilad Ben-Yossef <gilad@benyossef.com>
-To: Milan Broz <gmazyland@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ot0-f173.google.com ([74.125.82.173]:35029 "EHLO
-        mail-ot0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934384AbdCJNo4 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 10 Mar 2017 08:44:56 -0500
-Received: by mail-ot0-f173.google.com with SMTP id x37so76806540ota.2
-        for <linux-crypto@vger.kernel.org>; Fri, 10 Mar 2017 05:44:28 -0800 (PST)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: <brijesh.singh@amd.com>, <simon.guinot@sequanux.org>,
+	<linux-efi@vger.kernel.org>, <kvm@vger.kernel.org>, <rkrcmar@redhat.com>,
+	<matt@codeblueprint.co.uk>, <linux-pci@vger.kernel.org>,
+	<linus.walleij@linaro.org>, <gary.hook@amd.com>, <linux-mm@kvack.org>,
+	<paul.gortmaker@windriver.com>, <hpa@zytor.com>, <cl@linux.com>,
+	<dan.j.williams@intel.com>, <aarcange@redhat.com>, <sfr@canb.auug.org.au>,
+	<andriy.shevchenko@linux.intel.com>, <herbert@gondor.apana.org.au>,
+	<bhe@redhat.com>, <xemul@parallels.com>, <joro@8bytes.org>, <x86@kernel.org>,
+	<peterz@infradead.org>, <piotr.luc@intel.com>, <mingo@redhat.com>,
+	<msalter@redhat.com>, <ross.zwisler@linux.intel.com>, <dyoung@redhat.com>,
+	<thomas.lendacky@amd.com>, <jroedel@suse.de>, <keescook@chromium.org>,
+	<arnd@arndb.de>, <toshi.kani@hpe.com>, <mathieu.desnoyers@efficios.com>,
+	<luto@kernel.org>, <devel@linuxdriverproject.org>, <bhel
+To: Borislav Petkov <bp@suse.de>, Paolo Bonzini <pbonzini@redhat.com>
+Return-path: <owner-linux-mm@kvack.org>
+In-Reply-To: <20170309162942.jwtb3l33632zhbaz@pd.tnic>
+Sender: owner-linux-mm@kvack.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi all,
+Hi Boris and Paolo,
 
-I was tasked to post a summary the whole dm-crypt IV generation
-problem and all the suggested solutions along with their drawbacks, so
-here it goes...
+On 03/09/2017 10:29 AM, Borislav Petkov wrote:
+> On Thu, Mar 09, 2017 at 05:13:33PM +0100, Paolo Bonzini wrote:
+>> This is not how you check if running under a hypervisor; you should
+>> check the HYPERVISOR bit, i.e. bit 31 of cpuid(1).ecx.  This in turn
+>> tells you if leaf 0x40000000 is valid.
+>
+> Ah, good point, I already do that in the microcode loader :)
+>
+>         /*
+>          * CPUID(1).ECX[31]: reserved for hypervisor use. This is still not
+>          * completely accurate as xen pv guests don't see that CPUID bit set but
+>          * that's good enough as they don't land on the BSP path anyway.
+>          */
+>         if (native_cpuid_ecx(1) & BIT(31))
+>                 return *res;
+>
+>> That said, the main issue with this function is that it hardcodes the
+>> behavior for KVM.  It is possible that another hypervisor defines its
+>> 0x40000001 leaf in such a way that KVM_FEATURE_SEV has a different meaning.
+>>
+>> Instead, AMD should define a "well-known" bit in its own space (i.e.
+>> 0x800000xx) that is only used by hypervisors that support SEV.  This is
+>> similar to how Intel defined one bit in leaf 1 to say "is leaf
+>> 0x40000000 valid".
+>>
+>>> +	if (eax > 0x40000000) {
+>>> +		eax = 0x40000001;
+>>> +		ecx = 0;
+>>> +		native_cpuid(&eax, &ebx, &ecx, &edx);
+>>> +		if (!(eax & BIT(KVM_FEATURE_SEV)))
+>>> +			goto out;
+>>> +
+>>> +		eax = 0x8000001f;
+>>> +		ecx = 0;
+>>> +		native_cpuid(&eax, &ebx, &ecx, &edx);
+>>> +		if (!(eax & 1))
+>
+> Right, so this is testing CPUID_0x8000001f_ECX(0)[0], SME. Why not
+> simply set that bit for the guest too, in kvm?
+>
 
-PROBLEM STATEMENT:
-Currently, dm-crypt uses a fixed 512-byte sector size and handles
-en-/decrypting of a bio by submitting a separate request to the crypto
-API for each sector. This causes a performance problem with some
-crypto drivers that have a high processing overhead for small
-requests, i.e. most crypto accelerators [1][2] and also e.g. the
-AES-NI driver [3].
+CPUID_8000_001F[EAX] indicates whether the feature is supported.
+CPUID_0x8000001F[EAX]:
+  * Bit 0 - SME supported
+  * Bit 1 - SEV supported
+  * Bit 3 - SEV-ES supported
 
-POSSIBLE SOLUTIONS:
-1. Move IV generator algorithms to crypto API and allow them to
-process the whole bio at once. ([5] or something equivalent)
-    ISSUES:
-        a) The 'keycount' parameter.
-            In order to support multi-key modes from Loop-AES,
-dm-crypt accepts a keycount parameter which, if it != 1, causes
-consecutive sectors to be encrypted with a different key. This
-parameter can be specified with any of the cipher modes, which makes
-porting the whole scale of modes supported by dm-crypt to crypto API
-rather messy, since a lot of dm-crypt specific stuff needs to be moved
-into the crypto drivers.
-        b) New AEAD functionality; random IV generator.
-            The soon-to-be-added AEAD functionality in dm-crypt
-introduces a new IV generator that generates IVs randomly and stores
-them as sector metadata. This means IV generation cannot be handled
-solely in the driver. Also, additional AEAD implementation of IV
-generators would be eventually needed.
+We can use MSR_K8_SYSCFG[MemEncryptionModeEnc] to check if memory encryption is enabled.
+Currently, KVM returns zero when guest OS read MSR_K8_SYSCFG. I can update my patch sets
+to set this bit for SEV enabled guests.
 
-2. Restrict the keycount parameter to allow only reasonable
-combinations and then move IV generators to crypto API.
-    In Loop-AES, the multi-key mode always uses exactly 64 keys and
-there is no reasonable scenario where someone would like to use
-keycount != 1 with other IV mode than LMK. Thus it might be acceptable
-to only work with multiple keys in LMK (and only allow keycount == 64
-for it) and work with just one key in all other modes (and only allow
-keycount == 1 for them). I.e., the cipher format would remain the
-same, just with more restricted values.
+We could update this patch to use the below logic:
 
-    Note that this would be basically a breaking change (the keycount
-parameter is documented [4], so there may be users somewhere that use
-it in some unusual combination...). Still, such combinations would
-have to be used explicitly, as they are never used with common
-LUKS/Loop-AES/TrueCrypt partitions (something like cryptsetup --type
-plain ... or dmsetup would have to be used directly).
+  * CPUID(0) - Check for AuthenticAMD
+  * CPID(1) - Check if under hypervisor
+  * CPUID(0x80000000) - Check for highest supported leaf
+  * CPUID(0x8000001F).EAX - Check for SME and SEV support
+  * rdmsr (MSR_K8_SYSCFG)[MemEncryptionModeEnc] - Check if SMEE is set
 
-    Applying this change would allow implementing the IV generators as
-simple crypto algorithms that honor the usual interface (without
-setkey hacks and passing of special structures via IV).
 
-    ISSUES:
-        a) Backward incompatibility (see above).
-        b) Again need to somehow handle the new 'random' IV generator.
+Paolo,
 
-3. Extend crypto API to allow passing multiple requests at once (each
-with a separate IV) to crypto drivers.
-    (see [3])
-    ISSUES:
-        a) HW accelerators would have to specifically support this
-scheme (unless they are somehow programmable).
-            I.e. accelerators that already have the plain64 IV
-generator hard-coded could not fully benefit from this (I don't know
-how many are already out there). However, future ones could implement
-this 'universal' IV mode and enjoy basically the same benefit.
+One question, do we need "AuthenticAMD" check when we are running under hypervisor ?
+I was looking at qemu code and found that qemu exposes parameters to change the CPU
+vendor id. The above check will fail if user changes the vendor id while launching
+the SEV guest.
 
-4. Implement support of 4KB sectors (or other sizes, too) in dm-crypt.
-    This would partially help, since on devices with 4K sectors the
-size of each crypto request would then be 8x bigger and overhead would
-be reduced without the need to mess with the dm-crypt IV generators.
+-Brijesh
 
-    ISSUES:
-        a) Only 4KB would be processed at once, not the whole bio (but
-it may suffice).
-        b) Partitions encrypted as 4KB sectors could not be safely
-moved to a 512B-sector device (writes would not be atomic).
-
-QUESTIONS:
-@Mike/dm-devel: Do you think it would be feasible to apply solution 2
-(thus introducing the small incompatibility)?
-
-REFERENCES:
-[1] https://nelenkov.blogspot.com/2015/05/hardware-accelerated-disk-encryption-in.html
-[2] https://lkml.org/lkml/2017/3/2/274
-[3] https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg23007.html
-[4] https://gitlab.com/cryptsetup/cryptsetup/wikis/DMCrypt
-[5] https://lkml.org/lkml/2017/2/7/182
-
-Cheers,
-Ondrej
+--
+To unsubscribe, send a message with 'unsubscribe linux-mm' in
+the body to majordomo@kvack.org.  For more info on Linux MM,
+see: http://www.linux-mm.org/ .
+Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
