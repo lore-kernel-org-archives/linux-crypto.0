@@ -1,29 +1,40 @@
-From: Greg KH <greg@kroah.com>
-Subject: Re: [PATCH] crypto: Add ECB dependency for XTS mode
-Date: Fri, 10 Mar 2017 08:36:55 +0100
-Message-ID: <20170310073655.GA8956@kroah.com>
-References: <20170221231717.GA7186@nicolas-laptop>
- <20170223073826.19066-1-gmazyland@gmail.com>
- <02f80ce3-4c85-78ea-7b15-4467a2ae5be4@gmail.com>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: [ANNOUNCE] /dev/random - a new approach (code for 4.11-rc1)
+Date: Fri, 10 Mar 2017 09:21:01 +0100
+Message-ID: <2785457.pDyvZpZC2q@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: stable@vger.kernel.org, linux-crypto@vger.kernel.org,
-        herbert@gondor.apana.org.au
-To: Milan Broz <gmazyland@gmail.com>
-Return-path: <stable-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <02f80ce3-4c85-78ea-7b15-4467a2ae5be4@gmail.com>
-Sender: stable-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org
+To: linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Mar 03, 2017 at 07:25:21AM +0100, Milan Broz wrote:
-> Patch below should be backported to 4.10 stable
-> (only 4.10, older kernels are ok).
-> We have reports some systems fail to boot from LUKS now
-> (missing ecb module in initramdisk) ...
-> 
-> Upstream commit is 12cb3a1c4184f891d965d1f39f8cfcc9ef617647
+Hi,
 
-Now queued up, thanks.
+The patch set that can be downloaded at [1] provides a different approach to /
+dev/random which I call Linux Random Number Generator (LRNG) to collect 
+entropy within the Linux kernel. The main improvements compared to the legacy 
+/dev/random is to provide sufficient entropy during boot time as well as in 
+virtual environments and when using SSDs or Device Mapper targets. A secondary 
+design goal is to limit the impact of the entropy collection on massive 
+parallel systems and also allow the use accelerated cryptographic primitives. 
+Also, all steps of the entropic data processing are testable. Finally 
+performance improvements are visible at /dev/urandom and get_random_bytes.
 
-greg k-h
+The design and implementation is driven by a set of goals described in [2]
+that the LRNG completely implements. Furthermore, [2] includes a
+comparison with RNG design suggestions such as SP800-90B, SP800-90C, and
+AIS20/31.
+
+The LRNG has a flexible design by allowing an easy replacement of the
+deterministic random number generator component. Currently implemented DRNGs
+are an SP800-90A DRBG and a ChaCha20 DRNG.
+
+[1] http://www.chronox.de/lrng.html
+
+[2] http://www.chronox.de/lrng/doc/lrng.pdf
+
+Ciao
+Stephan
