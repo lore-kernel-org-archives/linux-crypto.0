@@ -1,44 +1,87 @@
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Subject: Re: XTS Crypto Not Found In /proc/crypto Even After Compiled for
- 4.10.1.
-Date: Fri, 10 Mar 2017 20:06:40 +0200
-Message-ID: <20170310180640.dnacw53vqrqji2xo@kozik-lap>
-References: <CALaQ_hpC4G6CaxZAFvwNG3gFjc5Dj1C7zB6b_WQjGeYhbArHKw@mail.gmail.com>
- <20170306173511.6w3e47v4vomu7yv4@kozik-lap>
- <CALaQ_hqhFjb60rJ2AgBnYgyNCPQ7fH5BdOOCeaMiankQR0VwqQ@mail.gmail.com>
- <20170308174542.2rydwxmrb3oehyrc@kozik-lap>
- <20170308211543.euqexxlhdgpfcdjk@kozik-lap>
- <CALaQ_hrikH8Q8ug9WTgnYR3UwSCip1DZtkkjj2NCLJVqcKQdZA@mail.gmail.com>
+From: Gary R Hook <gary.hook@amd.com>
+Subject: [PATCH] crypto: ccp - Assign DMA commands to the channel's CCP
+Date: Fri, 10 Mar 2017 12:28:18 -0600
+Message-ID: <20170310182818.21186.92711.stgit@taos>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Marek Szyprowski <m.szyprowski@samsung.com>
-To: Nathan Royce <nroycea+kernel@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: <thomas.lendacky@amd.com>, <gary.hook@amd.com>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wr0-f194.google.com ([209.85.128.194]:36708 "EHLO
-        mail-wr0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933100AbdCJSGv (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 10 Mar 2017 13:06:51 -0500
-Content-Disposition: inline
-In-Reply-To: <CALaQ_hrikH8Q8ug9WTgnYR3UwSCip1DZtkkjj2NCLJVqcKQdZA@mail.gmail.com>
+Received: from mail-by2nam01on0081.outbound.protection.outlook.com ([104.47.34.81]:14008
+        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S933059AbdCJS21 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 10 Mar 2017 13:28:27 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Mar 09, 2017 at 05:16:35AM -0600, Nathan Royce wrote:
-> Gave it a try on 4.10.1, but still to no avail:
+From: Gary R Hook <ghook@amd.com>
 
-(...)
+The CCP driver generally uses a round-robin approach when
+assigning operations to available CCPs. For the DMA engine,
+however, the DMA mappings of the SGs are associated with a
+specific CCP. When an IOMMU is enabled, the IOMMU is
+programmed based on this specific device.
 
-> Also for the sake of testing, I did not add any FLAGS for compilation this time.
+If the DMA operations are not performed by that specific
+CCP then addressing errors and I/O page faults will occur.
 
-Damn, I am fixing bugs around but not the one you are hitting. Can you
-also check if exynos_defconfig (+XTS + any other needed setting sfor
-you) also has this issue?
+Update the CCP driver to allow a specific CCP device to be
+requested for an operation and use this in the DMA engine
+support.
 
-I want to reproduce it but my setup does not use cryptswap. Probably I
-will have to set it up.
+Cc: <stable@vger.kernel.org> # 4.9.x-
+Signed-off-by: Gary R Hook <gary.hook@amd.com>
+---
+ drivers/crypto/ccp/ccp-dev.c       |    5 ++++-
+ drivers/crypto/ccp/ccp-dmaengine.c |    1 +
+ include/linux/ccp.h                |    2 +-
+ 3 files changed, 6 insertions(+), 2 deletions(-)
 
-Best regards,
-Krzysztof
+diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
+index 511ab04..92d1c69 100644
+--- a/drivers/crypto/ccp/ccp-dev.c
++++ b/drivers/crypto/ccp/ccp-dev.c
+@@ -283,11 +283,14 @@ unsigned int ccp_version(void)
+  */
+ int ccp_enqueue_cmd(struct ccp_cmd *cmd)
+ {
+-	struct ccp_device *ccp = ccp_get_device();
++	struct ccp_device *ccp;
+ 	unsigned long flags;
+ 	unsigned int i;
+ 	int ret;
+ 
++	/* Some commands might need to be sent to a specific device */
++	ccp = cmd->ccp ? cmd->ccp : ccp_get_device();
++
+ 	if (!ccp)
+ 		return -ENODEV;
+ 
+diff --git a/drivers/crypto/ccp/ccp-dmaengine.c b/drivers/crypto/ccp/ccp-dmaengine.c
+index e5d9278..8d0eeb4 100644
+--- a/drivers/crypto/ccp/ccp-dmaengine.c
++++ b/drivers/crypto/ccp/ccp-dmaengine.c
+@@ -390,6 +390,7 @@ static struct ccp_dma_desc *ccp_create_desc(struct dma_chan *dma_chan,
+ 			goto err;
+ 
+ 		ccp_cmd = &cmd->ccp_cmd;
++		ccp_cmd->ccp = chan->ccp;
+ 		ccp_pt = &ccp_cmd->u.passthru_nomap;
+ 		ccp_cmd->flags = CCP_CMD_MAY_BACKLOG;
+ 		ccp_cmd->flags |= CCP_CMD_PASSTHRU_NO_DMA_MAP;
+diff --git a/include/linux/ccp.h b/include/linux/ccp.h
+index c71dd8f..c41b8d99 100644
+--- a/include/linux/ccp.h
++++ b/include/linux/ccp.h
+@@ -556,7 +556,7 @@ enum ccp_engine {
+  * struct ccp_cmd - CCP operation request
+  * @entry: list element (ccp driver use only)
+  * @work: work element used for callbacks (ccp driver use only)
+- * @ccp: CCP device to be run on (ccp driver use only)
++ * @ccp: CCP device to be run on
+  * @ret: operation return code (ccp driver use only)
+  * @flags: cmd processing flags
+  * @engine: CCP operation to perform
