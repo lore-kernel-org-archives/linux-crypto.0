@@ -1,36 +1,54 @@
 From: Krzysztof Kozlowski <krzk@kernel.org>
-Subject: Re: [PATCH] MAINTAINERS: Add Krzysztof Kozlowski as maintainer of
- crypto/s5p-sss
-Date: Sat, 11 Mar 2017 08:02:25 +0200
-Message-ID: <20170311060225.vjj4ossn4miicmxe@kozik-lap>
-References: <20170310191038.7726-1-krzk@kernel.org>
- <6f86bed1-df24-9f0b-b32b-3e00674be8c0@mleia.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: Vladimir Zapolskiy <vz@mleia.com>
-Return-path: <linux-samsung-soc-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <6f86bed1-df24-9f0b-b32b-3e00674be8c0@mleia.com>
-Sender: linux-samsung-soc-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Subject: [PATCH v2] MAINTAINERS: Add maintianer entry for crypto/s5p-sss
+Date: Sat, 11 Mar 2017 08:11:00 +0200
+Message-ID: <20170311061100.4659-1-krzk@kernel.org>
+Cc: Vladimir Zapolskiy <vz@mleia.com>,
+        Krzysztof Kozlowski <krzk@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.kernel.org ([198.145.29.136]:42948 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751086AbdCKGL1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 11 Mar 2017 01:11:27 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Mar 10, 2017 at 11:18:13PM +0200, Vladimir Zapolskiy wrote:
-> Hi Krzysztof,
-> 
-> On 03/10/2017 09:10 PM, Krzysztof Kozlowski wrote:
-> > Beside developing of this driver recently, I handle also reviews and
-> > bug reports from users so having a maintainer entry will ensure that I
-> > will be CC-ed on important emails.
-> 
-> if you assume that the driver needs a special maintainership, can you
-> add me as a co-maintainer? I'll review new changes as usual and do
-> regression testing on legacy SoCs.
+Add Krzysztof Kozlowski and Vladimir Zapolskiy as maintainers of s5p-sss
+driver for handling reviews, testing and getting bug reports from the
+users.
 
-Of course, I'll send a v2.
+Cc: Vladimir Zapolskiy <vz@mleia.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
 
-Best regards,
-Krzysztof
+---
+
+Changes since v1:
+1. Add also Vladimir
+---
+ MAINTAINERS | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 57634d0f3486..94b221714fa8 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -10985,6 +10985,14 @@ F:	Documentation/devicetree/bindings/regulator/samsung,s2m*.txt
+ F:	Documentation/devicetree/bindings/regulator/samsung,s5m*.txt
+ F:	Documentation/devicetree/bindings/clock/samsung,s2mps11.txt
+ 
++SAMSUNG S5P Security SubSystem (SSS) DRIVER
++M:	Krzysztof Kozlowski <krzk@kernel.org>
++M:	Vladimir Zapolskiy <vz@mleia.com>
++L:	linux-crypto@vger.kernel.org
++L:	linux-samsung-soc@vger.kernel.org
++S:	Maintained
++F:	drivers/crypto/s5p-sss.c
++
+ SAMSUNG S5P/EXYNOS4 SOC SERIES CAMERA SUBSYSTEM DRIVERS
+ M:	Kyungmin Park <kyungmin.park@samsung.com>
+ M:	Sylwester Nawrocki <s.nawrocki@samsung.com>
+-- 
+2.9.3
