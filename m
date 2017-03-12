@@ -1,88 +1,32 @@
-From: <e.camilla.johansson@gmail.com>
-Subject: 11859 linux-crypto
-Date: Sun, 12 Mar 2017 00:54:46 -0000
-Message-ID: <148928008642.30294.14678461633328049117@hinet.net>
-Reply-To: <e.camilla.johansson@gmail.com>
+From: Vladimir Zapolskiy <vz@mleia.com>
+Subject: Re: [PATCH v2] MAINTAINERS: Add maintianer entry for crypto/s5p-sss
+Date: Sun, 12 Mar 2017 08:51:52 +0200
+Message-ID: <ba219e99-af65-a628-bd19-f8d493ff74b1@mleia.com>
+References: <20170311061100.4659-1-krzk@kernel.org>
 Mime-Version: 1.0
-Content-Type: application/zip; name="245663.zip"
-Content-Transfer-Encoding: base64
-To: "linux-crypto" <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 111-253-62-160.dynamic.hinet.net ([111.253.62.160]:43445 "HELO
-        hinet.net" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with SMTP
-        id S1753423AbdCLAyx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 11 Mar 2017 19:54:53 -0500
-Content-Disposition: attachment
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+To: Krzysztof Kozlowski <krzk@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20170311061100.4659-1-krzk@kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-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
-AFEAAAABDwAAAAA=
+On 03/11/2017 08:11 AM, Krzysztof Kozlowski wrote:
+> Add Krzysztof Kozlowski and Vladimir Zapolskiy as maintainers of s5p-sss
+> driver for handling reviews, testing and getting bug reports from the
+> users.
+> 
+> Cc: Vladimir Zapolskiy <vz@mleia.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
+> 
+
+Acked-by: Vladimir Zapolskiy <vz@mleia.com>
+
+--
+With best wishes,
+Vladimir
