@@ -1,63 +1,79 @@
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Subject: Re: XTS Crypto Not Found In /proc/crypto Even After Compiled for
- 4.10.1.
-Date: Mon, 13 Mar 2017 19:06:01 +0200
-Message-ID: <20170313170601.ozolfzgixqu6aa4g@kozik-lap>
-References: <CALaQ_hpC4G6CaxZAFvwNG3gFjc5Dj1C7zB6b_WQjGeYhbArHKw@mail.gmail.com>
- <20170306173511.6w3e47v4vomu7yv4@kozik-lap>
- <CALaQ_hqhFjb60rJ2AgBnYgyNCPQ7fH5BdOOCeaMiankQR0VwqQ@mail.gmail.com>
- <20170308174542.2rydwxmrb3oehyrc@kozik-lap>
- <20170308211543.euqexxlhdgpfcdjk@kozik-lap>
- <CALaQ_hrikH8Q8ug9WTgnYR3UwSCip1DZtkkjj2NCLJVqcKQdZA@mail.gmail.com>
- <20170310180640.dnacw53vqrqji2xo@kozik-lap>
- <CALaQ_hqomXaZs0z-S3YX6d-hS_giqgBqBSvumwsMm=BzrgZz7Q@mail.gmail.com>
- <20170312191322.bbux5nrkqf5klznq@kozik-lap>
+From: Mike Snitzer <snitzer@redhat.com>
+Subject: Re: dm-crypt IV generation (summary)
+Date: Mon, 13 Mar 2017 14:23:52 -0400
+Message-ID: <20170313182344.GA11766@redhat.com>
+References: <CAFqZXNs0=6+PvpGq3weRwCJkUOfSn06i_fD6ZuvXo_0rms9zeA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Marek Szyprowski <m.szyprowski@samsung.com>
-To: Nathan Royce <nroycea+kernel@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: Milan Broz <gmazyland@gmail.com>, linux-crypto@vger.kernel.org,
+        dm-devel@redhat.com, Alasdair Kergon <agk@redhat.com>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Binoy Jayan <binoy.jayan@linaro.org>,
+        Gilad Ben-Yossef <gilad@benyossef.com>
+To: Ondrej Mosnacek <omosnace@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:33017 "EHLO
-        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932099AbdCMRGH (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 13 Mar 2017 13:06:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35296 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751141AbdCMSXy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 13 Mar 2017 14:23:54 -0400
 Content-Disposition: inline
-In-Reply-To: <20170312191322.bbux5nrkqf5klznq@kozik-lap>
+In-Reply-To: <CAFqZXNs0=6+PvpGq3weRwCJkUOfSn06i_fD6ZuvXo_0rms9zeA@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Mar 12, 2017 at 09:13:22PM +0200, Krzysztof Kozlowski wrote:
-> On Fri, Mar 10, 2017 at 03:44:45PM -0600, Nathan Royce wrote:
-> > Sure, I went ahead and rebuilt it just using the bare exynos_defconfig
-> > and adding XTS and ECB and no other changes.
-> > 
-> > No flags were used. No patches were used other than the 2 you
-> > provided. Just the barest of bears, the barest of bones, the barest of
-> > deserts, the barest of hairless cats.
-> >
+On Fri, Mar 10 2017 at  8:44am -0500,
+Ondrej Mosnacek <omosnace@redhat.com> wrote:
+
+> Hi all,
 > 
-> Okay, I reproduced it. Beside enabling crypto tests, ECB and XTS, the
-> important step is to disable the "ARM Accelerated Cryptographic
-> Algorithms" so S5P-SSS will be used with XTS. The xts(ecb-aes-s5p))
-> itself passes TCRYPT tests but oopses on cryptswap.
+> I was tasked to post a summary the whole dm-crypt IV generation
+> problem and all the suggested solutions along with their drawbacks, so
+> here it goes...
 
-Hi Herbert,
-
-I bisected this to commit f1c131b45410 ("crypto: xts - Convert to
-skcipher"). The s5p-sss driver stays the same... but the xts changes and
-as a result we have a NULL pointer dereference (actually of value
-00000004):
-[   18.930195] Unable to handle kernel NULL pointer dereference at virtual address 00000004
+Thanks for the summary.
 ...
-[   18.972325] [<c0313c98>] (post_crypt) from [<c031408c>] (decrypt_done+0x4c/0x54)
-[   18.972343] [<c031408c>] (decrypt_done) from [<c056309c>] (s5p_aes_interrupt+0x1bc/0x208)
-[   18.972360] [<c056309c>] (s5p_aes_interrupt) from [<c0164930>] (irq_thread_fn+0x1c/0x54)
+ 
+> 2. Restrict the keycount parameter to allow only reasonable
+> combinations and then move IV generators to crypto API.
+>     In Loop-AES, the multi-key mode always uses exactly 64 keys and
+> there is no reasonable scenario where someone would like to use
+> keycount != 1 with other IV mode than LMK. Thus it might be acceptable
+> to only work with multiple keys in LMK (and only allow keycount == 64
+> for it) and work with just one key in all other modes (and only allow
+> keycount == 1 for them). I.e., the cipher format would remain the
+> same, just with more restricted values.
+> 
+>     Note that this would be basically a breaking change (the keycount
+> parameter is documented [4], so there may be users somewhere that use
+> it in some unusual combination...). Still, such combinations would
+> have to be used explicitly, as they are never used with common
+> LUKS/Loop-AES/TrueCrypt partitions (something like cryptsetup --type
+> plain ... or dmsetup would have to be used directly).
+> 
+>     Applying this change would allow implementing the IV generators as
+> simple crypto algorithms that honor the usual interface (without
+> setkey hacks and passing of special structures via IV).
+> 
+>     ISSUES:
+>         a) Backward incompatibility (see above).
+>         b) Again need to somehow handle the new 'random' IV generator.
 
-Any hints?
+...
+> 
+> QUESTIONS:
+> @Mike/dm-devel: Do you think it would be feasible to apply solution 2
+> (thus introducing the small incompatibility)?
 
-Best regards,
-Krzysztof
+Of all the proposals I think 2 is the best.  But I'm not in a position
+to _know_ how problematic such an incompatible change would be.  As such
+I unfortunately would need to defer to Milan, Herbert and others to say
+how risky such a change would be.  If the real-world risk is very
+limited then I think it would enable the most effective solution (moving
+the IV generators to crypto without carrying excess dm-crypt baggage).
+
+The other part mentioned ("need to somehow handle the new 'random' IV
+generator"): Milan or others, do you have ideas for this?  Presummably
+that is a prereq to moving forward with restricting keycount.
+
+Mike
