@@ -1,46 +1,30 @@
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Subject: Re: XTS Crypto Not Found In /proc/crypto Even After Compiled for
- 4.10.1.
-Date: Sun, 12 Mar 2017 21:13:22 +0200
-Message-ID: <20170312191322.bbux5nrkqf5klznq@kozik-lap>
-References: <CALaQ_hpC4G6CaxZAFvwNG3gFjc5Dj1C7zB6b_WQjGeYhbArHKw@mail.gmail.com>
- <20170306173511.6w3e47v4vomu7yv4@kozik-lap>
- <CALaQ_hqhFjb60rJ2AgBnYgyNCPQ7fH5BdOOCeaMiankQR0VwqQ@mail.gmail.com>
- <20170308174542.2rydwxmrb3oehyrc@kozik-lap>
- <20170308211543.euqexxlhdgpfcdjk@kozik-lap>
- <CALaQ_hrikH8Q8ug9WTgnYR3UwSCip1DZtkkjj2NCLJVqcKQdZA@mail.gmail.com>
- <20170310180640.dnacw53vqrqji2xo@kozik-lap>
- <CALaQ_hqomXaZs0z-S3YX6d-hS_giqgBqBSvumwsMm=BzrgZz7Q@mail.gmail.com>
+From: Jari Ruusu <jariruusu@users.sourceforge.net>
+Subject: Announce loop-AES-v3.7k file/swap crypto package
+Date: Mon, 13 Mar 2017 10:29:03 +0200
+Message-ID: <CACMCwJLsVoFhCJJv0vzRj7X0or+tMOZFJL9hxr-GpEr3ZHdRvw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Marek Szyprowski <m.szyprowski@samsung.com>
-To: Nathan Royce <nroycea+kernel@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Cc: linux-kernel@vger.kernel.org
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:35664 "EHLO
-        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934658AbdCLTN2 (ORCPT
+Received: from mail-wm0-f45.google.com ([74.125.82.45]:38443 "EHLO
+        mail-wm0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751206AbdCMI3G (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 12 Mar 2017 15:13:28 -0400
-Content-Disposition: inline
-In-Reply-To: <CALaQ_hqomXaZs0z-S3YX6d-hS_giqgBqBSvumwsMm=BzrgZz7Q@mail.gmail.com>
+        Mon, 13 Mar 2017 04:29:06 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Mar 10, 2017 at 03:44:45PM -0600, Nathan Royce wrote:
-> Sure, I went ahead and rebuilt it just using the bare exynos_defconfig
-> and adding XTS and ECB and no other changes.
-> 
-> No flags were used. No patches were used other than the 2 you
-> provided. Just the barest of bears, the barest of bones, the barest of
-> deserts, the barest of hairless cats.
->
+loop-AES changes since previous release:
+- Worked around kernel interface changes on 4.10 and 4.11-rc kernels.
 
-Okay, I reproduced it. Beside enabling crypto tests, ECB and XTS, the
-important step is to disable the "ARM Accelerated Cryptographic
-Algorithms" so S5P-SSS will be used with XTS. The xts(ecb-aes-s5p))
-itself passes TCRYPT tests but oopses on cryptswap.
 
-Best regards,
-Krzysztof
+bzip2 compressed tarball is here:
+
+    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.7k.tar.bz2
+    md5sum 942bff99a0361f209ce8de66404b64b3
+
+    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.7k.tar.bz2.sign
+
+-- 
+Jari Ruusu  4096R/8132F189 12D6 4C3A DCDA 0AA4 27BD  ACDF F073 3C80 8132 F189
