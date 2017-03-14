@@ -1,112 +1,137 @@
-From: Dmitry Vyukov <dvyukov@google.com>
-Subject: Re: crypto: deadlock between crypto_alg_sem/rtnl_mutex/genl_mutex
-Date: Tue, 14 Mar 2017 11:31:05 +0100
-Message-ID: <CACT4Y+bzAdkwKgNHZ2PXvJFvm0h2uFYtnjhwCWW1HNOki9=hEA@mail.gmail.com>
-References: <CACT4Y+bLbNbf0T376JHvemuY+za0+qgrfOKWzvJg5vAkJTCRFg@mail.gmail.com>
- <20170314091649.GA711@gondor.apana.org.au> <CACT4Y+YT6EZFtMTNywd4BtKyzWrJ9vtDU96TUFi9WLpypkgWhg@mail.gmail.com>
- <20170314102557.GA1225@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: David Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Cong Wang <xiyou.wangcong@gmail.com>,
-        netdev <netdev@vger.kernel.org>,
-        syzkaller <syzkaller@googlegroups.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Prarit Bhargava <prarit@redhat.com>
+Subject: [PATCH 1/2] hwrng: amd - Revert managed API changes
+Date: Tue, 14 Mar 2017 07:36:01 -0400
+Message-ID: <1489491362-26339-2-git-send-email-prarit@redhat.com>
+References: <1489491362-26339-1-git-send-email-prarit@redhat.com>
+Cc: Prarit Bhargava <prarit@redhat.com>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Corentin LABBE <clabbe.montjoie@gmail.com>,
+        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
+        Wei Yongjun <weiyongjun1@huawei.com>,
+        linux-crypto@vger.kernel.org, linux-geode@lists.infradead.org
+To: linux-kernel@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170314102557.GA1225@gondor.apana.org.au>
+In-Reply-To: <1489491362-26339-1-git-send-email-prarit@redhat.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Mar 14, 2017 at 11:25 AM, Herbert Xu
-<herbert@gondor.apana.org.au> wrote:
-> On Tue, Mar 14, 2017 at 10:44:10AM +0100, Dmitry Vyukov wrote:
->>
->> Yes, please.
->> Disregarding some reports is not a good way long term.
->
-> Please try this patch.
+After commit 31b2a73c9c5f ("hwrng: amd - Migrate to managed API"), the
+amd-rng driver uses devres with pci_dev->dev to keep track of resources,
+but does not actually register a PCI driver.  This results in the
+following issues:
 
-Applied on bots. I should have a conclusion within a day.
-Thanks!
+1. The message
 
+WARNING: CPU: 2 PID: 621 at drivers/base/dd.c:349 driver_probe_device+0x38c
 
-> ---8<---
-> Subject: netlink: Annotate nlk cb_mutex by protocol
->
-> Currently all occurences of nlk->cb_mutex are annotated by lockdep
-> as a single class.  This causes a false lcokdep cycle involving
-> genl and crypto_user.
->
-> This patch fixes it by dividing cb_mutex into individual classes
-> based on the netlink protocol.  As genl and crypto_user do not
-> use the same netlink protocol this breaks the false dependency
-> loop.
->
-> Reported-by: Dmitry Vyukov <dvyukov@google.com>
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
->
-> diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
-> index 7b73c7c..596eaff 100644
-> --- a/net/netlink/af_netlink.c
-> +++ b/net/netlink/af_netlink.c
-> @@ -96,6 +96,44 @@ static inline int netlink_is_kernel(struct sock *sk)
->
->  static DECLARE_WAIT_QUEUE_HEAD(nl_table_wait);
->
-> +static struct lock_class_key nlk_cb_mutex_keys[MAX_LINKS];
-> +
-> +static const char *const nlk_cb_mutex_key_strings[MAX_LINKS + 1] = {
-> +       "nlk_cb_mutex-ROUTE",
-> +       "nlk_cb_mutex-1",
-> +       "nlk_cb_mutex-USERSOCK",
-> +       "nlk_cb_mutex-FIREWALL",
-> +       "nlk_cb_mutex-SOCK_DIAG",
-> +       "nlk_cb_mutex-NFLOG",
-> +       "nlk_cb_mutex-XFRM",
-> +       "nlk_cb_mutex-SELINUX",
-> +       "nlk_cb_mutex-ISCSI",
-> +       "nlk_cb_mutex-AUDIT",
-> +       "nlk_cb_mutex-FIB_LOOKUP",
-> +       "nlk_cb_mutex-CONNECTOR",
-> +       "nlk_cb_mutex-NETFILTER",
-> +       "nlk_cb_mutex-IP6_FW",
-> +       "nlk_cb_mutex-DNRTMSG",
-> +       "nlk_cb_mutex-KOBJECT_UEVENT",
-> +       "nlk_cb_mutex-GENERIC",
-> +       "nlk_cb_mutex-17",
-> +       "nlk_cb_mutex-SCSITRANSPORT",
-> +       "nlk_cb_mutex-ECRYPTFS",
-> +       "nlk_cb_mutex-RDMA",
-> +       "nlk_cb_mutex-CRYPTO",
-> +       "nlk_cb_mutex-SMC",
-> +       "nlk_cb_mutex-23",
-> +       "nlk_cb_mutex-24",
-> +       "nlk_cb_mutex-25",
-> +       "nlk_cb_mutex-26",
-> +       "nlk_cb_mutex-27",
-> +       "nlk_cb_mutex-28",
-> +       "nlk_cb_mutex-29",
-> +       "nlk_cb_mutex-30",
-> +       "nlk_cb_mutex-31",
-> +       "nlk_cb_mutex-MAX_LINKS"
-> +};
-> +
->  static int netlink_dump(struct sock *sk);
->  static void netlink_skb_destructor(struct sk_buff *skb);
->
-> @@ -585,6 +623,9 @@ static int __netlink_create(struct net *net, struct socket *sock,
->         } else {
->                 nlk->cb_mutex = &nlk->cb_def_mutex;
->                 mutex_init(nlk->cb_mutex);
-> +               lockdep_set_class_and_name(nlk->cb_mutex,
-> +                                          nlk_cb_mutex_keys + protocol,
-> +                                          nlk_cb_mutex_key_strings[protocol]);
->         }
->         init_waitqueue_head(&nlk->wait);
->
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+is output when the i2c_amd756 driver loads and attempts to register a PCI
+driver.  The PCI & device subsystems assume that no resources have been
+registered for the device, and the WARN_ON() triggers since amd-rng has
+already do so.
+
+2.  The driver leaks memory because the driver does not attach to a
+device.  The driver only uses the PCI device as a reference.   devm_*()
+functions will release resources on driver detach, which the amd-rng
+driver will never do.  As a result,
+
+3.  The driver cannot be reloaded because there is always a use of the
+ioport and region after the first load of the driver.
+
+Revert the changes made by 31b2a73c9c5f ("hwrng: amd - Migrate to managed
+API").
+
+Signed-off-by: Prarit Bhargava <prarit@redhat.com>
+Fixes: 31b2a73c9c5f ("hwrng: amd - Migrate to managed API").
+Cc: Matt Mackall <mpm@selenic.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Corentin LABBE <clabbe.montjoie@gmail.com>
+Cc: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Cc: Wei Yongjun <weiyongjun1@huawei.com>
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-geode@lists.infradead.org
+---
+ drivers/char/hw_random/amd-rng.c |   42 ++++++++++++++++++++++++++++++--------
+ 1 file changed, 34 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/char/hw_random/amd-rng.c b/drivers/char/hw_random/amd-rng.c
+index 4a99ac756f08..9959c762da2f 100644
+--- a/drivers/char/hw_random/amd-rng.c
++++ b/drivers/char/hw_random/amd-rng.c
+@@ -55,6 +55,7 @@
+ struct amd768_priv {
+ 	void __iomem *iobase;
+ 	struct pci_dev *pcidev;
++	u32 pmbase;
+ };
+ 
+ static int amd_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
+@@ -148,33 +149,58 @@ static int __init mod_init(void)
+ 	if (pmbase == 0)
+ 		return -EIO;
+ 
+-	priv = devm_kzalloc(&pdev->dev, sizeof(*priv), GFP_KERNEL);
++	priv = kzalloc(sizeof(*priv), GFP_KERNEL);
+ 	if (!priv)
+ 		return -ENOMEM;
+ 
+-	if (!devm_request_region(&pdev->dev, pmbase + PMBASE_OFFSET,
+-				PMBASE_SIZE, DRV_NAME)) {
++	if (!request_region(pmbase + PMBASE_OFFSET, PMBASE_SIZE, DRV_NAME)) {
+ 		dev_err(&pdev->dev, DRV_NAME " region 0x%x already in use!\n",
+ 			pmbase + 0xF0);
+-		return -EBUSY;
++		err = -EBUSY;
++		goto out;
+ 	}
+ 
+-	priv->iobase = devm_ioport_map(&pdev->dev, pmbase + PMBASE_OFFSET,
+-			PMBASE_SIZE);
++	priv->iobase = ioport_map(pmbase + PMBASE_OFFSET, PMBASE_SIZE);
+ 	if (!priv->iobase) {
+ 		pr_err(DRV_NAME "Cannot map ioport\n");
+-		return -ENOMEM;
++		err = -EINVAL;
++		goto err_iomap;
+ 	}
+ 
+ 	amd_rng.priv = (unsigned long)priv;
++	priv->pmbase = pmbase;
+ 	priv->pcidev = pdev;
+ 
+ 	pr_info(DRV_NAME " detected\n");
+-	return devm_hwrng_register(&pdev->dev, &amd_rng);
++	err = hwrng_register(&amd_rng);
++	if (err) {
++		pr_err(DRV_NAME " registering failed (%d)\n", err);
++		goto err_hwrng;
++	}
++	return 0;
++
++err_hwrng:
++	ioport_unmap(priv->iobase);
++err_iomap:
++	release_region(pmbase + PMBASE_OFFSET, PMBASE_SIZE);
++out:
++	kfree(priv);
++	return err;
+ }
+ 
+ static void __exit mod_exit(void)
+ {
++	struct amd768_priv *priv;
++
++	priv = (struct amd768_priv *)amd_rng.priv;
++
++	hwrng_unregister(&amd_rng);
++
++	ioport_unmap(priv->iobase);
++
++	release_region(priv->pmbase + PMBASE_OFFSET, PMBASE_SIZE);
++
++	kfree(priv);
+ }
+ 
+ module_init(mod_init);
+-- 
+1.7.9.3
