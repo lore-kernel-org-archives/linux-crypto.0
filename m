@@ -1,78 +1,50 @@
-From: Shaohua Li <shli-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-Subject: Re: [PATCH v6 0/4] Broadcom SBA RAID support
-Date: Tue, 14 Mar 2017 11:48:06 -0700
-Message-ID: <20170314184806.o2oykhztje3obwot@kernel.org>
-References: <1488793408-25592-1-git-send-email-anup.patel@broadcom.com>
- <CAPcyv4hGGbhF-g8B__9=rsP+QwR6RBi=WqALLgABNb1M4D3rBw@mail.gmail.com>
+From: Corentin Labbe <clabbe.montjoie@gmail.com>
+Subject: Re: [PATCH 2/4] crypto: stm32 - Support for STM32 CRC32 crypto module
+Date: Tue, 14 Mar 2017 20:39:54 +0100
+Message-ID: <20170314193954.GA12137@Red>
+References: <1489509446-32283-1-git-send-email-fabien.dessenne@st.com>
+ <1489509446-32283-3-git-send-email-fabien.dessenne@st.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Anup Patel <anup.patel-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
-        Vinod Koul <vinod.koul-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
-        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-        "David S . Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-        Jassi Brar <jassisinghbrar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        Ray Jui <rjui-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
-        Scott Branden <sbranden-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
-        Jon Mason <jonmason-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
-        Rob Rice <rob.rice-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
-        BCM Kernel Feedback <bcm-kernel-feedback-list-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
-        "dmaengine-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <dmaengine-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Device Tree <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        "linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org"
-        <linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>,
-        "linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        linux-raid <lin
-To: Dan Williams <dan.j.williams-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@st.com>,
+        Russell King <linux@armlinux.org.uk>,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+To: Fabien Dessenne <fabien.dessenne@st.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wr0-f196.google.com ([209.85.128.196]:35321 "EHLO
+        mail-wr0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751489AbdCNTkE (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 14 Mar 2017 15:40:04 -0400
 Content-Disposition: inline
-In-Reply-To: <CAPcyv4hGGbhF-g8B__9=rsP+QwR6RBi=WqALLgABNb1M4D3rBw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1489509446-32283-3-git-send-email-fabien.dessenne@st.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Mar 14, 2017 at 09:56:35AM -0700, Dan Williams wrote:
-> On Mon, Mar 6, 2017 at 1:43 AM, Anup Patel <anup.patel-dY08KVG/lbpWk0Htik3J/w@public.gmane.org> wrote:
-> > The Broadcom SBA RAID is a stream-based device which provides
-> > RAID5/6 offload.
-> >
-> > It requires a SoC specific ring manager (such as Broadcom FlexRM
-> > ring manager) to provide ring-based programming interface. Due to
-> > this, the Broadcom SBA RAID driver (mailbox client) implements
-> > DMA device having one DMA channel using a set of mailbox channels
-> > provided by Broadcom SoC specific ring manager driver (mailbox
-> > controller).
-> >
-> > The Broadcom SBA RAID hardware requires PQ disk position instead
-> > of PQ disk coefficient. To address this, we have added raid_gflog
-> > table which will help driver to convert PQ disk coefficient to PQ
-> > disk position.
-> >
-> > This patchset is based on Linux-4.11-rc1 and depends on patchset
-> > "[PATCH v5 0/2] Broadcom FlexRM ring manager support"
-> >
-> > It is also available at sba-raid-v6 branch of
-> > https://github.com/Broadcom/arm64-linux.git
-> >
-> [..]
-> >
-> > Anup Patel (4):
-> >   lib/raid6: Add log-of-2 table for RAID6 HW requiring disk position
-> >   async_tx: Fix DMA_PREP_FENCE usage in do_async_gen_syndrome()
-> >   dmaengine: Add Broadcom SBA RAID driver
-> >   dt-bindings: Add DT bindings document for Broadcom SBA RAID driver
-> 
-> For the dmaengine and async_tx changes:
-> 
-> Acked-by: Dan Williams <dan.j.williams-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-> 
-> The raid change should get an ack from Shaohua.
+On Tue, Mar 14, 2017 at 05:37:24PM +0100, Fabien Dessenne wrote:
+> +static int stm32_crc_remove(struct platform_device *pdev)
+> +{
+> +	struct stm32_crc *crc = platform_get_drvdata(pdev);
+> +
+> +	spin_lock(&crc_list.lock);
+> +	list_del(&crc->list);
+> +	spin_unlock(&crc_list.lock);
+> +
+> +	crypto_unregister_shash(algs);
+> +
+> +	if (crc && crc->clk)
+> +		clk_disable_unprepare(crc->clk);
 
-For the raid6 part:
+Hello
 
-Acked-by: Shaohua Li <shli-b10kYP2dOMg@public.gmane.org>
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+No need to test for crc, if it was NULL, you dereference it just before in list_del.
+Furthermore, It seems that clk_disable_unprepare() handle perfectly NULL, so no test is needed.
+
+Regards
+Corentin Labbe
