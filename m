@@ -1,271 +1,849 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [PATCH] crypto: ccp - Assign DMA commands to the channel's CCP
-Date: Tue, 14 Mar 2017 08:17:10 +0100
-Message-ID: <4585707.bK1Ho6b7OP@tauon.atsec.com>
-References: <20170310180341.21062.82465.stgit@taos> <c50f3dd1-ba28-bc67-4a19-e608d223251f@amd.com>
+From: Dmitry Vyukov <dvyukov@google.com>
+Subject: Re: crypto: deadlock between crypto_alg_sem/rtnl_mutex/genl_mutex
+Date: Tue, 14 Mar 2017 09:14:41 +0100
+Message-ID: <CACT4Y+YTBPDMOZGMLuZPaQhSFXbeQeahHc8BUDOgNYm6hRy6fw@mail.gmail.com>
+References: <CACT4Y+bLbNbf0T376JHvemuY+za0+qgrfOKWzvJg5vAkJTCRFg@mail.gmail.com>
+ <CACT4Y+bJ1-d3DhCvzEN0PeDd7+P2LNgjF2NHwALXBubOKaOEsw@mail.gmail.com> <CACT4Y+YhLM0CetOZn6uXwyBBGM_oVsW-CC3NMg8A5K0xd3F2mA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Gary R Hook <ghook@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Cc: syzkaller <syzkaller@googlegroups.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        David Miller <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
+        Cong Wang <xiyou.wangcong@gmail.com>,
+        netdev <netdev@vger.kernel.org>, santosh.shilimkar@oracle.com,
+        rds-devel@oss.oracle.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:58052 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750866AbdCNHRO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 14 Mar 2017 03:17:14 -0400
-In-Reply-To: <c50f3dd1-ba28-bc67-4a19-e608d223251f@amd.com>
+Received: from mail-ua0-f169.google.com ([209.85.217.169]:35313 "EHLO
+        mail-ua0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751095AbdCNIPE (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 14 Mar 2017 04:15:04 -0400
+Received: by mail-ua0-f169.google.com with SMTP id q7so149647606uaf.2
+        for <linux-crypto@vger.kernel.org>; Tue, 14 Mar 2017 01:15:03 -0700 (PDT)
+In-Reply-To: <CACT4Y+YhLM0CetOZn6uXwyBBGM_oVsW-CC3NMg8A5K0xd3F2mA@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Montag, 13. März 2017, 20:35:07 CET schrieb Gary R Hook:
+On Mon, Mar 6, 2017 at 10:36 AM, Dmitry Vyukov <dvyukov@google.com> wrote:
+> On Sun, Mar 5, 2017 at 6:36 PM, Dmitry Vyukov <dvyukov@google.com> wrote:
+>> On Sun, Mar 5, 2017 at 4:08 PM, Dmitry Vyukov <dvyukov@google.com> wrote:
+>>> Hello,
+>>>
+>>> I am getting the following deadlock reports while running syzkaller
+>>> fuzzer on net-next/8d70eeb84ab277377c017af6a21d0a337025dede:
+>>>
+>>> ======================================================
+>>> [ INFO: possible circular locking dependency detected ]
+>>> 4.10.0+ #5 Not tainted
+>>> -------------------------------------------------------
+>>> syz-executor6/6143 is trying to acquire lock:
+>>>  (nlk->cb_mutex){+.+.+.}, at: [<ffffffff837df634>]
+>>> __netlink_dump_start+0xf4/0x760 net/netlink/af_netlink.c:2187
+>>>
+>>> but task is already holding lock:
+>>>  (crypto_alg_sem){+++++.}, at: [<ffffffff821cd1f6>]
+>>> crypto_user_rcv_msg+0x136/0x4f0 crypto/crypto_user.c:507
+>>>
+>>> which lock already depends on the new lock.
+>>>
+>>>
+>>> the existing dependency chain (in reverse order) is:
+>>>
+>>> -> #4 (crypto_alg_sem){+++++.}:
+>>>        validate_chain kernel/locking/lockdep.c:2267 [inline]
+>>>        __lock_acquire+0x2149/0x3430 kernel/locking/lockdep.c:3340
+>>>        lock_acquire+0x2a1/0x630 kernel/locking/lockdep.c:3755
+>>>        down_read+0x9b/0x150 kernel/locking/rwsem.c:23
+>>>        crypto_alg_lookup+0x23/0x50 crypto/api.c:199
+>>>        crypto_larval_lookup.part.10+0x9a/0x3b0 crypto/api.c:217
+>>>        crypto_larval_lookup crypto/api.c:211 [inline]
+>>>        crypto_alg_mod_lookup+0x77/0x1b0 crypto/api.c:270
+>>>        crypto_alloc_base+0x50/0x1e0 crypto/api.c:416
+>>>        crypto_alloc_cipher include/linux/crypto.h:1407 [inline]
+>>>        tcp_fastopen_reset_cipher+0xc2/0x2e0 net/ipv4/tcp_fastopen.c:48
+>>>        tcp_fastopen_init_key_once+0x114/0x120 net/ipv4/tcp_fastopen.c:29
+>>>        do_tcp_setsockopt.isra.36+0x140a/0x20a0 net/ipv4/tcp.c:2684
+>>>        tcp_setsockopt+0xb0/0xd0 net/ipv4/tcp.c:2733
+>>>        sock_common_setsockopt+0x95/0xd0 net/core/sock.c:2731
+>>>        SYSC_setsockopt net/socket.c:1786 [inline]
+>>>        SyS_setsockopt+0x25c/0x390 net/socket.c:1765
+>>>        entry_SYSCALL_64_fastpath+0x1f/0xc2
+>>>
+>>> -> #3 (sk_lock-AF_INET){+.+.+.}:
+>>>        validate_chain kernel/locking/lockdep.c:2267 [inline]
+>>>        __lock_acquire+0x2149/0x3430 kernel/locking/lockdep.c:3340
+>>>        lock_acquire+0x2a1/0x630 kernel/locking/lockdep.c:3755
+>>>        lock_sock_nested+0xcb/0x120 net/core/sock.c:2536
+>>>        lock_sock include/net/sock.h:1460 [inline]
+>>>        rds_tcp_listen_stop+0x57/0x140 net/rds/tcp_listen.c:284
+>>>        rds_tcp_kill_sock net/rds/tcp.c:529 [inline]
+>>>        rds_tcp_dev_event+0x383/0xc50 net/rds/tcp.c:568
+>>>        notifier_call_chain+0x1b5/0x2b0 kernel/notifier.c:93
+>>>        __raw_notifier_call_chain kernel/notifier.c:394 [inline]
+>>>        raw_notifier_call_chain+0x2d/0x40 kernel/notifier.c:401
+>>>        call_netdevice_notifiers_info+0x51/0x90 net/core/dev.c:1646
+>>>        call_netdevice_notifiers net/core/dev.c:1662 [inline]
+>>>        netdev_run_todo+0x3b2/0xa30 net/core/dev.c:7530
+>>>        rtnl_unlock+0xe/0x10 net/core/rtnetlink.c:104
+>>>        default_device_exit_batch+0x504/0x620 net/core/dev.c:8334
+>>>        ops_exit_list.isra.6+0x100/0x150 net/core/net_namespace.c:144
+>>>        cleanup_net+0x551/0xa90 net/core/net_namespace.c:463
+>>>        process_one_work+0xbd0/0x1c10 kernel/workqueue.c:2096
+>>>        worker_thread+0x223/0x1990 kernel/workqueue.c:2230
+>>>        kthread+0x326/0x3f0 kernel/kthread.c:229
+>>>        ret_from_fork+0x31/0x40 arch/x86/entry/entry_64.S:430
+>>>
+>>> -> #2 (rtnl_mutex){+.+.+.}:
+>>>        validate_chain kernel/locking/lockdep.c:2267 [inline]
+>>>        __lock_acquire+0x2149/0x3430 kernel/locking/lockdep.c:3340
+>>>        lock_acquire+0x2a1/0x630 kernel/locking/lockdep.c:3755
+>>>        __mutex_lock_common kernel/locking/mutex.c:756 [inline]
+>>>        __mutex_lock+0x172/0x1730 kernel/locking/mutex.c:893
+>>>        mutex_lock_nested+0x16/0x20 kernel/locking/mutex.c:908
+>>>        rtnl_lock+0x17/0x20 net/core/rtnetlink.c:70
+>>>        tipc_nl_bearer_dump+0x3ef/0x720 net/tipc/bearer.c:774
+>>>        genl_lock_dumpit+0x68/0x90 net/netlink/genetlink.c:479
+>>>        netlink_dump+0x54d/0xd40 net/netlink/af_netlink.c:2127
+>>>        __netlink_dump_start+0x4e5/0x760 net/netlink/af_netlink.c:2217
+>>>        genl_family_rcv_msg+0xd9d/0x1040 net/netlink/genetlink.c:546
+>>>        genl_rcv_msg+0xa6/0x140 net/netlink/genetlink.c:620
+>>>        netlink_rcv_skb+0x2ab/0x390 net/netlink/af_netlink.c:2298
+>>>        genl_rcv+0x28/0x40 net/netlink/genetlink.c:631
+>>>        netlink_unicast_kernel net/netlink/af_netlink.c:1231 [inline]
+>>>        netlink_unicast+0x514/0x730 net/netlink/af_netlink.c:1257
+>>>        netlink_sendmsg+0xa9f/0xe50 net/netlink/af_netlink.c:1803
+>>>        sock_sendmsg_nosec net/socket.c:633 [inline]
+>>>        sock_sendmsg+0xca/0x110 net/socket.c:643
+>>>        sock_write_iter+0x326/0x600 net/socket.c:846
+>>>        call_write_iter include/linux/fs.h:1733 [inline]
+>>>        new_sync_write fs/read_write.c:497 [inline]
+>>>        __vfs_write+0x483/0x740 fs/read_write.c:510
+>>>        vfs_write+0x187/0x530 fs/read_write.c:558
+>>>        SYSC_write fs/read_write.c:605 [inline]
+>>>        SyS_write+0xfb/0x230 fs/read_write.c:597
+>>>        entry_SYSCALL_64_fastpath+0x1f/0xc2
+>>>
+>>> -> #1 (genl_mutex){+.+.+.}:
+>>>        validate_chain kernel/locking/lockdep.c:2267 [inline]
+>>>        __lock_acquire+0x2149/0x3430 kernel/locking/lockdep.c:3340
+>>>        lock_acquire+0x2a1/0x630 kernel/locking/lockdep.c:3755
+>>>        __mutex_lock_common kernel/locking/mutex.c:756 [inline]
+>>>        __mutex_lock+0x172/0x1730 kernel/locking/mutex.c:893
+>>>        mutex_lock_nested+0x16/0x20 kernel/locking/mutex.c:908
+>>>        genl_lock net/netlink/genetlink.c:32 [inline]
+>>>        genl_lock_dumpit+0x41/0x90 net/netlink/genetlink.c:478
+>>>        netlink_dump+0x54d/0xd40 net/netlink/af_netlink.c:2127
+>>>        __netlink_dump_start+0x4e5/0x760 net/netlink/af_netlink.c:2217
+>>>        genl_family_rcv_msg+0xd9d/0x1040 net/netlink/genetlink.c:546
+>>>        genl_rcv_msg+0xa6/0x140 net/netlink/genetlink.c:620
+>>>        netlink_rcv_skb+0x2ab/0x390 net/netlink/af_netlink.c:2298
+>>>        genl_rcv+0x28/0x40 net/netlink/genetlink.c:631
+>>>        netlink_unicast_kernel net/netlink/af_netlink.c:1231 [inline]
+>>>        netlink_unicast+0x514/0x730 net/netlink/af_netlink.c:1257
+>>>        netlink_sendmsg+0xa9f/0xe50 net/netlink/af_netlink.c:1803
+>>>        sock_sendmsg_nosec net/socket.c:633 [inline]
+>>>        sock_sendmsg+0xca/0x110 net/socket.c:643
+>>>        sock_write_iter+0x326/0x600 net/socket.c:846
+>>>        call_write_iter include/linux/fs.h:1733 [inline]
+>>>        new_sync_write fs/read_write.c:497 [inline]
+>>>        __vfs_write+0x483/0x740 fs/read_write.c:510
+>>>        vfs_write+0x187/0x530 fs/read_write.c:558
+>>>        SYSC_write fs/read_write.c:605 [inline]
+>>>        SyS_write+0xfb/0x230 fs/read_write.c:597
+>>>        entry_SYSCALL_64_fastpath+0x1f/0xc2
+>>>
+>>> -> #0 (nlk->cb_mutex){+.+.+.}:
+>>>        check_prev_add kernel/locking/lockdep.c:1830 [inline]
+>>>        check_prevs_add+0xa8f/0x19f0 kernel/locking/lockdep.c:1940
+>>>        validate_chain kernel/locking/lockdep.c:2267 [inline]
+>>>        __lock_acquire+0x2149/0x3430 kernel/locking/lockdep.c:3340
+>>>        lock_acquire+0x2a1/0x630 kernel/locking/lockdep.c:3755
+>>>        __mutex_lock_common kernel/locking/mutex.c:756 [inline]
+>>>        __mutex_lock+0x172/0x1730 kernel/locking/mutex.c:893
+>>>        mutex_lock_nested+0x16/0x20 kernel/locking/mutex.c:908
+>>>        __netlink_dump_start+0xf4/0x760 net/netlink/af_netlink.c:2187
+>>>        netlink_dump_start include/linux/netlink.h:165 [inline]
+>>>        crypto_user_rcv_msg+0x2ad/0x4f0 crypto/crypto_user.c:517
+>>>        netlink_rcv_skb+0x2ab/0x390 net/netlink/af_netlink.c:2298
+>>>        crypto_netlink_rcv+0x2a/0x40 crypto/crypto_user.c:538
+>>>        netlink_unicast_kernel net/netlink/af_netlink.c:1231 [inline]
+>>>        netlink_unicast+0x514/0x730 net/netlink/af_netlink.c:1257
+>>>        netlink_sendmsg+0xa9f/0xe50 net/netlink/af_netlink.c:1803
+>>>        sock_sendmsg_nosec net/socket.c:633 [inline]
+>>>        sock_sendmsg+0xca/0x110 net/socket.c:643
+>>>        ___sys_sendmsg+0x8fa/0x9f0 net/socket.c:1985
+>>>        __sys_sendmsg+0x138/0x300 net/socket.c:2019
+>>>        SYSC_sendmsg net/socket.c:2030 [inline]
+>>>        SyS_sendmsg+0x2d/0x50 net/socket.c:2026
+>>>        entry_SYSCALL_64_fastpath+0x1f/0xc2
+>>>
+>>> other info that might help us debug this:
+>>>
+>>> Chain exists of:
+>>>   nlk->cb_mutex --> sk_lock-AF_INET --> crypto_alg_sem
+>>>
+>>>  Possible unsafe locking scenario:
+>>>
+>>>        CPU0                    CPU1
+>>>        ----                    ----
+>>>   lock(crypto_alg_sem);
+>>>                                lock(sk_lock-AF_INET);
+>>>                                lock(crypto_alg_sem);
+>>>   lock(nlk->cb_mutex);
+>>>
+>>>  *** DEADLOCK ***
+>>>
+>>> 2 locks held by syz-executor6/6143:
+>>>  #0:  (crypto_cfg_mutex){+.+...}, at: [<ffffffff821cad9b>]
+>>> crypto_netlink_rcv+0x1b/0x40 crypto/crypto_user.c:537
+>>>  #1:  (crypto_alg_sem){+++++.}, at: [<ffffffff821cd1f6>]
+>>> crypto_user_rcv_msg+0x136/0x4f0 crypto/crypto_user.c:507
+>>>
+>>> stack backtrace:
+>>> CPU: 0 PID: 6143 Comm: syz-executor6 Not tainted 4.10.0+ #5
+>>> Hardware name: Google Google Compute Engine/Google Compute Engine,
+>>> BIOS Google 01/01/2011
+>>> Call Trace:
+>>>  __dump_stack lib/dump_stack.c:16 [inline]
+>>>  dump_stack+0x2ee/0x3ef lib/dump_stack.c:52
+>>>  print_circular_bug+0x307/0x3b0 kernel/locking/lockdep.c:1204
+>>>  check_prev_add kernel/locking/lockdep.c:1830 [inline]
+>>>  check_prevs_add+0xa8f/0x19f0 kernel/locking/lockdep.c:1940
+>>>  validate_chain kernel/locking/lockdep.c:2267 [inline]
+>>>  __lock_acquire+0x2149/0x3430 kernel/locking/lockdep.c:3340
+>>>  lock_acquire+0x2a1/0x630 kernel/locking/lockdep.c:3755
+>>>  __mutex_lock_common kernel/locking/mutex.c:756 [inline]
+>>>  __mutex_lock+0x172/0x1730 kernel/locking/mutex.c:893
+>>>  mutex_lock_nested+0x16/0x20 kernel/locking/mutex.c:908
+>>>  __netlink_dump_start+0xf4/0x760 net/netlink/af_netlink.c:2187
+>>>  netlink_dump_start include/linux/netlink.h:165 [inline]
+>>>  crypto_user_rcv_msg+0x2ad/0x4f0 crypto/crypto_user.c:517
+>>>  netlink_rcv_skb+0x2ab/0x390 net/netlink/af_netlink.c:2298
+>>>  crypto_netlink_rcv+0x2a/0x40 crypto/crypto_user.c:538
+>>>  netlink_unicast_kernel net/netlink/af_netlink.c:1231 [inline]
+>>>  netlink_unicast+0x514/0x730 net/netlink/af_netlink.c:1257
+>>>  netlink_sendmsg+0xa9f/0xe50 net/netlink/af_netlink.c:1803
+>>>  sock_sendmsg_nosec net/socket.c:633 [inline]
+>>>  sock_sendmsg+0xca/0x110 net/socket.c:643
+>>>  ___sys_sendmsg+0x8fa/0x9f0 net/socket.c:1985
+>>>  __sys_sendmsg+0x138/0x300 net/socket.c:2019
+>>>  SYSC_sendmsg net/socket.c:2030 [inline]
+>>>  SyS_sendmsg+0x2d/0x50 net/socket.c:2026
+>>>  entry_SYSCALL_64_fastpath+0x1f/0xc2
+>>
+>>
+>>
+>> Another one involving tcp_md5sig_mutex:
+>>
+>>
+>> ======================================================
+>> [ INFO: possible circular locking dependency detected ]
+>> SELinux: unrecognized netlink message: protocol=9 nlmsg_type=2
+>> sclass=netlink_audit_socket pig=4033 comm=syz-executor4
+>> 4.10.0+ #5 Not tainted
+>> -------------------------------------------------------
+>> syz-executor8/4018 is trying to acquire lock:
+>>  (crypto_alg_sem){++++++}, at: [<ffffffff82193473>]
+>> crypto_alg_lookup+0x23/0x50 crypto/api.c:199
+>>
+>> but task is already holding lock:
+>>  (tcp_md5sig_mutex){+.+...}, at: [<ffffffff838e4efa>]
+>> tcp_alloc_md5sig_pool+0x4a/0x470 net/ipv4/tcp.c:3196
+>>
+>> which lock already depends on the new lock.
+>>
+>>
+>> the existing dependency chain (in reverse order) is:
+>>
+>> -> #5 (tcp_md5sig_mutex){+.+...}:
+>>        validate_chain kernel/locking/lockdep.c:2267 [inline]
+>>        __lock_acquire+0x2149/0x3430 kernel/locking/lockdep.c:3340
+>>        lock_acquire+0x2a1/0x630 kernel/locking/lockdep.c:3755
+>>        __mutex_lock_common kernel/locking/mutex.c:756 [inline]
+>>        __mutex_lock+0x172/0x1730 kernel/locking/mutex.c:893
+>>        mutex_lock_nested+0x16/0x20 kernel/locking/mutex.c:908
+>>        tcp_alloc_md5sig_pool+0x4a/0x470 net/ipv4/tcp.c:3196
+>>        tcp_md5_do_add+0x1d8/0x5d0 net/ipv4/tcp_ipv4.c:969
+>>        tcp_v4_parse_md5_keys+0x1c7/0x2b0 net/ipv4/tcp_ipv4.c:1037
+>>        do_tcp_setsockopt.isra.36+0x657/0x20a0 net/ipv4/tcp.c:2668
+>>        tcp_setsockopt+0xb0/0xd0 net/ipv4/tcp.c:2733
+>>        sock_common_setsockopt+0x95/0xd0 net/core/sock.c:2731
+>>        SYSC_setsockopt net/socket.c:1786 [inline]
+>>        SyS_setsockopt+0x25c/0x390 net/socket.c:1765
+>>        do_syscall_64+0x2e8/0x930 arch/x86/entry/common.c:281
+>>        return_from_SYSCALL_64+0x0/0x7a
+>>
+>> -> #4 (sk_lock-AF_INET){+.+.+.}:
+>>        validate_chain kernel/locking/lockdep.c:2267 [inline]
+>>        __lock_acquire+0x2149/0x3430 kernel/locking/lockdep.c:3340
+>>        lock_acquire+0x2a1/0x630 kernel/locking/lockdep.c:3755
+>>        lock_sock_nested+0xcb/0x120 net/core/sock.c:2536
+>>        lock_sock include/net/sock.h:1460 [inline]
+>>        do_ip_setsockopt.isra.12+0x301/0x3760 net/ipv4/ip_sockglue.c:653
+>>        ip_setsockopt+0x3a/0xb0 net/ipv4/ip_sockglue.c:1265
+>>        tcp_setsockopt+0x82/0xd0 net/ipv4/tcp.c:2731
+>>        sock_common_setsockopt+0x95/0xd0 net/core/sock.c:2731
+>>        SYSC_setsockopt net/socket.c:1786 [inline]
+>>        SyS_setsockopt+0x25c/0x390 net/socket.c:1765
+>>        entry_SYSCALL_64_fastpath+0x1f/0xc2
+>>
+>> -> #3 (rtnl_mutex){+.+.+.}:
+>>        validate_chain kernel/locking/lockdep.c:2267 [inline]
+>>        __lock_acquire+0x2149/0x3430 kernel/locking/lockdep.c:3340
+>>        lock_acquire+0x2a1/0x630 kernel/locking/lockdep.c:3755
+>>        __mutex_lock_common kernel/locking/mutex.c:756 [inline]
+>>        __mutex_lock+0x172/0x1730 kernel/locking/mutex.c:893
+>>        mutex_lock_nested+0x16/0x20 kernel/locking/mutex.c:908
+>>        rtnl_lock+0x17/0x20 net/core/rtnetlink.c:70
+>>        nl80211_prepare_wdev_dump.isra.37+0x2c/0x5d0 net/wireless/nl80211.c:548
+>>        nl80211_dump_station+0x178/0xd80 net/wireless/nl80211.c:4455
+>>        genl_lock_dumpit+0x68/0x90 net/netlink/genetlink.c:479
+>>        netlink_dump+0x54d/0xd40 net/netlink/af_netlink.c:2127
+>>        __netlink_dump_start+0x4e5/0x760 net/netlink/af_netlink.c:2217
+>>        genl_family_rcv_msg+0xd9d/0x1040 net/netlink/genetlink.c:546
+>>        genl_rcv_msg+0xa6/0x140 net/netlink/genetlink.c:620
+>>        netlink_rcv_skb+0x2ab/0x390 net/netlink/af_netlink.c:2298
+>>        genl_rcv+0x28/0x40 net/netlink/genetlink.c:631
+>>        netlink_unicast_kernel net/netlink/af_netlink.c:1231 [inline]
+>>        netlink_unicast+0x514/0x730 net/netlink/af_netlink.c:1257
+>>        netlink_sendmsg+0xa9f/0xe50 net/netlink/af_netlink.c:1803
+>>        sock_sendmsg_nosec net/socket.c:633 [inline]
+>>        sock_sendmsg+0xca/0x110 net/socket.c:643
+>>        sock_write_iter+0x326/0x600 net/socket.c:846
+>>        call_write_iter include/linux/fs.h:1733 [inline]
+>>        new_sync_write fs/read_write.c:497 [inline]
+>>        __vfs_write+0x483/0x740 fs/read_write.c:510
+>>        vfs_write+0x187/0x530 fs/read_write.c:558
+>>        SYSC_write fs/read_write.c:605 [inline]
+>>        SyS_write+0xfb/0x230 fs/read_write.c:597
+>>        entry_SYSCALL_64_fastpath+0x1f/0xc2
+>>
+>> -> #2 (genl_mutex){+.+.+.}:
+>>        validate_chain kernel/locking/lockdep.c:2267 [inline]
+>>        __lock_acquire+0x2149/0x3430 kernel/locking/lockdep.c:3340
+>>        lock_acquire+0x2a1/0x630 kernel/locking/lockdep.c:3755
+>>        __mutex_lock_common kernel/locking/mutex.c:756 [inline]
+>>        __mutex_lock+0x172/0x1730 kernel/locking/mutex.c:893
+>>        mutex_lock_nested+0x16/0x20 kernel/locking/mutex.c:908
+>>        genl_lock net/netlink/genetlink.c:32 [inline]
+>>        genl_lock_dumpit+0x41/0x90 net/netlink/genetlink.c:478
+>>        netlink_dump+0x54d/0xd40 net/netlink/af_netlink.c:2127
+>>        __netlink_dump_start+0x4e5/0x760 net/netlink/af_netlink.c:2217
+>>        genl_family_rcv_msg+0xd9d/0x1040 net/netlink/genetlink.c:546
+>>        genl_rcv_msg+0xa6/0x140 net/netlink/genetlink.c:620
+>>        netlink_rcv_skb+0x2ab/0x390 net/netlink/af_netlink.c:2298
+>>        genl_rcv+0x28/0x40 net/netlink/genetlink.c:631
+>>        netlink_unicast_kernel net/netlink/af_netlink.c:1231 [inline]
+>>        netlink_unicast+0x514/0x730 net/netlink/af_netlink.c:1257
+>>        netlink_sendmsg+0xa9f/0xe50 net/netlink/af_netlink.c:1803
+>>        sock_sendmsg_nosec net/socket.c:633 [inline]
+>>        sock_sendmsg+0xca/0x110 net/socket.c:643
+>>        sock_write_iter+0x326/0x600 net/socket.c:846
+>>        call_write_iter include/linux/fs.h:1733 [inline]
+>>        new_sync_write fs/read_write.c:497 [inline]
+>>        __vfs_write+0x483/0x740 fs/read_write.c:510
+>>        vfs_write+0x187/0x530 fs/read_write.c:558
+>>        SYSC_write fs/read_write.c:605 [inline]
+>>        SyS_write+0xfb/0x230 fs/read_write.c:597
+>>        entry_SYSCALL_64_fastpath+0x1f/0xc2
+>>
+>> -> #1 (nlk->cb_mutex){+.+.+.}:
+>>        validate_chain kernel/locking/lockdep.c:2267 [inline]
+>>        __lock_acquire+0x2149/0x3430 kernel/locking/lockdep.c:3340
+>>        lock_acquire+0x2a1/0x630 kernel/locking/lockdep.c:3755
+>>        __mutex_lock_common kernel/locking/mutex.c:756 [inline]
+>>        __mutex_lock+0x172/0x1730 kernel/locking/mutex.c:893
+>>        mutex_lock_nested+0x16/0x20 kernel/locking/mutex.c:908
+>>        __netlink_dump_start+0xf4/0x760 net/netlink/af_netlink.c:2187
+>>        netlink_dump_start include/linux/netlink.h:165 [inline]
+>>        crypto_user_rcv_msg+0x2ad/0x4f0 crypto/crypto_user.c:517
+>>        netlink_rcv_skb+0x2ab/0x390 net/netlink/af_netlink.c:2298
+>>        crypto_netlink_rcv+0x2a/0x40 crypto/crypto_user.c:538
+>>        netlink_unicast_kernel net/netlink/af_netlink.c:1231 [inline]
+>>        netlink_unicast+0x514/0x730 net/netlink/af_netlink.c:1257
+>>        netlink_sendmsg+0xa9f/0xe50 net/netlink/af_netlink.c:1803
+>>        sock_sendmsg_nosec net/socket.c:633 [inline]
+>>        sock_sendmsg+0xca/0x110 net/socket.c:643
+>>        ___sys_sendmsg+0x8fa/0x9f0 net/socket.c:1985
+>>        __sys_sendmsg+0x138/0x300 net/socket.c:2019
+>>        SYSC_sendmsg net/socket.c:2030 [inline]
+>>        SyS_sendmsg+0x2d/0x50 net/socket.c:2026
+>>        entry_SYSCALL_64_fastpath+0x1f/0xc2
+>>
+>> -> #0 (crypto_alg_sem){++++++}:
+>>        check_prev_add kernel/locking/lockdep.c:1830 [inline]
+>>        check_prevs_add+0xa8f/0x19f0 kernel/locking/lockdep.c:1940
+>>        validate_chain kernel/locking/lockdep.c:2267 [inline]
+>>        __lock_acquire+0x2149/0x3430 kernel/locking/lockdep.c:3340
+>>        lock_acquire+0x2a1/0x630 kernel/locking/lockdep.c:3755
+>>        down_read+0x9b/0x150 kernel/locking/rwsem.c:23
+>>        crypto_alg_lookup+0x23/0x50 crypto/api.c:199
+>>        crypto_larval_lookup.part.10+0x9a/0x3b0 crypto/api.c:217
+>>        crypto_larval_lookup crypto/api.c:211 [inline]
+>>        crypto_alg_mod_lookup+0x77/0x1b0 crypto/api.c:270
+>>        crypto_find_alg crypto/api.c:500 [inline]
+>>        crypto_alloc_tfm+0x101/0x2e0 crypto/api.c:533
+>>        crypto_alloc_ahash+0x2c/0x40 crypto/ahash.c:525
+>>        __tcp_alloc_md5sig_pool net/ipv4/tcp.c:3158 [inline]
+>>        tcp_alloc_md5sig_pool+0x85/0x470 net/ipv4/tcp.c:3199
+>>        tcp_md5_do_add+0x1d8/0x5d0 net/ipv4/tcp_ipv4.c:969
+>>        tcp_v4_parse_md5_keys+0x1c7/0x2b0 net/ipv4/tcp_ipv4.c:1037
+>>        do_tcp_setsockopt.isra.36+0x657/0x20a0 net/ipv4/tcp.c:2668
+>>        tcp_setsockopt+0xb0/0xd0 net/ipv4/tcp.c:2733
+>>        sock_common_setsockopt+0x95/0xd0 net/core/sock.c:2731
+>>        SYSC_setsockopt net/socket.c:1786 [inline]
+>>        SyS_setsockopt+0x25c/0x390 net/socket.c:1765
+>>        do_syscall_64+0x2e8/0x930 arch/x86/entry/common.c:281
+>>        return_from_SYSCALL_64+0x0/0x7a
+>>
+>> other info that might help us debug this:
+>>
+>> Chain exists of:
+>>   crypto_alg_sem --> sk_lock-AF_INET --> tcp_md5sig_mutex
+>>
+>>  Possible unsafe locking scenario:
+>>
+>>        CPU0                    CPU1
+>>        ----                    ----
+>>   lock(tcp_md5sig_mutex);
+>>                                lock(sk_lock-AF_INET);
+>>                                lock(tcp_md5sig_mutex);
+>>   lock(crypto_alg_sem);
+>>
+>>  *** DEADLOCK ***
+>>
+>> 2 locks held by syz-executor8/4018:
+>>  #0:  (sk_lock-AF_INET){+.+.+.}, at: [<ffffffff838e7a26>] lock_sock
+>> include/net/sock.h:1460 [inline]
+>>  #0:  (sk_lock-AF_INET){+.+.+.}, at: [<ffffffff838e7a26>]
+>> do_tcp_setsockopt.isra.36+0x216/0x20a0 net/ipv4/tcp.c:2466
+>>  #1:  (tcp_md5sig_mutex){+.+...}, at: [<ffffffff838e4efa>]
+>> tcp_alloc_md5sig_pool+0x4a/0x470 net/ipv4/tcp.c:3196
+>>
+>> stack backtrace:
+>> CPU: 0 PID: 4018 Comm: syz-executor8 Not tainted 4.10.0+ #5
+>> Hardware name: Google Google Compute Engine/Google Compute Engine,
+>> BIOS Google 01/01/2011
+>> Call Trace:
+>>  __dump_stack lib/dump_stack.c:16 [inline]
+>>  dump_stack+0x2ee/0x3ef lib/dump_stack.c:52
+>>  print_circular_bug+0x307/0x3b0 kernel/locking/lockdep.c:1204
+>>  check_prev_add kernel/locking/lockdep.c:1830 [inline]
+>>  check_prevs_add+0xa8f/0x19f0 kernel/locking/lockdep.c:1940
+>>  validate_chain kernel/locking/lockdep.c:2267 [inline]
+>>  __lock_acquire+0x2149/0x3430 kernel/locking/lockdep.c:3340
+>>  lock_acquire+0x2a1/0x630 kernel/locking/lockdep.c:3755
+>>  down_read+0x9b/0x150 kernel/locking/rwsem.c:23
+>>  crypto_alg_lookup+0x23/0x50 crypto/api.c:199
+>>  crypto_larval_lookup.part.10+0x9a/0x3b0 crypto/api.c:217
+>>  crypto_larval_lookup crypto/api.c:211 [inline]
+>>  crypto_alg_mod_lookup+0x77/0x1b0 crypto/api.c:270
+>>  crypto_find_alg crypto/api.c:500 [inline]
+>>  crypto_alloc_tfm+0x101/0x2e0 crypto/api.c:533
+>>  crypto_alloc_ahash+0x2c/0x40 crypto/ahash.c:525
+>>  __tcp_alloc_md5sig_pool net/ipv4/tcp.c:3158 [inline]
+>>  tcp_alloc_md5sig_pool+0x85/0x470 net/ipv4/tcp.c:3199
+>>  tcp_md5_do_add+0x1d8/0x5d0 net/ipv4/tcp_ipv4.c:969
+>>  tcp_v4_parse_md5_keys+0x1c7/0x2b0 net/ipv4/tcp_ipv4.c:1037
+>>  do_tcp_setsockopt.isra.36+0x657/0x20a0 net/ipv4/tcp.c:2668
+>>  tcp_setsockopt+0xb0/0xd0 net/ipv4/tcp.c:2733
+>>  sock_common_setsockopt+0x95/0xd0 net/core/sock.c:2731
+>>  SYSC_setsockopt net/socket.c:1786 [inline]
+>>  SyS_setsockopt+0x25c/0x390 net/socket.c:1765
+>>  do_syscall_64+0x2e8/0x930 arch/x86/entry/common.c:281
+>
+>
+>
+> Another one:
+>
+> ======================================================
+> [ INFO: possible circular locking dependency detected ]
+> 4.10.0+ #6 Not tainted
+> -------------------------------------------------------
+> syz-executor8/3613 is trying to acquire lock:
+>  (sk_lock-AF_INET6){+.+.+.}, at: [<ffffffff83b72eb9>] lock_sock
+> include/net/sock.h:1460 [inline]
+>  (sk_lock-AF_INET6){+.+.+.}, at: [<ffffffff83b72eb9>]
+> do_ipv6_setsockopt.isra.11+0x229/0x36e0 net/ipv6/ipv6_sockglue.c:167
+>
+> but task is already holding lock:
+>  (rtnl_mutex){+.+.+.}, at: [<ffffffff8370a197>] rtnl_lock+0x17/0x20
+> net/core/rtnetlink.c:70
+>
+> which lock already depends on the new lock.
+>
+>
+> the existing dependency chain (in reverse order) is:
+>
+> -> #4 (rtnl_mutex){+.+.+.}:
+>        validate_chain kernel/locking/lockdep.c:2267 [inline]
+>        __lock_acquire+0x2149/0x3430 kernel/locking/lockdep.c:3340
+>        lock_acquire+0x2a1/0x630 kernel/locking/lockdep.c:3755
+>        __mutex_lock_common kernel/locking/mutex.c:756 [inline]
+>        __mutex_lock+0x172/0x1730 kernel/locking/mutex.c:893
+>        mutex_lock_nested+0x16/0x20 kernel/locking/mutex.c:908
+>        rtnl_lock+0x17/0x20 net/core/rtnetlink.c:70
+>        tipc_nl_node_dump_monitor+0x260/0x510 net/tipc/node.c:2128
+>        genl_lock_dumpit+0x68/0x90 net/netlink/genetlink.c:479
+>        netlink_dump+0x54d/0xd40 net/netlink/af_netlink.c:2127
+>        __netlink_dump_start+0x4e5/0x760 net/netlink/af_netlink.c:2217
+>        genl_family_rcv_msg+0xd9d/0x1040 net/netlink/genetlink.c:546
+>        genl_rcv_msg+0xa6/0x140 net/netlink/genetlink.c:620
+>        netlink_rcv_skb+0x2ab/0x390 net/netlink/af_netlink.c:2298
+>        genl_rcv+0x28/0x40 net/netlink/genetlink.c:631
+>        netlink_unicast_kernel net/netlink/af_netlink.c:1231 [inline]
+>        netlink_unicast+0x514/0x730 net/netlink/af_netlink.c:1257
+>        netlink_sendmsg+0xa9f/0xe50 net/netlink/af_netlink.c:1803
+>        sock_sendmsg_nosec net/socket.c:633 [inline]
+>        sock_sendmsg+0xca/0x110 net/socket.c:643
+>        sock_write_iter+0x326/0x600 net/socket.c:846
+>        call_write_iter include/linux/fs.h:1733 [inline]
+>        new_sync_write fs/read_write.c:497 [inline]
+>        __vfs_write+0x483/0x740 fs/read_write.c:510
+>        vfs_write+0x187/0x530 fs/read_write.c:558
+>        SYSC_write fs/read_write.c:605 [inline]
+>        SyS_write+0xfb/0x230 fs/read_write.c:597
+>        entry_SYSCALL_64_fastpath+0x1f/0xc2
+>
+> -> #3 (genl_mutex){+.+.+.}:
+>        validate_chain kernel/locking/lockdep.c:2267 [inline]
+>        __lock_acquire+0x2149/0x3430 kernel/locking/lockdep.c:3340
+>        lock_acquire+0x2a1/0x630 kernel/locking/lockdep.c:3755
+>        __mutex_lock_common kernel/locking/mutex.c:756 [inline]
+>        __mutex_lock+0x172/0x1730 kernel/locking/mutex.c:893
+>        mutex_lock_nested+0x16/0x20 kernel/locking/mutex.c:908
+>        genl_lock net/netlink/genetlink.c:32 [inline]
+>        genl_lock_dumpit+0x41/0x90 net/netlink/genetlink.c:478
+>        netlink_dump+0x54d/0xd40 net/netlink/af_netlink.c:2127
+>        __netlink_dump_start+0x4e5/0x760 net/netlink/af_netlink.c:2217
+>        genl_family_rcv_msg+0xd9d/0x1040 net/netlink/genetlink.c:546
+>        genl_rcv_msg+0xa6/0x140 net/netlink/genetlink.c:620
+>        netlink_rcv_skb+0x2ab/0x390 net/netlink/af_netlink.c:2298
+>        genl_rcv+0x28/0x40 net/netlink/genetlink.c:631
+>        netlink_unicast_kernel net/netlink/af_netlink.c:1231 [inline]
+>        netlink_unicast+0x514/0x730 net/netlink/af_netlink.c:1257
+>        netlink_sendmsg+0xa9f/0xe50 net/netlink/af_netlink.c:1803
+>        sock_sendmsg_nosec net/socket.c:633 [inline]
+>        sock_sendmsg+0xca/0x110 net/socket.c:643
+>        sock_write_iter+0x326/0x600 net/socket.c:846
+>        call_write_iter include/linux/fs.h:1733 [inline]
+>        new_sync_write fs/read_write.c:497 [inline]
+>        __vfs_write+0x483/0x740 fs/read_write.c:510
+>        vfs_write+0x187/0x530 fs/read_write.c:558
+>        SYSC_write fs/read_write.c:605 [inline]
+>        SyS_write+0xfb/0x230 fs/read_write.c:597
+>        entry_SYSCALL_64_fastpath+0x1f/0xc2
+>
+> -> #2 (nlk->cb_mutex){+.+.+.}:
+>        validate_chain kernel/locking/lockdep.c:2267 [inline]
+>        __lock_acquire+0x2149/0x3430 kernel/locking/lockdep.c:3340
+>        lock_acquire+0x2a1/0x630 kernel/locking/lockdep.c:3755
+>        __mutex_lock_common kernel/locking/mutex.c:756 [inline]
+>        __mutex_lock+0x172/0x1730 kernel/locking/mutex.c:893
+>        mutex_lock_nested+0x16/0x20 kernel/locking/mutex.c:908
+>        __netlink_dump_start+0xf4/0x760 net/netlink/af_netlink.c:2187
+>        netlink_dump_start include/linux/netlink.h:165 [inline]
+>        crypto_user_rcv_msg+0x2ad/0x4f0 crypto/crypto_user.c:517
+>        netlink_rcv_skb+0x2ab/0x390 net/netlink/af_netlink.c:2298
+>        crypto_netlink_rcv+0x2a/0x40 crypto/crypto_user.c:538
+>        netlink_unicast_kernel net/netlink/af_netlink.c:1231 [inline]
+>        netlink_unicast+0x514/0x730 net/netlink/af_netlink.c:1257
+>        netlink_sendmsg+0xa9f/0xe50 net/netlink/af_netlink.c:1803
+>        sock_sendmsg_nosec net/socket.c:633 [inline]
+>        sock_sendmsg+0xca/0x110 net/socket.c:643
+>        ___sys_sendmsg+0x8fa/0x9f0 net/socket.c:1985
+>        __sys_sendmsg+0x138/0x300 net/socket.c:2019
+>        SYSC_sendmsg net/socket.c:2030 [inline]
+>        SyS_sendmsg+0x2d/0x50 net/socket.c:2026
+>        entry_SYSCALL_64_fastpath+0x1f/0xc2
+>
+> -> #1 (crypto_alg_sem){++++++}:
+>        validate_chain kernel/locking/lockdep.c:2267 [inline]
+>        __lock_acquire+0x2149/0x3430 kernel/locking/lockdep.c:3340
+>        lock_acquire+0x2a1/0x630 kernel/locking/lockdep.c:3755
+>        down_read+0x9b/0x150 kernel/locking/rwsem.c:23
+>        crypto_alg_lookup+0x23/0x50 crypto/api.c:199
+>        crypto_larval_lookup.part.10+0x9a/0x3b0 crypto/api.c:217
+>        crypto_larval_lookup crypto/api.c:211 [inline]
+>        crypto_alg_mod_lookup+0x77/0x1b0 crypto/api.c:270
+>        crypto_find_alg crypto/api.c:500 [inline]
+>        crypto_alloc_tfm+0x101/0x2e0 crypto/api.c:533
+>        crypto_alloc_shash+0x2c/0x40 crypto/shash.c:433
+>        sctp_listen_start net/sctp/socket.c:6969 [inline]
+>        sctp_inet_listen+0x5b7/0x7e0 net/sctp/socket.c:7054
+>        SYSC_listen net/socket.c:1440 [inline]
+>        SyS_listen+0x2c9/0x390 net/socket.c:1426
+>        entry_SYSCALL_64_fastpath+0x1f/0xc2
+>
+> -> #0 (sk_lock-AF_INET6){+.+.+.}:
+>        check_prev_add kernel/locking/lockdep.c:1830 [inline]
+>        check_prevs_add+0xa8f/0x19f0 kernel/locking/lockdep.c:1940
+>        validate_chain kernel/locking/lockdep.c:2267 [inline]
+>        __lock_acquire+0x2149/0x3430 kernel/locking/lockdep.c:3340
+>        lock_acquire+0x2a1/0x630 kernel/locking/lockdep.c:3755
+>        lock_sock_nested+0xcb/0x120 net/core/sock.c:2536
+>        lock_sock include/net/sock.h:1460 [inline]
+>        do_ipv6_setsockopt.isra.11+0x229/0x36e0 net/ipv6/ipv6_sockglue.c:167
+>        ipv6_setsockopt+0x9b/0x140 net/ipv6/ipv6_sockglue.c:919
+>        tcp_setsockopt+0x82/0xd0 net/ipv4/tcp.c:2731
+>        sock_common_setsockopt+0x95/0xd0 net/core/sock.c:2731
+>        SYSC_setsockopt net/socket.c:1786 [inline]
+>        SyS_setsockopt+0x25c/0x390 net/socket.c:1765
+>        entry_SYSCALL_64_fastpath+0x1f/0xc2
+>
+> other info that might help us debug this:
+>
+> Chain exists of:
+>   sk_lock-AF_INET6 --> genl_mutex --> rtnl_mutex
+>
+>  Possible unsafe locking scenario:
+>
+>        CPU0                    CPU1
+>        ----                    ----
+>   lock(rtnl_mutex);
+>                                lock(genl_mutex);
+>                                lock(rtnl_mutex);
+>   lock(sk_lock-AF_INET6);
+>
+>  *** DEADLOCK ***
+>
+> 1 lock held by syz-executor8/3613:
+>  #0:  (rtnl_mutex){+.+.+.}, at: [<ffffffff8370a197>]
+> rtnl_lock+0x17/0x20 net/core/rtnetlink.c:70
+>
+> stack backtrace:
+> CPU: 1 PID: 3613 Comm: syz-executor8 Not tainted 4.10.0+ #6
+> Hardware name: Google Google Compute Engine/Google Compute Engine,
+> BIOS Google 01/01/2011
+> Call Trace:
+>  __dump_stack lib/dump_stack.c:16 [inline]
+>  dump_stack+0x2ee/0x3ef lib/dump_stack.c:52
+>  print_circular_bug+0x307/0x3b0 kernel/locking/lockdep.c:1204
+>  check_prev_add kernel/locking/lockdep.c:1830 [inline]
+>  check_prevs_add+0xa8f/0x19f0 kernel/locking/lockdep.c:1940
+>  validate_chain kernel/locking/lockdep.c:2267 [inline]
+>  __lock_acquire+0x2149/0x3430 kernel/locking/lockdep.c:3340
+>  lock_acquire+0x2a1/0x630 kernel/locking/lockdep.c:3755
+>  lock_sock_nested+0xcb/0x120 net/core/sock.c:2536
+>  lock_sock include/net/sock.h:1460 [inline]
+>  do_ipv6_setsockopt.isra.11+0x229/0x36e0 net/ipv6/ipv6_sockglue.c:167
+>  ipv6_setsockopt+0x9b/0x140 net/ipv6/ipv6_sockglue.c:919
+>  tcp_setsockopt+0x82/0xd0 net/ipv4/tcp.c:2731
+>  sock_common_setsockopt+0x95/0xd0 net/core/sock.c:2731
+>  SYSC_setsockopt net/socket.c:1786 [inline]
+>  SyS_setsockopt+0x25c/0x390 net/socket.c:1765
 
-Hi Gary,
 
-> On 03/03/2017 7:15 AM, Stephan Mueller wrote:
-> > Am Donnerstag, 2. März 2017, 22:26:54 CET schrieb Gary R Hook:
-> > 
-> > Hi Gary,
-> 
-> Thanks for your comments, Stephan.
-> 
-> > > A version 5 device provides the primitive commands
-> > > required for AES GCM. This patch adds support for
-> > > en/decryption.
-> > > 
-> > > Signed-off-by: Gary R Hook <gary.hook@amd.com>
-> > > ---
-> > > 
-> > >  drivers/crypto/ccp/Makefile                |    1
-> > >  drivers/crypto/ccp/ccp-crypto-aes-galois.c |  257
-> > > 
-> > > ++++++++++++++++++++++++++++ drivers/crypto/ccp/ccp-crypto-main.c      
-> > > |
-> > > 12 +
-> > > 
-> > >  drivers/crypto/ccp/ccp-crypto.h            |   14 ++
-> > >  drivers/crypto/ccp/ccp-dev-v5.c            |    2
-> > >  drivers/crypto/ccp/ccp-dev.h               |    1
-> > >  drivers/crypto/ccp/ccp-ops.c               |  252
-> > > 
-> > > +++++++++++++++++++++++++++ include/linux/ccp.h                        |
-> > > 9 +
-> > > 
-> > >  8 files changed, 548 insertions(+)
-> > >  create mode 100644 drivers/crypto/ccp/ccp-crypto-aes-galois.c
-> > > 
-> > > diff --git a/drivers/crypto/ccp/ccp-crypto-aes-galois.c
-> > > b/drivers/crypto/ccp/ccp-crypto-aes-galois.c new file mode 100644
-> > > index 0000000..8bc18c9
-> > > --- /dev/null
-> > > +++ b/drivers/crypto/ccp/ccp-crypto-aes-galois.c
-> > > @@ -0,0 +1,257 @@
-> > > +/*
-> > > + * AMD Cryptographic Coprocessor (CCP) AES GCM crypto API support
-> > > + *
-> > > + * Copyright (C) 2016 Advanced Micro Devices, Inc.
-> > > + *
-> > > + * Author: Gary R Hook <gary.hook@amd.com>
-> > > + *
-> > > + * This program is free software; you can redistribute it and/or modify
-> > > + * it under the terms of the GNU General Public License version 2 as
-> > > + * published by the Free Software Foundation.
-> > > + */
-> > > +
-> > > +#include <linux/module.h>
-> > > +#include <linux/sched.h>
-> > > +#include <linux/delay.h>
-> > > +#include <linux/scatterlist.h>
-> > > +#include <linux/crypto.h>
-> > > +#include <crypto/internal/aead.h>
-> > > +#include <crypto/algapi.h>
-> > > +#include <crypto/aes.h>
-> > > +#include <crypto/ctr.h>
-> > > +#include <crypto/scatterwalk.h>
-> > > +#include <linux/delay.h>
-> > > +
-> > > +#include "ccp-crypto.h"
-> > > +
-> > > +#define    AES_GCM_IVSIZE  12
-> > > +
-> > > +static int ccp_aes_gcm_complete(struct crypto_async_request *async_req,
-> > > int ret) +{
-> > > +   return ret;
-> > > +}
-> > > +
-> > > +static int ccp_aes_gcm_setkey(struct crypto_aead *tfm, const u8 *key,
-> > > +                         unsigned int key_len)
-> > > +{
-> > > +   struct ccp_ctx *ctx = crypto_aead_ctx(tfm);
-> > > +
-> > > +   switch (key_len) {
-> > > +   case AES_KEYSIZE_128:
-> > > +           ctx->u.aes.type = CCP_AES_TYPE_128;
-> > > +           break;
-> > > +   case AES_KEYSIZE_192:
-> > > +           ctx->u.aes.type = CCP_AES_TYPE_192;
-> > > +           break;
-> > > +   case AES_KEYSIZE_256:
-> > > +           ctx->u.aes.type = CCP_AES_TYPE_256;
-> > > +           break;
-> > > +   default:
-> > > +           crypto_aead_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
-> > > +           return -EINVAL;
-> > > +   }
-> > > +
-> > > +   ctx->u.aes.mode = CCP_AES_MODE_GCM;
-> > > +   ctx->u.aes.key_len = key_len;
-> > > +
-> > > +   memcpy(ctx->u.aes.key, key, key_len);
-> > > +   sg_init_one(&ctx->u.aes.key_sg, ctx->u.aes.key, key_len);
-> > > +
-> > > +   return 0;
-> > > +}
-> > > +
-> > > +static int ccp_aes_gcm_setauthsize(struct crypto_aead *tfm,
-> > > +                              unsigned int authsize)
-> > > +{
-> > > +   return 0;
-> > > +}
-> > > +
-> > > +static int ccp_aes_gcm_crypt(struct aead_request *req, bool encrypt)
-> > > +{
-> > > +   struct crypto_aead *tfm = crypto_aead_reqtfm(req);
-> > > +   struct ccp_ctx *ctx = crypto_aead_ctx(tfm);
-> > > +   struct ccp_aes_req_ctx *rctx = aead_request_ctx(req);
-> > > +   struct scatterlist *iv_sg = NULL;
-> > > +   unsigned int iv_len = 0;
-> > > +   int i;
-> > > +   int ret = 0;
-> > > +
-> > > +   if (!ctx->u.aes.key_len)
-> > > +           return -EINVAL;
-> > > +
-> > > +   if (ctx->u.aes.mode != CCP_AES_MODE_GCM)
-> > > +           return -EINVAL;
-> > > +
-> > > +   if (!req->iv)
-> > > +           return -EINVAL;
-> > > +
-> > > +   /*
-> > > +    * 5 parts:
-> > > +    *   plaintext/ciphertext input
-> > > +    *   AAD
-> > > +    *   key
-> > > +    *   IV
-> > > +    *   Destination+tag buffer
-> > > +    */
-> > > +
-> > > +   /* According to the way AES GCM has been implemented here,
-> > > +    * per RFC 4106 it seems, the provided IV is fixed at 12 bytes,
-> > 
-> > When you have that restriction, should the cipher be called
-> > rfc4106(gcm(aes))?
-> > 
-> > But then, the key is 4 bytes longer than a normal AES key as it contains
-> > the leading 32 bits of the IV.
-> 
-> I had my wires crossed due to an incomplete understanding of an AEAD cipher
-> in general, and GCM in particular. I'm hopeful that someone can help me
-> understand:
-> 
-> For the AES GCM encryption tests in testmgr.h, where there is an IV,
-> they're all
-> 12 bytes in length. As I understand AES GCM the IV can be anywhere from
-> 1 to 2^64
-> bits in length; the value of 96 makes for convenience and efficiency.
-> But it's
-> neither a requirement nor restriction.
+Another one now involving rds_tcp_listen_stop (on net-next
+3e3eec09311a48c64104cafa193984cc807ab9e0):
 
-That is correct. For longer IVs, you would need to use Ghash to compress it to 
-96 bits. The remaining 32 bits to get to one AES block is the counter that is 
-used for the CTR AES mode in GCM.
-> 
-> There are no tests (in testmgr.h) that use an IV length other than  0 or 96.
+[ INFO: possible circular locking dependency detected ]
+4.10.0+ #26 Not tainted
+-------------------------------------------------------
+kworker/u4:1/19 is trying to acquire lock:
+ (sk_lock-AF_INET){+.+.+.}, at: [<ffffffff8409a6ec>] lock_sock
+include/net/sock.h:1460 [inline]
+ (sk_lock-AF_INET){+.+.+.}, at: [<ffffffff8409a6ec>]
+rds_tcp_listen_stop+0x5c/0x150 net/rds/tcp_listen.c:288
 
-See aes_gcm_rfc4106_enc_tv_template for other types of IV.
+but task is already holding lock:
+ (rtnl_mutex){+.+.+.}, at: [<ffffffff8370b057>] rtnl_lock+0x17/0x20
+net/core/rtnetlink.c:70
 
-> My comment about RFC4106 has to do with requiring an IV 0f 96 bits + a word
-> that
-> is incremented for each block (making every nonce unique, per the
-> requirement).
-> But let's ignore that, please.
-> 
-> It looks as if:
-> 
-> What seems to be missing is the ability to register a (GCM) transform
-> that can
-> handle an IV of arbitrary (allowable) length. I have to specify the
-> length (ivsize)
-> when I register an algorithm, and everything I see in the existing code
-> appears
-> to expect a GCM ivsize to be 96 bits, period (or zero). This is what I
-> meant when
-> I referenced RFC4106: I perceive restrictions not in my code, but n the
-> way GCM seems
-> to be supported in the crypto AEAD framework. A complete GCM
-> implementation would not
-> seem to have a restriction to a specific IV length (rather, a range of
-> allowed
-> values).
-
-96 bits is the use case in IPSEC. As the kernel crypto API transforms are used 
-for IPSEC. Nobody would prevent you from supporting other IV sizes. But then 
-you would need to add a Ghash operation to compress it to the right length. No 
-other GCM implementation has that and hence the limitation.
-
-But 96 bits is not the common case. See the 4106 implementations, you see the 
-ivsize being 8. This is correct because setkey requires AES keysize + 4 bytes 
-in length (see crypto_rfc4106_setkey for an example). The trailing 4 bytes of 
-the key are the initial 4 bytes of the GCM IV.
-
-My comment was about your comment to refer to RFC4106. I just wanted to 
-understand your code and and make sense of your comments. :-)
-> 
-> Is my reading of the GCM description in error? Do we need/want the ability
-> to have a flexible IV length for GCM? What am I not understanding?
-
-In your case, just change the wording in the comment slightly and we are all 
-good.
-> 
-> For reference, I'm working from the NIST doc:
-> http://csrc.nist.gov/groups/ST/toolkit/BCM/documents/proposedmodes/gcm/gcm-s
-> pec.pdf
-
-> 
-> > > +   rctx->cmd.u.aes.key = &ctx->u.aes.key_sg;
-> > > +   rctx->cmd.u.aes.key_len = ctx->u.aes.key_len;
-> > > +   rctx->cmd.u.aes.iv = iv_sg;
-> > > +   rctx->cmd.u.aes.iv_len = iv_len;
-> > > +   rctx->cmd.u.aes.src = req->src;
-> > > +   rctx->cmd.u.aes.src_len = req->cryptlen;
-> > > +   rctx->cmd.u.aes.aad_len = req->assoclen;
-> > 
-> > Just to be on the safe side: is the implementation good when cryptlen or
-> > assoclen is 0?
-> 
-> The engine has been designed to handle those two conditions. I've been
-> watching the discussions around these issues.
-> 
-> The first encryption test in testmgr.h has no input data nor IV. This
-> implementation passes that test.
-> 
-> The second encryption test in testmgr.h has input data but no IV, and this
-> implementation passes.
-> 
-> Is that an acceptable validation, or do we need more?
-
-I would recommend at least a private test with no input and no AAD (i.e. 
-authentication only).
-
-Maybe you can add a patch to testmgr for this case. An example is found at 
-[1]. Here, tag and exp is the expected result of the operation.
-
-[1] https://github.com/smuellerDD/libkcapi/blob/master/test/test.sh#L330
-> 
-> Thanks,
-> Gary
+which lock already depends on the new lock.
 
 
+the existing dependency chain (in reverse order) is:
 
-Ciao
-Stephan
+-> #4 (rtnl_mutex){+.+.+.}:
+       validate_chain kernel/locking/lockdep.c:2267 [inline]
+       __lock_acquire+0x2149/0x3430 kernel/locking/lockdep.c:3340
+       lock_acquire+0x2a1/0x630 kernel/locking/lockdep.c:3755
+       __mutex_lock_common kernel/locking/mutex.c:756 [inline]
+       __mutex_lock+0x172/0x1730 kernel/locking/mutex.c:893
+       mutex_lock_nested+0x16/0x20 kernel/locking/mutex.c:908
+       rtnl_lock+0x17/0x20 net/core/rtnetlink.c:70
+       nl80211_prepare_vendor_dump net/wireless/nl80211.c:11511 [inline]
+       nl80211_vendor_cmd_dump+0xda/0x1ab0 net/wireless/nl80211.c:11616
+       genl_lock_dumpit+0x68/0x90 net/netlink/genetlink.c:479
+       netlink_dump+0x54d/0xd40 net/netlink/af_netlink.c:2127
+       __netlink_dump_start+0x4e5/0x760 net/netlink/af_netlink.c:2217
+       genl_family_rcv_msg+0xd9d/0x1040 net/netlink/genetlink.c:546
+       genl_rcv_msg+0xa6/0x140 net/netlink/genetlink.c:620
+       netlink_rcv_skb+0x2ab/0x390 net/netlink/af_netlink.c:2298
+       genl_rcv+0x28/0x40 net/netlink/genetlink.c:631
+       netlink_unicast_kernel net/netlink/af_netlink.c:1231 [inline]
+       netlink_unicast+0x514/0x730 net/netlink/af_netlink.c:1257
+       netlink_sendmsg+0xa9f/0xe50 net/netlink/af_netlink.c:1803
+       sock_sendmsg_nosec net/socket.c:633 [inline]
+       sock_sendmsg+0xca/0x110 net/socket.c:643
+       ___sys_sendmsg+0x8fa/0x9f0 net/socket.c:1985
+       __sys_sendmsg+0x138/0x300 net/socket.c:2019
+       SYSC_sendmsg net/socket.c:2030 [inline]
+       SyS_sendmsg+0x2d/0x50 net/socket.c:2026
+       entry_SYSCALL_64_fastpath+0x1f/0xc2
+
+-> #3 (genl_mutex){+.+.+.}:
+       validate_chain kernel/locking/lockdep.c:2267 [inline]
+       __lock_acquire+0x2149/0x3430 kernel/locking/lockdep.c:3340
+       lock_acquire+0x2a1/0x630 kernel/locking/lockdep.c:3755
+       __mutex_lock_common kernel/locking/mutex.c:756 [inline]
+       __mutex_lock+0x172/0x1730 kernel/locking/mutex.c:893
+       mutex_lock_nested+0x16/0x20 kernel/locking/mutex.c:908
+       genl_lock net/netlink/genetlink.c:32 [inline]
+       genl_lock_dumpit+0x41/0x90 net/netlink/genetlink.c:478
+       netlink_dump+0x54d/0xd40 net/netlink/af_netlink.c:2127
+       __netlink_dump_start+0x4e5/0x760 net/netlink/af_netlink.c:2217
+       genl_family_rcv_msg+0xd9d/0x1040 net/netlink/genetlink.c:546
+       genl_rcv_msg+0xa6/0x140 net/netlink/genetlink.c:620
+       netlink_rcv_skb+0x2ab/0x390 net/netlink/af_netlink.c:2298
+       genl_rcv+0x28/0x40 net/netlink/genetlink.c:631
+       netlink_unicast_kernel net/netlink/af_netlink.c:1231 [inline]
+       netlink_unicast+0x514/0x730 net/netlink/af_netlink.c:1257
+       netlink_sendmsg+0xa9f/0xe50 net/netlink/af_netlink.c:1803
+       sock_sendmsg_nosec net/socket.c:633 [inline]
+       sock_sendmsg+0xca/0x110 net/socket.c:643
+       ___sys_sendmsg+0x8fa/0x9f0 net/socket.c:1985
+       __sys_sendmsg+0x138/0x300 net/socket.c:2019
+       SYSC_sendmsg net/socket.c:2030 [inline]
+       SyS_sendmsg+0x2d/0x50 net/socket.c:2026
+       entry_SYSCALL_64_fastpath+0x1f/0xc2
+
+-> #2 (nlk->cb_mutex){+.+.+.}:
+       validate_chain kernel/locking/lockdep.c:2267 [inline]
+       __lock_acquire+0x2149/0x3430 kernel/locking/lockdep.c:3340
+       lock_acquire+0x2a1/0x630 kernel/locking/lockdep.c:3755
+       __mutex_lock_common kernel/locking/mutex.c:756 [inline]
+       __mutex_lock+0x172/0x1730 kernel/locking/mutex.c:893
+       mutex_lock_nested+0x16/0x20 kernel/locking/mutex.c:908
+       __netlink_dump_start+0xf4/0x760 net/netlink/af_netlink.c:2187
+       netlink_dump_start include/linux/netlink.h:165 [inline]
+       crypto_user_rcv_msg+0x2ad/0x4f0 crypto/crypto_user.c:517
+       netlink_rcv_skb+0x2ab/0x390 net/netlink/af_netlink.c:2298
+       crypto_netlink_rcv+0x2a/0x40 crypto/crypto_user.c:538
+       netlink_unicast_kernel net/netlink/af_netlink.c:1231 [inline]
+       netlink_unicast+0x514/0x730 net/netlink/af_netlink.c:1257
+       netlink_sendmsg+0xa9f/0xe50 net/netlink/af_netlink.c:1803
+       sock_sendmsg_nosec net/socket.c:633 [inline]
+       sock_sendmsg+0xca/0x110 net/socket.c:643
+       ___sys_sendmsg+0x8fa/0x9f0 net/socket.c:1985
+       __sys_sendmsg+0x138/0x300 net/socket.c:2019
+       SYSC_sendmsg net/socket.c:2030 [inline]
+       SyS_sendmsg+0x2d/0x50 net/socket.c:2026
+       entry_SYSCALL_64_fastpath+0x1f/0xc2
+
+-> #1 (crypto_alg_sem){++++++}:
+       validate_chain kernel/locking/lockdep.c:2267 [inline]
+       __lock_acquire+0x2149/0x3430 kernel/locking/lockdep.c:3340
+       lock_acquire+0x2a1/0x630 kernel/locking/lockdep.c:3755
+       down_read+0x9b/0x150 kernel/locking/rwsem.c:23
+       crypto_alg_lookup+0x23/0x50 crypto/api.c:199
+       crypto_larval_lookup.part.10+0x9a/0x3b0 crypto/api.c:217
+       crypto_larval_lookup crypto/api.c:211 [inline]
+       crypto_alg_mod_lookup+0x77/0x1b0 crypto/api.c:270
+       crypto_find_alg crypto/api.c:500 [inline]
+       crypto_alloc_tfm+0x101/0x2e0 crypto/api.c:533
+       crypto_alloc_shash+0x2c/0x40 crypto/shash.c:433
+       sctp_listen_start net/sctp/socket.c:7050 [inline]
+       sctp_inet_listen+0x5b7/0x7e0 net/sctp/socket.c:7135
+       SYSC_listen net/socket.c:1440 [inline]
+       SyS_listen+0x2c9/0x390 net/socket.c:1426
+       entry_SYSCALL_64_fastpath+0x1f/0xc2
+
+-> #0 (sk_lock-AF_INET){+.+.+.}:
+       check_prev_add kernel/locking/lockdep.c:1830 [inline]
+       check_prevs_add+0xa8f/0x19f0 kernel/locking/lockdep.c:1940
+       validate_chain kernel/locking/lockdep.c:2267 [inline]
+       __lock_acquire+0x2149/0x3430 kernel/locking/lockdep.c:3340
+       lock_acquire+0x2a1/0x630 kernel/locking/lockdep.c:3755
+       lock_sock_nested+0xcb/0x120 net/core/sock.c:2596
+       lock_sock include/net/sock.h:1460 [inline]
+       rds_tcp_listen_stop+0x5c/0x150 net/rds/tcp_listen.c:288
+       rds_tcp_kill_sock net/rds/tcp.c:532 [inline]
+       rds_tcp_dev_event+0x38e/0xc20 net/rds/tcp.c:573
+       notifier_call_chain+0x1b5/0x2b0 kernel/notifier.c:93
+       __raw_notifier_call_chain kernel/notifier.c:394 [inline]
+       raw_notifier_call_chain+0x2d/0x40 kernel/notifier.c:401
+       call_netdevice_notifiers_info+0x51/0x90 net/core/dev.c:1646
+       call_netdevice_notifiers net/core/dev.c:1662 [inline]
+       netdev_run_todo+0x3b2/0xa30 net/core/dev.c:7530
+       rtnl_unlock+0xe/0x10 net/core/rtnetlink.c:104
+       default_device_exit_batch+0x504/0x620 net/core/dev.c:8334
+       ops_exit_list.isra.6+0x100/0x150 net/core/net_namespace.c:144
+       cleanup_net+0x551/0xa90 net/core/net_namespace.c:463
+       process_one_work+0xbd0/0x1c10 kernel/workqueue.c:2096
+       worker_thread+0x223/0x1990 kernel/workqueue.c:2230
+       kthread+0x326/0x3f0 kernel/kthread.c:229
+       ret_from_fork+0x31/0x40 arch/x86/entry/entry_64.S:430
+
+other info that might help us debug this:
+
+Chain exists of:
+  sk_lock-AF_INET --> genl_mutex --> rtnl_mutex
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(rtnl_mutex);
+                               lock(genl_mutex);
+                               lock(rtnl_mutex);
+  lock(sk_lock-AF_INET);
+
+ *** DEADLOCK ***
+
+4 locks held by kworker/u4:1/19:
+ #0:  ("%s""netns"){.+.+.+}, at: [<ffffffff81497943>]
+__write_once_size include/linux/compiler.h:283 [inline]
+ #0:  ("%s""netns"){.+.+.+}, at: [<ffffffff81497943>] atomic64_set
+arch/x86/include/asm/atomic64_64.h:33 [inline]
+ #0:  ("%s""netns"){.+.+.+}, at: [<ffffffff81497943>] atomic_long_set
+include/asm-generic/atomic-long.h:56 [inline]
+ #0:  ("%s""netns"){.+.+.+}, at: [<ffffffff81497943>] set_work_data
+kernel/workqueue.c:617 [inline]
+ #0:  ("%s""netns"){.+.+.+}, at: [<ffffffff81497943>]
+set_work_pool_and_clear_pending kernel/workqueue.c:644 [inline]
+ #0:  ("%s""netns"){.+.+.+}, at: [<ffffffff81497943>]
+process_one_work+0xab3/0x1c10 kernel/workqueue.c:2089
+ #1:  (net_cleanup_work){+.+.+.}, at: [<ffffffff81497997>]
+process_one_work+0xb07/0x1c10 kernel/workqueue.c:2093
+ #2:  (net_mutex){+.+.+.}, at: [<ffffffff836965cb>]
+cleanup_net+0x22b/0xa90 net/core/net_namespace.c:429
+ #3:  (rtnl_mutex){+.+.+.}, at: [<ffffffff8370b057>]
+rtnl_lock+0x17/0x20 net/core/rtnetlink.c:70
+
+stack backtrace:
+CPU: 0 PID: 19 Comm: kworker/u4:1 Not tainted 4.10.0+ #26
+Hardware name: Google Google Compute Engine/Google Compute Engine,
+BIOS Google 01/01/2011
+Workqueue: netns cleanup_net
+Call Trace:
+ __dump_stack lib/dump_stack.c:16 [inline]
+ dump_stack+0x2ee/0x3ef lib/dump_stack.c:52
+ print_circular_bug+0x307/0x3b0 kernel/locking/lockdep.c:1204
+ check_prev_add kernel/locking/lockdep.c:1830 [inline]
+ check_prevs_add+0xa8f/0x19f0 kernel/locking/lockdep.c:1940
+ validate_chain kernel/locking/lockdep.c:2267 [inline]
+ __lock_acquire+0x2149/0x3430 kernel/locking/lockdep.c:3340
+ lock_acquire+0x2a1/0x630 kernel/locking/lockdep.c:3755
+ lock_sock_nested+0xcb/0x120 net/core/sock.c:2596
+ lock_sock include/net/sock.h:1460 [inline]
+ rds_tcp_listen_stop+0x5c/0x150 net/rds/tcp_listen.c:288
+ rds_tcp_kill_sock net/rds/tcp.c:532 [inline]
+ rds_tcp_dev_event+0x38e/0xc20 net/rds/tcp.c:573
+ notifier_call_chain+0x1b5/0x2b0 kernel/notifier.c:93
+ __raw_notifier_call_chain kernel/notifier.c:394 [inline]
+ raw_notifier_call_chain+0x2d/0x40 kernel/notifier.c:401
+ call_netdevice_notifiers_info+0x51/0x90 net/core/dev.c:1646
+ call_netdevice_notifiers net/core/dev.c:1662 [inline]
+ netdev_run_todo+0x3b2/0xa30 net/core/dev.c:7530
+ rtnl_unlock+0xe/0x10 net/core/rtnetlink.c:104
+ default_device_exit_batch+0x504/0x620 net/core/dev.c:8334
+ ops_exit_list.isra.6+0x100/0x150 net/core/net_namespace.c:144
+ cleanup_net+0x551/0xa90 net/core/net_namespace.c:463
+ process_one_work+0xbd0/0x1c10 kernel/workqueue.c:2096
+ worker_thread+0x223/0x1990 kernel/workqueue.c:2230
+ kthread+0x326/0x3f0 kernel/kthread.c:229
+ ret_from_fork+0x31/0x40 arch/x86/entry/entry_64.S:430
