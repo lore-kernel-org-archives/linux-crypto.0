@@ -1,8 +1,7 @@
 From: Prarit Bhargava <prarit@redhat.com>
-Subject: [PATCH 1/2] hwrng: amd - Revert managed API changes
-Date: Tue, 14 Mar 2017 07:36:01 -0400
-Message-ID: <1489491362-26339-2-git-send-email-prarit@redhat.com>
-References: <1489491362-26339-1-git-send-email-prarit@redhat.com>
+Subject: [PATCH 0/2] hwrng: revert managed API changes for amd and geode
+Date: Tue, 14 Mar 2017 07:36:00 -0400
+Message-ID: <1489491362-26339-1-git-send-email-prarit@redhat.com>
 Cc: Prarit Bhargava <prarit@redhat.com>,
         Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -12,37 +11,58 @@ Cc: Prarit Bhargava <prarit@redhat.com>,
         linux-crypto@vger.kernel.org, linux-geode@lists.infradead.org
 To: linux-kernel@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1489491362-26339-1-git-send-email-prarit@redhat.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-After commit 31b2a73c9c5f ("hwrng: amd - Migrate to managed API"), the
-amd-rng driver uses devres with pci_dev->dev to keep track of resources,
-but does not actually register a PCI driver.  This results in the
-following issues:
-
-1. The message
+When booting top-of-tree the following WARN_ON triggers in the kernel on
+a 15h AMD system.
 
 WARNING: CPU: 2 PID: 621 at drivers/base/dd.c:349 driver_probe_device+0x38c
+Modules linked in: i2c_amd756(+) amd_rng sg pcspkr parport_pc(+) parport k8
+CPU: 2 PID: 621 Comm: systemd-udevd Not tainted 4.11.0-0.rc1.git0.1.el7_UNS
+Hardware name: To Be Filled By O.E.M. To Be Filled By O.E.M./TYAN High-End 
+Call Trace:
+dump_stack+0x63/0x8e
+__warn+0xd1/0xf0
+warn_slowpath_null+0x1d/0x20
+driver_probe_device+0x38c/0x470
+__driver_attach+0xc9/0xf0
+? driver_probe_device+0x470/0x470
+bus_for_each_dev+0x5d/0x90
+driver_attach+0x1e/0x20
+bus_add_driver+0x1d0/0x290
+driver_register+0x60/0xe0
+? 0xffffffffa0037000
+__pci_register_driver+0x4c/0x50
+amd756_driver_init+0x1e/0x1000 [i2c_amd756]
+do_one_initcall+0x51/0x1b0
+? __vunmap+0x85/0xd0
+? do_init_module+0x27/0x1fa
+do_init_module+0x60/0x1fa
+load_module+0x15d1/0x1ad0
+? m_show+0x1c0/0x1c0
+SYSC_finit_module+0xa9/0xd0
 
-is output when the i2c_amd756 driver loads and attempts to register a PCI
-driver.  The PCI & device subsystems assume that no resources have been
-registered for the device, and the WARN_ON() triggers since amd-rng has
-already do so.
+There are PCI devices that contain both a RNG and SMBUS device.  The
+RNG device is initialized by the amd-rng driver but the driver does not
+register against the device.  The SMBUS device is initialized by the
+i2c-amd756 driver and registers against the device and hits the WARN_ON()
+because the amd-rng driver has already allocated resources against the
+device.
 
-2.  The driver leaks memory because the driver does not attach to a
-device.  The driver only uses the PCI device as a reference.   devm_*()
-functions will release resources on driver detach, which the amd-rng
-driver will never do.  As a result,
+The amd-rng driver was incorrectly migrated to the device resource model
+(devres), and after code inspection I found that the geode-rng driver was also
+incorrectly migrated.  These drivers are using devres but do not register a
+driver against the device, and both drivers are expecting a memory cleanup on
+a driver detach that will never happen.  This results in a memory leak when the
+driver is unloaded and the inability to reload the driver.
 
-3.  The driver cannot be reloaded because there is always a use of the
-ioport and region after the first load of the driver.
-
-Revert the changes made by 31b2a73c9c5f ("hwrng: amd - Migrate to managed
-API").
+Revert 31b2a73c9c5f ("hwrng: amd - Migrate to managed API"), and 6e9b5e76882c
+("hwrng: geode - Migrate to managed API").
 
 Signed-off-by: Prarit Bhargava <prarit@redhat.com>
 Fixes: 31b2a73c9c5f ("hwrng: amd - Migrate to managed API").
+Fixes: 6e9b5e76882c ("hwrng: geode - Migrate to managed API")
 Cc: Matt Mackall <mpm@selenic.com>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: Corentin LABBE <clabbe.montjoie@gmail.com>
@@ -50,88 +70,14 @@ Cc: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
 Cc: Wei Yongjun <weiyongjun1@huawei.com>
 Cc: linux-crypto@vger.kernel.org
 Cc: linux-geode@lists.infradead.org
----
- drivers/char/hw_random/amd-rng.c |   42 ++++++++++++++++++++++++++++++--------
- 1 file changed, 34 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/char/hw_random/amd-rng.c b/drivers/char/hw_random/amd-rng.c
-index 4a99ac756f08..9959c762da2f 100644
---- a/drivers/char/hw_random/amd-rng.c
-+++ b/drivers/char/hw_random/amd-rng.c
-@@ -55,6 +55,7 @@
- struct amd768_priv {
- 	void __iomem *iobase;
- 	struct pci_dev *pcidev;
-+	u32 pmbase;
- };
- 
- static int amd_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
-@@ -148,33 +149,58 @@ static int __init mod_init(void)
- 	if (pmbase == 0)
- 		return -EIO;
- 
--	priv = devm_kzalloc(&pdev->dev, sizeof(*priv), GFP_KERNEL);
-+	priv = kzalloc(sizeof(*priv), GFP_KERNEL);
- 	if (!priv)
- 		return -ENOMEM;
- 
--	if (!devm_request_region(&pdev->dev, pmbase + PMBASE_OFFSET,
--				PMBASE_SIZE, DRV_NAME)) {
-+	if (!request_region(pmbase + PMBASE_OFFSET, PMBASE_SIZE, DRV_NAME)) {
- 		dev_err(&pdev->dev, DRV_NAME " region 0x%x already in use!\n",
- 			pmbase + 0xF0);
--		return -EBUSY;
-+		err = -EBUSY;
-+		goto out;
- 	}
- 
--	priv->iobase = devm_ioport_map(&pdev->dev, pmbase + PMBASE_OFFSET,
--			PMBASE_SIZE);
-+	priv->iobase = ioport_map(pmbase + PMBASE_OFFSET, PMBASE_SIZE);
- 	if (!priv->iobase) {
- 		pr_err(DRV_NAME "Cannot map ioport\n");
--		return -ENOMEM;
-+		err = -EINVAL;
-+		goto err_iomap;
- 	}
- 
- 	amd_rng.priv = (unsigned long)priv;
-+	priv->pmbase = pmbase;
- 	priv->pcidev = pdev;
- 
- 	pr_info(DRV_NAME " detected\n");
--	return devm_hwrng_register(&pdev->dev, &amd_rng);
-+	err = hwrng_register(&amd_rng);
-+	if (err) {
-+		pr_err(DRV_NAME " registering failed (%d)\n", err);
-+		goto err_hwrng;
-+	}
-+	return 0;
-+
-+err_hwrng:
-+	ioport_unmap(priv->iobase);
-+err_iomap:
-+	release_region(pmbase + PMBASE_OFFSET, PMBASE_SIZE);
-+out:
-+	kfree(priv);
-+	return err;
- }
- 
- static void __exit mod_exit(void)
- {
-+	struct amd768_priv *priv;
-+
-+	priv = (struct amd768_priv *)amd_rng.priv;
-+
-+	hwrng_unregister(&amd_rng);
-+
-+	ioport_unmap(priv->iobase);
-+
-+	release_region(priv->pmbase + PMBASE_OFFSET, PMBASE_SIZE);
-+
-+	kfree(priv);
- }
- 
- module_init(mod_init);
+Prarit Bhargava (2):
+  hwrng: amd - Revert managed API changes
+  hwrng: geode - Revert managed API changes
+
+ drivers/char/hw_random/amd-rng.c   |   42 ++++++++++++++++++++++++------
+ drivers/char/hw_random/geode-rng.c |   50 +++++++++++++++++++++++++-----------
+ 2 files changed, 69 insertions(+), 23 deletions(-)
+
 -- 
 1.7.9.3
