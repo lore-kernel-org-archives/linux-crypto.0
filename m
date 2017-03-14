@@ -1,87 +1,107 @@
-From: Dmitry Vyukov <dvyukov@google.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: crypto: deadlock between crypto_alg_sem/rtnl_mutex/genl_mutex
-Date: Tue, 14 Mar 2017 10:44:10 +0100
-Message-ID: <CACT4Y+YT6EZFtMTNywd4BtKyzWrJ9vtDU96TUFi9WLpypkgWhg@mail.gmail.com>
+Date: Tue, 14 Mar 2017 18:25:57 +0800
+Message-ID: <20170314102557.GA1225@gondor.apana.org.au>
 References: <CACT4Y+bLbNbf0T376JHvemuY+za0+qgrfOKWzvJg5vAkJTCRFg@mail.gmail.com>
  <20170314091649.GA711@gondor.apana.org.au>
+ <CACT4Y+YT6EZFtMTNywd4BtKyzWrJ9vtDU96TUFi9WLpypkgWhg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
 Cc: David Miller <davem@davemloft.net>, linux-crypto@vger.kernel.org,
         LKML <linux-kernel@vger.kernel.org>,
         Eric Dumazet <edumazet@google.com>,
         Cong Wang <xiyou.wangcong@gmail.com>,
         netdev <netdev@vger.kernel.org>,
         syzkaller <syzkaller@googlegroups.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <20170314091649.GA711@gondor.apana.org.au>
-Sender: netdev-owner@vger.kernel.org
+To: Dmitry Vyukov <dvyukov@google.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <CACT4Y+YT6EZFtMTNywd4BtKyzWrJ9vtDU96TUFi9WLpypkgWhg@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Mar 14, 2017 at 10:16 AM, Herbert Xu
-<herbert@gondor.apana.org.au> wrote:
-> On Sun, Mar 05, 2017 at 04:08:39PM +0100, Dmitry Vyukov wrote:
->>
->> -> #1 (genl_mutex){+.+.+.}:
->>        validate_chain kernel/locking/lockdep.c:2267 [inline]
->>        __lock_acquire+0x2149/0x3430 kernel/locking/lockdep.c:3340
->>        lock_acquire+0x2a1/0x630 kernel/locking/lockdep.c:3755
->>        __mutex_lock_common kernel/locking/mutex.c:756 [inline]
->>        __mutex_lock+0x172/0x1730 kernel/locking/mutex.c:893
->>        mutex_lock_nested+0x16/0x20 kernel/locking/mutex.c:908
->>        genl_lock net/netlink/genetlink.c:32 [inline]
->>        genl_lock_dumpit+0x41/0x90 net/netlink/genetlink.c:478
->>        netlink_dump+0x54d/0xd40 net/netlink/af_netlink.c:2127
->>        __netlink_dump_start+0x4e5/0x760 net/netlink/af_netlink.c:2217
->>        genl_family_rcv_msg+0xd9d/0x1040 net/netlink/genetlink.c:546
->>        genl_rcv_msg+0xa6/0x140 net/netlink/genetlink.c:620
->>        netlink_rcv_skb+0x2ab/0x390 net/netlink/af_netlink.c:2298
->>        genl_rcv+0x28/0x40 net/netlink/genetlink.c:631
->>        netlink_unicast_kernel net/netlink/af_netlink.c:1231 [inline]
->>        netlink_unicast+0x514/0x730 net/netlink/af_netlink.c:1257
->>        netlink_sendmsg+0xa9f/0xe50 net/netlink/af_netlink.c:1803
->>        sock_sendmsg_nosec net/socket.c:633 [inline]
->>        sock_sendmsg+0xca/0x110 net/socket.c:643
->>        sock_write_iter+0x326/0x600 net/socket.c:846
->>        call_write_iter include/linux/fs.h:1733 [inline]
->>        new_sync_write fs/read_write.c:497 [inline]
->>        __vfs_write+0x483/0x740 fs/read_write.c:510
->>        vfs_write+0x187/0x530 fs/read_write.c:558
->>        SYSC_write fs/read_write.c:605 [inline]
->>        SyS_write+0xfb/0x230 fs/read_write.c:597
->>        entry_SYSCALL_64_fastpath+0x1f/0xc2
->>
->> -> #0 (nlk->cb_mutex){+.+.+.}:
->>        check_prev_add kernel/locking/lockdep.c:1830 [inline]
->>        check_prevs_add+0xa8f/0x19f0 kernel/locking/lockdep.c:1940
->>        validate_chain kernel/locking/lockdep.c:2267 [inline]
->>        __lock_acquire+0x2149/0x3430 kernel/locking/lockdep.c:3340
->>        lock_acquire+0x2a1/0x630 kernel/locking/lockdep.c:3755
->>        __mutex_lock_common kernel/locking/mutex.c:756 [inline]
->>        __mutex_lock+0x172/0x1730 kernel/locking/mutex.c:893
->>        mutex_lock_nested+0x16/0x20 kernel/locking/mutex.c:908
->>        __netlink_dump_start+0xf4/0x760 net/netlink/af_netlink.c:2187
->>        netlink_dump_start include/linux/netlink.h:165 [inline]
->>        crypto_user_rcv_msg+0x2ad/0x4f0 crypto/crypto_user.c:517
->>        netlink_rcv_skb+0x2ab/0x390 net/netlink/af_netlink.c:2298
->>        crypto_netlink_rcv+0x2a/0x40 crypto/crypto_user.c:538
->>        netlink_unicast_kernel net/netlink/af_netlink.c:1231 [inline]
->>        netlink_unicast+0x514/0x730 net/netlink/af_netlink.c:1257
->>        netlink_sendmsg+0xa9f/0xe50 net/netlink/af_netlink.c:1803
->>        sock_sendmsg_nosec net/socket.c:633 [inline]
->>        sock_sendmsg+0xca/0x110 net/socket.c:643
->>        ___sys_sendmsg+0x8fa/0x9f0 net/socket.c:1985
->>        __sys_sendmsg+0x138/0x300 net/socket.c:2019
->>        SYSC_sendmsg net/socket.c:2030 [inline]
->>        SyS_sendmsg+0x2d/0x50 net/socket.c:2026
->>        entry_SYSCALL_64_fastpath+0x1f/0xc2
+On Tue, Mar 14, 2017 at 10:44:10AM +0100, Dmitry Vyukov wrote:
 >
-> This looks like a false positive.  The cb_mutex in #1 is not the
-> same as the cb_mutex in #0.  The cb_mutex in #0 comes is obtained
-> by crypto_user which uses straight netlink.  The cb_mutex in #1
-> is a genl netlink socket.
->
-> I'll have a look to see if we can annotate this.
+> Yes, please.
+> Disregarding some reports is not a good way long term.
 
-Yes, please.
-Disregarding some reports is not a good way long term.
+Please try this patch.
+
+---8<---
+Subject: netlink: Annotate nlk cb_mutex by protocol
+
+Currently all occurences of nlk->cb_mutex are annotated by lockdep
+as a single class.  This causes a false lcokdep cycle involving
+genl and crypto_user.
+
+This patch fixes it by dividing cb_mutex into individual classes
+based on the netlink protocol.  As genl and crypto_user do not
+use the same netlink protocol this breaks the false dependency
+loop.
+
+Reported-by: Dmitry Vyukov <dvyukov@google.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
+index 7b73c7c..596eaff 100644
+--- a/net/netlink/af_netlink.c
++++ b/net/netlink/af_netlink.c
+@@ -96,6 +96,44 @@ static inline int netlink_is_kernel(struct sock *sk)
+ 
+ static DECLARE_WAIT_QUEUE_HEAD(nl_table_wait);
+ 
++static struct lock_class_key nlk_cb_mutex_keys[MAX_LINKS];
++
++static const char *const nlk_cb_mutex_key_strings[MAX_LINKS + 1] = {
++	"nlk_cb_mutex-ROUTE",
++	"nlk_cb_mutex-1",
++	"nlk_cb_mutex-USERSOCK",
++	"nlk_cb_mutex-FIREWALL",
++	"nlk_cb_mutex-SOCK_DIAG",
++	"nlk_cb_mutex-NFLOG",
++	"nlk_cb_mutex-XFRM",
++	"nlk_cb_mutex-SELINUX",
++	"nlk_cb_mutex-ISCSI",
++	"nlk_cb_mutex-AUDIT",
++	"nlk_cb_mutex-FIB_LOOKUP",
++	"nlk_cb_mutex-CONNECTOR",
++	"nlk_cb_mutex-NETFILTER",
++	"nlk_cb_mutex-IP6_FW",
++	"nlk_cb_mutex-DNRTMSG",
++	"nlk_cb_mutex-KOBJECT_UEVENT",
++	"nlk_cb_mutex-GENERIC",
++	"nlk_cb_mutex-17",
++	"nlk_cb_mutex-SCSITRANSPORT",
++	"nlk_cb_mutex-ECRYPTFS",
++	"nlk_cb_mutex-RDMA",
++	"nlk_cb_mutex-CRYPTO",
++	"nlk_cb_mutex-SMC",
++	"nlk_cb_mutex-23",
++	"nlk_cb_mutex-24",
++	"nlk_cb_mutex-25",
++	"nlk_cb_mutex-26",
++	"nlk_cb_mutex-27",
++	"nlk_cb_mutex-28",
++	"nlk_cb_mutex-29",
++	"nlk_cb_mutex-30",
++	"nlk_cb_mutex-31",
++	"nlk_cb_mutex-MAX_LINKS"
++};
++
+ static int netlink_dump(struct sock *sk);
+ static void netlink_skb_destructor(struct sk_buff *skb);
+ 
+@@ -585,6 +623,9 @@ static int __netlink_create(struct net *net, struct socket *sock,
+ 	} else {
+ 		nlk->cb_mutex = &nlk->cb_def_mutex;
+ 		mutex_init(nlk->cb_mutex);
++		lockdep_set_class_and_name(nlk->cb_mutex,
++					   nlk_cb_mutex_keys + protocol,
++					   nlk_cb_mutex_key_strings[protocol]);
+ 	}
+ 	init_waitqueue_head(&nlk->wait);
+ 
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
