@@ -1,68 +1,230 @@
-From: Rob Herring <robh-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-Subject: Re: [PATCH] dt-bindings: rng: clocks property on omap_rng is optional
-Date: Wed, 15 Mar 2017 12:57:37 -0500
-Message-ID: <20170315175737.vfy5omissjkyyie7@rob-hp-laptop>
-References: <1488896308-17731-1-git-send-email-thomas.petazzoni@free-electrons.com>
+From: Gary R Hook <gary.hook@amd.com>
+Subject: [PATCH V3 1/3] crypto: ccp - Add SHA-2 384- and 512-bit support
+Date: Wed, 15 Mar 2017 13:20:43 -0500
+Message-ID: <20170315182043.29335.23961.stgit@taos>
+References: <20170315182014.29335.93268.stgit@taos>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        Ian Campbell <ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org>,
-        Pawel Moll <pawel.moll-5wv7dgnIgG8@public.gmane.org>,
-        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
-        Kumar Gala <galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>,
-        Deepak Saxena <dsaxena-k7pgMgclrJvR7s880joybQ@public.gmane.org>,
-        Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org>,
-        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-        linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, romain.perier-ZGY8ohtN/8qB+jHODAdFcQ@public.gmane.org,
-        Jason Cooper <jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org>,
-        Andrew Lunn <andrew-g2DYL2Zd6BY@public.gmane.org>,
-        Sebastian Hesselbarth <sebastian.hesselbarth-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        Gregory Clement <gregory.clement-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
-        Nadav Haklai <nadavh-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org>,
-        Hanna Hawa <hannah-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org>,
-        Yehuda Yitschak <yehuday-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org>, stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Thomas Petazzoni <thomas.petazzoni-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <1488896308-17731-1-git-send-email-thomas.petazzoni-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: <thomas.lendacky@amd.com>, <gary.hook@amd.com>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+To: <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-by2nam03on0083.outbound.protection.outlook.com ([104.47.42.83]:7593
+        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1753536AbdCOSWT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 15 Mar 2017 14:22:19 -0400
+In-Reply-To: <20170315182014.29335.93268.stgit@taos>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Mar 07, 2017 at 03:18:28PM +0100, Thomas Petazzoni wrote:
-> Commit 52060836f79 ("dt-bindings: omap-rng: Document SafeXcel IP-76
-> device variant") update the omap_rng Device Tree binding to add support
-> for the IP-76 variation of the IP. As part of this change, a "clocks"
-> property was added, but is indicated as "Required", while it is in fact
-> "Optional": some SoCs do not require a clock for this IP block.
-> 
-> Fixes: 52060836f79 ("dt-bindings: omap-rng: Document SafeXcel IP-76 device variant")
-> Cc: <stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-> Signed-off-by: Thomas Petazzoni <thomas.petazzoni-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
-> ---
->  Documentation/devicetree/bindings/rng/omap_rng.txt | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/rng/omap_rng.txt b/Documentation/devicetree/bindings/rng/omap_rng.txt
-> index 4714772..20d435da 100644
-> --- a/Documentation/devicetree/bindings/rng/omap_rng.txt
-> +++ b/Documentation/devicetree/bindings/rng/omap_rng.txt
-> @@ -12,6 +12,9 @@ Required properties:
->  - reg : Offset and length of the register set for the module
->  - interrupts : the interrupt number for the RNG module.
->  		Used for "ti,omap4-rng" and "inside-secure,safexcel-eip76"
-> +
-> +Optional properties:
-> +
+Incorporate 384-bit and 512-bit hashing for a version 5 CCP
+device
 
-Wouldn't just "for ? compatible only" be more correct?
 
->  - clocks: the trng clock source
->  
->  Example:
-> -- 
-> 2.7.4
-> 
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Signed-off-by: Gary R Hook <gary.hook@amd.com>
+---
+ drivers/crypto/ccp/ccp-crypto-sha.c |   22 +++++++++++
+ drivers/crypto/ccp/ccp-crypto.h     |    8 ++--
+ drivers/crypto/ccp/ccp-ops.c        |   72 +++++++++++++++++++++++++++++++++++
+ include/linux/ccp.h                 |    2 +
+ 4 files changed, 101 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/crypto/ccp/ccp-crypto-sha.c b/drivers/crypto/ccp/ccp-crypto-sha.c
+index 84a652b..6b46eea 100644
+--- a/drivers/crypto/ccp/ccp-crypto-sha.c
++++ b/drivers/crypto/ccp/ccp-crypto-sha.c
+@@ -146,6 +146,12 @@ static int ccp_do_sha_update(struct ahash_request *req, unsigned int nbytes,
+ 	case CCP_SHA_TYPE_256:
+ 		rctx->cmd.u.sha.ctx_len = SHA256_DIGEST_SIZE;
+ 		break;
++	case CCP_SHA_TYPE_384:
++		rctx->cmd.u.sha.ctx_len = SHA384_DIGEST_SIZE;
++		break;
++	case CCP_SHA_TYPE_512:
++		rctx->cmd.u.sha.ctx_len = SHA512_DIGEST_SIZE;
++		break;
+ 	default:
+ 		/* Should never get here */
+ 		break;
+@@ -393,6 +399,22 @@ struct ccp_sha_def {
+ 		.digest_size	= SHA256_DIGEST_SIZE,
+ 		.block_size	= SHA256_BLOCK_SIZE,
+ 	},
++	{
++		.version	= CCP_VERSION(5, 0),
++		.name		= "sha384",
++		.drv_name	= "sha384-ccp",
++		.type		= CCP_SHA_TYPE_384,
++		.digest_size	= SHA384_DIGEST_SIZE,
++		.block_size	= SHA384_BLOCK_SIZE,
++	},
++	{
++		.version	= CCP_VERSION(5, 0),
++		.name		= "sha512",
++		.drv_name	= "sha512-ccp",
++		.type		= CCP_SHA_TYPE_512,
++		.digest_size	= SHA512_DIGEST_SIZE,
++		.block_size	= SHA512_BLOCK_SIZE,
++	},
+ };
+ 
+ static int ccp_register_hmac_alg(struct list_head *head,
+diff --git a/drivers/crypto/ccp/ccp-crypto.h b/drivers/crypto/ccp/ccp-crypto.h
+index 8335b32..95cce27 100644
+--- a/drivers/crypto/ccp/ccp-crypto.h
++++ b/drivers/crypto/ccp/ccp-crypto.h
+@@ -137,9 +137,11 @@ struct ccp_aes_cmac_exp_ctx {
+ 	u8 buf[AES_BLOCK_SIZE];
+ };
+ 
+-/***** SHA related defines *****/
+-#define MAX_SHA_CONTEXT_SIZE	SHA256_DIGEST_SIZE
+-#define MAX_SHA_BLOCK_SIZE	SHA256_BLOCK_SIZE
++/* SHA-related defines
++ * These values must be large enough to accommodate any variant
++ */
++#define MAX_SHA_CONTEXT_SIZE	SHA512_DIGEST_SIZE
++#define MAX_SHA_BLOCK_SIZE	SHA512_BLOCK_SIZE
+ 
+ struct ccp_sha_ctx {
+ 	struct scatterlist opad_sg;
+diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
+index f1396c3..0d82080 100644
+--- a/drivers/crypto/ccp/ccp-ops.c
++++ b/drivers/crypto/ccp/ccp-ops.c
+@@ -41,6 +41,20 @@
+ 	cpu_to_be32(SHA256_H6), cpu_to_be32(SHA256_H7),
+ };
+ 
++static const __be64 ccp_sha384_init[SHA512_DIGEST_SIZE / sizeof(__be64)] = {
++	cpu_to_be64(SHA384_H0), cpu_to_be64(SHA384_H1),
++	cpu_to_be64(SHA384_H2), cpu_to_be64(SHA384_H3),
++	cpu_to_be64(SHA384_H4), cpu_to_be64(SHA384_H5),
++	cpu_to_be64(SHA384_H6), cpu_to_be64(SHA384_H7),
++};
++
++static const __be64 ccp_sha512_init[SHA512_DIGEST_SIZE / sizeof(__be64)] = {
++	cpu_to_be64(SHA512_H0), cpu_to_be64(SHA512_H1),
++	cpu_to_be64(SHA512_H2), cpu_to_be64(SHA512_H3),
++	cpu_to_be64(SHA512_H4), cpu_to_be64(SHA512_H5),
++	cpu_to_be64(SHA512_H6), cpu_to_be64(SHA512_H7),
++};
++
+ #define	CCP_NEW_JOBID(ccp)	((ccp->vdata->version == CCP_VERSION(3, 0)) ? \
+ 					ccp_gen_jobid(ccp) : 0)
+ 
+@@ -955,6 +969,18 @@ static int ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 			return -EINVAL;
+ 		block_size = SHA256_BLOCK_SIZE;
+ 		break;
++	case CCP_SHA_TYPE_384:
++		if (cmd_q->ccp->vdata->version < CCP_VERSION(4, 0)
++		    || sha->ctx_len < SHA384_DIGEST_SIZE)
++			return -EINVAL;
++		block_size = SHA384_BLOCK_SIZE;
++		break;
++	case CCP_SHA_TYPE_512:
++		if (cmd_q->ccp->vdata->version < CCP_VERSION(4, 0)
++		    || sha->ctx_len < SHA512_DIGEST_SIZE)
++			return -EINVAL;
++		block_size = SHA512_BLOCK_SIZE;
++		break;
+ 	default:
+ 		return -EINVAL;
+ 	}
+@@ -1042,6 +1068,21 @@ static int ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 		sb_count = 1;
+ 		ooffset = ioffset = 0;
+ 		break;
++	case CCP_SHA_TYPE_384:
++		digest_size = SHA384_DIGEST_SIZE;
++		init = (void *) ccp_sha384_init;
++		ctx_size = SHA512_DIGEST_SIZE;
++		sb_count = 2;
++		ioffset = 0;
++		ooffset = 2 * CCP_SB_BYTES - SHA384_DIGEST_SIZE;
++		break;
++	case CCP_SHA_TYPE_512:
++		digest_size = SHA512_DIGEST_SIZE;
++		init = (void *) ccp_sha512_init;
++		ctx_size = SHA512_DIGEST_SIZE;
++		sb_count = 2;
++		ooffset = ioffset = 0;
++		break;
+ 	default:
+ 		ret = -EINVAL;
+ 		goto e_data;
+@@ -1060,6 +1101,11 @@ static int ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 	op.u.sha.type = sha->type;
+ 	op.u.sha.msg_bits = sha->msg_bits;
+ 
++	/* For SHA1/224/256 the context fits in a single (32-byte) SB entry;
++	 * SHA384/512 require 2 adjacent SB slots, with the right half in the
++	 * first slot, and the left half in the second. Each portion must then
++	 * be in little endian format: use the 256-bit byte swap option.
++	 */
+ 	ret = ccp_init_dm_workarea(&ctx, cmd_q, sb_count * CCP_SB_BYTES,
+ 				   DMA_BIDIRECTIONAL);
+ 	if (ret)
+@@ -1071,6 +1117,13 @@ static int ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 		case CCP_SHA_TYPE_256:
+ 			memcpy(ctx.address + ioffset, init, ctx_size);
+ 			break;
++		case CCP_SHA_TYPE_384:
++		case CCP_SHA_TYPE_512:
++			memcpy(ctx.address + ctx_size / 2, init,
++			       ctx_size / 2);
++			memcpy(ctx.address, init + ctx_size / 2,
++			       ctx_size / 2);
++			break;
+ 		default:
+ 			ret = -EINVAL;
+ 			goto e_ctx;
+@@ -1137,6 +1190,15 @@ static int ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 					sha->ctx, 0,
+ 					digest_size);
+ 			break;
++		case CCP_SHA_TYPE_384:
++		case CCP_SHA_TYPE_512:
++			ccp_get_dm_area(&ctx, 0,
++					sha->ctx, LSB_ITEM_SIZE - ooffset,
++					LSB_ITEM_SIZE);
++			ccp_get_dm_area(&ctx, LSB_ITEM_SIZE + ooffset,
++					sha->ctx, 0,
++					LSB_ITEM_SIZE - ooffset);
++			break;
+ 		default:
+ 			ret = -EINVAL;
+ 			goto e_ctx;
+@@ -1174,6 +1236,16 @@ static int ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 			       ctx.address + ooffset,
+ 			       digest_size);
+ 			break;
++		case CCP_SHA_TYPE_384:
++		case CCP_SHA_TYPE_512:
++			memcpy(hmac_buf + block_size,
++			       ctx.address + LSB_ITEM_SIZE + ooffset,
++			       LSB_ITEM_SIZE);
++			memcpy(hmac_buf + block_size +
++			       (LSB_ITEM_SIZE - ooffset),
++			       ctx.address,
++			       LSB_ITEM_SIZE);
++			break;
+ 		default:
+ 			ret = -EINVAL;
+ 			goto e_ctx;
+diff --git a/include/linux/ccp.h b/include/linux/ccp.h
+index c71dd8f..90a1fbe 100644
+--- a/include/linux/ccp.h
++++ b/include/linux/ccp.h
+@@ -249,6 +249,8 @@ enum ccp_sha_type {
+ 	CCP_SHA_TYPE_1 = 1,
+ 	CCP_SHA_TYPE_224,
+ 	CCP_SHA_TYPE_256,
++	CCP_SHA_TYPE_384,
++	CCP_SHA_TYPE_512,
+ 	CCP_SHA_TYPE__LAST,
+ };
+ 
