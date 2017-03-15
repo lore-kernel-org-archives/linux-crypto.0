@@ -1,54 +1,56 @@
-From: Gary R Hook <gary.hook@amd.com>
-Subject: [PATCH V3 0/3] Support new function in new CCPs
-Date: Wed, 15 Mar 2017 13:20:34 -0500
-Message-ID: <20170315182014.29335.93268.stgit@taos>
+From: Daniel Axtens <dja@axtens.net>
+Subject: RE: [PATCH 1/4] crypto: powerpc - Factor out the core CRC vpmsum
+ algorithm
+Date: Thu, 16 Mar 2017 09:30:17 +1100
+Message-ID: <87efxy41hi.fsf@possimpible.ozlabs.ibm.com>
+References: <20170315123737.20234-1-dja@axtens.net>
+ <063D6719AE5E284EB5DD2968C1650D6DCFFB1A81@AcuExch.aculab.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: <thomas.lendacky@amd.com>, <gary.hook@amd.com>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-To: <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2nam02on0045.outbound.protection.outlook.com ([104.47.38.45]:21920
-        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753419AbdCOSgy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 15 Mar 2017 14:36:54 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain
+Cc: "anton@samba.org" <anton@samba.org>
+To: David Laight <David.Laight@ACULAB.COM>,
+ "linuxppc-dev\@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+ "linux-crypto\@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+In-Reply-To: <063D6719AE5E284EB5DD2968C1650D6DCFFB1A81@AcuExch.aculab.com>
+List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
+List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
+List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
+List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
+List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
+Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+Sender: "Linuxppc-dev"
+ <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+List-Id: linux-crypto.vger.kernel.org
 
-The following series implements new function in a version 5 coprocessor.
-New features are:
- - Support for SHA-2 384-bit and 512-bit hashing
- - Support for 3DES encryption
- - Support for AES GCM encryption
+Hi David,
 
-Changes from V2:
- - Correct a comment in the GCM support code.
- - Ensure the patches apply to the current repo
+> While not part of this change, the unrolled loops look as though
+> they just destroy the cpu cache.
+> I'd like be convinced that anything does CRC over long enough buffers
+> to make it a gain at all.
+>
+> With modern (not that modern now) superscalar cpus you can often
+> get the loop instructions 'for free'.
+> Sometimes pipelining the loop is needed to get full throughput.
+> Unlike the IP checksum, you don't even have to 'loop carry' the
+> cpu carry flag.
 
-Changes from V1:
- - Ensure the patches build correctly
+Internal testing on a NVMe device with T10DIF enabled on 4k blocks
+shows a 20x - 30x improvement. Without these patches, crc_t10dif_generic
+uses over 60% of CPU time - with these patches CRC drops to single
+digits.
 
----
+I should probably have lead with that, sorry.
 
-Gary R Hook (3):
-      crypto: ccp - Add SHA-2 384- and 512-bit support
-      crypto: ccp - Enable 3DES function on v5 CCPs
-      crypto: ccp - Enable support for AES GCM on v5 CCPs
+FWIW, the original patch showed a 3.7x gain on btrfs as well -
+6dd7a82cc54e ("crypto: powerpc - Add POWER8 optimised crc32c")
 
+When Anton wrote the original code he had access to IBM's internal
+tooling for looking at how instructions flow through the various stages
+of the CPU, so I trust it's pretty much optimal from that point of view.
 
- drivers/crypto/ccp/Makefile                |    2 
- drivers/crypto/ccp/ccp-crypto-aes-galois.c |  252 ++++++++++++++
- drivers/crypto/ccp/ccp-crypto-des3.c       |  254 ++++++++++++++
- drivers/crypto/ccp/ccp-crypto-main.c       |   22 +
- drivers/crypto/ccp/ccp-crypto-sha.c        |   22 +
- drivers/crypto/ccp/ccp-crypto.h            |   44 ++
- drivers/crypto/ccp/ccp-dev-v3.c            |    1 
- drivers/crypto/ccp/ccp-dev-v5.c            |   54 +++
- drivers/crypto/ccp/ccp-dev.h               |   14 +
- drivers/crypto/ccp/ccp-ops.c               |  522 ++++++++++++++++++++++++++++
- include/linux/ccp.h                        |   68 ++++
- 11 files changed, 1249 insertions(+), 6 deletions(-)
- create mode 100644 drivers/crypto/ccp/ccp-crypto-aes-galois.c
- create mode 100644 drivers/crypto/ccp/ccp-crypto-des3.c
+Regards,
+Daniel
