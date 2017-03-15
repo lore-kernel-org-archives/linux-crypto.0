@@ -1,53 +1,86 @@
-From: Sowmini Varadhan <sowmini.varadhan@oracle.com>
-Subject: Re: crypto: deadlock between crypto_alg_sem/rtnl_mutex/genl_mutex
-Date: Wed, 15 Mar 2017 07:30:19 -0400
-Message-ID: <20170315113019.GA28050@oracle.com>
-References: <CACT4Y+bLbNbf0T376JHvemuY+za0+qgrfOKWzvJg5vAkJTCRFg@mail.gmail.com>
- <CACT4Y+bJ1-d3DhCvzEN0PeDd7+P2LNgjF2NHwALXBubOKaOEsw@mail.gmail.com>
- <CACT4Y+YhLM0CetOZn6uXwyBBGM_oVsW-CC3NMg8A5K0xd3F2mA@mail.gmail.com>
- <CACT4Y+YTBPDMOZGMLuZPaQhSFXbeQeahHc8BUDOgNYm6hRy6fw@mail.gmail.com>
- <20170314152519.GA21159@oracle.com>
- <CACT4Y+a+SHMAB=xsMahgawEsQKRNVp0dgc6v3pv=TADqADsLpA@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        David Miller <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Cong Wang <xiyou.wangcong@gmail.com>,
-        netdev <netdev@vger.kernel.org>, santosh.shilimkar@oracle.com,
-        rds-devel@oss.oracle.com, syzkaller <syzkaller@googlegroups.com>
-To: Dmitry Vyukov <dvyukov@google.com>
+From: Philipp Zabel <p.zabel@pengutronix.de>
+Subject: [PATCH v2 01/14] crypto: sun4i-ss - simplify optional reset handling
+Date: Wed, 15 Mar 2017 12:31:28 +0100
+Message-ID: <20170315113128.8809-1-p.zabel@pengutronix.de>
+Cc: Corentin Labbe <clabbe.montjoie@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Maxime Ripard <maxime.ripard@free-electrons.com>,
+        Chen-Yu Tsai <wens@csie.org>, linux-kernel@vger.kernel.org,
+        Philipp Zabel <p.zabel@pengutronix.de>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CACT4Y+a+SHMAB=xsMahgawEsQKRNVp0dgc6v3pv=TADqADsLpA@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On (03/15/17 10:08), Dmitry Vyukov wrote:
-> After I've applied the patch these reports stopped to happen, and I
-> have not seem any other reports that look relevant.
-> However, it there was one, but it looks like a different issue and it
-> was probably masked by massive amounts of original deadlock reports:
+As of commit bb475230b8e5 ("reset: make optional functions really
+optional"), the reset framework API calls use NULL pointers to describe
+optional, non-present reset controls.
 
-Yes, this looks like a valid deadlock.
+This allows to return errors from devm_reset_control_get_optional and to
+call reset_control_(de)assert unconditionally.
 
-I think there may be some ->dumpit callbacks that take the rtnl_lock
-and do not unlock it before return, e.g., I see nl80211_dump_interface()
-doing this at 
+Signed-off-by: Philipp Zabel <p.zabel@pengutronix.de>
+---
+ drivers/crypto/sunxi-ss/sun4i-ss-core.c | 25 +++++++++++--------------
+ 1 file changed, 11 insertions(+), 14 deletions(-)
 
-   2612         rtnl_lock();
-   2613         if (!cb->args[2]) {
-     :
-   2619                 ret = nl80211_dump_wiphy_parse(skb, cb, &state);
-   2620                 if (ret)
-   2621                         return ret;
-
-afaict, nl80211_dump_wiphy_parse does not itself do rtnl_unlock on error.
-
-
-If that's the case then we'd run into the circular locking dependancy
-flagged by lockdep. 
-
-Disclaimer: I did not check every single ->dumpit, there may be more
-than one of these..
+diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-core.c b/drivers/crypto/sunxi-ss/sun4i-ss-core.c
+index 3ac6c6c4ad18e..e310e311d23ea 100644
+--- a/drivers/crypto/sunxi-ss/sun4i-ss-core.c
++++ b/drivers/crypto/sunxi-ss/sun4i-ss-core.c
+@@ -258,10 +258,11 @@ static int sun4i_ss_probe(struct platform_device *pdev)
+ 
+ 	ss->reset = devm_reset_control_get_optional(&pdev->dev, "ahb");
+ 	if (IS_ERR(ss->reset)) {
+-		if (PTR_ERR(ss->reset) == -EPROBE_DEFER)
+-			return PTR_ERR(ss->reset);
+-		dev_info(&pdev->dev, "no reset control found\n");
+-		ss->reset = NULL;
++		err = PTR_ERR(ss->reset);
++		if (err == -EPROBE_DEFER)
++			return err;
++		dev_err(&pdev->dev, "Cannot get reset control err=%d\n", err);
++		return err;
+ 	}
+ 
+ 	/* Enable both clocks */
+@@ -287,12 +288,10 @@ static int sun4i_ss_probe(struct platform_device *pdev)
+ 	}
+ 
+ 	/* Deassert reset if we have a reset control */
+-	if (ss->reset) {
+-		err = reset_control_deassert(ss->reset);
+-		if (err) {
+-			dev_err(&pdev->dev, "Cannot deassert reset control\n");
+-			goto error_clk;
+-		}
++	err = reset_control_deassert(ss->reset);
++	if (err) {
++		dev_err(&pdev->dev, "Cannot deassert reset control\n");
++		goto error_clk;
+ 	}
+ 
+ 	/*
+@@ -372,8 +371,7 @@ static int sun4i_ss_probe(struct platform_device *pdev)
+ 			break;
+ 		}
+ 	}
+-	if (ss->reset)
+-		reset_control_assert(ss->reset);
++	reset_control_assert(ss->reset);
+ error_clk:
+ 	clk_disable_unprepare(ss->ssclk);
+ error_ssclk:
+@@ -398,8 +396,7 @@ static int sun4i_ss_remove(struct platform_device *pdev)
+ 	}
+ 
+ 	writel(0, ss->base + SS_CTL);
+-	if (ss->reset)
+-		reset_control_assert(ss->reset);
++	reset_control_assert(ss->reset);
+ 	clk_disable_unprepare(ss->busclk);
+ 	clk_disable_unprepare(ss->ssclk);
+ 	return 0;
+-- 
+2.11.0
