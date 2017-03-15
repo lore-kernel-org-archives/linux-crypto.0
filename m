@@ -1,50 +1,61 @@
-From: Corentin Labbe <clabbe.montjoie@gmail.com>
-Subject: Re: [PATCH 2/4] crypto: stm32 - Support for STM32 CRC32 crypto module
-Date: Tue, 14 Mar 2017 20:39:54 +0100
-Message-ID: <20170314193954.GA12137@Red>
-References: <1489509446-32283-1-git-send-email-fabien.dessenne@st.com>
- <1489509446-32283-3-git-send-email-fabien.dessenne@st.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Fixes for 4.11
+Date: Wed, 15 Mar 2017 14:31:51 +0800
+Message-ID: <20170315063151.GA6767@gondor.apana.org.au>
+References: <20161119102748.GA4277@gondor.apana.org.au>
+ <20161215160732.GA16580@gondor.apana.org.au>
+ <20170111115646.GA8943@gondor.apana.org.au>
+ <20170304074119.GA3041@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        Russell King <linux@armlinux.org.uk>,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-To: Fabien Dessenne <fabien.dessenne@st.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wr0-f196.google.com ([209.85.128.196]:35321 "EHLO
-        mail-wr0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751489AbdCNTkE (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:39095 "EHLO
+        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1750944AbdCOGcK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 14 Mar 2017 15:40:04 -0400
+        Wed, 15 Mar 2017 02:32:10 -0400
 Content-Disposition: inline
-In-Reply-To: <1489509446-32283-3-git-send-email-fabien.dessenne@st.com>
+In-Reply-To: <20170304074119.GA3041@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Mar 14, 2017 at 05:37:24PM +0100, Fabien Dessenne wrote:
-> +static int stm32_crc_remove(struct platform_device *pdev)
-> +{
-> +	struct stm32_crc *crc = platform_get_drvdata(pdev);
-> +
-> +	spin_lock(&crc_list.lock);
-> +	list_del(&crc->list);
-> +	spin_unlock(&crc_list.lock);
-> +
-> +	crypto_unregister_shash(algs);
-> +
-> +	if (crc && crc->clk)
-> +		clk_disable_unprepare(crc->clk);
+Hi Linus:
 
-Hello
+This push fixes the following issues:
 
-No need to test for crc, if it was NULL, you dereference it just before in list_del.
-Furthermore, It seems that clk_disable_unprepare() handle perfectly NULL, so no test is needed.
+- Self-test failure of crc32c on powerpc.
+- Regressions of ecb(aes) when used with xts/lrw in s5p-sss.
+- A number of bugs in the omap RNG driver.
 
-Regards
-Corentin Labbe
+
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+
+
+Daniel Axtens (1):
+      crypto: powerpc - Fix initialisation of crc32c context
+
+Krzysztof Kozlowski (2):
+      crypto: s5p-sss - Fix completing crypto request in IRQ handler
+      crypto: s5p-sss - Fix spinlock recursion on LRW(AES)
+
+Thomas Petazzoni (3):
+      hwrng: omap - write registers after enabling the clock
+      hwrng: omap - use devm_clk_get() instead of of_clk_get()
+      hwrng: omap - Do not access INTMASK_REG on EIP76
+
+ arch/powerpc/crypto/crc32c-vpmsum_glue.c |    2 +-
+ drivers/char/hw_random/omap-rng.c        |   16 +++-
+ drivers/crypto/s5p-sss.c                 |  132 +++++++++++++++++++-----------
+ 3 files changed, 100 insertions(+), 50 deletions(-)
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
