@@ -1,7 +1,7 @@
 From: Gary R Hook <gary.hook@amd.com>
-Subject: [PATCH V3 3/3] crypto: ccp - Enable support for AES GCM on v5 CCPs
-Date: Wed, 15 Mar 2017 13:21:01 -0500
-Message-ID: <20170315182101.29335.80853.stgit@taos>
+Subject: [PATCH V3 2/3] crypto: ccp - Enable 3DES function on v5 CCPs
+Date: Wed, 15 Mar 2017 13:20:52 -0500
+Message-ID: <20170315182052.29335.14999.stgit@taos>
 References: <20170315182014.29335.93268.stgit@taos>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -10,53 +10,53 @@ Cc: <thomas.lendacky@amd.com>, <gary.hook@amd.com>,
         <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn3nam01on0043.outbound.protection.outlook.com ([104.47.33.43]:58957
-        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
+Received: from mail-by2nam03on0089.outbound.protection.outlook.com ([104.47.42.89]:14016
+        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753532AbdCOSWT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1753519AbdCOSWT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Wed, 15 Mar 2017 14:22:19 -0400
 In-Reply-To: <20170315182014.29335.93268.stgit@taos>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-A version 5 device provides the primitive commands
-required for AES GCM. This patch adds support for
-en/decryption.
+Wire up support for Triple DES in ECB mode.
 
 Signed-off-by: Gary R Hook <gary.hook@amd.com>
 ---
- drivers/crypto/ccp/Makefile                |    1 
- drivers/crypto/ccp/ccp-crypto-aes-galois.c |  252 ++++++++++++++++++++++++++++
- drivers/crypto/ccp/ccp-crypto-main.c       |   12 +
- drivers/crypto/ccp/ccp-crypto.h            |   14 ++
- drivers/crypto/ccp/ccp-ops.c               |  252 ++++++++++++++++++++++++++++
- include/linux/ccp.h                        |    9 +
- 6 files changed, 540 insertions(+)
- create mode 100644 drivers/crypto/ccp/ccp-crypto-aes-galois.c
+ drivers/crypto/ccp/Makefile          |    1 
+ drivers/crypto/ccp/ccp-crypto-des3.c |  254 ++++++++++++++++++++++++++++++++++
+ drivers/crypto/ccp/ccp-crypto-main.c |   10 +
+ drivers/crypto/ccp/ccp-crypto.h      |   22 +++
+ drivers/crypto/ccp/ccp-dev-v3.c      |    1 
+ drivers/crypto/ccp/ccp-dev-v5.c      |   54 +++++++
+ drivers/crypto/ccp/ccp-dev.h         |   14 ++
+ drivers/crypto/ccp/ccp-ops.c         |  198 +++++++++++++++++++++++++++
+ include/linux/ccp.h                  |   57 +++++++-
+ 9 files changed, 608 insertions(+), 3 deletions(-)
+ create mode 100644 drivers/crypto/ccp/ccp-crypto-des3.c
 
 diff --git a/drivers/crypto/ccp/Makefile b/drivers/crypto/ccp/Makefile
-index d2044b7..60919a3 100644
+index 346ceb8..d2044b7 100644
 --- a/drivers/crypto/ccp/Makefile
 +++ b/drivers/crypto/ccp/Makefile
-@@ -12,5 +12,6 @@ ccp-crypto-objs := ccp-crypto-main.o \
+@@ -12,4 +12,5 @@ ccp-crypto-objs := ccp-crypto-main.o \
  		   ccp-crypto-aes.o \
  		   ccp-crypto-aes-cmac.o \
  		   ccp-crypto-aes-xts.o \
-+		   ccp-crypto-aes-galois.o \
- 		   ccp-crypto-des3.o \
++		   ccp-crypto-des3.o \
  		   ccp-crypto-sha.o
-diff --git a/drivers/crypto/ccp/ccp-crypto-aes-galois.c b/drivers/crypto/ccp/ccp-crypto-aes-galois.c
+diff --git a/drivers/crypto/ccp/ccp-crypto-des3.c b/drivers/crypto/ccp/ccp-crypto-des3.c
 new file mode 100644
-index 0000000..38ee6f3
+index 0000000..5af7347
 --- /dev/null
-+++ b/drivers/crypto/ccp/ccp-crypto-aes-galois.c
-@@ -0,0 +1,252 @@
++++ b/drivers/crypto/ccp/ccp-crypto-des3.c
+@@ -0,0 +1,254 @@
 +/*
-+ * AMD Cryptographic Coprocessor (CCP) AES GCM crypto API support
++ * AMD Cryptographic Coprocessor (CCP) DES3 crypto API support
 + *
 + * Copyright (C) 2016 Advanced Micro Devices, Inc.
 + *
-+ * Author: Gary R Hook <gary.hook@amd.com>
++ * Author: Gary R Hook <ghook@amd.com>
 + *
 + * This program is free software; you can redistribute it and/or modify
 + * it under the terms of the GNU General Public License version 2 as
@@ -68,235 +68,237 @@ index 0000000..38ee6f3
 +#include <linux/delay.h>
 +#include <linux/scatterlist.h>
 +#include <linux/crypto.h>
-+#include <crypto/internal/aead.h>
 +#include <crypto/algapi.h>
-+#include <crypto/aes.h>
-+#include <crypto/ctr.h>
 +#include <crypto/scatterwalk.h>
-+#include <linux/delay.h>
++#include <crypto/des.h>
 +
 +#include "ccp-crypto.h"
 +
-+#define	AES_GCM_IVSIZE	12
-+
-+static int ccp_aes_gcm_complete(struct crypto_async_request *async_req, int ret)
++static int ccp_des3_complete(struct crypto_async_request *async_req, int ret)
 +{
-+	return ret;
++	struct ablkcipher_request *req = ablkcipher_request_cast(async_req);
++	struct ccp_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
++	struct ccp_des3_req_ctx *rctx = ablkcipher_request_ctx(req);
++
++	if (ret)
++		return ret;
++
++	if (ctx->u.des3.mode != CCP_DES3_MODE_ECB)
++		memcpy(req->info, rctx->iv, DES3_EDE_BLOCK_SIZE);
++
++	return 0;
 +}
 +
-+static int ccp_aes_gcm_setkey(struct crypto_aead *tfm, const u8 *key,
-+			      unsigned int key_len)
++static int ccp_des3_setkey(struct crypto_ablkcipher *tfm, const u8 *key,
++		unsigned int key_len)
 +{
-+	struct ccp_ctx *ctx = crypto_aead_ctx(tfm);
++	struct ccp_ctx *ctx = crypto_tfm_ctx(crypto_ablkcipher_tfm(tfm));
++	struct ccp_crypto_ablkcipher_alg *alg =
++		ccp_crypto_ablkcipher_alg(crypto_ablkcipher_tfm(tfm));
++	u32 *flags = &tfm->base.crt_flags;
 +
-+	switch (key_len) {
-+	case AES_KEYSIZE_128:
-+		ctx->u.aes.type = CCP_AES_TYPE_128;
-+		break;
-+	case AES_KEYSIZE_192:
-+		ctx->u.aes.type = CCP_AES_TYPE_192;
-+		break;
-+	case AES_KEYSIZE_256:
-+		ctx->u.aes.type = CCP_AES_TYPE_256;
-+		break;
-+	default:
-+		crypto_aead_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
++
++	/* From des_generic.c:
++	 *
++	 * RFC2451:
++	 *   If the first two or last two independent 64-bit keys are
++	 *   equal (k1 == k2 or k2 == k3), then the DES3 operation is simply the
++	 *   same as DES.  Implementers MUST reject keys that exhibit this
++	 *   property.
++	 */
++	const u32 *K = (const u32 *)key;
++
++	if (unlikely(!((K[0] ^ K[2]) | (K[1] ^ K[3])) ||
++		     !((K[2] ^ K[4]) | (K[3] ^ K[5]))) &&
++		     (*flags & CRYPTO_TFM_REQ_WEAK_KEY)) {
++		*flags |= CRYPTO_TFM_RES_WEAK_KEY;
 +		return -EINVAL;
 +	}
 +
-+	ctx->u.aes.mode = CCP_AES_MODE_GCM;
-+	ctx->u.aes.key_len = key_len;
++	/* It's not clear that there is any support for a keysize of 112.
++	 * If needed, the caller should make K1 == K3
++	 */
++	ctx->u.des3.type = CCP_DES3_TYPE_168;
++	ctx->u.des3.mode = alg->mode;
++	ctx->u.des3.key_len = key_len;
 +
-+	memcpy(ctx->u.aes.key, key, key_len);
-+	sg_init_one(&ctx->u.aes.key_sg, ctx->u.aes.key, key_len);
++	memcpy(ctx->u.des3.key, key, key_len);
++	sg_init_one(&ctx->u.des3.key_sg, ctx->u.des3.key, key_len);
 +
 +	return 0;
 +}
 +
-+static int ccp_aes_gcm_setauthsize(struct crypto_aead *tfm,
-+				   unsigned int authsize)
++static int ccp_des3_crypt(struct ablkcipher_request *req, bool encrypt)
 +{
-+	return 0;
-+}
-+
-+static int ccp_aes_gcm_crypt(struct aead_request *req, bool encrypt)
-+{
-+	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
-+	struct ccp_ctx *ctx = crypto_aead_ctx(tfm);
-+	struct ccp_aes_req_ctx *rctx = aead_request_ctx(req);
++	struct ccp_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
++	struct ccp_des3_req_ctx *rctx = ablkcipher_request_ctx(req);
 +	struct scatterlist *iv_sg = NULL;
 +	unsigned int iv_len = 0;
-+	int i;
-+	int ret = 0;
++	int ret;
 +
-+	if (!ctx->u.aes.key_len)
++	if (!ctx->u.des3.key_len)
 +		return -EINVAL;
 +
-+	if (ctx->u.aes.mode != CCP_AES_MODE_GCM)
++	if (((ctx->u.des3.mode == CCP_DES3_MODE_ECB) ||
++	     (ctx->u.des3.mode == CCP_DES3_MODE_CBC)) &&
++	    (req->nbytes & (DES3_EDE_BLOCK_SIZE - 1)))
 +		return -EINVAL;
 +
-+	if (!req->iv)
-+		return -EINVAL;
++	if (ctx->u.des3.mode != CCP_DES3_MODE_ECB) {
++		if (!req->info)
++			return -EINVAL;
 +
-+	/*
-+	 * 5 parts:
-+	 *   plaintext/ciphertext input
-+	 *   AAD
-+	 *   key
-+	 *   IV
-+	 *   Destination+tag buffer
-+	 */
++		memcpy(rctx->iv, req->info, DES3_EDE_BLOCK_SIZE);
++		iv_sg = &rctx->iv_sg;
++		iv_len = DES3_EDE_BLOCK_SIZE;
++		sg_init_one(iv_sg, rctx->iv, iv_len);
++	}
 +
-+	/* Prepare the IV: 12 bytes + an integer (counter) */
-+	memcpy(rctx->iv, req->iv, AES_GCM_IVSIZE);
-+	for (i = 0; i < 3; i++)
-+		rctx->iv[i + AES_GCM_IVSIZE] = 0;
-+	rctx->iv[AES_BLOCK_SIZE - 1] = 1;
-+
-+	/* Set up a scatterlist for the IV */
-+	iv_sg = &rctx->iv_sg;
-+	iv_len = AES_BLOCK_SIZE;
-+	sg_init_one(iv_sg, rctx->iv, iv_len);
-+
-+	/* The AAD + plaintext are concatenated in the src buffer */
 +	memset(&rctx->cmd, 0, sizeof(rctx->cmd));
 +	INIT_LIST_HEAD(&rctx->cmd.entry);
-+	rctx->cmd.engine = CCP_ENGINE_AES;
-+	rctx->cmd.u.aes.type = ctx->u.aes.type;
-+	rctx->cmd.u.aes.mode = ctx->u.aes.mode;
-+	rctx->cmd.u.aes.action = encrypt;
-+	rctx->cmd.u.aes.key = &ctx->u.aes.key_sg;
-+	rctx->cmd.u.aes.key_len = ctx->u.aes.key_len;
-+	rctx->cmd.u.aes.iv = iv_sg;
-+	rctx->cmd.u.aes.iv_len = iv_len;
-+	rctx->cmd.u.aes.src = req->src;
-+	rctx->cmd.u.aes.src_len = req->cryptlen;
-+	rctx->cmd.u.aes.aad_len = req->assoclen;
-+
-+	/* The cipher text + the tag are in the dst buffer */
-+	rctx->cmd.u.aes.dst = req->dst;
++	rctx->cmd.engine = CCP_ENGINE_DES3;
++	rctx->cmd.u.des3.type = ctx->u.des3.type;
++	rctx->cmd.u.des3.mode = ctx->u.des3.mode;
++	rctx->cmd.u.des3.action = (encrypt)
++				  ? CCP_DES3_ACTION_ENCRYPT
++				  : CCP_DES3_ACTION_DECRYPT;
++	rctx->cmd.u.des3.key = &ctx->u.des3.key_sg;
++	rctx->cmd.u.des3.key_len = ctx->u.des3.key_len;
++	rctx->cmd.u.des3.iv = iv_sg;
++	rctx->cmd.u.des3.iv_len = iv_len;
++	rctx->cmd.u.des3.src = req->src;
++	rctx->cmd.u.des3.src_len = req->nbytes;
++	rctx->cmd.u.des3.dst = req->dst;
 +
 +	ret = ccp_crypto_enqueue_request(&req->base, &rctx->cmd);
 +
 +	return ret;
 +}
 +
-+static int ccp_aes_gcm_encrypt(struct aead_request *req)
++static int ccp_des3_encrypt(struct ablkcipher_request *req)
 +{
-+	return ccp_aes_gcm_crypt(req, CCP_AES_ACTION_ENCRYPT);
++	return ccp_des3_crypt(req, true);
 +}
 +
-+static int ccp_aes_gcm_decrypt(struct aead_request *req)
++static int ccp_des3_decrypt(struct ablkcipher_request *req)
 +{
-+	return ccp_aes_gcm_crypt(req, CCP_AES_ACTION_DECRYPT);
++	return ccp_des3_crypt(req, false);
 +}
 +
-+static int ccp_aes_gcm_cra_init(struct crypto_aead *tfm)
++static int ccp_des3_cra_init(struct crypto_tfm *tfm)
 +{
-+	struct ccp_ctx *ctx = crypto_aead_ctx(tfm);
++	struct ccp_ctx *ctx = crypto_tfm_ctx(tfm);
 +
-+	ctx->complete = ccp_aes_gcm_complete;
-+	ctx->u.aes.key_len = 0;
++	ctx->complete = ccp_des3_complete;
++	ctx->u.des3.key_len = 0;
 +
-+	crypto_aead_set_reqsize(tfm, sizeof(struct ccp_aes_req_ctx));
++	tfm->crt_ablkcipher.reqsize = sizeof(struct ccp_des3_req_ctx);
 +
 +	return 0;
 +}
 +
-+static void ccp_aes_gcm_cra_exit(struct crypto_tfm *tfm)
++static void ccp_des3_cra_exit(struct crypto_tfm *tfm)
 +{
 +}
 +
-+static struct aead_alg ccp_aes_gcm_defaults = {
-+	.setkey = ccp_aes_gcm_setkey,
-+	.setauthsize = ccp_aes_gcm_setauthsize,
-+	.encrypt = ccp_aes_gcm_encrypt,
-+	.decrypt = ccp_aes_gcm_decrypt,
-+	.init = ccp_aes_gcm_cra_init,
-+	.ivsize = AES_GCM_IVSIZE,
-+	.maxauthsize = AES_BLOCK_SIZE,
-+	.base = {
-+		.cra_flags	= CRYPTO_ALG_TYPE_ABLKCIPHER |
-+				  CRYPTO_ALG_ASYNC |
-+				  CRYPTO_ALG_KERN_DRIVER_ONLY |
-+				  CRYPTO_ALG_NEED_FALLBACK,
-+		.cra_blocksize	= AES_BLOCK_SIZE,
-+		.cra_ctxsize	= sizeof(struct ccp_ctx),
-+		.cra_priority	= CCP_CRA_PRIORITY,
-+		.cra_type	= &crypto_ablkcipher_type,
-+		.cra_exit	= ccp_aes_gcm_cra_exit,
-+		.cra_module	= THIS_MODULE,
++static struct crypto_alg ccp_des3_defaults = {
++	.cra_flags	= CRYPTO_ALG_TYPE_ABLKCIPHER |
++		CRYPTO_ALG_ASYNC |
++		CRYPTO_ALG_KERN_DRIVER_ONLY |
++		CRYPTO_ALG_NEED_FALLBACK,
++	.cra_blocksize	= DES3_EDE_BLOCK_SIZE,
++	.cra_ctxsize	= sizeof(struct ccp_ctx),
++	.cra_priority	= CCP_CRA_PRIORITY,
++	.cra_type	= &crypto_ablkcipher_type,
++	.cra_init	= ccp_des3_cra_init,
++	.cra_exit	= ccp_des3_cra_exit,
++	.cra_module	= THIS_MODULE,
++	.cra_ablkcipher	= {
++		.setkey		= ccp_des3_setkey,
++		.encrypt	= ccp_des3_encrypt,
++		.decrypt	= ccp_des3_decrypt,
++		.min_keysize	= DES3_EDE_KEY_SIZE,
++		.max_keysize	= DES3_EDE_KEY_SIZE,
 +	},
 +};
 +
-+struct ccp_aes_aead_def {
-+	enum ccp_aes_mode mode;
++struct ccp_des3_def {
++	enum ccp_des3_mode mode;
 +	unsigned int version;
 +	const char *name;
 +	const char *driver_name;
 +	unsigned int blocksize;
 +	unsigned int ivsize;
-+	struct aead_alg *alg_defaults;
++	struct crypto_alg *alg_defaults;
 +};
 +
-+static struct ccp_aes_aead_def aes_aead_algs[] = {
++static struct ccp_des3_def des3_algs[] = {
 +	{
-+		.mode		= CCP_AES_MODE_GHASH,
++		.mode		= CCP_DES3_MODE_ECB,
 +		.version	= CCP_VERSION(5, 0),
-+		.name		= "gcm(aes)",
-+		.driver_name	= "gcm-aes-ccp",
-+		.blocksize	= 1,
-+		.ivsize		= AES_BLOCK_SIZE,
-+		.alg_defaults	= &ccp_aes_gcm_defaults,
++		.name		= "ecb(des3_ede)",
++		.driver_name	= "ecb-des3-ccp",
++		.blocksize	= DES3_EDE_BLOCK_SIZE,
++		.ivsize		= 0,
++		.alg_defaults	= &ccp_des3_defaults,
++	},
++	{
++		.mode		= CCP_DES3_MODE_CBC,
++		.version	= CCP_VERSION(5, 0),
++		.name		= "cbc(des3_ede)",
++		.driver_name	= "cbc-des3-ccp",
++		.blocksize	= DES3_EDE_BLOCK_SIZE,
++		.ivsize		= DES3_EDE_BLOCK_SIZE,
++		.alg_defaults	= &ccp_des3_defaults,
 +	},
 +};
 +
-+static int ccp_register_aes_aead(struct list_head *head,
-+				 const struct ccp_aes_aead_def *def)
++static int ccp_register_des3_alg(struct list_head *head,
++				 const struct ccp_des3_def *def)
 +{
-+	struct ccp_crypto_aead *ccp_aead;
-+	struct aead_alg *alg;
++	struct ccp_crypto_ablkcipher_alg *ccp_alg;
++	struct crypto_alg *alg;
 +	int ret;
 +
-+	ccp_aead = kzalloc(sizeof(*ccp_aead), GFP_KERNEL);
-+	if (!ccp_aead)
++	ccp_alg = kzalloc(sizeof(*ccp_alg), GFP_KERNEL);
++	if (!ccp_alg)
 +		return -ENOMEM;
 +
-+	INIT_LIST_HEAD(&ccp_aead->entry);
++	INIT_LIST_HEAD(&ccp_alg->entry);
 +
-+	ccp_aead->mode = def->mode;
++	ccp_alg->mode = def->mode;
 +
 +	/* Copy the defaults and override as necessary */
-+	alg = &ccp_aead->alg;
++	alg = &ccp_alg->alg;
 +	*alg = *def->alg_defaults;
-+	snprintf(alg->base.cra_name, CRYPTO_MAX_ALG_NAME, "%s", def->name);
-+	snprintf(alg->base.cra_driver_name, CRYPTO_MAX_ALG_NAME, "%s",
-+		 def->driver_name);
-+	alg->base.cra_blocksize = def->blocksize;
-+	alg->base.cra_ablkcipher.ivsize = def->ivsize;
++	snprintf(alg->cra_name, CRYPTO_MAX_ALG_NAME, "%s", def->name);
++	snprintf(alg->cra_driver_name, CRYPTO_MAX_ALG_NAME, "%s",
++			def->driver_name);
++	alg->cra_blocksize = def->blocksize;
++	alg->cra_ablkcipher.ivsize = def->ivsize;
 +
-+	ret = crypto_register_aead(alg);
++	ret = crypto_register_alg(alg);
 +	if (ret) {
 +		pr_err("%s ablkcipher algorithm registration error (%d)\n",
-+		       alg->base.cra_name, ret);
-+		kfree(ccp_aead);
++				alg->cra_name, ret);
++		kfree(ccp_alg);
 +		return ret;
 +	}
 +
-+	list_add(&ccp_aead->entry, head);
++	list_add(&ccp_alg->entry, head);
 +
 +	return 0;
 +}
 +
-+int ccp_register_aes_aeads(struct list_head *head)
++int ccp_register_des3_algs(struct list_head *head)
 +{
 +	int i, ret;
 +	unsigned int ccpversion = ccp_version();
 +
-+	for (i = 0; i < ARRAY_SIZE(aes_aead_algs); i++) {
-+		if (aes_aead_algs[i].version > ccpversion)
++	for (i = 0; i < ARRAY_SIZE(des3_algs); i++) {
++		if (des3_algs[i].version > ccpversion)
 +			continue;
-+		ret = ccp_register_aes_aead(head, &aes_aead_algs[i]);
++		ret = ccp_register_des3_alg(head, &des3_algs[i]);
 +		if (ret)
 +			return ret;
 +	}
@@ -304,169 +306,341 @@ index 0000000..38ee6f3
 +	return 0;
 +}
 diff --git a/drivers/crypto/ccp/ccp-crypto-main.c b/drivers/crypto/ccp/ccp-crypto-main.c
-index 3f1e36d..8dccbdd 100644
+index e0380e5..3f1e36d 100644
 --- a/drivers/crypto/ccp/ccp-crypto-main.c
 +++ b/drivers/crypto/ccp/ccp-crypto-main.c
-@@ -40,6 +40,7 @@
+@@ -33,6 +33,10 @@
+ module_param(sha_disable, uint, 0444);
+ MODULE_PARM_DESC(sha_disable, "Disable use of SHA - any non-zero value");
+ 
++static unsigned int des3_disable;
++module_param(des3_disable, uint, 0444);
++MODULE_PARM_DESC(des3_disable, "Disable use of 3DES - any non-zero value");
++
  /* List heads for the supported algorithms */
  static LIST_HEAD(hash_algs);
  static LIST_HEAD(cipher_algs);
-+static LIST_HEAD(aead_algs);
- 
- /* For any tfm, requests for that tfm must be returned on the order
-  * received.  With multiple queues available, the CCP can process more
-@@ -339,6 +340,10 @@ static int ccp_register_algs(void)
- 		ret = ccp_register_aes_xts_algs(&cipher_algs);
- 		if (ret)
+@@ -337,6 +341,12 @@ static int ccp_register_algs(void)
  			return ret;
-+
-+		ret = ccp_register_aes_aeads(&aead_algs);
+ 	}
+ 
++	if (!des3_disable) {
++		ret = ccp_register_des3_algs(&cipher_algs);
 +		if (ret)
 +			return ret;
- 	}
- 
- 	if (!des3_disable) {
-@@ -360,6 +365,7 @@ static void ccp_unregister_algs(void)
- {
- 	struct ccp_crypto_ahash_alg *ahash_alg, *ahash_tmp;
- 	struct ccp_crypto_ablkcipher_alg *ablk_alg, *ablk_tmp;
-+	struct ccp_crypto_aead *aead_alg, *aead_tmp;
- 
- 	list_for_each_entry_safe(ahash_alg, ahash_tmp, &hash_algs, entry) {
- 		crypto_unregister_ahash(&ahash_alg->alg);
-@@ -372,6 +378,12 @@ static void ccp_unregister_algs(void)
- 		list_del(&ablk_alg->entry);
- 		kfree(ablk_alg);
- 	}
-+
-+	list_for_each_entry_safe(aead_alg, aead_tmp, &aead_algs, entry) {
-+		crypto_unregister_aead(&aead_alg->alg);
-+		list_del(&aead_alg->entry);
-+		kfree(aead_alg);
 +	}
- }
- 
- static int ccp_crypto_init(void)
++
+ 	if (!sha_disable) {
+ 		ret = ccp_register_sha_algs(&hash_algs);
+ 		if (ret)
 diff --git a/drivers/crypto/ccp/ccp-crypto.h b/drivers/crypto/ccp/ccp-crypto.h
-index 8c8bd3f..dd5bf15 100644
+index 95cce27..8c8bd3f 100644
 --- a/drivers/crypto/ccp/ccp-crypto.h
 +++ b/drivers/crypto/ccp/ccp-crypto.h
-@@ -19,6 +19,8 @@
- #include <linux/ccp.h>
- #include <crypto/algapi.h>
- #include <crypto/aes.h>
-+#include <crypto/internal/aead.h>
-+#include <crypto/aead.h>
- #include <crypto/ctr.h>
+@@ -23,6 +23,8 @@
  #include <crypto/hash.h>
  #include <crypto/sha.h>
-@@ -35,6 +37,14 @@ struct ccp_crypto_ablkcipher_alg {
- 	struct crypto_alg alg;
+ 
++#define	CCP_LOG_LEVEL	KERN_INFO
++
+ #define CCP_CRA_PRIORITY	300
+ 
+ struct ccp_crypto_ablkcipher_alg {
+@@ -137,6 +139,24 @@ struct ccp_aes_cmac_exp_ctx {
+ 	u8 buf[AES_BLOCK_SIZE];
  };
  
-+struct ccp_crypto_aead {
-+	struct list_head entry;
++/***** 3DES related defines *****/
++struct ccp_des3_ctx {
++	enum ccp_engine engine;
++	enum ccp_des3_type type;
++	enum ccp_des3_mode mode;
 +
-+	u32 mode;
-+
-+	struct aead_alg alg;
++	struct scatterlist key_sg;
++	unsigned int key_len;
++	u8 key[AES_MAX_KEY_SIZE];
 +};
 +
- struct ccp_crypto_ahash_alg {
- 	struct list_head entry;
- 
-@@ -97,6 +107,9 @@ struct ccp_aes_req_ctx {
- 	struct scatterlist iv_sg;
- 	u8 iv[AES_BLOCK_SIZE];
- 
-+	struct scatterlist tag_sg;
-+	u8 tag[AES_BLOCK_SIZE];
++struct ccp_des3_req_ctx {
++	struct scatterlist iv_sg;
++	u8 iv[AES_BLOCK_SIZE];
 +
- 	/* Fields used for RFC3686 requests */
- 	u8 *rfc3686_info;
- 	u8 rfc3686_iv[AES_BLOCK_SIZE];
-@@ -233,6 +246,7 @@ struct scatterlist *ccp_crypto_sg_table_add(struct sg_table *table,
- int ccp_register_aes_algs(struct list_head *head);
++	struct ccp_cmd cmd;
++};
++
+ /* SHA-related defines
+  * These values must be large enough to accommodate any variant
+  */
+@@ -201,6 +221,7 @@ struct ccp_ctx {
+ 	union {
+ 		struct ccp_aes_ctx aes;
+ 		struct ccp_sha_ctx sha;
++		struct ccp_des3_ctx des3;
+ 	} u;
+ };
+ 
+@@ -213,5 +234,6 @@ struct scatterlist *ccp_crypto_sg_table_add(struct sg_table *table,
  int ccp_register_aes_cmac_algs(struct list_head *head);
  int ccp_register_aes_xts_algs(struct list_head *head);
-+int ccp_register_aes_aeads(struct list_head *head);
  int ccp_register_sha_algs(struct list_head *head);
- int ccp_register_des3_algs(struct list_head *head);
++int ccp_register_des3_algs(struct list_head *head);
  
+ #endif
+diff --git a/drivers/crypto/ccp/ccp-dev-v3.c b/drivers/crypto/ccp/ccp-dev-v3.c
+index 7bc0998..a3689a6 100644
+--- a/drivers/crypto/ccp/ccp-dev-v3.c
++++ b/drivers/crypto/ccp/ccp-dev-v3.c
+@@ -553,6 +553,7 @@ static irqreturn_t ccp_irq_handler(int irq, void *data)
+ static const struct ccp_actions ccp3_actions = {
+ 	.aes = ccp_perform_aes,
+ 	.xts_aes = ccp_perform_xts_aes,
++	.des3 = NULL,
+ 	.sha = ccp_perform_sha,
+ 	.rsa = ccp_perform_rsa,
+ 	.passthru = ccp_perform_passthru,
+diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
+index 41cc853..fc5666e 100644
+--- a/drivers/crypto/ccp/ccp-dev-v5.c
++++ b/drivers/crypto/ccp/ccp-dev-v5.c
+@@ -108,6 +108,12 @@ static void ccp_lsb_free(struct ccp_cmd_queue *cmd_q, unsigned int start,
+ 		u16 type:2;
+ 	} aes_xts;
+ 	struct {
++		u16 size:7;
++		u16 encrypt:1;
++		u16 mode:5;
++		u16 type:2;
++	} des3;
++	struct {
+ 		u16 rsvd1:10;
+ 		u16 type:4;
+ 		u16 rsvd2:1;
+@@ -139,6 +145,10 @@ static void ccp_lsb_free(struct ccp_cmd_queue *cmd_q, unsigned int start,
+ #define	CCP_AES_TYPE(p)		((p)->aes.type)
+ #define	CCP_XTS_SIZE(p)		((p)->aes_xts.size)
+ #define	CCP_XTS_ENCRYPT(p)	((p)->aes_xts.encrypt)
++#define	CCP_DES3_SIZE(p)	((p)->des3.size)
++#define	CCP_DES3_ENCRYPT(p)	((p)->des3.encrypt)
++#define	CCP_DES3_MODE(p)	((p)->des3.mode)
++#define	CCP_DES3_TYPE(p)	((p)->des3.type)
+ #define	CCP_SHA_TYPE(p)		((p)->sha.type)
+ #define	CCP_RSA_SIZE(p)		((p)->rsa.size)
+ #define	CCP_PT_BYTESWAP(p)	((p)->pt.byteswap)
+@@ -388,6 +398,47 @@ static int ccp5_perform_sha(struct ccp_op *op)
+ 	return ccp5_do_cmd(&desc, op->cmd_q);
+ }
+ 
++static int ccp5_perform_des3(struct ccp_op *op)
++{
++	struct ccp5_desc desc;
++	union ccp_function function;
++	u32 key_addr = op->sb_key * LSB_ITEM_SIZE;
++
++	/* Zero out all the fields of the command desc */
++	memset(&desc, 0, sizeof(struct ccp5_desc));
++
++	CCP5_CMD_ENGINE(&desc) = CCP_ENGINE_DES3;
++
++	CCP5_CMD_SOC(&desc) = op->soc;
++	CCP5_CMD_IOC(&desc) = 1;
++	CCP5_CMD_INIT(&desc) = op->init;
++	CCP5_CMD_EOM(&desc) = op->eom;
++	CCP5_CMD_PROT(&desc) = 0;
++
++	function.raw = 0;
++	CCP_DES3_ENCRYPT(&function) = op->u.des3.action;
++	CCP_DES3_MODE(&function) = op->u.des3.mode;
++	CCP_DES3_TYPE(&function) = op->u.des3.type;
++	CCP5_CMD_FUNCTION(&desc) = cpu_to_le32(function.raw);
++
++	CCP5_CMD_LEN(&desc) = cpu_to_le32(op->src.u.dma.length);
++
++	CCP5_CMD_SRC_LO(&desc) = cpu_to_le32(ccp_addr_lo(&op->src.u.dma));
++	CCP5_CMD_SRC_HI(&desc) = cpu_to_le32(ccp_addr_hi(&op->src.u.dma));
++	CCP5_CMD_SRC_MEM(&desc) = cpu_to_le32(CCP_MEMTYPE_SYSTEM);
++
++	CCP5_CMD_DST_LO(&desc) = cpu_to_le32(ccp_addr_lo(&op->dst.u.dma));
++	CCP5_CMD_DST_HI(&desc) = cpu_to_le32(ccp_addr_hi(&op->dst.u.dma));
++	CCP5_CMD_DST_MEM(&desc) = cpu_to_le32(CCP_MEMTYPE_SYSTEM);
++
++	CCP5_CMD_KEY_LO(&desc) = cpu_to_le32(lower_32_bits(key_addr));
++	CCP5_CMD_KEY_HI(&desc) = 0;
++	CCP5_CMD_KEY_MEM(&desc) = cpu_to_le32(CCP_MEMTYPE_SB);
++	CCP5_CMD_LSB_ID(&desc) = cpu_to_le32(op->sb_ctx);
++
++	return ccp5_do_cmd(&desc, op->cmd_q);
++}
++
+ static int ccp5_perform_rsa(struct ccp_op *op)
+ {
+ 	struct ccp5_desc desc;
+@@ -435,6 +486,7 @@ static int ccp5_perform_passthru(struct ccp_op *op)
+ 	struct ccp_dma_info *saddr = &op->src.u.dma;
+ 	struct ccp_dma_info *daddr = &op->dst.u.dma;
+ 
++
+ 	memset(&desc, 0, Q_DESC_SIZE);
+ 
+ 	CCP5_CMD_ENGINE(&desc) = CCP_ENGINE_PASSTHRU;
+@@ -729,6 +781,7 @@ static int ccp5_init(struct ccp_device *ccp)
+ 
+ 		dev_dbg(dev, "queue #%u available\n", i);
+ 	}
++
+ 	if (ccp->cmd_q_count == 0) {
+ 		dev_notice(dev, "no command queues available\n");
+ 		ret = -EIO;
+@@ -994,6 +1047,7 @@ static void ccp5other_config(struct ccp_device *ccp)
+ 	.aes = ccp5_perform_aes,
+ 	.xts_aes = ccp5_perform_xts_aes,
+ 	.sha = ccp5_perform_sha,
++	.des3 = ccp5_perform_des3,
+ 	.rsa = ccp5_perform_rsa,
+ 	.passthru = ccp5_perform_passthru,
+ 	.ecc = ccp5_perform_ecc,
+diff --git a/drivers/crypto/ccp/ccp-dev.h b/drivers/crypto/ccp/ccp-dev.h
+index 2b5c01f..754e9c2 100644
+--- a/drivers/crypto/ccp/ccp-dev.h
++++ b/drivers/crypto/ccp/ccp-dev.h
+@@ -190,6 +190,9 @@
+ #define CCP_XTS_AES_KEY_SB_COUNT	1
+ #define CCP_XTS_AES_CTX_SB_COUNT	1
+ 
++#define CCP_DES3_KEY_SB_COUNT		1
++#define CCP_DES3_CTX_SB_COUNT		1
++
+ #define CCP_SHA_SB_COUNT		1
+ 
+ #define CCP_RSA_MAX_WIDTH		4096
+@@ -475,6 +478,12 @@ struct ccp_xts_aes_op {
+ 	enum ccp_xts_aes_unit_size unit_size;
+ };
+ 
++struct ccp_des3_op {
++	enum ccp_des3_type type;
++	enum ccp_des3_mode mode;
++	enum ccp_des3_action action;
++};
++
+ struct ccp_sha_op {
+ 	enum ccp_sha_type type;
+ 	u64 msg_bits;
+@@ -512,6 +521,7 @@ struct ccp_op {
+ 	union {
+ 		struct ccp_aes_op aes;
+ 		struct ccp_xts_aes_op xts;
++		struct ccp_des3_op des3;
+ 		struct ccp_sha_op sha;
+ 		struct ccp_rsa_op rsa;
+ 		struct ccp_passthru_op passthru;
+@@ -620,13 +630,13 @@ struct ccp5_desc {
+ struct ccp_actions {
+ 	int (*aes)(struct ccp_op *);
+ 	int (*xts_aes)(struct ccp_op *);
++	int (*des3)(struct ccp_op *);
+ 	int (*sha)(struct ccp_op *);
+ 	int (*rsa)(struct ccp_op *);
+ 	int (*passthru)(struct ccp_op *);
+ 	int (*ecc)(struct ccp_op *);
+ 	u32 (*sballoc)(struct ccp_cmd_queue *, unsigned int);
+-	void (*sbfree)(struct ccp_cmd_queue *, unsigned int,
+-			       unsigned int);
++	void (*sbfree)(struct ccp_cmd_queue *, unsigned int, unsigned int);
+ 	unsigned int (*get_free_slots)(struct ccp_cmd_queue *);
+ 	int (*init)(struct ccp_device *);
+ 	void (*destroy)(struct ccp_device *);
 diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
-index 0de961a..c0dfdac 100644
+index 0d82080..0de961a 100644
 --- a/drivers/crypto/ccp/ccp-ops.c
 +++ b/drivers/crypto/ccp/ccp-ops.c
-@@ -601,6 +601,255 @@ static int ccp_run_aes_cmac_cmd(struct ccp_cmd_queue *cmd_q,
+@@ -16,6 +16,7 @@
+ #include <linux/pci.h>
+ #include <linux/interrupt.h>
+ #include <crypto/scatterwalk.h>
++#include <crypto/des.h>
+ #include <linux/ccp.h>
+ 
+ #include "ccp-dev.h"
+@@ -939,6 +940,200 @@ static int ccp_run_xts_aes_cmd(struct ccp_cmd_queue *cmd_q,
  	return ret;
  }
  
-+static int ccp_run_aes_gcm_cmd(struct ccp_cmd_queue *cmd_q,
-+			       struct ccp_cmd *cmd)
++static int ccp_run_des3_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 +{
-+	struct ccp_aes_engine *aes = &cmd->u.aes;
-+	struct ccp_dm_workarea key, ctx, final_wa, tag;
-+	struct ccp_data src, dst;
-+	struct ccp_data aad;
-+	struct ccp_op op;
++	struct ccp_des3_engine *des3 = &cmd->u.des3;
 +
-+	unsigned long long *final;
++	struct ccp_dm_workarea key, ctx;
++	struct ccp_data src, dst;
++	struct ccp_op op;
 +	unsigned int dm_offset;
-+	unsigned int ilen;
-+	bool in_place = true; /* Default value */
++	unsigned int len_singlekey;
++	bool in_place = false;
 +	int ret;
 +
-+	struct scatterlist *p_inp, sg_inp[2];
-+	struct scatterlist *p_tag, sg_tag[2];
-+	struct scatterlist *p_outp, sg_outp[2];
-+	struct scatterlist *p_aad;
-+
-+	if (!aes->iv)
++	/* Error checks */
++	if (!cmd_q->ccp->vdata->perform->des3)
 +		return -EINVAL;
 +
-+	if (!((aes->key_len == AES_KEYSIZE_128) ||
-+		(aes->key_len == AES_KEYSIZE_192) ||
-+		(aes->key_len == AES_KEYSIZE_256)))
++	if (des3->key_len != DES3_EDE_KEY_SIZE)
 +		return -EINVAL;
 +
-+	if (!aes->key) /* Gotta have a key SGL */
++	if (((des3->mode == CCP_DES3_MODE_ECB) ||
++		(des3->mode == CCP_DES3_MODE_CBC)) &&
++		(des3->src_len & (DES3_EDE_BLOCK_SIZE - 1)))
 +		return -EINVAL;
 +
-+	/* First, decompose the source buffer into AAD & PT,
-+	 * and the destination buffer into AAD, CT & tag, or
-+	 * the input into CT & tag.
-+	 * It is expected that the input and output SGs will
-+	 * be valid, even if the AAD and input lengths are 0.
-+	 */
-+	p_aad = aes->src;
-+	p_inp = scatterwalk_ffwd(sg_inp, aes->src, aes->aad_len);
-+	p_outp = scatterwalk_ffwd(sg_outp, aes->dst, aes->aad_len);
-+	if (aes->action == CCP_AES_ACTION_ENCRYPT) {
-+		ilen = aes->src_len;
-+		p_tag = scatterwalk_ffwd(sg_tag, p_outp, ilen);
-+	} else {
-+		/* Input length for decryption includes tag */
-+		ilen = aes->src_len - AES_BLOCK_SIZE;
-+		p_tag = scatterwalk_ffwd(sg_tag, p_inp, ilen);
++	if (!des3->key || !des3->src || !des3->dst)
++		return -EINVAL;
++
++	if (des3->mode != CCP_DES3_MODE_ECB) {
++		if (des3->iv_len != DES3_EDE_BLOCK_SIZE)
++			return -EINVAL;
++
++		if (!des3->iv)
++			return -EINVAL;
 +	}
 +
++	ret = -EIO;
++	/* Zero out all the fields of the command desc */
 +	memset(&op, 0, sizeof(op));
++
++	/* Set up the Function field */
 +	op.cmd_q = cmd_q;
 +	op.jobid = CCP_NEW_JOBID(cmd_q->ccp);
-+	op.sb_key = cmd_q->sb_key; /* Pre-allocated */
-+	op.sb_ctx = cmd_q->sb_ctx; /* Pre-allocated */
-+	op.init = 1;
-+	op.u.aes.type = aes->type;
++	op.sb_key = cmd_q->sb_key;
 +
-+	/* Copy the key to the LSB */
++	op.init = (des3->mode == CCP_DES3_MODE_ECB) ? 0 : 1;
++	op.u.des3.type = des3->type;
++	op.u.des3.mode = des3->mode;
++	op.u.des3.action = des3->action;
++
++	/*
++	 * All supported key sizes fit in a single (32-byte) KSB entry and
++	 * (like AES) must be in little endian format. Use the 256-bit byte
++	 * swap passthru option to convert from big endian to little endian.
++	 */
 +	ret = ccp_init_dm_workarea(&key, cmd_q,
-+				   CCP_AES_CTX_SB_COUNT * CCP_SB_BYTES,
++				   CCP_DES3_KEY_SB_COUNT * CCP_SB_BYTES,
 +				   DMA_TO_DEVICE);
 +	if (ret)
 +		return ret;
 +
-+	dm_offset = CCP_SB_BYTES - aes->key_len;
-+	ccp_set_dm_area(&key, dm_offset, aes->key, 0, aes->key_len);
++	/*
++	 * The contents of the key triplet are in the reverse order of what
++	 * is required by the engine. Copy the 3 pieces individually to put
++	 * them where they belong.
++	 */
++	dm_offset = CCP_SB_BYTES - des3->key_len; /* Basic offset */
++
++	len_singlekey = des3->key_len / 3;
++	ccp_set_dm_area(&key, dm_offset + 2 * len_singlekey,
++			des3->key, 0, len_singlekey);
++	ccp_set_dm_area(&key, dm_offset + len_singlekey,
++			des3->key, len_singlekey, len_singlekey);
++	ccp_set_dm_area(&key, dm_offset,
++			des3->key, 2 * len_singlekey, len_singlekey);
++
++	/* Copy the key to the SB */
 +	ret = ccp_copy_to_sb(cmd_q, &key, op.jobid, op.sb_key,
 +			     CCP_PASSTHRU_BYTESWAP_256BIT);
 +	if (ret) {
@@ -474,175 +648,110 @@ index 0de961a..c0dfdac 100644
 +		goto e_key;
 +	}
 +
-+	/* Copy the context (IV) to the LSB.
-+	 * There is an assumption here that the IV is 96 bits in length, plus
-+	 * a nonce of 32 bits. If no IV is present, use a zeroed buffer.
++	/*
++	 * The DES3 context fits in a single (32-byte) KSB entry and
++	 * must be in little endian format. Use the 256-bit byte swap
++	 * passthru option to convert from big endian to little endian.
 +	 */
-+	ret = ccp_init_dm_workarea(&ctx, cmd_q,
-+				   CCP_AES_CTX_SB_COUNT * CCP_SB_BYTES,
-+				   DMA_BIDIRECTIONAL);
-+	if (ret)
-+		goto e_key;
++	if (des3->mode != CCP_DES3_MODE_ECB) {
++		u32 load_mode;
 +
-+	dm_offset = CCP_AES_CTX_SB_COUNT * CCP_SB_BYTES - aes->iv_len;
-+	ccp_set_dm_area(&ctx, dm_offset, aes->iv, 0, aes->iv_len);
++		op.sb_ctx = cmd_q->sb_ctx;
 +
-+	ret = ccp_copy_to_sb(cmd_q, &ctx, op.jobid, op.sb_ctx,
-+			     CCP_PASSTHRU_BYTESWAP_256BIT);
-+	if (ret) {
-+		cmd->engine_error = cmd_q->cmd_error;
-+		goto e_ctx;
-+	}
-+
-+	op.init = 1;
-+	if (aes->aad_len > 0) {
-+		/* Step 1: Run a GHASH over the Additional Authenticated Data */
-+		ret = ccp_init_data(&aad, cmd_q, p_aad, aes->aad_len,
-+				    AES_BLOCK_SIZE,
-+				    DMA_TO_DEVICE);
-+		if (ret)
-+			goto e_ctx;
-+
-+		op.u.aes.mode = CCP_AES_MODE_GHASH;
-+		op.u.aes.action = CCP_AES_GHASHAAD;
-+
-+		while (aad.sg_wa.bytes_left) {
-+			ccp_prepare_data(&aad, NULL, &op, AES_BLOCK_SIZE, true);
-+
-+			ret = cmd_q->ccp->vdata->perform->aes(&op);
-+			if (ret) {
-+				cmd->engine_error = cmd_q->cmd_error;
-+				goto e_aad;
-+			}
-+
-+			ccp_process_data(&aad, NULL, &op);
-+			op.init = 0;
-+		}
-+	}
-+
-+	op.u.aes.mode = CCP_AES_MODE_GCTR;
-+	op.u.aes.action = aes->action;
-+
-+	if (ilen > 0) {
-+		/* Step 2: Run a GCTR over the plaintext */
-+		in_place = (sg_virt(p_inp) == sg_virt(p_outp)) ? true : false;
-+
-+		ret = ccp_init_data(&src, cmd_q, p_inp, ilen,
-+				    AES_BLOCK_SIZE,
-+				    in_place ? DMA_BIDIRECTIONAL
-+					     : DMA_TO_DEVICE);
-+		if (ret)
-+			goto e_ctx;
-+
-+		if (in_place) {
-+			dst = src;
-+		} else {
-+			ret = ccp_init_data(&dst, cmd_q, p_outp, ilen,
-+					    AES_BLOCK_SIZE, DMA_FROM_DEVICE);
-+			if (ret)
-+				goto e_src;
-+		}
-+
-+		op.soc = 0;
-+		op.eom = 0;
-+		op.init = 1;
-+		while (src.sg_wa.bytes_left) {
-+			ccp_prepare_data(&src, &dst, &op, AES_BLOCK_SIZE, true);
-+			if (!src.sg_wa.bytes_left) {
-+				unsigned int nbytes = aes->src_len
-+						      % AES_BLOCK_SIZE;
-+
-+				if (nbytes) {
-+					op.eom = 1;
-+					op.u.aes.size = (nbytes * 8) - 1;
-+				}
-+			}
-+
-+			ret = cmd_q->ccp->vdata->perform->aes(&op);
-+			if (ret) {
-+				cmd->engine_error = cmd_q->cmd_error;
-+				goto e_dst;
-+			}
-+
-+			ccp_process_data(&src, &dst, &op);
-+			op.init = 0;
-+		}
-+	}
-+
-+	/* Step 3: Update the IV portion of the context with the original IV */
-+	ret = ccp_copy_from_sb(cmd_q, &ctx, op.jobid, op.sb_ctx,
-+			       CCP_PASSTHRU_BYTESWAP_256BIT);
-+	if (ret) {
-+		cmd->engine_error = cmd_q->cmd_error;
-+		goto e_dst;
-+	}
-+
-+	ccp_set_dm_area(&ctx, dm_offset, aes->iv, 0, aes->iv_len);
-+
-+	ret = ccp_copy_to_sb(cmd_q, &ctx, op.jobid, op.sb_ctx,
-+			     CCP_PASSTHRU_BYTESWAP_256BIT);
-+	if (ret) {
-+		cmd->engine_error = cmd_q->cmd_error;
-+		goto e_dst;
-+	}
-+
-+	/* Step 4: Concatenate the lengths of the AAD and source, and
-+	 * hash that 16 byte buffer.
-+	 */
-+	ret = ccp_init_dm_workarea(&final_wa, cmd_q, AES_BLOCK_SIZE,
-+				   DMA_BIDIRECTIONAL);
-+	if (ret)
-+		goto e_dst;
-+	final = (unsigned long long *) final_wa.address;
-+	final[0] = cpu_to_be64(aes->aad_len * 8);
-+	final[1] = cpu_to_be64(ilen * 8);
-+
-+	op.u.aes.mode = CCP_AES_MODE_GHASH;
-+	op.u.aes.action = CCP_AES_GHASHFINAL;
-+	op.src.type = CCP_MEMTYPE_SYSTEM;
-+	op.src.u.dma.address = final_wa.dma.address;
-+	op.src.u.dma.length = AES_BLOCK_SIZE;
-+	op.dst.type = CCP_MEMTYPE_SYSTEM;
-+	op.dst.u.dma.address = final_wa.dma.address;
-+	op.dst.u.dma.length = AES_BLOCK_SIZE;
-+	op.eom = 1;
-+	op.u.aes.size = 0;
-+	ret = cmd_q->ccp->vdata->perform->aes(&op);
-+	if (ret)
-+		goto e_dst;
-+
-+	if (aes->action == CCP_AES_ACTION_ENCRYPT) {
-+		/* Put the ciphered tag after the ciphertext. */
-+		ccp_get_dm_area(&final_wa, 0, p_tag, 0, AES_BLOCK_SIZE);
-+	} else {
-+		/* Does this ciphered tag match the input? */
-+		ret = ccp_init_dm_workarea(&tag, cmd_q, AES_BLOCK_SIZE,
++		ret = ccp_init_dm_workarea(&ctx, cmd_q,
++					   CCP_DES3_CTX_SB_COUNT * CCP_SB_BYTES,
 +					   DMA_BIDIRECTIONAL);
 +		if (ret)
-+			goto e_tag;
-+		ccp_set_dm_area(&tag, 0, p_tag, 0, AES_BLOCK_SIZE);
++			goto e_key;
 +
-+		ret = memcmp(tag.address, final_wa.address, AES_BLOCK_SIZE);
-+		ccp_dm_free(&tag);
++		/* Load the context into the LSB */
++		dm_offset = CCP_SB_BYTES - des3->iv_len;
++		ccp_set_dm_area(&ctx, dm_offset, des3->iv, 0, des3->iv_len);
++
++		if (cmd_q->ccp->vdata->version == CCP_VERSION(3, 0))
++			load_mode = CCP_PASSTHRU_BYTESWAP_NOOP;
++		else
++			load_mode = CCP_PASSTHRU_BYTESWAP_256BIT;
++		ret = ccp_copy_to_sb(cmd_q, &ctx, op.jobid, op.sb_ctx,
++				     load_mode);
++		if (ret) {
++			cmd->engine_error = cmd_q->cmd_error;
++			goto e_ctx;
++		}
 +	}
 +
-+e_tag:
-+	ccp_dm_free(&final_wa);
++	/*
++	 * Prepare the input and output data workareas. For in-place
++	 * operations we need to set the dma direction to BIDIRECTIONAL
++	 * and copy the src workarea to the dst workarea.
++	 */
++	if (sg_virt(des3->src) == sg_virt(des3->dst))
++		in_place = true;
 +
++	ret = ccp_init_data(&src, cmd_q, des3->src, des3->src_len,
++			DES3_EDE_BLOCK_SIZE,
++			in_place ? DMA_BIDIRECTIONAL : DMA_TO_DEVICE);
++	if (ret)
++		goto e_ctx;
++
++	if (in_place)
++		dst = src;
++	else {
++		ret = ccp_init_data(&dst, cmd_q, des3->dst, des3->src_len,
++				DES3_EDE_BLOCK_SIZE, DMA_FROM_DEVICE);
++		if (ret)
++			goto e_src;
++	}
++
++	/* Send data to the CCP DES3 engine */
++	while (src.sg_wa.bytes_left) {
++		ccp_prepare_data(&src, &dst, &op, DES3_EDE_BLOCK_SIZE, true);
++		if (!src.sg_wa.bytes_left) {
++			op.eom = 1;
++
++			/* Since we don't retrieve the context in ECB mode
++			 * we have to wait for the operation to complete
++			 * on the last piece of data
++			 */
++			op.soc = 0;
++		}
++
++		ret = cmd_q->ccp->vdata->perform->des3(&op);
++		if (ret) {
++			cmd->engine_error = cmd_q->cmd_error;
++			goto e_dst;
++		}
++
++		ccp_process_data(&src, &dst, &op);
++	}
++
++	if (des3->mode != CCP_DES3_MODE_ECB) {
++		/* Retrieve the context and make BE */
++		ret = ccp_copy_from_sb(cmd_q, &ctx, op.jobid, op.sb_ctx,
++				       CCP_PASSTHRU_BYTESWAP_256BIT);
++		if (ret) {
++			cmd->engine_error = cmd_q->cmd_error;
++			goto e_dst;
++		}
++
++		/* ...but we only need the last DES3_EDE_BLOCK_SIZE bytes */
++		if (cmd_q->ccp->vdata->version == CCP_VERSION(3, 0))
++			dm_offset = CCP_SB_BYTES - des3->iv_len;
++		else
++			dm_offset = 0;
++		ccp_get_dm_area(&ctx, dm_offset, des3->iv, 0,
++				DES3_EDE_BLOCK_SIZE);
++	}
 +e_dst:
-+	if (aes->src_len && !in_place)
++	if (!in_place)
 +		ccp_free_data(&dst, cmd_q);
 +
 +e_src:
-+	if (aes->src_len)
-+		ccp_free_data(&src, cmd_q);
-+
-+e_aad:
-+	if (aes->aad_len)
-+		ccp_free_data(&aad, cmd_q);
++	ccp_free_data(&src, cmd_q);
 +
 +e_ctx:
-+	ccp_dm_free(&ctx);
++	if (des3->mode != CCP_DES3_MODE_ECB)
++		ccp_dm_free(&ctx);
 +
 +e_key:
 +	ccp_dm_free(&key);
@@ -650,50 +759,98 @@ index 0de961a..c0dfdac 100644
 +	return ret;
 +}
 +
- static int ccp_run_aes_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ static int ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
  {
- 	struct ccp_aes_engine *aes = &cmd->u.aes;
-@@ -614,6 +863,9 @@ static int ccp_run_aes_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
- 	if (aes->mode == CCP_AES_MODE_CMAC)
- 		return ccp_run_aes_cmac_cmd(cmd_q, cmd);
- 
-+	if (aes->mode == CCP_AES_MODE_GCM)
-+		return ccp_run_aes_gcm_cmd(cmd_q, cmd);
-+
- 	if (!((aes->key_len == AES_KEYSIZE_128) ||
- 	      (aes->key_len == AES_KEYSIZE_192) ||
- 	      (aes->key_len == AES_KEYSIZE_256)))
+ 	struct ccp_sha_engine *sha = &cmd->u.sha;
+@@ -1903,6 +2098,9 @@ int ccp_run_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 	case CCP_ENGINE_XTS_AES_128:
+ 		ret = ccp_run_xts_aes_cmd(cmd_q, cmd);
+ 		break;
++	case CCP_ENGINE_DES3:
++		ret = ccp_run_des3_cmd(cmd_q, cmd);
++		break;
+ 	case CCP_ENGINE_SHA:
+ 		ret = ccp_run_sha_cmd(cmd_q, cmd);
+ 		break;
 diff --git a/include/linux/ccp.h b/include/linux/ccp.h
-index fa02617..dbe8aa0 100644
+index 90a1fbe..fa02617 100644
 --- a/include/linux/ccp.h
 +++ b/include/linux/ccp.h
-@@ -123,6 +123,10 @@ enum ccp_aes_mode {
- 	CCP_AES_MODE_CFB,
- 	CCP_AES_MODE_CTR,
- 	CCP_AES_MODE_CMAC,
-+	CCP_AES_MODE_GHASH,
-+	CCP_AES_MODE_GCTR,
-+	CCP_AES_MODE_GCM,
-+	CCP_AES_MODE_GMAC,
- 	CCP_AES_MODE__LAST,
+@@ -292,6 +292,60 @@ struct ccp_sha_engine {
+ 				 * final sha cmd */
  };
  
-@@ -137,6 +141,9 @@ enum ccp_aes_action {
- 	CCP_AES_ACTION_ENCRYPT,
- 	CCP_AES_ACTION__LAST,
- };
-+/* Overloaded field */
-+#define	CCP_AES_GHASHAAD	CCP_AES_ACTION_DECRYPT
-+#define	CCP_AES_GHASHFINAL	CCP_AES_ACTION_ENCRYPT
- 
- /**
-  * struct ccp_aes_engine - CCP AES operation
-@@ -181,6 +188,8 @@ struct ccp_aes_engine {
- 	struct scatterlist *cmac_key;	/* K1/K2 cmac key required for
- 					 * final cmac cmd */
- 	u32 cmac_key_len;	/* In bytes */
++/***** 3DES engine *****/
++enum ccp_des3_mode {
++	CCP_DES3_MODE_ECB = 0,
++	CCP_DES3_MODE_CBC,
++	CCP_DES3_MODE_CFB,
++	CCP_DES3_MODE__LAST,
++};
 +
-+	u32 aad_len;		/* In bytes */
- };
- 
- /***** XTS-AES engine *****/
++enum ccp_des3_type {
++	CCP_DES3_TYPE_168 = 1,
++	CCP_DES3_TYPE__LAST,
++	};
++
++enum ccp_des3_action {
++	CCP_DES3_ACTION_DECRYPT = 0,
++	CCP_DES3_ACTION_ENCRYPT,
++	CCP_DES3_ACTION__LAST,
++};
++
++/**
++ * struct ccp_des3_engine - CCP SHA operation
++ * @type: Type of 3DES operation
++ * @mode: cipher mode
++ * @action: 3DES operation (decrypt/encrypt)
++ * @key: key to be used for this 3DES operation
++ * @key_len: length of key (in bytes)
++ * @iv: IV to be used for this AES operation
++ * @iv_len: length in bytes of iv
++ * @src: input data to be used for this operation
++ * @src_len: length of input data used for this operation (in bytes)
++ * @dst: output data produced by this operation
++ *
++ * Variables required to be set when calling ccp_enqueue_cmd():
++ *   - type, mode, action, key, key_len, src, dst, src_len
++ *   - iv, iv_len for any mode other than ECB
++ *
++ * The iv variable is used as both input and output. On completion of the
++ * 3DES operation the new IV overwrites the old IV.
++ */
++struct ccp_des3_engine {
++	enum ccp_des3_type type;
++	enum ccp_des3_mode mode;
++	enum ccp_des3_action action;
++
++	struct scatterlist *key;
++	u32 key_len;	    /* In bytes */
++
++	struct scatterlist *iv;
++	u32 iv_len;	     /* In bytes */
++
++	struct scatterlist *src, *dst;
++	u64 src_len;	    /* In bytes */
++};
++
+ /***** RSA engine *****/
+ /**
+  * struct ccp_rsa_engine - CCP RSA operation
+@@ -541,7 +595,7 @@ struct ccp_ecc_engine {
+ enum ccp_engine {
+ 	CCP_ENGINE_AES = 0,
+ 	CCP_ENGINE_XTS_AES_128,
+-	CCP_ENGINE_RSVD1,
++	CCP_ENGINE_DES3,
+ 	CCP_ENGINE_SHA,
+ 	CCP_ENGINE_RSA,
+ 	CCP_ENGINE_PASSTHRU,
+@@ -589,6 +643,7 @@ struct ccp_cmd {
+ 	union {
+ 		struct ccp_aes_engine aes;
+ 		struct ccp_xts_aes_engine xts;
++		struct ccp_des3_engine des3;
+ 		struct ccp_sha_engine sha;
+ 		struct ccp_rsa_engine rsa;
+ 		struct ccp_passthru_engine passthru;
