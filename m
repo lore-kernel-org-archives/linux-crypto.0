@@ -1,79 +1,103 @@
-From: Borislav Petkov <bp@suse.de>
-Subject: Re: [RFC PATCH v2 14/32] x86: mm: Provide support to use memblock
- when spliting large pages
-Date: Thu, 16 Mar 2017 19:28:36 +0100
-Message-ID: <20170316182836.tyvxoeq56thtc4pd@pd.tnic>
+From: Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [RFC PATCH v2 30/32] kvm: svm: Add support for SEV DEBUG_ENCRYPT
+ command
+Date: Thu, 16 Mar 2017 13:34:19 -0500
+Message-ID: <1d195fc9-8021-cd6d-727f-845586f70375__9035.84084376252$1489689331$gmane$org@amd.com>
 References: <148846752022.2349.13667498174822419498.stgit@brijesh-build-machine>
- <148846771545.2349.9373586041426414252.stgit@brijesh-build-machine>
- <20170310110657.hophlog2juw5hpzz@pd.tnic>
- <cb6a9a56-2c52-d98d-3ff6-3b61d0e5875e@amd.com>
+ <148846790758.2349.16768762953657853550.stgit@brijesh-build-machine>
+ <05dbd756-e8e9-9384-2759-898e230a6909@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: simon.guinot@sequanux.org, linux-efi@vger.kernel.org,
-	kvm@vger.kernel.org, rkrcmar@redhat.com, matt@codeblueprint.co.uk,
-	linux-pci@vger.kernel.org, linus.walleij@linaro.org,
-	gary.hook@amd.com, linux-mm@kvack.org, paul.gortmaker@windriver.com,
-	hpa@zytor.com, cl@linux.com, dan.j.williams@intel.com,
-	aarcange@redhat.com, sfr@canb.auug.org.au,
-	andriy.shevchenko@linux.intel.com, herbert@gondor.apana.org.au,
-	bhe@redhat.com, xemul@parallels.com, joro@8bytes.org,
-	x86@kernel.org, peterz@infradead.org, piotr.luc@intel.com,
-	mingo@redhat.com, msalter@redhat.com, ross.zwisler@linux.intel.com,
-	dyoung@redhat.com, thomas.lendacky@amd.com, jroedel@suse.de,
-	keescook@chromium.org, arnd@arndb.de, toshi.kani@hpe.com,
-	mathieu.desnoyers@efficios.com, luto@kernel.org,
-	devel@linuxdriverproject.org, bhelgaas@google.com,
-	tglx@linutronix.de, mchehab@kernel.org, iamjoonsoo.kim@lge.com,
-	labbott@fedo
-To: Brijesh Singh <brijesh.singh@amd.com>,
-	Paolo Bonzini <pbonzini@redhat.com>
-Return-path: <owner-linux-mm@kvack.org>
-Content-Disposition: inline
-In-Reply-To: <cb6a9a56-2c52-d98d-3ff6-3b61d0e5875e@amd.com>
-Sender: owner-linux-mm@kvack.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: <brijesh.singh@amd.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, <simon.guinot@sequanux.org>,
+        <linux-efi@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <rkrcmar@redhat.com>, <matt@codeblueprint.co.uk>,
+        <linux-pci@vger.kernel.org>, <linus.walleij@linaro.org>,
+        <gary.hook@amd.com>, <linux-mm@kvack.org>,
+        <paul.gortmaker@windriver.com>, <hpa@zytor.com>, <cl@linux.com>,
+        <dan.j.williams@intel.com>, <aarcange@redhat.com>,
+        <sfr@canb.auug.org.au>, <andriy.shevchenko@linux.intel.com>,
+        <herbert@gondor.apana.org.au>, <bhe@redhat.com>,
+        <xemul@parallels.com>, <joro@8bytes.org>, <x86@kernel.org>,
+        <peterz@infradead.org>, <piotr.luc@intel.com>, <mingo@redhat.com>,
+        <msalter@redhat.com>, <ross.zwisler@linux.intel.com>, <bp@suse.de>,
+        <dyoung@redhat.com>, <thomas.lendacky@amd.com>, <jroedel@suse.de>,
+        <keescook@chromium.org>, <arnd@arndb
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-dm3nam03on0077.outbound.protection.outlook.com ([104.47.41.77]:40396
+        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1753402AbdCPSes (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Mar 2017 14:34:48 -0400
+In-Reply-To: <05dbd756-e8e9-9384-2759-898e230a6909@redhat.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Mar 10, 2017 at 04:41:56PM -0600, Brijesh Singh wrote:
-> I can take a look at fixing those warning. In my initial attempt was to create
-> a new function to clear encryption bit but it ended up looking very similar to
-> __change_page_attr_set_clr() hence decided to extend the exiting function to
-> use memblock_alloc().
 
-... except that having all that SEV-specific code in main code paths is
-yucky and I'd like to avoid it, if possible.
 
-> Early in boot process, guest kernel allocates some structure (its either
-> statically allocated or dynamic allocated via memblock_alloc). And shares the physical
-> address of these structure with hypervisor. Since entire guest memory area is mapped
-> as encrypted hence those structure's are mapped as encrypted memory range. We need
-> a method to clear the encryption bit. Sometime these structure maybe part of 2M pages
-> and need to split into smaller pages.
+On 03/16/2017 06:03 AM, Paolo Bonzini wrote:
+>
+>
+> On 02/03/2017 16:18, Brijesh Singh wrote:
+>> +	data = (void *) get_zeroed_page(GFP_KERNEL);
+>
+> The page does not need to be zeroed, does it?
+>
 
-So how hard would it be if the hypervisor allocated that memory for the
-guest instead? It would allocate it decrypted and guest would need to
-access it decrypted too. All in preparation for SEV-ES which will need a
-block of unencrypted memory for the guest anyway...
+No, we don't have to zero it. I will fix it.
 
-> In most cases, guest and hypervisor communication starts as soon as guest provides
-> the physical address to hypervisor. So we must map the pages as decrypted before
-> sharing the physical address to hypervisor.
+>> +
+>> +	if ((len & 15) || (dst_addr & 15)) {
+>> +		/* if destination address and length are not 16-byte
+>> +		 * aligned then:
+>> +		 * a) decrypt destination page into temporary buffer
+>> +		 * b) copy source data into temporary buffer at correct offset
+>> +		 * c) encrypt temporary buffer
+>> +		 */
+>> +		ret = __sev_dbg_decrypt_page(kvm, dst_addr, data, &argp->error);
+>
+> Ah, I see now you're using this function here for read-modify-write.
+> data is already pinned here, so even if you keep the function it makes
+> sense to push pinning out of __sev_dbg_decrypt_page and into
+> sev_dbg_decrypt.
 
-See above: so purely theoretically speaking, the hypervisor could prep
-that decrypted range for the guest. I'd look in Paolo's direction,
-though, for the feasibility of something like that.
+I can push out pinning part outside __sev_dbg_decrypt_page
 
-Thanks.
+>
+>> +		if (ret)
+>> +			goto err_3;
+>> +		d_off = dst_addr & (PAGE_SIZE - 1);
+>> +
+>> +		if (copy_from_user(data + d_off,
+>> +					(uint8_t *)debug.src_addr, len)) {
+>> +			ret = -EFAULT;
+>> +			goto err_3;
+>> +		}
+>> +
+>> +		encrypt->length = PAGE_SIZE;
+>
+> Why decrypt/re-encrypt all the page instead of just the 16 byte area
+> around the [dst_addr, dst_addr+len) range?
+>
 
--- 
-Regards/Gruss,
-    Boris.
+good catch, I should be fine just decrypting a 16 byte area. Will fix in next rev
 
-SUSE Linux GmbH, GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
--- 
+>> +		encrypt->src_addr = __psp_pa(data);
+>> +		encrypt->dst_addr =  __sev_page_pa(inpages[0]);
+>> +	} else {
+>> +		if (copy_from_user(data, (uint8_t *)debug.src_addr, len)) {
+>> +			ret = -EFAULT;
+>> +			goto err_3;
+>> +		}
+>
+> Do you need copy_from_user, or can you just pin/unpin memory as for
+> DEBUG_DECRYPT?
+>
 
---
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+We can work either with pin/unpin or copy_from_user. I think I choose copy_from_user because
+in most of time ENCRYPT path was used when I set breakpoint through gdb which basically
+requires copying pretty small data into guest memory. It may be very much possible that
+someone can try to copy lot more data and then pin/unpin can speedup the things.
+
+-Brijesh
