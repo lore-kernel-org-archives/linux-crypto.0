@@ -1,49 +1,79 @@
-From: Kevin Hilman <khilman@baylibre.com>
-Subject: Re: [PATCH v3 1/3] clk: meson-gxbb: expose clock CLKID_RNG0
-Date: Thu, 16 Mar 2017 11:24:31 -0700
-Message-ID: <m2mvcl6pwg.fsf@baylibre.com>
-References: <4e2d12e5-f75b-3ac6-a3f7-18e8a8b7283b@gmail.com>
-        <20170316100743.GA12137@gondor.apana.org.au>
+From: Borislav Petkov <bp@suse.de>
+Subject: Re: [RFC PATCH v2 14/32] x86: mm: Provide support to use memblock
+ when spliting large pages
+Date: Thu, 16 Mar 2017 19:28:36 +0100
+Message-ID: <20170316182836.tyvxoeq56thtc4pd@pd.tnic>
+References: <148846752022.2349.13667498174822419498.stgit@brijesh-build-machine>
+ <148846771545.2349.9373586041426414252.stgit@brijesh-build-machine>
+ <20170310110657.hophlog2juw5hpzz@pd.tnic>
+ <cb6a9a56-2c52-d98d-3ff6-3b61d0e5875e@amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-        Jerome Brunet <jbrunet@baylibre.com>,
-        Neil Armstrong <narmstrong@baylibre.com>,
-        linux-amlogic@lists.infradead.org, linux-crypto@vger.kernel.org,
-        Stephen Boyd <sboyd@codeaurora.org>,
-        Michael Turquette <mturquette@baylibre.com>,
-        linux-clk@vger.kernel.org, devicetree@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pg0-f53.google.com ([74.125.83.53]:35735 "EHLO
-        mail-pg0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753801AbdCPSYe (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Mar 2017 14:24:34 -0400
-Received: by mail-pg0-f53.google.com with SMTP id b129so28966895pgc.2
-        for <linux-crypto@vger.kernel.org>; Thu, 16 Mar 2017 11:24:33 -0700 (PDT)
-In-Reply-To: <20170316100743.GA12137@gondor.apana.org.au> (Herbert Xu's
-        message of "Thu, 16 Mar 2017 18:07:43 +0800")
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: simon.guinot@sequanux.org, linux-efi@vger.kernel.org,
+	kvm@vger.kernel.org, rkrcmar@redhat.com, matt@codeblueprint.co.uk,
+	linux-pci@vger.kernel.org, linus.walleij@linaro.org,
+	gary.hook@amd.com, linux-mm@kvack.org, paul.gortmaker@windriver.com,
+	hpa@zytor.com, cl@linux.com, dan.j.williams@intel.com,
+	aarcange@redhat.com, sfr@canb.auug.org.au,
+	andriy.shevchenko@linux.intel.com, herbert@gondor.apana.org.au,
+	bhe@redhat.com, xemul@parallels.com, joro@8bytes.org,
+	x86@kernel.org, peterz@infradead.org, piotr.luc@intel.com,
+	mingo@redhat.com, msalter@redhat.com, ross.zwisler@linux.intel.com,
+	dyoung@redhat.com, thomas.lendacky@amd.com, jroedel@suse.de,
+	keescook@chromium.org, arnd@arndb.de, toshi.kani@hpe.com,
+	mathieu.desnoyers@efficios.com, luto@kernel.org,
+	devel@linuxdriverproject.org, bhelgaas@google.com,
+	tglx@linutronix.de, mchehab@kernel.org, iamjoonsoo.kim@lge.com,
+	labbott@fedo
+To: Brijesh Singh <brijesh.singh@amd.com>,
+	Paolo Bonzini <pbonzini@redhat.com>
+Return-path: <owner-linux-mm@kvack.org>
+Content-Disposition: inline
+In-Reply-To: <cb6a9a56-2c52-d98d-3ff6-3b61d0e5875e@amd.com>
+Sender: owner-linux-mm@kvack.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Herbert,
+On Fri, Mar 10, 2017 at 04:41:56PM -0600, Brijesh Singh wrote:
+> I can take a look at fixing those warning. In my initial attempt was to create
+> a new function to clear encryption bit but it ended up looking very similar to
+> __change_page_attr_set_clr() hence decided to extend the exiting function to
+> use memblock_alloc().
 
-Herbert Xu <herbert@gondor.apana.org.au> writes:
+... except that having all that SEV-specific code in main code paths is
+yucky and I'd like to avoid it, if possible.
 
-> On Wed, Feb 22, 2017 at 07:55:24AM +0100, Heiner Kallweit wrote:
->> Expose clock CLKID_RNG0 which is needed for the HW random number generator.
->> 
->> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
->
-> All patches applied.  Thanks.
+> Early in boot process, guest kernel allocates some structure (its either
+> statically allocated or dynamic allocated via memblock_alloc). And shares the physical
+> address of these structure with hypervisor. Since entire guest memory area is mapped
+> as encrypted hence those structure's are mapped as encrypted memory range. We need
+> a method to clear the encryption bit. Sometime these structure maybe part of 2M pages
+> and need to split into smaller pages.
 
-Actually, can you just apply [PATCH 4/4] to your tree?
+So how hard would it be if the hypervisor allocated that memory for the
+guest instead? It would allocate it decrypted and guest would need to
+access it decrypted too. All in preparation for SEV-ES which will need a
+block of unencrypted memory for the guest anyway...
 
-The clock and DT patches need to go through their respective trees or
-will otherwise have conflicts with other things going in via those
-trees.
+> In most cases, guest and hypervisor communication starts as soon as guest provides
+> the physical address to hypervisor. So we must map the pages as decrypted before
+> sharing the physical address to hypervisor.
 
-Thanks,
+See above: so purely theoretically speaking, the hypervisor could prep
+that decrypted range for the guest. I'd look in Paolo's direction,
+though, for the feasibility of something like that.
 
-Kevin
+Thanks.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+SUSE Linux GmbH, GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
+-- 
+
+--
+To unsubscribe, send a message with 'unsubscribe linux-mm' in
+the body to majordomo@kvack.org.  For more info on Linux MM,
+see: http://www.linux-mm.org/ .
+Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
