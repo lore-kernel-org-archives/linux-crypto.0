@@ -1,43 +1,30 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v1 0/8] improve performances on mediatek crypto driver
-Date: Thu, 16 Mar 2017 18:08:47 +0800
-Message-ID: <20170316100847.GC12137@gondor.apana.org.au>
-References: <1489025479-48036-1-git-send-email-ryder.lee@mediatek.com>
+Subject: Re: [PATCH v2] MAINTAINERS: Add maintianer entry for crypto/s5p-sss
+Date: Thu, 16 Mar 2017 18:09:08 +0800
+Message-ID: <20170316100908.GD12137@gondor.apana.org.au>
+References: <20170311061100.4659-1-krzk@kernel.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-mediatek@lists.infradead.org, linux-crypto@vger.kernel.org
-To: Ryder Lee <ryder.lee@mediatek.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:42467 "EHLO
-        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751182AbdCPKJF (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Mar 2017 06:09:05 -0400
+Cc: "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Vladimir Zapolskiy <vz@mleia.com>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1489025479-48036-1-git-send-email-ryder.lee@mediatek.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20170311061100.4659-1-krzk@kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Mar 09, 2017 at 10:11:11AM +0800, Ryder Lee wrote:
-> Hi all,
+On Sat, Mar 11, 2017 at 08:11:00AM +0200, Krzysztof Kozlowski wrote:
+> Add Krzysztof Kozlowski and Vladimir Zapolskiy as maintainers of s5p-sss
+> driver for handling reviews, testing and getting bug reports from the
+> users.
 > 
-> Some patches of this series improve the performances whereas others
-> clean up code and refine data structure to make it more efficient
-> 
-> Changes since v1:
-> - drop OFB and CFB patch
-> 
-> Ryder Lee (8):
->   crypto: mediatek - rework interrupt handler
->   crypto: mediatek - add MTK_* prefix and correct annotations.
->   crypto: mediatek - make mtk_sha_xmit() more generic
->   crypto: mediatek - simplify descriptor ring management
->   crypto: mediatek - add queue_task tasklet
->   crypto: mediatek - fix error handling in mtk_aes_complete()
->   crypto: mediatek - add mtk_aes_gcm_tag_verify()
->   crypto: mediatek - make hardware operation flow more efficient
+> Cc: Vladimir Zapolskiy <vz@mleia.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
