@@ -1,58 +1,59 @@
-From: Borislav Petkov <bp@suse.de>
-Subject: Re: [RFC PATCH v2 12/32] x86: Add early boot support when running
- with SEV active
-Date: Thu, 16 Mar 2017 11:16:56 +0100
-Message-ID: <20170316101656.dcwgtn4qdtyp5hip@pd.tnic>
-References: <148846752022.2349.13667498174822419498.stgit@brijesh-build-machine>
- <148846768878.2349.15757532025749214650.stgit@brijesh-build-machine>
- <20170309140748.tg67yo2jmc5ahck3@pd.tnic>
- <5d62b16f-16ef-1bd7-1551-f0c4c43573f4@redhat.com>
- <20170309162942.jwtb3l33632zhbaz@pd.tnic>
- <1fe1e177-f588-fe5a-dc13-e9fde00e8958@amd.com>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: Re: [PATCH v5 1/2] crypto: skcipher AF_ALG - overhaul memory management
+Date: Thu, 16 Mar 2017 11:18:33 +0100
+Message-ID: <4808097.uXnqYIEybL@tauon.atsec.com>
+References: <2523592.mde6d2a8Lg@positron.chronox.de> <1797510.JnIj36BbdJ@tauon.atsec.com> <20170316095248.GA11996@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: Paolo Bonzini <pbonzini@redhat.com>, simon.guinot@sequanux.org,
-        linux-efi@vger.kernel.org, kvm@vger.kernel.org, rkrcmar@redhat.com,
-        matt@codeblueprint.co.uk, linux-pci@vger.kernel.org,
-        linus.walleij@linaro.org, gary.hook@amd.com, linux-mm@kvack.org,
-        paul.gortmaker@windriver.com, hpa@zytor.com, cl@linux.com,
-        dan.j.williams@intel.com, aarcange@redhat.com,
-        sfr@canb.auug.org.au, andriy.shevchenko@linux.intel.com,
-        herbert@gondor.apana.org.au, bhe@redhat.com, xemul@parallels.com,
-        joro@8bytes.org, x86@kernel.org, peterz@infradead.org,
-        piotr.luc@intel.com, mingo@redhat.com, msalter@redhat.com,
-        ross.zwisler@linux.intel.com, dyoung@redhat.com,
-        thomas.lendacky@amd.com, jroedel@suse.de, keescook@chromium.org,
-        arnd@arndb.de, toshi.kani@hpe.com, mathieu.desnoyers@efficios.com,
-        luto@kernel.org, d
-To: Brijesh Singh <brijesh.singh@amd.com>
-Return-path: <linux-pci-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1fe1e177-f588-fe5a-dc13-e9fde00e8958@amd.com>
-Sender: linux-pci-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8BIT
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:58082 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751136AbdCPKUL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Mar 2017 06:20:11 -0400
+In-Reply-To: <20170316095248.GA11996@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Mar 10, 2017 at 10:35:30AM -0600, Brijesh Singh wrote:
-> We could update this patch to use the below logic:
+Am Donnerstag, 16. M�rz 2017, 10:52:48 CET schrieb Herbert Xu:
+
+Hi Herbert,
+
+> First of all you're only limiting the amount of memory occupied
+> by the SG list which is not the same thing as the memory pinned
+> down by the actual recvmsg.
+
+I am fully aware of that. As this was present in the code, I thought I could 
+reuse that approach.
+
+Are you saying that you want to stop this approach? 
 > 
->  * CPUID(0) - Check for AuthenticAMD
->  * CPID(1) - Check if under hypervisor
->  * CPUID(0x80000000) - Check for highest supported leaf
->  * CPUID(0x8000001F).EAX - Check for SME and SEV support
->  * rdmsr (MSR_K8_SYSCFG)[MemEncryptionModeEnc] - Check if SMEE is set
+> More importantly, with the current code, a very large recvmsg
+> would still work by doing it piecemeal.
 
-Actually, it is still not clear to me *why* we need to do anything
-special wrt SEV in the guest.
+This piecemeal would be done in the sync case. In the current AIO code path, 
+such piecemeal would not be achieved.
 
-Lemme clarify: why can't the guest boot just like a normal Linux on
-baremetal and use the SME(!) detection code to set sme_enable and so
-on? IOW, I'd like to avoid all those checks whether we're running under
-hypervisor and handle all that like we're running on baremetal.
+> With your patch, won't
+> it fail because sock_kmalloc could fail to allocate memory for
+> the whole thing?
 
--- 
-Regards/Gruss,
-    Boris.
+I this case yes. To handle AIO and sync in a common code path (and thus make 
+both behave identically), this would be the result.
 
-SUSE Linux GmbH, GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
--- 
+If very large recvmsg requests are to be handled, the socket option could be 
+increased or the caller would piecemeal that request.
+
+Otherwise, if do a piecemeal handling like it is done now, I see the following 
+drawbacks:
+
+- no common sync/AIO code and no common behavior
+
+- no common approach between skcipher and other implementations (algif_aead 
+and the algif_akcipher that I have in the pipe which looks identically to the 
+proposed patchset)
+
+Ciao
+Stephan
