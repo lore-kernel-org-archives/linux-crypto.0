@@ -1,55 +1,56 @@
-From: Anton Blanchard <anton@samba.org>
-Subject: Re: [PATCH 1/4] crypto: powerpc - Factor out the core CRC vpmsum
- algorithm
-Date: Thu, 16 Mar 2017 22:13:07 +1100
-Message-ID: <20170316221307.52d14611@kryten>
-References: <20170315123737.20234-1-dja@axtens.net>
- <063D6719AE5E284EB5DD2968C1650D6DCFFB1A81@AcuExch.aculab.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [RFC PATCH v2 14/32] x86: mm: Provide support to use memblock
+ when spliting large pages
+Date: Thu, 16 Mar 2017 13:28:01 +0100
+Message-ID: <55f528b7-da06-2506-2cd0-56b9493347f0__39808.9757924483$1489667351$gmane$org@redhat.com>
+References: <148846752022.2349.13667498174822419498.stgit@brijesh-build-machine>
+ <148846771545.2349.9373586041426414252.stgit@brijesh-build-machine>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Cc: "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
- "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
- 'Daniel Axtens' <dja@axtens.net>
-To: David Laight <David.Laight@ACULAB.COM>
-Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
-In-Reply-To: <063D6719AE5E284EB5DD2968C1650D6DCFFB1A81@AcuExch.aculab.com>
-List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
-List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
-List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
-List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
-List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
-Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
-Sender: "Linuxppc-dev"
- <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
-List-Id: linux-crypto.vger.kernel.org
+To: Brijesh Singh <brijesh.singh@amd.com>, simon.guinot@sequanux.org,
+        linux-efi@vger.kernel.org, kvm@vger.kernel.org, rkrcmar@redhat.com,
+        matt@codeblueprint.co.uk, linux-pci@vger.kernel.org,
+        linus.walleij@linaro.org, gary.hook@amd.com, linux-mm@kvack.org,
+        paul.gortmaker@windriver.com, hpa@zytor.com, cl@linux.com,
+        dan.j.williams@intel.com, aarcange@redhat.com,
+        sfr@canb.auug.org.au, andriy.shevchenko@linux.intel.com,
+        herbert@gondor.apana.org.au, bhe@redhat.com, xemul@parallels.com,
+        joro@8bytes.org, x86@kernel.org, peterz@infradead.org,
+        piotr.luc@intel.com, mingo@redhat.com, msalter@redhat.com,
+        ross.zwisler@linux.intel.com, bp@suse.de, dyoung@redhat.com,
+        thomas.lendacky@amd.com, jroedel@suse.de, keescook@chromium.org,
+        arnd@arndb.de, toshi.kani@hpe.com, mathieu.desnoyers@efficios.com,
+        luto
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:33688 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752468AbdCPM2W (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Mar 2017 08:28:22 -0400
+In-Reply-To: <148846771545.2349.9373586041426414252.stgit@brijesh-build-machine>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi David,
 
-> While not part of this change, the unrolled loops look as though
-> they just destroy the cpu cache.
-> I'd like be convinced that anything does CRC over long enough buffers
-> to make it a gain at all.
 
-btrfs data checksumming is one area.
+On 02/03/2017 16:15, Brijesh Singh wrote:
+> 
+>  __split_large_page(struct cpa_data *cpa, pte_t *kpte, unsigned long address,
+> -		   struct page *base)
+> +		  pte_t *pbase, unsigned long new_pfn)
+>  {
+> -	pte_t *pbase = (pte_t *)page_address(base);
 
-> With modern (not that modern now) superscalar cpus you can often
-> get the loop instructions 'for free'.
+Just one comment and I'll reply to Boris, I think you can compute pbase 
+with pfn_to_kaddr, and avoid adding a new argument.
 
-A branch on POWER8 is a three cycle redirect. The vpmsum instructions
-are 6 cycles.
+>  	 */
+> -	__set_pmd_pte(kpte, address, mk_pte(base, __pgprot(_KERNPG_TABLE)));
+> +	__set_pmd_pte(kpte, address,
+> +		native_make_pte((new_pfn << PAGE_SHIFT) + _KERNPG_TABLE));
 
-> Sometimes pipelining the loop is needed to get full throughput.
-> Unlike the IP checksum, you don't even have to 'loop carry' the
-> cpu carry flag.
+And this probably is better written as:
 
-It went through quite a lot of simulation to reach peak performance.
-The loop is quite delicate, we have to pace it just right to avoid
-some pipeline reject conditions.
+	__set_pmd_pte(kpte, address, pfn_pte(new_pfn, __pgprot(_KERNPG_TABLE));
 
-Note also that we already modulo schedule the loop across three
-iterations, required to hide the latency of the vpmsum instructions.
-
-Anton
+Paolo
