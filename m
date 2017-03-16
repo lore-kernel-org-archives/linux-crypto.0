@@ -1,68 +1,69 @@
-From: David Laight <David.Laight@ACULAB.COM>
-Subject: RE: [PATCH 1/4] crypto: powerpc - Factor out the core CRC vpmsum
- algorithm
-Date: Thu, 16 Mar 2017 09:50:13 +0000
-Message-ID: <063D6719AE5E284EB5DD2968C1650D6DCFFB2524@AcuExch.aculab.com>
-References: <20170315123737.20234-1-dja@axtens.net>
- <063D6719AE5E284EB5DD2968C1650D6DCFFB1A81@AcuExch.aculab.com>
- <87efxy41hi.fsf@possimpible.ozlabs.ibm.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v5 1/2] crypto: skcipher AF_ALG - overhaul memory
+ management
+Date: Thu, 16 Mar 2017 17:52:48 +0800
+Message-ID: <20170316095248.GA11996@gondor.apana.org.au>
+References: <2523592.mde6d2a8Lg@positron.chronox.de>
+ <13069331.7r3bo5pPcW@positron.chronox.de>
+ <20170316090823.GA11924@gondor.apana.org.au>
+ <1797510.JnIj36BbdJ@tauon.atsec.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="Windows-1252"
-Content-Transfer-Encoding: quoted-printable
-Cc: "anton@samba.org" <anton@samba.org>
-To: 'Daniel Axtens' <dja@axtens.net>, "linuxppc-dev@lists.ozlabs.org"
- <linuxppc-dev@lists.ozlabs.org>, "linux-crypto@vger.kernel.org"
- <linux-crypto@vger.kernel.org>
-Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
-In-Reply-To: <87efxy41hi.fsf@possimpible.ozlabs.ibm.com>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
-List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
-List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
-List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
-List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
-Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
-Sender: "Linuxppc-dev"
- <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Cc: linux-crypto@vger.kernel.org
+To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:45505 "EHLO
+        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1751141AbdCPJw6 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Mar 2017 05:52:58 -0400
+Content-Disposition: inline
+In-Reply-To: <1797510.JnIj36BbdJ@tauon.atsec.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Daniel Axtens
-> Sent: 15 March 2017 22:30
-> Hi David,
->=20
-> > While not part of this change, the unrolled loops look as though
-> > they just destroy the cpu cache.
-> > I'd like be convinced that anything does CRC over long enough buffers
-> > to make it a gain at all.
-> >
-> > With modern (not that modern now) superscalar cpus you can often
-> > get the loop instructions 'for free'.
-> > Sometimes pipelining the loop is needed to get full throughput.
-> > Unlike the IP checksum, you don't even have to 'loop carry' the
-> > cpu carry flag.
->=20
-> Internal testing on a NVMe device with T10DIF enabled on 4k blocks
-> shows a 20x - 30x improvement. Without these patches, crc_t10dif_generic
-> uses over 60% of CPU time - with these patches CRC drops to single
-> digits.
->=20
-> I should probably have lead with that, sorry.
+On Thu, Mar 16, 2017 at 10:23:49AM +0100, Stephan Müller wrote:
+> Am Donnerstag, 16. März 2017, 10:08:23 CET schrieb Herbert Xu:
+> 
+> Hi Herbert,
+> 
+> > On Thu, Mar 16, 2017 at 09:55:17AM +0100, Stephan Müller wrote:
+> > > With this approach I thought that the while loop could be a thing of the
+> > > past, considering that this is also the approach taken in
+> > > skcipher_recvmsg_async that is present in the current upstream code base.
+> > 
+> > The reason there is a limit is so that user-space doesn't pin down
+> > unlimited amounts of memory.  How is this addressed under your
+> > scheme?
+> 
+> sock_kmalloc limits the number of SG tables that we can manage. On my system, 
+> sock_kmalloc has 20480 bytes at its disposal as the limiting factor.
+> 
+> As this concept for limiting the impact of user space on kernel memory is used 
+> in the current upstream skcipher_recvmsg_async, I simply re-used that 
+> approach:
+> 
+>         while (iov_iter_count(&msg->msg_iter)) {
+>                 struct skcipher_async_rsgl *rsgl;
+> ...
+>                         rsgl = kmalloc(sizeof(*rsgl), GFP_KERNEL);
+> ...
+> 
+> Note I use sock_kmalloc instead of the currently existing kmalloc to ensure 
+> such limitation.
 
-I'm not doubting that using the cpu instruction for crcs gives a
-massive performance boost.
+First of all you're only limiting the amount of memory occupied
+by the SG list which is not the same thing as the memory pinned
+down by the actual recvmsg.
 
-Just that the heavily unrolled loop is unlikely to help overall.
-Some 'cold cache' tests on shorter buffers might be illuminating.
-=20
-> FWIW, the original patch showed a 3.7x gain on btrfs as well -
-> 6dd7a82cc54e ("crypto: powerpc - Add POWER8 optimised crc32c")
->=20
-> When Anton wrote the original code he had access to IBM's internal
-> tooling for looking at how instructions flow through the various stages
-> of the CPU, so I trust it's pretty much optimal from that point of view.
+More importantly, with the current code, a very large recvmsg
+would still work by doing it piecemeal.  With your patch, won't
+it fail because sock_kmalloc could fail to allocate memory for
+the whole thing?
 
-Doesn't mean he used it :-)
-
-	David
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
