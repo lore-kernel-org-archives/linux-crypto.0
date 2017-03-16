@@ -1,50 +1,49 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v5 1/2] crypto: skcipher AF_ALG - overhaul memory
- management
-Date: Thu, 16 Mar 2017 16:39:23 +0800
-Message-ID: <20170316083922.GA11653@gondor.apana.org.au>
-References: <2523592.mde6d2a8Lg@positron.chronox.de>
- <16908830.B9gcyeAhPX@positron.chronox.de>
+Subject: Re: [RFC 0/7] crypto: caam - add Queue Interface (QI) support
+Date: Thu, 16 Mar 2017 16:42:49 +0800
+Message-ID: <20170316084249.GB11653@gondor.apana.org.au>
+References: <1488552733-20806-1-git-send-email-horia.geanta@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Cc: linux-crypto@vger.kernel.org
-To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Cc: Scott Wood <oss@buserror.net>, Roy Pledge <roy.pledge@nxp.com>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        Dan Douglass <dan.douglass@nxp.com>,
+        Alexandru Porosanu <alexandru.porosanu@nxp.com>,
+        Vakul Garg <vakul@nxp.com>,
+        Cristian Stoica <cristian.stoica@nxp.com>,
+        Claudiu Manoil <claudiu.manoil@nxp.com>
+To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:52969 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:53305 "EHLO
         helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751477AbdCPIjq (ORCPT
+        with ESMTP id S1751492AbdCPInI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Mar 2017 04:39:46 -0400
+        Thu, 16 Mar 2017 04:43:08 -0400
 Content-Disposition: inline
-In-Reply-To: <16908830.B9gcyeAhPX@positron.chronox.de>
+In-Reply-To: <1488552733-20806-1-git-send-email-horia.geanta@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Feb 17, 2017 at 11:31:41PM +0100, Stephan Müller wrote:
->
-> +	} else {
-> +		/* Synchronous operation */
-> +		skcipher_request_set_callback(&areq->req,
-> +					      CRYPTO_TFM_REQ_MAY_SLEEP |
-> +					      CRYPTO_TFM_REQ_MAY_BACKLOG,
-> +					      af_alg_complete,
-> +					      &ctx->completion);
-> +		err = af_alg_wait_for_completion(ctx->enc ?
-> +					crypto_skcipher_encrypt(&areq->req) :
-> +					crypto_skcipher_decrypt(&areq->req),
-> +						 &ctx->completion);
-> +	}
+On Fri, Mar 03, 2017 at 04:52:06PM +0200, Horia GeantÄƒ wrote:
+> The patchset adds support for CAAM Queue Interface (QI), the additional
+> interface (besides job ring) available for submitting jobs to the engine
+> on platforms having DPAA (Datapath Acceleration Architecture).
+> 
+> Patches 1-4 are QMan dependencies.
+> I would prefer to take them through the crypto tree,
+> but I am open to suggestions.
+> 
+> Patch 5 adds a missing double inclusion guard in desc_constr.h.
+> 
+> Patch 6 adds the caam/qi job submission backend.
+> 
+> Patch 7 adds algorithms (ablkcipher and authenc) that run on top
+> of caam/qi. For now, their priority is set lower than caam/jr.
 
-This is now outside of the loop for the sync case.  The purpose
-of the loop in the sync case was to segment the data when we get
-a very large SG list that does not fit inside a single call.
+I'm fine with the crypto bits.
 
-Or did I miss something?
-
-Overall I like this patch.
-
-Thanks,
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
