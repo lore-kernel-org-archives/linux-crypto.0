@@ -1,13 +1,13 @@
 From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [RFC PATCH v2 26/32] kvm: svm: Add support for SEV
- LAUNCH_UPDATE_DATA command
-Date: Thu, 16 Mar 2017 11:48:48 +0100
-Message-ID: <14021d2a-2a94-a0c8-88db-acbc04b4daac__31880.3439768546$1489661381$gmane$org@redhat.com>
+Subject: Re: [RFC PATCH v2 29/32] kvm: svm: Add support for SEV DEBUG_DECRYPT
+ command
+Date: Thu, 16 Mar 2017 11:54:28 +0100
+Message-ID: <4579cfdd-1797-8b47-8e00-254e3f6eb73f__1777.14325623146$1489661759$gmane$org@redhat.com>
 References: <148846752022.2349.13667498174822419498.stgit@brijesh-build-machine>
- <148846786714.2349.17724971671841396908.stgit@brijesh-build-machine>
+ <148846789744.2349.167641684941925238.stgit@brijesh-build-machine>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 To: Brijesh Singh <brijesh.singh@amd.com>, simon.guinot@sequanux.org,
         linux-efi@vger.kernel.org, kvm@vger.kernel.org, rkrcmar@redhat.com,
         matt@codeblueprint.co.uk, linux-pci@vger.kernel.org,
@@ -23,92 +23,65 @@ To: Brijesh Singh <brijesh.singh@amd.com>, simon.guinot@sequanux.org,
         arnd@arndb.de, toshi.kani@hpe.com, mathieu.desnoyers@efficios.com,
         luto
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:36196 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:40754 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751137AbdCPKtE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Mar 2017 06:49:04 -0400
-In-Reply-To: <148846786714.2349.17724971671841396908.stgit@brijesh-build-machine>
+        id S1751182AbdCPKzV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Mar 2017 06:55:21 -0400
+In-Reply-To: <148846789744.2349.167641684941925238.stgit@brijesh-build-machine>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 
 
-On 02/03/2017 16:17, Brijesh Singh wrote:
-> +static struct page **sev_pin_memory(unsigned long uaddr, unsigned long ulen,
-> +				    unsigned long *n)
+On 02/03/2017 16:18, Brijesh Singh wrote:
+> +static int __sev_dbg_decrypt_page(struct kvm *kvm, unsigned long src,
+> +		void *dst, int *error)
 > +{
-> +	struct page **pages;
-> +	int first, last;
-> +	unsigned long npages, pinned;
-> +
-> +	/* Get number of pages */
-> +	first = (uaddr & PAGE_MASK) >> PAGE_SHIFT;
-> +	last = ((uaddr + ulen - 1) & PAGE_MASK) >> PAGE_SHIFT;
-> +	npages = (last - first + 1);
-> +
-> +	pages = kzalloc(npages * sizeof(struct page *), GFP_KERNEL);
-> +	if (!pages)
-> +		return NULL;
-> +
-> +	/* pin the user virtual address */
-> +	down_read(&current->mm->mmap_sem);
-> +	pinned = get_user_pages_fast(uaddr, npages, 1, pages);
-> +	up_read(&current->mm->mmap_sem);
-
-get_user_pages_fast, like get_user_pages_unlocked, must be called
-without mmap_sem held.
-
-> +	if (pinned != npages) {
-> +		printk(KERN_ERR "SEV: failed to pin  %ld pages (got %ld)\n",
-> +				npages, pinned);
-> +		goto err;
+> +	inpages = sev_pin_memory(src, PAGE_SIZE, &npages);
+> +	if (!inpages) {
+> +		ret = -ENOMEM;
+> +		goto err_1;
 > +	}
 > +
-> +	*n = npages;
-> +	return pages;
-> +err:
-> +	if (pinned > 0)
-> +		release_pages(pages, pinned, 0);
-> +	kfree(pages);
+> +	data->handle = sev_get_handle(kvm);
+> +	data->dst_addr = __psp_pa(dst);
+> +	data->src_addr = __sev_page_pa(inpages[0]);
+> +	data->length = PAGE_SIZE;
 > +
-> +	return NULL;
+> +	ret = sev_issue_cmd(kvm, SEV_CMD_DBG_DECRYPT, data, error);
+> +	if (ret)
+> +		printk(KERN_ERR "SEV: DEBUG_DECRYPT %d (%#010x)\n",
+> +				ret, *error);
+> +	sev_unpin_memory(inpages, npages);
+> +err_1:
+> +	kfree(data);
+> +	return ret;
 > +}
->
-> +	/* the array of pages returned by get_user_pages() is a page-aligned
-> +	 * memory. Since the user buffer is probably not page-aligned, we need
-> +	 * to calculate the offset within a page for first update entry.
-> +	 */
-> +	offset = uaddr & (PAGE_SIZE - 1);
-> +	len = min_t(size_t, (PAGE_SIZE - offset), ulen);
-> +	ulen -= len;
 > +
-> +	/* update first page -
-> +	 * special care need to be taken for the first page because we might
-> +	 * be dealing with offset within the page
+> +static int sev_dbg_decrypt(struct kvm *kvm, struct kvm_sev_cmd *argp)
+> +{
+> +	void *data;
+> +	int ret, offset, len;
+> +	struct kvm_sev_dbg debug;
+> +
+> +	if (!sev_guest(kvm))
+> +		return -ENOTTY;
+> +
+> +	if (copy_from_user(&debug, (void *)argp->data,
+> +				sizeof(struct kvm_sev_dbg)))
+> +		return -EFAULT;
+> +	/*
+> +	 * TODO: add support for decrypting length which crosses the
+> +	 * page boundary.
 > +	 */
+> +	offset = debug.src_addr & (PAGE_SIZE - 1);
+> +	if (offset + debug.length > PAGE_SIZE)
+> +		return -EINVAL;
+> +
 
-No need to special case the first page; just set "offset = 0" inside the
-loop after the first iteration.
+Please do add it, it doesn't seem very different from what you're doing
+in LAUNCH_UPDATE_DATA.  There's no need for a separate
+__sev_dbg_decrypt_page function, you can just pin/unpin here and do a
+per-page loop as in LAUNCH_UPDATE_DATA.
 
 Paolo
-
-> +	data->handle = sev_get_handle(kvm);
-> +	data->length = len;
-> +	data->address = __sev_page_pa(inpages[0]) + offset;
-> +	ret = sev_issue_cmd(kvm, SEV_CMD_LAUNCH_UPDATE_DATA,
-> +			data, &argp->error);
-> +	if (ret)
-> +		goto err_3;
-> +
-> +	/* update remaining pages */
-> +	for (i = 1; i < nr_pages; i++) {
-> +
-> +		len = min_t(size_t, PAGE_SIZE, ulen);
-> +		ulen -= len;
-> +		data->length = len;
-> +		data->address = __sev_page_pa(inpages[i]);
-> +		ret = sev_issue_cmd(kvm, SEV_CMD_LAUNCH_UPDATE_DATA,
-> +					data, &argp->error);
-> +		if (ret)
-> +			goto err_3;
-> +	}
