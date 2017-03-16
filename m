@@ -1,52 +1,43 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/4] hwrng: omap - fixes and improvements
-Date: Thu, 16 Mar 2017 18:08:22 +0800
-Message-ID: <20170316100822.GB12137@gondor.apana.org.au>
-References: <1488896089-17586-1-git-send-email-thomas.petazzoni@free-electrons.com>
+Subject: Re: [PATCH v1 0/8] improve performances on mediatek crypto driver
+Date: Thu, 16 Mar 2017 18:08:47 +0800
+Message-ID: <20170316100847.GC12137@gondor.apana.org.au>
+References: <1489025479-48036-1-git-send-email-ryder.lee@mediatek.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Deepak Saxena <dsaxena@plexity.net>,
-        Matt Mackall <mpm@selenic.com>, linux-crypto@vger.kernel.org,
-        romain.perier@collabora.com, Jason Cooper <jason@lakedaemon.net>,
-        Andrew Lunn <andrew@lunn.ch>,
-        Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-        Gregory Clement <gregory.clement@free-electrons.com>,
-        Nadav Haklai <nadavh@marvell.com>,
-        Hanna Hawa <hannah@marvell.com>,
-        Yehuda Yitschak <yehuday@marvell.com>
-To: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+Cc: linux-mediatek@lists.infradead.org, linux-crypto@vger.kernel.org
+To: Ryder Lee <ryder.lee@mediatek.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:41971 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:42467 "EHLO
         helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751182AbdCPKIj (ORCPT
+        with ESMTP id S1751182AbdCPKJF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Mar 2017 06:08:39 -0400
+        Thu, 16 Mar 2017 06:09:05 -0400
 Content-Disposition: inline
-In-Reply-To: <1488896089-17586-1-git-send-email-thomas.petazzoni@free-electrons.com>
+In-Reply-To: <1489025479-48036-1-git-send-email-ryder.lee@mediatek.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Mar 07, 2017 at 03:14:45PM +0100, Thomas Petazzoni wrote:
-> Hello,
+On Thu, Mar 09, 2017 at 10:11:11AM +0800, Ryder Lee wrote:
+> Hi all,
 > 
-> This small patch series brings a few fixes and improvements to the
-> omap_rng driver. The first fix is particularly important, as it fixes
-> using the driver built as a module on SoCs that require a clock for
-> the IP to work properly.
+> Some patches of this series improve the performances whereas others
+> clean up code and refine data structure to make it more efficient
 > 
-> Thanks,
+> Changes since v1:
+> - drop OFB and CFB patch
 > 
-> Thomas
-> 
-> Thomas Petazzoni (4):
->   hwrng: omap - write registers after enabling the clock
->   hwrng: omap - use devm_clk_get() instead of of_clk_get()
->   hwrng: omap - Do not access INTMASK_REG on EIP76
->   hwrng: omap - move clock related code to omap_rng_probe()
+> Ryder Lee (8):
+>   crypto: mediatek - rework interrupt handler
+>   crypto: mediatek - add MTK_* prefix and correct annotations.
+>   crypto: mediatek - make mtk_sha_xmit() more generic
+>   crypto: mediatek - simplify descriptor ring management
+>   crypto: mediatek - add queue_task tasklet
+>   crypto: mediatek - fix error handling in mtk_aes_complete()
+>   crypto: mediatek - add mtk_aes_gcm_tag_verify()
+>   crypto: mediatek - make hardware operation flow more efficient
 
-Patches 1-3 applied to crypto and patch 4 applied to cryptodev.
-
-Thanks,
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
