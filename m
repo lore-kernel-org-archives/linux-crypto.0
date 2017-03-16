@@ -1,28 +1,27 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] MAINTAINERS: Add maintianer entry for crypto/s5p-sss
-Date: Thu, 16 Mar 2017 18:09:08 +0800
-Message-ID: <20170316100908.GD12137@gondor.apana.org.au>
-References: <20170311061100.4659-1-krzk@kernel.org>
+Subject: Re: [PATCH] crypto: doc - fix typo (struct sdesc)
+Date: Thu, 16 Mar 2017 18:09:41 +0800
+Message-ID: <20170316100941.GA12324@gondor.apana.org.au>
+References: <1489052405-405-1-git-send-email-fabien.dessenne@st.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Vladimir Zapolskiy <vz@mleia.com>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org
+To: Fabien Dessenne <fabien.dessenne@st.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:48229 "EHLO
+        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1751856AbdCPKJw (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Mar 2017 06:09:52 -0400
 Content-Disposition: inline
-In-Reply-To: <20170311061100.4659-1-krzk@kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1489052405-405-1-git-send-email-fabien.dessenne@st.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Mar 11, 2017 at 08:11:00AM +0200, Krzysztof Kozlowski wrote:
-> Add Krzysztof Kozlowski and Vladimir Zapolskiy as maintainers of s5p-sss
-> driver for handling reviews, testing and getting bug reports from the
-> users.
+Fabien Dessenne <fabien.dessenne@st.com> wrote:
+> Add missing " " in api-samples.rst
 > 
-> Cc: Vladimir Zapolskiy <vz@mleia.com>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
+> Signed-off-by: Fabien Dessenne <fabien.dessenne@st.com>
 
 Patch applied.  Thanks.
 -- 
