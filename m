@@ -1,52 +1,41 @@
-From: Peter Zijlstra <peterz@infradead.org>
-Subject: Re: [PATCH 6/7] md/raid10, LLVM: get rid of variable length array
-Date: Fri, 17 Mar 2017 20:26:42 +0100
-Message-ID: <20170317192642.qnrf7xuopxzapl2r@hirez.programming.kicks-ass.net>
-References: <20170317001520.85223-1-md@google.com>
- <20170317001520.85223-7-md@google.com>
- <20170317120837.pr74cv3xuj7qpoin@hirez.programming.kicks-ass.net>
- <CAG_fn=XcQLtcHRSm2BHYce9LMtyFJ+fWxfE4vYPCw+7U0DcrmQ@mail.gmail.com>
- <CAG_fn=WooTLkzex3hqPgO5pr7GsK3v7Z5riSA7K+-_S=S7rmBQ@mail.gmail.com>
- <20170317180350.63jjysejk2i6vkon@pd.tnic>
- <CACT4Y+Ysvjz+UzEi0dTtsNxxnG7WXTiZPr+KSk8HHwSu7vX1ew@mail.gmail.com>
- <20170317185720.5s7qa6hl233t24ag@pd.tnic>
- <CACT4Y+bybdpqB71=inx8amwr188Mb2QyBeRTDdWZ3AFyDwVX0A@mail.gmail.com>
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: [PATCH] crypto: zip - Memory corruption in zip_clear_stats()
+Date: Fri, 17 Mar 2017 23:46:21 +0300
+Message-ID: <20170317204621.GD16505@mwanda>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Borislav Petkov <bp@alien8.de>,
-        Alexander Potapenko <glider@google.com>,
-        Michael Davidson <md@google.com>,
-        Michal Marek <mmarek@suse.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Shaohua Li <shli@kernel.org>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-crypto@vger.kernel.org, linux-raid@vger.kernel.org,
-        kbuild-all@01.org, Fengguang Wu <fengguang.wu@intel.com>
-To: Dmitry Vyukov <dvyukov@google.com>
-Return-path: <linux-raid-owner@vger.kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Jan Glauber <jglauber@cavium.com>,
+        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        Mahipal Challa <mahipalreddy2006@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from aserp1040.oracle.com ([141.146.126.69]:36202 "EHLO
+        aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751116AbdCQUrG (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 17 Mar 2017 16:47:06 -0400
 Content-Disposition: inline
-In-Reply-To: <CACT4Y+bybdpqB71=inx8amwr188Mb2QyBeRTDdWZ3AFyDwVX0A@mail.gmail.com>
-Sender: linux-raid-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Mar 17, 2017 at 08:05:16PM +0100, Dmitry Vyukov wrote:
-> You can also find some reasons in the Why section of LLVM-Linux project:
-> http://llvm.linuxfoundation.org/index.php/Main_Page
+There is a typo here.  It should be "stats" instead of "state".  The
+impact is that we clear 224 bytes instead of 80 and we zero out memory
+that we shouldn't.
 
->From that:
+Fixes: 09ae5d37e093 ("crypto: zip - Add Compression/Decompression statistics")
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 
- - LLVM/Clang is a fast moving project with many things fixed quickly
-   and features added.
-
-So what's the deal with that 5 year old bug you want us to work around?
-
-Also, clang doesn't support asm cc flags output and a few other
-extensions last time I checked.
-
+diff --git a/drivers/crypto/cavium/zip/zip_main.c b/drivers/crypto/cavium/zip/zip_main.c
+index 0951e20b395b..6ff13d80d82e 100644
+--- a/drivers/crypto/cavium/zip/zip_main.c
++++ b/drivers/crypto/cavium/zip/zip_main.c
+@@ -530,7 +530,7 @@ static int zip_clear_stats(struct seq_file *s, void *unused)
+ 	for (index = 0; index < MAX_ZIP_DEVICES; index++) {
+ 		if (zip_dev[index]) {
+ 			memset(&zip_dev[index]->stats, 0,
+-			       sizeof(struct zip_state));
++			       sizeof(struct zip_stats));
+ 			seq_printf(s, "Cleared stats for zip %d\n", index);
+ 		}
+ 	}
