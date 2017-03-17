@@ -1,41 +1,66 @@
-From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: [PATCH] crypto: zip - Memory corruption in zip_clear_stats()
-Date: Fri, 17 Mar 2017 23:46:21 +0300
-Message-ID: <20170317204621.GD16505@mwanda>
+From: hpa@zytor.com
+Subject: Re: [PATCH 6/7] md/raid10, LLVM: get rid of variable length array
+Date: Fri, 17 Mar 2017 13:04:27 -0700
+Message-ID: <96158847-4F1F-4293-8435-E111F39E3260@zytor.com>
+References: <20170317001520.85223-1-md@google.com> <20170317001520.85223-7-md@google.com> <20170317120837.pr74cv3xuj7qpoin@hirez.programming.kicks-ass.net> <CAG_fn=XcQLtcHRSm2BHYce9LMtyFJ+fWxfE4vYPCw+7U0DcrmQ@mail.gmail.com> <20170317124404.mt3jd5q5vyk63q2w@hirez.programming.kicks-ass.net> <CA+=D-XXy9yEQc-jLxSqRUwq=4ADnFqaxnsjSzV4=8jOisym=bQ@mail.gmail.com> <20170317192746.y5ade3bymifdni2p@hirez.programming.kicks-ass.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Jan Glauber <jglauber@cavium.com>,
-        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        Mahipal Challa <mahipalreddy2006@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from aserp1040.oracle.com ([141.146.126.69]:36202 "EHLO
-        aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751116AbdCQUrG (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 17 Mar 2017 16:47:06 -0400
-Content-Disposition: inline
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 8BIT
+Cc: Alexander Potapenko <glider@google.com>,
+        Michal Marek <mmarek@suse.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Shaohua Li <shli@kernel.org>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Matthias Kaehlcke <mka@chromium.org>, x86@kernel.org,
+        linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        linux-crypto@vger.kernel.org, linux-raid@vger.kernel.org
+To: Peter Zijlstra <peterz@infradead.org>,
+        Michael Davidson <md@google.com>
+Return-path: <linux-kbuild-owner@vger.kernel.org>
+In-Reply-To: <20170317192746.y5ade3bymifdni2p@hirez.programming.kicks-ass.net>
+Sender: linux-kbuild-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-There is a typo here.  It should be "stats" instead of "state".  The
-impact is that we clear 224 bytes instead of 80 and we zero out memory
-that we shouldn't.
+On March 17, 2017 12:27:46 PM PDT, Peter Zijlstra <peterz@infradead.org> wrote:
+>On Fri, Mar 17, 2017 at 11:52:01AM -0700, Michael Davidson wrote:
+>> On Fri, Mar 17, 2017 at 5:44 AM, Peter Zijlstra
+><peterz@infradead.org> wrote:
+>> >
+>> > Be that as it may; what you construct above is disgusting. Surely
+>the
+>> > code can be refactored to not look like dog vomit?
+>> >
+>> > Also; its not immediately obvious conf->copies is 'small' and this
+>> > doesn't blow up the stack; I feel that deserves a comment
+>somewhere.
+>> >
+>> 
+>> I agree that the code is horrible.
+>> 
+>> It is, in fact, exactly the same solution that was used to remove
+>> variable length arrays in structs from several of the crypto drivers
+>a
+>> few years ago - see the definition of SHASH_DESC_ON_STACK() in
+>> "crypto/hash.h" - I did not, however, hide the horrors in a macro
+>> preferring to leave the implementation visible as a warning to
+>whoever
+>> might touch the code next.
+>> 
+>> I believe that the actual stack usage is exactly the same as it was
+>previously.
+>> 
+>> I can certainly wrap this  up in a macro and add comments with
+>> appropriately dire warnings in it if you feel that is both necessary
+>> and sufficient.
+>
+>We got away with ugly in the past, so we should get to do it again?
 
-Fixes: 09ae5d37e093 ("crypto: zip - Add Compression/Decompression statistics")
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+Seriously, you should have taken the hack the first time that this needs to be fixed.  Just because this is a fairly uncommon construct in the kernel doesn't mean it is not in userspace.
 
-diff --git a/drivers/crypto/cavium/zip/zip_main.c b/drivers/crypto/cavium/zip/zip_main.c
-index 0951e20b395b..6ff13d80d82e 100644
---- a/drivers/crypto/cavium/zip/zip_main.c
-+++ b/drivers/crypto/cavium/zip/zip_main.c
-@@ -530,7 +530,7 @@ static int zip_clear_stats(struct seq_file *s, void *unused)
- 	for (index = 0; index < MAX_ZIP_DEVICES; index++) {
- 		if (zip_dev[index]) {
- 			memset(&zip_dev[index]->stats, 0,
--			       sizeof(struct zip_state));
-+			       sizeof(struct zip_stats));
- 			seq_printf(s, "Cleared stats for zip %d\n", index);
- 		}
- 	}
+I would like to say this falls in the category of "fix your compiler this time".  Once is one thing, twice is unacceptable.
+-- 
+Sent from my Android device with K-9 Mail. Please excuse my brevity.
