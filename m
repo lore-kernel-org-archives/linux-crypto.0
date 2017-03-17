@@ -1,55 +1,53 @@
-From: Scott Wood <oss@buserror.net>
-Subject: Re: [RFC 0/7] crypto: caam - add Queue Interface (QI) support
-Date: Thu, 16 Mar 2017 15:49:30 -0500
-Message-ID: <1489697370.2944.46.camel@buserror.net>
-References: <1488552733-20806-1-git-send-email-horia.geanta@nxp.com>
- <20170316084249.GB11653@gondor.apana.org.au>
- <DB4PR04MB0847AD372AFF9510CDCA3ECD98260@DB4PR04MB0847.eurprd04.prod.outlook.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- Claudiu Manoil <claudiu.manoil@nxp.com>,
- Cristian Stoica <cristian.stoica@nxp.com>, Dan Douglass <dan.douglass@nxp.com>,
- "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
- Vakul Garg <vakul@nxp.com>, Alexandru Porosanu <alexandru.porosanu@nxp.com>
-To: Horia =?UTF-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>, Herbert Xu
- <herbert@gondor.apana.org.au>, Roy Pledge <roy.pledge@nxp.com>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <DB4PR04MB0847AD372AFF9510CDCA3ECD98260@DB4PR04MB0847.eurprd04.prod.outlook.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+From: Michael Davidson <md@google.com>
+Subject: [PATCH 1/7] Makefile, LLVM: add -no-integrated-as to KBUILD_[AC]FLAGS
+Date: Thu, 16 Mar 2017 17:15:14 -0700
+Message-ID: <20170317001520.85223-2-md@google.com>
+References: <20170317001520.85223-1-md@google.com>
+Cc: Alexander Potapenko <glider@google.com>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Matthias Kaehlcke <mka@chromium.org>, x86@kernel.org,
+        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-raid@vger.kernel.org,
+        Michael Davidson <md@google.com>
+To: Michal Marek <mmarek@suse.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Shaohua Li <shli@kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pg0-f53.google.com ([74.125.83.53]:33230 "EHLO
+        mail-pg0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751483AbdCQAWs (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Mar 2017 20:22:48 -0400
+Received: by mail-pg0-f53.google.com with SMTP id n190so32703288pga.0
+        for <linux-crypto@vger.kernel.org>; Thu, 16 Mar 2017 17:22:48 -0700 (PDT)
+In-Reply-To: <20170317001520.85223-1-md@google.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-T24gVGh1LCAyMDE3LTAzLTE2IGF0IDE0OjEzICswMDAwLCBIb3JpYSBHZWFudMSDIHdyb3RlOgo+
-IE9uIDMvMTYvMjAxNyAxMDo0MyBBTSwgSGVyYmVydCBYdSB3cm90ZToKPiA+IAo+ID4gT24gRnJp
-LCBNYXIgMDMsIDIwMTcgYXQgMDQ6NTI6MDZQTSArMDIwMCwgSG9yaWEgR2VhbnTEgyB3cm90ZToK
-PiA+ID4gCj4gPiA+IFRoZSBwYXRjaHNldCBhZGRzIHN1cHBvcnQgZm9yIENBQU0gUXVldWUgSW50
-ZXJmYWNlIChRSSksIHRoZSBhZGRpdGlvbmFsCj4gPiA+IGludGVyZmFjZSAoYmVzaWRlcyBqb2Ig
-cmluZykgYXZhaWxhYmxlIGZvciBzdWJtaXR0aW5nIGpvYnMgdG8gdGhlIGVuZ2luZQo+ID4gPiBv
-biBwbGF0Zm9ybXMgaGF2aW5nIERQQUEgKERhdGFwYXRoIEFjY2VsZXJhdGlvbiBBcmNoaXRlY3R1
-cmUpLgo+ID4gPiAKPiA+ID4gUGF0Y2hlcyAxLTQgYXJlIFFNYW4gZGVwZW5kZW5jaWVzLgo+ID4g
-PiBJIHdvdWxkIHByZWZlciB0byB0YWtlIHRoZW0gdGhyb3VnaCB0aGUgY3J5cHRvIHRyZWUsCj4g
-PiA+IGJ1dCBJIGFtIG9wZW4gdG8gc3VnZ2VzdGlvbnMuCj4gPiA+IAo+ID4gPiBQYXRjaCA1IGFk
-ZHMgYSBtaXNzaW5nIGRvdWJsZSBpbmNsdXNpb24gZ3VhcmQgaW4gZGVzY19jb25zdHIuaC4KPiA+
-ID4gCj4gPiA+IFBhdGNoIDYgYWRkcyB0aGUgY2FhbS9xaSBqb2Igc3VibWlzc2lvbiBiYWNrZW5k
-Lgo+ID4gPiAKPiA+ID4gUGF0Y2ggNyBhZGRzIGFsZ29yaXRobXMgKGFibGtjaXBoZXIgYW5kIGF1
-dGhlbmMpIHRoYXQgcnVuIG9uIHRvcAo+ID4gPiBvZiBjYWFtL3FpLiBGb3Igbm93LCB0aGVpciBw
-cmlvcml0eSBpcyBzZXQgbG93ZXIgdGhhbiBjYWFtL2pyLgo+ID4gSSdtIGZpbmUgd2l0aCB0aGUg
-Y3J5cHRvIGJpdHMuCj4gPiAKPiBIZXJiZXJ0LAo+IAo+IFRoYW5rcyBmb3IgdGhlIHJldmlldy4K
-PiBTaG91bGQgSSBzdWJtaXQgZm9ybWFsbHksIGkuZS4gd2l0aG91dCB0aGUgW1JGQ10gcHJlZml4
-Pwo+IAo+IFNjb3R0LCBSb3ksCj4gCj4gRG8geW91IGhhdmUgYW55IGNvbW1lbnRzIHdydC4gc29j
-L3FtYW4gcGF0Y2hlcyBvciB3aXRoIHRoZW0gZ29pbmcKPiB0aHJvdWdoIHRoZSBjcnlwdG8gdHJl
-ZT8KCkdvaW5nIHRocm91Z2ggdGhlIGNyeXB0byB0cmVlIGlzIGZpbmUuCgotU2NvdHQKCgpfX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpsaW51eC1hcm0ta2Vy
-bmVsIG1haWxpbmcgbGlzdApsaW51eC1hcm0ta2VybmVsQGxpc3RzLmluZnJhZGVhZC5vcmcKaHR0
-cDovL2xpc3RzLmluZnJhZGVhZC5vcmcvbWFpbG1hbi9saXN0aW5mby9saW51eC1hcm0ta2VybmVs
-Cg==
+Add -no-integrated-as to KBUILD_AFLAGS and KBUILD_CFLAGS
+for clang.
+
+Signed-off-by: Michael Davidson <md@google.com>
+---
+ Makefile | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index b841fb36beb2..b21fd0ca2946 100644
+--- a/Makefile
++++ b/Makefile
+@@ -704,6 +704,8 @@ KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
+ # See modpost pattern 2
+ KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)
+ KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
++KBUILD_CFLAGS += $(call cc-option, -no-integrated-as)
++KBUILD_AFLAGS += $(call cc-option, -no-integrated-as)
+ else
+ 
+ # These warnings generated too much noise in a regular build.
+-- 
+2.12.0.367.g23dc2f6d3c-goog
