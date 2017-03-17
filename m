@@ -1,7 +1,7 @@
 From: Michael Davidson <md@google.com>
-Subject: [PATCH 2/7] Makefile, x86, LLVM: disable unsupported optimization flags
-Date: Thu, 16 Mar 2017 17:15:15 -0700
-Message-ID: <20170317001520.85223-3-md@google.com>
+Subject: [PATCH 3/7] x86, LLVM: suppress clang warnings about unaligned accesses
+Date: Thu, 16 Mar 2017 17:15:16 -0700
+Message-ID: <20170317001520.85223-4-md@google.com>
 References: <20170317001520.85223-1-md@google.com>
 Cc: Alexander Potapenko <glider@google.com>,
         Dmitry Vyukov <dvyukov@google.com>,
@@ -16,53 +16,36 @@ To: Michal Marek <mmarek@suse.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         Shaohua Li <shli@kernel.org>
-Return-path: <linux-kbuild-owner@vger.kernel.org>
+Return-path: <linux-raid-owner@vger.kernel.org>
 In-Reply-To: <20170317001520.85223-1-md@google.com>
-Sender: linux-kbuild-owner@vger.kernel.org
+Sender: linux-raid-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Unfortunately, while clang generates a warning about these flags
-being unsupported it still exits with a status of 0 so we have
-to explicitly disable them instead of just using a cc-option check.
+Suppress clang warnings about potential unaliged accesses
+to members in packed structs. This gets rid of almost 10,000
+warnings about accesses to the ring 0 stack pointer in the TSS.
 
 Signed-off-by: Michael Davidson <md@google.com>
 ---
- Makefile          | 2 ++
- arch/x86/Makefile | 2 ++
- 2 files changed, 4 insertions(+)
+ arch/x86/Makefile | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/Makefile b/Makefile
-index b21fd0ca2946..5e97e5fc1eea 100644
---- a/Makefile
-+++ b/Makefile
-@@ -629,7 +629,9 @@ ARCH_AFLAGS :=
- ARCH_CFLAGS :=
- include arch/$(SRCARCH)/Makefile
- 
-+ifneq ($(cc-name),clang)
- KBUILD_CFLAGS	+= $(call cc-option,-fno-delete-null-pointer-checks,)
-+endif
- KBUILD_CFLAGS	+= $(call cc-disable-warning,frame-address,)
- 
- ifdef CONFIG_LD_DEAD_CODE_DATA_ELIMINATION
 diff --git a/arch/x86/Makefile b/arch/x86/Makefile
-index 2d449337a360..894a8d18bf97 100644
+index 894a8d18bf97..7f21703c475d 100644
 --- a/arch/x86/Makefile
 +++ b/arch/x86/Makefile
-@@ -87,11 +87,13 @@ else
-         KBUILD_AFLAGS += -m64
-         KBUILD_CFLAGS += -m64
+@@ -128,6 +128,11 @@ endif
+         KBUILD_CFLAGS += $(call cc-option,-maccumulate-outgoing-args)
+ endif
  
-+ifneq ($(cc-name),clang)
-         # Align jump targets to 1 byte, not the default 16 bytes:
-         KBUILD_CFLAGS += -falign-jumps=1
- 
-         # Pack loops tightly as well:
-         KBUILD_CFLAGS += -falign-loops=1
++ifeq ($(cc-name),clang)
++# Suppress clang warnings about potential unaligned accesses.
++KBUILD_CFLAGS += $(call cc-disable-warning, address-of-packed-member)
 +endif
- 
-         # Don't autogenerate traditional x87 instructions
-         KBUILD_CFLAGS += $(call cc-option,-mno-80387)
++
+ ifdef CONFIG_X86_X32
+ 	x32_ld_ok := $(call try-run,\
+ 			/bin/echo -e '1: .quad 1b' | \
 -- 
 2.12.0.367.g23dc2f6d3c-goog
 
