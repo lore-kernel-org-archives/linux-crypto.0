@@ -1,78 +1,29 @@
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Subject: [PATCH 1/4] crypto: s5p-sss - Close possible race for completed requests
-Date: Fri, 17 Mar 2017 16:49:19 +0200
-Message-ID: <20170317144922.27379-2-krzk@kernel.org>
-References: <20170317144922.27379-1-krzk@kernel.org>
-Cc: Nathan Royce <nroycea+kernel@gmail.com>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        "# v4 . 10 . x" <stable@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Vladimir Zapolskiy <vz@mleia.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170317144922.27379-1-krzk@kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [ANNOUNCE] /dev/random - a new approach (code for 4.11-rc1)
+Date: Fri, 17 Mar 2017 16:31:29 +0100
+Message-ID: <CAHmME9oopUxc3fdRERdhHk=GYJuqAonhRBhmyUQE81fPdLn9Zw@mail.gmail.com>
+References: <2785457.pDyvZpZC2q@positron.chronox.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from frisell.zx2c4.com ([192.95.5.64]:60345 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751169AbdCQPci (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 17 Mar 2017 11:32:38 -0400
+In-Reply-To: <2785457.pDyvZpZC2q@positron.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Driver is capable of handling only one request at a time and it stores
-it in its state container struct s5p_aes_dev.  This stored request must be
-protected between concurrent invocations (e.g. completing current
-request and scheduling new one).  Combination of lock and "busy" field
-is used for that purpose.
+Hey Stephan,
 
-When "busy" field is true, the driver will not accept new request thus
-it will not overwrite currently handled data.
+Have you considered submitting this without so many options? For
+example -- just unconditionally using ChaCha20 instead of the
+configurable crypto API functions? And either removing the FIPS140
+compliance code, and either unconditionally including it, or just
+getting rid of it? And finally just making this a part of the kernel
+directly, instead of adding this as a standalone optional component?
 
-However commit 28b62b145868 ("crypto: s5p-sss - Fix spinlock recursion
-on LRW(AES)") moved some of the write to "busy" field out of a lock
-protected critical section.  This might lead to potential race between
-completing current request and scheduling a new one.  Effectively the
-request completion might try to operate on new crypto request.
-
-Cc: <stable@vger.kernel.org> # v4.10.x
-Fixes: 28b62b145868 ("crypto: s5p-sss - Fix spinlock recursion on LRW(AES)")
-Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
----
- drivers/crypto/s5p-sss.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
-index 1b9da3dc799b..6c620487e9c2 100644
---- a/drivers/crypto/s5p-sss.c
-+++ b/drivers/crypto/s5p-sss.c
-@@ -287,7 +287,6 @@ static void s5p_sg_done(struct s5p_aes_dev *dev)
- static void s5p_aes_complete(struct s5p_aes_dev *dev, int err)
- {
- 	dev->req->base.complete(&dev->req->base, err);
--	dev->busy = false;
- }
- 
- static void s5p_unset_outdata(struct s5p_aes_dev *dev)
-@@ -462,7 +461,7 @@ static irqreturn_t s5p_aes_interrupt(int irq, void *dev_id)
- 		spin_unlock_irqrestore(&dev->lock, flags);
- 
- 		s5p_aes_complete(dev, 0);
--		dev->busy = true;
-+		/* Device is still busy */
- 		tasklet_schedule(&dev->tasklet);
- 	} else {
- 		/*
-@@ -483,6 +482,7 @@ static irqreturn_t s5p_aes_interrupt(int irq, void *dev_id)
- 
- error:
- 	s5p_sg_done(dev);
-+	dev->busy = false;
- 	spin_unlock_irqrestore(&dev->lock, flags);
- 	s5p_aes_complete(dev, err);
- 
-@@ -634,6 +634,7 @@ static void s5p_aes_crypt_start(struct s5p_aes_dev *dev, unsigned long mode)
- 
- indata_error:
- 	s5p_sg_done(dev);
-+	dev->busy = false;
- 	spin_unlock_irqrestore(&dev->lock, flags);
- 	s5p_aes_complete(dev, err);
- }
--- 
-2.9.3
+Jason
