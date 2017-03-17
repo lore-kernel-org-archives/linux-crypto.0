@@ -1,7 +1,7 @@
 From: Michael Davidson <md@google.com>
-Subject: [PATCH 4/7] x86, boot, LLVM: #undef memcpy etc in string.c
-Date: Thu, 16 Mar 2017 17:15:17 -0700
-Message-ID: <20170317001520.85223-5-md@google.com>
+Subject: [PATCH 6/7] md/raid10, LLVM: get rid of variable length array
+Date: Thu, 16 Mar 2017 17:15:19 -0700
+Message-ID: <20170317001520.85223-7-md@google.com>
 References: <20170317001520.85223-1-md@google.com>
 Cc: Alexander Potapenko <glider@google.com>,
         Dmitry Vyukov <dvyukov@google.com>,
@@ -16,45 +16,39 @@ To: Michal Marek <mmarek@suse.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         Shaohua Li <shli@kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-kbuild-owner@vger.kernel.org>
 In-Reply-To: <20170317001520.85223-1-md@google.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Sender: linux-kbuild-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-undef memcpy and friends in boot/string.c so that the functions
-defined here will have the correct names, otherwise we end up
-up trying to redefine __builtin_memcpy etc.
-Surprisingly, gcc allows this (and, helpfully, discards the
-__builtin_ prefix from the function name when compiling it),
-but clang does not.
-
-Adding these #undef's appears to preserve what I assume was
-the original intent of the code.
+Replace a variable length array in a struct by allocating
+the memory for the entire struct in a char array on the stack.
 
 Signed-off-by: Michael Davidson <md@google.com>
 ---
- arch/x86/boot/string.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ drivers/md/raid10.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/boot/string.c b/arch/x86/boot/string.c
-index 5457b02fc050..b40266850869 100644
---- a/arch/x86/boot/string.c
-+++ b/arch/x86/boot/string.c
-@@ -16,6 +16,15 @@
- #include "ctype.h"
- #include "string.h"
- 
-+/*
-+ * Undef these macros so that the functions that we provide
-+ * here will have the correct names regardless of how string.h
-+ * may have chosen to #define them.
-+ */
-+#undef memcpy
-+#undef memset
-+#undef memcmp
-+
- int memcmp(const void *s1, const void *s2, size_t len)
- {
- 	bool diff;
+diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
+index 063c43d83b72..158ebdff782c 100644
+--- a/drivers/md/raid10.c
++++ b/drivers/md/raid10.c
+@@ -4654,11 +4654,10 @@ static int handle_reshape_read_error(struct mddev *mddev,
+ 	/* Use sync reads to get the blocks from somewhere else */
+ 	int sectors = r10_bio->sectors;
+ 	struct r10conf *conf = mddev->private;
+-	struct {
+-		struct r10bio r10_bio;
+-		struct r10dev devs[conf->copies];
+-	} on_stack;
+-	struct r10bio *r10b = &on_stack.r10_bio;
++	char on_stack_r10_bio[sizeof(struct r10bio) +
++			      conf->copies * sizeof(struct r10dev)]
++			      __aligned(__alignof__(struct r10bio));
++	struct r10bio *r10b = (struct r10bio *)on_stack_r10_bio;
+ 	int slot = 0;
+ 	int idx = 0;
+ 	struct bio_vec *bvec = r10_bio->master_bio->bi_io_vec;
 -- 
 2.12.0.367.g23dc2f6d3c-goog
+
