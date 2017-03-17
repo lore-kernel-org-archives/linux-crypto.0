@@ -1,50 +1,66 @@
-From: Florian Fainelli <f.fainelli@gmail.com>
-Subject: Re: [PATCH 1/1] ARM: dts: NSP: Add crypto (SPU) to dtsi
-Date: Fri, 17 Mar 2017 15:50:02 -0700
-Message-ID: <ff62a275-25c7-2f68-7d15-67e533208ad2@gmail.com>
-References: <1487798543-34229-1-git-send-email-steven.lin1@broadcom.com>
- <66ba937a-f1c3-1cae-ff2e-46a9d9c97344@gmail.com>
- <fd877ab2-48db-a677-b539-ba5ed55e75c6@gmail.com>
+From: Kevin Hilman <khilman-rdvid1DuHRBWk0Htik3J/w@public.gmane.org>
+Subject: Re: [PATCH v3 1/3] clk: meson-gxbb: expose clock CLKID_RNG0
+Date: Fri, 17 Mar 2017 16:05:26 -0700
+Message-ID: <m2zigj5wsp.fsf@baylibre.com>
+References: <4e2d12e5-f75b-3ac6-a3f7-18e8a8b7283b@gmail.com>
+        <20170316100743.GA12137@gondor.apana.org.au>
+        <m2mvcl6pwg.fsf@baylibre.com>
+        <20170317083032.GA18512@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: devicetree@vger.kernel.org, rob.rice@broadcom.com,
- linux-kernel@vger.kernel.org, bcm-kernel-feedback-list@broadcom.com,
- linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-To: Steve Lin <steven.lin1@broadcom.com>, herbert@gondor.apana.org.au,
- robh+dt@kernel.org, linux@armlinux.org.uk, ray.jui@broadcom.com,
- scott.branden@broadcom.com, jon.mason@broadcom.com, mark.rutland@arm.com
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <fd877ab2-48db-a677-b539-ba5ed55e75c6@gmail.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Content-Type: text/plain
+Cc: Heiner Kallweit <hkallweit1-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        Jerome Brunet <jbrunet-rdvid1DuHRBWk0Htik3J/w@public.gmane.org>,
+        Neil Armstrong <narmstrong-rdvid1DuHRBWk0Htik3J/w@public.gmane.org>,
+        linux-amlogic-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        Stephen Boyd <sboyd-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>,
+        Michael Turquette <mturquette-rdvid1DuHRBWk0Htik3J/w@public.gmane.org>,
+        linux-clk-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20170317083032.GA18512-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org> (Herbert Xu's
+        message of "Fri, 17 Mar 2017 16:30:32 +0800")
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 03/06/2017 11:22 AM, Florian Fainelli wrote:
-> On 02/28/2017 12:31 PM, Florian Fainelli wrote:
->> On 02/22/2017 01:22 PM, Steve Lin wrote:
->>> Adds crypto hardware (SPU) to Northstar Plus device tree file.
->>>
->>> Signed-off-by: Steve Lin <steven.lin1@broadcom.com>
->>
->> Applied, thanks!
-> 
-> And dropped, since there is a dependency on "ARM: dts: NSP: Add mailbox
-> (PDC) to NSP" to be applied first.
-> 
-> Let's wait for the mailbox maintainer to chime in before I apply the
-> following patches (in that order):
-> 
-> ARM: dts: NSP: Add mailbox (PDC) to NSP
-> ARM: dts: NSP: Add crypto (SPU) to dtsi
+Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org> writes:
 
-Applied again.
--- 
-Florian
+> On Thu, Mar 16, 2017 at 11:24:31AM -0700, Kevin Hilman wrote:
+>> Hi Herbert,
+>> 
+>> Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org> writes:
+>> 
+>> > On Wed, Feb 22, 2017 at 07:55:24AM +0100, Heiner Kallweit wrote:
+>> >> Expose clock CLKID_RNG0 which is needed for the HW random number generator.
+>> >> 
+>> >> Signed-off-by: Heiner Kallweit <hkallweit1-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>> >
+>> > All patches applied.  Thanks.
+>> 
+>> Actually, can you just apply [PATCH 4/4] to your tree?
+>> 
+>> The clock and DT patches need to go through their respective trees or
+>> will otherwise have conflicts with other things going in via those
+>> trees.
+>
+> It's too late now.  Please speak up sooner next time.  These
+> patches were posted a month ago.
+
+Sorry, I didn't realize you would be applying everything.  Also, I'm not
+the original author, just the platform maintainer that noticed it and
+now has to deal with the conflicts. :(
+
+Most other driver maintainers are only applying patches that directly
+apply to their subsystem and leave patches to other drivers (e.g. clk) and
+platform-specific stuff (e.g. DT) to go in via their proper trees, so
+that's what I was expecting to happen here too.
+
+Kevin
+
+
+
+
+
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
