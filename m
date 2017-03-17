@@ -1,176 +1,162 @@
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Subject: [PATCH 4/4] crypto: s5p-sss - Use mutex instead of spinlock
-Date: Fri, 17 Mar 2017 16:49:22 +0200
-Message-ID: <20170317144922.27379-5-krzk@kernel.org>
-References: <20170317144922.27379-1-krzk@kernel.org>
-Cc: Nathan Royce <nroycea+kernel@gmail.com>,
-        Krzysztof Kozlowski <krzk@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Vladimir Zapolskiy <vz@mleia.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170317144922.27379-1-krzk@kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: [RFC PATCH v2 08/32] x86: Use PAGE_KERNEL protection for ioremap
+ of memory page
+Date: Fri, 17 Mar 2017 09:55:55 -0500
+Message-ID: <bca182ee-a881-6290-9b94-fceabe20306f@amd.com>
+References: <148846752022.2349.13667498174822419498.stgit@brijesh-build-machine>
+ <148846761276.2349.4899767672892365544.stgit@brijesh-build-machine>
+ <20170307145954.l2fqy5s5h65wbtyz@pd.tnic>
+ <413f12e9-818a-745d-374b-3dbc439e972c@amd.com>
+ <0a7de265-1352-6327-ef3a-4287bfca732d@amd.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: 7bit
+Cc: linux-efi@vger.kernel.org, kvm@vger.kernel.org, rkrcmar@redhat.com,
+ matt@codeblueprint.co.uk, linux-pci@vger.kernel.org, linus.walleij@linaro.org,
+ gary.hook@amd.com, linux-mm@kvack.org, hpa@zytor.com, cl@linux.com,
+ tglx@linutronix.de, aarcange@redhat.com, sfr@canb.auug.org.au,
+ mchehab@kernel.org, simon.guinot@sequanux.org, bhe@redhat.com,
+ xemul@parallels.com, joro@8bytes.org, x86@kernel.org, peterz@infradead.org,
+ piotr.luc@intel.com, mingo@redhat.com, msalter@redhat.com,
+ ross.zwisler@linux.intel.com, labbott@fedoraproject.org, dyoung@redhat.com,
+ jroedel@suse.de, keescook@chromium.org, arnd@arndb.de, toshi.kani@hpe.com,
+ mathieu.desnoyers@efficios.com, luto@kernel.org, pbonzini@redhat.com,
+ bhelgaas@google.com, dan.j.williams@intel.com,
+ andriy.shevchenko@linux.intel.com, akpm@linux-foundation.org,
+ herbert@gondor.apana.org.au, tony.luck@intel.com, paul.gortmaker@windriver.com
+To: Borislav Petkov <bp@suse.de>, Brijesh Singh <brijesh.singh@amd.com>
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+In-Reply-To: <0a7de265-1352-6327-ef3a-4287bfca732d@amd.com>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-Driver uses threaded interrupt handler so there is no real need for
-using spinlocks for synchronization.  Mutexes would do fine and are
-friendlier for overall system preemptivness and real-time behavior.
+On 3/17/2017 9:32 AM, Tom Lendacky wrote:
+> On 3/16/2017 3:04 PM, Tom Lendacky wrote:
+>> On 3/7/2017 8:59 AM, Borislav Petkov wrote:
+>>> On Thu, Mar 02, 2017 at 10:13:32AM -0500, Brijesh Singh wrote:
+>>>> From: Tom Lendacky <thomas.lendacky@amd.com>
+>>>>
+>>>> In order for memory pages to be properly mapped when SEV is active, we
+>>>> need to use the PAGE_KERNEL protection attribute as the base
+>>>> protection.
+>>>> This will insure that memory mapping of, e.g. ACPI tables, receives the
+>>>> proper mapping attributes.
+>>>>
+>>>> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+>>>> ---
+>>>
+>>>> diff --git a/arch/x86/mm/ioremap.c b/arch/x86/mm/ioremap.c
+>>>> index c400ab5..481c999 100644
+>>>> --- a/arch/x86/mm/ioremap.c
+>>>> +++ b/arch/x86/mm/ioremap.c
+>>>> @@ -151,7 +151,15 @@ static void __iomem
+>>>> *__ioremap_caller(resource_size_t phys_addr,
+>>>>                 pcm = new_pcm;
+>>>>         }
+>>>>
+>>>> +       /*
+>>>> +        * If the page being mapped is in memory and SEV is active then
+>>>> +        * make sure the memory encryption attribute is enabled in the
+>>>> +        * resulting mapping.
+>>>> +        */
+>>>>         prot = PAGE_KERNEL_IO;
+>>>> +       if (sev_active() && page_is_mem(pfn))
+>>>
+>>> Hmm, a resource tree walk per ioremap call. This could get expensive for
+>>> ioremap-heavy workloads.
+>>>
+>>> __ioremap_caller() gets called here during boot 55 times so not a whole
+>>> lot but I wouldn't be surprised if there were some nasty use cases which
+>>> ioremap a lot.
+>>>
+>>> ...
+>>>
+>>>> diff --git a/kernel/resource.c b/kernel/resource.c
+>>>> index 9b5f044..db56ba3 100644
+>>>> --- a/kernel/resource.c
+>>>> +++ b/kernel/resource.c
+>>>> @@ -518,6 +518,46 @@ int __weak page_is_ram(unsigned long pfn)
+>>>>  }
+>>>>  EXPORT_SYMBOL_GPL(page_is_ram);
+>>>>
+>>>> +/*
+>>>> + * This function returns true if the target memory is marked as
+>>>> + * IORESOURCE_MEM and IORESOUCE_BUSY and described as other than
+>>>> + * IORES_DESC_NONE (e.g. IORES_DESC_ACPI_TABLES).
+>>>> + */
+>>>> +static int walk_mem_range(unsigned long start_pfn, unsigned long
+>>>> nr_pages)
+>>>> +{
+>>>> +    struct resource res;
+>>>> +    unsigned long pfn, end_pfn;
+>>>> +    u64 orig_end;
+>>>> +    int ret = -1;
+>>>> +
+>>>> +    res.start = (u64) start_pfn << PAGE_SHIFT;
+>>>> +    res.end = ((u64)(start_pfn + nr_pages) << PAGE_SHIFT) - 1;
+>>>> +    res.flags = IORESOURCE_MEM | IORESOURCE_BUSY;
+>>>> +    orig_end = res.end;
+>>>> +    while ((res.start < res.end) &&
+>>>> +        (find_next_iomem_res(&res, IORES_DESC_NONE, true) >= 0)) {
+>>>> +        pfn = (res.start + PAGE_SIZE - 1) >> PAGE_SHIFT;
+>>>> +        end_pfn = (res.end + 1) >> PAGE_SHIFT;
+>>>> +        if (end_pfn > pfn)
+>>>> +            ret = (res.desc != IORES_DESC_NONE) ? 1 : 0;
+>>>> +        if (ret)
+>>>> +            break;
+>>>> +        res.start = res.end + 1;
+>>>> +        res.end = orig_end;
+>>>> +    }
+>>>> +    return ret;
+>>>> +}
+>>>
+>>> So the relevant difference between this one and walk_system_ram_range()
+>>> is this:
+>>>
+>>> -            ret = (*func)(pfn, end_pfn - pfn, arg);
+>>> +            ret = (res.desc != IORES_DESC_NONE) ? 1 : 0;
+>>>
+>>> so it seems to me you can have your own *func() pointer which does that
+>>> IORES_DESC_NONE comparison. And then you can define your own workhorse
+>>> __walk_memory_range() which gets called by both walk_mem_range() and
+>>> walk_system_ram_range() instead of almost duplicating them.
+>>>
+>>> And looking at walk_system_ram_res(), that one looks similar too except
+>>> the pfn computation. But AFAICT the pfn/end_pfn things are computed from
+>>> res.start and res.end so it looks to me like all those three functions
+>>> are crying for unification...
+>>
+>> I'll take a look at what it takes to consolidate these with a pre-patch.
+>> Then I'll add the new support.
+>
+> It looks pretty straight forward to combine walk_iomem_res_desc() and
+> walk_system_ram_res(). The walk_system_ram_range() function would fit
+> easily into this, also, except for the fact that the callback function
+> takes unsigned longs vs the u64s of the other functions.  Is it worth
+> modifying all of the callers of walk_system_ram_range() (which are only
+> about 8 locations) to change the callback functions to accept u64s in
+> order to consolidate the walk_system_ram_range() function, too?
 
-Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
----
- drivers/crypto/s5p-sss.c | 35 ++++++++++++++++-------------------
- 1 file changed, 16 insertions(+), 19 deletions(-)
+The more I dig, the more I find that the changes keep expanding. I'll
+leave walk_system_ram_range() out of the consolidation for now.
 
-diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
-index 7ac657f46d15..1893cf5dedc0 100644
---- a/drivers/crypto/s5p-sss.c
-+++ b/drivers/crypto/s5p-sss.c
-@@ -21,6 +21,7 @@
- #include <linux/io.h>
- #include <linux/kernel.h>
- #include <linux/module.h>
-+#include <linux/mutex.h>
- #include <linux/of.h>
- #include <linux/platform_device.h>
- #include <linux/scatterlist.h>
-@@ -214,7 +215,7 @@ struct s5p_aes_dev {
- 	struct tasklet_struct		tasklet;
- 	struct crypto_queue		queue;
- 	bool				busy;
--	spinlock_t			lock;
-+	struct mutex			lock;
- };
- 
- static struct s5p_aes_dev *s5p_dev;
-@@ -443,11 +444,10 @@ static irqreturn_t s5p_aes_interrupt(int irq, void *dev_id)
- 	int err_dma_tx = 0;
- 	int err_dma_rx = 0;
- 	bool tx_end = false;
--	unsigned long flags;
- 	uint32_t status;
- 	int err;
- 
--	spin_lock_irqsave(&dev->lock, flags);
-+	mutex_lock(&dev->lock);
- 
- 	/*
- 	 * Handle rx or tx interrupt. If there is still data (scatterlist did not
-@@ -481,7 +481,7 @@ static irqreturn_t s5p_aes_interrupt(int irq, void *dev_id)
- 	if (tx_end) {
- 		s5p_sg_done(dev);
- 
--		spin_unlock_irqrestore(&dev->lock, flags);
-+		mutex_unlock(&dev->lock);
- 
- 		s5p_aes_complete(dev, 0);
- 		/* Device is still busy */
-@@ -498,7 +498,7 @@ static irqreturn_t s5p_aes_interrupt(int irq, void *dev_id)
- 		if (err_dma_rx == 1)
- 			s5p_set_dma_indata(dev, dev->sg_src);
- 
--		spin_unlock_irqrestore(&dev->lock, flags);
-+		mutex_unlock(&dev->lock);
- 	}
- 
- 	return IRQ_HANDLED;
-@@ -506,7 +506,7 @@ static irqreturn_t s5p_aes_interrupt(int irq, void *dev_id)
- error:
- 	s5p_sg_done(dev);
- 	dev->busy = false;
--	spin_unlock_irqrestore(&dev->lock, flags);
-+	mutex_unlock(&dev->lock);
- 	s5p_aes_complete(dev, err);
- 
- 	return IRQ_HANDLED;
-@@ -599,7 +599,6 @@ static void s5p_aes_crypt_start(struct s5p_aes_dev *dev, unsigned long mode)
- {
- 	struct ablkcipher_request *req = dev->req;
- 	uint32_t aes_control;
--	unsigned long flags;
- 	int err;
- 
- 	aes_control = SSS_AES_KEY_CHANGE_MODE;
-@@ -625,7 +624,7 @@ static void s5p_aes_crypt_start(struct s5p_aes_dev *dev, unsigned long mode)
- 		    |  SSS_AES_BYTESWAP_KEY
- 		    |  SSS_AES_BYTESWAP_CNT;
- 
--	spin_lock_irqsave(&dev->lock, flags);
-+	mutex_lock(&dev->lock);
- 
- 	SSS_WRITE(dev, FCINTENCLR,
- 		  SSS_FCINTENCLR_BTDMAINTENCLR | SSS_FCINTENCLR_BRDMAINTENCLR);
-@@ -648,7 +647,7 @@ static void s5p_aes_crypt_start(struct s5p_aes_dev *dev, unsigned long mode)
- 	SSS_WRITE(dev, FCINTENSET,
- 		  SSS_FCINTENSET_BTDMAINTENSET | SSS_FCINTENSET_BRDMAINTENSET);
- 
--	spin_unlock_irqrestore(&dev->lock, flags);
-+	mutex_unlock(&dev->lock);
- 
- 	return;
- 
-@@ -658,7 +657,7 @@ static void s5p_aes_crypt_start(struct s5p_aes_dev *dev, unsigned long mode)
- indata_error:
- 	s5p_sg_done(dev);
- 	dev->busy = false;
--	spin_unlock_irqrestore(&dev->lock, flags);
-+	mutex_unlock(&dev->lock);
- 	s5p_aes_complete(dev, err);
- }
- 
-@@ -667,18 +666,17 @@ static void s5p_tasklet_cb(unsigned long data)
- 	struct s5p_aes_dev *dev = (struct s5p_aes_dev *)data;
- 	struct crypto_async_request *async_req, *backlog;
- 	struct s5p_aes_reqctx *reqctx;
--	unsigned long flags;
- 
--	spin_lock_irqsave(&dev->lock, flags);
-+	mutex_lock(&dev->lock);
- 	backlog   = crypto_get_backlog(&dev->queue);
- 	async_req = crypto_dequeue_request(&dev->queue);
- 
- 	if (!async_req) {
- 		dev->busy = false;
--		spin_unlock_irqrestore(&dev->lock, flags);
-+		mutex_unlock(&dev->lock);
- 		return;
- 	}
--	spin_unlock_irqrestore(&dev->lock, flags);
-+	mutex_unlock(&dev->lock);
- 
- 	if (backlog)
- 		backlog->complete(backlog, -EINPROGRESS);
-@@ -693,18 +691,17 @@ static void s5p_tasklet_cb(unsigned long data)
- static int s5p_aes_handle_req(struct s5p_aes_dev *dev,
- 			      struct ablkcipher_request *req)
- {
--	unsigned long flags;
- 	int err;
- 
--	spin_lock_irqsave(&dev->lock, flags);
-+	mutex_lock(&dev->lock);
- 	err = ablkcipher_enqueue_request(&dev->queue, req);
- 	if (dev->busy) {
--		spin_unlock_irqrestore(&dev->lock, flags);
-+		mutex_unlock(&dev->lock);
- 		goto exit;
- 	}
- 	dev->busy = true;
- 
--	spin_unlock_irqrestore(&dev->lock, flags);
-+	mutex_unlock(&dev->lock);
- 
- 	tasklet_schedule(&dev->tasklet);
- 
-@@ -856,7 +853,7 @@ static int s5p_aes_probe(struct platform_device *pdev)
- 		return err;
- 	}
- 
--	spin_lock_init(&pdata->lock);
-+	mutex_init(&pdata->lock);
- 
- 	pdata->aes_ioaddr = pdata->ioaddr + variant->aes_offset;
- 
--- 
-2.9.3
+Thanks,
+Tom
+
+>
+> Thanks,
+> Tom
+>
+>>
+>> Thanks,
+>> Tom
+>>
+>>>
