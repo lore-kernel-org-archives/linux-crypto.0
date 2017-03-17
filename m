@@ -1,7 +1,7 @@
 From: Michael Davidson <md@google.com>
-Subject: [PATCH 5/7] x86, boot, LLVM: Use regparm=0 for memcpy and memset
-Date: Thu, 16 Mar 2017 17:15:18 -0700
-Message-ID: <20170317001520.85223-6-md@google.com>
+Subject: [PATCH 2/7] Makefile, x86, LLVM: disable unsupported optimization flags
+Date: Thu, 16 Mar 2017 17:15:15 -0700
+Message-ID: <20170317001520.85223-3-md@google.com>
 References: <20170317001520.85223-1-md@google.com>
 Cc: Alexander Potapenko <glider@google.com>,
         Dmitry Vyukov <dvyukov@google.com>,
@@ -21,95 +21,48 @@ In-Reply-To: <20170317001520.85223-1-md@google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Use the standard regparm=0 calling convention for memcpy and
-memset when building with clang.
-
-This is a work around for a long standing clang bug
-(see https://llvm.org/bugs/show_bug.cgi?id=3997) where
-clang always uses the standard regparm=0 calling convention
-for any implcit calls to memcpy and memset that it generates
-(eg for structure assignments and initialization) even if an
-alternate calling convention such as regparm=3 has been specified.
+Unfortunately, while clang generates a warning about these flags
+being unsupported it still exits with a status of 0 so we have
+to explicitly disable them instead of just using a cc-option check.
 
 Signed-off-by: Michael Davidson <md@google.com>
 ---
- arch/x86/boot/copy.S   | 15 +++++++++++++--
- arch/x86/boot/string.h | 13 +++++++++++++
- 2 files changed, 26 insertions(+), 2 deletions(-)
+ Makefile          | 2 ++
+ arch/x86/Makefile | 2 ++
+ 2 files changed, 4 insertions(+)
 
-diff --git a/arch/x86/boot/copy.S b/arch/x86/boot/copy.S
-index 1eb7d298b47d..57142d1ad0d2 100644
---- a/arch/x86/boot/copy.S
-+++ b/arch/x86/boot/copy.S
-@@ -18,6 +18,12 @@
- 	.text
+diff --git a/Makefile b/Makefile
+index b21fd0ca2946..5e97e5fc1eea 100644
+--- a/Makefile
++++ b/Makefile
+@@ -629,7 +629,9 @@ ARCH_AFLAGS :=
+ ARCH_CFLAGS :=
+ include arch/$(SRCARCH)/Makefile
  
- GLOBAL(memcpy)
-+#ifdef	__clang__	/* Use normal ABI calling conventions */
-+	movw	4(%esp), %ax
-+	movw	8(%esp), %dx
-+	movw	12(%esp), %cx
-+#endif
-+_memcpy:
- 	pushw	%si
- 	pushw	%di
- 	movw	%ax, %di
-@@ -34,6 +40,11 @@ GLOBAL(memcpy)
- ENDPROC(memcpy)
++ifneq ($(cc-name),clang)
+ KBUILD_CFLAGS	+= $(call cc-option,-fno-delete-null-pointer-checks,)
++endif
+ KBUILD_CFLAGS	+= $(call cc-disable-warning,frame-address,)
  
- GLOBAL(memset)
-+#ifdef	__clang__	/* Use normal ABI calling conventions */
-+	movw	4(%esp), %ax
-+	movw	8(%esp), %dx
-+	movw	12(%esp), %cx
-+#endif
- 	pushw	%di
- 	movw	%ax, %di
- 	movzbl	%dl, %eax
-@@ -52,7 +63,7 @@ GLOBAL(copy_from_fs)
- 	pushw	%ds
- 	pushw	%fs
- 	popw	%ds
--	calll	memcpy
-+	calll	_memcpy
- 	popw	%ds
- 	retl
- ENDPROC(copy_from_fs)
-@@ -61,7 +72,7 @@ GLOBAL(copy_to_fs)
- 	pushw	%es
- 	pushw	%fs
- 	popw	%es
--	calll	memcpy
-+	calll	_memcpy
- 	popw	%es
- 	retl
- ENDPROC(copy_to_fs)
-diff --git a/arch/x86/boot/string.h b/arch/x86/boot/string.h
-index 113588ddb43f..e735cccb3fc8 100644
---- a/arch/x86/boot/string.h
-+++ b/arch/x86/boot/string.h
-@@ -6,8 +6,21 @@
- #undef memset
- #undef memcmp
+ ifdef CONFIG_LD_DEAD_CODE_DATA_ELIMINATION
+diff --git a/arch/x86/Makefile b/arch/x86/Makefile
+index 2d449337a360..894a8d18bf97 100644
+--- a/arch/x86/Makefile
++++ b/arch/x86/Makefile
+@@ -87,11 +87,13 @@ else
+         KBUILD_AFLAGS += -m64
+         KBUILD_CFLAGS += -m64
  
-+/*
-+ * Use normal ABI calling conventions - i.e. regparm(0) -
-+ * for memcpy() and memset() if we are building the real
-+ * mode setup code with clang since clang may make implicit
-+ * calls to these functions that assume regparm(0).
-+ */
-+#if defined(_SETUP) && defined(__clang__)
-+void __attribute__((regparm(0))) *memcpy(void *dst, const void *src,
-+					 size_t len);
-+void __attribute__((regparm(0))) *memset(void *dst, int c, size_t len);
-+#else
- void *memcpy(void *dst, const void *src, size_t len);
- void *memset(void *dst, int c, size_t len);
-+#endif
-+
- int memcmp(const void *s1, const void *s2, size_t len);
++ifneq ($(cc-name),clang)
+         # Align jump targets to 1 byte, not the default 16 bytes:
+         KBUILD_CFLAGS += -falign-jumps=1
  
- /*
+         # Pack loops tightly as well:
+         KBUILD_CFLAGS += -falign-loops=1
++endif
+ 
+         # Don't autogenerate traditional x87 instructions
+         KBUILD_CFLAGS += $(call cc-option,-mno-80387)
 -- 
 2.12.0.367.g23dc2f6d3c-goog
 
