@@ -1,7 +1,7 @@
 From: Michael Davidson <md@google.com>
-Subject: [PATCH 7/7] crypto, x86, LLVM: aesni - fix token pasting
-Date: Thu, 16 Mar 2017 17:15:20 -0700
-Message-ID: <20170317001520.85223-8-md@google.com>
+Subject: [PATCH 4/7] x86, boot, LLVM: #undef memcpy etc in string.c
+Date: Thu, 16 Mar 2017 17:15:17 -0700
+Message-ID: <20170317001520.85223-5-md@google.com>
 References: <20170317001520.85223-1-md@google.com>
 Cc: Alexander Potapenko <glider@google.com>,
         Dmitry Vyukov <dvyukov@google.com>,
@@ -16,71 +16,45 @@ To: Michal Marek <mmarek@suse.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         Shaohua Li <shli@kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f178.google.com ([209.85.192.178]:34368 "EHLO
-        mail-pf0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754064AbdCQAXO (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Mar 2017 20:23:14 -0400
-Received: by mail-pf0-f178.google.com with SMTP id p189so8483712pfp.1
-        for <linux-crypto@vger.kernel.org>; Thu, 16 Mar 2017 17:23:13 -0700 (PDT)
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20170317001520.85223-1-md@google.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-aes_ctrby8_avx-x86_64.S uses the C preprocessor for token pasting
-of character sequences that are not valid preprocessor tokens.
-While this is allowed when preprocessing assembler files it exposes
-an incompatibilty between the clang and gcc preprocessors where
-clang does not strip leading white space from macro parameters,
-leading to the CONCAT(%xmm, i) macro expansion on line 96 resulting
-in a token with a space character embedded in it.
+undef memcpy and friends in boot/string.c so that the functions
+defined here will have the correct names, otherwise we end up
+up trying to redefine __builtin_memcpy etc.
+Surprisingly, gcc allows this (and, helpfully, discards the
+__builtin_ prefix from the function name when compiling it),
+but clang does not.
 
-While this could be fixed by deleting the offending space character,
-the assembler is perfectly capable of handling the token pasting
-correctly for itself so it seems preferable to let it do so and to
-get rid or the CONCAT(), DDQ() and XMM() preprocessor macros.
+Adding these #undef's appears to preserve what I assume was
+the original intent of the code.
 
 Signed-off-by: Michael Davidson <md@google.com>
 ---
- arch/x86/crypto/aes_ctrby8_avx-x86_64.S | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ arch/x86/boot/string.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/arch/x86/crypto/aes_ctrby8_avx-x86_64.S b/arch/x86/crypto/aes_ctrby8_avx-x86_64.S
-index a916c4a61165..5f6a5af9c489 100644
---- a/arch/x86/crypto/aes_ctrby8_avx-x86_64.S
-+++ b/arch/x86/crypto/aes_ctrby8_avx-x86_64.S
-@@ -65,7 +65,6 @@
- #include <linux/linkage.h>
- #include <asm/inst.h>
+diff --git a/arch/x86/boot/string.c b/arch/x86/boot/string.c
+index 5457b02fc050..b40266850869 100644
+--- a/arch/x86/boot/string.c
++++ b/arch/x86/boot/string.c
+@@ -16,6 +16,15 @@
+ #include "ctype.h"
+ #include "string.h"
  
--#define CONCAT(a,b)	a##b
- #define VMOVDQ		vmovdqu
- 
- #define xdata0		%xmm0
-@@ -92,8 +91,6 @@
- #define num_bytes	%r8
- 
- #define tmp		%r10
--#define	DDQ(i)		CONCAT(ddq_add_,i)
--#define	XMM(i)		CONCAT(%xmm, i)
- #define	DDQ_DATA	0
- #define	XDATA		1
- #define KEY_128		1
-@@ -131,12 +128,12 @@ ddq_add_8:
- /* generate a unique variable for ddq_add_x */
- 
- .macro setddq n
--	var_ddq_add = DDQ(\n)
-+	var_ddq_add = ddq_add_\n
- .endm
- 
- /* generate a unique variable for xmm register */
- .macro setxdata n
--	var_xdata = XMM(\n)
-+	var_xdata = %xmm\n
- .endm
- 
- /* club the numeric 'id' to the symbol 'name' */
++/*
++ * Undef these macros so that the functions that we provide
++ * here will have the correct names regardless of how string.h
++ * may have chosen to #define them.
++ */
++#undef memcpy
++#undef memset
++#undef memcmp
++
+ int memcmp(const void *s1, const void *s2, size_t len)
+ {
+ 	bool diff;
 -- 
 2.12.0.367.g23dc2f6d3c-goog
