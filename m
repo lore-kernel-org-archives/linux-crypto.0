@@ -1,66 +1,55 @@
-From: Kevin Hilman <khilman-rdvid1DuHRBWk0Htik3J/w@public.gmane.org>
-Subject: Re: [PATCH v3 1/3] clk: meson-gxbb: expose clock CLKID_RNG0
-Date: Fri, 17 Mar 2017 16:05:26 -0700
-Message-ID: <m2zigj5wsp.fsf@baylibre.com>
-References: <4e2d12e5-f75b-3ac6-a3f7-18e8a8b7283b@gmail.com>
-        <20170316100743.GA12137@gondor.apana.org.au>
-        <m2mvcl6pwg.fsf@baylibre.com>
-        <20170317083032.GA18512@gondor.apana.org.au>
+From: hpa@zytor.com
+Subject: Re: [PATCH 3/7] x86, LLVM: suppress clang warnings about unaligned accesses
+Date: Fri, 17 Mar 2017 16:50:19 -0700
+Message-ID: <FB827022-C732-432A-8F31-734C88EBF7A4@zytor.com>
+References: <20170317001520.85223-1-md@google.com> <20170317001520.85223-4-md@google.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Heiner Kallweit <hkallweit1-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        Jerome Brunet <jbrunet-rdvid1DuHRBWk0Htik3J/w@public.gmane.org>,
-        Neil Armstrong <narmstrong-rdvid1DuHRBWk0Htik3J/w@public.gmane.org>,
-        linux-amlogic-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        Stephen Boyd <sboyd-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>,
-        Michael Turquette <mturquette-rdvid1DuHRBWk0Htik3J/w@public.gmane.org>,
-        linux-clk-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170317083032.GA18512-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org> (Herbert Xu's
-        message of "Fri, 17 Mar 2017 16:30:32 +0800")
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 8BIT
+Cc: Alexander Potapenko <glider@google.com>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Matthias Kaehlcke <mka@chromium.org>, x86@kernel.org,
+        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-raid@vger.kernel.org
+To: Michael Davidson <md@google.com>, Michal Marek <mmarek@suse.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Shaohua Li <shli@kernel.org>
+Return-path: <linux-kbuild-owner@vger.kernel.org>
+In-Reply-To: <20170317001520.85223-4-md@google.com>
+Sender: linux-kbuild-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org> writes:
-
-> On Thu, Mar 16, 2017 at 11:24:31AM -0700, Kevin Hilman wrote:
->> Hi Herbert,
->> 
->> Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org> writes:
->> 
->> > On Wed, Feb 22, 2017 at 07:55:24AM +0100, Heiner Kallweit wrote:
->> >> Expose clock CLKID_RNG0 which is needed for the HW random number generator.
->> >> 
->> >> Signed-off-by: Heiner Kallweit <hkallweit1-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->> >
->> > All patches applied.  Thanks.
->> 
->> Actually, can you just apply [PATCH 4/4] to your tree?
->> 
->> The clock and DT patches need to go through their respective trees or
->> will otherwise have conflicts with other things going in via those
->> trees.
+On March 16, 2017 5:15:16 PM PDT, Michael Davidson <md@google.com> wrote:
+>Suppress clang warnings about potential unaliged accesses
+>to members in packed structs. This gets rid of almost 10,000
+>warnings about accesses to the ring 0 stack pointer in the TSS.
 >
-> It's too late now.  Please speak up sooner next time.  These
-> patches were posted a month ago.
+>Signed-off-by: Michael Davidson <md@google.com>
+>---
+> arch/x86/Makefile | 5 +++++
+> 1 file changed, 5 insertions(+)
+>
+>diff --git a/arch/x86/Makefile b/arch/x86/Makefile
+>index 894a8d18bf97..7f21703c475d 100644
+>--- a/arch/x86/Makefile
+>+++ b/arch/x86/Makefile
+>@@ -128,6 +128,11 @@ endif
+>         KBUILD_CFLAGS += $(call cc-option,-maccumulate-outgoing-args)
+> endif
+> 
+>+ifeq ($(cc-name),clang)
+>+# Suppress clang warnings about potential unaligned accesses.
+>+KBUILD_CFLAGS += $(call cc-disable-warning, address-of-packed-member)
+>+endif
+>+
+> ifdef CONFIG_X86_X32
+> 	x32_ld_ok := $(call try-run,\
+> 			/bin/echo -e '1: .quad 1b' | \
 
-Sorry, I didn't realize you would be applying everything.  Also, I'm not
-the original author, just the platform maintainer that noticed it and
-now has to deal with the conflicts. :(
-
-Most other driver maintainers are only applying patches that directly
-apply to their subsystem and leave patches to other drivers (e.g. clk) and
-platform-specific stuff (e.g. DT) to go in via their proper trees, so
-that's what I was expecting to happen here too.
-
-Kevin
-
-
-
-
-
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Why conditional on clang?
+-- 
+Sent from my Android device with K-9 Mail. Please excuse my brevity.
