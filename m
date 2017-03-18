@@ -1,40 +1,36 @@
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Subject: Question - seeding the hw pseudo random number generator
-Date: Sat, 18 Mar 2017 11:25:54 +0200
-Message-ID: <20170318092554.lggkhfg5eko23o3k@kozik-lap>
+From: Jeffrey Walton <noloader@gmail.com>
+Subject: Re: [ANNOUNCE] /dev/random - a new approach (code for 4.11-rc1)
+Date: Sat, 18 Mar 2017 06:11:57 -0400
+Message-ID: <CAH8yC8=+K76rwRfYk=92sBE0v9fPEWB=2bUQqF=tyY5C1nrvKQ@mail.gmail.com>
+References: <2785457.pDyvZpZC2q@positron.chronox.de>
+Reply-To: noloader@gmail.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: linux-arm-kernel@lists.infradead.org
-To: Matt Mackall <mpm@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- linux-crypto@vger.kernel.org
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Content-Type: text/plain; charset=UTF-8
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
+To: =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <2785457.pDyvZpZC2q@positron.chronox.de>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi,
+> The design and implementation is driven by a set of goals described in [2]
+> that the LRNG completely implements. Furthermore, [2] includes a
+> comparison with RNG design suggestions such as SP800-90B, SP800-90C, and
+> AIS20/31.
 
-I looked at Exynos Pseudo Random Nubmer Generator driver
-(drivers/char/hw_random/exynos-rng.c) and noticed that it always seeds
-the device with jiffies.  Then I looked at few other drivers and found
-that they do not seed themself (or at least I couldn't find this).
+A quick comment about SP800 and the hardware instructions... RDSEED is
+2 to 5 times slower than RDRAND on Intel hardware, depending on the
+architecture and microarchitecture. AMD's implementation of RDRAND is
+orders of magnitude slower than Intel's. Testing on an Athlon 845 X4
+(Bulldozer v4) @ 3.5 GHz shows it runs between 4100 and 4500 cycles
+per byte. It works out to be about 1 MiB/s.
 
-I think the hw_random API does not provide generic infrastructure for
-seeding.
+While the LRNG may reach a cryptographically acceptable seed level
+much earlier then the existing /dev/random, it may not be early
+enough. Some components, like systemd, will ask for random numbers and
+truck-on even if they are not available. Systemd does not block or
+wait if get_random_bytes fails to produce. In the bigger picture,
+don't expect that software layered above will do the expected thing in
+all cases.
 
-What is the preferred approach for seeding a PRNG device? Use jiffies or
-a fixed value?
-
-Or maybe the interface should be abandoned in favor of crypto API?
-
-Best regards,
-Krzysztof
+Jeff
