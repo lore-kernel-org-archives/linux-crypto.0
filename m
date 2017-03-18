@@ -1,54 +1,87 @@
-From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: Re: [PATCH] crypto: zip - Memory corruption in zip_clear_stats()
-Date: Sat, 18 Mar 2017 13:59:27 +0300
-Message-ID: <20170318105927.GA4343@mwanda>
-References: <20170317204621.GD16505@mwanda>
- <58CD0AE2.3070006@bfs.de>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: Re: [ANNOUNCE] /dev/random - a new approach (code for 4.11-rc1)
+Date: Sat, 18 Mar 2017 14:31:38 +0100
+Message-ID: <4792500.irvFnm0WRl@positron.chronox.de>
+References: <2785457.pDyvZpZC2q@positron.chronox.de> <CAH8yC8=+K76rwRfYk=92sBE0v9fPEWB=2bUQqF=tyY5C1nrvKQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Mahipal Challa <mahipalreddy2006@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jan Glauber <jglauber@cavium.com>,
-        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
-To: walter harms <wharms@bfs.de>
-Return-path: <kernel-janitors-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <58CD0AE2.3070006@bfs.de>
-Sender: kernel-janitors-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8BIT
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
+To: noloader@gmail.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:58104 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751134AbdCRNbp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 18 Mar 2017 09:31:45 -0400
+In-Reply-To: <CAH8yC8=+K76rwRfYk=92sBE0v9fPEWB=2bUQqF=tyY5C1nrvKQ@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Mar 18, 2017 at 11:24:34AM +0100, walter harms wrote:
-> 
-> 
-> Am 17.03.2017 21:46, schrieb Dan Carpenter:
-> > There is a typo here.  It should be "stats" instead of "state".  The
-> > impact is that we clear 224 bytes instead of 80 and we zero out memory
-> > that we shouldn't.
-> > 
-> > Fixes: 09ae5d37e093 ("crypto: zip - Add Compression/Decompression statistics")
-> > Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
-> > 
-> > diff --git a/drivers/crypto/cavium/zip/zip_main.c b/drivers/crypto/cavium/zip/zip_main.c
-> > index 0951e20b395b..6ff13d80d82e 100644
-> > --- a/drivers/crypto/cavium/zip/zip_main.c
-> > +++ b/drivers/crypto/cavium/zip/zip_main.c
-> > @@ -530,7 +530,7 @@ static int zip_clear_stats(struct seq_file *s, void *unused)
-> >  	for (index = 0; index < MAX_ZIP_DEVICES; index++) {
-> >  		if (zip_dev[index]) {
-> >  			memset(&zip_dev[index]->stats, 0,
-> > -			       sizeof(struct zip_state));
-> > +			       sizeof(struct zip_stats));
-> 
-> 
-> as future FIXME some show find a name that differ in more than just the last char.
-> NTL maybe
->  sizeof(zip_dev[index]->stats)
-> can be used here ?
+Am Samstag, 18. März 2017, 11:11:57 CET schrieb Jeffrey Walton:
 
-That's sort of unweildy.  I don't fear that change because I'm confident
-I would catch it with static analysis.
+Hi Jeffrey,
 
-regards,
-dan carpenter
+> > The design and implementation is driven by a set of goals described in [2]
+> > that the LRNG completely implements. Furthermore, [2] includes a
+> > comparison with RNG design suggestions such as SP800-90B, SP800-90C, and
+> > AIS20/31.
+> 
+> A quick comment about SP800 and the hardware instructions... RDSEED is
+> 2 to 5 times slower than RDRAND on Intel hardware, depending on the
+> architecture and microarchitecture.
 
+I am not sure how this statement relates to the quote above. RDSEED is the 
+CBC-MACed output of the flip-flop providing the raw noise.
+
+RDRAND is the output of the SP800-90A CTR DRBG that is seeded by the CBC-MAC 
+that also feeds RDSEED. Thus, RDSEED is as fast as the noise source where 
+RDRAND is a pure deterministic RNG that tries to be (re)seeded as often as 
+possible.
+
+Both instructions are totally unrelated to the SP800-90A DRBG available to the 
+Linux kernel.
+
+> AMD's implementation of RDRAND is
+> orders of magnitude slower than Intel's. Testing on an Athlon 845 X4
+> (Bulldozer v4) @ 3.5 GHz shows it runs between 4100 and 4500 cycles
+> per byte. It works out to be about 1 MiB/s.
+
+Please consider my speed measurements given in [1] section 3.4.6. The DRBG is 
+just slightly slower than the ChaCha20 on small block sizes and twice as fast 
+on larger block sizes using AES-NI on x86. As the DRBG implementation has no 
+relationship to the RDRAND DRBG, I am not sure about your argument.
+
+When I refer to hardware instructions and SP800-90A, I consider the SP800-90A 
+DRBG implementation in crypto/drbg.c provided with the kernel crypto API which 
+uses the raw AES/SHA cipher implementation provided by the kernel crypto API. 
+Here, the implementation uses the fastest one, such as the AES-NI raw AES 
+implementation on x86. Or it uses the ARM NEON SHA implementation for the 
+HMAC/Hash DRBG.
+> 
+> While the LRNG may reach a cryptographically acceptable seed level
+> much earlier then the existing /dev/random, it may not be early
+> enough.
+
+The LRNG will initialize as a DRBG during late_initcall. Thus, the DRBG is 
+always present if user space calls.
+
+However, during kernel boot, there is of course a need for earlier randomness. 
+This is covered by the init DRNG documented in [1] section 2.10.
+
+> Some components, like systemd, will ask for random numbers and
+> truck-on even if they are not available. Systemd does not block or
+> wait if get_random_bytes fails to produce. In the bigger picture,
+> don't expect that software layered above will do the expected thing in
+> all cases.
+
+The LRNG works as a full ABI and API replacement for the current /dev/random 
+implementation. I run it on my servers. It delivers random data for all use 
+cases, during early kernel and user space boot as well as during runtime.
+
+[1] http://www.chronox.de/lrng/doc/lrng.pdf
+> 
+> Jeff
+
+
+Ciao
+Stephan
