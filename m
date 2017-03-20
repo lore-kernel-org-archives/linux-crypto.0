@@ -1,60 +1,76 @@
-From: Mahipal Reddy <mahipalreddy2006@gmail.com>
-Subject: Re: [PATCH] crypto: zip - Memory corruption in zip_clear_stats()
-Date: Mon, 20 Mar 2017 19:52:21 +0530
-Message-ID: <CALyTkE_msYfR72Sjs_2x92SjzrppHdOXNft0j9eVcDjz17SW=w@mail.gmail.com>
-References: <20170317204621.GD16505@mwanda> <58CD0AE2.3070006@bfs.de> <20170318105927.GA4343@mwanda>
+From: Binoy Jayan <binoy.jayan@linaro.org>
+Subject: Re: [RFC PATCH v4] IV Generation algorithms for dm-crypt
+Date: Mon, 20 Mar 2017 20:08:19 +0530
+Message-ID: <CAHv-k_9xv3MH8VtNnN=bZOwNnMVHie+yQz9uyd+S-=qReGXM=g@mail.gmail.com>
+References: <1486463731-6224-1-git-send-email-binoy.jayan@linaro.org>
+ <CAOtvUMcN8s886978vE6T=AE79KkZsLBnXsmhewnb5PB0UyAG3A@mail.gmail.com>
+ <CAHv-k_8rgArzV2uQ64h1ZTNRpssX1jMf=RwuPoBmsjQ0FhCsWA@mail.gmail.com>
+ <68f70534-a309-46ba-a84d-8acc1e6620e5@gmail.com> <CAOtvUMf3c0fUjABmbfMrbs0W4gyhKVZyc_tZH3rQg65zF18YMg@mail.gmail.com>
+ <b563eb97-82ba-69d2-c4c5-66bc716a7507@gmail.com> <CAOtvUMePYT7OJDKL7i0y3y6Jvqsxyx6Je6g9aGKVq6PLZ_-Z8w@mail.gmail.com>
+ <2aef6e54-805f-e09b-ae66-c198f8c05335@gmail.com> <c835926e-c2bd-8a52-34db-6c605301bc2b@gmail.com>
+ <CAOtvUMdrQA4okKhiCyVmosQ4Oc2PHO4k4wLrDz-_fCyWB1rWBw@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: walter harms <wharms@bfs.de>,
+Cc: Milan Broz <gmazyland@gmail.com>, Oded <oded.golombek@arm.com>,
+        Ofir <Ofir.Drang@arm.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Jan Glauber <jglauber@cavium.com>,
-        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
-To: Dan Carpenter <dan.carpenter@oracle.com>
-Return-path: <kernel-janitors-owner@vger.kernel.org>
-In-Reply-To: <20170318105927.GA4343@mwanda>
-Sender: kernel-janitors-owner@vger.kernel.org
+        linux-crypto@vger.kernel.org, Mark Brown <broonie@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org,
+        Rajendra <rnayak@codeaurora.org>,
+        Ondrej Mosnacek <omosnace@redhat.com>
+To: Gilad Ben-Yossef <gilad@benyossef.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <CAOtvUMdrQA4okKhiCyVmosQ4Oc2PHO4k4wLrDz-_fCyWB1rWBw@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sat, Mar 18, 2017 at 4:29 PM, Dan Carpenter <dan.carpenter@oracle.com> wrote:
-> On Sat, Mar 18, 2017 at 11:24:34AM +0100, walter harms wrote:
->>
->>
->> Am 17.03.2017 21:46, schrieb Dan Carpenter:
->> > There is a typo here.  It should be "stats" instead of "state".  The
->> > impact is that we clear 224 bytes instead of 80 and we zero out memory
->> > that we shouldn't.
-
-Thank you Dan for identifying the issue. Yes there is a typo and it needs a fix.
-
-
->> > Fixes: 09ae5d37e093 ("crypto: zip - Add Compression/Decompression statistics")
->> > Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
->> >
->> > diff --git a/drivers/crypto/cavium/zip/zip_main.c b/drivers/crypto/cavium/zip/zip_main.c
->> > index 0951e20b395b..6ff13d80d82e 100644
->> > --- a/drivers/crypto/cavium/zip/zip_main.c
->> > +++ b/drivers/crypto/cavium/zip/zip_main.c
->> > @@ -530,7 +530,7 @@ static int zip_clear_stats(struct seq_file *s, void *unused)
->> >     for (index = 0; index < MAX_ZIP_DEVICES; index++) {
->> >             if (zip_dev[index]) {
->> >                     memset(&zip_dev[index]->stats, 0,
->> > -                          sizeof(struct zip_state));
->> > +                          sizeof(struct zip_stats));
-
-Yes this resolves the issue.
-Thanks for this fix.
-Mahipal
-
->>
->> as future FIXME some show find a name that differ in more than just the last char.
->> NTL maybe
->>  sizeof(zip_dev[index]->stats)
->> can be used here ?
+On 6 March 2017 at 20:08, Gilad Ben-Yossef <gilad@benyossef.com> wrote:
 >
-> That's sort of unweildy.  I don't fear that change because I'm confident
-> I would catch it with static analysis.
+> I gave it a spin on a x86_64 with 8 CPUs with AES-NI using cryptd and
+> on Arm  using CryptoCell hardware accelerator.
 >
-> regards,
-> dan carpenter
+> There was no difference in performance between 512 and 4096 bytes
+> cluster size on the x86_64 (800 MB loop file system)
 >
+> There was an improvement in latency of 3.2% between 512 and 4096 bytes
+> cluster size on the Arm. I expect the performance benefits for this
+> test for Binoy's patch to be the same.
+>
+> In both cases the very naive test was a simple dd with block size of
+> 4096 bytes or the raw block device.
+>
+> I do not know what effect having a bigger cluster size would have on
+> have on other more complex file system operations.
+> Is there any specific benchmark worth testing with?
+
+
+The multiple instances issue in /proc/crypto is fixed. It was because of
+the IV code itself modifying the algorithm name inadvertently in the
+global crypto algorithm lookup table when it was splitting up
+"plain(cbc(aes))" into "plain" and "cbc(aes)" so as to invoke the child
+algorithm.
+
+I ran a few tests with dd, bonnie and FIO under Qemu - x86 using the
+automated script [1] that I wrote to make the testing easy.
+The tests were done on software implementations of the algorithms
+as the real hardware was not available with me. According to the test,
+I found that the sequential reads and writes have a good improvement
+(5.7 %) in the data rate with the proposed solution while the random
+reads shows a very little improvement. When tested with FIO, the
+random writes also shows a small improvement (2.2%) but the random
+reads show a little deterioration in performance (4 %).
+
+When tested in arm hardware, only the sequential writes with bonnie
+shows improvement (5.6%). All other tests shows degraded performance
+in the absence of crypto hardware.
+
+[1] https://github.com/binoyjayan/utilities/blob/master/utils/dmtest
+Dependencies: dd [Full version], bonnie, fio
+
+Thanks,
+Binoy
