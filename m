@@ -1,93 +1,39 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH] crypto: zip - add a cast for printing atomic64_t values
-Date: Mon, 20 Mar 2017 13:39:16 +0100
-Message-ID: <20170320123955.4061033-1-arnd@arndb.de>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Mahipal Challa <mahipalreddy2006@gmail.com>,
-        Jan Glauber <jglauber@cavium.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Question - seeding the hw pseudo random number generator
+Date: Mon, 20 Mar 2017 21:28:58 +0800
+Message-ID: <20170320132858.GA27044@gondor.apana.org.au>
+References: <20170318092554.lggkhfg5eko23o3k@kozik-lap>
+ <CANc+2y5gv2ygSM4HF69XCW7Bb8UUHN+qJKq0os-mOvYknH+SeQ@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+ Krzysztof Kozlowski <krzk@kernel.org>, Matt Mackall <mpm@selenic.com>
+To: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <CANc+2y5gv2ygSM4HF69XCW7Bb8UUHN+qJKq0os-mOvYknH+SeQ@mail.gmail.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-kernelci.org reports a build-time regression on linux-next, with a harmless
-warning in x86 allmodconfig:
+On Mon, Mar 20, 2017 at 12:19:32PM +0530, PrasannaKumar Muralidharan wrote:
+>
+> AF_ALG interface for rng does have seeding support. I think hw_random
+> does not provide seeding support intentionally as I understand that
+> True RNG need not require seeding (please correct me if I am wrong).
 
-drivers/crypto/cavium/zip/zip_main.c:489:18: warning: format '%ld' expects argument of type 'long int', but argument 7 has type 'long long int' [-Wformat=]
-drivers/crypto/cavium/zip/zip_main.c:489:18: warning: format '%ld' expects argument of type 'long int', but argument 6 has type 'long long int' [-Wformat=]
-drivers/crypto/cavium/zip/zip_main.c:489:18: warning: format '%ld' expects argument of type 'long int', but argument 5 has type 'long long int' [-Wformat=]
+Yes.  We should be converting PRNGs in hwrng over to algif_rng.
 
-The return type for atomic64_read() unfortunately differs between
-architectures, with some defining it as atomic_long_read() and others
-returning a 64-bit type explicitly. Fixing this in general would be nice,
-but also require changing other users of these functions, so the simpler
-workaround is to add a cast here that avoids the warnings on the default
-build.
-
-Fixes: 09ae5d37e093 ("crypto: zip - Add Compression/Decompression statistics")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/crypto/cavium/zip/zip_main.c | 40 ++++++++++++++++++------------------
- 1 file changed, 20 insertions(+), 20 deletions(-)
-
-diff --git a/drivers/crypto/cavium/zip/zip_main.c b/drivers/crypto/cavium/zip/zip_main.c
-index 0951e20b395b..49f50c0e0308 100644
---- a/drivers/crypto/cavium/zip/zip_main.c
-+++ b/drivers/crypto/cavium/zip/zip_main.c
-@@ -488,32 +488,32 @@ static int zip_show_stats(struct seq_file *s, void *unused)
- 				  atomic64_read(&st->comp_out_bytes));
- 			seq_printf(s, "        ZIP Device %d Stats\n"
- 				      "-----------------------------------\n"
--				      "Comp Req Submitted        : \t%ld\n"
--				      "Comp Req Completed        : \t%ld\n"
--				      "Compress In Bytes         : \t%ld\n"
--				      "Compressed Out Bytes      : \t%ld\n"
-+				      "Comp Req Submitted        : \t%lld\n"
-+				      "Comp Req Completed        : \t%lld\n"
-+				      "Compress In Bytes         : \t%lld\n"
-+				      "Compressed Out Bytes      : \t%lld\n"
- 				      "Average Chunk size        : \t%llu\n"
- 				      "Average Compression ratio : \t%llu\n"
--				      "Decomp Req Submitted      : \t%ld\n"
--				      "Decomp Req Completed      : \t%ld\n"
--				      "Decompress In Bytes       : \t%ld\n"
--				      "Decompressed Out Bytes    : \t%ld\n"
--				      "Decompress Bad requests   : \t%ld\n"
--				      "Pending Req               : \t%ld\n"
-+				      "Decomp Req Submitted      : \t%lld\n"
-+				      "Decomp Req Completed      : \t%lld\n"
-+				      "Decompress In Bytes       : \t%lld\n"
-+				      "Decompressed Out Bytes    : \t%lld\n"
-+				      "Decompress Bad requests   : \t%lld\n"
-+				      "Pending Req               : \t%lld\n"
- 					"---------------------------------\n",
- 				       index,
--				       atomic64_read(&st->comp_req_submit),
--				       atomic64_read(&st->comp_req_complete),
--				       atomic64_read(&st->comp_in_bytes),
--				       atomic64_read(&st->comp_out_bytes),
-+				       (u64)atomic64_read(&st->comp_req_submit),
-+				       (u64)atomic64_read(&st->comp_req_complete),
-+				       (u64)atomic64_read(&st->comp_in_bytes),
-+				       (u64)atomic64_read(&st->comp_out_bytes),
- 				       avg_chunk,
- 				       avg_cr,
--				       atomic64_read(&st->decomp_req_submit),
--				       atomic64_read(&st->decomp_req_complete),
--				       atomic64_read(&st->decomp_in_bytes),
--				       atomic64_read(&st->decomp_out_bytes),
--				       atomic64_read(&st->decomp_bad_reqs),
--				       atomic64_read(&st->pending_req));
-+				       (u64)atomic64_read(&st->decomp_req_submit),
-+				       (u64)atomic64_read(&st->decomp_req_complete),
-+				       (u64)atomic64_read(&st->decomp_in_bytes),
-+				       (u64)atomic64_read(&st->decomp_out_bytes),
-+				       (u64)atomic64_read(&st->decomp_bad_reqs),
-+				       (u64)atomic64_read(&st->pending_req));
- 
- 			/* Reset pending requests  count */
- 			atomic64_set(&st->pending_req, 0);
+Thanks,
 -- 
-2.9.0
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
