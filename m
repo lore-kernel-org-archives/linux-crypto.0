@@ -1,44 +1,46 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [PATCH v5 1/2] crypto: skcipher AF_ALG - overhaul memory management
-Date: Sun, 19 Mar 2017 05:34:17 +0100
-Message-ID: <10084414.H7YYMriRbE@positron.chronox.de>
-References: <2523592.mde6d2a8Lg@positron.chronox.de> <1797510.JnIj36BbdJ@tauon.atsec.com> <20170316095248.GA11996@gondor.apana.org.au>
+From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Subject: Re: Question - seeding the hw pseudo random number generator
+Date: Mon, 20 Mar 2017 12:19:32 +0530
+Message-ID: <CANc+2y5gv2ygSM4HF69XCW7Bb8UUHN+qJKq0os-mOvYknH+SeQ@mail.gmail.com>
+References: <20170318092554.lggkhfg5eko23o3k@kozik-lap>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8
+Cc: Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Krzysztof Kozlowski <krzk@kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:58130 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751186AbdCSEed (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 19 Mar 2017 00:34:33 -0400
-In-Reply-To: <20170316095248.GA11996@gondor.apana.org.au>
+Received: from mail-ua0-f181.google.com ([209.85.217.181]:33565 "EHLO
+        mail-ua0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750717AbdCTGte (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 20 Mar 2017 02:49:34 -0400
+Received: by mail-ua0-f181.google.com with SMTP id u30so70994131uau.0
+        for <linux-crypto@vger.kernel.org>; Sun, 19 Mar 2017 23:49:33 -0700 (PDT)
+In-Reply-To: <20170318092554.lggkhfg5eko23o3k@kozik-lap>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Donnerstag, 16. März 2017, 10:52:48 CET schrieb Herbert Xu:
+> I looked at Exynos Pseudo Random Nubmer Generator driver
+> (drivers/char/hw_random/exynos-rng.c) and noticed that it always seeds
+> the device with jiffies.  Then I looked at few other drivers and found
+> that they do not seed themself (or at least I couldn't find this).
 
-Hi Herbert,
-> 
-> First of all you're only limiting the amount of memory occupied
-> by the SG list which is not the same thing as the memory pinned
-> down by the actual recvmsg.
+HW random interface is meant for true RNG, not pseudo RNG. Actually
+PRNGs should use AF_ALG interface. I think exynos-rng.c should follow
+the same.
 
-When considering af_alg_make_sg, the function iov_iter_get_pages is used to 
-obtain the user space pages for recvmsg. When looking closely at that 
-function, I would understand that the user space pages are pinned into memory 
-and made accessible from kernel space. That said, I would infer from the code 
-that no kernel-local memory is allocated for the real data. Similar to zero-
-copy, pages are shared between kernel and user that will hold the crypto 
-operation result (ciphertext for enc or plaintext for dec).
+> I think the hw_random API does not provide generic infrastructure for
+> seeding.
+>
+> What is the preferred approach for seeding a PRNG device? Use jiffies or
+> a fixed value?
+>
+> Or maybe the interface should be abandoned in favor of crypto API?
 
-Therefore, I would infer that the memory usage of the discussed code is 
-limited to the skcipher_rsgl meta data which is limited by sock_kmalloc. This 
-finally would imply that the kernel will not occupy more memory than allocated 
-by sock_kmalloc.
+AF_ALG interface for rng does have seeding support. I think hw_random
+does not provide seeding support intentionally as I understand that
+True RNG need not require seeding (please correct me if I am wrong).
 
-Or am I missing something?
-
-Thanks
-Stephan
+Regards,
+PrasannaKumar
