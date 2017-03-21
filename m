@@ -1,60 +1,53 @@
-From: Harsh Jain <harshjain.prof@gmail.com>
-Subject: Re: BUG: Seems un-initialed dst pointer received from algif_aead when
- outlen is zero
-Date: Tue, 21 Mar 2017 18:53:31 +0530
-Message-ID: <CAFXBA==5EOXOJV4UFaG+1AxAmuEo9PzFKsHe25YTMa8LGfKkkQ@mail.gmail.com>
-References: <CAFXBA==w7CK_CiiVC37NN8=7p7=a=18sNd5VTnUkDCozrMvT+w@mail.gmail.com>
- <5047201.43uXAH9qJG@positron.chronox.de> <CAFXBA=m10UrBr1qqJ3j9F-hUXL6Bm+iEi6jLLEv9tVmCXc_p1A@mail.gmail.com>
- <3894659.2TbsNqkGul@tauon.atsec.com>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: Re: BUG: Seems un-initialed dst pointer received from algif_aead when outlen is zero
+Date: Tue, 21 Mar 2017 16:00:04 +0100
+Message-ID: <1593289.epxWzXFfWH@positron.chronox.de>
+References: <CAFXBA==w7CK_CiiVC37NN8=7p7=a=18sNd5VTnUkDCozrMvT+w@mail.gmail.com> <3894659.2TbsNqkGul@tauon.atsec.com> <CAFXBA==5EOXOJV4UFaG+1AxAmuEo9PzFKsHe25YTMa8LGfKkkQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8BIT
 Cc: linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>
-To: =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>
+To: Harsh Jain <harshjain.prof@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-qk0-f169.google.com ([209.85.220.169]:35102 "EHLO
-        mail-qk0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932499AbdCUNXc (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Mar 2017 09:23:32 -0400
-Received: by mail-qk0-f169.google.com with SMTP id v127so134559830qkb.2
-        for <linux-crypto@vger.kernel.org>; Tue, 21 Mar 2017 06:23:32 -0700 (PDT)
-In-Reply-To: <3894659.2TbsNqkGul@tauon.atsec.com>
+Received: from mail.eperm.de ([89.247.134.16]:58198 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1756962AbdCUPAv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 21 Mar 2017 11:00:51 -0400
+In-Reply-To: <CAFXBA==5EOXOJV4UFaG+1AxAmuEo9PzFKsHe25YTMa8LGfKkkQ@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Mar 21, 2017 at 5:13 PM, Stephan M=C3=BCller <smueller@chronox.de> =
-wrote:
-> Am Dienstag, 21. M=C3=A4rz 2017, 11:59:54 CET schrieb Harsh Jain:
->
-> Hi Harsh,
->
->> > Executing this command on a 4.9 kernel, I get:
->> >
->> > bin/kcapi -x 2   -c "gcm(aes)" -i 0d92aa861746b324f20ee6b7 -k
->> > f4a6a5e5f2066f6dd9ec6fc5169c29043560ef595c9e81e76f42d29212cc581c -a ""=
- -t
->> > "5f24c68cbe6f32c29652442bf5d483ad" -q ""
->> > EBADMSG
->>
->> Probably because s/w implementation is not trying to access dst sg
->> pointer because there's nothing to copy in destination buffer.  1
->> question If we don't have data to copy to destination buffer what
->> should dst pointer contains?
->
-> The dst SGL should simply be discarded by implementations in the case you
-> mention above.
->
-> The implementation receives the tag size and the supplied input buffer. I=
-f
-> that input buffer length is equal to the tag length (i.e. no AAD and no
-> ciphertext), why would the dst SGL be ever touched during decrytion?
+Am Dienstag, 21. März 2017, 14:23:31 CET schrieb Harsh Jain:
 
-Yes, Driver can figure out when to discard dst SGL but for that Driver
-has to put checks before accessing dst SGL. Isn't better if AF_ALG
-sends NULL for dst SGL.
+Hi Harsh,
 
->
-> Ciao
-> Stephan
+> Yes, Driver can figure out when to discard dst SGL but for that Driver
+> has to put checks before accessing dst SGL. Isn't better if AF_ALG
+> sends NULL for dst SGL.
+
+With the code in [1], the first longer patch is planned to be merged after the 
+memory management changes are agreed upon. That patch contains:
+
++               /* chain the areq TX SGL holding the tag with RX SGL */
++               if (!last_rsgl) {
++                       /* no RX SGL present (e.g. only authentication) */
++                       sg_init_table(areq->first_rsgl.sgl.sg, 2);
++                       sg_chain(areq->first_rsgl.sgl.sg, 2, areq->tsgl);
++               } else {
++                       /* RX SGL present */
++                       struct af_alg_sgl *sgl_prev = &last_rsgl->sgl;
++
++                       sg_unmark_end(sgl_prev->sg + sgl_prev->npages - 1);
++                       sg_chain(sgl_prev->sg, sgl_prev->npages + 1, areq-
+>tsgl);
++               }
+
+
+This code snipped would exactly do what you want: the SGL is always 
+initialized. Besides, the code will do an in-place cipher operation.
+
+https://www.spinics.net/lists/linux-crypto/msg24343.html
+
+Ciao
+Stephan
