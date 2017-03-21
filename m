@@ -1,77 +1,53 @@
-From: Vinod Koul <vinod.koul@intel.com>
-Subject: Re: [PATCH v6 0/4] Broadcom SBA RAID support
-Date: Tue, 21 Mar 2017 14:48:29 +0530
-Message-ID: <20170321091829.GZ2843@localhost>
-References: <1488793408-25592-1-git-send-email-anup.patel@broadcom.com>
- <20170321083052.GY2843@localhost>
- <CAALAos-k_DBYAz49278wBr_GoceOKYVH_UuzTLn1h7QCiUd8pg@mail.gmail.com>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: Re: BUG: Seems un-initialed dst pointer received from algif_aead when outlen is zero
+Date: Tue, 21 Mar 2017 11:04:35 +0100
+Message-ID: <5047201.43uXAH9qJG@positron.chronox.de>
+References: <CAFXBA==w7CK_CiiVC37NN8=7p7=a=18sNd5VTnUkDCozrMvT+w@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Jassi Brar <jassisinghbrar@gmail.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Ray Jui <rjui@broadcom.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        Jon Mason <jonmason@broadcom.com>,
-        Rob Rice <rob.rice@broadcom.com>,
-        BCM Kernel Feedback <bcm-kernel-feedback-list@broadcom.com>,
-        dmaengine@vger.kernel.org,
-        Device Tree <devicetree@vger.kernel.org>,
-        Linux ARM Kernel <linux-arm-kernel@lists.infradead.org>,
-        Linux Kernel <linux-kernel@vger.kernel.org>,
-        linux-crypto@vger.kernel.org,
-        linux-raid <linux-raid@vger.kernel.org>
-To: Anup Patel <anup.patel@broadcom.com>
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8BIT
+Cc: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+To: Harsh Jain <harshjain.prof@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:38505 "EHLO mga02.intel.com"
+Received: from mail.eperm.de ([89.247.134.16]:58182 "EHLO mail.eperm.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755005AbdCUJRk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Mar 2017 05:17:40 -0400
-Content-Disposition: inline
-In-Reply-To: <CAALAos-k_DBYAz49278wBr_GoceOKYVH_UuzTLn1h7QCiUd8pg@mail.gmail.com>
+        id S1754332AbdCUKEk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 21 Mar 2017 06:04:40 -0400
+In-Reply-To: <CAFXBA==w7CK_CiiVC37NN8=7p7=a=18sNd5VTnUkDCozrMvT+w@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Mar 21, 2017 at 02:17:21PM +0530, Anup Patel wrote:
-> On Tue, Mar 21, 2017 at 2:00 PM, Vinod Koul <vinod.koul@intel.com> wrote:
-> > On Mon, Mar 06, 2017 at 03:13:24PM +0530, Anup Patel wrote:
-> >> The Broadcom SBA RAID is a stream-based device which provides
-> >> RAID5/6 offload.
-> >>
-> >> It requires a SoC specific ring manager (such as Broadcom FlexRM
-> >> ring manager) to provide ring-based programming interface. Due to
-> >> this, the Broadcom SBA RAID driver (mailbox client) implements
-> >> DMA device having one DMA channel using a set of mailbox channels
-> >> provided by Broadcom SoC specific ring manager driver (mailbox
-> >> controller).
-> >>
-> >> The Broadcom SBA RAID hardware requires PQ disk position instead
-> >> of PQ disk coefficient. To address this, we have added raid_gflog
-> >> table which will help driver to convert PQ disk coefficient to PQ
-> >> disk position.
-> >>
-> >> This patchset is based on Linux-4.11-rc1 and depends on patchset
-> >> "[PATCH v5 0/2] Broadcom FlexRM ring manager support"
-> >
-> > Okay I applied and was about to push when I noticed this :(
-> >
-> > So what is the status of this..?
-> 
-> PATCH2 is Acked but PATCH1 is under-review. Currently, its
-> v6 of that patchset.
-> 
-> The only dependency on that patchset is the changes in
-> brcm-message.h which are required by this BCM-SBA-RAID
-> driver.
-> 
-> @Jassi,
-> Can you please have a look at PATCH v6?
+Am Dienstag, 21. März 2017, 07:13:53 CET schrieb Harsh Jain:
 
-And I would need an immutable branch/tag once merged. I am going to keep
-this series pending till then.
+Hi Harsh,
 
--- 
-~Vinod
+> Hi,
+> 
+> For tag only AEAD decrypt operation(Zero length Payload). The dst sg
+> list pointer panic with general protection fault. I think it should be
+> NULL when output buffer is supposed to be empty.
+> 
+> Kcapi command to re-produce the issue
+> 
+> ./kcapi -x 2   -c "gcm(aes)" -i 0d92aa861746b324f20ee6b7 -k
+> f4a6a5e5f2066f6dd9ec6fc5169c29043560ef595c9e81e76f42d29212cc581c -a ""
+> -t "5f24c68cbe6f32c29652442bf5d483ad" -q ""
+> 
+> Its decrypt operation. Expected result should be EBADMSG.
+
+Executing this command on a 4.9 kernel, I get:
+
+bin/kcapi -x 2   -c "gcm(aes)" -i 0d92aa861746b324f20ee6b7 -k 
+f4a6a5e5f2066f6dd9ec6fc5169c29043560ef595c9e81e76f42d29212cc581c -a "" -t 
+"5f24c68cbe6f32c29652442bf5d483ad" -q ""
+EBADMSG
+
+There is no GP or other error. Can you please provide some details about your 
+system? I.e. which kernel version and what cipher implementation resolves to 
+gcm(aes)?
+
+Thanks
+
+Ciao
+Stephan
