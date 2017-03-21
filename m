@@ -1,7 +1,7 @@
 From: Fabien Dessenne <fabien.dessenne@st.com>
-Subject: [PATCH v2 5/5] ARM: configs: stm32: Add crypto support
-Date: Tue, 21 Mar 2017 16:13:31 +0100
-Message-ID: <1490109211-4869-6-git-send-email-fabien.dessenne@st.com>
+Subject: [PATCH v2 3/5] ARM: dts: stm32: Add CRC support to stm32f746
+Date: Tue, 21 Mar 2017 16:13:29 +0100
+Message-ID: <1490109211-4869-4-git-send-email-fabien.dessenne@st.com>
 References: <1490109211-4869-1-git-send-email-fabien.dessenne@st.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -26,24 +26,30 @@ Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add STM32 crypto support in stm32_defconfig file.
+Add CRC (CRC32 crypto) support to stm32f746.
 
 Signed-off-by: Fabien Dessenne <fabien.dessenne@st.com>
 ---
- arch/arm/configs/stm32_defconfig | 2 ++
- 1 file changed, 2 insertions(+)
+ arch/arm/boot/dts/stm32f746.dtsi | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/arch/arm/configs/stm32_defconfig b/arch/arm/configs/stm32_defconfig
-index a9d8e3c..03437f8 100644
---- a/arch/arm/configs/stm32_defconfig
-+++ b/arch/arm/configs/stm32_defconfig
-@@ -75,5 +75,7 @@ CONFIG_MAGIC_SYSRQ=y
- # CONFIG_SCHED_DEBUG is not set
- # CONFIG_DEBUG_BUGVERBOSE is not set
- # CONFIG_FTRACE is not set
-+CONFIG_CRYPTO=y
-+CONFIG_CRYPTO_DEV_STM32=y
- CONFIG_CRC_ITU_T=y
- CONFIG_CRC7=y
+diff --git a/arch/arm/boot/dts/stm32f746.dtsi b/arch/arm/boot/dts/stm32f746.dtsi
+index f321ffe..755fb92 100644
+--- a/arch/arm/boot/dts/stm32f746.dtsi
++++ b/arch/arm/boot/dts/stm32f746.dtsi
+@@ -289,6 +289,13 @@
+ 			};
+ 		};
+ 
++		crc: crc@40023000 {
++			compatible = "st,stm32f7-crc";
++			reg = <0x40023000 0x400>;
++			clocks = <&rcc 0 12>;
++			status = "disabled";
++		};
++
+ 		rcc: rcc@40023800 {
+ 			#clock-cells = <2>;
+ 			compatible = "st,stm32f42xx-rcc", "st,stm32-rcc";
 -- 
 2.7.4
