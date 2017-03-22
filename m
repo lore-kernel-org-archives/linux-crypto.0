@@ -1,69 +1,124 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: BUG: Seems un-initialed dst pointer received from algif_aead
- when outlen is zero
-Date: Wed, 22 Mar 2017 10:57:42 +0800
-Message-ID: <20170322025742.GA29214@gondor.apana.org.au>
-References: <CAFXBA==w7CK_CiiVC37NN8=7p7=a=18sNd5VTnUkDCozrMvT+w@mail.gmail.com>
- <3894659.2TbsNqkGul@tauon.atsec.com>
- <CAFXBA==5EOXOJV4UFaG+1AxAmuEo9PzFKsHe25YTMa8LGfKkkQ@mail.gmail.com>
- <1593289.epxWzXFfWH@positron.chronox.de>
+From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
+Subject: [PATCH] arm64: dts: ls1012a: add crypto node
+Date: Wed, 22 Mar 2017 14:29:39 +0200
+Message-ID: <20170322122939.22117-1-horia.geanta@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Cc: Harsh Jain <harshjain.prof@gmail.com>, linux-crypto@vger.kernel.org
-To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:38449 "EHLO
-        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1757932AbdCVDko (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Mar 2017 23:40:44 -0400
-Content-Disposition: inline
-In-Reply-To: <1593289.epxWzXFfWH@positron.chronox.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: devicetree@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+ Harninder Rai <harninder.rai@nxp.com>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Bhaskar Upadhaya <Bhaskar.Upadhaya@nxp.com>, Will Deacon <will.deacon@arm.com>,
+ Dan Douglass <dan.douglass@nxp.com>, linux-crypto@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, linux-arm-kernel@lists.infradead.org
+To: Shawn Guo <shawnguo@kernel.org>, Rob Herring <robh+dt@kernel.org>, Mark
+ Rutland <mark.rutland@arm.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Mar 21, 2017 at 04:00:04PM +0100, Stephan Müller wrote:
-> Am Dienstag, 21. März 2017, 14:23:31 CET schrieb Harsh Jain:
-> 
-> Hi Harsh,
-> 
-> > Yes, Driver can figure out when to discard dst SGL but for that Driver
-> > has to put checks before accessing dst SGL. Isn't better if AF_ALG
-> > sends NULL for dst SGL.
-> 
-> With the code in [1], the first longer patch is planned to be merged after the 
-> memory management changes are agreed upon. That patch contains:
-> 
-> +               /* chain the areq TX SGL holding the tag with RX SGL */
-> +               if (!last_rsgl) {
-> +                       /* no RX SGL present (e.g. only authentication) */
-> +                       sg_init_table(areq->first_rsgl.sgl.sg, 2);
-> +                       sg_chain(areq->first_rsgl.sgl.sg, 2, areq->tsgl);
-> +               } else {
-> +                       /* RX SGL present */
-> +                       struct af_alg_sgl *sgl_prev = &last_rsgl->sgl;
-> +
-> +                       sg_unmark_end(sgl_prev->sg + sgl_prev->npages - 1);
-> +                       sg_chain(sgl_prev->sg, sgl_prev->npages + 1, areq-
-> >tsgl);
-> +               }
-> 
-> 
-> This code snipped would exactly do what you want: the SGL is always 
-> initialized. Besides, the code will do an in-place cipher operation.
-> 
-> https://www.spinics.net/lists/linux-crypto/msg24343.html
-
-Even if we fix this one user of the crypto API, new users could
-still feed you bogus SG lists.  The API does not require the user
-to specify a NULL SG list so please fix this in the driver.
-
-We should also strength testmgr so that it provides something
-bogus to catch buggy drivers.
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+TFMxMDEyQSBoYXMgYSBTRUMgdjUuNCBzZWN1cml0eSBlbmdpbmUuCgpTaWduZWQtb2ZmLWJ5OiBI
+b3JpYSBHZWFudMSDIDxob3JpYS5nZWFudGFAbnhwLmNvbT4KLS0tCiBhcmNoL2FybTY0L2Jvb3Qv
+ZHRzL2ZyZWVzY2FsZS9mc2wtbHMxMDEyYS1mcmRtLmR0cyB8ICA5ICsrKwogYXJjaC9hcm02NC9i
+b290L2R0cy9mcmVlc2NhbGUvZnNsLWxzMTAxMmEtcWRzLmR0cyAgfCAgOSArKysKIGFyY2gvYXJt
+NjQvYm9vdC9kdHMvZnJlZXNjYWxlL2ZzbC1sczEwMTJhLXJkYi5kdHMgIHwgIDkgKysrCiBhcmNo
+L2FybTY0L2Jvb3QvZHRzL2ZyZWVzY2FsZS9mc2wtbHMxMDEyYS5kdHNpICAgICB8IDkxICsrKysr
+KysrKysrKysrKysrKysrKy0KIDQgZmlsZXMgY2hhbmdlZCwgMTE3IGluc2VydGlvbnMoKyksIDEg
+ZGVsZXRpb24oLSkKCmRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2Jvb3QvZHRzL2ZyZWVzY2FsZS9m
+c2wtbHMxMDEyYS1mcmRtLmR0cyBiL2FyY2gvYXJtNjQvYm9vdC9kdHMvZnJlZXNjYWxlL2ZzbC1s
+czEwMTJhLWZyZG0uZHRzCmluZGV4IGE2MTlmNjQ5NmE0Yy4uYmFiOWU2ODk0N2U0IDEwMDY0NAot
+LS0gYS9hcmNoL2FybTY0L2Jvb3QvZHRzL2ZyZWVzY2FsZS9mc2wtbHMxMDEyYS1mcmRtLmR0cwor
+KysgYi9hcmNoL2FybTY0L2Jvb3QvZHRzL2ZyZWVzY2FsZS9mc2wtbHMxMDEyYS1mcmRtLmR0cwpA
+QCAtNDksNiArNDksMTUgQEAKIAltb2RlbCA9ICJMUzEwMTJBIEZyZWVkb20gQm9hcmQiOwogCWNv
+bXBhdGlibGUgPSAiZnNsLGxzMTAxMmEtZnJkbSIsICJmc2wsbHMxMDEyYSI7CiAKKwlhbGlhc2Vz
+IHsKKwkJY3J5cHRvID0gJmNyeXB0bzsKKwkJcnRpY19hID0gJnJ0aWNfYTsKKwkJcnRpY19iID0g
+JnJ0aWNfYjsKKwkJcnRpY19jID0gJnJ0aWNfYzsKKwkJcnRpY19kID0gJnJ0aWNfZDsKKwkJc2Vj
+X21vbiA9ICZzZWNfbW9uOworCX07CisKIAlzeXNfbWNsazogY2xvY2stbWNsayB7CiAJCWNvbXBh
+dGlibGUgPSAiZml4ZWQtY2xvY2siOwogCQkjY2xvY2stY2VsbHMgPSA8MD47CmRpZmYgLS1naXQg
+YS9hcmNoL2FybTY0L2Jvb3QvZHRzL2ZyZWVzY2FsZS9mc2wtbHMxMDEyYS1xZHMuZHRzIGIvYXJj
+aC9hcm02NC9ib290L2R0cy9mcmVlc2NhbGUvZnNsLWxzMTAxMmEtcWRzLmR0cwppbmRleCAxNGE2
+N2YxNzA5ZTcuLjVjNGU4NGM3ZjIwZCAxMDA2NDQKLS0tIGEvYXJjaC9hcm02NC9ib290L2R0cy9m
+cmVlc2NhbGUvZnNsLWxzMTAxMmEtcWRzLmR0cworKysgYi9hcmNoL2FybTY0L2Jvb3QvZHRzL2Zy
+ZWVzY2FsZS9mc2wtbHMxMDEyYS1xZHMuZHRzCkBAIC00OSw2ICs0OSwxNSBAQAogCW1vZGVsID0g
+IkxTMTAxMkEgUURTIEJvYXJkIjsKIAljb21wYXRpYmxlID0gImZzbCxsczEwMTJhLXFkcyIsICJm
+c2wsbHMxMDEyYSI7CiAKKwlhbGlhc2VzIHsKKwkJY3J5cHRvID0gJmNyeXB0bzsKKwkJcnRpY19h
+ID0gJnJ0aWNfYTsKKwkJcnRpY19iID0gJnJ0aWNfYjsKKwkJcnRpY19jID0gJnJ0aWNfYzsKKwkJ
+cnRpY19kID0gJnJ0aWNfZDsKKwkJc2VjX21vbiA9ICZzZWNfbW9uOworCX07CisKIAlzeXNfbWNs
+azogY2xvY2stbWNsayB7CiAJCWNvbXBhdGlibGUgPSAiZml4ZWQtY2xvY2siOwogCQkjY2xvY2st
+Y2VsbHMgPSA8MD47CmRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2Jvb3QvZHRzL2ZyZWVzY2FsZS9m
+c2wtbHMxMDEyYS1yZGIuZHRzIGIvYXJjaC9hcm02NC9ib290L2R0cy9mcmVlc2NhbGUvZnNsLWxz
+MTAxMmEtcmRiLmR0cwppbmRleCA2MmM1YzcxMjNhMTUuLmZmOWRkMTZhYTY1YSAxMDA2NDQKLS0t
+IGEvYXJjaC9hcm02NC9ib290L2R0cy9mcmVlc2NhbGUvZnNsLWxzMTAxMmEtcmRiLmR0cworKysg
+Yi9hcmNoL2FybTY0L2Jvb3QvZHRzL2ZyZWVzY2FsZS9mc2wtbHMxMDEyYS1yZGIuZHRzCkBAIC00
+OCw2ICs0OCwxNSBAQAogLyB7CiAJbW9kZWwgPSAiTFMxMDEyQSBSREIgQm9hcmQiOwogCWNvbXBh
+dGlibGUgPSAiZnNsLGxzMTAxMmEtcmRiIiwgImZzbCxsczEwMTJhIjsKKworCWFsaWFzZXMgewor
+CQljcnlwdG8gPSAmY3J5cHRvOworCQlydGljX2EgPSAmcnRpY19hOworCQlydGljX2IgPSAmcnRp
+Y19iOworCQlydGljX2MgPSAmcnRpY19jOworCQlydGljX2QgPSAmcnRpY19kOworCQlzZWNfbW9u
+ID0gJnNlY19tb247CisJfTsKIH07CiAKICZkdWFydDAgewpkaWZmIC0tZ2l0IGEvYXJjaC9hcm02
+NC9ib290L2R0cy9mcmVlc2NhbGUvZnNsLWxzMTAxMmEuZHRzaSBiL2FyY2gvYXJtNjQvYm9vdC9k
+dHMvZnJlZXNjYWxlL2ZzbC1sczEwMTJhLmR0c2kKaW5kZXggY2ZmZWJiNGIzZGYxLi42OGYzMDEy
+YWUwN2UgMTAwNjQ0Ci0tLSBhL2FyY2gvYXJtNjQvYm9vdC9kdHMvZnJlZXNjYWxlL2ZzbC1sczEw
+MTJhLmR0c2kKKysrIGIvYXJjaC9hcm02NC9ib290L2R0cy9mcmVlc2NhbGUvZnNsLWxzMTAxMmEu
+ZHRzaQpAQCAtNDIsNyArNDIsNyBAQAogICogICAgIE9USEVSIERFQUxJTkdTIElOIFRIRSBTT0ZU
+V0FSRS4KICAqLwogCi0jaW5jbHVkZSA8ZHQtYmluZGluZ3MvaW50ZXJydXB0LWNvbnRyb2xsZXIv
+aXJxLmg+CisjaW5jbHVkZSA8ZHQtYmluZGluZ3MvaW50ZXJydXB0LWNvbnRyb2xsZXIvYXJtLWdp
+Yy5oPgogCiAvIHsKIAljb21wYXRpYmxlID0gImZzbCxsczEwMTJhIjsKQEAgLTExMyw2ICsxMTMs
+OTUgQEAKIAkJCWJpZy1lbmRpYW47CiAJCX07CiAKKwkJY3J5cHRvOiBjcnlwdG9AMTcwMDAwMCB7
+CisJCQljb21wYXRpYmxlID0gImZzbCxzZWMtdjUuNCIsICJmc2wsc2VjLXY1LjAiLAorCQkJCSAg
+ICAgImZzbCxzZWMtdjQuMCI7CisJCQlmc2wsc2VjLWVyYSA9IDw4PjsKKwkJCSNhZGRyZXNzLWNl
+bGxzID0gPDE+OworCQkJI3NpemUtY2VsbHMgPSA8MT47CisJCQlyYW5nZXMgPSA8MHgwIDB4MDAg
+MHgxNzAwMDAwIDB4MTAwMDAwPjsKKwkJCXJlZyA9IDwweDAwIDB4MTcwMDAwMCAweDAgMHgxMDAw
+MDA+OworCQkJaW50ZXJydXB0cyA9IDxHSUNfU1BJIDc1IElSUV9UWVBFX0xFVkVMX0hJR0g+Owor
+CisJCQlzZWNfanIwOiBqckAxMDAwMCB7CisJCQkJY29tcGF0aWJsZSA9ICJmc2wsc2VjLXY1LjQt
+am9iLXJpbmciLAorCQkJCQkgICAgICJmc2wsc2VjLXY1LjAtam9iLXJpbmciLAorCQkJCQkgICAg
+ICJmc2wsc2VjLXY0LjAtam9iLXJpbmciOworCQkJCXJlZwkgICA9IDwweDEwMDAwIDB4MTAwMDA+
+OworCQkJCWludGVycnVwdHMgPSA8R0lDX1NQSSA3MSBJUlFfVFlQRV9MRVZFTF9ISUdIPjsKKwkJ
+CX07CisKKwkJCXNlY19qcjE6IGpyQDIwMDAwIHsKKwkJCQljb21wYXRpYmxlID0gImZzbCxzZWMt
+djUuNC1qb2ItcmluZyIsCisJCQkJCSAgICAgImZzbCxzZWMtdjUuMC1qb2ItcmluZyIsCisJCQkJ
+CSAgICAgImZzbCxzZWMtdjQuMC1qb2ItcmluZyI7CisJCQkJcmVnCSAgID0gPDB4MjAwMDAgMHgx
+MDAwMD47CisJCQkJaW50ZXJydXB0cyA9IDxHSUNfU1BJIDcyIElSUV9UWVBFX0xFVkVMX0hJR0g+
+OworCQkJfTsKKworCQkJc2VjX2pyMjoganJAMzAwMDAgeworCQkJCWNvbXBhdGlibGUgPSAiZnNs
+LHNlYy12NS40LWpvYi1yaW5nIiwKKwkJCQkJICAgICAiZnNsLHNlYy12NS4wLWpvYi1yaW5nIiwK
+KwkJCQkJICAgICAiZnNsLHNlYy12NC4wLWpvYi1yaW5nIjsKKwkJCQlyZWcJICAgPSA8MHgzMDAw
+MCAweDEwMDAwPjsKKwkJCQlpbnRlcnJ1cHRzID0gPEdJQ19TUEkgNzMgSVJRX1RZUEVfTEVWRUxf
+SElHSD47CisJCQl9OworCisJCQlzZWNfanIzOiBqckA0MDAwMCB7CisJCQkJY29tcGF0aWJsZSA9
+ICJmc2wsc2VjLXY1LjQtam9iLXJpbmciLAorCQkJCQkgICAgICJmc2wsc2VjLXY1LjAtam9iLXJp
+bmciLAorCQkJCQkgICAgICJmc2wsc2VjLXY0LjAtam9iLXJpbmciOworCQkJCXJlZwkgICA9IDww
+eDQwMDAwIDB4MTAwMDA+OworCQkJCWludGVycnVwdHMgPSA8R0lDX1NQSSA3NCBJUlFfVFlQRV9M
+RVZFTF9ISUdIPjsKKwkJCX07CisKKwkJCXJ0aWNANjAwMDAgeworCQkJCWNvbXBhdGlibGUgPSAi
+ZnNsLHNlYy12NS40LXJ0aWMiLAorCQkJCQkgICAgICJmc2wsc2VjLXY1LjAtcnRpYyIsCisJCQkJ
+CSAgICAgImZzbCxzZWMtdjQuMC1ydGljIjsKKwkJCQkjYWRkcmVzcy1jZWxscyA9IDwxPjsKKwkJ
+CQkjc2l6ZS1jZWxscyA9IDwxPjsKKwkJCQlyZWcgPSA8MHg2MDAwMCAweDEwMCAweDYwZTAwIDB4
+MTg+OworCQkJCXJhbmdlcyA9IDwweDAgMHg2MDEwMCAweDUwMD47CisKKwkJCQlydGljX2E6IHJ0
+aWMtYUAwIHsKKwkJCQkJY29tcGF0aWJsZSA9ICJmc2wsc2VjLXY1LjQtcnRpYy1tZW1vcnkiLAor
+CQkJCQkJICAgICAiZnNsLHNlYy12NS4wLXJ0aWMtbWVtb3J5IiwKKwkJCQkJCSAgICAgImZzbCxz
+ZWMtdjQuMC1ydGljLW1lbW9yeSI7CisJCQkJCXJlZyA9IDwweDAwIDB4MjAgMHgxMDAgMHgxMDA+
+OworCQkJCX07CisKKwkJCQlydGljX2I6IHJ0aWMtYkAyMCB7CisJCQkJCWNvbXBhdGlibGUgPSAi
+ZnNsLHNlYy12NS40LXJ0aWMtbWVtb3J5IiwKKwkJCQkJCSAgICAgImZzbCxzZWMtdjUuMC1ydGlj
+LW1lbW9yeSIsCisJCQkJCQkgICAgICJmc2wsc2VjLXY0LjAtcnRpYy1tZW1vcnkiOworCQkJCQly
+ZWcgPSA8MHgyMCAweDIwIDB4MjAwIDB4MTAwPjsKKwkJCQl9OworCisJCQkJcnRpY19jOiBydGlj
+LWNANDAgeworCQkJCQljb21wYXRpYmxlID0gImZzbCxzZWMtdjUuNC1ydGljLW1lbW9yeSIsCisJ
+CQkJCQkgICAgICJmc2wsc2VjLXY1LjAtcnRpYy1tZW1vcnkiLAorCQkJCQkJICAgICAiZnNsLHNl
+Yy12NC4wLXJ0aWMtbWVtb3J5IjsKKwkJCQkJcmVnID0gPDB4NDAgMHgyMCAweDMwMCAweDEwMD47
+CisJCQkJfTsKKworCQkJCXJ0aWNfZDogcnRpYy1kQDYwIHsKKwkJCQkJY29tcGF0aWJsZSA9ICJm
+c2wsc2VjLXY1LjQtcnRpYy1tZW1vcnkiLAorCQkJCQkJICAgICAiZnNsLHNlYy12NS4wLXJ0aWMt
+bWVtb3J5IiwKKwkJCQkJCSAgICAgImZzbCxzZWMtdjQuMC1ydGljLW1lbW9yeSI7CisJCQkJCXJl
+ZyA9IDwweDYwIDB4MjAgMHg0MDAgMHgxMDA+OworCQkJCX07CisJCQl9OworCQl9OworCisJCXNl
+Y19tb246IHNlY19tb25AMWU5MDAwMCB7CisJCQljb21wYXRpYmxlID0gImZzbCxzZWMtdjUuNC1t
+b24iLCAiZnNsLHNlYy12NS4wLW1vbiIsCisJCQkJICAgICAiZnNsLHNlYy12NC4wLW1vbiI7CisJ
+CQlyZWcgPSA8MHgwIDB4MWU5MDAwMCAweDAgMHgxMDAwMD47CisJCQlpbnRlcnJ1cHRzID0gPEdJ
+Q19TUEkgNzggSVJRX1RZUEVfTEVWRUxfSElHSD4sCisJCQkJICAgICA8R0lDX1NQSSA3OSBJUlFf
+VFlQRV9MRVZFTF9ISUdIPjsKKwkJfTsKKwogCQlkY2ZnOiBkY2ZnQDFlZTAwMDAgewogCQkJY29t
+cGF0aWJsZSA9ICJmc2wsbHMxMDEyYS1kY2ZnIiwKIAkJCQkgICAgICJzeXNjb24iOwotLSAKMi4x
+Mi4wLjI2NC5nZDZkYjNmMjE2NTQ0CgoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX18KbGludXgtYXJtLWtlcm5lbCBtYWlsaW5nIGxpc3QKbGludXgtYXJtLWtl
+cm5lbEBsaXN0cy5pbmZyYWRlYWQub3JnCmh0dHA6Ly9saXN0cy5pbmZyYWRlYWQub3JnL21haWxt
+YW4vbGlzdGluZm8vbGludXgtYXJtLWtlcm5lbAo=
