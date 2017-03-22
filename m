@@ -1,51 +1,58 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: [PATCH] crypto: DRBG - initialize SGL only once
-Date: Wed, 22 Mar 2017 15:26:36 +0100
-Message-ID: <1909030.BalyQCuxjY@positron.chronox.de>
+From: Kevin Hilman <khilman-rdvid1DuHRBWk0Htik3J/w@public.gmane.org>
+Subject: Re: [PATCH v3 1/3] clk: meson-gxbb: expose clock CLKID_RNG0
+Date: Wed, 22 Mar 2017 08:24:08 -0700
+Message-ID: <m2lgrxnxlz.fsf@baylibre.com>
+References: <4e2d12e5-f75b-3ac6-a3f7-18e8a8b7283b@gmail.com>
+        <20170316100743.GA12137@gondor.apana.org.au>
+        <m2mvcl6pwg.fsf@baylibre.com>
+        <20170317083032.GA18512@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:58204 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1759063AbdCVO0z (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Mar 2017 10:26:55 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain
+Cc: Heiner Kallweit <hkallweit1-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        Jerome Brunet <jbrunet-rdvid1DuHRBWk0Htik3J/w@public.gmane.org>,
+        Neil Armstrong <narmstrong-rdvid1DuHRBWk0Htik3J/w@public.gmane.org>,
+        linux-amlogic-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        Stephen Boyd <sboyd-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>,
+        Michael Turquette <mturquette-rdvid1DuHRBWk0Htik3J/w@public.gmane.org>,
+        linux-clk-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20170317083032.GA18512-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org> (Herbert Xu's
+        message of "Fri, 17 Mar 2017 16:30:32 +0800")
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-An SGL to be initialized only once even when its buffers are written
-to several times.
+Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org> writes:
 
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- crypto/drbg.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+> On Thu, Mar 16, 2017 at 11:24:31AM -0700, Kevin Hilman wrote:
+>> Hi Herbert,
+>> 
+>> Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org> writes:
+>> 
+>> > On Wed, Feb 22, 2017 at 07:55:24AM +0100, Heiner Kallweit wrote:
+>> >> Expose clock CLKID_RNG0 which is needed for the HW random number generator.
+>> >> 
+>> >> Signed-off-by: Heiner Kallweit <hkallweit1-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>> >
+>> > All patches applied.  Thanks.
+>> 
+>> Actually, can you just apply [PATCH 4/4] to your tree?
+>> 
+>> The clock and DT patches need to go through their respective trees or
+>> will otherwise have conflicts with other things going in via those
+>> trees.
+>
+> It's too late now.  Please speak up sooner next time.  These
+> patches were posted a month ago.
 
-diff --git a/crypto/drbg.c b/crypto/drbg.c
-index 8a4d98b..fa749f4 100644
---- a/crypto/drbg.c
-+++ b/crypto/drbg.c
-@@ -1749,17 +1749,16 @@ static int drbg_kcapi_sym_ctr(struct drbg_state *drbg,
- 			      u8 *inbuf, u32 inlen,
- 			      u8 *outbuf, u32 outlen)
- {
--	struct scatterlist sg_in;
-+	struct scatterlist sg_in, sg_out;
- 	int ret;
- 
- 	sg_init_one(&sg_in, inbuf, inlen);
-+	sg_init_one(&sg_out, drbg->outscratchpad, DRBG_OUTSCRATCHLEN);
- 
- 	while (outlen) {
- 		u32 cryptlen = min3(inlen, outlen, (u32)DRBG_OUTSCRATCHLEN);
--		struct scatterlist sg_out;
- 
- 		/* Output buffer may not be valid for SGL, use scratchpad */
--		sg_init_one(&sg_out, drbg->outscratchpad, cryptlen);
- 		skcipher_request_set_crypt(drbg->ctr_req, &sg_in, &sg_out,
- 					   cryptlen, drbg->V);
- 		ret = crypto_skcipher_encrypt(drbg->ctr_req);
--- 
-2.9.3
+Because this will be causing conflicts with both the platform (amlogic)
+tree and the clk tree, could provide an immutable branch where these are
+applied to help us handle these conflicts?
+
+Thanks,
+
+Kevin
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
