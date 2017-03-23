@@ -1,52 +1,49 @@
 From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
 Subject: Re: Question - seeding the hw pseudo random number generator
-Date: Thu, 23 Mar 2017 12:35:56 +0100
-Message-ID: <32410262.FWdrND2fdY@positron.chronox.de>
-References: <20170318092554.lggkhfg5eko23o3k@kozik-lap> <1509135.hmo2UhaKWe@tauon.atsec.com> <602a68ef-c57a-0092-ebe0-161ec602fad6@linux.vnet.ibm.com>
+Date: Thu, 23 Mar 2017 12:44:57 +0100
+Message-ID: <6726036.ieol9yEJdI@positron.chronox.de>
+References: <20170318092554.lggkhfg5eko23o3k@kozik-lap> <20170323082307.GB16625@Red> <20170323094406.GA6848@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: 8BIT
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+Cc: Corentin Labbe <clabbe.montjoie@gmail.com>,
         PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
         Krzysztof Kozlowski <krzk@kernel.org>,
-        Matt Mackall <mpm@selenic.com>, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Jan Glauber <jan.glauber@de.ibm.com>,
-        Harald Freudenberger <freude@de.ibm.com>
-To: Harald Freudenberger <freude@linux.vnet.ibm.com>
+        Matt Mackall <mpm@selenic.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:58234 "EHLO mail.eperm.de"
+Received: from mail.eperm.de ([89.247.134.16]:58252 "EHLO mail.eperm.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753427AbdCWLgB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 Mar 2017 07:36:01 -0400
-In-Reply-To: <602a68ef-c57a-0092-ebe0-161ec602fad6@linux.vnet.ibm.com>
+        id S932855AbdCWLpN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 23 Mar 2017 07:45:13 -0400
+In-Reply-To: <20170323094406.GA6848@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Donnerstag, 23. März 2017, 09:03:23 CET schrieb Harald Freudenberger:
+Am Donnerstag, 23. März 2017, 10:44:06 CET schrieb Herbert Xu:
 
-Hi Harald,
+Hi Herbert,
 
-> I'll have a look on it. Currently the s390/crypto/prng seeds itself with
-> an algorithm based on the jitter of the very fine granular hardware
-> clock of a s390 machine. There were some thoughts and measurements
-> by an mathematician which let to this algorithm.
+> On Thu, Mar 23, 2017 at 09:23:07AM +0100, Corentin Labbe wrote:
+> > Problem with this conversion, a huge regression for user space.
+> > Using hwrng is simple as cat /dev/hwrng.
+> > Using algif_rng via AF_ALG is ... unusable for the moment.
+> > Perhaps creating an user space tool (prng-tool which provide a cat
+> > /dev/hwrng replacement) is mandatory before any convertion.
+> Stephan may have a tool to do this.  Stephan?
 
-It takes a page and simply writes 512 times the high-res time stamp using 
-get_tod_clock_fast into it. Effectively it uses the same fundamental noise 
-source as the jitterentropy. (A couple of months ago I had to perform an 
-SP800-90B assessment on exactly that code path. :-) )
+Creating such tool is more or less trivial. It simply requires the invocation 
+of kcapi_rng_init, kcapi_rng_seed, kcapi_rng_generate and eventually 
+kcapi_rng_destroy from [1]. I can write such a tool if requested.
 
-> However, long-term
-> the s390 platform will provide some kind of true hardware random number
-> generator and the idea is to use this for seeding the prng.
+I see one change we need to add to algif_rng.c: currently the caller must 
+provide the specific name of the DRNG to be used. With such a tool, the caller 
+does not care about the type of DRNG. Thus, rng_bind should be changed such 
+that if name is NULL, it should use crypto_get_default_rng(). This would 
+alleviate the caller from selecting "the right" DRNG.
 
-The question is just that it provides a device file nobody else provides. And 
-the question is whether to consolidate it. If it is a DRNG, the discussion is 
-about consolidating it behind AF_ALG. If it is an RNG with its own noise 
-source (i.e. it provides entropic data by itself), it should rather be placed 
-into drivers/char/hw_random and use the hw-random framework. This framework 
-will also ensure that it may seed the /dev/random device kernel-internally.
+[1] http://www.chronox.de/libkcapi.html
 
 Ciao
 Stephan
