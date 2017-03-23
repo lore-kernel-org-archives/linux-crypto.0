@@ -1,102 +1,52 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH] padata: avoid race in reordering
-Date: Thu, 23 Mar 2017 12:24:43 +0100
-Message-ID: <20170323112443.30843-1-Jason@zx2c4.com>
-References: <CAHmME9oLWiprOyZXo7zvGm7xq+1Kchw9ybLS_TM-9xDyHF0mxQ@mail.gmail.com>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: Steffen Klassert <steffen.klassert@secunet.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAHmME9oLWiprOyZXo7zvGm7xq+1Kchw9ybLS_TM-9xDyHF0mxQ@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: Re: Question - seeding the hw pseudo random number generator
+Date: Thu, 23 Mar 2017 12:35:56 +0100
+Message-ID: <32410262.FWdrND2fdY@positron.chronox.de>
+References: <20170318092554.lggkhfg5eko23o3k@kozik-lap> <1509135.hmo2UhaKWe@tauon.atsec.com> <602a68ef-c57a-0092-ebe0-161ec602fad6@linux.vnet.ibm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8BIT
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Matt Mackall <mpm@selenic.com>, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Jan Glauber <jan.glauber@de.ibm.com>,
+        Harald Freudenberger <freude@de.ibm.com>
+To: Harald Freudenberger <freude@linux.vnet.ibm.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:58234 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753427AbdCWLgB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 23 Mar 2017 07:36:01 -0400
+In-Reply-To: <602a68ef-c57a-0092-ebe0-161ec602fad6@linux.vnet.ibm.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Under extremely heavy uses of padata, crashes occur, and with list
-debugging turned on, this happens instead:
+Am Donnerstag, 23. März 2017, 09:03:23 CET schrieb Harald Freudenberger:
 
-[87487.298728] WARNING: CPU: 1 PID: 882 at lib/list_debug.c:33
-__list_add+0xae/0x130
-[87487.301868] list_add corruption. prev->next should be next
-(ffffb17abfc043d0), but was ffff8dba70872c80. (prev=ffff8dba70872b00).
-[87487.339011]  [<ffffffff9a53d075>] dump_stack+0x68/0xa3
-[87487.342198]  [<ffffffff99e119a1>] ? console_unlock+0x281/0x6d0
-[87487.345364]  [<ffffffff99d6b91f>] __warn+0xff/0x140
-[87487.348513]  [<ffffffff99d6b9aa>] warn_slowpath_fmt+0x4a/0x50
-[87487.351659]  [<ffffffff9a58b5de>] __list_add+0xae/0x130
-[87487.354772]  [<ffffffff9add5094>] ? _raw_spin_lock+0x64/0x70
-[87487.357915]  [<ffffffff99eefd66>] padata_reorder+0x1e6/0x420
-[87487.361084]  [<ffffffff99ef0055>] padata_do_serial+0xa5/0x120
+Hi Harald,
 
-padata_reorder calls list_add_tail with the list to which its adding
-locked, which seems correct:
+> I'll have a look on it. Currently the s390/crypto/prng seeds itself with
+> an algorithm based on the jitter of the very fine granular hardware
+> clock of a s390 machine. There were some thoughts and measurements
+> by an mathematician which let to this algorithm.
 
-spin_lock(&squeue->serial.lock);
-list_add_tail(&padata->list, &squeue->serial.list);
-spin_unlock(&squeue->serial.lock);
+It takes a page and simply writes 512 times the high-res time stamp using 
+get_tod_clock_fast into it. Effectively it uses the same fundamental noise 
+source as the jitterentropy. (A couple of months ago I had to perform an 
+SP800-90B assessment on exactly that code path. :-) )
 
-This therefore leaves only place where such inconsistency could occur:
-if padata->list is added at the same time on two different threads.
-This pdata pointer comes from the function call to
-padata_get_next(pd), which has in it the following block:
+> However, long-term
+> the s390 platform will provide some kind of true hardware random number
+> generator and the idea is to use this for seeding the prng.
 
-next_queue = per_cpu_ptr(pd->pqueue, cpu);
-padata = NULL;
-reorder = &next_queue->reorder;
-if (!list_empty(&reorder->list)) {
-       padata = list_entry(reorder->list.next,
-                           struct padata_priv, list);
-       spin_lock(&reorder->lock);
-       list_del_init(&padata->list);
-       atomic_dec(&pd->reorder_objects);
-       spin_unlock(&reorder->lock);
+The question is just that it provides a device file nobody else provides. And 
+the question is whether to consolidate it. If it is a DRNG, the discussion is 
+about consolidating it behind AF_ALG. If it is an RNG with its own noise 
+source (i.e. it provides entropic data by itself), it should rather be placed 
+into drivers/char/hw_random and use the hw-random framework. This framework 
+will also ensure that it may seed the /dev/random device kernel-internally.
 
-       pd->processed++;
-
-       goto out;
-}
-out:
-return padata;
-
-I strongly suspect that the problem here is that two threads can race
-on reorder list. Even though the deletion is locked, call to
-list_entry is not locked, which means it's feasible that two threads
-pick up the same padata object and subsequently call list_add_tail on
-them at the same time. The fix is thus be hoist that lock outside of
-that block.
-
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
- kernel/padata.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/kernel/padata.c b/kernel/padata.c
-index 05316c9f32da..3202aa17492c 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -186,19 +186,20 @@ static struct padata_priv *padata_get_next(struct parallel_data *pd)
- 
- 	reorder = &next_queue->reorder;
- 
-+	spin_lock(&reorder->lock);
- 	if (!list_empty(&reorder->list)) {
- 		padata = list_entry(reorder->list.next,
- 				    struct padata_priv, list);
- 
--		spin_lock(&reorder->lock);
- 		list_del_init(&padata->list);
- 		atomic_dec(&pd->reorder_objects);
--		spin_unlock(&reorder->lock);
- 
- 		pd->processed++;
- 
-+		spin_unlock(&reorder->lock);
- 		goto out;
- 	}
-+	spin_unlock(&reorder->lock);
- 
- 	if (__this_cpu_read(pd->pqueue->cpu_index) == next_queue->cpu_index) {
- 		padata = ERR_PTR(-ENODATA);
--- 
-2.11.1
+Ciao
+Stephan
