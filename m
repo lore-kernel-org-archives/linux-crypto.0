@@ -1,29 +1,139 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: [PATCH] crypto: ixp4xx - Use sg_virt()
-Date: Thu, 23 Mar 2017 10:48:04 -0700 (PDT)
-Message-ID: <20170323.104804.1545934092766639619.davem@davemloft.net>
-References: <a41fae798473b657f09859ae113403655b1717f9.1490258141.git.geliangtang@gmail.com>
+From: Gary R Hook <gary.hook@amd.com>
+Subject: [PATCH] crypto: ccp - Make some CCP DMA channels private
+Date: Thu, 23 Mar 2017 12:53:30 -0500
+Message-ID: <20170323175330.8742.62747.stgit@taos>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: geliangtang@gmail.com
+Cc: <thomas.lendacky@amd.com>, <gary.hook@amd.com>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from shards.monkeyblade.net ([184.105.139.130]:55390 "EHLO
-        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755026AbdCWRsI (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 Mar 2017 13:48:08 -0400
-In-Reply-To: <a41fae798473b657f09859ae113403655b1717f9.1490258141.git.geliangtang@gmail.com>
+Received: from mail-bn3nam01on0066.outbound.protection.outlook.com ([104.47.33.66]:37133
+        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752029AbdCWRxn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 23 Mar 2017 13:53:43 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Geliang Tang <geliangtang@gmail.com>
-Date: Thu, 23 Mar 2017 21:16:30 +0800
+The CCP registers its queues as channels capable of handling
+general DMA operations. The NTB driver will use DMA if
+directed, but as public channels can be reserved for use in
+asynchronous operations some channels should be held back
+as private. Since the public/private determination is
+handled at a device level, reserve the "other" (secondary)
+CCP channels as private.
 
-> Use sg_virt() instead of open-coding it.
-> 
-> Signed-off-by: Geliang Tang <geliangtang@gmail.com>
+Add a module parameter that allows for override, to be
+applied to all channels on all devices.
 
-Acked-by: David S. Miller <davem@davemloft.net>
+CC: <stable@vger.kernel.org> # 4.10.x-
+Signed-off-by: Gary R Hook <gary.hook@amd.com>
+---
+ drivers/crypto/ccp/ccp-dev-v5.c    |    1 +
+ drivers/crypto/ccp/ccp-dev.h       |    5 ++++
+ drivers/crypto/ccp/ccp-dmaengine.c |   41 ++++++++++++++++++++++++++++++++++++
+ 3 files changed, 47 insertions(+)
+
+diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
+index 41cc853..fc08b4e 100644
+--- a/drivers/crypto/ccp/ccp-dev-v5.c
++++ b/drivers/crypto/ccp/ccp-dev-v5.c
+@@ -1015,6 +1015,7 @@ static void ccp5other_config(struct ccp_device *ccp)
+ 
+ const struct ccp_vdata ccpv5b = {
+ 	.version = CCP_VERSION(5, 0),
++	.dma_chan_attr = DMA_PRIVATE,
+ 	.setup = ccp5other_config,
+ 	.perform = &ccp5_actions,
+ 	.bar = 2,
+diff --git a/drivers/crypto/ccp/ccp-dev.h b/drivers/crypto/ccp/ccp-dev.h
+index 2b5c01f..aa36f3f 100644
+--- a/drivers/crypto/ccp/ccp-dev.h
++++ b/drivers/crypto/ccp/ccp-dev.h
+@@ -179,6 +179,10 @@
+ 
+ /* ------------------------ General CCP Defines ------------------------ */
+ 
++#define	CCP_DMA_DFLT			0x0
++#define	CCP_DMA_PRIV			0x1
++#define	CCP_DMA_PUB			0x2
++
+ #define CCP_DMAPOOL_MAX_SIZE		64
+ #define CCP_DMAPOOL_ALIGN		BIT(5)
+ 
+@@ -636,6 +640,7 @@ struct ccp_actions {
+ /* Structure to hold CCP version-specific values */
+ struct ccp_vdata {
+ 	const unsigned int version;
++	const unsigned int dma_chan_attr;
+ 	void (*setup)(struct ccp_device *);
+ 	const struct ccp_actions *perform;
+ 	const unsigned int bar;
+diff --git a/drivers/crypto/ccp/ccp-dmaengine.c b/drivers/crypto/ccp/ccp-dmaengine.c
+index 8d0eeb4..e00be01 100644
+--- a/drivers/crypto/ccp/ccp-dmaengine.c
++++ b/drivers/crypto/ccp/ccp-dmaengine.c
+@@ -10,6 +10,7 @@
+  * published by the Free Software Foundation.
+  */
+ 
++#include <linux/module.h>
+ #include <linux/kernel.h>
+ #include <linux/dmaengine.h>
+ #include <linux/spinlock.h>
+@@ -25,6 +26,37 @@
+ 	(mask == 0) ? 64 : fls64(mask);	\
+ })
+ 
++/* The CCP as a DMA provider can be configured for public or private
++ * channels. Default is specified in the vdata for the device (PCI ID).
++ * This module parameter will override for all channels on all devices:
++ *   dma_chan_attr = 0x2 to force all channels public
++ *                 = 0x1 to force all channels private
++ *                 = 0x0 to defer to the vdata setting
++ *                 = any other value: warning, revert to 0x0
++ */
++static unsigned int dma_chan_attr = CCP_DMA_DFLT;
++module_param(dma_chan_attr, uint, 0444);
++MODULE_PARM_DESC(dma_chan_attr, "Set DMA channel visibility: 0 (default) = device defaults, 1 = make private, 2 = make public");
++
++unsigned int ccp_get_dma_chan_attr(struct ccp_device *ccp)
++{
++	switch (dma_chan_attr) {
++	case CCP_DMA_DFLT:
++		return ccp->vdata->dma_chan_attr;
++
++	case CCP_DMA_PRIV:
++		return DMA_PRIVATE;
++
++	case CCP_DMA_PUB:
++		return 0;
++
++	default:
++		dev_info_once(ccp->dev, "Invalid value for dma_chan_attr: %d\n",
++			      dma_chan_attr);
++		return ccp->vdata->dma_chan_attr;
++	}
++}
++
+ static void ccp_free_cmd_resources(struct ccp_device *ccp,
+ 				   struct list_head *list)
+ {
+@@ -675,6 +707,15 @@ int ccp_dmaengine_register(struct ccp_device *ccp)
+ 	dma_cap_set(DMA_SG, dma_dev->cap_mask);
+ 	dma_cap_set(DMA_INTERRUPT, dma_dev->cap_mask);
+ 
++	/* The DMA channels for this device can be set to public or private,
++	 * and overridden by the module parameter dma_chan_attr.
++	 * Default: according to the value in vdata (dma_chan_attr=0)
++	 * dma_chan_attr=0x1: all channels private (override vdata)
++	 * dma_chan_attr=0x2: all channels public (override vdata)
++	 */
++	if (ccp_get_dma_chan_attr(ccp) == DMA_PRIVATE)
++		dma_cap_set(DMA_PRIVATE, dma_dev->cap_mask);
++
+ 	INIT_LIST_HEAD(&dma_dev->channels);
+ 	for (i = 0; i < ccp->cmd_q_count; i++) {
+ 		chan = ccp->ccp_dma_chan + i;
