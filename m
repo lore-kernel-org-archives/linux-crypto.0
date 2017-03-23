@@ -1,38 +1,43 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v3 1/3] clk: meson-gxbb: expose clock CLKID_RNG0
-Date: Thu, 23 Mar 2017 15:56:02 +0800
-Message-ID: <20170323075602.GA6054@gondor.apana.org.au>
-References: <4e2d12e5-f75b-3ac6-a3f7-18e8a8b7283b@gmail.com>
- <20170316100743.GA12137@gondor.apana.org.au>
- <m2mvcl6pwg.fsf@baylibre.com>
- <20170317083032.GA18512@gondor.apana.org.au>
- <m2lgrxnxlz.fsf@baylibre.com>
+Subject: Re: Question - seeding the hw pseudo random number generator
+Date: Thu, 23 Mar 2017 17:44:06 +0800
+Message-ID: <20170323094406.GA6848@gondor.apana.org.au>
+References: <20170318092554.lggkhfg5eko23o3k@kozik-lap>
+ <CANc+2y5gv2ygSM4HF69XCW7Bb8UUHN+qJKq0os-mOvYknH+SeQ@mail.gmail.com>
+ <20170320132858.GA27044@gondor.apana.org.au>
+ <20170323082307.GB16625@Red>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-        Jerome Brunet <jbrunet@baylibre.com>,
-        Neil Armstrong <narmstrong@baylibre.com>,
-        linux-amlogic@lists.infradead.org, linux-crypto@vger.kernel.org,
-        Stephen Boyd <sboyd@codeaurora.org>,
-        Michael Turquette <mturquette@baylibre.com>,
-        linux-clk@vger.kernel.org, devicetree@vger.kernel.org
-To: Kevin Hilman <khilman@baylibre.com>
-Return-path: <linux-clk-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>,
+ PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
+ Krzysztof Kozlowski <krzk@kernel.org>, linux-crypto@vger.kernel.org,
+ Matt Mackall <mpm@selenic.com>, linux-arm-kernel@lists.infradead.org
+To: Corentin Labbe <clabbe.montjoie@gmail.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <m2lgrxnxlz.fsf@baylibre.com>
-Sender: linux-clk-owner@vger.kernel.org
+In-Reply-To: <20170323082307.GB16625@Red>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Mar 22, 2017 at 08:24:08AM -0700, Kevin Hilman wrote:
+On Thu, Mar 23, 2017 at 09:23:07AM +0100, Corentin Labbe wrote:
 > 
-> Because this will be causing conflicts with both the platform (amlogic)
-> tree and the clk tree, could provide an immutable branch where these are
-> applied to help us handle these conflicts?
+> Problem with this conversion, a huge regression for user space.
+> Using hwrng is simple as cat /dev/hwrng.
+> Using algif_rng via AF_ALG is ... unusable for the moment.
+> Perhaps creating an user space tool (prng-tool which provide a cat /dev/hwrng replacement) is mandatory before any convertion.
 
-If you apply the same patches to your tree there should be no
-conflicts at all.  git is able to resolve this automatically.
+Stephan may have a tool to do this.  Stephan?
 
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
