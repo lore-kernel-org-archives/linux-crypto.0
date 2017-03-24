@@ -1,51 +1,47 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] dt-bindings: rng: clocks property on omap_rng not
- always mandatory
-Date: Fri, 24 Mar 2017 22:13:42 +0800
-Message-ID: <20170324141342.GE14780@gondor.apana.org.au>
-References: <1489755519-32664-1-git-send-email-thomas.petazzoni@free-electrons.com>
+Subject: Re: [PATCH] crypto: xts,lrw - fix out-of-bounds write after kmalloc
+ failure
+Date: Fri, 24 Mar 2017 22:15:36 +0800
+Message-ID: <20170324141536.GK14780@gondor.apana.org.au>
+References: <CACT4Y+ZnQq9x7gXTpaRxnMSh_2Uk461J9CWnoq3i5KQBY-nLGw@mail.gmail.com>
+ <20170323203946.11242-1-ebiggers3@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: devicetree@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
-        Ian Campbell <ijc+devicetree@hellion.org.uk>,
-        Pawel Moll <pawel.moll@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Kumar Gala <galak@codeaurora.org>,
-        linux-crypto@vger.kernel.org, romain.perier@collabora.com,
-        Nadav Haklai <nadavh@marvell.com>,
-        Hanna Hawa <hannah@marvell.com>,
-        Yehuda Yitschak <yehuday@marvell.com>,
-        Jason Cooper <jason@lakedaemon.net>,
-        Andrew Lunn <andrew@lunn.ch>,
-        Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-        Gregory Clement <gregory.clement@free-electrons.com>,
-        stable@vger.kernel.org
-To: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+Cc: linux-crypto@vger.kernel.org,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>,
+        syzkaller <syzkaller@googlegroups.com>,
+        Eric Biggers <ebiggers@google.com>, stable@vger.kernel.org
+To: Eric Biggers <ebiggers3@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:42716 "EHLO
+Received: from orcrist.hmeau.com ([104.223.48.154]:42750 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S936130AbdCXOPM (ORCPT
+        with ESMTP id S965702AbdCXOQH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 24 Mar 2017 10:15:12 -0400
+        Fri, 24 Mar 2017 10:16:07 -0400
 Content-Disposition: inline
-In-Reply-To: <1489755519-32664-1-git-send-email-thomas.petazzoni@free-electrons.com>
+In-Reply-To: <20170323203946.11242-1-ebiggers3@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Mar 17, 2017 at 01:58:39PM +0100, Thomas Petazzoni wrote:
-> Commit 52060836f79 ("dt-bindings: omap-rng: Document SafeXcel IP-76
-> device variant") update the omap_rng Device Tree binding to add support
-> for the IP-76 variation of the IP. As part of this change, a "clocks"
-> property was added, but is indicated as "Required", without indicated
-> it's actually only required for some compatible strings.
+On Thu, Mar 23, 2017 at 01:39:46PM -0700, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
 > 
-> This commit fixes that, by explicitly stating that the clocks property
-> is only required with the inside-secure,safexcel-eip76 compatible
-> string.
+> In the generic XTS and LRW algorithms, for input data > 128 bytes, a
+> temporary buffer is allocated to hold the values to be XOR'ed with the
+> data before and after encryption or decryption.  If the allocation
+> fails, the fixed-size buffer embedded in the request buffer is meant to
+> be used as a fallback --- resulting in more calls to the ECB algorithm,
+> but still producing the correct result.  However, we weren't correctly
+> limiting subreq->cryptlen in this case, resulting in pre_crypt()
+> overrunning the embedded buffer.  Fix this by setting subreq->cryptlen
+> correctly.
 > 
-> Fixes: 52060836f79 ("dt-bindings: omap-rng: Document SafeXcel IP-76 device variant")
-> Cc: <stable@vger.kernel.org>
-> Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+> Fixes: f1c131b45410 ("crypto: xts - Convert to skcipher")
+> Fixes: 700cb3f5fe75 ("crypto: lrw - Convert to skcipher")
+> Cc: stable@vger.kernel.org # v4.10+
+> Reported-by: Dmitry Vyukov <dvyukov@google.com>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
 Patch applied.  Thanks.
 -- 
