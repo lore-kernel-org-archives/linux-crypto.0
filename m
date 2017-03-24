@@ -1,7 +1,7 @@
 From: Krzysztof Kozlowski <krzk@kernel.org>
-Subject: [PATCH 2/3] ARM: exynos_defconfig: Enable Exynos RNG and user-space crypto API
-Date: Fri, 24 Mar 2017 17:24:45 +0300
-Message-ID: <20170324142446.31129-3-krzk@kernel.org>
+Subject: [PATCH 3/3] ARM: multi_v7_defconfig: Enable Exynos RNG and user-space crypto API
+Date: Fri, 24 Mar 2017 17:24:46 +0300
+Message-ID: <20170324142446.31129-4-krzk@kernel.org>
 References: <20170324142446.31129-1-krzk@kernel.org>
 Cc: Arnd Bergmann <arnd@arndb.de>, Olof Johansson <olof@lixom.net>,
         Krzysztof Kozlowski <krzk@kernel.org>
@@ -22,25 +22,26 @@ user-space API to access crypto algorithms and devices (not only RNG).
 
 Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
 ---
- arch/arm/configs/exynos_defconfig | 6 ++++++
+ arch/arm/configs/multi_v7_defconfig | 6 ++++++
  1 file changed, 6 insertions(+)
 
-diff --git a/arch/arm/configs/exynos_defconfig b/arch/arm/configs/exynos_defconfig
-index 6dc661c4a2c1..960d55445e05 100644
---- a/arch/arm/configs/exynos_defconfig
-+++ b/arch/arm/configs/exynos_defconfig
-@@ -265,6 +265,12 @@ CONFIG_DEBUG_RT_MUTEXES=y
- CONFIG_DEBUG_SPINLOCK=y
- CONFIG_DEBUG_MUTEXES=y
- CONFIG_DEBUG_USER=y
+diff --git a/arch/arm/configs/multi_v7_defconfig b/arch/arm/configs/multi_v7_defconfig
+index 36c1b39cfb54..9bc1bd7f2afa 100644
+--- a/arch/arm/configs/multi_v7_defconfig
++++ b/arch/arm/configs/multi_v7_defconfig
+@@ -935,7 +935,13 @@ CONFIG_CPUFREQ_DT=y
+ CONFIG_KEYSTONE_IRQ=y
+ CONFIG_HW_RANDOM=y
+ CONFIG_HW_RANDOM_ST=y
 +CONFIG_CRYPTO_USER=m
 +CONFIG_CRYPTO_USER_API_HASH=m
 +CONFIG_CRYPTO_USER_API_SKCIPHER=m
 +CONFIG_CRYPTO_USER_API_RNG=m
 +CONFIG_CRYPTO_USER_API_AEAD=m
-+CONFIG_CRYPTO_DEV_EXYNOS_RNG=y
- CONFIG_CRYPTO_DEV_S5P=y
- CONFIG_ARM_CRYPTO=y
- CONFIG_CRYPTO_SHA1_ARM_NEON=m
+ CONFIG_CRYPTO_DEV_MARVELL_CESA=m
++CONFIG_CRYPTO_DEV_EXYNOS_RNG=m
+ CONFIG_CRYPTO_DEV_S5P=m
+ CONFIG_CRYPTO_DEV_SUN4I_SS=m
+ CONFIG_CRYPTO_DEV_ROCKCHIP=m
 -- 
 2.9.3
