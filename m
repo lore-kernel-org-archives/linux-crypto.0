@@ -1,69 +1,59 @@
-From: Dmitry Vyukov <dvyukov@google.com>
-Subject: Re: [PATCH 6/7] md/raid10, LLVM: get rid of variable length array
-Date: Fri, 24 Mar 2017 14:50:24 +0100
-Message-ID: <CACT4Y+bRWePGuZB-HCGBhHuENHAM=uDDv3i81fwZjNUKhNY2UA@mail.gmail.com>
-References: <20170317001520.85223-1-md@google.com> <20170317001520.85223-7-md@google.com>
- <20170317120837.pr74cv3xuj7qpoin@hirez.programming.kicks-ass.net>
- <CAG_fn=XcQLtcHRSm2BHYce9LMtyFJ+fWxfE4vYPCw+7U0DcrmQ@mail.gmail.com>
- <CAG_fn=WooTLkzex3hqPgO5pr7GsK3v7Z5riSA7K+-_S=S7rmBQ@mail.gmail.com>
- <20170317180350.63jjysejk2i6vkon@pd.tnic> <CACT4Y+Ysvjz+UzEi0dTtsNxxnG7WXTiZPr+KSk8HHwSu7vX1ew@mail.gmail.com>
- <20170317185720.5s7qa6hl233t24ag@pd.tnic> <CACT4Y+bybdpqB71=inx8amwr188Mb2QyBeRTDdWZ3AFyDwVX0A@mail.gmail.com>
- <20170317192642.qnrf7xuopxzapl2r@hirez.programming.kicks-ass.net> <20170317192935.d5almj4brat6uvlt@hirez.programming.kicks-ass.net>
+From: Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH v2] dt-bindings: rng: clocks property on omap_rng not
+ always mandatory
+Date: Fri, 24 Mar 2017 08:52:00 -0500
+Message-ID: <20170324135200.j7m3zzgphbetqn7p@rob-hp-laptop>
+References: <1489755519-32664-1-git-send-email-thomas.petazzoni@free-electrons.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Borislav Petkov <bp@alien8.de>,
-        Alexander Potapenko <glider@google.com>,
-        Michael Davidson <md@google.com>,
-        Michal Marek <mmarek@suse.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
+Content-Type: text/plain; charset=us-ascii
+Cc: devicetree@vger.kernel.org,
+        Ian Campbell <ijc+devicetree@hellion.org.uk>,
+        Pawel Moll <pawel.moll@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Kumar Gala <galak@codeaurora.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Shaohua Li <shli@kernel.org>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-crypto@vger.kernel.org, linux-raid@vger.kernel.org,
-        kbuild-all@01.org, Fengguang Wu <fengguang.wu@intel.com>
-To: Peter Zijlstra <peterz@infradead.org>
-Return-path: <linux-kbuild-owner@vger.kernel.org>
-In-Reply-To: <20170317192935.d5almj4brat6uvlt@hirez.programming.kicks-ass.net>
-Sender: linux-kbuild-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+        linux-crypto@vger.kernel.org, romain.perier@collabora.com,
+        Nadav Haklai <nadavh@marvell.com>,
+        Hanna Hawa <hannah@marvell.com>,
+        Yehuda Yitschak <yehuday@marvell.com>,
+        Jason Cooper <jason@lakedaemon.net>,
+        Andrew Lunn <andrew@lunn.ch>,
+        Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+        Gregory Clement <gregory.clement@free-electrons.com>,
+        stable@vger.kernel.org
+To: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-ot0-f194.google.com ([74.125.82.194]:35147 "EHLO
+        mail-ot0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752767AbdCXNwE (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 24 Mar 2017 09:52:04 -0400
+Content-Disposition: inline
+In-Reply-To: <1489755519-32664-1-git-send-email-thomas.petazzoni@free-electrons.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Mar 17, 2017 at 8:29 PM, Peter Zijlstra <peterz@infradead.org> wrote:
-> On Fri, Mar 17, 2017 at 08:26:42PM +0100, Peter Zijlstra wrote:
->> On Fri, Mar 17, 2017 at 08:05:16PM +0100, Dmitry Vyukov wrote:
->> > You can also find some reasons in the Why section of LLVM-Linux project:
->> > http://llvm.linuxfoundation.org/index.php/Main_Page
->>
->> From that:
->>
->>  - LLVM/Clang is a fast moving project with many things fixed quickly
->>    and features added.
->>
->> So what's the deal with that 5 year old bug you want us to work around?
->>
->> Also, clang doesn't support asm cc flags output and a few other
->> extensions last time I checked.
->>
->
-> Another great one:
->
->  - BSD License (some people prefer this license to the GPL)
->
-> Seems a very weak argument to make when talking about the Linux Kernel
-> which is very explicitly GPLv2 (and not later).
+On Fri, Mar 17, 2017 at 01:58:39PM +0100, Thomas Petazzoni wrote:
+> Commit 52060836f79 ("dt-bindings: omap-rng: Document SafeXcel IP-76
+> device variant") update the omap_rng Device Tree binding to add support
+> for the IP-76 variation of the IP. As part of this change, a "clocks"
+> property was added, but is indicated as "Required", without indicated
+> it's actually only required for some compatible strings.
+> 
+> This commit fixes that, by explicitly stating that the clocks property
+> is only required with the inside-secure,safexcel-eip76 compatible
+> string.
+> 
+> Fixes: 52060836f79 ("dt-bindings: omap-rng: Document SafeXcel IP-76 device variant")
+> Cc: <stable@vger.kernel.org>
+> Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+> ---
+> Changes since v1:
+>  - Instead of indicating the property as optional, indicate it as
+>    mandatory for the inside-secure,safexcel-eip76 compatible string, as
+>    suggested by Rob Herring.
+> ---
+>  Documentation/devicetree/bindings/rng/omap_rng.txt | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 
-OK, I guess should not have referenced the llvm-linux page.
-So here are reasons on our side that I am ready to vouch:
-
- - clang make it possible to implement KMSAN (dynamic detection of
-uses of uninit memory)
- - better code coverage for fuzzing
- - why simpler and faster development (e.g. we can port our user-space
-hardening technologies -- CFI and SafeStack)
-
-Michael is on a different team and has own reasons to do this.
+Acked-by: Rob Herring <robh@kernel.org>
