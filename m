@@ -1,59 +1,93 @@
-From: Rob Herring <robh@kernel.org>
-Subject: Re: [PATCH v2] dt-bindings: rng: clocks property on omap_rng not
- always mandatory
-Date: Fri, 24 Mar 2017 08:52:00 -0500
-Message-ID: <20170324135200.j7m3zzgphbetqn7p@rob-hp-laptop>
-References: <1489755519-32664-1-git-send-email-thomas.petazzoni@free-electrons.com>
+From: Shawn Guo <shawnguo-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Subject: Re: [PATCH] arm64: dts: ls1012a: add crypto node
+Date: Fri, 24 Mar 2017 22:03:22 +0800
+Message-ID: <20170324140320.GP30608@dragon>
+References: <20170322122939.22117-1-horia.geanta@nxp.com>
+ <20170324015606.GC30608@dragon>
+ <DB4PR04MB0847D837CB2762D5094720CB983E0@DB4PR04MB0847.eurprd04.prod.outlook.com>
+ <20170324073420.GM30608@dragon>
+ <DB4PR04MB0847E3EE8F7FAC11DD85FAA8983E0@DB4PR04MB0847.eurprd04.prod.outlook.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: devicetree@vger.kernel.org,
-        Ian Campbell <ijc+devicetree@hellion.org.uk>,
-        Pawel Moll <pawel.moll@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Kumar Gala <galak@codeaurora.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org, romain.perier@collabora.com,
-        Nadav Haklai <nadavh@marvell.com>,
-        Hanna Hawa <hannah@marvell.com>,
-        Yehuda Yitschak <yehuday@marvell.com>,
-        Jason Cooper <jason@lakedaemon.net>,
-        Andrew Lunn <andrew@lunn.ch>,
-        Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-        Gregory Clement <gregory.clement@free-electrons.com>,
-        stable@vger.kernel.org
-To: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ot0-f194.google.com ([74.125.82.194]:35147 "EHLO
-        mail-ot0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752767AbdCXNwE (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 24 Mar 2017 09:52:04 -0400
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
+        "devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+        Harninder Rai <harninder.rai-3arQi8VN3Tc@public.gmane.org>,
+        Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>,
+        Bhaskar U <bhaskar.upadhaya-3arQi8VN3Tc@public.gmane.org>,
+        Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>,
+        Dan Douglass <dan.douglass-3arQi8VN3Tc@public.gmane.org>,
+        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        "linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+        "linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org"
+        <linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta-3arQi8VN3Tc@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <1489755519-32664-1-git-send-email-thomas.petazzoni@free-electrons.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <DB4PR04MB0847E3EE8F7FAC11DD85FAA8983E0-tLF+feb1Bz4/w1fYxD+T089NdZoXdze2vxpqHgZTriW3zl9H0oFU5g@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Mar 17, 2017 at 01:58:39PM +0100, Thomas Petazzoni wrote:
-> Commit 52060836f79 ("dt-bindings: omap-rng: Document SafeXcel IP-76
-> device variant") update the omap_rng Device Tree binding to add support
-> for the IP-76 variation of the IP. As part of this change, a "clocks"
-> property was added, but is indicated as "Required", without indicated
-> it's actually only required for some compatible strings.
-> 
-> This commit fixes that, by explicitly stating that the clocks property
-> is only required with the inside-secure,safexcel-eip76 compatible
-> string.
-> 
-> Fixes: 52060836f79 ("dt-bindings: omap-rng: Document SafeXcel IP-76 device variant")
-> Cc: <stable@vger.kernel.org>
-> Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
-> ---
-> Changes since v1:
->  - Instead of indicating the property as optional, indicate it as
->    mandatory for the inside-secure,safexcel-eip76 compatible string, as
->    suggested by Rob Herring.
-> ---
->  Documentation/devicetree/bindings/rng/omap_rng.txt | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+On Fri, Mar 24, 2017 at 08:29:17AM +0000, Horia Geantă wrote:
+> On 3/24/2017 9:35 AM, Shawn Guo wrote:
+> > On Fri, Mar 24, 2017 at 07:17:50AM +0000, Horia Geantă wrote:
+> >>>> +		sec_mon: sec_mon@1e90000 {
+> >>>
+> >>> Hyphen is more preferred to be used in node name than underscore.
+> >>>
+> >> This would imply changing the
+> >> Documentation/devicetree/bindings/crypto/fsl-sec4.txt binding and
+> >> dealing with all the consequences, which IIUC is probably not worth.
+> > 
+> > I do not care the bindings doc that much, since I'm not the maintainer
+> > of it.  What are the consequences specifically, if we use a better node
+> > name in dts than bindings example?
+> > 
+> Users relying on finding the sec_mon node will obviously stop working.
+> I don't see any in-kernel users, however there could be others I am not
+> aware of and DT bindings should provide for backwards compatibility.
 
-Acked-by: Rob Herring <robh@kernel.org>
+Okay, point taken.  You can keep the node name as it is.
+
+> I could deprecate "sec_mon" in the bindings and suggest "sec-mon"
+> instead, while leaving all existing dts files as-is.
+> The risk is breaking LS1012A users relying on "sec_mon".
+
+For existing bindings, I do not care that much.  But for new ones, I do
+hope that we recommend to use hyphen, as that's more idiomatic at least
+for Linux kernel.
+
+> I see that ePAPR:
+> -allows both for hyphen and underline in case of node names
+> -allows only for hyphen (i.e. forbids underline) in case of alias nodes
+> 
+> In the first case, I understand there's an (undocumented?) agreement to
+> prefer hyphen over underline.
+
+Both are valid, but hyphen is more idiomatic for Linux kernel.
+
+> For the 2nd one, does this mean I should change alias names?
+
+This is something I see difference between specification and DTC.
+
+	aliases {
+		alias-name = &label_name;
+	};
+
+	label_name: node-name {
+		...
+	};
+
+The spec says that only hyphen is valid for alias name, but DTC works
+happily with underscore too.  From my experience with DTC playing, both
+hyphen and underscore are valid for alias and node name.  But for label
+name, only underscore is valid.  Using hyphen in label name will cause
+DTC to report syntax error.
+
+Shawn
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
