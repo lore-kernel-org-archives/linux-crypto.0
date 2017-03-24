@@ -1,10 +1,8 @@
 From: Krzysztof Kozlowski <krzk@kernel.org>
-Subject: [PATCH v2 0/3] crypto: hw_random - Add new Exynos RNG driver
-Date: Fri, 24 Mar 2017 21:26:03 +0300
-Message-ID: <20170324182606.23339-1-krzk@kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Subject: [PATCH v2 2/3] ARM: exynos_defconfig: Enable Exynos RNG and user-space crypto API
+Date: Fri, 24 Mar 2017 21:26:05 +0300
+Message-ID: <20170324182606.23339-3-krzk@kernel.org>
+References: <20170324182606.23339-1-krzk@kernel.org>
 Cc: Arnd Bergmann <arnd@arndb.de>, Olof Johansson <olof@lixom.net>,
         Krzysztof Kozlowski <krzk@kernel.org>
 To: Kukjin Kim <kgene@kernel.org>,
@@ -16,71 +14,35 @@ To: Kukjin Kim <kgene@kernel.org>,
         linux-samsung-soc@vger.kernel.org, linux-crypto@vger.kernel.org,
         Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
         =?UTF-8?q?Stephan=20M=C3=BCller?= <smueller@chronox.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+Return-path: <linux-samsung-soc-owner@vger.kernel.org>
+In-Reply-To: <20170324182606.23339-1-krzk@kernel.org>
+Sender: linux-samsung-soc-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi,
+Enable the new Exynos pseudo random number generator driver and
+user-space API to access crypto algorithms and devices (not only RNG).
 
+Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
+---
+ arch/arm/configs/exynos_defconfig | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-This is a follow up of my questions around exynos-rng [1].
-
-Changes since v1:
-=================
-1. Re-work the code for seeding after system resume, following suggestions
-   and review by Stephan Müller.
-   The resume path was not tested.
-
-2. Re-seed itself from time to time (every 100 ms), suggested by Stephan
-   Müller.
-
-3. Use a define for retries (Bartlomiej Zolnierkiewicz).
-4. Add some docs.
-
-
-Description:
-============
-The existing exynos-rng has many issues.  The most important one is that
-it is a pseudo RNG device but uses hw_random interface which does not allow
-proper seeding.
-
-The RNG module on Exynos4 requires seeding.  On newer SoCs (like Exynos5420)
-it can seed itself from a true RNG.  Converting the existing driver
-to use TRNG would effectively drop support for Exynos4 and break
-compatibility with existing users.
-
-Instead I decided to convert it to crypto API.  In the future I hope
-to add support for seeding from TRNG module.
-
-Tested with app [2].
-
-Patches are independent. I will take the defconfig changes (2/3 and 3/3)
-through samsung-soc tree.
-
-Best regards,
-Krzysztof
-
-[1] https://www.spinics.net/lists/arm-kernel/msg569641.html
-[2] https://www.spinics.net/lists/arm-kernel/msg571184.html
-
-
-Krzysztof Kozlowski (3):
-  crypto: hw_random - Add new Exynos RNG driver
-  ARM: exynos_defconfig: Enable Exynos RNG and user-space crypto API
-  ARM: multi_v7_defconfig: Enable Exynos RNG and user-space crypto API
-
- MAINTAINERS                         |   8 +
- arch/arm/configs/exynos_defconfig   |   6 +
- arch/arm/configs/multi_v7_defconfig |   6 +
- drivers/char/hw_random/Kconfig      |  14 --
- drivers/char/hw_random/Makefile     |   1 -
- drivers/char/hw_random/exynos-rng.c | 231 ---------------------
- drivers/crypto/Kconfig              |  15 ++
- drivers/crypto/Makefile             |   1 +
- drivers/crypto/exynos-rng.c         | 392 ++++++++++++++++++++++++++++++++++++
- 9 files changed, 428 insertions(+), 246 deletions(-)
- delete mode 100644 drivers/char/hw_random/exynos-rng.c
- create mode 100644 drivers/crypto/exynos-rng.c
-
+diff --git a/arch/arm/configs/exynos_defconfig b/arch/arm/configs/exynos_defconfig
+index 6dc661c4a2c1..960d55445e05 100644
+--- a/arch/arm/configs/exynos_defconfig
++++ b/arch/arm/configs/exynos_defconfig
+@@ -265,6 +265,12 @@ CONFIG_DEBUG_RT_MUTEXES=y
+ CONFIG_DEBUG_SPINLOCK=y
+ CONFIG_DEBUG_MUTEXES=y
+ CONFIG_DEBUG_USER=y
++CONFIG_CRYPTO_USER=m
++CONFIG_CRYPTO_USER_API_HASH=m
++CONFIG_CRYPTO_USER_API_SKCIPHER=m
++CONFIG_CRYPTO_USER_API_RNG=m
++CONFIG_CRYPTO_USER_API_AEAD=m
++CONFIG_CRYPTO_DEV_EXYNOS_RNG=y
+ CONFIG_CRYPTO_DEV_S5P=y
+ CONFIG_ARM_CRYPTO=y
+ CONFIG_CRYPTO_SHA1_ARM_NEON=m
 -- 
 2.9.3
