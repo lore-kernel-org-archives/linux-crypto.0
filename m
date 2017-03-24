@@ -1,42 +1,128 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: [PATCH] crypto: xts,lrw - fix out-of-bounds write after
- kmalloc failure
-Date: Thu, 23 Mar 2017 14:05:14 -0700 (PDT)
-Message-ID: <20170323.140514.85099184426140784.davem@davemloft.net>
-References: <CACT4Y+ZnQq9x7gXTpaRxnMSh_2Uk461J9CWnoq3i5KQBY-nLGw@mail.gmail.com>
-        <20170323203946.11242-1-ebiggers3@gmail.com>
+From: James Morris <jmorris@namei.org>
+Subject: [ANNOUNCE] Linux Security Summit 2017 - CFP
+Date: Fri, 24 Mar 2017 12:26:43 +1100 (AEDT)
+Message-ID: <alpine.LRH.2.20.1703241217250.10825@namei.org>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-        linux-kernel@vger.kernel.org, dvyukov@google.com,
-        syzkaller@googlegroups.com, ebiggers@google.com,
-        stable@vger.kernel.org
-To: ebiggers3@gmail.com
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170323203946.11242-1-ebiggers3@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: multipart/mixed; BOUNDARY="1665246916-1864586338-1490318299=:10825"
+Cc: lwn@lwn.net, fedora-selinux-list@redhat.com, selinux@tycho.nsa.gov,
+        Linux Security Summit Program Committee <lss-pc@lists.linuxfoundation.org>,
+        ubuntu-hardened@lists.ubuntu.com, netfilter-devel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, Audit-ML <linux-audit@redhat.com>,
+        gentoo-hardened@gentoo.org, keyrings@linux-nfs.org,
+        tpmdd-devel@lists.sourceforge.net, kernel-hardening@lists.openwall.com,
+        oss-security@lists.openwall.com, openxt@googlegroups.com,
+        tee-dev@lists.linaro.org
+To: linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org
+Return-path: <kernel-hardening-return-7094-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
+List-Post: <mailto:kernel-hardening@lists.openwall.com>
+List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
+List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
+List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
+Content-ID: <alpine.LRH.2.20.1703241220400.10825@namei.org>
 List-Id: linux-crypto.vger.kernel.org
 
-From: Eric Biggers <ebiggers3@gmail.com>
-Date: Thu, 23 Mar 2017 13:39:46 -0700
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-> From: Eric Biggers <ebiggers@google.com>
-> 
-> In the generic XTS and LRW algorithms, for input data > 128 bytes, a
-> temporary buffer is allocated to hold the values to be XOR'ed with the
-> data before and after encryption or decryption.  If the allocation
-> fails, the fixed-size buffer embedded in the request buffer is meant to
-> be used as a fallback --- resulting in more calls to the ECB algorithm,
-> but still producing the correct result.  However, we weren't correctly
-> limiting subreq->cryptlen in this case, resulting in pre_crypt()
-> overrunning the embedded buffer.  Fix this by setting subreq->cryptlen
-> correctly.
-> 
-> Fixes: f1c131b45410 ("crypto: xts - Convert to skcipher")
-> Fixes: 700cb3f5fe75 ("crypto: lrw - Convert to skcipher")
-> Cc: stable@vger.kernel.org # v4.10+
-> Reported-by: Dmitry Vyukov <dvyukov@google.com>
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
+--1665246916-1864586338-1490318299=:10825
+Content-Type: text/plain; CHARSET=ISO-8859-7
+Content-Transfer-Encoding: 8BIT
+Content-ID: <alpine.LRH.2.20.1703241220401.10825@namei.org>
 
-Acked-by: David S. Miller <davem@davemloft.net>
+
+==============================================================================
+		   ANNOUNCEMENT AND CALL FOR PARTICIPATION
+
+			  LINUX SECURITY SUMMIT 2017
+                         
+			       14-15 September
+			       LOS ANGELES, USA
+==============================================================================
+
+
+DESCRIPTION
+
+  The Linux Security Summit (LSS) is a technical forum for collaboration
+  between Linux developers, researchers, and end users. Its primary aim is to
+  foster community efforts in analyzing and solving Linux security challenges.
+
+  LSS this year will be co-located with the Open Source Summit and the Linux
+  Plumbers Conference.
+
+  The program committee currently seeks proposals for:
+
+    * Refereed Presentations:
+      45 minutes in length, including at least 10 minutes of discussion.
+
+    * Discussion Topics:
+      30 minutes in length.
+
+  Topic areas include, but are not limited to:
+
+    * Kernel self-protection
+    * Access control
+    * Cryptography and key management
+    * Integrity control
+    * Hardware Security
+    * Iot and embedded security
+    * Virtualization and containers
+    * System-specific system hardening
+    * Case studies
+    * Security tools
+    * Security UX
+    * Emerging technologies, threats & techniques 
+
+  Proposals should be submitted via:
+    http://events.linuxfoundation.org/events/linux-security-summit/program/cfp
+
+
+DATES
+
+  * CFP Close: June 5, 2017
+  * CFP Notifications: June 12, 2017
+  * Schedule Announced: June 19, 2017
+  * Slide Submission: August 31, 2017
+
+
+WHO SHOULD ATTEND
+
+  We're seeking a diverse range of attendees, and welcome participation by
+  people involved in Linux security development, operations, and research.
+
+  The LSS is a unique global event which provides the opportunity to present
+  and discuss your work or research with key Linux security community members
+  and maintainers.  It¢s also useful for those who wish to keep up with the
+  latest in Linux security development, and to provide input to the
+  development process.
+
+
+WEB SITE
+
+  http://events.linuxfoundation.org/events/linux-security-summit
+
+
+TWITTER
+
+  For event updates and announcements, follow:
+
+    https://twitter.com/LinuxSecSummit
+  
+
+PROGRAM COMMITTEE
+
+  The program committee for LSS 2017 is:
+
+    * James Morris, Oracle
+    * Serge Hallyn, Canonical
+    * Paul Moore, Red Hat
+    * Stephen Smalley, NSA
+    * Elena Reshetova, Intel
+    * John Johansen, Canonical
+    * Kees Cook, Google
+    * Casey Schaufler, Intel
+    * Mimi Zohar, IBM
+    * David A. Wheeler, Institute for Defense Analyses
+
+  The program committee may be contacted as a group via email:
+    lss-pc () lists.linuxfoundation.org
+--1665246916-1864586338-1490318299=:10825--
