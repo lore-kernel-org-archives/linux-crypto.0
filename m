@@ -1,60 +1,61 @@
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Subject: [PATCH v2 3/3] ARM: multi_v7_defconfig: Enable Exynos RNG and
- user-space crypto API
-Date: Fri, 24 Mar 2017 21:26:06 +0300
-Message-ID: <20170324182606.23339-4-krzk@kernel.org>
-References: <20170324182606.23339-1-krzk@kernel.org>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: Re: [PATCH v2 1/3] crypto: hw_random - Add new Exynos RNG driver
+Date: Fri, 24 Mar 2017 21:41:59 +0100
+Message-ID: <4248691.8fGIDmasva@tauon.atsec.com>
+References: <20170324182606.23339-1-krzk@kernel.org> <20170324182606.23339-2-krzk@kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Olof Johansson <olof@lixom.net>, Krzysztof Kozlowski <krzk@kernel.org>,
- Arnd Bergmann <arnd@arndb.de>
-To: Kukjin Kim <kgene@kernel.org>,
- Javier Martinez Canillas <javier@osg.samsung.com>,
- Matt Mackall <mpm@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-samsung-soc@vger.kernel.org,
- linux-crypto@vger.kernel.org,
- Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
- =?UTF-8?q?Stephan=20M=C3=BCller?= <smueller@chronox.de>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20170324182606.23339-1-krzk@kernel.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8BIT
+Cc: Kukjin Kim <kgene@kernel.org>,
+        Javier Martinez Canillas <javier@osg.samsung.com>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-samsung-soc@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Arnd Bergmann <arnd@arndb.de>, Olof Johansson <olof@lixom.net>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Return-path: <linux-samsung-soc-owner@vger.kernel.org>
+In-Reply-To: <20170324182606.23339-2-krzk@kernel.org>
+Sender: linux-samsung-soc-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Enable the new Exynos pseudo random number generator driver and
-user-space API to access crypto algorithms and devices (not only RNG).
+Am Freitag, 24. März 2017, 19:26:04 CET schrieb Krzysztof Kozlowski:
 
-Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
----
- arch/arm/configs/multi_v7_defconfig | 6 ++++++
- 1 file changed, 6 insertions(+)
+Hi Krzysztof,
 
-diff --git a/arch/arm/configs/multi_v7_defconfig b/arch/arm/configs/multi_v7_defconfig
-index 36c1b39cfb54..9bc1bd7f2afa 100644
---- a/arch/arm/configs/multi_v7_defconfig
-+++ b/arch/arm/configs/multi_v7_defconfig
-@@ -935,7 +935,13 @@ CONFIG_CPUFREQ_DT=y
- CONFIG_KEYSTONE_IRQ=y
- CONFIG_HW_RANDOM=y
- CONFIG_HW_RANDOM_ST=y
-+CONFIG_CRYPTO_USER=m
-+CONFIG_CRYPTO_USER_API_HASH=m
-+CONFIG_CRYPTO_USER_API_SKCIPHER=m
-+CONFIG_CRYPTO_USER_API_RNG=m
-+CONFIG_CRYPTO_USER_API_AEAD=m
- CONFIG_CRYPTO_DEV_MARVELL_CESA=m
-+CONFIG_CRYPTO_DEV_EXYNOS_RNG=m
- CONFIG_CRYPTO_DEV_S5P=m
- CONFIG_CRYPTO_DEV_SUN4I_SS=m
- CONFIG_CRYPTO_DEV_ROCKCHIP=m
--- 
-2.9.3
+> +static unsigned int exynos_rng_copy_random(struct exynos_rng_dev *rng,
+> +					   u8 *dst, unsigned int dlen)
+> +{
+> +	unsigned int cnt = 0;
+> +	int i, j;
+> +	u32 val;
+> +
+> +	for (j = 0; j < EXYNOS_RNG_SEED_REGS; j++) {
+> +		val = exynos_rng_readl(rng, EXYNOS_RNG_OUT(j));
+> +
+> +		for (i = 0; i < 4; i++) {
+> +			dst[cnt] = val & 0xff;
+> +			val >>= 8;
+> +			if (++cnt >= dlen)
+> +				return cnt;
+> +		}
+> +		rng->seed_save[j] = val;
+
+Just to clarify: is this call right? Shouldn't that be removed? Any RNG that 
+is given to a caller is tainted and should not serve as seed.
+> +	}
+> +
+> +	/*
+> +	 * Engine filled all output registers, so read the remaining registers
+> +	 * for storing data as future seed.
+> +	 */
+> +	for (; j < EXYNOS_RNG_SEED_REGS; j++)
+> +		rng->seed_save[j] = exynos_rng_readl(rng, EXYNOS_RNG_OUT(j));
+
+With this call, I guess the questioned line above could go away, right?
+
+
+Ciao
+Stephan
