@@ -1,33 +1,28 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: zip - Memory corruption in zip_clear_stats()
-Date: Fri, 24 Mar 2017 22:14:07 +0800
-Message-ID: <20170324141407.GG14780@gondor.apana.org.au>
-References: <20170317204621.GD16505@mwanda>
+Subject: Re: [PATCH] crypto: ixp4xx - Use sg_virt()
+Date: Fri, 24 Mar 2017 22:17:58 +0800
+Message-ID: <20170324141758.GL14780@gondor.apana.org.au>
+References: <a41fae798473b657f09859ae113403655b1717f9.1490258141.git.geliangtang@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Mahipal Challa <mahipalreddy2006@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jan Glauber <jglauber@cavium.com>,
-        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
-To: Dan Carpenter <dan.carpenter@oracle.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Geliang Tang <geliangtang@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:42694 "EHLO
+Received: from orcrist.hmeau.com ([104.223.48.154]:42766 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S935748AbdCXOOr (ORCPT
+        with ESMTP id S936035AbdCXOSN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 24 Mar 2017 10:14:47 -0400
+        Fri, 24 Mar 2017 10:18:13 -0400
 Content-Disposition: inline
-In-Reply-To: <20170317204621.GD16505@mwanda>
+In-Reply-To: <a41fae798473b657f09859ae113403655b1717f9.1490258141.git.geliangtang@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Mar 17, 2017 at 11:46:21PM +0300, Dan Carpenter wrote:
-> There is a typo here.  It should be "stats" instead of "state".  The
-> impact is that we clear 224 bytes instead of 80 and we zero out memory
-> that we shouldn't.
+On Thu, Mar 23, 2017 at 09:16:30PM +0800, Geliang Tang wrote:
+> Use sg_virt() instead of open-coding it.
 > 
-> Fixes: 09ae5d37e093 ("crypto: zip - Add Compression/Decompression statistics")
-> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+> Signed-off-by: Geliang Tang <geliangtang@gmail.com>
 
 Patch applied.  Thanks.
 -- 
