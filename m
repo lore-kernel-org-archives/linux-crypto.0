@@ -1,57 +1,34 @@
-From: Peter Zijlstra <peterz@infradead.org>
-Subject: Re: [PATCH 6/7] md/raid10, LLVM: get rid of variable length array
-Date: Fri, 24 Mar 2017 15:10:53 +0100
-Message-ID: <20170324141053.lte3qq7mfl6krlkb@hirez.programming.kicks-ass.net>
-References: <20170317120837.pr74cv3xuj7qpoin@hirez.programming.kicks-ass.net>
- <CAG_fn=XcQLtcHRSm2BHYce9LMtyFJ+fWxfE4vYPCw+7U0DcrmQ@mail.gmail.com>
- <CAG_fn=WooTLkzex3hqPgO5pr7GsK3v7Z5riSA7K+-_S=S7rmBQ@mail.gmail.com>
- <20170317180350.63jjysejk2i6vkon@pd.tnic>
- <CACT4Y+Ysvjz+UzEi0dTtsNxxnG7WXTiZPr+KSk8HHwSu7vX1ew@mail.gmail.com>
- <20170317185720.5s7qa6hl233t24ag@pd.tnic>
- <CACT4Y+bybdpqB71=inx8amwr188Mb2QyBeRTDdWZ3AFyDwVX0A@mail.gmail.com>
- <20170317192642.qnrf7xuopxzapl2r@hirez.programming.kicks-ass.net>
- <20170317192935.d5almj4brat6uvlt@hirez.programming.kicks-ass.net>
- <CACT4Y+bRWePGuZB-HCGBhHuENHAM=uDDv3i81fwZjNUKhNY2UA@mail.gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] md5: remove from lib and only live in crypto
+Date: Fri, 24 Mar 2017 22:13:13 +0800
+Message-ID: <20170324141313.GC14780@gondor.apana.org.au>
+References: <20170316141857.20910-1-Jason@zx2c4.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Borislav Petkov <bp@alien8.de>,
-        Alexander Potapenko <glider@google.com>,
-        Michael Davidson <md@google.com>,
-        Michal Marek <mmarek@suse.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Shaohua Li <shli@kernel.org>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-crypto@vger.kernel.org, linux-raid@vger.kernel.org,
-        kbuild-all@01.org, Fengguang Wu <fengguang.wu@intel.com>
-To: Dmitry Vyukov <dvyukov@google.com>
-Return-path: <linux-raid-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:42628 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S935803AbdCXONX (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 24 Mar 2017 10:13:23 -0400
 Content-Disposition: inline
-In-Reply-To: <CACT4Y+bRWePGuZB-HCGBhHuENHAM=uDDv3i81fwZjNUKhNY2UA@mail.gmail.com>
-Sender: linux-raid-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20170316141857.20910-1-Jason@zx2c4.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Mar 24, 2017 at 02:50:24PM +0100, Dmitry Vyukov wrote:
-> OK, I guess should not have referenced the llvm-linux page.
-> So here are reasons on our side that I am ready to vouch:
+On Thu, Mar 16, 2017 at 03:18:57PM +0100, Jason A. Donenfeld wrote:
+> The md5_transform function is no longer used any where in the tree,
+> except for the crypto api's actual implementation of md5, so we can drop
+> the function from lib and put it as a static function of the crypto
+> file, where it belongs. There should be no new users of md5_transform,
+> anyway, since there are more modern ways of doing what it once achieved.
 > 
->  - clang make it possible to implement KMSAN (dynamic detection of
-> uses of uninit memory)
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 
-How does GCC make this impossible?
-
->  - better code coverage for fuzzing
-
-How so? Why can't the same be achieved using GCC?
-
->  - why simpler and faster development (e.g. we can port our user-space
-> hardening technologies -- CFI and SafeStack)
-
-That's just because you've already implemented this in clang, right? So
-less work for you. Not because its impossible.
+Patch applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
