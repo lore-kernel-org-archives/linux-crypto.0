@@ -1,93 +1,56 @@
-From: Shawn Guo <shawnguo-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-Subject: Re: [PATCH] arm64: dts: ls1012a: add crypto node
-Date: Fri, 24 Mar 2017 22:03:22 +0800
-Message-ID: <20170324140320.GP30608@dragon>
-References: <20170322122939.22117-1-horia.geanta@nxp.com>
- <20170324015606.GC30608@dragon>
- <DB4PR04MB0847D837CB2762D5094720CB983E0@DB4PR04MB0847.eurprd04.prod.outlook.com>
- <20170324073420.GM30608@dragon>
- <DB4PR04MB0847E3EE8F7FAC11DD85FAA8983E0@DB4PR04MB0847.eurprd04.prod.outlook.com>
+From: Peter Zijlstra <peterz@infradead.org>
+Subject: Re: [PATCH 6/7] md/raid10, LLVM: get rid of variable length array
+Date: Fri, 24 Mar 2017 15:09:36 +0100
+Message-ID: <20170324140936.45gjbfdjyyag5cce@hirez.programming.kicks-ass.net>
+References: <20170317001520.85223-1-md@google.com>
+ <20170317001520.85223-7-md@google.com>
+ <20170317120837.pr74cv3xuj7qpoin@hirez.programming.kicks-ass.net>
+ <CAG_fn=XcQLtcHRSm2BHYce9LMtyFJ+fWxfE4vYPCw+7U0DcrmQ@mail.gmail.com>
+ <20170317124404.mt3jd5q5vyk63q2w@hirez.programming.kicks-ass.net>
+ <CA+=D-XXy9yEQc-jLxSqRUwq=4ADnFqaxnsjSzV4=8jOisym=bQ@mail.gmail.com>
+ <20170317192746.y5ade3bymifdni2p@hirez.programming.kicks-ass.net>
+ <96158847-4F1F-4293-8435-E111F39E3260@zytor.com>
+ <CACT4Y+awYCAwoCkh8PQ-i2BdkxeuFp9meVXp=Yv6hGY8YjDnQg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
-        "devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-        Harninder Rai <harninder.rai-3arQi8VN3Tc@public.gmane.org>,
-        Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>,
-        Bhaskar U <bhaskar.upadhaya-3arQi8VN3Tc@public.gmane.org>,
-        Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>,
-        Dan Douglass <dan.douglass-3arQi8VN3Tc@public.gmane.org>,
-        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        "linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-        "linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org"
-        <linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
-To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta-3arQi8VN3Tc@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: "H. Peter Anvin" <hpa@zytor.com>, Michael Davidson <md@google.com>,
+        Alexander Potapenko <glider@google.com>,
+        Michal Marek <mmarek@suse.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Shaohua Li <shli@kernel.org>,
+        Matthias Kaehlcke <mka@chromium.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-crypto@vger.kernel.org, linux-raid@vger.kernel.org
+To: Dmitry Vyukov <dvyukov@google.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from merlin.infradead.org ([205.233.59.134]:55892 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S965014AbdCXOKA (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 24 Mar 2017 10:10:00 -0400
 Content-Disposition: inline
-In-Reply-To: <DB4PR04MB0847E3EE8F7FAC11DD85FAA8983E0-tLF+feb1Bz4/w1fYxD+T089NdZoXdze2vxpqHgZTriW3zl9H0oFU5g@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <CACT4Y+awYCAwoCkh8PQ-i2BdkxeuFp9meVXp=Yv6hGY8YjDnQg@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Mar 24, 2017 at 08:29:17AM +0000, Horia Geantă wrote:
-> On 3/24/2017 9:35 AM, Shawn Guo wrote:
-> > On Fri, Mar 24, 2017 at 07:17:50AM +0000, Horia Geantă wrote:
-> >>>> +		sec_mon: sec_mon@1e90000 {
-> >>>
-> >>> Hyphen is more preferred to be used in node name than underscore.
-> >>>
-> >> This would imply changing the
-> >> Documentation/devicetree/bindings/crypto/fsl-sec4.txt binding and
-> >> dealing with all the consequences, which IIUC is probably not worth.
-> > 
-> > I do not care the bindings doc that much, since I'm not the maintainer
-> > of it.  What are the consequences specifically, if we use a better node
-> > name in dts than bindings example?
-> > 
-> Users relying on finding the sec_mon node will obviously stop working.
-> I don't see any in-kernel users, however there could be others I am not
-> aware of and DT bindings should provide for backwards compatibility.
-
-Okay, point taken.  You can keep the node name as it is.
-
-> I could deprecate "sec_mon" in the bindings and suggest "sec-mon"
-> instead, while leaving all existing dts files as-is.
-> The risk is breaking LS1012A users relying on "sec_mon".
-
-For existing bindings, I do not care that much.  But for new ones, I do
-hope that we recommend to use hyphen, as that's more idiomatic at least
-for Linux kernel.
-
-> I see that ePAPR:
-> -allows both for hyphen and underline in case of node names
-> -allows only for hyphen (i.e. forbids underline) in case of alias nodes
+On Fri, Mar 24, 2017 at 02:47:15PM +0100, Dmitry Vyukov wrote:
+> > Seriously, you should have taken the hack the first time that this
+> > needs to be fixed.  Just because this is a fairly uncommon construct
+> > in the kernel doesn't mean it is not in userspace.
 > 
-> In the first case, I understand there's an (undocumented?) agreement to
-> prefer hyphen over underline.
+> There is a reason why it is fairly uncommon in kernel.
 
-Both are valid, but hyphen is more idiomatic for Linux kernel.
+So first off; its not entirely clear that the code as it exists it
+correct. From a cursory reading of it and surrounding code, there is no
+actual upper limit on the variable. If I were stupid enough to make a
+raid with 64 devices I'd get a huge on-stack structure.
 
-> For the 2nd one, does this mean I should change alias names?
+Since you're touching it; you should check these things.
 
-This is something I see difference between specification and DTC.
-
-	aliases {
-		alias-name = &label_name;
-	};
-
-	label_name: node-name {
-		...
-	};
-
-The spec says that only hyphen is valid for alias name, but DTC works
-happily with underscore too.  From my experience with DTC playing, both
-hyphen and underscore are valid for alias and node name.  But for label
-name, only underscore is valid.  Using hyphen in label name will cause
-DTC to report syntax error.
-
-Shawn
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+And secondly, refactor the code to not look like dog vomit. You can do
+more than the absolute minimal patch to make it compile, I'm sure.
