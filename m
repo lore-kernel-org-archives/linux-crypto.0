@@ -1,69 +1,79 @@
-From: =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>
-Subject: Re: [PATCH] arm64: dts: ls1012a: add crypto node
-Date: Fri, 24 Mar 2017 08:29:17 +0000
-Message-ID: <DB4PR04MB0847E3EE8F7FAC11DD85FAA8983E0@DB4PR04MB0847.eurprd04.prod.outlook.com>
-References: <20170322122939.22117-1-horia.geanta@nxp.com>
- <20170324015606.GC30608@dragon>
- <DB4PR04MB0847D837CB2762D5094720CB983E0@DB4PR04MB0847.eurprd04.prod.outlook.com>
- <20170324073420.GM30608@dragon>
+From: Steffen Klassert <steffen.klassert@secunet.com>
+Subject: Re: [PATCH] padata: avoid race in reordering
+Date: Fri, 24 Mar 2017 10:41:59 +0100
+Message-ID: <20170324094157.GE5279@secunet.com>
+References: <CAHmME9oLWiprOyZXo7zvGm7xq+1Kchw9ybLS_TM-9xDyHF0mxQ@mail.gmail.com>
+ <20170323112443.30843-1-Jason@zx2c4.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
-Cc: Mark Rutland <mark.rutland@arm.com>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Harninder Rai <harninder.rai@nxp.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Bhaskar U <bhaskar.upadhaya@nxp.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Dan Douglass <dan.douglass@nxp.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        "linux-arm-kernel@lists.infradead.org"
-        <linux-arm-kernel@lists.infradead.org>
-To: Shawn Guo <shawnguo@kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-he1eur01on0070.outbound.protection.outlook.com ([104.47.0.70]:52480
-        "EHLO EUR01-HE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751499AbdCXI3X (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 24 Mar 2017 04:29:23 -0400
-Content-Language: en-US
+Received: from a.mx.secunet.com ([62.96.220.36]:49392 "EHLO a.mx.secunet.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753963AbdCXJmN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 24 Mar 2017 05:42:13 -0400
+Content-Disposition: inline
+In-Reply-To: <20170323112443.30843-1-Jason@zx2c4.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 3/24/2017 9:35 AM, Shawn Guo wrote:=0A=
-> On Fri, Mar 24, 2017 at 07:17:50AM +0000, Horia Geant=E3 wrote:=0A=
->>>> +		sec_mon: sec_mon@1e90000 {=0A=
->>>=0A=
->>> Hyphen is more preferred to be used in node name than underscore.=0A=
->>>=0A=
->> This would imply changing the=0A=
->> Documentation/devicetree/bindings/crypto/fsl-sec4.txt binding and=0A=
->> dealing with all the consequences, which IIUC is probably not worth.=0A=
-> =0A=
-> I do not care the bindings doc that much, since I'm not the maintainer=0A=
-> of it.  What are the consequences specifically, if we use a better node=
-=0A=
-> name in dts than bindings example?=0A=
-> =0A=
-Users relying on finding the sec_mon node will obviously stop working.=0A=
-I don't see any in-kernel users, however there could be others I am not=0A=
-aware of and DT bindings should provide for backwards compatibility.=0A=
-=0A=
-I could deprecate "sec_mon" in the bindings and suggest "sec-mon"=0A=
-instead, while leaving all existing dts files as-is.=0A=
-The risk is breaking LS1012A users relying on "sec_mon".=0A=
-=0A=
-I see that ePAPR:=0A=
--allows both for hyphen and underline in case of node names=0A=
--allows only for hyphen (i.e. forbids underline) in case of alias nodes=0A=
-=0A=
-In the first case, I understand there's an (undocumented?) agreement to=0A=
-prefer hyphen over underline.=0A=
-For the 2nd one, does this mean I should change alias names?=0A=
-=0A=
-Thanks,=0A=
-Horia=0A=
-=0A=
+On Thu, Mar 23, 2017 at 12:24:43PM +0100, Jason A. Donenfeld wrote:
+> Under extremely heavy uses of padata, crashes occur, and with list
+> debugging turned on, this happens instead:
+> 
+> [87487.298728] WARNING: CPU: 1 PID: 882 at lib/list_debug.c:33
+> __list_add+0xae/0x130
+> [87487.301868] list_add corruption. prev->next should be next
+> (ffffb17abfc043d0), but was ffff8dba70872c80. (prev=ffff8dba70872b00).
+> [87487.339011]  [<ffffffff9a53d075>] dump_stack+0x68/0xa3
+> [87487.342198]  [<ffffffff99e119a1>] ? console_unlock+0x281/0x6d0
+> [87487.345364]  [<ffffffff99d6b91f>] __warn+0xff/0x140
+> [87487.348513]  [<ffffffff99d6b9aa>] warn_slowpath_fmt+0x4a/0x50
+> [87487.351659]  [<ffffffff9a58b5de>] __list_add+0xae/0x130
+> [87487.354772]  [<ffffffff9add5094>] ? _raw_spin_lock+0x64/0x70
+> [87487.357915]  [<ffffffff99eefd66>] padata_reorder+0x1e6/0x420
+> [87487.361084]  [<ffffffff99ef0055>] padata_do_serial+0xa5/0x120
+> 
+> padata_reorder calls list_add_tail with the list to which its adding
+> locked, which seems correct:
+> 
+> spin_lock(&squeue->serial.lock);
+> list_add_tail(&padata->list, &squeue->serial.list);
+> spin_unlock(&squeue->serial.lock);
+> 
+> This therefore leaves only place where such inconsistency could occur:
+> if padata->list is added at the same time on two different threads.
+> This pdata pointer comes from the function call to
+> padata_get_next(pd), which has in it the following block:
+> 
+> next_queue = per_cpu_ptr(pd->pqueue, cpu);
+> padata = NULL;
+> reorder = &next_queue->reorder;
+> if (!list_empty(&reorder->list)) {
+>        padata = list_entry(reorder->list.next,
+>                            struct padata_priv, list);
+>        spin_lock(&reorder->lock);
+>        list_del_init(&padata->list);
+>        atomic_dec(&pd->reorder_objects);
+>        spin_unlock(&reorder->lock);
+> 
+>        pd->processed++;
+> 
+>        goto out;
+> }
+> out:
+> return padata;
+> 
+> I strongly suspect that the problem here is that two threads can race
+> on reorder list. Even though the deletion is locked, call to
+> list_entry is not locked, which means it's feasible that two threads
+> pick up the same padata object and subsequently call list_add_tail on
+> them at the same time. The fix is thus be hoist that lock outside of
+> that block.
+> 
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+
+Acked-by: Steffen Klassert <steffen.klassert@secunet.com>
