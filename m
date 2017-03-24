@@ -1,46 +1,90 @@
-From: Krzysztof Kozlowski <krzk@kernel.org>
+From: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
 Subject: Re: [PATCH 1/3] crypto: hw_random - Add new Exynos RNG driver
-Date: Fri, 24 Mar 2017 17:58:18 +0300
-Message-ID: <20170324145818.3muyy4cq3gms5len@kozik-lap>
+Date: Fri, 24 Mar 2017 16:26:47 +0100
+Message-ID: <3940941.n3qdgn1RbN@amdc3058>
 References: <20170324142446.31129-1-krzk@kernel.org>
- <3628768.ze2UxnIp5I@tauon.atsec.com>
- <20170324145156.miqmxgkhn2v7rbcu@kozik-lap>
- <2090327.CHzkLTTdtg@positron.chronox.de>
+ <20170324142446.31129-2-krzk@kernel.org>
+ <CGME20170324152650epcas5p1fb48677d6b5ac7210d6df438a5e70ca3@epcas5p1.samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-Cc: Kukjin Kim <kgene@kernel.org>,
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7Bit
+Cc: linux-arm-kernel@lists.infradead.org,
+        Kukjin Kim <kgene@kernel.org>,
         Javier Martinez Canillas <javier@osg.samsung.com>,
         Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-samsung-soc@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Arnd Bergmann <arnd@arndb.de>, Olof Johansson <olof@lixom.net>
-To: Stephan =?utf-8?Q?M=C3=BCller?= <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:35381 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752863AbdCXO60 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 24 Mar 2017 10:58:26 -0400
-Content-Disposition: inline
-In-Reply-To: <2090327.CHzkLTTdtg@positron.chronox.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+        linux-kernel@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
+        linux-crypto@vger.kernel.org, Olof Johansson <olof@lixom.net>,
+        Arnd Bergmann <arnd@arndb.de>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Return-path: <linux-samsung-soc-owner@vger.kernel.org>
+In-reply-to: <20170324142446.31129-2-krzk@kernel.org>
+Sender: linux-samsung-soc-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Mar 24, 2017 at 03:55:22PM +0100, Stephan Müller wrote:
-> Am Freitag, 24. März 2017, 15:51:56 CET schrieb Krzysztof Kozlowski:
-> 
-> Hi Krzysztof,
-> > 
-> > I'll use the generated random numbers.
-> 
-> If you do that, may I propse that you update this seed field periodically? 
-> E.g. with every (or every other) user request for random data, you may update 
-> that field with new data.
 
-Sounds reasonable. Thanks for feedback, it is much appreciated.
+Hi,
+
+Firstly, thanks for working on this.
+
+The patch looks fine overall for me, some review comments below.
+
+On Friday, March 24, 2017 05:24:44 PM Krzysztof Kozlowski wrote:
+> Replace existing hw_ranndom/exynos-rng driver with a new, reworked one.
+> This is a driver for pseudo random number generator block which on
+> Exynos4 chipsets must be seeded with some value.  On newer Exynos5420
+> chipsets it might seed itself from true random number generator block
+> but this is not implemented yet.
+> 
+> New driver is a complete rework to use the crypto ALGAPI instead of
+> hw_random API.  Rationale for the change:
+> 1. hw_random interface is for true RNG devices.
+> 2. The old driver was seeding itself with jiffies which is not a
+>    reliable source for randomness.
+> 3. Device generates five random numbers in each pass but old driver was
+>    returning only one thus its performance was reduced.
+> 
+> Compatibility with DeviceTree bindings is preserved.
+> 
+> New driver does not use runtime power management but manually enables
+> and disables the clock when needed.  This is preferred approach because
+> using runtime PM just to toggle clock is huge overhead.  Another
+
+I'm not entirely convinced that the new approach is better.
+
+With the old approach exynos_rng_generate() can be called more
+than once before PM autosuspend kicks in and thus clk_prepare_enable()/
+clk_disable()_unprepare() operations will be done only once. This
+would give better performance on the "burst" operations.
+
+[ The above assumes that clock operations are more costly than
+  going through PM core to check the current device state. ]
+
+> +static int exynos_rng_get_random(struct exynos_rng_dev *rng,
+> +				 u8 *dst, unsigned int dlen,
+> +				 unsigned int *read)
+> +{
+> +	int retry = 100;
+
+I know that this is copied verbatim from the old driver but please
+use define for the maximum number of retries.
+
+> +static int exynos_rng_probe(struct platform_device *pdev)
+> +{
+> +	struct exynos_rng_dev *rng;
+> +	struct resource *res;
+> +	int ret;
+> +
+> +	if (exynos_rng_dev)
+> +		return -EEXIST;
+
+How this condition could ever happen? 
+
+The probe function will never be called twice.
 
 Best regards,
-Krzysztof
+--
+Bartlomiej Zolnierkiewicz
+Samsung R&D Institute Poland
+Samsung Electronics
