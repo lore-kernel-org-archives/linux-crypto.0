@@ -1,74 +1,53 @@
 From: Krzysztof Kozlowski <krzk@kernel.org>
-Subject: [PATCH v3 0/3] crypto: hw_random - Add new Exynos RNG driver
-Date: Sat, 25 Mar 2017 19:26:51 +0300
-Message-ID: <20170325162654.3827-1-krzk@kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Olof Johansson <olof@lixom.net>, Krzysztof Kozlowski <krzk@kernel.org>,
- Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH v3 3/3] ARM: multi_v7_defconfig: Enable Exynos RNG and user-space crypto API
+Date: Sat, 25 Mar 2017 19:26:54 +0300
+Message-ID: <20170325162654.3827-4-krzk@kernel.org>
+References: <20170325162654.3827-1-krzk@kernel.org>
+Cc: Arnd Bergmann <arnd@arndb.de>, Olof Johansson <olof@lixom.net>,
+        Krzysztof Kozlowski <krzk@kernel.org>
 To: Kukjin Kim <kgene@kernel.org>,
- Javier Martinez Canillas <javier@osg.samsung.com>,
- Matt Mackall <mpm@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-samsung-soc@vger.kernel.org,
- linux-crypto@vger.kernel.org,
- Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
- =?UTF-8?q?Stephan=20M=C3=BCller?= <smueller@chronox.de>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+        Javier Martinez Canillas <javier@osg.samsung.com>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-samsung-soc@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        =?UTF-8?q?Stephan=20M=C3=BCller?= <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.kernel.org ([198.145.29.136]:44252 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751395AbdCYQ2Q (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 25 Mar 2017 12:28:16 -0400
+In-Reply-To: <20170325162654.3827-1-krzk@kernel.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-SGksCgoKVGhpcyBpcyBhIGZvbGxvdyB1cCBvZiBteSBxdWVzdGlvbnMgYXJvdW5kIGV4eW5vcy1y
-bmcgWzFdLgoKQ2hhbmdlcyBzaW5jZSB2MjoKPT09PT09PT09PT09PT09PT0KMS4gRG8gbm90IHJl
-LXVzZSByYW5kb20gbnVtYmVycyBmb3IgcmUtc2VlZCAobmVpdGhlciBmb3Igc3lzdGVtIHJlc3Vt
-ZQogICBub3IgZm9yIHBlcmlvZGljIHJlLXNlZWQpLiAgSW5zdGVhZCB0aGUgZHJpdmVyIHdpbGwg
-anVzdCBnZW5lcmF0ZSBuZXcKICAgcmFuZG9tIG51bWJlcnMgKHN1Z2dlc3RlZCBieSBTdGVwaGFu
-IE3DvGxsZXIpLgoKICAgU3VzcGVuZCBwYXRoIHRlc3RlZCB3aXRoIHN1c3BlbmQtdG8tZnJlZXpl
-LCBub3QgcmVhbCBzdXNwZW5kLiBUZXN0aW5nCiAgIG9uIFRyYXRzMiB3b3VsZCBiZSB3ZWxjb21l
-ZC4KCkNoYW5nZXMgc2luY2UgdjE6Cj09PT09PT09PT09PT09PT09CjEuIFJlLXdvcmsgdGhlIGNv
-ZGUgZm9yIHNlZWRpbmcgYWZ0ZXIgc3lzdGVtIHJlc3VtZSwgZm9sbG93aW5nIHN1Z2dlc3Rpb25z
-CiAgIGFuZCByZXZpZXcgYnkgU3RlcGhhbiBNw7xsbGVyLgoKMi4gUmUtc2VlZCBpdHNlbGYgZnJv
-bSB0aW1lIHRvIHRpbWUgKGV2ZXJ5IDEwMCBtcyksIHN1Z2dlc3RlZCBieSBTdGVwaGFuCiAgIE3D
-vGxsZXIuCgozLiBVc2UgYSBkZWZpbmUgZm9yIHJldHJpZXMgKEJhcnRsb21pZWogWm9sbmllcmtp
-ZXdpY3opLgo0LiBBZGQgc29tZSBkb2NzLgoKCkRlc2NyaXB0aW9uOgo9PT09PT09PT09PT0KVGhl
-IGV4aXN0aW5nIGV4eW5vcy1ybmcgaGFzIG1hbnkgaXNzdWVzLiAgVGhlIG1vc3QgaW1wb3J0YW50
-IG9uZSBpcyB0aGF0Cml0IGlzIGEgcHNldWRvIFJORyBkZXZpY2UgYnV0IHVzZXMgaHdfcmFuZG9t
-IGludGVyZmFjZSB3aGljaCBkb2VzIG5vdCBhbGxvdwpwcm9wZXIgc2VlZGluZy4KClRoZSBSTkcg
-bW9kdWxlIG9uIEV4eW5vczQgcmVxdWlyZXMgc2VlZGluZy4gIE9uIG5ld2VyIFNvQ3MgKGxpa2Ug
-RXh5bm9zNTQyMCkKaXQgY2FuIHNlZWQgaXRzZWxmIGZyb20gYSB0cnVlIFJORy4gIENvbnZlcnRp
-bmcgdGhlIGV4aXN0aW5nIGRyaXZlcgp0byB1c2UgVFJORyB3b3VsZCBlZmZlY3RpdmVseSBkcm9w
-IHN1cHBvcnQgZm9yIEV4eW5vczQgYW5kIGJyZWFrCmNvbXBhdGliaWxpdHkgd2l0aCBleGlzdGlu
-ZyB1c2Vycy4KCkluc3RlYWQgSSBkZWNpZGVkIHRvIGNvbnZlcnQgaXQgdG8gY3J5cHRvIEFQSS4g
-IEluIHRoZSBmdXR1cmUgSSBob3BlCnRvIGFkZCBzdXBwb3J0IGZvciBzZWVkaW5nIGZyb20gVFJO
-RyBtb2R1bGUuCgpUZXN0ZWQgd2l0aCBhcHAgWzJdLgoKUGF0Y2hlcyBhcmUgaW5kZXBlbmRlbnQu
-IEkgd2lsbCB0YWtlIHRoZSBkZWZjb25maWcgY2hhbmdlcyAoMi8zIGFuZCAzLzMpCnRocm91Z2gg
-c2Ftc3VuZy1zb2MgdHJlZS4KCkJlc3QgcmVnYXJkcywKS3J6eXN6dG9mCgpbMV0gaHR0cHM6Ly93
-d3cuc3Bpbmljcy5uZXQvbGlzdHMvYXJtLWtlcm5lbC9tc2c1Njk2NDEuaHRtbApbMl0gaHR0cHM6
-Ly93d3cuc3Bpbmljcy5uZXQvbGlzdHMvYXJtLWtlcm5lbC9tc2c1NzExODQuaHRtbAoKCktyenlz
-enRvZiBLb3psb3dza2kgKDMpOgogIGNyeXB0bzogaHdfcmFuZG9tIC0gQWRkIG5ldyBFeHlub3Mg
-Uk5HIGRyaXZlcgogIEFSTTogZXh5bm9zX2RlZmNvbmZpZzogRW5hYmxlIEV4eW5vcyBSTkcgYW5k
-IHVzZXItc3BhY2UgY3J5cHRvIEFQSQogIEFSTTogbXVsdGlfdjdfZGVmY29uZmlnOiBFbmFibGUg
-RXh5bm9zIFJORyBhbmQgdXNlci1zcGFjZSBjcnlwdG8gQVBJCgogTUFJTlRBSU5FUlMgICAgICAg
-ICAgICAgICAgICAgICAgICAgfCAgIDggKwogYXJjaC9hcm0vY29uZmlncy9leHlub3NfZGVmY29u
-ZmlnICAgfCAgIDYgKwogYXJjaC9hcm0vY29uZmlncy9tdWx0aV92N19kZWZjb25maWcgfCAgIDYg
-KwogZHJpdmVycy9jaGFyL2h3X3JhbmRvbS9LY29uZmlnICAgICAgfCAgMTQgLS0KIGRyaXZlcnMv
-Y2hhci9od19yYW5kb20vTWFrZWZpbGUgICAgIHwgICAxIC0KIGRyaXZlcnMvY2hhci9od19yYW5k
-b20vZXh5bm9zLXJuZy5jIHwgMjMxIC0tLS0tLS0tLS0tLS0tLS0tLS0tLQogZHJpdmVycy9jcnlw
-dG8vS2NvbmZpZyAgICAgICAgICAgICAgfCAgMTUgKysKIGRyaXZlcnMvY3J5cHRvL01ha2VmaWxl
-ICAgICAgICAgICAgIHwgICAxICsKIGRyaXZlcnMvY3J5cHRvL2V4eW5vcy1ybmcuYyAgICAgICAg
-IHwgMzkwICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKwogOSBmaWxlcyBjaGFu
-Z2VkLCA0MjYgaW5zZXJ0aW9ucygrKSwgMjQ2IGRlbGV0aW9ucygtKQogZGVsZXRlIG1vZGUgMTAw
-NjQ0IGRyaXZlcnMvY2hhci9od19yYW5kb20vZXh5bm9zLXJuZy5jCiBjcmVhdGUgbW9kZSAxMDA2
-NDQgZHJpdmVycy9jcnlwdG8vZXh5bm9zLXJuZy5jCgotLSAKMi45LjMKCgpfX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpsaW51eC1hcm0ta2VybmVsIG1haWxp
-bmcgbGlzdApsaW51eC1hcm0ta2VybmVsQGxpc3RzLmluZnJhZGVhZC5vcmcKaHR0cDovL2xpc3Rz
-LmluZnJhZGVhZC5vcmcvbWFpbG1hbi9saXN0aW5mby9saW51eC1hcm0ta2VybmVsCg==
+Enable the new Exynos pseudo random number generator driver and
+user-space API to access crypto algorithms and devices (not only RNG).
+
+Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
+---
+ arch/arm/configs/multi_v7_defconfig | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/arch/arm/configs/multi_v7_defconfig b/arch/arm/configs/multi_v7_defconfig
+index 36c1b39cfb54..9bc1bd7f2afa 100644
+--- a/arch/arm/configs/multi_v7_defconfig
++++ b/arch/arm/configs/multi_v7_defconfig
+@@ -935,7 +935,13 @@ CONFIG_CPUFREQ_DT=y
+ CONFIG_KEYSTONE_IRQ=y
+ CONFIG_HW_RANDOM=y
+ CONFIG_HW_RANDOM_ST=y
++CONFIG_CRYPTO_USER=m
++CONFIG_CRYPTO_USER_API_HASH=m
++CONFIG_CRYPTO_USER_API_SKCIPHER=m
++CONFIG_CRYPTO_USER_API_RNG=m
++CONFIG_CRYPTO_USER_API_AEAD=m
+ CONFIG_CRYPTO_DEV_MARVELL_CESA=m
++CONFIG_CRYPTO_DEV_EXYNOS_RNG=m
+ CONFIG_CRYPTO_DEV_S5P=m
+ CONFIG_CRYPTO_DEV_SUN4I_SS=m
+ CONFIG_CRYPTO_DEV_ROCKCHIP=m
+-- 
+2.9.3
