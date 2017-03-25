@@ -1,36 +1,74 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: KPP: DH/ECDH -- allocation returns ENOENT
-Date: Sat, 25 Mar 2017 14:49:32 +0100
-Message-ID: <14907475.FJ9jHvJebq@positron.chronox.de>
-References: <2264613.TBqMtEgLeW@positron.chronox.de>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: [PATCH v3 0/3] crypto: hw_random - Add new Exynos RNG driver
+Date: Sat, 25 Mar 2017 19:26:51 +0300
+Message-ID: <20170325162654.3827-1-krzk@kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
-Cc: salvatore benedetto <salvatore.benedetto@gmail.com>,
-        linux-crypto@vger.kernel.org
-To: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:58404 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750731AbdCYNts (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 25 Mar 2017 09:49:48 -0400
-In-Reply-To: <2264613.TBqMtEgLeW@positron.chronox.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: Olof Johansson <olof@lixom.net>, Krzysztof Kozlowski <krzk@kernel.org>,
+ Arnd Bergmann <arnd@arndb.de>
+To: Kukjin Kim <kgene@kernel.org>,
+ Javier Martinez Canillas <javier@osg.samsung.com>,
+ Matt Mackall <mpm@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-samsung-soc@vger.kernel.org,
+ linux-crypto@vger.kernel.org,
+ Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+ =?UTF-8?q?Stephan=20M=C3=BCller?= <smueller@chronox.de>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Samstag, 25. März 2017, 05:59:07 CET schrieb Stephan Müller:
-
-Hi,
-
-> Hi Salvatore,
-> 
-> when I test 4.11-rc1 with the DH and ECDH options enabled, I get -ENOENT
-> when trying to allocate the ciphers dh/dh_generic/ecdh.
-> 
-> Note, the dh/ecdh kernel modules are loaded.
-
-Apologies, please disregard this email. I had a patch in the kernel that 
-forgot to remove :-)
-
-Ciao
-Stephan
+SGksCgoKVGhpcyBpcyBhIGZvbGxvdyB1cCBvZiBteSBxdWVzdGlvbnMgYXJvdW5kIGV4eW5vcy1y
+bmcgWzFdLgoKQ2hhbmdlcyBzaW5jZSB2MjoKPT09PT09PT09PT09PT09PT0KMS4gRG8gbm90IHJl
+LXVzZSByYW5kb20gbnVtYmVycyBmb3IgcmUtc2VlZCAobmVpdGhlciBmb3Igc3lzdGVtIHJlc3Vt
+ZQogICBub3IgZm9yIHBlcmlvZGljIHJlLXNlZWQpLiAgSW5zdGVhZCB0aGUgZHJpdmVyIHdpbGwg
+anVzdCBnZW5lcmF0ZSBuZXcKICAgcmFuZG9tIG51bWJlcnMgKHN1Z2dlc3RlZCBieSBTdGVwaGFu
+IE3DvGxsZXIpLgoKICAgU3VzcGVuZCBwYXRoIHRlc3RlZCB3aXRoIHN1c3BlbmQtdG8tZnJlZXpl
+LCBub3QgcmVhbCBzdXNwZW5kLiBUZXN0aW5nCiAgIG9uIFRyYXRzMiB3b3VsZCBiZSB3ZWxjb21l
+ZC4KCkNoYW5nZXMgc2luY2UgdjE6Cj09PT09PT09PT09PT09PT09CjEuIFJlLXdvcmsgdGhlIGNv
+ZGUgZm9yIHNlZWRpbmcgYWZ0ZXIgc3lzdGVtIHJlc3VtZSwgZm9sbG93aW5nIHN1Z2dlc3Rpb25z
+CiAgIGFuZCByZXZpZXcgYnkgU3RlcGhhbiBNw7xsbGVyLgoKMi4gUmUtc2VlZCBpdHNlbGYgZnJv
+bSB0aW1lIHRvIHRpbWUgKGV2ZXJ5IDEwMCBtcyksIHN1Z2dlc3RlZCBieSBTdGVwaGFuCiAgIE3D
+vGxsZXIuCgozLiBVc2UgYSBkZWZpbmUgZm9yIHJldHJpZXMgKEJhcnRsb21pZWogWm9sbmllcmtp
+ZXdpY3opLgo0LiBBZGQgc29tZSBkb2NzLgoKCkRlc2NyaXB0aW9uOgo9PT09PT09PT09PT0KVGhl
+IGV4aXN0aW5nIGV4eW5vcy1ybmcgaGFzIG1hbnkgaXNzdWVzLiAgVGhlIG1vc3QgaW1wb3J0YW50
+IG9uZSBpcyB0aGF0Cml0IGlzIGEgcHNldWRvIFJORyBkZXZpY2UgYnV0IHVzZXMgaHdfcmFuZG9t
+IGludGVyZmFjZSB3aGljaCBkb2VzIG5vdCBhbGxvdwpwcm9wZXIgc2VlZGluZy4KClRoZSBSTkcg
+bW9kdWxlIG9uIEV4eW5vczQgcmVxdWlyZXMgc2VlZGluZy4gIE9uIG5ld2VyIFNvQ3MgKGxpa2Ug
+RXh5bm9zNTQyMCkKaXQgY2FuIHNlZWQgaXRzZWxmIGZyb20gYSB0cnVlIFJORy4gIENvbnZlcnRp
+bmcgdGhlIGV4aXN0aW5nIGRyaXZlcgp0byB1c2UgVFJORyB3b3VsZCBlZmZlY3RpdmVseSBkcm9w
+IHN1cHBvcnQgZm9yIEV4eW5vczQgYW5kIGJyZWFrCmNvbXBhdGliaWxpdHkgd2l0aCBleGlzdGlu
+ZyB1c2Vycy4KCkluc3RlYWQgSSBkZWNpZGVkIHRvIGNvbnZlcnQgaXQgdG8gY3J5cHRvIEFQSS4g
+IEluIHRoZSBmdXR1cmUgSSBob3BlCnRvIGFkZCBzdXBwb3J0IGZvciBzZWVkaW5nIGZyb20gVFJO
+RyBtb2R1bGUuCgpUZXN0ZWQgd2l0aCBhcHAgWzJdLgoKUGF0Y2hlcyBhcmUgaW5kZXBlbmRlbnQu
+IEkgd2lsbCB0YWtlIHRoZSBkZWZjb25maWcgY2hhbmdlcyAoMi8zIGFuZCAzLzMpCnRocm91Z2gg
+c2Ftc3VuZy1zb2MgdHJlZS4KCkJlc3QgcmVnYXJkcywKS3J6eXN6dG9mCgpbMV0gaHR0cHM6Ly93
+d3cuc3Bpbmljcy5uZXQvbGlzdHMvYXJtLWtlcm5lbC9tc2c1Njk2NDEuaHRtbApbMl0gaHR0cHM6
+Ly93d3cuc3Bpbmljcy5uZXQvbGlzdHMvYXJtLWtlcm5lbC9tc2c1NzExODQuaHRtbAoKCktyenlz
+enRvZiBLb3psb3dza2kgKDMpOgogIGNyeXB0bzogaHdfcmFuZG9tIC0gQWRkIG5ldyBFeHlub3Mg
+Uk5HIGRyaXZlcgogIEFSTTogZXh5bm9zX2RlZmNvbmZpZzogRW5hYmxlIEV4eW5vcyBSTkcgYW5k
+IHVzZXItc3BhY2UgY3J5cHRvIEFQSQogIEFSTTogbXVsdGlfdjdfZGVmY29uZmlnOiBFbmFibGUg
+RXh5bm9zIFJORyBhbmQgdXNlci1zcGFjZSBjcnlwdG8gQVBJCgogTUFJTlRBSU5FUlMgICAgICAg
+ICAgICAgICAgICAgICAgICAgfCAgIDggKwogYXJjaC9hcm0vY29uZmlncy9leHlub3NfZGVmY29u
+ZmlnICAgfCAgIDYgKwogYXJjaC9hcm0vY29uZmlncy9tdWx0aV92N19kZWZjb25maWcgfCAgIDYg
+KwogZHJpdmVycy9jaGFyL2h3X3JhbmRvbS9LY29uZmlnICAgICAgfCAgMTQgLS0KIGRyaXZlcnMv
+Y2hhci9od19yYW5kb20vTWFrZWZpbGUgICAgIHwgICAxIC0KIGRyaXZlcnMvY2hhci9od19yYW5k
+b20vZXh5bm9zLXJuZy5jIHwgMjMxIC0tLS0tLS0tLS0tLS0tLS0tLS0tLQogZHJpdmVycy9jcnlw
+dG8vS2NvbmZpZyAgICAgICAgICAgICAgfCAgMTUgKysKIGRyaXZlcnMvY3J5cHRvL01ha2VmaWxl
+ICAgICAgICAgICAgIHwgICAxICsKIGRyaXZlcnMvY3J5cHRvL2V4eW5vcy1ybmcuYyAgICAgICAg
+IHwgMzkwICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKwogOSBmaWxlcyBjaGFu
+Z2VkLCA0MjYgaW5zZXJ0aW9ucygrKSwgMjQ2IGRlbGV0aW9ucygtKQogZGVsZXRlIG1vZGUgMTAw
+NjQ0IGRyaXZlcnMvY2hhci9od19yYW5kb20vZXh5bm9zLXJuZy5jCiBjcmVhdGUgbW9kZSAxMDA2
+NDQgZHJpdmVycy9jcnlwdG8vZXh5bm9zLXJuZy5jCgotLSAKMi45LjMKCgpfX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpsaW51eC1hcm0ta2VybmVsIG1haWxp
+bmcgbGlzdApsaW51eC1hcm0ta2VybmVsQGxpc3RzLmluZnJhZGVhZC5vcmcKaHR0cDovL2xpc3Rz
+LmluZnJhZGVhZC5vcmcvbWFpbG1hbi9saXN0aW5mby9saW51eC1hcm0ta2VybmVsCg==
