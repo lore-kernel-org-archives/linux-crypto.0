@@ -1,55 +1,98 @@
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Subject: Re: [PATCH v3 1/3] crypto: hw_random - Add new Exynos RNG driver
-Date: Sun, 26 Mar 2017 21:09:59 +0300
-Message-ID: <20170326180959.rmps6pj5376l45fz@kozik-lap>
-References: <20170325162654.3827-1-krzk@kernel.org>
- <20170326160126.nwboar7mwztwxtgp@kozik-lap>
- <CANc+2y4xkDs2kQGXKP=8i_v9oYw4dPKTjWs0xFnvOcwDbar47g@mail.gmail.com>
- <1535446.zHpTqe8jba@positron.chronox.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: linux-samsung-soc@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
- Arnd Bergmann <arnd@arndb.de>,
- Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
- PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
- linux-kernel@vger.kernel.org,
- Javier Martinez Canillas <javier@osg.samsung.com>,
- Kukjin Kim <kgene@kernel.org>, linux-crypto@vger.kernel.org,
- Matt Mackall <mpm@selenic.com>, Olof Johansson <olof@lixom.net>,
- "David S. Miller" <davem@davemloft.net>, linux-arm-kernel@lists.infradead.org
-To: Stephan =?utf-8?Q?M=C3=BCller?= <smueller@chronox.de>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <1535446.zHpTqe8jba@positron.chronox.de>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH 7/7] crypto: aes - allow alternative AES drivers to fulfil AES dependency
+Date: Sun, 26 Mar 2017 19:49:08 +0100
+Message-ID: <1490554148-10953-8-git-send-email-ard.biesheuvel@linaro.org>
+References: <1490554148-10953-1-git-send-email-ard.biesheuvel@linaro.org>
+Cc: nico@linaro.org, ebiggers3@gmail.com,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wr0-f169.google.com ([209.85.128.169]:36239 "EHLO
+        mail-wr0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751668AbdCZSvE (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 26 Mar 2017 14:51:04 -0400
+Received: by mail-wr0-f169.google.com with SMTP id w11so15508865wrc.3
+        for <linux-crypto@vger.kernel.org>; Sun, 26 Mar 2017 11:49:34 -0700 (PDT)
+In-Reply-To: <1490554148-10953-1-git-send-email-ard.biesheuvel@linaro.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-T24gU3VuLCBNYXIgMjYsIDIwMTcgYXQgMDc6MDU6NDhQTSArMDIwMCwgU3RlcGhhbiBNw7xsbGVy
-IHdyb3RlOgo+IEFtIFNvbm50YWcsIDI2LiBNw6RyeiAyMDE3LCAxODo0NjowMiBDRVNUIHNjaHJp
-ZWIgUHJhc2FubmFLdW1hciBNdXJhbGlkaGFyYW46Cj4gCj4gSGkgCUtyenlzenRvZiwKPiAKPiA+
-ID4+ID4gKyAgICAgICBpZiAoc2xlbiA8IEVYWU5PU19STkdfU0VFRF9TSVpFKSB7Cj4gPiA+PiA+
-ICsgICAgICAgICAgICAgICBkZXZfd2FybihybmctPmRldiwgIlNlZWQgdG9vIHNob3J0IChvbmx5
-ICV1IGJ5dGVzKVxuIiwKPiA+ID4+ID4gc2xlbik7ICsgICAgICAgICAgICAgICByZXR1cm4gLUVJ
-TlZBTDsKPiA+ID4+ID4gKyAgICAgICB9Cj4gPiA+PiAKPiA+ID4+IFdpbGwgaXQgYmUgaGVscGZ1
-bCB0byBwcmludCB0aGUgcmVxdWlyZWQgc2VlZCBzaXplPwo+ID4gPiAKPiA+ID4gSXQgaXMgaW4g
-L3Byb2MvY3J5cHRvLi4uIEl0IGlzIG5vdCBhIHByb2JsZW0gdG8gcHJpbnQgaXQgYnV0IGlzbid0
-IHRoYXQKPiA+ID4gcmVkdW5kYW50Pwo+ID4gCj4gPiBOb3QgbmVjZXNzYXJ5IGlmIGl0IGlzIGFs
-cmVhZHkgYXZhaWxhYmxlLgo+IAo+IE1heWJlIHRoZSBkZXZfd2FybiBzaG91bGQgYmUgcmVtb3Zl
-ZC4gTm90ZSwgdW5wcml2aWxlZ2VkIHVzZXIgc3BhY2UgY2FuIAo+IHRyaWdnZXIgdGhpcyB3YXJu
-aW5nIGJ5IHNpbXBseSBpbnZva2luZyB0aGUgc2VlZGluZyBvcGVyYXRpb24gb3ZlciBhbmQgb3Zl
-ciAKPiBhZ2FpbiB3aXRoIGFuIGluc3VmZmljaWVudCBzZWVkIHNpemUuIFRoaXMgd291bGQgY2x1
-dHRlciB0aGUgbG9nLgoKTWFrZXMgc2Vuc2UuIFRoZSBnZW5lcmljIGRldl9kYmcoKSBiZWZvcmUg
-d291bGQgYnJpbmcgZW5vdWdoCmluZm9ybWF0aW9uLgoKQmVzdCByZWdhcmRzLApLcnp5c3p0b2YK
-CgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpsaW51eC1h
-cm0ta2VybmVsIG1haWxpbmcgbGlzdApsaW51eC1hcm0ta2VybmVsQGxpc3RzLmluZnJhZGVhZC5v
-cmcKaHR0cDovL2xpc3RzLmluZnJhZGVhZC5vcmcvbWFpbG1hbi9saXN0aW5mby9saW51eC1hcm0t
-a2VybmVsCg==
+Allow other AES drivers than crypto/aes_generic.o to fulfil soft
+dependencies on AES. This allows CRYPTO_AES to be disabled if no
+hard dependencies on it are enabled.
+
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+ arch/arm/crypto/Kconfig   | 1 +
+ arch/arm64/crypto/Kconfig | 1 +
+ crypto/Kconfig            | 9 ++++++++-
+ 3 files changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
+index 10c9d0c7e615..91b282cf7a99 100644
+--- a/arch/arm/crypto/Kconfig
++++ b/arch/arm/crypto/Kconfig
+@@ -65,6 +65,7 @@ config CRYPTO_AES_ARM
+ 	tristate "Scalar AES cipher for ARM"
+ 	select CRYPTO_ALGAPI
+ 	select CRYPTO_AES_CORE
++	select CRYPTO_HAVE_AES
+ 	help
+ 	  Use optimized AES assembler routines for ARM platforms.
+ 
+diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
+index c5b04627a721..e1fbf8b78d7c 100644
+--- a/arch/arm64/crypto/Kconfig
++++ b/arch/arm64/crypto/Kconfig
+@@ -44,6 +44,7 @@ config CRYPTO_CRC32_ARM64_CE
+ config CRYPTO_AES_ARM64
+ 	tristate "AES core cipher using scalar instructions"
+ 	select CRYPTO_AES_CORE
++	select CRYPTO_HAVE_AES
+ 
+ config CRYPTO_AES_ARM64_CE
+ 	tristate "AES core cipher using ARMv8 Crypto Extensions"
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 1ba4e836077b..3a16e58992bc 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -896,7 +896,11 @@ comment "Ciphers"
+ 
+ config CRYPTO_NEED_AES
+ 	tristate
+-	select CRYPTO_AES
++	select CRYPTO_AES if (CRYPTO_NEED_AES=y && CRYPTO_HAVE_AES != y) || \
++			     (CRYPTO_NEED_AES=m && !CRYPTO_HAVE_AES)
++
++config CRYPTO_HAVE_AES
++	tristate
+ 
+ config CRYPTO_AES
+ 	tristate "AES cipher algorithms"
+@@ -927,6 +931,7 @@ config CRYPTO_AES_CORE
+ config CRYPTO_AES_TI
+ 	tristate "Fixed time AES cipher"
+ 	select CRYPTO_ALGAPI
++	select CRYPTO_HAVE_AES
+ 	help
+ 	  This is a generic implementation of AES that attempts to eliminate
+ 	  data dependent latencies as much as possible without affecting
+@@ -946,6 +951,7 @@ config CRYPTO_AES_586
+ 	depends on (X86 || UML_X86) && !64BIT
+ 	select CRYPTO_ALGAPI
+ 	select CRYPTO_AES_CORE
++	select CRYPTO_HAVE_AES
+ 	help
+ 	  AES cipher algorithms (FIPS-197). AES uses the Rijndael
+ 	  algorithm.
+@@ -968,6 +974,7 @@ config CRYPTO_AES_X86_64
+ 	depends on (X86 || UML_X86) && 64BIT
+ 	select CRYPTO_ALGAPI
+ 	select CRYPTO_AES_CORE
++	select CRYPTO_HAVE_AES
+ 	help
+ 	  AES cipher algorithms (FIPS-197). AES uses the Rijndael
+ 	  algorithm.
+-- 
+2.7.4
