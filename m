@@ -1,62 +1,67 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+From: Krzysztof Kozlowski <krzk@kernel.org>
 Subject: Re: [PATCH v3 1/3] crypto: hw_random - Add new Exynos RNG driver
-Date: Sun, 26 Mar 2017 19:11:28 +0200
-Message-ID: <2736911.EcZSki4vB1@positron.chronox.de>
-References: <20170325162654.3827-1-krzk@kernel.org> <20170325162654.3827-2-krzk@kernel.org>
+Date: Sun, 26 Mar 2017 21:00:12 +0300
+Message-ID: <20170326180012.3eic4bt2p6h6u3nh@kozik-lap>
+References: <20170325162654.3827-1-krzk@kernel.org>
+ <20170325162654.3827-2-krzk@kernel.org>
+ <2736911.EcZSki4vB1@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
-Cc: Kukjin Kim <kgene@kernel.org>,
-        Javier Martinez Canillas <javier@osg.samsung.com>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-samsung-soc@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Arnd Bergmann <arnd@arndb.de>, Olof Johansson <olof@lixom.net>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:58566 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751455AbdCZRLe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 26 Mar 2017 13:11:34 -0400
-In-Reply-To: <20170325162654.3827-2-krzk@kernel.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: linux-samsung-soc@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+ Arnd Bergmann <arnd@arndb.de>,
+ Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+ linux-kernel@vger.kernel.org,
+ Javier Martinez Canillas <javier@osg.samsung.com>,
+ Kukjin Kim <kgene@kernel.org>, linux-crypto@vger.kernel.org,
+ Matt Mackall <mpm@selenic.com>, Olof Johansson <olof@lixom.net>,
+ "David S. Miller" <davem@davemloft.net>, linux-arm-kernel@lists.infradead.org
+To: Stephan =?utf-8?Q?M=C3=BCller?= <smueller@chronox.de>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <2736911.EcZSki4vB1@positron.chronox.de>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Samstag, 25. März 2017, 17:26:52 CEST schrieb Krzysztof Kozlowski:
-
-Hi Krzysztof,
-
-> +static int exynos_rng_set_seed(struct exynos_rng_dev *rng,
-> +			       const u8 *seed, unsigned int slen)
-> +{
-> +	u32 val;
-> +	int i;
-> +
-> +	dev_dbg(rng->dev, "Seeding with %u bytes\n", slen);
-> +
-> +	if (slen < EXYNOS_RNG_SEED_SIZE) {
-> +		dev_warn(rng->dev, "Seed too short (only %u bytes)\n", slen);
-> +		return -EINVAL;
-> +	}
-> +
-> +	for (i = 0 ; i < EXYNOS_RNG_SEED_REGS ; i++) {
-> +		val = seed[i * 4] << 24;
-> +		val |= seed[i * 4 + 1] << 16;
-> +		val |= seed[i * 4 + 2] << 8;
-> +		val |= seed[i * 4 + 3] << 0;
-> +
-> +		exynos_rng_writel(rng, val, EXYNOS_RNG_SEED(i));
-> +	}
-
-Would it make sense to add another outer loop here to allow all of slen to be 
-injected into the DRNG? Note, in some cases, a user wants to add more seed 
-into the DRNG than the actual seed size. In this case, the DRNG acts as a 
-compression operation of entropy. This is used when the entropy-to-data ratio 
-is not 1:1. In a lot of cases, users have a seed which has less entropy in 
-bits per data bit.
-
-Ciao
-Stephan
+T24gU3VuLCBNYXIgMjYsIDIwMTcgYXQgMDc6MTE6MjhQTSArMDIwMCwgU3RlcGhhbiBNw7xsbGVy
+IHdyb3RlOgo+IEFtIFNhbXN0YWcsIDI1LiBNw6RyeiAyMDE3LCAxNzoyNjo1MiBDRVNUIHNjaHJp
+ZWIgS3J6eXN6dG9mIEtvemxvd3NraToKPiA+ICtzdGF0aWMgaW50IGV4eW5vc19ybmdfc2V0X3Nl
+ZWQoc3RydWN0IGV4eW5vc19ybmdfZGV2ICpybmcsCj4gPiArCQkJICAgICAgIGNvbnN0IHU4ICpz
+ZWVkLCB1bnNpZ25lZCBpbnQgc2xlbikKPiA+ICt7Cj4gPiArCXUzMiB2YWw7Cj4gPiArCWludCBp
+Owo+ID4gKwo+ID4gKwlkZXZfZGJnKHJuZy0+ZGV2LCAiU2VlZGluZyB3aXRoICV1IGJ5dGVzXG4i
+LCBzbGVuKTsKPiA+ICsKPiA+ICsJaWYgKHNsZW4gPCBFWFlOT1NfUk5HX1NFRURfU0laRSkgewo+
+ID4gKwkJZGV2X3dhcm4ocm5nLT5kZXYsICJTZWVkIHRvbyBzaG9ydCAob25seSAldSBieXRlcylc
+biIsIHNsZW4pOwo+ID4gKwkJcmV0dXJuIC1FSU5WQUw7Cj4gPiArCX0KPiA+ICsKPiA+ICsJZm9y
+IChpID0gMCA7IGkgPCBFWFlOT1NfUk5HX1NFRURfUkVHUyA7IGkrKykgewo+ID4gKwkJdmFsID0g
+c2VlZFtpICogNF0gPDwgMjQ7Cj4gPiArCQl2YWwgfD0gc2VlZFtpICogNCArIDFdIDw8IDE2Owo+
+ID4gKwkJdmFsIHw9IHNlZWRbaSAqIDQgKyAyXSA8PCA4Owo+ID4gKwkJdmFsIHw9IHNlZWRbaSAq
+IDQgKyAzXSA8PCAwOwo+ID4gKwo+ID4gKwkJZXh5bm9zX3JuZ193cml0ZWwocm5nLCB2YWwsIEVY
+WU5PU19STkdfU0VFRChpKSk7Cj4gPiArCX0KPiAKPiBXb3VsZCBpdCBtYWtlIHNlbnNlIHRvIGFk
+ZCBhbm90aGVyIG91dGVyIGxvb3AgaGVyZSB0byBhbGxvdyBhbGwgb2Ygc2xlbiB0byBiZSAKPiBp
+bmplY3RlZCBpbnRvIHRoZSBEUk5HPyBOb3RlLCBpbiBzb21lIGNhc2VzLCBhIHVzZXIgd2FudHMg
+dG8gYWRkIG1vcmUgc2VlZCAKPiBpbnRvIHRoZSBEUk5HIHRoYW4gdGhlIGFjdHVhbCBzZWVkIHNp
+emUuIEluIHRoaXMgY2FzZSwgdGhlIERSTkcgYWN0cyBhcyBhIAo+IGNvbXByZXNzaW9uIG9wZXJh
+dGlvbiBvZiBlbnRyb3B5LiBUaGlzIGlzIHVzZWQgd2hlbiB0aGUgZW50cm9weS10by1kYXRhIHJh
+dGlvIAo+IGlzIG5vdCAxOjEuIEluIGEgbG90IG9mIGNhc2VzLCB1c2VycyBoYXZlIGEgc2VlZCB3
+aGljaCBoYXMgbGVzcyBlbnRyb3B5IGluIAo+IGJpdHMgcGVyIGRhdGEgYml0LgoKSGksCgpJIGRv
+IG5vdCBrbm93IHdoZXRoZXIgdGhpcyB3b3VsZCBoYXZlIGFueSBiZW5lZml0IG9uIGhhcmR3YXJl
+LiBUaGUKZGF0YXNoZWV0IGlzIG5vdCBkZXNjcmliaW5nIHRvbyBtdWNoIGhlcmUuIEl0IGlzIGFj
+dHVhbGx5IHNheWluZyBvbmx5OgoxLiBXcml0ZSBTRUVEIHRvIGVhY2ggcmVnaXN0ZXIgKGZpdmUg
+aW4gdG90YWwpLgoyLiBDb25maXJtIHRoYXQgU1RBVFVTIHJlZ2lzdGVyIHNheXMgc2VlZGluZyBk
+b25lLgozLiBTdGFydCBSTkcgZW5naW5lLgo0LiBXYWl0IGZvciBlbmdpbmUgZmluaXNoIChhbm90
+aGVyIGJpdCBpbiBTVEFUVVMgLSBjbGVhciBpdCB0aGVuKS4KNS4gUmVhZCB0aGUgcmFuZG9tcy4K
+Ckkgd291bGQgZ3Vlc3MgdGhhdCB0aGUgaGFyZHdhcmUgd2lsbCBpZ25vcmUgYWxsIHByZXZpb3Vz
+bHkgd3JpdHRlbiBzZWVkcwphbmQgdXNlIHRoZSBsYXN0IG9uZS4gTWF5YmUgdGhlIGhhcmR3YXJl
+IHdpbGwgdXNlIGFsbCBvZiB0aGUgc2VlZHMKd3JpdHRlbiBhcyB5b3UgaW1wbHkuIEl0IGlzIGp1
+c3QgYSBndWVzc2luZy4KCkJlc3QgcmVnYXJkcywKS3J6eXN6dG9mCgoKX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KbGludXgtYXJtLWtlcm5lbCBtYWlsaW5n
+IGxpc3QKbGludXgtYXJtLWtlcm5lbEBsaXN0cy5pbmZyYWRlYWQub3JnCmh0dHA6Ly9saXN0cy5p
+bmZyYWRlYWQub3JnL21haWxtYW4vbGlzdGluZm8vbGludXgtYXJtLWtlcm5lbAo=
