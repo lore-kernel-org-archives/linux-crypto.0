@@ -1,39 +1,60 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH 6/7] crypto: aes - split off shared AES tables and key
- expansion routines
-Date: Sun, 26 Mar 2017 21:11:43 +0100
-Message-ID: <CAKv+Gu9aNFs3J28ZZ-gXxbnULOwseBRhWhABaYgMyrrCo2bLDg@mail.gmail.com>
-References: <1490554148-10953-1-git-send-email-ard.biesheuvel@linaro.org>
- <1490554148-10953-7-git-send-email-ard.biesheuvel@linaro.org> <alpine.LFD.2.20.1703261542360.2304@knanqh.ubzr>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: Re: [PATCH v3 1/3] crypto: hw_random - Add new Exynos RNG driver
+Date: Sun, 26 Mar 2017 23:25:24 +0200
+Message-ID: <4479175.Jfq03yCxQW@tauon.atsec.com>
+References: <20170325162654.3827-1-krzk@kernel.org> <2736911.EcZSki4vB1@positron.chronox.de> <20170326180012.3eic4bt2p6h6u3nh@kozik-lap>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8BIT
+Cc: Kukjin Kim <kgene@kernel.org>,
+        Javier Martinez Canillas <javier@osg.samsung.com>,
+        Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Eric Biggers <ebiggers3@gmail.com>
-To: Nicolas Pitre <nicolas.pitre@linaro.org>
+        "David S. Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-samsung-soc@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Arnd Bergmann <arnd@arndb.de>, Olof Johansson <olof@lixom.net>
+To: Krzysztof Kozlowski <krzk@kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-it0-f44.google.com ([209.85.214.44]:33703 "EHLO
-        mail-it0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751450AbdCZUMN (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 26 Mar 2017 16:12:13 -0400
-Received: by mail-it0-f44.google.com with SMTP id 76so395910itj.0
-        for <linux-crypto@vger.kernel.org>; Sun, 26 Mar 2017 13:11:44 -0700 (PDT)
-In-Reply-To: <alpine.LFD.2.20.1703261542360.2304@knanqh.ubzr>
+Received: from mail.eperm.de ([89.247.134.16]:58582 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751609AbdCZV0Y (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 26 Mar 2017 17:26:24 -0400
+In-Reply-To: <20170326180012.3eic4bt2p6h6u3nh@kozik-lap>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 26 March 2017 at 20:50, Nicolas Pitre <nicolas.pitre@linaro.org> wrote:
-> On Sun, 26 Mar 2017, Ard Biesheuvel wrote:
->
->> [...]
->> +static const u32 rco_tab[10] = { 1, 2, 4, 8, 16, 32, 64, 128, 27, 54 };
->
-> You could consider using u8 for this table. This is a tiny space saving
-> and normally it shouldn't make the runtime any slower on most
-> architectures.
->
+Am Sonntag, 26. März 2017, 20:00:12 CEST schrieb Krzysztof Kozlowski:
 
-There is no performance concern here: this variable is only used by
-the key expansion routine. I'll propose to change it at the next
-occasion
+Hi Krzysztof,
+
+> > Would it make sense to add another outer loop here to allow all of slen to
+> > be injected into the DRNG? Note, in some cases, a user wants to add more
+> > seed into the DRNG than the actual seed size. In this case, the DRNG acts
+> > as a compression operation of entropy. This is used when the
+> > entropy-to-data ratio is not 1:1. In a lot of cases, users have a seed
+> > which has less entropy in bits per data bit.
+> 
+> Hi,
+> 
+> I do not know whether this would have any benefit on hardware. The
+> datasheet is not describing too much here. It is actually saying only:
+> 1. Write SEED to each register (five in total).
+> 2. Confirm that STATUS register says seeding done.
+> 3. Start RNG engine.
+> 4. Wait for engine finish (another bit in STATUS - clear it then).
+> 5. Read the randoms.
+> 
+> I would guess that the hardware will ignore all previously written seeds
+> and use the last one. Maybe the hardware will use all of the seeds
+> written as you imply. It is just a guessing.
+
+Oh my, if you are right with your first guess, this is a bad DRNG design.
+
+Just out of curiousity: what happens if a caller invokes the seed function 
+twice or more times (each time with the sufficient amount of bits)? What is 
+your guess here?
+
+Ciao
+Stephan
