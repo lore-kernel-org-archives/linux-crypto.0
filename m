@@ -1,115 +1,72 @@
-From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [RFC PATCH v2 15/32] x86: Add support for changing memory
- encryption attribute in early boot
-Date: Mon, 27 Mar 2017 10:07:00 -0500
-Message-ID: <f8c57c98-4d42-4bfe-f05f-37c607a81a42@amd.com>
-References: <148846752022.2349.13667498174822419498.stgit@brijesh-build-machine>
- <148846772794.2349.1396854638510933455.stgit@brijesh-build-machine>
- <20170324171257.lgvqcdqec3nla5nb@pd.tnic>
+From: "Ming Ma (mingma)" <mingma@micron.com>
+Subject: RE: [PATCH 1/1] crypto: If two strings are exact match, they must
+ have same length.
+Date: Mon, 27 Mar 2017 23:04:30 +0000
+Message-ID: <f44f9db26fbc4310bc233374d1d459d0@bowex17b.micron.com>
+References: <1490132440-112761-1-git-send-email-mingma@micron.com>
+ <20170322030040.GB29214@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: <brijesh.singh@amd.com>, <simon.guinot@sequanux.org>,
-	<linux-efi@vger.kernel.org>, <kvm@vger.kernel.org>, <rkrcmar@redhat.com>,
-	<matt@codeblueprint.co.uk>, <linux-pci@vger.kernel.org>,
-	<linus.walleij@linaro.org>, <gary.hook@amd.com>, <linux-mm@kvack.org>,
-	<paul.gortmaker@windriver.com>, <hpa@zytor.com>, <cl@linux.com>,
-	<dan.j.williams@intel.com>, <aarcange@redhat.com>, <sfr@canb.auug.org.au>,
-	<andriy.shevchenko@linux.intel.com>, <herbert@gondor.apana.org.au>,
-	<bhe@redhat.com>, <xemul@parallels.com>, <joro@8bytes.org>, <x86@kernel.org>,
-	<peterz@infradead.org>, <piotr.luc@intel.com>, <mingo@redhat.com>,
-	<msalter@redhat.com>, <ross.zwisler@linux.intel.com>, <dyoung@redhat.com>,
-	<thomas.lendacky@amd.com>, <jroedel@suse.de>, <keescook@chromium.org>,
-	<arnd@arndb.de>, <toshi.kani@hpe.com>, <mathieu.desnoyers@efficios.com>,
-	<luto@kernel.org>, <devel@linuxdriverproject.org>, <bhel
-To: Borislav Petkov <bp@suse.de>
-Return-path: <owner-linux-mm@kvack.org>
-In-Reply-To: <20170324171257.lgvqcdqec3nla5nb@pd.tnic>
-Sender: owner-linux-mm@kvack.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: "davem@davemloft.net" <davem@davemloft.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20170322030040.GB29214@gondor.apana.org.au>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Boris,
+Please ignore this patch, we have seen some issues in older verison of linux kernel. But it doesn't seem to be an issue in the latest kernel.
 
-On 03/24/2017 12:12 PM, Borislav Petkov wrote:
->>  }
->>
->> +static inline int __init early_set_memory_decrypted(void *addr,
->> +						    unsigned long size)
->> +{
->> +	return 1;
-> 	^^^^^^^^
->
-> return 1 when !CONFIG_AMD_MEM_ENCRYPT ?
->
-> The non-early variants return 0.
->
+thanks
 
-I will fix it and use the same return value.
+-----Original Message-----
+From: linux-crypto-owner@vger.kernel.org [mailto:linux-crypto-owner@vger.kernel.org] On Behalf Of Herbert Xu
+Sent: Tuesday, March 21, 2017 8:01 PM
+To: Ming Ma (mingma) <mingma@micron.com>
+Cc: davem@davemloft.net; linux-crypto@vger.kernel.org; linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/1] crypto: If two strings are exact match, they must have same length.
 
->> +}
->> +
->> +static inline int __init early_set_memory_encrypted(void *addr,
->> +						    unsigned long size)
->> +{
->> +	return 1;
->> +}
->> +
->>  #define __sme_pa		__pa
+On Tue, Mar 21, 2017 at 04:40:40PM -0500, Ming Ma wrote:
+> When both "crct10dif-pclmul" algorithm and "crct10dif-generic" 
+> algorithm exist in crypto_alg_list, "crct10dif-pclmul" should be 
+> selected, since it has higher priority than "crct10dif-generic". 
+> However, both algorithms have the same cra_name "crct10dif". If we use 
+> "crct10dif" to find a matched algorithm in crypto_alg_list, it's 
+> possible "crct10dif-generic" is selected, because the code calls 
+> strcmp to decide if two string are exact match, but doesn't check if two strings have the same length.
+> 
+> exact = !strcmp(q->cra_driver_name, name);
+> 
+> So ,if "crct10dif-generic" is in front of "crct10dif-pclmul" in 
+> crypto_alg_list, it will be picked as the matched algorithm, even if 
+> it has lower priority than "crct10dif-pclmul".
+> Signed-off-by: Ming Ma <mingma@micron.com>
+> ---
+>  crypto/api.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/crypto/api.c b/crypto/api.c index b16ce16..5b3d45a 100644
+> --- a/crypto/api.c
+> +++ b/crypto/api.c
+> @@ -76,7 +76,8 @@ static struct crypto_alg *__crypto_alg_lookup(const char *name, u32 type,
+>  		    ((struct crypto_larval *)q)->mask != mask)
+>  			continue;
+>  
+> -		exact = !strcmp(q->cra_driver_name, name);
+> +		exact = (strlen(name) == strlen(q->cra_driver_name)) &&
+> +				!strcmp(q->cra_driver_name, name);
+>  		fuzzy = !strcmp(q->cra_name, name);
+>  		if (!exact && !(fuzzy && q->cra_priority > best))
+>  			continue;
 
->> +	unsigned long pfn, npages;
->> +	unsigned long addr = (unsigned long)vaddr & PAGE_MASK;
->> +
->> +	/* We are going to change the physical page attribute from C=1 to C=0.
->> +	 * Flush the caches to ensure that all the data with C=1 is flushed to
->> +	 * memory. Any caching of the vaddr after function returns will
->> +	 * use C=0.
->> +	 */
->
-> Kernel comments style is:
->
-> 	/*
-> 	 * A sentence ending with a full-stop.
-> 	 * Another sentence. ...
-> 	 * More sentences. ...
-> 	 */
->
+This is bogus.  Please describe how you reproduced the problem.
 
-I will update to use kernel comment style.
+The priority matching should work.
 
-
->> +	clflush_cache_range(vaddr, size);
->> +
->> +	npages = PAGE_ALIGN(size) >> PAGE_SHIFT;
->> +	pfn = slow_virt_to_phys((void *)addr) >> PAGE_SHIFT;
->> +
->> +	return kernel_map_pages_in_pgd(init_mm.pgd, pfn, addr, npages,
->> +					flags & ~sme_me_mask);
->> +
->> +}
->> +
->> +int __init early_set_memory_decrypted(void *vaddr, unsigned long size)
->> +{
->> +	unsigned long flags = get_pte_flags((unsigned long)vaddr);
->
-> So this does lookup_address()...
->
->> +	return early_set_memory_enc_dec(vaddr, size, flags & ~sme_me_mask);
->
-> ... and this does it too in slow_virt_to_phys(). So you do it twice per
-> vaddr.
->
-> So why don't you define a __slow_virt_to_phys() helper - notice
-> the "__" - which returns flags in its second parameter and which
-> slow_virt_to_phys() calls with a NULL second parameter in the other
-> cases?
->
-
-I will look into creating a helper function. thanks
-
--Brijesh
-
+Cheers,
 --
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+Email: Herbert Xu <herbert@gondor.apana.org.au> Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
