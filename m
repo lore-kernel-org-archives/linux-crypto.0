@@ -1,88 +1,65 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH 0/7] crypto: aes - allow generic AES to be omitted
-Date: Tue, 28 Mar 2017 09:51:54 +0100
-Message-ID: <CAKv+Gu8P8ET541OPGa=cqPt4qLd4dkiNAztoOZ2mSR47KDYE7g@mail.gmail.com>
-References: <1490554148-10953-1-git-send-email-ard.biesheuvel@linaro.org> <20170328054349.GA1023@zzz>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH 2/2] crypto: ccp - Mark driver as little-endian only
+Date: Tue, 28 Mar 2017 11:58:05 +0200
+Message-ID: <20170328095814.3734615-2-arnd@arndb.de>
+References: <20170328095814.3734615-1-arnd@arndb.de>
+Cc: Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Tom Lendacky <thomas.lendacky@amd.com>,
+        Gary Hook <gary.hook@amd.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "nico@linaro.org" <nico@linaro.org>
-To: Eric Biggers <ebiggers3@gmail.com>
+        "David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-it0-f48.google.com ([209.85.214.48]:35229 "EHLO
-        mail-it0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754563AbdC1IwG (ORCPT
+Received: from mout.kundenserver.de ([212.227.126.135]:62787 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754373AbdC1KBD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Mar 2017 04:52:06 -0400
-Received: by mail-it0-f48.google.com with SMTP id y18so104466548itc.0
-        for <linux-crypto@vger.kernel.org>; Tue, 28 Mar 2017 01:52:00 -0700 (PDT)
-In-Reply-To: <20170328054349.GA1023@zzz>
+        Tue, 28 Mar 2017 06:01:03 -0400
+In-Reply-To: <20170328095814.3734615-1-arnd@arndb.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 28 March 2017 at 06:43, Eric Biggers <ebiggers3@gmail.com> wrote:
-> Hi Ard,
->
-> On Sun, Mar 26, 2017 at 07:49:01PM +0100, Ard Biesheuvel wrote:
->> The generic AES driver uses 16 lookup tables of 1 KB each, and has
->> encryption and decryption routines that are fully unrolled. Given how
->> the dependencies between this code and other drivers are declared in
->> Kconfig files, this code is always pulled into the core kernel, even
->> if it is usually superseded at runtime by accelerated drivers that
->> exist for many architectures.
->>
->> This leaves us with 25 KB of dead code in the kernel, which is negligible
->> in typical environments, but which is actually a big deal for the IoT
->> domain, where every kilobyte counts.
->>
->> For this reason, this series refactors the way the various AES
->> implementations are wired up, to allow the generic version in
->> crypto/aes_generic.c to be omitted from the build entirely.
->>
->> Patch #1 removes some bogus 'select CRYPTO_AES' statement.
->>
->> Patch #2 introduces CRYPTO_NEED_AES which can be selected by driver that
->> require an AES cipher to be available, but don't care how it is implemented.
->>
->> Patches #3 and #4 make some preparatory changes that allow dependencies on
->> crypto_aes_expand_key to be fulfilled by the new (and much smaller) fixed
->> time AES driver. (#5)
->>
->> Patch #6 splits the generic AES driver into a core containing the precomputed
->> sub/shift/mix tables and the key expansion routines on the one hand, and the
->> encryption/decryption routines and the crypto API registration on the other.
->>
->> Patch #7 introduces the CRYPTO_HAVE_AES Kconfig symbol, and adds statements to
->> various AES implementations that can fulfil the CRYPTO_NEED_AES dependencies
->> added in patch #2. The introduced Kconfig logic allows CRYPTO_AES to be
->> deselected even if AES dependencies exist, as long as one of these alternatives
->> is selected.
->
-> Just a thought: how about renaming CRYPTO_AES to CRYPTO_AES_GENERIC, then
-> renaming what you called CRYPTO_NEED_AES to CRYPTO_AES?  Then all the 'select
-> CRYPTO_AES' can remain as-is, instead of replacing them with the (in my opinion
-> uglier) 'select CRYPTO_NEED_AES'.  And it should still work for people who have
-> CRYPTO_AES=y or CRYPTO_AES=m in their kernel config, since they'll still get at
-> least one AES implementation (though they may stop getting the generic one).
->
-> Also, in general I think we need better Kconfig help text.  As proposed you can
-> now toggle simply "AES cipher algorithms", and nowhere in the help text is it
-> mentioned that that is only the generic implementation, which you don't need if
-> you have enabled some other implementation.  Similarly for "Fixed time AES
-> cipher"; it perhaps should be mentioned that it's only useful if a fixed-time
-> implementation using special CPU instructions like AES-NI or ARMv8-CE isn't
-> usable.
->
+The driver causes a warning when built as big-endian:
 
-Thanks for the feedback. I take it you are on board with the general idea then?
+drivers/crypto/ccp/ccp-dev-v5.c: In function 'ccp5_perform_des3':
+include/uapi/linux/byteorder/big_endian.h:32:26: error: large integer implicitly truncated to unsigned type [-Werror=overflow]
+ #define __cpu_to_le32(x) ((__force __le32)__swab32((x)))
+                          ^
+include/linux/byteorder/generic.h:87:21: note: in expansion of macro '__cpu_to_le32'
+ #define cpu_to_le32 __cpu_to_le32
+                     ^~~~~~~~~~~~~
+drivers/crypto/ccp/ccp-dev-v5.c:436:28: note: in expansion of macro 'cpu_to_le32'
+  CCP5_CMD_KEY_MEM(&desc) = cpu_to_le32(CCP_MEMTYPE_SB);
 
-Re name change, those are good points. I will experiment with that.
+The warning is correct, doing a 32-bit byte swap on a value that gets
+assigned into a bit field cannot work, since we would only write zeroes
+in this case, regardless of the input.
 
-I was a bit on the fence about modifying the x86 code more than
-required, but actually, I think it makes sense for the AES-NI code to
-use fixed-time AES as a fallback rather than the table-based x86 code,
-given that the fallback is rarely used (only when executed in the
-context of an interrupt taken from kernel code that is already using
-the FPU) and falling back to a non-fixed time implementation loses
-some guarantees that the AES-NI code gives.
+In fact, the use of bit fields in hardware defined data structures is
+not portable to start with, so until all these bit fields get replaced
+by something else, the driver cannot work on big-endian machines, and
+I'm adding an annotation here to prevent it from being selected.
+
+The CCPv3 code seems to not suffer from this problem, only v5 uses
+bitfields.
+
+Fixes: 4b394a232df7 ("crypto: ccp - Let a v5 CCP provide the same function as v3")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ drivers/crypto/ccp/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/crypto/ccp/Kconfig b/drivers/crypto/ccp/Kconfig
+index 2238f77aa248..07af9ece84f9 100644
+--- a/drivers/crypto/ccp/Kconfig
++++ b/drivers/crypto/ccp/Kconfig
+@@ -1,6 +1,7 @@
+ config CRYPTO_DEV_CCP_DD
+ 	tristate "Cryptographic Coprocessor device driver"
+ 	depends on CRYPTO_DEV_CCP
++	depends on !CPU_BIG_ENDIAN || BROKEN
+ 	default m
+ 	select HW_RANDOM
+ 	select DMA_ENGINE
+-- 
+2.9.0
