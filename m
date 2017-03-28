@@ -1,102 +1,123 @@
-From: Gary R Hook <ghook@amd.com>
-Subject: Re: [PATCH 1/2] crypto: ccp - Reduce stack frame size with KASAN
-Date: Tue, 28 Mar 2017 09:15:45 -0500
-Message-ID: <f04b2ede-f291-2ffa-d4a8-124d4af06199@amd.com>
-References: <20170328095814.3734615-1-arnd@arndb.de>
+From: Tom Herbert <tom@herbertland.com>
+Subject: Re: [RFC TLS Offload Support 05/15] tcp: Add TLS socket options for
+ TCP sockets
+Date: Tue, 28 Mar 2017 07:56:46 -0700
+Message-ID: <CALx6S378aiPhkJ_EX3Xm5UVYvcsoM6vKd9cQ=vW4o+17aBP0CA@mail.gmail.com>
+References: <1490707592-1430-1-git-send-email-aviadye@mellanox.com> <1490707592-1430-6-git-send-email-aviadye@mellanox.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "Hook, Gary" <Gary.Hook@amd.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2nam02on0040.outbound.protection.outlook.com ([104.47.38.40]:54969
-        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1754159AbdC1OQd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Mar 2017 10:16:33 -0400
-In-Reply-To: <20170328095814.3734615-1-arnd@arndb.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: "David S. Miller" <davem@davemloft.net>, ilyal@mellanox.com,
+        borisp@mellanox.com, Dave Watson <davejwatson@fb.com>,
+        Linux Kernel Network Developers <netdev@vger.kernel.org>,
+        matanb@mellanox.com, liranl@mellanox.com, haggaie@mellanox.com,
+        Herbert Xu <herbert@gondor.apana.org.au>, nmav@gnults.org,
+        fridolin.pokorny@gmail.com, ilant@mellanox.com,
+        kliteyn@mellanox.com,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Saeed Mahameed <saeedm@mellanox.com>,
+        aviadye@dev.mellanox.co.il
+To: Aviad Yehezkel <aviadye@mellanox.com>
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <1490707592-1430-6-git-send-email-aviadye@mellanox.com>
+Sender: netdev-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 03/28/2017 04:58 AM, Arnd Bergmann wrote:> The newly added AES GCM 
-implementation uses one of the largest stack frames
-> in the kernel, around 1KB on normal 64-bit kernels, and 1.6KB when
-> CONFIG_KASAN
-> is enabled:
+On Tue, Mar 28, 2017 at 6:26 AM, Aviad Yehezkel <aviadye@mellanox.com> wrote:
+> This patch adds TLS_TX and TLS_RX TCP socket options.
 >
-> drivers/crypto/ccp/ccp-ops.c: In function 'ccp_run_aes_gcm_cmd':
-> drivers/crypto/ccp/ccp-ops.c:851:1: error: the frame size of 1632 bytes
-> is larger than 1536 bytes [-Werror=frame-larger-than=]
+> Setting these socket options will change the sk->sk_prot
+> operations of the TCP socket. The user is responsible to
+> prevent races between calls to the previous operations
+> and the new operations. After successful return, data
+> sent on this socket will be encapsulated in TLS.
 >
-> This is problematic for multiple reasons:
+> Signed-off-by: Aviad Yehezkel <aviadye@mellanox.com>
+> Signed-off-by: Boris Pismenny <borisp@mellanox.com>
+> Signed-off-by: Ilya Lesokhin <ilyal@mellanox.com>
+> ---
+>  include/uapi/linux/tcp.h |  2 ++
+>  net/ipv4/tcp.c           | 32 ++++++++++++++++++++++++++++++++
+>  2 files changed, 34 insertions(+)
 >
->  - The crypto functions are often used in deep call chains, e.g. behind
->    mm, fs and dm layers, making it more likely to run into an actual stack
->    overflow
+> diff --git a/include/uapi/linux/tcp.h b/include/uapi/linux/tcp.h
+> index c53de26..f9f0e29 100644
+> --- a/include/uapi/linux/tcp.h
+> +++ b/include/uapi/linux/tcp.h
+> @@ -116,6 +116,8 @@ enum {
+>  #define TCP_SAVE_SYN           27      /* Record SYN headers for new connections */
+>  #define TCP_SAVED_SYN          28      /* Get SYN headers recorded for connection */
+>  #define TCP_REPAIR_WINDOW      29      /* Get/set window parameters */
+> +#define TCP_TLS_TX             30
+> +#define TCP_TLS_RX             31
 >
->  - Using this much stack space is an indicator that the code is not
->    written to be as efficient as it could be.
+>  struct tcp_repair_opt {
+>         __u32   opt_code;
+> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> index 302fee9..2d190e3 100644
+> --- a/net/ipv4/tcp.c
+> +++ b/net/ipv4/tcp.c
+> @@ -273,6 +273,7 @@
+>  #include <net/icmp.h>
+>  #include <net/inet_common.h>
+>  #include <net/tcp.h>
+> +#include <net/tls.h>
+>  #include <net/xfrm.h>
+>  #include <net/ip.h>
+>  #include <net/sock.h>
+> @@ -2676,6 +2677,21 @@ static int do_tcp_setsockopt(struct sock *sk, int level,
+>                 tp->notsent_lowat = val;
+>                 sk->sk_write_space(sk);
+>                 break;
+> +       case TCP_TLS_TX:
+> +       case TCP_TLS_RX: {
+> +               int (*fn)(struct sock *sk, int optname,
+> +                         char __user *optval, unsigned int optlen);
+> +
+> +               fn = symbol_get(tls_sk_attach);
+> +               if (!fn) {
+> +                       err = -EINVAL;
+> +                       break;
+> +               }
+> +
+> +               err = fn(sk, optname, optval, optlen);
+> +               symbol_put(tls_sk_attach);
+> +               break;
+> +       }
+>         default:
+>                 err = -ENOPROTOOPT;
+>                 break;
+> @@ -3064,6 +3080,22 @@ static int do_tcp_getsockopt(struct sock *sk, int level,
+>                 }
+>                 return 0;
+>         }
+> +       case TCP_TLS_TX:
+> +       case TCP_TLS_RX: {
+> +               int err;
+> +               int (*fn)(struct sock *sk, int optname,
+> +                         char __user *optval, int __user *optlen);
+> +
+> +               fn = symbol_get(tls_sk_query);
+> +               if (!fn) {
+> +                       err = -EINVAL;
+> +                       break;
+> +               }
+> +
+> +               err = fn(sk, optname, optval, optlen);
+> +               symbol_put(tls_sk_query);
+> +               return err;
+> +       }
 
-I'm not sure I agree that A -> B, but I will certainly look into this.
-
->  - While this goes unnoticed at the moment in mainline with the frame size
->    warning being disabled when KASAN is in use, I would like to enable
->    the warning again, and the current code is slightly above my arbitrary
->    pick for a limit of 1536 bytes (I already did patches for every other
->    driver exceeding this).
-
-I've got my stack frame size (also) set to 1536, and would have paid 
-more attention
-had a warning occurred due to my code.
-
-> A more drastic refactoring of the driver might be needed to reduce the
-> stack usage more substantially, but this patch is fairly simple and
-> at least addresses the third one of the problems I mentioned, reducing the
-> stack size by about 150 bytes and bringing it below the warning limit
-> I picked.
-
-Again, I'll devote some time to this.
-
-> diff --git a/drivers/crypto/ccp/ccp-dev.h b/drivers/crypto/ccp/ccp-dev.h
-> index 3a45c2af2fbd..c5ea0796a891 100644
-> --- a/drivers/crypto/ccp/ccp-dev.h
-> +++ b/drivers/crypto/ccp/ccp-dev.h
-> @@ -432,24 +432,24 @@ struct ccp_dma_info {
->          unsigned int offset;
->          unsigned int length;
->          enum dma_data_direction dir;
-> -};
-> +} __packed __aligned(4);
-
-My gcc 4.8 doesn't understand __aligned(). Shouldn't we use
-#pragma(4) here?
+This mechanism should be generalized. If we can do this with TLS then
+there will likely be other ULPs that we might want to set on a TCP
+socket. Maybe something like TCP_ULP_PUSH, TCP_ULP_POP (borrowing from
+STREAMS ever so slightly :-) ). I'd also suggest that the ULPs are
+indicated by a text string in the socket option argument, then have
+each ULP perform a registration for their service.
 
 
->  struct ccp_dm_workarea {
->          struct device *dev;
->          struct dma_pool *dma_pool;
-> -       unsigned int length;
+>         default:
+>                 return -ENOPROTOOPT;
+>         }
+> --
+> 2.7.4
 >
->          u8 *address;
->          struct ccp_dma_info dma;
-> +       unsigned int length;
->  };
->
->  struct ccp_sg_workarea {
->          struct scatterlist *sg;
->          int nents;
-> +       unsigned int dma_count;
->
->          struct scatterlist *dma_sg;
->          struct device *dma_dev;
-> -       unsigned int dma_count;
->          enum dma_data_direction dma_dir;
->
->          unsigned int sg_used;
-
-I'm okay with rearranging, but I'm going to submit an alternative patch.
