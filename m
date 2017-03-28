@@ -1,66 +1,146 @@
-From: <agiva@centrum.cz>
-Subject: 8537 linux-crypto
-Date: Tue, 28 Mar 2017 11:47:58 -0000
-Message-ID: <149070167889.6467.8242914770316883577@mytrinity.com.ua>
-Reply-To: <agiva@centrum.cz>
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: [PATCH 4.9 61/88] hwrng: amd - Revert managed API changes
+Date: Tue, 28 Mar 2017 14:31:16 +0200
+Message-ID: <20170328122751.166661291@linuxfoundation.org>
+References: <20170328122748.656530096@linuxfoundation.org>
 Mime-Version: 1.0
-Content-Type: application/zip; name="66697092.zip"
-Content-Transfer-Encoding: base64
-To: "linux-crypto" <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 5-105-53-217.mytrinity.com.ua ([5.105.53.217]:36188 "HELO
-        mytrinity.com.ua" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with SMTP id S1751302AbdC1Lsp (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Mar 2017 07:48:45 -0400
-Content-Disposition: attachment
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org, Prarit Bhargava <prarit@redhat.com>,
+        Matt Mackall <mpm@selenic.com>,
+        Corentin LABBE <clabbe.montjoie@gmail.com>,
+        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
+        Wei Yongjun <weiyongjun1@huawei.com>,
+        linux-crypto@vger.kernel.org, linux-geode@lists.infradead.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+To: linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20170328122748.656530096@linuxfoundation.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-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
-AAAAAQABAEwAAADtCQAAAAA=
+4.9-stable review patch.  If anyone has any objections, please let me know.
+
+------------------
+
+From: Prarit Bhargava <prarit@redhat.com>
+
+commit 69db7009318758769d625b023402161c750f7876 upstream.
+
+After commit 31b2a73c9c5f ("hwrng: amd - Migrate to managed API"), the
+amd-rng driver uses devres with pci_dev->dev to keep track of resources,
+but does not actually register a PCI driver.  This results in the
+following issues:
+
+1. The message
+
+WARNING: CPU: 2 PID: 621 at drivers/base/dd.c:349 driver_probe_device+0x38c
+
+is output when the i2c_amd756 driver loads and attempts to register a PCI
+driver.  The PCI & device subsystems assume that no resources have been
+registered for the device, and the WARN_ON() triggers since amd-rng has
+already do so.
+
+2.  The driver leaks memory because the driver does not attach to a
+device.  The driver only uses the PCI device as a reference.   devm_*()
+functions will release resources on driver detach, which the amd-rng
+driver will never do.  As a result,
+
+3.  The driver cannot be reloaded because there is always a use of the
+ioport and region after the first load of the driver.
+
+Revert the changes made by 31b2a73c9c5f ("hwrng: amd - Migrate to managed
+API").
+
+Signed-off-by: Prarit Bhargava <prarit@redhat.com>
+Fixes: 31b2a73c9c5f ("hwrng: amd - Migrate to managed API").
+Cc: Matt Mackall <mpm@selenic.com>
+Cc: Corentin LABBE <clabbe.montjoie@gmail.com>
+Cc: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Cc: Wei Yongjun <weiyongjun1@huawei.com>
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-geode@lists.infradead.org
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+---
+ drivers/char/hw_random/amd-rng.c |   42 +++++++++++++++++++++++++++++++--------
+ 1 file changed, 34 insertions(+), 8 deletions(-)
+
+--- a/drivers/char/hw_random/amd-rng.c
++++ b/drivers/char/hw_random/amd-rng.c
+@@ -55,6 +55,7 @@ MODULE_DEVICE_TABLE(pci, pci_tbl);
+ struct amd768_priv {
+ 	void __iomem *iobase;
+ 	struct pci_dev *pcidev;
++	u32 pmbase;
+ };
+ 
+ static int amd_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
+@@ -148,33 +149,58 @@ found:
+ 	if (pmbase == 0)
+ 		return -EIO;
+ 
+-	priv = devm_kzalloc(&pdev->dev, sizeof(*priv), GFP_KERNEL);
++	priv = kzalloc(sizeof(*priv), GFP_KERNEL);
+ 	if (!priv)
+ 		return -ENOMEM;
+ 
+-	if (!devm_request_region(&pdev->dev, pmbase + PMBASE_OFFSET,
+-				PMBASE_SIZE, DRV_NAME)) {
++	if (!request_region(pmbase + PMBASE_OFFSET, PMBASE_SIZE, DRV_NAME)) {
+ 		dev_err(&pdev->dev, DRV_NAME " region 0x%x already in use!\n",
+ 			pmbase + 0xF0);
+-		return -EBUSY;
++		err = -EBUSY;
++		goto out;
+ 	}
+ 
+-	priv->iobase = devm_ioport_map(&pdev->dev, pmbase + PMBASE_OFFSET,
+-			PMBASE_SIZE);
++	priv->iobase = ioport_map(pmbase + PMBASE_OFFSET, PMBASE_SIZE);
+ 	if (!priv->iobase) {
+ 		pr_err(DRV_NAME "Cannot map ioport\n");
+-		return -ENOMEM;
++		err = -EINVAL;
++		goto err_iomap;
+ 	}
+ 
+ 	amd_rng.priv = (unsigned long)priv;
++	priv->pmbase = pmbase;
+ 	priv->pcidev = pdev;
+ 
+ 	pr_info(DRV_NAME " detected\n");
+-	return devm_hwrng_register(&pdev->dev, &amd_rng);
++	err = hwrng_register(&amd_rng);
++	if (err) {
++		pr_err(DRV_NAME " registering failed (%d)\n", err);
++		goto err_hwrng;
++	}
++	return 0;
++
++err_hwrng:
++	ioport_unmap(priv->iobase);
++err_iomap:
++	release_region(pmbase + PMBASE_OFFSET, PMBASE_SIZE);
++out:
++	kfree(priv);
++	return err;
+ }
+ 
+ static void __exit mod_exit(void)
+ {
++	struct amd768_priv *priv;
++
++	priv = (struct amd768_priv *)amd_rng.priv;
++
++	hwrng_unregister(&amd_rng);
++
++	ioport_unmap(priv->iobase);
++
++	release_region(priv->pmbase + PMBASE_OFFSET, PMBASE_SIZE);
++
++	kfree(priv);
+ }
+ 
+ module_init(mod_init);
