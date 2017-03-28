@@ -1,144 +1,66 @@
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [PATCH 4.10 076/111] hwrng: geode - Revert managed API changes
-Date: Tue, 28 Mar 2017 14:31:02 +0200
-Message-ID: <20170328122918.841904711@linuxfoundation.org>
-References: <20170328122915.640228468@linuxfoundation.org>
+From: Gary R Hook <gary.hook@amd.com>
+Subject: [PATCH] crypto: ccp - Remove redundant cpu-to-le32 macros
+Date: Tue, 28 Mar 2017 08:58:28 -0500
+Message-ID: <20170328135828.13086.97535.stgit@taos>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org, Prarit Bhargava <prarit@redhat.com>,
-        Matt Mackall <mpm@selenic.com>,
-        Corentin LABBE <clabbe.montjoie@gmail.com>,
-        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
-        Wei Yongjun <weiyongjun1@huawei.com>,
-        linux-crypto@vger.kernel.org, linux-geode@lists.infradead.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-To: linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: <thomas.lendacky@amd.com>, <gary.hook@amd.com>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:60282 "EHLO
-        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754906AbdC1Mkg (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Mar 2017 08:40:36 -0400
-In-Reply-To: <20170328122915.640228468@linuxfoundation.org>
+Received: from mail-sn1nam02on0079.outbound.protection.outlook.com ([104.47.36.79]:20016
+        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752303AbdC1N7E (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 28 Mar 2017 09:59:04 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-4.10-stable review patch.  If anyone has any objections, please let me know.
+Endianness is dealt with when the command descriptor is
+copied into the command queue. Remove any occurrences of
+cpu_to_le32() found elsewhere.
 
-------------------
-
-From: Prarit Bhargava <prarit@redhat.com>
-
-commit 8c75704ebcac2ffa31ee7bcc359baf701b52bf00 upstream.
-
-After commit e9afc746299d ("hwrng: geode - Use linux/io.h instead of
-asm/io.h") the geode-rng driver uses devres with pci_dev->dev to keep
-track of resources, but does not actually register a PCI driver.  This
-results in the following issues:
-
-1.  The driver leaks memory because the driver does not attach to a
-device.  The driver only uses the PCI device as a reference.   devm_*()
-functions will release resources on driver detach, which the geode-rng
-driver will never do.  As a result,
-
-2.  The driver cannot be reloaded because there is always a use of the
-ioport and region after the first load of the driver.
-
-Revert the changes made by  e9afc746299d ("hwrng: geode - Use linux/io.h
-instead of asm/io.h").
-
-Signed-off-by: Prarit Bhargava <prarit@redhat.com>
-Fixes: 6e9b5e76882c ("hwrng: geode - Migrate to managed API")
-Cc: Matt Mackall <mpm@selenic.com>
-Cc: Corentin LABBE <clabbe.montjoie@gmail.com>
-Cc: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Cc: Wei Yongjun <weiyongjun1@huawei.com>
-Cc: linux-crypto@vger.kernel.org
-Cc: linux-geode@lists.infradead.org
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-
+Signed-off-by: Gary R Hook <gary.hook@amd.com>
 ---
- drivers/char/hw_random/geode-rng.c |   50 +++++++++++++++++++++++++------------
- 1 file changed, 35 insertions(+), 15 deletions(-)
+ drivers/crypto/ccp/ccp-dev-v5.c |   22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
---- a/drivers/char/hw_random/geode-rng.c
-+++ b/drivers/char/hw_random/geode-rng.c
-@@ -31,6 +31,9 @@
- #include <linux/module.h>
- #include <linux/pci.h>
+diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
+index 5e08654..e03d06a 100644
+--- a/drivers/crypto/ccp/ccp-dev-v5.c
++++ b/drivers/crypto/ccp/ccp-dev-v5.c
+@@ -419,22 +419,22 @@ static int ccp5_perform_des3(struct ccp_op *op)
+ 	CCP_DES3_ENCRYPT(&function) = op->u.des3.action;
+ 	CCP_DES3_MODE(&function) = op->u.des3.mode;
+ 	CCP_DES3_TYPE(&function) = op->u.des3.type;
+-	CCP5_CMD_FUNCTION(&desc) = cpu_to_le32(function.raw);
++	CCP5_CMD_FUNCTION(&desc) = function.raw;
  
-+
-+#define PFX	KBUILD_MODNAME ": "
-+
- #define GEODE_RNG_DATA_REG   0x50
- #define GEODE_RNG_STATUS_REG 0x54
+-	CCP5_CMD_LEN(&desc) = cpu_to_le32(op->src.u.dma.length);
++	CCP5_CMD_LEN(&desc) = op->src.u.dma.length;
  
-@@ -82,6 +85,7 @@ static struct hwrng geode_rng = {
+-	CCP5_CMD_SRC_LO(&desc) = cpu_to_le32(ccp_addr_lo(&op->src.u.dma));
+-	CCP5_CMD_SRC_HI(&desc) = cpu_to_le32(ccp_addr_hi(&op->src.u.dma));
+-	CCP5_CMD_SRC_MEM(&desc) = cpu_to_le32(CCP_MEMTYPE_SYSTEM);
++	CCP5_CMD_SRC_LO(&desc) = ccp_addr_lo(&op->src.u.dma);
++	CCP5_CMD_SRC_HI(&desc) = ccp_addr_hi(&op->src.u.dma);
++	CCP5_CMD_SRC_MEM(&desc) = CCP_MEMTYPE_SYSTEM;
  
- static int __init mod_init(void)
- {
-+	int err = -ENODEV;
- 	struct pci_dev *pdev = NULL;
- 	const struct pci_device_id *ent;
- 	void __iomem *mem;
-@@ -89,27 +93,43 @@ static int __init mod_init(void)
+-	CCP5_CMD_DST_LO(&desc) = cpu_to_le32(ccp_addr_lo(&op->dst.u.dma));
+-	CCP5_CMD_DST_HI(&desc) = cpu_to_le32(ccp_addr_hi(&op->dst.u.dma));
+-	CCP5_CMD_DST_MEM(&desc) = cpu_to_le32(CCP_MEMTYPE_SYSTEM);
++	CCP5_CMD_DST_LO(&desc) = ccp_addr_lo(&op->dst.u.dma);
++	CCP5_CMD_DST_HI(&desc) = ccp_addr_hi(&op->dst.u.dma);
++	CCP5_CMD_DST_MEM(&desc) = CCP_MEMTYPE_SYSTEM;
  
- 	for_each_pci_dev(pdev) {
- 		ent = pci_match_id(pci_tbl, pdev);
--		if (ent) {
--			rng_base = pci_resource_start(pdev, 0);
--			if (rng_base == 0)
--				return -ENODEV;
--
--			mem = devm_ioremap(&pdev->dev, rng_base, 0x58);
--			if (!mem)
--				return -ENOMEM;
--			geode_rng.priv = (unsigned long)mem;
--
--			pr_info("AMD Geode RNG detected\n");
--			return devm_hwrng_register(&pdev->dev, &geode_rng);
--		}
-+		if (ent)
-+			goto found;
- 	}
--
- 	/* Device not found. */
--	return -ENODEV;
-+	goto out;
-+
-+found:
-+	rng_base = pci_resource_start(pdev, 0);
-+	if (rng_base == 0)
-+		goto out;
-+	err = -ENOMEM;
-+	mem = ioremap(rng_base, 0x58);
-+	if (!mem)
-+		goto out;
-+	geode_rng.priv = (unsigned long)mem;
-+
-+	pr_info("AMD Geode RNG detected\n");
-+	err = hwrng_register(&geode_rng);
-+	if (err) {
-+		pr_err(PFX "RNG registering failed (%d)\n",
-+		       err);
-+		goto err_unmap;
-+	}
-+out:
-+	return err;
-+
-+err_unmap:
-+	iounmap(mem);
-+	goto out;
+-	CCP5_CMD_KEY_LO(&desc) = cpu_to_le32(lower_32_bits(key_addr));
++	CCP5_CMD_KEY_LO(&desc) = lower_32_bits(key_addr);
+ 	CCP5_CMD_KEY_HI(&desc) = 0;
+-	CCP5_CMD_KEY_MEM(&desc) = cpu_to_le32(CCP_MEMTYPE_SB);
+-	CCP5_CMD_LSB_ID(&desc) = cpu_to_le32(op->sb_ctx);
++	CCP5_CMD_KEY_MEM(&desc) = CCP_MEMTYPE_SB;
++	CCP5_CMD_LSB_ID(&desc) = op->sb_ctx;
+ 
+ 	return ccp5_do_cmd(&desc, op->cmd_q);
  }
- 
- static void __exit mod_exit(void)
- {
-+	void __iomem *mem = (void __iomem *)geode_rng.priv;
-+
-+	hwrng_unregister(&geode_rng);
-+	iounmap(mem);
- }
- 
- module_init(mod_init);
