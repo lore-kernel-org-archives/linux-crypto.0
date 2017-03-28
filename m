@@ -1,72 +1,76 @@
-From: "Ming Ma (mingma)" <mingma@micron.com>
-Subject: RE: [PATCH 1/1] crypto: If two strings are exact match, they must
- have same length.
-Date: Mon, 27 Mar 2017 23:04:30 +0000
-Message-ID: <f44f9db26fbc4310bc233374d1d459d0@bowex17b.micron.com>
-References: <1490132440-112761-1-git-send-email-mingma@micron.com>
- <20170322030040.GB29214@gondor.apana.org.au>
+From: Eric Biggers <ebiggers3@gmail.com>
+Subject: Re: [PATCH 0/7] crypto: aes - allow generic AES to be omitted
+Date: Mon, 27 Mar 2017 22:43:49 -0700
+Message-ID: <20170328054349.GA1023@zzz>
+References: <1490554148-10953-1-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: "davem@davemloft.net" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170322030040.GB29214@gondor.apana.org.au>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+        nico@linaro.org
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pg0-f66.google.com ([74.125.83.66]:36615 "EHLO
+        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753708AbdC1Fnx (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 28 Mar 2017 01:43:53 -0400
+Received: by mail-pg0-f66.google.com with SMTP id 81so18566072pgh.3
+        for <linux-crypto@vger.kernel.org>; Mon, 27 Mar 2017 22:43:52 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <1490554148-10953-1-git-send-email-ard.biesheuvel@linaro.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Please ignore this patch, we have seen some issues in older verison of linux kernel. But it doesn't seem to be an issue in the latest kernel.
+Hi Ard,
 
-thanks
-
------Original Message-----
-From: linux-crypto-owner@vger.kernel.org [mailto:linux-crypto-owner@vger.kernel.org] On Behalf Of Herbert Xu
-Sent: Tuesday, March 21, 2017 8:01 PM
-To: Ming Ma (mingma) <mingma@micron.com>
-Cc: davem@davemloft.net; linux-crypto@vger.kernel.org; linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/1] crypto: If two strings are exact match, they must have same length.
-
-On Tue, Mar 21, 2017 at 04:40:40PM -0500, Ming Ma wrote:
-> When both "crct10dif-pclmul" algorithm and "crct10dif-generic" 
-> algorithm exist in crypto_alg_list, "crct10dif-pclmul" should be 
-> selected, since it has higher priority than "crct10dif-generic". 
-> However, both algorithms have the same cra_name "crct10dif". If we use 
-> "crct10dif" to find a matched algorithm in crypto_alg_list, it's 
-> possible "crct10dif-generic" is selected, because the code calls 
-> strcmp to decide if two string are exact match, but doesn't check if two strings have the same length.
+On Sun, Mar 26, 2017 at 07:49:01PM +0100, Ard Biesheuvel wrote:
+> The generic AES driver uses 16 lookup tables of 1 KB each, and has
+> encryption and decryption routines that are fully unrolled. Given how
+> the dependencies between this code and other drivers are declared in
+> Kconfig files, this code is always pulled into the core kernel, even
+> if it is usually superseded at runtime by accelerated drivers that
+> exist for many architectures.
 > 
-> exact = !strcmp(q->cra_driver_name, name);
+> This leaves us with 25 KB of dead code in the kernel, which is negligible
+> in typical environments, but which is actually a big deal for the IoT
+> domain, where every kilobyte counts.
 > 
-> So ,if "crct10dif-generic" is in front of "crct10dif-pclmul" in 
-> crypto_alg_list, it will be picked as the matched algorithm, even if 
-> it has lower priority than "crct10dif-pclmul".
-> Signed-off-by: Ming Ma <mingma@micron.com>
-> ---
->  crypto/api.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> For this reason, this series refactors the way the various AES
+> implementations are wired up, to allow the generic version in
+> crypto/aes_generic.c to be omitted from the build entirely.
 > 
-> diff --git a/crypto/api.c b/crypto/api.c index b16ce16..5b3d45a 100644
-> --- a/crypto/api.c
-> +++ b/crypto/api.c
-> @@ -76,7 +76,8 @@ static struct crypto_alg *__crypto_alg_lookup(const char *name, u32 type,
->  		    ((struct crypto_larval *)q)->mask != mask)
->  			continue;
->  
-> -		exact = !strcmp(q->cra_driver_name, name);
-> +		exact = (strlen(name) == strlen(q->cra_driver_name)) &&
-> +				!strcmp(q->cra_driver_name, name);
->  		fuzzy = !strcmp(q->cra_name, name);
->  		if (!exact && !(fuzzy && q->cra_priority > best))
->  			continue;
+> Patch #1 removes some bogus 'select CRYPTO_AES' statement.
+> 
+> Patch #2 introduces CRYPTO_NEED_AES which can be selected by driver that
+> require an AES cipher to be available, but don't care how it is implemented.
+> 
+> Patches #3 and #4 make some preparatory changes that allow dependencies on
+> crypto_aes_expand_key to be fulfilled by the new (and much smaller) fixed
+> time AES driver. (#5)
+> 
+> Patch #6 splits the generic AES driver into a core containing the precomputed
+> sub/shift/mix tables and the key expansion routines on the one hand, and the
+> encryption/decryption routines and the crypto API registration on the other.
+> 
+> Patch #7 introduces the CRYPTO_HAVE_AES Kconfig symbol, and adds statements to
+> various AES implementations that can fulfil the CRYPTO_NEED_AES dependencies
+> added in patch #2. The introduced Kconfig logic allows CRYPTO_AES to be
+> deselected even if AES dependencies exist, as long as one of these alternatives
+> is selected.
 
-This is bogus.  Please describe how you reproduced the problem.
+Just a thought: how about renaming CRYPTO_AES to CRYPTO_AES_GENERIC, then
+renaming what you called CRYPTO_NEED_AES to CRYPTO_AES?  Then all the 'select
+CRYPTO_AES' can remain as-is, instead of replacing them with the (in my opinion
+uglier) 'select CRYPTO_NEED_AES'.  And it should still work for people who have
+CRYPTO_AES=y or CRYPTO_AES=m in their kernel config, since they'll still get at
+least one AES implementation (though they may stop getting the generic one).
 
-The priority matching should work.
+Also, in general I think we need better Kconfig help text.  As proposed you can
+now toggle simply "AES cipher algorithms", and nowhere in the help text is it
+mentioned that that is only the generic implementation, which you don't need if
+you have enabled some other implementation.  Similarly for "Fixed time AES
+cipher"; it perhaps should be mentioned that it's only useful if a fixed-time
+implementation using special CPU instructions like AES-NI or ARMv8-CE isn't
+usable.
 
-Cheers,
---
-Email: Herbert Xu <herbert@gondor.apana.org.au> Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+- Eric
