@@ -1,71 +1,146 @@
-From: Aviad Yehezkel <aviadye@mellanox.com>
-Subject: [RFC TLS Offload Support 04/15] net: Add TLS offload netdevice and socket support
-Date: Tue, 28 Mar 2017 16:26:21 +0300
-Message-ID: <1490707592-1430-5-git-send-email-aviadye@mellanox.com>
-References: <1490707592-1430-1-git-send-email-aviadye@mellanox.com>
-Cc: matanb@mellanox.com, liranl@mellanox.com, haggaie@mellanox.com,
-        tom@herbertland.com, herbert@gondor.apana.org.au, nmav@gnults.org,
-        fridolin.pokorny@gmail.com, ilant@mellanox.com,
-        kliteyn@mellanox.com, linux-crypto@vger.kernel.org,
-        saeedm@mellanox.com, aviadye@dev.mellanox.co.il
-To: davem@davemloft.net, aviadye@mellanox.com, ilyal@mellanox.com,
-        borisp@mellanox.com, davejwatson@fb.com, netdev@vger.kernel.org
-Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <1490707592-1430-1-git-send-email-aviadye@mellanox.com>
-Sender: netdev-owner@vger.kernel.org
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: [PATCH 4.10 075/111] hwrng: amd - Revert managed API changes
+Date: Tue, 28 Mar 2017 14:31:01 +0200
+Message-ID: <20170328122918.806452444@linuxfoundation.org>
+References: <20170328122915.640228468@linuxfoundation.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org, Prarit Bhargava <prarit@redhat.com>,
+        Matt Mackall <mpm@selenic.com>,
+        Corentin LABBE <clabbe.montjoie@gmail.com>,
+        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
+        Wei Yongjun <weiyongjun1@huawei.com>,
+        linux-crypto@vger.kernel.org, linux-geode@lists.infradead.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+To: linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20170328122915.640228468@linuxfoundation.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-From: Ilya Lesokhin <ilyal@mellanox.com>
+4.10-stable review patch.  If anyone has any objections, please let me know.
 
-This patch add a new NDO to add and delete TLS contexts on netdevices.
+------------------
 
-Signed-off-by: Boris Pismenny <borisp@mellanox.com>
-Signed-off-by: Ilya Lesokhin <ilyal@mellanox.com>
-Signed-off-by: Aviad Yehezkel <aviadye@mellanox.com>
+From: Prarit Bhargava <prarit@redhat.com>
+
+commit 69db7009318758769d625b023402161c750f7876 upstream.
+
+After commit 31b2a73c9c5f ("hwrng: amd - Migrate to managed API"), the
+amd-rng driver uses devres with pci_dev->dev to keep track of resources,
+but does not actually register a PCI driver.  This results in the
+following issues:
+
+1. The message
+
+WARNING: CPU: 2 PID: 621 at drivers/base/dd.c:349 driver_probe_device+0x38c
+
+is output when the i2c_amd756 driver loads and attempts to register a PCI
+driver.  The PCI & device subsystems assume that no resources have been
+registered for the device, and the WARN_ON() triggers since amd-rng has
+already do so.
+
+2.  The driver leaks memory because the driver does not attach to a
+device.  The driver only uses the PCI device as a reference.   devm_*()
+functions will release resources on driver detach, which the amd-rng
+driver will never do.  As a result,
+
+3.  The driver cannot be reloaded because there is always a use of the
+ioport and region after the first load of the driver.
+
+Revert the changes made by 31b2a73c9c5f ("hwrng: amd - Migrate to managed
+API").
+
+Signed-off-by: Prarit Bhargava <prarit@redhat.com>
+Fixes: 31b2a73c9c5f ("hwrng: amd - Migrate to managed API").
+Cc: Matt Mackall <mpm@selenic.com>
+Cc: Corentin LABBE <clabbe.montjoie@gmail.com>
+Cc: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Cc: Wei Yongjun <weiyongjun1@huawei.com>
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-geode@lists.infradead.org
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
 ---
- include/linux/netdevice.h | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
+ drivers/char/hw_random/amd-rng.c |   42 +++++++++++++++++++++++++++++++--------
+ 1 file changed, 34 insertions(+), 8 deletions(-)
 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 51f9336..ce4760c 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -844,6 +844,25 @@ struct xfrmdev_ops {
+--- a/drivers/char/hw_random/amd-rng.c
++++ b/drivers/char/hw_random/amd-rng.c
+@@ -55,6 +55,7 @@ MODULE_DEVICE_TABLE(pci, pci_tbl);
+ struct amd768_priv {
+ 	void __iomem *iobase;
+ 	struct pci_dev *pcidev;
++	u32 pmbase;
  };
- #endif
  
-+#if IS_ENABLED(CONFIG_TLS)
-+enum tls_offload_ctx_dir {
-+	TLS_OFFLOAD_CTX_DIR_RX,
-+	TLS_OFFLOAD_CTX_DIR_TX,
-+};
-+
-+struct tls_crypto_info;
-+struct tls_offload_context;
-+
-+struct tlsdev_ops {
-+	int (*tls_dev_add)(struct net_device *netdev, struct sock *sk,
-+			enum tls_offload_ctx_dir direction,
-+			struct tls_crypto_info *crypto_info,
-+			struct tls_offload_context **ctx);
-+	void (*tls_dev_del)(struct net_device *netdev, struct sock *sk,
-+			enum tls_offload_ctx_dir direction);
-+};
-+#endif
-+
- /*
-  * This structure defines the management hooks for network devices.
-  * The following hooks can be defined; unless noted otherwise, they are
-@@ -1722,6 +1741,10 @@ struct net_device {
- 	const struct xfrmdev_ops *xfrmdev_ops;
- #endif
+ static int amd_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
+@@ -148,33 +149,58 @@ found:
+ 	if (pmbase == 0)
+ 		return -EIO;
  
-+#if IS_ENABLED(CONFIG_TLS)
-+	const struct tlsdev_ops *tlsdev_ops;
-+#endif
-+
- 	const struct header_ops *header_ops;
+-	priv = devm_kzalloc(&pdev->dev, sizeof(*priv), GFP_KERNEL);
++	priv = kzalloc(sizeof(*priv), GFP_KERNEL);
+ 	if (!priv)
+ 		return -ENOMEM;
  
- 	unsigned int		flags;
--- 
-2.7.4
+-	if (!devm_request_region(&pdev->dev, pmbase + PMBASE_OFFSET,
+-				PMBASE_SIZE, DRV_NAME)) {
++	if (!request_region(pmbase + PMBASE_OFFSET, PMBASE_SIZE, DRV_NAME)) {
+ 		dev_err(&pdev->dev, DRV_NAME " region 0x%x already in use!\n",
+ 			pmbase + 0xF0);
+-		return -EBUSY;
++		err = -EBUSY;
++		goto out;
+ 	}
+ 
+-	priv->iobase = devm_ioport_map(&pdev->dev, pmbase + PMBASE_OFFSET,
+-			PMBASE_SIZE);
++	priv->iobase = ioport_map(pmbase + PMBASE_OFFSET, PMBASE_SIZE);
+ 	if (!priv->iobase) {
+ 		pr_err(DRV_NAME "Cannot map ioport\n");
+-		return -ENOMEM;
++		err = -EINVAL;
++		goto err_iomap;
+ 	}
+ 
+ 	amd_rng.priv = (unsigned long)priv;
++	priv->pmbase = pmbase;
+ 	priv->pcidev = pdev;
+ 
+ 	pr_info(DRV_NAME " detected\n");
+-	return devm_hwrng_register(&pdev->dev, &amd_rng);
++	err = hwrng_register(&amd_rng);
++	if (err) {
++		pr_err(DRV_NAME " registering failed (%d)\n", err);
++		goto err_hwrng;
++	}
++	return 0;
++
++err_hwrng:
++	ioport_unmap(priv->iobase);
++err_iomap:
++	release_region(pmbase + PMBASE_OFFSET, PMBASE_SIZE);
++out:
++	kfree(priv);
++	return err;
+ }
+ 
+ static void __exit mod_exit(void)
+ {
++	struct amd768_priv *priv;
++
++	priv = (struct amd768_priv *)amd_rng.priv;
++
++	hwrng_unregister(&amd_rng);
++
++	ioport_unmap(priv->iobase);
++
++	release_region(priv->pmbase + PMBASE_OFFSET, PMBASE_SIZE);
++
++	kfree(priv);
+ }
+ 
+ module_init(mod_init);
