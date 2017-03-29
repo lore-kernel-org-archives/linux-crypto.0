@@ -1,39 +1,38 @@
-From: Rob Herring <robh@kernel.org>
-Subject: Re: [PATCH v2 1/5] dt-bindings: Document STM32 CRC bindings
-Date: Tue, 28 Mar 2017 19:28:48 -0500
-Message-ID: <20170329002847.jfgs3ru3dwlepl3v@rob-hp-laptop>
-References: <1490109211-4869-1-git-send-email-fabien.dessenne@st.com>
- <1490109211-4869-2-git-send-email-fabien.dessenne@st.com>
+From: Shawn Guo <shawnguo@kernel.org>
+Subject: Re: [PATCH v2] arm64: dts: ls1012a: add crypto node
+Date: Wed, 29 Mar 2017 11:04:04 +0800
+Message-ID: <20170329030402.GV30608@dragon>
+References: <20170328104115.GT30608@dragon>
+ <20170328114619.16568-1-horia.geanta@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: Rob Herring <robh+dt@kernel.org>,
         Mark Rutland <mark.rutland@arm.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        Russell King <linux@armlinux.org.uk>,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Benjamin Gaignard <benjamin.gaignard@st.com>
-To: Fabien Dessenne <fabien.dessenne@st.com>
+        devicetree@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Harninder Rai <harninder.rai@nxp.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Bhaskar Upadhaya <Bhaskar.Upadhaya@nxp.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Dan Douglass <dan.douglass@nxp.com>,
+        linux-crypto@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-arm-kernel@lists.infradead.org
+To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-oi0-f68.google.com ([209.85.218.68]:34776 "EHLO
-        mail-oi0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932352AbdC2A2u (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Mar 2017 20:28:50 -0400
+Received: from mail.kernel.org ([198.145.29.136]:34250 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751441AbdC2DEw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 28 Mar 2017 23:04:52 -0400
 Content-Disposition: inline
-In-Reply-To: <1490109211-4869-2-git-send-email-fabien.dessenne@st.com>
+In-Reply-To: <20170328114619.16568-1-horia.geanta@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Mar 21, 2017 at 04:13:27PM +0100, Fabien Dessenne wrote:
-> Document device tree bindings for the STM32 CRC (crypto CRC32)
+On Tue, Mar 28, 2017 at 02:46:19PM +0300, Horia Geantă wrote:
+> LS1012A has a SEC v5.4 security engine.
 > 
-> Signed-off-by: Fabien Dessenne <fabien.dessenne@st.com>
-> ---
->  .../devicetree/bindings/crypto/st,stm32-crc.txt          | 16 ++++++++++++++++
->  1 file changed, 16 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/crypto/st,stm32-crc.txt
+> Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 
-Acked-by: Rob Herring <robh@kernel.org>
+Applied, thanks.
