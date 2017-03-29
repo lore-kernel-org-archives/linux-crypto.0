@@ -1,7 +1,8 @@
 From: Antoine Tenart <antoine.tenart@free-electrons.com>
-Subject: [PATCH 0/7] arm64: marvell: add cryptographic engine support for 7k/8k
-Date: Wed, 29 Mar 2017 14:44:25 +0200
-Message-ID: <20170329124432.27457-1-antoine.tenart@free-electrons.com>
+Subject: [PATCH 4/7] arm64: marvell: dts: add crypto engine description for 7k/8k
+Date: Wed, 29 Mar 2017 14:44:29 +0200
+Message-ID: <20170329124432.27457-5-antoine.tenart@free-electrons.com>
+References: <20170329124432.27457-1-antoine.tenart@free-electrons.com>
 Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
         linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         thomas.petazzoni@free-electrons.com,
@@ -11,73 +12,75 @@ To: herbert@gondor.apana.org.au, davem@davemloft.net,
         jason@lakedaemon.net, andrew@lunn.ch,
         gregory.clement@free-electrons.com, sebastian.hesselbarth@gmail.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:36269 "EHLO
+Received: from mail.free-electrons.com ([62.4.15.54]:36280 "EHLO
         mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932147AbdC2Moo (ORCPT
+        with ESMTP id S932178AbdC2Moo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Wed, 29 Mar 2017 08:44:44 -0400
+In-Reply-To: <20170329124432.27457-1-antoine.tenart@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi all,
+Add the description of the crypto engine hardware block for the Marvell
+Armada 7k and Armada 8k processors; for both the CP110 slave and master.
 
-This series adds support for the Inside Secure SafeXcel EIP197
-cryptographic engine which can be found on Marvell Armada 7k and 8k
-boards. A new cryptographic engine driver is added, as well as the
-relevant device tree definition for the Armada 7040 DB and 8040 DB
-boards.
+Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
+---
+ arch/arm64/boot/dts/marvell/armada-cp110-master.dtsi | 15 +++++++++++++++
+ arch/arm64/boot/dts/marvell/armada-cp110-slave.dtsi  | 15 +++++++++++++++
+ 2 files changed, 30 insertions(+)
 
-This driver needs two firmwares to work correctly. These firmware are
-usually used for more advanced operations than the ones supported (as of
-now), but we still need them to pass the data to the internal
-cryptographic engine.
-
-This series was tested in various ways on both the Armada 7040 DB and
-the Armada 8040 DB: using the crypto framework self tests, using tcrypt
-and while performing various transfers with iperf on top of IPsec.
-
-This series is based on top of v4.11-rc1, and is available on a branch
-(which also contains the PPv2 support for 7k/8k, to ease the process of
-testing IPsec): https://github.com/atenart/linux  v4.11-rc1/7k8k-crypto
-I can rebase if needed.
-
-Thanks,
-Antoine
-
-
-Antoine Tenart (7):
-  Documentation/bindings: Document the SafeXel cryptographic engine
-    driver
-  crypto: inside-secure: add SafeXcel EIP197 crypto engine driver
-  MAINTAINERS: add a maintainer for the Inside Secure crypto driver
-  arm64: marvell: dts: add crypto engine description for 7k/8k
-  arm64: marvell: dts: enable the crypto engine on the Armada 7040 DB
-  arm64: marvell: dts: enable the crypto engine on the Armada 8040 DB
-  arm64: defconfig: enable the Safexcel crypto engine as a module
-
- .../bindings/crypto/inside-secure-safexcel.txt     |   27 +
- MAINTAINERS                                        |    6 +
- arch/arm64/boot/dts/marvell/armada-7040-db.dts     |    4 +
- arch/arm64/boot/dts/marvell/armada-8040-db.dts     |    4 +
- .../boot/dts/marvell/armada-cp110-master.dtsi      |   15 +
- .../arm64/boot/dts/marvell/armada-cp110-slave.dtsi |   15 +
- arch/arm64/configs/defconfig                       |    1 +
- drivers/crypto/Kconfig                             |   17 +
- drivers/crypto/Makefile                            |    1 +
- drivers/crypto/inside-secure/Makefile              |    2 +
- drivers/crypto/inside-secure/safexcel.c            |  939 ++++++++++++++++++
- drivers/crypto/inside-secure/safexcel.h            |  581 +++++++++++
- drivers/crypto/inside-secure/safexcel_cipher.c     |  544 ++++++++++
- drivers/crypto/inside-secure/safexcel_hash.c       | 1045 ++++++++++++++++++++
- drivers/crypto/inside-secure/safexcel_ring.c       |  173 ++++
- 15 files changed, 3374 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/crypto/inside-secure-safexcel.txt
- create mode 100644 drivers/crypto/inside-secure/Makefile
- create mode 100644 drivers/crypto/inside-secure/safexcel.c
- create mode 100644 drivers/crypto/inside-secure/safexcel.h
- create mode 100644 drivers/crypto/inside-secure/safexcel_cipher.c
- create mode 100644 drivers/crypto/inside-secure/safexcel_hash.c
- create mode 100644 drivers/crypto/inside-secure/safexcel_ring.c
-
+diff --git a/arch/arm64/boot/dts/marvell/armada-cp110-master.dtsi b/arch/arm64/boot/dts/marvell/armada-cp110-master.dtsi
+index 9a2ce2ae49cd..7530a1b541c5 100644
+--- a/arch/arm64/boot/dts/marvell/armada-cp110-master.dtsi
++++ b/arch/arm64/boot/dts/marvell/armada-cp110-master.dtsi
+@@ -210,6 +210,21 @@
+ 				clocks = <&cpm_syscon0 1 25>;
+ 				status = "okay";
+ 			};
++
++			cpm_crypto: crypto@800000 {
++				compatible = "inside-secure,safexcel-eip197";
++				reg = <0x800000 0x200000>;
++				interrupts = <GIC_SPI 34 (IRQ_TYPE_EDGE_RISING | IRQ_TYPE_LEVEL_HIGH)>,
++					     <GIC_SPI 54 IRQ_TYPE_LEVEL_HIGH>,
++					     <GIC_SPI 55 IRQ_TYPE_LEVEL_HIGH>,
++					     <GIC_SPI 56 IRQ_TYPE_LEVEL_HIGH>,
++					     <GIC_SPI 57 IRQ_TYPE_LEVEL_HIGH>,
++					     <GIC_SPI 58 IRQ_TYPE_LEVEL_HIGH>;
++				interrupt-names = "mem", "ring0", "ring1",
++						  "ring2", "ring3", "eip";
++				clocks = <&cpm_syscon0 1 26>;
++				status = "disabled";
++			};
+ 		};
+ 
+ 		cpm_pcie0: pcie@f2600000 {
+diff --git a/arch/arm64/boot/dts/marvell/armada-cp110-slave.dtsi b/arch/arm64/boot/dts/marvell/armada-cp110-slave.dtsi
+index c9dfa244ebb6..6110d39087a6 100644
+--- a/arch/arm64/boot/dts/marvell/armada-cp110-slave.dtsi
++++ b/arch/arm64/boot/dts/marvell/armada-cp110-slave.dtsi
+@@ -210,6 +210,21 @@
+ 				clocks = <&cps_syscon0 1 25>;
+ 				status = "okay";
+ 			};
++
++			cps_crypto: crypto@800000 {
++				compatible = "inside-secure,safexcel-eip197";
++				reg = <0x800000 0x200000>;
++				interrupts = <GIC_SPI 34 (IRQ_TYPE_EDGE_RISING | IRQ_TYPE_LEVEL_HIGH)>,
++					     <GIC_SPI 278 IRQ_TYPE_LEVEL_HIGH>,
++					     <GIC_SPI 279 IRQ_TYPE_LEVEL_HIGH>,
++					     <GIC_SPI 280 IRQ_TYPE_LEVEL_HIGH>,
++					     <GIC_SPI 281 IRQ_TYPE_LEVEL_HIGH>,
++					     <GIC_SPI 282 IRQ_TYPE_LEVEL_HIGH>;
++				interrupt-names = "mem", "ring0", "ring1",
++						  "ring2", "ring3", "eip";
++				clocks = <&cps_syscon0 1 26>;
++				status = "disabled";
++			};
+ 		};
+ 
+ 		cps_pcie0: pcie@f4600000 {
 -- 
 2.11.0
