@@ -1,81 +1,67 @@
-From: Anup Patel <anup.patel@broadcom.com>
-Subject: Re: [PATCH v6 0/4] Broadcom SBA RAID support
-Date: Wed, 29 Mar 2017 11:35:43 +0530
-Message-ID: <CAALAos-P6CDdWTJxg8YQfT1V+iCxUcbYHiQ35EdZzz9PnN3cuA@mail.gmail.com>
-References: <1488793408-25592-1-git-send-email-anup.patel@broadcom.com>
- <20170321083052.GY2843@localhost> <CAALAos-k_DBYAz49278wBr_GoceOKYVH_UuzTLn1h7QCiUd8pg@mail.gmail.com>
- <20170321091829.GZ2843@localhost>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Jassi Brar <jassisinghbrar@gmail.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Ray Jui <rjui@broadcom.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        Jon Mason <jonmason@broadcom.com>,
-        Rob Rice <rob.rice@broadcom.com>,
-        BCM Kernel Feedback <bcm-kernel-feedback-list@broadcom.com>,
-        dmaengine@vger.kernel.org,
-        Device Tree <devicetree@vger.kernel.org>,
-        Linux ARM Kernel <linux-arm-kernel@lists.infradead.org>,
-        Linux Kernel <linux-kernel@vger.kernel.org>,
-        linux-crypto@vger.kernel.org,
-        linux-raid <linux-raid@vger.kernel.org>
-To: Vinod Koul <vinod.koul@intel.com>
-Return-path: <linux-raid-owner@vger.kernel.org>
-In-Reply-To: <20170321091829.GZ2843@localhost>
-Sender: linux-raid-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Antoine Tenart <antoine.tenart@free-electrons.com>
+Subject: [PATCH 1/7] Documentation/bindings: Document the SafeXel cryptographic engine driver
+Date: Wed, 29 Mar 2017 14:44:26 +0200
+Message-ID: <20170329124432.27457-2-antoine.tenart@free-electrons.com>
+References: <20170329124432.27457-1-antoine.tenart@free-electrons.com>
+Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        thomas.petazzoni@free-electrons.com,
+        boris.brezillon@free-electrons.com, oferh@marvell.com,
+        igall@marvell.com, nadavh@marvell.com
+To: herbert@gondor.apana.org.au, davem@davemloft.net,
+        jason@lakedaemon.net, andrew@lunn.ch,
+        gregory.clement@free-electrons.com, sebastian.hesselbarth@gmail.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.free-electrons.com ([62.4.15.54]:36253 "EHLO
+        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932111AbdC2Mon (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 29 Mar 2017 08:44:43 -0400
+In-Reply-To: <20170329124432.27457-1-antoine.tenart@free-electrons.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Mar 21, 2017 at 2:48 PM, Vinod Koul <vinod.koul@intel.com> wrote:
-> On Tue, Mar 21, 2017 at 02:17:21PM +0530, Anup Patel wrote:
->> On Tue, Mar 21, 2017 at 2:00 PM, Vinod Koul <vinod.koul@intel.com> wrote:
->> > On Mon, Mar 06, 2017 at 03:13:24PM +0530, Anup Patel wrote:
->> >> The Broadcom SBA RAID is a stream-based device which provides
->> >> RAID5/6 offload.
->> >>
->> >> It requires a SoC specific ring manager (such as Broadcom FlexRM
->> >> ring manager) to provide ring-based programming interface. Due to
->> >> this, the Broadcom SBA RAID driver (mailbox client) implements
->> >> DMA device having one DMA channel using a set of mailbox channels
->> >> provided by Broadcom SoC specific ring manager driver (mailbox
->> >> controller).
->> >>
->> >> The Broadcom SBA RAID hardware requires PQ disk position instead
->> >> of PQ disk coefficient. To address this, we have added raid_gflog
->> >> table which will help driver to convert PQ disk coefficient to PQ
->> >> disk position.
->> >>
->> >> This patchset is based on Linux-4.11-rc1 and depends on patchset
->> >> "[PATCH v5 0/2] Broadcom FlexRM ring manager support"
->> >
->> > Okay I applied and was about to push when I noticed this :(
->> >
->> > So what is the status of this..?
->>
->> PATCH2 is Acked but PATCH1 is under-review. Currently, its
->> v6 of that patchset.
->>
->> The only dependency on that patchset is the changes in
->> brcm-message.h which are required by this BCM-SBA-RAID
->> driver.
->>
->> @Jassi,
->> Can you please have a look at PATCH v6?
->
-> And I would need an immutable branch/tag once merged. I am going to keep
-> this series pending till then.
+The Inside Secure Safexcel cryptographic engine is found on some Marvell
+SoCs (7k/8k). Document the bindings used by its driver.
 
-The Broadcom FlexRM patchset is pickedup by Jassi and
-can be found in mailbox-for-next branch of
-git://git.linaro.org/landing-teams/working/fujitsu/integration
+Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
+---
+ .../bindings/crypto/inside-secure-safexcel.txt     | 27 ++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/inside-secure-safexcel.txt
 
-Both patchset (Broadcom FlexRM patchset and this one) are
-also available in sba-raid-v7 branch of
-https://github.com/Broadcom/arm64-linux.git
-
-Regards,
-Anup
+diff --git a/Documentation/devicetree/bindings/crypto/inside-secure-safexcel.txt b/Documentation/devicetree/bindings/crypto/inside-secure-safexcel.txt
+new file mode 100644
+index 000000000000..ff56b9384fcc
+--- /dev/null
++++ b/Documentation/devicetree/bindings/crypto/inside-secure-safexcel.txt
+@@ -0,0 +1,27 @@
++Inside Secure SafeXcel cryptographic engine
++
++Required properties:
++- compatible: Should be "inside-secure,safexcel-eip197".
++- reg: Base physical address of the engine and length of memory mapped region.
++- interrupts: Interrupt numbers for the rings and engine.
++- interrupt-names: Should be "ring0", "ring1", "ring2", "ring3", "eip", "mem".
++
++Optional properties:
++- clocks: Reference to the crypto engine clock.
++
++Example:
++
++	crypto: crypto@800000 {
++		compatible = "inside-secure,safexcel-eip197";
++		reg = <0x800000 0x200000>;
++		interrupts = <GIC_SPI 34 (IRQ_TYPE_EDGE_RISING | IRQ_TYPE_LEVEL_HIGH)>,
++			     <GIC_SPI 54 IRQ_TYPE_LEVEL_HIGH>,
++			     <GIC_SPI 55 IRQ_TYPE_LEVEL_HIGH>,
++			     <GIC_SPI 56 IRQ_TYPE_LEVEL_HIGH>,
++			     <GIC_SPI 57 IRQ_TYPE_LEVEL_HIGH>,
++			     <GIC_SPI 58 IRQ_TYPE_LEVEL_HIGH>;
++		interrupt-names = "mem", "ring0", "ring1", "ring2", "ring3",
++				  "eip";
++		clocks = <&cpm_syscon0 1 26>;
++		status = "disabled";
++	};
+-- 
+2.11.0
