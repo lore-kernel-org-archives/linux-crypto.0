@@ -1,50 +1,39 @@
-From: Michael Turquette <mturquette@baylibre.com>
-Subject: Re: [PATCH v3 1/3] clk: meson-gxbb: expose clock CLKID_RNG0
-Date: Tue, 28 Mar 2017 15:07:24 -0700
-Message-ID: <CAEG3pNCop22g0SbKfPma+iaHrSzv6sBXTJRsrjwtwUw+HGYV7Q@mail.gmail.com>
-References: <4e2d12e5-f75b-3ac6-a3f7-18e8a8b7283b@gmail.com>
- <20170316100743.GA12137@gondor.apana.org.au> <m2mvcl6pwg.fsf@baylibre.com>
- <20170317083032.GA18512@gondor.apana.org.au> <m2lgrxnxlz.fsf@baylibre.com> <20170323075602.GA6054@gondor.apana.org.au>
+From: Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH v2 1/5] dt-bindings: Document STM32 CRC bindings
+Date: Tue, 28 Mar 2017 19:28:48 -0500
+Message-ID: <20170329002847.jfgs3ru3dwlepl3v@rob-hp-laptop>
+References: <1490109211-4869-1-git-send-email-fabien.dessenne@st.com>
+ <1490109211-4869-2-git-send-email-fabien.dessenne@st.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Kevin Hilman <khilman@baylibre.com>,
-        Heiner Kallweit <hkallweit1@gmail.com>,
-        Jerome Brunet <jbrunet@baylibre.com>,
-        Neil Armstrong <narmstrong@baylibre.com>,
-        linux-amlogic@lists.infradead.org, linux-crypto@vger.kernel.org,
-        Stephen Boyd <sboyd@codeaurora.org>,
-        linux-clk <linux-clk@vger.kernel.org>,
-        Linux-DT <devicetree@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-clk-owner@vger.kernel.org>
-In-Reply-To: <20170323075602.GA6054@gondor.apana.org.au>
-Sender: linux-clk-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@st.com>,
+        Russell King <linux@armlinux.org.uk>,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Benjamin Gaignard <benjamin.gaignard@st.com>
+To: Fabien Dessenne <fabien.dessenne@st.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-oi0-f68.google.com ([209.85.218.68]:34776 "EHLO
+        mail-oi0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932352AbdC2A2u (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 28 Mar 2017 20:28:50 -0400
+Content-Disposition: inline
+In-Reply-To: <1490109211-4869-2-git-send-email-fabien.dessenne@st.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Herbert,
+On Tue, Mar 21, 2017 at 04:13:27PM +0100, Fabien Dessenne wrote:
+> Document device tree bindings for the STM32 CRC (crypto CRC32)
+> 
+> Signed-off-by: Fabien Dessenne <fabien.dessenne@st.com>
+> ---
+>  .../devicetree/bindings/crypto/st,stm32-crc.txt          | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/crypto/st,stm32-crc.txt
 
-On Thu, Mar 23, 2017 at 12:56 AM, Herbert Xu
-<herbert@gondor.apana.org.au> wrote:
-> On Wed, Mar 22, 2017 at 08:24:08AM -0700, Kevin Hilman wrote:
->>
->> Because this will be causing conflicts with both the platform (amlogic)
->> tree and the clk tree, could provide an immutable branch where these are
->> applied to help us handle these conflicts?
->
-> If you apply the same patches to your tree there should be no
-> conflicts at all.  git is able to resolve this automatically.
-
-The commits will have different SHA1 hashes (commit id's). Having
-multiple "copies" of the same patch with separate id's is undesirable
-and completely avoidable. Immutable, shared branches resolve this
-issue.
-
-Best regards,
-Mike
-
->
-> Cheers,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Acked-by: Rob Herring <robh@kernel.org>
