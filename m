@@ -1,7 +1,7 @@
 From: Antoine Tenart <antoine.tenart@free-electrons.com>
-Subject: [PATCH 7/7] arm64: defconfig: enable the Safexcel crypto engine as a module
-Date: Wed, 29 Mar 2017 14:44:32 +0200
-Message-ID: <20170329124432.27457-8-antoine.tenart@free-electrons.com>
+Subject: [PATCH 3/7] MAINTAINERS: add a maintainer for the Inside Secure crypto driver
+Date: Wed, 29 Mar 2017 14:44:28 +0200
+Message-ID: <20170329124432.27457-4-antoine.tenart@free-electrons.com>
 References: <20170329124432.27457-1-antoine.tenart@free-electrons.com>
 Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
         linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
@@ -12,35 +12,40 @@ To: herbert@gondor.apana.org.au, davem@davemloft.net,
         jason@lakedaemon.net, andrew@lunn.ch,
         gregory.clement@free-electrons.com, sebastian.hesselbarth@gmail.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:36300 "EHLO
+Received: from mail.free-electrons.com ([62.4.15.54]:36309 "EHLO
         mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932257AbdC2Mop (ORCPT
+        with ESMTP id S932147AbdC2Moq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 29 Mar 2017 08:44:45 -0400
+        Wed, 29 Mar 2017 08:44:46 -0400
 In-Reply-To: <20170329124432.27457-1-antoine.tenart@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The Safexcel EIP197 cryptographic engine is used on some Marvell SoCs,
-such as Armada 7040 and Armada 8040. Enable this driver as a module in
-the ARM64 defconfig.
+A new cryptographic engine driver was added in
+drivers/crypto/inside-secure. Add myself as a maintainer for this
+driver.
 
 Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
 ---
- arch/arm64/configs/defconfig | 1 +
- 1 file changed, 1 insertion(+)
+ MAINTAINERS | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
-index fece4d3c2095..76308fa2fa7a 100644
---- a/arch/arm64/configs/defconfig
-+++ b/arch/arm64/configs/defconfig
-@@ -519,6 +519,7 @@ CONFIG_MEMTEST=y
- CONFIG_SECURITY=y
- CONFIG_CRYPTO_ECHAINIV=y
- CONFIG_CRYPTO_ANSI_CPRNG=y
-+CONFIG_CRYPTO_DEV_SAFEXCEL=m
- CONFIG_ARM64_CRYPTO=y
- CONFIG_CRYPTO_SHA1_ARM64_CE=y
- CONFIG_CRYPTO_SHA2_ARM64_CE=y
+diff --git a/MAINTAINERS b/MAINTAINERS
+index c265a5fe4848..7240b9bca638 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -6487,6 +6487,12 @@ F:	Documentation/input/multi-touch-protocol.txt
+ F:	drivers/input/input-mt.c
+ K:	\b(ABS|SYN)_MT_
+ 
++INSIDE SECURE CRYPTO DRIVER
++M:	Antoine Tenart <antoine.tenart@free-electrons.com>
++F:	drivers/crypto/inside-secure/
++S:	Maintained
++L:	linux-crypto@vger.kernel.org
++
+ INTEL ASoC BDW/HSW DRIVERS
+ M:	Jie Yang <yang.jie@linux.intel.com>
+ L:	alsa-devel@alsa-project.org (moderated for non-subscribers)
 -- 
 2.11.0
