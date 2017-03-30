@@ -1,107 +1,95 @@
-From: Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>
-Subject: Re: [PATCH] crypto: vmx: Remove dubiously licensed crypto code
-Date: Thu, 30 Mar 2017 13:30:17 -0300
-Message-ID: <8591ac8ff6ef6fa9c4bd264017ac360d@linux.vnet.ibm.com>
-References: <20170329125639.14288-1-msuchanek@suse.de>
- <20170329145135.GA28057@kroah.com> <20170329171327.38d4fdd6@kitsune.suse.cz>
- <7ec54553-610c-a5dc-d4d9-3c83f6a161d9@linux.vnet.ibm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-Cc: =?UTF-8?Q?Michal_Such=C3=A1nek?= <msuchanek@suse.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Geert Uytterhoeven <geert+renesas@glider.be>,
-        linux-kernel@vger.kernel.org, Paul Mackerras <paulus@samba.org>,
-        linux-crypto@vger.kernel.org,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        linuxppc-dev@lists.ozlabs.org,
-        "David S. Miller" <davem@davemloft.net>
-To: Tyrel Datwyler <tyreld@linux.vnet.ibm.com>
+From: Ondrej Mosnacek <omosnacek@gmail.com>
+Subject: [PATCH] crypto: gf128mul - define gf128mul_x_ble in gf128mul.h
+Date: Thu, 30 Mar 2017 21:25:35 +0200
+Message-ID: <20170330192535.23123-1-omosnacek@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, Milan Broz <gmazyland@gmail.com>,
+        Ondrej Mosnacek <omosnacek@gmail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59892 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S933794AbdC3Q0m (ORCPT
+Received: from mail-wr0-f193.google.com ([209.85.128.193]:36437 "EHLO
+        mail-wr0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934067AbdC3TZw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 Mar 2017 12:26:42 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id v2UGNhZm004710
-        for <linux-crypto@vger.kernel.org>; Thu, 30 Mar 2017 12:26:41 -0400
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 29h4ek3pjc-1
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Thu, 30 Mar 2017 12:26:40 -0400
-Received: from localhost
-        by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-crypto@vger.kernel.org> from <pfsmorigo@linux.vnet.ibm.com>;
-        Thu, 30 Mar 2017 12:26:40 -0400
-In-Reply-To: <7ec54553-610c-a5dc-d4d9-3c83f6a161d9@linux.vnet.ibm.com>
+        Thu, 30 Mar 2017 15:25:52 -0400
+Received: by mail-wr0-f193.google.com with SMTP id k6so13536847wre.3
+        for <linux-crypto@vger.kernel.org>; Thu, 30 Mar 2017 12:25:51 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 2017-03-29 20:08, Tyrel Datwyler wrote:
-> On 03/29/2017 08:13 AM, Michal Suchánek wrote:
->> On Wed, 29 Mar 2017 16:51:35 +0200
->> Greg Kroah-Hartman <gregkh@linuxfoundation.org> wrote:
->> 
->>> On Wed, Mar 29, 2017 at 02:56:39PM +0200, Michal Suchanek wrote:
->>>> While reviewing commit 11c6e16ee13a ("crypto: vmx - Adding asm
->>>> subroutines for XTS") which adds the OpenSSL license header to
->>>> drivers/crypto/vmx/aesp8-ppc.pl licensing of this driver came into
->>>> qestion. The whole license reads:
->>>> 
->>>>  # Licensed under the OpenSSL license (the "License").  You may not
->>>> use # this file except in compliance with the License.  You can
->>>> obtain a # copy
->>>>  # in the file LICENSE in the source distribution or at
->>>>  # https://www.openssl.org/source/license.html
->>>> 
->>>>  #
->>>>  #
->>>> ====================================================================
->>>> # Written by Andy Polyakov <appro@openssl.org> for the OpenSSL #
->>>> project. The module is, however, dual licensed under OpenSSL and #
->>>> CRYPTOGAMS licenses depending on where you obtain it. For further #
->>>> details see http://www.openssl.org/~appro/cryptogams/. #
->>>> ====================================================================
->>>> 
->>>> After seeking legal advice it is still not clear that this driver
->>>> can be legally used in Linux. In particular the "depending on where
->>>> you obtain it" part does not make it clear when you can apply the
->>>> GPL and when the OpenSSL license.
->>>> 
->>>> I tried contacting the author of the code for clarification but did
->>>> not hear back. In absence of clear licensing the only solution I
->>>> see is removing this code.
-> 
-> A quick 'git grep OpenSSL' of the Linux tree returns several other
-> crypto files under the ARM architecture that are similarly licensed. 
-> Namely:
-> 
-> arch/arm/crypto/sha1-armv4-large.S
-> arch/arm/crypto/sha256-armv4.pl
-> arch/arm/crypto/sha256-core.S_shipped
-> arch/arm/crypto/sha512-armv4.pl
-> arch/arm/crypto/sha512-core.S_shipped
-> arch/arm64/crypto/sha256-core.S_shipped
-> arch/arm64/crypto/sha512-armv8.pl
-> arch/arm64/crypto/sha512-core.S_shipped
-> 
-> On closer inspection of some of those files have the addendum that
-> "Permission to use under GPL terms is granted", but not all of them.
-> 
-> -Tyrel
+The gf128mul_x_ble function is currently defined in gf128mul.c, because
+it depends on the gf128mul_table_be multiplication table.
 
-In 2015, Andy Polyakov, the author, replied in this mailing list [1]:
+However, since the function is very small and only uses two values from
+the table, it is better for it to be defined as inline function in
+gf128mul.h. That way, the function can be inlined by the compiler for
+better performance.
 
-"I have no problems with reusing assembly modules in kernel context. The
-whole idea behind cryptogams initiative was exactly to reuse code in
-different contexts."
+After this change, the speed of the generic 'xts(aes)' implementation
+increased from ~225 MiB/s to ~235 MiB/s (measured using 'cryptsetup
+benchmark' on an Intel system with CRYPTO_AES_X86_64 and
+CRYPTO_AES_NI_INTEL disabled).
 
-[1] https://patchwork.kernel.org/patch/6027481/
+Signed-off-by: Ondrej Mosnacek <omosnacek@gmail.com>
+---
+ crypto/gf128mul.c         | 11 -----------
+ include/crypto/gf128mul.h | 15 +++++++++++++--
+ 2 files changed, 13 insertions(+), 13 deletions(-)
 
+diff --git a/crypto/gf128mul.c b/crypto/gf128mul.c
+index 04facc0..2eab1a1 100644
+--- a/crypto/gf128mul.c
++++ b/crypto/gf128mul.c
+@@ -156,17 +156,6 @@ static void gf128mul_x_bbe(be128 *r, const be128 *x)
+ 	r->b = cpu_to_be64((b << 1) ^ _tt);
+ }
+ 
+-void gf128mul_x_ble(be128 *r, const be128 *x)
+-{
+-	u64 a = le64_to_cpu(x->a);
+-	u64 b = le64_to_cpu(x->b);
+-	u64 _tt = gf128mul_table_be[b >> 63];
+-
+-	r->a = cpu_to_le64((a << 1) ^ _tt);
+-	r->b = cpu_to_le64((b << 1) | (a >> 63));
+-}
+-EXPORT_SYMBOL(gf128mul_x_ble);
+-
+ static void gf128mul_x8_lle(be128 *x)
+ {
+ 	u64 a = be64_to_cpu(x->a);
+diff --git a/include/crypto/gf128mul.h b/include/crypto/gf128mul.h
+index 0bc9b5f..46a01a2 100644
+--- a/include/crypto/gf128mul.h
++++ b/include/crypto/gf128mul.h
+@@ -49,6 +49,7 @@
+ #ifndef _CRYPTO_GF128MUL_H
+ #define _CRYPTO_GF128MUL_H
+ 
++#include <asm/byteorder.h>
+ #include <crypto/b128ops.h>
+ #include <linux/slab.h>
+ 
+@@ -163,8 +164,18 @@ void gf128mul_lle(be128 *a, const be128 *b);
+ 
+ void gf128mul_bbe(be128 *a, const be128 *b);
+ 
+-/* multiply by x in ble format, needed by XTS */
+-void gf128mul_x_ble(be128 *a, const be128 *b);
++/* Multiply by x in ble format, needed by XTS.
++ * Defined here for performance. */
++static inline void gf128mul_x_ble(be128 *r, const be128 *x)
++{
++	u64 a = le64_to_cpu(x->a);
++	u64 b = le64_to_cpu(x->b);
++	/* equivalent to gf128mul_table_be[b >> 63] (see crypto/gf128mul.c): */
++	u64 _tt = (b & ((u64)1 << 63)) ? 0x87 : 0x00;
++
++	r->a = cpu_to_le64((a << 1) ^ _tt);
++	r->b = cpu_to_le64((b << 1) | (a >> 63));
++}
+ 
+ /* 4k table optimization */
+ 
 -- 
-Paulo Flabiano Smorigo
-IBM Linux Technology Center
+2.9.3
