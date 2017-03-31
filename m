@@ -1,48 +1,58 @@
-From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: [PATCH v2] crypto: gf128mul - define gf128mul_x_* in gf128mul.h
-Date: Thu, 30 Mar 2017 20:53:15 -0700
-Message-ID: <20170331035315.GA598@zzz>
-References: <20170330220442.11012-1-omosnacek@gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Subject: Re: [PATCH 1/6] virtio: wrap find_vqs
+Date: Fri, 31 Mar 2017 12:04:55 +0800
+Message-ID: <c388e4fd-2956-8894-31ec-31fe8b01e49f@redhat.com>
+References: <1490820507-8005-1-git-send-email-mst@redhat.com>
+ <1490820507-8005-2-git-send-email-mst@redhat.com>
+ <72f533a2-482d-1956-b0fe-254e273e1818@redhat.com>
+ <20170330173146-mutt-send-email-mst@kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Cc: linux-kernel@vger.kernel.org,
+        John Fastabend <john.fastabend@gmail.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Amit Shah <amit@kernel.org>, Gonglei <arei.gonglei@huawei.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, Milan Broz <gmazyland@gmail.com>,
-        Eric Biggers <ebiggers@google.com>
-To: Ondrej Mosnacek <omosnacek@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pg0-f66.google.com ([74.125.83.66]:33741 "EHLO
-        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932265AbdCaDxS (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 Mar 2017 23:53:18 -0400
-Received: by mail-pg0-f66.google.com with SMTP id 79so14197648pgf.0
-        for <linux-crypto@vger.kernel.org>; Thu, 30 Mar 2017 20:53:18 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <20170330220442.11012-1-omosnacek@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+        David Airlie <airlied@linux.ie>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Dmitry Tarnyagin <dmitry.tarnyagin@lockless.no>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        virtualization@lists.linux-foundation.org,
+        linux-crypto@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        netdev@vger.kerne
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <20170330173146-mutt-send-email-mst@kernel.org>
+Sender: netdev-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Mar 31, 2017 at 12:04:42AM +0200, Ondrej Mosnacek wrote:
-> The gf128mul_x_ble function is currently defined in gf128mul.c, because
-> it depends on the gf128mul_table_be multiplication table.
-> 
-> However, since the function is very small and only uses two values from
-> the table, it is better for it to be defined as inline function in
-> gf128mul.h. That way, the function can be inlined by the compiler for
-> better performance.
-> 
-> For consistency, the other gf128mul_x_* functions are also moved to the
-> header file.
-> 
-> After this change, the speed of the generic 'xts(aes)' implementation
-> increased from ~225 MiB/s to ~235 MiB/s (measured using 'cryptsetup
-> benchmark -c aes-xts-plain64' on an Intel system with CRYPTO_AES_X86_64
-> and CRYPTO_AES_NI_INTEL disabled).
-> 
 
-Reviewed-by: Eric Biggers <ebiggers@google.com>
 
-Thanks,
+On 2017年03月30日 22:32, Michael S. Tsirkin wrote:
+> On Thu, Mar 30, 2017 at 02:00:08PM +0800, Jason Wang wrote:
+>>
+>> On 2017年03月30日 04:48, Michael S. Tsirkin wrote:
+>>> We are going to add more parameters to find_vqs, let's wrap the call so
+>>> we don't need to tweak all drivers every time.
+>>>
+>>> Signed-off-by: Michael S. Tsirkin<mst@redhat.com>
+>>> ---
+>> A quick glance and it looks ok, but what the benefit of this series, is it
+>> required by other changes?
+>>
+>> Thanks
+> Yes - to avoid touching all devices when doing the rest of
+> the patchset.
 
-- Eric
+Maybe I'm not clear. I mean the benefit of this series not this single 
+patch. I guess it may be used by you proposal that avoid reset when set 
+XDP? If yes, do we really want to drop some packets after XDP is set?
+
+Thanks
