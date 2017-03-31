@@ -1,58 +1,39 @@
-From: Jason Wang <jasowang@redhat.com>
-Subject: Re: [PATCH 1/6] virtio: wrap find_vqs
-Date: Fri, 31 Mar 2017 12:04:55 +0800
-Message-ID: <c388e4fd-2956-8894-31ec-31fe8b01e49f@redhat.com>
-References: <1490820507-8005-1-git-send-email-mst@redhat.com>
- <1490820507-8005-2-git-send-email-mst@redhat.com>
- <72f533a2-482d-1956-b0fe-254e273e1818@redhat.com>
- <20170330173146-mutt-send-email-mst@kernel.org>
+From: Jeffrey Walton <noloader@gmail.com>
+Subject: Re: [PATCH] crypto: gf128mul - define gf128mul_x_ble in gf128mul.h
+Date: Fri, 31 Mar 2017 02:05:02 -0400
+Message-ID: <CAH8yC8nNJZ9yhvffkz7Fqg=zXFJTA+VQohAWa=8RFkpMBsY_qQ@mail.gmail.com>
+References: <20170330192535.23123-1-omosnacek@gmail.com> <20170330195546.GA60896@gmail.com>
+ <CAAUqJDs37N7NETK2DWU5mpV3ZwnYbi399bEpL9HHg8fRawch+A@mail.gmail.com>
+Reply-To: noloader@gmail.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Cc: linux-kernel@vger.kernel.org,
-        John Fastabend <john.fastabend@gmail.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Amit Shah <amit@kernel.org>, Gonglei <arei.gonglei@huawei.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        David Airlie <airlied@linux.ie>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Dmitry Tarnyagin <dmitry.tarnyagin@lockless.no>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        virtualization@lists.linux-foundation.org,
-        linux-crypto@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        netdev@vger.kerne
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <20170330173146-mutt-send-email-mst@kernel.org>
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Cc: linux-crypto@vger.kernel.org
+To: =?UTF-8?B?T25kcmVqIE1vc27DocSNZWs=?= <omosnacek@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-oi0-f53.google.com ([209.85.218.53]:35365 "EHLO
+        mail-oi0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750723AbdCaGFE (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 31 Mar 2017 02:05:04 -0400
+Received: by mail-oi0-f53.google.com with SMTP id f193so51429778oib.2
+        for <linux-crypto@vger.kernel.org>; Thu, 30 Mar 2017 23:05:03 -0700 (PDT)
+In-Reply-To: <CAAUqJDs37N7NETK2DWU5mpV3ZwnYbi399bEpL9HHg8fRawch+A@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-
-
-On 2017年03月30日 22:32, Michael S. Tsirkin wrote:
-> On Thu, Mar 30, 2017 at 02:00:08PM +0800, Jason Wang wrote:
+>> Also note that '(b & ((u64)1 << 63)) ? 0x87 : 0x00;' is actually getting
+>> compiled as '((s64)b >> 63) & 0x87', which is branchless and therefore makes the
+>> new version more efficient than one might expect:
 >>
->> On 2017年03月30日 04:48, Michael S. Tsirkin wrote:
->>> We are going to add more parameters to find_vqs, let's wrap the call so
->>> we don't need to tweak all drivers every time.
->>>
->>> Signed-off-by: Michael S. Tsirkin<mst@redhat.com>
->>> ---
->> A quick glance and it looks ok, but what the benefit of this series, is it
->> required by other changes?
+>>         sar    $0x3f,%rax
+>>         and    $0x87,%eax
 >>
->> Thanks
-> Yes - to avoid touching all devices when doing the rest of
-> the patchset.
+>> It could even be written the branchless way explicitly, but it shouldn't matter.
+>
+> I think the definition using unsigned operations is more intuitive...
+> Let's just leave the clever tricks up to the compiler :)
 
-Maybe I'm not clear. I mean the benefit of this series not this single 
-patch. I guess it may be used by you proposal that avoid reset when set 
-XDP? If yes, do we really want to drop some packets after XDP is set?
+It may be a good idea to use the one that provides constant time-ness
+to help avoid leaking information.
 
-Thanks
+Jeff
