@@ -1,67 +1,51 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 4.11
-Date: Fri, 31 Mar 2017 18:29:07 +0800
-Message-ID: <20170331102907.GA11348@gondor.apana.org.au>
-References: <20161119102748.GA4277@gondor.apana.org.au>
- <20161215160732.GA16580@gondor.apana.org.au>
- <20170111115646.GA8943@gondor.apana.org.au>
- <20170304074119.GA3041@gondor.apana.org.au>
- <20170315063151.GA6767@gondor.apana.org.au>
- <20170324134627.GA14273@gondor.apana.org.au>
+Subject: Re: [PATCH v5 1/2] crypto: skcipher AF_ALG - overhaul memory
+ management
+Date: Fri, 31 Mar 2017 18:33:53 +0800
+Message-ID: <20170331103353.GA12223@gondor.apana.org.au>
+References: <2523592.mde6d2a8Lg@positron.chronox.de>
+ <1797510.JnIj36BbdJ@tauon.atsec.com>
+ <20170316095248.GA11996@gondor.apana.org.au>
+ <4808097.uXnqYIEybL@tauon.atsec.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Cc: linux-crypto@vger.kernel.org
+To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:53934 "EHLO
+Received: from orcrist.hmeau.com ([104.223.48.154]:53998 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932677AbdCaK3i (ORCPT
+        with ESMTP id S1754231AbdCaKeS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 31 Mar 2017 06:29:38 -0400
+        Fri, 31 Mar 2017 06:34:18 -0400
 Content-Disposition: inline
-In-Reply-To: <20170324134627.GA14273@gondor.apana.org.au>
+In-Reply-To: <4808097.uXnqYIEybL@tauon.atsec.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+On Thu, Mar 16, 2017 at 11:18:33AM +0100, Stephan Müller wrote:
+> Am Donnerstag, 16. März 2017, 10:52:48 CET schrieb Herbert Xu:
+> 
+> Hi Herbert,
+> 
+> > First of all you're only limiting the amount of memory occupied
+> > by the SG list which is not the same thing as the memory pinned
+> > down by the actual recvmsg.
+> 
+> I am fully aware of that. As this was present in the code, I thought I could 
+> reuse that approach.
+> 
+> Are you saying that you want to stop this approach? 
 
-This push fixes the following issues:
+No you're confusing things.  Previously there was an explicit
+limit on the number of pages that can be pinned.  Now you're
+only indirectly limiting it by limiting the size of the metadata
+through sock_kmalloc.
 
-- Memory corruption when kmalloc fails in xts/lrw.
-- Mark some CCP DMA channels as private.
-- Fix reordering race in padata.
-- Regression in omap-rng DT description.
+The end result is that you're now allowing a huge amount of user
+memory to be pinned down by the system call.  This is *unacceptable*.
 
-
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-
-
-Eric Biggers (1):
-      crypto: xts,lrw - fix out-of-bounds write after kmalloc failure
-
-Gary R Hook (1):
-      crypto: ccp - Make some CCP DMA channels private
-
-Jason A. Donenfeld (1):
-      padata: avoid race in reordering
-
-Thomas Petazzoni (1):
-      dt-bindings: rng: clocks property on omap_rng not always mandatory
-
- Documentation/devicetree/bindings/rng/omap_rng.txt |    3 +-
- crypto/lrw.c                                       |    7 +++-
- crypto/xts.c                                       |    7 +++-
- drivers/crypto/ccp/ccp-dev-v5.c                    |    1 +
- drivers/crypto/ccp/ccp-dev.h                       |    5 +++
- drivers/crypto/ccp/ccp-dmaengine.c                 |   41 ++++++++++++++++++++
- kernel/padata.c                                    |    5 ++-
- 7 files changed, 62 insertions(+), 7 deletions(-)
-
-Thanks,
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
