@@ -1,86 +1,64 @@
-From: Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-Subject: Re: [PATCH] OF: mark released devices as no longer populated
-Date: Fri, 31 Mar 2017 11:59:50 -0500
-Message-ID: <CAL_JsqLHEycZLaxLZcAnDS4gp6D8xQDpgZXV1g3dokzF_EeQtQ@mail.gmail.com>
-References: <E1bX3Pw-00088i-KU@rmk-PC.armlinux.org.uk> <CAL_Jsq+pDeL1_=p06ynrV4CK+h8-Yx_KDbH-W=d-aSdARe3ZHw@mail.gmail.com>
- <20170331103950.GA18376@n2100.armlinux.org.uk> <VI1PR0401MB2591E5FD962023914F042C9B98370@VI1PR0401MB2591.eurprd04.prod.outlook.com>
+From: Eric Biggers <ebiggers3@gmail.com>
+Subject: Re: [PATCH v3] crypto: gf128mul - define gf128mul_x_* in gf128mul.h
+Date: Fri, 31 Mar 2017 20:44:07 -0700
+Message-ID: <20170401034407.GA598@zzz>
+References: <20170331092703.2520-1-omosnacek@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
-Cc: Russell King - ARM Linux <linux-I+IVW8TIWO2tmTQ+vhA3Yw@public.gmane.org>,
-        Fabio Estevam <fabio.estevam-3arQi8VN3Tc@public.gmane.org>,
-        Frank Rowand <frowand.list-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        "devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        "linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org"
-        <linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>,
-        "linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Dan Douglass <dan.douglass-3arQi8VN3Tc@public.gmane.org>
-To: =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta-3arQi8VN3Tc@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <VI1PR0401MB2591E5FD962023914F042C9B98370-9IDQY6o3qQhGNIhRVge97I3W/0Ik+aLCnBOFsp37pqbUKgpGm//BTAC/G2K4zDHf@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, Jeffrey Walton <noloader@gmail.com>,
+        Milan Broz <gmazyland@gmail.com>,
+        Eric Biggers <ebiggers@google.com>
+To: Ondrej Mosnacek <omosnacek@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pf0-f193.google.com ([209.85.192.193]:33718 "EHLO
+        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751078AbdDADoK (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 31 Mar 2017 23:44:10 -0400
+Received: by mail-pf0-f193.google.com with SMTP id 197so268293pfv.0
+        for <linux-crypto@vger.kernel.org>; Fri, 31 Mar 2017 20:44:10 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <20170331092703.2520-1-omosnacek@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Mar 31, 2017 at 10:23 AM, Horia Geantă <horia.geanta-3arQi8VN3Tc@public.gmane.org> wrote:
-> On 3/31/2017 1:40 PM, Russell King - ARM Linux wrote:
->> Ping, this issue still exists with 4.11-rc4 - and there's been no
->> reaction from the alleged CAAM maintainers.
->>
-> Sorry, this somehow slipped through (Cc vs. To, no linux-crypto).
->
->> On Tue, Aug 09, 2016 at 11:48:38AM -0500, Rob Herring wrote:
->>> On Tue, Aug 9, 2016 at 4:33 AM, Russell King <rmk+kernel-I+IVW8TIWO2tmTQ+vhA3Yw@public.gmane.org> wrote:
->>>> When a Linux device is released and cleaned up, we left the OF device
->>>> node marked as populated.  This causes the Freescale CAAM driver
->>>> (drivers/crypto/caam) problems when the module is removed and re-
->>>> inserted:
->>>>
->>>> JR0 Platform device creation error
->>>> JR0 Platform device creation error
->>>> caam 2100000.caam: no queues configured, terminating
->>>> caam: probe of 2100000.caam failed with error -12
->>>>
->>>> The reason is that CAAM creates platform devices for each job ring:
->>>>
->>>>         for_each_available_child_of_node(nprop, np)
->>>>                 if (of_device_is_compatible(np, "fsl,sec-v4.0-job-ring") ||
->>>>                     of_device_is_compatible(np, "fsl,sec4.0-job-ring")) {
->>>>                         ctrlpriv->jrpdev[ring] =
->>>>                                 of_platform_device_create(np, NULL, dev);
->>>>
->>>> which sets OF_POPULATED on the device node, but then it cleans these
->>>> up:
->>>>
->>>>         /* Remove platform devices for JobRs */
->>>>         for (ring = 0; ring < ctrlpriv->total_jobrs; ring++) {
->>>>                 if (ctrlpriv->jrpdev[ring])
->>>>                         of_device_unregister(ctrlpriv->jrpdev[ring]);
->>>
->>> This looks a bit asymmetrical to me with a of_platform_device_* call
->>> and a of_device_* call.
->>>
->>> I think you could use of_platform_{de}populate here instead. That
->>> would simplify things in the driver a bit too as you wouldn't need to
->>> store jrpdev. It wouldn't work if there are other child nodes with
-> Indeed, this would clean-up the driver a bit. However, the driver needs
-> to know how many of the devices probed successfully - to print the
-> number and more importantly to exit in case total_jobrs = 0.
+On Fri, Mar 31, 2017 at 11:27:03AM +0200, Ondrej Mosnacek wrote:
+> The gf128mul_x_ble function is currently defined in gf128mul.c, because
+> it depends on the gf128mul_table_be multiplication table.
+> 
+> However, since the function is very small and only uses two values from
+> the table, it is better for it to be defined as inline function in
+> gf128mul.h. That way, the function can be inlined by the compiler for
+> better performance.
+> 
+> For consistency, the other gf128mul_x_* functions are also moved to the
+> header file. In addition, the code is rewritten to be constant-time.
+> 
+> After this change, the speed of the generic 'xts(aes)' implementation
+> increased from ~225 MiB/s to ~235 MiB/s (measured using 'cryptsetup
+> benchmark -c aes-xts-plain64' on an Intel system with CRYPTO_AES_X86_64
+> and CRYPTO_AES_NI_INTEL disabled).
+> 
+> Signed-off-by: Ondrej Mosnacek <omosnacek@gmail.com>
+> Cc: Eric Biggers <ebiggers@google.com>
 
-The only thing you are guaranteed is the OF code created some platform
-devices. That's it. Whether any driver probed successfully is separate
-and a lot more things can go wrong there. The only thing you are
-checking is that your dtb is not crap.
+Reviewed-by: Eric Biggers <ebiggers@google.com>
 
-> Thus, I would keep the one-by-one probing of the devices.
-> What options are there in this case?
-> Should a function symmetric to of_platform_device_create() be added - to
-> replace of_device_unregister() - or rely on an open-coded solution?
+Also, I realized that for gf128mul_x_lle() now that we aren't using the table we
+don't need to shift '_tt' but rather can use the constant 0xe100000000000000:
 
-Certainly not the latter. We don't want drivers mucking with flags
-internal to the DT code.
+        /* equivalent to (u64)gf128mul_table_le[(b << 7) & 0xff] << 48
+         * (see crypto/gf128mul.c): */
+        u64 _tt = gf128mul_mask_from_bit(b, 0) & 0xe100000000000000;
 
-Rob
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+        r->b = cpu_to_be64((b >> 1) | (a << 63));
+        r->a = cpu_to_be64((a >> 1) ^ _tt);
+
+I think that would be better and you could send a v4 to do it that way if you
+want.  It's not a huge deal though.
+
+Thanks!
+
+- Eric
