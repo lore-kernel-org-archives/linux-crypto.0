@@ -1,64 +1,87 @@
-From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: [PATCH v3] crypto: gf128mul - define gf128mul_x_* in gf128mul.h
-Date: Fri, 31 Mar 2017 20:44:07 -0700
-Message-ID: <20170401034407.GA598@zzz>
-References: <20170331092703.2520-1-omosnacek@gmail.com>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: [PATCH] crypto: AF_ALG: handle 0 lengths in af_alg_make_sg
+Date: Sat, 01 Apr 2017 17:04:28 +0200
+Message-ID: <2380853.MJYDG7HQLD@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, Jeffrey Walton <noloader@gmail.com>,
-        Milan Broz <gmazyland@gmail.com>,
-        Eric Biggers <ebiggers@google.com>
-To: Ondrej Mosnacek <omosnacek@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:33718 "EHLO
-        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751078AbdDADoK (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 31 Mar 2017 23:44:10 -0400
-Received: by mail-pf0-f193.google.com with SMTP id 197so268293pfv.0
-        for <linux-crypto@vger.kernel.org>; Fri, 31 Mar 2017 20:44:10 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <20170331092703.2520-1-omosnacek@gmail.com>
+Received: from mail.eperm.de ([89.247.134.16]:58726 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751479AbdDAPEn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 1 Apr 2017 11:04:43 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Mar 31, 2017 at 11:27:03AM +0200, Ondrej Mosnacek wrote:
-> The gf128mul_x_ble function is currently defined in gf128mul.c, because
-> it depends on the gf128mul_table_be multiplication table.
-> 
-> However, since the function is very small and only uses two values from
-> the table, it is better for it to be defined as inline function in
-> gf128mul.h. That way, the function can be inlined by the compiler for
-> better performance.
-> 
-> For consistency, the other gf128mul_x_* functions are also moved to the
-> header file. In addition, the code is rewritten to be constant-time.
-> 
-> After this change, the speed of the generic 'xts(aes)' implementation
-> increased from ~225 MiB/s to ~235 MiB/s (measured using 'cryptsetup
-> benchmark -c aes-xts-plain64' on an Intel system with CRYPTO_AES_X86_64
-> and CRYPTO_AES_NI_INTEL disabled).
-> 
-> Signed-off-by: Ondrej Mosnacek <omosnacek@gmail.com>
-> Cc: Eric Biggers <ebiggers@google.com>
+Hi Herbert,
 
-Reviewed-by: Eric Biggers <ebiggers@google.com>
+If you concur with the patch, I think it should go to 4.11 as well as
+to stable.
 
-Also, I realized that for gf128mul_x_lle() now that we aren't using the table we
-don't need to shift '_tt' but rather can use the constant 0xe100000000000000:
+Ciao
+Stephan
 
-        /* equivalent to (u64)gf128mul_table_le[(b << 7) & 0xff] << 48
-         * (see crypto/gf128mul.c): */
-        u64 _tt = gf128mul_mask_from_bit(b, 0) & 0xe100000000000000;
+---8<---
 
-        r->b = cpu_to_be64((b >> 1) | (a << 63));
-        r->a = cpu_to_be64((a >> 1) ^ _tt);
+The function af_alg_make_sg converts user-provided IOVECs into an SGL.
+Thus it operates directly on the user-space provided number of IOVECs.
+When user space provides 0 for the number of IOVECs iov_iter_get_pages
+returns a bogus number of bytes. This in turn will cause a crash when
+the SGL is processed.
 
-I think that would be better and you could send a v4 to do it that way if you
-want.  It's not a huge deal though.
+The fix initializes an SGL with one entry for handling chaining
+operation but does not contain data.
 
-Thanks!
+In addition, the patch changes variable type of len from int to size_t
+to be consistent with the data type of the invoker and the data type
+where len is used.
 
-- Eric
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/af_alg.c         | 10 +++++++++-
+ include/crypto/if_alg.h |  2 +-
+ 2 files changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index 24dc082..5992997 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -399,12 +399,20 @@ static const struct net_proto_family alg_family = {
+ 	.owner	=	THIS_MODULE,
+ };
+ 
+-int af_alg_make_sg(struct af_alg_sgl *sgl, struct iov_iter *iter, int len)
++int af_alg_make_sg(struct af_alg_sgl *sgl, struct iov_iter *iter, size_t len)
+ {
+ 	size_t off;
+ 	ssize_t n;
+ 	int npages, i;
+ 
++	if (!len) {
++		/* init one for linking */
++		sg_init_table(sgl->sg, 1);
++		sg_mark_end(sgl->sg);
++		sgl->npages = 0;
++		return 0;
++	}
++
+ 	n = iov_iter_get_pages(iter, sgl->pages, len, ALG_MAX_PAGES, &off);
+ 	if (n < 0)
+ 		return n;
+diff --git a/include/crypto/if_alg.h b/include/crypto/if_alg.h
+index 6c3e6e7..c637ac9 100644
+--- a/include/crypto/if_alg.h
++++ b/include/crypto/if_alg.h
+@@ -76,7 +76,7 @@ int af_alg_release(struct socket *sock);
+ void af_alg_release_parent(struct sock *sk);
+ int af_alg_accept(struct sock *sk, struct socket *newsock);
+ 
+-int af_alg_make_sg(struct af_alg_sgl *sgl, struct iov_iter *iter, int len);
++int af_alg_make_sg(struct af_alg_sgl *sgl, struct iov_iter *iter, size_t len);
+ void af_alg_free_sg(struct af_alg_sgl *sgl);
+ void af_alg_link_sg(struct af_alg_sgl *sgl_prev, struct af_alg_sgl *sgl_new);
+ 
+-- 
+2.9.3
