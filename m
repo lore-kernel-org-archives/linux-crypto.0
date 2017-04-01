@@ -1,87 +1,49 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: [PATCH] crypto: AF_ALG: handle 0 lengths in af_alg_make_sg
-Date: Sat, 01 Apr 2017 17:04:28 +0200
-Message-ID: <2380853.MJYDG7HQLD@positron.chronox.de>
+From: =?UTF-8?B?T25kcmVqIE1vc27DocSNZWs=?= <omosnacek@gmail.com>
+Subject: Re: [PATCH v3] crypto: gf128mul - define gf128mul_x_* in gf128mul.h
+Date: Sat, 1 Apr 2017 17:13:51 +0200
+Message-ID: <CAAUqJDuaLaAp5JUtekzKTur09SGj1LR0JhWrERg_AbAjAzFxNA@mail.gmail.com>
+References: <20170331092703.2520-1-omosnacek@gmail.com> <20170401034407.GA598@zzz>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
+Content-Type: text/plain; charset=UTF-8
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, Jeffrey Walton <noloader@gmail.com>,
+        Milan Broz <gmazyland@gmail.com>,
+        Eric Biggers <ebiggers@google.com>
+To: Eric Biggers <ebiggers3@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:58726 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751479AbdDAPEn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 1 Apr 2017 11:04:43 -0400
+Received: from mail-lf0-f48.google.com ([209.85.215.48]:36001 "EHLO
+        mail-lf0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751545AbdDAPON (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 1 Apr 2017 11:14:13 -0400
+Received: by mail-lf0-f48.google.com with SMTP id x137so55533071lff.3
+        for <linux-crypto@vger.kernel.org>; Sat, 01 Apr 2017 08:14:12 -0700 (PDT)
+In-Reply-To: <20170401034407.GA598@zzz>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
+2017-04-01 5:44 GMT+02:00 Eric Biggers <ebiggers3@gmail.com>:
+> Also, I realized that for gf128mul_x_lle() now that we aren't using the table we
+> don't need to shift '_tt' but rather can use the constant 0xe100000000000000:
+>
+>         /* equivalent to (u64)gf128mul_table_le[(b << 7) & 0xff] << 48
+>          * (see crypto/gf128mul.c): */
+>         u64 _tt = gf128mul_mask_from_bit(b, 0) & 0xe100000000000000;
+>
+>         r->b = cpu_to_be64((b >> 1) | (a << 63));
+>         r->a = cpu_to_be64((a >> 1) ^ _tt);
+>
+> I think that would be better and you could send a v4 to do it that way if you
+> want.  It's not a huge deal though.
 
-If you concur with the patch, I think it should go to 4.11 as well as
-to stable.
+Yes, I was hoping the compiler would be wise enough to fold the shift
+into the constant, but I didn't actually check the assembly output...
+I took the time to write a quick benchmark and the version without
+shift is indeed notably faster.
 
-Ciao
-Stephan
+That said, I'll go the extra mile and send a v4.
 
----8<---
+Thanks for the review!
 
-The function af_alg_make_sg converts user-provided IOVECs into an SGL.
-Thus it operates directly on the user-space provided number of IOVECs.
-When user space provides 0 for the number of IOVECs iov_iter_get_pages
-returns a bogus number of bytes. This in turn will cause a crash when
-the SGL is processed.
-
-The fix initializes an SGL with one entry for handling chaining
-operation but does not contain data.
-
-In addition, the patch changes variable type of len from int to size_t
-to be consistent with the data type of the invoker and the data type
-where len is used.
-
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- crypto/af_alg.c         | 10 +++++++++-
- include/crypto/if_alg.h |  2 +-
- 2 files changed, 10 insertions(+), 2 deletions(-)
-
-diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index 24dc082..5992997 100644
---- a/crypto/af_alg.c
-+++ b/crypto/af_alg.c
-@@ -399,12 +399,20 @@ static const struct net_proto_family alg_family = {
- 	.owner	=	THIS_MODULE,
- };
- 
--int af_alg_make_sg(struct af_alg_sgl *sgl, struct iov_iter *iter, int len)
-+int af_alg_make_sg(struct af_alg_sgl *sgl, struct iov_iter *iter, size_t len)
- {
- 	size_t off;
- 	ssize_t n;
- 	int npages, i;
- 
-+	if (!len) {
-+		/* init one for linking */
-+		sg_init_table(sgl->sg, 1);
-+		sg_mark_end(sgl->sg);
-+		sgl->npages = 0;
-+		return 0;
-+	}
-+
- 	n = iov_iter_get_pages(iter, sgl->pages, len, ALG_MAX_PAGES, &off);
- 	if (n < 0)
- 		return n;
-diff --git a/include/crypto/if_alg.h b/include/crypto/if_alg.h
-index 6c3e6e7..c637ac9 100644
---- a/include/crypto/if_alg.h
-+++ b/include/crypto/if_alg.h
-@@ -76,7 +76,7 @@ int af_alg_release(struct socket *sock);
- void af_alg_release_parent(struct sock *sk);
- int af_alg_accept(struct sock *sk, struct socket *newsock);
- 
--int af_alg_make_sg(struct af_alg_sgl *sgl, struct iov_iter *iter, int len);
-+int af_alg_make_sg(struct af_alg_sgl *sgl, struct iov_iter *iter, size_t len);
- void af_alg_free_sg(struct af_alg_sgl *sgl);
- void af_alg_link_sg(struct af_alg_sgl *sgl_prev, struct af_alg_sgl *sgl_new);
- 
--- 
-2.9.3
+O.M.
