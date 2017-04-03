@@ -1,54 +1,77 @@
-From: Stewart Smith <stewart@linux.vnet.ibm.com>
-Subject: Re: [PATCH 4/5] crypto/nx: Add P9 NX support for 842 compression engine.
-Date: Mon, 03 Apr 2017 11:37:22 +1000
-Message-ID: <87vaqmmfu5.fsf@linux.vnet.ibm.com>
-References: <1491066107.29552.29.camel@hbabu-laptop>
+From: abed mohammad kamaluddin <abedamu@gmail.com>
+Subject: Re: algif for compression?
+Date: Mon, 3 Apr 2017 11:40:19 +0530
+Message-ID: <CACVarEQ14ZF9LGDkaNYtX3GRD5GOH62NBiPtC4z=i6RY4MtFDA@mail.gmail.com>
+References: <CACVarETuTx40WFD5TRUCwiYv5r3SEvhuJHpGjqPsz90qVZsYKA@mail.gmail.com>
+ <20161210081014.GA32746@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: mikey@neuling.org, suka@us.ibm.com, linux-crypto@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
-To: Haren Myneni <haren@linux.vnet.ibm.com>,
-        herbert@gondor.apana.org.au, mpe@ellerman.id.au, ddstreet@ieee.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52273 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1750992AbdDCBhe (ORCPT
+Received: from mail-wr0-f173.google.com ([209.85.128.173]:32932 "EHLO
+        mail-wr0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751141AbdDCGKl (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 2 Apr 2017 21:37:34 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id v331XmaC122820
-        for <linux-crypto@vger.kernel.org>; Sun, 2 Apr 2017 21:37:34 -0400
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 29k3uugrm8-1
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Sun, 02 Apr 2017 21:37:33 -0400
-Received: from localhost
-        by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-crypto@vger.kernel.org> from <stewart@linux.vnet.ibm.com>;
-        Sun, 2 Apr 2017 21:37:33 -0400
-In-Reply-To: <1491066107.29552.29.camel@hbabu-laptop>
+        Mon, 3 Apr 2017 02:10:41 -0400
+Received: by mail-wr0-f173.google.com with SMTP id w43so153054365wrb.0
+        for <linux-crypto@vger.kernel.org>; Sun, 02 Apr 2017 23:10:40 -0700 (PDT)
+In-Reply-To: <20161210081014.GA32746@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Haren Myneni <haren@linux.vnet.ibm.com> writes:
-> @@ -656,13 +953,21 @@ static __init int nx842_powernv_init(void)
->  	BUILD_BUG_ON(DDE_BUFFER_ALIGN % DDE_BUFFER_SIZE_MULT);
->  	BUILD_BUG_ON(DDE_BUFFER_SIZE_MULT % DDE_BUFFER_LAST_MULT);
+Hi Herbert,
+
+We have implemented algif acomp interface for user space applications
+to utilize the kernel compression framework and the hardware drivers
+using it and have been testing it using userspace zlib library.
+
+However, what we find lacking in the existing acomp implementation is
+the ability to pass context data between the applications and the
+drivers using the acomp interface. Currently the interface only allows
+src/dest data  and a flag argument with each request. There are two
+context pointers, one in acomp_req and another in crypto_tfm but they
+are for internal use and not available to applications through the
+api's. Would it be acceptable to add fields that need to be
+communicated b/w the driver and applications like history,
+csum/adler32, EOF, stream ctx  to acomp_req.
+
+Or is there any other way, which I may have missed, through which we
+can pass ctx data between applications and drivers while using the
+kernel compression framework?
+
+Thanks,
+Abed
+(Cavium Inc)
+
+
+On Sat, Dec 10, 2016 at 1:40 PM, Herbert Xu <herbert@gondor.apana.org.au> w=
+rote:
+> abed mohammad kamaluddin <abedamu@gmail.com> wrote:
+>>
+>> We are also looking for user-space access to the kernel crypto layer
+>> compression algorithms. I have gone through AF_ALG but couldn=E2=80=99t =
+find
+>> support for compression ops through it. This is required for our
+>> hardware zip engines whose driver hooks up to the crypto layer.
+>>
+>> I was going through the lists and stumbled across this thread. Has
+>> there been  any updates or efforts put up in this direction since this
+>> thread is a few years old. If not, are there any alternate
+>> implementations that allow user-space access to compression? I have
+>> gone through cryptodev and see the same limitation there.
+>>
+>> Would appreciate any pointers in this regard.
 >
-> -	for_each_compatible_node(dn, NULL, "ibm,power-nx")
-> -		nx842_powernv_probe(dn);
-> +	if (is_vas_available()) {
-> +		for_each_compatible_node(dn, NULL, "ibm,xscom")
-> +			nx842_powernv_probe_vas(dn);
-
-I'm not keen on how the device bindings work, instead, I think firmware
-should provide a 'ibm,vas' compatible node, rather than simply searching
-through all the ibm,xscom nodes.
-
-XSCOMs aren't something that Linux should really know about, it's a
-debug interface, and one we use through PRD to do PRD-things, XSCOMs
-aren't part of the architecture.
-
--- 
-Stewart Smith
-OPAL Architect, IBM.
+> The compression interface is currently in a state of flux.  We
+> should make it settle down first before exporting it to user-space.
+>
+> For a start it would be good to actually switch IPsec/IPcomp over
+> to the new compression interface.
+>
+> Cheers,
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
