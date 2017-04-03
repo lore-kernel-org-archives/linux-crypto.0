@@ -1,16 +1,16 @@
 From: Matthias Kaehlcke <mka@chromium.org>
-Subject: Re: [PATCH 1/7] Makefile, LLVM: add -no-integrated-as to
- KBUILD_[AC]FLAGS
-Date: Mon, 3 Apr 2017 15:49:02 -0700
-Message-ID: <20170403224902.GE13986@google.com>
+Subject: Re: [PATCH 3/7] x86, LLVM: suppress clang warnings about unaligned
+ accesses
+Date: Mon, 3 Apr 2017 16:01:58 -0700
+Message-ID: <20170403230158.GA145051@google.com>
 References: <20170317001520.85223-1-md@google.com>
- <20170317001520.85223-2-md@google.com>
+ <20170317001520.85223-4-md@google.com>
+ <FB827022-C732-432A-8F31-734C88EBF7A4@zytor.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Cc: Michal Marek <mmarek@suse.com>,
+Cc: Michael Davidson <md@google.com>, Michal Marek <mmarek@suse.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         Shaohua Li <shli@kernel.org>,
@@ -18,38 +18,53 @@ Cc: Michal Marek <mmarek@suse.com>,
         Dmitry Vyukov <dvyukov@google.com>, x86@kernel.org,
         linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-crypto@vger.kernel.org, linux-raid@vger.kernel.org
-To: Michael Davidson <md@google.com>
-Return-path: <linux-raid-owner@vger.kernel.org>
+To: hpa@zytor.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pg0-f48.google.com ([74.125.83.48]:35156 "EHLO
+        mail-pg0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751590AbdDCXCA (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 3 Apr 2017 19:02:00 -0400
+Received: by mail-pg0-f48.google.com with SMTP id 81so134101331pgh.2
+        for <linux-crypto@vger.kernel.org>; Mon, 03 Apr 2017 16:02:00 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <20170317001520.85223-2-md@google.com>
-Sender: linux-raid-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <FB827022-C732-432A-8F31-734C88EBF7A4@zytor.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-El Thu, Mar 16, 2017 at 05:15:14PM -0700 Michael Davidson ha dit:
+El Fri, Mar 17, 2017 at 04:50:19PM -0700 hpa@zytor.com ha dit:
 
-> Add -no-integrated-as to KBUILD_AFLAGS and KBUILD_CFLAGS
-> for clang.
+> On March 16, 2017 5:15:16 PM PDT, Michael Davidson <md@google.com> wrote:
+> >Suppress clang warnings about potential unaliged accesses
+> >to members in packed structs. This gets rid of almost 10,000
+> >warnings about accesses to the ring 0 stack pointer in the TSS.
+> >
+> >Signed-off-by: Michael Davidson <md@google.com>
+> >---
+> > arch/x86/Makefile | 5 +++++
+> > 1 file changed, 5 insertions(+)
+> >
+> >diff --git a/arch/x86/Makefile b/arch/x86/Makefile
+> >index 894a8d18bf97..7f21703c475d 100644
+> >--- a/arch/x86/Makefile
+> >+++ b/arch/x86/Makefile
+> >@@ -128,6 +128,11 @@ endif
+> >         KBUILD_CFLAGS += $(call cc-option,-maccumulate-outgoing-args)
+> > endif
+> > 
+> >+ifeq ($(cc-name),clang)
+> >+# Suppress clang warnings about potential unaligned accesses.
+> >+KBUILD_CFLAGS += $(call cc-disable-warning, address-of-packed-member)
+> >+endif
+> >+
+> > ifdef CONFIG_X86_X32
+> > 	x32_ld_ok := $(call try-run,\
+> > 			/bin/echo -e '1: .quad 1b' | \
 > 
-> Signed-off-by: Michael Davidson <md@google.com>
-> ---
->  Makefile | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/Makefile b/Makefile
-> index b841fb36beb2..b21fd0ca2946 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -704,6 +704,8 @@ KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
->  # See modpost pattern 2
->  KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)
->  KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
-> +KBUILD_CFLAGS += $(call cc-option, -no-integrated-as)
-> +KBUILD_AFLAGS += $(call cc-option, -no-integrated-as)
->  else
->  
->  # These warnings generated too much noise in a regular build.
+> Why conditional on clang?
 
-Ping, any feedback on this patch?
+My understanding is that this warning is clang specific, it is not
+listed on https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html
 
 Cheers
 
