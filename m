@@ -1,75 +1,54 @@
-From: Ondrej Mosnacek <omosnacek@gmail.com>
-Subject: [PATCH v5 3/4] crypto: glue_helper - remove the le128_gf128mul_x_ble function
-Date: Sun,  2 Apr 2017 21:19:15 +0200
-Message-ID: <20170402191916.9309-4-omosnacek@gmail.com>
-References: <20170402191916.9309-1-omosnacek@gmail.com>
-Cc: Ondrej Mosnacek <omosnacek@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@google.com>,
-        Milan Broz <gmazyland@gmail.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Stewart Smith <stewart@linux.vnet.ibm.com>
+Subject: Re: [PATCH 4/5] crypto/nx: Add P9 NX support for 842 compression engine.
+Date: Mon, 03 Apr 2017 11:37:22 +1000
+Message-ID: <87vaqmmfu5.fsf@linux.vnet.ibm.com>
+References: <1491066107.29552.29.camel@hbabu-laptop>
+Mime-Version: 1.0
+Content-Type: text/plain
+Cc: mikey@neuling.org, suka@us.ibm.com, linux-crypto@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
+To: Haren Myneni <haren@linux.vnet.ibm.com>,
+        herbert@gondor.apana.org.au, mpe@ellerman.id.au, ddstreet@ieee.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wr0-f196.google.com ([209.85.128.196]:35826 "EHLO
-        mail-wr0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751588AbdDBTUf (ORCPT
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52273 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1750992AbdDCBhe (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 2 Apr 2017 15:20:35 -0400
-Received: by mail-wr0-f196.google.com with SMTP id p52so28280990wrc.2
-        for <linux-crypto@vger.kernel.org>; Sun, 02 Apr 2017 12:20:34 -0700 (PDT)
-In-Reply-To: <20170402191916.9309-1-omosnacek@gmail.com>
+        Sun, 2 Apr 2017 21:37:34 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id v331XmaC122820
+        for <linux-crypto@vger.kernel.org>; Sun, 2 Apr 2017 21:37:34 -0400
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 29k3uugrm8-1
+        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Sun, 02 Apr 2017 21:37:33 -0400
+Received: from localhost
+        by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-crypto@vger.kernel.org> from <stewart@linux.vnet.ibm.com>;
+        Sun, 2 Apr 2017 21:37:33 -0400
+In-Reply-To: <1491066107.29552.29.camel@hbabu-laptop>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The le128_gf128mul_x_ble function in glue_helper.h is now obsolete and
-can be replaced with the gf128mul_x_ble function from gf128mul.h.
+Haren Myneni <haren@linux.vnet.ibm.com> writes:
+> @@ -656,13 +953,21 @@ static __init int nx842_powernv_init(void)
+>  	BUILD_BUG_ON(DDE_BUFFER_ALIGN % DDE_BUFFER_SIZE_MULT);
+>  	BUILD_BUG_ON(DDE_BUFFER_SIZE_MULT % DDE_BUFFER_LAST_MULT);
+>
+> -	for_each_compatible_node(dn, NULL, "ibm,power-nx")
+> -		nx842_powernv_probe(dn);
+> +	if (is_vas_available()) {
+> +		for_each_compatible_node(dn, NULL, "ibm,xscom")
+> +			nx842_powernv_probe_vas(dn);
 
-Signed-off-by: Ondrej Mosnacek <omosnacek@gmail.com>
----
- arch/x86/crypto/glue_helper.c             |  3 ++-
- arch/x86/include/asm/crypto/glue_helper.h | 10 ----------
- 2 files changed, 2 insertions(+), 11 deletions(-)
+I'm not keen on how the device bindings work, instead, I think firmware
+should provide a 'ibm,vas' compatible node, rather than simply searching
+through all the ibm,xscom nodes.
 
-diff --git a/arch/x86/crypto/glue_helper.c b/arch/x86/crypto/glue_helper.c
-index 260a060..24ac9fa 100644
---- a/arch/x86/crypto/glue_helper.c
-+++ b/arch/x86/crypto/glue_helper.c
-@@ -27,6 +27,7 @@
- 
- #include <linux/module.h>
- #include <crypto/b128ops.h>
-+#include <crypto/gf128mul.h>
- #include <crypto/internal/skcipher.h>
- #include <crypto/lrw.h>
- #include <crypto/xts.h>
-@@ -457,7 +458,7 @@ void glue_xts_crypt_128bit_one(void *ctx, u128 *dst, const u128 *src, le128 *iv,
- 	le128 ivblk = *iv;
- 
- 	/* generate next IV */
--	le128_gf128mul_x_ble(iv, &ivblk);
-+	gf128mul_x_ble(iv, &ivblk);
- 
- 	/* CC <- T xor C */
- 	u128_xor(dst, src, (u128 *)&ivblk);
-diff --git a/arch/x86/include/asm/crypto/glue_helper.h b/arch/x86/include/asm/crypto/glue_helper.h
-index 29e53ea..ed8b66d 100644
---- a/arch/x86/include/asm/crypto/glue_helper.h
-+++ b/arch/x86/include/asm/crypto/glue_helper.h
-@@ -125,16 +125,6 @@ static inline void le128_inc(le128 *i)
- 	i->b = cpu_to_le64(b);
- }
- 
--static inline void le128_gf128mul_x_ble(le128 *dst, const le128 *src)
--{
--	u64 a = le64_to_cpu(src->a);
--	u64 b = le64_to_cpu(src->b);
--	u64 _tt = ((s64)a >> 63) & 0x87;
--
--	dst->a = cpu_to_le64((a << 1) ^ (b >> 63));
--	dst->b = cpu_to_le64((b << 1) ^ _tt);
--}
--
- extern int glue_ecb_crypt_128bit(const struct common_glue_ctx *gctx,
- 				 struct blkcipher_desc *desc,
- 				 struct scatterlist *dst,
+XSCOMs aren't something that Linux should really know about, it's a
+debug interface, and one we use through PRD to do PRD-things, XSCOMs
+aren't part of the architecture.
+
 -- 
-2.9.3
+Stewart Smith
+OPAL Architect, IBM.
