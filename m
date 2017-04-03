@@ -1,77 +1,53 @@
-From: abed mohammad kamaluddin <abedamu@gmail.com>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
 Subject: Re: algif for compression?
-Date: Mon, 3 Apr 2017 11:40:19 +0530
-Message-ID: <CACVarEQ14ZF9LGDkaNYtX3GRD5GOH62NBiPtC4z=i6RY4MtFDA@mail.gmail.com>
-References: <CACVarETuTx40WFD5TRUCwiYv5r3SEvhuJHpGjqPsz90qVZsYKA@mail.gmail.com>
- <20161210081014.GA32746@gondor.apana.org.au>
+Date: Mon, 03 Apr 2017 09:26:38 +0200
+Message-ID: <12030384.uXSX3S3VSk@tauon.chronox.de>
+References: <CACVarETuTx40WFD5TRUCwiYv5r3SEvhuJHpGjqPsz90qVZsYKA@mail.gmail.com> <20161210081014.GA32746@gondor.apana.org.au> <CACVarEQ14ZF9LGDkaNYtX3GRD5GOH62NBiPtC4z=i6RY4MtFDA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org
+To: abed mohammad kamaluddin <abedamu@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wr0-f173.google.com ([209.85.128.173]:32932 "EHLO
-        mail-wr0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751141AbdDCGKl (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 3 Apr 2017 02:10:41 -0400
-Received: by mail-wr0-f173.google.com with SMTP id w43so153054365wrb.0
-        for <linux-crypto@vger.kernel.org>; Sun, 02 Apr 2017 23:10:40 -0700 (PDT)
-In-Reply-To: <20161210081014.GA32746@gondor.apana.org.au>
+Received: from mail.eperm.de ([89.247.134.16]:58762 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751431AbdDCH0n (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 3 Apr 2017 03:26:43 -0400
+In-Reply-To: <CACVarEQ14ZF9LGDkaNYtX3GRD5GOH62NBiPtC4z=i6RY4MtFDA@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
+Am Montag, 3. April 2017, 08:10:19 CEST schrieb abed mohammad kamaluddin:
 
-We have implemented algif acomp interface for user space applications
-to utilize the kernel compression framework and the hardware drivers
-using it and have been testing it using userspace zlib library.
+Hi abed,
 
-However, what we find lacking in the existing acomp implementation is
-the ability to pass context data between the applications and the
-drivers using the acomp interface. Currently the interface only allows
-src/dest data  and a flag argument with each request. There are two
-context pointers, one in acomp_req and another in crypto_tfm but they
-are for internal use and not available to applications through the
-api's. Would it be acceptable to add fields that need to be
-communicated b/w the driver and applications like history,
-csum/adler32, EOF, stream ctx  to acomp_req.
+> Hi Herbert,
+> 
+> We have implemented algif acomp interface for user space applications
+> to utilize the kernel compression framework and the hardware drivers
+> using it and have been testing it using userspace zlib library.
+> 
+> However, what we find lacking in the existing acomp implementation is
+> the ability to pass context data between the applications and the
+> drivers using the acomp interface. Currently the interface only allows
+> src/dest data  and a flag argument with each request. There are two
+> context pointers, one in acomp_req and another in crypto_tfm but they
+> are for internal use and not available to applications through the
+> api's. Would it be acceptable to add fields that need to be
+> communicated b/w the driver and applications like history,
+> csum/adler32, EOF, stream ctx  to acomp_req.
+> 
+> Or is there any other way, which I may have missed, through which we
+> can pass ctx data between applications and drivers while using the
+> kernel compression framework?
 
-Or is there any other way, which I may have missed, through which we
-can pass ctx data between applications and drivers while using the
-kernel compression framework?
+If you follow the AF_ALG implementations that are currently in the kernel, a 
+calling application receives two file descriptors. The first file descriptor 
+is the reference to a tfm, the second is the reference to a particular 
+request.
 
-Thanks,
-Abed
-(Cavium Inc)
+Wouldn't those file descriptors be the reference you are looking for?
 
-
-On Sat, Dec 10, 2016 at 1:40 PM, Herbert Xu <herbert@gondor.apana.org.au> w=
-rote:
-> abed mohammad kamaluddin <abedamu@gmail.com> wrote:
->>
->> We are also looking for user-space access to the kernel crypto layer
->> compression algorithms. I have gone through AF_ALG but couldn=E2=80=99t =
-find
->> support for compression ops through it. This is required for our
->> hardware zip engines whose driver hooks up to the crypto layer.
->>
->> I was going through the lists and stumbled across this thread. Has
->> there been  any updates or efforts put up in this direction since this
->> thread is a few years old. If not, are there any alternate
->> implementations that allow user-space access to compression? I have
->> gone through cryptodev and see the same limitation there.
->>
->> Would appreciate any pointers in this regard.
->
-> The compression interface is currently in a state of flux.  We
-> should make it settle down first before exporting it to user-space.
->
-> For a start it would be good to actually switch IPsec/IPcomp over
-> to the new compression interface.
->
-> Cheers,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Ciao
+Stephan
