@@ -1,86 +1,45 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH] padata: avoid race in reordering
-Date: Tue, 4 Apr 2017 13:53:15 +0200
-Message-ID: <CAHmME9radQrAeyWmwapLGg1RYD0wVz3ysAT_p19KD0fi4q=anQ@mail.gmail.com>
-References: <20170323112443.30843-1-Jason@zx2c4.com> <20170324141608.GA15370@gondor.apana.org.au>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: Re: What should be the algo priority
+Date: Tue, 04 Apr 2017 14:37:02 +0200
+Message-ID: <42612664.V5g4013kpk@tauon.chronox.de>
+References: <CAFXBA=kTywuuZOKw6a7mj+aXtn0YcOYF=jmesuBE2L3zZmojMw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-To: stable@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org
+To: Harsh Jain <harshjain.prof@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from frisell.zx2c4.com ([192.95.5.64]:56193 "EHLO frisell.zx2c4.com"
+Received: from mail.eperm.de ([89.247.134.16]:58818 "EHLO mail.eperm.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752932AbdDDLxX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 4 Apr 2017 07:53:23 -0400
-In-Reply-To: <20170324141608.GA15370@gondor.apana.org.au>
+        id S1751031AbdDDMhH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 4 Apr 2017 08:37:07 -0400
+In-Reply-To: <CAFXBA=kTywuuZOKw6a7mj+aXtn0YcOYF=jmesuBE2L3zZmojMw@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Herbert applied this to his tree. It's probably a good stable
-candidate, since it's a two line change to fix a race condition.
+Am Dienstag, 4. April 2017, 09:53:17 CEST schrieb Harsh Jain:
 
-On Fri, Mar 24, 2017 at 3:16 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->> Under extremely heavy uses of padata, crashes occur, and with list
->> debugging turned on, this happens instead:
->>
->> [87487.298728] WARNING: CPU: 1 PID: 882 at lib/list_debug.c:33
->> __list_add+0xae/0x130
->> [87487.301868] list_add corruption. prev->next should be next
->> (ffffb17abfc043d0), but was ffff8dba70872c80. (prev=ffff8dba70872b00).
->> [87487.339011]  [<ffffffff9a53d075>] dump_stack+0x68/0xa3
->> [87487.342198]  [<ffffffff99e119a1>] ? console_unlock+0x281/0x6d0
->> [87487.345364]  [<ffffffff99d6b91f>] __warn+0xff/0x140
->> [87487.348513]  [<ffffffff99d6b9aa>] warn_slowpath_fmt+0x4a/0x50
->> [87487.351659]  [<ffffffff9a58b5de>] __list_add+0xae/0x130
->> [87487.354772]  [<ffffffff9add5094>] ? _raw_spin_lock+0x64/0x70
->> [87487.357915]  [<ffffffff99eefd66>] padata_reorder+0x1e6/0x420
->> [87487.361084]  [<ffffffff99ef0055>] padata_do_serial+0xa5/0x120
->>
->> padata_reorder calls list_add_tail with the list to which its adding
->> locked, which seems correct:
->>
->> spin_lock(&squeue->serial.lock);
->> list_add_tail(&padata->list, &squeue->serial.list);
->> spin_unlock(&squeue->serial.lock);
->>
->> This therefore leaves only place where such inconsistency could occur:
->> if padata->list is added at the same time on two different threads.
->> This pdata pointer comes from the function call to
->> padata_get_next(pd), which has in it the following block:
->>
->> next_queue = per_cpu_ptr(pd->pqueue, cpu);
->> padata = NULL;
->> reorder = &next_queue->reorder;
->> if (!list_empty(&reorder->list)) {
->>       padata = list_entry(reorder->list.next,
->>                           struct padata_priv, list);
->>       spin_lock(&reorder->lock);
->>       list_del_init(&padata->list);
->>       atomic_dec(&pd->reorder_objects);
->>       spin_unlock(&reorder->lock);
->>
->>       pd->processed++;
->>
->>       goto out;
->> }
->> out:
->> return padata;
->>
->> I strongly suspect that the problem here is that two threads can race
->> on reorder list. Even though the deletion is locked, call to
->> list_entry is not locked, which means it's feasible that two threads
->> pick up the same padata object and subsequently call list_add_tail on
->> them at the same time. The fix is thus be hoist that lock outside of
->> that block.
->>
->> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
->
-> Patch applied.  Thanks.
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Hi Harsh,
+
+> Hi,
+> 
+> Do we have any guidelines documented to decide what should be the
+> algorithm priority. Specially for authenc implementation.Most of the
+> drivers have fixed priority for all algos. Problem comes in when we
+> have cbc(aes), hmac(sha1) and authenc(cbc(aes),hmac(sha1))
+> implementation in driver. Base authenc driver gets more precedence
+> because of higher priority(enc->base.cra_priority * 10 +
+> auth_base->cra_priority;)
+> 
+> What should be the priority of
+> cbc(aes),
+> hmac(sha1)
+> authenc(cbc(aes),hmac(sha1))
+
+There is no general rule about the actual numbers. But commonly, the prios are 
+set such that the prios of C implementations < ASM implementations < hardware 
+accelerators. The idea is to give users the fastest implementation there is 
+for his particular system.
+
+Ciao
+Stephan
