@@ -1,34 +1,44 @@
 From: Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: [PATCH 2/5] crypto/nx: Create nx842_cfg_crb function
-Date: Tue, 04 Apr 2017 21:12:27 +1000
-Message-ID: <87fuhov338.fsf@concordia.ellerman.id.au>
-References: <1491066000.29552.27.camel@hbabu-laptop>
+Subject: Re: [PATCH 1/5] crypto/nx: Rename nx842_powernv_function as icswx
+ function
+Date: Tue, 04 Apr 2017 21:11:51 +1000
+Message-ID: <87inmkv348.fsf@concordia.ellerman.id.au>
+References: <1491065941.29552.26.camel@hbabu-laptop>
 Mime-Version: 1.0
 Content-Type: text/plain
-Cc: linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
-        benh@kernel.crashing.org, mikey@neuling.org, suka@us.ibm.com,
-        hbabu@us.ibm.com
-To: Haren Myneni <haren@linux.vnet.ibm.com>,
-        herbert@gondor.apana.org.au, ddstreet@ieee.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ozlabs.org ([103.22.144.67]:40953 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753679AbdDDLMe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 4 Apr 2017 07:12:34 -0400
-In-Reply-To: <1491066000.29552.27.camel@hbabu-laptop>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: mikey@neuling.org, suka@us.ibm.com, linux-crypto@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org
+To: Haren Myneni <haren@linux.vnet.ibm.com>, herbert@gondor.apana.org.au,
+ ddstreet@ieee.org
+Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+In-Reply-To: <1491065941.29552.26.camel@hbabu-laptop>
+List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
+List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
+List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
+List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
+List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
+Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+Sender: "Linuxppc-dev"
+ <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+List-Id: linux-crypto.vger.kernel.org
 
 Haren Myneni <haren@linux.vnet.ibm.com> writes:
 
-> [PATCH 2/5] crypto/nx: Create nx842_cfg_crb function
+> [PATCH 1/5] crypto/nx: Rename nx842_powernv_function as icswx function
 >
-> Configure CRB is moved to nx842_cfg_crb() so that it can be
-> used for icswx function and VAS function which will be added
-> later.
+> nx842_powernv_function is points to nx842_icswx_function and
+> will be point to VAS function which will be added later for
+> P9 NX support.
 
-Buy a vowel! :)
+I know it's nit-picking but can you give it a better name while you're
+there.
 
-nx842_configure_crb() is fine.
+I was thinking it should be called "send" or something, but it actually
+synchronously sends and waits for a request.
+
+So perhaps just nx842_exec(), for "execute a request", and then you can
+have nx842_exec_icswx() and nx842_exec_vas().
 
 cheers
