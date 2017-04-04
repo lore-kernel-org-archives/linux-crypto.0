@@ -1,185 +1,129 @@
-From: =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>
+From: Laurentiu Tudor <laurentiu.tudor@nxp.com>
 Subject: Re: [7/7] crypto: caam/qi - add ablkcipher and authenc algorithms
-Date: Tue, 4 Apr 2017 12:42:37 +0000
-Message-ID: <VI1PR0401MB2591B66506D78DF5AFCC8FA4980B0@VI1PR0401MB2591.eurprd04.prod.outlook.com>
+Date: Tue, 4 Apr 2017 13:28:49 +0000
+Message-ID: <58E39F90.6050408@nxp.com>
 References: <20170317100602.2837-8-horia.geanta@nxp.com>
  <87vaqkvk6c.fsf@concordia.ellerman.id.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
-Cc: "David S. Miller" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: Claudiu Manoil <claudiu.manoil@nxp.com>,
+        Cristian Stoica <cristian.stoica@nxp.com>,
+        Dan Douglass <dan.douglass@nxp.com>,
         "linux-arm-kernel@lists.infradead.org"
         <linux-arm-kernel@lists.infradead.org>,
-        Dan Douglass <dan.douglass@nxp.com>,
-        Alexandru Porosanu <alexandru.porosanu@nxp.com>,
         Vakul Garg <vakul.garg@nxp.com>,
-        Cristian Stoica <cristian.stoica@nxp.com>,
-        "Claudiu Manoil" <claudiu.manoil@nxp.com>,
-        "linuxppc-dev@" <"lists.ozlabs.org linuxppc-dev"@lists.ozlabs.org>
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Alexandru Porosanu <alexandru.porosanu@nxp.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
 To: Michael Ellerman <mpe@ellerman.id.au>,
+        =?utf-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@nxp.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Scott Wood <oss@buserror.net>, Roy Pledge <roy.pledge@nxp.com>,
-        Madalin-Cristian Bucur <madalin.bucur@nxp.com>
+        Scott Wood <oss@buserror.net>, Roy Pledge <roy.pledge@nxp.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-eopbgr50071.outbound.protection.outlook.com ([40.107.5.71]:64956
-        "EHLO EUR03-VE1-obe.outbound.protection.outlook.com"
+Received: from mail-ve1eur01on0080.outbound.protection.outlook.com ([104.47.1.80]:45696
+        "EHLO EUR01-VE1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752165AbdDDMmn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 4 Apr 2017 08:42:43 -0400
+        id S1752461AbdDDN24 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 4 Apr 2017 09:28:56 -0400
+In-Reply-To: <87vaqkvk6c.fsf@concordia.ellerman.id.au>
 Content-Language: en-US
+Content-ID: <B97538A3D476F941ABEAD9B44B097270@eurprd04.prod.outlook.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 4/4/2017 8:03 AM, Michael Ellerman wrote:=0A=
-> Horia Geant=E3 <horia.geanta@nxp.com> writes:=0A=
-> =0A=
->> Add support to submit ablkcipher and authenc algorithms=0A=
->> via the QI backend:=0A=
->> -ablkcipher:=0A=
->> cbc({aes,des,des3_ede})=0A=
->> ctr(aes), rfc3686(ctr(aes))=0A=
->> xts(aes)=0A=
->> -authenc:=0A=
->> authenc(hmac(md5),cbc({aes,des,des3_ede}))=0A=
->> authenc(hmac(sha*),cbc({aes,des,des3_ede}))=0A=
->>=0A=
->> caam/qi being a new driver, let's wait some time to settle down without=
-=0A=
->> interfering with existing caam/jr driver.=0A=
->> Accordingly, for now all caam/qi algorithms (caamalg_qi module) are=0A=
->> marked to be of lower priority than caam/jr ones (caamalg module).=0A=
->>=0A=
->> Signed-off-by: Vakul Garg <vakul.garg@nxp.com>=0A=
->> Signed-off-by: Alex Porosanu <alexandru.porosanu@nxp.com>=0A=
->> Signed-off-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
->> ---=0A=
->>  drivers/crypto/caam/Kconfig        |   20 +-=0A=
->>  drivers/crypto/caam/Makefile       |    1 +=0A=
->>  drivers/crypto/caam/caamalg.c      |    9 +-=0A=
->>  drivers/crypto/caam/caamalg_desc.c |   77 +-=0A=
->>  drivers/crypto/caam/caamalg_desc.h |   15 +-=0A=
->>  drivers/crypto/caam/caamalg_qi.c   | 2387 +++++++++++++++++++++++++++++=
-+++++++=0A=
->>  drivers/crypto/caam/sg_sw_qm.h     |  108 ++=0A=
->>  7 files changed, 2601 insertions(+), 16 deletions(-)=0A=
->>  create mode 100644 drivers/crypto/caam/caamalg_qi.c=0A=
->>  create mode 100644 drivers/crypto/caam/sg_sw_qm.h=0A=
-> =0A=
-> =0A=
-> This appears to be blowing up my Freescale (NXP) P5020DS board:=0A=
-> =0A=
-=0A=
-Michael,=0A=
-=0A=
-Unfortunately I was not able to reproduce the issue on my P5020DS using=0A=
-the same SHA1 (b189817cf789). Assuming you've used=0A=
-corenet64_smp_defconfig and the p5020ds dts file in this tree.=0A=
-=0A=
-Roy, Madalin,=0A=
-=0A=
-This might be a probing order issue b/w CAAM/QI and QMan=0A=
-(drivers/soc/fsl/qbman/qman_ccsr.c) platform drivers.=0A=
-AFAICT the same dependency exists b/w QMan and DPAA Ethernet, thus is=0A=
-should be fixed there too.=0A=
-=0A=
-CAAM and QMan are sibling devices, having "soc" DT node as parent.=0A=
-Should device link mechanism (Documentation/driver-api/device_link.rst)=0A=
-be used to register the dependency b/w QMan driver (supplier) and=0A=
-CAAM/QI driver (consumer)?=0A=
-=0A=
-Thanks,=0A=
-Horia=0A=
-=0A=
->   Unable to handle kernel paging request for data at address 0x00000020=
-=0A=
->   Faulting instruction address: 0xc0000000004393e4=0A=
->   Oops: Kernel access of bad area, sig: 11 [#1]=0A=
->   SMP NR_CPUS=3D24 =0A=
->   CoreNet Generic=0A=
->   Modules linked in:=0A=
->   CPU: 0 PID: 1 Comm: swapper/0 Not tainted 4.11.0-rc3-compiler_gcc-4.6.3=
--00046-gb189817cf789 #5=0A=
->   task: c0000000f70c0000 task.stack: c0000000f70c8000=0A=
->   NIP: c0000000004393e4 LR: c0000000004aeba0 CTR: c0000000004fa7d8=0A=
->   REGS: c0000000f70cb160 TRAP: 0300   Not tainted  (4.11.0-rc3-compiler_g=
-cc-4.6.3-00046-gb189817cf789)=0A=
->   MSR: 0000000080029000 <CE,EE,ME>=0A=
->     CR: 24adbe48  XER: 20000000=0A=
->   DEAR: 0000000000000020 ESR: 0000000000000000 SOFTE: 1 =0A=
->   GPR00: c0000000006feba0 c0000000f70cb3e0 c000000000e60000 0000000000000=
-000 =0A=
->   GPR04: 0000000000000001 0000000000000000 c000000000e0b290 0000000000000=
-003 =0A=
->   GPR08: 0000000000000004 c000000000ea5280 0000000000000004 0000000000000=
-004 =0A=
->   GPR12: 0000000088adbe22 c00000003fff5000 c000000000ba3518 8000080088090=
-fa8 =0A=
->   GPR16: 0000000000001000 c000000000ba3500 c0000000f72c68d8 0000000000000=
-004 =0A=
->   GPR20: c000000000ea5280 c000000000ba34e8 0000000000000020 0000000000000=
-004 =0A=
->   GPR24: c000000000eab7c0 0000000000000000 c0000000f7fc8818 c000000000eb0=
-000 =0A=
->   GPR28: c0000000f786cc00 c000000000eab780 fffffffff786cc00 c000000000eab=
-7c0 =0A=
->   NIP [c0000000004393e4] .gen_pool_alloc+0x0/0xc=0A=
->   LR [c0000000004aeba0] .qman_alloc_cgrid_range+0x24/0x54=0A=
->   Call Trace:=0A=
->   [c0000000f70cb3e0] [c000000000504054] .platform_device_register_full+0x=
-12c/0x150 (unreliable)=0A=
->   [c0000000f70cb460] [c0000000006feba0] .caam_qi_init+0x158/0x63c=0A=
->   [c0000000f70cb5f0] [c0000000006fc64c] .caam_probe+0x8b8/0x1830=0A=
->   [c0000000f70cb740] [c000000000503288] .platform_drv_probe+0x60/0xac=0A=
->   [c0000000f70cb7c0] [c000000000501194] .driver_probe_device+0x248/0x344=
-=0A=
->   [c0000000f70cb870] [c0000000005013b4] .__driver_attach+0x124/0x128=0A=
->   [c0000000f70cb900] [c0000000004fed90] .bus_for_each_dev+0x80/0xcc=0A=
->   [c0000000f70cb9a0] [c000000000500858] .driver_attach+0x24/0x38=0A=
->   [c0000000f70cba10] [c00000000050043c] .bus_add_driver+0x14c/0x29c=0A=
->   [c0000000f70cbab0] [c000000000501d64] .driver_register+0x8c/0x154=0A=
->   [c0000000f70cbb30] [c000000000503000] .__platform_driver_register+0x48/=
-0x5c=0A=
->   [c0000000f70cbba0] [c000000000c7f798] .caam_driver_init+0x1c/0x30=0A=
->   [c0000000f70cbc10] [c000000000001904] .do_one_initcall+0x60/0x1a8=0A=
->   [c0000000f70cbcf0] [c000000000c35f30] .kernel_init_freeable+0x248/0x334=
-=0A=
->   [c0000000f70cbdb0] [c0000000000020fc] .kernel_init+0x1c/0xf20=0A=
->   [c0000000f70cbe30] [c0000000000009bc] .ret_from_kernel_thread+0x58/0x9c=
-=0A=
->   Instruction dump:=0A=
->   eb61ffd8 eb81ffe0 eba1ffe8 ebc1fff0 ebe1fff8 4e800020 38600000 4bffffb0=
- =0A=
->   7ce53b78 4bffff0c 7f67db78 4bffff24 <e8a30020> e8c30028 4bfffd30 fbe1ff=
-f8 =0A=
->   ---[ end trace 9f61087068991b02 ]---=0A=
-> =0A=
-> =0A=
-> home:linux-next(4)(I)> git bisect log=0A=
-> ...=0A=
-> git bisect bad b189817cf7894e03fd3700acd923221d3007259e=0A=
-> # first bad commit: [b189817cf7894e03fd3700acd923221d3007259e] crypto: ca=
-am/qi - add ablkcipher and authenc algorithms=0A=
-> =0A=
-> =0A=
-> The oops is saying gen_pool_alloc() was called with a NULL pointer, so=0A=
-> it seems qm_cgralloc is NULL:=0A=
-> =0A=
-> static int qman_alloc_range(struct gen_pool *p, u32 *result, u32 cnt)=0A=
-> {=0A=
-> 	unsigned long addr;=0A=
-> =0A=
-> 	addr =3D gen_pool_alloc(p, cnt);=0A=
-> 	...=0A=
-> =0A=
-> int qman_alloc_cgrid_range(u32 *result, u32 count)=0A=
-> {=0A=
-> 	return qman_alloc_range(qm_cgralloc, result, count);=0A=
-> }=0A=
-> =0A=
-> =0A=
-> I didn't pull the thread any further than that.=0A=
-> =0A=
-> cheers=0A=
-> =0A=
-=0A=
+SGkgTWljaGFlbCwNCg0KSnVzdCBhIGNvdXBsZSBvZiBiYXNpYyB0aGluZ3MgdG8gY2hlY2s6DQog
+IC0gd2FzIHRoZSBkdGIgdXBkYXRlZCB0byB0aGUgbmV3ZXN0Pw0KICAtIGlzIHRoZSBxbWFuIG5v
+ZGUgcHJlc2VudD8gVGhpcyBzaG91bGQgYmUgZWFzaWx5IHZpc2libGUgaW4gDQovcHJvYy9kZXZp
+Y2UtdHJlZS9zb2NAZmZlMDAwMDAwL3FtYW5AMzE4MDAwLg0KDQotLS0NCkJlc3QgUmVnYXJkcywg
+TGF1cmVudGl1DQoNCk9uIDA0LzA0LzIwMTcgMDg6MDMgQU0sIE1pY2hhZWwgRWxsZXJtYW4gd3Jv
+dGU6DQo+IEhvcmlhIEdlYW50xIMgPGhvcmlhLmdlYW50YUBueHAuY29tPiB3cml0ZXM6DQo+DQo+
+PiBBZGQgc3VwcG9ydCB0byBzdWJtaXQgYWJsa2NpcGhlciBhbmQgYXV0aGVuYyBhbGdvcml0aG1z
+DQo+PiB2aWEgdGhlIFFJIGJhY2tlbmQ6DQo+PiAtYWJsa2NpcGhlcjoNCj4+IGNiYyh7YWVzLGRl
+cyxkZXMzX2VkZX0pDQo+PiBjdHIoYWVzKSwgcmZjMzY4NihjdHIoYWVzKSkNCj4+IHh0cyhhZXMp
+DQo+PiAtYXV0aGVuYzoNCj4+IGF1dGhlbmMoaG1hYyhtZDUpLGNiYyh7YWVzLGRlcyxkZXMzX2Vk
+ZX0pKQ0KPj4gYXV0aGVuYyhobWFjKHNoYSopLGNiYyh7YWVzLGRlcyxkZXMzX2VkZX0pKQ0KPj4N
+Cj4+IGNhYW0vcWkgYmVpbmcgYSBuZXcgZHJpdmVyLCBsZXQncyB3YWl0IHNvbWUgdGltZSB0byBz
+ZXR0bGUgZG93biB3aXRob3V0DQo+PiBpbnRlcmZlcmluZyB3aXRoIGV4aXN0aW5nIGNhYW0vanIg
+ZHJpdmVyLg0KPj4gQWNjb3JkaW5nbHksIGZvciBub3cgYWxsIGNhYW0vcWkgYWxnb3JpdGhtcyAo
+Y2FhbWFsZ19xaSBtb2R1bGUpIGFyZQ0KPj4gbWFya2VkIHRvIGJlIG9mIGxvd2VyIHByaW9yaXR5
+IHRoYW4gY2FhbS9qciBvbmVzIChjYWFtYWxnIG1vZHVsZSkuDQo+Pg0KPj4gU2lnbmVkLW9mZi1i
+eTogVmFrdWwgR2FyZyA8dmFrdWwuZ2FyZ0BueHAuY29tPg0KPj4gU2lnbmVkLW9mZi1ieTogQWxl
+eCBQb3Jvc2FudSA8YWxleGFuZHJ1LnBvcm9zYW51QG54cC5jb20+DQo+PiBTaWduZWQtb2ZmLWJ5
+OiBIb3JpYSBHZWFudMSDIDxob3JpYS5nZWFudGFAbnhwLmNvbT4NCj4+IC0tLQ0KPj4gICBkcml2
+ZXJzL2NyeXB0by9jYWFtL0tjb25maWcgICAgICAgIHwgICAyMCArLQ0KPj4gICBkcml2ZXJzL2Ny
+eXB0by9jYWFtL01ha2VmaWxlICAgICAgIHwgICAgMSArDQo+PiAgIGRyaXZlcnMvY3J5cHRvL2Nh
+YW0vY2FhbWFsZy5jICAgICAgfCAgICA5ICstDQo+PiAgIGRyaXZlcnMvY3J5cHRvL2NhYW0vY2Fh
+bWFsZ19kZXNjLmMgfCAgIDc3ICstDQo+PiAgIGRyaXZlcnMvY3J5cHRvL2NhYW0vY2FhbWFsZ19k
+ZXNjLmggfCAgIDE1ICstDQo+PiAgIGRyaXZlcnMvY3J5cHRvL2NhYW0vY2FhbWFsZ19xaS5jICAg
+fCAyMzg3ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKw0KPj4gICBkcml2ZXJz
+L2NyeXB0by9jYWFtL3NnX3N3X3FtLmggICAgIHwgIDEwOCArKw0KPj4gICA3IGZpbGVzIGNoYW5n
+ZWQsIDI2MDEgaW5zZXJ0aW9ucygrKSwgMTYgZGVsZXRpb25zKC0pDQo+PiAgIGNyZWF0ZSBtb2Rl
+IDEwMDY0NCBkcml2ZXJzL2NyeXB0by9jYWFtL2NhYW1hbGdfcWkuYw0KPj4gICBjcmVhdGUgbW9k
+ZSAxMDA2NDQgZHJpdmVycy9jcnlwdG8vY2FhbS9zZ19zd19xbS5oDQo+DQo+DQo+IFRoaXMgYXBw
+ZWFycyB0byBiZSBibG93aW5nIHVwIG15IEZyZWVzY2FsZSAoTlhQKSBQNTAyMERTIGJvYXJkOg0K
+Pg0KPiAgICBVbmFibGUgdG8gaGFuZGxlIGtlcm5lbCBwYWdpbmcgcmVxdWVzdCBmb3IgZGF0YSBh
+dCBhZGRyZXNzIDB4MDAwMDAwMjANCj4gICAgRmF1bHRpbmcgaW5zdHJ1Y3Rpb24gYWRkcmVzczog
+MHhjMDAwMDAwMDAwNDM5M2U0DQo+ICAgIE9vcHM6IEtlcm5lbCBhY2Nlc3Mgb2YgYmFkIGFyZWEs
+IHNpZzogMTEgWyMxXQ0KPiAgICBTTVAgTlJfQ1BVUz0yNA0KPiAgICBDb3JlTmV0IEdlbmVyaWMN
+Cj4gICAgTW9kdWxlcyBsaW5rZWQgaW46DQo+ICAgIENQVTogMCBQSUQ6IDEgQ29tbTogc3dhcHBl
+ci8wIE5vdCB0YWludGVkIDQuMTEuMC1yYzMtY29tcGlsZXJfZ2NjLTQuNi4zLTAwMDQ2LWdiMTg5
+ODE3Y2Y3ODkgIzUNCj4gICAgdGFzazogYzAwMDAwMDBmNzBjMDAwMCB0YXNrLnN0YWNrOiBjMDAw
+MDAwMGY3MGM4MDAwDQo+ICAgIE5JUDogYzAwMDAwMDAwMDQzOTNlNCBMUjogYzAwMDAwMDAwMDRh
+ZWJhMCBDVFI6IGMwMDAwMDAwMDA0ZmE3ZDgNCj4gICAgUkVHUzogYzAwMDAwMDBmNzBjYjE2MCBU
+UkFQOiAwMzAwICAgTm90IHRhaW50ZWQgICg0LjExLjAtcmMzLWNvbXBpbGVyX2djYy00LjYuMy0w
+MDA0Ni1nYjE4OTgxN2NmNzg5KQ0KPiAgICBNU1I6IDAwMDAwMDAwODAwMjkwMDAgPENFLEVFLE1F
+Pg0KPiAgICAgIENSOiAyNGFkYmU0OCAgWEVSOiAyMDAwMDAwMA0KPiAgICBERUFSOiAwMDAwMDAw
+MDAwMDAwMDIwIEVTUjogMDAwMDAwMDAwMDAwMDAwMCBTT0ZURTogMQ0KPiAgICBHUFIwMDogYzAw
+MDAwMDAwMDZmZWJhMCBjMDAwMDAwMGY3MGNiM2UwIGMwMDAwMDAwMDBlNjAwMDAgMDAwMDAwMDAw
+MDAwMDAwMA0KPiAgICBHUFIwNDogMDAwMDAwMDAwMDAwMDAwMSAwMDAwMDAwMDAwMDAwMDAwIGMw
+MDAwMDAwMDBlMGIyOTAgMDAwMDAwMDAwMDAwMDAwMw0KPiAgICBHUFIwODogMDAwMDAwMDAwMDAw
+MDAwNCBjMDAwMDAwMDAwZWE1MjgwIDAwMDAwMDAwMDAwMDAwMDQgMDAwMDAwMDAwMDAwMDAwNA0K
+PiAgICBHUFIxMjogMDAwMDAwMDA4OGFkYmUyMiBjMDAwMDAwMDNmZmY1MDAwIGMwMDAwMDAwMDBi
+YTM1MTggODAwMDA4MDA4ODA5MGZhOA0KPiAgICBHUFIxNjogMDAwMDAwMDAwMDAwMTAwMCBjMDAw
+MDAwMDAwYmEzNTAwIGMwMDAwMDAwZjcyYzY4ZDggMDAwMDAwMDAwMDAwMDAwNA0KPiAgICBHUFIy
+MDogYzAwMDAwMDAwMGVhNTI4MCBjMDAwMDAwMDAwYmEzNGU4IDAwMDAwMDAwMDAwMDAwMjAgMDAw
+MDAwMDAwMDAwMDAwNA0KPiAgICBHUFIyNDogYzAwMDAwMDAwMGVhYjdjMCAwMDAwMDAwMDAwMDAw
+MDAwIGMwMDAwMDAwZjdmYzg4MTggYzAwMDAwMDAwMGViMDAwMA0KPiAgICBHUFIyODogYzAwMDAw
+MDBmNzg2Y2MwMCBjMDAwMDAwMDAwZWFiNzgwIGZmZmZmZmZmZjc4NmNjMDAgYzAwMDAwMDAwMGVh
+YjdjMA0KPiAgICBOSVAgW2MwMDAwMDAwMDA0MzkzZTRdIC5nZW5fcG9vbF9hbGxvYysweDAvMHhj
+DQo+ICAgIExSIFtjMDAwMDAwMDAwNGFlYmEwXSAucW1hbl9hbGxvY19jZ3JpZF9yYW5nZSsweDI0
+LzB4NTQNCj4gICAgQ2FsbCBUcmFjZToNCj4gICAgW2MwMDAwMDAwZjcwY2IzZTBdIFtjMDAwMDAw
+MDAwNTA0MDU0XSAucGxhdGZvcm1fZGV2aWNlX3JlZ2lzdGVyX2Z1bGwrMHgxMmMvMHgxNTAgKHVu
+cmVsaWFibGUpDQo+ICAgIFtjMDAwMDAwMGY3MGNiNDYwXSBbYzAwMDAwMDAwMDZmZWJhMF0gLmNh
+YW1fcWlfaW5pdCsweDE1OC8weDYzYw0KPiAgICBbYzAwMDAwMDBmNzBjYjVmMF0gW2MwMDAwMDAw
+MDA2ZmM2NGNdIC5jYWFtX3Byb2JlKzB4OGI4LzB4MTgzMA0KPiAgICBbYzAwMDAwMDBmNzBjYjc0
+MF0gW2MwMDAwMDAwMDA1MDMyODhdIC5wbGF0Zm9ybV9kcnZfcHJvYmUrMHg2MC8weGFjDQo+ICAg
+IFtjMDAwMDAwMGY3MGNiN2MwXSBbYzAwMDAwMDAwMDUwMTE5NF0gLmRyaXZlcl9wcm9iZV9kZXZp
+Y2UrMHgyNDgvMHgzNDQNCj4gICAgW2MwMDAwMDAwZjcwY2I4NzBdIFtjMDAwMDAwMDAwNTAxM2I0
+XSAuX19kcml2ZXJfYXR0YWNoKzB4MTI0LzB4MTI4DQo+ICAgIFtjMDAwMDAwMGY3MGNiOTAwXSBb
+YzAwMDAwMDAwMDRmZWQ5MF0gLmJ1c19mb3JfZWFjaF9kZXYrMHg4MC8weGNjDQo+ICAgIFtjMDAw
+MDAwMGY3MGNiOWEwXSBbYzAwMDAwMDAwMDUwMDg1OF0gLmRyaXZlcl9hdHRhY2grMHgyNC8weDM4
+DQo+ICAgIFtjMDAwMDAwMGY3MGNiYTEwXSBbYzAwMDAwMDAwMDUwMDQzY10gLmJ1c19hZGRfZHJp
+dmVyKzB4MTRjLzB4MjljDQo+ICAgIFtjMDAwMDAwMGY3MGNiYWIwXSBbYzAwMDAwMDAwMDUwMWQ2
+NF0gLmRyaXZlcl9yZWdpc3RlcisweDhjLzB4MTU0DQo+ICAgIFtjMDAwMDAwMGY3MGNiYjMwXSBb
+YzAwMDAwMDAwMDUwMzAwMF0gLl9fcGxhdGZvcm1fZHJpdmVyX3JlZ2lzdGVyKzB4NDgvMHg1Yw0K
+PiAgICBbYzAwMDAwMDBmNzBjYmJhMF0gW2MwMDAwMDAwMDBjN2Y3OThdIC5jYWFtX2RyaXZlcl9p
+bml0KzB4MWMvMHgzMA0KPiAgICBbYzAwMDAwMDBmNzBjYmMxMF0gW2MwMDAwMDAwMDAwMDE5MDRd
+IC5kb19vbmVfaW5pdGNhbGwrMHg2MC8weDFhOA0KPiAgICBbYzAwMDAwMDBmNzBjYmNmMF0gW2Mw
+MDAwMDAwMDBjMzVmMzBdIC5rZXJuZWxfaW5pdF9mcmVlYWJsZSsweDI0OC8weDMzNA0KPiAgICBb
+YzAwMDAwMDBmNzBjYmRiMF0gW2MwMDAwMDAwMDAwMDIwZmNdIC5rZXJuZWxfaW5pdCsweDFjLzB4
+ZjIwDQo+ICAgIFtjMDAwMDAwMGY3MGNiZTMwXSBbYzAwMDAwMDAwMDAwMDliY10gLnJldF9mcm9t
+X2tlcm5lbF90aHJlYWQrMHg1OC8weDljDQo+ICAgIEluc3RydWN0aW9uIGR1bXA6DQo+ICAgIGVi
+NjFmZmQ4IGViODFmZmUwIGViYTFmZmU4IGViYzFmZmYwIGViZTFmZmY4IDRlODAwMDIwIDM4NjAw
+MDAwIDRiZmZmZmIwDQo+ICAgIDdjZTUzYjc4IDRiZmZmZjBjIDdmNjdkYjc4IDRiZmZmZjI0IDxl
+OGEzMDAyMD4gZThjMzAwMjggNGJmZmZkMzAgZmJlMWZmZjgNCj4gICAgLS0tWyBlbmQgdHJhY2Ug
+OWY2MTA4NzA2ODk5MWIwMiBdLS0tDQo+DQo+DQo+IGhvbWU6bGludXgtbmV4dCg0KShJKT4gZ2l0
+IGJpc2VjdCBsb2cNCj4gLi4uDQo+IGdpdCBiaXNlY3QgYmFkIGIxODk4MTdjZjc4OTRlMDNmZDM3
+MDBhY2Q5MjMyMjFkMzAwNzI1OWUNCj4gIyBmaXJzdCBiYWQgY29tbWl0OiBbYjE4OTgxN2NmNzg5
+NGUwM2ZkMzcwMGFjZDkyMzIyMWQzMDA3MjU5ZV0gY3J5cHRvOiBjYWFtL3FpIC0gYWRkIGFibGtj
+aXBoZXIgYW5kIGF1dGhlbmMgYWxnb3JpdGhtcw0KPg0KPg0KPiBUaGUgb29wcyBpcyBzYXlpbmcg
+Z2VuX3Bvb2xfYWxsb2MoKSB3YXMgY2FsbGVkIHdpdGggYSBOVUxMIHBvaW50ZXIsIHNvDQo+IGl0
+IHNlZW1zIHFtX2NncmFsbG9jIGlzIE5VTEw6DQo+DQo+IHN0YXRpYyBpbnQgcW1hbl9hbGxvY19y
+YW5nZShzdHJ1Y3QgZ2VuX3Bvb2wgKnAsIHUzMiAqcmVzdWx0LCB1MzIgY250KQ0KPiB7DQo+IAl1
+bnNpZ25lZCBsb25nIGFkZHI7DQo+DQo+IAlhZGRyID0gZ2VuX3Bvb2xfYWxsb2MocCwgY250KTsN
+Cj4gCS4uLg0KPg0KPiBpbnQgcW1hbl9hbGxvY19jZ3JpZF9yYW5nZSh1MzIgKnJlc3VsdCwgdTMy
+IGNvdW50KQ0KPiB7DQo+IAlyZXR1cm4gcW1hbl9hbGxvY19yYW5nZShxbV9jZ3JhbGxvYywgcmVz
+dWx0LCBjb3VudCk7DQo+IH0NCj4NCj4NCj4gSSBkaWRuJ3QgcHVsbCB0aGUgdGhyZWFkIGFueSBm
+dXJ0aGVyIHRoYW4gdGhhdC4NCj4NCj4gY2hlZXJzDQo+
