@@ -1,129 +1,94 @@
-From: Laurentiu Tudor <laurentiu.tudor@nxp.com>
-Subject: Re: [7/7] crypto: caam/qi - add ablkcipher and authenc algorithms
-Date: Tue, 4 Apr 2017 13:28:49 +0000
-Message-ID: <58E39F90.6050408@nxp.com>
-References: <20170317100602.2837-8-horia.geanta@nxp.com>
- <87vaqkvk6c.fsf@concordia.ellerman.id.au>
+From: Greg KH <greg@kroah.com>
+Subject: Re: [PATCH] padata: avoid race in reordering
+Date: Tue, 4 Apr 2017 20:26:12 +0200
+Message-ID: <20170404182612.GA3419@kroah.com>
+References: <20170323112443.30843-1-Jason@zx2c4.com>
+ <20170324141608.GA15370@gondor.apana.org.au>
+ <CAHmME9radQrAeyWmwapLGg1RYD0wVz3ysAT_p19KD0fi4q=anQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Claudiu Manoil <claudiu.manoil@nxp.com>,
-        Cristian Stoica <cristian.stoica@nxp.com>,
-        Dan Douglass <dan.douglass@nxp.com>,
-        "linux-arm-kernel@lists.infradead.org"
-        <linux-arm-kernel@lists.infradead.org>,
-        Vakul Garg <vakul.garg@nxp.com>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Alexandru Porosanu <alexandru.porosanu@nxp.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Michael Ellerman <mpe@ellerman.id.au>,
-        =?utf-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Scott Wood <oss@buserror.net>, Roy Pledge <roy.pledge@nxp.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: stable@vger.kernel.org,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ve1eur01on0080.outbound.protection.outlook.com ([104.47.1.80]:45696
-        "EHLO EUR01-VE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752461AbdDDN24 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 4 Apr 2017 09:28:56 -0400
-In-Reply-To: <87vaqkvk6c.fsf@concordia.ellerman.id.au>
-Content-Language: en-US
-Content-ID: <B97538A3D476F941ABEAD9B44B097270@eurprd04.prod.outlook.com>
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:41364 "EHLO
+        out1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1752518AbdDDS0Z (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 4 Apr 2017 14:26:25 -0400
+Content-Disposition: inline
+In-Reply-To: <CAHmME9radQrAeyWmwapLGg1RYD0wVz3ysAT_p19KD0fi4q=anQ@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-SGkgTWljaGFlbCwNCg0KSnVzdCBhIGNvdXBsZSBvZiBiYXNpYyB0aGluZ3MgdG8gY2hlY2s6DQog
-IC0gd2FzIHRoZSBkdGIgdXBkYXRlZCB0byB0aGUgbmV3ZXN0Pw0KICAtIGlzIHRoZSBxbWFuIG5v
-ZGUgcHJlc2VudD8gVGhpcyBzaG91bGQgYmUgZWFzaWx5IHZpc2libGUgaW4gDQovcHJvYy9kZXZp
-Y2UtdHJlZS9zb2NAZmZlMDAwMDAwL3FtYW5AMzE4MDAwLg0KDQotLS0NCkJlc3QgUmVnYXJkcywg
-TGF1cmVudGl1DQoNCk9uIDA0LzA0LzIwMTcgMDg6MDMgQU0sIE1pY2hhZWwgRWxsZXJtYW4gd3Jv
-dGU6DQo+IEhvcmlhIEdlYW50xIMgPGhvcmlhLmdlYW50YUBueHAuY29tPiB3cml0ZXM6DQo+DQo+
-PiBBZGQgc3VwcG9ydCB0byBzdWJtaXQgYWJsa2NpcGhlciBhbmQgYXV0aGVuYyBhbGdvcml0aG1z
-DQo+PiB2aWEgdGhlIFFJIGJhY2tlbmQ6DQo+PiAtYWJsa2NpcGhlcjoNCj4+IGNiYyh7YWVzLGRl
-cyxkZXMzX2VkZX0pDQo+PiBjdHIoYWVzKSwgcmZjMzY4NihjdHIoYWVzKSkNCj4+IHh0cyhhZXMp
-DQo+PiAtYXV0aGVuYzoNCj4+IGF1dGhlbmMoaG1hYyhtZDUpLGNiYyh7YWVzLGRlcyxkZXMzX2Vk
-ZX0pKQ0KPj4gYXV0aGVuYyhobWFjKHNoYSopLGNiYyh7YWVzLGRlcyxkZXMzX2VkZX0pKQ0KPj4N
-Cj4+IGNhYW0vcWkgYmVpbmcgYSBuZXcgZHJpdmVyLCBsZXQncyB3YWl0IHNvbWUgdGltZSB0byBz
-ZXR0bGUgZG93biB3aXRob3V0DQo+PiBpbnRlcmZlcmluZyB3aXRoIGV4aXN0aW5nIGNhYW0vanIg
-ZHJpdmVyLg0KPj4gQWNjb3JkaW5nbHksIGZvciBub3cgYWxsIGNhYW0vcWkgYWxnb3JpdGhtcyAo
-Y2FhbWFsZ19xaSBtb2R1bGUpIGFyZQ0KPj4gbWFya2VkIHRvIGJlIG9mIGxvd2VyIHByaW9yaXR5
-IHRoYW4gY2FhbS9qciBvbmVzIChjYWFtYWxnIG1vZHVsZSkuDQo+Pg0KPj4gU2lnbmVkLW9mZi1i
-eTogVmFrdWwgR2FyZyA8dmFrdWwuZ2FyZ0BueHAuY29tPg0KPj4gU2lnbmVkLW9mZi1ieTogQWxl
-eCBQb3Jvc2FudSA8YWxleGFuZHJ1LnBvcm9zYW51QG54cC5jb20+DQo+PiBTaWduZWQtb2ZmLWJ5
-OiBIb3JpYSBHZWFudMSDIDxob3JpYS5nZWFudGFAbnhwLmNvbT4NCj4+IC0tLQ0KPj4gICBkcml2
-ZXJzL2NyeXB0by9jYWFtL0tjb25maWcgICAgICAgIHwgICAyMCArLQ0KPj4gICBkcml2ZXJzL2Ny
-eXB0by9jYWFtL01ha2VmaWxlICAgICAgIHwgICAgMSArDQo+PiAgIGRyaXZlcnMvY3J5cHRvL2Nh
-YW0vY2FhbWFsZy5jICAgICAgfCAgICA5ICstDQo+PiAgIGRyaXZlcnMvY3J5cHRvL2NhYW0vY2Fh
-bWFsZ19kZXNjLmMgfCAgIDc3ICstDQo+PiAgIGRyaXZlcnMvY3J5cHRvL2NhYW0vY2FhbWFsZ19k
-ZXNjLmggfCAgIDE1ICstDQo+PiAgIGRyaXZlcnMvY3J5cHRvL2NhYW0vY2FhbWFsZ19xaS5jICAg
-fCAyMzg3ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKw0KPj4gICBkcml2ZXJz
-L2NyeXB0by9jYWFtL3NnX3N3X3FtLmggICAgIHwgIDEwOCArKw0KPj4gICA3IGZpbGVzIGNoYW5n
-ZWQsIDI2MDEgaW5zZXJ0aW9ucygrKSwgMTYgZGVsZXRpb25zKC0pDQo+PiAgIGNyZWF0ZSBtb2Rl
-IDEwMDY0NCBkcml2ZXJzL2NyeXB0by9jYWFtL2NhYW1hbGdfcWkuYw0KPj4gICBjcmVhdGUgbW9k
-ZSAxMDA2NDQgZHJpdmVycy9jcnlwdG8vY2FhbS9zZ19zd19xbS5oDQo+DQo+DQo+IFRoaXMgYXBw
-ZWFycyB0byBiZSBibG93aW5nIHVwIG15IEZyZWVzY2FsZSAoTlhQKSBQNTAyMERTIGJvYXJkOg0K
-Pg0KPiAgICBVbmFibGUgdG8gaGFuZGxlIGtlcm5lbCBwYWdpbmcgcmVxdWVzdCBmb3IgZGF0YSBh
-dCBhZGRyZXNzIDB4MDAwMDAwMjANCj4gICAgRmF1bHRpbmcgaW5zdHJ1Y3Rpb24gYWRkcmVzczog
-MHhjMDAwMDAwMDAwNDM5M2U0DQo+ICAgIE9vcHM6IEtlcm5lbCBhY2Nlc3Mgb2YgYmFkIGFyZWEs
-IHNpZzogMTEgWyMxXQ0KPiAgICBTTVAgTlJfQ1BVUz0yNA0KPiAgICBDb3JlTmV0IEdlbmVyaWMN
-Cj4gICAgTW9kdWxlcyBsaW5rZWQgaW46DQo+ICAgIENQVTogMCBQSUQ6IDEgQ29tbTogc3dhcHBl
-ci8wIE5vdCB0YWludGVkIDQuMTEuMC1yYzMtY29tcGlsZXJfZ2NjLTQuNi4zLTAwMDQ2LWdiMTg5
-ODE3Y2Y3ODkgIzUNCj4gICAgdGFzazogYzAwMDAwMDBmNzBjMDAwMCB0YXNrLnN0YWNrOiBjMDAw
-MDAwMGY3MGM4MDAwDQo+ICAgIE5JUDogYzAwMDAwMDAwMDQzOTNlNCBMUjogYzAwMDAwMDAwMDRh
-ZWJhMCBDVFI6IGMwMDAwMDAwMDA0ZmE3ZDgNCj4gICAgUkVHUzogYzAwMDAwMDBmNzBjYjE2MCBU
-UkFQOiAwMzAwICAgTm90IHRhaW50ZWQgICg0LjExLjAtcmMzLWNvbXBpbGVyX2djYy00LjYuMy0w
-MDA0Ni1nYjE4OTgxN2NmNzg5KQ0KPiAgICBNU1I6IDAwMDAwMDAwODAwMjkwMDAgPENFLEVFLE1F
-Pg0KPiAgICAgIENSOiAyNGFkYmU0OCAgWEVSOiAyMDAwMDAwMA0KPiAgICBERUFSOiAwMDAwMDAw
-MDAwMDAwMDIwIEVTUjogMDAwMDAwMDAwMDAwMDAwMCBTT0ZURTogMQ0KPiAgICBHUFIwMDogYzAw
-MDAwMDAwMDZmZWJhMCBjMDAwMDAwMGY3MGNiM2UwIGMwMDAwMDAwMDBlNjAwMDAgMDAwMDAwMDAw
-MDAwMDAwMA0KPiAgICBHUFIwNDogMDAwMDAwMDAwMDAwMDAwMSAwMDAwMDAwMDAwMDAwMDAwIGMw
-MDAwMDAwMDBlMGIyOTAgMDAwMDAwMDAwMDAwMDAwMw0KPiAgICBHUFIwODogMDAwMDAwMDAwMDAw
-MDAwNCBjMDAwMDAwMDAwZWE1MjgwIDAwMDAwMDAwMDAwMDAwMDQgMDAwMDAwMDAwMDAwMDAwNA0K
-PiAgICBHUFIxMjogMDAwMDAwMDA4OGFkYmUyMiBjMDAwMDAwMDNmZmY1MDAwIGMwMDAwMDAwMDBi
-YTM1MTggODAwMDA4MDA4ODA5MGZhOA0KPiAgICBHUFIxNjogMDAwMDAwMDAwMDAwMTAwMCBjMDAw
-MDAwMDAwYmEzNTAwIGMwMDAwMDAwZjcyYzY4ZDggMDAwMDAwMDAwMDAwMDAwNA0KPiAgICBHUFIy
-MDogYzAwMDAwMDAwMGVhNTI4MCBjMDAwMDAwMDAwYmEzNGU4IDAwMDAwMDAwMDAwMDAwMjAgMDAw
-MDAwMDAwMDAwMDAwNA0KPiAgICBHUFIyNDogYzAwMDAwMDAwMGVhYjdjMCAwMDAwMDAwMDAwMDAw
-MDAwIGMwMDAwMDAwZjdmYzg4MTggYzAwMDAwMDAwMGViMDAwMA0KPiAgICBHUFIyODogYzAwMDAw
-MDBmNzg2Y2MwMCBjMDAwMDAwMDAwZWFiNzgwIGZmZmZmZmZmZjc4NmNjMDAgYzAwMDAwMDAwMGVh
-YjdjMA0KPiAgICBOSVAgW2MwMDAwMDAwMDA0MzkzZTRdIC5nZW5fcG9vbF9hbGxvYysweDAvMHhj
-DQo+ICAgIExSIFtjMDAwMDAwMDAwNGFlYmEwXSAucW1hbl9hbGxvY19jZ3JpZF9yYW5nZSsweDI0
-LzB4NTQNCj4gICAgQ2FsbCBUcmFjZToNCj4gICAgW2MwMDAwMDAwZjcwY2IzZTBdIFtjMDAwMDAw
-MDAwNTA0MDU0XSAucGxhdGZvcm1fZGV2aWNlX3JlZ2lzdGVyX2Z1bGwrMHgxMmMvMHgxNTAgKHVu
-cmVsaWFibGUpDQo+ICAgIFtjMDAwMDAwMGY3MGNiNDYwXSBbYzAwMDAwMDAwMDZmZWJhMF0gLmNh
-YW1fcWlfaW5pdCsweDE1OC8weDYzYw0KPiAgICBbYzAwMDAwMDBmNzBjYjVmMF0gW2MwMDAwMDAw
-MDA2ZmM2NGNdIC5jYWFtX3Byb2JlKzB4OGI4LzB4MTgzMA0KPiAgICBbYzAwMDAwMDBmNzBjYjc0
-MF0gW2MwMDAwMDAwMDA1MDMyODhdIC5wbGF0Zm9ybV9kcnZfcHJvYmUrMHg2MC8weGFjDQo+ICAg
-IFtjMDAwMDAwMGY3MGNiN2MwXSBbYzAwMDAwMDAwMDUwMTE5NF0gLmRyaXZlcl9wcm9iZV9kZXZp
-Y2UrMHgyNDgvMHgzNDQNCj4gICAgW2MwMDAwMDAwZjcwY2I4NzBdIFtjMDAwMDAwMDAwNTAxM2I0
-XSAuX19kcml2ZXJfYXR0YWNoKzB4MTI0LzB4MTI4DQo+ICAgIFtjMDAwMDAwMGY3MGNiOTAwXSBb
-YzAwMDAwMDAwMDRmZWQ5MF0gLmJ1c19mb3JfZWFjaF9kZXYrMHg4MC8weGNjDQo+ICAgIFtjMDAw
-MDAwMGY3MGNiOWEwXSBbYzAwMDAwMDAwMDUwMDg1OF0gLmRyaXZlcl9hdHRhY2grMHgyNC8weDM4
-DQo+ICAgIFtjMDAwMDAwMGY3MGNiYTEwXSBbYzAwMDAwMDAwMDUwMDQzY10gLmJ1c19hZGRfZHJp
-dmVyKzB4MTRjLzB4MjljDQo+ICAgIFtjMDAwMDAwMGY3MGNiYWIwXSBbYzAwMDAwMDAwMDUwMWQ2
-NF0gLmRyaXZlcl9yZWdpc3RlcisweDhjLzB4MTU0DQo+ICAgIFtjMDAwMDAwMGY3MGNiYjMwXSBb
-YzAwMDAwMDAwMDUwMzAwMF0gLl9fcGxhdGZvcm1fZHJpdmVyX3JlZ2lzdGVyKzB4NDgvMHg1Yw0K
-PiAgICBbYzAwMDAwMDBmNzBjYmJhMF0gW2MwMDAwMDAwMDBjN2Y3OThdIC5jYWFtX2RyaXZlcl9p
-bml0KzB4MWMvMHgzMA0KPiAgICBbYzAwMDAwMDBmNzBjYmMxMF0gW2MwMDAwMDAwMDAwMDE5MDRd
-IC5kb19vbmVfaW5pdGNhbGwrMHg2MC8weDFhOA0KPiAgICBbYzAwMDAwMDBmNzBjYmNmMF0gW2Mw
-MDAwMDAwMDBjMzVmMzBdIC5rZXJuZWxfaW5pdF9mcmVlYWJsZSsweDI0OC8weDMzNA0KPiAgICBb
-YzAwMDAwMDBmNzBjYmRiMF0gW2MwMDAwMDAwMDAwMDIwZmNdIC5rZXJuZWxfaW5pdCsweDFjLzB4
-ZjIwDQo+ICAgIFtjMDAwMDAwMGY3MGNiZTMwXSBbYzAwMDAwMDAwMDAwMDliY10gLnJldF9mcm9t
-X2tlcm5lbF90aHJlYWQrMHg1OC8weDljDQo+ICAgIEluc3RydWN0aW9uIGR1bXA6DQo+ICAgIGVi
-NjFmZmQ4IGViODFmZmUwIGViYTFmZmU4IGViYzFmZmYwIGViZTFmZmY4IDRlODAwMDIwIDM4NjAw
-MDAwIDRiZmZmZmIwDQo+ICAgIDdjZTUzYjc4IDRiZmZmZjBjIDdmNjdkYjc4IDRiZmZmZjI0IDxl
-OGEzMDAyMD4gZThjMzAwMjggNGJmZmZkMzAgZmJlMWZmZjgNCj4gICAgLS0tWyBlbmQgdHJhY2Ug
-OWY2MTA4NzA2ODk5MWIwMiBdLS0tDQo+DQo+DQo+IGhvbWU6bGludXgtbmV4dCg0KShJKT4gZ2l0
-IGJpc2VjdCBsb2cNCj4gLi4uDQo+IGdpdCBiaXNlY3QgYmFkIGIxODk4MTdjZjc4OTRlMDNmZDM3
-MDBhY2Q5MjMyMjFkMzAwNzI1OWUNCj4gIyBmaXJzdCBiYWQgY29tbWl0OiBbYjE4OTgxN2NmNzg5
-NGUwM2ZkMzcwMGFjZDkyMzIyMWQzMDA3MjU5ZV0gY3J5cHRvOiBjYWFtL3FpIC0gYWRkIGFibGtj
-aXBoZXIgYW5kIGF1dGhlbmMgYWxnb3JpdGhtcw0KPg0KPg0KPiBUaGUgb29wcyBpcyBzYXlpbmcg
-Z2VuX3Bvb2xfYWxsb2MoKSB3YXMgY2FsbGVkIHdpdGggYSBOVUxMIHBvaW50ZXIsIHNvDQo+IGl0
-IHNlZW1zIHFtX2NncmFsbG9jIGlzIE5VTEw6DQo+DQo+IHN0YXRpYyBpbnQgcW1hbl9hbGxvY19y
-YW5nZShzdHJ1Y3QgZ2VuX3Bvb2wgKnAsIHUzMiAqcmVzdWx0LCB1MzIgY250KQ0KPiB7DQo+IAl1
-bnNpZ25lZCBsb25nIGFkZHI7DQo+DQo+IAlhZGRyID0gZ2VuX3Bvb2xfYWxsb2MocCwgY250KTsN
-Cj4gCS4uLg0KPg0KPiBpbnQgcW1hbl9hbGxvY19jZ3JpZF9yYW5nZSh1MzIgKnJlc3VsdCwgdTMy
-IGNvdW50KQ0KPiB7DQo+IAlyZXR1cm4gcW1hbl9hbGxvY19yYW5nZShxbV9jZ3JhbGxvYywgcmVz
-dWx0LCBjb3VudCk7DQo+IH0NCj4NCj4NCj4gSSBkaWRuJ3QgcHVsbCB0aGUgdGhyZWFkIGFueSBm
-dXJ0aGVyIHRoYW4gdGhhdC4NCj4NCj4gY2hlZXJzDQo+
+On Tue, Apr 04, 2017 at 01:53:15PM +0200, Jason A. Donenfeld wrote:
+> Herbert applied this to his tree. It's probably a good stable
+> candidate, since it's a two line change to fix a race condition.
+> 
+> On Fri, Mar 24, 2017 at 3:16 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> > Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> >> Under extremely heavy uses of padata, crashes occur, and with list
+> >> debugging turned on, this happens instead:
+> >>
+> >> [87487.298728] WARNING: CPU: 1 PID: 882 at lib/list_debug.c:33
+> >> __list_add+0xae/0x130
+> >> [87487.301868] list_add corruption. prev->next should be next
+> >> (ffffb17abfc043d0), but was ffff8dba70872c80. (prev=ffff8dba70872b00).
+> >> [87487.339011]  [<ffffffff9a53d075>] dump_stack+0x68/0xa3
+> >> [87487.342198]  [<ffffffff99e119a1>] ? console_unlock+0x281/0x6d0
+> >> [87487.345364]  [<ffffffff99d6b91f>] __warn+0xff/0x140
+> >> [87487.348513]  [<ffffffff99d6b9aa>] warn_slowpath_fmt+0x4a/0x50
+> >> [87487.351659]  [<ffffffff9a58b5de>] __list_add+0xae/0x130
+> >> [87487.354772]  [<ffffffff9add5094>] ? _raw_spin_lock+0x64/0x70
+> >> [87487.357915]  [<ffffffff99eefd66>] padata_reorder+0x1e6/0x420
+> >> [87487.361084]  [<ffffffff99ef0055>] padata_do_serial+0xa5/0x120
+> >>
+> >> padata_reorder calls list_add_tail with the list to which its adding
+> >> locked, which seems correct:
+> >>
+> >> spin_lock(&squeue->serial.lock);
+> >> list_add_tail(&padata->list, &squeue->serial.list);
+> >> spin_unlock(&squeue->serial.lock);
+> >>
+> >> This therefore leaves only place where such inconsistency could occur:
+> >> if padata->list is added at the same time on two different threads.
+> >> This pdata pointer comes from the function call to
+> >> padata_get_next(pd), which has in it the following block:
+> >>
+> >> next_queue = per_cpu_ptr(pd->pqueue, cpu);
+> >> padata = NULL;
+> >> reorder = &next_queue->reorder;
+> >> if (!list_empty(&reorder->list)) {
+> >>       padata = list_entry(reorder->list.next,
+> >>                           struct padata_priv, list);
+> >>       spin_lock(&reorder->lock);
+> >>       list_del_init(&padata->list);
+> >>       atomic_dec(&pd->reorder_objects);
+> >>       spin_unlock(&reorder->lock);
+> >>
+> >>       pd->processed++;
+> >>
+> >>       goto out;
+> >> }
+> >> out:
+> >> return padata;
+> >>
+> >> I strongly suspect that the problem here is that two threads can race
+> >> on reorder list. Even though the deletion is locked, call to
+> >> list_entry is not locked, which means it's feasible that two threads
+> >> pick up the same padata object and subsequently call list_add_tail on
+> >> them at the same time. The fix is thus be hoist that lock outside of
+> >> that block.
+> >>
+> >> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> >
+> > Patch applied.  Thanks.
+
+Any clue as to what the git commit id is?
+
+thanks,
+
+greg k-h
