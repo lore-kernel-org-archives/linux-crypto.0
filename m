@@ -1,9 +1,8 @@
 From: Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: [PATCH 1/5] crypto/nx: Rename nx842_powernv_function as icswx
- function
-Date: Tue, 04 Apr 2017 21:11:51 +1000
-Message-ID: <87inmkv348.fsf@concordia.ellerman.id.au>
-References: <1491065941.29552.26.camel@hbabu-laptop>
+Subject: Re: [PATCH 3/5] crypto/nx: Create nx842_delete_coproc function
+Date: Tue, 04 Apr 2017 21:13:23 +1000
+Message-ID: <87d1csv31o.fsf@concordia.ellerman.id.au>
+References: <1491066046.29552.28.camel@hbabu-laptop>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: mikey@neuling.org, suka@us.ibm.com, linux-crypto@vger.kernel.org,
@@ -11,7 +10,7 @@ Cc: mikey@neuling.org, suka@us.ibm.com, linux-crypto@vger.kernel.org,
 To: Haren Myneni <haren@linux.vnet.ibm.com>, herbert@gondor.apana.org.au,
  ddstreet@ieee.org
 Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
-In-Reply-To: <1491065941.29552.26.camel@hbabu-laptop>
+In-Reply-To: <1491066046.29552.28.camel@hbabu-laptop>
 List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
  <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
 List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
@@ -26,19 +25,12 @@ List-Id: linux-crypto.vger.kernel.org
 
 Haren Myneni <haren@linux.vnet.ibm.com> writes:
 
-> [PATCH 1/5] crypto/nx: Rename nx842_powernv_function as icswx function
+> [PATCH 3/5] crypto/nx: Create nx842_delete_coproc function
 >
-> nx842_powernv_function is points to nx842_icswx_function and
-> will be point to VAS function which will be added later for
-> P9 NX support.
+> Move deleting coprocessor info upon exit or failure to
+> nx842_delete_coproc().
 
-I know it's nit-picking but can you give it a better name while you're
-there.
-
-I was thinking it should be called "send" or something, but it actually
-synchronously sends and waits for a request.
-
-So perhaps just nx842_exec(), for "execute a request", and then you can
-have nx842_exec_icswx() and nx842_exec_vas().
+Naming again, this deletes *all* the coprocs, so the name should be
+plural.
 
 cheers
