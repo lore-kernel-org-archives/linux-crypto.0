@@ -1,52 +1,53 @@
-From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH] crypto: caam - fix RNG deinstantiation error checking
-Date: Wed, 5 Apr 2017 11:41:03 +0300
-Message-ID: <20170405084103.19053-1-horia.geanta@nxp.com>
+From: Michael Ellerman <mpe@ellerman.id.au>
+Subject: Re: [7/7] crypto: caam/qi - add ablkcipher and authenc algorithms
+Date: Wed, 05 Apr 2017 20:06:50 +1000
+Message-ID: <87lgrftbgl.fsf@concordia.ellerman.id.au>
+References: <20170317100602.2837-8-horia.geanta@nxp.com> <87vaqkvk6c.fsf@concordia.ellerman.id.au> <58E39F90.6050408@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-        <linux-crypto@vger.kernel.org>,
+Content-Type: text/plain
+Cc: Claudiu Manoil <claudiu.manoil@nxp.com>,
+        Cristian Stoica <cristian.stoica@nxp.com>,
         Dan Douglass <dan.douglass@nxp.com>,
-        Alexandru Porosanu <alexandru.porosanu@nxp.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+        "linux-arm-kernel\@lists.infradead.org"
+        <linux-arm-kernel@lists.infradead.org>,
+        Vakul Garg <vakul.garg@nxp.com>,
+        "linuxppc-dev\@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Alexandru Porosanu <alexandru.porosanu@nxp.com>,
+        "linux-crypto\@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Laurentiu Tudor <laurentiu.tudor@nxp.com>,
+        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Scott Wood <oss@buserror.net>, Roy Pledge <roy.pledge@nxp.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2nam02on0062.outbound.protection.outlook.com ([104.47.38.62]:57103
-        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753993AbdDEIl2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 5 Apr 2017 04:41:28 -0400
+Received: from ozlabs.org ([103.22.144.67]:47019 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1755214AbdDEKHC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 5 Apr 2017 06:07:02 -0400
+In-Reply-To: <58E39F90.6050408@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-RNG instantiation was previously fixed by
-commit 62743a4145bb9 ("crypto: caam - fix RNG init descriptor ret. code checking")
-while deinstantiation was not addressed.
+Laurentiu Tudor <laurentiu.tudor@nxp.com> writes:
 
-Since the descriptors used are similar, in the sense that they both end
-with a JUMP HALT command, checking for errors should be similar too,
-i.e. status code 7000_0000h should be considered successful.
+> Hi Michael,
+>
+> Just a couple of basic things to check:
+>   - was the dtb updated to the newest?
 
-Cc: <stable@vger.kernel.org> # 3.13+
-Fixes: 1005bccd7a4a6 ("crypto: caam - enable instantiation of all RNG4 state handles")
-Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
----
- drivers/crypto/caam/ctrl.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Possibly not, it's an automated build/boot, I'll have to check what it
+does with the dtb.
 
-diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index b3a94d5eff26..b7a36af5008d 100644
---- a/drivers/crypto/caam/ctrl.c
-+++ b/drivers/crypto/caam/ctrl.c
-@@ -285,7 +285,8 @@ static int deinstantiate_rng(struct device *ctrldev, int state_handle_mask)
- 			/* Try to run it through DECO0 */
- 			ret = run_descriptor_deco0(ctrldev, desc, &status);
- 
--			if (ret || status) {
-+			if (ret ||
-+			    (status && status != JRSTA_SSRC_JUMP_HALT_CC)) {
- 				dev_err(ctrldev,
- 					"Failed to deinstantiate RNG4 SH%d\n",
- 					sh_idx);
--- 
-2.12.0.264.gd6db3f216544
+>   - is the qman node present? This should be easily visible in 
+> /proc/device-tree/soc@ffe000000/qman@318000.
+
+No it's not there.
+
+That's running linux-next with:
+
+CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API_QI=n
+
+
+Does that mean I didn't update the device tree?
+
+cheers
