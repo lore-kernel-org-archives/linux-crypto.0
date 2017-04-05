@@ -1,123 +1,127 @@
 From: Rick Altherr <raltherr@google.com>
-Subject: [PATCH v2 1/3] hw_random: Migrate timeriomem_rng to new API
-Date: Wed,  5 Apr 2017 16:20:58 -0700
-Message-ID: <20170405232100.2023-2-raltherr@google.com>
+Subject: [PATCH v2 2/3] hw_random: timeriomem_rng: Shorten verbose type and variable names
+Date: Wed,  5 Apr 2017 16:20:59 -0700
+Message-ID: <20170405232100.2023-3-raltherr@google.com>
 References: <20170405232100.2023-1-raltherr@google.com>
 Cc: openbmc@lists.ozlabs.org, Herbert Xu <herbert@gondor.apana.org.au>,
         Matt Mackall <mpm@selenic.com>, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org
 To: alex@digriz.org.uk
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pg0-f43.google.com ([74.125.83.43]:36806 "EHLO
+        mail-pg0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752304AbdDEXVI (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 5 Apr 2017 19:21:08 -0400
+Received: by mail-pg0-f43.google.com with SMTP id g2so17988981pge.3
+        for <linux-crypto@vger.kernel.org>; Wed, 05 Apr 2017 16:21:08 -0700 (PDT)
 In-Reply-To: <20170405232100.2023-1-raltherr@google.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Preserves the existing behavior of only returning 32-bits per call.
+No functional changes.
 
 Signed-off-by: Rick Altherr <raltherr@google.com>
 ---
 
 Changes in v2:
-- Split API migration into separate patch
+- Split type and variable renames into separate patch
 
- drivers/char/hw_random/timeriomem-rng.c | 60 ++++++++++++++++-----------------
- 1 file changed, 30 insertions(+), 30 deletions(-)
+ drivers/char/hw_random/timeriomem-rng.c | 27 +++++++++++++--------------
+ 1 file changed, 13 insertions(+), 14 deletions(-)
 
 diff --git a/drivers/char/hw_random/timeriomem-rng.c b/drivers/char/hw_random/timeriomem-rng.c
-index cf37db263ecd..17574452fd35 100644
+index 17574452fd35..024bdff7999f 100644
 --- a/drivers/char/hw_random/timeriomem-rng.c
 +++ b/drivers/char/hw_random/timeriomem-rng.c
-@@ -20,18 +20,16 @@
-  * TODO: add support for reading sizes other than 32bits and masking
-  */
- 
--#include <linux/module.h>
--#include <linux/kernel.h>
--#include <linux/platform_device.h>
--#include <linux/of.h>
-+#include <linux/completion.h>
- #include <linux/hw_random.h>
- #include <linux/io.h>
-+#include <linux/jiffies.h>
-+#include <linux/module.h>
-+#include <linux/of.h>
-+#include <linux/platform_device.h>
- #include <linux/slab.h>
+@@ -31,7 +31,7 @@
  #include <linux/timeriomem-rng.h>
--#include <linux/jiffies.h>
--#include <linux/sched.h>
  #include <linux/timer.h>
--#include <linux/completion.h>
  
- struct timeriomem_rng_private_data {
+-struct timeriomem_rng_private_data {
++struct timeriomem_rng_private {
  	void __iomem		*io_base;
-@@ -45,32 +43,36 @@ struct timeriomem_rng_private_data {
- 	struct hwrng		timeriomem_rng_ops;
+ 	unsigned int		expires;
+ 	unsigned int		period;
+@@ -40,15 +40,14 @@ struct timeriomem_rng_private_data {
+ 	struct timer_list	timer;
+ 	struct completion	completion;
+ 
+-	struct hwrng		timeriomem_rng_ops;
++	struct hwrng		rng_ops;
  };
  
--#define to_rng_priv(rng) \
--		((struct timeriomem_rng_private_data *)rng->priv)
--
--/*
-- * have data return 1, however return 0 if we have nothing
-- */
--static int timeriomem_rng_data_present(struct hwrng *rng, int wait)
-+static int timeriomem_rng_read(struct hwrng *hwrng, void *data,
-+				size_t max, bool wait)
+ static int timeriomem_rng_read(struct hwrng *hwrng, void *data,
+ 				size_t max, bool wait)
  {
--	struct timeriomem_rng_private_data *priv = to_rng_priv(rng);
-+	struct timeriomem_rng_private_data *priv =
-+		container_of(hwrng, struct timeriomem_rng_private_data,
-+				timeriomem_rng_ops);
-+	unsigned long cur;
-+	s32 delay;
+-	struct timeriomem_rng_private_data *priv =
+-		container_of(hwrng, struct timeriomem_rng_private_data,
+-				timeriomem_rng_ops);
++	struct timeriomem_rng_private *priv =
++		container_of(hwrng, struct timeriomem_rng_private, rng_ops);
+ 	unsigned long cur;
+ 	s32 delay;
  
--	if (!wait || priv->present)
--		return priv->present;
-+	/* The RNG provides 32-bit per read.  Ensure there is enough space. */
-+	if (max < sizeof(u32))
-+		return 0;
+@@ -89,8 +88,8 @@ static int timeriomem_rng_read(struct hwrng *hwrng, void *data,
  
--	wait_for_completion(&priv->completion);
-+	/*
-+	 * There may not have been enough time for new data to be generated
-+	 * since the last request.  If the caller doesn't want to wait, let them
-+	 * bail out.  Otherwise, wait for the completion.  If the new data has
-+	 * already been generated, the completion should already be available.
-+	 */
-+	if (!wait && !priv->present)
-+		return 0;
+ static void timeriomem_rng_trigger(unsigned long data)
+ {
+-	struct timeriomem_rng_private_data *priv
+-			= (struct timeriomem_rng_private_data *)data;
++	struct timeriomem_rng_private *priv
++			= (struct timeriomem_rng_private *)data;
  
--	return 1;
--}
--
--static int timeriomem_rng_data_read(struct hwrng *rng, u32 *data)
--{
--	struct timeriomem_rng_private_data *priv = to_rng_priv(rng);
--	unsigned long cur;
--	s32 delay;
-+	wait_for_completion(&priv->completion);
+ 	priv->present = 1;
+ 	complete(&priv->completion);
+@@ -99,7 +98,7 @@ static void timeriomem_rng_trigger(unsigned long data)
+ static int timeriomem_rng_probe(struct platform_device *pdev)
+ {
+ 	struct timeriomem_rng_data *pdata = pdev->dev.platform_data;
+-	struct timeriomem_rng_private_data *priv;
++	struct timeriomem_rng_private *priv;
+ 	struct resource *res;
+ 	int err = 0;
+ 	int period;
+@@ -121,7 +120,7 @@ static int timeriomem_rng_probe(struct platform_device *pdev)
  
--	*data = readl(priv->io_base);
-+	*(u32 *)data = readl(priv->io_base);
+ 	/* Allocate memory for the device structure (and zero it) */
+ 	priv = devm_kzalloc(&pdev->dev,
+-			sizeof(struct timeriomem_rng_private_data), GFP_KERNEL);
++			sizeof(struct timeriomem_rng_private), GFP_KERNEL);
+ 	if (!priv)
+ 		return -ENOMEM;
  
-+	/*
-+	 * Block any new callers until the RNG has had time to generate new
-+	 * data.
-+	 */
- 	cur = jiffies;
+@@ -155,8 +154,8 @@ static int timeriomem_rng_probe(struct platform_device *pdev)
  
- 	delay = cur - priv->expires;
-@@ -154,9 +156,7 @@ static int timeriomem_rng_probe(struct platform_device *pdev)
  	setup_timer(&priv->timer, timeriomem_rng_trigger, (unsigned long)priv);
  
- 	priv->timeriomem_rng_ops.name		= dev_name(&pdev->dev);
--	priv->timeriomem_rng_ops.data_present	= timeriomem_rng_data_present;
--	priv->timeriomem_rng_ops.data_read	= timeriomem_rng_data_read;
--	priv->timeriomem_rng_ops.priv		= (unsigned long)priv;
-+	priv->timeriomem_rng_ops.read		= timeriomem_rng_read;
+-	priv->timeriomem_rng_ops.name		= dev_name(&pdev->dev);
+-	priv->timeriomem_rng_ops.read		= timeriomem_rng_read;
++	priv->rng_ops.name = dev_name(&pdev->dev);
++	priv->rng_ops.read = timeriomem_rng_read;
  
  	priv->io_base = devm_ioremap_resource(&pdev->dev, res);
  	if (IS_ERR(priv->io_base)) {
+@@ -164,7 +163,7 @@ static int timeriomem_rng_probe(struct platform_device *pdev)
+ 		goto out_timer;
+ 	}
+ 
+-	err = hwrng_register(&priv->timeriomem_rng_ops);
++	err = hwrng_register(&priv->rng_ops);
+ 	if (err) {
+ 		dev_err(&pdev->dev, "problem registering\n");
+ 		goto out_timer;
+@@ -182,9 +181,9 @@ static int timeriomem_rng_probe(struct platform_device *pdev)
+ 
+ static int timeriomem_rng_remove(struct platform_device *pdev)
+ {
+-	struct timeriomem_rng_private_data *priv = platform_get_drvdata(pdev);
++	struct timeriomem_rng_private *priv = platform_get_drvdata(pdev);
+ 
+-	hwrng_unregister(&priv->timeriomem_rng_ops);
++	hwrng_unregister(&priv->rng_ops);
+ 
+ 	del_timer_sync(&priv->timer);
+ 
 -- 
 2.12.2.715.g7642488e1d-goog
