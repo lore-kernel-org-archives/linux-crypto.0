@@ -1,70 +1,88 @@
-From: Michael Davidson <md@google.com>
-Subject: Re: [PATCH 2/7] Makefile, x86, LLVM: disable unsupported optimization flags
-Date: Wed, 5 Apr 2017 12:11:17 -0700
-Message-ID: <CA+=D-XVbZfgaQ+ZrjctAF5Ek3kaF3XqTLsSu==hK9savDztKsw@mail.gmail.com>
-References: <20170317001520.85223-1-md@google.com> <20170317001520.85223-3-md@google.com>
- <CAK7LNAR2efi4e3-st-hP3T7v=Hkb81beKibgYeKzxs3Q3kP0uA@mail.gmail.com> <20170405190130.GD145051@google.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH v2] crypto: arm64/sha: Add constant operand modifier to ASM_EXPORT
+Date: Wed, 5 Apr 2017 20:21:59 +0100
+Message-ID: <CAKv+Gu8aXQb2LueqQg7L2794bujH-OyEJ+EsQitr3oybTJMUmA@mail.gmail.com>
+References: <20170405183458.193068-1-mka@chromium.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>,
-        Michal Marek <mmarek@suse.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Shaohua Li <shli@kernel.org>,
-        Alexander Potapenko <glider@google.com>,
-        Dmitry Vyukov <dvyukov@google.com>, X86 ML <x86@kernel.org>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-crypto@vger.kernel.org, linux-raid@vger.kernel.org
-To: Matthias Kaehlcke <mka@chromium.org>
-Return-path: <linux-kbuild-owner@vger.kernel.org>
-In-Reply-To: <20170405190130.GD145051@google.com>
-Sender: linux-kbuild-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: Greg Hackmann <ghackmann@google.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org"
+        <linux-arm-kernel@lists.infradead.org>,
+        Grant Grundler <grundler@chromium.org>,
+        Michael Davidson <md@google.com>
+To: Matthias Kaehlcke <mka@chromium.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-io0-f169.google.com ([209.85.223.169]:35231 "EHLO
+        mail-io0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755396AbdDETWA (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 5 Apr 2017 15:22:00 -0400
+Received: by mail-io0-f169.google.com with SMTP id z13so16479631iof.2
+        for <linux-crypto@vger.kernel.org>; Wed, 05 Apr 2017 12:22:00 -0700 (PDT)
+In-Reply-To: <20170405183458.193068-1-mka@chromium.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-It "works" for the cases that I currently care about but I have to say
-that I am uneasy about adding -Werror to the cc-option test in this
-way.
+On 5 April 2017 at 19:34, Matthias Kaehlcke <mka@chromium.org> wrote:
+> The operand is an integer constant, make the constness explicit by
+> adding the modifier. This is needed for clang to generate valid code
+> and also works with gcc.
+>
+> Also change the constraint of the operand from 'I' ("Integer constant
+> that is valid as an immediate operand in an ADD instruction", AArch64)
+> to 'i' ("An immediate integer operand").
+>
+> Based-on-patch-from: Greg Hackmann <ghackmann@google.com>
+> Signed-off-by: Greg Hackmann <ghackmann@google.com>
+> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
 
-Suppose that one of the *other* flags that is implicitly passed to the
-compiler by cc-option - eg something that was explicitly specified in
-$(KBUILD_CFLAGS) - triggers a warning. In that case all calls to
-cc-option will silently fail because of the -Werror and valid options
-will not be detected correctly.
+Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-If everyone is OK with that because "it shouldn't normally ever
-happen" then that is fine, but if does result in a subtle change from
-existing behavior (and a trap that I almost immediately fell into
-after applying a similar patch).
+Herbert, could you please pick this up?
 
-On Wed, Apr 5, 2017 at 12:01 PM, Matthias Kaehlcke <mka@chromium.org> wrote:
-> Hi Masahiro,
+> ---
+> Changes in v2:
+> - Changed operand constraint from I to i
+> - Updated commit message
+> - Changed 'From' tag to 'Based-on-patch-from'
 >
-> El Thu, Apr 06, 2017 at 03:08:26AM +0900 Masahiro Yamada ha dit:
+>  arch/arm64/crypto/sha1-ce-glue.c | 2 +-
+>  arch/arm64/crypto/sha2-ce-glue.c | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 >
->> 2017-03-17 9:15 GMT+09:00 Michael Davidson <md@google.com>:
->> > Unfortunately, while clang generates a warning about these flags
->> > being unsupported it still exits with a status of 0 so we have
->> > to explicitly disable them instead of just using a cc-option check.
->> >
->> > Signed-off-by: Michael Davidson <md@google.com>
->>
->>
->> Instead, does the following work for you?
->> https://patchwork.kernel.org/patch/9657285/
+> diff --git a/arch/arm64/crypto/sha1-ce-glue.c b/arch/arm64/crypto/sha1-ce-glue.c
+> index aefda9868627..6b520e3f3ab1 100644
+> --- a/arch/arm64/crypto/sha1-ce-glue.c
+> +++ b/arch/arm64/crypto/sha1-ce-glue.c
+> @@ -18,7 +18,7 @@
+>  #include <linux/module.h>
 >
-> Thanks for the pointer, I was about to give this change (or rather its
-> ancestor) a rework myself :)
+>  #define ASM_EXPORT(sym, val) \
+> -       asm(".globl " #sym "; .set " #sym ", %0" :: "I"(val));
+> +       asm(".globl " #sym "; .set " #sym ", %c0" :: "i"(val));
 >
->> You need to use
->> $(call cc-option, ...)
->> for -falign-jumps=1 and -falign-loops=1
+>  MODULE_DESCRIPTION("SHA1 secure hash using ARMv8 Crypto Extensions");
+>  MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
+> diff --git a/arch/arm64/crypto/sha2-ce-glue.c b/arch/arm64/crypto/sha2-ce-glue.c
+> index 7cd587564a41..e3abe11de48c 100644
+> --- a/arch/arm64/crypto/sha2-ce-glue.c
+> +++ b/arch/arm64/crypto/sha2-ce-glue.c
+> @@ -18,7 +18,7 @@
+>  #include <linux/module.h>
 >
-> I can confirm that this works.
+>  #define ASM_EXPORT(sym, val) \
+> -       asm(".globl " #sym "; .set " #sym ", %0" :: "I"(val));
+> +       asm(".globl " #sym "; .set " #sym ", %c0" :: "i"(val));
 >
-> Thanks
+>  MODULE_DESCRIPTION("SHA-224/SHA-256 secure hash using ARMv8 Crypto Extensions");
+>  MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
+> --
+> 2.12.2.715.g7642488e1d-goog
 >
-> Matthias
