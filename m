@@ -1,63 +1,59 @@
-From: Haren Myneni <haren@linux.vnet.ibm.com>
-Subject: Re: [PATCH 1/5] crypto/nx: Rename nx842_powernv_function as icswx
- function
-Date: Tue, 04 Apr 2017 20:32:05 -0700
-Message-ID: <58E46535.5080108@linux.vnet.ibm.com>
-References: <1491065941.29552.26.camel@hbabu-laptop> <87inmkv348.fsf@concordia.ellerman.id.au>
+From: Eric Biggers <ebiggers3@gmail.com>
+Subject: Re: [PATCH v5 0/4] gf128mul refactoring
+Date: Tue, 4 Apr 2017 21:13:51 -0700
+Message-ID: <20170405041351.GA4761@zzz>
+References: <20170402191916.9309-1-omosnacek@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, ddstreet@ieee.org,
-        linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
-        benh@kernel.crashing.org, mikey@neuling.org, suka@us.ibm.com,
-        hbabu@us.ibm.com
-To: Michael Ellerman <mpe@ellerman.id.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@google.com>,
+        Jeffrey Walton <noloader@gmail.com>,
+        Milan Broz <gmazyland@gmail.com>
+To: Ondrej Mosnacek <omosnacek@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59877 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1752348AbdDEDcU (ORCPT
+Received: from mail-pf0-f195.google.com ([209.85.192.195]:33202 "EHLO
+        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750712AbdDEENy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 4 Apr 2017 23:32:20 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id v353T8k0004138
-        for <linux-crypto@vger.kernel.org>; Tue, 4 Apr 2017 23:32:19 -0400
-Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 29mbv3amnk-1
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Tue, 04 Apr 2017 23:32:19 -0400
-Received: from localhost
-        by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-crypto@vger.kernel.org> from <haren@linux.vnet.ibm.com>;
-        Tue, 4 Apr 2017 21:32:18 -0600
-In-Reply-To: <87inmkv348.fsf@concordia.ellerman.id.au>
+        Wed, 5 Apr 2017 00:13:54 -0400
+Received: by mail-pf0-f195.google.com with SMTP id 197so335721pfv.0
+        for <linux-crypto@vger.kernel.org>; Tue, 04 Apr 2017 21:13:54 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <20170402191916.9309-1-omosnacek@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 04/04/2017 04:11 AM, Michael Ellerman wrote:
-> Haren Myneni <haren@linux.vnet.ibm.com> writes:
-> 
->> [PATCH 1/5] crypto/nx: Rename nx842_powernv_function as icswx function
->>
->> nx842_powernv_function is points to nx842_icswx_function and
->> will be point to VAS function which will be added later for
->> P9 NX support.
-> 
-> I know it's nit-picking but can you give it a better name while you're
-> there.
-> 
-> I was thinking it should be called "send" or something, but it actually
-> synchronously sends and waits for a request.
-> 
-> So perhaps just nx842_exec(), for "execute a request", and then you can
-> have nx842_exec_icswx() and nx842_exec_vas().
-> 
-> cheers
-> 
+Hi Ondrej,
 
-Michael, 
+On Sun, Apr 02, 2017 at 09:19:12PM +0200, Ondrej Mosnacek wrote:
+> This patchset contains the following gf128mul-related changes:
+>   1. The gf128mul_x_* functions are moved to gf128mul.h for performance reasons.
+>   2. The gf128mul_x_ble function is fixed to use the correct block type.
+>   3. The le128_gf128mul_x_ble function from glue_helper.h is removed and its
+>      usages replaced with gf128mul_x_ble calls.
+>   4. The now obsolete dependency of CRYPTO_XTS on CRYPTO_GF128MUL is removed.
+> 
+> v4 -> v5: added the other three patches
+> v3 -> v4: a faster version of gf128mul_x_lle
+> v2 -> v3: constant-time implementation
+> v1 -> v2: move all _x_ functions to the header, not just gf128mul_x_ble
+> 
+> Ondrej Mosnacek (4):
+>   crypto: gf128mul - define gf128mul_x_* in gf128mul.h
+>   crypto: gf128mul - switch gf128mul_x_ble to le128
+>   crypto: glue_helper - remove the le128_gf128mul_x_ble function
+>   crypto: xts - drop gf128mul dependency
 
-Thanks for review,
+These all look good to me, and you can add
 
-nx842_powernv_function() was used before, So just renamed similar to this name. But I will make changes in the next version.
+	Reviewed-by: Eric Biggers <ebiggers@google.com>
 
-Haren 
+to the patches.
+
+I think the change to le128 is an improvement, but what I've actually wanted to
+do is have the GF(2^128) elements strongly typed, with ble128, bbe128, and
+lle128 types, so that the types would reflect both the bit order and the byte
+order.  But that's harder to do and I ran into some issues when I tried it last.
+
+- Eric
