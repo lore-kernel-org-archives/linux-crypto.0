@@ -1,53 +1,34 @@
-From: Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: [7/7] crypto: caam/qi - add ablkcipher and authenc algorithms
-Date: Wed, 05 Apr 2017 20:06:50 +1000
-Message-ID: <87lgrftbgl.fsf@concordia.ellerman.id.au>
-References: <20170317100602.2837-8-horia.geanta@nxp.com> <87vaqkvk6c.fsf@concordia.ellerman.id.au> <58E39F90.6050408@nxp.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] padata: avoid race in reordering
+Date: Wed, 5 Apr 2017 18:29:28 +0800
+Message-ID: <20170405102928.GB24802@gondor.apana.org.au>
+References: <20170323112443.30843-1-Jason@zx2c4.com>
+ <20170324141608.GA15370@gondor.apana.org.au>
+ <CAHmME9radQrAeyWmwapLGg1RYD0wVz3ysAT_p19KD0fi4q=anQ@mail.gmail.com>
+ <20170404182612.GA3419@kroah.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Claudiu Manoil <claudiu.manoil@nxp.com>,
-        Cristian Stoica <cristian.stoica@nxp.com>,
-        Dan Douglass <dan.douglass@nxp.com>,
-        "linux-arm-kernel\@lists.infradead.org"
-        <linux-arm-kernel@lists.infradead.org>,
-        Vakul Garg <vakul.garg@nxp.com>,
-        "linuxppc-dev\@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Alexandru Porosanu <alexandru.porosanu@nxp.com>,
-        "linux-crypto\@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Laurentiu Tudor <laurentiu.tudor@nxp.com>,
-        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Scott Wood <oss@buserror.net>, Roy Pledge <roy.pledge@nxp.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ozlabs.org ([103.22.144.67]:47019 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755214AbdDEKHC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 5 Apr 2017 06:07:02 -0400
-In-Reply-To: <58E39F90.6050408@nxp.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>, stable@vger.kernel.org,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+To: Greg KH <greg@kroah.com>
+Return-path: <stable-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20170404182612.GA3419@kroah.com>
+Sender: stable-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Laurentiu Tudor <laurentiu.tudor@nxp.com> writes:
+On Tue, Apr 04, 2017 at 08:26:12PM +0200, Greg KH wrote:
+> Any clue as to what the git commit id is?
 
-> Hi Michael,
->
-> Just a couple of basic things to check:
->   - was the dtb updated to the newest?
+It's
 
-Possibly not, it's an automated build/boot, I'll have to check what it
-does with the dtb.
-
->   - is the qman node present? This should be easily visible in 
-> /proc/device-tree/soc@ffe000000/qman@318000.
-
-No it's not there.
-
-That's running linux-next with:
-
-CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API_QI=n
+https://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git/commit/?h=linus&id=de5540d088fe97ad583cc7d396586437b32149a5
 
 
-Does that mean I didn't update the device tree?
-
-cheers
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
