@@ -1,40 +1,40 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: caam - fix RNG deinstantiation error checking
-Date: Wed, 5 Apr 2017 22:09:00 +0800
-Message-ID: <20170405140900.GC27150@gondor.apana.org.au>
-References: <20170405084103.19053-1-horia.geanta@nxp.com>
+Subject: Re: [PATCH v5 0/4] gf128mul refactoring
+Date: Wed, 5 Apr 2017 22:11:05 +0800
+Message-ID: <20170405141105.GH27150@gondor.apana.org.au>
+References: <20170402191916.9309-1-omosnacek@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
 Cc: "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, Dan Douglass <dan.douglass@nxp.com>,
-        Alexandru Porosanu <alexandru.porosanu@nxp.com>
-To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
+        linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@google.com>,
+        Jeffrey Walton <noloader@gmail.com>,
+        Milan Broz <gmazyland@gmail.com>
+To: Ondrej Mosnacek <omosnacek@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:37518 "EHLO
+Received: from orcrist.hmeau.com ([104.223.48.154]:37510 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755303AbdDEOQT (ORCPT
+        with ESMTP id S1754554AbdDEON0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 5 Apr 2017 10:16:19 -0400
+        Wed, 5 Apr 2017 10:13:26 -0400
 Content-Disposition: inline
-In-Reply-To: <20170405084103.19053-1-horia.geanta@nxp.com>
+In-Reply-To: <20170402191916.9309-1-omosnacek@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Apr 05, 2017 at 11:41:03AM +0300, Horia Geantă wrote:
-> RNG instantiation was previously fixed by
-> commit 62743a4145bb9 ("crypto: caam - fix RNG init descriptor ret. code checking")
-> while deinstantiation was not addressed.
+On Sun, Apr 02, 2017 at 09:19:12PM +0200, Ondrej Mosnacek wrote:
+> This patchset contains the following gf128mul-related changes:
+>   1. The gf128mul_x_* functions are moved to gf128mul.h for performance reasons.
+>   2. The gf128mul_x_ble function is fixed to use the correct block type.
+>   3. The le128_gf128mul_x_ble function from glue_helper.h is removed and its
+>      usages replaced with gf128mul_x_ble calls.
+>   4. The now obsolete dependency of CRYPTO_XTS on CRYPTO_GF128MUL is removed.
 > 
-> Since the descriptors used are similar, in the sense that they both end
-> with a JUMP HALT command, checking for errors should be similar too,
-> i.e. status code 7000_0000h should be considered successful.
-> 
-> Cc: <stable@vger.kernel.org> # 3.13+
-> Fixes: 1005bccd7a4a6 ("crypto: caam - enable instantiation of all RNG4 state handles")
-> Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+> v4 -> v5: added the other three patches
+> v3 -> v4: a faster version of gf128mul_x_lle
+> v2 -> v3: constant-time implementation
+> v1 -> v2: move all _x_ functions to the header, not just gf128mul_x_ble
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
