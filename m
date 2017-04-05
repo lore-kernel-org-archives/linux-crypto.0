@@ -1,14 +1,13 @@
-From: Matthias Kaehlcke <mka@chromium.org>
-Subject: Re: [PATCH 2/7] Makefile, x86, LLVM: disable unsupported
- optimization flags
-Date: Wed, 5 Apr 2017 12:01:30 -0700
-Message-ID: <20170405190130.GD145051@google.com>
-References: <20170317001520.85223-1-md@google.com>
- <20170317001520.85223-3-md@google.com>
- <CAK7LNAR2efi4e3-st-hP3T7v=Hkb81beKibgYeKzxs3Q3kP0uA@mail.gmail.com>
+From: Michael Davidson <md@google.com>
+Subject: Re: [PATCH 2/7] Makefile, x86, LLVM: disable unsupported optimization flags
+Date: Wed, 5 Apr 2017 12:11:17 -0700
+Message-ID: <CA+=D-XVbZfgaQ+ZrjctAF5Ek3kaF3XqTLsSu==hK9savDztKsw@mail.gmail.com>
+References: <20170317001520.85223-1-md@google.com> <20170317001520.85223-3-md@google.com>
+ <CAK7LNAR2efi4e3-st-hP3T7v=Hkb81beKibgYeKzxs3Q3kP0uA@mail.gmail.com> <20170405190130.GD145051@google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: Michael Davidson <md@google.com>, Michal Marek <mmarek@suse.com>,
+Content-Type: text/plain; charset=UTF-8
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>,
+        Michal Marek <mmarek@suse.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>,
         "H. Peter Anvin" <hpa@zytor.com>,
@@ -20,37 +19,52 @@ Cc: Michael Davidson <md@google.com>, Michal Marek <mmarek@suse.com>,
         Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         linux-crypto@vger.kernel.org, linux-raid@vger.kernel.org
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
+To: Matthias Kaehlcke <mka@chromium.org>
 Return-path: <linux-kbuild-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CAK7LNAR2efi4e3-st-hP3T7v=Hkb81beKibgYeKzxs3Q3kP0uA@mail.gmail.com>
+In-Reply-To: <20170405190130.GD145051@google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Masahiro,
+It "works" for the cases that I currently care about but I have to say
+that I am uneasy about adding -Werror to the cc-option test in this
+way.
 
-El Thu, Apr 06, 2017 at 03:08:26AM +0900 Masahiro Yamada ha dit:
+Suppose that one of the *other* flags that is implicitly passed to the
+compiler by cc-option - eg something that was explicitly specified in
+$(KBUILD_CFLAGS) - triggers a warning. In that case all calls to
+cc-option will silently fail because of the -Werror and valid options
+will not be detected correctly.
 
-> 2017-03-17 9:15 GMT+09:00 Michael Davidson <md@google.com>:
-> > Unfortunately, while clang generates a warning about these flags
-> > being unsupported it still exits with a status of 0 so we have
-> > to explicitly disable them instead of just using a cc-option check.
-> >
-> > Signed-off-by: Michael Davidson <md@google.com>
-> 
-> 
-> Instead, does the following work for you?
-> https://patchwork.kernel.org/patch/9657285/
+If everyone is OK with that because "it shouldn't normally ever
+happen" then that is fine, but if does result in a subtle change from
+existing behavior (and a trap that I almost immediately fell into
+after applying a similar patch).
 
-Thanks for the pointer, I was about to give this change (or rather its
-ancestor) a rework myself :)
-
-> You need to use
-> $(call cc-option, ...)
-> for -falign-jumps=1 and -falign-loops=1
-
-I can confirm that this works.
-
-Thanks
-
-Matthias
+On Wed, Apr 5, 2017 at 12:01 PM, Matthias Kaehlcke <mka@chromium.org> wrote:
+> Hi Masahiro,
+>
+> El Thu, Apr 06, 2017 at 03:08:26AM +0900 Masahiro Yamada ha dit:
+>
+>> 2017-03-17 9:15 GMT+09:00 Michael Davidson <md@google.com>:
+>> > Unfortunately, while clang generates a warning about these flags
+>> > being unsupported it still exits with a status of 0 so we have
+>> > to explicitly disable them instead of just using a cc-option check.
+>> >
+>> > Signed-off-by: Michael Davidson <md@google.com>
+>>
+>>
+>> Instead, does the following work for you?
+>> https://patchwork.kernel.org/patch/9657285/
+>
+> Thanks for the pointer, I was about to give this change (or rather its
+> ancestor) a rework myself :)
+>
+>> You need to use
+>> $(call cc-option, ...)
+>> for -falign-jumps=1 and -falign-loops=1
+>
+> I can confirm that this works.
+>
+> Thanks
+>
+> Matthias
