@@ -1,35 +1,42 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: caam - fix invalid dereference in
- caam_rsa_init_tfm()
-Date: Wed, 5 Apr 2017 22:08:51 +0800
-Message-ID: <20170405140851.GB27150@gondor.apana.org.au>
-References: <20170403153007.30455-1-horia.geanta@nxp.com>
+Subject: Re: [PATCH v2 0/5] STM32 CRC crypto driver
+Date: Wed, 5 Apr 2017 22:09:29 +0800
+Message-ID: <20170405140929.GD27150@gondor.apana.org.au>
+References: <1490109211-4869-1-git-send-email-fabien.dessenne@st.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, Dan Douglass <dan.douglass@nxp.com>
-To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: "David S . Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@st.com>,
+        Russell King <linux@armlinux.org.uk>,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Benjamin Gaignard <benjamin.gaignard@st.com>
+To: Fabien Dessenne <fabien.dessenne@st.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:37480 "EHLO
+Received: from orcrist.hmeau.com ([104.223.48.154]:37562 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755510AbdDEON5 (ORCPT
+        with ESMTP id S1753260AbdDEOR1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 5 Apr 2017 10:13:57 -0400
+        Wed, 5 Apr 2017 10:17:27 -0400
 Content-Disposition: inline
-In-Reply-To: <20170403153007.30455-1-horia.geanta@nxp.com>
+In-Reply-To: <1490109211-4869-1-git-send-email-fabien.dessenne@st.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Apr 03, 2017 at 06:30:07PM +0300, Horia Geantă wrote:
-> In case caam_jr_alloc() fails, ctx->dev carries the error code,
-> thus accessing it with dev_err() is incorrect.
+On Tue, Mar 21, 2017 at 04:13:26PM +0100, Fabien Dessenne wrote:
+> This set of patches adds a new crypto driver for STMicroelectronics stm32f746.
+> The drivers uses the crypto API and provides with an HW-enabled CRC32 algorithm.
+> It was developed and tested (tcrypt / testmgr) on evaluation board stm32746g.
 > 
-> Cc: <stable@vger.kernel.org> # 4.8+
-> Fixes: 8c419778ab57e ("crypto: caam - add support for RSA algorithm")
-> Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+> v2 changes:
+> - remove useless check of crc / crc->clk
+> - enable crypto in stm32 defconfig
+> - typo fix in dt-bindings
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
