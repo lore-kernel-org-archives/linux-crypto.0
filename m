@@ -1,68 +1,54 @@
-From: Laurentiu Tudor <laurentiu.tudor@nxp.com>
-Subject: Re: [7/7] crypto: caam/qi - add ablkcipher and authenc algorithms
-Date: Wed, 5 Apr 2017 11:49:24 +0000
-Message-ID: <58E4D9C3.4070406@nxp.com>
-References: <20170317100602.2837-8-horia.geanta@nxp.com>
- <87vaqkvk6c.fsf@concordia.ellerman.id.au> <58E39F90.6050408@nxp.com>
- <87lgrftbgl.fsf@concordia.ellerman.id.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: AF_ALG: handle 0 lengths in af_alg_make_sg
+Date: Wed, 5 Apr 2017 20:50:12 +0800
+Message-ID: <20170405125012.GA26558@gondor.apana.org.au>
+References: <2380853.MJYDG7HQLD@positron.chronox.de>
+ <2164576.cSnkze5bYl@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Dan Douglass <dan.douglass@nxp.com>,
- Cristian Stoica <cristian.stoica@nxp.com>,
- Claudiu Manoil <claudiu.manoil@nxp.com>,
- Alexandru Porosanu <alexandru.porosanu@nxp.com>,
- Vakul Garg <vakul.garg@nxp.com>,
- "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>, "David S.
- Miller" <davem@davemloft.net>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
- "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Michael Ellerman <mpe@ellerman.id.au>, =?utf-8?B?SG9yaWEgR2VhbnTEgw==?=
- <horia.geanta@nxp.com>, Herbert Xu <herbert@gondor.apana.org.au>, Scott Wood
- <oss@buserror.net>, Roy Pledge <roy.pledge@nxp.com>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <87lgrftbgl.fsf@concordia.ellerman.id.au>
-Content-Language: en-US
-Content-ID: <B471335390D0E341B9E7C2DD27A81E6E@eurprd04.prod.outlook.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Cc: linux-crypto@vger.kernel.org
+To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:37318 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932130AbdDEMwG (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 5 Apr 2017 08:52:06 -0400
+Content-Disposition: inline
+In-Reply-To: <2164576.cSnkze5bYl@positron.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
+On Sat, Apr 01, 2017 at 07:46:39PM +0200, Stephan Müller wrote:
+> Am Samstag, 1. April 2017, 17:04:28 CEST schrieb Stephan Müller:
+> 
+> Hi Herbert,
+> 
+> > Hi Herbert,
+> > 
+> > If you concur with the patch, I think it should go to 4.11 as well as
+> > to stable.
+> 
+> After checking this issue again, I see that it is not triggerable in the 
+> current code as the different af_alg users make sure that this function is not 
+> called with 0.
+> 
+> I only triggered this issue during experimenting with the algif_skcipher and 
+> algif_aead revamp as requested by you. During those experiments, I invoked 
+> af_alg_make_sg with a len = 0.
+> 
+> Thus, this patch is not applicable for stable and 4.11.
+> 
+> Yet, I would suggest to consider this patch as a safeguard for any potential 
+> programming errors.
 
+So this is only possible with patches that have not been applied
+yet? In that case please fold this into whichever patch series
+that needs it.
 
-On 04/05/2017 01:06 PM, Michael Ellerman wrote:
-> Laurentiu Tudor <laurentiu.tudor@nxp.com> writes:
->
->> Hi Michael,
->>
->> Just a couple of basic things to check:
->>    - was the dtb updated to the newest?
->
-> Possibly not, it's an automated build/boot, I'll have to check what it
-> does with the dtb.
->
->>    - is the qman node present? This should be easily visible in
->> /proc/device-tree/soc@ffe000000/qman@318000.
->
-> No it's not there.
->
-> That's running linux-next with:
->
-> CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API_QI=n
->
->
-> Does that mean I didn't update the device tree?
->
-
-I think so. Also, I just checked that the node is actually there by 
-compiling p5020ds.dts and then decompiling the dtb.
-
----
-Best Regards, Laurentiu
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
