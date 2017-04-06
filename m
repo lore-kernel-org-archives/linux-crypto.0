@@ -1,10 +1,9 @@
 From: Alexander Sverdlin <alexander.sverdlin@nokia.com>
-Subject: Re: [PATCH 4/4] crypto: api - Extend algorithm name limit to 128
- bytes
-Date: Thu, 6 Apr 2017 17:11:28 +0200
-Message-ID: <d3f0d05f-a06c-60f2-495e-b455f1e77404@nokia.com>
+Subject: Re: [PATCH 3/4] xfrm: Prepare for CRYPTO_MAX_ALG_NAME expansion
+Date: Thu, 6 Apr 2017 17:10:56 +0200
+Message-ID: <b80cd89e-0ec2-1d81-9c34-f0d31d079db8@nokia.com>
 References: <20170406081509.GB30557@gondor.apana.org.au>
- <E1cw2aR-000868-VF@gondobar>
+ <E1cw2aQ-00085u-SY@gondobar>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
@@ -12,24 +11,21 @@ To: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         <linux-crypto@vger.kernel.org>, <netdev@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-eopbgr40091.outbound.protection.outlook.com ([40.107.4.91]:33728
-        "EHLO EUR03-DB5-obe.outbound.protection.outlook.com"
+Received: from mail-db5eur01on0096.outbound.protection.outlook.com ([104.47.2.96]:51328
+        "EHLO EUR01-DB5-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1756964AbdDFPLv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1756944AbdDFPLv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Thu, 6 Apr 2017 11:11:51 -0400
-In-Reply-To: <E1cw2aR-000868-VF@gondobar>
+In-Reply-To: <E1cw2aQ-00085u-SY@gondobar>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 On 06/04/17 10:16, Herbert Xu wrote:
-> With the new explicit IV generators, we may now exceed the 64-byte
-> length limit on the algorithm name, e.g., with
+> This patch fixes the xfrm_user code to use the actual array size
+> rather than the hard-coded CRYPTO_MAX_ALG_NAME length.  This is
+> because the array size is fixed at 64 bytes while we want to increase
+> the in-kernel CRYPTO_MAX_ALG_NAME value.
 > 
-> 	echainiv(authencesn(hmac(sha256-generic),cbc(des3_ede-generic)))
-> 
-> This patch extends the length limit to 128 bytes.
-> 
-> Reported-by: Alexander Sverdlin <alexander.sverdlin@nokia.com>
 > Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
 Acked-by: Alexander Sverdlin <alexander.sverdlin@nokia.com>
@@ -37,22 +33,40 @@ Tested-by: Alexander Sverdlin <alexander.sverdlin@nokia.com>
 
 > ---
 > 
->  include/linux/crypto.h |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  net/xfrm/xfrm_user.c |    6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 > 
-> diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-> index c0b0cf3..84da997 100644
-> --- a/include/linux/crypto.h
-> +++ b/include/linux/crypto.h
-> @@ -123,7 +123,7 @@
->  /*
->   * Miscellaneous stuff.
->   */
-> -#define CRYPTO_MAX_ALG_NAME		64
-> +#define CRYPTO_MAX_ALG_NAME		128
+> diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+> index 9705c27..96557cf 100644
+> --- a/net/xfrm/xfrm_user.c
+> +++ b/net/xfrm/xfrm_user.c
+> @@ -55,7 +55,7 @@ static int verify_one_alg(struct nlattr **attrs, enum xfrm_attr_type_t type)
+>  		return -EINVAL;
+>  	}
 >  
->  /*
->   * The macro CRYPTO_MINALIGN_ATTR (along with the void * type in the actual
+> -	algp->alg_name[CRYPTO_MAX_ALG_NAME - 1] = '\0';
+> +	algp->alg_name[sizeof(algp->alg_name) - 1] = '\0';
+>  	return 0;
+>  }
+>  
+> @@ -71,7 +71,7 @@ static int verify_auth_trunc(struct nlattr **attrs)
+>  	if (nla_len(rt) < xfrm_alg_auth_len(algp))
+>  		return -EINVAL;
+>  
+> -	algp->alg_name[CRYPTO_MAX_ALG_NAME - 1] = '\0';
+> +	algp->alg_name[sizeof(algp->alg_name) - 1] = '\0';
+>  	return 0;
+>  }
+>  
+> @@ -87,7 +87,7 @@ static int verify_aead(struct nlattr **attrs)
+>  	if (nla_len(rt) < aead_len(algp))
+>  		return -EINVAL;
+>  
+> -	algp->alg_name[CRYPTO_MAX_ALG_NAME - 1] = '\0';
+> +	algp->alg_name[sizeof(algp->alg_name) - 1] = '\0';
+>  	return 0;
+>  }
+>  
 > 
 
 -- 
