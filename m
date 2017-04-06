@@ -1,62 +1,157 @@
 From: Alexander Sverdlin <alexander.sverdlin@nokia.com>
-Subject: Re: [PATCH 0/4] crypto: CRYPTO_MAX_ALG_NAME is too low
-Date: Thu, 6 Apr 2017 17:10:16 +0200
-Message-ID: <83468dbd-08a8-0014-3d01-08ea3693393c@nokia.com>
-References: <e96825bd-4e1d-c6c1-160e-0dc10f7f3981@nokia.com>
- <367298c5-aa5d-3708-72d0-8a44702d0caa@nokia.com>
- <20170406081509.GB30557@gondor.apana.org.au>
+Subject: Re: [PATCH 1/4] crypto: user - Prepare for CRYPTO_MAX_ALG_NAME
+ expansion
+Date: Thu, 6 Apr 2017 17:10:27 +0200
+Message-ID: <508e733a-b0ba-0978-8ec3-b07f151c47df@nokia.com>
+References: <20170406081509.GB30557@gondor.apana.org.au>
+ <E1cw2aO-00085E-NH@gondobar>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Cc: "David S. Miller" <davem@davemloft.net>,
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
         <linux-crypto@vger.kernel.org>, <netdev@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-db5eur01on0117.outbound.protection.outlook.com ([104.47.2.117]:35927
-        "EHLO EUR01-DB5-obe.outbound.protection.outlook.com"
+Received: from mail-ve1eur01on0128.outbound.protection.outlook.com ([104.47.1.128]:31789
+        "EHLO EUR01-VE1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751593AbdDFPLK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 6 Apr 2017 11:11:10 -0400
-In-Reply-To: <20170406081509.GB30557@gondor.apana.org.au>
+        id S1756736AbdDFPLc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 6 Apr 2017 11:11:32 -0400
+In-Reply-To: <E1cw2aO-00085E-NH@gondobar>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi!
+On 06/04/17 10:16, Herbert Xu wrote:
+> This patch hard-codes CRYPTO_MAX_NAME in the user-space API to
+> 64, which is the current value of CRYPTO_MAX_ALG_NAME.  This patch
+> also replaces all remaining occurences of CRYPTO_MAX_ALG_NAME
+> in the user-space API with CRYPTO_MAX_NAME.
+> 
+> This way the user-space API will not be modified when we raise
+> the value of CRYPTO_MAX_ALG_NAME.
+> 
+> Furthermore, the code has been updated to handle names longer than
+> the user-space API.  They will be truncated.
+> 
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-On 06/04/17 10:15, Herbert Xu wrote:
-> On Thu, Mar 16, 2017 at 03:16:29PM +0100, Alexander Sverdlin wrote:
->> This is a regression caused by 856e3f4092
->> ("crypto: seqiv - Add support for new AEAD interface")
->>
->> As I've said above, I can offer one of the two solutions, which patch should I send?
->> Or do you see any better alternatives?
-> Here is a series of patches which should fix the problem.
-> 
-> The first three patches prepare the user-space interfaces to deal
-> with longer names.  The final patch extends it.
-> 
-> Note that with crypto_user I haven't actually extended it to
-> configure longer names.  It'll only be able to configure names
-> less than 64 bytes.  However, it should be able to dump/read
-> algorithms with longer names, albeit the name will be truncated
-> to 64 bytes length.
-> 
-> Steffen, when convenient could you look into extending the crypto
-> user interface to handle longer names (preferably arbitraty length
-> since netlink should be able to deal with that)?
-> 
-> Likewise xfrm is still fixed to 64 bytes long.  But this should
-> be OK as the problematic case only arises with IV generators for
-> now and we do not allow IV generators to be specified through xfrm.
-> 
-> af_alg on the other hand now allows arbitrarily long names.
+Acked-by: Alexander Sverdlin <alexander.sverdlin@nokia.com>
+Tested-by: Alexander Sverdlin <alexander.sverdlin@nokia.com>
 
-I'm not sure about patch 2 (as I've replied separately), but I've applied
-and tested the whole series and it at least solves the original problem
-with long algorithm name.
-
-> As the final patch depends on all three it would be easiest if
-> we pushed the xfrm patch through the crypto tree.  Steffen/David?
+> ---
+> 
+>  crypto/crypto_user.c            |   18 +++++++++---------
+>  include/uapi/linux/cryptouser.h |   10 +++++-----
+>  2 files changed, 14 insertions(+), 14 deletions(-)
+> 
+> diff --git a/crypto/crypto_user.c b/crypto/crypto_user.c
+> index a90404a..89acaab 100644
+> --- a/crypto/crypto_user.c
+> +++ b/crypto/crypto_user.c
+> @@ -83,7 +83,7 @@ static int crypto_report_cipher(struct sk_buff *skb, struct crypto_alg *alg)
+>  {
+>  	struct crypto_report_cipher rcipher;
+>  
+> -	strncpy(rcipher.type, "cipher", sizeof(rcipher.type));
+> +	strlcpy(rcipher.type, "cipher", sizeof(rcipher.type));
+>  
+>  	rcipher.blocksize = alg->cra_blocksize;
+>  	rcipher.min_keysize = alg->cra_cipher.cia_min_keysize;
+> @@ -102,7 +102,7 @@ static int crypto_report_comp(struct sk_buff *skb, struct crypto_alg *alg)
+>  {
+>  	struct crypto_report_comp rcomp;
+>  
+> -	strncpy(rcomp.type, "compression", sizeof(rcomp.type));
+> +	strlcpy(rcomp.type, "compression", sizeof(rcomp.type));
+>  	if (nla_put(skb, CRYPTOCFGA_REPORT_COMPRESS,
+>  		    sizeof(struct crypto_report_comp), &rcomp))
+>  		goto nla_put_failure;
+> @@ -116,7 +116,7 @@ static int crypto_report_acomp(struct sk_buff *skb, struct crypto_alg *alg)
+>  {
+>  	struct crypto_report_acomp racomp;
+>  
+> -	strncpy(racomp.type, "acomp", sizeof(racomp.type));
+> +	strlcpy(racomp.type, "acomp", sizeof(racomp.type));
+>  
+>  	if (nla_put(skb, CRYPTOCFGA_REPORT_ACOMP,
+>  		    sizeof(struct crypto_report_acomp), &racomp))
+> @@ -131,7 +131,7 @@ static int crypto_report_akcipher(struct sk_buff *skb, struct crypto_alg *alg)
+>  {
+>  	struct crypto_report_akcipher rakcipher;
+>  
+> -	strncpy(rakcipher.type, "akcipher", sizeof(rakcipher.type));
+> +	strlcpy(rakcipher.type, "akcipher", sizeof(rakcipher.type));
+>  
+>  	if (nla_put(skb, CRYPTOCFGA_REPORT_AKCIPHER,
+>  		    sizeof(struct crypto_report_akcipher), &rakcipher))
+> @@ -146,7 +146,7 @@ static int crypto_report_kpp(struct sk_buff *skb, struct crypto_alg *alg)
+>  {
+>  	struct crypto_report_kpp rkpp;
+>  
+> -	strncpy(rkpp.type, "kpp", sizeof(rkpp.type));
+> +	strlcpy(rkpp.type, "kpp", sizeof(rkpp.type));
+>  
+>  	if (nla_put(skb, CRYPTOCFGA_REPORT_KPP,
+>  		    sizeof(struct crypto_report_kpp), &rkpp))
+> @@ -160,10 +160,10 @@ static int crypto_report_kpp(struct sk_buff *skb, struct crypto_alg *alg)
+>  static int crypto_report_one(struct crypto_alg *alg,
+>  			     struct crypto_user_alg *ualg, struct sk_buff *skb)
+>  {
+> -	strncpy(ualg->cru_name, alg->cra_name, sizeof(ualg->cru_name));
+> -	strncpy(ualg->cru_driver_name, alg->cra_driver_name,
+> +	strlcpy(ualg->cru_name, alg->cra_name, sizeof(ualg->cru_name));
+> +	strlcpy(ualg->cru_driver_name, alg->cra_driver_name,
+>  		sizeof(ualg->cru_driver_name));
+> -	strncpy(ualg->cru_module_name, module_name(alg->cra_module),
+> +	strlcpy(ualg->cru_module_name, module_name(alg->cra_module),
+>  		sizeof(ualg->cru_module_name));
+>  
+>  	ualg->cru_type = 0;
+> @@ -176,7 +176,7 @@ static int crypto_report_one(struct crypto_alg *alg,
+>  	if (alg->cra_flags & CRYPTO_ALG_LARVAL) {
+>  		struct crypto_report_larval rl;
+>  
+> -		strncpy(rl.type, "larval", sizeof(rl.type));
+> +		strlcpy(rl.type, "larval", sizeof(rl.type));
+>  		if (nla_put(skb, CRYPTOCFGA_REPORT_LARVAL,
+>  			    sizeof(struct crypto_report_larval), &rl))
+>  			goto nla_put_failure;
+> diff --git a/include/uapi/linux/cryptouser.h b/include/uapi/linux/cryptouser.h
+> index 11d21fc..b4def5c 100644
+> --- a/include/uapi/linux/cryptouser.h
+> +++ b/include/uapi/linux/cryptouser.h
+> @@ -31,7 +31,7 @@ enum {
+>  #define CRYPTO_MSG_MAX (__CRYPTO_MSG_MAX - 1)
+>  #define CRYPTO_NR_MSGTYPES (CRYPTO_MSG_MAX + 1 - CRYPTO_MSG_BASE)
+>  
+> -#define CRYPTO_MAX_NAME CRYPTO_MAX_ALG_NAME
+> +#define CRYPTO_MAX_NAME 64
+>  
+>  /* Netlink message attributes.  */
+>  enum crypto_attr_type_t {
+> @@ -53,9 +53,9 @@ enum crypto_attr_type_t {
+>  };
+>  
+>  struct crypto_user_alg {
+> -	char cru_name[CRYPTO_MAX_ALG_NAME];
+> -	char cru_driver_name[CRYPTO_MAX_ALG_NAME];
+> -	char cru_module_name[CRYPTO_MAX_ALG_NAME];
+> +	char cru_name[CRYPTO_MAX_NAME];
+> +	char cru_driver_name[CRYPTO_MAX_NAME];
+> +	char cru_module_name[CRYPTO_MAX_NAME];
+>  	__u32 cru_type;
+>  	__u32 cru_mask;
+>  	__u32 cru_refcnt;
+> @@ -73,7 +73,7 @@ struct crypto_report_hash {
+>  };
+>  
+>  struct crypto_report_cipher {
+> -	char type[CRYPTO_MAX_ALG_NAME];
+> +	char type[CRYPTO_MAX_NAME];
+>  	unsigned int blocksize;
+>  	unsigned int min_keysize;
+>  	unsigned int max_keysize;
+> 
 
 -- 
 Best regards,
