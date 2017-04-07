@@ -1,31 +1,40 @@
-From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: Re: [PATCH 3/4] xfrm: Prepare for CRYPTO_MAX_ALG_NAME expansion
-Date: Thu, 6 Apr 2017 23:15:51 +0200
-Message-ID: <20170406211551.GE12763@secunet.com>
-References: <20170406081509.GB30557@gondor.apana.org.au>
- <E1cw2aQ-00085u-SY@gondobar>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Cc: Alexander Sverdlin <alexander.sverdlin@nokia.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        <linux-crypto@vger.kernel.org>, <netdev@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: [PATCH] padata: free correct variable
+Date: Fri,  7 Apr 2017 02:33:30 +0200
+Message-ID: <20170407003330.6552-1-Jason@zx2c4.com>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>, stable@vger.kernel.org
+To: linux-crypto@vger.kernel.org, steffen.klassert@secunet.com,
+        linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([62.96.220.36]:41462 "EHLO a.mx.secunet.com"
+Received: from frisell.zx2c4.com ([192.95.5.64]:32921 "EHLO frisell.zx2c4.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751593AbdDFVQG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 6 Apr 2017 17:16:06 -0400
-Content-Disposition: inline
-In-Reply-To: <E1cw2aQ-00085u-SY@gondobar>
+        id S1752124AbdDGAdq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 6 Apr 2017 20:33:46 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Apr 06, 2017 at 04:16:10PM +0800, Herbert Xu wrote:
-> This patch fixes the xfrm_user code to use the actual array size
-> rather than the hard-coded CRYPTO_MAX_ALG_NAME length.  This is
-> because the array size is fixed at 64 bytes while we want to increase
-> the in-kernel CRYPTO_MAX_ALG_NAME value.
-> 
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+The author meant to free the variable that was just allocated, instead
+of the one that failed to be allocated, but made a simple typo. This
+patch rectifies that.
 
-Acked-by: Steffen Klassert <steffen.klassert@secunet.com>
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Cc: stable@vger.kernel.org
+---
+ kernel/padata.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/kernel/padata.c b/kernel/padata.c
+index 05316c9f32da..1faa7d62d87d 100644
+--- a/kernel/padata.c
++++ b/kernel/padata.c
+@@ -353,7 +353,7 @@ static int padata_setup_cpumasks(struct parallel_data *pd,
+ 
+ 	cpumask_and(pd->cpumask.pcpu, pcpumask, cpu_online_mask);
+ 	if (!alloc_cpumask_var(&pd->cpumask.cbcpu, GFP_KERNEL)) {
+-		free_cpumask_var(pd->cpumask.cbcpu);
++		free_cpumask_var(pd->cpumask.pcpu);
+ 		return -ENOMEM;
+ 	}
+ 
+-- 
+2.12.2
