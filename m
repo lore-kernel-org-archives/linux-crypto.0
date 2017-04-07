@@ -1,57 +1,57 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 2/4] crypto: af_alg - Allow arbitrarily long algorithm
- names
-Date: Fri, 7 Apr 2017 13:25:32 +0800
-Message-ID: <20170407052532.GA2023@gondor.apana.org.au>
-References: <20170406081509.GB30557@gondor.apana.org.au>
- <E1cw2aP-00085S-Q4@gondobar>
- <32d123fa-5c5f-4db6-d333-24b71639b738@nokia.com>
+Subject: Re: dm-crypt IV generation (summary)
+Date: Fri, 7 Apr 2017 14:12:26 +0800
+Message-ID: <20170407061226.GA2282@gondor.apana.org.au>
+References: <CAFqZXNs0=6+PvpGq3weRwCJkUOfSn06i_fD6ZuvXo_0rms9zeA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, netdev@vger.kernel.org
-To: Alexander Sverdlin <alexander.sverdlin@nokia.com>
-Return-path: <netdev-owner@vger.kernel.org>
+Cc: Milan Broz <gmazyland@gmail.com>, linux-crypto@vger.kernel.org,
+        dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        Binoy Jayan <binoy.jayan@linaro.org>,
+        Gilad Ben-Yossef <gilad@benyossef.com>
+To: Ondrej Mosnacek <omosnace@redhat.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:41912 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752449AbdDGGNM (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 7 Apr 2017 02:13:12 -0400
 Content-Disposition: inline
-In-Reply-To: <32d123fa-5c5f-4db6-d333-24b71639b738@nokia.com>
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <CAFqZXNs0=6+PvpGq3weRwCJkUOfSn06i_fD6ZuvXo_0rms9zeA@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Apr 06, 2017 at 02:32:27PM +0200, Alexander Sverdlin wrote:
+On Fri, Mar 10, 2017 at 02:44:26PM +0100, Ondrej Mosnacek wrote:
 >
-> > diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-> > index 690deca..3556d8e 100644
-> > --- a/crypto/af_alg.c
-> > +++ b/crypto/af_alg.c
-> > @@ -160,11 +160,11 @@ static int alg_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
-> >  	if (sock->state == SS_CONNECTED)
-> >  		return -EINVAL;
-> >  
-> > -	if (addr_len != sizeof(*sa))
-> > +	if (addr_len < sizeof(*sa))
-> >  		return -EINVAL;
-> >  
-> >  	sa->salg_type[sizeof(sa->salg_type) - 1] = 0;
-> > -	sa->salg_name[sizeof(sa->salg_name) - 1] = 0;
-> > +	sa->salg_name[sizeof(sa->salg_name) + addr_len - sizeof(*sa) - 1] = 0;
-> >  
-> >  	type = alg_get_type(sa->salg_type);
-> >  	if (IS_ERR(type) && PTR_ERR(type) == -ENOENT) {
-> 
-> Why should userspace ever extend the structure if salg_name is hardcoded to 64 in if_alg.h?
-> This patch doesn't change the behavior at all, or am I missing something?
+>     ISSUES:
+>         a) The 'keycount' parameter.
+>             In order to support multi-key modes from Loop-AES,
+> dm-crypt accepts a keycount parameter which, if it != 1, causes
+> consecutive sectors to be encrypted with a different key. This
+> parameter can be specified with any of the cipher modes, which makes
+> porting the whole scale of modes supported by dm-crypt to crypto API
+> rather messy, since a lot of dm-crypt specific stuff needs to be moved
+> into the crypto drivers.
 
-We cannot change the structure in the user-space API by increasing
-its length because that would break backwards compatibility.
+Actually I think this one can probably easily handled in the crypto
+layer.  All we need is to add a multikey template that sits on top
+of an underlying IV generator.  The multikey instance can then accept
+a key length that is a multiple of the underlying key length.
 
-What this patch does is relax the size check so that user-space can
-pass in a name that is longer than 64 bytes.  This would fail on
-older kernels with EINVAL.  Of course, user-space must be modified
-to allow for such longer names.  That is beyond the scope of this
-patch.
+>         b) New AEAD functionality; random IV generator.
+>             The soon-to-be-added AEAD functionality in dm-crypt
+> introduces a new IV generator that generates IVs randomly and stores
+> them as sector metadata. This means IV generation cannot be handled
+> solely in the driver. Also, additional AEAD implementation of IV
+> generators would be eventually needed.
 
-For names shorter than 64 bytes the existing API needs be respected
-and user-space must pad it to exactly 64 bytes.
+Again I don't see the problem here.  IV generators are supposed
+to return the IV to the caller so that it can be transmitted.
+
+For example, the IV generated in IPsec is explicitly transmitted.
+Here we just need to store the IV.
 
 Cheers,
 -- 
