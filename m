@@ -1,40 +1,60 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH] padata: free correct variable
-Date: Fri,  7 Apr 2017 02:33:30 +0200
-Message-ID: <20170407003330.6552-1-Jason@zx2c4.com>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>, stable@vger.kernel.org
-To: linux-crypto@vger.kernel.org, steffen.klassert@secunet.com,
-        linux-kernel@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from frisell.zx2c4.com ([192.95.5.64]:32921 "EHLO frisell.zx2c4.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752124AbdDGAdq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 6 Apr 2017 20:33:46 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 2/4] crypto: af_alg - Allow arbitrarily long algorithm
+ names
+Date: Fri, 7 Apr 2017 13:25:32 +0800
+Message-ID: <20170407052532.GA2023@gondor.apana.org.au>
+References: <20170406081509.GB30557@gondor.apana.org.au>
+ <E1cw2aP-00085S-Q4@gondobar>
+ <32d123fa-5c5f-4db6-d333-24b71639b738@nokia.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, netdev@vger.kernel.org
+To: Alexander Sverdlin <alexander.sverdlin@nokia.com>
+Return-path: <netdev-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <32d123fa-5c5f-4db6-d333-24b71639b738@nokia.com>
+Sender: netdev-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-The author meant to free the variable that was just allocated, instead
-of the one that failed to be allocated, but made a simple typo. This
-patch rectifies that.
+On Thu, Apr 06, 2017 at 02:32:27PM +0200, Alexander Sverdlin wrote:
+>
+> > diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+> > index 690deca..3556d8e 100644
+> > --- a/crypto/af_alg.c
+> > +++ b/crypto/af_alg.c
+> > @@ -160,11 +160,11 @@ static int alg_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
+> >  	if (sock->state == SS_CONNECTED)
+> >  		return -EINVAL;
+> >  
+> > -	if (addr_len != sizeof(*sa))
+> > +	if (addr_len < sizeof(*sa))
+> >  		return -EINVAL;
+> >  
+> >  	sa->salg_type[sizeof(sa->salg_type) - 1] = 0;
+> > -	sa->salg_name[sizeof(sa->salg_name) - 1] = 0;
+> > +	sa->salg_name[sizeof(sa->salg_name) + addr_len - sizeof(*sa) - 1] = 0;
+> >  
+> >  	type = alg_get_type(sa->salg_type);
+> >  	if (IS_ERR(type) && PTR_ERR(type) == -ENOENT) {
+> 
+> Why should userspace ever extend the structure if salg_name is hardcoded to 64 in if_alg.h?
+> This patch doesn't change the behavior at all, or am I missing something?
 
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-Cc: stable@vger.kernel.org
----
- kernel/padata.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+We cannot change the structure in the user-space API by increasing
+its length because that would break backwards compatibility.
 
-diff --git a/kernel/padata.c b/kernel/padata.c
-index 05316c9f32da..1faa7d62d87d 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -353,7 +353,7 @@ static int padata_setup_cpumasks(struct parallel_data *pd,
- 
- 	cpumask_and(pd->cpumask.pcpu, pcpumask, cpu_online_mask);
- 	if (!alloc_cpumask_var(&pd->cpumask.cbcpu, GFP_KERNEL)) {
--		free_cpumask_var(pd->cpumask.cbcpu);
-+		free_cpumask_var(pd->cpumask.pcpu);
- 		return -ENOMEM;
- 	}
- 
+What this patch does is relax the size check so that user-space can
+pass in a name that is longer than 64 bytes.  This would fail on
+older kernels with EINVAL.  Of course, user-space must be modified
+to allow for such longer names.  That is beyond the scope of this
+patch.
+
+For names shorter than 64 bytes the existing API needs be respected
+and user-space must pad it to exactly 64 bytes.
+
+Cheers,
 -- 
-2.12.2
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
