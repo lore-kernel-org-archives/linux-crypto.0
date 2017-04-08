@@ -1,81 +1,63 @@
-From: <membership@instituteofcredit.org>
-Subject: 21741 linux-crypto
-Date: Sat, 08 Apr 2017 04:25:18 -0000
-Message-ID: <149162551871.14695.8980994429235950562@linode.com>
-Reply-To: <membership@instituteofcredit.org>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: Re: XTS Crypto Not Found In /proc/crypto Even After Compiled for
+ 4.10.1.
+Date: Sat, 8 Apr 2017 14:23:23 +0200
+Message-ID: <20170408122323.x34ytemitl7h7rzz@kozik-lap>
+References: <CALaQ_hqhFjb60rJ2AgBnYgyNCPQ7fH5BdOOCeaMiankQR0VwqQ@mail.gmail.com>
+ <20170308174542.2rydwxmrb3oehyrc@kozik-lap>
+ <20170308211543.euqexxlhdgpfcdjk@kozik-lap>
+ <CALaQ_hrikH8Q8ug9WTgnYR3UwSCip1DZtkkjj2NCLJVqcKQdZA@mail.gmail.com>
+ <20170310180640.dnacw53vqrqji2xo@kozik-lap>
+ <CALaQ_hqomXaZs0z-S3YX6d-hS_giqgBqBSvumwsMm=BzrgZz7Q@mail.gmail.com>
+ <20170312191322.bbux5nrkqf5klznq@kozik-lap>
+ <20170313170601.ozolfzgixqu6aa4g@kozik-lap>
+ <20170406095414.GA31658@gondor.apana.org.au>
+ <20170408020246.GA4815@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: application/zip; name="525.zip"
-Content-Transfer-Encoding: base64
-To: "linux-crypto" <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Cc: Nathan Royce <nroycea+kernel@gmail.com>, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Marek Szyprowski <m.szyprowski@samsung.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from li384-232.members.linode.com ([106.187.41.232]:49884 "HELO
-        linode.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with SMTP
-        id S1751037AbdDHEZY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 8 Apr 2017 00:25:24 -0400
-Content-Disposition: attachment
+Received: from mail-wr0-f194.google.com ([209.85.128.194]:34134 "EHLO
+        mail-wr0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752226AbdDHMX1 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 8 Apr 2017 08:23:27 -0400
+Content-Disposition: inline
+In-Reply-To: <20170408020246.GA4815@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-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
+On Sat, Apr 08, 2017 at 10:02:46AM +0800, Herbert Xu wrote:
+> On Thu, Apr 06, 2017 at 05:54:14PM +0800, Herbert Xu wrote:
+> > On Mon, Mar 13, 2017 at 07:06:01PM +0200, Krzysztof Kozlowski wrote:
+> > >
+> > > I bisected this to commit f1c131b45410 ("crypto: xts - Convert to
+> > > skcipher"). The s5p-sss driver stays the same... but the xts changes and
+> > > as a result we have a NULL pointer dereference (actually of value
+> > > 00000004):
+> > > [   18.930195] Unable to handle kernel NULL pointer dereference at virtual address 00000004
+> > > ...
+> > > [   18.972325] [<c0313c98>] (post_crypt) from [<c031408c>] (decrypt_done+0x4c/0x54)
+> > > [   18.972343] [<c031408c>] (decrypt_done) from [<c056309c>] (s5p_aes_interrupt+0x1bc/0x208)
+> > > [   18.972360] [<c056309c>] (s5p_aes_interrupt) from [<c0164930>] (irq_thread_fn+0x1c/0x54)
+> > > 
+> > > Any hints?
+> > 
+> > I haven't found any smoking guns, but the locking between the
+> > tasklet and the IRQ routine looks suspect.  First of all the
+> > tasklet is modifying the dev structure without holding any locks.
+> 
+> I think I see the problem.  Could you please try this patch and
+> let me know if it fixes the crash?
+
+Yes, fixed! Thanks.
+Tested on Odroid XU3 with following script:
+https://github.com/krzk/tools/blob/master/tests/s5p-sss-cryptsetup.sh
+
+Tested-by: Krzysztof Kozlowski <krzk@kernel.org>
+
+Best regards,
+Krzysztof
