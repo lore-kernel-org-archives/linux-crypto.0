@@ -1,77 +1,68 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: crypto: algif_aead - Fix bogus request dereference in completion
- function
-Date: Mon, 10 Apr 2017 17:59:07 +0800
-Message-ID: <20170410095907.GA8226@gondor.apana.org.au>
+From: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+Subject: Re: [PATCH v4 2/2] crypto: hw_random - Add new Exynos RNG driver
+Date: Mon, 10 Apr 2017 12:12:03 +0200
+Message-ID: <1713505.1UrJUbMZVN@amdc3058>
+References: <20170408133245.30147-1-krzk@kernel.org>
+ <CGME20170408133346epcas2p1d015a5a590955524e98cfd1119414e21@epcas2p1.samsung.com>
+ <20170408133245.30147-3-krzk@kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:51816 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752963AbdDJJ7d (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Apr 2017 05:59:33 -0400
-Content-Disposition: inline
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: linux-samsung-soc@vger.kernel.org, James Hogan <james.hogan@imgtec.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
+ Bernie Thompson <bernie@plugable.com>, dri-devel@lists.freedesktop.org,
+ linux-kernel@vger.kernel.org,
+ Javier Martinez Canillas <javier@osg.samsung.com>, linux-metag@vger.kernel.org,
+ Kukjin Kim <kgene@kernel.org>,
+ Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>,
+ linux-crypto@vger.kernel.org, linux-fbdev@vger.kernel.org,
+ Matt Mackall <mpm@selenic.com>, Dave Airlie <airlied@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, linux-arm-kernel@lists.infradead.org
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Return-path: <dri-devel-bounces@lists.freedesktop.org>
+In-reply-to: <20170408133245.30147-3-krzk@kernel.org>
+List-Unsubscribe: <https://lists.freedesktop.org/mailman/options/dri-devel>,
+ <mailto:dri-devel-request@lists.freedesktop.org?subject=unsubscribe>
+List-Archive: <https://lists.freedesktop.org/archives/dri-devel>
+List-Post: <mailto:dri-devel@lists.freedesktop.org>
+List-Help: <mailto:dri-devel-request@lists.freedesktop.org?subject=help>
+List-Subscribe: <https://lists.freedesktop.org/mailman/listinfo/dri-devel>,
+ <mailto:dri-devel-request@lists.freedesktop.org?subject=subscribe>
+Errors-To: dri-devel-bounces@lists.freedesktop.org
+Sender: "dri-devel" <dri-devel-bounces@lists.freedesktop.org>
+List-Id: linux-crypto.vger.kernel.org
 
-The algif_aead completion function tries to deduce the aead_request
-from the crypto_async_request argument.  This is broken because
-the API does not guarantee that the same request will be pased to
-the completion function.  Only the value of req->data can be used
-in the completion function.
-
-This patch fixes it by storing a pointer to sk in areq and using
-that instead of passing in sk through req->data.
-
-Fixes: 83094e5e9e49 ("crypto: af_alg - add async support to...")
-Cc: <stable@vger.kernel.org>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
-index 5a80537..ef59d99 100644
---- a/crypto/algif_aead.c
-+++ b/crypto/algif_aead.c
-@@ -40,6 +40,7 @@ struct aead_async_req {
- 	struct aead_async_rsgl first_rsgl;
- 	struct list_head list;
- 	struct kiocb *iocb;
-+	struct sock *sk;
- 	unsigned int tsgls;
- 	char iv[];
- };
-@@ -379,12 +380,10 @@ static ssize_t aead_sendpage(struct socket *sock, struct page *page,
- 
- static void aead_async_cb(struct crypto_async_request *_req, int err)
- {
--	struct sock *sk = _req->data;
--	struct alg_sock *ask = alg_sk(sk);
--	struct aead_ctx *ctx = ask->private;
--	struct crypto_aead *tfm = crypto_aead_reqtfm(&ctx->aead_req);
--	struct aead_request *req = aead_request_cast(_req);
-+	struct aead_request *req = _req->data;
-+	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
- 	struct aead_async_req *areq = GET_ASYM_REQ(req, tfm);
-+	struct sock *sk = areq->sk;
- 	struct scatterlist *sg = areq->tsgl;
- 	struct aead_async_rsgl *rsgl;
- 	struct kiocb *iocb = areq->iocb;
-@@ -447,11 +446,12 @@ static int aead_recvmsg_async(struct socket *sock, struct msghdr *msg,
- 	memset(&areq->first_rsgl, '\0', sizeof(areq->first_rsgl));
- 	INIT_LIST_HEAD(&areq->list);
- 	areq->iocb = msg->msg_iocb;
-+	areq->sk = sk;
- 	memcpy(areq->iv, ctx->iv, crypto_aead_ivsize(tfm));
- 	aead_request_set_tfm(req, tfm);
- 	aead_request_set_ad(req, ctx->aead_assoclen);
- 	aead_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
--				  aead_async_cb, sk);
-+				  aead_async_cb, req);
- 	used -= ctx->aead_assoclen;
- 
- 	/* take over all tx sgls from ctx */
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+CkhpLAoKT24gU2F0dXJkYXksIEFwcmlsIDA4LCAyMDE3IDAzOjMyOjQ1IFBNIEtyenlzenRvZiBL
+b3psb3dza2kgd3JvdGU6Cj4gUmVwbGFjZSBleGlzdGluZyBod19yYW5uZG9tL2V4eW5vcy1ybmcg
+ZHJpdmVyIHdpdGggYSBuZXcsIHJld29ya2VkIG9uZS4KPiBUaGlzIGlzIGEgZHJpdmVyIGZvciBw
+c2V1ZG8gcmFuZG9tIG51bWJlciBnZW5lcmF0b3IgYmxvY2sgd2hpY2ggb24KPiBFeHlub3M0IGNo
+aXBzZXRzIG11c3QgYmUgc2VlZGVkIHdpdGggc29tZSB2YWx1ZS4gIE9uIG5ld2VyIEV4eW5vczU0
+MjAKPiBjaGlwc2V0cyBpdCBtaWdodCBzZWVkIGl0c2VsZiBmcm9tIHRydWUgcmFuZG9tIG51bWJl
+ciBnZW5lcmF0b3IgYmxvY2sKPiBidXQgdGhpcyBpcyBub3QgaW1wbGVtZW50ZWQgeWV0Lgo+IAo+
+IE5ldyBkcml2ZXIgaXMgYSBjb21wbGV0ZSByZXdvcmsgdG8gdXNlIHRoZSBjcnlwdG8gQUxHQVBJ
+IGluc3RlYWQgb2YKPiBod19yYW5kb20gQVBJLiAgUmF0aW9uYWxlIGZvciB0aGUgY2hhbmdlOgo+
+IDEuIGh3X3JhbmRvbSBpbnRlcmZhY2UgaXMgZm9yIHRydWUgUk5HIGRldmljZXMuCj4gMi4gVGhl
+IG9sZCBkcml2ZXIgd2FzIHNlZWRpbmcgaXRzZWxmIHdpdGggamlmZmllcyB3aGljaCBpcyBub3Qg
+YQo+ICAgIHJlbGlhYmxlIHNvdXJjZSBmb3IgcmFuZG9tbmVzcy4KPiAzLiBEZXZpY2UgZ2VuZXJh
+dGVzIGZpdmUgcmFuZG9tIDMyLWJpdCBudW1iZXJzIGluIGVhY2ggcGFzcyBidXQgb2xkCj4gICAg
+ZHJpdmVyIHdhcyByZXR1cm5pbmcgb25seSBvbmUgMzItYml0IG51bWJlciB0aHVzIGl0cyBwZXJm
+b3JtYW5jZSB3YXMKPiAgICByZWR1Y2VkLgo+IAo+IENvbXBhdGliaWxpdHkgd2l0aCBEZXZpY2VU
+cmVlIGJpbmRpbmdzIGlzIHByZXNlcnZlZC4KPiAKPiBOZXcgZHJpdmVyIGRvZXMgbm90IHVzZSBy
+dW50aW1lIHBvd2VyIG1hbmFnZW1lbnQgYnV0IG1hbnVhbGx5IGVuYWJsZXMKPiBhbmQgZGlzYWJs
+ZXMgdGhlIGNsb2NrIHdoZW4gbmVlZGVkLiAgVGhpcyBpcyBwcmVmZXJyZWQgYXBwcm9hY2ggYmVj
+YXVzZQo+IHVzaW5nIHJ1bnRpbWUgUE0ganVzdCB0byB0b2dnbGUgY2xvY2sgaXMgaHVnZSBvdmVy
+aGVhZC4KPiAKPiBBbm90aGVyIGRpZmZlcmVuY2UgaXMgcmVzZWVkaW5nIGl0c2VsZiB3aXRoIGdl
+bmVyYXRlZCByYW5kb20gZGF0YQo+IHBlcmlvZGljYWxseSBhbmQgZHVyaW5nIHJlc3VtaW5nIGZy
+b20gc3lzdGVtIHN1c3BlbmQgKHByZXZpb3VzbHkgZHJpdmVyCj4gd2FzIHJlLXNlZWRpbmcgaXRz
+ZWxmIGFnYWluIHdpdGggamlmZmllcykuCj4gCj4gU2lnbmVkLW9mZi1ieTogS3J6eXN6dG9mIEtv
+emxvd3NraSA8a3J6a0BrZXJuZWwub3JnPgo+IFJldmlld2VkLWJ5OiBTdGVwaGFuIE3DvGxsZXIg
+PHNtdWVsbGVyQGNocm9ub3guZGU+Cj4gUmV2aWV3ZWQtYnk6IFByYXNhbm5hS3VtYXIgTXVyYWxp
+ZGhhcmFuIDxwcmFzYW5uYXRzbWt1bWFyQGdtYWlsLmNvbT4KClJldmlld2VkLWJ5OiBCYXJ0bG9t
+aWVqIFpvbG5pZXJraWV3aWN6IDxiLnpvbG5pZXJraWVAc2Ftc3VuZy5jb20+CgpCZXN0IHJlZ2Fy
+ZHMsCi0tCkJhcnRsb21pZWogWm9sbmllcmtpZXdpY3oKU2Ftc3VuZyBSJkQgSW5zdGl0dXRlIFBv
+bGFuZApTYW1zdW5nIEVsZWN0cm9uaWNzCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fXwpkcmktZGV2ZWwgbWFpbGluZyBsaXN0CmRyaS1kZXZlbEBsaXN0cy5m
+cmVlZGVza3RvcC5vcmcKaHR0cHM6Ly9saXN0cy5mcmVlZGVza3RvcC5vcmcvbWFpbG1hbi9saXN0
+aW5mby9kcmktZGV2ZWwK
