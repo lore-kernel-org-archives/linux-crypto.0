@@ -1,32 +1,35 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: lz4: fixed decompress function to return error
- code
-Date: Mon, 10 Apr 2017 19:23:04 +0800
-Message-ID: <20170410112304.GC8800@gondor.apana.org.au>
-References: <1491784462-31424-1-git-send-email-mhjungk@gmail.com>
+Subject: Re: What should be the algo priority
+Date: Mon, 10 Apr 2017 19:25:33 +0800
+Message-ID: <20170410112533.GA8996@gondor.apana.org.au>
+References: <CAFXBA=mHp_LB9tufr-aRGXkfoULGbMn5RxRV1ajSozx88Er0CQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Myungho Jung <mhjungk@gmail.com>
+Cc: smueller@chronox.de, linux-crypto@vger.kernel.org
+To: Harsh Jain <harshjain.prof@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:51950 "EHLO
+Received: from orcrist.hmeau.com ([104.223.48.154]:51952 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753723AbdDJLXb (ORCPT
+        with ESMTP id S1752756AbdDJLZ6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Apr 2017 07:23:31 -0400
+        Mon, 10 Apr 2017 07:25:58 -0400
 Content-Disposition: inline
-In-Reply-To: <1491784462-31424-1-git-send-email-mhjungk@gmail.com>
+In-Reply-To: <CAFXBA=mHp_LB9tufr-aRGXkfoULGbMn5RxRV1ajSozx88Er0CQ@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Apr 09, 2017 at 05:34:22PM -0700, Myungho Jung wrote:
-> Decompress function in LZ4 library is supposed to return an error code or
-> negative result. But, it returns -1 when any error is detected. Return
-> error code when the library returns negative value.
-> 
-> Signed-off-by: Myungho Jung <mhjungk@gmail.com>
+Harsh Jain <harshjain.prof@gmail.com> wrote:
+>
+> It means cbc, hmac should have smaller(nearly 10 times less) priority
+> than their authenc implementation otherwise request will not offload
+> to driver because sw authenc priority is (aes * 10 + hmac).
 
-Patch applied.  Thanks.
+I think you should look at it the other way.  The priority of
+your hardware authenc should be greater than (aes * 10 + hmac)
+where aes is the priority of your hardware aes and hmac is the
+priority of your hardware hmac.
+
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
