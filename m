@@ -1,52 +1,47 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 4.11
-Date: Mon, 10 Apr 2017 19:04:32 +0800
-Message-ID: <20170410110432.GA8731@gondor.apana.org.au>
-References: <20161119102748.GA4277@gondor.apana.org.au>
- <20161215160732.GA16580@gondor.apana.org.au>
- <20170111115646.GA8943@gondor.apana.org.au>
- <20170304074119.GA3041@gondor.apana.org.au>
- <20170315063151.GA6767@gondor.apana.org.au>
- <20170324134627.GA14273@gondor.apana.org.au>
- <20170331102907.GA11348@gondor.apana.org.au>
+Subject: Re: [PATCH v2] crypto: arm64/sha: Add constant operand modifier to
+ ASM_EXPORT
+Date: Mon, 10 Apr 2017 19:22:30 +0800
+Message-ID: <20170410112230.GA8800@gondor.apana.org.au>
+References: <20170405183458.193068-1-mka@chromium.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Greg Hackmann <ghackmann@google.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Grant Grundler <grundler@chromium.org>,
+        Michael Davidson <md@google.com>
+To: Matthias Kaehlcke <mka@chromium.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:51924 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753557AbdDJLW7 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 10 Apr 2017 07:22:59 -0400
 Content-Disposition: inline
-In-Reply-To: <20170331102907.GA11348@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20170405183458.193068-1-mka@chromium.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+On Wed, Apr 05, 2017 at 11:34:58AM -0700, Matthias Kaehlcke wrote:
+> The operand is an integer constant, make the constness explicit by
+> adding the modifier. This is needed for clang to generate valid code
+> and also works with gcc.
+> 
+> Also change the constraint of the operand from 'I' ("Integer constant
+> that is valid as an immediate operand in an ADD instruction", AArch64)
+> to 'i' ("An immediate integer operand").
+> 
+> Based-on-patch-from: Greg Hackmann <ghackmann@google.com>
+> Signed-off-by: Greg Hackmann <ghackmann@google.com>
+> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
 
-This push fixes a number of bugs in the caam driver:
-
-- Device creation fails after release.
-- Error-path NULL-pointer dereference.
-- Spurious hardware error in RNG deinstantiation.
-
-
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-
-
-Horia Geantă (3):
-      crypto: caam - fix JR platform device subsequent (re)creations
-      crypto: caam - fix invalid dereference in caam_rsa_init_tfm()
-      crypto: caam - fix RNG deinstantiation error checking
-
- drivers/crypto/caam/caampkc.c |    2 +-
- drivers/crypto/caam/ctrl.c    |   66 +++++++++++++----------------------------
- drivers/crypto/caam/intern.h  |    1 -
- 3 files changed, 22 insertions(+), 47 deletions(-)
-
-Thanks,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
