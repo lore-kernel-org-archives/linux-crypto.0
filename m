@@ -1,47 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] crypto: arm64/sha: Add constant operand modifier to
- ASM_EXPORT
-Date: Mon, 10 Apr 2017 19:22:30 +0800
-Message-ID: <20170410112230.GA8800@gondor.apana.org.au>
-References: <20170405183458.193068-1-mka@chromium.org>
+Subject: Re: [PATCH v2 0/3] hw_random: timeriomem_rng: Migrate to new API and
+ improve performance
+Date: Mon, 10 Apr 2017 19:22:48 +0800
+Message-ID: <20170410112248.GB8800@gondor.apana.org.au>
+References: <20170405232100.2023-1-raltherr@google.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Greg Hackmann <ghackmann@google.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Grant Grundler <grundler@chromium.org>,
-        Michael Davidson <md@google.com>
-To: Matthias Kaehlcke <mka@chromium.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:51924 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753557AbdDJLW7 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Apr 2017 07:22:59 -0400
+Cc: alex@digriz.org.uk, openbmc@lists.ozlabs.org,
+        Matt Mackall <mpm@selenic.com>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Rick Altherr <raltherr@google.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20170405183458.193068-1-mka@chromium.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20170405232100.2023-1-raltherr@google.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Apr 05, 2017 at 11:34:58AM -0700, Matthias Kaehlcke wrote:
-> The operand is an integer constant, make the constness explicit by
-> adding the modifier. This is needed for clang to generate valid code
-> and also works with gcc.
+On Wed, Apr 05, 2017 at 04:20:57PM -0700, Rick Altherr wrote:
+> AST2400 can generate 32-bits of random data every 1us.  Original driver
+> was limited to one 32-bit read every jiffie due to deprecated API and use
+> of timers.  Migrating to new hwrng API and switching to hrtimers
+> improves read performance of /dev/hwrng to 13Mb/s.
 > 
-> Also change the constraint of the operand from 'I' ("Integer constant
-> that is valid as an immediate operand in an ADD instruction", AArch64)
-> to 'i' ("An immediate integer operand").
-> 
-> Based-on-patch-from: Greg Hackmann <ghackmann@google.com>
-> Signed-off-by: Greg Hackmann <ghackmann@google.com>
-> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+> Changes in v2:
+> - Split API migration into separate patch
+> - Split type and variable renames into separate patch
+> - Split performance improvements into separate patch
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
