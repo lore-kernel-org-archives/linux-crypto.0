@@ -1,51 +1,50 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v4 2/2] crypto: hw_random - Add new Exynos RNG driver
-Date: Mon, 10 Apr 2017 18:55:47 +0800
-Message-ID: <20170410105547.GA8615@gondor.apana.org.au>
-References: <20170408133245.30147-1-krzk@kernel.org>
- <20170408133245.30147-3-krzk@kernel.org>
+Subject: Re: [PATCH v6 1/2] crypto: skcipher AF_ALG - overhaul memory
+ management
+Date: Mon, 10 Apr 2017 18:56:38 +0800
+Message-ID: <20170410105638.GB8615@gondor.apana.org.au>
+References: <2473716.zZb2vDUueJ@positron.chronox.de>
+ <1663859.jv2e0HPzin@positron.chronox.de>
+ <20170410104333.GB8427@gondor.apana.org.au>
+ <1936619.vexBXQoksL@tauon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: James Hogan <james.hogan@imgtec.com>,
-        Matt Mackall <mpm@selenic.com>, Kukjin Kim <kgene@kernel.org>,
-        Javier Martinez Canillas <javier@osg.samsung.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Dave Airlie <airlied@redhat.com>,
-        David Airlie <airlied@linux.ie>,
-        Bernie Thompson <bernie@plugable.com>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
-        linux-kernel@vger.kernel.org, linux-metag@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-samsung-soc@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-fbdev@vger.kernel.org,
-        Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
-To: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Cc: linux-crypto@vger.kernel.org
+To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:51880 "EHLO
+Received: from orcrist.hmeau.com ([104.223.48.154]:51884 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752746AbdDJK4k (ORCPT
+        with ESMTP id S1752343AbdDJK5C (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Apr 2017 06:56:40 -0400
+        Mon, 10 Apr 2017 06:57:02 -0400
 Content-Disposition: inline
-In-Reply-To: <20170408133245.30147-3-krzk@kernel.org>
+In-Reply-To: <1936619.vexBXQoksL@tauon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Apr 08, 2017 at 03:32:45PM +0200, Krzysztof Kozlowski wrote:
->
-> +static struct rng_alg exynos_rng_alg = {
-> +	.generate		= exynos_rng_generate,
-> +	.seed			= exynos_rng_seed,
-> +	.seedsize		= EXYNOS_RNG_SEED_SIZE,
-> +	.base			= {
-> +		.cra_name		= "exynos_rng",
+On Mon, Apr 10, 2017 at 12:54:58PM +0200, Stephan Müller wrote:
+> Am Montag, 10. April 2017, 12:43:33 CEST schrieb Herbert Xu:
+> 
+> Hi Herbert,
+> 
+> > On Sat, Apr 01, 2017 at 10:52:30PM +0200, Stephan Müller wrote:
+> > >  	lock_sock(sk);
+> > > 
+> > > -	while (msg_data_left(msg)) {
+> > > -		if (!ctx->used) {
+> > > -			err = skcipher_wait_for_data(sk, flags);
+> > > -			if (err)
+> > > -				goto unlock;
+> > > +	while (iov_iter_count(&msg->msg_iter)) {
+> > 
+> > Please keep it as msg_data_left.
+> 
+> Shall I apply the algif_aead patch on top of your patch just sent to stable?
 
-Please use stdrng.  Or is there a reason why this can't be used
-by the crypto layer itself?
+It doesn't really matter.  I'll figure it out when I apply it.
 
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
