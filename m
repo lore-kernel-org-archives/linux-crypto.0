@@ -1,70 +1,76 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/7] arm64: marvell: add cryptographic engine support for
- 7k/8k
-Date: Mon, 10 Apr 2017 17:39:03 +0800
-Message-ID: <20170410093903.GA8035@gondor.apana.org.au>
-References: <20170329124432.27457-1-antoine.tenart@free-electrons.com>
+Subject: crypto: algif_aead - Fix bogus request dereference in completion
+ function
+Date: Mon, 10 Apr 2017 17:59:07 +0800
+Message-ID: <20170410095907.GA8226@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, jason@lakedaemon.net, andrew@lunn.ch,
-        gregory.clement@free-electrons.com,
-        sebastian.hesselbarth@gmail.com, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        thomas.petazzoni@free-electrons.com,
-        boris.brezillon@free-electrons.com, oferh@marvell.com,
-        igall@marvell.com, nadavh@marvell.com
-To: Antoine Tenart <antoine.tenart@free-electrons.com>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:51798 "EHLO
+Received: from orcrist.hmeau.com ([104.223.48.154]:51816 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751134AbdDJJjo (ORCPT
+        with ESMTP id S1752963AbdDJJ7d (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Apr 2017 05:39:44 -0400
+        Mon, 10 Apr 2017 05:59:33 -0400
 Content-Disposition: inline
-In-Reply-To: <20170329124432.27457-1-antoine.tenart@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Mar 29, 2017 at 02:44:25PM +0200, Antoine Tenart wrote:
-> Hi all,
-> 
-> This series adds support for the Inside Secure SafeXcel EIP197
-> cryptographic engine which can be found on Marvell Armada 7k and 8k
-> boards. A new cryptographic engine driver is added, as well as the
-> relevant device tree definition for the Armada 7040 DB and 8040 DB
-> boards.
-> 
-> This driver needs two firmwares to work correctly. These firmware are
-> usually used for more advanced operations than the ones supported (as of
-> now), but we still need them to pass the data to the internal
-> cryptographic engine.
-> 
-> This series was tested in various ways on both the Armada 7040 DB and
-> the Armada 8040 DB: using the crypto framework self tests, using tcrypt
-> and while performing various transfers with iperf on top of IPsec.
-> 
-> This series is based on top of v4.11-rc1, and is available on a branch
-> (which also contains the PPv2 support for 7k/8k, to ease the process of
-> testing IPsec): https://github.com/atenart/linux  v4.11-rc1/7k8k-crypto
-> I can rebase if needed.
-> 
-> Thanks,
-> Antoine
-> 
-> 
-> Antoine Tenart (7):
->   Documentation/bindings: Document the SafeXel cryptographic engine
->     driver
->   crypto: inside-secure: add SafeXcel EIP197 crypto engine driver
->   MAINTAINERS: add a maintainer for the Inside Secure crypto driver
->   arm64: marvell: dts: add crypto engine description for 7k/8k
->   arm64: marvell: dts: enable the crypto engine on the Armada 7040 DB
->   arm64: marvell: dts: enable the crypto engine on the Armada 8040 DB
->   arm64: defconfig: enable the Safexcel crypto engine as a module
+The algif_aead completion function tries to deduce the aead_request
+from the crypto_async_request argument.  This is broken because
+the API does not guarantee that the same request will be pased to
+the completion function.  Only the value of req->data can be used
+in the completion function.
 
-I have no problems with the crypto bits.
+This patch fixes it by storing a pointer to sk in areq and using
+that instead of passing in sk through req->data.
 
-Thanks,
+Fixes: 83094e5e9e49 ("crypto: af_alg - add async support to...")
+Cc: <stable@vger.kernel.org>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
+index 5a80537..ef59d99 100644
+--- a/crypto/algif_aead.c
++++ b/crypto/algif_aead.c
+@@ -40,6 +40,7 @@ struct aead_async_req {
+ 	struct aead_async_rsgl first_rsgl;
+ 	struct list_head list;
+ 	struct kiocb *iocb;
++	struct sock *sk;
+ 	unsigned int tsgls;
+ 	char iv[];
+ };
+@@ -379,12 +380,10 @@ static ssize_t aead_sendpage(struct socket *sock, struct page *page,
+ 
+ static void aead_async_cb(struct crypto_async_request *_req, int err)
+ {
+-	struct sock *sk = _req->data;
+-	struct alg_sock *ask = alg_sk(sk);
+-	struct aead_ctx *ctx = ask->private;
+-	struct crypto_aead *tfm = crypto_aead_reqtfm(&ctx->aead_req);
+-	struct aead_request *req = aead_request_cast(_req);
++	struct aead_request *req = _req->data;
++	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
+ 	struct aead_async_req *areq = GET_ASYM_REQ(req, tfm);
++	struct sock *sk = areq->sk;
+ 	struct scatterlist *sg = areq->tsgl;
+ 	struct aead_async_rsgl *rsgl;
+ 	struct kiocb *iocb = areq->iocb;
+@@ -447,11 +446,12 @@ static int aead_recvmsg_async(struct socket *sock, struct msghdr *msg,
+ 	memset(&areq->first_rsgl, '\0', sizeof(areq->first_rsgl));
+ 	INIT_LIST_HEAD(&areq->list);
+ 	areq->iocb = msg->msg_iocb;
++	areq->sk = sk;
+ 	memcpy(areq->iv, ctx->iv, crypto_aead_ivsize(tfm));
+ 	aead_request_set_tfm(req, tfm);
+ 	aead_request_set_ad(req, ctx->aead_assoclen);
+ 	aead_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+-				  aead_async_cb, sk);
++				  aead_async_cb, req);
+ 	used -= ctx->aead_assoclen;
+ 
+ 	/* take over all tx sgls from ctx */
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
