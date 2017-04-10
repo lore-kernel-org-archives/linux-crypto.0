@@ -1,78 +1,102 @@
-From: Milan Broz <gmazyland@gmail.com>
-Subject: Re: [RFC PATCH v5] IV Generation algorithms for dm-crypt
-Date: Mon, 10 Apr 2017 16:00:39 +0200
-Message-ID: <774a9713-05ef-0162-0203-461254a04f6e@gmail.com>
-References: <1491562064-23591-1-git-send-email-binoy.jayan@linaro.org>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: Re: [PATCH 2/7] Makefile, x86, LLVM: disable unsupported optimization flags
+Date: Mon, 10 Apr 2017 23:54:57 +0900
+Message-ID: <CAK7LNARuyveh5o9ypX56rDACyYW-EMb--TB5Uar-NT0Egc_jiw@mail.gmail.com>
+References: <20170317001520.85223-1-md@google.com> <20170317001520.85223-3-md@google.com>
+ <CAK7LNAR2efi4e3-st-hP3T7v=Hkb81beKibgYeKzxs3Q3kP0uA@mail.gmail.com>
+ <20170405190130.GD145051@google.com> <CA+=D-XVbZfgaQ+ZrjctAF5Ek3kaF3XqTLsSu==hK9savDztKsw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Type: text/plain; charset=UTF-8
+Cc: Matthias Kaehlcke <mka@chromium.org>,
+        Michal Marek <mmarek@suse.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, Mark Brown <broonie@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org,
-        Rajendra <rnayak@codeaurora.org>,
-        Milan Broz <gmazyland@gmail.com>, Gilad <gilad@benyossef.com>
-To: Binoy Jayan <binoy.jayan@linaro.org>, Oded <oded.golombek@arm.com>,
-        Ofir <Ofir.Drang@arm.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:33048 "EHLO
-        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753243AbdDJOAn (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Apr 2017 10:00:43 -0400
-In-Reply-To: <1491562064-23591-1-git-send-email-binoy.jayan@linaro.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+        Shaohua Li <shli@kernel.org>,
+        Alexander Potapenko <glider@google.com>,
+        Dmitry Vyukov <dvyukov@google.com>, X86 ML <x86@kernel.org>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-crypto@vger.kernel.org, linux-raid@vger.kernel.org,
+        Arnd Bergmann <arnd@arndb.de>
+To: Michael Davidson <md@google.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <CA+=D-XVbZfgaQ+ZrjctAF5Ek3kaF3XqTLsSu==hK9savDztKsw@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 04/07/2017 12:47 PM, Binoy Jayan wrote:
-> ===============================================================================
-> dm-crypt optimization for larger block sizes
-> ===============================================================================
-...
-> Tests with dd [direct i/o]
-> 
-> Sequential read            -0.134 %
-> Sequential Write           +0.091 %
-> 
-> Tests with fio [Aggregate bandwidth - aggrb]
-> 
-> Random Read                +0.358 %
-> Random Write               +0.010 %
-> 
-> Tests with bonnie++ [768 MiB File, 384 MiB Ram]
-> after mounting dm-crypt target as ext4
-> 
-> Sequential o/p [per-char]  -2.876 %
-> Sequential o/p [per-blk]   +0.992 %
-> Sequential o/p [re-write]  +4.465 %
-> 
-> Sequential i/p [per-char] -0.453 %
-> Sequential i/p [per-blk]  -0.740 %
-> 
-> Sequential create         -0.255 %
-> Sequential delete         +0.042 %
-> Random create             -0.007 %
-> Random delete             +0.454 %
-> 
-> NB: The '+' sign shows improvement and '-' shows degradation.
->     The tests were performed with minimal cpu load.
->     Tests with higher cpu load to be done
+Hi.
 
-Well, it is good that there is no performance degradation but it
-would be nice to have some user of it that proves it is really
-working for your hw.
 
-FYI - with patch that increases dmcrypt sector size to 4k
-I can see improvement in speed usually in 5-15% with sync AES-NI
-(depends on access pattern), with dmcrypt mapped to memory
-it is even close to 20% speed up (but such a configuration is
-completely artificial).
+2017-04-06 4:11 GMT+09:00 Michael Davidson <md@google.com>:
+> It "works" for the cases that I currently care about but I have to say
+> that I am uneasy about adding -Werror to the cc-option test in this
+> way.
+>
+> Suppose that one of the *other* flags that is implicitly passed to the
+> compiler by cc-option - eg something that was explicitly specified in
+> $(KBUILD_CFLAGS) - triggers a warning. In that case all calls to
+> cc-option will silently fail because of the -Werror and valid options
+> will not be detected correctly.
 
-I wonder why increased dmcrypt sector size does not work for your hw,
-it should help as well (and can be combiuned later with this IV approach).
-(For native 4k drives this should be used in future anyway...)
+Theoretically, options explicitly specified in KBUILD_CFLAGS
+should be always valid.
+Options that may not be supported in some cases
+should be wrapped with $(call cc-option ).
 
-Milan
+
+
+> If everyone is OK with that because "it shouldn't normally ever
+> happen" then that is fine, but if does result in a subtle change from
+> existing behavior (and a trap that I almost immediately fell into
+> after applying a similar patch).
+
+There is a rare case where a particular combination fails
+(such as the conflict between -pg and -ffunction-sections
+as reported in https://patchwork.kernel.org/patch/9624573/).
+
+In a such case, we may end up with swapping the order,
+but this should not happen quite often.
+
+
+
+> On Wed, Apr 5, 2017 at 12:01 PM, Matthias Kaehlcke <mka@chromium.org> wrote:
+>> Hi Masahiro,
+>>
+>> El Thu, Apr 06, 2017 at 03:08:26AM +0900 Masahiro Yamada ha dit:
+>>
+>>> 2017-03-17 9:15 GMT+09:00 Michael Davidson <md@google.com>:
+>>> > Unfortunately, while clang generates a warning about these flags
+>>> > being unsupported it still exits with a status of 0 so we have
+>>> > to explicitly disable them instead of just using a cc-option check.
+>>> >
+>>> > Signed-off-by: Michael Davidson <md@google.com>
+>>>
+>>>
+>>> Instead, does the following work for you?
+>>> https://patchwork.kernel.org/patch/9657285/
+>>
+>> Thanks for the pointer, I was about to give this change (or rather its
+>> ancestor) a rework myself :)
+>>
+>>> You need to use
+>>> $(call cc-option, ...)
+>>> for -falign-jumps=1 and -falign-loops=1
+>>
+>> I can confirm that this works.
+>>
+>> Thanks
+>>
+>> Matthias
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
