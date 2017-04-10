@@ -1,34 +1,39 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Fwd: [linux-next:master 7274/8070] undefined reference to
- `crypto_alloc_shash'
-Date: Mon, 10 Apr 2017 18:22:23 +0800
-Message-ID: <20170410102223.GA8340@gondor.apana.org.au>
-References: <1827882.yksAJm9a6v@positron.chronox.de>
+Subject: Re: authenc: crash if key is not set
+Date: Mon, 10 Apr 2017 18:41:25 +0800
+Message-ID: <20170410104125.GA8427@gondor.apana.org.au>
+References: <13796038.esLDiIrSPd@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: 8bit
-Cc: linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>
+Cc: linux-crypto@vger.kernel.org
 To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:51824 "EHLO
+Received: from orcrist.hmeau.com ([104.223.48.154]:51832 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751946AbdDJKWz (ORCPT
+        with ESMTP id S1752829AbdDJKl4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Apr 2017 06:22:55 -0400
+        Mon, 10 Apr 2017 06:41:56 -0400
 Content-Disposition: inline
-In-Reply-To: <1827882.yksAJm9a6v@positron.chronox.de>
+In-Reply-To: <13796038.esLDiIrSPd@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Apr 09, 2017 at 10:09:54PM +0200, Stephan Müller wrote:
+On Fri, Feb 24, 2017 at 09:24:34PM +0100, Stephan Müller wrote:
 > Hi Herbert,
 > 
-> I got the attached error report. This is due to CRYPTO_HASH2 is selected as m 
-> whereas security/keys/dh.c is compiled as y. Note CRYPTO_HASH is selected as 
-> y.
+> I am working on fuzzing the AF_ALG interface.
+> 
+> The fuzzer reliably triggered the following type of bug when I use 
+> authenc(hmac(sha256),cbc(aes)) or other types of authenc() but do not call 
+> setkey.
+> 
+> Note, it works with gcm or ccm.
+> 
+> Is that bug similar in nature as the algif_skcipher and algif_hash bugs that 
+> were fixed with the *nokey functions?
 
-Hmm that's weird because CRYPTO_HASH selects CRYPTO_HASH2.  Do
-you have a kconfig file that reproduces this?
+Yes we need to add the same thing to AEAD.
 
 Thanks,
 -- 
