@@ -1,216 +1,74 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: crypto: ahash - Fix EINPROGRESS notification callback
-Date: Mon, 10 Apr 2017 16:44:50 +0800
-Message-ID: <20170410084450.GA7533@gondor.apana.org.au>
+Subject: crypto: lrw - Fix use-after-free on EINPROGRESS
+Date: Mon, 10 Apr 2017 17:15:48 +0800
+Message-ID: <20170410091547.GA7634@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Sabrina Dubroca <sdubroca@redhat.com>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:51764 "EHLO
+Received: from orcrist.hmeau.com ([104.223.48.154]:51778 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751134AbdDJIpM (ORCPT
+        with ESMTP id S1752078AbdDJJQH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Apr 2017 04:45:12 -0400
+        Mon, 10 Apr 2017 05:16:07 -0400
 Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The ahash API modifies the request's callback function in order
-to clean up after itself in some corner cases (unaligned final
-and missing finup).
+When we get an EINPROGRESS completion in lrw, we will end up marking
+the request as done and freeing it.  This then blows up when the
+request is really completed as we've already freed the memory.
 
-When the request is complete ahash will restore the original
-callback and everything is fine.  However, when the request gets
-an EBUSY on a full queue, an EINPROGRESS callback is made while
-the request is still ongoing.
-
-In this case the ahash API will incorrectly call its own callback.
-
-This patch fixes the problem by creating a temporary request
-object on the stack which is used to relay EINPROGRESS back to
-the original completion function.
-
-This patch also adds code to preserve the original flags value.
-
-Cc: <vger@stable.kernel.org>
-Reported-by: Sabrina Dubroca <sdubroca@redhat.com>
+Fixes: 700cb3f5fe75 ("crypto: lrw - Convert to skcipher")
+Cc: <stable@vger.kernel.org>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-diff --git a/crypto/ahash.c b/crypto/ahash.c
-index e58c497..1810feb 100644
---- a/crypto/ahash.c
-+++ b/crypto/ahash.c
-@@ -32,6 +32,7 @@ struct ahash_request_priv {
- 	crypto_completion_t complete;
- 	void *data;
- 	u8 *result;
-+	u32 flags;
- 	void *ubuf[] CRYPTO_MINALIGN_ATTR;
- };
+diff --git a/crypto/lrw.c b/crypto/lrw.c
+index 3ea095a..a8bfae4 100644
+--- a/crypto/lrw.c
++++ b/crypto/lrw.c
+@@ -345,6 +345,13 @@ static void encrypt_done(struct crypto_async_request *areq, int err)
+ 	struct rctx *rctx;
  
-@@ -253,6 +254,8 @@ static int ahash_save_req(struct ahash_request *req, crypto_completion_t cplt)
- 	priv->result = req->result;
- 	priv->complete = req->base.complete;
- 	priv->data = req->base.data;
-+	priv->flags = req->base.flags;
+ 	rctx = skcipher_request_ctx(req);
 +
- 	/*
- 	 * WARNING: We do not backup req->priv here! The req->priv
- 	 *          is for internal use of the Crypto API and the
-@@ -267,38 +270,44 @@ static int ahash_save_req(struct ahash_request *req, crypto_completion_t cplt)
- 	return 0;
- }
- 
--static void ahash_restore_req(struct ahash_request *req)
-+static void ahash_restore_req(struct ahash_request *req, int err)
- {
- 	struct ahash_request_priv *priv = req->priv;
- 
-+	if (!err)
-+		memcpy(priv->result, req->result,
-+		       crypto_ahash_digestsize(crypto_ahash_reqtfm(req)));
-+
- 	/* Restore the original crypto request. */
- 	req->result = priv->result;
--	req->base.complete = priv->complete;
--	req->base.data = priv->data;
-+
-+	ahash_request_set_callback(req, priv->flags,
-+				   priv->complete, priv->data);
- 	req->priv = NULL;
- 
- 	/* Free the req->priv.priv from the ADJUSTED request. */
- 	kzfree(priv);
- }
- 
--static void ahash_op_unaligned_finish(struct ahash_request *req, int err)
-+static void ahash_notify_einprogress(struct ahash_request *req)
- {
- 	struct ahash_request_priv *priv = req->priv;
-+	struct crypto_async_request oreq;
- 
--	if (err == -EINPROGRESS)
--		return;
-+	oreq.data = priv->data;
- 
--	if (!err)
--		memcpy(priv->result, req->result,
--		       crypto_ahash_digestsize(crypto_ahash_reqtfm(req)));
--
--	ahash_restore_req(req);
-+	priv->complete(&oreq, -EINPROGRESS);
- }
- 
- static void ahash_op_unaligned_done(struct crypto_async_request *req, int err)
- {
- 	struct ahash_request *areq = req->data;
- 
 +	if (err == -EINPROGRESS) {
-+		ahash_notify_einprogress(areq);
-+		return;
++		if (rctx->left != req->cryptlen)
++			return;
++		goto out;
 +	}
 +
- 	/*
- 	 * Restore the original request, see ahash_op_unaligned() for what
- 	 * goes where.
-@@ -309,7 +318,7 @@ static void ahash_op_unaligned_done(struct crypto_async_request *req, int err)
- 	 */
+ 	subreq = &rctx->subreq;
+ 	subreq->base.flags &= CRYPTO_TFM_REQ_MAY_BACKLOG;
  
- 	/* First copy req->result into req->priv.result */
--	ahash_op_unaligned_finish(areq, err);
-+	ahash_restore_req(areq, err);
- 
- 	/* Complete the ORIGINAL request. */
- 	areq->base.complete(&areq->base, err);
-@@ -325,7 +334,12 @@ static int ahash_op_unaligned(struct ahash_request *req,
- 		return err;
- 
- 	err = op(req);
--	ahash_op_unaligned_finish(req, err);
-+	if (err == -EINPROGRESS ||
-+	    (err == -EBUSY && (ahash_request_flags(req) &
-+			       CRYPTO_TFM_REQ_MAY_BACKLOG)))
-+ 		return err;
-+
-+	ahash_restore_req(req, err);
- 
- 	return err;
- }
-@@ -360,25 +374,14 @@ int crypto_ahash_digest(struct ahash_request *req)
- }
- EXPORT_SYMBOL_GPL(crypto_ahash_digest);
- 
--static void ahash_def_finup_finish2(struct ahash_request *req, int err)
-+static void ahash_def_finup_done2(struct crypto_async_request *req, int err)
- {
--	struct ahash_request_priv *priv = req->priv;
-+	struct ahash_request *areq = req->data;
- 
- 	if (err == -EINPROGRESS)
+@@ -352,6 +359,7 @@ static void encrypt_done(struct crypto_async_request *areq, int err)
+ 	if (rctx->left)
  		return;
  
--	if (!err)
--		memcpy(priv->result, req->result,
--		       crypto_ahash_digestsize(crypto_ahash_reqtfm(req)));
--
--	ahash_restore_req(req);
--}
--
--static void ahash_def_finup_done2(struct crypto_async_request *req, int err)
--{
--	struct ahash_request *areq = req->data;
--
--	ahash_def_finup_finish2(areq, err);
-+	ahash_restore_req(areq, err);
- 
- 	areq->base.complete(&areq->base, err);
++out:
+ 	skcipher_request_complete(req, err);
  }
-@@ -389,11 +392,15 @@ static int ahash_def_finup_finish1(struct ahash_request *req, int err)
- 		goto out;
  
- 	req->base.complete = ahash_def_finup_done2;
--	req->base.flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
+@@ -389,6 +397,13 @@ static void decrypt_done(struct crypto_async_request *areq, int err)
+ 	struct rctx *rctx;
+ 
+ 	rctx = skcipher_request_ctx(req);
 +
- 	err = crypto_ahash_reqtfm(req)->final(req);
-+	if (err == -EINPROGRESS ||
-+	    (err == -EBUSY && (ahash_request_flags(req) &
-+			       CRYPTO_TFM_REQ_MAY_BACKLOG)))
-+		return err;
- 
- out:
--	ahash_def_finup_finish2(req, err);
-+	ahash_restore_req(req, err);
- 	return err;
- }
- 
-@@ -401,7 +408,16 @@ static void ahash_def_finup_done1(struct crypto_async_request *req, int err)
- {
- 	struct ahash_request *areq = req->data;
- 
 +	if (err == -EINPROGRESS) {
-+		ahash_notify_einprogress(areq);
-+		return;
++		if (rctx->left != req->cryptlen)
++			return;
++		goto out;
 +	}
 +
-+	areq->base.flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
-+
- 	err = ahash_def_finup_finish1(areq, err);
-+	if (areq->priv)
-+		return;
+ 	subreq = &rctx->subreq;
+ 	subreq->base.flags &= CRYPTO_TFM_REQ_MAY_BACKLOG;
  
- 	areq->base.complete(&areq->base, err);
- }
-@@ -416,6 +432,11 @@ static int ahash_def_finup(struct ahash_request *req)
- 		return err;
+@@ -396,6 +411,7 @@ static void decrypt_done(struct crypto_async_request *areq, int err)
+ 	if (rctx->left)
+ 		return;
  
- 	err = tfm->update(req);
-+	if (err == -EINPROGRESS ||
-+	    (err == -EBUSY && (ahash_request_flags(req) &
-+			       CRYPTO_TFM_REQ_MAY_BACKLOG)))
-+ 		return err;
-+
- 	return ahash_def_finup_finish1(req, err);
++out:
+ 	skcipher_request_complete(req, err);
  }
  
 -- 
