@@ -1,262 +1,119 @@
 From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: [PATCH] crypto: algif_aead - Require setkey before accept(2)
-Date: Mon, 10 Apr 2017 13:59:21 +0200
-Message-ID: <2439869.UPpkkqdW7f@positron.chronox.de>
+Subject: [PATCH v7 0/2] crypto: AF_ALG memory management fix
+Date: Mon, 10 Apr 2017 14:11:20 +0200
+Message-ID: <5852545.bu9l2NtIoo@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
 Cc: linux-crypto@vger.kernel.org
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:58896 "EHLO mail.eperm.de"
+Received: from mail.eperm.de ([89.247.134.16]:58910 "EHLO mail.eperm.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753169AbdDJL73 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Apr 2017 07:59:29 -0400
+        id S1753235AbdDJMNA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 10 Apr 2017 08:13:00 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Some cipher implementations will crash if you try to use them
-without calling setkey first.  This patch adds a check so that
-the accept(2) call will fail with -ENOKEY if setkey hasn't been
-done on the socket yet.
+Hi Herbert,
 
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- crypto/algif_aead.c | 164 ++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 154 insertions(+), 10 deletions(-)
+Changes v7:
+* use msg_data_left instead of iov_iter_count
+* rebase algif_aead patch on top of the require setkey before accept(2) (i.e.
+  the *nokey functions are included)
 
-diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
-index 5a80537..1f77a6f 100644
---- a/crypto/algif_aead.c
-+++ b/crypto/algif_aead.c
-@@ -44,6 +44,11 @@ struct aead_async_req {
- 	char iv[];
- };
- 
-+struct aead_tfm {
-+	struct crypto_aead *aead;
-+	bool has_key;
-+};
-+
- struct aead_ctx {
- 	struct aead_sg_list tsgl;
- 	struct aead_async_rsgl first_rsgl;
-@@ -723,32 +728,157 @@ static struct proto_ops algif_aead_ops = {
- 	.poll		=	aead_poll,
- };
- 
-+static int aead_check_key(struct socket *sock)
-+{
-+	int err = 0;
-+	struct sock *psk;
-+	struct alg_sock *pask;
-+	struct aead_tfm *tfm;
-+	struct sock *sk = sock->sk;
-+	struct alg_sock *ask = alg_sk(sk);
-+
-+	lock_sock(sk);
-+	if (ask->refcnt)
-+		goto unlock_child;
-+
-+	psk = ask->parent;
-+	pask = alg_sk(ask->parent);
-+	tfm = pask->private;
-+
-+	err = -ENOKEY;
-+	lock_sock_nested(psk, SINGLE_DEPTH_NESTING);
-+	if (!tfm->has_key)
-+		goto unlock;
-+
-+	if (!pask->refcnt++)
-+		sock_hold(psk);
-+
-+	ask->refcnt = 1;
-+	sock_put(psk);
-+
-+	err = 0;
-+
-+unlock:
-+	release_sock(psk);
-+unlock_child:
-+	release_sock(sk);
-+
-+	return err;
-+}
-+
-+static int aead_sendmsg_nokey(struct socket *sock, struct msghdr *msg,
-+				  size_t size)
-+{
-+	int err;
-+
-+	err = aead_check_key(sock);
-+	if (err)
-+		return err;
-+
-+	return aead_sendmsg(sock, msg, size);
-+}
-+
-+static ssize_t aead_sendpage_nokey(struct socket *sock, struct page *page,
-+				       int offset, size_t size, int flags)
-+{
-+	int err;
-+
-+	err = aead_check_key(sock);
-+	if (err)
-+		return err;
-+
-+	return aead_sendpage(sock, page, offset, size, flags);
-+}
-+
-+static int aead_recvmsg_nokey(struct socket *sock, struct msghdr *msg,
-+				  size_t ignored, int flags)
-+{
-+	int err;
-+
-+	err = aead_check_key(sock);
-+	if (err)
-+		return err;
-+
-+	return aead_recvmsg(sock, msg, ignored, flags);
-+}
-+
-+static struct proto_ops algif_aead_ops_nokey = {
-+	.family		=	PF_ALG,
-+
-+	.connect	=	sock_no_connect,
-+	.socketpair	=	sock_no_socketpair,
-+	.getname	=	sock_no_getname,
-+	.ioctl		=	sock_no_ioctl,
-+	.listen		=	sock_no_listen,
-+	.shutdown	=	sock_no_shutdown,
-+	.getsockopt	=	sock_no_getsockopt,
-+	.mmap		=	sock_no_mmap,
-+	.bind		=	sock_no_bind,
-+	.accept		=	sock_no_accept,
-+	.setsockopt	=	sock_no_setsockopt,
-+
-+	.release	=	af_alg_release,
-+	.sendmsg	=	aead_sendmsg_nokey,
-+	.sendpage	=	aead_sendpage_nokey,
-+	.recvmsg	=	aead_recvmsg_nokey,
-+	.poll		=	aead_poll,
-+};
-+
- static void *aead_bind(const char *name, u32 type, u32 mask)
- {
--	return crypto_alloc_aead(name, type, mask);
-+	struct aead_tfm *tfm;
-+	struct crypto_aead *aead;
-+
-+	tfm = kzalloc(sizeof(*tfm), GFP_KERNEL);
-+	if (!tfm)
-+		return ERR_PTR(-ENOMEM);
-+
-+	aead = crypto_alloc_aead(name, type, mask);
-+	if (IS_ERR(aead)) {
-+		kfree(tfm);
-+		return ERR_CAST(aead);
-+	}
-+
-+	tfm->aead = aead;
-+
-+	return tfm;
- }
- 
- static void aead_release(void *private)
- {
--	crypto_free_aead(private);
-+	struct aead_tfm *tfm = private;
-+
-+	crypto_free_aead(tfm->aead);
-+	kfree(tfm);
- }
- 
- static int aead_setauthsize(void *private, unsigned int authsize)
- {
--	return crypto_aead_setauthsize(private, authsize);
-+	struct aead_tfm *tfm = private;
-+
-+	return crypto_aead_setauthsize(tfm->aead, authsize);
- }
- 
- static int aead_setkey(void *private, const u8 *key, unsigned int keylen)
- {
--	return crypto_aead_setkey(private, key, keylen);
-+	struct aead_tfm *tfm = private;
-+	int err;
-+
-+	err = crypto_aead_setkey(tfm->aead, key, keylen);
-+	tfm->has_key = !err;
-+
-+	return err;
- }
- 
- static void aead_sock_destruct(struct sock *sk)
- {
- 	struct alg_sock *ask = alg_sk(sk);
- 	struct aead_ctx *ctx = ask->private;
--	unsigned int ivlen = crypto_aead_ivsize(
--				crypto_aead_reqtfm(&ctx->aead_req));
-+	struct sock *psk = ask->parent;
-+	struct alg_sock *pask = alg_sk(psk);
-+	struct aead_tfm *aeadc = pask->private;
-+	struct crypto_aead *tfm = aeadc->aead;
-+	unsigned int ivlen = crypto_aead_ivsize(tfm);
- 
- 	WARN_ON(atomic_read(&sk->sk_refcnt) != 0);
- 	aead_put_sgl(sk);
-@@ -757,12 +887,14 @@ static void aead_sock_destruct(struct sock *sk)
- 	af_alg_release_parent(sk);
- }
- 
--static int aead_accept_parent(void *private, struct sock *sk)
-+static int aead_accept_parent_nokey(void *private, struct sock *sk)
- {
- 	struct aead_ctx *ctx;
- 	struct alg_sock *ask = alg_sk(sk);
--	unsigned int len = sizeof(*ctx) + crypto_aead_reqsize(private);
--	unsigned int ivlen = crypto_aead_ivsize(private);
-+	struct aead_tfm *tfm = private;
-+	struct crypto_aead *aead = tfm->aead;
-+	unsigned int len = sizeof(*ctx) + crypto_aead_reqsize(aead);
-+	unsigned int ivlen = crypto_aead_ivsize(aead);
- 
- 	ctx = sock_kmalloc(sk, len, GFP_KERNEL);
- 	if (!ctx)
-@@ -789,7 +921,7 @@ static int aead_accept_parent(void *private, struct sock *sk)
- 
- 	ask->private = ctx;
- 
--	aead_request_set_tfm(&ctx->aead_req, private);
-+	aead_request_set_tfm(&ctx->aead_req, aead);
- 	aead_request_set_callback(&ctx->aead_req, CRYPTO_TFM_REQ_MAY_BACKLOG,
- 				  af_alg_complete, &ctx->completion);
- 
-@@ -798,13 +930,25 @@ static int aead_accept_parent(void *private, struct sock *sk)
- 	return 0;
- }
- 
-+static int aead_accept_parent(void *private, struct sock *sk)
-+{
-+	struct aead_tfm *tfm = private;
-+
-+	if (!tfm->has_key)
-+		return -ENOKEY;
-+
-+	return aead_accept_parent_nokey(private, sk);
-+}
-+
- static const struct af_alg_type algif_type_aead = {
- 	.bind		=	aead_bind,
- 	.release	=	aead_release,
- 	.setkey		=	aead_setkey,
- 	.setauthsize	=	aead_setauthsize,
- 	.accept		=	aead_accept_parent,
-+	.accept_nokey	=	aead_accept_parent_nokey,
- 	.ops		=	&algif_aead_ops,
-+	.ops_nokey	=	&algif_aead_ops_nokey,
- 	.name		=	"aead",
- 	.owner		=	THIS_MODULE
- };
+Changes v6:
+* port to 4.11-rc1 (a header file was included from upstream)
+* Limit the RX SGL in an identical fashion as the TX SGL size is limited by
+  adding [skcipher|aead]_readable which is an equivalent to the existing
+  [skcipher|aead]_writable. To ensure that the limit is enforced, ctx->rcvused
+  is added which tracks the RX SGL memory currently in use for the context
+  (i.e. covering all requests that are currently processed).
+* Add an outer loop to the recvmsg operation to allow continuous recvmsg
+  operation in parallel to a continuous sendmsg operation.
+
+Changes v5:
+* use list_for_each_entry_safe in aead_count_tsgl
+
+Changes v4:
+* replace ctx->processed with a maintenance of a private recvmsg
+  TX SGL
+* algif_skcipher: rename skcipher_sg_list into skcipher_tsgl to make
+  it consistent with algif_aead to prepare for a code consolidation
+
+Changes v3:
+* in *_pull_tsgl: make sure ctx->processed cannot be less than zero
+* perform fuzzing of all input parameters with bogus values
+
+Changes v2:
+* import fix from Harsh Jain <harsh@chelsio.com> to remove SG
+  from list before freeing
+* fix return code used for ki_complete to match AIO behavior
+  with sync behavior
+* rename variable list -> tsgl_list
+* update the algif_aead patch to include a dynamic TX SGL
+  allocation similar to what algif_skcipher does. This allows
+  concurrent continuous read/write operations to the extent
+  you requested. Although I have not implemented "pairs of
+  TX/RX SGLs" as I think that is even more overhead, the
+  implementation conceptually defines such pairs. The recvmsg
+  call defines how much from the input data is processed.
+  The caller can have arbitrary number of sendmsg calls
+  where the data is added to the TX SGL before an recvmsg
+  asks the kernel to process a given amount (or all) of the
+  TX SGL.
+
+With the changes, you will see a lot of code duplication now
+as I deliberately tried to use the same struct and variable names,
+the same function names and even the same oder of functions.
+If you agree to this patch, I volunteer to provide a followup
+patch that will extract the code duplication into common
+functions.
+
+Please find attached memory management updates to
+
+- simplify the code: the old AIO memory management is very
+  complex and seemingly very fragile -- the update now
+  eliminates all reported bugs in the skcipher and AEAD
+  interfaces which allowed the kernel to be crashed by
+  an unprivileged user
+
+- streamline the code: there is one code path for AIO and sync
+  operation; the code between algif_skcipher and algif_aead
+  is very similar (if that patch set is accepted, I volunteer
+  to reduce code duplication by moving service operations
+  into af_alg.c and to further unify the TX SGL handling)
+
+- unify the AIO and sync operation which only differ in the
+  kernel crypto API callback and whether to wait for the
+  crypto operation or not
+
+- fix all reported bugs regarding the handling of multiple
+  IOCBs.
+
+The following testing was performed:
+
+- stress testing to verify that no memleaks exist
+
+- testing using Tadeusz Struck AIO test tool (see
+  https://github.com/tstruk/afalg_async_test) -- the AEAD test
+  is not applicable any more due to the changed user space
+  interface; the skcipher test works once the user space
+  interface change is honored in the test code
+
+- using the libkcapi test suite, all tests including the
+  originally failing ones (AIO with multiple IOCBs) work now --
+  the current libkcapi code artificially limits the AEAD
+  operation to one IOCB. After altering the libkcapi code
+  to allow multiple IOCBs, the testing works flawless.
+
+Stephan Mueller (2):
+  crypto: skcipher AF_ALG - overhaul memory management
+  crypto: aead AF_ALG - overhaul memory management
+
+ crypto/algif_aead.c     | 776 ++++++++++++++++++++++++++++--------------------
+ crypto/algif_skcipher.c | 579 ++++++++++++++++++------------------
+ 2 files changed, 750 insertions(+), 605 deletions(-)
+
 -- 
 2.9.3
