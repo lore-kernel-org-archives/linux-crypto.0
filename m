@@ -1,77 +1,61 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: crypto: lrw - Fix use-after-free on EINPROGRESS
-Date: Mon, 10 Apr 2017 17:15:48 +0800
-Message-ID: <20170410091547.GA7634@gondor.apana.org.au>
+From: Sabrina Dubroca <sd@queasysnail.net>
+Subject: Re: crypto: ahash - Fix EINPROGRESS notification callback
+Date: Mon, 10 Apr 2017 11:21:27 +0200
+Message-ID: <20170410092127.GA24816@bistromath.localdomain>
+References: <20170410084450.GA7533@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:51778 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752078AbdDJJQH (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Apr 2017 05:16:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46140 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752750AbdDJJVb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 10 Apr 2017 05:21:31 -0400
 Content-Disposition: inline
+In-Reply-To: <20170410084450.GA7533@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-When we get an EINPROGRESS completion in lrw, we will end up marking
-the request as done and freeing it.  This then blows up when the
-request is really completed as we've already freed the memory.
+2017-04-10, 16:44:50 +0800, Herbert Xu wrote:
+> The ahash API modifies the request's callback function in order
+> to clean up after itself in some corner cases (unaligned final
+> and missing finup).
+> 
+> When the request is complete ahash will restore the original
+> callback and everything is fine.  However, when the request gets
+> an EBUSY on a full queue, an EINPROGRESS callback is made while
+> the request is still ongoing.
+> 
+> In this case the ahash API will incorrectly call its own callback.
+> 
+> This patch fixes the problem by creating a temporary request
+> object on the stack which is used to relay EINPROGRESS back to
+> the original completion function.
+> 
+> This patch also adds code to preserve the original flags value.
+> 
+> Cc: <vger@stable.kernel.org>
 
-Fixes: 700cb3f5fe75 ("crypto: lrw - Convert to skcipher")
-Cc: <stable@vger.kernel.org>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Should that be stable@vger.kernel.org?
 
-diff --git a/crypto/lrw.c b/crypto/lrw.c
-index 3ea095a..a8bfae4 100644
---- a/crypto/lrw.c
-+++ b/crypto/lrw.c
-@@ -345,6 +345,13 @@ static void encrypt_done(struct crypto_async_request *areq, int err)
- 	struct rctx *rctx;
- 
- 	rctx = skcipher_request_ctx(req);
-+
-+	if (err == -EINPROGRESS) {
-+		if (rctx->left != req->cryptlen)
-+			return;
-+		goto out;
-+	}
-+
- 	subreq = &rctx->subreq;
- 	subreq->base.flags &= CRYPTO_TFM_REQ_MAY_BACKLOG;
- 
-@@ -352,6 +359,7 @@ static void encrypt_done(struct crypto_async_request *areq, int err)
- 	if (rctx->left)
- 		return;
- 
-+out:
- 	skcipher_request_complete(req, err);
- }
- 
-@@ -389,6 +397,13 @@ static void decrypt_done(struct crypto_async_request *areq, int err)
- 	struct rctx *rctx;
- 
- 	rctx = skcipher_request_ctx(req);
-+
-+	if (err == -EINPROGRESS) {
-+		if (rctx->left != req->cryptlen)
-+			return;
-+		goto out;
-+	}
-+
- 	subreq = &rctx->subreq;
- 	subreq->base.flags &= CRYPTO_TFM_REQ_MAY_BACKLOG;
- 
-@@ -396,6 +411,7 @@ static void decrypt_done(struct crypto_async_request *areq, int err)
- 	if (rctx->left)
- 		return;
- 
-+out:
- 	skcipher_request_complete(req, err);
- }
- 
+> Reported-by: Sabrina Dubroca <sdubroca@redhat.com>
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+The definition of ahash_request_flags() was missing, so I added:
+
+    static inline u32 ahash_request_flags(struct ahash_request *req)
+    {
+           return req->base.flags;
+    }
+
+And with this, my tests seem fine.
+
+Tested-by: Sabrina Dubroca <sd@queasysnail.net>
+Could also you change the 'Reported-by:' to that email address?
+
+
+Thanks,
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Sabrina
