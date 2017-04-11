@@ -1,89 +1,119 @@
-From: Gregory CLEMENT <gregory.clement@free-electrons.com>
-Subject: Re: [PATCH 0/7] arm64: marvell: add cryptographic engine support for 7k/8k
-Date: Tue, 11 Apr 2017 18:12:25 +0200
-Message-ID: <87efwyj53q.fsf@free-electrons.com>
-References: <20170329124432.27457-1-antoine.tenart@free-electrons.com>
-        <20170410093903.GA8035@gondor.apana.org.au>
+From: Krzysztof Kozlowski <krzk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Subject: [PATCH v5 0/2] crypto: hw_random - Add new Exynos RNG driver
+Date: Tue, 11 Apr 2017 20:08:33 +0200
+Message-ID: <20170411180835.8928-1-krzk@kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
-        davem@davemloft.net, jason@lakedaemon.net, andrew@lunn.ch,
-        sebastian.hesselbarth@gmail.com, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        thomas.petazzoni@free-electrons.com,
-        boris.brezillon@free-electrons.com, oferh@marvell.com,
-        igall@marvell.com, nadavh@marvell.com
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:36457 "EHLO
-        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751848AbdDKQM1 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Apr 2017 12:12:27 -0400
-In-Reply-To: <20170410093903.GA8035@gondor.apana.org.au> (Herbert Xu's message
-        of "Mon, 10 Apr 2017 17:39:03 +0800")
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+To: James Hogan <james.hogan-1AXoQHu6uovQT0dZR+AlfA@public.gmane.org>,
+        Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org>,
+        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+        Kukjin Kim <kgene-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        Krzysztof Kozlowski <krzk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        Javier Martinez Canillas <javier-JPH+aEBZ4P+UEJcrhfAQsw@public.gmane.org>,
+        "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+        Dave Airlie <airlied-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+        David Airlie <airlied-cv59FeDIM0c@public.gmane.org>,
+        Bernie Thompson <bernie-5otTQG2S3XlWk0Htik3J/w@public.gmane.org>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>,
+        Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>,
+        PrasannaKumar Muralidharan <prasannatsmkumar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-metag-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+        linux-samsung-soc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, dri-devel-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org,
+        linux-fbdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+Return-path: <linux-metag-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-metag-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Herbert,
- 
- On lun., avril 10 2017, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+Hi,
 
-> On Wed, Mar 29, 2017 at 02:44:25PM +0200, Antoine Tenart wrote:
->> Hi all,
->> 
->> This series adds support for the Inside Secure SafeXcel EIP197
->> cryptographic engine which can be found on Marvell Armada 7k and 8k
->> boards. A new cryptographic engine driver is added, as well as the
->> relevant device tree definition for the Armada 7040 DB and 8040 DB
->> boards.
->> 
->> This driver needs two firmwares to work correctly. These firmware are
->> usually used for more advanced operations than the ones supported (as of
->> now), but we still need them to pass the data to the internal
->> cryptographic engine.
->> 
->> This series was tested in various ways on both the Armada 7040 DB and
->> the Armada 8040 DB: using the crypto framework self tests, using tcrypt
->> and while performing various transfers with iperf on top of IPsec.
->> 
->> This series is based on top of v4.11-rc1, and is available on a branch
->> (which also contains the PPv2 support for 7k/8k, to ease the process of
->> testing IPsec): https://github.com/atenart/linux  v4.11-rc1/7k8k-crypto
->> I can rebase if needed.
->> 
->> Thanks,
->> Antoine
->> 
->> 
->> Antoine Tenart (7):
->>   Documentation/bindings: Document the SafeXel cryptographic engine
->>     driver
->>   crypto: inside-secure: add SafeXcel EIP197 crypto engine driver
->>   MAINTAINERS: add a maintainer for the Inside Secure crypto driver
->>   arm64: marvell: dts: add crypto engine description for 7k/8k
->>   arm64: marvell: dts: enable the crypto engine on the Armada 7040 DB
->>   arm64: marvell: dts: enable the crypto engine on the Armada 8040 DB
->>   arm64: defconfig: enable the Safexcel crypto engine as a module
->
-> I have no problems with the crypto bits.
+This is a follow up of my questions around exynos-rng [1].
 
-Does it means that you agree that I apply the arm-soc related patches
-(from 4 to 7) to my mvebu trees?
+Changes since v4:
+=================
+1. Patch 2/2: Use "stdrng" name, as suggested by Herbert.
+2. Patch 2/2: Add Bartlomiej's reviewed-by.
 
-Thanks,
+Changes since v3:
+=================
+1. New patch: 1/2 for ALIGN_DOWN macro. The change in metag architecture
+   was not compiled. Please test it.
+2. Dropped patches touching ARM defconfig as they are not changing and
+   they pollute this submission.
+3. Utilize all seed provided by kcapi (suggested by Stephan Müller).
+4. Drop dev->ctx (suggested by PrasannaKumar Muralidharan).
+5. Remove any printks from set_seed callback as this might be a way
+   for unprivileged user to pollute the log (suggested by Stephan).
+6. Minor cleanups: initialize 'read' variable in exynos_rng_reseed()
+   for readability (it is not strictly required).
+7. Add review tags from Stephen and PrasannaKumar.
 
-Gregory
 
->
-> Thanks,
-> -- 
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Changes since v2:
+=================
+1. Do not re-use random numbers for re-seed (neither for system resume
+   nor for periodic re-seed).  Instead the driver will just generate new
+   random numbers (suggested by Stephan Müller).
+
+   Suspend path tested with suspend-to-freeze, not real suspend. Testing
+   on Trats2 would be welcomed.
+
+Changes since v1:
+=================
+1. Re-work the code for seeding after system resume, following suggestions
+   and review by Stephan Müller.
+
+2. Re-seed itself from time to time (every 100 ms), suggested by Stephan
+   Müller.
+
+3. Use a define for retries (Bartlomiej Zolnierkiewicz).
+4. Add some docs.
+
+
+Description:
+============
+The existing exynos-rng has many issues.  The most important one is that
+it is a pseudo RNG device but uses hw_random interface which does not allow
+proper seeding.
+
+The RNG module on Exynos4 requires seeding.  On newer SoCs (like Exynos5420)
+it can seed itself from a true RNG.  Converting the existing driver
+to use TRNG would effectively drop support for Exynos4 and break
+compatibility with existing users.
+
+Instead I decided to convert it to crypto API.  In the future I hope
+to add support for seeding from TRNG module.
+
+Tested with app [2].
+
+Patches are independent. I will take the defconfig changes (2/3 and 3/3)
+through samsung-soc tree.
+
+Best regards,
+Krzysztof
+
+[1] https://www.spinics.net/lists/arm-kernel/msg569641.html
+[2] https://www.spinics.net/lists/arm-kernel/msg571184.html
+
+Krzysztof Kozlowski (2):
+  linux/kernel.h: Add ALIGN_DOWN macro
+  crypto: hw_random - Add new Exynos RNG driver
+
+ MAINTAINERS                         |   8 +
+ arch/metag/kernel/stacktrace.c      |   2 -
+ drivers/char/hw_random/Kconfig      |  14 --
+ drivers/char/hw_random/Makefile     |   1 -
+ drivers/char/hw_random/exynos-rng.c | 231 ---------------------
+ drivers/crypto/Kconfig              |  15 ++
+ drivers/crypto/Makefile             |   1 +
+ drivers/crypto/exynos-rng.c         | 389 ++++++++++++++++++++++++++++++++++++
+ drivers/gpu/drm/udl/udl_fb.c        |   2 +-
+ include/linux/kernel.h              |   1 +
+ include/video/udlfb.h               |   2 +-
+ 11 files changed, 416 insertions(+), 250 deletions(-)
+ delete mode 100644 drivers/char/hw_random/exynos-rng.c
+ create mode 100644 drivers/crypto/exynos-rng.c
 
 -- 
-Gregory Clement, Free Electrons
-Kernel, drivers, real-time and embedded Linux
-development, consulting, training and support.
-http://free-electrons.com
+2.9.3
