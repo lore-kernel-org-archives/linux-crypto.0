@@ -1,32 +1,46 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: Fwd: [linux-next:master 7274/8070] undefined reference to `crypto_alloc_shash'
-Date: Tue, 11 Apr 2017 12:56:16 +0200
-Message-ID: <2872138.dZQKejMMtt@tauon.chronox.de>
-References: <1827882.yksAJm9a6v@positron.chronox.de> <1883619.lA7a8XQHvy@tauon.chronox.de> <20170411105000.GA12081@gondor.apana.org.au>
+From: Wei Yongjun <weiyj.lk@gmail.com>
+Subject: [PATCH -next] crypto: caam - fix error return code in caam_qi_init()
+Date: Tue, 11 Apr 2017 16:04:09 +0000
+Message-ID: <20170411160409.18430-1-weiyj.lk@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: Wei Yongjun <weiyongjun1@huawei.com>, linux-crypto@vger.kernel.org
+To: horia.geanta@nxp.com, dan.douglass@nxp.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:58912 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752674AbdDKK4S (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Apr 2017 06:56:18 -0400
-In-Reply-To: <20170411105000.GA12081@gondor.apana.org.au>
+Received: from mail-pf0-f195.google.com ([209.85.192.195]:33178 "EHLO
+        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752757AbdDKQEQ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 11 Apr 2017 12:04:16 -0400
+Received: by mail-pf0-f195.google.com with SMTP id c198so256571pfc.0
+        for <linux-crypto@vger.kernel.org>; Tue, 11 Apr 2017 09:04:16 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 11. April 2017, 12:50:00 CEST schrieb Herbert Xu:
+From: Wei Yongjun <weiyongjun1@huawei.com>
 
-Hi Herbert,
+Fix to return error code -ENOMEM from the kmem_cache_create() error
+handling case instead of 0(err is 0 here), as done elsewhere in this
+function.
 
-> I see the problem.  When you select CRYPTO_HASH you must also
-> select CRYPTO.
+Fixes: 67c2315def06 ("crypto: caam - add Queue Interface (QI) backend support")
+Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
+---
+ drivers/crypto/caam/qi.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thank you very much.
-
-I will prepare a patch.
-
-Ciao
-Stephan
+diff --git a/drivers/crypto/caam/qi.c b/drivers/crypto/caam/qi.c
+index 45de8fd..1990ed4 100644
+--- a/drivers/crypto/caam/qi.c
++++ b/drivers/crypto/caam/qi.c
+@@ -789,7 +789,7 @@ int caam_qi_init(struct platform_device *caam_pdev)
+ 		dev_err(qidev, "Can't allocate CAAM cache\n");
+ 		free_rsp_fqs();
+ 		platform_device_unregister(qi_pdev);
+-		return err;
++		return -ENOMEM;
+ 	}
+ 
+ 	/* Done with the CGRs; restore the cpus allowed mask */
