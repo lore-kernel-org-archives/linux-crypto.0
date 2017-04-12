@@ -1,68 +1,68 @@
-From: Gregory CLEMENT <gregory.clement@free-electrons.com>
-Subject: Re: [PATCH 7/7] arm64: defconfig: enable the Safexcel crypto engine as a module
-Date: Wed, 12 Apr 2017 10:38:03 +0200
-Message-ID: <87shleggwk.fsf@free-electrons.com>
-References: <20170329124432.27457-1-antoine.tenart@free-electrons.com>
-        <20170329124432.27457-8-antoine.tenart@free-electrons.com>
-Mime-Version: 1.0
-Content-Type: text/plain
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-        jason@lakedaemon.net, andrew@lunn.ch,
-        sebastian.hesselbarth@gmail.com, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        thomas.petazzoni@free-electrons.com,
-        boris.brezillon@free-electrons.com, oferh@marvell.com,
-        igall@marvell.com, nadavh@marvell.com
-To: Antoine Tenart <antoine.tenart@free-electrons.com>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: [PATCH] padata: get_next is never NULL
+Date: Wed, 12 Apr 2017 10:40:19 +0200
+Message-ID: <20170412084019.16190-1-Jason@zx2c4.com>
+References: <20170411091601.GA24844@mwanda>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: steffen.klassert@secunet.com, linux-crypto@vger.kernel.org,
+        dan.carpenter@oracle.com, linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:49233 "EHLO
-        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753262AbdDLIiU (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Apr 2017 04:38:20 -0400
-In-Reply-To: <20170329124432.27457-8-antoine.tenart@free-electrons.com>
-        (Antoine Tenart's message of "Wed, 29 Mar 2017 14:44:32 +0200")
+Received: from frisell.zx2c4.com ([192.95.5.64]:42779 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753394AbdDLIke (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 12 Apr 2017 04:40:34 -0400
+In-Reply-To: <20170411091601.GA24844@mwanda>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Antoine,
+Per Dan's static checker warning, the code that returns NULL was removed
+in 2010, so this patch updates the comments and fixes the code
+assumptions.
+
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
+---
+ kernel/padata.c | 13 ++++---------
+ 1 file changed, 4 insertions(+), 9 deletions(-)
+
+diff --git a/kernel/padata.c b/kernel/padata.c
+index f1aef1639204..ac8f1e524836 100644
+--- a/kernel/padata.c
++++ b/kernel/padata.c
+@@ -154,8 +154,6 @@ EXPORT_SYMBOL(padata_do_parallel);
+  * A pointer to the control struct of the next object that needs
+  * serialization, if present in one of the percpu reorder queues.
+  *
+- * NULL, if all percpu reorder queues are empty.
+- *
+  * -EINPROGRESS, if the next object that needs serialization will
+  *  be parallel processed by another cpu and is not yet present in
+  *  the cpu's reorder queue.
+@@ -182,8 +180,6 @@ static struct padata_priv *padata_get_next(struct parallel_data *pd)
+ 	cpu = padata_index_to_cpu(pd, next_index);
+ 	next_queue = per_cpu_ptr(pd->pqueue, cpu);
  
- On mer., mars 29 2017, Antoine Tenart <antoine.tenart@free-electrons.com> wrote:
-
-> The Safexcel EIP197 cryptographic engine is used on some Marvell SoCs,
-> such as Armada 7040 and Armada 8040. Enable this driver as a module in
-> the ARM64 defconfig.
->
-> Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
-
-Applied on mvebu/defconfig64
-
-Thanks,
-
-Gregory
-
-> ---
->  arch/arm64/configs/defconfig | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
-> index fece4d3c2095..76308fa2fa7a 100644
-> --- a/arch/arm64/configs/defconfig
-> +++ b/arch/arm64/configs/defconfig
-> @@ -519,6 +519,7 @@ CONFIG_MEMTEST=y
->  CONFIG_SECURITY=y
->  CONFIG_CRYPTO_ECHAINIV=y
->  CONFIG_CRYPTO_ANSI_CPRNG=y
-> +CONFIG_CRYPTO_DEV_SAFEXCEL=m
->  CONFIG_ARM64_CRYPTO=y
->  CONFIG_CRYPTO_SHA1_ARM64_CE=y
->  CONFIG_CRYPTO_SHA2_ARM64_CE=y
-> -- 
-> 2.11.0
->
-
+-	padata = NULL;
+-
+ 	reorder = &next_queue->reorder;
+ 
+ 	spin_lock(&reorder->lock);
+@@ -235,12 +231,11 @@ static void padata_reorder(struct parallel_data *pd)
+ 		padata = padata_get_next(pd);
+ 
+ 		/*
+-		 * All reorder queues are empty, or the next object that needs
+-		 * serialization is parallel processed by another cpu and is
+-		 * still on it's way to the cpu's reorder queue, nothing to
+-		 * do for now.
++		 * If the next object that needs serialization is parallel
++		 * processed by another cpu and is still on it's way to the
++		 * cpu's reorder queue, nothing to do for now.
+ 		 */
+-		if (!padata || PTR_ERR(padata) == -EINPROGRESS)
++		if (PTR_ERR(padata) == -EINPROGRESS)
+ 			break;
+ 
+ 		/*
 -- 
-Gregory Clement, Free Electrons
-Kernel, drivers, real-time and embedded Linux
-development, consulting, training and support.
-http://free-electrons.com
+2.12.2
