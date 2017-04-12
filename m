@@ -1,7 +1,7 @@
 From: Gary R Hook <gary.hook@amd.com>
-Subject: [PATCH 1/2] crypto: ccp - Use only the relevant interrupt bits
-Date: Wed, 12 Apr 2017 17:54:35 -0500
-Message-ID: <20170412225435.17707.67228.stgit@taos>
+Subject: [PATCH 2/2] crypto: ccp - Disable interrupts early on unload
+Date: Wed, 12 Apr 2017 17:54:43 -0500
+Message-ID: <20170412225443.17707.83299.stgit@taos>
 References: <20170412225324.17707.75176.stgit@taos>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -10,37 +10,39 @@ Cc: <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>,
         <davem@davemloft.net>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn3nam01on0074.outbound.protection.outlook.com ([104.47.33.74]:27874
-        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
+Received: from mail-bl2nam02on0080.outbound.protection.outlook.com ([104.47.38.80]:24400
+        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1754893AbdDLWyt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Apr 2017 18:54:49 -0400
+        id S1755387AbdDLWzA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 12 Apr 2017 18:55:00 -0400
 In-Reply-To: <20170412225324.17707.75176.stgit@taos>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Each CCP queue can product interrupts for 4 conditions:
-operation complete, queue empty, error, and queue stopped.
-This driver only works with completion and error events.
+From: Gary R Hook <ghook@amd.com>
 
-Signed-off-by: Gary R Hook <gary.hook@amd.com>
+Ensure that we disable interrupts first when shutting down
+the driver.
+
+Signed-off-by: Gary R Hook <ghook@amd.com>
 ---
- drivers/crypto/ccp/ccp-dev.h |    5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ drivers/crypto/ccp/ccp-dev-v5.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/ccp/ccp-dev.h b/drivers/crypto/ccp/ccp-dev.h
-index 191274d..a60aac7 100644
---- a/drivers/crypto/ccp/ccp-dev.h
-+++ b/drivers/crypto/ccp/ccp-dev.h
-@@ -109,9 +109,8 @@
- #define INT_COMPLETION			0x1
- #define INT_ERROR			0x2
- #define INT_QUEUE_STOPPED		0x4
--#define ALL_INTERRUPTS			(INT_COMPLETION| \
--					 INT_ERROR| \
--					 INT_QUEUE_STOPPED)
-+#define	INT_EMPTY_QUEUE			0x8
-+#define ALL_INTERRUPTS			(INT_COMPLETION | INT_ERROR)
+diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
+index e03d06a..293c08e 100644
+--- a/drivers/crypto/ccp/ccp-dev-v5.c
++++ b/drivers/crypto/ccp/ccp-dev-v5.c
+@@ -942,10 +942,10 @@ static void ccp5_destroy(struct ccp_device *ccp)
+ 		iowrite32(cmd_q->qcontrol & ~CMD5_Q_RUN, cmd_q->reg_control);
  
- #define LSB_REGION_WIDTH		5
- #define MAX_LSB_CNT			8
+ 		/* Disable the interrupts */
+-		iowrite32(ALL_INTERRUPTS, cmd_q->reg_interrupt_status);
++		iowrite32(0x00, cmd_q->reg_int_enable);
+ 
+ 		/* Clear the interrupt status */
+-		iowrite32(0x00, cmd_q->reg_int_enable);
++		iowrite32(ALL_INTERRUPTS, cmd_q->reg_interrupt_status);
+ 		ioread32(cmd_q->reg_int_status);
+ 		ioread32(cmd_q->reg_status);
+ 	}
