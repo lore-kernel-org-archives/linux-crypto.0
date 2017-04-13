@@ -1,7 +1,8 @@
 From: Gary R Hook <gary.hook@amd.com>
-Subject: [PATCH V2 0/2] Interrupt management fixes
-Date: Thu, 13 Apr 2017 11:46:36 -0500
-Message-ID: <20170413164352.11624.84058.stgit@taos>
+Subject: [PATCH V2 1/2] crypto: ccp - Use only the relevant interrupt bits
+Date: Thu, 13 Apr 2017 11:46:46 -0500
+Message-ID: <20170413164646.11624.66163.stgit@taos>
+References: <20170413164352.11624.84058.stgit@taos>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
@@ -9,28 +10,79 @@ Cc: <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>,
         <davem@davemloft.net>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-co1nam03on0040.outbound.protection.outlook.com ([104.47.40.40]:21184
-        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
+Received: from mail-dm3nam03on0085.outbound.protection.outlook.com ([104.47.41.85]:6016
+        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752689AbdDMQqx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Apr 2017 12:46:53 -0400
+        id S1752689AbdDMQrD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 13 Apr 2017 12:47:03 -0400
+In-Reply-To: <20170413164352.11624.84058.stgit@taos>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Correct the driver to attend to only relevant interrupt
-bits, and ensure that interrupts are managed properly
-at module unload.
+Each CCP queue can product interrupts for 4 conditions:
+operation complete, queue empty, error, and queue stopped.
+This driver only works with completion and error events.
 
-Changes from V1:
-- Changed the #define to "SUPPORTED_INTERRUPTS"
-
+Signed-off-by: Gary R Hook <gary.hook@amd.com>
 ---
-
-Gary R Hook (2):
-      crypto: ccp - Use only the relevant interrupt bits
-      crypto: ccp - Disable interrupts early on unload
-
-
- drivers/crypto/ccp/ccp-dev-v5.c |   11 ++++++-----
+ drivers/crypto/ccp/ccp-dev-v5.c |    9 +++++----
  drivers/crypto/ccp/ccp-dev.h    |    5 ++---
- 2 files changed, 8 insertions(+), 8 deletions(-)
+ 2 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
+index e03d06a..c7972e7 100644
+--- a/drivers/crypto/ccp/ccp-dev-v5.c
++++ b/drivers/crypto/ccp/ccp-dev-v5.c
+@@ -801,7 +801,7 @@ static int ccp5_init(struct ccp_device *ccp)
+ 		ioread32(cmd_q->reg_status);
+ 
+ 		/* Clear the interrupts */
+-		iowrite32(ALL_INTERRUPTS, cmd_q->reg_interrupt_status);
++		iowrite32(SUPPORTED_INTERRUPTS, cmd_q->reg_interrupt_status);
+ 	}
+ 
+ 	dev_dbg(dev, "Requesting an IRQ...\n");
+@@ -882,7 +882,7 @@ static int ccp5_init(struct ccp_device *ccp)
+ 	/* Enable interrupts */
+ 	for (i = 0; i < ccp->cmd_q_count; i++) {
+ 		cmd_q = &ccp->cmd_q[i];
+-		iowrite32(ALL_INTERRUPTS, cmd_q->reg_int_enable);
++		iowrite32(SUPPORTED_INTERRUPTS, cmd_q->reg_int_enable);
+ 	}
+ 
+ 	dev_dbg(dev, "Registering device...\n");
+@@ -942,7 +942,7 @@ static void ccp5_destroy(struct ccp_device *ccp)
+ 		iowrite32(cmd_q->qcontrol & ~CMD5_Q_RUN, cmd_q->reg_control);
+ 
+ 		/* Disable the interrupts */
+-		iowrite32(ALL_INTERRUPTS, cmd_q->reg_interrupt_status);
++		iowrite32(SUPPORTED_INTERRUPTS, cmd_q->reg_interrupt_status);
+ 
+ 		/* Clear the interrupt status */
+ 		iowrite32(0x00, cmd_q->reg_int_enable);
+@@ -1002,7 +1002,8 @@ static irqreturn_t ccp5_irq_handler(int irq, void *data)
+ 			cmd_q->int_rcvd = 1;
+ 
+ 			/* Acknowledge the interrupt and wake the kthread */
+-			iowrite32(ALL_INTERRUPTS, cmd_q->reg_interrupt_status);
++			iowrite32(SUPPORTED_INTERRUPTS,
++				  cmd_q->reg_interrupt_status);
+ 			wake_up_interruptible(&cmd_q->int_queue);
+ 		}
+ 	}
+diff --git a/drivers/crypto/ccp/ccp-dev.h b/drivers/crypto/ccp/ccp-dev.h
+index 191274d..2dfec01 100644
+--- a/drivers/crypto/ccp/ccp-dev.h
++++ b/drivers/crypto/ccp/ccp-dev.h
+@@ -109,9 +109,8 @@
+ #define INT_COMPLETION			0x1
+ #define INT_ERROR			0x2
+ #define INT_QUEUE_STOPPED		0x4
+-#define ALL_INTERRUPTS			(INT_COMPLETION| \
+-					 INT_ERROR| \
+-					 INT_QUEUE_STOPPED)
++#define	INT_EMPTY_QUEUE			0x8
++#define SUPPORTED_INTERRUPTS		(INT_COMPLETION | INT_ERROR)
+ 
+ #define LSB_REGION_WIDTH		5
+ #define MAX_LSB_CNT			8
