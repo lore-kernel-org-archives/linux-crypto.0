@@ -1,374 +1,205 @@
-From: Abed Kamaluddin <abedamu@gmail.com>
-Subject: [RFC PATCH v1 1/1] crypto: algif_compression - User-space interface for compression
-Date: Fri, 14 Apr 2017 00:04:54 +0530
-Message-ID: <1492108494-10694-2-git-send-email-akamaluddin@cavium.com>
-References: <1492108494-10694-1-git-send-email-akamaluddin@cavium.com>
-Cc: akamaluddin@cavium.com, pathreya@cavium.com, machalla@cavium.com
-To: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f194.google.com ([209.85.192.194]:36186 "EHLO
-        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755809AbdDMSfh (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Apr 2017 14:35:37 -0400
-Received: by mail-pf0-f194.google.com with SMTP id i5so12129492pfc.3
-        for <linux-crypto@vger.kernel.org>; Thu, 13 Apr 2017 11:35:36 -0700 (PDT)
-In-Reply-To: <1492108494-10694-1-git-send-email-akamaluddin@cavium.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Logan Gunthorpe <logang-OTvnGxWRz7hWk0Htik3J/w@public.gmane.org>
+Subject: [PATCH 01/22] scatterlist: Introduce sg_map helper functions
+Date: Thu, 13 Apr 2017 16:05:14 -0600
+Message-ID: <1492121135-4437-2-git-send-email-logang@deltatee.com>
+References: <1492121135-4437-1-git-send-email-logang@deltatee.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Steve Wise <swise-7bPotxP6k4+P2YhJcF5u+vpXobYPEAuW@public.gmane.org>
+To: Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>,
+ "Martin K. Petersen" <martin.petersen-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
+ Sagi Grimberg <sagi-NQWnxTmZq1alnMjI0IkVqw@public.gmane.org>, Jens Axboe <axboe-tSWWG44O7X1aa/9Udqfwiw@public.gmane.org>,
+ Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>,
+ Dan Williams <dan.j.williams-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+ Ross Zwisler <ross.zwisler-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>,
+ Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+ Sumit Semwal <sumit.semwal-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Ming Lin <ming.l-Vzezgt5dB6uUEJcrhfAQsw@public.gmane.org>,
+ linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+ linux-media-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, dri-devel-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org,
+ linaro-mm-sig-cunTk1MwBs8s++Sfvej+rw@public.gmane.org, intel-gfx-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org,
+ linux-raid-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-mmc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+ linux-nvme-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-nvdimm-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org,
+ linux-scsi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, fcoe-devel-s9riP+hp16TNLxjTenLetw@public.gmane.org,
+ open-iscsi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org, megaraidlinux.pdl-dY08KVG/lbpWk0Htik3J/w@public.gmane.org,
+ sparmaintainer-GLv8BlqOqDDQT0dZR+AlfA@public.gmane.org, devel@driverd
+Return-path: <linux-nvdimm-bounces-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org>
+In-Reply-To: <1492121135-4437-1-git-send-email-logang-OTvnGxWRz7hWk0Htik3J/w@public.gmane.org>
+List-Unsubscribe: <https://lists.01.org/mailman/options/linux-nvdimm>,
+ <mailto:linux-nvdimm-request-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.01.org/pipermail/linux-nvdimm/>
+List-Post: <mailto:linux-nvdimm-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org>
+List-Help: <mailto:linux-nvdimm-request-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.01.org/mailman/listinfo/linux-nvdimm>,
+ <mailto:linux-nvdimm-request-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org?subject=subscribe>
+Errors-To: linux-nvdimm-bounces-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org
+Sender: "Linux-nvdimm" <linux-nvdimm-bounces-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org>
+List-Id: linux-crypto.vger.kernel.org
 
-crypto: algif_compression - User-space interface for compression
+This patch introduces functions which kmap the pages inside an sgl. Two
+variants are provided: one if an offset is required and one if the
+offset is zero. These functions replace a common pattern of
+kmap(sg_page(sg)) that is used in about 50 places within the kernel.
 
-This patch adds af_alg plugin for compression algorithms of type scomp/acomp
-registered to the kernel crypto layer.
+The motivation for this work is to eventually safely support sgls that
+contain io memory. In order for that to work, any access to the contents
+of an iomem SGL will need to be done with iomemcpy or hit some warning.
+(The exact details of how this will work have yet to be worked out.)
+Having all the kmaps in one place is just a first step in that
+direction. Additionally, seeing this helps cut down the users of sg_page,
+it should make any effort to go to struct-page-less DMAs a little
+easier (should that idea ever swing back into favour again).
 
-The user needs to set operation (compression/decompression) as a control
-message to sendmsg, identical to selecting the cipher operation type in case of
-ciphers. Once a sendmsg call occurs, no further writes can be made to the
-socket until all previous data has been processed and read. Therefore the
-interface only supports one request at a time.
+A flags option is added to select between a regular or atomic mapping so
+these functions can replace kmap(sg_page or kmap_atomic(sg_page.
+Future work may expand this to have flags for using page_address or
+vmap. Much further in the future, there may be a flag to allocate memory
+and copy the data from/to iomem.
 
-The interface is completely synchronous; all operations are carried out in
-recvmsg and will complete prior to the system call returning.
+We also add the semantic that sg_map can fail to create a mapping,
+despite the fact that the current code this is replacing is assumed to
+never fail and the current version of these functions cannot fail. This
+is to support iomem which either have to fail to create the mapping or
+allocate memory as a bounce buffer which itself can fail.
 
-The sendmsg and recvmsg interface supports directly reading/writing to 
-user-space without additional copying, i.e., the kernel crypto interface will
-receive the user-space address as its input/output SG list. The scomp interface
-or crypto drivers may copy the data as required.
+Also, in terms of cleanup, a few of the existing kmap(sg_page) users
+play things a bit loose in terms of whether they apply sg->offset
+so using these helper functions should help avoid such issues.
 
-Signed-off-by: Abed Kamaluddin <akam...@cavium.com>
-Signed-off-by: Mahipal Challa <mahipal.cha...@cavium.com>
-
+Signed-off-by: Logan Gunthorpe <logang-OTvnGxWRz7hWk0Htik3J/w@public.gmane.org>
 ---
- crypto/Kconfig              |  11 ++
- crypto/Makefile             |   1 +
- crypto/algif_compression.c  | 272 ++++++++++++++++++++++++++++++++++++++++++++
- include/uapi/linux/if_alg.h |   2 +
- 4 files changed, 286 insertions(+)
+ drivers/dma-buf/dma-buf.c   |  3 ++
+ include/linux/scatterlist.h | 97 +++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 100 insertions(+)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index f37e9cc..13b03ba 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -1741,6 +1741,17 @@ config CRYPTO_USER_API_AEAD
- 	  This option enables the user-spaces interface for AEAD
- 	  cipher algorithms.
+diff --git a/drivers/dma-buf/dma-buf.c b/drivers/dma-buf/dma-buf.c
+index 0007b79..b95934b 100644
+--- a/drivers/dma-buf/dma-buf.c
++++ b/drivers/dma-buf/dma-buf.c
+@@ -37,6 +37,9 @@
  
-+config CRYPTO_USER_API_COMPRESSION
-+	tristate "User-space interface for compression algorithms"
-+	depends on NET
-+	select CRYPTO_ACOMP
-+	select CRYPTO_USER_API
-+	help
-+	  This option enables the user-space interface for compression
-+	  algorithms. Enable this option for access to compression algorithms
-+	  of type scomp/acomp exported by the kernel crypto layer through
-+	  AF_ALG interface.
-+
- config CRYPTO_HASH_INFO
- 	bool
+ #include <uapi/linux/dma-buf.h>
  
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 8a44057..1469e06 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -134,6 +134,7 @@ obj-$(CONFIG_CRYPTO_TEST) += tcrypt.o
- obj-$(CONFIG_CRYPTO_GHASH) += ghash-generic.o
- obj-$(CONFIG_CRYPTO_USER_API) += af_alg.o
- obj-$(CONFIG_CRYPTO_USER_API_HASH) += algif_hash.o
-+obj-$(CONFIG_CRYPTO_USER_API_COMPRESSION) += algif_compression.o
- obj-$(CONFIG_CRYPTO_USER_API_SKCIPHER) += algif_skcipher.o
- obj-$(CONFIG_CRYPTO_USER_API_RNG) += algif_rng.o
- obj-$(CONFIG_CRYPTO_USER_API_AEAD) += algif_aead.o
-diff --git a/crypto/algif_compression.c b/crypto/algif_compression.c
-new file mode 100644
-index 0000000..0ba6d1e
---- /dev/null
-+++ b/crypto/algif_compression.c
-@@ -0,0 +1,272 @@
-+/*
-+ * algif_compression: User-space interface for COMPRESSION algorithms
-+ *
-+ * This file provides user-space API support for compression algorithms
-+ * registered through the kernel crypto layer.
-+ *
-+ * Copyright (C) 2017 Cavium, Inc.
-+ *
-+ * Original Authors: Abed Kamaluddin <akamaluddin@cavium.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the Free
-+ * Software Foundation; either version 2 of the License, or (at your option)
-+ * any later version.
-+ */
++/* Prevent the highmem.h macro from aliasing ops->kunmap_atomic */
++#undef kunmap_atomic
 +
-+#include <crypto/acompress.h>
-+#include <crypto/if_alg.h>
-+#include <linux/crypto.h>
-+#include <linux/init.h>
-+#include <linux/kernel.h>
-+#include <linux/mm.h>
-+#include <linux/module.h>
-+#include <linux/net.h>
-+#include <net/sock.h>
-+#include <linux/scatterlist.h>
-+
-+/* scomp scratch is currently 128KB */
-+#define COMP_BUFFER_SIZE	65535
-+
-+struct comp_ctx {
-+	struct af_alg_sgl tsgl;
-+	struct af_alg_sgl rsgl;
-+	struct af_alg_completion completion;
-+	unsigned int clen;
-+	unsigned int slen;
-+	unsigned int dlen;
-+	bool comp;
-+	bool used;
-+	struct acomp_req *acomp_req;
-+};
-+
-+struct comp_tfm {
-+	struct crypto_acomp *acomp;
-+};
-+
-+static int comp_sendmsg(struct socket *sock, struct msghdr *msg,
-+			size_t ignored)
-+{
-+	struct sock *sk = sock->sk;
-+	struct alg_sock *ask = alg_sk(sk);
-+	struct comp_ctx *ctx = ask->private;
-+	struct af_alg_control con = {};
-+	int limit = COMP_BUFFER_SIZE;
-+	int len;
-+	int err = -EINVAL;
-+
-+	if (msg->msg_controllen) {
-+		err = af_alg_cmsg_send(msg, &con);
-+		if (err)
-+			return err;
-+
-+		switch (con.op) {
-+		case ALG_OP_COMPRESS:
-+			ctx->comp = 1;
-+			break;
-+
-+		case ALG_OP_DECOMPRESS:
-+			ctx->comp = 0;
-+			break;
-+
-+		default:
-+			return -EINVAL;
-+		}
-+	}
-+
-+	lock_sock(sk);
-+
-+	/* One request at a time supported, data submitted for comp/decomp will
-+	 * be processed at subsequent recvmsg
-+	 */
-+	if (ctx->used) {
-+		err = -EAGAIN;
-+		goto unlock;
-+	}
-+
-+	len = msg_data_left(msg);
-+
-+	if (len > limit)
-+		len = limit;
-+
-+	len = af_alg_make_sg(&ctx->tsgl, &msg->msg_iter, len);
-+
-+	if (len < 0) {
-+		err = len;
-+		goto unlock;
-+	}
-+
-+	ctx->slen = len;
-+	ctx->used = 1;
-+
-+unlock:
-+	release_sock(sk);
-+
-+	return err ?: len;
-+}
-+
-+static int comp_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
-+			int flags)
-+{
-+	struct sock *sk = sock->sk;
-+	struct alg_sock *ask = alg_sk(sk);
-+	struct comp_ctx *ctx = ask->private;
-+	int rlen = ctx->dlen;
-+	int err;
-+
-+	if (len > rlen)
-+		len = rlen;
-+
-+	lock_sock(sk);
-+
-+	if (!ctx->used) {
-+		err = -EAGAIN;
-+		goto unlock;
-+	}
-+
-+	len = af_alg_make_sg(&ctx->rsgl, &msg->msg_iter, len);
-+	if (len < 0) {
-+		err = len;
-+		goto unlock;
-+	}
-+
-+	acomp_request_set_params(ctx->acomp_req, ctx->tsgl.sg, ctx->rsgl.sg,
-+				 ctx->slen, len);
-+
-+	/* Synchronous completion of comp/decomp requests */
-+	err = af_alg_wait_for_completion(
-+			ctx->comp ?
-+				crypto_acomp_compress(ctx->acomp_req) :
-+				crypto_acomp_decompress(ctx->acomp_req),
-+				&ctx->completion);
-+
-+	/* Add acomp req wrapper for dlen */
-+	len = (ctx->acomp_req)->dlen;
-+
-+	af_alg_free_sg(&ctx->tsgl);
-+	af_alg_free_sg(&ctx->rsgl);
-+
-+unlock:
-+	ctx->used = 0;
-+	release_sock(sk);
-+
-+	return err ?: len;
-+}
-+
-+static struct proto_ops algif_comp_ops = {
-+	.family		=	PF_ALG,
-+
-+	.connect	=	sock_no_connect,
-+	.socketpair	=	sock_no_socketpair,
-+	.getname	=	sock_no_getname,
-+	.ioctl		=	sock_no_ioctl,
-+	.listen		=	sock_no_listen,
-+	.shutdown	=	sock_no_shutdown,
-+	.getsockopt	=	sock_no_getsockopt,
-+	.mmap		=	sock_no_mmap,
-+	.bind		=	sock_no_bind,
-+	.setsockopt	=	sock_no_setsockopt,
-+	.poll		=	sock_no_poll,
-+
-+	.release	=	af_alg_release,
-+	.sendmsg	=	comp_sendmsg,
-+	.recvmsg	=	comp_recvmsg,
-+	.sendpage	=	sock_no_sendpage,
-+	.accept		=	sock_no_accept,
-+};
-+
-+static void *comp_bind(const char *name, u32 type, u32 mask)
-+{
-+	struct comp_tfm *tfm;
-+	struct crypto_acomp *acomp;
-+
-+	tfm = kzalloc(sizeof(*tfm), GFP_KERNEL);
-+	if (!tfm)
-+		return ERR_PTR(-ENOMEM);
-+
-+	acomp = crypto_alloc_acomp(name, type, mask);
-+	if (IS_ERR_OR_NULL(acomp)) {
-+		kfree(tfm);
-+		return ERR_PTR(-ENOMEM);
-+	}
-+	tfm->acomp = acomp;
-+
-+	return tfm;
-+}
-+
-+static void comp_release(void *private)
-+{
-+	struct comp_tfm *tfm = private;
-+
-+	crypto_free_acomp(tfm->acomp);
-+	kfree(tfm);
-+}
-+
-+static void comp_sock_destruct(struct sock *sk)
-+{
-+	struct alg_sock *ask = alg_sk(sk);
-+	struct comp_ctx *ctx = ask->private;
-+
-+	acomp_request_free(ctx->acomp_req);
-+	sock_kfree_s(sk, ctx, ctx->clen);
-+	af_alg_release_parent(sk);
-+}
-+
-+static int comp_accept_parent(void *private, struct sock *sk)
-+{
-+	struct comp_ctx *ctx;
-+	struct alg_sock *ask = alg_sk(sk);
-+	struct comp_tfm *tfm = private;
-+	struct crypto_acomp *acomp = tfm->acomp;
-+	unsigned int len = sizeof(*ctx);
-+
-+	ctx = sock_kmalloc(sk, len, GFP_KERNEL);
-+	if (!ctx)
-+		return -ENOMEM;
-+
-+	ctx->used = 0;
-+	ctx->clen = len;
-+	ctx->dlen = COMP_BUFFER_SIZE;
-+	ctx->slen = COMP_BUFFER_SIZE;
-+
-+	af_alg_init_completion(&ctx->completion);
-+
-+	ctx->acomp_req = acomp_request_alloc(acomp);
-+	if (!ctx->acomp_req) {
-+		sock_kfree_s(sk, ctx, ctx->clen);
-+		return -ENOMEM;
-+	}
-+
-+	acomp_request_set_callback(ctx->acomp_req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-+				   af_alg_complete, &ctx->completion);
-+
-+	ask->private = ctx;
-+	sk->sk_destruct = comp_sock_destruct;
-+
-+	return 0;
-+}
-+
-+static const struct af_alg_type algif_type_comp = {
-+	.bind		=	comp_bind,
-+	.release	=	comp_release,
-+	.accept		=	comp_accept_parent,
-+	.ops		=	&algif_comp_ops,
-+	.name		=	"compression",
-+	.owner		=	THIS_MODULE
-+};
-+
-+static int __init algif_comp_init(void)
-+{
-+	return af_alg_register_type(&algif_type_comp);
-+}
-+
-+static void __exit algif_comp_exit(void)
-+{
-+	int err = af_alg_unregister_type(&algif_type_comp);
-+
-+	BUG_ON(err);
-+}
-+
-+module_init(algif_comp_init);
-+module_exit(algif_comp_exit);
-+MODULE_LICENSE("GPL");
-diff --git a/include/uapi/linux/if_alg.h b/include/uapi/linux/if_alg.h
-index f2acd2f..5cca9eb 100644
---- a/include/uapi/linux/if_alg.h
-+++ b/include/uapi/linux/if_alg.h
-@@ -38,5 +38,7 @@ struct af_alg_iv {
- /* Operations */
- #define ALG_OP_DECRYPT			0
- #define ALG_OP_ENCRYPT			1
-+#define ALG_OP_DECOMPRESS		0
-+#define ALG_OP_COMPRESS		1
+ static inline int is_dma_buf_file(struct file *);
  
- #endif	/* _LINUX_IF_ALG_H */
+ struct dma_buf_list {
+diff --git a/include/linux/scatterlist.h b/include/linux/scatterlist.h
+index cb3c8fe..acd4d73 100644
+--- a/include/linux/scatterlist.h
++++ b/include/linux/scatterlist.h
+@@ -5,6 +5,7 @@
+ #include <linux/types.h>
+ #include <linux/bug.h>
+ #include <linux/mm.h>
++#include <linux/highmem.h>
+ #include <asm/io.h>
+ 
+ struct scatterlist {
+@@ -126,6 +127,102 @@ static inline struct page *sg_page(struct scatterlist *sg)
+ 	return (struct page *)((sg)->page_link & ~0x3);
+ }
+ 
++#define SG_KMAP		(1 << 0)	/* create a mapping with kmap */
++#define SG_KMAP_ATOMIC	(1 << 1)	/* create a mapping with kmap_atomic */
++
++/**
++ * sg_map_offset - kmap a page inside an sgl
++ * @sg:		SG entry
++ * @offset:	Offset into entry
++ * @flags:	Flags for creating the mapping
++ *
++ * Description:
++ *   Use this function to map a page in the scatterlist at the specified
++ *   offset. sg->offset is already added for you. Note: the semantics of
++ *   this function are that it may fail. Thus, its output should be checked
++ *   with IS_ERR and PTR_ERR. Otherwise, a pointer to the specified offset
++ *   in the mapped page is returned.
++ *
++ *   Flags can be any of:
++ *	* SG_KMAP	 - Use kmap to create the mapping
++ *	* SG_KMAP_ATOMIC - Use kmap_atomic to map the page atommically.
++ *			   Thus, the rules of that function apply: the cpu
++ *			   may not sleep until it is unmaped.
++ *
++ *   Also, consider carefully whether this function is appropriate. It is
++ *   largely not recommended for new code and if the sgl came from another
++ *   subsystem and you don't know what kind of memory might be in the list
++ *   then you definitely should not call it. Non-mappable memory may be in
++ *   the sgl and thus this function may fail unexpectedly.
++ **/
++static inline void *sg_map_offset(struct scatterlist *sg, size_t offset,
++				   int flags)
++{
++	struct page *pg;
++	unsigned int pg_off;
++
++	offset += sg->offset;
++	pg = nth_page(sg_page(sg), offset >> PAGE_SHIFT);
++	pg_off = offset_in_page(offset);
++
++	if (flags & SG_KMAP_ATOMIC)
++		return kmap_atomic(pg) + pg_off;
++	else
++		return kmap(pg) + pg_off;
++}
++
++/**
++ * sg_unkmap_offset - unmap a page that was mapped with sg_map_offset
++ * @sg:		SG entry
++ * @addr:	address returned by sg_map_offset
++ * @offset:	Offset into entry (same as specified for sg_map_offset)
++ * @flags:	Flags, which are the same specified for sg_map_offset
++ *
++ * Description:
++ *   Unmap the page that was mapped with sg_map_offset
++ *
++ **/
++static inline void sg_unmap_offset(struct scatterlist *sg, void *addr,
++				    size_t offset, int flags)
++{
++	struct page *pg = nth_page(sg_page(sg), offset >> PAGE_SHIFT);
++	unsigned int pg_off = offset_in_page(offset);
++
++	if (flags & SG_KMAP_ATOMIC)
++		kunmap_atomic(addr - sg->offset - pg_off);
++	else
++		kunmap(pg);
++}
++
++/**
++ * sg_map - map the first page in the scatterlist entry
++ * @sg:		SG entry
++ * @flags:	Flags, see sg_map_offset for a description
++ *
++ * Description:
++ *   Same as sg_map_offset(sg, 0, flags);
++ *
++ **/
++static inline void *sg_map(struct scatterlist *sg, int flags)
++{
++	return sg_map_offset(sg, 0, flags);
++}
++
++/**
++ * sg_unmap - unmap a page mapped with sg_map
++ * @sg:		SG entry
++ * @addr:       address returned by sg_map
++ * @flags:	Flags, see sg_map_offset for a description
++ *
++ * Description:
++ *   Same as sg_map_offset(sg, 0, flags);
++ *
++ **/
++static inline void sg_unmap(struct scatterlist *sg, void *addr, int flags)
++{
++	sg_unmap_offset(sg, addr, 0, flags);
++}
++
+ /**
+  * sg_set_buf - Set sg entry to point at given data
+  * @sg:		 SG entry
 -- 
-2.7.4
+2.1.4
