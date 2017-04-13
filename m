@@ -1,107 +1,76 @@
-From: Thomas Gleixner <tglx@linutronix.de>
-Subject: [patch V2 13/13] crypto: n2 - Replace racy task affinity logic
-Date: Thu, 13 Apr 2017 10:20:23 +0200 (CEST)
-Message-ID: <alpine.DEB.2.20.1704131019420.2408@nanos>
-References: <20170412200726.941336635@linutronix.de> <20170412201043.231299672@linutronix.de>
+From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Subject: Re: [PATCH 2/2] hwrng: mtk: Add driver for hardware random generator
+ on MT7623 SoC
+Date: Thu, 13 Apr 2017 14:09:45 +0530
+Message-ID: <CANc+2y4Oj-sbSKnsTSK+kRYNewp7Pj0fEk_=dqULxWG08L77Eg@mail.gmail.com>
+References: <1492067108-14748-1-git-send-email-sean.wang@mediatek.com> <1492067108-14748-3-git-send-email-sean.wang@mediatek.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Cc: Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Sebastian Siewior <bigeasy@linutronix.de>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Fenghua Yu <fenghua.yu@intel.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        Len Brown <lenb@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>, Tejun Heo <tj@kernel.org>,
-        Tony Luck <tony.luck@intel.com>,
-        Viresh Kumar <viresh.kumar@linaro.org>,
-        linux-crypto@vger.kernel.org
-To: LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        Matt Mackall <mpm@selenic.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Corentin LABBE <clabbe.montjoie@gmail.com>,
+        Romain Perier <romain.perier@free-electrons.com>,
+        shannon.nelson@oracle.com, Wei Yongjun <weiyongjun1@huawei.com>,
+        devicetree@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-mediatek@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        keyhaede@gmail.com
+To: sean.wang@mediatek.com
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170412201043.231299672@linutronix.de>
+In-Reply-To: <1492067108-14748-3-git-send-email-sean.wang@mediatek.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-spu_queue_register() needs to invoke setup functions on a particular
-CPU. This is achieved by temporarily setting the affinity of the
-calling user space thread to the requested CPU and reset it to the original
-affinity afterwards.
+Hi Sean,
 
-That's racy vs. CPU hotplug and concurrent affinity settings for that
-thread resulting in code executing on the wrong CPU and overwriting the
-new affinity setting.
+Mostly looks good, have few minor comments.
 
-Replace it by using work_on_cpu_safe() which guarantees to run the code on
-the requested CPU or to fail in case the CPU is offline.
+On 13 April 2017 at 12:35,  <sean.wang@mediatek.com> wrote:
+> +static bool mtk_rng_wait_ready(struct hwrng *rng, bool wait)
+> +{
+> +       struct mtk_rng *priv = to_mtk_rng(rng);
+> +       int ready;
+> +
+> +       ready = readl(priv->base + RNG_CTRL) & RNG_READY;
+> +       if (!ready && wait)
+> +               readl_poll_timeout_atomic(priv->base + RNG_CTRL, ready,
+> +                                         ready & RNG_READY, USEC_POLL,
+> +                                         TIMEOUT_POLL);
+> +       return !!ready;
+> +}
 
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org
----
+Use readl_poll_timeout_atomic's return value or -EIO instead of
+!!ready. This will simplify mtk_rng_read.
 
-V2: Fixup build-bot complaints
+> +static int mtk_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
+> +{
+> +       struct mtk_rng *priv = to_mtk_rng(rng);
+> +       int retval = 0;
+> +
+> +       while (max >= sizeof(u32)) {
+> +               if (!mtk_rng_wait_ready(rng, wait))
+> +                       break;
+> +
+> +               *(u32 *)buf = readl(priv->base + RNG_DATA);
+> +               retval += sizeof(u32);
+> +               buf += sizeof(u32);
+> +               max -= sizeof(u32);
+> +       }
+> +
+> +       if (unlikely(wait && max))
+> +               dev_warn(priv->dev, "timeout might be not properly set\n");
 
- drivers/crypto/n2_core.c |   31 ++++++++++++++++---------------
- 1 file changed, 16 insertions(+), 15 deletions(-)
+Is this really necessary? Better to choose proper timeout than
+providing this warning message. In rare cases if the timeout could
+occur due to some reason (may be a hardware fault) print appropriate
+warning message.
 
---- a/drivers/crypto/n2_core.c
-+++ b/drivers/crypto/n2_core.c
-@@ -65,6 +65,11 @@ struct spu_queue {
- 	struct list_head	list;
- };
- 
-+struct spu_qreg {
-+	struct spu_queue	*queue;
-+	unsigned long		type;
-+};
-+
- static struct spu_queue **cpu_to_cwq;
- static struct spu_queue **cpu_to_mau;
- 
-@@ -1631,31 +1636,27 @@ static void queue_cache_destroy(void)
- 	kmem_cache_destroy(queue_cache[HV_NCS_QTYPE_CWQ - 1]);
- }
- 
--static int spu_queue_register(struct spu_queue *p, unsigned long q_type)
-+static long spu_queue_register_workfn(void *arg)
- {
--	cpumask_var_t old_allowed;
-+	struct spu_qreg *qr = arg;
-+	struct spu_queue *p = qr->queue;
-+	unsigned long q_type = qr->type;
- 	unsigned long hv_ret;
- 
--	if (cpumask_empty(&p->sharing))
--		return -EINVAL;
--
--	if (!alloc_cpumask_var(&old_allowed, GFP_KERNEL))
--		return -ENOMEM;
--
--	cpumask_copy(old_allowed, &current->cpus_allowed);
--
--	set_cpus_allowed_ptr(current, &p->sharing);
--
- 	hv_ret = sun4v_ncs_qconf(q_type, __pa(p->q),
- 				 CWQ_NUM_ENTRIES, &p->qhandle);
- 	if (!hv_ret)
- 		sun4v_ncs_sethead_marker(p->qhandle, 0);
- 
--	set_cpus_allowed_ptr(current, old_allowed);
-+	return hv_ret ? -EINVAL : 0;
-+}
- 
--	free_cpumask_var(old_allowed);
-+static int spu_queue_register(struct spu_queue *p, unsigned long q_type)
-+{
-+	int cpu = cpumask_any_and(&p->sharing, cpu_online_mask);
-+	struct spu_qreg qr = { .queue = p, .type = q_type };
- 
--	return (hv_ret ? -EINVAL : 0);
-+	return work_on_cpu_safe(cpu, spu_queue_register_workfn, &qr);
- }
- 
- static int spu_queue_setup(struct spu_queue *p)
+> +       return retval || !wait ? retval : -EIO;
+> +}
+
+Set retavl to mtk_rng_wait_ready and return retval.
+
+Regards,
+Prasanna
