@@ -1,7 +1,7 @@
 From: <sean.wang@mediatek.com>
-Subject: [PATCH 2/2] hwrng: mtk: Add driver for hardware random generator on MT7623 SoC
-Date: Thu, 13 Apr 2017 15:05:08 +0800
-Message-ID: <1492067108-14748-3-git-send-email-sean.wang@mediatek.com>
+Subject: [PATCH 1/2] dt-bindings: hwrng: Add Mediatek hardware random generator bindings
+Date: Thu, 13 Apr 2017 15:05:07 +0800
+Message-ID: <1492067108-14748-2-git-send-email-sean.wang@mediatek.com>
 References: <1492067108-14748-1-git-send-email-sean.wang@mediatek.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -22,244 +22,39 @@ List-Id: linux-crypto.vger.kernel.org
 
 From: Sean Wang <sean.wang@mediatek.com>
 
-This patch adds support for hardware random generator on MT7623 SoC
-and should also work on other similar Mediatek SoCs. Currently,
-the driver is already tested successfully with rng-tools.
+Document the devicetree bindings for Mediatek random number
+generator which could be found on MT7623 SoC or other similar
+Mediatek SoCs.
 
 Signed-off-by: Sean Wang <sean.wang@mediatek.com>
 ---
- drivers/char/hw_random/Kconfig   |  16 +++-
- drivers/char/hw_random/Makefile  |   2 +-
- drivers/char/hw_random/mtk-rng.c | 174 +++++++++++++++++++++++++++++++++++++++
- 3 files changed, 190 insertions(+), 2 deletions(-)
- create mode 100644 drivers/char/hw_random/mtk-rng.c
+ Documentation/devicetree/bindings/rng/mtk-rng.txt | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/rng/mtk-rng.txt
 
-diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-index 0cafe08..af782ce 100644
---- a/drivers/char/hw_random/Kconfig
-+++ b/drivers/char/hw_random/Kconfig
-@@ -419,10 +419,24 @@ config HW_RANDOM_CAVIUM
-          Generator hardware found on Cavium SoCs.
- 
-          To compile this driver as a module, choose M here: the
--         module will be called cavium_rng.
-+         module will be called mtk-rng.
- 
-          If unsure, say Y.
- 
-+config HW_RANDOM_MTK
-+	tristate "Mediatek Random Number Generator support"
-+	depends on HW_RANDOM
-+	depends on ARCH_MEDIATEK || COMPILE_TEST
-+	default y
-+	---help---
-+	  This driver provides kernel-side support for the Random Number
-+	  Generator hardware found on Mediatek SoCs.
-+
-+	  To compile this driver as a module, choose M here. the
-+	  module will be called mtk-rng.
-+
-+	  If unsure, say Y.
-+
- endif # HW_RANDOM
- 
- config UML_RANDOM
-diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Makefile
-index 5f52b1e..68be716 100644
---- a/drivers/char/hw_random/Makefile
-+++ b/drivers/char/hw_random/Makefile
-@@ -1,7 +1,6 @@
- #
- # Makefile for HW Random Number Generator (RNG) device drivers.
- #
--
- obj-$(CONFIG_HW_RANDOM) += rng-core.o
- rng-core-y := core.o
- obj-$(CONFIG_HW_RANDOM_TIMERIOMEM) += timeriomem-rng.o
-@@ -36,3 +35,4 @@ obj-$(CONFIG_HW_RANDOM_STM32) += stm32-rng.o
- obj-$(CONFIG_HW_RANDOM_PIC32) += pic32-rng.o
- obj-$(CONFIG_HW_RANDOM_MESON) += meson-rng.o
- obj-$(CONFIG_HW_RANDOM_CAVIUM) += cavium-rng.o cavium-rng-vf.o
-+obj-$(CONFIG_HW_RANDOM_MTK)	+= mtk-rng.o
-diff --git a/drivers/char/hw_random/mtk-rng.c b/drivers/char/hw_random/mtk-rng.c
+diff --git a/Documentation/devicetree/bindings/rng/mtk-rng.txt b/Documentation/devicetree/bindings/rng/mtk-rng.txt
 new file mode 100644
-index 0000000..6561ee0
+index 0000000..a6d62a2
 --- /dev/null
-+++ b/drivers/char/hw_random/mtk-rng.c
-@@ -0,0 +1,174 @@
-+/*
-+ * Driver for Mediatek Hardware Random Number Generator
-+ *
-+ * Copyright (C) 2017 Sean Wang <sean.wang@mediatek.com>
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License as
-+ * published by the Free Software Foundation; either version 2 of
-+ * the License, or (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-+ * GNU General Public License for more details.
-+ */
-+#define MTK_RNG_DEV KBUILD_MODNAME
++++ b/Documentation/devicetree/bindings/rng/mtk-rng.txt
+@@ -0,0 +1,18 @@
++Device-Tree bindings for Mediatek random number generator
++found in Mediatek SoC family
 +
-+#include <linux/clk.h>
-+#include <linux/delay.h>
-+#include <linux/err.h>
-+#include <linux/hw_random.h>
-+#include <linux/io.h>
-+#include <linux/iopoll.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/of.h>
-+#include <linux/platform_device.h>
++Required properties:
++- compatible	    : Should be "mediatek,mt7623-rng"
++- clocks	    : list of clock specifiers, corresponding to
++		      entries in clock-names property;
++- clock-names	    : Should contain "rng" entries;
++- reg 		    : Specifies base physical address and size of the registers
 +
-+#define USEC_POLL			2
-+#define TIMEOUT_POLL			20
++Example:
 +
-+#define RNG_CTRL			0x00
-+#define  RNG_EN				BIT(0)
-+#define  RNG_READY			BIT(31)
-+
-+#define RNG_DATA			0x08
-+
-+#define to_mtk_rng(p)	container_of(p, struct mtk_rng, rng)
-+
-+struct mtk_rng {
-+	struct device	*dev;
-+	void __iomem *base;
-+	struct clk *clk;
-+	struct hwrng rng;
++rng: rng@1020f000 {
++	compatible = "mediatek,mt7623-rng";
++	reg = <0 0x1020f000 0 0x1000>;
++	clocks = <&infracfg CLK_INFRA_TRNG>;
++	clock-names = "rng";
 +};
-+
-+static int mtk_rng_init(struct hwrng *rng)
-+{
-+	struct mtk_rng *priv = to_mtk_rng(rng);
-+	u32 val;
-+	int err;
-+
-+	err = clk_prepare_enable(priv->clk);
-+	if (err)
-+		return err;
-+
-+	val = readl(priv->base + RNG_CTRL);
-+	val |= RNG_EN;
-+	writel(val, priv->base + RNG_CTRL);
-+
-+	return 0;
-+}
-+
-+static void mtk_rng_cleanup(struct hwrng *rng)
-+{
-+	struct mtk_rng *priv = to_mtk_rng(rng);
-+	u32 val;
-+
-+	val = readl(priv->base + RNG_CTRL);
-+	val &= ~RNG_EN;
-+	writel(val, priv->base + RNG_CTRL);
-+
-+	clk_disable_unprepare(priv->clk);
-+}
-+
-+static bool mtk_rng_wait_ready(struct hwrng *rng, bool wait)
-+{
-+	struct mtk_rng *priv = to_mtk_rng(rng);
-+	int ready;
-+
-+	ready = readl(priv->base + RNG_CTRL) & RNG_READY;
-+	if (!ready && wait)
-+		readl_poll_timeout_atomic(priv->base + RNG_CTRL, ready,
-+					  ready & RNG_READY, USEC_POLL,
-+					  TIMEOUT_POLL);
-+	return !!ready;
-+}
-+
-+static int mtk_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
-+{
-+	struct mtk_rng *priv = to_mtk_rng(rng);
-+	int retval = 0;
-+
-+	while (max >= sizeof(u32)) {
-+		if (!mtk_rng_wait_ready(rng, wait))
-+			break;
-+
-+		*(u32 *)buf = readl(priv->base + RNG_DATA);
-+		retval += sizeof(u32);
-+		buf += sizeof(u32);
-+		max -= sizeof(u32);
-+	}
-+
-+	if (unlikely(wait && max))
-+		dev_warn(priv->dev, "timeout might be not properly set\n");
-+
-+	return retval || !wait ? retval : -EIO;
-+}
-+
-+static int mtk_rng_probe(struct platform_device *pdev)
-+{
-+	struct resource *res;
-+	int ret;
-+	struct mtk_rng *priv;
-+
-+	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
-+	if (!res) {
-+		dev_err(&pdev->dev, "no iomem resource\n");
-+		return -ENXIO;
-+	}
-+
-+	priv = devm_kzalloc(&pdev->dev, sizeof(*priv), GFP_KERNEL);
-+	if (!priv)
-+		return -ENOMEM;
-+
-+	priv->dev = &pdev->dev;
-+	priv->rng.name = pdev->name;
-+	priv->rng.init = mtk_rng_init;
-+	priv->rng.cleanup = mtk_rng_cleanup;
-+	priv->rng.read = mtk_rng_read;
-+
-+	priv->clk = devm_clk_get(&pdev->dev, "rng");
-+	if (IS_ERR(priv->clk)) {
-+		ret = PTR_ERR(priv->clk);
-+		dev_err(&pdev->dev, "no clock for device: %d\n", ret);
-+		return ret;
-+	}
-+
-+	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
-+	priv->base = devm_ioremap_resource(&pdev->dev, res);
-+	if (IS_ERR(priv->base))
-+		return PTR_ERR(priv->base);
-+
-+	ret = devm_hwrng_register(&pdev->dev, &priv->rng);
-+	if (ret) {
-+		dev_err(&pdev->dev, "failed to register rng device: %d\n",
-+			ret);
-+		return ret;
-+	}
-+
-+	dev_info(&pdev->dev, "registered RNG driver\n");
-+
-+	return 0;
-+}
-+
-+static const struct of_device_id mtk_rng_match[] = {
-+	{ .compatible = "mediatek,mt7623-rng" },
-+	{},
-+};
-+MODULE_DEVICE_TABLE(of, mtk_rng_match);
-+
-+static struct platform_driver mtk_rng_driver = {
-+	.probe          = mtk_rng_probe,
-+	.driver = {
-+		.name = MTK_RNG_DEV,
-+		.of_match_table = mtk_rng_match,
-+	},
-+};
-+
-+module_platform_driver(mtk_rng_driver);
-+
-+MODULE_DESCRIPTION("Mediatek Random Number Generator Driver");
-+MODULE_AUTHOR("Sean Wang <sean.wang@mediatek.com>");
-+MODULE_LICENSE("GPL");
 -- 
 1.9.1
