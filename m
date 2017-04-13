@@ -1,59 +1,141 @@
-From: Binoy Jayan <binoy.jayan@linaro.org>
-Subject: Re: [RFC PATCH v5] IV Generation algorithms for dm-crypt
-Date: Thu, 13 Apr 2017 14:16:43 +0530
-Message-ID: <CAHv-k_98gM8Je+Yi5+Yj5s=6-qxNuuYY1x=ypy_dk6gL=WqyKg@mail.gmail.com>
-References: <1491562064-23591-1-git-send-email-binoy.jayan@linaro.org> <774a9713-05ef-0162-0203-461254a04f6e@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Oded <oded.golombek@arm.com>, Ofir <Ofir.Drang@arm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, Mark Brown <broonie@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org,
-        Rajendra <rnayak@codeaurora.org>, Gilad <gilad@benyossef.com>
-To: Milan Broz <gmazyland@gmail.com>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: [PATCH] padata: allow caller to control queue length
+Date: Thu, 13 Apr 2017 11:52:13 +0200
+Message-ID: <20170413095213.23513-1-Jason@zx2c4.com>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        steffen.klassert@secunet.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-vk0-f45.google.com ([209.85.213.45]:34257 "EHLO
-        mail-vk0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750746AbdDMIqu (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Apr 2017 04:46:50 -0400
-Received: by mail-vk0-f45.google.com with SMTP id z204so25100674vkd.1
-        for <linux-crypto@vger.kernel.org>; Thu, 13 Apr 2017 01:46:45 -0700 (PDT)
-In-Reply-To: <774a9713-05ef-0162-0203-461254a04f6e@gmail.com>
+Received: from frisell.zx2c4.com ([192.95.5.64]:58901 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750765AbdDMJwa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 13 Apr 2017 05:52:30 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Milan,
+Allow users of padata to determine the queue length themselves, via this
+added helper function, so that we can later remove the hard-coded 1000-
+job limit. We thus add a helper function, and then move the limiting
+functionality to pcrypt-proper, since it was the only current consumer
+relying on the 1000-job limit. We do, however, impose a limit on padata
+so that the reference count does not have an integer overflow.
 
-On 10 April 2017 at 19:30, Milan Broz <gmazyland@gmail.com> wrote:
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+---
+ Documentation/padata.txt |  8 ++++++++
+ crypto/pcrypt.c          |  5 +++++
+ include/linux/padata.h   |  2 ++
+ kernel/padata.c          | 20 +++++++++++++++++---
+ 4 files changed, 32 insertions(+), 3 deletions(-)
 
-Thank you for the reply.
-
-> Well, it is good that there is no performance degradation but it
-> would be nice to have some user of it that proves it is really
-> working for your hw.
-
-I have been able to get access to a hardware with IV generation support
-a few days back. The hardware I was having before did not have IV
-generation support. Will be able to come up with numbers after making
-it work with the new one.
-
-> FYI - with patch that increases dmcrypt sector size to 4k
-> I can see improvement in speed usually in 5-15% with sync AES-NI
-> (depends on access pattern), with dmcrypt mapped to memory
-> it is even close to 20% speed up (but such a configuration is
-> completely artificial).
->
-> I wonder why increased dmcrypt sector size does not work for your hw,
-> it should help as well (and can be combiuned later with this IV approach).
-> (For native 4k drives this should be used in future anyway...)
-
-I think it should work well too with backward incompatibility.
-
-Thanks,
-Binoy
+diff --git a/Documentation/padata.txt b/Documentation/padata.txt
+index 7ddfe216a0aa..9347d145bb27 100644
+--- a/Documentation/padata.txt
++++ b/Documentation/padata.txt
+@@ -158,3 +158,11 @@ when a padata instance is no longer needed:
+ This function will busy-wait while any remaining tasks are completed, so it
+ might be best not to call it while there is work outstanding.  Shutting
+ down the workqueue, if necessary, should be done separately.
++
++While you cannot have more than 2^31-1 taks submitted at the same time, this
++maximum is well above what you might actually want to be submitted. Thus,
++callers are encouraged to determine their maximum latency/memory/throughput
++constraints, and limit calls to padata_do_parallel() based on the current
++queue length, which can be determined with:
++
++    int padata_queue_len(struct padata_instance *pinst);
+diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
+index ee9cfb99fe25..ea321154994b 100644
+--- a/crypto/pcrypt.c
++++ b/crypto/pcrypt.c
+@@ -70,6 +70,8 @@ struct pcrypt_aead_ctx {
+ 	unsigned int cb_cpu;
+ };
+ 
++#define MAX_OBJ_NUM 1000
++
+ static int pcrypt_do_parallel(struct padata_priv *padata, unsigned int *cb_cpu,
+ 			      struct padata_pcrypt *pcrypt)
+ {
+@@ -78,6 +80,9 @@ static int pcrypt_do_parallel(struct padata_priv *padata, unsigned int *cb_cpu,
+ 
+ 	cpu = *cb_cpu;
+ 
++	if (padata_queue_len(pcrypt->pinst) >= MAX_OBJ_NUM)
++		return -EBUSY;
++
+ 	rcu_read_lock_bh();
+ 	cpumask = rcu_dereference_bh(pcrypt->cb_cpumask);
+ 	if (cpumask_test_cpu(cpu, cpumask->mask))
+diff --git a/include/linux/padata.h b/include/linux/padata.h
+index 0f9e567d5e15..2482b442f136 100644
+--- a/include/linux/padata.h
++++ b/include/linux/padata.h
+@@ -3,6 +3,7 @@
+  *
+  * Copyright (C) 2008, 2009 secunet Security Networks AG
+  * Copyright (C) 2008, 2009 Steffen Klassert <steffen.klassert@secunet.com>
++ * Copyright (C) 2016, 2017 Jason A. Donenfeld <Jason@zx2c4.com>
+  *
+  * This program is free software; you can redistribute it and/or modify it
+  * under the terms and conditions of the GNU General Public License,
+@@ -181,4 +182,5 @@ extern int padata_register_cpumask_notifier(struct padata_instance *pinst,
+ 					    struct notifier_block *nblock);
+ extern int padata_unregister_cpumask_notifier(struct padata_instance *pinst,
+ 					      struct notifier_block *nblock);
++extern int padata_queue_len(struct padata_instance *pinst);
+ #endif
+diff --git a/kernel/padata.c b/kernel/padata.c
+index ac8f1e524836..6ba2db73413f 100644
+--- a/kernel/padata.c
++++ b/kernel/padata.c
+@@ -5,6 +5,7 @@
+  *
+  * Copyright (C) 2008, 2009 secunet Security Networks AG
+  * Copyright (C) 2008, 2009 Steffen Klassert <steffen.klassert@secunet.com>
++ * Copyright (C) 2016, 2017 Jason A. Donenfeld <Jason@zx2c4.com>
+  *
+  * This program is free software; you can redistribute it and/or modify it
+  * under the terms and conditions of the GNU General Public License,
+@@ -32,8 +33,6 @@
+ #include <linux/rcupdate.h>
+ #include <linux/module.h>
+ 
+-#define MAX_OBJ_NUM 1000
+-
+ static int padata_index_to_cpu(struct parallel_data *pd, int cpu_index)
+ {
+ 	int cpu, target_cpu;
+@@ -122,7 +121,7 @@ int padata_do_parallel(struct padata_instance *pinst,
+ 	if ((pinst->flags & PADATA_RESET))
+ 		goto out;
+ 
+-	if (atomic_read(&pd->refcnt) >= MAX_OBJ_NUM)
++	if (unlikely(atomic_read(&pd->refcnt) == INT_MAX))
+ 		goto out;
+ 
+ 	err = 0;
+@@ -1021,6 +1020,21 @@ void padata_free(struct padata_instance *pinst)
+ }
+ EXPORT_SYMBOL(padata_free);
+ 
++/**
++ * padata_queue_len - retreive the number of in progress jobs
++ *
++ * @padata_inst: padata instance from which to read the queue size
++ */
++int padata_queue_len(struct padata_instance *pinst)
++{
++	int len;
++	rcu_read_lock_bh();
++	len = atomic_read(&rcu_dereference_bh(pinst->pd)->refcnt);
++	rcu_read_unlock_bh();
++	return len;
++}
++EXPORT_SYMBOL(padata_queue_len);
++
+ #ifdef CONFIG_HOTPLUG_CPU
+ 
+ static __init int padata_driver_init(void)
+-- 
+2.12.2
