@@ -1,65 +1,61 @@
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Subject: [PATCH v2] crypto: chcr - Fix error handling related to 'chcr_alloc_shash'
-Date: Thu, 13 Apr 2017 20:25:15 +0200
-Message-ID: <20170413182515.29107-1-christophe.jaillet@wanadoo.fr>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-janitors@vger.kernel.org,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To: herbert@gondor.apana.org.au, davem@davemloft.net,
-        harsh@chelsio.com, hariprasad@chelsio.com
-Return-path: <kernel-janitors-owner@vger.kernel.org>
-Sender: kernel-janitors-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Abed Kamaluddin <abedamu@gmail.com>
+Subject: [RFC PATCH v1 0/1] *** crypto: AF_ALG: add compression support ***
+Date: Fri, 14 Apr 2017 00:04:53 +0530
+Message-ID: <1492108494-10694-1-git-send-email-akamaluddin@cavium.com>
+Cc: akamaluddin@cavium.com, pathreya@cavium.com, machalla@cavium.com
+To: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pf0-f193.google.com ([209.85.192.193]:32875 "EHLO
+        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755716AbdDMSfN (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 13 Apr 2017 14:35:13 -0400
+Received: by mail-pf0-f193.google.com with SMTP id c198so12189791pfc.0
+        for <linux-crypto@vger.kernel.org>; Thu, 13 Apr 2017 11:35:13 -0700 (PDT)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Up to now, 'crypto_alloc_shash()' may return a valid pointer, an error
-pointer or NULL (in case of invalid parameter)
-Update it to always return an error pointer in case of error. It now
-returns ERR_PTR(-EINVAL) instead of NULL in case of invalid parameter.
+Hi Herbert,
 
-This simplifies error handling.
+This patch adds compression support to the AF_ALG interface exported by the 
+kernel crypto API. By extending AF_ALG, all compression algorithms of types 
+scomp and acomp, which the kernel crypto API allows access to, are now also
+accessible from userspace.
 
-Also fix a crash in 'chcr_authenc_setkey()' if 'chcr_alloc_shash()'
-returns an error pointer and the "goto out" path is taken.
+The new compression interface has been tested with both kernel software
+deflate(scomp) and HW accelerated ThunderX deflate(scomp) using the zpipe
+example application provided by zlib.
 
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
----
-v2: Modify 'chcr_alloc_shash' to return ERR_PTR(-EINVAL) instead of NULL
-    in case of invalid parameter.
----
- drivers/crypto/chelsio/chcr_algo.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+The user-space side would look similar to hash/cipher implementations.
 
-diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
-index 41bc7f4f58cd..1fb1ac9d70b1 100644
---- a/drivers/crypto/chelsio/chcr_algo.c
-+++ b/drivers/crypto/chelsio/chcr_algo.c
-@@ -294,7 +294,7 @@ static inline void get_aes_decrypt_key(unsigned char *dec_key,
- 
- static struct crypto_shash *chcr_alloc_shash(unsigned int ds)
- {
--	struct crypto_shash *base_hash = NULL;
-+	struct crypto_shash *base_hash = ERR_PTR(-EINVAL);
- 
- 	switch (ds) {
- 	case SHA1_DIGEST_SIZE:
-@@ -2259,7 +2259,7 @@ static int chcr_authenc_setkey(struct crypto_aead *authenc, const u8 *key,
- 	int err = 0, i, key_ctx_len = 0;
- 	unsigned char ck_size = 0;
- 	unsigned char pad[CHCR_HASH_MAX_BLOCK_SIZE_128] = { 0 };
--	struct crypto_shash *base_hash = NULL;
-+	struct crypto_shash *base_hash = ERR_PTR(-EINVAL);
- 	struct algo_param param;
- 	int align;
- 	u8 *o_ptr = NULL;
-@@ -2351,7 +2351,7 @@ static int chcr_authenc_setkey(struct crypto_aead *authenc, const u8 *key,
- 	}
- out:
- 	aeadctx->enckey_len = 0;
--	if (base_hash)
-+	if (!IS_ERR(base_hash))
- 		chcr_free_shash(base_hash);
- 	return -EINVAL;
- }
+struct sockaddr_alg sa = {
+    .salg_family = AF_ALG,
+    .salg_type = "compression",
+    .salg_name = "deflate"
+};
+
+The operations supported are ALG_OP_DECOMPRESS and ALG_OP_COMPRESS. This
+interface is synchronous and handles one request at a time. The data for
+compression/decompression is read in sendmsg and all operations are carried
+out and completed in recvmsg.
+
+This interface can utilize full deflate functionality provided by kernel.
+However to achieve complete zlib functionality in user space, the acomp
+interface needs to be modified and provide api's to pass context and additional
+data between the kernel user and algorithm as has been pointed on a different
+thread.
+
+Patches have been generated on top of "kernel/git/herbert/crypto-2.6.git" repo.
+
+Abed Kamaluddin (1):
+  crypto: algif_compression - User-space interface for compression
+
+ crypto/Kconfig              |  11 ++
+ crypto/Makefile             |   1 +
+ crypto/algif_compression.c  | 272 ++++++++++++++++++++++++++++++++++++++++++++
+ include/uapi/linux/if_alg.h |   2 +
+ 4 files changed, 286 insertions(+)
+ create mode 100644 crypto/algif_compression.c
+
 -- 
-2.11.0
-
+2.7.4
