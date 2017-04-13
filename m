@@ -1,76 +1,59 @@
-From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Subject: Re: [PATCH 2/2] hwrng: mtk: Add driver for hardware random generator
- on MT7623 SoC
-Date: Thu, 13 Apr 2017 14:09:45 +0530
-Message-ID: <CANc+2y4Oj-sbSKnsTSK+kRYNewp7Pj0fEk_=dqULxWG08L77Eg@mail.gmail.com>
-References: <1492067108-14748-1-git-send-email-sean.wang@mediatek.com> <1492067108-14748-3-git-send-email-sean.wang@mediatek.com>
+From: Binoy Jayan <binoy.jayan@linaro.org>
+Subject: Re: [RFC PATCH v5] IV Generation algorithms for dm-crypt
+Date: Thu, 13 Apr 2017 14:16:43 +0530
+Message-ID: <CAHv-k_98gM8Je+Yi5+Yj5s=6-qxNuuYY1x=ypy_dk6gL=WqyKg@mail.gmail.com>
+References: <1491562064-23591-1-git-send-email-binoy.jayan@linaro.org> <774a9713-05ef-0162-0203-461254a04f6e@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Matt Mackall <mpm@selenic.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Corentin LABBE <clabbe.montjoie@gmail.com>,
-        Romain Perier <romain.perier@free-electrons.com>,
-        shannon.nelson@oracle.com, Wei Yongjun <weiyongjun1@huawei.com>,
-        devicetree@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-mediatek@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        keyhaede@gmail.com
-To: sean.wang@mediatek.com
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1492067108-14748-3-git-send-email-sean.wang@mediatek.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: Oded <oded.golombek@arm.com>, Ofir <Ofir.Drang@arm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, Mark Brown <broonie@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org,
+        Rajendra <rnayak@codeaurora.org>, Gilad <gilad@benyossef.com>
+To: Milan Broz <gmazyland@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-vk0-f45.google.com ([209.85.213.45]:34257 "EHLO
+        mail-vk0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750746AbdDMIqu (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 13 Apr 2017 04:46:50 -0400
+Received: by mail-vk0-f45.google.com with SMTP id z204so25100674vkd.1
+        for <linux-crypto@vger.kernel.org>; Thu, 13 Apr 2017 01:46:45 -0700 (PDT)
+In-Reply-To: <774a9713-05ef-0162-0203-461254a04f6e@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Sean,
+Hi Milan,
 
-Mostly looks good, have few minor comments.
+On 10 April 2017 at 19:30, Milan Broz <gmazyland@gmail.com> wrote:
 
-On 13 April 2017 at 12:35,  <sean.wang@mediatek.com> wrote:
-> +static bool mtk_rng_wait_ready(struct hwrng *rng, bool wait)
-> +{
-> +       struct mtk_rng *priv = to_mtk_rng(rng);
-> +       int ready;
-> +
-> +       ready = readl(priv->base + RNG_CTRL) & RNG_READY;
-> +       if (!ready && wait)
-> +               readl_poll_timeout_atomic(priv->base + RNG_CTRL, ready,
-> +                                         ready & RNG_READY, USEC_POLL,
-> +                                         TIMEOUT_POLL);
-> +       return !!ready;
-> +}
+Thank you for the reply.
 
-Use readl_poll_timeout_atomic's return value or -EIO instead of
-!!ready. This will simplify mtk_rng_read.
+> Well, it is good that there is no performance degradation but it
+> would be nice to have some user of it that proves it is really
+> working for your hw.
 
-> +static int mtk_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
-> +{
-> +       struct mtk_rng *priv = to_mtk_rng(rng);
-> +       int retval = 0;
-> +
-> +       while (max >= sizeof(u32)) {
-> +               if (!mtk_rng_wait_ready(rng, wait))
-> +                       break;
-> +
-> +               *(u32 *)buf = readl(priv->base + RNG_DATA);
-> +               retval += sizeof(u32);
-> +               buf += sizeof(u32);
-> +               max -= sizeof(u32);
-> +       }
-> +
-> +       if (unlikely(wait && max))
-> +               dev_warn(priv->dev, "timeout might be not properly set\n");
+I have been able to get access to a hardware with IV generation support
+a few days back. The hardware I was having before did not have IV
+generation support. Will be able to come up with numbers after making
+it work with the new one.
 
-Is this really necessary? Better to choose proper timeout than
-providing this warning message. In rare cases if the timeout could
-occur due to some reason (may be a hardware fault) print appropriate
-warning message.
+> FYI - with patch that increases dmcrypt sector size to 4k
+> I can see improvement in speed usually in 5-15% with sync AES-NI
+> (depends on access pattern), with dmcrypt mapped to memory
+> it is even close to 20% speed up (but such a configuration is
+> completely artificial).
+>
+> I wonder why increased dmcrypt sector size does not work for your hw,
+> it should help as well (and can be combiuned later with this IV approach).
+> (For native 4k drives this should be used in future anyway...)
 
-> +       return retval || !wait ? retval : -EIO;
-> +}
+I think it should work well too with backward incompatibility.
 
-Set retavl to mtk_rng_wait_ready and return retval.
-
-Regards,
-Prasanna
+Thanks,
+Binoy
