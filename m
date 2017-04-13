@@ -1,48 +1,65 @@
-From: Gary R Hook <gary.hook@amd.com>
-Subject: [PATCH V2 2/2] crypto: ccp - Disable interrupts early on unload
-Date: Thu, 13 Apr 2017 11:46:57 -0500
-Message-ID: <20170413164657.11624.3790.stgit@taos>
-References: <20170413164352.11624.84058.stgit@taos>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>
-To: <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-dm3nam03on0086.outbound.protection.outlook.com ([104.47.41.86]:22688
-        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752689AbdDMQrM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Apr 2017 12:47:12 -0400
-In-Reply-To: <20170413164352.11624.84058.stgit@taos>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Subject: [PATCH v2] crypto: chcr - Fix error handling related to 'chcr_alloc_shash'
+Date: Thu, 13 Apr 2017 20:25:15 +0200
+Message-ID: <20170413182515.29107-1-christophe.jaillet@wanadoo.fr>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-janitors@vger.kernel.org,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+To: herbert@gondor.apana.org.au, davem@davemloft.net,
+        harsh@chelsio.com, hariprasad@chelsio.com
+Return-path: <kernel-janitors-owner@vger.kernel.org>
+Sender: kernel-janitors-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-From: Gary R Hook <ghook@amd.com>
+Up to now, 'crypto_alloc_shash()' may return a valid pointer, an error
+pointer or NULL (in case of invalid parameter)
+Update it to always return an error pointer in case of error. It now
+returns ERR_PTR(-EINVAL) instead of NULL in case of invalid parameter.
 
-Ensure that we disable interrupts first when shutting down
-the driver.
+This simplifies error handling.
 
-Signed-off-by: Gary R Hook <ghook@amd.com>
+Also fix a crash in 'chcr_authenc_setkey()' if 'chcr_alloc_shash()'
+returns an error pointer and the "goto out" path is taken.
+
+Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
 ---
- drivers/crypto/ccp/ccp-dev-v5.c |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+v2: Modify 'chcr_alloc_shash' to return ERR_PTR(-EINVAL) instead of NULL
+    in case of invalid parameter.
+---
+ drivers/crypto/chelsio/chcr_algo.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
-index c7972e7..13b81a1 100644
---- a/drivers/crypto/ccp/ccp-dev-v5.c
-+++ b/drivers/crypto/ccp/ccp-dev-v5.c
-@@ -942,10 +942,10 @@ static void ccp5_destroy(struct ccp_device *ccp)
- 		iowrite32(cmd_q->qcontrol & ~CMD5_Q_RUN, cmd_q->reg_control);
+diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
+index 41bc7f4f58cd..1fb1ac9d70b1 100644
+--- a/drivers/crypto/chelsio/chcr_algo.c
++++ b/drivers/crypto/chelsio/chcr_algo.c
+@@ -294,7 +294,7 @@ static inline void get_aes_decrypt_key(unsigned char *dec_key,
  
- 		/* Disable the interrupts */
--		iowrite32(SUPPORTED_INTERRUPTS, cmd_q->reg_interrupt_status);
-+		iowrite32(0x00, cmd_q->reg_int_enable);
+ static struct crypto_shash *chcr_alloc_shash(unsigned int ds)
+ {
+-	struct crypto_shash *base_hash = NULL;
++	struct crypto_shash *base_hash = ERR_PTR(-EINVAL);
  
- 		/* Clear the interrupt status */
--		iowrite32(0x00, cmd_q->reg_int_enable);
-+		iowrite32(SUPPORTED_INTERRUPTS, cmd_q->reg_interrupt_status);
- 		ioread32(cmd_q->reg_int_status);
- 		ioread32(cmd_q->reg_status);
+ 	switch (ds) {
+ 	case SHA1_DIGEST_SIZE:
+@@ -2259,7 +2259,7 @@ static int chcr_authenc_setkey(struct crypto_aead *authenc, const u8 *key,
+ 	int err = 0, i, key_ctx_len = 0;
+ 	unsigned char ck_size = 0;
+ 	unsigned char pad[CHCR_HASH_MAX_BLOCK_SIZE_128] = { 0 };
+-	struct crypto_shash *base_hash = NULL;
++	struct crypto_shash *base_hash = ERR_PTR(-EINVAL);
+ 	struct algo_param param;
+ 	int align;
+ 	u8 *o_ptr = NULL;
+@@ -2351,7 +2351,7 @@ static int chcr_authenc_setkey(struct crypto_aead *authenc, const u8 *key,
  	}
+ out:
+ 	aeadctx->enckey_len = 0;
+-	if (base_hash)
++	if (!IS_ERR(base_hash))
+ 		chcr_free_shash(base_hash);
+ 	return -EINVAL;
+ }
+-- 
+2.11.0
+
