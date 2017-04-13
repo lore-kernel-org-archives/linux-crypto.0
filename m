@@ -1,60 +1,107 @@
-From: <sean.wang@mediatek.com>
-Subject: [PATCH 1/2] dt-bindings: hwrng: Add Mediatek hardware random generator bindings
-Date: Thu, 13 Apr 2017 15:05:07 +0800
-Message-ID: <1492067108-14748-2-git-send-email-sean.wang@mediatek.com>
-References: <1492067108-14748-1-git-send-email-sean.wang@mediatek.com>
+From: Thomas Gleixner <tglx@linutronix.de>
+Subject: [patch V2 13/13] crypto: n2 - Replace racy task affinity logic
+Date: Thu, 13 Apr 2017 10:20:23 +0200 (CEST)
+Message-ID: <alpine.DEB.2.20.1704131019420.2408@nanos>
+References: <20170412200726.941336635@linutronix.de> <20170412201043.231299672@linutronix.de>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <weiyongjun1@huawei.com>, <devicetree@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>,
-        <linux-mediatek@lists.infradead.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, <keyhaede@gmail.com>,
-        Sean Wang <sean.wang@mediatek.com>
-To: <herbert@gondor.apana.org.au>, <mpm@selenic.com>,
-        <robh+dt@kernel.org>, <mark.rutland@arm.com>,
-        <clabbe.montjoie@gmail.com>, <prasannatsmkumar@gmail.com>,
-        <romain.perier@free-electrons.com>, <shannon.nelson@oracle.com>
+Content-Type: text/plain; charset=US-ASCII
+Cc: Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Sebastian Siewior <bigeasy@linutronix.de>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Fenghua Yu <fenghua.yu@intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        Len Brown <lenb@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>, Tejun Heo <tj@kernel.org>,
+        Tony Luck <tony.luck@intel.com>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        linux-crypto@vger.kernel.org
+To: LKML <linux-kernel@vger.kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1492067108-14748-1-git-send-email-sean.wang@mediatek.com>
+In-Reply-To: <20170412201043.231299672@linutronix.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-From: Sean Wang <sean.wang@mediatek.com>
+spu_queue_register() needs to invoke setup functions on a particular
+CPU. This is achieved by temporarily setting the affinity of the
+calling user space thread to the requested CPU and reset it to the original
+affinity afterwards.
 
-Document the devicetree bindings for Mediatek random number
-generator which could be found on MT7623 SoC or other similar
-Mediatek SoCs.
+That's racy vs. CPU hotplug and concurrent affinity settings for that
+thread resulting in code executing on the wrong CPU and overwriting the
+new affinity setting.
 
-Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+Replace it by using work_on_cpu_safe() which guarantees to run the code on
+the requested CPU or to fail in case the CPU is offline.
+
+Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org
 ---
- Documentation/devicetree/bindings/rng/mtk-rng.txt | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/rng/mtk-rng.txt
 
-diff --git a/Documentation/devicetree/bindings/rng/mtk-rng.txt b/Documentation/devicetree/bindings/rng/mtk-rng.txt
-new file mode 100644
-index 0000000..a6d62a2
---- /dev/null
-+++ b/Documentation/devicetree/bindings/rng/mtk-rng.txt
-@@ -0,0 +1,18 @@
-+Device-Tree bindings for Mediatek random number generator
-+found in Mediatek SoC family
-+
-+Required properties:
-+- compatible	    : Should be "mediatek,mt7623-rng"
-+- clocks	    : list of clock specifiers, corresponding to
-+		      entries in clock-names property;
-+- clock-names	    : Should contain "rng" entries;
-+- reg 		    : Specifies base physical address and size of the registers
-+
-+Example:
-+
-+rng: rng@1020f000 {
-+	compatible = "mediatek,mt7623-rng";
-+	reg = <0 0x1020f000 0 0x1000>;
-+	clocks = <&infracfg CLK_INFRA_TRNG>;
-+	clock-names = "rng";
+V2: Fixup build-bot complaints
+
+ drivers/crypto/n2_core.c |   31 ++++++++++++++++---------------
+ 1 file changed, 16 insertions(+), 15 deletions(-)
+
+--- a/drivers/crypto/n2_core.c
++++ b/drivers/crypto/n2_core.c
+@@ -65,6 +65,11 @@ struct spu_queue {
+ 	struct list_head	list;
+ };
+ 
++struct spu_qreg {
++	struct spu_queue	*queue;
++	unsigned long		type;
 +};
--- 
-1.9.1
++
+ static struct spu_queue **cpu_to_cwq;
+ static struct spu_queue **cpu_to_mau;
+ 
+@@ -1631,31 +1636,27 @@ static void queue_cache_destroy(void)
+ 	kmem_cache_destroy(queue_cache[HV_NCS_QTYPE_CWQ - 1]);
+ }
+ 
+-static int spu_queue_register(struct spu_queue *p, unsigned long q_type)
++static long spu_queue_register_workfn(void *arg)
+ {
+-	cpumask_var_t old_allowed;
++	struct spu_qreg *qr = arg;
++	struct spu_queue *p = qr->queue;
++	unsigned long q_type = qr->type;
+ 	unsigned long hv_ret;
+ 
+-	if (cpumask_empty(&p->sharing))
+-		return -EINVAL;
+-
+-	if (!alloc_cpumask_var(&old_allowed, GFP_KERNEL))
+-		return -ENOMEM;
+-
+-	cpumask_copy(old_allowed, &current->cpus_allowed);
+-
+-	set_cpus_allowed_ptr(current, &p->sharing);
+-
+ 	hv_ret = sun4v_ncs_qconf(q_type, __pa(p->q),
+ 				 CWQ_NUM_ENTRIES, &p->qhandle);
+ 	if (!hv_ret)
+ 		sun4v_ncs_sethead_marker(p->qhandle, 0);
+ 
+-	set_cpus_allowed_ptr(current, old_allowed);
++	return hv_ret ? -EINVAL : 0;
++}
+ 
+-	free_cpumask_var(old_allowed);
++static int spu_queue_register(struct spu_queue *p, unsigned long q_type)
++{
++	int cpu = cpumask_any_and(&p->sharing, cpu_online_mask);
++	struct spu_qreg qr = { .queue = p, .type = q_type };
+ 
+-	return (hv_ret ? -EINVAL : 0);
++	return work_on_cpu_safe(cpu, spu_queue_register_workfn, &qr);
+ }
+ 
+ static int spu_queue_setup(struct spu_queue *p)
