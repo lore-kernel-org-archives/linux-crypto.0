@@ -1,48 +1,57 @@
-From: Gary R Hook <gary.hook@amd.com>
-Subject: [PATCH 2/2] crypto: ccp - Disable interrupts early on unload
-Date: Wed, 12 Apr 2017 17:54:43 -0500
-Message-ID: <20170412225443.17707.83299.stgit@taos>
-References: <20170412225324.17707.75176.stgit@taos>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [patch 13/13] crypto: n2 - Replace racy task affinity logic
+Date: Thu, 13 Apr 2017 12:56:15 +0800
+Message-ID: <20170413045615.GA21693@gondor.apana.org.au>
+References: <20170412200726.941336635@linutronix.de>
+ <20170412201043.231299672@linutronix.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>
-To: <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: LKML <linux-kernel@vger.kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Sebastian Siewior <bigeasy@linutronix.de>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Fenghua Yu <fenghua.yu@intel.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        Len Brown <lenb@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>, Tejun Heo <tj@kernel.org>,
+        Tony Luck <tony.luck@intel.com>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        linux-crypto@vger.kernel.org
+To: Thomas Gleixner <tglx@linutronix.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2nam02on0080.outbound.protection.outlook.com ([104.47.38.80]:24400
-        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1755387AbdDLWzA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Apr 2017 18:55:00 -0400
-In-Reply-To: <20170412225324.17707.75176.stgit@taos>
+Received: from [198.176.57.175] ([198.176.57.175]:58208 "EHLO
+        deadmen.hmeau.com" rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1751577AbdDMFim (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 13 Apr 2017 01:38:42 -0400
+Content-Disposition: inline
+In-Reply-To: <20170412201043.231299672@linutronix.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Gary R Hook <ghook@amd.com>
+On Wed, Apr 12, 2017 at 10:07:39PM +0200, Thomas Gleixner wrote:
+> spu_queue_register() needs to invoke setup functions on a particular
+> CPU. This is achieved by temporarily setting the affinity of the
+> calling user space thread to the requested CPU and reset it to the original
+> affinity afterwards.
+> 
+> That's racy vs. CPU hotplug and concurrent affinity settings for that
+> thread resulting in code executing on the wrong CPU and overwriting the
+> new affinity setting.
+> 
+> Replace it by using work_on_cpu_safe() which guarantees to run the code on
+> the requested CPU or to fail in case the CPU is offline.
+> 
+> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: linux-crypto@vger.kernel.org
 
-Ensure that we disable interrupts first when shutting down
-the driver.
-
-Signed-off-by: Gary R Hook <ghook@amd.com>
----
- drivers/crypto/ccp/ccp-dev-v5.c |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
-index e03d06a..293c08e 100644
---- a/drivers/crypto/ccp/ccp-dev-v5.c
-+++ b/drivers/crypto/ccp/ccp-dev-v5.c
-@@ -942,10 +942,10 @@ static void ccp5_destroy(struct ccp_device *ccp)
- 		iowrite32(cmd_q->qcontrol & ~CMD5_Q_RUN, cmd_q->reg_control);
- 
- 		/* Disable the interrupts */
--		iowrite32(ALL_INTERRUPTS, cmd_q->reg_interrupt_status);
-+		iowrite32(0x00, cmd_q->reg_int_enable);
- 
- 		/* Clear the interrupt status */
--		iowrite32(0x00, cmd_q->reg_int_enable);
-+		iowrite32(ALL_INTERRUPTS, cmd_q->reg_interrupt_status);
- 		ioread32(cmd_q->reg_int_status);
- 		ioread32(cmd_q->reg_status);
- 	}
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
