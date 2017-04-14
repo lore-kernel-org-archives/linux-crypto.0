@@ -1,42 +1,58 @@
-From: Christoph Hellwig <hch@lst.de>
-Subject: Re: export pcie_flr and remove copies of it in drivers
-Date: Fri, 14 Apr 2017 17:57:29 +0200
-Message-ID: <20170414155729.GC22412@lst.de>
-References: <20170413145339.20186-1-hch@lst.de> <20170414144108.GB29349@bhelgaas-glaptop.roam.corp.google.com> <CAErSpo4HBhG5cLZMMt4NtswjQ1yNvW9x39DsxFWtBPOVwG7JpA@mail.gmail.com>
+From: Logan Gunthorpe <logang@deltatee.com>
+Subject: Re: [PATCH 09/22] dm-crypt: Make use of the new sg_map helper in 4
+ call sites
+Date: Fri, 14 Apr 2017 10:03:43 -0600
+Message-ID: <302ae5ab-d515-5427-2e54-d58a9cdb8241@deltatee.com>
+References: <1492121135-4437-1-git-send-email-logang@deltatee.com>
+ <1492121135-4437-10-git-send-email-logang@deltatee.com>
+ <20170414083921.GC25471@lst.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Bjorn Helgaas <helgaas@kernel.org>, Christoph Hellwig <hch@lst.de>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Salvatore Benedetto <salvatore.benedetto@intel.com>,
-        Mike Marciniszyn <mike.marciniszyn@intel.com>,
-        Dennis Dalessandro <dennis.dalessandro@intel.com>,
-        Derek Chickles <derek.chickles@caviumnetworks.com>,
-        Satanand Burla <satananda.burla@caviumnetworks.com>,
-        Felix Manlunas <felix.manlunas@caviumnetworks.com>,
-        Raghu Vatsavayi <raghu.vatsavayi@caviumnetworks.com>,
-        Jeff Kirsher <jeffrey.t.kirsher@intel.com>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        qat-linux@intel.com, linux-crypto@vger.kernel.org,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        netdev <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-To: Bjorn Helgaas <bhelgaas@google.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from verein.lst.de ([213.95.11.211]:43494 "EHLO newverein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752152AbdDNP5b (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Apr 2017 11:57:31 -0400
-Content-Disposition: inline
-In-Reply-To: <CAErSpo4HBhG5cLZMMt4NtswjQ1yNvW9x39DsxFWtBPOVwG7JpA@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Steve Wise <swise@opengridcomputing.com>, linux-nvme@lists.infradead.org,
+ Stephen Bates <sbates@raithlin.com>, target-devel@vger.kernel.org,
+ Sumit Semwal <sumit.semwal@linaro.org>, devel@driverdev.osuosl.org,
+ rds-devel@oss.oracle.com, Sagi Grimberg <sagi@grimberg.me>,
+ linux-scsi@vger.kernel.org, Matthew Wilcox <mawilcox@microsoft.com>,
+ linux-rdma@vger.kernel.org, fcoe-devel@open-fcoe.org,
+ Ross Zwisler <ross.zwisler@linux.intel.com>, open-iscsi@googlegroups.com,
+ linux-media@vger.kernel.org, Ming Lin <ming.l@ssi.samsung.com>,
+ intel-gfx@lists.freedesktop.org, sparmaintainer@unisys.com,
+ linux-raid@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ Dan Williams <dan.j.williams@intel.com>, megaraidlinux.pdl@broadcom.com,
+ Jens Axboe <axboe@kernel.dk>, linaro-mm-sig@lists.linaro.org,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org
+To: Christoph Hellwig <hch@lst.de>
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+In-Reply-To: <20170414083921.GC25471@lst.de>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Apr 14, 2017 at 09:51:48AM -0500, Bjorn Helgaas wrote:
-> > Otherwise, I'd be glad to take the series given acks for the non-PCI
-> > parts.  Just let me know.
+
+
+On 14/04/17 02:39 AM, Christoph Hellwig wrote:
+> On Thu, Apr 13, 2017 at 04:05:22PM -0600, Logan Gunthorpe wrote:
+>> Very straightforward conversion to the new function in all four spots.
 > 
-> I do already have a patch (c5e4f0192ad2 ("PCI: Avoid FLR for Intel
-> 82579 NICs")) on my pci/virtualization branch that touches pcie_flr()
-> and will conflict with this one.
+> I think the right fix here is to switch dm-crypt to the ahash API
+> that takes a scatterlist.
 
-I'll take a look and will resend on top of that branch.
+Hmm, well I'm not sure I understand the code enough to make that
+conversion. But I was looking at it. One tricky bit seems to be that
+crypt_iv_lmk_one adds a seed, skips the first 16 bytes in the page and
+then hashes another 16 bytes from other data. What would you do
+construct a new sgl for it and pass it to the ahash api?
+
+The other thing is crypt_iv_lmk_post also seems to modify the page after
+the hash with a  crypto_xor so you'd still need at least one kmap in there.
+
+Logan
