@@ -1,56 +1,37 @@
-From: Logan Gunthorpe <logang-OTvnGxWRz7hWk0Htik3J/w@public.gmane.org>
-Subject: Re: [PATCH 03/22] libiscsi: Make use of new the sg_map helper function
-Date: Fri, 14 Apr 2017 09:37:20 -0600
-Message-ID: <85eda3a6-edab-e59e-d2d4-c3af5599d0fd@deltatee.com>
-References: <1492121135-4437-1-git-send-email-logang@deltatee.com>
- <1492121135-4437-4-git-send-email-logang@deltatee.com>
- <20170414083607.GB25471@lst.de>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [PATCH] padata: allow caller to control queue length
+Date: Fri, 14 Apr 2017 17:44:47 +0200
+Message-ID: <CAHmME9qDrq-ZvuE0weLFLKAz2qTyNtC53K4+Tc0JBCvBZ9O-5A@mail.gmail.com>
+References: <20170413095213.23513-1-Jason@zx2c4.com> <20170414075711.GJ12763@secunet.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Steve Wise <swise-7bPotxP6k4+P2YhJcF5u+vpXobYPEAuW@public.gmane.org>, linux-nvme-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
- target-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Sumit Semwal <sumit.semwal-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
- devel-gWbeCf7V1WCQmaza687I9mD2FQJk+8+b@public.gmane.org, rds-devel-N0ozoZBvEnrZJqsBc5GL+g@public.gmane.org,
- linux-scsi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
- linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, fcoe-devel-s9riP+hp16TNLxjTenLetw@public.gmane.org,
- open-iscsi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org, linux-media-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- Ming Lin <ming.l-Vzezgt5dB6uUEJcrhfAQsw@public.gmane.org>, intel-gfx-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org,
- sparmaintainer-GLv8BlqOqDDQT0dZR+AlfA@public.gmane.org, linux-raid-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- dri-devel-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org, megaraidlinux.pdl-dY08KVG/lbpWk0Htik3J/w@public.gmane.org,
- Jens Axboe <axboe-tSWWG44O7X1aa/9Udqfwiw@public.gmane.org>, linaro-mm-sig-cunTk1MwBs8s++Sfvej+rw@public.gmane.org,
- "Martin K. Petersen" <martin.petersen-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
- Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>, linux-nvdimm-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org,
- linux-mmc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- Tejun Heo <tj@k
-To: Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>
-Return-path: <linux-nvdimm-bounces-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org>
-In-Reply-To: <20170414083607.GB25471-jcswGhMUV9g@public.gmane.org>
-List-Unsubscribe: <https://lists.01.org/mailman/options/linux-nvdimm>,
- <mailto:linux-nvdimm-request-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.01.org/pipermail/linux-nvdimm/>
-List-Post: <mailto:linux-nvdimm-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org>
-List-Help: <mailto:linux-nvdimm-request-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.01.org/mailman/listinfo/linux-nvdimm>,
- <mailto:linux-nvdimm-request-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org?subject=subscribe>
-Errors-To: linux-nvdimm-bounces-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org
-Sender: "Linux-nvdimm" <linux-nvdimm-bounces-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from frisell.zx2c4.com ([192.95.5.64]:56721 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752529AbdDNPoy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 14 Apr 2017 11:44:54 -0400
+In-Reply-To: <20170414075711.GJ12763@secunet.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
+On Fri, Apr 14, 2017 at 9:57 AM, Steffen Klassert
+<steffen.klassert@secunet.com> wrote:
+> Why do we need this? As long as we don't have a user that needs a
+> different limit, this patch adds just some useless code.
 
+My [not-yet-mainlined] code wants it.
 
-On 14/04/17 02:36 AM, Christoph Hellwig wrote:
-> On Thu, Apr 13, 2017 at 04:05:16PM -0600, Logan Gunthorpe wrote:
->> Convert the kmap and kmap_atomic uses to the sg_map function. We now
->> store the flags for the kmap instead of a boolean to indicate
->> atomicitiy. We also propogate a possible kmap error down and create
->> a new ISCSI_TCP_INTERNAL_ERR error type for this.
-> 
-> Can you split out the new error handling into a separate prep patch
-> which should go to the iscsi maintainers ASAP?
-> 
+But more compellingly, padata simply isn't a very useful interface if
+it contains random limits like that. Different consumers will want
+different things. Pcrypt has been the only consumer for years and
+years, despite it being in kernel/; it's probably a good idea to
+figure out how to make this more attractive in general, since parallel
+processing is a useful thing. The 1000 job limit is particularly
+annoying for systems with tons and tons of cores; here you'd want the
+ability for more jobs to be allowed at a time.
 
-Yes, I can do that. I'd just have thought they'd want to see the use
-case for the new error before accepting a patch like that...
-
-Logan
+I'm also open to discussing other ways to handle limiting. But a hard
+coded random number of 1000 seems wrong.
