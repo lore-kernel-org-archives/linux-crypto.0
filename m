@@ -1,107 +1,105 @@
-From: <smallgroups@dudleycvs.org.uk>
-Subject: (unknown)
-Date: Sat, 15 Apr 2017 13:53:09 -0000
-Message-ID: <149226438945.21744.4048955814039986594@hinet.net>
+From: Thomas Gleixner <tglx@linutronix.de>
+Subject: [patch 03/20] padata: Make padata_alloc() static
+Date: Sat, 15 Apr 2017 19:01:10 +0200
+Message-ID: <20170415171651.483363066@linutronix.de>
+References: <20170415170107.643253702@linutronix.de>
 Mime-Version: 1.0
-Content-Type: application/zip; name="REPORT_8394710_linux-crypto.zip"
-Content-Transfer-Encoding: base64
-To: "linux-crypto" <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 114-42-235-119.dynamic-ip.hinet.net ([114.42.235.119]:34628
-        "HELO hinet.net" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with SMTP id S1751541AbdDONxQ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 15 Apr 2017 09:53:16 -0400
-Content-Disposition: attachment
-Subject: 
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-15
+Cc: Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Sebastian Siewior <bigeasy@linutronix.de>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        linux-crypto@vger.kernel.org
+To: LKML <linux-kernel@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline; filename=padata--Make-padata_alloc---static.patch
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-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
+No users outside of padata.c
+
+Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: linux-crypto@vger.kernel.org
+---
+ include/linux/padata.h |    3 ---
+ kernel/padata.c        |   34 +++++++++++++++++-----------------
+ 2 files changed, 17 insertions(+), 20 deletions(-)
+
+--- a/include/linux/padata.h
++++ b/include/linux/padata.h
+@@ -166,9 +166,6 @@ struct padata_instance {
+ 
+ extern struct padata_instance *padata_alloc_possible(
+ 					struct workqueue_struct *wq);
+-extern struct padata_instance *padata_alloc(struct workqueue_struct *wq,
+-					    const struct cpumask *pcpumask,
+-					    const struct cpumask *cbcpumask);
+ extern void padata_free(struct padata_instance *pinst);
+ extern int padata_do_parallel(struct padata_instance *pinst,
+ 			      struct padata_priv *padata, int cb_cpu);
+--- a/kernel/padata.c
++++ b/kernel/padata.c
+@@ -913,7 +913,7 @@ static ssize_t padata_sysfs_show(struct
+ }
+ 
+ static ssize_t padata_sysfs_store(struct kobject *kobj, struct attribute *attr,
+-				  const char *buf, size_t count)
++s				  const char *buf, size_t count)
+ {
+ 	struct padata_instance *pinst;
+ 	struct padata_sysfs_entry *pentry;
+@@ -939,19 +939,6 @@ static struct kobj_type padata_attr_type
+ };
+ 
+ /**
+- * padata_alloc_possible - Allocate and initialize padata instance.
+- *                         Use the cpu_possible_mask for serial and
+- *                         parallel workers.
+- *
+- * @wq: workqueue to use for the allocated padata instance
+- */
+-struct padata_instance *padata_alloc_possible(struct workqueue_struct *wq)
+-{
+-	return padata_alloc(wq, cpu_possible_mask, cpu_possible_mask);
+-}
+-EXPORT_SYMBOL(padata_alloc_possible);
+-
+-/**
+  * padata_alloc - allocate and initialize a padata instance and specify
+  *                cpumasks for serial and parallel workers.
+  *
+@@ -959,9 +946,9 @@ EXPORT_SYMBOL(padata_alloc_possible);
+  * @pcpumask: cpumask that will be used for padata parallelization
+  * @cbcpumask: cpumask that will be used for padata serialization
+  */
+-struct padata_instance *padata_alloc(struct workqueue_struct *wq,
+-				     const struct cpumask *pcpumask,
+-				     const struct cpumask *cbcpumask)
++static struct padata_instance *padata_alloc(struct workqueue_struct *wq,
++					    const struct cpumask *pcpumask,
++					    const struct cpumask *cbcpumask)
+ {
+ 	struct padata_instance *pinst;
+ 	struct parallel_data *pd = NULL;
+@@ -1016,6 +1003,19 @@ struct padata_instance *padata_alloc(str
+ }
+ 
+ /**
++ * padata_alloc_possible - Allocate and initialize padata instance.
++ *                         Use the cpu_possible_mask for serial and
++ *                         parallel workers.
++ *
++ * @wq: workqueue to use for the allocated padata instance
++ */
++struct padata_instance *padata_alloc_possible(struct workqueue_struct *wq)
++{
++	return padata_alloc(wq, cpu_possible_mask, cpu_possible_mask);
++}
++EXPORT_SYMBOL(padata_alloc_possible);
++
++/**
+  * padata_free - free a padata instance
+  *
+  * @padata_inst: padata instance to free
