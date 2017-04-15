@@ -1,122 +1,115 @@
-From: Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 1/7] PCI: export pcie_flr
-Date: Fri, 14 Apr 2017 21:11:25 +0200
-Message-ID: <20170414191131.14286-2-hch@lst.de>
-References: <20170414191131.14286-1-hch@lst.de>
-Cc: linux-pci@vger.kernel.org, qat-linux@intel.com,
-        linux-crypto@vger.kernel.org, linux-rdma@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Bjorn Helgaas <bhelgaas@google.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Salvatore Benedetto <salvatore.benedetto@intel.com>,
-        Mike Marciniszyn <mike.marciniszyn@intel.com>,
-        Dennis Dalessandro <dennis.dalessandro@intel.com>,
-        Derek Chickles <derek.chickles@caviumnetworks.com>,
-        Satanand Burla <satananda.burla@caviumnetworks.com>,
-        Felix Manlunas <felix.manlunas@caviumnetworks.com>,
-        Raghu Vatsavayi <raghu.vatsavayi@caviumnetworks.com>,
-        Jeff Kirsher <jeffrey.t.kirsher@intel.com>
-Return-path: <linux-pci-owner@vger.kernel.org>
-In-Reply-To: <20170414191131.14286-1-hch@lst.de>
-Sender: linux-pci-owner@vger.kernel.org
+From: Harsh Jain <harshjain.prof-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 08/22] crypto: chcr: Make use of the new sg_map helper
+ function
+Date: Sat, 15 Apr 2017 10:23:33 +0530
+Message-ID: <CAFXBA=k74+9jRZQX4r_iGoL8yiDbXPDTLw+AELEb1LeT_jeKiQ@mail.gmail.com>
+References: <1492121135-4437-1-git-send-email-logang@deltatee.com>
+ <1492121135-4437-9-git-send-email-logang@deltatee.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Steve Wise <swise-7bPotxP6k4+P2YhJcF5u+vpXobYPEAuW@public.gmane.org>, linux-nvme-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+ target-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Sumit Semwal <sumit.semwal-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
+ devel-gWbeCf7V1WCQmaza687I9mD2FQJk+8+b@public.gmane.org, rds-devel-N0ozoZBvEnrZJqsBc5GL+g@public.gmane.org,
+ linux-scsi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+ linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>,
+ fcoe-devel-s9riP+hp16TNLxjTenLetw@public.gmane.org, open-iscsi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org,
+ linux-media-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Ming Lin <ming.l-Vzezgt5dB6uUEJcrhfAQsw@public.gmane.org>,
+ intel-gfx-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org, sparmaintainer-GLv8BlqOqDDQT0dZR+AlfA@public.gmane.org,
+ linux-raid-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, dri-devel-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org,
+ megaraidlinux.pdl-dY08KVG/lbpWk0Htik3J/w@public.gmane.org, Jens Axboe <axboe-tSWWG44O7X1aa/9Udqfwiw@public.gmane.org>,
+ linaro-mm-sig-cunTk1MwBs8s++Sfvej+rw@public.gmane.org,
+ "Martin K. Petersen" <martin.petersen-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
+ Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>, linux-nvdimm-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org,
+ linux-mmc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+ linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, netdev@
+To: Logan Gunthorpe <logang-OTvnGxWRz7hWk0Htik3J/w@public.gmane.org>, harsh-ut6Up61K2wZBDgjK7y7TUQ@public.gmane.org
+Return-path: <linux-nvdimm-bounces-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org>
+In-Reply-To: <1492121135-4437-9-git-send-email-logang-OTvnGxWRz7hWk0Htik3J/w@public.gmane.org>
+List-Unsubscribe: <https://lists.01.org/mailman/options/linux-nvdimm>,
+ <mailto:linux-nvdimm-request-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.01.org/pipermail/linux-nvdimm/>
+List-Post: <mailto:linux-nvdimm-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org>
+List-Help: <mailto:linux-nvdimm-request-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.01.org/mailman/listinfo/linux-nvdimm>,
+ <mailto:linux-nvdimm-request-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org?subject=subscribe>
+Errors-To: linux-nvdimm-bounces-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org
+Sender: "Linux-nvdimm" <linux-nvdimm-bounces-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org>
 List-Id: linux-crypto.vger.kernel.org
 
-Currently we opencode the FLR sequence in lots of place, export a core
-helper instead.  We split out the probing for FLR support as all the
-non-core callers already know their hardware.
+On Fri, Apr 14, 2017 at 3:35 AM, Logan Gunthorpe <logang-OTvnGxWRz7hWk0Htik3J/w@public.gmane.org> wrote:
+> The get_page in this area looks *highly* suspect due to there being no
+> corresponding put_page. However, I've left that as is to avoid breaking
+> things.
+chcr driver will post the request to LLD driver cxgb4 and put_page is
+implemented there. it will no harm. Any how
+we have removed the below code from driver.
 
-Note that in the new pci_has_flr function the quirk check has been moved
-before the capability check as there is no point in reading the
-capability in this case.
+http://www.mail-archive.com/linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org/msg24561.html
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Acked-by: Bjorn Helgaas <bhelgaas@google.com>
----
- drivers/pci/pci.c   | 39 ++++++++++++++++++++++++++++-----------
- include/linux/pci.h |  1 +
- 2 files changed, 29 insertions(+), 11 deletions(-)
+After this merge we can ignore your patch. Thanks
 
-diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
-index bef14777bb30..957a11a6a840 100644
---- a/drivers/pci/pci.c
-+++ b/drivers/pci/pci.c
-@@ -3773,27 +3773,41 @@ static void pci_flr_wait(struct pci_dev *dev)
- 			 (i - 1) * 100);
- }
- 
--static int pcie_flr(struct pci_dev *dev, int probe)
-+/**
-+ * pcie_has_flr - check if a device supports function level resets
-+ * @dev:	device to check
-+ *
-+ * Returns true if the device advertises support for PCIe function level
-+ * resets.
-+ */
-+static bool pcie_has_flr(struct pci_dev *dev)
- {
- 	u32 cap;
- 
--	pcie_capability_read_dword(dev, PCI_EXP_DEVCAP, &cap);
--	if (!(cap & PCI_EXP_DEVCAP_FLR))
--		return -ENOTTY;
--
- 	if (dev->dev_flags & PCI_DEV_FLAGS_NO_FLR_RESET)
--		return -ENOTTY;
-+		return false;
- 
--	if (probe)
--		return 0;
-+	pcie_capability_read_dword(dev, PCI_EXP_DEVCAP, &cap);
-+	return cap & PCI_EXP_DEVCAP_FLR;
-+}
- 
-+/**
-+ * pcie_flr - initiate a PCIe function level reset
-+ * @dev:	device to reset
-+ *
-+ * Initiate a function level reset on @dev.  The caller should ensure the
-+ * device supports FLR before calling this function, e.g. by using the
-+ * pcie_has_flr() helper.
-+ */
-+void pcie_flr(struct pci_dev *dev)
-+{
- 	if (!pci_wait_for_pending_transaction(dev))
- 		dev_err(&dev->dev, "timed out waiting for pending transaction; performing function level reset anyway\n");
- 
- 	pcie_capability_set_word(dev, PCI_EXP_DEVCTL, PCI_EXP_DEVCTL_BCR_FLR);
- 	pci_flr_wait(dev);
--	return 0;
- }
-+EXPORT_SYMBOL_GPL(pcie_flr);
- 
- static int pci_af_flr(struct pci_dev *dev, int probe)
- {
-@@ -3977,9 +3991,12 @@ static int __pci_dev_reset(struct pci_dev *dev, int probe)
- 	if (rc != -ENOTTY)
- 		goto done;
- 
--	rc = pcie_flr(dev, probe);
--	if (rc != -ENOTTY)
-+	if (pcie_has_flr(dev)) {
-+		if (!probe)
-+			pcie_flr(dev);
-+		rc = 0;
- 		goto done;
-+	}
- 
- 	rc = pci_af_flr(dev, probe);
- 	if (rc != -ENOTTY)
-diff --git a/include/linux/pci.h b/include/linux/pci.h
-index 20e1865233a4..60162f51227a 100644
---- a/include/linux/pci.h
-+++ b/include/linux/pci.h
-@@ -1054,6 +1054,7 @@ int pcie_get_mps(struct pci_dev *dev);
- int pcie_set_mps(struct pci_dev *dev, int mps);
- int pcie_get_minimum_link(struct pci_dev *dev, enum pci_bus_speed *speed,
- 			  enum pcie_link_width *width);
-+void pcie_flr(struct pci_dev *dev);
- int __pci_reset_function(struct pci_dev *dev);
- int __pci_reset_function_locked(struct pci_dev *dev);
- int pci_reset_function(struct pci_dev *dev);
--- 
-2.11.0
+>
+> I've also removed the KMAP_ATOMIC_ARGS check as it appears to be dead
+> code that dates back to when it was first committed...
+
+
+>
+> Signed-off-by: Logan Gunthorpe <logang-OTvnGxWRz7hWk0Htik3J/w@public.gmane.org>
+> ---
+>  drivers/crypto/chelsio/chcr_algo.c | 28 +++++++++++++++-------------
+>  1 file changed, 15 insertions(+), 13 deletions(-)
+>
+> diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
+> index 41bc7f4..a993d1d 100644
+> --- a/drivers/crypto/chelsio/chcr_algo.c
+> +++ b/drivers/crypto/chelsio/chcr_algo.c
+> @@ -1489,22 +1489,21 @@ static struct sk_buff *create_authenc_wr(struct aead_request *req,
+>         return ERR_PTR(-EINVAL);
+>  }
+>
+> -static void aes_gcm_empty_pld_pad(struct scatterlist *sg,
+> -                                 unsigned short offset)
+> +static int aes_gcm_empty_pld_pad(struct scatterlist *sg,
+> +                                unsigned short offset)
+>  {
+> -       struct page *spage;
+>         unsigned char *addr;
+>
+> -       spage = sg_page(sg);
+> -       get_page(spage); /* so that it is not freed by NIC */
+> -#ifdef KMAP_ATOMIC_ARGS
+> -       addr = kmap_atomic(spage, KM_SOFTIRQ0);
+> -#else
+> -       addr = kmap_atomic(spage);
+> -#endif
+> -       memset(addr + sg->offset, 0, offset + 1);
+> +       get_page(sg_page(sg)); /* so that it is not freed by NIC */
+> +
+> +       addr = sg_map(sg, SG_KMAP_ATOMIC);
+> +       if (IS_ERR(addr))
+> +               return PTR_ERR(addr);
+> +
+> +       memset(addr, 0, offset + 1);
+> +       sg_unmap(sg, addr, SG_KMAP_ATOMIC);
+>
+> -       kunmap_atomic(addr);
+> +       return 0;
+>  }
+>
+>  static int set_msg_len(u8 *block, unsigned int msglen, int csize)
+> @@ -1940,7 +1939,10 @@ static struct sk_buff *create_gcm_wr(struct aead_request *req,
+>         if (req->cryptlen) {
+>                 write_sg_to_skb(skb, &frags, src, req->cryptlen);
+>         } else {
+> -               aes_gcm_empty_pld_pad(req->dst, authsize - 1);
+> +               err = aes_gcm_empty_pld_pad(req->dst, authsize - 1);
+> +               if (err)
+> +                       goto dstmap_fail;
+> +
+>                 write_sg_to_skb(skb, &frags, reqctx->dst, crypt_len);
+>
+>         }
+> --
+> 2.1.4
+>
