@@ -1,7 +1,7 @@
 From: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
-Subject: [PATCH 6/6] ima: Support appended signatures for appraisal
-Date: Tue, 18 Apr 2017 17:17:46 -0300
-Message-ID: <1492546666-16615-7-git-send-email-bauerman@linux.vnet.ibm.com>
+Subject: [PATCH 5/6] MODSIGN: Export module signature definitions.
+Date: Tue, 18 Apr 2017 17:17:45 -0300
+Message-ID: <1492546666-16615-6-git-send-email-bauerman@linux.vnet.ibm.com>
 References: <1492546666-16615-1-git-send-email-bauerman@linux.vnet.ibm.com>
 Cc: linux-ima-devel@lists.sourceforge.net, keyrings@vger.kernel.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -13,487 +13,224 @@ Cc: linux-ima-devel@lists.sourceforge.net, keyrings@vger.kernel.org,
         Claudio Carvalho <cclaudio@linux.vnet.ibm.com>,
         Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
 To: linux-security-module@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38746 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1757564AbdDRUTC (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Apr 2017 16:19:02 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id v3IKItFj049772
-        for <linux-crypto@vger.kernel.org>; Tue, 18 Apr 2017 16:19:01 -0400
-Received: from e24smtp02.br.ibm.com (e24smtp02.br.ibm.com [32.104.18.86])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 29wqpt57ca-1
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Tue, 18 Apr 2017 16:18:58 -0400
-Received: from localhost
-        by e24smtp02.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-crypto@vger.kernel.org> from <bauerman@linux.vnet.ibm.com>;
-        Tue, 18 Apr 2017 17:18:38 -0300
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1492546666-16615-1-git-send-email-bauerman@linux.vnet.ibm.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-This patch introduces the appended_imasig keyword to the IMA policy syntax
-to specify that a given hook should expect the file to have the IMA
-signature appended to it. Here is how it can be used in a rule:
+IMA will use the module_signature format for append signatures, so export
+the relevant definitions and factor out the code which verifies that the
+appended signature trailer is valid.
 
-appraise func=KEXEC_KERNEL_CHECK appraise_type=appended_imasig
-appraise func=KEXEC_KERNEL_CHECK appraise_type=appended_imasig|imasig
-
-In the second form, IMA will accept either an appended signature or a
-signature stored in the extended attribute. In that case, it will first
-check whether there is an appended signature, and if not it will read it
-from the extended attribute.
-
-The format of the appended signature is the same used for signed kernel
-modules. This means that the file can be signed with the scripts/sign-file
-tool, with a command line such as this:
-
-$ sign-file sha256 privkey_ima.pem x509_ima.der vmlinux
-
-This code only works for files that are hashed from a memory buffer, not
-for files that are read from disk at the time of hash calculation. In other
-words, only hooks that use kernel_read_file can support appended
-signatures.
-
-The change in CONFIG_INTEGRITY_SIGNATURE to select CONFIG_KEYS instead of
-depending on it is to avoid a dependency recursion in
-CONFIG_IMA_APPRAISE_APPENDED_SIG, because CONFIG_MODULE_SIG_FORMAT selects
-CONFIG_KEYS and Kconfig complains that CONFIG_INTEGRITY_SIGNATURE depends
-on it.
+Also, create a CONFIG_MODULE_SIG_FORMAT option so that IMA can select it
+and be able to use validate_module_signature without having to depend on
+CONFIG_MODULE_SIG.
 
 Signed-off-by: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
 ---
- crypto/asymmetric_keys/asymmetric_type.c |  1 +
- crypto/asymmetric_keys/pkcs7_parser.c    | 12 +++++
- crypto/asymmetric_keys/pkcs7_verify.c    | 13 +++++
- include/crypto/pkcs7.h                   |  3 ++
- include/linux/verification.h             |  1 +
- security/integrity/Kconfig               |  2 +-
- security/integrity/ima/Kconfig           | 13 +++++
- security/integrity/ima/ima.h             |  8 +++
- security/integrity/ima/ima_appraise.c    | 84 +++++++++++++++++++++++++++++++-
- security/integrity/ima/ima_main.c        | 30 ++++++++++--
- security/integrity/ima/ima_policy.c      | 43 ++++++++++------
- security/integrity/integrity.h           | 20 +++++---
- 12 files changed, 204 insertions(+), 26 deletions(-)
+ include/linux/module_signature.h | 45 ++++++++++++++++++++++++
+ init/Kconfig                     |  6 +++-
+ kernel/Makefile                  |  2 +-
+ kernel/module_signing.c          | 74 +++++++++++++++++-----------------------
+ 4 files changed, 82 insertions(+), 45 deletions(-)
 
-diff --git a/crypto/asymmetric_keys/asymmetric_type.c b/crypto/asymmetric_keys/asymmetric_type.c
-index e4b0ed386bc8..0d58ecfba2ea 100644
---- a/crypto/asymmetric_keys/asymmetric_type.c
-+++ b/crypto/asymmetric_keys/asymmetric_type.c
-@@ -28,6 +28,7 @@ const char *const key_being_used_for[NR__KEY_BEING_USED_FOR] = {
- 	[VERIFYING_KEXEC_PE_SIGNATURE]		= "kexec PE sig",
- 	[VERIFYING_KEY_SIGNATURE]		= "key sig",
- 	[VERIFYING_KEY_SELF_SIGNATURE]		= "key self sig",
-+	[VERIFYING_KEXEC_CMS_SIGNATURE]		= "kexec CMS sig",
- 	[VERIFYING_UNSPECIFIED_SIGNATURE]	= "unspec sig",
- };
- EXPORT_SYMBOL_GPL(key_being_used_for);
-diff --git a/crypto/asymmetric_keys/pkcs7_parser.c b/crypto/asymmetric_keys/pkcs7_parser.c
-index af4cd8649117..e41beda297a8 100644
---- a/crypto/asymmetric_keys/pkcs7_parser.c
-+++ b/crypto/asymmetric_keys/pkcs7_parser.c
-@@ -673,3 +673,15 @@ int pkcs7_note_signed_info(void *context, size_t hdrlen,
- 		return -ENOMEM;
- 	return 0;
- }
-+
-+/**
-+ * pkcs7_get_message_sig - get signature in @pkcs7
+diff --git a/include/linux/module_signature.h b/include/linux/module_signature.h
+new file mode 100644
+index 000000000000..b04f16559b47
+--- /dev/null
++++ b/include/linux/module_signature.h
+@@ -0,0 +1,45 @@
++/* Module signature handling.
 + *
-+ * This function doesn't meaningfully support messages with more than one
-+ * signature. It will always return the first signature.
++ * Copyright (C) 2012 Red Hat, Inc. All Rights Reserved.
++ * Written by David Howells (dhowells@redhat.com)
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public Licence
++ * as published by the Free Software Foundation; either version
++ * 2 of the Licence, or (at your option) any later version.
 + */
-+const struct public_key_signature *pkcs7_get_message_sig(
-+					const struct pkcs7_message *pkcs7)
-+{
-+	return pkcs7->signed_infos ? pkcs7->signed_infos->sig : NULL;
-+}
-diff --git a/crypto/asymmetric_keys/pkcs7_verify.c b/crypto/asymmetric_keys/pkcs7_verify.c
-index 2d93d9eccb4d..eee78074580a 100644
---- a/crypto/asymmetric_keys/pkcs7_verify.c
-+++ b/crypto/asymmetric_keys/pkcs7_verify.c
-@@ -420,6 +420,19 @@ int pkcs7_verify(struct pkcs7_message *pkcs7,
- 			return -EKEYREJECTED;
- 		}
- 		break;
-+	case VERIFYING_KEXEC_CMS_SIGNATURE:
-+		/* Shipping certificates in the CMS message is not allowed. */
-+		if (pkcs7->certs) {
-+			pr_warn("Signature isn't allowed to contain certificates.\n");
-+			return -EBADMSG;
-+		}
 +
-+		/* Shipping CRLs in the CMS message is not allowed. */
-+		if (pkcs7->crl) {
-+			pr_warn("Signature isn't allowed to contain CRLs.\n");
-+			return -EBADMSG;
-+		}
-+		break;
- 	default:
- 		return -EINVAL;
- 	}
-diff --git a/include/crypto/pkcs7.h b/include/crypto/pkcs7.h
-index 583f199400a3..a05a0d7214e6 100644
---- a/include/crypto/pkcs7.h
-+++ b/include/crypto/pkcs7.h
-@@ -29,6 +29,9 @@ extern int pkcs7_get_content_data(const struct pkcs7_message *pkcs7,
- 				  const void **_data, size_t *_datalen,
- 				  size_t *_headerlen);
- 
-+extern const struct public_key_signature *pkcs7_get_message_sig(
-+					const struct pkcs7_message *pkcs7);
++#ifndef _LINUX_MODULE_SIGNATURE_H
++#define _LINUX_MODULE_SIGNATURE_H
 +
- /*
-  * pkcs7_trust.c
-  */
-diff --git a/include/linux/verification.h b/include/linux/verification.h
-index a10549a6c7cd..b7298d804440 100644
---- a/include/linux/verification.h
-+++ b/include/linux/verification.h
-@@ -22,6 +22,7 @@ enum key_being_used_for {
- 	VERIFYING_KEY_SIGNATURE,
- 	VERIFYING_KEY_SELF_SIGNATURE,
- 	VERIFYING_UNSPECIFIED_SIGNATURE,
-+	VERIFYING_KEXEC_CMS_SIGNATURE,
- 	NR__KEY_BEING_USED_FOR
- };
- extern const char *const key_being_used_for[NR__KEY_BEING_USED_FOR];
-diff --git a/security/integrity/Kconfig b/security/integrity/Kconfig
-index da9565891738..0d642e0317c7 100644
---- a/security/integrity/Kconfig
-+++ b/security/integrity/Kconfig
-@@ -17,8 +17,8 @@ if INTEGRITY
- 
- config INTEGRITY_SIGNATURE
- 	bool "Digital signature verification using multiple keyrings"
--	depends on KEYS
- 	default n
-+	select KEYS
- 	select SIGNATURE
- 	help
- 	  This option enables digital signature verification support
-diff --git a/security/integrity/ima/Kconfig b/security/integrity/ima/Kconfig
-index 370eb2f4dd37..13662043bf90 100644
---- a/security/integrity/ima/Kconfig
-+++ b/security/integrity/ima/Kconfig
-@@ -155,6 +155,19 @@ config IMA_APPRAISE
- 	  <http://linux-ima.sourceforge.net>
- 	  If unsure, say N.
- 
-+config IMA_APPRAISE_APPENDED_SIG
-+	bool "Support appended signatures for appraisal"
-+	depends on IMA_APPRAISE
-+	depends on INTEGRITY_ASYMMETRIC_KEYS
-+	select PKCS7_MESSAGE_PARSER
++enum pkey_id_type {
++	PKEY_ID_PGP,		/* OpenPGP generated key ID */
++	PKEY_ID_X509,		/* X.509 arbitrary subjectKeyIdentifier */
++	PKEY_ID_PKCS7,		/* Signature in PKCS#7 message */
++};
++
++/*
++ * Module signature information block.
++ *
++ * The constituents of the signature section are, in order:
++ *
++ *	- Signer's name
++ *	- Key identifier
++ *	- Signature data
++ *	- Information block
++ */
++struct module_signature {
++	u8	algo;		/* Public-key crypto algorithm [0] */
++	u8	hash;		/* Digest algorithm [0] */
++	u8	id_type;	/* Key identifier type [PKEY_ID_PKCS7] */
++	u8	signer_len;	/* Length of signer's name [0] */
++	u8	key_id_len;	/* Length of key identifier [0] */
++	u8	__pad[3];
++	__be32	sig_len;	/* Length of signature data */
++};
++
++int validate_module_signature(const struct module_signature *ms,
++			      size_t file_len);
++int mod_verify_sig(const void *mod, unsigned long *_modlen);
++
++#endif /* _LINUX_MODULE_SIGNATURE_H */
+diff --git a/init/Kconfig b/init/Kconfig
+index a92f27da4a27..891325e5aeff 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -2024,7 +2024,7 @@ config MODULE_SRCVERSION_ALL
+ config MODULE_SIG
+ 	bool "Module signature verification"
+ 	depends on MODULES
+-	select SYSTEM_DATA_VERIFICATION
 +	select MODULE_SIG_FORMAT
-+	default n
-+	help
-+	   Adds support for signatures appended to files. The format of the
-+	   appended signature is the same used for signed kernel modules.
-+	   The appended_imasig keyword can be used in the IMA policy for this
-+	   purpose.
-+
- config IMA_TRUSTED_KEYRING
- 	bool "Require all keys on the .ima keyring be signed (deprecated)"
- 	depends on IMA_APPRAISE && SYSTEM_TRUSTED_KEYRING
-diff --git a/security/integrity/ima/ima.h b/security/integrity/ima/ima.h
-index b563fbd4d122..63ce5a1179c3 100644
---- a/security/integrity/ima/ima.h
-+++ b/security/integrity/ima/ima.h
-@@ -185,6 +185,8 @@ enum ima_hooks {
- 	MAX_CHECK
- };
+ 	help
+ 	  Check modules for valid signatures upon load: the signature
+ 	  is simply appended to the module. For more information see
+@@ -2039,6 +2039,10 @@ config MODULE_SIG
+ 	  debuginfo strip done by some packagers (such as rpmbuild) and
+ 	  inclusion into an initramfs that wants the module size reduced.
  
-+extern const char *const func_tokens[];
++config MODULE_SIG_FORMAT
++	def_bool n
++	select SYSTEM_DATA_VERIFICATION
 +
- /* LIM API function definitions */
- int ima_get_action(struct inode *inode, int mask,
- 		   enum ima_hooks func, int *pcr);
-@@ -243,6 +245,12 @@ enum hash_algo ima_get_hash_algo(struct evm_ima_xattr_data *xattr_value,
- int ima_read_xattr(struct dentry *dentry,
- 		   struct evm_ima_xattr_data **xattr_value);
+ config MODULE_SIG_FORCE
+ 	bool "Require modules to be validly signed"
+ 	depends on MODULE_SIG
+diff --git a/kernel/Makefile b/kernel/Makefile
+index b302b4731d16..4451bbc70a08 100644
+--- a/kernel/Makefile
++++ b/kernel/Makefile
+@@ -56,7 +56,7 @@ obj-y += up.o
+ endif
+ obj-$(CONFIG_UID16) += uid16.o
+ obj-$(CONFIG_MODULES) += module.o
+-obj-$(CONFIG_MODULE_SIG) += module_signing.o
++obj-$(CONFIG_MODULE_SIG_FORMAT) += module_signing.o
+ obj-$(CONFIG_KALLSYMS) += kallsyms.o
+ obj-$(CONFIG_BSD_PROCESS_ACCT) += acct.o
+ obj-$(CONFIG_KEXEC_CORE) += kexec_core.o
+diff --git a/kernel/module_signing.c b/kernel/module_signing.c
+index 937c844bee4a..421e3e668714 100644
+--- a/kernel/module_signing.c
++++ b/kernel/module_signing.c
+@@ -11,36 +11,38 @@
  
-+#ifdef CONFIG_IMA_APPRAISE_APPENDED_SIG
-+void ima_read_appended_sig(const void *buf, loff_t *buf_len,
-+			  struct evm_ima_xattr_data **xattr_value,
-+			  int *xattr_len);
-+#endif
-+
- #else
- static inline int ima_appraise_measurement(enum ima_hooks func,
- 					   struct integrity_iint_cache *iint,
-diff --git a/security/integrity/ima/ima_appraise.c b/security/integrity/ima/ima_appraise.c
-index 8c8030a29117..64a42f16c4ee 100644
---- a/security/integrity/ima/ima_appraise.c
-+++ b/security/integrity/ima/ima_appraise.c
-@@ -9,12 +9,15 @@
-  * the Free Software Foundation, version 2 of the License.
-  */
- #include <linux/module.h>
+ #include <linux/kernel.h>
+ #include <linux/errno.h>
 +#include <linux/module_signature.h>
- #include <linux/file.h>
- #include <linux/fs.h>
- #include <linux/xattr.h>
- #include <linux/magic.h>
- #include <linux/ima.h>
- #include <linux/evm.h>
-+#include <keys/asymmetric-type.h>
-+#include <crypto/pkcs7.h>
+ #include <linux/string.h>
+ #include <linux/verification.h>
+ #include <crypto/public_key.h>
+ #include "module-internal.h"
  
- #include "ima.h"
- 
-@@ -177,6 +180,85 @@ int ima_read_xattr(struct dentry *dentry,
- 	return ret;
- }
- 
-+#ifdef CONFIG_IMA_APPRAISE_APPENDED_SIG
-+void ima_read_appended_sig(const void *buf, loff_t *buf_len,
-+			  struct evm_ima_xattr_data **xattr_value,
-+			  int *xattr_len)
-+{
-+	const size_t marker_len = sizeof(MODULE_SIG_STRING) - 1;
-+	const struct public_key_signature *pks;
-+	const struct module_signature *sig;
-+	struct signature_v2_hdr *hdr;
-+	struct pkcs7_message *pkcs7;
-+	int i, hdr_len;
-+	loff_t file_len = *buf_len;
-+	size_t sig_len;
-+	const void *p;
-+
-+	if (file_len <= marker_len + sizeof(*sig))
-+		return;
-+
-+	p = buf + file_len - marker_len;
-+	if (memcmp(p, MODULE_SIG_STRING, marker_len))
-+		return;
-+
-+	file_len -= marker_len;
-+	sig = (const struct module_signature *) (p - sizeof(*sig));
-+
-+	if (validate_module_signature(sig, file_len))
-+		return;
-+
-+	sig_len = be32_to_cpu(sig->sig_len);
-+	file_len -= sig_len + sizeof(*sig);
-+
-+	pkcs7 = pkcs7_parse_message(buf + file_len, sig_len);
-+	if (IS_ERR(pkcs7))
-+		return;
-+
-+	if (pkcs7_verify(pkcs7, VERIFYING_KEXEC_CMS_SIGNATURE))
-+		goto out;
-+
-+	pks = pkcs7_get_message_sig(pkcs7);
-+	if (!pks)
-+		goto out;
-+
-+	/* IMA only supports RSA keys. */
-+	if (strcmp(pks->pkey_algo, "rsa"))
-+		goto out;
-+
-+	if (!pks->auth_ids[0])
-+		goto out;
-+
-+	for (i = 0; i < HASH_ALGO__LAST; i++)
-+		if (!strcmp(hash_algo_name[i], pks->hash_algo))
-+			break;
-+
-+	if (i == HASH_ALGO__LAST)
-+		goto out;
-+
-+	hdr_len = sizeof(*hdr) + pks->s_size;
-+	hdr = kmalloc(hdr_len, GFP_KERNEL);
-+	if (!hdr)
-+		goto out;
-+
-+	hdr->type = EVM_IMA_XATTR_DIGSIG;
-+	hdr->version = 2;
-+	hdr->hash_algo = i;
-+	memcpy(hdr->sig, pks->s, pks->s_size);
-+	hdr->sig_size = cpu_to_be16(pks->s_size);
-+
-+	p = pks->auth_ids[0]->data + pks->auth_ids[0]->len - sizeof(hdr->keyid);
-+	memcpy(&hdr->keyid, p, sizeof(hdr->keyid));
-+
-+	*xattr_value = (typeof(*xattr_value)) hdr;
-+	*xattr_len = hdr_len;
-+	*buf_len = file_len;
-+
-+ out:
-+	pkcs7_free_message(pkcs7);
-+}
-+#endif /* CONFIG_IMA_APPRAISE_APPENDED_SIG */
-+
- /*
-  * ima_appraise_measurement - appraise file measurement
+-enum pkey_id_type {
+-	PKEY_ID_PGP,		/* OpenPGP generated key ID */
+-	PKEY_ID_X509,		/* X.509 arbitrary subjectKeyIdentifier */
+-	PKEY_ID_PKCS7,		/* Signature in PKCS#7 message */
+-};
+-
+-/*
+- * Module signature information block.
+- *
+- * The constituents of the signature section are, in order:
++/**
++ * validate_module_signature - validate that the given signature is sane
   *
-@@ -205,7 +287,7 @@ int ima_appraise_measurement(enum ima_hooks func,
- 		if (rc && rc != -ENODATA)
- 			goto out;
- 
--		cause = iint->flags & IMA_DIGSIG_REQUIRED ?
-+		cause = iint->flags & IMA_DIGSIG_REQUIRED_MASK ?
- 				"IMA-signature-required" : "missing-hash";
- 		status = INTEGRITY_NOLABEL;
- 		if (opened & FILE_CREATED) {
-diff --git a/security/integrity/ima/ima_main.c b/security/integrity/ima/ima_main.c
-index 2aebb7984437..994ee420b2ec 100644
---- a/security/integrity/ima/ima_main.c
-+++ b/security/integrity/ima/ima_main.c
-@@ -16,6 +16,9 @@
-  *	implements the IMA hooks: ima_bprm_check, ima_file_mmap,
-  *	and ima_file_check.
+- *	- Signer's name
+- *	- Key identifier
+- *	- Signature data
+- *	- Information block
++ * @ms:		Signature to validate.
++ * @file_len:	Size of the file to which @ms is appended.
   */
-+
-+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-+
- #include <linux/module.h>
- #include <linux/file.h>
- #include <linux/binfmts.h>
-@@ -228,9 +231,30 @@ static int process_measurement(struct file *file, char *buf, loff_t size,
- 
- 	template_desc = ima_template_desc_current();
- 	if ((action & IMA_APPRAISE_SUBMASK) ||
--		    strcmp(template_desc->name, IMA_TEMPLATE_IMA_NAME) != 0)
--		/* read 'security.ima' */
--		xattr_len = ima_read_xattr(file_dentry(file), &xattr_value);
-+		    strcmp(template_desc->name, IMA_TEMPLATE_IMA_NAME) != 0) {
-+#ifdef CONFIG_IMA_APPRAISE_APPENDED_SIG
-+		unsigned long digsig_req;
-+
-+		if (iint->flags & IMA_APPENDED_DIGSIG_REQUIRED) {
-+			if (!buf || !size)
-+				pr_err("%s doesn't support appended_imasig\n",
-+				       func_tokens[func]);
-+			else
-+				ima_read_appended_sig(buf, &size, &xattr_value,
-+						      &xattr_len);
-+		}
-+
-+		/*
-+		 * Don't try to read the xattr if we require an appended
-+		 * signature but failed to get one.
-+		 */
-+		digsig_req = iint->flags & IMA_DIGSIG_REQUIRED_MASK;
-+		if (!xattr_len && digsig_req != IMA_APPENDED_DIGSIG_REQUIRED)
-+#endif /* CONFIG_IMA_APPRAISE_APPENDED_SIG */
-+			/* read 'security.ima' */
-+			xattr_len = ima_read_xattr(file_dentry(file),
-+						   &xattr_value);
+-struct module_signature {
+-	u8	algo;		/* Public-key crypto algorithm [0] */
+-	u8	hash;		/* Digest algorithm [0] */
+-	u8	id_type;	/* Key identifier type [PKEY_ID_PKCS7] */
+-	u8	signer_len;	/* Length of signer's name [0] */
+-	u8	key_id_len;	/* Length of key identifier [0] */
+-	u8	__pad[3];
+-	__be32	sig_len;	/* Length of signature data */
+-};
++int validate_module_signature(const struct module_signature *ms, size_t file_len)
++{
++	if (be32_to_cpu(ms->sig_len) >= file_len - sizeof(*ms))
++		return -EBADMSG;
++	else if (ms->id_type != PKEY_ID_PKCS7) {
++		pr_err("Module is not signed with expected PKCS#7 message\n");
++		return -ENOPKG;
++	} else if (ms->algo != 0 ||
++		   ms->hash != 0 ||
++		   ms->signer_len != 0 ||
++		   ms->key_id_len != 0 ||
++		   ms->__pad[0] != 0 ||
++		   ms->__pad[1] != 0 ||
++		   ms->__pad[2] != 0) {
++		pr_err("PKCS#7 signature info has unexpected non-zero params\n");
++		return -EBADMSG;
 +	}
- 
- 	hash_algo = ima_get_hash_algo(xattr_value, xattr_len);
- 
-diff --git a/security/integrity/ima/ima_policy.c b/security/integrity/ima/ima_policy.c
-index 158eafef64e8..96601b5ba411 100644
---- a/security/integrity/ima/ima_policy.c
-+++ b/security/integrity/ima/ima_policy.c
-@@ -777,8 +777,15 @@ static int ima_parse_rule(char *rule, struct ima_rule_entry *entry)
- 			}
- 
- 			ima_log_string(ab, "appraise_type", args[0].from);
--			if ((strcmp(args[0].from, "imasig")) == 0)
-+			if (!strcmp(args[0].from, "imasig"))
- 				entry->flags |= IMA_DIGSIG_REQUIRED;
-+#ifdef CONFIG_IMA_APPRAISE_APPENDED_SIG
-+			else if (!strcmp(args[0].from, "appended_imasig"))
-+				entry->flags |= IMA_APPENDED_DIGSIG_REQUIRED;
-+			else if (!strcmp(args[0].from, "appended_imasig|imasig"))
-+				entry->flags |= IMA_DIGSIG_REQUIRED
-+						| IMA_APPENDED_DIGSIG_REQUIRED;
-+#endif /* CONFIG_IMA_APPRAISE_APPENDED_SIG */
- 			else
- 				result = -EINVAL;
- 			break;
-@@ -884,19 +891,7 @@ void ima_delete_rules(void)
- 	}
- }
- 
--#ifdef	CONFIG_IMA_READ_POLICY
--enum {
--	mask_exec = 0, mask_write, mask_read, mask_append
--};
--
--static const char *const mask_tokens[] = {
--	"MAY_EXEC",
--	"MAY_WRITE",
--	"MAY_READ",
--	"MAY_APPEND"
--};
--
--static const char *const func_tokens[] = {
-+const char *const func_tokens[] = {
- 	NULL,
- 	"FILE_CHECK",
- 	"MMAP_CHECK",
-@@ -909,6 +904,18 @@ static const char *const func_tokens[] = {
- 	"POLICY_CHECK"
- };
- 
-+#ifdef	CONFIG_IMA_READ_POLICY
-+enum {
-+	mask_exec = 0, mask_write, mask_read, mask_append
-+};
 +
-+static const char *const mask_tokens[] = {
-+	"MAY_EXEC",
-+	"MAY_WRITE",
-+	"MAY_READ",
-+	"MAY_APPEND"
-+};
-+
- void *ima_policy_start(struct seq_file *m, loff_t *pos)
++	return 0;
++}
+ 
+ /*
+  * Verify the signature on a module.
+@@ -49,6 +51,7 @@ int mod_verify_sig(const void *mod, unsigned long *_modlen)
  {
- 	loff_t l = *pos;
-@@ -1062,7 +1069,13 @@ int ima_policy_show(struct seq_file *m, void *v)
- 			}
- 		}
- 	}
--	if (entry->flags & IMA_DIGSIG_REQUIRED)
-+	if ((entry->flags & IMA_DIGSIG_REQUIRED_MASK) == IMA_DIGSIG_REQUIRED_MASK)
-+#ifdef CONFIG_IMA_APPRAISE_APPENDED_SIG
-+		seq_puts(m, "appraise_type=appended_imasig|imasig ");
-+	else if (entry->flags & IMA_APPENDED_DIGSIG_REQUIRED)
-+		seq_puts(m, "appraise_type=appended_imasig ");
-+	else if (entry->flags & IMA_DIGSIG_REQUIRED)
-+#endif /* CONFIG_IMA_APPRAISE_APPENDED_SIG */
- 		seq_puts(m, "appraise_type=imasig ");
- 	if (entry->flags & IMA_PERMIT_DIRECTIO)
- 		seq_puts(m, "permit_directio ");
-diff --git a/security/integrity/integrity.h b/security/integrity/integrity.h
-index a53e7e4ab06c..de2a666740c1 100644
---- a/security/integrity/integrity.h
-+++ b/security/integrity/integrity.h
-@@ -27,12 +27,20 @@
- #define IMA_AUDITED		0x00000080
+ 	struct module_signature ms;
+ 	size_t modlen = *_modlen, sig_len;
++	int ret;
  
- /* iint cache flags */
--#define IMA_ACTION_FLAGS	0xff000000
--#define IMA_ACTION_RULE_FLAGS	0x06000000
--#define IMA_DIGSIG		0x01000000
--#define IMA_DIGSIG_REQUIRED	0x02000000
--#define IMA_PERMIT_DIRECTIO	0x04000000
--#define IMA_NEW_FILE		0x08000000
-+#define IMA_ACTION_FLAGS		0xff000000
-+#define IMA_ACTION_RULE_FLAGS		0x16000000
-+#define IMA_DIGSIG			0x01000000
-+#define IMA_DIGSIG_REQUIRED		0x02000000
-+#define IMA_PERMIT_DIRECTIO		0x04000000
-+#define IMA_NEW_FILE			0x08000000
-+#define IMA_APPENDED_DIGSIG_REQUIRED	0x10000000
+ 	pr_devel("==>%s(,%zu)\n", __func__, modlen);
+ 
+@@ -56,30 +59,15 @@ int mod_verify_sig(const void *mod, unsigned long *_modlen)
+ 		return -EBADMSG;
+ 
+ 	memcpy(&ms, mod + (modlen - sizeof(ms)), sizeof(ms));
+-	modlen -= sizeof(ms);
 +
-+#ifdef CONFIG_IMA_APPRAISE_APPENDED_SIG
-+#define IMA_DIGSIG_REQUIRED_MASK	(IMA_DIGSIG_REQUIRED | \
-+					 IMA_APPENDED_DIGSIG_REQUIRED)
-+#else
-+#define IMA_DIGSIG_REQUIRED_MASK	IMA_DIGSIG_REQUIRED
-+#endif /* CONFIG_IMA_APPRAISE_APPENDED_SIG */
++	ret = validate_module_signature(&ms, modlen);
++	if (ret)
++		return ret;
  
- #define IMA_DO_MASK		(IMA_MEASURE | IMA_APPRAISE | IMA_AUDIT | \
- 				 IMA_APPRAISE_SUBMASK)
+ 	sig_len = be32_to_cpu(ms.sig_len);
+-	if (sig_len >= modlen)
+-		return -EBADMSG;
+-	modlen -= sig_len;
++	modlen -= sig_len + sizeof(ms);
+ 	*_modlen = modlen;
+ 
+-	if (ms.id_type != PKEY_ID_PKCS7) {
+-		pr_err("Module is not signed with expected PKCS#7 message\n");
+-		return -ENOPKG;
+-	}
+-
+-	if (ms.algo != 0 ||
+-	    ms.hash != 0 ||
+-	    ms.signer_len != 0 ||
+-	    ms.key_id_len != 0 ||
+-	    ms.__pad[0] != 0 ||
+-	    ms.__pad[1] != 0 ||
+-	    ms.__pad[2] != 0) {
+-		pr_err("PKCS#7 signature info has unexpected non-zero params\n");
+-		return -EBADMSG;
+-	}
+-
+ 	return verify_pkcs7_signature(mod, modlen, mod + modlen, sig_len,
+ 				      NULL, VERIFYING_MODULE_SIGNATURE,
+ 				      NULL, NULL);
 -- 
 2.7.4
