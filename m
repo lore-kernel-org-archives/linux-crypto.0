@@ -1,105 +1,59 @@
-From: Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>
-Subject: Re: [PATCH 0/4] staging: add ccree crypto driver
-Date: Tue, 18 Apr 2017 16:43:50 +0100
-Message-ID: <20170418154349.GJ17866@leverpostej>
-References: <1492524470-13847-1-git-send-email-gilad@benyossef.com>
- <20170418151355.GI17866@leverpostej>
- <CAOtvUMeB8ub-e6PXxgJWyK=TW4HseZgSN6NO=kSmVax514ufdg@mail.gmail.com>
+From: Logan Gunthorpe <logang@deltatee.com>
+Subject: Re: [PATCH 05/22] drm/i915: Make use of the new sg_map helper function
+Date: Tue, 18 Apr 2017 09:44:43 -0600
+Message-ID: <303094a1-15e0-de95-5157-493a6da039bc@deltatee.com>
+References: <1492121135-4437-1-git-send-email-logang@deltatee.com>
+ <1492121135-4437-6-git-send-email-logang@deltatee.com>
+ <20170418064427.r5ewu3p66p2zwdru@phenom.ffwll.local>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-        "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>,
-        devel-gWbeCf7V1WCQmaza687I9mD2FQJk+8+b@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        Linux kernel mailing list <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Gilad Ben-Yossef <gilad.benyossef-5wv7dgnIgG8@public.gmane.org>,
-        Binoy Jayan <binoy.jayan-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
-        Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>
-To: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <CAOtvUMeB8ub-e6PXxgJWyK=TW4HseZgSN6NO=kSmVax514ufdg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+To: Christoph Hellwig <hch@lst.de>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Sagi Grimberg <sagi@grimberg.me>, Jens Axboe <axboe@kernel.dk>,
+ Tejun Heo <tj@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Dan Williams <dan.j.williams@intel.com>,
+ Ross Zwisler <ross.zwisler@linux.intel.com>,
+ Matthew Wilcox <mawilcox@microsoft.com>,
+ Sumit Semwal <sumit.semwal@linaro.org>, Ming Lin <ming.l@ssi.samsung.com>,
+ linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linaro-mm-sig@lists.linaro.org, intel-gfx@lists.freedesktop.org,
+ linux-raid@vger.kernel.org, linux-mmc@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-nvdimm@lists.01.org,
+ linux-scsi@vger.kernel.org, fcoe-devel@open-fcoe.org,
+ open-iscsi@googlegroups.com, megaraidlinux.pdl@broadcom.com,
+ sparmaintainer@unisys.com, devel@driverd
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+In-Reply-To: <20170418064427.r5ewu3p66p2zwdru@phenom.ffwll.local>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Apr 18, 2017 at 06:29:22PM +0300, Gilad Ben-Yossef wrote:
-> On Tue, Apr 18, 2017 at 6:13 PM, Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org> wrote:
-> > On Tue, Apr 18, 2017 at 05:07:50PM +0300, Gilad Ben-Yossef wrote:
-> >> Arm TrustZone CryptoCell 700 is a family of cryptographic hardware
-> >> accelerators. It is supported by a long lived series of out of tree
-> >> drivers, which I am now in the process of unifying and upstreaming.
-> >> This is the first drop, supporting the new CryptoCell 712 REE.
-> >>
-> >> The code still needs some cleanup before maturing to a proper
-> >> upstream driver, which I am in the process of doing. However,
-> >> as discussion of some of the capabilities of the hardware and
-> >> its application to some dm-crypt and dm-verity features recently
-> >> took place I though it is better to do this in the open via the
-> >> staging tree.
-> >>
-> >> A Git repository based off of Linux 4.11-rc7 is available at
-> >> https://github.com/gby/linux.git branch ccree.
-> >>
-> >> Signed-off-by: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-> >> CC: Binoy Jayan <binoy.jayan-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-> >> CC: Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>
-> >>
-> >> Gilad Ben-Yossef (4):
-> >>   staging: add ccree crypto driver
-> >>   staging: ccree: add TODO list
-> >>   staging: ccree: add devicetree bindings
-> >>   MAINTAINERS: add Gilad BY as maintainer for ccree
-> >>
-> >>  .../devicetree/bindings/crypto/arm-cryptocell.txt  |   23 +
-> >
-> > I'm interested in looking at the DT binding, but for some reason I've
-> > only recevied the cover letter so far.
-> >
-> > Are my mail servers being particularly slow today, or has something gone
-> > wrong with the Cc list for the remaining patches?
-> >
+
+
+On 18/04/17 12:44 AM, Daniel Vetter wrote:
+> On Thu, Apr 13, 2017 at 04:05:18PM -0600, Logan Gunthorpe wrote:
+>> This is a single straightforward conversion from kmap to sg_map.
+>>
+>> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
 > 
-> Thanks a bunch for the willingness to review this.
+> Acked-by: Daniel Vetter <daniel.vetter@ffwll.ch>
 > 
-> My apologies for not communicating this clearly enough -  Since it is
-> an pre-existing driver it is rather big.
-> I did not want to inflict a 600K patch on the mailing list so opted to
-> provide a git repo instead, as stated in the
-> email.
+> Probably makes sense to merge through some other tree, but please be aware
+> of the considerable churn rate in i915 (i.e. make sure your tree is in
+> linux-next before you send a pull request for this). Plane B would be to
+> get the prep patch in first and then merge the i915 conversion one kernel
+> release later.
 
-Should this have been a [GIT PULL], then?
+Yes, as per what I said in my cover letter, I was leaning towards a
+"Plan B" style approach.
 
-I was confused by the [PATCH 0/4].
-
-> The patch in question is here:
-> https://github.com/gby/linux/commit/12d92e0bc19aa9bbd891cdab765eaaeabe0b6967
-> 
-> Do let me know if you prefer that I will send at least the smaller
-> patch file via email in the normal fashion.
-
-Sending patches is the usual way to have things reviewed. Linking to an
-external site doesn't fit with the workflows of everyone.
-
-If you wish to have patches reviewed, please send them as patches in the
-usual fashion.
-
-I will note that on the patch you linked, the compatible string is far
-too vague, per common conventions. Per your description above, that
-should be something like "arm,cryptocell-712-ree" (and each variant
-should have its own string).
-
-I don't have documentation to hand to attempt to review the rest.
-
-I would appreciate if you could ensure that the DT binding was reviewed
-as part of the staging TODOs. That needs to follow the usual DT review
-process of sending patches to the list. Until that has occurred, it
-shouldn't be in Documentation/devicetree/.
-
-Thanks,
-Mark.
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Logan
