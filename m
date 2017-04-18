@@ -1,7 +1,7 @@
 From: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
-Subject: [PATCH 1/6] integrity: Small code improvements
-Date: Tue, 18 Apr 2017 17:17:41 -0300
-Message-ID: <1492546666-16615-2-git-send-email-bauerman@linux.vnet.ibm.com>
+Subject: [PATCH 3/6] ima: Simplify policy_func_show.
+Date: Tue, 18 Apr 2017 17:17:43 -0300
+Message-ID: <1492546666-16615-4-git-send-email-bauerman@linux.vnet.ibm.com>
 References: <1492546666-16615-1-git-send-email-bauerman@linux.vnet.ibm.com>
 Cc: linux-ima-devel@lists.sourceforge.net, keyrings@vger.kernel.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -13,99 +13,116 @@ Cc: linux-ima-devel@lists.sourceforge.net, keyrings@vger.kernel.org,
         Claudio Carvalho <cclaudio@linux.vnet.ibm.com>,
         Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
 To: linux-security-module@vger.kernel.org
-Return-path: <linux-security-module-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39949 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1757889AbdDRUS1 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 18 Apr 2017 16:18:27 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id v3IK3kes030859
+        for <linux-crypto@vger.kernel.org>; Tue, 18 Apr 2017 16:18:22 -0400
+Received: from e24smtp02.br.ibm.com (e24smtp02.br.ibm.com [32.104.18.86])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 29wqptw8pr-1
+        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Tue, 18 Apr 2017 16:18:21 -0400
+Received: from localhost
+        by e24smtp02.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-crypto@vger.kernel.org> from <bauerman@linux.vnet.ibm.com>;
+        Tue, 18 Apr 2017 17:18:19 -0300
 In-Reply-To: <1492546666-16615-1-git-send-email-bauerman@linux.vnet.ibm.com>
-Sender: owner-linux-security-module@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The keyid and sig_size members of struct signature_v2_hdr are in BE format,
-so use a type that makes this assumption explicit. Also, use beXX_to_cpu
-instead of __beXX_to_cpu to read them.
-
-Change integrity_kernel_read to take a void * buffer instead of char *
-buffer, so that callers don't have to use a cast if they provide a buffer
-that isn't a char *.
-
-Also, add missing fall through comment in ima_appraise.c.
+If the func_tokens array uses the same indices as enum ima_hooks,
+policy_func_show can be a lot simpler, and the func_* enum becomes
+unnecessary.
 
 Signed-off-by: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
 ---
- security/integrity/digsig_asymmetric.c | 4 ++--
- security/integrity/iint.c              | 2 +-
- security/integrity/ima/ima_appraise.c  | 1 +
- security/integrity/integrity.h         | 7 ++++---
- 4 files changed, 8 insertions(+), 6 deletions(-)
+ security/integrity/ima/ima_policy.c | 47 ++++++-------------------------------
+ 1 file changed, 7 insertions(+), 40 deletions(-)
 
-diff --git a/security/integrity/digsig_asymmetric.c b/security/integrity/digsig_asymmetric.c
-index 80052ed8d467..ab6a029062a1 100644
---- a/security/integrity/digsig_asymmetric.c
-+++ b/security/integrity/digsig_asymmetric.c
-@@ -92,13 +92,13 @@ int asymmetric_verify(struct key *keyring, const char *sig,
+diff --git a/security/integrity/ima/ima_policy.c b/security/integrity/ima/ima_policy.c
+index cfda5d7b17ec..158eafef64e8 100644
+--- a/security/integrity/ima/ima_policy.c
++++ b/security/integrity/ima/ima_policy.c
+@@ -896,20 +896,14 @@ static const char *const mask_tokens[] = {
+ 	"MAY_APPEND"
+ };
  
- 	siglen -= sizeof(*hdr);
+-enum {
+-	func_file = 0, func_mmap, func_bprm,
+-	func_module, func_firmware, func_post,
+-	func_kexec_kernel, func_kexec_initramfs,
+-	func_policy
+-};
+-
+ static const char *const func_tokens[] = {
++	NULL,
+ 	"FILE_CHECK",
+ 	"MMAP_CHECK",
+ 	"BPRM_CHECK",
++	"POST_SETATTR",
+ 	"MODULE_CHECK",
+ 	"FIRMWARE_CHECK",
+-	"POST_SETATTR",
+ 	"KEXEC_KERNEL_CHECK",
+ 	"KEXEC_INITRAMFS_CHECK",
+ 	"POLICY_CHECK"
+@@ -949,48 +943,21 @@ void ima_policy_stop(struct seq_file *m, void *v)
  
--	if (siglen != __be16_to_cpu(hdr->sig_size))
-+	if (siglen != be16_to_cpu(hdr->sig_size))
- 		return -EBADMSG;
+ #define pt(token)	policy_tokens[token + Opt_err].pattern
+ #define mt(token)	mask_tokens[token]
+-#define ft(token)	func_tokens[token]
  
- 	if (hdr->hash_algo >= HASH_ALGO__LAST)
- 		return -ENOPKG;
- 
--	key = request_asymmetric_key(keyring, __be32_to_cpu(hdr->keyid));
-+	key = request_asymmetric_key(keyring, be32_to_cpu(hdr->keyid));
- 	if (IS_ERR(key))
- 		return PTR_ERR(key);
- 
-diff --git a/security/integrity/iint.c b/security/integrity/iint.c
-index c710d22042f9..6fc888ca468e 100644
---- a/security/integrity/iint.c
-+++ b/security/integrity/iint.c
-@@ -182,7 +182,7 @@ security_initcall(integrity_iintcache_init);
-  *
+ /*
+  * policy_func_show - display the ima_hooks policy rule
   */
- int integrity_kernel_read(struct file *file, loff_t offset,
--			  char *addr, unsigned long count)
-+			  void *addr, unsigned long count)
+ static void policy_func_show(struct seq_file *m, enum ima_hooks func)
  {
- 	mm_segment_t old_fs;
- 	char __user *buf = (char __user *)addr;
-diff --git a/security/integrity/ima/ima_appraise.c b/security/integrity/ima/ima_appraise.c
-index 1fd9539a969d..427a896bc806 100644
---- a/security/integrity/ima/ima_appraise.c
-+++ b/security/integrity/ima/ima_appraise.c
-@@ -227,6 +227,7 @@ int ima_appraise_measurement(enum ima_hooks func,
- 	case IMA_XATTR_DIGEST_NG:
- 		/* first byte contains algorithm id */
- 		hash_start = 1;
-+		/* fall through */
- 	case IMA_XATTR_DIGEST:
- 		if (iint->flags & IMA_DIGSIG_REQUIRED) {
- 			cause = "IMA-signature-required";
-diff --git a/security/integrity/integrity.h b/security/integrity/integrity.h
-index 24520b4ef3b0..a53e7e4ab06c 100644
---- a/security/integrity/integrity.h
-+++ b/security/integrity/integrity.h
-@@ -92,8 +92,8 @@ struct signature_v2_hdr {
- 	uint8_t type;		/* xattr type */
- 	uint8_t version;	/* signature format version */
- 	uint8_t	hash_algo;	/* Digest algorithm [enum hash_algo] */
--	uint32_t keyid;		/* IMA key identifier - not X509/PGP specific */
--	uint16_t sig_size;	/* signature size */
-+	__be32 keyid;		/* IMA key identifier - not X509/PGP specific */
-+	__be16 sig_size;	/* signature size */
- 	uint8_t sig[0];		/* signature payload */
- } __packed;
+-	char tbuf[64] = {0,};
++	if (func > 0 && func < MAX_CHECK)
++		seq_printf(m, pt(Opt_func), func_tokens[func]);
++	else {
++		char tbuf[64] = {0,};
  
-@@ -118,7 +118,8 @@ struct integrity_iint_cache {
- struct integrity_iint_cache *integrity_iint_find(struct inode *inode);
- 
- int integrity_kernel_read(struct file *file, loff_t offset,
--			  char *addr, unsigned long count);
-+			  void *addr, unsigned long count);
+-	switch (func) {
+-	case FILE_CHECK:
+-		seq_printf(m, pt(Opt_func), ft(func_file));
+-		break;
+-	case MMAP_CHECK:
+-		seq_printf(m, pt(Opt_func), ft(func_mmap));
+-		break;
+-	case BPRM_CHECK:
+-		seq_printf(m, pt(Opt_func), ft(func_bprm));
+-		break;
+-	case MODULE_CHECK:
+-		seq_printf(m, pt(Opt_func), ft(func_module));
+-		break;
+-	case FIRMWARE_CHECK:
+-		seq_printf(m, pt(Opt_func), ft(func_firmware));
+-		break;
+-	case POST_SETATTR:
+-		seq_printf(m, pt(Opt_func), ft(func_post));
+-		break;
+-	case KEXEC_KERNEL_CHECK:
+-		seq_printf(m, pt(Opt_func), ft(func_kexec_kernel));
+-		break;
+-	case KEXEC_INITRAMFS_CHECK:
+-		seq_printf(m, pt(Opt_func), ft(func_kexec_initramfs));
+-		break;
+-	case POLICY_CHECK:
+-		seq_printf(m, pt(Opt_func), ft(func_policy));
+-		break;
+-	default:
+ 		snprintf(tbuf, sizeof(tbuf), "%d", func);
+ 		seq_printf(m, pt(Opt_func), tbuf);
+-		break;
+ 	}
 +
- int __init integrity_read_file(const char *path, char **data);
+ 	seq_puts(m, " ");
+ }
  
- #define INTEGRITY_KEYRING_EVM		0
 -- 
 2.7.4
-
