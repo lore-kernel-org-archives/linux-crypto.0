@@ -1,64 +1,93 @@
-From: Mark Rutland <mark.rutland@arm.com>
+From: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
 Subject: Re: [PATCH 0/4] staging: add ccree crypto driver
-Date: Tue, 18 Apr 2017 16:13:55 +0100
-Message-ID: <20170418151355.GI17866@leverpostej>
-References: <1492524470-13847-1-git-send-email-gilad@benyossef.com>
+Date: Tue, 18 Apr 2017 18:29:22 +0300
+Message-ID: <CAOtvUMeB8ub-e6PXxgJWyK=TW4HseZgSN6NO=kSmVax514ufdg@mail.gmail.com>
+References: <1492524470-13847-1-git-send-email-gilad@benyossef.com> <20170418151355.GI17866@leverpostej>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        devel@driverdev.osuosl.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        gilad.benyossef@arm.com, Binoy Jayan <binoy.jayan@linaro.org>,
-        Ofir Drang <ofir.drang@arm.com>
-To: Gilad Ben-Yossef <gilad@benyossef.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:58026 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750758AbdDRPOW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Apr 2017 11:14:22 -0400
-Content-Disposition: inline
-In-Reply-To: <1492524470-13847-1-git-send-email-gilad@benyossef.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+        "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>,
+        devel-gWbeCf7V1WCQmaza687I9mD2FQJk+8+b@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        Linux kernel mailing list <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        Gilad Ben-Yossef <gilad.benyossef-5wv7dgnIgG8@public.gmane.org>,
+        Binoy Jayan <binoy.jayan-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
+        Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>
+To: Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20170418151355.GI17866@leverpostej>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi,
+Hi Mark,
 
-On Tue, Apr 18, 2017 at 05:07:50PM +0300, Gilad Ben-Yossef wrote:
-> Arm TrustZone CryptoCell 700 is a family of cryptographic hardware
-> accelerators. It is supported by a long lived series of out of tree
-> drivers, which I am now in the process of unifying and upstreaming.
-> This is the first drop, supporting the new CryptoCell 712 REE. 
-> 
-> The code still needs some cleanup before maturing to a proper
-> upstream driver, which I am in the process of doing. However,
-> as discussion of some of the capabilities of the hardware and
-> its application to some dm-crypt and dm-verity features recently
-> took place I though it is better to do this in the open via the
-> staging tree.
-> 
-> A Git repository based off of Linux 4.11-rc7 is available at
-> https://github.com/gby/linux.git branch ccree.
-> 
-> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
-> CC: Binoy Jayan <binoy.jayan@linaro.org>
-> CC: Ofir Drang <ofir.drang@arm.com>
-> 
-> Gilad Ben-Yossef (4):
->   staging: add ccree crypto driver
->   staging: ccree: add TODO list
->   staging: ccree: add devicetree bindings
->   MAINTAINERS: add Gilad BY as maintainer for ccree
-> 
->  .../devicetree/bindings/crypto/arm-cryptocell.txt  |   23 +
+On Tue, Apr 18, 2017 at 6:13 PM, Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org> wrote:
+> Hi,
+>
+> On Tue, Apr 18, 2017 at 05:07:50PM +0300, Gilad Ben-Yossef wrote:
+>> Arm TrustZone CryptoCell 700 is a family of cryptographic hardware
+>> accelerators. It is supported by a long lived series of out of tree
+>> drivers, which I am now in the process of unifying and upstreaming.
+>> This is the first drop, supporting the new CryptoCell 712 REE.
+>>
+>> The code still needs some cleanup before maturing to a proper
+>> upstream driver, which I am in the process of doing. However,
+>> as discussion of some of the capabilities of the hardware and
+>> its application to some dm-crypt and dm-verity features recently
+>> took place I though it is better to do this in the open via the
+>> staging tree.
+>>
+>> A Git repository based off of Linux 4.11-rc7 is available at
+>> https://github.com/gby/linux.git branch ccree.
+>>
+>> Signed-off-by: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
+>> CC: Binoy Jayan <binoy.jayan-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+>> CC: Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>
+>>
+>> Gilad Ben-Yossef (4):
+>>   staging: add ccree crypto driver
+>>   staging: ccree: add TODO list
+>>   staging: ccree: add devicetree bindings
+>>   MAINTAINERS: add Gilad BY as maintainer for ccree
+>>
+>>  .../devicetree/bindings/crypto/arm-cryptocell.txt  |   23 +
+>
+> I'm interested in looking at the DT binding, but for some reason I've
+> only recevied the cover letter so far.
+>
+> Are my mail servers being particularly slow today, or has something gone
+> wrong with the Cc list for the remaining patches?
+>
 
-I'm interested in looking at the DT binding, but for some reason I've
-only recevied the cover letter so far.
+Thanks a bunch for the willingness to review this.
 
-Are my mail servers being particularly slow today, or has something gone
-wrong with the Cc list for the remaining patches?
+My apologies for not communicating this clearly enough -  Since it is
+an pre-existing driver it is rather big.
+I did not want to inflict a 600K patch on the mailing list so opted to
+provide a git repo instead, as stated in the
+email.
 
-Thanks,
-Mark.
+The patch in question is here:
+https://github.com/gby/linux/commit/12d92e0bc19aa9bbd891cdab765eaaeabe0b6967
+
+Do let me know if you prefer that I will send at least the smaller
+patch file via email in the normal fashion.
+
+Many thanks,
+Gilad
+
+
+
+-- 
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+"If you take a class in large-scale robotics, can you end up in a
+situation where the homework eats your dog?"
+ -- Jean-Baptiste Queru
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
