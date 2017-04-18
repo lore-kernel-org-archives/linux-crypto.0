@@ -1,92 +1,106 @@
-From: Daniel Vetter <daniel@ffwll.ch>
-Subject: Re: [PATCH 05/22] drm/i915: Make use of the new sg_map
- helper function
-Date: Tue, 18 Apr 2017 08:44:27 +0200
-Message-ID: <20170418064427.r5ewu3p66p2zwdru@phenom.ffwll.local>
-References: <1492121135-4437-1-git-send-email-logang@deltatee.com>
- <1492121135-4437-6-git-send-email-logang@deltatee.com>
+From: Antoine Tenart <antoine.tenart@free-electrons.com>
+Subject: Re: [PATCH 4/7] arm64: marvell: dts: add crypto engine description
+ for 7k/8k
+Date: Tue, 18 Apr 2017 09:34:18 +0200
+Message-ID: <20170418073418.tpgg7i27uigatddu@kwain>
+References: <20170329124432.27457-1-antoine.tenart@free-electrons.com>
+ <20170329124432.27457-5-antoine.tenart@free-electrons.com>
+ <20170412105608.41501b63@free-electrons.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Steve Wise <swise@opengridcomputing.com>, linux-nvme@lists.infradead.org,
- Stephen Bates <sbates@raithlin.com>, target-devel@vger.kernel.org,
- Sumit Semwal <sumit.semwal@linaro.org>, devel@driverdev.osuosl.org,
- rds-devel@oss.oracle.com, Sagi Grimberg <sagi@grimberg.me>,
- linux-scsi@vger.kernel.org, Matthew Wilcox <mawilcox@microsoft.com>,
- linux-rdma@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- fcoe-devel@open-fcoe.org, Ross Zwisler <ross.zwisler@linux.intel.com>,
- open-iscsi@googlegroups.com, linux-media@vger.kernel.org,
- Ming Lin <ming.l@ssi.samsung.com>, intel-gfx@lists.freedesktop.org,
- sparmaintainer@unisys.com, linux-raid@vger.kernel.org,
- dri-devel@lists.freedesktop.org, Dan Williams <dan.j.williams@intel.com>,
- megaraidlinux.pdl@broadcom.com, Jens Axboe <axboe@kernel.dk>,
- linaro-mm-sig@lists.linaro.org,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- Greg Kroah-Ha
-To: Logan Gunthorpe <logang@deltatee.com>
-Return-path: <intel-gfx-bounces@lists.freedesktop.org>
-Content-Disposition: inline
-In-Reply-To: <1492121135-4437-6-git-send-email-logang@deltatee.com>
-List-Unsubscribe: <https://lists.freedesktop.org/mailman/options/intel-gfx>,
- <mailto:intel-gfx-request@lists.freedesktop.org?subject=unsubscribe>
-List-Archive: <https://lists.freedesktop.org/archives/intel-gfx>
-List-Post: <mailto:intel-gfx@lists.freedesktop.org>
-List-Help: <mailto:intel-gfx-request@lists.freedesktop.org?subject=help>
-List-Subscribe: <https://lists.freedesktop.org/mailman/listinfo/intel-gfx>,
- <mailto:intel-gfx-request@lists.freedesktop.org?subject=subscribe>
-Errors-To: intel-gfx-bounces@lists.freedesktop.org
-Sender: "Intel-gfx" <intel-gfx-bounces@lists.freedesktop.org>
+Content-Type: multipart/mixed; boundary="===============6917686420323071512=="
+Cc: andrew@lunn.ch, herbert@gondor.apana.org.au,
+ boris.brezillon@free-electrons.com, igall@marvell.com,
+ Antoine Tenart <antoine.tenart@free-electrons.com>, oferh@marvell.com,
+ nadavh@marvell.com, linux-crypto@vger.kernel.org,
+ gregory.clement@free-electrons.com, sebastian.hesselbarth@gmail.com,
+ davem@davemloft.net, linux-arm-kernel@lists.infradead.org,
+ jason@lakedaemon.net
+To: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20170412105608.41501b63@free-electrons.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-T24gVGh1LCBBcHIgMTMsIDIwMTcgYXQgMDQ6MDU6MThQTSAtMDYwMCwgTG9nYW4gR3VudGhvcnBl
-IHdyb3RlOgo+IFRoaXMgaXMgYSBzaW5nbGUgc3RyYWlnaHRmb3J3YXJkIGNvbnZlcnNpb24gZnJv
-bSBrbWFwIHRvIHNnX21hcC4KPiAKPiBTaWduZWQtb2ZmLWJ5OiBMb2dhbiBHdW50aG9ycGUgPGxv
-Z2FuZ0BkZWx0YXRlZS5jb20+CgpBY2tlZC1ieTogRGFuaWVsIFZldHRlciA8ZGFuaWVsLnZldHRl
-ckBmZndsbC5jaD4KClByb2JhYmx5IG1ha2VzIHNlbnNlIHRvIG1lcmdlIHRocm91Z2ggc29tZSBv
-dGhlciB0cmVlLCBidXQgcGxlYXNlIGJlIGF3YXJlCm9mIHRoZSBjb25zaWRlcmFibGUgY2h1cm4g
-cmF0ZSBpbiBpOTE1IChpLmUuIG1ha2Ugc3VyZSB5b3VyIHRyZWUgaXMgaW4KbGludXgtbmV4dCBi
-ZWZvcmUgeW91IHNlbmQgYSBwdWxsIHJlcXVlc3QgZm9yIHRoaXMpLiBQbGFuZSBCIHdvdWxkIGJl
-IHRvCmdldCB0aGUgcHJlcCBwYXRjaCBpbiBmaXJzdCBhbmQgdGhlbiBtZXJnZSB0aGUgaTkxNSBj
-b252ZXJzaW9uIG9uZSBrZXJuZWwKcmVsZWFzZSBsYXRlci4KLURhbmllbAoKPiAtLS0KPiAgZHJp
-dmVycy9ncHUvZHJtL2k5MTUvaTkxNV9nZW0uYyB8IDI3ICsrKysrKysrKysrKysrKystLS0tLS0t
-LS0tLQo+ICAxIGZpbGUgY2hhbmdlZCwgMTYgaW5zZXJ0aW9ucygrKSwgMTEgZGVsZXRpb25zKC0p
-Cj4gCj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvZ3B1L2RybS9pOTE1L2k5MTVfZ2VtLmMgYi9kcml2
-ZXJzL2dwdS9kcm0vaTkxNS9pOTE1X2dlbS5jCj4gaW5kZXggNjdiMWZjNS4uMWIxYjkxYSAxMDA2
-NDQKPiAtLS0gYS9kcml2ZXJzL2dwdS9kcm0vaTkxNS9pOTE1X2dlbS5jCj4gKysrIGIvZHJpdmVy
-cy9ncHUvZHJtL2k5MTUvaTkxNV9nZW0uYwo+IEBAIC0yMTg4LDYgKzIxODgsMTUgQEAgc3RhdGlj
-IHZvaWQgX19pOTE1X2dlbV9vYmplY3RfcmVzZXRfcGFnZV9pdGVyKHN0cnVjdCBkcm1faTkxNV9n
-ZW1fb2JqZWN0ICpvYmopCj4gIAkJcmFkaXhfdHJlZV9kZWxldGUoJm9iai0+bW0uZ2V0X3BhZ2Uu
-cmFkaXgsIGl0ZXIuaW5kZXgpOwo+ICB9Cj4gIAo+ICtzdGF0aWMgdm9pZCBpOTE1X2dlbV9vYmpl
-Y3RfdW5tYXAoY29uc3Qgc3RydWN0IGRybV9pOTE1X2dlbV9vYmplY3QgKm9iaiwKPiArCQkJCSAg
-dm9pZCAqcHRyKQo+ICt7Cj4gKwlpZiAoaXNfdm1hbGxvY19hZGRyKHB0cikpCj4gKwkJdnVubWFw
-KHB0cik7Cj4gKwllbHNlCj4gKwkJc2dfdW5tYXAob2JqLT5tbS5wYWdlcy0+c2dsLCBwdHIsIFNH
-X0tNQVApOwo+ICt9Cj4gKwo+ICB2b2lkIF9faTkxNV9nZW1fb2JqZWN0X3B1dF9wYWdlcyhzdHJ1
-Y3QgZHJtX2k5MTVfZ2VtX29iamVjdCAqb2JqLAo+ICAJCQkJIGVudW0gaTkxNV9tbV9zdWJjbGFz
-cyBzdWJjbGFzcykKPiAgewo+IEBAIC0yMjE1LDEwICsyMjI0LDcgQEAgdm9pZCBfX2k5MTVfZ2Vt
-X29iamVjdF9wdXRfcGFnZXMoc3RydWN0IGRybV9pOTE1X2dlbV9vYmplY3QgKm9iaiwKPiAgCQl2
-b2lkICpwdHI7Cj4gIAo+ICAJCXB0ciA9IHB0cl9tYXNrX2JpdHMob2JqLT5tbS5tYXBwaW5nKTsK
-PiAtCQlpZiAoaXNfdm1hbGxvY19hZGRyKHB0cikpCj4gLQkJCXZ1bm1hcChwdHIpOwo+IC0JCWVs
-c2UKPiAtCQkJa3VubWFwKGttYXBfdG9fcGFnZShwdHIpKTsKPiArCQlpOTE1X2dlbV9vYmplY3Rf
-dW5tYXAob2JqLCBwdHIpOwo+ICAKPiAgCQlvYmotPm1tLm1hcHBpbmcgPSBOVUxMOwo+ICAJfQo+
-IEBAIC0yNDc1LDggKzI0ODEsMTEgQEAgc3RhdGljIHZvaWQgKmk5MTVfZ2VtX29iamVjdF9tYXAo
-Y29uc3Qgc3RydWN0IGRybV9pOTE1X2dlbV9vYmplY3QgKm9iaiwKPiAgCXZvaWQgKmFkZHI7Cj4g
-IAo+ICAJLyogQSBzaW5nbGUgcGFnZSBjYW4gYWx3YXlzIGJlIGttYXBwZWQgKi8KPiAtCWlmIChu
-X3BhZ2VzID09IDEgJiYgdHlwZSA9PSBJOTE1X01BUF9XQikKPiAtCQlyZXR1cm4ga21hcChzZ19w
-YWdlKHNndC0+c2dsKSk7Cj4gKwlpZiAobl9wYWdlcyA9PSAxICYmIHR5cGUgPT0gSTkxNV9NQVBf
-V0IpIHsKPiArCQlhZGRyID0gc2dfbWFwKHNndC0+c2dsLCBTR19LTUFQKTsKPiArCQlpZiAoSVNf
-RVJSKGFkZHIpKQo+ICsJCQlyZXR1cm4gTlVMTDsKPiArCX0KPiAgCj4gIAlpZiAobl9wYWdlcyA+
-IEFSUkFZX1NJWkUoc3RhY2tfcGFnZXMpKSB7Cj4gIAkJLyogVG9vIGJpZyBmb3Igc3RhY2sgLS0g
-YWxsb2NhdGUgdGVtcG9yYXJ5IGFycmF5IGluc3RlYWQgKi8KPiBAQCAtMjU0MywxMSArMjU1Miw3
-IEBAIHZvaWQgKmk5MTVfZ2VtX29iamVjdF9waW5fbWFwKHN0cnVjdCBkcm1faTkxNV9nZW1fb2Jq
-ZWN0ICpvYmosCj4gIAkJCWdvdG8gZXJyX3VucGluOwo+ICAJCX0KPiAgCj4gLQkJaWYgKGlzX3Zt
-YWxsb2NfYWRkcihwdHIpKQo+IC0JCQl2dW5tYXAocHRyKTsKPiAtCQllbHNlCj4gLQkJCWt1bm1h
-cChrbWFwX3RvX3BhZ2UocHRyKSk7Cj4gLQo+ICsJCWk5MTVfZ2VtX29iamVjdF91bm1hcChvYmos
-IHB0cik7Cj4gIAkJcHRyID0gb2JqLT5tbS5tYXBwaW5nID0gTlVMTDsKPiAgCX0KPiAgCj4gLS0g
-Cj4gMi4xLjQKPiAKPiBfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fXwo+IGRyaS1kZXZlbCBtYWlsaW5nIGxpc3QKPiBkcmktZGV2ZWxAbGlzdHMuZnJlZWRlc2t0
-b3Aub3JnCj4gaHR0cHM6Ly9saXN0cy5mcmVlZGVza3RvcC5vcmcvbWFpbG1hbi9saXN0aW5mby9k
-cmktZGV2ZWwKCi0tIApEYW5pZWwgVmV0dGVyClNvZnR3YXJlIEVuZ2luZWVyLCBJbnRlbCBDb3Jw
-b3JhdGlvbgpodHRwOi8vYmxvZy5mZndsbC5jaApfX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fXwpJbnRlbC1nZnggbWFpbGluZyBsaXN0CkludGVsLWdmeEBsaXN0
-cy5mcmVlZGVza3RvcC5vcmcKaHR0cHM6Ly9saXN0cy5mcmVlZGVza3RvcC5vcmcvbWFpbG1hbi9s
-aXN0aW5mby9pbnRlbC1nZngK
+
+--===============6917686420323071512==
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="dpjtucoqyjtczpw6"
+Content-Disposition: inline
+
+
+--dpjtucoqyjtczpw6
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Hi Thomas,
+
+On Wed, Apr 12, 2017 at 10:56:08AM +0200, Thomas Petazzoni wrote:
+> On Wed, 29 Mar 2017 14:44:29 +0200, Antoine Tenart wrote:
+>=20
+> > +			cpm_crypto: crypto@800000 {
+> > +				compatible =3D "inside-secure,safexcel-eip197";
+> > +				reg =3D <0x800000 0x200000>;
+> > +				interrupts =3D <GIC_SPI 34 (IRQ_TYPE_EDGE_RISING | IRQ_TYPE_LEVEL_=
+HIGH)>,
+>=20
+> Now that I look into this, does it makes sense for an interrupt to be
+> both an edge interrupt and a level interrupt at the same time? This
+> looks odd.
+
+I agree this looks odd. I took it from Russel's ICU mapping:
+http://lists.infradead.org/pipermail/linux-arm-kernel/2017-February/489040.=
+html
+
+Also note the driver does not use it (yet?).
+
+Antoine
+
+--=20
+Antoine T=E9nart, Free Electrons
+Embedded Linux and Kernel engineering
+http://free-electrons.com
+
+--dpjtucoqyjtczpw6
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBCgAGBQJY9cF4AAoJEFxNi8it27zYZa4QAIrpdtjcxXhkA8+MPoe285at
+DcZxdSufidlS5tc8L6H/qn/0DYFu/5Ec9OsmQZswaR53hUEPYlyAcuBdOILwuEEv
+rjQHK6a2bQCZKo1DhMso/F/lwu6tppqISQBWEHdY0M+vfkXyRHsZWrSG11GItYqp
+4U4nFfGkVApLHwbdjgecIPu1XlkqXyTYQtglkSMUssrBNQkKkP9D1vrLIFPHJF7K
+HT8TNvs0R8yEe7zhMry+c+02+Ja1MehAqwSH3qFyM5hrGVpj63P+xb5Luu0d1GbJ
+ijXsVDsuxr1h0QVFq6XqPfTa8w40HXOmZtsVKIaXAGv6BsKft1Ltb6mjjrk6OWO3
+aCl7/l/kHJQnUkl3m/euoe0c2qkbhhKsOy/bLMQKeD3tbfXMWQlj12apcCFprez2
++0uHgRKKvTzrjflDvSdxZyLH8xmISFS80SHeKMGYzfo9TjUfInSMiADF49+9fDzb
+K8r5kx8YshCDJFGos5sfYcgYrRzMPvMVU2Bh7t3mPOPYht1MiBVxDR+oV9Ilhq+O
+Tmf7JzlSIbQIlwwfFsjd1pAAoHozxN6wTEa5ALR1b9euGK421wXKRL/Bw0t6AtUO
+5IEU27KobwdOjjJNbpkSBpq85fEWUPLQwCXtA1HNtN63Lq7U9OtON9nzOP7mms/4
+qGNRHzZZVhA2NK7MyO5g
+=q+9q
+-----END PGP SIGNATURE-----
+
+--dpjtucoqyjtczpw6--
+
+
+--===============6917686420323071512==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+linux-arm-kernel mailing list
+linux-arm-kernel@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+
+--===============6917686420323071512==--
