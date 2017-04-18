@@ -1,95 +1,109 @@
-From: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Subject: Re: [PATCH 16/22] xen-blkfront: Make use of the new sg_map helper
- function
-Date: Tue, 18 Apr 2017 10:27:23 -0400
-Message-ID: <20170418142723.GA27133@char.us.oracle.com>
-References: <1492121135-4437-1-git-send-email-logang@deltatee.com>
- <1492121135-4437-17-git-send-email-logang@deltatee.com>
- <063D6719AE5E284EB5DD2968C1650D6DCFFD3CD7@AcuExch.aculab.com>
+From: Paul Gortmaker <paul.gortmaker@windriver.com>
+Subject: Re: [PATCH v2] crypto: arm64/sha: Add constant operand modifier to ASM_EXPORT
+Date: Tue, 18 Apr 2017 10:47:36 -0400
+Message-ID: <CAP=VYLpejcYwXUMtCCkXmjXw=T1tBJLn21aVi-9v_VGmEinjRg@mail.gmail.com>
+References: <20170405183458.193068-1-mka@chromium.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>,
- Steve Wise <swise@opengridcomputing.com>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- "target-devel@vger.kernel.org" <target-devel@vger.kernel.org>,
- Sumit Semwal <sumit.semwal@linaro.org>,
- "devel@driverdev.osuosl.org" <devel@driverdev.osuosl.org>,
- "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
- Sagi Grimberg <sagi@grimberg.me>,
- "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
- Matthew Wilcox <mawilcox@microsoft.com>,
- "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
- Christoph Hellwig <hch@lst.de>,
- "fcoe-devel@open-fcoe.org" <fcoe-devel@open-fcoe.org>,
- Ross Zwisler <ross.zwisler@linux.intel.com>,
- "open-iscsi@googlegroups.com" <open-iscsi@googlegroups.com>,
- "linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
- Ming Lin <ming.l@ssi.samsung.com>,
- "intel-gfx@list
-To: David Laight <David.Laight@ACULAB.COM>, xen-devel@lists.xensource.com
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-Content-Disposition: inline
-In-Reply-To: <063D6719AE5E284EB5DD2968C1650D6DCFFD3CD7@AcuExch.aculab.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Greg Hackmann <ghackmann@google.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-crypto@vger.kernel.org,
+        "linux-arm-kernel@lists.infradead.org"
+        <linux-arm-kernel@lists.infradead.org>,
+        Grant Grundler <grundler@chromium.org>,
+        Michael Davidson <md@google.com>
+To: Matthias Kaehlcke <mka@chromium.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-vk0-f67.google.com ([209.85.213.67]:36038 "EHLO
+        mail-vk0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752204AbdDROsH (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 18 Apr 2017 10:48:07 -0400
+In-Reply-To: <20170405183458.193068-1-mka@chromium.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Apr 18, 2017 at 02:13:59PM +0000, David Laight wrote:
-> From: Logan Gunthorpe
-> > Sent: 13 April 2017 23:05
-> > Straightforward conversion to the new helper, except due to
-> > the lack of error path, we have to warn if unmapable memory
-> > is ever present in the sgl.
+On Wed, Apr 5, 2017 at 2:34 PM, Matthias Kaehlcke <mka@chromium.org> wrote:
+> The operand is an integer constant, make the constness explicit by
+> adding the modifier. This is needed for clang to generate valid code
+> and also works with gcc.
 
-Interesting that you didn't CC any of the maintainers. Could you 
-do that in the future please?
+Actually it doesn't work with all gcc.  I've got an older arm64 toolchain that I
+only use for syntax checking (and hence I don't care if it is the latest and
+greatest) and this commit breaks it:
 
-> > 
-> > Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-> > ---
-> >  drivers/block/xen-blkfront.c | 33 +++++++++++++++++++++++++++------
-> >  1 file changed, 27 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-> > index 5067a0a..7dcf41d 100644
-> > --- a/drivers/block/xen-blkfront.c
-> > +++ b/drivers/block/xen-blkfront.c
-> > @@ -807,8 +807,19 @@ static int blkif_queue_rw_req(struct request *req, struct blkfront_ring_info *ri
-> >  		BUG_ON(sg->offset + sg->length > PAGE_SIZE);
-> > 
-> >  		if (setup.need_copy) {
-> > -			setup.bvec_off = sg->offset;
-> > -			setup.bvec_data = kmap_atomic(sg_page(sg));
-> > +			setup.bvec_off = 0;
-> > +			setup.bvec_data = sg_map(sg, SG_KMAP_ATOMIC);
-> > +			if (IS_ERR(setup.bvec_data)) {
-> > +				/*
-> > +				 * This should really never happen unless
-> > +				 * the code is changed to use memory that is
-> > +				 * not mappable in the sg. Seeing there is a
-> > +				 * questionable error path out of here,
-> > +				 * we WARN.
-> > +				 */
-> > +				WARN(1, "Non-mappable memory used in sg!");
-> > +				return 1;
-> > +			}
-> ...
-> 
-> Perhaps add a flag to mark failure as 'unexpected' and trace (and panic?)
-> inside sg_map().
-> 
-> 	David
-> 
-> 
-> _______________________________________________
-> Linux-nvdimm mailing list
-> Linux-nvdimm@lists.01.org
-> https://lists.01.org/mailman/listinfo/linux-nvdimm
+arch/arm64/crypto/sha1-ce-glue.c:21:2: error: invalid 'asm': invalid
+operand prefix '%c'
+  asm(".globl " #sym "; .set " #sym ", %c0" :: "i"(val));
+
+I'm currently reverting this change locally so I can continue to use the old
+toolchain:
+
+$ aarch64-linux-gnu-gcc --version
+aarch64-linux-gnu-gcc (crosstool-NG linaro-1.13.1-4.8-2013.12 - Linaro
+GCC 2013.11) 4.8.3 20131202 (prerelease)
+Copyright (C) 2013 Free Software Foundation, Inc.
+
+$ aarch64-linux-gnu-as --version
+GNU assembler (crosstool-NG linaro-1.13.1-4.8-2013.12 - Linaro GCC
+2013.11) 2.24.0.20131220
+Copyright 2013 Free Software Foundation, Inc.
+
+Maybe it is finally too old and nobody cares, but I thought it worth a mention.
+
+Paul.
+--
+
+>
+> Also change the constraint of the operand from 'I' ("Integer constant
+> that is valid as an immediate operand in an ADD instruction", AArch64)
+> to 'i' ("An immediate integer operand").
+>
+> Based-on-patch-from: Greg Hackmann <ghackmann@google.com>
+> Signed-off-by: Greg Hackmann <ghackmann@google.com>
+> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+> ---
+> Changes in v2:
+> - Changed operand constraint from I to i
+> - Updated commit message
+> - Changed 'From' tag to 'Based-on-patch-from'
+>
+>  arch/arm64/crypto/sha1-ce-glue.c | 2 +-
+>  arch/arm64/crypto/sha2-ce-glue.c | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/arm64/crypto/sha1-ce-glue.c b/arch/arm64/crypto/sha1-ce-glue.c
+> index aefda9868627..6b520e3f3ab1 100644
+> --- a/arch/arm64/crypto/sha1-ce-glue.c
+> +++ b/arch/arm64/crypto/sha1-ce-glue.c
+> @@ -18,7 +18,7 @@
+>  #include <linux/module.h>
+>
+>  #define ASM_EXPORT(sym, val) \
+> -       asm(".globl " #sym "; .set " #sym ", %0" :: "I"(val));
+> +       asm(".globl " #sym "; .set " #sym ", %c0" :: "i"(val));
+>
+>  MODULE_DESCRIPTION("SHA1 secure hash using ARMv8 Crypto Extensions");
+>  MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
+> diff --git a/arch/arm64/crypto/sha2-ce-glue.c b/arch/arm64/crypto/sha2-ce-glue.c
+> index 7cd587564a41..e3abe11de48c 100644
+> --- a/arch/arm64/crypto/sha2-ce-glue.c
+> +++ b/arch/arm64/crypto/sha2-ce-glue.c
+> @@ -18,7 +18,7 @@
+>  #include <linux/module.h>
+>
+>  #define ASM_EXPORT(sym, val) \
+> -       asm(".globl " #sym "; .set " #sym ", %0" :: "I"(val));
+> +       asm(".globl " #sym "; .set " #sym ", %c0" :: "i"(val));
+>
+>  MODULE_DESCRIPTION("SHA-224/SHA-256 secure hash using ARMv8 Crypto Extensions");
+>  MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
+> --
+> 2.12.2.715.g7642488e1d-goog
+>
