@@ -1,236 +1,102 @@
-From: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
-Subject: [PATCH 5/6] MODSIGN: Export module signature definitions.
-Date: Tue, 18 Apr 2017 17:17:45 -0300
-Message-ID: <1492546666-16615-6-git-send-email-bauerman@linux.vnet.ibm.com>
-References: <1492546666-16615-1-git-send-email-bauerman@linux.vnet.ibm.com>
-Cc: linux-ima-devel@lists.sourceforge.net, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Claudio Carvalho <cclaudio@linux.vnet.ibm.com>,
-        Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
-To: linux-security-module@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1492546666-16615-1-git-send-email-bauerman@linux.vnet.ibm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: [PATCH 4/8] crypto: KPP - add API crypto_kpp_set_params
+Date: Wed, 19 Apr 2017 01:06:03 +0200
+Message-ID: <4927943.K0bBmtyjOX@positron.chronox.de>
+References: <2715753.J0rCo2lbig@positron.chronox.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: keyrings@vger.kernel.org
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:59000 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1758022AbdDRXJu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 18 Apr 2017 19:09:50 -0400
+In-Reply-To: <2715753.J0rCo2lbig@positron.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-IMA will use the module_signature format for append signatures, so export
-the relevant definitions and factor out the code which verifies that the
-appended signature trailer is valid.
+KPP mechanisms like DH require a parameter set to be provided by the
+caller. That parameter set may be provided by the crypto_kpp_set_secret
+function. Yet, the parameters hare handled independently from the secret
+key which implies that they should be able to be set independently from
+the key.
 
-Also, create a CONFIG_MODULE_SIG_FORMAT option so that IMA can select it
-and be able to use validate_module_signature without having to depend on
-CONFIG_MODULE_SIG.
+The new API allows KPP mechanisms to register a callback allowing to set
+such parameters.
 
-Signed-off-by: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- include/linux/module_signature.h | 45 ++++++++++++++++++++++++
- init/Kconfig                     |  6 +++-
- kernel/Makefile                  |  2 +-
- kernel/module_signing.c          | 74 +++++++++++++++++-----------------------
- 4 files changed, 82 insertions(+), 45 deletions(-)
+ Documentation/crypto/api-kpp.rst |  2 +-
+ include/crypto/kpp.h             | 28 ++++++++++++++++++++++++++++
+ 2 files changed, 29 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/module_signature.h b/include/linux/module_signature.h
-new file mode 100644
-index 000000000000..b04f16559b47
---- /dev/null
-+++ b/include/linux/module_signature.h
-@@ -0,0 +1,45 @@
-+/* Module signature handling.
-+ *
-+ * Copyright (C) 2012 Red Hat, Inc. All Rights Reserved.
-+ * Written by David Howells (dhowells@redhat.com)
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public Licence
-+ * as published by the Free Software Foundation; either version
-+ * 2 of the Licence, or (at your option) any later version.
-+ */
-+
-+#ifndef _LINUX_MODULE_SIGNATURE_H
-+#define _LINUX_MODULE_SIGNATURE_H
-+
-+enum pkey_id_type {
-+	PKEY_ID_PGP,		/* OpenPGP generated key ID */
-+	PKEY_ID_X509,		/* X.509 arbitrary subjectKeyIdentifier */
-+	PKEY_ID_PKCS7,		/* Signature in PKCS#7 message */
-+};
-+
-+/*
-+ * Module signature information block.
-+ *
-+ * The constituents of the signature section are, in order:
-+ *
-+ *	- Signer's name
-+ *	- Key identifier
-+ *	- Signature data
-+ *	- Information block
-+ */
-+struct module_signature {
-+	u8	algo;		/* Public-key crypto algorithm [0] */
-+	u8	hash;		/* Digest algorithm [0] */
-+	u8	id_type;	/* Key identifier type [PKEY_ID_PKCS7] */
-+	u8	signer_len;	/* Length of signer's name [0] */
-+	u8	key_id_len;	/* Length of key identifier [0] */
-+	u8	__pad[3];
-+	__be32	sig_len;	/* Length of signature data */
-+};
-+
-+int validate_module_signature(const struct module_signature *ms,
-+			      size_t file_len);
-+int mod_verify_sig(const void *mod, unsigned long *_modlen);
-+
-+#endif /* _LINUX_MODULE_SIGNATURE_H */
-diff --git a/init/Kconfig b/init/Kconfig
-index a92f27da4a27..891325e5aeff 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -2024,7 +2024,7 @@ config MODULE_SRCVERSION_ALL
- config MODULE_SIG
- 	bool "Module signature verification"
- 	depends on MODULES
--	select SYSTEM_DATA_VERIFICATION
-+	select MODULE_SIG_FORMAT
- 	help
- 	  Check modules for valid signatures upon load: the signature
- 	  is simply appended to the module. For more information see
-@@ -2039,6 +2039,10 @@ config MODULE_SIG
- 	  debuginfo strip done by some packagers (such as rpmbuild) and
- 	  inclusion into an initramfs that wants the module size reduced.
+diff --git a/Documentation/crypto/api-kpp.rst b/Documentation/crypto/api-kpp.rst
+index 7d86ab9..7b2c0d4 100644
+--- a/Documentation/crypto/api-kpp.rst
++++ b/Documentation/crypto/api-kpp.rst
+@@ -11,7 +11,7 @@ Key-agreement Protocol Primitives (KPP) Cipher API
+    :doc: Generic Key-agreement Protocol Primitives API
  
-+config MODULE_SIG_FORMAT
-+	def_bool n
-+	select SYSTEM_DATA_VERIFICATION
-+
- config MODULE_SIG_FORCE
- 	bool "Require modules to be validly signed"
- 	depends on MODULE_SIG
-diff --git a/kernel/Makefile b/kernel/Makefile
-index b302b4731d16..4451bbc70a08 100644
---- a/kernel/Makefile
-+++ b/kernel/Makefile
-@@ -56,7 +56,7 @@ obj-y += up.o
- endif
- obj-$(CONFIG_UID16) += uid16.o
- obj-$(CONFIG_MODULES) += module.o
--obj-$(CONFIG_MODULE_SIG) += module_signing.o
-+obj-$(CONFIG_MODULE_SIG_FORMAT) += module_signing.o
- obj-$(CONFIG_KALLSYMS) += kallsyms.o
- obj-$(CONFIG_BSD_PROCESS_ACCT) += acct.o
- obj-$(CONFIG_KEXEC_CORE) += kexec_core.o
-diff --git a/kernel/module_signing.c b/kernel/module_signing.c
-index 937c844bee4a..421e3e668714 100644
---- a/kernel/module_signing.c
-+++ b/kernel/module_signing.c
-@@ -11,36 +11,38 @@
+ .. kernel-doc:: include/crypto/kpp.h
+-   :functions: crypto_alloc_kpp crypto_free_kpp crypto_kpp_set_secret crypto_kpp_generate_public_key crypto_kpp_compute_shared_secret crypto_kpp_maxsize
++   :functions: crypto_alloc_kpp crypto_free_kpp crypto_kpp_set_params crypto_kpp_set_secret crypto_kpp_generate_public_key crypto_kpp_compute_shared_secret crypto_kpp_maxsize
  
- #include <linux/kernel.h>
- #include <linux/errno.h>
-+#include <linux/module_signature.h>
- #include <linux/string.h>
- #include <linux/verification.h>
- #include <crypto/public_key.h>
- #include "module-internal.h"
- 
--enum pkey_id_type {
--	PKEY_ID_PGP,		/* OpenPGP generated key ID */
--	PKEY_ID_X509,		/* X.509 arbitrary subjectKeyIdentifier */
--	PKEY_ID_PKCS7,		/* Signature in PKCS#7 message */
--};
--
--/*
-- * Module signature information block.
-- *
-- * The constituents of the signature section are, in order:
-+/**
-+ * validate_module_signature - validate that the given signature is sane
+ Key-agreement Protocol Primitives (KPP) Cipher Request Handle
+ -------------------------------------------------------------
+diff --git a/include/crypto/kpp.h b/include/crypto/kpp.h
+index ce8e1f7..5931364 100644
+--- a/include/crypto/kpp.h
++++ b/include/crypto/kpp.h
+@@ -51,6 +51,9 @@ struct crypto_kpp {
+ /**
+  * struct kpp_alg - generic key-agreement protocol primitives
   *
-- *	- Signer's name
-- *	- Key identifier
-- *	- Signature data
-- *	- Information block
-+ * @ms:		Signature to validate.
-+ * @file_len:	Size of the file to which @ms is appended.
++ * @set_params:	Function allows the caller to set the parameters
++ *			separately from the key. The format of the parameters
++ *			is protocol specific.
+  * @set_secret:		Function invokes the protocol specific function to
+  *			store the secret private key along with parameters.
+  *			The implementation knows how to decode thie buffer
+@@ -74,6 +77,8 @@ struct crypto_kpp {
+  * @base:		Common crypto API algorithm data structure
   */
--struct module_signature {
--	u8	algo;		/* Public-key crypto algorithm [0] */
--	u8	hash;		/* Digest algorithm [0] */
--	u8	id_type;	/* Key identifier type [PKEY_ID_PKCS7] */
--	u8	signer_len;	/* Length of signer's name [0] */
--	u8	key_id_len;	/* Length of key identifier [0] */
--	u8	__pad[3];
--	__be32	sig_len;	/* Length of signature data */
--};
-+int validate_module_signature(const struct module_signature *ms, size_t file_len)
+ struct kpp_alg {
++	int (*set_params)(struct crypto_kpp *tfm, const void *buffer,
++			  unsigned int len);
+ 	int (*set_secret)(struct crypto_kpp *tfm, const void *buffer,
+ 			  unsigned int len);
+ 	int (*generate_public_key)(struct kpp_request *req);
+@@ -259,6 +264,29 @@ struct kpp_secret {
+ };
+ 
+ /**
++ * crypto_kpp_set_params() - Set parameters needed for kpp operation
++ *
++ * Function invokes the specific kpp operation for a given alg.
++ *
++ * @tfm:	tfm handle
++ * @buffer:	Buffer holding the protocol specific representation of the
++ *		parameters (e.g. PKCS#3 DER for DH)
++ * @len:	Length of the parameter buffer.
++ *
++ * Return: zero on success; error code in case of error
++ */
++static inline int crypto_kpp_set_params(struct crypto_kpp *tfm,
++				        const void *buffer, unsigned int len)
 +{
-+	if (be32_to_cpu(ms->sig_len) >= file_len - sizeof(*ms))
-+		return -EBADMSG;
-+	else if (ms->id_type != PKEY_ID_PKCS7) {
-+		pr_err("Module is not signed with expected PKCS#7 message\n");
-+		return -ENOPKG;
-+	} else if (ms->algo != 0 ||
-+		   ms->hash != 0 ||
-+		   ms->signer_len != 0 ||
-+		   ms->key_id_len != 0 ||
-+		   ms->__pad[0] != 0 ||
-+		   ms->__pad[1] != 0 ||
-+		   ms->__pad[2] != 0) {
-+		pr_err("PKCS#7 signature info has unexpected non-zero params\n");
-+		return -EBADMSG;
-+	}
++	struct kpp_alg *alg = crypto_kpp_alg(tfm);
 +
-+	return 0;
++	if (alg->set_params)
++		return alg->set_params(tfm, buffer, len);
++	else
++		return -EOPNOTSUPP;
 +}
- 
- /*
-  * Verify the signature on a module.
-@@ -49,6 +51,7 @@ int mod_verify_sig(const void *mod, unsigned long *_modlen)
- {
- 	struct module_signature ms;
- 	size_t modlen = *_modlen, sig_len;
-+	int ret;
- 
- 	pr_devel("==>%s(,%zu)\n", __func__, modlen);
- 
-@@ -56,30 +59,15 @@ int mod_verify_sig(const void *mod, unsigned long *_modlen)
- 		return -EBADMSG;
- 
- 	memcpy(&ms, mod + (modlen - sizeof(ms)), sizeof(ms));
--	modlen -= sizeof(ms);
 +
-+	ret = validate_module_signature(&ms, modlen);
-+	if (ret)
-+		return ret;
- 
- 	sig_len = be32_to_cpu(ms.sig_len);
--	if (sig_len >= modlen)
--		return -EBADMSG;
--	modlen -= sig_len;
-+	modlen -= sig_len + sizeof(ms);
- 	*_modlen = modlen;
- 
--	if (ms.id_type != PKEY_ID_PKCS7) {
--		pr_err("Module is not signed with expected PKCS#7 message\n");
--		return -ENOPKG;
--	}
--
--	if (ms.algo != 0 ||
--	    ms.hash != 0 ||
--	    ms.signer_len != 0 ||
--	    ms.key_id_len != 0 ||
--	    ms.__pad[0] != 0 ||
--	    ms.__pad[1] != 0 ||
--	    ms.__pad[2] != 0) {
--		pr_err("PKCS#7 signature info has unexpected non-zero params\n");
--		return -EBADMSG;
--	}
--
- 	return verify_pkcs7_signature(mod, modlen, mod + modlen, sig_len,
- 				      NULL, VERIFYING_MODULE_SIGNATURE,
- 				      NULL, NULL);
++/**
+  * crypto_kpp_set_secret() - Invoke kpp operation
+  *
+  * Function invokes the specific kpp operation for a given alg.
 -- 
-2.7.4
+2.9.3
