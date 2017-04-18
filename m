@@ -1,83 +1,83 @@
-From: Thomas Gleixner <tglx@linutronix.de>
-Subject: [patch V2 04/24] padata: Avoid nested calls to get_online_cpus() in
- pcrypt_init_padata()
-Date: Tue, 18 Apr 2017 19:04:46 +0200
-Message-ID: <20170418170552.697398655@linutronix.de>
-References: <20170418170442.665445272@linutronix.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-15
-Cc: Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Sebastian Siewior <bigeasy@linutronix.de>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        linux-crypto@vger.kernel.org
-To: LKML <linux-kernel@vger.kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline;
- filename=kernelpadata_Avoid_get_online_cpus()_recursion_via_pcrypt_init_padata().patch
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
+Subject: [PATCH 0/6] Appended signatures support for IMA appraisal
+Date: Tue, 18 Apr 2017 17:17:40 -0300
+Message-ID: <1492546666-16615-1-git-send-email-bauerman@linux.vnet.ibm.com>
+Cc: linux-ima-devel@lists.sourceforge.net, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Claudio Carvalho <cclaudio@linux.vnet.ibm.com>,
+        Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
+To: linux-security-module@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37432 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1757575AbdDRUSE (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 18 Apr 2017 16:18:04 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id v3IK3YRE011896
+        for <linux-crypto@vger.kernel.org>; Tue, 18 Apr 2017 16:18:03 -0400
+Received: from e24smtp03.br.ibm.com (e24smtp03.br.ibm.com [32.104.18.24])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 29wqpt56nr-1
+        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Tue, 18 Apr 2017 16:18:02 -0400
+Received: from localhost
+        by e24smtp03.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-crypto@vger.kernel.org> from <bauerman@linux.vnet.ibm.com>;
+        Tue, 18 Apr 2017 17:18:01 -0300
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+On the OpenPOWER platform, secure boot and trusted boot are being
+implemented using IMA for taking measurements and verifying signatures.
+Since the kernel image on Power servers is an ELF binary, kernels are
+signed using the scripts/sign-file tool and thus use the same signature
+format as signed kernel modules.
 
-pcrypt_init_padata()
-   get_online_cpus()
-   padata_alloc_possible()
-     padata_alloc()
-       get_online_cpus()
+This patch series adds support in IMA for verifying those signatures.
+It adds flexibility to OpenPOWER secure boot, because it can boot kernels
+with the signature appended to them as well as kernels where the signature
+is stored in the IMA extended attribute.
 
-The nested call to get_online_cpus() works with the current implementation,
-but prevents the conversion to a percpu rwsem.
+The first four patches are cleanups and improvements that can be taken
+independently from the others (and from each other as well). The last two
+are the ones actually focused on this feature.
 
-The other caller of padata_alloc_possible() is pcrypt_init_padata() which
-calls from a get_online_cpus() protected region as well.
+These patches apply on top of today's linux-security/next.
 
-Remove the get_online_cpus() call in padata_alloc() and document the
-calling convention.
+Thiago Jung Bauermann (6):
+  integrity: Small code improvements
+  ima: Tidy up constant strings
+  ima: Simplify policy_func_show.
+  ima: Log the same audit cause whenever a file has no signature
+  MODSIGN: Export module signature definitions.
+  ima: Support appended signatures for appraisal
 
-Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: linux-crypto@vger.kernel.org
+ crypto/asymmetric_keys/asymmetric_type.c |  1 +
+ crypto/asymmetric_keys/pkcs7_parser.c    | 12 +++++
+ crypto/asymmetric_keys/pkcs7_verify.c    | 13 +++++
+ include/crypto/pkcs7.h                   |  3 ++
+ include/linux/module_signature.h         | 45 ++++++++++++++++
+ include/linux/verification.h             |  1 +
+ init/Kconfig                             |  6 ++-
+ kernel/Makefile                          |  2 +-
+ kernel/module_signing.c                  | 74 +++++++++++----------------
+ security/integrity/Kconfig               |  2 +-
+ security/integrity/digsig_asymmetric.c   |  4 +-
+ security/integrity/iint.c                |  2 +-
+ security/integrity/ima/Kconfig           | 13 +++++
+ security/integrity/ima/ima.h             |  8 +++
+ security/integrity/ima/ima_appraise.c    | 86 ++++++++++++++++++++++++++++++-
+ security/integrity/ima/ima_init.c        |  2 +-
+ security/integrity/ima/ima_main.c        | 30 +++++++++--
+ security/integrity/ima/ima_policy.c      | 88 ++++++++++++--------------------
+ security/integrity/integrity.h           | 27 ++++++----
+ 19 files changed, 302 insertions(+), 117 deletions(-)
+ create mode 100644 include/linux/module_signature.h
 
----
- kernel/padata.c |    6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -945,6 +945,8 @@ static struct kobj_type padata_attr_type
-  * @wq: workqueue to use for the allocated padata instance
-  * @pcpumask: cpumask that will be used for padata parallelization
-  * @cbcpumask: cpumask that will be used for padata serialization
-+ *
-+ * Must be called from a get_online_cpus() protected region
-  */
- static struct padata_instance *padata_alloc(struct workqueue_struct *wq,
- 					    const struct cpumask *pcpumask,
-@@ -957,7 +959,6 @@ static struct padata_instance *padata_al
- 	if (!pinst)
- 		goto err;
- 
--	get_online_cpus();
- 	if (!alloc_cpumask_var(&pinst->cpumask.pcpu, GFP_KERNEL))
- 		goto err_free_inst;
- 	if (!alloc_cpumask_var(&pinst->cpumask.cbcpu, GFP_KERNEL)) {
-@@ -997,7 +998,6 @@ static struct padata_instance *padata_al
- 	free_cpumask_var(pinst->cpumask.cbcpu);
- err_free_inst:
- 	kfree(pinst);
--	put_online_cpus();
- err:
- 	return NULL;
- }
-@@ -1008,6 +1008,8 @@ static struct padata_instance *padata_al
-  *                         parallel workers.
-  *
-  * @wq: workqueue to use for the allocated padata instance
-+ *
-+ * Must be called from a get_online_cpus() protected region
-  */
- struct padata_instance *padata_alloc_possible(struct workqueue_struct *wq)
- {
+-- 
+2.7.4
