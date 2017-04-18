@@ -1,58 +1,119 @@
-From: Logan Gunthorpe <logang@deltatee.com>
-Subject: Re: [PATCH 16/22] xen-blkfront: Make use of the new
- sg_map helper function
-Date: Tue, 18 Apr 2017 09:59:09 -0600
-Message-ID: <bed54c06-eb00-e682-8a50-236ebb9c1db4@deltatee.com>
-References: <1492121135-4437-1-git-send-email-logang@deltatee.com>
- <1492121135-4437-17-git-send-email-logang@deltatee.com>
- <063D6719AE5E284EB5DD2968C1650D6DCFFD3CD7@AcuExch.aculab.com>
- <20170418142723.GA27133@char.us.oracle.com>
- <7930aa93-6106-e12f-ba76-e2771d4ec2dc@deltatee.com>
- <20170418155020.GF12001@char.us.oracle.com>
+From: Matthias Kaehlcke <mka@chromium.org>
+Subject: Re: [PATCH v2] crypto: arm64/sha: Add constant operand modifier to
+ ASM_EXPORT
+Date: Tue, 18 Apr 2017 10:34:01 -0700
+Message-ID: <20170418173401.GA128305@google.com>
+References: <20170405183458.193068-1-mka@chromium.org>
+ <CAP=VYLpejcYwXUMtCCkXmjXw=T1tBJLn21aVi-9v_VGmEinjRg@mail.gmail.com>
+ <CAKv+Gu_DHBT=2YA9h+ao3pZXgEV5KsO9ia+J90wtLuDX=a4+eg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>,
- Steve Wise <swise@opengridcomputing.com>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- "target-devel@vger.kernel.org" <target-devel@vger.kernel.org>,
- Sumit Semwal <sumit.semwal@linaro.org>,
- "devel@driverdev.osuosl.org" <devel@driverdev.osuosl.org>,
- "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
- xen-devel@lists.xensource.com, Sagi Grimberg <sagi@grimberg.me>,
- "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
- Matthew Wilcox <mawilcox@microsoft.com>,
- "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
- Christoph Hellwig <hch@lst.de>, Ross Zwisler <ross.zwisler@linux.intel.com>,
- "open-iscsi@googlegroups.com" <open-iscsi@googlegroups.com>,
- "linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
- "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
- "sparma
-To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Return-path: <intel-gfx-bounces@lists.freedesktop.org>
-In-Reply-To: <20170418155020.GF12001@char.us.oracle.com>
-List-Unsubscribe: <https://lists.freedesktop.org/mailman/options/intel-gfx>,
- <mailto:intel-gfx-request@lists.freedesktop.org?subject=unsubscribe>
-List-Archive: <https://lists.freedesktop.org/archives/intel-gfx>
-List-Post: <mailto:intel-gfx@lists.freedesktop.org>
-List-Help: <mailto:intel-gfx-request@lists.freedesktop.org?subject=help>
-List-Subscribe: <https://lists.freedesktop.org/mailman/listinfo/intel-gfx>,
- <mailto:intel-gfx-request@lists.freedesktop.org?subject=subscribe>
-Errors-To: intel-gfx-bounces@lists.freedesktop.org
-Sender: "Intel-gfx" <intel-gfx-bounces@lists.freedesktop.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+ Grant Grundler <grundler@chromium.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>,
+ LKML <linux-kernel@vger.kernel.org>, Greg Hackmann <ghackmann@google.com>,
+ Michael Davidson <md@google.com>,
+ Paul Gortmaker <paul.gortmaker@windriver.com>,
+ "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+ Robin Murphy <robin.murphy@arm.com>, "David S . Miller" <davem@davemloft.net>,
+ "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <CAKv+Gu_DHBT=2YA9h+ao3pZXgEV5KsO9ia+J90wtLuDX=a4+eg@mail.gmail.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-CgpPbiAxOC8wNC8xNyAwOTo1MCBBTSwgS29ucmFkIFJ6ZXN6dXRlayBXaWxrIHdyb3RlOgo+IEkg
-YW0gbm90IHN1cmUgaWYgeW91IGtub3csIGJ1dCB5b3UgY2FuIGFkZCBvbiBlYWNoIHBhdGNoIHRo
-ZSByZXNwZWN0aXZlCj4gbWFpbnRhaW5lciB2aWEgJ0NDJy4gVGhhdCB3YXkgeW91IGNhbiBoYXZl
-IGNlcnRhaW4gbWFpbnRhaW5lcnMgQ0NlZCBvbmx5Cj4gb24gdGhlIHN1YnN5c3RlbXMgdGhleSBj
-b3Zlci4gWW91IHB1dCBpdCBhZnRlciAob3IgYmVmb3JlKSB5b3VyIFNvQiBhbmQKPiBnaXQgc2Vu
-ZC1lbWFpbCBoYXBwaWxseSBwaWNrcyBpdCB1cC4KClllcywgYnV0IEkndmUgc2VlbiBzb21lIG1h
-aW50YWluZXJzIGNvbXBsYWluIHdoZW4gdGhleSByZWNlaXZlIGEgcGF0Y2gKd2l0aCBubyBjb250
-ZXh0IChpZS4gY292ZXIgbGV0dGVyIGFuZCBmaXJzdCBwYXRjaCkuIFNvIEkgY2hvc2UgdG8gZG8g
-aXQKdGhpcyB3YXkuIEkgZXhwZWN0IGluIHRoaXMgc2l0dWF0aW9uLCBubyBtYXR0ZXIgd2hhdCB5
-b3UgZG8sIHNvbWVvbmUgaXMKZ29pbmcgdG8gY29tcGxhaW4gYWJvdXQgdGhlIGFwcHJvYWNoIGNo
-b3Nlbi4KClRoYW5rcyBhbnl3YXkgZm9yIHRoZSB0aXAuCgpMb2dhbgpfX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpJbnRlbC1nZnggbWFpbGluZyBsaXN0Cklu
-dGVsLWdmeEBsaXN0cy5mcmVlZGVza3RvcC5vcmcKaHR0cHM6Ly9saXN0cy5mcmVlZGVza3RvcC5v
-cmcvbWFpbG1hbi9saXN0aW5mby9pbnRlbC1nZngK
+El Tue, Apr 18, 2017 at 04:35:02PM +0100 Ard Biesheuvel ha dit:
+
+> On 18 April 2017 at 15:47, Paul Gortmaker <paul.gortmaker@windriver.com> wrote:
+> > On Wed, Apr 5, 2017 at 2:34 PM, Matthias Kaehlcke <mka@chromium.org> wrote:
+> >> The operand is an integer constant, make the constness explicit by
+> >> adding the modifier. This is needed for clang to generate valid code
+> >> and also works with gcc.
+> >
+> > Actually it doesn't work with all gcc.  I've got an older arm64 toolchain that I
+> > only use for syntax checking (and hence I don't care if it is the latest and
+> > greatest) and this commit breaks it:
+> >
+> > arch/arm64/crypto/sha1-ce-glue.c:21:2: error: invalid 'asm': invalid
+> > operand prefix '%c'
+> >   asm(".globl " #sym "; .set " #sym ", %c0" :: "i"(val));
+
+Sorry about that :(
+
+> > I'm currently reverting this change locally so I can continue to use the old
+> > toolchain:
+> >
+> > $ aarch64-linux-gnu-gcc --version
+> > aarch64-linux-gnu-gcc (crosstool-NG linaro-1.13.1-4.8-2013.12 - Linaro
+> > GCC 2013.11) 4.8.3 20131202 (prerelease)
+> > Copyright (C) 2013 Free Software Foundation, Inc.
+> >
+> > $ aarch64-linux-gnu-as --version
+> > GNU assembler (crosstool-NG linaro-1.13.1-4.8-2013.12 - Linaro GCC
+> > 2013.11) 2.24.0.20131220
+> > Copyright 2013 Free Software Foundation, Inc.
+> >
+> > Maybe it is finally too old and nobody cares, but I thought it worth a mention.
+> >
+> 
+> Thanks for the report. I think we care more about GCC 4.8 than about
+> Clang, which argues for reverting this patch.
+
+I agree, we certainly shouldn't break GCC.
+
+> I understand these issues must be frustrating if you are working on
+> this stuff, but to me, it is not entirely obvious why we want to
+> support Clang in the first place (i.e., what does it buy you if your
+> distro/environment is not already using Clang for userland),
+
+There are environments that use Clang for userland, like Chrome OS or
+Android. Debian releases with GCC, but also does Clang builds of most
+of its repository: http://clang.debian.net/
+
+I would also argue that Linux directly benefits from additional error
+checks provided by Clang.
+
+> and why the burden is on Linux to make modifications to support
+> Clang, especially when it comes to GCC extensions such as inline
+> assembly syntax.
+
+Personally I'm on the pragmatic side. 99.9x% of the kernel already
+builds with Clang (at least for arm64 and x86), only a very tiny
+fraction of the code needs adaptation, which should ideally result in
+the same code for gcc and clang. And it's not like Clang is just
+another proprietary or niche compiler, it's the other big open source
+compiler out there, since the effort is relatively small it seems
+desirable to support it without out-of-tree patches. In parallel there
+is also work ongoing with upstream Clang to improve compatiblity.
+
+> It is ultimately up to the maintainers to decide what to do with this
+> patch, but my vote would be to revert it, especially given that the %c
+> placeholder prefix is not documented anywhere, and appears to simply
+> trigger some GCC internals that happen to do the right thing in this
+> case.
+> 
+> However, the I -> i change is arguably an improvement, and considering
+> that the following
+> 
+> asm("foo: .long %0" :: "i"(some value))
+> 
+> doesn't compile with clang either, I suggest you (Matthias) file a bug
+> against Clang to get this fixed, and we can propose another patch just
+> for the I->i change.
+
+Ok, I will see if we can get this fixed in Clang.
+
+Thanks
+
+Matthias
