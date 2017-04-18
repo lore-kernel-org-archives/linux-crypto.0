@@ -1,49 +1,101 @@
-From: Bjorn Helgaas <helgaas@kernel.org>
-Subject: Re: export pcie_flr and remove copies of it in drivers V2
-Date: Tue, 18 Apr 2017 13:36:12 -0500
-Message-ID: <20170418183612.GC25295@bhelgaas-glaptop.roam.corp.google.com>
-References: <20170414191131.14286-1-hch@lst.de>
+From: Thomas Gleixner <tglx@linutronix.de>
+Subject: [patch V2 03/24] padata: Make padata_alloc() static
+Date: Tue, 18 Apr 2017 19:04:45 +0200
+Message-ID: <20170418170552.619297328@linutronix.de>
+References: <20170418170442.665445272@linutronix.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Bjorn Helgaas <bhelgaas@google.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Salvatore Benedetto <salvatore.benedetto@intel.com>,
-        Mike Marciniszyn <mike.marciniszyn@intel.com>,
-        Dennis Dalessandro <dennis.dalessandro@intel.com>,
-        Derek Chickles <derek.chickles@caviumnetworks.com>,
-        Satanand Burla <satananda.burla@caviumnetworks.com>,
-        Felix Manlunas <felix.manlunas@caviumnetworks.com>,
-        Raghu Vatsavayi <raghu.vatsavayi@caviumnetworks.com>,
-        Jeff Kirsher <jeffrey.t.kirsher@intel.com>,
-        linux-pci@vger.kernel.org, qat-linux@intel.com,
-        linux-crypto@vger.kernel.org, linux-rdma@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset=ISO-8859-15
+Cc: Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Sebastian Siewior <bigeasy@linutronix.de>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        linux-crypto@vger.kernel.org
+To: LKML <linux-kernel@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.136]:33326 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753320AbdDRSgQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Apr 2017 14:36:16 -0400
-Content-Disposition: inline
-In-Reply-To: <20170414191131.14286-1-hch@lst.de>
+Received: from Galois.linutronix.de ([146.0.238.70]:53048 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756031AbdDRTtL (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 18 Apr 2017 15:49:11 -0400
+Content-Disposition: inline; filename=padata--Make-padata_alloc---static.patch
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Apr 14, 2017 at 09:11:24PM +0200, Christoph Hellwig wrote:
-> Hi all,
-> 
-> this exports the PCI layer pcie_flr helper, and removes various opencoded
-> copies of it.
-> 
-> Changes since V1:
->  - rebase on top of the pci/virtualization branch
->  - fixed the probe case in __pci_dev_reset
->  - added ACKs from Bjorn
+No users outside of padata.c
 
-Applied the first three patches:
+Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: linux-crypto@vger.kernel.org
+---
+ include/linux/padata.h |    3 ---
+ kernel/padata.c        |   32 ++++++++++++++++----------------
+ 2 files changed, 16 insertions(+), 19 deletions(-)
+
+--- a/include/linux/padata.h
++++ b/include/linux/padata.h
+@@ -166,9 +166,6 @@ struct padata_instance {
  
-  bc13871ef35a PCI: Export pcie_flr()
-  e641c375d414 PCI: Call pcie_flr() from reset_intel_82599_sfp_virtfn()
-  40e0901ea4bf PCI: Call pcie_flr() from reset_chelsio_generic_dev()
-
-to pci/virtualization for v4.12, thanks!
+ extern struct padata_instance *padata_alloc_possible(
+ 					struct workqueue_struct *wq);
+-extern struct padata_instance *padata_alloc(struct workqueue_struct *wq,
+-					    const struct cpumask *pcpumask,
+-					    const struct cpumask *cbcpumask);
+ extern void padata_free(struct padata_instance *pinst);
+ extern int padata_do_parallel(struct padata_instance *pinst,
+ 			      struct padata_priv *padata, int cb_cpu);
+--- a/kernel/padata.c
++++ b/kernel/padata.c
+@@ -939,19 +939,6 @@ static struct kobj_type padata_attr_type
+ };
+ 
+ /**
+- * padata_alloc_possible - Allocate and initialize padata instance.
+- *                         Use the cpu_possible_mask for serial and
+- *                         parallel workers.
+- *
+- * @wq: workqueue to use for the allocated padata instance
+- */
+-struct padata_instance *padata_alloc_possible(struct workqueue_struct *wq)
+-{
+-	return padata_alloc(wq, cpu_possible_mask, cpu_possible_mask);
+-}
+-EXPORT_SYMBOL(padata_alloc_possible);
+-
+-/**
+  * padata_alloc - allocate and initialize a padata instance and specify
+  *                cpumasks for serial and parallel workers.
+  *
+@@ -959,9 +946,9 @@ EXPORT_SYMBOL(padata_alloc_possible);
+  * @pcpumask: cpumask that will be used for padata parallelization
+  * @cbcpumask: cpumask that will be used for padata serialization
+  */
+-struct padata_instance *padata_alloc(struct workqueue_struct *wq,
+-				     const struct cpumask *pcpumask,
+-				     const struct cpumask *cbcpumask)
++static struct padata_instance *padata_alloc(struct workqueue_struct *wq,
++					    const struct cpumask *pcpumask,
++					    const struct cpumask *cbcpumask)
+ {
+ 	struct padata_instance *pinst;
+ 	struct parallel_data *pd = NULL;
+@@ -1016,6 +1003,19 @@ struct padata_instance *padata_alloc(str
+ }
+ 
+ /**
++ * padata_alloc_possible - Allocate and initialize padata instance.
++ *                         Use the cpu_possible_mask for serial and
++ *                         parallel workers.
++ *
++ * @wq: workqueue to use for the allocated padata instance
++ */
++struct padata_instance *padata_alloc_possible(struct workqueue_struct *wq)
++{
++	return padata_alloc(wq, cpu_possible_mask, cpu_possible_mask);
++}
++EXPORT_SYMBOL(padata_alloc_possible);
++
++/**
+  * padata_free - free a padata instance
+  *
+  * @padata_inst: padata instance to free
