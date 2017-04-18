@@ -1,109 +1,64 @@
-From: Paul Gortmaker <paul.gortmaker@windriver.com>
-Subject: Re: [PATCH v2] crypto: arm64/sha: Add constant operand modifier to ASM_EXPORT
-Date: Tue, 18 Apr 2017 10:47:36 -0400
-Message-ID: <CAP=VYLpejcYwXUMtCCkXmjXw=T1tBJLn21aVi-9v_VGmEinjRg@mail.gmail.com>
-References: <20170405183458.193068-1-mka@chromium.org>
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH 0/4] staging: add ccree crypto driver
+Date: Tue, 18 Apr 2017 16:13:55 +0100
+Message-ID: <20170418151355.GI17866@leverpostej>
+References: <1492524470-13847-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Greg Hackmann <ghackmann@google.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-crypto@vger.kernel.org,
-        "linux-arm-kernel@lists.infradead.org"
-        <linux-arm-kernel@lists.infradead.org>,
-        Grant Grundler <grundler@chromium.org>,
-        Michael Davidson <md@google.com>
-To: Matthias Kaehlcke <mka@chromium.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        devel@driverdev.osuosl.org, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        gilad.benyossef@arm.com, Binoy Jayan <binoy.jayan@linaro.org>,
+        Ofir Drang <ofir.drang@arm.com>
+To: Gilad Ben-Yossef <gilad@benyossef.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-vk0-f67.google.com ([209.85.213.67]:36038 "EHLO
-        mail-vk0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752204AbdDROsH (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Apr 2017 10:48:07 -0400
-In-Reply-To: <20170405183458.193068-1-mka@chromium.org>
+Received: from foss.arm.com ([217.140.101.70]:58026 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750758AbdDRPOW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 18 Apr 2017 11:14:22 -0400
+Content-Disposition: inline
+In-Reply-To: <1492524470-13847-1-git-send-email-gilad@benyossef.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Apr 5, 2017 at 2:34 PM, Matthias Kaehlcke <mka@chromium.org> wrote:
-> The operand is an integer constant, make the constness explicit by
-> adding the modifier. This is needed for clang to generate valid code
-> and also works with gcc.
+Hi,
 
-Actually it doesn't work with all gcc.  I've got an older arm64 toolchain that I
-only use for syntax checking (and hence I don't care if it is the latest and
-greatest) and this commit breaks it:
+On Tue, Apr 18, 2017 at 05:07:50PM +0300, Gilad Ben-Yossef wrote:
+> Arm TrustZone CryptoCell 700 is a family of cryptographic hardware
+> accelerators. It is supported by a long lived series of out of tree
+> drivers, which I am now in the process of unifying and upstreaming.
+> This is the first drop, supporting the new CryptoCell 712 REE. 
+> 
+> The code still needs some cleanup before maturing to a proper
+> upstream driver, which I am in the process of doing. However,
+> as discussion of some of the capabilities of the hardware and
+> its application to some dm-crypt and dm-verity features recently
+> took place I though it is better to do this in the open via the
+> staging tree.
+> 
+> A Git repository based off of Linux 4.11-rc7 is available at
+> https://github.com/gby/linux.git branch ccree.
+> 
+> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+> CC: Binoy Jayan <binoy.jayan@linaro.org>
+> CC: Ofir Drang <ofir.drang@arm.com>
+> 
+> Gilad Ben-Yossef (4):
+>   staging: add ccree crypto driver
+>   staging: ccree: add TODO list
+>   staging: ccree: add devicetree bindings
+>   MAINTAINERS: add Gilad BY as maintainer for ccree
+> 
+>  .../devicetree/bindings/crypto/arm-cryptocell.txt  |   23 +
 
-arch/arm64/crypto/sha1-ce-glue.c:21:2: error: invalid 'asm': invalid
-operand prefix '%c'
-  asm(".globl " #sym "; .set " #sym ", %c0" :: "i"(val));
+I'm interested in looking at the DT binding, but for some reason I've
+only recevied the cover letter so far.
 
-I'm currently reverting this change locally so I can continue to use the old
-toolchain:
+Are my mail servers being particularly slow today, or has something gone
+wrong with the Cc list for the remaining patches?
 
-$ aarch64-linux-gnu-gcc --version
-aarch64-linux-gnu-gcc (crosstool-NG linaro-1.13.1-4.8-2013.12 - Linaro
-GCC 2013.11) 4.8.3 20131202 (prerelease)
-Copyright (C) 2013 Free Software Foundation, Inc.
-
-$ aarch64-linux-gnu-as --version
-GNU assembler (crosstool-NG linaro-1.13.1-4.8-2013.12 - Linaro GCC
-2013.11) 2.24.0.20131220
-Copyright 2013 Free Software Foundation, Inc.
-
-Maybe it is finally too old and nobody cares, but I thought it worth a mention.
-
-Paul.
---
-
->
-> Also change the constraint of the operand from 'I' ("Integer constant
-> that is valid as an immediate operand in an ADD instruction", AArch64)
-> to 'i' ("An immediate integer operand").
->
-> Based-on-patch-from: Greg Hackmann <ghackmann@google.com>
-> Signed-off-by: Greg Hackmann <ghackmann@google.com>
-> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
-> ---
-> Changes in v2:
-> - Changed operand constraint from I to i
-> - Updated commit message
-> - Changed 'From' tag to 'Based-on-patch-from'
->
->  arch/arm64/crypto/sha1-ce-glue.c | 2 +-
->  arch/arm64/crypto/sha2-ce-glue.c | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/arm64/crypto/sha1-ce-glue.c b/arch/arm64/crypto/sha1-ce-glue.c
-> index aefda9868627..6b520e3f3ab1 100644
-> --- a/arch/arm64/crypto/sha1-ce-glue.c
-> +++ b/arch/arm64/crypto/sha1-ce-glue.c
-> @@ -18,7 +18,7 @@
->  #include <linux/module.h>
->
->  #define ASM_EXPORT(sym, val) \
-> -       asm(".globl " #sym "; .set " #sym ", %0" :: "I"(val));
-> +       asm(".globl " #sym "; .set " #sym ", %c0" :: "i"(val));
->
->  MODULE_DESCRIPTION("SHA1 secure hash using ARMv8 Crypto Extensions");
->  MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
-> diff --git a/arch/arm64/crypto/sha2-ce-glue.c b/arch/arm64/crypto/sha2-ce-glue.c
-> index 7cd587564a41..e3abe11de48c 100644
-> --- a/arch/arm64/crypto/sha2-ce-glue.c
-> +++ b/arch/arm64/crypto/sha2-ce-glue.c
-> @@ -18,7 +18,7 @@
->  #include <linux/module.h>
->
->  #define ASM_EXPORT(sym, val) \
-> -       asm(".globl " #sym "; .set " #sym ", %0" :: "I"(val));
-> +       asm(".globl " #sym "; .set " #sym ", %c0" :: "i"(val));
->
->  MODULE_DESCRIPTION("SHA-224/SHA-256 secure hash using ARMv8 Crypto Extensions");
->  MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
-> --
-> 2.12.2.715.g7642488e1d-goog
->
+Thanks,
+Mark.
