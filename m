@@ -1,272 +1,417 @@
-From: Antoine Tenart <antoine.tenart@free-electrons.com>
-Subject: Re: [PATCH 2/7] crypto: inside-secure: add SafeXcel EIP197 crypto
- engine driver
-Date: Tue, 18 Apr 2017 10:04:22 +0200
-Message-ID: <20170418080422.55k63czpmnuqn7ku@kwain>
-References: <20170329124432.27457-1-antoine.tenart@free-electrons.com>
- <20170329124432.27457-3-antoine.tenart@free-electrons.com>
- <5a016e1e-1443-158a-5ced-58dcb4ad63cc@arm.com>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: Re: [RFC PATCH v1 1/1] crypto: algif_compression - User-space interface for compression
+Date: Tue, 18 Apr 2017 12:12:10 +0200
+Message-ID: <1503555.c1mqzxcg8O@positron.chronox.de>
+References: <1492108494-10694-1-git-send-email-akamaluddin@cavium.com> <1492108494-10694-2-git-send-email-akamaluddin@cavium.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="c3kwbi6r5oxbnufm"
-Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        jason@lakedaemon.net, andrew@lunn.ch,
-        gregory.clement@free-electrons.com,
-        sebastian.hesselbarth@gmail.com,
-        thomas.petazzoni@free-electrons.com,
-        boris.brezillon@free-electrons.com, igall@marvell.com,
-        nadavh@marvell.com, linux-crypto@vger.kernel.org,
-        oferh@marvell.com, linux-arm-kernel@lists.infradead.org
-To: Robin Murphy <robin.murphy@arm.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        akamaluddin@cavium.com, pathreya@cavium.com, machalla@cavium.com
+To: Abed Kamaluddin <abedamu@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:37944 "EHLO
-        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751625AbdDRIEZ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Apr 2017 04:04:25 -0400
-Content-Disposition: inline
-In-Reply-To: <5a016e1e-1443-158a-5ced-58dcb4ad63cc@arm.com>
+Received: from mail.eperm.de ([89.247.134.16]:58984 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753239AbdDRKMW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 18 Apr 2017 06:12:22 -0400
+In-Reply-To: <1492108494-10694-2-git-send-email-akamaluddin@cavium.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Am Donnerstag, 13. April 2017, 20:34:54 CEST schrieb Abed Kamaluddin:
 
---c3kwbi6r5oxbnufm
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi Abed,
 
-Hi Robin,
+> crypto: algif_compression - User-space interface for compression
+> 
+> This patch adds af_alg plugin for compression algorithms of type scomp/acomp
+> registered to the kernel crypto layer.
+> 
+> The user needs to set operation (compression/decompression) as a control
+> message to sendmsg, identical to selecting the cipher operation type in case
+> of ciphers. Once a sendmsg call occurs, no further writes can be made to
+> the socket until all previous data has been processed and read. Therefore
+> the interface only supports one request at a time.
+> 
+> The interface is completely synchronous; all operations are carried out in
+> recvmsg and will complete prior to the system call returning.
+> 
+> The sendmsg and recvmsg interface supports directly reading/writing to
+> user-space without additional copying, i.e., the kernel crypto interface
+> will receive the user-space address as its input/output SG list. The scomp
+> interface or crypto drivers may copy the data as required.
+> 
+> Signed-off-by: Abed Kamaluddin <akam...@cavium.com>
+> Signed-off-by: Mahipal Challa <mahipal.cha...@cavium.com>
+> 
+> ---
+>  crypto/Kconfig              |  11 ++
+>  crypto/Makefile             |   1 +
+>  crypto/algif_compression.c  | 272
+> ++++++++++++++++++++++++++++++++++++++++++++ include/uapi/linux/if_alg.h | 
+>  2 +
+>  4 files changed, 286 insertions(+)
+> 
+> diff --git a/crypto/Kconfig b/crypto/Kconfig
+> index f37e9cc..13b03ba 100644
+> --- a/crypto/Kconfig
+> +++ b/crypto/Kconfig
+> @@ -1741,6 +1741,17 @@ config CRYPTO_USER_API_AEAD
+>  	  This option enables the user-spaces interface for AEAD
+>  	  cipher algorithms.
+> 
+> +config CRYPTO_USER_API_COMPRESSION
+> +	tristate "User-space interface for compression algorithms"
+> +	depends on NET
+> +	select CRYPTO_ACOMP
+> +	select CRYPTO_USER_API
+> +	help
+> +	  This option enables the user-space interface for compression
+> +	  algorithms. Enable this option for access to compression algorithms
+> +	  of type scomp/acomp exported by the kernel crypto layer through
+> +	  AF_ALG interface.
+> +
+>  config CRYPTO_HASH_INFO
+>  	bool
+> 
+> diff --git a/crypto/Makefile b/crypto/Makefile
+> index 8a44057..1469e06 100644
+> --- a/crypto/Makefile
+> +++ b/crypto/Makefile
+> @@ -134,6 +134,7 @@ obj-$(CONFIG_CRYPTO_TEST) += tcrypt.o
+>  obj-$(CONFIG_CRYPTO_GHASH) += ghash-generic.o
+>  obj-$(CONFIG_CRYPTO_USER_API) += af_alg.o
+>  obj-$(CONFIG_CRYPTO_USER_API_HASH) += algif_hash.o
+> +obj-$(CONFIG_CRYPTO_USER_API_COMPRESSION) += algif_compression.o
+>  obj-$(CONFIG_CRYPTO_USER_API_SKCIPHER) += algif_skcipher.o
+>  obj-$(CONFIG_CRYPTO_USER_API_RNG) += algif_rng.o
+>  obj-$(CONFIG_CRYPTO_USER_API_AEAD) += algif_aead.o
+> diff --git a/crypto/algif_compression.c b/crypto/algif_compression.c
+> new file mode 100644
+> index 0000000..0ba6d1e
+> --- /dev/null
+> +++ b/crypto/algif_compression.c
+> @@ -0,0 +1,272 @@
+> +/*
+> + * algif_compression: User-space interface for COMPRESSION algorithms
+> + *
+> + * This file provides user-space API support for compression algorithms
+> + * registered through the kernel crypto layer.
+> + *
+> + * Copyright (C) 2017 Cavium, Inc.
+> + *
+> + * Original Authors: Abed Kamaluddin <akamaluddin@cavium.com>
+> + *
+> + * This program is free software; you can redistribute it and/or modify it
+> + * under the terms of the GNU General Public License as published by the
+> Free + * Software Foundation; either version 2 of the License, or (at your
+> option) + * any later version.
+> + */
+> +
+> +#include <crypto/acompress.h>
+> +#include <crypto/if_alg.h>
+> +#include <linux/crypto.h>
+> +#include <linux/init.h>
+> +#include <linux/kernel.h>
+> +#include <linux/mm.h>
+> +#include <linux/module.h>
+> +#include <linux/net.h>
+> +#include <net/sock.h>
+> +#include <linux/scatterlist.h>
+> +
+> +/* scomp scratch is currently 128KB */
+> +#define COMP_BUFFER_SIZE	65535
+> +
+> +struct comp_ctx {
+> +	struct af_alg_sgl tsgl;
+> +	struct af_alg_sgl rsgl;
+> +	struct af_alg_completion completion;
+> +	unsigned int clen;
+> +	unsigned int slen;
+> +	unsigned int dlen;
+> +	bool comp;
+> +	bool used;
+> +	struct acomp_req *acomp_req;
+> +};
+> +
+> +struct comp_tfm {
+> +	struct crypto_acomp *acomp;
+> +};
+> +
+> +static int comp_sendmsg(struct socket *sock, struct msghdr *msg,
+> +			size_t ignored)
+> +{
+> +	struct sock *sk = sock->sk;
+> +	struct alg_sock *ask = alg_sk(sk);
+> +	struct comp_ctx *ctx = ask->private;
+> +	struct af_alg_control con = {};
+> +	int limit = COMP_BUFFER_SIZE;
+> +	int len;
+> +	int err = -EINVAL;
+> +
+> +	if (msg->msg_controllen) {
+> +		err = af_alg_cmsg_send(msg, &con);
+> +		if (err)
+> +			return err;
+> +
+> +		switch (con.op) {
+> +		case ALG_OP_COMPRESS:
+> +			ctx->comp = 1;
+> +			break;
+> +
+> +		case ALG_OP_DECOMPRESS:
+> +			ctx->comp = 0;
 
-On Wed, Apr 12, 2017 at 02:54:13PM +0100, Robin Murphy wrote:
->=20
-> Bit of a drive-by, but since I have it in my head that crypto drivers
-> are a hotspot for dodgy DMA usage (in part due to the hardware often
-> being a bit esoteric with embedded RAMs and such), this caught my eye
-> and I thought I'd give this a quick once-over to check for anything
-> smelly. Unfortunately, I was not disappointed... ;)
+You set the ctx without locking. I guess you want to move the ctx->comp 
+setting below the lock.
 
-:-)
+> +			break;
+> +
+> +		default:
+> +			return -EINVAL;
+> +		}
+> +	}
+> +
+> +	lock_sock(sk);
+> +
+> +	/* One request at a time supported, data submitted for comp/decomp will
+> +	 * be processed at subsequent recvmsg
 
-> On 29/03/17 13:44, Antoine Tenart wrote:
-> [...]
-> > diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/i=
-nside-secure/safexcel.c
-> > new file mode 100644
-> > index 000000000000..00f3f2c85d05
-> > --- /dev/null
-> > +++ b/drivers/crypto/inside-secure/safexcel.c
-> [...]
-> > +int safexcel_invalidate_cache(struct crypto_async_request *async,
-> > +			      struct safexcel_context *ctx,
-> > +			      struct safexcel_crypto_priv *priv,
-> > +			      dma_addr_t ctxr_dma, int ring,
-> > +			      struct safexcel_request *request)
-> > +{
-> > +	struct safexcel_command_desc *cdesc;
-> > +	struct safexcel_result_desc *rdesc;
-> > +	phys_addr_t ctxr_phys;
-> > +	int ret =3D 0;
-> > +
-> > +	ctxr_phys =3D dma_to_phys(priv->dev, ctxr_dma);
->=20
-> No no no. This is a SWIOTLB-specific (or otherwise arch-private,
-> depending on implementation) helper, not a DMA API function, and should
-> not be called directly by drivers. There is no guarantee it will give
-> the result you expect, or even compile, in all cases (if the kbuild
-> robot hasn't already revealed via the COMPILE_TEST dependency).
->=20
-> That said, AFAICS ctxr_phys ends up in a descriptor which is given to
-> the device, so trying to use a physical address is wrong and it should
-> still be the DMA address anyway.
+I recommend to lift that limitation.
 
-I see. The cryptographic engine should always use dma addresses. I'll
-update the descriptors structure members from "phys" to "dma" as well.
+May I propose that you look into the patches for skcipher and aead regarding 
+memory handling updates that are currently discussed. There you will find the 
+sendmsg code with two parts:
 
-> [...]
-> > +static int safexcel_probe(struct platform_device *pdev)
-> > +{
-> > +	struct device *dev =3D &pdev->dev;
-> > +	struct resource *res;
-> > +	struct safexcel_crypto_priv *priv;
-> > +	int i, ret;
-> > +
-> > +	priv =3D devm_kzalloc(dev, sizeof(struct safexcel_crypto_priv),
-> > +			    GFP_KERNEL);
-> > +	if (!priv)
-> > +		return -ENOMEM;
-> > +
-> > +	priv->dev =3D dev;
-> > +
-> > +	res =3D platform_get_resource(pdev, IORESOURCE_MEM, 0);
-> > +	priv->base =3D devm_ioremap_resource(dev, res);
-> > +	if (IS_ERR(priv->base)) {
-> > +		dev_err(dev, "failed to get resource\n");
-> > +		return PTR_ERR(priv->base);
-> > +	}
-> > +
-> > +	priv->clk =3D of_clk_get(dev->of_node, 0);
-> > +	if (!IS_ERR(priv->clk)) {
-> > +		ret =3D clk_prepare_enable(priv->clk);
-> > +		if (ret) {
-> > +			dev_err(dev, "unable to enable clk (%d)\n", ret);
-> > +			return ret;
-> > +		}
-> > +	} else {
-> > +		/* The clock isn't mandatory */
-> > +		if (PTR_ERR(priv->clk) =3D=3D -EPROBE_DEFER)
-> > +			return -EPROBE_DEFER;
-> > +	}
->=20
-> You should call dma_set_mask_and_coherent() before any DMA API calls,
-> both to confirm DMA really is going to work all, and also (since this IP
-> apparently supports >32-bit addresses) to describe the full inherent
-> addressing capability, not least to avoid wasting time/space with
-> unnecessary bounce buffering otherwise.
+1. checking of the input data of cmsg and setting the ctx respectively.
 
-OK, I'll add a call to this helper before using DMA API calls.
+2. the big while loop for getting all user space data
 
-> > +
-> > +err_pool:
-> > +	dma_pool_destroy(priv->context_pool);
->=20
-> You used dmam_pool_create(), so not only is an explicit destroy
-> unnecessary, but doing so with the non-managed version is actively
-> harmful, since devres would end up double-freeing the pool after you retu=
-rn.
+I guess you have seen that I would like to consolidate the algif 
+implementations once the memory handling patch is in and agreed on. My plan 
+is: Bullet 1 will be private to the algif implementation, so leave your code. 
+Bullet 2 will be moved into a common service function. Thus, may I propose 
+that you simply copy the entire while loop with the same TX data structures 
+into your sendmsg code. This way you do not have the mentioned limit.
 
-I saw this and fixed it in my local version.
+Also, simply copy the sendpage code from the patch set to support splice/
+vmsplice.
 
-> > +struct safexcel_token {
-> > +	u32 packet_length:17;
-> > +	u8 stat:2;
-> > +	u16 instructions:9;
-> > +	u8 opcode:4;
-> > +} __packed;
->=20
-> Using bitfields in hardware descriptors seems pretty risky, since you've
-> no real guarantee two compilers will lay them out the same way (or that
-> either would be correct WRT what the hardware expects). I'd be more
-> inclined to construct all these fields with explicit masking and shifting.
 
-Hmm, I'm not sure to follow you here. If I use bitfields in a __packed
-structure, we should be safe. Why would the compiler have a different
-behaviour?
 
-> > +static int safexcel_aes_send(struct crypto_async_request *async,
-> > +			     int ring, struct safexcel_request *request,
-> > +			     int *commands, int *results)
-> > +{
-> > +	struct ablkcipher_request *req =3D ablkcipher_request_cast(async);
-> > +	struct safexcel_cipher_ctx *ctx =3D crypto_tfm_ctx(req->base.tfm);
-> > +	struct safexcel_crypto_priv *priv =3D ctx->priv;
-> > +	struct safexcel_command_desc *cdesc;
-> > +	struct safexcel_result_desc *rdesc;
-> > +	struct scatterlist *sg;
-> > +	phys_addr_t ctxr_phys;
-> > +	int nr_src, nr_dst, n_cdesc =3D 0, n_rdesc =3D 0, queued =3D req->nby=
-tes;
-> > +	int i, ret =3D 0;
-> > +
-> > +	request->req =3D &req->base;
-> > +
-> > +	if (req->src =3D=3D req->dst) {
-> > +		nr_src =3D sg_nents_for_len(req->src, req->nbytes);
-> > +		nr_dst =3D nr_src;
-> > +
-> > +		if (dma_map_sg(priv->dev, req->src, nr_src, DMA_BIDIRECTIONAL) <=3D =
-0)
->=20
-> Nit: you only need to check for zero/nonzero to determine failure
-> (similarly below) - dma_map_sg() cannot return negative values.
+> +	 */
+> +	if (ctx->used) {
+> +		err = -EAGAIN;
+> +		goto unlock;
+> +	}
+> +
+> +	len = msg_data_left(msg);
+> +
+> +	if (len > limit)
+> +		len = limit;
+> +
+> +	len = af_alg_make_sg(&ctx->tsgl, &msg->msg_iter, len);
+> +
+> +	if (len < 0) {
+> +		err = len;
+> +		goto unlock;
+> +	}
+> +
+> +	ctx->slen = len;
+> +	ctx->used = 1;
+> +
+> +unlock:
+> +	release_sock(sk);
+> +
+> +	return err ?: len;
+> +}
+> +
+> +static int comp_recvmsg(struct socket *sock, struct msghdr *msg, size_t
+> len, +			int flags)
+> +{
+> +	struct sock *sk = sock->sk;
+> +	struct alg_sock *ask = alg_sk(sk);
+> +	struct comp_ctx *ctx = ask->private;
+> +	int rlen = ctx->dlen;
+> +	int err;
+> +
+> +	if (len > rlen)
+> +		len = rlen;
+> +
+> +	lock_sock(sk);
+> +
+> +	if (!ctx->used) {
+> +		err = -EAGAIN;
+> +		goto unlock;
+> +	}
+> +
+> +	len = af_alg_make_sg(&ctx->rsgl, &msg->msg_iter, len);
+> +	if (len < 0) {
+> +		err = len;
+> +		goto unlock;
+> +	}
 
-OK.
+As mentioned above, I recommend to change this code here too. Please copy the 
+while loop from the skcipher_recvmsg and the associated data structures. Also, 
+copy the areq allocation and handling code to support synchronous and async 
+operations.
 
-> Bigger complaint: you should not ignore the successful return value and
-> rely on it being equal to nr_src - please see the description of
-> dma_map_sg() in Documenatation/DMA-API.txt
+Note, the code below the while loop in the recvmsg is private to your 
+implementation.
+> +
+> +	acomp_request_set_params(ctx->acomp_req, ctx->tsgl.sg, ctx->rsgl.sg,
+> +				 ctx->slen, len);
+> +
+> +	/* Synchronous completion of comp/decomp requests */
+> +	err = af_alg_wait_for_completion(
+> +			ctx->comp ?
+> +				crypto_acomp_compress(ctx->acomp_req) :
+> +				crypto_acomp_decompress(ctx->acomp_req),
+> +				&ctx->completion);
+> +
+> +	/* Add acomp req wrapper for dlen */
+> +	len = (ctx->acomp_req)->dlen;
+> +
+> +	af_alg_free_sg(&ctx->tsgl);
+> +	af_alg_free_sg(&ctx->rsgl);
+> +
+> +unlock:
+> +	ctx->used = 0;
+> +	release_sock(sk);
+> +
+> +	return err ?: len;
+> +}
+> +
+> +static struct proto_ops algif_comp_ops = {
+> +	.family		=	PF_ALG,
+> +
+> +	.connect	=	sock_no_connect,
+> +	.socketpair	=	sock_no_socketpair,
+> +	.getname	=	sock_no_getname,
+> +	.ioctl		=	sock_no_ioctl,
+> +	.listen		=	sock_no_listen,
+> +	.shutdown	=	sock_no_shutdown,
+> +	.getsockopt	=	sock_no_getsockopt,
+> +	.mmap		=	sock_no_mmap,
+> +	.bind		=	sock_no_bind,
+> +	.setsockopt	=	sock_no_setsockopt,
+> +	.poll		=	sock_no_poll,
+> +
+> +	.release	=	af_alg_release,
+> +	.sendmsg	=	comp_sendmsg,
+> +	.recvmsg	=	comp_recvmsg,
+> +	.sendpage	=	sock_no_sendpage,
+> +	.accept		=	sock_no_accept,
+> +};
+> +
+> +static void *comp_bind(const char *name, u32 type, u32 mask)
+> +{
+> +	struct comp_tfm *tfm;
+> +	struct crypto_acomp *acomp;
+> +
+> +	tfm = kzalloc(sizeof(*tfm), GFP_KERNEL);
+> +	if (!tfm)
+> +		return ERR_PTR(-ENOMEM);
+> +
+> +	acomp = crypto_alloc_acomp(name, type, mask);
+> +	if (IS_ERR_OR_NULL(acomp)) {
+> +		kfree(tfm);
+> +		return ERR_PTR(-ENOMEM);
+> +	}
+> +	tfm->acomp = acomp;
+> +
+> +	return tfm;
+> +}
+> +
+> +static void comp_release(void *private)
+> +{
+> +	struct comp_tfm *tfm = private;
+> +
+> +	crypto_free_acomp(tfm->acomp);
+> +	kfree(tfm);
+> +}
+> +
+> +static void comp_sock_destruct(struct sock *sk)
+> +{
+> +	struct alg_sock *ask = alg_sk(sk);
+> +	struct comp_ctx *ctx = ask->private;
+> +
+> +	acomp_request_free(ctx->acomp_req);
+> +	sock_kfree_s(sk, ctx, ctx->clen);
+> +	af_alg_release_parent(sk);
+> +}
+> +
+> +static int comp_accept_parent(void *private, struct sock *sk)
+> +{
+> +	struct comp_ctx *ctx;
+> +	struct alg_sock *ask = alg_sk(sk);
+> +	struct comp_tfm *tfm = private;
+> +	struct crypto_acomp *acomp = tfm->acomp;
+> +	unsigned int len = sizeof(*ctx);
+> +
+> +	ctx = sock_kmalloc(sk, len, GFP_KERNEL);
+> +	if (!ctx)
+> +		return -ENOMEM;
+> +
+> +	ctx->used = 0;
+> +	ctx->clen = len;
+> +	ctx->dlen = COMP_BUFFER_SIZE;
+> +	ctx->slen = COMP_BUFFER_SIZE;
+> +
+> +	af_alg_init_completion(&ctx->completion);
+> +
+> +	ctx->acomp_req = acomp_request_alloc(acomp);
+> +	if (!ctx->acomp_req) {
+> +		sock_kfree_s(sk, ctx, ctx->clen);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	acomp_request_set_callback(ctx->acomp_req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+> +				   af_alg_complete, &ctx->completion);
+> +
+> +	ask->private = ctx;
+> +	sk->sk_destruct = comp_sock_destruct;
+> +
+> +	return 0;
+> +}
+> +
+> +static const struct af_alg_type algif_type_comp = {
+> +	.bind		=	comp_bind,
+> +	.release	=	comp_release,
+> +	.accept		=	comp_accept_parent,
+> +	.ops		=	&algif_comp_ops,
+> +	.name		=	"compression",
+> +	.owner		=	THIS_MODULE
+> +};
+> +
+> +static int __init algif_comp_init(void)
+> +{
+> +	return af_alg_register_type(&algif_type_comp);
+> +}
+> +
+> +static void __exit algif_comp_exit(void)
+> +{
+> +	int err = af_alg_unregister_type(&algif_type_comp);
+> +
+> +	BUG_ON(err);
+> +}
+> +
+> +module_init(algif_comp_init);
+> +module_exit(algif_comp_exit);
+> +MODULE_LICENSE("GPL");
+> diff --git a/include/uapi/linux/if_alg.h b/include/uapi/linux/if_alg.h
+> index f2acd2f..5cca9eb 100644
+> --- a/include/uapi/linux/if_alg.h
+> +++ b/include/uapi/linux/if_alg.h
+> @@ -38,5 +38,7 @@ struct af_alg_iv {
+>  /* Operations */
+>  #define ALG_OP_DECRYPT			0
+>  #define ALG_OP_ENCRYPT			1
+> +#define ALG_OP_DECOMPRESS		0
+> +#define ALG_OP_COMPRESS		1
+> 
+>  #endif	/* _LINUX_IF_ALG_H */
 
-OK, I'll have a look at it and fix this.
 
-> > +	/* command descriptors */
-> > +	for_each_sg(req->src, sg, nr_src, i) {
-> > +		phys_addr_t sg_phys =3D dma_to_phys(priv->dev, sg_dma_address(sg));
-> > +		int len =3D sg_dma_len(sg);
->=20
-> If dma_map_sg() coalesced any entries into the same mapping such that
-> count < nents, these could well give bogus values toward the end of the
-> list once i >=3D count(if you're lucky, at least len might be 0).
-
-OK, I'll fix this.
-
-> > +	/* Add a command descriptor for the cached data, if any */
-> > +	if (cache_len) {
-> > +		ctx->base.cache_dma =3D dma_map_single(priv->dev, req->cache,
->=20
-> This is pretty dodgy, since req->cache is inside a live data structure,
-> adjoining parts of which are updated whilst still mapped (the update of
-> req->processed below). You just about get away without data corruption
-> since we *probably* don't invalidate anything when unmapping
-> DMA_TO_DEVICE, and the coherency hardware *probably* doesn't do anything
-> crazy, but you've no real guarantee of that - any DMA buffer should
-> really be separately kmalloced. "That's a nice dirty cache line you've
-> got there, it'd be a shame if anything were to happen to it..."
-
-OK, good to know.
-
-> > +	rdr->base =3D dmam_alloc_coherent(priv->dev,
-> > +					rdr->offset * EIP197_DEFAULT_RING_SIZE,
-> > +					&rdr->base_dma, GFP_KERNEL);
-> > +	if (!rdr->base) {
-> > +		dmam_free_coherent(priv->dev,
-> > +				   cdr->offset * EIP197_DEFAULT_RING_SIZE,
-> > +				   cdr->base, cdr->base_dma);
->=20
-> Returning an error here will abort your probe routine, so devres will
-> clean these up there and then - there's no need to do free anything
-> explicitly. That's rather the point of using devm_*() to begin with.
-
-Sure.
-
-> > +	dmam_free_coherent(priv->dev,
-> > +			   cdr->offset * EIP197_DEFAULT_RING_SIZE,
-> > +			   cdr->base, cdr->base_dma);
-> > +	dmam_free_coherent(priv->dev,
-> > +			   rdr->offset * EIP197_DEFAULT_RING_SIZE,
-> > +			   rdr->base, rdr->base_dma);
-> > +}
->=20
-> Again, this is only called at device teardown, so the whole function is
-> redundant.
-
-OK, I'll remove these.
-
-Thanks for the review!
-Antoine
-
---=20
-Antoine T=E9nart, Free Electrons
-Embedded Linux and Kernel engineering
-http://free-electrons.com
-
---c3kwbi6r5oxbnufm
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBCgAGBQJY9ciGAAoJEFxNi8it27zYjT0P/AtdhgwW6iC54DtM7zZ4jC/F
-a1liWqzLsELwzQY0u2uYsJ8ueHYFLdEwZ4nEfdJmQmafZIg9Im6O7Y9M/ZDUodjr
-6+KdvR60rNCiT0WyZ5xqug5ecXtpX2oJyjReQSqtnUJq7Hi7SpKfuipRFqxdmktS
-wja+6+f5nOeost6VZrcYdr+exJQzKQDT4dvWUMnLLYHxVJ0Rt9RSHh/j+vjYuvFe
-vxw5Rm6N5EKSm42uExkuECZ0+ztatyqq1M+o9EhIIpFeZU8t2xWZC5agGh4i4pRc
-ZKRDvRPFWXhO3S42VstjbIQ7yYdHEfVRhoa1ihoj1IU/xCdrozZM0md5rypHiWsL
-UwPDanretMms49jd/1KlgFJjUn70IvIhWEWitk6RONkeMrEzWUJ+L4hlJ8tVZ2XU
-q8k0Sdxk1lc4dtwp8fYIEfpY619Gmuxj9I7vjTuaFjBdlZhr3IiNxPKDRArRTV/Z
-OIMfbtTYah8be6JkhqxF8u8eYRzbST7Clx6UumdRGZqxKLeiFvDeSZA/E8ovy3FJ
-aZqwLblSVIC9bHD83x+hRagaOiWE/YwYZfbwoisXjhfM6nMN+ayshHDkuM9+ynp2
-xVy1nBzhTzN5BIZGZmcD6+WqGGkEk6UypENZPuQNAOldZAsQhC8Cgj16vrTfSg++
-kfutymvYiJJqeEa/MSso
-=OYG+
------END PGP SIGNATURE-----
-
---c3kwbi6r5oxbnufm--
+Ciao
+Stephan
