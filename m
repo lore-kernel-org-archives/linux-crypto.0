@@ -1,60 +1,95 @@
-From: Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>
-Subject: Re: [PATCH 0/4] staging: add ccree crypto driver
-Date: Tue, 18 Apr 2017 17:39:51 +0200
-Message-ID: <20170418153951.GA31214@kroah.com>
-References: <1492524470-13847-1-git-send-email-gilad@benyossef.com>
+From: Logan Gunthorpe <logang@deltatee.com>
+Subject: Re: [PATCH 16/22] xen-blkfront: Make use of the new sg_map helper
+ function
+Date: Tue, 18 Apr 2017 09:42:20 -0600
+Message-ID: <7930aa93-6106-e12f-ba76-e2771d4ec2dc@deltatee.com>
+References: <1492121135-4437-1-git-send-email-logang@deltatee.com>
+ <1492121135-4437-17-git-send-email-logang@deltatee.com>
+ <063D6719AE5E284EB5DD2968C1650D6DCFFD3CD7@AcuExch.aculab.com>
+ <20170418142723.GA27133@char.us.oracle.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-        "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
-        devel-gWbeCf7V1WCQmaza687I9mD2FQJk+8+b@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        gilad.benyossef-5wv7dgnIgG8@public.gmane.org, Binoy Jayan <binoy.jayan-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
-        Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>
-To: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <1492524470-13847-1-git-send-email-gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>,
+ Steve Wise <swise@opengridcomputing.com>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ "target-devel@vger.kernel.org" <target-devel@vger.kernel.org>,
+ Sumit Semwal <sumit.semwal@linaro.org>,
+ "devel@driverdev.osuosl.org" <devel@driverdev.osuosl.org>,
+ "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
+ Sagi Grimberg <sagi@grimberg.me>,
+ "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ Matthew Wilcox <mawilcox@microsoft.com>,
+ "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+ Christoph Hellwig <hch@lst.de>,
+ "fcoe-devel@open-fcoe.org" <fcoe-devel@open-fcoe.org>,
+ Ross Zwisler <ross.zwisler@linux.intel.com>,
+ "open-iscsi@googlegroups.com" <open-iscsi@googlegroups.com>,
+ "linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
+ Ming Lin <ming.l@ssi.samsung.com>,
+ "intel-gfx@list
+To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+ David Laight <David.Laight@ACULAB.COM>, xen-devel@lists.xensource.com
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+In-Reply-To: <20170418142723.GA27133@char.us.oracle.com>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Apr 18, 2017 at 05:07:50PM +0300, Gilad Ben-Yossef wrote:
-> Arm TrustZone CryptoCell 700 is a family of cryptographic hardware
-> accelerators. It is supported by a long lived series of out of tree
-> drivers, which I am now in the process of unifying and upstreaming.
-> This is the first drop, supporting the new CryptoCell 712 REE. 
-> 
-> The code still needs some cleanup before maturing to a proper
-> upstream driver, which I am in the process of doing. However,
-> as discussion of some of the capabilities of the hardware and
-> its application to some dm-crypt and dm-verity features recently
-> took place I though it is better to do this in the open via the
-> staging tree.
-> 
-> A Git repository based off of Linux 4.11-rc7 is available at
-> https://github.com/gby/linux.git branch ccree.
-> 
-> Signed-off-by: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-> CC: Binoy Jayan <binoy.jayan-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-> CC: Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>
-> 
-> Gilad Ben-Yossef (4):
->   staging: add ccree crypto driver
->   staging: ccree: add TODO list
->   staging: ccree: add devicetree bindings
->   MAINTAINERS: add Gilad BY as maintainer for ccree
 
-We can't do much without a real patch, sorry.  Digging in random git
-trees doesn't work :(
 
-I can't take this as-is, I need patches.
+On 18/04/17 08:27 AM, Konrad Rzeszutek Wilk wrote:
+> Interesting that you didn't CC any of the maintainers. Could you 
+> do that in the future please?
 
-thanks,
+Please read the cover letter. The distribution list for the patchset
+would have been way too large to cc every maintainer (even as limited as
+it was, I had mailing lists yelling at me). My plan was to get buy in
+for the first patch, get it merged and resend the rest independently to
+their respective maintainers. Of course, though, I'd be open to other
+suggestions.
 
-greg k-h
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>>
+>>> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+>>> ---
+>>>  drivers/block/xen-blkfront.c | 33 +++++++++++++++++++++++++++------
+>>>  1 file changed, 27 insertions(+), 6 deletions(-)
+>>>
+>>> diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
+>>> index 5067a0a..7dcf41d 100644
+>>> --- a/drivers/block/xen-blkfront.c
+>>> +++ b/drivers/block/xen-blkfront.c
+>>> @@ -807,8 +807,19 @@ static int blkif_queue_rw_req(struct request *req, struct blkfront_ring_info *ri
+>>>  		BUG_ON(sg->offset + sg->length > PAGE_SIZE);
+>>>
+>>>  		if (setup.need_copy) {
+>>> -			setup.bvec_off = sg->offset;
+>>> -			setup.bvec_data = kmap_atomic(sg_page(sg));
+>>> +			setup.bvec_off = 0;
+>>> +			setup.bvec_data = sg_map(sg, SG_KMAP_ATOMIC);
+>>> +			if (IS_ERR(setup.bvec_data)) {
+>>> +				/*
+>>> +				 * This should really never happen unless
+>>> +				 * the code is changed to use memory that is
+>>> +				 * not mappable in the sg. Seeing there is a
+>>> +				 * questionable error path out of here,
+>>> +				 * we WARN.
+>>> +				 */
+>>> +				WARN(1, "Non-mappable memory used in sg!");
+>>> +				return 1;
+>>> +			}
+>> ...
+>>
+>> Perhaps add a flag to mark failure as 'unexpected' and trace (and panic?)
+>> inside sg_map().
+
+Thanks, that's a good suggestion. I'll make the change for v2.
+
+Logan
