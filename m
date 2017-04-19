@@ -1,99 +1,78 @@
 From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH] crypto: acomp - replace compression known answer test
-Date: Wed, 19 Apr 2017 14:27:18 +0100
-Message-ID: <20170419132718.3438-1-giovanni.cabiddu@intel.com>
+Subject: [PATCH 1/2] crypto: scomp - allow registration of multiple scomps
+Date: Wed, 19 Apr 2017 15:11:41 +0100
+Message-ID: <20170419141142.3678-1-giovanni.cabiddu@intel.com>
 Cc: linux-crypto@vger.kernel.org, weigang.li@intel.com,
         giovanni.cabiddu@gmail.com,
         Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:17459 "EHLO mga03.intel.com"
+Received: from mga02.intel.com ([134.134.136.20]:59504 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1763606AbdDSN1d (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 19 Apr 2017 09:27:33 -0400
+        id S934725AbdDSOL7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 19 Apr 2017 10:11:59 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Compression implementations might return valid outputs that
-do not match what specified in the test vectors.
-For this reason, the testmgr might report that a compression
-implementation failed the test even if the data produced
-by the compressor is correct.
-This implements a decompress-and-verify test for acomp
-compression tests rather than a known answer test.
+Add crypto_register_scomps and crypto_unregister_scomps to allow
+the registration of multiple implementations with one call.
 
 Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 ---
- crypto/testmgr.c | 29 ++++++++++++++++++++++++++---
- 1 file changed, 26 insertions(+), 3 deletions(-)
+ crypto/scompress.c                  | 29 +++++++++++++++++++++++++++++
+ include/crypto/internal/scompress.h |  3 +++
+ 2 files changed, 32 insertions(+)
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index cd075c7..8373c72 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -1458,7 +1458,7 @@ static int test_acomp(struct crypto_acomp *tfm,
- {
- 	const char *algo = crypto_tfm_alg_driver_name(crypto_acomp_tfm(tfm));
- 	unsigned int i;
--	char *output;
-+	char *output, *decomp_out;
- 	int ret;
- 	struct scatterlist src, dst;
- 	struct acomp_req *req;
-@@ -1468,6 +1468,12 @@ static int test_acomp(struct crypto_acomp *tfm,
- 	if (!output)
- 		return -ENOMEM;
+diff --git a/crypto/scompress.c b/crypto/scompress.c
+index 6b048b3..ae1d3cf 100644
+--- a/crypto/scompress.c
++++ b/crypto/scompress.c
+@@ -353,5 +353,34 @@ int crypto_unregister_scomp(struct scomp_alg *alg)
+ }
+ EXPORT_SYMBOL_GPL(crypto_unregister_scomp);
  
-+	decomp_out = kmalloc(COMP_BUF_SIZE, GFP_KERNEL);
-+	if (!decomp_out) {
-+		kfree(output);
-+		return -ENOMEM;
++int crypto_register_scomps(struct scomp_alg *algs, int count)
++{
++	int i, ret;
++
++	for (i = 0; i < count; i++) {
++		ret = crypto_register_scomp(&algs[i]);
++		if (ret)
++			goto err;
 +	}
 +
- 	for (i = 0; i < ctcount; i++) {
- 		unsigned int dlen = COMP_BUF_SIZE;
- 		int ilen = ctemplate[i].inlen;
-@@ -1506,7 +1512,23 @@ static int test_acomp(struct crypto_acomp *tfm,
- 			goto out;
- 		}
- 
--		if (req->dlen != ctemplate[i].outlen) {
-+		ilen = req->dlen;
-+		dlen = COMP_BUF_SIZE;
-+		sg_init_one(&src, output, ilen);
-+		sg_init_one(&dst, decomp_out, dlen);
-+		init_completion(&result.completion);
-+		acomp_request_set_params(req, &src, &dst, ilen, dlen);
++	return 0;
 +
-+		ret = wait_async_op(&result, crypto_acomp_decompress(req));
-+		if (ret) {
-+			pr_err("alg: acomp: compression failed on test %d for %s: ret=%d\n",
-+			       i + 1, algo, -ret);
-+			kfree(input_vec);
-+			acomp_request_free(req);
-+			goto out;
-+		}
++err:
++	for (--i; i >= 0; --i)
++		crypto_unregister_scomp(&algs[i]);
 +
-+		if (req->dlen != ctemplate[i].inlen) {
- 			pr_err("alg: acomp: Compression test %d failed for %s: output len = %d\n",
- 			       i + 1, algo, req->dlen);
- 			ret = -EINVAL;
-@@ -1515,7 +1537,7 @@ static int test_acomp(struct crypto_acomp *tfm,
- 			goto out;
- 		}
++	return ret;
++}
++EXPORT_SYMBOL_GPL(crypto_register_scomps);
++
++void crypto_unregister_scomps(struct scomp_alg *algs, int count)
++{
++	int i;
++
++	for (i = count - 1; i >= 0; --i)
++		crypto_unregister_scomp(&algs[i]);
++}
++EXPORT_SYMBOL_GPL(crypto_unregister_scomps);
++
+ MODULE_LICENSE("GPL");
+ MODULE_DESCRIPTION("Synchronous compression type");
+diff --git a/include/crypto/internal/scompress.h b/include/crypto/internal/scompress.h
+index 3fda3c5..ccad9b2 100644
+--- a/include/crypto/internal/scompress.h
++++ b/include/crypto/internal/scompress.h
+@@ -133,4 +133,7 @@ int crypto_register_scomp(struct scomp_alg *alg);
+  */
+ int crypto_unregister_scomp(struct scomp_alg *alg);
  
--		if (memcmp(output, ctemplate[i].output, req->dlen)) {
-+		if (memcmp(input_vec, decomp_out, req->dlen)) {
- 			pr_err("alg: acomp: Compression test %d failed for %s\n",
- 			       i + 1, algo);
- 			hexdump(output, req->dlen);
-@@ -1593,6 +1615,7 @@ static int test_acomp(struct crypto_acomp *tfm,
- 	ret = 0;
- 
- out:
-+	kfree(decomp_out);
- 	kfree(output);
- 	return ret;
- }
++int crypto_register_scomps(struct scomp_alg *algs, int count);
++void crypto_unregister_scomps(struct scomp_alg *algs, int count);
++
+ #endif
 -- 
 2.9.3
