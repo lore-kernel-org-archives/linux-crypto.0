@@ -1,67 +1,52 @@
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH v2 1/9] staging: ccree: introduce CryptoCell HW driver
-Date: Thu, 20 Apr 2017 16:01:03 +0200
-Message-ID: <20170420140103.GA20172@kroah.com>
-References: <1492693983-8175-1-git-send-email-gilad@benyossef.com>
- <1492693983-8175-2-git-send-email-gilad@benyossef.com>
- <20170420133308.GB8998@kroah.com>
- <CAOtvUMdH-=VrSS0wYUv99n=67WH53EyPfaby7kDhmgJk05C8gQ@mail.gmail.com>
+From: David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH 5/6] MODSIGN: Export module signature definitions.
+Date: Thu, 20 Apr 2017 15:37:37 +0100
+Message-ID: <21102.1492699057@warthog.procyon.org.uk>
+References: <1492691712.3081.85.camel@linux.vnet.ibm.com> <1492546666-16615-1-git-send-email-bauerman@linux.vnet.ibm.com> <1492546666-16615-6-git-send-email-bauerman@linux.vnet.ibm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Mark Rutland <mark.rutland@arm.com>, devel@driverdev.osuosl.org,
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
+Cc: dhowells@redhat.com,
+        Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
+        linux-security-module@vger.kernel.org,
+        linux-ima-devel@lists.sourceforge.net, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Binoy Jayan <binoy.jayan@linaro.org>,
-        Gilad Ben-Yossef <gilad.benyossef@arm.com>,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
-        devicetree@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
-        linux-crypto@vger.kernel.org, Ofir Drang <ofir.drang@arm.com>,
         "David S. Miller" <davem@davemloft.net>,
-        Stuart Yoder <stuart.yoder@arm.com>
-To: Gilad Ben-Yossef <gilad@benyossef.com>
+        Claudio Carvalho <cclaudio@linux.vnet.ibm.com>
+To: Mimi Zohar <zohar@linux.vnet.ibm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:37148 "EHLO
-        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1032005AbdDTOBU (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 20 Apr 2017 10:01:20 -0400
-Content-Disposition: inline
-In-Reply-To: <CAOtvUMdH-=VrSS0wYUv99n=67WH53EyPfaby7kDhmgJk05C8gQ@mail.gmail.com>
+Received: from mx1.redhat.com ([209.132.183.28]:37008 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S946424AbdDTOhl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 20 Apr 2017 10:37:41 -0400
+In-Reply-To: <1492691712.3081.85.camel@linux.vnet.ibm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Apr 20, 2017 at 04:40:56PM +0300, Gilad Ben-Yossef wrote:
-> On Thu, Apr 20, 2017 at 4:33 PM, Greg Kroah-Hartman
-> <gregkh@linuxfoundation.org> wrote:
-> > On Thu, Apr 20, 2017 at 04:12:55PM +0300, Gilad Ben-Yossef wrote:
-> >> +++ b/drivers/staging/ccree/bsp.h
-> >> @@ -0,0 +1,21 @@
-> >> +/*
-> >> + * Copyright (C) 2012-2016 ARM Limited or its affiliates.
-> >> + *
-> >> + * This program is free software; you can redistribute it and/or modify it
-> >> + * under the terms of the GNU General Public License as published by the Free
-> >> + * Software Foundation; either version 2 of the License, or (at your option)
-> >> + * any later version.
-> >
-> > Oh, I have to ask, do you really mean "any later version" here and
-> > elsewhere?
-> >
-> > If so, then your MODULE_LICENSE() marking is wrong, please fix that up,
-> > or fix up the license text, I can't take incompatible ones without
-> > getting angry emails from legal people sent to me...
-> >
-> 
-> Thanks for noticing this.
-> 
-> The copyright + license notice is a boilerplate I got from the powers
-> that be here.
-> 
-> I'll consult internally what is the proper action. I don't want to
-> make legal mad either... :-)
+Mimi Zohar <zohar@linux.vnet.ibm.com> wrote:
 
-Ok, I'll drop this patch series then, and wait for an updated one with
-this fixed up.
+> On Tue, 2017-04-18 at 17:17 -0300, Thiago Jung Bauermann wrote:
+> > IMA will use the module_signature format for append signatures, so export
+> > the relevant definitions and factor out the code which verifies that the
+> > appended signature trailer is valid.
+> > 
+> > Also, create a CONFIG_MODULE_SIG_FORMAT option so that IMA can select it
+> > and be able to use validate_module_signature without having to depend on
+> > CONFIG_MODULE_SIG.
+> 
+> Basically we want to generalize the concept of an appended signature.
+>  Referring to it as a "module signature format" seems a bit confusing.
+> 
+> David, would you have a problem with changing the appended string from
+> "~Module signature appended~\n" to something more generic?
 
-thanks,
+Conceptually, no.  Is it possible that doing so could break someone's module
+that they load on multiple versions of the kernel?  Say a module that only
+exports things and doesn't use anything from the core or any other module.
 
-greg k-h
+Also, it needs to reasonably long and distinct enough to prevent a false
+positive match.
+
+David
