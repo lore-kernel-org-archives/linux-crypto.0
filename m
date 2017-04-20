@@ -1,52 +1,71 @@
-From: David Howells <dhowells@redhat.com>
-Subject: Re: [PATCH 5/6] MODSIGN: Export module signature definitions.
-Date: Thu, 20 Apr 2017 15:37:37 +0100
-Message-ID: <21102.1492699057@warthog.procyon.org.uk>
-References: <1492691712.3081.85.camel@linux.vnet.ibm.com> <1492546666-16615-1-git-send-email-bauerman@linux.vnet.ibm.com> <1492546666-16615-6-git-send-email-bauerman@linux.vnet.ibm.com>
+From: abed mohammad kamaluddin <abedamu@gmail.com>
+Subject: Re: [RFC PATCH v1 0/1] *** crypto: AF_ALG: add compression support ***
+Date: Thu, 20 Apr 2017 20:09:52 +0530
+Message-ID: <CACVarESLvtwerfFnoo1brhUxZVkQf6v6+2ZET72cv83Qxw=V0A@mail.gmail.com>
+References: <1492108494-10694-1-git-send-email-akamaluddin@cavium.com>
+ <20170414083240.GA26625@gondor.apana.org.au> <CACVarEQ9kW=zF+Zse17LA2KjM-dg7mb6d5XWCvSbg5nCT3=Y6A@mail.gmail.com>
+ <20170420080038.GB6780@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-Cc: dhowells@redhat.com,
-        Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
-        linux-security-module@vger.kernel.org,
-        linux-ima-devel@lists.sourceforge.net, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Claudio Carvalho <cclaudio@linux.vnet.ibm.com>
-To: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Cc: linux-crypto@vger.kernel.org,
+        "akamaluddin@cavium.com" <akamaluddin@cavium.com>,
+        pathreya@cavium.com, mchalla@cavium.com
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:37008 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S946424AbdDTOhl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 20 Apr 2017 10:37:41 -0400
-In-Reply-To: <1492691712.3081.85.camel@linux.vnet.ibm.com>
+Received: from mail-yb0-f173.google.com ([209.85.213.173]:34971 "EHLO
+        mail-yb0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1032745AbdDTOkO (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 20 Apr 2017 10:40:14 -0400
+Received: by mail-yb0-f173.google.com with SMTP id 6so27022618ybq.2
+        for <linux-crypto@vger.kernel.org>; Thu, 20 Apr 2017 07:40:13 -0700 (PDT)
+In-Reply-To: <20170420080038.GB6780@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Mimi Zohar <zohar@linux.vnet.ibm.com> wrote:
+Hi Herbert,
 
-> On Tue, 2017-04-18 at 17:17 -0300, Thiago Jung Bauermann wrote:
-> > IMA will use the module_signature format for append signatures, so export
-> > the relevant definitions and factor out the code which verifies that the
-> > appended signature trailer is valid.
-> > 
-> > Also, create a CONFIG_MODULE_SIG_FORMAT option so that IMA can select it
-> > and be able to use validate_module_signature without having to depend on
-> > CONFIG_MODULE_SIG.
-> 
-> Basically we want to generalize the concept of an appended signature.
->  Referring to it as a "module signature format" seems a bit confusing.
-> 
-> David, would you have a problem with changing the appended string from
-> "~Module signature appended~\n" to something more generic?
+>> > I think we should convert ipcomp over to the new interface first
+>> > in order to make sure that we don't need to change the interface
+>> > which would be hard to do once we export it to user-space.
+>>
+>> Would it be acceptable if we export an algif interface using alg_type_compress,
+>
+> No we're not going to export an obsolete interface.
+>
 
-Conceptually, no.  Is it possible that doing so could break someone's module
-that they load on multiple versions of the kernel?  Say a module that only
-exports things and doesn't use anything from the core or any other module.
+Are there any deficiencies expected in the acomp interface for use
+with ipcomp? One issue mentioned earlier on the lists was that the
+interface might
+require tweaks for piecemeal decompression. Has this been taken up?
 
-Also, it needs to reasonably long and distinct enough to prevent a false
-positive match.
+We identified few issues when using acomp with user-space zlib for file
+compression. If the the interface is tweaked keeping those use-cases
+in mind apart from the existing kernel apps (zswap/ipcomp/zram), the hardware
+algorithms can be utilized using the algif framework.
 
-David
+Thanks
+Abed
+
+
+
+On Thu, Apr 20, 2017 at 1:30 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> On Thu, Apr 20, 2017 at 12:39:58PM +0530, abed mohammad kamaluddin wrote:
+>> Hi Herbert,
+>>
+>> > I think we should convert ipcomp over to the new interface first
+>> > in order to make sure that we don't need to change the interface
+>> > which would be hard to do once we export it to user-space.
+>>
+>> Would it be acceptable if we export an algif interface using alg_type_compress,
+>> which is being used by ipcomp currently? We would like to use our zip
+>> device from
+>> userspace through this interface.
+>
+> No we're not going to export an obsolete interface.
+>
+> Cheers,
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
