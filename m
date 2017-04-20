@@ -1,50 +1,60 @@
-From: Eric Biggers <ebiggers3@gmail.com>
-Subject: [PATCH 2/5] KEYS: DH: don't feed uninitialized "otherinfo" into KDF
-Date: Wed, 19 Apr 2017 22:46:30 -0700
-Message-ID: <20170420054633.14572-3-ebiggers3@gmail.com>
-References: <20170420054633.14572-1-ebiggers3@gmail.com>
+From: abed mohammad kamaluddin <abedamu@gmail.com>
+Subject: Re: [RFC PATCH v1 0/1] *** crypto: AF_ALG: add compression support ***
+Date: Thu, 20 Apr 2017 12:39:58 +0530
+Message-ID: <CACVarEQ9kW=zF+Zse17LA2KjM-dg7mb6d5XWCvSbg5nCT3=Y6A@mail.gmail.com>
+References: <1492108494-10694-1-git-send-email-akamaluddin@cavium.com> <20170414083240.GA26625@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Cc: linux-crypto@vger.kernel.org,
-        Stephan Mueller <smueller@chronox.de>,
-        David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        mathew.j.martineau@linux.intel.com,
-        Eric Biggers <ebiggers@google.com>
-To: keyrings@vger.kernel.org
+        "akamaluddin@cavium.com" <akamaluddin@cavium.com>,
+        pathreya@cavium.com, mchalla@cavium.com
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-oi0-f68.google.com ([209.85.218.68]:33445 "EHLO
-        mail-oi0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S939618AbdDTFsV (ORCPT
+Received: from mail-io0-f171.google.com ([209.85.223.171]:34010 "EHLO
+        mail-io0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S941875AbdDTHKV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 20 Apr 2017 01:48:21 -0400
-In-Reply-To: <20170420054633.14572-1-ebiggers3@gmail.com>
+        Thu, 20 Apr 2017 03:10:21 -0400
+Received: by mail-io0-f171.google.com with SMTP id a103so58811650ioj.1
+        for <linux-crypto@vger.kernel.org>; Thu, 20 Apr 2017 00:10:21 -0700 (PDT)
+In-Reply-To: <20170414083240.GA26625@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Eric Biggers <ebiggers@google.com>
+Hi Herbert,
 
-If userspace called KEYCTL_DH_COMPUTE with kdf_params containing NULL
-otherinfo but nonzero otherinfolen, the kernel would allocate a buffer
-for the otherinfo, then feed it into the KDF without initializing it.
-Fix this by always doing the copy from userspace (which will fail with
-EFAULT in this scenario).
+> I think we should convert ipcomp over to the new interface first
+> in order to make sure that we don't need to change the interface
+> which would be hard to do once we export it to user-space.
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- security/keys/dh.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Would it be acceptable if we export an algif interface using alg_type_compress,
+which is being used by ipcomp currently? We would like to use our zip
+device from
+userspace through this interface.
 
-diff --git a/security/keys/dh.c b/security/keys/dh.c
-index 8abc70ebe22d..1c1cac677041 100644
---- a/security/keys/dh.c
-+++ b/security/keys/dh.c
-@@ -317,7 +317,7 @@ long __keyctl_dh_compute(struct keyctl_dh_params __user *params,
- 	 * Concatenate SP800-56A otherinfo past DH shared secret -- the
- 	 * input to the KDF is (DH shared secret || otherinfo)
- 	 */
--	if (kdfcopy && kdfcopy->otherinfo &&
-+	if (kdfcopy &&
- 	    copy_from_user(kbuf + resultlen, kdfcopy->otherinfo,
- 			   kdfcopy->otherinfolen) != 0) {
- 		ret = -EFAULT;
--- 
-2.12.2
+Thanks
+Abed (Cavium)
+
+
+On Fri, Apr 14, 2017 at 2:02 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> On Fri, Apr 14, 2017 at 12:04:53AM +0530, Abed Kamaluddin wrote:
+>> Hi Herbert,
+>>
+>> This patch adds compression support to the AF_ALG interface exported by the
+>> kernel crypto API. By extending AF_ALG, all compression algorithms of types
+>> scomp and acomp, which the kernel crypto API allows access to, are now also
+>> accessible from userspace.
+>>
+>> The new compression interface has been tested with both kernel software
+>> deflate(scomp) and HW accelerated ThunderX deflate(scomp) using the zpipe
+>> example application provided by zlib.
+>
+> I think we should convert ipcomp over to the new interface first
+> in order to make sure that we don't need to change the interface
+> which would be hard to do once we export it to user-space.
+>
+> Thanks,
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
