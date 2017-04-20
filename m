@@ -1,44 +1,126 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC PATCH v1 0/1] *** crypto: AF_ALG: add compression support
- ***
-Date: Thu, 20 Apr 2017 16:00:38 +0800
-Message-ID: <20170420080038.GB6780@gondor.apana.org.au>
-References: <1492108494-10694-1-git-send-email-akamaluddin@cavium.com>
- <20170414083240.GA26625@gondor.apana.org.au>
- <CACVarEQ9kW=zF+Zse17LA2KjM-dg7mb6d5XWCvSbg5nCT3=Y6A@mail.gmail.com>
+From: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Subject: Re: [PATCH 3/6] ima: Simplify policy_func_show.
+Date: Thu, 20 Apr 2017 08:13:23 -0400
+Message-ID: <1492690403.3081.72.camel@linux.vnet.ibm.com>
+References: <1492546666-16615-1-git-send-email-bauerman@linux.vnet.ibm.com>
+         <1492546666-16615-4-git-send-email-bauerman@linux.vnet.ibm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-        "akamaluddin@cavium.com" <akamaluddin@cavium.com>,
-        pathreya@cavium.com, mchalla@cavium.com
-To: abed mohammad kamaluddin <abedamu@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [198.176.57.175] ([198.176.57.175]:56966 "EHLO
-        deadmen.hmeau.com" rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1764735AbdDTIBn (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 20 Apr 2017 04:01:43 -0400
-Content-Disposition: inline
-In-Reply-To: <CACVarEQ9kW=zF+Zse17LA2KjM-dg7mb6d5XWCvSbg5nCT3=Y6A@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Cc: linux-ima-devel@lists.sourceforge.net, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Claudio Carvalho <cclaudio@linux.vnet.ibm.com>
+To: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
+        linux-security-module@vger.kernel.org
+Return-path: <linux-security-module-owner@vger.kernel.org>
+In-Reply-To: <1492546666-16615-4-git-send-email-bauerman@linux.vnet.ibm.com>
+Sender: owner-linux-security-module@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Apr 20, 2017 at 12:39:58PM +0530, abed mohammad kamaluddin wrote:
-> Hi Herbert,
+On Tue, 2017-04-18 at 17:17 -0300, Thiago Jung Bauermann wrote:
+> If the func_tokens array uses the same indices as enum ima_hooks,
+> policy_func_show can be a lot simpler, and the func_* enum becomes
+> unnecessary.
+
+My main concern with separating the enumeration from the string
+definition is that they might become out of sync.  Perhaps using
+macros, similar to those used for kernel_read_file_id_str(), would be
+better?
+
+> Signed-off-by: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
+> ---
+>  security/integrity/ima/ima_policy.c | 47 ++++++-------------------------------
+>  1 file changed, 7 insertions(+), 40 deletions(-)
 > 
-> > I think we should convert ipcomp over to the new interface first
-> > in order to make sure that we don't need to change the interface
-> > which would be hard to do once we export it to user-space.
+> diff --git a/security/integrity/ima/ima_policy.c b/security/integrity/ima/ima_policy.c
+> index cfda5d7b17ec..158eafef64e8 100644
+> --- a/security/integrity/ima/ima_policy.c
+> +++ b/security/integrity/ima/ima_policy.c
+> @@ -896,20 +896,14 @@ static const char *const mask_tokens[] = {
+>  	"MAY_APPEND"
+>  };
 > 
-> Would it be acceptable if we export an algif interface using alg_type_compress,
-> which is being used by ipcomp currently? We would like to use our zip
-> device from
-> userspace through this interface.
+> -enum {
+> -	func_file = 0, func_mmap, func_bprm,
+> -	func_module, func_firmware, func_post,
+> -	func_kexec_kernel, func_kexec_initramfs,
+> -	func_policy
+> -};
+> -
 
-No we're not going to export an obsolete interface.
+At least, add a comment here and near the ima_hooks enumeration to
+prevent them from becoming out of sync.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Mimi
+
+>  static const char *const func_tokens[] = {
+> +	NULL,
+>  	"FILE_CHECK",
+>  	"MMAP_CHECK",
+>  	"BPRM_CHECK",
+> +	"POST_SETATTR",
+>  	"MODULE_CHECK",
+>  	"FIRMWARE_CHECK",
+> -	"POST_SETATTR",
+>  	"KEXEC_KERNEL_CHECK",
+>  	"KEXEC_INITRAMFS_CHECK",
+>  	"POLICY_CHECK"
+> @@ -949,48 +943,21 @@ void ima_policy_stop(struct seq_file *m, void *v)
+> 
+>  #define pt(token)	policy_tokens[token + Opt_err].pattern
+>  #define mt(token)	mask_tokens[token]
+> -#define ft(token)	func_tokens[token]
+> 
+>  /*
+>   * policy_func_show - display the ima_hooks policy rule
+>   */
+>  static void policy_func_show(struct seq_file *m, enum ima_hooks func)
+>  {
+> -	char tbuf[64] = {0,};
+> +	if (func > 0 && func < MAX_CHECK)
+> +		seq_printf(m, pt(Opt_func), func_tokens[func]);
+> +	else {
+> +		char tbuf[64] = {0,};
+> 
+> -	switch (func) {
+> -	case FILE_CHECK:
+> -		seq_printf(m, pt(Opt_func), ft(func_file));
+> -		break;
+> -	case MMAP_CHECK:
+> -		seq_printf(m, pt(Opt_func), ft(func_mmap));
+> -		break;
+> -	case BPRM_CHECK:
+> -		seq_printf(m, pt(Opt_func), ft(func_bprm));
+> -		break;
+> -	case MODULE_CHECK:
+> -		seq_printf(m, pt(Opt_func), ft(func_module));
+> -		break;
+> -	case FIRMWARE_CHECK:
+> -		seq_printf(m, pt(Opt_func), ft(func_firmware));
+> -		break;
+> -	case POST_SETATTR:
+> -		seq_printf(m, pt(Opt_func), ft(func_post));
+> -		break;
+> -	case KEXEC_KERNEL_CHECK:
+> -		seq_printf(m, pt(Opt_func), ft(func_kexec_kernel));
+> -		break;
+> -	case KEXEC_INITRAMFS_CHECK:
+> -		seq_printf(m, pt(Opt_func), ft(func_kexec_initramfs));
+> -		break;
+> -	case POLICY_CHECK:
+> -		seq_printf(m, pt(Opt_func), ft(func_policy));
+> -		break;
+> -	default:
+>  		snprintf(tbuf, sizeof(tbuf), "%d", func);
+>  		seq_printf(m, pt(Opt_func), tbuf);
+> -		break;
+>  	}
+> +
+>  	seq_puts(m, " ");
+>  }
+> 
+
