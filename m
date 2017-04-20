@@ -1,56 +1,42 @@
-From: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
-Subject: Re: [PATCH 5/6] MODSIGN: Export module signature definitions.
-Date: Thu, 20 Apr 2017 18:07:15 -0300
-Message-ID: <1544111.Uq9hhXcF4r@morokweng>
-References: <1492691712.3081.85.camel@linux.vnet.ibm.com> <1492546666-16615-6-git-send-email-bauerman@linux.vnet.ibm.com> <21102.1492699057@warthog.procyon.org.uk>
+From: Gary R Hook <ghook@amd.com>
+Subject: Re: [PATCH V3 1/2] crypto: ccp - Use only the relevant interrupt bits
+Date: Thu, 20 Apr 2017 16:25:28 -0500
+Message-ID: <f7dbfe96-02d1-e8f0-9316-00c87ad69283@amd.com>
+References: <20170420202004.4792.47388.stgit@taos.amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        linux-security-module@vger.kernel.org,
-        linux-ima-devel@lists.sourceforge.net, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Claudio Carvalho <cclaudio@linux.vnet.ibm.com>
-To: David Howells <dhowells@redhat.com>
-Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <21102.1492699057@warthog.procyon.org.uk>
-Sender: owner-linux-security-module@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: "Hook, Gary" <Gary.Hook@amd.com>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>
+To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-cys01nam02on0088.outbound.protection.outlook.com ([104.47.37.88]:22848
+        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1033520AbdDTVZl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 20 Apr 2017 17:25:41 -0400
+In-Reply-To: <20170420202004.4792.47388.stgit@taos.amd.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Am Donnerstag, 20. April 2017, 15:37:37 BRT schrieb David Howells:
-> Mimi Zohar <zohar@linux.vnet.ibm.com> wrote:
-> > On Tue, 2017-04-18 at 17:17 -0300, Thiago Jung Bauermann wrote:
-> > > IMA will use the module_signature format for append signatures, so
-> > > export
-> > > the relevant definitions and factor out the code which verifies that the
-> > > appended signature trailer is valid.
-> > > 
-> > > Also, create a CONFIG_MODULE_SIG_FORMAT option so that IMA can select it
-> > > and be able to use validate_module_signature without having to depend on
-> > > CONFIG_MODULE_SIG.
-> > 
-> > Basically we want to generalize the concept of an appended signature.
-> >  Referring to it as a "module signature format" seems a bit confusing.
-> > 
-> > David, would you have a problem with changing the appended string from
-> > "~Module signature appended~\n" to something more generic?
-> 
-> Conceptually, no.  Is it possible that doing so could break someone's module
-> that they load on multiple versions of the kernel?  Say a module that only
-> exports things and doesn't use anything from the core or any other module.
+On 04/20/2017 03:20 PM, Hook, Gary wrote:
+> Each CCP queue can product interrupts for 4 conditions:
+> operation complete, queue empty, error, and queue stopped.
+> This driver only works with completion and error events.
 
-I think that changing the appended string has limited value because very few 
-people actually see them. It's just a marker. We could s/module_signature/
-appended_signature/ in the code but keep the actual string unchanged. What do 
-you think?
 
-Alternatively, we could change the string but accept both the old and the new 
-string for backwards compatibility.
+Apologies for this errant submission. Please ignore one of these (V3 1/2);
+the proper pair, with cover letter, is right behind this one.
 
--- 
-Thiago Jung Bauermann
-IBM Linux Technology Center
+Not that there's anything wrong with this one, only that it
+went out without a cover letter.
 
+...and now I see that there's a typo. Dang it.
+
+>
+> Cc: <stable@vger.kernel.org> # 4.9.x-
+>
+> Signed-off-by: Gary R Hook <gary.hook@amd.com>
+> ---
