@@ -1,50 +1,100 @@
-From: Gary R Hook <gary.hook@amd.com>
-Subject: [PATCH V3 2/2] crypto: ccp - Disable interrupts early on unload
-Date: Thu, 20 Apr 2017 15:24:22 -0500
-Message-ID: <20170420202422.4843.38323.stgit@taos.amd.com>
-References: <20170420202030.4843.76826.stgit@taos.amd.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>
-To: <linux-crypto@vger.kernel.org>
+From: Megha Dey <megha.dey@linux.intel.com>
+Subject: [Patch V5 0/7] crypto: AES CBC multibuffer implementation
+Date: Thu, 20 Apr 2017 13:50:33 -0700
+Message-ID: <1492721440-3698-1-git-send-email-megha.dey@linux.intel.com>
+Cc: tim.c.chen@linux.intel.com, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        megha.dey@intel.com, Megha Dey <megha.dey@linux.intel.com>
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-sn1nam02on0060.outbound.protection.outlook.com ([104.47.36.60]:55648
-        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1033664AbdDTUYk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 20 Apr 2017 16:24:40 -0400
-In-Reply-To: <20170420202030.4843.76826.stgit@taos.amd.com>
+Received: from mga09.intel.com ([134.134.136.24]:36277 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S943214AbdDTUkK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 20 Apr 2017 16:40:10 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Gary R Hook <ghook@amd.com>
+In this patch series, we introduce AES CBC encryption that is parallelized on
+x86_64 cpu with XMM registers. The multi-buffer technique encrypt 8 data
+streams in parallel with SIMD instructions. Decryption is handled as in the
+existing AESNI Intel CBC implementation which can already parallelize decryption
+even for a single data stream.
 
-Ensure that we disable interrupts first when shutting down
-the driver.
+Please see the multi-buffer whitepaper for details of the technique:
+http://www.intel.com/content/www/us/en/communications/communications-ia-multi-buffer-paper.html
 
-Cc: <stable@vger.kernel.org> # 4.9.x+
+It is important that any driver uses this algorithm properly for scenarios
+where we have many data streams that can fill up the data lanes most of the
+time. It shouldn't be used when only a single data stream is expected mostly.
+Otherwise we may incur extra delays when we have frequent gaps in data lanes,
+causing us to wait till data come in to fill the data lanes before initiating
+encryption.  We may have to wait for flush operations to commence when no new
+data come in after some wait time. However we keep this extra delay to a
+minimum by opportunistically flushing the unfinished jobs if crypto daemon is
+the only active task running on a cpu.
 
-Signed-off-by: Gary R Hook <ghook@amd.com>
----
- drivers/crypto/ccp/ccp-dev-v5.c |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+By using this technique, we saw a throughput increase of up to 5.7x under
+optimal conditions when we have fully loaded encryption jobs filling up all
+the data lanes.
 
-diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
-index c7972e733e43..13b81a1c1184 100644
---- a/drivers/crypto/ccp/ccp-dev-v5.c
-+++ b/drivers/crypto/ccp/ccp-dev-v5.c
-@@ -942,10 +942,10 @@ static void ccp5_destroy(struct ccp_device *ccp)
- 		iowrite32(cmd_q->qcontrol & ~CMD5_Q_RUN, cmd_q->reg_control);
- 
- 		/* Disable the interrupts */
--		iowrite32(SUPPORTED_INTERRUPTS, cmd_q->reg_interrupt_status);
-+		iowrite32(0x00, cmd_q->reg_int_enable);
- 
- 		/* Clear the interrupt status */
--		iowrite32(0x00, cmd_q->reg_int_enable);
-+		iowrite32(SUPPORTED_INTERRUPTS, cmd_q->reg_interrupt_status);
- 		ioread32(cmd_q->reg_int_status);
- 		ioread32(cmd_q->reg_status);
- 	}
+Change Log:
+
+v5
+1. Use an async implementation of the inner algorithm instead of sync and use
+the latest skcipher interface instead of the older blkcipher interface.
+(we have picked up this work after a while)
+
+v4
+1. Make the decrypt path also use ablkcpher walk.
+http://lkml.iu.edu/hypermail/linux/kernel/1512.0/01807.html
+
+v3
+1. Use ablkcipher_walk helpers to walk the scatter gather list
+and eliminated needs to modify blkcipher_walk for multibuffer cipher
+
+v2
+1. Update cpu feature check to make sure SSE is supported
+2. Fix up unloading of aes-cbc-mb module to properly free memory
+
+Megha Dey (7):
+  crypto: Multi-buffer encryption infrastructure support
+  crypto: AES CBC multi-buffer data structures
+  crypto: AES CBC multi-buffer scheduler
+  crypto: AES CBC by8 encryption
+  crypto: AES CBC multi-buffer glue code
+  crypto: AES vectors for AES CBC multibuffer testing
+  crypto: AES CBC multi-buffer tcrypt
+
+ arch/x86/crypto/Makefile                           |    1 +
+ arch/x86/crypto/aes-cbc-mb/Makefile                |   22 +
+ arch/x86/crypto/aes-cbc-mb/aes_cbc_enc_x8.S        |  775 ++++++++++
+ arch/x86/crypto/aes-cbc-mb/aes_cbc_mb.c            |  737 ++++++++++
+ arch/x86/crypto/aes-cbc-mb/aes_cbc_mb_ctx.h        |   97 ++
+ arch/x86/crypto/aes-cbc-mb/aes_cbc_mb_mgr.h        |  132 ++
+ arch/x86/crypto/aes-cbc-mb/aes_mb_mgr_init.c       |  146 ++
+ arch/x86/crypto/aes-cbc-mb/mb_mgr_datastruct.S     |  271 ++++
+ arch/x86/crypto/aes-cbc-mb/mb_mgr_inorder_x8_asm.S |  223 +++
+ arch/x86/crypto/aes-cbc-mb/mb_mgr_ooo_x8_asm.S     |  417 ++++++
+ arch/x86/crypto/aes-cbc-mb/reg_sizes.S             |  126 ++
+ crypto/Kconfig                                     |   15 +
+ crypto/mcryptd.c                                   |  298 ++++
+ crypto/simd.c                                      |  164 +++
+ crypto/tcrypt.c                                    |  257 +++-
+ crypto/testmgr.c                                   |  707 +++++++++
+ crypto/testmgr.h                                   | 1496 ++++++++++++++++++++
+ include/crypto/internal/simd.h                     |    3 +
+ include/crypto/mcryptd.h                           |   35 +
+ 19 files changed, 5921 insertions(+), 1 deletion(-)
+ create mode 100644 arch/x86/crypto/aes-cbc-mb/Makefile
+ create mode 100644 arch/x86/crypto/aes-cbc-mb/aes_cbc_enc_x8.S
+ create mode 100644 arch/x86/crypto/aes-cbc-mb/aes_cbc_mb.c
+ create mode 100644 arch/x86/crypto/aes-cbc-mb/aes_cbc_mb_ctx.h
+ create mode 100644 arch/x86/crypto/aes-cbc-mb/aes_cbc_mb_mgr.h
+ create mode 100644 arch/x86/crypto/aes-cbc-mb/aes_mb_mgr_init.c
+ create mode 100644 arch/x86/crypto/aes-cbc-mb/mb_mgr_datastruct.S
+ create mode 100644 arch/x86/crypto/aes-cbc-mb/mb_mgr_inorder_x8_asm.S
+ create mode 100644 arch/x86/crypto/aes-cbc-mb/mb_mgr_ooo_x8_asm.S
+ create mode 100644 arch/x86/crypto/aes-cbc-mb/reg_sizes.S
+
+-- 
+1.9.1
