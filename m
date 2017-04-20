@@ -1,7 +1,7 @@
 From: Eric Biggers <ebiggers3@gmail.com>
-Subject: [PATCH 3/5] KEYS: DH: don't feed uninitialized result memory into KDF
-Date: Wed, 19 Apr 2017 22:46:31 -0700
-Message-ID: <20170420054633.14572-4-ebiggers3@gmail.com>
+Subject: [PATCH 2/5] KEYS: DH: don't feed uninitialized "otherinfo" into KDF
+Date: Wed, 19 Apr 2017 22:46:30 -0700
+Message-ID: <20170420054633.14572-3-ebiggers3@gmail.com>
 References: <20170420054633.14572-1-ebiggers3@gmail.com>
 Cc: linux-crypto@vger.kernel.org,
         Stephan Mueller <smueller@chronox.de>,
@@ -11,66 +11,40 @@ Cc: linux-crypto@vger.kernel.org,
         Eric Biggers <ebiggers@google.com>
 To: keyrings@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-oi0-f66.google.com ([209.85.218.66]:33455 "EHLO
-        mail-oi0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S938756AbdDTFsW (ORCPT
+Received: from mail-oi0-f68.google.com ([209.85.218.68]:33445 "EHLO
+        mail-oi0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S939618AbdDTFsV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 20 Apr 2017 01:48:22 -0400
+        Thu, 20 Apr 2017 01:48:21 -0400
 In-Reply-To: <20170420054633.14572-1-ebiggers3@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 From: Eric Biggers <ebiggers@google.com>
 
-The result of the Diffie-Hellman computation may be shorter than the
-input prime number.  Only calculate the KDF over the actual result;
-don't include additional uninitialized memory.
+If userspace called KEYCTL_DH_COMPUTE with kdf_params containing NULL
+otherinfo but nonzero otherinfolen, the kernel would allocate a buffer
+for the otherinfo, then feed it into the KDF without initializing it.
+Fix this by always doing the copy from userspace (which will fail with
+EFAULT in this scenario).
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- security/keys/dh.c | 22 ++++++++++------------
- 1 file changed, 10 insertions(+), 12 deletions(-)
+ security/keys/dh.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/security/keys/dh.c b/security/keys/dh.c
-index 1c1cac677041..a3a8607107f5 100644
+index 8abc70ebe22d..1c1cac677041 100644
 --- a/security/keys/dh.c
 +++ b/security/keys/dh.c
-@@ -313,17 +313,6 @@ long __keyctl_dh_compute(struct keyctl_dh_params __user *params,
- 		goto error4;
- 	}
- 
--	/*
--	 * Concatenate SP800-56A otherinfo past DH shared secret -- the
--	 * input to the KDF is (DH shared secret || otherinfo)
--	 */
--	if (kdfcopy &&
--	    copy_from_user(kbuf + resultlen, kdfcopy->otherinfo,
--			   kdfcopy->otherinfolen) != 0) {
--		ret = -EFAULT;
--		goto error5;
--	}
--
- 	ret = do_dh(result, base, private, prime);
- 	if (ret)
- 		goto error5;
-@@ -333,8 +322,17 @@ long __keyctl_dh_compute(struct keyctl_dh_params __user *params,
- 		goto error5;
- 
- 	if (kdfcopy) {
-+		/*
-+		 * Concatenate SP800-56A otherinfo past DH shared secret -- the
-+		 * input to the KDF is (DH shared secret || otherinfo)
-+		 */
-+		if (copy_from_user(kbuf + nbytes, kdfcopy->otherinfo,
-+				   kdfcopy->otherinfolen) != 0) {
-+			ret = -EFAULT;
-+			goto error5;
-+		}
- 		ret = keyctl_dh_compute_kdf(sdesc, buffer, buflen, kbuf,
--					    resultlen + kdfcopy->otherinfolen);
-+					    nbytes + kdfcopy->otherinfolen);
- 	} else {
- 		ret = nbytes;
- 		if (copy_to_user(buffer, kbuf, nbytes) != 0)
+@@ -317,7 +317,7 @@ long __keyctl_dh_compute(struct keyctl_dh_params __user *params,
+ 	 * Concatenate SP800-56A otherinfo past DH shared secret -- the
+ 	 * input to the KDF is (DH shared secret || otherinfo)
+ 	 */
+-	if (kdfcopy && kdfcopy->otherinfo &&
++	if (kdfcopy &&
+ 	    copy_from_user(kbuf + resultlen, kdfcopy->otherinfo,
+ 			   kdfcopy->otherinfolen) != 0) {
+ 		ret = -EFAULT;
 -- 
 2.12.2
