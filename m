@@ -1,54 +1,51 @@
-From: Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>
-Subject: Re: [PATCH v2 0/9] staging: ccree: add Arm TrustZone CryptoCell REE
- driver
-Date: Thu, 20 Apr 2017 15:30:52 +0200
-Message-ID: <20170420133052.GA8998@kroah.com>
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH v2 1/9] staging: ccree: introduce CryptoCell HW driver
+Date: Thu, 20 Apr 2017 15:33:08 +0200
+Message-ID: <20170420133308.GB8998@kroah.com>
 References: <1492693983-8175-1-git-send-email-gilad@benyossef.com>
+ <1492693983-8175-2-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-        "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
-        devel-gWbeCf7V1WCQmaza687I9mD2FQJk+8+b@public.gmane.org, Binoy Jayan <binoy.jayan-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
-        devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, gilad.benyossef-5wv7dgnIgG8@public.gmane.org,
-        linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        Stuart Yoder <stuart.yoder-5wv7dgnIgG8@public.gmane.org>,
-        Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>
-To: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Mark Rutland <mark.rutland@arm.com>, devel@driverdev.osuosl.org,
+ Herbert Xu <herbert@gondor.apana.org.au>, Binoy Jayan <binoy.jayan@linaro.org>,
+ gilad.benyossef@arm.com, linux-kernel@vger.kernel.org,
+ devicetree@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
+ linux-crypto@vger.kernel.org, Ofir Drang <ofir.drang@arm.com>,
+ "David S. Miller" <davem@davemloft.net>, Stuart Yoder <stuart.yoder@arm.com>
+To: Gilad Ben-Yossef <gilad@benyossef.com>
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
 Content-Disposition: inline
-In-Reply-To: <1492693983-8175-1-git-send-email-gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+In-Reply-To: <1492693983-8175-2-git-send-email-gilad@benyossef.com>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Apr 20, 2017 at 04:12:54PM +0300, Gilad Ben-Yossef wrote:
-> Arm TrustZone CryptoCell 700 is a family of cryptographic hardware
-> accelerators. It is supported by a long lived series of out of tree
-> drivers, which I am now in the process of unifying and upstreaming.
-> This is the first drop, supporting the new CryptoCell 712 REE.
-> 
-> The code still needs some cleanup before maturing to a proper
-> upstream driver, which I am in the process of doing. However,
-> as discussion of some of the capabilities of the hardware and
-> its application to some dm-crypt and dm-verity features recently
-> took place I though it is better to do this in the open via the
-> staging tree.
-> 
-> A Git repository based off of Linux 4.11-rc7 is also available at
-> https://github.com/gby/linux.git branch ccree_v2 for those inclined.
+On Thu, Apr 20, 2017 at 04:12:55PM +0300, Gilad Ben-Yossef wrote:
+> +++ b/drivers/staging/ccree/bsp.h
+> @@ -0,0 +1,21 @@
+> +/*
+> + * Copyright (C) 2012-2016 ARM Limited or its affiliates.
+> + * 
+> + * This program is free software; you can redistribute it and/or modify it
+> + * under the terms of the GNU General Public License as published by the Free
+> + * Software Foundation; either version 2 of the License, or (at your option)
+> + * any later version.
 
-If you want this in staging, I'll be glad to take it, but note then you
-can't work off of an external repo, as syncing the two is almost
-impossible and more work than you want to go through.
+Oh, I have to ask, do you really mean "any later version" here and
+elsewhere?
 
-So, as long as this builds properly, want me to queue these up in my
-tree?
+If so, then your MODULE_LICENSE() marking is wrong, please fix that up,
+or fix up the license text, I can't take incompatible ones without
+getting angry emails from legal people sent to me...
 
 thanks,
 
 greg k-h
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
