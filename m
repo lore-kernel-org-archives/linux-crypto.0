@@ -1,73 +1,88 @@
-From: kbuild test robot <lkp-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH v2 5/9] staging: ccree: add AEAD support
-Date: Fri, 21 Apr 2017 02:57:53 +0800
-Message-ID: <201704210221.n1RK8DTY%fengguang.wu@intel.com>
-References: <1492693983-8175-6-git-send-email-gilad@benyossef.com>
+From: Gary R Hook <gary.hook@amd.com>
+Subject: [PATCH V3 1/2] crypto: ccp - Use only the relevant interrupt bits
+Date: Thu, 20 Apr 2017 15:20:04 -0500
+Message-ID: <20170420202004.4792.47388.stgit@taos.amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: kbuild-all-JC7UmRfGjtg@public.gmane.org, Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-        "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
-        Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>,
-        devel-gWbeCf7V1WCQmaza687I9mD2FQJk+8+b@public.gmane.org, Binoy Jayan <binoy.jayan-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
-        devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, gilad.benyossef-5wv7dgnIgG8@public.gmane.org,
-        linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        Stuart Yoder <stuart.yoder-5wv7dgnIgG8@public.gmane.org>,
-        Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>
-To: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <1492693983-8175-6-git-send-email-gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>
+To: <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-bn3nam01on0046.outbound.protection.outlook.com ([104.47.33.46]:2848
+        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1033578AbdDTUUL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 20 Apr 2017 16:20:11 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Gilad,
+Each CCP queue can product interrupts for 4 conditions:
+operation complete, queue empty, error, and queue stopped.
+This driver only works with completion and error events.
 
-[auto build test WARNING on linus/master]
-[also build test WARNING on v4.11-rc7]
-[cannot apply to staging/staging-testing next-20170420]
-[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
+Cc: <stable@vger.kernel.org> # 4.9.x-
 
-url:    https://github.com/0day-ci/linux/commits/Gilad-Ben-Yossef/staging-ccree-add-Arm-TrustZone-CryptoCell-REE-driver/20170420-222023
-
-
-coccinelle warnings: (new ones prefixed by >>)
-
->> drivers/staging/ccree/ssi_buffer_mgr.c:758:2-4: ERROR: test of a variable/field address
-
-vim +758 drivers/staging/ccree/ssi_buffer_mgr.c
-
-   742		
-   743			if (areq_ctx->gcm_iv_inc2_dma_addr != 0) {
-   744				SSI_RESTORE_DMA_ADDR_TO_48BIT(areq_ctx->gcm_iv_inc2_dma_addr);
-   745				dma_unmap_single(dev, areq_ctx->gcm_iv_inc2_dma_addr, 
-   746					AES_BLOCK_SIZE, DMA_TO_DEVICE);
-   747			}
-   748		}
-   749	#endif
-   750	
-   751		if (areq_ctx->ccm_hdr_size != ccm_header_size_null) {
-   752			if (areq_ctx->ccm_iv0_dma_addr != 0) {
-   753				SSI_RESTORE_DMA_ADDR_TO_48BIT(areq_ctx->ccm_iv0_dma_addr);
-   754				dma_unmap_single(dev, areq_ctx->ccm_iv0_dma_addr, 
-   755					AES_BLOCK_SIZE, DMA_TO_DEVICE);
-   756			}
-   757	
- > 758			if (&areq_ctx->ccm_adata_sg != NULL)
-   759				dma_unmap_sg(dev, &areq_ctx->ccm_adata_sg,
-   760					1, DMA_TO_DEVICE);
-   761		}
-   762		if (areq_ctx->gen_ctx.iv_dma_addr != 0) {
-   763			SSI_RESTORE_DMA_ADDR_TO_48BIT(areq_ctx->gen_ctx.iv_dma_addr);
-   764			dma_unmap_single(dev, areq_ctx->gen_ctx.iv_dma_addr,
-   765					 hw_iv_size, DMA_BIDIRECTIONAL);
-   766		}
-
+Signed-off-by: Gary R Hook <gary.hook@amd.com>
 ---
-0-DAY kernel test infrastructure                Open Source Technology Center
-https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+ drivers/crypto/ccp/ccp-dev-v5.c |    9 +++++----
+ drivers/crypto/ccp/ccp-dev.h    |    5 ++---
+ 2 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
+index e03d06a54d4e..c7972e733e43 100644
+--- a/drivers/crypto/ccp/ccp-dev-v5.c
++++ b/drivers/crypto/ccp/ccp-dev-v5.c
+@@ -801,7 +801,7 @@ static int ccp5_init(struct ccp_device *ccp)
+ 		ioread32(cmd_q->reg_status);
+ 
+ 		/* Clear the interrupts */
+-		iowrite32(ALL_INTERRUPTS, cmd_q->reg_interrupt_status);
++		iowrite32(SUPPORTED_INTERRUPTS, cmd_q->reg_interrupt_status);
+ 	}
+ 
+ 	dev_dbg(dev, "Requesting an IRQ...\n");
+@@ -882,7 +882,7 @@ static int ccp5_init(struct ccp_device *ccp)
+ 	/* Enable interrupts */
+ 	for (i = 0; i < ccp->cmd_q_count; i++) {
+ 		cmd_q = &ccp->cmd_q[i];
+-		iowrite32(ALL_INTERRUPTS, cmd_q->reg_int_enable);
++		iowrite32(SUPPORTED_INTERRUPTS, cmd_q->reg_int_enable);
+ 	}
+ 
+ 	dev_dbg(dev, "Registering device...\n");
+@@ -942,7 +942,7 @@ static void ccp5_destroy(struct ccp_device *ccp)
+ 		iowrite32(cmd_q->qcontrol & ~CMD5_Q_RUN, cmd_q->reg_control);
+ 
+ 		/* Disable the interrupts */
+-		iowrite32(ALL_INTERRUPTS, cmd_q->reg_interrupt_status);
++		iowrite32(SUPPORTED_INTERRUPTS, cmd_q->reg_interrupt_status);
+ 
+ 		/* Clear the interrupt status */
+ 		iowrite32(0x00, cmd_q->reg_int_enable);
+@@ -1002,7 +1002,8 @@ static irqreturn_t ccp5_irq_handler(int irq, void *data)
+ 			cmd_q->int_rcvd = 1;
+ 
+ 			/* Acknowledge the interrupt and wake the kthread */
+-			iowrite32(ALL_INTERRUPTS, cmd_q->reg_interrupt_status);
++			iowrite32(SUPPORTED_INTERRUPTS,
++				  cmd_q->reg_interrupt_status);
+ 			wake_up_interruptible(&cmd_q->int_queue);
+ 		}
+ 	}
+diff --git a/drivers/crypto/ccp/ccp-dev.h b/drivers/crypto/ccp/ccp-dev.h
+index 191274d41036..2dfec019a832 100644
+--- a/drivers/crypto/ccp/ccp-dev.h
++++ b/drivers/crypto/ccp/ccp-dev.h
+@@ -109,9 +109,8 @@
+ #define INT_COMPLETION			0x1
+ #define INT_ERROR			0x2
+ #define INT_QUEUE_STOPPED		0x4
+-#define ALL_INTERRUPTS			(INT_COMPLETION| \
+-					 INT_ERROR| \
+-					 INT_QUEUE_STOPPED)
++#define	INT_EMPTY_QUEUE			0x8
++#define SUPPORTED_INTERRUPTS		(INT_COMPLETION | INT_ERROR)
+ 
+ #define LSB_REGION_WIDTH		5
+ #define MAX_LSB_CNT			8
