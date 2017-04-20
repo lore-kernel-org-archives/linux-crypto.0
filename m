@@ -1,886 +1,651 @@
 From: Megha Dey <megha.dey@linux.intel.com>
-Subject: [Patch V5 3/7] crypto: AES CBC multi-buffer scheduler
-Date: Thu, 20 Apr 2017 13:50:36 -0700
-Message-ID: <1492721440-3698-4-git-send-email-megha.dey@linux.intel.com>
+Subject: [Patch V5 1/7] crypto: Multi-buffer encryption infrastructure support
+Date: Thu, 20 Apr 2017 13:50:34 -0700
+Message-ID: <1492721440-3698-2-git-send-email-megha.dey@linux.intel.com>
 References: <1492721440-3698-1-git-send-email-megha.dey@linux.intel.com>
 Cc: tim.c.chen@linux.intel.com, davem@davemloft.net,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         megha.dey@intel.com, Megha Dey <megha.dey@linux.intel.com>
 To: herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:38411 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S971447AbdDTUkO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 20 Apr 2017 16:40:14 -0400
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1492721440-3698-1-git-send-email-megha.dey@linux.intel.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-This patch implements in-order scheduler for encrypting multiple buffers
-in parallel supporting AES CBC encryption with key sizes of
-128, 192 and 256 bits. It uses 8 data lanes by taking advantage of the
-SIMD instructions with XMM registers.
+In this patch, the infrastructure needed to support multibuffer
+encryption implementation is added:
 
-The multibuffer manager and scheduler is mostly written in assembly and
-the initialization support is written C. The AES CBC multibuffer crypto
-driver support interfaces with the multibuffer manager and scheduler
-to support AES CBC encryption in parallel. The scheduler supports
-job submissions, job flushing and and job retrievals after completion.
+a) Enhance mcryptd daemon to support skcipher requests.
 
-The basic flow of usage of the CBC multibuffer scheduler is as follows:
+b) Add multi-buffer simd skcipher helper which presents the
+   top-level algorithm as an skcipher.
 
-- The caller allocates an aes_cbc_mb_mgr_inorder_x8 object
-and initializes it once by calling aes_cbc_init_mb_mgr_inorder_x8().
+b) Update configuration to include multi-buffer encryption build
+support.
 
-- The aes_cbc_mb_mgr_inorder_x8 structure has an array of JOB_AES
-objects. Allocation and scheduling of JOB_AES objects are managed
-by the multibuffer scheduler support routines. The caller allocates
-a JOB_AES using aes_cbc_get_next_job_inorder_x8().
-
-- The returned JOB_AES must be filled in with parameters for CBC
-encryption (eg: plaintext buffer, ciphertext buffer, key, iv, etc) and
-submitted to the manager object using aes_cbc_submit_job_inorder_xx().
-
-- If the oldest JOB_AES is completed during a call to
-aes_cbc_submit_job_inorder_x8(), it is returned. Otherwise,
-NULL is returned.
-
-- A call to aes_cbc_flush_job_inorder_x8() always returns the
-oldest job, unless the multibuffer manager is empty of jobs.
-
-- A call to aes_cbc_get_completed_job_inorder_x8() returns
-a completed job. This routine is useful to process completed
-jobs instead of waiting for the flusher to engage.
-
-- When a job is returned from submit or flush, the caller extracts
-the useful data and returns it to the multibuffer manager implicitly
-by the next call to aes_cbc_get_next_job_xx().
-
-Jobs are always returned from submit or flush routines in the order they
-were submitted (hence "inorder").A job allocated using
-aes_cbc_get_next_job_inorder_x8() must be filled in and submitted before
-another call. A job returned by aes_cbc_submit_job_inorder_x8() or
-aes_cbc_flush_job_inorder_x8() is 'deallocated' upon the next call to
-get a job structure. Calls to get_next_job() cannot fail. If all jobs
-are
-allocated after a call to get_next_job(), the subsequent call to submit
-always returns the oldest job in a completed state.
+For an introduction to the multi-buffer implementation, please see
+http://www.intel.com/content/www/us/en/communications/communications-ia-multi-buffer-paper.html
 
 Originally-by: Chandramouli Narayanan <mouli_7982@yahoo.com>
 Signed-off-by: Megha Dey <megha.dey@linux.intel.com>
 Acked-by: Tim Chen <tim.c.chen@linux.intel.com>
 ---
- arch/x86/crypto/aes-cbc-mb/aes_mb_mgr_init.c       | 146 ++++++++
- arch/x86/crypto/aes-cbc-mb/mb_mgr_inorder_x8_asm.S | 223 +++++++++++
- arch/x86/crypto/aes-cbc-mb/mb_mgr_ooo_x8_asm.S     | 417 +++++++++++++++++++++
- 3 files changed, 786 insertions(+)
- create mode 100644 arch/x86/crypto/aes-cbc-mb/aes_mb_mgr_init.c
- create mode 100644 arch/x86/crypto/aes-cbc-mb/mb_mgr_inorder_x8_asm.S
- create mode 100644 arch/x86/crypto/aes-cbc-mb/mb_mgr_ooo_x8_asm.S
+ crypto/Kconfig                 |  15 +++
+ crypto/mcryptd.c               | 298 +++++++++++++++++++++++++++++++++++++++++
+ crypto/simd.c                  | 164 +++++++++++++++++++++++
+ include/crypto/internal/simd.h |   3 +
+ include/crypto/mcryptd.h       |  35 +++++
+ 5 files changed, 515 insertions(+)
 
-diff --git a/arch/x86/crypto/aes-cbc-mb/aes_mb_mgr_init.c b/arch/x86/crypto/aes-cbc-mb/aes_mb_mgr_init.c
-new file mode 100644
-index 0000000..2a2ce6c
---- /dev/null
-+++ b/arch/x86/crypto/aes-cbc-mb/aes_mb_mgr_init.c
-@@ -0,0 +1,146 @@
-+/*
-+ * Initialization code for multi buffer AES CBC algorithm
-+ *
-+ *
-+ * This file is provided under a dual BSD/GPLv2 license.  When using or
-+ * redistributing this file, you may do so under either license.
-+ *
-+ * GPL LICENSE SUMMARY
-+ *
-+ * Copyright(c) 2016 Intel Corporation.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of version 2 of the GNU General Public License as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful, but
-+ * WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * General Public License for more details.
-+ *
-+ * Contact Information:
-+ * James Guilford <james.guilford@intel.com>
-+ * Sean Gulley <sean.m.gulley@intel.com>
-+ * Tim Chen <tim.c.chen@linux.intel.com>
-+ * Megha Dey <megha.dey@linux.intel.com>
-+ *
-+ * BSD LICENSE
-+ *
-+ * Copyright(c) 2016 Intel Corporation.
-+ *
-+ * Redistribution and use in source and binary forms, with or without
-+ * modification, are permitted provided that the following conditions
-+ * are met:
-+ *
-+ * Redistributions of source code must retain the above copyright
-+ * notice, this list of conditions and the following disclaimer.
-+ * Redistributions in binary form must reproduce the above copyright
-+ * notice, this list of conditions and the following disclaimer in
-+ * the documentation and/or other materials provided with the
-+ * distribution.
-+ * Neither the name of Intel Corporation nor the names of its
-+ * contributors may be used to endorse or promote products derived
-+ * from this software without specific prior written permission.
-+ *
-+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-+ *
-+ */
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index aac4bc9..d172459 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1008,6 +1008,21 @@ config CRYPTO_AES_NI_INTEL
+ 	  ECB, CBC, LRW, PCBC, XTS. The 64 bit version has additional
+ 	  acceleration for CTR.
+ 
++config CRYPTO_AES_CBC_MB
++        tristate "AES CBC algorithm (x86_64 Multi-Buffer, Experimental)"
++        depends on X86 && 64BIT
++        select CRYPTO_SIMD
++        select CRYPTO_MCRYPTD
++        help
++          AES CBC encryption implemented using multi-buffer technique.
++          This algorithm computes on multiple data lanes concurrently with
++          SIMD instructions for better throughput. It should only be used
++          when we expect many concurrent crypto requests to keep all the
++          data lanes filled to realize the performance benefit. If the data
++          lanes are unfilled, a flush operation will be initiated after some
++          delay to process the exisiting crypto jobs, adding some extra
++          latency to low load case.
 +
-+#include "aes_cbc_mb_mgr.h"
-+
-+void aes_cbc_init_mb_mgr_inorder_x8(struct aes_cbc_mb_mgr_inorder_x8 *state)
+ config CRYPTO_AES_SPARC64
+ 	tristate "AES cipher algorithms (SPARC64)"
+ 	depends on SPARC64
+diff --git a/crypto/mcryptd.c b/crypto/mcryptd.c
+index 4e64726..4e4830e 100644
+--- a/crypto/mcryptd.c
++++ b/crypto/mcryptd.c
+@@ -273,6 +273,266 @@ static inline bool mcryptd_check_internal(struct rtattr **tb, u32 *type,
+ 		return false;
+ }
+ 
++static int mcryptd_enqueue_skcipher_request(struct mcryptd_queue *queue,
++				struct crypto_async_request *request,
++				struct mcryptd_skcipher_request_ctx *rctx)
 +{
-+	/* Init "out of order" components */
-+	state->unused_lanes = 0xF76543210;
-+	state->job_in_lane[0] = NULL;
-+	state->job_in_lane[1] = NULL;
-+	state->job_in_lane[2] = NULL;
-+	state->job_in_lane[3] = NULL;
-+	state->job_in_lane[4] = NULL;
-+	state->job_in_lane[5] = NULL;
-+	state->job_in_lane[6] = NULL;
-+	state->job_in_lane[7] = NULL;
++	int cpu, err;
++	struct mcryptd_cpu_queue *cpu_queue;
 +
-+	/* Init "in order" components */
-+	state->next_job = 0;
-+	state->earliest_job = -1;
++	cpu = get_cpu();
++	cpu_queue = this_cpu_ptr(queue->cpu_queue);
++	rctx->tag.cpu = cpu;
 +
++	err = crypto_enqueue_request(&cpu_queue->queue, request);
++	pr_debug("enqueue request: cpu %d cpu_queue %p request %p\n",
++		cpu, cpu_queue, request);
++	queue_work_on(cpu, kcrypto_wq, &cpu_queue->work);
++	put_cpu();
++
++	return err;
 +}
 +
-+#define JOBS(offset) ((struct job_aes_cbc *)(((u64)state->jobs)+offset))
-+
-+struct job_aes_cbc *
-+aes_cbc_get_next_job_inorder_x8(struct aes_cbc_mb_mgr_inorder_x8 *state)
++static int mcryptd_skcipher_setkey(struct crypto_skcipher *parent,
++				const u8 *key, unsigned int keylen)
 +{
-+	return JOBS(state->next_job);
++	struct mcryptd_skcipher_ctx *ctx = crypto_skcipher_ctx(parent);
++	struct crypto_skcipher *child = ctx->child;
++	int err;
++
++	crypto_skcipher_clear_flags(child, CRYPTO_TFM_REQ_MASK);
++	crypto_skcipher_set_flags(child, crypto_skcipher_get_flags(parent) &
++						CRYPTO_TFM_REQ_MASK);
++	err = crypto_skcipher_setkey(child, key, keylen);
++	crypto_skcipher_set_flags(parent, crypto_skcipher_get_flags(child) &
++						CRYPTO_TFM_RES_MASK);
++	return err;
 +}
 +
-+struct job_aes_cbc *
-+aes_cbc_flush_job_inorder_x8(struct aes_cbc_mb_mgr_inorder_x8 *state)
++static void mcryptd_skcipher_complete(struct skcipher_request *req, int err)
 +{
-+	struct job_aes_cbc *job;
++	struct mcryptd_skcipher_request_ctx *rctx = skcipher_request_ctx(req);
 +
-+	/* checking earliest_job < 0 fails and the code walks over bogus */
-+	if (state->earliest_job == -1)
-+		return NULL; /* empty */
++	local_bh_disable();
++	rctx->complete(&req->base, err);
++	local_bh_enable();
++}
 +
-+	job = JOBS(state->earliest_job);
-+	while (job->status != STS_COMPLETED) {
-+		switch (job->key_len) {
-+		case AES_KEYSIZE_128:
-+			aes_cbc_flush_job_ooo_128x8(state);
-+			break;
-+		case AES_KEYSIZE_192:
-+			aes_cbc_flush_job_ooo_192x8(state);
-+			break;
-+		case AES_KEYSIZE_256:
-+			aes_cbc_flush_job_ooo_256x8(state);
-+			break;
-+		default:
-+			break;
-+		}
++static void mcryptd_skcipher_encrypt(struct crypto_async_request *base,
++								int err)
++{
++	struct skcipher_request *req = skcipher_request_cast(base);
++	struct mcryptd_skcipher_request_ctx *rctx = skcipher_request_ctx(req);
++	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
++	struct mcryptd_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
++	struct crypto_skcipher *child = ctx->child;
++	struct skcipher_request subreq;
++
++	if (unlikely(err == -EINPROGRESS))
++		goto out;
++
++	/* set up the skcipher request to work on */
++	skcipher_request_set_tfm(&subreq, child);
++	skcipher_request_set_callback(&subreq,
++					CRYPTO_TFM_REQ_MAY_SLEEP, 0, 0);
++	skcipher_request_set_crypt(&subreq, req->src, req->dst,
++					req->cryptlen, req->iv);
++
++	/*
++	 * pass addr of descriptor stored in the request context
++	 * so that the callee can get to the request context
++	 */
++	rctx->desc = subreq;
++	err = crypto_skcipher_encrypt(&rctx->desc);
++
++	if (err) {
++		req->base.complete = rctx->complete;
++		goto out;
++	}
++	return;
++
++out:
++	mcryptd_skcipher_complete(req, err);
++}
++
++static void mcryptd_skcipher_decrypt(struct crypto_async_request *base,
++								int err)
++{
++	struct skcipher_request *req = skcipher_request_cast(base);
++	struct mcryptd_skcipher_request_ctx *rctx = skcipher_request_ctx(req);
++	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
++	struct mcryptd_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
++	struct crypto_skcipher *child = ctx->child;
++	struct skcipher_request subreq;
++
++	if (unlikely(err == -EINPROGRESS))
++		goto out;
++
++	/* set up the skcipher request to work on */
++	skcipher_request_set_tfm(&subreq, child);
++	skcipher_request_set_callback(&subreq,
++				CRYPTO_TFM_REQ_MAY_SLEEP, NULL, NULL);
++	skcipher_request_set_crypt(&subreq, req->src, req->dst,
++						req->cryptlen, req->iv);
++
++	/*
++	 * pass addr of descriptor stored in the request context
++	 * so that the callee can get to the request context
++	 */
++	rctx->desc = subreq;
++	err = crypto_skcipher_decrypt(&rctx->desc);
++
++	if (err) {
++	req->base.complete = rctx->complete;
++	goto out;
++	}
++	return;
++
++out:
++	mcryptd_skcipher_complete(req, err);
++}
++
++static int mcryptd_skcipher_enqueue(struct skcipher_request *req,
++					crypto_completion_t complete)
++{
++	struct mcryptd_skcipher_request_ctx *rctx =
++					skcipher_request_ctx(req);
++	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
++	struct mcryptd_queue *queue;
++
++	queue = mcryptd_get_queue(crypto_skcipher_tfm(tfm));
++	rctx->complete = req->base.complete;
++	req->base.complete = complete;
++
++	return mcryptd_enqueue_skcipher_request(queue, &req->base, rctx);
++}
++
++static int mcryptd_skcipher_encrypt_enqueue(struct skcipher_request *req)
++{
++	return mcryptd_skcipher_enqueue(req, mcryptd_skcipher_encrypt);
++}
++
++static int mcryptd_skcipher_decrypt_enqueue(struct skcipher_request *req)
++{
++	return mcryptd_skcipher_enqueue(req, mcryptd_skcipher_decrypt);
++}
++
++static int mcryptd_skcipher_init_tfm(struct crypto_skcipher *tfm)
++{
++	struct skcipher_instance *inst = skcipher_alg_instance(tfm);
++	struct mskcipherd_instance_ctx *ictx = skcipher_instance_ctx(inst);
++	struct crypto_skcipher_spawn *spawn = &ictx->spawn;
++	struct mcryptd_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
++	struct crypto_skcipher *cipher;
++
++	cipher = crypto_spawn_skcipher(spawn);
++	if (IS_ERR(cipher))
++		return PTR_ERR(cipher);
++
++	ctx->child = cipher;
++	crypto_skcipher_set_reqsize(tfm,
++			sizeof(struct mcryptd_skcipher_request_ctx));
++	return 0;
++}
++
++static void mcryptd_skcipher_exit_tfm(struct crypto_skcipher *tfm)
++{
++	struct mcryptd_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
++
++	crypto_free_skcipher(ctx->child);
++}
++
++static void mcryptd_skcipher_free(struct skcipher_instance *inst)
++{
++	struct mskcipherd_instance_ctx *ctx = skcipher_instance_ctx(inst);
++
++	crypto_drop_skcipher(&ctx->spawn);
++}
++
++static int mcryptd_init_instance(struct crypto_instance *inst,
++					struct crypto_alg *alg)
++{
++	if (snprintf(inst->alg.cra_driver_name, CRYPTO_MAX_ALG_NAME,
++		"mcryptd(%s)",
++			alg->cra_driver_name) >= CRYPTO_MAX_ALG_NAME)
++		return -ENAMETOOLONG;
++
++	memcpy(inst->alg.cra_name, alg->cra_name, CRYPTO_MAX_ALG_NAME);
++	inst->alg.cra_priority = alg->cra_priority + 50;
++	inst->alg.cra_blocksize = alg->cra_blocksize;
++	inst->alg.cra_alignmask = alg->cra_alignmask;
++
++	return 0;
++}
++
++static int mcryptd_create_skcipher(struct crypto_template *tmpl,
++				   struct rtattr **tb,
++				   struct mcryptd_queue *queue)
++{
++	struct mskcipherd_instance_ctx *ctx;
++	struct skcipher_instance *inst;
++	struct skcipher_alg *alg;
++	const char *name;
++	u32 type;
++	u32 mask;
++	int err;
++
++	type = 0;
++	mask = CRYPTO_ALG_ASYNC;
++
++	mcryptd_check_internal(tb, &type, &mask);
++
++	name = crypto_attr_alg_name(tb[1]);
++	if (IS_ERR(name))
++		return PTR_ERR(name);
++
++	inst = kzalloc(sizeof(*inst) + sizeof(*ctx), GFP_KERNEL);
++	if (!inst)
++		return -ENOMEM;
++
++	ctx = skcipher_instance_ctx(inst);
++	ctx->queue = queue;
++
++	crypto_set_skcipher_spawn(&ctx->spawn, skcipher_crypto_instance(inst));
++	err = crypto_grab_skcipher(&ctx->spawn, name, type, mask);
++
++	if (err)
++		goto out_free_inst;
++
++	alg = crypto_spawn_skcipher_alg(&ctx->spawn);
++	err = mcryptd_init_instance(skcipher_crypto_instance(inst), &alg->base);
++	if (err)
++		goto out_drop_skcipher;
++
++	inst->alg.base.cra_flags = CRYPTO_ALG_ASYNC |
++				(alg->base.cra_flags & CRYPTO_ALG_INTERNAL);
++
++	inst->alg.ivsize = crypto_skcipher_alg_ivsize(alg);
++	inst->alg.chunksize = crypto_skcipher_alg_chunksize(alg);
++	inst->alg.min_keysize = crypto_skcipher_alg_min_keysize(alg);
++	inst->alg.max_keysize = crypto_skcipher_alg_max_keysize(alg);
++
++	inst->alg.base.cra_ctxsize = sizeof(struct mcryptd_skcipher_ctx);
++
++	inst->alg.init = mcryptd_skcipher_init_tfm;
++	inst->alg.exit = mcryptd_skcipher_exit_tfm;
++
++	inst->alg.setkey = mcryptd_skcipher_setkey;
++	inst->alg.encrypt = mcryptd_skcipher_encrypt_enqueue;
++	inst->alg.decrypt = mcryptd_skcipher_decrypt_enqueue;
++
++	inst->free = mcryptd_skcipher_free;
++
++	err = skcipher_register_instance(tmpl, inst);
++	if (err) {
++out_drop_skcipher:
++	crypto_drop_skcipher(&ctx->spawn);
++out_free_inst:
++	kfree(inst);
++	}
++	return err;
++}
++
+ static int mcryptd_hash_init_tfm(struct crypto_tfm *tfm)
+ {
+ 	struct crypto_instance *inst = crypto_tfm_alg_instance(tfm);
+@@ -564,6 +824,8 @@ static int mcryptd_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 		return PTR_ERR(algt);
+ 
+ 	switch (algt->type & algt->mask & CRYPTO_ALG_TYPE_MASK) {
++	case CRYPTO_ALG_TYPE_BLKCIPHER:
++		return mcryptd_create_skcipher(tmpl, tb, &mqueue);
+ 	case CRYPTO_ALG_TYPE_DIGEST:
+ 		return mcryptd_create_hash(tmpl, tb, &mqueue);
+ 	break;
+@@ -595,6 +857,42 @@ static void mcryptd_free(struct crypto_instance *inst)
+ 	.module = THIS_MODULE,
+ };
+ 
++struct mcryptd_skcipher *mcryptd_alloc_skcipher(const char *alg_name,
++							u32 type, u32 mask)
++{
++	char cryptd_alg_name[CRYPTO_MAX_ALG_NAME];
++	struct crypto_skcipher *tfm;
++
++	if (snprintf(cryptd_alg_name, CRYPTO_MAX_ALG_NAME,
++		"mcryptd(%s)", alg_name) >= CRYPTO_MAX_ALG_NAME)
++		return ERR_PTR(-EINVAL);
++	tfm = crypto_alloc_skcipher(cryptd_alg_name, type, mask);
++	if (IS_ERR(tfm))
++		return ERR_CAST(tfm);
++	if (tfm->base.__crt_alg->cra_module != THIS_MODULE) {
++		crypto_free_skcipher(tfm);
++		return ERR_PTR(-EINVAL);
 +	}
 +
-+	/* advance earliest job */
-+	state->earliest_job += sizeof(struct job_aes_cbc);
-+	if (state->earliest_job == MAX_AES_JOBS * sizeof(struct job_aes_cbc))
-+		state->earliest_job = 0;
-+
-+	if (state->earliest_job == state->next_job)
-+		state->earliest_job = -1;
-+
-+	return job;
++	return container_of(tfm, struct mcryptd_skcipher, base);
 +}
++EXPORT_SYMBOL_GPL(mcryptd_alloc_skcipher);
 +
-+struct job_aes_cbc *
-+aes_cbc_get_completed_job_inorder_x8(struct aes_cbc_mb_mgr_inorder_x8 *state)
++struct crypto_skcipher *mcryptd_skcipher_child(
++			struct mcryptd_skcipher *tfm)
 +{
-+	struct job_aes_cbc *job;
++	struct mcryptd_skcipher_ctx *ctx = crypto_skcipher_ctx(&tfm->base);
 +
-+	if (state->earliest_job == -1)
-+		return NULL; /* empty */
-+
-+	job = JOBS(state->earliest_job);
-+	if (job->status != STS_COMPLETED)
-+		return NULL;
-+
-+	state->earliest_job += sizeof(struct job_aes_cbc);
-+
-+	if (state->earliest_job == MAX_AES_JOBS * sizeof(struct job_aes_cbc))
-+		state->earliest_job = 0;
-+	if (state->earliest_job == state->next_job)
-+		state->earliest_job = -1;
-+
-+	/* we have a completed job */
-+	return job;
++	return ctx->child;
 +}
-diff --git a/arch/x86/crypto/aes-cbc-mb/mb_mgr_inorder_x8_asm.S b/arch/x86/crypto/aes-cbc-mb/mb_mgr_inorder_x8_asm.S
-new file mode 100644
-index 0000000..5108875
---- /dev/null
-+++ b/arch/x86/crypto/aes-cbc-mb/mb_mgr_inorder_x8_asm.S
-@@ -0,0 +1,223 @@
-+/*
-+ *	AES CBC by8 multibuffer inorder scheduler optimization (x86_64)
-+ *
-+ *
-+ * This file is provided under a dual BSD/GPLv2 license.  When using or
-+ * redistributing this file, you may do so under either license.
-+ *
-+ * GPL LICENSE SUMMARY
-+ *
-+ * Copyright(c) 2016 Intel Corporation.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of version 2 of the GNU General Public License as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful, but
-+ * WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * General Public License for more details.
-+ *
-+ * Contact Information:
-+ * James Guilford <james.guilford@intel.com>
-+ * Sean Gulley <sean.m.gulley@intel.com>
-+ * Tim Chen <tim.c.chen@linux.intel.com>
-+ * Megha Dey <megha.dey@linux.intel.com>
-+ *
-+ * BSD LICENSE
-+ *
-+ * Copyright(c) 2016 Intel Corporation.
-+ *
-+ * Redistribution and use in source and binary forms, with or without
-+ * modification, are permitted provided that the following conditions
-+ * are met:
-+ *
-+ * Redistributions of source code must retain the above copyright
-+ * notice, this list of conditions and the following disclaimer.
-+ * Redistributions in binary form must reproduce the above copyright
-+ * notice, this list of conditions and the following disclaimer in
-+ * the documentation and/or other materials provided with the
-+ * distribution.
-+ * Neither the name of Intel Corporation nor the names of its
-+ * contributors may be used to endorse or promote products derived
-+ * from this software without specific prior written permission.
-+ *
-+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-+ *
-+ */
-+#include <linux/linkage.h>
-+#include "mb_mgr_datastruct.S"
-+#include "reg_sizes.S"
-+
-+#define JUMP
-+
-+#define arg1	%rdi
-+#define arg2	%rsi
-+#define state	arg1
-+
-+/* virtual registers used by submit_job_aes_inorder_x8 */
-+#define next_job	%rdx
-+#define earliest_job	%rcx
-+#define zero		%r8
-+#define returned_job	%rax	/* register that returns a value from func */
-+
-+.extern aes_cbc_submit_job_ooo_128x8
-+.extern aes_cbc_submit_job_ooo_192x8
-+.extern aes_cbc_submit_job_ooo_256x8
-+.extern aes_cbc_flush_job_ooo_128x8
-+.extern aes_cbc_flush_job_ooo_192x8
-+.extern aes_cbc_flush_job_ooo_256x8
-+.extern aes_cbc_flush_job_ooo_x8
-+
-+/*
-+ * struct job_aes* aes_cbc_submit_job_inorder_x8(
-+ *		struct aes_cbc_mb_mgr_inorder_x8 *state)
-+ */
-+
-+.macro aes_cbc_submit_job_inorder_x8 key_len
-+
-+	sub	$8, %rsp	/* align stack for next calls */
-+
-+	mov	_next_job(state), DWORD(next_job)
-+	lea	_jobs(state, next_job), arg2
-+
-+	.if \key_len == AES_KEYSIZE_128
-+		call	aes_cbc_submit_job_ooo_128x8
-+	.elseif \key_len == AES_KEYSIZE_192
-+		call	aes_cbc_submit_job_ooo_192x8
-+	.elseif \key_len == AES_KEYSIZE_256
-+		call	aes_cbc_submit_job_ooo_256x8
-+	.endif
-+
-+	mov	_earliest_job(state), DWORD(earliest_job)
-+	cmp	$0, DWORD(earliest_job)
-+	jl	.Lstate_was_empty\key_len
-+
-+	/* we have a valid earliest_job */
-+
-+	/* advance next_job */
-+	mov	_next_job(state), DWORD(next_job)
-+	add	$_JOB_AES_size, next_job
-+#ifdef JUMP
-+	cmp	$(MAX_AES_JOBS * _JOB_AES_size), next_job
-+	jne	.Lskip1\key_len
-+	xor	next_job, next_job
-+.Lskip1\key_len:
-+#else
-+	xor	zero,zero
-+	cmp	$(MAX_AES_JOBS * _JOB_AES_size), next_job
-+	cmove	zero, next_job
-+#endif
-+	mov	DWORD(next_job), _next_job(state)
-+
-+	lea	_jobs(state, earliest_job), returned_job
-+	cmp	next_job, earliest_job
-+	je	.Lfull\key_len
-+
-+	/* not full */
-+	cmpl	$STS_COMPLETED, _status(returned_job)
-+	jne	.Lreturn_null\key_len
-+
-+	/* advance earliest_job */
-+	add	$_JOB_AES_size, earliest_job
-+	cmp	$(MAX_AES_JOBS * _JOB_AES_size), earliest_job
-+#ifdef JUMP
-+	jne	.Lskip2\key_len
-+	xor	earliest_job, earliest_job
-+.Lskip2\key_len:
-+#else
-+	cmove	zero, earliest_job
-+#endif
-+
-+	add	$8, %rsp
-+	mov	DWORD(earliest_job), _earliest_job(state)
-+	ret
-+
-+.Lreturn_null\key_len:
-+	add	$8, %rsp
-+	xor	returned_job, returned_job
-+	ret
-+
-+.Lfull\key_len:
-+	cmpl	$STS_COMPLETED, _status(returned_job)
-+	je	.Lcompleted\key_len
-+	mov	earliest_job, (%rsp)
-+.Lflush_loop\key_len:
-+	.if \key_len == AES_KEYSIZE_128
-+		call	aes_cbc_flush_job_ooo_128x8
-+	.elseif \key_len == AES_KEYSIZE_192
-+		call	aes_cbc_flush_job_ooo_192x8
-+	.elseif \key_len == AES_KEYSIZE_256
-+		call	aes_cbc_flush_job_ooo_256x8
-+	.endif
-+	/* state is still valid */
-+	mov	(%rsp), earliest_job
-+	cmpl	$STS_COMPLETED, _status(returned_job)
-+	jne	.Lflush_loop\key_len
-+	xor	zero,zero
-+.Lcompleted\key_len:
-+	/* advance earliest_job */
-+	add	$_JOB_AES_size, earliest_job
-+	cmp	$(MAX_AES_JOBS * _JOB_AES_size), earliest_job
-+#ifdef JUMP
-+	jne	.Lskip3\key_len
-+	xor	earliest_job, earliest_job
-+.Lskip3\key_len:
-+#else
-+	cmove	zero, earliest_job
-+#endif
-+
-+	add	$8, %rsp
-+	mov	DWORD(earliest_job), _earliest_job(state)
-+	ret
-+
-+.Lstate_was_empty\key_len:
-+	mov	_next_job(state), DWORD(next_job)
-+	mov	DWORD(next_job), _earliest_job(state)
-+
-+	/* advance next_job */
-+	add	$_JOB_AES_size, next_job
-+#ifdef JUMP
-+	cmp	$(MAX_AES_JOBS * _JOB_AES_size), next_job
-+	jne	.Lskip4\key_len
-+	xor	next_job, next_job
-+.Lskip4\key_len:
-+#else
-+	xor	zero,zero
-+	cmp	$(MAX_AES_JOBS * _JOB_AES_size), next_job
-+	cmove	zero, next_job
-+#endif
-+	mov	DWORD(next_job), _next_job(state)
-+
-+	add	$8, %rsp
-+	xor	returned_job, returned_job
-+	ret
-+.endm
-+
-+ENTRY(aes_cbc_submit_job_inorder_128x8)
-+
-+	aes_cbc_submit_job_inorder_x8 AES_KEYSIZE_128
-+
-+ENDPROC(aes_cbc_submit_job_inorder_128x8)
-+
-+ENTRY(aes_cbc_submit_job_inorder_192x8)
-+
-+	aes_cbc_submit_job_inorder_x8 AES_KEYSIZE_192
-+
-+ENDPROC(aes_cbc_submit_job_inorder_192x8)
-+
-+ENTRY(aes_cbc_submit_job_inorder_256x8)
-+
-+	aes_cbc_submit_job_inorder_x8 AES_KEYSIZE_256
-+
-+ENDPROC(aes_cbc_submit_job_inorder_256x8)
-diff --git a/arch/x86/crypto/aes-cbc-mb/mb_mgr_ooo_x8_asm.S b/arch/x86/crypto/aes-cbc-mb/mb_mgr_ooo_x8_asm.S
-new file mode 100644
-index 0000000..351f30f
---- /dev/null
-+++ b/arch/x86/crypto/aes-cbc-mb/mb_mgr_ooo_x8_asm.S
-@@ -0,0 +1,417 @@
-+/*
-+ *	AES CBC by8 multibuffer out-of-order scheduler optimization (x86_64)
-+ *
-+ *
-+ * This file is provided under a dual BSD/GPLv2 license.  When using or
-+ * redistributing this file, you may do so under either license.
-+ *
-+ * GPL LICENSE SUMMARY
-+ *
-+ * Copyright(c) 2016 Intel Corporation.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of version 2 of the GNU General Public License as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful, but
-+ * WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * General Public License for more details.
-+ *
-+ * Contact Information:
-+ * James Guilford <james.guilford@intel.com>
-+ * Sean Gulley <sean.m.gulley@intel.com>
-+ * Tim Chen <tim.c.chen@linux.intel.com>
-+ * Megha Dey <megha.dey@linux.intel.com>
-+ *
-+ * BSD LICENSE
-+ *
-+ * Copyright(c) 2016 Intel Corporation.
-+ *
-+ * Redistribution and use in source and binary forms, with or without
-+ * modification, are permitted provided that the following conditions
-+ * are met:
-+ *
-+ * Redistributions of source code must retain the above copyright
-+ * notice, this list of conditions and the following disclaimer.
-+ * Redistributions in binary form must reproduce the above copyright
-+ * notice, this list of conditions and the following disclaimer in
-+ * the documentation and/or other materials provided with the
-+ * distribution.
-+ * Neither the name of Intel Corporation nor the names of its
-+ * contributors may be used to endorse or promote products derived
-+ * from this software without specific prior written permission.
-+ *
-+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-+ *
-+ */
-+
-+#include <linux/linkage.h>
-+#include "mb_mgr_datastruct.S"
-+#include "reg_sizes.S"
-+
-+#define arg1	%rdi
-+#define arg2	%rsi
-+#define state	arg1
-+#define job	arg2
-+
-+/* virtual registers used by aes_cbc_submit_job_ooo_x8 */
-+#define unused_lanes	%rax
-+#define lane		%rdx
-+#define	tmp1		%rcx
-+#define	tmp2		%r8
-+#define	tmp3		%r9
-+#define len		tmp1
-+
-+#define good_lane	lane
-+
-+/* virtual registers used by aes_cbc_submit_job_inorder_x8 */
-+#define new_job		%rdx
-+#define earliest_job	%rcx
-+#define minus1		%r8
-+#define returned_job	%rax	/* register that returns a value from func */
-+
-+.section .rodata
-+.align 16
-+len_masks:
-+	.octa 0x0000000000000000000000000000FFFF
-+	.octa 0x000000000000000000000000FFFF0000
-+	.octa 0x00000000000000000000FFFF00000000
-+	.octa 0x0000000000000000FFFF000000000000
-+	.octa 0x000000000000FFFF0000000000000000
-+	.octa 0x00000000FFFF00000000000000000000
-+	.octa 0x0000FFFF000000000000000000000000
-+	.octa 0xFFFF0000000000000000000000000000
-+
-+dupw:
-+	.octa 0x01000100010001000100010001000100
-+
-+one:	.quad  1
-+two:	.quad  2
-+three:	.quad  3
-+four:	.quad  4
-+five:	.quad  5
-+six:	.quad  6
-+seven:	.quad  7
-+
-+.text
-+
-+.extern aes_cbc_enc_128_x8
-+.extern aes_cbc_enc_192_x8
-+.extern aes_cbc_enc_256_x8
-+
-+/* arg1/state remains intact after call */
-+/*
-+ * void aes_cbc_submit_job__ooo_128x8(
-+ *	struct aes_cbc_mb_mgr_aes_inorder_x8 *state,
-+ *	struct job_aes_cbc *job);
-+ * void aes_cbc_submit_job__ooo_192x8(
-+ *	struct aes_cbc_mb_mgr_aes_inorder_x8 *state,
-+ *	struct job_aes_cbc *job);
-+ * void aes_cbc_submit_job__ooo_256x8(
-+ *	struct aes_cbc_mb_mgr_aes_inorder_x8 *state,
-+ *	struct job_aes_cbc *job);
-+ */
-+
-+.global aes_cbc_submit_job_ooo_128x8
-+.global aes_cbc_submit_job_ooo_192x8
-+.global aes_cbc_submit_job_ooo_256x8
-+
-+
-+.macro aes_cbc_submit_job_ooo_x8 key_len
-+
-+	mov	_unused_lanes(state), unused_lanes
-+	mov	unused_lanes, lane
-+	and	$0xF, lane
-+	shr	$4, unused_lanes
-+
-+	/* state->job_in_lane[lane] = job; */
-+	mov	job, _job_in_lane(state, lane, 8)
-+
-+	/*state->lens[lane] = job->len / AES_BLOCK_SIZE; */
-+	mov	_len(job), DWORD(len)
-+	shr	$4, len
-+	mov	WORD(len), _lens(state, lane, 2)
-+
-+	mov	_plaintext(job), tmp1
-+	mov	_ciphertext(job), tmp2
-+	mov	_keys(job), tmp3
-+	movdqu	_IV(job), %xmm2
-+	mov	tmp1, _args_in(state, lane, 8)
-+	mov	tmp2, _args_out(state , lane, 8)
-+	mov	tmp3, _args_keys(state, lane, 8)
-+	shl	$4, lane
-+	movdqa	%xmm2, _args_IV(state , lane)
-+
-+	movl	$STS_BEING_PROCESSED, _status(job)
-+
-+	mov	unused_lanes, _unused_lanes(state)
-+	cmp	$0xF, unused_lanes
-+	jne	.Lnot_enough_jobs\key_len
-+
-+	movdqa	_lens(state), %xmm0
-+	phminposuw	%xmm0, %xmm1
-+	/*
-+	 * xmm1{15:0} = min value
-+	 * xmm1{18:16} = index of min
-+	 */
-+
-+	/*
-+	 * arg1 = rcx = state = args (and it is not clobbered by routine)
-+	 * arg2 = rdx = min len
-+	 */
-+	movd	%xmm1, arg2
-+	and	$0xFFFF, arg2
-+
-+	/* subtract min len from lengths */
-+	pshufb	dupw(%rip), %xmm1	/* duplicate words across all lanes */
-+	psubw	%xmm1, %xmm0
-+	movdqa	%xmm0, _lens(state)
-+
-+	/* need to align stack */
-+	sub	$8, %rsp
-+	.if \key_len == AES_KEYSIZE_128
-+		call aes_cbc_enc_128_x8
-+	.elseif \key_len == AES_KEYSIZE_192
-+		call aes_cbc_enc_192_x8
-+	.elseif \key_len == AES_KEYSIZE_256
-+		call aes_cbc_enc_256_x8
-+	.endif
-+	add	$8, %rsp
-+	/* arg1/state is still intact */
-+
-+	/* process completed jobs */
-+	movdqa	_lens(state), %xmm0
-+	phminposuw	%xmm0, %xmm1
-+	/*
-+	 * xmm1{15:0} = min value
-+	 * xmm1{18:16} = index of min
-+	 */
-+
-+	/*
-+	 * at this point at least one len should be 0
-+	 * so min value should be 0
-+	 * and the index is the index of that lane [0...7]
-+	 */
-+	lea	len_masks(%rip), tmp3
-+	mov	_unused_lanes(state), unused_lanes
-+	movd	%xmm1, lane
-+.Lcontinue_loop\key_len:
-+	/* assert((lane & 0xFFFF) == 0) */
-+	shr	$16, lane	/* lane is now index */
-+	mov	_job_in_lane(state, lane, 8), job
-+	movl	$STS_COMPLETED, _status(job)
-+	movq	$0, _job_in_lane(state ,lane, 8)
-+	shl	$4, unused_lanes
-+	or	lane, unused_lanes
-+	shl	$4, lane
-+	movdqa	_args_IV(state,lane), %xmm2
-+	movdqu	%xmm2, _IV(job)
-+	por	(tmp3, lane), %xmm0
-+
-+	phminposuw	%xmm0, %xmm1
-+	movd	%xmm1, lane
-+	/* see if bits 15:0 are zero */
-+	test	$0xFFFF, lane
-+	jz	.Lcontinue_loop\key_len
-+
-+	/* done; save registers */
-+	mov	unused_lanes, _unused_lanes(state)
-+	/* don't need to save xmm0/lens */
-+
-+.Lnot_enough_jobs\key_len:
-+	ret
-+.endm
-+
-+ENTRY(aes_cbc_submit_job_ooo_128x8)
-+
-+	aes_cbc_submit_job_ooo_x8 AES_KEYSIZE_128
-+
-+ENDPROC(aes_cbc_submit_job_ooo_128x8)
-+
-+ENTRY(aes_cbc_submit_job_ooo_192x8)
-+
-+	aes_cbc_submit_job_ooo_x8 AES_KEYSIZE_192
-+
-+ENDPROC(aes_cbc_submit_job_ooo_192x8)
-+
-+ENTRY(aes_cbc_submit_job_ooo_256x8)
-+
-+	aes_cbc_submit_job_ooo_x8 AES_KEYSIZE_256
-+
-+ENDPROC(aes_cbc_submit_job_ooo_256x8)
-+
-+
-+/* arg1/state remains intact after call */
-+/*
-+ * void aes_cbc_flush_job_ooo_128x8(
-+ *	struct aes_cbc_mb_mgr_aes_inorder_x8 *state)
-+ * void aes_cbc_flush_job_ooo_192x8(
-+ *	struct aes_cbc_mb_mgr_aes_inorder_x8 *state)
-+ * void aes_cbc_flush_job_ooo_256x8(
-+ *	struct aes_cbc_mb_mgr_aes_inorder_x8 *state)
-+ */
-+.global aes_cbc_flush_job_ooo_128x8
-+.global aes_cbc_flush_job_ooo_192x8
-+.global aes_cbc_flush_job_ooo_256x8
-+
-+.macro aes_cbc_flush_job_ooo_x8 key_len
-+
-+	mov	_unused_lanes(state), unused_lanes
-+
-+	/* if bit (32+3) is set, then all lanes are empty */
-+	bt	$(32+3), unused_lanes
-+	jc	.Lreturn\key_len
-+
-+	/* find a lane with a non-null job */
-+	xor	good_lane, good_lane
-+	cmpq	$0, (_job_in_lane+8*1)(state)
-+	cmovne	one(%rip), good_lane
-+	cmpq	$0, (_job_in_lane+8*2)(state)
-+	cmovne	two(%rip), good_lane
-+	cmpq	$0, (_job_in_lane+8*3)(state)
-+	cmovne	three(%rip), good_lane
-+	cmpq	$0, (_job_in_lane+8*4)(state)
-+	cmovne	four(%rip), good_lane
-+	cmpq	$0, (_job_in_lane+8*5)(state)
-+	cmovne	five(%rip), good_lane
-+	cmpq	$0, (_job_in_lane+8*6)(state)
-+	cmovne	six(%rip), good_lane
-+	cmpq	$0, (_job_in_lane+8*7)(state)
-+	cmovne	seven(%rip), good_lane
-+
-+	/* copy good_lane to empty lanes */
-+	mov	_args_in(state, good_lane, 8), tmp1
-+	mov	_args_out(state, good_lane, 8), tmp2
-+	mov	_args_keys(state, good_lane, 8), tmp3
-+	shl	$4, good_lane
-+	movdqa	_args_IV(state, good_lane), %xmm2
-+
-+	movdqa	_lens(state), %xmm0
-+
-+	I = 0
-+
-+.altmacro
-+	.rept 8
-+		cmpq	$0, (_job_in_lane + 8*I)(state)
-+		.if \key_len == AES_KEYSIZE_128
-+			cond_jump jne, .Lskip128_,%I
-+		.elseif \key_len == AES_KEYSIZE_192
-+			cond_jump jne, .Lskip192_,%I
-+		.elseif \key_len == AES_KEYSIZE_256
-+			cond_jump jne, .Lskip256_,%I
-+		.endif
-+		mov	tmp1, (_args_in + 8*I)(state)
-+		mov	tmp2, (_args_out + 8*I)(state)
-+		mov	tmp3, (_args_keys + 8*I)(state)
-+		movdqa	%xmm2, (_args_IV + 16*I)(state)
-+		por	(len_masks + 16*I)(%rip), %xmm0
-+		.if \key_len == AES_KEYSIZE_128
-+			LABEL .Lskip128_,%I
-+		.elseif \key_len == AES_KEYSIZE_192
-+			LABEL .Lskip192_,%I
-+		.elseif \key_len == AES_KEYSIZE_256
-+			LABEL .Lskip256_,%I
-+		.endif
-+		I = (I+1)
-+	.endr
-+.noaltmacro
-+
-+	phminposuw	%xmm0, %xmm1
-+	/*
-+	 * xmm1{15:0} = min value
-+	 * xmm1{18:16} = index of min
-+	 */
-+
-+	/*
-+	 * arg1 = rcx = state = args (and it is not clobbered by routine)
-+	 * arg2 = rdx = min len
-+	 */
-+	movd	%xmm1, arg2
-+	and	$0xFFFF, arg2
-+
-+	/* subtract min len from lengths */
-+	pshufb	dupw(%rip), %xmm1	/* duplicate words across all lanes */
-+	psubw	%xmm1, %xmm0
-+	movdqa	%xmm0, _lens(state)
-+
-+	/* need to align stack */
-+	sub	$8, %rsp
-+	.if \key_len == AES_KEYSIZE_128
-+		call aes_cbc_enc_128_x8
-+	.elseif \key_len == AES_KEYSIZE_192
-+		call aes_cbc_enc_192_x8
-+	.elseif \key_len == AES_KEYSIZE_256
-+		call aes_cbc_enc_256_x8
-+	.endif
-+	add	$8, %rsp
-+	/* arg1/state is still intact */
-+
-+	/* process completed jobs */
-+	movdqa	_lens(state), %xmm0
-+	phminposuw	%xmm0, %xmm1
-+	/*
-+	 * xmm1{15:0} = min value
-+	 * xmm1{18:16} = index of min
-+	 */
-+
-+	/*
-+	 * at this point at least one len should be 0, so min value should be 0
-+	 * and the index is the index of that lane [0...3]
-+	 */
-+	lea	len_masks(%rip), tmp3
-+	mov	_unused_lanes(state), unused_lanes
-+	movd	%xmm1, lane
-+.Lcontinue_loop2\key_len:
-+	/* assert((lane & 0xFFFF) == 0) */
-+	shr	$16, lane	/* lane is now index */
-+	mov	_job_in_lane(state, lane, 8), job
-+	movl	$STS_COMPLETED, _status(job)
-+	movq	$0, _job_in_lane(state, lane, 8)
-+	shl	$4, unused_lanes
-+	or	lane, unused_lanes
-+	shl	$4, lane
-+	movdqa	_args_IV(state, lane), %xmm2
-+	movdqu	%xmm2, _IV(job)
-+	por	(tmp3, lane), %xmm0
-+
-+	phminposuw	%xmm0, %xmm1
-+	movd	%xmm1, lane
-+	/* see if bits 15:0 are zero */
-+	test	$0xFFFF, lane
-+	jz	.Lcontinue_loop2\key_len
-+
-+	/* done; save registers */
-+	mov	unused_lanes, _unused_lanes(state)
-+	/* don't need to save xmm0/lens */
-+.Lreturn\key_len:
-+	ret
-+.endm
-+
-+ENTRY(aes_cbc_flush_job_ooo_128x8)
-+
-+	aes_cbc_flush_job_ooo_x8 AES_KEYSIZE_128
-+
-+ENDPROC(aes_cbc_flush_job_ooo_128x8)
-+
-+ENTRY(aes_cbc_flush_job_ooo_192x8)
-+
-+	aes_cbc_flush_job_ooo_x8 AES_KEYSIZE_192
-+
-+ENDPROC(aes_cbc_flush_job_ooo_192x8)
-+
-+ENTRY(aes_cbc_flush_job_ooo_256x8)
-+
-+	aes_cbc_flush_job_ooo_x8 AES_KEYSIZE_256
-+
-+ENDPROC(aes_cbc_flush_job_ooo_256x8)
++EXPORT_SYMBOL_GPL(mcryptd_skcipher_child);
++
++void mcryptd_free_skcipher(struct mcryptd_skcipher *tfm)
++{
++	crypto_free_skcipher(&tfm->base);
++}
++EXPORT_SYMBOL_GPL(mcryptd_free_skcipher);
++
+ struct mcryptd_ahash *mcryptd_alloc_ahash(const char *alg_name,
+ 					u32 type, u32 mask)
+ {
+diff --git a/crypto/simd.c b/crypto/simd.c
+index 8820337..6757d44 100644
+--- a/crypto/simd.c
++++ b/crypto/simd.c
+@@ -28,11 +28,14 @@
+ #include <crypto/cryptd.h>
+ #include <crypto/internal/simd.h>
+ #include <crypto/internal/skcipher.h>
++#include <crypto/mcryptd.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/preempt.h>
+ #include <asm/simd.h>
+ 
++static struct mcryptd_alg_state cbc_mb_alg_state;
++
+ struct simd_skcipher_alg {
+ 	const char *ialg_name;
+ 	struct skcipher_alg alg;
+@@ -42,6 +45,10 @@ struct simd_skcipher_ctx {
+ 	struct cryptd_skcipher *cryptd_tfm;
+ };
+ 
++struct simd_skcipher_ctx_mb {
++	struct mcryptd_skcipher *mcryptd_tfm;
++};
++
+ static int simd_skcipher_setkey(struct crypto_skcipher *tfm, const u8 *key,
+ 				unsigned int key_len)
+ {
+@@ -203,6 +210,163 @@ struct simd_skcipher_alg *simd_skcipher_create_compat(const char *algname,
+ }
+ EXPORT_SYMBOL_GPL(simd_skcipher_create_compat);
+ 
++static int simd_skcipher_setkey_mb(struct crypto_skcipher *tfm, const u8 *key,
++				unsigned int key_len)
++{
++	struct simd_skcipher_ctx_mb *ctx = crypto_skcipher_ctx(tfm);
++	struct crypto_skcipher *child = &ctx->mcryptd_tfm->base;
++	int err;
++
++	crypto_skcipher_clear_flags(child, CRYPTO_TFM_REQ_MASK);
++	crypto_skcipher_set_flags(child, crypto_skcipher_get_flags(tfm) &
++					CRYPTO_TFM_REQ_MASK);
++	err = crypto_skcipher_setkey(child, key, key_len);
++	crypto_skcipher_set_flags(tfm, crypto_skcipher_get_flags(child) &
++					CRYPTO_TFM_RES_MASK);
++	return err;
++}
++
++static int simd_skcipher_decrypt_mb(struct skcipher_request *req)
++{
++	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
++	struct simd_skcipher_ctx_mb *ctx = crypto_skcipher_ctx(tfm);
++	struct skcipher_request *subreq;
++	struct crypto_skcipher *child;
++
++	subreq = skcipher_request_ctx(req);
++	*subreq = *req;
++
++	child = &ctx->mcryptd_tfm->base;
++
++	skcipher_request_set_tfm(subreq, child);
++
++	return crypto_skcipher_decrypt(subreq);
++}
++
++static int simd_skcipher_encrypt_mb(struct skcipher_request *req)
++{
++	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
++	struct simd_skcipher_ctx_mb *ctx = crypto_skcipher_ctx(tfm);
++	struct skcipher_request *subreq;
++	struct crypto_skcipher *child;
++
++	subreq = skcipher_request_ctx(req);
++	*subreq = *req;
++
++	child = &ctx->mcryptd_tfm->base;
++
++	skcipher_request_set_tfm(subreq, child);
++
++	return crypto_skcipher_encrypt(subreq);
++}
++
++static void simd_skcipher_exit_mb(struct crypto_skcipher *tfm)
++{
++	struct simd_skcipher_ctx_mb *ctx = crypto_skcipher_ctx(tfm);
++
++	mcryptd_free_skcipher(ctx->mcryptd_tfm);
++}
++
++static int simd_skcipher_init_mb(struct crypto_skcipher *tfm)
++{
++	struct simd_skcipher_ctx_mb *ctx = crypto_skcipher_ctx(tfm);
++	struct mcryptd_skcipher *mcryptd_tfm;
++	struct simd_skcipher_alg *salg;
++	struct skcipher_alg *alg;
++	unsigned reqsize;
++	struct mcryptd_skcipher_ctx *mctx;
++
++	alg = crypto_skcipher_alg(tfm);
++	salg = container_of(alg, struct simd_skcipher_alg, alg);
++
++	mcryptd_tfm = mcryptd_alloc_skcipher(salg->ialg_name,
++					   CRYPTO_ALG_INTERNAL,
++					   CRYPTO_ALG_INTERNAL);
++	if (IS_ERR(mcryptd_tfm))
++		return PTR_ERR(mcryptd_tfm);
++
++	mctx = crypto_skcipher_ctx(&mcryptd_tfm->base);
++
++	mctx->alg_state = &cbc_mb_alg_state;
++	ctx->mcryptd_tfm = mcryptd_tfm;
++
++	reqsize = sizeof(struct skcipher_request);
++	reqsize += crypto_skcipher_reqsize(&mcryptd_tfm->base);
++
++	crypto_skcipher_set_reqsize(tfm, reqsize);
++
++	return 0;
++}
++
++struct simd_skcipher_alg *simd_skcipher_create_compat_mb(const char *algname,
++							const char *drvname,
++							const char *basename)
++{
++	struct simd_skcipher_alg *salg;
++	struct crypto_skcipher *tfm;
++	struct skcipher_alg *ialg;
++	struct skcipher_alg *alg;
++	int err;
++
++	tfm = crypto_alloc_skcipher(basename, CRYPTO_ALG_INTERNAL,
++				    CRYPTO_ALG_INTERNAL | CRYPTO_ALG_ASYNC);
++	if (IS_ERR(tfm))
++		return ERR_CAST(tfm);
++
++	ialg = crypto_skcipher_alg(tfm);
++
++	salg = kzalloc(sizeof(*salg), GFP_KERNEL);
++	if (!salg) {
++		salg = ERR_PTR(-ENOMEM);
++		goto out_put_tfm;
++	}
++
++	salg->ialg_name = basename;
++	alg = &salg->alg;
++
++	err = -ENAMETOOLONG;
++	if (snprintf(alg->base.cra_name, CRYPTO_MAX_ALG_NAME, "%s", algname) >=
++	    CRYPTO_MAX_ALG_NAME)
++		goto out_free_salg;
++
++	if (snprintf(alg->base.cra_driver_name, CRYPTO_MAX_ALG_NAME, "%s",
++		     drvname) >= CRYPTO_MAX_ALG_NAME)
++		goto out_free_salg;
++
++	alg->base.cra_flags = CRYPTO_ALG_ASYNC;
++	alg->base.cra_priority = ialg->base.cra_priority;
++	alg->base.cra_blocksize = ialg->base.cra_blocksize;
++	alg->base.cra_alignmask = ialg->base.cra_alignmask;
++	alg->base.cra_module = ialg->base.cra_module;
++	alg->base.cra_ctxsize = sizeof(struct simd_skcipher_ctx_mb);
++
++	alg->ivsize = ialg->ivsize;
++	alg->chunksize = ialg->chunksize;
++	alg->min_keysize = ialg->min_keysize;
++	alg->max_keysize = ialg->max_keysize;
++
++	alg->init = simd_skcipher_init_mb;
++	alg->exit = simd_skcipher_exit_mb;
++
++	alg->setkey = simd_skcipher_setkey_mb;
++	alg->encrypt = simd_skcipher_encrypt_mb;
++	alg->decrypt = simd_skcipher_decrypt_mb;
++
++	err = crypto_register_skcipher(alg);
++	if (err)
++		goto out_free_salg;
++
++out_put_tfm:
++	crypto_free_skcipher(tfm);
++	return salg;
++
++out_free_salg:
++	kfree(salg);
++	salg = ERR_PTR(err);
++	goto out_put_tfm;
++}
++EXPORT_SYMBOL_GPL(simd_skcipher_create_compat_mb);
++
+ struct simd_skcipher_alg *simd_skcipher_create(const char *algname,
+ 					       const char *basename)
+ {
+diff --git a/include/crypto/internal/simd.h b/include/crypto/internal/simd.h
+index 4295099..2c518a6 100644
+--- a/include/crypto/internal/simd.h
++++ b/include/crypto/internal/simd.h
+@@ -10,6 +10,9 @@
+ struct simd_skcipher_alg *simd_skcipher_create_compat(const char *algname,
+ 						      const char *drvname,
+ 						      const char *basename);
++struct simd_skcipher_alg *simd_skcipher_create_compat_mb(const char *algname,
++							const char *drvname,
++							const char *basename);
+ struct simd_skcipher_alg *simd_skcipher_create(const char *algname,
+ 					       const char *basename);
+ void simd_skcipher_free(struct simd_skcipher_alg *alg);
+diff --git a/include/crypto/mcryptd.h b/include/crypto/mcryptd.h
+index 4a53c0d..5b17ce6 100644
+--- a/include/crypto/mcryptd.h
++++ b/include/crypto/mcryptd.h
+@@ -13,6 +13,28 @@
+ #include <linux/crypto.h>
+ #include <linux/kernel.h>
+ #include <crypto/hash.h>
++#include <crypto/b128ops.h>
++#include <crypto/internal/skcipher.h>
++#include <crypto/internal/hash.h>
++
++struct mskcipherd_instance_ctx {
++	struct crypto_skcipher_spawn spawn;
++	struct mcryptd_queue *queue;
++};
++
++struct mcryptd_skcipher_ctx {
++	struct crypto_skcipher *child;
++	struct mcryptd_alg_state *alg_state;
++};
++
++struct mcryptd_skcipher {
++	struct crypto_skcipher base;
++};
++
++struct mcryptd_skcipher *mcryptd_alloc_skcipher(const char *alg_name,
++					      u32 type, u32 mask);
++struct crypto_skcipher *mcryptd_skcipher_child(struct mcryptd_skcipher *tfm);
++void mcryptd_free_skcipher(struct mcryptd_skcipher *tfm);
+ 
+ struct mcryptd_ahash {
+ 	struct crypto_ahash base;
+@@ -62,6 +84,19 @@ struct mcryptd_hash_request_ctx {
+ 	struct ahash_request areq;
+ };
+ 
++struct mcryptd_skcipher_request_ctx {
++	struct list_head waiter;
++	crypto_completion_t complete;
++	struct mcryptd_tag tag;
++	struct skcipher_walk walk;
++	u8 flag;
++	int nbytes;
++	int error;
++	struct skcipher_request desc;
++	void *job;
++	u128 seq_iv;
++};
++
+ struct mcryptd_ahash *mcryptd_alloc_ahash(const char *alg_name,
+ 					u32 type, u32 mask);
+ struct crypto_ahash *mcryptd_ahash_child(struct mcryptd_ahash *tfm);
 -- 
 1.9.1
