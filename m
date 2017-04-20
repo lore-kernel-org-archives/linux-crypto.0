@@ -1,124 +1,72 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [PATCH v2 6/9] staging: ccree: add FIPS support
-Date: Thu, 20 Apr 2017 15:39:48 +0200
-Message-ID: <6020947.G2hzgUSCE3@positron.chronox.de>
-References: <1492693983-8175-1-git-send-email-gilad@benyossef.com> <1492693983-8175-7-git-send-email-gilad@benyossef.com>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: Re: [PATCH v2 1/9] staging: ccree: introduce CryptoCell HW driver
+Date: Thu, 20 Apr 2017 16:40:56 +0300
+Message-ID: <CAOtvUMdH-=VrSS0wYUv99n=67WH53EyPfaby7kDhmgJk05C8gQ@mail.gmail.com>
+References: <1492693983-8175-1-git-send-email-gilad@benyossef.com>
+ <1492693983-8175-2-git-send-email-gilad@benyossef.com> <20170420133308.GB8998@kroah.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset=UTF-8
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         Rob Herring <robh+dt@kernel.org>,
         Mark Rutland <mark.rutland@arm.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        devel@driverdev.osuosl.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        gilad.benyossef@arm.com, Binoy Jayan <binoy.jayan@linaro.org>,
-        Ofir Drang <ofir.drang@arm.com>,
-        Stuart Yoder <stuart.yoder@arm.com>
-To: Gilad Ben-Yossef <gilad@benyossef.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1492693983-8175-7-git-send-email-gilad@benyossef.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+        devel@driverdev.osuosl.org, Binoy Jayan <binoy.jayan@linaro.org>,
+        devicetree@vger.kernel.org,
+        Gilad Ben-Yossef <gilad.benyossef@arm.com>,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+        linux-crypto@vger.kernel.org, Stuart Yoder <stuart.yoder@arm.com>,
+        Ofir Drang <ofir.drang@arm.com>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-yb0-f177.google.com ([209.85.213.177]:34992 "EHLO
+        mail-yb0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S945941AbdDTNk5 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 20 Apr 2017 09:40:57 -0400
+Received: by mail-yb0-f177.google.com with SMTP id 6so25030479ybq.2
+        for <linux-crypto@vger.kernel.org>; Thu, 20 Apr 2017 06:40:57 -0700 (PDT)
+In-Reply-To: <20170420133308.GB8998@kroah.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Am Donnerstag, 20. April 2017, 15:13:00 CEST schrieb Gilad Ben-Yossef:
+On Thu, Apr 20, 2017 at 4:33 PM, Greg Kroah-Hartman
+<gregkh@linuxfoundation.org> wrote:
+> On Thu, Apr 20, 2017 at 04:12:55PM +0300, Gilad Ben-Yossef wrote:
+>> +++ b/drivers/staging/ccree/bsp.h
+>> @@ -0,0 +1,21 @@
+>> +/*
+>> + * Copyright (C) 2012-2016 ARM Limited or its affiliates.
+>> + *
+>> + * This program is free software; you can redistribute it and/or modify it
+>> + * under the terms of the GNU General Public License as published by the Free
+>> + * Software Foundation; either version 2 of the License, or (at your option)
+>> + * any later version.
+>
+> Oh, I have to ask, do you really mean "any later version" here and
+> elsewhere?
+>
+> If so, then your MODULE_LICENSE() marking is wrong, please fix that up,
+> or fix up the license text, I can't take incompatible ones without
+> getting angry emails from legal people sent to me...
+>
 
-Hi Gilad,
+Thanks for noticing this.
 
-> +/* The function verifies that tdes keys are not weak.*/
-> +static int ssi_fips_verify_3des_keys(const u8 *key, unsigned int keylen)
-> +{
-> +#ifdef CCREE_FIPS_SUPPORT
-> +        tdes_keys_t *tdes_key = (tdes_keys_t*)key;
-> +
-> +	/* verify key1 != key2 and key3 != key2*/
+The copyright + license notice is a boilerplate I got from the powers
+that be here.
 
-I do not think that this check is necessary. There is no FIPS requirement or 
-IG that mandates this (unlike the XTS key check).
-
-If there would be such requirement, we would need a common service function 
-for all TDES implementations
-
-> +        if (unlikely( (memcmp((u8*)tdes_key->key1, (u8*)tdes_key->key2,
-> sizeof(tdes_key->key1)) == 0) || +		      (memcmp((u8*)tdes_key->key3,
-> (u8*)tdes_key->key2, sizeof(tdes_key->key3)) == 0) )) { +               
-> return -ENOEXEC;
-> +        }
-> +#endif /* CCREE_FIPS_SUPPORT */
-> +
-> +        return 0;
-> +}
-> +
-> +/* The function verifies that xts keys are not weak.*/
-> +static int ssi_fips_verify_xts_keys(const u8 *key, unsigned int keylen)
-> +{
-> +#ifdef CCREE_FIPS_SUPPORT
-> +        /* Weak key is define as key that its first half (128/256 lsb)
-> equals its second half (128/256 msb) */ +        int singleKeySize = keylen
-> >> 1;
-> +
-> +	if (unlikely(memcmp(key, &key[singleKeySize], singleKeySize) == 0)) {
-> +		return -ENOEXEC;
-
-Use xts_check_key.
-
-> +The test vectors were taken from:
-> +
-> +* AES
-> +NIST Special Publication 800-38A 2001 Edition
-> +Recommendation for Block Cipher Modes of Operation
-> +http://csrc.nist.gov/publications/nistpubs/800-38a/sp800-38a.pdf
-> +Appendix F: Example Vectors for Modes of Operation of the AES
-> +
-> +* AES CTS
-> +Advanced Encryption Standard (AES) Encryption for Kerberos 5
-> +February 2005
-> +https://tools.ietf.org/html/rfc3962#appendix-B
-> +B.  Sample Test Vectors
-> +
-> +* AES XTS
-> +http://csrc.nist.gov/groups/STM/cavp/#08
-> +http://csrc.nist.gov/groups/STM/cavp/documents/aes/XTSTestVectors.zip
-> +
-> +* AES CMAC
-> +http://csrc.nist.gov/groups/STM/cavp/index.html#07
-> +http://csrc.nist.gov/groups/STM/cavp/documents/mac/cmactestvectors.zip
-> +
-> +* AES-CCM
-> +http://csrc.nist.gov/groups/STM/cavp/#07
-> +http://csrc.nist.gov/groups/STM/cavp/documents/mac/ccmtestvectors.zip
-> +
-> +* AES-GCM
-> +http://csrc.nist.gov/groups/STM/cavp/documents/mac/gcmtestvectors.zip
-> +
-> +* Triple-DES
-> +NIST Special Publication 800-67 January 2012
-> +Recommendation for the Triple Data Encryption Algorithm (TDEA) Block Cipher
-> +http://csrc.nist.gov/publications/nistpubs/800-67-Rev1/SP-800-67-Rev1.pdf
-> +APPENDIX B: EXAMPLE OF TDEA FORWARD AND INVERSE CIPHER OPERATIONS +and
-> +http://csrc.nist.gov/groups/STM/cavp/#01
-> +http://csrc.nist.gov/groups/STM/cavp/documents/des/tdesmct_intermediate.zip
-> +
-> +* HASH
-> +http://csrc.nist.gov/groups/STM/cavp/#03
-> +http://csrc.nist.gov/groups/STM/cavp/documents/shs/shabytetestvectors.zip
-> +
-> +* HMAC
-> +http://csrc.nist.gov/groups/STM/cavp/#07
-> +http://csrc.nist.gov/groups/STM/cavp/documents/mac/hmactestvectors.zip
-> +
-> +*/
-
-Is this test vector business really needed? Why do you think that testmgr.c is 
-not sufficient? Other successful FIPS validations of the kernel crypto API 
-managed without such special code.
-
-Also, your entire API seems to implement the approach that if there is a self 
-test error, you disable the cipher functions, but leave the rest in-tact. The 
-standard kernel crypto API handling logic is to simply panic the kernel. Is it 
-really necessary to implement a special case for your driver?
+I'll consult internally what is the proper action. I don't want to
+make legal mad either... :-)
 
 
-Ciao
-Stephan
+Thanks again,
+
+Gilad
+
+-- 
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+"If you take a class in large-scale robotics, can you end up in a
+situation where the homework eats your dog?"
+ -- Jean-Baptiste Queru
