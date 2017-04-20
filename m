@@ -1,55 +1,100 @@
 From: kbuild test robot <lkp@intel.com>
-Subject: Re: [PATCH v2 2/9] staging: ccree: add ahash support
+Subject: [PATCH] staging: ccree: fix ifnullfree.cocci warnings
 Date: Fri, 21 Apr 2017 02:06:29 +0800
-Message-ID: <201704210146.3krxPlST%fengguang.wu@intel.com>
-References: <1492693983-8175-3-git-send-email-gilad@benyossef.com>
+Message-ID: <20170420180629.GA1954@lkp-ne04.lkp.intel.com>
+References: <201704210146.3krxPlST%fengguang.wu@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: kbuild-all@01.org, Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        devel@driverdev.osuosl.org, Binoy Jayan <binoy.jayan@linaro.org>,
-        devicetree@vger.kernel.org, gilad.benyossef@arm.com,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Stuart Yoder <stuart.yoder@arm.com>,
-        Ofir Drang <ofir.drang@arm.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Mark Rutland <mark.rutland@arm.com>, devel@driverdev.osuosl.org,
+ Herbert Xu <herbert@gondor.apana.org.au>, Binoy Jayan <binoy.jayan@linaro.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-kernel@vger.kernel.org,
+ devicetree@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
+ kbuild-all@01.org, gilad.benyossef@arm.com,
+ Stuart Yoder <stuart.yoder@arm.com>, Ofir Drang <ofir.drang@arm.com>,
+ "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org
 To: Gilad Ben-Yossef <gilad@benyossef.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:3271 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S968162AbdDTSHT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 20 Apr 2017 14:07:19 -0400
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
 Content-Disposition: inline
 In-Reply-To: <1492693983-8175-3-git-send-email-gilad@benyossef.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Gilad,
+drivers/staging/ccree/ssi_hash.c:317:2-7: WARNING: NULL check before freeing functions like kfree, debugfs_remove, debugfs_remove_recursive or usb_free_urb is not needed. Maybe consider reorganizing relevant code to avoid passing NULL values.
+drivers/staging/ccree/ssi_hash.c:320:2-7: WARNING: NULL check before freeing functions like kfree, debugfs_remove, debugfs_remove_recursive or usb_free_urb is not needed. Maybe consider reorganizing relevant code to avoid passing NULL values.
+drivers/staging/ccree/ssi_hash.c:323:2-7: WARNING: NULL check before freeing functions like kfree, debugfs_remove, debugfs_remove_recursive or usb_free_urb is not needed. Maybe consider reorganizing relevant code to avoid passing NULL values.
+drivers/staging/ccree/ssi_hash.c:373:2-7: WARNING: NULL check before freeing functions like kfree, debugfs_remove, debugfs_remove_recursive or usb_free_urb is not needed. Maybe consider reorganizing relevant code to avoid passing NULL values.
+drivers/staging/ccree/ssi_hash.c:375:2-7: WARNING: NULL check before freeing functions like kfree, debugfs_remove, debugfs_remove_recursive or usb_free_urb is not needed. Maybe consider reorganizing relevant code to avoid passing NULL values.
+drivers/staging/ccree/ssi_hash.c:377:2-7: WARNING: NULL check before freeing functions like kfree, debugfs_remove, debugfs_remove_recursive or usb_free_urb is not needed. Maybe consider reorganizing relevant code to avoid passing NULL values.
+drivers/staging/ccree/ssi_hash.c:379:3-8: WARNING: NULL check before freeing functions like kfree, debugfs_remove, debugfs_remove_recursive or usb_free_urb is not needed. Maybe consider reorganizing relevant code to avoid passing NULL values.
+drivers/staging/ccree/ssi_hash.c:381:2-7: WARNING: NULL check before freeing functions like kfree, debugfs_remove, debugfs_remove_recursive or usb_free_urb is not needed. Maybe consider reorganizing relevant code to avoid passing NULL values.
+drivers/staging/ccree/ssi_hash.c:383:2-7: WARNING: NULL check before freeing functions like kfree, debugfs_remove, debugfs_remove_recursive or usb_free_urb is not needed. Maybe consider reorganizing relevant code to avoid passing NULL values.
 
-[auto build test WARNING on linus/master]
-[also build test WARNING on v4.11-rc7]
-[cannot apply to staging/staging-testing next-20170420]
-[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
+ NULL check before some freeing functions is not needed.
 
-url:    https://github.com/0day-ci/linux/commits/Gilad-Ben-Yossef/staging-ccree-add-Arm-TrustZone-CryptoCell-REE-driver/20170420-222023
+ Based on checkpatch warning
+ "kfree(NULL) is safe this check is probably not required"
+ and kfreeaddr.cocci by Julia Lawall.
 
+Generated by: scripts/coccinelle/free/ifnullfree.cocci
 
-coccinelle warnings: (new ones prefixed by >>)
-
->> drivers/staging/ccree/ssi_hash.c:317:2-7: WARNING: NULL check before freeing functions like kfree, debugfs_remove, debugfs_remove_recursive or usb_free_urb is not needed. Maybe consider reorganizing relevant code to avoid passing NULL values.
-   drivers/staging/ccree/ssi_hash.c:320:2-7: WARNING: NULL check before freeing functions like kfree, debugfs_remove, debugfs_remove_recursive or usb_free_urb is not needed. Maybe consider reorganizing relevant code to avoid passing NULL values.
-   drivers/staging/ccree/ssi_hash.c:323:2-7: WARNING: NULL check before freeing functions like kfree, debugfs_remove, debugfs_remove_recursive or usb_free_urb is not needed. Maybe consider reorganizing relevant code to avoid passing NULL values.
-   drivers/staging/ccree/ssi_hash.c:373:2-7: WARNING: NULL check before freeing functions like kfree, debugfs_remove, debugfs_remove_recursive or usb_free_urb is not needed. Maybe consider reorganizing relevant code to avoid passing NULL values.
-   drivers/staging/ccree/ssi_hash.c:375:2-7: WARNING: NULL check before freeing functions like kfree, debugfs_remove, debugfs_remove_recursive or usb_free_urb is not needed. Maybe consider reorganizing relevant code to avoid passing NULL values.
-   drivers/staging/ccree/ssi_hash.c:377:2-7: WARNING: NULL check before freeing functions like kfree, debugfs_remove, debugfs_remove_recursive or usb_free_urb is not needed. Maybe consider reorganizing relevant code to avoid passing NULL values.
-   drivers/staging/ccree/ssi_hash.c:379:3-8: WARNING: NULL check before freeing functions like kfree, debugfs_remove, debugfs_remove_recursive or usb_free_urb is not needed. Maybe consider reorganizing relevant code to avoid passing NULL values.
-   drivers/staging/ccree/ssi_hash.c:381:2-7: WARNING: NULL check before freeing functions like kfree, debugfs_remove, debugfs_remove_recursive or usb_free_urb is not needed. Maybe consider reorganizing relevant code to avoid passing NULL values.
-   drivers/staging/ccree/ssi_hash.c:383:2-7: WARNING: NULL check before freeing functions like kfree, debugfs_remove, debugfs_remove_recursive or usb_free_urb is not needed. Maybe consider reorganizing relevant code to avoid passing NULL values.
-
-Please review and possibly fold the followup patch.
-
+CC: Gilad Ben-Yossef <gilad@benyossef.com>
+Signed-off-by: Fengguang Wu <fengguang.wu@intel.com>
 ---
-0-DAY kernel test infrastructure                Open Source Technology Center
-https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+
+ ssi_hash.c |   27 +++++++++------------------
+ 1 file changed, 9 insertions(+), 18 deletions(-)
+
+--- a/drivers/staging/ccree/ssi_hash.c
++++ b/drivers/staging/ccree/ssi_hash.c
+@@ -313,14 +313,11 @@ fail4:
+ 		state->digest_buff_dma_addr = 0;
+ 	}
+ fail3:
+-	if (state->opad_digest_buff != NULL)
+-		kfree(state->opad_digest_buff);
++	kfree(state->opad_digest_buff);
+ fail2:
+-	if (state->digest_bytes_len != NULL)
+-		kfree(state->digest_bytes_len);
++	kfree(state->digest_bytes_len);
+ fail1:
+-	if (state->digest_buff != NULL)
+-		kfree(state->digest_buff);
++	 kfree(state->digest_buff);
+ fail_digest_result_buff:
+ 	 if (state->digest_result_buff != NULL) {
+ 		 kfree(state->digest_result_buff);
+@@ -369,18 +366,12 @@ static void ssi_hash_unmap_request(struc
+ 		state->opad_digest_dma_addr = 0;
+ 	}
+ 
+-	if (state->opad_digest_buff != NULL)
+-		kfree(state->opad_digest_buff);
+-	if (state->digest_bytes_len != NULL)
+-		kfree(state->digest_bytes_len);
+-	if (state->digest_buff != NULL)
+-		kfree(state->digest_buff);
+-	if (state->digest_result_buff != NULL) 
+-	 	kfree(state->digest_result_buff);
+-	if (state->buff1 != NULL) 
+-		kfree(state->buff1);
+-	if (state->buff0 != NULL)
+-		kfree(state->buff0);
++	kfree(state->opad_digest_buff);
++	kfree(state->digest_bytes_len);
++	kfree(state->digest_buff);
++	kfree(state->digest_result_buff);
++	kfree(state->buff1);
++	kfree(state->buff0);
+ }
+ 
+ static void ssi_hash_unmap_result(struct device *dev, 
