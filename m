@@ -1,47 +1,48 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 2/2] n2rng: Combine substrings for two messages in
- n2rng_probe()
-Date: Fri, 21 Apr 2017 19:36:41 +0800
-Message-ID: <20170421113641.GA14100@gondor.apana.org.au>
-References: <4d9fbb01-e12f-eb5c-7ecd-5a2a10fd5110@users.sourceforge.net>
- <fef1883c-4338-5f8a-5dfe-e970b424fbc5@users.sourceforge.net>
+Subject: Re: [PATCH] crypto: acomp - report scomp implementations
+Date: Fri, 21 Apr 2017 19:39:07 +0800
+Message-ID: <20170421113907.GB14100@gondor.apana.org.au>
+References: <20170419132614.3363-1-giovanni.cabiddu@intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Matt Mackall <mpm@selenic.com>,
-        Shannon Nelson <shannon.nelson@oracle.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kernel-janitors@vger.kernel.org
-To: SF Markus Elfring <elfring@users.sourceforge.net>
+Cc: linux-crypto@vger.kernel.org, weigang.li@intel.com,
+        giovanni.cabiddu@gmail.com
+To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [198.176.57.175] ([198.176.57.175]:42820 "EHLO
+Received: from [198.176.57.175] ([198.176.57.175]:42828 "EHLO
         deadmen.hmeau.com" rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1038772AbdDULiz (ORCPT
+        with ESMTP id S1038793AbdDULjl (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Apr 2017 07:38:55 -0400
+        Fri, 21 Apr 2017 07:39:41 -0400
 Content-Disposition: inline
-In-Reply-To: <fef1883c-4338-5f8a-5dfe-e970b424fbc5@users.sourceforge.net>
+In-Reply-To: <20170419132614.3363-1-giovanni.cabiddu@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Apr 19, 2017 at 11:11:35AM +0200, SF Markus Elfring wrote:
-> From: Markus Elfring <elfring@users.sourceforge.net>
-> Date: Wed, 19 Apr 2017 10:50:04 +0200
+On Wed, Apr 19, 2017 at 02:26:14PM +0100, Giovanni Cabiddu wrote:
+> Fix crypto_has_acomp to report scomp implementations.
 > 
-> The script "checkpatch.pl" pointed information out like the following.
+> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> ---
+>  include/crypto/acompress.h | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> WARNING: quoted string split across lines
-> 
-> Thus fix the affected source code places.
-> 
-> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+> diff --git a/include/crypto/acompress.h b/include/crypto/acompress.h
+> index e328b52..39871f9 100644
+> --- a/include/crypto/acompress.h
+> +++ b/include/crypto/acompress.h
+> @@ -162,6 +162,7 @@ static inline int crypto_has_acomp(const char *alg_name, u32 type, u32 mask)
+>  {
+>  	type &= ~CRYPTO_ALG_TYPE_MASK;
+>  	type |= CRYPTO_ALG_TYPE_ACOMPRESS;
+> +	type |= CRYPTO_ALG_TYPE_SCOMPRESS;
+>  	mask |= CRYPTO_ALG_TYPE_MASK;
+>  
+>  	return crypto_has_alg(alg_name, type, mask);
 
-This patch doesn't seem to add any value so I'm not taking it.
+Are you sure this works? I think you should modify the mask instead.
 
-Please don't send patches based purely on a checkpatch complaint.
-
-Thanks,
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
