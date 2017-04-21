@@ -1,36 +1,36 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: Allow ecb(cipher_null) in FIPS mode
-Date: Fri, 21 Apr 2017 20:18:20 +0800
-Message-ID: <20170421121820.GA14381@gondor.apana.org.au>
-References: <20170421110306.3343-1-gmazyland@gmail.com>
+Subject: Re: [PATCH 0/4]  Bug fixes and fallback for AEAD
+Date: Fri, 21 Apr 2017 21:14:33 +0800
+Message-ID: <20170421131433.GA14803@gondor.apana.org.au>
+References: <cover.1491807106.git.harsh@chelsio.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, gmazyland@gmail.com
-To: Milan Broz <gmazyland@gmail.com>,
-        Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+        atul.gupta@chelsio.com, ganeshgr@chelsio.com
+To: Harsh Jain <harsh@chelsio.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [198.176.57.175] ([198.176.57.175]:42848 "EHLO
+Received: from [198.176.57.175] ([198.176.57.175]:42862 "EHLO
         deadmen.hmeau.com" rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1039038AbdDUMSs (ORCPT
+        with ESMTP id S1039679AbdDUNPL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Apr 2017 08:18:48 -0400
+        Fri, 21 Apr 2017 09:15:11 -0400
 Content-Disposition: inline
-In-Reply-To: <20170421110306.3343-1-gmazyland@gmail.com>
+In-Reply-To: <cover.1491807106.git.harsh@chelsio.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Milan Broz <gmazyland@gmail.com> wrote:
-> The cipher_null is not a real cipher, FIPS mode should not restrict its use.
+On Mon, Apr 10, 2017 at 06:23:57PM +0530, Harsh Jain wrote:
+> This series based on Herbert cryptodev-2.6.
+> It includes bug fixes and fallback for AEAD algos.
 > 
-> It is used for several tests (for example in cryptsetup testsuite) and also
-> temporarily for reencryption of not yet encrypted device in cryptsetup-reencrypt tool.
-> 
-> Problem is easily reproducible with
->  cryptsetup benchmark -c null
-> 
-> Signed-off-by: Milan Broz <gmazyland@gmail.com>
+> Harsh Jain (3):
+>   chcr: Increase priority of AEAD algos.
+>   chcr:Set hmac_ctrl bit to use HW register HMAC_CFG[456].
+>   chcr: Add fallback for AEAD algos
+> Atul Gupta (1):
+>   chcr: Fix txq ids
 
-Stephan?
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
