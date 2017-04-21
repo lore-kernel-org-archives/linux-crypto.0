@@ -1,36 +1,37 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/4]  Bug fixes and fallback for AEAD
-Date: Fri, 21 Apr 2017 21:14:33 +0800
-Message-ID: <20170421131433.GA14803@gondor.apana.org.au>
-References: <cover.1491807106.git.harsh@chelsio.com>
+Subject: Re: [PATCH -next] crypto: caam - fix error return code in
+ caam_qi_init()
+Date: Fri, 21 Apr 2017 21:14:47 +0800
+Message-ID: <20170421131447.GB14803@gondor.apana.org.au>
+References: <20170411160409.18430-1-weiyj.lk@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-        atul.gupta@chelsio.com, ganeshgr@chelsio.com
-To: Harsh Jain <harsh@chelsio.com>
+Cc: horia.geanta@nxp.com, dan.douglass@nxp.com, davem@davemloft.net,
+        Wei Yongjun <weiyongjun1@huawei.com>,
+        linux-crypto@vger.kernel.org
+To: Wei Yongjun <weiyj.lk@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [198.176.57.175] ([198.176.57.175]:42862 "EHLO
+Received: from [198.176.57.175] ([198.176.57.175]:42872 "EHLO
         deadmen.hmeau.com" rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1039679AbdDUNPL (ORCPT
+        with ESMTP id S1039679AbdDUNP2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Apr 2017 09:15:11 -0400
+        Fri, 21 Apr 2017 09:15:28 -0400
 Content-Disposition: inline
-In-Reply-To: <cover.1491807106.git.harsh@chelsio.com>
+In-Reply-To: <20170411160409.18430-1-weiyj.lk@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Apr 10, 2017 at 06:23:57PM +0530, Harsh Jain wrote:
-> This series based on Herbert cryptodev-2.6.
-> It includes bug fixes and fallback for AEAD algos.
+On Tue, Apr 11, 2017 at 04:04:09PM +0000, Wei Yongjun wrote:
+> From: Wei Yongjun <weiyongjun1@huawei.com>
 > 
-> Harsh Jain (3):
->   chcr: Increase priority of AEAD algos.
->   chcr:Set hmac_ctrl bit to use HW register HMAC_CFG[456].
->   chcr: Add fallback for AEAD algos
-> Atul Gupta (1):
->   chcr: Fix txq ids
+> Fix to return error code -ENOMEM from the kmem_cache_create() error
+> handling case instead of 0(err is 0 here), as done elsewhere in this
+> function.
+> 
+> Fixes: 67c2315def06 ("crypto: caam - add Queue Interface (QI) backend support")
+> Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
