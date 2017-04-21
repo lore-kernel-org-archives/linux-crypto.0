@@ -1,8 +1,7 @@
 From: Gary R Hook <gary.hook@amd.com>
-Subject: [PATCH 2/2] crypto: ccp - Change ISR handler method for a v5 CCP
-Date: Fri, 21 Apr 2017 10:50:14 -0500
-Message-ID: <20170421155014.11643.57345.stgit@taos.amd.com>
-References: <20170421151225.11643.91749.stgit@taos.amd.com>
+Subject: [PATCH 0/2] Change CCP ISR handler model
+Date: Fri, 21 Apr 2017 10:49:56 -0500
+Message-ID: <20170421151225.11643.91749.stgit@taos.amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
@@ -10,207 +9,32 @@ Cc: <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>,
         <davem@davemloft.net>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn3nam01on0053.outbound.protection.outlook.com ([104.47.33.53]:14560
-        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
+Received: from mail-by2nam03on0065.outbound.protection.outlook.com ([104.47.42.65]:4869
+        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1161729AbdDUPvr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Apr 2017 11:51:47 -0400
-In-Reply-To: <20170421151225.11643.91749.stgit@taos.amd.com>
+        id S1161788AbdDUPwk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 21 Apr 2017 11:52:40 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The CCP has the ability to perform several operations simultaneously,
-but only one interrupt.  When implemented as a PCI device and using
-MSI-X/MSI interrupts, use a tasklet model to service interrupts. By
-disabling and enabling interrupts from the CCP, coupled with the
-queuing that tasklets provide, we can ensure that all events
-(occurring on the device) are recognized and serviced.
+he CCP has the ability to perform several operations
+simultaneously, but only one interrupt. The current design
+exposes a window when using MSI/MSI-X interrupts wherein
+state can change but no interrupt is generated; this can
+lead to a hang in the engine.  Switch to a tasklet backend
+which allows serializing state changes, handles processing
+of the interrupts, and avoids the loss of task completion
+status.
 
-This change fixes a problem wherein 2 or more busy queues can cause
-notification bits to change state while a (CCP) interrupt is being
-serviced, but after the queue state has been evaluated. This results
-in the event being 'lost' and the queue hanging, waiting to be
-serviced. Since the status bits are never fully de-asserted, the
-CCP never generates another interrupt (all bits zero -> one or more
-bits one), and no further CCP operations will be executed.
-
-
-Cc: <stable@vger.kernel.org> # 4.9.x+
-
-Signed-off-by: Gary R Hook <gary.hook@amd.com>
 ---
- drivers/crypto/ccp/ccp-dev-v5.c |  111 ++++++++++++++++++++++++---------------
- 1 file changed, 67 insertions(+), 44 deletions(-)
 
-diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
-index 13b81a1c1184..ccbe32d5dd1c 100644
---- a/drivers/crypto/ccp/ccp-dev-v5.c
-+++ b/drivers/crypto/ccp/ccp-dev-v5.c
-@@ -705,6 +705,65 @@ static int ccp_assign_lsbs(struct ccp_device *ccp)
- 	return rc;
- }
- 
-+static void ccp5_disable_queue_interrupts(struct ccp_device *ccp)
-+{
-+	unsigned int i;
-+
-+	for (i = 0; i < ccp->cmd_q_count; i++)
-+		iowrite32(0x0, ccp->cmd_q[i].reg_int_enable);
-+}
-+
-+static void ccp5_enable_queue_interrupts(struct ccp_device *ccp)
-+{
-+	unsigned int i;
-+
-+	for (i = 0; i < ccp->cmd_q_count; i++)
-+		iowrite32(SUPPORTED_INTERRUPTS, ccp->cmd_q[i].reg_int_enable);
-+}
-+
-+static void ccp5_irq_bh(unsigned long data)
-+{
-+	struct ccp_device *ccp = (struct ccp_device *)data;
-+	u32 status;
-+	unsigned int i;
-+
-+	for (i = 0; i < ccp->cmd_q_count; i++) {
-+		struct ccp_cmd_queue *cmd_q = &ccp->cmd_q[i];
-+
-+		status = ioread32(cmd_q->reg_interrupt_status);
-+
-+		if (status) {
-+			cmd_q->int_status = status;
-+			cmd_q->q_status = ioread32(cmd_q->reg_status);
-+			cmd_q->q_int_status = ioread32(cmd_q->reg_int_status);
-+
-+			/* On error, only save the first error value */
-+			if ((status & INT_ERROR) && !cmd_q->cmd_error)
-+				cmd_q->cmd_error = CMD_Q_ERROR(cmd_q->q_status);
-+
-+			cmd_q->int_rcvd = 1;
-+
-+			/* Acknowledge the interrupt and wake the kthread */
-+			iowrite32(status, cmd_q->reg_interrupt_status);
-+			wake_up_interruptible(&cmd_q->int_queue);
-+		}
-+	}
-+	ccp5_enable_queue_interrupts(ccp);
-+}
-+
-+static irqreturn_t ccp5_irq_handler(int irq, void *data)
-+{
-+	struct device *dev = data;
-+	struct ccp_device *ccp = dev_get_drvdata(dev);
-+
-+	ccp5_disable_queue_interrupts(ccp);
-+	if (ccp->use_tasklet)
-+		tasklet_schedule(&ccp->irq_tasklet);
-+	else
-+		ccp5_irq_bh((unsigned long)ccp);
-+	return IRQ_HANDLED;
-+}
-+
- static int ccp5_init(struct ccp_device *ccp)
- {
- 	struct device *dev = ccp->dev;
-@@ -789,18 +848,17 @@ static int ccp5_init(struct ccp_device *ccp)
- 	}
- 
- 	/* Turn off the queues and disable interrupts until ready */
-+	ccp5_disable_queue_interrupts(ccp);
- 	for (i = 0; i < ccp->cmd_q_count; i++) {
- 		cmd_q = &ccp->cmd_q[i];
- 
- 		cmd_q->qcontrol = 0; /* Start with nothing */
- 		iowrite32(cmd_q->qcontrol, cmd_q->reg_control);
- 
--		/* Disable the interrupts */
--		iowrite32(0x00, cmd_q->reg_int_enable);
- 		ioread32(cmd_q->reg_int_status);
- 		ioread32(cmd_q->reg_status);
- 
--		/* Clear the interrupts */
-+		/* Clear the interrupt status */
- 		iowrite32(SUPPORTED_INTERRUPTS, cmd_q->reg_interrupt_status);
- 	}
- 
-@@ -811,6 +869,10 @@ static int ccp5_init(struct ccp_device *ccp)
- 		dev_err(dev, "unable to allocate an IRQ\n");
- 		goto e_pool;
- 	}
-+	/* Initialize the ISR tasklet */
-+	if (ccp->use_tasklet)
-+		tasklet_init(&ccp->irq_tasklet, ccp5_irq_bh,
-+			     (unsigned long)ccp);
- 
- 	dev_dbg(dev, "Loading LSB map...\n");
- 	/* Copy the private LSB mask to the public registers */
-@@ -879,11 +941,7 @@ static int ccp5_init(struct ccp_device *ccp)
- 	}
- 
- 	dev_dbg(dev, "Enabling interrupts...\n");
--	/* Enable interrupts */
--	for (i = 0; i < ccp->cmd_q_count; i++) {
--		cmd_q = &ccp->cmd_q[i];
--		iowrite32(SUPPORTED_INTERRUPTS, cmd_q->reg_int_enable);
--	}
-+	ccp5_enable_queue_interrupts(ccp);
- 
- 	dev_dbg(dev, "Registering device...\n");
- 	/* Put this on the unit list to make it available */
-@@ -935,15 +993,13 @@ static void ccp5_destroy(struct ccp_device *ccp)
- 	ccp_del_device(ccp);
- 
- 	/* Disable and clear interrupts */
-+	ccp5_disable_queue_interrupts(ccp);
- 	for (i = 0; i < ccp->cmd_q_count; i++) {
- 		cmd_q = &ccp->cmd_q[i];
- 
- 		/* Turn off the run bit */
- 		iowrite32(cmd_q->qcontrol & ~CMD5_Q_RUN, cmd_q->reg_control);
- 
--		/* Disable the interrupts */
--		iowrite32(0x00, cmd_q->reg_int_enable);
--
- 		/* Clear the interrupt status */
- 		iowrite32(SUPPORTED_INTERRUPTS, cmd_q->reg_interrupt_status);
- 		ioread32(cmd_q->reg_int_status);
-@@ -978,39 +1034,6 @@ static void ccp5_destroy(struct ccp_device *ccp)
- 	}
- }
- 
--static irqreturn_t ccp5_irq_handler(int irq, void *data)
--{
--	struct device *dev = data;
--	struct ccp_device *ccp = dev_get_drvdata(dev);
--	u32 status;
--	unsigned int i;
--
--	for (i = 0; i < ccp->cmd_q_count; i++) {
--		struct ccp_cmd_queue *cmd_q = &ccp->cmd_q[i];
--
--		status = ioread32(cmd_q->reg_interrupt_status);
--
--		if (status) {
--			cmd_q->int_status = status;
--			cmd_q->q_status = ioread32(cmd_q->reg_status);
--			cmd_q->q_int_status = ioread32(cmd_q->reg_int_status);
--
--			/* On error, only save the first error value */
--			if ((status & INT_ERROR) && !cmd_q->cmd_error)
--				cmd_q->cmd_error = CMD_Q_ERROR(cmd_q->q_status);
--
--			cmd_q->int_rcvd = 1;
--
--			/* Acknowledge the interrupt and wake the kthread */
--			iowrite32(SUPPORTED_INTERRUPTS,
--				  cmd_q->reg_interrupt_status);
--			wake_up_interruptible(&cmd_q->int_queue);
--		}
--	}
--
--	return IRQ_HANDLED;
--}
--
- static void ccp5_config(struct ccp_device *ccp)
- {
- 	/* Public side */
+Gary R Hook (2):
+      crypto: ccp - Change ISR handler method for a v3 CCP
+      crypto: ccp - Change ISR handler method for a v5 CCP
+
+
+ drivers/crypto/ccp/ccp-dev-v3.c |  120 +++++++++++++++++++++++----------------
+ drivers/crypto/ccp/ccp-dev-v5.c |  111 ++++++++++++++++++++++--------------
+ drivers/crypto/ccp/ccp-dev.h    |    3 +
+ drivers/crypto/ccp/ccp-pci.c    |    2 +
+ 4 files changed, 142 insertions(+), 94 deletions(-)
