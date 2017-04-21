@@ -1,66 +1,78 @@
-From: abed mohammad kamaluddin <abedamu@gmail.com>
-Subject: Re: [RFC PATCH v1 1/1] crypto: algif_compression - User-space
- interface for compression
-Date: Fri, 21 Apr 2017 21:12:10 +0530
-Message-ID: <CACVarETMxEzAhDvHkuSVqaqxRN_SLc9pY0mmVeOT1N8PbcTf5g@mail.gmail.com>
-References: <1492108494-10694-1-git-send-email-akamaluddin@cavium.com>
- <1492108494-10694-2-git-send-email-akamaluddin@cavium.com> <1503555.c1mqzxcg8O@positron.chronox.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org,
-        "akamaluddin@cavium.com" <akamaluddin@cavium.com>,
-        pathreya@cavium.com, mchalla@cavium.com
-To: =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>
+From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH v2 1/2] crypto: scomp - allow registration of multiple scomps
+Date: Fri, 21 Apr 2017 21:54:29 +0100
+Message-ID: <20170421205430.11551-1-giovanni.cabiddu@intel.com>
+Cc: linux-crypto@vger.kernel.org, weigang.li@intel.com,
+        giovanni.cabiddu@gmail.com,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-io0-f174.google.com ([209.85.223.174]:35248 "EHLO
-        mail-io0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1425452AbdDUTmZ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Apr 2017 15:42:25 -0400
-Received: by mail-io0-f174.google.com with SMTP id r16so126615746ioi.2
-        for <linux-crypto@vger.kernel.org>; Fri, 21 Apr 2017 12:42:25 -0700 (PDT)
-In-Reply-To: <1503555.c1mqzxcg8O@positron.chronox.de>
+Received: from mga01.intel.com ([192.55.52.88]:2991 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1040858AbdDUUyn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 21 Apr 2017 16:54:43 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Stephan,
+Add crypto_register_scomps and crypto_unregister_scomps to allow
+the registration of multiple implementations with one call.
 
-On Tue, Apr 18, 2017 at 3:42 PM, Stephan M=C3=BCller <smueller@chronox.de> =
-wrote:
-> Am Donnerstag, 13. April 2017, 20:34:54 CEST schrieb Abed Kamaluddin:
->
-> May I propose that you look into the patches for skcipher and aead regard=
-ing
-> memory handling updates that are currently discussed. There you will find=
- the
-> sendmsg code with two parts:
->
-> 1. checking of the input data of cmsg and setting the ctx respectively.
->
-> 2. the big while loop for getting all user space data
->
-> I guess you have seen that I would like to consolidate the algif
-> implementations once the memory handling patch is in and agreed on. My pl=
-an
-> is: Bullet 1 will be private to the algif implementation, so leave your c=
-ode.
-> Bullet 2 will be moved into a common service function. Thus, may I propos=
-e
-> that you simply copy the entire while loop with the same TX data structur=
-es
-> into your sendmsg code. This way you do not have the mentioned limit.
->
-> Also, simply copy the sendpage code from the patch set to support splice/
-> vmsplice.
->
+Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+---
+ crypto/scompress.c                  | 29 +++++++++++++++++++++++++++++
+ include/crypto/internal/scompress.h |  3 +++
+ 2 files changed, 32 insertions(+)
 
-Thanks for the suggestions and helpful pointers, I will rework the
-patch and incorporate these, hoping that the compression interface
-will be exported. These changes would also remain unaffected by any
-changes to the acomp interface.
-
-Thanks
-Abed (Cavium)
-Regards,
+diff --git a/crypto/scompress.c b/crypto/scompress.c
+index 6b048b3..ae1d3cf 100644
+--- a/crypto/scompress.c
++++ b/crypto/scompress.c
+@@ -353,5 +353,34 @@ int crypto_unregister_scomp(struct scomp_alg *alg)
+ }
+ EXPORT_SYMBOL_GPL(crypto_unregister_scomp);
+ 
++int crypto_register_scomps(struct scomp_alg *algs, int count)
++{
++	int i, ret;
++
++	for (i = 0; i < count; i++) {
++		ret = crypto_register_scomp(&algs[i]);
++		if (ret)
++			goto err;
++	}
++
++	return 0;
++
++err:
++	for (--i; i >= 0; --i)
++		crypto_unregister_scomp(&algs[i]);
++
++	return ret;
++}
++EXPORT_SYMBOL_GPL(crypto_register_scomps);
++
++void crypto_unregister_scomps(struct scomp_alg *algs, int count)
++{
++	int i;
++
++	for (i = count - 1; i >= 0; --i)
++		crypto_unregister_scomp(&algs[i]);
++}
++EXPORT_SYMBOL_GPL(crypto_unregister_scomps);
++
+ MODULE_LICENSE("GPL");
+ MODULE_DESCRIPTION("Synchronous compression type");
+diff --git a/include/crypto/internal/scompress.h b/include/crypto/internal/scompress.h
+index 3fda3c5..ccad9b2 100644
+--- a/include/crypto/internal/scompress.h
++++ b/include/crypto/internal/scompress.h
+@@ -133,4 +133,7 @@ int crypto_register_scomp(struct scomp_alg *alg);
+  */
+ int crypto_unregister_scomp(struct scomp_alg *alg);
+ 
++int crypto_register_scomps(struct scomp_alg *algs, int count);
++void crypto_unregister_scomps(struct scomp_alg *algs, int count);
++
+ #endif
+-- 
+2.9.3
