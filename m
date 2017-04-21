@@ -1,212 +1,157 @@
-From: Mimi Zohar <zohar@linux.vnet.ibm.com>
-Subject: Re: [PATCH 3/6] ima: Simplify policy_func_show.
-Date: Fri, 21 Apr 2017 09:57:56 -0400
-Message-ID: <1492783076.3081.202.camel@linux.vnet.ibm.com>
-References: <1492546666-16615-1-git-send-email-bauerman@linux.vnet.ibm.com>
-         <1492546666-16615-4-git-send-email-bauerman@linux.vnet.ibm.com>
-         <1492690403.3081.72.camel@linux.vnet.ibm.com>
-         <2085797.x18HOhjl0i@morokweng>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-Cc: linux-security-module@vger.kernel.org,
-        linux-ima-devel@lists.sourceforge.net, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        David Howells <dhowells@redhat.com>,
+From: Jiri Slaby <jslaby@suse.cz>
+Subject: [PATCH v3 15/29] x86: assembly, annotate aliases
+Date: Fri, 21 Apr 2017 16:12:51 +0200
+Message-ID: <20170421141305.25180-15-jslaby@suse.cz>
+References: <20170421141305.25180-1-jslaby@suse.cz>
+Cc: tglx@linutronix.de, hpa@zytor.com, x86@kernel.org,
+        jpoimboe@redhat.com, linux-kernel@vger.kernel.org,
+        Jiri Slaby <jslaby@suse.cz>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Claudio Carvalho <cclaudio@linux.vnet.ibm.com>
-To: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
-Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <2085797.x18HOhjl0i@morokweng>
-Sender: owner-linux-security-module@vger.kernel.org
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Juergen Gross <jgross@suse.com>, linux-crypto@vger.kernel.org,
+        xen-devel@lists.xenproject.org
+To: mingo@redhat.com
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20170421141305.25180-1-jslaby@suse.cz>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, 2017-04-20 at 17:40 -0300, Thiago Jung Bauermann wrote:
-> Am Donnerstag, 20. April 2017, 08:13:23 BRT schrieb Mimi Zohar:
-> > On Tue, 2017-04-18 at 17:17 -0300, Thiago Jung Bauermann wrote:
-> > > If the func_tokens array uses the same indices as enum ima_hooks,
-> > > policy_func_show can be a lot simpler, and the func_* enum becomes
-> > > unnecessary.
-> > 
-> > My main concern with separating the enumeration from the string
-> > definition is that they might become out of sync.  Perhaps using
-> > macros, similar to those used for kernel_read_file_id_str(), would be
-> > better?
-> 
-> I agree that it would be better. Is the patch below what you had in mind?
+_key_expansion_128 is an alias to _key_expansion_256a, __memcpy to
+memcpy, xen_syscall32_target to xen_sysenter_target, and so on. Annotate
+them all using the new SYM_FUNC_START_ALIAS, SYM_FUNC_START_LOCAL_ALIAS,
+and SYM_FUNC_END_ALIAS. This will make the tools generating the
+debuginfo happy.
 
-Yes, I haven't tested it yet, but it looks right.
-> 
-> I also noticed that policy_func_show can be even simpler if we stop using the 
-> printf format string from the policy_tokens table. What do you think?
-> 
-> -- 
-> Thiago Jung Bauermann
-> IBM Linux Technology Center
-> 
-> 
-> From 594628c94f5dd7c6d2624944a76b6a01f9668128 Mon Sep 17 00:00:00 2001
-> From: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
-> Date: Mon, 10 Apr 2017 14:59:44 -0300
-> Subject: [PATCH 3/6] ima: Simplify policy_func_show.
-> 
-> If the func_tokens array uses the same indices as enum ima_hooks,
-> policy_func_show can be a lot simpler, and the func_* enum becomes
-> unnecessary.
-> 
-> Also, if we use the same macro trick used by kernel_read_file_id_str we can
-> use one hooks list for both the enum and the string array, making sure they
-> are always in sync (suggested by Mimi Zohar).
+Signed-off-by: Jiri Slaby <jslaby@suse.cz>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: <x86@kernel.org>
+Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+Cc: Juergen Gross <jgross@suse.com>
+Reviewed-by: Juergen Gross <jgross@suse.com> [xen parts]
+Cc: <linux-crypto@vger.kernel.org>
+Cc: <xen-devel@lists.xenproject.org>
+---
+ arch/x86/crypto/aesni-intel_asm.S | 5 ++---
+ arch/x86/lib/memcpy_64.S          | 4 ++--
+ arch/x86/lib/memmove_64.S         | 4 ++--
+ arch/x86/lib/memset_64.S          | 4 ++--
+ arch/x86/xen/xen-asm_64.S         | 4 ++--
+ 5 files changed, 10 insertions(+), 11 deletions(-)
 
-> Finally, by using the printf pattern for the function token directly
-> instead of using the pt macro we can simplify policy_func_show even further
-> and avoid the need of having a temporary buffer. Since the only use of
-> Opt_func's printf pattern in policy_tokens was in policy_func_show, we
-> don't need it at all anymore so remove it.
-> 
-> Signed-off-by: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
-> ---
->  security/integrity/ima/ima.h        | 25 +++++++++-------
->  security/integrity/ima/ima_policy.c | 60 +++++--------------------------------
->  2 files changed, 22 insertions(+), 63 deletions(-)
-> 
-> diff --git a/security/integrity/ima/ima.h b/security/integrity/ima/ima.h
-> index b563fbd4d122..51ef805cf7f3 100644
-> --- a/security/integrity/ima/ima.h
-> +++ b/security/integrity/ima/ima.h
-> @@ -172,17 +172,22 @@ static inline unsigned long ima_hash_key(u8 *digest)
->  	return hash_long(*digest, IMA_HASH_BITS);
->  }
-> 
-> +#define __ima_hooks(hook)		\
-> +	hook(NONE)			\
-> +	hook(FILE_CHECK)		\
-> +	hook(MMAP_CHECK)		\
-> +	hook(BPRM_CHECK)		\
-> +	hook(POST_SETATTR)		\
-> +	hook(MODULE_CHECK)		\
-> +	hook(FIRMWARE_CHECK)		\
-> +	hook(KEXEC_KERNEL_CHECK)	\
-> +	hook(KEXEC_INITRAMFS_CHECK)	\
-> +	hook(POLICY_CHECK)		\
-> +	hook(MAX_CHECK)
-> +#define __ima_hook_enumify(ENUM)	ENUM,
-> +
->  enum ima_hooks {
-> -	FILE_CHECK = 1,
-> -	MMAP_CHECK,
-> -	BPRM_CHECK,
-> -	POST_SETATTR,
-> -	MODULE_CHECK,
-> -	FIRMWARE_CHECK,
-> -	KEXEC_KERNEL_CHECK,
-> -	KEXEC_INITRAMFS_CHECK,
-> -	POLICY_CHECK,
-> -	MAX_CHECK
-> +	__ima_hooks(__ima_hook_enumify)
->  };
-> 
->  /* LIM API function definitions */
-> diff --git a/security/integrity/ima/ima_policy.c b/security/integrity/ima/ima_policy.c
-> index cfda5d7b17ec..39d43a5beb5a 100644
-> --- a/security/integrity/ima/ima_policy.c
-> +++ b/security/integrity/ima/ima_policy.c
-> @@ -503,7 +503,7 @@ static match_table_t policy_tokens = {
->  	{Opt_subj_user, "subj_user=%s"},
->  	{Opt_subj_role, "subj_role=%s"},
->  	{Opt_subj_type, "subj_type=%s"},
-> -	{Opt_func, "func=%s"},
-> +	{Opt_func, NULL},
->  	{Opt_mask, "mask=%s"},
->  	{Opt_fsmagic, "fsmagic=%s"},
->  	{Opt_fsuuid, "fsuuid=%s"},
-> @@ -896,23 +896,10 @@ static const char *const mask_tokens[] = {
->  	"MAY_APPEND"
->  };
-> 
-> -enum {
-> -	func_file = 0, func_mmap, func_bprm,
-> -	func_module, func_firmware, func_post,
-> -	func_kexec_kernel, func_kexec_initramfs,
-> -	func_policy
-> -};
-> +#define __ima_hook_stringify(str)	#str,
-> 
->  static const char *const func_tokens[] = {
-> -	"FILE_CHECK",
-> -	"MMAP_CHECK",
-> -	"BPRM_CHECK",
-> -	"MODULE_CHECK",
-> -	"FIRMWARE_CHECK",
-> -	"POST_SETATTR",
-> -	"KEXEC_KERNEL_CHECK",
-> -	"KEXEC_INITRAMFS_CHECK",
-> -	"POLICY_CHECK"
-> +	__ima_hooks(__ima_hook_stringify)
->  };
-> 
->  void *ima_policy_start(struct seq_file *m, loff_t *pos)
-> @@ -949,49 +936,16 @@ void ima_policy_stop(struct seq_file *m, void *v)
-> 
->  #define pt(token)	policy_tokens[token + Opt_err].pattern
->  #define mt(token)	mask_tokens[token]
-> -#define ft(token)	func_tokens[token]
-> 
->  /*
->   * policy_func_show - display the ima_hooks policy rule
->   */
->  static void policy_func_show(struct seq_file *m, enum ima_hooks func)
->  {
-> -	char tbuf[64] = {0,};
-> -
-> -	switch (func) {
-> -	case FILE_CHECK:
-> -		seq_printf(m, pt(Opt_func), ft(func_file));
-> -		break;
-> -	case MMAP_CHECK:
-> -		seq_printf(m, pt(Opt_func), ft(func_mmap));
-> -		break;
-> -	case BPRM_CHECK:
-> -		seq_printf(m, pt(Opt_func), ft(func_bprm));
-> -		break;
-> -	case MODULE_CHECK:
-> -		seq_printf(m, pt(Opt_func), ft(func_module));
-> -		break;
-> -	case FIRMWARE_CHECK:
-> -		seq_printf(m, pt(Opt_func), ft(func_firmware));
-> -		break;
-> -	case POST_SETATTR:
-> -		seq_printf(m, pt(Opt_func), ft(func_post));
-> -		break;
-> -	case KEXEC_KERNEL_CHECK:
-> -		seq_printf(m, pt(Opt_func), ft(func_kexec_kernel));
-> -		break;
-> -	case KEXEC_INITRAMFS_CHECK:
-> -		seq_printf(m, pt(Opt_func), ft(func_kexec_initramfs));
-> -		break;
-> -	case POLICY_CHECK:
-> -		seq_printf(m, pt(Opt_func), ft(func_policy));
-> -		break;
-> -	default:
-> -		snprintf(tbuf, sizeof(tbuf), "%d", func);
-> -		seq_printf(m, pt(Opt_func), tbuf);
-> -		break;
-> -	}
-> -	seq_puts(m, " ");
-> +	if (func > 0 && func < MAX_CHECK)
-> +		seq_printf(m, "func=%s ", func_tokens[func]);
-> +	else
-> +		seq_printf(m, "func=%d ", func);
-
-The only time this can happen is when __kernel_read_file_id() is
-updated without updating the read_idmap[].  Perhaps we can display the
-number and the appropriate __kernel_read_file_id string.
-
-Mimi
-
->  }
-> 
->  int ima_policy_show(struct seq_file *m, void *v)
-
+diff --git a/arch/x86/crypto/aesni-intel_asm.S b/arch/x86/crypto/aesni-intel_asm.S
+index da76ae01e791..3469670df832 100644
+--- a/arch/x86/crypto/aesni-intel_asm.S
++++ b/arch/x86/crypto/aesni-intel_asm.S
+@@ -1744,8 +1744,7 @@ ENDPROC(aesni_gcm_enc)
+ #endif
+ 
+ 
+-.align 4
+-_key_expansion_128:
++SYM_FUNC_START_LOCAL_ALIAS(_key_expansion_128)
+ SYM_FUNC_START_LOCAL(_key_expansion_256a)
+ 	pshufd $0b11111111, %xmm1, %xmm1
+ 	shufps $0b00010000, %xmm0, %xmm4
+@@ -1756,8 +1755,8 @@ SYM_FUNC_START_LOCAL(_key_expansion_256a)
+ 	movaps %xmm0, (TKEYP)
+ 	add $0x10, TKEYP
+ 	ret
+-ENDPROC(_key_expansion_128)
+ SYM_FUNC_END(_key_expansion_256a)
++SYM_FUNC_END_ALIAS(_key_expansion_128)
+ 
+ SYM_FUNC_START_LOCAL(_key_expansion_192a)
+ 	pshufd $0b01010101, %xmm1, %xmm1
+diff --git a/arch/x86/lib/memcpy_64.S b/arch/x86/lib/memcpy_64.S
+index 9a53a06e5a3e..4911b1c61aa8 100644
+--- a/arch/x86/lib/memcpy_64.S
++++ b/arch/x86/lib/memcpy_64.S
+@@ -26,7 +26,7 @@
+  * Output:
+  * rax original destination
+  */
+-ENTRY(__memcpy)
++SYM_FUNC_START_ALIAS(__memcpy)
+ ENTRY(memcpy)
+ 	ALTERNATIVE_2 "jmp memcpy_orig", "", X86_FEATURE_REP_GOOD, \
+ 		      "jmp memcpy_erms", X86_FEATURE_ERMS
+@@ -40,7 +40,7 @@ ENTRY(memcpy)
+ 	rep movsb
+ 	ret
+ ENDPROC(memcpy)
+-ENDPROC(__memcpy)
++SYM_FUNC_END_ALIAS(__memcpy)
+ EXPORT_SYMBOL(memcpy)
+ EXPORT_SYMBOL(__memcpy)
+ 
+diff --git a/arch/x86/lib/memmove_64.S b/arch/x86/lib/memmove_64.S
+index 15de86cd15b0..d22af97e5b27 100644
+--- a/arch/x86/lib/memmove_64.S
++++ b/arch/x86/lib/memmove_64.S
+@@ -25,7 +25,7 @@
+  */
+ .weak memmove
+ 
+-ENTRY(memmove)
++SYM_FUNC_START_ALIAS(memmove)
+ ENTRY(__memmove)
+ 
+ 	/* Handle more 32 bytes in loop */
+@@ -207,6 +207,6 @@ ENTRY(__memmove)
+ 13:
+ 	retq
+ ENDPROC(__memmove)
+-ENDPROC(memmove)
++SYM_FUNC_END_ALIAS(memmove)
+ EXPORT_SYMBOL(__memmove)
+ EXPORT_SYMBOL(memmove)
+diff --git a/arch/x86/lib/memset_64.S b/arch/x86/lib/memset_64.S
+index 55b95db30a61..0d3a1d341e60 100644
+--- a/arch/x86/lib/memset_64.S
++++ b/arch/x86/lib/memset_64.S
+@@ -18,7 +18,7 @@
+  *
+  * rax   original destination
+  */
+-ENTRY(memset)
++SYM_FUNC_START_ALIAS(memset)
+ ENTRY(__memset)
+ 	/*
+ 	 * Some CPUs support enhanced REP MOVSB/STOSB feature. It is recommended
+@@ -42,8 +42,8 @@ ENTRY(__memset)
+ 	rep stosb
+ 	movq %r9,%rax
+ 	ret
+-ENDPROC(memset)
+ ENDPROC(__memset)
++SYM_FUNC_END_ALIAS(memset)
+ EXPORT_SYMBOL(memset)
+ EXPORT_SYMBOL(__memset)
+ 
+diff --git a/arch/x86/xen/xen-asm_64.S b/arch/x86/xen/xen-asm_64.S
+index d617bea76039..e1174171ab57 100644
+--- a/arch/x86/xen/xen-asm_64.S
++++ b/arch/x86/xen/xen-asm_64.S
+@@ -117,13 +117,13 @@ ENDPROC(xen_sysenter_target)
+ 
+ #else /* !CONFIG_IA32_EMULATION */
+ 
+-ENTRY(xen_syscall32_target)
++SYM_FUNC_START_ALIAS(xen_syscall32_target)
+ ENTRY(xen_sysenter_target)
+ 	lea 16(%rsp), %rsp	/* strip %rcx, %r11 */
+ 	mov $-ENOSYS, %rax
+ 	pushq $0
+ 	jmp hypercall_iret
+-ENDPROC(xen_syscall32_target)
+ ENDPROC(xen_sysenter_target)
++SYM_FUNC_END_ALIAS(xen_syscall32_target)
+ 
+ #endif	/* CONFIG_IA32_EMULATION */
+-- 
+2.12.2
