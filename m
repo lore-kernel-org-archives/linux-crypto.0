@@ -1,283 +1,47 @@
-From: Gary R Hook <gary.hook@amd.com>
-Subject: [PATCH 1/2] crypto: ccp - Change ISR handler method for a v3 CCP
-Date: Fri, 21 Apr 2017 10:50:05 -0500
-Message-ID: <20170421155004.11643.45228.stgit@taos.amd.com>
-References: <20170421151225.11643.91749.stgit@taos.amd.com>
+From: abed mohammad kamaluddin <abedamu@gmail.com>
+Subject: Re: [RFC PATCH v1 1/1] crypto: algif_compression - User-space
+ interface for compression
+Date: Fri, 21 Apr 2017 21:37:48 +0530
+Message-ID: <CACVarETBrCPZjEOABBQTKR52Wjv3bHxA_wg66hMDw2fNrtZmsA@mail.gmail.com>
+References: <1492108494-10694-1-git-send-email-akamaluddin@cavium.com>
+ <1503555.c1mqzxcg8O@positron.chronox.de> <CACVarETMxEzAhDvHkuSVqaqxRN_SLc9pY0mmVeOT1N8PbcTf5g@mail.gmail.com>
+ <1869148.qqR7Ib7PBA@tauon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>
-To: <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org,
+        "akamaluddin@cavium.com" <akamaluddin@cavium.com>,
+        pathreya@cavium.com, mchalla@cavium.com
+To: =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-dm3nam03on0080.outbound.protection.outlook.com ([104.47.41.80]:26432
-        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1041387AbdDUQji (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Apr 2017 12:39:38 -0400
-In-Reply-To: <20170421151225.11643.91749.stgit@taos.amd.com>
+Received: from mail-yb0-f182.google.com ([209.85.213.182]:36250 "EHLO
+        mail-yb0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1162233AbdDURGu (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 21 Apr 2017 13:06:50 -0400
+Received: by mail-yb0-f182.google.com with SMTP id s22so47720170ybe.3
+        for <linux-crypto@vger.kernel.org>; Fri, 21 Apr 2017 10:06:50 -0700 (PDT)
+In-Reply-To: <1869148.qqR7Ib7PBA@tauon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The CCP has the ability to perform several operations simultaneously,
-but only one interrupt.  When implemented as a PCI device and using
-MSI-X/MSI interrupts, use a tasklet model to service interrupts. By
-disabling and enabling interrupts from the CCP, coupled with the
-queuing that tasklets provide, we can ensure that all events
-(occurring on the device) are recognized and serviced.
+On Fri, Apr 21, 2017 at 9:20 PM, Stephan M=C3=BCller <smueller@chronox.de> =
+wrote:
+> Am Freitag, 21. April 2017, 17:42:10 CEST schrieb abed mohammad kamaluddi=
+n:
+>
+> Just diff the just RFCed algif_kpp with the proposed patch set for
+> algif_skcipher and algif_aead. There you will see that 80% of all code is
+> identical (if you disregard the different namespace). And that is the cod=
+e I
+> am referring to.
+>
+> Ciao
+> Stephan
 
-This change fixes a problem wherein 2 or more busy queues can cause
-notification bits to change state while a (CCP) interrupt is being
-serviced, but after the queue state has been evaluated. This results
-in the event being 'lost' and the queue hanging, waiting to be
-serviced. Since the status bits are never fully de-asserted, the
-CCP never generates another interrupt (all bits zero -> one or more
-bits one), and no further CCP operations will be executed.
+Thanks, I will use the pointer. Considering all the identical code,
+the proposal to consolidate would definitely help!
 
-
-Cc: <stable@vger.kernel.org> # 4.9.x+
-
-Signed-off-by: Gary R Hook <gary.hook@amd.com>
----
- drivers/crypto/ccp/ccp-dev-v3.c |  120 +++++++++++++++++++++++----------------
- drivers/crypto/ccp/ccp-dev.h    |    3 +
- drivers/crypto/ccp/ccp-pci.c    |    2 +
- 3 files changed, 75 insertions(+), 50 deletions(-)
-
-diff --git a/drivers/crypto/ccp/ccp-dev-v3.c b/drivers/crypto/ccp/ccp-dev-v3.c
-index a3689a66cb1d..367c2e30656f 100644
---- a/drivers/crypto/ccp/ccp-dev-v3.c
-+++ b/drivers/crypto/ccp/ccp-dev-v3.c
-@@ -315,17 +315,73 @@ static int ccp_perform_ecc(struct ccp_op *op)
- 	return ccp_do_cmd(op, cr, ARRAY_SIZE(cr));
- }
- 
-+static void ccp_disable_queue_interrupts(struct ccp_device *ccp)
-+{
-+	iowrite32(0x00, ccp->io_regs + IRQ_MASK_REG);
-+}
-+
-+static void ccp_enable_queue_interrupts(struct ccp_device *ccp)
-+{
-+	iowrite32(ccp->qim, ccp->io_regs + IRQ_MASK_REG);
-+}
-+
-+static void ccp_irq_bh(unsigned long data)
-+{
-+	struct ccp_device *ccp = (struct ccp_device *)data;
-+	struct ccp_cmd_queue *cmd_q;
-+	u32 q_int, status;
-+	unsigned int i;
-+
-+	status = ioread32(ccp->io_regs + IRQ_STATUS_REG);
-+
-+	for (i = 0; i < ccp->cmd_q_count; i++) {
-+		cmd_q = &ccp->cmd_q[i];
-+
-+		q_int = status & (cmd_q->int_ok | cmd_q->int_err);
-+		if (q_int) {
-+			cmd_q->int_status = status;
-+			cmd_q->q_status = ioread32(cmd_q->reg_status);
-+			cmd_q->q_int_status = ioread32(cmd_q->reg_int_status);
-+
-+			/* On error, only save the first error value */
-+			if ((q_int & cmd_q->int_err) && !cmd_q->cmd_error)
-+				cmd_q->cmd_error = CMD_Q_ERROR(cmd_q->q_status);
-+
-+			cmd_q->int_rcvd = 1;
-+
-+			/* Acknowledge the interrupt and wake the kthread */
-+			iowrite32(q_int, ccp->io_regs + IRQ_STATUS_REG);
-+			wake_up_interruptible(&cmd_q->int_queue);
-+		}
-+	}
-+	ccp_enable_queue_interrupts(ccp);
-+}
-+
-+static irqreturn_t ccp_irq_handler(int irq, void *data)
-+{
-+	struct device *dev = data;
-+	struct ccp_device *ccp = dev_get_drvdata(dev);
-+
-+	ccp_disable_queue_interrupts(ccp);
-+	if (ccp->use_tasklet)
-+		tasklet_schedule(&ccp->irq_tasklet);
-+	else
-+		ccp_irq_bh((unsigned long)ccp);
-+
-+	return IRQ_HANDLED;
-+}
-+
- static int ccp_init(struct ccp_device *ccp)
- {
- 	struct device *dev = ccp->dev;
- 	struct ccp_cmd_queue *cmd_q;
- 	struct dma_pool *dma_pool;
- 	char dma_pool_name[MAX_DMAPOOL_NAME_LEN];
--	unsigned int qmr, qim, i;
-+	unsigned int qmr, i;
- 	int ret;
- 
- 	/* Find available queues */
--	qim = 0;
-+	ccp->qim = 0;
- 	qmr = ioread32(ccp->io_regs + Q_MASK_REG);
- 	for (i = 0; i < MAX_HW_QUEUES; i++) {
- 		if (!(qmr & (1 << i)))
-@@ -370,7 +426,7 @@ static int ccp_init(struct ccp_device *ccp)
- 		init_waitqueue_head(&cmd_q->int_queue);
- 
- 		/* Build queue interrupt mask (two interrupts per queue) */
--		qim |= cmd_q->int_ok | cmd_q->int_err;
-+		ccp->qim |= cmd_q->int_ok | cmd_q->int_err;
- 
- #ifdef CONFIG_ARM64
- 		/* For arm64 set the recommended queue cache settings */
-@@ -388,14 +444,14 @@ static int ccp_init(struct ccp_device *ccp)
- 	dev_notice(dev, "%u command queues available\n", ccp->cmd_q_count);
- 
- 	/* Disable and clear interrupts until ready */
--	iowrite32(0x00, ccp->io_regs + IRQ_MASK_REG);
-+	ccp_disable_queue_interrupts(ccp);
- 	for (i = 0; i < ccp->cmd_q_count; i++) {
- 		cmd_q = &ccp->cmd_q[i];
- 
- 		ioread32(cmd_q->reg_int_status);
- 		ioread32(cmd_q->reg_status);
- 	}
--	iowrite32(qim, ccp->io_regs + IRQ_STATUS_REG);
-+	iowrite32(ccp->qim, ccp->io_regs + IRQ_STATUS_REG);
- 
- 	/* Request an irq */
- 	ret = ccp->get_irq(ccp);
-@@ -404,6 +460,11 @@ static int ccp_init(struct ccp_device *ccp)
- 		goto e_pool;
- 	}
- 
-+	/* Initialize the ISR tasklet? */
-+	if (ccp->use_tasklet)
-+		tasklet_init(&ccp->irq_tasklet, ccp_irq_bh,
-+			     (unsigned long)ccp);
-+
- 	dev_dbg(dev, "Starting threads...\n");
- 	/* Create a kthread for each queue */
- 	for (i = 0; i < ccp->cmd_q_count; i++) {
-@@ -426,7 +487,7 @@ static int ccp_init(struct ccp_device *ccp)
- 
- 	dev_dbg(dev, "Enabling interrupts...\n");
- 	/* Enable interrupts */
--	iowrite32(qim, ccp->io_regs + IRQ_MASK_REG);
-+	ccp_enable_queue_interrupts(ccp);
- 
- 	dev_dbg(dev, "Registering device...\n");
- 	ccp_add_device(ccp);
-@@ -463,7 +524,7 @@ static void ccp_destroy(struct ccp_device *ccp)
- {
- 	struct ccp_cmd_queue *cmd_q;
- 	struct ccp_cmd *cmd;
--	unsigned int qim, i;
-+	unsigned int i;
- 
- 	/* Unregister the DMA engine */
- 	ccp_dmaengine_unregister(ccp);
-@@ -474,22 +535,15 @@ static void ccp_destroy(struct ccp_device *ccp)
- 	/* Remove this device from the list of available units */
- 	ccp_del_device(ccp);
- 
--	/* Build queue interrupt mask (two interrupt masks per queue) */
--	qim = 0;
--	for (i = 0; i < ccp->cmd_q_count; i++) {
--		cmd_q = &ccp->cmd_q[i];
--		qim |= cmd_q->int_ok | cmd_q->int_err;
--	}
--
- 	/* Disable and clear interrupts */
--	iowrite32(0x00, ccp->io_regs + IRQ_MASK_REG);
-+	ccp_disable_queue_interrupts(ccp);
- 	for (i = 0; i < ccp->cmd_q_count; i++) {
- 		cmd_q = &ccp->cmd_q[i];
- 
- 		ioread32(cmd_q->reg_int_status);
- 		ioread32(cmd_q->reg_status);
- 	}
--	iowrite32(qim, ccp->io_regs + IRQ_STATUS_REG);
-+	iowrite32(ccp->qim, ccp->io_regs + IRQ_STATUS_REG);
- 
- 	/* Stop the queue kthreads */
- 	for (i = 0; i < ccp->cmd_q_count; i++)
-@@ -516,40 +570,6 @@ static void ccp_destroy(struct ccp_device *ccp)
- 	}
- }
- 
--static irqreturn_t ccp_irq_handler(int irq, void *data)
--{
--	struct device *dev = data;
--	struct ccp_device *ccp = dev_get_drvdata(dev);
--	struct ccp_cmd_queue *cmd_q;
--	u32 q_int, status;
--	unsigned int i;
--
--	status = ioread32(ccp->io_regs + IRQ_STATUS_REG);
--
--	for (i = 0; i < ccp->cmd_q_count; i++) {
--		cmd_q = &ccp->cmd_q[i];
--
--		q_int = status & (cmd_q->int_ok | cmd_q->int_err);
--		if (q_int) {
--			cmd_q->int_status = status;
--			cmd_q->q_status = ioread32(cmd_q->reg_status);
--			cmd_q->q_int_status = ioread32(cmd_q->reg_int_status);
--
--			/* On error, only save the first error value */
--			if ((q_int & cmd_q->int_err) && !cmd_q->cmd_error)
--				cmd_q->cmd_error = CMD_Q_ERROR(cmd_q->q_status);
--
--			cmd_q->int_rcvd = 1;
--
--			/* Acknowledge the interrupt and wake the kthread */
--			iowrite32(q_int, ccp->io_regs + IRQ_STATUS_REG);
--			wake_up_interruptible(&cmd_q->int_queue);
--		}
--	}
--
--	return IRQ_HANDLED;
--}
--
- static const struct ccp_actions ccp3_actions = {
- 	.aes = ccp_perform_aes,
- 	.xts_aes = ccp_perform_xts_aes,
-diff --git a/drivers/crypto/ccp/ccp-dev.h b/drivers/crypto/ccp/ccp-dev.h
-index 2dfec019a832..0cb09d0feeaf 100644
---- a/drivers/crypto/ccp/ccp-dev.h
-+++ b/drivers/crypto/ccp/ccp-dev.h
-@@ -339,7 +339,10 @@ struct ccp_device {
- 	void *dev_specific;
- 	int (*get_irq)(struct ccp_device *ccp);
- 	void (*free_irq)(struct ccp_device *ccp);
-+	unsigned int qim;
- 	unsigned int irq;
-+	bool use_tasklet;
-+	struct tasklet_struct irq_tasklet;
- 
- 	/* I/O area used for device communication. The register mapping
- 	 * starts at an offset into the mapped bar.
-diff --git a/drivers/crypto/ccp/ccp-pci.c b/drivers/crypto/ccp/ccp-pci.c
-index 28a9996c1085..e880d4cf4ada 100644
---- a/drivers/crypto/ccp/ccp-pci.c
-+++ b/drivers/crypto/ccp/ccp-pci.c
-@@ -69,6 +69,7 @@ static int ccp_get_msix_irqs(struct ccp_device *ccp)
- 			goto e_irq;
- 		}
- 	}
-+	ccp->use_tasklet = true;
- 
- 	return 0;
- 
-@@ -100,6 +101,7 @@ static int ccp_get_msi_irq(struct ccp_device *ccp)
- 		dev_notice(dev, "unable to allocate MSI IRQ (%d)\n", ret);
- 		goto e_msi;
- 	}
-+	ccp->use_tasklet = true;
- 
- 	return 0;
- 
+Thanks,
+Abed
