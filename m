@@ -1,45 +1,37 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] powerpc/crypto/crct10dif-vpmsum: Fix missing
- preempt_disable()
-Date: Fri, 21 Apr 2017 21:16:35 +0800
-Message-ID: <20170421131635.GH14803@gondor.apana.org.au>
-References: <1492666509-4568-1-git-send-email-mpe@ellerman.id.au>
+Subject: Re: [PATCH 1/2] n2rng: Use devm_kcalloc() in n2rng_probe()
+Date: Fri, 21 Apr 2017 21:16:13 +0800
+Message-ID: <20170421131612.GE14803@gondor.apana.org.au>
+References: <4d9fbb01-e12f-eb5c-7ecd-5a2a10fd5110@users.sourceforge.net>
+ <38c41219-7e7f-3a3e-29dd-04ae2d57beaa@users.sourceforge.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linuxppc-dev@ozlabs.org, dja@axtens.net,
-        linux-crypto@vger.kernel.org
-To: Michael Ellerman <mpe@ellerman.id.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [198.176.57.175] ([198.176.57.175]:42934 "EHLO
-        deadmen.hmeau.com" rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1039759AbdDUNRJ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Apr 2017 09:17:09 -0400
+Cc: linux-crypto@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Matt Mackall <mpm@selenic.com>,
+        Shannon Nelson <shannon.nelson@oracle.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kernel-janitors@vger.kernel.org
+To: SF Markus Elfring <elfring@users.sourceforge.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1492666509-4568-1-git-send-email-mpe@ellerman.id.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <38c41219-7e7f-3a3e-29dd-04ae2d57beaa@users.sourceforge.net>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Apr 20, 2017 at 03:35:09PM +1000, Michael Ellerman wrote:
-> In crct10dif_vpmsum() we call enable_kernel_altivec() without first
-> disabling preemption, which is not allowed.
+On Wed, Apr 19, 2017 at 11:10:07AM +0200, SF Markus Elfring wrote:
+> From: Markus Elfring <elfring@users.sourceforge.net>
+> Date: Wed, 19 Apr 2017 10:30:47 +0200
 > 
-> It used to be sufficient just to call pagefault_disable(), because that
-> also disabled preemption. But the two were decoupled in commit 8222dbe21e79
-> ("sched/preempt, mm/fault: Decouple preemption from the page fault
-> logic") in mid 2015.
+> * A multiplication for the size determination of a memory allocation
+>   indicated that an array data structure should be processed.
+>   Thus use the corresponding function "devm_kcalloc".
 > 
-> The crct10dif-vpmsum code inherited this bug from the crc32c-vpmsum code
-> on which it was modelled.
+> * Replace the specification of a data structure by a pointer dereference
+>   to make the corresponding size determination a bit safer according to
+>   the Linux coding style convention.
 > 
-> So add the missing preempt_disable/enable(). We should also call
-> disable_kernel_fp(), although it does nothing by default, there is a
-> debug switch to make it active and all enables should be paired with
-> disables.
-> 
-> Fixes: b01df1c16c9a ("crypto: powerpc - Add CRC-T10DIF acceleration")
-> Acked-by: Daniel Axtens <dja@axtens.net>
-> Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
+> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
 
 Patch applied.  Thanks.
 -- 
