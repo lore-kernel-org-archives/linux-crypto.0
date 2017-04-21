@@ -1,34 +1,45 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: acomp - replace compression known answer test
-Date: Fri, 21 Apr 2017 21:16:28 +0800
-Message-ID: <20170421131627.GG14803@gondor.apana.org.au>
-References: <20170419132718.3438-1-giovanni.cabiddu@intel.com>
+Subject: Re: [PATCH v2] powerpc/crypto/crct10dif-vpmsum: Fix missing
+ preempt_disable()
+Date: Fri, 21 Apr 2017 21:16:35 +0800
+Message-ID: <20170421131635.GH14803@gondor.apana.org.au>
+References: <1492666509-4568-1-git-send-email-mpe@ellerman.id.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, weigang.li@intel.com,
-        giovanni.cabiddu@gmail.com
-To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc: linuxppc-dev@ozlabs.org, dja@axtens.net,
+        linux-crypto@vger.kernel.org
+To: Michael Ellerman <mpe@ellerman.id.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [198.176.57.175] ([198.176.57.175]:42916 "EHLO
+Received: from [198.176.57.175] ([198.176.57.175]:42934 "EHLO
         deadmen.hmeau.com" rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1039793AbdDUNQv (ORCPT
+        with ESMTP id S1039759AbdDUNRJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Apr 2017 09:16:51 -0400
+        Fri, 21 Apr 2017 09:17:09 -0400
 Content-Disposition: inline
-In-Reply-To: <20170419132718.3438-1-giovanni.cabiddu@intel.com>
+In-Reply-To: <1492666509-4568-1-git-send-email-mpe@ellerman.id.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Apr 19, 2017 at 02:27:18PM +0100, Giovanni Cabiddu wrote:
-> Compression implementations might return valid outputs that
-> do not match what specified in the test vectors.
-> For this reason, the testmgr might report that a compression
-> implementation failed the test even if the data produced
-> by the compressor is correct.
-> This implements a decompress-and-verify test for acomp
-> compression tests rather than a known answer test.
+On Thu, Apr 20, 2017 at 03:35:09PM +1000, Michael Ellerman wrote:
+> In crct10dif_vpmsum() we call enable_kernel_altivec() without first
+> disabling preemption, which is not allowed.
 > 
-> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> It used to be sufficient just to call pagefault_disable(), because that
+> also disabled preemption. But the two were decoupled in commit 8222dbe21e79
+> ("sched/preempt, mm/fault: Decouple preemption from the page fault
+> logic") in mid 2015.
+> 
+> The crct10dif-vpmsum code inherited this bug from the crc32c-vpmsum code
+> on which it was modelled.
+> 
+> So add the missing preempt_disable/enable(). We should also call
+> disable_kernel_fp(), although it does nothing by default, there is a
+> debug switch to make it active and all enables should be paired with
+> disables.
+> 
+> Fixes: b01df1c16c9a ("crypto: powerpc - Add CRC-T10DIF acceleration")
+> Acked-by: Daniel Axtens <dja@axtens.net>
+> Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
 
 Patch applied.  Thanks.
 -- 
