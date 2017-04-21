@@ -1,39 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/2] n2rng: Use devm_kcalloc() in n2rng_probe()
-Date: Fri, 21 Apr 2017 21:16:13 +0800
-Message-ID: <20170421131612.GE14803@gondor.apana.org.au>
-References: <4d9fbb01-e12f-eb5c-7ecd-5a2a10fd5110@users.sourceforge.net>
- <38c41219-7e7f-3a3e-29dd-04ae2d57beaa@users.sourceforge.net>
+Subject: Re: [PATCH V3 0/2] Interrupt management fixes
+Date: Fri, 21 Apr 2017 21:17:04 +0800
+Message-ID: <20170421131704.GJ14803@gondor.apana.org.au>
+References: <20170420202030.4843.76826.stgit@taos.amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Matt Mackall <mpm@selenic.com>,
-        Shannon Nelson <shannon.nelson@oracle.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kernel-janitors@vger.kernel.org
-To: SF Markus Elfring <elfring@users.sourceforge.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org, thomas.lendacky@amd.com,
+        davem@davemloft.net
+To: Gary R Hook <gary.hook@amd.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from [198.176.57.175] ([198.176.57.175]:42954 "EHLO
+        deadmen.hmeau.com" rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1039839AbdDUNRf (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 21 Apr 2017 09:17:35 -0400
 Content-Disposition: inline
-In-Reply-To: <38c41219-7e7f-3a3e-29dd-04ae2d57beaa@users.sourceforge.net>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20170420202030.4843.76826.stgit@taos.amd.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Apr 19, 2017 at 11:10:07AM +0200, SF Markus Elfring wrote:
-> From: Markus Elfring <elfring@users.sourceforge.net>
-> Date: Wed, 19 Apr 2017 10:30:47 +0200
+On Thu, Apr 20, 2017 at 03:24:00PM -0500, Gary R Hook wrote:
+> Correct the driver to attend to only relevant interrupt
+> bits, and ensure that interrupts are managed properly
+> at module unload.
 > 
-> * A multiplication for the size determination of a memory allocation
->   indicated that an array data structure should be processed.
->   Thus use the corresponding function "devm_kcalloc".
-> 
-> * Replace the specification of a data structure by a pointer dereference
->   to make the corresponding size determination a bit safer according to
->   the Linux coding style convention.
-> 
-> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+> Changes from V2:
+> - Apply patches to relevant stable branches
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
