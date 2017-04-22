@@ -1,50 +1,51 @@
-From: Loganaden Velvindron <logan@hackers.mu>
-Subject: [PATCH] crypto: ecc : Wipe memory for p on errors.
-Date: Sat, 22 Apr 2017 15:31:34 +0400
-Message-ID: <20170422113134.hzulmuvnveqg7sjq@hackers.mu>
+From: Pirabarlen-Cheenaramen <selven@hackers.mu>
+Subject: [PATCH] crypto: testmgr: clean up memory for sensitive information
+Date: Sun, 23 Apr 2017 01:40:56 +0200
+Message-ID: <20170422234056.GA25272@hackers.mu>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from walmailout06.yourhostingaccount.com ([65.254.253.50]:34541 "EHLO
-        walmailout06.yourhostingaccount.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1423019AbdDVMCX (ORCPT
+Received: from walmailout02.yourhostingaccount.com ([65.254.253.197]:37446
+        "EHLO walmailout02.yourhostingaccount.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1427384AbdDWAlz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 22 Apr 2017 08:02:23 -0400
-Received: from mailscan08.yourhostingaccount.com ([10.1.15.8] helo=walmailscan08.yourhostingaccount.com)
-        by walmailout06.yourhostingaccount.com with esmtp (Exim)
-        id 1d1tGZ-00045g-Bq
-        for linux-crypto@vger.kernel.org; Sat, 22 Apr 2017 07:31:51 -0400
-Received: from [10.114.3.31] (helo=walimpout11)
-        by walmailscan08.yourhostingaccount.com with esmtp (Exim)
-        id 1d1tGZ-0003fE-AQ
-        for linux-crypto@vger.kernel.org; Sat, 22 Apr 2017 07:31:51 -0400
-Received: from [197.226.251.188] (port=39382 helo=hackers.mu)
-        by walauthsmtp16.yourhostingaccount.com with esmtpsa (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256)
-        (Exim)
-        id 1d1tGV-0003zn-CS
-        for linux-crypto@vger.kernel.org; Sat, 22 Apr 2017 07:31:48 -0400
+        Sat, 22 Apr 2017 20:41:55 -0400
+Received: from mailscan05.yourhostingaccount.com ([10.1.15.5] helo=walmailscan05.yourhostingaccount.com)
+        by walmailout02.yourhostingaccount.com with esmtp (Exim)
+        id 1d24eF-000145-QO
+        for linux-crypto@vger.kernel.org; Sat, 22 Apr 2017 19:41:03 -0400
+Received: from [10.114.3.33] (helo=walimpout13)
+        by walmailscan05.yourhostingaccount.com with esmtp (Exim)
+        id 1d24eF-0007xr-Nj
+        for linux-crypto@vger.kernel.org; Sat, 22 Apr 2017 19:41:03 -0400
+Received: from x1-6-50-6a-03-e0-98-fa.cpe.webspeed.dk ([188.181.91.111]:58504 helo=hackers.mu)
+        by walauthsmtp07.yourhostingaccount.com with esmtpa (Exim)
+        id 1d24eC-0007f7-Bi
+        for linux-crypto@vger.kernel.org; Sat, 22 Apr 2017 19:41:00 -0400
 Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Signed-off-by: Loganaden Velvindron <logan@hackers.mu>
+Signed-off-by: Pirabarlen-Cheenaramen <selven@hackers.mu>
 ---
- crypto/ecc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ crypto/testmgr.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/crypto/ecc.c b/crypto/ecc.c
-index 414c78a..32f50c34 100644
---- a/crypto/ecc.c
-+++ b/crypto/ecc.c
-@@ -88,7 +88,7 @@ static struct ecc_point *ecc_alloc_point(unsigned int ndigits)
- err_alloc_y:
- 	ecc_free_digits_space(p->x);
- err_alloc_x:
--	kfree(p);
-+	kzfree(p);
- 	return NULL;
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index cd075c7..0af2e16 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -953,8 +953,8 @@ static int __test_aead(struct crypto_aead *tfm, int enc,
+ out_noaxbuf:
+ 	testmgr_free_buf(xbuf);
+ out_noxbuf:
+-	kfree(key);
+-	kfree(iv);
++	kzfree(key);
++	kzfree(iv);
+ 	return ret;
  }
  
 -- 
-2.9.3
+1.9.1
