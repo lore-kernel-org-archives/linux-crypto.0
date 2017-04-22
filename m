@@ -1,59 +1,58 @@
-From: <membership@instituteofcredit.org>
-Subject: 44942 linux-crypto
-Date: Sat, 22 Apr 2017 04:08:07 -0000
-Message-ID: <149283408700.20069.17690585785141961500@ttknet.ru>
+From: Sandy Harris <sandyinchina@gmail.com>
+Subject: Re: [PATCH] crypto: Allow ecb(cipher_null) in FIPS mode
+Date: Sat, 22 Apr 2017 15:54:08 +0800
+Message-ID: <CACXcFm=HAew+fMAZXWL9WtT49GVdvUdVShnOOsDLEqUwU5cJng@mail.gmail.com>
+References: <20170421121820.GA14381@gondor.apana.org.au> <8205294.2qxUD6mCvD@tauon.chronox.de>
+ <9105605.SAXsSHs1iB@tauon.chronox.de>
 Mime-Version: 1.0
-Content-Type: application/zip; name="8375267.zip"
-Content-Transfer-Encoding: base64
-To: <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        Milan Broz <gmazyland@gmail.com>, linux-crypto@vger.kernel.org
+To: =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 227.59.access.ttknet.ru ([31.163.59.227]:32859 "HELO ttknet.ru"
-        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with SMTP
-        id S1751082AbdDVEIN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 22 Apr 2017 00:08:13 -0400
-Content-Disposition: attachment
+Received: from mail-wm0-f45.google.com ([74.125.82.45]:38309 "EHLO
+        mail-wm0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1042861AbdDVHyK (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 22 Apr 2017 03:54:10 -0400
+Received: by mail-wm0-f45.google.com with SMTP id r190so32167713wme.1
+        for <linux-crypto@vger.kernel.org>; Sat, 22 Apr 2017 00:54:09 -0700 (PDT)
+In-Reply-To: <9105605.SAXsSHs1iB@tauon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-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
+On Sat, Apr 22, 2017 at 2:56 AM, Stephan M=C3=BCller <smueller@chronox.de> =
+wrote:
+
+> Am Freitag, 21. April 2017, 17:25:41 CEST schrieb Stephan M=C3=BCller:
+
+> Just for the records: for FIPS 140-2 rules, cipher_null is to be interpre=
+ted
+> as a memcpy on SGLs. Thus it is no cipher even though it sounds like one.
+>
+> cipher_null is also needed for seqiv which is required for rfc4106(gcm(ae=
+s)),
+> which is an approved cipher. Also, it is needed for authenc() which uses =
+it
+> for copying the AAD from src to dst.
+>
+> That said, cipher_null must not be used for "encryption" operation but ra=
+ther
+> for handling data that is not subjected to FIPS 140-2 rules.
+
+In the FreeS/WAN project, back around the turn of the century,
+we refused to implement several things required by the RFCs
+because we thought they were insecure: null cipher, single
+DES & 768-bit DH Group 1.
+
+At that time, not having DES did cause some problems in
+interoperating with other IPsec implementations, but I
+doubt it would today. Neither of the other dropped items
+caused any problems at all.
+
+Today I'd say drop all of those plus the 1024-bit Group 2,
+and then look at whether others should go as well. As of
+2001 or so, the 1536-bit Group 5 was very widely used,
+so dropping it might well be problematic, but I am not
+certain if it is either secure or widely used now.
