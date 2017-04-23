@@ -1,52 +1,49 @@
-From: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-Subject: [PATCH v3 10/15] staging: ccree: remove useless NULL test of field
-Date: Sun, 23 Apr 2017 12:26:18 +0300
-Message-ID: <1492939583-25688-11-git-send-email-gilad@benyossef.com>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: [PATCH v3 09/15] MAINTAINERS: add Gilad BY as ccree maintainer
+Date: Sun, 23 Apr 2017 12:26:17 +0300
+Message-ID: <1492939583-25688-10-git-send-email-gilad@benyossef.com>
 References: <1492939583-25688-1-git-send-email-gilad@benyossef.com>
-Cc: linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, gilad.benyossef-5wv7dgnIgG8@public.gmane.org,
-        Binoy Jayan <binoy.jayan-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
-        Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>,
-        Stuart Yoder <stuart.yoder-5wv7dgnIgG8@public.gmane.org>,
-        Stephan Muller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
-To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-        "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
-        Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>,
-        devel-gWbeCf7V1WCQmaza687I9mD2FQJk+8+b@public.gmane.org
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1492939583-25688-1-git-send-email-gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, gilad.benyossef@arm.com,
+        Binoy Jayan <binoy.jayan@linaro.org>,
+        Ofir Drang <ofir.drang@arm.com>,
+        Stuart Yoder <stuart.yoder@arm.com>,
+        Stephan Muller <smueller@chronox.de>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        devel@driverdev.osuosl.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1492939583-25688-1-git-send-email-gilad@benyossef.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Remove kbuild test robot reported NULL check for a struct field address.
+I work for Arm on maintaining the TrustZone CryptoCell driver.
 
-Signed-off-by: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-Reported-by: kbuild test robot <fengguang.wu-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
+Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/ssi_buffer_mgr.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ MAINTAINERS | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/drivers/staging/ccree/ssi_buffer_mgr.c b/drivers/staging/ccree/ssi_buffer_mgr.c
-index 0140199..af50904 100644
---- a/drivers/staging/ccree/ssi_buffer_mgr.c
-+++ b/drivers/staging/ccree/ssi_buffer_mgr.c
-@@ -755,9 +755,7 @@ void ssi_buffer_mgr_unmap_aead_request(
- 				AES_BLOCK_SIZE, DMA_TO_DEVICE);
- 		}
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 676c139..f21caa1 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -3066,6 +3066,13 @@ F:	drivers/net/ieee802154/cc2520.c
+ F:	include/linux/spi/cc2520.h
+ F:	Documentation/devicetree/bindings/net/ieee802154/cc2520.txt
  
--		if (&areq_ctx->ccm_adata_sg != NULL)
--			dma_unmap_sg(dev, &areq_ctx->ccm_adata_sg,
--				1, DMA_TO_DEVICE);
-+		dma_unmap_sg(dev, &areq_ctx->ccm_adata_sg, 1, DMA_TO_DEVICE);
- 	}
- 	if (areq_ctx->gen_ctx.iv_dma_addr != 0) {
- 		SSI_RESTORE_DMA_ADDR_TO_48BIT(areq_ctx->gen_ctx.iv_dma_addr);
++CCREE ARM TRUSTZONE CRYPTOCELL 700 REE DRIVER
++M:	Gilad Ben-Yossef <gilad@benyossef.com>
++L:	linux-crypto@vger.kernel.org
++S:	Supported
++F:	drivers/staging/ccree/
++W:	https://developer.arm.com/products/system-ip/trustzone-cryptocell/cryptocell-700-family
++
+ CEC DRIVER
+ M:	Hans Verkuil <hans.verkuil@cisco.com>
+ L:	linux-media@vger.kernel.org
 -- 
 2.1.4
-
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
