@@ -1,49 +1,46 @@
-From: Codarren Velvindron <codarren@hackers.mu>
-Subject: [PATCH] crypto: tcrypt: Zero iv before freeing it
-Date: Sun, 23 Apr 2017 20:12:04 +0400
-Message-ID: <20170423161204.GA9489@hackers.mu>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
+Subject: Re: [PATCH v2 6/9] staging: ccree: add FIPS support
+Date: Sun, 23 Apr 2017 20:57:58 +0200
+Message-ID: <19392241.HaQDpS1BQU@positron.chronox.de>
+References: <1492693983-8175-1-git-send-email-gilad@benyossef.com> <6020947.G2hzgUSCE3@positron.chronox.de> <CAOtvUMcOib2xr=THj1hy_uPtVhRHgJ2-4__mUBb5VwANQ1GA_A@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailout03.yourhostingaccount.com ([65.254.254.78]:48213 "EHLO
-        walmailout03.yourhostingaccount.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S971339AbdDWQnA (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 23 Apr 2017 12:43:00 -0400
-Received: from mailscan10.yourhostingaccount.com ([10.1.15.10] helo=walmailscan10.yourhostingaccount.com)
-        by walmailout03.yourhostingaccount.com with esmtp (Exim)
-        id 1d2K7R-0000CI-V1
-        for linux-crypto@vger.kernel.org; Sun, 23 Apr 2017 12:12:13 -0400
-Received: from [10.114.3.32] (helo=walimpout12)
-        by walmailscan10.yourhostingaccount.com with esmtp (Exim)
-        id 1d2K7R-0008MJ-Rr
-        for linux-crypto@vger.kernel.org; Sun, 23 Apr 2017 12:12:13 -0400
-Received: from [197.226.251.189] (port=42108 helo=hackers.mu)
-        by walauthsmtp12.yourhostingaccount.com with esmtpa (Exim)
-        id 1d2K7N-0003Tt-VR
-        for linux-crypto@vger.kernel.org; Sun, 23 Apr 2017 12:12:10 -0400
-Content-Disposition: inline
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+        "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
+        Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>,
+        devel-gWbeCf7V1WCQmaza687I9mD2FQJk+8+b@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        Linux kernel mailing list <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        Gilad Ben-Yossef <gilad.benyossef-5wv7dgnIgG8@public.gmane.org>,
+        Binoy Jayan <binoy.jayan-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
+        Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>,
+        Stuart Yoder <stuart.yoder-5wv7dgnIgG8@public.gmane.org>
+To: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CAOtvUMcOib2xr=THj1hy_uPtVhRHgJ2-4__mUBb5VwANQ1GA_A-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-Signed-off-by: Codarren Velvindron <codarren@hackers.mu>
----
- crypto/tcrypt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Am Sonntag, 23. April 2017, 11:48:58 CEST schrieb Gilad Ben-Yossef:
 
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index 9a11f3c..48a721c 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -384,7 +384,7 @@ static void test_aead_speed(const char *algo, int enc, unsigned int secs,
- out_noaxbuf:
- 	testmgr_free_buf(xbuf);
- out_noxbuf:
--	kfree(iv);
-+	kzfree(iv);
- 	return;
- }
- 
--- 
-2.7.4
+Hi Gilad,
+
+> I do wonder if there is value in alternate behavior of stopping crypto
+> API on FIPS error rather than a panic though. I will try to get an
+> explanation why we do it this way.
+
+In FIPS, all crypto function must cease if a self test fails. This can be done 
+by instrumenting the crypto API calls with a check to a global flag or by 
+simply terminating the entire "FIPS module".
+
+The panic() is the simplest approach to meet that requirement.
+
+Ciao
+Stephan
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
