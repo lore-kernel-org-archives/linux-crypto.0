@@ -1,7 +1,7 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH v3 07/15] staging: ccree: add TODO list
-Date: Sun, 23 Apr 2017 12:26:15 +0300
-Message-ID: <1492939583-25688-8-git-send-email-gilad@benyossef.com>
+Subject: [PATCH v3 08/15] staging: ccree: add DT bindings for Arm CryptoCell
+Date: Sun, 23 Apr 2017 12:26:16 +0300
+Message-ID: <1492939583-25688-9-git-send-email-gilad@benyossef.com>
 References: <1492939583-25688-1-git-send-email-gilad@benyossef.com>
 Cc: linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
         linux-kernel@vger.kernel.org, gilad.benyossef@arm.com,
@@ -16,57 +16,55 @@ To: Herbert Xu <herbert@gondor.apana.org.au>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         devel@driverdev.osuosl.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:46976 "EHLO foss.arm.com"
+Received: from foss.arm.com ([217.140.101.70]:46988 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1044405AbdDWJ1I (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 23 Apr 2017 05:27:08 -0400
+        id S1044408AbdDWJ1M (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 23 Apr 2017 05:27:12 -0400
 In-Reply-To: <1492939583-25688-1-git-send-email-gilad@benyossef.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add TODO list for moving out of staging tree for ccree crypto driver
+This adds DT bindings for the Arm TrustZone CryptoCell cryptographic
+accelerator IP.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/TODO | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
- create mode 100644 drivers/staging/ccree/TODO
+ .../devicetree/bindings/crypto/arm-cryptocell.txt  | 27 ++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
+ create mode 100644 drivers/staging/ccree/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt
 
-diff --git a/drivers/staging/ccree/TODO b/drivers/staging/ccree/TODO
+diff --git a/drivers/staging/ccree/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt b/drivers/staging/ccree/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt
 new file mode 100644
-index 0000000..c9f5754
+index 0000000..2ea6517
 --- /dev/null
-+++ b/drivers/staging/ccree/TODO
-@@ -0,0 +1,30 @@
++++ b/drivers/staging/ccree/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt
+@@ -0,0 +1,27 @@
++Arm TrustZone CryptoCell cryptographic accelerators
++
++Required properties:
++- compatible: must be "arm,cryptocell-712-ree".
++- reg: shall contain base register location and length.
++	Typically length is 0x10000.
++- interrupts: shall contain the interrupt for the device.
++
++Optional properties:
++- interrupt-parent: can designate the interrupt controller the
++	device interrupt is connected to, if needed.
++- clocks: may contain the clock handling the device, if needed.
++- power-domains: may contain a reference to the PM domain, if applicable.
 +
 +
-+*************************************************************************
-+*									*
-+* Arm Trust Zone CryptoCell REE Linux driver upstreaming TODO items	*
-+*									*
-+*************************************************************************
++Examples:
 +
-+ccree specific items
-+a.k.a stuff fixing for this driver to move out of staging
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++Zynq FPGA device
++----------------
 +
-+1.  Move to using Crypto Engine to handle backlog queueing.
-+2.  Remove synchronous algorithm support leftovers.
-+3.  Separate platform specific code for FIPS and power management into separate platform modules.
-+4.  Drop legacy kernel support code.
-+5.  Move most (all?) #ifdef CONFIG into inline functions.
-+6.  Remove all unused definitions.
-+7.  Re-factor to accomediate newer/older HW revisions besides the 712.
-+8.  Handle the many checkpatch errors.
-+9.  Implement ahash import/export correctly.
-+10. Go through a proper review of DT bindings and sysfs ABI
-+11. Sort out FIPS mode: bake tests into testmgr, sort out behaviour on error, 
-+    figure if 3DES weak key check is needed
++       arm_cc7x: arm_cc7x@80000000 {
++               compatible = "arm,cryptocell-712-ree";
++               interrupt-parent = <&intc>;
++               interrupts = < 0 30 4 >;
++               reg = < 0x80000000 0x10000 >;
++       };
 +
-+Kernel infrastructure items
-+a.k.a stuff we either neither need to fix in the kernel or understand what we're doing wrong
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+1. ahash import/export context has a PAGE_SIZE/8 size limit.  We need more.
-+2. Crypto Engine seems to be built for HW with hardware queue depth of 1, we have 600++.
 -- 
 2.1.4
