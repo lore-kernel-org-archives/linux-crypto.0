@@ -1,46 +1,56 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
-Subject: Re: [PATCH v2 6/9] staging: ccree: add FIPS support
-Date: Sun, 23 Apr 2017 20:57:58 +0200
-Message-ID: <19392241.HaQDpS1BQU@positron.chronox.de>
-References: <1492693983-8175-1-git-send-email-gilad@benyossef.com> <6020947.G2hzgUSCE3@positron.chronox.de> <CAOtvUMcOib2xr=THj1hy_uPtVhRHgJ2-4__mUBb5VwANQ1GA_A@mail.gmail.com>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: Re: [PATCH] crypto: Allow ecb(cipher_null) in FIPS mode
+Date: Sun, 23 Apr 2017 21:06:30 +0200
+Message-ID: <2841324.7RLLSJtzS3@positron.chronox.de>
+References: <20170421121820.GA14381@gondor.apana.org.au> <9105605.SAXsSHs1iB@tauon.chronox.de> <CACXcFm=HAew+fMAZXWL9WtT49GVdvUdVShnOOsDLEqUwU5cJng@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-        "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
-        Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>,
-        devel-gWbeCf7V1WCQmaza687I9mD2FQJk+8+b@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        Linux kernel mailing list <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Gilad Ben-Yossef <gilad.benyossef-5wv7dgnIgG8@public.gmane.org>,
-        Binoy Jayan <binoy.jayan-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
-        Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>,
-        Stuart Yoder <stuart.yoder-5wv7dgnIgG8@public.gmane.org>
-To: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAOtvUMcOib2xr=THj1hy_uPtVhRHgJ2-4__mUBb5VwANQ1GA_A-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        Milan Broz <gmazyland@gmail.com>, linux-crypto@vger.kernel.org
+To: Sandy Harris <sandyinchina@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:59160 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1755403AbdDWTGe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 23 Apr 2017 15:06:34 -0400
+In-Reply-To: <CACXcFm=HAew+fMAZXWL9WtT49GVdvUdVShnOOsDLEqUwU5cJng@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Am Sonntag, 23. April 2017, 11:48:58 CEST schrieb Gilad Ben-Yossef:
+Am Samstag, 22. April 2017, 09:54:08 CEST schrieb Sandy Harris:
 
-Hi Gilad,
+Hi Sandy,
 
-> I do wonder if there is value in alternate behavior of stopping crypto
-> API on FIPS error rather than a panic though. I will try to get an
-> explanation why we do it this way.
+> In the FreeS/WAN project, back around the turn of the century,
+> we refused to implement several things required by the RFCs
+> because we thought they were insecure: null cipher, single
+> DES & 768-bit DH Group 1.
+> 
+> At that time, not having DES did cause some problems in
+> interoperating with other IPsec implementations, but I
+> doubt it would today. Neither of the other dropped items
+> caused any problems at all.
+> 
+> Today I'd say drop all of those plus the 1024-bit Group 2,
+> and then look at whether others should go as well. As of
+> 2001 or so, the 1536-bit Group 5 was very widely used,
+> so dropping it might well be problematic, but I am not
+> certain if it is either secure or widely used now.
 
-In FIPS, all crypto function must cease if a self test fails. This can be done 
-by instrumenting the crypto API calls with a check to a global flag or by 
-simply terminating the entire "FIPS module".
+This approach is fully appropriate and I strongly support that. However, the 
+kernel crypto API has a need of a memcpy over SGLs, because the entire crypto 
+API operates on SGLs. There are valid use cases. The one I am currently 
+working on are AEAD ciphers where we want to copy the AAD from the src SGL to 
+the dst SGL. Instead of walking through the SGLs in my code and invoke the 
+memcpy, I simply use the null cipher.
 
-The panic() is the simplest approach to meet that requirement.
+What I would like to say is that there are valid use cases of the null cipher 
+which do not impair security constraints. For those use cases, the null cipher 
+should and must be allowed.
+
+For all other use cases, including the "encryption operation" in IPSEC or dm-
+crypt, it should never be used.
 
 Ciao
 Stephan
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
