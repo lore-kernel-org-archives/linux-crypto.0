@@ -1,67 +1,70 @@
-From: Codarren Velvindron <codarren@hackers.mu>
-Subject: Re: [PATCH] crypto: tcrypt: Zero iv before freeing it
-Date: Mon, 24 Apr 2017 09:34:28 +0400
-Message-ID: <20170424053428.GA6763@hackers.mu>
-References: <20170423161204.GA9489@hackers.mu>
- <10591442.E9JOlzuEgW@positron.chronox.de>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: Re: [PATCH v2 6/9] staging: ccree: add FIPS support
+Date: Mon, 24 Apr 2017 09:06:09 +0300
+Message-ID: <CAOtvUMdF53Bu65oLtDaUKvnxcMCBY1h=Dq8LaPwTGOwg4YKYVg@mail.gmail.com>
+References: <1492693983-8175-1-git-send-email-gilad@benyossef.com>
+ <1492693983-8175-7-git-send-email-gilad@benyossef.com>
+ <6020947.G2hzgUSCE3@positron.chronox.de>
+ <CAOtvUMcOib2xr=THj1hy_uPtVhRHgJ2-4__mUBb5VwANQ1GA_A@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Cc: linux-crypto@vger.kernel.org
-To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from walmailout06.yourhostingaccount.com ([65.254.253.50]:45153 "EHLO
-        walmailout06.yourhostingaccount.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1046431AbdDXGF0 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Apr 2017 02:05:26 -0400
-Received: from mailscan07.yourhostingaccount.com ([10.1.15.7] helo=walmailscan07.yourhostingaccount.com)
-        by walmailout06.yourhostingaccount.com with esmtp (Exim)
-        id 1d2Wdz-0000n2-94
-        for linux-crypto@vger.kernel.org; Mon, 24 Apr 2017 01:34:39 -0400
-Received: from [10.114.3.31] (helo=walimpout11)
-        by walmailscan07.yourhostingaccount.com with esmtp (Exim)
-        id 1d2Wdz-0000ve-6R
-        for linux-crypto@vger.kernel.org; Mon, 24 Apr 2017 01:34:39 -0400
-Content-Disposition: inline
-In-Reply-To: <10591442.E9JOlzuEgW@positron.chronox.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: Mark Rutland <mark.rutland@arm.com>, devel@driverdev.osuosl.org,
+ Herbert Xu <herbert@gondor.apana.org.au>, devicetree@vger.kernel.org,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+ Binoy Jayan <binoy.jayan@linaro.org>, Rob Herring <robh+dt@kernel.org>,
+ linux-crypto@vger.kernel.org, Gilad Ben-Yossef <gilad.benyossef@arm.com>,
+ Stuart Yoder <stuart.yoder@arm.com>, "David S. Miller" <davem@davemloft.net>,
+ Ofir Drang <ofir.drang@arm.com>
+To: =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+In-Reply-To: <CAOtvUMcOib2xr=THj1hy_uPtVhRHgJ2-4__mUBb5VwANQ1GA_A@mail.gmail.com>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+List-Id: linux-crypto.vger.kernel.org
 
-On Sun, Apr 23, 2017 at 09:11:04PM +0200, Stephan Müller wrote:
-> Am Sonntag, 23. April 2017, 18:12:04 CEST schrieb Codarren Velvindron:
-> 
-> Hi Codarren,
-> 
-> > Signed-off-by: Codarren Velvindron <codarren@hackers.mu>
-> > ---
-> >  crypto/tcrypt.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-> > index 9a11f3c..48a721c 100644
-> > --- a/crypto/tcrypt.c
-> > +++ b/crypto/tcrypt.c
-> > @@ -384,7 +384,7 @@ static void test_aead_speed(const char *algo, int enc,
-> > unsigned int secs, out_noaxbuf:
-> >  	testmgr_free_buf(xbuf);
-> >  out_noxbuf:
-> > -	kfree(iv);
-> > +	kzfree(iv);
-> 
-> Why would you think this is needed?
-> 
->        if (iv_len)
->               memset(iv, 0xff, iv_len);
-> 
-> 
-> Ciao
-> Stephan
-Hello, 
-
-Thanks for bringing this up to my attention.
-
-Kindly disregard the patch.
-
-Best Regards,
-Codarren
+T24gU3VuLCBBcHIgMjMsIDIwMTcgYXQgMTI6NDggUE0sIEdpbGFkIEJlbi1Zb3NzZWYgPGdpbGFk
+QGJlbnlvc3NlZi5jb20+IHdyb3RlOgo+IEhpLAo+Cj4gVGhhbmsgeW91IGZvciB0aGUgcmV2aWV3
+Lgo+Cj4gT24gVGh1LCBBcHIgMjAsIDIwMTcgYXQgNDozOSBQTSwgU3RlcGhhbiBNw7xsbGVyIDxz
+bXVlbGxlckBjaHJvbm94LmRlPiB3cm90ZToKPgo+Pj4gKy8qIFRoZSBmdW5jdGlvbiB2ZXJpZmll
+cyB0aGF0IHRkZXMga2V5cyBhcmUgbm90IHdlYWsuKi8KPj4+ICtzdGF0aWMgaW50IHNzaV9maXBz
+X3ZlcmlmeV8zZGVzX2tleXMoY29uc3QgdTggKmtleSwgdW5zaWduZWQgaW50IGtleWxlbikKPj4+
+ICt7Cj4+PiArI2lmZGVmIENDUkVFX0ZJUFNfU1VQUE9SVAo+Pj4gKyAgICAgICAgdGRlc19rZXlz
+X3QgKnRkZXNfa2V5ID0gKHRkZXNfa2V5c190KilrZXk7Cj4+PiArCj4+PiArICAgICAvKiB2ZXJp
+Znkga2V5MSAhPSBrZXkyIGFuZCBrZXkzICE9IGtleTIqLwo+Pgo+PiBJIGRvIG5vdCB0aGluayB0
+aGF0IHRoaXMgY2hlY2sgaXMgbmVjZXNzYXJ5LiBUaGVyZSBpcyBubyBGSVBTIHJlcXVpcmVtZW50
+IG9yCj4+IElHIHRoYXQgbWFuZGF0ZXMgdGhpcyAodW5saWtlIHRoZSBYVFMga2V5IGNoZWNrKS4K
+Pj4KPj4gSWYgdGhlcmUgd291bGQgYmUgc3VjaCByZXF1aXJlbWVudCwgd2Ugd291bGQgbmVlZCBh
+IGNvbW1vbiBzZXJ2aWNlIGZ1bmN0aW9uCj4+IGZvciBhbGwgVERFUyBpbXBsZW1lbnRhdGlvbnMK
+CgpXZWxsLCBpdCB0dXJucyBvdXQgdGhlcmUgaXMgYW5kIHdlIGRvIDotKQoKVGhpcyBpcyBmcm9t
+IGNyeXB0by9kZXNfZ2VuZXJpYy5jOgoKLyoKICogUkZDMjQ1MToKICoKICogICBGb3IgREVTLUVE
+RTMsIHRoZXJlIGlzIG5vIGtub3duIG5lZWQgdG8gcmVqZWN0IHdlYWsgb3IKICogICBjb21wbGVt
+ZW50YXRpb24ga2V5cy4gIEFueSB3ZWFrbmVzcyBpcyBvYnZpYXRlZCBieSB0aGUgdXNlIG9mCiAq
+ICAgbXVsdGlwbGUga2V5cy4KICoKICogICBIb3dldmVyLCBpZiB0aGUgZmlyc3QgdHdvIG9yIGxh
+c3QgdHdvIGluZGVwZW5kZW50IDY0LWJpdCBrZXlzIGFyZQogKiAgIGVxdWFsIChrMSA9PSBrMiBv
+ciBrMiA9PSBrMyksIHRoZW4gdGhlIERFUzMgb3BlcmF0aW9uIGlzIHNpbXBseSB0aGUKICogICBz
+YW1lIGFzIERFUy4gIEltcGxlbWVudGVycyBNVVNUIHJlamVjdCBrZXlzIHRoYXQgZXhoaWJpdCB0
+aGlzCiAqICAgcHJvcGVydHkuCiAqCiAqLwppbnQgX19kZXMzX2VkZV9zZXRrZXkodTMyICpleHBr
+ZXksIHUzMiAqZmxhZ3MsIGNvbnN0IHU4ICprZXksCiAgICAgICAgICAgICAgICAgICAgICB1bnNp
+Z25lZCBpbnQga2V5bGVuKQoKSG93ZXZlciwgdGhpcyBkb2VzIG5vdCBjaGVjayB0aGF0IGsxID09
+IGszLiBJbiB0aGlzIGNhc2UgREVTMwpiZWNvbWVzIDJERVMgKDIta2V5cyBUREVBKSwgdGhlIHVz
+ZSBvZiB3aGljaCB3YXMgZHJvcHBlZCBwb3N0IDIwMTUKYnkgTklTVCBTcGVjaWFsIFB1YmxpY2F0
+aW9uIDgwMC0xMzFBKi4KCldvdWxkIGl0IGJlIGFjY2VwdGFibGUgaWYgSSBvZmZlciBhIHBhdGNo
+IGFkZGluZyB0aGlzIGNoZWNrIHRvCl9fZGVzM19lZGVfc2V0a2V5KCkKYW5kIHVzZSB0aGF0IGlu
+IHRoZSBjY3JlZSBkcml2ZXI/CgoqIGh0dHA6Ly9udmxwdWJzLm5pc3QuZ292L25pc3RwdWJzL1Nw
+ZWNpYWxQdWJsaWNhdGlvbnMvTklTVC5TUC44MDAtMTMxQXIxLnBkZgoKCk1hbnkgdGhhbmtzLApH
+aWxhZAoKLS0gCkdpbGFkIEJlbi1Zb3NzZWYKQ2hpZWYgQ29mZmVlIERyaW5rZXIKCiJJZiB5b3Ug
+dGFrZSBhIGNsYXNzIGluIGxhcmdlLXNjYWxlIHJvYm90aWNzLCBjYW4geW91IGVuZCB1cCBpbiBh
+CnNpdHVhdGlvbiB3aGVyZSB0aGUgaG9tZXdvcmsgZWF0cyB5b3VyIGRvZz8iCiAtLSBKZWFuLUJh
+cHRpc3RlIFF1ZXJ1Cl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fCmRldmVsIG1haWxpbmcgbGlzdApkZXZlbEBsaW51eGRyaXZlcnByb2plY3Qub3JnCmh0dHA6
+Ly9kcml2ZXJkZXYubGludXhkcml2ZXJwcm9qZWN0Lm9yZy9tYWlsbWFuL2xpc3RpbmZvL2RyaXZl
+cmRldi1kZXZlbAo=
