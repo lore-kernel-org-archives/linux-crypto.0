@@ -1,44 +1,67 @@
-From: <isaac@debian.org>
-Subject: 21399 linux-crypto
-Date: Mon, 24 Apr 2017 01:08:27 -0000
-Message-ID: <149299610707.15559.15255177362651784780@t-mobile.at>
+From: Codarren Velvindron <codarren@hackers.mu>
+Subject: Re: [PATCH] crypto: tcrypt: Zero iv before freeing it
+Date: Mon, 24 Apr 2017 09:34:28 +0400
+Message-ID: <20170424053428.GA6763@hackers.mu>
+References: <20170423161204.GA9489@hackers.mu>
+ <10591442.E9JOlzuEgW@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: application/zip; name="8125957.zip"
-Content-Transfer-Encoding: base64
-To: <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Cc: linux-crypto@vger.kernel.org
+To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 078132065167.public.t-mobile.at ([78.132.65.167]:44384 "HELO
-        t-mobile.at" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with SMTP
-        id S1163875AbdDXBIc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 23 Apr 2017 21:08:32 -0400
-Content-Disposition: attachment
+Received: from walmailout06.yourhostingaccount.com ([65.254.253.50]:45153 "EHLO
+        walmailout06.yourhostingaccount.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1046431AbdDXGF0 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 24 Apr 2017 02:05:26 -0400
+Received: from mailscan07.yourhostingaccount.com ([10.1.15.7] helo=walmailscan07.yourhostingaccount.com)
+        by walmailout06.yourhostingaccount.com with esmtp (Exim)
+        id 1d2Wdz-0000n2-94
+        for linux-crypto@vger.kernel.org; Mon, 24 Apr 2017 01:34:39 -0400
+Received: from [10.114.3.31] (helo=walimpout11)
+        by walmailscan07.yourhostingaccount.com with esmtp (Exim)
+        id 1d2Wdz-0000ve-6R
+        for linux-crypto@vger.kernel.org; Mon, 24 Apr 2017 01:34:39 -0400
+Content-Disposition: inline
+In-Reply-To: <10591442.E9JOlzuEgW@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-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
+On Sun, Apr 23, 2017 at 09:11:04PM +0200, Stephan Müller wrote:
+> Am Sonntag, 23. April 2017, 18:12:04 CEST schrieb Codarren Velvindron:
+> 
+> Hi Codarren,
+> 
+> > Signed-off-by: Codarren Velvindron <codarren@hackers.mu>
+> > ---
+> >  crypto/tcrypt.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+> > index 9a11f3c..48a721c 100644
+> > --- a/crypto/tcrypt.c
+> > +++ b/crypto/tcrypt.c
+> > @@ -384,7 +384,7 @@ static void test_aead_speed(const char *algo, int enc,
+> > unsigned int secs, out_noaxbuf:
+> >  	testmgr_free_buf(xbuf);
+> >  out_noxbuf:
+> > -	kfree(iv);
+> > +	kzfree(iv);
+> 
+> Why would you think this is needed?
+> 
+>        if (iv_len)
+>               memset(iv, 0xff, iv_len);
+> 
+> 
+> Ciao
+> Stephan
+Hello, 
+
+Thanks for bringing this up to my attention.
+
+Kindly disregard the patch.
+
+Best Regards,
+Codarren
