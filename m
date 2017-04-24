@@ -1,7 +1,7 @@
 From: Corentin Labbe <clabbe.montjoie@gmail.com>
-Subject: [PATCH 5/9] crypto: mv_cesa - Use IPAD/OPAD constant
-Date: Mon, 24 Apr 2017 16:16:25 +0200
-Message-ID: <20170424141629.27155-5-clabbe.montjoie@gmail.com>
+Subject: [PATCH 6/9] crypto: omap-sham - Use IPAD/OPAD constant
+Date: Mon, 24 Apr 2017 16:16:26 +0200
+Message-ID: <20170424141629.27155-6-clabbe.montjoie@gmail.com>
 References: <20170424141629.27155-1-clabbe.montjoie@gmail.com>
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org,
@@ -13,11 +13,11 @@ To: herbert@gondor.apana.org.au, davem@davemloft.net,
         matthias.bgg@gmail.com, giovanni.cabiddu@intel.com,
         salvatore.benedetto@intel.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:35266 "EHLO
-        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1172416AbdDXOSw (ORCPT
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:36188 "EHLO
+        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1171491AbdDXOSx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Apr 2017 10:18:52 -0400
+        Mon, 24 Apr 2017 10:18:53 -0400
 In-Reply-To: <20170424141629.27155-1-clabbe.montjoie@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
@@ -27,23 +27,23 @@ define.
 
 Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
 ---
- drivers/crypto/mv_cesa.c | 4 ++--
+ drivers/crypto/omap-sham.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/mv_cesa.c b/drivers/crypto/mv_cesa.c
-index 451fa18..41ae190 100644
---- a/drivers/crypto/mv_cesa.c
-+++ b/drivers/crypto/mv_cesa.c
-@@ -822,8 +822,8 @@ static int mv_hash_setkey(struct crypto_ahash *tfm, const u8 * key,
- 		memcpy(opad, ipad, bs);
+diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+index d0b16e5..11e11a6 100644
+--- a/drivers/crypto/omap-sham.c
++++ b/drivers/crypto/omap-sham.c
+@@ -1326,8 +1326,8 @@ static int omap_sham_setkey(struct crypto_ahash *tfm, const u8 *key,
+ 		memcpy(bctx->opad, bctx->ipad, bs);
  
  		for (i = 0; i < bs; i++) {
--			ipad[i] ^= 0x36;
--			opad[i] ^= 0x5c;
-+			ipad[i] ^= HMAC_IPAD_VALUE;
-+			opad[i] ^= HMAC_OPAD_VALUE;
+-			bctx->ipad[i] ^= 0x36;
+-			bctx->opad[i] ^= 0x5c;
++			bctx->ipad[i] ^= HMAC_IPAD_VALUE;
++			bctx->opad[i] ^= HMAC_OPAD_VALUE;
  		}
+ 	}
  
- 		rc = crypto_shash_init(shash) ? :
 -- 
 2.10.2
