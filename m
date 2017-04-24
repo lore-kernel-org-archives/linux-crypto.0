@@ -1,245 +1,116 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [PATCH v3 2/3] crypto: inside-secure: add SafeXcel EIP197 crypto engine driver
-Date: Mon, 24 Apr 2017 14:59:05 +0200
-Message-ID: <2475079.gcOV5qCq7E@tauon.chronox.de>
-References: <20170424075407.19730-1-antoine.tenart@free-electrons.com> <20170424075407.19730-3-antoine.tenart@free-electrons.com>
+From: "Byczkowski, Jakub" <jakub.byczkowski@intel.com>
+Subject: RE: [PATCH 5/7] IB/hfi1: use pcie_flr instead of duplicating it
+Date: Mon, 24 Apr 2017 14:16:31 +0000
+Message-ID: <A33E225544E47D4DB5713032774B132783960382@irsmsx105.ger.corp.intel.com>
+References: <20170414191131.14286-1-hch@lst.de>
+ <20170414191131.14286-6-hch@lst.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-        jason@lakedaemon.net, andrew@lunn.ch,
-        gregory.clement@free-electrons.com,
-        sebastian.hesselbarth@gmail.com, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        thomas.petazzoni@free-electrons.com,
-        boris.brezillon@free-electrons.com, oferh@marvell.com,
-        igall@marvell.com, nadavh@marvell.com, robin.murphy@arm.com
-To: Antoine Tenart <antoine.tenart@free-electrons.com>
+Content-Transfer-Encoding: 8BIT
+Cc: "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        qat-linux <qat-linux@intel.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Christoph Hellwig <hch@lst.de>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>,
+        "Benedetto, Salvatore" <salvatore.benedetto@intel.com>,
+        "Marciniszyn, Mike" <mike.marciniszyn@intel.com>,
+        "Dalessandro, Dennis" <dennis.dalessandro@intel.com>,
+        Derek Chickles <derek.chickles@caviumnetworks.com>,
+        Satanand Burla <satananda.burla@caviumnetworks.com>,
+        Felix Manlunas <felix.manlunas@caviumnetworks.com>,
+        Raghu Vatsavayi <raghu.vatsavayi@caviumnetworks.com>,
+        "Kirsher, Jeffrey T" <jeffrey.t.kirsher@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:59268 "EHLO mail.eperm.de"
+Received: from mga14.intel.com ([192.55.52.115]:51760 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1170319AbdDXM7I (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Apr 2017 08:59:08 -0400
-In-Reply-To: <20170424075407.19730-3-antoine.tenart@free-electrons.com>
+        id S1763908AbdDXOQf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 24 Apr 2017 10:16:35 -0400
+In-Reply-To: <20170414191131.14286-6-hch@lst.de>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Montag, 24. April 2017, 09:54:06 CEST schrieb Antoine Tenart:
+Tested-by: Jakub Byczkowski <jakub.byczkowski@intel.com>
 
-Hi Antoine,
+-----Original Message-----
+From: linux-rdma-owner@vger.kernel.org [mailto:linux-rdma-owner@vger.kernel.org] On Behalf Of Christoph Hellwig
+Sent: Friday, April 14, 2017 9:11 PM
+To: Bjorn Helgaas <bhelgaas@google.com>; Cabiddu, Giovanni <giovanni.cabiddu@intel.com>; Benedetto, Salvatore <salvatore.benedetto@intel.com>; Marciniszyn, Mike <mike.marciniszyn@intel.com>; Dalessandro, Dennis <dennis.dalessandro@intel.com>; Derek Chickles <derek.chickles@caviumnetworks.com>; Satanand Burla <satananda.burla@caviumnetworks.com>; Felix Manlunas <felix.manlunas@caviumnetworks.com>; Raghu Vatsavayi <raghu.vatsavayi@caviumnetworks.com>; Kirsher, Jeffrey T <jeffrey.t.kirsher@intel.com>
+Cc: linux-pci@vger.kernel.org; qat-linux <qat-linux@intel.com>; linux-crypto@vger.kernel.org; linux-rdma@vger.kernel.org; netdev@vger.kernel.org; linux-kernel@vger.kernel.org
+Subject: [PATCH 5/7] IB/hfi1: use pcie_flr instead of duplicating it
 
-> +struct safexcel_cipher_ctx {
-> +	struct safexcel_context base;
-> +	struct safexcel_crypto_priv *priv;
-> +
-> +	enum safexcel_cipher_direction direction;
-> +	u32 mode;
-> +
-> +	__le32 key[8];
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/infiniband/hw/hfi1/chip.c |  4 ++--  drivers/infiniband/hw/hfi1/hfi.h  |  1 -  drivers/infiniband/hw/hfi1/pcie.c | 30 ------------------------------
+ 3 files changed, 2 insertions(+), 33 deletions(-)
 
-Can you please help me find the location where this memory is zeroized when 
-released?
-
-
-> +	unsigned int key_len;
-> +};
-> +
-> +static void safexcel_cipher_token(struct safexcel_cipher_ctx *ctx,
-> +				  struct crypto_async_request *async,
-> +				  struct safexcel_command_desc *cdesc,
-> +				  u32 length)
-> +{
-> +	struct ablkcipher_request *req = ablkcipher_request_cast(async);
-> +	struct safexcel_token *token;
-> +	unsigned offset = 0;
-> +
-> +	if (ctx->mode == CONTEXT_CONTROL_CRYPTO_MODE_CBC) {
-> +		offset = AES_BLOCK_SIZE / sizeof(u32);
-> +		memcpy(cdesc->control_data.token, req->info, AES_BLOCK_SIZE);
-> +
-> +		cdesc->control_data.options |= EIP197_OPTION_4_TOKEN_IV_CMD;
-> +	}
-> +
-> +	token = (struct safexcel_token *)(cdesc->control_data.token + offset);
-> +
-> +	token[0].opcode = EIP197_TOKEN_OPCODE_DIRECTION;
-> +	token[0].packet_length = length;
-> +	token[0].stat = EIP197_TOKEN_STAT_LAST_PACKET;
-> +	token[0].instructions = EIP197_TOKEN_INS_LAST |
-> +				EIP197_TOKEN_INS_TYPE_CRYTO |
-> +				EIP197_TOKEN_INS_TYPE_OUTPUT;
-> +}
-> +
-> +static int safexcel_aes_setkey(struct crypto_ablkcipher *ctfm, const u8
-> *key, +			       unsigned int len)
-> +{
-
-You still use ablkcipher. I thought that it is on its way out in favor of the 
-skcipher API. Why do you stick to ablkcipher?
-
-Note, a change could be as simple as s/ablkcipher/skcipher/g
-
-> +	struct crypto_tfm *tfm = crypto_ablkcipher_tfm(ctfm);
-> +	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
-> +	struct crypto_aes_ctx aes;
-> +	int ret, i;
-> +
-> +	ret = crypto_aes_expand_key(&aes, key, len);
-> +	if (ret) {
-> +		crypto_ablkcipher_set_flags(ctfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
-> +		return ret;
-> +	}
-> +
-> +	for (i = 0; i < len / sizeof(u32); i++) {
-> +		if (ctx->key[i] != cpu_to_le32(aes.key_enc[i])) {
-> +			ctx->base.needs_inv = true;
-> +			break;
-> +		}
-> +	}
-> +
-> +	for (i = 0; i < len / sizeof(u32); i++)
-> +		ctx->key[i] = cpu_to_le32(aes.key_enc[i]);
-> +
-> +	ctx->key_len = len;
-
-memzero_explicit(aes)?
-
-> +
-> +	return 0;
-> +}
-> +
-> +static int safexcel_context_control(struct safexcel_cipher_ctx *ctx,
-> +				    struct safexcel_command_desc *cdesc)
-> +{
-> +	struct safexcel_crypto_priv *priv = ctx->priv;
-> +	int ctrl_size;
-> +
-> +	if (ctx->direction == SAFEXCEL_ENCRYPT)
-> +		cdesc->control_data.control0 |= CONTEXT_CONTROL_TYPE_CRYPTO_OUT;
-> +	else
-> +		cdesc->control_data.control0 |= CONTEXT_CONTROL_TYPE_CRYPTO_IN;
-> +
-> +	cdesc->control_data.control0 |= CONTEXT_CONTROL_KEY_EN;
-> +	cdesc->control_data.control1 |= ctx->mode;
-> +
-> +	switch (ctx->key_len) {
-> +	case AES_KEYSIZE_128:
-> +		cdesc->control_data.control0 |= CONTEXT_CONTROL_CRYPTO_ALG_AES128;
-> +		ctrl_size = 4;
-> +		break;
-> +	case AES_KEYSIZE_192:
-> +		cdesc->control_data.control0 |= CONTEXT_CONTROL_CRYPTO_ALG_AES192;
-> +		ctrl_size = 6;
-> +		break;
-> +	case AES_KEYSIZE_256:
-> +		cdesc->control_data.control0 |= CONTEXT_CONTROL_CRYPTO_ALG_AES256;
-> +		ctrl_size = 8;
-> +		break;
-> +	default:
-> +		dev_err(priv->dev, "aes keysize not supported: %u\n",
-> +			ctx->key_len);
-> +		return -EINVAL;
-> +	}
-> +	cdesc->control_data.control0 |= CONTEXT_CONTROL_SIZE(ctrl_size);
-> +
-> +	return 0;
-> +}
-> +
-> +static int safexcel_handle_result(struct safexcel_crypto_priv *priv, int
-> ring, +				  struct crypto_async_request *async,
-> +				  bool *should_complete, int *ret)
-> +{
-> +	struct ablkcipher_request *req = ablkcipher_request_cast(async);
-> +	struct safexcel_result_desc *rdesc;
-> +	int ndesc = 0;
-> +
-> +	*ret = 0;
-> +
-> +	spin_lock_bh(&priv->ring[ring].egress_lock);
-> +	do {
-> +		rdesc = safexcel_ring_next_rptr(priv, &priv->ring[ring].rdr);
-> +		if (IS_ERR(rdesc)) {
-> +			dev_err(priv->dev,
-> +				"cipher: result: could not retrieve the result descriptor\n");
-> +			*ret = PTR_ERR(rdesc);
-> +			break;
-> +		}
-> +
-> +		if (rdesc->result_data.error_code) {
-> +			dev_err(priv->dev,
-> +				"cipher: result: result descriptor error (%d)\n",
-> +				rdesc->result_data.error_code);
-> +			*ret = -EIO;
-> +		}
-> +
-> +		ndesc++;
-> +	} while (!rdesc->last_seg);
-> +
-> +	safexcel_complete(priv, ring);
-> +	spin_unlock_bh(&priv->ring[ring].egress_lock);
-> +
-> +	if (req->src == req->dst) {
-> +		dma_unmap_sg(priv->dev, req->src,
-> +			     sg_nents_for_len(req->src, req->nbytes),
-> +			     DMA_BIDIRECTIONAL);
-> +	} else {
-> +		dma_unmap_sg(priv->dev, req->src,
-> +			     sg_nents_for_len(req->src, req->nbytes),
-> +			     DMA_TO_DEVICE);
-> +		dma_unmap_sg(priv->dev, req->dst,
-> +			     sg_nents_for_len(req->dst, req->nbytes),
-> +			     DMA_FROM_DEVICE);
-> +	}
-> +
-> +	*should_complete = true;
-> +
-> +	return ndesc;
-> +}
-> +
-> +static int safexcel_aes_send(struct crypto_async_request *async,
-> +			     int ring, struct safexcel_request *request,
-> +			     int *commands, int *results)
-> +{
-> +	struct ablkcipher_request *req = ablkcipher_request_cast(async);
-> +	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
-> +	struct safexcel_crypto_priv *priv = ctx->priv;
-> +	struct safexcel_command_desc *cdesc;
-> +	struct safexcel_result_desc *rdesc;
-> +	struct scatterlist *sg;
-> +	int nr_src, nr_dst, n_cdesc = 0, n_rdesc = 0, queued = req->nbytes;
-> +	int i, ret = 0;
-> +
-> +	request->req = &req->base;
-> +
-> +	if (req->src == req->dst) {
-> +		nr_src = dma_map_sg(priv->dev, req->src,
-> +				    sg_nents_for_len(req->src, req->nbytes),
-> +				    DMA_BIDIRECTIONAL);
-> +		nr_dst = nr_src;
-> +		if (!nr_src)
-> +			return -EINVAL;
-> +	} else {
-> +		nr_src = dma_map_sg(priv->dev, req->src,
-> +				    sg_nents_for_len(req->src, req->nbytes),
-> +				    DMA_TO_DEVICE);
-> +		if (!nr_src)
-> +			return -EINVAL;
-> +
-> +		nr_dst = dma_map_sg(priv->dev, req->dst,
-> +				    sg_nents_for_len(req->dst, req->nbytes),
-> +				    DMA_FROM_DEVICE);
-> +		if (!nr_dst) {
-> +			dma_unmap_sg(priv->dev, req->src,
-> +				     sg_nents_for_len(req->src, req->nbytes),
-> +				     DMA_TO_DEVICE);
-> +			return -EINVAL;
-> +		}
-> +	}
-> +
-> +	memcpy(ctx->base.ctxr->data, ctx->key, ctx->key_len);
-
-Is ctxr->data properly zeroized?
-
-
-Ciao
-Stephan
+diff --git a/drivers/infiniband/hw/hfi1/chip.c b/drivers/infiniband/hw/hfi1/chip.c
+index 121a4c920f1b..d037f72e4d96 100644
+--- a/drivers/infiniband/hw/hfi1/chip.c
++++ b/drivers/infiniband/hw/hfi1/chip.c
+@@ -13610,14 +13610,14 @@ static void init_chip(struct hfi1_devdata *dd)
+ 		dd_dev_info(dd, "Resetting CSRs with FLR\n");
+ 
+ 		/* do the FLR, the DC reset will remain */
+-		hfi1_pcie_flr(dd);
++		pcie_flr(dd->pcidev);
+ 
+ 		/* restore command and BARs */
+ 		restore_pci_variables(dd);
+ 
+ 		if (is_ax(dd)) {
+ 			dd_dev_info(dd, "Resetting CSRs with FLR\n");
+-			hfi1_pcie_flr(dd);
++			pcie_flr(dd->pcidev);
+ 			restore_pci_variables(dd);
+ 		}
+ 	} else {
+diff --git a/drivers/infiniband/hw/hfi1/hfi.h b/drivers/infiniband/hw/hfi1/hfi.h
+index 0808e3c3ba39..40d7559fa723 100644
+--- a/drivers/infiniband/hw/hfi1/hfi.h
++++ b/drivers/infiniband/hw/hfi1/hfi.h
+@@ -1764,7 +1764,6 @@ int hfi1_pcie_init(struct pci_dev *, const struct pci_device_id *);  void hfi1_pcie_cleanup(struct pci_dev *);  int hfi1_pcie_ddinit(struct hfi1_devdata *, struct pci_dev *);  void hfi1_pcie_ddcleanup(struct hfi1_devdata *); -void hfi1_pcie_flr(struct hfi1_devdata *);  int pcie_speeds(struct hfi1_devdata *);  void request_msix(struct hfi1_devdata *, u32 *, struct hfi1_msix_entry *);  void hfi1_enable_intx(struct pci_dev *); diff --git a/drivers/infiniband/hw/hfi1/pcie.c b/drivers/infiniband/hw/hfi1/pcie.c
+index 0829fce06172..c81556e84831 100644
+--- a/drivers/infiniband/hw/hfi1/pcie.c
++++ b/drivers/infiniband/hw/hfi1/pcie.c
+@@ -240,36 +240,6 @@ void hfi1_pcie_ddcleanup(struct hfi1_devdata *dd)
+ 		iounmap(dd->piobase);
+ }
+ 
+-/*
+- * Do a Function Level Reset (FLR) on the device.
+- * Based on static function drivers/pci/pci.c:pcie_flr().
+- */
+-void hfi1_pcie_flr(struct hfi1_devdata *dd) -{
+-	int i;
+-	u16 status;
+-
+-	/* no need to check for the capability - we know the device has it */
+-
+-	/* wait for Transaction Pending bit to clear, at most a few ms */
+-	for (i = 0; i < 4; i++) {
+-		if (i)
+-			msleep((1 << (i - 1)) * 100);
+-
+-		pcie_capability_read_word(dd->pcidev, PCI_EXP_DEVSTA, &status);
+-		if (!(status & PCI_EXP_DEVSTA_TRPND))
+-			goto clear;
+-	}
+-
+-	dd_dev_err(dd, "Transaction Pending bit is not clearing, proceeding with reset anyway\n");
+-
+-clear:
+-	pcie_capability_set_word(dd->pcidev, PCI_EXP_DEVCTL,
+-				 PCI_EXP_DEVCTL_BCR_FLR);
+-	/* PCIe spec requires the function to be back within 100ms */
+-	msleep(100);
+-}
+-
+ static void msix_setup(struct hfi1_devdata *dd, int pos, u32 *msixcnt,
+ 		       struct hfi1_msix_entry *hfi1_msix_entry)  {
+--
+2.11.0
