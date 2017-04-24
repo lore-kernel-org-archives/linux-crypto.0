@@ -1,97 +1,48 @@
-From: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
-Subject: Re: [PATCH 3/6] ima: Simplify policy_func_show.
-Date: Mon, 24 Apr 2017 14:14:05 -0300
-Message-ID: <9111285.IvmltpgZRA@morokweng>
-References: <1492546666-16615-1-git-send-email-bauerman@linux.vnet.ibm.com> <2085797.x18HOhjl0i@morokweng> <1492783076.3081.202.camel@linux.vnet.ibm.com>
+From: Dennis Dalessandro <dennis.dalessandro-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 5/7] IB/hfi1: use pcie_flr instead of duplicating it
+Date: Mon, 24 Apr 2017 16:00:50 -0400
+Message-ID: <cc79455c-5d22-5d78-9ea5-46a17961213b@intel.com>
+References: <20170414191131.14286-1-hch@lst.de>
+ <20170414191131.14286-6-hch@lst.de>
+ <A33E225544E47D4DB5713032774B132783960382@irsmsx105.ger.corp.intel.com>
+ <20170424143507.GA28812@lst.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-security-module@vger.kernel.org,
-        linux-ima-devel@lists.sourceforge.net, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Claudio Carvalho <cclaudio@linux.vnet.ibm.com>
-To: Mimi Zohar <zohar@linux.vnet.ibm.com>
-Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <1492783076.3081.202.camel@linux.vnet.ibm.com>
-Sender: owner-linux-security-module@vger.kernel.org
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: Bjorn Helgaas <bhelgaas-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>,
+        "Cabiddu, Giovanni" <giovanni.cabiddu-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+        "Benedetto, Salvatore" <salvatore.benedetto-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+        "Marciniszyn, Mike" <mike.marciniszyn-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+        Derek Chickles <derek.chickles-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org>,
+        Satanand Burla <satananda.burla-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org>,
+        Felix Manlunas <felix.manlunas-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org>,
+        Raghu Vatsavayi <raghu.vatsavayi-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org>,
+        "Kirsher, Jeffrey T" <jeffrey.t.kirsher-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+        "linux-pci-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-pci-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        qat-linux <qat-linux-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+        "linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        "linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        "netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        "linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>,
+        "Byczkowski, Jakub" <jakub.byczkowski-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
+Return-path: <linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20170424143507.GA28812-jcswGhMUV9g@public.gmane.org>
+Sender: linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-Am Freitag, 21. April 2017, 09:57:56 BRT schrieb Mimi Zohar:
-> On Thu, 2017-04-20 at 17:40 -0300, Thiago Jung Bauermann wrote:
-> > @@ -949,49 +936,16 @@ void ima_policy_stop(struct seq_file *m, void *v)
-> > 
-> >  #define pt(token)	policy_tokens[token + Opt_err].pattern
-> >  #define mt(token)	mask_tokens[token]
-> > 
-> > -#define ft(token)	func_tokens[token]
-> > 
-> >  /*
-> >  
-> >   * policy_func_show - display the ima_hooks policy rule
-> >   */
-> >  
-> >  static void policy_func_show(struct seq_file *m, enum ima_hooks func)
-> >  {
-> > 
-> > -	char tbuf[64] = {0,};
-> > -
-> > -	switch (func) {
-> > -	case FILE_CHECK:
-> > -		seq_printf(m, pt(Opt_func), ft(func_file));
-> > -		break;
-> > -	case MMAP_CHECK:
-> > -		seq_printf(m, pt(Opt_func), ft(func_mmap));
-> > -		break;
-> > -	case BPRM_CHECK:
-> > -		seq_printf(m, pt(Opt_func), ft(func_bprm));
-> > -		break;
-> > -	case MODULE_CHECK:
-> > -		seq_printf(m, pt(Opt_func), ft(func_module));
-> > -		break;
-> > -	case FIRMWARE_CHECK:
-> > -		seq_printf(m, pt(Opt_func), ft(func_firmware));
-> > -		break;
-> > -	case POST_SETATTR:
-> > -		seq_printf(m, pt(Opt_func), ft(func_post));
-> > -		break;
-> > -	case KEXEC_KERNEL_CHECK:
-> > -		seq_printf(m, pt(Opt_func), ft(func_kexec_kernel));
-> > -		break;
-> > -	case KEXEC_INITRAMFS_CHECK:
-> > -		seq_printf(m, pt(Opt_func), ft(func_kexec_initramfs));
-> > -		break;
-> > -	case POLICY_CHECK:
-> > -		seq_printf(m, pt(Opt_func), ft(func_policy));
-> > -		break;
-> > -	default:
-> > -		snprintf(tbuf, sizeof(tbuf), "%d", func);
-> > -		seq_printf(m, pt(Opt_func), tbuf);
-> > -		break;
-> > -	}
-> > -	seq_puts(m, " ");
-> > +	if (func > 0 && func < MAX_CHECK)
-> > +		seq_printf(m, "func=%s ", func_tokens[func]);
-> > +	else
-> > +		seq_printf(m, "func=%d ", func);
-> 
-> The only time this can happen is when __kernel_read_file_id() is
-> updated without updating the read_idmap[].  Perhaps we can display the
-> number and the appropriate __kernel_read_file_id string.
+On 04/24/2017 10:35 AM, Christoph Hellwig wrote:
+> On Mon, Apr 24, 2017 at 02:16:31PM +0000, Byczkowski, Jakub wrote:
+>> Tested-by: Jakub Byczkowski <jakub.byczkowski-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
+>
+> Are you (and Doug) ok with queueing this up in the PCI tree?
 
->From what I understood of the code func comes from ima_parse_rule, so that 
-condition would only happen if ima_parse_rule got out of sync with 
-func_tokens. Since that code only initializes func with constants from enum 
-ima_hooks and this patch makes ima_hooks automatically sync with func_tokens, 
-the else branch is more like a "can't happen" safety net.
+We are fine however Doug wants to handle it.
 
-read_idmap is only used in ima_post_read_file, and I couldn't see a relation 
-between that code path and the one for ima_policy_show.
+-Denny
 
--- 
-Thiago Jung Bauermann
-IBM Linux Technology Center
 
+--
+To unsubscribe from this list: send the line "unsubscribe linux-rdma" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
