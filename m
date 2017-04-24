@@ -1,49 +1,34 @@
-From: Corentin Labbe <clabbe.montjoie@gmail.com>
-Subject: [PATCH 4/9] crypto: marvell - Use IPAD/OPAD constant
-Date: Mon, 24 Apr 2017 16:16:24 +0200
-Message-ID: <20170424141629.27155-4-clabbe.montjoie@gmail.com>
-References: <20170424141629.27155-1-clabbe.montjoie@gmail.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-mediatek@lists.infradead.org, qat-linux@intel.com,
-        Corentin Labbe <clabbe.montjoie@gmail.com>
-To: herbert@gondor.apana.org.au, davem@davemloft.net,
-        thomas.lendacky@amd.com, gary.hook@amd.com,
-        boris.brezillon@free-electrons.com, arno@natisbad.org,
-        matthias.bgg@gmail.com, giovanni.cabiddu@intel.com,
-        salvatore.benedetto@intel.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:35235 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1171926AbdDXOSq (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Apr 2017 10:18:46 -0400
-In-Reply-To: <20170424141629.27155-1-clabbe.montjoie@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH 5/7] IB/hfi1: use pcie_flr instead of duplicating it
+Date: Mon, 24 Apr 2017 16:35:07 +0200
+Message-ID: <20170424143507.GA28812@lst.de>
+References: <20170414191131.14286-1-hch@lst.de> <20170414191131.14286-6-hch@lst.de> <A33E225544E47D4DB5713032774B132783960382@irsmsx105.ger.corp.intel.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: Christoph Hellwig <hch@lst.de>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>,
+        "Benedetto, Salvatore" <salvatore.benedetto@intel.com>,
+        "Marciniszyn, Mike" <mike.marciniszyn@intel.com>,
+        "Dalessandro, Dennis" <dennis.dalessandro@intel.com>,
+        Derek Chickles <derek.chickles@caviumnetworks.com>,
+        Satanand Burla <satananda.burla@caviumnetworks.com>,
+        Felix Manlunas <felix.manlunas@caviumnetworks.com>,
+        Raghu Vatsavayi <raghu.vatsavayi@caviumnetworks.com>,
+        "Kirsher, Jeffrey T" <jeffrey.t.kirsher@intel.com>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        qat-linux <qat-linux@intel.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "netdev@vger.kernel.or
+To: "Byczkowski, Jakub" <jakub.byczkowski@intel.com>
+Return-path: <linux-pci-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <A33E225544E47D4DB5713032774B132783960382@irsmsx105.ger.corp.intel.com>
+Sender: linux-pci-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-This patch simply replace all occurrence of HMAC IPAD/OPAD value by their
-define.
+On Mon, Apr 24, 2017 at 02:16:31PM +0000, Byczkowski, Jakub wrote:
+> Tested-by: Jakub Byczkowski <jakub.byczkowski@intel.com>
 
-Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
----
- drivers/crypto/marvell/hash.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/crypto/marvell/hash.c b/drivers/crypto/marvell/hash.c
-index 77c0fb9..a6df61f 100644
---- a/drivers/crypto/marvell/hash.c
-+++ b/drivers/crypto/marvell/hash.c
-@@ -1164,8 +1164,8 @@ static int mv_cesa_ahmac_pad_init(struct ahash_request *req,
- 	memcpy(opad, ipad, blocksize);
- 
- 	for (i = 0; i < blocksize; i++) {
--		ipad[i] ^= 0x36;
--		opad[i] ^= 0x5c;
-+		ipad[i] ^= HMAC_IPAD_VALUE;
-+		opad[i] ^= HMAC_OPAD_VALUE;
- 	}
- 
- 	return 0;
--- 
-2.10.2
+Are you (and Doug) ok with queueing this up in the PCI tree?
