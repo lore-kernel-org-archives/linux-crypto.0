@@ -1,35 +1,52 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: Allow ecb(cipher_null) in FIPS mode
-Date: Mon, 24 Apr 2017 18:21:46 +0800
-Message-ID: <20170424102146.GA21181@gondor.apana.org.au>
-References: <20170421110306.3343-1-gmazyland@gmail.com>
+Subject: Re: [PATCH 2/3] crypto: cavium: Remove the individual
+ encrypt/decrypt function for each algorithm
+Date: Mon, 24 Apr 2017 18:05:14 +0800
+Message-ID: <20170424100514.GA20943@gondor.apana.org.au>
+References: <1492773366-17899-1-git-send-email-george.cherian@cavium.com>
+ <1492773366-17899-3-git-send-email-george.cherian@cavium.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, gmazyland@gmail.com
-To: Milan Broz <gmazyland@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        davem@davemloft.net
+To: George Cherian <george.cherian@cavium.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
 Received: from [198.176.57.175] ([198.176.57.175]:47324 "EHLO
         deadmen.hmeau.com" rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1168460AbdDXKkD (ORCPT
+        with ESMTP id S1168750AbdDXKkZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Apr 2017 06:40:03 -0400
+        Mon, 24 Apr 2017 06:40:25 -0400
 Content-Disposition: inline
-In-Reply-To: <20170421110306.3343-1-gmazyland@gmail.com>
+In-Reply-To: <1492773366-17899-3-git-send-email-george.cherian@cavium.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Milan Broz <gmazyland@gmail.com> wrote:
-> The cipher_null is not a real cipher, FIPS mode should not restrict its use.
-> 
-> It is used for several tests (for example in cryptsetup testsuite) and also
-> temporarily for reencryption of not yet encrypted device in cryptsetup-reencrypt tool.
-> 
-> Problem is easily reproducible with
->  cryptsetup benchmark -c null
-> 
-> Signed-off-by: Milan Broz <gmazyland@gmail.com>
+On Fri, Apr 21, 2017 at 11:16:05AM +0000, George Cherian wrote:
+>
+> -int cvm_aes_encrypt_cbc(struct ablkcipher_request *req)
+> +static inline u32 cvm_cipher_type(const char *name)
+>  {
+> -	return cvm_enc_dec(req, true, AES_CBC);
+> -}
+>  
+> -int cvm_aes_decrypt_cbc(struct ablkcipher_request *req)
+> -{
+> -	return cvm_enc_dec(req, false, AES_CBC);
+> +	const struct cvm_cipher *cipher = cvm_cipher_table;
+> +
+> +	while (cipher->name) {
+> +		if (!strcmp(cipher->name, name))
+> +			break;
+> +		cipher++;
+> +	}
+> +
+> +	return cipher->value;
+>  }
 
-Patch applied.  Thanks.
+That's rather unwieldy.  It's usually easier to embed the cipher
+type into the algo structure and then get to it via the alg object.
+
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
