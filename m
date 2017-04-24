@@ -1,70 +1,76 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
 Subject: Re: [PATCH v2 6/9] staging: ccree: add FIPS support
-Date: Mon, 24 Apr 2017 09:06:09 +0300
-Message-ID: <CAOtvUMdF53Bu65oLtDaUKvnxcMCBY1h=Dq8LaPwTGOwg4YKYVg@mail.gmail.com>
-References: <1492693983-8175-1-git-send-email-gilad@benyossef.com>
- <1492693983-8175-7-git-send-email-gilad@benyossef.com>
- <6020947.G2hzgUSCE3@positron.chronox.de>
- <CAOtvUMcOib2xr=THj1hy_uPtVhRHgJ2-4__mUBb5VwANQ1GA_A@mail.gmail.com>
+Date: Mon, 24 Apr 2017 08:16:50 +0200
+Message-ID: <2108964.Kb0ivG6kmD@tauon.chronox.de>
+References: <1492693983-8175-1-git-send-email-gilad@benyossef.com> <CAOtvUMcOib2xr=THj1hy_uPtVhRHgJ2-4__mUBb5VwANQ1GA_A@mail.gmail.com> <CAOtvUMdF53Bu65oLtDaUKvnxcMCBY1h=Dq8LaPwTGOwg4YKYVg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Mark Rutland <mark.rutland@arm.com>, devel@driverdev.osuosl.org,
- Herbert Xu <herbert@gondor.apana.org.au>, devicetree@vger.kernel.org,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Linux kernel mailing list <linux-kernel@vger.kernel.org>,
- Binoy Jayan <binoy.jayan@linaro.org>, Rob Herring <robh+dt@kernel.org>,
- linux-crypto@vger.kernel.org, Gilad Ben-Yossef <gilad.benyossef@arm.com>,
- Stuart Yoder <stuart.yoder@arm.com>, "David S. Miller" <davem@davemloft.net>,
- Ofir Drang <ofir.drang@arm.com>
-To: =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-In-Reply-To: <CAOtvUMcOib2xr=THj1hy_uPtVhRHgJ2-4__mUBb5VwANQ1GA_A@mail.gmail.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+        "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
+        Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>,
+        devel-gWbeCf7V1WCQmaza687I9mD2FQJk+8+b@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        Linux kernel mailing list <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        Gilad Ben-Yossef <gilad.benyossef-5wv7dgnIgG8@public.gmane.org>,
+        Binoy Jayan <binoy.jayan-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
+        Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>,
+        Stuart Yoder <stuart.yoder-5wv7dgnIgG8@public.gmane.org>
+To: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CAOtvUMdF53Bu65oLtDaUKvnxcMCBY1h=Dq8LaPwTGOwg4YKYVg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-T24gU3VuLCBBcHIgMjMsIDIwMTcgYXQgMTI6NDggUE0sIEdpbGFkIEJlbi1Zb3NzZWYgPGdpbGFk
-QGJlbnlvc3NlZi5jb20+IHdyb3RlOgo+IEhpLAo+Cj4gVGhhbmsgeW91IGZvciB0aGUgcmV2aWV3
-Lgo+Cj4gT24gVGh1LCBBcHIgMjAsIDIwMTcgYXQgNDozOSBQTSwgU3RlcGhhbiBNw7xsbGVyIDxz
-bXVlbGxlckBjaHJvbm94LmRlPiB3cm90ZToKPgo+Pj4gKy8qIFRoZSBmdW5jdGlvbiB2ZXJpZmll
-cyB0aGF0IHRkZXMga2V5cyBhcmUgbm90IHdlYWsuKi8KPj4+ICtzdGF0aWMgaW50IHNzaV9maXBz
-X3ZlcmlmeV8zZGVzX2tleXMoY29uc3QgdTggKmtleSwgdW5zaWduZWQgaW50IGtleWxlbikKPj4+
-ICt7Cj4+PiArI2lmZGVmIENDUkVFX0ZJUFNfU1VQUE9SVAo+Pj4gKyAgICAgICAgdGRlc19rZXlz
-X3QgKnRkZXNfa2V5ID0gKHRkZXNfa2V5c190KilrZXk7Cj4+PiArCj4+PiArICAgICAvKiB2ZXJp
-Znkga2V5MSAhPSBrZXkyIGFuZCBrZXkzICE9IGtleTIqLwo+Pgo+PiBJIGRvIG5vdCB0aGluayB0
-aGF0IHRoaXMgY2hlY2sgaXMgbmVjZXNzYXJ5LiBUaGVyZSBpcyBubyBGSVBTIHJlcXVpcmVtZW50
-IG9yCj4+IElHIHRoYXQgbWFuZGF0ZXMgdGhpcyAodW5saWtlIHRoZSBYVFMga2V5IGNoZWNrKS4K
-Pj4KPj4gSWYgdGhlcmUgd291bGQgYmUgc3VjaCByZXF1aXJlbWVudCwgd2Ugd291bGQgbmVlZCBh
-IGNvbW1vbiBzZXJ2aWNlIGZ1bmN0aW9uCj4+IGZvciBhbGwgVERFUyBpbXBsZW1lbnRhdGlvbnMK
-CgpXZWxsLCBpdCB0dXJucyBvdXQgdGhlcmUgaXMgYW5kIHdlIGRvIDotKQoKVGhpcyBpcyBmcm9t
-IGNyeXB0by9kZXNfZ2VuZXJpYy5jOgoKLyoKICogUkZDMjQ1MToKICoKICogICBGb3IgREVTLUVE
-RTMsIHRoZXJlIGlzIG5vIGtub3duIG5lZWQgdG8gcmVqZWN0IHdlYWsgb3IKICogICBjb21wbGVt
-ZW50YXRpb24ga2V5cy4gIEFueSB3ZWFrbmVzcyBpcyBvYnZpYXRlZCBieSB0aGUgdXNlIG9mCiAq
-ICAgbXVsdGlwbGUga2V5cy4KICoKICogICBIb3dldmVyLCBpZiB0aGUgZmlyc3QgdHdvIG9yIGxh
-c3QgdHdvIGluZGVwZW5kZW50IDY0LWJpdCBrZXlzIGFyZQogKiAgIGVxdWFsIChrMSA9PSBrMiBv
-ciBrMiA9PSBrMyksIHRoZW4gdGhlIERFUzMgb3BlcmF0aW9uIGlzIHNpbXBseSB0aGUKICogICBz
-YW1lIGFzIERFUy4gIEltcGxlbWVudGVycyBNVVNUIHJlamVjdCBrZXlzIHRoYXQgZXhoaWJpdCB0
-aGlzCiAqICAgcHJvcGVydHkuCiAqCiAqLwppbnQgX19kZXMzX2VkZV9zZXRrZXkodTMyICpleHBr
-ZXksIHUzMiAqZmxhZ3MsIGNvbnN0IHU4ICprZXksCiAgICAgICAgICAgICAgICAgICAgICB1bnNp
-Z25lZCBpbnQga2V5bGVuKQoKSG93ZXZlciwgdGhpcyBkb2VzIG5vdCBjaGVjayB0aGF0IGsxID09
-IGszLiBJbiB0aGlzIGNhc2UgREVTMwpiZWNvbWVzIDJERVMgKDIta2V5cyBUREVBKSwgdGhlIHVz
-ZSBvZiB3aGljaCB3YXMgZHJvcHBlZCBwb3N0IDIwMTUKYnkgTklTVCBTcGVjaWFsIFB1YmxpY2F0
-aW9uIDgwMC0xMzFBKi4KCldvdWxkIGl0IGJlIGFjY2VwdGFibGUgaWYgSSBvZmZlciBhIHBhdGNo
-IGFkZGluZyB0aGlzIGNoZWNrIHRvCl9fZGVzM19lZGVfc2V0a2V5KCkKYW5kIHVzZSB0aGF0IGlu
-IHRoZSBjY3JlZSBkcml2ZXI/CgoqIGh0dHA6Ly9udmxwdWJzLm5pc3QuZ292L25pc3RwdWJzL1Nw
-ZWNpYWxQdWJsaWNhdGlvbnMvTklTVC5TUC44MDAtMTMxQXIxLnBkZgoKCk1hbnkgdGhhbmtzLApH
-aWxhZAoKLS0gCkdpbGFkIEJlbi1Zb3NzZWYKQ2hpZWYgQ29mZmVlIERyaW5rZXIKCiJJZiB5b3Ug
-dGFrZSBhIGNsYXNzIGluIGxhcmdlLXNjYWxlIHJvYm90aWNzLCBjYW4geW91IGVuZCB1cCBpbiBh
-CnNpdHVhdGlvbiB3aGVyZSB0aGUgaG9tZXdvcmsgZWF0cyB5b3VyIGRvZz8iCiAtLSBKZWFuLUJh
-cHRpc3RlIFF1ZXJ1Cl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fCmRldmVsIG1haWxpbmcgbGlzdApkZXZlbEBsaW51eGRyaXZlcnByb2plY3Qub3JnCmh0dHA6
-Ly9kcml2ZXJkZXYubGludXhkcml2ZXJwcm9qZWN0Lm9yZy9tYWlsbWFuL2xpc3RpbmZvL2RyaXZl
-cmRldi1kZXZlbAo=
+Am Montag, 24. April 2017, 08:06:09 CEST schrieb Gilad Ben-Yossef:
+
+Hi Gilad,
+> 
+> Well, it turns out there is and we do :-)
+> 
+> This is from crypto/des_generic.c:
+> 
+> /*
+>  * RFC2451:
+>  *
+>  *   For DES-EDE3, there is no known need to reject weak or
+>  *   complementation keys.  Any weakness is obviated by the use of
+>  *   multiple keys.
+>  *
+>  *   However, if the first two or last two independent 64-bit keys are
+>  *   equal (k1 == k2 or k2 == k3), then the DES3 operation is simply the
+>  *   same as DES.  Implementers MUST reject keys that exhibit this
+>  *   property.
+>  *
+>  */
+> int __des3_ede_setkey(u32 *expkey, u32 *flags, const u8 *key,
+>                       unsigned int keylen)
+> 
+> However, this does not check that k1 == k3. In this case DES3
+> becomes 2DES (2-keys TDEA), the use of which was dropped post 2015
+> by NIST Special Publication 800-131A*.
+
+It is correct that the RFC wants at least a 2key 3DES. And it is correct that 
+SP800-131A mandates 3key 3DES post 2015. All I am saying is that FIPS 140-2 
+does *not* require a technical verification of the 3 keys being not identical.
+
+Note, formally, FIPS 140-2 requires that the 3 keys (i.e. all 192 bits) must 
+be obtained from *one* call to a DRBG or KDF (separate independent calls to, 
+say, obtain one key at a time is *not* permitted). Of course, fixing the 
+parity bits is allowed after obtaining the random number.
+> 
+> Would it be acceptable if I offer a patch adding this check to
+> __des3_ede_setkey()
+> and use that in the ccree driver?
+
+I am not sure it makes sense as the core requirement is the *one* invocation 
+of the DRBG.
+
+Ciao
+Stephan
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
