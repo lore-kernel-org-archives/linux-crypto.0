@@ -1,116 +1,63 @@
-From: "Byczkowski, Jakub" <jakub.byczkowski@intel.com>
-Subject: RE: [PATCH 5/7] IB/hfi1: use pcie_flr instead of duplicating it
-Date: Mon, 24 Apr 2017 14:16:31 +0000
-Message-ID: <A33E225544E47D4DB5713032774B132783960382@irsmsx105.ger.corp.intel.com>
-References: <20170414191131.14286-1-hch@lst.de>
- <20170414191131.14286-6-hch@lst.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        qat-linux <qat-linux@intel.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-To: Christoph Hellwig <hch@lst.de>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>,
-        "Benedetto, Salvatore" <salvatore.benedetto@intel.com>,
-        "Marciniszyn, Mike" <mike.marciniszyn@intel.com>,
-        "Dalessandro, Dennis" <dennis.dalessandro@intel.com>,
-        Derek Chickles <derek.chickles@caviumnetworks.com>,
-        Satanand Burla <satananda.burla@caviumnetworks.com>,
-        Felix Manlunas <felix.manlunas@caviumnetworks.com>,
-        Raghu Vatsavayi <raghu.vatsavayi@caviumnetworks.com>,
-        "Kirsher, Jeffrey T" <jeffrey.t.kirsher@intel.com>
+From: Corentin Labbe <clabbe.montjoie@gmail.com>
+Subject: [PATCH 1/9] crypto: add hmac IPAD/OPAD constant
+Date: Mon, 24 Apr 2017 16:16:21 +0200
+Message-ID: <20170424141629.27155-1-clabbe.montjoie@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-mediatek@lists.infradead.org, qat-linux@intel.com,
+        Corentin Labbe <clabbe.montjoie@gmail.com>
+To: herbert@gondor.apana.org.au, davem@davemloft.net,
+        thomas.lendacky@amd.com, gary.hook@amd.com,
+        boris.brezillon@free-electrons.com, arno@natisbad.org,
+        matthias.bgg@gmail.com, giovanni.cabiddu@intel.com,
+        salvatore.benedetto@intel.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:51760 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1763908AbdDXOQf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Apr 2017 10:16:35 -0400
-In-Reply-To: <20170414191131.14286-6-hch@lst.de>
-Content-Language: en-US
+Received: from mail-wr0-f195.google.com ([209.85.128.195]:36075 "EHLO
+        mail-wr0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1171491AbdDXOSn (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 24 Apr 2017 10:18:43 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Tested-by: Jakub Byczkowski <jakub.byczkowski@intel.com>
+Many HMAC users directly use directly 0x36/0x5c values.
+It's better with crypto to use a name instead of directly some crypto
+constant.
 
------Original Message-----
-From: linux-rdma-owner@vger.kernel.org [mailto:linux-rdma-owner@vger.kernel.org] On Behalf Of Christoph Hellwig
-Sent: Friday, April 14, 2017 9:11 PM
-To: Bjorn Helgaas <bhelgaas@google.com>; Cabiddu, Giovanni <giovanni.cabiddu@intel.com>; Benedetto, Salvatore <salvatore.benedetto@intel.com>; Marciniszyn, Mike <mike.marciniszyn@intel.com>; Dalessandro, Dennis <dennis.dalessandro@intel.com>; Derek Chickles <derek.chickles@caviumnetworks.com>; Satanand Burla <satananda.burla@caviumnetworks.com>; Felix Manlunas <felix.manlunas@caviumnetworks.com>; Raghu Vatsavayi <raghu.vatsavayi@caviumnetworks.com>; Kirsher, Jeffrey T <jeffrey.t.kirsher@intel.com>
-Cc: linux-pci@vger.kernel.org; qat-linux <qat-linux@intel.com>; linux-crypto@vger.kernel.org; linux-rdma@vger.kernel.org; netdev@vger.kernel.org; linux-kernel@vger.kernel.org
-Subject: [PATCH 5/7] IB/hfi1: use pcie_flr instead of duplicating it
+This patch simply add HMAC_IPAD_VALUE/HMAC_OPAD_VALUE defines.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
 ---
- drivers/infiniband/hw/hfi1/chip.c |  4 ++--  drivers/infiniband/hw/hfi1/hfi.h  |  1 -  drivers/infiniband/hw/hfi1/pcie.c | 30 ------------------------------
- 3 files changed, 2 insertions(+), 33 deletions(-)
+ crypto/hmac.c         | 4 ++--
+ include/crypto/hash.h | 3 +++
+ 2 files changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/infiniband/hw/hfi1/chip.c b/drivers/infiniband/hw/hfi1/chip.c
-index 121a4c920f1b..d037f72e4d96 100644
---- a/drivers/infiniband/hw/hfi1/chip.c
-+++ b/drivers/infiniband/hw/hfi1/chip.c
-@@ -13610,14 +13610,14 @@ static void init_chip(struct hfi1_devdata *dd)
- 		dd_dev_info(dd, "Resetting CSRs with FLR\n");
+diff --git a/crypto/hmac.c b/crypto/hmac.c
+index 72e38c0..4a997ce 100644
+--- a/crypto/hmac.c
++++ b/crypto/hmac.c
+@@ -74,8 +74,8 @@ static int hmac_setkey(struct crypto_shash *parent,
+ 	memcpy(opad, ipad, bs);
  
- 		/* do the FLR, the DC reset will remain */
--		hfi1_pcie_flr(dd);
-+		pcie_flr(dd->pcidev);
+ 	for (i = 0; i < bs; i++) {
+-		ipad[i] ^= 0x36;
+-		opad[i] ^= 0x5c;
++		ipad[i] ^= HMAC_IPAD_VALUE;
++		opad[i] ^= HMAC_OPAD_VALUE;
+ 	}
  
- 		/* restore command and BARs */
- 		restore_pci_variables(dd);
- 
- 		if (is_ax(dd)) {
- 			dd_dev_info(dd, "Resetting CSRs with FLR\n");
--			hfi1_pcie_flr(dd);
-+			pcie_flr(dd->pcidev);
- 			restore_pci_variables(dd);
- 		}
- 	} else {
-diff --git a/drivers/infiniband/hw/hfi1/hfi.h b/drivers/infiniband/hw/hfi1/hfi.h
-index 0808e3c3ba39..40d7559fa723 100644
---- a/drivers/infiniband/hw/hfi1/hfi.h
-+++ b/drivers/infiniband/hw/hfi1/hfi.h
-@@ -1764,7 +1764,6 @@ int hfi1_pcie_init(struct pci_dev *, const struct pci_device_id *);  void hfi1_pcie_cleanup(struct pci_dev *);  int hfi1_pcie_ddinit(struct hfi1_devdata *, struct pci_dev *);  void hfi1_pcie_ddcleanup(struct hfi1_devdata *); -void hfi1_pcie_flr(struct hfi1_devdata *);  int pcie_speeds(struct hfi1_devdata *);  void request_msix(struct hfi1_devdata *, u32 *, struct hfi1_msix_entry *);  void hfi1_enable_intx(struct pci_dev *); diff --git a/drivers/infiniband/hw/hfi1/pcie.c b/drivers/infiniband/hw/hfi1/pcie.c
-index 0829fce06172..c81556e84831 100644
---- a/drivers/infiniband/hw/hfi1/pcie.c
-+++ b/drivers/infiniband/hw/hfi1/pcie.c
-@@ -240,36 +240,6 @@ void hfi1_pcie_ddcleanup(struct hfi1_devdata *dd)
- 		iounmap(dd->piobase);
+ 	return crypto_shash_init(shash) ?:
+diff --git a/include/crypto/hash.h b/include/crypto/hash.h
+index b5727bc..0f51ff1 100644
+--- a/include/crypto/hash.h
++++ b/include/crypto/hash.h
+@@ -922,4 +922,7 @@ static inline void shash_desc_zero(struct shash_desc *desc)
+ 			 sizeof(*desc) + crypto_shash_descsize(desc->tfm));
  }
  
--/*
-- * Do a Function Level Reset (FLR) on the device.
-- * Based on static function drivers/pci/pci.c:pcie_flr().
-- */
--void hfi1_pcie_flr(struct hfi1_devdata *dd) -{
--	int i;
--	u16 status;
--
--	/* no need to check for the capability - we know the device has it */
--
--	/* wait for Transaction Pending bit to clear, at most a few ms */
--	for (i = 0; i < 4; i++) {
--		if (i)
--			msleep((1 << (i - 1)) * 100);
--
--		pcie_capability_read_word(dd->pcidev, PCI_EXP_DEVSTA, &status);
--		if (!(status & PCI_EXP_DEVSTA_TRPND))
--			goto clear;
--	}
--
--	dd_dev_err(dd, "Transaction Pending bit is not clearing, proceeding with reset anyway\n");
--
--clear:
--	pcie_capability_set_word(dd->pcidev, PCI_EXP_DEVCTL,
--				 PCI_EXP_DEVCTL_BCR_FLR);
--	/* PCIe spec requires the function to be back within 100ms */
--	msleep(100);
--}
--
- static void msix_setup(struct hfi1_devdata *dd, int pos, u32 *msixcnt,
- 		       struct hfi1_msix_entry *hfi1_msix_entry)  {
---
-2.11.0
++#define HMAC_IPAD_VALUE 0x36
++#define HMAC_OPAD_VALUE 0x5c
++
+ #endif	/* _CRYPTO_HASH_H */
+-- 
+2.10.2
