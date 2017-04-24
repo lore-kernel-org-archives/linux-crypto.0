@@ -1,76 +1,45 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
-Subject: Re: [PATCH v2 6/9] staging: ccree: add FIPS support
-Date: Mon, 24 Apr 2017 08:16:50 +0200
-Message-ID: <2108964.Kb0ivG6kmD@tauon.chronox.de>
-References: <1492693983-8175-1-git-send-email-gilad@benyossef.com> <CAOtvUMcOib2xr=THj1hy_uPtVhRHgJ2-4__mUBb5VwANQ1GA_A@mail.gmail.com> <CAOtvUMdF53Bu65oLtDaUKvnxcMCBY1h=Dq8LaPwTGOwg4YKYVg@mail.gmail.com>
+From: <barbara.polaszek@umk.pl>
+Subject: 31591 linux-crypto
+Date: Mon, 24 Apr 2017 06:19:18 -0000
+Message-ID: <149301475812.15557.12278189284438764796@vnpt.vn>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-        "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
-        Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>,
-        devel-gWbeCf7V1WCQmaza687I9mD2FQJk+8+b@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        Linux kernel mailing list <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Gilad Ben-Yossef <gilad.benyossef-5wv7dgnIgG8@public.gmane.org>,
-        Binoy Jayan <binoy.jayan-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
-        Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>,
-        Stuart Yoder <stuart.yoder-5wv7dgnIgG8@public.gmane.org>
-To: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAOtvUMdF53Bu65oLtDaUKvnxcMCBY1h=Dq8LaPwTGOwg4YKYVg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: application/zip; name="051.zip"
+Content-Transfer-Encoding: base64
+To: <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from [147.95.137.164] ([147.95.137.164]:57481 "HELO vnpt.vn"
+        rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with SMTP
+        id S1165369AbdDXGTV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 24 Apr 2017 02:19:21 -0400
+Content-Disposition: attachment
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Am Montag, 24. April 2017, 08:06:09 CEST schrieb Gilad Ben-Yossef:
-
-Hi Gilad,
-> 
-> Well, it turns out there is and we do :-)
-> 
-> This is from crypto/des_generic.c:
-> 
-> /*
->  * RFC2451:
->  *
->  *   For DES-EDE3, there is no known need to reject weak or
->  *   complementation keys.  Any weakness is obviated by the use of
->  *   multiple keys.
->  *
->  *   However, if the first two or last two independent 64-bit keys are
->  *   equal (k1 == k2 or k2 == k3), then the DES3 operation is simply the
->  *   same as DES.  Implementers MUST reject keys that exhibit this
->  *   property.
->  *
->  */
-> int __des3_ede_setkey(u32 *expkey, u32 *flags, const u8 *key,
->                       unsigned int keylen)
-> 
-> However, this does not check that k1 == k3. In this case DES3
-> becomes 2DES (2-keys TDEA), the use of which was dropped post 2015
-> by NIST Special Publication 800-131A*.
-
-It is correct that the RFC wants at least a 2key 3DES. And it is correct that 
-SP800-131A mandates 3key 3DES post 2015. All I am saying is that FIPS 140-2 
-does *not* require a technical verification of the 3 keys being not identical.
-
-Note, formally, FIPS 140-2 requires that the 3 keys (i.e. all 192 bits) must 
-be obtained from *one* call to a DRBG or KDF (separate independent calls to, 
-say, obtain one key at a time is *not* permitted). Of course, fixing the 
-parity bits is allowed after obtaining the random number.
-> 
-> Would it be acceptable if I offer a patch adding this check to
-> __des3_ede_setkey()
-> and use that in the ccree driver?
-
-I am not sure it makes sense as the core requirement is the *one* invocation 
-of the DRBG.
-
-Ciao
-Stephan
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+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
+BQAAAAA=
