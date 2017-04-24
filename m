@@ -1,43 +1,92 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
-Subject: Re: [PATCH v2 6/9] staging: ccree: add FIPS support
-Date: Mon, 24 Apr 2017 09:23:32 +0200
-Message-ID: <1965077.Btm8atTi0c@tauon.chronox.de>
-References: <1492693983-8175-1-git-send-email-gilad@benyossef.com> <2100092.9meQszc5SR@tauon.chronox.de> <CAOtvUMdYtLa10dUQ--5hxeYOAi+vw9OTLZF=WPmDS27cr6KvJg@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-        "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
-        Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>,
-        devel-gWbeCf7V1WCQmaza687I9mD2FQJk+8+b@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        Linux kernel mailing list <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Gilad Ben-Yossef <gilad.benyossef-5wv7dgnIgG8@public.gmane.org>,
-        Binoy Jayan <binoy.jayan-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
-        Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>,
-        Stuart Yoder <stuart.yoder-5wv7dgnIgG8@public.gmane.org>
-To: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAOtvUMdYtLa10dUQ--5hxeYOAi+vw9OTLZF=WPmDS27cr6KvJg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+From: Antoine Tenart <antoine.tenart@free-electrons.com>
+Subject: [PATCH v3 0/3] arm64: marvell: add cryptographic engine support for 7k/8k
+Date: Mon, 24 Apr 2017 09:54:04 +0200
+Message-ID: <20170424075407.19730-1-antoine.tenart@free-electrons.com>
+Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        thomas.petazzoni@free-electrons.com,
+        boris.brezillon@free-electrons.com, oferh@marvell.com,
+        igall@marvell.com, nadavh@marvell.com, robin.murphy@arm.com
+To: herbert@gondor.apana.org.au, davem@davemloft.net,
+        jason@lakedaemon.net, andrew@lunn.ch,
+        gregory.clement@free-electrons.com, sebastian.hesselbarth@gmail.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.free-electrons.com ([62.4.15.54]:48548 "EHLO
+        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1166314AbdDXHyW (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 24 Apr 2017 03:54:22 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Am Montag, 24. April 2017, 09:07:45 CEST schrieb Gilad Ben-Yossef:
+Hi all,
 
-Hi Gilad,
+This series adds support for the Inside Secure SafeXcel EIP197
+cryptographic engine which can be found on Marvell Armada 7k and 8k
+boards. A new cryptographic engine driver is added, as well as the
+relevant device tree definition for the Armada 7040 DB and 8040 DB
+boards.
 
-> I guess we could change the function to indicate that a key is valid
-> for decryption but not encryption
-> and have the implementation limiting based on that if there is an
-> interest in SP800-131A compliance.
+This driver needs two firmwares to work correctly. These firmware are
+usually used for more advanced operations than the ones supported (as of
+now), but we still need them to pass the data to the internal
+cryptographic engine.
 
-I would be delighted to see and review a patch.
+This series was tested in various ways on both the Armada 7040 DB and
+the Armada 8040 DB: using the crypto framework self tests, using tcrypt
+and while performing various transfers with iperf on top of IPsec.
 
-Ciao
-Stephan
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+This series is based on top of v4.11-rc1, and is available on a branch
+(which also contains the PPv2 support for 7k/8k, to ease the process of
+testing IPsec): https://github.com/atenart/linux  v4.11-rc1/7k8k-crypto
+I can rebase if needed. Patches adding device tree nodes and modifying
+the arm64 defconfig have been applied to the mvebu tree already.
+
+I'd like to thank Ofer Heifetz and Igal Liberman who helped me to do
+this driver by adding functionalities, optimizing functions and testing
+(a lot).
+
+Thanks,
+Antoine
+
+Since v2:
+  - Used sha*_zero_message_hash definitions instead of custom ones.
+  - Used memzero_explicit() instead of memset() to avoid leaks.
+  - Misc cosmetic updates.
+
+Since v1:
+  - Fixed two compilation issues reported by Kbuild.
+  - Removed all dma_to_phys() calls and used the dma addresses instead.
+  - Added a call to dma_set_mask_and_coherent() before calling any DMA
+    API helper.
+  - Removed some DMA free functions to avoid double-freeing.
+  - Do not rely on sg_nents_for_len() to get the number of sg anymore.
+  - Added a dedicated kmalloc'ed cache to use for dma_map_single().
+
+Antoine Tenart (3):
+  Documentation/bindings: Document the SafeXel cryptographic engine
+    driver
+  crypto: inside-secure: add SafeXcel EIP197 crypto engine driver
+  MAINTAINERS: add a maintainer for the Inside Secure crypto driver
+
+ .../bindings/crypto/inside-secure-safexcel.txt     |   27 +
+ MAINTAINERS                                        |    6 +
+ drivers/crypto/Kconfig                             |   17 +
+ drivers/crypto/Makefile                            |    1 +
+ drivers/crypto/inside-secure/Makefile              |    2 +
+ drivers/crypto/inside-secure/safexcel.c            |  925 +++++++++++++++++
+ drivers/crypto/inside-secure/safexcel.h            |  579 +++++++++++
+ drivers/crypto/inside-secure/safexcel_cipher.c     |  555 +++++++++++
+ drivers/crypto/inside-secure/safexcel_hash.c       | 1045 ++++++++++++++++++++
+ drivers/crypto/inside-secure/safexcel_ring.c       |  157 +++
+ 10 files changed, 3314 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/inside-secure-safexcel.txt
+ create mode 100644 drivers/crypto/inside-secure/Makefile
+ create mode 100644 drivers/crypto/inside-secure/safexcel.c
+ create mode 100644 drivers/crypto/inside-secure/safexcel.h
+ create mode 100644 drivers/crypto/inside-secure/safexcel_cipher.c
+ create mode 100644 drivers/crypto/inside-secure/safexcel_hash.c
+ create mode 100644 drivers/crypto/inside-secure/safexcel_ring.c
+
+-- 
+2.11.0
