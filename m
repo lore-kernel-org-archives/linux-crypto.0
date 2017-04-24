@@ -1,72 +1,100 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
 Subject: Re: [PATCH v2 6/9] staging: ccree: add FIPS support
-Date: Mon, 24 Apr 2017 10:07:45 +0300
-Message-ID: <CAOtvUMdYtLa10dUQ--5hxeYOAi+vw9OTLZF=WPmDS27cr6KvJg@mail.gmail.com>
+Date: Mon, 24 Apr 2017 09:22:02 +0200
+Message-ID: <2863349.j9L1IQv8si@tauon.chronox.de>
 References: <1492693983-8175-1-git-send-email-gilad@benyossef.com>
- <CAOtvUMdF53Bu65oLtDaUKvnxcMCBY1h=Dq8LaPwTGOwg4YKYVg@mail.gmail.com>
- <2108964.Kb0ivG6kmD@tauon.chronox.de> <2100092.9meQszc5SR@tauon.chronox.de>
+ <2108964.Kb0ivG6kmD@tauon.chronox.de>
+ <CAOtvUMfOM0fG+NCX=FcqDZfZ0k54Fcie+dcikxRaFjmfubYkKQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        devel@driverdev.osuosl.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
-        Gilad Ben-Yossef <gilad.benyossef@arm.com>,
-        Binoy Jayan <binoy.jayan@linaro.org>,
-        Ofir Drang <ofir.drang@arm.com>,
-        Stuart Yoder <stuart.yoder@arm.com>
-To: =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <2100092.9meQszc5SR@tauon.chronox.de>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Mark Rutland <mark.rutland@arm.com>, devel@driverdev.osuosl.org,
+ Herbert Xu <herbert@gondor.apana.org.au>, devicetree@vger.kernel.org,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+ Binoy Jayan <binoy.jayan@linaro.org>, Rob Herring <robh+dt@kernel.org>,
+ linux-crypto@vger.kernel.org, Gilad Ben-Yossef <gilad.benyossef@arm.com>,
+ Stuart Yoder <stuart.yoder@arm.com>, "David S. Miller" <davem@davemloft.net>,
+ Ofir Drang <ofir.drang@arm.com>
+To: Gilad Ben-Yossef <gilad@benyossef.com>
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+In-Reply-To: <CAOtvUMfOM0fG+NCX=FcqDZfZ0k54Fcie+dcikxRaFjmfubYkKQ@mail.gmail.com>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Apr 24, 2017 at 9:21 AM, Stephan M=C3=BCller <smueller@chronox.de> =
-wrote:
-> Am Montag, 24. April 2017, 08:16:50 CEST schrieb Stephan M=C3=BCller:
->
-> Hi Gilad,
->
->> >
->> > int __des3_ede_setkey(u32 *expkey, u32 *flags, const u8 *key,
->> >
->> >                       unsigned int keylen)
->> >
->> > However, this does not check that k1 =3D=3D k3. In this case DES3
->> > becomes 2DES (2-keys TDEA), the use of which was dropped post 2015
->> > by NIST Special Publication 800-131A*.
->>
->> It is correct that the RFC wants at least a 2key 3DES. And it is correct
->> that SP800-131A mandates 3key 3DES post 2015. All I am saying is that FI=
-PS
->> 140-2 does *not* require a technical verification of the 3 keys being no=
-t
->> identical.
->
-> One side note: we had discussed a patch to this function in the past, see=
- [1].
->
-> [1] https://patchwork.kernel.org/patch/8293441/
->
+Am Montag, 24. April 2017, 09:04:13 CEST schrieb Gilad Ben-Yossef:
 
-Thanks, I was not aware of that.
+Hi Gilad,
 
-I guess we could change the function to indicate that a key is valid
-for decryption but not encryption
-and have the implementation limiting based on that if there is an
-interest in SP800-131A compliance.
+> 
+> Thanks you for the clarification. As I think is obvious by now I am
+> not a FIPS expert by any stretch.
+> 
+> Isn't the requirements on DRBG or KDF invocations pertain to key
+> generation only?
+> What happens if you don't derive the keys on the system, but wish to
+> use keys derived elsewhere?
+> I assumed the limitations on weak keys etc. were meant to protect
+> against that scenario and are
+> therefore independent from key generation requirements, but I may have
+> misunderstood that.
 
-Gilad
+That is exactly an important question. NIST lately moved away from a pure 
+cipher-only view of cryptography to a more holistic view (i.e. where are 
+ciphers used).
 
---=20
-Gilad Ben-Yossef
-Chief Coffee Drinker
+That said, for 3DES there is no formal requirement that the 3 keys must be 
+checked. NIST is fine when documentation says how the keys are generated by 
+some logic outside the module.
+> 
+> Anyway, if I understand you correctly, what you are saying is that
+> these checks might make an
+> implementation RFC 2451 and SP800-131A compliant respectively but they
+> are not required for
+> FIPS 140-2 compliance? did I understand that correctly?
 
-"If you take a class in large-scale robotics, can you end up in a
-situation where the homework eats your dog?"
- -- Jean-Baptiste Queru
+Correct. Regarding SP800-131A, it only says that a full 3key 3DES is required. 
+It does not say whether/how the key shall be enforced not being identical.
+> 
+> If so, since two 3DES implementation in the kernel already do the RFC
+> 2451 compliant check I assume
+> you would not object to the ccree driver using the same function,
+> disconnect from FIPS being set or
+> not, just as is being done with the other 3DES implementation.
+
+Absolutely. If possible, all 3DES implementations should use the same checking 
+functions. The existing checking function regarding the prevention of 1key 
+3DES should be used by your code too.
+
+All I am saying that from a FIPS perspective, there is no need to extent the 
+common function by a 3key 3DES enforcer.
+> 
+> In addition, would it be OK if we did an extra check in the ccree
+> driver for SP800-131A key compliance
+> and disable encryption (but allow decryption) if the key fails the
+> check? again, this would be independent
+> from FIPS mode?
+
+My personal taste would be: changes that makes sense for all 3DES 
+implementations should go to a common function. Otherwise, 3DES implementation 
+A behaves differently than impl. B.
+
+That said, having a check that all three keys are non-identical would 
+certainly be good (see my Ack to the patch from a year ago). But you cannot 
+use the argument that FIPS mandates it to push it through. :-)
+
+Ciao
+Stephan
+
+PS: There is currently a new requirement being discussed for FIPS: 3DES 
+operations should not allow more than 4GB of data to be encrypted with one 
+key. This requirement would need technical enforcement. I am looking into this 
+one for some time now.
