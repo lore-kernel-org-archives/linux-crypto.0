@@ -1,49 +1,92 @@
-From: Loganaden Velvindron <logan@hackers.mu>
-Subject: Re: [PATCH] crypto: ecc : Wipe memory for p on errors.
-Date: Mon, 24 Apr 2017 10:05:17 +0400
-Message-ID: <20170424060517.vdufjvbrxhtuwda6@hackers.mu>
-References: <20170422113134.hzulmuvnveqg7sjq@hackers.mu>
- <1812636.Q25d83Qtbu@positron.chronox.de>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: Re: [PATCH v2 6/9] staging: ccree: add FIPS support
+Date: Mon, 24 Apr 2017 10:04:13 +0300
+Message-ID: <CAOtvUMfOM0fG+NCX=FcqDZfZ0k54Fcie+dcikxRaFjmfubYkKQ@mail.gmail.com>
+References: <1492693983-8175-1-git-send-email-gilad@benyossef.com>
+ <CAOtvUMcOib2xr=THj1hy_uPtVhRHgJ2-4__mUBb5VwANQ1GA_A@mail.gmail.com>
+ <CAOtvUMdF53Bu65oLtDaUKvnxcMCBY1h=Dq8LaPwTGOwg4YKYVg@mail.gmail.com>
+ <2108964.Kb0ivG6kmD@tauon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Cc: linux-crypto@vger.kernel.org
-To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from walmailout01.yourhostingaccount.com ([65.254.253.94]:48903 "EHLO
-        walmailout01.yourhostingaccount.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1165577AbdDXGfl (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Apr 2017 02:35:41 -0400
-Received: from mailscan02.yourhostingaccount.com ([10.1.15.2] helo=walmailscan02.yourhostingaccount.com)
-        by walmailout01.yourhostingaccount.com with esmtp (Exim)
-        id 1d2X7q-0007m6-Cz
-        for linux-crypto@vger.kernel.org; Mon, 24 Apr 2017 02:05:30 -0400
-Received: from [10.114.3.31] (helo=walimpout11)
-        by walmailscan02.yourhostingaccount.com with esmtp (Exim)
-        id 1d2X7q-0006EH-AS
-        for linux-crypto@vger.kernel.org; Mon, 24 Apr 2017 02:05:30 -0400
-Content-Disposition: inline
-In-Reply-To: <1812636.Q25d83Qtbu@positron.chronox.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: Mark Rutland <mark.rutland@arm.com>, devel@driverdev.osuosl.org,
+ Herbert Xu <herbert@gondor.apana.org.au>, devicetree@vger.kernel.org,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+ Binoy Jayan <binoy.jayan@linaro.org>, Rob Herring <robh+dt@kernel.org>,
+ linux-crypto@vger.kernel.org, Gilad Ben-Yossef <gilad.benyossef@arm.com>,
+ Stuart Yoder <stuart.yoder@arm.com>, "David S. Miller" <davem@davemloft.net>,
+ Ofir Drang <ofir.drang@arm.com>
+To: =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+In-Reply-To: <2108964.Kb0ivG6kmD@tauon.chronox.de>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+List-Id: linux-crypto.vger.kernel.org
 
-On Sun, Apr 23, 2017 at 09:14:18PM +0200, Stephan Müller wrote:
-> Am Samstag, 22. April 2017, 13:31:34 CEST schrieb Loganaden Velvindron:
-> 
-> Hi Loganaden,
-> 
-> > -	kfree(p);
-> > +	kzfree(p);
-> 
-> Why do you think this is necessary? p is not filled in this function as this 
-> function only allocates the memory.
-On 2nd reading, p doesn't contain any sensitive information in this function,
-and doesn't need to be zero'ed.
-
-Thank you Stephan. Please disregard the patch.
-
-
-> 
-> Ciao
-> Stephan
+T24gTW9uLCBBcHIgMjQsIDIwMTcgYXQgOToxNiBBTSwgU3RlcGhhbiBNw7xsbGVyIDxzbXVlbGxl
+ckBjaHJvbm94LmRlPiB3cm90ZToKPiBBbSBNb250YWcsIDI0LiBBcHJpbCAyMDE3LCAwODowNjow
+OSBDRVNUIHNjaHJpZWIgR2lsYWQgQmVuLVlvc3NlZjoKPgo+IEhpIEdpbGFkLAo+Pgo+PiBXZWxs
+LCBpdCB0dXJucyBvdXQgdGhlcmUgaXMgYW5kIHdlIGRvIDotKQo+Pgo+PiBUaGlzIGlzIGZyb20g
+Y3J5cHRvL2Rlc19nZW5lcmljLmM6Cj4+Cj4+IC8qCj4+ICAqIFJGQzI0NTE6Cj4+ICAqCj4+ICAq
+ICAgRm9yIERFUy1FREUzLCB0aGVyZSBpcyBubyBrbm93biBuZWVkIHRvIHJlamVjdCB3ZWFrIG9y
+Cj4+ICAqICAgY29tcGxlbWVudGF0aW9uIGtleXMuICBBbnkgd2Vha25lc3MgaXMgb2J2aWF0ZWQg
+YnkgdGhlIHVzZSBvZgo+PiAgKiAgIG11bHRpcGxlIGtleXMuCj4+ICAqCj4+ICAqICAgSG93ZXZl
+ciwgaWYgdGhlIGZpcnN0IHR3byBvciBsYXN0IHR3byBpbmRlcGVuZGVudCA2NC1iaXQga2V5cyBh
+cmUKPj4gICogICBlcXVhbCAoazEgPT0gazIgb3IgazIgPT0gazMpLCB0aGVuIHRoZSBERVMzIG9w
+ZXJhdGlvbiBpcyBzaW1wbHkgdGhlCj4+ICAqICAgc2FtZSBhcyBERVMuICBJbXBsZW1lbnRlcnMg
+TVVTVCByZWplY3Qga2V5cyB0aGF0IGV4aGliaXQgdGhpcwo+PiAgKiAgIHByb3BlcnR5Lgo+PiAg
+Kgo+PiAgKi8KPj4gaW50IF9fZGVzM19lZGVfc2V0a2V5KHUzMiAqZXhwa2V5LCB1MzIgKmZsYWdz
+LCBjb25zdCB1OCAqa2V5LAo+PiAgICAgICAgICAgICAgICAgICAgICAgdW5zaWduZWQgaW50IGtl
+eWxlbikKPj4KPj4gSG93ZXZlciwgdGhpcyBkb2VzIG5vdCBjaGVjayB0aGF0IGsxID09IGszLiBJ
+biB0aGlzIGNhc2UgREVTMwo+PiBiZWNvbWVzIDJERVMgKDIta2V5cyBUREVBKSwgdGhlIHVzZSBv
+ZiB3aGljaCB3YXMgZHJvcHBlZCBwb3N0IDIwMTUKPj4gYnkgTklTVCBTcGVjaWFsIFB1YmxpY2F0
+aW9uIDgwMC0xMzFBKi4KPgo+IEl0IGlzIGNvcnJlY3QgdGhhdCB0aGUgUkZDIHdhbnRzIGF0IGxl
+YXN0IGEgMmtleSAzREVTLiBBbmQgaXQgaXMgY29ycmVjdCB0aGF0Cj4gU1A4MDAtMTMxQSBtYW5k
+YXRlcyAza2V5IDNERVMgcG9zdCAyMDE1LiBBbGwgSSBhbSBzYXlpbmcgaXMgdGhhdCBGSVBTIDE0
+MC0yCj4gZG9lcyAqbm90KiByZXF1aXJlIGEgdGVjaG5pY2FsIHZlcmlmaWNhdGlvbiBvZiB0aGUg
+MyBrZXlzIGJlaW5nIG5vdCBpZGVudGljYWwuCj4KPiBOb3RlLCBmb3JtYWxseSwgRklQUyAxNDAt
+MiByZXF1aXJlcyB0aGF0IHRoZSAzIGtleXMgKGkuZS4gYWxsIDE5MiBiaXRzKSBtdXN0Cj4gYmUg
+b2J0YWluZWQgZnJvbSAqb25lKiBjYWxsIHRvIGEgRFJCRyBvciBLREYgKHNlcGFyYXRlIGluZGVw
+ZW5kZW50IGNhbGxzIHRvLAo+IHNheSwgb2J0YWluIG9uZSBrZXkgYXQgYSB0aW1lIGlzICpub3Qq
+IHBlcm1pdHRlZCkuIE9mIGNvdXJzZSwgZml4aW5nIHRoZQo+IHBhcml0eSBiaXRzIGlzIGFsbG93
+ZWQgYWZ0ZXIgb2J0YWluaW5nIHRoZSByYW5kb20gbnVtYmVyLgo+Pgo+PiBXb3VsZCBpdCBiZSBh
+Y2NlcHRhYmxlIGlmIEkgb2ZmZXIgYSBwYXRjaCBhZGRpbmcgdGhpcyBjaGVjayB0bwo+PiBfX2Rl
+czNfZWRlX3NldGtleSgpCj4+IGFuZCB1c2UgdGhhdCBpbiB0aGUgY2NyZWUgZHJpdmVyPwo+Cj4g
+SSBhbSBub3Qgc3VyZSBpdCBtYWtlcyBzZW5zZSBhcyB0aGUgY29yZSByZXF1aXJlbWVudCBpcyB0
+aGUgKm9uZSogaW52b2NhdGlvbgo+IG9mIHRoZSBEUkJHLgoKClRoYW5rcyB5b3UgZm9yIHRoZSBj
+bGFyaWZpY2F0aW9uLiBBcyBJIHRoaW5rIGlzIG9idmlvdXMgYnkgbm93IEkgYW0Kbm90IGEgRklQ
+UyBleHBlcnQgYnkgYW55IHN0cmV0Y2guCgpJc24ndCB0aGUgcmVxdWlyZW1lbnRzIG9uIERSQkcg
+b3IgS0RGIGludm9jYXRpb25zIHBlcnRhaW4gdG8ga2V5CmdlbmVyYXRpb24gb25seT8KV2hhdCBo
+YXBwZW5zIGlmIHlvdSBkb24ndCBkZXJpdmUgdGhlIGtleXMgb24gdGhlIHN5c3RlbSwgYnV0IHdp
+c2ggdG8KdXNlIGtleXMgZGVyaXZlZCBlbHNld2hlcmU/CkkgYXNzdW1lZCB0aGUgbGltaXRhdGlv
+bnMgb24gd2VhayBrZXlzIGV0Yy4gd2VyZSBtZWFudCB0byBwcm90ZWN0CmFnYWluc3QgdGhhdCBz
+Y2VuYXJpbyBhbmQgYXJlCnRoZXJlZm9yZSBpbmRlcGVuZGVudCBmcm9tIGtleSBnZW5lcmF0aW9u
+IHJlcXVpcmVtZW50cywgYnV0IEkgbWF5IGhhdmUKbWlzdW5kZXJzdG9vZCB0aGF0LgoKQW55d2F5
+LCBpZiBJIHVuZGVyc3RhbmQgeW91IGNvcnJlY3RseSwgd2hhdCB5b3UgYXJlIHNheWluZyBpcyB0
+aGF0CnRoZXNlIGNoZWNrcyBtaWdodCBtYWtlIGFuCmltcGxlbWVudGF0aW9uIFJGQyAyNDUxIGFu
+ZCBTUDgwMC0xMzFBIGNvbXBsaWFudCByZXNwZWN0aXZlbHkgYnV0IHRoZXkKYXJlIG5vdCByZXF1
+aXJlZCBmb3IKRklQUyAxNDAtMiBjb21wbGlhbmNlPyBkaWQgSSB1bmRlcnN0YW5kIHRoYXQgY29y
+cmVjdGx5PwoKSWYgc28sIHNpbmNlIHR3byAzREVTIGltcGxlbWVudGF0aW9uIGluIHRoZSBrZXJu
+ZWwgYWxyZWFkeSBkbyB0aGUgUkZDCjI0NTEgY29tcGxpYW50IGNoZWNrIEkgYXNzdW1lCnlvdSB3
+b3VsZCBub3Qgb2JqZWN0IHRvIHRoZSBjY3JlZSBkcml2ZXIgdXNpbmcgdGhlIHNhbWUgZnVuY3Rp
+b24sCmRpc2Nvbm5lY3QgZnJvbSBGSVBTIGJlaW5nIHNldCBvcgpub3QsIGp1c3QgYXMgaXMgYmVp
+bmcgZG9uZSB3aXRoIHRoZSBvdGhlciAzREVTIGltcGxlbWVudGF0aW9uLgoKSW4gYWRkaXRpb24s
+IHdvdWxkIGl0IGJlIE9LIGlmIHdlIGRpZCBhbiBleHRyYSBjaGVjayBpbiB0aGUgY2NyZWUKZHJp
+dmVyIGZvciBTUDgwMC0xMzFBIGtleSBjb21wbGlhbmNlCmFuZCBkaXNhYmxlIGVuY3J5cHRpb24g
+KGJ1dCBhbGxvdyBkZWNyeXB0aW9uKSBpZiB0aGUga2V5IGZhaWxzIHRoZQpjaGVjaz8gYWdhaW4s
+IHRoaXMgd291bGQgYmUgaW5kZXBlbmRlbnQKZnJvbSBGSVBTIG1vZGU/CgpUaGFua3MgYWdhaW4s
+CkdpbGFkCgoKLS0gCkdpbGFkIEJlbi1Zb3NzZWYKQ2hpZWYgQ29mZmVlIERyaW5rZXIKCiJJZiB5
+b3UgdGFrZSBhIGNsYXNzIGluIGxhcmdlLXNjYWxlIHJvYm90aWNzLCBjYW4geW91IGVuZCB1cCBp
+biBhCnNpdHVhdGlvbiB3aGVyZSB0aGUgaG9tZXdvcmsgZWF0cyB5b3VyIGRvZz8iCiAtLSBKZWFu
+LUJhcHRpc3RlIFF1ZXJ1Cl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fCmRldmVsIG1haWxpbmcgbGlzdApkZXZlbEBsaW51eGRyaXZlcnByb2plY3Qub3JnCmh0
+dHA6Ly9kcml2ZXJkZXYubGludXhkcml2ZXJwcm9qZWN0Lm9yZy9tYWlsbWFuL2xpc3RpbmZvL2Ry
+aXZlcmRldi1kZXZlbAo=
