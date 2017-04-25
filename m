@@ -1,57 +1,44 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH] crypto: tcrypt: don't disable irqs and wait
-Date: Tue, 25 Apr 2017 11:25:40 +0300
-Message-ID: <1493108740-1642-1-git-send-email-gilad@benyossef.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        gilad.benyossef@arm.com, Ofir Drang <ofir.drang@arm.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2] crypto: algif_aead - Require setkey before accept(2)
+Date: Tue, 25 Apr 2017 16:47:48 +0800
+Message-ID: <20170425084748.GA24078@gondor.apana.org.au>
+References: <2439869.UPpkkqdW7f@positron.chronox.de>
+ <1688100.DB4uBLsSBi@positron.chronox.de>
+ <20170424102239.GE20943@gondor.apana.org.au>
+ <41476204.egAyRFCtmD@tauon.chronox.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Cc: linux-crypto@vger.kernel.org
+To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:37598 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1176026AbdDYIZt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 Apr 2017 04:25:49 -0400
+Received: from [198.176.57.175] ([198.176.57.175]:47438 "EHLO
+        deadmen.hmeau.com" rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1176850AbdDYIsW (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 25 Apr 2017 04:48:22 -0400
+Content-Disposition: inline
+In-Reply-To: <41476204.egAyRFCtmD@tauon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The tcrypt AEAD cycles speed tests disables irqs during the test, which is
-broken at the very least since commit
-'1425d2d17f7309c6 ("crypto: tcrypt - Fix AEAD speed tests")'
-adds a wait for completion as part of the test and probably since
-switching to the new AEAD API.
+On Mon, Apr 24, 2017 at 12:26:15PM +0200, Stephan Müller wrote:
+> Am Montag, 24. April 2017, 12:22:39 CEST schrieb Herbert Xu:
+> 
+> Hi Herbert,
+> 
+> > Patch applied.  Thanks.
+> 
+> Thank you.
+> 
+> The patch regarding the memory management of algif_aead is affected by this 
+> change as well. Shall I roll a new version of that patch for algif_aead or do 
+> you want me to wait for another review round?
 
-While the result of taking a cycle count diff may not mean much on SMP
-systems if the task migrates, it's good enough for tcrypt being the quick
-& dirty dev tool it is. It's also what all the other (i.e. hash) cycle
-speed tests do.
+Could you wait until the next merge window closes?
 
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
-Reported-by: Ofir Drang <ofir.drang@arm.com>
----
- crypto/tcrypt.c | 4 ----
- 1 file changed, 4 deletions(-)
-
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index 9a11f3c..0dd6a43 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -138,8 +138,6 @@ static int test_aead_cycles(struct aead_request *req, int enc, int blen)
- 	int ret = 0;
- 	int i;
- 
--	local_irq_disable();
--
- 	/* Warm-up run. */
- 	for (i = 0; i < 4; i++) {
- 		if (enc)
-@@ -169,8 +167,6 @@ static int test_aead_cycles(struct aead_request *req, int enc, int blen)
- 	}
- 
- out:
--	local_irq_enable();
--
- 	if (ret == 0)
- 		printk("1 operation in %lu cycles (%d bytes)\n",
- 		       (cycles + 4) / 8, blen);
+Thanks,
 -- 
-2.1.4
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
