@@ -1,53 +1,75 @@
-From: Doug Ledford <dledford-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 5/7] IB/hfi1: use pcie_flr instead of duplicating it
-Date: Tue, 25 Apr 2017 13:00:03 -0400
-Message-ID: <1493139603.3041.74.camel@redhat.com>
-References: <20170414191131.14286-1-hch@lst.de>
-         <20170414191131.14286-6-hch@lst.de>
-         <A33E225544E47D4DB5713032774B132783960382@irsmsx105.ger.corp.intel.com>
-         <20170424143507.GA28812@lst.de>
+From: Tim Chen <tim.c.chen@linux.intel.com>
+Subject: Re: [PATCH] crypto: sha512-mb - add some missing unlock on error
+Date: Tue, 25 Apr 2017 10:37:44 -0700
+Message-ID: <1493141864.3209.94.camel@linux.intel.com>
+References: <20170425091854.6fryhkc2v4tf4dnl@mwanda>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-Cc: Bjorn Helgaas <bhelgaas-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>,
-        "Cabiddu, Giovanni" <giovanni.cabiddu-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-        "Benedetto, Salvatore" <salvatore.benedetto-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-        "Marciniszyn, Mike" <mike.marciniszyn-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-        "Dalessandro, Dennis" <dennis.dalessandro-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-        Derek Chickles <derek.chickles-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org>,
-        Satanand Burla <satananda.burla-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org>,
-        Felix Manlunas <felix.manlunas-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org>,
-        Raghu Vatsavayi <raghu.vatsavayi-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org>,
-        "Kirsher, Jeffrey T" <jeffrey.t.kirsher-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-        "linux-pci-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-pci-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        qat-linux <qat-linux-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-        "linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        "linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        "netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        "li
-To: Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>,
-        "Byczkowski, Jakub" <jakub.byczkowski-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170424143507.GA28812-jcswGhMUV9g@public.gmane.org>
-Sender: linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        Megha Dey <megha.dey@linux.intel.com>,
+        Fenghua Yu <fenghua.yu@intel.com>,
+        Greg Tucker <greg.b.tucker@intel.com>,
+        Xiaodong Liu <xiaodong.liu@intel.com>,
+        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
+To: Dan Carpenter <dan.carpenter@oracle.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga11.intel.com ([192.55.52.93]:40725 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1429452AbdDYRhv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 25 Apr 2017 13:37:51 -0400
+In-Reply-To: <20170425091854.6fryhkc2v4tf4dnl@mwanda>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 2017-04-24 at 16:35 +0200, Christoph Hellwig wrote:
-> On Mon, Apr 24, 2017 at 02:16:31PM +0000, Byczkowski, Jakub wrote:
-> > 
-> > Tested-by: Jakub Byczkowski <jakub.byczkowski-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
+On Tue, 2017-04-25 at 12:18 +0300, Dan Carpenter wrote:
+> We recently added some new locking but missed the unlocks on these
+> error paths in sha512_ctx_mgr_submit().
+
+Thanks for catching this issue.
+
+Acked-by: Tim Chen <tim.c.chen@linux.intel.com>
+
 > 
-> Are you (and Doug) ok with queueing this up in the PCI tree?
-
-I'm fine with that.  Feel free to add my Acked-by to the hfi1 patch.
-
--- 
-Doug Ledford <dledford-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-    GPG KeyID: B826A3330E572FDD
-   
-Key fingerprint = AE6B 1BDA 122B 23B4 265B  1274 B826 A333 0E57 2FDD
-
---
-To unsubscribe from this list: send the line "unsubscribe linux-rdma" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Fixes: c459bd7beda0 ("crypto: sha512-mb - Protect sha512 mb ctx mgr access")
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+> 
+> diff --git a/arch/x86/crypto/sha512-mb/sha512_mb.c b/arch/x86/crypto/sha512-mb/sha512_mb.c
+> index 2dd3674b5a1e..458409b7568d 100644
+> --- a/arch/x86/crypto/sha512-mb/sha512_mb.c
+> +++ b/arch/x86/crypto/sha512-mb/sha512_mb.c
+> @@ -269,19 +269,19 @@ static struct sha512_hash_ctx
+>  		 * LAST
+>  		 */
+>  		ctx->error = HASH_CTX_ERROR_INVALID_FLAGS;
+> -		return ctx;
+> +		goto unlock;
+>  	}
+>  
+>  	if (ctx->status & HASH_CTX_STS_PROCESSING) {
+>  		/* Cannot submit to a currently processing job. */
+>  		ctx->error = HASH_CTX_ERROR_ALREADY_PROCESSING;
+> -		return ctx;
+> +		goto unlock;
+>  	}
+>  
+>  	if ((ctx->status & HASH_CTX_STS_COMPLETE) && !(flags & HASH_FIRST)) {
+>  		/* Cannot update a finished job. */
+>  		ctx->error = HASH_CTX_ERROR_ALREADY_COMPLETED;
+> -		return ctx;
+> +		goto unlock;
+>  	}
+>  
+>  
+> @@ -363,6 +363,7 @@ static struct sha512_hash_ctx
+>  	}
+>  
+>  	ctx = sha512_ctx_mgr_resubmit(mgr, ctx);
+> +unlock:
+>  	spin_unlock_irqrestore(&cstate->work_lock, irqflags);
+>  	return ctx;
+>  }
