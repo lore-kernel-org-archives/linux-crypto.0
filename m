@@ -1,180 +1,57 @@
-From: Matthias Kaehlcke <mka@chromium.org>
-Subject: Re: [PATCH v2] crypto: arm64/sha: Add constant operand modifier to
- ASM_EXPORT
-Date: Tue, 25 Apr 2017 12:21:54 -0700
-Message-ID: <20170425192154.GO128305@google.com>
-References: <20170405183458.193068-1-mka@chromium.org>
- <CAP=VYLpejcYwXUMtCCkXmjXw=T1tBJLn21aVi-9v_VGmEinjRg@mail.gmail.com>
- <CAKv+Gu_DHBT=2YA9h+ao3pZXgEV5KsO9ia+J90wtLuDX=a4+eg@mail.gmail.com>
- <20170425173937.GN128305@google.com>
- <CAKv+Gu-5G-o_jRXdJS0u_AHpjZ1Zg7dAVvD0cXn9nyC7oD==YA@mail.gmail.com>
+From: Bjorn Helgaas <helgaas-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Subject: Re: [PATCH 5/7] IB/hfi1: use pcie_flr instead of duplicating it
+Date: Tue, 25 Apr 2017 14:39:55 -0500
+Message-ID: <20170425193955.GC29024@bhelgaas-glaptop.roam.corp.google.com>
+References: <20170414191131.14286-1-hch@lst.de>
+ <20170414191131.14286-6-hch@lst.de>
+ <A33E225544E47D4DB5713032774B132783960382@irsmsx105.ger.corp.intel.com>
+ <20170424143507.GA28812@lst.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: Paul Gortmaker <paul.gortmaker@windriver.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Greg Hackmann <ghackmann@google.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Robin Murphy <robin.murphy@arm.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org"
-        <linux-arm-kernel@lists.infradead.org>,
-        Grant Grundler <grundler@chromium.org>,
-        Michael Davidson <md@google.com>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pg0-f49.google.com ([74.125.83.49]:34981 "EHLO
-        mail-pg0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1431240AbdDYTV5 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 Apr 2017 15:21:57 -0400
-Received: by mail-pg0-f49.google.com with SMTP id 72so32830714pge.2
-        for <linux-crypto@vger.kernel.org>; Tue, 25 Apr 2017 12:21:56 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Cc: "Byczkowski, Jakub" <jakub.byczkowski-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+        Bjorn Helgaas <bhelgaas-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>,
+        "Cabiddu, Giovanni" <giovanni.cabiddu-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+        "Benedetto, Salvatore" <salvatore.benedetto-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+        "Marciniszyn, Mike" <mike.marciniszyn-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+        "Dalessandro, Dennis" <dennis.dalessandro-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+        Derek Chickles <derek.chickles-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org>,
+        Satanand Burla <satananda.burla-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org>,
+        Felix Manlunas <felix.manlunas-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org>,
+        Raghu Vatsavayi <raghu.vatsavayi-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org>,
+        "Kirsher, Jeffrey T" <jeffrey.t.kirsher-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+        "linux-pci-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-pci-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        qat-linux <qat-linux-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+        "linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        "linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        "net
+To: Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>
+Return-path: <linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <CAKv+Gu-5G-o_jRXdJS0u_AHpjZ1Zg7dAVvD0cXn9nyC7oD==YA@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20170424143507.GA28812-jcswGhMUV9g@public.gmane.org>
+Sender: linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-El Tue, Apr 25, 2017 at 07:06:30PM +0100 Ard Biesheuvel ha dit:
-
-> On 25 April 2017 at 18:39, Matthias Kaehlcke <mka@chromium.org> wrote:
-> > Hi,
-> >
-> > El Tue, Apr 18, 2017 at 04:35:02PM +0100 Ard Biesheuvel ha dit:
-> >
-> >> On 18 April 2017 at 15:47, Paul Gortmaker <paul.gortmaker@windriver.com> wrote:
-> >> > On Wed, Apr 5, 2017 at 2:34 PM, Matthias Kaehlcke <mka@chromium.org> wrote:
-> >> >> The operand is an integer constant, make the constness explicit by
-> >> >> adding the modifier. This is needed for clang to generate valid code
-> >> >> and also works with gcc.
-> >> >
-> >> > Actually it doesn't work with all gcc.  I've got an older arm64 toolchain that I
-> >> > only use for syntax checking (and hence I don't care if it is the latest and
-> >> > greatest) and this commit breaks it:
-> >> >
-> >> > arch/arm64/crypto/sha1-ce-glue.c:21:2: error: invalid 'asm': invalid
-> >> > operand prefix '%c'
-> >> >   asm(".globl " #sym "; .set " #sym ", %c0" :: "i"(val));
-> >> >
-> >> > I'm currently reverting this change locally so I can continue to use the old
-> >> > toolchain:
-> >> >
-> >> > $ aarch64-linux-gnu-gcc --version
-> >> > aarch64-linux-gnu-gcc (crosstool-NG linaro-1.13.1-4.8-2013.12 - Linaro
-> >> > GCC 2013.11) 4.8.3 20131202 (prerelease)
-> >> > Copyright (C) 2013 Free Software Foundation, Inc.
-> >> >
-> >> > $ aarch64-linux-gnu-as --version
-> >> > GNU assembler (crosstool-NG linaro-1.13.1-4.8-2013.12 - Linaro GCC
-> >> > 2013.11) 2.24.0.20131220
-> >> > Copyright 2013 Free Software Foundation, Inc.
-> >> >
-> >> > Maybe it is finally too old and nobody cares, but I thought it worth a mention.
-> >> >
-> >>
-> >> Thanks for the report. I think we care more about GCC 4.8 than about
-> >> Clang, which argues for reverting this patch.
-> >>
-> >> I understand these issues must be frustrating if you are working on
-> >> this stuff, but to me, it is not entirely obvious why we want to
-> >> support Clang in the first place (i.e., what does it buy you if your
-> >> distro/environment is not already using Clang for userland), and why
-> >> the burden is on Linux to make modifications to support Clang,
-> >> especially when it comes to GCC extensions such as inline assembly
-> >> syntax.
-> >>
-> >> It is ultimately up to the maintainers to decide what to do with this
-> >> patch, but my vote would be to revert it, especially given that the %c
-> >> placeholder prefix is not documented anywhere, and appears to simply
-> >> trigger some GCC internals that happen to do the right thing in this
-> >> case.
-> >>
-> >> However, the I -> i change is arguably an improvement, and considering
-> >> that the following
-> >>
-> >> asm("foo: .long %0" :: "i"(some value))
-> >>
-> >> doesn't compile with clang either, I suggest you (Matthias) file a bug
-> >> against Clang to get this fixed, and we can propose another patch just
-> >> for the I->i change.
-> >
-> > I consulted with folks with more expertise in this area than myself.
-> > This is their analysis of the situation:
-> >
-> > "The ARM ARM specifies that the correct AArch64 instruction assembly
-> > syntax is to have a hash sign (#) before an immediate.
-> >
+On Mon, Apr 24, 2017 at 04:35:07PM +0200, Christoph Hellwig wrote:
+> On Mon, Apr 24, 2017 at 02:16:31PM +0000, Byczkowski, Jakub wrote:
+> > Tested-by: Jakub Byczkowski <jakub.byczkowski-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
 > 
-> It does not specify that at all:
-> 
-> """
-> The A64 assembly language does not require the # character to
-> introduce constant immediate operands, but an assembler must allow
-> immediate values introduced with or without the # character. ARM
-> recommends that an A64 disassembler outputs a # before an immediate
-> operand.
-> """
-> (ARM DDI 0487A.g page C1-121)
-> 
-> IOW, it only /recommends/ the # sign for *dis*assemblers. Big difference.
+> Are you (and Doug) ok with queueing this up in the PCI tree?
 
-Indeed, thanks for the clarification.
+Applied this with Jakub's tested-by and Doug's ack to pci/virtualization
+for v4.12.
 
-> > Therefore, every time an inline assembly constraint is used that
-> > specifies to print an immediate (like 'i' or 'I'), the immediate
-> > (e.g. 42) should be printed with the hash (e.g. #42).
-> >
-> > Therefore, if you're using an immediate constraint where the hash sign
-> > must not be printed, you have to use the "c" operand modifier. The "c"
-> > operand modifier apparently got introduced to gcc after the 4.8
-> > release.
-> >
-> 
-> My problem with the %c modifier is that it is completely undocumented,
-> and appears in an internal GCC code generation code path. IOW, the GCC
-> developers could also remove it at any time (although this is highly
-> unlikely, of course)
+This still leaves these:
 
-clang documents it, but for GCC it is only mentioned under "x86
-Operand Modifiers".
+  [PATCH 4/7] ixgbe: use pcie_flr instead of duplicating it
+  [PATCH 6/7] crypto: qat: use pcie_flr instead of duplicating it
+  [PATCH 7/7] liquidio: use pcie_flr instead of duplicating it
 
-> > The binutils assembler and the clang integrated assembler accept
-> > immediates without the hash sign as a non-official extension.
-> 
-> Nope. *That* is mandated by the ARM ARM, see above.
-> 
-> > Some of
-> > the immediate constraints on gcc seem to not print out the hash sign
-> > either; which is why the variant in the linux kernel works with gcc.
-> >
-> 
-> Yes, and since it is perfectly legal for the "i" constraint not to
-> have a #, I don't understand what the big deal is tbh.
-> 
-> > In summary, it seems to me that the inline assembly with the %c0
-> > operand is the correct one and gcc 4.8 is simply too old to support
-> > this."
-> >
-> 
-> OK, so we're back to having to choose between GCC 4.8 and Clang.
+I haven't seen any response to 4 and 6.  Felix reported an unused
+variable in 7.  Let me know if you'd like me to do anything with
+these.
 
-That's not what I suggested.
-
-> > If the above is correct it seems that the solution is not to "fix"
-> > clang, but to use different instructions for gcc<=4.8 and newer
-> > compilers. I am aware that this is not a popular option.
-> >
-> > What do you think?
-> >
-> 
-> Perhaps I should just rework the code not to rely on inline asm at all.
-
-That sounds like a good option if it is not too much of a hassle.
-
-> I will take a look,
-
-Thanks!
-
-Matthias
+Bjorn
+--
+To unsubscribe from this list: send the line "unsubscribe linux-rdma" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
