@@ -1,200 +1,64 @@
-From: Antoine Tenart <antoine.tenart@free-electrons.com>
-Subject: Re: [PATCH v3 2/3] crypto: inside-secure: add SafeXcel EIP197 crypto
- engine driver
-Date: Tue, 25 Apr 2017 08:53:40 +0200
-Message-ID: <20170425065340.xdhmilo5caswkmxp@kwain>
-References: <20170424075407.19730-1-antoine.tenart@free-electrons.com>
- <20170424075407.19730-3-antoine.tenart@free-electrons.com>
- <2475079.gcOV5qCq7E@tauon.chronox.de>
+From: <archerrp@evms.edu>
+Subject: 18732 linux-crypto
+Date: Tue, 25 Apr 2017 07:52:09 -0000
+Message-ID: <149310672979.16693.7614524821039452275@jupiter.com.br>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="jsrqfl7eypfixw7w"
-Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        jason@lakedaemon.net, andrew@lunn.ch,
-        gregory.clement@free-electrons.com,
-        sebastian.hesselbarth@gmail.com, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        thomas.petazzoni@free-electrons.com,
-        boris.brezillon@free-electrons.com, oferh@marvell.com,
-        igall@marvell.com, nadavh@marvell.com, robin.murphy@arm.com
-To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Content-Type: application/zip; name="20368001405026.zip"
+Content-Transfer-Encoding: base64
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:42802 "EHLO
-        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1165276AbdDYGxv (ORCPT
+Received: from 170.231.134.119.jupiter.com.br ([170.231.134.119]:1104 "HELO
+        jupiter.com.br" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with SMTP id S980489AbdDYHwQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 Apr 2017 02:53:51 -0400
-Content-Disposition: inline
-In-Reply-To: <2475079.gcOV5qCq7E@tauon.chronox.de>
+        Tue, 25 Apr 2017 03:52:16 -0400
+Content-Disposition: attachment
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-
---jsrqfl7eypfixw7w
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Hi Stephan,
-
-On Mon, Apr 24, 2017 at 02:59:05PM +0200, Stephan M=FCller wrote:
-> Am Montag, 24. April 2017, 09:54:06 CEST schrieb Antoine Tenart:
->=20
-> > +struct safexcel_cipher_ctx {
-> > +	struct safexcel_context base;
-> > +	struct safexcel_crypto_priv *priv;
-> > +
-> > +	enum safexcel_cipher_direction direction;
-> > +	u32 mode;
-> > +
-> > +	__le32 key[8];
->=20
-> Can you please help me find the location where this memory is zeroized wh=
-en=20
-> released?
-
-It's not, I'll fix this.
-
-> > +static void safexcel_cipher_token(struct safexcel_cipher_ctx *ctx,
-> > +				  struct crypto_async_request *async,
-> > +				  struct safexcel_command_desc *cdesc,
-> > +				  u32 length)
-> > +{
-> > +	struct ablkcipher_request *req =3D ablkcipher_request_cast(async);
-> > +	struct safexcel_token *token;
-> > +	unsigned offset =3D 0;
-> > +
-> > +	if (ctx->mode =3D=3D CONTEXT_CONTROL_CRYPTO_MODE_CBC) {
-> > +		offset =3D AES_BLOCK_SIZE / sizeof(u32);
-> > +		memcpy(cdesc->control_data.token, req->info, AES_BLOCK_SIZE);
-> > +
-> > +		cdesc->control_data.options |=3D EIP197_OPTION_4_TOKEN_IV_CMD;
-> > +	}
-> > +
-> > +	token =3D (struct safexcel_token *)(cdesc->control_data.token + offse=
-t);
-> > +
-> > +	token[0].opcode =3D EIP197_TOKEN_OPCODE_DIRECTION;
-> > +	token[0].packet_length =3D length;
-> > +	token[0].stat =3D EIP197_TOKEN_STAT_LAST_PACKET;
-> > +	token[0].instructions =3D EIP197_TOKEN_INS_LAST |
-> > +				EIP197_TOKEN_INS_TYPE_CRYTO |
-> > +				EIP197_TOKEN_INS_TYPE_OUTPUT;
-> > +}
-> > +
-> > +static int safexcel_aes_setkey(struct crypto_ablkcipher *ctfm, const u8
-> > *key, +			       unsigned int len)
-> > +{
->=20
-> You still use ablkcipher. I thought that it is on its way out in favor of=
- the=20
-> skcipher API. Why do you stick to ablkcipher?
->=20
-> Note, a change could be as simple as s/ablkcipher/skcipher/g
-
-Because I wasn't aware of this :) I'll update.
-
-> > +	struct crypto_tfm *tfm =3D crypto_ablkcipher_tfm(ctfm);
-> > +	struct safexcel_cipher_ctx *ctx =3D crypto_tfm_ctx(tfm);
-> > +	struct crypto_aes_ctx aes;
-> > +	int ret, i;
-> > +
-> > +	ret =3D crypto_aes_expand_key(&aes, key, len);
-> > +	if (ret) {
-> > +		crypto_ablkcipher_set_flags(ctfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
-> > +		return ret;
-> > +	}
-> > +
-> > +	for (i =3D 0; i < len / sizeof(u32); i++) {
-> > +		if (ctx->key[i] !=3D cpu_to_le32(aes.key_enc[i])) {
-> > +			ctx->base.needs_inv =3D true;
-> > +			break;
-> > +		}
-> > +	}
-> > +
-> > +	for (i =3D 0; i < len / sizeof(u32); i++)
-> > +		ctx->key[i] =3D cpu_to_le32(aes.key_enc[i]);
-> > +
-> > +	ctx->key_len =3D len;
->=20
-> memzero_explicit(aes)?
-
-OK, I'll update.
-
-> > +static int safexcel_aes_send(struct crypto_async_request *async,
-> > +			     int ring, struct safexcel_request *request,
-> > +			     int *commands, int *results)
-> > +{
-> > +	struct ablkcipher_request *req =3D ablkcipher_request_cast(async);
-> > +	struct safexcel_cipher_ctx *ctx =3D crypto_tfm_ctx(req->base.tfm);
-> > +	struct safexcel_crypto_priv *priv =3D ctx->priv;
-> > +	struct safexcel_command_desc *cdesc;
-> > +	struct safexcel_result_desc *rdesc;
-> > +	struct scatterlist *sg;
-> > +	int nr_src, nr_dst, n_cdesc =3D 0, n_rdesc =3D 0, queued =3D req->nby=
-tes;
-> > +	int i, ret =3D 0;
-> > +
-> > +	request->req =3D &req->base;
-> > +
-> > +	if (req->src =3D=3D req->dst) {
-> > +		nr_src =3D dma_map_sg(priv->dev, req->src,
-> > +				    sg_nents_for_len(req->src, req->nbytes),
-> > +				    DMA_BIDIRECTIONAL);
-> > +		nr_dst =3D nr_src;
-> > +		if (!nr_src)
-> > +			return -EINVAL;
-> > +	} else {
-> > +		nr_src =3D dma_map_sg(priv->dev, req->src,
-> > +				    sg_nents_for_len(req->src, req->nbytes),
-> > +				    DMA_TO_DEVICE);
-> > +		if (!nr_src)
-> > +			return -EINVAL;
-> > +
-> > +		nr_dst =3D dma_map_sg(priv->dev, req->dst,
-> > +				    sg_nents_for_len(req->dst, req->nbytes),
-> > +				    DMA_FROM_DEVICE);
-> > +		if (!nr_dst) {
-> > +			dma_unmap_sg(priv->dev, req->src,
-> > +				     sg_nents_for_len(req->src, req->nbytes),
-> > +				     DMA_TO_DEVICE);
-> > +			return -EINVAL;
-> > +		}
-> > +	}
-> > +
-> > +	memcpy(ctx->base.ctxr->data, ctx->key, ctx->key_len);
->=20
-> Is ctxr->data properly zeroized?
-
-No, I'll update.
-
-Thanks for the review!
-Antoine
-
---=20
-Antoine T=E9nart, Free Electrons
-Embedded Linux and Kernel engineering
-http://free-electrons.com
-
---jsrqfl7eypfixw7w
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAABCgAGBQJY/vJxAAoJEFxNi8it27zYQ+oP/jViTBvbzzoNKzPsc4bIQ4s9
-byhMzAQ52Ics5C5EmcXcsX1EkvHe+DqwxV3SHZqjSe5NkBiMqrDEmVLoLNyc3LUC
-OuHyeqw87TbLEn3NH47Uyr094jqJAFd/oACB6LoJDFHvYK682aHFEQvE07Uza2am
-iecdzxiBsGJY62Rv+zfyCPZeakIkDFUbJZAZBKigLVysMJSAaUgXopj4sAJaQcdS
-dNhTVae6PePH1no0Csq9aawloTyC6W1EL4sMeWcKzq/n5hticNHmcZshr00/E9Qp
-VUdji1j/qBCtCwgEe5wC+9h4Nu2LzDPz2JJ8O2XBdQmEPLO/o4fT9oqw7PLehXd6
-QPkstYl4VARgaScFE4lUiT+eS6PQD7LHk/3banIGW+dtMAtgRKdpfCWH2V5f0SVN
-agGMPbvD0qz+ltJfAgiprPI9/xUOkY9QZZHIMcbjuYnt/YJz9ofEEg1kau22fLuw
-YAWyPRAm78gZY6Zj608eq4nPr5LxEXcQtG1GeBqdOnkNHEKCzMYovEnFekusqbGb
-mMZuKlLgJCq8LgqjRGbd9k7odVTf2oTKmbYaPJDsLxRidPkJh4BDqbIdg69DbEaE
-zRcxq2gdMN5bNxIz7y1hKtoyKtbVTXI8WlRRZZHK4BoGi1aL/AL25kcU4NnqZiS8
-zoM0UOd34dZ26CD+yQYo
-=bNSi
------END PGP SIGNATURE-----
-
---jsrqfl7eypfixw7w--
+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
