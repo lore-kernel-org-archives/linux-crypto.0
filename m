@@ -1,78 +1,180 @@
-From: Logan Gunthorpe <logang-OTvnGxWRz7hWk0Htik3J/w@public.gmane.org>
-Subject: [PATCH v2 19/21] mmc: sdricoh_cs: Make use of the new sg_map helper
- function
-Date: Tue, 25 Apr 2017 12:21:06 -0600
-Message-ID: <1493144468-22493-20-git-send-email-logang@deltatee.com>
-References: <1493144468-22493-1-git-send-email-logang@deltatee.com>
+From: Matthias Kaehlcke <mka@chromium.org>
+Subject: Re: [PATCH v2] crypto: arm64/sha: Add constant operand modifier to
+ ASM_EXPORT
+Date: Tue, 25 Apr 2017 12:21:54 -0700
+Message-ID: <20170425192154.GO128305@google.com>
+References: <20170405183458.193068-1-mka@chromium.org>
+ <CAP=VYLpejcYwXUMtCCkXmjXw=T1tBJLn21aVi-9v_VGmEinjRg@mail.gmail.com>
+ <CAKv+Gu_DHBT=2YA9h+ao3pZXgEV5KsO9ia+J90wtLuDX=a4+eg@mail.gmail.com>
+ <20170425173937.GN128305@google.com>
+ <CAKv+Gu-5G-o_jRXdJS0u_AHpjZ1Zg7dAVvD0cXn9nyC7oD==YA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Jens Axboe <axboe-tSWWG44O7X1aa/9Udqfwiw@public.gmane.org>, Ulf Hansson <ulf.hansson-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
- "James E.J. Bottomley" <jejb-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>,
- "Martin K. Petersen" <martin.petersen-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
- Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
- Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>,
- Sumit Semwal <sumit.semwal-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
- Sascha Sommer <saschasommer-KuiJ5kEpwI6ELgA04lAiVw@public.gmane.org>, Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>
-To: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- linux-media-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, dri-devel-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org,
- intel-gfx-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org, linux-raid-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- linux-mmc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nvdimm-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org,
- linux-scsi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, open-iscsi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org,
- megaraidlinux.pdl-dY08KVG/lbpWk0Htik3J/w@public.gmane.org, sparmaintainer-GLv8BlqOqDDQT0dZR+AlfA@public.gmane.org,
- devel-gWbeCf7V1WCQmaza687I9mD2FQJk+8+b@public.gmane.org, target-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, dm-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
-Return-path: <linux-nvdimm-bounces-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org>
-In-Reply-To: <1493144468-22493-1-git-send-email-logang-OTvnGxWRz7hWk0Htik3J/w@public.gmane.org>
-List-Unsubscribe: <https://lists.01.org/mailman/options/linux-nvdimm>,
- <mailto:linux-nvdimm-request-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.01.org/pipermail/linux-nvdimm/>
-List-Post: <mailto:linux-nvdimm-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org>
-List-Help: <mailto:linux-nvdimm-request-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.01.org/mailman/listinfo/linux-nvdimm>,
- <mailto:linux-nvdimm-request-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org?subject=subscribe>
-Errors-To: linux-nvdimm-bounces-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org
-Sender: "Linux-nvdimm" <linux-nvdimm-bounces-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Cc: Paul Gortmaker <paul.gortmaker@windriver.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Greg Hackmann <ghackmann@google.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Robin Murphy <robin.murphy@arm.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org"
+        <linux-arm-kernel@lists.infradead.org>,
+        Grant Grundler <grundler@chromium.org>,
+        Michael Davidson <md@google.com>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pg0-f49.google.com ([74.125.83.49]:34981 "EHLO
+        mail-pg0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1431240AbdDYTV5 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 25 Apr 2017 15:21:57 -0400
+Received: by mail-pg0-f49.google.com with SMTP id 72so32830714pge.2
+        for <linux-crypto@vger.kernel.org>; Tue, 25 Apr 2017 12:21:56 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <CAKv+Gu-5G-o_jRXdJS0u_AHpjZ1Zg7dAVvD0cXn9nyC7oD==YA@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-This is a straightforward conversion to the new function.
+El Tue, Apr 25, 2017 at 07:06:30PM +0100 Ard Biesheuvel ha dit:
 
-Signed-off-by: Logan Gunthorpe <logang-OTvnGxWRz7hWk0Htik3J/w@public.gmane.org>
-Cc: Sascha Sommer <saschasommer-KuiJ5kEpwI6ELgA04lAiVw@public.gmane.org>
-Cc: Ulf Hansson <ulf.hansson-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
----
- drivers/mmc/host/sdricoh_cs.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+> On 25 April 2017 at 18:39, Matthias Kaehlcke <mka@chromium.org> wrote:
+> > Hi,
+> >
+> > El Tue, Apr 18, 2017 at 04:35:02PM +0100 Ard Biesheuvel ha dit:
+> >
+> >> On 18 April 2017 at 15:47, Paul Gortmaker <paul.gortmaker@windriver.com> wrote:
+> >> > On Wed, Apr 5, 2017 at 2:34 PM, Matthias Kaehlcke <mka@chromium.org> wrote:
+> >> >> The operand is an integer constant, make the constness explicit by
+> >> >> adding the modifier. This is needed for clang to generate valid code
+> >> >> and also works with gcc.
+> >> >
+> >> > Actually it doesn't work with all gcc.  I've got an older arm64 toolchain that I
+> >> > only use for syntax checking (and hence I don't care if it is the latest and
+> >> > greatest) and this commit breaks it:
+> >> >
+> >> > arch/arm64/crypto/sha1-ce-glue.c:21:2: error: invalid 'asm': invalid
+> >> > operand prefix '%c'
+> >> >   asm(".globl " #sym "; .set " #sym ", %c0" :: "i"(val));
+> >> >
+> >> > I'm currently reverting this change locally so I can continue to use the old
+> >> > toolchain:
+> >> >
+> >> > $ aarch64-linux-gnu-gcc --version
+> >> > aarch64-linux-gnu-gcc (crosstool-NG linaro-1.13.1-4.8-2013.12 - Linaro
+> >> > GCC 2013.11) 4.8.3 20131202 (prerelease)
+> >> > Copyright (C) 2013 Free Software Foundation, Inc.
+> >> >
+> >> > $ aarch64-linux-gnu-as --version
+> >> > GNU assembler (crosstool-NG linaro-1.13.1-4.8-2013.12 - Linaro GCC
+> >> > 2013.11) 2.24.0.20131220
+> >> > Copyright 2013 Free Software Foundation, Inc.
+> >> >
+> >> > Maybe it is finally too old and nobody cares, but I thought it worth a mention.
+> >> >
+> >>
+> >> Thanks for the report. I think we care more about GCC 4.8 than about
+> >> Clang, which argues for reverting this patch.
+> >>
+> >> I understand these issues must be frustrating if you are working on
+> >> this stuff, but to me, it is not entirely obvious why we want to
+> >> support Clang in the first place (i.e., what does it buy you if your
+> >> distro/environment is not already using Clang for userland), and why
+> >> the burden is on Linux to make modifications to support Clang,
+> >> especially when it comes to GCC extensions such as inline assembly
+> >> syntax.
+> >>
+> >> It is ultimately up to the maintainers to decide what to do with this
+> >> patch, but my vote would be to revert it, especially given that the %c
+> >> placeholder prefix is not documented anywhere, and appears to simply
+> >> trigger some GCC internals that happen to do the right thing in this
+> >> case.
+> >>
+> >> However, the I -> i change is arguably an improvement, and considering
+> >> that the following
+> >>
+> >> asm("foo: .long %0" :: "i"(some value))
+> >>
+> >> doesn't compile with clang either, I suggest you (Matthias) file a bug
+> >> against Clang to get this fixed, and we can propose another patch just
+> >> for the I->i change.
+> >
+> > I consulted with folks with more expertise in this area than myself.
+> > This is their analysis of the situation:
+> >
+> > "The ARM ARM specifies that the correct AArch64 instruction assembly
+> > syntax is to have a hash sign (#) before an immediate.
+> >
+> 
+> It does not specify that at all:
+> 
+> """
+> The A64 assembly language does not require the # character to
+> introduce constant immediate operands, but an assembler must allow
+> immediate values introduced with or without the # character. ARM
+> recommends that an A64 disassembler outputs a # before an immediate
+> operand.
+> """
+> (ARM DDI 0487A.g page C1-121)
+> 
+> IOW, it only /recommends/ the # sign for *dis*assemblers. Big difference.
 
-diff --git a/drivers/mmc/host/sdricoh_cs.c b/drivers/mmc/host/sdricoh_cs.c
-index 5ff26ab..03225c3 100644
---- a/drivers/mmc/host/sdricoh_cs.c
-+++ b/drivers/mmc/host/sdricoh_cs.c
-@@ -319,16 +319,20 @@ static void sdricoh_request(struct mmc_host *mmc, struct mmc_request *mrq)
- 		for (i = 0; i < data->blocks; i++) {
- 			size_t len = data->blksz;
- 			u8 *buf;
--			struct page *page;
- 			int result;
--			page = sg_page(data->sg);
- 
--			buf = kmap(page) + data->sg->offset + (len * i);
-+			buf = sg_map(data->sg, (len * i), SG_KMAP);
-+			if (IS_ERR(buf)) {
-+				cmd->error = PTR_ERR(buf);
-+				break;
-+			}
-+
- 			result =
- 				sdricoh_blockio(host,
- 					data->flags & MMC_DATA_READ, buf, len);
--			kunmap(page);
--			flush_dcache_page(page);
-+			sg_unmap(data->sg, buf, (len * i), SG_KMAP);
-+
-+			flush_dcache_page(sg_page(data->sg));
- 			if (result) {
- 				dev_err(dev, "sdricoh_request: cmd %i "
- 					"block transfer failed\n", cmd->opcode);
--- 
-2.1.4
+Indeed, thanks for the clarification.
+
+> > Therefore, every time an inline assembly constraint is used that
+> > specifies to print an immediate (like 'i' or 'I'), the immediate
+> > (e.g. 42) should be printed with the hash (e.g. #42).
+> >
+> > Therefore, if you're using an immediate constraint where the hash sign
+> > must not be printed, you have to use the "c" operand modifier. The "c"
+> > operand modifier apparently got introduced to gcc after the 4.8
+> > release.
+> >
+> 
+> My problem with the %c modifier is that it is completely undocumented,
+> and appears in an internal GCC code generation code path. IOW, the GCC
+> developers could also remove it at any time (although this is highly
+> unlikely, of course)
+
+clang documents it, but for GCC it is only mentioned under "x86
+Operand Modifiers".
+
+> > The binutils assembler and the clang integrated assembler accept
+> > immediates without the hash sign as a non-official extension.
+> 
+> Nope. *That* is mandated by the ARM ARM, see above.
+> 
+> > Some of
+> > the immediate constraints on gcc seem to not print out the hash sign
+> > either; which is why the variant in the linux kernel works with gcc.
+> >
+> 
+> Yes, and since it is perfectly legal for the "i" constraint not to
+> have a #, I don't understand what the big deal is tbh.
+> 
+> > In summary, it seems to me that the inline assembly with the %c0
+> > operand is the correct one and gcc 4.8 is simply too old to support
+> > this."
+> >
+> 
+> OK, so we're back to having to choose between GCC 4.8 and Clang.
+
+That's not what I suggested.
+
+> > If the above is correct it seems that the solution is not to "fix"
+> > clang, but to use different instructions for gcc<=4.8 and newer
+> > compilers. I am aware that this is not a popular option.
+> >
+> > What do you think?
+> >
+> 
+> Perhaps I should just rework the code not to rely on inline asm at all.
+
+That sounds like a good option if it is not too much of a hassle.
+
+> I will take a look,
+
+Thanks!
+
+Matthias
