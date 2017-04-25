@@ -1,38 +1,48 @@
-From: Gary R Hook <gary.hook@amd.com>
-Subject: [PATCH] crypto: ccp - Add a module author
-Date: Tue, 25 Apr 2017 08:59:44 -0500
-Message-ID: <20170425135944.5726.83246.stgit@taos.amd.com>
+From: Wei Yongjun <weiyj.lk@gmail.com>
+Subject: [PATCH -next] crypto: stm32 - Fix OF module alias information
+Date: Tue, 25 Apr 2017 14:35:42 +0000
+Message-ID: <20170425143542.1069-1-weiyj.lk@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
-Cc: <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>
-To: <linux-crypto@vger.kernel.org>
+Cc: Wei Yongjun <weiyongjun1@huawei.com>, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@st.com>,
+        Fabien DESSENNE <fabien.dessenne@st.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-co1nam03on0087.outbound.protection.outlook.com ([104.47.40.87]:12016
-        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1031688AbdDYN74 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 Apr 2017 09:59:56 -0400
+Received: from mail-pg0-f68.google.com ([74.125.83.68]:33200 "EHLO
+        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1948028AbdDYOfw (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 25 Apr 2017 10:35:52 -0400
+Received: by mail-pg0-f68.google.com with SMTP id 63so11738080pgh.0
+        for <linux-crypto@vger.kernel.org>; Tue, 25 Apr 2017 07:35:52 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-CC: <stable@vger.kernel.org> # 4.9.x+
+From: Wei Yongjun <weiyongjun1@huawei.com>
 
-Signed-off-by: Gary R Hook <gary.hook@amd.com>
+The module alias information passed to MODULE_DEVICE_TABLE()
+should use stm32_dt_ids instead of undefined sti_dt_ids.
+
+Fixes: b51dbe90912a ("crypto: stm32 - Support for STM32 CRC32 crypto module")
+Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
 ---
- drivers/crypto/ccp/ccp-dev.c |    1 +
- 1 file changed, 1 insertion(+)
+ drivers/crypto/stm32/stm32_crc32.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
-index 92d1c6959f08..b7504562715c 100644
---- a/drivers/crypto/ccp/ccp-dev.c
-+++ b/drivers/crypto/ccp/ccp-dev.c
-@@ -31,6 +31,7 @@
- #include "ccp-dev.h"
+diff --git a/drivers/crypto/stm32/stm32_crc32.c b/drivers/crypto/stm32/stm32_crc32.c
+index 7652822..ec83b1e 100644
+--- a/drivers/crypto/stm32/stm32_crc32.c
++++ b/drivers/crypto/stm32/stm32_crc32.c
+@@ -306,7 +306,7 @@ static const struct of_device_id stm32_dt_ids[] = {
+ 	{ .compatible = "st,stm32f7-crc", },
+ 	{},
+ };
+-MODULE_DEVICE_TABLE(of, sti_dt_ids);
++MODULE_DEVICE_TABLE(of, stm32_dt_ids);
  
- MODULE_AUTHOR("Tom Lendacky <thomas.lendacky@amd.com>");
-+MODULE_AUTHOR("Gary R Hook <gary.hook@amd.com>");
- MODULE_LICENSE("GPL");
- MODULE_VERSION("1.0.0");
- MODULE_DESCRIPTION("AMD Cryptographic Coprocessor driver");
+ static struct platform_driver stm32_crc_driver = {
+ 	.probe  = stm32_crc_probe,
