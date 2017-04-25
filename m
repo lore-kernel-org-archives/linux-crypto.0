@@ -1,64 +1,57 @@
-From: <archerrp@evms.edu>
-Subject: 18732 linux-crypto
-Date: Tue, 25 Apr 2017 07:52:09 -0000
-Message-ID: <149310672979.16693.7614524821039452275@jupiter.com.br>
-Mime-Version: 1.0
-Content-Type: application/zip; name="20368001405026.zip"
-Content-Transfer-Encoding: base64
-To: <linux-crypto@vger.kernel.org>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: [PATCH] crypto: tcrypt: don't disable irqs and wait
+Date: Tue, 25 Apr 2017 11:25:40 +0300
+Message-ID: <1493108740-1642-1-git-send-email-gilad@benyossef.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        gilad.benyossef@arm.com, Ofir Drang <ofir.drang@arm.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 170.231.134.119.jupiter.com.br ([170.231.134.119]:1104 "HELO
-        jupiter.com.br" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with SMTP id S980489AbdDYHwQ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 Apr 2017 03:52:16 -0400
-Content-Disposition: attachment
+Received: from foss.arm.com ([217.140.101.70]:37598 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1176026AbdDYIZt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 25 Apr 2017 04:25:49 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-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
+The tcrypt AEAD cycles speed tests disables irqs during the test, which is
+broken at the very least since commit
+'1425d2d17f7309c6 ("crypto: tcrypt - Fix AEAD speed tests")'
+adds a wait for completion as part of the test and probably since
+switching to the new AEAD API.
+
+While the result of taking a cycle count diff may not mean much on SMP
+systems if the task migrates, it's good enough for tcrypt being the quick
+& dirty dev tool it is. It's also what all the other (i.e. hash) cycle
+speed tests do.
+
+Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+Reported-by: Ofir Drang <ofir.drang@arm.com>
+---
+ crypto/tcrypt.c | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index 9a11f3c..0dd6a43 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -138,8 +138,6 @@ static int test_aead_cycles(struct aead_request *req, int enc, int blen)
+ 	int ret = 0;
+ 	int i;
+ 
+-	local_irq_disable();
+-
+ 	/* Warm-up run. */
+ 	for (i = 0; i < 4; i++) {
+ 		if (enc)
+@@ -169,8 +167,6 @@ static int test_aead_cycles(struct aead_request *req, int enc, int blen)
+ 	}
+ 
+ out:
+-	local_irq_enable();
+-
+ 	if (ret == 0)
+ 		printk("1 operation in %lu cycles (%d bytes)\n",
+ 		       (cycles + 4) / 8, blen);
+-- 
+2.1.4
