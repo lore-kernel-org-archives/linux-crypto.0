@@ -1,48 +1,53 @@
-From: Wei Yongjun <weiyj.lk@gmail.com>
-Subject: [PATCH -next] crypto: stm32 - Fix OF module alias information
-Date: Tue, 25 Apr 2017 14:35:42 +0000
-Message-ID: <20170425143542.1069-1-weiyj.lk@gmail.com>
+From: Doug Ledford <dledford-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH 5/7] IB/hfi1: use pcie_flr instead of duplicating it
+Date: Tue, 25 Apr 2017 13:00:03 -0400
+Message-ID: <1493139603.3041.74.camel@redhat.com>
+References: <20170414191131.14286-1-hch@lst.de>
+         <20170414191131.14286-6-hch@lst.de>
+         <A33E225544E47D4DB5713032774B132783960382@irsmsx105.ger.corp.intel.com>
+         <20170424143507.GA28812@lst.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: Wei Yongjun <weiyongjun1@huawei.com>, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        Fabien DESSENNE <fabien.dessenne@st.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pg0-f68.google.com ([74.125.83.68]:33200 "EHLO
-        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1948028AbdDYOfw (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 Apr 2017 10:35:52 -0400
-Received: by mail-pg0-f68.google.com with SMTP id 63so11738080pgh.0
-        for <linux-crypto@vger.kernel.org>; Tue, 25 Apr 2017 07:35:52 -0700 (PDT)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Cc: Bjorn Helgaas <bhelgaas-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>,
+        "Cabiddu, Giovanni" <giovanni.cabiddu-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+        "Benedetto, Salvatore" <salvatore.benedetto-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+        "Marciniszyn, Mike" <mike.marciniszyn-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+        "Dalessandro, Dennis" <dennis.dalessandro-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+        Derek Chickles <derek.chickles-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org>,
+        Satanand Burla <satananda.burla-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org>,
+        Felix Manlunas <felix.manlunas-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org>,
+        Raghu Vatsavayi <raghu.vatsavayi-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org>,
+        "Kirsher, Jeffrey T" <jeffrey.t.kirsher-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+        "linux-pci-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-pci-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        qat-linux <qat-linux-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+        "linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        "linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        "netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        "li
+To: Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>,
+        "Byczkowski, Jakub" <jakub.byczkowski-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
+Return-path: <linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20170424143507.GA28812-jcswGhMUV9g@public.gmane.org>
+Sender: linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-From: Wei Yongjun <weiyongjun1@huawei.com>
+On Mon, 2017-04-24 at 16:35 +0200, Christoph Hellwig wrote:
+> On Mon, Apr 24, 2017 at 02:16:31PM +0000, Byczkowski, Jakub wrote:
+> > 
+> > Tested-by: Jakub Byczkowski <jakub.byczkowski-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
+> 
+> Are you (and Doug) ok with queueing this up in the PCI tree?
 
-The module alias information passed to MODULE_DEVICE_TABLE()
-should use stm32_dt_ids instead of undefined sti_dt_ids.
+I'm fine with that.  Feel free to add my Acked-by to the hfi1 patch.
 
-Fixes: b51dbe90912a ("crypto: stm32 - Support for STM32 CRC32 crypto module")
-Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
----
- drivers/crypto/stm32/stm32_crc32.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+-- 
+Doug Ledford <dledford-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+    GPG KeyID: B826A3330E572FDD
+   
+Key fingerprint = AE6B 1BDA 122B 23B4 265B  1274 B826 A333 0E57 2FDD
 
-diff --git a/drivers/crypto/stm32/stm32_crc32.c b/drivers/crypto/stm32/stm32_crc32.c
-index 7652822..ec83b1e 100644
---- a/drivers/crypto/stm32/stm32_crc32.c
-+++ b/drivers/crypto/stm32/stm32_crc32.c
-@@ -306,7 +306,7 @@ static const struct of_device_id stm32_dt_ids[] = {
- 	{ .compatible = "st,stm32f7-crc", },
- 	{},
- };
--MODULE_DEVICE_TABLE(of, sti_dt_ids);
-+MODULE_DEVICE_TABLE(of, stm32_dt_ids);
- 
- static struct platform_driver stm32_crc_driver = {
- 	.probe  = stm32_crc_probe,
+--
+To unsubscribe from this list: send the line "unsubscribe linux-rdma" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
