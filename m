@@ -1,89 +1,67 @@
-From: Jeff Kirsher <jeffrey.t.kirsher-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 5/7] IB/hfi1: use pcie_flr instead of duplicating it
-Date: Wed, 26 Apr 2017 15:10:25 -0700
-Message-ID: <1493244625.2124.6.camel@intel.com>
-References: <20170414191131.14286-1-hch@lst.de>
-         <20170414191131.14286-6-hch@lst.de>
-         <A33E225544E47D4DB5713032774B132783960382@irsmsx105.ger.corp.intel.com>
-         <20170424143507.GA28812@lst.de>
-         <20170425193955.GC29024@bhelgaas-glaptop.roam.corp.google.com>
-Mime-Version: 1.0
-Content-Type: multipart/signed; micalg="pgp-sha512";
-        protocol="application/pgp-signature"; boundary="=-jIG6ReGmICyr8JtIFsUq"
-Cc: "Byczkowski, Jakub" <jakub.byczkowski-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-        Bjorn Helgaas <bhelgaas-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>,
-        "Cabiddu, Giovanni" <giovanni.cabiddu-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-        "Benedetto, Salvatore" <salvatore.benedetto-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-        "Marciniszyn, Mike" <mike.marciniszyn-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-        "Dalessandro, Dennis" <dennis.dalessandro-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-        Derek Chickles <derek.chickles-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org>,
-        Satanand Burla <satananda.burla-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org>,
-        Felix Manlunas <felix.manlunas-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org>,
-        Raghu Vatsavayi <raghu.vatsavayi-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org>,
-        "linux-pci-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-pci-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        qat-linux <qat-linux-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-        "linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        "linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        "netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        "linu
-To: Bjorn Helgaas <helgaas-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>
-Return-path: <linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170425193955.GC29024-1RhO1Y9PlrlHTL0Zs8A6p5iNqAH0jzoTYJqu5kTmcBRl57MIdRCFDg@public.gmane.org>
-Sender: linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+From: Mehmet Kayaalp <mkayaalp@linux.vnet.ibm.com>
+Subject: Re: [PATCH 6/6] ima: Support appended signatures for appraisal
+Date: Wed, 26 Apr 2017 18:18:34 -0400
+Message-ID: <CDEBC6BB-7178-4891-9743-DD2B70328FCC@linux.vnet.ibm.com>
+References: <201704201148.IPsFhl4B%fengguang.wu@intel.com>
+ <35565259.p7kmk0rNRg@morokweng>
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 8BIT
+Cc: kbuild test robot <lkp@intel.com>, kbuild-all@01.org,
+        LSM <linux-security-module@vger.kernel.org>,
+        linux-ima-devel@lists.sourceforge.net,
+        keyrings <keyrings@vger.kernel.org>,
+        linux-crypto@vger.kernel.org,
+        kernel <linux-kernel@vger.kernel.org>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Claudio Carvalho <cclaudio@linux.vnet.ibm.com>
+To: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56228 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1031408AbdDZWOm (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 26 Apr 2017 18:14:42 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id v3QMDYij115032
+        for <linux-crypto@vger.kernel.org>; Wed, 26 Apr 2017 18:14:42 -0400
+Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2a2ebvjccm-1
+        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Wed, 26 Apr 2017 18:14:41 -0400
+Received: from localhost
+        by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-crypto@vger.kernel.org> from <mkayaalp@linux.vnet.ibm.com>;
+        Wed, 26 Apr 2017 18:14:41 -0400
+In-Reply-To: <35565259.p7kmk0rNRg@morokweng>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 
---=-jIG6ReGmICyr8JtIFsUq
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+> On Apr 20, 2017, at 7:41 PM, Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com> wrote:
+> 
+> This patch introduces the appended_imasig keyword to the IMA policy syntax
+> to specify that a given hook should expect the file to have the IMA
+> signature appended to it. Here is how it can be used in a rule:
+> 
+> appraise func=KEXEC_KERNEL_CHECK appraise_type=appended_imasig
+> appraise func=KEXEC_KERNEL_CHECK appraise_type=appended_imasig|imasig
+> 
+> In the second form, IMA will accept either an appended signature or a
+> signature stored in the extended attribute. In that case, it will first
+> check whether there is an appended signature, and if not it will read it
+> from the extended attribute.
+> 
+> The format of the appended signature is the same used for signed kernel
+> modules. This means that the file can be signed with the scripts/sign-file
+> tool, with a command line such as this:
 
-On Tue, 2017-04-25 at 14:39 -0500, Bjorn Helgaas wrote:
-> On Mon, Apr 24, 2017 at 04:35:07PM +0200, Christoph Hellwig wrote:
-> > On Mon, Apr 24, 2017 at 02:16:31PM +0000, Byczkowski, Jakub wrote:
-> > > Tested-by: Jakub Byczkowski <jakub.byczkowski-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-> >=20
-> > Are you (and Doug) ok with queueing this up in the PCI tree?
->=20
-> Applied this with Jakub's tested-by and Doug's ack to pci/virtualization
-> for v4.12.
->=20
-> This still leaves these:
->=20
-> =C2=A0 [PATCH 4/7] ixgbe: use pcie_flr instead of duplicating it
-> =C2=A0 [PATCH 6/7] crypto: qat: use pcie_flr instead of duplicating it
-> =C2=A0 [PATCH 7/7] liquidio: use pcie_flr instead of duplicating it
->=20
-> I haven't seen any response to 4 and 6.=C2=A0 Felix reported an unused
-> variable in 7.=C2=A0 Let me know if you'd like me to do anything with
-> these.
+I would suggest naming the appraise_type as modsig (or some variant) to clarify
+that the format is defined by how module signatures are handled. Maybe we'd like 
+to define a different appended/inline signature format for IMA in the future.
 
-Just provided my ACK for ixgbe patch.
---=-jIG6ReGmICyr8JtIFsUq
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAABCgAGBQJZARrRAAoJEOVv75VaS+3OlRoQAI8Y9SG9qJ9Z8GcmZX02HTc7
-XngO312dcy+PZU1gLFqOXrBXjoXf0cWmvwNSHCzLFOvm5DI7qCpQ701yweewHWLC
-D6x3JoeAeHJTCAvi2wSopOxMt7XZA4gJZSbvlvF+qlPt7D3qwq/AFOEMNasjR2qd
-QOpJDvksHvIPMEW26oXqQuXpy+uIsEcEwzt8F1HgXg/EWP1KRRCCOd6aWR7Qa3yx
-8ZMH9cCpT/C00hkK66XoUsAODF8P9aMLyZeuID6r+xqAYoG8ySSzilyt1DBUcZzM
-/AUSxWhRM1rgg1/mxXVyzXU7ectAKv3gTjOWD9dgFzWyhQGqqhcyYWq1+WAy83gl
-Ttu/aTV65BksmEA+l+QfYa5M+IH+xKPEOztxkeBk66V4nAFjXsvG5gcosAA8e8I3
-W2wMLwaJuvIuSfUo1aol2oNp+UwDNIbToYTr+2Ah9KeH1uU+QW9ThPUkbxBOtJjh
-LhYtVP41kbXhfuPKUUApW9f0uTNegC6TDXAkwmjyDyeAm9qJ0iOnBhBzx1WquzFA
-VQx983bwWAXgiY36qh1KlKpuq4wRrkI2wFGavVbWz1qqthXQ+Q6tM4dHOLfRCIKs
-T15dhdfQQX9yjulTSsQzmbRG1O/gvwHRIxfb8duD6UBnMi0FGRTTkzyuQTndNr6P
-XUITPPdTnamXn1nAp/kr
-=QB8C
------END PGP SIGNATURE-----
-
---=-jIG6ReGmICyr8JtIFsUq--
-
---
-To unsubscribe from this list: send the line "unsubscribe linux-rdma" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+-Mehmet
