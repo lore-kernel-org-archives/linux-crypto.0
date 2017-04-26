@@ -1,155 +1,36 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH] crypto: arm64/sha - avoid non-standard inline asm tricks
-Date: Wed, 26 Apr 2017 17:11:32 +0100
-Message-ID: <20170426161132.11311-1-ard.biesheuvel@linaro.org>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-        mka@chromium.org
+From: Matthias Kaehlcke <mka@chromium.org>
+Subject: Re: [PATCH] crypto: arm64/sha - avoid non-standard inline asm tricks
+Date: Wed, 26 Apr 2017 10:34:02 -0700
+Message-ID: <20170426173402.GP128305@google.com>
+References: <20170426161132.11311-1-ard.biesheuvel@linaro.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wr0-f175.google.com ([209.85.128.175]:36238 "EHLO
-        mail-wr0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750931AbdDZQLs (ORCPT
+Received: from mail-pf0-f175.google.com ([209.85.192.175]:33390 "EHLO
+        mail-pf0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750738AbdDZReE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Apr 2017 12:11:48 -0400
-Received: by mail-wr0-f175.google.com with SMTP id l50so2889649wrc.3
-        for <linux-crypto@vger.kernel.org>; Wed, 26 Apr 2017 09:11:47 -0700 (PDT)
+        Wed, 26 Apr 2017 13:34:04 -0400
+Received: by mail-pf0-f175.google.com with SMTP id a188so3295174pfa.0
+        for <linux-crypto@vger.kernel.org>; Wed, 26 Apr 2017 10:34:04 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <20170426161132.11311-1-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Replace the inline asm which exports struct offsets as ELF symbols
-with proper const variables exposing the same values. This works
-around an issue with Clang which does not interpret the "i" (or "I")
-constraints in the same way as GCC.
+El Wed, Apr 26, 2017 at 05:11:32PM +0100 Ard Biesheuvel ha dit:
 
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
- arch/arm64/crypto/sha1-ce-core.S |  6 ++++--
- arch/arm64/crypto/sha1-ce-glue.c | 11 +++--------
- arch/arm64/crypto/sha2-ce-core.S |  6 ++++--
- arch/arm64/crypto/sha2-ce-glue.c | 13 +++++--------
- 4 files changed, 16 insertions(+), 20 deletions(-)
+> Replace the inline asm which exports struct offsets as ELF symbols
+> with proper const variables exposing the same values. This works
+> around an issue with Clang which does not interpret the "i" (or "I")
+> constraints in the same way as GCC.
+> 
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-diff --git a/arch/arm64/crypto/sha1-ce-core.S b/arch/arm64/crypto/sha1-ce-core.S
-index c98e7e849f06..8550408735a0 100644
---- a/arch/arm64/crypto/sha1-ce-core.S
-+++ b/arch/arm64/crypto/sha1-ce-core.S
-@@ -82,7 +82,8 @@ ENTRY(sha1_ce_transform)
- 	ldr		dgb, [x0, #16]
- 
- 	/* load sha1_ce_state::finalize */
--	ldr		w4, [x0, #:lo12:sha1_ce_offsetof_finalize]
-+	ldr_l		w4, sha1_ce_offsetof_finalize, x4
-+	ldr		w4, [x0, x4]
- 
- 	/* load input */
- 0:	ld1		{v8.4s-v11.4s}, [x1], #64
-@@ -132,7 +133,8 @@ CPU_LE(	rev32		v11.16b, v11.16b	)
- 	 * the padding is handled by the C code in that case.
- 	 */
- 	cbz		x4, 3f
--	ldr		x4, [x0, #:lo12:sha1_ce_offsetof_count]
-+	ldr_l		w4, sha1_ce_offsetof_count, x4
-+	ldr		x4, [x0, x4]
- 	movi		v9.2d, #0
- 	mov		x8, #0x80000000
- 	movi		v10.2d, #0
-diff --git a/arch/arm64/crypto/sha1-ce-glue.c b/arch/arm64/crypto/sha1-ce-glue.c
-index aefda9868627..ea319c055f5d 100644
---- a/arch/arm64/crypto/sha1-ce-glue.c
-+++ b/arch/arm64/crypto/sha1-ce-glue.c
-@@ -17,9 +17,6 @@
- #include <linux/crypto.h>
- #include <linux/module.h>
- 
--#define ASM_EXPORT(sym, val) \
--	asm(".globl " #sym "; .set " #sym ", %0" :: "I"(val));
--
- MODULE_DESCRIPTION("SHA1 secure hash using ARMv8 Crypto Extensions");
- MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
- MODULE_LICENSE("GPL v2");
-@@ -32,6 +29,9 @@ struct sha1_ce_state {
- asmlinkage void sha1_ce_transform(struct sha1_ce_state *sst, u8 const *src,
- 				  int blocks);
- 
-+const u32 sha1_ce_offsetof_count = offsetof(struct sha1_ce_state, sst.count);
-+const u32 sha1_ce_offsetof_finalize = offsetof(struct sha1_ce_state, finalize);
-+
- static int sha1_ce_update(struct shash_desc *desc, const u8 *data,
- 			  unsigned int len)
- {
-@@ -52,11 +52,6 @@ static int sha1_ce_finup(struct shash_desc *desc, const u8 *data,
- 	struct sha1_ce_state *sctx = shash_desc_ctx(desc);
- 	bool finalize = !sctx->sst.count && !(len % SHA1_BLOCK_SIZE);
- 
--	ASM_EXPORT(sha1_ce_offsetof_count,
--		   offsetof(struct sha1_ce_state, sst.count));
--	ASM_EXPORT(sha1_ce_offsetof_finalize,
--		   offsetof(struct sha1_ce_state, finalize));
--
- 	/*
- 	 * Allow the asm code to perform the finalization if there is no
- 	 * partial data and the input is a round multiple of the block size.
-diff --git a/arch/arm64/crypto/sha2-ce-core.S b/arch/arm64/crypto/sha2-ce-core.S
-index 01cfee066837..679c6c002f4f 100644
---- a/arch/arm64/crypto/sha2-ce-core.S
-+++ b/arch/arm64/crypto/sha2-ce-core.S
-@@ -88,7 +88,8 @@ ENTRY(sha2_ce_transform)
- 	ld1		{dgav.4s, dgbv.4s}, [x0]
- 
- 	/* load sha256_ce_state::finalize */
--	ldr		w4, [x0, #:lo12:sha256_ce_offsetof_finalize]
-+	ldr_l		w4, sha256_ce_offsetof_finalize, x4
-+	ldr		w4, [x0, x4]
- 
- 	/* load input */
- 0:	ld1		{v16.4s-v19.4s}, [x1], #64
-@@ -136,7 +137,8 @@ CPU_LE(	rev32		v19.16b, v19.16b	)
- 	 * the padding is handled by the C code in that case.
- 	 */
- 	cbz		x4, 3f
--	ldr		x4, [x0, #:lo12:sha256_ce_offsetof_count]
-+	ldr_l		w4, sha256_ce_offsetof_count, x4
-+	ldr		x4, [x0, x4]
- 	movi		v17.2d, #0
- 	mov		x8, #0x80000000
- 	movi		v18.2d, #0
-diff --git a/arch/arm64/crypto/sha2-ce-glue.c b/arch/arm64/crypto/sha2-ce-glue.c
-index 7cd587564a41..0ed9486f75dd 100644
---- a/arch/arm64/crypto/sha2-ce-glue.c
-+++ b/arch/arm64/crypto/sha2-ce-glue.c
-@@ -17,9 +17,6 @@
- #include <linux/crypto.h>
- #include <linux/module.h>
- 
--#define ASM_EXPORT(sym, val) \
--	asm(".globl " #sym "; .set " #sym ", %0" :: "I"(val));
--
- MODULE_DESCRIPTION("SHA-224/SHA-256 secure hash using ARMv8 Crypto Extensions");
- MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
- MODULE_LICENSE("GPL v2");
-@@ -32,6 +29,11 @@ struct sha256_ce_state {
- asmlinkage void sha2_ce_transform(struct sha256_ce_state *sst, u8 const *src,
- 				  int blocks);
- 
-+const u32 sha256_ce_offsetof_count = offsetof(struct sha256_ce_state,
-+					      sst.count);
-+const u32 sha256_ce_offsetof_finalize = offsetof(struct sha256_ce_state,
-+						 finalize);
-+
- static int sha256_ce_update(struct shash_desc *desc, const u8 *data,
- 			    unsigned int len)
- {
-@@ -52,11 +54,6 @@ static int sha256_ce_finup(struct shash_desc *desc, const u8 *data,
- 	struct sha256_ce_state *sctx = shash_desc_ctx(desc);
- 	bool finalize = !sctx->sst.count && !(len % SHA256_BLOCK_SIZE);
- 
--	ASM_EXPORT(sha256_ce_offsetof_count,
--		   offsetof(struct sha256_ce_state, sst.count));
--	ASM_EXPORT(sha256_ce_offsetof_finalize,
--		   offsetof(struct sha256_ce_state, finalize));
--
- 	/*
- 	 * Allow the asm code to perform the finalization if there is no
- 	 * partial data and the input is a round multiple of the block size.
--- 
-2.9.3
+Tested-by: Matthias Kaehlcke <mka@chromium.org>
+
+Thanks!
+
+Matthias
