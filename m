@@ -1,81 +1,158 @@
-From: =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>
-Subject: Re: [PATCH] crypto: tcrypt: don't disable irqs and wait
-Date: Wed, 26 Apr 2017 12:05:55 +0000
-Message-ID: <VI1PR0401MB259167A209EFFF799BB1FF9B98110@VI1PR0401MB2591.eurprd04.prod.outlook.com>
-References: <1493108740-1642-1-git-send-email-gilad@benyossef.com>
+From: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Subject: Re: [PATCH 6/6] ima: Support appended signatures for appraisal
+Date: Wed, 26 Apr 2017 07:21:19 -0400
+Message-ID: <1493205679.3908.76.camel@linux.vnet.ibm.com>
+References: <1492546666-16615-1-git-send-email-bauerman@linux.vnet.ibm.com>
+         <1492546666-16615-7-git-send-email-bauerman@linux.vnet.ibm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "gilad.benyossef@arm.com" <gilad.benyossef@arm.com>,
-        Ofir Drang <ofir.drang@arm.com>
-To: Gilad Ben-Yossef <gilad@benyossef.com>,
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Cc: linux-ima-devel@lists.sourceforge.net, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        David Howells <dhowells@redhat.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-eopbgr00085.outbound.protection.outlook.com ([40.107.0.85]:20160
-        "EHLO EUR02-AM5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1951574AbdDZMF6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Apr 2017 08:05:58 -0400
-Content-Language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+        "David S. Miller" <davem@davemloft.net>,
+        Claudio Carvalho <cclaudio@linux.vnet.ibm.com>
+To: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
+        linux-security-module@vger.kernel.org
+Return-path: <linux-security-module-owner@vger.kernel.org>
+In-Reply-To: <1492546666-16615-7-git-send-email-bauerman@linux.vnet.ibm.com>
+Sender: owner-linux-security-module@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 4/25/2017 11:25 AM, Gilad Ben-Yossef wrote:=0A=
-> The tcrypt AEAD cycles speed tests disables irqs during the test, which i=
-s=0A=
-> broken at the very least since commit=0A=
-> '1425d2d17f7309c6 ("crypto: tcrypt - Fix AEAD speed tests")'=0A=
-> adds a wait for completion as part of the test and probably since=0A=
-> switching to the new AEAD API.=0A=
-> =0A=
-> While the result of taking a cycle count diff may not mean much on SMP=0A=
-> systems if the task migrates, it's good enough for tcrypt being the quick=
-=0A=
-> & dirty dev tool it is. It's also what all the other (i.e. hash) cycle=0A=
-> speed tests do.=0A=
-> =0A=
-> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>=0A=
-> Reported-by: Ofir Drang <ofir.drang@arm.com>=0A=
-Reviewed-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
-=0A=
-I've also noticed this in CAAM accelerator - spin_unlock_bh() called=0A=
-from caam_jr_enqueue() complains due to disabled interrupts:=0A=
-WARNING: CPU: 4 PID: 2585 at kernel/softirq.c:161=0A=
-.__local_bh_enable_ip+0x70/0xcc=0A=
-=0A=
-Thanks,=0A=
-Horia=0A=
-=0A=
-> ---=0A=
->  crypto/tcrypt.c | 4 ----=0A=
->  1 file changed, 4 deletions(-)=0A=
-> =0A=
-> diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c=0A=
-> index 9a11f3c..0dd6a43 100644=0A=
-> --- a/crypto/tcrypt.c=0A=
-> +++ b/crypto/tcrypt.c=0A=
-> @@ -138,8 +138,6 @@ static int test_aead_cycles(struct aead_request *req,=
- int enc, int blen)=0A=
->  	int ret =3D 0;=0A=
->  	int i;=0A=
->  =0A=
-> -	local_irq_disable();=0A=
-> -=0A=
->  	/* Warm-up run. */=0A=
->  	for (i =3D 0; i < 4; i++) {=0A=
->  		if (enc)=0A=
-> @@ -169,8 +167,6 @@ static int test_aead_cycles(struct aead_request *req,=
- int enc, int blen)=0A=
->  	}=0A=
->  =0A=
->  out:=0A=
-> -	local_irq_enable();=0A=
-> -=0A=
->  	if (ret =3D=3D 0)=0A=
->  		printk("1 operation in %lu cycles (%d bytes)\n",=0A=
->  		       (cycles + 4) / 8, blen);=0A=
-> =0A=
-=0A=
+Hi Thiago,
+
+On Tue, 2017-04-18 at 17:17 -0300, Thiago Jung Bauermann wrote:
+> This patch introduces the appended_imasig keyword to the IMA policy syntax
+> to specify that a given hook should expect the file to have the IMA
+> signature appended to it.  Here is how it can be used in a rule:
+> 
+> appraise func=KEXEC_KERNEL_CHECK appraise_type=appended_imasig
+> appraise func=KEXEC_KERNEL_CHECK appraise_type=appended_imasig|imasig
+
+> In the second form, IMA will accept either an appended signature or a
+> signature stored in the extended attribute. In that case, it will first
+> check whether there is an appended signature, and if not it will read it
+> from the extended attribute.
+
+An appended signature should be another place to look for a signature,
+when a signature is required, but it shouldn't make a difference where
+the signature is located.  "imasig" could have implied to look for the
+signature in both places - xattr or appended.  So the new option is
+just a hint - a performance improvement.
+
+This might seem picayune, but the difference between "expect" vs.
+"hint" impacts the code. (Further explanation inline.)
+
+> The format of the appended signature is the same used for signed kernel
+> modules. This means that the file can be signed with the scripts/sign-file
+> tool, with a command line such as this:
+> 
+> $ sign-file sha256 privkey_ima.pem x509_ima.der vmlinux
+> 
+> This code only works for files that are hashed from a memory buffer, not
+> for files that are read from disk at the time of hash calculation. In other
+> words, only hooks that use kernel_read_file can support appended
+> signatures.
+> 
+> The change in CONFIG_INTEGRITY_SIGNATURE to select CONFIG_KEYS instead of
+> depending on it is to avoid a dependency recursion in
+> CONFIG_IMA_APPRAISE_APPENDED_SIG, because CONFIG_MODULE_SIG_FORMAT selects
+> CONFIG_KEYS and Kconfig complains that CONFIG_INTEGRITY_SIGNATURE depends
+> on it.
+> 
+> Signed-off-by: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
+> ---
+
+snip
+
+> diff --git a/security/integrity/ima/ima_main.c b/security/integrity/ima/ima_main.c
+> index 2aebb7984437..994ee420b2ec 100644
+> --- a/security/integrity/ima/ima_main.c
+> +++ b/security/integrity/ima/ima_main.c
+> @@ -16,6 +16,9 @@
+>   *	implements the IMA hooks: ima_bprm_check, ima_file_mmap,
+>   *	and ima_file_check.
+>   */
+> +
+> +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+> +
+>  #include <linux/module.h>
+>  #include <linux/file.h>
+>  #include <linux/binfmts.h>
+> @@ -228,9 +231,30 @@ static int process_measurement(struct file *file, char *buf, loff_t size,
+> 
+>  	template_desc = ima_template_desc_current();
+>  	if ((action & IMA_APPRAISE_SUBMASK) ||
+> -		    strcmp(template_desc->name, IMA_TEMPLATE_IMA_NAME) != 0)
+> -		/* read 'security.ima' */
+> -		xattr_len = ima_read_xattr(file_dentry(file), &xattr_value);
+> +		    strcmp(template_desc->name, IMA_TEMPLATE_IMA_NAME) != 0) {
+> +#ifdef CONFIG_IMA_APPRAISE_APPENDED_SIG
+
+Using "ifdef" in C code is really discouraged. Normally, it is an
+indication that the code needs to be re-factored.  Assuming we really
+need a new CONFIG option, which I'm not sure that we do, I would move
+the appended signature code to its own file, define stub functions in
+ima.h, and update the Makefile.
+
+> +		unsigned long digsig_req;
+> +
+> +		if (iint->flags & IMA_APPENDED_DIGSIG_REQUIRED) {
+> +			if (!buf || !size)
+> +				pr_err("%s doesn't support appended_imasig\n",
+> +				       func_tokens[func]);
+
+The policy parsing should prevent defining appended_imasig on
+inappropriate hooks.  Since the iint->flags might be shared between
+hooks, we might still need to test buf, but it could be simplified to:
+
+if (!buf && iint->flags & IMA_APPENDED_DIGSIG_REQUIRED) {
+
+> +			else
+> +				ima_read_appended_sig(buf, &size, &xattr_value,
+> +						      &xattr_len);
+> +		}
+> +
+> +		/*
+> +		 * Don't try to read the xattr if we require an appended
+> +		 * signature but failed to get one.
+> +		 */
+
+If the appended_sig is just a hint as to where the signature is
+located, then we should read the xattr, even if IMA_DIGSIG_REQUIRED is
+not specified.  ima_appraise_measurement() should be updated to
+require a signature if either IMA_DIGSIG_REQUIRED or
+IMA_APPENDED_SIGNATURE_REQUIRED are specified.  
+
+Part of the confusion might be due to the naming
+-"IMA_APPENEDED_SIGNATURE_REQUIRED".
+
+
+> +		digsig_req = iint->flags & IMA_DIGSIG_REQUIRED_MASK;
+> +		if (!xattr_len && digsig_req != IMA_APPENDED_DIGSIG_REQUIRED)
+> +#endif /* CONFIG_IMA_APPRAISE_APPENDED_SIG */
+
+Is limiting the "if" to the ifdef really necessary? 
+
+> +			/* read 'security.ima' */
+> +			xattr_len = ima_read_xattr(file_dentry(file),
+> +						   &xattr_value);
+> +	}
+> 
+
+Suppose an appended signature and an xattr both exist (eg. kernel
+modules), but for some reason the appended signature validation fails.
+ The code should somehow retry the signature validation with the
+xattr.
+
+>  	hash_algo = ima_get_hash_algo(xattr_value, xattr_len);
+> 
+
+Unfortunately, if the hash algorithm in the appended signature and the
+xattr are not the same, then we would need to re-calculate the file
+hash.
+
+Mimi
+
