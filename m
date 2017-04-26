@@ -1,79 +1,177 @@
-From: Logan Gunthorpe <logang@deltatee.com>
-Subject: Re: [PATCH v2 01/21] scatterlist: Introduce sg_map helper functions
-Date: Wed, 26 Apr 2017 12:11:33 -0600
-Message-ID: <4736d44e-bbcf-5d59-a1a9-317d0f4da847@deltatee.com>
-References: <1493144468-22493-1-git-send-email-logang@deltatee.com>
- <1493144468-22493-2-git-send-email-logang@deltatee.com>
- <20170426074416.GA7936@lst.de>
+From: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
+Subject: Re: [PATCH 6/6] ima: Support appended signatures for appraisal
+Date: Wed, 26 Apr 2017 17:40:27 -0300
+Message-ID: <2691998.fl6SjX7UkO@morokweng>
+References: <1492546666-16615-1-git-send-email-bauerman@linux.vnet.ibm.com> <1492546666-16615-7-git-send-email-bauerman@linux.vnet.ibm.com> <1493205679.3908.76.camel@linux.vnet.ibm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: dri-devel@lists.freedesktop.org, Stephen Bates <sbates@raithlin.com>,
- dm-devel@redhat.com, target-devel@vger.kernel.org,
- Sumit Semwal <sumit.semwal@linaro.org>, devel@driverdev.osuosl.org,
- "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>, linux-scsi@vger.kernel.org,
- linux-nvdimm@lists.01.org, linux-rdma@vger.kernel.org,
- Ross Zwisler <ross.zwisler@linux.intel.com>, open-iscsi@googlegroups.com,
- linux-media@vger.kernel.org, intel-gfx@lists.freedesktop.org,
- sparmaintainer@unisys.com, linux-raid@vger.kernel.org,
- Dan Williams <dan.j.williams@intel.com>, megaraidlinux.pdl@broadcom.com,
- Jens Axboe <axboe@kernel.dk>,
- "Martin K. Petersen" <martin.petersen@oracle.com>, netdev@vger.kernel.org,
- Matthew Wilcox <mawilcox@microsoft.com>, linux-mmc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Christoph Hellwig <hch@lst.de>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-In-Reply-To: <20170426074416.GA7936@lst.de>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-security-module@vger.kernel.org,
+        linux-ima-devel@lists.sourceforge.net, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Claudio Carvalho <cclaudio@linux.vnet.ibm.com>
+To: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Return-path: <linux-security-module-owner@vger.kernel.org>
+In-Reply-To: <1493205679.3908.76.camel@linux.vnet.ibm.com>
+Sender: owner-linux-security-module@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-CgpPbiAyNi8wNC8xNyAwMTo0NCBBTSwgQ2hyaXN0b3BoIEhlbGx3aWcgd3JvdGU6Cj4gSSB0aGlu
-ayB3ZSdsbCBhdCBsZWFzdCBuZWVkIGEgZHJhZnQgb2YgdGhvc2UgdG8gbWFrZSBzZW5zZSBvZiB0
-aGVzZQo+IHBhdGNoZXMuICBPdGhlcndpc2UgdGhleSBqdXN0IGxvb2sgdmVyeSBjbHVtc3kuCgpP
-aywgSSdsbCB3b3JrIHVwIGEgZHJhZnQgcHJvcG9zYWwgYW5kIHNlbmQgaXQgaW4gYSBjb3VwbGUg
-ZGF5cy4gQnV0CndpdGhvdXQgYSBsb3Qgb2YgY2xlYW51cCBzdWNoIGFzIHRoaXMgc2VyaWVzIGl0
-J3Mgbm90IGdvaW5nIHRvIGV2ZW4gYmUKYWJsZSB0byBjb21waWxlLgoKPiBJJ20gc29ycnkgYnV0
-IHRoaXMgQVBJIGlzIGp1c3QgYSB0cmFpbndyZWNrLiAgUmlnaHQgbm93IHdlIGhhdmUgdGhlCj4g
-bmljZSBsaXR0bGUga21hcF9hdG9taWMgQVBJLCB3aGljaCBuZXZlciBmYWlscyBhbmQgaGFzIGEg
-dmVyeSBuaWNlCj4gY2FsbGluZyBjb252ZW50aW9uIHdoZXJlIHdlIGp1c3QgcGFzcyBiYWNrIHRo
-ZSByZXR1cm4gYWRkcmVzcywgYnV0IGRvZXMKPiBub3Qgc3VwcG9ydCBzbGVlcGluZyBpbnNpZGUg
-dGhlIGNyaXRpY2FsIHNlY3Rpb24uCj4gCj4gQW5kIGttYXAsIHdo0ZZjaCBtYXkgZmFpbCBhbmQg
-cmVxdWlyZXMgdGhlIG9yaWdpbmFsIHBhZ2UgdG8gYmUgcGFzc2VkCj4gYmFjay4gIEFueXRoaW5n
-IHRoYXQgbWl4ZXMgdGhlc2UgdHdvIGNvbmNlcHRzIHVwIGlzIHNpbXBseSBhIG5vbi1zdGFydGVy
-LgoKT2ssIHdlbGwgZm9yIHN0YXJ0ZXJzIEkgdGhpbmsgeW91IGFyZSBtaXN0YWtlbiBhYm91dCBr
-bWFwIGJlaW5nIGFibGUgdG8KZmFpbC4gSSdtIGhhdmluZyBhIGhhcmQgdGltZSBmaW5kaW5nIG1h
-bnkgdXNlcnMgb2YgdGhhdCBmdW5jdGlvbiB0aGF0CmJvdGhlciB0byBjaGVjayBmb3IgYW4gZXJy
-b3Igd2hlbiBjYWxsaW5nIGl0LiBUaGUgbWFpbiBkaWZmaWN1bHR5IHdlCmhhdmUgbm93IGlzIHRo
-YXQgbmVpdGhlciBvZiB0aG9zZSBmdW5jdGlvbnMgYXJlIGV4cGVjdGVkIHRvIGZhaWwgYW5kIHdl
-Cm5lZWQgdGhlbSB0byBiZSBhYmxlIHRvIGluIGNhc2VzIHdoZXJlIHRoZSBwYWdlIGRvZXNuJ3Qg
-bWFwIHRvIHN5c3RlbQpSQU0uIFRoaXMgcGF0Y2ggc2VyaWVzIGlzIHRyeWluZyB0byBhZGRyZXNz
-IGl0IGZvciB1c2VycyBvZiBzY2F0dGVybGlzdC4KSSdtIGNlcnRhaW5seSBvcGVuIHRvIG90aGVy
-IHN1Z2dlc3Rpb25zLgoKSSBhbHNvIGhhdmUgdG8gZGlzYWdyZWUgdGhhdCBrbWFwIGFuZCBrbWFw
-X2F0b21pYyBhcmUgYWxsIHRoYXQgIm5pY2UiLgpFeGNlcHQgZm9yIHRoZSBzbGVlcGluZyByZXN0
-cmljdGlvbiBhbmQgcGVyZm9ybWFuY2UsIHRoZXkgZWZmZWN0aXZlbHkgZG8KdGhlIHNhbWUgdGhp
-bmcuIEFuZCBpdCB3YXMgbmVjZXNzYXJ5IHRvIHdyaXRlIGEgbWFjcm8gd3JhcHBlciBhcm91bmQK
-a3VubWFwX2F0b21pYyB0byBlbnN1cmUgdGhhdCB1c2VycyBvZiB0aGF0IGZ1bmN0aW9uIGRvbid0
-IHNjcmV3IGl0IHVwLgooU2VlIDU5Nzc4MWYzZTUuKSBJJ2Qgc2F5IHRoZSBrbWFwL2ttYXBfYXRv
-bWljIGZ1bmN0aW9ucyBhcmUgdGhlCnRyYWlud3JlY2sgYW5kIEknbSB0cnlpbmcgdG8gZG8gbXkg
-YmVzdCB0byBjbGVhbnVwIGEgZmV3IGNhc2VzLgoKVGhlcmUgYXJlIGEgZmFpciBudW1iZXIgb2Yg
-Y2FzZXMgaW4gdGhlIGtlcm5lbCB0aGF0IGRvIHNvbWV0aGluZyBsaWtlOgoKaWYgKHNvbWV0aGlu
-ZykKICAgIHggPSBrbWFwKHBhZ2UpOwplbHNlCiAgICB4ID0ga21hcF9hdG9taWMocGFnZSk7Ci4u
-LgppZiAoc29tZXRoaW5nKQogICAga3VubWFwKHBhZ2UpCmVsc2UKICAgIGt1bm1hcF9hdG9taWMo
-eCkKCldoaWNoIGp1c3Qgc2VlbXMgY3VtYmVyc29tZSB0byBtZS4KCkluIGFueSBjYXNlLCBpZiB5
-b3UgY2FuIGFjY2VwdCBhbiBzZ19rbWFwIGFuZCBzZ19rbWFwX2F0b21pYyBhcGkganVzdApzYXkg
-c28gYW5kIEknbGwgbWFrZSB0aGUgY2hhbmdlLiBCdXQgSSdsbCBzdGlsbCBuZWVkIGEgZmxhZ3Mg
-dmFyaWFibGUKZm9yIFNHX01BUF9NVVNUX05PVF9GQUlMIHRvIHN1cHBvcnQgbGVnYWN5IGNhc2Vz
-IHRoYXQgaGF2ZSBubyBmYWlsIHBhdGgKYW5kIGJvdGggb2YgdGhvc2UgZnVuY3Rpb25zIHdpbGwg
-bmVlZCB0byBiZSBwcmV0dHkgbmVhcmx5IHJlcGxpY2FzIG9mCmVhY2ggb3RoZXIuCgpMb2dhbgoK
-Cl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmRldmVsIG1h
-aWxpbmcgbGlzdApkZXZlbEBsaW51eGRyaXZlcnByb2plY3Qub3JnCmh0dHA6Ly9kcml2ZXJkZXYu
-bGludXhkcml2ZXJwcm9qZWN0Lm9yZy9tYWlsbWFuL2xpc3RpbmZvL2RyaXZlcmRldi1kZXZlbAo=
+Hello Mimi,
+
+Thanks for your review.
+
+Am Mittwoch, 26. April 2017, 07:21:19 BRT schrieb Mimi Zohar:
+> On Tue, 2017-04-18 at 17:17 -0300, Thiago Jung Bauermann wrote:
+> > This patch introduces the appended_imasig keyword to the IMA policy syntax
+> > to specify that a given hook should expect the file to have the IMA
+> > signature appended to it.  Here is how it can be used in a rule:
+> > 
+> > appraise func=KEXEC_KERNEL_CHECK appraise_type=appended_imasig
+> > appraise func=KEXEC_KERNEL_CHECK appraise_type=appended_imasig|imasig
+> > 
+> > In the second form, IMA will accept either an appended signature or a
+> > signature stored in the extended attribute. In that case, it will first
+> > check whether there is an appended signature, and if not it will read it
+> > from the extended attribute.
+> 
+> An appended signature should be another place to look for a signature,
+> when a signature is required, but it shouldn't make a difference where
+> the signature is located.  "imasig" could have implied to look for the
+> signature in both places - xattr or appended.  So the new option is
+> just a hint - a performance improvement.
+> 
+> This might seem picayune, but the difference between "expect" vs.
+> "hint" impacts the code. (Further explanation inline.)
+
+Thanks, I just learned a new word. :-)
+
+If appended_imasig is just a performance improvement, is it really necessary? 
+Perhaps if CONFIG_IMA_APPENDED_SIG is enabled then imasig would imply always 
+first looking for an appended signature.
+
+My first impression is that yes, it's necessary because pointlessly checking 
+for an appended signature at the end of every file covered by FILE_CHECK could 
+have a performance impact on the system. On the other hand, it's just a memcmp 
+and that may be negligible compared to the cost of reading an xattr. II'll 
+have to measure that...
+
+> > diff --git a/security/integrity/ima/ima_main.c
+> > b/security/integrity/ima/ima_main.c index 2aebb7984437..994ee420b2ec
+> > 100644
+> > --- a/security/integrity/ima/ima_main.c
+> > +++ b/security/integrity/ima/ima_main.c
+> > @@ -16,6 +16,9 @@
+> > 
+> >   *	implements the IMA hooks: ima_bprm_check, ima_file_mmap,
+> >   *	and ima_file_check.
+> >   */
+> > 
+> > +
+> > +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+> > +
+> > 
+> >  #include <linux/module.h>
+> >  #include <linux/file.h>
+> >  #include <linux/binfmts.h>
+> > 
+> > @@ -228,9 +231,30 @@ static int process_measurement(struct file *file,
+> > char *buf, loff_t size,> 
+> >  	template_desc = ima_template_desc_current();
+> >  	if ((action & IMA_APPRAISE_SUBMASK) ||
+> > 
+> > -		    strcmp(template_desc->name, IMA_TEMPLATE_IMA_NAME) != 0)
+> > -		/* read 'security.ima' */
+> > -		xattr_len = ima_read_xattr(file_dentry(file), &xattr_value);
+> > +		    strcmp(template_desc->name, IMA_TEMPLATE_IMA_NAME) != 0) {
+> > +#ifdef CONFIG_IMA_APPRAISE_APPENDED_SIG
+> 
+> Using "ifdef" in C code is really discouraged. Normally, it is an
+> indication that the code needs to be re-factored.  Assuming we really
+> need a new CONFIG option, which I'm not sure that we do, I would move
+> the appended signature code to its own file, define stub functions in
+> ima.h, and update the Makefile.
+
+I didn't like the #ifdef here either and tried to find an alternative, but 
+couldn't come up with something that was actually better. Perhaps it'll be 
+easier with the changes needed in process_measurement to try reading the xattr 
+if the appended sig fails.
+
+I decided to add a new CONFIG option because otherwise CONFIG_IMA_APPRAISE 
+would have to start depending on CONFIG_KEYS, CONFIG_PKCS7_MESSAGE_PARSER, 
+CONFIG_X509_CERTIFICATE_PARSER and others. If you don't mind the extra 
+dependencies, I can remove the CONFIG option.
+
+> > +		unsigned long digsig_req;
+> > +
+> > +		if (iint->flags & IMA_APPENDED_DIGSIG_REQUIRED) {
+> > +			if (!buf || !size)
+> > +				pr_err("%s doesn't support appended_imasig\n",
+> > +				       func_tokens[func]);
+> 
+> The policy parsing should prevent defining appended_imasig on
+> inappropriate hooks.  Since the iint->flags might be shared between
+> hooks, we might still need to test buf, but it could be simplified to:
+> 
+> if (!buf && iint->flags & IMA_APPENDED_DIGSIG_REQUIRED) {
+
+That would require that me maintain a list of IMA hooks that use 
+kernel_read_file and update it if any hook is converted to use it. I can do 
+that if you think it's worth it (it is if it's unlikely or infrequent that 
+hooks get converted to kernel_read_file).
+
+I could also implement appended_imasig for hooks which need IMA to read the 
+file and remove the restriction altogether. I'd have to check how hard that 
+would be. Also not sure how useful it would be in practice to have those hooks 
+supporting an appended signature.
+
+> > +			else
+> > +				ima_read_appended_sig(buf, &size, &xattr_value,
+> > +						      &xattr_len);
+> > +		}
+> > +
+> > +		/*
+> > +		 * Don't try to read the xattr if we require an appended
+> > +		 * signature but failed to get one.
+> > +		 */
+> 
+> If the appended_sig is just a hint as to where the signature is
+> located, then we should read the xattr, even if IMA_DIGSIG_REQUIRED is
+> not specified.  ima_appraise_measurement() should be updated to
+> require a signature if either IMA_DIGSIG_REQUIRED or
+> IMA_APPENDED_SIGNATURE_REQUIRED are specified.  
+
+Indeed.
+
+> Part of the confusion might be due to the naming
+> -"IMA_APPENEDED_SIGNATURE_REQUIRED".
+
+Right, not a good name. I'll change that.
+
+> > +		digsig_req = iint->flags & IMA_DIGSIG_REQUIRED_MASK;
+> > +		if (!xattr_len && digsig_req != IMA_APPENDED_DIGSIG_REQUIRED)
+> > +#endif /* CONFIG_IMA_APPRAISE_APPENDED_SIG */
+> 
+> Is limiting the "if" to the ifdef really necessary? 
+
+Hopefully not after the changes to make process_measurement try one sig and 
+then the other.
+
+> >  	hash_algo = ima_get_hash_algo(xattr_value, xattr_len);
+> 
+> Unfortunately, if the hash algorithm in the appended signature and the
+> xattr are not the same, then we would need to re-calculate the file
+> hash.
+
+I think the most common case for the appended sig verification to fail will be 
+that it won't be there than the signature actually failing.
+
+Having to rehash the file is unfortunate but how frequently would that happen?
+
+-- 
+Thiago Jung Bauermann
+IBM Linux Technology Center
+
