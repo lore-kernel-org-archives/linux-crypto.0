@@ -1,158 +1,589 @@
-From: Mimi Zohar <zohar@linux.vnet.ibm.com>
-Subject: Re: [PATCH 6/6] ima: Support appended signatures for appraisal
-Date: Wed, 26 Apr 2017 07:21:19 -0400
-Message-ID: <1493205679.3908.76.camel@linux.vnet.ibm.com>
-References: <1492546666-16615-1-git-send-email-bauerman@linux.vnet.ibm.com>
-         <1492546666-16615-7-git-send-email-bauerman@linux.vnet.ibm.com>
+From: Gary R Hook <gary.hook@amd.com>
+Subject: [PATCH] crypto: ccp - Add debugfs entries for CCP information
+Date: Wed, 26 Apr 2017 10:51:46 -0500
+Message-ID: <20170426155146.488.30894.stgit@taos.amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-Cc: linux-ima-devel@lists.sourceforge.net, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Claudio Carvalho <cclaudio@linux.vnet.ibm.com>
-To: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
-        linux-security-module@vger.kernel.org
-Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <1492546666-16615-7-git-send-email-bauerman@linux.vnet.ibm.com>
-Sender: owner-linux-security-module@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>
+To: <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-cys01nam02on0056.outbound.protection.outlook.com ([104.47.37.56]:62544
+        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1754592AbdDZPwF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 26 Apr 2017 11:52:05 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Thiago,
+Expose some data about the configuration and operation of the CCP
+through debugfs entries: device name, capabilities, configuration,
+statistics.
 
-On Tue, 2017-04-18 at 17:17 -0300, Thiago Jung Bauermann wrote:
-> This patch introduces the appended_imasig keyword to the IMA policy syntax
-> to specify that a given hook should expect the file to have the IMA
-> signature appended to it.  Here is how it can be used in a rule:
-> 
-> appraise func=KEXEC_KERNEL_CHECK appraise_type=appended_imasig
-> appraise func=KEXEC_KERNEL_CHECK appraise_type=appended_imasig|imasig
+Allow the user to reset the counters to zero by writing (any value)
+to the 'stats' file. This can be done per queue or per device.
 
-> In the second form, IMA will accept either an appended signature or a
-> signature stored in the extended attribute. In that case, it will first
-> check whether there is an appended signature, and if not it will read it
-> from the extended attribute.
+Signed-off-by: Gary R Hook <gary.hook@amd.com>
+---
+ drivers/crypto/ccp/Makefile      |    3 
+ drivers/crypto/ccp/ccp-debugfs.c |  345 ++++++++++++++++++++++++++++++++++++++
+ drivers/crypto/ccp/ccp-dev-v5.c  |   28 +++
+ drivers/crypto/ccp/ccp-dev.c     |    2 
+ drivers/crypto/ccp/ccp-dev.h     |   20 ++
+ 5 files changed, 395 insertions(+), 3 deletions(-)
+ create mode 100644 drivers/crypto/ccp/ccp-debugfs.c
 
-An appended signature should be another place to look for a signature,
-when a signature is required, but it shouldn't make a difference where
-the signature is located.  "imasig" could have implied to look for the
-signature in both places - xattr or appended.  So the new option is
-just a hint - a performance improvement.
-
-This might seem picayune, but the difference between "expect" vs.
-"hint" impacts the code. (Further explanation inline.)
-
-> The format of the appended signature is the same used for signed kernel
-> modules. This means that the file can be signed with the scripts/sign-file
-> tool, with a command line such as this:
-> 
-> $ sign-file sha256 privkey_ima.pem x509_ima.der vmlinux
-> 
-> This code only works for files that are hashed from a memory buffer, not
-> for files that are read from disk at the time of hash calculation. In other
-> words, only hooks that use kernel_read_file can support appended
-> signatures.
-> 
-> The change in CONFIG_INTEGRITY_SIGNATURE to select CONFIG_KEYS instead of
-> depending on it is to avoid a dependency recursion in
-> CONFIG_IMA_APPRAISE_APPENDED_SIG, because CONFIG_MODULE_SIG_FORMAT selects
-> CONFIG_KEYS and Kconfig complains that CONFIG_INTEGRITY_SIGNATURE depends
-> on it.
-> 
-> Signed-off-by: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
-> ---
-
-snip
-
-> diff --git a/security/integrity/ima/ima_main.c b/security/integrity/ima/ima_main.c
-> index 2aebb7984437..994ee420b2ec 100644
-> --- a/security/integrity/ima/ima_main.c
-> +++ b/security/integrity/ima/ima_main.c
-> @@ -16,6 +16,9 @@
->   *	implements the IMA hooks: ima_bprm_check, ima_file_mmap,
->   *	and ima_file_check.
->   */
-> +
-> +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-> +
->  #include <linux/module.h>
->  #include <linux/file.h>
->  #include <linux/binfmts.h>
-> @@ -228,9 +231,30 @@ static int process_measurement(struct file *file, char *buf, loff_t size,
-> 
->  	template_desc = ima_template_desc_current();
->  	if ((action & IMA_APPRAISE_SUBMASK) ||
-> -		    strcmp(template_desc->name, IMA_TEMPLATE_IMA_NAME) != 0)
-> -		/* read 'security.ima' */
-> -		xattr_len = ima_read_xattr(file_dentry(file), &xattr_value);
-> +		    strcmp(template_desc->name, IMA_TEMPLATE_IMA_NAME) != 0) {
-> +#ifdef CONFIG_IMA_APPRAISE_APPENDED_SIG
-
-Using "ifdef" in C code is really discouraged. Normally, it is an
-indication that the code needs to be re-factored.  Assuming we really
-need a new CONFIG option, which I'm not sure that we do, I would move
-the appended signature code to its own file, define stub functions in
-ima.h, and update the Makefile.
-
-> +		unsigned long digsig_req;
-> +
-> +		if (iint->flags & IMA_APPENDED_DIGSIG_REQUIRED) {
-> +			if (!buf || !size)
-> +				pr_err("%s doesn't support appended_imasig\n",
-> +				       func_tokens[func]);
-
-The policy parsing should prevent defining appended_imasig on
-inappropriate hooks.  Since the iint->flags might be shared between
-hooks, we might still need to test buf, but it could be simplified to:
-
-if (!buf && iint->flags & IMA_APPENDED_DIGSIG_REQUIRED) {
-
-> +			else
-> +				ima_read_appended_sig(buf, &size, &xattr_value,
-> +						      &xattr_len);
-> +		}
-> +
-> +		/*
-> +		 * Don't try to read the xattr if we require an appended
-> +		 * signature but failed to get one.
-> +		 */
-
-If the appended_sig is just a hint as to where the signature is
-located, then we should read the xattr, even if IMA_DIGSIG_REQUIRED is
-not specified.  ima_appraise_measurement() should be updated to
-require a signature if either IMA_DIGSIG_REQUIRED or
-IMA_APPENDED_SIGNATURE_REQUIRED are specified.  
-
-Part of the confusion might be due to the naming
--"IMA_APPENEDED_SIGNATURE_REQUIRED".
-
-
-> +		digsig_req = iint->flags & IMA_DIGSIG_REQUIRED_MASK;
-> +		if (!xattr_len && digsig_req != IMA_APPENDED_DIGSIG_REQUIRED)
-> +#endif /* CONFIG_IMA_APPRAISE_APPENDED_SIG */
-
-Is limiting the "if" to the ifdef really necessary? 
-
-> +			/* read 'security.ima' */
-> +			xattr_len = ima_read_xattr(file_dentry(file),
-> +						   &xattr_value);
-> +	}
-> 
-
-Suppose an appended signature and an xattr both exist (eg. kernel
-modules), but for some reason the appended signature validation fails.
- The code should somehow retry the signature validation with the
-xattr.
-
->  	hash_algo = ima_get_hash_algo(xattr_value, xattr_len);
-> 
-
-Unfortunately, if the hash algorithm in the appended signature and the
-xattr are not the same, then we would need to re-calculate the file
-hash.
-
-Mimi
-
+diff --git a/drivers/crypto/ccp/Makefile b/drivers/crypto/ccp/Makefile
+index 60919a3ec53b..59493fd3a751 100644
+--- a/drivers/crypto/ccp/Makefile
++++ b/drivers/crypto/ccp/Makefile
+@@ -4,7 +4,8 @@ ccp-objs := ccp-dev.o \
+ 	    ccp-dev-v3.o \
+ 	    ccp-dev-v5.o \
+ 	    ccp-platform.o \
+-	    ccp-dmaengine.o
++	    ccp-dmaengine.o \
++	    ccp-debugfs.o
+ ccp-$(CONFIG_PCI) += ccp-pci.o
+ 
+ obj-$(CONFIG_CRYPTO_DEV_CCP_CRYPTO) += ccp-crypto.o
+diff --git a/drivers/crypto/ccp/ccp-debugfs.c b/drivers/crypto/ccp/ccp-debugfs.c
+new file mode 100644
+index 000000000000..6d86693b117f
+--- /dev/null
++++ b/drivers/crypto/ccp/ccp-debugfs.c
+@@ -0,0 +1,345 @@
++/*
++ * AMD Cryptographic Coprocessor (CCP) driver
++ *
++ * Copyright (C) 2017 Advanced Micro Devices, Inc.
++ *
++ * Author: Gary R Hook <gary.hook@amd.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ */
++
++#include <linux/debugfs.h>
++#include <linux/ccp.h>
++
++#include "ccp-dev.h"
++
++/* DebugFS helpers */
++#define	OBUFP		(obuf + oboff)
++#define	OBUFLEN		512
++#define	OBUFSPC		(OBUFLEN - oboff)
++#define	OSCNPRINTF(fmt, ...) \
++		scnprintf(OBUFP, OBUFSPC, fmt, ## __VA_ARGS__)
++
++#define BUFLEN	63
++
++#define	RI_VERSION_NUM	0x0000003F
++#define	RI_AES_PRESENT	0x00000040
++#define	RI_3DES_PRESENT	0x00000080
++#define	RI_SHA_PRESENT	0x00000100
++#define	RI_RSA_PRESENT	0x00000200
++#define	RI_ECC_PRESENT	0x00000400
++#define	RI_ZDE_PRESENT	0x00000800
++#define	RI_ZCE_PRESENT	0x00001000
++#define	RI_TRNG_PRESENT	0x00002000
++#define	RI_ELFC_PRESENT	0x00004000
++#define	RI_ELFC_SHIFT	14
++#define	RI_NUM_VQM	0x00078000
++#define	RI_NVQM_SHIFT	15
++#define	RI_NVQM(r)	(((r) * RI_NUM_VQM) >> RI_NVQM_SHIFT)
++#define	RI_LSB_ENTRIES	0x0FF80000
++#define	RI_NLSB_SHIFT	19
++#define	RI_NLSB(r)	(((r) * RI_LSB_ENTRIES) >> RI_NLSB_SHIFT)
++
++static ssize_t ccp5_debugfs_info_read(struct file *filp, char __user *ubuf,
++				      size_t count, loff_t *offp)
++{
++	struct ccp_device *ccp = filp->private_data;
++	unsigned int oboff = 0;
++	unsigned int regval;
++	ssize_t ret;
++	char *obuf;
++
++	if (!ccp)
++		return 0;
++
++	obuf = kmalloc(OBUFLEN, GFP_KERNEL);
++	if (!obuf)
++		return -ENOMEM;
++
++	oboff += OSCNPRINTF("Device name: %s\n", ccp->name);
++	oboff += OSCNPRINTF("   RNG name: %s\n", ccp->rngname);
++	oboff += OSCNPRINTF("   # Queues: %d\n", ccp->cmd_q_count);
++	oboff += OSCNPRINTF("     # Cmds: %d\n", ccp->cmd_count);
++
++	regval = ioread32(ccp->io_regs + CMD5_PSP_CCP_VERSION);
++	oboff += OSCNPRINTF("    Version: %d\n", regval & RI_VERSION_NUM);
++	oboff += OSCNPRINTF("    Engines:");
++	if (regval & RI_AES_PRESENT)
++		oboff += OSCNPRINTF(" AES");
++	if (regval & RI_3DES_PRESENT)
++		oboff += OSCNPRINTF(" 3DES");
++	if (regval & RI_SHA_PRESENT)
++		oboff += OSCNPRINTF(" SHA");
++	if (regval & RI_RSA_PRESENT)
++		oboff += OSCNPRINTF(" RSA");
++	if (regval & RI_ECC_PRESENT)
++		oboff += OSCNPRINTF(" ECC");
++	if (regval & RI_ZDE_PRESENT)
++		oboff += OSCNPRINTF(" ZDE");
++	if (regval & RI_ZCE_PRESENT)
++		oboff += OSCNPRINTF(" ZCE");
++	if (regval & RI_TRNG_PRESENT)
++		oboff += OSCNPRINTF(" TRNG");
++	oboff += OSCNPRINTF("\n");
++	oboff += OSCNPRINTF("     Queues: %d\n",
++		   (regval & RI_NUM_VQM) >> RI_NVQM_SHIFT);
++	oboff += OSCNPRINTF("LSB Entries: %d\n",
++		   (regval & RI_LSB_ENTRIES) >> RI_NLSB_SHIFT);
++
++	ret = simple_read_from_buffer(ubuf, count, offp, obuf, oboff);
++	kfree(obuf);
++
++	return ret;
++}
++
++/* Return a formatted buffer containing the current
++ * statistics across all queues for a CCP.
++ */
++static ssize_t ccp5_debugfs_stats_read(struct file *filp, char __user *ubuf,
++				       size_t count, loff_t *offp)
++{
++	struct ccp_device *ccp = filp->private_data;
++	unsigned long total_xts_aes_ops = 0;
++	unsigned long total_3des_ops = 0;
++	unsigned long total_aes_ops = 0;
++	unsigned long total_sha_ops = 0;
++	unsigned long total_rsa_ops = 0;
++	unsigned long total_ecc_ops = 0;
++	unsigned long total_pt_ops = 0;
++	unsigned long total_ops = 0;
++	unsigned int oboff = 0;
++	ssize_t ret = 0;
++	unsigned int i;
++	char *obuf;
++
++	for (i = 0; i < ccp->cmd_q_count; i++) {
++		struct ccp_cmd_queue *cmd_q = &ccp->cmd_q[i];
++
++		total_ops += cmd_q->total_ops;
++		total_aes_ops += cmd_q->total_aes_ops;
++		total_xts_aes_ops += cmd_q->total_xts_aes_ops;
++		total_3des_ops += cmd_q->total_3des_ops;
++		total_sha_ops += cmd_q->total_sha_ops;
++		total_rsa_ops += cmd_q->total_rsa_ops;
++		total_pt_ops += cmd_q->total_pt_ops;
++		total_ecc_ops += cmd_q->total_ecc_ops;
++	}
++
++	obuf = kmalloc(OBUFLEN, GFP_KERNEL);
++	if (!obuf)
++		return -ENOMEM;
++
++	oboff += OSCNPRINTF("Total Interrupts Handled: %ld\n",
++			    ccp->total_interrupts);
++	oboff += OSCNPRINTF("        Total Operations: %ld\n",
++			    total_ops);
++	oboff += OSCNPRINTF("                     AES: %ld\n",
++			    total_aes_ops);
++	oboff += OSCNPRINTF("                 XTS AES: %ld\n",
++			    total_xts_aes_ops);
++	oboff += OSCNPRINTF("                     SHA: %ld\n",
++			    total_3des_ops);
++	oboff += OSCNPRINTF("                     SHA: %ld\n",
++			    total_sha_ops);
++	oboff += OSCNPRINTF("                     RSA: %ld\n",
++			    total_rsa_ops);
++	oboff += OSCNPRINTF("               Pass-Thru: %ld\n",
++			    total_pt_ops);
++	oboff += OSCNPRINTF("                     ECC: %ld\n",
++			    total_ecc_ops);
++
++	ret = simple_read_from_buffer(ubuf, count, offp, obuf, oboff);
++	kfree(obuf);
++
++	return ret;
++}
++
++/* Reset the counters in a queue
++ */
++static void ccp5_debugfs_reset_queue_stats(struct ccp_cmd_queue *cmd_q)
++{
++	cmd_q->total_ops = 0L;
++	cmd_q->total_aes_ops = 0L;
++	cmd_q->total_xts_aes_ops = 0L;
++	cmd_q->total_3des_ops = 0L;
++	cmd_q->total_sha_ops = 0L;
++	cmd_q->total_rsa_ops = 0L;
++	cmd_q->total_pt_ops = 0L;
++	cmd_q->total_ecc_ops = 0L;
++}
++
++/* A value was written to the stats variable, which
++ * should be used to reset the queue counters across
++ * that device.
++ */
++static ssize_t ccp5_debugfs_stats_write(struct file *filp,
++					const char __user *ubuf,
++					size_t count, loff_t *offp)
++{
++	struct ccp_device *ccp = filp->private_data;
++	int i;
++
++	for (i = 0; i < ccp->cmd_q_count; i++)
++		ccp5_debugfs_reset_queue_stats(&ccp->cmd_q[i]);
++	ccp->total_interrupts = 0L;
++
++	return count;
++}
++
++/* Return a formatted buffer containing the current information
++ * for that queue
++ */
++static ssize_t ccp5_debugfs_queue_read(struct file *filp, char __user *ubuf,
++				       size_t count, loff_t *offp)
++{
++	struct ccp_cmd_queue *cmd_q = filp->private_data;
++	unsigned int oboff = 0;
++	unsigned int regval;
++	ssize_t ret;
++	char *obuf;
++
++	if (!cmd_q)
++		return 0;
++
++	obuf = kmalloc(OBUFLEN, GFP_KERNEL);
++	if (!obuf)
++		return -ENOMEM;
++
++	oboff += OSCNPRINTF("  Total Queue Operations: %ld\n",
++			    cmd_q->total_ops);
++	oboff += OSCNPRINTF("                     AES: %ld\n",
++			    cmd_q->total_aes_ops);
++	oboff += OSCNPRINTF("                 XTS AES: %ld\n",
++			    cmd_q->total_xts_aes_ops);
++	oboff += OSCNPRINTF("                     SHA: %ld\n",
++			    cmd_q->total_3des_ops);
++	oboff += OSCNPRINTF("                     SHA: %ld\n",
++			    cmd_q->total_sha_ops);
++	oboff += OSCNPRINTF("                     RSA: %ld\n",
++			    cmd_q->total_rsa_ops);
++	oboff += OSCNPRINTF("               Pass-Thru: %ld\n",
++			    cmd_q->total_pt_ops);
++	oboff += OSCNPRINTF("                     ECC: %ld\n",
++			    cmd_q->total_ecc_ops);
++
++	regval = ioread32(cmd_q->reg_int_enable);
++	oboff += OSCNPRINTF("      Enabled Interrupts:");
++	if (regval & INT_EMPTY_QUEUE)
++		oboff += OSCNPRINTF(" EMPTY");
++	if (regval & INT_QUEUE_STOPPED)
++		oboff += OSCNPRINTF(" STOPPED");
++	if (regval & INT_ERROR)
++		oboff += OSCNPRINTF(" ERROR");
++	if (regval & INT_COMPLETION)
++		oboff += OSCNPRINTF(" COMPLETION");
++	oboff += OSCNPRINTF("\n");
++
++	ret = simple_read_from_buffer(ubuf, count, offp, obuf, oboff);
++	kfree(obuf);
++
++	return ret;
++}
++
++/* A value was written to the stats variable for a
++ * queue. Reset the queue counters to this value.
++ */
++static ssize_t ccp5_debugfs_queue_write(struct file *filp,
++					const char __user *ubuf,
++					size_t count, loff_t *offp)
++{
++	struct ccp_cmd_queue *cmd_q = filp->private_data;
++
++	ccp5_debugfs_reset_queue_stats(cmd_q);
++
++	return count;
++}
++
++static const struct file_operations ccp_debugfs_info_ops = {
++	.owner = THIS_MODULE,
++	.open = simple_open,
++	.read = ccp5_debugfs_info_read,
++	.write = NULL,
++};
++
++static const struct file_operations ccp_debugfs_queue_ops = {
++	.owner = THIS_MODULE,
++	.open = simple_open,
++	.read = ccp5_debugfs_queue_read,
++	.write = ccp5_debugfs_queue_write,
++};
++
++static const struct file_operations ccp_debugfs_stats_ops = {
++	.owner = THIS_MODULE,
++	.open = simple_open,
++	.read = ccp5_debugfs_stats_read,
++	.write = ccp5_debugfs_stats_write,
++};
++
++static struct dentry *ccp_debugfs_dir;
++static DEFINE_RWLOCK(ccp_debugfs_lock);
++
++#define	MAX_NAME_LEN	20
++
++void ccp5_debugfs_setup(struct ccp_device *ccp)
++{
++	struct ccp_cmd_queue *cmd_q;
++	char name[MAX_NAME_LEN + 1];
++	struct dentry *debugfs_info;
++	struct dentry *debugfs_stats;
++	struct dentry *debugfs_q_instance;
++	struct dentry *debugfs_q_stats;
++	unsigned long flags;
++	int i;
++
++	if (!debugfs_initialized())
++		return;
++
++	write_lock_irqsave(&ccp_debugfs_lock, flags);
++	if (!ccp_debugfs_dir) {
++		ccp_debugfs_dir = debugfs_create_dir(KBUILD_MODNAME, NULL);
++		if (!ccp_debugfs_dir)
++			return;
++	}
++	write_unlock_irqrestore(&ccp_debugfs_lock, flags);
++
++	ccp->debugfs_instance = debugfs_create_dir(ccp->name, ccp_debugfs_dir);
++	if (!ccp->debugfs_instance)
++		return;
++
++	debugfs_info = debugfs_create_file("info", 0400,
++					   ccp->debugfs_instance, ccp,
++					   &ccp_debugfs_info_ops);
++	if (!debugfs_info)
++		return;
++
++	debugfs_stats = debugfs_create_file("stats", 0600,
++					    ccp->debugfs_instance, ccp,
++					    &ccp_debugfs_stats_ops);
++	if (!debugfs_stats)
++		return;
++
++	for (i = 0; i < ccp->cmd_q_count; i++) {
++		cmd_q = &ccp->cmd_q[i];
++
++		snprintf(name, MAX_NAME_LEN - 1, "q%d", cmd_q->id);
++
++		debugfs_q_instance =
++			debugfs_create_dir(name, ccp->debugfs_instance);
++		if (!debugfs_q_instance)
++			return;
++
++		debugfs_q_stats =
++			debugfs_create_file("stats", 0600,
++					    debugfs_q_instance, cmd_q,
++					    &ccp_debugfs_queue_ops);
++		if (!debugfs_q_stats)
++			return;
++	}
++}
++
++void ccp5_debugfs_destroy(void)
++{
++	debugfs_remove_recursive(ccp_debugfs_dir);
++}
+diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
+index ccbe32d5dd1c..58323cddab59 100644
+--- a/drivers/crypto/ccp/ccp-dev-v5.c
++++ b/drivers/crypto/ccp/ccp-dev-v5.c
+@@ -14,6 +14,7 @@
+ #include <linux/kernel.h>
+ #include <linux/pci.h>
+ #include <linux/kthread.h>
++#include <linux/debugfs.h>
+ #include <linux/dma-mapping.h>
+ #include <linux/interrupt.h>
+ #include <linux/compiler.h>
+@@ -231,6 +232,8 @@ static int ccp5_do_cmd(struct ccp5_desc *desc,
+ 	int	i;
+ 	int ret = 0;
+ 
++	cmd_q->total_ops++;
++
+ 	if (CCP5_CMD_SOC(desc)) {
+ 		CCP5_CMD_IOC(desc) = 1;
+ 		CCP5_CMD_SOC(desc) = 0;
+@@ -282,6 +285,8 @@ static int ccp5_perform_aes(struct ccp_op *op)
+ 	union ccp_function function;
+ 	u32 key_addr = op->sb_key * LSB_ITEM_SIZE;
+ 
++	op->cmd_q->total_aes_ops++;
++
+ 	/* Zero out all the fields of the command desc */
+ 	memset(&desc, 0, Q_DESC_SIZE);
+ 
+@@ -325,6 +330,8 @@ static int ccp5_perform_xts_aes(struct ccp_op *op)
+ 	union ccp_function function;
+ 	u32 key_addr = op->sb_key * LSB_ITEM_SIZE;
+ 
++	op->cmd_q->total_xts_aes_ops++;
++
+ 	/* Zero out all the fields of the command desc */
+ 	memset(&desc, 0, Q_DESC_SIZE);
+ 
+@@ -364,6 +371,8 @@ static int ccp5_perform_sha(struct ccp_op *op)
+ 	struct ccp5_desc desc;
+ 	union ccp_function function;
+ 
++	op->cmd_q->total_sha_ops++;
++
+ 	/* Zero out all the fields of the command desc */
+ 	memset(&desc, 0, Q_DESC_SIZE);
+ 
+@@ -404,6 +413,8 @@ static int ccp5_perform_des3(struct ccp_op *op)
+ 	union ccp_function function;
+ 	u32 key_addr = op->sb_key * LSB_ITEM_SIZE;
+ 
++	op->cmd_q->total_3des_ops++;
++
+ 	/* Zero out all the fields of the command desc */
+ 	memset(&desc, 0, sizeof(struct ccp5_desc));
+ 
+@@ -444,6 +455,8 @@ static int ccp5_perform_rsa(struct ccp_op *op)
+ 	struct ccp5_desc desc;
+ 	union ccp_function function;
+ 
++	op->cmd_q->total_rsa_ops++;
++
+ 	/* Zero out all the fields of the command desc */
+ 	memset(&desc, 0, Q_DESC_SIZE);
+ 
+@@ -487,6 +500,8 @@ static int ccp5_perform_passthru(struct ccp_op *op)
+ 	struct ccp_dma_info *daddr = &op->dst.u.dma;
+ 
+ 
++	op->cmd_q->total_pt_ops++;
++
+ 	memset(&desc, 0, Q_DESC_SIZE);
+ 
+ 	CCP5_CMD_ENGINE(&desc) = CCP_ENGINE_PASSTHRU;
+@@ -543,6 +558,8 @@ static int ccp5_perform_ecc(struct ccp_op *op)
+ 	struct ccp5_desc desc;
+ 	union ccp_function function;
+ 
++	op->cmd_q->total_ecc_ops++;
++
+ 	/* Zero out all the fields of the command desc */
+ 	memset(&desc, 0, Q_DESC_SIZE);
+ 
+@@ -592,7 +609,6 @@ static int ccp_find_lsb_regions(struct ccp_cmd_queue *cmd_q, u64 status)
+ 	return queues ? 0 : -EINVAL;
+ }
+ 
+-
+ static int ccp_find_and_assign_lsb_to_q(struct ccp_device *ccp,
+ 					int lsb_cnt, int n_lsbs,
+ 					unsigned long *lsb_pub)
+@@ -757,6 +773,7 @@ static irqreturn_t ccp5_irq_handler(int irq, void *data)
+ 	struct ccp_device *ccp = dev_get_drvdata(dev);
+ 
+ 	ccp5_disable_queue_interrupts(ccp);
++	ccp->total_interrupts++;
+ 	if (ccp->use_tasklet)
+ 		tasklet_schedule(&ccp->irq_tasklet);
+ 	else
+@@ -956,6 +973,9 @@ static int ccp5_init(struct ccp_device *ccp)
+ 	if (ret)
+ 		goto e_hwrng;
+ 
++	/* Set up debugfs entries */
++	ccp5_debugfs_setup(ccp);
++
+ 	return 0;
+ 
+ e_hwrng:
+@@ -992,6 +1012,12 @@ static void ccp5_destroy(struct ccp_device *ccp)
+ 	/* Remove this device from the list of available units first */
+ 	ccp_del_device(ccp);
+ 
++	/* We're in the process of tearing down the entire driver;
++	 * when all the devices are gone clean up debugfs
++	 */
++	if (!ccp_present())
++		ccp5_debugfs_destroy();
++
+ 	/* Disable and clear interrupts */
+ 	ccp5_disable_queue_interrupts(ccp);
+ 	for (i = 0; i < ccp->cmd_q_count; i++) {
+diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
+index b7504562715c..2506b5025700 100644
+--- a/drivers/crypto/ccp/ccp-dev.c
++++ b/drivers/crypto/ccp/ccp-dev.c
+@@ -33,7 +33,7 @@
+ MODULE_AUTHOR("Tom Lendacky <thomas.lendacky@amd.com>");
+ MODULE_AUTHOR("Gary R Hook <gary.hook@amd.com>");
+ MODULE_LICENSE("GPL");
+-MODULE_VERSION("1.0.0");
++MODULE_VERSION("1.1.0");
+ MODULE_DESCRIPTION("AMD Cryptographic Coprocessor driver");
+ 
+ struct ccp_tasklet_data {
+diff --git a/drivers/crypto/ccp/ccp-dev.h b/drivers/crypto/ccp/ccp-dev.h
+index 0cb09d0feeaf..a70154ac7405 100644
+--- a/drivers/crypto/ccp/ccp-dev.h
++++ b/drivers/crypto/ccp/ccp-dev.h
+@@ -70,6 +70,7 @@
+ #define LSB_PUBLIC_MASK_HI_OFFSET	0x1C
+ #define LSB_PRIVATE_MASK_LO_OFFSET	0x20
+ #define LSB_PRIVATE_MASK_HI_OFFSET	0x24
++#define CMD5_PSP_CCP_VERSION		0x100
+ 
+ #define CMD5_Q_CONTROL_BASE		0x0000
+ #define CMD5_Q_TAIL_LO_BASE		0x0004
+@@ -322,6 +323,16 @@ struct ccp_cmd_queue {
+ 	/* Interrupt wait queue */
+ 	wait_queue_head_t int_queue;
+ 	unsigned int int_rcvd;
++
++	/* Per-queue Statistics */
++	unsigned long total_ops;
++	unsigned long total_aes_ops;
++	unsigned long total_xts_aes_ops;
++	unsigned long total_3des_ops;
++	unsigned long total_sha_ops;
++	unsigned long total_rsa_ops;
++	unsigned long total_pt_ops;
++	unsigned long total_ecc_ops;
+ } ____cacheline_aligned;
+ 
+ struct ccp_device {
+@@ -419,6 +430,12 @@ struct ccp_device {
+ 
+ 	/* DMA caching attribute support */
+ 	unsigned int axcache;
++
++	/* Device Statistics */
++	unsigned long total_interrupts;
++
++	/* DebugFS info */
++	struct dentry *debugfs_instance;
+ };
+ 
+ enum ccp_memtype {
+@@ -632,6 +649,9 @@ struct ccp5_desc {
+ int ccp_dmaengine_register(struct ccp_device *ccp);
+ void ccp_dmaengine_unregister(struct ccp_device *ccp);
+ 
++void ccp5_debugfs_setup(struct ccp_device *ccp);
++void ccp5_debugfs_destroy(void);
++
+ /* Structure for computation functions that are device-specific */
+ struct ccp_actions {
+ 	int (*aes)(struct ccp_op *);
