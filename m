@@ -1,61 +1,67 @@
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: Re: [PATCH 4/8] random: remove unused branch in hot code path
-Date: Thu, 27 Apr 2017 13:23:56 +0200
-Message-ID: <CAMuHMdWBjqzPUN=W-4s8Y6nsayyetAf6MsikQigW-cAS27kU2Q@mail.gmail.com>
-References: <3254875.f5A5oHPdxF@positron.chronox.de> <3380804.uZWydldqLU@positron.chronox.de>
- <20170118043536.aeqmxfthmx4h33g7@thunk.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170118043536.aeqmxfthmx4h33g7@thunk.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Antoine Tenart <antoine.tenart@free-electrons.com>
+Subject: [PATCH v4 1/3] Documentation/bindings: Document the SafeXel cryptographic engine driver
+Date: Thu, 27 Apr 2017 15:24:57 +0200
+Message-ID: <20170427132459.23159-2-antoine.tenart@free-electrons.com>
+References: <20170427132459.23159-1-antoine.tenart@free-electrons.com>
+Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        thomas.petazzoni@free-electrons.com,
+        boris.brezillon@free-electrons.com, oferh@marvell.com,
+        igall@marvell.com, nadavh@marvell.com
+To: herbert@gondor.apana.org.au, davem@davemloft.net,
+        jason@lakedaemon.net, andrew@lunn.ch,
+        gregory.clement@free-electrons.com, sebastian.hesselbarth@gmail.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.free-electrons.com ([62.4.15.54]:39563 "EHLO
+        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1033320AbdD0NZW (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 27 Apr 2017 09:25:22 -0400
+In-Reply-To: <20170427132459.23159-1-antoine.tenart@free-electrons.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Ted,
+The Inside Secure Safexcel cryptographic engine is found on some Marvell
+SoCs (7k/8k). Document the bindings used by its driver.
 
-(replying to an old thread)
+Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
+---
+ .../bindings/crypto/inside-secure-safexcel.txt     | 27 ++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/inside-secure-safexcel.txt
 
-On Wed, Jan 18, 2017 at 5:35 AM, Theodore Ts'o <tytso@mit.edu> wrote:
-> On Tue, Dec 27, 2016 at 11:40:23PM +0100, Stephan M=C3=BCller wrote:
->> The variable ip is defined to be a __u64 which is always 8 bytes on any
->> architecture. Thus, the check for sizeof(ip) > 4 will always be true.
->>
->> As the check happens in a hot code path, remove the branch.
->
-> The fact that it's a hot code path means the compiler will optimize it
-> out, so the fact that it's on the hot code path is irrelevant.  The
-> main issue is that on platforms with a 32-bit IP's, ip >> 32 will
-> always be zero.  It might be that we can just do this via
->
-> #if BITS_PER_LONG =3D=3D 32
->   ...
-> #else
->   ...
-> #endif
->
-> I'm not sure that works for all platforms, though.  More research is
-> needed...
-
-Is the intention for the test "sizeof(ip) > 4" to distinguish between
-32-bit and 64-bit platforms?
-As ip is __u64, while regs is a pointer, shouldn't the test be
-"sizeof(regs) > 4"?
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
+diff --git a/Documentation/devicetree/bindings/crypto/inside-secure-safexcel.txt b/Documentation/devicetree/bindings/crypto/inside-secure-safexcel.txt
+new file mode 100644
+index 000000000000..ff56b9384fcc
+--- /dev/null
++++ b/Documentation/devicetree/bindings/crypto/inside-secure-safexcel.txt
+@@ -0,0 +1,27 @@
++Inside Secure SafeXcel cryptographic engine
++
++Required properties:
++- compatible: Should be "inside-secure,safexcel-eip197".
++- reg: Base physical address of the engine and length of memory mapped region.
++- interrupts: Interrupt numbers for the rings and engine.
++- interrupt-names: Should be "ring0", "ring1", "ring2", "ring3", "eip", "mem".
++
++Optional properties:
++- clocks: Reference to the crypto engine clock.
++
++Example:
++
++	crypto: crypto@800000 {
++		compatible = "inside-secure,safexcel-eip197";
++		reg = <0x800000 0x200000>;
++		interrupts = <GIC_SPI 34 (IRQ_TYPE_EDGE_RISING | IRQ_TYPE_LEVEL_HIGH)>,
++			     <GIC_SPI 54 IRQ_TYPE_LEVEL_HIGH>,
++			     <GIC_SPI 55 IRQ_TYPE_LEVEL_HIGH>,
++			     <GIC_SPI 56 IRQ_TYPE_LEVEL_HIGH>,
++			     <GIC_SPI 57 IRQ_TYPE_LEVEL_HIGH>,
++			     <GIC_SPI 58 IRQ_TYPE_LEVEL_HIGH>;
++		interrupt-names = "mem", "ring0", "ring1", "ring2", "ring3",
++				  "eip";
++		clocks = <&cpm_syscon0 1 26>;
++		status = "disabled";
++	};
+-- 
+2.11.0
