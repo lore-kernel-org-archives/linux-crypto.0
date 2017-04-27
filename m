@@ -1,52 +1,61 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH] crypto: stm32 - fix building as a module
-Date: Thu, 27 Apr 2017 13:07:07 +0200
-Message-ID: <20170427110907.2515229-1-arnd@arndb.de>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: Re: [PATCH 4/8] random: remove unused branch in hot code path
+Date: Thu, 27 Apr 2017 13:23:56 +0200
+Message-ID: <CAMuHMdWBjqzPUN=W-4s8Y6nsayyetAf6MsikQigW-cAS27kU2Q@mail.gmail.com>
+References: <3254875.f5A5oHPdxF@positron.chronox.de> <3380804.uZWydldqLU@positron.chronox.de>
+ <20170118043536.aeqmxfthmx4h33g7@thunk.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Alexandre Torgue <alexandre.torgue@st.com>, Arnd Bergmann <arnd@arndb.de>,
- linux-kernel@vger.kernel.org, Fabien DESSENNE <fabien.dessenne@st.com>,
- linux-crypto@vger.kernel.org, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, linux-arm-kernel@lists.infradead.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20170118043536.aeqmxfthmx4h33g7@thunk.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The names in the MODULE_DEVICE_TABLE and the actual array don't match:
+Hi Ted,
 
-drivers/crypto/stm32/stm32_crc32.c:309:21: error: 'sti_dt_ids' undeclared here (not in a function); did you mean 'stm32_dt_ids'?
+(replying to an old thread)
 
-This changes the reference that was evidently copied incorrectly from
-another driver.
+On Wed, Jan 18, 2017 at 5:35 AM, Theodore Ts'o <tytso@mit.edu> wrote:
+> On Tue, Dec 27, 2016 at 11:40:23PM +0100, Stephan M=C3=BCller wrote:
+>> The variable ip is defined to be a __u64 which is always 8 bytes on any
+>> architecture. Thus, the check for sizeof(ip) > 4 will always be true.
+>>
+>> As the check happens in a hot code path, remove the branch.
+>
+> The fact that it's a hot code path means the compiler will optimize it
+> out, so the fact that it's on the hot code path is irrelevant.  The
+> main issue is that on platforms with a 32-bit IP's, ip >> 32 will
+> always be zero.  It might be that we can just do this via
+>
+> #if BITS_PER_LONG =3D=3D 32
+>   ...
+> #else
+>   ...
+> #endif
+>
+> I'm not sure that works for all platforms, though.  More research is
+> needed...
 
-Fixes: b51dbe90912a ("crypto: stm32 - Support for STM32 CRC32 crypto module")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/crypto/stm32/stm32_crc32.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Is the intention for the test "sizeof(ip) > 4" to distinguish between
+32-bit and 64-bit platforms?
+As ip is __u64, while regs is a pointer, shouldn't the test be
+"sizeof(regs) > 4"?
 
-diff --git a/drivers/crypto/stm32/stm32_crc32.c b/drivers/crypto/stm32/stm32_crc32.c
-index 765282262d44..ec83b1e6bfe8 100644
---- a/drivers/crypto/stm32/stm32_crc32.c
-+++ b/drivers/crypto/stm32/stm32_crc32.c
-@@ -306,7 +306,7 @@ static const struct of_device_id stm32_dt_ids[] = {
- 	{ .compatible = "st,stm32f7-crc", },
- 	{},
- };
--MODULE_DEVICE_TABLE(of, sti_dt_ids);
-+MODULE_DEVICE_TABLE(of, stm32_dt_ids);
- 
- static struct platform_driver stm32_crc_driver = {
- 	.probe  = stm32_crc_probe,
--- 
-2.9.0
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
