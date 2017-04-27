@@ -1,44 +1,75 @@
 From: Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH 5/7] IB/hfi1: use pcie_flr instead of duplicating it
-Date: Thu, 27 Apr 2017 08:47:58 +0200
-Message-ID: <20170427064758.GA20614@lst.de>
-References: <20170414191131.14286-1-hch@lst.de> <20170414191131.14286-6-hch@lst.de> <A33E225544E47D4DB5713032774B132783960382@irsmsx105.ger.corp.intel.com> <20170424143507.GA28812@lst.de> <20170425193955.GC29024@bhelgaas-glaptop.roam.corp.google.com>
+Subject: Re: [PATCH v2 01/21] scatterlist: Introduce sg_map helper functions
+Date: Thu, 27 Apr 2017 08:53:38 +0200
+Message-ID: <20170427065338.GA20677@lst.de>
+References: <1493144468-22493-1-git-send-email-logang@deltatee.com> <1493144468-22493-2-git-send-email-logang@deltatee.com> <20170426074416.GA7936@lst.de> <4736d44e-bbcf-5d59-a1a9-317d0f4da847@deltatee.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Christoph Hellwig <hch@lst.de>,
-        "Byczkowski, Jakub" <jakub.byczkowski@intel.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>,
-        "Benedetto, Salvatore" <salvatore.benedetto@intel.com>,
-        "Marciniszyn, Mike" <mike.marciniszyn@intel.com>,
-        "Dalessandro, Dennis" <dennis.dalessandro@intel.com>,
-        Derek Chickles <derek.chickles@caviumnetworks.com>,
-        Satanand Burla <satananda.burla@caviumnetworks.com>,
-        Felix Manlunas <felix.manlunas@caviumnetworks.com>,
-        Raghu Vatsavayi <raghu.vatsavayi@caviumnetworks.com>,
-        "Kirsher, Jeffrey T" <jeffrey.t.kirsher@intel.com>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        qat-linux <qat-linux@intel.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <l
-To: Bjorn Helgaas <helgaas@kernel.org>
-Return-path: <linux-pci-owner@vger.kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-media@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        linux-raid@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-nvdimm@lists.01.org, linux-scsi@vger.kernel.org,
+        open-iscsi@googlegroups.com, megaraidlinux.pdl@broadcom.com,
+        sparmaintainer@unisys.com, devel@driverdev.osuosl.org,
+        target-devel@vger.kernel.org, netdev@vger.kernel.org,
+        linux-rdma@vger.kernel.org, dm-devel@redhat.com,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+To: Logan Gunthorpe <logang@deltatee.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from verein.lst.de ([213.95.11.211]:45070 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751950AbdD0Gxl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 27 Apr 2017 02:53:41 -0400
 Content-Disposition: inline
-In-Reply-To: <20170425193955.GC29024@bhelgaas-glaptop.roam.corp.google.com>
-Sender: linux-pci-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <4736d44e-bbcf-5d59-a1a9-317d0f4da847@deltatee.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Apr 25, 2017 at 02:39:55PM -0500, Bjorn Helgaas wrote:
-> This still leaves these:
-> 
->   [PATCH 4/7] ixgbe: use pcie_flr instead of duplicating it
->   [PATCH 6/7] crypto: qat: use pcie_flr instead of duplicating it
->   [PATCH 7/7] liquidio: use pcie_flr instead of duplicating it
-> 
-> I haven't seen any response to 4 and 6.  Felix reported an unused
-> variable in 7.  Let me know if you'd like me to do anything with
-> these.
+On Wed, Apr 26, 2017 at 12:11:33PM -0600, Logan Gunthorpe wrote:
+> Ok, well for starters I think you are mistaken about kmap being able to
+> fail. I'm having a hard time finding many users of that function that
+> bother to check for an error when calling it.
 
-Now that Jeff ACKed 4 it might be worth to add it to the pci tree last
-minute.  I'll resend liquidio and qat to the respective maintainers for
-the next merge window.
+A quick audit of the arch code shows you're right - kmap can't fail
+anywhere anymore.
+
+> The main difficulty we
+> have now is that neither of those functions are expected to fail and we
+> need them to be able to in cases where the page doesn't map to system
+> RAM. This patch series is trying to address it for users of scatterlist.
+> I'm certainly open to other suggestions.
+
+I think you'll need to follow the existing kmap semantics and never
+fail the iomem version either.  Otherwise you'll have a special case
+that's almost never used that has a different error path.
+
+> There are a fair number of cases in the kernel that do something like:
+> 
+> if (something)
+>     x = kmap(page);
+> else
+>     x = kmap_atomic(page);
+> ...
+> if (something)
+>     kunmap(page)
+> else
+>     kunmap_atomic(x)
+> 
+> Which just seems cumbersome to me.
+
+Passing a different flag based on something isn't really much better.
+
+> In any case, if you can accept an sg_kmap and sg_kmap_atomic api just
+> say so and I'll make the change. But I'll still need a flags variable
+> for SG_MAP_MUST_NOT_FAIL to support legacy cases that have no fail path
+> and both of those functions will need to be pretty nearly replicas of
+> each other.
+
+Again, wrong way.  Suddenly making things fail for your special case
+that normally don't fail is a receipe for bugs.
