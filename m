@@ -1,75 +1,52 @@
-From: Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v2 01/21] scatterlist: Introduce sg_map helper functions
-Date: Thu, 27 Apr 2017 08:53:38 +0200
-Message-ID: <20170427065338.GA20677@lst.de>
-References: <1493144468-22493-1-git-send-email-logang@deltatee.com> <1493144468-22493-2-git-send-email-logang@deltatee.com> <20170426074416.GA7936@lst.de> <4736d44e-bbcf-5d59-a1a9-317d0f4da847@deltatee.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] crypto: stm32 - fix building as a module
+Date: Thu, 27 Apr 2017 13:07:07 +0200
+Message-ID: <20170427110907.2515229-1-arnd@arndb.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Christoph Hellwig <hch@lst.de>, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-media@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-        linux-raid@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-nvdimm@lists.01.org, linux-scsi@vger.kernel.org,
-        open-iscsi@googlegroups.com, megaraidlinux.pdl@broadcom.com,
-        sparmaintainer@unisys.com, devel@driverdev.osuosl.org,
-        target-devel@vger.kernel.org, netdev@vger.kernel.org,
-        linux-rdma@vger.kernel.org, dm-devel@redhat.com,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-To: Logan Gunthorpe <logang@deltatee.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from verein.lst.de ([213.95.11.211]:45070 "EHLO newverein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751950AbdD0Gxl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 Apr 2017 02:53:41 -0400
-Content-Disposition: inline
-In-Reply-To: <4736d44e-bbcf-5d59-a1a9-317d0f4da847@deltatee.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Alexandre Torgue <alexandre.torgue@st.com>, Arnd Bergmann <arnd@arndb.de>,
+ linux-kernel@vger.kernel.org, Fabien DESSENNE <fabien.dessenne@st.com>,
+ linux-crypto@vger.kernel.org, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, linux-arm-kernel@lists.infradead.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Apr 26, 2017 at 12:11:33PM -0600, Logan Gunthorpe wrote:
-> Ok, well for starters I think you are mistaken about kmap being able to
-> fail. I'm having a hard time finding many users of that function that
-> bother to check for an error when calling it.
+The names in the MODULE_DEVICE_TABLE and the actual array don't match:
 
-A quick audit of the arch code shows you're right - kmap can't fail
-anywhere anymore.
+drivers/crypto/stm32/stm32_crc32.c:309:21: error: 'sti_dt_ids' undeclared here (not in a function); did you mean 'stm32_dt_ids'?
 
-> The main difficulty we
-> have now is that neither of those functions are expected to fail and we
-> need them to be able to in cases where the page doesn't map to system
-> RAM. This patch series is trying to address it for users of scatterlist.
-> I'm certainly open to other suggestions.
+This changes the reference that was evidently copied incorrectly from
+another driver.
 
-I think you'll need to follow the existing kmap semantics and never
-fail the iomem version either.  Otherwise you'll have a special case
-that's almost never used that has a different error path.
+Fixes: b51dbe90912a ("crypto: stm32 - Support for STM32 CRC32 crypto module")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ drivers/crypto/stm32/stm32_crc32.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> There are a fair number of cases in the kernel that do something like:
-> 
-> if (something)
->     x = kmap(page);
-> else
->     x = kmap_atomic(page);
-> ...
-> if (something)
->     kunmap(page)
-> else
->     kunmap_atomic(x)
-> 
-> Which just seems cumbersome to me.
-
-Passing a different flag based on something isn't really much better.
-
-> In any case, if you can accept an sg_kmap and sg_kmap_atomic api just
-> say so and I'll make the change. But I'll still need a flags variable
-> for SG_MAP_MUST_NOT_FAIL to support legacy cases that have no fail path
-> and both of those functions will need to be pretty nearly replicas of
-> each other.
-
-Again, wrong way.  Suddenly making things fail for your special case
-that normally don't fail is a receipe for bugs.
+diff --git a/drivers/crypto/stm32/stm32_crc32.c b/drivers/crypto/stm32/stm32_crc32.c
+index 765282262d44..ec83b1e6bfe8 100644
+--- a/drivers/crypto/stm32/stm32_crc32.c
++++ b/drivers/crypto/stm32/stm32_crc32.c
+@@ -306,7 +306,7 @@ static const struct of_device_id stm32_dt_ids[] = {
+ 	{ .compatible = "st,stm32f7-crc", },
+ 	{},
+ };
+-MODULE_DEVICE_TABLE(of, sti_dt_ids);
++MODULE_DEVICE_TABLE(of, stm32_dt_ids);
+ 
+ static struct platform_driver stm32_crc_driver = {
+ 	.probe  = stm32_crc_probe,
+-- 
+2.9.0
