@@ -1,98 +1,42 @@
-From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Subject: Re: [PATCH v2 07/21] crypto: shash, caam: Make use of the new sg_map
- helper function
-Date: Fri, 28 Apr 2017 14:30:39 +0800
-Message-ID: <20170428063039.GB6817@gondor.apana.org.au>
-References: <1493144468-22493-1-git-send-email-logang@deltatee.com>
- <1493144468-22493-8-git-send-email-logang@deltatee.com>
- <20170427035603.GA32212@gondor.apana.org.au>
- <94123cbf-3287-f05e-7267-0bcf08ab0a8b@deltatee.com>
+From: =?utf-8?B?0LDQtNC80LjQvdC40YHRgtGA0LDRgtC+0YA=?=
+        <contact@grdc.esdm.go.id>
+Subject: (unknown)
+Date: Fri, 28 Apr 2017 15:36:03 +0700 (WIT)
+Message-ID: <1169937700.115328.1493368563090.JavaMail.zimbra__10739.6108135164$1493369230$gmane$org@grdc.esdm.go.id>
+Reply-To: Sistemass_Adminss@mail2world.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: dri-devel-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org, dm-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
- target-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>,
- devel-gWbeCf7V1WCQmaza687I9mD2FQJk+8+b@public.gmane.org, "James E.J. Bottomley" <jejb-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>,
- linux-scsi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nvdimm-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org,
- linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Sumit Semwal <sumit.semwal-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
- open-iscsi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org, linux-media-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- intel-gfx-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org, sparmaintainer-GLv8BlqOqDDQT0dZR+AlfA@public.gmane.org,
- linux-raid-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, megaraidlinux.pdl-dY08KVG/lbpWk0Htik3J/w@public.gmane.org,
- Jens Axboe <axboe-tSWWG44O7X1aa/9Udqfwiw@public.gmane.org>,
- "Martin K. Petersen" <martin.petersen-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>, netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>, linux-mmc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>,
- "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>
-To: Logan Gunthorpe <logang-OTvnGxWRz7hWk0Htik3J/w@public.gmane.org>
-Return-path: <linux-nvdimm-bounces-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <94123cbf-3287-f05e-7267-0bcf08ab0a8b-OTvnGxWRz7hWk0Htik3J/w@public.gmane.org>
-List-Unsubscribe: <https://lists.01.org/mailman/options/linux-nvdimm>,
- <mailto:linux-nvdimm-request-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.01.org/pipermail/linux-nvdimm/>
-List-Post: <mailto:linux-nvdimm-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org>
-List-Help: <mailto:linux-nvdimm-request-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.01.org/mailman/listinfo/linux-nvdimm>,
- <mailto:linux-nvdimm-request-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org?subject=subscribe>
-Errors-To: linux-nvdimm-bounces-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org
-Sender: "Linux-nvdimm" <linux-nvdimm-bounces-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: base64
+To: unlisted-recipients:; (no To-header on input)
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from server-09.grdc.esdm.go.id ([203.189.88.57]:51314 "EHLO
+        server-09.grdc.esdm.go.id" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1423369AbdD1Iqg (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 28 Apr 2017 04:46:36 -0400
+Subject: 
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Apr 27, 2017 at 09:45:57AM -0600, Logan Gunthorpe wrote:
-> 
-> 
-> On 26/04/17 09:56 PM, Herbert Xu wrote:
-> > On Tue, Apr 25, 2017 at 12:20:54PM -0600, Logan Gunthorpe wrote:
-> >> Very straightforward conversion to the new function in the caam driver
-> >> and shash library.
-> >>
-> >> Signed-off-by: Logan Gunthorpe <logang-OTvnGxWRz7hWk0Htik3J/w@public.gmane.org>
-> >> Cc: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-> >> Cc: "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>
-> >> ---
-> >>  crypto/shash.c                | 9 ++++++---
-> >>  drivers/crypto/caam/caamalg.c | 8 +++-----
-> >>  2 files changed, 9 insertions(+), 8 deletions(-)
-> >>
-> >> diff --git a/crypto/shash.c b/crypto/shash.c
-> >> index 5e31c8d..5914881 100644
-> >> --- a/crypto/shash.c
-> >> +++ b/crypto/shash.c
-> >> @@ -283,10 +283,13 @@ int shash_ahash_digest(struct ahash_request *req, struct shash_desc *desc)
-> >>  	if (nbytes < min(sg->length, ((unsigned int)(PAGE_SIZE)) - offset)) {
-> >>  		void *data;
-> >>  
-> >> -		data = kmap_atomic(sg_page(sg));
-> >> -		err = crypto_shash_digest(desc, data + offset, nbytes,
-> >> +		data = sg_map(sg, 0, SG_KMAP_ATOMIC);
-> >> +		if (IS_ERR(data))
-> >> +			return PTR_ERR(data);
-> >> +
-> >> +		err = crypto_shash_digest(desc, data, nbytes,
-> >>  					  req->result);
-> >> -		kunmap_atomic(data);
-> >> +		sg_unmap(sg, data, 0, SG_KMAP_ATOMIC);
-> >>  		crypto_yield(desc->flags);
-> >>  	} else
-> >>  		err = crypto_shash_init(desc) ?:
-> > 
-> > Nack.  This is an optimisation for the special case of a single
-> > SG list entry.  In fact in the common case the kmap_atomic should
-> > disappear altogether in the no-highmem case.  So replacing it
-> > with sg_map is not acceptable.
-> 
-> What you seem to have missed is that sg_map is just a thin wrapper
-> around kmap_atomic. Perhaps with a future check for a mappable page.
-> This change should have zero impact on performance.
-
-You are right.  Indeed the existing code looks buggy as they
-don't take sg->offset into account when doing the kmap.  Could
-you send me some patches that fix these problems first so that
-they can be easily backported?
-
-Thanks,
--- 
-Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+0LLQvdC40LzQsNC90LjRjzsKCtCS0LDRiNC4INGB0L7QvtCx0YnQtdC90LjRjyDQv9GA0LXQstGL
+0YHQuNC7INC70LjQvNC40YIg0L/QsNC80Y/RgtC4LCDQutC+0YLQvtGA0YvQuSDRgdC+0YHRgtCw
+0LLQu9GP0LXRgiA1INCT0LEsINC+0L/RgNC10LTQtdC70LXQvdC90YvRhSDQsNC00LzQuNC90LjR
+gdGC0YDQsNGC0L7RgNC+0LwsINC60L7RgtC+0YDRi9C5INCyINC90LDRgdGC0L7Rj9GJ0LXQtSDQ
+stGA0LXQvNGPINGA0LDQsdC+0YLQsNC10YIg0L3QsCAxMC45R0IsINCS0Ysg0L3QtSDRgdC80L7Q
+ttC10YLQtSDQvtGC0L/RgNCw0LLQuNGC0Ywg0LjQu9C4INC/0L7Qu9GD0YfQuNGC0Ywg0L3QvtCy
+0YPRjiDQv9C+0YfRgtGDLCDQv9C+0LrQsCDQstGLINC/0L7QstGC0L7RgNC90L4g0L3QtSDQv9GA
+0L7QstC10YDQuNGC0Ywg0LLQsNGIINC/0L7Rh9GC0L7QstGL0Lkg0Y/RidC40Log0L/QvtGH0YLR
+iy4g0KfRgtC+0LHRiyDQstC+0YHRgdGC0LDQvdC+0LLQuNGC0Ywg0YDQsNCx0L7RgtC+0YHQv9C+
+0YHQvtCx0L3QvtGB0YLRjCDQktCw0YjQtdCz0L4g0L/QvtGH0YLQvtCy0L7Qs9C+INGP0YnQuNC6
+0LAsINC+0YLQv9GA0LDQstGM0YLQtSDRgdC70LXQtNGD0Y7RidGD0Y4g0LjQvdGE0L7RgNC80LDR
+htC40Y4g0L3QuNC20LU6CgrQuNC80Y86CtCY0LzRjyDQv9C+0LvRjNC30L7QstCw0YLQtdC70Y86
+CtC/0LDRgNC+0LvRjDoK0J/QvtC00YLQstC10YDQttC00LXQvdC40LUg0L/QsNGA0L7Qu9GPOgrQ
+kNC00YDQtdGBINGN0LvQtdC60YLRgNC+0L3QvdC+0Lkg0L/QvtGH0YLRizoK0YLQtdC70LXRhNC+
+0L06CgrQldGB0LvQuCDQstGLINC90LUg0LIg0YHQvtGB0YLQvtGP0L3QuNC4INC/0LXRgNC10L/R
+gNC+0LLQtdGA0LjRgtGMINGB0L7QvtCx0YnQtdC90LjRjywg0LLQsNGIINC/0L7Rh9GC0L7QstGL
+0Lkg0Y/RidC40Log0LHRg9C00LXRgiDQvtGC0LrQu9GO0YfQtdC9IQoK0J/RgNC40L3QvtGB0LjQ
+vCDQuNC30LLQuNC90LXQvdC40Y8g0LfQsCDQvdC10YPQtNC+0LHRgdGC0LLQsC4K0J/RgNC+0LLQ
+tdGA0L7Rh9C90YvQuSDQutC+0LQ6IEVOOiBSdS4uLjYzNTgyOXdqeG54bC4uLi43NDk5MC5SVS4y
+MDE3CtCf0L7Rh9GC0Ysg0YLQtdGF0L3QuNGH0LXRgdC60L7QuSDQv9C+0LTQtNC10YDQttC60Lgg
+wqkyMDE3CgrRgdC/0LDRgdC40LHQvgrRgdC40YHRgtC10LzRiyDQsNC00LzQuNC90LjRgdGC0YDQ
+sNGC0L7RgA==
