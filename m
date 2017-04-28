@@ -1,79 +1,61 @@
-From: Logan Gunthorpe <logang@deltatee.com>
-Subject: Re: [PATCH v2 15/21] xen-blkfront: Make use of the new sg_map helper
- function
-Date: Thu, 27 Apr 2017 17:29:08 -0600
-Message-ID: <eb33e0ce-987f-a345-ca95-71e4c0a4d1ea@deltatee.com>
-References: <1493144468-22493-1-git-send-email-logang@deltatee.com>
- <1493144468-22493-16-git-send-email-logang@deltatee.com>
- <20170426073720.okv33ly2ldepilti@dhcp-3-128.uk.xensource.com>
- <df6586e2-7d45-6b0b-facb-4dea882df06e@deltatee.com>
- <20170427205339.GB26330@obsidianresearch.com>
- <02ba3c7b-5fab-a06c-fbbf-c3be1c0fae1b@deltatee.com>
- <20170427221132.GA30036@obsidianresearch.com>
- <3a7c0d27-0744-4e91-b37f-3885c50455e8@deltatee.com>
- <20170427232022.GA30398@obsidianresearch.com>
+From: Eric Biggers <ebiggers3@gmail.com>
+Subject: Re: [PATCH 3/5] KEYS: DH: don't feed uninitialized result memory
+ into KDF
+Date: Thu, 27 Apr 2017 22:26:52 -0700
+Message-ID: <20170428052652.GA7172@zzz>
+References: <20170421034448.GA626@zzz>
+ <20170420054633.14572-1-ebiggers3@gmail.com>
+ <2035658.QVN4rZd2FW@positron.chronox.de>
+ <20170420174602.GA103004@gmail.com>
+ <2707352.sSpDZZo8GT@tauon.chronox.de>
+ <28956.1493306119@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>, linux-nvdimm@ml01.01.org,
- dri-devel@lists.freedesktop.org, Stephen Bates <sbates@raithlin.com>,
- dm-devel@redhat.com, target-devel@vger.kernel.org,
- Christoph Hellwig <hch@lst.de>, devel@driverdev.osuosl.org,
- "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>, linux-scsi@vger.kernel.org,
- Matthew Wilcox <mawilcox@microsoft.com>, linux-rdma@vger.kernel.org,
- Sumit Semwal <sumit.semwal@linaro.org>,
- Ross Zwisler <ross.zwisler@linux.intel.com>, open-iscsi@googlegroups.com,
- linux-media@vger.kernel.org, Juergen Gross <jgross@suse.com>,
- Julien Grall <julien.grall@arm.com>,
- Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
- intel-gfx@lists.freedesktop.org, sparmaintainer@unisys.com,
- linux-raid@vger.kernel.org, Dan Williams <dan.j.williams@intel.com>,
- megaraidlinux.pdl@broadcom.com, Jens Axboe <axboe@kernel.dk>,
- "Martin K. Petersen" <martin.p
-To: Jason Gunthorpe <jgunthorpe@obsidianresearch.com>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-In-Reply-To: <20170427232022.GA30398@obsidianresearch.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        mathew.j.martineau@linux.intel.com,
+        Eric Biggers <ebiggers@google.com>
+To: David Howells <dhowells@redhat.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pf0-f194.google.com ([209.85.192.194]:33464 "EHLO
+        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755738AbdD1F04 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 28 Apr 2017 01:26:56 -0400
+Content-Disposition: inline
+In-Reply-To: <28956.1493306119@warthog.procyon.org.uk>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-
-
-On 27/04/17 05:20 PM, Jason Gunthorpe wrote:
-> It seems the most robust: test for iomem, and jump to a slow path
-> copy, otherwise inline the kmap and memcpy
+On Thu, Apr 27, 2017 at 04:15:19PM +0100, David Howells wrote:
+> Eric Biggers <ebiggers3@gmail.com> wrote:
 > 
-> Every place doing memcpy from sgl will need that pattern to be
-> correct.
-
-Ok, sounds like a good place to start to me. I'll see what I can do for
-a v3 of this set. Though, I probably won't send anything until after the
-merge window.
-
->>> sg_miter will still fail when the sg contains __iomem, however I would
->>> expect that the sg_copy will work with iomem, by using the __iomem
->>> memcpy variant.
->>
->> Yes, that's true. Any sg_miters that ever see iomem will need to be
->> converted to support it. This isn't much different than the other
->> kmap(sg_page()) users I was converting that will also fail if they see
->> iomem. Though, I suspect an sg_miter user would be easier to convert to
->> iomem than a random kmap user.
+> > > > By the way: do we really need this in the kernel at all, given that it's
+> > > > just doing some math on data which userspace has access to?
+> > > 
+> > > It is the question about how we want the keys subsystem to operate. The DH
+> > > shared secret shall not be used as a key. But the DH operation is part of
+> > > the key subsystem. If there is never a case where the result of the DH
+> > > operation is used in the kernel, then the KDF can be removed and my
+> > > patches could be reverted. However, in this case, the entire DH business
+> > > could be questioned as this can easily be done in user space as well.
+> > > 
+> > 
+> > Well, who exactly is asking for Diffie-Hellman in the kernel at all?  If it
+> > can be done in userspace then it should be done there.  Having it in the
+> > kernel means having yet another API that's callable by unprivileged users
+> > and needs to be audited for security vulnerabilities.  Just because the
+> > kernel can support doing hashes or has an arbitrary-precision arithmetic
+> > library or whatever doesn't mean it's the right place to do random crypto
+> > stuff.
 > 
-> How? sg_miter seems like the next nightmare down this path, what is
-> sg_miter_next supposed to do when something hits an iomem sgl?
+> I understood that there is the possibility of offloading this to hardware.
+> 
 
-My proposal is roughly included in the draft I sent upthread. We add an
-sg_miter flag indicating the iteratee supports iomem and if miter finds
-iomem (with the support flag set) it sets ioaddr which is __iomem. The
-iteratee then just needs to null check addr and ioaddr and perform the
-appropriate action.
+Okay, but where is this hardware, where are drivers for it, and how do we know
+this API is actually going to be compatible with it?  Will it be just for
+performance, or for other reasons too?  None of this seems to have been
+explained.
 
-Logan
+Eric
