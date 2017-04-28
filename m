@@ -1,46 +1,50 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [PATCH 0/5] KEYS: fixes for new keyctl_dh_compute() KDF extension
-Date: Fri, 28 Apr 2017 17:56:03 +0200
-Message-ID: <2296178.cJbEENo9rQ@tauon.chronox.de>
-References: <20170420054633.14572-1-ebiggers3@gmail.com> <791.1493394780@warthog.procyon.org.uk>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Eric Biggers <ebiggers3@gmail.com>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org,
+From: Sabrina Dubroca <sd@queasysnail.net>
+Subject: [PATCH 0/7] crypto: aesni: provide generic gcm(aes)
+Date: Fri, 28 Apr 2017 18:11:55 +0200
+Message-ID: <cover.1493395785.git.sd@queasysnail.net>
+Cc: Sabrina Dubroca <sd@queasysnail.net>,
+        Hannes Frederic Sowa <hannes@stressinduktion.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        mathew.j.martineau@linux.intel.com,
-        Eric Biggers <ebiggers@google.com>
-To: David Howells <dhowells@redhat.com>
+        "David S. Miller" <davem@davemloft.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: netdev@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:59338 "EHLO mail.eperm.de"
+Received: from mx1.redhat.com ([209.132.183.28]:34380 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2998876AbdD1P4G (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 Apr 2017 11:56:06 -0400
-In-Reply-To: <791.1493394780@warthog.procyon.org.uk>
+        id S1164100AbdD1QMk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 28 Apr 2017 12:12:40 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Freitag, 28. April 2017, 17:53:00 CEST schrieb David Howells:
+The current aesni AES-GCM implementation only offers support for
+rfc4106(gcm(aes)).  This makes some things a little bit simpler
+(handling of associated data and authentication tag), but it means
+that non-IPsec users of gcm(aes) have to rely on
+gcm_base(ctr-aes-aesni,ghash-clmulni), which is much slower.
 
-Hi David,
+This patchset adds handling of all valid authentication tag lengths
+and of any associated data length to the assembly code, and exposes a
+generic gcm(aes) AEAD algorithm to the crypto API.
 
-> Stephan,
-> 
-> Eric Biggers <ebiggers3@gmail.com> wrote:
-> > This patch series fixes several bugs in the KDF extension to
-> > keyctl_dh_compute() currently sitting in keys-next: a way userspace could
-> > cause an infinite loop, two ways userspace could cause the use of
-> > uninitialized memory, a misalignment, and missing __user annotations.
-> 
-> Do you want to ack these or do they need fixing?
+With these patches, performance of MACsec on a single core increases
+by 40% (from 4.5Gbps to around 6.3Gbps).
 
-All patches except patch 3/5:
+Sabrina Dubroca (7):
+  crypto: aesni: make non-AVX AES-GCM work with any aadlen
+  crypto: aesni: make non-AVX AES-GCM work with all valid auth_tag_len
+  crypto: aesni: make AVX AES-GCM work with any aadlen
+  crypto: aesni: make AVX AES-GCM work with all valid auth_tag_len
+  crypto: aesni: make AVX2 AES-GCM work with any aadlen
+  crypto: aesni: make AVX2 AES-GCM work with all valid auth_tag_len
+  crypto: aesni: add generic gcm(aes)
 
-Acked-by: Stephan Mueller <smueller@chronox.de>
+ arch/x86/crypto/aesni-intel_asm.S        | 231 +++++++++++++++++++------
+ arch/x86/crypto/aesni-intel_avx-x86_64.S | 283 ++++++++++++++++++++++---------
+ arch/x86/crypto/aesni-intel_glue.c       | 208 +++++++++++++++++------
+ 3 files changed, 539 insertions(+), 183 deletions(-)
 
-For the patch 3/5 I would send an updated patch shortly which changes the 
-kmalloc to kzalloc.
-
-Ciao
-Stephan
+-- 
+2.12.2
