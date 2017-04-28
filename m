@@ -1,91 +1,63 @@
-From: Logan Gunthorpe <logang@deltatee.com>
-Subject: [PATCH] crypto: hifn_795x: Fix a handful of minor bugs spotted by eye
-Date: Fri, 28 Apr 2017 11:02:40 -0600
-Message-ID: <1493398960-25643-1-git-send-email-logang@deltatee.com>
-Cc: Logan Gunthorpe <logang@deltatee.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-To: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ale.deltatee.com ([207.54.116.67]:60759 "EHLO ale.deltatee.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755333AbdD1RDy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 Apr 2017 13:03:54 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Subject: Re: [PATCH v2 07/21] crypto: shash, caam: Make use of the new sg_map
+ helper function
+Date: Sat, 29 Apr 2017 01:51:47 +0800
+Message-ID: <20170428175147.GA9596@gondor.apana.org.au>
+References: <1493144468-22493-1-git-send-email-logang@deltatee.com>
+ <1493144468-22493-8-git-send-email-logang@deltatee.com>
+ <20170427035603.GA32212@gondor.apana.org.au>
+ <94123cbf-3287-f05e-7267-0bcf08ab0a8b@deltatee.com>
+ <20170428063039.GB6817@gondor.apana.org.au>
+ <5a08708b-c3b8-41fe-96de-607a109eacbd@deltatee.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: dri-devel-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org, dm-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
+ target-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>,
+ devel-gWbeCf7V1WCQmaza687I9mD2FQJk+8+b@public.gmane.org, "James E.J. Bottomley" <jejb-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>,
+ linux-scsi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nvdimm-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org,
+ linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Sumit Semwal <sumit.semwal-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
+ open-iscsi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org, linux-media-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+ intel-gfx-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org, sparmaintainer-GLv8BlqOqDDQT0dZR+AlfA@public.gmane.org,
+ linux-raid-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, megaraidlinux.pdl-dY08KVG/lbpWk0Htik3J/w@public.gmane.org,
+ Jens Axboe <axboe-tSWWG44O7X1aa/9Udqfwiw@public.gmane.org>,
+ "Martin K. Petersen" <martin.petersen-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>, netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+ Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>, linux-mmc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+ linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+ Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>,
+ "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>
+To: Logan Gunthorpe <logang-OTvnGxWRz7hWk0Htik3J/w@public.gmane.org>
+Return-path: <linux-nvdimm-bounces-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <5a08708b-c3b8-41fe-96de-607a109eacbd-OTvnGxWRz7hWk0Htik3J/w@public.gmane.org>
+List-Unsubscribe: <https://lists.01.org/mailman/options/linux-nvdimm>,
+ <mailto:linux-nvdimm-request-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.01.org/pipermail/linux-nvdimm/>
+List-Post: <mailto:linux-nvdimm-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org>
+List-Help: <mailto:linux-nvdimm-request-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.01.org/mailman/listinfo/linux-nvdimm>,
+ <mailto:linux-nvdimm-request-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org?subject=subscribe>
+Errors-To: linux-nvdimm-bounces-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org
+Sender: "Linux-nvdimm" <linux-nvdimm-bounces-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org>
+List-Id: linux-crypto.vger.kernel.org
 
-* Cleaned up the formatting of ablkcipher_get arguments so it complies
-  with kernel style
-* The offset in ablkcipher_get sould be added to the source, not the
-  destination. We rename it to soffset for clarity.
-* dst++ should be dst=sg_next(dst)
-* We call kunmap_atomic earlier so we only have to do it once.
-* If ablkcipher_get fails, we should probably ensure the request
-  completes with an error.
+On Fri, Apr 28, 2017 at 10:53:45AM -0600, Logan Gunthorpe wrote:
+> 
+> 
+> On 28/04/17 12:30 AM, Herbert Xu wrote:
+> > You are right.  Indeed the existing code looks buggy as they
+> > don't take sg->offset into account when doing the kmap.  Could
+> > you send me some patches that fix these problems first so that
+> > they can be easily backported?
+> 
+> Ok, I think the only buggy one in crypto is hifn_795x. Shash and caam
+> both do have the sg->offset accounted for. I'll send a patch for the
+> buggy one shortly.
 
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
----
- drivers/crypto/hifn_795x.c | 17 ++++++++++-------
- 1 file changed, 10 insertions(+), 7 deletions(-)
+I think they're all buggy when sg->offset is greater than PAGE_SIZE.
 
-diff --git a/drivers/crypto/hifn_795x.c b/drivers/crypto/hifn_795x.c
-index e09d405..4c19e4a 100644
---- a/drivers/crypto/hifn_795x.c
-+++ b/drivers/crypto/hifn_795x.c
-@@ -1619,8 +1619,9 @@ static int hifn_start_device(struct hifn_device *dev)
- 	return 0;
- }
- 
--static int ablkcipher_get(void *saddr, unsigned int *srestp, unsigned int offset,
--		struct scatterlist *dst, unsigned int size, unsigned int *nbytesp)
-+static int ablkcipher_get(void *saddr, unsigned int *srestp,
-+			  unsigned int soffset, struct scatterlist *dst,
-+			  unsigned int size, unsigned int *nbytesp)
- {
- 	unsigned int srest = *srestp, nbytes = *nbytesp, copy;
- 	void *daddr;
-@@ -1633,19 +1634,19 @@ static int ablkcipher_get(void *saddr, unsigned int *srestp, unsigned int offset
- 		copy = min3(srest, dst->length, size);
- 
- 		daddr = kmap_atomic(sg_page(dst));
--		memcpy(daddr + dst->offset + offset, saddr, copy);
-+		memcpy(daddr + dst->offset, saddr + soffset, copy);
- 		kunmap_atomic(daddr);
- 
- 		nbytes -= copy;
- 		size -= copy;
- 		srest -= copy;
- 		saddr += copy;
--		offset = 0;
-+		soffset = 0;
- 
- 		pr_debug("%s: copy: %u, size: %u, srest: %u, nbytes: %u.\n",
- 			 __func__, copy, size, srest, nbytes);
- 
--		dst++;
-+		dst = sg_next(dst);
- 		idx++;
- 	}
- 
-@@ -1699,13 +1700,15 @@ static void hifn_process_ready(struct ablkcipher_request *req, int error)
- 
- 			err = ablkcipher_get(saddr, &t->length, t->offset,
- 					dst, nbytes, &nbytes);
-+			kunmap_atomic(saddr);
-+
- 			if (err < 0) {
--				kunmap_atomic(saddr);
-+				if (!error)
-+					error = err;
- 				break;
- 			}
- 
- 			idx += err;
--			kunmap_atomic(saddr);
- 		}
- 
- 		hifn_cipher_walk_exit(&rctx->walk);
+Thanks,
 -- 
-2.1.4
+Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
