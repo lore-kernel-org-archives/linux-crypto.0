@@ -1,105 +1,388 @@
-From: <smallgroups@dudleycvs.org.uk>
-Subject: 26430 linux-crypto
-Date: Sun, 30 Apr 2017 11:30:58 -0000
-Message-ID: <149355185870.14991.8471822211372267336@hinet.net>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Update for 4.12
+Date: Mon, 1 May 2017 22:26:21 +0800
+Message-ID: <20170501142621.GA14379@gondor.apana.org.au>
+References: <20161119102748.GA4277@gondor.apana.org.au>
+ <20161213132414.GA7898@gondor.apana.org.au>
+ <20170223125141.GA17400@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: application/zip; name="9869986954.zip"
-Content-Transfer-Encoding: base64
-To: <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 114-26-216-157.dynamic-ip.hinet.net ([114.26.216.157]:56960
-        "HELO hinet.net" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with SMTP id S935098AbdD3LbG (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 30 Apr 2017 07:31:06 -0400
-Content-Disposition: attachment
+Received: from [128.1.224.119] ([128.1.224.119]:40176 "EHLO deadmen.hmeau.com"
+        rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1424756AbdEAO0n (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 1 May 2017 10:26:43 -0400
+Content-Disposition: inline
+In-Reply-To: <20170223125141.GA17400@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-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
-AL0SAAAAAA==
+Hi Linus: 
+
+Here is the crypto update for 4.12:
+
+API:
+
+- Add batch registration for acomp/scomp.
+- Change acomp testing to non-unique compressed result.
+- Extend algorithm name limit to 128 bytes.
+- Require setkey before accept(2) in algif_aead.
+
+Algorithms:
+
+- Add support for deflate rfc1950 (zlib).
+
+Drivers:
+
+- Add accelerated crct10dif for powerpc.
+- Add crc32 in stm32.
+- Add sha384/sha512 in ccp.
+- Add 3des/gcm(aes) for v5 devices in ccp.
+- Add Queue Interface (QI) backend support in caam.
+- Add new Exynos RNG driver.
+- Add ThunderX ZIP driver.
+- Add driver for hardware random generator on MT7623 SoC.
+
+
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+
+
+Ard Biesheuvel (2):
+      crypto: arm/aes-neonbs - resolve fallback cipher at runtime
+      crypto: algapi - annotate expected branch behavior in crypto_inc()
+
+Arnd Bergmann (1):
+      crypto: zip - add a cast for printing atomic64_t values
+
+Christophe Jaillet (1):
+      crypto: chcr - Fix error handling related to 'chcr_alloc_shash'
+
+Colin Ian King (2):
+      crypto: bcm - fix spelling mistake: "genereate" -> "generate"
+      crypto: crypto4xx - rename ce_ring_contol to ce_ring_control
+
+Dan Carpenter (1):
+      crypto: zip - Memory corruption in zip_clear_stats()
+
+Daniel Axtens (4):
+      crypto: powerpc - Factor out the core CRC vpmsum algorithm
+      crypto: powerpc - Re-enable non-REFLECTed CRCs
+      crypto: powerpc - Add CRC-T10DIF acceleration
+      crypto: powerpc - Stress test for vpmsum implementations
+
+Eric Biggers (7):
+      crypto: gf128mul - fix some comments
+      crypto: gf128mul - remove xx() macro
+      crypto: gf128mul - rename the byte overflow tables
+      crypto: gf128mul - constify 4k and 64k multiplication tables
+      crypto: kpp - constify buffer passed to crypto_kpp_set_secret()
+      crypto: testmgr - constify all test vectors
+      crypto: xts,lrw - fix out-of-bounds write after kmalloc failure
+
+Fabien DESSENNE (6):
+      crypto: doc - fix typo (struct sdesc)
+      dt-bindings: Document STM32 CRC bindings
+      crypto: stm32 - Support for STM32 CRC32 crypto module
+      ARM: dts: stm32: Add CRC support to stm32f746
+      ARM: dts: stm32: enable CRC on stm32746g-eval board
+      ARM: configs: stm32: Add crypto support
+
+Gary R Hook (11):
+      crypto: ccp - Assign DMA commands to the channel's CCP
+      crypto: ccp - Make some CCP DMA channels private
+      crypto: ccp - Add SHA-2 384- and 512-bit support
+      crypto: ccp - Enable 3DES function on v5 CCPs
+      crypto: ccp - Enable support for AES GCM on v5 CCPs
+      crypto: ccp - Remove redundant cpu-to-le32 macros
+      crypto: ccp - Rearrange structure members to minimize size
+      crypto: ccp - Use only the relevant interrupt bits
+      crypto: ccp - Disable interrupts early on unload
+      crypto: ccp - Change ISR handler method for a v3 CCP
+      crypto: ccp - Change ISR handler method for a v5 CCP
+
+Geliang Tang (1):
+      crypto: ixp4xx - Use sg_virt()
+
+Giovanni Cabiddu (4):
+      crypto: acomp - allow registration of multiple acomps
+      crypto: testmgr - replace compression known answer test
+      crypto: scomp - allow registration of multiple scomps
+      crypto: scomp - add support for deflate rfc1950 (zlib)
+
+Haren Myneni (1):
+      crypto: nx - Update MAINTAINERS entry for 842 compression
+
+Harsh Jain (4):
+      crypto: chcr - Increase priority of AEAD algos.
+      crypto: chcr - Set hmac_ctrl bit to use HW register HMAC_CFG[456]
+      crypto: chcr - Fix txq ids.
+      crypto: chcr - Add fallback for AEAD algos
+
+Heiner Kallweit (4):
+      clk: meson-gxbb: expose clock CLKID_RNG0
+      dt-bindings: rng: add clock to DT binding documentation for hwrng
+      ARM64: dts: meson-gx: add clock CLKID_RNG0 to hwrng node
+      hwrng: meson - add clock handling to driver
+
+Herbert Xu (7):
+      Merge git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux
+      Merge git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6
+      crypto: user - Prepare for CRYPTO_MAX_ALG_NAME expansion
+      crypto: af_alg - Allow arbitrarily long algorithm names
+      xfrm: Prepare for CRYPTO_MAX_ALG_NAME expansion
+      crypto: api - Extend algorithm name limit to 128 bytes
+      Revert "crypto: arm64/sha - Add constant operand modifier to ASM_EXPORT"
+
+Horia Geantă (10):
+      soc/qman: export volatile dequeue related structs
+      soc/qman: add dedicated channel ID for CAAM
+      soc/qman: export non-programmable FQD fields query
+      soc/qman: add macros needed by caam/qi driver
+      crypto: caam - avoid double inclusion in desc_constr.h
+      crypto: caam - add Queue Interface (QI) backend support
+      crypto: caam/qi - add ablkcipher and authenc algorithms
+      crypto: caam - fix JR platform device subsequent (re)creations
+      crypto: caam - fix invalid dereference in caam_rsa_init_tfm()
+      crypto: caam - fix RNG deinstantiation error checking
+
+Jason A. Donenfeld (4):
+      padata: avoid race in reordering
+      md5: remove from lib and only live in crypto
+      padata: free correct variable
+      padata: get_next is never NULL
+
+Krzysztof Kozlowski (6):
+      MAINTAINERS: Add maintianer entry for crypto/s5p-sss
+      crypto: s5p-sss - Close possible race for completed requests
+      crypto: s5p-sss - Remove unused variant field from state container
+      crypto: s5p-sss - Document the struct s5p_aes_dev
+      linux/kernel.h: Add ALIGN_DOWN macro
+      crypto: exynos - Add new Exynos RNG driver
+
+Mahipal Challa (3):
+      crypto: zip - Add ThunderX ZIP driver core
+      crypto: zip - Wire-up Compression / decompression HW offload
+      crypto: zip - Add Compression/Decompression statistics
+
+Marcelo Cerri (3):
+      crypto: cbc - Propagate NEED_FALLBACK bit
+      crypto: ctr - Propagate NEED_FALLBACK bit
+      crypto: testmgr - mark ctr(des3_ede) as fips_allowed
+
+Markus Elfring (1):
+      hwrng: n2 - Use devm_kcalloc() in n2rng_probe()
+
+Matthias Kaehlcke (1):
+      crypto: arm64/sha - Add constant operand modifier to ASM_EXPORT
+
+Michael Davidson (1):
+      crypto, x86: aesni - fix token pasting for clang
+
+Michael Ellerman (1):
+      crypto: crct10dif-vpmsum - Fix missing preempt_disable()
+
+Milan Broz (1):
+      crypto: testmgr - Allow ecb(cipher_null) in FIPS mode
+
+Myungho Jung (1):
+      crypto: lz4 - fixed decompress function to return error code
+
+Ondrej Mosnáček (4):
+      crypto: gf128mul - define gf128mul_x_* in gf128mul.h
+      crypto: gf128mul - switch gf128mul_x_ble to le128
+      crypto: glue_helper - remove the le128_gf128mul_x_ble function
+      crypto: xts - drop gf128mul dependency
+
+Prarit Bhargava (2):
+      hwrng: amd - Revert managed API changes
+      hwrng: geode - Revert managed API changes
+
+Rick Altherr (3):
+      hwrng: timeriomem - Migrate to new API
+      hwrng: timeriomem - Shorten verbose type and variable names
+      hwrng: timeriomem - Improve performance for sub-jiffie update periods
+
+Ryder Lee (8):
+      crypto: mediatek - rework interrupt handler
+      crypto: mediatek - add MTK_* prefix and correct annotations.
+      crypto: mediatek - make mtk_sha_xmit() more generic
+      crypto: mediatek - simplify descriptor ring management
+      crypto: mediatek - add queue_task tasklet
+      crypto: mediatek - fix error handling in mtk_aes_complete()
+      crypto: mediatek - add mtk_aes_gcm_tag_verify()
+      crypto: mediatek - make hardware operation flow more efficient
+
+Sean Wang (2):
+      dt-bindings: hwrng: Add Mediatek hardware random generator bindings
+      hwrng: mtk - Add driver for hardware random generator on MT7623 SoC
+
+Stephan Mueller (2):
+      crypto: DRBG - initialize SGL only once
+      crypto: algif_aead - Require setkey before accept(2)
+
+Thomas Petazzoni (2):
+      hwrng: omap - move clock related code to omap_rng_probe()
+      dt-bindings: rng: clocks property on omap_rng not always mandatory
+
+Wei Yongjun (2):
+      crypto: caam - fix error return code in caam_qi_init()
+      crypto: stm32 - Fix OF module alias information
+
+ Documentation/crypto/api-samples.rst               |    6 +-
+ .../devicetree/bindings/crypto/st,stm32-crc.txt    |   16 +
+ .../devicetree/bindings/rng/amlogic,meson-rng.txt  |   11 +-
+ Documentation/devicetree/bindings/rng/mtk-rng.txt  |   18 +
+ Documentation/devicetree/bindings/rng/omap_rng.txt |    3 +-
+ MAINTAINERS                                        |   18 +-
+ arch/arm/boot/dts/stm32746g-eval.dts               |    4 +
+ arch/arm/boot/dts/stm32f746.dtsi                   |    7 +
+ arch/arm/configs/stm32_defconfig                   |    2 +
+ arch/arm/crypto/Kconfig                            |    2 +-
+ arch/arm/crypto/aes-neonbs-glue.c                  |   60 +-
+ arch/arm64/boot/dts/amlogic/meson-gx.dtsi          |    2 +-
+ arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi        |    5 +
+ arch/metag/kernel/stacktrace.c                     |    2 -
+ arch/powerpc/crypto/Makefile                       |    3 +
+ arch/powerpc/crypto/crc-vpmsum_test.c              |  137 ++
+ arch/powerpc/crypto/crc32-vpmsum_core.S            |  755 +++++++
+ arch/powerpc/crypto/crc32c-vpmsum_asm.S            |  715 +-----
+ arch/powerpc/crypto/crct10dif-vpmsum_asm.S         |  850 +++++++
+ arch/powerpc/crypto/crct10dif-vpmsum_glue.c        |  128 ++
+ arch/x86/crypto/aes_ctrby8_avx-x86_64.S            |    7 +-
+ arch/x86/crypto/camellia_glue.c                    |    4 +-
+ arch/x86/crypto/glue_helper.c                      |    3 +-
+ arch/x86/crypto/serpent_sse2_glue.c                |    4 +-
+ arch/x86/crypto/twofish_glue_3way.c                |    4 +-
+ arch/x86/include/asm/crypto/glue_helper.h          |   10 -
+ crypto/Kconfig                                     |   18 +-
+ crypto/acompress.c                                 |   29 +
+ crypto/af_alg.c                                    |    4 +-
+ crypto/algapi.c                                    |    4 +-
+ crypto/algif_aead.c                                |  157 +-
+ crypto/cbc.c                                       |   15 +-
+ crypto/crypto_user.c                               |   18 +-
+ crypto/ctr.c                                       |   23 +-
+ crypto/deflate.c                                   |   61 +-
+ crypto/dh.c                                        |    3 +-
+ crypto/drbg.c                                      |    5 +-
+ crypto/ecdh.c                                      |    3 +-
+ crypto/gf128mul.c                                  |  111 +-
+ crypto/lrw.c                                       |    7 +-
+ crypto/lz4.c                                       |    2 +-
+ crypto/lz4hc.c                                     |    2 +-
+ crypto/md5.c                                       |   95 +-
+ crypto/scompress.c                                 |   29 +
+ crypto/testmgr.c                                   |  112 +-
+ crypto/testmgr.h                                   |  587 ++---
+ crypto/xts.c                                       |   45 +-
+ drivers/char/hw_random/Kconfig                     |   28 +-
+ drivers/char/hw_random/Makefile                    |    2 +-
+ drivers/char/hw_random/amd-rng.c                   |   42 +-
+ drivers/char/hw_random/exynos-rng.c                |  231 --
+ drivers/char/hw_random/geode-rng.c                 |   50 +-
+ drivers/char/hw_random/meson-rng.c                 |   22 +
+ drivers/char/hw_random/mtk-rng.c                   |  168 ++
+ drivers/char/hw_random/n2-drv.c                    |    4 +-
+ drivers/char/hw_random/omap-rng.c                  |   22 +-
+ drivers/char/hw_random/timeriomem-rng.c            |  157 +-
+ drivers/clk/meson/gxbb.h                           |    2 +-
+ drivers/crypto/Kconfig                             |   24 +
+ drivers/crypto/Makefile                            |    3 +
+ drivers/crypto/amcc/crypto4xx_core.c               |    2 +-
+ drivers/crypto/amcc/crypto4xx_reg_def.h            |    2 +-
+ drivers/crypto/bcm/util.c                          |    2 +-
+ drivers/crypto/caam/Kconfig                        |   20 +-
+ drivers/crypto/caam/Makefile                       |    5 +
+ drivers/crypto/caam/caamalg.c                      |    9 +-
+ drivers/crypto/caam/caamalg_desc.c                 |   77 +-
+ drivers/crypto/caam/caamalg_desc.h                 |   15 +-
+ drivers/crypto/caam/caamalg_qi.c                   | 2387 ++++++++++++++++++++
+ drivers/crypto/caam/caampkc.c                      |    2 +-
+ drivers/crypto/caam/ctrl.c                         |  121 +-
+ drivers/crypto/caam/desc_constr.h                  |    5 +
+ drivers/crypto/caam/intern.h                       |   25 +-
+ drivers/crypto/caam/qi.c                           |  805 +++++++
+ drivers/crypto/caam/qi.h                           |  201 ++
+ drivers/crypto/caam/sg_sw_qm.h                     |  108 +
+ drivers/crypto/cavium/Makefile                     |    4 +
+ drivers/crypto/cavium/zip/Makefile                 |   11 +
+ drivers/crypto/cavium/zip/common.h                 |  202 ++
+ drivers/crypto/cavium/zip/zip_crypto.c             |  313 +++
+ drivers/crypto/cavium/zip/zip_crypto.h             |   79 +
+ drivers/crypto/cavium/zip/zip_deflate.c            |  200 ++
+ drivers/crypto/cavium/zip/zip_deflate.h            |   62 +
+ drivers/crypto/cavium/zip/zip_device.c             |  202 ++
+ drivers/crypto/cavium/zip/zip_device.h             |  108 +
+ drivers/crypto/cavium/zip/zip_inflate.c            |  223 ++
+ drivers/crypto/cavium/zip/zip_inflate.h            |   62 +
+ drivers/crypto/cavium/zip/zip_main.c               |  729 ++++++
+ drivers/crypto/cavium/zip/zip_main.h               |  121 +
+ drivers/crypto/cavium/zip/zip_mem.c                |  114 +
+ drivers/crypto/cavium/zip/zip_mem.h                |   78 +
+ drivers/crypto/cavium/zip/zip_regs.h               | 1347 +++++++++++
+ drivers/crypto/ccp/Makefile                        |    2 +
+ drivers/crypto/ccp/ccp-crypto-aes-galois.c         |  252 +++
+ drivers/crypto/ccp/ccp-crypto-des3.c               |  254 +++
+ drivers/crypto/ccp/ccp-crypto-main.c               |   22 +
+ drivers/crypto/ccp/ccp-crypto-sha.c                |   22 +
+ drivers/crypto/ccp/ccp-crypto.h                    |   44 +-
+ drivers/crypto/ccp/ccp-dev-v3.c                    |  121 +-
+ drivers/crypto/ccp/ccp-dev-v5.c                    |  169 +-
+ drivers/crypto/ccp/ccp-dev.c                       |    5 +-
+ drivers/crypto/ccp/ccp-dev.h                       |   35 +-
+ drivers/crypto/ccp/ccp-dmaengine.c                 |   42 +
+ drivers/crypto/ccp/ccp-ops.c                       |  522 +++++
+ drivers/crypto/ccp/ccp-pci.c                       |    2 +
+ drivers/crypto/chelsio/chcr_algo.c                 |  304 ++-
+ drivers/crypto/chelsio/chcr_algo.h                 |    4 +
+ drivers/crypto/chelsio/chcr_core.h                 |    2 +
+ drivers/crypto/chelsio/chcr_crypto.h               |   10 +-
+ drivers/crypto/exynos-rng.c                        |  389 ++++
+ drivers/crypto/ixp4xx_crypto.c                     |    2 +-
+ drivers/crypto/mediatek/mtk-aes.c                  |  421 ++--
+ drivers/crypto/mediatek/mtk-platform.c             |   15 +-
+ drivers/crypto/mediatek/mtk-platform.h             |   56 +-
+ drivers/crypto/mediatek/mtk-sha.c                  |  309 +--
+ drivers/crypto/qat/qat_common/qat_asym_algs.c      |    2 +-
+ drivers/crypto/s5p-sss.c                           |   35 +-
+ drivers/crypto/stm32/Kconfig                       |    7 +
+ drivers/crypto/stm32/Makefile                      |    2 +
+ drivers/crypto/stm32/stm32_crc32.c                 |  324 +++
+ drivers/gpu/drm/udl/udl_fb.c                       |    2 +-
+ drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c    |    9 +
+ drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.h     |    1 +
+ drivers/net/ethernet/chelsio/cxgb4/t4fw_api.h      |    3 +-
+ drivers/soc/fsl/qbman/qman.c                       |    4 +-
+ drivers/soc/fsl/qbman/qman_ccsr.c                  |    6 +-
+ drivers/soc/fsl/qbman/qman_priv.h                  |   97 -
+ include/crypto/gf128mul.h                          |   87 +-
+ include/crypto/internal/acompress.h                |    3 +
+ include/crypto/internal/scompress.h                |    3 +
+ include/crypto/kpp.h                               |    6 +-
+ include/crypto/xts.h                               |    2 +-
+ include/dt-bindings/clock/gxbb-clkc.h              |    3 +-
+ include/linux/ccp.h                                |   70 +-
+ include/linux/crypto.h                             |    2 +-
+ include/linux/cryptohash.h                         |    5 -
+ include/linux/kernel.h                             |    1 +
+ include/soc/fsl/qman.h                             |  109 +
+ include/uapi/linux/cryptouser.h                    |   10 +-
+ include/video/udlfb.h                              |    2 +-
+ kernel/padata.c                                    |   20 +-
+ lib/Makefile                                       |    2 +-
+ lib/md5.c                                          |   95 -
+ net/xfrm/xfrm_user.c                               |    6 +-
+ 144 files changed, 13867 insertions(+), 2557 deletions(-)
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
