@@ -1,51 +1,592 @@
-From: Sowmini Varadhan <sowmini.varadhan@oracle.com>
-Subject: Re: IPsec PFP support on linux
-Date: Tue, 2 May 2017 10:05:26 -0400
-Message-ID: <20170502140526.GF5843@oracle.com>
-References: <20170502123238.GE5843@oracle.com>
- <B4EE88ED-B403-42C3-A6D8-1A2526F1DA67@nohats.ca>
+From: Gary R Hook <gary.hook@amd.com>
+Subject: [PATCH V2] crypto: ccp - Add debugfs entries for CCP information
+Date: Tue, 2 May 2017 17:33:40 -0500
+Message-ID: <20170502223220.6039.25937.stgit@taos.amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Cc: steffen.klassert@secunet.com, borisp@mellanox.com, swan@lists.libreswan.org,
- netdev@vger.kernel.org, ilant@mellanox.com, linux-crypto@vger.kernel.org,
- herbert@gondor.apana.org.au
-To: Paul Wouters <paul@nohats.ca>
-Return-path: <swan-bounces@lists.libreswan.org>
-Content-Disposition: inline
-In-Reply-To: <B4EE88ED-B403-42C3-A6D8-1A2526F1DA67@nohats.ca>
-List-Unsubscribe: <https://lists.libreswan.org/mailman/options/swan>,
- <mailto:swan-request@lists.libreswan.org?subject=unsubscribe>
-List-Archive: <https://lists.libreswan.org/pipermail/swan/>
-List-Post: <mailto:swan@lists.libreswan.org>
-List-Help: <mailto:swan-request@lists.libreswan.org?subject=help>
-List-Subscribe: <https://lists.libreswan.org/mailman/listinfo/swan>,
- <mailto:swan-request@lists.libreswan.org?subject=subscribe>
-Errors-To: swan-bounces@lists.libreswan.org
-Sender: "Swan" <swan-bounces@lists.libreswan.org>
-List-Id: linux-crypto.vger.kernel.org
+Cc: <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>
+To: <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-cys01nam02on0077.outbound.protection.outlook.com ([104.47.37.77]:8000
+        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751327AbdEBWdt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 2 May 2017 18:33:49 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On (05/02/17 09:58), Paul Wouters wrote:
->    I think you want to use Opportunistic IPsec, eg see 
->    https://libreswan.org/wiki/HOWTO:_Opportunistic_IPsec
+Expose some data about the configuration and operation of the CCP
+through debugfs entries: device name, capabilities, configuration,
+statistics.
 
-I dont think that what I want is opportunistic ipsec..
+Allow the user to reset the counters to zero by writing (any value)
+to the 'stats' file. This can be done per queue or per device.
 
-taking an extreme example, I can set up the ipsec tunnels with 
-esp-null for *.5001 and 5001.* (and that's how I'm able to
-trigger quick mode in my experiment).
+Changes from V1:
+ - Correct polarity of test when destroying devices at module unload
 
-But I want each 5-tuple to/from 5001 to get its own SPI. That
-is not happening in my case. 
+Signed-off-by: Gary R Hook <gary.hook@amd.com>
+---
+ drivers/crypto/ccp/Makefile      |    3 
+ drivers/crypto/ccp/ccp-debugfs.c |  345 ++++++++++++++++++++++++++++++++++++++
+ drivers/crypto/ccp/ccp-dev-v5.c  |   28 +++
+ drivers/crypto/ccp/ccp-dev.c     |    2 
+ drivers/crypto/ccp/ccp-dev.h     |   20 ++
+ 5 files changed, 395 insertions(+), 3 deletions(-)
+ create mode 100644 drivers/crypto/ccp/ccp-debugfs.c
 
-If I used OE, I would *never* get a per-5-tuple SPI, right?
-(I can give this a try later today but the rfc definition of OE is
-not what I have in mind- I really want PFP, not OE).
-
->    Note that IKEv2 also allows you to define one connection and instantiate
->     a connection based on the trigger packet whose src/dst proto/port are
->    included in the IKEv2 packet as traffic selectors. See RFC7296 and
->    "narrowing".
-
-yes, the rfc's permit this, I'm not sure how to set up my 
-SPD for this though.
+diff --git a/drivers/crypto/ccp/Makefile b/drivers/crypto/ccp/Makefile
+index 60919a3ec53b..59493fd3a751 100644
+--- a/drivers/crypto/ccp/Makefile
++++ b/drivers/crypto/ccp/Makefile
+@@ -4,7 +4,8 @@ ccp-objs := ccp-dev.o \
+ 	    ccp-dev-v3.o \
+ 	    ccp-dev-v5.o \
+ 	    ccp-platform.o \
+-	    ccp-dmaengine.o
++	    ccp-dmaengine.o \
++	    ccp-debugfs.o
+ ccp-$(CONFIG_PCI) += ccp-pci.o
+ 
+ obj-$(CONFIG_CRYPTO_DEV_CCP_CRYPTO) += ccp-crypto.o
+diff --git a/drivers/crypto/ccp/ccp-debugfs.c b/drivers/crypto/ccp/ccp-debugfs.c
+new file mode 100644
+index 000000000000..6d86693b117f
+--- /dev/null
++++ b/drivers/crypto/ccp/ccp-debugfs.c
+@@ -0,0 +1,345 @@
++/*
++ * AMD Cryptographic Coprocessor (CCP) driver
++ *
++ * Copyright (C) 2017 Advanced Micro Devices, Inc.
++ *
++ * Author: Gary R Hook <gary.hook@amd.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ */
++
++#include <linux/debugfs.h>
++#include <linux/ccp.h>
++
++#include "ccp-dev.h"
++
++/* DebugFS helpers */
++#define	OBUFP		(obuf + oboff)
++#define	OBUFLEN		512
++#define	OBUFSPC		(OBUFLEN - oboff)
++#define	OSCNPRINTF(fmt, ...) \
++		scnprintf(OBUFP, OBUFSPC, fmt, ## __VA_ARGS__)
++
++#define BUFLEN	63
++
++#define	RI_VERSION_NUM	0x0000003F
++#define	RI_AES_PRESENT	0x00000040
++#define	RI_3DES_PRESENT	0x00000080
++#define	RI_SHA_PRESENT	0x00000100
++#define	RI_RSA_PRESENT	0x00000200
++#define	RI_ECC_PRESENT	0x00000400
++#define	RI_ZDE_PRESENT	0x00000800
++#define	RI_ZCE_PRESENT	0x00001000
++#define	RI_TRNG_PRESENT	0x00002000
++#define	RI_ELFC_PRESENT	0x00004000
++#define	RI_ELFC_SHIFT	14
++#define	RI_NUM_VQM	0x00078000
++#define	RI_NVQM_SHIFT	15
++#define	RI_NVQM(r)	(((r) * RI_NUM_VQM) >> RI_NVQM_SHIFT)
++#define	RI_LSB_ENTRIES	0x0FF80000
++#define	RI_NLSB_SHIFT	19
++#define	RI_NLSB(r)	(((r) * RI_LSB_ENTRIES) >> RI_NLSB_SHIFT)
++
++static ssize_t ccp5_debugfs_info_read(struct file *filp, char __user *ubuf,
++				      size_t count, loff_t *offp)
++{
++	struct ccp_device *ccp = filp->private_data;
++	unsigned int oboff = 0;
++	unsigned int regval;
++	ssize_t ret;
++	char *obuf;
++
++	if (!ccp)
++		return 0;
++
++	obuf = kmalloc(OBUFLEN, GFP_KERNEL);
++	if (!obuf)
++		return -ENOMEM;
++
++	oboff += OSCNPRINTF("Device name: %s\n", ccp->name);
++	oboff += OSCNPRINTF("   RNG name: %s\n", ccp->rngname);
++	oboff += OSCNPRINTF("   # Queues: %d\n", ccp->cmd_q_count);
++	oboff += OSCNPRINTF("     # Cmds: %d\n", ccp->cmd_count);
++
++	regval = ioread32(ccp->io_regs + CMD5_PSP_CCP_VERSION);
++	oboff += OSCNPRINTF("    Version: %d\n", regval & RI_VERSION_NUM);
++	oboff += OSCNPRINTF("    Engines:");
++	if (regval & RI_AES_PRESENT)
++		oboff += OSCNPRINTF(" AES");
++	if (regval & RI_3DES_PRESENT)
++		oboff += OSCNPRINTF(" 3DES");
++	if (regval & RI_SHA_PRESENT)
++		oboff += OSCNPRINTF(" SHA");
++	if (regval & RI_RSA_PRESENT)
++		oboff += OSCNPRINTF(" RSA");
++	if (regval & RI_ECC_PRESENT)
++		oboff += OSCNPRINTF(" ECC");
++	if (regval & RI_ZDE_PRESENT)
++		oboff += OSCNPRINTF(" ZDE");
++	if (regval & RI_ZCE_PRESENT)
++		oboff += OSCNPRINTF(" ZCE");
++	if (regval & RI_TRNG_PRESENT)
++		oboff += OSCNPRINTF(" TRNG");
++	oboff += OSCNPRINTF("\n");
++	oboff += OSCNPRINTF("     Queues: %d\n",
++		   (regval & RI_NUM_VQM) >> RI_NVQM_SHIFT);
++	oboff += OSCNPRINTF("LSB Entries: %d\n",
++		   (regval & RI_LSB_ENTRIES) >> RI_NLSB_SHIFT);
++
++	ret = simple_read_from_buffer(ubuf, count, offp, obuf, oboff);
++	kfree(obuf);
++
++	return ret;
++}
++
++/* Return a formatted buffer containing the current
++ * statistics across all queues for a CCP.
++ */
++static ssize_t ccp5_debugfs_stats_read(struct file *filp, char __user *ubuf,
++				       size_t count, loff_t *offp)
++{
++	struct ccp_device *ccp = filp->private_data;
++	unsigned long total_xts_aes_ops = 0;
++	unsigned long total_3des_ops = 0;
++	unsigned long total_aes_ops = 0;
++	unsigned long total_sha_ops = 0;
++	unsigned long total_rsa_ops = 0;
++	unsigned long total_ecc_ops = 0;
++	unsigned long total_pt_ops = 0;
++	unsigned long total_ops = 0;
++	unsigned int oboff = 0;
++	ssize_t ret = 0;
++	unsigned int i;
++	char *obuf;
++
++	for (i = 0; i < ccp->cmd_q_count; i++) {
++		struct ccp_cmd_queue *cmd_q = &ccp->cmd_q[i];
++
++		total_ops += cmd_q->total_ops;
++		total_aes_ops += cmd_q->total_aes_ops;
++		total_xts_aes_ops += cmd_q->total_xts_aes_ops;
++		total_3des_ops += cmd_q->total_3des_ops;
++		total_sha_ops += cmd_q->total_sha_ops;
++		total_rsa_ops += cmd_q->total_rsa_ops;
++		total_pt_ops += cmd_q->total_pt_ops;
++		total_ecc_ops += cmd_q->total_ecc_ops;
++	}
++
++	obuf = kmalloc(OBUFLEN, GFP_KERNEL);
++	if (!obuf)
++		return -ENOMEM;
++
++	oboff += OSCNPRINTF("Total Interrupts Handled: %ld\n",
++			    ccp->total_interrupts);
++	oboff += OSCNPRINTF("        Total Operations: %ld\n",
++			    total_ops);
++	oboff += OSCNPRINTF("                     AES: %ld\n",
++			    total_aes_ops);
++	oboff += OSCNPRINTF("                 XTS AES: %ld\n",
++			    total_xts_aes_ops);
++	oboff += OSCNPRINTF("                     SHA: %ld\n",
++			    total_3des_ops);
++	oboff += OSCNPRINTF("                     SHA: %ld\n",
++			    total_sha_ops);
++	oboff += OSCNPRINTF("                     RSA: %ld\n",
++			    total_rsa_ops);
++	oboff += OSCNPRINTF("               Pass-Thru: %ld\n",
++			    total_pt_ops);
++	oboff += OSCNPRINTF("                     ECC: %ld\n",
++			    total_ecc_ops);
++
++	ret = simple_read_from_buffer(ubuf, count, offp, obuf, oboff);
++	kfree(obuf);
++
++	return ret;
++}
++
++/* Reset the counters in a queue
++ */
++static void ccp5_debugfs_reset_queue_stats(struct ccp_cmd_queue *cmd_q)
++{
++	cmd_q->total_ops = 0L;
++	cmd_q->total_aes_ops = 0L;
++	cmd_q->total_xts_aes_ops = 0L;
++	cmd_q->total_3des_ops = 0L;
++	cmd_q->total_sha_ops = 0L;
++	cmd_q->total_rsa_ops = 0L;
++	cmd_q->total_pt_ops = 0L;
++	cmd_q->total_ecc_ops = 0L;
++}
++
++/* A value was written to the stats variable, which
++ * should be used to reset the queue counters across
++ * that device.
++ */
++static ssize_t ccp5_debugfs_stats_write(struct file *filp,
++					const char __user *ubuf,
++					size_t count, loff_t *offp)
++{
++	struct ccp_device *ccp = filp->private_data;
++	int i;
++
++	for (i = 0; i < ccp->cmd_q_count; i++)
++		ccp5_debugfs_reset_queue_stats(&ccp->cmd_q[i]);
++	ccp->total_interrupts = 0L;
++
++	return count;
++}
++
++/* Return a formatted buffer containing the current information
++ * for that queue
++ */
++static ssize_t ccp5_debugfs_queue_read(struct file *filp, char __user *ubuf,
++				       size_t count, loff_t *offp)
++{
++	struct ccp_cmd_queue *cmd_q = filp->private_data;
++	unsigned int oboff = 0;
++	unsigned int regval;
++	ssize_t ret;
++	char *obuf;
++
++	if (!cmd_q)
++		return 0;
++
++	obuf = kmalloc(OBUFLEN, GFP_KERNEL);
++	if (!obuf)
++		return -ENOMEM;
++
++	oboff += OSCNPRINTF("  Total Queue Operations: %ld\n",
++			    cmd_q->total_ops);
++	oboff += OSCNPRINTF("                     AES: %ld\n",
++			    cmd_q->total_aes_ops);
++	oboff += OSCNPRINTF("                 XTS AES: %ld\n",
++			    cmd_q->total_xts_aes_ops);
++	oboff += OSCNPRINTF("                     SHA: %ld\n",
++			    cmd_q->total_3des_ops);
++	oboff += OSCNPRINTF("                     SHA: %ld\n",
++			    cmd_q->total_sha_ops);
++	oboff += OSCNPRINTF("                     RSA: %ld\n",
++			    cmd_q->total_rsa_ops);
++	oboff += OSCNPRINTF("               Pass-Thru: %ld\n",
++			    cmd_q->total_pt_ops);
++	oboff += OSCNPRINTF("                     ECC: %ld\n",
++			    cmd_q->total_ecc_ops);
++
++	regval = ioread32(cmd_q->reg_int_enable);
++	oboff += OSCNPRINTF("      Enabled Interrupts:");
++	if (regval & INT_EMPTY_QUEUE)
++		oboff += OSCNPRINTF(" EMPTY");
++	if (regval & INT_QUEUE_STOPPED)
++		oboff += OSCNPRINTF(" STOPPED");
++	if (regval & INT_ERROR)
++		oboff += OSCNPRINTF(" ERROR");
++	if (regval & INT_COMPLETION)
++		oboff += OSCNPRINTF(" COMPLETION");
++	oboff += OSCNPRINTF("\n");
++
++	ret = simple_read_from_buffer(ubuf, count, offp, obuf, oboff);
++	kfree(obuf);
++
++	return ret;
++}
++
++/* A value was written to the stats variable for a
++ * queue. Reset the queue counters to this value.
++ */
++static ssize_t ccp5_debugfs_queue_write(struct file *filp,
++					const char __user *ubuf,
++					size_t count, loff_t *offp)
++{
++	struct ccp_cmd_queue *cmd_q = filp->private_data;
++
++	ccp5_debugfs_reset_queue_stats(cmd_q);
++
++	return count;
++}
++
++static const struct file_operations ccp_debugfs_info_ops = {
++	.owner = THIS_MODULE,
++	.open = simple_open,
++	.read = ccp5_debugfs_info_read,
++	.write = NULL,
++};
++
++static const struct file_operations ccp_debugfs_queue_ops = {
++	.owner = THIS_MODULE,
++	.open = simple_open,
++	.read = ccp5_debugfs_queue_read,
++	.write = ccp5_debugfs_queue_write,
++};
++
++static const struct file_operations ccp_debugfs_stats_ops = {
++	.owner = THIS_MODULE,
++	.open = simple_open,
++	.read = ccp5_debugfs_stats_read,
++	.write = ccp5_debugfs_stats_write,
++};
++
++static struct dentry *ccp_debugfs_dir;
++static DEFINE_RWLOCK(ccp_debugfs_lock);
++
++#define	MAX_NAME_LEN	20
++
++void ccp5_debugfs_setup(struct ccp_device *ccp)
++{
++	struct ccp_cmd_queue *cmd_q;
++	char name[MAX_NAME_LEN + 1];
++	struct dentry *debugfs_info;
++	struct dentry *debugfs_stats;
++	struct dentry *debugfs_q_instance;
++	struct dentry *debugfs_q_stats;
++	unsigned long flags;
++	int i;
++
++	if (!debugfs_initialized())
++		return;
++
++	write_lock_irqsave(&ccp_debugfs_lock, flags);
++	if (!ccp_debugfs_dir) {
++		ccp_debugfs_dir = debugfs_create_dir(KBUILD_MODNAME, NULL);
++		if (!ccp_debugfs_dir)
++			return;
++	}
++	write_unlock_irqrestore(&ccp_debugfs_lock, flags);
++
++	ccp->debugfs_instance = debugfs_create_dir(ccp->name, ccp_debugfs_dir);
++	if (!ccp->debugfs_instance)
++		return;
++
++	debugfs_info = debugfs_create_file("info", 0400,
++					   ccp->debugfs_instance, ccp,
++					   &ccp_debugfs_info_ops);
++	if (!debugfs_info)
++		return;
++
++	debugfs_stats = debugfs_create_file("stats", 0600,
++					    ccp->debugfs_instance, ccp,
++					    &ccp_debugfs_stats_ops);
++	if (!debugfs_stats)
++		return;
++
++	for (i = 0; i < ccp->cmd_q_count; i++) {
++		cmd_q = &ccp->cmd_q[i];
++
++		snprintf(name, MAX_NAME_LEN - 1, "q%d", cmd_q->id);
++
++		debugfs_q_instance =
++			debugfs_create_dir(name, ccp->debugfs_instance);
++		if (!debugfs_q_instance)
++			return;
++
++		debugfs_q_stats =
++			debugfs_create_file("stats", 0600,
++					    debugfs_q_instance, cmd_q,
++					    &ccp_debugfs_queue_ops);
++		if (!debugfs_q_stats)
++			return;
++	}
++}
++
++void ccp5_debugfs_destroy(void)
++{
++	debugfs_remove_recursive(ccp_debugfs_dir);
++}
+diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
+index ccbe32d5dd1c..b10d2d2075cb 100644
+--- a/drivers/crypto/ccp/ccp-dev-v5.c
++++ b/drivers/crypto/ccp/ccp-dev-v5.c
+@@ -14,6 +14,7 @@
+ #include <linux/kernel.h>
+ #include <linux/pci.h>
+ #include <linux/kthread.h>
++#include <linux/debugfs.h>
+ #include <linux/dma-mapping.h>
+ #include <linux/interrupt.h>
+ #include <linux/compiler.h>
+@@ -231,6 +232,8 @@ static int ccp5_do_cmd(struct ccp5_desc *desc,
+ 	int	i;
+ 	int ret = 0;
+ 
++	cmd_q->total_ops++;
++
+ 	if (CCP5_CMD_SOC(desc)) {
+ 		CCP5_CMD_IOC(desc) = 1;
+ 		CCP5_CMD_SOC(desc) = 0;
+@@ -282,6 +285,8 @@ static int ccp5_perform_aes(struct ccp_op *op)
+ 	union ccp_function function;
+ 	u32 key_addr = op->sb_key * LSB_ITEM_SIZE;
+ 
++	op->cmd_q->total_aes_ops++;
++
+ 	/* Zero out all the fields of the command desc */
+ 	memset(&desc, 0, Q_DESC_SIZE);
+ 
+@@ -325,6 +330,8 @@ static int ccp5_perform_xts_aes(struct ccp_op *op)
+ 	union ccp_function function;
+ 	u32 key_addr = op->sb_key * LSB_ITEM_SIZE;
+ 
++	op->cmd_q->total_xts_aes_ops++;
++
+ 	/* Zero out all the fields of the command desc */
+ 	memset(&desc, 0, Q_DESC_SIZE);
+ 
+@@ -364,6 +371,8 @@ static int ccp5_perform_sha(struct ccp_op *op)
+ 	struct ccp5_desc desc;
+ 	union ccp_function function;
+ 
++	op->cmd_q->total_sha_ops++;
++
+ 	/* Zero out all the fields of the command desc */
+ 	memset(&desc, 0, Q_DESC_SIZE);
+ 
+@@ -404,6 +413,8 @@ static int ccp5_perform_des3(struct ccp_op *op)
+ 	union ccp_function function;
+ 	u32 key_addr = op->sb_key * LSB_ITEM_SIZE;
+ 
++	op->cmd_q->total_3des_ops++;
++
+ 	/* Zero out all the fields of the command desc */
+ 	memset(&desc, 0, sizeof(struct ccp5_desc));
+ 
+@@ -444,6 +455,8 @@ static int ccp5_perform_rsa(struct ccp_op *op)
+ 	struct ccp5_desc desc;
+ 	union ccp_function function;
+ 
++	op->cmd_q->total_rsa_ops++;
++
+ 	/* Zero out all the fields of the command desc */
+ 	memset(&desc, 0, Q_DESC_SIZE);
+ 
+@@ -487,6 +500,8 @@ static int ccp5_perform_passthru(struct ccp_op *op)
+ 	struct ccp_dma_info *daddr = &op->dst.u.dma;
+ 
+ 
++	op->cmd_q->total_pt_ops++;
++
+ 	memset(&desc, 0, Q_DESC_SIZE);
+ 
+ 	CCP5_CMD_ENGINE(&desc) = CCP_ENGINE_PASSTHRU;
+@@ -543,6 +558,8 @@ static int ccp5_perform_ecc(struct ccp_op *op)
+ 	struct ccp5_desc desc;
+ 	union ccp_function function;
+ 
++	op->cmd_q->total_ecc_ops++;
++
+ 	/* Zero out all the fields of the command desc */
+ 	memset(&desc, 0, Q_DESC_SIZE);
+ 
+@@ -592,7 +609,6 @@ static int ccp_find_lsb_regions(struct ccp_cmd_queue *cmd_q, u64 status)
+ 	return queues ? 0 : -EINVAL;
+ }
+ 
+-
+ static int ccp_find_and_assign_lsb_to_q(struct ccp_device *ccp,
+ 					int lsb_cnt, int n_lsbs,
+ 					unsigned long *lsb_pub)
+@@ -757,6 +773,7 @@ static irqreturn_t ccp5_irq_handler(int irq, void *data)
+ 	struct ccp_device *ccp = dev_get_drvdata(dev);
+ 
+ 	ccp5_disable_queue_interrupts(ccp);
++	ccp->total_interrupts++;
+ 	if (ccp->use_tasklet)
+ 		tasklet_schedule(&ccp->irq_tasklet);
+ 	else
+@@ -956,6 +973,9 @@ static int ccp5_init(struct ccp_device *ccp)
+ 	if (ret)
+ 		goto e_hwrng;
+ 
++	/* Set up debugfs entries */
++	ccp5_debugfs_setup(ccp);
++
+ 	return 0;
+ 
+ e_hwrng:
+@@ -992,6 +1012,12 @@ static void ccp5_destroy(struct ccp_device *ccp)
+ 	/* Remove this device from the list of available units first */
+ 	ccp_del_device(ccp);
+ 
++	/* We're in the process of tearing down the entire driver;
++	 * when all the devices are gone clean up debugfs
++	 */
++	if (ccp_present())
++		ccp5_debugfs_destroy();
++
+ 	/* Disable and clear interrupts */
+ 	ccp5_disable_queue_interrupts(ccp);
+ 	for (i = 0; i < ccp->cmd_q_count; i++) {
+diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
+index b7504562715c..2506b5025700 100644
+--- a/drivers/crypto/ccp/ccp-dev.c
++++ b/drivers/crypto/ccp/ccp-dev.c
+@@ -33,7 +33,7 @@
+ MODULE_AUTHOR("Tom Lendacky <thomas.lendacky@amd.com>");
+ MODULE_AUTHOR("Gary R Hook <gary.hook@amd.com>");
+ MODULE_LICENSE("GPL");
+-MODULE_VERSION("1.0.0");
++MODULE_VERSION("1.1.0");
+ MODULE_DESCRIPTION("AMD Cryptographic Coprocessor driver");
+ 
+ struct ccp_tasklet_data {
+diff --git a/drivers/crypto/ccp/ccp-dev.h b/drivers/crypto/ccp/ccp-dev.h
+index 0cb09d0feeaf..a70154ac7405 100644
+--- a/drivers/crypto/ccp/ccp-dev.h
++++ b/drivers/crypto/ccp/ccp-dev.h
+@@ -70,6 +70,7 @@
+ #define LSB_PUBLIC_MASK_HI_OFFSET	0x1C
+ #define LSB_PRIVATE_MASK_LO_OFFSET	0x20
+ #define LSB_PRIVATE_MASK_HI_OFFSET	0x24
++#define CMD5_PSP_CCP_VERSION		0x100
+ 
+ #define CMD5_Q_CONTROL_BASE		0x0000
+ #define CMD5_Q_TAIL_LO_BASE		0x0004
+@@ -322,6 +323,16 @@ struct ccp_cmd_queue {
+ 	/* Interrupt wait queue */
+ 	wait_queue_head_t int_queue;
+ 	unsigned int int_rcvd;
++
++	/* Per-queue Statistics */
++	unsigned long total_ops;
++	unsigned long total_aes_ops;
++	unsigned long total_xts_aes_ops;
++	unsigned long total_3des_ops;
++	unsigned long total_sha_ops;
++	unsigned long total_rsa_ops;
++	unsigned long total_pt_ops;
++	unsigned long total_ecc_ops;
+ } ____cacheline_aligned;
+ 
+ struct ccp_device {
+@@ -419,6 +430,12 @@ struct ccp_device {
+ 
+ 	/* DMA caching attribute support */
+ 	unsigned int axcache;
++
++	/* Device Statistics */
++	unsigned long total_interrupts;
++
++	/* DebugFS info */
++	struct dentry *debugfs_instance;
+ };
+ 
+ enum ccp_memtype {
+@@ -632,6 +649,9 @@ struct ccp5_desc {
+ int ccp_dmaengine_register(struct ccp_device *ccp);
+ void ccp_dmaengine_unregister(struct ccp_device *ccp);
+ 
++void ccp5_debugfs_setup(struct ccp_device *ccp);
++void ccp5_debugfs_destroy(void);
++
+ /* Structure for computation functions that are device-specific */
+ struct ccp_actions {
+ 	int (*aes)(struct ccp_op *);
