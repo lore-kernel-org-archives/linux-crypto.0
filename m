@@ -1,94 +1,80 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: BUG: drbg: Added nodes from Stack Memory in link list
-Date: Wed, 03 May 2017 15:11:05 +0200
-Message-ID: <11088841.2SosuHvOD7@tauon.chronox.de>
-References: <CAFXBA=kDqH_32bX8XpUes9bdPP-3Gq5KRGBxu_FXKD3jwgzVdQ@mail.gmail.com>
+From: Antoine Tenart <antoine.tenart@free-electrons.com>
+Subject: Re: [PATCH v3 2/3] crypto: inside-secure: add SafeXcel EIP197 crypto
+ engine driver
+Date: Wed, 3 May 2017 16:03:12 +0200
+Message-ID: <20170503140312.civ5uxkksauhqfyp@kwain>
+References: <20170424075407.19730-1-antoine.tenart@free-electrons.com>
+ <20170424075407.19730-3-antoine.tenart@free-electrons.com>
+ <6ed16e7e-7f7a-795f-ee82-d2d97c3a5540@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-To: Harsh Jain <harshjain.prof@gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="x2pkhhp3vywp3dhj"
+Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        jason@lakedaemon.net, andrew@lunn.ch,
+        gregory.clement@free-electrons.com,
+        sebastian.hesselbarth@gmail.com,
+        thomas.petazzoni@free-electrons.com,
+        boris.brezillon@free-electrons.com, igall@marvell.com,
+        nadavh@marvell.com, linux-crypto@vger.kernel.org,
+        oferh@marvell.com, linux-arm-kernel@lists.infradead.org
+To: Robin Murphy <robin.murphy@arm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:59430 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751703AbdECNLH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 3 May 2017 09:11:07 -0400
-In-Reply-To: <CAFXBA=kDqH_32bX8XpUes9bdPP-3Gq5KRGBxu_FXKD3jwgzVdQ@mail.gmail.com>
+Received: from mail.free-electrons.com ([62.4.15.54]:46099 "EHLO
+        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752985AbdECODO (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 3 May 2017 10:03:14 -0400
+Content-Disposition: inline
+In-Reply-To: <6ed16e7e-7f7a-795f-ee82-d2d97c3a5540@arm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Mittwoch, 3. Mai 2017, 14:47:24 CEST schrieb Harsh Jain:
 
-Hi Harsh,
+--x2pkhhp3vywp3dhj
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> Hi Stephen,
-> 
-> In drbg driver local variable of function are added as list nodes. one
-> instance is given below.
-> 
-> 
-> static inline int __init drbg_healthcheck_sanity(void)
-> 
-> 
-> 
-> ---
-> ---
-> 
-> max_addtllen = drbg_max_addtl(drbg);
-> max_request_bytes = drbg_max_request_bytes(drbg);
-> drbg_string_fill(&addtl, buf, max_addtllen + 1);
-> /* overflow addtllen with additonal info string */
-> len = drbg_generate(drbg, buf, OUTBUFLEN, &addtl);
-> 
-> ===> Added "addtllist"  to the tail. which local variable.
-> 
-> 
-> BUG_ON(0 < len);
-> /* overflow max_bits */
-> len = drbg_generate(drbg, buf, (max_request_bytes + 1), NULL);
-> BUG_ON(0 < len);
-> 
-> /* overflow max addtllen with personalization string */
-> ret = drbg_seed(drbg, &addtl, false);
-> 
-> ====> Added "seedlist" to the tail of same list. Previous
-> node(addtllist) already invalid(Out of scope when function returns)
-> 
-> 
-> BUG_ON(0 == ret);
-> /* all tests passed */
-> rc = 0;
-> 
-> 
-> 
-> Is't a BUG? or I missed something.
+Hi Robin,
 
-:-) You are right that in normal processing this is a bug. But this is a 
-special function which shall perform a sanity checks for the maximum length 
-enforcement. Thus, addtllist or seedlist should never be filled.
+On Wed, May 03, 2017 at 12:57:25PM +0100, Robin Murphy wrote:
+> On 24/04/17 08:54, Antoine Tenart wrote:
+> > +
+> > +#include <asm/dma-mapping.h>
+>=20
+> <linux/dma-mapping.h> everywhere, please.
+>=20
+> Other than that, the DMA aspects all look much nicer now, thanks.
 
-To be precise: The called code is expected to return an error before the 
-variables are used due to the length checks. If these errors do not appear, 
-something is wrong with the DRBG which causes the BUG_ON.
+I'll update and resend a series when the next -rc1 is out.
 
-The following error conditions are triggered:
+Thanks!
+Antoine
 
-        /* 9.3.1 step 2 */
-        len = -EINVAL;
-        if (buflen > (drbg_max_request_bytes(drbg))) {
-                pr_devel("DRBG: requested random numbers too large %u\n",
-                         buflen);
-                goto err;
-        }
+--=20
+Antoine T=E9nart, Free Electrons
+Embedded Linux and Kernel engineering
+http://free-electrons.com
 
-        /* 9.3.1 step 4 */
-        if (addtl && addtl->len > (drbg_max_addtl(drbg))) {
-                pr_devel("DRBG: additional information string too long %zu\n",
-                         addtl->len);
-                goto err;
-        }
+--x2pkhhp3vywp3dhj
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
 
-Ciao
-Stephan
+iQIcBAABCgAGBQJZCeMeAAoJEFxNi8it27zYMLsP/0MgFd4Ec23L5egh43VVQwIu
+krNpKUcHUVppxoMbF6N0qhI6kujHuFZv29IuKVGPaegfBmEMfrYlLii1t8dfyb0b
+wIzif+kXItddyu1lo5nJLEl/4mYWTIDompkhCzFbTIrP8iXvjUAJmgavMGfttTVd
+0+GYBJEyJKTOpcWt/SAylaO2NbBpTaqfVtf/LvsPb1dmd8Zf0EVgKxB+lKRlLygV
+49J/74rMqLKEiYbmgS22O5YuLqTHpS6Y92MOcQZ/TA4PNvNoV9SUcMbHPdN4IW+I
+vuOzPCqAcvkkA4Re2mztLWsxc/+IuvZGSMhY6bMWyb2pR5+MAhO5Gzk2SD9hPF5P
+BirupTG042VfiIpFdo0rTQMZBd9dl6amq+j/NfijTYYX0VU5eVryR4/jfZXPbARA
+dpx0KfguwYsYAnY/hLbLpTEfdE2NHVZEuTffJ3X/T21Dy+NLO8yb7+1M+OtUXoij
+C9/28ly6ZprpVvFaykGxeiZKAJ1uFufa5xrxvloTPJD8VpWAM+1KaGaaEY/wShAB
+PrG9WNfpAD5pRJaamsR1j1pjXBhhByVJDUk84XXGFxXRqdXqtikSux1yTSyONyS6
+PmVdvWxvluDwhIPo/Pw46Ur+zOGV9xw85VKdXqMZlyoX8W7JM5ggVv11K+LunYcU
+w2i/yhoWXpYx4MLGupQM
+=WLjV
+-----END PGP SIGNATURE-----
+
+--x2pkhhp3vywp3dhj--
