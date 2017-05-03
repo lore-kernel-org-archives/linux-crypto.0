@@ -1,80 +1,70 @@
-From: Antoine Tenart <antoine.tenart@free-electrons.com>
-Subject: Re: [PATCH v3 2/3] crypto: inside-secure: add SafeXcel EIP197 crypto
- engine driver
-Date: Wed, 3 May 2017 16:03:12 +0200
-Message-ID: <20170503140312.civ5uxkksauhqfyp@kwain>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v3 1/3] Documentation/bindings: Document the SafeXel
+ cryptographic engine driver
+Date: Wed, 3 May 2017 17:36:38 +0100
+Message-ID: <7986721e-3a2b-23fb-61d7-7032f0d65533@arm.com>
 References: <20170424075407.19730-1-antoine.tenart@free-electrons.com>
- <20170424075407.19730-3-antoine.tenart@free-electrons.com>
- <6ed16e7e-7f7a-795f-ee82-d2d97c3a5540@arm.com>
+ <20170424075407.19730-2-antoine.tenart@free-electrons.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="x2pkhhp3vywp3dhj"
-Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        jason@lakedaemon.net, andrew@lunn.ch,
-        gregory.clement@free-electrons.com,
-        sebastian.hesselbarth@gmail.com,
-        thomas.petazzoni@free-electrons.com,
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Cc: thomas.petazzoni@free-electrons.com,
         boris.brezillon@free-electrons.com, igall@marvell.com,
         nadavh@marvell.com, linux-crypto@vger.kernel.org,
-        oferh@marvell.com, linux-arm-kernel@lists.infradead.org
-To: Robin Murphy <robin.murphy@arm.com>
+        robin.murphy@arm.com, oferh@marvell.com,
+        linux-arm-kernel@lists.infradead.org
+To: Antoine Tenart <antoine.tenart@free-electrons.com>,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        jason@lakedaemon.net, andrew@lunn.ch,
+        gregory.clement@free-electrons.com, sebastian.hesselbarth@gmail.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:46099 "EHLO
-        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752985AbdECODO (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 3 May 2017 10:03:14 -0400
-Content-Disposition: inline
-In-Reply-To: <6ed16e7e-7f7a-795f-ee82-d2d97c3a5540@arm.com>
+Received: from foss.arm.com ([217.140.101.70]:59030 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750955AbdECQgn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 3 May 2017 12:36:43 -0400
+In-Reply-To: <20170424075407.19730-2-antoine.tenart@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+On 24/04/17 08:54, Antoine Tenart wrote:
+> The Inside Secure Safexcel cryptographic engine is found on some Marvell
+> SoCs (7k/8k). Document the bindings used by its driver.
+> 
+> Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
+> ---
+>  .../bindings/crypto/inside-secure-safexcel.txt     | 27 ++++++++++++++++++++++
+>  1 file changed, 27 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/crypto/inside-secure-safexcel.txt
+> 
+> diff --git a/Documentation/devicetree/bindings/crypto/inside-secure-safexcel.txt b/Documentation/devicetree/bindings/crypto/inside-secure-safexcel.txt
+> new file mode 100644
+> index 000000000000..ff56b9384fcc
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/crypto/inside-secure-safexcel.txt
+> @@ -0,0 +1,27 @@
+> +Inside Secure SafeXcel cryptographic engine
+> +
+> +Required properties:
+> +- compatible: Should be "inside-secure,safexcel-eip197".
+> +- reg: Base physical address of the engine and length of memory mapped region.
+> +- interrupts: Interrupt numbers for the rings and engine.
+> +- interrupt-names: Should be "ring0", "ring1", "ring2", "ring3", "eip", "mem".
+> +
+> +Optional properties:
+> +- clocks: Reference to the crypto engine clock.
+> +
+> +Example:
+> +
+> +	crypto: crypto@800000 {
+> +		compatible = "inside-secure,safexcel-eip197";
+> +		reg = <0x800000 0x200000>;
+> +		interrupts = <GIC_SPI 34 (IRQ_TYPE_EDGE_RISING | IRQ_TYPE_LEVEL_HIGH)>,
 
---x2pkhhp3vywp3dhj
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I'm puzzled. How can the interrupt can be both level *and* edge? That
+doesn't make any sense.
 
-Hi Robin,
+Thanks,
 
-On Wed, May 03, 2017 at 12:57:25PM +0100, Robin Murphy wrote:
-> On 24/04/17 08:54, Antoine Tenart wrote:
-> > +
-> > +#include <asm/dma-mapping.h>
->=20
-> <linux/dma-mapping.h> everywhere, please.
->=20
-> Other than that, the DMA aspects all look much nicer now, thanks.
-
-I'll update and resend a series when the next -rc1 is out.
-
-Thanks!
-Antoine
-
---=20
-Antoine T=E9nart, Free Electrons
-Embedded Linux and Kernel engineering
-http://free-electrons.com
-
---x2pkhhp3vywp3dhj
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAABCgAGBQJZCeMeAAoJEFxNi8it27zYMLsP/0MgFd4Ec23L5egh43VVQwIu
-krNpKUcHUVppxoMbF6N0qhI6kujHuFZv29IuKVGPaegfBmEMfrYlLii1t8dfyb0b
-wIzif+kXItddyu1lo5nJLEl/4mYWTIDompkhCzFbTIrP8iXvjUAJmgavMGfttTVd
-0+GYBJEyJKTOpcWt/SAylaO2NbBpTaqfVtf/LvsPb1dmd8Zf0EVgKxB+lKRlLygV
-49J/74rMqLKEiYbmgS22O5YuLqTHpS6Y92MOcQZ/TA4PNvNoV9SUcMbHPdN4IW+I
-vuOzPCqAcvkkA4Re2mztLWsxc/+IuvZGSMhY6bMWyb2pR5+MAhO5Gzk2SD9hPF5P
-BirupTG042VfiIpFdo0rTQMZBd9dl6amq+j/NfijTYYX0VU5eVryR4/jfZXPbARA
-dpx0KfguwYsYAnY/hLbLpTEfdE2NHVZEuTffJ3X/T21Dy+NLO8yb7+1M+OtUXoij
-C9/28ly6ZprpVvFaykGxeiZKAJ1uFufa5xrxvloTPJD8VpWAM+1KaGaaEY/wShAB
-PrG9WNfpAD5pRJaamsR1j1pjXBhhByVJDUk84XXGFxXRqdXqtikSux1yTSyONyS6
-PmVdvWxvluDwhIPo/Pw46Ur+zOGV9xw85VKdXqMZlyoX8W7JM5ggVv11K+LunYcU
-w2i/yhoWXpYx4MLGupQM
-=WLjV
------END PGP SIGNATURE-----
-
---x2pkhhp3vywp3dhj--
+	M.
+-- 
+Jazz is not dead. It just smells funny...
