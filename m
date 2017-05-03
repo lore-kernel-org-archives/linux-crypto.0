@@ -1,52 +1,54 @@
-From: Pushkar Jambhlekar <pushkar.iit@gmail.com>
-Subject: [PATCH] drivers/crypto/ccp: return NULL instead of 0
-Date: Wed,  3 May 2017 09:32:09 +0530
-Message-ID: <1493784129-32613-1-git-send-email-pushkar.iit@gmail.com>
-Cc: linux-crypto@vger.kernel.org (open list:AMD CRYPTOGRAPHIC COPROCESSOR
-        (CCP) DRIVER), linux-kernel@vger.kernel.org (open list),
-        Pushkar Jambhlekar <pushkar.iit@gmail.com>
-To: Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>,
+From: Vinod Koul <vinod.koul@intel.com>
+Subject: Re: [PATCH v6 0/4] Broadcom SBA RAID support
+Date: Wed, 3 May 2017 10:29:27 +0530
+Message-ID: <20170503045926.GV6263@localhost>
+References: <1488793408-25592-1-git-send-email-anup.patel@broadcom.com>
+ <20170321083052.GY2843@localhost>
+ <CAALAos-k_DBYAz49278wBr_GoceOKYVH_UuzTLn1h7QCiUd8pg@mail.gmail.com>
+ <20170321091829.GZ2843@localhost>
+ <CAALAos-P6CDdWTJxg8YQfT1V+iCxUcbYHiQ35EdZzz9PnN3cuA@mail.gmail.com>
+ <20170330044940.GU9308@localhost>
+ <CAALAos8hVtCqzpv3nvPAGnm=WKMfcXeBEFm5Yb0gWwYGLE4SeA@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: Jassi Brar <jassisinghbrar@gmail.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
+        "David S . Miller" <davem@davemloft.net>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        Jon Mason <jonmason@broadcom.com>,
+        Rob Rice <rob.rice@broadcom.com>,
+        BCM Kernel Feedback <bcm-kernel-feedback-list@broadcom.com>,
+        dmaengine@vger.kernel.org,
+        Device Tree <devicetree@vger.kernel.org>,
+        Linux ARM Kernel <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel <linux-kernel@vger.kernel.org>,
+        linux-crypto@vger.kernel.org,
+        linux-raid <linux-raid@vger.kernel.org>
+To: Anup Patel <anup.patel@broadcom.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pg0-f68.google.com ([74.125.83.68]:35243 "EHLO
-        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750737AbdECECT (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 3 May 2017 00:02:19 -0400
+Received: from mga07.intel.com ([134.134.136.100]:41982 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751217AbdECE5f (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 3 May 2017 00:57:35 -0400
+Content-Disposition: inline
+In-Reply-To: <CAALAos8hVtCqzpv3nvPAGnm=WKMfcXeBEFm5Yb0gWwYGLE4SeA@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This change is to handle sparse warning. Return type of function is a pointer to the structure and
-it returns 0. Instead it should return NULL.
+On Wed, May 03, 2017 at 09:15:20AM +0530, Anup Patel wrote:
+> Hi Vinod,
+> 
+> The Broadcom FlexRM patchset have been
+> merged in v4.11.
+> 
+> I think you now can take this patchset in next
+> merge window. Right??
 
-Signed-off-by: Pushkar Jambhlekar <pushkar.iit@gmail.com>
----
- drivers/crypto/ccp/ccp-platform.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Sure, please rebase and resend after -rc1 is out
 
-diff --git a/drivers/crypto/ccp/ccp-platform.c b/drivers/crypto/ccp/ccp-platform.c
-index 351f28d8..e26969e 100644
---- a/drivers/crypto/ccp/ccp-platform.c
-+++ b/drivers/crypto/ccp/ccp-platform.c
-@@ -44,7 +44,7 @@ static struct ccp_vdata *ccp_get_of_version(struct platform_device *pdev)
- 	if (match && match->data)
- 		return (struct ccp_vdata *)match->data;
- #endif
--	return 0;
-+	return NULL;
- }
- 
- static struct ccp_vdata *ccp_get_acpi_version(struct platform_device *pdev)
-@@ -56,7 +56,7 @@ static struct ccp_vdata *ccp_get_acpi_version(struct platform_device *pdev)
- 	if (match && match->driver_data)
- 		return (struct ccp_vdata *)match->driver_data;
- #endif
--	return 0;
-+	return NULL;
- }
- 
- static int ccp_get_irq(struct ccp_device *ccp)
 -- 
-2.7.4
+~Vinod
