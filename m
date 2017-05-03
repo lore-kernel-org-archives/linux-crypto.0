@@ -1,77 +1,65 @@
-From: Robin Murphy <robin.murphy@arm.com>
-Subject: Re: [PATCH v3 2/3] crypto: inside-secure: add SafeXcel EIP197 crypto
- engine driver
-Date: Wed, 3 May 2017 12:57:25 +0100
-Message-ID: <6ed16e7e-7f7a-795f-ee82-d2d97c3a5540@arm.com>
-References: <20170424075407.19730-1-antoine.tenart@free-electrons.com>
- <20170424075407.19730-3-antoine.tenart@free-electrons.com>
+From: Harsh Jain <harshjain.prof@gmail.com>
+Subject: BUG: drbg: Added nodes from Stack Memory in link list
+Date: Wed, 3 May 2017 18:17:24 +0530
+Message-ID: <CAFXBA=kDqH_32bX8XpUes9bdPP-3Gq5KRGBxu_FXKD3jwgzVdQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: thomas.petazzoni@free-electrons.com,
-        boris.brezillon@free-electrons.com, igall@marvell.com,
-        nadavh@marvell.com, linux-crypto@vger.kernel.org,
-        oferh@marvell.com, linux-arm-kernel@lists.infradead.org
-To: Antoine Tenart <antoine.tenart@free-electrons.com>,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        jason@lakedaemon.net, andrew@lunn.ch,
-        gregory.clement@free-electrons.com, sebastian.hesselbarth@gmail.com
+Content-Type: text/plain; charset=UTF-8
+To: Stephan Mueller <smueller@chronox.de>,
+        linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:54934 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751264AbdECL5b (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 3 May 2017 07:57:31 -0400
-In-Reply-To: <20170424075407.19730-3-antoine.tenart@free-electrons.com>
+Received: from mail-wm0-f54.google.com ([74.125.82.54]:36695 "EHLO
+        mail-wm0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752280AbdECMrb (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 3 May 2017 08:47:31 -0400
+Received: by mail-wm0-f54.google.com with SMTP id u65so145449659wmu.1
+        for <linux-crypto@vger.kernel.org>; Wed, 03 May 2017 05:47:25 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Antoine,
+Hi Stephen,
 
-On 24/04/17 08:54, Antoine Tenart wrote:
-> Add support for Inside Secure SafeXcel EIP197 cryptographic engine,
-> which can be found on Marvell Armada 7k and 8k boards. This driver
-> currently implements: ecb(aes), cbc(aes), sha1, sha224, sha256 and
-> hmac(sah1) algorithms.
-> 
-> Two firmwares are needed for this engine to work. Their are mostly used
-> for more advanced operations than the ones supported (as of now), but we
-> still need them to pass the data to the internal cryptographic engine.
-> 
-> Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
+In drbg driver local variable of function are added as list nodes. one
+instance is given below.
 
-[...]
 
-> diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
-> new file mode 100644
-> index 000000000000..9cb3d0832835
-> --- /dev/null
-> +++ b/drivers/crypto/inside-secure/safexcel.c
-> @@ -0,0 +1,925 @@
-> +/*
-> + * Copyright (C) 2017 Marvell
-> + *
-> + * Antoine Tenart <antoine.tenart@free-electrons.com>
-> + *
-> + * This file is licensed under the terms of the GNU General Public
-> + * License version 2. This program is licensed "as is" without any
-> + * warranty of any kind, whether express or implied.
-> + */
-> +
-> +#include <linux/clk.h>
-> +#include <linux/device.h>
-> +#include <linux/dmapool.h>
-> +#include <linux/firmware.h>
-> +#include <linux/interrupt.h>
-> +#include <linux/module.h>
-> +#include <linux/of_platform.h>
-> +#include <linux/of_irq.h>
-> +#include <linux/platform_device.h>
-> +#include <linux/workqueue.h>
-> +
-> +#include <asm/dma-mapping.h>
+static inline int __init drbg_healthcheck_sanity(void)
 
-<linux/dma-mapping.h> everywhere, please.
 
-Other than that, the DMA aspects all look much nicer now, thanks.
 
-Robin.
+---
+---
+
+max_addtllen = drbg_max_addtl(drbg);
+max_request_bytes = drbg_max_request_bytes(drbg);
+drbg_string_fill(&addtl, buf, max_addtllen + 1);
+/* overflow addtllen with additonal info string */
+len = drbg_generate(drbg, buf, OUTBUFLEN, &addtl);
+
+===> Added "addtllist"  to the tail. which local variable.
+
+
+BUG_ON(0 < len);
+/* overflow max_bits */
+len = drbg_generate(drbg, buf, (max_request_bytes + 1), NULL);
+BUG_ON(0 < len);
+
+/* overflow max addtllen with personalization string */
+ret = drbg_seed(drbg, &addtl, false);
+
+====> Added "seedlist" to the tail of same list. Previous
+node(addtllist) already invalid(Out of scope when function returns)
+
+
+BUG_ON(0 == ret);
+/* all tests passed */
+rc = 0;
+
+
+
+Is't a BUG? or I missed something.
+
+
+Regards
+Harsh Jain
