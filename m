@@ -1,40 +1,320 @@
 From: George Cherian <george.cherian@cavium.com>
-Subject: [PATCH v2 0/3] Add more algorithms and some misc cleanups
-Date: Thu,  4 May 2017 11:34:43 +0000
-Message-ID: <1493897686-12330-1-git-send-email-george.cherian@cavium.com>
+Subject: [PATCH v2 2/3] crypto: cavium: Remove the individual encrypt/decrypt function for each algorithm
+Date: Thu,  4 May 2017 11:34:45 +0000
+Message-ID: <1493897686-12330-3-git-send-email-george.cherian@cavium.com>
+References: <1493897686-12330-1-git-send-email-george.cherian@cavium.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: george.cherian@cavium.com, herbert@gondor.apana.org.au,
         davem@davemloft.net
 To: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2nam03on0063.outbound.protection.outlook.com ([104.47.42.63]:53652
+Received: from mail-by2nam03on0050.outbound.protection.outlook.com ([104.47.42.50]:3520
         "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751991AbdEDLfE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 4 May 2017 07:35:04 -0400
+        id S1752545AbdEDLfP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 4 May 2017 07:35:15 -0400
+In-Reply-To: <1493897686-12330-1-git-send-email-george.cherian@cavium.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This series adds more algorithem support for CPT.
-Add support for
-        -ecb(aes)
-        -cfb(aes)
-        -ecb(des3_ede)
+Remove the individual encrypt/decrypt function for easch algorithm.
+This is in prepration of adding more crypto algorithms supported by
+hardware. While at that simplify create_ctx_hdr/create_input_list
+function interfaces.
 
-Some cleanups too.
+Signed-off-by: George Cherian <george.cherian@cavium.com>
+---
+ drivers/crypto/cavium/cpt/cptvf_algs.c | 153 ++++++++++++++++-----------------
+ drivers/crypto/cavium/cpt/cptvf_algs.h |   7 ++
+ 2 files changed, 83 insertions(+), 77 deletions(-)
 
-George Cherian (3):
-  crypto: cavium: Downgrade the annoying misc interrupt print from
-    dev_err to dev_dbg
-  crypto: cavium: Remove the individual encrypt/decrypt function for
-    each algorithm
-  crypto: cavium: Add more algorithms
-
- drivers/crypto/cavium/cpt/cptvf_algs.c | 234 ++++++++++++++++++++++-----------
- drivers/crypto/cavium/cpt/cptvf_algs.h |   7 +
- drivers/crypto/cavium/cpt/cptvf_main.c |   2 +-
- 3 files changed, 165 insertions(+), 78 deletions(-)
-
+diff --git a/drivers/crypto/cavium/cpt/cptvf_algs.c b/drivers/crypto/cavium/cpt/cptvf_algs.c
+index cc853f9..443c362 100644
+--- a/drivers/crypto/cavium/cpt/cptvf_algs.c
++++ b/drivers/crypto/cavium/cpt/cptvf_algs.c
+@@ -98,7 +98,6 @@ static inline void update_output_data(struct cpt_request_info *req_info,
+ }
+ 
+ static inline u32 create_ctx_hdr(struct ablkcipher_request *req, u32 enc,
+-				 u32 cipher_type, u32 aes_key_type,
+ 				 u32 *argcnt)
+ {
+ 	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
+@@ -124,11 +123,11 @@ static inline u32 create_ctx_hdr(struct ablkcipher_request *req, u32 enc,
+ 	req_info->req.param1 = req->nbytes; /* Encryption Data length */
+ 	req_info->req.param2 = 0; /*Auth data length */
+ 
+-	fctx->enc.enc_ctrl.e.enc_cipher = cipher_type;
+-	fctx->enc.enc_ctrl.e.aes_key = aes_key_type;
++	fctx->enc.enc_ctrl.e.enc_cipher = ctx->cipher_type;
++	fctx->enc.enc_ctrl.e.aes_key = ctx->key_type;
+ 	fctx->enc.enc_ctrl.e.iv_source = FROM_DPTR;
+ 
+-	if (cipher_type == AES_XTS)
++	if (ctx->cipher_type == AES_XTS)
+ 		memcpy(fctx->enc.encr_key, ctx->enc_key, ctx->key_len * 2);
+ 	else
+ 		memcpy(fctx->enc.encr_key, ctx->enc_key, ctx->key_len);
+@@ -154,14 +153,13 @@ static inline u32 create_ctx_hdr(struct ablkcipher_request *req, u32 enc,
+ }
+ 
+ static inline u32 create_input_list(struct ablkcipher_request  *req, u32 enc,
+-				    u32 cipher_type, u32 aes_key_type,
+ 				    u32 enc_iv_len)
+ {
+ 	struct cvm_req_ctx *rctx = ablkcipher_request_ctx(req);
+ 	struct cpt_request_info *req_info = &rctx->cpt_req;
+ 	u32 argcnt =  0;
+ 
+-	create_ctx_hdr(req, enc, cipher_type, aes_key_type, &argcnt);
++	create_ctx_hdr(req, enc, &argcnt);
+ 	update_input_iv(req_info, req->info, enc_iv_len, &argcnt);
+ 	update_input_data(req_info, req->src, req->nbytes, &argcnt);
+ 	req_info->incnt = argcnt;
+@@ -177,7 +175,6 @@ static inline void store_cb_info(struct ablkcipher_request *req,
+ }
+ 
+ static inline void create_output_list(struct ablkcipher_request *req,
+-				      u32 cipher_type,
+ 				      u32 enc_iv_len)
+ {
+ 	struct cvm_req_ctx *rctx = ablkcipher_request_ctx(req);
+@@ -197,12 +194,9 @@ static inline void create_output_list(struct ablkcipher_request *req,
+ 	req_info->outcnt = argcnt;
+ }
+ 
+-static inline int cvm_enc_dec(struct ablkcipher_request *req, u32 enc,
+-			      u32 cipher_type)
++static inline int cvm_enc_dec(struct ablkcipher_request *req, u32 enc)
+ {
+ 	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
+-	struct cvm_enc_ctx *ctx = crypto_ablkcipher_ctx(tfm);
+-	u32 key_type = AES_128_BIT;
+ 	struct cvm_req_ctx *rctx = ablkcipher_request_ctx(req);
+ 	u32 enc_iv_len = crypto_ablkcipher_ivsize(tfm);
+ 	struct fc_context *fctx = &rctx->fctx;
+@@ -210,36 +204,10 @@ static inline int cvm_enc_dec(struct ablkcipher_request *req, u32 enc,
+ 	void *cdev = NULL;
+ 	int status;
+ 
+-	switch (ctx->key_len) {
+-	case 16:
+-		key_type = AES_128_BIT;
+-		break;
+-	case 24:
+-		key_type = AES_192_BIT;
+-		break;
+-	case 32:
+-		if (cipher_type == AES_XTS)
+-			key_type = AES_128_BIT;
+-		else
+-			key_type = AES_256_BIT;
+-		break;
+-	case 64:
+-		if (cipher_type == AES_XTS)
+-			key_type = AES_256_BIT;
+-		else
+-			return -EINVAL;
+-		break;
+-	default:
+-		return -EINVAL;
+-	}
+-
+-	if (cipher_type == DES3_CBC)
+-		key_type = 0;
+-
+ 	memset(req_info, 0, sizeof(struct cpt_request_info));
+ 	memset(fctx, 0, sizeof(struct fc_context));
+-	create_input_list(req, enc, cipher_type, key_type, enc_iv_len);
+-	create_output_list(req, cipher_type, enc_iv_len);
++	create_input_list(req, enc, enc_iv_len);
++	create_output_list(req, enc_iv_len);
+ 	store_cb_info(req, req_info);
+ 	cdev = dev_handle.cdev[smp_processor_id()];
+ 	status = cptvf_do_request(cdev, req_info);
+@@ -254,34 +222,14 @@ static inline int cvm_enc_dec(struct ablkcipher_request *req, u32 enc,
+ 		return -EINPROGRESS;
+ }
+ 
+-int cvm_des3_encrypt_cbc(struct ablkcipher_request *req)
++int cvm_encrypt(struct ablkcipher_request *req)
+ {
+-	return cvm_enc_dec(req, true, DES3_CBC);
++	return cvm_enc_dec(req, true);
+ }
+ 
+-int cvm_des3_decrypt_cbc(struct ablkcipher_request *req)
++int cvm_decrypt(struct ablkcipher_request *req)
+ {
+-	return cvm_enc_dec(req, false, DES3_CBC);
+-}
+-
+-int cvm_aes_encrypt_xts(struct ablkcipher_request *req)
+-{
+-	return cvm_enc_dec(req, true, AES_XTS);
+-}
+-
+-int cvm_aes_decrypt_xts(struct ablkcipher_request *req)
+-{
+-	return cvm_enc_dec(req, false, AES_XTS);
+-}
+-
+-int cvm_aes_encrypt_cbc(struct ablkcipher_request *req)
+-{
+-	return cvm_enc_dec(req, true, AES_CBC);
+-}
+-
+-int cvm_aes_decrypt_cbc(struct ablkcipher_request *req)
+-{
+-	return cvm_enc_dec(req, false, AES_CBC);
++	return cvm_enc_dec(req, false);
+ }
+ 
+ int cvm_xts_setkey(struct crypto_ablkcipher *cipher, const u8 *key,
+@@ -299,24 +247,75 @@ int cvm_xts_setkey(struct crypto_ablkcipher *cipher, const u8 *key,
+ 	ctx->key_len = keylen;
+ 	memcpy(ctx->enc_key, key1, keylen / 2);
+ 	memcpy(ctx->enc_key + KEY2_OFFSET, key2, keylen / 2);
++	ctx->cipher_type = AES_XTS;
++	switch (ctx->key_len) {
++	case 32:
++		ctx->key_type = AES_128_BIT;
++		break;
++	case 64:
++		ctx->key_type = AES_256_BIT;
++		break;
++	default:
++		return -EINVAL;
++	}
+ 
+ 	return 0;
+ }
+ 
+-int cvm_enc_dec_setkey(struct crypto_ablkcipher *cipher, const u8 *key,
+-		       u32 keylen)
++static int cvm_validate_keylen(struct cvm_enc_ctx *ctx, u32 keylen)
++{
++	if ((keylen == 16) || (keylen == 24) || (keylen == 32)) {
++		ctx->key_len = keylen;
++		switch (ctx->key_len) {
++		case 16:
++			ctx->key_type = AES_128_BIT;
++			break;
++		case 24:
++			ctx->key_type = AES_192_BIT;
++			break;
++		case 32:
++			ctx->key_type = AES_256_BIT;
++			break;
++		default:
++			return -EINVAL;
++		}
++
++		if (ctx->cipher_type == DES3_CBC)
++			ctx->key_type = 0;
++
++		return 0;
++	}
++
++	return -EINVAL;
++}
++
++static int cvm_setkey(struct crypto_ablkcipher *cipher, const u8 *key,
++		      u32 keylen, u8 cipher_type)
+ {
+ 	struct crypto_tfm *tfm = crypto_ablkcipher_tfm(cipher);
+ 	struct cvm_enc_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+-	if ((keylen == 16) || (keylen == 24) || (keylen == 32)) {
+-		ctx->key_len = keylen;
++	ctx->cipher_type = cipher_type;
++	if (!cvm_validate_keylen(ctx, keylen)) {
+ 		memcpy(ctx->enc_key, key, keylen);
+ 		return 0;
++	} else {
++		crypto_ablkcipher_set_flags(cipher,
++					    CRYPTO_TFM_RES_BAD_KEY_LEN);
++		return -EINVAL;
+ 	}
+-	crypto_ablkcipher_set_flags(cipher, CRYPTO_TFM_RES_BAD_KEY_LEN);
++}
+ 
+-	return -EINVAL;
++static int cvm_cbc_aes_setkey(struct crypto_ablkcipher *cipher, const u8 *key,
++			      u32 keylen)
++{
++	return cvm_setkey(cipher, key, keylen, AES_CBC);
++}
++
++static int cvm_cbc_des3_setkey(struct crypto_ablkcipher *cipher, const u8 *key,
++			       u32 keylen)
++{
++	return cvm_setkey(cipher, key, keylen, DES3_CBC);
+ }
+ 
+ int cvm_enc_dec_init(struct crypto_tfm *tfm)
+@@ -349,8 +348,8 @@ struct crypto_alg algs[] = { {
+ 			.min_keysize = 2 * AES_MIN_KEY_SIZE,
+ 			.max_keysize = 2 * AES_MAX_KEY_SIZE,
+ 			.setkey = cvm_xts_setkey,
+-			.encrypt = cvm_aes_encrypt_xts,
+-			.decrypt = cvm_aes_decrypt_xts,
++			.encrypt = cvm_encrypt,
++			.decrypt = cvm_decrypt,
+ 		},
+ 	},
+ 	.cra_init = cvm_enc_dec_init,
+@@ -369,9 +368,9 @@ struct crypto_alg algs[] = { {
+ 			.ivsize = AES_BLOCK_SIZE,
+ 			.min_keysize = AES_MIN_KEY_SIZE,
+ 			.max_keysize = AES_MAX_KEY_SIZE,
+-			.setkey = cvm_enc_dec_setkey,
+-			.encrypt = cvm_aes_encrypt_cbc,
+-			.decrypt = cvm_aes_decrypt_cbc,
++			.setkey = cvm_cbc_aes_setkey,
++			.encrypt = cvm_encrypt,
++			.decrypt = cvm_decrypt,
+ 		},
+ 	},
+ 	.cra_init = cvm_enc_dec_init,
+@@ -390,9 +389,9 @@ struct crypto_alg algs[] = { {
+ 			.min_keysize = DES3_EDE_KEY_SIZE,
+ 			.max_keysize = DES3_EDE_KEY_SIZE,
+ 			.ivsize = DES_BLOCK_SIZE,
+-			.setkey = cvm_enc_dec_setkey,
+-			.encrypt = cvm_des3_encrypt_cbc,
+-			.decrypt = cvm_des3_decrypt_cbc,
++			.setkey = cvm_cbc_des3_setkey,
++			.encrypt = cvm_encrypt,
++			.decrypt = cvm_decrypt,
+ 		},
+ 	},
+ 	.cra_init = cvm_enc_dec_init,
+diff --git a/drivers/crypto/cavium/cpt/cptvf_algs.h b/drivers/crypto/cavium/cpt/cptvf_algs.h
+index a12050d..902f257 100644
+--- a/drivers/crypto/cavium/cpt/cptvf_algs.h
++++ b/drivers/crypto/cavium/cpt/cptvf_algs.h
+@@ -77,6 +77,11 @@ union encr_ctrl {
+ 	} e;
+ };
+ 
++struct cvm_cipher {
++	const char *name;
++	u8 value;
++};
++
+ struct enc_context {
+ 	union encr_ctrl enc_ctrl;
+ 	u8 encr_key[32];
+@@ -96,6 +101,8 @@ struct fc_context {
+ struct cvm_enc_ctx {
+ 	u32 key_len;
+ 	u8 enc_key[MAX_KEY_SIZE];
++	u8 cipher_type:4;
++	u8 key_type:2;
+ };
+ 
+ struct cvm_des3_ctx {
 -- 
 2.1.4
