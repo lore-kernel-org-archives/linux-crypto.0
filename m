@@ -1,54 +1,95 @@
-From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Subject: Re: [PATCH] crypto: vmx: Remove dubiously licensed crypto code
-Date: Fri, 05 May 2017 20:11:53 +0200
-Message-ID: <1494007913.25766.411.camel@kernel.crashing.org>
-References: <20170329125639.14288-1-msuchanek@suse.de>
-         <20170329145135.GA28057@kroah.com>
-         <20170329171327.38d4fdd6@kitsune.suse.cz>
-         <7ec54553-610c-a5dc-d4d9-3c83f6a161d9@linux.vnet.ibm.com>
-         <8591ac8ff6ef6fa9c4bd264017ac360d@linux.vnet.ibm.com>
-         <20170505155241.2274f347@kitsune.suse.cz>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-Cc: "Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Geert Uytterhoeven <geert+renesas@glider.be>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-kernel@vger.kernel.org, Paul Mackerras <paulus@samba.org>,
-        Tyrel Datwyler <tyreld@linux.vnet.ibm.com>, appro@openssl.org,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        linuxppc-dev@lists.ozlabs.org,
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: [RFC 00/10] introduce crypto wait for async op function
+Date: Sat,  6 May 2017 15:59:49 +0300
+Message-ID: <1494075602-5061-1-git-send-email-gilad@benyossef.com>
+Cc: Ofir Drang <ofir.drang@arm.com>,
+        Gilad Ben-Yossef <gilad.benyossef@arm.com>,
+        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-raid@vger.kernel.org, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-fsdevel@vger.kernel.org,
+        linux-ima-devel@lists.sourceforge.net,
+        linux-ima-user@lists.sourceforge.net,
+        linux-security-module@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-To: Michal =?ISO-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>,
-        Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>
+        Jonathan Corbet <corbet@lwn.net>,
+        David Howells <dhowells@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Shaohua Li <shli@kernel.org>, Steve French <sfrench@samba.org>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        James Morris <james.l.morris@oracle.com>,
+        "Serge E. Hallyn" <serge@hallyn.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from gate.crashing.org ([63.228.1.57]:57635 "EHLO gate.crashing.org"
+Received: from foss.arm.com ([217.140.101.70]:59022 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751052AbdEESMp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 5 May 2017 14:12:45 -0400
-In-Reply-To: <20170505155241.2274f347@kitsune.suse.cz>
+        id S1751400AbdEFNAP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 6 May 2017 09:00:15 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, 2017-05-05 at 15:52 +0200, Michal Suchánek wrote:
-> 
-> So you have an e-mail message from one of the authors of the code.
-> Andy Polyakov wrote most of the code but there are probably other
-> contributors who never gave explicit consent for using their code
-> outside of OpenSSL.
+Many users of kernel async. crypto services have a pattern of
+starting an async. crypto op and than using a completion
+to wait for it to end, resulting of the same code repeating
+itself in multiple places, sometime with errors.
 
-The only contributions to that file in OpenSSL that isn't from Andy
-are a whitespace fix and the addition of the licence :-)
+This patch aims to introduce a generic "wait for async. 
+crypto op to complete" functions and move all the users
+I could find to use it.  This gets rid of almost 300 
+lines of code and fixes at least one bug (hopefully
+without adding new ones).
 
-If that makes you feel better we could undo the whitespace fix :-)
+In some cases (indicated in the specific patch description)
+the move to the generic function changes the semantics
+slightly (such as dropping interruptible when waiting).
+I am especially interested in feedback whether people
+think this is OK or I should an interruptible variant.
 
-I've checked the other PowerPC related files in there and the situation
-is identical (aes-ppc.pl does have also a spelling fix in comments).
+The patch set was boot tested on x86_64 and arm64 which
+at the very least tests the crypto users via testmgr
+but I am less confident regarding some of the other
+users and would love feedback.
 
-At this point, it's pretty clear that this code is authored solely by
-Andy who gave permission to use it.
+Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 
-Cheers,
-Ben.
+Gilad Ben-Yossef (10):
+  crypto: factor async completion for general use
+  crypto: move pub key to generic async completion
+  crypto: move drbg to generic async completion
+  crypto: move gcm to generic async completion
+  crypto: move testmgr to generic async completion
+  dm: move dm-verity to generic async completion
+  fscrypt: move to generic async completion
+  cifs: move to generic async completion
+  ima: move to generic async completion
+  crypto: adapt api sample to use async. op wait
+
+ Documentation/crypto/api-samples.rst |  52 ++--------
+ crypto/af_alg.c                      |  27 -----
+ crypto/algif_aead.c                  |  14 +--
+ crypto/algif_hash.c                  |  30 +++---
+ crypto/algif_skcipher.c              |  10 +-
+ crypto/api.c                         |  28 ++++++
+ crypto/asymmetric_keys/public_key.c  |  28 +-----
+ crypto/drbg.c                        |  35 ++-----
+ crypto/gcm.c                         |  34 ++-----
+ crypto/testmgr.c                     | 184 +++++++++++------------------------
+ drivers/md/dm-verity-target.c        |  81 ++++-----------
+ drivers/md/dm-verity.h               |   5 -
+ fs/cifs/smb2ops.c                    |  30 +-----
+ fs/crypto/crypto.c                   |  28 +-----
+ fs/crypto/fname.c                    |  36 ++-----
+ fs/crypto/fscrypt_private.h          |  10 --
+ fs/crypto/keyinfo.c                  |  21 +---
+ include/crypto/drbg.h                |   3 +-
+ include/crypto/if_alg.h              |  14 ---
+ include/linux/crypto.h               |  28 ++++++
+ security/integrity/ima/ima_crypto.c  |  56 ++++-------
+ 21 files changed, 222 insertions(+), 532 deletions(-)
+
+-- 
+2.1.4
