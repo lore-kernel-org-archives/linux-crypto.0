@@ -1,112 +1,108 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: BUG: drbg: Added nodes from Stack Memory in link list
-Date: Mon, 08 May 2017 10:30:42 +0200
-Message-ID: <1775267.oRCpN7QUMS@tauon.chronox.de>
-References: <CAFXBA=kDqH_32bX8XpUes9bdPP-3Gq5KRGBxu_FXKD3jwgzVdQ@mail.gmail.com> <11088841.2SosuHvOD7@tauon.chronox.de> <CAFXBA=k4MWJYi5Aiw83pFVLykFBQ6RXKerC8Er-MQ3KE2Xi_oA@mail.gmail.com>
+From: Igal Liberman <igall@marvell.com>
+Subject: RE: [PATCH v3 2/3] crypto: inside-secure: add SafeXcel EIP197 crypto
+ engine driver
+Date: Mon, 8 May 2017 08:46:08 +0000
+Message-ID: <a5e25c4a7e294ec2bea11803a79d0a77@IL-EXCH01.marvell.com>
+References: <20170424075407.19730-1-antoine.tenart@free-electrons.com>
+ <20170424075407.19730-3-antoine.tenart@free-electrons.com>
+ <8ff65d6a5e5e4d388d3c5a384e4f5fd6@IL-EXCH01.marvell.com>
+ <20170424085731.wbg53t5lcler4mng@kwain>
+ <c018afb6-202c-6e89-d990-c2259dc07f6e@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-To: Harsh Jain <harshjain.prof@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:59416 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751111AbdEHIap (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 8 May 2017 04:30:45 -0400
-In-Reply-To: <CAFXBA=k4MWJYi5Aiw83pFVLykFBQ6RXKerC8Er-MQ3KE2Xi_oA@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Transfer-Encoding: 7bit
+Cc: "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>, "andrew@lunn.ch" <andrew@lunn.ch>,
+ "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+ "boris.brezillon@free-electrons.com" <boris.brezillon@free-electrons.com>,
+ Ofer Heifetz <oferh@marvell.com>, Nadav Haklai <nadavh@marvell.com>,
+ "thomas.petazzoni@free-electrons.com" <thomas.petazzoni@free-electrons.com>,
+ "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+ "gregory.clement@free-electrons.com" <gregory.clement@free-electrons.com>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "jason@lakedaemon.net" <jason@lakedaemon.net>,
+ "sebastian.hesselbarth@gmail.com" <sebastian.hesselbarth@gmail.com>
+To: Robin Murphy <robin.murphy@arm.com>, Antoine Tenart
+ <antoine.tenart@free-electrons.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <c018afb6-202c-6e89-d990-c2259dc07f6e@arm.com>
+Content-Language: en-US
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Montag, 8. Mai 2017, 08:30:13 CEST schrieb Harsh Jain:
+Hi Robin
 
-Hi Harsh,
+> -----Original Message-----
+> From: linux-crypto-owner@vger.kernel.org [mailto:linux-crypto-
+> owner@vger.kernel.org] On Behalf Of Robin Murphy
+> Sent: Wednesday, May 03, 2017 20:15
+> To: Antoine Tenart; Igal Liberman
+> Cc: herbert@gondor.apana.org.au; davem@davemloft.net;
+> jason@lakedaemon.net; andrew@lunn.ch; gregory.clement@free-
+> electrons.com; sebastian.hesselbarth@gmail.com; linux-
+> crypto@vger.kernel.org; linux-arm-kernel@lists.infradead.org;
+> thomas.petazzoni@free-electrons.com; boris.brezillon@free-electrons.com;
+> Ofer Heifetz; Nadav Haklai
+> Subject: Re: [PATCH v3 2/3] crypto: inside-secure: add SafeXcel EIP197
+> crypto engine driver
 > 
-> Confusing, I have to dig more for DRBG. Actually we observed following
-> panic in Chcr (Chelsio) when drgb is enabled and Panic trace points
-> some thing wrong
-> with drgb modules. Any idea what are possible reason for this.
-
-Just to confirm: are you using the latest kernel? The bug you are referring to 
-happens in the drbg_kcapi_sym_ctr called by the update operation to process 
-seed material. This function had a bug in it where I used stack buffer. This 
-is now repaced with heap buffer:
-
-5102981212454998d549273ff9847f19e97a1794
-
-I am yet wondering why a __list_add is called that causes the bug. In the DRBG 
-code path seen below, I am not seeing any list_add calls.
+> On 24/04/17 09:57, Antoine Tenart wrote:
+> > Hi Igal,
+> >
+> > On Mon, Apr 24, 2017 at 08:50:32AM +0000, Igal Liberman wrote:
+> >> [...]
+> >>
+> >>> +	priv->clk = of_clk_get(dev->of_node, 0);
+> >>> +	if (!IS_ERR(priv->clk)) {
+> >>> +		ret = clk_prepare_enable(priv->clk);
+> >>> +		if (ret) {
+> >>> +			dev_err(dev, "unable to enable clk (%d)\n", ret);
+> >>> +			return ret;
+> >>> +		}
+> >>> +	} else {
+> >>> +		/* The clock isn't mandatory */
+> >>> +		if (PTR_ERR(priv->clk) == -EPROBE_DEFER)
+> >>> +			return -EPROBE_DEFER;
+> >>> +	}
+> >>> +
+> >>> +	ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64));
+> >>
+> >> The correct address width of the engine in Marvell SoCs is 40bit.
 > 
-> alg: No test for authenc(digest_null,rfc3686(ctr(aes)))
-> (authenc(digest_null-generic,rfc3686-ctr-aes-chcr))
-> alg: No test for seqiv(authenc(digest_null,rfc3686(ctr(aes))))
-> (seqiv(authenc(digest_null-generic,rfc3686-ctr-aes-chcr)))
-> alg: No test for fips(ansi_cprng) (fips_ansi_cprng)
-> BUG: unable to handle kernel NULL pointer dereference at           (null)
-> IP: [<ffffffff81317c66>] __list_add+0x26/0xd0
-> PGD 0
-> Oops: 0000 [#1] SMP
-> Modules linked in: drbg(+) ansi_cprng seqiv xfrm6_mode_tunnel
-> xfrm4_mode_tunnel xfrm4_tunnel tunnel4 ipcomp xfrm_ipcomp esp4 ah4
-> af_key cbc ccm ctr ghash_generic gf128mul ghash_clmulni_intel cryptd
-> gcm sha512_ssse3 sha512_generic chcr(OE) cxgb4(OE) authenc netconsole
-> configfs xt_nat iptable_nat nf_conntrack_ipv4 nf_defrag_ipv4
-> nf_nat_ipv4 nf_nat nf_conntrack ip_tables nfsd lockd grace nfs_acl
-> auth_rpcgss sunrpc ipv6 crc_ccitt vfat fat joydev iTCO_wdt
-> iTCO_vendor_support mxm_wmi pcspkr sg i2c_i801 i2c_smbus lpc_ich
-> mfd_core shpchp xhci_pci xhci_hcd igb i2c_algo_bit i2c_core ptp
-> pps_core ioatdma dca ipmi_si ipmi_msghandler wmi acpi_cpufreq acpi_pad
-> dm_mod(E) ext4(E) mbcache(E) jbd2(E) sd_mod(E) ahci(E) libahci(E)
-> [last unloaded: scsi_transport_fc]
-> CPU: 9 PID: 3672 Comm: cryptomgr_test Tainted: G           OE   4.9.13 #2
-> Hardware name: Supermicro X10DRi/X10DRi, BIOS 2.0 12/28/2015
-> task: ffff88103b418a00 task.stack: ffffc90008a7c000
-> RIP: 0010:[<ffffffff81317c66>]  [<ffffffff81317c66>] __list_add+0x26/0xd0
-> RSP: 0018:ffffc90008a7f8c8  EFLAGS: 00010046
-> RAX: 0000000000000000 RBX: ffffc90008a7f920 RCX: 0000000000000001
-> RDX: ffff88103c8b5ef0 RSI: 0000000000000000 RDI: ffffc90008a7f920
-> RBP: ffffc90008a7f8f8 R08: 0000000000000000 R09: ffff8810053200b0
-> R10: ffff88103caf3100 R11: 0000000000000020 R12: ffff88103c8b5ef0
-> R13: 0000000000000000 R14: ffff88103b418a00 R15: 7fffffffffffffff
-> FS:  0000000000000000(0000) GS:ffff88107f440000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000000000000000 CR3: 0000000001c07000 CR4: 00000000001406e0
-> Stack:
->  ffffc90008a7f8e8 0000000000000246 ffff88103caf3040 ffff88103c8b5ee0
->  ffff88103c8b5ee8 ffffc90008a7f908 ffffc90008a7f968 ffffffff81654c02
->  0000000000000001 ffff88103b418a00 ffffffff81097370 0000000000000000
-> Call Trace:
->  [<ffffffff81654c02>] wait_for_completion_interruptible+0xc2/0x130
->  [<ffffffff81097370>] ? try_to_wake_up+0x240/0x240
->  [<ffffffffa02582fb>] drbg_kcapi_sym_ctr+0xeb/0x150 [drbg]
->  [<ffffffffa0259560>] drbg_ctr_update+0x1b0/0x2a0 [drbg]
->  [<ffffffffa0259bd2>] drbg_seed+0x1a2/0x2e0 [drbg]
->  [<ffffffffa025a6ef>] ? drbg_init_sym_kernel+0x13f/0x200 [drbg]
->  [<ffffffffa025aa62>] drbg_instantiate+0x52/0x1e0 [drbg]
->  [<ffffffff811ca2ee>] ? __kmalloc+0xee/0x1d0
->  [<ffffffff812a873d>] ? crypto_create_tfm+0x3d/0xd0
->  [<ffffffffa025acbc>] drbg_kcapi_seed+0xcc/0x118 [drbg]
->  [<ffffffff812a87a1>] ? crypto_create_tfm+0xa1/0xd0
->  [<ffffffff812bb48d>] crypto_rng_reset+0x5d/0x80
->  [<ffffffff812b5197>] drbg_cavs_test+0xf7/0x370
->  [<ffffffff810a3018>] ? dequeue_task_fair+0x68/0x420
->  [<ffffffff8109ccd5>] ? pick_next_task_idle+0x45/0x50
->  [<ffffffff812b547b>] alg_test_drbg+0x6b/0xa0
->  [<ffffffff812b18d5>] alg_test+0x145/0x350
->  [<ffffffff812b0ad0>] ? cryptomgr_probe+0xd0/0xd0
->  [<ffffffff812b0ad0>] ? cryptomgr_probe+0xd0/0xd0
->  [<ffffffff812b0b15>] cryptomgr_test+0x45/0x50
->  [<ffffffff8108a5ed>] kthread+0xcd/0xf0
->  [<ffffffff8109503e>] ? schedule_tail+0x1e/0xc0
->  [<ffffffff8108a520>] ? __kthread_init_worker+0x40/0x40
->  [<ffffffff81657bd2>] ret_from_fork+0x22/0x30
-> Code: 00 00 00 00 00 55 48 89 e5 48 83 ec 30 48 89 5d e8 4c 89 65 f0
-> 48 89 fb 4c 89 6d f8 4c 8b 42 08 49 89 f5 49 89 d4 49 39 f0 75 31 <4d>
-> 8b 45 00 4d 39 c4 75 6f 4c 39 e3 74 45 4c 39 eb 74 40 49 89
-> RIP  [<ffffffff81317c66>] __list_add+0x26/0xd0
->  RSP <ffffc90008a7f8c8>
-> CR2: 0000000000000000
-> ---[ end trace fbf11c880e8c4c52 ]---
+> Is that what the IP block itself is internally limited to, or just how many bits
+> happen to be wired up externally in the particular Marvell integrations?
+> 
 
-Ciao
-Stephan
+The IP supports up to 64bit address width (depends on the revision).
+The 40bit limitation is related to Marvell integration.
+
+> > Oops. I'll update.
+> 
+> If the device itself can handle full 64-bit addresses, then the driver should
+> reflect that regardless of the integration - describing integration limitations is
+> the job of the firmware, e.g. with DT "dma-ranges", assuming they actually
+> matter (typically if the whole SoC interconnect and physical memory map is
+> the same width then having an even wider DMA mask doesn't make any
+> difference - 64 bits still just means "everything").
+> 
+> If it's the case that the IP is configurable and could be synthesised with
+> various internal address widths, then that might warrant a DT property to
+> identify the particular configuration if it's not readable from some ID
+> register, although it may be reasonable in practice to simply assume the
+> chosen configuration to be sane (i.e. not smaller than the rest of the system)
+> and that the driver can set the maximal DMA mask as above.
+> 
+> Robin.
+> 
+> >
+> > Thanks!
+> > Antoine
+> >
