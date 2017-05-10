@@ -1,46 +1,43 @@
-From: Eric Biggers <ebiggers3@gmail.com>
-Subject: [PATCH] crypto: aes_ti - fix comment for MixColumns step
-Date: Tue,  9 May 2017 17:20:27 -0700
-Message-ID: <20170510002027.47632-1-ebiggers3@gmail.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Eric Biggers <ebiggers@google.com>
-To: linux-crypto@vger.kernel.org
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: [PATCH] crypto: glue_helper - Delete some dead code
+Date: Wed, 10 May 2017 08:52:26 +0300
+Message-ID: <20170510055226.5mlkw654cl6djc65@mwanda>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pg0-f67.google.com ([74.125.83.67]:34615 "EHLO
-        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750751AbdEJAVY (ORCPT
+Received: from aserp1040.oracle.com ([141.146.126.69]:16974 "EHLO
+        aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751353AbdEJFxH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 9 May 2017 20:21:24 -0400
-Received: by mail-pg0-f67.google.com with SMTP id u187so1854325pgb.1
-        for <linux-crypto@vger.kernel.org>; Tue, 09 May 2017 17:21:24 -0700 (PDT)
+        Wed, 10 May 2017 01:53:07 -0400
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Eric Biggers <ebiggers@google.com>
+We checked (nbytes < bsize) inside the loops so it's not possible to hit
+the "goto done;" here.  This code is cut and paste from other slightly
+different loops where we don't have the check inside the loop.
 
-mix_columns() contains a comment which shows the matrix used by the
-MixColumns step of AES, but the last entry in this matrix was incorrect
---- and did not match the code, which is correct.  Fix the comment.
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- crypto/aes_ti.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/crypto/aes_ti.c b/crypto/aes_ti.c
-index 92644fd1ac19..03023b2290e8 100644
---- a/crypto/aes_ti.c
-+++ b/crypto/aes_ti.c
-@@ -114,7 +114,7 @@ static u32 mix_columns(u32 x)
- 	 * | 0x2 0x3 0x1 0x1 |   | x[0] |
- 	 * | 0x1 0x2 0x3 0x1 |   | x[1] |
- 	 * | 0x1 0x1 0x2 0x3 | x | x[2] |
--	 * | 0x3 0x1 0x1 0x3 |   | x[3] |
-+	 * | 0x3 0x1 0x1 0x2 |   | x[3] |
- 	 */
- 	u32 y = mul_by_x(x) ^ ror32(x, 16);
+diff --git a/arch/x86/crypto/glue_helper.c b/arch/x86/crypto/glue_helper.c
+index 24ac9fad832d..d61e57960fe0 100644
+--- a/arch/x86/crypto/glue_helper.c
++++ b/arch/x86/crypto/glue_helper.c
+@@ -176,9 +176,6 @@ __glue_cbc_decrypt_128bit(const struct common_glue_ctx *gctx,
+ 				src -= 1;
+ 				dst -= 1;
+ 			} while (nbytes >= func_bytes);
+-
+-			if (nbytes < bsize)
+-				goto done;
+ 		}
+ 	}
  
--- 
-2.13.0.rc2.291.g57267f2277-goog
