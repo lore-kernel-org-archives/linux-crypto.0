@@ -1,10 +1,11 @@
 From: kbuild test robot <lkp@intel.com>
-Subject: Re: [PATCH v1 1/3] crypto: cavium - Add support for CNN55XX adapters.
-Date: Wed, 10 May 2017 22:38:46 +0800
-Message-ID: <201705102241.U8wdQM0B%fengguang.wu@intel.com>
-References: <20170510130640.5838-2-Jampala.Srikanth@cavium.com>
+Subject: Re: [PATCH v1 3/3] crypto: cavium - Register the CNN55XX supported
+ crypto algorithms.
+Date: Wed, 10 May 2017 22:43:00 +0800
+Message-ID: <201705102230.beRMMvlM%fengguang.wu@intel.com>
+References: <20170510130640.5838-4-Jampala.Srikanth@cavium.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="NzB8fVQJ5HfG6fxh"
+Content-Type: multipart/mixed; boundary="gKMricLos+KVdGMg"
 Cc: kbuild-all@01.org, herbert@gondor.apana.org.au,
         davem@davemloft.net, linux-kernel@vger.kernel.org,
         linux-crypto@vger.kernel.org, George.Cherian@cavium.com,
@@ -12,24 +13,24 @@ Cc: kbuild-all@01.org, herbert@gondor.apana.org.au,
         Ram.Kumar@cavium.com, Jampala.Srikanth@cavium.com
 To: Srikanth Jampala <Jampala.Srikanth@cavium.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:7015 "EHLO mga02.intel.com"
+Received: from mga02.intel.com ([134.134.136.20]:15105 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751118AbdEJOjY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 10 May 2017 10:39:24 -0400
+        id S1751267AbdEJOnX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 10 May 2017 10:43:23 -0400
 Content-Disposition: inline
-In-Reply-To: <20170510130640.5838-2-Jampala.Srikanth@cavium.com>
+In-Reply-To: <20170510130640.5838-4-Jampala.Srikanth@cavium.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 
---NzB8fVQJ5HfG6fxh
+--gKMricLos+KVdGMg
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
 Hi Srikanth,
 
-[auto build test ERROR on cryptodev/master]
-[also build test ERROR on next-20170510]
+[auto build test WARNING on cryptodev/master]
+[also build test WARNING on next-20170510]
 [cannot apply to v4.11]
 [if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
 
@@ -41,69 +42,61 @@ reproduce:
         # save the attached .config to linux build tree
         make ARCH=i386 
 
-All errors (new ones prefixed by >>):
+All warnings (new ones prefixed by >>):
 
-   In file included from drivers/crypto/cavium/nitrox/nitrox_main.c:10:0:
+   In file included from drivers/crypto/cavium/nitrox/nitrox_algs.c:12:0:
    drivers/crypto/cavium/nitrox/nitrox_dev.h: In function 'nitrox_read_csr':
->> drivers/crypto/cavium/nitrox/nitrox_dev.h:156:9: error: implicit declaration of function 'readq' [-Werror=implicit-function-declaration]
+   drivers/crypto/cavium/nitrox/nitrox_dev.h:159:9: error: implicit declaration of function 'readq' [-Werror=implicit-function-declaration]
      return readq(ndev->bar_addr + offset);
             ^~~~~
    drivers/crypto/cavium/nitrox/nitrox_dev.h: In function 'nitrox_write_csr':
->> drivers/crypto/cavium/nitrox/nitrox_dev.h:168:2: error: implicit declaration of function 'writeq' [-Werror=implicit-function-declaration]
+   drivers/crypto/cavium/nitrox/nitrox_dev.h:171:2: error: implicit declaration of function 'writeq' [-Werror=implicit-function-declaration]
      writeq(value, (ndev->bar_addr + offset));
      ^~~~~~
-   cc1: some warnings being treated as errors
---
-   In file included from drivers/crypto/cavium/nitrox/nitrox_hal.c:3:0:
-   drivers/crypto/cavium/nitrox/nitrox_dev.h: In function 'nitrox_read_csr':
->> drivers/crypto/cavium/nitrox/nitrox_dev.h:156:9: error: implicit declaration of function 'readq' [-Werror=implicit-function-declaration]
-     return readq(ndev->bar_addr + offset);
-            ^~~~~
-   drivers/crypto/cavium/nitrox/nitrox_dev.h: In function 'nitrox_write_csr':
->> drivers/crypto/cavium/nitrox/nitrox_dev.h:168:2: error: implicit declaration of function 'writeq' [-Werror=implicit-function-declaration]
-     writeq(value, (ndev->bar_addr + offset));
-     ^~~~~~
-   drivers/crypto/cavium/nitrox/nitrox_hal.c: In function 'nitrox_config_pkt_input_rings':
-   drivers/crypto/cavium/nitrox/nitrox_hal.c:120:23: warning: unused variable 'cmdq' [-Wunused-variable]
-      struct nitrox_cmdq *cmdq = &ndev->pkt_cmdqs[i];
-                          ^~~~
+   drivers/crypto/cavium/nitrox/nitrox_algs.c: In function 'nitrox_ablkcipher_exit':
+>> drivers/crypto/cavium/nitrox/nitrox_algs.c:117:23: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
+      crypto_free_context((void *)inst->u.ctx_handle);
+                          ^
    cc1: some warnings being treated as errors
 
-vim +/readq +156 drivers/crypto/cavium/nitrox/nitrox_dev.h
+vim +117 drivers/crypto/cavium/nitrox/nitrox_algs.c
 
-   150	 * @offset: offset of the register to read
-   151	 *
-   152	 * Returns: value read
-   153	 */
-   154	static inline u64 nitrox_read_csr(struct nitrox_device *ndev, u64 offset)
-   155	{
- > 156		return readq(ndev->bar_addr + offset);
-   157	}
-   158	
-   159	/**
-   160	 * nitrox_write_csr - Write to device register
-   161	 * @ndev: NITROX device
-   162	 * @offset: offset of the register to write
-   163	 * @value: value to write
-   164	 */
-   165	static inline void nitrox_write_csr(struct nitrox_device *ndev, u64 offset,
-   166					    u64 value)
-   167	{
- > 168		writeq(value, (ndev->bar_addr + offset));
-   169	}
-   170	
-   171	static inline int nitrox_in_use(struct nitrox_device *ndev)
+   101		ctx = crypto_alloc_context(inst->ndev);
+   102		if (!ctx) {
+   103			nitrox_put_device(inst->ndev);
+   104			return -ENOMEM;
+   105		}
+   106		inst->u.ctx_handle = (uintptr_t)ctx;
+   107	
+   108		return 0;
+   109	}
+   110	
+   111	static void nitrox_ablkcipher_exit(struct crypto_tfm *tfm)
+   112	{
+   113		struct nitrox_crypto_instance *inst = crypto_tfm_ctx(tfm);
+   114	
+   115		/* free the crypto context */
+   116		if (inst->u.ctx_handle)
+ > 117			crypto_free_context((void *)inst->u.ctx_handle);
+   118	
+   119		nitrox_put_device(inst->ndev);
+   120	
+   121		inst->u.ctx_handle = 0;
+   122		inst->ndev = NULL;
+   123	}
+   124	
+   125	static inline int nitrox_ablkcipher_setkey(struct crypto_ablkcipher *cipher,
 
 ---
 0-DAY kernel test infrastructure                Open Source Technology Center
 https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
 
---NzB8fVQJ5HfG6fxh
+--gKMricLos+KVdGMg
 Content-Type: application/gzip
 Content-Disposition: attachment; filename=".config.gz"
 Content-Transfer-Encoding: base64
 
-H4sICJkcE1kAAy5jb25maWcAlDzLdtw2svt8RR/nLmYWsa1HNM65RwsQBLuRJgkaALvV2vAo
+H4sICJQeE1kAAy5jb25maWcAlDzLdtw2svt8RR/nLmYWsa1HNM65RwsQBLuRJgkaALvV2vAo
 ctvRGVnytFozyf36WwXwAYBAO5NFLKIK73pXoX/84ccFeT0+f707PtzfPT7+ufiyf9of7o77
 T4vPD4/7/13kYlELvWA5128BuXx4ev3j3cPFh6vF5duzs7fvfzrcXyzW+8PT/nFBn58+P3x5
 he4Pz08//AjoVNQFX3ZXlxnXi4eXxdPzcfGyP/7Qt998uOouzq//dL6nD14rLVuquai7nFGR
@@ -583,4 +576,4 @@ TNbtGZTCGWvyoiin0URGAB0jF3ep1sr8QcdtCZmyUjdfu/bwwRa9aTGyt8PvufmfpyZUwbAm
 CxESCyoMSW8z0DhgLvwFJCWONlzJeatvq0AujcuJ5elWwFXFtf0CHY3IAnjvy5uU4H2NhbAE
 r9aUo3Y2iEBW2LFGOrEvYQQYzxEW2Kkbbeq2bDGtV4si/AejhO5dtrABAA==
 
---NzB8fVQJ5HfG6fxh--
+--gKMricLos+KVdGMg--
