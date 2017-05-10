@@ -1,18 +1,20 @@
 From: Tudor Ambarus <tudor.ambarus@microchip.com>
-Subject: [PATCH 1/2] crypto: dh - fix dh_max_size
-Date: Wed, 10 May 2017 16:04:28 +0300
-Message-ID: <1494421469-17125-1-git-send-email-tudor.ambarus@microchip.com>
+Subject: [PATCH 2/2] crypto: ecdh - fix ecdh_max_size
+Date: Wed, 10 May 2017 16:04:29 +0300
+Message-ID: <1494421469-17125-2-git-send-email-tudor.ambarus@microchip.com>
+References: <1494421469-17125-1-git-send-email-tudor.ambarus@microchip.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: <linux-crypto@vger.kernel.org>,
         Tudor Ambarus <tudor.ambarus@microchip.com>
 To: <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from esa4.microchip.iphmx.com ([68.232.154.123]:13324 "EHLO
-        esa4.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751432AbdEJNEj (ORCPT
+Received: from esa5.microchip.iphmx.com ([216.71.150.166]:27550 "EHLO
+        esa5.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751432AbdEJNEl (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 10 May 2017 09:04:39 -0400
+        Wed, 10 May 2017 09:04:41 -0400
+In-Reply-To: <1494421469-17125-1-git-send-email-tudor.ambarus@microchip.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
@@ -21,21 +23,26 @@ or error code if key hasn't been set.
 
 Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
 ---
- crypto/dh.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ crypto/ecdh.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/crypto/dh.c b/crypto/dh.c
-index 87e3542..53d17ff 100644
---- a/crypto/dh.c
-+++ b/crypto/dh.c
-@@ -148,7 +148,7 @@ static int dh_max_size(struct crypto_kpp *tfm)
+diff --git a/crypto/ecdh.c b/crypto/ecdh.c
+index 63ca337..01bfd13 100644
+--- a/crypto/ecdh.c
++++ b/crypto/ecdh.c
+@@ -109,10 +109,10 @@ static int ecdh_compute_value(struct kpp_request *req)
+ static int ecdh_max_size(struct crypto_kpp *tfm)
  {
- 	struct dh_ctx *ctx = dh_get_ctx(tfm);
+ 	struct ecdh_ctx *ctx = ecdh_get_ctx(tfm);
+-	int nbytes = ctx->ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
  
--	return mpi_get_size(ctx->p);
-+	return ctx->p ? mpi_get_size(ctx->p) : -EINVAL;
+-	/* Public key is made of two coordinates */
+-	return 2 * nbytes;
++	/* Public key is made of two coordinates, add one to the left shift  */
++	return ctx->ndigits ? ctx->ndigits << (ECC_DIGITS_TO_BYTES_SHIFT + 1) :
++			      -EINVAL;
  }
  
- static void dh_exit_tfm(struct crypto_kpp *tfm)
+ static void no_exit_tfm(struct crypto_kpp *tfm)
 -- 
 2.7.4
