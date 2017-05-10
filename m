@@ -1,48 +1,49 @@
-From: Tudor Ambarus <tudor.ambarus@microchip.com>
-Subject: [PATCH 2/2] crypto: ecdh - fix ecdh_max_size
-Date: Wed, 10 May 2017 16:04:29 +0300
-Message-ID: <1494421469-17125-2-git-send-email-tudor.ambarus@microchip.com>
-References: <1494421469-17125-1-git-send-email-tudor.ambarus@microchip.com>
+From: Colin King <colin.king@canonical.com>
+Subject: [PATCH] crypto: glue_helper: remove redundant check on nbytes < bsize
+Date: Wed, 10 May 2017 14:04:31 +0100
+Message-ID: <20170510130431.21236-1-colin.king@canonical.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <linux-crypto@vger.kernel.org>,
-        Tudor Ambarus <tudor.ambarus@microchip.com>
-To: <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from esa5.microchip.iphmx.com ([216.71.150.166]:27550 "EHLO
-        esa5.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751432AbdEJNEl (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 10 May 2017 09:04:41 -0400
-In-Reply-To: <1494421469-17125-1-git-send-email-tudor.ambarus@microchip.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        linux-crypto@vger.kernel.org
+Return-path: <kernel-janitors-owner@vger.kernel.org>
+Sender: kernel-janitors-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-The function should return minimum size for output buffer
-or error code if key hasn't been set.
+From: Colin Ian King <colin.king@canonical.com>
 
-Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
+There is a check to see if nbytes < bsize (and a jump to label 'done' if
+it is true) inside the proceeding do-while loop so it is impossible for
+the second nbytes < bsize check to be true, hence is it redundant and
+can be removed. Remove it.
+
+Detected by CoverityScan, CID#712347 ("Logically dead code")
+
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
 ---
- crypto/ecdh.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ arch/x86/crypto/glue_helper.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/crypto/ecdh.c b/crypto/ecdh.c
-index 63ca337..01bfd13 100644
---- a/crypto/ecdh.c
-+++ b/crypto/ecdh.c
-@@ -109,10 +109,10 @@ static int ecdh_compute_value(struct kpp_request *req)
- static int ecdh_max_size(struct crypto_kpp *tfm)
- {
- 	struct ecdh_ctx *ctx = ecdh_get_ctx(tfm);
--	int nbytes = ctx->ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
+diff --git a/arch/x86/crypto/glue_helper.c b/arch/x86/crypto/glue_helper.c
+index 24ac9fad832d..d61e57960fe0 100644
+--- a/arch/x86/crypto/glue_helper.c
++++ b/arch/x86/crypto/glue_helper.c
+@@ -176,9 +176,6 @@ __glue_cbc_decrypt_128bit(const struct common_glue_ctx *gctx,
+ 				src -= 1;
+ 				dst -= 1;
+ 			} while (nbytes >= func_bytes);
+-
+-			if (nbytes < bsize)
+-				goto done;
+ 		}
+ 	}
  
--	/* Public key is made of two coordinates */
--	return 2 * nbytes;
-+	/* Public key is made of two coordinates, add one to the left shift  */
-+	return ctx->ndigits ? ctx->ndigits << (ECC_DIGITS_TO_BYTES_SHIFT + 1) :
-+			      -EINVAL;
- }
- 
- static void no_exit_tfm(struct crypto_kpp *tfm)
 -- 
-2.7.4
+2.11.0
+
