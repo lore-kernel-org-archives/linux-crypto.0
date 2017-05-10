@@ -1,75 +1,198 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: need to pick a solution for dm-crypt IV generation and do it!
- [was: Re: dm: submit stacked requests in irq enabled context]
-Date: Wed, 10 May 2017 17:55:03 +0300
-Message-ID: <CAOtvUMdrnvr4RSzh6YB9F0B_WqfQ2WmSDUtCgn605JvRHrB3gg@mail.gmail.com>
-References: <a66b6e17-a8c4-3465-fc2e-c3114abe0ca7@codeaurora.org>
- <dee12838-7b43-2fdd-0644-41c10ecf9148@codeaurora.org> <20170509155555.GB2572@localhost.localdomain>
- <20170510071733.GA24980@infradead.org> <39356321-b39b-98c7-f52b-ffd19d6dfc69@codeaurora.org>
- <CAOtvUMcjULAOZYQ3K_XDvxcFoFJJjX-wxF6e6Y1+-r67tS_Y7g@mail.gmail.com> <20170510144525.GA5608@redhat.com>
+From: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Subject: Re: [RFC 09/10] ima: move to generic async completion
+Date: Wed, 10 May 2017 17:26:08 -0400
+Message-ID: <1494451568.3006.30.camel@linux.vnet.ibm.com>
+References: <1494075602-5061-1-git-send-email-gilad@benyossef.com>
+         <1494075602-5061-10-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Neeraj Soni <neersoni@codeaurora.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Keith Busch <keith.busch@intel.com>, dm-devel@redhat.com,
-        Alasdair Kergon <agk@redhat.com>,
-        Ondrej Mosnacek <omosnace@redhat.com>,
-        Milan Broz <gmazyland@gmail.com>,
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: Ofir Drang <ofir.drang@arm.com>,
+        Gilad Ben-Yossef <gilad.benyossef@arm.com>,
+        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-raid@vger.kernel.org, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-fsdevel@vger.kernel.org,
+        linux-ima-devel@lists.sourceforge.net,
+        linux-ima-user@lists.sourceforge.net,
+        linux-security-module@vger.kernel.org
+To: Gilad Ben-Yossef <gilad@benyossef.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org
-To: Mike Snitzer <snitzer@redhat.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-yb0-f179.google.com ([209.85.213.179]:33021 "EHLO
-        mail-yb0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751955AbdEJOzF (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 10 May 2017 10:55:05 -0400
-Received: by mail-yb0-f179.google.com with SMTP id j17so8649875ybj.0
-        for <linux-crypto@vger.kernel.org>; Wed, 10 May 2017 07:55:05 -0700 (PDT)
-In-Reply-To: <20170510144525.GA5608@redhat.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+        "David S. Miller" <davem@davemloft.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        David Howells <dhowells@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Shaohua Li <shli@kernel.org>, Steve French <sfrench@samba.org>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        James Morris <james.l.morris@oracle.com>,
+        "Serge E. Hallyn" <serge@hallyn.com>
+Return-path: <linux-security-module-owner@vger.kernel.org>
+In-Reply-To: <1494075602-5061-10-git-send-email-gilad@benyossef.com>
+Sender: owner-linux-security-module@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, May 10, 2017 at 5:45 PM, Mike Snitzer <snitzer@redhat.com> wrote:
-> On Wed, May 10 2017 at  9:37am -0400,
-> Gilad Ben-Yossef <gilad@benyossef.com> wrote:
->
->> On Wed, May 10, 2017 at 11:49 AM, Neeraj Soni <neersoni@codeaurora.org> wrote:
->> > Hi Keith,
->> >
->> > Request based dm (dm-req-crypt) is being used for Disk Encryption solution
->> > in Android used by Google. Also as i mentioned reverting this fix  improves
->> > the RR/RW numbers so this proves the request based dm is coming into path
->> > and is being used.
->>
->> Sadly, that is an out of tree module.
->>
->> Does it still use Qcom specific APIs in its implementation (qcrypto_* funcs)?
->> It did the last time I've checked - and the driver that implements
->> those is not upstream either...
->>
->> It makes it difficult to help - which is a shame since I am interested
->> in enabling higher performance
->> of dm-crypt when using HW based crypto transformation myself.
->
-> I have absolutely no interest in request-based dm-crypt.  It is a hack
-> to work-around limitations in crypto IV generation.
+On Sat, 2017-05-06 at 15:59 +0300, Gilad Ben-Yossef wrote:
+> ima starts several async. crypto ops and  waits for their completions.
+> Move it over to generic code doing the same.
+> 
+> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 
-I agree. This is why I've said I'm interested in a high performance dm-crypt,
-not "request based dm-crypt". They are trying to solve the same problem but
-with the wrong solution and doing so out of upstream.
+Acked-by: Mimi Zohar <zohar@linux.vnet.ibm.com>
 
-As the parlance of our time seems to go... sad. :-)
+> ---
+>  security/integrity/ima/ima_crypto.c | 56 +++++++++++--------------------------
+>  1 file changed, 17 insertions(+), 39 deletions(-)
+> 
+> diff --git a/security/integrity/ima/ima_crypto.c b/security/integrity/ima/ima_crypto.c
+> index 802d5d2..0e4db1fe 100644
+> --- a/security/integrity/ima/ima_crypto.c
+> +++ b/security/integrity/ima/ima_crypto.c
+> @@ -27,11 +27,6 @@
+> 
+>  #include "ima.h"
+> 
+> -struct ahash_completion {
+> -	struct completion completion;
+> -	int err;
+> -};
+> -
+>  /* minimum file size for ahash use */
+>  static unsigned long ima_ahash_minsize;
+>  module_param_named(ahash_minsize, ima_ahash_minsize, ulong, 0644);
+> @@ -196,30 +191,13 @@ static void ima_free_atfm(struct crypto_ahash *tfm)
+>  		crypto_free_ahash(tfm);
+>  }
+> 
+> -static void ahash_complete(struct crypto_async_request *req, int err)
+> +static inline int ahash_wait(int err, struct crypto_wait *wait)
+>  {
+> -	struct ahash_completion *res = req->data;
+> 
+> -	if (err == -EINPROGRESS)
+> -		return;
+> -	res->err = err;
+> -	complete(&res->completion);
+> -}
+> +	err = crypto_wait_req(err, wait);
+> 
+> -static int ahash_wait(int err, struct ahash_completion *res)
+> -{
+> -	switch (err) {
+> -	case 0:
+> -		break;
+> -	case -EINPROGRESS:
+> -	case -EBUSY:
+> -		wait_for_completion(&res->completion);
+> -		reinit_completion(&res->completion);
+> -		err = res->err;
+> -		/* fall through */
+> -	default:
+> +	if (err)
+>  		pr_crit_ratelimited("ahash calculation failed: err: %d\n", err);
+> -	}
+> 
+>  	return err;
+>  }
+> @@ -233,7 +211,7 @@ static int ima_calc_file_hash_atfm(struct file *file,
+>  	int rc, read = 0, rbuf_len, active = 0, ahash_rc = 0;
+>  	struct ahash_request *req;
+>  	struct scatterlist sg[1];
+> -	struct ahash_completion res;
+> +	struct crypto_wait wait;
+>  	size_t rbuf_size[2];
+> 
+>  	hash->length = crypto_ahash_digestsize(tfm);
+> @@ -242,12 +220,12 @@ static int ima_calc_file_hash_atfm(struct file *file,
+>  	if (!req)
+>  		return -ENOMEM;
+> 
+> -	init_completion(&res.completion);
+> +	crypto_init_wait(&wait);
+>  	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG |
+>  				   CRYPTO_TFM_REQ_MAY_SLEEP,
+> -				   ahash_complete, &res);
+> +				   crypto_req_done, &wait);
+> 
+> -	rc = ahash_wait(crypto_ahash_init(req), &res);
+> +	rc = ahash_wait(crypto_ahash_init(req), &wait);
+>  	if (rc)
+>  		goto out1;
+> 
+> @@ -288,7 +266,7 @@ static int ima_calc_file_hash_atfm(struct file *file,
+>  			 * read/request, wait for the completion of the
+>  			 * previous ahash_update() request.
+>  			 */
+> -			rc = ahash_wait(ahash_rc, &res);
+> +			rc = ahash_wait(ahash_rc, &wait);
+>  			if (rc)
+>  				goto out3;
+>  		}
+> @@ -304,7 +282,7 @@ static int ima_calc_file_hash_atfm(struct file *file,
+>  			 * read/request, wait for the completion of the
+>  			 * previous ahash_update() request.
+>  			 */
+> -			rc = ahash_wait(ahash_rc, &res);
+> +			rc = ahash_wait(ahash_rc, &wait);
+>  			if (rc)
+>  				goto out3;
+>  		}
+> @@ -318,7 +296,7 @@ static int ima_calc_file_hash_atfm(struct file *file,
+>  			active = !active; /* swap buffers, if we use two */
+>  	}
+>  	/* wait for the last update request to complete */
+> -	rc = ahash_wait(ahash_rc, &res);
+> +	rc = ahash_wait(ahash_rc, &wait);
+>  out3:
+>  	if (read)
+>  		file->f_mode &= ~FMODE_READ;
+> @@ -327,7 +305,7 @@ static int ima_calc_file_hash_atfm(struct file *file,
+>  out2:
+>  	if (!rc) {
+>  		ahash_request_set_crypt(req, NULL, hash->digest, 0);
+> -		rc = ahash_wait(crypto_ahash_final(req), &res);
+> +		rc = ahash_wait(crypto_ahash_final(req), &wait);
+>  	}
+>  out1:
+>  	ahash_request_free(req);
+> @@ -527,7 +505,7 @@ static int calc_buffer_ahash_atfm(const void *buf, loff_t len,
+>  {
+>  	struct ahash_request *req;
+>  	struct scatterlist sg;
+> -	struct ahash_completion res;
+> +	struct crypto_wait wait;
+>  	int rc, ahash_rc = 0;
+> 
+>  	hash->length = crypto_ahash_digestsize(tfm);
+> @@ -536,12 +514,12 @@ static int calc_buffer_ahash_atfm(const void *buf, loff_t len,
+>  	if (!req)
+>  		return -ENOMEM;
+> 
+> -	init_completion(&res.completion);
+> +	crypto_init_wait(&wait);
+>  	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG |
+>  				   CRYPTO_TFM_REQ_MAY_SLEEP,
+> -				   ahash_complete, &res);
+> +				   crypto_req_done, &wait);
+> 
+> -	rc = ahash_wait(crypto_ahash_init(req), &res);
+> +	rc = ahash_wait(crypto_ahash_init(req), &wait);
+>  	if (rc)
+>  		goto out;
+> 
+> @@ -551,10 +529,10 @@ static int calc_buffer_ahash_atfm(const void *buf, loff_t len,
+>  	ahash_rc = crypto_ahash_update(req);
+> 
+>  	/* wait for the update request to complete */
+> -	rc = ahash_wait(ahash_rc, &res);
+> +	rc = ahash_wait(ahash_rc, &wait);
+>  	if (!rc) {
+>  		ahash_request_set_crypt(req, NULL, hash->digest, 0);
+> -		rc = ahash_wait(crypto_ahash_final(req), &res);
+> +		rc = ahash_wait(crypto_ahash_final(req), &wait);
+>  	}
+>  out:
+>  	ahash_request_free(req);
 
-
-Cheers,
-Gilad
-
-
--- 
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-"If you take a class in large-scale robotics, can you end up in a
-situation where the homework eats your dog?"
- -- Jean-Baptiste Queru
