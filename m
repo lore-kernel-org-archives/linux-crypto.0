@@ -1,102 +1,63 @@
-From: srikanth jampala <jsrikanth@caviumnetworks.com>
-Subject: Re: [PATCH v1 3/3] crypto: cavium - Register the CNN55XX supported
- crypto algorithms.
-Date: Thu, 11 May 2017 18:10:09 +0530
-Message-ID: <07399c55-d75b-096f-a5f7-16cdf92e92a1@caviumnetworks.com>
-References: <20170510130640.5838-1-Jampala.Srikanth@cavium.com>
- <3575749.J6klBtBYWh@tauon.chronox.de>
- <685383f7-6ae2-31fe-f081-2ac739343137@caviumnetworks.com>
- <2489871.hhvjNBQWWt@tauon.chronox.de>
+From: SF Markus Elfring <elfring@users.sourceforge.net>
+Subject: [PATCH] crypto-testmgr: Delete an error message for a failed memory
+ allocation in two functions
+Date: Thu, 11 May 2017 17:12:11 +0200
+Message-ID: <0168ce01-446b-a1f0-8a3f-55da49bdbd86@users.sourceforge.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Cc: Srikanth Jampala <Jampala.Srikanth@cavium.com>,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        George.Cherian@cavium.com, Nidadavolu.Murthy@cavium.com,
-        Sreerama.Gadam@cavium.com, Ram.Kumar@cavium.com
-To: =?UTF-8?Q?Stephan_M=c3=bcller?= <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-dm3nam03on0077.outbound.protection.outlook.com ([104.47.41.77]:45120
-        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1754975AbdEKMlH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 11 May 2017 08:41:07 -0400
-In-Reply-To: <2489871.hhvjNBQWWt@tauon.chronox.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: LKML <linux-kernel@vger.kernel.org>,
+        kernel-janitors@vger.kernel.org, Wolfram Sang <wsa@the-dreams.de>
+To: linux-crypto@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Stephan,
+From: Markus Elfring <elfring@users.sourceforge.net>
+Date: Thu, 11 May 2017 17:05:17 +0200
 
-On Thursday 11 May 2017 05:52 PM, Stephan Müller wrote:
-> Am Donnerstag, 11. Mai 2017, 14:18:34 CEST schrieb srikanth jampala:
-> 
-> Hi srikanth,
-> 
->> Hi Stephan,
->>
->> On Wednesday 10 May 2017 07:26 PM, Stephan Müller wrote:
->>> Am Mittwoch, 10. Mai 2017, 15:06:40 CEST schrieb Srikanth Jampala:
->>>
->>> Hi Srikanth,
->>>
->>> In general: you are using the ablkcipher API. I think it is on its way out
->>> and being replaced with skcipher.
->>>
->>> Maybe it makes sense to replace it here too. It could be as simple as s/
->>> ablkcipher/skcipher/g
->>
->> Sure, I will do the changes accordingly.
->> As per my understanding, I see the following changes,
->> 1. CRYPTO_ALG_TYPE_ABLKCIPHER changed to CRYPTO_ALG_TYPE_SKCIPHER
->> 2. nitrox_ablkcipher_foo() changed to nitrox_skcipher_foo()
->>
->> Please let me know, any other changes I have to consider?
-> 
-> What about all crypto_ablkcipher* function calls / structs? Also all 
-> ablkcipher_request function calls/structs?
+Omit an extra message for a memory allocation failure in these functions.
 
-I will work on the changes suggested.
->>
->>>> +static inline int nitrox_ablkcipher_setkey(struct crypto_ablkcipher
->>>> *cipher,
->>>> +                                          int aes_keylen, const u8 *key,
->>>> +                                          unsigned int keylen)
->>>> +{
->>>> +       struct crypto_tfm *tfm = crypto_ablkcipher_tfm(cipher);
->>>> +       struct nitrox_crypto_instance *inst = crypto_tfm_ctx(tfm);
->>>> +       struct flexi_crypto_context *fctx;
->>>> +       enum flexi_cipher cipher_type;
->>>> +       const char *name;
->>>> +
->>>> +       name = crypto_tfm_alg_name(tfm);
->>>> +       cipher_type = flexi_cipher_type(name);
->>>> +       if (cipher_type == CIPHER_INVALID) {
->>>> +               pr_err("unsupported cipher: %s\n", name);
->>>> +               return -EINVAL;
->>>> +       }
->>>> +
->>>> +       /* fill crypto context */
->>>> +       fctx = inst->u.fctx;
->>>> +       fctx->flags = 0;
->>>> +       fctx->w0.cipher_type = cipher_type;
->>>> +       fctx->w0.aes_keylen = aes_keylen;
->>>> +       fctx->w0.iv_source = IV_FROM_DPTR;
->>>> +       fctx->flags = cpu_to_be64(*(u64 *)&fctx->w0);
->>>> +       /* copy the key to context */
->>>> +       memcpy(fctx->crypto.u.key, key, keylen);
->>>
->>> Could you help me finding the location where this memory is zeroized upon
->>> release?
->>
->> Currently, we are not zeroized the context in release.
->> We are doing it at the time of allocation.
-> 
-> You store a key in a piece of heap memory. I guess you want to zeroize that 
-> key memory before releasing?
-> 
-I will do the changes.
-> 
-> Ciao
-> Stephan
-> 
+This issue was detected by using the Coccinelle software.
+
+Link: http://events.linuxfoundation.org/sites/events/files/slides/LCJ16-Refactor_Strings-WSang_0.pdf
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+---
+ crypto/testmgr.c | 10 +++-------
+ 1 file changed, 3 insertions(+), 7 deletions(-)
+
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 6f5f3ed8376c..392bb4f95024 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -217,10 +217,9 @@ static int ahash_partial_update(struct ahash_request **preq,
+ 	statesize = crypto_ahash_statesize(
+ 			crypto_ahash_reqtfm(req));
+ 	state = kmalloc(statesize + sizeof(guard), GFP_KERNEL);
+-	if (!state) {
+-		pr_err("alt: hash: Failed to alloc state for %s\n", algo);
++	if (!state)
+ 		goto out_nostate;
+-	}
++
+ 	memcpy(state + statesize, guard, sizeof(guard));
+ 	ret = crypto_ahash_export(req, state);
+ 	WARN_ON(memcmp(state + statesize, guard, sizeof(guard)));
+@@ -1632,11 +1631,8 @@ static int test_cprng(struct crypto_rng *tfm,
+ 	seedsize = crypto_rng_seedsize(tfm);
+ 
+ 	seed = kmalloc(seedsize, GFP_KERNEL);
+-	if (!seed) {
+-		printk(KERN_ERR "alg: cprng: Failed to allocate seed space "
+-		       "for %s\n", algo);
++	if (!seed)
+ 		return -ENOMEM;
+-	}
+ 
+ 	for (i = 0; i < tcount; i++) {
+ 		memset(result, 0, 32);
+-- 
+2.12.3
