@@ -1,7 +1,7 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 1/4] crypto: handle EBUSY due to backlog correctly
-Date: Thu, 11 May 2017 14:53:42 +0300
-Message-ID: <1494503626-15877-2-git-send-email-gilad@benyossef.com>
+Subject: [PATCH 3/4] crypto: gcm wait for crypto op not signal safe
+Date: Thu, 11 May 2017 14:53:44 +0300
+Message-ID: <1494503626-15877-4-git-send-email-gilad@benyossef.com>
 References: <1494503626-15877-1-git-send-email-gilad@benyossef.com>
 Cc: Ofir Drang <ofir.drang@arm.com>,
         Gilad Ben-Yossef <gilad.benyossef@arm.com>,
@@ -12,37 +12,57 @@ To: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         Jonathan Corbet <corbet@lwn.net>,
         David Howells <dhowells@redhat.com>
-Return-path: <stable-owner@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1494503626-15877-1-git-send-email-gilad@benyossef.com>
-Sender: stable-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-public_key_verify_signature() was passing the CRYPTO_TFM_REQ_MAY_BACKLOG
-flag to akcipher_request_set_callback() but was not handling correctly
-the case where a -EBUSY error could be returned from the call to
-crypto_akcipher_verify() if backlog was used, possibly casuing
-data corruption due to use-after-free of buffers.
+crypto_gcm_setkey() was using wait_for_completion_interruptible() to
+wait for completion of async crypto op but if a signal occurs it
+may return before DMA ops of HW crypto provider finish, thus
+corrupting the data buffer that is kfree'ed in this case.
 
-Resolve this by handling -EBUSY correctly.
+Resolve this by using wait_for_completion() instead.
 
+Reported-by: Eric Biggers <ebiggers3@gmail.com>
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 CC: stable@vger.kernel.org
 ---
- crypto/asymmetric_keys/public_key.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ crypto/drbg.c | 4 ++--
+ crypto/gcm.c  | 6 ++----
+ 2 files changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
-index d3a989e..3cd6e12 100644
---- a/crypto/asymmetric_keys/public_key.c
-+++ b/crypto/asymmetric_keys/public_key.c
-@@ -141,7 +141,7 @@ int public_key_verify_signature(const struct public_key *pkey,
- 	 * signature and returns that to us.
- 	 */
- 	ret = crypto_akcipher_verify(req);
--	if (ret == -EINPROGRESS) {
-+	if ((ret == -EINPROGRESS) || (ret == -EBUSY)) {
- 		wait_for_completion(&compl.completion);
- 		ret = compl.err;
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index fa9054d..cdb27ac 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -1767,8 +1767,8 @@ static int drbg_kcapi_sym_ctr(struct drbg_state *drbg,
+ 			break;
+ 		case -EINPROGRESS:
+ 		case -EBUSY:
+-			ret = wait_for_completion(&drbg->ctr_completion);
+-			if (!ret && !drbg->ctr_async_err) {
++			wait_for_completion(&drbg->ctr_completion);
++			if (!drbg->ctr_async_err) {
+ 				reinit_completion(&drbg->ctr_completion);
+ 				break;
+ 			}
+diff --git a/crypto/gcm.c b/crypto/gcm.c
+index b7ad808..3841b5e 100644
+--- a/crypto/gcm.c
++++ b/crypto/gcm.c
+@@ -152,10 +152,8 @@ static int crypto_gcm_setkey(struct crypto_aead *aead, const u8 *key,
+ 
+ 	err = crypto_skcipher_encrypt(&data->req);
+ 	if (err == -EINPROGRESS || err == -EBUSY) {
+-		err = wait_for_completion_interruptible(
+-			&data->result.completion);
+-		if (!err)
+-			err = data->result.err;
++		wait_for_completion(&data->result.completion);
++		err = data->result.err;
  	}
+ 
+ 	if (err)
 -- 
 2.1.4
