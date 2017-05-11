@@ -1,44 +1,103 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 0/4] crypto: async crypto op fixes
-Date: Thu, 11 May 2017 14:53:41 +0300
-Message-ID: <1494503626-15877-1-git-send-email-gilad@benyossef.com>
-Cc: Ofir Drang <ofir.drang@arm.com>,
-        Gilad Ben-Yossef <gilad.benyossef@arm.com>,
-        Eric Biggers <ebiggers3@gmail.com>, stable@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, keyrings@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        David Howells <dhowells@redhat.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: srikanth jampala <jsrikanth@caviumnetworks.com>
+Subject: Re: [PATCH v1 3/3] crypto: cavium - Register the CNN55XX supported
+ crypto algorithms.
+Date: Thu, 11 May 2017 17:48:34 +0530
+Message-ID: <685383f7-6ae2-31fe-f081-2ac739343137@caviumnetworks.com>
+References: <20170510130640.5838-1-Jampala.Srikanth@cavium.com>
+ <20170510130640.5838-4-Jampala.Srikanth@cavium.com>
+ <3575749.J6klBtBYWh@tauon.chronox.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        George.Cherian@cavium.com, Nidadavolu.Murthy@cavium.com,
+        Sreerama.Gadam@cavium.com, Ram.Kumar@cavium.com
+To: =?UTF-8?Q?Stephan_M=c3=bcller?= <smueller@chronox.de>,
+        Srikanth Jampala <Jampala.Srikanth@cavium.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-cys01nam02on0044.outbound.protection.outlook.com ([104.47.37.44]:18816
+        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1754486AbdEKMTG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 11 May 2017 08:19:06 -0400
+In-Reply-To: <3575749.J6klBtBYWh@tauon.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-This patch set fixes various usage and documentation errors
-in waiting for async crypto op to complete which can result
-in data corruption.
+Hi Stephan,
 
-Note: these were discovered in the process of working on a
-patch set that replaces these call sites and more with a
-generic implementation that will prevent these problems
-going forward. These are just the fix ups for current code.
+On Wednesday 10 May 2017 07:26 PM, Stephan Müller wrote:
+> Am Mittwoch, 10. Mai 2017, 15:06:40 CEST schrieb Srikanth Jampala:
+> 
+> Hi Srikanth,
+> 
+> In general: you are using the ablkcipher API. I think it is on its way out and 
+> being replaced with skcipher.
+> 
+> Maybe it makes sense to replace it here too. It could be as simple as s/
+> ablkcipher/skcipher/g
+> 
+Sure, I will do the changes accordingly.
+As per my understanding, I see the following changes,
+1. CRYPTO_ALG_TYPE_ABLKCIPHER changed to CRYPTO_ALG_TYPE_SKCIPHER
+2. nitrox_ablkcipher_foo() changed to nitrox_skcipher_foo()
 
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
-CC: stable@vger.kernel.org
-CC: Eric Biggers <ebiggers3@gmail.com>
+Please let me know, any other changes I have to consider?
 
-Gilad Ben-Yossef (4):
-  crypto: handle EBUSY due to backlog correctly
-  crypto: drbg wait for crypto op not signal safe
-  crypto: gcm wait for crypto op not signal safe
-  crypto: Documentation: fix none signal safe sample
+>> +static inline int nitrox_ablkcipher_setkey(struct crypto_ablkcipher
+>> *cipher,
+>> +                                          int aes_keylen, const u8 *key,
+>> +                                          unsigned int keylen)
+>> +{
+>> +       struct crypto_tfm *tfm = crypto_ablkcipher_tfm(cipher);
+>> +       struct nitrox_crypto_instance *inst = crypto_tfm_ctx(tfm);
+>> +       struct flexi_crypto_context *fctx;
+>> +       enum flexi_cipher cipher_type;
+>> +       const char *name;
+>> +
+>> +       name = crypto_tfm_alg_name(tfm);
+>> +       cipher_type = flexi_cipher_type(name);
+>> +       if (cipher_type == CIPHER_INVALID) {
+>> +               pr_err("unsupported cipher: %s\n", name);
+>> +               return -EINVAL;
+>> +       }
+>> +
+>> +       /* fill crypto context */
+>> +       fctx = inst->u.fctx;
+>> +       fctx->flags = 0;
+>> +       fctx->w0.cipher_type = cipher_type;
+>> +       fctx->w0.aes_keylen = aes_keylen;
+>> +       fctx->w0.iv_source = IV_FROM_DPTR;
+>> +       fctx->flags = cpu_to_be64(*(u64 *)&fctx->w0);
+>> +       /* copy the key to context */
+>> +       memcpy(fctx->crypto.u.key, key, keylen);
+> 
+> Could you help me finding the location where this memory is zeroized upon 
+> release?
 
- Documentation/crypto/api-samples.rst | 2 +-
- crypto/asymmetric_keys/public_key.c  | 2 +-
- crypto/drbg.c                        | 5 ++---
- crypto/gcm.c                         | 6 ++----
- 4 files changed, 6 insertions(+), 9 deletions(-)
+Currently, we are not zeroized the context in release.
+We are doing it at the time of allocation.
 
--- 
-2.1.4
++void *crypto_alloc_context(struct nitrox_device *ndev)
++{
++       struct ctx_hdr *ctx;
++       void *vaddr;
++       dma_addr_t dma;
++
++       vaddr = dma_pool_alloc(ndev->ctx_pool, (GFP_ATOMIC | __GFP_ZERO), &dma);
++       if (!vaddr)
++               return NULL;
++
++       /* fill meta data */
++       ctx = vaddr;
++       ctx->pool = ndev->ctx_pool;
++       ctx->dma = dma;
++       ctx->ctx_dma = dma + sizeof(struct ctx_hdr);
++
++       return ((u8 *)vaddr + sizeof(struct ctx_hdr));
++}
+
+>> +
+>> +       return 0;
+>> +}
