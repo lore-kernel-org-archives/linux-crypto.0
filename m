@@ -1,61 +1,77 @@
-From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: [RFC 07/10] fscrypt: move to generic async completion
-Date: Wed, 10 May 2017 21:04:42 -0700
-Message-ID: <20170511040442.GB2936@zzz>
-References: <1494075602-5061-1-git-send-email-gilad@benyossef.com>
- <1494075602-5061-8-git-send-email-gilad@benyossef.com>
+From: Neeraj Soni <neersoni@codeaurora.org>
+Subject: Re: need to pick a solution for dm-crypt IV generation and do it!
+ [was: Re: dm: submit stacked requests in irq enabled context]
+Date: Thu, 11 May 2017 11:22:23 +0530
+Message-ID: <6f802971-1622-1186-93d2-ff2cb3ca9fa0@codeaurora.org>
+References: <a66b6e17-a8c4-3465-fc2e-c3114abe0ca7@codeaurora.org>
+ <dee12838-7b43-2fdd-0644-41c10ecf9148@codeaurora.org>
+ <20170509155555.GB2572@localhost.localdomain>
+ <20170510071733.GA24980@infradead.org>
+ <39356321-b39b-98c7-f52b-ffd19d6dfc69@codeaurora.org>
+ <CAOtvUMcjULAOZYQ3K_XDvxcFoFJJjX-wxF6e6Y1+-r67tS_Y7g@mail.gmail.com>
+ <20170510144525.GA5608@redhat.com>
+ <CAOtvUMdrnvr4RSzh6YB9F0B_WqfQ2WmSDUtCgn605JvRHrB3gg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        David Howells <dhowells@redhat.com>,
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: Christoph Hellwig <hch@infradead.org>,
+        Keith Busch <keith.busch@intel.com>, dm-devel@redhat.com,
         Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Shaohua Li <shli@kernel.org>, Steve French <sfrench@samba.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        James Morris <james.l.morris@oracle.com>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Ofir Drang <ofir.drang@arm.com>,
-        Gilad Ben-Yossef <gilad.benyossef@arm.com>,
-        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-raid@vger.kernel.org,
-To: Gilad Ben-Yossef <gilad@benyossef.com>
+        Ondrej Mosnacek <omosnace@redhat.com>,
+        Milan Broz <gmazyland@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org
+To: Gilad Ben-Yossef <gilad@benyossef.com>,
+        Mike Snitzer <snitzer@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:33517 "EHLO
-        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753133AbdEKEEp (ORCPT
+Received: from smtp.codeaurora.org ([198.145.29.96]:45332 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753446AbdEKFwa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 11 May 2017 00:04:45 -0400
-Content-Disposition: inline
-In-Reply-To: <1494075602-5061-8-git-send-email-gilad@benyossef.com>
+        Thu, 11 May 2017 01:52:30 -0400
+In-Reply-To: <CAOtvUMdrnvr4RSzh6YB9F0B_WqfQ2WmSDUtCgn605JvRHrB3gg@mail.gmail.com>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Gilad,
+Thanks for inputs folks. So shall i conclude that there is no remedy 
+available that can be applied on 4.4 and reverting this patch is only 
+way forward to solve the degradation?
 
-On Sat, May 06, 2017 at 03:59:56PM +0300, Gilad Ben-Yossef wrote:
->  int fscrypt_do_page_crypto(const struct inode *inode, fscrypt_direction_t rw,
->  			   u64 lblk_num, struct page *src_page,
->  			   struct page *dest_page, unsigned int len,
-> @@ -150,7 +135,7 @@ int fscrypt_do_page_crypto(const struct inode *inode, fscrypt_direction_t rw,
->  		u8 padding[FS_XTS_TWEAK_SIZE - sizeof(__le64)];
->  	} xts_tweak;
->  	struct skcipher_request *req = NULL;
-> -	DECLARE_FS_COMPLETION_RESULT(ecr);
-> +	DECLARE_CRYPTO_WAIT(ecr);
->  	struct scatterlist dst, src;
->  	struct fscrypt_info *ci = inode->i_crypt_info;
->  	struct crypto_skcipher *tfm = ci->ci_ctfm;
-> @@ -168,7 +153,7 @@ int fscrypt_do_page_crypto(const struct inode *inode, fscrypt_direction_t rw,
-[...]
+Neeraj
 
-This patch looks good --- thanks for doing this!  I suggest also renaming 'ecr'
-to 'wait' in the places being updated to use crypto_wait, since the name is
-obsolete (and was already; it originally stood for "ext4 completion result").
 
-- Eric
+On 5/10/2017 8:25 PM, Gilad Ben-Yossef wrote:
+> On Wed, May 10, 2017 at 5:45 PM, Mike Snitzer <snitzer@redhat.com> wrote:
+>> On Wed, May 10 2017 at  9:37am -0400,
+>> Gilad Ben-Yossef <gilad@benyossef.com> wrote:
+>>
+>>> On Wed, May 10, 2017 at 11:49 AM, Neeraj Soni <neersoni@codeaurora.org> wrote:
+>>>> Hi Keith,
+>>>>
+>>>> Request based dm (dm-req-crypt) is being used for Disk Encryption solution
+>>>> in Android used by Google. Also as i mentioned reverting this fix  improves
+>>>> the RR/RW numbers so this proves the request based dm is coming into path
+>>>> and is being used.
+>>> Sadly, that is an out of tree module.
+>>>
+>>> Does it still use Qcom specific APIs in its implementation (qcrypto_* funcs)?
+>>> It did the last time I've checked - and the driver that implements
+>>> those is not upstream either...
+>>>
+>>> It makes it difficult to help - which is a shame since I am interested
+>>> in enabling higher performance
+>>> of dm-crypt when using HW based crypto transformation myself.
+>> I have absolutely no interest in request-based dm-crypt.  It is a hack
+>> to work-around limitations in crypto IV generation.
+> I agree. This is why I've said I'm interested in a high performance dm-crypt,
+> not "request based dm-crypt". They are trying to solve the same problem but
+> with the wrong solution and doing so out of upstream.
+>
+> As the parlance of our time seems to go... sad. :-)
+>
+>
+> Cheers,
+> Gilad
+>
+>
