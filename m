@@ -1,7 +1,7 @@
 From: Tudor Ambarus <tudor.ambarus@microchip.com>
-Subject: [PATCH 7/8] crypto: ecdh - fix ecdh_max_size
-Date: Fri, 12 May 2017 13:11:45 +0300
-Message-ID: <1494583906-15472-8-git-send-email-tudor.ambarus@microchip.com>
+Subject: [PATCH 8/8] crypto: ecc - don't be selfish on pubkeys
+Date: Fri, 12 May 2017 13:11:46 +0300
+Message-ID: <1494583906-15472-9-git-send-email-tudor.ambarus@microchip.com>
 References: <1494583906-15472-1-git-send-email-tudor.ambarus@microchip.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -11,38 +11,67 @@ To: <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
 Received: from esa2.microchip.iphmx.com ([68.232.149.84]:27442 "EHLO
         esa2.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1757671AbdELKME (ORCPT
+        with ESMTP id S1757671AbdELKMF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 May 2017 06:12:04 -0400
+        Fri, 12 May 2017 06:12:05 -0400
 In-Reply-To: <1494583906-15472-1-git-send-email-tudor.ambarus@microchip.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The function should return minimum size for output buffer
-or error code if key hasn't been set.
+Rename ecdh_make_pub_key() to ecc_make_pub_key().
+This function might as well be used by ecdsa.
 
 Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
 ---
- crypto/ecdh.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ crypto/ecc.c  | 4 ++--
+ crypto/ecc.h  | 4 ++--
+ crypto/ecdh.c | 4 ++--
+ 3 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/crypto/ecdh.c b/crypto/ecdh.c
-index c1f0163..830dfb6 100644
---- a/crypto/ecdh.c
-+++ b/crypto/ecdh.c
-@@ -107,10 +107,10 @@ static int ecdh_compute_value(struct kpp_request *req)
- static int ecdh_max_size(struct crypto_kpp *tfm)
- {
- 	struct ecdh_ctx *ctx = ecdh_get_ctx(tfm);
--	int nbytes = ctx->ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
- 
--	/* Public key is made of two coordinates */
--	return 2 * nbytes;
-+	/* Public key is made of two coordinates, add one to the left shift  */
-+	return ctx->ndigits ? ctx->ndigits << (ECC_DIGITS_TO_BYTES_SHIFT + 1) :
-+			      -EINVAL;
+diff --git a/crypto/ecc.c b/crypto/ecc.c
+index e3a2b8f..6c33c43 100644
+--- a/crypto/ecc.c
++++ b/crypto/ecc.c
+@@ -927,8 +927,8 @@ int ecc_is_key_valid(unsigned int curve_id, unsigned int ndigits,
+ 	return 0;
  }
  
- static void no_exit_tfm(struct crypto_kpp *tfm)
+-int ecdh_make_pub_key(unsigned int curve_id, unsigned int ndigits,
+-		      const u64 *private_key, u64 *public_key)
++int ecc_make_pub_key(unsigned int curve_id, unsigned int ndigits,
++		     const u64 *private_key, u64 *public_key)
+ {
+ 	int ret = 0;
+ 	struct ecc_point *pk;
+diff --git a/crypto/ecc.h b/crypto/ecc.h
+index af2ffdb..673c834 100644
+--- a/crypto/ecc.h
++++ b/crypto/ecc.h
+@@ -54,8 +54,8 @@ int ecc_is_key_valid(unsigned int curve_id, unsigned int ndigits,
+  * Returns 0 if the public key was generated successfully, a negative value
+  * if an error occurred.
+  */
+-int ecdh_make_pub_key(const unsigned int curve_id, unsigned int ndigits,
+-		      const u64 *private_key, u64 *public_key);
++int ecc_make_pub_key(const unsigned int curve_id, unsigned int ndigits,
++		     const u64 *private_key, u64 *public_key);
+ 
+ /**
+  * crypto_ecdh_shared_secret() - Compute a shared secret
+diff --git a/crypto/ecdh.c b/crypto/ecdh.c
+index 830dfb6..8b6450d 100644
+--- a/crypto/ecdh.c
++++ b/crypto/ecdh.c
+@@ -87,8 +87,8 @@ static int ecdh_compute_value(struct kpp_request *req)
+ 
+ 		buf = ctx->shared_secret;
+ 	} else {
+-		ret = ecdh_make_pub_key(ctx->curve_id, ctx->ndigits,
+-					ctx->private_key, ctx->public_key);
++		ret = ecc_make_pub_key(ctx->curve_id, ctx->ndigits,
++				       ctx->private_key, ctx->public_key);
+ 		buf = ctx->public_key;
+ 		/* Public part is a point thus it has both coordinates */
+ 		nbytes *= 2;
 -- 
 2.7.4
