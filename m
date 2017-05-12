@@ -1,43 +1,32 @@
-From: Tudor Ambarus <tudor.ambarus@microchip.com>
-Subject: [PATCH 6/8] crypto: dh - fix dh_max_size
-Date: Fri, 12 May 2017 13:11:44 +0300
-Message-ID: <1494583906-15472-7-git-send-email-tudor.ambarus@microchip.com>
-References: <1494583906-15472-1-git-send-email-tudor.ambarus@microchip.com>
+From: "Thomas Credit Firm" <miorellana@salud.gob.sv>
+Subject: APPLY FOR YOUR URGENT LOAN AT 2%
+Date: Fri, 12 May 2017 11:53:34 +0100
+Message-ID: <20170512105348.79AD648074B1__6779.59266254238$1494587088$gmane$org@mail.salud.gob.sv>
+Reply-To: thomascreditfirm@gmail.com
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <linux-crypto@vger.kernel.org>,
-        Tudor Ambarus <tudor.ambarus@microchip.com>
-To: <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+To: receipt <miorellana@salud.gob.sv>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from esa2.microchip.iphmx.com ([68.232.149.84]:27442 "EHLO
-        esa2.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1757671AbdELKMC (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 May 2017 06:12:02 -0400
-In-Reply-To: <1494583906-15472-1-git-send-email-tudor.ambarus@microchip.com>
+Received: from mail.salud.gob.sv ([190.5.143.2]:60076 "EHLO mail.salud.gob.sv"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751370AbdELLEk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 12 May 2017 07:04:40 -0400
+Content-Description: Mail message body
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The function should return minimum size for output buffer
-or error code if key hasn't been set.
+* Do you need an urgent loan? We offer all kinds of loan
+* Very fast and urgent transfer to your bank account. 
+* Payment begins (6) months after you get the money in your bank account 
+* Low interest rates 2% 
+* Payment of long-term (1-30 years) duration 
+For more information and loan application form through the Contact now 
 
-Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
+E-mail:  Thomascreditfirm@gmail.com 
+Thomas B. Dawson 
+THOMAS CREDIT FIRM
+
 ---
- crypto/dh.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/crypto/dh.c b/crypto/dh.c
-index 7cec0498..325a5dd 100644
---- a/crypto/dh.c
-+++ b/crypto/dh.c
-@@ -148,7 +148,7 @@ static int dh_max_size(struct crypto_kpp *tfm)
- {
- 	struct dh_ctx *ctx = dh_get_ctx(tfm);
- 
--	return mpi_get_size(ctx->p);
-+	return ctx->p ? mpi_get_size(ctx->p) : -EINVAL;
- }
- 
- static void dh_exit_tfm(struct crypto_kpp *tfm)
--- 
-2.7.4
+This email has been checked for viruses by Avast antivirus software.
+https://www.avast.com/antivirus
