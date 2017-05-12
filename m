@@ -1,63 +1,45 @@
-From: SF Markus Elfring <elfring@users.sourceforge.net>
-Subject: [PATCH] crypto-testmgr: Delete an error message for a failed memory
- allocation in two functions
-Date: Thu, 11 May 2017 17:12:11 +0200
-Message-ID: <0168ce01-446b-a1f0-8a3f-55da49bdbd86@users.sourceforge.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: LKML <linux-kernel@vger.kernel.org>,
-        kernel-janitors@vger.kernel.org, Wolfram Sang <wsa@the-dreams.de>
-To: linux-crypto@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Mike Frysinger <vapier@gentoo.org>
+Subject: [PATCH] hwrng: do not warn when there are no devices
+Date: Fri, 12 May 2017 00:17:34 -0400
+Message-ID: <20170512041734.31945-1-vapier@gentoo.org>
+Cc: linux-crypto@vger.kernel.org, Mike Frysinger <vapier@chromium.org>
+To: mpm@selenic.com, herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from smtp.gentoo.org ([140.211.166.183]:50474 "EHLO smtp.gentoo.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1755728AbdELERq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 12 May 2017 00:17:46 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Thu, 11 May 2017 17:05:17 +0200
+From: Mike Frysinger <vapier@chromium.org>
 
-Omit an extra message for a memory allocation failure in these functions.
+If you build in hwrng & tpm-rng, but boot on a system that doesn't
+have a tpm (like via KVM), hwrng will spam the logs every 10 seconds
+with the line:
+	hwrng: no data available
 
-This issue was detected by using the Coccinelle software.
+This isn't terribly useful, so squelch the error in the ENODEV case.
+For all other errors, we still warn, and include the actual error.
 
-Link: http://events.linuxfoundation.org/sites/events/files/slides/LCJ16-Refactor_Strings-WSang_0.pdf
-Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+Signed-off-by: Mike Frysinger <vapier@chromium.org>
 ---
- crypto/testmgr.c | 10 +++-------
- 1 file changed, 3 insertions(+), 7 deletions(-)
+ drivers/char/hw_random/core.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 6f5f3ed8376c..392bb4f95024 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -217,10 +217,9 @@ static int ahash_partial_update(struct ahash_request **preq,
- 	statesize = crypto_ahash_statesize(
- 			crypto_ahash_reqtfm(req));
- 	state = kmalloc(statesize + sizeof(guard), GFP_KERNEL);
--	if (!state) {
--		pr_err("alt: hash: Failed to alloc state for %s\n", algo);
-+	if (!state)
- 		goto out_nostate;
--	}
-+
- 	memcpy(state + statesize, guard, sizeof(guard));
- 	ret = crypto_ahash_export(req, state);
- 	WARN_ON(memcmp(state + statesize, guard, sizeof(guard)));
-@@ -1632,11 +1631,8 @@ static int test_cprng(struct crypto_rng *tfm,
- 	seedsize = crypto_rng_seedsize(tfm);
- 
- 	seed = kmalloc(seedsize, GFP_KERNEL);
--	if (!seed) {
--		printk(KERN_ERR "alg: cprng: Failed to allocate seed space "
--		       "for %s\n", algo);
-+	if (!seed)
- 		return -ENOMEM;
--	}
- 
- 	for (i = 0; i < tcount; i++) {
- 		memset(result, 0, 32);
+diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+index 503a41dfa193..da24bd5a9902 100644
+--- a/drivers/char/hw_random/core.c
++++ b/drivers/char/hw_random/core.c
+@@ -392,7 +392,8 @@ static int hwrng_fillfn(void *unused)
+ 		mutex_unlock(&reading_mutex);
+ 		put_rng(rng);
+ 		if (rc <= 0) {
+-			pr_warn("hwrng: no data available\n");
++			if (rc != -ENODEV)
++				pr_warn("hwrng: no data available: %li\n", rc);
+ 			msleep_interruptible(10000);
+ 			continue;
+ 		}
 -- 
-2.12.3
+2.12.0
