@@ -1,7 +1,7 @@
 From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: [PATCH v11 1/5] crypto: DRBG - externalize DRBG functions for LRNG
-Date: Sun, 14 May 2017 16:27:29 +0200
-Message-ID: <1718059.lItsl9qoly@positron.chronox.de>
+Subject: [PATCH v11 2/5] random: conditionally compile code depending on LRNG
+Date: Sun, 14 May 2017 16:28:00 +0200
+Message-ID: <74740507.fE4fldbO5y@positron.chronox.de>
 References: <7746835.7W6fIIgSam@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -9,85 +9,44 @@ Content-Transfer-Encoding: 7Bit
 Cc: linux-crypto@vger.kernel.org,
         "Jason A. Donenfeld" <Jason@zx2c4.com>
 To: linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:59570 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751477AbdENObm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 14 May 2017 10:31:42 -0400
 In-Reply-To: <7746835.7W6fIIgSam@positron.chronox.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-This patch allows several DRBG functions to be called by the LRNG kernel
-code paths outside the drbg.c file.
+When selecting the LRNG for compilation, disable the legacy /dev/random
+implementation.
+
+The LRNG is a drop-in replacement for the legacy /dev/random which
+implements the same in-kernel and user space API. Only the hooks of
+/dev/random into other parts of the kernel need to be disabled.
 
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- crypto/drbg.c         | 11 +++++------
- include/crypto/drbg.h |  7 +++++++
- 2 files changed, 12 insertions(+), 6 deletions(-)
+ include/linux/genhd.h | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/crypto/drbg.c b/crypto/drbg.c
-index fa749f4..2ab8721 100644
---- a/crypto/drbg.c
-+++ b/crypto/drbg.c
-@@ -113,7 +113,7 @@
-  * the SHA256 / AES 256 over other ciphers. Thus, the favored
-  * DRBGs are the latest entries in this array.
-  */
--static const struct drbg_core drbg_cores[] = {
-+const struct drbg_core drbg_cores[] = {
- #ifdef CONFIG_CRYPTO_DRBG_CTR
- 	{
- 		.flags = DRBG_CTR | DRBG_STRENGTH128,
-@@ -205,7 +205,7 @@ static int drbg_uninstantiate(struct drbg_state *drbg);
-  * Return: normalized strength in *bytes* value or 32 as default
-  *	   to counter programming errors
-  */
--static inline unsigned short drbg_sec_strength(drbg_flag_t flags)
-+unsigned short drbg_sec_strength(drbg_flag_t flags)
- {
- 	switch (flags & DRBG_STRENGTH_MASK) {
- 	case DRBG_STRENGTH128:
-@@ -1129,7 +1129,7 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
- }
+diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+index acff943..2a8d748 100644
+--- a/include/linux/genhd.h
++++ b/include/linux/genhd.h
+@@ -428,8 +428,13 @@ extern void disk_flush_events(struct gendisk *disk, unsigned int mask);
+ extern unsigned int disk_clear_events(struct gendisk *disk, unsigned int mask);
  
- /* Free all substructures in a DRBG state without the DRBG state structure */
--static inline void drbg_dealloc_state(struct drbg_state *drbg)
-+void drbg_dealloc_state(struct drbg_state *drbg)
- {
- 	if (!drbg)
- 		return;
-@@ -1148,7 +1148,7 @@ static inline void drbg_dealloc_state(struct drbg_state *drbg)
-  * Allocate all sub-structures for a DRBG state.
-  * The DRBG state structure must already be allocated.
-  */
--static inline int drbg_alloc_state(struct drbg_state *drbg)
-+int drbg_alloc_state(struct drbg_state *drbg)
- {
- 	int ret = -ENOMEM;
- 	unsigned int sb_size = 0;
-@@ -1806,8 +1806,7 @@ static int drbg_kcapi_sym_ctr(struct drbg_state *drbg,
-  *
-  * return: flags
-  */
--static inline void drbg_convert_tfm_core(const char *cra_driver_name,
--					 int *coreref, bool *pr)
-+void drbg_convert_tfm_core(const char *cra_driver_name, int *coreref, bool *pr)
- {
- 	int i = 0;
- 	size_t start = 0;
-diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
-index 22f884c..eaedeb78 100644
---- a/include/crypto/drbg.h
-+++ b/include/crypto/drbg.h
-@@ -282,4 +282,11 @@ enum drbg_prefixes {
- 	DRBG_PREFIX3
- };
+ /* drivers/char/random.c */
++#ifdef CONFIG_LRNG
++#define add_disk_randomness(disk) do {} while (0)
++#define rand_initialize_disk(disk) do {} while (0)
++#else
+ extern void add_disk_randomness(struct gendisk *disk) __latent_entropy;
+ extern void rand_initialize_disk(struct gendisk *disk);
++#endif
  
-+extern int drbg_alloc_state(struct drbg_state *drbg);
-+extern void drbg_dealloc_state(struct drbg_state *drbg);
-+extern void drbg_convert_tfm_core(const char *cra_driver_name, int *coreref,
-+				  bool *pr);
-+extern const struct drbg_core drbg_cores[];
-+extern unsigned short drbg_sec_strength(drbg_flag_t flags);
-+
- #endif /* _DRBG_H */
+ static inline sector_t get_start_sect(struct block_device *bdev)
+ {
 -- 
 2.9.3
