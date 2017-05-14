@@ -1,74 +1,93 @@
 From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: [PATCH v11 0/5] /dev/random - a new approach
-Date: Sun, 14 May 2017 16:26:49 +0200
-Message-ID: <7746835.7W6fIIgSam@positron.chronox.de>
+Subject: [PATCH v11 1/5] crypto: DRBG - externalize DRBG functions for LRNG
+Date: Sun, 14 May 2017 16:27:29 +0200
+Message-ID: <1718059.lItsl9qoly@positron.chronox.de>
+References: <7746835.7W6fIIgSam@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: linux-kernel@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <7746835.7W6fIIgSam@positron.chronox.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi,
+This patch allows several DRBG functions to be called by the LRNG kernel
+code paths outside the drbg.c file.
 
-The following patch set provides a different approach to /dev/random which
-I call Linux Random Number Generator (LRNG) to collect entropy within the Linux
-kernel. The main improvements compared to the legacy /dev/random is to provide
-sufficient entropy during boot time as well as in virtual environments and when
-using SSDs. A secondary design goal is to limit the impact of the entropy
-collection on massive parallel systems and also allow the use accelerated
-cryptographic primitives. Also, all steps of the entropic data processing are
-testable. Finally massive performance improvements are visible at /dev/urandom
-and get_random_bytes.
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/drbg.c         | 11 +++++------
+ include/crypto/drbg.h |  7 +++++++
+ 2 files changed, 12 insertions(+), 6 deletions(-)
 
-The design and implementation is driven by a set of goals described in [1]
-that the LRNG completely implements. Furthermore, [1] includes a
-comparison with RNG design suggestions such as SP800-90B, SP800-90C, and
-AIS20/31.
-
-The LRNG has a flexible design by allowing an easy replacement of the
-deterministic random number generator component. Currently implemented DRNGs
-are an SP800-90A DRBG and a ChaCha20 DRNG.
-
-[1] http://www.chronox.de/lrng.html
-
-Changes v11 (compared to v9):
-* port to 4.12-rc1
-* contintionally compile JitterRNG code depending on CONFIG_CRYPTO_JITTERENTROPY
-* update error code path when lrng_hash_buffer fails to report the successfully
-  read entropy
-* remove LRNG_DRBG_BLOCKLEN_BYTES in favor of LRNG_DRBG_BLOCKSIZE
-* add get_random_u64 and get_random_u32 from legacy /dev/random to prevent
-  any modifications of random.c
-* move LRNG to drivers/char/
-* wakeup user space writers only when entropy in pool is low (not when primary
-  DRBG entropy is low)
-* LFSR alteration to space the processed words 67 words apart to counter
-  polynomial taps that are close together which may be affected by dependencies
-* Always mix in an interrupt time stamp even when considered stuck, just do not
-  increment number of collected interrupts used to determine the entropy content
-
-Stephan Mueller (5):
-  crypto: DRBG - externalize DRBG functions for LRNG
-  random: conditionally compile code depending on LRNG
-  Linux Random Number Generator
-  LRNG - enable compile
-  LRNG - add ChaCha20 support
-
- crypto/drbg.c                  |   11 +-
- drivers/char/Kconfig           |    9 +
- drivers/char/Makefile          |   15 +-
- drivers/char/lrng_base.c       | 2283 ++++++++++++++++++++++++++++++++++++++++
- drivers/char/lrng_kcapi.c      |  173 +++
- drivers/char/lrng_standalone.c |  325 ++++++
- include/crypto/drbg.h          |    7 +
- include/linux/genhd.h          |    5 +
- 8 files changed, 2821 insertions(+), 7 deletions(-)
- create mode 100644 drivers/char/lrng_base.c
- create mode 100644 drivers/char/lrng_kcapi.c
- create mode 100644 drivers/char/lrng_standalone.c
-
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index fa749f4..2ab8721 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -113,7 +113,7 @@
+  * the SHA256 / AES 256 over other ciphers. Thus, the favored
+  * DRBGs are the latest entries in this array.
+  */
+-static const struct drbg_core drbg_cores[] = {
++const struct drbg_core drbg_cores[] = {
+ #ifdef CONFIG_CRYPTO_DRBG_CTR
+ 	{
+ 		.flags = DRBG_CTR | DRBG_STRENGTH128,
+@@ -205,7 +205,7 @@ static int drbg_uninstantiate(struct drbg_state *drbg);
+  * Return: normalized strength in *bytes* value or 32 as default
+  *	   to counter programming errors
+  */
+-static inline unsigned short drbg_sec_strength(drbg_flag_t flags)
++unsigned short drbg_sec_strength(drbg_flag_t flags)
+ {
+ 	switch (flags & DRBG_STRENGTH_MASK) {
+ 	case DRBG_STRENGTH128:
+@@ -1129,7 +1129,7 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
+ }
+ 
+ /* Free all substructures in a DRBG state without the DRBG state structure */
+-static inline void drbg_dealloc_state(struct drbg_state *drbg)
++void drbg_dealloc_state(struct drbg_state *drbg)
+ {
+ 	if (!drbg)
+ 		return;
+@@ -1148,7 +1148,7 @@ static inline void drbg_dealloc_state(struct drbg_state *drbg)
+  * Allocate all sub-structures for a DRBG state.
+  * The DRBG state structure must already be allocated.
+  */
+-static inline int drbg_alloc_state(struct drbg_state *drbg)
++int drbg_alloc_state(struct drbg_state *drbg)
+ {
+ 	int ret = -ENOMEM;
+ 	unsigned int sb_size = 0;
+@@ -1806,8 +1806,7 @@ static int drbg_kcapi_sym_ctr(struct drbg_state *drbg,
+  *
+  * return: flags
+  */
+-static inline void drbg_convert_tfm_core(const char *cra_driver_name,
+-					 int *coreref, bool *pr)
++void drbg_convert_tfm_core(const char *cra_driver_name, int *coreref, bool *pr)
+ {
+ 	int i = 0;
+ 	size_t start = 0;
+diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
+index 22f884c..eaedeb78 100644
+--- a/include/crypto/drbg.h
++++ b/include/crypto/drbg.h
+@@ -282,4 +282,11 @@ enum drbg_prefixes {
+ 	DRBG_PREFIX3
+ };
+ 
++extern int drbg_alloc_state(struct drbg_state *drbg);
++extern void drbg_dealloc_state(struct drbg_state *drbg);
++extern void drbg_convert_tfm_core(const char *cra_driver_name, int *coreref,
++				  bool *pr);
++extern const struct drbg_core drbg_cores[];
++extern unsigned short drbg_sec_strength(drbg_flag_t flags);
++
+ #endif /* _DRBG_H */
 -- 
 2.9.3
