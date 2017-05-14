@@ -1,71 +1,74 @@
 From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: [PATCH v11 4/5] LRNG - enable compile
-Date: Sun, 14 May 2017 16:29:03 +0200
-Message-ID: <2619717.M11260EEPi@positron.chronox.de>
-References: <7746835.7W6fIIgSam@positron.chronox.de>
+Subject: [PATCH v11 0/5] /dev/random - a new approach
+Date: Sun, 14 May 2017 16:26:49 +0200
+Message-ID: <7746835.7W6fIIgSam@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: linux-kernel@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:59560 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751614AbdENObg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 14 May 2017 10:31:36 -0400
-In-Reply-To: <7746835.7W6fIIgSam@positron.chronox.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Add LRNG compilation support.
+Hi,
 
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- drivers/char/Kconfig  | 10 ++++++++++
- drivers/char/Makefile | 10 +++++++++-
- 2 files changed, 19 insertions(+), 1 deletion(-)
+The following patch set provides a different approach to /dev/random which
+I call Linux Random Number Generator (LRNG) to collect entropy within the Linux
+kernel. The main improvements compared to the legacy /dev/random is to provide
+sufficient entropy during boot time as well as in virtual environments and when
+using SSDs. A secondary design goal is to limit the impact of the entropy
+collection on massive parallel systems and also allow the use accelerated
+cryptographic primitives. Also, all steps of the entropic data processing are
+testable. Finally massive performance improvements are visible at /dev/urandom
+and get_random_bytes.
 
-diff --git a/drivers/char/Kconfig b/drivers/char/Kconfig
-index 31adbeb..ee26190 100644
---- a/drivers/char/Kconfig
-+++ b/drivers/char/Kconfig
-@@ -594,5 +594,15 @@ config TILE_SROM
- 
- source "drivers/char/xillybus/Kconfig"
- 
-+config LRNG
-+	bool "Linux Random Number Generator"
-+	select CRYPTO_DRBG_MENU
-+	select CRYPTO_CMAC if CRYPTO_DRBG_CTR
-+	help
-+	  The Linux Random Number Generator (LRNG) is the replacement
-+	  of the legacy /dev/random provided with drivers/char/random.c.
-+	  It generates entropy from different noise sources and
-+	  delivers significant entropy during boot.
-+
- endmenu
- 
-diff --git a/drivers/char/Makefile b/drivers/char/Makefile
-index 6e6c244..618bebb 100644
---- a/drivers/char/Makefile
-+++ b/drivers/char/Makefile
-@@ -2,7 +2,15 @@
- # Makefile for the kernel character device drivers.
- #
- 
--obj-y				+= mem.o random.o
-+obj-y				+= mem.o
-+
-+ifeq ($(CONFIG_LRNG),y)
-+  obj-$(CONFIG_LRNG)		+= lrng.o
-+  lrng-y			+= lrng_base.o lrng_kcapi.o
-+else
-+  obj-y				+= random.o
-+endif
-+
- obj-$(CONFIG_TTY_PRINTK)	+= ttyprintk.o
- obj-y				+= misc.o
- obj-$(CONFIG_ATARI_DSP56K)	+= dsp56k.o
+The design and implementation is driven by a set of goals described in [1]
+that the LRNG completely implements. Furthermore, [1] includes a
+comparison with RNG design suggestions such as SP800-90B, SP800-90C, and
+AIS20/31.
+
+The LRNG has a flexible design by allowing an easy replacement of the
+deterministic random number generator component. Currently implemented DRNGs
+are an SP800-90A DRBG and a ChaCha20 DRNG.
+
+[1] http://www.chronox.de/lrng.html
+
+Changes v11 (compared to v9):
+* port to 4.12-rc1
+* contintionally compile JitterRNG code depending on CONFIG_CRYPTO_JITTERENTROPY
+* update error code path when lrng_hash_buffer fails to report the successfully
+  read entropy
+* remove LRNG_DRBG_BLOCKLEN_BYTES in favor of LRNG_DRBG_BLOCKSIZE
+* add get_random_u64 and get_random_u32 from legacy /dev/random to prevent
+  any modifications of random.c
+* move LRNG to drivers/char/
+* wakeup user space writers only when entropy in pool is low (not when primary
+  DRBG entropy is low)
+* LFSR alteration to space the processed words 67 words apart to counter
+  polynomial taps that are close together which may be affected by dependencies
+* Always mix in an interrupt time stamp even when considered stuck, just do not
+  increment number of collected interrupts used to determine the entropy content
+
+Stephan Mueller (5):
+  crypto: DRBG - externalize DRBG functions for LRNG
+  random: conditionally compile code depending on LRNG
+  Linux Random Number Generator
+  LRNG - enable compile
+  LRNG - add ChaCha20 support
+
+ crypto/drbg.c                  |   11 +-
+ drivers/char/Kconfig           |    9 +
+ drivers/char/Makefile          |   15 +-
+ drivers/char/lrng_base.c       | 2283 ++++++++++++++++++++++++++++++++++++++++
+ drivers/char/lrng_kcapi.c      |  173 +++
+ drivers/char/lrng_standalone.c |  325 ++++++
+ include/crypto/drbg.h          |    7 +
+ include/linux/genhd.h          |    5 +
+ 8 files changed, 2821 insertions(+), 7 deletions(-)
+ create mode 100644 drivers/char/lrng_base.c
+ create mode 100644 drivers/char/lrng_kcapi.c
+ create mode 100644 drivers/char/lrng_standalone.c
+
 -- 
 2.9.3
