@@ -1,141 +1,85 @@
-From: Eric Biggers <ebiggers3@gmail.com>
-Subject: [PATCH] crypto: x86/aes - Don't use %rbp as temporary register
-Date: Tue, 16 May 2017 21:03:08 -0700
-Message-ID: <20170517040308.406-1-ebiggers3@gmail.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, Josh Poimboeuf <jpoimboe@redhat.com>,
-        Eric Biggers <ebiggers@google.com>
-To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:35883 "EHLO
-        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752159AbdEQEHU (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 17 May 2017 00:07:20 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Jonathan Corbet <corbet@lwn.net>
+Subject: Re: [PATCH 00/36] Convert DocBook documents to ReST
+Date: Mon, 15 May 2017 11:11:41 -0600
+Message-ID: <20170515111141.0fcd5ee6@lwn.net>
+References: <cover.1494596071.git.mchehab@s-opensource.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Andrew Lunn <andrew@lunn.ch>, alsa-devel@alsa-project.org,
+ Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+ Takashi Iwai <tiwai@suse.de>, Jan Kiszka <jan.kiszka@siemens.com>, "Herton R.
+ Krzesinski" <herton@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
+ Takashi Iwai <tiwai@suse.com>, "J. Bruce
+ Fields" <bfields@fieldses.org>, linux-ide@vger.kernel.org,
+ Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+ Jeff Layton <jlayton@poochiereds.net>, Jan Kara <jack@suse.com>,
+ Soheil Hassas Yeganeh <soheil@google.com>, linux-s390@vger.kernel.org,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, linux-scsi@vger.kernel.org,
+ Ursula Braun <ubraun@linux.vnet.ibm.com>,
+ "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+ Peter Zijlstra <peterz@infradead.org>, Julian Anastasov <ja@ssi.bg>,
+ Ingo
+To: Mauro Carvalho Chehab <mchehab@s-opensource.com>
+Return-path: <alsa-devel-bounces@alsa-project.org>
+In-Reply-To: <cover.1494596071.git.mchehab@s-opensource.com>
+List-Unsubscribe: <http://mailman.alsa-project.org/mailman/options/alsa-devel>,
+ <mailto:alsa-devel-request@alsa-project.org?subject=unsubscribe>
+List-Archive: <http://mailman.alsa-project.org/pipermail/alsa-devel/>
+List-Post: <mailto:alsa-devel@alsa-project.org>
+List-Help: <mailto:alsa-devel-request@alsa-project.org?subject=help>
+List-Subscribe: <http://mailman.alsa-project.org/mailman/listinfo/alsa-devel>,
+ <mailto:alsa-devel-request@alsa-project.org?subject=subscribe>
+Errors-To: alsa-devel-bounces@alsa-project.org
+Sender: alsa-devel-bounces@alsa-project.org
+List-Id: linux-crypto.vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+On Fri, 12 May 2017 10:59:43 -0300
+Mauro Carvalho Chehab <mchehab@s-opensource.com> wrote:
 
-When using the "aes-asm" implementation of AES (*not* the AES-NI
-implementation) on an x86_64, v4.12-rc1 kernel with lockdep enabled, the
-following warning was reported, along with a long unwinder dump:
+> This patch series convert the following books from
+> DocBook to ReST:
+> 
+>    - filesystems
+>    - kernel-hacking
+>    - kernel-locking
+>    - kgdb
+>    - libata
+>    - networking
+>    - rapidio
+>    - s390-drivers
+>    - scsi
+>    - w1
+>    - z8530book
+> 
+> It also adjusts some Sphinx-pedantic errors/warnings on
+> some kernel-doc markups.
+> 
+> I also added some patches here to add PDF output for all
+> existing ReST books.
 
-	WARNING: kernel stack regs at ffffc90000643558 in kworker/u4:2:155 has bad 'bp' value 000000000000001c
+So I've been through the series (including digging out the parts that
+weren't sent to me).  
 
-The problem is that aes_enc_block() and aes_dec_block() use %rbp as a
-temporary register, which breaks stack traces if an interrupt occurs.
+> I did my best to check if what's there is not too outdated, but
+> the best is if the subsystem maintainers could check it.
 
-Fix this by replacing %rbp with %r9, which was being used to hold the
-saved value of %rbp.  This required rearranging the AES round macro
-slightly since %r9d cannot be used as the target of a move from %ah-%dh.
+That has been my real concern with those remaining books; many of them
+have not been touched in any significant way in at least ten years.  Just
+shoveling a bunch of stuff into RST doesn't really solve the problem that
+Documentation/ is an unorganized jumble of sometimes highly outdated
+documentation.
 
-Performance is essentially unchanged --- actually about 0.2% faster than
-before.  Interestingly, I also measured aes-generic as being nearly 7%
-faster than aes-asm, so perhaps aes-asm has outlived its usefulness...
+But, then, I guess there's value in having a disorganized jumble that
+depends on only one fragile toolchain rather than two :)  So maybe we
+should just do this.
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- arch/x86/crypto/aes-x86_64-asm_64.S | 47 +++++++++++++++++--------------------
- 1 file changed, 22 insertions(+), 25 deletions(-)
+I only had one real comment with the series beyond the general stuff
+here.  I see Markus had a few.  When the tweaks are done, can you send me
+a series for the stuff I can apply, and I'll do it?
 
-diff --git a/arch/x86/crypto/aes-x86_64-asm_64.S b/arch/x86/crypto/aes-x86_64-asm_64.S
-index 910565547163..8739cf7795de 100644
---- a/arch/x86/crypto/aes-x86_64-asm_64.S
-+++ b/arch/x86/crypto/aes-x86_64-asm_64.S
-@@ -42,17 +42,15 @@
- #define R5E	%esi
- #define R6	%rdi
- #define R6E	%edi
--#define R7	%rbp
--#define R7E	%ebp
-+#define R7	%r9	/* don't use %rbp; it breaks stack traces */
-+#define R7E	%r9d
- #define R8	%r8
--#define R9	%r9
- #define R10	%r10
- #define R11	%r11
- 
--#define prologue(FUNC,KEY,B128,B192,r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11) \
-+#define prologue(FUNC,KEY,B128,B192,r1,r2,r5,r6,r7,r8,r9,r10,r11) \
- 	ENTRY(FUNC);			\
- 	movq	r1,r2;			\
--	movq	r3,r4;			\
- 	leaq	KEY+48(r8),r9;		\
- 	movq	r10,r11;		\
- 	movl	(r7),r5 ## E;		\
-@@ -70,9 +68,8 @@
- 	je	B192;			\
- 	leaq	32(r9),r9;
- 
--#define epilogue(FUNC,r1,r2,r3,r4,r5,r6,r7,r8,r9) \
-+#define epilogue(FUNC,r1,r2,r5,r6,r7,r8,r9) \
- 	movq	r1,r2;			\
--	movq	r3,r4;			\
- 	movl	r5 ## E,(r9);		\
- 	movl	r6 ## E,4(r9);		\
- 	movl	r7 ## E,8(r9);		\
-@@ -88,12 +85,12 @@
- 	movl	TAB(,r6,4),r6 ## E;	\
- 	roll	$16,r2 ## E;		\
- 	shrl	$16,r4 ## E;		\
--	movzbl	r4 ## H,r7 ## E;	\
--	movzbl	r4 ## L,r4 ## E;	\
-+	movzbl	r4 ## L,r7 ## E;	\
-+	movzbl	r4 ## H,r4 ## E;	\
- 	xorl	OFFSET(r8),ra ## E;	\
- 	xorl	OFFSET+4(r8),rb ## E;	\
--	xorl	TAB+3072(,r7,4),r5 ## E;\
--	xorl	TAB+2048(,r4,4),r6 ## E;\
-+	xorl	TAB+3072(,r4,4),r5 ## E;\
-+	xorl	TAB+2048(,r7,4),r6 ## E;\
- 	movzbl	r1 ## L,r7 ## E;	\
- 	movzbl	r1 ## H,r4 ## E;	\
- 	movl	TAB+1024(,r4,4),r4 ## E;\
-@@ -101,19 +98,19 @@
- 	roll	$16,r1 ## E;		\
- 	shrl	$16,r3 ## E;		\
- 	xorl	TAB(,r7,4),r5 ## E;	\
--	movzbl	r3 ## H,r7 ## E;	\
--	movzbl	r3 ## L,r3 ## E;	\
--	xorl	TAB+3072(,r7,4),r4 ## E;\
--	xorl	TAB+2048(,r3,4),r5 ## E;\
--	movzbl	r1 ## H,r7 ## E;	\
--	movzbl	r1 ## L,r3 ## E;	\
-+	movzbl	r3 ## L,r7 ## E;	\
-+	movzbl	r3 ## H,r3 ## E;	\
-+	xorl	TAB+3072(,r3,4),r4 ## E;\
-+	xorl	TAB+2048(,r7,4),r5 ## E;\
-+	movzbl	r1 ## L,r7 ## E;	\
-+	movzbl	r1 ## H,r3 ## E;	\
- 	shrl	$16,r1 ## E;		\
--	xorl	TAB+3072(,r7,4),r6 ## E;\
--	movl	TAB+2048(,r3,4),r3 ## E;\
--	movzbl	r1 ## H,r7 ## E;	\
--	movzbl	r1 ## L,r1 ## E;	\
--	xorl	TAB+1024(,r7,4),r6 ## E;\
--	xorl	TAB(,r1,4),r3 ## E;	\
-+	xorl	TAB+3072(,r3,4),r6 ## E;\
-+	movl	TAB+2048(,r7,4),r3 ## E;\
-+	movzbl	r1 ## L,r7 ## E;	\
-+	movzbl	r1 ## H,r1 ## E;	\
-+	xorl	TAB+1024(,r1,4),r6 ## E;\
-+	xorl	TAB(,r7,4),r3 ## E;	\
- 	movzbl	r2 ## H,r1 ## E;	\
- 	movzbl	r2 ## L,r7 ## E;	\
- 	shrl	$16,r2 ## E;		\
-@@ -131,9 +128,9 @@
- 	movl	r4 ## E,r2 ## E;
- 
- #define entry(FUNC,KEY,B128,B192) \
--	prologue(FUNC,KEY,B128,B192,R2,R8,R7,R9,R1,R3,R4,R6,R10,R5,R11)
-+	prologue(FUNC,KEY,B128,B192,R2,R8,R1,R3,R4,R6,R10,R5,R11)
- 
--#define return(FUNC) epilogue(FUNC,R8,R2,R9,R7,R5,R6,R3,R4,R11)
-+#define return(FUNC) epilogue(FUNC,R8,R2,R5,R6,R3,R4,R11)
- 
- #define encrypt_round(TAB,OFFSET) \
- 	round(TAB,OFFSET,R1,R2,R3,R4,R5,R6,R7,R10,R5,R6,R3,R4) \
--- 
-2.13.0
+Thanks,
+
+jon
