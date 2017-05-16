@@ -1,79 +1,49 @@
-From: Mauro Carvalho Chehab <mchehab@s-opensource.com>
-Subject: [PATCH v2 13/53] docs-rst: add crypto API book to pdf output
-Date: Tue, 16 May 2017 09:16:05 -0300
-Message-ID: <8db0b75f4262edc7bb5d25137c2780d9c3186288.1494935649.git.mchehab@s-opensource.com>
-References: <cover.1494935649.git.mchehab@s-opensource.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Boris Brezillon <boris.brezillon@free-electrons.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, Jonathan Corbet <corbet@lwn.net>,
- Richard Weinberger <richard@nod.at>, linux-kernel@vger.kernel.org,
- Mauro Carvalho Chehab <mchehab@infradead.org>,
- Mauro Carvalho Chehab <mchehab@s-opensource.com>,
- Marek Vasut <marek.vasut@gmail.com>, linux-mtd@lists.infradead.org,
- linux-crypto@vger.kernel.org, Cyrille Pitchen <cyrille.pitchen@atmel.com>,
- Brian Norris <computersforpeace@gmail.com>,
- David Woodhouse <dwmw2@infradead.org>, "David S. Miller" <davem@davemloft.net>
-To: Linux Doc Mailing List <linux-doc@vger.kernel.org>
-Return-path: <linux-mtd-bounces+gldm-linux-mtd-36=gmane.org@lists.infradead.org>
-In-Reply-To: <cover.1494935649.git.mchehab@s-opensource.com>
-In-Reply-To: <cover.1494935649.git.mchehab@s-opensource.com>
-References: <cover.1494935649.git.mchehab@s-opensource.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-mtd>,
- <mailto:linux-mtd-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-mtd/>
-List-Post: <mailto:linux-mtd@lists.infradead.org>
-List-Help: <mailto:linux-mtd-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-mtd>,
- <mailto:linux-mtd-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-mtd" <linux-mtd-bounces@lists.infradead.org>
-Errors-To: linux-mtd-bounces+gldm-linux-mtd-36=gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+From: Christoph Hellwig <hch@lst.de>
+Subject: [PATCH] crypto: qat: use pcie_flr instead of duplicating it
+Date: Tue, 16 May 2017 16:21:05 +0200
+Message-ID: <20170516142105.21686-1-hch@lst.de>
+Cc: herbert@gondor.apana.org.au, qat-linux@intel.com,
+        linux-crypto@vger.kernel.org
+To: giovanni.cabiddu@intel.com, salvatore.benedetto@intel.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([65.50.211.133]:55155 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752287AbdEPOVQ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 16 May 2017 10:21:16 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The crypto API book was added without the bits required to
-generate PDF output. Add them.
-
-Signed-off-by: Mauro Carvalho Chehab <mchehab@s-opensource.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- Documentation/conf.py        |  2 ++
- Documentation/crypto/conf.py | 10 ++++++++++
- 2 files changed, 12 insertions(+)
- create mode 100644 Documentation/crypto/conf.py
+ drivers/crypto/qat/qat_common/adf_aer.c | 15 +--------------
+ 1 file changed, 1 insertion(+), 14 deletions(-)
 
-diff --git a/Documentation/conf.py b/Documentation/conf.py
-index 15f34d6863a7..ce62723491d4 100644
---- a/Documentation/conf.py
-+++ b/Documentation/conf.py
-@@ -351,6 +351,8 @@ latex_documents = [
-      'The kernel development community', 'manual'),
-     ('core-api/index', 'core-api.tex', 'The kernel core API manual',
-      'The kernel development community', 'manual'),
-+    ('crypto/index', 'crypto-api.tex', 'Linux Kernel Crypto API manual',
-+     'The kernel development community', 'manual'),
-     ('doc-guide/index', 'kernel-doc-guide.tex', 'Linux Kernel Documentation Guide',
-      'The kernel development community', 'manual'),
-     ('driver-api/index', 'driver-api.tex', 'The kernel driver API manual',
-diff --git a/Documentation/crypto/conf.py b/Documentation/crypto/conf.py
-new file mode 100644
-index 000000000000..4335d251ddf3
---- /dev/null
-+++ b/Documentation/crypto/conf.py
-@@ -0,0 +1,10 @@
-+# -*- coding: utf-8; mode: python -*-
-+
-+project = 'Linux Kernel Crypto API'
-+
-+tags.add("subproject")
-+
-+latex_documents = [
-+    ('index', 'crypto-api.tex', 'Linux Kernel Crypto API manual',
-+     'The kernel development community', 'manual'),
-+]
+diff --git a/drivers/crypto/qat/qat_common/adf_aer.c b/drivers/crypto/qat/qat_common/adf_aer.c
+index 2839fccdd84b..d3e25c37dc33 100644
+--- a/drivers/crypto/qat/qat_common/adf_aer.c
++++ b/drivers/crypto/qat/qat_common/adf_aer.c
+@@ -109,20 +109,7 @@ EXPORT_SYMBOL_GPL(adf_reset_sbr);
+ 
+ void adf_reset_flr(struct adf_accel_dev *accel_dev)
+ {
+-	struct pci_dev *pdev = accel_to_pci_dev(accel_dev);
+-	u16 control = 0;
+-	int pos = 0;
+-
+-	dev_info(&GET_DEV(accel_dev), "Function level reset\n");
+-	pos = pci_pcie_cap(pdev);
+-	if (!pos) {
+-		dev_err(&GET_DEV(accel_dev), "Restart device failed\n");
+-		return;
+-	}
+-	pci_read_config_word(pdev, pos + PCI_EXP_DEVCTL, &control);
+-	control |= PCI_EXP_DEVCTL_BCR_FLR;
+-	pci_write_config_word(pdev, pos + PCI_EXP_DEVCTL, control);
+-	msleep(100);
++	pcie_flr(accel_to_pci_dev(accel_dev));
+ }
+ EXPORT_SYMBOL_GPL(adf_reset_flr);
+ 
 -- 
-2.9.3
-
-
-______________________________________________________
-Linux MTD discussion mailing list
-http://lists.infradead.org/mailman/listinfo/linux-mtd/
+2.11.0
