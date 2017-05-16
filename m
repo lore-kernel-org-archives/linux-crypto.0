@@ -1,36 +1,50 @@
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH] drivers/staging/ccree: Fixing coding guideline errors
-Date: Tue, 16 May 2017 10:16:29 +0200
-Message-ID: <20170516081629.GA5631@kroah.com>
-References: <1494921952-8384-1-git-send-email-pushkar.iit@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: devel@driverdev.osuosl.org, driverdev-devel@linuxdriverproject.org,
- linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Pushkar Jambhlekar <pushkar.iit@gmail.com>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-Content-Disposition: inline
-In-Reply-To: <1494921952-8384-1-git-send-email-pushkar.iit@gmail.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
-List-Id: linux-crypto.vger.kernel.org
+From: Arvind Yadav <arvind.yadav.cs@gmail.com>
+Subject: [PATCH v1] crypto: img-hash - Handle return value of clk_prepare_enable
+Date: Tue, 16 May 2017 13:57:41 +0530
+Message-ID: <1494923261-18884-1-git-send-email-arvind.yadav.cs@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: herbert@gondor.apana.org.au, davem@davemloft.net,
+        will.thomas@imgtec.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pg0-f68.google.com ([74.125.83.68]:36464 "EHLO
+        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751646AbdEPI3C (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 16 May 2017 04:29:02 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, May 16, 2017 at 01:35:52PM +0530, Pushkar Jambhlekar wrote:
-> Fixing coding guideline errors reported by 'checkpatch.pl'
+Here, Clock enable can failed. So adding an error check for
+clk_prepare_enable.
 
-That is very "vague", you are going to have to be specific here.
+Signed-off-by: Arvind Yadav <arvind.yadav.cs@gmail.com>
+---
+ drivers/crypto/img-hash.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-Also remember you can only do "one type of thing" per patch, and no,
-"fix all warnings" is not one type of thing :)
-
-thanks,
-
-greg k-h
+diff --git a/drivers/crypto/img-hash.c b/drivers/crypto/img-hash.c
+index 9b07f3d8..0c6a917 100644
+--- a/drivers/crypto/img-hash.c
++++ b/drivers/crypto/img-hash.c
+@@ -1088,9 +1088,17 @@ static int img_hash_suspend(struct device *dev)
+ static int img_hash_resume(struct device *dev)
+ {
+ 	struct img_hash_dev *hdev = dev_get_drvdata(dev);
++	int ret;
+ 
+-	clk_prepare_enable(hdev->hash_clk);
+-	clk_prepare_enable(hdev->sys_clk);
++	ret = clk_prepare_enable(hdev->hash_clk);
++	if (ret)
++		return ret;
++
++	ret = clk_prepare_enable(hdev->sys_clk);
++	if (ret) {
++		clk_disable_unprepare(hdev->hash_clk);
++		return ret;
++	}
+ 
+ 	return 0;
+ }
+-- 
+1.9.1
