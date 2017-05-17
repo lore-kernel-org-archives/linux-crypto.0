@@ -1,7 +1,8 @@
 From: Tudor Ambarus <tudor.ambarus@microchip.com>
-Subject: [RFC PATCH v2 0/4] crypto: (ec)dh - add privkey generation support
-Date: Wed, 17 May 2017 18:26:49 +0300
-Message-ID: <1495034813-27143-1-git-send-email-tudor.ambarus@microchip.com>
+Subject: [RFC PATCH v2 1/4] crypto: ecc - add privkey generation support
+Date: Wed, 17 May 2017 18:26:50 +0300
+Message-ID: <1495034813-27143-2-git-send-email-tudor.ambarus@microchip.com>
+References: <1495034813-27143-1-git-send-email-tudor.ambarus@microchip.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: <linux-crypto@vger.kernel.org>, <smueller@chronox.de>,
@@ -9,52 +10,82 @@ Cc: <linux-crypto@vger.kernel.org>, <smueller@chronox.de>,
         Tudor Ambarus <tudor.ambarus@microchip.com>
 To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from esa3.microchip.iphmx.com ([68.232.153.233]:15235 "EHLO
-        esa3.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751155AbdEQP1Y (ORCPT
+Received: from esa1.microchip.iphmx.com ([68.232.147.91]:31947 "EHLO
+        esa1.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752156AbdEQP1a (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 17 May 2017 11:27:24 -0400
+        Wed, 17 May 2017 11:27:30 -0400
+In-Reply-To: <1495034813-27143-1-git-send-email-tudor.ambarus@microchip.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+Add support for generating ecc private keys.
 
-This is an RFC to discuss how to support private key generation for dh and ecdh.
+Generation of ecc private keys is helpful in a user-space to kernel
+ecdh offload because the keys are not revealed to user-space. Private
+key generation is also helpful to implement forward secrecy.
 
-This is helpful in a user-space to kernel (ec)dh offload because the keys are
-generated in kernel and never revealed to user-space.
+Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
+---
+ crypto/ecc.c | 20 ++++++++++++++++++++
+ crypto/ecc.h | 14 ++++++++++++++
+ 2 files changed, 34 insertions(+)
 
-Private key generation is also helpful to implement forward secrecy.
-A public/private key system demonstrates the property of forward secrecy if it
-creates new key pairs for each communication session. These key pairs are
-generated on an as-needed basis and are destroyed after the session is over.
-If an attacker were to record previous encrypted session data, they wouldn't be
-able to decrypt it with possession of a long-term key.
-
-There are crypto accelerators that are capable of generating and retaining
-private keys without revealing them to software. This patch set is a
-prerequisite for hardware private key generation support.
-
-Changes in v2:
- - free dh params in case of error
- - code defensively in testmgr: use sizeof(*ptr) while in memcpy
-
-v1 can be found at:
-http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg25176.html
-
-Tudor Ambarus (4):
-  crypto: ecc - add privkey generation support
-  crypto: ecdh - allow user to provide NULL privkey
-  crypto: dh - allow user to provide NULL privkey
-  crypto: testmgr - add genkey kpp test
-
- crypto/dh.c      |  21 ++++++++
- crypto/ecc.c     |  20 +++++++
- crypto/ecc.h     |  14 +++++
- crypto/ecdh.c    |   4 ++
- crypto/testmgr.c |  76 +++++++++++++++++++++++----
- crypto/testmgr.h | 155 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 6 files changed, 279 insertions(+), 11 deletions(-)
-
+diff --git a/crypto/ecc.c b/crypto/ecc.c
+index 414c78a..a591907 100644
+--- a/crypto/ecc.c
++++ b/crypto/ecc.c
+@@ -927,6 +927,26 @@ int ecc_is_key_valid(unsigned int curve_id, unsigned int ndigits,
+ 	return 0;
+ }
+ 
++int ecc_gen_privkey(unsigned int curve_id, unsigned int ndigits, u64 *privkey)
++{
++	const struct ecc_curve *curve = ecc_get_curve(curve_id);
++	u64 priv[ndigits];
++	unsigned int nbytes = ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
++
++	get_random_bytes(priv, nbytes);
++
++	if (vli_is_zero(priv, ndigits))
++		return -EINVAL;
++
++	/* Make sure the private key is in the range [1, n-1]. */
++	if (vli_cmp(curve->n, priv, ndigits) != 1)
++		return -EINVAL;
++
++	ecc_swap_digits(priv, privkey, ndigits);
++
++	return 0;
++}
++
+ int ecdh_make_pub_key(unsigned int curve_id, unsigned int ndigits,
+ 		      const u8 *private_key, unsigned int private_key_len,
+ 		      u8 *public_key, unsigned int public_key_len)
+diff --git a/crypto/ecc.h b/crypto/ecc.h
+index 663d598..b94b7ce 100644
+--- a/crypto/ecc.h
++++ b/crypto/ecc.h
+@@ -44,6 +44,20 @@ int ecc_is_key_valid(unsigned int curve_id, unsigned int ndigits,
+ 		     const u8 *private_key, unsigned int private_key_len);
+ 
+ /**
++ * ecc_gen_privkey() -  Generates an ECC private key.
++ * The private key is a random integer in the range 0 < random < n, where n is a
++ * prime that is the order of the cyclic subgroup generated by the distinguished
++ * point G.
++ * @curve_id:		id representing the curve to use
++ * @ndigits:		curve number of digits
++ * @private_key:	buffer for storing the generated private key
++ *
++ * Returns 0 if the private key was generated successfully, a negative value
++ * if an error occurred.
++ */
++int ecc_gen_privkey(unsigned int curve_id, unsigned int ndigits, u64 *privkey);
++
++/**
+  * ecdh_make_pub_key() - Compute an ECC public key
+  *
+  * @curve_id:		id representing the curve to use
 -- 
 2.7.4
