@@ -1,56 +1,45 @@
-From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: [PATCH] crypto: x86/aes - Don't use %rbp as temporary register
-Date: Wed, 17 May 2017 15:21:41 -0700
-Message-ID: <20170517222141.GA60476@gmail.com>
-References: <20170517040308.406-1-ebiggers3@gmail.com>
- <20170517204427.lwvzonoa26paoitk@treble>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, Eric Biggers <ebiggers@google.com>
-To: Josh Poimboeuf <jpoimboe@redhat.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pg0-f66.google.com ([74.125.83.66]:36695 "EHLO
-        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754464AbdEQWVp (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 17 May 2017 18:21:45 -0400
-Content-Disposition: inline
-In-Reply-To: <20170517204427.lwvzonoa26paoitk@treble>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Rick Altherr <raltherr-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH v1 1/2] dt-bindings: timeriomem_rng: Add entropy quality property
+Date: Wed, 17 May 2017 15:29:10 -0700
+Message-ID: <20170517222911.9295-1-raltherr@google.com>
+Cc: devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
+        Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org>
+To: linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, May 17, 2017 at 03:44:27PM -0500, Josh Poimboeuf wrote:
-> On Tue, May 16, 2017 at 09:03:08PM -0700, Eric Biggers wrote:
-> > From: Eric Biggers <ebiggers@google.com>
-> > 
-> > When using the "aes-asm" implementation of AES (*not* the AES-NI
-> > implementation) on an x86_64, v4.12-rc1 kernel with lockdep enabled, the
-> > following warning was reported, along with a long unwinder dump:
-> > 
-> > 	WARNING: kernel stack regs at ffffc90000643558 in kworker/u4:2:155 has bad 'bp' value 000000000000001c
-> > 
-> > The problem is that aes_enc_block() and aes_dec_block() use %rbp as a
-> > temporary register, which breaks stack traces if an interrupt occurs.
-> > 
-> > Fix this by replacing %rbp with %r9, which was being used to hold the
-> > saved value of %rbp.  This required rearranging the AES round macro
-> > slightly since %r9d cannot be used as the target of a move from %ah-%dh.
-> > 
-> > Performance is essentially unchanged --- actually about 0.2% faster than
-> > before.  Interestingly, I also measured aes-generic as being nearly 7%
-> > faster than aes-asm, so perhaps aes-asm has outlived its usefulness...
-> > 
-> > Signed-off-by: Eric Biggers <ebiggers@google.com>
-> 
-> Reviewed-by: Josh Poimboeuf <jpoimboe@redhat.com>
-> 
+Signed-off-by: Rick Altherr <raltherr-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>
+---
 
-Hmm, it looks like a number of other algorithms in arch/x86/crypto/ use %rbp (or
-%ebp), e.g. blowfish, camellia, cast5, and aes-i586.  Presumably they have the
-same problem.  I'm a little confused: do these all need to be fixed, and
-when/why did this start being considered broken?
+ Documentation/devicetree/bindings/rng/timeriomem_rng.txt | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-Eric
+diff --git a/Documentation/devicetree/bindings/rng/timeriomem_rng.txt b/Documentation/devicetree/bindings/rng/timeriomem_rng.txt
+index 6616d15866a3..214940093b55 100644
+--- a/Documentation/devicetree/bindings/rng/timeriomem_rng.txt
++++ b/Documentation/devicetree/bindings/rng/timeriomem_rng.txt
+@@ -5,6 +5,13 @@ Required properties:
+ - reg : base address to sample from
+ - period : wait time in microseconds to use between samples
+ 
++Optional properties:
++- quality : estimated number of bits of true entropy per 1024 bits read from the
++            rng.  Defaults to zero which causes the kernel's default quality to
++            be used instead.  Note that the default quality is usually zero
++            which disables using this rng to automatically fill the kernel's
++            entropy pool.
++
+ N.B. currently 'reg' must be four bytes wide and aligned
+ 
+ Example:
+-- 
+2.13.0.303.g4ebf302169-goog
+
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
