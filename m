@@ -1,47 +1,56 @@
-From: Rob Herring <robh@kernel.org>
-Subject: Re: [PATCH v4 1/3] Documentation/bindings: Document the SafeXel
- cryptographic engine driver
-Date: Wed, 17 May 2017 16:25:48 -0500
-Message-ID: <CAL_JsqKB-D4UBJWX==pQdKsDd+rGP6JJD3jnwPBbLxpHS85XCw@mail.gmail.com>
-References: <20170427132459.23159-1-antoine.tenart@free-electrons.com>
- <20170427132459.23159-2-antoine.tenart@free-electrons.com>
+From: Eric Biggers <ebiggers3@gmail.com>
+Subject: Re: [PATCH] crypto: x86/aes - Don't use %rbp as temporary register
+Date: Wed, 17 May 2017 15:21:41 -0700
+Message-ID: <20170517222141.GA60476@gmail.com>
+References: <20170517040308.406-1-ebiggers3@gmail.com>
+ <20170517204427.lwvzonoa26paoitk@treble>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
- Andrew Lunn <andrew@lunn.ch>, Herbert Xu <herbert@gondor.apana.org.au>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
- Boris BREZILLON <boris.brezillon@free-electrons.com>,
- linux-crypto@vger.kernel.org, Nadav Haklai <nadavh@marvell.com>,
- oferh@marvell.com, Igal Liberman <igall@marvell.com>,
- Gregory Clement <gregory.clement@free-electrons.com>,
- David Miller <davem@davemloft.net>, Jason Cooper <jason@lakedaemon.net>,
- Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>
-To: Antoine Tenart <antoine.tenart@free-electrons.com>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20170427132459.23159-2-antoine.tenart@free-electrons.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, Eric Biggers <ebiggers@google.com>
+To: Josh Poimboeuf <jpoimboe@redhat.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pg0-f66.google.com ([74.125.83.66]:36695 "EHLO
+        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754464AbdEQWVp (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 17 May 2017 18:21:45 -0400
+Content-Disposition: inline
+In-Reply-To: <20170517204427.lwvzonoa26paoitk@treble>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Apr 27, 2017 at 8:24 AM, Antoine Tenart
-<antoine.tenart@free-electrons.com> wrote:
-> The Inside Secure Safexcel cryptographic engine is found on some Marvell
-> SoCs (7k/8k). Document the bindings used by its driver.
->
-> Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
-> ---
->  .../bindings/crypto/inside-secure-safexcel.txt     | 27 ++++++++++++++++++++++
->  1 file changed, 27 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/crypto/inside-secure-safexcel.txt
+On Wed, May 17, 2017 at 03:44:27PM -0500, Josh Poimboeuf wrote:
+> On Tue, May 16, 2017 at 09:03:08PM -0700, Eric Biggers wrote:
+> > From: Eric Biggers <ebiggers@google.com>
+> > 
+> > When using the "aes-asm" implementation of AES (*not* the AES-NI
+> > implementation) on an x86_64, v4.12-rc1 kernel with lockdep enabled, the
+> > following warning was reported, along with a long unwinder dump:
+> > 
+> > 	WARNING: kernel stack regs at ffffc90000643558 in kworker/u4:2:155 has bad 'bp' value 000000000000001c
+> > 
+> > The problem is that aes_enc_block() and aes_dec_block() use %rbp as a
+> > temporary register, which breaks stack traces if an interrupt occurs.
+> > 
+> > Fix this by replacing %rbp with %r9, which was being used to hold the
+> > saved value of %rbp.  This required rearranging the AES round macro
+> > slightly since %r9d cannot be used as the target of a move from %ah-%dh.
+> > 
+> > Performance is essentially unchanged --- actually about 0.2% faster than
+> > before.  Interestingly, I also measured aes-generic as being nearly 7%
+> > faster than aes-asm, so perhaps aes-asm has outlived its usefulness...
+> > 
+> > Signed-off-by: Eric Biggers <ebiggers@google.com>
+> 
+> Reviewed-by: Josh Poimboeuf <jpoimboe@redhat.com>
+> 
 
-If you would like this reviewed, please re-send to the DT list.
+Hmm, it looks like a number of other algorithms in arch/x86/crypto/ use %rbp (or
+%ebp), e.g. blowfish, camellia, cast5, and aes-i586.  Presumably they have the
+same problem.  I'm a little confused: do these all need to be fixed, and
+when/why did this start being considered broken?
 
-Rob
+Eric
