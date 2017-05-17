@@ -1,98 +1,55 @@
-From: Mauro Carvalho Chehab <mchehab@s-opensource.com>
-Subject: Re: [PATCH 00/36] Convert DocBook documents to ReST
-Date: Mon, 15 May 2017 14:41:03 -0300
-Message-ID: <20170515144103.306189d6@vento.lan>
-References: <cover.1494596071.git.mchehab@s-opensource.com>
- <20170515111141.0fcd5ee6@lwn.net>
+From: Tudor Ambarus <tudor.ambarus@microchip.com>
+Subject: [RFC PATCH 0/4] crypto: (ec)dh - add privkey generation support
+Date: Wed, 17 May 2017 13:38:32 +0300
+Message-ID: <1495017516-10048-1-git-send-email-tudor.ambarus@microchip.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Andrew Lunn <andrew@lunn.ch>, alsa-devel@alsa-project.org,
- Linux Doc Mailing List <linux-doc@vger.kernel.org>,
- Takashi Iwai <tiwai@suse.de>, Jan Kiszka <jan.kiszka@siemens.com>, "Herton R.
- Krzesinski" <herton@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
- Takashi Iwai <tiwai@suse.com>, "J. Bruce
- Fields" <bfields@fieldses.org>, linux-ide@vger.kernel.org,
- Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
- Jeff Layton <jlayton@poochiereds.net>, Jan Kara <jack@suse.com>,
- Soheil Hassas Yeganeh <soheil@google.com>, linux-s390@vger.kernel.org,
- Florian Fainelli <f.fainelli@gmail.com>,
- "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, linux-scsi@vger.kernel.org,
- Ursula Braun <ubraun@linux.vnet.ibm.com>,
- "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
- Peter Zijlstra <peterz@infradead.org>, Julian Anastasov <ja@ssi.bg>,
- Ingo
-To: Jonathan Corbet <corbet@lwn.net>
-Return-path: <alsa-devel-bounces@alsa-project.org>
-In-Reply-To: <20170515111141.0fcd5ee6@lwn.net>
-List-Unsubscribe: <http://mailman.alsa-project.org/mailman/options/alsa-devel>,
- <mailto:alsa-devel-request@alsa-project.org?subject=unsubscribe>
-List-Archive: <http://mailman.alsa-project.org/pipermail/alsa-devel/>
-List-Post: <mailto:alsa-devel@alsa-project.org>
-List-Help: <mailto:alsa-devel-request@alsa-project.org?subject=help>
-List-Subscribe: <http://mailman.alsa-project.org/mailman/listinfo/alsa-devel>,
- <mailto:alsa-devel-request@alsa-project.org?subject=subscribe>
-Errors-To: alsa-devel-bounces@alsa-project.org
-Sender: alsa-devel-bounces@alsa-project.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain
+Cc: <linux-crypto@vger.kernel.org>, <smueller@chronox.de>,
+        <marcel@holtmann.org>, <Nicolas.Ferre@microchip.com>,
+        Tudor Ambarus <tudor.ambarus@microchip.com>
+To: <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from esa3.microchip.iphmx.com ([68.232.153.233]:35757 "EHLO
+        esa3.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751782AbdEQKiv (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 17 May 2017 06:38:51 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Em Mon, 15 May 2017 11:11:41 -0600
-Jonathan Corbet <corbet@lwn.net> escreveu:
+Hi,
 
-> On Fri, 12 May 2017 10:59:43 -0300
-> Mauro Carvalho Chehab <mchehab@s-opensource.com> wrote:
-> 
-> > This patch series convert the following books from
-> > DocBook to ReST:
-> > 
-> >    - filesystems
-> >    - kernel-hacking
-> >    - kernel-locking
-> >    - kgdb
-> >    - libata
-> >    - networking
-> >    - rapidio
-> >    - s390-drivers
-> >    - scsi
-> >    - w1
-> >    - z8530book
-> > 
-> > It also adjusts some Sphinx-pedantic errors/warnings on
-> > some kernel-doc markups.
-> > 
-> > I also added some patches here to add PDF output for all
-> > existing ReST books.  
-> 
-> So I've been through the series (including digging out the parts that
-> weren't sent to me).  
-> 
-> > I did my best to check if what's there is not too outdated, but
-> > the best is if the subsystem maintainers could check it.  
-> 
-> That has been my real concern with those remaining books; many of them
-> have not been touched in any significant way in at least ten years. Just
-> shoveling a bunch of stuff into RST doesn't really solve the problem that
-> Documentation/ is an unorganized jumble of sometimes highly outdated
-> documentation.
+This is an RFC to discuss how to support private key generation for dh and
+ecdh.
 
-True. Yet, on the checks I did, on the books that have API descriptions,
-the C domain references still exist. On the books that just have
-kernel-doc tags, I wouldn't expect any changes there, as the API
-changes should be, instead, at the C code.
+This is helpful in a user-space to kernel (ec)dh offload because the keys
+are generated in kernel and never revealed to user-space.
 
-So, I guess that it is not that bad, and, by having them in ReST will
-make them easier to be updated, as ReST is basically ascii with benefits.
+Private key generation is also helpful to implement forward secrecy.
+A public/private key system demonstrates the property of forward secrecy
+if it creates new key pairs for each communication session. These
+key pairs are generated on an as-needed basis and are destroyed after
+the session is over. If an attacker were to record previous encrypted
+session data, they wouldn't be able to decrypt it with possession of a
+long-term key.
 
-> But, then, I guess there's value in having a disorganized jumble that
-> depends on only one fragile toolchain rather than two :)  So maybe we
-> should just do this.
-> 
-> I only had one real comment with the series beyond the general stuff
-> here.  I see Markus had a few.  When the tweaks are done, can you send me
-> a series for the stuff I can apply, and I'll do it?
+There are crypto accelerators that are capable of generating and retaining
+private keys without revealing them to software. This patch set is a
+prerequisite for hardware private key generation support.
 
-Sure, I'm addressing the comments and will send you a new series.
+Tudor Ambarus (4):
+  crypto: ecc - add privkey generation support
+  crypto: ecdh - allow user to provide NULL privkey
+  crypto: dh - allow user to provide NULL privkey
+  crypto: testmgr - add genkey kpp test
 
-Thanks,
-Mauro
+ crypto/dh.c      |  18 +++++++
+ crypto/ecc.c     |  20 +++++++
+ crypto/ecc.h     |  14 +++++
+ crypto/ecdh.c    |   4 ++
+ crypto/testmgr.c |  77 +++++++++++++++++++++++----
+ crypto/testmgr.h | 155 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 277 insertions(+), 11 deletions(-)
+
+-- 
+2.7.4
