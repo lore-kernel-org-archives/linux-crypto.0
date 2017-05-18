@@ -1,104 +1,66 @@
-From: <agiva@centrum.cz>
-Subject: (unknown)
-Date: Thu, 18 May 2017 14:13:27 -0000
-Message-ID: <149511680740.6150.15373944853234217680@isurgut.ru>
+From: Branislav Katreniak <brano@ksp.sk>
+Subject: [PATCH] staging: ccree: fix checkpatch no space before tabs
+Date: Thu, 18 May 2017 22:28:33 +0200
+Message-ID: <20170518202833.GA30843@archiv.ksp.sk>
 Mime-Version: 1.0
-Content-Type: application/zip; name="233627250363201.zip"
-Content-Transfer-Encoding: base64
-To: <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+To: Gilad Ben-Yossef <gilad@benyossef.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 178-47-113-181.static-adsl.isurgut.ru ([178.47.113.181]:48638
-        "HELO isurgut.ru" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with SMTP id S1756172AbdERONc (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 May 2017 10:13:32 -0400
-Content-Disposition: attachment
-Subject: 
+Received: from element.ksp.sk ([158.195.16.154]:40857 "EHLO ksp.sk"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752741AbdERUfp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 18 May 2017 16:35:45 -0400
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-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
+Fixes checkpatch warning:
+WARNING: please, no space before tabs
+
+Signed-off-by: Branislav Katreniak <brano@ksp.sk>
+---
+ drivers/staging/ccree/cc_crypto_ctx.h | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/staging/ccree/cc_crypto_ctx.h b/drivers/staging/ccree/cc_crypto_ctx.h
+index 216d247..ac39d34 100644
+--- a/drivers/staging/ccree/cc_crypto_ctx.h
++++ b/drivers/staging/ccree/cc_crypto_ctx.h
+@@ -54,13 +54,13 @@
+ #define CC_AES_KEY_SIZE_MAX			CC_AES_256_BIT_KEY_SIZE
+ #define CC_AES_KEY_SIZE_WORDS_MAX		(CC_AES_KEY_SIZE_MAX >> 2)
+ 
+-#define CC_MD5_DIGEST_SIZE 	16
+-#define CC_SHA1_DIGEST_SIZE 	20
+-#define CC_SHA224_DIGEST_SIZE 	28
+-#define CC_SHA256_DIGEST_SIZE 	32
++#define CC_MD5_DIGEST_SIZE	16
++#define CC_SHA1_DIGEST_SIZE	20
++#define CC_SHA224_DIGEST_SIZE	28
++#define CC_SHA256_DIGEST_SIZE	32
+ #define CC_SHA256_DIGEST_SIZE_IN_WORDS 8
+-#define CC_SHA384_DIGEST_SIZE 	48
+-#define CC_SHA512_DIGEST_SIZE 	64
++#define CC_SHA384_DIGEST_SIZE	48
++#define CC_SHA512_DIGEST_SIZE	64
+ 
+ #define CC_SHA1_BLOCK_SIZE 64
+ #define CC_SHA1_BLOCK_SIZE_IN_WORDS 16
+@@ -83,9 +83,9 @@
+ 
+ #define CC_HMAC_BLOCK_SIZE_MAX CC_HASH_BLOCK_SIZE_MAX
+ 
+-#define CC_MULTI2_SYSTEM_KEY_SIZE 		32
+-#define CC_MULTI2_DATA_KEY_SIZE 		8
+-#define CC_MULTI2_SYSTEM_N_DATA_KEY_SIZE 	(CC_MULTI2_SYSTEM_KEY_SIZE + CC_MULTI2_DATA_KEY_SIZE)
++#define CC_MULTI2_SYSTEM_KEY_SIZE		32
++#define CC_MULTI2_DATA_KEY_SIZE		8
++#define CC_MULTI2_SYSTEM_N_DATA_KEY_SIZE	(CC_MULTI2_SYSTEM_KEY_SIZE + CC_MULTI2_DATA_KEY_SIZE)
+ #define	CC_MULTI2_BLOCK_SIZE					8
+ #define	CC_MULTI2_IV_SIZE					8
+ #define	CC_MULTI2_MIN_NUM_ROUNDS				8
+-- 
+2.7.4
