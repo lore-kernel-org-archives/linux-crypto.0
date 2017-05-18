@@ -1,81 +1,62 @@
-From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Subject: Re: [PATCH v1 2/2] hw_random: timeriomem_rng: Allow setting RNG
- quality from platform data
-Date: Thu, 18 May 2017 11:13:29 +0530
-Message-ID: <CANc+2y4vg1F2+y98ijoR1Ve_2u+zpChN3OXxn+6uLebVLcDp6Q@mail.gmail.com>
-References: <20170517222911.9295-1-raltherr@google.com> <20170517222911.9295-2-raltherr@google.com>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: Re: [PATCH 2/4] crypto: drbg wait for crypto op not signal safe
+Date: Thu, 18 May 2017 12:23:08 +0300
+Message-ID: <CAOtvUMdNS_hQhqmiQp9N=72u4DL+tjy1ANzZyhSCkEe8FOargw@mail.gmail.com>
+References: <1494503626-15877-1-git-send-email-gilad@benyossef.com>
+ <1494503626-15877-3-git-send-email-gilad@benyossef.com> <20170518050933.GA32409@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Matt Mackall <mpm@selenic.com>
-To: Rick Altherr <raltherr@google.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-vk0-f66.google.com ([209.85.213.66]:33437 "EHLO
-        mail-vk0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751348AbdERFna (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 May 2017 01:43:30 -0400
-In-Reply-To: <20170517222911.9295-2-raltherr@google.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        David Howells <dhowells@redhat.com>,
+        Ofir Drang <ofir.drang@arm.com>,
+        Gilad Ben-Yossef <gilad.benyossef@arm.com>,
+        Eric Biggers <ebiggers3@gmail.com>, stable@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+        keyrings@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-doc-owner@vger.kernel.org>
+In-Reply-To: <20170518050933.GA32409@gondor.apana.org.au>
+Sender: linux-doc-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Rick,
+On Thu, May 18, 2017 at 8:09 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> On Thu, May 11, 2017 at 02:53:43PM +0300, Gilad Ben-Yossef wrote:
+>> drbg_kcapi_sym_ctr() was using wait_for_completion_interruptible() to
+>> wait for completion of async crypto op but if a signal occurs it
+>> may return before DMA ops of HW crypto provider finish, thus
+>> corrupting the output buffer.
+>>
+>> Resolve this by using wait_for_completion() instead.
+>>
+>> Reported-by: Eric Biggers <ebiggers3@gmail.com>
+>> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+>> CC: stable@vger.kernel.org
+>
+> This patch doesn't even compile.  Please test your work first.
 
-Minor comment below.
+Sigh... I've noticed it, fixed it, compiled it and than went ahead and
+squashed the fix with the next patch in series instead of this one
+like an idiot.
 
-On 18 May 2017 at 03:59, Rick Altherr <raltherr@google.com> wrote:
-> When a hw_random device's quality is non-zero, it will automatically be
-> used to fill the kernel's entropy pool.  Since timeriomem_rng is used by
-> many different devices, the quality needs to be provided by platform
-> data or device tree.
->
-> Signed-off-by: Rick Altherr <raltherr@google.com>
-> ---
->
->  drivers/char/hw_random/timeriomem-rng.c | 7 +++++++
->  include/linux/timeriomem-rng.h          | 3 +++
->  2 files changed, 10 insertions(+)
->
-> diff --git a/drivers/char/hw_random/timeriomem-rng.c b/drivers/char/hw_random/timeriomem-rng.c
-> index a0faa5f05deb..03ff5483d865 100644
-> --- a/drivers/char/hw_random/timeriomem-rng.c
-> +++ b/drivers/char/hw_random/timeriomem-rng.c
-> @@ -151,8 +151,15 @@ static int timeriomem_rng_probe(struct platform_device *pdev)
->                         dev_err(&pdev->dev, "missing period\n");
->                         return -EINVAL;
->                 }
-> +
-> +               if (!of_property_read_u32(pdev->dev.of_node,
-> +                                               "quality", &i))
-> +                       priv->rng_ops.quality = i;
-> +               else
-> +                       priv->rng_ops.quality = 0;
->         } else {
->                 period = pdata->period;
-> +               priv->rng_ops.quality = pdata->quality;
->         }
->
->         priv->period = ns_to_ktime(period * NSEC_PER_USEC);
-> diff --git a/include/linux/timeriomem-rng.h b/include/linux/timeriomem-rng.h
-> index 46eb27ddbfab..320f743bf06b 100644
-> --- a/include/linux/timeriomem-rng.h
-> +++ b/include/linux/timeriomem-rng.h
-> @@ -13,4 +13,7 @@ struct timeriomem_rng_data {
->
->         /* measures in usecs */
->         unsigned int            period;
-> +
-> +       /* bits of entropy per 1000 bits read */
+Please accept my apologies for wasting your time. I'll send a fixed version.
 
-Your dt-bindings patch says 'entropy per 1024 bits'. Please be consistent.
+Gilad
 
-> +       unsigned int            quality;
->  };
+>
+> Thanks,
 > --
-> 2.13.0.303.g4ebf302169-goog
->
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
-Regards,
-PrasannaKumar
+
+
+-- 
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+"If you take a class in large-scale robotics, can you end up in a
+situation where the homework eats your dog?"
+ -- Jean-Baptiste Queru
