@@ -1,31 +1,43 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: arm64/sha - avoid non-standard inline asm tricks
-Date: Thu, 18 May 2017 13:26:54 +0800
-Message-ID: <20170518052654.GE32485@gondor.apana.org.au>
-References: <20170426161132.11311-1-ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH 0/7] crypto: aesni: provide generic gcm(aes)
+Date: Thu, 18 May 2017 13:28:00 +0800
+Message-ID: <20170518052800.GF32485@gondor.apana.org.au>
+References: <cover.1493395785.git.sd@queasysnail.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, mka@chromium.org
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: netdev@vger.kernel.org,
+        Hannes Frederic Sowa <hannes@stressinduktion.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Sabrina Dubroca <sd@queasysnail.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [128.1.224.119] ([128.1.224.119]:41902 "EHLO deadmen.hmeau.com"
+Received: from [128.1.224.119] ([128.1.224.119]:41930 "EHLO deadmen.hmeau.com"
         rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752823AbdERF1I (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 May 2017 01:27:08 -0400
+        id S1751789AbdERF2o (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 18 May 2017 01:28:44 -0400
 Content-Disposition: inline
-In-Reply-To: <20170426161132.11311-1-ard.biesheuvel@linaro.org>
+In-Reply-To: <cover.1493395785.git.sd@queasysnail.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Apr 26, 2017 at 05:11:32PM +0100, Ard Biesheuvel wrote:
-> Replace the inline asm which exports struct offsets as ELF symbols
-> with proper const variables exposing the same values. This works
-> around an issue with Clang which does not interpret the "i" (or "I")
-> constraints in the same way as GCC.
+On Fri, Apr 28, 2017 at 06:11:55PM +0200, Sabrina Dubroca wrote:
+> The current aesni AES-GCM implementation only offers support for
+> rfc4106(gcm(aes)).  This makes some things a little bit simpler
+> (handling of associated data and authentication tag), but it means
+> that non-IPsec users of gcm(aes) have to rely on
+> gcm_base(ctr-aes-aesni,ghash-clmulni), which is much slower.
 > 
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> This patchset adds handling of all valid authentication tag lengths
+> and of any associated data length to the assembly code, and exposes a
+> generic gcm(aes) AEAD algorithm to the crypto API.
+> 
+> With these patches, performance of MACsec on a single core increases
+> by 40% (from 4.5Gbps to around 6.3Gbps).
 
-Patch applied.  Thanks.
+All patches applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
