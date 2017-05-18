@@ -1,40 +1,35 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: tcrypt: don't disable irqs and wait
-Date: Thu, 18 May 2017 13:25:01 +0800
-Message-ID: <20170518052501.GA32485@gondor.apana.org.au>
-References: <1493108740-1642-1-git-send-email-gilad@benyossef.com>
+Subject: Re: [PATCH 0/5] crypto: caampkc - extend RSA private key
+ representation
+Date: Thu, 18 May 2017 13:25:51 +0800
+Message-ID: <20170518052551.GC32485@gondor.apana.org.au>
+References: <20170425132639.20178-1-horia.geanta@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Cc: "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        gilad.benyossef@arm.com, Ofir Drang <ofir.drang@arm.com>
-To: Gilad Ben-Yossef <gilad@benyossef.com>
+        linux-crypto@vger.kernel.org, Dan Douglass <dan.douglass@nxp.com>,
+        Radu Alexe <radu.alexe@nxp.com>,
+        Tudor Ambarus <tudor.ambarus@microchip.com>
+To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [128.1.224.119] ([128.1.224.119]:41854 "EHLO deadmen.hmeau.com"
+Received: from [128.1.224.119] ([128.1.224.119]:41866 "EHLO deadmen.hmeau.com"
         rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751155AbdERFZ2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 May 2017 01:25:28 -0400
+        id S1754063AbdERF0G (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 18 May 2017 01:26:06 -0400
 Content-Disposition: inline
-In-Reply-To: <1493108740-1642-1-git-send-email-gilad@benyossef.com>
+In-Reply-To: <20170425132639.20178-1-horia.geanta@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Apr 25, 2017 at 11:25:40AM +0300, Gilad Ben-Yossef wrote:
-> The tcrypt AEAD cycles speed tests disables irqs during the test, which is
-> broken at the very least since commit
-> '1425d2d17f7309c6 ("crypto: tcrypt - Fix AEAD speed tests")'
-> adds a wait for completion as part of the test and probably since
-> switching to the new AEAD API.
+On Tue, Apr 25, 2017 at 04:26:34PM +0300, Horia Geantă wrote:
+> This patch set adds support for the second and third RSA private key
+> representations and extends caampkc to use the fastest key when all related
+> components are present in the private key.
 > 
-> While the result of taking a cycle count diff may not mean much on SMP
-> systems if the task migrates, it's good enough for tcrypt being the quick
-> & dirty dev tool it is. It's also what all the other (i.e. hash) cycle
-> speed tests do.
-> 
-> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
-> Reported-by: Ofir Drang <ofir.drang@arm.com>
+> Additionally a rsa tcrypt test has been added.
 
-Patch applied.  Thanks.
+Patches 2-5 applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
