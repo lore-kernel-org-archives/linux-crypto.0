@@ -1,9 +1,9 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH v2 0/4] crypto: async crypto op fixes
-Date: Thu, 18 May 2017 16:29:22 +0300
-Message-ID: <1495114167-3073-1-git-send-email-gilad@benyossef.com>
+Subject: [PATCH v2 2/4] crypto: drbg wait for crypto op not signal safe
+Date: Thu, 18 May 2017 16:29:24 +0300
+Message-ID: <1495114167-3073-3-git-send-email-gilad@benyossef.com>
+References: <1495114167-3073-1-git-send-email-gilad@benyossef.com>
 Cc: Ofir Drang <ofir.drang@arm.com>, stable@vger.kernel.org,
-        Eric Biggers <ebiggers3@gmail.com>,
         linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
         linux-kernel@vger.kernel.org, keyrings@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>,
@@ -11,36 +11,39 @@ To: Herbert Xu <herbert@gondor.apana.org.au>,
         Jonathan Corbet <corbet@lwn.net>,
         David Howells <dhowells@redhat.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1495114167-3073-1-git-send-email-gilad@benyossef.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch set fixes various usage and documentation errors
-in waiting for async crypto op to complete which can result
-in data corruption.
+drbg_kcapi_sym_ctr() was using wait_for_completion_interruptible() to
+wait for completion of async crypto op but if a signal occurs it
+may return before DMA ops of HW crypto provider finish, thus
+corrupting the output buffer.
 
-Note: these were discovered in the process of working on a
-patch set that replaces these call sites and more with a
-generic implementation that will prevent these problems
-going forward. These are just the fix ups for current code.
+Resolve this by using wait_for_completion() instead.
 
+Reported-by: Eric Biggers <ebiggers3@gmail.com>
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 CC: stable@vger.kernel.org
-CC: Eric Biggers <ebiggers3@gmail.com>
+---
+ crypto/drbg.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-Gilad Ben-Yossef (4):
-  crypto: handle EBUSY due to backlog correctly
-  crypto: drbg wait for crypto op not signal safe
-  crypto: gcm wait for crypto op not signal safe
-  crypto: Documentation: fix none signal safe sample
-
-Changes from v1:
-- Fix a brown paper bug compile error due to bad git rebase squashing
-
- Documentation/crypto/api-samples.rst | 2 +-
- crypto/asymmetric_keys/public_key.c  | 2 +-
- crypto/drbg.c                        | 5 ++---
- crypto/gcm.c                         | 6 ++----
- 4 files changed, 6 insertions(+), 9 deletions(-)
-
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index fa749f4..cdb27ac 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -1767,9 +1767,8 @@ static int drbg_kcapi_sym_ctr(struct drbg_state *drbg,
+ 			break;
+ 		case -EINPROGRESS:
+ 		case -EBUSY:
+-			ret = wait_for_completion_interruptible(
+-				&drbg->ctr_completion);
+-			if (!ret && !drbg->ctr_async_err) {
++			wait_for_completion(&drbg->ctr_completion);
++			if (!drbg->ctr_async_err) {
+ 				reinit_completion(&drbg->ctr_completion);
+ 				break;
+ 			}
 -- 
 2.1.4
