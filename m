@@ -1,27 +1,29 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: ccp - Add a module author
-Date: Thu, 18 May 2017 13:26:22 +0800
-Message-ID: <20170518052622.GD32485@gondor.apana.org.au>
-References: <20170425135944.5726.83246.stgit@taos.amd.com>
+Subject: Re: [PATCH] crypto: arm64/sha - avoid non-standard inline asm tricks
+Date: Thu, 18 May 2017 13:26:54 +0800
+Message-ID: <20170518052654.GE32485@gondor.apana.org.au>
+References: <20170426161132.11311-1-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, thomas.lendacky@amd.com,
-        davem@davemloft.net
-To: Gary R Hook <gary.hook@amd.com>
+Cc: linux-crypto@vger.kernel.org, mka@chromium.org
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [128.1.224.119] ([128.1.224.119]:41888 "EHLO deadmen.hmeau.com"
+Received: from [128.1.224.119] ([128.1.224.119]:41902 "EHLO deadmen.hmeau.com"
         rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753626AbdERF0i (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 May 2017 01:26:38 -0400
+        id S1752823AbdERF1I (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 18 May 2017 01:27:08 -0400
 Content-Disposition: inline
-In-Reply-To: <20170425135944.5726.83246.stgit@taos.amd.com>
+In-Reply-To: <20170426161132.11311-1-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Apr 25, 2017 at 08:59:44AM -0500, Gary R Hook wrote:
-> CC: <stable@vger.kernel.org> # 4.9.x+
+On Wed, Apr 26, 2017 at 05:11:32PM +0100, Ard Biesheuvel wrote:
+> Replace the inline asm which exports struct offsets as ELF symbols
+> with proper const variables exposing the same values. This works
+> around an issue with Clang which does not interpret the "i" (or "I")
+> constraints in the same way as GCC.
 > 
-> Signed-off-by: Gary R Hook <gary.hook@amd.com>
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
 Patch applied.  Thanks.
 -- 
