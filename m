@@ -1,70 +1,43 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/9] crypto: add hmac IPAD/OPAD constant
-Date: Thu, 18 May 2017 12:10:45 +0800
-Message-ID: <20170518041045.GA32127@gondor.apana.org.au>
-References: <20170424141629.27155-1-clabbe.montjoie@gmail.com>
+Subject: Re: [PATCH 2/4] crypto: drbg wait for crypto op not signal safe
+Date: Thu, 18 May 2017 13:09:34 +0800
+Message-ID: <20170518050933.GA32409@gondor.apana.org.au>
+References: <1494503626-15877-1-git-send-email-gilad@benyossef.com>
+ <1494503626-15877-3-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, thomas.lendacky@amd.com, gary.hook@amd.com,
-        boris.brezillon@free-electrons.com, arno@natisbad.org,
-        matthias.bgg@gmail.com, giovanni.cabiddu@intel.com,
-        salvatore.benedetto@intel.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-mediatek@lists.infradead.org, qat-linux@intel.com
-To: Corentin Labbe <clabbe.montjoie@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        David Howells <dhowells@redhat.com>,
+        Ofir Drang <ofir.drang@arm.com>,
+        Gilad Ben-Yossef <gilad.benyossef@arm.com>,
+        Eric Biggers <ebiggers3@gmail.com>, stable@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, keyrings@vger.kernel.org
+To: Gilad Ben-Yossef <gilad@benyossef.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [128.1.224.119] ([128.1.224.119]:41768 "EHLO deadmen.hmeau.com"
+Received: from [128.1.224.119] ([128.1.224.119]:41826 "EHLO deadmen.hmeau.com"
         rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753164AbdERELY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 May 2017 00:11:24 -0400
+        id S1751155AbdERFKQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 18 May 2017 01:10:16 -0400
 Content-Disposition: inline
-In-Reply-To: <20170424141629.27155-1-clabbe.montjoie@gmail.com>
+In-Reply-To: <1494503626-15877-3-git-send-email-gilad@benyossef.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Apr 24, 2017 at 04:16:21PM +0200, Corentin Labbe wrote:
-> Many HMAC users directly use directly 0x36/0x5c values.
-> It's better with crypto to use a name instead of directly some crypto
-> constant.
+On Thu, May 11, 2017 at 02:53:43PM +0300, Gilad Ben-Yossef wrote:
+> drbg_kcapi_sym_ctr() was using wait_for_completion_interruptible() to
+> wait for completion of async crypto op but if a signal occurs it
+> may return before DMA ops of HW crypto provider finish, thus
+> corrupting the output buffer.
 > 
-> This patch simply add HMAC_IPAD_VALUE/HMAC_OPAD_VALUE defines.
+> Resolve this by using wait_for_completion() instead.
 > 
-> Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
-> ---
->  crypto/hmac.c         | 4 ++--
->  include/crypto/hash.h | 3 +++
->  2 files changed, 5 insertions(+), 2 deletions(-)
-> 
-> diff --git a/crypto/hmac.c b/crypto/hmac.c
-> index 72e38c0..4a997ce 100644
-> --- a/crypto/hmac.c
-> +++ b/crypto/hmac.c
-> @@ -74,8 +74,8 @@ static int hmac_setkey(struct crypto_shash *parent,
->  	memcpy(opad, ipad, bs);
->  
->  	for (i = 0; i < bs; i++) {
-> -		ipad[i] ^= 0x36;
-> -		opad[i] ^= 0x5c;
-> +		ipad[i] ^= HMAC_IPAD_VALUE;
-> +		opad[i] ^= HMAC_OPAD_VALUE;
->  	}
->  
->  	return crypto_shash_init(shash) ?:
-> diff --git a/include/crypto/hash.h b/include/crypto/hash.h
-> index b5727bc..0f51ff1 100644
-> --- a/include/crypto/hash.h
-> +++ b/include/crypto/hash.h
-> @@ -922,4 +922,7 @@ static inline void shash_desc_zero(struct shash_desc *desc)
->  			 sizeof(*desc) + crypto_shash_descsize(desc->tfm));
->  }
->  
-> +#define HMAC_IPAD_VALUE 0x36
-> +#define HMAC_OPAD_VALUE 0x5c
-> +
->  #endif	/* _CRYPTO_HASH_H */
+> Reported-by: Eric Biggers <ebiggers3@gmail.com>
+> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+> CC: stable@vger.kernel.org
 
-I think this should go into a header file specific to hmac.  Since
-I don't see an existing hmac header file you should create one for it.
+This patch doesn't even compile.  Please test your work first.
 
 Thanks,
 -- 
