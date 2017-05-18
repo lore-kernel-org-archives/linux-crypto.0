@@ -1,44 +1,81 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/7] crypto: aesni: provide generic gcm(aes)
-Date: Thu, 18 May 2017 13:28:00 +0800
-Message-ID: <20170518052800.GF32485@gondor.apana.org.au>
-References: <cover.1493395785.git.sd@queasysnail.net>
+From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Subject: Re: [PATCH v1 2/2] hw_random: timeriomem_rng: Allow setting RNG
+ quality from platform data
+Date: Thu, 18 May 2017 11:13:29 +0530
+Message-ID: <CANc+2y4vg1F2+y98ijoR1Ve_2u+zpChN3OXxn+6uLebVLcDp6Q@mail.gmail.com>
+References: <20170517222911.9295-1-raltherr@google.com> <20170517222911.9295-2-raltherr@google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: netdev@vger.kernel.org,
-        Hannes Frederic Sowa <hannes@stressinduktion.org>,
-        "David S. Miller" <davem@davemloft.net>,
+Content-Type: text/plain; charset="UTF-8"
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Sabrina Dubroca <sd@queasysnail.net>
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Matt Mackall <mpm@selenic.com>
+To: Rick Altherr <raltherr@google.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [128.1.224.119] ([128.1.224.119]:41930 "EHLO deadmen.hmeau.com"
-        rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751789AbdERF2o (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 May 2017 01:28:44 -0400
-Content-Disposition: inline
-In-Reply-To: <cover.1493395785.git.sd@queasysnail.net>
+Received: from mail-vk0-f66.google.com ([209.85.213.66]:33437 "EHLO
+        mail-vk0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751348AbdERFna (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 18 May 2017 01:43:30 -0400
+In-Reply-To: <20170517222911.9295-2-raltherr@google.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Apr 28, 2017 at 06:11:55PM +0200, Sabrina Dubroca wrote:
-> The current aesni AES-GCM implementation only offers support for
-> rfc4106(gcm(aes)).  This makes some things a little bit simpler
-> (handling of associated data and authentication tag), but it means
-> that non-IPsec users of gcm(aes) have to rely on
-> gcm_base(ctr-aes-aesni,ghash-clmulni), which is much slower.
-> 
-> This patchset adds handling of all valid authentication tag lengths
-> and of any associated data length to the assembly code, and exposes a
-> generic gcm(aes) AEAD algorithm to the crypto API.
-> 
-> With these patches, performance of MACsec on a single core increases
-> by 40% (from 4.5Gbps to around 6.3Gbps).
+Hi Rick,
 
-All patches applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Minor comment below.
+
+On 18 May 2017 at 03:59, Rick Altherr <raltherr@google.com> wrote:
+> When a hw_random device's quality is non-zero, it will automatically be
+> used to fill the kernel's entropy pool.  Since timeriomem_rng is used by
+> many different devices, the quality needs to be provided by platform
+> data or device tree.
+>
+> Signed-off-by: Rick Altherr <raltherr@google.com>
+> ---
+>
+>  drivers/char/hw_random/timeriomem-rng.c | 7 +++++++
+>  include/linux/timeriomem-rng.h          | 3 +++
+>  2 files changed, 10 insertions(+)
+>
+> diff --git a/drivers/char/hw_random/timeriomem-rng.c b/drivers/char/hw_random/timeriomem-rng.c
+> index a0faa5f05deb..03ff5483d865 100644
+> --- a/drivers/char/hw_random/timeriomem-rng.c
+> +++ b/drivers/char/hw_random/timeriomem-rng.c
+> @@ -151,8 +151,15 @@ static int timeriomem_rng_probe(struct platform_device *pdev)
+>                         dev_err(&pdev->dev, "missing period\n");
+>                         return -EINVAL;
+>                 }
+> +
+> +               if (!of_property_read_u32(pdev->dev.of_node,
+> +                                               "quality", &i))
+> +                       priv->rng_ops.quality = i;
+> +               else
+> +                       priv->rng_ops.quality = 0;
+>         } else {
+>                 period = pdata->period;
+> +               priv->rng_ops.quality = pdata->quality;
+>         }
+>
+>         priv->period = ns_to_ktime(period * NSEC_PER_USEC);
+> diff --git a/include/linux/timeriomem-rng.h b/include/linux/timeriomem-rng.h
+> index 46eb27ddbfab..320f743bf06b 100644
+> --- a/include/linux/timeriomem-rng.h
+> +++ b/include/linux/timeriomem-rng.h
+> @@ -13,4 +13,7 @@ struct timeriomem_rng_data {
+>
+>         /* measures in usecs */
+>         unsigned int            period;
+> +
+> +       /* bits of entropy per 1000 bits read */
+
+Your dt-bindings patch says 'entropy per 1024 bits'. Please be consistent.
+
+> +       unsigned int            quality;
+>  };
+> --
+> 2.13.0.303.g4ebf302169-goog
+>
+
+Regards,
+PrasannaKumar
