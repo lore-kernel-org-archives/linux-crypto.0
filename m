@@ -1,60 +1,37 @@
-From: Rick Altherr <raltherr@google.com>
-Subject: [PATCH v1 2/2] hw_random: timeriomem_rng: Allow setting RNG quality from platform data
-Date: Wed, 17 May 2017 15:29:11 -0700
-Message-ID: <20170517222911.9295-2-raltherr@google.com>
-References: <20170517222911.9295-1-raltherr@google.com>
-Cc: linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Matt Mackall <mpm@selenic.com>
-To: linux-crypto@vger.kernel.org
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: hifn_795x: Fix a handful of minor bugs spotted
+ by eye
+Date: Thu, 18 May 2017 11:25:06 +0800
+Message-ID: <20170518032506.GA31773@gondor.apana.org.au>
+References: <1493398960-25643-1-git-send-email-logang@deltatee.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>
+To: Logan Gunthorpe <logang@deltatee.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170517222911.9295-1-raltherr@google.com>
+Content-Disposition: inline
+In-Reply-To: <1493398960-25643-1-git-send-email-logang@deltatee.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-When a hw_random device's quality is non-zero, it will automatically be
-used to fill the kernel's entropy pool.  Since timeriomem_rng is used by
-many different devices, the quality needs to be provided by platform
-data or device tree.
+On Fri, Apr 28, 2017 at 11:02:40AM -0600, Logan Gunthorpe wrote:
+> * Cleaned up the formatting of ablkcipher_get arguments so it complies
+>   with kernel style
+> * The offset in ablkcipher_get sould be added to the source, not the
+>   destination. We rename it to soffset for clarity.
+> * dst++ should be dst=sg_next(dst)
+> * We call kunmap_atomic earlier so we only have to do it once.
+> * If ablkcipher_get fails, we should probably ensure the request
+>   completes with an error.
 
-Signed-off-by: Rick Altherr <raltherr@google.com>
----
+Please don't mix unrelated changes in the same patch.
 
- drivers/char/hw_random/timeriomem-rng.c | 7 +++++++
- include/linux/timeriomem-rng.h          | 3 +++
- 2 files changed, 10 insertions(+)
+Also was this tested on actual hardware? This is an old driver so
+it's probably best to just let it be.
 
-diff --git a/drivers/char/hw_random/timeriomem-rng.c b/drivers/char/hw_random/timeriomem-rng.c
-index a0faa5f05deb..03ff5483d865 100644
---- a/drivers/char/hw_random/timeriomem-rng.c
-+++ b/drivers/char/hw_random/timeriomem-rng.c
-@@ -151,8 +151,15 @@ static int timeriomem_rng_probe(struct platform_device *pdev)
- 			dev_err(&pdev->dev, "missing period\n");
- 			return -EINVAL;
- 		}
-+
-+		if (!of_property_read_u32(pdev->dev.of_node,
-+						"quality", &i))
-+			priv->rng_ops.quality = i;
-+		else
-+			priv->rng_ops.quality = 0;
- 	} else {
- 		period = pdata->period;
-+		priv->rng_ops.quality = pdata->quality;
- 	}
- 
- 	priv->period = ns_to_ktime(period * NSEC_PER_USEC);
-diff --git a/include/linux/timeriomem-rng.h b/include/linux/timeriomem-rng.h
-index 46eb27ddbfab..320f743bf06b 100644
---- a/include/linux/timeriomem-rng.h
-+++ b/include/linux/timeriomem-rng.h
-@@ -13,4 +13,7 @@ struct timeriomem_rng_data {
- 
- 	/* measures in usecs */
- 	unsigned int		period;
-+
-+	/* bits of entropy per 1000 bits read */
-+	unsigned int		quality;
- };
+Thanks,
 -- 
-2.13.0.303.g4ebf302169-goog
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
