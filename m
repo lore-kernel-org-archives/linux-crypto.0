@@ -1,55 +1,62 @@
-From: Corentin Labbe <clabbe.montjoie@gmail.com>
-Subject: [PATCH v2 3/9] crypto: ixp4xx - Use IPAD/OPAD constant
-Date: Fri, 19 May 2017 08:53:25 +0200
-Message-ID: <20170519065331.27670-4-clabbe.montjoie@gmail.com>
-References: <20170519065331.27670-1-clabbe.montjoie@gmail.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-mediatek@lists.infradead.org, qat-linux@intel.com,
-        Corentin Labbe <clabbe.montjoie@gmail.com>
-To: herbert@gondor.apana.org.au, davem@davemloft.net,
-        thomas.lendacky@amd.com, gary.hook@amd.com,
-        boris.brezillon@free-electrons.com, arno@natisbad.org,
-        matthias.bgg@gmail.com, giovanni.cabiddu@intel.com,
-        salvatore.benedetto@intel.com
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] staging: ccree: add CRYPTO dependency
+Date: Fri, 19 May 2017 10:04:01 +0200
+Message-ID: <20170519080409.1042426-1-arnd@arndb.de>
+Cc: Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        linux-kernel@vger.kernel.org
+To: Gilad Ben-Yossef <gilad@benyossef.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:33323 "EHLO
-        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752194AbdESGzu (ORCPT
+Received: from mout.kundenserver.de ([212.227.126.131]:55844 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750788AbdESIES (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 May 2017 02:55:50 -0400
-In-Reply-To: <20170519065331.27670-1-clabbe.montjoie@gmail.com>
+        Fri, 19 May 2017 04:04:18 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch simply replace all occurrence of HMAC IPAD/OPAD value by their
-define.
+A rare randconfig build error shows up when we have CONFIG_CRYPTO=m
+in combination with a built-in CCREE driver:
 
-Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+crypto/hmac.o: In function `hmac_update':
+hmac.c:(.text.hmac_update+0x28): undefined reference to `crypto_shash_update'
+crypto/hmac.o: In function `hmac_setkey':
+hmac.c:(.text.hmac_setkey+0x90): undefined reference to `crypto_shash_digest'
+hmac.c:(.text.hmac_setkey+0x154): undefined reference to `crypto_shash_update'
+drivers/staging/ccree/ssi_cipher.o: In function `ssi_blkcipher_setkey':
+ssi_cipher.c:(.text.ssi_blkcipher_setkey+0x350): undefined reference to `crypto_shash_digest'
+drivers/staging/ccree/ssi_cipher.o: In function `ssi_blkcipher_exit':
+ssi_cipher.c:(.text.ssi_blkcipher_exit+0xd4): undefined reference to `crypto_destroy_tfm'
+drivers/staging/ccree/ssi_cipher.o: In function `ssi_blkcipher_init':
+ssi_cipher.c:(.text.ssi_blkcipher_init+0x1b0): undefined reference to `crypto_alloc_shash'
+drivers/staging/ccree/ssi_cipher.o: In function `ssi_ablkcipher_free':
+ssi_cipher.c:(.text.ssi_ablkcipher_free+0x48): undefined reference to `crypto_unregister_alg'
+drivers/staging/ccree/ssi_cipher.o: In function `ssi_ablkcipher_alloc':
+ssi_cipher.c:(.text.ssi_ablkcipher_alloc+0x138): undefined reference to `crypto_register_alg'
+ssi_cipher.c:(.text.ssi_ablkcipher_alloc+0x274): undefined reference to `crypto_blkcipher_type'
+
+We actually need to depend on both CRYPTO and CRYPTO_HW here to avoid the
+problem, since CRYPTO_HW is a bool symbol and by itself that does not
+force CCREE to be a loadable module when the core cryto support is modular.
+
+Fixes: 50cfbbb7e627 ("staging: ccree: add ahash support")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- drivers/crypto/ixp4xx_crypto.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/staging/ccree/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/ixp4xx_crypto.c b/drivers/crypto/ixp4xx_crypto.c
-index 771dd26c7076..427cbe012729 100644
---- a/drivers/crypto/ixp4xx_crypto.c
-+++ b/drivers/crypto/ixp4xx_crypto.c
-@@ -23,6 +23,7 @@
- #include <crypto/ctr.h>
- #include <crypto/des.h>
- #include <crypto/aes.h>
-+#include <crypto/hmac.h>
- #include <crypto/sha.h>
- #include <crypto/algapi.h>
- #include <crypto/internal/aead.h>
-@@ -90,8 +91,6 @@
- #define CTL_FLAG_PERFORM_AEAD	0x0008
- #define CTL_FLAG_MASK		0x000f
- 
--#define HMAC_IPAD_VALUE   0x36
--#define HMAC_OPAD_VALUE   0x5C
- #define HMAC_PAD_BLOCKLEN SHA1_BLOCK_SIZE
- 
- #define MD5_DIGEST_SIZE   16
+diff --git a/drivers/staging/ccree/Kconfig b/drivers/staging/ccree/Kconfig
+index ae627049c499..4be87f503e3b 100644
+--- a/drivers/staging/ccree/Kconfig
++++ b/drivers/staging/ccree/Kconfig
+@@ -1,6 +1,6 @@
+ config CRYPTO_DEV_CCREE
+ 	tristate "Support for ARM TrustZone CryptoCell C7XX family of Crypto accelerators"
+-	depends on CRYPTO_HW && OF && HAS_DMA
++	depends on CRYPTO && CRYPTO_HW && OF && HAS_DMA
+ 	default n
+ 	select CRYPTO_HASH
+ 	select CRYPTO_BLKCIPHER
 -- 
-2.13.0
+2.9.0
