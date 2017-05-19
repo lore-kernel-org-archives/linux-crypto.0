@@ -1,7 +1,7 @@
 From: Corentin Labbe <clabbe.montjoie@gmail.com>
-Subject: [PATCH v2 6/9] crypto: omap-sham - Use IPAD/OPAD constant
-Date: Fri, 19 May 2017 08:53:28 +0200
-Message-ID: <20170519065331.27670-7-clabbe.montjoie@gmail.com>
+Subject: [PATCH v2 5/9] crypto: mv_cesa - Use IPAD/OPAD constant
+Date: Fri, 19 May 2017 08:53:27 +0200
+Message-ID: <20170519065331.27670-6-clabbe.montjoie@gmail.com>
 References: <20170519065331.27670-1-clabbe.montjoie@gmail.com>
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org,
@@ -12,46 +12,41 @@ To: herbert@gondor.apana.org.au, davem@davemloft.net,
         boris.brezillon@free-electrons.com, arno@natisbad.org,
         matthias.bgg@gmail.com, giovanni.cabiddu@intel.com,
         salvatore.benedetto@intel.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:36255 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752338AbdESGzy (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 May 2017 02:55:54 -0400
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20170519065331.27670-1-clabbe.montjoie@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 This patch simply replace all occurrence of HMAC IPAD/OPAD value by their
 define.
 
 Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
 ---
- drivers/crypto/omap-sham.c | 5 +++--
+ drivers/crypto/mv_cesa.c | 5 +++--
  1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
-index d0b16e5e4ee5..1864a57caaa4 100644
---- a/drivers/crypto/omap-sham.c
-+++ b/drivers/crypto/omap-sham.c
-@@ -41,6 +41,7 @@
- #include <crypto/algapi.h>
- #include <crypto/sha.h>
- #include <crypto/hash.h>
+diff --git a/drivers/crypto/mv_cesa.c b/drivers/crypto/mv_cesa.c
+index 451fa18c1c7b..bf25f415eea6 100644
+--- a/drivers/crypto/mv_cesa.c
++++ b/drivers/crypto/mv_cesa.c
+@@ -18,6 +18,7 @@
+ #include <linux/slab.h>
+ #include <linux/module.h>
+ #include <linux/clk.h>
 +#include <crypto/hmac.h>
  #include <crypto/internal/hash.h>
- 
- #define MD5_DIGEST_SIZE			16
-@@ -1326,8 +1327,8 @@ static int omap_sham_setkey(struct crypto_ahash *tfm, const u8 *key,
- 		memcpy(bctx->opad, bctx->ipad, bs);
+ #include <crypto/sha.h>
+ #include <linux/of.h>
+@@ -822,8 +823,8 @@ static int mv_hash_setkey(struct crypto_ahash *tfm, const u8 * key,
+ 		memcpy(opad, ipad, bs);
  
  		for (i = 0; i < bs; i++) {
--			bctx->ipad[i] ^= 0x36;
--			bctx->opad[i] ^= 0x5c;
-+			bctx->ipad[i] ^= HMAC_IPAD_VALUE;
-+			bctx->opad[i] ^= HMAC_OPAD_VALUE;
+-			ipad[i] ^= 0x36;
+-			opad[i] ^= 0x5c;
++			ipad[i] ^= HMAC_IPAD_VALUE;
++			opad[i] ^= HMAC_OPAD_VALUE;
  		}
- 	}
  
+ 		rc = crypto_shash_init(shash) ? :
 -- 
 2.13.0
