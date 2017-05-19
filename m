@@ -1,66 +1,114 @@
-From: Branislav Katreniak <brano@ksp.sk>
-Subject: [PATCH] staging: ccree: fix checkpatch no space before tabs
-Date: Thu, 18 May 2017 22:28:33 +0200
-Message-ID: <20170518202833.GA30843@archiv.ksp.sk>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Gilad Ben-Yossef <gilad@benyossef.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-crypto@vger.kernel.org,
-        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from element.ksp.sk ([158.195.16.154]:40857 "EHLO ksp.sk"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752741AbdERUfp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 May 2017 16:35:45 -0400
-Content-Disposition: inline
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Mauro Carvalho Chehab <mchehab@s-opensource.com>
+Subject: [PATCH 00/31] Standardize doc formats - part 1
+Date: Thu, 18 May 2017 22:22:05 -0300
+Message-ID: <cover.1495156488.git.mchehab@s-opensource.com>
+Cc: Mauro Carvalho Chehab <mchehab@s-opensource.com>,
+        Mauro Carvalho Chehab <mchehab@infradead.org>,
+        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Brian Norris <computersforpeace@gmail.com>,
+        Boris Brezillon <boris.brezillon@free-electrons.com>,
+        Marek Vasut <marek.vasut@gmail.com>,
+        Richard Weinberger <richard@nod.at>,
+        Cyrille Pitchen <cyrille.pitchen@atmel.com>,
+        linux-mtd@lists.infradead.org, tboot-devel@lists.sourceforge.net,
+        Emese Revfy <re.emese@gmail.com>,
+        Li Zefan <lizefan@huawei.com>, Ning Sun <ning.sun@intel.com>,
+        Kees Cook <keescook@chromium.org>, Tejun Heo <tj@kernel.org>,
+        linux-crypto@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
+        cgroups@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+        Johann
+To: Linux Doc Mailing List <linux-doc@vger.kernel.org>
+Return-path: <linux-doc-owner@vger.kernel.org>
+Sender: linux-doc-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Fixes checkpatch warning:
-WARNING: please, no space before tabs
+Each document under Documentation/*.txt has its own format.
+Some follow markup notations, some don't even have a title!
 
-Signed-off-by: Branislav Katreniak <brano@ksp.sk>
----
- drivers/staging/ccree/cc_crypto_ctx.h | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+In order to try to get some order on it, change the document
+style to the standard we're adopting after the adoption of
+ReStructured Text.
 
-diff --git a/drivers/staging/ccree/cc_crypto_ctx.h b/drivers/staging/ccree/cc_crypto_ctx.h
-index 216d247..ac39d34 100644
---- a/drivers/staging/ccree/cc_crypto_ctx.h
-+++ b/drivers/staging/ccree/cc_crypto_ctx.h
-@@ -54,13 +54,13 @@
- #define CC_AES_KEY_SIZE_MAX			CC_AES_256_BIT_KEY_SIZE
- #define CC_AES_KEY_SIZE_WORDS_MAX		(CC_AES_KEY_SIZE_MAX >> 2)
- 
--#define CC_MD5_DIGEST_SIZE 	16
--#define CC_SHA1_DIGEST_SIZE 	20
--#define CC_SHA224_DIGEST_SIZE 	28
--#define CC_SHA256_DIGEST_SIZE 	32
-+#define CC_MD5_DIGEST_SIZE	16
-+#define CC_SHA1_DIGEST_SIZE	20
-+#define CC_SHA224_DIGEST_SIZE	28
-+#define CC_SHA256_DIGEST_SIZE	32
- #define CC_SHA256_DIGEST_SIZE_IN_WORDS 8
--#define CC_SHA384_DIGEST_SIZE 	48
--#define CC_SHA512_DIGEST_SIZE 	64
-+#define CC_SHA384_DIGEST_SIZE	48
-+#define CC_SHA512_DIGEST_SIZE	64
- 
- #define CC_SHA1_BLOCK_SIZE 64
- #define CC_SHA1_BLOCK_SIZE_IN_WORDS 16
-@@ -83,9 +83,9 @@
- 
- #define CC_HMAC_BLOCK_SIZE_MAX CC_HASH_BLOCK_SIZE_MAX
- 
--#define CC_MULTI2_SYSTEM_KEY_SIZE 		32
--#define CC_MULTI2_DATA_KEY_SIZE 		8
--#define CC_MULTI2_SYSTEM_N_DATA_KEY_SIZE 	(CC_MULTI2_SYSTEM_KEY_SIZE + CC_MULTI2_DATA_KEY_SIZE)
-+#define CC_MULTI2_SYSTEM_KEY_SIZE		32
-+#define CC_MULTI2_DATA_KEY_SIZE		8
-+#define CC_MULTI2_SYSTEM_N_DATA_KEY_SIZE	(CC_MULTI2_SYSTEM_KEY_SIZE + CC_MULTI2_DATA_KEY_SIZE)
- #define	CC_MULTI2_BLOCK_SIZE					8
- #define	CC_MULTI2_IV_SIZE					8
- #define	CC_MULTI2_MIN_NUM_ROUNDS				8
+The documents touched on this series now build fine with
+Sphinx, if renamed to *.rst extension.
+
+The main goal with this is to teach people by example about
+what format is expected on newer documents. It also helps
+to add those files to Kernel books.
+
+In order to make things more palatable, I'm spliting the
+conversion into three parts.
+
+This is part 1.
+
+Mauro Carvalho Chehab (31):
+  bcache.txt: standardize document format
+  bt8xxgpio.txt: standardize document format
+  btmrvl.txt: standardize document format
+  bus-virt-phys-mapping.txt: standardize document format
+  cachetlb.txt: standardize document format
+  cgroup-v2.txt: standardize document format
+  circular-buffers.txt: standardize document format
+  clk.txt: standardize document format
+  cpu-load: standardize document format
+  cputopology.txt: standardize document format
+  crc32.txt: standardize document format
+  dcdbas.txt: standardize document format
+  digsig.txt: standardize document format
+  DMA-API.txt: standardize document format
+  DMA-API-HOWTO.txt: standardize document format
+  DMA-attributes.txt: standardize document format
+  DMA-ISA-LPC.txt: standardize document format
+  debugging-via-ohci1394.txt: standardize document format
+  efi-stub.txt: standardize document format
+  eisa.txt: standardize document format
+  flexible-arrays.txt: standardize document format
+  futex-requeue-pi.txt: standardize document format
+  gcc-plugins.txt: standardize document format
+  highuid.txt: standardize document format
+  hw_random.txt: standardize document format
+  hwspinlock.txt: standardize document format
+  intel_txt.txt: standardize document format
+  Intel-IOMMU.txt: standardize document format
+  io-mapping.txt: standardize document format
+  io_ordering.txt: standardize document format
+  iostats.txt: standardize document format
+
+ Documentation/DMA-API-HOWTO.txt          | 159 +++++----
+ Documentation/DMA-API.txt                | 575 ++++++++++++++++++-------------
+ Documentation/DMA-ISA-LPC.txt            |  71 ++--
+ Documentation/DMA-attributes.txt         |  15 +-
+ Documentation/Intel-IOMMU.txt            |  36 +-
+ Documentation/bcache.txt                 | 200 ++++++-----
+ Documentation/bt8xxgpio.txt              |  19 +-
+ Documentation/btmrvl.txt                 |  64 ++--
+ Documentation/bus-virt-phys-mapping.txt  |  63 ++--
+ Documentation/cachetlb.txt               |  92 ++---
+ Documentation/cgroup-v2.txt              | 449 ++++++++++++------------
+ Documentation/circular-buffers.txt       |  51 ++-
+ Documentation/clk.txt                    | 189 +++++-----
+ Documentation/cpu-load.txt               | 117 +++----
+ Documentation/cputopology.txt            |  35 +-
+ Documentation/crc32.txt                  |  75 ++--
+ Documentation/dcdbas.txt                 |  24 +-
+ Documentation/debugging-via-ohci1394.txt |  21 +-
+ Documentation/digsig.txt                 | 124 +++----
+ Documentation/efi-stub.txt               |  25 +-
+ Documentation/eisa.txt                   | 260 +++++++-------
+ Documentation/flexible-arrays.txt        |  24 +-
+ Documentation/futex-requeue-pi.txt       |  83 ++---
+ Documentation/gcc-plugins.txt            |  58 ++--
+ Documentation/highuid.txt                |  46 +--
+ Documentation/hw_random.txt              | 158 +++++----
+ Documentation/hwspinlock.txt             | 527 ++++++++++++++++------------
+ Documentation/intel_txt.txt              |  63 ++--
+ Documentation/io-mapping.txt             |  67 ++--
+ Documentation/io_ordering.txt            |  61 ++--
+ Documentation/iostats.txt                |  40 ++-
+ 31 files changed, 2101 insertions(+), 1690 deletions(-)
+
 -- 
-2.7.4
+2.9.4
+
+
