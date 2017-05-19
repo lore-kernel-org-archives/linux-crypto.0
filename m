@@ -1,70 +1,76 @@
-From: <archerrp@evms.edu>
-Subject: (unknown)
-Date: Fri, 19 May 2017 04:32:28 -0000
-Message-ID: <149516834830.27287.6421478140573837786@pldt.net>
-Mime-Version: 1.0
-Content-Type: application/zip; name="6070538009916.zip"
-Content-Transfer-Encoding: base64
-To: <linux-crypto@vger.kernel.org>
+From: Corentin Labbe <clabbe.montjoie@gmail.com>
+Subject: [PATCH v2 1/9] crypto: add hmac IPAD/OPAD constant
+Date: Fri, 19 May 2017 08:53:23 +0200
+Message-ID: <20170519065331.27670-2-clabbe.montjoie@gmail.com>
+References: <20170519065331.27670-1-clabbe.montjoie@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-mediatek@lists.infradead.org, qat-linux@intel.com,
+        Corentin Labbe <clabbe.montjoie@gmail.com>
+To: herbert@gondor.apana.org.au, davem@davemloft.net,
+        thomas.lendacky@amd.com, gary.hook@amd.com,
+        boris.brezillon@free-electrons.com, arno@natisbad.org,
+        matthias.bgg@gmail.com, giovanni.cabiddu@intel.com,
+        salvatore.benedetto@intel.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 122.3.154.115.pldt.net ([122.3.154.115]:59465 "HELO pldt.net"
-        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with SMTP
-        id S1751055AbdESEcf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 May 2017 00:32:35 -0400
-Content-Disposition: attachment
-Subject: 
+Received: from mail-wr0-f193.google.com ([209.85.128.193]:34169 "EHLO
+        mail-wr0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752137AbdESGzu (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 19 May 2017 02:55:50 -0400
+In-Reply-To: <20170519065331.27670-1-clabbe.montjoie@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-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
-AA==
+Many HMAC users directly use directly 0x36/0x5c values.
+It's better with crypto to use a name instead of directly some crypto
+constant.
+
+This patch simply add HMAC_IPAD_VALUE/HMAC_OPAD_VALUE defines in a new
+include file "crypto/hmac.h" and use them in crypto/hmac.c
+
+Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+---
+ crypto/hmac.c         | 5 +++--
+ include/crypto/hmac.h | 7 +++++++
+ 2 files changed, 10 insertions(+), 2 deletions(-)
+ create mode 100644 include/crypto/hmac.h
+
+diff --git a/crypto/hmac.c b/crypto/hmac.c
+index 72e38c098bb3..92871dc2a63e 100644
+--- a/crypto/hmac.c
++++ b/crypto/hmac.c
+@@ -16,6 +16,7 @@
+  *
+  */
+ 
++#include <crypto/hmac.h>
+ #include <crypto/internal/hash.h>
+ #include <crypto/scatterwalk.h>
+ #include <linux/err.h>
+@@ -74,8 +75,8 @@ static int hmac_setkey(struct crypto_shash *parent,
+ 	memcpy(opad, ipad, bs);
+ 
+ 	for (i = 0; i < bs; i++) {
+-		ipad[i] ^= 0x36;
+-		opad[i] ^= 0x5c;
++		ipad[i] ^= HMAC_IPAD_VALUE;
++		opad[i] ^= HMAC_OPAD_VALUE;
+ 	}
+ 
+ 	return crypto_shash_init(shash) ?:
+diff --git a/include/crypto/hmac.h b/include/crypto/hmac.h
+new file mode 100644
+index 000000000000..ef09f7938204
+--- /dev/null
++++ b/include/crypto/hmac.h
+@@ -0,0 +1,7 @@
++#ifndef _CRYPTO_HMAC_H
++#define _CRYPTO_HMAC_H
++
++#define HMAC_IPAD_VALUE 0x36
++#define HMAC_OPAD_VALUE 0x5c
++
++#endif /* _CRYPTO_HMAC_H */
+-- 
+2.13.0
