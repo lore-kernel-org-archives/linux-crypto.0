@@ -1,77 +1,44 @@
-From: Gary R Hook <gary.hook@amd.com>
-Subject: Re: [PATCH v2 9/9] crypto: ccp - Use IPAD/OPAD constant
-Date: Fri, 19 May 2017 15:32:09 -0500
-Message-ID: <5f959f00-ca3b-0515-d743-33b251fb4b18@amd.com>
-References: <20170519065331.27670-1-clabbe.montjoie@gmail.com>
- <20170519065331.27670-10-clabbe.montjoie@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org"
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-mediatek@lists.infradead.org"
-        <linux-mediatek@lists.infradead.org>,
-        "qat-linux@intel.com" <qat-linux@intel.com>
-To: Corentin Labbe <clabbe.montjoie@gmail.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "boris.brezillon@free-electrons.com"
-        <boris.brezillon@free-electrons.com>,
-        "arno@natisbad.org" <arno@natisbad.org>,
-        "matthias.bgg@gmail.com" <matthias.bgg@gmail.com>,
-        "giovanni.cabiddu@intel.com" <giovanni.cabiddu@intel.com>,
-        "salvatore.benedetto@intel.com" <salvatore.benedetto@intel.com>
+From: Cosar Dindar <cosardindar@gmail.com>
+Subject: [PATCH v2 0/5] Add support for the STM32F4 CRC32
+Date: Sat, 20 May 2017 16:30:18 +0300
+Message-ID: <cover.1495285223.git.cosardindar@gmail.com>
+Cc: davem@davemloft.net, mcoquelin.stm32@gmail.com,
+        alexandre.torgue@st.com, fabien.dessenne@st.com,
+        weiyongjun1@huawei.com, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Cosar Dindar <cosardindar@gmail.com>
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2nam01on0042.outbound.protection.outlook.com ([104.47.34.42]:43405
-        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1750943AbdESUcS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 May 2017 16:32:18 -0400
-In-Reply-To: <20170519065331.27670-10-clabbe.montjoie@gmail.com>
-Content-Language: en-US
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:36776 "EHLO
+        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751206AbdETNbI (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 20 May 2017 09:31:08 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 5/19/2017 1:53 AM, Corentin Labbe wrote:
-> This patch simply replace all occurrence of HMAC IPAD/OPAD value by their
-> define.
-> 
-> Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+This patch series add hardware CRC32 ("Ethernet") calculation support
+for STMicroelectronics STM32F429.
 
-Acked-by: Gary R Hook <gary.hook@amd.com>
+Polynomial and key setting are not supported, key is fixed as 0x4C11DB7
+and poly is 0xFFFFFFFF.
 
-> ---
->   drivers/crypto/ccp/ccp-crypto-sha.c | 5 +++--
->   1 file changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/crypto/ccp/ccp-crypto-sha.c 
-> b/drivers/crypto/ccp/ccp-crypto-sha.c
-> index 6b46eea94932..ce97b3868f4a 100644
-> --- a/drivers/crypto/ccp/ccp-crypto-sha.c
-> +++ b/drivers/crypto/ccp/ccp-crypto-sha.c
-> @@ -18,6 +18,7 @@
->   #include <linux/crypto.h>
->   #include <crypto/algapi.h>
->   #include <crypto/hash.h>
-> +#include <crypto/hmac.h>
->   #include <crypto/internal/hash.h>
->   #include <crypto/sha.h>
->   #include <crypto/scatterwalk.h>
-> @@ -308,8 +309,8 @@ static int ccp_sha_setkey(struct crypto_ahash *tfm, 
-> const u8 *key,
->           }
-> 
->           for (i = 0; i < block_size; i++) {
-> -               ctx->u.sha.ipad[i] = ctx->u.sha.key[i] ^ 0x36;
-> -               ctx->u.sha.opad[i] = ctx->u.sha.key[i] ^ 0x5c;
-> +               ctx->u.sha.ipad[i] = ctx->u.sha.key[i] ^ HMAC_IPAD_VALUE;
-> +               ctx->u.sha.opad[i] = ctx->u.sha.key[i] ^ HMAC_OPAD_VALUE;
->           }
-> 
->           sg_init_one(&ctx->u.sha.opad_sg, ctx->u.sha.opad, block_size);
-> -- 
-> 2.13.0
-> 
+Module is tested on STM32F429-disco board with crypto testmgr using
+cases within the key 0xFFFFFFFF.
+
+Cosar Dindar (5):
+  crypto : stm32 - Add STM32F4 CRC32 support
+  dt-bindings : Document the STM32F4 CRC32 binding
+  ARM: dts: stm32: enable CRC32 on stm32429-disco board
+  ARM: dts: stm32: enable CRC32 on stm32429i-eval board
+  ARM: dts: stm32: Add CRC support to stm32f429
+
+ .../devicetree/bindings/crypto/st,stm32-crc.txt    |  4 +-
+ arch/arm/boot/dts/stm32429i-eval.dts               |  4 ++
+ arch/arm/boot/dts/stm32f429-disco.dts              |  4 ++
+ arch/arm/boot/dts/stm32f429.dtsi                   |  7 +++
+ drivers/crypto/stm32/stm32_crc32.c                 | 68 ++++++++++++++++++----
+ 5 files changed, 75 insertions(+), 12 deletions(-)
+
+-- 
+2.7.4
