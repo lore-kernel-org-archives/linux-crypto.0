@@ -1,59 +1,84 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH 4/5] crypto: arm/sha2-ce - enable module autoloading based on CPU feature bits
-Date: Sun, 21 May 2017 10:23:39 +0000
-Message-ID: <1495362220-30044-5-git-send-email-ard.biesheuvel@linaro.org>
-References: <1495362220-30044-1-git-send-email-ard.biesheuvel@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f42.google.com ([74.125.82.42]:37049 "EHLO
-        mail-wm0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752678AbdEUKX4 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 21 May 2017 06:23:56 -0400
-Received: by mail-wm0-f42.google.com with SMTP id d127so117726436wmf.0
-        for <linux-crypto@vger.kernel.org>; Sun, 21 May 2017 03:23:56 -0700 (PDT)
-In-Reply-To: <1495362220-30044-1-git-send-email-ard.biesheuvel@linaro.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: Re: [PATCH] staging: ccree: add CRYPTO dependency
+Date: Sun, 21 May 2017 15:26:32 +0300
+Message-ID: <CAOtvUMeK==iNg4s3m2DBPVeqn3kkyeVpWWhnzP1MRwWMtyQCcA@mail.gmail.com>
+References: <20170519080409.1042426-1-arnd@arndb.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: devel@driverdev.osuosl.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ driverdev-devel@linuxdriverproject.org, linux-crypto@vger.kernel.org,
+ Linux kernel mailing list <linux-kernel@vger.kernel.org>
+To: Arnd Bergmann <arnd@arndb.de>
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+In-Reply-To: <20170519080409.1042426-1-arnd@arndb.de>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+List-Id: linux-crypto.vger.kernel.org
 
-Make the module autoloadable by tying it to the CPU feature bit that
-describes whether the optional instructions it relies on are implemented
-by the current CPU.
+On Fri, May 19, 2017 at 11:04 AM, Arnd Bergmann <arnd@arndb.de> wrote:
+> A rare randconfig build error shows up when we have CONFIG_CRYPTO=m
+> in combination with a built-in CCREE driver:
+>
+> crypto/hmac.o: In function `hmac_update':
+> hmac.c:(.text.hmac_update+0x28): undefined reference to `crypto_shash_update'
+> crypto/hmac.o: In function `hmac_setkey':
+> hmac.c:(.text.hmac_setkey+0x90): undefined reference to `crypto_shash_digest'
+> hmac.c:(.text.hmac_setkey+0x154): undefined reference to `crypto_shash_update'
+> drivers/staging/ccree/ssi_cipher.o: In function `ssi_blkcipher_setkey':
+> ssi_cipher.c:(.text.ssi_blkcipher_setkey+0x350): undefined reference to `crypto_shash_digest'
+> drivers/staging/ccree/ssi_cipher.o: In function `ssi_blkcipher_exit':
+> ssi_cipher.c:(.text.ssi_blkcipher_exit+0xd4): undefined reference to `crypto_destroy_tfm'
+> drivers/staging/ccree/ssi_cipher.o: In function `ssi_blkcipher_init':
+> ssi_cipher.c:(.text.ssi_blkcipher_init+0x1b0): undefined reference to `crypto_alloc_shash'
+> drivers/staging/ccree/ssi_cipher.o: In function `ssi_ablkcipher_free':
+> ssi_cipher.c:(.text.ssi_ablkcipher_free+0x48): undefined reference to `crypto_unregister_alg'
+> drivers/staging/ccree/ssi_cipher.o: In function `ssi_ablkcipher_alloc':
+> ssi_cipher.c:(.text.ssi_ablkcipher_alloc+0x138): undefined reference to `crypto_register_alg'
+> ssi_cipher.c:(.text.ssi_ablkcipher_alloc+0x274): undefined reference to `crypto_blkcipher_type'
+>
+> We actually need to depend on both CRYPTO and CRYPTO_HW here to avoid the
+> problem, since CRYPTO_HW is a bool symbol and by itself that does not
+> force CCREE to be a loadable module when the core cryto support is modular.
+>
+> Fixes: 50cfbbb7e627 ("staging: ccree: add ahash support")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  drivers/staging/ccree/Kconfig | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/staging/ccree/Kconfig b/drivers/staging/ccree/Kconfig
+> index ae627049c499..4be87f503e3b 100644
+> --- a/drivers/staging/ccree/Kconfig
+> +++ b/drivers/staging/ccree/Kconfig
+> @@ -1,6 +1,6 @@
+>  config CRYPTO_DEV_CCREE
+>         tristate "Support for ARM TrustZone CryptoCell C7XX family of Crypto accelerators"
+> -       depends on CRYPTO_HW && OF && HAS_DMA
+> +       depends on CRYPTO && CRYPTO_HW && OF && HAS_DMA
+>         default n
+>         select CRYPTO_HASH
+>         select CRYPTO_BLKCIPHER
+> --
+> 2.9.0
+>
 
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
- arch/arm/crypto/sha2-ce-glue.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+Thank you and
 
-diff --git a/arch/arm/crypto/sha2-ce-glue.c b/arch/arm/crypto/sha2-ce-glue.c
-index 0755b2d657f3..df4dcef054ae 100644
---- a/arch/arm/crypto/sha2-ce-glue.c
-+++ b/arch/arm/crypto/sha2-ce-glue.c
-@@ -11,6 +11,7 @@
- #include <crypto/internal/hash.h>
- #include <crypto/sha.h>
- #include <crypto/sha256_base.h>
-+#include <linux/cpufeature.h>
- #include <linux/crypto.h>
- #include <linux/module.h>
- 
-@@ -100,8 +101,6 @@ static struct shash_alg algs[] = { {
- 
- static int __init sha2_ce_mod_init(void)
- {
--	if (!(elf_hwcap2 & HWCAP2_SHA2))
--		return -ENODEV;
- 	return crypto_register_shashes(algs, ARRAY_SIZE(algs));
- }
- 
-@@ -110,5 +109,5 @@ static void __exit sha2_ce_mod_fini(void)
- 	crypto_unregister_shashes(algs, ARRAY_SIZE(algs));
- }
- 
--module_init(sha2_ce_mod_init);
-+module_cpu_feature_match(SHA2, sha2_ce_mod_init);
- module_exit(sha2_ce_mod_fini);
+Acked-By: Gilad Ben-Yossef <gilad@benyossef.com>
+
+
 -- 
-2.7.4
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+"If you take a class in large-scale robotics, can you end up in a
+situation where the homework eats your dog?"
+ -- Jean-Baptiste Queru
