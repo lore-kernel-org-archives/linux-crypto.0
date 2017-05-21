@@ -1,54 +1,70 @@
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Subject: Re: [PATCH] crypto: exynoes-rng: Set cra_ctxsize to 0
-Date: Sun, 21 May 2017 09:14:12 +0200
-Message-ID: <CAJKOXPcyzcM93OXcRRbR-zSs0Fj81ROuBn293PNcqEzp1to0iQ@mail.gmail.com>
-References: <20170521060952.19055-1-prasannatsmkumar@gmail.com>
- <CAJKOXPfh21DLOqTUPSZ=mDUyuCE+L8Wn9m=ioM=N1nomT4Vs+g@mail.gmail.com> <CANc+2y4KsFfLqnK4rA8iMEQcvUQD6nvQq43oDoheEwt+T23kxQ@mail.gmail.com>
+From: <agiva@centrum.cz>
+Subject: (unknown)
+Date: Sun, 21 May 2017 08:55:28 -0000
+Message-ID: <149535692851.6152.15955710063068203656@tyumen.ru>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org
-To: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Content-Type: application/zip; name="5812262.zip"
+Content-Transfer-Encoding: base64
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:47706 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750803AbdEUHOO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 21 May 2017 03:14:14 -0400
-Received: from mail-io0-f177.google.com (mail-io0-f177.google.com [209.85.223.177])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5C97F239B0
-        for <linux-crypto@vger.kernel.org>; Sun, 21 May 2017 07:14:13 +0000 (UTC)
-Received: by mail-io0-f177.google.com with SMTP id k91so66444566ioi.1
-        for <linux-crypto@vger.kernel.org>; Sun, 21 May 2017 00:14:13 -0700 (PDT)
-In-Reply-To: <CANc+2y4KsFfLqnK4rA8iMEQcvUQD6nvQq43oDoheEwt+T23kxQ@mail.gmail.com>
+Received: from leased-client-98.tyumen.ru ([217.195.223.98]:59166 "HELO
+        tyumen.ru" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with SMTP
+        id S1750917AbdEUIzc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 21 May 2017 04:55:32 -0400
+Content-Disposition: attachment
+Subject: 
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, May 21, 2017 at 9:11 AM, PrasannaKumar Muralidharan
-<prasannatsmkumar@gmail.com> wrote:
-> Hi Krzysztof
->
-> On 21 May 2017 at 11:56, Krzysztof Kozlowski <krzk@kernel.org> wrote:
->> On Sun, May 21, 2017 at 8:09 AM, PrasannaKumar Muralidharan
->> <prasannatsmkumar@gmail.com> wrote:
->>> As cra_ctxsize is set but the allocated space is not used, set it 0.
->>
->> Why do you think it is not used? Did you test our change on hardware?
->
-> Had a look at the crypto rng code. I think the additional size is used
-> to store driver private data. But this driver does not store any
-> private data in the crypto_tfm structure so I think the 'cra_ctxsize'
-> can be safely set to 0.
-
-Then from where does crypto_tfm_ctx() get its memory?
-
-> I do not have access to the hardware, did not test the change. Sorry I
-> forgot to mention that.
-
-That is quite important... By default everything must be tested so if
-you are skipping this step then please mark the patch respectively so
-others will provide testing.
-
-Best regards,
-Krzysztof
+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
+AQABAFoAAAD5CgAAAAA=
