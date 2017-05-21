@@ -1,52 +1,40 @@
-From: Cosar Dindar <cosardindar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH v2 2/5] dt-bindings : Document the STM32F4 CRC32 binding
-Date: Sat, 20 May 2017 16:32:12 +0300
-Message-ID: <bb672acb88667e9d27beb4d1e4fd8882f265ee47.1495285223.git.cosardindar@gmail.com>
-References: <cover.1495285223.git.cosardindar@gmail.com>
-Cc: davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org,
-        mcoquelin.stm32-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, alexandre.torgue-qxv4g6HH51o@public.gmane.org,
-        linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        fabien.dessenne-qxv4g6HH51o@public.gmane.org, Cosar Dindar <cosardindar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <cover.1495285223.git.cosardindar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Subject: [PATCH] crypto: exynoes-rng: Set cra_ctxsize to 0
+Date: Sun, 21 May 2017 11:39:52 +0530
+Message-ID: <20170521060952.19055-1-prasannatsmkumar@gmail.com>
+Cc: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+To: krzk@kernel.org, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pg0-f66.google.com ([74.125.83.66]:36759 "EHLO
+        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750819AbdEUGLI (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 21 May 2017 02:11:08 -0400
+Received: by mail-pg0-f66.google.com with SMTP id h64so14083444pge.3
+        for <linux-crypto@vger.kernel.org>; Sat, 20 May 2017 23:11:07 -0700 (PDT)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Add device tree binding for STM32F4.
+As cra_ctxsize is set but the allocated space is not used, set it 0.
 
-Signed-off-by: Cosar Dindar <cosardindar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
 ---
- Documentation/devicetree/bindings/crypto/st,stm32-crc.txt | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/crypto/exynos-rng.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Documentation/devicetree/bindings/crypto/st,stm32-crc.txt b/Documentation/devicetree/bindings/crypto/st,stm32-crc.txt
-index 3ba92a5..7b30f1e 100644
---- a/Documentation/devicetree/bindings/crypto/st,stm32-crc.txt
-+++ b/Documentation/devicetree/bindings/crypto/st,stm32-crc.txt
-@@ -1,7 +1,7 @@
- * STMicroelectronics STM32 CRC
- 
- Required properties:
--- compatible: Should be "st,stm32f7-crc".
-+- compatible: Can be either "st,stm32f7-crc" or "st,srm32f4-crc".
- - reg: The address and length of the peripheral registers space
- - clocks: The input clock of the CRC instance
- 
-@@ -10,7 +10,7 @@ Optional properties: none
- Example:
- 
- crc: crc@40023000 {
--	compatible = "st,stm32f7-crc";
-+	compatible = "st,stm32f7-crc", "st,stm32f4-crc";
- 	reg = <0x40023000 0x400>;
- 	clocks = <&rcc 0 12>;
- };
+diff --git a/drivers/crypto/exynos-rng.c b/drivers/crypto/exynos-rng.c
+index 451620b..d009df6 100644
+--- a/drivers/crypto/exynos-rng.c
++++ b/drivers/crypto/exynos-rng.c
+@@ -260,7 +260,7 @@ static int exynos_rng_kcapi_init(struct crypto_tfm *tfm)
+ 		.cra_name		= "stdrng",
+ 		.cra_driver_name	= "exynos_rng",
+ 		.cra_priority		= 100,
+-		.cra_ctxsize		= sizeof(struct exynos_rng_ctx),
++		.cra_ctxsize		= 0,
+ 		.cra_module		= THIS_MODULE,
+ 		.cra_init		= exynos_rng_kcapi_init,
+ 	}
 -- 
-2.7.4
-
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+1.8.5.6
