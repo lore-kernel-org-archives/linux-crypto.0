@@ -1,171 +1,104 @@
-From: Cosar Dindar <cosardindar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH v3 2/5] crypto : stm32 - Add STM32F4 CRC32 support
-Date: Mon, 22 May 2017 17:34:24 +0300
-Message-ID: <3c520bbef98c630ca7de609f8ec27405e2ac07d4.1495463449.git.cosardindar@gmail.com>
-References: <cover.1495463449.git.cosardindar@gmail.com>
-Cc: davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org,
-        mcoquelin.stm32-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, alexandre.torgue-qxv4g6HH51o@public.gmane.org,
-        linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        fabien.dessenne-qxv4g6HH51o@public.gmane.org, Cosar Dindar <cosardindar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <cover.1495463449.git.cosardindar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+From: Antoine Tenart <antoine.tenart@free-electrons.com>
+Subject: [PATCH v5 0/4] arm64: marvell: add cryptographic engine support for 7k/8k
+Date: Mon, 22 May 2017 16:45:10 +0200
+Message-ID: <20170522144514.6654-1-antoine.tenart@free-electrons.com>
+Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        thomas.petazzoni@free-electrons.com, oferh@marvell.com,
+        igall@marvell.com, nadavh@marvell.com, robin.murphy@arm.com
+To: herbert@gondor.apana.org.au, davem@davemloft.net,
+        jason@lakedaemon.net, andrew@lunn.ch,
+        gregory.clement@free-electrons.com, sebastian.hesselbarth@gmail.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.free-electrons.com ([62.4.15.54]:44539 "EHLO
+        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934376AbdEVOqH (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 22 May 2017 10:46:07 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-This patch adds CRC (CRC32 Crypto) support for STM32F4 series.
+Hi all,
 
-As an hardware limitation polynomial and key setting are not supported.
-They are fixed as 0x4C11DB7 (poly) and 0xFFFFFFFF (key).
-CRC32C Castagnoli algorithm is not used.
+This series adds support for the Inside Secure SafeXcel EIP197
+cryptographic engine which can be found on Marvell Armada 7k and 8k
+boards. A new cryptographic engine driver is added, as well as the
+relevant device tree definition for the Armada 7040 DB and 8040 DB
+boards.
 
-Signed-off-by: Cosar Dindar <cosardindar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
----
- drivers/crypto/stm32/stm32_crc32.c | 68 ++++++++++++++++++++++++++++++++------
- 1 file changed, 58 insertions(+), 10 deletions(-)
+This driver needs two firmwares to work correctly. These firmware are
+usually used for more advanced operations than the ones supported (as of
+now), but we still need them to pass the data to the internal
+cryptographic engine.
 
-diff --git a/drivers/crypto/stm32/stm32_crc32.c b/drivers/crypto/stm32/stm32_crc32.c
-index ec83b1e..12fbd98 100644
---- a/drivers/crypto/stm32/stm32_crc32.c
-+++ b/drivers/crypto/stm32/stm32_crc32.c
-@@ -7,6 +7,7 @@
- #include <linux/bitrev.h>
- #include <linux/clk.h>
- #include <linux/module.h>
-+#include <linux/of.h>
- #include <linux/platform_device.h>
- 
- #include <crypto/internal/hash.h>
-@@ -39,6 +40,9 @@ struct stm32_crc {
- 	struct clk       *clk;
- 	u8               pending_data[sizeof(u32)];
- 	size_t           nb_pending_bytes;
-+	bool             key_support;
-+	bool             poly_support;
-+	bool             reverse_support;
- };
- 
- struct stm32_crc_list {
-@@ -106,13 +110,31 @@ static int stm32_crc_init(struct shash_desc *desc)
- 	}
- 	spin_unlock_bh(&crc_list.lock);
- 
--	/* Reset, set key, poly and configure in bit reverse mode */
--	writel(bitrev32(mctx->key), ctx->crc->regs + CRC_INIT);
--	writel(bitrev32(mctx->poly), ctx->crc->regs + CRC_POL);
--	writel(CRC_CR_RESET | CRC_CR_REVERSE, ctx->crc->regs + CRC_CR);
-+	/* set key */
-+	if (ctx->crc->key_support) {
-+		writel(bitrev32(mctx->key), ctx->crc->regs + CRC_INIT);
-+	} else if (mctx->key != CRC_INIT_DEFAULT) {
-+		dev_err(ctx->crc->dev, "Unsupported key value! Should be: 0x%x\n",
-+			CRC_INIT_DEFAULT);
-+		return -EINVAL;
-+	}
-+
-+	/* set poly */
-+	if (ctx->crc->poly_support)
-+		writel(bitrev32(mctx->poly), ctx->crc->regs + CRC_POL);
-+
-+	/* reset and configure in bit reverse mode if supported */
-+	if (ctx->crc->reverse_support)
-+		writel(CRC_CR_RESET | CRC_CR_REVERSE, ctx->crc->regs + CRC_CR);
-+	else
-+		writel(CRC_CR_RESET, ctx->crc->regs + CRC_CR);
-+
-+	/* store partial result */
-+	if (!ctx->crc->reverse_support)
-+		ctx->partial = bitrev32(readl(crc->regs + CRC_DR));
-+	else
-+		ctx->partial = readl(ctx->crc->regs + CRC_DR);
- 
--	/* Store partial result */
--	ctx->partial = readl(ctx->crc->regs + CRC_DR);
- 	ctx->crc->nb_pending_bytes = 0;
- 
- 	return 0;
-@@ -135,7 +157,12 @@ static int stm32_crc_update(struct shash_desc *desc, const u8 *d8,
- 
- 		if (crc->nb_pending_bytes == sizeof(u32)) {
- 			/* Process completed pending data */
--			writel(*(u32 *)crc->pending_data, crc->regs + CRC_DR);
-+			if (!ctx->crc->reverse_support)
-+				writel(bitrev32(*(u32 *)crc->pending_data),
-+				       crc->regs + CRC_DR);
-+			else
-+				writel(*(u32 *)crc->pending_data,
-+				       crc->regs + CRC_DR);
- 			crc->nb_pending_bytes = 0;
- 		}
- 	}
-@@ -143,10 +170,16 @@ static int stm32_crc_update(struct shash_desc *desc, const u8 *d8,
- 	d32 = (u32 *)d8;
- 	for (i = 0; i < length >> 2; i++)
- 		/* Process 32 bits data */
--		writel(*(d32++), crc->regs + CRC_DR);
-+		if (!ctx->crc->reverse_support)
-+			writel(bitrev32(*(d32++)), crc->regs + CRC_DR);
-+		else
-+			writel(*(d32++), crc->regs + CRC_DR);
- 
- 	/* Store partial result */
--	ctx->partial = readl(crc->regs + CRC_DR);
-+	if (!ctx->crc->reverse_support)
-+		ctx->partial = bitrev32(readl(crc->regs + CRC_DR));
-+	else
-+		ctx->partial = readl(crc->regs + CRC_DR);
- 
- 	/* Check for pending data (non 32 bits) */
- 	length &= 3;
-@@ -243,6 +276,7 @@ static int stm32_crc_probe(struct platform_device *pdev)
- 	struct stm32_crc *crc;
- 	struct resource *res;
- 	int ret;
-+	int algs_size;
- 
- 	crc = devm_kzalloc(dev, sizeof(*crc), GFP_KERNEL);
- 	if (!crc)
-@@ -269,13 +303,26 @@ static int stm32_crc_probe(struct platform_device *pdev)
- 		return ret;
- 	}
- 
-+	/* set key, poly and reverse support if device is of F7 series */
-+	if (of_device_is_compatible(crc->dev->of_node, "st,stm32f7-crc")) {
-+		crc->key_support = true;
-+		crc->poly_support = true;
-+		crc->reverse_support = true;
-+	}
-+
- 	platform_set_drvdata(pdev, crc);
- 
- 	spin_lock(&crc_list.lock);
- 	list_add(&crc->list, &crc_list.dev_list);
- 	spin_unlock(&crc_list.lock);
- 
--	ret = crypto_register_shashes(algs, ARRAY_SIZE(algs));
-+	/* For F4 series only CRC32 algorithm will be used */
-+	if (of_device_is_compatible(crc->dev->of_node, "st,stm32f4-crc"))
-+		algs_size = 1;
-+	else
-+		algs_size = ARRAY_SIZE(algs);
-+
-+	ret = crypto_register_shashes(algs, algs_size);
- 	if (ret) {
- 		dev_err(dev, "Failed to register\n");
- 		clk_disable_unprepare(crc->clk);
-@@ -304,6 +351,7 @@ static int stm32_crc_remove(struct platform_device *pdev)
- 
- static const struct of_device_id stm32_dt_ids[] = {
- 	{ .compatible = "st,stm32f7-crc", },
-+	{ .compatible = "st,stm32f4-crc", },
- 	{},
- };
- MODULE_DEVICE_TABLE(of, stm32_dt_ids);
+This series was tested in various ways on both the Armada 7040 DB and
+the Armada 8040 DB: using the crypto framework self tests, using tcrypt
+and while performing various transfers with iperf on top of IPsec.
+
+This series is based on top of v4.12-rc1, and is available at:
+https://github.com/atenart/linux  v4.12-rc1/7k8k-crypto
+I can rebase if needed. Patches adding device tree nodes and modifying
+the arm64 defconfig have been applied to the mvebu tree already.
+
+I'd like to thank Ofer Heifetz and Igal Liberman who helped me to do
+this driver by adding functionalities, optimizing functions and testing
+(a lot).
+
+Thanks,
+Antoine
+
+Since v4:
+  - Added a dma-mask property and updated the default DMA mask to 64.
+  - Replaced all <asm/dma-mapping.h> to <linux/dma-mapping.h>.
+  - Rebased on top of 4.12-rc1.
+
+Since v3:
+  - Updated to use the skcipher API instead of the ablkcipher one.
+  - Added explicit zeroing of the keys.
+  - Fixed the DMA mask.
+  - Removed a few remaining phys_addr_t.
+
+Since v2:
+  - Used sha*_zero_message_hash definitions instead of custom ones.
+  - Used memzero_explicit() instead of memset() to avoid leaks.
+  - Misc cosmetic updates.
+
+Since v1:
+  - Fixed two compilation issues reported by Kbuild.
+  - Removed all dma_to_phys() calls and used the dma addresses instead.
+  - Added a call to dma_set_mask_and_coherent() before calling any DMA
+    API helper.
+  - Removed some DMA free functions to avoid double-freeing.
+  - Do not rely on sg_nents_for_len() to get the number of sg anymore.
+  - Added a dedicated kmalloc'ed cache to use for dma_map_single().
+
+Antoine Tenart (4):
+  Documentation/bindings: Document the SafeXel cryptographic engine
+    driver
+  crypto: inside-secure: add SafeXcel EIP197 crypto engine driver
+  MAINTAINERS: add a maintainer for the Inside Secure crypto driver
+  arm64: marvell: dts: add dma-mask in crypto nodes for 7k/8k
+
+ .../bindings/crypto/inside-secure-safexcel.txt     |   29 +
+ MAINTAINERS                                        |    6 +
+ .../boot/dts/marvell/armada-cp110-master.dtsi      |    1 +
+ .../arm64/boot/dts/marvell/armada-cp110-slave.dtsi |    1 +
+ drivers/crypto/Kconfig                             |   17 +
+ drivers/crypto/Makefile                            |    1 +
+ drivers/crypto/inside-secure/Makefile              |    2 +
+ drivers/crypto/inside-secure/safexcel.c            |  930 +++++++++++++++++
+ drivers/crypto/inside-secure/safexcel.h            |  572 +++++++++++
+ drivers/crypto/inside-secure/safexcel_cipher.c     |  556 +++++++++++
+ drivers/crypto/inside-secure/safexcel_hash.c       | 1045 ++++++++++++++++++++
+ drivers/crypto/inside-secure/safexcel_ring.c       |  157 +++
+ 12 files changed, 3317 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/inside-secure-safexcel.txt
+ create mode 100644 drivers/crypto/inside-secure/Makefile
+ create mode 100644 drivers/crypto/inside-secure/safexcel.c
+ create mode 100644 drivers/crypto/inside-secure/safexcel.h
+ create mode 100644 drivers/crypto/inside-secure/safexcel_cipher.c
+ create mode 100644 drivers/crypto/inside-secure/safexcel_hash.c
+ create mode 100644 drivers/crypto/inside-secure/safexcel_ring.c
+
 -- 
-2.7.4
-
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+2.9.4
