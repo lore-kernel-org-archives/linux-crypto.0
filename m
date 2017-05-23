@@ -1,24 +1,26 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 6/8] crypto: dh - fix dh_max_size
-Date: Tue, 23 May 2017 12:06:57 +0800
-Message-ID: <20170523040657.GB12788@gondor.apana.org.au>
-References: <1494583906-15472-1-git-send-email-tudor.ambarus@microchip.com>
- <1494583906-15472-7-git-send-email-tudor.ambarus@microchip.com>
+Subject: Re: [PATCH v2 04/11] crypto: dh - fix dh_max_size
+Date: Tue, 23 May 2017 12:07:44 +0800
+Message-ID: <20170523040744.GC12788@gondor.apana.org.au>
+References: <1495033238-26016-1-git-send-email-tudor.ambarus@microchip.com>
+ <1495033238-26016-5-git-send-email-tudor.ambarus@microchip.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
+Cc: davem@davemloft.net, dhowells@redhat.com,
+        linux-crypto@vger.kernel.org, keyrings@vger.kernel.org,
+        Nicolas.Ferre@microchip.com
 To: Tudor Ambarus <tudor.ambarus@microchip.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [128.1.224.119] ([128.1.224.119]:47856 "EHLO deadmen.hmeau.com"
+Received: from [128.1.224.119] ([128.1.224.119]:47864 "EHLO deadmen.hmeau.com"
         rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751088AbdEWEHL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 May 2017 00:07:11 -0400
+        id S1751088AbdEWEIC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 23 May 2017 00:08:02 -0400
 Content-Disposition: inline
-In-Reply-To: <1494583906-15472-7-git-send-email-tudor.ambarus@microchip.com>
+In-Reply-To: <1495033238-26016-5-git-send-email-tudor.ambarus@microchip.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, May 12, 2017 at 01:11:44PM +0300, Tudor Ambarus wrote:
+On Wed, May 17, 2017 at 06:00:31PM +0300, Tudor Ambarus wrote:
 > The function should return minimum size for output buffer
 > or error code if key hasn't been set.
 > 
@@ -37,7 +39,6 @@ On Fri, May 12, 2017 at 01:11:44PM +0300, Tudor Ambarus wrote:
 >  
 > -	return mpi_get_size(ctx->p);
 > +	return ctx->p ? mpi_get_size(ctx->p) : -EINVAL;
->  }
 
 How about ENOKEY?
 
