@@ -1,49 +1,47 @@
-From: Matthias Kaehlcke <mka@chromium.org>
-Subject: [PATCH] crypto: rng: Remove unused function __crypto_rng_cast()
-Date: Mon, 22 May 2017 15:49:43 -0700
-Message-ID: <20170522224943.176039-1-mka@chromium.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Douglas Anderson <dianders@chromium.org>,
-        Matthias Kaehlcke <mka@chromium.org>
-To: Neil Horman <nhorman@tuxdriver.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>
+From: Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH] crypto: stm32 - Add CRC32 support for STM32F4XX
+Date: Mon, 22 May 2017 19:29:48 -0500
+Message-ID: <20170523002948.k4fh24rzccix2bsn@rob-hp-laptop>
+References: <1494969530-91589-1-git-send-email-cosardindar@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+        mark.rutland@arm.com, mcoquelin.stm32@gmail.com,
+        alexandre.torgue@st.com, linux@armlinux.org.uk,
+        weiyongjun1@huawei.com, fabien.dessenne@st.com,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+To: Cosar Dindar <cosardindar@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f175.google.com ([209.85.192.175]:32916 "EHLO
-        mail-pf0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1757976AbdEVWuO (ORCPT
+Received: from mail-oi0-f65.google.com ([209.85.218.65]:35041 "EHLO
+        mail-oi0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1760227AbdEWA3t (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 22 May 2017 18:50:14 -0400
-Received: by mail-pf0-f175.google.com with SMTP id e193so95397705pfh.0
-        for <linux-crypto@vger.kernel.org>; Mon, 22 May 2017 15:50:14 -0700 (PDT)
+        Mon, 22 May 2017 20:29:49 -0400
+Content-Disposition: inline
+In-Reply-To: <1494969530-91589-1-git-send-email-cosardindar@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This fixes the following warning when building with clang:
+On Wed, May 17, 2017 at 12:18:50AM +0300, Cosar Dindar wrote:
+> This patch series add hardware CRC32 ("Ethernet") calculation support
+> for STMicroelectronics STM32F4XX series devices.
+> 
+> As an hardware limitation polynomial and key setting are not supported
+> as they are fixed as 0x4C11DB7 (poly) and 0xFFFFFFFF (key).
+> 
+> CRC32C Castagnoli algorithm is not supported also.
+> Module is tested on STM32F429-disco board with crypto testmgr using
+> cases within the key 0xFFFFFFFF.
+> 
+> Signed-off-by: Cosar Dindar <cosardindar@gmail.com>
+> ---
+>  .../devicetree/bindings/crypto/st,stm32-crc.txt    |  4 +-
+>  arch/arm/boot/dts/stm32429i-eval.dts               |  4 ++
+>  arch/arm/boot/dts/stm32f429-disco.dts              |  4 ++
+>  arch/arm/boot/dts/stm32f429.dtsi                   |  7 +++
+>  arch/arm/boot/dts/stm32f469-disco.dts              |  4 ++
+>  drivers/crypto/stm32/stm32_crc32.c                 | 68 ++++++++++++++++++----
+>  6 files changed, 79 insertions(+), 12 deletions(-)
 
-crypto/rng.c:35:34: error: unused function '__crypto_rng_cast'
-    [-Werror,-Wunused-function]
-
-Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
----
- crypto/rng.c | 5 -----
- 1 file changed, 5 deletions(-)
-
-diff --git a/crypto/rng.c b/crypto/rng.c
-index f46dac5288b9..5e8469244960 100644
---- a/crypto/rng.c
-+++ b/crypto/rng.c
-@@ -33,11 +33,6 @@ struct crypto_rng *crypto_default_rng;
- EXPORT_SYMBOL_GPL(crypto_default_rng);
- static int crypto_default_rng_refcnt;
- 
--static inline struct crypto_rng *__crypto_rng_cast(struct crypto_tfm *tfm)
--{
--	return container_of(tfm, struct crypto_rng, base);
--}
--
- int crypto_rng_reset(struct crypto_rng *tfm, const u8 *seed, unsigned int slen)
- {
- 	u8 *buf = NULL;
--- 
-2.13.0.303.g4ebf302169-goog
+Acked-by: Rob Herring <robh@kernel.org>
