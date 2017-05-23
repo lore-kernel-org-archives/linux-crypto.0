@@ -1,49 +1,33 @@
-From: Tudor Ambarus <tudor.ambarus@microchip.com>
-Subject: [PATCH v3 08/11] crypto: testmgr - check err on akcipher maxsize
-Date: Tue, 23 May 2017 16:19:02 +0300
-Message-ID: <1495545545-16872-9-git-send-email-tudor.ambarus@microchip.com>
-References: <1495545545-16872-1-git-send-email-tudor.ambarus@microchip.com>
+From: Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH v1 1/2] dt-bindings: timeriomem_rng: Add entropy quality
+ property
+Date: Tue, 23 May 2017 09:06:14 -0500
+Message-ID: <20170523140614.52m6fnifw7qf4k6b@rob-hp-laptop>
+References: <20170517222911.9295-1-raltherr@google.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <linux-crypto@vger.kernel.org>, <keyrings@vger.kernel.org>,
-        <Nicolas.Ferre@microchip.com>,
-        Tudor Ambarus <tudor.ambarus@microchip.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <dhowells@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Matt Mackall <mpm@selenic.com>
+To: Rick Altherr <raltherr@google.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from esa1.microchip.iphmx.com ([68.232.147.91]:2549 "EHLO
-        esa1.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S937109AbdEWNUC (ORCPT
+Received: from mail-oi0-f66.google.com ([209.85.218.66]:34921 "EHLO
+        mail-oi0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1764186AbdEWOGS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 May 2017 09:20:02 -0400
-In-Reply-To: <1495545545-16872-1-git-send-email-tudor.ambarus@microchip.com>
+        Tue, 23 May 2017 10:06:18 -0400
+Content-Disposition: inline
+In-Reply-To: <20170517222911.9295-1-raltherr@google.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-crypto_akcipher_maxsize() returns minimum length for output buffer
-or error code if key hasn't been set. Check for error before
-allocating memory.
+On Wed, May 17, 2017 at 03:29:10PM -0700, Rick Altherr wrote:
+> Signed-off-by: Rick Altherr <raltherr@google.com>
+> ---
+> 
+>  Documentation/devicetree/bindings/rng/timeriomem_rng.txt | 7 +++++++
+>  1 file changed, 7 insertions(+)
 
-Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
----
- crypto/testmgr.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 4f8029c..0bf9a00 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -2155,6 +2155,11 @@ static int test_akcipher_one(struct crypto_akcipher *tfm,
- 
- 	err = -ENOMEM;
- 	out_len_max = crypto_akcipher_maxsize(tfm);
-+	if (out_len_max < 0) {
-+		err = out_len_max;
-+		goto free_req;
-+	}
-+
- 	outbuf_enc = kzalloc(out_len_max, GFP_KERNEL);
- 	if (!outbuf_enc)
- 		goto free_req;
--- 
-2.7.4
+Acked-by: Rob Herring <robh@kernel.org>
