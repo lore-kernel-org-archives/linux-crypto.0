@@ -1,7 +1,7 @@
 From: Tudor Ambarus <tudor.ambarus@microchip.com>
-Subject: [PATCH v3 09/11] crypto: KEYS: check err on akcipher maxsize
-Date: Tue, 23 May 2017 16:19:03 +0300
-Message-ID: <1495545545-16872-10-git-send-email-tudor.ambarus@microchip.com>
+Subject: [PATCH v3 11/11] crypto: dh - fix memleak in setkey
+Date: Tue, 23 May 2017 16:19:05 +0300
+Message-ID: <1495545545-16872-12-git-send-email-tudor.ambarus@microchip.com>
 References: <1495545545-16872-1-git-send-email-tudor.ambarus@microchip.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -11,39 +11,38 @@ Cc: <linux-crypto@vger.kernel.org>, <keyrings@vger.kernel.org>,
 To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
         <dhowells@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from esa4.microchip.iphmx.com ([68.232.154.123]:62761 "EHLO
+Received: from esa4.microchip.iphmx.com ([68.232.154.123]:33438 "EHLO
         esa4.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S937121AbdEWNT5 (ORCPT
+        with ESMTP id S935923AbdEWNUA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 May 2017 09:19:57 -0400
+        Tue, 23 May 2017 09:20:00 -0400
 In-Reply-To: <1495545545-16872-1-git-send-email-tudor.ambarus@microchip.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-crypto_akcipher_maxsize() returns minimum length for output buffer
-or error code if key hasn't been set. Check for error before
-allocating memory.
+setkey can be called multiple times during the existence
+of the transformation object. In case of multiple setkey calls,
+the old key was not freed and we leaked memory.
+Free the old MPI key if any.
 
 Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
 ---
- crypto/asymmetric_keys/public_key.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ crypto/dh.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
-index d3a989e..2b2f8bf 100644
---- a/crypto/asymmetric_keys/public_key.c
-+++ b/crypto/asymmetric_keys/public_key.c
-@@ -123,6 +123,11 @@ int public_key_verify_signature(const struct public_key *pkey,
+diff --git a/crypto/dh.c b/crypto/dh.c
+index 3d35ba9..8eb433d 100644
+--- a/crypto/dh.c
++++ b/crypto/dh.c
+@@ -85,6 +85,9 @@ static int dh_set_secret(struct crypto_kpp *tfm, const void *buf,
+ 	struct dh_ctx *ctx = dh_get_ctx(tfm);
+ 	struct dh params;
  
- 	ret = -ENOMEM;
- 	outlen = crypto_akcipher_maxsize(tfm);
-+	if (outlen < 0) {
-+		ret = outlen;
-+		goto error_free_req;
-+	}
++	/* Free the old MPI key if any */
++	dh_free_ctx(ctx);
 +
- 	output = kmalloc(outlen, GFP_KERNEL);
- 	if (!output)
- 		goto error_free_req;
+ 	if (crypto_dh_decode_key(buf, len, &params) < 0)
+ 		return -EINVAL;
+ 
 -- 
 2.7.4
