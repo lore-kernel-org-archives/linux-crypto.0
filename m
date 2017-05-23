@@ -1,75 +1,30 @@
-From: <agiva@centrum.cz>
-Subject: (unknown)
-Date: Tue, 23 May 2017 16:24:14 -0000
-Message-ID: <149555665451.6150.1208065861767385141@zaural.ru>
+From: David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH] X.509: Fix error code in x509_cert_parse()
+Date: Tue, 23 May 2017 17:49:03 +0100
+Message-ID: <4045.1495558143@warthog.procyon.org.uk>
+References: <20170523142717.GA28346@elgon.mountain>
 Mime-Version: 1.0
-Content-Type: application/zip; name="146902373.zip"
-Content-Transfer-Encoding: base64
-To: <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ws9.zone31-163-152.zaural.ru ([31.163.152.9]:58888 "HELO
-        zaural.ru" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with SMTP
-        id S1762444AbdEWQYT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 May 2017 12:24:19 -0400
-Content-Disposition: attachment
-Subject: 
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Cc: dhowells@redhat.com, Tadeusz Struk <tadeusz.struk@intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
+To: Dan Carpenter <dan.carpenter@oracle.com>
+Return-path: <kernel-janitors-owner@vger.kernel.org>
+In-Reply-To: <20170523142717.GA28346@elgon.mountain>
+Content-ID: <4044.1495558143.1@warthog.procyon.org.uk>
+Sender: kernel-janitors-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-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
-AAEAAQBPAAAAIgwAAAAA
+Dan Carpenter <dan.carpenter@oracle.com> wrote:
+
+>  	cert->pub->key = kmemdup(ctx->key, ctx->key_size, GFP_KERNEL);
+> -	if (!cert->pub->key)
+> +	if (!cert->pub->key) {
+> +		ret = -ENOMEM;
+>  		goto error_decode;
+> +	}
+
+Put the "ret = -ENOMEM" line before the kmemdup line maybe?
+
+David
