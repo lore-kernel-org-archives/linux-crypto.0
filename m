@@ -1,7 +1,7 @@
 From: Tudor Ambarus <tudor.ambarus@microchip.com>
-Subject: [PATCH v3 05/11] crypto: ecdh - fix ecdh_max_size
-Date: Tue, 23 May 2017 16:18:59 +0300
-Message-ID: <1495545545-16872-6-git-send-email-tudor.ambarus@microchip.com>
+Subject: [PATCH v3 06/11] crypto: rsa - change err code in rsa_max_size
+Date: Tue, 23 May 2017 16:19:00 +0300
+Message-ID: <1495545545-16872-7-git-send-email-tudor.ambarus@microchip.com>
 References: <1495545545-16872-1-git-send-email-tudor.ambarus@microchip.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -11,43 +11,35 @@ Cc: <linux-crypto@vger.kernel.org>, <keyrings@vger.kernel.org>,
 To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
         <dhowells@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from esa4.microchip.iphmx.com ([68.232.154.123]:7607 "EHLO
-        esa4.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S935896AbdEWNTd (ORCPT
+Received: from esa1.microchip.iphmx.com ([68.232.147.91]:2549 "EHLO
+        esa1.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S937106AbdEWNTx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 May 2017 09:19:33 -0400
+        Tue, 23 May 2017 09:19:53 -0400
 In-Reply-To: <1495545545-16872-1-git-send-email-tudor.ambarus@microchip.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-If someone called this function before a successful setkey,
-we would end up in a NULL dereference.
-
-The function should return minimum size for output buffer
-or error code if key hasn't been set.
+If key was not successfully set, return -ENOKEY instead of
+-EINVAL.
 
 Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
 ---
- crypto/ecdh.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ crypto/rsa.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/crypto/ecdh.c b/crypto/ecdh.c
-index c1f0163..b2b12cd 100644
---- a/crypto/ecdh.c
-+++ b/crypto/ecdh.c
-@@ -107,10 +107,10 @@ static int ecdh_compute_value(struct kpp_request *req)
- static int ecdh_max_size(struct crypto_kpp *tfm)
+diff --git a/crypto/rsa.c b/crypto/rsa.c
+index 4c280b6..3cf640e 100644
+--- a/crypto/rsa.c
++++ b/crypto/rsa.c
+@@ -341,7 +341,7 @@ static int rsa_max_size(struct crypto_akcipher *tfm)
  {
- 	struct ecdh_ctx *ctx = ecdh_get_ctx(tfm);
--	int nbytes = ctx->ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
+ 	struct rsa_mpi_key *pkey = akcipher_tfm_ctx(tfm);
  
--	/* Public key is made of two coordinates */
--	return 2 * nbytes;
-+	/* Public key is made of two coordinates, add one to the left shift  */
-+	return ctx->ndigits ? ctx->ndigits << (ECC_DIGITS_TO_BYTES_SHIFT + 1) :
-+			      -ENOKEY;
+-	return pkey->n ? mpi_get_size(pkey->n) : -EINVAL;
++	return pkey->n ? mpi_get_size(pkey->n) : -ENOKEY;
  }
  
- static void no_exit_tfm(struct crypto_kpp *tfm)
+ static void rsa_exit_tfm(struct crypto_akcipher *tfm)
 -- 
 2.7.4
