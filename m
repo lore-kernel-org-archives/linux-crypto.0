@@ -1,33 +1,38 @@
-From: Rob Herring <robh@kernel.org>
-Subject: Re: [PATCH v1 1/2] dt-bindings: timeriomem_rng: Add entropy quality
- property
-Date: Tue, 23 May 2017 09:06:14 -0500
-Message-ID: <20170523140614.52m6fnifw7qf4k6b@rob-hp-laptop>
-References: <20170517222911.9295-1-raltherr@google.com>
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: [PATCH] X.509: Fix error code in x509_cert_parse()
+Date: Tue, 23 May 2017 17:27:17 +0300
+Message-ID: <20170523142717.GA28346@elgon.mountain>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Matt Mackall <mpm@selenic.com>
-To: Rick Altherr <raltherr@google.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-oi0-f66.google.com ([209.85.218.66]:34921 "EHLO
-        mail-oi0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1764186AbdEWOGS (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 May 2017 10:06:18 -0400
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
+To: David Howells <dhowells@redhat.com>,
+        Tadeusz Struk <tadeusz.struk@intel.com>
+Return-path: <kernel-janitors-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20170517222911.9295-1-raltherr@google.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: kernel-janitors-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, May 17, 2017 at 03:29:10PM -0700, Rick Altherr wrote:
-> Signed-off-by: Rick Altherr <raltherr@google.com>
-> ---
-> 
->  Documentation/devicetree/bindings/rng/timeriomem_rng.txt | 7 +++++++
->  1 file changed, 7 insertions(+)
+We forgot to set the error code on this path so it could result in
+returning NULL which leads to a NULL dereference.
 
-Acked-by: Rob Herring <robh@kernel.org>
+Fixes: db6c43bd2132 ("crypto: KEYS: convert public key and digsig asym to the akcipher api")
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+
+diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
+index c80765b211cf..1f69e948fb34 100644
+--- a/crypto/asymmetric_keys/x509_cert_parser.c
++++ b/crypto/asymmetric_keys/x509_cert_parser.c
+@@ -103,8 +103,10 @@ struct x509_certificate *x509_cert_parse(const void *data, size_t datalen)
+ 	}
+ 
+ 	cert->pub->key = kmemdup(ctx->key, ctx->key_size, GFP_KERNEL);
+-	if (!cert->pub->key)
++	if (!cert->pub->key) {
++		ret = -ENOMEM;
+ 		goto error_decode;
++	}
+ 
+ 	cert->pub->keylen = ctx->key_size;
+ 
