@@ -1,75 +1,139 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v3 1/3] Documentation/bindings: Document the SafeXel
- cryptographic engine driver
-Date: Tue, 23 May 2017 12:13:28 +0100
-Message-ID: <9a3961ee-1396-cc8f-64ca-12beacf75c2a@arm.com>
-References: <20170424075407.19730-1-antoine.tenart@free-electrons.com>
- <20170424075407.19730-2-antoine.tenart@free-electrons.com>
- <7986721e-3a2b-23fb-61d7-7032f0d65533@arm.com>
- <20170522143049.GD14976@kwain.lan>
- <e8ef1f11-539c-9abc-9977-36366d4994b1@arm.com>
- <20170522145440.GE14976@kwain.lan>
- <44fc18ba-a06a-de89-2172-08c093880e79@arm.com>
- <20170522213746.403aa844@free-electrons.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        jason@lakedaemon.net, andrew@lunn.ch,
-        gregory.clement@free-electrons.com,
-        sebastian.hesselbarth@gmail.com,
-        boris.brezillon@free-electrons.com, igall@marvell.com,
-        nadavh@marvell.com, linux-crypto@vger.kernel.org,
-        robin.murphy@arm.com, oferh@marvell.com,
-        linux-arm-kernel@lists.infradead.org
-To: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+From: Corentin Labbe <clabbe.montjoie@gmail.com>
+Subject: [PATCH 1/2] crypto: engine - replace pr_xxx by dev_xxx
+Date: Tue, 23 May 2017 14:09:02 +0200
+Message-ID: <20170523120903.31637-1-clabbe.montjoie@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Corentin Labbe <clabbe.montjoie@gmail.com>
+To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:50026 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1758513AbdEWLNd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 May 2017 07:13:33 -0400
-In-Reply-To: <20170522213746.403aa844@free-electrons.com>
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:36508 "EHLO
+        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S936053AbdEWMLJ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 23 May 2017 08:11:09 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 22/05/17 20:37, Thomas Petazzoni wrote:
-> Hello,
-> 
-> On Mon, 22 May 2017 16:02:33 +0100, Marc Zyngier wrote:
-> 
->>> It also says: 87 =>  34 En Lv 5, which is the IRQ I'm looking for.  
->>
->> Ah, that one as well. So how is the interrupt routed? Via the ICU, and
->> then to the GIC (with several ICU sources mapped on a single SPI)?
-> 
-> The crypto block being in the CP part, it has a wired interrupt to the
-> ICU (also in the CP). The ICU then turns this wired interrupt into a
-> memory write transaction to a register called GICP SPI in the AP, which
-> triggers a SPI interrupt in the GIC.
+By adding a struct device *dev to struct engine, we could store the
+device used at register time and so use all dev_xxx functions instead of
+pr_xxx.
 
-Is that some kind of Level-triggered MSI, à la GICv3 GICD_SETSPI_NSR?
+Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+---
+ crypto/crypto_engine.c  | 23 +++++++++++++----------
+ include/crypto/engine.h |  1 +
+ 2 files changed, 14 insertions(+), 10 deletions(-)
 
-> In the current mainline kernel, the ICU is configured by the firmware
-> and creates static associations between wired interrupts in the CP and
-> corresponding SPI interrupts. Therefore the Device Tree currently
-> reference such SPI interrupts directly.
-> 
-> However, I have a patch series that I plan to submit hopefully in the
-> next days that adds an ICU driver, and changes the Device Tree to refer
-> to the ICU interrupt instead.
-
-OK, I'm quite interested to see that, specially if my above hunch is
-right...
-
-> Therefore, I don't think the binding should reference anything else
-> than the usual info about the interrupts property.
-
-That I completely agree with, as long as it doesn't describe anything
-that is semantically incorrect.
-
-Thanks,
-
-	M.
+diff --git a/crypto/crypto_engine.c b/crypto/crypto_engine.c
+index 727bd5c3569e..61e7c4e02fd2 100644
+--- a/crypto/crypto_engine.c
++++ b/crypto/crypto_engine.c
+@@ -70,7 +70,7 @@ static void crypto_pump_requests(struct crypto_engine *engine,
+ 
+ 		if (engine->unprepare_crypt_hardware &&
+ 		    engine->unprepare_crypt_hardware(engine))
+-			pr_err("failed to unprepare crypt hardware\n");
++			dev_err(engine->dev, "failed to unprepare crypt hardware\n");
+ 
+ 		spin_lock_irqsave(&engine->queue_lock, flags);
+ 		engine->idling = false;
+@@ -99,7 +99,7 @@ static void crypto_pump_requests(struct crypto_engine *engine,
+ 	if (!was_busy && engine->prepare_crypt_hardware) {
+ 		ret = engine->prepare_crypt_hardware(engine);
+ 		if (ret) {
+-			pr_err("failed to prepare crypt hardware\n");
++			dev_err(engine->dev, "failed to prepare crypt hardware\n");
+ 			goto req_err;
+ 		}
+ 	}
+@@ -110,14 +110,15 @@ static void crypto_pump_requests(struct crypto_engine *engine,
+ 		if (engine->prepare_hash_request) {
+ 			ret = engine->prepare_hash_request(engine, hreq);
+ 			if (ret) {
+-				pr_err("failed to prepare request: %d\n", ret);
++				dev_err(engine->dev, "failed to prepare request: %d\n",
++					ret);
+ 				goto req_err;
+ 			}
+ 			engine->cur_req_prepared = true;
+ 		}
+ 		ret = engine->hash_one_request(engine, hreq);
+ 		if (ret) {
+-			pr_err("failed to hash one request from queue\n");
++			dev_err(engine->dev, "failed to hash one request from queue\n");
+ 			goto req_err;
+ 		}
+ 		return;
+@@ -126,19 +127,20 @@ static void crypto_pump_requests(struct crypto_engine *engine,
+ 		if (engine->prepare_cipher_request) {
+ 			ret = engine->prepare_cipher_request(engine, breq);
+ 			if (ret) {
+-				pr_err("failed to prepare request: %d\n", ret);
++				dev_err(engine->dev, "failed to prepare request: %d\n",
++					ret);
+ 				goto req_err;
+ 			}
+ 			engine->cur_req_prepared = true;
+ 		}
+ 		ret = engine->cipher_one_request(engine, breq);
+ 		if (ret) {
+-			pr_err("failed to cipher one request from queue\n");
++			dev_err(engine->dev, "failed to cipher one request from queue\n");
+ 			goto req_err;
+ 		}
+ 		return;
+ 	default:
+-		pr_err("failed to prepare request of unknown type\n");
++		dev_err(engine->dev, "failed to prepare request of unknown type\n");
+ 		return;
+ 	}
+ 
+@@ -275,7 +277,7 @@ void crypto_finalize_cipher_request(struct crypto_engine *engine,
+ 		    engine->unprepare_cipher_request) {
+ 			ret = engine->unprepare_cipher_request(engine, req);
+ 			if (ret)
+-				pr_err("failed to unprepare request\n");
++				dev_err(engine->dev, "failed to unprepare request\n");
+ 		}
+ 		spin_lock_irqsave(&engine->queue_lock, flags);
+ 		engine->cur_req = NULL;
+@@ -312,7 +314,7 @@ void crypto_finalize_hash_request(struct crypto_engine *engine,
+ 		    engine->unprepare_hash_request) {
+ 			ret = engine->unprepare_hash_request(engine, req);
+ 			if (ret)
+-				pr_err("failed to unprepare request\n");
++				dev_err(engine->dev, "failed to unprepare request\n");
+ 		}
+ 		spin_lock_irqsave(&engine->queue_lock, flags);
+ 		engine->cur_req = NULL;
+@@ -384,7 +386,7 @@ int crypto_engine_stop(struct crypto_engine *engine)
+ 	spin_unlock_irqrestore(&engine->queue_lock, flags);
+ 
+ 	if (ret)
+-		pr_warn("could not stop engine\n");
++		dev_warn(engine->dev, "could not stop engine\n");
+ 
+ 	return ret;
+ }
+@@ -411,6 +413,7 @@ struct crypto_engine *crypto_engine_alloc_init(struct device *dev, bool rt)
+ 	if (!engine)
+ 		return NULL;
+ 
++	engine->dev = dev;
+ 	engine->rt = rt;
+ 	engine->running = false;
+ 	engine->busy = false;
+diff --git a/include/crypto/engine.h b/include/crypto/engine.h
+index 1bf600fc99f7..9e968a1033d0 100644
+--- a/include/crypto/engine.h
++++ b/include/crypto/engine.h
+@@ -58,6 +58,7 @@ struct crypto_engine {
+ 	struct list_head	list;
+ 	spinlock_t		queue_lock;
+ 	struct crypto_queue	queue;
++	struct device *dev;
+ 
+ 	bool			rt;
+ 
 -- 
-Jazz is not dead. It just smells funny...
+2.13.0
