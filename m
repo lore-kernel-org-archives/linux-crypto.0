@@ -1,58 +1,75 @@
-From: Tudor Ambarus <tudor.ambarus@microchip.com>
-Subject: Re: ecdh: generation and retention of ecc privkey in kernel/hardware
-Date: Tue, 23 May 2017 11:06:53 +0300
-Message-ID: <99d85bf6-5bd1-6c4e-9ffa-91ce81c846d8@microchip.com>
-References: <db7c370c-65b6-2a78-2a5d-87f7a4e43cea@microchip.com>
- <20170523035836.GA12788@gondor.apana.org.au>
+From: <delaware.orders@nationalcorp.com>
+Subject: (unknown)
+Date: Tue, 23 May 2017 08:42:57 -0000
+Message-ID: <149552897780.26770.14724516928776211226@hinet.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: <linux-crypto@vger.kernel.org>,
-        =?UTF-8?Q?Stephan_M=c3=bcller?= <smueller@chronox.de>,
-        Nicolas Ferre - M43238 <Nicolas.Ferre@microchip.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: application/zip; name="0880469378.zip"
+Content-Transfer-Encoding: base64
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from esa2.microchip.iphmx.com ([68.232.149.84]:41673 "EHLO
-        esa2.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753236AbdEWIG5 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 May 2017 04:06:57 -0400
-In-Reply-To: <20170523035836.GA12788@gondor.apana.org.au>
-Content-Language: en-US
+Received: from 36-226-41-160.dynamic-ip.hinet.net ([36.226.41.160]:51780 "HELO
+        hinet.net" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with SMTP
+        id S934335AbdEWInK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 23 May 2017 04:43:10 -0400
+Subject: 
+Content-Disposition: attachment
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-
-
-On 23.05.2017 06:58, Herbert Xu wrote:
-> On Thu, Apr 27, 2017 at 05:17:58PM +0300, Tudor Ambarus wrote:
->> Hi, Herbert,
->>
->> I'm working with a crypto accelerator that is capable of generating and
->> retaining ecc private keys in hardware and further use them for ecdh.
->> The private keys can not be read from the device. This is good because
->> the less software has access to secrets, the better.
->>
->> Generation and retention of ecc private keys are also helpful in a user
->> space to kernel ecdh offload. The privkey can be generated in kernel and
->> never revealed to user space.
->>
->> I propose to extend the ecc software support to allow the generation of
->> private keys. ECDH software implementation and drivers will permit the
->> users to provide NULL keys. In this case, the kernel (or the device, if
->> possible) will generate the ecc private key and further use it for ecdh.
->>
->> What's your feeling on this?
-> 
-> It sounds sane to me.
-> 
-> It does raise the question though whether we need the ability to set the
-> secret at all.
-
-Ephemeral-Static Mode is a must in rfc2631[1], so the ability of using
-a static key pair.
-
-Thanks,
-ta
-
-[1]https://www.ietf.org/rfc/rfc2631.txt
+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
+DAAAAAA=
