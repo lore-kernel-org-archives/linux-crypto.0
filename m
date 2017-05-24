@@ -1,7 +1,7 @@
 From: Antoine Tenart <antoine.tenart@free-electrons.com>
-Subject: [PATCH v6 3/5] arm64: marvell: dts: add dma-mask in crypto nodes for 7k/8k
-Date: Wed, 24 May 2017 16:10:33 +0200
-Message-ID: <20170524141035.21031-4-antoine.tenart@free-electrons.com>
+Subject: [PATCH v6 2/5] arm64: marvell: dts: fix interrupts in 7k/8k crypto nodes
+Date: Wed, 24 May 2017 16:10:32 +0200
+Message-ID: <20170524141035.21031-3-antoine.tenart@free-electrons.com>
 References: <20170524141035.21031-1-antoine.tenart@free-electrons.com>
 Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
         linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
@@ -11,48 +11,52 @@ To: herbert@gondor.apana.org.au, davem@davemloft.net,
         jason@lakedaemon.net, andrew@lunn.ch,
         gregory.clement@free-electrons.com, sebastian.hesselbarth@gmail.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:41717 "EHLO
+Received: from mail.free-electrons.com ([62.4.15.54]:41710 "EHLO
         mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S935174AbdEXOLD (ORCPT
+        with ESMTP id S933600AbdEXOLD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Wed, 24 May 2017 10:11:03 -0400
 In-Reply-To: <20170524141035.21031-1-antoine.tenart@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The EIP197 cryptographic engine supports 64 bits address width but is
-limited to 40 bits on 7k/8k. Add a dma-mask property in the
-cryptographic engine nodes to reflect this.
+The cryptographic engine nodes have an interrupt which is configured as
+both edge and level, which makes no sense at all. Fix this by
+configuring it the right way (level).
 
 Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
 ---
- arch/arm64/boot/dts/marvell/armada-cp110-master.dtsi | 1 +
- arch/arm64/boot/dts/marvell/armada-cp110-slave.dtsi  | 1 +
- 2 files changed, 2 insertions(+)
+ arch/arm64/boot/dts/marvell/armada-cp110-master.dtsi | 3 +--
+ arch/arm64/boot/dts/marvell/armada-cp110-slave.dtsi  | 3 +--
+ 2 files changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/arch/arm64/boot/dts/marvell/armada-cp110-master.dtsi b/arch/arm64/boot/dts/marvell/armada-cp110-master.dtsi
-index b4bc42ece754..434d8a806ffa 100644
+index ac8df5201cd6..b4bc42ece754 100644
 --- a/arch/arm64/boot/dts/marvell/armada-cp110-master.dtsi
 +++ b/arch/arm64/boot/dts/marvell/armada-cp110-master.dtsi
-@@ -240,6 +240,7 @@
- 				interrupt-names = "mem", "ring0", "ring1",
- 				"ring2", "ring3", "eip";
- 				clocks = <&cpm_syscon0 1 26>;
-+				dma-mask = <0xff 0xffffffff>;
- 				status = "disabled";
- 			};
- 		};
+@@ -231,8 +231,7 @@
+ 			cpm_crypto: crypto@800000 {
+ 				compatible = "inside-secure,safexcel-eip197";
+ 				reg = <0x800000 0x200000>;
+-				interrupts = <GIC_SPI 34 (IRQ_TYPE_EDGE_RISING
+-				| IRQ_TYPE_LEVEL_HIGH)>,
++				interrupts = <GIC_SPI 34 IRQ_TYPE_LEVEL_HIGH>,
+ 					     <GIC_SPI 54 IRQ_TYPE_LEVEL_HIGH>,
+ 					     <GIC_SPI 55 IRQ_TYPE_LEVEL_HIGH>,
+ 					     <GIC_SPI 56 IRQ_TYPE_LEVEL_HIGH>,
 diff --git a/arch/arm64/boot/dts/marvell/armada-cp110-slave.dtsi b/arch/arm64/boot/dts/marvell/armada-cp110-slave.dtsi
-index 6e2058847ddc..17ca94a5d6b4 100644
+index 7740a75a8230..6e2058847ddc 100644
 --- a/arch/arm64/boot/dts/marvell/armada-cp110-slave.dtsi
 +++ b/arch/arm64/boot/dts/marvell/armada-cp110-slave.dtsi
-@@ -230,6 +230,7 @@
- 				interrupt-names = "mem", "ring0", "ring1",
- 						  "ring2", "ring3", "eip";
- 				clocks = <&cps_syscon0 1 26>;
-+				dma-mask = <0xff 0xffffffff>;
- 				status = "disabled";
- 			};
- 		};
+@@ -221,8 +221,7 @@
+ 			cps_crypto: crypto@800000 {
+ 				compatible = "inside-secure,safexcel-eip197";
+ 				reg = <0x800000 0x200000>;
+-				interrupts = <GIC_SPI 34 (IRQ_TYPE_EDGE_RISING
+-				| IRQ_TYPE_LEVEL_HIGH)>,
++				interrupts = <GIC_SPI 34 IRQ_TYPE_LEVEL_HIGH>,
+ 					     <GIC_SPI 278 IRQ_TYPE_LEVEL_HIGH>,
+ 					     <GIC_SPI 279 IRQ_TYPE_LEVEL_HIGH>,
+ 					     <GIC_SPI 280 IRQ_TYPE_LEVEL_HIGH>,
 -- 
 2.9.4
