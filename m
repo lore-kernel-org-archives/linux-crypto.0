@@ -1,166 +1,79 @@
-From: Dave Watson <davejwatson@fb.com>
-Subject: [PATCH net-next 4/4] tls: Documentation
-Date: Wed, 24 May 2017 09:27:19 -0700
-Message-ID: <20170524162719.GA24240@davejwatson-mba.local>
-References: <cover.1495642647.git.davejwatson@fb.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
-        <nmav@gnults.org>, <fridolin.pokorny@gmail.com>
-To: Ilya Lesokhin <ilyal@mellanox.com>,
-        Aviad Yehezkel <aviadye@mellanox.com>,
-        Boris Pismenny <borisp@mellanox.com>,
-        Liran Liss <liranl@mellanox.com>,
-        Matan Barak <matanb@mellanox.com>,
-        David Miller <davem@davemloft.net>, <netdev@vger.kernel.org>,
-        Tom Herbert <tom@herbertland.com>,
-        <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>,
-        Hannes Frederic Sowa <hannes@stressinduktion.org>
+From: Antoine Tenart <antoine.tenart@free-electrons.com>
+Subject: [PATCH 10/11] crypto: sun4i-ss: fix large block size support
+Date: Wed, 24 May 2017 21:06:51 +0200
+Message-ID: <20170524190652.13278-11-antoine.tenart@free-electrons.com>
+References: <20170524190652.13278-1-antoine.tenart@free-electrons.com>
+Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: herbert@gondor.apana.org.au, davem@davemloft.net,
+        maxime.ripard@free-electrons.com, wens@csie.org,
+        clabbe.montjoie@gmail.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:48396 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1032529AbdEXQ1m (ORCPT
+Received: from mail.free-electrons.com ([62.4.15.54]:50265 "EHLO
+        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932415AbdEXV1M (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 May 2017 12:27:42 -0400
-Content-Disposition: inline
-In-Reply-To: <cover.1495642647.git.davejwatson@fb.com>
+        Wed, 24 May 2017 17:27:12 -0400
+In-Reply-To: <20170524190652.13278-1-antoine.tenart@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add documentation for the tcp ULP tls interface.
+The run-time self-tests fail quite early, as soon as the input block
+size is larger than 64 bytes:
 
-Signed-off-by: Boris Pismenny <borisp@mellanox.com>
-Signed-off-by: Dave Watson <davejwatson@fb.com>
+  alg: hash: Test 4 failed for sha1-sun4i-ss
+  00000000: b9 c9 1e 52 c0 26 d8 39 81 ff f2 3c 99 b1 27 b2
+  00000010: 30 d6 c9 85
+
+One thing to notice is the value of the last word, which is the one
+expected (it can sometime be the last two words). The datasheet isn't
+very clear about when the digest is ready to retrieve and is seems the
+bit SS_DATA_END is cleared when the digest was computed *but* that
+doesn't mean the digest is ready to retrieve in the registers.
+
+A ndelay(1) is added before reading the computed digest to ensure it is
+available in the SS_MD[] registers.
+
+Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
 ---
- Documentation/networking/tls.txt | 120 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 120 insertions(+)
- create mode 100644 Documentation/networking/tls.txt
+ drivers/crypto/sunxi-ss/sun4i-ss-hash.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/Documentation/networking/tls.txt b/Documentation/networking/tls.txt
-new file mode 100644
-index 0000000..7bfb256
---- /dev/null
-+++ b/Documentation/networking/tls.txt
-@@ -0,0 +1,120 @@
-+Overview
-+========
+diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-hash.c b/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
+index 685de5b6ab17..6da8d2bbd4da 100644
+--- a/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
++++ b/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
+@@ -358,6 +358,15 @@ static int sun4i_hash(struct ahash_request *areq)
+ 		goto release_ss;
+ 	}
+ 
++	/*
++	 * The datasheet isn't very clear about when to retrieve the digest. The
++	 * bit SS_DATA_END is cleared when the engine has processed the data and
++	 * when the digest is computed *but* it doesn't mean the digest is
++	 * available in the diesgt registers. Hence the delay to be sure we can
++	 * read it.
++	 */
++	ndelay(1);
 +
-+Transport Layer Security (TLS) is a Upper Layer Protocol (ULP) that runs over
-+TCP. TLS provides end-to-end data integrity and confidentiality.
+ 	for (i = 0; i < crypto_ahash_digestsize(tfm) / 4; i++)
+ 		op->hash[i] = readl(ss->base + SS_MD0 + i * 4);
+ 
+@@ -446,6 +455,15 @@ static int sun4i_hash(struct ahash_request *areq)
+ 		goto release_ss;
+ 	}
+ 
++	/*
++	 * The datasheet isn't very clear about when to retrieve the digest. The
++	 * bit SS_DATA_END is cleared when the engine has processed the data and
++	 * when the digest is computed *but* it doesn't mean the digest is
++	 * available in the diesgt registers. Hence the delay to be sure we can
++	 * read it.
++	 */
++	ndelay(1);
 +
-+User interface
-+==============
-+
-+Creating a TLS connection
-+-------------------------
-+
-+First create a new TCP socket and set the TLS ULP.
-+
-+  sock = socket(AF_INET, SOCK_STREAM, 0);
-+  setsockopt(sock, SOL_TCP, TCP_ULP, "tls", sizeof("tls"));
-+
-+Setting the TLS ULP allows us to set/get TLS socket options. Currently
-+only the symmetric encryption is handled in the kernel.  After the TLS
-+handshake is complete, we have all the parameters required to move the
-+data-path to the kernel. There is a separate socket option for moving
-+the transmit and the receive into the kernel.
-+
-+  /* From linux/tls.h */
-+  struct tls_crypto_info {
-+          unsigned short version;
-+          unsigned short cipher_type;
-+  };
-+
-+  struct tls12_crypto_info_aes_gcm_128 {
-+          struct tls_crypto_info info;
-+          unsigned char iv[TLS_CIPHER_AES_GCM_128_IV_SIZE];
-+          unsigned char key[TLS_CIPHER_AES_GCM_128_KEY_SIZE];
-+          unsigned char salt[TLS_CIPHER_AES_GCM_128_SALT_SIZE];
-+          unsigned char rec_seq[TLS_CIPHER_AES_GCM_128_REC_SEQ_SIZE];
-+  };
-+
-+
-+  struct tls12_crypto_info_aes_gcm_128 crypto_info;
-+
-+  crypto_info.info.version = TLS_1_2_VERSION;
-+  crypto_info.info.cipher_type = TLS_CIPHER_AES_GCM_128;
-+  memcpy(crypto_info.iv, iv_write, TLS_CIPHER_AES_GCM_128_IV_SIZE);
-+  memcpy(crypto_info.rec_seq, seq_number_write,
-+					TLS_CIPHER_AES_GCM_128_REC_SEQ_SIZE);
-+  memcpy(crypto_info.key, cipher_key_write, TLS_CIPHER_AES_GCM_128_KEY_SIZE);
-+  memcpy(crypto_info.salt, implicit_iv_write, TLS_CIPHER_AES_GCM_128_SALT_SIZE);
-+
-+  setsockopt(sock, SOL_TLS, TLS_TX, &crypto_info, sizeof(crypto_info));
-+
-+Sending TLS application data
-+----------------------------
-+
-+After setting the TLS_TX socket option all application data sent over this
-+socket is encrypted using TLS and the parameters provided in the socket option.
-+For example, we can send an encrypted hello world record as follows:
-+
-+  const char *msg = "hello world\n";
-+  send(sock, msg, strlen(msg));
-+
-+send() data is directly encrypted from the userspace buffer provided
-+to the encrypted kernel send buffer if possible.
-+
-+The sendfile system call will send the file's data over TLS records of maximum
-+length (2^14).
-+
-+  file = open(filename, O_RDONLY);
-+  fstat(file, &stat);
-+  sendfile(sock, file, &offset, stat.st_size);
-+
-+TLS records are created and sent after each send() call, unless
-+MSG_MORE is passed.  MSG_MORE will delay creation of a record until
-+MSG_MORE is not passed, or the maximum record size is reached.
-+
-+The kernel will need to allocate a buffer for the encrypted data.
-+This buffer is allocated at the time send() is called, such that
-+either the entire send() call will return -ENOMEM (or block waiting
-+for memory), or the encryption will always succeed.  If send() returns
-+-ENOMEM and some data was left on the socket buffer from a previous
-+call using MSG_MORE, the MSG_MORE data is left on the socket buffer.
-+
-+Send TLS control messages
-+-------------------------
-+
-+Other than application data, TLS has control messages such as alert
-+messages (record type 21) and handshake messages (record type 22), etc.
-+These messages can be sent over the socket by providing the TLS record type
-+via a CMSG. For example the following function sends @data of @length bytes
-+using a record of type @record_type.
-+
-+/* send TLS control message using record_type */
-+  static int klts_send_ctrl_message(int sock, unsigned char record_type,
-+                                  void *data, size_t length)
-+  {
-+        struct msghdr msg = {0};
-+        int cmsg_len = sizeof(record_type);
-+        struct cmsghdr *cmsg;
-+        char buf[CMSG_SPACE(cmsg_len)];
-+        struct iovec msg_iov;   /* Vector of data to send/receive into.  */
-+
-+        msg.msg_control = buf;
-+        msg.msg_controllen = sizeof(buf);
-+        cmsg = CMSG_FIRSTHDR(&msg);
-+        cmsg->cmsg_level = SOL_TLS;
-+        cmsg->cmsg_type = TLS_SET_RECORD_TYPE;
-+        cmsg->cmsg_len = CMSG_LEN(cmsg_len);
-+        *CMSG_DATA(cmsg) = record_type;
-+        msg.msg_controllen = cmsg->cmsg_len;
-+
-+        msg_iov.iov_base = data;
-+        msg_iov.iov_len = length;
-+        msg.msg_iov = &msg_iov;
-+        msg.msg_iovlen = 1;
-+
-+        return sendmsg(sock, &msg, 0);
-+  }
-+
-+Control message data should be provided unencrypted, and will be
-+encrypted by the kernel.  At a high level, the kernel TLS ULP is a
-+replacement for the record layer of a userspace TLS library.
+ 	/* Get the hash from the device */
+ 	if (op->mode == SS_OP_SHA1) {
+ 		for (i = 0; i < 5; i++) {
 -- 
-2.9.3
+2.9.4
