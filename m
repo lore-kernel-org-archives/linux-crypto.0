@@ -1,7 +1,7 @@
 From: Derek Robson <robsonde@gmail.com>
-Subject: [PATCH 06/27] Drivers: ccree: ssi_pm_ext.c - align block comments
-Date: Wed, 24 May 2017 16:42:24 +1200
-Message-ID: <20170524044224.30143-1-robsonde@gmail.com>
+Subject: [PATCH 07/27] Drivers: ccree: ssi_pm.h - align block comments
+Date: Wed, 24 May 2017 16:42:41 +1200
+Message-ID: <20170524044241.30191-1-robsonde@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
@@ -27,40 +27,21 @@ Found using checkpatch
 
 Signed-off-by: Derek Robson <robsonde@gmail.com>
 ---
- drivers/staging/ccree/ssi_pm_ext.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ drivers/staging/ccree/ssi_pm.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/staging/ccree/ssi_pm_ext.c b/drivers/staging/ccree/ssi_pm_ext.c
-index 5889d9f97479..453151cdd6b2 100644
---- a/drivers/staging/ccree/ssi_pm_ext.c
-+++ b/drivers/staging/ccree/ssi_pm_ext.c
-@@ -26,10 +26,10 @@
- #include "ssi_pm_ext.h"
+diff --git a/drivers/staging/ccree/ssi_pm.h b/drivers/staging/ccree/ssi_pm.h
+index f1fe1777c04a..8b0d8be95199 100644
+--- a/drivers/staging/ccree/ssi_pm.h
++++ b/drivers/staging/ccree/ssi_pm.h
+@@ -15,7 +15,7 @@
+  */
  
- /*
--This function should suspend the HW (if possiable), It should be implemented by
--the driver user.
--The reference code clears the internal SRAM to imitate lose of state.
--*/
-+ * This function should suspend the HW (if possiable), It should be implemented by
-+ * the driver user.
-+ * The reference code clears the internal SRAM to imitate lose of state.
+ /* \file ssi_pm.h
+-    */
 + */
- void ssi_pm_ext_hw_suspend(struct device *dev)
- {
- 	struct ssi_drvdata *drvdata =
-@@ -50,9 +50,9 @@ void ssi_pm_ext_hw_suspend(struct device *dev)
- }
  
- /*
--This function should resume the HW (if possiable).It should be implemented by
--the driver user.
--*/
-+ * This function should resume the HW (if possiable).It should be implemented by
-+ * the driver user.
-+ */
- void ssi_pm_ext_hw_resume(struct device *dev)
- {
- 	return;
+ #ifndef __SSI_POWER_MGR_H__
+ #define __SSI_POWER_MGR_H__
 -- 
 2.12.2
