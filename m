@@ -1,106 +1,63 @@
-From: Thomas Gleixner <tglx@linutronix.de>
-Subject: [patch V3 07/32] padata: Avoid nested calls to cpus_read_lock() in
- pcrypt_init_padata()
-Date: Wed, 24 May 2017 10:15:18 +0200
-Message-ID: <20170524081547.571278910@linutronix.de>
-References: <20170524081511.203800767@linutronix.de>
+From: "Tobin C. Harding" <me@tobin.cc>
+Subject: Re: [PATCH 01/27] Drivers: ccree: ssi_sysfs.h - align block comments
+Date: Wed, 24 May 2017 19:51:05 +1000
+Message-ID: <20170524095105.GK8158@eros>
+References: <20170524044032.29913-1-robsonde@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-15
-Cc: Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Sebastian Siewior <bigeasy@linutronix.de>,
-        Paul McKenney <paulmck@linux.vnet.ibm.com>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        linux-crypto@vger.kernel.org
-To: LKML <linux-kernel@vger.kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline;
- filename=padata_Avoid_nested_calls_to_get_online_cpus()_in_pcrypt_init_padata().patch
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: devel@driverdev.osuosl.org, gregkh@linuxfoundation.org,
+ driverdev-devel@linuxdriverproject.org, linux-kernel@vger.kernel.org,
+ linux-crypto@vger.kernel.org
+To: Derek Robson <robsonde@gmail.com>
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+Content-Disposition: inline
+In-Reply-To: <20170524044032.29913-1-robsonde@gmail.com>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+On Wed, May 24, 2017 at 04:40:32PM +1200, Derek Robson wrote:
+> Fixed block comment alignment, Style fix only
+> Found using checkpatch
 
-pcrypt_init_padata()
-   cpus_read_lock()
-   padata_alloc_possible()
-     padata_alloc()
-       cpus_read_lock()
+It's 'one thing per patch', this whole set does one thing. You may
+like to submit it as a single patch. You won't need the file name in
+the commit summary then also :)
 
-The nested call to cpus_read_lock() works with the current implementation,
-but prevents the conversion to a percpu rwsem.
+Good luck,
+Tobin.
 
-The other caller of padata_alloc_possible() is pcrypt_init_padata() which
-calls from a cpus_read_lock() protected region as well.
-
-Remove the cpus_read_lock() call in padata_alloc() and document the
-calling convention.
-
-Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: Peter Zijlstra <peterz@infradead.org>
-Cc: Steven Rostedt <rostedt@goodmis.org>
-Cc: linux-crypto@vger.kernel.org
-
----
- kernel/padata.c |   11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
-
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -940,6 +940,8 @@ static struct kobj_type padata_attr_type
-  * @wq: workqueue to use for the allocated padata instance
-  * @pcpumask: cpumask that will be used for padata parallelization
-  * @cbcpumask: cpumask that will be used for padata serialization
-+ *
-+ * Must be called from a cpus_read_lock() protected region
-  */
- static struct padata_instance *padata_alloc(struct workqueue_struct *wq,
- 					    const struct cpumask *pcpumask,
-@@ -952,7 +954,6 @@ static struct padata_instance *padata_al
- 	if (!pinst)
- 		goto err;
- 
--	get_online_cpus();
- 	if (!alloc_cpumask_var(&pinst->cpumask.pcpu, GFP_KERNEL))
- 		goto err_free_inst;
- 	if (!alloc_cpumask_var(&pinst->cpumask.cbcpu, GFP_KERNEL)) {
-@@ -976,14 +977,12 @@ static struct padata_instance *padata_al
- 
- 	pinst->flags = 0;
- 
--	put_online_cpus();
--
- 	BLOCKING_INIT_NOTIFIER_HEAD(&pinst->cpumask_change_notifier);
- 	kobject_init(&pinst->kobj, &padata_attr_type);
- 	mutex_init(&pinst->lock);
- 
- #ifdef CONFIG_HOTPLUG_CPU
--	cpuhp_state_add_instance_nocalls(hp_online, &pinst->node);
-+	cpuhp_state_add_instance_nocalls_cpuslocked(hp_online, &pinst->node);
- #endif
- 	return pinst;
- 
-@@ -992,7 +991,6 @@ static struct padata_instance *padata_al
- 	free_cpumask_var(pinst->cpumask.cbcpu);
- err_free_inst:
- 	kfree(pinst);
--	put_online_cpus();
- err:
- 	return NULL;
- }
-@@ -1003,9 +1001,12 @@ static struct padata_instance *padata_al
-  *                         parallel workers.
-  *
-  * @wq: workqueue to use for the allocated padata instance
-+ *
-+ * Must be called from a cpus_read_lock() protected region
-  */
- struct padata_instance *padata_alloc_possible(struct workqueue_struct *wq)
- {
-+	lockdep_assert_cpus_held();
- 	return padata_alloc(wq, cpu_possible_mask, cpu_possible_mask);
- }
- EXPORT_SYMBOL(padata_alloc_possible);
+> 
+> Signed-off-by: Derek Robson <robsonde@gmail.com>
+> ---
+>  drivers/staging/ccree/ssi_sysfs.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/staging/ccree/ssi_sysfs.h b/drivers/staging/ccree/ssi_sysfs.h
+> index cd456c5dccc4..4893e014adf7 100644
+> --- a/drivers/staging/ccree/ssi_sysfs.h
+> +++ b/drivers/staging/ccree/ssi_sysfs.h
+> @@ -15,7 +15,7 @@
+>   */
+>  
+>  /* \file ssi_sysfs.h
+> -   ARM CryptoCell sysfs APIs
+> + * ARM CryptoCell sysfs APIs
+>   */
+>  
+>  #ifndef __SSI_SYSFS_H__
+> -- 
+> 2.12.2
+> 
+> _______________________________________________
+> devel mailing list
+> devel@linuxdriverproject.org
+> http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel
