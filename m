@@ -1,7 +1,7 @@
 From: Antoine Tenart <antoine.tenart@free-electrons.com>
-Subject: [PATCH 01/11] crypto: sun4i-ss: group variable definitions in sun4i_hash()
-Date: Wed, 24 May 2017 21:06:42 +0200
-Message-ID: <20170524190652.13278-2-antoine.tenart@free-electrons.com>
+Subject: [PATCH 06/11] crypto: sun4i-ss: simplify the pad length calculation
+Date: Wed, 24 May 2017 21:06:47 +0200
+Message-ID: <20170524190652.13278-7-antoine.tenart@free-electrons.com>
 References: <20170524190652.13278-1-antoine.tenart@free-electrons.com>
 Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
         linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
@@ -9,75 +9,87 @@ To: herbert@gondor.apana.org.au, davem@davemloft.net,
         maxime.ripard@free-electrons.com, wens@csie.org,
         clabbe.montjoie@gmail.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:50287 "EHLO
+Received: from mail.free-electrons.com ([62.4.15.54]:50327 "EHLO
         mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933862AbdEXV1R (ORCPT
+        with ESMTP id S937734AbdEXV1V (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 May 2017 17:27:17 -0400
+        Wed, 24 May 2017 17:27:21 -0400
 In-Reply-To: <20170524190652.13278-1-antoine.tenart@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Cosmetic change to avoid having a full screen a variable definitions. It
-also helps to see which variables share the same type.
+When sending the last block of data to the engine, it should be padded
+so that the total length of the request can be given to the engine as
+the last 2 words of the last 64 bytes block.
+
+Simplify the calculation of this pad offset.
 
 Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
 ---
- drivers/crypto/sunxi-ss/sun4i-ss-hash.c | 31 +++++++++++--------------------
- 1 file changed, 11 insertions(+), 20 deletions(-)
+ drivers/crypto/sunxi-ss/sun4i-ss-hash.c | 29 ++++++++++++-----------------
+ 1 file changed, 12 insertions(+), 17 deletions(-)
 
 diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-hash.c b/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
-index 0de2f62d51ff..855325338844 100644
+index 518bc7a7df6a..59d9b4412aca 100644
 --- a/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
 +++ b/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
-@@ -167,37 +167,28 @@ int sun4i_hash_import_sha1(struct ahash_request *areq, const void *in)
-  */
- static int sun4i_hash(struct ahash_request *areq)
- {
--	u32 v, ivmode = 0;
--	unsigned int i = 0;
- 	/*
- 	 * i is the total bytes read from SGs, to be compared to areq->nbytes
- 	 * i is important because we cannot rely on SG length since the sum of
- 	 * SG->length could be greater than areq->nbytes
-+	 *
-+	 * end is the position when we need to stop writing to the device,
-+	 * to be compared to i
-+	 *
-+	 * in_i: advancement in the current SG
+@@ -177,7 +177,7 @@ static int sun4i_hash(struct ahash_request *areq)
+ 	 *
+ 	 * in_i: advancement in the current SG
  	 */
--
-+	unsigned int i = 0, end, index, padlen, nwait, nbw = 0, j = 0, todo;
-+	unsigned int in_i = 0;
-+	u32 spaces, rx_cnt = SS_RX_DEFAULT, bf[32], wb = 0, v, ivmode = 0;
+-	unsigned int i = 0, end, index, padlen, nwait, nbw = 0, j = 0, todo;
++	unsigned int i = 0, end, fill, min_fill, nwait, nbw = 0, j = 0, todo;
+ 	unsigned int in_i = 0;
+ 	u32 spaces, rx_cnt = SS_RX_DEFAULT, bf[32] = {0}, wb = 0, v, ivmode = 0;
  	struct sun4i_req_ctx *op = ahash_request_ctx(areq);
- 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
- 	struct sun4i_tfm_ctx *tfmctx = crypto_ahash_ctx(tfm);
+@@ -186,7 +186,7 @@ static int sun4i_hash(struct ahash_request *areq)
  	struct sun4i_ss_ctx *ss = tfmctx->ss;
--	unsigned int in_i = 0; /* advancement in the current SG */
--	unsigned int end;
--	/*
--	 * end is the position when we need to stop writing to the device,
--	 * to be compared to i
--	 */
--	int in_r, err = 0;
--	unsigned int todo;
--	u32 spaces, rx_cnt = SS_RX_DEFAULT;
--	size_t copied = 0;
-+	struct scatterlist *in_sg = areq->src;
+ 	struct scatterlist *in_sg = areq->src;
  	struct sg_mapping_iter mi;
--	unsigned int j = 0;
--	int zeros;
--	unsigned int index, padlen;
-+	int in_r, err = 0, zeros;
-+	size_t copied = 0;
- 	__be64 bits;
--	u32 bf[32];
--	u32 wb = 0;
--	unsigned int nwait, nbw = 0;
--	struct scatterlist *in_sg = areq->src;
+-	int in_r, err = 0, zeros;
++	int in_r, err = 0;
+ 	size_t copied = 0;
  
  	dev_dbg(ss->dev, "%s %s bc=%llu len=%u mode=%x wl=%u h0=%0x",
- 		__func__, crypto_tfm_alg_name(areq->base.tfm),
+@@ -387,6 +387,8 @@ static int sun4i_hash(struct ahash_request *areq)
+ 		nbw = op->len - 4 * nwait;
+ 		wb = *(u32 *)(op->buf + nwait * 4);
+ 		wb &= (0xFFFFFFFF >> (4 - nbw) * 8);
++
++		op->byte_count += nbw;
+ 	}
+ 
+ 	/* write the remaining bytes of the nbw buffer */
+@@ -402,22 +404,15 @@ static int sun4i_hash(struct ahash_request *areq)
+ 	 * I take the operations from other MD5/SHA1 implementations
+ 	 */
+ 
+-	/* we have already send 4 more byte of which nbw data */
+-	if (op->mode == SS_OP_MD5) {
+-		index = (op->byte_count + 4) & 0x3f;
+-		op->byte_count += nbw;
+-		if (index > 56)
+-			zeros = (120 - index) / 4;
+-		else
+-			zeros = (56 - index) / 4;
+-	} else {
+-		op->byte_count += nbw;
+-		index = op->byte_count & 0x3f;
+-		padlen = (index < 56) ? (56 - index) : ((64 + 56) - index);
+-		zeros = (padlen - 1) / 4;
+-	}
++	/* last block size */
++	fill = 64 - (op->byte_count % 64);
++	min_fill = 2 * sizeof(u32) + (nbw ? 0 : sizeof(u32));
++
++	/* if we can't fill all data, jump to the next 64 block */
++	if (fill < min_fill)
++		fill += 64;
+ 
+-	j += zeros;
++	j += (fill - min_fill) / sizeof(u32);
+ 
+ 	/* write the length of data */
+ 	if (op->mode == SS_OP_SHA1) {
 -- 
 2.9.4
