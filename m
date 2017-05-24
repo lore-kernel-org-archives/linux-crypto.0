@@ -1,7 +1,7 @@
 From: Tero Kristo <t-kristo@ti.com>
-Subject: [PATCH 09/13] crypto: omap-aes: export some AES driver functionality locally
-Date: Wed, 24 May 2017 10:35:30 +0300
-Message-ID: <1495611334-15039-10-git-send-email-t-kristo@ti.com>
+Subject: [PATCH 11/13] crypto: omap-sham: buffer handling fixes for hashing later
+Date: Wed, 24 May 2017 10:35:32 +0300
+Message-ID: <1495611334-15039-12-git-send-email-t-kristo@ti.com>
 References: <1495611334-15039-1-git-send-email-t-kristo@ti.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -9,96 +9,73 @@ Cc: <linux-omap@vger.kernel.org>
 To: <herbert@gondor.apana.org.au>, <lokeshvutla@ti.com>,
         <davem@davemloft.net>, <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from lelnx193.ext.ti.com ([198.47.27.77]:51589 "EHLO
+Received: from lelnx193.ext.ti.com ([198.47.27.77]:51597 "EHLO
         lelnx193.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S966650AbdEXHgT (ORCPT
+        with ESMTP id S966684AbdEXHgZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 May 2017 03:36:19 -0400
+        Wed, 24 May 2017 03:36:25 -0400
 In-Reply-To: <1495611334-15039-1-git-send-email-t-kristo@ti.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-These are going to be required by the addition of the GCM support.
+Currently, the hash later code only handles the cases when we have
+either new data coming in with the request or old data in the buffer,
+but not the combination when we have both. Fix this by changing the
+ordering of the code a bit and handling both cases properly
+simultaneously if needed. Also, fix an issue with omap_sham_update
+that surfaces with this fix, so that the code checks the bufcnt
+instead of total data amount against buffer length to avoid any
+buffer overflows.
 
 Signed-off-by: Tero Kristo <t-kristo@ti.com>
 ---
- drivers/crypto/omap-aes.c | 12 ++++++------
- drivers/crypto/omap-aes.h |  7 +++++++
- 2 files changed, 13 insertions(+), 6 deletions(-)
+ drivers/crypto/omap-sham.c | 22 ++++++++++++++--------
+ 1 file changed, 14 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index cf7968c..bf3b27d 100644
---- a/drivers/crypto/omap-aes.c
-+++ b/drivers/crypto/omap-aes.c
-@@ -55,7 +55,7 @@
- 	_read_ret;						\
- })
- #else
--static inline u32 omap_aes_read(struct omap_aes_dev *dd, u32 offset)
-+inline u32 omap_aes_read(struct omap_aes_dev *dd, u32 offset)
- {
- 	return __raw_readl(dd->io_base + offset);
- }
-@@ -69,7 +69,7 @@ static inline u32 omap_aes_read(struct omap_aes_dev *dd, u32 offset)
- 		__raw_writel(value, dd->io_base + offset);		\
- 	} while (0)
- #else
--static inline void omap_aes_write(struct omap_aes_dev *dd, u32 offset,
-+inline void omap_aes_write(struct omap_aes_dev *dd, u32 offset,
- 				  u32 value)
- {
- 	__raw_writel(value, dd->io_base + offset);
-@@ -112,7 +112,7 @@ static int omap_aes_hw_init(struct omap_aes_dev *dd)
- 	return 0;
- }
+diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+index d0b16e5..c65b49b 100644
+--- a/drivers/crypto/omap-sham.c
++++ b/drivers/crypto/omap-sham.c
+@@ -873,14 +873,21 @@ static int omap_sham_prepare_request(struct ahash_request *req, bool update)
+ 	}
  
--static int omap_aes_write_ctrl(struct omap_aes_dev *dd)
-+int omap_aes_write_ctrl(struct omap_aes_dev *dd)
- {
- 	unsigned int key32;
- 	int i, err;
-@@ -183,7 +183,7 @@ static void omap_aes_dma_stop(struct omap_aes_dev *dd)
- 	omap_aes_write_mask(dd, AES_REG_MASK(dd), 0, mask);
- }
- 
--static struct omap_aes_dev *omap_aes_find_dev(struct omap_aes_reqctx *rctx)
-+struct omap_aes_dev *omap_aes_find_dev(struct omap_aes_reqctx *rctx)
- {
- 	struct omap_aes_dev *dd;
- 
-@@ -321,7 +321,7 @@ static int omap_aes_crypt_dma(struct omap_aes_dev *dd,
- 	return 0;
- }
- 
--static int omap_aes_crypt_dma_start(struct omap_aes_dev *dd)
-+int omap_aes_crypt_dma_start(struct omap_aes_dev *dd)
- {
- 	int err;
- 
-@@ -366,7 +366,7 @@ static void omap_aes_finish_req(struct omap_aes_dev *dd, int err)
- 	pm_runtime_put_autosuspend(dd->dev);
- }
- 
--static int omap_aes_crypt_dma_stop(struct omap_aes_dev *dd)
-+int omap_aes_crypt_dma_stop(struct omap_aes_dev *dd)
- {
- 	pr_debug("total: %d\n", dd->total);
- 
-diff --git a/drivers/crypto/omap-aes.h b/drivers/crypto/omap-aes.h
-index ce4346e..11e1784 100644
---- a/drivers/crypto/omap-aes.h
-+++ b/drivers/crypto/omap-aes.h
-@@ -164,4 +164,11 @@ struct omap_aes_dev {
- 	const struct omap_aes_pdata	*pdata;
- };
- 
-+u32 omap_aes_read(struct omap_aes_dev *dd, u32 offset);
-+void omap_aes_write(struct omap_aes_dev *dd, u32 offset, u32 value);
-+struct omap_aes_dev *omap_aes_find_dev(struct omap_aes_reqctx *rctx);
-+int omap_aes_write_ctrl(struct omap_aes_dev *dd);
-+int omap_aes_crypt_dma_start(struct omap_aes_dev *dd);
-+int omap_aes_crypt_dma_stop(struct omap_aes_dev *dd);
+ 	if (hash_later) {
+-		if (req->nbytes) {
+-			scatterwalk_map_and_copy(rctx->buffer, req->src,
+-						 req->nbytes - hash_later,
+-						 hash_later, 0);
+-		} else {
++		int offset = 0;
 +
- #endif
++		if (hash_later > req->nbytes) {
+ 			memcpy(rctx->buffer, rctx->buffer + xmit_len,
+-			       hash_later);
++			       hash_later - req->nbytes);
++			offset = hash_later - req->nbytes;
+ 		}
++
++		if (req->nbytes) {
++			scatterwalk_map_and_copy(rctx->buffer + offset,
++						 req->src,
++						 offset + req->nbytes -
++						 hash_later, hash_later, 0);
++		}
++
+ 		rctx->bufcnt = hash_later;
+ 	} else {
+ 		rctx->bufcnt = 0;
+@@ -1189,11 +1196,10 @@ static int omap_sham_update(struct ahash_request *req)
+ 	if (!req->nbytes)
+ 		return 0;
+ 
+-	if (ctx->total + req->nbytes < ctx->buflen) {
++	if (ctx->bufcnt + req->nbytes <= ctx->buflen) {
+ 		scatterwalk_map_and_copy(ctx->buffer + ctx->bufcnt, req->src,
+ 					 0, req->nbytes, 0);
+ 		ctx->bufcnt += req->nbytes;
+-		ctx->total += req->nbytes;
+ 		return 0;
+ 	}
+ 
 -- 
 1.9.1
