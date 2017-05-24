@@ -1,60 +1,52 @@
 From: Antoine Tenart <antoine.tenart@free-electrons.com>
-Subject: [PATCH 00/11] ARM: sun5i: cryptographic engine support
-Date: Wed, 24 May 2017 21:06:41 +0200
-Message-ID: <20170524190652.13278-1-antoine.tenart@free-electrons.com>
+Subject: [PATCH 08/11] crypto: sun4i-ss: use GENMASK to generate masks
+Date: Wed, 24 May 2017 21:06:49 +0200
+Message-ID: <20170524190652.13278-9-antoine.tenart@free-electrons.com>
+References: <20170524190652.13278-1-antoine.tenart@free-electrons.com>
 Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
         linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 To: herbert@gondor.apana.org.au, davem@davemloft.net,
         maxime.ripard@free-electrons.com, wens@csie.org,
         clabbe.montjoie@gmail.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:50312 "EHLO
+Received: from mail.free-electrons.com ([62.4.15.54]:50317 "EHLO
         mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S937716AbdEXV1X (ORCPT
+        with ESMTP id S941006AbdEXV1W (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 May 2017 17:27:23 -0400
+        Wed, 24 May 2017 17:27:22 -0400
+In-Reply-To: <20170524190652.13278-1-antoine.tenart@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello all,
+Use the GENMASK helper instead of custom calculations to generate masks,
+It also helps the readability.
 
-This series adds the cryptographic engine support to sun5i SoCs. This is
-based on top of v4.12-rc1 and was tested on a CHIP. The series begins
-with fixes and improvements. The series is available at:
-https://github.com/atenart/linux v4.12-rc1/sun5i-crypto
+Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
+---
+ drivers/crypto/sunxi-ss/sun4i-ss-hash.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-The 8 first patches are reworks and cosmetic improvements.
-
-Patch 9 moves the cipher part of the sun4i-ss driver from the ablkcipher
-API to the newer skcipher API.
-
-Patch 10 fixes the crypto framework selftests on the CHIP. It might fix
-other users too.
-
-Patch 11 adds a cryptographic engine node for sun5i SoCs.
-
-Thanks,
-Antoine
-
-Antoine Tenart (11):
-  crypto: sun4i-ss: group variable definitions in sun4i_hash()
-  crypto: sun4i-ss: remove conditional checks against 0
-  crypto: sun4i-ss: use lower/upper_32_bits helpers
-  crypto: sun4i-ss: cannot use DMA is the request is 0 length
-  crypto: sun4i-ss: do not dynamically set parts of the last buffer to 0
-  crypto: sun4i-ss: simplify the pad length calculation
-  crypto: sun4i-ss: simplify the appended bit assignment
-  crypto: sun4i-ss: use GENMASK to generate masks
-  crypto: sun4i-ss: move from ablkcipher to skcipher API
-  crypto: sun4i-ss: fix large block size support
-  ARM: sun5i: add a cryptographic engine node
-
- arch/arm/boot/dts/sun5i.dtsi              |   8 +
- drivers/crypto/sunxi-ss/sun4i-ss-cipher.c | 213 ++++++++++++++-------------
- drivers/crypto/sunxi-ss/sun4i-ss-core.c   | 237 +++++++++++++++---------------
- drivers/crypto/sunxi-ss/sun4i-ss-hash.c   | 138 ++++++++---------
- drivers/crypto/sunxi-ss/sun4i-ss.h        |  34 +++--
- 5 files changed, 321 insertions(+), 309 deletions(-)
-
+diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-hash.c b/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
+index 0c2efc88bc0a..685de5b6ab17 100644
+--- a/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
++++ b/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
+@@ -384,11 +384,14 @@ static int sun4i_hash(struct ahash_request *areq)
+ 			writesl(ss->base + SS_RXFIFO, op->buf, nwait);
+ 			op->byte_count += 4 * nwait;
+ 		}
++
+ 		nbw = op->len - 4 * nwait;
+-		wb = *(u32 *)(op->buf + nwait * 4);
+-		wb &= (0xFFFFFFFF >> (4 - nbw) * 8);
++		if (nbw) {
++			wb = *(u32 *)(op->buf + nwait * 4);
++			wb &= GENMASK((nbw * 8) - 1, 0);
+ 
+-		op->byte_count += nbw;
++			op->byte_count += nbw;
++		}
+ 	}
+ 
+ 	/* write the remaining bytes of the nbw buffer */
 -- 
 2.9.4
