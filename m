@@ -1,7 +1,7 @@
 From: Derek Robson <robsonde@gmail.com>
-Subject: [PATCH 09/27] Drivers: ccree: ssi_hash.h - align block comments
-Date: Wed, 24 May 2017 16:43:11 +1200
-Message-ID: <20170524044311.30283-1-robsonde@gmail.com>
+Subject: [PATCH 10/27] Drivers: ccree: ssi_hash.c - align block comments
+Date: Wed, 24 May 2017 16:43:26 +1200
+Message-ID: <20170524044326.30330-1-robsonde@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
@@ -27,21 +27,42 @@ Found using checkpatch
 
 Signed-off-by: Derek Robson <robsonde@gmail.com>
 ---
- drivers/staging/ccree/ssi_hash.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/staging/ccree/ssi_hash.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/staging/ccree/ssi_hash.h b/drivers/staging/ccree/ssi_hash.h
-index b821d0c854b5..7c946614a1f9 100644
---- a/drivers/staging/ccree/ssi_hash.h
-+++ b/drivers/staging/ccree/ssi_hash.h
-@@ -15,7 +15,7 @@
-  */
+diff --git a/drivers/staging/ccree/ssi_hash.c b/drivers/staging/ccree/ssi_hash.c
+index 162d17dee2cd..11b5eae1c55e 100644
+--- a/drivers/staging/ccree/ssi_hash.c
++++ b/drivers/staging/ccree/ssi_hash.c
+@@ -97,7 +97,8 @@ struct hash_key_req_ctx {
+ struct ssi_hash_ctx {
+ 	struct ssi_drvdata *drvdata;
+ 	/* holds the origin digest; the digest after "setkey" if HMAC,*
+-	   the initial digest if HASH. */
++	 * the initial digest if HASH.
++	 */
+ 	u8 digest_buff[SSI_MAX_HASH_DIGEST_SIZE]  ____cacheline_aligned;
+ 	u8 opad_tmp_keys_buff[SSI_MAX_HASH_OPAD_TMP_KEYS_SIZE]  ____cacheline_aligned;
+ 	dma_addr_t opad_tmp_keys_dma_addr  ____cacheline_aligned;
+@@ -250,7 +251,8 @@ static int ssi_hash_map_request(struct device *dev,
+ 		}
+ 	} else { /*hash*/
+ 		/* Copy the initial digests if hash flow. The SRAM contains the
+-		initial digests in the expected order for all SHA* */
++		 * initial digests in the expected order for all SHA*
++		 */
+ 		HW_DESC_INIT(&desc);
+ 		HW_DESC_SET_DIN_SRAM(&desc, larval_digest_addr, ctx->inter_digestsize);
+ 		HW_DESC_SET_DOUT_DLLI(&desc, state->digest_buff_dma_addr, ctx->inter_digestsize, NS_BIT, 0);
+@@ -1027,7 +1029,8 @@ static int ssi_hash_setkey(void *hash,
+ 					ctx->drvdata, ctx->hash_mode);
  
- /* \file ssi_hash.h
--   ARM CryptoCell Hash Crypto API
-+ * ARM CryptoCell Hash Crypto API
-  */
- 
- #ifndef __SSI_HASH_H__
+ 	/* The keylen value distinguishes HASH in case keylen is ZERO bytes,
+-	   any NON-ZERO value utilizes HMAC flow */
++	 * any NON-ZERO value utilizes HMAC flow
++	 */
+ 	ctx->key_params.keylen = keylen;
+ 	ctx->key_params.key_dma_addr = 0;
+ 	ctx->is_hmac = true;
 -- 
 2.12.2
