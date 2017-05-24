@@ -1,7 +1,7 @@
 From: Tero Kristo <t-kristo@ti.com>
-Subject: [PATCH 06/13] crypto: omap-des: use base omap crypto support library
-Date: Wed, 24 May 2017 10:35:27 +0300
-Message-ID: <1495611334-15039-7-git-send-email-t-kristo@ti.com>
+Subject: [PATCH 09/13] crypto: omap-aes: export some AES driver functionality locally
+Date: Wed, 24 May 2017 10:35:30 +0300
+Message-ID: <1495611334-15039-10-git-send-email-t-kristo@ti.com>
 References: <1495611334-15039-1-git-send-email-t-kristo@ti.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -9,210 +9,96 @@ Cc: <linux-omap@vger.kernel.org>
 To: <herbert@gondor.apana.org.au>, <lokeshvutla@ti.com>,
         <davem@davemloft.net>, <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from fllnx210.ext.ti.com ([198.47.19.17]:52363 "EHLO
-        fllnx210.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S966650AbdEXHgK (ORCPT
+Received: from lelnx193.ext.ti.com ([198.47.27.77]:51589 "EHLO
+        lelnx193.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S966650AbdEXHgT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 May 2017 03:36:10 -0400
+        Wed, 24 May 2017 03:36:19 -0400
 In-Reply-To: <1495611334-15039-1-git-send-email-t-kristo@ti.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Use the SG alignment APIs from the OMAP crypto support library instead
-of using own implementations. This reduces the amount of copy-paste
-code.
+These are going to be required by the addition of the GCM support.
 
 Signed-off-by: Tero Kristo <t-kristo@ti.com>
 ---
- drivers/crypto/omap-des.c | 112 ++++++++++++----------------------------------
- 1 file changed, 28 insertions(+), 84 deletions(-)
+ drivers/crypto/omap-aes.c | 12 ++++++------
+ drivers/crypto/omap-aes.h |  7 +++++++
+ 2 files changed, 13 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/crypto/omap-des.c b/drivers/crypto/omap-des.c
-index 3783dcf..0bcab00 100644
---- a/drivers/crypto/omap-des.c
-+++ b/drivers/crypto/omap-des.c
-@@ -41,6 +41,8 @@
- #include <crypto/algapi.h>
- #include <crypto/engine.h>
- 
-+#include "omap-crypto.h"
-+
- #define DST_MAXBURST			2
- 
- #define DES_BLOCK_WORDS		(DES_BLOCK_SIZE >> 2)
-@@ -80,6 +82,9 @@
- 
- #define DEFAULT_AUTOSUSPEND_DELAY	1000
- 
-+#define FLAGS_IN_DATA_ST_SHIFT	8
-+#define FLAGS_OUT_DATA_ST_SHIFT	10
-+
- struct omap_des_ctx {
- 	struct omap_des_dev *dd;
- 
-@@ -153,7 +158,6 @@ struct omap_des_dev {
- 	struct scatterlist		in_sgl;
- 	struct scatterlist		out_sgl;
- 	struct scatterlist		*orig_out;
--	int				sgs_copied;
- 
- 	struct scatter_walk		in_walk;
- 	struct scatter_walk		out_walk;
-@@ -372,20 +376,6 @@ static void omap_des_dma_cleanup(struct omap_des_dev *dd)
- 	dma_release_channel(dd->dma_lch_in);
+diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
+index cf7968c..bf3b27d 100644
+--- a/drivers/crypto/omap-aes.c
++++ b/drivers/crypto/omap-aes.c
+@@ -55,7 +55,7 @@
+ 	_read_ret;						\
+ })
+ #else
+-static inline u32 omap_aes_read(struct omap_aes_dev *dd, u32 offset)
++inline u32 omap_aes_read(struct omap_aes_dev *dd, u32 offset)
+ {
+ 	return __raw_readl(dd->io_base + offset);
  }
- 
--static void sg_copy_buf(void *buf, struct scatterlist *sg,
--			      unsigned int start, unsigned int nbytes, int out)
--{
--	struct scatter_walk walk;
--
--	if (!nbytes)
--		return;
--
--	scatterwalk_start(&walk, sg);
--	scatterwalk_advance(&walk, start);
--	scatterwalk_copychunks(buf, &walk, nbytes, out);
--	scatterwalk_done(&walk, out, 0);
--}
--
- static int omap_des_crypt_dma(struct crypto_tfm *tfm,
- 		struct scatterlist *in_sg, struct scatterlist *out_sg,
- 		int in_sg_len, int out_sg_len)
-@@ -526,55 +516,6 @@ static int omap_des_crypt_dma_stop(struct omap_des_dev *dd)
+@@ -69,7 +69,7 @@ static inline u32 omap_aes_read(struct omap_aes_dev *dd, u32 offset)
+ 		__raw_writel(value, dd->io_base + offset);		\
+ 	} while (0)
+ #else
+-static inline void omap_aes_write(struct omap_aes_dev *dd, u32 offset,
++inline void omap_aes_write(struct omap_aes_dev *dd, u32 offset,
+ 				  u32 value)
+ {
+ 	__raw_writel(value, dd->io_base + offset);
+@@ -112,7 +112,7 @@ static int omap_aes_hw_init(struct omap_aes_dev *dd)
  	return 0;
  }
  
--static int omap_des_copy_needed(struct scatterlist *sg)
--{
--	while (sg) {
--		if (!IS_ALIGNED(sg->offset, 4))
--			return -1;
--		if (!IS_ALIGNED(sg->length, DES_BLOCK_SIZE))
--			return -1;
--		sg = sg_next(sg);
--	}
--	return 0;
--}
--
--static int omap_des_copy_sgs(struct omap_des_dev *dd)
--{
--	void *buf_in, *buf_out;
--	int pages;
--
--	pages = dd->total >> PAGE_SHIFT;
--
--	if (dd->total & (PAGE_SIZE-1))
--		pages++;
--
--	BUG_ON(!pages);
--
--	buf_in = (void *)__get_free_pages(GFP_ATOMIC, pages);
--	buf_out = (void *)__get_free_pages(GFP_ATOMIC, pages);
--
--	if (!buf_in || !buf_out) {
--		pr_err("Couldn't allocated pages for unaligned cases.\n");
--		return -1;
--	}
--
--	dd->orig_out = dd->out_sg;
--
--	sg_copy_buf(buf_in, dd->in_sg, 0, dd->total, 0);
--
--	sg_init_table(&dd->in_sgl, 1);
--	sg_set_buf(&dd->in_sgl, buf_in, dd->total);
--	dd->in_sg = &dd->in_sgl;
--	dd->in_sg_len = 1;
--
--	sg_init_table(&dd->out_sgl, 1);
--	sg_set_buf(&dd->out_sgl, buf_out, dd->total);
--	dd->out_sg = &dd->out_sgl;
--	dd->out_sg_len = 1;
--
--	return 0;
--}
--
- static int omap_des_handle_queue(struct omap_des_dev *dd,
- 				 struct ablkcipher_request *req)
+-static int omap_aes_write_ctrl(struct omap_aes_dev *dd)
++int omap_aes_write_ctrl(struct omap_aes_dev *dd)
  {
-@@ -591,6 +532,8 @@ static int omap_des_prepare_req(struct crypto_engine *engine,
- 			crypto_ablkcipher_reqtfm(req));
- 	struct omap_des_dev *dd = omap_des_find_dev(ctx);
- 	struct omap_des_reqctx *rctx;
-+	int ret;
-+	u16 flags;
+ 	unsigned int key32;
+ 	int i, err;
+@@ -183,7 +183,7 @@ static void omap_aes_dma_stop(struct omap_aes_dev *dd)
+ 	omap_aes_write_mask(dd, AES_REG_MASK(dd), 0, mask);
+ }
  
- 	if (!dd)
- 		return -ENODEV;
-@@ -601,6 +544,23 @@ static int omap_des_prepare_req(struct crypto_engine *engine,
- 	dd->total_save = req->nbytes;
- 	dd->in_sg = req->src;
- 	dd->out_sg = req->dst;
-+	dd->orig_out = req->dst;
-+
-+	flags = OMAP_CRYPTO_COPY_DATA;
-+	if (req->src == req->dst)
-+		flags |= OMAP_CRYPTO_FORCE_COPY;
-+
-+	ret = omap_crypto_align_sg(&dd->in_sg, dd->total, DES_BLOCK_SIZE,
-+				   &dd->in_sgl, flags,
-+				   FLAGS_IN_DATA_ST_SHIFT, &dd->flags);
-+	if (ret)
-+		return ret;
-+
-+	ret = omap_crypto_align_sg(&dd->out_sg, dd->total, DES_BLOCK_SIZE,
-+				   &dd->out_sgl, 0,
-+				   FLAGS_OUT_DATA_ST_SHIFT, &dd->flags);
-+	if (ret)
-+		return ret;
- 
- 	dd->in_sg_len = sg_nents_for_len(dd->in_sg, dd->total);
- 	if (dd->in_sg_len < 0)
-@@ -610,15 +570,6 @@ static int omap_des_prepare_req(struct crypto_engine *engine,
- 	if (dd->out_sg_len < 0)
- 		return dd->out_sg_len;
- 
--	if (omap_des_copy_needed(dd->in_sg) ||
--	    omap_des_copy_needed(dd->out_sg)) {
--		if (omap_des_copy_sgs(dd))
--			pr_err("Failed to copy SGs for unaligned cases\n");
--		dd->sgs_copied = 1;
--	} else {
--		dd->sgs_copied = 0;
--	}
--
- 	rctx = ablkcipher_request_ctx(req);
- 	ctx = crypto_ablkcipher_ctx(crypto_ablkcipher_reqtfm(req));
- 	rctx->mode &= FLAGS_MODE_MASK;
-@@ -646,8 +597,6 @@ static int omap_des_crypt_req(struct crypto_engine *engine,
- static void omap_des_done_task(unsigned long data)
+-static struct omap_aes_dev *omap_aes_find_dev(struct omap_aes_reqctx *rctx)
++struct omap_aes_dev *omap_aes_find_dev(struct omap_aes_reqctx *rctx)
  {
- 	struct omap_des_dev *dd = (struct omap_des_dev *)data;
--	void *buf_in, *buf_out;
--	int pages;
+ 	struct omap_aes_dev *dd;
  
- 	pr_debug("enter done_task\n");
+@@ -321,7 +321,7 @@ static int omap_aes_crypt_dma(struct omap_aes_dev *dd,
+ 	return 0;
+ }
  
-@@ -660,16 +609,11 @@ static void omap_des_done_task(unsigned long data)
- 		omap_des_crypt_dma_stop(dd);
- 	}
+-static int omap_aes_crypt_dma_start(struct omap_aes_dev *dd)
++int omap_aes_crypt_dma_start(struct omap_aes_dev *dd)
+ {
+ 	int err;
  
--	if (dd->sgs_copied) {
--		buf_in = sg_virt(&dd->in_sgl);
--		buf_out = sg_virt(&dd->out_sgl);
-+	omap_crypto_cleanup(&dd->in_sgl, NULL, 0, dd->total_save,
-+			    FLAGS_IN_DATA_ST_SHIFT, dd->flags);
+@@ -366,7 +366,7 @@ static void omap_aes_finish_req(struct omap_aes_dev *dd, int err)
+ 	pm_runtime_put_autosuspend(dd->dev);
+ }
  
--		sg_copy_buf(buf_out, dd->orig_out, 0, dd->total_save, 1);
--
--		pages = get_order(dd->total_save);
--		free_pages((unsigned long)buf_in, pages);
--		free_pages((unsigned long)buf_out, pages);
--	}
-+	omap_crypto_cleanup(&dd->out_sgl, dd->orig_out, 0, dd->total_save,
-+			    FLAGS_OUT_DATA_ST_SHIFT, dd->flags);
+-static int omap_aes_crypt_dma_stop(struct omap_aes_dev *dd)
++int omap_aes_crypt_dma_stop(struct omap_aes_dev *dd)
+ {
+ 	pr_debug("total: %d\n", dd->total);
  
- 	omap_des_finish_req(dd, 0);
+diff --git a/drivers/crypto/omap-aes.h b/drivers/crypto/omap-aes.h
+index ce4346e..11e1784 100644
+--- a/drivers/crypto/omap-aes.h
++++ b/drivers/crypto/omap-aes.h
+@@ -164,4 +164,11 @@ struct omap_aes_dev {
+ 	const struct omap_aes_pdata	*pdata;
+ };
  
++u32 omap_aes_read(struct omap_aes_dev *dd, u32 offset);
++void omap_aes_write(struct omap_aes_dev *dd, u32 offset, u32 value);
++struct omap_aes_dev *omap_aes_find_dev(struct omap_aes_reqctx *rctx);
++int omap_aes_write_ctrl(struct omap_aes_dev *dd);
++int omap_aes_crypt_dma_start(struct omap_aes_dev *dd);
++int omap_aes_crypt_dma_stop(struct omap_aes_dev *dd);
++
+ #endif
 -- 
 1.9.1
