@@ -1,7 +1,7 @@
 From: Tero Kristo <t-kristo@ti.com>
-Subject: [PATCH 01/13] crypto: omap-aes: drop unused flags attribute from omap_aes_ctx
-Date: Wed, 24 May 2017 10:35:22 +0300
-Message-ID: <1495611334-15039-2-git-send-email-t-kristo@ti.com>
+Subject: [PATCH 05/13] crypto: omap: add base support library for common routines
+Date: Wed, 24 May 2017 10:35:26 +0300
+Message-ID: <1495611334-15039-6-git-send-email-t-kristo@ti.com>
 References: <1495611334-15039-1-git-send-email-t-kristo@ti.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -9,33 +9,300 @@ Cc: <linux-omap@vger.kernel.org>
 To: <herbert@gondor.apana.org.au>, <lokeshvutla@ti.com>,
         <davem@davemloft.net>, <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from fllnx210.ext.ti.com ([198.47.19.17]:52352 "EHLO
-        fllnx210.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1758135AbdEXHf7 (ORCPT
+Received: from lelnx193.ext.ti.com ([198.47.27.77]:51578 "EHLO
+        lelnx193.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S966618AbdEXHgI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 May 2017 03:35:59 -0400
+        Wed, 24 May 2017 03:36:08 -0400
 In-Reply-To: <1495611334-15039-1-git-send-email-t-kristo@ti.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This is not used for anything, so drop it.
+This contains the generic APIs for aligning SG buffers.
 
 Signed-off-by: Tero Kristo <t-kristo@ti.com>
 ---
- drivers/crypto/omap-aes.c | 1 -
- 1 file changed, 1 deletion(-)
+ drivers/crypto/Kconfig       |  11 +++
+ drivers/crypto/Makefile      |   1 +
+ drivers/crypto/omap-crypto.c | 185 +++++++++++++++++++++++++++++++++++++++++++
+ drivers/crypto/omap-crypto.h |  37 +++++++++
+ 4 files changed, 234 insertions(+)
+ create mode 100644 drivers/crypto/omap-crypto.c
+ create mode 100644 drivers/crypto/omap-crypto.h
 
-diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index fe32dd9..ad6e2b3 100644
---- a/drivers/crypto/omap-aes.c
-+++ b/drivers/crypto/omap-aes.c
-@@ -105,7 +105,6 @@ struct omap_aes_ctx {
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index fb1e60f..64171ca 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -314,6 +314,15 @@ config HW_RANDOM_PPC4XX
+ 	 This option provides the kernel-side support for the TRNG hardware
+ 	 found in the security function of some PowerPC 4xx SoCs.
  
- 	int		keylen;
- 	u32		key[AES_KEYSIZE_256 / sizeof(u32)];
--	unsigned long	flags;
- 	struct crypto_skcipher	*fallback;
- };
++config CRYPTO_DEV_OMAP
++	tristate "Support for OMAP crypto HW accelerators"
++	depends on ARCH_OMAP2PLUS
++	help
++	  OMAP processors have various crypto HW accelerators. Select this if
++          you want to use the OMAP modules for any of the crypto algorithms.
++
++if CRYPTO_DEV_OMAP
++
+ config CRYPTO_DEV_OMAP_SHAM
+ 	tristate "Support for OMAP MD5/SHA1/SHA2 hw accelerator"
+ 	depends on ARCH_OMAP2PLUS
+@@ -351,6 +360,8 @@ config CRYPTO_DEV_OMAP_DES
+ 	  the ECB and CBC modes of operation are supported by the driver. Also
+ 	  accesses made on unaligned boundaries are supported.
  
++endif # CRYPTO_DEV_OMAP
++
+ config CRYPTO_DEV_PICOXCELL
+ 	tristate "Support for picoXcell IPSEC and Layer2 crypto engines"
+ 	depends on (ARCH_PICOXCELL || COMPILE_TEST) && HAVE_CLK
+diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
+index 463f335..8fd1151 100644
+--- a/drivers/crypto/Makefile
++++ b/drivers/crypto/Makefile
+@@ -20,6 +20,7 @@ obj-$(CONFIG_CRYPTO_DEV_MXC_SCC) += mxc-scc.o
+ obj-$(CONFIG_CRYPTO_DEV_NIAGARA2) += n2_crypto.o
+ n2_crypto-y := n2_core.o n2_asm.o
+ obj-$(CONFIG_CRYPTO_DEV_NX) += nx/
++obj-$(CONFIG_CRYPTO_DEV_OMAP) += omap-crypto.o
+ obj-$(CONFIG_CRYPTO_DEV_OMAP_AES) += omap-aes.o
+ obj-$(CONFIG_CRYPTO_DEV_OMAP_DES) += omap-des.o
+ obj-$(CONFIG_CRYPTO_DEV_OMAP_SHAM) += omap-sham.o
+diff --git a/drivers/crypto/omap-crypto.c b/drivers/crypto/omap-crypto.c
+new file mode 100644
+index 0000000..7267792
+--- /dev/null
++++ b/drivers/crypto/omap-crypto.c
+@@ -0,0 +1,184 @@
++/*
++ * OMAP Crypto driver common support routines.
++ *
++ * Copyright (c) 2017 Texas Instruments Incorporated
++ *   Tero Kristo <t-kristo@ti.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as published
++ * by the Free Software Foundation.
++ */
++
++#include <linux/module.h>
++#include <linux/kernel.h>
++#include <linux/scatterlist.h>
++#include <crypto/scatterwalk.h>
++
++#include "omap-crypto.h"
++
++static int omap_crypto_copy_sg_lists(int total, int bs,
++				     struct scatterlist **sg,
++				     struct scatterlist *new_sg, u16 flags)
++{
++	int n = sg_nents(*sg);
++	struct scatterlist *tmp;
++
++	if (!(flags & OMAP_CRYPTO_FORCE_SINGLE_ENTRY)) {
++		new_sg = kmalloc_array(n, sizeof(*sg), GFP_KERNEL);
++		if (!new_sg)
++			return -ENOMEM;
++
++		sg_init_table(new_sg, n);
++	}
++
++	tmp = new_sg;
++
++	while (*sg && total) {
++		int len = (*sg)->length;
++
++		if (total < len)
++			len = total;
++
++		if (len > 0) {
++			total -= len;
++			sg_set_page(tmp, sg_page(*sg), len, (*sg)->offset);
++			if (total <= 0)
++				sg_mark_end(tmp);
++			tmp = sg_next(tmp);
++		}
++
++		*sg = sg_next(*sg);
++	}
++
++	*sg = new_sg;
++
++	return 0;
++}
++
++static int omap_crypto_copy_sgs(int total, int bs, struct scatterlist **sg,
++				struct scatterlist *new_sg, u16 flags)
++{
++	void *buf;
++	int pages;
++	int new_len;
++
++	new_len = ALIGN(total, bs);
++	pages = get_order(new_len);
++
++	buf = (void *)__get_free_pages(GFP_ATOMIC, pages);
++	if (!buf) {
++		pr_err("%s: Couldn't allocate pages for unaligned cases.\n",
++		       __func__);
++		return -ENOMEM;
++	}
++
++	if (flags & OMAP_CRYPTO_COPY_DATA) {
++		scatterwalk_map_and_copy(buf, *sg, 0, total, 0);
++		if (flags & OMAP_CRYPTO_ZERO_BUF)
++			memset(buf + total, 0, new_len - total);
++	}
++
++	if (!(flags & OMAP_CRYPTO_FORCE_SINGLE_ENTRY))
++		sg_init_table(new_sg, 1);
++
++	sg_set_buf(new_sg, buf, new_len);
++
++	*sg = new_sg;
++
++	return 0;
++}
++
++static int omap_crypto_check_sg(struct scatterlist *sg, int total, int bs,
++				u16 flags)
++{
++	int len = 0;
++	int num_sg = 0;
++
++	if (!IS_ALIGNED(total, bs))
++		return OMAP_CRYPTO_NOT_ALIGNED;
++
++	while (sg) {
++		num_sg++;
++
++		if (!IS_ALIGNED(sg->offset, 4))
++			return OMAP_CRYPTO_NOT_ALIGNED;
++		if (!IS_ALIGNED(sg->length, bs))
++			return OMAP_CRYPTO_NOT_ALIGNED;
++
++		len += sg->length;
++		sg = sg_next(sg);
++
++		if (len >= total)
++			break;
++	}
++
++	if ((flags & OMAP_CRYPTO_FORCE_SINGLE_ENTRY) && num_sg > 1)
++		return OMAP_CRYPTO_NOT_ALIGNED;
++
++	if (len != total)
++		return OMAP_CRYPTO_BAD_DATA_LENGTH;
++
++	return 0;
++}
++
++int omap_crypto_align_sg(struct scatterlist **sg, int total, int bs,
++			 struct scatterlist *new_sg, u16 flags,
++			 u8 flags_shift, unsigned long *dd_flags)
++{
++	int ret;
++
++	*dd_flags &= ~(OMAP_CRYPTO_COPY_MASK << flags_shift);
++
++	if (flags & OMAP_CRYPTO_FORCE_COPY)
++		ret = OMAP_CRYPTO_NOT_ALIGNED;
++	else
++		ret = omap_crypto_check_sg(*sg, total, bs, flags);
++
++	if (ret == OMAP_CRYPTO_NOT_ALIGNED) {
++		ret = omap_crypto_copy_sgs(total, bs, sg, new_sg, flags);
++		if (ret)
++			return ret;
++		*dd_flags |= OMAP_CRYPTO_DATA_COPIED << flags_shift;
++	} else if (ret == OMAP_CRYPTO_BAD_DATA_LENGTH) {
++		ret = omap_crypto_copy_sg_lists(total, bs, sg, new_sg, flags);
++		if (ret)
++			return ret;
++		if (!(flags & OMAP_CRYPTO_FORCE_SINGLE_ENTRY))
++			*dd_flags |= OMAP_CRYPTO_SG_COPIED << flags_shift;
++	} else if (flags & OMAP_CRYPTO_FORCE_SINGLE_ENTRY) {
++		sg_set_buf(new_sg, sg_virt(*sg), (*sg)->length);
++	}
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(omap_crypto_align_sg);
++
++void omap_crypto_cleanup(struct scatterlist *sg, struct scatterlist *orig,
++			 int offset, int len, u8 flags_shift,
++			 unsigned long flags)
++{
++	void *buf;
++	int pages;
++
++	flags >>= flags_shift;
++	flags &= OMAP_CRYPTO_COPY_MASK;
++
++	if (!flags)
++		return;
++
++	buf = sg_virt(sg);
++	pages = get_order(len);
++
++	if (orig && (flags & OMAP_CRYPTO_COPY_MASK))
++		scatterwalk_map_and_copy(buf, orig, offset, len, 1);
++
++	if (flags & OMAP_CRYPTO_DATA_COPIED)
++		free_pages((unsigned long)buf, pages);
++	else if (flags & OMAP_CRYPTO_SG_COPIED)
++		kfree(sg);
++}
++EXPORT_SYMBOL_GPL(omap_crypto_cleanup);
++
++MODULE_DESCRIPTION("OMAP crypto support library.");
++MODULE_LICENSE("GPL v2");
++MODULE_AUTHOR("Tero Kristo <t-kristo@ti.com>");
+diff --git a/drivers/crypto/omap-crypto.h b/drivers/crypto/omap-crypto.h
+new file mode 100644
+index 0000000..36a230e
+--- /dev/null
++++ b/drivers/crypto/omap-crypto.h
+@@ -0,0 +1,37 @@
++/*
++ * OMAP Crypto driver common support routines.
++ *
++ * Copyright (c) 2017 Texas Instruments Incorporated
++ *   Tero Kristo <t-kristo@ti.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as published
++ * by the Free Software Foundation.
++ */
++
++#ifndef __CRYPTO_OMAP_CRYPTO_H
++#define __CRYPTO_OMAP_CRYPTO_H
++
++enum {
++	OMAP_CRYPTO_NOT_ALIGNED = 1,
++	OMAP_CRYPTO_BAD_DATA_LENGTH,
++};
++
++#define OMAP_CRYPTO_DATA_COPIED		BIT(0)
++#define OMAP_CRYPTO_SG_COPIED		BIT(1)
++
++#define OMAP_CRYPTO_COPY_MASK		0x3
++
++#define OMAP_CRYPTO_COPY_DATA		BIT(0)
++#define OMAP_CRYPTO_FORCE_COPY		BIT(1)
++#define OMAP_CRYPTO_ZERO_BUF		BIT(2)
++#define OMAP_CRYPTO_FORCE_SINGLE_ENTRY	BIT(3)
++
++int omap_crypto_align_sg(struct scatterlist **sg, int total, int bs,
++			 struct scatterlist *new_sg, u16 flags,
++			 u8 flags_shift, unsigned long *dd_flags);
++void omap_crypto_cleanup(struct scatterlist *sg, struct scatterlist *orig,
++			 int offset, int len, u8 flags_shift,
++			 unsigned long flags);
++
++#endif
 -- 
 1.9.1
