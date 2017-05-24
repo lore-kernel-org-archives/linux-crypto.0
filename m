@@ -1,8 +1,7 @@
 From: Derek Robson <robsonde@gmail.com>
-Subject: [PATCH 26/27] Drivers: ccree: cc_hw_queue_defs.h - align block
- comments
-Date: Wed, 24 May 2017 16:47:38 +1200
-Message-ID: <20170524044738.31070-1-robsonde@gmail.com>
+Subject: [PATCH 27/27] Drivers: ccree: cc_crypto_ctx.h - align block comments
+Date: Wed, 24 May 2017 16:47:53 +1200
+Message-ID: <20170524044753.31116-1-robsonde@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
@@ -28,142 +27,50 @@ Found using checkpatch
 
 Signed-off-by: Derek Robson <robsonde@gmail.com>
 ---
- drivers/staging/ccree/cc_hw_queue_defs.h | 32 ++++++++++++++++----------------
- 1 file changed, 16 insertions(+), 16 deletions(-)
+ drivers/staging/ccree/cc_crypto_ctx.h | 17 ++++++++++-------
+ 1 file changed, 10 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/staging/ccree/cc_hw_queue_defs.h b/drivers/staging/ccree/cc_hw_queue_defs.h
-index 71381760566d..bb64fddc371d 100644
---- a/drivers/staging/ccree/cc_hw_queue_defs.h
-+++ b/drivers/staging/ccree/cc_hw_queue_defs.h
-@@ -23,8 +23,8 @@
- #include "dx_crys_kernel.h"
+diff --git a/drivers/staging/ccree/cc_crypto_ctx.h b/drivers/staging/ccree/cc_crypto_ctx.h
+index 216d24791d5d..dcec9a649a84 100644
+--- a/drivers/staging/ccree/cc_crypto_ctx.h
++++ b/drivers/staging/ccree/cc_crypto_ctx.h
+@@ -219,7 +219,8 @@ struct drv_ctx_hash {
+ };
  
- /******************************************************************************
--*				DEFINITIONS
--******************************************************************************/
-+ *				DEFINITIONS
-+ ******************************************************************************/
+ /* !!!! drv_ctx_hmac should have the same structure as drv_ctx_hash except
+-   k0, k0_size fields */
++ *  k0, k0_size fields
++ */
+ struct drv_ctx_hmac {
+ 	enum drv_crypto_alg alg; /* DRV_CRYPTO_ALG_HMAC */
+ 	enum drv_hash_mode mode;
+@@ -240,9 +241,10 @@ struct drv_ctx_cipher {
+ 	u32 key_size; /* numeric value in bytes   */
+ 	u32 data_unit_size; /* required for XTS */
+ 	/* block_state is the AES engine block state.
+-	*  It is used by the host to pass IV or counter at initialization.
+-	*  It is used by SeP for intermediate block chaining state and for
+-	*  returning MAC algorithms results.           */
++	 *  It is used by the host to pass IV or counter at initialization.
++	 *  It is used by SeP for intermediate block chaining state and for
++	 *  returning MAC algorithms results.     
++         */
+ 	u8 block_state[CC_AES_BLOCK_SIZE];
+ 	u8 key[CC_AES_KEY_SIZE_MAX];
+ 	u8 xex_key[CC_AES_KEY_SIZE_MAX];
+@@ -279,9 +281,10 @@ struct drv_ctx_aead {
  
- /* Dma AXI Secure bit */
- #define	AXI_SECURE	0
-@@ -36,8 +36,8 @@
- #define _HW_DESC_MONITOR_KICK 0x7FFFC00
  
- /******************************************************************************
--*				TYPE DEFINITIONS
--******************************************************************************/
-+ *				TYPE DEFINITIONS
-+ ******************************************************************************/
+ /* Get the address of a @member within a given @ctx address
+-   @ctx: The context address
+-   @type: Type of context structure
+-   @member: Associated context field */
++ *  @ctx: The context address
++ *  @type: Type of context structure
++ *  @member: Associated context field
++ */
+ #define GET_CTX_FIELD_ADDR(ctx, type, member) (ctx + offsetof(type, member))
  
- struct cc_hw_desc {
- 	u32 word[HW_DESC_SIZE_WORDS];
-@@ -400,7 +400,7 @@ enum cc_hw_des_key_size {
-  *
-  * \param pDesc pointer HW descriptor struct
-  * \param numRounds number of rounds for Multi2
--*/
-+ */
- #define HW_DESC_SET_MULTI2_NUM_ROUNDS(pDesc, numRounds)									\
- 	do {														\
- 		CC_REG_FLD_SET(CRY_KERNEL, DSCRPTR_QUEUE_WORD2, VALUE, (pDesc)->word[2], (u32)(numRounds));	\
-@@ -411,7 +411,7 @@ enum cc_hw_des_key_size {
-  *
-  * \param pDesc pointer HW descriptor struct
-  * \param flowMode Any one of the modes defined in [CC7x-DESC]
--*/
-+ */
- 
- #define HW_DESC_SET_FLOW_MODE(pDesc, flowMode)										\
- 	do {														\
-@@ -423,7 +423,7 @@ enum cc_hw_des_key_size {
-  *
-  * \param pDesc pointer HW descriptor struct
-  * \param cipherMode Any one of the modes defined in [CC7x-DESC]
--*/
-+ */
- #define HW_DESC_SET_CIPHER_MODE(pDesc, cipherMode)									\
- 	do {														\
- 		CC_REG_FLD_SET(CRY_KERNEL, DSCRPTR_QUEUE_WORD4, CIPHER_MODE, (pDesc)->word[4], (cipherMode));		\
-@@ -434,7 +434,7 @@ enum cc_hw_des_key_size {
-  *
-  * \param pDesc pointer HW descriptor struct
-  * \param cipherConfig Any one of the modes defined in [CC7x-DESC]
--*/
-+ */
- #define HW_DESC_SET_CIPHER_CONFIG0(pDesc, cipherConfig)									\
- 	do {														\
- 		CC_REG_FLD_SET(CRY_KERNEL, DSCRPTR_QUEUE_WORD4, CIPHER_CONF0, (pDesc)->word[4], (cipherConfig));	\
-@@ -445,7 +445,7 @@ enum cc_hw_des_key_size {
-  *
-  * \param pDesc pointer HW descriptor struct
-  * \param cipherConfig Any one of the modes defined in [CC7x-DESC]
--*/
-+ */
- #define HW_DESC_SET_CIPHER_CONFIG1(pDesc, cipherConfig)									\
- 	do {														\
- 		CC_REG_FLD_SET(CRY_KERNEL, DSCRPTR_QUEUE_WORD4, CIPHER_CONF1, (pDesc)->word[4], (cipherConfig));	\
-@@ -456,7 +456,7 @@ enum cc_hw_des_key_size {
-  *
-  * \param pDesc pointer HW descriptor struct
-  * \param hwKey The hw key number as in enun HwCryptoKey
--*/
-+ */
- #define HW_DESC_SET_HW_CRYPTO_KEY(pDesc, hwKey)										\
- 	do {														\
- 		CC_REG_FLD_SET(CRY_KERNEL, DSCRPTR_QUEUE_WORD4, CIPHER_DO, (pDesc)->word[4], (hwKey) & HW_KEY_MASK_CIPHER_DO);		\
-@@ -468,7 +468,7 @@ enum cc_hw_des_key_size {
-  *
-  * \param pDesc pointer HW descriptor struct
-  * \param swapConfig Any one of the modes defined in [CC7x-DESC]
--*/
-+ */
- #define HW_DESC_SET_BYTES_SWAP(pDesc, swapConfig)									\
- 	do {														\
- 		CC_REG_FLD_SET(CRY_KERNEL, DSCRPTR_QUEUE_WORD4, BYTES_SWAP, (pDesc)->word[4], (swapConfig));		\
-@@ -478,7 +478,7 @@ enum cc_hw_des_key_size {
-  * This macro sets the CMAC_SIZE0 mode.
-  *
-  * \param pDesc pointer HW descriptor struct
--*/
-+ */
- #define HW_DESC_SET_CMAC_SIZE0_MODE(pDesc)										\
- 	do {														\
- 		CC_REG_FLD_SET(CRY_KERNEL, DSCRPTR_QUEUE_WORD4, CMAC_SIZE0, (pDesc)->word[4], 0x1);			\
-@@ -489,7 +489,7 @@ enum cc_hw_des_key_size {
-  *
-  * \param pDesc pointer HW descriptor struct
-  * \param keySize key size in bytes (NOT size code)
--*/
-+ */
- #define HW_DESC_SET_KEY_SIZE_AES(pDesc, keySize)									\
- 	do {													        \
- 		CC_REG_FLD_SET(CRY_KERNEL, DSCRPTR_QUEUE_WORD4, KEY_SIZE, (pDesc)->word[4], ((keySize) >> 3) - 2);	\
-@@ -500,7 +500,7 @@ enum cc_hw_des_key_size {
-  *
-  * \param pDesc pointer HW descriptor struct
-  * \param keySize key size in bytes (NOT size code)
--*/
-+ */
- #define HW_DESC_SET_KEY_SIZE_DES(pDesc, keySize)									\
- 	do {													        \
- 		CC_REG_FLD_SET(CRY_KERNEL, DSCRPTR_QUEUE_WORD4, KEY_SIZE, (pDesc)->word[4], ((keySize) >> 3) - 1);	\
-@@ -511,7 +511,7 @@ enum cc_hw_des_key_size {
-  *
-  * \param pDesc pointer HW descriptor struct
-  * \param setupMode Any one of the setup modes defined in [CC7x-DESC]
--*/
-+ */
- #define HW_DESC_SET_SETUP_MODE(pDesc, setupMode)									\
- 	do {														\
- 		CC_REG_FLD_SET(CRY_KERNEL, DSCRPTR_QUEUE_WORD4, SETUP_OPERATION, (pDesc)->word[4], (setupMode));	\
-@@ -522,7 +522,7 @@ enum cc_hw_des_key_size {
-  *
-  * \param pDesc pointer HW descriptor struct
-  * \param cipherDo Any one of the cipher do defined in [CC7x-DESC]
--*/
-+ */
- #define HW_DESC_SET_CIPHER_DO(pDesc, cipherDo)											\
- 	do {															\
- 		CC_REG_FLD_SET(CRY_KERNEL, DSCRPTR_QUEUE_WORD4, CIPHER_DO, (pDesc)->word[4], (cipherDo) & HW_KEY_MASK_CIPHER_DO);	\
+ #endif /* _CC_CRYPTO_CTX_H_ */
 -- 
 2.12.2
