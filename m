@@ -1,39 +1,80 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 08/11] crypto: testmgr - check err on akcipher maxsize
-Date: Wed, 24 May 2017 11:51:32 +0800
-Message-ID: <20170524035132.GB21629@gondor.apana.org.au>
-References: <1495033238-26016-1-git-send-email-tudor.ambarus@microchip.com>
- <1495033238-26016-9-git-send-email-tudor.ambarus@microchip.com>
- <20170523040836.GD12788@gondor.apana.org.au>
- <dcec37d7-888f-4903-2aeb-b287b5d1042c@microchip.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, dhowells@redhat.com,
-        linux-crypto@vger.kernel.org, keyrings@vger.kernel.org,
-        Nicolas.Ferre@microchip.com
-To: Tudor Ambarus <tudor.ambarus@microchip.com>
+From: Derek Robson <robsonde@gmail.com>
+Subject: [PATCH 00/27] Drivers: ccree - align block comments
+Date: Wed, 24 May 2017 16:40:16 +1200
+Message-ID: <20170524044016.29866-1-robsonde@gmail.com>
+Cc: linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        linux-kernel@vger.kernel.org, Derek Robson <robsonde@gmail.com>
+To: gilad@benyossef.com, gregkh@linuxfoundation.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [128.1.224.119] ([128.1.224.119]:48858 "EHLO deadmen.hmeau.com"
-        rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1761881AbdEXDv4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 May 2017 23:51:56 -0400
-Content-Disposition: inline
-In-Reply-To: <dcec37d7-888f-4903-2aeb-b287b5d1042c@microchip.com>
+Received: from mail-pg0-f66.google.com ([74.125.83.66]:34175 "EHLO
+        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934000AbdEXEk0 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 24 May 2017 00:40:26 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, May 23, 2017 at 12:18:23PM +0300, Tudor Ambarus wrote:
-> 
-> As of now, this call is reached only after a successful setkey.
-> If some user call it before setkey we will end up in a NULL dereference.
-> I tend to keep the error checking.
+Fixed block comments across whole ccree driver
 
-I fail to see how this could be an issue in testmgr.
 
-Please just kill these unnecessary checks.
+Derek Robson (27):
+  Drivers: ccree: ssi_sysfs.h - align block comments
+  Drivers: ccree: ssi_sysfs.c - align block comments
+  Drivers: ccree: ssi_request_mgr.h - align block comments
+  Drivers: ccree: ssi_request_mgr.c - align block comments
+  Drivers: ccree: ssi_pm_ext.h - align block comments
+  Drivers: ccree: ssi_pm_ext.c - align block comments
+  Drivers: ccree: ssi_pm.h - align block comments
+  Drivers: ccree: ssi_ivgen.c - align block comments
+  Drivers: ccree: ssi_hash.h - align block comments
+  Drivers: ccree: ssi_hash.c - align block comments
+  Drivers: ccree: ssi_fips_local.c - align block comments
+  Drivers: ccree: ssi_fips_ll.c - align block comments
+  Drivers: ccree: ssi_fips_ext.c - align block comments
+  Drivers: ccree: ssi_fips_data.h - align block comments
+  Drivers: ccree: ssi_fips.h - align block comments
+  Drivers: ccree: ssi_fips.c - align block comments
+  Drivers: ccree: ssi_driver.h - align block comments
+  Drivers: ccree: ssi_config.h - align block comments
+  Drivers: ccree: ssi_cipher.h - align block comments
+  Drivers: ccree: ssi_buffer_mgr.h - align block comments
+  Drivers: ccree: ssi_buffer_mgr.c - align block comments
+  Drivers: ccree: ssi_aead.h - align block comments
+  Drivers: ccree: ssi_aead.c - align block comments
+  Drivers: ccree: hash_defs.h - align block comments
+  Drivers: ccree: cc_regs.h - align block comments
+  Drivers: ccree: cc_hw_queue_defs.h - align block comments
+  Drivers: ccree: cc_crypto_ctx.h - align block comments
 
-Thanks,
+ drivers/staging/ccree/cc_crypto_ctx.h    | 17 +++---
+ drivers/staging/ccree/cc_hw_queue_defs.h | 32 +++++------
+ drivers/staging/ccree/cc_regs.h          | 13 ++---
+ drivers/staging/ccree/hash_defs.h        | 15 +++---
+ drivers/staging/ccree/ssi_aead.c         | 45 ++++++++++------
+ drivers/staging/ccree/ssi_aead.h         |  7 +--
+ drivers/staging/ccree/ssi_buffer_mgr.c   | 87 +++++++++++++++++-------------
+ drivers/staging/ccree/ssi_buffer_mgr.h   |  2 +-
+ drivers/staging/ccree/ssi_cipher.h       |  2 +-
+ drivers/staging/ccree/ssi_config.h       |  5 +-
+ drivers/staging/ccree/ssi_driver.h       | 16 +++---
+ drivers/staging/ccree/ssi_fips.c         | 16 +++---
+ drivers/staging/ccree/ssi_fips.h         |  6 +--
+ drivers/staging/ccree/ssi_fips_data.h    | 93 ++++++++++++++++----------------
+ drivers/staging/ccree/ssi_fips_ext.c     | 46 ++++++++--------
+ drivers/staging/ccree/ssi_fips_ll.c      | 21 ++++----
+ drivers/staging/ccree/ssi_fips_local.c   | 21 ++++----
+ drivers/staging/ccree/ssi_hash.c         |  9 ++--
+ drivers/staging/ccree/ssi_hash.h         |  2 +-
+ drivers/staging/ccree/ssi_ivgen.c        |  6 ++-
+ drivers/staging/ccree/ssi_pm.h           |  2 +-
+ drivers/staging/ccree/ssi_pm_ext.c       | 14 ++---
+ drivers/staging/ccree/ssi_pm_ext.h       |  2 +-
+ drivers/staging/ccree/ssi_request_mgr.c  | 37 +++++++------
+ drivers/staging/ccree/ssi_request_mgr.h  |  2 +-
+ drivers/staging/ccree/ssi_sysfs.c        |  3 +-
+ drivers/staging/ccree/ssi_sysfs.h        |  2 +-
+ 27 files changed, 288 insertions(+), 235 deletions(-)
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.12.2
