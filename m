@@ -1,50 +1,39 @@
-From: =?UTF-8?q?Rapha=C3=ABl=20Beamonte?= <raphael.beamonte@gmail.com>
-Subject: [PATCH] drivers: staging: ccree: ISO C forbids casting to and from non-scalar
-Date: Tue, 23 May 2017 20:53:14 +0200
-Message-ID: <f83a37c8226318f8051ec2be5ba8172caf7ce573.1495565594.git.raphael.beamonte@gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2 08/11] crypto: testmgr - check err on akcipher maxsize
+Date: Wed, 24 May 2017 11:51:32 +0800
+Message-ID: <20170524035132.GB21629@gondor.apana.org.au>
+References: <1495033238-26016-1-git-send-email-tudor.ambarus@microchip.com>
+ <1495033238-26016-9-git-send-email-tudor.ambarus@microchip.com>
+ <20170523040836.GD12788@gondor.apana.org.au>
+ <dcec37d7-888f-4903-2aeb-b287b5d1042c@microchip.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Cc: =?UTF-8?q?Rapha=C3=ABl=20Beamonte?= <raphael.beamonte@gmail.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-crypto@vger.kernel.org,
-        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
-        linux-kernel@vger.kernel.org
-To: Gilad Ben-Yossef <gilad@benyossef.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: davem@davemloft.net, dhowells@redhat.com,
+        linux-crypto@vger.kernel.org, keyrings@vger.kernel.org,
+        Nicolas.Ferre@microchip.com
+To: Tudor Ambarus <tudor.ambarus@microchip.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:33504 "EHLO
-        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1762718AbdEWSxa (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 May 2017 14:53:30 -0400
+Received: from [128.1.224.119] ([128.1.224.119]:48858 "EHLO deadmen.hmeau.com"
+        rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1761881AbdEXDv4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 23 May 2017 23:51:56 -0400
+Content-Disposition: inline
+In-Reply-To: <dcec37d7-888f-4903-2aeb-b287b5d1042c@microchip.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Fixes the following sparse warnings:
-drivers/staging/ccree/ssi_hash.c:2447:24: warning: cast to non-scalar
-drivers/staging/ccree/ssi_hash.c:2447:24: warning: cast from non-scalar
-drivers/staging/ccree/ssi_hash.c:2448:28: warning: cast to non-scalar
-drivers/staging/ccree/ssi_hash.c:2448:28: warning: cast from non-scalar
+On Tue, May 23, 2017 at 12:18:23PM +0300, Tudor Ambarus wrote:
+> 
+> As of now, this call is reached only after a successful setkey.
+> If some user call it before setkey we will end up in a NULL dereference.
+> I tend to keep the error checking.
 
-Signed-off-by: Raphaël Beamonte <raphael.beamonte@gmail.com>
----
- drivers/staging/ccree/ssi_hash.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+I fail to see how this could be an issue in testmgr.
 
-diff --git a/drivers/staging/ccree/ssi_hash.c b/drivers/staging/ccree/ssi_hash.c
-index 162d17dee2cd..8585f73161b3 100644
---- a/drivers/staging/ccree/ssi_hash.c
-+++ b/drivers/staging/ccree/ssi_hash.c
-@@ -2444,8 +2444,8 @@ int ssi_hash_alloc(struct ssi_drvdata *drvdata)
- 
- 		/* register hmac version */
- 
--		if ((((struct ssi_hash_template)driver_hash[alg]).hw_mode != DRV_CIPHER_XCBC_MAC) &&
--			(((struct ssi_hash_template)driver_hash[alg]).hw_mode != DRV_CIPHER_CMAC)) {
-+		if ((((struct ssi_hash_template *)&driver_hash[alg])->hw_mode != DRV_CIPHER_XCBC_MAC) &&
-+		    (((struct ssi_hash_template *)&driver_hash[alg])->hw_mode != DRV_CIPHER_CMAC)) {
- 			t_alg = ssi_hash_create_alg(&driver_hash[alg], true);
- 			if (IS_ERR(t_alg)) {
- 				rc = PTR_ERR(t_alg);
+Please just kill these unnecessary checks.
+
+Thanks,
 -- 
-2.11.0
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
