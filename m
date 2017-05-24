@@ -1,7 +1,7 @@
 From: Derek Robson <robsonde@gmail.com>
-Subject: [PATCH 24/27] Drivers: ccree: hash_defs.h - align block comments
-Date: Wed, 24 May 2017 16:47:05 +1200
-Message-ID: <20170524044705.30978-1-robsonde@gmail.com>
+Subject: [PATCH 25/27] Drivers: ccree: cc_regs.h - align block comments
+Date: Wed, 24 May 2017 16:47:24 +1200
+Message-ID: <20170524044724.31024-1-robsonde@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
@@ -27,34 +27,39 @@ Found using checkpatch
 
 Signed-off-by: Derek Robson <robsonde@gmail.com>
 ---
- drivers/staging/ccree/hash_defs.h | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+ drivers/staging/ccree/cc_regs.h | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/staging/ccree/hash_defs.h b/drivers/staging/ccree/hash_defs.h
-index 613897038f6d..3f2b2d1521c2 100644
---- a/drivers/staging/ccree/hash_defs.h
-+++ b/drivers/staging/ccree/hash_defs.h
-@@ -59,13 +59,14 @@ enum HashCipherDoPadding {
+diff --git a/drivers/staging/ccree/cc_regs.h b/drivers/staging/ccree/cc_regs.h
+index 8b89f0603f16..f4b3b5a23ae2 100644
+--- a/drivers/staging/ccree/cc_regs.h
++++ b/drivers/staging/ccree/cc_regs.h
+@@ -55,8 +55,9 @@ do {								            \
+ 	BITFIELD_GET(reg_val, CC_ ## reg_name ## _ ## fld_name ## _BIT_SHIFT, \
+ 		     CC_ ## reg_name ## _ ## fld_name ## _BIT_SIZE))
  
- typedef struct SepHashPrivateContext {
- 	/* The current length is placed at the end of the context buffer because the hash
--	   context is used for all HMAC operations as well. HMAC context includes a 64 bytes
--	   K0 field.  The size of struct drv_ctx_hash reserved field is  88/184 bytes depend if t
--	   he SHA512 is supported ( in this case teh context size is 256 bytes).
--	   The size of struct drv_ctx_hash reseved field is 20 or 52 depend if the SHA512 is supported.
--	   This means that this structure size (without the reserved field can be up to 20 bytes ,
--	   in case sha512 is not suppported it is 20 bytes (SEP_HASH_LENGTH_WORDS define to 2 ) and in the other
--	   case it is 28 (SEP_HASH_LENGTH_WORDS define to 4) */
-+	 *  context is used for all HMAC operations as well. HMAC context includes a 64 bytes
-+	 *  K0 field.  The size of struct drv_ctx_hash reserved field is  88/184 bytes depend if t
-+	 *  he SHA512 is supported ( in this case teh context size is 256 bytes).
-+	 *  The size of struct drv_ctx_hash reseved field is 20 or 52 depend if the SHA512 is supported.
-+	 *  This means that this structure size (without the reserved field can be up to 20 bytes ,
-+	 *  in case sha512 is not suppported it is 20 bytes (SEP_HASH_LENGTH_WORDS define to 2 ) and in the other
-+	 * case it is 28 (SEP_HASH_LENGTH_WORDS define to 4)
-+	 */
- 	u32 reserved[(sizeof(struct drv_ctx_hash)/sizeof(u32)) - SEP_HASH_LENGTH_WORDS - 3];
- 	u32 CurrentDigestedLength[SEP_HASH_LENGTH_WORDS];
- 	u32 KeyType;
+-/* yael TBD !!! -       				      *
+-* all HW includes should start with CC_ and not DX_ !!	      */
++/* yael TBD !!!
++ * all HW includes should start with CC_ and not DX_ !!	    
++ */
+ 
+ 
+ /*! Bit fields set */
+@@ -86,10 +87,10 @@ do {                                                                     \
+ } while (0)
+ 
+ /* Usage example:
+-   u32 reg_shadow = READ_REGISTER(CC_REG_ADDR(CRY_KERNEL,AES_CONTROL));
+-   CC_REG_FLD_SET(CRY_KERNEL,AES_CONTROL,NK_KEY0,reg_shadow, 3);
+-   CC_REG_FLD_SET(CRY_KERNEL,AES_CONTROL,NK_KEY1,reg_shadow, 1);
+-   WRITE_REGISTER(CC_REG_ADDR(CRY_KERNEL,AES_CONTROL), reg_shadow);
++ * u32 reg_shadow = READ_REGISTER(CC_REG_ADDR(CRY_KERNEL,AES_CONTROL));
++ * CC_REG_FLD_SET(CRY_KERNEL,AES_CONTROL,NK_KEY0,reg_shadow, 3);
++ * CC_REG_FLD_SET(CRY_KERNEL,AES_CONTROL,NK_KEY1,reg_shadow, 1);
++ * WRITE_REGISTER(CC_REG_ADDR(CRY_KERNEL,AES_CONTROL), reg_shadow);
+  */
+ 
+ #endif /*_CC_REGS_H_*/
 -- 
 2.12.2
