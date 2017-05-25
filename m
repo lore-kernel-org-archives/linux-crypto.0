@@ -1,7 +1,7 @@
 From: Tudor Ambarus <tudor.ambarus@microchip.com>
-Subject: [PATCH v4 02/14] crypto: ecc - remove unused function arguments
-Date: Thu, 25 May 2017 10:18:04 +0300
-Message-ID: <1495696696-22580-3-git-send-email-tudor.ambarus@microchip.com>
+Subject: [PATCH v4 03/14] crypto: ecc - remove unnecessary casts
+Date: Thu, 25 May 2017 10:18:05 +0300
+Message-ID: <1495696696-22580-4-git-send-email-tudor.ambarus@microchip.com>
 References: <1495696696-22580-1-git-send-email-tudor.ambarus@microchip.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -11,115 +11,177 @@ To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
         <horia.geanta@nxp.com>, <dan.douglass@nxp.com>,
         <giovanni.cabiddu@intel.com>, <salvatore.benedetto@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from esa4.microchip.iphmx.com ([68.232.154.123]:59284 "EHLO
-        esa4.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932943AbdEYHSa (ORCPT
+Received: from esa2.microchip.iphmx.com ([68.232.149.84]:28624 "EHLO
+        esa2.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932943AbdEYHSf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 May 2017 03:18:30 -0400
+        Thu, 25 May 2017 03:18:35 -0400
 In-Reply-To: <1495696696-22580-1-git-send-email-tudor.ambarus@microchip.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+ecc software implementation works with chunks of u64 data. There were some
+unnecessary casts to u8 and then back to u64 for the ecc keys. This patch
+removes the unnecessary casts.
+
 Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
 ---
- crypto/ecc.c  |  8 +++-----
- crypto/ecc.h  | 13 +++----------
+ crypto/ecc.c  | 28 +++++++++++++---------------
+ crypto/ecc.h  |  8 ++++----
  crypto/ecdh.c | 11 +++++------
- 3 files changed, 11 insertions(+), 21 deletions(-)
+ 3 files changed, 22 insertions(+), 25 deletions(-)
 
 diff --git a/crypto/ecc.c b/crypto/ecc.c
-index 414c78a..69b4cc4 100644
+index 69b4cc4..e3a2b8f 100644
 --- a/crypto/ecc.c
 +++ b/crypto/ecc.c
-@@ -928,8 +928,7 @@ int ecc_is_key_valid(unsigned int curve_id, unsigned int ndigits,
+@@ -904,7 +904,7 @@ static inline void ecc_swap_digits(const u64 *in, u64 *out,
+ }
+ 
+ int ecc_is_key_valid(unsigned int curve_id, unsigned int ndigits,
+-		     const u8 *private_key, unsigned int private_key_len)
++		     const u64 *private_key, unsigned int private_key_len)
+ {
+ 	int nbytes;
+ 	const struct ecc_curve *curve = ecc_get_curve(curve_id);
+@@ -917,23 +917,22 @@ int ecc_is_key_valid(unsigned int curve_id, unsigned int ndigits,
+ 	if (private_key_len != nbytes)
+ 		return -EINVAL;
+ 
+-	if (vli_is_zero((const u64 *)&private_key[0], ndigits))
++	if (vli_is_zero(private_key, ndigits))
+ 		return -EINVAL;
+ 
+ 	/* Make sure the private key is in the range [1, n-1]. */
+-	if (vli_cmp(curve->n, (const u64 *)&private_key[0], ndigits) != 1)
++	if (vli_cmp(curve->n, private_key, ndigits) != 1)
+ 		return -EINVAL;
+ 
+ 	return 0;
  }
  
  int ecdh_make_pub_key(unsigned int curve_id, unsigned int ndigits,
--		      const u8 *private_key, unsigned int private_key_len,
--		      u8 *public_key, unsigned int public_key_len)
-+		      const u8 *private_key, u8 *public_key)
+-		      const u8 *private_key, u8 *public_key)
++		      const u64 *private_key, u64 *public_key)
  {
  	int ret = 0;
  	struct ecc_point *pk;
-@@ -967,9 +966,8 @@ int ecdh_make_pub_key(unsigned int curve_id, unsigned int ndigits,
+ 	u64 priv[ndigits];
+-	unsigned int nbytes;
+ 	const struct ecc_curve *curve = ecc_get_curve(curve_id);
+ 
+ 	if (!private_key || !curve) {
+@@ -941,7 +940,7 @@ int ecdh_make_pub_key(unsigned int curve_id, unsigned int ndigits,
+ 		goto out;
+ 	}
+ 
+-	ecc_swap_digits((const u64 *)private_key, priv, ndigits);
++	ecc_swap_digits(private_key, priv, ndigits);
+ 
+ 	pk = ecc_alloc_point(ndigits);
+ 	if (!pk) {
+@@ -955,9 +954,8 @@ int ecdh_make_pub_key(unsigned int curve_id, unsigned int ndigits,
+ 		goto err_free_point;
+ 	}
+ 
+-	nbytes = ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
+-	ecc_swap_digits(pk->x, (u64 *)public_key, ndigits);
+-	ecc_swap_digits(pk->y, (u64 *)&public_key[nbytes], ndigits);
++	ecc_swap_digits(pk->x, public_key, ndigits);
++	ecc_swap_digits(pk->y, &public_key[ndigits], ndigits);
+ 
+ err_free_point:
+ 	ecc_free_point(pk);
+@@ -966,8 +964,8 @@ int ecdh_make_pub_key(unsigned int curve_id, unsigned int ndigits,
  }
  
  int crypto_ecdh_shared_secret(unsigned int curve_id, unsigned int ndigits,
--		       const u8 *private_key, unsigned int private_key_len,
--		       const u8 *public_key, unsigned int public_key_len,
--		       u8 *secret, unsigned int secret_len)
-+			      const u8 *private_key, const u8 *public_key,
-+			      u8 *secret)
+-			      const u8 *private_key, const u8 *public_key,
+-			      u8 *secret)
++			      const u64 *private_key, const u64 *public_key,
++			      u64 *secret)
  {
  	int ret = 0;
  	struct ecc_point *product, *pk;
+@@ -997,13 +995,13 @@ int crypto_ecdh_shared_secret(unsigned int curve_id, unsigned int ndigits,
+ 		goto err_alloc_product;
+ 	}
+ 
+-	ecc_swap_digits((const u64 *)public_key, pk->x, ndigits);
+-	ecc_swap_digits((const u64 *)&public_key[nbytes], pk->y, ndigits);
+-	ecc_swap_digits((const u64 *)private_key, priv, ndigits);
++	ecc_swap_digits(public_key, pk->x, ndigits);
++	ecc_swap_digits(&public_key[ndigits], pk->y, ndigits);
++	ecc_swap_digits(private_key, priv, ndigits);
+ 
+ 	ecc_point_mult(product, pk, priv, rand_z, curve->p, ndigits);
+ 
+-	ecc_swap_digits(product->x, (u64 *)secret, ndigits);
++	ecc_swap_digits(product->x, secret, ndigits);
+ 
+ 	if (ecc_point_is_zero(product))
+ 		ret = -EFAULT;
 diff --git a/crypto/ecc.h b/crypto/ecc.h
-index 37f4385..1ca9bf7 100644
+index 1ca9bf7..af2ffdb 100644
 --- a/crypto/ecc.h
 +++ b/crypto/ecc.h
-@@ -49,16 +49,13 @@ int ecc_is_key_valid(unsigned int curve_id, unsigned int ndigits,
-  * @curve_id:		id representing the curve to use
-  * @ndigits:		curve's number of digits
-  * @private_key:	pregenerated private key for the given curve
-- * @private_key_len:	length of private_key
-  * @public_key:		buffer for storing the generated public key
-- * @public_key_len:	length of the public_key buffer
-  *
-  * Returns 0 if the public key was generated successfully, a negative value
+@@ -41,7 +41,7 @@
+  * Returns 0 if the key is acceptable, a negative value otherwise
+  */
+ int ecc_is_key_valid(unsigned int curve_id, unsigned int ndigits,
+-		     const u8 *private_key, unsigned int private_key_len);
++		     const u64 *private_key, unsigned int private_key_len);
+ 
+ /**
+  * ecdh_make_pub_key() - Compute an ECC public key
+@@ -55,7 +55,7 @@ int ecc_is_key_valid(unsigned int curve_id, unsigned int ndigits,
   * if an error occurred.
   */
  int ecdh_make_pub_key(const unsigned int curve_id, unsigned int ndigits,
--		      const u8 *private_key, unsigned int private_key_len,
--		      u8 *public_key, unsigned int public_key_len);
-+		      const u8 *private_key, u8 *public_key);
+-		      const u8 *private_key, u8 *public_key);
++		      const u64 *private_key, u64 *public_key);
  
  /**
   * crypto_ecdh_shared_secret() - Compute a shared secret
-@@ -66,11 +63,8 @@ int ecdh_make_pub_key(const unsigned int curve_id, unsigned int ndigits,
-  * @curve_id:		id representing the curve to use
-  * @ndigits:		curve's number of digits
-  * @private_key:	private key of part A
-- * @private_key_len:	length of private_key
-  * @public_key:		public key of counterpart B
-- * @public_key_len:	length of public_key
-  * @secret:		buffer for storing the calculated shared secret
-- * @secret_len:		length of the secret buffer
-  *
-  * Note: It is recommended that you hash the result of crypto_ecdh_shared_secret
-  * before using it for symmetric encryption or HMAC.
-@@ -79,7 +73,6 @@ int ecdh_make_pub_key(const unsigned int curve_id, unsigned int ndigits,
+@@ -73,6 +73,6 @@ int ecdh_make_pub_key(const unsigned int curve_id, unsigned int ndigits,
   * if an error occurred.
   */
  int crypto_ecdh_shared_secret(unsigned int curve_id, unsigned int ndigits,
--		       const u8 *private_key, unsigned int private_key_len,
--		       const u8 *public_key, unsigned int public_key_len,
--		       u8 *secret, unsigned int secret_len);
-+			      const u8 *private_key, const u8 *public_key,
-+			      u8 *secret);
+-			      const u8 *private_key, const u8 *public_key,
+-			      u8 *secret);
++			      const u64 *private_key, const u64 *public_key,
++			      u64 *secret);
  #endif
 diff --git a/crypto/ecdh.c b/crypto/ecdh.c
-index 3623307..69c3951 100644
+index 69c3951..c1f0163 100644
 --- a/crypto/ecdh.c
 +++ b/crypto/ecdh.c
-@@ -81,16 +81,15 @@ static int ecdh_compute_value(struct kpp_request *req)
+@@ -56,7 +56,7 @@ static int ecdh_set_secret(struct crypto_kpp *tfm, const void *buf,
+ 	ctx->ndigits = ndigits;
+ 
+ 	if (ecc_is_key_valid(ctx->curve_id, ctx->ndigits,
+-			     (const u8 *)params.key, params.key_size) < 0)
++			     (const u64 *)params.key, params.key_size) < 0)
+ 		return -EINVAL;
+ 
+ 	memcpy(ctx->private_key, params.key, params.key_size);
+@@ -81,15 +81,14 @@ static int ecdh_compute_value(struct kpp_request *req)
  			return -EINVAL;
  
  		ret = crypto_ecdh_shared_secret(ctx->curve_id, ctx->ndigits,
--					 (const u8 *)ctx->private_key, nbytes,
--					 (const u8 *)ctx->public_key, 2 * nbytes,
--					 (u8 *)ctx->shared_secret, nbytes);
-+						(const u8 *)ctx->private_key,
-+						(const u8 *)ctx->public_key,
-+						(u8 *)ctx->shared_secret);
+-						(const u8 *)ctx->private_key,
+-						(const u8 *)ctx->public_key,
+-						(u8 *)ctx->shared_secret);
++						ctx->private_key,
++						ctx->public_key,
++						ctx->shared_secret);
  
  		buf = ctx->shared_secret;
  	} else {
  		ret = ecdh_make_pub_key(ctx->curve_id, ctx->ndigits,
--					(const u8 *)ctx->private_key, nbytes,
--					(u8 *)ctx->public_key,
--					sizeof(ctx->public_key));
-+					(const u8 *)ctx->private_key,
-+					(u8 *)ctx->public_key);
+-					(const u8 *)ctx->private_key,
+-					(u8 *)ctx->public_key);
++					ctx->private_key, ctx->public_key);
  		buf = ctx->public_key;
  		/* Public part is a point thus it has both coordinates */
  		nbytes *= 2;
