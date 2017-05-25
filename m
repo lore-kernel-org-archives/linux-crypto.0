@@ -1,7 +1,7 @@
 From: Tudor Ambarus <tudor.ambarus@microchip.com>
-Subject: [PATCH v4 04/14] crypto: ecc - don't be selfish on pubkeys
-Date: Thu, 25 May 2017 10:18:06 +0300
-Message-ID: <1495696696-22580-5-git-send-email-tudor.ambarus@microchip.com>
+Subject: [PATCH v4 05/14] crypto: dh - fix memleak in setkey
+Date: Thu, 25 May 2017 10:18:07 +0300
+Message-ID: <1495696696-22580-6-git-send-email-tudor.ambarus@microchip.com>
 References: <1495696696-22580-1-git-send-email-tudor.ambarus@microchip.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -13,67 +13,36 @@ To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
 Return-path: <linux-crypto-owner@vger.kernel.org>
 Received: from esa4.microchip.iphmx.com ([68.232.154.123]:14671 "EHLO
         esa4.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933384AbdEYHSj (ORCPT
+        with ESMTP id S933384AbdEYHSn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 May 2017 03:18:39 -0400
+        Thu, 25 May 2017 03:18:43 -0400
 In-Reply-To: <1495696696-22580-1-git-send-email-tudor.ambarus@microchip.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Rename ecdh_make_pub_key() to ecc_make_pub_key().
-This function might as well be used by ecdsa.
+setkey can be called multiple times during the existence
+of the transformation object. In case of multiple setkey calls,
+the old key was not freed and we leaked memory.
+Free the old MPI key if any.
 
 Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
 ---
- crypto/ecc.c  | 4 ++--
- crypto/ecc.h  | 4 ++--
- crypto/ecdh.c | 4 ++--
- 3 files changed, 6 insertions(+), 6 deletions(-)
+ crypto/dh.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/crypto/ecc.c b/crypto/ecc.c
-index e3a2b8f..6c33c43 100644
---- a/crypto/ecc.c
-+++ b/crypto/ecc.c
-@@ -927,8 +927,8 @@ int ecc_is_key_valid(unsigned int curve_id, unsigned int ndigits,
- 	return 0;
- }
+diff --git a/crypto/dh.c b/crypto/dh.c
+index 7cec0498..e151f12 100644
+--- a/crypto/dh.c
++++ b/crypto/dh.c
+@@ -85,6 +85,9 @@ static int dh_set_secret(struct crypto_kpp *tfm, const void *buf,
+ 	struct dh_ctx *ctx = dh_get_ctx(tfm);
+ 	struct dh params;
  
--int ecdh_make_pub_key(unsigned int curve_id, unsigned int ndigits,
--		      const u64 *private_key, u64 *public_key)
-+int ecc_make_pub_key(unsigned int curve_id, unsigned int ndigits,
-+		     const u64 *private_key, u64 *public_key)
- {
- 	int ret = 0;
- 	struct ecc_point *pk;
-diff --git a/crypto/ecc.h b/crypto/ecc.h
-index af2ffdb..673c834 100644
---- a/crypto/ecc.h
-+++ b/crypto/ecc.h
-@@ -54,8 +54,8 @@ int ecc_is_key_valid(unsigned int curve_id, unsigned int ndigits,
-  * Returns 0 if the public key was generated successfully, a negative value
-  * if an error occurred.
-  */
--int ecdh_make_pub_key(const unsigned int curve_id, unsigned int ndigits,
--		      const u64 *private_key, u64 *public_key);
-+int ecc_make_pub_key(const unsigned int curve_id, unsigned int ndigits,
-+		     const u64 *private_key, u64 *public_key);
++	/* Free the old MPI key if any */
++	dh_free_ctx(ctx);
++
+ 	if (crypto_dh_decode_key(buf, len, &params) < 0)
+ 		return -EINVAL;
  
- /**
-  * crypto_ecdh_shared_secret() - Compute a shared secret
-diff --git a/crypto/ecdh.c b/crypto/ecdh.c
-index c1f0163..ed1464a 100644
---- a/crypto/ecdh.c
-+++ b/crypto/ecdh.c
-@@ -87,8 +87,8 @@ static int ecdh_compute_value(struct kpp_request *req)
- 
- 		buf = ctx->shared_secret;
- 	} else {
--		ret = ecdh_make_pub_key(ctx->curve_id, ctx->ndigits,
--					ctx->private_key, ctx->public_key);
-+		ret = ecc_make_pub_key(ctx->curve_id, ctx->ndigits,
-+				       ctx->private_key, ctx->public_key);
- 		buf = ctx->public_key;
- 		/* Public part is a point thus it has both coordinates */
- 		nbytes *= 2;
 -- 
 2.7.4
