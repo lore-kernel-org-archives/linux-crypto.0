@@ -1,7 +1,7 @@
 From: Tudor Ambarus <tudor.ambarus@microchip.com>
-Subject: [PATCH v4 09/14] crypto: qat - comply with crypto_kpp_maxsize()
-Date: Thu, 25 May 2017 10:18:11 +0300
-Message-ID: <1495696696-22580-10-git-send-email-tudor.ambarus@microchip.com>
+Subject: [PATCH v4 10/14] crypto: akcipher: maxsize() - assume key is already set
+Date: Thu, 25 May 2017 10:18:12 +0300
+Message-ID: <1495696696-22580-11-git-send-email-tudor.ambarus@microchip.com>
 References: <1495696696-22580-1-git-send-email-tudor.ambarus@microchip.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -11,41 +11,61 @@ To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
         <horia.geanta@nxp.com>, <dan.douglass@nxp.com>,
         <giovanni.cabiddu@intel.com>, <salvatore.benedetto@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from esa2.microchip.iphmx.com ([68.232.149.84]:38810 "EHLO
-        esa2.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933384AbdEYHS7 (ORCPT
+Received: from esa4.microchip.iphmx.com ([68.232.154.123]:17718 "EHLO
+        esa4.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933384AbdEYHTD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 May 2017 03:18:59 -0400
+        Thu, 25 May 2017 03:19:03 -0400
 In-Reply-To: <1495696696-22580-1-git-send-email-tudor.ambarus@microchip.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-crypto_kpp_maxsize() asks for the output buffer size without
-caring for errors. It allways assume that will be called after
-a valid setkey. Comply with it and return what he wants.
+As of now, crypto_akcipher_maxsize() can not be reached without
+successfully setting the key for the transformation. akcipher
+algorithm implementations check if the key was set and then return
+the output buffer size required for the given key.
+
+Change the return type to unsigned int and always assume that this
+function is called after a successful setkey of the transformation.
+akcipher algorithm implementations will remove the check if key is not NULL
+and directly return the max size.
 
 Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
 ---
- drivers/crypto/qat/qat_common/qat_asym_algs.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ include/crypto/akcipher.h | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/crypto/qat/qat_common/qat_asym_algs.c b/drivers/crypto/qat/qat_common/qat_asym_algs.c
-index 2aab80b..1d882a7 100644
---- a/drivers/crypto/qat/qat_common/qat_asym_algs.c
-+++ b/drivers/crypto/qat/qat_common/qat_asym_algs.c
-@@ -521,11 +521,11 @@ static int qat_dh_set_secret(struct crypto_kpp *tfm, const void *buf,
- 	return 0;
- }
+diff --git a/include/crypto/akcipher.h b/include/crypto/akcipher.h
+index c37cc59..b5e11de 100644
+--- a/include/crypto/akcipher.h
++++ b/include/crypto/akcipher.h
+@@ -98,7 +98,7 @@ struct akcipher_alg {
+ 			   unsigned int keylen);
+ 	int (*set_priv_key)(struct crypto_akcipher *tfm, const void *key,
+ 			    unsigned int keylen);
+-	int (*max_size)(struct crypto_akcipher *tfm);
++	unsigned int (*max_size)(struct crypto_akcipher *tfm);
+ 	int (*init)(struct crypto_akcipher *tfm);
+ 	void (*exit)(struct crypto_akcipher *tfm);
  
--static int qat_dh_max_size(struct crypto_kpp *tfm)
-+static unsigned int qat_dh_max_size(struct crypto_kpp *tfm)
+@@ -257,13 +257,14 @@ static inline void akcipher_request_set_crypt(struct akcipher_request *req,
+ /**
+  * crypto_akcipher_maxsize() - Get len for output buffer
+  *
+- * Function returns the dest buffer size required for a given key
++ * Function returns the dest buffer size required for a given key.
++ * Function assumes that the key is already set in the transformation. If this
++ * function is called without a setkey or with a failed setkey, you will end up
++ * in a NULL dereference.
+  *
+  * @tfm:	AKCIPHER tfm handle allocated with crypto_alloc_akcipher()
+- *
+- * Return: minimum len for output buffer or error code in key hasn't been set
+  */
+-static inline int crypto_akcipher_maxsize(struct crypto_akcipher *tfm)
++static inline unsigned int crypto_akcipher_maxsize(struct crypto_akcipher *tfm)
  {
- 	struct qat_dh_ctx *ctx = kpp_tfm_ctx(tfm);
+ 	struct akcipher_alg *alg = crypto_akcipher_alg(tfm);
  
--	return ctx->p ? ctx->p_size : -EINVAL;
-+	return ctx->p_size;
- }
- 
- static int qat_dh_init_tfm(struct crypto_kpp *tfm)
 -- 
 2.7.4
