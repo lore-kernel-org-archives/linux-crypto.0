@@ -1,67 +1,50 @@
-From: Matthias Brugger <matthias.bgg@gmail.com>
-Subject: Re: [PATCH 2/2] crypto: mediatek - update DT binding documentation
-Date: Fri, 26 May 2017 16:15:23 +0200
-Message-ID: <a16ecc4c-2d82-1239-ec57-94dd3b24efb0@gmail.com>
-References: <1495791789-19230-1-git-send-email-ryder.lee@mediatek.com>
- <1495791789-19230-2-git-send-email-ryder.lee@mediatek.com>
+From: Eric Dumazet <eric.dumazet@gmail.com>
+Subject: Re: [PATCH net-next 3/4] tls: kernel TLS support
+Date: Fri, 26 May 2017 07:16:59 -0700
+Message-ID: <1495808219.6465.118.camel@edumazet-glaptop3.roam.corp.google.com>
+References: <cover.1495642647.git.davejwatson@fb.com>
+         <20170524162708.GA24215@davejwatson-mba.local>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Rob Herring <robh+dt@kernel.org>,
-        linux-mediatek@lists.infradead.org, linux-crypto@vger.kernel.org
-To: Ryder Lee <ryder.lee@mediatek.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Ilya Lesokhin <ilyal@mellanox.com>,
+        Aviad Yehezkel <aviadye@mellanox.com>,
+        Boris Pismenny <borisp@mellanox.com>,
+        Liran Liss <liranl@mellanox.com>,
+        Matan Barak <matanb@mellanox.com>,
+        David Miller <davem@davemloft.net>, netdev@vger.kernel.org,
+        Tom Herbert <tom@herbertland.com>, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org,
+        Hannes Frederic Sowa <hannes@stressinduktion.org>,
+        Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+        nmav@gnults.org, fridolin.pokorny@gmail.com
+To: Dave Watson <davejwatson@fb.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:34790 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S940721AbdEZOP1 (ORCPT
+Received: from mail-pf0-f193.google.com ([209.85.192.193]:34703 "EHLO
+        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S940721AbdEZORC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 May 2017 10:15:27 -0400
-In-Reply-To: <1495791789-19230-2-git-send-email-ryder.lee@mediatek.com>
-Content-Language: en-US
+        Fri, 26 May 2017 10:17:02 -0400
+In-Reply-To: <20170524162708.GA24215@davejwatson-mba.local>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+On Wed, 2017-05-24 at 09:27 -0700, Dave Watson wrote:
+> Software implementation of transport layer security, implemented using ULP
+> infrastructure.  tcp proto_ops are replaced with tls equivalents of sendmsg and
+> sendpage.
 
+...
 
-On 26/05/17 11:43, Ryder Lee wrote:
-> This patch removes unnecessary clock in binding file.
-> 
-> Signed-off-by: Ryder Lee <ryder.lee@mediatek.com>
-> ---
+> +
+> +int tls_sw_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
+> +{
+	...
+> +
+> +	lock_sock(sk);
+> +
+> +	/* Only one writer at a time is allowed */
+> +	if (sk->sk_write_pending)
+> +		return -EBUSY;
 
-In the driver clocks are get by name, so this change does not break 
-backwards compatibility.
-
-Reviewed-by: Matthias Brugger <matthias.bgg@gmail.com>
-
->   Documentation/devicetree/bindings/crypto/mediatek-crypto.txt | 8 +++-----
->   1 file changed, 3 insertions(+), 5 deletions(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/crypto/mediatek-crypto.txt b/Documentation/devicetree/bindings/crypto/mediatek-crypto.txt
-> index c204725..450da36 100644
-> --- a/Documentation/devicetree/bindings/crypto/mediatek-crypto.txt
-> +++ b/Documentation/devicetree/bindings/crypto/mediatek-crypto.txt
-> @@ -6,8 +6,7 @@ Required properties:
->   - interrupts: Should contain the five crypto engines interrupts in numeric
->   	order. These are global system and four descriptor rings.
->   - clocks: the clock used by the core
-> -- clock-names: the names of the clock listed in the clocks property. These are
-> -	"ethif", "cryp"
-> +- clock-names: Must contain "cryp".
->   - power-domains: Must contain a reference to the PM domain.
->   
->   
-> @@ -20,8 +19,7 @@ Example:
->   			     <GIC_SPI 84 IRQ_TYPE_LEVEL_LOW>,
->   			     <GIC_SPI 91 IRQ_TYPE_LEVEL_LOW>,
->   			     <GIC_SPI 97 IRQ_TYPE_LEVEL_LOW>;
-> -		clocks = <&topckgen CLK_TOP_ETHIF_SEL>,
-> -			 <&ethsys CLK_ETHSYS_CRYPTO>;
-> -		clock-names = "ethif","cryp";
-> +		clocks = <&ethsys CLK_ETHSYS_CRYPTO>;
-> +		clock-names = "cryp";
->   		power-domains = <&scpsys MT2701_POWER_DOMAIN_ETH>;
->   	};
-> 
+Ouch...
