@@ -1,94 +1,52 @@
-From: Corentin Labbe <clabbe.montjoie@gmail.com>
-Subject: Re: [PATCH 10/11] crypto: sun4i-ss: fix large block size support
-Date: Fri, 26 May 2017 16:55:01 +0200
-Message-ID: <20170526145501.GA19284@Red>
-References: <20170524190652.13278-1-antoine.tenart@free-electrons.com>
- <20170524190652.13278-11-antoine.tenart@free-electrons.com>
+From: David Miller <davem@davemloft.net>
+Subject: Re: [PATCH net-next 3/4] tls: kernel TLS support
+Date: Fri, 26 May 2017 11:18:52 -0400 (EDT)
+Message-ID: <20170526.111852.235696953256744250.davem@davemloft.net>
+References: <cover.1495642647.git.davejwatson@fb.com>
+        <20170524162708.GA24215@davejwatson-mba.local>
+        <1495808219.6465.118.camel@edumazet-glaptop3.roam.corp.google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-        maxime.ripard@free-electrons.com, wens@csie.org,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-To: Antoine Tenart <antoine.tenart@free-electrons.com>
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Cc: davejwatson@fb.com, ilyal@mellanox.com, aviadye@mellanox.com,
+        borisp@mellanox.com, liranl@mellanox.com, matanb@mellanox.com,
+        netdev@vger.kernel.org, tom@herbertland.com,
+        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        hannes@stressinduktion.org, alexei.starovoitov@gmail.com,
+        nmav@gnults.org, fridolin.pokorny@gmail.com
+To: eric.dumazet@gmail.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:34643 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1034656AbdEZOzI (ORCPT
+Received: from shards.monkeyblade.net ([184.105.139.130]:41344 "EHLO
+        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S968345AbdEZPSz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 May 2017 10:55:08 -0400
-Received: by mail-wm0-f68.google.com with SMTP id d127so4414972wmf.1
-        for <linux-crypto@vger.kernel.org>; Fri, 26 May 2017 07:55:08 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <20170524190652.13278-11-antoine.tenart@free-electrons.com>
+        Fri, 26 May 2017 11:18:55 -0400
+In-Reply-To: <1495808219.6465.118.camel@edumazet-glaptop3.roam.corp.google.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, May 24, 2017 at 09:06:51PM +0200, Antoine Tenart wrote:
-> The run-time self-tests fail quite early, as soon as the input block
-> size is larger than 64 bytes:
+From: Eric Dumazet <eric.dumazet@gmail.com>
+Date: Fri, 26 May 2017 07:16:59 -0700
+
+> On Wed, 2017-05-24 at 09:27 -0700, Dave Watson wrote:
+>> Software implementation of transport layer security, implemented using ULP
+>> infrastructure.  tcp proto_ops are replaced with tls equivalents of sendmsg and
+>> sendpage.
 > 
->   alg: hash: Test 4 failed for sha1-sun4i-ss
->   00000000: b9 c9 1e 52 c0 26 d8 39 81 ff f2 3c 99 b1 27 b2
->   00000010: 30 d6 c9 85
+> ...
 > 
-> One thing to notice is the value of the last word, which is the one
-> expected (it can sometime be the last two words). The datasheet isn't
-> very clear about when the digest is ready to retrieve and is seems the
-> bit SS_DATA_END is cleared when the digest was computed *but* that
-> doesn't mean the digest is ready to retrieve in the registers.
+>> +
+>> +int tls_sw_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
+>> +{
+> 	...
+>> +
+>> +	lock_sock(sk);
+>> +
+>> +	/* Only one writer at a time is allowed */
+>> +	if (sk->sk_write_pending)
+>> +		return -EBUSY;
 > 
-> A ndelay(1) is added before reading the computed digest to ensure it is
-> available in the SS_MD[] registers.
-> 
-> Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
-> ---
->  drivers/crypto/sunxi-ss/sun4i-ss-hash.c | 18 ++++++++++++++++++
->  1 file changed, 18 insertions(+)
-> 
-> diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-hash.c b/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
-> index 685de5b6ab17..6da8d2bbd4da 100644
-> --- a/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
-> +++ b/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
-> @@ -358,6 +358,15 @@ static int sun4i_hash(struct ahash_request *areq)
->  		goto release_ss;
->  	}
->  
-> +	/*
-> +	 * The datasheet isn't very clear about when to retrieve the digest. The
-> +	 * bit SS_DATA_END is cleared when the engine has processed the data and
-> +	 * when the digest is computed *but* it doesn't mean the digest is
-> +	 * available in the diesgt registers. Hence the delay to be sure we can
+> Ouch...
 
-Hello
-
-Small typo here (diesgt/digest)
-
-> +	 * read it.
-> +	 */
-> +	ndelay(1);
-> +
->  	for (i = 0; i < crypto_ahash_digestsize(tfm) / 4; i++)
->  		op->hash[i] = readl(ss->base + SS_MD0 + i * 4);
->  
-> @@ -446,6 +455,15 @@ static int sun4i_hash(struct ahash_request *areq)
->  		goto release_ss;
->  	}
->  
-> +	/*
-> +	 * The datasheet isn't very clear about when to retrieve the digest. The
-> +	 * bit SS_DATA_END is cleared when the engine has processed the data and
-> +	 * when the digest is computed *but* it doesn't mean the digest is
-> +	 * available in the diesgt registers. Hence the delay to be sure we can
-
-and here.
-
-This behaviour is very strange since I didnt get it on other platform.
-Could you give me the board name where you get it ?
-Does any wmb() after the writel(..SS_DATA_END..) do the trick ?
-Which speed are the SS clocks ?
-
-Anyway the whole serie seems good, I will test it just after this weekend.
-
-Thanks
-Regards
-Corentin Labbe
+Well, as I understand it, it is the same restriction userspace must
+itself enforce either in the application or in the SSL library.
