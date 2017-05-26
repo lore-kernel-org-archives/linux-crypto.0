@@ -1,96 +1,64 @@
-From: Ryder Lee <ryder.lee-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>
-Subject: [PATCH 1/2] crypto: mediatek - remove redundant clock setting
-Date: Fri, 26 May 2017 17:43:08 +0800
-Message-ID: <1495791789-19230-1-git-send-email-ryder.lee@mediatek.com>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: Re: [PATCH 1/1] crypto:drbg- Fixes panic in wait_for_completion call.
+Date: Fri, 26 May 2017 12:12:51 +0200
+Message-ID: <12466881.1IDO9Q7xg5@positron.chronox.de>
+References: <ea78b839-5717-2edb-c073-82fa82a0b403@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Ryder Lee <ryder.lee-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>,
- linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
- linux-mediatek-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Return-path: <linux-mediatek-bounces+glpam-linux-mediatek=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-mediatek>,
- <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-mediatek/>
-List-Post: <mailto:linux-mediatek-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
-List-Help: <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-mediatek>,
- <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=subscribe>
-Sender: "Linux-mediatek" <linux-mediatek-bounces-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
-Errors-To: linux-mediatek-bounces+glpam-linux-mediatek=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Transfer-Encoding: 7Bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org
+To: Harsh Jain <harshjain.prof@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:59696 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1764256AbdEZKMy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 26 May 2017 06:12:54 -0400
+In-Reply-To: <ea78b839-5717-2edb-c073-82fa82a0b403@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-This patch removes redundant clock setting for 'clk_ethif', which is
-the parent for 'clk_cryp'. Hence, we just need to handle its child.
+Am Donnerstag, 25. Mai 2017, 17:23:47 CEST schrieb Harsh Jain:
 
-Signed-off-by: Ryder Lee <ryder.lee-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>
+Hi Harsh,
+
+> Initialise ctr_completion variable before use.
+
+Thank you very much for catching this.
+
+But I think the chosen function is wrong. When we have an HMAC or Hash DRBG, this completion function does not need to be initialized.
+
+May I ask you to check this patch?
+
+Ciao
+Stephan
+
+---8<---
+
+>From 1ec5f753644eb9005ad758c9bfd75032602c9727 Mon Sep 17 00:00:00 2001
+From: Stephan Mueller <smueller@chronox.de>
+Date: Fri, 26 May 2017 12:11:31 +0200
+Subject: [PATCH] crypto: drbg- Fixes panic in wait_for_completion call
+
+Initialise ctr_completion variable before use.
+
+Signed-off-by: Harsh Jain <harshjain.prof@gmail.com>
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- drivers/crypto/mediatek/mtk-platform.c | 10 +---------
- drivers/crypto/mediatek/mtk-platform.h |  2 --
- 2 files changed, 1 insertion(+), 11 deletions(-)
+ crypto/drbg.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/crypto/mediatek/mtk-platform.c b/drivers/crypto/mediatek/mtk-platform.c
-index b6ecc28..9b4437c 100644
---- a/drivers/crypto/mediatek/mtk-platform.c
-+++ b/drivers/crypto/mediatek/mtk-platform.c
-@@ -504,19 +504,14 @@ static int mtk_crypto_probe(struct platform_device *pdev)
- 		}
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index fa749f4..433c425 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -1691,6 +1691,7 @@ static int drbg_init_sym_kernel(struct drbg_state *drbg)
+ 		return PTR_ERR(sk_tfm);
  	}
+ 	drbg->ctr_handle = sk_tfm;
++	init_completion(&drbg->ctr_completion);
  
--	cryp->clk_ethif = devm_clk_get(&pdev->dev, "ethif");
- 	cryp->clk_cryp = devm_clk_get(&pdev->dev, "cryp");
--	if (IS_ERR(cryp->clk_ethif) || IS_ERR(cryp->clk_cryp))
-+	if (IS_ERR(cryp->clk_cryp))
- 		return -EPROBE_DEFER;
- 
- 	cryp->dev = &pdev->dev;
- 	pm_runtime_enable(cryp->dev);
- 	pm_runtime_get_sync(cryp->dev);
- 
--	err = clk_prepare_enable(cryp->clk_ethif);
--	if (err)
--		goto err_clk_ethif;
--
- 	err = clk_prepare_enable(cryp->clk_cryp);
- 	if (err)
- 		goto err_clk_cryp;
-@@ -559,8 +554,6 @@ static int mtk_crypto_probe(struct platform_device *pdev)
- err_resource:
- 	clk_disable_unprepare(cryp->clk_cryp);
- err_clk_cryp:
--	clk_disable_unprepare(cryp->clk_ethif);
--err_clk_ethif:
- 	pm_runtime_put_sync(cryp->dev);
- 	pm_runtime_disable(cryp->dev);
- 
-@@ -576,7 +569,6 @@ static int mtk_crypto_remove(struct platform_device *pdev)
- 	mtk_desc_dma_free(cryp);
- 
- 	clk_disable_unprepare(cryp->clk_cryp);
--	clk_disable_unprepare(cryp->clk_ethif);
- 
- 	pm_runtime_put_sync(cryp->dev);
- 	pm_runtime_disable(cryp->dev);
-diff --git a/drivers/crypto/mediatek/mtk-platform.h b/drivers/crypto/mediatek/mtk-platform.h
-index 303c152..f0831f1 100644
---- a/drivers/crypto/mediatek/mtk-platform.h
-+++ b/drivers/crypto/mediatek/mtk-platform.h
-@@ -200,7 +200,6 @@ struct mtk_sha_rec {
-  * struct mtk_cryp - Cryptographic device
-  * @base:	pointer to mapped register I/O base
-  * @dev:	pointer to device
-- * @clk_ethif:	pointer to ethif clock
-  * @clk_cryp:	pointer to crypto clock
-  * @irq:	global system and rings IRQ
-  * @ring:	pointer to descriptor rings
-@@ -215,7 +214,6 @@ struct mtk_sha_rec {
- struct mtk_cryp {
- 	void __iomem *base;
- 	struct device *dev;
--	struct clk *clk_ethif;
- 	struct clk *clk_cryp;
- 	int irq[MTK_IRQ_NUM];
- 
+ 	req = skcipher_request_alloc(sk_tfm, GFP_KERNEL);
+ 	if (!req) {
 -- 
-1.9.1
+2.9.3
