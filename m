@@ -1,76 +1,59 @@
-From: Gennadii Altukhov <grinrag@gmail.com>
-Subject: [PATCH] staging: ccree: fix cc_crypto_ctx.h white spaces
-Date: Fri, 26 May 2017 11:28:47 +0200
-Message-ID: <20170526092847.GA26812@dhcp129-169.brq.redhat.com>
+From: Ryder Lee <ryder.lee-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>
+Subject: [PATCH 2/2] crypto: mediatek - update DT binding documentation
+Date: Fri, 26 May 2017 17:43:09 +0800
+Message-ID: <1495791789-19230-2-git-send-email-ryder.lee@mediatek.com>
+References: <1495791789-19230-1-git-send-email-ryder.lee@mediatek.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: devel@driverdev.osuosl.org, driverdev-devel@linuxdriverproject.org,
- linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: gilad@benyossef.com
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-Content-Disposition: inline
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+Cc: devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Ryder Lee <ryder.lee-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>,
+ linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+ linux-mediatek-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Return-path: <linux-mediatek-bounces+glpam-linux-mediatek=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+In-Reply-To: <1495791789-19230-1-git-send-email-ryder.lee-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-mediatek>,
+ <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-mediatek/>
+List-Post: <mailto:linux-mediatek-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+List-Help: <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-mediatek>,
+ <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=subscribe>
+Sender: "Linux-mediatek" <linux-mediatek-bounces-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+Errors-To: linux-mediatek-bounces+glpam-linux-mediatek=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-Fix checkpatch.pl reported checks: spaces preferred around '/' and '<<' in cc_crypto_ctx.h
+This patch removes unnecessary clock in binding file.
 
-Signed-off-by: Gennadii Altukhov <grinrag@gmail.com>
+Signed-off-by: Ryder Lee <ryder.lee-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>
 ---
- drivers/staging/ccree/cc_crypto_ctx.h | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ Documentation/devicetree/bindings/crypto/mediatek-crypto.txt | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/staging/ccree/cc_crypto_ctx.h b/drivers/staging/ccree/cc_crypto_ctx.h
-index ac39d34..2fabb5c 100644
---- a/drivers/staging/ccree/cc_crypto_ctx.h
-+++ b/drivers/staging/ccree/cc_crypto_ctx.h
-@@ -28,7 +28,7 @@
- #define CC_CTX_SIZE_LOG2 7
- #endif
- #endif
--#define CC_CTX_SIZE (1<<CC_CTX_SIZE_LOG2)
-+#define CC_CTX_SIZE (1 << CC_CTX_SIZE_LOG2)
- #define CC_DRV_CTX_SIZE_WORDS (CC_CTX_SIZE >> 2)
+diff --git a/Documentation/devicetree/bindings/crypto/mediatek-crypto.txt b/Documentation/devicetree/bindings/crypto/mediatek-crypto.txt
+index c204725..450da36 100644
+--- a/Documentation/devicetree/bindings/crypto/mediatek-crypto.txt
++++ b/Documentation/devicetree/bindings/crypto/mediatek-crypto.txt
+@@ -6,8 +6,7 @@ Required properties:
+ - interrupts: Should contain the five crypto engines interrupts in numeric
+ 	order. These are global system and four descriptor rings.
+ - clocks: the clock used by the core
+-- clock-names: the names of the clock listed in the clocks property. These are
+-	"ethif", "cryp"
++- clock-names: Must contain "cryp".
+ - power-domains: Must contain a reference to the PM domain.
  
- #define CC_DRV_DES_IV_SIZE 8
-@@ -224,7 +224,7 @@ struct drv_ctx_hmac {
- 	enum drv_crypto_alg alg; /* DRV_CRYPTO_ALG_HMAC */
- 	enum drv_hash_mode mode;
- 	u8 digest[CC_DIGEST_SIZE_MAX];
--	u32 k0[CC_HMAC_BLOCK_SIZE_MAX/sizeof(u32)];
-+	u32 k0[CC_HMAC_BLOCK_SIZE_MAX / sizeof(u32)];
- 	u32 k0_size;
- 	/* reserve to end of allocated context size */
- 	u8 reserved[CC_CTX_SIZE - 3 * sizeof(u32) -
-@@ -248,8 +248,8 @@ struct drv_ctx_cipher {
- 	u8 xex_key[CC_AES_KEY_SIZE_MAX];
- 	/* reserve to end of allocated context size */
- 	u32 reserved[CC_DRV_CTX_SIZE_WORDS - 7 -
--		CC_AES_BLOCK_SIZE/sizeof(u32) - 2 *
--		(CC_AES_KEY_SIZE_MAX/sizeof(u32))];
-+		CC_AES_BLOCK_SIZE / sizeof(u32) - 2 *
-+		(CC_AES_KEY_SIZE_MAX / sizeof(u32))];
- };
  
- /* authentication and encryption with associated data class */
-@@ -269,8 +269,8 @@ struct drv_ctx_aead {
- 	u8 key[CC_AES_KEY_SIZE_MAX];
- 	/* reserve to end of allocated context size */
- 	u32 reserved[CC_DRV_CTX_SIZE_WORDS - 8 -
--		3 * (CC_AES_BLOCK_SIZE/sizeof(u32)) -
--		CC_AES_KEY_SIZE_MAX/sizeof(u32)];
-+		3 * (CC_AES_BLOCK_SIZE / sizeof(u32)) -
-+		CC_AES_KEY_SIZE_MAX / sizeof(u32)];
- };
- 
- /*******************************************************************/
+@@ -20,8 +19,7 @@ Example:
+ 			     <GIC_SPI 84 IRQ_TYPE_LEVEL_LOW>,
+ 			     <GIC_SPI 91 IRQ_TYPE_LEVEL_LOW>,
+ 			     <GIC_SPI 97 IRQ_TYPE_LEVEL_LOW>;
+-		clocks = <&topckgen CLK_TOP_ETHIF_SEL>,
+-			 <&ethsys CLK_ETHSYS_CRYPTO>;
+-		clock-names = "ethif","cryp";
++		clocks = <&ethsys CLK_ETHSYS_CRYPTO>;
++		clock-names = "cryp";
+ 		power-domains = <&scpsys MT2701_POWER_DOMAIN_ETH>;
+ 	};
 -- 
-1.8.3.1
+1.9.1
