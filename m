@@ -1,114 +1,85 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: may_use_simd on aarch64, chacha20
-Date: Fri, 26 May 2017 14:28:09 +0100
-Message-ID: <20170526132808.GP3559@e103592.cambridge.arm.com>
-References: <CAHmME9qH=Wu-=9YUmxi7NPrczHu1UrB7phG0y68ipB+ProQ2TA@mail.gmail.com>
- <4150EFDC-CD3A-4C5C-9EF7-689F63C142C2@linaro.org>
+From: Tudor Ambarus <tudor.ambarus@microchip.com>
+Subject: Re: [RFC PATCH v2 4/4] crypto: testmgr - add genkey kpp test
+Date: Fri, 26 May 2017 16:44:26 +0300
+Message-ID: <5be85917-79d3-9ad8-5292-be1d5a448719@microchip.com>
+References: <1495034813-27143-1-git-send-email-tudor.ambarus@microchip.com>
+ <1495034813-27143-5-git-send-email-tudor.ambarus@microchip.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-arm-kernel@lists.infradead.org
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: <linux-crypto@vger.kernel.org>, <smueller@chronox.de>,
+        <marcel@holtmann.org>, <Nicolas.Ferre@microchip.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:60456 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1761891AbdEZN2N (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 May 2017 09:28:13 -0400
-Content-Disposition: inline
-In-Reply-To: <4150EFDC-CD3A-4C5C-9EF7-689F63C142C2@linaro.org>
+Received: from esa1.microchip.iphmx.com ([68.232.147.91]:62289 "EHLO
+        esa1.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750999AbdEZNoc (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 26 May 2017 09:44:32 -0400
+In-Reply-To: <1495034813-27143-5-git-send-email-tudor.ambarus@microchip.com>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, May 21, 2017 at 10:55:20PM +0200, Ard Biesheuvel wrote:
-> (+ Dave)
 
-Apologies for the slow reply -- hopefully this is still useful.
 
-> > On 21 May 2017, at 19:02, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> > 
-> > Hi folks,
-> > 
-> > I noticed that the ARM implementation [1] of chacha20 makes a check to
-> > may_use_simd(), but the ARM64 implementation [2] does not. Question 1:
-> > is this a bug, in which case I'll submit a patch shortly, or is this
-> > intentional? In case of the latter, could somebody explain the
-> > reasoning?
+On 17.05.2017 18:26, Tudor Ambarus wrote:
+> The test considers a party that already has a private-public
+> key pair and a party that provides a NULL key. The kernel will
+> generate the private-public key pair for the latter, computes
+> the shared secret on both ends and verifies it it's the same.
 > 
-> This is intentional. arm64 supports kernel mode NEON in any context,
-> whereas ARM only supports it in process context. This is due to the way
-> lazy FP restore is implemented on ARM. However, we are about to change
-> this on arm64 to only allow non-nested kernel mode NEON, similar to
-> x86. This is necessary to support SVE.
+> The explicit private-public key pairs were copied from
+> the previous test vectors.
 > 
-> > On a similar note, the only ARM64 glue code that uses
-> > may_use_simd() is sha256; everything else does not. Shall I submit a
-> > substantial patch series to fix this up everywhere?
-> > 
+> Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
+> ---
+>   crypto/testmgr.c |  76 +++++++++++++++++++++++----
+>   crypto/testmgr.h | 155 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>   2 files changed, 220 insertions(+), 11 deletions(-)
 > 
-> Currently, may_use_simd() is only used as a hint on arm64 whether it
-> makes sense to offload crypto to process context. In the sha256 code,
-> whose arm64 neon implementation is only marginally faster than scalar
-> on some micro-architectures, it is used to prefer the scalar code in
-> interrupt context, because the NEON code preserves/restores the NEON
-> state of the interrupted context eagerly, which is costly.
-> 
-> > Secondly, I noticed that may_use_simd() is essentially aliased to
-> > !in_interrupt(), since it uses the asm-generic variety. Question 2:
-> > Isn't this overkill? Couldn't we make an arm/arm64 variant of this
-> > that only checks in_irq()?
-> > 
-> 
-> No. ARM does not support kernel mode NEON in softirq context, and
-> arm64 will soon have its own override that only allows non-nested use
-> in softirq context.
-> 
-> > Lastly, APIs like pcrypts and padata execute with bottom halves
-> > disabled, even though their actual execution environment is process
-> > context, via a workqueue. Thus, here, in_interrupt() will always be
-> > true, even though this is likely a place where we want to use simd.
-> > Question 3: is there something better that could be done?
-> 
-> I guess we should switch to in_serving_softirq() instead.
+> diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+> index 6f5f3ed..faf5fd8 100644
+> --- a/crypto/testmgr.c
+> +++ b/crypto/testmgr.c
+> @@ -1997,6 +1997,9 @@ static int do_test_kpp(struct crypto_kpp *tfm, const struct kpp_testvec *vec,
+>   	struct kpp_request *req;
+>   	void *input_buf = NULL;
+>   	void *output_buf = NULL;
+> +	void *a_public = NULL;
+> +	void *a_ss = NULL;
+> +	void *shared_secret = NULL;
+>   	struct tcrypt_result result;
+>   	unsigned int out_len_max;
+>   	int err = -ENOMEM;
+> @@ -2026,20 +2029,31 @@ static int do_test_kpp(struct crypto_kpp *tfm, const struct kpp_testvec *vec,
+>   	kpp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+>   				 tcrypt_complete, &result);
+>   
+> -	/* Compute public key */
+> +	/* Compute party A's public key */
+>   	err = wait_async_op(&result, crypto_kpp_generate_public_key(req));
+>   	if (err) {
+> -		pr_err("alg: %s: generate public key test failed. err %d\n",
+> +		pr_err("alg: %s: Party A: generate public key test failed. err %d\n",
+>   		       alg, err);
+>   		goto free_output;
+>   	}
+> -	/* Verify calculated public key */
+> -	if (memcmp(vec->expected_a_public, sg_virt(req->dst),
+> -		   vec->expected_a_public_size)) {
+> -		pr_err("alg: %s: generate public key test failed. Invalid output\n",
+> -		       alg);
+> -		err = -EINVAL;
+> -		goto free_output;
+> +
+> +	if (vec->genkey) {
+> +		/* Save party A's public key */
+> +		a_public = kzalloc(out_len_max, GFP_KERNEL);
+> +		if (!a_public) {
+> +			err = -ENOMEM;
+> +			goto free_output;
+> +		}
+> +		memcpy(a_public, sg_virt(req->dst), sizeof(*a_public));
 
-For context, the arm64 kernel-mode NEON refactoring I've been working
-on [1] defines may_use_simd() to indicate whether calling
-kernel_neon_begin() is safe or not, rather then being a hint about
-whether it is desirable to do so.
-
-This changes the definition of may_use_simd() to something that is
-probably appropriate for your scenario.  From process context without
-any outer kernel_neon_begin()...kernel_neon_end(), it should return
-true.
-
-In general, callers in any context should do something like:
-
-	if (may_use_simd()) {
-		kernel_neon_begin();
-		/* SIMD implementation */
-		kernel_neon_end();
-	} else {
-		/* fallback implementation, or defer to another context */
-	}
-
-Even from task context where may_use_simd() should always return true
-and thus where the fallback path can be omitted, it may be a good idea
-to do something like
-
-	if (!may_use_simd()) {
-		WARN_ON(1);
-		return -EBUSY;
-	}
-
-... or similar.
-
-
-If the semantics or name don't feel right, I'm happy to change them.
-
-Cheers
----Dave
-
-
-[1] lists.infradead.org/pipermail/linux-arm-kernel/2017-May/508901.html
-(arm64: neon: Remove support for nested or hardirq kernel-mode NEON)
+The size is wrong, I'll correct it in the next version.
