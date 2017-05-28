@@ -1,96 +1,50 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: may_use_simd on aarch64, chacha20
-Date: Fri, 26 May 2017 18:59:48 +0100
-Message-ID: <20170526175948.GQ3559@e103592.cambridge.arm.com>
-References: <CAHmME9qH=Wu-=9YUmxi7NPrczHu1UrB7phG0y68ipB+ProQ2TA@mail.gmail.com>
- <4150EFDC-CD3A-4C5C-9EF7-689F63C142C2@linaro.org>
- <20170526132808.GP3559@e103592.cambridge.arm.com>
- <CAKv+Gu_RqVKjK5nh=qFb8OrkazSGEcjJiHnLS5c7j18=GehywQ@mail.gmail.com>
+From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Subject: Re: [PATCH v6 4/5] crypto: inside-secure: add SafeXcel EIP197 crypto
+ engine driver
+Date: Sun, 28 May 2017 11:09:43 +0530
+Message-ID: <CANc+2y46roki41fd_yURACWeXNzjyBEk_kOwiLEr_D=zFyaWuQ@mail.gmail.com>
+References: <20170524141035.21031-1-antoine.tenart@free-electrons.com> <20170524141035.21031-5-antoine.tenart@free-electrons.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org"
-        <linux-arm-kernel@lists.infradead.org>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>, jason@lakedaemon.net,
+        andrew@lunn.ch,
+        Gregory Clement <gregory.clement@free-electrons.com>,
+        sebastian.hesselbarth@gmail.com, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+        oferh@marvell.com, Igal Liberman <igall@marvell.com>,
+        Nadav Haklai <nadavh@marvell.com>, robin.murphy@arm.com
+To: Antoine Tenart <antoine.tenart@free-electrons.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:34756 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752564AbdEZR7x (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 May 2017 13:59:53 -0400
-Content-Disposition: inline
-In-Reply-To: <CAKv+Gu_RqVKjK5nh=qFb8OrkazSGEcjJiHnLS5c7j18=GehywQ@mail.gmail.com>
+Received: from mail-ua0-f173.google.com ([209.85.217.173]:33476 "EHLO
+        mail-ua0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750792AbdE1Fjp (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 28 May 2017 01:39:45 -0400
+Received: by mail-ua0-f173.google.com with SMTP id e28so22694950uah.0
+        for <linux-crypto@vger.kernel.org>; Sat, 27 May 2017 22:39:44 -0700 (PDT)
+In-Reply-To: <20170524141035.21031-5-antoine.tenart@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, May 26, 2017 at 07:44:46PM +0200, Ard Biesheuvel wrote:
-> On 26 May 2017 at 15:28, Dave Martin <Dave.Martin@arm.com> wrote:
-> > On Sun, May 21, 2017 at 10:55:20PM +0200, Ard Biesheuvel wrote:
-> >> (+ Dave)
+Hi Antonie,
 
-[...]
+On 24 May 2017 at 19:40, Antoine Tenart
+<antoine.tenart@free-electrons.com> wrote:
+> Add support for Inside Secure SafeXcel EIP197 cryptographic engine,
+> which can be found on Marvell Armada 7k and 8k boards. This driver
+> currently implements: ecb(aes), cbc(aes), sha1, sha224, sha256 and
+> hmac(sah1) algorithms.
+>
+> Two firmwares are needed for this engine to work. Their are mostly used
+> for more advanced operations than the ones supported (as of now), but we
+> still need them to pass the data to the internal cryptographic engine.
+>
+> Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
 
-> >> > Lastly, APIs like pcrypts and padata execute with bottom halves
-> >> > disabled, even though their actual execution environment is process
-> >> > context, via a workqueue. Thus, here, in_interrupt() will always be
-> >> > true, even though this is likely a place where we want to use simd.
-> >> > Question 3: is there something better that could be done?
-> >>
-> >> I guess we should switch to in_serving_softirq() instead.
-> >
-> > For context, the arm64 kernel-mode NEON refactoring I've been working
-> > on [1] defines may_use_simd() to indicate whether calling
-> > kernel_neon_begin() is safe or not, rather then being a hint about
-> > whether it is desirable to do so.
-> >
-> 
-> I should mention again, perhaps redundantly, that may_use_simd() was
-> not intended as a hint. It only became this way after we removed the
-> limitation on arm64 that SIMD may only be used in process context.
+As you have got help from other people for testing, wouldn't it be
+nice to add tested-by tag?
 
-My current may_use_simd() is intended to have those non-hint semantics
--- however, it feels a bit odd to have to include an extra header just
-for that, when clients of kernel-mode NEON are necessarily not portable.
-
-I don't have a very strong feeling either way, though.
-
-> > This changes the definition of may_use_simd() to something that is
-> > probably appropriate for your scenario.  From process context without
-> > any outer kernel_neon_begin()...kernel_neon_end(), it should return
-> > true.
-> >
-> > In general, callers in any context should do something like:
-> >
-> >         if (may_use_simd()) {
-> >                 kernel_neon_begin();
-> >                 /* SIMD implementation */
-> >                 kernel_neon_end();
-> >         } else {
-> >                 /* fallback implementation, or defer to another context */
-> >         }
-> >
-> > Even from task context where may_use_simd() should always return true
-> > and thus where the fallback path can be omitted, it may be a good idea
-> > to do something like
-> >
-> >         if (!may_use_simd()) {
-> >                 WARN_ON(1);
-> >                 return -EBUSY;
-> >         }
-> >
-> > ... or similar.
-> >
-> 
-> I don't think it is generally a good idea to make inferences about
-> whether may_use_simd() is going to return true or false in code that
-> is not tightly coupled to the FP/SIMD arch code itself, although I do
-> understand that there may be cases where it is cumbersome to provide a
-> fallback, especially if you know it is never going to be used.
-
-Agreed.  I don't think we should encourage this, but I thought it worth
-illustrating.  Hopefully there are few if any real situations where this
-would be justified.
-
-Cheers
----Dave
+Regards,
+PrasannaKumar
