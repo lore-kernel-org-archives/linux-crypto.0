@@ -1,50 +1,61 @@
-From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Subject: Re: [PATCH v6 4/5] crypto: inside-secure: add SafeXcel EIP197 crypto
- engine driver
-Date: Sun, 28 May 2017 11:09:43 +0530
-Message-ID: <CANc+2y46roki41fd_yURACWeXNzjyBEk_kOwiLEr_D=zFyaWuQ@mail.gmail.com>
-References: <20170524141035.21031-1-antoine.tenart@free-electrons.com> <20170524141035.21031-5-antoine.tenart@free-electrons.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>, jason@lakedaemon.net,
-        andrew@lunn.ch,
-        Gregory Clement <gregory.clement@free-electrons.com>,
-        sebastian.hesselbarth@gmail.com, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-        oferh@marvell.com, Igal Liberman <igall@marvell.com>,
-        Nadav Haklai <nadavh@marvell.com>, robin.murphy@arm.com
-To: Antoine Tenart <antoine.tenart@free-electrons.com>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: [PATCH 00/12] staging: ccree: addtional driver cleanups
+Date: Sun, 28 May 2017 17:40:25 +0300
+Message-ID: <1495982440-10047-1-git-send-email-gilad@benyossef.com>
+Cc: Ofir Drang <ofir.drang@arm.com>, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ua0-f173.google.com ([209.85.217.173]:33476 "EHLO
-        mail-ua0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750792AbdE1Fjp (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 28 May 2017 01:39:45 -0400
-Received: by mail-ua0-f173.google.com with SMTP id e28so22694950uah.0
-        for <linux-crypto@vger.kernel.org>; Sat, 27 May 2017 22:39:44 -0700 (PDT)
-In-Reply-To: <20170524141035.21031-5-antoine.tenart@free-electrons.com>
+Received: from foss.arm.com ([217.140.101.70]:42074 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750776AbdE1Okt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 28 May 2017 10:40:49 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Antonie,
+This is another batch of clean ups for the ccree driver.
+Mostly comprised of:
+- Coding Style fixes
+- Move to kernel infrastructure from custom constructs
+- Removal of dead code
 
-On 24 May 2017 at 19:40, Antoine Tenart
-<antoine.tenart@free-electrons.com> wrote:
-> Add support for Inside Secure SafeXcel EIP197 cryptographic engine,
-> which can be found on Marvell Armada 7k and 8k boards. This driver
-> currently implements: ecb(aes), cbc(aes), sha1, sha224, sha256 and
-> hmac(sah1) algorithms.
->
-> Two firmwares are needed for this engine to work. Their are mostly used
-> for more advanced operations than the ones supported (as of now), but we
-> still need them to pass the data to the internal cryptographic engine.
->
-> Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
+Gilad Ben-Yossef (12):
+  staging: ccree: correct coding style violations
+  staging: ccree: move to kernel bitfields/bitops
+  staging: ccree: remove 48 bit dma addr sim
+  staging: ccree: cleanup lli access macro
+  staging: ccree: remove cycle count debug support
+  staging: ccree: move request_mgr to generic bitfield ops
+  staging: ccree remove custom bitfield macros
+  staging: ccree: remove unused struct
+  staging: ccree: use snake_case for hash enums
+  staging: ccree: drop no longer used macro
+  staging: ccree: remove dead code
+  staging: ccree: whitespace fixes
 
-As you have got help from other people for testing, wouldn't it be
-nice to add tested-by tag?
+ drivers/staging/ccree/cc_bitops.h        |  35 --
+ drivers/staging/ccree/cc_crypto_ctx.h    |  66 ++-
+ drivers/staging/ccree/cc_hw_queue_defs.h | 770 +++++++++++++------------
+ drivers/staging/ccree/cc_lli_defs.h      |  67 ++-
+ drivers/staging/ccree/cc_regs.h          |  74 +--
+ drivers/staging/ccree/dx_crys_kernel.h   | 308 +++++-----
+ drivers/staging/ccree/dx_host.h          | 256 ++++-----
+ drivers/staging/ccree/hash_defs.h        |  52 +-
+ drivers/staging/ccree/ssi_aead.c         | 953 ++++++++++++++-----------------
+ drivers/staging/ccree/ssi_buffer_mgr.c   | 128 +----
+ drivers/staging/ccree/ssi_buffer_mgr.h   |  16 -
+ drivers/staging/ccree/ssi_cipher.c       | 248 ++++----
+ drivers/staging/ccree/ssi_config.h       |   6 -
+ drivers/staging/ccree/ssi_driver.c       |   8 -
+ drivers/staging/ccree/ssi_driver.h       |  30 +-
+ drivers/staging/ccree/ssi_fips_ll.c      | 704 +++++++++++------------
+ drivers/staging/ccree/ssi_hash.c         | 895 ++++++++++++++---------------
+ drivers/staging/ccree/ssi_ivgen.c        |  80 ++-
+ drivers/staging/ccree/ssi_request_mgr.c  | 152 +----
+ drivers/staging/ccree/ssi_sram_mgr.c     |   8 +-
+ 20 files changed, 2170 insertions(+), 2686 deletions(-)
+ delete mode 100644 drivers/staging/ccree/cc_bitops.h
 
-Regards,
-PrasannaKumar
+-- 
+2.1.4
