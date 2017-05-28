@@ -1,36 +1,77 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 10/12] staging: ccree: drop no longer used macro
-Date: Sun, 28 May 2017 17:40:35 +0300
-Message-ID: <1495982440-10047-11-git-send-email-gilad@benyossef.com>
+Subject: [PATCH 11/12] staging: ccree: remove dead code
+Date: Sun, 28 May 2017 17:40:36 +0300
+Message-ID: <1495982440-10047-12-git-send-email-gilad@benyossef.com>
 References: <1495982440-10047-1-git-send-email-gilad@benyossef.com>
 Cc: Ofir Drang <ofir.drang@arm.com>, linux-kernel@vger.kernel.org,
         linux-crypto@vger.kernel.org,
         driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from foss.arm.com ([217.140.101.70]:42186 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750873AbdE1Olw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 28 May 2017 10:41:52 -0400
 In-Reply-To: <1495982440-10047-1-git-send-email-gilad@benyossef.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-MSB64 macro is no longer used or needed. Drop it.
+Remove some unused macro definitions from hash definitions.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/cc_hw_queue_defs.h | 2 --
- 1 file changed, 2 deletions(-)
+ drivers/staging/ccree/hash_defs.h | 31 +++----------------------------
+ 1 file changed, 3 insertions(+), 28 deletions(-)
 
-diff --git a/drivers/staging/ccree/cc_hw_queue_defs.h b/drivers/staging/ccree/cc_hw_queue_defs.h
-index ec2113a..f12761a 100644
---- a/drivers/staging/ccree/cc_hw_queue_defs.h
-+++ b/drivers/staging/ccree/cc_hw_queue_defs.h
-@@ -237,8 +237,6 @@ static inline void set_ack_last(struct cc_hw_desc *pdesc)
- 	pdesc->word[4] |= FIELD_PREP(WORD4_ACK_NEEDED, 1);
- }
+diff --git a/drivers/staging/ccree/hash_defs.h b/drivers/staging/ccree/hash_defs.h
+index 872ed97..f52656f 100644
+--- a/drivers/staging/ccree/hash_defs.h
++++ b/drivers/staging/ccree/hash_defs.h
+@@ -14,36 +14,11 @@
+  * along with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
  
--#define MSB64(_addr) (sizeof(_addr) == 4 ? 0 : ((_addr) >> 32) & U16_MAX)
+-#ifndef  _HASH_DEFS_H__
+-#define  _HASH_DEFS_H__
++#ifndef _HASH_DEFS_H_
++#define _HASH_DEFS_H_
+ 
+ #include "cc_crypto_ctx.h"
+ 
+-/* this files provides definitions required for hash engine drivers */
+-#ifndef CC_CONFIG_HASH_SHA_512_SUPPORTED
+-#define SEP_HASH_LENGTH_WORDS		2
+-#else
+-#define SEP_HASH_LENGTH_WORDS		4
+-#endif
 -
- /*
-  * Set the DIN field of a HW descriptors
-  *
+-#ifdef BIG__ENDIAN
+-#define OPAD_CURRENT_LENGTH 0x40000000, 0x00000000 , 0x00000000, 0x00000000
+-#define HASH_LARVAL_MD5  0x76543210, 0xFEDCBA98, 0x89ABCDEF, 0x01234567
+-#define HASH_LARVAL_SHA1 0xF0E1D2C3, 0x76543210, 0xFEDCBA98, 0x89ABCDEF, 0x01234567
+-#define HASH_LARVAL_SHA224 0XA44FFABE, 0XA78FF964, 0X11155868, 0X310BC0FF, 0X39590EF7, 0X17DD7030, 0X07D57C36, 0XD89E05C1
+-#define HASH_LARVAL_SHA256 0X19CDE05B, 0XABD9831F, 0X8C68059B, 0X7F520E51, 0X3AF54FA5, 0X72F36E3C, 0X85AE67BB, 0X67E6096A
+-#define HASH_LARVAL_SHA384 0X1D48B547, 0XA44FFABE, 0X0D2E0CDB, 0XA78FF964, 0X874AB48E, 0X11155868, 0X67263367, 0X310BC0FF, 0XD8EC2F15, 0X39590EF7, 0X5A015991, 0X17DD7030, 0X2A299A62, 0X07D57C36, 0X5D9DBBCB, 0XD89E05C1
+-#define HASH_LARVAL_SHA512 0X19CDE05B, 0X79217E13, 0XABD9831F, 0X6BBD41FB, 0X8C68059B, 0X1F6C3E2B, 0X7F520E51, 0XD182E6AD, 0X3AF54FA5, 0XF1361D5F, 0X72F36E3C, 0X2BF894FE, 0X85AE67BB, 0X3BA7CA84, 0X67E6096A, 0X08C9BCF3
+-#else
+-#define OPAD_CURRENT_LENGTH 0x00000040, 0x00000000, 0x00000000, 0x00000000
+-#define HASH_LARVAL_MD5  0x10325476, 0x98BADCFE, 0xEFCDAB89, 0x67452301
+-#define HASH_LARVAL_SHA1 0xC3D2E1F0, 0x10325476, 0x98BADCFE, 0xEFCDAB89, 0x67452301
+-#define HASH_LARVAL_SHA224 0xbefa4fa4, 0x64f98fa7, 0x68581511, 0xffc00b31, 0xf70e5939, 0x3070dd17, 0x367cd507, 0xc1059ed8
+-#define HASH_LARVAL_SHA256 0x5be0cd19, 0x1f83d9ab, 0x9b05688c, 0x510e527f, 0xa54ff53a, 0x3c6ef372, 0xbb67ae85, 0x6a09e667
+-#define HASH_LARVAL_SHA384 0X47B5481D, 0XBEFA4FA4, 0XDB0C2E0D, 0X64F98FA7, 0X8EB44A87, 0X68581511, 0X67332667, 0XFFC00B31, 0X152FECD8, 0XF70E5939, 0X9159015A, 0X3070DD17, 0X629A292A, 0X367CD507, 0XCBBB9D5D, 0XC1059ED8
+-#define HASH_LARVAL_SHA512 0x5be0cd19, 0x137e2179, 0x1f83d9ab, 0xfb41bd6b, 0x9b05688c, 0x2b3e6c1f, 0x510e527f, 0xade682d1, 0xa54ff53a, 0x5f1d36f1, 0x3c6ef372, 0xfe94f82b, 0xbb67ae85, 0x84caa73b, 0x6a09e667, 0xf3bcc908
+-#endif
+-
+ enum cc_hash_conf_pad {
+ 	HASH_PADDING_DISABLED = 0,
+ 	HASH_PADDING_ENABLED = 1,
+@@ -57,5 +32,5 @@ enum cc_hash_cipher_pad {
+ 	HASH_CIPHER_DO_PADDING_RESERVE32 = S32_MAX,
+ };
+ 
+-#endif /*_HASH_DEFS_H__*/
++#endif /*_HASH_DEFS_H_*/
+ 
 -- 
 2.1.4
