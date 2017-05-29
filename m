@@ -1,69 +1,49 @@
 From: Antoine Tenart <antoine.tenart@free-electrons.com>
-Subject: [PATCH v2 00/12] ARM: sun5i: cryptographic engine support
-Date: Mon, 29 May 2017 22:27:26 +0200
-Message-ID: <20170529202738.2167-1-antoine.tenart@free-electrons.com>
+Subject: [PATCH v2 07/12] crypto: sun4i-ss: simplify the appended bit assignment
+Date: Mon, 29 May 2017 22:27:33 +0200
+Message-ID: <20170529202738.2167-8-antoine.tenart@free-electrons.com>
+References: <20170529202738.2167-1-antoine.tenart@free-electrons.com>
 Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
         linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 To: herbert@gondor.apana.org.au, davem@davemloft.net,
         maxime.ripard@free-electrons.com, wens@csie.org,
         clabbe.montjoie@gmail.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:36611 "EHLO
+Received: from mail.free-electrons.com ([62.4.15.54]:36616 "EHLO
         mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751151AbdE2U2W (ORCPT
+        with ESMTP id S1751175AbdE2U2W (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Mon, 29 May 2017 16:28:22 -0400
+In-Reply-To: <20170529202738.2167-1-antoine.tenart@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello,
+A bit is appended at the end of the input buffer for sha1. Simplify the
+code assigning it.
 
-This series adds the cryptographic engine support to sun5i SoCs. This is
-based on top of v4.12-rc1 and was tested on a CHIP. The series begins
-with fixes and improvements. The series is available at:
-https://github.com/atenart/linux v4.12-rc1/sun5i-crypto
+Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
+---
+ drivers/crypto/sunxi-ss/sun4i-ss-hash.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
-The 8 first patches are reworks and cosmetic improvements.
-
-Patch 9 moves the cipher part of the sun4i-ss driver from the ablkcipher
-API to the newer skcipher API.
-
-Patch 10 adds the CRYPTO_ALG_KERN_DRIVER_ONLY flag for ciphers exposed
-by the sun4i-ss driver.
-
-Patch 11 fixes the crypto framework selftests on the CHIP. It might fix
-other users too.
-
-Patch 12 adds a cryptographic engine node for sun5i SoCs.
-
-Thanks,
-Antoine
-
-Since v1:
-  - Fixed a typo.
-  - Made the CRYPTO_ALG_KERN_DRIVER_ONLY flag addition in a dedicated
-    patch.
-
-Antoine Tenart (12):
-  crypto: sun4i-ss: group variable definitions in sun4i_hash()
-  crypto: sun4i-ss: remove conditional checks against 0
-  crypto: sun4i-ss: use lower/upper_32_bits helpers
-  crypto: sun4i-ss: cannot use DMA is the request is 0 length
-  crypto: sun4i-ss: do not dynamically set parts of the last buffer to 0
-  crypto: sun4i-ss: simplify the pad length calculation
-  crypto: sun4i-ss: simplify the appended bit assignment
-  crypto: sun4i-ss: use GENMASK to generate masks
-  crypto: sun4i-ss: move from ablkcipher to skcipher API
-  crypto: sun4i-ss: add the CRYPTO_ALG_KERN_DRIVER_ONLY flag
-  crypto: sun4i-ss: fix large block size support
-  ARM: sun5i: add a cryptographic engine node
-
- arch/arm/boot/dts/sun5i.dtsi              |   8 +
- drivers/crypto/sunxi-ss/sun4i-ss-cipher.c | 213 ++++++++++++++-------------
- drivers/crypto/sunxi-ss/sun4i-ss-core.c   | 237 +++++++++++++++---------------
- drivers/crypto/sunxi-ss/sun4i-ss-hash.c   | 138 ++++++++---------
- drivers/crypto/sunxi-ss/sun4i-ss.h        |  34 +++--
- 5 files changed, 321 insertions(+), 309 deletions(-)
-
+diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-hash.c b/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
+index 59d9b4412aca..0c2efc88bc0a 100644
+--- a/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
++++ b/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
+@@ -392,12 +392,8 @@ static int sun4i_hash(struct ahash_request *areq)
+ 	}
+ 
+ 	/* write the remaining bytes of the nbw buffer */
+-	if (nbw) {
+-		wb |= ((1 << 7) << (nbw * 8));
+-		bf[j++] = wb;
+-	} else {
+-		bf[j++] = 1 << 7;
+-	}
++	wb |= ((1 << 7) << (nbw * 8));
++	bf[j++] = wb;
+ 
+ 	/*
+ 	 * number of space to pad to obtain 64o minus 8(size) minus 4 (final 1)
 -- 
 2.9.4
