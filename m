@@ -1,81 +1,111 @@
-From: Maxime Ripard <maxime.ripard@free-electrons.com>
-Subject: Re: [PATCH 10/11] crypto: sun4i-ss: fix large block size support
-Date: Mon, 29 May 2017 10:29:31 +0200
-Message-ID: <20170529082931.ocoatlnpl7fvtgfu@flea.lan>
-References: <20170524190652.13278-1-antoine.tenart@free-electrons.com>
- <20170524190652.13278-11-antoine.tenart@free-electrons.com>
- <20170526145501.GA19284@Red>
- <20170529080944.GA3169@kwain>
+From: Tudor Ambarus <tudor.ambarus@microchip.com>
+Subject: Re: [RFC PATCH v2 1/4] crypto: ecc - add privkey generation support
+Date: Mon, 29 May 2017 12:08:38 +0300
+Message-ID: <c9c47d0f-d4cb-0326-4c43-979fec11001c@microchip.com>
+References: <1495034813-27143-1-git-send-email-tudor.ambarus@microchip.com>
+ <1495034813-27143-2-git-send-email-tudor.ambarus@microchip.com>
+ <8501918.Kgl28GDAYF@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="rynuluogfa56aubc"
-Cc: Corentin Labbe <clabbe.montjoie@gmail.com>,
-        herbert@gondor.apana.org.au, davem@davemloft.net, wens@csie.org,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-To: Antoine Tenart <antoine.tenart@free-electrons.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Cc: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <linux-crypto@vger.kernel.org>, <marcel@holtmann.org>,
+        <Nicolas.Ferre@microchip.com>
+To: =?UTF-8?Q?Stephan_M=c3=bcller?= <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:52804 "EHLO
-        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750787AbdE2IaE (ORCPT
+Received: from esa1.microchip.iphmx.com ([68.232.147.91]:41245 "EHLO
+        esa1.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750893AbdE2JIq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 29 May 2017 04:30:04 -0400
-Content-Disposition: inline
-In-Reply-To: <20170529080944.GA3169@kwain>
+        Mon, 29 May 2017 05:08:46 -0400
+In-Reply-To: <8501918.Kgl28GDAYF@positron.chronox.de>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Hi, Stephan,
 
---rynuluogfa56aubc
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Thank you for the review. Please see inline.
 
-On Mon, May 29, 2017 at 10:09:44AM +0200, Antoine Tenart wrote:
-> > Which speed are the SS clocks ?
->=20
-> The AHB SS clk is running at 300 MHz and the SS clk at 150 MHz. SS clk
-> is at the expected rate but the AHB SS clk has a higher rate that what's
-> expected.
->=20
-> In the probing function only the SS clk rate is explicitly set. I tried
-> to set the AHB clk rate as well and removed the delays. This didn't fix
-> the framework selftests at boot time. Is there any reason the AHB SS clk
-> rate isn't explicitly set when probing the driver? (Should it?)
+On 28.05.2017 21:44, Stephan Müller wrote:
+> Am Mittwoch, 17. Mai 2017, 17:26:50 CEST schrieb Tudor Ambarus:
+> 
+> Hi Tudor,
+> 
+>> Add support for generating ecc private keys.
+>>
+>> Generation of ecc private keys is helpful in a user-space to kernel
+>> ecdh offload because the keys are not revealed to user-space. Private
+>> key generation is also helpful to implement forward secrecy.
+>>
+>> Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
+>> ---
+>>   crypto/ecc.c | 20 ++++++++++++++++++++
+>>   crypto/ecc.h | 14 ++++++++++++++
+>>   2 files changed, 34 insertions(+)
+>>
+>> diff --git a/crypto/ecc.c b/crypto/ecc.c
+>> index 414c78a..a591907 100644
+>> --- a/crypto/ecc.c
+>> +++ b/crypto/ecc.c
+>> @@ -927,6 +927,26 @@ int ecc_is_key_valid(unsigned int curve_id, unsigned
+>> int ndigits, return 0;
+>>   }
+>>
+>> +int ecc_gen_privkey(unsigned int curve_id, unsigned int ndigits, u64
+>> *privkey) +{
+>> +	const struct ecc_curve *curve = ecc_get_curve(curve_id);
+> 
+> Shouldn't there be a check that a curve is selected? I.e. a check for an error
+> should be added?
 
-It probably shouldn't.
+We already checked the curve_id before generating the key. The function
+assumes that curve_id is checked before calling it, like 
+ecc_is_key_valid() does.
 
-The AHB clock is shared by most of the drivers, some of them actually
-using that clock to generate their signals.
+> 
+>> +	u64 priv[ndigits];
+> 
+> Shouldn't there be a size check of ndigits?
 
-You would have to unbreak all those drivers first, which is probably
-not needed at all. I haven't seen a case where a block had a module
-clock and did care for its AHB clock rate.
+Already checked when setting the secret. But FIPS 186-4, B.4.1
+recommends to check the bit length of n. It should be greater or equal 
+with 160. I will add this check, thanks.
 
-Maxime
+> 
+>> +	unsigned int nbytes = ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
+>> +
+>> +	get_random_bytes(priv, nbytes);
+> 
+> Can you please use crypto_get_default_rng / crypto_rng_get_bytes /
+> crypto_put_default_rng?
 
---=20
-Maxime Ripard, Free Electrons
-Embedded Linux and Kernel engineering
-http://free-electrons.com
+Actually I tried this and I encountered some problems, I'm currently
+debugging it.
 
---rynuluogfa56aubc
-Content-Type: application/pgp-signature; name="signature.asc"
+When using the default rng and the run-time self tests are enabled,
+the kernel is in a blocking state. What's worse is that the kernel
+blocks before the console has the chance to be enabled and I can't see
+anything :).
 
------BEGIN PGP SIGNATURE-----
+I suspect that the kernel blocks because the rng does not have enough
+entropy. Could you please give me some hints?
 
-iQIcBAEBAgAGBQJZK9vrAAoJEBx+YmzsjxAg/w8P/j/SF3hzSk7Z3EdPc5iZXGVL
-Sacbi9DDpFLXpbVeQrSHmLERMbEjDqrfMb0sHnF/qY0SkMsDIG3uwV8wEV0FY2R+
-5G2irsmRSN06/2Qv9Tk6KUao+npcVYZy7IpRNqIj4IiZMChHiUbM/UOyYqqRklc6
-mn+Ki834rBj+IHUBCZblPvyV3lNFll0xp9dbiuE+2qjOvujtuCH19qFOk2UCub7Q
-p32EIj9tXTg2HxWFJOSfP8BXc7Endo0zgWWoqk5f7d4emDznSOMW5WGJUmgkoTdq
-1RnvfxQZPTYvXl8gUu7cqvkKi+G4yWXdbjNs8VWtfotWd2wI26AZ+WNAuPDUZwc3
-k5Q3DNri80SpAPouHb9oGYU60nvtSu2ygsCf7TlW3mdyN8dYrBjLWHxbbUkfUpgQ
-GxzcO7qdpJulGkUnOvAbobFJkK95zathBnxJe3jZEsGIHiOBfD5lVpXqYkNERMuz
-xV5EWYOaoIlZsaHC7dIPgYiMTdu+DS5S5YsikFk515H+qfO4QMHj7m7Avl6+bm5J
-Qs6v3+ACMtg54qyb2gWRsBShFTpfJPqn5koV7bSuM/oYpDM89vSQo77FzxfeF7+b
-oaasIEifGYUYeSH1JeEzuKEk269D3uOKxF9W7BJBv5lmqpLhaXfVUcSNG0fQQxvG
-N+o17BlAfDY7k9/988MW
-=bNfV
------END PGP SIGNATURE-----
+>> +
+>> +	if (vli_is_zero(priv, ndigits))
+>> +		return -EINVAL;
+>> +
+>> +	/* Make sure the private key is in the range [1, n-1]. */
+>> +	if (vli_cmp(curve->n, priv, ndigits) != 1)
+>> +		return -EINVAL;
+>> +
+>> +	ecc_swap_digits(priv, privkey, ndigits);
+> 
+> Is a byteswap faster than a copy operation by looping through priv/privkey and
+> simply assinging the value?
 
---rynuluogfa56aubc--
+Maybe not, but I am consistent with the rest of the code. Can we change
+this in a latter patch, if necessary?
+
+Thanks,
+ta
