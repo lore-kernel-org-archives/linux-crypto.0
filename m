@@ -1,118 +1,124 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [PATCH 02/12] staging: ccree: move to kernel bitfields/bitops
-Date: Mon, 29 May 2017 20:23:07 +0300
-Message-ID: <CAOtvUMfPhPeD9LNG--KrXq+6n=BJR=L8_aSU_uyrgvY=UEeEsg@mail.gmail.com>
+Subject: Re: [PATCH 04/12] staging: ccree: cleanup lli access macro
+Date: Mon, 29 May 2017 20:32:30 +0300
+Message-ID: <CAOtvUMcT3rh5rHy9hrwD-JqmT7EfKdW1pQ+n2V6RsAbuq-OGiw@mail.gmail.com>
 References: <1495982440-10047-1-git-send-email-gilad@benyossef.com>
- <1495982440-10047-3-git-send-email-gilad@benyossef.com> <20170529143844.GB12428@kroah.com>
+ <1495982440-10047-5-git-send-email-gilad@benyossef.com>
+ <20170529144114.GC12428@kroah.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: linux-crypto@vger.kernel.org, devel@driverdev.osuosl.org,
-        driverdev-devel@linuxdriverproject.org,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
-        Ofir Drang <ofir.drang@arm.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: devel@driverdev.osuosl.org, driverdev-devel@linuxdriverproject.org,
+ linux-crypto@vger.kernel.org, Ofir Drang <ofir.drang@arm.com>,
+ Linux kernel mailing list <linux-kernel@vger.kernel.org>
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-yw0-f194.google.com ([209.85.161.194]:34777 "EHLO
-        mail-yw0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750846AbdE2RXJ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 29 May 2017 13:23:09 -0400
-Received: by mail-yw0-f194.google.com with SMTP id 5so3179445ywe.1
-        for <linux-crypto@vger.kernel.org>; Mon, 29 May 2017 10:23:08 -0700 (PDT)
-In-Reply-To: <20170529143844.GB12428@kroah.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+In-Reply-To: <20170529144114.GC12428@kroah.com>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, May 29, 2017 at 5:38 PM, Greg Kroah-Hartman
+On Mon, May 29, 2017 at 5:41 PM, Greg Kroah-Hartman
 <gregkh@linuxfoundation.org> wrote:
-> On Sun, May 28, 2017 at 05:40:27PM +0300, Gilad Ben-Yossef wrote:
->> ccree had a lot of boilerplate code for dealing with bitops
->> and bitfield register access. Move it over to the generic kernel
->> infrastructure used for doing the same.
+> On Sun, May 28, 2017 at 05:40:29PM +0300, Gilad Ben-Yossef wrote:
+>> The Linked List Item descriptors were being accessed via
+>> a baroque set of defines and macro. Re-factor for structs
+>> and inline function for readability and sanity.
 >>
 >> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 >> ---
->>  drivers/staging/ccree/cc_bitops.h        |  11 +-
->>  drivers/staging/ccree/cc_hw_queue_defs.h | 679 ++++++++++++-----------
->>  drivers/staging/ccree/ssi_aead.c         | 901 +++++++++++++++----------------
->>  drivers/staging/ccree/ssi_cipher.c       | 224 ++++----
->>  drivers/staging/ccree/ssi_driver.h       |   4 +-
->>  drivers/staging/ccree/ssi_fips_ll.c      | 704 ++++++++++++------------
->>  drivers/staging/ccree/ssi_hash.c         | 832 ++++++++++++++--------------
->>  drivers/staging/ccree/ssi_ivgen.c        |  77 ++-
->>  drivers/staging/ccree/ssi_request_mgr.c  |  25 +-
->>  drivers/staging/ccree/ssi_sram_mgr.c     |   8 +-
->>  10 files changed, 1765 insertions(+), 1700 deletions(-)
+>>  drivers/staging/ccree/cc_lli_defs.h    | 65 +++++++++++++++++++---------------
+>>  drivers/staging/ccree/ssi_buffer_mgr.c | 45 +++++------------------
+>>  2 files changed, 44 insertions(+), 66 deletions(-)
 >>
->> diff --git a/drivers/staging/ccree/cc_bitops.h b/drivers/staging/ccree/cc_bitops.h
->> index ee5238a..a12a65c 100644
->> --- a/drivers/staging/ccree/cc_bitops.h
->> +++ b/drivers/staging/ccree/cc_bitops.h
->> @@ -21,9 +21,14 @@
->>  #ifndef _CC_BITOPS_H_
->>  #define _CC_BITOPS_H_
+>> diff --git a/drivers/staging/ccree/cc_lli_defs.h b/drivers/staging/ccree/cc_lli_defs.h
+>> index 857b94f..c6b2917 100644
+>> --- a/drivers/staging/ccree/cc_lli_defs.h
+>> +++ b/drivers/staging/ccree/cc_lli_defs.h
+>> @@ -28,36 +28,43 @@
 >>
->> -#define BITMASK(mask_size) (((mask_size) < 32) ?     \
->> -     ((1UL << (mask_size)) - 1) : 0xFFFFFFFFUL)
->> -#define BITMASK_AT(mask_size, mask_offset) (BITMASK(mask_size) << (mask_offset))
->> +#include <linux/bitops.h>
->> +#include <linux/bitfield.h>
->> +
->> +#define BITMASK(mask_size) (((mask_size) < 32) ? \
->> +             ((1UL << (mask_size)) - 1) : 0xFFFFFFFFUL)
->> +
->> +#define BITMASK_AT(mask_size, mask_offset) \
->> +     (BITMASK(mask_size) << (mask_offset))
->
-> Why do you still needed these macros with this change?
->
-
-My description of the patch is at fault. This patch gets rid of one
-group of these
-custom bit field ops users - and so does each one in the rest of the
-series until
-the patch that deletes them.
-
-Getting rid of the custom bitfield ops was the reason why I've done
-it, but of course
-as you point it it isn't what the patch is doing. I will fix it.
-
+>>  #define CC_MAX_MLLI_ENTRY_SIZE 0x10000
 >>
->>  #define BITFIELD_GET(word, bit_offset, bit_size) \
->>       (((word) >> (bit_offset)) & BITMASK(bit_size))
->> diff --git a/drivers/staging/ccree/cc_hw_queue_defs.h b/drivers/staging/ccree/cc_hw_queue_defs.h
->> index 7138176..af10850 100644
->> --- a/drivers/staging/ccree/cc_hw_queue_defs.h
->> +++ b/drivers/staging/ccree/cc_hw_queue_defs.h
->> @@ -22,25 +22,69 @@
->>  #include "cc_regs.h"
->>  #include "dx_crys_kernel.h"
->>
->> -/******************************************************************************
->> -*                            DEFINITIONS
->> -******************************************************************************/
+>> -#define LLI_SET_ADDR(__lli_p, __addr) do {                           \
+>> -             u32 *lli_p = (u32 *)__lli_p;                            \
+>> -             typeof(__addr) addr = __addr;                           \
+>> -                                                                     \
+>> -             BITFIELD_SET(lli_p[LLI_WORD0_OFFSET],                   \
+>> -                     LLI_LADDR_BIT_OFFSET,                           \
+>> -                     LLI_LADDR_BIT_SIZE, (addr & U32_MAX));          \
+>> -                                                                     \
+>> -             BITFIELD_SET(lli_p[LLI_WORD1_OFFSET],                   \
+>> -                     LLI_HADDR_BIT_OFFSET,                           \
+>> -                     LLI_HADDR_BIT_SIZE, MSB64(addr));               \
+>> -     } while (0)
 >> -
->> -/* Dma AXI Secure bit */
->> -#define      AXI_SECURE      0
->> -#define AXI_NOT_SECURE       1
->> +/*****************************************************************************
->> + *                           DEFINITIONS
->> + *****************************************************************************/
+>> -#define LLI_SET_SIZE(lli_p, size)                                    \
+>> -             BITFIELD_SET(((u32 *)(lli_p))[LLI_WORD1_OFFSET],        \
+>> -             LLI_SIZE_BIT_OFFSET, LLI_SIZE_BIT_SIZE, size)
+>> +#define LLI_MAX_NUM_OF_DATA_ENTRIES 128
+>> +#define LLI_MAX_NUM_OF_ASSOC_DATA_ENTRIES 4
+>> +#define MLLI_TABLE_MIN_ALIGNMENT 4 /* 32 bit alignment */
+>> +#define MAX_NUM_OF_BUFFERS_IN_MLLI 4
+>> +#define MAX_NUM_OF_TOTAL_MLLI_ENTRIES (2 * LLI_MAX_NUM_OF_DATA_ENTRIES + \
+>> +                                    LLI_MAX_NUM_OF_ASSOC_DATA_ENTRIES)
+>> +
+>> +struct cc_lli_entry {
+>> +#ifndef __LITTLE_ENDIAN__
+>> +     u32 addr_lsb;
+>> +     u16 size;
+>> +     u16 addr_msb;
+>> +#else /* __BIG_ENDIAN__ */
+>> +     u16 addr_msb;
+>> +     u16 size;
+>> +     u32 addr_lsb;
+>> +#endif
 >
-> That has nothing to do with changing bitops :(
->
->>
->>  #define HW_DESC_SIZE_WORDS           6
->> -#define HW_QUEUE_SLOTS_MAX              15 /* Max. available slots in HW queue */
->> +#define HW_QUEUE_SLOTS_MAX              15 /* Max. available HW queue slots */
->
-> Neither does this :(
->
-> I'm stopping reviewing this here, please be more careful...
+> How is the bits within the different variables also not affected by the
+> endian issues?  Just moving them around in the 64bits seems really
+> strange.
 
-Thanks. I will fix and resend.
+I actually did not overlook this issue. My reasoning was that the new code
+is doing exactly what the old code was doing. Either the callers was doing
+the right thing, or the HW is magically taking care of it[1] or the
+new code is as
+broken as the old in a bug to bug compatibility sort of way.
 
+And if it's broken, fixing it in this patch would actually break the
+"do one thing"
+rule... :-)
+
+[1] I know this sounds strange but the control register description has language
+that sounds like it does automagicall swabbing under certain circumstances I am
+yet to understand and since I don't have a big endian test system at
+my disposable
+I chose to leave it as is for now.
+
+>
+> Why not just use the "normal" ways to address data in an endian-neutral
+> way instead of making your own macros up here?  (i.e. shift and mask.)
+>
+
+I personally find it more readable it this way and there are other
+example in the
+kernel source of doing this) but I will gladly switch if you think it
+is preferred.
+
+Thanks,
 Gilad
+
+> thanks,
+>
+> greg k-h
+
+
+
 -- 
 Gilad Ben-Yossef
 Chief Coffee Drinker
