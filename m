@@ -1,67 +1,66 @@
 From: Antoine Tenart <antoine.tenart@free-electrons.com>
-Subject: Re: [PATCH 10/11] crypto: sun4i-ss: fix large block size support
-Date: Mon, 29 May 2017 11:15:04 +0200
-Message-ID: <20170529091503.GB3169@kwain>
-References: <20170524190652.13278-1-antoine.tenart@free-electrons.com>
- <20170524190652.13278-11-antoine.tenart@free-electrons.com>
- <20170526145501.GA19284@Red>
- <20170529080944.GA3169@kwain>
- <20170529082931.ocoatlnpl7fvtgfu@flea.lan>
+Subject: Re: [PATCH v6 4/5] crypto: inside-secure: add SafeXcel EIP197 crypto
+ engine driver
+Date: Mon, 29 May 2017 11:21:07 +0200
+Message-ID: <20170529092107.GA24048@kwain>
+References: <20170524141035.21031-1-antoine.tenart@free-electrons.com>
+ <20170524141035.21031-5-antoine.tenart@free-electrons.com>
+ <CANc+2y46roki41fd_yURACWeXNzjyBEk_kOwiLEr_D=zFyaWuQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="O5XBE6gyVG5Rl6Rj"
+        protocol="application/pgp-signature"; boundary="+QahgC5+KEYLbs62"
 Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
-        Corentin Labbe <clabbe.montjoie@gmail.com>,
-        herbert@gondor.apana.org.au, davem@davemloft.net, wens@csie.org,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-To: Maxime Ripard <maxime.ripard@free-electrons.com>
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>, jason@lakedaemon.net,
+        andrew@lunn.ch,
+        Gregory Clement <gregory.clement@free-electrons.com>,
+        sebastian.hesselbarth@gmail.com, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+        oferh@marvell.com, Igal Liberman <igall@marvell.com>,
+        Nadav Haklai <nadavh@marvell.com>, robin.murphy@arm.com
+To: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:53951 "EHLO
+Received: from mail.free-electrons.com ([62.4.15.54]:54497 "EHLO
         mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750864AbdE2JPP (ORCPT
+        with ESMTP id S1750844AbdE2JVY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 29 May 2017 05:15:15 -0400
+        Mon, 29 May 2017 05:21:24 -0400
 Content-Disposition: inline
-In-Reply-To: <20170529082931.ocoatlnpl7fvtgfu@flea.lan>
+In-Reply-To: <CANc+2y46roki41fd_yURACWeXNzjyBEk_kOwiLEr_D=zFyaWuQ@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 
---O5XBE6gyVG5Rl6Rj
+--+QahgC5+KEYLbs62
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-Hi Maxime,
+Hello,
 
-On Mon, May 29, 2017 at 10:29:31AM +0200, Maxime Ripard wrote:
-> On Mon, May 29, 2017 at 10:09:44AM +0200, Antoine Tenart wrote:
-> > > Which speed are the SS clocks ?
-> >=20
-> > The AHB SS clk is running at 300 MHz and the SS clk at 150 MHz. SS clk
-> > is at the expected rate but the AHB SS clk has a higher rate that what's
-> > expected.
-> >=20
-> > In the probing function only the SS clk rate is explicitly set. I tried
-> > to set the AHB clk rate as well and removed the delays. This didn't fix
-> > the framework selftests at boot time. Is there any reason the AHB SS clk
-> > rate isn't explicitly set when probing the driver? (Should it?)
+On Sun, May 28, 2017 at 11:09:43AM +0530, PrasannaKumar Muralidharan wrote:
+> On 24 May 2017 at 19:40, Antoine Tenart
+> <antoine.tenart@free-electrons.com> wrote:
+> > Add support for Inside Secure SafeXcel EIP197 cryptographic engine,
+> > which can be found on Marvell Armada 7k and 8k boards. This driver
+> > currently implements: ecb(aes), cbc(aes), sha1, sha224, sha256 and
+> > hmac(sah1) algorithms.
+> >
+> > Two firmwares are needed for this engine to work. Their are mostly used
+> > for more advanced operations than the ones supported (as of now), but we
+> > still need them to pass the data to the internal cryptographic engine.
+> >
+> > Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
 >=20
-> It probably shouldn't.
->=20
-> The AHB clock is shared by most of the drivers, some of them actually
-> using that clock to generate their signals.
->=20
-> You would have to unbreak all those drivers first, which is probably
-> not needed at all. I haven't seen a case where a block had a module
-> clock and did care for its AHB clock rate.
+> As you have got help from other people for testing, wouldn't it be
+> nice to add tested-by tag?
 
-OK, makes sense.
+Well, they're listed as authors of the driver: not only they helped to
+test it but they developed parts of it. The tested-by tag doesn't apply
+here.
 
-I'll wait for Corentin to test the series, and I'll send a v2 only
-fixing the typos then.
-
-Thanks!
+Thanks,
 Antoine
 
 --=20
@@ -69,25 +68,25 @@ Antoine T=E9nart, Free Electrons
 Embedded Linux and Kernel engineering
 http://free-electrons.com
 
---O5XBE6gyVG5Rl6Rj
+--+QahgC5+KEYLbs62
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAABCgAGBQJZK+aXAAoJEFxNi8it27zYvOwQAI0RNBfV+r0PofXYXNtDBLG+
-pLq9g4aQx7PrwdOSDbVMxuYMqgxLiW6S4J1iqK2HYeuzyQ3MP6Oa61SjVK0Vw2WN
-UTZjkiHsauMAkNbA99tIFjXqp4PYnHpz7Q0ZOlovfJceH3HRumyUYeLs4qcbGVFl
-ICAHwo9Qrse3m7WUR8dVDbo/NxXg8dPUe0JH2m3AFJxsj63Risedfg7FP6HfnkY6
-LDUQ90jvXUVqmI2/13q3lvb1W4xA48XUKqLItX5AhSVN33DAFaCIttXnaGToVLVU
-Oy1kMzMUIoDetED7+JDY7kQI9vOKRKtVipwMvr0oK8wK5NlOR0Eq6WFNrWVsGtEc
-fcb3gFUBUz4V8LlwVRDd6jf0BqRNuuJ44/EFmkPqYEqhRZ7vS2YR32YvQ0da36xG
-cnx4R6lCEFCs1C+ljtJHwfMPrQ0JP6Ib1VwHlzh3gy6DkARy6nTSHYX9cXCo0Rh9
-Grmwin+G9jQ8X/fiP3i4hMXiv8aXD+IAkQawsjEfEfZQRGyjBXdED4+YReMc8BFT
-ViPts533mMiEAF8jw+9f6D1NLI3S1ISUsgAEJcEWF/dnYz81IgAlPIe/rRIy++Iz
-H6v6F1bksEzKIdk68lzZjh1Vrxgovn/26+D0BR34Rhqw+6W9N3XJv9cyLhF0G7DZ
-dpB16iR8uVVArQiRmw73
-=vXyt
+iQIcBAABCgAGBQJZK+gDAAoJEFxNi8it27zYY9EP+weB+07DYAdjl6UT5FM8/dRa
+XvbSDqbU0a5lqLwZBd5Zv884JPPNqKwAkMJAXt2cmjaQoH2RrijkVlI9N45sKH9q
+SSGXWj3yNvSX77kCev9Rb+Y4fl95cLuT6qkz14v9I/USPVfrXTXWDQvYbg55N8tQ
+mjJYRW2jhHwhXNBVT2Vcd4/5QtACxMPcdOH7Rtw77V1nmijBB+6/CbtFif12IGic
+jta2XS443JhnJTMWd4jgNz22h46i2cKL1fA7oj6xW3QP/CVj15YN+yTU6OHczOt0
+3YoGaa1U9fmJSYgGYuDtDGnXIUftQMk3dWgdV2RYUFdEWJsM5OCET0XvsP16yMbU
++sYmdAnb+tcmi7t0lm3IhCIaZ+jYM2Bd98Y5hnmLG3H2/5qjhcYpTqmA+qQDyUz5
+jM73GX5FZLKxxWhaKAZCj75SDGf15eOQiMNLCYxsbPWFEZrmQtOypVK09+kghto6
+HGcsj1dUHhjCqN0TwUxz7NQYR6UohJAKS3sI4U7mj7YzlN6tr/1XWz0JNoD2XxfZ
+RCwVm2yyV0cjOgnnwR+rPOwdxTXV7oZQXp5W6325c+IDt6WVU/rPcWQnQ8QV8zLq
+fkAhS1kCaWM9VgoXmEaDago3uuUxcD5UKU5dT8j0fsnbWW5Dg5M/ScRXliIk2Q4Y
+JzcG1P7FCixoj1QRpfmq
+=Fldh
 -----END PGP SIGNATURE-----
 
---O5XBE6gyVG5Rl6Rj--
+--+QahgC5+KEYLbs62--
