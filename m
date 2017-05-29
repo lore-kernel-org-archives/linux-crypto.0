@@ -1,128 +1,105 @@
-From: Fabien DESSENNE <fabien.dessenne-qxv4g6HH51o@public.gmane.org>
-Subject: Re: [PATCH v3 2/5] crypto : stm32 - Add STM32F4 CRC32 support
-Date: Mon, 29 May 2017 07:56:48 +0000
-Message-ID: <efdd669a-2df6-f7fa-849b-e1c7057ae666@st.com>
-References: <cover.1495463449.git.cosardindar@gmail.com>
- <3c520bbef98c630ca7de609f8ec27405e2ac07d4.1495463449.git.cosardindar@gmail.com>
+From: Antoine Tenart <antoine.tenart@free-electrons.com>
+Subject: Re: [PATCH 10/11] crypto: sun4i-ss: fix large block size support
+Date: Mon, 29 May 2017 10:09:44 +0200
+Message-ID: <20170529080944.GA3169@kwain>
+References: <20170524190652.13278-1-antoine.tenart@free-electrons.com>
+ <20170524190652.13278-11-antoine.tenart@free-electrons.com>
+ <20170526145501.GA19284@Red>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: "davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-        "robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org" <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        "mark.rutland-5wv7dgnIgG8@public.gmane.org" <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
-        "mcoquelin.stm32-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org" <mcoquelin.stm32-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        Alexandre TORGUE <alexandre.torgue-qxv4g6HH51o@public.gmane.org>,
-        "linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        "devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        "linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org"
-        <linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>,
-        "linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Cosar Dindar <cosardindar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        "herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org" <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <3c520bbef98c630ca7de609f8ec27405e2ac07d4.1495463449.git.cosardindar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Content-Language: en-US
-Content-ID: <58173B46F577A94CB9B621165C5FAB39-qxv4g6HH51o@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="YZ5djTAD1cGYuMQK"
+Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        maxime.ripard@free-electrons.com, wens@csie.org,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Corentin Labbe <clabbe.montjoie@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.free-electrons.com ([62.4.15.54]:52090 "EHLO
+        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750787AbdE2IKB (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 29 May 2017 04:10:01 -0400
+Content-Disposition: inline
+In-Reply-To: <20170526145501.GA19284@Red>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-SGkgQ29zYXIsDQoNClRoYW5rIHlvdSBmb3IgdGhlIHBhdGNoDQoNCk9uIDIyLzA1LzE3IDE2OjM0
-LCBDb3NhciBEaW5kYXIgd3JvdGU6DQo+IFRoaXMgcGF0Y2ggYWRkcyBDUkMgKENSQzMyIENyeXB0
-bykgc3VwcG9ydCBmb3IgU1RNMzJGNCBzZXJpZXMuDQo+DQo+IEFzIGFuIGhhcmR3YXJlIGxpbWl0
-YXRpb24gcG9seW5vbWlhbCBhbmQga2V5IHNldHRpbmcgYXJlIG5vdCBzdXBwb3J0ZWQuDQo+IFRo
-ZXkgYXJlIGZpeGVkIGFzIDB4NEMxMURCNyAocG9seSkgYW5kIDB4RkZGRkZGRkYgKGtleSkuDQo+
-IENSQzMyQyBDYXN0YWdub2xpIGFsZ29yaXRobSBpcyBub3QgdXNlZC4NCj4NCj4gU2lnbmVkLW9m
-Zi1ieTogQ29zYXIgRGluZGFyIDxjb3NhcmRpbmRhckBnbWFpbC5jb20+DQo+IC0tLQ0KPiAgIGRy
-aXZlcnMvY3J5cHRvL3N0bTMyL3N0bTMyX2NyYzMyLmMgfCA2OCArKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKy0tLS0tLQ0KPiAgIDEgZmlsZSBjaGFuZ2VkLCA1OCBpbnNlcnRpb25zKCsp
-LCAxMCBkZWxldGlvbnMoLSkNCj4NCj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvY3J5cHRvL3N0bTMy
-L3N0bTMyX2NyYzMyLmMgYi9kcml2ZXJzL2NyeXB0by9zdG0zMi9zdG0zMl9jcmMzMi5jDQo+IGlu
-ZGV4IGVjODNiMWUuLjEyZmJkOTggMTAwNjQ0DQo+IC0tLSBhL2RyaXZlcnMvY3J5cHRvL3N0bTMy
-L3N0bTMyX2NyYzMyLmMNCj4gKysrIGIvZHJpdmVycy9jcnlwdG8vc3RtMzIvc3RtMzJfY3JjMzIu
-Yw0KPiBAQCAtNyw2ICs3LDcgQEANCj4gICAjaW5jbHVkZSA8bGludXgvYml0cmV2Lmg+DQo+ICAg
-I2luY2x1ZGUgPGxpbnV4L2Nsay5oPg0KPiAgICNpbmNsdWRlIDxsaW51eC9tb2R1bGUuaD4NCj4g
-KyNpbmNsdWRlIDxsaW51eC9vZi5oPg0KPiAgICNpbmNsdWRlIDxsaW51eC9wbGF0Zm9ybV9kZXZp
-Y2UuaD4NCj4gICANCj4gICAjaW5jbHVkZSA8Y3J5cHRvL2ludGVybmFsL2hhc2guaD4NCj4gQEAg
-LTM5LDYgKzQwLDkgQEAgc3RydWN0IHN0bTMyX2NyYyB7DQo+ICAgCXN0cnVjdCBjbGsgICAgICAg
-KmNsazsNCj4gICAJdTggICAgICAgICAgICAgICBwZW5kaW5nX2RhdGFbc2l6ZW9mKHUzMildOw0K
-PiAgIAlzaXplX3QgICAgICAgICAgIG5iX3BlbmRpbmdfYnl0ZXM7DQo+ICsJYm9vbCAgICAgICAg
-ICAgICBrZXlfc3VwcG9ydDsNCj4gKwlib29sICAgICAgICAgICAgIHBvbHlfc3VwcG9ydDsNCj4g
-Kwlib29sICAgICAgICAgICAgIHJldmVyc2Vfc3VwcG9ydDsNCj4gICB9Ow0KPiAgIA0KPiAgIHN0
-cnVjdCBzdG0zMl9jcmNfbGlzdCB7DQo+IEBAIC0xMDYsMTMgKzExMCwzMSBAQCBzdGF0aWMgaW50
-IHN0bTMyX2NyY19pbml0KHN0cnVjdCBzaGFzaF9kZXNjICpkZXNjKQ0KPiAgIAl9DQo+ICAgCXNw
-aW5fdW5sb2NrX2JoKCZjcmNfbGlzdC5sb2NrKTsNCj4gICANCj4gLQkvKiBSZXNldCwgc2V0IGtl
-eSwgcG9seSBhbmQgY29uZmlndXJlIGluIGJpdCByZXZlcnNlIG1vZGUgKi8NCj4gLQl3cml0ZWwo
-Yml0cmV2MzIobWN0eC0+a2V5KSwgY3R4LT5jcmMtPnJlZ3MgKyBDUkNfSU5JVCk7DQo+IC0Jd3Jp
-dGVsKGJpdHJldjMyKG1jdHgtPnBvbHkpLCBjdHgtPmNyYy0+cmVncyArIENSQ19QT0wpOw0KPiAt
-CXdyaXRlbChDUkNfQ1JfUkVTRVQgfCBDUkNfQ1JfUkVWRVJTRSwgY3R4LT5jcmMtPnJlZ3MgKyBD
-UkNfQ1IpOw0KPiArCS8qIHNldCBrZXkgKi8NCj4gKwlpZiAoY3R4LT5jcmMtPmtleV9zdXBwb3J0
-KSB7DQo+ICsJCXdyaXRlbChiaXRyZXYzMihtY3R4LT5rZXkpLCBjdHgtPmNyYy0+cmVncyArIENS
-Q19JTklUKTsNCj4gKwl9IGVsc2UgaWYgKG1jdHgtPmtleSAhPSBDUkNfSU5JVF9ERUZBVUxUKSB7
-DQo+ICsJCWRldl9lcnIoY3R4LT5jcmMtPmRldiwgIlVuc3VwcG9ydGVkIGtleSB2YWx1ZSEgU2hv
-dWxkIGJlOiAweCV4XG4iLA0KPiArCQkJQ1JDX0lOSVRfREVGQVVMVCk7DQo+ICsJCXJldHVybiAt
-RUlOVkFMOw0KPiArCX0NCj4gKw0KPiArCS8qIHNldCBwb2x5ICovDQo+ICsJaWYgKGN0eC0+Y3Jj
-LT5wb2x5X3N1cHBvcnQpDQo+ICsJCXdyaXRlbChiaXRyZXYzMihtY3R4LT5wb2x5KSwgY3R4LT5j
-cmMtPnJlZ3MgKyBDUkNfUE9MKTsNCj4gKw0KPiArCS8qIHJlc2V0IGFuZCBjb25maWd1cmUgaW4g
-Yml0IHJldmVyc2UgbW9kZSBpZiBzdXBwb3J0ZWQgKi8NCj4gKwlpZiAoY3R4LT5jcmMtPnJldmVy
-c2Vfc3VwcG9ydCkNCj4gKwkJd3JpdGVsKENSQ19DUl9SRVNFVCB8IENSQ19DUl9SRVZFUlNFLCBj
-dHgtPmNyYy0+cmVncyArIENSQ19DUik7DQo+ICsJZWxzZQ0KPiArCQl3cml0ZWwoQ1JDX0NSX1JF
-U0VULCBjdHgtPmNyYy0+cmVncyArIENSQ19DUik7DQo+ICsNCj4gKwkvKiBzdG9yZSBwYXJ0aWFs
-IHJlc3VsdCAqLw0KPiArCWlmICghY3R4LT5jcmMtPnJldmVyc2Vfc3VwcG9ydCkNCj4gKwkJY3R4
-LT5wYXJ0aWFsID0gYml0cmV2MzIocmVhZGwoY3JjLT5yZWdzICsgQ1JDX0RSKSk7DQo+ICsJZWxz
-ZQ0KPiArCQljdHgtPnBhcnRpYWwgPSByZWFkbChjdHgtPmNyYy0+cmVncyArIENSQ19EUik7DQo+
-ICAgDQo+IC0JLyogU3RvcmUgcGFydGlhbCByZXN1bHQgKi8NCj4gLQljdHgtPnBhcnRpYWwgPSBy
-ZWFkbChjdHgtPmNyYy0+cmVncyArIENSQ19EUik7DQo+ICAgCWN0eC0+Y3JjLT5uYl9wZW5kaW5n
-X2J5dGVzID0gMDsNCj4gICANCj4gICAJcmV0dXJuIDA7DQo+IEBAIC0xMzUsNyArMTU3LDEyIEBA
-IHN0YXRpYyBpbnQgc3RtMzJfY3JjX3VwZGF0ZShzdHJ1Y3Qgc2hhc2hfZGVzYyAqZGVzYywgY29u
-c3QgdTggKmQ4LA0KPiAgIA0KPiAgIAkJaWYgKGNyYy0+bmJfcGVuZGluZ19ieXRlcyA9PSBzaXpl
-b2YodTMyKSkgew0KPiAgIAkJCS8qIFByb2Nlc3MgY29tcGxldGVkIHBlbmRpbmcgZGF0YSAqLw0K
-PiAtCQkJd3JpdGVsKCoodTMyICopY3JjLT5wZW5kaW5nX2RhdGEsIGNyYy0+cmVncyArIENSQ19E
-Uik7DQo+ICsJCQlpZiAoIWN0eC0+Y3JjLT5yZXZlcnNlX3N1cHBvcnQpDQo+ICsJCQkJd3JpdGVs
-KGJpdHJldjMyKCoodTMyICopY3JjLT5wZW5kaW5nX2RhdGEpLA0KPiArCQkJCSAgICAgICBjcmMt
-PnJlZ3MgKyBDUkNfRFIpOw0KPiArCQkJZWxzZQ0KPiArCQkJCXdyaXRlbCgqKHUzMiAqKWNyYy0+
-cGVuZGluZ19kYXRhLA0KPiArCQkJCSAgICAgICBjcmMtPnJlZ3MgKyBDUkNfRFIpOw0KPiAgIAkJ
-CWNyYy0+bmJfcGVuZGluZ19ieXRlcyA9IDA7DQo+ICAgCQl9DQo+ICAgCX0NCj4gQEAgLTE0Mywx
-MCArMTcwLDE2IEBAIHN0YXRpYyBpbnQgc3RtMzJfY3JjX3VwZGF0ZShzdHJ1Y3Qgc2hhc2hfZGVz
-YyAqZGVzYywgY29uc3QgdTggKmQ4LA0KPiAgIAlkMzIgPSAodTMyICopZDg7DQo+ICAgCWZvciAo
-aSA9IDA7IGkgPCBsZW5ndGggPj4gMjsgaSsrKQ0KPiAgIAkJLyogUHJvY2VzcyAzMiBiaXRzIGRh
-dGEgKi8NCj4gLQkJd3JpdGVsKCooZDMyKyspLCBjcmMtPnJlZ3MgKyBDUkNfRFIpOw0KPiArCQlp
-ZiAoIWN0eC0+Y3JjLT5yZXZlcnNlX3N1cHBvcnQpDQo+ICsJCQl3cml0ZWwoYml0cmV2MzIoKihk
-MzIrKykpLCBjcmMtPnJlZ3MgKyBDUkNfRFIpOw0KPiArCQllbHNlDQo+ICsJCQl3cml0ZWwoKihk
-MzIrKyksIGNyYy0+cmVncyArIENSQ19EUik7DQo+ICAgDQo+ICAgCS8qIFN0b3JlIHBhcnRpYWwg
-cmVzdWx0ICovDQo+IC0JY3R4LT5wYXJ0aWFsID0gcmVhZGwoY3JjLT5yZWdzICsgQ1JDX0RSKTsN
-Cj4gKwlpZiAoIWN0eC0+Y3JjLT5yZXZlcnNlX3N1cHBvcnQpDQo+ICsJCWN0eC0+cGFydGlhbCA9
-IGJpdHJldjMyKHJlYWRsKGNyYy0+cmVncyArIENSQ19EUikpOw0KPiArCWVsc2UNCj4gKwkJY3R4
-LT5wYXJ0aWFsID0gcmVhZGwoY3JjLT5yZWdzICsgQ1JDX0RSKTsNCj4gICANCj4gICAJLyogQ2hl
-Y2sgZm9yIHBlbmRpbmcgZGF0YSAobm9uIDMyIGJpdHMpICovDQo+ICAgCWxlbmd0aCAmPSAzOw0K
-PiBAQCAtMjQzLDYgKzI3Niw3IEBAIHN0YXRpYyBpbnQgc3RtMzJfY3JjX3Byb2JlKHN0cnVjdCBw
-bGF0Zm9ybV9kZXZpY2UgKnBkZXYpDQo+ICAgCXN0cnVjdCBzdG0zMl9jcmMgKmNyYzsNCj4gICAJ
-c3RydWN0IHJlc291cmNlICpyZXM7DQo+ICAgCWludCByZXQ7DQo+ICsJaW50IGFsZ3Nfc2l6ZTsN
-Cj4gICANCj4gICAJY3JjID0gZGV2bV9remFsbG9jKGRldiwgc2l6ZW9mKCpjcmMpLCBHRlBfS0VS
-TkVMKTsNCj4gICAJaWYgKCFjcmMpDQo+IEBAIC0yNjksMTMgKzMwMywyNiBAQCBzdGF0aWMgaW50
-IHN0bTMyX2NyY19wcm9iZShzdHJ1Y3QgcGxhdGZvcm1fZGV2aWNlICpwZGV2KQ0KPiAgIAkJcmV0
-dXJuIHJldDsNCj4gICAJfQ0KPiAgIA0KPiArCS8qIHNldCBrZXksIHBvbHkgYW5kIHJldmVyc2Ug
-c3VwcG9ydCBpZiBkZXZpY2UgaXMgb2YgRjcgc2VyaWVzICovDQo+ICsJaWYgKG9mX2RldmljZV9p
-c19jb21wYXRpYmxlKGNyYy0+ZGV2LT5vZl9ub2RlLCAic3Qsc3RtMzJmNy1jcmMiKSkgew0KPiAr
-CQljcmMtPmtleV9zdXBwb3J0ID0gdHJ1ZTsNCj4gKwkJY3JjLT5wb2x5X3N1cHBvcnQgPSB0cnVl
-Ow0KPiArCQljcmMtPnJldmVyc2Vfc3VwcG9ydCA9IHRydWU7DQo+ICsJfQ0KPiArDQo+ICAgCXBs
-YXRmb3JtX3NldF9kcnZkYXRhKHBkZXYsIGNyYyk7DQo+ICAgDQo+ICAgCXNwaW5fbG9jaygmY3Jj
-X2xpc3QubG9jayk7DQo+ICAgCWxpc3RfYWRkKCZjcmMtPmxpc3QsICZjcmNfbGlzdC5kZXZfbGlz
-dCk7DQo+ICAgCXNwaW5fdW5sb2NrKCZjcmNfbGlzdC5sb2NrKTsNCj4gICANCj4gLQlyZXQgPSBj
-cnlwdG9fcmVnaXN0ZXJfc2hhc2hlcyhhbGdzLCBBUlJBWV9TSVpFKGFsZ3MpKTsNCj4gKwkvKiBG
-b3IgRjQgc2VyaWVzIG9ubHkgQ1JDMzIgYWxnb3JpdGhtIHdpbGwgYmUgdXNlZCAqLw0KPiArCWlm
-IChvZl9kZXZpY2VfaXNfY29tcGF0aWJsZShjcmMtPmRldi0+b2Zfbm9kZSwgInN0LHN0bTMyZjQt
-Y3JjIikpDQo+ICsJCWFsZ3Nfc2l6ZSA9IDE7DQo+ICsJZWxzZQ0KPiArCQlhbGdzX3NpemUgPSBB
-UlJBWV9TSVpFKGFsZ3MpOw0KPiArDQo+ICsJcmV0ID0gY3J5cHRvX3JlZ2lzdGVyX3NoYXNoZXMo
-YWxncywgYWxnc19zaXplKTsNCj4gICAJaWYgKHJldCkgew0KPiAgIAkJZGV2X2VycihkZXYsICJG
-YWlsZWQgdG8gcmVnaXN0ZXJcbiIpOw0KPiAgIAkJY2xrX2Rpc2FibGVfdW5wcmVwYXJlKGNyYy0+
-Y2xrKTsNCj4gQEAgLTMwNCw2ICszNTEsNyBAQCBzdGF0aWMgaW50IHN0bTMyX2NyY19yZW1vdmUo
-c3RydWN0IHBsYXRmb3JtX2RldmljZSAqcGRldikNCj4gICANCj4gICBzdGF0aWMgY29uc3Qgc3Ry
-dWN0IG9mX2RldmljZV9pZCBzdG0zMl9kdF9pZHNbXSA9IHsNCj4gICAJeyAuY29tcGF0aWJsZSA9
-ICJzdCxzdG0zMmY3LWNyYyIsIH0sDQo+ICsJeyAuY29tcGF0aWJsZSA9ICJzdCxzdG0zMmY0LWNy
-YyIsIH0sDQo+ICAgCXt9LA0KPiAgIH07DQo+ICAgTU9EVUxFX0RFVklDRV9UQUJMRShvZiwgc3Rt
-MzJfZHRfaWRzKTsNClJldmlld2VkLWJ5OiBGYWJpZW4gRGVzc2VubmUgPGZhYmllbi5kZXNzZW5u
-ZUBzdC5jb20+
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+--YZ5djTAD1cGYuMQK
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Hi Corentin,
+
+On Fri, May 26, 2017 at 04:55:01PM +0200, Corentin Labbe wrote:
+> On Wed, May 24, 2017 at 09:06:51PM +0200, Antoine Tenart wrote:
+> > =20
+> > +	/*
+> > +	 * The datasheet isn't very clear about when to retrieve the digest. =
+The
+> > +	 * bit SS_DATA_END is cleared when the engine has processed the data =
+and
+> > +	 * when the digest is computed *but* it doesn't mean the digest is
+> > +	 * available in the diesgt registers. Hence the delay to be sure we c=
+an
+>=20
+> Small typo here (diesgt/digest)
+
+Oops. I'll fix it.
+
+> This behaviour is very strange since I didnt get it on other platform.
+> Could you give me the board name where you get it ?
+
+I used a CHIP (sun5i-r8-chip).
+
+> Does any wmb() after the writel(..SS_DATA_END..) do the trick ?
+
+Nope. I tried this and it didn't help.
+
+> Which speed are the SS clocks ?
+
+The AHB SS clk is running at 300 MHz and the SS clk at 150 MHz. SS clk
+is at the expected rate but the AHB SS clk has a higher rate that what's
+expected.
+
+In the probing function only the SS clk rate is explicitly set. I tried
+to set the AHB clk rate as well and removed the delays. This didn't fix
+the framework selftests at boot time. Is there any reason the AHB SS clk
+rate isn't explicitly set when probing the driver? (Should it?)
+
+> Anyway the whole serie seems good, I will test it just after this weekend.
+
+Let me know if your tests went well, I'll send a v2 fixing the typo
+below then (and setting the AHB SS clk rate explicitly if needed).
+
+Thanks,
+Antoine
+
+--=20
+Antoine T=E9nart, Free Electrons
+Embedded Linux and Kernel engineering
+http://free-electrons.com
+
+--YZ5djTAD1cGYuMQK
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAABCgAGBQJZK9dGAAoJEFxNi8it27zY8RoP/3n+8tSmXiwqIJH/DYIhOhml
+fFRueP4TqFQzvdybeqpqNd/zmlnhbHOfKR4OVYhqgkWs7bnAU99wfHB0IdE71JwP
+9ykaO6c0m0jCPBsx0cC4uooywcSXvqGAxMXukW2vp96QiikYVvddRD1Arhl5ypKb
+DcAQMWFr0S9cy1VxlXt4es8F+kTGonG0ZTUts14p362N5el+w5VEgXLcATXiFV8Q
+7mzflLFowgFwfT769I1162WD6MEvsz3f6OcyN2lD1yV8mA2XGRJrj+ryUWL9Cy9J
+KflS92C/14rVcqy4u3GyDdHKV4cSR2SmKxkP0bGLVu6otBvsARXk5e2iSbHx+xS7
+gILTNuTrTohiKFH/gkwImNItrvyrPGv8AS6EFX3H27LnNYbvMalD0c11OxbrCXkQ
+7HhXrFo+UD97BaaRZ47xkcrAH0huocSH4cbxgLZg1yDTxnNW5bZO5BR8Z17wFCsc
+GX+nz2y5j67AKGdu25yZUydi60D1hhudrkpqmgtyHWAG+VGeR6dIN+xw2rw6Clsj
+qs9HfwIOGEPP2oVXIzbTGM5l3EZ7t5KHqPKWdZs41HRFlRBmrX0Z7vqo8OtDhosv
+pj4XobctOEWCGKwxODqMrOz2y81dIkfe8WoOgzcRnlawmOi41Jkxpnsf3ieOoBjI
+IX3pO6smM4k5rd1X0vPp
+=WwMo
+-----END PGP SIGNATURE-----
+
+--YZ5djTAD1cGYuMQK--
