@@ -1,76 +1,90 @@
-From: Antoine Tenart <antoine.tenart@free-electrons.com>
-Subject: Re: [PATCH 09/11] crypto: sun4i-ss: move from ablkcipher to skcipher
- API
-Date: Mon, 29 May 2017 16:56:13 +0200
-Message-ID: <20170529145613.GA14148@kwain>
-References: <20170524190652.13278-1-antoine.tenart@free-electrons.com>
- <20170524190652.13278-10-antoine.tenart@free-electrons.com>
- <20170529144757.GA23017@Red>
+From: Greg KH <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH 12/27] Drivers: ccree: ssi_fips_ll.c - align block
+ comments
+Date: Mon, 29 May 2017 16:53:38 +0200
+Message-ID: <20170529145338.GA32447@kroah.com>
+References: <20170524044352.30423-1-robsonde@gmail.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="sm4nu43k4a2Rpi4c"
-Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        maxime.ripard@free-electrons.com, wens@csie.org,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-To: Corentin Labbe <clabbe.montjoie@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: gilad@benyossef.com, devel@driverdev.osuosl.org,
+        driverdev-devel@linuxdriverproject.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Derek Robson <robsonde@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:59646 "EHLO
-        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751116AbdE2O4Z (ORCPT
+Received: from mail.linuxfoundation.org ([140.211.169.12]:57734 "EHLO
+        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750985AbdE2PHj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 29 May 2017 10:56:25 -0400
+        Mon, 29 May 2017 11:07:39 -0400
 Content-Disposition: inline
-In-Reply-To: <20170529144757.GA23017@Red>
+In-Reply-To: <20170524044352.30423-1-robsonde@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+On Wed, May 24, 2017 at 04:43:52PM +1200, Derek Robson wrote:
+> Fixed block comment alignment, Style fix only
+> Found using checkpatch
+> 
+> Signed-off-by: Derek Robson <robsonde@gmail.com>
+> ---
+>  drivers/staging/ccree/ssi_fips_ll.c | 21 ++++++++++++---------
+>  1 file changed, 12 insertions(+), 9 deletions(-)
+> 
+> diff --git a/drivers/staging/ccree/ssi_fips_ll.c b/drivers/staging/ccree/ssi_fips_ll.c
+> index 7c7c922f0788..cb487d747ee8 100644
+> --- a/drivers/staging/ccree/ssi_fips_ll.c
+> +++ b/drivers/staging/ccree/ssi_fips_ll.c
+> @@ -15,9 +15,9 @@
+>   */
+>  
+>  /**************************************************************
+> -This file defines the driver FIPS Low Level implmentaion functions,
+> -that executes the KAT.
+> -***************************************************************/
+> + * This file defines the driver FIPS Low Level implmentaion functions,
+> + * that executes the KAT.
+> + ***************************************************************/
+>  #include <linux/kernel.h>
+>  
+>  #include "ssi_driver.h"
+> @@ -816,7 +816,8 @@ ssi_hmac_fips_run_test(struct ssi_drvdata *drvdata,
+>  		       dma_addr_t digest_bytes_len_dma_addr)
+>  {
+>  	/* The implemented flow is not the same as the one implemented in ssi_hash.c (setkey + digest flows).
+> -	   In this flow, there is no need to store and reload some of the intermidiate results. */
+> +	 * In this flow, there is no need to store and reload some of the intermidiate results.
+> +	 */
+>  
+>  	/* max number of descriptors used for the flow */
+>  	#define FIPS_HMAC_MAX_SEQ_LEN 12
+> @@ -948,9 +949,9 @@ ssi_hmac_fips_run_test(struct ssi_drvdata *drvdata,
+>  	idx++;
+>  
+>  	/* at this point:
+> -	   tmp_digest = H(o_key_pad)
+> -	   k0 = H(i_key_pad || m)
+> -	   */
+> +	 * tmp_digest = H(o_key_pad)
+> +	 * k0 = H(i_key_pad || m)
+> +	 */
+>  
+>  	/* Loading hash opad xor key state */
+>  	HW_DESC_INIT(&desc[idx]);
+> @@ -1413,8 +1414,10 @@ ssi_gcm_fips_run_test(struct ssi_drvdata *drvdata,
+>  	idx++;
+>  
+>  	/* Configure Hash Engine to work with GHASH.
+> -	   Since it was not possible to extend HASH submodes to add GHASH,
+> -	   The following command is necessary in order to select GHASH (according to HW designers)*/
+> +	 * Since it was not possible to extend HASH submodes to add GHASH,
+> +	 * The following command is necessary in order to 
 
---sm4nu43k4a2Rpi4c
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+You added a coding style issue that was not previously here in this
+patch, which isn't ok :(
 
-Hi Corentin,
+I've stopped here with this series, please fix up the reset of this
+series (hint, this wasn't the only place you messed this up) and resend.
 
-On Mon, May 29, 2017 at 04:47:57PM +0200, Corentin Labbe wrote:
-> On Wed, May 24, 2017 at 09:06:50PM +0200, Antoine Tenart wrote:
-> > +			.cra_flags =3D CRYPTO_ALG_TYPE_SKCIPHER |
-> > +				     CRYPTO_ALG_KERN_DRIVER_ONLY,
->=20
-> You add CRYPTO_ALG_KERN_DRIVER_ONLY on all flags which is unrelated to
-> the patch description.
+thanks,
 
-Right, I forgot to make an extra patch for this. I'll fix this (and the
-other ones).
-
-Thanks,
-Antoine
-
---=20
-Antoine T=E9nart, Free Electrons
-Embedded Linux and Kernel engineering
-http://free-electrons.com
-
---sm4nu43k4a2Rpi4c
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAABCgAGBQJZLDaMAAoJEFxNi8it27zYOPQP/AnIfAs3WbfROGLLWIst3T+H
-rFWFsczZ5yxH4KyAaaHp2cbRSodS/nS1liDWOxgoW0bsytAtImFSKJaDBWG9Rg9r
-5ZFy7hQCNlHIL1xp+/h4f0MGPo0a3jgn5UGXy+NXqCxhtQZyKfv9306DMC3E2VA2
-r1rg/MzhIa1iwqfds67xAF1Wl1bbKivO+iCG6leBN/WmEplfGr+za+yuOzy8/WCR
-CAyFTYJrOpF7HN12oCnxpPvSQhCSZHPNAfreCj8OV8e4xHi9+bas02y2SRqw8eBy
-B7dURsWyHiVcBE6rYmIaMy4AL0hTXfVu7hWvAmWFp1O0JgSK/6GYEEFoFKoMoJRj
-n6Z8O2k5z8eT7b9b/M0K0rFanMS0z6rIrmUIZzRf18ReJdgAlLrv1490Lj8Xptqg
-jONaAem4rSjKztKzCDDfzFfw/iZtWHmvJxoSDi/+Q/EHhT7RCQKJRYyNGBHJOtjn
-BIeHcLyp5thu+2tQoT0UzHQQ+THdEK1TG+ePjiHeidfYGlaG4F5WyApP2ei+1Tkc
-urtpGUcXRlAMlMjh8NhIzKqM2JuvtrTmZsvItX0flgX5ITW5bh3OR4p7ye78IPZg
-S5UAPJ9LhY+0ljxy0gtf9ee/OO5zusICMJb9wz3gMcMvFMa9duFC1JydwkeByjhv
-wMHuhAEHuf6GrrB0piWM
-=jQsn
------END PGP SIGNATURE-----
-
---sm4nu43k4a2Rpi4c--
+greg k-h
