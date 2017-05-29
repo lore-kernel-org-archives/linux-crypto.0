@@ -1,105 +1,100 @@
-From: Antoine Tenart <antoine.tenart@free-electrons.com>
-Subject: Re: [PATCH 10/11] crypto: sun4i-ss: fix large block size support
-Date: Mon, 29 May 2017 10:09:44 +0200
-Message-ID: <20170529080944.GA3169@kwain>
-References: <20170524190652.13278-1-antoine.tenart@free-electrons.com>
- <20170524190652.13278-11-antoine.tenart@free-electrons.com>
- <20170526145501.GA19284@Red>
-Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="YZ5djTAD1cGYuMQK"
-Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        maxime.ripard@free-electrons.com, wens@csie.org,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-To: Corentin Labbe <clabbe.montjoie@gmail.com>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: [PATCH v2 00/11] introduce crypto wait for async op
+Date: Mon, 29 May 2017 11:22:47 +0300
+Message-ID: <1496046180-21962-1-git-send-email-gilad@benyossef.com>
+Cc: Eric Biggers <ebiggers3@gmail.com>,
+        Ofir Drang <ofir.drang@arm.com>,
+        Pavel Shilovsky <pshilov@microsoft.com>,
+        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-raid@vger.kernel.org, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-fscrypt@vger.kernel.org,
+        linux-ima-devel@lists.sourceforge.net,
+        linux-ima-user@lists.sourceforge.net,
+        linux-security-module@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        David Howells <dhowells@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Shaohua Li <shli@kernel.org>, Steve French <sfrench@samba.org>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        James Morris <james.l.morris@oracle.com>,
+        "Serge E. Hallyn" <serge@hallyn.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:52090 "EHLO
-        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750787AbdE2IKB (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 29 May 2017 04:10:01 -0400
-Content-Disposition: inline
-In-Reply-To: <20170526145501.GA19284@Red>
+Received: from foss.arm.com ([217.140.101.70]:45730 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750787AbdE2IXP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 29 May 2017 04:23:15 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Many users of kernel async. crypto services have a pattern of
+starting an async. crypto op and than using a completion
+to wait for it to end, resulting of the same code repeating
+itself in multiple places, sometime with coding errors.
 
---YZ5djTAD1cGYuMQK
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This patch aims to introduce a generic "wait for async.
+crypto op to complete" functions and move all the users
+I could find to use it.  This gets rid of almost 300
+lines of code and uncovered a few bugs in existing code
+(separate bug fix patch set sent previously).
 
-Hi Corentin,
+The patch set was boot tested on x86_64 and arm64 which
+at the very least tests the crypto users via testmgr
+but I am less confident regarding some of the other
+users and would love more testers.
+ 
+Changes from v1:
+- Address review comments from Eric Biggers.
+- Separated out bug fixes of existing code and rebase
+  on top of that patch set.
+- Rename 'ecr' to 'wait' in fscrypto code.
+- Split patch introducing the new API from the change
+  moving over the algif code which it originated from
+  to the new API.
+- Inline crypto_wait_req().
+- Some code indentation fixes.
 
-On Fri, May 26, 2017 at 04:55:01PM +0200, Corentin Labbe wrote:
-> On Wed, May 24, 2017 at 09:06:51PM +0200, Antoine Tenart wrote:
-> > =20
-> > +	/*
-> > +	 * The datasheet isn't very clear about when to retrieve the digest. =
-The
-> > +	 * bit SS_DATA_END is cleared when the engine has processed the data =
-and
-> > +	 * when the digest is computed *but* it doesn't mean the digest is
-> > +	 * available in the diesgt registers. Hence the delay to be sure we c=
-an
->=20
-> Small typo here (diesgt/digest)
+Gilad Ben-Yossef (11):
+  crypto: introduce crypto wait for async op
+  crypto: move algif to generic async completion
+  crypto: move pub key to generic async completion
+  crypto: move drbg to generic async completion
+  crypto: move gcm to generic async completion
+  crypto: move testmgr to generic async completion
+  dm: move dm-verity to generic async completion
+  fscrypt: move to generic async completion
+  cifs: move to generic async completion
+  ima: move to generic async completion
+  crypto: adapt api sample to use async. op wait
 
-Oops. I'll fix it.
+ Documentation/crypto/api-samples.rst |  52 ++--------
+ crypto/af_alg.c                      |  27 -----
+ crypto/algif_aead.c                  |  14 +--
+ crypto/algif_hash.c                  |  29 +++---
+ crypto/algif_skcipher.c              |  15 ++-
+ crypto/api.c                         |  13 +++
+ crypto/asymmetric_keys/public_key.c  |  28 +-----
+ crypto/drbg.c                        |  34 ++-----
+ crypto/gcm.c                         |  32 ++----
+ crypto/testmgr.c                     | 184 +++++++++++------------------------
+ drivers/md/dm-verity-target.c        |  81 ++++-----------
+ drivers/md/dm-verity.h               |   5 -
+ fs/cifs/smb2ops.c                    |  30 +-----
+ fs/crypto/crypto.c                   |  28 +-----
+ fs/crypto/fname.c                    |  36 ++-----
+ fs/crypto/fscrypt_private.h          |  10 --
+ fs/crypto/keyinfo.c                  |  21 +---
+ include/crypto/drbg.h                |   3 +-
+ include/crypto/if_alg.h              |  14 ---
+ include/linux/crypto.h               |  41 ++++++++
+ security/integrity/ima/ima_crypto.c  |  56 ++++-------
+ 21 files changed, 220 insertions(+), 533 deletions(-)
 
-> This behaviour is very strange since I didnt get it on other platform.
-> Could you give me the board name where you get it ?
-
-I used a CHIP (sun5i-r8-chip).
-
-> Does any wmb() after the writel(..SS_DATA_END..) do the trick ?
-
-Nope. I tried this and it didn't help.
-
-> Which speed are the SS clocks ?
-
-The AHB SS clk is running at 300 MHz and the SS clk at 150 MHz. SS clk
-is at the expected rate but the AHB SS clk has a higher rate that what's
-expected.
-
-In the probing function only the SS clk rate is explicitly set. I tried
-to set the AHB clk rate as well and removed the delays. This didn't fix
-the framework selftests at boot time. Is there any reason the AHB SS clk
-rate isn't explicitly set when probing the driver? (Should it?)
-
-> Anyway the whole serie seems good, I will test it just after this weekend.
-
-Let me know if your tests went well, I'll send a v2 fixing the typo
-below then (and setting the AHB SS clk rate explicitly if needed).
-
-Thanks,
-Antoine
-
---=20
-Antoine T=E9nart, Free Electrons
-Embedded Linux and Kernel engineering
-http://free-electrons.com
-
---YZ5djTAD1cGYuMQK
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAABCgAGBQJZK9dGAAoJEFxNi8it27zY8RoP/3n+8tSmXiwqIJH/DYIhOhml
-fFRueP4TqFQzvdybeqpqNd/zmlnhbHOfKR4OVYhqgkWs7bnAU99wfHB0IdE71JwP
-9ykaO6c0m0jCPBsx0cC4uooywcSXvqGAxMXukW2vp96QiikYVvddRD1Arhl5ypKb
-DcAQMWFr0S9cy1VxlXt4es8F+kTGonG0ZTUts14p362N5el+w5VEgXLcATXiFV8Q
-7mzflLFowgFwfT769I1162WD6MEvsz3f6OcyN2lD1yV8mA2XGRJrj+ryUWL9Cy9J
-KflS92C/14rVcqy4u3GyDdHKV4cSR2SmKxkP0bGLVu6otBvsARXk5e2iSbHx+xS7
-gILTNuTrTohiKFH/gkwImNItrvyrPGv8AS6EFX3H27LnNYbvMalD0c11OxbrCXkQ
-7HhXrFo+UD97BaaRZ47xkcrAH0huocSH4cbxgLZg1yDTxnNW5bZO5BR8Z17wFCsc
-GX+nz2y5j67AKGdu25yZUydi60D1hhudrkpqmgtyHWAG+VGeR6dIN+xw2rw6Clsj
-qs9HfwIOGEPP2oVXIzbTGM5l3EZ7t5KHqPKWdZs41HRFlRBmrX0Z7vqo8OtDhosv
-pj4XobctOEWCGKwxODqMrOz2y81dIkfe8WoOgzcRnlawmOi41Jkxpnsf3ieOoBjI
-IX3pO6smM4k5rd1X0vPp
-=WwMo
------END PGP SIGNATURE-----
-
---YZ5djTAD1cGYuMQK--
+-- 
+2.1.4
