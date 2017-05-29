@@ -1,7 +1,7 @@
 From: Antoine Tenart <antoine.tenart@free-electrons.com>
-Subject: [PATCH v2 03/12] crypto: sun4i-ss: use lower/upper_32_bits helpers
-Date: Mon, 29 May 2017 22:27:29 +0200
-Message-ID: <20170529202738.2167-4-antoine.tenart@free-electrons.com>
+Subject: [PATCH v2 05/12] crypto: sun4i-ss: do not dynamically set parts of the last buffer to 0
+Date: Mon, 29 May 2017 22:27:31 +0200
+Message-ID: <20170529202738.2167-6-antoine.tenart@free-electrons.com>
 References: <20170529202738.2167-1-antoine.tenart@free-electrons.com>
 Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
         linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
@@ -9,52 +9,43 @@ To: herbert@gondor.apana.org.au, davem@davemloft.net,
         maxime.ripard@free-electrons.com, wens@csie.org,
         clabbe.montjoie@gmail.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:36575 "EHLO
+Received: from mail.free-electrons.com ([62.4.15.54]:36601 "EHLO
         mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751130AbdE2U2N (ORCPT
+        with ESMTP id S1751130AbdE2U2W (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 29 May 2017 16:28:13 -0400
+        Mon, 29 May 2017 16:28:22 -0400
 In-Reply-To: <20170529202738.2167-1-antoine.tenart@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Replace custom bit shifts and masks with lower/upper_32_bits helpers.
+Parts of the bf buffer were dynamically set to 0. Change this to set the
+whole buffer to 0 by default to avoid any mistake.
 
 Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
 ---
- drivers/crypto/sunxi-ss/sun4i-ss-hash.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ drivers/crypto/sunxi-ss/sun4i-ss-hash.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-hash.c b/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
-index 39f0abe5ee25..e53c3127b743 100644
+index bc3cbde07219..518bc7a7df6a 100644
 --- a/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
 +++ b/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
-@@ -188,7 +188,6 @@ static int sun4i_hash(struct ahash_request *areq)
- 	struct sg_mapping_iter mi;
- 	int in_r, err = 0, zeros;
- 	size_t copied = 0;
--	__be64 bits;
+@@ -179,7 +179,7 @@ static int sun4i_hash(struct ahash_request *areq)
+ 	 */
+ 	unsigned int i = 0, end, index, padlen, nwait, nbw = 0, j = 0, todo;
+ 	unsigned int in_i = 0;
+-	u32 spaces, rx_cnt = SS_RX_DEFAULT, bf[32], wb = 0, v, ivmode = 0;
++	u32 spaces, rx_cnt = SS_RX_DEFAULT, bf[32] = {0}, wb = 0, v, ivmode = 0;
+ 	struct sun4i_req_ctx *op = ahash_request_ctx(areq);
+ 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
+ 	struct sun4i_tfm_ctx *tfmctx = crypto_ahash_ctx(tfm);
+@@ -417,7 +417,6 @@ static int sun4i_hash(struct ahash_request *areq)
+ 		zeros = (padlen - 1) / 4;
+ 	}
  
- 	dev_dbg(ss->dev, "%s %s bc=%llu len=%u mode=%x wl=%u h0=%0x",
- 		__func__, crypto_tfm_alg_name(areq->base.tfm),
-@@ -423,12 +422,13 @@ static int sun4i_hash(struct ahash_request *areq)
+-	memset(bf + j, 0, 4 * zeros);
+ 	j += zeros;
  
  	/* write the length of data */
- 	if (op->mode == SS_OP_SHA1) {
--		bits = cpu_to_be64(op->byte_count << 3);
--		bf[j++] = bits & 0xffffffff;
--		bf[j++] = (bits >> 32) & 0xffffffff;
-+		__be64 bits = cpu_to_be64(op->byte_count << 3);
-+		bf[j++] = lower_32_bits(bits);
-+		bf[j++] = upper_32_bits(bits);
- 	} else {
--		bf[j++] = (op->byte_count << 3) & 0xffffffff;
--		bf[j++] = (op->byte_count >> 29) & 0xffffffff;
-+		__le64 bits = op->byte_count << 3;
-+		bf[j++] = lower_32_bits(bits);
-+		bf[j++] = upper_32_bits(bits);
- 	}
- 	writesl(ss->base + SS_RXFIFO, bf, j);
- 
 -- 
 2.9.4
