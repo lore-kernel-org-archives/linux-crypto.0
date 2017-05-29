@@ -1,90 +1,81 @@
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH 04/12] staging: ccree: cleanup lli access macro
-Date: Mon, 29 May 2017 16:41:14 +0200
-Message-ID: <20170529144114.GC12428@kroah.com>
-References: <1495982440-10047-1-git-send-email-gilad@benyossef.com>
- <1495982440-10047-5-git-send-email-gilad@benyossef.com>
+From: Corentin Labbe <clabbe.montjoie@gmail.com>
+Subject: Re: [PATCH 09/11] crypto: sun4i-ss: move from ablkcipher to skcipher
+ API
+Date: Mon, 29 May 2017 16:47:57 +0200
+Message-ID: <20170529144757.GA23017@Red>
+References: <20170524190652.13278-1-antoine.tenart@free-electrons.com>
+ <20170524190652.13278-10-antoine.tenart@free-electrons.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: devel@driverdev.osuosl.org, driverdev-devel@linuxdriverproject.org,
- linux-crypto@vger.kernel.org, Ofir Drang <ofir.drang@arm.com>,
- linux-kernel@vger.kernel.org
-To: Gilad Ben-Yossef <gilad@benyossef.com>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+        maxime.ripard@free-electrons.com, wens@csie.org,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Antoine Tenart <antoine.tenart@free-electrons.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:34429 "EHLO
+        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750987AbdE2OsG (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 29 May 2017 10:48:06 -0400
+Received: by mail-wm0-f67.google.com with SMTP id d127so18298259wmf.1
+        for <linux-crypto@vger.kernel.org>; Mon, 29 May 2017 07:48:06 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <1495982440-10047-5-git-send-email-gilad@benyossef.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20170524190652.13278-10-antoine.tenart@free-electrons.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, May 28, 2017 at 05:40:29PM +0300, Gilad Ben-Yossef wrote:
-> The Linked List Item descriptors were being accessed via
-> a baroque set of defines and macro. Re-factor for structs
-> and inline function for readability and sanity.
+On Wed, May 24, 2017 at 09:06:50PM +0200, Antoine Tenart wrote:
+> Update the sun4i-ss driver to use the skcipher API instead of the old
+> ablkcipher one. It's a bit more tricky than s/ablkcipher/skcipher/, but
+> still nothing special and the driver's logic stays the same.
 > 
-> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+> Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
 > ---
->  drivers/staging/ccree/cc_lli_defs.h    | 65 +++++++++++++++++++---------------
->  drivers/staging/ccree/ssi_buffer_mgr.c | 45 +++++------------------
->  2 files changed, 44 insertions(+), 66 deletions(-)
+>  drivers/crypto/sunxi-ss/sun4i-ss-cipher.c | 189 ++++++++++++-------------
+>  drivers/crypto/sunxi-ss/sun4i-ss-core.c   | 227 +++++++++++++++---------------
+>  drivers/crypto/sunxi-ss/sun4i-ss.h        |  34 ++---
+>  3 files changed, 226 insertions(+), 224 deletions(-)
 > 
-> diff --git a/drivers/staging/ccree/cc_lli_defs.h b/drivers/staging/ccree/cc_lli_defs.h
-> index 857b94f..c6b2917 100644
-> --- a/drivers/staging/ccree/cc_lli_defs.h
-> +++ b/drivers/staging/ccree/cc_lli_defs.h
-> @@ -28,36 +28,43 @@
->  
->  #define CC_MAX_MLLI_ENTRY_SIZE 0x10000
->  
-> -#define LLI_SET_ADDR(__lli_p, __addr) do {				\
-> -		u32 *lli_p = (u32 *)__lli_p;				\
-> -		typeof(__addr) addr = __addr;				\
-> -									\
-> -		BITFIELD_SET(lli_p[LLI_WORD0_OFFSET],			\
-> -			LLI_LADDR_BIT_OFFSET,				\
-> -			LLI_LADDR_BIT_SIZE, (addr & U32_MAX));		\
-> -									\
-> -		BITFIELD_SET(lli_p[LLI_WORD1_OFFSET],			\
-> -			LLI_HADDR_BIT_OFFSET,				\
-> -			LLI_HADDR_BIT_SIZE, MSB64(addr));		\
-> -	} while (0)
-> -
-> -#define LLI_SET_SIZE(lli_p, size)					\
-> -		BITFIELD_SET(((u32 *)(lli_p))[LLI_WORD1_OFFSET],	\
-> -		LLI_SIZE_BIT_OFFSET, LLI_SIZE_BIT_SIZE, size)
-> +#define LLI_MAX_NUM_OF_DATA_ENTRIES 128
-> +#define LLI_MAX_NUM_OF_ASSOC_DATA_ENTRIES 4
-> +#define MLLI_TABLE_MIN_ALIGNMENT 4 /* 32 bit alignment */
-> +#define MAX_NUM_OF_BUFFERS_IN_MLLI 4
-> +#define MAX_NUM_OF_TOTAL_MLLI_ENTRIES (2 * LLI_MAX_NUM_OF_DATA_ENTRIES + \
-> +				       LLI_MAX_NUM_OF_ASSOC_DATA_ENTRIES)
-> +
-> +struct cc_lli_entry {
-> +#ifndef __LITTLE_ENDIAN__
-> +	u32 addr_lsb;
-> +	u16 size;
-> +	u16 addr_msb;
-> +#else /* __BIG_ENDIAN__ */
-> +	u16 addr_msb;
-> +	u16 size;
-> +	u32 addr_lsb;
-> +#endif
+> diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c b/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
+> index 23e549204365..5cf64746731a 100644
+> --- a/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
+> +++ b/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
+> -{       .type = CRYPTO_ALG_TYPE_ABLKCIPHER,
+> +{       .type = CRYPTO_ALG_TYPE_SKCIPHER,
+>  	.alg.crypto = {
+> -		.cra_name = "cbc(aes)",
+> -		.cra_driver_name = "cbc-aes-sun4i-ss",
+> -		.cra_priority = 300,
+> -		.cra_blocksize = AES_BLOCK_SIZE,
+> -		.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER,
+> -		.cra_ctxsize = sizeof(struct sun4i_tfm_ctx),
+> -		.cra_module = THIS_MODULE,
+> -		.cra_alignmask = 3,
+> -		.cra_type = &crypto_ablkcipher_type,
+> -		.cra_init = sun4i_ss_cipher_init,
+> -		.cra_ablkcipher = {
+> -			.min_keysize	= AES_MIN_KEY_SIZE,
+> -			.max_keysize	= AES_MAX_KEY_SIZE,
+> -			.ivsize		= AES_BLOCK_SIZE,
+> -			.setkey         = sun4i_ss_aes_setkey,
+> -			.encrypt        = sun4i_ss_cbc_aes_encrypt,
+> -			.decrypt        = sun4i_ss_cbc_aes_decrypt,
+> +		.setkey         = sun4i_ss_aes_setkey,
+> +		.encrypt        = sun4i_ss_cbc_aes_encrypt,
+> +		.decrypt        = sun4i_ss_cbc_aes_decrypt,
+> +		.min_keysize	= AES_MIN_KEY_SIZE,
+> +		.max_keysize	= AES_MAX_KEY_SIZE,
+> +		.ivsize		= AES_BLOCK_SIZE,
+> +		.base = {
+> +			.cra_name = "cbc(aes)",
+> +			.cra_driver_name = "cbc-aes-sun4i-ss",
+> +			.cra_priority = 300,
+> +			.cra_blocksize = AES_BLOCK_SIZE,
+> +			.cra_flags = CRYPTO_ALG_TYPE_SKCIPHER |
+> +				     CRYPTO_ALG_KERN_DRIVER_ONLY,
 
-How is the bits within the different variables also not affected by the
-endian issues?  Just moving them around in the 64bits seems really
-strange.
+Hello
 
-Why not just use the "normal" ways to address data in an endian-neutral
-way instead of making your own macros up here?  (i.e. shift and mask.)
+You add CRYPTO_ALG_KERN_DRIVER_ONLY on all flags which is unrelated to the patch description.
 
-thanks,
-
-greg k-h
+Regards
