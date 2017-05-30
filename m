@@ -1,82 +1,78 @@
-From: Corentin Labbe <clabbe.montjoie@gmail.com>
-Subject: Re: [PATCH v2 00/12] ARM: sun5i: cryptographic engine support
-Date: Tue, 30 May 2017 13:52:06 +0200
-Message-ID: <20170530115206.GB26229@Red>
-References: <20170529202738.2167-1-antoine.tenart@free-electrons.com>
+From: Srikanth Jampala <Jampala.Srikanth@cavium.com>
+Subject: [PATCH v2 0/3] Add support for Cavium CNN55XX crypto adapters.
+Date: Tue, 30 May 2017 17:28:00 +0530
+Message-ID: <20170530115803.8965-1-Jampala.Srikanth@cavium.com>
+References: <3575749.J6klBtBYWh@tauon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-        maxime.ripard@free-electrons.com, wens@csie.org,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-To: Antoine Tenart <antoine.tenart@free-electrons.com>
+Content-Type: text/plain
+Cc: davem@davemloft.net, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, Sreerama.Gadam@cavium.com,
+        Ram.Kumar@cavium.com, Nidadavolu.Murthy@cavium.com,
+        George.Cherian@cavium.com,
+        Srikanth Jampala <Jampala.Srikanth@cavium.com>
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:36556 "EHLO
-        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750992AbdE3LwJ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 May 2017 07:52:09 -0400
-Received: by mail-wm0-f67.google.com with SMTP id k15so24752971wmh.3
-        for <linux-crypto@vger.kernel.org>; Tue, 30 May 2017 04:52:09 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <20170529202738.2167-1-antoine.tenart@free-electrons.com>
+Received: from mail-bn3nam01on0080.outbound.protection.outlook.com ([104.47.33.80]:64480
+        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1750905AbdE3L6l (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 30 May 2017 07:58:41 -0400
+In-Reply-To: <3575749.J6klBtBYWh@tauon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, May 29, 2017 at 10:27:26PM +0200, Antoine Tenart wrote:
-> Hello,
-> 
-> This series adds the cryptographic engine support to sun5i SoCs. This is
-> based on top of v4.12-rc1 and was tested on a CHIP. The series begins
-> with fixes and improvements. The series is available at:
-> https://github.com/atenart/linux v4.12-rc1/sun5i-crypto
-> 
-> The 8 first patches are reworks and cosmetic improvements.
-> 
-> Patch 9 moves the cipher part of the sun4i-ss driver from the ablkcipher
-> API to the newer skcipher API.
-> 
-> Patch 10 adds the CRYPTO_ALG_KERN_DRIVER_ONLY flag for ciphers exposed
-> by the sun4i-ss driver.
-> 
-> Patch 11 fixes the crypto framework selftests on the CHIP. It might fix
-> other users too.
-> 
-> Patch 12 adds a cryptographic engine node for sun5i SoCs.
-> 
-> Thanks,
-> Antoine
-> 
-> Since v1:
->   - Fixed a typo.
->   - Made the CRYPTO_ALG_KERN_DRIVER_ONLY flag addition in a dedicated
->     patch.
-> 
-> Antoine Tenart (12):
->   crypto: sun4i-ss: group variable definitions in sun4i_hash()
->   crypto: sun4i-ss: remove conditional checks against 0
->   crypto: sun4i-ss: use lower/upper_32_bits helpers
->   crypto: sun4i-ss: cannot use DMA is the request is 0 length
->   crypto: sun4i-ss: do not dynamically set parts of the last buffer to 0
->   crypto: sun4i-ss: simplify the pad length calculation
->   crypto: sun4i-ss: simplify the appended bit assignment
->   crypto: sun4i-ss: use GENMASK to generate masks
->   crypto: sun4i-ss: move from ablkcipher to skcipher API
->   crypto: sun4i-ss: add the CRYPTO_ALG_KERN_DRIVER_ONLY flag
->   crypto: sun4i-ss: fix large block size support
->   ARM: sun5i: add a cryptographic engine node
-> 
->  arch/arm/boot/dts/sun5i.dtsi              |   8 +
->  drivers/crypto/sunxi-ss/sun4i-ss-cipher.c | 213 ++++++++++++++-------------
->  drivers/crypto/sunxi-ss/sun4i-ss-core.c   | 237 +++++++++++++++---------------
->  drivers/crypto/sunxi-ss/sun4i-ss-hash.c   | 138 ++++++++---------
->  drivers/crypto/sunxi-ss/sun4i-ss.h        |  34 +++--
->  5 files changed, 321 insertions(+), 309 deletions(-)
-> 
+This series adds support for Cavium CNN55XX crypto adapters.
+  
+ CNN55XX crypto adapters belongs to Cavium NITROX family series,
+ able to accelerates both Symmetric and Asymmetric crypto workloads.
+ These adapters have crypto cores for Symmetric and Asymmetric
+ crypto operations, and needs to load firmware to become operational.
+ 
+ Patches are generated on top of kernel/git/herbert/crypto-2.6
 
-Hello
+ The series was tested with dm-crypt for in kernel
+ cryptographic offload operations.
 
-Thanks for the work
+Changes from v1 to v2:
+- Addressed the Stephan Muller comments.
+  - Moved from ablkcipher to skcipher API.
+  - Clear the context information while releasing.
+- Cleanup in request processing, avoids unnecessary copies.
+- Use refcount_t type for reference counters.
+- Dependencies updated in Kconfig.
 
-For the whole serie:
-Tested-by: Corentin Labbe <clabbe.montjoie@gmail.com>
-Acked-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+Srikanth Jampala (3):
+  crypto: cavium - Add support for CNN55XX adapters.
+  crypto: cavium - Add debugfs support in CNN55XX driver.
+  crypto: cavium - Register the CNN55XX supported crypto algorithms.
+
+ drivers/crypto/Kconfig                       |    1 +
+ drivers/crypto/Makefile                      |    1 +
+ drivers/crypto/cavium/nitrox/Kconfig         |   21 +
+ drivers/crypto/cavium/nitrox/Makefile        |    8 +
+ drivers/crypto/cavium/nitrox/nitrox_algs.c   |  457 +++++++++++
+ drivers/crypto/cavium/nitrox/nitrox_common.h |   42 +
+ drivers/crypto/cavium/nitrox/nitrox_csr.h    | 1084 ++++++++++++++++++++++++++
+ drivers/crypto/cavium/nitrox/nitrox_dev.h    |  179 +++++
+ drivers/crypto/cavium/nitrox/nitrox_hal.c    |  401 ++++++++++
+ drivers/crypto/cavium/nitrox/nitrox_isr.c    |  467 +++++++++++
+ drivers/crypto/cavium/nitrox/nitrox_lib.c    |  210 +++++
+ drivers/crypto/cavium/nitrox/nitrox_main.c   |  640 +++++++++++++++
+ drivers/crypto/cavium/nitrox/nitrox_req.h    |  445 +++++++++++
+ drivers/crypto/cavium/nitrox/nitrox_reqmgr.c |  732 +++++++++++++++++
+ 14 files changed, 4688 insertions(+)
+ create mode 100644 drivers/crypto/cavium/nitrox/Kconfig
+ create mode 100644 drivers/crypto/cavium/nitrox/Makefile
+ create mode 100644 drivers/crypto/cavium/nitrox/nitrox_algs.c
+ create mode 100644 drivers/crypto/cavium/nitrox/nitrox_common.h
+ create mode 100644 drivers/crypto/cavium/nitrox/nitrox_csr.h
+ create mode 100644 drivers/crypto/cavium/nitrox/nitrox_dev.h
+ create mode 100644 drivers/crypto/cavium/nitrox/nitrox_hal.c
+ create mode 100644 drivers/crypto/cavium/nitrox/nitrox_isr.c
+ create mode 100644 drivers/crypto/cavium/nitrox/nitrox_lib.c
+ create mode 100644 drivers/crypto/cavium/nitrox/nitrox_main.c
+ create mode 100644 drivers/crypto/cavium/nitrox/nitrox_req.h
+ create mode 100644 drivers/crypto/cavium/nitrox/nitrox_reqmgr.c
+
+-- 
+2.9.3
