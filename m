@@ -1,34 +1,44 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [PATCH v3 1/2] crypto: ecdh - add privkey generation support
-Date: Tue, 30 May 2017 17:23:13 +0200
-Message-ID: <1782175.fxql8cH1xg@tauon.chronox.de>
-References: <1496155969-13765-1-git-send-email-tudor.ambarus@microchip.com> <10614195.cHMlZhE11R@tauon.chronox.de> <401a2c0d-b2f6-b31a-f7e5-7155d8846a7c@microchip.com>
+From: "Tobin C. Harding" <me@tobin.cc>
+Subject: Re: [PATCH V2 00/27] Drivers: ccree - align block comments
+Date: Wed, 31 May 2017 07:59:24 +1000
+Message-ID: <20170530215924.GB4233@eros>
+References: <20170530060937.12981-1-robsonde@gmail.com>
+ <20170530064941.GA5802@kwain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, marcel@holtmann.org,
-        Nicolas.Ferre@microchip.com
-To: Tudor Ambarus <tudor.ambarus@microchip.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:59866 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750733AbdE3PXP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 May 2017 11:23:15 -0400
-In-Reply-To: <401a2c0d-b2f6-b31a-f7e5-7155d8846a7c@microchip.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: devel@driverdev.osuosl.org, Derek Robson <robsonde@gmail.com>,
+ gregkh@linuxfoundation.org, driverdev-devel@linuxdriverproject.org,
+ linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Antoine Tenart <antoine.tenart@free-electrons.com>
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+Content-Disposition: inline
+In-Reply-To: <20170530064941.GA5802@kwain>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+List-Id: linux-crypto.vger.kernel.org
 
-Am Dienstag, 30. Mai 2017, 17:18:41 CEST schrieb Tudor Ambarus:
+On Tue, May 30, 2017 at 08:49:41AM +0200, Antoine Tenart wrote:
+> Hello Derek,
+> 
+> On Tue, May 30, 2017 at 06:09:37PM +1200, Derek Robson wrote:
+> > Fixed block comments across whole ccree driver
+> 
+> Since all these commits are doing the same logical change across a
+> single driver, you could probably squash them all into a single one.
 
-Hi Tudor,
+I suggested that when v1 was submitted ;)
 
-> You missed the return. When generating the key I just exit with the
-> return value of ecc_gen_privkey().
+> 
+> Thanks!
+> Antoine
 
-Rrrright :-)
-
-Reviewed-by: Stephan Müller <smueller@chronox.de>
-
-Ciao
-Stephan
+thanks,
+Tobin.
