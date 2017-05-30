@@ -1,248 +1,94 @@
-From: Srikanth Jampala <Jampala.Srikanth@cavium.com>
-Subject: [PATCH v2 2/3] crypto: cavium - Add debugfs support in CNN55XX driver.
-Date: Tue, 30 May 2017 17:28:02 +0530
-Message-ID: <20170530115803.8965-3-Jampala.Srikanth@cavium.com>
-References: <3575749.J6klBtBYWh@tauon.chronox.de>
- <20170530115803.8965-1-Jampala.Srikanth@cavium.com>
+From: Tudor Ambarus <tudor.ambarus@microchip.com>
+Subject: [PATCH v5 04/14] crypto: ecc - rename ecdh_make_pub_key()
+Date: Tue, 30 May 2017 15:37:56 +0300
+Message-ID: <1496147876-3616-1-git-send-email-tudor.ambarus@microchip.com>
+References: <260d4e89-76a5-6566-829a-4e95529dd556@microchip.com>
 Mime-Version: 1.0
 Content-Type: text/plain
-Cc: davem@davemloft.net, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, Sreerama.Gadam@cavium.com,
-        Ram.Kumar@cavium.com, Nidadavolu.Murthy@cavium.com,
-        George.Cherian@cavium.com,
-        Srikanth Jampala <Jampala.Srikanth@cavium.com>
-To: herbert@gondor.apana.org.au
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170530115803.8965-1-Jampala.Srikanth@cavium.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: <linux-crypto@vger.kernel.org>, <horia.geanta@nxp.com>,
+        Tudor Ambarus <tudor.ambarus@microchip.com>
+To: <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from esa2.microchip.iphmx.com ([68.232.149.84]:1949 "EHLO
+        esa2.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750965AbdE3Mi3 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 30 May 2017 08:38:29 -0400
+In-Reply-To: <260d4e89-76a5-6566-829a-4e95529dd556@microchip.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Add debugfs support in CNN55XX Physical Function driver.
-Provides hardware counters and firmware information.
+Rename ecdh_make_pub_key() to ecc_make_pub_key().
+ecdh_make_pub_key() is not dh specific and the reference
+to dh is wrong.
 
-Signed-off-by: Srikanth Jampala <Jampala.Srikanth@cavium.com>
+Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
 ---
- drivers/crypto/cavium/nitrox/nitrox_csr.h  |   4 +
- drivers/crypto/cavium/nitrox/nitrox_dev.h  |   4 +
- drivers/crypto/cavium/nitrox/nitrox_main.c | 135 +++++++++++++++++++++++++++++
- 3 files changed, 143 insertions(+)
+v5 updates the description of the function by replacing
+"ecdh_make_pub_key()" with "ecc_make_pub_key()". I also
+updated the commit message.
 
-diff --git a/drivers/crypto/cavium/nitrox/nitrox_csr.h b/drivers/crypto/cavium/nitrox/nitrox_csr.h
-index 5834651..30b04c4 100644
---- a/drivers/crypto/cavium/nitrox/nitrox_csr.h
-+++ b/drivers/crypto/cavium/nitrox/nitrox_csr.h
-@@ -42,6 +42,8 @@
- #define NPS_CORE_INT_ACTIVE	0x1000080
- #define NPS_CORE_INT		0x10000A0
- #define NPS_CORE_INT_ENA_W1S	0x10000B8
-+#define NPS_STATS_PKT_DMA_RD_CNT	0x1000180
-+#define NPS_STATS_PKT_DMA_WR_CNT	0x1000190
- 
- /* NPS packet registers */
- #define NPS_PKT_INT				0x1040018
-@@ -78,6 +80,7 @@
- #define BMI_INT		0x1140000
- #define BMI_CTL		0x1140020
- #define BMI_INT_ENA_W1S	0x1140018
-+#define BMI_NPS_PKT_CNT	0x1140070
- 
- /* EFL registers */
- #define EFL_CORE_INT_ENA_W1SX(_i)		(0x1240018 + ((_i) * 0x400))
-@@ -91,6 +94,7 @@
- 
- /* BMO registers */
- #define BMO_CTL2		0x1180028
-+#define BMO_NPS_SLC_PKT_CNT	0x1180078
- 
- /* LBC registers */
- #define LBC_INT			0x1200000
-diff --git a/drivers/crypto/cavium/nitrox/nitrox_dev.h b/drivers/crypto/cavium/nitrox/nitrox_dev.h
-index 2793a10..57858b0 100644
---- a/drivers/crypto/cavium/nitrox/nitrox_dev.h
-+++ b/drivers/crypto/cavium/nitrox/nitrox_dev.h
-@@ -118,6 +118,7 @@ struct nitrox_bh {
-  * @msix: MSI-X information
-  * @bh: post processing work
-  * @hw: hardware information
-+ * @debugfs_dir: debugfs directory
-  */
- struct nitrox_device {
- 	struct list_head list;
-@@ -141,6 +142,9 @@ struct nitrox_device {
- 	struct nitrox_bh bh;
- 
- 	struct nitrox_hw hw;
-+#if IS_ENABLED(CONFIG_DEBUG_FS)
-+	struct dentry *debugfs_dir;
-+#endif
- };
- 
- /**
-diff --git a/drivers/crypto/cavium/nitrox/nitrox_main.c b/drivers/crypto/cavium/nitrox/nitrox_main.c
-index aa33120..9b07003 100644
---- a/drivers/crypto/cavium/nitrox/nitrox_main.c
-+++ b/drivers/crypto/cavium/nitrox/nitrox_main.c
-@@ -1,5 +1,6 @@
- #include <linux/aer.h>
- #include <linux/delay.h>
-+#include <linux/debugfs.h>
- #include <linux/firmware.h>
- #include <linux/list.h>
- #include <linux/module.h>
-@@ -305,6 +306,135 @@ static int nitrox_pf_hw_init(struct nitrox_device *ndev)
+Herbert, do I need to resend a new series for this change or
+having the updated patch like this is ok for you?
+
+ crypto/ecc.c  | 4 ++--
+ crypto/ecc.h  | 6 +++---
+ crypto/ecdh.c | 4 ++--
+ 3 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/crypto/ecc.c b/crypto/ecc.c
+index e3a2b8f..6c33c43 100644
+--- a/crypto/ecc.c
++++ b/crypto/ecc.c
+@@ -927,8 +927,8 @@ int ecc_is_key_valid(unsigned int curve_id, unsigned int ndigits,
  	return 0;
  }
  
-+#if IS_ENABLED(CONFIG_DEBUG_FS)
-+static int registers_show(struct seq_file *s, void *v)
-+{
-+	struct nitrox_device *ndev = s->private;
-+	u64 offset;
-+
-+	/* NPS DMA stats */
-+	offset = NPS_STATS_PKT_DMA_RD_CNT;
-+	seq_printf(s, "NPS_STATS_PKT_DMA_RD_CNT  0x%016llx\n",
-+		   nitrox_read_csr(ndev, offset));
-+	offset = NPS_STATS_PKT_DMA_WR_CNT;
-+	seq_printf(s, "NPS_STATS_PKT_DMA_WR_CNT  0x%016llx\n",
-+		   nitrox_read_csr(ndev, offset));
-+
-+	/* BMI/BMO stats */
-+	offset = BMI_NPS_PKT_CNT;
-+	seq_printf(s, "BMI_NPS_PKT_CNT  0x%016llx\n",
-+		   nitrox_read_csr(ndev, offset));
-+	offset = BMO_NPS_SLC_PKT_CNT;
-+	seq_printf(s, "BMO_NPS_PKT_CNT  0x%016llx\n",
-+		   nitrox_read_csr(ndev, offset));
-+
-+	return 0;
-+}
-+
-+static int registers_open(struct inode *inode, struct file *file)
-+{
-+	return single_open(file, registers_show, inode->i_private);
-+}
-+
-+static const struct file_operations register_fops = {
-+	.owner = THIS_MODULE,
-+	.open = registers_open,
-+	.read = seq_read,
-+	.llseek = seq_lseek,
-+	.release = single_release,
-+};
-+
-+static int firmware_show(struct seq_file *s, void *v)
-+{
-+	struct nitrox_device *ndev = s->private;
-+
-+	seq_printf(s, "Version: %s\n", ndev->hw.fw_name);
-+	return 0;
-+}
-+
-+static int firmware_open(struct inode *inode, struct file *file)
-+{
-+	return single_open(file, firmware_show, inode->i_private);
-+}
-+
-+static const struct file_operations firmware_fops = {
-+	.owner = THIS_MODULE,
-+	.open = firmware_open,
-+	.read = seq_read,
-+	.llseek = seq_lseek,
-+	.release = single_release,
-+};
-+
-+static int nitrox_show(struct seq_file *s, void *v)
-+{
-+	struct nitrox_device *ndev = s->private;
-+
-+	seq_printf(s, "NITROX-5 [idx: %d]\n", ndev->idx);
-+	seq_printf(s, "  Revsion ID: 0x%0x\n", ndev->hw.revision_id);
-+	seq_printf(s, "  Cores [AE: %u  SE: %u]\n",
-+		   ndev->hw.ae_cores, ndev->hw.se_cores);
-+	seq_printf(s, "  Number of Queues: %u\n", ndev->nr_queues);
-+	seq_printf(s, "  Queue length: %u\n", ndev->qlen);
-+	seq_printf(s, "  Node: %u\n", ndev->node);
-+
-+	return 0;
-+}
-+
-+static int nitrox_open(struct inode *inode, struct file *file)
-+{
-+	return single_open(file, nitrox_show, inode->i_private);
-+}
-+
-+static const struct file_operations nitrox_fops = {
-+	.owner = THIS_MODULE,
-+	.open = nitrox_open,
-+	.read = seq_read,
-+	.llseek = seq_lseek,
-+	.release = single_release,
-+};
-+
-+static void nitrox_debugfs_exit(struct nitrox_device *ndev)
-+{
-+	debugfs_remove_recursive(ndev->debugfs_dir);
-+	ndev->debugfs_dir = NULL;
-+}
-+
-+static int nitrox_debugfs_init(struct nitrox_device *ndev)
-+{
-+	struct dentry *dir, *f;
-+
-+	dir = debugfs_create_dir(KBUILD_MODNAME, NULL);
-+	if (!dir)
-+		return -ENOMEM;
-+
-+	ndev->debugfs_dir = dir;
-+	f = debugfs_create_file("counters", 0400, dir, ndev, &register_fops);
-+	if (!f)
-+		goto err;
-+	f = debugfs_create_file("firmware", 0400, dir, ndev, &firmware_fops);
-+	if (!f)
-+		goto err;
-+	f = debugfs_create_file("nitrox", 0400, dir, ndev, &nitrox_fops);
-+	if (!f)
-+		goto err;
-+
-+	return 0;
-+
-+err:
-+	nitrox_debugfs_exit(ndev);
-+	return -ENODEV;
-+}
-+#else
-+static int nitrox_debugfs_init(struct nitrox_device *ndev)
-+{
-+	return 0;
-+}
-+
-+static void nitrox_debugfs_exit(struct nitrox_device *ndev)
-+{
-+}
-+#endif
-+
+-int ecdh_make_pub_key(unsigned int curve_id, unsigned int ndigits,
+-		      const u64 *private_key, u64 *public_key)
++int ecc_make_pub_key(unsigned int curve_id, unsigned int ndigits,
++		     const u64 *private_key, u64 *public_key)
+ {
+ 	int ret = 0;
+ 	struct ecc_point *pk;
+diff --git a/crypto/ecc.h b/crypto/ecc.h
+index af2ffdb..e13fe88 100644
+--- a/crypto/ecc.h
++++ b/crypto/ecc.h
+@@ -44,7 +44,7 @@ int ecc_is_key_valid(unsigned int curve_id, unsigned int ndigits,
+ 		     const u64 *private_key, unsigned int private_key_len);
+ 
  /**
-  * nitrox_probe - NITROX Initialization function.
-  * @pdev: PCI device information struct
-@@ -389,6 +519,10 @@ static int nitrox_probe(struct pci_dev *pdev,
- 	if (err)
- 		goto pf_hw_fail;
+- * ecdh_make_pub_key() - Compute an ECC public key
++ * ecc_make_pub_key() - Compute an ECC public key
+  *
+  * @curve_id:		id representing the curve to use
+  * @ndigits:		curve's number of digits
+@@ -54,8 +54,8 @@ int ecc_is_key_valid(unsigned int curve_id, unsigned int ndigits,
+  * Returns 0 if the public key was generated successfully, a negative value
+  * if an error occurred.
+  */
+-int ecdh_make_pub_key(const unsigned int curve_id, unsigned int ndigits,
+-		      const u64 *private_key, u64 *public_key);
++int ecc_make_pub_key(const unsigned int curve_id, unsigned int ndigits,
++		     const u64 *private_key, u64 *public_key);
  
-+	err = nitrox_debugfs_init(ndev);
-+	if (err)
-+		goto pf_hw_fail;
-+
- 	set_bit(NITROX_READY, &ndev->status);
- 	/* barrier to sync with other cpus */
- 	smp_mb__after_atomic();
-@@ -431,6 +565,7 @@ static void nitrox_remove(struct pci_dev *pdev)
- 	smp_mb__after_atomic();
+ /**
+  * crypto_ecdh_shared_secret() - Compute a shared secret
+diff --git a/crypto/ecdh.c b/crypto/ecdh.c
+index c1f0163..ed1464a 100644
+--- a/crypto/ecdh.c
++++ b/crypto/ecdh.c
+@@ -87,8 +87,8 @@ static int ecdh_compute_value(struct kpp_request *req)
  
- 	nitrox_remove_from_devlist(ndev);
-+	nitrox_debugfs_exit(ndev);
- 	nitrox_pf_sw_cleanup(ndev);
- 
- 	iounmap(ndev->bar_addr);
+ 		buf = ctx->shared_secret;
+ 	} else {
+-		ret = ecdh_make_pub_key(ctx->curve_id, ctx->ndigits,
+-					ctx->private_key, ctx->public_key);
++		ret = ecc_make_pub_key(ctx->curve_id, ctx->ndigits,
++				       ctx->private_key, ctx->public_key);
+ 		buf = ctx->public_key;
+ 		/* Public part is a point thus it has both coordinates */
+ 		nbytes *= 2;
 -- 
-2.9.3
+2.7.4
