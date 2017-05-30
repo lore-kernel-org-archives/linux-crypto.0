@@ -1,7 +1,7 @@
 From: Srikanth Jampala <Jampala.Srikanth@cavium.com>
-Subject: [PATCH v2 3/3] crypto: cavium - Register the CNN55XX supported crypto algorithms.
-Date: Tue, 30 May 2017 17:28:03 +0530
-Message-ID: <20170530115803.8965-4-Jampala.Srikanth@cavium.com>
+Subject: [PATCH v2 2/3] crypto: cavium - Add debugfs support in CNN55XX driver.
+Date: Tue, 30 May 2017 17:28:02 +0530
+Message-ID: <20170530115803.8965-3-Jampala.Srikanth@cavium.com>
 References: <3575749.J6klBtBYWh@tauon.chronox.de>
  <20170530115803.8965-1-Jampala.Srikanth@cavium.com>
 Mime-Version: 1.0
@@ -12,640 +12,237 @@ Cc: davem@davemloft.net, linux-kernel@vger.kernel.org,
         George.Cherian@cavium.com,
         Srikanth Jampala <Jampala.Srikanth@cavium.com>
 To: herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn3nam01on0063.outbound.protection.outlook.com ([104.47.33.63]:11904
-        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751127AbdE3L6y (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 May 2017 07:58:54 -0400
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20170530115803.8965-1-Jampala.Srikanth@cavium.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Register the Symmetric crypto algorithms supported by
-CNN55XX driver with crypto subsystem.
-
-The following Symmetric crypto algorithms are supported,
-  - aes with cbc, ecb, cfb, xts, ctr and cts modes
-  - des3_ede with cbc and ecb modes
+Add debugfs support in CNN55XX Physical Function driver.
+Provides hardware counters and firmware information.
 
 Signed-off-by: Srikanth Jampala <Jampala.Srikanth@cavium.com>
 ---
- drivers/crypto/cavium/nitrox/Makefile        |   3 +-
- drivers/crypto/cavium/nitrox/nitrox_algs.c   | 457 +++++++++++++++++++++++++++
- drivers/crypto/cavium/nitrox/nitrox_common.h |   7 +
- drivers/crypto/cavium/nitrox/nitrox_lib.c    |  38 +++
- drivers/crypto/cavium/nitrox/nitrox_main.c   |  40 +++
- 5 files changed, 544 insertions(+), 1 deletion(-)
- create mode 100644 drivers/crypto/cavium/nitrox/nitrox_algs.c
+ drivers/crypto/cavium/nitrox/nitrox_csr.h  |   4 +
+ drivers/crypto/cavium/nitrox/nitrox_dev.h  |   4 +
+ drivers/crypto/cavium/nitrox/nitrox_main.c | 135 +++++++++++++++++++++++++++++
+ 3 files changed, 143 insertions(+)
 
-diff --git a/drivers/crypto/cavium/nitrox/Makefile b/drivers/crypto/cavium/nitrox/Makefile
-index ef457f6..5af2e43 100644
---- a/drivers/crypto/cavium/nitrox/Makefile
-+++ b/drivers/crypto/cavium/nitrox/Makefile
-@@ -4,4 +4,5 @@ n5pf-objs := nitrox_main.o \
- 	nitrox_isr.o \
- 	nitrox_lib.o \
- 	nitrox_hal.o \
--	nitrox_reqmgr.o
-+	nitrox_reqmgr.o \
-+	nitrox_algs.o
-diff --git a/drivers/crypto/cavium/nitrox/nitrox_algs.c b/drivers/crypto/cavium/nitrox/nitrox_algs.c
-new file mode 100644
-index 0000000..ce33027
---- /dev/null
-+++ b/drivers/crypto/cavium/nitrox/nitrox_algs.c
-@@ -0,0 +1,457 @@
-+#include <linux/crypto.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/printk.h>
-+
-+#include <crypto/aes.h>
-+#include <crypto/skcipher.h>
-+#include <crypto/ctr.h>
-+#include <crypto/des.h>
-+#include <crypto/xts.h>
-+
-+#include "nitrox_dev.h"
-+#include "nitrox_common.h"
-+#include "nitrox_req.h"
-+
-+#define PRIO 4001
-+
-+struct nitrox_cipher {
-+	const char *name;
-+	enum flexi_cipher value;
-+};
-+
-+/**
-+ * supported cipher list
-+ */
-+static const struct nitrox_cipher flexi_cipher_table[] = {
-+	{ "null",		CIPHER_NULL },
-+	{ "cbc(des3_ede)",	CIPHER_3DES_CBC },
-+	{ "ecb(des3_ede)",	CIPHER_3DES_ECB },
-+	{ "cbc(aes)",		CIPHER_AES_CBC },
-+	{ "ecb(aes)",		CIPHER_AES_ECB },
-+	{ "cfb(aes)",		CIPHER_AES_CFB },
-+	{ "rfc3686(ctr(aes))",	CIPHER_AES_CTR },
-+	{ "xts(aes)",		CIPHER_AES_XTS },
-+	{ "cts(cbc(aes))",	CIPHER_AES_CBC_CTS },
-+	{ NULL,			CIPHER_INVALID }
-+};
-+
-+static enum flexi_cipher flexi_cipher_type(const char *name)
-+{
-+	const struct nitrox_cipher *cipher = flexi_cipher_table;
-+
-+	while (cipher->name) {
-+		if (!strcmp(cipher->name, name))
-+			break;
-+		cipher++;
-+	}
-+	return cipher->value;
-+}
-+
-+static int flexi_aes_keylen(int keylen)
-+{
-+	int aes_keylen;
-+
-+	switch (keylen) {
-+	case AES_KEYSIZE_128:
-+		aes_keylen = 1;
-+		break;
-+	case AES_KEYSIZE_192:
-+		aes_keylen = 2;
-+		break;
-+	case AES_KEYSIZE_256:
-+		aes_keylen = 3;
-+		break;
-+	default:
-+		aes_keylen = -EINVAL;
-+		break;
-+	}
-+	return aes_keylen;
-+}
-+
-+static int nitrox_skcipher_init(struct crypto_skcipher *tfm)
-+{
-+	struct nitrox_crypto_ctx *nctx = crypto_skcipher_ctx(tfm);
-+	void *fctx;
-+
-+	/* get the first device */
-+	nctx->ndev = nitrox_get_first_device();
-+	if (!nctx->ndev)
-+		return -ENODEV;
-+
-+	/* allocate nitrox crypto context */
-+	fctx = crypto_alloc_context(nctx->ndev);
-+	if (!fctx) {
-+		nitrox_put_device(nctx->ndev);
-+		return -ENOMEM;
-+	}
-+	nctx->u.ctx_handle = (uintptr_t)fctx;
-+	crypto_skcipher_set_reqsize(tfm, crypto_skcipher_reqsize(tfm) +
-+				    sizeof(struct nitrox_kcrypt_request));
-+	return 0;
-+}
-+
-+static void nitrox_skcipher_exit(struct crypto_skcipher *tfm)
-+{
-+	struct nitrox_crypto_ctx *nctx = crypto_skcipher_ctx(tfm);
-+
-+	/* free the nitrox crypto context */
-+	if (nctx->u.ctx_handle) {
-+		struct flexi_crypto_context *fctx = nctx->u.fctx;
-+
-+		memset(&fctx->crypto, 0, sizeof(struct crypto_keys));
-+		memset(&fctx->auth, 0, sizeof(struct auth_keys));
-+		crypto_free_context((void *)fctx);
-+	}
-+	nitrox_put_device(nctx->ndev);
-+
-+	nctx->u.ctx_handle = 0;
-+	nctx->ndev = NULL;
-+}
-+
-+static inline int nitrox_skcipher_setkey(struct crypto_skcipher *cipher,
-+					 int aes_keylen, const u8 *key,
-+					 unsigned int keylen)
-+{
-+	struct crypto_tfm *tfm = crypto_skcipher_tfm(cipher);
-+	struct nitrox_crypto_ctx *nctx = crypto_tfm_ctx(tfm);
-+	struct flexi_crypto_context *fctx;
-+	enum flexi_cipher cipher_type;
-+	const char *name;
-+
-+	name = crypto_tfm_alg_name(tfm);
-+	cipher_type = flexi_cipher_type(name);
-+	if (unlikely(cipher_type == CIPHER_INVALID)) {
-+		pr_err("unsupported cipher: %s\n", name);
-+		return -EINVAL;
-+	}
-+
-+	/* fill crypto context */
-+	fctx = nctx->u.fctx;
-+	fctx->flags = 0;
-+	fctx->w0.cipher_type = cipher_type;
-+	fctx->w0.aes_keylen = aes_keylen;
-+	fctx->w0.iv_source = IV_FROM_DPTR;
-+	fctx->flags = cpu_to_be64(*(u64 *)&fctx->w0);
-+	/* copy the key to context */
-+	memcpy(fctx->crypto.u.key, key, keylen);
-+
-+	return 0;
-+}
-+
-+static int nitrox_aes_setkey(struct crypto_skcipher *cipher, const u8 *key,
-+			     unsigned int keylen)
-+{
-+	int aes_keylen;
-+
-+	aes_keylen = flexi_aes_keylen(keylen);
-+	if (aes_keylen < 0) {
-+		crypto_skcipher_set_flags(cipher, CRYPTO_TFM_RES_BAD_KEY_LEN);
-+		return -EINVAL;
-+	}
-+	return nitrox_skcipher_setkey(cipher, aes_keylen, key, keylen);
-+}
-+
-+static void nitrox_skcipher_callback(struct skcipher_request *skreq,
-+				     int err)
-+{
-+	if (err) {
-+		pr_err_ratelimited("request failed status 0x%0x\n", err);
-+		err = -EINVAL;
-+	}
-+	skcipher_request_complete(skreq, err);
-+}
-+
-+static int nitrox_skcipher_crypt(struct skcipher_request *skreq, bool enc)
-+{
-+	struct crypto_skcipher *cipher = crypto_skcipher_reqtfm(skreq);
-+	struct nitrox_crypto_ctx *nctx = crypto_skcipher_ctx(cipher);
-+	struct nitrox_kcrypt_request *nkreq = skcipher_request_ctx(skreq);
-+	int ivsize = crypto_skcipher_ivsize(cipher);
-+	struct se_crypto_request *creq;
-+
-+	creq = &nkreq->creq;
-+	creq->flags = skreq->base.flags;
-+	creq->gfp = (skreq->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
-+		     GFP_KERNEL : GFP_ATOMIC;
-+
-+	/* fill the request */
-+	creq->ctrl.value = 0;
-+	creq->opcode = FLEXI_CRYPTO_ENCRYPT_HMAC;
-+	creq->ctrl.s.arg = (enc ? ENCRYPT : DECRYPT);
-+	/* param0: length of the data to be encrypted */
-+	creq->gph.param0 = cpu_to_be16(skreq->cryptlen);
-+	creq->gph.param1 = 0;
-+	/* param2: encryption data offset */
-+	creq->gph.param2 = cpu_to_be16(ivsize);
-+	creq->gph.param3 = 0;
-+
-+	creq->ctx_handle = nctx->u.ctx_handle;
-+	creq->ctrl.s.ctxl = sizeof(struct flexi_crypto_context);
-+
-+	/* copy the iv */
-+	memcpy(creq->iv, skreq->iv, ivsize);
-+	creq->ivsize = ivsize;
-+	creq->src = skreq->src;
-+	creq->dst = skreq->dst;
-+
-+	nkreq->nctx = nctx;
-+	nkreq->skreq = skreq;
-+
-+	/* send the crypto request */
-+	return nitrox_process_se_request(nctx->ndev, creq,
-+					 nitrox_skcipher_callback, skreq);
-+}
-+
-+static int nitrox_aes_encrypt(struct skcipher_request *skreq)
-+{
-+	return nitrox_skcipher_crypt(skreq, true);
-+}
-+
-+static int nitrox_aes_decrypt(struct skcipher_request *skreq)
-+{
-+	return nitrox_skcipher_crypt(skreq, false);
-+}
-+
-+static int nitrox_3des_setkey(struct crypto_skcipher *cipher,
-+			      const u8 *key, unsigned int keylen)
-+{
-+	if (keylen != DES3_EDE_KEY_SIZE) {
-+		crypto_skcipher_set_flags(cipher, CRYPTO_TFM_RES_BAD_KEY_LEN);
-+		return -EINVAL;
-+	}
-+
-+	return nitrox_skcipher_setkey(cipher, 0, key, keylen);
-+}
-+
-+static int nitrox_3des_encrypt(struct skcipher_request *skreq)
-+{
-+	return nitrox_skcipher_crypt(skreq, true);
-+}
-+
-+static int nitrox_3des_decrypt(struct skcipher_request *skreq)
-+{
-+	return nitrox_skcipher_crypt(skreq, false);
-+}
-+
-+static int nitrox_aes_xts_setkey(struct crypto_skcipher *cipher,
-+				 const u8 *key, unsigned int keylen)
-+{
-+	struct crypto_tfm *tfm = crypto_skcipher_tfm(cipher);
-+	struct nitrox_crypto_ctx *nctx = crypto_tfm_ctx(tfm);
-+	struct flexi_crypto_context *fctx;
-+	int aes_keylen, ret;
-+
-+	ret = xts_check_key(tfm, key, keylen);
-+	if (ret)
-+		return ret;
-+
-+	keylen /= 2;
-+
-+	aes_keylen = flexi_aes_keylen(keylen);
-+	if (aes_keylen < 0) {
-+		crypto_skcipher_set_flags(cipher, CRYPTO_TFM_RES_BAD_KEY_LEN);
-+		return -EINVAL;
-+	}
-+
-+	fctx = nctx->u.fctx;
-+	/* copy KEY2 */
-+	memcpy(fctx->auth.u.key2, (key + keylen), keylen);
-+
-+	return nitrox_skcipher_setkey(cipher, aes_keylen, key, keylen);
-+}
-+
-+static int nitrox_aes_ctr_rfc3686_setkey(struct crypto_skcipher *cipher,
-+					 const u8 *key, unsigned int keylen)
-+{
-+	struct crypto_tfm *tfm = crypto_skcipher_tfm(cipher);
-+	struct nitrox_crypto_ctx *nctx = crypto_tfm_ctx(tfm);
-+	struct flexi_crypto_context *fctx;
-+	int aes_keylen;
-+
-+	if (keylen < CTR_RFC3686_NONCE_SIZE)
-+		return -EINVAL;
-+
-+	fctx = nctx->u.fctx;
-+
-+	memcpy(fctx->crypto.iv, key + (keylen - CTR_RFC3686_NONCE_SIZE),
-+	       CTR_RFC3686_NONCE_SIZE);
-+
-+	keylen -= CTR_RFC3686_NONCE_SIZE;
-+
-+	aes_keylen = flexi_aes_keylen(keylen);
-+	if (aes_keylen < 0) {
-+		crypto_skcipher_set_flags(cipher, CRYPTO_TFM_RES_BAD_KEY_LEN);
-+		return -EINVAL;
-+	}
-+	return nitrox_skcipher_setkey(cipher, aes_keylen, key, keylen);
-+}
-+
-+static struct skcipher_alg nitrox_skciphers[] = { {
-+	.base = {
-+		.cra_name = "cbc(aes)",
-+		.cra_driver_name = "n5_cbc(aes)",
-+		.cra_priority = PRIO,
-+		.cra_flags = CRYPTO_ALG_ASYNC,
-+		.cra_blocksize = AES_BLOCK_SIZE,
-+		.cra_ctxsize = sizeof(struct nitrox_crypto_ctx),
-+		.cra_alignmask = 0,
-+		.cra_module = THIS_MODULE,
-+	},
-+	.min_keysize = AES_MIN_KEY_SIZE,
-+	.max_keysize = AES_MAX_KEY_SIZE,
-+	.ivsize = AES_BLOCK_SIZE,
-+	.setkey = nitrox_aes_setkey,
-+	.encrypt = nitrox_aes_encrypt,
-+	.decrypt = nitrox_aes_decrypt,
-+	.init = nitrox_skcipher_init,
-+	.exit = nitrox_skcipher_exit,
-+}, {
-+	.base = {
-+		.cra_name = "ecb(aes)",
-+		.cra_driver_name = "n5_ecb(aes)",
-+		.cra_priority = PRIO,
-+		.cra_flags = CRYPTO_ALG_ASYNC,
-+		.cra_blocksize = AES_BLOCK_SIZE,
-+		.cra_ctxsize = sizeof(struct nitrox_crypto_ctx),
-+		.cra_alignmask = 0,
-+		.cra_module = THIS_MODULE,
-+	},
-+	.min_keysize = AES_MIN_KEY_SIZE,
-+	.max_keysize = AES_MAX_KEY_SIZE,
-+	.ivsize = AES_BLOCK_SIZE,
-+	.setkey = nitrox_aes_setkey,
-+	.encrypt = nitrox_aes_encrypt,
-+	.decrypt = nitrox_aes_decrypt,
-+	.init = nitrox_skcipher_init,
-+	.exit = nitrox_skcipher_exit,
-+}, {
-+	.base = {
-+		.cra_name = "cfb(aes)",
-+		.cra_driver_name = "n5_cfb(aes)",
-+		.cra_priority = PRIO,
-+		.cra_flags = CRYPTO_ALG_ASYNC,
-+		.cra_blocksize = AES_BLOCK_SIZE,
-+		.cra_ctxsize = sizeof(struct nitrox_crypto_ctx),
-+		.cra_alignmask = 0,
-+		.cra_module = THIS_MODULE,
-+	},
-+	.min_keysize = AES_MIN_KEY_SIZE,
-+	.max_keysize = AES_MAX_KEY_SIZE,
-+	.ivsize = AES_BLOCK_SIZE,
-+	.setkey = nitrox_aes_setkey,
-+	.encrypt = nitrox_aes_encrypt,
-+	.decrypt = nitrox_aes_decrypt,
-+	.init = nitrox_skcipher_init,
-+	.exit = nitrox_skcipher_exit,
-+}, {
-+	.base = {
-+		.cra_name = "xts(aes)",
-+		.cra_driver_name = "n5_xts(aes)",
-+		.cra_priority = PRIO,
-+		.cra_flags = CRYPTO_ALG_ASYNC,
-+		.cra_blocksize = AES_BLOCK_SIZE,
-+		.cra_ctxsize = sizeof(struct nitrox_crypto_ctx),
-+		.cra_alignmask = 0,
-+		.cra_module = THIS_MODULE,
-+	},
-+	.min_keysize = 2 * AES_MIN_KEY_SIZE,
-+	.max_keysize = 2 * AES_MAX_KEY_SIZE,
-+	.ivsize = AES_BLOCK_SIZE,
-+	.setkey = nitrox_aes_xts_setkey,
-+	.encrypt = nitrox_aes_encrypt,
-+	.decrypt = nitrox_aes_decrypt,
-+	.init = nitrox_skcipher_init,
-+	.exit = nitrox_skcipher_exit,
-+}, {
-+	.base = {
-+		.cra_name = "rfc3686(ctr(aes))",
-+		.cra_driver_name = "n5_rfc3686(ctr(aes))",
-+		.cra_priority = PRIO,
-+		.cra_flags = CRYPTO_ALG_ASYNC,
-+		.cra_blocksize = 1,
-+		.cra_ctxsize = sizeof(struct nitrox_crypto_ctx),
-+		.cra_alignmask = 0,
-+		.cra_module = THIS_MODULE,
-+	},
-+	.min_keysize = AES_MIN_KEY_SIZE + CTR_RFC3686_NONCE_SIZE,
-+	.max_keysize = AES_MAX_KEY_SIZE + CTR_RFC3686_NONCE_SIZE,
-+	.ivsize = CTR_RFC3686_IV_SIZE,
-+	.init = nitrox_skcipher_init,
-+	.exit = nitrox_skcipher_exit,
-+	.setkey = nitrox_aes_ctr_rfc3686_setkey,
-+	.encrypt = nitrox_aes_encrypt,
-+	.decrypt = nitrox_aes_decrypt,
-+}, {
-+	.base = {
-+		.cra_name = "cts(cbc(aes))",
-+		.cra_driver_name = "n5_cts(cbc(aes))",
-+		.cra_priority = PRIO,
-+		.cra_flags = CRYPTO_ALG_ASYNC,
-+		.cra_blocksize = AES_BLOCK_SIZE,
-+		.cra_ctxsize = sizeof(struct nitrox_crypto_ctx),
-+		.cra_alignmask = 0,
-+		.cra_type = &crypto_ablkcipher_type,
-+		.cra_module = THIS_MODULE,
-+	},
-+	.min_keysize = AES_MIN_KEY_SIZE,
-+	.max_keysize = AES_MAX_KEY_SIZE,
-+	.ivsize = AES_BLOCK_SIZE,
-+	.setkey = nitrox_aes_setkey,
-+	.encrypt = nitrox_aes_encrypt,
-+	.decrypt = nitrox_aes_decrypt,
-+	.init = nitrox_skcipher_init,
-+	.exit = nitrox_skcipher_exit,
-+}, {
-+	.base = {
-+		.cra_name = "cbc(des3_ede)",
-+		.cra_driver_name = "n5_cbc(des3_ede)",
-+		.cra_priority = PRIO,
-+		.cra_flags = CRYPTO_ALG_ASYNC,
-+		.cra_blocksize = DES3_EDE_BLOCK_SIZE,
-+		.cra_ctxsize = sizeof(struct nitrox_crypto_ctx),
-+		.cra_alignmask = 0,
-+		.cra_module = THIS_MODULE,
-+	},
-+	.min_keysize = DES3_EDE_KEY_SIZE,
-+	.max_keysize = DES3_EDE_KEY_SIZE,
-+	.ivsize = DES3_EDE_BLOCK_SIZE,
-+	.setkey = nitrox_3des_setkey,
-+	.encrypt = nitrox_3des_encrypt,
-+	.decrypt = nitrox_3des_decrypt,
-+	.init = nitrox_skcipher_init,
-+	.exit = nitrox_skcipher_exit,
-+}, {
-+	.base = {
-+		.cra_name = "ecb(des3_ede)",
-+		.cra_driver_name = "n5_ecb(des3_ede)",
-+		.cra_priority = PRIO,
-+		.cra_flags = CRYPTO_ALG_ASYNC,
-+		.cra_blocksize = DES3_EDE_BLOCK_SIZE,
-+		.cra_ctxsize = sizeof(struct nitrox_crypto_ctx),
-+		.cra_alignmask = 0,
-+		.cra_module = THIS_MODULE,
-+	},
-+	.min_keysize = DES3_EDE_KEY_SIZE,
-+	.max_keysize = DES3_EDE_KEY_SIZE,
-+	.ivsize = DES3_EDE_BLOCK_SIZE,
-+	.setkey = nitrox_3des_setkey,
-+	.encrypt = nitrox_3des_encrypt,
-+	.decrypt = nitrox_3des_decrypt,
-+	.init = nitrox_skcipher_init,
-+	.exit = nitrox_skcipher_exit,
-+}
-+
-+};
-+
-+int nitrox_crypto_register(void)
-+{
-+	return crypto_register_skciphers(nitrox_skciphers,
-+					 ARRAY_SIZE(nitrox_skciphers));
-+}
-+
-+void nitrox_crypto_unregister(void)
-+{
-+	crypto_unregister_skciphers(nitrox_skciphers,
-+				    ARRAY_SIZE(nitrox_skciphers));
-+}
-diff --git a/drivers/crypto/cavium/nitrox/nitrox_common.h b/drivers/crypto/cavium/nitrox/nitrox_common.h
-index 3284ffe..4888c78 100644
---- a/drivers/crypto/cavium/nitrox/nitrox_common.h
-+++ b/drivers/crypto/cavium/nitrox/nitrox_common.h
-@@ -4,6 +4,13 @@
- #include "nitrox_dev.h"
- #include "nitrox_req.h"
+diff --git a/drivers/crypto/cavium/nitrox/nitrox_csr.h b/drivers/crypto/cavium/nitrox/nitrox_csr.h
+index 5834651..30b04c4 100644
+--- a/drivers/crypto/cavium/nitrox/nitrox_csr.h
++++ b/drivers/crypto/cavium/nitrox/nitrox_csr.h
+@@ -42,6 +42,8 @@
+ #define NPS_CORE_INT_ACTIVE	0x1000080
+ #define NPS_CORE_INT		0x10000A0
+ #define NPS_CORE_INT_ENA_W1S	0x10000B8
++#define NPS_STATS_PKT_DMA_RD_CNT	0x1000180
++#define NPS_STATS_PKT_DMA_WR_CNT	0x1000190
  
-+int nitrox_crypto_register(void);
-+void nitrox_crypto_unregister(void);
-+void *crypto_alloc_context(struct nitrox_device *ndev);
-+void crypto_free_context(void *ctx);
-+struct nitrox_device *nitrox_get_first_device(void);
-+void nitrox_put_device(struct nitrox_device *ndev);
-+
- void nitrox_pf_cleanup_isr(struct nitrox_device *ndev);
- int nitrox_pf_init_isr(struct nitrox_device *ndev);
+ /* NPS packet registers */
+ #define NPS_PKT_INT				0x1040018
+@@ -78,6 +80,7 @@
+ #define BMI_INT		0x1140000
+ #define BMI_CTL		0x1140020
+ #define BMI_INT_ENA_W1S	0x1140018
++#define BMI_NPS_PKT_CNT	0x1140070
  
-diff --git a/drivers/crypto/cavium/nitrox/nitrox_lib.c b/drivers/crypto/cavium/nitrox/nitrox_lib.c
-index 846e990..b4a391a 100644
---- a/drivers/crypto/cavium/nitrox/nitrox_lib.c
-+++ b/drivers/crypto/cavium/nitrox/nitrox_lib.c
-@@ -137,6 +137,44 @@ static void destroy_crypto_dma_pool(struct nitrox_device *ndev)
- 	ndev->ctx_pool = NULL;
- }
+ /* EFL registers */
+ #define EFL_CORE_INT_ENA_W1SX(_i)		(0x1240018 + ((_i) * 0x400))
+@@ -91,6 +94,7 @@
  
-+/*
-+ * crypto_alloc_context - Allocate crypto context from pool
-+ * @ndev: NITROX Device
-+ */
-+void *crypto_alloc_context(struct nitrox_device *ndev)
-+{
-+	struct ctx_hdr *ctx;
-+	void *vaddr;
-+	dma_addr_t dma;
-+
-+	vaddr = dma_pool_alloc(ndev->ctx_pool, (GFP_ATOMIC | __GFP_ZERO), &dma);
-+	if (!vaddr)
-+		return NULL;
-+
-+	/* fill meta data */
-+	ctx = vaddr;
-+	ctx->pool = ndev->ctx_pool;
-+	ctx->dma = dma;
-+	ctx->ctx_dma = dma + sizeof(struct ctx_hdr);
-+
-+	return ((u8 *)vaddr + sizeof(struct ctx_hdr));
-+}
-+
-+/**
-+ * crypto_free_context - Free crypto context to pool
-+ * @ctx: context to free
-+ */
-+void crypto_free_context(void *ctx)
-+{
-+	struct ctx_hdr *ctxp;
-+
-+	if (!ctx)
-+		return;
-+
-+	ctxp = (struct ctx_hdr *)((u8 *)ctx - sizeof(struct ctx_hdr));
-+	dma_pool_free(ctxp->pool, ctxp, ctxp->dma);
-+}
-+
+ /* BMO registers */
+ #define BMO_CTL2		0x1180028
++#define BMO_NPS_SLC_PKT_CNT	0x1180078
+ 
+ /* LBC registers */
+ #define LBC_INT			0x1200000
+diff --git a/drivers/crypto/cavium/nitrox/nitrox_dev.h b/drivers/crypto/cavium/nitrox/nitrox_dev.h
+index 2793a10..57858b0 100644
+--- a/drivers/crypto/cavium/nitrox/nitrox_dev.h
++++ b/drivers/crypto/cavium/nitrox/nitrox_dev.h
+@@ -118,6 +118,7 @@ struct nitrox_bh {
+  * @msix: MSI-X information
+  * @bh: post processing work
+  * @hw: hardware information
++ * @debugfs_dir: debugfs directory
+  */
+ struct nitrox_device {
+ 	struct list_head list;
+@@ -141,6 +142,9 @@ struct nitrox_device {
+ 	struct nitrox_bh bh;
+ 
+ 	struct nitrox_hw hw;
++#if IS_ENABLED(CONFIG_DEBUG_FS)
++	struct dentry *debugfs_dir;
++#endif
+ };
+ 
  /**
-  * nitrox_common_sw_init - allocate software resources.
-  * @ndev: NITROX device
 diff --git a/drivers/crypto/cavium/nitrox/nitrox_main.c b/drivers/crypto/cavium/nitrox/nitrox_main.c
-index 9b07003..eee6fb5 100644
+index aa33120..9b07003 100644
 --- a/drivers/crypto/cavium/nitrox/nitrox_main.c
 +++ b/drivers/crypto/cavium/nitrox/nitrox_main.c
-@@ -180,6 +180,35 @@ static void nitrox_remove_from_devlist(struct nitrox_device *ndev)
- 	mutex_unlock(&devlist_lock);
+@@ -1,5 +1,6 @@
+ #include <linux/aer.h>
+ #include <linux/delay.h>
++#include <linux/debugfs.h>
+ #include <linux/firmware.h>
+ #include <linux/list.h>
+ #include <linux/module.h>
+@@ -305,6 +306,135 @@ static int nitrox_pf_hw_init(struct nitrox_device *ndev)
+ 	return 0;
  }
  
-+struct nitrox_device *nitrox_get_first_device(void)
++#if IS_ENABLED(CONFIG_DEBUG_FS)
++static int registers_show(struct seq_file *s, void *v)
 +{
-+	struct nitrox_device *ndev = NULL;
++	struct nitrox_device *ndev = s->private;
++	u64 offset;
 +
-+	mutex_lock(&devlist_lock);
-+	list_for_each_entry(ndev, &ndevlist, list) {
-+		if (nitrox_ready(ndev))
-+			break;
-+	}
-+	mutex_unlock(&devlist_lock);
-+	if (!ndev)
-+		return NULL;
++	/* NPS DMA stats */
++	offset = NPS_STATS_PKT_DMA_RD_CNT;
++	seq_printf(s, "NPS_STATS_PKT_DMA_RD_CNT  0x%016llx\n",
++		   nitrox_read_csr(ndev, offset));
++	offset = NPS_STATS_PKT_DMA_WR_CNT;
++	seq_printf(s, "NPS_STATS_PKT_DMA_WR_CNT  0x%016llx\n",
++		   nitrox_read_csr(ndev, offset));
 +
-+	refcount_inc(&ndev->refcnt);
-+	/* barrier to sync with other cpus */
-+	smp_mb__after_atomic();
-+	return ndev;
++	/* BMI/BMO stats */
++	offset = BMI_NPS_PKT_CNT;
++	seq_printf(s, "BMI_NPS_PKT_CNT  0x%016llx\n",
++		   nitrox_read_csr(ndev, offset));
++	offset = BMO_NPS_SLC_PKT_CNT;
++	seq_printf(s, "BMO_NPS_PKT_CNT  0x%016llx\n",
++		   nitrox_read_csr(ndev, offset));
++
++	return 0;
 +}
 +
-+void nitrox_put_device(struct nitrox_device *ndev)
++static int registers_open(struct inode *inode, struct file *file)
 +{
-+	if (!ndev)
-+		return;
-+
-+	refcount_dec(&ndev->refcnt);
-+	/* barrier to sync with other cpus */
-+	smp_mb__after_atomic();
++	return single_open(file, registers_show, inode->i_private);
 +}
 +
- static int nitrox_reset_device(struct pci_dev *pdev)
- {
- 	int pos = 0;
-@@ -526,8 +555,18 @@ static int nitrox_probe(struct pci_dev *pdev,
++static const struct file_operations register_fops = {
++	.owner = THIS_MODULE,
++	.open = registers_open,
++	.read = seq_read,
++	.llseek = seq_lseek,
++	.release = single_release,
++};
++
++static int firmware_show(struct seq_file *s, void *v)
++{
++	struct nitrox_device *ndev = s->private;
++
++	seq_printf(s, "Version: %s\n", ndev->hw.fw_name);
++	return 0;
++}
++
++static int firmware_open(struct inode *inode, struct file *file)
++{
++	return single_open(file, firmware_show, inode->i_private);
++}
++
++static const struct file_operations firmware_fops = {
++	.owner = THIS_MODULE,
++	.open = firmware_open,
++	.read = seq_read,
++	.llseek = seq_lseek,
++	.release = single_release,
++};
++
++static int nitrox_show(struct seq_file *s, void *v)
++{
++	struct nitrox_device *ndev = s->private;
++
++	seq_printf(s, "NITROX-5 [idx: %d]\n", ndev->idx);
++	seq_printf(s, "  Revsion ID: 0x%0x\n", ndev->hw.revision_id);
++	seq_printf(s, "  Cores [AE: %u  SE: %u]\n",
++		   ndev->hw.ae_cores, ndev->hw.se_cores);
++	seq_printf(s, "  Number of Queues: %u\n", ndev->nr_queues);
++	seq_printf(s, "  Queue length: %u\n", ndev->qlen);
++	seq_printf(s, "  Node: %u\n", ndev->node);
++
++	return 0;
++}
++
++static int nitrox_open(struct inode *inode, struct file *file)
++{
++	return single_open(file, nitrox_show, inode->i_private);
++}
++
++static const struct file_operations nitrox_fops = {
++	.owner = THIS_MODULE,
++	.open = nitrox_open,
++	.read = seq_read,
++	.llseek = seq_lseek,
++	.release = single_release,
++};
++
++static void nitrox_debugfs_exit(struct nitrox_device *ndev)
++{
++	debugfs_remove_recursive(ndev->debugfs_dir);
++	ndev->debugfs_dir = NULL;
++}
++
++static int nitrox_debugfs_init(struct nitrox_device *ndev)
++{
++	struct dentry *dir, *f;
++
++	dir = debugfs_create_dir(KBUILD_MODNAME, NULL);
++	if (!dir)
++		return -ENOMEM;
++
++	ndev->debugfs_dir = dir;
++	f = debugfs_create_file("counters", 0400, dir, ndev, &register_fops);
++	if (!f)
++		goto err;
++	f = debugfs_create_file("firmware", 0400, dir, ndev, &firmware_fops);
++	if (!f)
++		goto err;
++	f = debugfs_create_file("nitrox", 0400, dir, ndev, &nitrox_fops);
++	if (!f)
++		goto err;
++
++	return 0;
++
++err:
++	nitrox_debugfs_exit(ndev);
++	return -ENODEV;
++}
++#else
++static int nitrox_debugfs_init(struct nitrox_device *ndev)
++{
++	return 0;
++}
++
++static void nitrox_debugfs_exit(struct nitrox_device *ndev)
++{
++}
++#endif
++
+ /**
+  * nitrox_probe - NITROX Initialization function.
+  * @pdev: PCI device information struct
+@@ -389,6 +519,10 @@ static int nitrox_probe(struct pci_dev *pdev,
+ 	if (err)
+ 		goto pf_hw_fail;
+ 
++	err = nitrox_debugfs_init(ndev);
++	if (err)
++		goto pf_hw_fail;
++
  	set_bit(NITROX_READY, &ndev->status);
  	/* barrier to sync with other cpus */
  	smp_mb__after_atomic();
-+
-+	err = nitrox_crypto_register();
-+	if (err)
-+		goto crypto_fail;
-+
- 	return 0;
- 
-+crypto_fail:
-+	nitrox_debugfs_exit(ndev);
-+	clear_bit(NITROX_READY, &ndev->status);
-+	/* barrier to sync with other cpus */
-+	smp_mb__after_atomic();
- pf_hw_fail:
- 	nitrox_pf_sw_cleanup(ndev);
- ioremap_err:
-@@ -565,6 +604,7 @@ static void nitrox_remove(struct pci_dev *pdev)
+@@ -431,6 +565,7 @@ static void nitrox_remove(struct pci_dev *pdev)
  	smp_mb__after_atomic();
  
  	nitrox_remove_from_devlist(ndev);
-+	nitrox_crypto_unregister();
- 	nitrox_debugfs_exit(ndev);
++	nitrox_debugfs_exit(ndev);
  	nitrox_pf_sw_cleanup(ndev);
  
+ 	iounmap(ndev->bar_addr);
 -- 
 2.9.3
