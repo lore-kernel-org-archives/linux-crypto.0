@@ -1,7 +1,7 @@
 From: Derek Robson <robsonde@gmail.com>
-Subject: [PATCH V2 05/27] Drivers: ccree: ssi_pm_ext.h - align block comments
-Date: Tue, 30 May 2017 18:11:02 +1200
-Message-ID: <20170530061102.13211-1-robsonde@gmail.com>
+Subject: [PATCH V2 06/27] Drivers: ccree: ssi_pm_ext.c - align block comments
+Date: Tue, 30 May 2017 18:11:17 +1200
+Message-ID: <20170530061117.13257-1-robsonde@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
@@ -27,21 +27,40 @@ Found using checkpatch
 
 Signed-off-by: Derek Robson <robsonde@gmail.com>
 ---
- drivers/staging/ccree/ssi_pm_ext.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/staging/ccree/ssi_pm_ext.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/staging/ccree/ssi_pm_ext.h b/drivers/staging/ccree/ssi_pm_ext.h
-index 9049e6ffa8d3..dbe658b530bf 100644
---- a/drivers/staging/ccree/ssi_pm_ext.h
-+++ b/drivers/staging/ccree/ssi_pm_ext.h
-@@ -15,7 +15,7 @@
-  */
+diff --git a/drivers/staging/ccree/ssi_pm_ext.c b/drivers/staging/ccree/ssi_pm_ext.c
+index 5889d9f97479..453151cdd6b2 100644
+--- a/drivers/staging/ccree/ssi_pm_ext.c
++++ b/drivers/staging/ccree/ssi_pm_ext.c
+@@ -26,10 +26,10 @@
+ #include "ssi_pm_ext.h"
  
- /* \file ssi_pm_ext.h
--    */
+ /*
+-This function should suspend the HW (if possiable), It should be implemented by
+-the driver user.
+-The reference code clears the internal SRAM to imitate lose of state.
+-*/
++ * This function should suspend the HW (if possiable), It should be implemented by
++ * the driver user.
++ * The reference code clears the internal SRAM to imitate lose of state.
 + */
+ void ssi_pm_ext_hw_suspend(struct device *dev)
+ {
+ 	struct ssi_drvdata *drvdata =
+@@ -50,9 +50,9 @@ void ssi_pm_ext_hw_suspend(struct device *dev)
+ }
  
- #ifndef __PM_EXT_H__
- #define __PM_EXT_H__
+ /*
+-This function should resume the HW (if possiable).It should be implemented by
+-the driver user.
+-*/
++ * This function should resume the HW (if possiable).It should be implemented by
++ * the driver user.
++ */
+ void ssi_pm_ext_hw_resume(struct device *dev)
+ {
+ 	return;
 -- 
 2.13.0
