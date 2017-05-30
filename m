@@ -1,8 +1,7 @@
 From: Derek Robson <robsonde@gmail.com>
-Subject: [PATCH V2 11/27] Drivers: ccree: ssi_fips_local.c - align block
- comments
-Date: Tue, 30 May 2017 18:12:53 +1200
-Message-ID: <20170530061253.13488-1-robsonde@gmail.com>
+Subject: [PATCH V2 12/27] Drivers: ccree: ssi_fips_ll.c - align block comments
+Date: Tue, 30 May 2017 18:13:10 +1200
+Message-ID: <20170530061310.13537-1-robsonde@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
@@ -28,67 +27,61 @@ Found using checkpatch
 
 Signed-off-by: Derek Robson <robsonde@gmail.com>
 ---
- drivers/staging/ccree/ssi_fips_local.c | 21 ++++++++++++---------
+ drivers/staging/ccree/ssi_fips_ll.c | 21 ++++++++++++---------
  1 file changed, 12 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/staging/ccree/ssi_fips_local.c b/drivers/staging/ccree/ssi_fips_local.c
-index 316507d88b4e..8076c771f750 100644
---- a/drivers/staging/ccree/ssi_fips_local.c
-+++ b/drivers/staging/ccree/ssi_fips_local.c
-@@ -15,8 +15,8 @@
+diff --git a/drivers/staging/ccree/ssi_fips_ll.c b/drivers/staging/ccree/ssi_fips_ll.c
+index 7c7c922f0788..ef0a9a580560 100644
+--- a/drivers/staging/ccree/ssi_fips_ll.c
++++ b/drivers/staging/ccree/ssi_fips_ll.c
+@@ -15,9 +15,9 @@
   */
  
  /**************************************************************
--This file defines the driver FIPS internal function, used by the driver itself.
+-This file defines the driver FIPS Low Level implmentaion functions,
+-that executes the KAT.
 -***************************************************************/
-+ * This file defines the driver FIPS internal function, used by the driver itself.
++ * This file defines the driver FIPS Low Level implmentaion functions,
++ * that executes the KAT.
 + ***************************************************************/
  #include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/platform_device.h>
-@@ -80,10 +80,10 @@ static enum ssi_fips_error ssi_fips_get_tee_error(struct ssi_drvdata *drvdata)
  
- 
- /*
-- This function should push the FIPS REE library status towards the TEE library.
-- By writing the error state to HOST_GPR0 register. The function is called from  						.
-- driver entry point so no need to protect by mutex.
--*/
-+ * This function should push the FIPS REE library status towards the TEE library.
-+ * By writing the error state to HOST_GPR0 register. The function is called from
-+ * driver entry point so no need to protect by mutex.
-+ */
- static void ssi_fips_update_tee_upon_ree_status(struct ssi_drvdata *drvdata, ssi_fips_error_t err)
+ #include "ssi_driver.h"
+@@ -816,7 +816,8 @@ ssi_hmac_fips_run_test(struct ssi_drvdata *drvdata,
+ 		       dma_addr_t digest_bytes_len_dma_addr)
  {
- 	void __iomem *cc_base = drvdata->cc_base;
-@@ -232,7 +232,8 @@ ssi_fips_error_t cc_fips_run_power_up_tests(struct ssi_drvdata *drvdata)
+ 	/* The implemented flow is not the same as the one implemented in ssi_hash.c (setkey + digest flows).
+-	   In this flow, there is no need to store and reload some of the intermidiate results. */
++	 * In this flow, there is no need to store and reload some of the intermidiate results.
++	 */
  
+ 	/* max number of descriptors used for the flow */
+ 	#define FIPS_HMAC_MAX_SEQ_LEN 12
+@@ -948,9 +949,9 @@ ssi_hmac_fips_run_test(struct ssi_drvdata *drvdata,
+ 	idx++;
  
- /* The function checks if FIPS supported and FIPS error exists.*
--*  It should be used in every driver API.*/
-+ * It should be used in every driver API.
-+ */
- int ssi_fips_check_fips_error(void)
- {
- 	ssi_fips_state_t fips_state;
-@@ -250,14 +251,16 @@ int ssi_fips_check_fips_error(void)
+ 	/* at this point:
+-	   tmp_digest = H(o_key_pad)
+-	   k0 = H(i_key_pad || m)
+-	   */
++	 * tmp_digest = H(o_key_pad)
++	 * k0 = H(i_key_pad || m)
++	 */
  
+ 	/* Loading hash opad xor key state */
+ 	HW_DESC_INIT(&desc[idx]);
+@@ -1413,8 +1414,10 @@ ssi_gcm_fips_run_test(struct ssi_drvdata *drvdata,
+ 	idx++;
  
- /* The function sets the REE FIPS state.*
--*  It should be used while driver is being loaded .*/
-+ * It should be used while driver is being loaded.
-+ */
- int ssi_fips_set_state(ssi_fips_state_t state)
- {
- 	return ssi_fips_ext_set_state(state);
- }
- 
- /* The function sets the REE FIPS error, and pushes the error to TEE library. *
--*  It should be used when any of the KAT tests fails .*/
-+ * It should be used when any of the KAT tests fails.
-+ */
- int ssi_fips_set_error(struct ssi_drvdata *p_drvdata, ssi_fips_error_t err)
- {
- 	int rc = 0;
+ 	/* Configure Hash Engine to work with GHASH.
+-	   Since it was not possible to extend HASH submodes to add GHASH,
+-	   The following command is necessary in order to select GHASH (according to HW designers)*/
++	 * Since it was not possible to extend HASH submodes to add GHASH,
++	 * The following command is necessary in order to
++	 * select GHASH (according to HW designers)
++	 */
+ 	HW_DESC_INIT(&desc[idx]);
+ 	HW_DESC_SET_DIN_NO_DMA(&desc[idx], 0, 0xfffff0);
+ 	HW_DESC_SET_DOUT_NO_DMA(&desc[idx], 0, 0, 1);
 -- 
 2.13.0
