@@ -1,7 +1,7 @@
 From: Derek Robson <robsonde@gmail.com>
-Subject: [PATCH V2 18/27] Drivers: ccree: ssi_config.h - align block comments
-Date: Tue, 30 May 2017 18:14:54 +1200
-Message-ID: <20170530061454.13814-1-robsonde@gmail.com>
+Subject: [PATCH V2 19/27] Drivers: ccree: ssi_cipher.h - align block comments
+Date: Tue, 30 May 2017 18:15:09 +1200
+Message-ID: <20170530061509.13860-1-robsonde@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
@@ -27,31 +27,21 @@ Found using checkpatch
 
 Signed-off-by: Derek Robson <robsonde@gmail.com>
 ---
- drivers/staging/ccree/ssi_config.h | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ drivers/staging/ccree/ssi_cipher.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/staging/ccree/ssi_config.h b/drivers/staging/ccree/ssi_config.h
-index 431b518d893a..9feb692fff0d 100644
---- a/drivers/staging/ccree/ssi_config.h
-+++ b/drivers/staging/ccree/ssi_config.h
+diff --git a/drivers/staging/ccree/ssi_cipher.h b/drivers/staging/ccree/ssi_cipher.h
+index 7d58b56fc2c7..22d7b431edb9 100644
+--- a/drivers/staging/ccree/ssi_cipher.h
++++ b/drivers/staging/ccree/ssi_cipher.h
 @@ -15,7 +15,7 @@
   */
  
- /* \file ssi_config.h
--   Definitions for ARM CryptoCell Linux Crypto Driver
-+ * Definitions for ARM CryptoCell Linux Crypto Driver
+ /* \file ssi_cipher.h
+-   ARM CryptoCell Cipher Crypto API
++ * ARM CryptoCell Cipher Crypto API
   */
  
- #ifndef __SSI_CONFIG_H__
-@@ -49,7 +49,8 @@
- 	#define SSI_CACHE_PARAMS (0x000)
- 	/* CC attached to NONE-ACP such as HPP/ACE/AMBA4.
- 	 * The customer is responsible to enable/disable this feature
--	 * according to his platform type. */
-+	 * according to his platform type.
-+	 */
- 	#define DX_HAS_ACP 0
- #else
- 	#define SSI_CACHE_PARAMS (0xEEE)
+ #ifndef __SSI_CIPHER_H__
 -- 
 2.13.0
