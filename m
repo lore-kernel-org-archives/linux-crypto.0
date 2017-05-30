@@ -1,7 +1,8 @@
 From: Derek Robson <robsonde@gmail.com>
-Subject: [PATCH V2 19/27] Drivers: ccree: ssi_cipher.h - align block comments
-Date: Tue, 30 May 2017 18:15:09 +1200
-Message-ID: <20170530061509.13860-1-robsonde@gmail.com>
+Subject: [PATCH V2 20/27] Drivers: ccree: ssi_buffer_mgr.h - align block
+ comments
+Date: Tue, 30 May 2017 18:15:26 +1200
+Message-ID: <20170530061526.13906-1-robsonde@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
@@ -27,21 +28,21 @@ Found using checkpatch
 
 Signed-off-by: Derek Robson <robsonde@gmail.com>
 ---
- drivers/staging/ccree/ssi_cipher.h | 2 +-
+ drivers/staging/ccree/ssi_buffer_mgr.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/staging/ccree/ssi_cipher.h b/drivers/staging/ccree/ssi_cipher.h
-index 7d58b56fc2c7..22d7b431edb9 100644
---- a/drivers/staging/ccree/ssi_cipher.h
-+++ b/drivers/staging/ccree/ssi_cipher.h
+diff --git a/drivers/staging/ccree/ssi_buffer_mgr.h b/drivers/staging/ccree/ssi_buffer_mgr.h
+index 4acbb4b6afc9..98355dd789e5 100644
+--- a/drivers/staging/ccree/ssi_buffer_mgr.h
++++ b/drivers/staging/ccree/ssi_buffer_mgr.h
 @@ -15,7 +15,7 @@
   */
  
- /* \file ssi_cipher.h
--   ARM CryptoCell Cipher Crypto API
-+ * ARM CryptoCell Cipher Crypto API
+ /* \file buffer_mgr.h
+-   Buffer Manager
++ * Buffer Manager
   */
  
- #ifndef __SSI_CIPHER_H__
+ #ifndef __SSI_BUFFER_MGR_H__
 -- 
 2.13.0
