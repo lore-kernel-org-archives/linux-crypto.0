@@ -1,7 +1,8 @@
 From: Derek Robson <robsonde@gmail.com>
-Subject: [PATCH V2 13/27] Drivers: ccree: ssi_fips_ext.c - align block comments
-Date: Tue, 30 May 2017 18:13:26 +1200
-Message-ID: <20170530061326.13583-1-robsonde@gmail.com>
+Subject: [PATCH V2 14/27] Drivers: ccree: ssi_fips_data.h - align block
+ comments
+Date: Tue, 30 May 2017 18:13:46 +1200
+Message-ID: <20170530061346.13629-1-robsonde@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
@@ -27,93 +28,112 @@ Found using checkpatch
 
 Signed-off-by: Derek Robson <robsonde@gmail.com>
 ---
- drivers/staging/ccree/ssi_fips_ext.c | 46 ++++++++++++++++++------------------
- 1 file changed, 23 insertions(+), 23 deletions(-)
+ drivers/staging/ccree/ssi_fips_data.h | 93 +++++++++++++++++------------------
+ 1 file changed, 46 insertions(+), 47 deletions(-)
 
-diff --git a/drivers/staging/ccree/ssi_fips_ext.c b/drivers/staging/ccree/ssi_fips_ext.c
-index 291a880f567c..0f53a4bc43de 100644
---- a/drivers/staging/ccree/ssi_fips_ext.c
-+++ b/drivers/staging/ccree/ssi_fips_ext.c
-@@ -15,9 +15,9 @@
+diff --git a/drivers/staging/ccree/ssi_fips_data.h b/drivers/staging/ccree/ssi_fips_data.h
+index a4b78f1b4d48..fa6bf41c27e5 100644
+--- a/drivers/staging/ccree/ssi_fips_data.h
++++ b/drivers/staging/ccree/ssi_fips_data.h
+@@ -15,53 +15,52 @@
   */
  
- /**************************************************************
--This file defines the driver FIPS functions that should be
--implemented by the driver user. Current implementation is sample code only.
--***************************************************************/
-+ * This file defines the driver FIPS functions that should be
-+ * implemented by the driver user. Current implementation is sample code only.
-+ ***************************************************************/
- 
- #include <linux/module.h>
- #include "ssi_fips_local.h"
-@@ -32,11 +32,11 @@ static ssi_fips_state_t fips_state = CC_FIPS_STATE_NOT_SUPPORTED;
- static ssi_fips_error_t fips_error = CC_REE_FIPS_ERROR_OK;
- 
  /*
--This function returns the FIPS REE state.
--The function should be implemented by the driver user, depends on where                          .
--the state value is stored.
--The reference code uses global variable.
+-The test vectors were taken from:
+-
+-* AES
+-NIST Special Publication 800-38A 2001 Edition
+-Recommendation for Block Cipher Modes of Operation
+-http://csrc.nist.gov/publications/nistpubs/800-38a/sp800-38a.pdf
+-Appendix F: Example Vectors for Modes of Operation of the AES
+-
+-* AES CTS
+-Advanced Encryption Standard (AES) Encryption for Kerberos 5
+-February 2005
+-https://tools.ietf.org/html/rfc3962#appendix-B
+-B.  Sample Test Vectors
+-
+-* AES XTS
+-http://csrc.nist.gov/groups/STM/cavp/#08
+-http://csrc.nist.gov/groups/STM/cavp/documents/aes/XTSTestVectors.zip
+-
+-* AES CMAC
+-http://csrc.nist.gov/groups/STM/cavp/index.html#07
+-http://csrc.nist.gov/groups/STM/cavp/documents/mac/cmactestvectors.zip
+-
+-* AES-CCM
+-http://csrc.nist.gov/groups/STM/cavp/#07
+-http://csrc.nist.gov/groups/STM/cavp/documents/mac/ccmtestvectors.zip
+-
+-* AES-GCM
+-http://csrc.nist.gov/groups/STM/cavp/documents/mac/gcmtestvectors.zip
+-
+-* Triple-DES
+-NIST Special Publication 800-67 January 2012
+-Recommendation for the Triple Data Encryption Algorithm (TDEA) Block Cipher
+-http://csrc.nist.gov/publications/nistpubs/800-67-Rev1/SP-800-67-Rev1.pdf
+-APPENDIX B: EXAMPLE OF TDEA FORWARD AND INVERSE CIPHER OPERATIONS
+-and
+-http://csrc.nist.gov/groups/STM/cavp/#01
+-http://csrc.nist.gov/groups/STM/cavp/documents/des/tdesmct_intermediate.zip
+-
+-* HASH
+-http://csrc.nist.gov/groups/STM/cavp/#03
+-http://csrc.nist.gov/groups/STM/cavp/documents/shs/shabytetestvectors.zip
+-
+-* HMAC
+-http://csrc.nist.gov/groups/STM/cavp/#07
+-http://csrc.nist.gov/groups/STM/cavp/documents/mac/hmactestvectors.zip
+-
 -*/
-+ * This function returns the FIPS REE state.
-+ * The function should be implemented by the driver user, depends on where
-+ * the state value is stored.
-+ * The reference code uses global variable.
++ * The test vectors were taken from:
++ *
++ * * AES
++ * NIST Special Publication 800-38A 2001 Edition
++ * Recommendation for Block Cipher Modes of Operation
++ * http://csrc.nist.gov/publications/nistpubs/800-38a/sp800-38a.pdf
++ * Appendix F: Example Vectors for Modes of Operation of the AES
++ *
++ * * AES CTS
++ * Advanced Encryption Standard (AES) Encryption for Kerberos 5
++ * February 2005
++ * https://tools.ietf.org/html/rfc3962#appendix-B
++ * B.  Sample Test Vectors
++ *
++ * * AES XTS
++ * http://csrc.nist.gov/groups/STM/cavp/#08
++ * http://csrc.nist.gov/groups/STM/cavp/documents/aes/XTSTestVectors.zip
++ *
++ * * AES CMAC
++ * http://csrc.nist.gov/groups/STM/cavp/index.html#07
++ * http://csrc.nist.gov/groups/STM/cavp/documents/mac/cmactestvectors.zip
++ *
++ * * AES-CCM
++ * http://csrc.nist.gov/groups/STM/cavp/#07
++ * http://csrc.nist.gov/groups/STM/cavp/documents/mac/ccmtestvectors.zip
++ *
++ * * AES-GCM
++ * http://csrc.nist.gov/groups/STM/cavp/documents/mac/gcmtestvectors.zip
++ *
++ * * Triple-DES
++ * NIST Special Publication 800-67 January 2012
++ * Recommendation for the Triple Data Encryption Algorithm (TDEA) Block Cipher
++ * http://csrc.nist.gov/publications/nistpubs/800-67-Rev1/SP-800-67-Rev1.pdf
++ * APPENDIX B: EXAMPLE OF TDEA FORWARD AND INVERSE CIPHER OPERATIONS
++ * and
++ * http://csrc.nist.gov/groups/STM/cavp/#01
++ * http://csrc.nist.gov/groups/STM/cavp/documents/des/tdesmct_intermediate.zip
++ *
++ * * HASH
++ * http://csrc.nist.gov/groups/STM/cavp/#03
++ * http://csrc.nist.gov/groups/STM/cavp/documents/shs/shabytetestvectors.zip
++ *
++ * * HMAC
++ * http://csrc.nist.gov/groups/STM/cavp/#07
++ * http://csrc.nist.gov/groups/STM/cavp/documents/mac/hmactestvectors.zip
 + */
- int ssi_fips_ext_get_state(ssi_fips_state_t *p_state)
- {
-         int rc = 0;
-@@ -51,11 +51,11 @@ int ssi_fips_ext_get_state(ssi_fips_state_t *p_state)
- }
  
- /*
--This function returns the FIPS REE error.
--The function should be implemented by the driver user, depends on where                          .
--the error value is stored.
--The reference code uses global variable.
--*/
-+ * This function returns the FIPS REE error.
-+ * The function should be implemented by the driver user, depends on where
-+ * the error value is stored.
-+ * The reference code uses global variable.
-+ */
- int ssi_fips_ext_get_error(ssi_fips_error_t *p_err)
- {
-         int rc = 0;
-@@ -70,11 +70,11 @@ int ssi_fips_ext_get_error(ssi_fips_error_t *p_err)
- }
- 
- /*
--This function sets the FIPS REE state.
--The function should be implemented by the driver user, depends on where                          .
--the state value is stored.
--The reference code uses global variable.
--*/
-+ * This function sets the FIPS REE state.
-+ * The function should be implemented by the driver user, depends on where
-+ * the state value is stored.
-+ * The reference code uses global variable.
-+ */
- int ssi_fips_ext_set_state(ssi_fips_state_t state)
- {
- 	fips_state = state;
-@@ -82,11 +82,11 @@ int ssi_fips_ext_set_state(ssi_fips_state_t state)
- }
- 
- /*
--This function sets the FIPS REE error.
--The function should be implemented by the driver user, depends on where                          .
--the error value is stored.
--The reference code uses global variable.
--*/
-+ * This function sets the FIPS REE error.
-+ * The function should be implemented by the driver user, depends on where
-+ * the error value is stored.
-+ * The reference code uses global variable.
-+ */
- int ssi_fips_ext_set_error(ssi_fips_error_t err)
- {
- 	fips_error = err;
+ /* NIST AES */
+ #define AES_128_BIT_KEY_SIZE    16
 -- 
 2.13.0
