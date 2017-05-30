@@ -1,94 +1,66 @@
 From: Tudor Ambarus <tudor.ambarus@microchip.com>
-Subject: [PATCH v5 04/14] crypto: ecc - rename ecdh_make_pub_key()
-Date: Tue, 30 May 2017 15:37:56 +0300
-Message-ID: <1496147876-3616-1-git-send-email-tudor.ambarus@microchip.com>
-References: <260d4e89-76a5-6566-829a-4e95529dd556@microchip.com>
+Subject: [PATCH v3 0/2] crypto: ecdh - add privkey generation support
+Date: Tue, 30 May 2017 17:52:47 +0300
+Message-ID: <1496155969-13765-1-git-send-email-tudor.ambarus@microchip.com>
 Mime-Version: 1.0
 Content-Type: text/plain
-Cc: <linux-crypto@vger.kernel.org>, <horia.geanta@nxp.com>,
+Cc: <linux-crypto@vger.kernel.org>, <smueller@chronox.de>,
+        <marcel@holtmann.org>, <Nicolas.Ferre@microchip.com>,
         Tudor Ambarus <tudor.ambarus@microchip.com>
-To: <herbert@gondor.apana.org.au>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from esa2.microchip.iphmx.com ([68.232.149.84]:1949 "EHLO
-        esa2.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750965AbdE3Mi3 (ORCPT
+Received: from esa1.microchip.iphmx.com ([68.232.147.91]:62090 "EHLO
+        esa1.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751214AbdE3O4G (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 May 2017 08:38:29 -0400
-In-Reply-To: <260d4e89-76a5-6566-829a-4e95529dd556@microchip.com>
+        Tue, 30 May 2017 10:56:06 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Rename ecdh_make_pub_key() to ecc_make_pub_key().
-ecdh_make_pub_key() is not dh specific and the reference
-to dh is wrong.
+Hi,
 
-Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
----
-v5 updates the description of the function by replacing
-"ecdh_make_pub_key()" with "ecc_make_pub_key()". I also
-updated the commit message.
+This patch set adds support for generating ecc private keys.
+ecc private keys are generated using the method of extra random bits,
+equivalent to that described in FIPS 186-4, Appendix B.4.1.
 
-Herbert, do I need to resend a new series for this change or
-having the updated patch like this is ok for you?
+Generation of ecc private keys is helpful in a user-space to kernel
+ecdh offload because the keys are not revealed to user-space.
 
- crypto/ecc.c  | 4 ++--
- crypto/ecc.h  | 6 +++---
- crypto/ecdh.c | 4 ++--
- 3 files changed, 7 insertions(+), 7 deletions(-)
+Private key generation is also helpful to implement forward secrecy.
+A public/private key system demonstrates the property of forward secrecy
+if it creates new key pairs for each communication session. These key pairs
+are generated on an as-needed basis and are destroyed after the session
+is over. If an attacker were to record previous encrypted session data,
+they wouldn't be able to decrypt it with possession of a long-term key.
 
-diff --git a/crypto/ecc.c b/crypto/ecc.c
-index e3a2b8f..6c33c43 100644
---- a/crypto/ecc.c
-+++ b/crypto/ecc.c
-@@ -927,8 +927,8 @@ int ecc_is_key_valid(unsigned int curve_id, unsigned int ndigits,
- 	return 0;
- }
- 
--int ecdh_make_pub_key(unsigned int curve_id, unsigned int ndigits,
--		      const u64 *private_key, u64 *public_key)
-+int ecc_make_pub_key(unsigned int curve_id, unsigned int ndigits,
-+		     const u64 *private_key, u64 *public_key)
- {
- 	int ret = 0;
- 	struct ecc_point *pk;
-diff --git a/crypto/ecc.h b/crypto/ecc.h
-index af2ffdb..e13fe88 100644
---- a/crypto/ecc.h
-+++ b/crypto/ecc.h
-@@ -44,7 +44,7 @@ int ecc_is_key_valid(unsigned int curve_id, unsigned int ndigits,
- 		     const u64 *private_key, unsigned int private_key_len);
- 
- /**
-- * ecdh_make_pub_key() - Compute an ECC public key
-+ * ecc_make_pub_key() - Compute an ECC public key
-  *
-  * @curve_id:		id representing the curve to use
-  * @ndigits:		curve's number of digits
-@@ -54,8 +54,8 @@ int ecc_is_key_valid(unsigned int curve_id, unsigned int ndigits,
-  * Returns 0 if the public key was generated successfully, a negative value
-  * if an error occurred.
-  */
--int ecdh_make_pub_key(const unsigned int curve_id, unsigned int ndigits,
--		      const u64 *private_key, u64 *public_key);
-+int ecc_make_pub_key(const unsigned int curve_id, unsigned int ndigits,
-+		     const u64 *private_key, u64 *public_key);
- 
- /**
-  * crypto_ecdh_shared_secret() - Compute a shared secret
-diff --git a/crypto/ecdh.c b/crypto/ecdh.c
-index c1f0163..ed1464a 100644
---- a/crypto/ecdh.c
-+++ b/crypto/ecdh.c
-@@ -87,8 +87,8 @@ static int ecdh_compute_value(struct kpp_request *req)
- 
- 		buf = ctx->shared_secret;
- 	} else {
--		ret = ecdh_make_pub_key(ctx->curve_id, ctx->ndigits,
--					ctx->private_key, ctx->public_key);
-+		ret = ecc_make_pub_key(ctx->curve_id, ctx->ndigits,
-+				       ctx->private_key, ctx->public_key);
- 		buf = ctx->public_key;
- 		/* Public part is a point thus it has both coordinates */
- 		nbytes *= 2;
+There are crypto accelerators that are capable of generating and retaining
+ecdh private keys without revealing them to software. This patch set is a
+prerequisite for hardware ecdh with private key generation support.
+
+Changes in v3:
+ - make ecc priv key generation compliant with FIPS 186-4.
+ - drop dh privkey generation. The implementation was broken because
+   was generating private keys based on the length of p, instead of q.
+   As of know the dh implementation does not provide a pointer to q,
+   so just drop the dh pursue.
+ - correct the length in memcpy in testmgr.
+ - rebase on top of "[PATCH v4 00/14] fixes for kpp and akcipher"
+
+v2 can be found at:
+http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg25193.html
+
+Tudor Ambarus (2):
+  crypto: ecdh - add privkey generation support
+  crypto: testmgr - add genkey kpp test
+
+ crypto/Kconfig   |  1 +
+ crypto/Makefile  |  9 ++++---
+ crypto/ecc.c     | 56 +++++++++++++++++++++++++++++++++++++++++
+ crypto/ecc.h     | 14 +++++++++++
+ crypto/ecdh.c    |  4 +++
+ crypto/testmgr.c | 76 ++++++++++++++++++++++++++++++++++++++++++++++++--------
+ crypto/testmgr.h | 47 +++++++++++++++++++++++++++++++++++
+ 7 files changed, 192 insertions(+), 15 deletions(-)
+
 -- 
 2.7.4
