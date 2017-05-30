@@ -1,59 +1,82 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [RFC PATCH v2 1/4] crypto: ecc - add privkey generation support
-Date: Mon, 29 May 2017 11:56:55 +0200
-Message-ID: <1712750.5bvosCThh4@tauon.chronox.de>
-References: <1495034813-27143-1-git-send-email-tudor.ambarus@microchip.com> <6869489.T5IFoD8UlO@tauon.chronox.de> <f8e3cae5-d431-85e2-8d87-6624058d52ea@microchip.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, marcel@holtmann.org,
-        Nicolas.Ferre@microchip.com
-To: Tudor Ambarus <tudor.ambarus@microchip.com>
+From: Derek Robson <robsonde@gmail.com>
+Subject: [PATCH V2 00/27] Drivers: ccree - align block comments
+Date: Tue, 30 May 2017 18:09:37 +1200
+Message-ID: <20170530060937.12981-1-robsonde@gmail.com>
+Cc: linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        linux-kernel@vger.kernel.org, Derek Robson <robsonde@gmail.com>
+To: gilad@benyossef.com, gregkh@linuxfoundation.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:59826 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751011AbdE2J46 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 29 May 2017 05:56:58 -0400
-In-Reply-To: <f8e3cae5-d431-85e2-8d87-6624058d52ea@microchip.com>
+Received: from mail-pf0-f195.google.com ([209.85.192.195]:33544 "EHLO
+        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751110AbdE3GJu (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 30 May 2017 02:09:50 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Montag, 29. Mai 2017, 11:47:48 CEST schrieb Tudor Ambarus:
+Fixed block comments across whole ccree driver
 
-Hi Tudor,
+Version #1 has some trailing white space issue in a few patches
 
-> > Hm, there should be no blocking for the DRBG to initialize.
-> > 
-> > What happens if you compile that as a module and insmod it at runtime?
-> 
-> We will have a nop:
-> 
-> #ifdef CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
-> 
-> /* a perfect nop */
-> int alg_test(const char *driver, const char *alg, u32 type, u32 mask)
-> {
-> 	printk(KERN_ERR "no op in alg_test");
-> 	return 0;
-> }
-> 
-> #else
-> ...
-> #endif
-> 
-> If I further mangle it and change #ifdef with #ifndef then the tests are
-> passing.
 
-Can you please enable the testmgr in the kernel config and compile the DH/ECDH 
-code as a module. Then I would insmod the dh/ecdh kernel module to see whether 
-the self tests work or not.
+Derek Robson (27):
+  Drivers: ccree: ssi_sysfs.h - align block comments
+  Drivers: ccree: ssi_sysfs.c - align block comments
+  Drivers: ccree: ssi_request_mgr.h - align block comments
+  Drivers: ccree: ssi_request_mgr.c - align block comments
+  Drivers: ccree: ssi_pm_ext.h - align block comments
+  Drivers: ccree: ssi_pm_ext.c - align block comments
+  Drivers: ccree: ssi_pm.h - align block comments
+  Drivers: ccree: ssi_ivgen.c - align block comments
+  Drivers: ccree: ssi_hash.h - align block comments
+  Drivers: ccree: ssi_hash.c - align block comments
+  Drivers: ccree: ssi_fips_local.c - align block comments
+  Drivers: ccree: ssi_fips_ll.c - align block comments
+  Drivers: ccree: ssi_fips_ext.c - align block comments
+  Drivers: ccree: ssi_fips_data.h - align block comments
+  Drivers: ccree: ssi_fips.h - align block comments
+  Drivers: ccree: ssi_fips.c - align block comments
+  Drivers: ccree: ssi_driver.h - align block comments
+  Drivers: ccree: ssi_config.h - align block comments
+  Drivers: ccree: ssi_cipher.h - align block comments
+  Drivers: ccree: ssi_buffer_mgr.h - align block comments
+  Drivers: ccree: ssi_buffer_mgr.c - align block comments
+  Drivers: ccree: ssi_aead.h - align block comments
+  Drivers: ccree: ssi_aead.c - align block comments
+  Drivers: ccree: hash_defs.h - align block comments
+  Drivers: ccree: cc_regs.h - align block comments
+  Drivers: ccree: cc_hw_queue_defs.h - align block comments
+  Drivers: ccree: cc_crypto_ctx.h - align block comments
 
-Note, if you use the calls of crypto_get_default_rng and friends, the DRBG 
-must be present in the kernel at the time of calling. I.e. if you statically 
-compile dh/ecdh but compile the RNG support as a module, the RNG will not load 
-during self test. If you compile dh/ecdh as a module, the RNG can stay as a 
-module.
+ drivers/staging/ccree/cc_crypto_ctx.h    | 17 +++---
+ drivers/staging/ccree/cc_hw_queue_defs.h | 32 +++++------
+ drivers/staging/ccree/cc_regs.h          | 13 ++---
+ drivers/staging/ccree/hash_defs.h        | 15 +++---
+ drivers/staging/ccree/ssi_aead.c         | 45 ++++++++++------
+ drivers/staging/ccree/ssi_aead.h         |  7 +--
+ drivers/staging/ccree/ssi_buffer_mgr.c   | 87 +++++++++++++++++-------------
+ drivers/staging/ccree/ssi_buffer_mgr.h   |  2 +-
+ drivers/staging/ccree/ssi_cipher.h       |  2 +-
+ drivers/staging/ccree/ssi_config.h       |  5 +-
+ drivers/staging/ccree/ssi_driver.h       | 16 +++---
+ drivers/staging/ccree/ssi_fips.c         | 16 +++---
+ drivers/staging/ccree/ssi_fips.h         |  6 +--
+ drivers/staging/ccree/ssi_fips_data.h    | 93 ++++++++++++++++----------------
+ drivers/staging/ccree/ssi_fips_ext.c     | 46 ++++++++--------
+ drivers/staging/ccree/ssi_fips_ll.c      | 21 ++++----
+ drivers/staging/ccree/ssi_fips_local.c   | 21 ++++----
+ drivers/staging/ccree/ssi_hash.c         |  9 ++--
+ drivers/staging/ccree/ssi_hash.h         |  2 +-
+ drivers/staging/ccree/ssi_ivgen.c        |  6 ++-
+ drivers/staging/ccree/ssi_pm.h           |  2 +-
+ drivers/staging/ccree/ssi_pm_ext.c       | 14 ++---
+ drivers/staging/ccree/ssi_pm_ext.h       |  2 +-
+ drivers/staging/ccree/ssi_request_mgr.c  | 37 +++++++------
+ drivers/staging/ccree/ssi_request_mgr.h  |  2 +-
+ drivers/staging/ccree/ssi_sysfs.c        |  3 +-
+ drivers/staging/ccree/ssi_sysfs.h        |  2 +-
+ 27 files changed, 288 insertions(+), 235 deletions(-)
 
-Ciao
-Stephan
+-- 
+2.13.0
