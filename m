@@ -1,61 +1,45 @@
-From: Anatoly Pugachev <matorola@gmail.com>
-Subject: Re: [sparc64] crc32c misbehave
-Date: Wed, 31 May 2017 15:12:09 +0300
-Message-ID: <CADxRZqwKAEHZwkCmZw7zShCm7uMACdLMfD=EdFETZK4HZ=DEeg@mail.gmail.com>
-References: <CADxRZqzgaL4ew6PVek3WBsdwo6GcT0ORx=7h+6p0V3NAr8qF+w@mail.gmail.com>
- <CADxRZqzNTB1n0g1r_2rLsjifHpJ+_x1WPxNOSqEcHbi74jHi5w@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Eric Sandeen <sandeen@sandeen.net>, linux-crypto@vger.kernel.org
-To: Sparc kernel list <sparclinux@vger.kernel.org>
+From: srishti sharma <srishtishar@gmail.com>
+Subject: [PATCH] Staging: ccree: cc_crypto_ctx.h: Fixed a comment coding style issue.
+Date: Wed, 31 May 2017 18:24:55 +0530
+Message-ID: <1496235295-2696-1-git-send-email-srishtishar@gmail.com>
+Cc: gilad@benyossef.com, linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        linux-kernel@vger.kernel.org,
+        srishti sharma <srishtishar@gmail.com>
+To: gregkh@linuxfoundation.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f50.google.com ([74.125.82.50]:38732 "EHLO
-        mail-wm0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751070AbdEaMML (ORCPT
+Received: from mail-pf0-f194.google.com ([209.85.192.194]:35961 "EHLO
+        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751009AbdEaMzA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 31 May 2017 08:12:11 -0400
-In-Reply-To: <CADxRZqzNTB1n0g1r_2rLsjifHpJ+_x1WPxNOSqEcHbi74jHi5w@mail.gmail.com>
+        Wed, 31 May 2017 08:55:00 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-A bit more on testing machines:
+Fixed a comment coding style issue that generated a warning stating that block comments should align the * on each line.
 
-kernel on T5 ldom ttip is git kernel:
+Signed-off-by: srishti sharma <srishtishar@gmail.com>
+---
+ drivers/staging/ccree/cc_crypto_ctx.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Linux ttip 4.12.0-rc3-00011-gf511c0b17b08 #327 SMP Wed May 31 12:54:02
-MSK 2017 sparc64 GNU/Linux
-
-kernel on v215 is debian sid kernel:
-
-Linux v215 4.9.0-3-sparc64-smp #1 SMP Debian 4.9.25-1 (2017-05-02)
-sparc64 GNU/Linux
-
-mator@ttip:~$ gcc -v
-Using built-in specs.
-COLLECT_GCC=gcc
-COLLECT_LTO_WRAPPER=/usr/lib/gcc/sparc64-linux-gnu/6/lto-wrapper
-Target: sparc64-linux-gnu
-Configured with: ../src/configure -v --with-pkgversion='Debian
-6.3.0-18' --with-bugurl=file:///usr/share/doc/gcc-6/README.Bugs
---enable-languages=c,ada,c++,java,go,d,fortran,objc,obj-c++
---prefix=/usr --program-suffix=-6 --program-prefix=sparc64-linux-gnu-
---enable-shared --enable-linker-build-id --libexecdir=/usr/lib
---without-included-gettext --enable-threads=posix --libdir=/usr/lib
---enable-nls --with-sysroot=/ --enable-clocale=gnu
---enable-libstdcxx-debug --enable-libstdcxx-time=yes
---with-default-libstdcxx-abi=new --enable-gnu-unique-object
---disable-libquadmath --enable-plugin --enable-default-pie
---with-system-zlib --disable-browser-plugin --enable-java-awt=gtk
---enable-gtk-cairo
---with-java-home=/usr/lib/jvm/java-1.5.0-gcj-6-sparc64/jre
---enable-java-home
---with-jvm-root-dir=/usr/lib/jvm/java-1.5.0-gcj-6-sparc64
---with-jvm-jar-dir=/usr/lib/jvm-exports/java-1.5.0-gcj-6-sparc64
---with-arch-directory=sparc64
---with-ecj-jar=/usr/share/java/eclipse-ecj.jar --enable-objc-gc=auto
---enable-multiarch --enable-targets=all --with-cpu-32=ultrasparc
---with-long-double-128 --enable-multilib --enable-checking=release
---build=sparc64-linux-gnu --host=sparc64-linux-gnu
---target=sparc64-linux-gnu
-Thread model: posix
-gcc version 6.3.0 20170516 (Debian 6.3.0-18)
+diff --git a/drivers/staging/ccree/cc_crypto_ctx.h b/drivers/staging/ccree/cc_crypto_ctx.h
+index c5784bc..38f6615 100644
+--- a/drivers/staging/ccree/cc_crypto_ctx.h
++++ b/drivers/staging/ccree/cc_crypto_ctx.h
+@@ -239,10 +239,10 @@ struct drv_ctx_cipher {
+ 	enum drv_crypto_padding_type padding_type;
+ 	u32 key_size; /* numeric value in bytes   */
+ 	u32 data_unit_size; /* required for XTS */
+-	/* block_state is the AES engine block state.
+-	*  It is used by the host to pass IV or counter at initialization.
+-	*  It is used by SeP for intermediate block chaining state and for
+-	*  returning MAC algorithms results.           */
++	/*  block_state is the AES engine block state.
++	 *  It is used by the host to pass IV or counter at initialization.
++	 *  It is used by SeP for intermediate block chaining state and for
++	 *  returning MAC algorithms results.           */
+ 	u8 block_state[CC_AES_BLOCK_SIZE];
+ 	u8 key[CC_AES_KEY_SIZE_MAX];
+ 	u8 xex_key[CC_AES_KEY_SIZE_MAX];
+2.7.4
