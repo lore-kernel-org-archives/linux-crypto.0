@@ -1,45 +1,59 @@
-From: srishti sharma <srishtishar@gmail.com>
-Subject: [PATCH] Staging: ccree: cc_crypto_ctx.h: Fixed a comment coding style issue.
-Date: Wed, 31 May 2017 18:24:55 +0530
-Message-ID: <1496235295-2696-1-git-send-email-srishtishar@gmail.com>
-Cc: gilad@benyossef.com, linux-crypto@vger.kernel.org,
-        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
-        linux-kernel@vger.kernel.org,
-        srishti sharma <srishtishar@gmail.com>
-To: gregkh@linuxfoundation.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f194.google.com ([209.85.192.194]:35961 "EHLO
-        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751009AbdEaMzA (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 31 May 2017 08:55:00 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: David Miller <davem@davemloft.net>
+Subject: Re: [sparc64] crc32c misbehave
+Date: Wed, 31 May 2017 11:53:35 -0400 (EDT)
+Message-ID: <20170531.115335.213691069712156732.davem@davemloft.net>
+References: <CADxRZqzgaL4ew6PVek3WBsdwo6GcT0ORx=7h+6p0V3NAr8qF+w@mail.gmail.com>
+        <CADxRZqzNTB1n0g1r_2rLsjifHpJ+_x1WPxNOSqEcHbi74jHi5w@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Cc: sparclinux@vger.kernel.org, sandeen@sandeen.net,
+        linux-crypto@vger.kernel.org
+To: matorola@gmail.com
+Return-path: <sparclinux-owner@vger.kernel.org>
+In-Reply-To: <CADxRZqzNTB1n0g1r_2rLsjifHpJ+_x1WPxNOSqEcHbi74jHi5w@mail.gmail.com>
+Sender: sparclinux-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Fixed a comment coding style issue that generated a warning stating that block comments should align the * on each line.
+From: Anatoly Pugachev <matorola@gmail.com>
+Date: Wed, 31 May 2017 14:56:52 +0300
 
-Signed-off-by: srishti sharma <srishtishar@gmail.com>
----
- drivers/staging/ccree/cc_crypto_ctx.h | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+> While debugging occasional crc32c checksum errors with xfs disk reads on
+> sparc64 (T5 [sun4v] 3.6 GHz CPU ldom, debian unstable/sid), Eric have found
+> that crc32c sometimes returns wrong checksum for data. Eric made a simple
+> test kernel module (included), which produce the following results on my
+> sparc64 machines:
 
-diff --git a/drivers/staging/ccree/cc_crypto_ctx.h b/drivers/staging/ccree/cc_crypto_ctx.h
-index c5784bc..38f6615 100644
---- a/drivers/staging/ccree/cc_crypto_ctx.h
-+++ b/drivers/staging/ccree/cc_crypto_ctx.h
-@@ -239,10 +239,10 @@ struct drv_ctx_cipher {
- 	enum drv_crypto_padding_type padding_type;
- 	u32 key_size; /* numeric value in bytes   */
- 	u32 data_unit_size; /* required for XTS */
--	/* block_state is the AES engine block state.
--	*  It is used by the host to pass IV or counter at initialization.
--	*  It is used by SeP for intermediate block chaining state and for
--	*  returning MAC algorithms results.           */
-+	/*  block_state is the AES engine block state.
-+	 *  It is used by the host to pass IV or counter at initialization.
-+	 *  It is used by SeP for intermediate block chaining state and for
-+	 *  returning MAC algorithms results.           */
- 	u8 block_state[CC_AES_BLOCK_SIZE];
- 	u8 key[CC_AES_KEY_SIZE_MAX];
- 	u8 xex_key[CC_AES_KEY_SIZE_MAX];
-2.7.4
+I don't think that crc32c() is thread safe because of the way it is
+implemented with a shared TFM crypto object allocated once at boot
+time.
+
+I think you are seeing the corruption any time an interrupt comes in
+on the same cpu as your test module is running on and does a crc32c()
+calculation, corrupting the context key value being used by your
+invocation.
+
+At least that's my guess, I could have misread how the key is stored
+and managed around operations.
+
+Can you try something like disabling cpu IRQs around the crc32c() function
+in lib/libcrc32c.c?  Something like:
+
+	u32 retval;
+
+	local_irq_disable();
+
+	shash->tfm = tfm;
+	shash->flags = 0;
+	*ctx = crc;
+
+	err = crypto_shash_update(shash, address, length);
+	BUG_ON(err);
+
+	retval = *ctx;
+
+	local_irq_enable();
+
+	return retval;
+
+Thanks.
