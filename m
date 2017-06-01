@@ -1,57 +1,96 @@
-From: Ryder Lee <ryder.lee@mediatek.com>
-Subject: [PATCH v1 2/2] dt-bindings: crypto: remove mediatek ethif clock
-Date: Thu, 1 Jun 2017 10:30:22 +0800
-Message-ID: <1496284222-12560-3-git-send-email-ryder.lee@mediatek.com>
+From: Ryder Lee <ryder.lee-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>
+Subject: [PATCH v1 1/2] crypto: mediatek - remove redundant clock setting
+Date: Thu, 1 Jun 2017 10:30:21 +0800
+Message-ID: <1496284222-12560-2-git-send-email-ryder.lee@mediatek.com>
 References: <1496284222-12560-1-git-send-email-ryder.lee@mediatek.com>
 Mime-Version: 1.0
 Content-Type: text/plain
-Cc: <devicetree@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <linux-mediatek@lists.infradead.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, Ryder Lee <ryder.lee@mediatek.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1496284222-12560-1-git-send-email-ryder.lee@mediatek.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Cc: <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        <linux-mediatek-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>,
+        <linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>,
+        <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, Ryder Lee <ryder.lee-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>
+To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1496284222-12560-1-git-send-email-ryder.lee-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch removes the parent clock 'ethif' in bindings, since we don't
-need to control the parent of a clock in current clock framework.
+This patch removes redundant clock setting for 'clk_ethif', which is
+the parent of 'clk_cryp'. Hence, we just need to handle its child.
 
-Moreover, the clocks are get by name in the driver, thus this change
-does not break backwards compatibility.
-
-Signed-off-by: Ryder Lee <ryder.lee@mediatek.com>
-Reviewed-by: Matthias Brugger <matthias.bgg@gmail.com>
+Signed-off-by: Ryder Lee <ryder.lee-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>
 ---
- Documentation/devicetree/bindings/crypto/mediatek-crypto.txt | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+ drivers/crypto/mediatek/mtk-platform.c | 10 +---------
+ drivers/crypto/mediatek/mtk-platform.h |  2 --
+ 2 files changed, 1 insertion(+), 11 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/crypto/mediatek-crypto.txt b/Documentation/devicetree/bindings/crypto/mediatek-crypto.txt
-index c204725..450da36 100644
---- a/Documentation/devicetree/bindings/crypto/mediatek-crypto.txt
-+++ b/Documentation/devicetree/bindings/crypto/mediatek-crypto.txt
-@@ -6,8 +6,7 @@ Required properties:
- - interrupts: Should contain the five crypto engines interrupts in numeric
- 	order. These are global system and four descriptor rings.
- - clocks: the clock used by the core
--- clock-names: the names of the clock listed in the clocks property. These are
--	"ethif", "cryp"
-+- clock-names: Must contain "cryp".
- - power-domains: Must contain a reference to the PM domain.
+diff --git a/drivers/crypto/mediatek/mtk-platform.c b/drivers/crypto/mediatek/mtk-platform.c
+index b6ecc28..9b4437c 100644
+--- a/drivers/crypto/mediatek/mtk-platform.c
++++ b/drivers/crypto/mediatek/mtk-platform.c
+@@ -504,19 +504,14 @@ static int mtk_crypto_probe(struct platform_device *pdev)
+ 		}
+ 	}
  
+-	cryp->clk_ethif = devm_clk_get(&pdev->dev, "ethif");
+ 	cryp->clk_cryp = devm_clk_get(&pdev->dev, "cryp");
+-	if (IS_ERR(cryp->clk_ethif) || IS_ERR(cryp->clk_cryp))
++	if (IS_ERR(cryp->clk_cryp))
+ 		return -EPROBE_DEFER;
  
-@@ -20,8 +19,7 @@ Example:
- 			     <GIC_SPI 84 IRQ_TYPE_LEVEL_LOW>,
- 			     <GIC_SPI 91 IRQ_TYPE_LEVEL_LOW>,
- 			     <GIC_SPI 97 IRQ_TYPE_LEVEL_LOW>;
--		clocks = <&topckgen CLK_TOP_ETHIF_SEL>,
--			 <&ethsys CLK_ETHSYS_CRYPTO>;
--		clock-names = "ethif","cryp";
-+		clocks = <&ethsys CLK_ETHSYS_CRYPTO>;
-+		clock-names = "cryp";
- 		power-domains = <&scpsys MT2701_POWER_DOMAIN_ETH>;
- 	};
+ 	cryp->dev = &pdev->dev;
+ 	pm_runtime_enable(cryp->dev);
+ 	pm_runtime_get_sync(cryp->dev);
+ 
+-	err = clk_prepare_enable(cryp->clk_ethif);
+-	if (err)
+-		goto err_clk_ethif;
+-
+ 	err = clk_prepare_enable(cryp->clk_cryp);
+ 	if (err)
+ 		goto err_clk_cryp;
+@@ -559,8 +554,6 @@ static int mtk_crypto_probe(struct platform_device *pdev)
+ err_resource:
+ 	clk_disable_unprepare(cryp->clk_cryp);
+ err_clk_cryp:
+-	clk_disable_unprepare(cryp->clk_ethif);
+-err_clk_ethif:
+ 	pm_runtime_put_sync(cryp->dev);
+ 	pm_runtime_disable(cryp->dev);
+ 
+@@ -576,7 +569,6 @@ static int mtk_crypto_remove(struct platform_device *pdev)
+ 	mtk_desc_dma_free(cryp);
+ 
+ 	clk_disable_unprepare(cryp->clk_cryp);
+-	clk_disable_unprepare(cryp->clk_ethif);
+ 
+ 	pm_runtime_put_sync(cryp->dev);
+ 	pm_runtime_disable(cryp->dev);
+diff --git a/drivers/crypto/mediatek/mtk-platform.h b/drivers/crypto/mediatek/mtk-platform.h
+index 303c152..f0831f1 100644
+--- a/drivers/crypto/mediatek/mtk-platform.h
++++ b/drivers/crypto/mediatek/mtk-platform.h
+@@ -200,7 +200,6 @@ struct mtk_sha_rec {
+  * struct mtk_cryp - Cryptographic device
+  * @base:	pointer to mapped register I/O base
+  * @dev:	pointer to device
+- * @clk_ethif:	pointer to ethif clock
+  * @clk_cryp:	pointer to crypto clock
+  * @irq:	global system and rings IRQ
+  * @ring:	pointer to descriptor rings
+@@ -215,7 +214,6 @@ struct mtk_sha_rec {
+ struct mtk_cryp {
+ 	void __iomem *base;
+ 	struct device *dev;
+-	struct clk *clk_ethif;
+ 	struct clk *clk_cryp;
+ 	int irq[MTK_IRQ_NUM];
+ 
 -- 
 1.9.1
+
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
