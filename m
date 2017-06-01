@@ -1,74 +1,37 @@
-From: <cdevries@calvauto.com>
-Subject: (unknown)
-Date: Thu, 01 Jun 2017 01:55:56 -0000
-Message-ID: <149628215601.29697.5949420420129041916@zaural.ru>
+From: Ryder Lee <ryder.lee@mediatek.com>
+Subject: [PATCH v1 0/2] remove mediatek ethif clock in crypto driver
+Date: Thu, 1 Jun 2017 10:30:20 +0800
+Message-ID: <1496284222-12560-1-git-send-email-ryder.lee@mediatek.com>
 Mime-Version: 1.0
-Content-Type: application/zip; name="3483483188.zip"
-Content-Transfer-Encoding: base64
-To: <linux-crypto@vger.kernel.org>
+Content-Type: text/plain
+Cc: <devicetree@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <linux-mediatek@lists.infradead.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, Ryder Lee <ryder.lee@mediatek.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        Rob Herring <robh+dt@kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ws234.252.50.zone94.zaural.ru ([94.50.252.234]:55162 "HELO
-        zaural.ru" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with SMTP
-        id S1751037AbdFAB4A (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 31 May 2017 21:56:00 -0400
-Subject: 
-Content-Disposition: attachment
+Received: from mailgw02.mediatek.com ([210.61.82.184]:62779 "EHLO
+        mailgw02.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1751052AbdFACai (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 31 May 2017 22:30:38 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-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
+This patch series only remove redundant clock setting in mediatek crypto driver.
+
+Changes since v1:
+-rework the commit message.
+
+Ryder Lee (2):
+  crypto: mediatek - remove redundant clock setting
+  dt-bindings: crypto: remove mediatek ethif clock
+
+ Documentation/devicetree/bindings/crypto/mediatek-crypto.txt |  8 +++-----
+ drivers/crypto/mediatek/mtk-platform.c                       | 10 +---------
+ drivers/crypto/mediatek/mtk-platform.h                       |  2 --
+ 3 files changed, 4 insertions(+), 16 deletions(-)
+
+-- 
+1.9.1
