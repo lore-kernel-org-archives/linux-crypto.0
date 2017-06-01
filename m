@@ -1,38 +1,75 @@
-From: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
-Subject: [-next] crypto: 842 propagate PTR_ERR value instead of -ENOMEM
-Date: Thu,  1 Jun 2017 16:57:26 +0800
-Message-ID: <1496307446-12377-1-git-send-email-zhangshengju@cmss.chinamobile.com>
-To: haren@us.ibm.com, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: [PATCH v2 00/20] additional driver cleanups
+Date: Thu,  1 Jun 2017 14:02:50 +0300
+Message-ID: <1496314993-30229-1-git-send-email-gilad@benyossef.com>
+Cc: Joe Perches <joe@perches.com>, Ofir Drang <ofir.drang@arm.com>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from cmccmta3.chinamobile.com ([221.176.66.81]:19257 "EHLO
-        cmccmta3.chinamobile.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751106AbdFAJGq (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Jun 2017 05:06:46 -0400
+Received: from foss.arm.com ([217.140.101.70]:54336 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751501AbdFALDW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 1 Jun 2017 07:03:22 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-It is better to propagate PTR_ERR value instead of a hardcoded
-value(-ENOMEM here).
+This is another batch of clean ups for the ccree driver.
+Mostly comprised of:
+- Coding Style fixes
+- Move to kernel infrastructure from custom constructs
+- Replace macros with static inline functions
+- Removal of dead code
 
-Signed-off-by: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
----
- crypto/842.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Changes from v1:
+- Break up patches better to "do one thing" as indicated by GregKH
+- Better description for some of the patches
+- Better line breakup for code clarity as suggested by Joe Perches
 
-diff --git a/crypto/842.c b/crypto/842.c
-index bc26dc9..6d4f7c7 100644
---- a/crypto/842.c
-+++ b/crypto/842.c
-@@ -54,7 +54,7 @@ static int crypto842_init(struct crypto_tfm *tfm)
- 
- 	ctx->wmem = crypto842_alloc_ctx(NULL);
- 	if (IS_ERR(ctx->wmem))
--		return -ENOMEM;
-+		return PTR_ERR(ctx-wmem);
- 
- 	return 0;
- }
+Gilad Ben-Yossef (20):
+  staging: ccree: remove spurious blank lines
+  staging: ccree: replace bit shift with BIT macro
+  staging: ccree: fix longer than 80 chars lines
+  staging: ccree: fix operator spacing
+  staging: ccree: fix comments formatting
+  staging: ccree: add parentheses to macro argument
+  staging: ccree: refactor HW command FIFO access
+  staging: ccree: remove 48 bit dma addr sim
+  staging: ccree: refactor LLI access macros
+  staging: ccree: move M/LLI defines to header file
+  staging: ccree: remove unused debug macros
+  staging: ccree: remove cycle count debug support
+  staging: ccree: move request_mgr to generic bitfield ops
+  staging: ccree: remove custom bitfield macros
+  staging: ccree: remove unused struct
+  staging: ccree: use snake_case for hash enums
+  staging: ccree: drop no longer used macro
+  staging: ccree: remove dead code
+  staging: ccree: remove spurious blank line
+  staging: ccree: fix wrong whitespace usage
+
+ drivers/staging/ccree/cc_bitops.h        |  35 --
+ drivers/staging/ccree/cc_crypto_ctx.h    |  42 +-
+ drivers/staging/ccree/cc_hw_queue_defs.h | 752 +++++++++++++-----------
+ drivers/staging/ccree/cc_lli_defs.h      |  49 +-
+ drivers/staging/ccree/cc_regs.h          |  74 +--
+ drivers/staging/ccree/dx_crys_kernel.h   | 308 +++++-----
+ drivers/staging/ccree/dx_host.h          | 256 ++++-----
+ drivers/staging/ccree/hash_defs.h        |  52 +-
+ drivers/staging/ccree/ssi_aead.c         | 953 ++++++++++++++-----------------
+ drivers/staging/ccree/ssi_buffer_mgr.c   | 117 +---
+ drivers/staging/ccree/ssi_buffer_mgr.h   |  16 -
+ drivers/staging/ccree/ssi_cipher.c       | 248 ++++----
+ drivers/staging/ccree/ssi_config.h       |   6 -
+ drivers/staging/ccree/ssi_driver.c       |   8 -
+ drivers/staging/ccree/ssi_driver.h       |  30 +-
+ drivers/staging/ccree/ssi_fips_ll.c      | 704 +++++++++++------------
+ drivers/staging/ccree/ssi_hash.c         | 895 ++++++++++++++---------------
+ drivers/staging/ccree/ssi_ivgen.c        |  80 ++-
+ drivers/staging/ccree/ssi_request_mgr.c  | 158 +----
+ drivers/staging/ccree/ssi_sram_mgr.c     |   8 +-
+ 20 files changed, 2144 insertions(+), 2647 deletions(-)
+ delete mode 100644 drivers/staging/ccree/cc_bitops.h
+
 -- 
-1.8.3.1
+2.1.4
