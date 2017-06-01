@@ -1,29 +1,30 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/5] crypto: arm - enable module autoloading
-Date: Thu, 1 Jun 2017 13:06:41 +0800
-Message-ID: <20170601050641.GA12973@gondor.apana.org.au>
-References: <1495362220-30044-1-git-send-email-ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH v2 1/2] dt-bindings: timeriomem_rng: Add entropy quality
+ property
+Date: Thu, 1 Jun 2017 13:07:16 +0800
+Message-ID: <20170601050716.GB12973@gondor.apana.org.au>
+References: <20170522211224.12202-1-raltherr@google.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Matt Mackall <mpm@selenic.com>
+To: Rick Altherr <raltherr@google.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [128.1.224.119] ([128.1.224.119]:59248 "EHLO deadmen.hmeau.com"
+Received: from [128.1.224.119] ([128.1.224.119]:59258 "EHLO deadmen.hmeau.com"
         rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751152AbdFAFHA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Jun 2017 01:07:00 -0400
+        id S1750848AbdFAFHg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 1 Jun 2017 01:07:36 -0400
 Content-Disposition: inline
-In-Reply-To: <1495362220-30044-1-git-send-email-ard.biesheuvel@linaro.org>
+In-Reply-To: <20170522211224.12202-1-raltherr@google.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, May 21, 2017 at 10:23:35AM +0000, Ard Biesheuvel wrote:
-> Now that the prerequisite changes are in place, we can modify the
-> various accelerated crypto modules that use special instructions to
-> expose the CPU feature they depend on. This allows udev to autoload
-> the module at boot.
+On Mon, May 22, 2017 at 02:12:23PM -0700, Rick Altherr wrote:
+> Signed-off-by: Rick Altherr <raltherr@google.com>
 
-All applied.  Thanks.
+Both patches applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
