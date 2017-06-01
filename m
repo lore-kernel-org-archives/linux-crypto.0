@@ -1,31 +1,38 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 1/2] dt-bindings: timeriomem_rng: Add entropy quality
- property
-Date: Thu, 1 Jun 2017 13:07:16 +0800
-Message-ID: <20170601050716.GB12973@gondor.apana.org.au>
-References: <20170522211224.12202-1-raltherr@google.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Matt Mackall <mpm@selenic.com>
-To: Rick Altherr <raltherr@google.com>
+From: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
+Subject: [-next] crypto: 842 propagate PTR_ERR value instead of -ENOMEM
+Date: Thu,  1 Jun 2017 16:57:26 +0800
+Message-ID: <1496307446-12377-1-git-send-email-zhangshengju@cmss.chinamobile.com>
+To: haren@us.ibm.com, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [128.1.224.119] ([128.1.224.119]:59258 "EHLO deadmen.hmeau.com"
-        rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1750848AbdFAFHg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Jun 2017 01:07:36 -0400
-Content-Disposition: inline
-In-Reply-To: <20170522211224.12202-1-raltherr@google.com>
+Received: from cmccmta3.chinamobile.com ([221.176.66.81]:19257 "EHLO
+        cmccmta3.chinamobile.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751106AbdFAJGq (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 1 Jun 2017 05:06:46 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, May 22, 2017 at 02:12:23PM -0700, Rick Altherr wrote:
-> Signed-off-by: Rick Altherr <raltherr@google.com>
+It is better to propagate PTR_ERR value instead of a hardcoded
+value(-ENOMEM here).
 
-Both patches applied.  Thanks.
+Signed-off-by: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
+---
+ crypto/842.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/crypto/842.c b/crypto/842.c
+index bc26dc9..6d4f7c7 100644
+--- a/crypto/842.c
++++ b/crypto/842.c
+@@ -54,7 +54,7 @@ static int crypto842_init(struct crypto_tfm *tfm)
+ 
+ 	ctx->wmem = crypto842_alloc_ctx(NULL);
+ 	if (IS_ERR(ctx->wmem))
+-		return -ENOMEM;
++		return PTR_ERR(ctx-wmem);
+ 
+ 	return 0;
+ }
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.8.3.1
