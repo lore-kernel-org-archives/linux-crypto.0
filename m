@@ -1,7 +1,7 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH v2 05/20] staging: ccree: fix comments formatting
-Date: Thu,  1 Jun 2017 14:02:55 +0300
-Message-ID: <1496314993-30229-6-git-send-email-gilad@benyossef.com>
+Subject: [PATCH v2 06/20] staging: ccree: add parentheses to macro argument
+Date: Thu,  1 Jun 2017 14:02:56 +0300
+Message-ID: <1496314993-30229-7-git-send-email-gilad@benyossef.com>
 References: <1496314993-30229-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -23,57 +23,26 @@ Errors-To: driverdev-devel-bounces@linuxdriverproject.org
 Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-A few of the comments in cc_crypto_ctx.h where not formatted
-correctly. Format according to coding style guidelines.
+Add parentheses around macro argument to guard against precedence
+issues.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/cc_crypto_ctx.h | 19 +++++++++++--------
- 1 file changed, 11 insertions(+), 8 deletions(-)
+ drivers/staging/ccree/cc_crypto_ctx.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/staging/ccree/cc_crypto_ctx.h b/drivers/staging/ccree/cc_crypto_ctx.h
-index 10f57e6..838e6e4 100644
+index 838e6e4..20f3f9f 100644
 --- a/drivers/staging/ccree/cc_crypto_ctx.h
 +++ b/drivers/staging/ccree/cc_crypto_ctx.h
-@@ -214,8 +214,9 @@ struct drv_ctx_hash {
- 			CC_DIGEST_SIZE_MAX];
- };
- 
--/* !!!! drv_ctx_hmac should have the same structure as drv_ctx_hash except
--   k0, k0_size fields */
-+/* NOTE! drv_ctx_hmac should have the same structure as drv_ctx_hash except
-+ * k0, k0_size fields
-+ */
- struct drv_ctx_hmac {
- 	enum drv_crypto_alg alg; /* DRV_CRYPTO_ALG_HMAC */
- 	enum drv_hash_mode mode;
-@@ -236,9 +237,10 @@ struct drv_ctx_cipher {
- 	u32 key_size; /* numeric value in bytes   */
- 	u32 data_unit_size; /* required for XTS */
- 	/* block_state is the AES engine block state.
--	*  It is used by the host to pass IV or counter at initialization.
--	*  It is used by SeP for intermediate block chaining state and for
--	*  returning MAC algorithms results.           */
-+	 * It is used by the host to pass IV or counter at initialization.
-+	 * It is used by SeP for intermediate block chaining state and for
-+	 * returning MAC algorithms results.
-+	 */
- 	u8 block_state[CC_AES_BLOCK_SIZE];
- 	u8 key[CC_AES_KEY_SIZE_MAX];
- 	u8 xex_key[CC_AES_KEY_SIZE_MAX];
-@@ -274,9 +276,10 @@ struct drv_ctx_aead {
- /*******************************************************************/
- 
- /* Get the address of a @member within a given @ctx address
--   @ctx: The context address
--   @type: Type of context structure
--   @member: Associated context field */
-+ * @ctx: The context address
-+ * @type: Type of context structure
-+ * @member: Associated context field
-+ */
- #define GET_CTX_FIELD_ADDR(ctx, type, member) (ctx + offsetof(type, member))
+@@ -280,7 +280,7 @@ struct drv_ctx_aead {
+  * @type: Type of context structure
+  * @member: Associated context field
+  */
+-#define GET_CTX_FIELD_ADDR(ctx, type, member) (ctx + offsetof(type, member))
++#define GET_CTX_FIELD_ADDR(ctx, type, member) ((ctx) + offsetof(type, member))
  
  #endif /* _CC_CRYPTO_CTX_H_ */
+ 
 -- 
 2.1.4
