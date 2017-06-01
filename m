@@ -1,7 +1,7 @@
 From: Antoine Tenart <antoine.tenart@free-electrons.com>
-Subject: [PATCH v3 04/13] crypto: sun4i-ss: cannot use DMA is the request is 0 length
-Date: Thu,  1 Jun 2017 21:38:56 +0200
-Message-ID: <20170601193905.28829-5-antoine.tenart@free-electrons.com>
+Subject: [PATCH v3 12/13] ARM: sun5i: add a cryptographic engine node
+Date: Thu,  1 Jun 2017 21:39:04 +0200
+Message-ID: <20170601193905.28829-13-antoine.tenart@free-electrons.com>
 References: <20170601193905.28829-1-antoine.tenart@free-electrons.com>
 Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
         linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
@@ -9,36 +9,43 @@ To: herbert@gondor.apana.org.au, davem@davemloft.net,
         maxime.ripard@free-electrons.com, wens@csie.org,
         clabbe.montjoie@gmail.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:46594 "EHLO
+Received: from mail.free-electrons.com ([62.4.15.54]:46605 "EHLO
         mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751154AbdFATjj (ORCPT
+        with ESMTP id S1751201AbdFATjm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Jun 2017 15:39:39 -0400
+        Thu, 1 Jun 2017 15:39:42 -0400
 In-Reply-To: <20170601193905.28829-1-antoine.tenart@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Do not use DMA is the request is 0 length.
+Add a node for the cryptographic engine that can be found on sun5i SoCs.
+This cryptographic engine is compatible with the Allwinner cryptographic
+accelerator driver.
 
 Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
-Tested-by: Corentin Labbe <clabbe.montjoie@gmail.com>
-Acked-by: Corentin Labbe <clabbe.montjoie@gmail.com>
 ---
- drivers/crypto/sunxi-ss/sun4i-ss-hash.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm/boot/dts/sun5i.dtsi | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-hash.c b/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
-index e53c3127b743..bc3cbde07219 100644
---- a/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
-+++ b/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
-@@ -250,7 +250,7 @@ static int sun4i_hash(struct ahash_request *areq)
- 			i = 0;
- 		in_sg = sg_next(in_sg);
- 	}
--	if (i == 1 && !op->len)
-+	if (i == 1 && !op->len && areq->nbytes)
- 		dev_dbg(ss->dev, "We can DMA\n");
+diff --git a/arch/arm/boot/dts/sun5i.dtsi b/arch/arm/boot/dts/sun5i.dtsi
+index 5175f9cc9bed..294b864d6dce 100644
+--- a/arch/arm/boot/dts/sun5i.dtsi
++++ b/arch/arm/boot/dts/sun5i.dtsi
+@@ -355,6 +355,15 @@
+ 			status = "disabled";
+ 		};
  
- 	i = 0;
++		crypto: crypto-engine@01c15000 {
++			compatible = "allwinner,sun5i-a13-crypto",
++				     "allwinner,sun4i-a10-crypto";
++			reg = <0x01c15000 0x1000>;
++			interrupts = <54>;
++			clocks = <&ccu CLK_AHB_SS>, <&ccu CLK_SS>;
++			clock-names = "ahb", "mod";
++		};
++
+ 		spi2: spi@01c17000 {
+ 			compatible = "allwinner,sun4i-a10-spi";
+ 			reg = <0x01c17000 0x1000>;
 -- 
 2.9.4
