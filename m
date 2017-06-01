@@ -1,7 +1,7 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH v2 04/20] staging: ccree: fix operator spacing
-Date: Thu,  1 Jun 2017 14:02:54 +0300
-Message-ID: <1496314993-30229-5-git-send-email-gilad@benyossef.com>
+Subject: [PATCH v2 05/20] staging: ccree: fix comments formatting
+Date: Thu,  1 Jun 2017 14:02:55 +0300
+Message-ID: <1496314993-30229-6-git-send-email-gilad@benyossef.com>
 References: <1496314993-30229-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -23,48 +23,57 @@ Errors-To: driverdev-devel-bounces@linuxdriverproject.org
 Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-cc_crypto_ctx.h file had a few macro definitions with missing
-spaces around operators. Add missing spaces.
+A few of the comments in cc_crypto_ctx.h where not formatted
+correctly. Format according to coding style guidelines.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/cc_crypto_ctx.h | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ drivers/staging/ccree/cc_crypto_ctx.h | 19 +++++++++++--------
+ 1 file changed, 11 insertions(+), 8 deletions(-)
 
 diff --git a/drivers/staging/ccree/cc_crypto_ctx.h b/drivers/staging/ccree/cc_crypto_ctx.h
-index 15b4ef9..10f57e6 100644
+index 10f57e6..838e6e4 100644
 --- a/drivers/staging/ccree/cc_crypto_ctx.h
 +++ b/drivers/staging/ccree/cc_crypto_ctx.h
-@@ -220,7 +220,7 @@ struct drv_ctx_hmac {
+@@ -214,8 +214,9 @@ struct drv_ctx_hash {
+ 			CC_DIGEST_SIZE_MAX];
+ };
+ 
+-/* !!!! drv_ctx_hmac should have the same structure as drv_ctx_hash except
+-   k0, k0_size fields */
++/* NOTE! drv_ctx_hmac should have the same structure as drv_ctx_hash except
++ * k0, k0_size fields
++ */
+ struct drv_ctx_hmac {
  	enum drv_crypto_alg alg; /* DRV_CRYPTO_ALG_HMAC */
  	enum drv_hash_mode mode;
- 	u8 digest[CC_DIGEST_SIZE_MAX];
--	u32 k0[CC_HMAC_BLOCK_SIZE_MAX/sizeof(u32)];
-+	u32 k0[CC_HMAC_BLOCK_SIZE_MAX / sizeof(u32)];
- 	u32 k0_size;
- 	/* reserve to end of allocated context size */
- 	u8 reserved[CC_CTX_SIZE - 3 * sizeof(u32) -
-@@ -244,8 +244,8 @@ struct drv_ctx_cipher {
- 	u8 xex_key[CC_AES_KEY_SIZE_MAX];
- 	/* reserve to end of allocated context size */
- 	u32 reserved[CC_DRV_CTX_SIZE_WORDS - 7 -
--		CC_AES_BLOCK_SIZE/sizeof(u32) - 2 *
--		(CC_AES_KEY_SIZE_MAX/sizeof(u32))];
-+		CC_AES_BLOCK_SIZE / sizeof(u32) - 2 *
-+		(CC_AES_KEY_SIZE_MAX / sizeof(u32))];
- };
- 
- /* authentication and encryption with associated data class */
-@@ -265,8 +265,8 @@ struct drv_ctx_aead {
+@@ -236,9 +237,10 @@ struct drv_ctx_cipher {
+ 	u32 key_size; /* numeric value in bytes   */
+ 	u32 data_unit_size; /* required for XTS */
+ 	/* block_state is the AES engine block state.
+-	*  It is used by the host to pass IV or counter at initialization.
+-	*  It is used by SeP for intermediate block chaining state and for
+-	*  returning MAC algorithms results.           */
++	 * It is used by the host to pass IV or counter at initialization.
++	 * It is used by SeP for intermediate block chaining state and for
++	 * returning MAC algorithms results.
++	 */
+ 	u8 block_state[CC_AES_BLOCK_SIZE];
  	u8 key[CC_AES_KEY_SIZE_MAX];
- 	/* reserve to end of allocated context size */
- 	u32 reserved[CC_DRV_CTX_SIZE_WORDS - 8 -
--		3 * (CC_AES_BLOCK_SIZE/sizeof(u32)) -
--		CC_AES_KEY_SIZE_MAX/sizeof(u32)];
-+		3 * (CC_AES_BLOCK_SIZE / sizeof(u32)) -
-+		CC_AES_KEY_SIZE_MAX / sizeof(u32)];
- };
- 
+ 	u8 xex_key[CC_AES_KEY_SIZE_MAX];
+@@ -274,9 +276,10 @@ struct drv_ctx_aead {
  /*******************************************************************/
+ 
+ /* Get the address of a @member within a given @ctx address
+-   @ctx: The context address
+-   @type: Type of context structure
+-   @member: Associated context field */
++ * @ctx: The context address
++ * @type: Type of context structure
++ * @member: Associated context field
++ */
+ #define GET_CTX_FIELD_ADDR(ctx, type, member) (ctx + offsetof(type, member))
+ 
+ #endif /* _CC_CRYPTO_CTX_H_ */
 -- 
 2.1.4
