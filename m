@@ -1,197 +1,170 @@
-From: Cosar Dindar <cosardindar@gmail.com>
-Subject: Re: [PATCH v3 2/5] crypto : stm32 - Add STM32F4 CRC32 support
-Date: Fri, 2 Jun 2017 16:56:08 +0300
-Message-ID: <20170602135608.GA40339@osboxes>
-References: <cover.1495463449.git.cosardindar@gmail.com>
- <3c520bbef98c630ca7de609f8ec27405e2ac07d4.1495463449.git.cosardindar@gmail.com>
- <efdd669a-2df6-f7fa-849b-e1c7057ae666@st.com>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: get_random_bytes returns bad randomness before seeding is complete
+Date: Fri, 2 Jun 2017 16:59:56 +0200
+Message-ID: <CAHmME9q=AdK7BHQw0+sd4T0HGQce92KXTD+-TTc2s2CXbEHAAA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: "mark.rutland@arm.com" <mark.rutland@arm.com>,
- "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
- Alexandre TORGUE <alexandre.torgue@st.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "robh+dt@kernel.org" <robh+dt@kernel.org>,
- "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
- "mcoquelin.stm32@gmail.com" <mcoquelin.stm32@gmail.com>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
- "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
-To: Fabien DESSENNE <fabien.dessenne@st.com>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <efdd669a-2df6-f7fa-849b-e1c7057ae666@st.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+To: Stephan Mueller <smueller@chronox.de>,
+        "Theodore Ts'o" <tytso@mit.edu>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kernel-hardening@lists.openwall.com
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Fabien,
+Hi folks,
 
-Thanks for your review.
+This email is about an issue with get_random_bytes(), the CSPRNG used
+inside the kernel for generating keys and nonces and whatnot. However,
+I will begin with an aside:
 
-On Mon, May 29, 2017 at 07:56:48AM +0000, Fabien DESSENNE wrote:
-> Hi Cosar,
-> 
-> Thank you for the patch
-> 
-> On 22/05/17 16:34, Cosar Dindar wrote:
-> > This patch adds CRC (CRC32 Crypto) support for STM32F4 series.
-> >
-> > As an hardware limitation polynomial and key setting are not supported.
-> > They are fixed as 0x4C11DB7 (poly) and 0xFFFFFFFF (key).
-> > CRC32C Castagnoli algorithm is not used.
-> >
-> > Signed-off-by: Cosar Dindar <cosardindar@gmail.com>
-> > ---
-> >   drivers/crypto/stm32/stm32_crc32.c | 68 ++++++++++++++++++++++++++++++++------
-> >   1 file changed, 58 insertions(+), 10 deletions(-)
-> >
-> > diff --git a/drivers/crypto/stm32/stm32_crc32.c b/drivers/crypto/stm32/stm32_crc32.c
-> > index ec83b1e..12fbd98 100644
-> > --- a/drivers/crypto/stm32/stm32_crc32.c
-> > +++ b/drivers/crypto/stm32/stm32_crc32.c
-> > @@ -7,6 +7,7 @@
-> >   #include <linux/bitrev.h>
-> >   #include <linux/clk.h>
-> >   #include <linux/module.h>
-> > +#include <linux/of.h>
-> >   #include <linux/platform_device.h>
-> >   
-> >   #include <crypto/internal/hash.h>
-> > @@ -39,6 +40,9 @@ struct stm32_crc {
-> >   	struct clk       *clk;
-> >   	u8               pending_data[sizeof(u32)];
-> >   	size_t           nb_pending_bytes;
-> > +	bool             key_support;
-> > +	bool             poly_support;
-> > +	bool             reverse_support;
-> >   };
-> >   
-> >   struct stm32_crc_list {
-> > @@ -106,13 +110,31 @@ static int stm32_crc_init(struct shash_desc *desc)
-> >   	}
-> >   	spin_unlock_bh(&crc_list.lock);
-> >   
-> > -	/* Reset, set key, poly and configure in bit reverse mode */
-> > -	writel(bitrev32(mctx->key), ctx->crc->regs + CRC_INIT);
-> > -	writel(bitrev32(mctx->poly), ctx->crc->regs + CRC_POL);
-> > -	writel(CRC_CR_RESET | CRC_CR_REVERSE, ctx->crc->regs + CRC_CR);
-> > +	/* set key */
-> > +	if (ctx->crc->key_support) {
-> > +		writel(bitrev32(mctx->key), ctx->crc->regs + CRC_INIT);
-> > +	} else if (mctx->key != CRC_INIT_DEFAULT) {
-> > +		dev_err(ctx->crc->dev, "Unsupported key value! Should be: 0x%x\n",
-> > +			CRC_INIT_DEFAULT);
-> > +		return -EINVAL;
-> > +	}
-> > +
-> > +	/* set poly */
-> > +	if (ctx->crc->poly_support)
-> > +		writel(bitrev32(mctx->poly), ctx->crc->regs + CRC_POL);
-> > +
-> > +	/* reset and configure in bit reverse mode if supported */
-> > +	if (ctx->crc->reverse_support)
-> > +		writel(CRC_CR_RESET | CRC_CR_REVERSE, ctx->crc->regs + CRC_CR);
-> > +	else
-> > +		writel(CRC_CR_RESET, ctx->crc->regs + CRC_CR);
-> > +
-> > +	/* store partial result */
-> > +	if (!ctx->crc->reverse_support)
-> > +		ctx->partial = bitrev32(readl(crc->regs + CRC_DR));
-> > +	else
-> > +		ctx->partial = readl(ctx->crc->regs + CRC_DR);
-> >   
-> > -	/* Store partial result */
-> > -	ctx->partial = readl(ctx->crc->regs + CRC_DR);
-> >   	ctx->crc->nb_pending_bytes = 0;
-> >   
-> >   	return 0;
-> > @@ -135,7 +157,12 @@ static int stm32_crc_update(struct shash_desc *desc, const u8 *d8,
-> >   
-> >   		if (crc->nb_pending_bytes == sizeof(u32)) {
-> >   			/* Process completed pending data */
-> > -			writel(*(u32 *)crc->pending_data, crc->regs + CRC_DR);
-> > +			if (!ctx->crc->reverse_support)
-> > +				writel(bitrev32(*(u32 *)crc->pending_data),
-> > +				       crc->regs + CRC_DR);
-> > +			else
-> > +				writel(*(u32 *)crc->pending_data,
-> > +				       crc->regs + CRC_DR);
-> >   			crc->nb_pending_bytes = 0;
-> >   		}
-> >   	}
-> > @@ -143,10 +170,16 @@ static int stm32_crc_update(struct shash_desc *desc, const u8 *d8,
-> >   	d32 = (u32 *)d8;
-> >   	for (i = 0; i < length >> 2; i++)
-> >   		/* Process 32 bits data */
-> > -		writel(*(d32++), crc->regs + CRC_DR);
-> > +		if (!ctx->crc->reverse_support)
-> > +			writel(bitrev32(*(d32++)), crc->regs + CRC_DR);
-> > +		else
-> > +			writel(*(d32++), crc->regs + CRC_DR);
-> >   
-> >   	/* Store partial result */
-> > -	ctx->partial = readl(crc->regs + CRC_DR);
-> > +	if (!ctx->crc->reverse_support)
-> > +		ctx->partial = bitrev32(readl(crc->regs + CRC_DR));
-> > +	else
-> > +		ctx->partial = readl(crc->regs + CRC_DR);
-> >   
-> >   	/* Check for pending data (non 32 bits) */
-> >   	length &= 3;
-> > @@ -243,6 +276,7 @@ static int stm32_crc_probe(struct platform_device *pdev)
-> >   	struct stm32_crc *crc;
-> >   	struct resource *res;
-> >   	int ret;
-> > +	int algs_size;
-> >   
-> >   	crc = devm_kzalloc(dev, sizeof(*crc), GFP_KERNEL);
-> >   	if (!crc)
-> > @@ -269,13 +303,26 @@ static int stm32_crc_probe(struct platform_device *pdev)
-> >   		return ret;
-> >   	}
-> >   
-> > +	/* set key, poly and reverse support if device is of F7 series */
-> > +	if (of_device_is_compatible(crc->dev->of_node, "st,stm32f7-crc")) {
-> > +		crc->key_support = true;
-> > +		crc->poly_support = true;
-> > +		crc->reverse_support = true;
-> > +	}
-> > +
-> >   	platform_set_drvdata(pdev, crc);
-> >   
-> >   	spin_lock(&crc_list.lock);
-> >   	list_add(&crc->list, &crc_list.dev_list);
-> >   	spin_unlock(&crc_list.lock);
-> >   
-> > -	ret = crypto_register_shashes(algs, ARRAY_SIZE(algs));
-> > +	/* For F4 series only CRC32 algorithm will be used */
-> > +	if (of_device_is_compatible(crc->dev->of_node, "st,stm32f4-crc"))
-> > +		algs_size = 1;
-> > +	else
-> > +		algs_size = ARRAY_SIZE(algs);
-> > +
-> > +	ret = crypto_register_shashes(algs, algs_size);
-> >   	if (ret) {
-> >   		dev_err(dev, "Failed to register\n");
-> >   		clk_disable_unprepare(crc->clk);
-> > @@ -304,6 +351,7 @@ static int stm32_crc_remove(struct platform_device *pdev)
-> >   
-> >   static const struct of_device_id stm32_dt_ids[] = {
-> >   	{ .compatible = "st,stm32f7-crc", },
-> > +	{ .compatible = "st,stm32f4-crc", },
-> >   	{},
-> >   };
-> >   MODULE_DEVICE_TABLE(of, stm32_dt_ids);
-> Reviewed-by: Fabien Dessenne <fabien.dessenne@st.com>
+/dev/urandom will return bad randomness before its seeded, rather than
+blocking, and despite years and years of discussion and bike shedding,
+this behavior hasn't changed, and the vast majority of cryptographers
+and security experts remain displeased. It _should_ block until its
+been seeded for the first time, just like the new getrandom() syscall,
+and this important bug fix (which is not a real api break) should be
+backported to all stable kernels. (Userspace doesn't even have a
+reliable way of determining whether or not it's been seeded!) Yes,
+yes, you have arguments for why you're keeping this pathological, but
+you're still wrong, and this api is still a bug. Forcing userspace
+architectures to work around your bug, as your arguments usually go,
+is disquieting. Anyway, that's not what this email is about, but given
+that as a backdrop, here's a different-but-related, and perhaps more
+petulant, issue...
 
-Best Regards.
-Cosar
+The problem this email intends to address is this:
+
+void get_random_bytes(void *buf, int nbytes)
+{
+#if DEBUG_RANDOM_BOOT > 0
+       if (!crng_ready())
+               printk(KERN_NOTICE "random: %pF get_random_bytes called "
+                      "with crng_init = %d\n", (void *) _RET_IP_, crng_init);
+#endif
+       ...
+       extract_crng(buf);
+
+Or, on older kernels:
+
+void get_random_bytes(void *buf, int nbytes)
+{
+#if DEBUG_RANDOM_BOOT > 0
+       if (unlikely(nonblocking_pool.initialized == 0))
+               printk(KERN_NOTICE "random: %pF get_random_bytes called "
+                      "with %d bits of entropy available\n",
+                      (void *) _RET_IP_,
+                      nonblocking_pool.entropy_total);
+#endif
+       trace_get_random_bytes(nbytes, _RET_IP_);
+       extract_entropy(&nonblocking_pool, buf, nbytes, 0, 0);
+}
+
+As the printk implies, it's possible for get_random_bytes() to be
+called before it's seeded. Why was that helpful printk put behind an
+ifdef? I suspect because people would see the lines in their dmesg and
+write emails like this one to the list.
+
+I anticipate an argument coming from the never-block /dev/urandom
+cartel that goes something along the lines of, "get_random_bytes() is
+only called in paths initiated by a syscall; therefore, userspace must
+ensure /dev/urandom, which is the same pool as get_random_bytes, has
+been properly seeded, before making any syscalls that might lead to
+get_random_bytes() being called."
+
+If you've already given up on the general initiative of trying to urge
+them to make /dev/urandom block until seeded, then this might seem
+like a reasonable argument. If /dev/urandom is broken, it doesn't
+matter if get_random_bytes() is broken too, if the required
+work-around for one is the same as for the other.
+
+But the premise is flawed. get_random_bytes() can be called before any
+syscalls are made, before userspace even has an opportunity to ensure
+/dev/urandom is seeded. That's what that printk in the ifdef is all
+about. Bad news bears.
+
+Grepping through the source tree for get_random_bytes, I just opened a
+few files at random to see what the deal was. Here's one:
+
+drivers/net/ieee802154/at86rf230.c:
+static int at86rf230_probe(struct spi_device *spi)
+{
+...
+        get_random_bytes(csma_seed, ARRAY_SIZE(csma_seed));
+
+No clue what this driver is for or if it actually needs good
+randomness, but using get_random_bytes in a hardware probe function
+can happen prior to userspace's ability to seed.
+
+arch/s390/crypto/prng.c seems to call get_random_bytes on module load,
+which can happen pre-userspace, for seeding some kind of RNG of its
+own.
+
+net/ipv6/addrconf.c:
+static void __ipv6_regen_rndid(struct inet6_dev *idev)
+{
+regen:
+       get_random_bytes(idev->rndid, sizeof(idev->rndid));
+
+This is in the networking stack when bringing up an interface and
+assigning randomly assigned v6 addresses. While you might argue that
+userspace is required for networking, remember that the kernel
+actually has the ability to initiate networking all on its own, before
+userspace; the kernel even has its own dhcp client! Yowza. In fact, on
+that note:
+
+net/ipv4/ipconfig.c:
+static int __init ic_open_devs(void)
+{
+...
+        get_random_bytes(&d->xid, sizeof(__be32));
+
+And so on and so on and so on. If you grep the source as I did, you'll
+find there's no shortage of head-scratchers. "Hmmm," you ask yourself,
+"could this be called before userspace has ensured that /dev/urandom
+is seeded? do we actually _need_ good randomness here, or does it not
+matter?" I guess you could try to reason about each and every one of
+them -- you might even have those same questions about the silly
+examples I pasted above -- but that one-by-one methodology seems
+excessively fragile and arduous.
+
+There must have been a developer who thought about this at least once
+before, because random.c does have a callback notifier mechanism for
+drivers to learn when they can safely call get_random_bytes --
+add_random_ready_callback. However, it's only used by ONE driver --
+the drbg in crypto/. It's pretty clunky to use, and there's no
+reasonable to way replace every single usage of get_random_bytes with
+complicated callback infrastructure.
+
+Instead, get_random_bytes simply needs to always return good
+randomness. But this is complicated to do inside the kernel. We can't
+simply have it block until seeded, because we might not be in process
+context and therefore cannot sleep, and introducing a spin for
+something that could take a while is untenable too.
+
+There might be some hope, however. Recent kernels now have a very fast
+urandom seeding, which moves the seed-ready-point to be much early
+during boot. This is still not early enough to just "do nothing", but
+early enough that there's room for a good solution:
+
+For builtin modules, we defer all __init calls to after seeding of
+drivers that use get_random_bytes. That is to say, rather than using
+add_random_ready_callback one by one in an ad-hoc fashion with every
+call site that needs good randomness, we just defer loading those
+entire modules until an add_random_ready_callback callback. We might
+need to explicitly opt-in to this -- by introducing an
+`after_urandom_init(..)`, for example, to replace module_init in these
+cases -- or perhaps there's a way to automatically detect and defer.
+For external modules, it's much easier; we simply have
+request_module() block until after seeding is complete. This function
+is already a blocking one, so that's not an issue. And it'd ensure
+that things like virtual network drivers that are dynamically loaded
+and use get_random_bytes, such as vxlan or wireguard, simply block on
+`ip link add ...`, which would be the desired behavior.
+
+Alternatively, I'm open to other solutions people might come up with.
+
+Thoughts?
+
+Jason
