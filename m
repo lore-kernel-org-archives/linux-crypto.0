@@ -1,37 +1,37 @@
 From: Maxime Ripard <maxime.ripard@free-electrons.com>
-Subject: Re: [PATCH v3 13/13] ARM: dts: sunxi: add SoC specific compatibles
- for the crypto nodes
-Date: Fri, 2 Jun 2017 15:21:14 +0200
-Message-ID: <20170602132114.qbueyl6oj45z4v65@flea.lan>
+Subject: Re: [PATCH v3 12/13] ARM: sun5i: add a cryptographic engine node
+Date: Fri, 2 Jun 2017 15:21:24 +0200
+Message-ID: <20170602132124.z6wnz4n7id5zx6ya@flea.lan>
 References: <20170601193905.28829-1-antoine.tenart@free-electrons.com>
- <20170601193905.28829-14-antoine.tenart@free-electrons.com>
+ <20170601193905.28829-13-antoine.tenart@free-electrons.com>
 Mime-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="jxlmokge4vjzfipu"
+        protocol="application/pgp-signature"; boundary="zoafwltavybyclio"
 Cc: herbert@gondor.apana.org.au, davem@davemloft.net, wens@csie.org,
         clabbe.montjoie@gmail.com, linux-crypto@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org
 To: Antoine Tenart <antoine.tenart@free-electrons.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:41509 "EHLO
+Received: from mail.free-electrons.com ([62.4.15.54]:41518 "EHLO
         mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751138AbdFBNV0 (ORCPT
+        with ESMTP id S1751138AbdFBNVf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Jun 2017 09:21:26 -0400
+        Fri, 2 Jun 2017 09:21:35 -0400
 Content-Disposition: inline
-In-Reply-To: <20170601193905.28829-14-antoine.tenart@free-electrons.com>
+In-Reply-To: <20170601193905.28829-13-antoine.tenart@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 
---jxlmokge4vjzfipu
+--zoafwltavybyclio
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 01, 2017 at 09:39:05PM +0200, Antoine Tenart wrote:
-> Add SoC specific compatibles for all sunXi crypto nodes, in addition to
-> the one already used (allwinner,sun4i-a10-crypto).
+On Thu, Jun 01, 2017 at 09:39:04PM +0200, Antoine Tenart wrote:
+> Add a node for the cryptographic engine that can be found on sun5i SoCs.
+> This cryptographic engine is compatible with the Allwinner cryptographic
+> accelerator driver.
 >=20
 > Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
 
@@ -43,24 +43,24 @@ Maxime Ripard, Free Electrons
 Embedded Linux and Kernel engineering
 http://free-electrons.com
 
---jxlmokge4vjzfipu
+--zoafwltavybyclio
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIcBAEBAgAGBQJZMWZKAAoJEBx+YmzsjxAgUTAP/20CNRAHuc9YA2AQB7zUKmUr
-OvbbfU1hLmVlaNQnm08z8zmyFGtrUVvT01ZqZyNYQLlkcD9zRWN0zLnAdaNBNcaa
-kdh9ArsjCCyMfy7ipUkX0azhsQyEfWRg0MmNz+v6Mdc11cYAAZ93y4ONbaXOuo39
-PwZlEePQjXaTtAf/bUAbG8cJImU6/cBZkZz31Nt/4dkEQDTiQWa6Uz7Bb7Xq4hUL
-t07obY0NPN/PPLWFj/qBFIscvzKU1d/IkJhzcTLh3lXX58UnWm5Igs2+JZGCzVVe
-V09QB3oB3SInO5bXyNEMDhjlEDJ/PmDwshbDgkyI0UN+cgXNJZKYwSiuxDWSOsff
-H9rLukIHOx18sH+IjYbVBQ/Ambd3A56hpGbaFrmCaoUmmmbIUyMzc8Wm6xiR/BcW
-lO5kz5KXO3g93Xn1xVSPYTgIIF0Ewjs1iumjXS7CRwPq3ebXWdm5qwm+brdlwmJV
-nGdx0R6hJJ/+A8iZhmq+cv2MNNwRCWvPnWAfhmiqAxPZozckbrMtf9KenHq0ybhO
-znYdQaPMEwyx/4lCvfcCs3ZMgiadbT6RT4fpRambJmWRkMPbEReJQqLmykRPTMpE
-7FQESzDoFwru+C1z8b3dnXnMB8MTUMMI6YA/beJx+oquq94NNlY/+zUrfr2JNoVo
-DDcWCaXD8PmGiuLFBYYe
-=kZ0x
+iQIcBAEBAgAGBQJZMWZTAAoJEBx+YmzsjxAgkZoQAMKXGrHrqWyWlSHbmrJyPFMJ
+elMPVOU4ISBk36xY6zoneKCLQN6GiHKycYVnujQujp+Y7qcw2A4VEOxStzaVfAit
+XTN2WUhk5Zd7Kw2lEwZTBYRUG8RGC5m5Xp07leuSnVs2VsC68HJ2UEAJ352vkmhV
+W+aM9bu1zZciYgpf6fGi3M1E7fRVaVFJzUFG8FR2HUnZvOVps/3wQgYnnpGO8Sdj
+YU0JgCyrkEIK0qOaV5LciKoEQ3mFV0TC7tbg0EQrze3mWqcdQ6F3TTEHy4u3O8sZ
+8xTM3Jkd40x2gJOF7sQtLggCpcBon3v/1KfCyHgXFtmVtd34On2HQuSljFL/gh7E
+yyryHfTxAO1W3apFUt61HUIKze1AbASBZYCyUpnVDR6CKhq1TC2p7MO2wq948YsP
+JWNg31WSrgRuNbMF2JMDeGuq8NvKdni9oZygprRvLFm6XLGXWcXZVtfAI14Plvln
+i4DP4MrtAC7fa8B1+9XlsjKLZk4GMUduPgVHldfHNDnLgO9pLwxoMqV15wD2ABBW
+E792B+qNtwD4BNoXgpso0c41tz28ZMguQ/pyaIb1P/IzingDwo029GgvGgf23slB
+Bd8PPODJmSPw9VmQ9SdAa0n41gJ8i4buPw7LmNg/TADisDhJ3aBp06F7/NWpDFtO
+kdXffKuVQ0Sp6xVCtrMm
+=PDWE
 -----END PGP SIGNATURE-----
 
---jxlmokge4vjzfipu--
+--zoafwltavybyclio--
