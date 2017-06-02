@@ -1,160 +1,60 @@
-From: David Miller <davem@davemloft.net>
-Subject: crypto: Work around deallocated stack frame reference gcc bug on
- sparc.
-Date: Fri, 02 Jun 2017 11:28:54 -0400 (EDT)
-Message-ID: <20170602.112854.571030442583332811.davem@davemloft.net>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: Re: get_random_bytes returns bad randomness before seeding is complete
+Date: Fri, 2 Jun 2017 17:53:39 +0200
+Message-ID: <CAHmME9omJTaP1C=yUh3913Cv1gF1pBtpy9cmEMyJG4yw_dnZWQ@mail.gmail.com>
+References: <CAHmME9q=AdK7BHQw0+sd4T0HGQce92KXTD+-TTc2s2CXbEHAAA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, sparclinux@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, clm@fb.com, jbacik@fb.com,
-        dsterba@suse.com, matorola@gmail.com, sandeen@sandeen.net,
-        linux-xfs@vger.kernel.org
-To: herbert@gondor.apana.org.au
-Return-path: <sparclinux-owner@vger.kernel.org>
-Sender: sparclinux-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+To: Stephan Mueller <smueller@chronox.de>,
+        "Theodore Ts'o" <tytso@mit.edu>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kernel-hardening@lists.openwall.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from frisell.zx2c4.com ([192.95.5.64]:54561 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750813AbdFBPxm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 2 Jun 2017 11:53:42 -0400
+In-Reply-To: <CAHmME9q=AdK7BHQw0+sd4T0HGQce92KXTD+-TTc2s2CXbEHAAA@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
+(Meanwhile...)
 
-On sparc, if we have an alloca() like situation, as is the case with
-SHASH_DESC_ON_STACK(), we can end up referencing deallocated stack
-memory.  The result can be that the value is clobbered if a trap
-or interrupt arrives at just the right instruction.
+In my own code, I'm currently playing with a workaround that looks like this:
 
-It only occurs if the function ends returning a value from that
-alloca() area and that value can be placed into the return value
-register using a single instruction.
+--- a/src/main.c
++++ b/src/main.c
 
-For example, in lib/libcrc32c.c:crc32c() we end up with a return
-sequence like:
++#include <linux/completion.h>
++#include <linux/random.h>
 
-        return  %i7+8
-         lduw   [%o5+16], %o0   ! MEM[(u32 *)__shash_desc.1_10 + 16B],
++struct rng_initializer {
++       struct completion done;
++       struct random_ready_callback cb;
++};
++static void rng_initialized_callback(struct random_ready_callback *cb)
++{
++       complete(&container_of(cb, struct rng_initializer, cb)->done);
++}
++
+static int __init mod_init(void)
+{
+       int ret;
++       struct rng_initializer rng = {
++               .done = COMPLETION_INITIALIZER(rng.done),
++               .cb = { .owner = THIS_MODULE, .func = rng_initialized_callback }
++       };
++
++       ret = add_random_ready_callback(&rng.cb);
++       if (!ret)
++               wait_for_completion(&rng.done);
++       else if (ret != -EALREADY)
++               return ret;
 
-%o5 holds the base of the on-stack area allocated for the shash
-descriptor.  But the return released the stack frame and the
-register window.
+       do_things_with_get_random_bytes_maybe();
 
-So if an intererupt arrives between 'return' and 'lduw', then
-the value read at %o5+16 can be corrupted.
-
-Add a data compiler barrier to work around this problem.  This is
-exactly what the gcc fix will end up doing as well, and it absolutely
-should not change the code generated for other cpus (unless gcc
-on them has the same bug :-)
-
-With crucial insight from Eric Sandeen.
-
-Reported-by: Anatoly Pugachev <matorola@gmail.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
----
-
-See the thread anchored at:
-
-	http://marc.info/?l=linux-sparc&m=149623182616944&w=2
-
-for discussion, it has a reproducer module.  The problem was
-first noticed as occaisional XFS checksum corruptions.
-
-Herbert, I don't expect you to like this but it is the best we can do
-I think.  It should not pessimize code on other architectures at all.
-I will work on fixing the gcc bug but it's been around forever and all
-versions are effected.
-
-I noticed while working on this that at least btrfs duplicates the
-facilities provided by lib/libcrc32c.c and therefore should probably
-be converted over to straight crc32c() calls if possible.
-
-Thanks!
-
-diff --git a/drivers/infiniband/sw/rxe/rxe.h b/drivers/infiniband/sw/rxe/rxe.h
-index ecdba2f..1ac5b85 100644
---- a/drivers/infiniband/sw/rxe/rxe.h
-+++ b/drivers/infiniband/sw/rxe/rxe.h
-@@ -68,6 +68,7 @@
- static inline u32 rxe_crc32(struct rxe_dev *rxe,
- 			    u32 crc, void *next, size_t len)
- {
-+	u32 retval;
- 	int err;
- 
- 	SHASH_DESC_ON_STACK(shash, rxe->tfm);
-@@ -81,7 +82,9 @@ static inline u32 rxe_crc32(struct rxe_dev *rxe,
- 		return crc32_le(crc, next, len);
- 	}
- 
--	return *(u32 *)shash_desc_ctx(shash);
-+	retval = *(u32 *)shash_desc_ctx(shash);
-+	barrier_data(shash_desc_ctx(shash));
-+	return retval;
- }
- 
- int rxe_set_mtu(struct rxe_dev *rxe, unsigned int dev_mtu);
-diff --git a/fs/btrfs/hash.c b/fs/btrfs/hash.c
-index a97fdc1..baacc18 100644
---- a/fs/btrfs/hash.c
-+++ b/fs/btrfs/hash.c
-@@ -38,6 +38,7 @@ u32 btrfs_crc32c(u32 crc, const void *address, unsigned int length)
- {
- 	SHASH_DESC_ON_STACK(shash, tfm);
- 	u32 *ctx = (u32 *)shash_desc_ctx(shash);
-+	u32 retval;
- 	int err;
- 
- 	shash->tfm = tfm;
-@@ -47,5 +48,7 @@ u32 btrfs_crc32c(u32 crc, const void *address, unsigned int length)
- 	err = crypto_shash_update(shash, address, length);
- 	BUG_ON(err);
- 
--	return *ctx;
-+	retval = *ctx;
-+	barrier_data(ctx);
-+	return retval;
- }
-diff --git a/fs/f2fs/f2fs.h b/fs/f2fs/f2fs.h
-index 2185c7a..fd2e651 100644
---- a/fs/f2fs/f2fs.h
-+++ b/fs/f2fs/f2fs.h
-@@ -1078,6 +1078,7 @@ static inline u32 f2fs_crc32(struct f2fs_sb_info *sbi, const void *address,
- {
- 	SHASH_DESC_ON_STACK(shash, sbi->s_chksum_driver);
- 	u32 *ctx = (u32 *)shash_desc_ctx(shash);
-+	u32 retval;
- 	int err;
- 
- 	shash->tfm = sbi->s_chksum_driver;
-@@ -1087,7 +1088,9 @@ static inline u32 f2fs_crc32(struct f2fs_sb_info *sbi, const void *address,
- 	err = crypto_shash_update(shash, address, length);
- 	BUG_ON(err);
- 
--	return *ctx;
-+	retval = *ctx;
-+	barrier_data(ctx);
-+	return retval;
- }
- 
- static inline bool f2fs_crc_valid(struct f2fs_sb_info *sbi, __u32 blk_crc,
-diff --git a/lib/libcrc32c.c b/lib/libcrc32c.c
-index 74a54b7..9f79547 100644
---- a/lib/libcrc32c.c
-+++ b/lib/libcrc32c.c
-@@ -43,7 +43,7 @@ static struct crypto_shash *tfm;
- u32 crc32c(u32 crc, const void *address, unsigned int length)
- {
- 	SHASH_DESC_ON_STACK(shash, tfm);
--	u32 *ctx = (u32 *)shash_desc_ctx(shash);
-+	u32 ret, *ctx = (u32 *)shash_desc_ctx(shash);
- 	int err;
- 
- 	shash->tfm = tfm;
-@@ -53,7 +53,9 @@ u32 crc32c(u32 crc, const void *address, unsigned int length)
- 	err = crypto_shash_update(shash, address, length);
- 	BUG_ON(err);
- 
--	return *ctx;
-+	ret = *ctx;
-+	barrier_data(ctx);
-+	return ret;
- }
- 
- EXPORT_SYMBOL(crc32c);
+Depending on the situation, however, I could imagine that
+wait_for_completion never returning, if its blocking activity that
+contributes to the seed actually being available, if this is called
+from a compiled-in module, so I find this a bit sub-optimal...
