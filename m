@@ -1,50 +1,47 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: crypto: Work around deallocated stack frame reference gcc bug
- on sparc.
-Date: Fri, 02 Jun 2017 15:55:29 -0400 (EDT)
-Message-ID: <20170602.155529.599501370529389401.davem@davemloft.net>
-References: <20170602.112854.571030442583332811.davem@davemloft.net>
-        <20170602180808.GB5636@birch.djwong.org>
-        <20170602.143906.818489457650113258.davem@davemloft.net>
+From: srishti sharma <srishtishar@gmail.com>
+Subject: [PATCH] Staging: ccree: ssi_aead.h: Fixed a pointer declaration error.
+Date: Sat,  3 Jun 2017 04:15:17 +0530
+Message-ID: <1496443518-18497-1-git-send-email-srishtishar@gmail.com>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        sparclinux@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        clm@fb.com, jbacik@fb.com, dsterba@suse.com, matorola@gmail.com,
-        sandeen@sandeen.net, linux-xfs@vger.kernel.org,
-        linux-ext4@vger.kernel.org
-To: darrick.wong@oracle.com
-Return-path: <sparclinux-owner@vger.kernel.org>
-In-Reply-To: <20170602.143906.818489457650113258.davem@davemloft.net>
-Sender: sparclinux-owner@vger.kernel.org
+Cc: devel@driverdev.osuosl.org, gregkh@linuxfoundation.org,
+ driverdev-devel@linuxdriverproject.org, linux-kernel@vger.kernel.org,
+ srishti sharma <srishtishar@gmail.com>, linux-crypto@vger.kernel.org
+To: gilad@benyossef.com
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-From: David Miller <davem@davemloft.net>
-Date: Fri, 02 Jun 2017 14:39:06 -0400 (EDT)
+Fixed a pointer declaration error , the dereferencing operator was misplaced.
 
-> From: "Darrick J. Wong" <darrick.wong@oracle.com>
-> Date: Fri, 2 Jun 2017 11:08:08 -0700
-> 
->> ext4/jbd2's crc32c implementations will also need a fix like this for
->> {ext4,jbd2}_chksum.  Note that both of these modules call the crypto api
->> directly to avoid a static dependence on libcrc32c; this was done to
->> reduce kernel footprint for applications that don't need it.  (ext2,
->> ext3, and ext4 before the metadata_csum feature existed).
-> 
-> Good catch.  I even looked at that code the other day so should
-> have spotted it as well.
-> 
-> I'll integrate fixes for those into my patch when I get a chance,
-> thanks!
+Signed-off-by: srishti sharma <srishtishar@gmail.com>
+---
+ drivers/staging/ccree/ssi_aead.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Actually, ext4 doesn't trigger the problem because the on-stack object
-used in ext4 is a fixed size at compile time.  Which is technically an
-ill-advised assumption to make.  Even the generic libcrc32c.c doesn't
-assume that the context area is 4 bytes for crc32c.
-
-Anyways, back to the main point, the gcc bug only triggers when
-alloca() like constructs are used.
-
-That's why I scanned for SHASH_DESC_ON_STACK() to see exactly where
-the workaround is necessary.
+diff --git a/drivers/staging/ccree/ssi_aead.h b/drivers/staging/ccree/ssi_aead.h
+index 654a181..9cf5225 100644
+--- a/drivers/staging/ccree/ssi_aead.h
++++ b/drivers/staging/ccree/ssi_aead.h
+@@ -97,8 +97,8 @@ struct aead_req_ctx {
+	struct ssi_mlli assoc;
+	struct ssi_mlli src;
+	struct ssi_mlli dst;
+-	struct scatterlist* srcSgl;
+-	struct scatterlist* dstSgl;
++	struct scatterlist *srcSgl;
++	struct scatterlist *dstSgl;
+	unsigned int srcOffset;
+	unsigned int dstOffset;
+	enum ssi_req_dma_buf_type assoc_buff_type;
+--
+2.7.4
