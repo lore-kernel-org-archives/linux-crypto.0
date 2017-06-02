@@ -1,170 +1,160 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: get_random_bytes returns bad randomness before seeding is complete
-Date: Fri, 2 Jun 2017 16:59:56 +0200
-Message-ID: <CAHmME9q=AdK7BHQw0+sd4T0HGQce92KXTD+-TTc2s2CXbEHAAA@mail.gmail.com>
+From: David Miller <davem@davemloft.net>
+Subject: crypto: Work around deallocated stack frame reference gcc bug on
+ sparc.
+Date: Fri, 02 Jun 2017 11:28:54 -0400 (EDT)
+Message-ID: <20170602.112854.571030442583332811.davem@davemloft.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-To: Stephan Mueller <smueller@chronox.de>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kernel-hardening@lists.openwall.com
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, sparclinux@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, clm@fb.com, jbacik@fb.com,
+        dsterba@suse.com, matorola@gmail.com, sandeen@sandeen.net,
+        linux-xfs@vger.kernel.org
+To: herbert@gondor.apana.org.au
+Return-path: <sparclinux-owner@vger.kernel.org>
+Sender: sparclinux-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi folks,
 
-This email is about an issue with get_random_bytes(), the CSPRNG used
-inside the kernel for generating keys and nonces and whatnot. However,
-I will begin with an aside:
+On sparc, if we have an alloca() like situation, as is the case with
+SHASH_DESC_ON_STACK(), we can end up referencing deallocated stack
+memory.  The result can be that the value is clobbered if a trap
+or interrupt arrives at just the right instruction.
 
-/dev/urandom will return bad randomness before its seeded, rather than
-blocking, and despite years and years of discussion and bike shedding,
-this behavior hasn't changed, and the vast majority of cryptographers
-and security experts remain displeased. It _should_ block until its
-been seeded for the first time, just like the new getrandom() syscall,
-and this important bug fix (which is not a real api break) should be
-backported to all stable kernels. (Userspace doesn't even have a
-reliable way of determining whether or not it's been seeded!) Yes,
-yes, you have arguments for why you're keeping this pathological, but
-you're still wrong, and this api is still a bug. Forcing userspace
-architectures to work around your bug, as your arguments usually go,
-is disquieting. Anyway, that's not what this email is about, but given
-that as a backdrop, here's a different-but-related, and perhaps more
-petulant, issue...
+It only occurs if the function ends returning a value from that
+alloca() area and that value can be placed into the return value
+register using a single instruction.
 
-The problem this email intends to address is this:
+For example, in lib/libcrc32c.c:crc32c() we end up with a return
+sequence like:
 
-void get_random_bytes(void *buf, int nbytes)
-{
-#if DEBUG_RANDOM_BOOT > 0
-       if (!crng_ready())
-               printk(KERN_NOTICE "random: %pF get_random_bytes called "
-                      "with crng_init = %d\n", (void *) _RET_IP_, crng_init);
-#endif
-       ...
-       extract_crng(buf);
+        return  %i7+8
+         lduw   [%o5+16], %o0   ! MEM[(u32 *)__shash_desc.1_10 + 16B],
 
-Or, on older kernels:
+%o5 holds the base of the on-stack area allocated for the shash
+descriptor.  But the return released the stack frame and the
+register window.
 
-void get_random_bytes(void *buf, int nbytes)
-{
-#if DEBUG_RANDOM_BOOT > 0
-       if (unlikely(nonblocking_pool.initialized == 0))
-               printk(KERN_NOTICE "random: %pF get_random_bytes called "
-                      "with %d bits of entropy available\n",
-                      (void *) _RET_IP_,
-                      nonblocking_pool.entropy_total);
-#endif
-       trace_get_random_bytes(nbytes, _RET_IP_);
-       extract_entropy(&nonblocking_pool, buf, nbytes, 0, 0);
-}
+So if an intererupt arrives between 'return' and 'lduw', then
+the value read at %o5+16 can be corrupted.
 
-As the printk implies, it's possible for get_random_bytes() to be
-called before it's seeded. Why was that helpful printk put behind an
-ifdef? I suspect because people would see the lines in their dmesg and
-write emails like this one to the list.
+Add a data compiler barrier to work around this problem.  This is
+exactly what the gcc fix will end up doing as well, and it absolutely
+should not change the code generated for other cpus (unless gcc
+on them has the same bug :-)
 
-I anticipate an argument coming from the never-block /dev/urandom
-cartel that goes something along the lines of, "get_random_bytes() is
-only called in paths initiated by a syscall; therefore, userspace must
-ensure /dev/urandom, which is the same pool as get_random_bytes, has
-been properly seeded, before making any syscalls that might lead to
-get_random_bytes() being called."
+With crucial insight from Eric Sandeen.
 
-If you've already given up on the general initiative of trying to urge
-them to make /dev/urandom block until seeded, then this might seem
-like a reasonable argument. If /dev/urandom is broken, it doesn't
-matter if get_random_bytes() is broken too, if the required
-work-around for one is the same as for the other.
+Reported-by: Anatoly Pugachev <matorola@gmail.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+---
 
-But the premise is flawed. get_random_bytes() can be called before any
-syscalls are made, before userspace even has an opportunity to ensure
-/dev/urandom is seeded. That's what that printk in the ifdef is all
-about. Bad news bears.
+See the thread anchored at:
 
-Grepping through the source tree for get_random_bytes, I just opened a
-few files at random to see what the deal was. Here's one:
+	http://marc.info/?l=linux-sparc&m=149623182616944&w=2
 
-drivers/net/ieee802154/at86rf230.c:
-static int at86rf230_probe(struct spi_device *spi)
-{
-...
-        get_random_bytes(csma_seed, ARRAY_SIZE(csma_seed));
+for discussion, it has a reproducer module.  The problem was
+first noticed as occaisional XFS checksum corruptions.
 
-No clue what this driver is for or if it actually needs good
-randomness, but using get_random_bytes in a hardware probe function
-can happen prior to userspace's ability to seed.
+Herbert, I don't expect you to like this but it is the best we can do
+I think.  It should not pessimize code on other architectures at all.
+I will work on fixing the gcc bug but it's been around forever and all
+versions are effected.
 
-arch/s390/crypto/prng.c seems to call get_random_bytes on module load,
-which can happen pre-userspace, for seeding some kind of RNG of its
-own.
+I noticed while working on this that at least btrfs duplicates the
+facilities provided by lib/libcrc32c.c and therefore should probably
+be converted over to straight crc32c() calls if possible.
 
-net/ipv6/addrconf.c:
-static void __ipv6_regen_rndid(struct inet6_dev *idev)
-{
-regen:
-       get_random_bytes(idev->rndid, sizeof(idev->rndid));
+Thanks!
 
-This is in the networking stack when bringing up an interface and
-assigning randomly assigned v6 addresses. While you might argue that
-userspace is required for networking, remember that the kernel
-actually has the ability to initiate networking all on its own, before
-userspace; the kernel even has its own dhcp client! Yowza. In fact, on
-that note:
-
-net/ipv4/ipconfig.c:
-static int __init ic_open_devs(void)
-{
-...
-        get_random_bytes(&d->xid, sizeof(__be32));
-
-And so on and so on and so on. If you grep the source as I did, you'll
-find there's no shortage of head-scratchers. "Hmmm," you ask yourself,
-"could this be called before userspace has ensured that /dev/urandom
-is seeded? do we actually _need_ good randomness here, or does it not
-matter?" I guess you could try to reason about each and every one of
-them -- you might even have those same questions about the silly
-examples I pasted above -- but that one-by-one methodology seems
-excessively fragile and arduous.
-
-There must have been a developer who thought about this at least once
-before, because random.c does have a callback notifier mechanism for
-drivers to learn when they can safely call get_random_bytes --
-add_random_ready_callback. However, it's only used by ONE driver --
-the drbg in crypto/. It's pretty clunky to use, and there's no
-reasonable to way replace every single usage of get_random_bytes with
-complicated callback infrastructure.
-
-Instead, get_random_bytes simply needs to always return good
-randomness. But this is complicated to do inside the kernel. We can't
-simply have it block until seeded, because we might not be in process
-context and therefore cannot sleep, and introducing a spin for
-something that could take a while is untenable too.
-
-There might be some hope, however. Recent kernels now have a very fast
-urandom seeding, which moves the seed-ready-point to be much early
-during boot. This is still not early enough to just "do nothing", but
-early enough that there's room for a good solution:
-
-For builtin modules, we defer all __init calls to after seeding of
-drivers that use get_random_bytes. That is to say, rather than using
-add_random_ready_callback one by one in an ad-hoc fashion with every
-call site that needs good randomness, we just defer loading those
-entire modules until an add_random_ready_callback callback. We might
-need to explicitly opt-in to this -- by introducing an
-`after_urandom_init(..)`, for example, to replace module_init in these
-cases -- or perhaps there's a way to automatically detect and defer.
-For external modules, it's much easier; we simply have
-request_module() block until after seeding is complete. This function
-is already a blocking one, so that's not an issue. And it'd ensure
-that things like virtual network drivers that are dynamically loaded
-and use get_random_bytes, such as vxlan or wireguard, simply block on
-`ip link add ...`, which would be the desired behavior.
-
-Alternatively, I'm open to other solutions people might come up with.
-
-Thoughts?
-
-Jason
+diff --git a/drivers/infiniband/sw/rxe/rxe.h b/drivers/infiniband/sw/rxe/rxe.h
+index ecdba2f..1ac5b85 100644
+--- a/drivers/infiniband/sw/rxe/rxe.h
++++ b/drivers/infiniband/sw/rxe/rxe.h
+@@ -68,6 +68,7 @@
+ static inline u32 rxe_crc32(struct rxe_dev *rxe,
+ 			    u32 crc, void *next, size_t len)
+ {
++	u32 retval;
+ 	int err;
+ 
+ 	SHASH_DESC_ON_STACK(shash, rxe->tfm);
+@@ -81,7 +82,9 @@ static inline u32 rxe_crc32(struct rxe_dev *rxe,
+ 		return crc32_le(crc, next, len);
+ 	}
+ 
+-	return *(u32 *)shash_desc_ctx(shash);
++	retval = *(u32 *)shash_desc_ctx(shash);
++	barrier_data(shash_desc_ctx(shash));
++	return retval;
+ }
+ 
+ int rxe_set_mtu(struct rxe_dev *rxe, unsigned int dev_mtu);
+diff --git a/fs/btrfs/hash.c b/fs/btrfs/hash.c
+index a97fdc1..baacc18 100644
+--- a/fs/btrfs/hash.c
++++ b/fs/btrfs/hash.c
+@@ -38,6 +38,7 @@ u32 btrfs_crc32c(u32 crc, const void *address, unsigned int length)
+ {
+ 	SHASH_DESC_ON_STACK(shash, tfm);
+ 	u32 *ctx = (u32 *)shash_desc_ctx(shash);
++	u32 retval;
+ 	int err;
+ 
+ 	shash->tfm = tfm;
+@@ -47,5 +48,7 @@ u32 btrfs_crc32c(u32 crc, const void *address, unsigned int length)
+ 	err = crypto_shash_update(shash, address, length);
+ 	BUG_ON(err);
+ 
+-	return *ctx;
++	retval = *ctx;
++	barrier_data(ctx);
++	return retval;
+ }
+diff --git a/fs/f2fs/f2fs.h b/fs/f2fs/f2fs.h
+index 2185c7a..fd2e651 100644
+--- a/fs/f2fs/f2fs.h
++++ b/fs/f2fs/f2fs.h
+@@ -1078,6 +1078,7 @@ static inline u32 f2fs_crc32(struct f2fs_sb_info *sbi, const void *address,
+ {
+ 	SHASH_DESC_ON_STACK(shash, sbi->s_chksum_driver);
+ 	u32 *ctx = (u32 *)shash_desc_ctx(shash);
++	u32 retval;
+ 	int err;
+ 
+ 	shash->tfm = sbi->s_chksum_driver;
+@@ -1087,7 +1088,9 @@ static inline u32 f2fs_crc32(struct f2fs_sb_info *sbi, const void *address,
+ 	err = crypto_shash_update(shash, address, length);
+ 	BUG_ON(err);
+ 
+-	return *ctx;
++	retval = *ctx;
++	barrier_data(ctx);
++	return retval;
+ }
+ 
+ static inline bool f2fs_crc_valid(struct f2fs_sb_info *sbi, __u32 blk_crc,
+diff --git a/lib/libcrc32c.c b/lib/libcrc32c.c
+index 74a54b7..9f79547 100644
+--- a/lib/libcrc32c.c
++++ b/lib/libcrc32c.c
+@@ -43,7 +43,7 @@ static struct crypto_shash *tfm;
+ u32 crc32c(u32 crc, const void *address, unsigned int length)
+ {
+ 	SHASH_DESC_ON_STACK(shash, tfm);
+-	u32 *ctx = (u32 *)shash_desc_ctx(shash);
++	u32 ret, *ctx = (u32 *)shash_desc_ctx(shash);
+ 	int err;
+ 
+ 	shash->tfm = tfm;
+@@ -53,7 +53,9 @@ u32 crc32c(u32 crc, const void *address, unsigned int length)
+ 	err = crypto_shash_update(shash, address, length);
+ 	BUG_ON(err);
+ 
+-	return *ctx;
++	ret = *ctx;
++	barrier_data(ctx);
++	return ret;
+ }
+ 
+ EXPORT_SYMBOL(crc32c);
