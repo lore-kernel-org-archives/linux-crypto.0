@@ -1,7 +1,7 @@
 From: Colin King <colin.king@canonical.com>
-Subject: [PATCH] taging: ccree: fix spelling mistake: "chanined" -> "chained"
-Date: Sun,  4 Jun 2017 00:31:10 +0100
-Message-ID: <20170603233110.18159-1-colin.king@canonical.com>
+Subject: [PATCH][V2] staging: ccree: fix spelling mistake: "chanined" -> "chained"
+Date: Sun,  4 Jun 2017 00:31:42 +0100
+Message-ID: <20170603233142.18223-1-colin.king@canonical.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -11,11 +11,11 @@ To: Gilad Ben-Yossef <gilad@benyossef.com>,
         linux-crypto@vger.kernel.org,
         driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from youngberry.canonical.com ([91.189.89.112]:37589 "EHLO
+Received: from youngberry.canonical.com ([91.189.89.112]:37598 "EHLO
         youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751077AbdFCXbN (ORCPT
+        with ESMTP id S1751077AbdFCXbo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 3 Jun 2017 19:31:13 -0400
+        Sat, 3 Jun 2017 19:31:44 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
