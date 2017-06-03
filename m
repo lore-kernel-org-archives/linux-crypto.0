@@ -1,40 +1,71 @@
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH RFC 0/3] get_random_bytes seed blocking
-Date: Sat,  3 Jun 2017 04:32:01 +0200
-Message-ID: <20170603023204.30933-1-Jason@zx2c4.com>
+Subject: [PATCH RFC 2/3] random: add get_random_{bytes,u32,u64,int,long}_wait family
+Date: Sat,  3 Jun 2017 04:32:03 +0200
+Message-ID: <20170603023204.30933-3-Jason@zx2c4.com>
 References: <CAHmME9oLHP85ENr5aZgKsTSrxiUWoQ_pfv7C6XYxmcoxPfq3Ew@mail.gmail.com>
+ <20170603023204.30933-1-Jason@zx2c4.com>
 Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
 To: Theodore Ts'o <tytso@mit.edu>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kernel-hardening@lists.openwall.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from frisell.zx2c4.com ([192.95.5.64]:57039 "EHLO frisell.zx2c4.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751142AbdFCCcS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Jun 2017 22:32:18 -0400
-In-Reply-To: <CAHmME9oLHP85ENr5aZgKsTSrxiUWoQ_pfv7C6XYxmcoxPfq3Ew@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>,
+	kernel-hardening@lists.openwall.com
+Return-path: <kernel-hardening-return-8222-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
+List-Post: <mailto:kernel-hardening@lists.openwall.com>
+List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
+List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
+List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
+In-Reply-To: <20170603023204.30933-1-Jason@zx2c4.com>
+List-Id: linux-crypto.vger.kernel.org
 
-Per the other thread on this mailing list, here's an initial
-stab at what we discussed -- adding a blocking API for the RNG,
-and adding a default-on dmesg Kconfig value for when things go
-wrong.
+These functions are simple convience wrappers that call
+wait_for_random_bytes before calling the respective get_random_*
+function.
 
-Let me know what you think of this general implementation strategy,
-and if you like it, I'll move forward with polish and with integrating
-it into a fix for a few currently buggy get_random_bytes use cases.
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+---
+ include/linux/random.h | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
 
-Jason A. Donenfeld (3):
-  random: add synchronous API for the urandom pool
-  random: add get_random_{bytes,u32,u64,int,long}_wait family
-  random: warn when kernel uses unseeded randomness
-
- drivers/char/random.c  | 49 +++++++++++++++++++++++++++++++++++++++++++++----
- include/linux/random.h | 31 +++++++++++++++++++++++++++++++
- lib/Kconfig.debug      | 15 +++++++++++++++
- 3 files changed, 91 insertions(+), 4 deletions(-)
-
+diff --git a/include/linux/random.h b/include/linux/random.h
+index 20dd73418bd5..6a19da815ff1 100644
+--- a/include/linux/random.h
++++ b/include/linux/random.h
+@@ -58,6 +58,36 @@ static inline unsigned long get_random_long(void)
+ #endif
+ }
+ 
++/* Calls wait_for_random_bytes(is_interruptable, timeout) and then
++ * calls get_random_bytes(buf, nbytes). Returns the result of the
++ * call to wait_for_random_bytes.
++ */
++static inline int get_random_bytes_wait(void *buf, int nbytes,
++			bool is_interruptable, unsigned long timeout)
++{
++	int ret = wait_for_random_bytes(is_interruptable, timeout);
++	if (unlikely(ret))
++		return ret;
++	get_random_bytes(buf, nbytes);
++	return 0;
++}
++
++#define declare_get_random_var_wait(var) \
++	static inline int get_random_ ## var ## _wait(var *out, \
++			bool is_interruptable, unsigned long timeout) { \
++		int ret = wait_for_random_bytes(is_interruptable, timeout); \
++		if (unlikely(ret)) \
++			return ret; \
++		*out = get_random_ ## var(); \
++		return 0; \
++	}
++declare_get_random_var_wait(u32)
++declare_get_random_var_wait(u64)
++declare_get_random_var_wait(int)
++declare_get_random_var_wait(long)
++#undef declare_get_random_var
++
++
+ unsigned long randomize_page(unsigned long start, unsigned long range);
+ 
+ u32 prandom_u32(void);
 -- 
 2.13.0
