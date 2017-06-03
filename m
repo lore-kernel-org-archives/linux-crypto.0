@@ -1,41 +1,40 @@
-From: Sandy Harris <sandyinchina@gmail.com>
-Subject: Re: [kernel-hardening] Re: get_random_bytes returns bad randomness
- before seeding is complete
-Date: Fri, 2 Jun 2017 20:20:26 -0400
-Message-ID: <CACXcFmmx0cGXoF7ng+OKcXeP7w-Q39H8Fe2LMeRkyvX3NdAL3g@mail.gmail.com>
-References: <CAHmME9q=AdK7BHQw0+sd4T0HGQce92KXTD+-TTc2s2CXbEHAAA@mail.gmail.com>
- <20170602172616.47qcxav6adq52nmk@thunk.org> <CAHmME9oS_GCRMLf7EF8XBGwjdjohcRz4rzZiWr5ZDUurTj8A7Q@mail.gmail.com>
- <20170602190734.6zll7zc5hr66oacl@thunk.org> <CAHmME9oLHP85ENr5aZgKsTSrxiUWoQ_pfv7C6XYxmcoxPfq3Ew@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: "Theodore Ts'o" <tytso@mit.edu>,
-        Stephan Mueller <smueller@chronox.de>,
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: [PATCH RFC 0/3] get_random_bytes seed blocking
+Date: Sat,  3 Jun 2017 04:32:01 +0200
+Message-ID: <20170603023204.30933-1-Jason@zx2c4.com>
+References: <CAHmME9oLHP85ENr5aZgKsTSrxiUWoQ_pfv7C6XYxmcoxPfq3Ew@mail.gmail.com>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Theodore Ts'o <tytso@mit.edu>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
         kernel-hardening@lists.openwall.com
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wr0-f172.google.com ([209.85.128.172]:36855 "EHLO
-        mail-wr0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750971AbdFCAU2 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Jun 2017 20:20:28 -0400
+Received: from frisell.zx2c4.com ([192.95.5.64]:57039 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751142AbdFCCcS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 2 Jun 2017 22:32:18 -0400
 In-Reply-To: <CAHmME9oLHP85ENr5aZgKsTSrxiUWoQ_pfv7C6XYxmcoxPfq3Ew@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The only sensible & general solution for the initialisation problem
-that I have seen is John Denker's.
-http://www.av8n.com/computer/htm/secure-random.htm#sec-boot-image
+Per the other thread on this mailing list, here's an initial
+stab at what we discussed -- adding a blocking API for the RNG,
+and adding a default-on dmesg Kconfig value for when things go
+wrong.
 
-If I read that right, it would require only minor kernel changes &
-none to the API Ted & others are worrying about. It would be secure
-except against an enemy who can read your kernel image or interfere
-with your install process. Assuming permissions are set sensibly, that
-means an enemy who already has root & such an enemy has lots of much
-easier ways to break things, so we need not worry about that case.
+Let me know what you think of this general implementation strategy,
+and if you like it, I'll move forward with polish and with integrating
+it into a fix for a few currently buggy get_random_bytes use cases.
 
-The difficulty is that it would require significant changes to
-installation scripts. Still, since it is a general solution to a real
-problem, it might be better to implement that rather than work on the
-other suggestions in the thread.
+Jason A. Donenfeld (3):
+  random: add synchronous API for the urandom pool
+  random: add get_random_{bytes,u32,u64,int,long}_wait family
+  random: warn when kernel uses unseeded randomness
+
+ drivers/char/random.c  | 49 +++++++++++++++++++++++++++++++++++++++++++++----
+ include/linux/random.h | 31 +++++++++++++++++++++++++++++++
+ lib/Kconfig.debug      | 15 +++++++++++++++
+ 3 files changed, 91 insertions(+), 4 deletions(-)
+
+-- 
+2.13.0
