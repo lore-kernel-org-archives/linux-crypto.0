@@ -1,8 +1,8 @@
 From: srishti sharma <srishtishar@gmail.com>
-Subject: [PATCH 1/4] Staging: ccree: cc_crypto_ctx.h: Added * on subsequent
- lines of a comment block.
-Date: Sun,  4 Jun 2017 05:02:08 +0530
-Message-ID: <e1974f1fece258f422e8f90ca820170a2b982933.1496531673.git.srishtishar@gmail.com>
+Subject: [PATCH 2/4] Staging: ccree: cc_crypto_ctx.h: Fixed trailing */ issue
+ in a comment block
+Date: Sun,  4 Jun 2017 05:02:39 +0530
+Message-ID: <6b7fc631a83098730a03c30fc6bfc20b681c0d26.1496531673.git.srishtishar@gmail.com>
 References: <cover.1496531673.git.srishtishar@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -24,25 +24,34 @@ Errors-To: driverdev-devel-bounces@linuxdriverproject.org
 Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-Added * on subsequent lines of a comment block.
+Fixed trailing */ style issue in a block comment.
 
 Signed-off-by: srishti sharma <srishtishar@gmail.com>
 ---
- drivers/staging/ccree/cc_crypto_ctx.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/staging/ccree/cc_crypto_ctx.h | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/staging/ccree/cc_crypto_ctx.h b/drivers/staging/ccree/cc_crypto_ctx.h
-index ac39d34..6ee51b8 100644
+index 6ee51b8..27a5914 100644
 --- a/drivers/staging/ccree/cc_crypto_ctx.h
 +++ b/drivers/staging/ccree/cc_crypto_ctx.h
-@@ -219,7 +219,7 @@ struct drv_ctx_hash {
+@@ -218,8 +218,10 @@ struct drv_ctx_hash {
+			CC_DIGEST_SIZE_MAX];
  };
 
- /* !!!! drv_ctx_hmac should have the same structure as drv_ctx_hash except
--   k0, k0_size fields */
-+ * k0, k0_size fields */
+-/* !!!! drv_ctx_hmac should have the same structure as drv_ctx_hash except
+- * k0, k0_size fields */
++/*
++ * !!!! drv_ctx_hmac should have the same structure as drv_ctx_hash except
++ * k0, k0_size fields
++ */
  struct drv_ctx_hmac {
 	enum drv_crypto_alg alg; /* DRV_CRYPTO_ALG_HMAC */
 	enum drv_hash_mode mode;
+@@ -285,4 +287,3 @@ struct drv_ctx_aead {
+ #define GET_CTX_FIELD_ADDR(ctx, type, member) (ctx + offsetof(type, member))
+
+ #endif /* _CC_CRYPTO_CTX_H_ */
+-
 --
 2.7.4
