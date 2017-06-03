@@ -1,115 +1,148 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH RFC 1/3] random: add synchronous API for the urandom pool
-Date: Sat,  3 Jun 2017 04:32:02 +0200
-Message-ID: <20170603023204.30933-2-Jason@zx2c4.com>
-References: <CAHmME9oLHP85ENr5aZgKsTSrxiUWoQ_pfv7C6XYxmcoxPfq3Ew@mail.gmail.com>
- <20170603023204.30933-1-Jason@zx2c4.com>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: Theodore Ts'o <tytso@mit.edu>,
+From: Theodore Ts'o <tytso@mit.edu>
+Subject: Re: get_random_bytes returns bad randomness before seeding is
+ complete
+Date: Sat, 3 Jun 2017 01:04:33 -0400
+Message-ID: <20170603050433.4xpvloul25s47f2z@thunk.org>
+References: <CAHmME9q=AdK7BHQw0+sd4T0HGQce92KXTD+-TTc2s2CXbEHAAA@mail.gmail.com>
+ <20170602172616.47qcxav6adq52nmk@thunk.org>
+ <CAHmME9oS_GCRMLf7EF8XBGwjdjohcRz4rzZiWr5ZDUurTj8A7Q@mail.gmail.com>
+ <20170602190734.6zll7zc5hr66oacl@thunk.org>
+ <CAHmME9oLHP85ENr5aZgKsTSrxiUWoQ_pfv7C6XYxmcoxPfq3Ew@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Cc: Stephan Mueller <smueller@chronox.de>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
         kernel-hardening@lists.openwall.com
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from frisell.zx2c4.com ([192.95.5.64]:57039 "EHLO frisell.zx2c4.com"
+Received: from imap.thunk.org ([74.207.234.97]:39564 "EHLO imap.thunk.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751142AbdFCCcU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Jun 2017 22:32:20 -0400
-In-Reply-To: <20170603023204.30933-1-Jason@zx2c4.com>
+        id S1750707AbdFCFEj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 3 Jun 2017 01:04:39 -0400
+Content-Disposition: inline
+In-Reply-To: <CAHmME9oLHP85ENr5aZgKsTSrxiUWoQ_pfv7C6XYxmcoxPfq3Ew@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This enables users of get_random_{bytes,u32,u64,int,long} to wait until
-the pool is ready before using this function, in case they actually want
-to have reliable randomness.
+On Sat, Jun 03, 2017 at 01:58:25AM +0200, Jason A. Donenfeld wrote:
+> Hi Ted,
+> 
+> Based on the tone of your last email, before I respond to your
+> individual points....
 
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
- drivers/char/random.c  | 46 ++++++++++++++++++++++++++++++++++++++++++++--
- include/linux/random.h |  1 +
- 2 files changed, 45 insertions(+), 2 deletions(-)
+May I gently point out that *your* tone that started this whole thread
+has been pretty terrible?   Quoting your your first message:
 
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 0ab024918907..bee7b1349bcb 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -1466,7 +1466,10 @@ static ssize_t extract_entropy_user(struct entropy_store *r, void __user *buf,
-  * number of good random numbers, suitable for key generation, seeding
-  * TCP sequence numbers, etc.  It does not rely on the hardware random
-  * number generator.  For random bytes direct from the hardware RNG
-- * (when available), use get_random_bytes_arch().
-+ * (when available), use get_random_bytes_arch(). In order to ensure
-+ * that the randomness provided by this function is okay, the function
-+ * wait_for_random_bytes() should be called and return 0 at least once
-+ * at any point prior.
-  */
- void get_random_bytes(void *buf, int nbytes)
- {
-@@ -1496,6 +1499,42 @@ void get_random_bytes(void *buf, int nbytes)
- EXPORT_SYMBOL(get_random_bytes);
- 
- /*
-+ * Wait for the urandom pool to be seeded and thus guaranteed to supply
-+ * cryptographically secure random numbers. This applies to: the /dev/urandom
-+ * device, the get_random_bytes function, and the get_random_{u32,u64,int,long}
-+ * family of functions. Using any of these functions without first calling
-+ * this function forfeits the guarantee of security.
-+ *
-+ * If is_interruptable is true, then this uses wait_event_interruptable.
-+ * Otherwise the calling process will not respond to signals. If timeout is
-+ * 0, then, unless interrupted, this function will wait potentially forever.
-+ * Otherwise, timeout is a measure in jiffies.
-+ *
-+ * Returns: 0 if the urandom pool has been seeded.
-+ *          -ERESTARTSYS if the function was interrupted or timed out.
-+ *          Other return values of the wait_event_* functions.
-+ */
-+int wait_for_random_bytes(bool is_interruptable, unsigned long timeout)
-+{
-+	if (likely(crng_ready()))
-+		return 0;
-+	if (is_interruptable && timeout)
-+		return wait_event_interruptible_timeout(crng_init_wait, crng_ready(), timeout);
-+	if (is_interruptable && !timeout)
-+		return wait_event_interruptible(crng_init_wait, crng_ready());
-+	if (!is_interruptable && timeout)
-+		return wait_event_timeout(crng_init_wait, crng_ready(), timeout);
-+	if (!is_interruptable && !timeout) {
-+		wait_event(crng_init_wait, crng_ready());
-+		return 0;
-+	}
-+
-+	BUG(); /* This BUG() should be compiled out as unreachable code, but just in case... */
-+	return -EINVAL;
-+}
-+EXPORT_SYMBOL(wait_for_random_bytes);
-+
-+/*
-  * Add a callback function that will be invoked when the nonblocking
-  * pool is initialised.
-  *
-@@ -2023,7 +2062,10 @@ struct batched_entropy {
- /*
-  * Get a random word for internal kernel use only. The quality of the random
-  * number is either as good as RDRAND or as good as /dev/urandom, with the
-- * goal of being quite fast and not depleting entropy.
-+ * goal of being quite fast and not depleting entropy. In order to ensure
-+ * that the randomness provided by this function is okay, the function
-+ * wait_for_random_bytes() should be called and return 0 at least once
-+ * at any point prior.
-  */
- static DEFINE_PER_CPU(struct batched_entropy, batched_entropy_u64);
- u64 get_random_u64(void)
-diff --git a/include/linux/random.h b/include/linux/random.h
-index ed5c3838780d..20dd73418bd5 100644
---- a/include/linux/random.h
-+++ b/include/linux/random.h
-@@ -34,6 +34,7 @@ extern void add_input_randomness(unsigned int type, unsigned int code,
- extern void add_interrupt_randomness(int irq, int irq_flags) __latent_entropy;
- 
- extern void get_random_bytes(void *buf, int nbytes);
-+extern int wait_for_random_bytes(bool is_interruptable, unsigned long timeout);
- extern int add_random_ready_callback(struct random_ready_callback *rdy);
- extern void del_random_ready_callback(struct random_ready_callback *rdy);
- extern void get_random_bytes_arch(void *buf, int nbytes);
--- 
-2.13.0
+   "Yes, yes, you have arguments for why you're keeping this
+   pathological, but you're still wrong, and this api is still a bug."
+
+This kind of "my shit doesn't stink, but yours does", is not
+particularly useful if you are trying to have a constructive
+discussion.  If you think the /dev/urandom question wasn't appropriate
+to discuss in this thread, then why the *hell* did you bring it up
+*first*?
+
+The reason why I keep harping on this is because I'm concerned about
+an absolutist attitude towards technical design, where the good is the
+enemy of the perfect, and where bricking machines in the pursuit of
+cryptographic perfection is considered laudable.  Yes, if you apply
+thermite to the CPU and the hard drives, the system will be secure.
+But it also won't be terribly useful.
+
+And to me, the phrase "you're still wrong" doesn't seem to admit any
+concessions towards acknowledging that there might be another side to
+the security versus usability debate.  And I'd ***really*** rather not
+waste my time trying to work with someone who doesn't care about
+usability, because my focus is in practical engineering, which means
+if no one uses the system, or can use the system, then I consider it a
+failure, even if it is 100% secure.  And this is true no matter
+whether we're talking about /dev/urandom or some enhancement to
+get_random_bytes().
+
+> Do you have any opinions on the issue of what the most flexible API
+> would be? There are a lot of varieties of wait_event. The default one
+> is uninterruptable, but as Stephan and Herbert saw when they were
+> working on this was that it could be dangerous in certain
+> circumstances not to allow interruption. So probably we'd want an
+> interruptable variety. But then maybe we want to support the other
+> wait_event_* modes too, like killable, timeout, hrtimeout, io, and so
+> on. There's a huge list. These are all implemented as macros in
+> wait.h, and I don't really want to have a different get_random_bytes_*
+> function that corresponds to _each_ of these wait_event_* functions,
+> since that'd be overwhelming.
+
+We're going to have to look at a representative sample of the call
+sites to figure this out.  The simple case is where the call site is
+only run in response to a userspace system call.  There, blocking
+makes perfect sense.  I'm just not sure there are many callers of
+get_random_ bytes() where this is the case.
+
+There are definitely quite a few callsites of get_random_bytes() where
+the caller is in the middle of an interrupt service routine, or is
+holding spinlock.  There, we are *not* allowed to block.  So any kind
+of blocking interface isn't going to be allowed; the async callback is
+the only thing which is guaranteed to work, in fact.  Mercifully, many
+of these are cases where prandom_u32() makes sense.
+
+> So I was thinking maybe a simple flag and a timeout param could work:
+
+When would a timeout be useful?  If you are using get_random_bytes()
+for security reasons, does the security reason go away after 15
+seconds?  Or even 30 seconds?
+
+> > Or maybe we can then help figure out what percentage of the callsites
+> > can be fixed with a synchronous interface, and fix some number of them
+> > just to demonstrate that the synchronous interface does work well.
+> 
+> I was planning on doing this to at least a couple callsites in my
+> upcoming patch series that adds the synchronous interface. It seems
+> like the right way to see if the API is good or not.
+
+This is absolutely the right approach.  See my above comments about
+why there may not be that many places where a synchronous interface
+will work out.  And I'm going to be rather surprised if there are
+places where having a timeout parameter will be helpful.  But I could
+be wrong; let's see if we can find cases where we (a) need secure
+bytes, (b) are allowed to block, and (c) where a timeout would make
+sense.
+
+> Right. In my initial email I proposed a distinction:
+> 
+> - External module loading is usually in a different process context,
+> so multiple modules can be attempted to be loaded at the same time. In
+> this case, it is probably safe to block in request_module.
+> - Built-in modules are loaded ± linearly, from init/main.c, so these
+> really can't block each other. For this, I was thinking of introducing
+> an rnginit section, to add to the list of things like lateinit. The
+> rnginit drivers would be loaded _after_ the RNG has initialized, so
+> that they don't get blocked.
+
+... except that we already have an order in which drivers are added,
+so moving a driver to the rnginit section might mean that some kernel
+module that depends on that driver being loaded also needs to be moved
+after rnginit.  We already have the following initcall levels:
+
+static char *initcall_level_names[] __initdata = {
+	"early",
+	"core",
+	"postcore",
+	"arch",
+	"subsys",
+	"fs",
+	"device",
+	"late",
+};
+
+If we move a caller of get_random_bytes() from say, "fs" to after
+"rnginit", that may break things.
+
+Also, it is possible that we may have architectures, without
+fine-grained clocks, where we don't initialize the rng until after
+userspace as sharted running.  So it's not clear adding a rnginit
+section makes sense.  Even if we put it as late as possible --- say,
+after "late", what do we do if don't have the CRNG fully
+negotiated after the last of the "late" drivers have been run?
+
+	   	     	     	 - Ted
