@@ -1,48 +1,45 @@
-From: Jeffrey Walton <noloader@gmail.com>
-Subject: Re: get_random_bytes returns bad randomness before seeding is complete
-Date: Sat, 3 Jun 2017 18:54:39 -0400
-Message-ID: <CAH8yC8m1HRNWTE9=NXkUypMupAoMTCfs2L=EEfwtXpBgT5BrZg@mail.gmail.com>
-References: <CAHmME9q=AdK7BHQw0+sd4T0HGQce92KXTD+-TTc2s2CXbEHAAA@mail.gmail.com>
- <20170602172616.47qcxav6adq52nmk@thunk.org> <CAHmME9oS_GCRMLf7EF8XBGwjdjohcRz4rzZiWr5ZDUurTj8A7Q@mail.gmail.com>
- <20170602190734.6zll7zc5hr66oacl@thunk.org> <CAHmME9oLHP85ENr5aZgKsTSrxiUWoQ_pfv7C6XYxmcoxPfq3Ew@mail.gmail.com>
- <20170603050433.4xpvloul25s47f2z@thunk.org> <CAHmME9rwKneq0C5GYPSWamGRT0775=-Xw3pyq6uxJXJyyBtr1g@mail.gmail.com>
- <CACXcFmndxSpytsndqeEsOsyB-nyx_xwBAaG1PMRUmof4U-rDMw@mail.gmail.com>
-Reply-To: noloader@gmail.com
+From: Colin King <colin.king@canonical.com>
+Subject: [PATCH] taging: ccree: fix spelling mistake: "chanined" -> "chained"
+Date: Sun,  4 Jun 2017 00:31:10 +0100
+Message-ID: <20170603233110.18159-1-colin.king@canonical.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        Stephan Mueller <smueller@chronox.de>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kernel-hardening@lists.openwall.com
-To: Sandy Harris <sandyinchina@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Cc: linux-kernel@vger.kernel.org
+To: Gilad Ben-Yossef <gilad@benyossef.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-oi0-f41.google.com ([209.85.218.41]:33753 "EHLO
-        mail-oi0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751077AbdFCWyk (ORCPT
+Received: from youngberry.canonical.com ([91.189.89.112]:37589 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751077AbdFCXbN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 3 Jun 2017 18:54:40 -0400
-In-Reply-To: <CACXcFmndxSpytsndqeEsOsyB-nyx_xwBAaG1PMRUmof4U-rDMw@mail.gmail.com>
+        Sat, 3 Jun 2017 19:31:13 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Jun 3, 2017 at 5:45 PM, Sandy Harris <sandyinchina@gmail.com> wrote:
-> ...
-> Of course this will fail on systems with no high-res timer. Are there
-> still some of those? It might be done in about 1000 times as long on a
-> system that lacks the realtime library's nanosecond timer but has the
-> Posix standard microsecond timer, implying a delay time in the
-> milliseconds. Would that be acceptable in those cases?
+From: Colin Ian King <colin.king@canonical.com>
 
-A significant portion of the use cases should include mobile devices.
-Device sales outnumbered desktop and server sales several years ago.
+Trivial fix to spelling mistake in SSI_LOG_ERR message
 
-Many devices are sensor rich. Even the low-end ones come with
-accelorometers for gaming. A typical one has 3 or 4 sensors, and
-higher-end ones have 7 or 8 sensors. An Evo 4G has 7 of them.
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ drivers/staging/ccree/ssi_buffer_mgr.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-There's no wanting for entropy in many of the use cases. The thing
-that is lacking seems to be taking advantage of it.
-
-Jeff
+diff --git a/drivers/staging/ccree/ssi_buffer_mgr.c b/drivers/staging/ccree/ssi_buffer_mgr.c
+index 04515e70d2d3..379eecf85ba1 100644
+--- a/drivers/staging/ccree/ssi_buffer_mgr.c
++++ b/drivers/staging/ccree/ssi_buffer_mgr.c
+@@ -156,7 +156,7 @@ static unsigned int ssi_buffer_mgr_get_sgl_nents(
+ 	unsigned int nents = 0;
+ 	while (nbytes != 0) {
+ 		if (sg_is_chain(sg_list)) {
+-			SSI_LOG_ERR("Unexpected chanined entry "
++			SSI_LOG_ERR("Unexpected chained entry "
+ 				   "in sg (entry =0x%X) \n", nents);
+ 			BUG();
+ 		}
+-- 
+2.11.0
