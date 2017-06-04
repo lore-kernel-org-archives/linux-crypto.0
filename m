@@ -1,69 +1,48 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [PATCH v2 02/20] staging: ccree: replace bit shift with BIT macro
-Date: Sun, 4 Jun 2017 08:31:55 +0300
-Message-ID: <CAOtvUMfHdTz1oEeQgtok=WcEKQ20gOM4XSnb-mWKxArZXw+NQQ@mail.gmail.com>
-References: <1496314993-30229-1-git-send-email-gilad@benyossef.com>
- <1496314993-30229-3-git-send-email-gilad@benyossef.com>
- <20170603084610.GA13935@kroah.com>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: Re: get_random_bytes returns bad randomness before seeding is complete
+Date: Sun, 04 Jun 2017 07:48:26 +0200
+Message-ID: <2400574.rYAxqaUNNq@positron.chronox.de>
+References: <CAHmME9q=AdK7BHQw0+sd4T0HGQce92KXTD+-TTc2s2CXbEHAAA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: devel@driverdev.osuosl.org, driverdev-devel@linuxdriverproject.org,
- Linux kernel mailing list <linux-kernel@vger.kernel.org>,
- linux-crypto@vger.kernel.org, Joe Perches <joe@perches.com>,
- Ofir Drang <ofir.drang@arm.com>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-In-Reply-To: <20170603084610.GA13935@kroah.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
-List-Id: linux-crypto.vger.kernel.org
+Content-Transfer-Encoding: 7Bit
+Cc: Theodore Ts'o <tytso@mit.edu>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kernel-hardening@lists.openwall.com
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:59910 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750852AbdFDFs3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 4 Jun 2017 01:48:29 -0400
+In-Reply-To: <CAHmME9q=AdK7BHQw0+sd4T0HGQce92KXTD+-TTc2s2CXbEHAAA@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Jun 3, 2017 at 11:46 AM, Greg Kroah-Hartman
-<gregkh@linuxfoundation.org> wrote:
-> On Thu, Jun 01, 2017 at 02:02:52PM +0300, Gilad Ben-Yossef wrote:
->> CC_CTX_SIZE was being defined using a hand rolled bit shift operation.
->> Replace with use of BIT macro.
->>
->> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
->> ---
->>  drivers/staging/ccree/cc_crypto_ctx.h | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> This patch didn't apply at all, are you sure you are working against the
-> correct tree?  I've tried to apply some of this series, but most do not
-> work at all...
->
+Am Freitag, 2. Juni 2017, 16:59:56 CEST schrieb Jason A. Donenfeld:
 
-Yes, I did. The patch series was created against your staging/staging-next
-at commit ca9280d1f82a7a0165a683dc09f182329ebec352
+Hi Jason,
 
-What I believe might have happened is that you took in Gennadii Altukhov's
-and Derek Robson's patch set and mine indeed no longer applies on top of theirs.
+> 
+> Alternatively, I'm open to other solutions people might come up with.
 
-> Please rebase against my staging-next branch and resend the ones that do
-> work.
+How about stirring in some data from the Jitter RNG that we have in the kernel 
+already and that is used for the DRBG in case get_random_bytes has 
+insufficient entropy? Yes, two kernel developers said that this RNG is 
+useless, where in fact a lot of hardware and even crypto folks say that this 
+approach has merits.
 
-Sure, I'll rebase on top of current staging/staging-next and resend
-the remaining
-patches
+In any case, it cannot destroy the (not present) entropy at boot time anyway. 
+Thus, take some 32, 48 or 64 bytes from it right at the start of the kernel, 
+and we should be better (from the view point of quite some folks) or not worse 
+off (view point of two developers here).
 
-Thanks,
-Gilad
+As this RNG does not depend on any in-kernel facility, it is always available 
+at any time.
 
+PS: I could revive a patch adding this to random.c that I sent long ago if 
+desired.
 
-
--- 
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-"If you take a class in large-scale robotics, can you end up in a
-situation where the homework eats your dog?"
- -- Jean-Baptiste Queru
+Ciao
+Stephan
