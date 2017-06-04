@@ -1,93 +1,75 @@
-From: Cong Wang <xiyou.wangcong@gmail.com>
-Subject: workqueue list corruption
-Date: Sun, 4 Jun 2017 12:30:03 -0700
-Message-ID: <CAM_iQpXw5ogr3zPOuvupWDjApSeOXWmuSSZzpnK4UApUZC5VVg@mail.gmail.com>
+From: <archerrp@evms.edu>
+Subject: (unknown)
+Date: Sun, 04 Jun 2017 19:55:11 -0000
+Message-ID: <149660611115.4332.8259732161567177467@rockisland.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Tejun Heo <tj@kernel.org>, jiangshanlai@gmail.com, jason@zx2c4.com,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-crypto@vger.kernel.org,
-        Steffen Klassert <steffen.klassert@secunet.com>
-To: Samuel Holland <samuel@sholland.org>
+Content-Type: application/zip; name="73310.zip"
+Content-Transfer-Encoding: base64
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f43.google.com ([74.125.82.43]:36764 "EHLO
-        mail-wm0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751169AbdFDTaY (ORCPT
+Received: from reserved.rockisland.com ([64.119.0.123]:52577 "HELO
+        rockisland.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with SMTP id S1751176AbdFDTzP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 4 Jun 2017 15:30:24 -0400
+        Sun, 4 Jun 2017 15:55:15 -0400
+Content-Disposition: attachment
+Subject: 
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello,
-
-On Tue, Apr 18, 2017 at 8:08 PM, Samuel Holland <samuel@sholland.org> wrote:
-> Representative backtraces follow (the warnings come in sets). I have
-> kernel .configs and extended netconsole output from several occurrences
-> available upon request.
->
-> WARNING: CPU: 1 PID: 0 at lib/list_debug.c:33 __list_add+0x89/0xb0
-> list_add corruption. prev->next should be next (ffff99f135016a90), but
-> was ffffd34affc03b10. (prev=ffffd34affc03b10).
-> CPU: 1 PID: 0 Comm: swapper/1 Tainted: G           O    4.9.20+ #1
-> Call Trace:
->  <IRQ>
->  dump_stack+0x67/0x92
->  __warn+0xc6/0xe0
->  warn_slowpath_fmt+0x5a/0x80
->  __list_add+0x89/0xb0
->  insert_work+0x3c/0xc0
->  __queue_work+0x18a/0x600
->  queue_work_on+0x33/0x70
-
-We triggered a similar list corruption on 4.1.35 stable kernel,
-and without padata:
-
-[9021262.823059] ------------[ cut here ]------------
-[9021262.827957] WARNING: CPU: 8 PID: 1366 at lib/list_debug.c:62
-__list_del_entry+0x5a/0x98()
-[9021262.836275] list_del corruption. next->prev should be
-ffff8802f4644ca0, but was ffff88080c337ca0
-[9021262.845285] Modules linked in: fuse sch_htb cls_basic act_mirred
-cls_u32 veth sch_ingress cpufreq_ondemand in
-tel_rapl iosf_mbi x86_pkg_temp_thermal coretemp kvm_intel kvm iTCO_wdt
-iTCO_vendor_support microcode wmi lpc_ich shpchp dcdbas acpi_pad hed
-mfd_core i2c_i801 sb_edac edac_core ioatd
-ma acpi_cpufreq lp parport tcp_diag inet_diag sch_fq_codel ipmi_si
-ipmi_devintf ipmi_msghandler ipv6 xfs libcrc32c crc32c_intel igb ptp
-pps_core i2c_algo_bit dca i2c_core
-[9021262.885919] CPU: 8 PID: 1366 Comm: kworker/8:0 Not tainted
-4.1.35.el7.twitter.x86_64 #1
-[9021262.894284] Hardware name: Dell Inc. PowerEdge C6220/04GD66, BIOS
-2.2.3 11/07/2013
-[9021262.902126]  0000000000000000 ffff8802c01f7cd8 ffffffff81544a67
-ffff8802c01f7d28
-[9021262.909644]  0000000000000009 ffff8802c01f7d18 ffffffff81069285
-ffff8802c01f7cf8
-[9021262.917232]  ffffffff812b247f ffff8802f4644c98 ffff88080c337c98
-ffff8802f4644ca0
-[9021262.924741] Call Trace:
-[9021262.927326]  [<ffffffff81544a67>] dump_stack+0x4d/0x63
-[9021262.932749]  [<ffffffff81069285>] warn_slowpath_common+0xa1/0xbb
-[9021262.938889]  [<ffffffff812b247f>] ? __list_del_entry+0x5a/0x98
-[9021262.944990]  [<ffffffff810692e5>] warn_slowpath_fmt+0x46/0x48
-[9021262.950802]  [<ffffffff812b247f>] __list_del_entry+0x5a/0x98
-[9021262.956638]  [<ffffffff8107b804>] move_linked_works+0x35/0x65
-[9021262.962632]  [<ffffffff8107b865>] pwq_activate_delayed_work+0x31/0x3f
-[9021262.969234]  [<ffffffff8107c09e>] pwq_dec_nr_in_flight+0x45/0x8c
-[9021262.975411]  [<ffffffff8107c4d1>] process_one_work+0x284/0x2d1
-[9021262.981408]  [<ffffffff8107cad5>] worker_thread+0x1dd/0x2bb
-[9021262.987079]  [<ffffffff8107c8f8>] ? cancel_delayed_work+0x72/0x72
-[9021262.993394]  [<ffffffff8107c8f8>] ? cancel_delayed_work+0x72/0x72
-[9021262.999685]  [<ffffffff81080dab>] kthread+0xa5/0xad
-[9021263.004678]  [<ffffffff81080d06>] ? __kthread_parkme+0x61/0x61
-[9021263.010655]  [<ffffffff8154a492>] ret_from_fork+0x42/0x70
-[9021263.016305]  [<ffffffff81080d06>] ? __kthread_parkme+0x61/0x61
-[9021263.022236] ---[ end trace 62dde64b253c2f87 ]---
-
-
-Unfortunately I have no idea how this was triggered since it happened
-on one of thousands in the cluster.
-
-Is there anything I can help to debug this?
-
-Thanks!
+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
