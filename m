@@ -1,67 +1,56 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH v3 11/18] staging: ccree: use snake_case for hash enums
-Date: Sun,  4 Jun 2017 11:02:32 +0300
-Message-ID: <1496563362-7954-12-git-send-email-gilad@benyossef.com>
+Subject: [PATCH v3 10/18] staging: ccree: remove unused struct
+Date: Sun,  4 Jun 2017 11:02:31 +0300
+Message-ID: <1496563362-7954-11-git-send-email-gilad@benyossef.com>
 References: <1496563362-7954-1-git-send-email-gilad@benyossef.com>
 Cc: Joe Perches <joe@perches.com>, Ofir Drang <ofir.drang@arm.com>,
         linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from foss.arm.com ([217.140.101.70]:52768 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751193AbdFDIDw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 4 Jun 2017 04:03:52 -0400
 In-Reply-To: <1496563362-7954-1-git-send-email-gilad@benyossef.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hash enum were named using CamelCase, move over to snake_case.
+struct SepHashPrivateContext is not used anywhere in the code.
+Remove it.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/cc_hw_queue_defs.h | 4 ++--
- drivers/staging/ccree/hash_defs.h        | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ drivers/staging/ccree/hash_defs.h | 18 ------------------
+ 1 file changed, 18 deletions(-)
 
-diff --git a/drivers/staging/ccree/cc_hw_queue_defs.h b/drivers/staging/ccree/cc_hw_queue_defs.h
-index 8dc9b6e..1cbd2e1 100644
---- a/drivers/staging/ccree/cc_hw_queue_defs.h
-+++ b/drivers/staging/ccree/cc_hw_queue_defs.h
-@@ -505,7 +505,7 @@ static inline void set_cipher_config0(struct cc_hw_desc *pdesc,
-  * @config: Any one of the modes defined in [CC7x-DESC]
-  */
- static inline void set_cipher_config1(struct cc_hw_desc *pdesc,
--				      enum HashConfig1Padding config)
-+				      enum cc_hash_conf_pad config)
- {
- 	pdesc->word[4] |= FIELD_PREP(WORD4_CIPHER_CONF1, config);
- }
-@@ -598,7 +598,7 @@ static inline void set_setup_mode(struct cc_hw_desc *pdesc,
-  * @config: Any one of the cipher do defined in [CC7x-DESC]
-  */
- static inline void set_cipher_do(struct cc_hw_desc *pdesc,
--				 enum HashCipherDoPadding config)
-+				 enum cc_hash_cipher_pad config)
- {
- 	pdesc->word[4] |= FIELD_PREP(WORD4_CIPHER_DO,
- 				(config & HW_KEY_MASK_CIPHER_DO));
 diff --git a/drivers/staging/ccree/hash_defs.h b/drivers/staging/ccree/hash_defs.h
-index 9e01219..872ed97 100644
+index 3f2b2d1..9e01219 100644
 --- a/drivers/staging/ccree/hash_defs.h
 +++ b/drivers/staging/ccree/hash_defs.h
-@@ -44,14 +44,14 @@
- #define HASH_LARVAL_SHA512 0x5be0cd19, 0x137e2179, 0x1f83d9ab, 0xfb41bd6b, 0x9b05688c, 0x2b3e6c1f, 0x510e527f, 0xade682d1, 0xa54ff53a, 0x5f1d36f1, 0x3c6ef372, 0xfe94f82b, 0xbb67ae85, 0x84caa73b, 0x6a09e667, 0xf3bcc908
- #endif
- 
--enum HashConfig1Padding {
-+enum cc_hash_conf_pad {
- 	HASH_PADDING_DISABLED = 0,
- 	HASH_PADDING_ENABLED = 1,
- 	HASH_DIGEST_RESULT_LITTLE_ENDIAN = 2,
- 	HASH_CONFIG1_PADDING_RESERVE32 = S32_MAX,
+@@ -57,23 +57,5 @@ enum HashCipherDoPadding {
+ 	HASH_CIPHER_DO_PADDING_RESERVE32 = S32_MAX,
  };
  
--enum HashCipherDoPadding {
-+enum cc_hash_cipher_pad {
- 	DO_NOT_PAD = 0,
- 	DO_PAD = 1,
- 	HASH_CIPHER_DO_PADDING_RESERVE32 = S32_MAX,
+-typedef struct SepHashPrivateContext {
+-	/* The current length is placed at the end of the context buffer because the hash
+-	 *  context is used for all HMAC operations as well. HMAC context includes a 64 bytes
+-	 *  K0 field.  The size of struct drv_ctx_hash reserved field is  88/184 bytes depend if t
+-	 *  he SHA512 is supported ( in this case teh context size is 256 bytes).
+-	 *  The size of struct drv_ctx_hash reseved field is 20 or 52 depend if the SHA512 is supported.
+-	 *  This means that this structure size (without the reserved field can be up to 20 bytes ,
+-	 *  in case sha512 is not suppported it is 20 bytes (SEP_HASH_LENGTH_WORDS define to 2 ) and in the other
+-	 * case it is 28 (SEP_HASH_LENGTH_WORDS define to 4)
+-	 */
+-	u32 reserved[(sizeof(struct drv_ctx_hash)/sizeof(u32)) - SEP_HASH_LENGTH_WORDS - 3];
+-	u32 CurrentDigestedLength[SEP_HASH_LENGTH_WORDS];
+-	u32 KeyType;
+-	u32 dataCompleted;
+-	u32 hmacFinalization;
+-	/* no space left */
+-} SepHashPrivateContext_s;
+-
+ #endif /*_HASH_DEFS_H__*/
+ 
 -- 
 2.1.4
