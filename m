@@ -1,48 +1,47 @@
-From: Steve Lin <steven.lin1@broadcom.com>
-Subject: Re: [PATCH] crypto: brcm: fix spelling mistake: "fallbck" -> "fallback"
-Date: Mon, 5 Jun 2017 10:10:48 -0400
-Message-ID: <CA+Jmh7F0oWL44==Xsy6HY_kabVQQNcefh3Q8S0mH5mHhRyD1ag@mail.gmail.com>
-References: <20170604182920.26389-1-colin.king@canonical.com>
+From: Tejun Heo <tj@kernel.org>
+Subject: Re: workqueue list corruption
+Date: Mon, 5 Jun 2017 15:42:36 -0400
+Message-ID: <20170605194236.GB9399@htj.duckdns.org>
+References: <CAM_iQpXw5ogr3zPOuvupWDjApSeOXWmuSSZzpnK4UApUZC5VVg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Rob Rice <rob.rice@broadcom.com>,
-        Corentin LABBE <clabbe.montjoie@gmail.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Colin King <colin.king@canonical.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: Samuel Holland <samuel@sholland.org>, jiangshanlai@gmail.com,
+        jason@zx2c4.com, LKML <linux-kernel@vger.kernel.org>,
+        linux-crypto@vger.kernel.org,
+        Steffen Klassert <steffen.klassert@secunet.com>
+To: Cong Wang <xiyou.wangcong@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170604182920.26389-1-colin.king@canonical.com>
+Content-Disposition: inline
+In-Reply-To: <CAM_iQpXw5ogr3zPOuvupWDjApSeOXWmuSSZzpnK4UApUZC5VVg@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sun, Jun 4, 2017 at 2:29 PM, Colin King <colin.king@canonical.com> wrote:
-> From: Colin Ian King <colin.king@canonical.com>
->
-> Trivial fix to spelling mistake in flow_log message
->
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
+Hello,
 
-Good catch, thanks!
-Reviewed-by: Steve Lin <steven.lin1@broadcom.com>
+On Sun, Jun 04, 2017 at 12:30:03PM -0700, Cong Wang wrote:
+> On Tue, Apr 18, 2017 at 8:08 PM, Samuel Holland <samuel@sholland.org> wrote:
+> > Representative backtraces follow (the warnings come in sets). I have
+> > kernel .configs and extended netconsole output from several occurrences
+> > available upon request.
+> >
+> > WARNING: CPU: 1 PID: 0 at lib/list_debug.c:33 __list_add+0x89/0xb0
+> > list_add corruption. prev->next should be next (ffff99f135016a90), but
+> > was ffffd34affc03b10. (prev=ffffd34affc03b10).
 
-> ---
->  drivers/crypto/bcm/cipher.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/drivers/crypto/bcm/cipher.c b/drivers/crypto/bcm/cipher.c
-> index 61393dc70b0b..9cfd36c1bcb6 100644
-> --- a/drivers/crypto/bcm/cipher.c
-> +++ b/drivers/crypto/bcm/cipher.c
-> @@ -2639,7 +2639,7 @@ static int aead_need_fallback(struct aead_request *req)
->             (spu->spu_type == SPU_TYPE_SPUM) &&
->             (ctx->digestsize != 8) && (ctx->digestsize != 12) &&
->             (ctx->digestsize != 16)) {
-> -               flow_log("%s() AES CCM needs fallbck for digest size %d\n",
-> +               flow_log("%s() AES CCM needs fallback for digest size %d\n",
->                          __func__, ctx->digestsize);
->                 return 1;
->         }
-> --
-> 2.11.0
->
+So, while trying to move a work item from delayed list to the pending
+list, the pending list's last item's next pointer is no longer
+pointing to the head and looks re-initialized.  Could be a premature
+free and reuse.
+
+If this is reproducible, it'd help a lot to update move_linked_works()
+to check for list validity directly and print out the work function of
+the corrupt work item.  There's no guarantee that the re-user is the
+one which did premature free but given that we're likely seeing
+INIT_LIST_HEAD() instead of random corruption is encouraging, so
+there's some chance that doing that would point us to the culprit or
+at least pretty close to it.
+
+Thanks.
+
+-- 
+tejun
