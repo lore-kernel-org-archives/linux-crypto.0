@@ -1,55 +1,102 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH RFC v2 8/8] ceph: ensure RNG is seeded before using
-Date: Mon,  5 Jun 2017 05:47:57 +0200
-Message-ID: <20170605034757.4803-9-Jason@zx2c4.com>
-References: <20170605034757.4803-1-Jason@zx2c4.com>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Ilya Dryomov <idryomov@gmail.com>,
-	"Yan, Zheng" <zyan@redhat.com>,
-	Sage Weil <sage@redhat.com>
-To: Theodore Ts'o <tytso@mit.edu>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>,
-	kernel-hardening@lists.openwall.com,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Return-path: <kernel-hardening-return-8295-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
-List-Post: <mailto:kernel-hardening@lists.openwall.com>
-List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
-List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
-List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
-In-Reply-To: <20170605034757.4803-1-Jason@zx2c4.com>
-List-Id: linux-crypto.vger.kernel.org
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: [PATCH] crypto: testmgr: use consistent format for errors
+Date: Mon,  5 Jun 2017 08:33:43 +0300
+Message-ID: <1496640823-30421-1-git-send-email-gilad@benyossef.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from foss.arm.com ([217.140.101.70]:57458 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751241AbdFEFdw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 5 Jun 2017 01:33:52 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Ceph uses the RNG for various nonce generations, and it shouldn't accept
-using bad randomness. So, we wait for the RNG to be properly seeded. We
-do this by calling wait_for_random_bytes() in a function that is
-certainly called in process context, early on, so that all subsequent
-calls to get_random_bytes are necessarily acceptable.
+Fix inconsistent format and spelling in hash tests error messages.
 
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-Cc: Ilya Dryomov <idryomov@gmail.com>
-Cc: "Yan, Zheng" <zyan@redhat.com>
-Cc: Sage Weil <sage@redhat.com>
+Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- net/ceph/ceph_common.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ crypto/testmgr.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/net/ceph/ceph_common.c b/net/ceph/ceph_common.c
-index 4fd02831beed..26ab58665f77 100644
---- a/net/ceph/ceph_common.c
-+++ b/net/ceph/ceph_common.c
-@@ -611,7 +611,11 @@ struct ceph_client *ceph_create_client(struct ceph_options *opt, void *private)
- {
- 	struct ceph_client *client;
- 	struct ceph_entity_addr *myaddr = NULL;
--	int err = -ENOMEM;
-+	int err;
-+
-+	err = wait_for_random_bytes();
-+	if (err < 0)
-+		return ERR_PTR(err);
- 
- 	client = kzalloc(sizeof(*client), GFP_KERNEL);
- 	if (client == NULL)
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 6f5f3ed..8c68c99 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -218,14 +218,14 @@ static int ahash_partial_update(struct ahash_request **preq,
+ 			crypto_ahash_reqtfm(req));
+ 	state = kmalloc(statesize + sizeof(guard), GFP_KERNEL);
+ 	if (!state) {
+-		pr_err("alt: hash: Failed to alloc state for %s\n", algo);
++		pr_err("alg: hash: Failed to alloc state for %s\n", algo);
+ 		goto out_nostate;
+ 	}
+ 	memcpy(state + statesize, guard, sizeof(guard));
+ 	ret = crypto_ahash_export(req, state);
+ 	WARN_ON(memcmp(state + statesize, guard, sizeof(guard)));
+ 	if (ret) {
+-		pr_err("alt: hash: Failed to export() for %s\n", algo);
++		pr_err("alg: hash: Failed to export() for %s\n", algo);
+ 		goto out;
+ 	}
+ 	ahash_request_free(req);
+@@ -344,19 +344,19 @@ static int __test_hash(struct crypto_ahash *tfm,
+ 		} else {
+ 			ret = wait_async_op(&tresult, crypto_ahash_init(req));
+ 			if (ret) {
+-				pr_err("alt: hash: init failed on test %d "
++				pr_err("alg: hash: init failed on test %d "
+ 				       "for %s: ret=%d\n", j, algo, -ret);
+ 				goto out;
+ 			}
+ 			ret = wait_async_op(&tresult, crypto_ahash_update(req));
+ 			if (ret) {
+-				pr_err("alt: hash: update failed on test %d "
++				pr_err("alg: hash: update failed on test %d "
+ 				       "for %s: ret=%d\n", j, algo, -ret);
+ 				goto out;
+ 			}
+ 			ret = wait_async_op(&tresult, crypto_ahash_final(req));
+ 			if (ret) {
+-				pr_err("alt: hash: final failed on test %d "
++				pr_err("alg: hash: final failed on test %d "
+ 				       "for %s: ret=%d\n", j, algo, -ret);
+ 				goto out;
+ 			}
+@@ -488,13 +488,13 @@ static int __test_hash(struct crypto_ahash *tfm,
+ 		ahash_request_set_crypt(req, sg, result, template[i].tap[0]);
+ 		ret = wait_async_op(&tresult, crypto_ahash_init(req));
+ 		if (ret) {
+-			pr_err("alt: hash: init failed on test %d for %s: ret=%d\n",
++			pr_err("alg: hash: init failed on test %d for %s: ret=%d\n",
+ 				j, algo, -ret);
+ 			goto out;
+ 		}
+ 		ret = wait_async_op(&tresult, crypto_ahash_update(req));
+ 		if (ret) {
+-			pr_err("alt: hash: update failed on test %d for %s: ret=%d\n",
++			pr_err("alg: hash: update failed on test %d for %s: ret=%d\n",
+ 				j, algo, -ret);
+ 			goto out;
+ 		}
+@@ -505,7 +505,7 @@ static int __test_hash(struct crypto_ahash *tfm,
+ 				hash_buff, k, temp, &sg[0], algo, result,
+ 				&tresult);
+ 			if (ret) {
+-				pr_err("hash: partial update failed on test %d for %s: ret=%d\n",
++				pr_err("alg: hash: partial update failed on test %d for %s: ret=%d\n",
+ 					j, algo, -ret);
+ 				goto out_noreq;
+ 			}
+@@ -513,7 +513,7 @@ static int __test_hash(struct crypto_ahash *tfm,
+ 		}
+ 		ret = wait_async_op(&tresult, crypto_ahash_final(req));
+ 		if (ret) {
+-			pr_err("alt: hash: final failed on test %d for %s: ret=%d\n",
++			pr_err("alg: hash: final failed on test %d for %s: ret=%d\n",
+ 				j, algo, -ret);
+ 			goto out;
+ 		}
 -- 
-2.13.0
+2.1.4
