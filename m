@@ -1,130 +1,83 @@
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH RFC v2 1/8] random: add synchronous API for the urandom pool
-Date: Mon,  5 Jun 2017 05:47:50 +0200
-Message-ID: <20170605034757.4803-2-Jason@zx2c4.com>
+Subject: [PATCH RFC v2 3/8] random: warn when kernel uses unseeded randomness
+Date: Mon,  5 Jun 2017 05:47:52 +0200
+Message-ID: <20170605034757.4803-4-Jason@zx2c4.com>
 References: <20170605034757.4803-1-Jason@zx2c4.com>
 Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
 To: Theodore Ts'o <tytso@mit.edu>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>,
-	kernel-hardening@lists.openwall.com,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Return-path: <kernel-hardening-return-8289-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
-List-Post: <mailto:kernel-hardening@lists.openwall.com>
-List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
-List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
-List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kernel-hardening@lists.openwall.com,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from frisell.zx2c4.com ([192.95.5.64]:36893 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751293AbdFEDse (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 4 Jun 2017 23:48:34 -0400
 In-Reply-To: <20170605034757.4803-1-Jason@zx2c4.com>
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-This enables users of get_random_{bytes,u32,u64,int,long} to wait until
-the pool is ready before using this function, in case they actually want
-to have reliable randomness.
+This enables an important dmesg notification about when drivers have
+used the crng without it being seeded first. Prior, these errors would
+occur silently, and so there hasn't been a great way of diagnosing these
+types of bugs for obscure setups. By adding this as a config option, we
+can leave it on by default, so that we learn where these issues happen,
+in the field, will still allowing some people to turn it off, if they
+really know what they're doing and do not want the log entries.
 
 Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 ---
- drivers/char/random.c  | 41 +++++++++++++++++++++++++++++++----------
- include/linux/random.h |  1 +
- 2 files changed, 32 insertions(+), 10 deletions(-)
+ drivers/char/random.c |  3 +--
+ lib/Kconfig.debug     | 15 +++++++++++++++
+ 2 files changed, 16 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 0ab024918907..035a5d7c06bd 100644
+index 035a5d7c06bd..9320b04235ae 100644
 --- a/drivers/char/random.c
 +++ b/drivers/char/random.c
-@@ -844,11 +844,6 @@ static void crng_reseed(struct crng_state *crng, struct entropy_store *r)
- 	spin_unlock_irqrestore(&primary_crng.lock, flags);
- }
+@@ -285,7 +285,6 @@
+ #define SEC_XFER_SIZE		512
+ #define EXTRACT_SIZE		10
  
--static inline void crng_wait_ready(void)
--{
--	wait_event_interruptible(crng_init_wait, crng_ready());
--}
--
- static void _extract_crng(struct crng_state *crng,
- 			  __u8 out[CHACHA20_BLOCK_SIZE])
- {
-@@ -1466,7 +1461,10 @@ static ssize_t extract_entropy_user(struct entropy_store *r, void __user *buf,
-  * number of good random numbers, suitable for key generation, seeding
-  * TCP sequence numbers, etc.  It does not rely on the hardware random
-  * number generator.  For random bytes direct from the hardware RNG
-- * (when available), use get_random_bytes_arch().
-+ * (when available), use get_random_bytes_arch(). In order to ensure
-+ * that the randomness provided by this function is okay, the function
-+ * wait_for_random_bytes() should be called and return 0 at least once
-+ * at any point prior.
-  */
- void get_random_bytes(void *buf, int nbytes)
- {
-@@ -1496,6 +1494,24 @@ void get_random_bytes(void *buf, int nbytes)
- EXPORT_SYMBOL(get_random_bytes);
+-#define DEBUG_RANDOM_BOOT 0
  
- /*
-+ * Wait for the urandom pool to be seeded and thus guaranteed to supply
-+ * cryptographically secure random numbers. This applies to: the /dev/urandom
-+ * device, the get_random_bytes function, and the get_random_{u32,u64,int,long}
-+ * family of functions. Using any of these functions without first calling
-+ * this function forfeits the guarantee of security.
-+ *
-+ * Returns: 0 if the urandom pool has been seeded.
-+ *          -ERESTARTSYS if the function was interrupted by a signal.
-+ */
-+int wait_for_random_bytes(void)
-+{
-+	if (likely(crng_ready()))
-+		return 0;
-+	return wait_event_interruptible(crng_init_wait, crng_ready());
-+}
-+EXPORT_SYMBOL(wait_for_random_bytes);
+ #define LONGS(x) (((x) + sizeof(unsigned long) - 1)/sizeof(unsigned long))
+ 
+@@ -1470,7 +1469,7 @@ void get_random_bytes(void *buf, int nbytes)
+ {
+ 	__u8 tmp[CHACHA20_BLOCK_SIZE];
+ 
+-#if DEBUG_RANDOM_BOOT > 0
++#ifdef CONFIG_WARN_UNSEEDED_RANDOM
+ 	if (!crng_ready())
+ 		printk(KERN_NOTICE "random: %pF get_random_bytes called "
+ 		       "with crng_init = %d\n", (void *) _RET_IP_, crng_init);
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index e4587ebe52c7..fd5e67bcd46c 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -1209,6 +1209,21 @@ config STACKTRACE
+ 	  It is also used by various kernel debugging features that require
+ 	  stack trace generation.
+ 
++config WARN_UNSEEDED_RANDOM
++	bool "Warn when kernel uses unseeded randomness"
++	default y
++	help
++	  Some parts of the kernel contain bugs relating to their use of
++	  cryptographically secure random numbers before it's actually possible
++	  to generate those numbers securely. This setting ensures that these
++	  flaws don't go unnoticed, by enabling a message, should this ever
++	  occur. This will allow people with obscure setups to know when things
++	  are going wrong, so that they might contact developers about fixing
++	  it.
 +
-+/*
-  * Add a callback function that will be invoked when the nonblocking
-  * pool is initialised.
-  *
-@@ -1849,6 +1865,8 @@ const struct file_operations urandom_fops = {
- SYSCALL_DEFINE3(getrandom, char __user *, buf, size_t, count,
- 		unsigned int, flags)
- {
-+	int ret;
++	  Say Y here, unless you simply do not care about using unseeded
++	  randomness and do not want a potential warning message in your logs.
 +
- 	if (flags & ~(GRND_NONBLOCK|GRND_RANDOM))
- 		return -EINVAL;
- 
-@@ -1861,9 +1879,9 @@ SYSCALL_DEFINE3(getrandom, char __user *, buf, size_t, count,
- 	if (!crng_ready()) {
- 		if (flags & GRND_NONBLOCK)
- 			return -EAGAIN;
--		crng_wait_ready();
--		if (signal_pending(current))
--			return -ERESTARTSYS;
-+		ret = wait_for_random_bytes();
-+		if (unlikely(ret))
-+			return ret;
- 	}
- 	return urandom_read(NULL, buf, count, NULL);
- }
-@@ -2023,7 +2041,10 @@ struct batched_entropy {
- /*
-  * Get a random word for internal kernel use only. The quality of the random
-  * number is either as good as RDRAND or as good as /dev/urandom, with the
-- * goal of being quite fast and not depleting entropy.
-+ * goal of being quite fast and not depleting entropy. In order to ensure
-+ * that the randomness provided by this function is okay, the function
-+ * wait_for_random_bytes() should be called and return 0 at least once
-+ * at any point prior.
-  */
- static DEFINE_PER_CPU(struct batched_entropy, batched_entropy_u64);
- u64 get_random_u64(void)
-diff --git a/include/linux/random.h b/include/linux/random.h
-index ed5c3838780d..e29929347c95 100644
---- a/include/linux/random.h
-+++ b/include/linux/random.h
-@@ -34,6 +34,7 @@ extern void add_input_randomness(unsigned int type, unsigned int code,
- extern void add_interrupt_randomness(int irq, int irq_flags) __latent_entropy;
- 
- extern void get_random_bytes(void *buf, int nbytes);
-+extern int wait_for_random_bytes(void);
- extern int add_random_ready_callback(struct random_ready_callback *rdy);
- extern void del_random_ready_callback(struct random_ready_callback *rdy);
- extern void get_random_bytes_arch(void *buf, int nbytes);
+ config DEBUG_KOBJECT
+ 	bool "kobject debugging"
+ 	depends on DEBUG_KERNEL
 -- 
 2.13.0
