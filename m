@@ -1,12 +1,11 @@
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH RFC v2 7/8] bluetooth/smp: ensure RNG is properly seeded before ECDH use
-Date: Mon,  5 Jun 2017 05:47:56 +0200
-Message-ID: <20170605034757.4803-8-Jason@zx2c4.com>
+Subject: [PATCH RFC v2 6/8] iscsi: ensure RNG is seeded before use
+Date: Mon,  5 Jun 2017 05:47:55 +0200
+Message-ID: <20170605034757.4803-7-Jason@zx2c4.com>
 References: <20170605034757.4803-1-Jason@zx2c4.com>
 Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Gustavo Padovan <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
+        "Nicholas A. Bellinger" <nab@linux-iscsi.org>,
+        Lee Duncan <lduncan@suse.com>, Chris Leech <cleech@redhat.com>
 To: Theodore Ts'o <tytso@mit.edu>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
@@ -15,110 +14,152 @@ To: Theodore Ts'o <tytso@mit.edu>,
 Return-path: <linux-crypto-owner@vger.kernel.org>
 Received: from frisell.zx2c4.com ([192.95.5.64]:36893 "EHLO frisell.zx2c4.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751354AbdFEDs7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 4 Jun 2017 23:48:59 -0400
+        id S1751293AbdFEDsv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 4 Jun 2017 23:48:51 -0400
 In-Reply-To: <20170605034757.4803-1-Jason@zx2c4.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This protocol uses lots of complex cryptography that relies on securely
-generated random numbers. Thus, it's important that the RNG is actually
-seeded before use. Fortuantely, it appears we're always operating in
-process context (there are many GFP_KERNEL allocations and other
-sleeping operations), and so we can simply demand that the RNG is seeded
-before we use it.
+It's not safe to use weak random data here, especially for the challenge
+response randomness. Since we're always in process context, it's safe to
+simply wait until we have enough randomness to carry out the
+authentication correctly.
 
-We take two strategies in this commit. The first is for the library code
-that's called from other modules like hci or mgmt: here we just change
-the call to get_random_bytes_wait, and return the result of the wait to
-the caller, along with the other error codes of those functions like
-usual. Then there's the SMP protocol handler itself, which makes many
-many many calls to get_random_bytes during different phases. For this,
-rather than have to change all the calls to get_random_bytes_wait and
-propagate the error result, it's actually enough to just put a single
-call to wait_for_random_bytes() at the beginning of the handler, to
-ensure that all the subsequent invocations are safe, without having to
-actually change them. Likewise, for the random address changing
-function, we'd rather know early on in the function whether the RNG
-initialization has been interrupted, rather than later, so we call
-wait_for_random_bytes() at the top, so that later on the call to
-get_random_bytes() is acceptable.
+While we're at it, we clean up a small memleak during an error
+condition.
 
 Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: Gustavo Padovan <gustavo@padovan.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: "Nicholas A. Bellinger" <nab@linux-iscsi.org>
+Cc: Lee Duncan <lduncan@suse.com>
+Cc: Chris Leech <cleech@redhat.com>
 ---
- net/bluetooth/hci_request.c |  6 ++++++
- net/bluetooth/smp.c         | 18 ++++++++++++++----
- 2 files changed, 20 insertions(+), 4 deletions(-)
+ drivers/target/iscsi/iscsi_target_auth.c  | 14 +++++++++++---
+ drivers/target/iscsi/iscsi_target_login.c | 22 ++++++++++++++--------
+ 2 files changed, 25 insertions(+), 11 deletions(-)
 
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index b5faff458d8b..4078057c4fd7 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -1406,6 +1406,12 @@ int hci_update_random_address(struct hci_request *req, bool require_privacy,
- 	struct hci_dev *hdev = req->hdev;
- 	int err;
+diff --git a/drivers/target/iscsi/iscsi_target_auth.c b/drivers/target/iscsi/iscsi_target_auth.c
+index 903b667f8e01..f9bc8ec6fb6b 100644
+--- a/drivers/target/iscsi/iscsi_target_auth.c
++++ b/drivers/target/iscsi/iscsi_target_auth.c
+@@ -47,18 +47,21 @@ static void chap_binaryhex_to_asciihex(char *dst, char *src, int src_len)
+ 	}
+ }
  
-+	if (require_privacy) {
-+		err = wait_for_random_bytes();
-+		if (unlikely(err))
-+			return err;
+-static void chap_gen_challenge(
++static int chap_gen_challenge(
+ 	struct iscsi_conn *conn,
+ 	int caller,
+ 	char *c_str,
+ 	unsigned int *c_len)
+ {
++	int ret;
+ 	unsigned char challenge_asciihex[CHAP_CHALLENGE_LENGTH * 2 + 1];
+ 	struct iscsi_chap *chap = conn->auth_protocol;
+ 
+ 	memset(challenge_asciihex, 0, CHAP_CHALLENGE_LENGTH * 2 + 1);
+ 
+-	get_random_bytes(chap->challenge, CHAP_CHALLENGE_LENGTH);
++	ret = get_random_bytes_wait(chap->challenge, CHAP_CHALLENGE_LENGTH);
++	if (unlikely(ret))
++		return ret;
+ 	chap_binaryhex_to_asciihex(challenge_asciihex, chap->challenge,
+ 				CHAP_CHALLENGE_LENGTH);
+ 	/*
+@@ -69,6 +72,7 @@ static void chap_gen_challenge(
+ 
+ 	pr_debug("[%s] Sending CHAP_C=0x%s\n\n", (caller) ? "server" : "client",
+ 			challenge_asciihex);
++	return 0;
+ }
+ 
+ static int chap_check_algorithm(const char *a_str)
+@@ -143,6 +147,7 @@ static struct iscsi_chap *chap_server_open(
+ 	case CHAP_DIGEST_UNKNOWN:
+ 	default:
+ 		pr_err("Unsupported CHAP_A value\n");
++		kfree(conn->auth_protocol);
+ 		return NULL;
+ 	}
+ 
+@@ -156,7 +161,10 @@ static struct iscsi_chap *chap_server_open(
+ 	/*
+ 	 * Generate Challenge.
+ 	 */
+-	chap_gen_challenge(conn, 1, aic_str, aic_len);
++	if (chap_gen_challenge(conn, 1, aic_str, aic_len) < 0) {
++		kfree(conn->auth_protocol);
++		return NULL;
 +	}
-+
- 	/* If privacy is enabled use a resolvable private address. If
- 	 * current RPA has expired or there is something else than
- 	 * the current RPA in use, then generate a new one.
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 14585edc9439..5fef1bc96f42 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -537,7 +537,9 @@ int smp_generate_rpa(struct hci_dev *hdev, const u8 irk[16], bdaddr_t *rpa)
  
- 	smp = chan->data;
+ 	return chap;
+ }
+diff --git a/drivers/target/iscsi/iscsi_target_login.c b/drivers/target/iscsi/iscsi_target_login.c
+index 66238477137b..5ef028c11738 100644
+--- a/drivers/target/iscsi/iscsi_target_login.c
++++ b/drivers/target/iscsi/iscsi_target_login.c
+@@ -245,22 +245,26 @@ int iscsi_check_for_session_reinstatement(struct iscsi_conn *conn)
+ 	return 0;
+ }
  
--	get_random_bytes(&rpa->b[3], 3);
-+	err = get_random_bytes_wait(&rpa->b[3], 3);
-+	if (unlikely(err))
-+		return err;
+-static void iscsi_login_set_conn_values(
++static int iscsi_login_set_conn_values(
+ 	struct iscsi_session *sess,
+ 	struct iscsi_conn *conn,
+ 	__be16 cid)
+ {
++	int ret;
+ 	conn->sess		= sess;
+ 	conn->cid		= be16_to_cpu(cid);
+ 	/*
+ 	 * Generate a random Status sequence number (statsn) for the new
+ 	 * iSCSI connection.
+ 	 */
+-	get_random_bytes(&conn->stat_sn, sizeof(u32));
++	ret = get_random_bytes_wait(&conn->stat_sn, sizeof(u32));
++	if (unlikely(ret))
++		return ret;
  
- 	rpa->b[5] &= 0x3f;	/* Clear two most significant bits */
- 	rpa->b[5] |= 0x40;	/* Set second most significant bit */
-@@ -570,7 +572,9 @@ int smp_generate_oob(struct hci_dev *hdev, u8 hash[16], u8 rand[16])
- 	} else {
- 		while (true) {
- 			/* Seed private key with random number */
--			get_random_bytes(smp->local_sk, 32);
-+			err = get_random_bytes_wait(smp->local_sk, 32);
-+			if (unlikely(err))
-+				return err;
+ 	mutex_lock(&auth_id_lock);
+ 	conn->auth_id		= iscsit_global->auth_id++;
+ 	mutex_unlock(&auth_id_lock);
++	return 0;
+ }
  
- 			/* Generate local key pair for Secure Connections */
- 			if (!generate_ecdh_keys(smp->local_pk, smp->local_sk))
-@@ -589,7 +593,9 @@ int smp_generate_oob(struct hci_dev *hdev, u8 hash[16], u8 rand[16])
- 	SMP_DBG("OOB Public Key Y: %32phN", smp->local_pk + 32);
- 	SMP_DBG("OOB Private Key:  %32phN", smp->local_sk);
+ __printf(2, 3) int iscsi_change_param_sprintf(
+@@ -306,7 +310,11 @@ static int iscsi_login_zero_tsih_s1(
+ 		return -ENOMEM;
+ 	}
  
--	get_random_bytes(smp->local_rand, 16);
-+	err = get_random_bytes_wait(smp->local_rand, 16);
-+	if (unlikely(err))
-+		return err;
+-	iscsi_login_set_conn_values(sess, conn, pdu->cid);
++	ret = iscsi_login_set_conn_values(sess, conn, pdu->cid);
++	if (unlikely(ret)) {
++		kfree(sess);
++		return ret;
++	}
+ 	sess->init_task_tag	= pdu->itt;
+ 	memcpy(&sess->isid, pdu->isid, 6);
+ 	sess->exp_cmd_sn	= be32_to_cpu(pdu->cmdsn);
+@@ -497,8 +505,7 @@ static int iscsi_login_non_zero_tsih_s1(
+ {
+ 	struct iscsi_login_req *pdu = (struct iscsi_login_req *)buf;
  
- 	err = smp_f4(smp->tfm_cmac, smp->local_pk, smp->local_pk,
- 		     smp->local_rand, 0, hash);
-@@ -2831,7 +2837,11 @@ static int smp_sig_channel(struct l2cap_chan *chan, struct sk_buff *skb)
- 	struct hci_conn *hcon = conn->hcon;
- 	struct smp_chan *smp;
- 	__u8 code, reason;
--	int err = 0;
-+	int err;
-+
-+	err = wait_for_random_bytes();
-+	if (unlikely(err))
-+		return err;
+-	iscsi_login_set_conn_values(NULL, conn, pdu->cid);
+-	return 0;
++	return iscsi_login_set_conn_values(NULL, conn, pdu->cid);
+ }
  
- 	if (skb->len < 1)
- 		return -EILSEQ;
+ /*
+@@ -554,9 +561,8 @@ static int iscsi_login_non_zero_tsih_s2(
+ 		atomic_set(&sess->session_continuation, 1);
+ 	spin_unlock_bh(&sess->conn_lock);
+ 
+-	iscsi_login_set_conn_values(sess, conn, pdu->cid);
+-
+-	if (iscsi_copy_param_list(&conn->param_list,
++	if (iscsi_login_set_conn_values(sess, conn, pdu->cid) < 0 ||
++	    iscsi_copy_param_list(&conn->param_list,
+ 			conn->tpg->param_list, 0) < 0) {
+ 		iscsit_tx_login_rsp(conn, ISCSI_STATUS_CLS_TARGET_ERR,
+ 				ISCSI_LOGIN_STATUS_NO_RESOURCES);
 -- 
 2.13.0
