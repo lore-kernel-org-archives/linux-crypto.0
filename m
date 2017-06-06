@@ -1,74 +1,35 @@
-From: Matthias Brugger <matthias.bgg@gmail.com>
-Subject: Re: [PATCH 1/4] dt-bindings: rng: add generic bindings for MediaTek
- SoCs
-Date: Tue, 6 Jun 2017 13:07:44 +0200
-Message-ID: <9eb87222-ca89-0abb-4532-3887008f6e7a@gmail.com>
-References: <cover.1496255334.git.sean.wang@mediatek.com>
- <1d9c981e1b45bf2f04732a02d90e6857cc203ce5.1496255334.git.sean.wang@mediatek.com>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [PATCH v3 02/13] random: add get_random_{bytes,u32,u64,int,long,once}_wait
+ family
+Date: Tue, 6 Jun 2017 14:21:53 +0200
+Message-ID: <CAHmME9pWe15nBc+AusJ9W-ujkbq+LjNiQq8mzT_fmqHCeCmNSQ@mail.gmail.com>
+References: <20170606005108.5646-1-Jason@zx2c4.com> <20170606005108.5646-3-Jason@zx2c4.com>
+ <CAH8yC8kq7OVBw_L32qD+OMgUhhh0K3huHpamO+4ABrE5i=fPkw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: devicetree@vger.kernel.org, keyhaede@gmail.com,
-        linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org,
-        linux-crypto@vger.kernel.org, weiyongjun1@huawei.com,
-        linux-arm-kernel@lists.infradead.org
-To: sean.wang@mediatek.com, herbert@gondor.apana.org.au,
-        mpm@selenic.com, robh+dt@kernel.org, mark.rutland@arm.com,
-        clabbe.montjoie@gmail.com, prasannatsmkumar@gmail.com,
-        romain.perier@free-electrons.com, shannon.nelson@oracle.com
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1d9c981e1b45bf2f04732a02d90e6857cc203ce5.1496255334.git.sean.wang@mediatek.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: "Theodore Ts'o" <tytso@mit.edu>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kernel-hardening@lists.openwall.com,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        David Miller <davem@davemloft.net>
+To: noloader@gmail.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from frisell.zx2c4.com ([192.95.5.64]:59377 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751345AbdFFMV4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 6 Jun 2017 08:21:56 -0400
+In-Reply-To: <CAH8yC8kq7OVBw_L32qD+OMgUhhh0K3huHpamO+4ABrE5i=fPkw@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
+On Tue, Jun 6, 2017 at 7:11 AM, Jeffrey Walton <noloader@gmail.com> wrote:
+> On Mon, Jun 5, 2017 at 8:50 PM, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+>> These functions are simple convenience wrappers that call
+>> wait_for_random_bytes before calling the respective get_random_*
+>> function.
+>
+> It may be advantageous to add a timeout, too.
 
-
-On 31/05/17 20:44, sean.wang@mediatek.com wrote:
-> From: Sean Wang <sean.wang@mediatek.com>
-> 
-> Add the generic binding for allowing the support of RNG on MediaTek SoCs
-> such as MT7622.
-> 
-> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
-> ---
->   Documentation/devicetree/bindings/rng/mtk-rng.txt | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/rng/mtk-rng.txt b/Documentation/devicetree/bindings/rng/mtk-rng.txt
-> index a6d62a2..0772913 100644
-> --- a/Documentation/devicetree/bindings/rng/mtk-rng.txt
-> +++ b/Documentation/devicetree/bindings/rng/mtk-rng.txt
-> @@ -2,7 +2,8 @@ Device-Tree bindings for Mediatek random number generator
->   found in Mediatek SoC family
->   
->   Required properties:
-> -- compatible	    : Should be "mediatek,mt7623-rng"
-> +- compatible	    : Should be "mediatek,generic-rng" or
-> +				"mediatek,mt7623-rng".
-
-What does generic-rng mean. Is it for all mt7xxx, or also for mt6xxx and 
-mt8xxx based SoCs? I think we should stick with SoC specific bindings, 
-as we don't know if Mediatek won't publish a new IP block next year 
-which is differnet.
-
-Just in case we should add a binding for the actual SoC + a fallback. 
-For example.
-- compatible " Should be
-	"mediatek,mt7622-rng", 	"mediatek,mt7623-rng" for SoC mt7622
-	"mediatek,mt7623-rng" for SoC mt7623
-
-This will also eliminate the need of adding mt6722-rng to the driver, as 
-it will use mt7623-rng as fallback. If in the future we realize that 
-mt7622-rng has a extra feature/bug, we can still work around it, without 
-breaking the bindings.
-
-Makes sense?
-
-Regards,
-Matthias
-
->   - clocks	    : list of clock specifiers, corresponding to
->   		      entries in clock-names property;
->   - clock-names	    : Should contain "rng" entries;
-> 
+This was in v1, but was removed because of a lack of particular use
+case in this context.
