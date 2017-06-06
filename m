@@ -1,46 +1,48 @@
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH v3 08/13] cifs: use get_random_u32 for 32-bit lock random
-Date: Tue,  6 Jun 2017 02:51:03 +0200
-Message-ID: <20170606005108.5646-9-Jason@zx2c4.com>
+Subject: [PATCH v3 10/13] net/neighbor: use get_random_u32 for 32-bit hash random
+Date: Tue,  6 Jun 2017 02:51:05 +0200
+Message-ID: <20170606005108.5646-11-Jason@zx2c4.com>
 References: <20170606005108.5646-1-Jason@zx2c4.com>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Steve French <sfrench@samba.org>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
 To: Theodore Ts'o <tytso@mit.edu>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>,
-	kernel-hardening@lists.openwall.com,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	David Miller <davem@davemloft.net>
-Return-path: <kernel-hardening-return-8324-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
-List-Post: <mailto:kernel-hardening@lists.openwall.com>
-List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
-List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
-List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kernel-hardening@lists.openwall.com,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        David Miller <davem@davemloft.net>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from frisell.zx2c4.com ([192.95.5.64]:49237 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751495AbdFFAwM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 5 Jun 2017 20:52:12 -0400
 In-Reply-To: <20170606005108.5646-1-Jason@zx2c4.com>
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 Using get_random_u32 here is faster, more fitting of the use case, and
 just as cryptographically secure. It also has the benefit of providing
-better randomness at early boot, which is sometimes when this is used.
+better randomness at early boot, which is when many of these structures
+are assigned.
 
 Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-Cc: Steve French <sfrench@samba.org>
+Cc: David Miller <davem@davemloft.net>
 ---
- fs/cifs/cifsfs.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/core/neighbour.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 9a1667e0e8d6..fe0c8dcc7dc7 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -1359,7 +1359,7 @@ init_cifs(void)
- 	spin_lock_init(&cifs_tcp_ses_lock);
- 	spin_lock_init(&GlobalMid_Lock);
+diff --git a/net/core/neighbour.c b/net/core/neighbour.c
+index d274f81fcc2c..9784133b0cdb 100644
+--- a/net/core/neighbour.c
++++ b/net/core/neighbour.c
+@@ -312,8 +312,7 @@ static struct neighbour *neigh_alloc(struct neigh_table *tbl, struct net_device
  
--	get_random_bytes(&cifs_lock_secret, sizeof(cifs_lock_secret));
-+	cifs_lock_secret = get_random_u32();
+ static void neigh_get_hash_rnd(u32 *x)
+ {
+-	get_random_bytes(x, sizeof(*x));
+-	*x |= 1;
++	*x = get_random_u32() | 1;
+ }
  
- 	if (cifs_max_pending < 2) {
- 		cifs_max_pending = 2;
+ static struct neigh_hash_table *neigh_hash_alloc(unsigned int shift)
 -- 
 2.13.0
