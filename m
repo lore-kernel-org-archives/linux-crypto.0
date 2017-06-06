@@ -1,33 +1,74 @@
-From: David Howells <dhowells@redhat.com>
-Subject: Re: [PATCH v3 05/13] security/keys: ensure RNG is seeded before use
-Date: Tue, 06 Jun 2017 11:08:49 +0100
-Message-ID: <26642.1496743729@warthog.procyon.org.uk>
-References: <20170606005108.5646-6-Jason@zx2c4.com> <20170606005108.5646-1-Jason@zx2c4.com>
+From: Matthias Brugger <matthias.bgg@gmail.com>
+Subject: Re: [PATCH 1/4] dt-bindings: rng: add generic bindings for MediaTek
+ SoCs
+Date: Tue, 6 Jun 2017 13:07:44 +0200
+Message-ID: <9eb87222-ca89-0abb-4532-3887008f6e7a@gmail.com>
+References: <cover.1496255334.git.sean.wang@mediatek.com>
+ <1d9c981e1b45bf2f04732a02d90e6857cc203ce5.1496255334.git.sean.wang@mediatek.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Cc: dhowells@redhat.com, Theodore Ts'o <tytso@mit.edu>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kernel-hardening@lists.openwall.com,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        David Miller <davem@davemloft.net>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        David Safford <safford@us.ibm.com>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:60824 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751274AbdFFKI6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Jun 2017 06:08:58 -0400
-In-Reply-To: <20170606005108.5646-6-Jason@zx2c4.com>
-Content-ID: <26641.1496743729.1@warthog.procyon.org.uk>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: devicetree@vger.kernel.org, keyhaede@gmail.com,
+        linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org,
+        linux-crypto@vger.kernel.org, weiyongjun1@huawei.com,
+        linux-arm-kernel@lists.infradead.org
+To: sean.wang@mediatek.com, herbert@gondor.apana.org.au,
+        mpm@selenic.com, robh+dt@kernel.org, mark.rutland@arm.com,
+        clabbe.montjoie@gmail.com, prasannatsmkumar@gmail.com,
+        romain.perier@free-electrons.com, shannon.nelson@oracle.com
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1d9c981e1b45bf2f04732a02d90e6857cc203ce5.1496255334.git.sean.wang@mediatek.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Jason A. Donenfeld <Jason@zx2c4.com> wrote:
 
-> +		key->serial = get_random_u32() >> 1;
 
-If this may sleep, it must be interruptible.
+On 31/05/17 20:44, sean.wang@mediatek.com wrote:
+> From: Sean Wang <sean.wang@mediatek.com>
+> 
+> Add the generic binding for allowing the support of RNG on MediaTek SoCs
+> such as MT7622.
+> 
+> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+> ---
+>   Documentation/devicetree/bindings/rng/mtk-rng.txt | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/rng/mtk-rng.txt b/Documentation/devicetree/bindings/rng/mtk-rng.txt
+> index a6d62a2..0772913 100644
+> --- a/Documentation/devicetree/bindings/rng/mtk-rng.txt
+> +++ b/Documentation/devicetree/bindings/rng/mtk-rng.txt
+> @@ -2,7 +2,8 @@ Device-Tree bindings for Mediatek random number generator
+>   found in Mediatek SoC family
+>   
+>   Required properties:
+> -- compatible	    : Should be "mediatek,mt7623-rng"
+> +- compatible	    : Should be "mediatek,generic-rng" or
+> +				"mediatek,mt7623-rng".
 
-David
+What does generic-rng mean. Is it for all mt7xxx, or also for mt6xxx and 
+mt8xxx based SoCs? I think we should stick with SoC specific bindings, 
+as we don't know if Mediatek won't publish a new IP block next year 
+which is differnet.
+
+Just in case we should add a binding for the actual SoC + a fallback. 
+For example.
+- compatible " Should be
+	"mediatek,mt7622-rng", 	"mediatek,mt7623-rng" for SoC mt7622
+	"mediatek,mt7623-rng" for SoC mt7623
+
+This will also eliminate the need of adding mt6722-rng to the driver, as 
+it will use mt7623-rng as fallback. If in the future we realize that 
+mt7622-rng has a extra feature/bug, we can still work around it, without 
+breaking the bindings.
+
+Makes sense?
+
+Regards,
+Matthias
+
+>   - clocks	    : list of clock specifiers, corresponding to
+>   		      entries in clock-names property;
+>   - clock-names	    : Should contain "rng" entries;
+> 
