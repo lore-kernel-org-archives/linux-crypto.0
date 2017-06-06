@@ -1,35 +1,48 @@
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH RFC v2 0/8] get_random_bytes_wait family of APIs
-Date: Tue, 6 Jun 2017 09:45:52 +0200
-Message-ID: <20170606074552.GA10432@kroah.com>
-References: <20170605034757.4803-1-Jason@zx2c4.com>
- <CAHmME9oXmZD2X8hSicVgAZRbaoBNUwRK-16Ekz2JAkNcZE+_dg@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Theodore Ts'o <tytso@mit.edu>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kernel-hardening@lists.openwall.com
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CAHmME9oXmZD2X8hSicVgAZRbaoBNUwRK-16Ekz2JAkNcZE+_dg@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: [BUGFIX PATCH] staging: ccree: fix buffer copy
+Date: Tue,  6 Jun 2017 11:00:45 +0300
+Message-ID: <1496736045-29945-1-git-send-email-gilad@benyossef.com>
+Cc: Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        linux-kernel@vger.kernel.org
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from foss.arm.com ([217.140.101.70]:41814 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750881AbdFFIBD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 6 Jun 2017 04:01:03 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jun 06, 2017 at 01:47:25AM +0200, Jason A. Donenfeld wrote:
-> As this RFC series matures, all the changes are in this branch here, to look at:
-> 
-> https://git.zx2c4.com/linux-dev/log/?h=jd/rng-blocker
-> 
-> Ted -- there's one, in particular, that should probably be picked up
-> regardless of the rest, and that's "random: invalidate batched entropy
-> after crng init". Hopefully though, we can develop that in relation
-> with the rest and make this a proper series.
+Fix a bug where the copying of scatterlist buffers incorrectly
+ignored bytes to skip in a scatterlist and ended 1 byte short.
 
-If it's needed no matter what, can you make it the first patch in the
-series?  And does it need to go to any older kernels as well?
+This fixes testmgr hmac and hash test failures currently obscured
+by hash import/export not being supported.
 
-thanks,
+Fixes: abefd6741d ("staging: ccree: introduce CryptoCell HW driver").
 
-greg k-h
+Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+---
+
+Please roll this patch into 4.12-rc5 if possible.
+
+ drivers/staging/ccree/ssi_buffer_mgr.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/staging/ccree/ssi_buffer_mgr.c b/drivers/staging/ccree/ssi_buffer_mgr.c
+index 038e2ff..6471d3d 100644
+--- a/drivers/staging/ccree/ssi_buffer_mgr.c
++++ b/drivers/staging/ccree/ssi_buffer_mgr.c
+@@ -216,7 +216,8 @@ void ssi_buffer_mgr_copy_scatterlist_portion(
+ 	uint32_t nents, lbytes;
+ 
+ 	nents = ssi_buffer_mgr_get_sgl_nents(sg, end, &lbytes, NULL);
+-	sg_copy_buffer(sg, nents, (void *)dest, (end - to_skip), 0, (direct == SSI_SG_TO_BUF));
++	sg_copy_buffer(sg, nents, (void *)dest, (end - to_skip + 1), to_skip,
++		       (direct == SSI_SG_TO_BUF));
+ }
+ 
+ static inline int ssi_buffer_mgr_render_buff_to_mlli(
+-- 
+2.1.4
