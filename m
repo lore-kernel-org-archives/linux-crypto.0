@@ -1,52 +1,51 @@
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH v3 07/13] ceph: ensure RNG is seeded before using
-Date: Tue,  6 Jun 2017 02:51:02 +0200
-Message-ID: <20170606005108.5646-8-Jason@zx2c4.com>
+Subject: [PATCH v3 11/13] net/route: use get_random_int for random counter
+Date: Tue,  6 Jun 2017 02:51:06 +0200
+Message-ID: <20170606005108.5646-12-Jason@zx2c4.com>
 References: <20170606005108.5646-1-Jason@zx2c4.com>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        "Yan, Zheng" <zyan@redhat.com>, Sage Weil <sage@redhat.com>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
 To: Theodore Ts'o <tytso@mit.edu>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
         kernel-hardening@lists.openwall.com,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         David Miller <davem@davemloft.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from frisell.zx2c4.com ([192.95.5.64]:52481 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751448AbdFFAwH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 5 Jun 2017 20:52:07 -0400
 In-Reply-To: <20170606005108.5646-1-Jason@zx2c4.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Ceph uses the RNG for various nonce generations, and it shouldn't accept
-using bad randomness. So, we wait for the RNG to be properly seeded. We
-do this by calling wait_for_random_bytes() in a function that is
-certainly called in process context, early on, so that all subsequent
-calls to get_random_bytes are necessarily acceptable.
+Using get_random_int here is faster, more fitting of the use case, and
+just as cryptographically secure. It also has the benefit of providing
+better randomness at early boot, which is when many of these structures
+are assigned.
+
+Also, semantically, it's not really proper to have been assigning an
+atomic_t in this way before, even if in practice it works fine.
 
 Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-Cc: Ilya Dryomov <idryomov@gmail.com>
-Cc: "Yan, Zheng" <zyan@redhat.com>
-Cc: Sage Weil <sage@redhat.com>
+Cc: David Miller <davem@davemloft.net>
 ---
- net/ceph/ceph_common.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ net/ipv4/route.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/net/ceph/ceph_common.c b/net/ceph/ceph_common.c
-index 4fd02831beed..26ab58665f77 100644
---- a/net/ceph/ceph_common.c
-+++ b/net/ceph/ceph_common.c
-@@ -611,7 +611,11 @@ struct ceph_client *ceph_create_client(struct ceph_options *opt, void *private)
+diff --git a/net/ipv4/route.c b/net/ipv4/route.c
+index 655d9eebe43e..11e001a42094 100644
+--- a/net/ipv4/route.c
++++ b/net/ipv4/route.c
+@@ -2936,8 +2936,7 @@ static __net_init int rt_genid_init(struct net *net)
  {
- 	struct ceph_client *client;
- 	struct ceph_entity_addr *myaddr = NULL;
--	int err = -ENOMEM;
-+	int err;
-+
-+	err = wait_for_random_bytes();
-+	if (err < 0)
-+		return ERR_PTR(err);
+ 	atomic_set(&net->ipv4.rt_genid, 0);
+ 	atomic_set(&net->fnhe_genid, 0);
+-	get_random_bytes(&net->ipv4.dev_addr_genid,
+-			 sizeof(net->ipv4.dev_addr_genid));
++	atomic_set(&net->ipv4.dev_addr_genid, get_random_int());
+ 	return 0;
+ }
  
- 	client = kzalloc(sizeof(*client), GFP_KERNEL);
- 	if (client == NULL)
 -- 
 2.13.0
