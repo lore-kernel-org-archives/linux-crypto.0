@@ -1,76 +1,45 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [kernel-hardening] Re: [PATCH v3 04/13] crypto/rng: ensure that
- the RNG is ready before using
-Date: Tue, 6 Jun 2017 14:34:43 +0200
-Message-ID: <CAHmME9q0N3KgWU4XMDmzNjd0EF_HWROBquwXMYXxfssx_VoghA@mail.gmail.com>
-References: <20170606005108.5646-1-Jason@zx2c4.com> <20170606005108.5646-5-Jason@zx2c4.com>
- <20170606030004.4go6btmobrsmqiwz@thunk.org> <CAHmME9qZUEMDjQGNOBC7PrCTcanOxohVHcED+Xyg_3jR64Q7VQ@mail.gmail.com>
- <20170606044404.GA3469@zzz>
+From: srishti sharma <srishtishar@gmail.com>
+Subject: Re: [PATCH 1/4] Staging: ccree: cc_crypto_ctx.h: Added * on
+ subsequent lines of a comment block.
+Date: Tue, 6 Jun 2017 19:10:48 +0530
+Message-ID: <CAB3L5oxeQjSAJwsS1d9FuZtf_P6noosAFSfkK016PY118WgwPg@mail.gmail.com>
+References: <cover.1496531673.git.srishtishar@gmail.com> <e1974f1fece258f422e8f90ca820170a2b982933.1496531673.git.srishtishar@gmail.com>
+ <20170604081957.GA28749@kroah.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: "Theodore Ts'o" <tytso@mit.edu>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kernel-hardening@lists.openwall.com,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        David Miller <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Stephan Mueller <smueller@chronox.de>
-To: Eric Biggers <ebiggers3@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170606044404.GA3469@zzz>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: devel@driverdev.osuosl.org, driverdev-devel@linuxdriverproject.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Greg KH <gregkh@linuxfoundation.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-qt0-f177.google.com ([209.85.216.177]:35163 "EHLO
+        mail-qt0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751345AbdFFNkt (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 6 Jun 2017 09:40:49 -0400
+In-Reply-To: <20170604081957.GA28749@kroah.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Eric,
+On Sun, Jun 4, 2017 at 1:49 PM, Greg KH <gregkh@linuxfoundation.org> wrote:
+> On Sun, Jun 04, 2017 at 05:02:08AM +0530, srishti sharma wrote:
+>> Added * on subsequent lines of a comment block.
+>>
+>> Signed-off-by: srishti sharma <srishtishar@gmail.com>
+>> ---
+>>  drivers/staging/ccree/cc_crypto_ctx.h | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> This whole series also does not apply.  Note, this driver is under
+> active development, you are probably running into the problem that lots
+> of people are working on it at the same time.
+>
+> sorry,
+>
+> greg k-h
 
-On Tue, Jun 6, 2017 at 6:44 AM, Eric Biggers <ebiggers3@gmail.com> wrote:
-> I don't think big_key even needs randomness at init time.  The 'big_key_rng'
-> could just be removed and big_key_gen_enckey() changed to call
-> get_random_bytes().  (Or get_random_bytes_wait(), I guess; it's only reachable
-> via the keyring syscalls.)
 
-That sounds good to me. I'll go ahead and make these changes, and will
-add you to the Cc for the patch. You'll find the latest version in
-here:
-https://git.zx2c4.com/linux-dev/log/?h=jd/rng-blocker
 
-> It's going to take a while to go through all 217 users of get_random_bytes()
-> like this, though...  It's really a shame there's no way to guarantee good
-> randomness at boot time.
+Okay , Thanks a lot !
 
-Yes, I agree whole-heartedly.  A lot of people have proposals for
-fixing the direct idea of entropy gathering, but for whatever reason,
-Ted hasn't merged stuff. I think Stephan (CCd) rewrote big critical
-sections of the RNG, called LRNG, and published a big paper for peer
-review and did a lot of cool engineering, but for some reason this
-hasn't been integrated. I look forward to movement on this front in
-the future, if it ever happens. Would be great.
-
-However, in lieu of that, I agree that playing whack a mole with all
-call sites is mega arduous and error prone. In my original message to
-Ted about this, I proposed instead a more global approach of
-introducing an rng_init() to complement things like late_init() and
-device_init() and such. The idea here would be two-fold:
-
-- Modules that are built in would only be loaded as a callback to the
-initialization of the RNG. An API for that already exists.
-- Modules that are external would simply block userspace in
-request_module until the RNG is initialized. This patch series adds
-that kind of API.
-
-If I understood correctly, Ted was worried that this might introduce
-some headaches with module load ordering. However, IMHO, dealing with
-the very few use cases of ordering issues is going to be far less
-arduous than playing whack-a-mole with every call site. But, given the
-fact that we still do need a blocking API (this patch series), I
-decided to go with implementing this first, and then second attacking
-the more difficult issue of adding rng_init().
-
-So hopefully a combination of this patch series and the next one will
-amount to something workable.
-
-Long term, though, I think we need Stephan's work, in one form or
-another, to be merged.
-
-Jason
+Regards,
+Srishti
