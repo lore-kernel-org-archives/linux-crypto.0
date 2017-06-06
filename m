@@ -1,46 +1,47 @@
-From: Corentin Labbe <clabbe.montjoie@gmail.com>
-Subject: Re: [PATCH v2 2/2] crypto: engine - Permit to enqueue skcipher
- request
-Date: Tue, 6 Jun 2017 16:24:22 +0200
-Message-ID: <20170606142422.GA24141@Red>
-References: <20170606134417.18850-1-clabbe.montjoie@gmail.com>
- <20170606134417.18850-3-clabbe.montjoie@gmail.com>
- <1595132.gd3LNaoxir@tauon.chronox.de>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [kernel-hardening] Re: [PATCH v3 04/13] crypto/rng: ensure that
+ the RNG is ready before using
+Date: Tue, 6 Jun 2017 17:23:04 +0200
+Message-ID: <CAHmME9rTpe4FM2+VSxZB48JDPCNTpSWzHx2DW1om7DW_1PvttQ@mail.gmail.com>
+References: <20170606005108.5646-1-Jason@zx2c4.com> <20170606005108.5646-5-Jason@zx2c4.com>
+ <20170606030004.4go6btmobrsmqiwz@thunk.org> <CAHmME9qZUEMDjQGNOBC7PrCTcanOxohVHcED+Xyg_3jR64Q7VQ@mail.gmail.com>
+ <20170606044404.GA3469@zzz> <CAHmME9q0N3KgWU4XMDmzNjd0EF_HWROBquwXMYXxfssx_VoghA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Content-Type: text/plain; charset="UTF-8"
+Cc: "Theodore Ts'o" <tytso@mit.edu>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kernel-hardening@lists.openwall.com,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        David Miller <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Stephan Mueller <smueller@chronox.de>
+To: Eric Biggers <ebiggers3@gmail.com>,
+        David Howells <dhowells@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f42.google.com ([74.125.82.42]:37762 "EHLO
-        mail-wm0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751418AbdFFOY2 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Jun 2017 10:24:28 -0400
-Content-Disposition: inline
-In-Reply-To: <1595132.gd3LNaoxir@tauon.chronox.de>
+Received: from frisell.zx2c4.com ([192.95.5.64]:36875 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751390AbdFFPXJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 6 Jun 2017 11:23:09 -0400
+In-Reply-To: <CAHmME9q0N3KgWU4XMDmzNjd0EF_HWROBquwXMYXxfssx_VoghA@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jun 06, 2017 at 04:07:25PM +0200, Stephan Müller wrote:
-> Am Dienstag, 6. Juni 2017, 15:44:17 CEST schrieb Corentin Labbe:
-> 
-> Hi Corentin,
-> 
-> > The crypto engine could actually only enqueue hash and ablkcipher request.
-> > This patch permit it to enqueue skcipher requets by adding all necessary
-> > functions.
-> > The only problem is that ablkcipher and skcipher id are the same, so
-> > only one cipher type is usable on the same crypto engine.
-> 
-> Why do you think this is needed? I thought that skcipher is the successor to 
-> ablkcipher AND blkcipher. I.e. ablkcipher and blkcipher should be phased out. 
-> Thus, I would infer that any ablkcipher support should or could be dropped.
-> 
+Hey again Eric,
 
-There are two user of it, crypto/omap and crypto/virtio.
-And for crypto/omap, I have no way of testing any convertion to skcipher (no hardware).
+One thing led to another and I wound up just rewriting all the crypto
+in big_keys.c. I'll include this for v4:
 
-Regards
-Corentin Labbe
+https://git.zx2c4.com/linux-dev/commit/?h=jd/rng-blocker&id=886ff283b9808aecb14aa8e397da8496a9635aed
+
+Not only was the use of crypto/rng inappropriate, but the decision to
+go with aes-ecb is shocking. Seeing that this author had no other
+commits in the tree, and that all subsequent commits that mentioned
+his name were cleaning up his mess, I just went ahead and removed both
+the crypto/rng misusage and changed from aes-ecb to aes-gcm.
+
+Anyway, I'll wait for some more reviews on v3, and then this can be
+reviewed for v4.
+
+Regards,
+Jason
