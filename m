@@ -1,166 +1,119 @@
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH v3 06/13] iscsi: ensure RNG is seeded before use
-Date: Tue,  6 Jun 2017 02:51:01 +0200
-Message-ID: <20170606005108.5646-7-Jason@zx2c4.com>
+Subject: [PATCH v3 13/13] random: warn when kernel uses unseeded randomness
+Date: Tue,  6 Jun 2017 02:51:08 +0200
+Message-ID: <20170606005108.5646-14-Jason@zx2c4.com>
 References: <20170606005108.5646-1-Jason@zx2c4.com>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	"Nicholas A. Bellinger" <nab@linux-iscsi.org>,
-	Lee Duncan <lduncan@suse.com>,
-	Chris Leech <cleech@redhat.com>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
 To: Theodore Ts'o <tytso@mit.edu>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>,
-	kernel-hardening@lists.openwall.com,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	David Miller <davem@davemloft.net>
-Return-path: <kernel-hardening-return-8322-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
-List-Post: <mailto:kernel-hardening@lists.openwall.com>
-List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
-List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
-List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kernel-hardening@lists.openwall.com,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        David Miller <davem@davemloft.net>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from frisell.zx2c4.com ([192.95.5.64]:49237 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751507AbdFFAwN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 5 Jun 2017 20:52:13 -0400
 In-Reply-To: <20170606005108.5646-1-Jason@zx2c4.com>
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-It's not safe to use weak random data here, especially for the challenge
-response randomness. Since we're always in process context, it's safe to
-simply wait until we have enough randomness to carry out the
-authentication correctly.
+This enables an important dmesg notification about when drivers have
+used the crng without it being seeded first. Prior, these errors would
+occur silently, and so there hasn't been a great way of diagnosing these
+types of bugs for obscure setups. By adding this as a config option, we
+can leave it on by default, so that we learn where these issues happen,
+in the field, will still allowing some people to turn it off, if they
+really know what they're doing and do not want the log entries.
 
-While we're at it, we clean up a small memleak during an error
-condition.
+However, we don't leave it _completely_ by default. An earlier version
+of this patch simply had `default y`. I'd really love that, but it turns
+out, this problem with unseeded randomness being used is really quite
+present and is going to take a long time to fix. Thus, as a compromise
+between log-messages-for-all and nobody-knows, this is `default y`,
+except it is also `depends on DEBUG_KERNEL`. This will ensure that the
+curious see the messages while others don't have to.
 
 Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-Cc: "Nicholas A. Bellinger" <nab@linux-iscsi.org>
-Cc: Lee Duncan <lduncan@suse.com>
-Cc: Chris Leech <cleech@redhat.com>
 ---
- drivers/target/iscsi/iscsi_target_auth.c  | 14 +++++++++++---
- drivers/target/iscsi/iscsi_target_login.c | 22 ++++++++++++++--------
- 2 files changed, 25 insertions(+), 11 deletions(-)
+ drivers/char/random.c | 15 +++++++++++++--
+ lib/Kconfig.debug     | 16 ++++++++++++++++
+ 2 files changed, 29 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/target/iscsi/iscsi_target_auth.c b/drivers/target/iscsi/iscsi_target_auth.c
-index 903b667f8e01..f9bc8ec6fb6b 100644
---- a/drivers/target/iscsi/iscsi_target_auth.c
-+++ b/drivers/target/iscsi/iscsi_target_auth.c
-@@ -47,18 +47,21 @@ static void chap_binaryhex_to_asciihex(char *dst, char *src, int src_len)
- 	}
- }
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index c328e9b11f1f..d4698c8bc35f 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -285,7 +285,6 @@
+ #define SEC_XFER_SIZE		512
+ #define EXTRACT_SIZE		10
  
--static void chap_gen_challenge(
-+static int chap_gen_challenge(
- 	struct iscsi_conn *conn,
- 	int caller,
- 	char *c_str,
- 	unsigned int *c_len)
+-#define DEBUG_RANDOM_BOOT 0
+ 
+ #define LONGS(x) (((x) + sizeof(unsigned long) - 1)/sizeof(unsigned long))
+ 
+@@ -1474,7 +1473,7 @@ void get_random_bytes(void *buf, int nbytes)
  {
-+	int ret;
- 	unsigned char challenge_asciihex[CHAP_CHALLENGE_LENGTH * 2 + 1];
- 	struct iscsi_chap *chap = conn->auth_protocol;
+ 	__u8 tmp[CHACHA20_BLOCK_SIZE];
  
- 	memset(challenge_asciihex, 0, CHAP_CHALLENGE_LENGTH * 2 + 1);
+-#if DEBUG_RANDOM_BOOT > 0
++#ifdef CONFIG_WARN_UNSEEDED_RANDOM
+ 	if (!crng_ready())
+ 		printk(KERN_NOTICE "random: %pF get_random_bytes called "
+ 		       "with crng_init = %d\n", (void *) _RET_IP_, crng_init);
+@@ -2068,6 +2067,12 @@ u64 get_random_u64(void)
+ 	    return ret;
+ #endif
  
--	get_random_bytes(chap->challenge, CHAP_CHALLENGE_LENGTH);
-+	ret = get_random_bytes_wait(chap->challenge, CHAP_CHALLENGE_LENGTH);
-+	if (unlikely(ret))
-+		return ret;
- 	chap_binaryhex_to_asciihex(challenge_asciihex, chap->challenge,
- 				CHAP_CHALLENGE_LENGTH);
- 	/*
-@@ -69,6 +72,7 @@ static void chap_gen_challenge(
++#ifdef CONFIG_WARN_UNSEEDED_RANDOM
++	if (!crng_ready())
++		printk(KERN_NOTICE "random: %pF get_random_u64 called "
++		       "with crng_init = %d\n", (void *) _RET_IP_, crng_init);
++#endif
++
+ 	batch = &get_cpu_var(batched_entropy_u64);
+ 	if (use_lock)
+ 		read_lock_irqsave(&batched_entropy_reset_lock, flags);
+@@ -2094,6 +2099,12 @@ u32 get_random_u32(void)
+ 	if (arch_get_random_int(&ret))
+ 		return ret;
  
- 	pr_debug("[%s] Sending CHAP_C=0x%s\n\n", (caller) ? "server" : "client",
- 			challenge_asciihex);
-+	return 0;
- }
++#ifdef CONFIG_WARN_UNSEEDED_RANDOM
++	if (!crng_ready())
++		printk(KERN_NOTICE "random: %pF get_random_u32 called "
++		       "with crng_init = %d\n", (void *) _RET_IP_, crng_init);
++#endif
++
+ 	batch = &get_cpu_var(batched_entropy_u32);
+ 	if (use_lock)
+ 		read_lock_irqsave(&batched_entropy_reset_lock, flags);
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index e4587ebe52c7..c4159605bfbf 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -1209,6 +1209,22 @@ config STACKTRACE
+ 	  It is also used by various kernel debugging features that require
+ 	  stack trace generation.
  
- static int chap_check_algorithm(const char *a_str)
-@@ -143,6 +147,7 @@ static struct iscsi_chap *chap_server_open(
- 	case CHAP_DIGEST_UNKNOWN:
- 	default:
- 		pr_err("Unsupported CHAP_A value\n");
-+		kfree(conn->auth_protocol);
- 		return NULL;
- 	}
- 
-@@ -156,7 +161,10 @@ static struct iscsi_chap *chap_server_open(
- 	/*
- 	 * Generate Challenge.
- 	 */
--	chap_gen_challenge(conn, 1, aic_str, aic_len);
-+	if (chap_gen_challenge(conn, 1, aic_str, aic_len) < 0) {
-+		kfree(conn->auth_protocol);
-+		return NULL;
-+	}
- 
- 	return chap;
- }
-diff --git a/drivers/target/iscsi/iscsi_target_login.c b/drivers/target/iscsi/iscsi_target_login.c
-index 66238477137b..5ef028c11738 100644
---- a/drivers/target/iscsi/iscsi_target_login.c
-+++ b/drivers/target/iscsi/iscsi_target_login.c
-@@ -245,22 +245,26 @@ int iscsi_check_for_session_reinstatement(struct iscsi_conn *conn)
- 	return 0;
- }
- 
--static void iscsi_login_set_conn_values(
-+static int iscsi_login_set_conn_values(
- 	struct iscsi_session *sess,
- 	struct iscsi_conn *conn,
- 	__be16 cid)
- {
-+	int ret;
- 	conn->sess		= sess;
- 	conn->cid		= be16_to_cpu(cid);
- 	/*
- 	 * Generate a random Status sequence number (statsn) for the new
- 	 * iSCSI connection.
- 	 */
--	get_random_bytes(&conn->stat_sn, sizeof(u32));
-+	ret = get_random_bytes_wait(&conn->stat_sn, sizeof(u32));
-+	if (unlikely(ret))
-+		return ret;
- 
- 	mutex_lock(&auth_id_lock);
- 	conn->auth_id		= iscsit_global->auth_id++;
- 	mutex_unlock(&auth_id_lock);
-+	return 0;
- }
- 
- __printf(2, 3) int iscsi_change_param_sprintf(
-@@ -306,7 +310,11 @@ static int iscsi_login_zero_tsih_s1(
- 		return -ENOMEM;
- 	}
- 
--	iscsi_login_set_conn_values(sess, conn, pdu->cid);
-+	ret = iscsi_login_set_conn_values(sess, conn, pdu->cid);
-+	if (unlikely(ret)) {
-+		kfree(sess);
-+		return ret;
-+	}
- 	sess->init_task_tag	= pdu->itt;
- 	memcpy(&sess->isid, pdu->isid, 6);
- 	sess->exp_cmd_sn	= be32_to_cpu(pdu->cmdsn);
-@@ -497,8 +505,7 @@ static int iscsi_login_non_zero_tsih_s1(
- {
- 	struct iscsi_login_req *pdu = (struct iscsi_login_req *)buf;
- 
--	iscsi_login_set_conn_values(NULL, conn, pdu->cid);
--	return 0;
-+	return iscsi_login_set_conn_values(NULL, conn, pdu->cid);
- }
- 
- /*
-@@ -554,9 +561,8 @@ static int iscsi_login_non_zero_tsih_s2(
- 		atomic_set(&sess->session_continuation, 1);
- 	spin_unlock_bh(&sess->conn_lock);
- 
--	iscsi_login_set_conn_values(sess, conn, pdu->cid);
--
--	if (iscsi_copy_param_list(&conn->param_list,
-+	if (iscsi_login_set_conn_values(sess, conn, pdu->cid) < 0 ||
-+	    iscsi_copy_param_list(&conn->param_list,
- 			conn->tpg->param_list, 0) < 0) {
- 		iscsit_tx_login_rsp(conn, ISCSI_STATUS_CLS_TARGET_ERR,
- 				ISCSI_LOGIN_STATUS_NO_RESOURCES);
++config WARN_UNSEEDED_RANDOM
++	bool "Warn when kernel uses unseeded randomness"
++	default y
++	depends on DEBUG_KERNEL
++	help
++	  Some parts of the kernel contain bugs relating to their use of
++	  cryptographically secure random numbers before it's actually possible
++	  to generate those numbers securely. This setting ensures that these
++	  flaws don't go unnoticed, by enabling a message, should this ever
++	  occur. This will allow people with obscure setups to know when things
++	  are going wrong, so that they might contact developers about fixing
++	  it.
++
++	  Say Y here, unless you simply do not care about using unseeded
++	  randomness and do not want a potential warning message in your logs.
++
+ config DEBUG_KOBJECT
+ 	bool "kobject debugging"
+ 	depends on DEBUG_KERNEL
 -- 
 2.13.0
