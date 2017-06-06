@@ -1,47 +1,117 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [kernel-hardening] Re: [PATCH v3 04/13] crypto/rng: ensure that
- the RNG is ready before using
-Date: Tue, 6 Jun 2017 17:23:04 +0200
-Message-ID: <CAHmME9rTpe4FM2+VSxZB48JDPCNTpSWzHx2DW1om7DW_1PvttQ@mail.gmail.com>
-References: <20170606005108.5646-1-Jason@zx2c4.com> <20170606005108.5646-5-Jason@zx2c4.com>
- <20170606030004.4go6btmobrsmqiwz@thunk.org> <CAHmME9qZUEMDjQGNOBC7PrCTcanOxohVHcED+Xyg_3jR64Q7VQ@mail.gmail.com>
- <20170606044404.GA3469@zzz> <CAHmME9q0N3KgWU4XMDmzNjd0EF_HWROBquwXMYXxfssx_VoghA@mail.gmail.com>
+From: Dave Watson <davejwatson@fb.com>
+Subject: [PATCH v2 net-next 0/4] kernel TLS
+Date: Tue, 6 Jun 2017 09:59:50 -0700
+Message-ID: <20170606165950.GA19036@davejwatson-mba.local>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: "Theodore Ts'o" <tytso@mit.edu>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kernel-hardening@lists.openwall.com,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        David Miller <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Stephan Mueller <smueller@chronox.de>
-To: Eric Biggers <ebiggers3@gmail.com>,
-        David Howells <dhowells@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+        <nmav@gnutls.org>, <fridolin.pokorny@gmail.com>
+To: Ilya Lesokhin <ilyal@mellanox.com>,
+        Aviad Yehezkel <aviadye@mellanox.com>,
+        Boris Pismenny <borisp@mellanox.com>,
+        Liran Liss <liranl@mellanox.com>,
+        Matan Barak <matanb@mellanox.com>,
+        David Miller <davem@davemloft.net>, <netdev@vger.kernel.org>,
+        Tom Herbert <tom@herbertland.com>,
+        <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>,
+        Hannes Frederic Sowa <hannes@stressinduktion.org>,
+        Eric Dumazet <eric.dumazet@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from frisell.zx2c4.com ([192.95.5.64]:36875 "EHLO frisell.zx2c4.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751390AbdFFPXJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Jun 2017 11:23:09 -0400
-In-Reply-To: <CAHmME9q0N3KgWU4XMDmzNjd0EF_HWROBquwXMYXxfssx_VoghA@mail.gmail.com>
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:46777 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1751404AbdFFRAV (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 6 Jun 2017 13:00:21 -0400
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hey again Eric,
+This series adds support for kernel TLS encryption over TCP sockets.
+A standard TCP socket is converted to a TLS socket using a setsockopt.
+Only symmetric crypto is done in the kernel, as well as TLS record
+framing.  The handshake remains in userspace, and the negotiated
+cipher keys/iv are provided to the TCP socket.
 
-One thing led to another and I wound up just rewriting all the crypto
-in big_keys.c. I'll include this for v4:
+We implemented support for this API in OpenSSL 1.1.0, the code is
+available at https://github.com/Mellanox/tls-openssl/tree/master
 
-https://git.zx2c4.com/linux-dev/commit/?h=jd/rng-blocker&id=886ff283b9808aecb14aa8e397da8496a9635aed
+It should work with any TLS library with similar modifications,
+a test tool using gnutls is here: https://github.com/Mellanox/tls-af_ktls_tool
 
-Not only was the use of crypto/rng inappropriate, but the decision to
-go with aes-ecb is shocking. Seeing that this author had no other
-commits in the tree, and that all subsequent commits that mentioned
-his name were cleaning up his mess, I just went ahead and removed both
-the crypto/rng misusage and changed from aes-ecb to aes-gcm.
+Changes from V1:
 
-Anyway, I'll wait for some more reviews on v3, and then this can be
-reviewed for v4.
+* EXPORT_SYMBOL GPL in patch 2
+* Add link to OpenSSL patch & gnutls example in documentation patch.
+* sk_write_pending check was rolled in to wait_for_memory path,
+  avoids special case and fixes lock inbalance issue.
+* Unify flag handling for sendmsg/sendfile
 
-Regards,
-Jason
+Changes from RFC V2:
+
+* Generic ULP (upper layer protocol) framework instead of TLS specific
+  setsockopts
+* Dropped Mellanox hardware patches, will come as separate series.
+  Framework will work for both.
+
+RFC V2:
+
+http://www.mail-archive.com/netdev@vger.kernel.org/msg160317.html
+
+Changes from RFC V1:
+
+* Socket based on changing TCP proto_ops instead of crypto framework
+* Merged code with Mellanox's hardware tls offload
+* Zerocopy sendmsg support added - sendpage/sendfile is no longer
+  necessary for zerocopy optimization
+
+RFC V1:
+
+http://www.mail-archive.com/netdev@vger.kernel.org/msg88021.html
+
+* Socket based on crypto userspace API framework, required two
+  sockets in userspace, one encrypted, one unencrypted.
+
+Paper: https://netdevconf.org/1.2/papers/ktls.pdf
+
+Aviad Yehezkel (1):
+  tcp: export do_tcp_sendpages and tcp_rate_check_app_limited functions
+
+Boris Pismenny (2):
+  tcp: ULP infrastructure
+  tls: Documentation
+
+Ilya Lesokhin (1):
+  tls: kernel TLS support
+
+ Documentation/networking/tls.txt   | 135 +++++++
+ MAINTAINERS                        |  10 +
+ include/linux/socket.h             |   1 +
+ include/net/inet_connection_sock.h |   4 +
+ include/net/tcp.h                  |  27 ++
+ include/net/tls.h                  | 222 +++++++++++
+ include/uapi/linux/tcp.h           |   1 +
+ include/uapi/linux/tls.h           |  79 ++++
+ net/Kconfig                        |   1 +
+ net/Makefile                       |   1 +
+ net/ipv4/Makefile                  |   2 +-
+ net/ipv4/sysctl_net_ipv4.c         |  25 ++
+ net/ipv4/tcp.c                     |  33 +-
+ net/ipv4/tcp_ipv4.c                |   2 +
+ net/ipv4/tcp_rate.c                |   1 +
+ net/ipv4/tcp_ulp.c                 | 134 +++++++
+ net/tls/Kconfig                    |  12 +
+ net/tls/Makefile                   |   7 +
+ net/tls/tls_main.c                 | 485 ++++++++++++++++++++++
+ net/tls/tls_sw.c                   | 794 +++++++++++++++++++++++++++++++++++++
+ 20 files changed, 1973 insertions(+), 3 deletions(-)
+ create mode 100644 Documentation/networking/tls.txt
+ create mode 100644 include/net/tls.h
+ create mode 100644 include/uapi/linux/tls.h
+ create mode 100644 net/ipv4/tcp_ulp.c
+ create mode 100644 net/tls/Kconfig
+ create mode 100644 net/tls/Makefile
+ create mode 100644 net/tls/tls_main.c
+ create mode 100644 net/tls/tls_sw.c
+
+-- 
+2.9.3
