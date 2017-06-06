@@ -1,48 +1,33 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [BUGFIX PATCH] staging: ccree: fix buffer copy
-Date: Tue,  6 Jun 2017 11:00:45 +0300
-Message-ID: <1496736045-29945-1-git-send-email-gilad@benyossef.com>
-Cc: Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
-        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
-        linux-kernel@vger.kernel.org
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+From: David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH v3 05/13] security/keys: ensure RNG is seeded before use
+Date: Tue, 06 Jun 2017 11:08:49 +0100
+Message-ID: <26642.1496743729@warthog.procyon.org.uk>
+References: <20170606005108.5646-6-Jason@zx2c4.com> <20170606005108.5646-1-Jason@zx2c4.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Cc: dhowells@redhat.com, Theodore Ts'o <tytso@mit.edu>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kernel-hardening@lists.openwall.com,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        David Miller <davem@davemloft.net>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        David Safford <safford@us.ibm.com>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:41814 "EHLO foss.arm.com"
+Received: from mx1.redhat.com ([209.132.183.28]:60824 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750881AbdFFIBD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Jun 2017 04:01:03 -0400
+        id S1751274AbdFFKI6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 6 Jun 2017 06:08:58 -0400
+In-Reply-To: <20170606005108.5646-6-Jason@zx2c4.com>
+Content-ID: <26641.1496743729.1@warthog.procyon.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Fix a bug where the copying of scatterlist buffers incorrectly
-ignored bytes to skip in a scatterlist and ended 1 byte short.
+Jason A. Donenfeld <Jason@zx2c4.com> wrote:
 
-This fixes testmgr hmac and hash test failures currently obscured
-by hash import/export not being supported.
+> +		key->serial = get_random_u32() >> 1;
 
-Fixes: abefd6741d ("staging: ccree: introduce CryptoCell HW driver").
+If this may sleep, it must be interruptible.
 
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
----
-
-Please roll this patch into 4.12-rc5 if possible.
-
- drivers/staging/ccree/ssi_buffer_mgr.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/staging/ccree/ssi_buffer_mgr.c b/drivers/staging/ccree/ssi_buffer_mgr.c
-index 038e2ff..6471d3d 100644
---- a/drivers/staging/ccree/ssi_buffer_mgr.c
-+++ b/drivers/staging/ccree/ssi_buffer_mgr.c
-@@ -216,7 +216,8 @@ void ssi_buffer_mgr_copy_scatterlist_portion(
- 	uint32_t nents, lbytes;
- 
- 	nents = ssi_buffer_mgr_get_sgl_nents(sg, end, &lbytes, NULL);
--	sg_copy_buffer(sg, nents, (void *)dest, (end - to_skip), 0, (direct == SSI_SG_TO_BUF));
-+	sg_copy_buffer(sg, nents, (void *)dest, (end - to_skip + 1), to_skip,
-+		       (direct == SSI_SG_TO_BUF));
- }
- 
- static inline int ssi_buffer_mgr_render_buff_to_mlli(
--- 
-2.1.4
+David
