@@ -1,10 +1,12 @@
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH v5 05/13] crypto/rng: ensure that the RNG is ready before using
-Date: Thu,  8 Jun 2017 01:25:59 +0200
-Message-ID: <20170607232607.26870-6-Jason@zx2c4.com>
+Subject: [PATCH v5 07/13] ceph: ensure RNG is seeded before using
+Date: Thu,  8 Jun 2017 01:26:01 +0200
+Message-ID: <20170607232607.26870-8-Jason@zx2c4.com>
 References: <20170607232607.26870-1-Jason@zx2c4.com>
 Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
+	Ilya Dryomov <idryomov@gmail.com>,
+	"Yan, Zheng" <zyan@redhat.com>,
+	Sage Weil <sage@redhat.com>
 To: Theodore Ts'o <tytso@mit.edu>,
 	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
 	LKML <linux-kernel@vger.kernel.org>,
@@ -13,7 +15,7 @@ To: Theodore Ts'o <tytso@mit.edu>,
 	Eric Biggers <ebiggers3@gmail.com>,
 	Linus Torvalds <torvalds@linux-foundation.org>,
 	David Miller <davem@davemloft.net>
-Return-path: <kernel-hardening-return-8428-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
+Return-path: <kernel-hardening-return-8430-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
 List-Post: <mailto:kernel-hardening@lists.openwall.com>
 List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
 List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
@@ -21,37 +23,36 @@ List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
 In-Reply-To: <20170607232607.26870-1-Jason@zx2c4.com>
 List-Id: linux-crypto.vger.kernel.org
 
-Otherwise, we might be seeding the RNG using bad randomness, which is
-dangerous. The one use of this function from within the kernel -- not
-from userspace -- is being removed (keys/big_key), so that call site
-isn't relevant in assessing this.
+Ceph uses the RNG for various nonce generations, and it shouldn't accept
+using bad randomness. So, we wait for the RNG to be properly seeded. We
+do this by calling wait_for_random_bytes() in a function that is
+certainly called in process context, early on, so that all subsequent
+calls to get_random_bytes are necessarily acceptable.
 
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Cc: Ilya Dryomov <idryomov@gmail.com>
+Cc: "Yan, Zheng" <zyan@redhat.com>
+Cc: Sage Weil <sage@redhat.com>
 ---
- crypto/rng.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ net/ceph/ceph_common.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/crypto/rng.c b/crypto/rng.c
-index f46dac5288b9..e042437e64b4 100644
---- a/crypto/rng.c
-+++ b/crypto/rng.c
-@@ -48,12 +48,14 @@ int crypto_rng_reset(struct crypto_rng *tfm, const u8 *seed, unsigned int slen)
- 		if (!buf)
- 			return -ENOMEM;
+diff --git a/net/ceph/ceph_common.c b/net/ceph/ceph_common.c
+index 47e94b560ba0..0368a04995b3 100644
+--- a/net/ceph/ceph_common.c
++++ b/net/ceph/ceph_common.c
+@@ -598,7 +598,11 @@ struct ceph_client *ceph_create_client(struct ceph_options *opt, void *private)
+ {
+ 	struct ceph_client *client;
+ 	struct ceph_entity_addr *myaddr = NULL;
+-	int err = -ENOMEM;
++	int err;
++
++	err = wait_for_random_bytes();
++	if (err < 0)
++		return ERR_PTR(err);
  
--		get_random_bytes(buf, slen);
-+		err = get_random_bytes_wait(buf, slen);
-+		if (err)
-+			goto out;
- 		seed = buf;
- 	}
- 
- 	err = crypto_rng_alg(tfm)->seed(tfm, seed, slen);
--
-+out:
- 	kzfree(buf);
- 	return err;
- }
+ 	client = kzalloc(sizeof(*client), GFP_KERNEL);
+ 	if (client == NULL)
 -- 
 2.13.0
