@@ -1,59 +1,31 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH v3 03/13] random: invalidate batched entropy after crng init
-Date: Wed, 7 Jun 2017 20:16:05 +0200
-Message-ID: <CAHmME9qp5J6yhj+TYtZEhC-snqWB85gdYQ1=-eUysaYT8BkgwQ@mail.gmail.com>
-References: <20170606005108.5646-4-Jason@zx2c4.com> <201706080107.xhkKszte%fengguang.wu@intel.com>
+From: David Miller <davem@davemloft.net>
+Subject: Re: [PATCH v2 net-next 1/4] tcp: ULP infrastructure
+Date: Wed, 07 Jun 2017 14:48:03 -0400 (EDT)
+Message-ID: <20170607.144803.1105141240150759683.davem@davemloft.net>
+References: <cover.1496767702.git.davejwatson@fb.com>
+        <20170606170020.GA19182@davejwatson-mba.local>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: kbuild-all@01.org, "Theodore Ts'o" <tytso@mit.edu>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kernel-hardening@lists.openwall.com,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        David Miller <davem@davemloft.net>
-To: kbuild test robot <lkp@intel.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from frisell.zx2c4.com ([192.95.5.64]:53441 "EHLO frisell.zx2c4.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751717AbdFGSQJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Jun 2017 14:16:09 -0400
-In-Reply-To: <201706080107.xhkKszte%fengguang.wu@intel.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Cc: ilyal@mellanox.com, aviadye@mellanox.com, borisp@mellanox.com,
+        liranl@mellanox.com, matanb@mellanox.com, netdev@vger.kernel.org,
+        tom@herbertland.com, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, hannes@stressinduktion.org,
+        eric.dumazet@gmail.com, alexei.starovoitov@gmail.com,
+        nmav@gnutls.org, fridolin.pokorny@gmail.com
+To: davejwatson@fb.com
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <20170606170020.GA19182@davejwatson-mba.local>
+Sender: netdev-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Strange, not all compilers do this warning. Fixing with:
+From: Dave Watson <davejwatson@fb.com>
+Date: Tue, 6 Jun 2017 10:00:20 -0700
 
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 12758db..5252690 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -2061,8 +2061,8 @@ static DEFINE_PER_CPU(struct batched_entropy,
-batched_entropy_u64);
-u64 get_random_u64(void)
-{
-       u64 ret;
--       bool use_lock = crng_init < 2;
--       unsigned long flags;
-+       const bool use_lock = READ_ONCE(crng_init) < 2;
-+       unsigned long flags = 0;
-       struct batched_entropy *batch;
+> +EXPORT_SYMBOL(tcp_register_ulp);
 
-#if BITS_PER_LONG == 64
-@@ -2099,8 +2099,8 @@ static DEFINE_PER_CPU(struct batched_entropy,
-batched_entropy_u32);
-u32 get_random_u32(void)
-{
-       u32 ret;
--       bool use_lock = crng_init < 2;
--       unsigned long flags;
-+       const bool use_lock = READ_ONCE(crng_init) < 2;
-+       unsigned long flags = 0;
-       struct batched_entropy *batch;
+EXPORT_SYMBOL_GPL() please.
 
-       if (arch_get_random_int(&ret))
+> +EXPORT_SYMBOL(tcp_unregister_ulp);
 
-Const, because it's more correct. READ_ONCE to be certain that the
-compiler doesn't try to paste the expression into both uses. And
-finally flags=0 to shutup the compiler.
-
-If anybody has a better way of approaching this, feel free to chime in.
+Likewise.
