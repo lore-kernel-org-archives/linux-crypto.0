@@ -1,127 +1,107 @@
-From: Matthias Brugger <matthias.bgg@gmail.com>
-Subject: Re: [PATCH 1/4] dt-bindings: rng: add generic bindings for MediaTek
- SoCs
-Date: Wed, 7 Jun 2017 15:25:59 +0200
-Message-ID: <a8b797e9-db6f-7f92-2cee-72d456815310@gmail.com>
-References: <cover.1496255334.git.sean.wang@mediatek.com>
- <1d9c981e1b45bf2f04732a02d90e6857cc203ce5.1496255334.git.sean.wang@mediatek.com>
- <9eb87222-ca89-0abb-4532-3887008f6e7a@gmail.com>
- <1496841619.30833.5.camel@mtkswgap22>
+From: Che-Min Hsieh <cheminh@qti.qualcomm.com>
+Subject: Can someone check linux kernel 4.4, and 4.9 rfc4309 test vectors?
+Date: Wed, 7 Jun 2017 13:57:31 +0000
+Message-ID: <cd81c137faef49999fbd6da538132b03@NALASEXR01F.na.qualcomm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, mpm@selenic.com, robh+dt@kernel.org,
-        mark.rutland@arm.com, clabbe.montjoie@gmail.com,
-        prasannatsmkumar@gmail.com, romain.perier@free-electrons.com,
-        shannon.nelson@oracle.com, devicetree@vger.kernel.org,
-        keyhaede@gmail.com, linux-kernel@vger.kernel.org,
-        linux-mediatek@lists.infradead.org, linux-crypto@vger.kernel.org,
-        weiyongjun1@huawei.com, linux-arm-kernel@lists.infradead.org
-To: Sean Wang <sean.wang@mediatek.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Cc: Zhen Kong <zkong@quicinc.com>,
+        Dan Bronstein <dbronste@qti.qualcomm.com>
+To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:34828 "EHLO
-        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751535AbdFGN0H (ORCPT
+Received: from wolverine02.qualcomm.com ([199.106.114.251]:20798 "EHLO
+        wolverine02.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751203AbdFGN6U (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Jun 2017 09:26:07 -0400
-In-Reply-To: <1496841619.30833.5.camel@mtkswgap22>
+        Wed, 7 Jun 2017 09:58:20 -0400
 Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Rfc4309 test vectors in testmgr.h have gone through major changes from linu=
+x3  to linux4.
+In linux 4.4, linux4.9, there are vectors as such
+
+23194 static struct aead_testvec aes_ccm_rfc4309_enc_tv_template[] =3D {
+23195    { /* Generated using Crypto++ */
+23196                    .key       =3D zeroed_string,
+23197                    .klen      =3D 19,
+23198                    .iv           =3D zeroed_string,
+23199                    .input    =3D zeroed_string,
+23200                    .ilen       =3D 16,
+23201                    .assoc    =3D zeroed_string,
+23202                    .alen      =3D 16,
+23203                    .result   =3D "\x2E\x9A\xCA\x6B\xDA\x54\xFC\x6F"
+23204                                      "\x12\x50\xE8\xDE\x81\x3C\x63\x0=
+8"
+23205                                      "\x1A\x22\xBA\x75\xEE\xD4\xD5\xB=
+5"
+23206                                      "\x27\x50\x01\xAC\x03\x33\x39\xF=
+B",
+23207                    .rlen       =3D 32,
 
 
-On 07/06/17 15:20, Sean Wang wrote:
-> On Tue, 2017-06-06 at 13:07 +0200, Matthias Brugger wrote:
->>
->> On 31/05/17 20:44, sean.wang@mediatek.com wrote:
->>> From: Sean Wang <sean.wang@mediatek.com>
->>>
->>> Add the generic binding for allowing the support of RNG on MediaTek SoCs
->>> such as MT7622.
->>>
->>> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
->>> ---
->>>    Documentation/devicetree/bindings/rng/mtk-rng.txt | 3 ++-
->>>    1 file changed, 2 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/Documentation/devicetree/bindings/rng/mtk-rng.txt b/Documentation/devicetree/bindings/rng/mtk-rng.txt
->>> index a6d62a2..0772913 100644
->>> --- a/Documentation/devicetree/bindings/rng/mtk-rng.txt
->>> +++ b/Documentation/devicetree/bindings/rng/mtk-rng.txt
->>> @@ -2,7 +2,8 @@ Device-Tree bindings for Mediatek random number generator
->>>    found in Mediatek SoC family
->>>    
->>>    Required properties:
->>> -- compatible	    : Should be "mediatek,mt7623-rng"
->>> +- compatible	    : Should be "mediatek,generic-rng" or
->>> +				"mediatek,mt7623-rng".
->>
->> What does generic-rng mean. Is it for all mt7xxx, or also for mt6xxx and
->> mt8xxx based SoCs? I think we should stick with SoC specific bindings,
->> as we don't know if Mediatek won't publish a new IP block next year
->> which is differnet.
->>
-> 
-> Yes, what I mean is generic-rng can be applied to all
-> platform MediaTek provides.
-> 
-> 
->> Just in case we should add a binding for the actual SoC + a fallback.
->> For example.
->> - compatible " Should be
->> 	"mediatek,mt7622-rng", 	"mediatek,mt7623-rng" for SoC mt7622
->> 	"mediatek,mt7623-rng" for SoC mt7623
->>
->> This will also eliminate the need of adding mt6722-rng to the driver, as
->> it will use mt7623-rng as fallback. If in the future we realize that
->> mt7622-rng has a extra feature/bug, we can still work around it, without
->> breaking the bindings.
->>
-> 
-> I knew the fallback rules you said here because I saw them being used in
-> many drivers such as sysirq and uart driver, such kind of basic drivers.
-> 
-> These drivers are basic enough, various following chipsets almost fall
-> back into the oldest one. So the clues let me think the hardware
-> interface shouldn't have too much differences among them.
-> 
-> If there is string used like generic-uart or generic-sysirq, it can
-> stop we blindly add new string into the binding document when a new
-> platform is introduced.
-> 
-> And they easily allows users unfamiliar MediaTek platform (they didn't
-> know what the oldest MediaTek chipset is) pick up the right compatible
-> string to start bring up the new platform.
-> 
-> The specific one can be added after new feature required is added or
-> critical hardware bug is found. Otherwise the generic one can fit
-> all generic needs for those.
-> 
-> Those are only opinions, if you don't like it, I still can accept the
-> original way as you suggest :)
-> 
+I have a test program using open ssl API (-l crypto), and run on Ubuntu Lin=
+ux PC,   I  get the following  test result:
 
-I can see your reasoning, but the device tree maintainers prefer to have 
-the bindings updated for a new SoC. As I mentioned before, just imagine 
-next year Mediatek changes the IP block and from now on, it uses the new 
-device in all SoCs. In 5 years we would have a binding which states 
-'generic' although it is not compatible with any SoC of the last So
+2e 9a ca 6b da 54 fc 6f 12 50 e8 de 81 3c 63 08
+fb 64 91 b4 dd dc bf 5d fd 67 e3 a2 f8 7c 0e 6c
+              The first part of encrypted text is correct. But MAC is not t=
+he same.
 
-So please keep with the bindings as done up to now.
+My program is as the following:
 
-Best regards,
-Matthias
+void ccmTest()
+{
+    /* Initialization */
+    EVP_CIPHER_CTX ctx;
+    EVP_CIPHER_CTX *cryptCtx =3D &ctx;
+    EVP_CIPHER_CTX_init(cryptCtx);
+    int i;
 
-> 
->> Makes sense?
->>
->> Regards,
->> Matthias
->>
->>>    - clocks	    : list of clock specifiers, corresponding to
->>>    		      entries in clock-names property;
->>>    - clock-names	    : Should contain "rng" entries;
->>>
-> 
-> 
+   unsigned char P[16] =3D {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    int Psize =3D sizeof(P);
+    unsigned char K[16] =3D {0};
+    unsigned char N[11] =3D {0};
+    unsigned char A[16] =3D {0};
+    unsigned char CT[128];
+
+    int Nsize =3D 11;
+    int Tsize =3D 16;
+
+    // Initialize the context with the alg only
+    EVP_EncryptInit(cryptCtx, EVP_aes_128_ccm(), 0, 0);
+
+    // Set nonce and tag sizes
+    EVP_CIPHER_CTX_ctrl(cryptCtx, EVP_CTRL_CCM_SET_IVLEN, Nsize, 0);
+    EVP_CIPHER_CTX_ctrl(cryptCtx, EVP_CTRL_CCM_SET_TAG, Tsize, 0);
+
+    // Finally set the key and the nonce
+    EVP_EncryptInit(cryptCtx, 0, K, N);
+
+    // Tell the alg we will encrypt Psize bytes
+    int outl =3D 0;
+    EVP_EncryptUpdate(cryptCtx, 0, &outl, 0, sizeof(P));
+   // Add the AAD
+    EVP_EncryptUpdate(cryptCtx, 0, &outl, A, sizeof(A));
+   // Now we encrypt the data in P, placing the output in CT
+    EVP_EncryptUpdate(cryptCtx, CT, &outl, P, Psize);
+    EVP_EncryptFinal(cryptCtx, &CT[outl], &outl);
+    // Append the tag to the end of the encrypted output
+    EVP_CIPHER_CTX_ctrl(cryptCtx, EVP_CTRL_CCM_GET_TAG, Tsize, &CT[Psize]);
+    hexdump(CT, Tsize+Psize);
+}
+
+
+I run "insmod tcrypt.ko mode=3D45"  rfc4309 test with Qualcomm crypto hardw=
+are on Linux4.4. The test fails. The generated output is the same as my ope=
+nSSL test application in 1. =20
+
+My test application runs on Ubuntu with linux 3.10 rfc4309 test vector, and=
+ generated MAC as expected from test vectors.  Qualcomm crypto hardware run=
+s "insmod tcrypt.ko mode=3D45" successfully with linux 3.10.
+
+I am suspicious about the test vectors of 4.4. Can someone verify the Linux=
+ 4.4 rfc4309 test vectors with his/her openSSL application on PC?
+
+Chemin
