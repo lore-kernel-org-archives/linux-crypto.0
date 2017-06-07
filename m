@@ -1,12 +1,10 @@
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH v5 07/13] ceph: ensure RNG is seeded before using
-Date: Thu,  8 Jun 2017 01:26:01 +0200
-Message-ID: <20170607232607.26870-8-Jason@zx2c4.com>
+Subject: [PATCH v5 08/13] cifs: use get_random_u32 for 32-bit lock random
+Date: Thu,  8 Jun 2017 01:26:02 +0200
+Message-ID: <20170607232607.26870-9-Jason@zx2c4.com>
 References: <20170607232607.26870-1-Jason@zx2c4.com>
 Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Ilya Dryomov <idryomov@gmail.com>,
-	"Yan, Zheng" <zyan@redhat.com>,
-	Sage Weil <sage@redhat.com>
+	Steve French <sfrench@samba.org>
 To: Theodore Ts'o <tytso@mit.edu>,
 	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
 	LKML <linux-kernel@vger.kernel.org>,
@@ -15,7 +13,7 @@ To: Theodore Ts'o <tytso@mit.edu>,
 	Eric Biggers <ebiggers3@gmail.com>,
 	Linus Torvalds <torvalds@linux-foundation.org>,
 	David Miller <davem@davemloft.net>
-Return-path: <kernel-hardening-return-8430-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
+Return-path: <kernel-hardening-return-8435-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
 List-Post: <mailto:kernel-hardening@lists.openwall.com>
 List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
 List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
@@ -23,36 +21,28 @@ List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
 In-Reply-To: <20170607232607.26870-1-Jason@zx2c4.com>
 List-Id: linux-crypto.vger.kernel.org
 
-Ceph uses the RNG for various nonce generations, and it shouldn't accept
-using bad randomness. So, we wait for the RNG to be properly seeded. We
-do this by calling wait_for_random_bytes() in a function that is
-certainly called in process context, early on, so that all subsequent
-calls to get_random_bytes are necessarily acceptable.
+Using get_random_u32 here is faster, more fitting of the use case, and
+just as cryptographically secure. It also has the benefit of providing
+better randomness at early boot, which is sometimes when this is used.
 
 Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-Cc: Ilya Dryomov <idryomov@gmail.com>
-Cc: "Yan, Zheng" <zyan@redhat.com>
-Cc: Sage Weil <sage@redhat.com>
+Cc: Steve French <sfrench@samba.org>
 ---
- net/ceph/ceph_common.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ fs/cifs/cifsfs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/ceph/ceph_common.c b/net/ceph/ceph_common.c
-index 47e94b560ba0..0368a04995b3 100644
---- a/net/ceph/ceph_common.c
-+++ b/net/ceph/ceph_common.c
-@@ -598,7 +598,11 @@ struct ceph_client *ceph_create_client(struct ceph_options *opt, void *private)
- {
- 	struct ceph_client *client;
- 	struct ceph_entity_addr *myaddr = NULL;
--	int err = -ENOMEM;
-+	int err;
-+
-+	err = wait_for_random_bytes();
-+	if (err < 0)
-+		return ERR_PTR(err);
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 9a1667e0e8d6..fe0c8dcc7dc7 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -1359,7 +1359,7 @@ init_cifs(void)
+ 	spin_lock_init(&cifs_tcp_ses_lock);
+ 	spin_lock_init(&GlobalMid_Lock);
  
- 	client = kzalloc(sizeof(*client), GFP_KERNEL);
- 	if (client == NULL)
+-	get_random_bytes(&cifs_lock_secret, sizeof(cifs_lock_secret));
++	cifs_lock_secret = get_random_u32();
+ 
+ 	if (cifs_max_pending < 2) {
+ 		cifs_max_pending = 2;
 -- 
 2.13.0
