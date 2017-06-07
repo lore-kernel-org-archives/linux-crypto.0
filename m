@@ -1,49 +1,57 @@
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH v5 11/13] net/route: use get_random_int for random counter
-Date: Thu,  8 Jun 2017 01:26:05 +0200
-Message-ID: <20170607232607.26870-12-Jason@zx2c4.com>
+Subject: [PATCH v5 05/13] crypto/rng: ensure that the RNG is ready before using
+Date: Thu,  8 Jun 2017 01:25:59 +0200
+Message-ID: <20170607232607.26870-6-Jason@zx2c4.com>
 References: <20170607232607.26870-1-Jason@zx2c4.com>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
 To: Theodore Ts'o <tytso@mit.edu>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kernel-hardening@lists.openwall.com,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Eric Biggers <ebiggers3@gmail.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        David Miller <davem@davemloft.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>,
+	kernel-hardening@lists.openwall.com,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Eric Biggers <ebiggers3@gmail.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	David Miller <davem@davemloft.net>
+Return-path: <kernel-hardening-return-8428-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
+List-Post: <mailto:kernel-hardening@lists.openwall.com>
+List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
+List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
+List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
 In-Reply-To: <20170607232607.26870-1-Jason@zx2c4.com>
-Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Using get_random_int here is faster, more fitting of the use case, and
-just as cryptographically secure. It also has the benefit of providing
-better randomness at early boot, which is when many of these structures
-are assigned.
+Otherwise, we might be seeding the RNG using bad randomness, which is
+dangerous. The one use of this function from within the kernel -- not
+from userspace -- is being removed (keys/big_key), so that call site
+isn't relevant in assessing this.
 
-Also, semantically, it's not really proper to have been assigning an
-atomic_t in this way before, even if in practice it works fine.
-
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-Cc: David Miller <davem@davemloft.net>
 ---
- net/ipv4/route.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ crypto/rng.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/net/ipv4/route.c b/net/ipv4/route.c
-index 6883b3d4ba8f..32a3332ec9cf 100644
---- a/net/ipv4/route.c
-+++ b/net/ipv4/route.c
-@@ -2944,8 +2944,7 @@ static __net_init int rt_genid_init(struct net *net)
- {
- 	atomic_set(&net->ipv4.rt_genid, 0);
- 	atomic_set(&net->fnhe_genid, 0);
--	get_random_bytes(&net->ipv4.dev_addr_genid,
--			 sizeof(net->ipv4.dev_addr_genid));
-+	atomic_set(&net->ipv4.dev_addr_genid, get_random_int());
- 	return 0;
- }
+diff --git a/crypto/rng.c b/crypto/rng.c
+index f46dac5288b9..e042437e64b4 100644
+--- a/crypto/rng.c
++++ b/crypto/rng.c
+@@ -48,12 +48,14 @@ int crypto_rng_reset(struct crypto_rng *tfm, const u8 *seed, unsigned int slen)
+ 		if (!buf)
+ 			return -ENOMEM;
  
+-		get_random_bytes(buf, slen);
++		err = get_random_bytes_wait(buf, slen);
++		if (err)
++			goto out;
+ 		seed = buf;
+ 	}
+ 
+ 	err = crypto_rng_alg(tfm)->seed(tfm, seed, slen);
+-
++out:
+ 	kzfree(buf);
+ 	return err;
+ }
 -- 
 2.13.0
