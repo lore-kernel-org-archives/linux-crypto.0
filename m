@@ -1,39 +1,31 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [kernel-hardening] Re: [PATCH v3 04/13] crypto/rng: ensure that the RNG is ready before using
-Date: Wed, 07 Jun 2017 07:00:17 +0200
-Message-ID: <1691714.1h4IbvMDSf@tauon.chronox.de>
-References: <20170606005108.5646-1-Jason@zx2c4.com> <20170606170319.5eva2yoxxeru5p74@thunk.org> <20170606221910.GB9057@khazad-dum.debian.net>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [PATCH v4 00/13] Unseeded In-Kernel Randomness Fixes
+Date: Wed, 7 Jun 2017 14:33:14 +0200
+Message-ID: <CAHmME9ouOPUf9g4bR9zfsiTYfB1-D5jfBB5BOCHUeoPUwC-C1A@mail.gmail.com>
+References: <20170606174804.31124-1-Jason@zx2c4.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Theodore Ts'o <tytso@mit.edu>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Eric Biggers <ebiggers3@gmail.com>,
+Content-Type: text/plain; charset="UTF-8"
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
         kernel-hardening@lists.openwall.com,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         David Miller <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-To: Henrique de Moraes Holschuh <hmh@hmh.eng.br>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170606221910.GB9057@khazad-dum.debian.net>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+        Eric Biggers <ebiggers3@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from frisell.zx2c4.com ([192.95.5.64]:35339 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751432AbdFGMdT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 7 Jun 2017 08:33:19 -0400
+In-Reply-To: <20170606174804.31124-1-Jason@zx2c4.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Am Mittwoch, 7. Juni 2017, 00:19:10 CEST schrieb Henrique de Moraes Holschuh:
+Hi Ted,
 
-Hi Henrique,
+Could I get your Signed-off-by on this patchset, so that somebody can
+add it to their tree?
 
-> On that same idea, one could add an early_initramfs handler for entropy
-> data.
-
-Any data that comes from outside during the boot process, be it some NVRAM 
-location, the /var/lib...seed file for /dev/random or other approaches are 
-viewed by a number of folks to have zero bits of entropy.
-
-I.e. this data is nice for stirring the pool, but is not considered to help 
-our entropy problem.
-
-Ciao
-Stephan
+Thanks,
+Jason
