@@ -1,8 +1,8 @@
 From: Mark Rutland <mark.rutland@arm.com>
 Subject: Re: [kernel-hardening] Re: [PATCH v3 04/13] crypto/rng: ensure that
  the RNG is ready before using
-Date: Wed, 7 Jun 2017 18:26:28 +0100
-Message-ID: <20170607172627.GB8330@leverpostej>
+Date: Wed, 7 Jun 2017 18:37:50 +0100
+Message-ID: <20170607173749.GC8330@leverpostej>
 References: <20170606005108.5646-1-Jason@zx2c4.com>
  <20170606005108.5646-5-Jason@zx2c4.com>
  <20170606030004.4go6btmobrsmqiwz@thunk.org>
@@ -10,12 +10,9 @@ References: <20170606005108.5646-1-Jason@zx2c4.com>
  <20170606044404.GA3469@zzz>
  <CAHmME9q0N3KgWU4XMDmzNjd0EF_HWROBquwXMYXxfssx_VoghA@mail.gmail.com>
  <20170606170319.5eva2yoxxeru5p74@thunk.org>
- <20170606221910.GB9057@khazad-dum.debian.net>
- <1496854825.10825.24.camel@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Henrique de Moraes Holschuh <hmh@hmh.eng.br>,
-        Theodore Ts'o <tytso@mit.edu>,
+To: Theodore Ts'o <tytso@mit.edu>,
         "Jason A. Donenfeld" <Jason@zx2c4.com>,
         Eric Biggers <ebiggers3@gmail.com>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
@@ -24,39 +21,46 @@ Cc: Henrique de Moraes Holschuh <hmh@hmh.eng.br>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         David Miller <davem@davemloft.net>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Stephan Mueller <smueller@chronox.de>
-To: Daniel Micay <danielmicay@gmail.com>
+        Stephan Mueller <smueller@chronox.de>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:35958 "EHLO foss.arm.com"
+Received: from foss.arm.com ([217.140.101.70]:36092 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751397AbdFGR1N (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Jun 2017 13:27:13 -0400
+        id S1751768AbdFGRif (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 7 Jun 2017 13:38:35 -0400
 Content-Disposition: inline
-In-Reply-To: <1496854825.10825.24.camel@gmail.com>
+In-Reply-To: <20170606170319.5eva2yoxxeru5p74@thunk.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jun 07, 2017 at 01:00:25PM -0400, Daniel Micay wrote:
-> > On the better bootloaders, an initramfs segment can be loaded
-> > independently (and you can have as many as required), which makes an
-> > early_initramfs a more palatable vector to inject large amounts of
-> > entropy into the next boot than, say, modifying the kernel image
-> > directly at every boot/shutdown to stash entropy in there somewhere.
+On Tue, Jun 06, 2017 at 01:03:19PM -0400, Theodore Ts'o wrote:
+> The other approach is to find a way to have initialized "seed" entropy
+> which we can count on at every boot.  The problem is that this is very
+> much dependent on how the bootloader works.  It's easy to say "store
+> it in the kernel", but where the kernel is stored varies greatly from
+> architecture to architecture.  In some cases, the kernel can stored in
+> ROM, where it can't be modified at all.
+> 
+> It might be possible, for example, to store a cryptographic key in a
+> UEFI boot-services variable, where the key becomes inaccessible after
+> the boot-time services terminate.  But you also need either a reliable
+> time-of-day clock, or a reliable counter which is incremented each
+> time the system that boots, and which can't be messed with by an
+> attacker, or trivially reset by a clueless user/sysadmin.
 
-[...]
- 
-> I didn't really understand the device tree approach and mentioned a
-> few times before. Passing via the kernel cmdline is a lot simpler than
-> modifying the device tree in-memory and persistent modification isn't
-> an option unless verified boot is missing anyway.
+FWIW, EFI has an (optional) EFI_RNG_PROTOCOL, that we currently use to
+seed the kernel's entropy pool. The EFI stub creates a config table with
+the entropy, which the kernel reads.
 
-I might be missing something here, but the command line is inside of the
-device tree, at /chosen/bootargs, so modifying the kernel command line
-*is* modifying the device tree in-memory.
+This is re-seeded prior to kexec() to avoid the entropy being recycled.
 
-For arm64, we have a /chosen/kaslr-seed property that we hope
-FW/bootloaders fill in, and similar could be done for some initial
-entropy, provided appropriate HW/FW support.
+See commits:
+
+636259880a7e7d34 ("efi: Add support for seeding the RNG from a UEFI config table")
+568bc4e87033d232 (" efi/arm*/libstub: Invoke EFI_RNG_PROTOCOL to seed the UEFI RNG table")
+
+Unfortunately, I beleive that support for the protocol is currently rare
+in practice.
 
 Thanks,
 Mark.
