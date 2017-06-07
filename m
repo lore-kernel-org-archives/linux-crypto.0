@@ -1,11 +1,9 @@
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH v5 09/13] rhashtable: use get_random_u32 for hash_rnd
-Date: Thu,  8 Jun 2017 01:26:03 +0200
-Message-ID: <20170607232607.26870-10-Jason@zx2c4.com>
+Subject: [PATCH v5 10/13] net/neighbor: use get_random_u32 for 32-bit hash random
+Date: Thu,  8 Jun 2017 01:26:04 +0200
+Message-ID: <20170607232607.26870-11-Jason@zx2c4.com>
 References: <20170607232607.26870-1-Jason@zx2c4.com>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Thomas Graf <tgraf@suug.ch>,
-        Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
 To: Theodore Ts'o <tytso@mit.edu>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
@@ -15,37 +13,38 @@ To: Theodore Ts'o <tytso@mit.edu>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         David Miller <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from frisell.zx2c4.com ([192.95.5.64]:33481 "EHLO frisell.zx2c4.com"
+Received: from frisell.zx2c4.com ([192.95.5.64]:54805 "EHLO frisell.zx2c4.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753430AbdFGX0e (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Jun 2017 19:26:34 -0400
+        id S1753485AbdFGX0f (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 7 Jun 2017 19:26:35 -0400
 In-Reply-To: <20170607232607.26870-1-Jason@zx2c4.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This is much faster and just as secure. It also has the added benefit of
-probably returning better randomness at early-boot on systems with
-architectural RNGs.
+Using get_random_u32 here is faster, more fitting of the use case, and
+just as cryptographically secure. It also has the benefit of providing
+better randomness at early boot, which is when many of these structures
+are assigned.
 
 Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-Cc: Thomas Graf <tgraf@suug.ch>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: David Miller <davem@davemloft.net>
 ---
- lib/rhashtable.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/core/neighbour.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/lib/rhashtable.c b/lib/rhashtable.c
-index d9e7274a04cd..a1eb7c947f46 100644
---- a/lib/rhashtable.c
-+++ b/lib/rhashtable.c
-@@ -235,7 +235,7 @@ static struct bucket_table *bucket_table_alloc(struct rhashtable *ht,
+diff --git a/net/core/neighbour.c b/net/core/neighbour.c
+index d274f81fcc2c..9784133b0cdb 100644
+--- a/net/core/neighbour.c
++++ b/net/core/neighbour.c
+@@ -312,8 +312,7 @@ static struct neighbour *neigh_alloc(struct neigh_table *tbl, struct net_device
  
- 	INIT_LIST_HEAD(&tbl->walkers);
+ static void neigh_get_hash_rnd(u32 *x)
+ {
+-	get_random_bytes(x, sizeof(*x));
+-	*x |= 1;
++	*x = get_random_u32() | 1;
+ }
  
--	get_random_bytes(&tbl->hash_rnd, sizeof(tbl->hash_rnd));
-+	tbl->hash_rnd = get_random_u32();
- 
- 	for (i = 0; i < nbuckets; i++)
- 		INIT_RHT_NULLS_HEAD(tbl->buckets[i], ht, i);
+ static struct neigh_hash_table *neigh_hash_alloc(unsigned int shift)
 -- 
 2.13.0
