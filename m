@@ -1,31 +1,53 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: [PATCH v2 net-next 1/4] tcp: ULP infrastructure
-Date: Wed, 07 Jun 2017 14:48:03 -0400 (EDT)
-Message-ID: <20170607.144803.1105141240150759683.davem@davemloft.net>
-References: <cover.1496767702.git.davejwatson@fb.com>
-        <20170606170020.GA19182@davejwatson-mba.local>
+From: Theodore Ts'o <tytso@mit.edu>
+Subject: Re: [kernel-hardening] Re: [PATCH v3 04/13] crypto/rng: ensure that
+ the RNG is ready before using
+Date: Wed, 7 Jun 2017 17:27:37 -0400
+Message-ID: <20170607212737.t54x4a6ym4wqxzmw@thunk.org>
+References: <20170606005108.5646-1-Jason@zx2c4.com>
+ <20170606170319.5eva2yoxxeru5p74@thunk.org>
+ <20170606221910.GB9057@khazad-dum.debian.net>
+ <1691714.1h4IbvMDSf@tauon.chronox.de>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: ilyal@mellanox.com, aviadye@mellanox.com, borisp@mellanox.com,
-        liranl@mellanox.com, matanb@mellanox.com, netdev@vger.kernel.org,
-        tom@herbertland.com, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org, hannes@stressinduktion.org,
-        eric.dumazet@gmail.com, alexei.starovoitov@gmail.com,
-        nmav@gnutls.org, fridolin.pokorny@gmail.com
-To: davejwatson@fb.com
-Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <20170606170020.GA19182@davejwatson-mba.local>
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Cc: Henrique de Moraes Holschuh <hmh@hmh.eng.br>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Eric Biggers <ebiggers3@gmail.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kernel-hardening@lists.openwall.com,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        David Miller <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from imap.thunk.org ([74.207.234.97]:56370 "EHLO imap.thunk.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751072AbdFGV1x (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 7 Jun 2017 17:27:53 -0400
+Content-Disposition: inline
+In-Reply-To: <1691714.1h4IbvMDSf@tauon.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Dave Watson <davejwatson@fb.com>
-Date: Tue, 6 Jun 2017 10:00:20 -0700
+On Wed, Jun 07, 2017 at 07:00:17AM +0200, Stephan Müller wrote:
+> > On that same idea, one could add an early_initramfs handler for entropy
+> > data.
+> 
+> Any data that comes from outside during the boot process, be it some NVRAM 
+> location, the /var/lib...seed file for /dev/random or other approaches are 
+> viewed by a number of folks to have zero bits of entropy.
 
-> +EXPORT_SYMBOL(tcp_register_ulp);
+The Open BSD folks would disagree with you.  They've designed their
+whole system around saving entropy at shutdown, reading it as early as
+possible by the bootloader, and then as soon as possible after the
+reboot, to overwrite and reinitialize the entropy seed stored on disk
+so that on a reboot after a crash.  They consider this good enough to
+assume that their CRNG is *always* strongly initialized.
 
-EXPORT_SYMBOL_GPL() please.
+I'll let you have that discussion/argument with Theo de Raadt, though.
+Be warned that he has opinions about security that are almost
+certainly as strong (and held with the same level of certainty) as a
+certain Brad Spengler...
 
-> +EXPORT_SYMBOL(tcp_unregister_ulp);
-
-Likewise.
+						- Ted
