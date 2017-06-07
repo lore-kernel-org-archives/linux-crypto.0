@@ -1,53 +1,33 @@
-From: Theodore Ts'o <tytso@mit.edu>
-Subject: Re: [kernel-hardening] Re: [PATCH v3 04/13] crypto/rng: ensure that
- the RNG is ready before using
-Date: Wed, 7 Jun 2017 17:27:37 -0400
-Message-ID: <20170607212737.t54x4a6ym4wqxzmw@thunk.org>
-References: <20170606005108.5646-1-Jason@zx2c4.com>
- <20170606170319.5eva2yoxxeru5p74@thunk.org>
- <20170606221910.GB9057@khazad-dum.debian.net>
- <1691714.1h4IbvMDSf@tauon.chronox.de>
+From: Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH v1 2/2] dt-bindings: crypto: remove mediatek ethif clock
+Date: Wed, 7 Jun 2017 16:38:17 -0500
+Message-ID: <20170607213817.nr3n6vdrchspcc5i@rob-hp-laptop>
+References: <1496284222-12560-1-git-send-email-ryder.lee@mediatek.com>
+ <1496284222-12560-3-git-send-email-ryder.lee@mediatek.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Cc: Henrique de Moraes Holschuh <hmh@hmh.eng.br>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Eric Biggers <ebiggers3@gmail.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kernel-hardening@lists.openwall.com,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        David Miller <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from imap.thunk.org ([74.207.234.97]:56370 "EHLO imap.thunk.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751072AbdFGV1x (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Jun 2017 17:27:53 -0400
+Content-Type: text/plain; charset=us-ascii
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        devicetree@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-mediatek@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+To: Ryder Lee <ryder.lee@mediatek.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1691714.1h4IbvMDSf@tauon.chronox.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1496284222-12560-3-git-send-email-ryder.lee@mediatek.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Jun 07, 2017 at 07:00:17AM +0200, Stephan Müller wrote:
-> > On that same idea, one could add an early_initramfs handler for entropy
-> > data.
+On Thu, Jun 01, 2017 at 10:30:22AM +0800, Ryder Lee wrote:
+> This patch removes the parent clock 'ethif' in bindings, since we don't
+> need to control the parent of a clock in current clock framework.
 > 
-> Any data that comes from outside during the boot process, be it some NVRAM 
-> location, the /var/lib...seed file for /dev/random or other approaches are 
-> viewed by a number of folks to have zero bits of entropy.
+> Moreover, the clocks are get by name in the driver, thus this change
+> does not break backwards compatibility.
+> 
+> Signed-off-by: Ryder Lee <ryder.lee@mediatek.com>
+> Reviewed-by: Matthias Brugger <matthias.bgg@gmail.com>
+> ---
+>  Documentation/devicetree/bindings/crypto/mediatek-crypto.txt | 8 +++-----
+>  1 file changed, 3 insertions(+), 5 deletions(-)
 
-The Open BSD folks would disagree with you.  They've designed their
-whole system around saving entropy at shutdown, reading it as early as
-possible by the bootloader, and then as soon as possible after the
-reboot, to overwrite and reinitialize the entropy seed stored on disk
-so that on a reboot after a crash.  They consider this good enough to
-assume that their CRNG is *always* strongly initialized.
-
-I'll let you have that discussion/argument with Theo de Raadt, though.
-Be warned that he has opinions about security that are almost
-certainly as strong (and held with the same level of certainty) as a
-certain Brad Spengler...
-
-						- Ted
+Acked-by: Rob Herring <robh@kernel.org>
