@@ -1,27 +1,51 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH v4 13/13] random: warn when kernel uses unseeded randomness
-Date: Thu, 8 Jun 2017 14:01:51 +0200
-Message-ID: <CAHmME9rjhdsXiQgJh-qNz9ato3PYL8XHMwHO+GNmZCVpc2YNsw@mail.gmail.com>
-References: <20170606174804.31124-1-Jason@zx2c4.com> <20170606174804.31124-14-Jason@zx2c4.com>
- <20170608081919.zbtwdjl32vbvd7jt@thunk.org>
+From: Kevin Easton <kevin@guarana.org>
+Subject: Re: [PATCH v3 04/13] crypto/rng: ensure that the RNG is ready before
+ using
+Date: Thu, 8 Jun 2017 08:02:02 -0400
+Message-ID: <20170608120202.GA19250@la.guarana.org>
+References: <20170606005108.5646-1-Jason@zx2c4.com>
+ <20170606005108.5646-5-Jason@zx2c4.com>
+ <20170606030004.4go6btmobrsmqiwz@thunk.org>
+ <CAHmME9qZUEMDjQGNOBC7PrCTcanOxohVHcED+Xyg_3jR64Q7VQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+Content-Type: text/plain; charset=us-ascii
+Cc: Theodore Ts'o <tytso@mit.edu>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
         kernel-hardening@lists.openwall.com,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         David Miller <davem@davemloft.net>,
-        Eric Biggers <ebiggers3@gmail.com>
+        Herbert Xu <herbert@gondor.apana.org.au>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170608081919.zbtwdjl32vbvd7jt@thunk.org>
+Content-Disposition: inline
+In-Reply-To: <CAHmME9qZUEMDjQGNOBC7PrCTcanOxohVHcED+Xyg_3jR64Q7VQ@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jun 8, 2017 at 10:19 AM, Theodore Ts'o <tytso@mit.edu> wrote:
-> At the very least we probably should do a logical "uniq" on the output
-> (e.g., if we have complained about the previous callsite, don't whinge
-> about it again).
+On Tue, Jun 06, 2017 at 05:56:20AM +0200, Jason A. Donenfeld wrote:
+> Hey Ted,
+> 
+> On Tue, Jun 6, 2017 at 5:00 AM, Theodore Ts'o <tytso@mit.edu> wrote:
+> > Note that crypto_rng_reset() is called by big_key_init() in
+> > security/keys/big_key.c as a late_initcall().  So if we are on a
+> > system where the crng doesn't get initialized until during the system
+> > boot scripts, and big_key is compiled directly into the kernel, the
+> > boot could end up deadlocking.
+> >
+> > There may be other instances of where crypto_rng_reset() is called by
+> > an initcall, so big_key_init() may not be an exhaustive enumeration of
+> > potential problems.  But this is an example of why the synchronous
+> > API, although definitely much more convenient, can end up being a trap
+> > for the unwary....
+> 
+> Thanks for pointing this out. I'll look more closely into it and see
+> if I can figure out a good way of approaching this.
 
-That seems okay to me.
+Would it work for wait_for_random_bytes() to include a
+
+    WARN_ON(system_state < SYSTEM_RUNNING);
+
+to catch those kinds of cases?
+
+    - Kevin 
