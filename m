@@ -1,51 +1,33 @@
-From: Kevin Easton <kevin@guarana.org>
-Subject: Re: [PATCH v3 04/13] crypto/rng: ensure that the RNG is ready before
- using
-Date: Thu, 8 Jun 2017 08:02:02 -0400
-Message-ID: <20170608120202.GA19250@la.guarana.org>
-References: <20170606005108.5646-1-Jason@zx2c4.com>
- <20170606005108.5646-5-Jason@zx2c4.com>
- <20170606030004.4go6btmobrsmqiwz@thunk.org>
- <CAHmME9qZUEMDjQGNOBC7PrCTcanOxohVHcED+Xyg_3jR64Q7VQ@mail.gmail.com>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [PATCH v4 12/13] bluetooth/smp: ensure RNG is properly seeded
+ before ECDH use
+Date: Thu, 8 Jun 2017 14:03:28 +0200
+Message-ID: <CAHmME9oOPyw_GFGQykt+quxeHV3jNMUx1P+Us1NhNrMPvKUrNg@mail.gmail.com>
+References: <20170606174804.31124-1-Jason@zx2c4.com> <20170606174804.31124-13-Jason@zx2c4.com>
+ <20170608030631.ywmldxzehtumeqd3@thunk.org> <7B079482-B436-4FE7-A752-9518606F15AB@holtmann.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Theodore Ts'o <tytso@mit.edu>,
+Content-Type: text/plain; charset="UTF-8"
+Cc: "Theodore Ts'o" <tytso@mit.edu>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
         kernel-hardening@lists.openwall.com,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        David Miller <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Biggers <ebiggers3@gmail.com>,
+        "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CAHmME9qZUEMDjQGNOBC7PrCTcanOxohVHcED+Xyg_3jR64Q7VQ@mail.gmail.com>
+In-Reply-To: <7B079482-B436-4FE7-A752-9518606F15AB@holtmann.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Jun 06, 2017 at 05:56:20AM +0200, Jason A. Donenfeld wrote:
-> Hey Ted,
-> 
-> On Tue, Jun 6, 2017 at 5:00 AM, Theodore Ts'o <tytso@mit.edu> wrote:
-> > Note that crypto_rng_reset() is called by big_key_init() in
-> > security/keys/big_key.c as a late_initcall().  So if we are on a
-> > system where the crng doesn't get initialized until during the system
-> > boot scripts, and big_key is compiled directly into the kernel, the
-> > boot could end up deadlocking.
-> >
-> > There may be other instances of where crypto_rng_reset() is called by
-> > an initcall, so big_key_init() may not be an exhaustive enumeration of
-> > potential problems.  But this is an example of why the synchronous
-> > API, although definitely much more convenient, can end up being a trap
-> > for the unwary....
-> 
-> Thanks for pointing this out. I'll look more closely into it and see
-> if I can figure out a good way of approaching this.
+On Thu, Jun 8, 2017 at 7:04 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+>> Do we need to do all of this?  Bluetooth folks, is it fair to assume
+>> that hci_power_on() has to be called before any bluetooth functions
+>> can be done?  If so, adding a wait_for_random_bytes() in
+>> hci_power_on() might be all that is necessary.
 
-Would it work for wait_for_random_bytes() to include a
-
-    WARN_ON(system_state < SYSTEM_RUNNING);
-
-to catch those kinds of cases?
-
-    - Kevin 
+Maybe, but that could hassle bluetooth users who don't want to use any
+of the fancy bluetooth crypto and don't want to bother waiting for
+their RNG to initialize.
