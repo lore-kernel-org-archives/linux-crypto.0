@@ -1,8 +1,8 @@
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
 Subject: Re: [kernel-hardening] [PATCH v4 08/13] cifs: use get_random_u32 for
  32-bit lock random
-Date: Thu, 8 Jun 2017 02:31:23 +0200
-Message-ID: <CAHmME9prHVM+faDB61hQUSa9crSQqmLysWmTakf=9WcUyWwq4A@mail.gmail.com>
+Date: Thu, 8 Jun 2017 02:34:40 +0200
+Message-ID: <CAHmME9o+qn+yo1KRekNXNm1r1swSgQasKpqws2EGh6iv1LOagg@mail.gmail.com>
 References: <20170606174804.31124-1-Jason@zx2c4.com> <20170606174804.31124-9-Jason@zx2c4.com>
  <20170608002523.m3h3jin4poav5xy2@thunk.org>
 Mime-Version: 1.0
@@ -16,10 +16,14 @@ To: "Theodore Ts'o" <tytso@mit.edu>,
         David Miller <davem@davemloft.net>,
         Eric Biggers <ebiggers3@gmail.com>,
         Steve French <sfrench@samba.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from frisell.zx2c4.com ([192.95.5.64]:48143 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751382AbdFHAeo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 7 Jun 2017 20:34:44 -0400
 In-Reply-To: <20170608002523.m3h3jin4poav5xy2@thunk.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 On Thu, Jun 8, 2017 at 2:25 AM, Theodore Ts'o <tytso@mit.edu> wrote:
 > There's a bigger problem here, which is that cifs_lock_secret is a
