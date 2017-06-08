@@ -1,49 +1,54 @@
-From: Jeffrey Walton <noloader@gmail.com>
-Subject: Re: [PATCH v4 13/13] random: warn when kernel uses unseeded randomness
-Date: Thu, 8 Jun 2017 04:43:39 -0400
-Message-ID: <CAH8yC8mauXh5_a1qLn23d16SLNMJEfb4D3Ceee3PoADvZk1rbA@mail.gmail.com>
-References: <20170606174804.31124-1-Jason@zx2c4.com> <20170606174804.31124-14-Jason@zx2c4.com>
-Reply-To: noloader@gmail.com
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Fixes for 4.12
+Date: Thu, 8 Jun 2017 17:23:21 +0800
+Message-ID: <20170608092320.GA6478@gondor.apana.org.au>
+References: <20161119102748.GA4277@gondor.apana.org.au>
+ <20161215160732.GA16580@gondor.apana.org.au>
+ <20170111115646.GA8943@gondor.apana.org.au>
+ <20170304074119.GA3041@gondor.apana.org.au>
+ <20170523034211.GA12748@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: "Theodore Ts'o" <tytso@mit.edu>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kernel-hardening@lists.openwall.com,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        David Miller <davem@davemloft.net>,
-        Eric Biggers <ebiggers3@gmail.com>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170606174804.31124-14-Jason@zx2c4.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from [128.1.224.119] ([128.1.224.119]:38120 "EHLO deadmen.hmeau.com"
+        rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1750725AbdFHJXq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 8 Jun 2017 05:23:46 -0400
+Content-Disposition: inline
+In-Reply-To: <20170523034211.GA12748@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jun 6, 2017 at 1:48 PM, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> This enables an important dmesg notification about when drivers have
-> used the crng without it being seeded first. Prior, these errors would
-> occur silently, and so there hasn't been a great way of diagnosing these
-> types of bugs for obscure setups. By adding this as a config option, we
-> can leave it on by default, so that we learn where these issues happen,
-> in the field, will still allowing some people to turn it off, if they
-> really know what they're doing and do not want the log entries.
->
-> However, we don't leave it _completely_ by default. An earlier version
-> of this patch simply had `default y`. I'd really love that, but it turns
-> out, this problem with unseeded randomness being used is really quite
-> present and is going to take a long time to fix. Thus, as a compromise
-> between log-messages-for-all and nobody-knows, this is `default y`,
-> except it is also `depends on DEBUG_KERNEL`. This will ensure that the
-> curious see the messages while others don't have to.
+Hi Linus:
 
-Please forgive my ignorance... What do the last two sentence mean exactly?
+This push fixes a couple of places in the crypto code that were
+doing interruptible sleeps dangerously.  They have been converted
+to use non-interruptible sleeps.  This push also fixes a bug in
+asymmetric_keys where it would trigger a use-after-free if a
+request returned EBUSY due to a full device queue.
 
-If I am running a production Debian, Fedora or Ubuntu kernel, will a
-messages be present if a violation occurs? A "violation" is a policy
-violation, and I mean a generator is used before its operational.
 
-Sunlight is the best disinfectant. At least one message should be
-logged to ensure the issue is known. But its not clear to me if that's
-what happens when trying to parse the last two sentences.
+Please pull from
 
-Jeff
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+
+
+Gilad Ben-Yossef (3):
+      crypto: asymmetric_keys - handle EBUSY due to backlog correctly
+      crypto: drbg - wait for crypto op not signal safe
+      crypto: gcm - wait for crypto op not signal safe
+
+ crypto/asymmetric_keys/public_key.c |    2 +-
+ crypto/drbg.c                       |    5 ++---
+ crypto/gcm.c                        |    6 ++----
+ 3 files changed, 5 insertions(+), 8 deletions(-)
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
