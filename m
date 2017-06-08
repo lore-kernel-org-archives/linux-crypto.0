@@ -1,48 +1,94 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH v4 12/13] bluetooth/smp: ensure RNG is properly seeded
- before ECDH use
-Date: Thu, 8 Jun 2017 19:34:01 +0200
-Message-ID: <CAHmME9oKYuOR-5cWF94yv41hfXArWUWyGM3wRtY8NyQPY=5J=w@mail.gmail.com>
-References: <20170606174804.31124-1-Jason@zx2c4.com> <20170606174804.31124-13-Jason@zx2c4.com>
- <20170608030631.ywmldxzehtumeqd3@thunk.org> <7B079482-B436-4FE7-A752-9518606F15AB@holtmann.org>
- <CAHmME9rEcAZop80q47n1h3PP9hx5-X6R0w-SD2nDxZZLsJOQYw@mail.gmail.com> <707C1A6E-D79A-45BC-A868-A78289A327EC@holtmann.org>
+From: Megha Dey <megha.dey@intel.com>
+Subject: Re: [Patch V5 1/7] crypto: Multi-buffer encryption infrastructure
+ support
+Date: Thu, 08 Jun 2017 12:52:54 -0700
+Message-ID: <1496951574.8042.15.camel@megha-Z97X-UD7-TH>
+References: <1492721440-3698-1-git-send-email-megha.dey@linux.intel.com>
+         <1492721440-3698-2-git-send-email-megha.dey@linux.intel.com>
+         <20170424090024.GA20535@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Cc: "Theodore Ts'o" <tytso@mit.edu>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kernel-hardening@lists.openwall.com,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Biggers <ebiggers3@gmail.com>,
-        "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+Content-Transfer-Encoding: 7bit
+Cc: tim.c.chen@linux.intel.com, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from frisell.zx2c4.com ([192.95.5.64]:45853 "EHLO frisell.zx2c4.com"
+Received: from mga14.intel.com ([192.55.52.115]:6755 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751132AbdFHReE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Jun 2017 13:34:04 -0400
-In-Reply-To: <707C1A6E-D79A-45BC-A868-A78289A327EC@holtmann.org>
+        id S1751853AbdFHTmZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 8 Jun 2017 15:42:25 -0400
+In-Reply-To: <20170424090024.GA20535@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jun 8, 2017 at 7:05 PM, Marcel Holtmann <marcel@holtmann.org> wrote=
-:
-> on a powered down controller, you can not do any crypto. SMP is only duri=
-ng a connection and the RPAs are only generated when needed. So yes, doing =
-this once in hci_power_on is plenty. However we might want to limit this to=
- LE capable controllers since for BR/EDR only controllers this is not neede=
-d. For A2MP I need to check that we need the random numbers seeded there. H=
-owever this hidden behind the high speed feature.
+On Mon, 2017-04-24 at 17:00 +0800, Herbert Xu wrote:
+> On Thu, Apr 20, 2017 at 01:50:34PM -0700, Megha Dey wrote:
+> >
+> > +static int simd_skcipher_decrypt_mb(struct skcipher_request *req)
+> > +{
+> > +	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+> > +	struct simd_skcipher_ctx_mb *ctx = crypto_skcipher_ctx(tfm);
+> > +	struct skcipher_request *subreq;
+> > +	struct crypto_skcipher *child;
+> > +
+> > +	subreq = skcipher_request_ctx(req);
+> > +	*subreq = *req;
+> > +
+> > +	child = &ctx->mcryptd_tfm->base;
+> > +
+> > +	skcipher_request_set_tfm(subreq, child);
+> > +
+> > +	return crypto_skcipher_decrypt(subreq);
+> > +}
+> 
+> Why did you add the code here in simd.c? This doesn't seem to have
+> anything to do with kernel SIMD instructions.
+> 
+> From your later patch I see that what you want is simply a wrapper
+> around a synchronous internal algorithm.  That is indeed similar
+> in purpose to simd.c, but I still find it weird to be adding this
+> code here.
+> 
+> My suggestion is to instead move this code to mcryptd.c.  It's
+> a bit fiddly because mcryptd already exists as a template.  But
+> you should still be able to create a seaprate mcryptd interface
+> for skcipher in the way that simd does it.  In time we can convert
+> mcryptd hash to this model too.
+> 
+> Also you adopted the simd compat naming scheme.  Please don't do
+> that as you're creating something brand new so there is no need
+> to keep the existing compat (i.e., __XXX) naming scheme.  In the
+> new naming scheme, the internal algorithm should just carry the
+> normal alg name (e.g., ecb(aes)) and driver name, while the mcryptd
+> wrapped version will have the same algorithm name but carry a
+> prefix on the driver name (which is simd- for simd.c, but you
+> should probably used mcryptd-).
+> 
+> Cheers,
 
-Okay so it sounds like certain controllers will use this and certain
-won't, and so it might be slightly complicated to follow the mouse
-through the tube ideally. In that case, I'd recommend continuing with
-this current patchset, which just adds the wait (which is a no-op if
-it's already seeded) close to the actual call sites.
+I will move this code to the mcryptd.c.
 
-Can you review that patch and give your Signed-off-by if it looks good?
+About the naming scheme, could you give me an example where the internal
+and external algorithm have the same name? I tried searching but did not
+find any.
 
-Jason
+When the outer and inner algorithm have the same name, I see a crash
+when testing using tcrypt. This is because the wrong algortihm (with a
+higher priority) is being picked up in __crypto_alg_lookup.  
+
+Inner alg:
+Currently:
+alg name:__cbc(aes), driver name:__cbc-aes-aesni-mb
+
+expected:
+alg name:cbc(aes), driver name: cbc-aes-aesni-mb
+
+Outer alg:
+Currently:
+alg name:cbc(aes), driver name:cbc-aes-aesni-mb
+
+expected:
+alg name:cbc(aes), driver name:mcryptd-cbc-aes-aesni-mb
+
+Thanks,
+Megha
