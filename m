@@ -1,101 +1,154 @@
-From: Che-Min Hsieh <cheminh@qti.qualcomm.com>
-Subject: RE: Can someone check linux kernel 4.4, and 4.9 rfc4309 test vectors?
-Date: Fri, 9 Jun 2017 14:24:18 +0000
-Message-ID: <fe357958f42a4082bba6f3ff43b3e4a7@NALASEXR01F.na.qualcomm.com>
-References: <cd81c137faef49999fbd6da538132b03@NALASEXR01F.na.qualcomm.com>
- <CAFXBA=kX=MmdrMKPQEN=gjFqCgEovPet+o3em-xpQZqidxXbFg@mail.gmail.com>
+From: Raj Ammanur <rammanur@arista.com>
+Subject: Alg errors with Intel QAT Card
+Date: Fri, 9 Jun 2017 11:36:46 -0700
+Message-ID: <CAMFBXfmo5GmJS5kF+Pf2AvPaLOE20cz-NHUS9X53Lb7RspAOHw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Zhen Kong <zkong@quicinc.com>,
-        Dan Bronstein <dbronste@qti.qualcomm.com>
-To: Harsh Jain <harshjain.prof@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sabertooth01.qualcomm.com ([65.197.215.72]:49361 "EHLO
-        sabertooth01.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751712AbdFIOYZ (ORCPT
+Received: from mail-ua0-f178.google.com ([209.85.217.178]:33289 "EHLO
+        mail-ua0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751639AbdFISgr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Jun 2017 10:24:25 -0400
-In-Reply-To: <CAFXBA=kX=MmdrMKPQEN=gjFqCgEovPet+o3em-xpQZqidxXbFg@mail.gmail.com>
-Content-Language: en-US
+        Fri, 9 Jun 2017 14:36:47 -0400
+Received: by mail-ua0-f178.google.com with SMTP id 68so19456785uas.0
+        for <linux-crypto@vger.kernel.org>; Fri, 09 Jun 2017 11:36:47 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-VGhhbmtzLg0KWWVzLCBpbiB0aGUgbmV3IGtlcm5lbCwgdGhlIGFzc29jaWF0aW9uIGRhdGEgcGFz
-c2luZyBpbiB0byB0aGUgZHJpdmVyLCB0aGUgbGFzdCA4IGJ5dGVzIG9mIGRhdGEgc2hvdWxkIGJl
-IGV4Y2x1ZGVkIGluIHRoZSBkcml2ZXIuDQpUaGUgY29udmVyc2lvbiBmcm9tIHJmYzQzMDkgdGVz
-dCB2ZWN0b3JzIGRlZmluZWQgaW4gdGhlIHRlc3RtZ3IuaCBzaG91bGQgZHJvcCB0aGUgbGFzdCA4
-IGJ5dGVzIG9mIGRhdGEgYmVmb3JlIHBhc3NpbmcgdG8gdGhlIG9wZW5TU0wgQVBJIGFzIGFzc29j
-aWF0aW9uIGRhdGEuIA0KQWZ0ZXIgSSBkaWQgdGhhdCwgdGhpbmdzIG1hdGNoLg0KDQoNCi0tLS0t
-T3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBIYXJzaCBKYWluIFttYWlsdG86aGFyc2hqYWlu
-LnByb2ZAZ21haWwuY29tXSANClNlbnQ6IEZyaWRheSwgSnVuZSA5LCAyMDE3IDI6MzEgQU0NClRv
-OiBDaGUtTWluIEhzaWVoIDxjaGVtaW5oQHF0aS5xdWFsY29tbS5jb20+DQpDYzogbGludXgtY3J5
-cHRvQHZnZXIua2VybmVsLm9yZzsgWmhlbiBLb25nIDx6a29uZ0BxdWljaW5jLmNvbT47IERhbiBC
-cm9uc3RlaW4gPGRicm9uc3RlQHF0aS5xdWFsY29tbS5jb20+DQpTdWJqZWN0OiBSZTogQ2FuIHNv
-bWVvbmUgY2hlY2sgbGludXgga2VybmVsIDQuNCwgYW5kIDQuOSByZmM0MzA5IHRlc3QgdmVjdG9y
-cz8NCg0KT24gV2VkLCBKdW4gNywgMjAxNyBhdCA3OjI3IFBNLCBDaGUtTWluIEhzaWVoIDxjaGVt
-aW5oQHF0aS5xdWFsY29tbS5jb20+IHdyb3RlOg0KPiBSZmM0MzA5IHRlc3QgdmVjdG9ycyBpbiB0
-ZXN0bWdyLmggaGF2ZSBnb25lIHRocm91Z2ggbWFqb3IgY2hhbmdlcyBmcm9tIGxpbnV4MyAgdG8g
-bGludXg0Lg0KPiBJbiBsaW51eCA0LjQsIGxpbnV4NC45LCB0aGVyZSBhcmUgdmVjdG9ycyBhcyBz
-dWNoDQo+DQo+IDIzMTk0IHN0YXRpYyBzdHJ1Y3QgYWVhZF90ZXN0dmVjIGFlc19jY21fcmZjNDMw
-OV9lbmNfdHZfdGVtcGxhdGVbXSA9IHsNCj4gMjMxOTUgICAgeyAvKiBHZW5lcmF0ZWQgdXNpbmcg
-Q3J5cHRvKysgKi8NCj4gMjMxOTYgICAgICAgICAgICAgICAgICAgIC5rZXkgICAgICAgPSB6ZXJv
-ZWRfc3RyaW5nLA0KPiAyMzE5NyAgICAgICAgICAgICAgICAgICAgLmtsZW4gICAgICA9IDE5LA0K
-PiAyMzE5OCAgICAgICAgICAgICAgICAgICAgLml2ICAgICAgICAgICA9IHplcm9lZF9zdHJpbmcs
-DQo+IDIzMTk5ICAgICAgICAgICAgICAgICAgICAuaW5wdXQgICAgPSB6ZXJvZWRfc3RyaW5nLA0K
-PiAyMzIwMCAgICAgICAgICAgICAgICAgICAgLmlsZW4gICAgICAgPSAxNiwNCj4gMjMyMDEgICAg
-ICAgICAgICAgICAgICAgIC5hc3NvYyAgICA9IHplcm9lZF9zdHJpbmcsDQo+IDIzMjAyICAgICAg
-ICAgICAgICAgICAgICAuYWxlbiAgICAgID0gMTYsDQo+IDIzMjAzICAgICAgICAgICAgICAgICAg
-ICAucmVzdWx0ICAgPSAiXHgyRVx4OUFceENBXHg2Qlx4REFceDU0XHhGQ1x4NkYiDQo+IDIzMjA0
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAiXHgxMlx4NTBceEU4XHhERVx4
-ODFceDNDXHg2M1x4MDgiDQo+IDIzMjA1ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAiXHgxQVx4MjJceEJBXHg3NVx4RUVceEQ0XHhENVx4QjUiDQo+IDIzMjA2ICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAiXHgyN1x4NTBceDAxXHhBQ1x4MDNceDMzXHgz
-OVx4RkIiLA0KPiAyMzIwNyAgICAgICAgICAgICAgICAgICAgLnJsZW4gICAgICAgPSAzMiwNCj4N
-Cj4NCj4gSSBoYXZlIGEgdGVzdCBwcm9ncmFtIHVzaW5nIG9wZW4gc3NsIEFQSSAoLWwgY3J5cHRv
-KSwgYW5kIHJ1biBvbiBVYnVudHUgTGludXggUEMsICAgSSAgZ2V0IHRoZSBmb2xsb3dpbmcgIHRl
-c3QgcmVzdWx0Og0KPg0KPiAyZSA5YSBjYSA2YiBkYSA1NCBmYyA2ZiAxMiA1MCBlOCBkZSA4MSAz
-YyA2MyAwOCBmYiA2NCA5MSBiNCBkZCBkYyBiZiANCj4gNWQgZmQgNjcgZTMgYTIgZjggN2MgMGUg
-NmMNCj4gICAgICAgICAgICAgICBUaGUgZmlyc3QgcGFydCBvZiBlbmNyeXB0ZWQgdGV4dCBpcyBj
-b3JyZWN0LiBCdXQgTUFDIGlzIG5vdCB0aGUgc2FtZS4NCj4NCj4gTXkgcHJvZ3JhbSBpcyBhcyB0
-aGUgZm9sbG93aW5nOg0KPg0KPiB2b2lkIGNjbVRlc3QoKQ0KPiB7DQo+ICAgICAvKiBJbml0aWFs
-aXphdGlvbiAqLw0KPiAgICAgRVZQX0NJUEhFUl9DVFggY3R4Ow0KPiAgICAgRVZQX0NJUEhFUl9D
-VFggKmNyeXB0Q3R4ID0gJmN0eDsNCj4gICAgIEVWUF9DSVBIRVJfQ1RYX2luaXQoY3J5cHRDdHgp
-Ow0KPiAgICAgaW50IGk7DQo+DQo+ICAgIHVuc2lnbmVkIGNoYXIgUFsxNl0gPSB7MCwwLDAsMCww
-LDAsMCwwLDAsMCwwLDAsMCwwLDAsMH07DQo+ICAgICBpbnQgUHNpemUgPSBzaXplb2YoUCk7DQo+
-ICAgICB1bnNpZ25lZCBjaGFyIEtbMTZdID0gezB9Ow0KPiAgICAgdW5zaWduZWQgY2hhciBOWzEx
-XSA9IHswfTsNCj4gICAgIHVuc2lnbmVkIGNoYXIgQVsxNl0gPSB7MH07DQo+ICAgICB1bnNpZ25l
-ZCBjaGFyIENUWzEyOF07DQo+DQo+ICAgICBpbnQgTnNpemUgPSAxMTsNCj4gICAgIGludCBUc2l6
-ZSA9IDE2Ow0KPg0KPiAgICAgLy8gSW5pdGlhbGl6ZSB0aGUgY29udGV4dCB3aXRoIHRoZSBhbGcg
-b25seQ0KPiAgICAgRVZQX0VuY3J5cHRJbml0KGNyeXB0Q3R4LCBFVlBfYWVzXzEyOF9jY20oKSwg
-MCwgMCk7DQo+DQo+ICAgICAvLyBTZXQgbm9uY2UgYW5kIHRhZyBzaXplcw0KPiAgICAgRVZQX0NJ
-UEhFUl9DVFhfY3RybChjcnlwdEN0eCwgRVZQX0NUUkxfQ0NNX1NFVF9JVkxFTiwgTnNpemUsIDAp
-Ow0KPiAgICAgRVZQX0NJUEhFUl9DVFhfY3RybChjcnlwdEN0eCwgRVZQX0NUUkxfQ0NNX1NFVF9U
-QUcsIFRzaXplLCAwKTsNCj4NCj4gICAgIC8vIEZpbmFsbHkgc2V0IHRoZSBrZXkgYW5kIHRoZSBu
-b25jZQ0KPiAgICAgRVZQX0VuY3J5cHRJbml0KGNyeXB0Q3R4LCAwLCBLLCBOKTsNCj4NCj4gICAg
-IC8vIFRlbGwgdGhlIGFsZyB3ZSB3aWxsIGVuY3J5cHQgUHNpemUgYnl0ZXMNCj4gICAgIGludCBv
-dXRsID0gMDsNCj4gICAgIEVWUF9FbmNyeXB0VXBkYXRlKGNyeXB0Q3R4LCAwLCAmb3V0bCwgMCwg
-c2l6ZW9mKFApKTsNCj4gICAgLy8gQWRkIHRoZSBBQUQNCj4gICAgIEVWUF9FbmNyeXB0VXBkYXRl
-KGNyeXB0Q3R4LCAwLCAmb3V0bCwgQSwgc2l6ZW9mKEEpKTsNCj4gICAgLy8gTm93IHdlIGVuY3J5
-cHQgdGhlIGRhdGEgaW4gUCwgcGxhY2luZyB0aGUgb3V0cHV0IGluIENUDQo+ICAgICBFVlBfRW5j
-cnlwdFVwZGF0ZShjcnlwdEN0eCwgQ1QsICZvdXRsLCBQLCBQc2l6ZSk7DQo+ICAgICBFVlBfRW5j
-cnlwdEZpbmFsKGNyeXB0Q3R4LCAmQ1Rbb3V0bF0sICZvdXRsKTsNCj4gICAgIC8vIEFwcGVuZCB0
-aGUgdGFnIHRvIHRoZSBlbmQgb2YgdGhlIGVuY3J5cHRlZCBvdXRwdXQNCj4gICAgIEVWUF9DSVBI
-RVJfQ1RYX2N0cmwoY3J5cHRDdHgsIEVWUF9DVFJMX0NDTV9HRVRfVEFHLCBUc2l6ZSwgJkNUW1Bz
-aXplXSk7DQo+ICAgICBoZXhkdW1wKENULCBUc2l6ZStQc2l6ZSk7DQo+IH0NCj4NCj4NCj4gSSBy
-dW4gImluc21vZCB0Y3J5cHQua28gbW9kZT00NSIgIHJmYzQzMDkgdGVzdCB3aXRoIFF1YWxjb21t
-IGNyeXB0byBoYXJkd2FyZSBvbiBMaW51eDQuNC4gVGhlIHRlc3QgZmFpbHMuIFRoZSBnZW5lcmF0
-ZWQgb3V0cHV0IGlzIHRoZSBzYW1lIGFzIG15IG9wZW5TU0wgdGVzdCBhcHBsaWNhdGlvbiBpbiAx
-Lg0KT2xkZXIga2VybmVsIGRyaXZlciBhbHNvIGluY2x1ZGVzIElWIGluIEF1dGhlbnRpY2F0aW9u
-IGRhdGEuICBUaGF0cyB3aHkgTUFDIGlzIHdyb25nIC4gNC40IGtlcm5lbCBjcnlwdG8gZHJpdmVy
-cyBkb24ndCBuZWVkIHRvIGluY2x1ZGUgSVYgaW4gYXV0aGVudGljYXRpb24gZGF0YS4gVXBkYXRp
-bmcgZHJpdmVyIG5vdCB0byBpbmNsdWRlIElWIHN0cmluZyBpbiBhdXRoZW50aWNhdGlvbiBkYXRh
-IGZvciBsYXRlc3Qga2VybmVscyBzaG91bGQgd29yay4NCj4NCj4gTXkgdGVzdCBhcHBsaWNhdGlv
-biBydW5zIG9uIFVidW50dSB3aXRoIGxpbnV4IDMuMTAgcmZjNDMwOSB0ZXN0IHZlY3RvciwgYW5k
-IGdlbmVyYXRlZCBNQUMgYXMgZXhwZWN0ZWQgZnJvbSB0ZXN0IHZlY3RvcnMuICBRdWFsY29tbSBj
-cnlwdG8gaGFyZHdhcmUgcnVucyAiaW5zbW9kIHRjcnlwdC5rbyBtb2RlPTQ1IiBzdWNjZXNzZnVs
-bHkgd2l0aCBsaW51eCAzLjEwLg0KPg0KPiBJIGFtIHN1c3BpY2lvdXMgYWJvdXQgdGhlIHRlc3Qg
-dmVjdG9ycyBvZiA0LjQuIENhbiBzb21lb25lIHZlcmlmeSB0aGUgTGludXggNC40IHJmYzQzMDkg
-dGVzdCB2ZWN0b3JzIHdpdGggaGlzL2hlciBvcGVuU1NMIGFwcGxpY2F0aW9uIG9uIFBDPw0KPg0K
-PiBDaGVtaW4NCg==
+Hi
+
+I am seeing the below errors after  installing an Intel QAT card
+and loading the upstreamed qat_dh895xcc and intel_qat modules.
+
+Have others seen similar errors and know if this is a known issue
+and a fix exists or know whats going on ? This is with 4.12.0-rc4+
+version of the kernel.
+
+Any help is sincerely appreciated.
+
+thanks
+--Raj
+
+
+[    3.639046] dh895xcc 0000:00:0b.0: qat_dev0 started 12 acceleration engines
+[    4.168887] alg: skcipher-ddst: Test 5 failed (invalid result) on
+encryption for qat_aes_cbc
+[    4.217866] alg: skcipher-ddst: Chunk test 1 failed on encryption
+at page 0 for qat_aes_ctr
+[    4.282042] alg: skcipher: Test 4 failed (invalid result) on
+encryption for qat_aes_xts
+[    4.395210] alg: akcipher: test 1 failed for qat-rsa, err=-22
+[root@dhcp-swlab-681 ~]# dmesg | grep -i alg
+[    1.499336] alg: No test for pkcs1pad(rsa,sha256)
+(pkcs1pad(rsa-generic,sha256))
+[    2.562511] SELinux:  Class alg_socket not defined in policy.
+[    4.168887] alg: skcipher-ddst: Test 5 failed (invalid result) on
+encryption for qat_aes_cbc
+[    4.217866] alg: skcipher-ddst: Chunk test 1 failed on encryption
+at page 0 for qat_aes_ctr
+[    4.282042] alg: skcipher: Test 4 failed (invalid result) on
+encryption for qat_aes_xts
+[    4.367682] alg: akcipher: encrypt test failed. Invalid output
+[    4.395210] alg: akcipher: test 1 failed for qat-rsa, err=-22
+[    4.431827] alg: dh: generate public key test failed. Invalid output
+[    4.431829] alg: dh: test failed on vector 1, err=-22
+
+
+83:00.0 Co-processor: Intel Corporation DH895XCC Series QAT
+Subsystem: Intel Corporation Device 0000
+Physical Slot: 2
+Control: I/O- Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- ParErr-
+Stepping- SERR+ FastB2B- DisINTx+
+Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=fast >TAbort-
+<TAbort- <MAbort- >SERR- <PERR- INTx-
+Latency: 0, Cache Line Size: 32 bytes
+Interrupt: pin A routed to IRQ 35
+NUMA node: 1
+Region 0: Memory at fb900000 (64-bit, prefetchable) [size=512K]
+Region 2: Memory at fbd40000 (64-bit, non-prefetchable) [size=256K]
+Region 4: Memory at fbd00000 (64-bit, non-prefetchable) [size=256K]
+Capabilities: [b0] MSI: Enable- Count=1/1 Maskable+ 64bit+
+Address: 0000000000000000  Data: 0000
+Masking: 00000000  Pending: 00000000
+Capabilities: [60] MSI-X: Enable+ Count=33 Masked-
+Vector table: BAR=2 offset=0003b000
+PBA: BAR=2 offset=0003b800
+Capabilities: [6c] Power Management version 3
+Flags: PMEClk- DSI+ D1- D2- AuxCurrent=0mA PME(D0-,D1-,D2-,D3hot-,D3cold-)
+Status: D0 NoSoftRst- PME-Enable- DSel=0 DScale=0 PME-
+Capabilities: [74] Express (v2) Endpoint, MSI 00
+DevCap: MaxPayload 256 bytes, PhantFunc 0, Latency L0s <128ns, L1 <1us
+ExtTag+ AttnBtn- AttnInd- PwrInd- RBE+ FLReset+ SlotPowerLimit 0.000W
+DevCtl: Report errors: Correctable+ Non-Fatal+ Fatal+ Unsupported+
+RlxdOrd- ExtTag+ PhantFunc- AuxPwr- NoSnoop+ FLReset-
+MaxPayload 256 bytes, MaxReadReq 1024 bytes
+DevSta: CorrErr+ UncorrErr- FatalErr- UnsuppReq+ AuxPwr- TransPend-
+LnkCap: Port #0, Speed 5GT/s, Width x16, ASPM L0s, Exit Latency L0s
+<512ns, L1 unlimited
+ClockPM- Surprise- LLActRep- BwNot- ASPMOptComp-
+LnkCtl: ASPM Disabled; RCB 64 bytes Disabled- CommClk-
+ExtSynch- ClockPM- AutWidDis- BWInt- AutBWInt-
+LnkSta: Speed 5GT/s, Width x16, TrErr- Train- SlotClk- DLActive-
+BWMgmt- ABWMgmt-
+DevCap2: Completion Timeout: Range B, TimeoutDis+, LTR-, OBFF Not Supported
+AtomicOpsCap: 32bit- 64bit- 128bitCAS-
+DevCtl2: Completion Timeout: 50us to 50ms, TimeoutDis-, LTR-, OBFF Disabled
+AtomicOpsCtl: ReqEn-
+LnkCtl2: Target Link Speed: 5GT/s, EnterCompliance- SpeedDis-
+ Transmit Margin: Normal Operating Range, EnterModifiedCompliance-
+ComplianceSOS-
+ Compliance De-emphasis: -6dB
+LnkSta2: Current De-emphasis Level: -6dB, EqualizationComplete-,
+EqualizationPhase1-
+ EqualizationPhase2-, EqualizationPhase3-, LinkEqualizationRequest-
+Capabilities: [100 v1] Advanced Error Reporting
+UESta: DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF-
+MalfTLP- ECRC- UnsupReq- ACSViol-
+UEMsk: DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF-
+MalfTLP- ECRC- UnsupReq- ACSViol-
+UESvrt: DLP+ SDES+ TLP- FCP+ CmpltTO- CmpltAbrt- UnxCmplt- RxOF+
+MalfTLP+ ECRC- UnsupReq- ACSViol-
+CESta: RxErr- BadTLP- BadDLLP- Rollover- Timeout- NonFatalErr-
+CEMsk: RxErr- BadTLP- BadDLLP- Rollover- Timeout- NonFatalErr+
+AERCap: First Error Pointer: 00, GenCap- CGenEn- ChkCap- ChkEn-
+Capabilities: [138 v1] Alternative Routing-ID Interpretation (ARI)
+ARICap: MFVC- ACS-, Next Function: 0
+ARICtl: MFVC- ACS-, Function Group: 0
+Capabilities: [140 v1] Single Root I/O Virtualization (SR-IOV)
+IOVCap: Migration-, Interrupt Message Number: 000
+IOVCtl: Enable- Migration- Interrupt- MSE- ARIHierarchy+
+IOVSta: Migration-
+Initial VFs: 32, Total VFs: 32, Number of VFs: 0, Function Dependency Link: 00
+VF offset: 8, stride: 1, Device ID: 0443
+Supported Page Size: 00000553, System Page Size: 00000001
+Region 0: Memory at 00000000fbd80000 (64-bit, non-prefetchable)
+Region 2: Memory at 00000000fbda0000 (64-bit, non-prefetchable)
+VF Migration: offset: 00000000, BIR: 0
+Kernel driver in use: dh895xcc
+Kernel modules: qat_dh895xcc
+
+
+# lsmod | grep qat
+qat_dh895xcc           16384  1
+intel_qat             126976  13 qat_dh895xcc
+dh_generic             16384  1 intel_qat
+authenc                16384  1 intel_qat
+
+# modinfo qat_dh895xcc
+filename:
+/lib/modules/4.12.0-rc4+/kernel/drivers/crypto/qat/qat_dh895xcc/qat_dh895xcc.ko
+version:        0.6.0
+description:    Intel(R) QuickAssist Technology
+firmware:       qat_895xcc.bin
+author:         Intel
+license:        Dual BSD/GPL
+srcversion:     37370A80B9807EC2308F493
+alias:          pci:v00008086d00000435sv*sd*bc*sc*i*
+depends:        intel_qat
+intree:         Y
+vermagic:       4.12.0-rc4+ SMP mod_unload
+signat:         PKCS#7
+signer:
+sig_key:
+sig_hashalgo:   md4
