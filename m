@@ -1,38 +1,53 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Crypto Fixes for 4.12
-Date: Fri, 9 Jun 2017 10:52:33 +0800
-Message-ID: <20170609025233.GA8630@gondor.apana.org.au>
-References: <20170304074119.GA3041@gondor.apana.org.au>
- <20170523034211.GA12748@gondor.apana.org.au>
- <20170608092320.GA6478@gondor.apana.org.au>
- <20170608.100502.1861332545609152555.davem@davemloft.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-To: David Miller <davem@davemloft.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20170608.100502.1861332545609152555.davem@davemloft.net>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Derek Robson <robsonde@gmail.com>
+Subject: [PATCH] Drivers: ccree - style fix
+Date: Fri,  9 Jun 2017 18:08:00 +1200
+Message-ID: <20170609060800.21736-1-robsonde@gmail.com>
+Cc: linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        linux-kernel@vger.kernel.org, Derek Robson <robsonde@gmail.com>
+To: gilad@benyossef.com, gregkh@linuxfoundation.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pg0-f68.google.com ([74.125.83.68]:34117 "EHLO
+        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751505AbdFIGIL (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 9 Jun 2017 02:08:11 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jun 08, 2017 at 10:05:02AM -0400, David Miller wrote:
-> From: Herbert Xu <herbert@gondor.apana.org.au>
-> Date: Thu, 8 Jun 2017 17:23:21 +0800
-> 
-> > This push fixes a couple of places in the crypto code that were
-> > doing interruptible sleeps dangerously.  They have been converted
-> > to use non-interruptible sleeps.  This push also fixes a bug in
-> > asymmetric_keys where it would trigger a use-after-free if a
-> > request returned EBUSY due to a full device queue.
-> 
-> Where is the gcc shash miscompile workaround?
+Align block comments
+Found using checkpatch
 
-I'll push it to Linus in a couple of days.
+Signed-off-by: Derek Robson <robsonde@gmail.com>
+---
+ drivers/staging/ccree/cc_hw_queue_defs.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Cheers,
+diff --git a/drivers/staging/ccree/cc_hw_queue_defs.h b/drivers/staging/ccree/cc_hw_queue_defs.h
+index aaa56c85bda2..0e6416ed9a58 100644
+--- a/drivers/staging/ccree/cc_hw_queue_defs.h
++++ b/drivers/staging/ccree/cc_hw_queue_defs.h
+@@ -23,8 +23,8 @@
+ #include <linux/bitfield.h>
+ 
+ /******************************************************************************
+-*				DEFINITIONS
+-******************************************************************************/
++ *				DEFINITIONS
++ ******************************************************************************/
+ 
+ #define HW_DESC_SIZE_WORDS		6
+ #define HW_QUEUE_SLOTS_MAX              15 /* Max. available slots in HW queue */
+@@ -70,8 +70,8 @@
+ #define WORD5_DOUT_ADDR_HIGH	CC_GENMASK(5, DOUT_ADDR_HIGH)
+ 
+ /******************************************************************************
+-*				TYPE DEFINITIONS
+-******************************************************************************/
++ *				TYPE DEFINITIONS
++ ******************************************************************************/
+ 
+ struct cc_hw_desc {
+ 	union {
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.13.0
