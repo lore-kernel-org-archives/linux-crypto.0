@@ -1,55 +1,29 @@
-From: <agiva@centrum.cz>
-Subject: (unknown)
-Date: Sat, 10 Jun 2017 05:29:15 -0000
-Message-ID: <149707255553.19457.7118669435808385265@fastwebnet.it>
+From: David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH v2] X.509: Fix error code in x509_cert_parse()
+Date: Sat, 10 Jun 2017 07:14:56 +0100
+Message-ID: <25797.1497075296@warthog.procyon.org.uk>
+References: <20170610041820.GH14719@gondor.apana.org.au> <4045.1495558143@warthog.procyon.org.uk> <20170529132622.6tapug7i7aqmvnqz@mwanda>
 Mime-Version: 1.0
-Content-Type: application/zip; name="32156204782.zip"
-Content-Transfer-Encoding: base64
-To: <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Cc: dhowells@redhat.com, Dan Carpenter <dan.carpenter@oracle.com>,
+        "David S. Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 2-229-9-104.ip194.fastwebnet.it ([2.229.9.104]:60701 "HELO
-        fastwebnet.it" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with SMTP
-        id S1750945AbdFJF3T (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 10 Jun 2017 01:29:19 -0400
-Content-Disposition: attachment
-Subject: 
+Received: from mx1.redhat.com ([209.132.183.28]:37950 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751741AbdFJGPA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 10 Jun 2017 02:15:00 -0400
+In-Reply-To: <20170610041820.GH14719@gondor.apana.org.au>
+Content-ID: <25796.1497075296.1@warthog.procyon.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-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
-AAA=
+Herbert Xu <herbert@gondor.apana.org.au> wrote:
+
+> Patch applied.  Thanks.
+
+Note that I've passed this on to James to pass on to Linus along with a bunch
+of other patches.
+
+David
