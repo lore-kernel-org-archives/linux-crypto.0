@@ -1,10 +1,10 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v6 4/5] crypto: inside-secure: add SafeXcel EIP197 crypto
- engine driver
-Date: Sat, 10 Jun 2017 12:16:17 +0800
-Message-ID: <20170610041617.GD14719@gondor.apana.org.au>
+Subject: Re: [PATCH v6 5/5] MAINTAINERS: add a maintainer for the Inside
+ Secure crypto driver
+Date: Sat, 10 Jun 2017 12:16:31 +0800
+Message-ID: <20170610041631.GE14719@gondor.apana.org.au>
 References: <20170524141035.21031-1-antoine.tenart@free-electrons.com>
- <20170524141035.21031-5-antoine.tenart@free-electrons.com>
+ <20170524141035.21031-6-antoine.tenart@free-electrons.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
@@ -16,7 +16,7 @@ Cc: thomas.petazzoni@free-electrons.com, andrew@lunn.ch, jason@lakedaemon.net,
 To: Antoine Tenart <antoine.tenart@free-electrons.com>
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <20170524141035.21031-5-antoine.tenart@free-electrons.com>
+In-Reply-To: <20170524141035.21031-6-antoine.tenart@free-electrons.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -28,15 +28,10 @@ Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, May 24, 2017 at 04:10:34PM +0200, Antoine Tenart wrote:
-> Add support for Inside Secure SafeXcel EIP197 cryptographic engine,
-> which can be found on Marvell Armada 7k and 8k boards. This driver
-> currently implements: ecb(aes), cbc(aes), sha1, sha224, sha256 and
-> hmac(sah1) algorithms.
-> 
-> Two firmwares are needed for this engine to work. Their are mostly used
-> for more advanced operations than the ones supported (as of now), but we
-> still need them to pass the data to the internal cryptographic engine.
+On Wed, May 24, 2017 at 04:10:35PM +0200, Antoine Tenart wrote:
+> A new cryptographic engine driver was added in
+> drivers/crypto/inside-secure. Add myself as a maintainer for this
+> driver.
 > 
 > Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
 
