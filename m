@@ -1,109 +1,150 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH 00/12] arm64: crypto: prepare for new kernel mode NEON policy
-Date: Sat, 10 Jun 2017 16:22:46 +0000
-Message-ID: <1497111778-4210-1-git-send-email-ard.biesheuvel@linaro.org>
+Subject: [PATCH 02/12] crypto: arm64/ghash-ce - add non-SIMD scalar fallback
+Date: Sat, 10 Jun 2017 16:22:48 +0000
+Message-ID: <1497111778-4210-3-git-send-email-ard.biesheuvel@linaro.org>
+References: <1497111778-4210-1-git-send-email-ard.biesheuvel@linaro.org>
 Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
         linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com,
         will.deacon@arm.com, dave.martin@arm.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wr0-f181.google.com ([209.85.128.181]:35806 "EHLO
-        mail-wr0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752070AbdFJQXG (ORCPT
+Received: from mail-wr0-f170.google.com ([209.85.128.170]:34061 "EHLO
+        mail-wr0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752070AbdFJQXL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 10 Jun 2017 12:23:06 -0400
-Received: by mail-wr0-f181.google.com with SMTP id q97so58888066wrb.2
-        for <linux-crypto@vger.kernel.org>; Sat, 10 Jun 2017 09:23:05 -0700 (PDT)
+        Sat, 10 Jun 2017 12:23:11 -0400
+Received: by mail-wr0-f170.google.com with SMTP id g76so58539401wrd.1
+        for <linux-crypto@vger.kernel.org>; Sat, 10 Jun 2017 09:23:10 -0700 (PDT)
+In-Reply-To: <1497111778-4210-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-TL;DR: preparatory work for expected changes in arm64's handling of kernel
-       mode SIMD
+The arm64 kernel will shortly disallow nested kernel mode NEON, so
+add a fallback to scalar C code that can be invoked in that case.
 
-@Herbert: The arm64 maintainers may want to take this through the arm64 tree,
-          and if not, we need their acks on patch #1. Thanks.
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+ arch/arm64/crypto/Kconfig         |  3 +-
+ arch/arm64/crypto/ghash-ce-glue.c | 49 ++++++++++++++++----
+ 2 files changed, 43 insertions(+), 9 deletions(-)
 
-Currently, arm64 allows kernel mode NEON (KMN) in process, softirq or hardirq
-context. In the process case, we preserve/restore the NEON context lazily,
-but in the softirq/hardirq cases, we eagerly stash a slice of the NEON
-register file, and immediately restore it when kernel_neon_end() is called.
-
-Given the above, arm64 actually does not use the generic may_use_simd() API
-at all*, which was added to allow async wrappers of synchronous SIMD routines
-to be implemented in a generic manner. (On x86, kernel mode SIMD may be used
-in process context or while serving an interrupt taken from user space. On ARM,
-SIMD may only be used in process context)
-
-When adding support for the SVE architecture extension, which shared part of
-the NEON register file with the SIMD and crypto extensions, the eager preserve/
-restore in interrupt context is becoming a problem: it should either preserve
-and restore the entire SVE state (which may be up to 8 KB in size), or it
-should not be allowed to interrupt the lazy preserve, which does need to deal
-with the large SVE state anyway. Otherwise, such an interruption would corrupt
-the NEON state the lazy preserve sees after the interruption.
-
-Given how
-a) KMN is never actually used in hardirq context,
-b) KMN is only used in softirq context by mac80211 code running on behalf of
-   WiFi devices that don't perform the crypto in hardware,
-b) KMN in softirq context is statistically unlikely to interrupt the kernel
-   while it is doing kernel mode NEON in process context,
-
-the unconditional eager preserve/restore typically executes when no KMN in
-process context is in progress, and we can simplify things substantially by
-disallowing nested KMN, i.e., disallow KMN in hardirq context, and allow KMN
-in softirq only if no KMN in process context is already in progress.
-
-The no-nesting rule leaves only the outer SVE-aware lazy preserve/restore,
-which needs to execute with bottom halves disabled, but other than that, no
-intrusive changes should be needed to deal with the SVE payloads.
-
-Given that the no-nesting rule implies that SIMD is no longer allowed in any
-context, the KMN users need to be made aware of this. This series updates the
-current KMN users in the arm64 tree to take may_use_simd() into account. Since
-at this time, SIMD is still allowed in any context, an implementation of
-may_use_simd() is added that simply returns true (#1). It will be updated in
-the future when the no-nesting modifications are made.
-
-* may_use_simd() is only used as a hint in the SHA256 NEON code, since on some
-  microarchitectures, it is only marginally faster, and the eager preserve and
-  restore could actually make it slower.
-
-Ard Biesheuvel (12):
-  arm64: neon: replace generic definition of may_use_simd()
-  crypto: arm64/ghash-ce - add non-SIMD scalar fallback
-  crypto: arm64/crct10dif - add non-SIMD generic fallback
-  crypto: arm64/crc32 - add non-SIMD scalar fallback
-  crypto: arm64/sha1-ce - add non-SIMD generic fallback
-  crypto: arm64/sha2-ce - add non-SIMD scalar fallback
-  crypto: arm64/aes-ce-cipher - match round key endianness with generic
-    code
-  crypto: arm64/aes-ce-cipher: add non-SIMD generic fallback
-  crypto: arm64/aes-ce-ccm: add non-SIMD generic fallback
-  crypto: arm64/aes-blk - add a non-SIMD fallback for synchronous CTR
-  crypto: arm64/chacha20 - take may_use_simd() into account
-  crypto: arm64/aes-bs - implement non-SIMD fallback for AES-CTR
-
- arch/arm64/crypto/Kconfig              |  22 ++-
- arch/arm64/crypto/aes-ce-ccm-core.S    |  30 ++--
- arch/arm64/crypto/aes-ce-ccm-glue.c    | 152 +++++++++++++++-----
- arch/arm64/crypto/aes-ce-cipher.c      |  55 ++++---
- arch/arm64/crypto/aes-ce.S             |  12 +-
- arch/arm64/crypto/aes-ctr-fallback.h   |  55 +++++++
- arch/arm64/crypto/aes-glue.c           |  17 ++-
- arch/arm64/crypto/aes-neonbs-glue.c    |  48 ++++++-
- arch/arm64/crypto/chacha20-neon-glue.c |   5 +-
- arch/arm64/crypto/crc32-ce-glue.c      |  11 +-
- arch/arm64/crypto/crct10dif-ce-glue.c  |  13 +-
- arch/arm64/crypto/ghash-ce-glue.c      |  49 +++++--
- arch/arm64/crypto/sha1-ce-glue.c       |  18 ++-
- arch/arm64/crypto/sha2-ce-glue.c       |  30 +++-
- arch/arm64/crypto/sha256-glue.c        |   1 +
- arch/arm64/include/asm/Kbuild          |   1 -
- arch/arm64/include/asm/simd.h          |  24 ++++
- 17 files changed, 420 insertions(+), 123 deletions(-)
- create mode 100644 arch/arm64/crypto/aes-ctr-fallback.h
- create mode 100644 arch/arm64/include/asm/simd.h
-
+diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
+index d92293747d63..7d75a363e317 100644
+--- a/arch/arm64/crypto/Kconfig
++++ b/arch/arm64/crypto/Kconfig
+@@ -28,8 +28,9 @@ config CRYPTO_SHA2_ARM64_CE
+ 
+ config CRYPTO_GHASH_ARM64_CE
+ 	tristate "GHASH (for GCM chaining mode) using ARMv8 Crypto Extensions"
+-	depends on ARM64 && KERNEL_MODE_NEON
++	depends on KERNEL_MODE_NEON
+ 	select CRYPTO_HASH
++	select CRYPTO_GF128MUL
+ 
+ config CRYPTO_CRCT10DIF_ARM64_CE
+ 	tristate "CRCT10DIF digest algorithm using PMULL instructions"
+diff --git a/arch/arm64/crypto/ghash-ce-glue.c b/arch/arm64/crypto/ghash-ce-glue.c
+index 833ec1e3f3e9..3e1a778b181a 100644
+--- a/arch/arm64/crypto/ghash-ce-glue.c
++++ b/arch/arm64/crypto/ghash-ce-glue.c
+@@ -1,7 +1,7 @@
+ /*
+  * Accelerated GHASH implementation with ARMv8 PMULL instructions.
+  *
+- * Copyright (C) 2014 Linaro Ltd. <ard.biesheuvel@linaro.org>
++ * Copyright (C) 2014 - 2017 Linaro Ltd. <ard.biesheuvel@linaro.org>
+  *
+  * This program is free software; you can redistribute it and/or modify it
+  * under the terms of the GNU General Public License version 2 as published
+@@ -9,7 +9,9 @@
+  */
+ 
+ #include <asm/neon.h>
++#include <asm/simd.h>
+ #include <asm/unaligned.h>
++#include <crypto/gf128mul.h>
+ #include <crypto/internal/hash.h>
+ #include <linux/cpufeature.h>
+ #include <linux/crypto.h>
+@@ -25,6 +27,7 @@ MODULE_LICENSE("GPL v2");
+ struct ghash_key {
+ 	u64 a;
+ 	u64 b;
++	be128 k;
+ };
+ 
+ struct ghash_desc_ctx {
+@@ -44,6 +47,36 @@ static int ghash_init(struct shash_desc *desc)
+ 	return 0;
+ }
+ 
++static void ghash_do_update(int blocks, u64 dg[], const char *src,
++			    struct ghash_key *key, const char *head)
++{
++	if (may_use_simd()) {
++		kernel_neon_begin();
++		pmull_ghash_update(blocks, dg, src, key, head);
++		kernel_neon_end();
++	} else {
++		be128 dst = { cpu_to_be64(dg[1]), cpu_to_be64(dg[0]) };
++
++		do {
++			const u8 *in = src;
++
++			if (head) {
++				in = head;
++				blocks++;
++				head = NULL;
++			} else {
++				src += GHASH_BLOCK_SIZE;
++			}
++
++			crypto_xor((u8 *)&dst, in, GHASH_BLOCK_SIZE);
++			gf128mul_lle(&dst, &key->k);
++		} while (--blocks);
++
++		dg[0] = be64_to_cpu(dst.b);
++		dg[1] = be64_to_cpu(dst.a);
++	}
++}
++
+ static int ghash_update(struct shash_desc *desc, const u8 *src,
+ 			unsigned int len)
+ {
+@@ -67,10 +100,9 @@ static int ghash_update(struct shash_desc *desc, const u8 *src,
+ 		blocks = len / GHASH_BLOCK_SIZE;
+ 		len %= GHASH_BLOCK_SIZE;
+ 
+-		kernel_neon_begin_partial(8);
+-		pmull_ghash_update(blocks, ctx->digest, src, key,
+-				   partial ? ctx->buf : NULL);
+-		kernel_neon_end();
++		ghash_do_update(blocks, ctx->digest, src, key,
++				partial ? ctx->buf : NULL);
++
+ 		src += blocks * GHASH_BLOCK_SIZE;
+ 		partial = 0;
+ 	}
+@@ -89,9 +121,7 @@ static int ghash_final(struct shash_desc *desc, u8 *dst)
+ 
+ 		memset(ctx->buf + partial, 0, GHASH_BLOCK_SIZE - partial);
+ 
+-		kernel_neon_begin_partial(8);
+-		pmull_ghash_update(1, ctx->digest, ctx->buf, key, NULL);
+-		kernel_neon_end();
++		ghash_do_update(1, ctx->digest, ctx->buf, key, NULL);
+ 	}
+ 	put_unaligned_be64(ctx->digest[1], dst);
+ 	put_unaligned_be64(ctx->digest[0], dst + 8);
+@@ -111,6 +141,9 @@ static int ghash_setkey(struct crypto_shash *tfm,
+ 		return -EINVAL;
+ 	}
+ 
++	/* needed for the fallback */
++	memcpy(&key->k, inkey, GHASH_BLOCK_SIZE);
++
+ 	/* perform multiplication by 'x' in GF(2^128) */
+ 	b = get_unaligned_be64(inkey);
+ 	a = get_unaligned_be64(inkey + 8);
 -- 
 2.7.4
