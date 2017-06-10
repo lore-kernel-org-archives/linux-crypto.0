@@ -1,62 +1,76 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH 11/12] crypto: arm64/chacha20 - take may_use_simd() into account
-Date: Sat, 10 Jun 2017 16:22:57 +0000
-Message-ID: <1497111778-4210-12-git-send-email-ard.biesheuvel@linaro.org>
-References: <1497111778-4210-1-git-send-email-ard.biesheuvel@linaro.org>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-        linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com,
-        will.deacon@arm.com, dave.martin@arm.com
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: [PATCH v9 0/2] crypto: AF_ALG memory management fix
+Date: Sat, 10 Jun 2017 19:59:01 +0200
+Message-ID: <1529895.BiIeBiIAIs@positron.chronox.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wr0-f169.google.com ([209.85.128.169]:34910 "EHLO
-        mail-wr0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752205AbdFJQXc (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 10 Jun 2017 12:23:32 -0400
-Received: by mail-wr0-f169.google.com with SMTP id q97so58893555wrb.2
-        for <linux-crypto@vger.kernel.org>; Sat, 10 Jun 2017 09:23:32 -0700 (PDT)
-In-Reply-To: <1497111778-4210-1-git-send-email-ard.biesheuvel@linaro.org>
+Received: from mail.eperm.de ([89.247.134.16]:60158 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751548AbdFJSCm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 10 Jun 2017 14:02:42 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-To accommodate systems that disallow the use of kernel mode NEON in
-some circumstances, take the return value of may_use_simd into
-account when deciding whether to invoke the C fallback routine.
+Hi Herbert,
 
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
- arch/arm64/crypto/chacha20-neon-glue.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Changes v9:
+- remove ctx->inflight (implies remove of associated finish wait queue)
 
-diff --git a/arch/arm64/crypto/chacha20-neon-glue.c b/arch/arm64/crypto/chacha20-neon-glue.c
-index a7cd575ea223..cbdb75d15cd0 100644
---- a/arch/arm64/crypto/chacha20-neon-glue.c
-+++ b/arch/arm64/crypto/chacha20-neon-glue.c
-@@ -1,7 +1,7 @@
- /*
-  * ChaCha20 256-bit cipher algorithm, RFC7539, arm64 NEON functions
-  *
-- * Copyright (C) 2016 Linaro, Ltd. <ard.biesheuvel@linaro.org>
-+ * Copyright (C) 2016 - 2017 Linaro, Ltd. <ard.biesheuvel@linaro.org>
-  *
-  * This program is free software; you can redistribute it and/or modify
-  * it under the terms of the GNU General Public License version 2 as
-@@ -26,6 +26,7 @@
- 
- #include <asm/hwcap.h>
- #include <asm/neon.h>
-+#include <asm/simd.h>
- 
- asmlinkage void chacha20_block_xor_neon(u32 *state, u8 *dst, const u8 *src);
- asmlinkage void chacha20_4block_xor_neon(u32 *state, u8 *dst, const u8 *src);
-@@ -64,7 +65,7 @@ static int chacha20_neon(struct skcipher_request *req)
- 	u32 state[16];
- 	int err;
- 
--	if (req->cryptlen <= CHACHA20_BLOCK_SIZE)
-+	if (!may_use_simd() || req->cryptlen <= CHACHA20_BLOCK_SIZE)
- 		return crypto_chacha20_crypt(req);
- 
- 	err = skcipher_walk_virt(&walk, req, true);
+With the changes, you will see a lot of code duplication now
+as I deliberately tried to use the same struct and variable names,
+the same function names and even the same oder of functions.
+If you agree to this patch, I volunteer to provide a followup
+patch that will extract the code duplication into common
+functions.
+
+Please find attached memory management updates to
+
+- simplify the code: the old AIO memory management is very
+  complex and seemingly very fragile -- the update now
+  eliminates all reported bugs in the skcipher and AEAD
+  interfaces which allowed the kernel to be crashed by
+  an unprivileged user
+
+- streamline the code: there is one code path for AIO and sync
+  operation; the code between algif_skcipher and algif_aead
+  is very similar (if that patch set is accepted, I volunteer
+  to reduce code duplication by moving service operations
+  into af_alg.c and to further unify the TX SGL handling)
+
+- unify the AIO and sync operation which only differ in the
+  kernel crypto API callback and whether to wait for the
+  crypto operation or not
+
+- fix all reported bugs regarding the handling of multiple
+  IOCBs.
+
+The following testing was performed:
+
+- stress testing to verify that no memleaks exist
+
+- testing using Tadeusz Struck AIO test tool (see
+  https://github.com/tstruk/afalg_async_test) -- the AEAD test
+  is not applicable any more due to the changed user space
+  interface; the skcipher test works once the user space
+  interface change is honored in the test code
+
+- using the libkcapi test suite, all tests including the
+  originally failing ones (AIO with multiple IOCBs) work now --
+  the current libkcapi code artificially limits the AEAD
+  operation to one IOCB. After altering the libkcapi code
+  to allow multiple IOCBs, the testing works flawless.
+
+Stephan Mueller (2):
+  crypto: skcipher AF_ALG - overhaul memory management
+  crypto: aead AF_ALG - overhaul memory management
+
+ crypto/algif_aead.c     | 770 ++++++++++++++++++++++++++++--------------------
+ crypto/algif_skcipher.c | 567 ++++++++++++++++++-----------------
+ 2 files changed, 726 insertions(+), 611 deletions(-)
+
 -- 
-2.7.4
+2.9.4
