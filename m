@@ -1,29 +1,103 @@
-From: David Howells <dhowells@redhat.com>
-Subject: Re: [PATCH v2] X.509: Fix error code in x509_cert_parse()
-Date: Sat, 10 Jun 2017 07:14:56 +0100
-Message-ID: <25797.1497075296@warthog.procyon.org.uk>
-References: <20170610041820.GH14719@gondor.apana.org.au> <4045.1495558143@warthog.procyon.org.uk> <20170529132622.6tapug7i7aqmvnqz@mwanda>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: Re: [PATCH v2 01/11] crypto: introduce crypto wait for async op
+Date: Sat, 10 Jun 2017 11:05:39 +0300
+Message-ID: <CAOtvUMeRtcVcp8HE9oJAkJO35yF9XBsry3tdNQYj-e31DnDFQQ@mail.gmail.com>
+References: <1496046180-21962-1-git-send-email-gilad@benyossef.com>
+ <1496046180-21962-2-git-send-email-gilad@benyossef.com> <20170610034336.GB14206@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Cc: dhowells@redhat.com, Dan Carpenter <dan.carpenter@oracle.com>,
-        "David S. Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        David Howells <dhowells@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        device-mapper development <dm-devel@redhat.com>,
+        Shaohua Li <shli@kernel.org>, Steve French <sfrench@samba.org>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        James Morris <james.l.morris@oracle.com>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Eric Biggers <ebiggers3@gmail.com>,
+        Ofir Drang <ofir.drang@arm.com>,
+        Pavel Shilovsky <pshilov@microsoft.com>,
+        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:37950 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751741AbdFJGPA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 10 Jun 2017 02:15:00 -0400
-In-Reply-To: <20170610041820.GH14719@gondor.apana.org.au>
-Content-ID: <25796.1497075296.1@warthog.procyon.org.uk>
+Received: from mail-yw0-f196.google.com ([209.85.161.196]:35268 "EHLO
+        mail-yw0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751910AbdFJIFk (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 10 Jun 2017 04:05:40 -0400
+Received: by mail-yw0-f196.google.com with SMTP id p144so4286443ywp.2
+        for <linux-crypto@vger.kernel.org>; Sat, 10 Jun 2017 01:05:40 -0700 (PDT)
+In-Reply-To: <20170610034336.GB14206@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Herbert Xu <herbert@gondor.apana.org.au> wrote:
+On Sat, Jun 10, 2017 at 6:43 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> On Mon, May 29, 2017 at 11:22:48AM +0300, Gilad Ben-Yossef wrote:
+>>
+>> +static inline int crypto_wait_req(int err, struct crypto_wait *wait)
+>> +{
+>> +     switch (err) {
+>> +     case -EINPROGRESS:
+>> +     case -EBUSY:
+>> +             wait_for_completion(&wait->completion);
+>> +             reinit_completion(&wait->completion);
+>> +             err = wait->err;
+>> +             break;
+>> +     };
+>> +
+>> +     return err;
+>> +}
+>
+> This assumes that the request is used with backlog.  For non-backlog
+> requests this would result in a memory leak as EBUSY in that case is
+> a fatal error.
+>
+> So this API can't be used without backlog.
 
-> Patch applied.  Thanks.
+You are right, of course. I did not take that into account.
 
-Note that I've passed this on to James to pass on to Linus along with a bunch
-of other patches.
+>
+> We could introduce a flag to indicate whether we want backlog or not,
+> or maybe we should change our API so that in the non-backlog case we
+> return something other than EBUSY.
+>
+> Opinions?
 
-David
+I guess there is a question if it really is important to know that
+your request ended up
+on the backlog, rather than being handled.I can imagine it can be used
+as back pressure
+indication but I wonder if someone is using that.
+
+If not, maybe we can simplify things and use EINPROGRESS asindication
+of a request
+being accepted by the next layer (either being processed or queued in
+the back log), whereas
+EBUSY would indicate failure.
+
+It does have a potential to make things simpler, I think.
+
+Gilad
+
+>
+> Thanks,
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
+
+
+-- 
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+"If you take a class in large-scale robotics, can you end up in a
+situation where the homework eats your dog?"
+ -- Jean-Baptiste Queru
