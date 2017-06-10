@@ -1,37 +1,36 @@
-From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Subject: Re: [PATCH v1 0/2] remove mediatek ethif clock in crypto driver
-Date: Sat, 10 Jun 2017 12:19:11 +0800
-Message-ID: <20170610041911.GK14719@gondor.apana.org.au>
-References: <1496284222-12560-1-git-send-email-ryder.lee@mediatek.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v4 00/14] fixes for kpp and akcipher
+Date: Sat, 10 Jun 2017 12:17:05 +0800
+Message-ID: <20170610041705.GF14719@gondor.apana.org.au>
+References: <1495696696-22580-1-git-send-email-tudor.ambarus@microchip.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, linux-mediatek-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
- linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
-To: Ryder Lee <ryder.lee-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>
-Return-path: <linux-mediatek-bounces+glpam-linux-mediatek=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: davem@davemloft.net, horia.geanta@nxp.com, dan.douglass@nxp.com,
+        giovanni.cabiddu@intel.com, salvatore.benedetto@intel.com,
+        linux-crypto@vger.kernel.org
+To: Tudor Ambarus <tudor.ambarus@microchip.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:53018 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751838AbdFJE6r (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 10 Jun 2017 00:58:47 -0400
 Content-Disposition: inline
-In-Reply-To: <1496284222-12560-1-git-send-email-ryder.lee-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-mediatek>,
- <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-mediatek/>
-List-Post: <mailto:linux-mediatek-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
-List-Help: <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-mediatek>,
- <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=subscribe>
-Sender: "Linux-mediatek" <linux-mediatek-bounces-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
-Errors-To: linux-mediatek-bounces+glpam-linux-mediatek=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1495696696-22580-1-git-send-email-tudor.ambarus@microchip.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jun 01, 2017 at 10:30:20AM +0800, Ryder Lee wrote:
-> This patch series only remove redundant clock setting in mediatek crypto driver.
+On Thu, May 25, 2017 at 10:18:02AM +0300, Tudor Ambarus wrote:
+> Hi,
 > 
-> Changes since v1:
-> -rework the commit message.
+> These are various fixes that I made while reading kpp and akcipher
+> implementations.
+> 
+> Changes in v4:
+>  - assume key is already set when calling crypto_akcipher/kpp_maxsize()
 
-All applied.  Thanks.
+All applied, with patch 4/14 taken from v5.  Thanks.
 -- 
-Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
