@@ -1,39 +1,76 @@
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Subject: [PATCH] crypto: crypto4xx - fix an error code
-Date: Sat, 10 Jun 2017 14:54:33 +0200
-Message-ID: <20170610125433.26294-1-christophe.jaillet@wanadoo.fr>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-janitors@vger.kernel.org,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To: herbert@gondor.apana.org.au, davem@davemloft.net
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH 01/12] arm64: neon: replace generic definition of may_use_simd()
+Date: Sat, 10 Jun 2017 16:22:47 +0000
+Message-ID: <1497111778-4210-2-git-send-email-ard.biesheuvel@linaro.org>
+References: <1497111778-4210-1-git-send-email-ard.biesheuvel@linaro.org>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+        linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com,
+        will.deacon@arm.com, dave.martin@arm.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp11.smtpout.orange.fr ([80.12.242.133]:47739 "EHLO
-        smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751838AbdFJMyp (ORCPT
+Received: from mail-wr0-f170.google.com ([209.85.128.170]:35985 "EHLO
+        mail-wr0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752070AbdFJQXI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 10 Jun 2017 08:54:45 -0400
+        Sat, 10 Jun 2017 12:23:08 -0400
+Received: by mail-wr0-f170.google.com with SMTP id v111so58814317wrc.3
+        for <linux-crypto@vger.kernel.org>; Sat, 10 Jun 2017 09:23:08 -0700 (PDT)
+In-Reply-To: <1497111778-4210-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-If 'kzalloc' fails, we return 0 which means success.
-return -ENOMEM instead as already done a few lines above.
+In preparation of modifying the logic that decides whether kernel mode
+NEON is allowable, which is required for SVE support, introduce an
+implementation of may_use_simd() that reflects the current reality, i.e.,
+that SIMD is allowed in any context.
 
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- drivers/crypto/amcc/crypto4xx_core.c | 1 +
- 1 file changed, 1 insertion(+)
+ arch/arm64/include/asm/Kbuild |  1 -
+ arch/arm64/include/asm/simd.h | 24 ++++++++++++++++++++
+ 2 files changed, 24 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
-index fdc83a2281ca..65dc78b91dea 100644
---- a/drivers/crypto/amcc/crypto4xx_core.c
-+++ b/drivers/crypto/amcc/crypto4xx_core.c
-@@ -1179,6 +1179,7 @@ static int crypto4xx_probe(struct platform_device *ofdev)
- 	dev_set_drvdata(dev, core_dev);
- 	core_dev->ofdev = ofdev;
- 	core_dev->dev = kzalloc(sizeof(struct crypto4xx_device), GFP_KERNEL);
-+	rc = -ENOMEM;
- 	if (!core_dev->dev)
- 		goto err_alloc_dev;
- 
+diff --git a/arch/arm64/include/asm/Kbuild b/arch/arm64/include/asm/Kbuild
+index a7a97a608033..3c469b557ee8 100644
+--- a/arch/arm64/include/asm/Kbuild
++++ b/arch/arm64/include/asm/Kbuild
+@@ -31,7 +31,6 @@ generic-y += sembuf.h
+ generic-y += serial.h
+ generic-y += set_memory.h
+ generic-y += shmbuf.h
+-generic-y += simd.h
+ generic-y += sizes.h
+ generic-y += socket.h
+ generic-y += sockios.h
+diff --git a/arch/arm64/include/asm/simd.h b/arch/arm64/include/asm/simd.h
+new file mode 100644
+index 000000000000..f8aa7b3a0140
+--- /dev/null
++++ b/arch/arm64/include/asm/simd.h
+@@ -0,0 +1,24 @@
++/*
++ * Copyright (C) 2017 Linaro Ltd. <ard.biesheuvel@linaro.org>
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License version 2 as published
++ * by the Free Software Foundation.
++ */
++
++#ifndef __ASM_SIMD_H
++#define __ASM_SIMD_H
++
++#include <linux/compiler.h>
++#include <linux/types.h>
++
++/*
++ * may_use_simd - whether it is allowable at this time to issue SIMD
++ *                instructions or access the SIMD register file
++ */
++static __must_check inline bool may_use_simd(void)
++{
++	return true;
++}
++
++#endif
 -- 
-2.11.0
+2.7.4
