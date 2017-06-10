@@ -1,51 +1,65 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v8 1/2] crypto: skcipher AF_ALG - overhaul memory
- management
-Date: Sat, 10 Jun 2017 11:13:16 +0800
-Message-ID: <20170610031316.GA14206@gondor.apana.org.au>
-References: <1534260.eLzG41Ydnz@positron.chronox.de>
- <2934385.XAQy5ZyJXM@positron.chronox.de>
+Subject: Re: [PATCH v2 01/11] crypto: introduce crypto wait for async op
+Date: Sat, 10 Jun 2017 11:43:37 +0800
+Message-ID: <20170610034336.GB14206@gondor.apana.org.au>
+References: <1496046180-21962-1-git-send-email-gilad@benyossef.com>
+ <1496046180-21962-2-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Cc: linux-crypto@vger.kernel.org
-To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [128.1.224.119] ([128.1.224.119]:54302 "EHLO deadmen.hmeau.com"
-        rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751685AbdFJDNi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Jun 2017 23:13:38 -0400
+Content-Type: text/plain; charset=us-ascii
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        David Howells <dhowells@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Shaohua Li <shli@kernel.org>, Steve French <sfrench@samba.org>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        James Morris <james.l.morris@oracle.com>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Eric Biggers <ebiggers3@gmail.com>,
+        Ofir Drang <ofir.drang@arm.com>,
+        Pavel Shilovsky <pshilov@microsoft.com>,
+        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-raid@vger.kernel.org, linux-cif
+To: Gilad Ben-Yossef <gilad@benyossef.com>
+Return-path: <linux-doc-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <2934385.XAQy5ZyJXM@positron.chronox.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1496046180-21962-2-git-send-email-gilad@benyossef.com>
+Sender: linux-doc-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, May 23, 2017 at 04:31:59PM +0200, Stephan Müller wrote:
+On Mon, May 29, 2017 at 11:22:48AM +0300, Gilad Ben-Yossef wrote:
 >
->  static void skcipher_sock_destruct(struct sock *sk)
->  {
->  	struct alg_sock *ask = alg_sk(sk);
->  	struct skcipher_ctx *ctx = ask->private;
-> -	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(&ctx->req);
-> +	struct sock *psk = ask->parent;
-> +	struct alg_sock *pask = alg_sk(psk);
-> +	struct skcipher_tfm *skc = pask->private;
-> +	struct crypto_skcipher *tfm = skc->skcipher;
->  
-> -	if (atomic_read(&ctx->inflight))
-> -		skcipher_wait(sk);
-> +	/* Suspend caller if AIO operations are in flight. */
-> +	wait_event_interruptible(skcipher_aio_finish_wait,
-> +				 (ctx->inflight == 0));
+> +static inline int crypto_wait_req(int err, struct crypto_wait *wait)
+> +{
+> +	switch (err) {
+> +	case -EINPROGRESS:
+> +	case -EBUSY:
+> +		wait_for_completion(&wait->completion);
+> +		reinit_completion(&wait->completion);
+> +		err = wait->err;
+> +		break;
+> +	};
+> +
+> +	return err;
+> +}
 
-This doesn't look right.  If a signal comes in wouldn't you end
-up freeing live memory?
+This assumes that the request is used with backlog.  For non-backlog
+requests this would result in a memory leak as EBUSY in that case is
+a fatal error.
 
-The existing code is crap too.  We should not be waiting in the
-destructor in the first place.  The proper way to do it is to hold
-a reference count on the socket.
+So this API can't be used without backlog.
 
-Cheers,
+We could introduce a flag to indicate whether we want backlog or not,
+or maybe we should change our API so that in the non-backlog case we
+return something other than EBUSY.
+
+Opinions?
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
