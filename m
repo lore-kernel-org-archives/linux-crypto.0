@@ -1,75 +1,52 @@
-From: <service@burdadirect.de>
-Subject: (unknown)
-Date: Sun, 11 Jun 2017 00:20:57 -0000
-Message-ID: <149714045705.12490.13968788257802001116@permonline.ru>
+From: George Cherian <gcherianv@gmail.com>
+Subject: Re: [PATCH v2 0/3] Add more algorithms and some misc cleanups
+Date: Sun, 11 Jun 2017 07:57:30 +0530
+Message-ID: <CABYS091MS4tjV-U1A37Uy4+petP5R4YkpASVqrORNdjoXOCPNQ@mail.gmail.com>
+References: <1493897686-12330-1-git-send-email-george.cherian@cavium.com>
 Mime-Version: 1.0
-Content-Type: application/zip; name="68658800.zip"
-Content-Transfer-Encoding: base64
-To: <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net
+To: George Cherian <george.cherian@cavium.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 90.150.122.230.permonline.ru ([90.150.122.230]:33498 "HELO
-        permonline.ru" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with SMTP id S1751768AbdFKAVF (ORCPT
+Received: from mail-qt0-f195.google.com ([209.85.216.195]:34262 "EHLO
+        mail-qt0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751601AbdFKC1b (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 10 Jun 2017 20:21:05 -0400
-Subject: 
-Content-Disposition: attachment
+        Sat, 10 Jun 2017 22:27:31 -0400
+In-Reply-To: <1493897686-12330-1-git-send-email-george.cherian@cavium.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-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
+Hi Herbert,
+
+Ping on this series....
+
+Regards,
+-George Cherian
+
+On Thu, May 4, 2017 at 5:04 PM, George Cherian
+<george.cherian@cavium.com> wrote:
+> This series adds more algorithm support for CPT.
+> Add support for
+>         -ecb(aes)
+>         -cfb(aes)
+>         -ecb(des3_ede)
+>
+> Some cleanups too.
+>
+> George Cherian (3):
+>   crypto: cavium: Downgrade the annoying misc interrupt print from
+>     dev_err to dev_dbg
+>   crypto: cavium: Remove the individual encrypt/decrypt function for
+>     each algorithm
+>   crypto: cavium: Add more algorithms
+>
+>  drivers/crypto/cavium/cpt/cptvf_algs.c | 234 ++++++++++++++++++++++-----------
+>  drivers/crypto/cavium/cpt/cptvf_algs.h |   7 +
+>  drivers/crypto/cavium/cpt/cptvf_main.c |   2 +-
+>  3 files changed, 165 insertions(+), 78 deletions(-)
+>
+> --
+> 2.1.4
+>
