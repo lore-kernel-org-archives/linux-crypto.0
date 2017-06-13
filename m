@@ -1,150 +1,184 @@
-From: David Gstir <david@sigma-star.at>
-Subject: Re: [RFC PATCH 0/2] crypto: caam - fix cts(cbc(aes)) with CAAM driver
-Date: Tue, 13 Jun 2017 13:53:59 +0200
-Message-ID: <4AF4B212-0F65-4342-83A0-0E2DDD8B77B1@sigma-star.at>
-References: <20170602122446.2427-1-david@sigma-star.at>
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Neil Horman <nhorman@tuxdriver.com>
+Subject: Re: Alg errors with Intel QAT Card
+Date: Tue, 13 Jun 2017 08:30:31 -0400
+Message-ID: <20170613123031.GA18575@hmswarspite.think-freely.org>
+References: <CAMFBXfmo5GmJS5kF+Pf2AvPaLOE20cz-NHUS9X53Lb7RspAOHw@mail.gmail.com>
+ <309B30E91F5E2846B79BD9AA9711D0312ECE8C01@IRSMSX102.ger.corp.intel.com>
+Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 8BIT
-Cc: richard@sigma-star.at, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: horia.geanta@nxp.com, dan.douglass@nxp.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net
+Cc: Raj Ammanur <rammanur@arista.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: "Benedetto, Salvatore" <salvatore.benedetto@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.sigma-star.at ([95.130.255.111]:45996 "EHLO
-        mail.sigma-star.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752456AbdFMLx7 (ORCPT
+Received: from charlotte.tuxdriver.com ([70.61.120.58]:46347 "EHLO
+        smtp.tuxdriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752608AbdFMMak (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Jun 2017 07:53:59 -0400
-In-Reply-To: <20170602122446.2427-1-david@sigma-star.at>
+        Tue, 13 Jun 2017 08:30:40 -0400
+Content-Disposition: inline
+In-Reply-To: <309B30E91F5E2846B79BD9AA9711D0312ECE8C01@IRSMSX102.ger.corp.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Friendly ping. Any feedback on that?
+On Mon, Jun 12, 2017 at 03:52:07PM +0000, Benedetto, Salvatore wrote:
+> Hi Raj,
+> 
+> I've compiled and tested kernel 4.12.0-rc4 and I can't reproduce your issue.
+> Are you seeing any of this with a previous kernel version? If not, git bisect might
+> help us finding the root-cause.
+> Have you tried with another platform/hw?
+> 
+> Regards,
+> Salvatore
+> 
+Try a soft reboot and see if the error clears up.  This looks a bit reminscient
+of some firmware errors we've been chasing down
+Neil
 
-Thanks,
-David
-
-> On 2 Jun 2017, at 14:24, David Gstir <david@sigma-star.at> wrote:
-> 
-> Hi!
-> 
-> While testing fscrypt's filename encryption, I noticed that the implementation
-> of cts(cbc(aes)) is broken when the CAAM hardware crypto driver is enabled.
-> Some digging showed that the refactoring of crypto/cts.c in v4.8 
-> (commit 0605c41cc53ca) exposed some problems with CAAM's aes-cbc
-> implementation. This can be tested quite easily by loading the tcrypt
-> module with mode=38. Looks like the cts mode is not used very often
-> and this went unnoticed since 4.8...
-> 
-> This patch series is an attempt to fix that and get cts(cbc(aes)) working
-> properly again when the CAAM driver is enabled.
-> 
-> Specifically, the issues are:
-> 
-> 1) The cts implementation assumes ->info of ablkcipher_request (or ->iv of
->   skcipher_request respectively) to be set to the last ciphertext block when
->   the aes-cbc encryption is finished. Meaning that ->info is changed by the
->   aes-cbc code. The CAAM driver does not do that and leaves ->info as-is.
-> 
->   It is not fully clear to me yet if this is a requirement of the crypto API,
->   or if this is just a side effect that is exploited by the cts implementation?
-> 
->   For now, I assumed it is a requirement of the crypto API since I've seen
->   other crypto drivers (e.g. AMD's CCP) do that. So the patch fixes the CAAM
->   crypto driver accordingly.
-> 
->   Also, the aead code in the CAAM driver, more specifically the gcm mode code
->   seems to have the same flaw, so it'll need a similar fix in case.
-> 
-> 
-> 2) The cts implementation uses aes-cbc twice to perform its job. The second
->   time, it is called from within the callback of the first call to aes-cbc.
->   This usage is not properly handled in the CAAM driver which triggers the
->   BUG below.
-> 
->   My current proposal is to use in_interrupt() to detect such cases and set
->   the k*alloc flags accordingly. However, since using in_interrupt() is not
->   really nice, I'm wondering if there is a better way to handle this?
-> 
-> 
-> Thanks,
-> David
-> 
-> <snip>
-> [  126.252543] BUG: sleeping function called from invalid context at mm/slab.h:432
-> [  126.260099] in_atomic(): 1, irqs_disabled(): 0, pid: 0, name: swapper/0
-> [  126.266837] no locks held by swapper/0/0.
-> [  126.270969] CPU: 0 PID: 0 Comm: swapper/0 Not tainted 4.12.0-rc3-00052-g0ddec680d395 #287
-> [  126.279226] Hardware name: Freescale i.MX6 Quad/DualLite (Device Tree)
-> [  126.285821] Backtrace:
-> [  126.288406] [<c010c3e4>] (dump_backtrace) from [<c010c690>] (show_stack+0x18/0x1c)
-> [  126.296057]  r7:00000000 r6:60000113 r5:00000000 r4:c102ab48
-> [  126.301798] [<c010c678>] (show_stack) from [<c0427060>] (dump_stack+0xb4/0xe8)
-> [  126.309106] [<c0426fac>] (dump_stack) from [<c014f020>] (___might_sleep+0x17c/0x2a0)
-> [  126.316929]  r9:00000000 r8:c0a016dc r7:c101ee3e r6:000001b0 r5:c0c12fac r4:ffffe000
-> [  126.324751] [<c014eea4>] (___might_sleep) from [<c014f1a8>] (__might_sleep+0x64/0xa4)
-> [  126.332655]  r7:014080c1 r6:00000000 r5:000001b0 r4:c0c12fac
-> [  126.338397] [<c014f144>] (__might_sleep) from [<c0224a20>] (__kmalloc+0x130/0x1b8)
-> [  126.346039]  r6:c071a8ec r5:014080c1 r4:eec01e00
-> [  126.350742] [<c02248f0>] (__kmalloc) from [<c071a8ec>] (ablkcipher_edesc_alloc.constprop.1+0x200/0x900)
-> [  126.360213]  r10:00000000 r9:00000000 r8:c0a016dc r7:c0a016dc r6:ee05ac10 r5:edfdaec0
-> [  126.368109]  r4:00000001 r3:00000020
-> [  126.371765] [<c071a6ec>] (ablkcipher_edesc_alloc.constprop.1) from [<c071b010>] (ablkcipher_encrypt+0x24/0x9c)
-> [  126.381843]  r10:00000000 r9:00000020 r8:00000001 r7:ee05ac10 r6:ed597000 r5:edfdaec0
-> [  126.389738]  r4:ed475d08
-> [  126.392354] [<c071afec>] (ablkcipher_encrypt) from [<c03d6f20>] (skcipher_encrypt_ablkcipher+0x68/0x6c)
-> [  126.401822]  r7:ed475d08 r6:ed597000 r5:00000400 r4:ed475d08
-> [  126.407566] [<c03d6eb8>] (skcipher_encrypt_ablkcipher) from [<c03e8a70>] (cts_cbc_encrypt+0x118/0x124)
-> [  126.416947]  r7:ed475d08 r6:c1001cc0 r5:00000010 r4:edfdae00
-> [  126.422686] [<c03e8958>] (cts_cbc_encrypt) from [<c03e8b88>] (crypto_cts_encrypt_done+0x20/0x54)
-> [  126.431548]  r10:00000000 r9:ee05ac10 r8:00000000 r7:00000010 r6:edc8e6c0 r5:edc8e6d8
-> [  126.439443]  r4:edfdae00
-> [  126.442056] [<c03e8b68>] (crypto_cts_encrypt_done) from [<c07195a0>] (ablkcipher_encrypt_done+0x88/0x9c)
-> [  126.445180] fec 2188000.ethernet eth0: MDIO read timeout
-> [  126.456948]  r5:edc8e6d8 r4:edfdaec0
-> [  126.460604] [<c0719518>] (ablkcipher_encrypt_done) from [<c0715ca0>] (caam_jr_dequeue+0x214/0x2d4)
-> [  126.469639]  r9:00000001 r8:ee088010 r7:000001ff r6:00000001 r5:00000000 r4:edfdaec0
-> [  126.477467] [<c0715a8c>] (caam_jr_dequeue) from [<c012b3f0>] (tasklet_action+0x98/0x154)
-> [  126.485160] fec 2188000.ethernet eth0: MDIO read timeout
-> [  126.490975]  r10:c1080b80 r9:c1008b84 r8:00000000 r7:c1000000 r6:00000000 r5:ee088028
-> [  126.498870]  r4:ee088024
-> [  126.501484] [<c012b358>] (tasklet_action) from [<c012b60c>] (__do_softirq+0xf0/0x2a4)
-> [  126.509390]  r10:40000006 r9:c1002080 r8:00000101 r7:c1002098 r6:c1000000 r5:00000006
-> [  126.517285]  r4:00000000
-> [  126.519896] [<c012b51c>] (__do_softirq) from [<c012bb90>] (irq_exit+0xec/0x168)
-> [  126.525127] fec 2188000.ethernet eth0: MDIO write timeout
-> [  126.532709]  r10:c1008cf0 r9:eec08400 r8:00000001 r7:00000000 r6:c1008b84 r5:00000000
-> [  126.540603]  r4:c0fd940c
-> [  126.543222] [<c012baa4>] (irq_exit) from [<c017ff24>] (__handle_domain_irq+0x74/0xe8)
-> [  126.551135] [<c017feb0>] (__handle_domain_irq) from [<c01015fc>] (gic_handle_irq+0x58/0xbc)
-> [  126.559564]  r9:f4000100 r8:c102af80 r7:c1001ea8 r6:000003ff r5:000003eb r4:f400010c
-> [  126.567384] [<c01015a4>] (gic_handle_irq) from [<c010d2f0>] (__irq_svc+0x70/0x98)
-> [  126.574937] Exception stack(0xc1001ea8 to 0xc1001ef0)
-> [  126.580065] 1ea0:                   00000001 2e39a000 00000000 c100c080 00000000 ef374698
-> [  126.588320] 1ec0: 653b20b1 0000001d 653afed6 0000001d 00000000 c1001f24 c1001ec8 c1001ef8
-> [  126.596568] 1ee0: c016fcf4 c06f1fbc 20000013 ffffffff
-> [  126.601696]  r10:00000000 r9:c1000000 r8:653afed6 r7:c1001edc r6:ffffffff r5:20000013
-> [  126.609591]  r4:c06f1fbc
-> [  126.612210] [<c06f1e34>] (cpuidle_enter_state) from [<c06f2120>] (cpuidle_enter+0x1c/0x20)
-> [  126.620551]  r10:c100f8c0 r9:ef374698 r8:c1008b84 r7:c0fda690 r6:c10089ec r5:c1008a38
-> [  126.628448]  r4:c1000000 r3:ef374698
-> [  126.632114] [<c06f2104>] (cpuidle_enter) from [<c0167330>] (call_cpuidle+0x28/0x44)
-> [  126.639859] [<c0167308>] (call_cpuidle) from [<c0167608>] (do_idle+0x1ac/0x220)
-> [  126.647249] [<c016745c>] (do_idle) from [<c0167a20>] (cpu_startup_entry+0x20/0x24)
-> [  126.654895]  r10:c0e60a50 r9:efffc940 r8:c1080000 r7:c10089c0 r6:c1080000 r5:00000002
-> [  126.662793]  r4:000000bd r3:c0e733c4
-> [  126.666457] [<c0167a00>] (cpu_startup_entry) from [<c09cfbd4>] (rest_init+0x154/0x198)
-> [  126.674463] [<c09cfa80>] (rest_init) from [<c0e00cf0>] (start_kernel+0x344/0x3b8)
-> [  126.682015]  r5:ffffffff r4:c108004c
-> [  126.685668] [<c0e009ac>] (start_kernel) from [<1000807c>] (0x1000807c)
-> </snip>
-> 
->  crypto: caam - properly set IV after {en,de}crypt
->  crypto: caam - fix k*alloc if called from own cipher callback
-> 
-> drivers/crypto/caam/caamalg.c | 55 +++++++++++++++++++++++++++++++++++--------
-> 1 file changed, 45 insertions(+), 10 deletions(-)
-> 
-> -- 
-> 2.12.0
+> > -----Original Message-----
+> > From: linux-crypto-owner@vger.kernel.org [mailto:linux-crypto-
+> > owner@vger.kernel.org] On Behalf Of Raj Ammanur
+> > Sent: Friday, June 9, 2017 7:37 PM
+> > To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+> > Subject: Alg errors with Intel QAT Card
+> > 
+> > Hi
+> > 
+> > I am seeing the below errors after  installing an Intel QAT card
+> > and loading the upstreamed qat_dh895xcc and intel_qat modules.
+> > 
+> > Have others seen similar errors and know if this is a known issue
+> > and a fix exists or know whats going on ? This is with 4.12.0-rc4+
+> > version of the kernel.
+> > 
+> > Any help is sincerely appreciated.
+> > 
+> > thanks
+> > --Raj
+> > 
+> > 
+> > [    3.639046] dh895xcc 0000:00:0b.0: qat_dev0 started 12 acceleration engines
+> > [    4.168887] alg: skcipher-ddst: Test 5 failed (invalid result) on
+> > encryption for qat_aes_cbc
+> > [    4.217866] alg: skcipher-ddst: Chunk test 1 failed on encryption
+> > at page 0 for qat_aes_ctr
+> > [    4.282042] alg: skcipher: Test 4 failed (invalid result) on
+> > encryption for qat_aes_xts
+> > [    4.395210] alg: akcipher: test 1 failed for qat-rsa, err=-22
+> > [root@dhcp-swlab-681 ~]# dmesg | grep -i alg
+> > [    1.499336] alg: No test for pkcs1pad(rsa,sha256)
+> > (pkcs1pad(rsa-generic,sha256))
+> > [    2.562511] SELinux:  Class alg_socket not defined in policy.
+> > [    4.168887] alg: skcipher-ddst: Test 5 failed (invalid result) on
+> > encryption for qat_aes_cbc
+> > [    4.217866] alg: skcipher-ddst: Chunk test 1 failed on encryption
+> > at page 0 for qat_aes_ctr
+> > [    4.282042] alg: skcipher: Test 4 failed (invalid result) on
+> > encryption for qat_aes_xts
+> > [    4.367682] alg: akcipher: encrypt test failed. Invalid output
+> > [    4.395210] alg: akcipher: test 1 failed for qat-rsa, err=-22
+> > [    4.431827] alg: dh: generate public key test failed. Invalid output
+> > [    4.431829] alg: dh: test failed on vector 1, err=-22
+> > 
+> > 
+> > 83:00.0 Co-processor: Intel Corporation DH895XCC Series QAT
+> > Subsystem: Intel Corporation Device 0000
+> > Physical Slot: 2
+> > Control: I/O- Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- ParErr-
+> > Stepping- SERR+ FastB2B- DisINTx+
+> > Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=fast >TAbort-
+> > <TAbort- <MAbort- >SERR- <PERR- INTx-
+> > Latency: 0, Cache Line Size: 32 bytes
+> > Interrupt: pin A routed to IRQ 35
+> > NUMA node: 1
+> > Region 0: Memory at fb900000 (64-bit, prefetchable) [size=512K]
+> > Region 2: Memory at fbd40000 (64-bit, non-prefetchable) [size=256K]
+> > Region 4: Memory at fbd00000 (64-bit, non-prefetchable) [size=256K]
+> > Capabilities: [b0] MSI: Enable- Count=1/1 Maskable+ 64bit+
+> > Address: 0000000000000000  Data: 0000
+> > Masking: 00000000  Pending: 00000000
+> > Capabilities: [60] MSI-X: Enable+ Count=33 Masked-
+> > Vector table: BAR=2 offset=0003b000
+> > PBA: BAR=2 offset=0003b800
+> > Capabilities: [6c] Power Management version 3
+> > Flags: PMEClk- DSI+ D1- D2- AuxCurrent=0mA PME(D0-,D1-,D2-,D3hot-
+> > ,D3cold-)
+> > Status: D0 NoSoftRst- PME-Enable- DSel=0 DScale=0 PME-
+> > Capabilities: [74] Express (v2) Endpoint, MSI 00
+> > DevCap: MaxPayload 256 bytes, PhantFunc 0, Latency L0s <128ns, L1 <1us
+> > ExtTag+ AttnBtn- AttnInd- PwrInd- RBE+ FLReset+ SlotPowerLimit 0.000W
+> > DevCtl: Report errors: Correctable+ Non-Fatal+ Fatal+ Unsupported+
+> > RlxdOrd- ExtTag+ PhantFunc- AuxPwr- NoSnoop+ FLReset-
+> > MaxPayload 256 bytes, MaxReadReq 1024 bytes
+> > DevSta: CorrErr+ UncorrErr- FatalErr- UnsuppReq+ AuxPwr- TransPend-
+> > LnkCap: Port #0, Speed 5GT/s, Width x16, ASPM L0s, Exit Latency L0s
+> > <512ns, L1 unlimited
+> > ClockPM- Surprise- LLActRep- BwNot- ASPMOptComp-
+> > LnkCtl: ASPM Disabled; RCB 64 bytes Disabled- CommClk-
+> > ExtSynch- ClockPM- AutWidDis- BWInt- AutBWInt-
+> > LnkSta: Speed 5GT/s, Width x16, TrErr- Train- SlotClk- DLActive-
+> > BWMgmt- ABWMgmt-
+> > DevCap2: Completion Timeout: Range B, TimeoutDis+, LTR-, OBFF Not
+> > Supported
+> > AtomicOpsCap: 32bit- 64bit- 128bitCAS-
+> > DevCtl2: Completion Timeout: 50us to 50ms, TimeoutDis-, LTR-, OBFF
+> > Disabled
+> > AtomicOpsCtl: ReqEn-
+> > LnkCtl2: Target Link Speed: 5GT/s, EnterCompliance- SpeedDis-
+> >  Transmit Margin: Normal Operating Range, EnterModifiedCompliance-
+> > ComplianceSOS-
+> >  Compliance De-emphasis: -6dB
+> > LnkSta2: Current De-emphasis Level: -6dB, EqualizationComplete-,
+> > EqualizationPhase1-
+> >  EqualizationPhase2-, EqualizationPhase3-, LinkEqualizationRequest-
+> > Capabilities: [100 v1] Advanced Error Reporting
+> > UESta: DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF-
+> > MalfTLP- ECRC- UnsupReq- ACSViol-
+> > UEMsk: DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF-
+> > MalfTLP- ECRC- UnsupReq- ACSViol-
+> > UESvrt: DLP+ SDES+ TLP- FCP+ CmpltTO- CmpltAbrt- UnxCmplt- RxOF+
+> > MalfTLP+ ECRC- UnsupReq- ACSViol-
+> > CESta: RxErr- BadTLP- BadDLLP- Rollover- Timeout- NonFatalErr-
+> > CEMsk: RxErr- BadTLP- BadDLLP- Rollover- Timeout- NonFatalErr+
+> > AERCap: First Error Pointer: 00, GenCap- CGenEn- ChkCap- ChkEn-
+> > Capabilities: [138 v1] Alternative Routing-ID Interpretation (ARI)
+> > ARICap: MFVC- ACS-, Next Function: 0
+> > ARICtl: MFVC- ACS-, Function Group: 0
+> > Capabilities: [140 v1] Single Root I/O Virtualization (SR-IOV)
+> > IOVCap: Migration-, Interrupt Message Number: 000
+> > IOVCtl: Enable- Migration- Interrupt- MSE- ARIHierarchy+
+> > IOVSta: Migration-
+> > Initial VFs: 32, Total VFs: 32, Number of VFs: 0, Function Dependency Link: 00
+> > VF offset: 8, stride: 1, Device ID: 0443
+> > Supported Page Size: 00000553, System Page Size: 00000001
+> > Region 0: Memory at 00000000fbd80000 (64-bit, non-prefetchable)
+> > Region 2: Memory at 00000000fbda0000 (64-bit, non-prefetchable)
+> > VF Migration: offset: 00000000, BIR: 0
+> > Kernel driver in use: dh895xcc
+> > Kernel modules: qat_dh895xcc
+> > 
+> > 
+> > # lsmod | grep qat
+> > qat_dh895xcc           16384  1
+> > intel_qat             126976  13 qat_dh895xcc
+> > dh_generic             16384  1 intel_qat
+> > authenc                16384  1 intel_qat
+> > 
+> > # modinfo qat_dh895xcc
+> > filename:
+> > /lib/modules/4.12.0-
+> > rc4+/kernel/drivers/crypto/qat/qat_dh895xcc/qat_dh895xcc.ko
+> > version:        0.6.0
+> > description:    Intel(R) QuickAssist Technology
+> > firmware:       qat_895xcc.bin
+> > author:         Intel
+> > license:        Dual BSD/GPL
+> > srcversion:     37370A80B9807EC2308F493
+> > alias:          pci:v00008086d00000435sv*sd*bc*sc*i*
+> > depends:        intel_qat
+> > intree:         Y
+> > vermagic:       4.12.0-rc4+ SMP mod_unload
+> > signat:         PKCS#7
+> > signer:
+> > sig_key:
+> > sig_hashalgo:   md4
