@@ -1,61 +1,51 @@
-From: Matthias Brugger <matthias.bgg@gmail.com>
-Subject: Re: [PATCH v2 1/3] dt-bindings: rng: add MediaTek MT7622 Hardware
- Random Generator bindings
-Date: Tue, 13 Jun 2017 11:39:38 +0200
-Message-ID: <3f01f336-b2ac-20ee-d984-2f13f7853d1f@gmail.com>
-References: <cover.1497280813.git.sean.wang@mediatek.com>
- <89b9b682ff9e294df7cda75787c1439c95ffc992.1497280813.git.sean.wang@mediatek.com>
+From: Michael Ellerman <mpe@ellerman.id.au>
+Subject: Re: [PATCH v2 0/6] Appended signatures support for IMA appraisal
+Date: Tue, 13 Jun 2017 20:18:51 +1000
+Message-ID: <87tw3kgph0.fsf@concordia.ellerman.id.au>
+References: <1496886555-10082-1-git-send-email-bauerman@linux.vnet.ibm.com> <87d1adihhk.fsf@concordia.ellerman.id.au> <87efusyi3s.fsf@linux.vnet.ibm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: devicetree@vger.kernel.org, keyhaede@gmail.com,
-        linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org,
-        linux-crypto@vger.kernel.org, weiyongjun1@huawei.com,
-        linux-arm-kernel@lists.infradead.org
-To: sean.wang@mediatek.com, herbert@gondor.apana.org.au,
-        mpm@selenic.com, robh+dt@kernel.org, mark.rutland@arm.com,
-        clabbe.montjoie@gmail.com, prasannatsmkumar@gmail.com,
-        romain.perier@free-electrons.com, shannon.nelson@oracle.com
+Content-Type: text/plain
+Cc: linux-security-module@vger.kernel.org,
+        Jessica Yu <jeyu@redhat.com>, linuxppc-dev@lists.ozlabs.org,
+        Rusty Russell <rusty@rustcorp.com.au>,
+        linux-kernel@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        David Howells <dhowells@redhat.com>,
+        "AKASHI\, Takahiro" <takahiro.akashi@linaro.org>,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        James Morris <james.l.morris@oracle.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        linux-ima-devel@lists.sourceforge.net,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>
+To: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wr0-f196.google.com ([209.85.128.196]:34486 "EHLO
-        mail-wr0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752489AbdFMJjm (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Jun 2017 05:39:42 -0400
-In-Reply-To: <89b9b682ff9e294df7cda75787c1439c95ffc992.1497280813.git.sean.wang@mediatek.com>
-Content-Language: en-US
+Received: from ozlabs.org ([103.22.144.67]:46415 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751895AbdFMKSz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 13 Jun 2017 06:18:55 -0400
+In-Reply-To: <87efusyi3s.fsf@linux.vnet.ibm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com> writes:
 
+> Michael Ellerman <mpe@ellerman.id.au> writes:
+>
+>> Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com> writes:
+>>
+>>> On the OpenPOWER platform, secure boot and trusted boot are being
+>>> implemented using IMA for taking measurements and verifying signatures.
+>>
+>> I still want you to implement arch_kexec_kernel_verify_sig() as well :)
+>
+> Yes, I will implement it! We are still working on loading the public
+> keys for kernel signing from the firmware into a kernel keyring, so
+> there's not much point in implementing arch_kexec_kernel_verify_sig
+> without having that first.
 
-On 12/06/17 17:56, sean.wang@mediatek.com wrote:
-> From: Sean Wang <sean.wang@mediatek.com>
-> 
-> Document the bindings used by MediaTek MT7622 SoC hardware random number
-> generator.
-> 
-> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
-> ---
->   Documentation/devicetree/bindings/rng/mtk-rng.txt | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
-> 
+OK. What's the ETA on those patches?
 
-Reviewed-by: Matthias Brugger <matthias.bgg@gmail.com>
-
-> diff --git a/Documentation/devicetree/bindings/rng/mtk-rng.txt b/Documentation/devicetree/bindings/rng/mtk-rng.txt
-> index a6d62a2..366b99b 100644
-> --- a/Documentation/devicetree/bindings/rng/mtk-rng.txt
-> +++ b/Documentation/devicetree/bindings/rng/mtk-rng.txt
-> @@ -2,7 +2,9 @@ Device-Tree bindings for Mediatek random number generator
->   found in Mediatek SoC family
->   
->   Required properties:
-> -- compatible	    : Should be "mediatek,mt7623-rng"
-> +- compatible	    : Should be
-> +			"mediatek,mt7622-rng", 	"mediatek,mt7623-rng" : for MT7622
-> +			"mediatek,mt7623-rng" : for MT7623
->   - clocks	    : list of clock specifiers, corresponding to
->   		      entries in clock-names property;
->   - clock-names	    : Should contain "rng" entries;
-> 
+cheers
