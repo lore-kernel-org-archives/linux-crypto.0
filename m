@@ -1,39 +1,45 @@
 From: Colin King <colin.king@canonical.com>
-Subject: [PATCH][crypto-next] crypto: omap-aes: fix spelling mistake "Encryptio" -> "Encryption"
-Date: Tue, 13 Jun 2017 09:46:47 +0100
-Message-ID: <20170613084647.20500-1-colin.king@canonical.com>
+Subject: [PATCH][crypto-next] crypto: cavium: fix spelling mistake "Revsion" -> "Revision"
+Date: Tue, 13 Jun 2017 09:52:54 +0100
+Message-ID: <20170613085254.20855-1-colin.king@canonical.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S . Miller" <davem@davemloft.net>,
+        Srikanth Jampala <Jampala.Srikanth@cavium.com>,
         linux-crypto@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from youngberry.canonical.com ([91.189.89.112]:54930 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751914AbdFMIw7 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 13 Jun 2017 04:52:59 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 From: Colin Ian King <colin.king@canonical.com>
 
-Trivial fix to spelling mistake in pr_err message
+Trivial fix to spelling mistake in seq_printf message
 
 Signed-off-by: Colin Ian King <colin.king@canonical.com>
 ---
- drivers/crypto/omap-aes-gcm.c | 2 +-
+ drivers/crypto/cavium/nitrox/nitrox_main.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/omap-aes-gcm.c b/drivers/crypto/omap-aes-gcm.c
-index 521a310ea699..7d4f8a4be6d8 100644
---- a/drivers/crypto/omap-aes-gcm.c
-+++ b/drivers/crypto/omap-aes-gcm.c
-@@ -214,7 +214,7 @@ static int do_encrypt_iv(struct aead_request *req, u32 *tag, u32 *iv)
- 		}
- 		/* fall through */
- 	default:
--		pr_err("Encryptio of IV failed for GCM mode");
-+		pr_err("Encryption of IV failed for GCM mode");
- 		break;
- 	}
+diff --git a/drivers/crypto/cavium/nitrox/nitrox_main.c b/drivers/crypto/cavium/nitrox/nitrox_main.c
+index eee6fb501580..ae44a464cd2d 100644
+--- a/drivers/crypto/cavium/nitrox/nitrox_main.c
++++ b/drivers/crypto/cavium/nitrox/nitrox_main.c
+@@ -399,7 +399,7 @@ static int nitrox_show(struct seq_file *s, void *v)
+ 	struct nitrox_device *ndev = s->private;
  
+ 	seq_printf(s, "NITROX-5 [idx: %d]\n", ndev->idx);
+-	seq_printf(s, "  Revsion ID: 0x%0x\n", ndev->hw.revision_id);
++	seq_printf(s, "  Revision ID: 0x%0x\n", ndev->hw.revision_id);
+ 	seq_printf(s, "  Cores [AE: %u  SE: %u]\n",
+ 		   ndev->hw.ae_cores, ndev->hw.se_cores);
+ 	seq_printf(s, "  Number of Queues: %u\n", ndev->nr_queues);
 -- 
 2.11.0
