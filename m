@@ -1,392 +1,208 @@
-From: frowand.list@gmail.com
-Subject: [PATCH] of: update ePAPR references to point to Devicetree Specification
-Date: Tue, 13 Jun 2017 19:49:04 -0700
-Message-ID: <1497408544-7383-1-git-send-email-frowand.list@gmail.com>
+From: Neil Horman <nhorman@tuxdriver.com>
+Subject: Re: Alg errors with Intel QAT Card
+Date: Wed, 14 Jun 2017 08:12:38 -0400
+Message-ID: <20170614121238.GA18388@hmswarspite.think-freely.org>
+References: <CAMFBXfmo5GmJS5kF+Pf2AvPaLOE20cz-NHUS9X53Lb7RspAOHw@mail.gmail.com>
+ <309B30E91F5E2846B79BD9AA9711D0312ECE8C01@IRSMSX102.ger.corp.intel.com>
+ <20170613123031.GA18575@hmswarspite.think-freely.org>
+ <CAMFBXfn=mUyxQQqVcrg=mjw9JT+gK1MSbLszG1vNu__B78H41w@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Cc: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-        Dan Douglass <dan.douglass@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Jason Cooper <jason@lakedaemon.net>,
-        Marc Zyngier <marc.zyngier@arm.com>,
-        Scott Wood <oss@buserror.net>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Jonathan Corbet <corbet@lwn.net>, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org
-To: Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: "Benedetto, Salvatore" <salvatore.benedetto@intel.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Raj Ammanur <rammanur@arista.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from charlotte.tuxdriver.com ([70.61.120.58]:34378 "EHLO
+        smtp.tuxdriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750756AbdFNMMs (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 14 Jun 2017 08:12:48 -0400
+Content-Disposition: inline
+In-Reply-To: <CAMFBXfn=mUyxQQqVcrg=mjw9JT+gK1MSbLszG1vNu__B78H41w@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Frank Rowand <frank.rowand@sony.com>
+On Tue, Jun 13, 2017 at 01:32:55PM -0700, Raj Ammanur wrote:
+> Hi Neil & Salvatore,
+> 
+> thanks for the replies. The soft reboot hasn't helped. I am trying a previous
+> kernel version that works with a similar card that we installed in
+> another server
+> and that works fine. Will keep you posted.
+> 
+> Neil: have you found fix/workaround for the firmware errors or you just using
+> a soft reboot? by that, you just mean unload and load the kernel modules or
+> a system reboot. I have tried both.
+> 
+its the latter that works around the issue.  I belive a QAT firmware update will
+be forthcomming to fix the issue
 
-The Devicetree Specification has superseded the ePAPR as the
-base specification for bindings.  Update files in Documentation
-to reference the new document.
+Neil
 
-Some files are not updated because there is no hypervisor chapter
-in the Devicetree Specification:
-   Documentation/devicetree/bindings/powerpc/fsl/msi-pic.txt
-   Documenation/virtual/kvm/api.txt
-   Documenation/virtual/kvm/ppc-pv.txt
-
-Signed-off-by: Frank Rowand <frank.rowand@sony.com>
----
- Documentation/devicetree/bindings/arm/cci.txt               | 12 ++++++------
- Documentation/devicetree/bindings/arm/cpus.txt              | 13 +++++++------
- Documentation/devicetree/bindings/arm/idle-states.txt       |  4 ++--
- Documentation/devicetree/bindings/arm/l2c2x0.txt            |  4 ++--
- Documentation/devicetree/bindings/arm/topology.txt          |  4 ++--
- Documentation/devicetree/bindings/bus/simple-pm-bus.txt     |  2 +-
- Documentation/devicetree/bindings/chosen.txt                |  3 ++-
- Documentation/devicetree/bindings/common-properties.txt     |  2 +-
- Documentation/devicetree/bindings/crypto/fsl-sec4.txt       |  4 ++--
- Documentation/devicetree/bindings/crypto/fsl-sec6.txt       |  4 ++--
- .../devicetree/bindings/interrupt-controller/open-pic.txt   |  5 ++---
- Documentation/devicetree/bindings/net/ethernet.txt          |  9 ++++++---
- Documentation/devicetree/bindings/powerpc/fsl/cpus.txt      |  6 +++---
- Documentation/devicetree/bindings/powerpc/fsl/l2cache.txt   |  2 +-
- Documentation/devicetree/bindings/powerpc/fsl/srio-rmu.txt  |  4 ++--
- Documentation/devicetree/bindings/powerpc/fsl/srio.txt      |  3 ++-
- Documentation/devicetree/booting-without-of.txt             |  2 +-
- Documentation/devicetree/usage-model.txt                    |  2 +-
- Documentation/xtensa/mmu.txt                                |  6 +++---
- 19 files changed, 48 insertions(+), 43 deletions(-)
-
-diff --git a/Documentation/devicetree/bindings/arm/cci.txt b/Documentation/devicetree/bindings/arm/cci.txt
-index 0f2153e8fa7e..cc7621b204f4 100644
---- a/Documentation/devicetree/bindings/arm/cci.txt
-+++ b/Documentation/devicetree/bindings/arm/cci.txt
-@@ -11,9 +11,9 @@ clusters, through memory mapped interface, with a global control register
- space and multiple sets of interface control registers, one per slave
- interface.
- 
--Bindings for the CCI node follow the ePAPR standard, available from:
-+Bindings for the CCI node follow the Devicetree Specification, available from:
- 
--www.power.org/documentation/epapr-version-1-1/
-+https://www.devicetree.org/specifications/
- 
- with the addition of the bindings described in this document which are
- specific to ARM.
-@@ -50,10 +50,10 @@ specific to ARM.
- 			    as a tuple of cells, containing child address,
- 			    parent address and the size of the region in the
- 			    child address space.
--		Definition: A standard property. Follow rules in the ePAPR for
--			    hierarchical bus addressing. CCI interfaces
--			    addresses refer to the parent node addressing
--			    scheme to declare their register bases.
-+		Definition: A standard property. Follow rules in the Devicetree
-+			    Specification for hierarchical bus addressing. CCI
-+			    interfaces addresses refer to the parent node
-+			    addressing scheme to declare their register bases.
- 
- 	CCI interconnect node can define the following child nodes:
- 
-diff --git a/Documentation/devicetree/bindings/arm/cpus.txt b/Documentation/devicetree/bindings/arm/cpus.txt
-index 1030f5f50207..283c520a2224 100644
---- a/Documentation/devicetree/bindings/arm/cpus.txt
-+++ b/Documentation/devicetree/bindings/arm/cpus.txt
-@@ -6,9 +6,9 @@ The device tree allows to describe the layout of CPUs in a system through
- the "cpus" node, which in turn contains a number of subnodes (ie "cpu")
- defining properties for every cpu.
- 
--Bindings for CPU nodes follow the ePAPR v1.1 standard, available from:
-+Bindings for CPU nodes follow the Devicetree Specification, available from:
- 
--https://www.power.org/documentation/epapr-version-1-1/
-+https://www.devicetree.org/specifications/
- 
- with updates for 32-bit and 64-bit ARM systems provided in this document.
- 
-@@ -16,8 +16,8 @@ with updates for 32-bit and 64-bit ARM systems provided in this document.
- Convention used in this document
- ================================
- 
--This document follows the conventions described in the ePAPR v1.1, with
--the addition:
-+This document follows the conventions described in the Devicetree
-+Specification, with the addition:
- 
- - square brackets define bitfields, eg reg[7:0] value of the bitfield in
-   the reg property contained in bits 7 down to 0
-@@ -26,8 +26,9 @@ the addition:
- cpus and cpu node bindings definition
- =====================================
- 
--The ARM architecture, in accordance with the ePAPR, requires the cpus and cpu
--nodes to be present and contain the properties described below.
-+The ARM architecture, in accordance with the Devicetree Specification,
-+requires the cpus and cpu nodes to be present and contain the properties
-+described below.
- 
- - cpus node
- 
-diff --git a/Documentation/devicetree/bindings/arm/idle-states.txt b/Documentation/devicetree/bindings/arm/idle-states.txt
-index b8e41c148a3c..7a591333f2b1 100644
---- a/Documentation/devicetree/bindings/arm/idle-states.txt
-+++ b/Documentation/devicetree/bindings/arm/idle-states.txt
-@@ -695,5 +695,5 @@ cpus {
- [4] ARM Architecture Reference Manuals
-     http://infocenter.arm.com/help/index.jsp
- 
--[5] ePAPR standard
--    https://www.power.org/documentation/epapr-version-1-1/
-+[5] Devicetree Specification
-+    https://www.devicetree.org/specifications/
-diff --git a/Documentation/devicetree/bindings/arm/l2c2x0.txt b/Documentation/devicetree/bindings/arm/l2c2x0.txt
-index d9650c1788f4..fbe6cb21f4cf 100644
---- a/Documentation/devicetree/bindings/arm/l2c2x0.txt
-+++ b/Documentation/devicetree/bindings/arm/l2c2x0.txt
-@@ -4,8 +4,8 @@ ARM cores often have a separate L2C210/L2C220/L2C310 (also known as PL210/PL220/
- PL310 and variants) based level 2 cache controller. All these various implementations
- of the L2 cache controller have compatible programming models (Note 1).
- Some of the properties that are just prefixed "cache-*" are taken from section
--3.7.3 of the ePAPR v1.1 specification which can be found at:
--https://www.power.org/wp-content/uploads/2012/06/Power_ePAPR_APPROVED_v1.1.pdf
-+3.7.3 of the Devicetree Specification which can be found at:
-+https://www.devicetree.org/specifications/
- 
- The ARM L2 cache representation in the device tree should be done as follows:
- 
-diff --git a/Documentation/devicetree/bindings/arm/topology.txt b/Documentation/devicetree/bindings/arm/topology.txt
-index 1061faf5f602..de9eb0486630 100644
---- a/Documentation/devicetree/bindings/arm/topology.txt
-+++ b/Documentation/devicetree/bindings/arm/topology.txt
-@@ -29,9 +29,9 @@ corresponding to the system hierarchy; syntactically they are defined as device
- tree nodes.
- 
- The remainder of this document provides the topology bindings for ARM, based
--on the ePAPR standard, available from:
-+on the Devicetree Specification, available from:
- 
--http://www.power.org/documentation/epapr-version-1-1/
-+https://www.devicetree.org/specifications/
- 
- If not stated otherwise, whenever a reference to a cpu node phandle is made its
- value must point to a cpu node compliant with the cpu node bindings as
-diff --git a/Documentation/devicetree/bindings/bus/simple-pm-bus.txt b/Documentation/devicetree/bindings/bus/simple-pm-bus.txt
-index d032237512c2..6f15037131ed 100644
---- a/Documentation/devicetree/bindings/bus/simple-pm-bus.txt
-+++ b/Documentation/devicetree/bindings/bus/simple-pm-bus.txt
-@@ -10,7 +10,7 @@ enabled for child devices connected to the bus (either on-SoC or externally)
- to function.
- 
- While "simple-pm-bus" follows the "simple-bus" set of properties, as specified
--in ePAPR, it is not an extension of "simple-bus".
-+in the Devicetree Specification, it is not an extension of "simple-bus".
- 
- 
- Required properties:
-diff --git a/Documentation/devicetree/bindings/chosen.txt b/Documentation/devicetree/bindings/chosen.txt
-index b5e39af4ddc0..dee3f5d9df26 100644
---- a/Documentation/devicetree/bindings/chosen.txt
-+++ b/Documentation/devicetree/bindings/chosen.txt
-@@ -10,7 +10,8 @@ stdout-path property
- --------------------
- 
- Device trees may specify the device to be used for boot console output
--with a stdout-path property under /chosen, as described in ePAPR, e.g.
-+with a stdout-path property under /chosen, as described in the Devicetree
-+Specification, e.g.
- 
- / {
- 	chosen {
-diff --git a/Documentation/devicetree/bindings/common-properties.txt b/Documentation/devicetree/bindings/common-properties.txt
-index 3193979b1d05..697714f8d75c 100644
---- a/Documentation/devicetree/bindings/common-properties.txt
-+++ b/Documentation/devicetree/bindings/common-properties.txt
-@@ -1,6 +1,6 @@
- Common properties
- 
--The ePAPR specification does not define any properties related to hardware
-+The Devicetree Specification does not define any properties related to hardware
- byteswapping, but endianness issues show up frequently in porting Linux to
- different machine types.  This document attempts to provide a consistent
- way of handling byteswapping across drivers.
-diff --git a/Documentation/devicetree/bindings/crypto/fsl-sec4.txt b/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
-index 10a425f451fc..7aef0eae58d4 100644
---- a/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
-+++ b/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
-@@ -118,8 +118,8 @@ PROPERTIES
-       Definition: A list of clock name strings in the same order as the
-           clocks property.
- 
--   Note: All other standard properties (see the ePAPR) are allowed
--   but are optional.
-+   Note: All other standard properties (see the Devicetree Specification)
-+   are allowed but are optional.
- 
- 
- EXAMPLE
-diff --git a/Documentation/devicetree/bindings/crypto/fsl-sec6.txt b/Documentation/devicetree/bindings/crypto/fsl-sec6.txt
-index baf8a3c1b469..73b0eb950bb3 100644
---- a/Documentation/devicetree/bindings/crypto/fsl-sec6.txt
-+++ b/Documentation/devicetree/bindings/crypto/fsl-sec6.txt
-@@ -55,8 +55,8 @@ PROPERTIES
-            triplet that includes the child address, parent address, &
-            length.
- 
--   Note: All other standard properties (see the ePAPR) are allowed
--   but are optional.
-+   Note: All other standard properties (see the Devicetree Specification)
-+   are allowed but are optional.
- 
- EXAMPLE
- 	crypto@a0000 {
-diff --git a/Documentation/devicetree/bindings/interrupt-controller/open-pic.txt b/Documentation/devicetree/bindings/interrupt-controller/open-pic.txt
-index 909a902dff85..ccbbfdc53c72 100644
---- a/Documentation/devicetree/bindings/interrupt-controller/open-pic.txt
-+++ b/Documentation/devicetree/bindings/interrupt-controller/open-pic.txt
-@@ -92,7 +92,6 @@ Example 2:
- 
- * References
- 
--[1] Power.org (TM) Standard for Embedded Power Architecture (TM) Platform
--    Requirements (ePAPR), Version 1.0, July 2008.
--    (http://www.power.org/resources/downloads/Power_ePAPR_APPROVED_v1.0.pdf)
-+[1] Devicetree Specification
-+    (https://www.devicetree.org/specifications/)
- 
-diff --git a/Documentation/devicetree/bindings/net/ethernet.txt b/Documentation/devicetree/bindings/net/ethernet.txt
-index 3a6916909d90..08dd263beeb9 100644
---- a/Documentation/devicetree/bindings/net/ethernet.txt
-+++ b/Documentation/devicetree/bindings/net/ethernet.txt
-@@ -8,7 +8,8 @@ The following properties are common to the Ethernet controllers:
-   property;
- - max-speed: number, specifies maximum speed in Mbit/s supported by the device;
- - max-frame-size: number, maximum transfer unit (IEEE defined MTU), rather than
--  the maximum frame size (there's contradiction in ePAPR).
-+  the maximum frame size (there's contradiction in the Devicetree
-+  Specification).
- - phy-mode: string, operation mode of the PHY interface. This is now a de-facto
-   standard property; supported values are:
-   * "mii"
-@@ -32,9 +33,11 @@ The following properties are common to the Ethernet controllers:
-   * "2000base-x",
-   * "2500base-x",
-   * "rxaui"
--- phy-connection-type: the same as "phy-mode" property but described in ePAPR;
-+- phy-connection-type: the same as "phy-mode" property but described in the
-+  Devicetree Specification;
- - phy-handle: phandle, specifies a reference to a node representing a PHY
--  device; this property is described in ePAPR and so preferred;
-+  device; this property is described in the Devicetree Specification and so
-+  preferred;
- - phy: the same as "phy-handle" property, not recommended for new bindings.
- - phy-device: the same as "phy-handle" property, not recommended for new
-   bindings.
-diff --git a/Documentation/devicetree/bindings/powerpc/fsl/cpus.txt b/Documentation/devicetree/bindings/powerpc/fsl/cpus.txt
-index f8cd2397aa04..d63ab1dec16d 100644
---- a/Documentation/devicetree/bindings/powerpc/fsl/cpus.txt
-+++ b/Documentation/devicetree/bindings/powerpc/fsl/cpus.txt
-@@ -3,10 +3,10 @@ Power Architecture CPU Binding
- Copyright 2013 Freescale Semiconductor Inc.
- 
- Power Architecture CPUs in Freescale SOCs are represented in device trees as
--per the definition in ePAPR.
-+per the definition in the Devicetree Specification.
- 
--In addition to the ePAPR definitions, the properties defined below may be
--present on CPU nodes.
-+In addition to the the Devicetree Specification definitions, the properties
-+defined below may be present on CPU nodes.
- 
- PROPERTIES
- 
-diff --git a/Documentation/devicetree/bindings/powerpc/fsl/l2cache.txt b/Documentation/devicetree/bindings/powerpc/fsl/l2cache.txt
-index dc9bb3182525..8a70696395a7 100644
---- a/Documentation/devicetree/bindings/powerpc/fsl/l2cache.txt
-+++ b/Documentation/devicetree/bindings/powerpc/fsl/l2cache.txt
-@@ -1,7 +1,7 @@
- Freescale L2 Cache Controller
- 
- L2 cache is present in Freescale's QorIQ and QorIQ Qonverge platforms.
--The cache bindings explained below are ePAPR compliant
-+The cache bindings explained below are Devicetree Specification compliant
- 
- Required Properties:
- 
-diff --git a/Documentation/devicetree/bindings/powerpc/fsl/srio-rmu.txt b/Documentation/devicetree/bindings/powerpc/fsl/srio-rmu.txt
-index b9a8a2bcfae7..0496ada4bba4 100644
---- a/Documentation/devicetree/bindings/powerpc/fsl/srio-rmu.txt
-+++ b/Documentation/devicetree/bindings/powerpc/fsl/srio-rmu.txt
-@@ -124,8 +124,8 @@ Port-Write Unit:
- 		A single IRQ that handles port-write conditions is
- 		specified by this property.  (Typically shared with error).
- 
--   Note: All other standard properties (see the ePAPR) are allowed
--   but are optional.
-+   Note: All other standard properties (see the Devicetree Specification)
-+   are allowed but are optional.
- 
- Example:
- 	rmu: rmu@d3000 {
-diff --git a/Documentation/devicetree/bindings/powerpc/fsl/srio.txt b/Documentation/devicetree/bindings/powerpc/fsl/srio.txt
-index 07abf0f2f440..86ee6ea73754 100644
---- a/Documentation/devicetree/bindings/powerpc/fsl/srio.txt
-+++ b/Documentation/devicetree/bindings/powerpc/fsl/srio.txt
-@@ -72,7 +72,8 @@ the following properties:
- 		represents the LIODN associated with maintenance transactions
- 		for the port.
- 
--Note: All other standard properties (see ePAPR) are allowed but are optional.
-+Note: All other standard properties (see the Devicetree Specification)
-+are allowed but are optional.
- 
- Example:
- 
-diff --git a/Documentation/devicetree/booting-without-of.txt b/Documentation/devicetree/booting-without-of.txt
-index 280d283304bb..fb740445199f 100644
---- a/Documentation/devicetree/booting-without-of.txt
-+++ b/Documentation/devicetree/booting-without-of.txt
-@@ -1413,7 +1413,7 @@ Optional property:
- 	from DMA operations originating from the bus. It provides a means of
- 	defining a mapping or translation between the physical address space of
- 	the bus and the physical address space of the parent of the bus.
--	(for more information see ePAPR specification)
-+	(for more information see the Devicetree Specification)
- 
- * DMA Bus child
- Optional property:
-diff --git a/Documentation/devicetree/usage-model.txt b/Documentation/devicetree/usage-model.txt
-index 2b6b3d3f0388..33a8aaac02a8 100644
---- a/Documentation/devicetree/usage-model.txt
-+++ b/Documentation/devicetree/usage-model.txt
-@@ -387,7 +387,7 @@ static void __init harmony_init_machine(void)
- 	of_platform_populate(NULL, of_default_bus_match_table, NULL, NULL);
- }
- 
--"simple-bus" is defined in the ePAPR 1.0 specification as a property
-+"simple-bus" is defined in the Devicetree Specification as a property
- meaning a simple memory mapped bus, so the of_platform_populate() code
- could be written to just assume simple-bus compatible nodes will
- always be traversed.  However, we pass it in as an argument so that
-diff --git a/Documentation/xtensa/mmu.txt b/Documentation/xtensa/mmu.txt
-index 222a2c6748e6..5de8715d5bec 100644
---- a/Documentation/xtensa/mmu.txt
-+++ b/Documentation/xtensa/mmu.txt
-@@ -41,9 +41,9 @@ The scheme below assumes that the kernel is loaded below 0x40000000.
-  00..1F -> 00  -> 00  -> 00
- 
- The default location of IO peripherals is above 0xf0000000. This may be changed
--using a "ranges" property in a device tree simple-bus node. See ePAPR 1.1, §6.5
--for details on the syntax and semantic of simple-bus nodes. The following
--limitations apply:
-+using a "ranges" property in a device tree simple-bus node. See the Devicetree
-+Specification, section 4.5 for details on the syntax and semantics of
-+simple-bus nodes. The following limitations apply:
- 
- 1. Only top level simple-bus nodes are considered
- 
--- 
-Frank Rowand <frank.rowand@sony.com>
+> thanks
+> --Raj
+> 
+> On Tue, Jun 13, 2017 at 5:30 AM, Neil Horman <nhorman@tuxdriver.com> wrote:
+> > On Mon, Jun 12, 2017 at 03:52:07PM +0000, Benedetto, Salvatore wrote:
+> >> Hi Raj,
+> >>
+> >> I've compiled and tested kernel 4.12.0-rc4 and I can't reproduce your issue.
+> >> Are you seeing any of this with a previous kernel version? If not, git bisect might
+> >> help us finding the root-cause.
+> >> Have you tried with another platform/hw?
+> >>
+> >> Regards,
+> >> Salvatore
+> >>
+> > Try a soft reboot and see if the error clears up.  This looks a bit reminscient
+> > of some firmware errors we've been chasing down
+> > Neil
+> >
+> >> > -----Original Message-----
+> >> > From: linux-crypto-owner@vger.kernel.org [mailto:linux-crypto-
+> >> > owner@vger.kernel.org] On Behalf Of Raj Ammanur
+> >> > Sent: Friday, June 9, 2017 7:37 PM
+> >> > To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+> >> > Subject: Alg errors with Intel QAT Card
+> >> >
+> >> > Hi
+> >> >
+> >> > I am seeing the below errors after  installing an Intel QAT card
+> >> > and loading the upstreamed qat_dh895xcc and intel_qat modules.
+> >> >
+> >> > Have others seen similar errors and know if this is a known issue
+> >> > and a fix exists or know whats going on ? This is with 4.12.0-rc4+
+> >> > version of the kernel.
+> >> >
+> >> > Any help is sincerely appreciated.
+> >> >
+> >> > thanks
+> >> > --Raj
+> >> >
+> >> >
+> >> > [    3.639046] dh895xcc 0000:00:0b.0: qat_dev0 started 12 acceleration engines
+> >> > [    4.168887] alg: skcipher-ddst: Test 5 failed (invalid result) on
+> >> > encryption for qat_aes_cbc
+> >> > [    4.217866] alg: skcipher-ddst: Chunk test 1 failed on encryption
+> >> > at page 0 for qat_aes_ctr
+> >> > [    4.282042] alg: skcipher: Test 4 failed (invalid result) on
+> >> > encryption for qat_aes_xts
+> >> > [    4.395210] alg: akcipher: test 1 failed for qat-rsa, err=-22
+> >> > [root@dhcp-swlab-681 ~]# dmesg | grep -i alg
+> >> > [    1.499336] alg: No test for pkcs1pad(rsa,sha256)
+> >> > (pkcs1pad(rsa-generic,sha256))
+> >> > [    2.562511] SELinux:  Class alg_socket not defined in policy.
+> >> > [    4.168887] alg: skcipher-ddst: Test 5 failed (invalid result) on
+> >> > encryption for qat_aes_cbc
+> >> > [    4.217866] alg: skcipher-ddst: Chunk test 1 failed on encryption
+> >> > at page 0 for qat_aes_ctr
+> >> > [    4.282042] alg: skcipher: Test 4 failed (invalid result) on
+> >> > encryption for qat_aes_xts
+> >> > [    4.367682] alg: akcipher: encrypt test failed. Invalid output
+> >> > [    4.395210] alg: akcipher: test 1 failed for qat-rsa, err=-22
+> >> > [    4.431827] alg: dh: generate public key test failed. Invalid output
+> >> > [    4.431829] alg: dh: test failed on vector 1, err=-22
+> >> >
+> >> >
+> >> > 83:00.0 Co-processor: Intel Corporation DH895XCC Series QAT
+> >> > Subsystem: Intel Corporation Device 0000
+> >> > Physical Slot: 2
+> >> > Control: I/O- Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- ParErr-
+> >> > Stepping- SERR+ FastB2B- DisINTx+
+> >> > Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=fast >TAbort-
+> >> > <TAbort- <MAbort- >SERR- <PERR- INTx-
+> >> > Latency: 0, Cache Line Size: 32 bytes
+> >> > Interrupt: pin A routed to IRQ 35
+> >> > NUMA node: 1
+> >> > Region 0: Memory at fb900000 (64-bit, prefetchable) [size=512K]
+> >> > Region 2: Memory at fbd40000 (64-bit, non-prefetchable) [size=256K]
+> >> > Region 4: Memory at fbd00000 (64-bit, non-prefetchable) [size=256K]
+> >> > Capabilities: [b0] MSI: Enable- Count=1/1 Maskable+ 64bit+
+> >> > Address: 0000000000000000  Data: 0000
+> >> > Masking: 00000000  Pending: 00000000
+> >> > Capabilities: [60] MSI-X: Enable+ Count=33 Masked-
+> >> > Vector table: BAR=2 offset=0003b000
+> >> > PBA: BAR=2 offset=0003b800
+> >> > Capabilities: [6c] Power Management version 3
+> >> > Flags: PMEClk- DSI+ D1- D2- AuxCurrent=0mA PME(D0-,D1-,D2-,D3hot-
+> >> > ,D3cold-)
+> >> > Status: D0 NoSoftRst- PME-Enable- DSel=0 DScale=0 PME-
+> >> > Capabilities: [74] Express (v2) Endpoint, MSI 00
+> >> > DevCap: MaxPayload 256 bytes, PhantFunc 0, Latency L0s <128ns, L1 <1us
+> >> > ExtTag+ AttnBtn- AttnInd- PwrInd- RBE+ FLReset+ SlotPowerLimit 0.000W
+> >> > DevCtl: Report errors: Correctable+ Non-Fatal+ Fatal+ Unsupported+
+> >> > RlxdOrd- ExtTag+ PhantFunc- AuxPwr- NoSnoop+ FLReset-
+> >> > MaxPayload 256 bytes, MaxReadReq 1024 bytes
+> >> > DevSta: CorrErr+ UncorrErr- FatalErr- UnsuppReq+ AuxPwr- TransPend-
+> >> > LnkCap: Port #0, Speed 5GT/s, Width x16, ASPM L0s, Exit Latency L0s
+> >> > <512ns, L1 unlimited
+> >> > ClockPM- Surprise- LLActRep- BwNot- ASPMOptComp-
+> >> > LnkCtl: ASPM Disabled; RCB 64 bytes Disabled- CommClk-
+> >> > ExtSynch- ClockPM- AutWidDis- BWInt- AutBWInt-
+> >> > LnkSta: Speed 5GT/s, Width x16, TrErr- Train- SlotClk- DLActive-
+> >> > BWMgmt- ABWMgmt-
+> >> > DevCap2: Completion Timeout: Range B, TimeoutDis+, LTR-, OBFF Not
+> >> > Supported
+> >> > AtomicOpsCap: 32bit- 64bit- 128bitCAS-
+> >> > DevCtl2: Completion Timeout: 50us to 50ms, TimeoutDis-, LTR-, OBFF
+> >> > Disabled
+> >> > AtomicOpsCtl: ReqEn-
+> >> > LnkCtl2: Target Link Speed: 5GT/s, EnterCompliance- SpeedDis-
+> >> >  Transmit Margin: Normal Operating Range, EnterModifiedCompliance-
+> >> > ComplianceSOS-
+> >> >  Compliance De-emphasis: -6dB
+> >> > LnkSta2: Current De-emphasis Level: -6dB, EqualizationComplete-,
+> >> > EqualizationPhase1-
+> >> >  EqualizationPhase2-, EqualizationPhase3-, LinkEqualizationRequest-
+> >> > Capabilities: [100 v1] Advanced Error Reporting
+> >> > UESta: DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF-
+> >> > MalfTLP- ECRC- UnsupReq- ACSViol-
+> >> > UEMsk: DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF-
+> >> > MalfTLP- ECRC- UnsupReq- ACSViol-
+> >> > UESvrt: DLP+ SDES+ TLP- FCP+ CmpltTO- CmpltAbrt- UnxCmplt- RxOF+
+> >> > MalfTLP+ ECRC- UnsupReq- ACSViol-
+> >> > CESta: RxErr- BadTLP- BadDLLP- Rollover- Timeout- NonFatalErr-
+> >> > CEMsk: RxErr- BadTLP- BadDLLP- Rollover- Timeout- NonFatalErr+
+> >> > AERCap: First Error Pointer: 00, GenCap- CGenEn- ChkCap- ChkEn-
+> >> > Capabilities: [138 v1] Alternative Routing-ID Interpretation (ARI)
+> >> > ARICap: MFVC- ACS-, Next Function: 0
+> >> > ARICtl: MFVC- ACS-, Function Group: 0
+> >> > Capabilities: [140 v1] Single Root I/O Virtualization (SR-IOV)
+> >> > IOVCap: Migration-, Interrupt Message Number: 000
+> >> > IOVCtl: Enable- Migration- Interrupt- MSE- ARIHierarchy+
+> >> > IOVSta: Migration-
+> >> > Initial VFs: 32, Total VFs: 32, Number of VFs: 0, Function Dependency Link: 00
+> >> > VF offset: 8, stride: 1, Device ID: 0443
+> >> > Supported Page Size: 00000553, System Page Size: 00000001
+> >> > Region 0: Memory at 00000000fbd80000 (64-bit, non-prefetchable)
+> >> > Region 2: Memory at 00000000fbda0000 (64-bit, non-prefetchable)
+> >> > VF Migration: offset: 00000000, BIR: 0
+> >> > Kernel driver in use: dh895xcc
+> >> > Kernel modules: qat_dh895xcc
+> >> >
+> >> >
+> >> > # lsmod | grep qat
+> >> > qat_dh895xcc           16384  1
+> >> > intel_qat             126976  13 qat_dh895xcc
+> >> > dh_generic             16384  1 intel_qat
+> >> > authenc                16384  1 intel_qat
+> >> >
+> >> > # modinfo qat_dh895xcc
+> >> > filename:
+> >> > /lib/modules/4.12.0-
+> >> > rc4+/kernel/drivers/crypto/qat/qat_dh895xcc/qat_dh895xcc.ko
+> >> > version:        0.6.0
+> >> > description:    Intel(R) QuickAssist Technology
+> >> > firmware:       qat_895xcc.bin
+> >> > author:         Intel
+> >> > license:        Dual BSD/GPL
+> >> > srcversion:     37370A80B9807EC2308F493
+> >> > alias:          pci:v00008086d00000435sv*sd*bc*sc*i*
+> >> > depends:        intel_qat
+> >> > intree:         Y
+> >> > vermagic:       4.12.0-rc4+ SMP mod_unload
+> >> > signat:         PKCS#7
+> >> > signer:
+> >> > sig_key:
+> >> > sig_hashalgo:   md4
+> 
