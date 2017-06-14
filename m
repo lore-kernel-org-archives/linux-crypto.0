@@ -1,140 +1,53 @@
-From: Tom Herbert <tom@herbertland.com>
+From: Dave Watson <davejwatson@fb.com>
 Subject: Re: [PATCH v3 net-next 0/4] kernel TLS
-Date: Wed, 14 Jun 2017 13:54:31 -0700
-Message-ID: <CALx6S36NPk4ZYCq1TzWoAdfOeK+ba2D79-giE7WOLeoVuYM_nw@mail.gmail.com>
+Date: Wed, 14 Jun 2017 15:06:26 -0700
+Message-ID: <20170614220626.GB72301@davejwatson-mba.dhcp.thefacebook.com>
 References: <20170614183654.GA80067@davejwatson-mba.dhcp.thefacebook.com>
+ <20170614.154759.673143940024124611.davem@davemloft.net>
+ <1497471353.765278.1009639400.15AB6F46@webmail.messagingengine.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Ilya Lesokhin <ilyal@mellanox.com>,
-        Aviad Yehezkel <aviadye@mellanox.com>,
-        Boris Pismenny <borisp@mellanox.com>,
-        Liran Liss <liranl@mellanox.com>,
-        Matan Barak <matanb@mellanox.com>,
-        David Miller <davem@davemloft.net>,
-        Linux Kernel Network Developers <netdev@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Hannes Frederic Sowa <hannes@stressinduktion.org>,
-        Eric Dumazet <eric.dumazet@gmail.com>,
-        Alexei Starovoitov <alexei.starovoitov@gmail.com>,
-        nmav@gnutls.org,
-        =?UTF-8?B?RnJpZG9sw61uIFBva29ybsO9?= <fridolin.pokorny@gmail.com>
-To: Dave Watson <davejwatson@fb.com>
+Content-Type: text/plain; charset="us-ascii"
+Cc: David Miller <davem@davemloft.net>, <ilyal@mellanox.com>,
+        <aviadye@mellanox.com>, <borisp@mellanox.com>,
+        <liranl@mellanox.com>, <matanb@mellanox.com>,
+        <netdev@vger.kernel.org>, <tom@herbertland.com>,
+        <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>,
+        <eric.dumazet@gmail.com>, <alexei.starovoitov@gmail.com>,
+        <nmav@gnutls.org>, <fridolin.pokorny@gmail.com>
+To: Hannes Frederic Sowa <hannes@stressinduktion.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wr0-f196.google.com ([209.85.128.196]:34858 "EHLO
-        mail-wr0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752371AbdFNUyd (ORCPT
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:46534 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1751606AbdFNWGy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 14 Jun 2017 16:54:33 -0400
-Received: by mail-wr0-f196.google.com with SMTP id z45so2952950wrb.2
-        for <linux-crypto@vger.kernel.org>; Wed, 14 Jun 2017 13:54:33 -0700 (PDT)
-In-Reply-To: <20170614183654.GA80067@davejwatson-mba.dhcp.thefacebook.com>
+        Wed, 14 Jun 2017 18:06:54 -0400
+Content-Disposition: inline
+In-Reply-To: <1497471353.765278.1009639400.15AB6F46@webmail.messagingengine.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jun 14, 2017 at 11:36 AM, Dave Watson <davejwatson@fb.com> wrote:
-> This series adds support for kernel TLS encryption over TCP sockets.
-> A standard TCP socket is converted to a TLS socket using a setsockopt.
-> Only symmetric crypto is done in the kernel, as well as TLS record
-> framing.  The handshake remains in userspace, and the negotiated
-> cipher keys/iv are provided to the TCP socket.
->
-I don't see support for TLS receive path in the kernel, only the send
-path. Am I missing something?
+Hi Hannes, 
 
-Thanks,
-Tom
+On 06/14/17 10:15 PM, Hannes Frederic Sowa wrote:
+> one question for this patch set:
+> 
+> What is the reason for not allowing key updates for the TX path? I was
+> always loud pointing out the problems with TLSv1.2 renegotiation and
+> TLSv1.3 key update alerts. This patch set uses encryption in a
+> synchronous way directly in the socket layer and thus wouldn't suffer
+> from problems regarding updates of the key. My hunch is that you leave
+> this option open so you can later on introduce asynchronous crypto which
+> might be used on hardware? It looks also be doable in case of MSG_MORE.
+> Otherwise by allowing key updates to the data path I would not see any
+> problems with key updates in TLS.
 
-> We implemented support for this API in OpenSSL 1.1.0, the code is
-> available at https://github.com/Mellanox/tls-openssl/tree/master
->
-> It should work with any TLS library with similar modifications,
-> a test tool using gnutls is here: https://github.com/Mellanox/tls-af_ktls_tool
->
-> RFC patch to openssl:
-> https://mta.openssl.org/pipermail/openssl-dev/2017-June/009384.html
->
-> Changes from V2:
->
-> * EXPORT_SYMBOL_GPL in patch 1
-> * Ensure cleanup code always called before sk_stream_kill_queues to
->   avoid warnings
->
-> Changes from V1:
->
-> * EXPORT_SYMBOL GPL in patch 2
-> * Add link to OpenSSL patch & gnutls example in documentation patch.
-> * sk_write_pending check was rolled in to wait_for_memory path,
->   avoids special case and fixes lock inbalance issue.
-> * Unify flag handling for sendmsg/sendfile
->
-> Changes from RFC V2:
->
-> * Generic ULP (upper layer protocol) framework instead of TLS specific
->   setsockopts
-> * Dropped Mellanox hardware patches, will come as separate series.
->   Framework will work for both.
->
-> RFC V2:
->
-> http://www.mail-archive.com/netdev@vger.kernel.org/msg160317.html
->
-> Changes from RFC V1:
->
-> * Socket based on changing TCP proto_ops instead of crypto framework
-> * Merged code with Mellanox's hardware tls offload
-> * Zerocopy sendmsg support added - sendpage/sendfile is no longer
->   necessary for zerocopy optimization
->
-> RFC V1:
->
-> http://www.mail-archive.com/netdev@vger.kernel.org/msg88021.html
->
-> * Socket based on crypto userspace API framework, required two
->   sockets in userspace, one encrypted, one unencrypted.
->
-> Paper: https://netdevconf.org/1.2/papers/ktls.pdf
->
-> Aviad Yehezkel (1):
->   tcp: export do_tcp_sendpages and tcp_rate_check_app_limited functions
->
-> Boris Pismenny (2):
->   tcp: ULP infrastructure
->   tls: Documentation
->
-> Ilya Lesokhin (1):
->   tls: kernel TLS support
->
->  Documentation/networking/tls.txt   | 135 +++++++
->  MAINTAINERS                        |  10 +
->  include/linux/socket.h             |   1 +
->  include/net/inet_connection_sock.h |   4 +
->  include/net/tcp.h                  |  27 ++
->  include/net/tls.h                  | 237 ++++++++++++
->  include/uapi/linux/tcp.h           |   1 +
->  include/uapi/linux/tls.h           |  79 ++++
->  net/Kconfig                        |   1 +
->  net/Makefile                       |   1 +
->  net/ipv4/Makefile                  |   2 +-
->  net/ipv4/sysctl_net_ipv4.c         |  25 ++
->  net/ipv4/tcp.c                     |  33 +-
->  net/ipv4/tcp_ipv4.c                |   2 +
->  net/ipv4/tcp_rate.c                |   1 +
->  net/ipv4/tcp_ulp.c                 | 134 +++++++
->  net/tls/Kconfig                    |  12 +
->  net/tls/Makefile                   |   7 +
->  net/tls/tls_main.c                 | 487 +++++++++++++++++++++++
->  net/tls/tls_sw.c                   | 772 +++++++++++++++++++++++++++++++++++++
->  20 files changed, 1968 insertions(+), 3 deletions(-)
->  create mode 100644 Documentation/networking/tls.txt
->  create mode 100644 include/net/tls.h
->  create mode 100644 include/uapi/linux/tls.h
->  create mode 100644 net/ipv4/tcp_ulp.c
->  create mode 100644 net/tls/Kconfig
->  create mode 100644 net/tls/Makefile
->  create mode 100644 net/tls/tls_main.c
->  create mode 100644 net/tls/tls_sw.c
->
-> --
-> 2.9.3
->
+I don't currently have any reasons to not support renegotation, we
+just don't currently use it, so I didn't add support for it.  I don't
+work on the hardware, but yes it looks like it would have to keep the
+old keys around until everything sent using them has been acked.
+
+> Anyway, this patch seems easy and maybe with key updates added later on
+> doesn't seem to have any problems pointed out by me so far.
+
+Indeed, it would be easy to flush any unencrypted data, and then
+change the keys.
