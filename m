@@ -1,46 +1,33 @@
-From: Dave Watson <davejwatson@fb.com>
-Subject: Re: [PATCH v3 net-next 0/4] kernel TLS
-Date: Wed, 14 Jun 2017 15:17:38 -0700
-Message-ID: <20170614221738.GC72301@davejwatson-mba.dhcp.thefacebook.com>
-References: <20170614183654.GA80067@davejwatson-mba.dhcp.thefacebook.com>
- <CALx6S36NPk4ZYCq1TzWoAdfOeK+ba2D79-giE7WOLeoVuYM_nw@mail.gmail.com>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [PATCH v5 01/13] random: invalidate batched entropy after crng init
+Date: Thu, 15 Jun 2017 00:33:12 +0200
+Message-ID: <CAHmME9oRG4Oe4zNN4D8Nc9+A51uXPC0y3m3+ws_QK2aq=K=zwA@mail.gmail.com>
+References: <20170607232607.26870-1-Jason@zx2c4.com> <20170607232607.26870-2-Jason@zx2c4.com>
+ <20170614192838.3jz4sxpcuhxygx4z@breakpoint.cc>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Cc: Ilya Lesokhin <ilyal@mellanox.com>,
-        Aviad Yehezkel <aviadye@mellanox.com>,
-        Boris Pismenny <borisp@mellanox.com>,
-        Liran Liss <liranl@mellanox.com>,
-        Matan Barak <matanb@mellanox.com>,
-        David Miller <davem@davemloft.net>,
-        Linux Kernel Network Developers <netdev@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Type: text/plain; charset="UTF-8"
+Cc: "Theodore Ts'o" <tytso@mit.edu>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Hannes Frederic Sowa <hannes@stressinduktion.org>,
-        Eric Dumazet <eric.dumazet@gmail.com>,
-        Alexei Starovoitov <alexei.starovoitov@gmail.com>,
-        <nmav@gnutls.org>,
-        =?iso-8859-1?Q?Fridol=EDn_Pokorn=FD?= <fridolin.pokorny@gmail.com>
-To: Tom Herbert <tom@herbertland.com>
-Return-path: <netdev-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CALx6S36NPk4ZYCq1TzWoAdfOeK+ba2D79-giE7WOLeoVuYM_nw@mail.gmail.com>
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+        LKML <linux-kernel@vger.kernel.org>,
+        kernel-hardening@lists.openwall.com,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Eric Biggers <ebiggers3@gmail.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        David Miller <davem@davemloft.net>, tglx@breakpoint.cc
+To: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from frisell.zx2c4.com ([192.95.5.64]:38907 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752628AbdFNWdV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 14 Jun 2017 18:33:21 -0400
+In-Reply-To: <20170614192838.3jz4sxpcuhxygx4z@breakpoint.cc>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 06/14/17 01:54 PM, Tom Herbert wrote:
-> On Wed, Jun 14, 2017 at 11:36 AM, Dave Watson <davejwatson@fb.com> wrote:
-> > This series adds support for kernel TLS encryption over TCP sockets.
-> > A standard TCP socket is converted to a TLS socket using a setsockopt.
-> > Only symmetric crypto is done in the kernel, as well as TLS record
-> > framing.  The handshake remains in userspace, and the negotiated
-> > cipher keys/iv are provided to the TCP socket.
-> >
-> I don't see support for TLS receive path in the kernel, only the send
-> path. Am I missing something?
+There's a potential race that I fixed in my v5 of that patch set, but
+Ted only took v4, and for whatever reason has been to busy to submit
+the additional patch I already posted showing the diff between v4&v5.
+Hopefully he actually gets around to it and sends this for the next
+rc. Here it is:
 
-Correct, this is only TX.  Since it sounds likely some hardware might
-only be able to offload TX, we decided to configure TX and RX
-separately.  Using the OpenSSL patches, it should be transparent to
-users even if only one side is offloaded.
-
-The software RX patches exist but haven't been polished up yet.
+https://patchwork.kernel.org/patch/9774563/
