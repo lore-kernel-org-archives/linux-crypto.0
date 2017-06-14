@@ -1,108 +1,50 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH] random: silence compiler warnings and fix race
-Date: Thu, 15 Jun 2017 00:45:26 +0200
-Message-ID: <20170614224526.29076-1-Jason@zx2c4.com>
-References: <20170614192838.3jz4sxpcuhxygx4z@breakpoint.cc>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: Theodore Ts'o <tytso@mit.edu>,
+From: Tom Herbert <tom@herbertland.com>
+Subject: Re: [PATCH v3 net-next 0/4] kernel TLS
+Date: Wed, 14 Jun 2017 16:24:53 -0700
+Message-ID: <CALx6S37sPyn2Za++taRnFy6LcQHx8_yBiS=p7j5X8fN-0j44Pg@mail.gmail.com>
+References: <20170614183654.GA80067@davejwatson-mba.dhcp.thefacebook.com>
+ <CALx6S36NPk4ZYCq1TzWoAdfOeK+ba2D79-giE7WOLeoVuYM_nw@mail.gmail.com> <20170614221738.GC72301@davejwatson-mba.dhcp.thefacebook.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Cc: Ilya Lesokhin <ilyal@mellanox.com>,
+        Aviad Yehezkel <aviadye@mellanox.com>,
+        Boris Pismenny <borisp@mellanox.com>,
+        Liran Liss <liranl@mellanox.com>,
+        Matan Barak <matanb@mellanox.com>,
+        David Miller <davem@davemloft.net>,
+        Linux Kernel Network Developers <netdev@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kernel-hardening@lists.openwall.com,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Eric Biggers <ebiggers3@gmail.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        David Miller <davem@davemloft.net>, tglx@breakpoint.cc
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from frisell.zx2c4.com ([192.95.5.64]:57883 "EHLO frisell.zx2c4.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752097AbdFNWpk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 14 Jun 2017 18:45:40 -0400
-In-Reply-To: <20170614192838.3jz4sxpcuhxygx4z@breakpoint.cc>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+        Hannes Frederic Sowa <hannes@stressinduktion.org>,
+        Eric Dumazet <eric.dumazet@gmail.com>,
+        Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+        nmav@gnutls.org,
+        =?UTF-8?B?RnJpZG9sw61uIFBva29ybsO9?= <fridolin.pokorny@gmail.com>
+To: Dave Watson <davejwatson@fb.com>
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <20170614221738.GC72301@davejwatson-mba.dhcp.thefacebook.com>
+Sender: netdev-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Odd versions of gcc for the sh4 architecture will actually warn about
-flags being used while uninitialized, so we set them to zero. Non crazy
-gccs will optimize that out again, so it doesn't make a difference.
+On Wed, Jun 14, 2017 at 3:17 PM, Dave Watson <davejwatson@fb.com> wrote:
+> On 06/14/17 01:54 PM, Tom Herbert wrote:
+>> On Wed, Jun 14, 2017 at 11:36 AM, Dave Watson <davejwatson@fb.com> wrote:
+>> > This series adds support for kernel TLS encryption over TCP sockets.
+>> > A standard TCP socket is converted to a TLS socket using a setsockopt.
+>> > Only symmetric crypto is done in the kernel, as well as TLS record
+>> > framing.  The handshake remains in userspace, and the negotiated
+>> > cipher keys/iv are provided to the TCP socket.
+>> >
+>> I don't see support for TLS receive path in the kernel, only the send
+>> path. Am I missing something?
+>
+> Correct, this is only TX.  Since it sounds likely some hardware might
+> only be able to offload TX, we decided to configure TX and RX
+> separately.  Using the OpenSSL patches, it should be transparent to
+> users even if only one side is offloaded.
+>
+> The software RX patches exist but haven't been polished up yet.
 
-Next, over aggressive gccs could inline the expression that defines
-use_lock, which could then introduce a race resulting in a lock
-imbalance. By using READ_ONCE, we prevent that fate. Finally, we make
-that assignment const, so that gcc can still optimize a nice amount.
+Thanks for the clarification, looking forward to RX patches also!
 
-Finally, we fix a potential deadlock between primary_crng.lock and
-batched_entropy_reset_lock, where they could be called in opposite
-order. Moving the call to invalidate_batched_entropy to outside the lock
-rectifies this issue.
-
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
-Ted -- the first part of this is the fixup patch we discussed earlier.
-Then I added on top a fix for a potentially related race.
-
-I'm not totally convinced that moving this block to outside the spinlock
-is 100% okay, so please give this a close look before merging.
-
-
- drivers/char/random.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index e870f329db88..01a260f67437 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -803,13 +803,13 @@ static int crng_fast_load(const char *cp, size_t len)
- 		p[crng_init_cnt % CHACHA20_KEY_SIZE] ^= *cp;
- 		cp++; crng_init_cnt++; len--;
- 	}
-+	spin_unlock_irqrestore(&primary_crng.lock, flags);
- 	if (crng_init_cnt >= CRNG_INIT_CNT_THRESH) {
- 		invalidate_batched_entropy();
- 		crng_init = 1;
- 		wake_up_interruptible(&crng_init_wait);
- 		pr_notice("random: fast init done\n");
- 	}
--	spin_unlock_irqrestore(&primary_crng.lock, flags);
- 	return 1;
- }
- 
-@@ -841,6 +841,7 @@ static void crng_reseed(struct crng_state *crng, struct entropy_store *r)
- 	}
- 	memzero_explicit(&buf, sizeof(buf));
- 	crng->init_time = jiffies;
-+	spin_unlock_irqrestore(&primary_crng.lock, flags);
- 	if (crng == &primary_crng && crng_init < 2) {
- 		invalidate_batched_entropy();
- 		crng_init = 2;
-@@ -848,7 +849,6 @@ static void crng_reseed(struct crng_state *crng, struct entropy_store *r)
- 		wake_up_interruptible(&crng_init_wait);
- 		pr_notice("random: crng init done\n");
- 	}
--	spin_unlock_irqrestore(&primary_crng.lock, flags);
- }
- 
- static inline void crng_wait_ready(void)
-@@ -2041,8 +2041,8 @@ static DEFINE_PER_CPU(struct batched_entropy, batched_entropy_u64);
- u64 get_random_u64(void)
- {
- 	u64 ret;
--	bool use_lock = crng_init < 2;
--	unsigned long flags;
-+	bool use_lock = READ_ONCE(crng_init) < 2;
-+	unsigned long flags = 0;
- 	struct batched_entropy *batch;
- 
- #if BITS_PER_LONG == 64
-@@ -2073,8 +2073,8 @@ static DEFINE_PER_CPU(struct batched_entropy, batched_entropy_u32);
- u32 get_random_u32(void)
- {
- 	u32 ret;
--	bool use_lock = crng_init < 2;
--	unsigned long flags;
-+	bool use_lock = READ_ONCE(crng_init) < 2;
-+	unsigned long flags = 0;
- 	struct batched_entropy *batch;
- 
- 	if (arch_get_random_int(&ret))
--- 
-2.13.1
+Tom
