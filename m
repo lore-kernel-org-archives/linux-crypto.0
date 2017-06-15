@@ -1,55 +1,47 @@
 From: Antoine Tenart <antoine.tenart@free-electrons.com>
-Subject: [PATCH 11/13] crypto: inside-secure - only dequeue when needed
-Date: Thu, 15 Jun 2017 09:56:27 +0200
-Message-ID: <20170615075629.30907-12-antoine.tenart@free-electrons.com>
+Subject: [PATCH 06/13] crypto: inside-secure - align the cipher and hash send functions
+Date: Thu, 15 Jun 2017 09:56:22 +0200
+Message-ID: <20170615075629.30907-7-antoine.tenart@free-electrons.com>
 References: <20170615075629.30907-1-antoine.tenart@free-electrons.com>
-Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
+Cc: Ofer Heifetz <oferh@marvell.com>,
         thomas.petazzoni@free-electrons.com,
-        gregory.clement@free-electrons.com, oferh@marvell.com,
-        igall@marvell.com, nadavh@marvell.com, linux-crypto@vger.kernel.org
+        gregory.clement@free-electrons.com, igall@marvell.com,
+        nadavh@marvell.com, linux-crypto@vger.kernel.org,
+        Antoine Tenart <antoine.tenart@free-electrons.com>
 To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:53375 "EHLO
+Received: from mail.free-electrons.com ([62.4.15.54]:53413 "EHLO
         mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752116AbdFOIAE (ORCPT
+        with ESMTP id S1752142AbdFOIAG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Jun 2017 04:00:04 -0400
+        Thu, 15 Jun 2017 04:00:06 -0400
 In-Reply-To: <20170615075629.30907-1-antoine.tenart@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This force the need_dequeue flag to be unset whenever the dequeue
-function is called, to avoid calling it when it is not necessary.
+From: Ofer Heifetz <oferh@marvell.com>
 
+The cipher and hash send functions both set the results variable, to be
+used later by the caller. Align the way they're setting this variable.
+
+Signed-off-by: Ofer Heifetz <oferh@marvell.com>
 Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
 ---
- drivers/crypto/inside-secure/safexcel.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/crypto/inside-secure/safexcel_cipher.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
-index 8f195e031938..e7f87ac12685 100644
---- a/drivers/crypto/inside-secure/safexcel.c
-+++ b/drivers/crypto/inside-secure/safexcel.c
-@@ -429,6 +429,8 @@ void safexcel_dequeue(struct safexcel_crypto_priv *priv, int ring)
- 	struct safexcel_request *request;
- 	int ret, nreq = 0, cdesc = 0, rdesc = 0, commands, results;
+diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
+index 59e6081602a2..8eea4d30db31 100644
+--- a/drivers/crypto/inside-secure/safexcel_cipher.c
++++ b/drivers/crypto/inside-secure/safexcel_cipher.c
+@@ -269,7 +269,7 @@ static int safexcel_aes_send(struct crypto_async_request *async,
+ 	spin_unlock_bh(&priv->ring[ring].egress_lock);
  
-+	priv->ring[ring].need_dequeue = false;
-+
- 	do {
- 		spin_lock_bh(&priv->ring[ring].queue_lock);
- 		backlog = crypto_get_backlog(&priv->ring[ring].queue);
-@@ -631,10 +633,8 @@ static void safexcel_handle_result_work(struct work_struct *work)
+ 	*commands = n_cdesc;
+-	*results = nr_dst;
++	*results = n_rdesc;
+ 	return 0;
  
- 	safexcel_handle_result_descriptor(priv, data->ring);
- 
--	if (priv->ring[data->ring].need_dequeue) {
--		priv->ring[data->ring].need_dequeue = false;
-+	if (priv->ring[data->ring].need_dequeue)
- 		safexcel_dequeue(data->priv, data->ring);
--	}
- }
- 
- struct safexcel_ring_irq_data {
+ rdesc_rollback:
 -- 
 2.9.4
