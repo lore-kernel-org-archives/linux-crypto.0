@@ -1,39 +1,55 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: pkcs1pad and RSA e
-Date: Wed, 14 Jun 2017 05:57:47 +0200
-Message-ID: <68084916.If5LWl0jeS@positron.chronox.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-To: linux-crypto@vger.kernel.org
+From: Antoine Tenart <antoine.tenart@free-electrons.com>
+Subject: [PATCH 11/13] crypto: inside-secure - only dequeue when needed
+Date: Thu, 15 Jun 2017 09:56:27 +0200
+Message-ID: <20170615075629.30907-12-antoine.tenart@free-electrons.com>
+References: <20170615075629.30907-1-antoine.tenart@free-electrons.com>
+Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
+        thomas.petazzoni@free-electrons.com,
+        gregory.clement@free-electrons.com, oferh@marvell.com,
+        igall@marvell.com, nadavh@marvell.com, linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:61038 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750861AbdFOHt1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Jun 2017 03:49:27 -0400
-Received: from positron.chronox.de (mail.eperm.de [89.247.134.16])
-        by mail.eperm.de (Postfix) with ESMTPA id 00B33181607D
-        for <linux-crypto@vger.kernel.org>; Thu, 15 Jun 2017 09:49:24 +0200 (CEST)
+Received: from mail.free-electrons.com ([62.4.15.54]:53375 "EHLO
+        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752116AbdFOIAE (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 15 Jun 2017 04:00:04 -0400
+In-Reply-To: <20170615075629.30907-1-antoine.tenart@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+This force the need_dequeue flag to be unset whenever the dequeue
+function is called, to avoid calling it when it is not necessary.
 
-during the preparation of the self-test patch for pkcs1pad, I noticed the 
-following strange behavior:
+Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
+---
+ drivers/crypto/inside-secure/safexcel.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-I set an RSA private key with e=0x10001 to generate a signature. This 
-generation process was successful and the expected signature was generated. 
-Now, when using the very same TFM with the already set private key and perform 
-a signature verification on the previously generated signature failed.
-
-After some experiments, I found that I had to set e=0x0000000 ... 10001 where 
-the size of e is equal to the size of n. Still, signature generation passed. 
-And now, using the same TFM with the set private key, the signature 
-verification passed too.
-
-How come that there is a dissimilar handling of e regarding signature 
-generation and verification?
-
-Ciao
-Stephan
+diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
+index 8f195e031938..e7f87ac12685 100644
+--- a/drivers/crypto/inside-secure/safexcel.c
++++ b/drivers/crypto/inside-secure/safexcel.c
+@@ -429,6 +429,8 @@ void safexcel_dequeue(struct safexcel_crypto_priv *priv, int ring)
+ 	struct safexcel_request *request;
+ 	int ret, nreq = 0, cdesc = 0, rdesc = 0, commands, results;
+ 
++	priv->ring[ring].need_dequeue = false;
++
+ 	do {
+ 		spin_lock_bh(&priv->ring[ring].queue_lock);
+ 		backlog = crypto_get_backlog(&priv->ring[ring].queue);
+@@ -631,10 +633,8 @@ static void safexcel_handle_result_work(struct work_struct *work)
+ 
+ 	safexcel_handle_result_descriptor(priv, data->ring);
+ 
+-	if (priv->ring[data->ring].need_dequeue) {
+-		priv->ring[data->ring].need_dequeue = false;
++	if (priv->ring[data->ring].need_dequeue)
+ 		safexcel_dequeue(data->priv, data->ring);
+-	}
+ }
+ 
+ struct safexcel_ring_irq_data {
+-- 
+2.9.4
