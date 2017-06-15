@@ -1,87 +1,59 @@
 From: Antoine Tenart <antoine.tenart@free-electrons.com>
-Subject: [PATCH 07/13] crypto: inside-secure - update the context and request later
-Date: Thu, 15 Jun 2017 09:56:23 +0200
-Message-ID: <20170615075629.30907-8-antoine.tenart@free-electrons.com>
+Subject: [PATCH 05/13] crypto: inside-secure - optimize DSE bufferability control
+Date: Thu, 15 Jun 2017 09:56:21 +0200
+Message-ID: <20170615075629.30907-6-antoine.tenart@free-electrons.com>
 References: <20170615075629.30907-1-antoine.tenart@free-electrons.com>
-Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
+Cc: Igal Liberman <igall@marvell.com>,
         thomas.petazzoni@free-electrons.com,
         gregory.clement@free-electrons.com, oferh@marvell.com,
-        igall@marvell.com, nadavh@marvell.com, linux-crypto@vger.kernel.org
+        nadavh@marvell.com, linux-crypto@vger.kernel.org,
+        Antoine Tenart <antoine.tenart@free-electrons.com>
 To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:53416 "EHLO
+Received: from mail.free-electrons.com ([62.4.15.54]:53408 "EHLO
         mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752120AbdFOIAG (ORCPT
+        with ESMTP id S1752140AbdFOIAF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Jun 2017 04:00:06 -0400
+        Thu, 15 Jun 2017 04:00:05 -0400
 In-Reply-To: <20170615075629.30907-1-antoine.tenart@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This move the context and request updates at the end of the cipher and
-hash send() functions. This way the context and request fields are set
-only when everything else was successful in the send() functions.
+From: Igal Liberman <igall@marvell.com>
 
+Configure the data write bufferability to always buffer packets in the
+DSE. This change slightly improves performance.
+
+Signed-off-by: Igal Liberman <igall@marvell.com>
 Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
 ---
- drivers/crypto/inside-secure/safexcel_cipher.c | 7 +++----
- drivers/crypto/inside-secure/safexcel_hash.c   | 8 ++++----
- 2 files changed, 7 insertions(+), 8 deletions(-)
+ drivers/crypto/inside-secure/safexcel.c | 1 +
+ drivers/crypto/inside-secure/safexcel.h | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
-index 8eea4d30db31..6037cdfc1f16 100644
---- a/drivers/crypto/inside-secure/safexcel_cipher.c
-+++ b/drivers/crypto/inside-secure/safexcel_cipher.c
-@@ -190,8 +190,6 @@ static int safexcel_aes_send(struct crypto_async_request *async,
- 	int nr_src, nr_dst, n_cdesc = 0, n_rdesc = 0, queued = req->cryptlen;
- 	int i, ret = 0;
+diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
+index 658b307c6a11..73f4ef8d71f3 100644
+--- a/drivers/crypto/inside-secure/safexcel.c
++++ b/drivers/crypto/inside-secure/safexcel.c
+@@ -329,6 +329,7 @@ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
+ 	val = EIP197_HIA_DSE_CFG_DIS_DEBUG;
+ 	val |= EIP197_HIA_DxE_CFG_MIN_DATA_SIZE(7) | EIP197_HIA_DxE_CFG_MAX_DATA_SIZE(8);
+ 	val |= EIP197_HIA_DxE_CFG_DATA_CACHE_CTRL(WR_CACHE_3BITS);
++	val |= EIP197_HIA_DSE_CFG_ALLWAYS_BUFFERABLE;
+ 	val |= EIP197_HIA_DSE_CFG_EN_SINGLE_WR;
+ 	writel(val, priv->base + EIP197_HIA_DSE_CFG);
  
--	request->req = &req->base;
--
- 	if (req->src == req->dst) {
- 		nr_src = dma_map_sg(priv->dev, req->src,
- 				    sg_nents_for_len(req->src, req->cryptlen),
-@@ -264,10 +262,11 @@ static int safexcel_aes_send(struct crypto_async_request *async,
- 		n_rdesc++;
- 	}
- 
--	ctx->base.handle_result = safexcel_handle_result;
--
- 	spin_unlock_bh(&priv->ring[ring].egress_lock);
- 
-+	request->req = &req->base;
-+	ctx->base.handle_result = safexcel_handle_result;
-+
- 	*commands = n_cdesc;
- 	*results = n_rdesc;
- 	return 0;
-diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
-index 6eee1a502225..4e526372464f 100644
---- a/drivers/crypto/inside-secure/safexcel_hash.c
-+++ b/drivers/crypto/inside-secure/safexcel_hash.c
-@@ -198,9 +198,6 @@ static int safexcel_ahash_send(struct crypto_async_request *async, int ring,
- 		len -= extra;
- 	}
- 
--	request->req = &areq->base;
--	ctx->base.handle_result = safexcel_handle_result;
--
- 	spin_lock_bh(&priv->ring[ring].egress_lock);
- 
- 	/* Add a command descriptor for the cached data, if any */
-@@ -291,9 +288,12 @@ static int safexcel_ahash_send(struct crypto_async_request *async, int ring,
- 		goto cdesc_rollback;
- 	}
- 
--	req->processed += len;
- 	spin_unlock_bh(&priv->ring[ring].egress_lock);
- 
-+	req->processed += len;
-+	request->req = &areq->base;
-+	ctx->base.handle_result = safexcel_handle_result;
-+
- 	*commands = n_cdesc;
- 	*results = 1;
- 	return 0;
+diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
+index b8a81c568c99..7e3cbb9ac98e 100644
+--- a/drivers/crypto/inside-secure/safexcel.h
++++ b/drivers/crypto/inside-secure/safexcel.h
+@@ -139,6 +139,7 @@
+ #define EIP197_HIA_DxE_CFG_MIN_DATA_SIZE(n)	((n) << 0)
+ #define EIP197_HIA_DxE_CFG_DATA_CACHE_CTRL(n)	(((n) & 0x7) << 4)
+ #define EIP197_HIA_DxE_CFG_MAX_DATA_SIZE(n)	((n) << 8)
++#define EIP197_HIA_DSE_CFG_ALLWAYS_BUFFERABLE	GENMASK(15, 14)
+ #define EIP197_HIA_DxE_CFG_MIN_CTRL_SIZE(n)	((n) << 16)
+ #define EIP197_HIA_DxE_CFG_CTRL_CACHE_CTRL(n)	(((n) & 0x7) << 20)
+ #define EIP197_HIA_DxE_CFG_MAX_CTRL_SIZE(n)	((n) << 24)
 -- 
 2.9.4
