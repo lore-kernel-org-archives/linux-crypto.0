@@ -1,7 +1,7 @@
 From: Antoine Tenart <antoine.tenart@free-electrons.com>
-Subject: [PATCH 01/13] crypto: inside-secure - use hmac ipad/opad constants
-Date: Thu, 15 Jun 2017 09:56:17 +0200
-Message-ID: <20170615075629.30907-2-antoine.tenart@free-electrons.com>
+Subject: [PATCH 07/13] crypto: inside-secure - update the context and request later
+Date: Thu, 15 Jun 2017 09:56:23 +0200
+Message-ID: <20170615075629.30907-8-antoine.tenart@free-electrons.com>
 References: <20170615075629.30907-1-antoine.tenart@free-electrons.com>
 Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
         thomas.petazzoni@free-electrons.com,
@@ -9,44 +9,79 @@ Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
         igall@marvell.com, nadavh@marvell.com, linux-crypto@vger.kernel.org
 To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:53379 "EHLO
+Received: from mail.free-electrons.com ([62.4.15.54]:53416 "EHLO
         mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752120AbdFOIAE (ORCPT
+        with ESMTP id S1752120AbdFOIAG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Jun 2017 04:00:04 -0400
+        Thu, 15 Jun 2017 04:00:06 -0400
 In-Reply-To: <20170615075629.30907-1-antoine.tenart@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Replace the hmac ipad/opad values by their defined constants.
+This move the context and request updates at the end of the cipher and
+hash send() functions. This way the context and request fields are set
+only when everything else was successful in the send() functions.
 
 Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
 ---
- drivers/crypto/inside-secure/safexcel_hash.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ drivers/crypto/inside-secure/safexcel_cipher.c | 7 +++----
+ drivers/crypto/inside-secure/safexcel_hash.c   | 8 ++++----
+ 2 files changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
-index 060ea034c9da..6eee1a502225 100644
---- a/drivers/crypto/inside-secure/safexcel_hash.c
-+++ b/drivers/crypto/inside-secure/safexcel_hash.c
-@@ -8,6 +8,7 @@
-  * warranty of any kind, whether express or implied.
-  */
+diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
+index 8eea4d30db31..6037cdfc1f16 100644
+--- a/drivers/crypto/inside-secure/safexcel_cipher.c
++++ b/drivers/crypto/inside-secure/safexcel_cipher.c
+@@ -190,8 +190,6 @@ static int safexcel_aes_send(struct crypto_async_request *async,
+ 	int nr_src, nr_dst, n_cdesc = 0, n_rdesc = 0, queued = req->cryptlen;
+ 	int i, ret = 0;
  
-+#include <crypto/hmac.h>
- #include <crypto/sha.h>
- #include <linux/device.h>
- #include <linux/dma-mapping.h>
-@@ -774,8 +775,8 @@ static int safexcel_hmac_init_pad(struct ahash_request *areq,
- 	memcpy(opad, ipad, blocksize);
- 
- 	for (i = 0; i < blocksize; i++) {
--		ipad[i] ^= 0x36;
--		opad[i] ^= 0x5c;
-+		ipad[i] ^= HMAC_IPAD_VALUE;
-+		opad[i] ^= HMAC_OPAD_VALUE;
+-	request->req = &req->base;
+-
+ 	if (req->src == req->dst) {
+ 		nr_src = dma_map_sg(priv->dev, req->src,
+ 				    sg_nents_for_len(req->src, req->cryptlen),
+@@ -264,10 +262,11 @@ static int safexcel_aes_send(struct crypto_async_request *async,
+ 		n_rdesc++;
  	}
  
+-	ctx->base.handle_result = safexcel_handle_result;
+-
+ 	spin_unlock_bh(&priv->ring[ring].egress_lock);
+ 
++	request->req = &req->base;
++	ctx->base.handle_result = safexcel_handle_result;
++
+ 	*commands = n_cdesc;
+ 	*results = n_rdesc;
+ 	return 0;
+diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
+index 6eee1a502225..4e526372464f 100644
+--- a/drivers/crypto/inside-secure/safexcel_hash.c
++++ b/drivers/crypto/inside-secure/safexcel_hash.c
+@@ -198,9 +198,6 @@ static int safexcel_ahash_send(struct crypto_async_request *async, int ring,
+ 		len -= extra;
+ 	}
+ 
+-	request->req = &areq->base;
+-	ctx->base.handle_result = safexcel_handle_result;
+-
+ 	spin_lock_bh(&priv->ring[ring].egress_lock);
+ 
+ 	/* Add a command descriptor for the cached data, if any */
+@@ -291,9 +288,12 @@ static int safexcel_ahash_send(struct crypto_async_request *async, int ring,
+ 		goto cdesc_rollback;
+ 	}
+ 
+-	req->processed += len;
+ 	spin_unlock_bh(&priv->ring[ring].egress_lock);
+ 
++	req->processed += len;
++	request->req = &areq->base;
++	ctx->base.handle_result = safexcel_handle_result;
++
+ 	*commands = n_cdesc;
+ 	*results = 1;
  	return 0;
 -- 
 2.9.4
