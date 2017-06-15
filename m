@@ -1,54 +1,221 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [kernel-hardening] Re: [PATCH v4 13/13] random: warn when kernel uses unseeded randomness
-Date: Thu, 15 Jun 2017 13:59:43 +0200
-Message-ID: <1606799.lNpamfCTbW@tauon.chronox.de>
-References: <20170606174804.31124-1-Jason@zx2c4.com> <20170608081919.zbtwdjl32vbvd7jt@thunk.org> <871sqlpl63.fsf@concordia.ellerman.id.au>
+From: =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>
+Subject: Re: [RFC PATCH 0/2] crypto: caam - fix cts(cbc(aes)) with CAAM driver
+Date: Thu, 15 Jun 2017 14:57:18 +0000
+Message-ID: <VI1PR0401MB25910B19DB95DABF62C00A7598C00@VI1PR0401MB2591.eurprd04.prod.outlook.com>
+References: <20170602122446.2427-1-david@sigma-star.at>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Michael Ellerman <mpe@ellerman.id.au>,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        David Miller <davem@davemloft.net>,
-        Eric Biggers <ebiggers3@gmail.com>
-To: kernel-hardening@lists.openwall.com
+Content-Type: text/plain; charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
+Cc: "richard@sigma-star.at" <richard@sigma-star.at>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: David Gstir <david@sigma-star.at>,
+        Dan Douglass <dan.douglass@nxp.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        Radu Solea <radu.solea@nxp.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:60254 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752323AbdFOL7q (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Jun 2017 07:59:46 -0400
-In-Reply-To: <871sqlpl63.fsf@concordia.ellerman.id.au>
+Received: from mail-db5eur01on0071.outbound.protection.outlook.com ([104.47.2.71]:32864
+        "EHLO EUR01-DB5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751755AbdFOO5X (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 15 Jun 2017 10:57:23 -0400
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Donnerstag, 15. Juni 2017, 13:03:48 CEST schrieb Michael Ellerman:
-
-Hi Michael,
-
-> 
-> Even with this patch, it's still pretty spammy (today's linux-next):
-> 
-
-I would think that the issue regarding the logging is relevant for 
-cryptographic use cases or use cases requiring strong random numbers only. 
-Only those use cases should be fixed eventually to wait for a fully seeded 
-DRNG.
-
-The logged messages you present here indicate use cases where no strong 
-security is required. It looks like that the logs show ASLR related use of 
-random numbers. Those do not require a fully seeded ChaCha20 DRNG.
-
-IMHO, users using the get_random_u64 or get_random_u32 are use cases that do 
-not require a fully seeded DRNG thus do not need a cryptographically strong 
-random number. Hence, I would think that the logging should be removed from 
-get_random_u32/u64.
-
-Yet, logging should remain for get_random_bytes which should be denominated as 
-the interface for use cases where cryptographically strong random numbers are 
-required.
-
-Ciao
-Stephan
+On 6/2/2017 3:25 PM, David Gstir wrote:=0A=
+> Hi!=0A=
+> =0A=
+> While testing fscrypt's filename encryption, I noticed that the implement=
+ation=0A=
+> of cts(cbc(aes)) is broken when the CAAM hardware crypto driver is enable=
+d.=0A=
+> Some digging showed that the refactoring of crypto/cts.c in v4.8 =0A=
+> (commit 0605c41cc53ca) exposed some problems with CAAM's aes-cbc=0A=
+> implementation. This can be tested quite easily by loading the tcrypt=0A=
+> module with mode=3D38. Looks like the cts mode is not used very often=0A=
+> and this went unnoticed since 4.8...=0A=
+> =0A=
+> This patch series is an attempt to fix that and get cts(cbc(aes)) working=
+=0A=
+> properly again when the CAAM driver is enabled.=0A=
+> =0A=
+David, thanks for taking time to fix these.=0A=
+=0A=
+> Specifically, the issues are:=0A=
+> =0A=
+> 1) The cts implementation assumes ->info of ablkcipher_request (or ->iv o=
+f=0A=
+>    skcipher_request respectively) to be set to the last ciphertext block =
+when=0A=
+>    the aes-cbc encryption is finished. Meaning that ->info is changed by =
+the=0A=
+>    aes-cbc code. The CAAM driver does not do that and leaves ->info as-is=
+.=0A=
+> =0A=
+>    It is not fully clear to me yet if this is a requirement of the crypto=
+ API,=0A=
+>    or if this is just a side effect that is exploited by the cts implemen=
+tation?=0A=
+> =0A=
+>    For now, I assumed it is a requirement of the crypto API since I've se=
+en=0A=
+>    other crypto drivers (e.g. AMD's CCP) do that. So the patch fixes the =
+CAAM=0A=
+>    crypto driver accordingly.=0A=
+> =0A=
+IIUC, yes, the Crypto API requires ->info to be updated.=0A=
+=0A=
+Dan, Radu,=0A=
+=0A=
+IIRC, you've hit smth. similar while testing CAAM on i.MX.=0A=
+Could you please review David's fix, compare it with yours, so in the=0A=
+end we would choose the one that fits best?=0A=
+=0A=
+>    Also, the aead code in the CAAM driver, more specifically the gcm mode=
+ code=0A=
+>    seems to have the same flaw, so it'll need a similar fix in case.=0A=
+> =0A=
+> =0A=
+> 2) The cts implementation uses aes-cbc twice to perform its job. The seco=
+nd=0A=
+>    time, it is called from within the callback of the first call to aes-c=
+bc.=0A=
+>    This usage is not properly handled in the CAAM driver which triggers t=
+he=0A=
+>    BUG below.=0A=
+> =0A=
+Dan, Radu - have you seen this on i.MX?=0A=
+=0A=
+>    My current proposal is to use in_interrupt() to detect such cases and =
+set=0A=
+>    the k*alloc flags accordingly. However, since using in_interrupt() is =
+not=0A=
+>    really nice, I'm wondering if there is a better way to handle this?=0A=
+> =0A=
+Nothing else crosses my mind right now, but I'd like to sleep on it.=0A=
+=0A=
+> =0A=
+> Thanks,=0A=
+> David=0A=
+> =0A=
+> <snip>=0A=
+> [  126.252543] BUG: sleeping function called from invalid context at mm/s=
+lab.h:432=0A=
+> [  126.260099] in_atomic(): 1, irqs_disabled(): 0, pid: 0, name: swapper/=
+0=0A=
+> [  126.266837] no locks held by swapper/0/0.=0A=
+> [  126.270969] CPU: 0 PID: 0 Comm: swapper/0 Not tainted 4.12.0-rc3-00052=
+-g0ddec680d395 #287=0A=
+> [  126.279226] Hardware name: Freescale i.MX6 Quad/DualLite (Device Tree)=
+=0A=
+> [  126.285821] Backtrace:=0A=
+> [  126.288406] [<c010c3e4>] (dump_backtrace) from [<c010c690>] (show_stac=
+k+0x18/0x1c)=0A=
+> [  126.296057]  r7:00000000 r6:60000113 r5:00000000 r4:c102ab48=0A=
+> [  126.301798] [<c010c678>] (show_stack) from [<c0427060>] (dump_stack+0x=
+b4/0xe8)=0A=
+> [  126.309106] [<c0426fac>] (dump_stack) from [<c014f020>] (___might_slee=
+p+0x17c/0x2a0)=0A=
+> [  126.316929]  r9:00000000 r8:c0a016dc r7:c101ee3e r6:000001b0 r5:c0c12f=
+ac r4:ffffe000=0A=
+> [  126.324751] [<c014eea4>] (___might_sleep) from [<c014f1a8>] (__might_s=
+leep+0x64/0xa4)=0A=
+> [  126.332655]  r7:014080c1 r6:00000000 r5:000001b0 r4:c0c12fac=0A=
+> [  126.338397] [<c014f144>] (__might_sleep) from [<c0224a20>] (__kmalloc+=
+0x130/0x1b8)=0A=
+> [  126.346039]  r6:c071a8ec r5:014080c1 r4:eec01e00=0A=
+> [  126.350742] [<c02248f0>] (__kmalloc) from [<c071a8ec>] (ablkcipher_ede=
+sc_alloc.constprop.1+0x200/0x900)=0A=
+> [  126.360213]  r10:00000000 r9:00000000 r8:c0a016dc r7:c0a016dc r6:ee05a=
+c10 r5:edfdaec0=0A=
+> [  126.368109]  r4:00000001 r3:00000020=0A=
+> [  126.371765] [<c071a6ec>] (ablkcipher_edesc_alloc.constprop.1) from [<c=
+071b010>] (ablkcipher_encrypt+0x24/0x9c)=0A=
+> [  126.381843]  r10:00000000 r9:00000020 r8:00000001 r7:ee05ac10 r6:ed597=
+000 r5:edfdaec0=0A=
+> [  126.389738]  r4:ed475d08=0A=
+> [  126.392354] [<c071afec>] (ablkcipher_encrypt) from [<c03d6f20>] (skcip=
+her_encrypt_ablkcipher+0x68/0x6c)=0A=
+> [  126.401822]  r7:ed475d08 r6:ed597000 r5:00000400 r4:ed475d08=0A=
+> [  126.407566] [<c03d6eb8>] (skcipher_encrypt_ablkcipher) from [<c03e8a70=
+>] (cts_cbc_encrypt+0x118/0x124)=0A=
+> [  126.416947]  r7:ed475d08 r6:c1001cc0 r5:00000010 r4:edfdae00=0A=
+> [  126.422686] [<c03e8958>] (cts_cbc_encrypt) from [<c03e8b88>] (crypto_c=
+ts_encrypt_done+0x20/0x54)=0A=
+> [  126.431548]  r10:00000000 r9:ee05ac10 r8:00000000 r7:00000010 r6:edc8e=
+6c0 r5:edc8e6d8=0A=
+> [  126.439443]  r4:edfdae00=0A=
+> [  126.442056] [<c03e8b68>] (crypto_cts_encrypt_done) from [<c07195a0>] (=
+ablkcipher_encrypt_done+0x88/0x9c)=0A=
+> [  126.445180] fec 2188000.ethernet eth0: MDIO read timeout=0A=
+> [  126.456948]  r5:edc8e6d8 r4:edfdaec0=0A=
+> [  126.460604] [<c0719518>] (ablkcipher_encrypt_done) from [<c0715ca0>] (=
+caam_jr_dequeue+0x214/0x2d4)=0A=
+> [  126.469639]  r9:00000001 r8:ee088010 r7:000001ff r6:00000001 r5:000000=
+00 r4:edfdaec0=0A=
+> [  126.477467] [<c0715a8c>] (caam_jr_dequeue) from [<c012b3f0>] (tasklet_=
+action+0x98/0x154)=0A=
+> [  126.485160] fec 2188000.ethernet eth0: MDIO read timeout=0A=
+> [  126.490975]  r10:c1080b80 r9:c1008b84 r8:00000000 r7:c1000000 r6:00000=
+000 r5:ee088028=0A=
+> [  126.498870]  r4:ee088024=0A=
+> [  126.501484] [<c012b358>] (tasklet_action) from [<c012b60c>] (__do_soft=
+irq+0xf0/0x2a4)=0A=
+> [  126.509390]  r10:40000006 r9:c1002080 r8:00000101 r7:c1002098 r6:c1000=
+000 r5:00000006=0A=
+> [  126.517285]  r4:00000000=0A=
+> [  126.519896] [<c012b51c>] (__do_softirq) from [<c012bb90>] (irq_exit+0x=
+ec/0x168)=0A=
+> [  126.525127] fec 2188000.ethernet eth0: MDIO write timeout=0A=
+> [  126.532709]  r10:c1008cf0 r9:eec08400 r8:00000001 r7:00000000 r6:c1008=
+b84 r5:00000000=0A=
+> [  126.540603]  r4:c0fd940c=0A=
+> [  126.543222] [<c012baa4>] (irq_exit) from [<c017ff24>] (__handle_domain=
+_irq+0x74/0xe8)=0A=
+> [  126.551135] [<c017feb0>] (__handle_domain_irq) from [<c01015fc>] (gic_=
+handle_irq+0x58/0xbc)=0A=
+> [  126.559564]  r9:f4000100 r8:c102af80 r7:c1001ea8 r6:000003ff r5:000003=
+eb r4:f400010c=0A=
+> [  126.567384] [<c01015a4>] (gic_handle_irq) from [<c010d2f0>] (__irq_svc=
++0x70/0x98)=0A=
+> [  126.574937] Exception stack(0xc1001ea8 to 0xc1001ef0)=0A=
+> [  126.580065] 1ea0:                   00000001 2e39a000 00000000 c100c08=
+0 00000000 ef374698=0A=
+> [  126.588320] 1ec0: 653b20b1 0000001d 653afed6 0000001d 00000000 c1001f2=
+4 c1001ec8 c1001ef8=0A=
+> [  126.596568] 1ee0: c016fcf4 c06f1fbc 20000013 ffffffff=0A=
+> [  126.601696]  r10:00000000 r9:c1000000 r8:653afed6 r7:c1001edc r6:fffff=
+fff r5:20000013=0A=
+> [  126.609591]  r4:c06f1fbc=0A=
+> [  126.612210] [<c06f1e34>] (cpuidle_enter_state) from [<c06f2120>] (cpui=
+dle_enter+0x1c/0x20)=0A=
+> [  126.620551]  r10:c100f8c0 r9:ef374698 r8:c1008b84 r7:c0fda690 r6:c1008=
+9ec r5:c1008a38=0A=
+> [  126.628448]  r4:c1000000 r3:ef374698=0A=
+> [  126.632114] [<c06f2104>] (cpuidle_enter) from [<c0167330>] (call_cpuid=
+le+0x28/0x44)=0A=
+> [  126.639859] [<c0167308>] (call_cpuidle) from [<c0167608>] (do_idle+0x1=
+ac/0x220)=0A=
+> [  126.647249] [<c016745c>] (do_idle) from [<c0167a20>] (cpu_startup_entr=
+y+0x20/0x24)=0A=
+> [  126.654895]  r10:c0e60a50 r9:efffc940 r8:c1080000 r7:c10089c0 r6:c1080=
+000 r5:00000002=0A=
+> [  126.662793]  r4:000000bd r3:c0e733c4=0A=
+> [  126.666457] [<c0167a00>] (cpu_startup_entry) from [<c09cfbd4>] (rest_i=
+nit+0x154/0x198)=0A=
+> [  126.674463] [<c09cfa80>] (rest_init) from [<c0e00cf0>] (start_kernel+0=
+x344/0x3b8)=0A=
+> [  126.682015]  r5:ffffffff r4:c108004c=0A=
+> [  126.685668] [<c0e009ac>] (start_kernel) from [<1000807c>] (0x1000807c)=
+=0A=
+> </snip>=0A=
+> =0A=
+>   crypto: caam - properly set IV after {en,de}crypt=0A=
+>   crypto: caam - fix k*alloc if called from own cipher callback=0A=
+> =0A=
+>  drivers/crypto/caam/caamalg.c | 55 +++++++++++++++++++++++++++++++++++--=
+------=0A=
+>  1 file changed, 45 insertions(+), 10 deletions(-)=0A=
+> =0A=
