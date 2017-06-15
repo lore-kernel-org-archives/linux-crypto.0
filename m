@@ -1,38 +1,34 @@
 From: David Miller <davem@davemloft.net>
-Subject: Re: Crypto Fixes for 4.12
-Date: Thu, 15 Jun 2017 11:02:02 -0400 (EDT)
-Message-ID: <20170615.110202.2304410513992498772.davem@davemloft.net>
-References: <20170615005443.GA30435@gondor.apana.org.au>
-        <CA+55aFwU1ZvJZK8x9QQtROjOVHG_ks-H3XpU+hjuf8BTxndN3g@mail.gmail.com>
-        <20170615094210.GA32322@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: n2: make of_device_ids const
+Date: Thu, 15 Jun 2017 11:11:11 -0400 (EDT)
+Message-ID: <20170615.111111.1375437088749599511.davem@davemloft.net>
+References: <9ab9e99928c8add9d11779c5f5a267f10f166875.1497527778.git.arvind.yadav.cs@gmail.com>
 Mime-Version: 1.0
 Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Cc: torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from shards.monkeyblade.net ([184.105.139.130]:54066 "EHLO
-        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752683AbdFOPCE (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Jun 2017 11:02:04 -0400
-In-Reply-To: <20170615094210.GA32322@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: herbert@gondor.apana.org.au, tglx@linutronix.de,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: arvind.yadav.cs@gmail.com
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <9ab9e99928c8add9d11779c5f5a267f10f166875.1497527778.git.arvind.yadav.cs@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Date: Thu, 15 Jun 2017 17:42:10 +0800
+From: Arvind Yadav <arvind.yadav.cs@gmail.com>
+Date: Thu, 15 Jun 2017 17:28:10 +0530
 
-> On Thu, Jun 15, 2017 at 06:04:44PM +0900, Linus Torvalds wrote:
->> There's a fair number of SHASH_DESC_ON_STACK users, are all the others
->> safe for some random reason that just happens to be about code
->> generation? Did people actually verify that?
+> of_device_ids are not supposed to change at runtime. All functions
+> working with of_device_ids provided by <linux/of.h> work with const
+> of_device_ids. So mark the non-const structs as const.
 > 
-> If I understand this correctly this is only an issue if you directly
-> return a value from the shash_desc struct allocated on the stack.
-> This is usually rare as normally you'd return an error code and the
-> hash result would be written directly to some memory passed in from
-> the caller.
+> File size before:
+>    text	   data	    bss	    dec	    hex	filename
+>    2001	   2168	     48	   4217	   1079	drivers/crypto/n2_core.o
+> 
+> File size after constify dummy_tlb_ops.:
+>    text	   data	    bss	    dec	    hex	filename
+>    3601	    536	     48	   4185	   1059	drivers/crypto/n2_core.o
+> 
+> Signed-off-by: Arvind Yadav <arvind.yadav.cs@gmail.com>
 
-Correct.
+Acked-by: David S. Miller <davem@davemloft.net>
