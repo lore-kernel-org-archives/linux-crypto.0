@@ -1,53 +1,64 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC PATCH 0/2] crypto: caam - fix cts(cbc(aes)) with CAAM driver
-Date: Fri, 16 Jun 2017 15:59:41 +0800
-Message-ID: <20170616075941.GA5346@gondor.apana.org.au>
-References: <20170602122446.2427-1-david@sigma-star.at>
- <VI1PR0401MB25910B19DB95DABF62C00A7598C00@VI1PR0401MB2591.eurprd04.prod.outlook.com>
- <VI1PR0401MB25913AAA76159D27E8EB13DF98C10@VI1PR0401MB2591.eurprd04.prod.outlook.com>
+From: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+Subject: Re: [PATCH v5 01/13] random: invalidate batched entropy after crng
+ init
+Date: Fri, 16 Jun 2017 10:31:12 +0200
+Message-ID: <20170616083111.5cwwkzyauocxafou@breakpoint.cc>
+References: <20170607232607.26870-1-Jason@zx2c4.com>
+ <20170607232607.26870-2-Jason@zx2c4.com>
+ <20170614192838.3jz4sxpcuhxygx4z@breakpoint.cc>
+ <CAHmME9oRG4Oe4zNN4D8Nc9+A51uXPC0y3m3+ws_QK2aq=K=zwA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: David Gstir <david@sigma-star.at>,
-        Dan Douglass <dan.douglass@nxp.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        Radu Solea <radu.solea@nxp.com>,
-        "richard@sigma-star.at" <richard@sigma-star.at>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
+Cc: Theodore Ts'o <tytso@mit.edu>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kernel-hardening@lists.openwall.com,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Eric Biggers <ebiggers3@gmail.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        David Miller <davem@davemloft.net>, tglx@linutronix.de
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:57134 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752124AbdFPIAK (ORCPT
+Received: from Chamillionaire.breakpoint.cc ([146.0.238.67]:35228 "EHLO
+        Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1752529AbdFPIbW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Jun 2017 04:00:10 -0400
+        Fri, 16 Jun 2017 04:31:22 -0400
 Content-Disposition: inline
-In-Reply-To: <VI1PR0401MB25913AAA76159D27E8EB13DF98C10@VI1PR0401MB2591.eurprd04.prod.outlook.com>
+In-Reply-To: <CAHmME9oRG4Oe4zNN4D8Nc9+A51uXPC0y3m3+ws_QK2aq=K=zwA@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jun 16, 2017 at 07:57:00AM +0000, Horia Geantă wrote:
->
-> Commit 0605c41cc53ca ("crypto: cts - Convert to skcipher") appends
-> CRYPTO_TFM_REQ_MAY_BACKLOG to the original crypto request flags for the
-> last block - when calling cts_cbc_encrypt().
-> Is it really needed?
+On 2017-06-15 00:33:12 [+0200], Jason A. Donenfeld wrote:
+> There's a potential race that I fixed in my v5 of that patch set, but
+> Ted only took v4, and for whatever reason has been to busy to submit
+> the additional patch I already posted showing the diff between v4&v5.
+> Hopefully he actually gets around to it and sends this for the next
+> rc. Here it is:
+> 
+> https://patchwork.kernel.org/patch/9774563/
 
-Yes, because at this point we cannot tell the sender to back off.
+So you replace "crng_init < 2" with use_lock instead. That is not what I
+am talking about. Again:
+	add_interrupt_randomness()
+->       crng_fast_load()	        spin_trylock_irqsave(&primary_crng.lock, )
+->        invalidate_batched_entropy()  write_lock_irqsave(&batched_entropy_reset_lock, );
 
-> For cts(cbc(aes)) with cbc(aes) offloaded in HW, i.e. running in async
-> mode, we get the below stack for CAAM driver.
-> Driver is told that it can sleep (CRYPTO_TFM_REQ_MAY_BACKLOG flag), so
-> it uses GFP_KERNEL to allocate memory. However, this is incorrect, since
-> driver runs in atomic context (softirq).
+in that order while the code path
+	get_random_uXX()                read_lock_irqsave(&batched_entropy_reset_lock, );
+->       extract_crng()
+->        _extract_crng()                spin_lock_irqsave(&crng->lock, );
 
-This is wrong.  Whether you can sleep or not is determined by
-MAY_SLEEP, not MAY_BACKLOG.  MAY_BACKLOG only indicates that this
-request must be queued, even if the queue is full.
+which allocates the same lock in opposite order.
+That means
+  T1			T2
+  crng_fast_load()	get_random_u64()
+  			extract_crng()
+              *dead lock*
+invalidate_batched_entropy()
+			_extract_crng()
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+So T1 waits for batched_entropy_reset_lock holding primary_crng.lock and
+T2 waits for primary_crng.lock holding batched_entropy_reset_lock.
+
+Sebastian
