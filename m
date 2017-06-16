@@ -1,117 +1,48 @@
-From: Tudor Ambarus <tudor.ambarus@microchip.com>
-Subject: [PATCH] crypto: vmx: remove unnecessary check
-Date: Fri, 16 Jun 2017 11:39:48 +0300
-Message-ID: <1497602388-6886-1-git-send-email-tudor.ambarus@microchip.com>
-Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <linux-crypto@vger.kernel.org>,
-        Tudor Ambarus <tudor.ambarus@microchip.com>
-To: <leosilva@linux.vnet.ibm.com>, <pfsmorigo@linux.vnet.ibm.com>,
-        <herbert@gondor.apana.org.au>
+From: Arvind Yadav <arvind.yadav.cs@gmail.com>
+Subject: [PATCH] crypto: caam: make of_device_ids const.
+Date: Fri, 16 Jun 2017 14:46:44 +0530
+Message-ID: <006670ce30a5b56744b9a723582702d89fa5f274.1497604474.git.arvind.yadav.cs@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: horia.geanta@nxp.com, dan.douglass@nxp.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from esa2.microchip.iphmx.com ([68.232.149.84]:57994 "EHLO
-        esa2.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753140AbdFPIkG (ORCPT
+Received: from mail-pf0-f193.google.com ([209.85.192.193]:33876 "EHLO
+        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753214AbdFPJRV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Jun 2017 04:40:06 -0400
+        Fri, 16 Jun 2017 05:17:21 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-You can't reach init() if parent alg_name is invalid. Moreover,
-cypto_alloc_base() will return ENOENT if alg_name is NULL.
-Found while grasping the fallback mechanism.
+of_device_ids are not supposed to change at runtime. All functions
+working with of_device_ids provided by <linux/of.h> work with const
+of_device_ids. So mark the non-const structs as const.
 
-Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
+File size before:
+   text	   data	    bss	    dec	    hex	filename
+   2376	    808	    128	   3312	    cf0	drivers/crypto/caam/jr.o
+
+File size after constify caam_jr_match:
+   text	   data	    bss	    dec	    hex	filename
+   2976	    192	    128	   3296	    ce0	drivers/crypto/caam/jr.o
+
+Signed-off-by: Arvind Yadav <arvind.yadav.cs@gmail.com>
 ---
- drivers/crypto/vmx/aes.c     | 7 +------
- drivers/crypto/vmx/aes_cbc.c | 7 +------
- drivers/crypto/vmx/aes_ctr.c | 7 +------
- drivers/crypto/vmx/aes_xts.c | 7 +------
- 4 files changed, 4 insertions(+), 24 deletions(-)
+ drivers/crypto/caam/jr.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/vmx/aes.c b/drivers/crypto/vmx/aes.c
-index 022c7ab..96072b9 100644
---- a/drivers/crypto/vmx/aes.c
-+++ b/drivers/crypto/vmx/aes.c
-@@ -37,15 +37,10 @@ struct p8_aes_ctx {
+diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
+index 2763100..1ccfb31 100644
+--- a/drivers/crypto/caam/jr.c
++++ b/drivers/crypto/caam/jr.c
+@@ -536,7 +536,7 @@ static int caam_jr_probe(struct platform_device *pdev)
+ 	return 0;
+ }
  
- static int p8_aes_init(struct crypto_tfm *tfm)
- {
--	const char *alg;
-+	const char *alg = crypto_tfm_alg_name(tfm);
- 	struct crypto_cipher *fallback;
- 	struct p8_aes_ctx *ctx = crypto_tfm_ctx(tfm);
- 
--	if (!(alg = crypto_tfm_alg_name(tfm))) {
--		printk(KERN_ERR "Failed to get algorithm name.\n");
--		return -ENOENT;
--	}
--
- 	fallback = crypto_alloc_cipher(alg, 0, CRYPTO_ALG_NEED_FALLBACK);
- 	if (IS_ERR(fallback)) {
- 		printk(KERN_ERR
-diff --git a/drivers/crypto/vmx/aes_cbc.c b/drivers/crypto/vmx/aes_cbc.c
-index 72a26eb..7394d35 100644
---- a/drivers/crypto/vmx/aes_cbc.c
-+++ b/drivers/crypto/vmx/aes_cbc.c
-@@ -39,15 +39,10 @@ struct p8_aes_cbc_ctx {
- 
- static int p8_aes_cbc_init(struct crypto_tfm *tfm)
- {
--	const char *alg;
-+	const char *alg = crypto_tfm_alg_name(tfm);
- 	struct crypto_skcipher *fallback;
- 	struct p8_aes_cbc_ctx *ctx = crypto_tfm_ctx(tfm);
- 
--	if (!(alg = crypto_tfm_alg_name(tfm))) {
--		printk(KERN_ERR "Failed to get algorithm name.\n");
--		return -ENOENT;
--	}
--
- 	fallback = crypto_alloc_skcipher(alg, 0,
- 			CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK);
- 
-diff --git a/drivers/crypto/vmx/aes_ctr.c b/drivers/crypto/vmx/aes_ctr.c
-index 7cf6d31..9c26d9e 100644
---- a/drivers/crypto/vmx/aes_ctr.c
-+++ b/drivers/crypto/vmx/aes_ctr.c
-@@ -36,15 +36,10 @@ struct p8_aes_ctr_ctx {
- 
- static int p8_aes_ctr_init(struct crypto_tfm *tfm)
- {
--	const char *alg;
-+	const char *alg = crypto_tfm_alg_name(tfm);
- 	struct crypto_blkcipher *fallback;
- 	struct p8_aes_ctr_ctx *ctx = crypto_tfm_ctx(tfm);
- 
--	if (!(alg = crypto_tfm_alg_name(tfm))) {
--		printk(KERN_ERR "Failed to get algorithm name.\n");
--		return -ENOENT;
--	}
--
- 	fallback =
- 	    crypto_alloc_blkcipher(alg, 0, CRYPTO_ALG_NEED_FALLBACK);
- 	if (IS_ERR(fallback)) {
-diff --git a/drivers/crypto/vmx/aes_xts.c b/drivers/crypto/vmx/aes_xts.c
-index 6adc929..8cd6e62 100644
---- a/drivers/crypto/vmx/aes_xts.c
-+++ b/drivers/crypto/vmx/aes_xts.c
-@@ -41,15 +41,10 @@ struct p8_aes_xts_ctx {
- 
- static int p8_aes_xts_init(struct crypto_tfm *tfm)
- {
--	const char *alg;
-+	const char *alg = crypto_tfm_alg_name(tfm);
- 	struct crypto_skcipher *fallback;
- 	struct p8_aes_xts_ctx *ctx = crypto_tfm_ctx(tfm);
- 
--	if (!(alg = crypto_tfm_alg_name(tfm))) {
--		printk(KERN_ERR "Failed to get algorithm name.\n");
--		return -ENOENT;
--	}
--
- 	fallback = crypto_alloc_skcipher(alg, 0,
- 			CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK);
- 	if (IS_ERR(fallback)) {
+-static struct of_device_id caam_jr_match[] = {
++static const struct of_device_id caam_jr_match[] = {
+ 	{
+ 		.compatible = "fsl,sec-v4.0-job-ring",
+ 	},
 -- 
-2.7.4
+1.9.1
