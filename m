@@ -1,64 +1,117 @@
-From: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
-Subject: Re: [PATCH v5 01/13] random: invalidate batched entropy after crng
- init
-Date: Fri, 16 Jun 2017 10:31:12 +0200
-Message-ID: <20170616083111.5cwwkzyauocxafou@breakpoint.cc>
-References: <20170607232607.26870-1-Jason@zx2c4.com>
- <20170607232607.26870-2-Jason@zx2c4.com>
- <20170614192838.3jz4sxpcuhxygx4z@breakpoint.cc>
- <CAHmME9oRG4Oe4zNN4D8Nc9+A51uXPC0y3m3+ws_QK2aq=K=zwA@mail.gmail.com>
+From: Tudor Ambarus <tudor.ambarus@microchip.com>
+Subject: [PATCH] crypto: vmx: remove unnecessary check
+Date: Fri, 16 Jun 2017 11:39:48 +0300
+Message-ID: <1497602388-6886-1-git-send-email-tudor.ambarus@microchip.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: Theodore Ts'o <tytso@mit.edu>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kernel-hardening@lists.openwall.com,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Eric Biggers <ebiggers3@gmail.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        David Miller <davem@davemloft.net>, tglx@linutronix.de
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Content-Type: text/plain
+Cc: <linux-crypto@vger.kernel.org>,
+        Tudor Ambarus <tudor.ambarus@microchip.com>
+To: <leosilva@linux.vnet.ibm.com>, <pfsmorigo@linux.vnet.ibm.com>,
+        <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([146.0.238.67]:35228 "EHLO
-        Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752529AbdFPIbW (ORCPT
+Received: from esa2.microchip.iphmx.com ([68.232.149.84]:57994 "EHLO
+        esa2.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753140AbdFPIkG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Jun 2017 04:31:22 -0400
-Content-Disposition: inline
-In-Reply-To: <CAHmME9oRG4Oe4zNN4D8Nc9+A51uXPC0y3m3+ws_QK2aq=K=zwA@mail.gmail.com>
+        Fri, 16 Jun 2017 04:40:06 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 2017-06-15 00:33:12 [+0200], Jason A. Donenfeld wrote:
-> There's a potential race that I fixed in my v5 of that patch set, but
-> Ted only took v4, and for whatever reason has been to busy to submit
-> the additional patch I already posted showing the diff between v4&v5.
-> Hopefully he actually gets around to it and sends this for the next
-> rc. Here it is:
-> 
-> https://patchwork.kernel.org/patch/9774563/
+You can't reach init() if parent alg_name is invalid. Moreover,
+cypto_alloc_base() will return ENOENT if alg_name is NULL.
+Found while grasping the fallback mechanism.
 
-So you replace "crng_init < 2" with use_lock instead. That is not what I
-am talking about. Again:
-	add_interrupt_randomness()
-->       crng_fast_load()	        spin_trylock_irqsave(&primary_crng.lock, )
-->        invalidate_batched_entropy()  write_lock_irqsave(&batched_entropy_reset_lock, );
+Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
+---
+ drivers/crypto/vmx/aes.c     | 7 +------
+ drivers/crypto/vmx/aes_cbc.c | 7 +------
+ drivers/crypto/vmx/aes_ctr.c | 7 +------
+ drivers/crypto/vmx/aes_xts.c | 7 +------
+ 4 files changed, 4 insertions(+), 24 deletions(-)
 
-in that order while the code path
-	get_random_uXX()                read_lock_irqsave(&batched_entropy_reset_lock, );
-->       extract_crng()
-->        _extract_crng()                spin_lock_irqsave(&crng->lock, );
-
-which allocates the same lock in opposite order.
-That means
-  T1			T2
-  crng_fast_load()	get_random_u64()
-  			extract_crng()
-              *dead lock*
-invalidate_batched_entropy()
-			_extract_crng()
-
-So T1 waits for batched_entropy_reset_lock holding primary_crng.lock and
-T2 waits for primary_crng.lock holding batched_entropy_reset_lock.
-
-Sebastian
+diff --git a/drivers/crypto/vmx/aes.c b/drivers/crypto/vmx/aes.c
+index 022c7ab..96072b9 100644
+--- a/drivers/crypto/vmx/aes.c
++++ b/drivers/crypto/vmx/aes.c
+@@ -37,15 +37,10 @@ struct p8_aes_ctx {
+ 
+ static int p8_aes_init(struct crypto_tfm *tfm)
+ {
+-	const char *alg;
++	const char *alg = crypto_tfm_alg_name(tfm);
+ 	struct crypto_cipher *fallback;
+ 	struct p8_aes_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+-	if (!(alg = crypto_tfm_alg_name(tfm))) {
+-		printk(KERN_ERR "Failed to get algorithm name.\n");
+-		return -ENOENT;
+-	}
+-
+ 	fallback = crypto_alloc_cipher(alg, 0, CRYPTO_ALG_NEED_FALLBACK);
+ 	if (IS_ERR(fallback)) {
+ 		printk(KERN_ERR
+diff --git a/drivers/crypto/vmx/aes_cbc.c b/drivers/crypto/vmx/aes_cbc.c
+index 72a26eb..7394d35 100644
+--- a/drivers/crypto/vmx/aes_cbc.c
++++ b/drivers/crypto/vmx/aes_cbc.c
+@@ -39,15 +39,10 @@ struct p8_aes_cbc_ctx {
+ 
+ static int p8_aes_cbc_init(struct crypto_tfm *tfm)
+ {
+-	const char *alg;
++	const char *alg = crypto_tfm_alg_name(tfm);
+ 	struct crypto_skcipher *fallback;
+ 	struct p8_aes_cbc_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+-	if (!(alg = crypto_tfm_alg_name(tfm))) {
+-		printk(KERN_ERR "Failed to get algorithm name.\n");
+-		return -ENOENT;
+-	}
+-
+ 	fallback = crypto_alloc_skcipher(alg, 0,
+ 			CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK);
+ 
+diff --git a/drivers/crypto/vmx/aes_ctr.c b/drivers/crypto/vmx/aes_ctr.c
+index 7cf6d31..9c26d9e 100644
+--- a/drivers/crypto/vmx/aes_ctr.c
++++ b/drivers/crypto/vmx/aes_ctr.c
+@@ -36,15 +36,10 @@ struct p8_aes_ctr_ctx {
+ 
+ static int p8_aes_ctr_init(struct crypto_tfm *tfm)
+ {
+-	const char *alg;
++	const char *alg = crypto_tfm_alg_name(tfm);
+ 	struct crypto_blkcipher *fallback;
+ 	struct p8_aes_ctr_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+-	if (!(alg = crypto_tfm_alg_name(tfm))) {
+-		printk(KERN_ERR "Failed to get algorithm name.\n");
+-		return -ENOENT;
+-	}
+-
+ 	fallback =
+ 	    crypto_alloc_blkcipher(alg, 0, CRYPTO_ALG_NEED_FALLBACK);
+ 	if (IS_ERR(fallback)) {
+diff --git a/drivers/crypto/vmx/aes_xts.c b/drivers/crypto/vmx/aes_xts.c
+index 6adc929..8cd6e62 100644
+--- a/drivers/crypto/vmx/aes_xts.c
++++ b/drivers/crypto/vmx/aes_xts.c
+@@ -41,15 +41,10 @@ struct p8_aes_xts_ctx {
+ 
+ static int p8_aes_xts_init(struct crypto_tfm *tfm)
+ {
+-	const char *alg;
++	const char *alg = crypto_tfm_alg_name(tfm);
+ 	struct crypto_skcipher *fallback;
+ 	struct p8_aes_xts_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+-	if (!(alg = crypto_tfm_alg_name(tfm))) {
+-		printk(KERN_ERR "Failed to get algorithm name.\n");
+-		return -ENOENT;
+-	}
+-
+ 	fallback = crypto_alloc_skcipher(alg, 0,
+ 			CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK);
+ 	if (IS_ERR(fallback)) {
+-- 
+2.7.4
