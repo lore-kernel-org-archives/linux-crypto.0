@@ -1,33 +1,31 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH v5 01/13] random: invalidate batched entropy after crng init
-Date: Fri, 16 Jun 2017 14:12:42 +0200
-Message-ID: <CAHmME9q_9-zQan0um9j2deHHPejYreCCbfss0BeNuEr4_tuaKg@mail.gmail.com>
-References: <20170607232607.26870-1-Jason@zx2c4.com> <20170607232607.26870-2-Jason@zx2c4.com>
- <20170614192838.3jz4sxpcuhxygx4z@breakpoint.cc> <CAHmME9oRG4Oe4zNN4D8Nc9+A51uXPC0y3m3+ws_QK2aq=K=zwA@mail.gmail.com>
- <20170616083111.5cwwkzyauocxafou@breakpoint.cc>
+From: Theodore Ts'o <tytso@mit.edu>
+Subject: Re: Crypto Fixes for 4.12
+Date: Fri, 16 Jun 2017 08:50:07 -0400
+Message-ID: <20170616125007.v7t4dlcagy5p3q6u@thunk.org>
+References: <20170608092320.GA6478@gondor.apana.org.au>
+ <20170615005443.GA30435@gondor.apana.org.au>
+ <CA+55aFwU1ZvJZK8x9QQtROjOVHG_ks-H3XpU+hjuf8BTxndN3g@mail.gmail.com>
+ <20170615.110118.912361155799259361.davem@davemloft.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: "Theodore Ts'o" <tytso@mit.edu>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kernel-hardening@lists.openwall.com,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Eric Biggers <ebiggers3@gmail.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        David Miller <davem@davemloft.net>,
-        Thomas Gleixner <tglx@linutronix.de>
-To: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+Content-Type: text/plain; charset=us-ascii
+Cc: torvalds@linux-foundation.org, herbert@gondor.apana.org.au,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: David Miller <davem@davemloft.net>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170616083111.5cwwkzyauocxafou@breakpoint.cc>
+Content-Disposition: inline
+In-Reply-To: <20170615.110118.912361155799259361.davem@davemloft.net>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Jun 16, 2017 at 10:31 AM, Sebastian Andrzej Siewior
-<sebastian@breakpoint.cc> wrote:
-> am talking about. Again:
+On Thu, Jun 15, 2017 at 11:01:18AM -0400, David Miller wrote:
+> As a side note, ext4 does something similar with a private
+> implementation, but it doesn't use something the evaluates to an
+> alloca.  Instead it uses a fixed 4-byte size for the shash context
+> value in the on-stack declaration.
 
-I actually figured that out myself after sending the initial email, so
-then I wrote a follow-up patch which I attached to this thread. You
-should have received it. Can you take a look?
+In ext4's case, we're doing it inside an inline function, and then
+using the "return" value from inside the calling function.  Assuming
+that gcc actually inlines the function, are we in danger of tripping
+over the bug?
 
-https://lkml.org/lkml/2017/6/14/942
+						- Ted
