@@ -1,31 +1,29 @@
-From: Theodore Ts'o <tytso@mit.edu>
-Subject: Re: Crypto Fixes for 4.12
-Date: Fri, 16 Jun 2017 08:50:07 -0400
-Message-ID: <20170616125007.v7t4dlcagy5p3q6u@thunk.org>
-References: <20170608092320.GA6478@gondor.apana.org.au>
- <20170615005443.GA30435@gondor.apana.org.au>
- <CA+55aFwU1ZvJZK8x9QQtROjOVHG_ks-H3XpU+hjuf8BTxndN3g@mail.gmail.com>
- <20170615.110118.912361155799259361.davem@davemloft.net>
+From: Srikanth Jampala <Jampala.Srikanth@cavium.com>
+Subject: [PATCH 0/1] Add firmware for CNN55XX crypto driver
+Date: Fri, 16 Jun 2017 19:52:25 +0530
+Message-ID: <20170616142226.3950-1-Jampala.Srikanth@cavium.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: torvalds@linux-foundation.org, herbert@gondor.apana.org.au,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: David Miller <davem@davemloft.net>
+Content-Type: text/plain
+Cc: davem@davemloft.net, linux-firmware@kernel.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Sreerama.Gadam@cavium.com,
+        Srikanth Jampala <Jampala.Srikanth@cavium.com>
+To: herbert@gondor.apana.org.au
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20170615.110118.912361155799259361.davem@davemloft.net>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jun 15, 2017 at 11:01:18AM -0400, David Miller wrote:
-> As a side note, ext4 does something similar with a private
-> implementation, but it doesn't use something the evaluates to an
-> alloca.  Instead it uses a fixed 4-byte size for the shash context
-> value in the on-stack declaration.
+CNN55XX driver is accepted and needs firmware to functional.
+This patchset adds CNN55XX firmware v07 supports
+symmetric crypto operations.
 
-In ext4's case, we're doing it inside an inline function, and then
-using the "return" value from inside the calling function.  Assuming
-that gcc actually inlines the function, are we in danger of tripping
-over the bug?
+Srikanth Jampala (1):
+  cavium: Add firmware for CNN55XX crypto driver.
 
-						- Ted
+ WHENCE        |   9 +++++++++
+ cnn55xx_se.fw | Bin 0 -> 27698 bytes
+ 2 files changed, 9 insertions(+)
+ create mode 100644 cnn55xx_se.fw
+
+-- 
+2.9.4
