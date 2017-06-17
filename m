@@ -1,71 +1,80 @@
-From: David Gstir <david@sigma-star.at>
-Subject: Re: [RFC PATCH 0/2] crypto: caam - fix cts(cbc(aes)) with CAAM driver
-Date: Sat, 17 Jun 2017 11:05:55 +0200
-Message-ID: <5215CFD1-A162-4668-A34C-1C29509DC27E@sigma-star.at>
-References: <20170602122446.2427-1-david@sigma-star.at>
- <VI1PR0401MB25910B19DB95DABF62C00A7598C00@VI1PR0401MB2591.eurprd04.prod.outlook.com>
- <VI1PR0401MB25913AAA76159D27E8EB13DF98C10@VI1PR0401MB2591.eurprd04.prod.outlook.com>
- <20170616075941.GA5346@gondor.apana.org.au>
- <VI1PR0401MB25914CC17187DD446802C25F98C10@VI1PR0401MB2591.eurprd04.prod.outlook.com>
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Dan Douglass <dan.douglass@nxp.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        Radu Solea <radu.solea@nxp.com>,
-        "richard@sigma-star.at" <richard@sigma-star.at>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-To: =?utf-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>
+From: Jeffrey Walton <noloader@gmail.com>
+Subject: Re: [kernel-hardening] Re: [PATCH v4 06/13] iscsi: ensure RNG is
+ seeded before use
+Date: Sat, 17 Jun 2017 10:23:09 -0400
+Message-ID: <CAH8yC8nHX2r9cfQ0gNeJAUrgSfAS8V16dVHv35BRnLn-YprZCg@mail.gmail.com>
+References: <20170606174804.31124-1-Jason@zx2c4.com> <20170606174804.31124-7-Jason@zx2c4.com>
+ <20170608024357.fhyyentj2qm7ti2q@thunk.org> <CAHmME9pViOqqDPyjXKLfCWSTnQrcE4OLJMdK1yaTiUvrOV+ecQ@mail.gmail.com>
+ <fbca1b2b-c9ae-80ce-45ef-17c3d3b93e57@suse.com> <CAHmME9rU_H6Jq7ArjDq1yByrYf1P7nyC4Y8tqkzG585U39MFLg@mail.gmail.com>
+ <02d60ed4-4207-dd7d-8826-0f9f7f4e966d@suse.com>
+Reply-To: noloader@gmail.com
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        "Theodore Ts'o" <tytso@mit.edu>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kernel-hardening@lists.openwall.com,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        David Miller <davem@davemloft.net>,
+        Eric Biggers <ebiggers3@gmail.com>,
+        "Nicholas A. Bellinger" <nab@linux-iscsi.org>,
+        Chris Leech <cleech@redhat.com>, open-iscsi@googlegroups.com
+To: Lee Duncan <lduncan@suse.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.sigma-star.at ([95.130.255.111]:45996 "EHLO
-        mail.sigma-star.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751949AbdFQJF6 (ORCPT
+Received: from mail-oi0-f67.google.com ([209.85.218.67]:33728 "EHLO
+        mail-oi0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752069AbdFQOXL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 17 Jun 2017 05:05:58 -0400
-In-Reply-To: <VI1PR0401MB25914CC17187DD446802C25F98C10@VI1PR0401MB2591.eurprd04.prod.outlook.com>
+        Sat, 17 Jun 2017 10:23:11 -0400
+In-Reply-To: <02d60ed4-4207-dd7d-8826-0f9f7f4e966d@suse.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Horia,
+On Fri, Jun 16, 2017 at 11:45 PM, Lee Duncan <lduncan@suse.com> wrote:
+> On 06/16/2017 05:41 PM, Jason A. Donenfeld wrote:
+>> Hi Lee,
+>>
+>> On Fri, Jun 16, 2017 at 11:58 PM, Lee Duncan <lduncan@suse.com> wrote:
+>>> It seems like what you are doing is basically "good", i.e. if there is
+>>> not enough random data, don't use it. But what happens in that case? The
+>>> authentication fails? How does the user know to wait and try again?
+>>
+>> The process just remains in interruptible (kill-able) sleep until
+>> there is enough entropy, so the process doesn't need to do anything.
+>> If the waiting is interrupted by a signal, it returns -ESYSRESTART,
+>> which follows the usual semantics of restartable syscalls.
+>>
+> In your testing, how long might a process have to wait? Are we talking
+> seconds? Longer? What about timeouts?
+>
+> Sorry, but your changing something that isn't exactly broken, so I just
+> want to be sure we're not introducing some regression, like clients
+> can't connect the first 5 minutes are a reboot.
 
-> On 16 Jun 2017, at 23:01, Horia Geantă <horia.geanta@nxp.com> wrote:
-> 
-> On 6/16/2017 11:00 AM, Herbert Xu wrote:
->> On Fri, Jun 16, 2017 at 07:57:00AM +0000, Horia Geantă wrote:
->>> 
->>> Commit 0605c41cc53ca ("crypto: cts - Convert to skcipher") appends
->>> CRYPTO_TFM_REQ_MAY_BACKLOG to the original crypto request flags for the
->>> last block - when calling cts_cbc_encrypt().
->>> Is it really needed?
->> 
->> Yes, because at this point we cannot tell the sender to back off.
->> 
->>> For cts(cbc(aes)) with cbc(aes) offloaded in HW, i.e. running in async
->>> mode, we get the below stack for CAAM driver.
->>> Driver is told that it can sleep (CRYPTO_TFM_REQ_MAY_BACKLOG flag), so
->>> it uses GFP_KERNEL to allocate memory. However, this is incorrect, since
->>> driver runs in atomic context (softirq).
->> 
->> This is wrong.  Whether you can sleep or not is determined by
->> MAY_SLEEP, not MAY_BACKLOG.  MAY_BACKLOG only indicates that this
->> request must be queued, even if the queue is full.
->> 
-> Indeed, CAAM driver incorrectly decides to use GFP_KERNEL for allocation
-> when MAY_BACKLOG flag is set. This seems to be a long-standing issue, I
-> will send a fix (separately).
-> 
-> Still I think we have a problem.
-> David reported that the user is fscrypt. Looking into fscrypt code, I
-> see that besides MAY_BACKLOG, MAY_SLEEP flag is also set. So we end up
-> in the situation I described earlier: the last block is encrypted in
-> atomic context and with MAY_SLEEP set.
+CHAP (https://www.rfc-editor.org/rfc/rfc1994.txt) and iSCSI
+(https://www.ietf.org/rfc/rfc3720.txt) require random values. If iSCSI
+is operating without them, it seems like something is broken. From RFC
+3720, Section 8.2.1, CHAP Considerations:
 
-Fixing the MAY_BACKLOG issue in the CAAM driver should get rid of the problem
-altogether since the CTS code clears the MAY_SLEEP flag when encrypting the
-last block [1].
+   When CHAP is performed over a non-encrypted channel, it is vulnerable
+   to an off-line dictionary attack.  Implementations MUST support use
+   of up to 128 bit random CHAP secrets, including the means to generate
+   such secrets and to accept them from an external generation source.
+   Implementations MUST NOT provide secret generation (or expansion)
+   means other than random generation.
 
-David
+CHAP actually has a weaker requirement since it only requires _unique_
+(and not _random_). From RFC 1994, Section 2.3, Design Requirements:
 
-[1] http://elixir.free-electrons.com/linux/v4.12-rc5/source/crypto/cts.c#L124
+   Each challenge value SHOULD be unique, since repetition of a
+   challenge value in conjunction with the same secret would permit an
+   attacker to reply with a previously intercepted response.  Since it
+   is expected that the same secret MAY be used to authenticate with
+   servers in disparate geographic regions, the challenge SHOULD exhibit
+   global and temporal uniqueness.
+
+But its not clear to me how to ensure uniqueness when its based on
+randomness from the generators.
+
+Jeff
