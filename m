@@ -1,58 +1,48 @@
-From: Dave Watson <davejwatson@fb.com>
-Subject: Re: [PATCH v3 net-next 3/4] tls: kernel TLS support
-Date: Fri, 16 Jun 2017 17:35:20 -0700
-Message-ID: <20170617003520.GA58072@davejwatson-mba.local>
-References: <cover.1497465295.git.davejwatson@fb.com>
- <20170614183739.GA80368@davejwatson-mba.dhcp.thefacebook.com>
- <20170616135846.6d6011db@xeon-e3>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [PATCH] random: silence compiler warnings and fix race
+Date: Sat, 17 Jun 2017 02:39:40 +0200
+Message-ID: <CAHmME9pLs2rKnuZ_La+PqYivEJDKEUdxUWS7eZthaw0jd8APVQ@mail.gmail.com>
+References: <20170614192838.3jz4sxpcuhxygx4z@breakpoint.cc>
+ <20170614224526.29076-1-Jason@zx2c4.com> <20170616143515.yn6oo6tvmcsrxidw@linutronix.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Cc: Ilya Lesokhin <ilyal@mellanox.com>,
-        Aviad Yehezkel <aviadye@mellanox.com>,
-        Boris Pismenny <borisp@mellanox.com>,
-        Liran Liss <liranl@mellanox.com>,
-        Matan Barak <matanb@mellanox.com>,
-        David Miller <davem@davemloft.net>, <netdev@vger.kernel.org>,
-        Tom Herbert <tom@herbertland.com>,
-        <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>,
-        Hannes Frederic Sowa <hannes@stressinduktion.org>,
-        Eric Dumazet <eric.dumazet@gmail.com>,
-        Alexei Starovoitov <alexei.starovoitov@gmail.com>,
-        <nmav@gnutls.org>, <fridolin.pokorny@gmail.com>
-To: Stephen Hemminger <stephen@networkplumber.org>
+Content-Type: text/plain; charset="UTF-8"
+Cc: "Theodore Ts'o" <tytso@mit.edu>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kernel-hardening@lists.openwall.com,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Eric Biggers <ebiggers3@gmail.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        David Miller <davem@davemloft.net>,
+        Thomas Gleixner <tglx@linutronix.de>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:33067 "EHLO
-        mx0b-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752234AbdFQAfx (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Jun 2017 20:35:53 -0400
-Content-Disposition: inline
-In-Reply-To: <20170616135846.6d6011db@xeon-e3>
+Received: from frisell.zx2c4.com ([192.95.5.64]:51951 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752042AbdFQAjn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 16 Jun 2017 20:39:43 -0400
+In-Reply-To: <20170616143515.yn6oo6tvmcsrxidw@linutronix.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 06/16/17 01:58 PM, Stephen Hemminger wrote:
-> On Wed, 14 Jun 2017 11:37:39 -0700
-> Dave Watson <davejwatson@fb.com> wrote:
-> 
-> > --- /dev/null
-> > +++ b/net/tls/Kconfig
-> > @@ -0,0 +1,12 @@
-> > +#
-> > +# TLS configuration
-> > +#
-> > +config TLS
-> > +	tristate "Transport Layer Security support"
-> > +	depends on NET
-> > +	default m
-> > +	---help---
-> > +	Enable kernel support for TLS protocol. This allows symmetric
-> > +	encryption handling of the TLS protocol to be done in-kernel.
-> > +
-> > +	If unsure, say M.
-> 
-> I understand that this will be useful to lots of people and most distributions
-> will enable it. But the defacto policy in kernel configuration has been that
-> new features in kernel default to being disabled.
+On Fri, Jun 16, 2017 at 4:35 PM, Sebastian Andrzej Siewior
+<bigeasy@linutronix.de> wrote:
+> I wouldn't just push the lock one up as is but move that write part to
+> crng_init to remain within the locked section. Like that:
 
-Sure, will send a patch to switch to default n.
+We can't quite do that, because invalidate_batched_entropy() needs to
+be called _before_ crng_init. Otherwise a concurrent call to
+get_random_u32/u64() will have crng_init being the wrong value when
+the batched entropy is still old.
+
+> Are use about that? I am not sure that the gcc will inline "crng_init"
+> read twice. It is not a local variable. READ_ONCE() is usually used
+> where gcc could cache a memory access but you do not want this. But hey!
+> If someone knows better I am here to learn.
+
+The whole purpose is that I _want_ it to cache the memory access so
+that it is _not_ inlined. So, based on your understanding, it does
+exactly what I intended it to do. The reason is that I'd like to avoid
+a lock imbalance, which could happen if the read is inlined.
+
+Jason
