@@ -1,25 +1,21 @@
 From: Mauro Carvalho Chehab <mchehab@s-opensource.com>
-Subject: [PATCH v2 25/29] padata.txt: standardize document format
-Date: Sat, 17 Jun 2017 12:26:53 -0300
-Message-ID: <97648e768772465cc4eca19345febb510ddbb180.1497713210.git.mchehab@s-opensource.com>
-References: <2932e5ece623ed990b6c3b80174df270278dc314.1497713210.git.mchehab@s-opensource.com>
+Subject: [PATCH v2 24/31] hw_random.txt: standardize document format
+Date: Sat, 17 Jun 2017 12:25:43 -0300
+Message-ID: <1533429bc3453d40fe0f6c7cd4b458517b51585a.1497713142.git.mchehab@s-opensource.com>
+References: <f0f77a106d183325dce9eecd3c11214154050e11.1497713142.git.mchehab@s-opensource.com>
 Cc: Mauro Carvalho Chehab <mchehab@s-opensource.com>,
         Mauro Carvalho Chehab <mchehab@infradead.org>,
         linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         linux-crypto@vger.kernel.org
 To: Linux Doc Mailing List <linux-doc@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:38681
-        "EHLO osg.samsung.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1753224AbdFQP1I (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 17 Jun 2017 11:27:08 -0400
-In-Reply-To: <2932e5ece623ed990b6c3b80174df270278dc314.1497713210.git.mchehab@s-opensource.com>
-In-Reply-To: <2932e5ece623ed990b6c3b80174df270278dc314.1497713210.git.mchehab@s-opensource.com>
-References: <2932e5ece623ed990b6c3b80174df270278dc314.1497713210.git.mchehab@s-opensource.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <f0f77a106d183325dce9eecd3c11214154050e11.1497713142.git.mchehab@s-opensource.com>
+In-Reply-To: <f0f77a106d183325dce9eecd3c11214154050e11.1497713142.git.mchehab@s-opensource.com>
+References: <f0f77a106d183325dce9eecd3c11214154050e11.1497713142.git.mchehab@s-opensource.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 Each text file under Documentation follows a different
 format. Some doesn't even have titles!
@@ -27,123 +23,197 @@ format. Some doesn't even have titles!
 Change its representation to follow the adopted standard,
 using ReST markups for it to be parseable by Sphinx:
 
-- mark document title;
-- mark literal blocks.
+- use proper markups for titles;
+- adjust section identation;
+- use proper markup for notes and fix it to properly show the
+  numbered list.
 
 Signed-off-by: Mauro Carvalho Chehab <mchehab@s-opensource.com>
 ---
- Documentation/padata.txt | 27 +++++++++++++++------------
- 1 file changed, 15 insertions(+), 12 deletions(-)
+ Documentation/hw_random.txt | 159 ++++++++++++++++++++++++--------------------
+ 1 file changed, 87 insertions(+), 72 deletions(-)
 
-diff --git a/Documentation/padata.txt b/Documentation/padata.txt
-index 7ddfe216a0aa..b103d0c82000 100644
---- a/Documentation/padata.txt
-+++ b/Documentation/padata.txt
-@@ -1,5 +1,8 @@
-+=======================================
- The padata parallel execution mechanism
--Last updated for 2.6.36
-+=======================================
+diff --git a/Documentation/hw_random.txt b/Documentation/hw_random.txt
+index fce1634907d0..121de96e395e 100644
+--- a/Documentation/hw_random.txt
++++ b/Documentation/hw_random.txt
+@@ -1,90 +1,105 @@
+-Introduction:
+-
+-	The hw_random framework is software that makes use of a
+-	special hardware feature on your CPU or motherboard,
+-	a Random Number Generator (RNG).  The software has two parts:
+-	a core providing the /dev/hwrng character device and its
+-	sysfs support, plus a hardware-specific driver that plugs
+-	into that core.
+-
+-	To make the most effective use of these mechanisms, you
+-	should download the support software as well.  Download the
+-	latest version of the "rng-tools" package from the
+-	hw_random driver's official Web site:
+-
+-		http://sourceforge.net/projects/gkernel/
+-
+-	Those tools use /dev/hwrng to fill the kernel entropy pool,
+-	which is used internally and exported by the /dev/urandom and
+-	/dev/random special files.
+-
+-Theory of operation:
+-
+-	CHARACTER DEVICE.  Using the standard open()
+-	and read() system calls, you can read random data from
+-	the hardware RNG device.  This data is NOT CHECKED by any
+-	fitness tests, and could potentially be bogus (if the
+-	hardware is faulty or has been tampered with).  Data is only
+-	output if the hardware "has-data" flag is set, but nevertheless
+-	a security-conscious person would run fitness tests on the
+-	data before assuming it is truly random.
+-
+-	The rng-tools package uses such tests in "rngd", and lets you
+-	run them by hand with a "rngtest" utility.
+-
+-	/dev/hwrng is char device major 10, minor 183.
+-
+-	CLASS DEVICE.  There is a /sys/class/misc/hw_random node with
+-	two unique attributes, "rng_available" and "rng_current".  The
+-	"rng_available" attribute lists the hardware-specific drivers
+-	available, while "rng_current" lists the one which is currently
+-	connected to /dev/hwrng.  If your system has more than one
+-	RNG available, you may change the one used by writing a name from
+-	the list in "rng_available" into "rng_current".
++==========================================================
++Linux support for random number generator in i8xx chipsets
++==========================================================
 +
-+:Last updated: for 2.6.36
++Introduction
++============
++
++The hw_random framework is software that makes use of a
++special hardware feature on your CPU or motherboard,
++a Random Number Generator (RNG).  The software has two parts:
++a core providing the /dev/hwrng character device and its
++sysfs support, plus a hardware-specific driver that plugs
++into that core.
++
++To make the most effective use of these mechanisms, you
++should download the support software as well.  Download the
++latest version of the "rng-tools" package from the
++hw_random driver's official Web site:
++
++	http://sourceforge.net/projects/gkernel/
++
++Those tools use /dev/hwrng to fill the kernel entropy pool,
++which is used internally and exported by the /dev/urandom and
++/dev/random special files.
++
++Theory of operation
++===================
++
++CHARACTER DEVICE.  Using the standard open()
++and read() system calls, you can read random data from
++the hardware RNG device.  This data is NOT CHECKED by any
++fitness tests, and could potentially be bogus (if the
++hardware is faulty or has been tampered with).  Data is only
++output if the hardware "has-data" flag is set, but nevertheless
++a security-conscious person would run fitness tests on the
++data before assuming it is truly random.
++
++The rng-tools package uses such tests in "rngd", and lets you
++run them by hand with a "rngtest" utility.
++
++/dev/hwrng is char device major 10, minor 183.
++
++CLASS DEVICE.  There is a /sys/class/misc/hw_random node with
++two unique attributes, "rng_available" and "rng_current".  The
++"rng_available" attribute lists the hardware-specific drivers
++available, while "rng_current" lists the one which is currently
++connected to /dev/hwrng.  If your system has more than one
++RNG available, you may change the one used by writing a name from
++the list in "rng_available" into "rng_current".
  
- Padata is a mechanism by which the kernel can farm work out to be done in
- parallel on multiple CPUs while retaining the ordering of tasks.  It was
-@@ -9,7 +12,7 @@ those packets.  The crypto developers made a point of writing padata in a
- sufficiently general fashion that it could be put to other uses as well.
+ ==========================================================================
  
- The first step in using padata is to set up a padata_instance structure for
--overall control of how tasks are to be run:
-+overall control of how tasks are to be run::
+-	Hardware driver for Intel/AMD/VIA Random Number Generators (RNG)
+-	Copyright 2000,2001 Jeff Garzik <jgarzik@pobox.com>
+-	Copyright 2000,2001 Philipp Rumpf <prumpf@mandrakesoft.com>
  
-     #include <linux/padata.h>
++Hardware driver for Intel/AMD/VIA Random Number Generators (RNG)
++	- Copyright 2000,2001 Jeff Garzik <jgarzik@pobox.com>
++	- Copyright 2000,2001 Philipp Rumpf <prumpf@mandrakesoft.com>
  
-@@ -24,7 +27,7 @@ The workqueue wq is where the work will actually be done; it should be
- a multithreaded queue, naturally.
+-About the Intel RNG hardware, from the firmware hub datasheet:
  
- To allocate a padata instance with the cpu_possible_mask for both
--cpumasks this helper function can be used:
-+cpumasks this helper function can be used::
+-	The Firmware Hub integrates a Random Number Generator (RNG)
+-	using thermal noise generated from inherently random quantum
+-	mechanical properties of silicon. When not generating new random
+-	bits the RNG circuitry will enter a low power state. Intel will
+-	provide a binary software driver to give third party software
+-	access to our RNG for use as a security feature. At this time,
+-	the RNG is only to be used with a system in an OS-present state.
++About the Intel RNG hardware, from the firmware hub datasheet
++=============================================================
  
-     struct padata_instance *padata_alloc_possible(struct workqueue_struct *wq);
+-Intel RNG Driver notes:
++The Firmware Hub integrates a Random Number Generator (RNG)
++using thermal noise generated from inherently random quantum
++mechanical properties of silicon. When not generating new random
++bits the RNG circuitry will enter a low power state. Intel will
++provide a binary software driver to give third party software
++access to our RNG for use as a security feature. At this time,
++the RNG is only to be used with a system in an OS-present state.
  
-@@ -36,7 +39,7 @@ it is legal to supply a cpumask to padata that contains offline CPUs.
- Once an offline CPU in the user supplied cpumask comes online, padata
- is going to use it.
+-	* FIXME: support poll(2)
++Intel RNG Driver notes
++======================
  
--There are functions for enabling and disabling the instance:
-+There are functions for enabling and disabling the instance::
+-	NOTE: request_mem_region was removed, for three reasons:
+-	1) Only one RNG is supported by this driver, 2) The location
+-	used by the RNG is a fixed location in MMIO-addressable memory,
++FIXME: support poll(2)
++
++.. note::
++
++	request_mem_region was removed, for three reasons:
++
++	1) Only one RNG is supported by this driver;
++	2) The location used by the RNG is a fixed location in
++	   MMIO-addressable memory;
+ 	3) users with properly working BIOS e820 handling will always
+-	have the region in which the RNG is located reserved, so
+-	request_mem_region calls always fail for proper setups.
+-	However, for people who use mem=XX, BIOS e820 information is
+-	-not- in /proc/iomem, and request_mem_region(RNG_ADDR) can
+-	succeed.
++	   have the region in which the RNG is located reserved, so
++	   request_mem_region calls always fail for proper setups.
++	   However, for people who use mem=XX, BIOS e820 information is
++	   **not** in /proc/iomem, and request_mem_region(RNG_ADDR) can
++	   succeed.
  
-     int padata_start(struct padata_instance *pinst);
-     void padata_stop(struct padata_instance *pinst);
-@@ -48,7 +51,7 @@ padata cpumask contains no active CPU (flag not set).
- padata_stop clears the flag and blocks until the padata instance
- is unused.
+-Driver details:
++Driver details
++==============
  
--The list of CPUs to be used can be adjusted with these functions:
-+The list of CPUs to be used can be adjusted with these functions::
+-	Based on:
++Based on:
+ 	Intel 82802AB/82802AC Firmware Hub (FWH) Datasheet
+-		May 1999 Order Number: 290658-002 R
++	May 1999 Order Number: 290658-002 R
  
-     int padata_set_cpumasks(struct padata_instance *pinst,
- 			    cpumask_var_t pcpumask,
-@@ -71,12 +74,12 @@ padata_add_cpu/padata_remove_cpu are used. cpu specifies the CPU to add or
- remove and mask is one of PADATA_CPU_SERIAL, PADATA_CPU_PARALLEL.
+-	Intel 82802 Firmware Hub: Random Number Generator
++Intel 82802 Firmware Hub:
++	Random Number Generator
+ 	Programmer's Reference Manual
+-		December 1999 Order Number: 298029-001 R
++	December 1999 Order Number: 298029-001 R
  
- If a user is interested in padata cpumask changes, he can register to
--the padata cpumask change notifier:
-+the padata cpumask change notifier::
+-	Intel 82802 Firmware HUB Random Number Generator Driver
++Intel 82802 Firmware HUB Random Number Generator Driver
+ 	Copyright (c) 2000 Matt Sottek <msottek@quiknet.com>
  
-     int padata_register_cpumask_notifier(struct padata_instance *pinst,
- 					 struct notifier_block *nblock);
- 
--To unregister from that notifier:
-+To unregister from that notifier::
- 
-     int padata_unregister_cpumask_notifier(struct padata_instance *pinst,
- 					   struct notifier_block *nblock);
-@@ -84,7 +87,7 @@ To unregister from that notifier:
- The padata cpumask change notifier notifies about changes of the usable
- cpumasks, i.e. the subset of active CPUs in the user supplied cpumask.
- 
--Padata calls the notifier chain with:
-+Padata calls the notifier chain with::
- 
-     blocking_notifier_call_chain(&pinst->cpumask_change_notifier,
- 				 notification_mask,
-@@ -95,7 +98,7 @@ is one of PADATA_CPU_SERIAL, PADATA_CPU_PARALLEL and cpumask is a pointer
- to a struct padata_cpumask that contains the new cpumask information.
- 
- Actually submitting work to the padata instance requires the creation of a
--padata_priv structure:
-+padata_priv structure::
- 
-     struct padata_priv {
-         /* Other stuff here... */
-@@ -110,7 +113,7 @@ parallel() and serial() functions should be provided.  Those functions will
- be called in the process of getting the work done as we will see
- momentarily.
- 
--The submission of work is done with:
-+The submission of work is done with::
- 
-     int padata_do_parallel(struct padata_instance *pinst,
- 		           struct padata_priv *padata, int cb_cpu);
-@@ -138,7 +141,7 @@ need not be completed during this call, but, if parallel() leaves work
- outstanding, it should be prepared to be called again with a new job before
- the previous one completes.  When a task does complete, parallel() (or
- whatever function actually finishes the job) should inform padata of the
--fact with a call to:
-+fact with a call to::
- 
-     void padata_do_serial(struct padata_priv *padata);
- 
-@@ -151,7 +154,7 @@ pains to ensure that tasks are completed in the order in which they were
- submitted.
- 
- The one remaining function in the padata API should be called to clean up
--when a padata instance is no longer needed:
-+when a padata instance is no longer needed::
- 
-     void padata_free(struct padata_instance *pinst);
- 
+-	Special thanks to Matt Sottek.  I did the "guts", he
+-	did the "brains" and all the testing.
++Special thanks to Matt Sottek.  I did the "guts", he
++did the "brains" and all the testing.
 -- 
 2.9.4
