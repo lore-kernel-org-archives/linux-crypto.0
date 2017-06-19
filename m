@@ -1,37 +1,39 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [-next] crypto: 842 propagate PTR_ERR value instead of -ENOMEM
-Date: Mon, 19 Jun 2017 14:28:33 +0800
-Message-ID: <20170619062833.GA13622@gondor.apana.org.au>
-References: <1496307446-12377-1-git-send-email-zhangshengju@cmss.chinamobile.com>
+Subject: Re: [PATCH v2] crypto: talitos: Extend max key length for
+ SHA384/512-HMAC and AEAD
+Date: Mon, 19 Jun 2017 14:38:24 +0800
+Message-ID: <20170619063824.GA13667@gondor.apana.org.au>
+References: <20170502133835.GA17402@darwin.bork.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: haren@us.ibm.com, linux-crypto@vger.kernel.org
-To: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
+Cc: linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
+        stable@vger.kernel.org, horia.geanta@nxp.com
+To: Martin Hicks <mort@bork.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:59614 "EHLO
+Received: from orcrist.hmeau.com ([104.223.48.154]:59624 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752531AbdFSG25 (ORCPT
+        with ESMTP id S1750895AbdFSGiw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Jun 2017 02:28:57 -0400
+        Mon, 19 Jun 2017 02:38:52 -0400
 Content-Disposition: inline
-In-Reply-To: <1496307446-12377-1-git-send-email-zhangshengju@cmss.chinamobile.com>
+In-Reply-To: <20170502133835.GA17402@darwin.bork.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Zhang Shengju <zhangshengju@cmss.chinamobile.com> wrote:
-> It is better to propagate PTR_ERR value instead of a hardcoded
-> value(-ENOMEM here).
+Martin Hicks <mort@bork.org> wrote:
 > 
-> Signed-off-by: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
+> An updated patch that also handles the additional key length requirements
+> for the AEAD algorithms.
+> 
+> The max keysize is not 96.  For SHA384/512 it's 128, and for the AEAD
+> algorithms it's longer still.  Extend the max keysize for the
+> AEAD size for AES256 + HMAC(SHA512).
+> 
+> Cc: <stable@vger.kernel.org> # 3.6+
+> Fixes: 357fb60502ede ("crypto: talitos - add sha224, sha384 and sha512 to existing AEAD algorithms")
+> Signed-off-by: Martin Hicks <mort@bork.org>
 
-...
-
-> -               return -ENOMEM;
-> +               return PTR_ERR(ctx-wmem);
-
-Please test your patches before submission.
-
-Thanks,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
