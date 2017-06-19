@@ -1,33 +1,30 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] Documentation: crypto: Fixed bugs, added example usage
- of calc_hash().
-Date: Mon, 19 Jun 2017 14:40:44 +0800
-Message-ID: <20170619064044.GB13800@gondor.apana.org.au>
-References: <CGME20170512153803eucas1p1d3029703e8edee069e4aa3c578885d00@eucas1p1.samsung.com>
- <98b6249c-cd31-10cb-1527-9d95ac26f10e@partner.samsung.com>
+Subject: Re: [PATCH] crypto: algapi: Use pr_err common logging style.
+Date: Mon, 19 Jun 2017 14:42:04 +0800
+Message-ID: <20170619064204.GA13863@gondor.apana.org.au>
+References: <1494702319-5673-1-git-send-email-karim.eshapa@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>, linux-crypto@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Kamil Konieczny <k.konieczny@partner.samsung.com>
-Return-path: <linux-doc-owner@vger.kernel.org>
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, karim.eshapa@gmail.com
+To: Karim Eshapa <karim.eshapa@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:59700 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751058AbdFSGmX (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 19 Jun 2017 02:42:23 -0400
 Content-Disposition: inline
-In-Reply-To: <98b6249c-cd31-10cb-1527-9d95ac26f10e@partner.samsung.com>
-Sender: linux-doc-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1494702319-5673-1-git-send-email-karim.eshapa@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, May 12, 2017 at 05:38:02PM +0200, Kamil Konieczny wrote:
-> - Fixed bugs in example for shash and rng (added missing "*" and " *").
-> - Corrected pr_info() in calc_hash().
-> - Added example usage of calc_hash().
-> - No need for negate PTR_ERR to get error code, as crypto_alloc_rng
->   already returns negative values like ERR_PTR(-ENOMEM). Fixed.
+Karim Eshapa <karim.eshapa@gmail.com> wrote:
+> Use more common error logging style.
 > 
-> Signed-off-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
+> Signed-off-by: Karim Eshapa <karim.eshapa@gmail.com>
 
-Patch applied.  Thanks.
+karim.eshapa@gmail.com
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
