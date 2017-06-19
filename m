@@ -1,28 +1,26 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: testmgr: use consistent format for errors
-Date: Mon, 19 Jun 2017 14:44:14 +0800
-Message-ID: <20170619064414.GE13800@gondor.apana.org.au>
-References: <1496640823-30421-1-git-send-email-gilad@benyossef.com>
+Subject: Re: [PATCH v2 1/2] crypto: engine - replace pr_xxx by dev_xxx
+Date: Mon, 19 Jun 2017 14:46:52 +0800
+Message-ID: <20170619064652.GG13800@gondor.apana.org.au>
+References: <20170606134417.18850-1-clabbe.montjoie@gmail.com>
+ <20170606134417.18850-2-clabbe.montjoie@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Gilad Ben-Yossef <gilad@benyossef.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:59738 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753341AbdFSGoj (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Jun 2017 02:44:39 -0400
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Corentin Labbe <clabbe.montjoie@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1496640823-30421-1-git-send-email-gilad@benyossef.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20170606134417.18850-2-clabbe.montjoie@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Jun 05, 2017 at 08:33:43AM +0300, Gilad Ben-Yossef wrote:
-> Fix inconsistent format and spelling in hash tests error messages.
+On Tue, Jun 06, 2017 at 03:44:16PM +0200, Corentin Labbe wrote:
+> By adding a struct device *dev to struct engine, we could store the
+> device used at register time and so use all dev_xxx functions instead of
+> pr_xxx.
 > 
-> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+> Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
 
 Patch applied.  Thanks.
 -- 
