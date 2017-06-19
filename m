@@ -1,34 +1,28 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: brcm: fix spelling mistake: "fallbck" ->
- "fallback"
-Date: Mon, 19 Jun 2017 14:43:55 +0800
-Message-ID: <20170619064355.GD13800@gondor.apana.org.au>
-References: <20170604182920.26389-1-colin.king@canonical.com>
- <CA+Jmh7F0oWL44==Xsy6HY_kabVQQNcefh3Q8S0mH5mHhRyD1ag@mail.gmail.com>
+Subject: Re: [PATCH] crypto: testmgr: use consistent format for errors
+Date: Mon, 19 Jun 2017 14:44:14 +0800
+Message-ID: <20170619064414.GE13800@gondor.apana.org.au>
+References: <1496640823-30421-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Colin King <colin.king@canonical.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Rob Rice <rob.rice@broadcom.com>,
-        Corentin LABBE <clabbe.montjoie@gmail.com>,
+Cc: "David S. Miller" <davem@davemloft.net>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Steve Lin <steven.lin1@broadcom.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+To: Gilad Ben-Yossef <gilad@benyossef.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:59738 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753341AbdFSGoj (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 19 Jun 2017 02:44:39 -0400
 Content-Disposition: inline
-In-Reply-To: <CA+Jmh7F0oWL44==Xsy6HY_kabVQQNcefh3Q8S0mH5mHhRyD1ag@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1496640823-30421-1-git-send-email-gilad@benyossef.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jun 05, 2017 at 10:10:48AM -0400, Steve Lin wrote:
-> On Sun, Jun 4, 2017 at 2:29 PM, Colin King <colin.king@canonical.com> wrote:
-> > From: Colin Ian King <colin.king@canonical.com>
-> >
-> > Trivial fix to spelling mistake in flow_log message
-> >
-> > Signed-off-by: Colin Ian King <colin.king@canonical.com>
+On Mon, Jun 05, 2017 at 08:33:43AM +0300, Gilad Ben-Yossef wrote:
+> Fix inconsistent format and spelling in hash tests error messages.
 > 
-> Good catch, thanks!
-> Reviewed-by: Steve Lin <steven.lin1@broadcom.com>
+> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 
 Patch applied.  Thanks.
 -- 
