@@ -1,109 +1,55 @@
-From: Mike Frysinger <vapier@chromium.org>
-Subject: Re: [PATCH] hwrng: do not warn when there are no devices
-Date: Mon, 19 Jun 2017 12:03:37 -0700
-Message-ID: <CAAbOScnZxHyh-RwpqGgOy9Ybh2C+noGc4m5nFWzQzSb38BsavA@mail.gmail.com>
-References: <20170512041734.31945-1-vapier@gentoo.org> <CANc+2y5si9imDg7NEC-3XsnjPFfoUMu=2T5gxKDqgoo24XHCaA@mail.gmail.com>
- <CAAbOSc=e07W8LL8PAHv5awt_uPk8yNJ6wTTu3Ebe-Mww+inG8A@mail.gmail.com>
- <CANc+2y6=TtMGFknqgc5oAjY-pHkU6J31+QQaa7=6oAS=Omc0cg@mail.gmail.com>
- <CANc+2y5YDcJYcwyCUtdCcvW_07HhjTzSrShyWFkfCjXYTsi0QQ@mail.gmail.com>
- <CAAbOSck2Uzk7kRHErLwEGRoPkMVV+=3bvdz1nnSOsE6UTQZF0A@mail.gmail.com>
- <CANc+2y40u1vviM9_m8TX896Skr=qCjmvvSq86Y=tkX923Q_3fg@mail.gmail.com>
- <20170619041234.GA12984@gondor.apana.org.au> <CAAbOSckrApUs26m7+iGyex43tEaWthNOuuN2jjBu-apj-y-Rdw@mail.gmail.com>
- <20170619062115.GA13498@gondor.apana.org.au> <CANc+2y4TUNDd0-7jQBTQkBJELDTSS=jNHF2zqHGtS58XU=TuAA@mail.gmail.com>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [PATCH] random: silence compiler warnings and fix race
+Date: Mon, 19 Jun 2017 22:55:37 +0200
+Message-ID: <CAHmME9rnSaB+wqrhefhPPNOPOK-zVCvdFQAxmKtPajD97mYqNw@mail.gmail.com>
+References: <20170614192838.3jz4sxpcuhxygx4z@breakpoint.cc>
+ <20170614224526.29076-1-Jason@zx2c4.com> <20170616143515.yn6oo6tvmcsrxidw@linutronix.de>
+ <CAHmME9pLs2rKnuZ_La+PqYivEJDKEUdxUWS7eZthaw0jd8APVQ@mail.gmail.com> <20170619074553.wo3ec6i2yaojn7qs@linutronix.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Matt Mackall <mpm@selenic.com>, linux-crypto@vger.kernel.org
-To: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Cc: "Theodore Ts'o" <tytso@mit.edu>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kernel-hardening@lists.openwall.com,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Eric Biggers <ebiggers3@gmail.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        David Miller <davem@davemloft.net>,
+        Thomas Gleixner <tglx@linutronix.de>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-vk0-f48.google.com ([209.85.213.48]:33797 "EHLO
-        mail-vk0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753150AbdFSTEJ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Jun 2017 15:04:09 -0400
-Received: by mail-vk0-f48.google.com with SMTP id g66so57526347vki.1
-        for <linux-crypto@vger.kernel.org>; Mon, 19 Jun 2017 12:04:08 -0700 (PDT)
-In-Reply-To: <CANc+2y4TUNDd0-7jQBTQkBJELDTSS=jNHF2zqHGtS58XU=TuAA@mail.gmail.com>
+Received: from frisell.zx2c4.com ([192.95.5.64]:41327 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751736AbdFSUzl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 19 Jun 2017 16:55:41 -0400
+In-Reply-To: <20170619074553.wo3ec6i2yaojn7qs@linutronix.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jun 19, 2017 at 2:43 AM, PrasannaKumar Muralidharan wrote:
-> On 19 June 2017 at 11:51, Herbert Xu wrote:
->> On Sun, Jun 18, 2017 at 10:00:17PM -0700, Mike Frysinger wrote:
->>>
->>> in order to make tpm-rng react in the way you're implying, the TPM
->>> subsystem would need to add a notification chain for transitions from
->>> none<->some devices, then tpm-rng could subscribe to that, and during
->>> those transition points, it would call hwrng_register/hwrng_unregister
->>> to make itself visible accordingly to the hwrng subsystem.  maybe
->>> someone on the TPM side would be interested in writing all that logic,
->>> but it sounds excessive for this minor usage.  the current tpm-rng
->>> driver is *extremely* simple -- it's 3 funcs, each of which are 1
->>> line.
+On Mon, Jun 19, 2017 at 9:45 AM, Sebastian Andrzej Siewior
+<bigeasy@linutronix.de> wrote:
+> ehm. You sure? I simply delayed the lock-dropping _after_ the state
+> variable was been modified. So it was basically what your patch did
+> except it was unlocked later=E2=80=A6
+
+Yes, I'm sure. You moved the call to invalidate_batched_entropy() to
+be after the assignment of crng_init. However, the call to
+invalidate_batched_entropy() must be made _before_ the assignment of
+crng_init.
+
+>> > Are use about that? I am not sure that the gcc will inline "crng_init"
+>> > read twice. It is not a local variable. READ_ONCE() is usually used
+>> > where gcc could cache a memory access but you do not want this. But he=
+y!
+>> > If someone knows better I am here to learn.
 >>
->> It's simple and it's broken, as far as the way it hooks into the
->> hwrng is concerned.
+>> The whole purpose is that I _want_ it to cache the memory access so
+>> that it is _not_ inlined. So, based on your understanding, it does
+>> exactly what I intended it to do. The reason is that I'd like to avoid
+>> a lock imbalance, which could happen if the read is inlined.
 >
-> *********************************************************************************************
-> diff --git a/drivers/char/hw_random/tpm-rng.c b/drivers/char/hw_random/tpm-rng.c
-> index d6d4482..4861b35 100644
-> --- a/drivers/char/hw_random/tpm-rng.c
-> +++ b/drivers/char/hw_random/tpm-rng.c
-> @@ -22,6 +22,10 @@
->  #include <linux/tpm.h>
->
->  #define MODULE_NAME "tpm-rng"
-> +#define MAX_RETRIES 30
-> +
-> +static struct delayed_work check_tpm_work;
-> +static int retry_count;
->
->  static int tpm_rng_read(struct hwrng *rng, void *data, size_t max, bool wait)
->  {
-> @@ -33,9 +37,27 @@ static struct hwrng tpm_rng = {
->         .read = tpm_rng_read,
->  };
->
-> +static void check_tpm_presence(struct work_struct *work)
-> +{
-> +       u8 data = 0;
-> +       if (tpm_get_random(TPM_ANY_NUM, &data, 1) > 0) {
-> +               hwrng_register(&tpm_rng);
-> +       } else {
-> +               if (retry_count < MAX_RETRIES) {
-> +                       retry_count++;
-> +                       schedule_delayed_work(&check_tpm_work, HZ * 10);
-> +               } else {
-> +                       pr_err("Could not find any TPM chip, not
-> registering rng");
-> +               }
-> +       }
-> +}
-> +
->  static int __init rng_init(void)
->  {
-> -       return hwrng_register(&tpm_rng);
-> +       INIT_DELAYED_WORK(&check_tpm_work, check_tpm_presence);
-> +       check_tpm_presence(NULL);
-> +
-> +       return 0;
->  }
->  module_init(rng_init);
-> *********************************************************************************************
->
-> Why not something like this? Patch is completely untested. If this
-> idea seems useful I can clean the code but would require help in
-> testing.
+> So it was good as it was which means you can drop that READ_ONCE().
 
-first, that's not how deferred device probing works in the kernel.
-drivers shouldn't be doing their own sleeping.  but we can ignore that
-because no amount of delay/retries will work -- TPMs can come & go at
-anytime via hotplugging or module loading/unloading.  so the only way
-to pull it off would be to do something like what i described --
-extending the tpm framework so that it can signal children to come
-up/go down.
-
-imo, standing all of that up is over-engineering and not worth the
-effort, so i'm not going to do it.  but maybe you can convince some of
-the TPM maintainers it's worthwhile.
--mike
+Except READ_ONCE ensures that the compiler will never inline it, so it
+actually needs to stay.
