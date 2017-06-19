@@ -1,116 +1,37 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH] random: silence compiler warnings and fix race
-Date: Mon, 19 Jun 2017 22:57:18 +0200
-Message-ID: <CAHmME9rv3EjOVF4LhYZ0VS2LYKjDr_-TxzNHvyE_mKZ_UX0+eA@mail.gmail.com>
-References: <20170614192838.3jz4sxpcuhxygx4z@breakpoint.cc> <20170614224526.29076-1-Jason@zx2c4.com>
+From: INFO <mguerrero@huv.gov.co>
+Subject: Re: Reply Urgent
+Date: Mon, 19 Jun 2017 14:39:18 -0500
+Message-ID: <20170619143918.2132176qvnaamicm__2949.25974817506$1497917361$gmane$org@correo.huv.gov.co>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: tglx@breakpoint.cc, David Miller <davem@davemloft.net>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Eric Biggers <ebiggers3@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        kernel-hardening@lists.openwall.com,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: "Theodore Ts'o" <tytso@mit.edu>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170614224526.29076-1-Jason@zx2c4.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain;
+ charset=ISO-8859-1;
+ DelSp="Yes";
+ format="flowed"
+Content-Transfer-Encoding: 7bit
+To: undisclosed-recipients:;
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from correo.huv.gov.co ([190.6.160.84]:4695 "EHLO correo.huv.gov.co"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753205AbdFTAIX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 19 Jun 2017 20:08:23 -0400
+Content-Disposition: inline
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hello Ted,
+Hello,
 
-With rc6 already released and rc7 coming up, I'd really appreciate you
-stepping in here and either ACKing the above commit, or giving your
-two cents about it in case I need to roll something different.
+How are you doing? I have been sent to inform you that, We have an  
+inheritance of a deceased client with your surname. Contact Mr Andrew  
+Bailey Reply Email To: myinfand@gmail.com with your "Full Names" for  
+more info.  Thanks for your understanding.
 
-Thanks,
-Jason
+Reply ASAP thank you.
 
-On Thu, Jun 15, 2017 at 12:45 AM, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> Odd versions of gcc for the sh4 architecture will actually warn about
-> flags being used while uninitialized, so we set them to zero. Non crazy
-> gccs will optimize that out again, so it doesn't make a difference.
->
-> Next, over aggressive gccs could inline the expression that defines
-> use_lock, which could then introduce a race resulting in a lock
-> imbalance. By using READ_ONCE, we prevent that fate. Finally, we make
-> that assignment const, so that gcc can still optimize a nice amount.
->
-> Finally, we fix a potential deadlock between primary_crng.lock and
-> batched_entropy_reset_lock, where they could be called in opposite
-> order. Moving the call to invalidate_batched_entropy to outside the lock
-> rectifies this issue.
->
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-> ---
-> Ted -- the first part of this is the fixup patch we discussed earlier.
-> Then I added on top a fix for a potentially related race.
->
-> I'm not totally convinced that moving this block to outside the spinlock
-> is 100% okay, so please give this a close look before merging.
->
->
->  drivers/char/random.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
->
-> diff --git a/drivers/char/random.c b/drivers/char/random.c
-> index e870f329db88..01a260f67437 100644
-> --- a/drivers/char/random.c
-> +++ b/drivers/char/random.c
-> @@ -803,13 +803,13 @@ static int crng_fast_load(const char *cp, size_t len)
->                 p[crng_init_cnt % CHACHA20_KEY_SIZE] ^= *cp;
->                 cp++; crng_init_cnt++; len--;
->         }
-> +       spin_unlock_irqrestore(&primary_crng.lock, flags);
->         if (crng_init_cnt >= CRNG_INIT_CNT_THRESH) {
->                 invalidate_batched_entropy();
->                 crng_init = 1;
->                 wake_up_interruptible(&crng_init_wait);
->                 pr_notice("random: fast init done\n");
->         }
-> -       spin_unlock_irqrestore(&primary_crng.lock, flags);
->         return 1;
->  }
->
-> @@ -841,6 +841,7 @@ static void crng_reseed(struct crng_state *crng, struct entropy_store *r)
->         }
->         memzero_explicit(&buf, sizeof(buf));
->         crng->init_time = jiffies;
-> +       spin_unlock_irqrestore(&primary_crng.lock, flags);
->         if (crng == &primary_crng && crng_init < 2) {
->                 invalidate_batched_entropy();
->                 crng_init = 2;
-> @@ -848,7 +849,6 @@ static void crng_reseed(struct crng_state *crng, struct entropy_store *r)
->                 wake_up_interruptible(&crng_init_wait);
->                 pr_notice("random: crng init done\n");
->         }
-> -       spin_unlock_irqrestore(&primary_crng.lock, flags);
->  }
->
->  static inline void crng_wait_ready(void)
-> @@ -2041,8 +2041,8 @@ static DEFINE_PER_CPU(struct batched_entropy, batched_entropy_u64);
->  u64 get_random_u64(void)
->  {
->         u64 ret;
-> -       bool use_lock = crng_init < 2;
-> -       unsigned long flags;
-> +       bool use_lock = READ_ONCE(crng_init) < 2;
-> +       unsigned long flags = 0;
->         struct batched_entropy *batch;
->
->  #if BITS_PER_LONG == 64
-> @@ -2073,8 +2073,8 @@ static DEFINE_PER_CPU(struct batched_entropy, batched_entropy_u32);
->  u32 get_random_u32(void)
->  {
->         u32 ret;
-> -       bool use_lock = crng_init < 2;
-> -       unsigned long flags;
-> +       bool use_lock = READ_ONCE(crng_init) < 2;
-> +       unsigned long flags = 0;
->         struct batched_entropy *batch;
->
->         if (arch_get_random_int(&ret))
-> --
-> 2.13.1
->
+Melissa.
+----------------------------------
+Correo Corporativo Hospital Universitario del Valle E.S.E
+*******************************************************************************
+
+"Estamos re-dimensionandonos para crecer!"
+
+******************************************************************************
