@@ -1,55 +1,116 @@
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
 Subject: Re: [PATCH] random: silence compiler warnings and fix race
-Date: Mon, 19 Jun 2017 22:55:37 +0200
-Message-ID: <CAHmME9rnSaB+wqrhefhPPNOPOK-zVCvdFQAxmKtPajD97mYqNw@mail.gmail.com>
-References: <20170614192838.3jz4sxpcuhxygx4z@breakpoint.cc>
- <20170614224526.29076-1-Jason@zx2c4.com> <20170616143515.yn6oo6tvmcsrxidw@linutronix.de>
- <CAHmME9pLs2rKnuZ_La+PqYivEJDKEUdxUWS7eZthaw0jd8APVQ@mail.gmail.com> <20170619074553.wo3ec6i2yaojn7qs@linutronix.de>
+Date: Mon, 19 Jun 2017 22:57:18 +0200
+Message-ID: <CAHmME9rv3EjOVF4LhYZ0VS2LYKjDr_-TxzNHvyE_mKZ_UX0+eA@mail.gmail.com>
+References: <20170614192838.3jz4sxpcuhxygx4z@breakpoint.cc> <20170614224526.29076-1-Jason@zx2c4.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Cc: "Theodore Ts'o" <tytso@mit.edu>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kernel-hardening@lists.openwall.com,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Eric Biggers <ebiggers3@gmail.com>,
+Cc: tglx@breakpoint.cc, David Miller <davem@davemloft.net>,
         Linus Torvalds <torvalds@linux-foundation.org>,
-        David Miller <davem@davemloft.net>,
-        Thomas Gleixner <tglx@linutronix.de>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from frisell.zx2c4.com ([192.95.5.64]:41327 "EHLO frisell.zx2c4.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751736AbdFSUzl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Jun 2017 16:55:41 -0400
-In-Reply-To: <20170619074553.wo3ec6i2yaojn7qs@linutronix.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+        Eric Biggers <ebiggers3@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        kernel-hardening@lists.openwall.com,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: "Theodore Ts'o" <tytso@mit.edu>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20170614224526.29076-1-Jason@zx2c4.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Jun 19, 2017 at 9:45 AM, Sebastian Andrzej Siewior
-<bigeasy@linutronix.de> wrote:
-> ehm. You sure? I simply delayed the lock-dropping _after_ the state
-> variable was been modified. So it was basically what your patch did
-> except it was unlocked later=E2=80=A6
+Hello Ted,
 
-Yes, I'm sure. You moved the call to invalidate_batched_entropy() to
-be after the assignment of crng_init. However, the call to
-invalidate_batched_entropy() must be made _before_ the assignment of
-crng_init.
+With rc6 already released and rc7 coming up, I'd really appreciate you
+stepping in here and either ACKing the above commit, or giving your
+two cents about it in case I need to roll something different.
 
->> > Are use about that? I am not sure that the gcc will inline "crng_init"
->> > read twice. It is not a local variable. READ_ONCE() is usually used
->> > where gcc could cache a memory access but you do not want this. But he=
-y!
->> > If someone knows better I am here to learn.
->>
->> The whole purpose is that I _want_ it to cache the memory access so
->> that it is _not_ inlined. So, based on your understanding, it does
->> exactly what I intended it to do. The reason is that I'd like to avoid
->> a lock imbalance, which could happen if the read is inlined.
+Thanks,
+Jason
+
+On Thu, Jun 15, 2017 at 12:45 AM, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> Odd versions of gcc for the sh4 architecture will actually warn about
+> flags being used while uninitialized, so we set them to zero. Non crazy
+> gccs will optimize that out again, so it doesn't make a difference.
 >
-> So it was good as it was which means you can drop that READ_ONCE().
-
-Except READ_ONCE ensures that the compiler will never inline it, so it
-actually needs to stay.
+> Next, over aggressive gccs could inline the expression that defines
+> use_lock, which could then introduce a race resulting in a lock
+> imbalance. By using READ_ONCE, we prevent that fate. Finally, we make
+> that assignment const, so that gcc can still optimize a nice amount.
+>
+> Finally, we fix a potential deadlock between primary_crng.lock and
+> batched_entropy_reset_lock, where they could be called in opposite
+> order. Moving the call to invalidate_batched_entropy to outside the lock
+> rectifies this issue.
+>
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> ---
+> Ted -- the first part of this is the fixup patch we discussed earlier.
+> Then I added on top a fix for a potentially related race.
+>
+> I'm not totally convinced that moving this block to outside the spinlock
+> is 100% okay, so please give this a close look before merging.
+>
+>
+>  drivers/char/random.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+>
+> diff --git a/drivers/char/random.c b/drivers/char/random.c
+> index e870f329db88..01a260f67437 100644
+> --- a/drivers/char/random.c
+> +++ b/drivers/char/random.c
+> @@ -803,13 +803,13 @@ static int crng_fast_load(const char *cp, size_t len)
+>                 p[crng_init_cnt % CHACHA20_KEY_SIZE] ^= *cp;
+>                 cp++; crng_init_cnt++; len--;
+>         }
+> +       spin_unlock_irqrestore(&primary_crng.lock, flags);
+>         if (crng_init_cnt >= CRNG_INIT_CNT_THRESH) {
+>                 invalidate_batched_entropy();
+>                 crng_init = 1;
+>                 wake_up_interruptible(&crng_init_wait);
+>                 pr_notice("random: fast init done\n");
+>         }
+> -       spin_unlock_irqrestore(&primary_crng.lock, flags);
+>         return 1;
+>  }
+>
+> @@ -841,6 +841,7 @@ static void crng_reseed(struct crng_state *crng, struct entropy_store *r)
+>         }
+>         memzero_explicit(&buf, sizeof(buf));
+>         crng->init_time = jiffies;
+> +       spin_unlock_irqrestore(&primary_crng.lock, flags);
+>         if (crng == &primary_crng && crng_init < 2) {
+>                 invalidate_batched_entropy();
+>                 crng_init = 2;
+> @@ -848,7 +849,6 @@ static void crng_reseed(struct crng_state *crng, struct entropy_store *r)
+>                 wake_up_interruptible(&crng_init_wait);
+>                 pr_notice("random: crng init done\n");
+>         }
+> -       spin_unlock_irqrestore(&primary_crng.lock, flags);
+>  }
+>
+>  static inline void crng_wait_ready(void)
+> @@ -2041,8 +2041,8 @@ static DEFINE_PER_CPU(struct batched_entropy, batched_entropy_u64);
+>  u64 get_random_u64(void)
+>  {
+>         u64 ret;
+> -       bool use_lock = crng_init < 2;
+> -       unsigned long flags;
+> +       bool use_lock = READ_ONCE(crng_init) < 2;
+> +       unsigned long flags = 0;
+>         struct batched_entropy *batch;
+>
+>  #if BITS_PER_LONG == 64
+> @@ -2073,8 +2073,8 @@ static DEFINE_PER_CPU(struct batched_entropy, batched_entropy_u32);
+>  u32 get_random_u32(void)
+>  {
+>         u32 ret;
+> -       bool use_lock = crng_init < 2;
+> -       unsigned long flags;
+> +       bool use_lock = READ_ONCE(crng_init) < 2;
+> +       unsigned long flags = 0;
+>         struct batched_entropy *batch;
+>
+>         if (arch_get_random_int(&ret))
+> --
+> 2.13.1
+>
