@@ -1,68 +1,69 @@
-From: Colin King <colin.king@canonical.com>
-Subject: [PATCH] crypto: cavium: make several functions static
-Date: Tue, 20 Jun 2017 11:35:50 +0100
-Message-ID: <20170620103550.7660-1-colin.king@canonical.com>
+From: Corentin Labbe <clabbe.montjoie@gmail.com>
+Subject: Re: [PATCH] crypto: sun4i-ss: support the Security System PRNG
+Date: Tue, 20 Jun 2017 13:45:36 +0200
+Message-ID: <20170620114536.GA4766@Red>
+References: <20170620085819.20114-1-clabbe.montjoie@gmail.com>
+ <20170620095947.i3r3iym2cxz5jciw@flea.lan>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-To: George Cherian <george.cherian@cavium.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from youngberry.canonical.com ([91.189.89.112]:53232 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750992AbdFTKf7 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Jun 2017 06:35:59 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net, wens@csie.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+To: Maxime Ripard <maxime.ripard@free-electrons.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20170620095947.i3r3iym2cxz5jciw@flea.lan>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-From: Colin Ian King <colin.king@canonical.com>
+On Tue, Jun 20, 2017 at 11:59:47AM +0200, Maxime Ripard wrote:
+> Hi,
+> 
+> On Tue, Jun 20, 2017 at 10:58:19AM +0200, Corentin Labbe wrote:
+> > The Security System have a PRNG, this patch add support for it via
+> > crypto_rng.
+> 
+> This might be a dumb question, but is the CRYPTO_RNG code really
+> supposed to be used with PRNG?
+> 
 
-The functions cvm_encrypt, cvm_decrypt, cvm_xts_setkey and
-cvm_enc_dec_init does not need to be in global scope, so make
-them static.
+Yes, see recently added drivers/crypto/exynos-rng.c
 
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
----
- drivers/crypto/cavium/cpt/cptvf_algs.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+[...]
+> > --- a/drivers/crypto/sunxi-ss/sun4i-ss.h
+> > +++ b/drivers/crypto/sunxi-ss/sun4i-ss.h
+> > @@ -32,6 +32,7 @@
+> >  #include <crypto/aes.h>
+> >  #include <crypto/des.h>
+> >  #include <crypto/internal/rng.h>
+> > +#include <crypto/rng.h>
+> >  
+> >  #define SS_CTL            0x00
+> >  #define SS_KEY0           0x04
+> > @@ -127,6 +128,9 @@
+> >  #define SS_RXFIFO_EMP_INT_ENABLE	(1 << 2)
+> >  #define SS_TXFIFO_AVA_INT_ENABLE	(1 << 0)
+> >  
+> > +#define SS_SEED_LEN (192 / 8)
+> > +#define SS_DATA_LEN (160 / 8)
+> > +
+> >  struct sun4i_ss_ctx {
+> >  	void __iomem *base;
+> >  	int irq;
+> > @@ -136,6 +140,7 @@ struct sun4i_ss_ctx {
+> >  	struct device *dev;
+> >  	struct resource *res;
+> >  	spinlock_t slock; /* control the use of the device */
+> > +	u32 seed[SS_SEED_LEN / 4];
+> 
+> Shouldn't you define SS_SEED_LEN in bits, and then use either
+> BITS_PER_BYTE and BITS_PER_LONG so that it's obvious what you're doing
+> ?
+> 
+> And you could also make that variable defined based on the option,
+> otherwise you'll always allocate that array, even if you're not using
+> it.
 
-diff --git a/drivers/crypto/cavium/cpt/cptvf_algs.c b/drivers/crypto/cavium/cpt/cptvf_algs.c
-index 1b220f3ed017..df21d996db7e 100644
---- a/drivers/crypto/cavium/cpt/cptvf_algs.c
-+++ b/drivers/crypto/cavium/cpt/cptvf_algs.c
-@@ -222,17 +222,17 @@ static inline int cvm_enc_dec(struct ablkcipher_request *req, u32 enc)
- 		return -EINPROGRESS;
- }
- 
--int cvm_encrypt(struct ablkcipher_request *req)
-+static int cvm_encrypt(struct ablkcipher_request *req)
- {
- 	return cvm_enc_dec(req, true);
- }
- 
--int cvm_decrypt(struct ablkcipher_request *req)
-+static int cvm_decrypt(struct ablkcipher_request *req)
- {
- 	return cvm_enc_dec(req, false);
- }
- 
--int cvm_xts_setkey(struct crypto_ablkcipher *cipher, const u8 *key,
-+static int cvm_xts_setkey(struct crypto_ablkcipher *cipher, const u8 *key,
- 		   u32 keylen)
- {
- 	struct crypto_tfm *tfm = crypto_ablkcipher_tfm(cipher);
-@@ -336,7 +336,7 @@ static int cvm_ecb_des3_setkey(struct crypto_ablkcipher *cipher, const u8 *key,
- 	return cvm_setkey(cipher, key, keylen, DES3_ECB);
- }
- 
--int cvm_enc_dec_init(struct crypto_tfm *tfm)
-+static int cvm_enc_dec_init(struct crypto_tfm *tfm)
- {
- 	struct cvm_enc_ctx *ctx = crypto_tfm_ctx(tfm);
- 
--- 
-2.11.0
+I will do that
+
+Thanks
