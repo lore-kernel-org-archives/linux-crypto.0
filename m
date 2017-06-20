@@ -1,234 +1,108 @@
-From: Corentin Labbe <clabbe.montjoie@gmail.com>
-Subject: [PATCH] crypto: sun4i-ss: support the Security System PRNG
-Date: Tue, 20 Jun 2017 10:58:19 +0200
-Message-ID: <20170620085819.20114-1-clabbe.montjoie@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Corentin Labbe <clabbe.montjoie@gmail.com>, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au, davem@davemloft.net,
- maxime.ripard@free-electrons.com, wens@csie.org
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH v3 0/7] crypto: aes - allow generic AES to be omitted
+Date: Tue, 20 Jun 2017 11:28:53 +0200
+Message-ID: <1497950940-24243-1-git-send-email-ard.biesheuvel@linaro.org>
+Cc: herbert@gondor.apana.org.au, nico@linaro.org, ebiggers3@gmail.com,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wm0-f48.google.com ([74.125.82.48]:36150 "EHLO
+        mail-wm0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751927AbdFTJ3F (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 20 Jun 2017 05:29:05 -0400
+Received: by mail-wm0-f48.google.com with SMTP id m125so15863047wmm.1
+        for <linux-crypto@vger.kernel.org>; Tue, 20 Jun 2017 02:29:04 -0700 (PDT)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The Security System have a PRNG, this patch add support for it via
-crypto_rng.
+The generic AES driver uses 16 lookup tables of 1 KB each, and has
+encryption and decryption routines that are fully unrolled. Given how
+the dependencies between this code and other drivers are declared in
+Kconfig files, this code is always pulled into the core kernel, even
+if it is usually superseded at runtime by accelerated drivers that
+exist for many architectures.
 
-Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
----
- drivers/crypto/Kconfig                  |  8 +++++
- drivers/crypto/sunxi-ss/Makefile        |  1 +
- drivers/crypto/sunxi-ss/sun4i-ss-core.c | 30 ++++++++++++++++++
- drivers/crypto/sunxi-ss/sun4i-ss-prng.c | 56 +++++++++++++++++++++++++++++++++
- drivers/crypto/sunxi-ss/sun4i-ss.h      |  9 ++++++
- 5 files changed, 104 insertions(+)
- create mode 100644 drivers/crypto/sunxi-ss/sun4i-ss-prng.c
+This leaves us with 25 KB of dead code in the kernel, which is negligible
+in typical environments, but which is actually a big deal for the IoT
+domain, where every kilobyte counts.
 
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index ab82536d64e2..bde0b102eb70 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -618,6 +618,14 @@ config CRYPTO_DEV_SUN4I_SS
- 	  To compile this driver as a module, choose M here: the module
- 	  will be called sun4i-ss.
- 
-+config CRYPTO_DEV_SUN4I_SS_PRNG
-+	bool "Support for Allwinner Security System PRNG"
-+	depends on CRYPTO_DEV_SUN4I_SS
-+	select CRYPTO_RNG
-+	help
-+	  Select this option if you to provides kernel-side support for
-+	  the Pseudo-Random Number Generator found in the Security System.
-+
- config CRYPTO_DEV_ROCKCHIP
- 	tristate "Rockchip's Cryptographic Engine driver"
- 	depends on OF && ARCH_ROCKCHIP
-diff --git a/drivers/crypto/sunxi-ss/Makefile b/drivers/crypto/sunxi-ss/Makefile
-index 8f4c7a273141..ccb893219079 100644
---- a/drivers/crypto/sunxi-ss/Makefile
-+++ b/drivers/crypto/sunxi-ss/Makefile
-@@ -1,2 +1,3 @@
- obj-$(CONFIG_CRYPTO_DEV_SUN4I_SS) += sun4i-ss.o
- sun4i-ss-y += sun4i-ss-core.o sun4i-ss-hash.o sun4i-ss-cipher.o
-+sun4i-ss-$(CONFIG_CRYPTO_DEV_SUN4I_SS_PRNG) += sun4i-ss-prng.o
-diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-core.c b/drivers/crypto/sunxi-ss/sun4i-ss-core.c
-index 02ad8256e900..d6bb2991c000 100644
---- a/drivers/crypto/sunxi-ss/sun4i-ss-core.c
-+++ b/drivers/crypto/sunxi-ss/sun4i-ss-core.c
-@@ -213,6 +213,23 @@ static struct sun4i_ss_alg_template ss_algs[] = {
- 		}
- 	}
- },
-+#ifdef CONFIG_CRYPTO_DEV_SUN4I_SS_PRNG
-+{
-+	.type = CRYPTO_ALG_TYPE_RNG,
-+	.alg.rng = {
-+		.base = {
-+			.cra_name		= "stdrng",
-+			.cra_driver_name	= "sun4i_ss_rng",
-+			.cra_priority		= 300,
-+			.cra_ctxsize		= 0,
-+			.cra_module		= THIS_MODULE,
-+		},
-+		.generate               = sun4i_ss_prng_generate,
-+		.seed                   = sun4i_ss_prng_seed,
-+		.seedsize               = SS_SEED_LEN,
-+	}
-+},
-+#endif
- };
- 
- static int sun4i_ss_probe(struct platform_device *pdev)
-@@ -355,6 +372,13 @@ static int sun4i_ss_probe(struct platform_device *pdev)
- 				goto error_alg;
- 			}
- 			break;
-+		case CRYPTO_ALG_TYPE_RNG:
-+			err = crypto_register_rng(&ss_algs[i].alg.rng);
-+			if (err) {
-+				dev_err(ss->dev, "Fail to register %s\n",
-+					ss_algs[i].alg.rng.base.cra_name);
-+			}
-+			break;
- 		}
- 	}
- 	platform_set_drvdata(pdev, ss);
-@@ -369,6 +393,9 @@ static int sun4i_ss_probe(struct platform_device *pdev)
- 		case CRYPTO_ALG_TYPE_AHASH:
- 			crypto_unregister_ahash(&ss_algs[i].alg.hash);
- 			break;
-+		case CRYPTO_ALG_TYPE_RNG:
-+			crypto_unregister_rng(&ss_algs[i].alg.rng);
-+			break;
- 		}
- 	}
- 	if (ss->reset)
-@@ -393,6 +420,9 @@ static int sun4i_ss_remove(struct platform_device *pdev)
- 		case CRYPTO_ALG_TYPE_AHASH:
- 			crypto_unregister_ahash(&ss_algs[i].alg.hash);
- 			break;
-+		case CRYPTO_ALG_TYPE_RNG:
-+			crypto_unregister_rng(&ss_algs[i].alg.rng);
-+			break;
- 		}
- 	}
- 
-diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-prng.c b/drivers/crypto/sunxi-ss/sun4i-ss-prng.c
-new file mode 100644
-index 000000000000..3941587def6b
---- /dev/null
-+++ b/drivers/crypto/sunxi-ss/sun4i-ss-prng.c
-@@ -0,0 +1,56 @@
-+#include "sun4i-ss.h"
-+
-+int sun4i_ss_prng_seed(struct crypto_rng *tfm, const u8 *seed,
-+		       unsigned int slen)
-+{
-+	struct sun4i_ss_alg_template *algt;
-+	struct rng_alg *alg = crypto_rng_alg(tfm);
-+
-+	algt = container_of(alg, struct sun4i_ss_alg_template, alg.rng);
-+	memcpy(algt->ss->seed, seed, slen);
-+
-+	return 0;
-+}
-+
-+int sun4i_ss_prng_generate(struct crypto_rng *tfm, const u8 *src,
-+			   unsigned int slen, u8 *dst, unsigned int dlen)
-+{
-+	struct sun4i_ss_alg_template *algt;
-+	struct rng_alg *alg = crypto_rng_alg(tfm);
-+	int i;
-+	u32 v;
-+	u32 *data = (u32 *)dst;
-+	const u32 mode = SS_OP_PRNG | SS_PRNG_CONTINUE | SS_ENABLED;
-+	size_t len;
-+	struct sun4i_ss_ctx *ss;
-+	unsigned int todo = (dlen / 4) * 4;
-+
-+	algt = container_of(alg, struct sun4i_ss_alg_template, alg.rng);
-+	ss = algt->ss;
-+
-+	spin_lock(&ss->slock);
-+
-+	writel(mode, ss->base + SS_CTL);
-+
-+	while (todo > 0) {
-+		/* write the seed */
-+		for (i = 0; i < SS_SEED_LEN / 4; i++)
-+			writel(ss->seed[i], ss->base + SS_KEY0 + i * 4);
-+
-+		/* Read the random data */
-+		len = min_t(size_t, SS_DATA_LEN, todo);
-+		readsl(ss->base + SS_TXFIFO, data, len / 4);
-+		data += len / 4;
-+		todo -= len;
-+
-+		/* Update the seed */
-+		for (i = 0; i < SS_SEED_LEN / 4; i++) {
-+			v = readl(ss->base + SS_KEY0 + i * 4);
-+			ss->seed[i] = v;
-+		}
-+	}
-+
-+	writel(0, ss->base + SS_CTL);
-+	spin_unlock(&ss->slock);
-+	return dlen;
-+}
-diff --git a/drivers/crypto/sunxi-ss/sun4i-ss.h b/drivers/crypto/sunxi-ss/sun4i-ss.h
-index a0e1efc1cb2a..293632b1cf27 100644
---- a/drivers/crypto/sunxi-ss/sun4i-ss.h
-+++ b/drivers/crypto/sunxi-ss/sun4i-ss.h
-@@ -32,6 +32,7 @@
- #include <crypto/aes.h>
- #include <crypto/des.h>
- #include <crypto/internal/rng.h>
-+#include <crypto/rng.h>
- 
- #define SS_CTL            0x00
- #define SS_KEY0           0x04
-@@ -127,6 +128,9 @@
- #define SS_RXFIFO_EMP_INT_ENABLE	(1 << 2)
- #define SS_TXFIFO_AVA_INT_ENABLE	(1 << 0)
- 
-+#define SS_SEED_LEN (192 / 8)
-+#define SS_DATA_LEN (160 / 8)
-+
- struct sun4i_ss_ctx {
- 	void __iomem *base;
- 	int irq;
-@@ -136,6 +140,7 @@ struct sun4i_ss_ctx {
- 	struct device *dev;
- 	struct resource *res;
- 	spinlock_t slock; /* control the use of the device */
-+	u32 seed[SS_SEED_LEN / 4];
- };
- 
- struct sun4i_ss_alg_template {
-@@ -144,6 +149,7 @@ struct sun4i_ss_alg_template {
- 	union {
- 		struct skcipher_alg crypto;
- 		struct ahash_alg hash;
-+		struct rng_alg rng;
- 	} alg;
- 	struct sun4i_ss_ctx *ss;
- };
-@@ -201,3 +207,6 @@ int sun4i_ss_des_setkey(struct crypto_skcipher *tfm, const u8 *key,
- 			unsigned int keylen);
- int sun4i_ss_des3_setkey(struct crypto_skcipher *tfm, const u8 *key,
- 			 unsigned int keylen);
-+int sun4i_ss_prng_generate(struct crypto_rng *tfm, const u8 *src,
-+			   unsigned int slen, u8 *dst, unsigned int dlen);
-+int sun4i_ss_prng_seed(struct crypto_rng *tfm, const u8 *seed, unsigned int slen);
+Also, the scalar, table based AES routines that exist for ARM, arm64, i586
+and x86_64 share the lookup tables with AES generic, and may be invoked
+occasionally when the time-invariant AES-NI or other special instruction
+drivers are called in interrupt context, at which time the SIMD register
+file cannot be used. Pulling 16 KB of code and 9 KB of instructions into
+the L1s (and evicting what was already there) when a softirq happens to
+be handled in the context of an interrupt taken from kernel mode (which
+means no SIMD on x86) is also something that we may like to avoid, by
+falling back to a much smaller and moderately less performant driver.
+(Note that arm64 will be updated shortly to supply fallbacks for all
+SIMD based AES implementations, which will be based on the core routines
+[if they are accepted].)
+
+For the reasons above, this series refactors the way the various AES
+implementations are wired up, to allow the generic version in
+crypto/aes_generic.c to be omitted from the build entirely.
+
+Patch #1 removes some bogus 'select CRYPTO_AES' statement.
+
+Patch #2 introduces CRYPTO_AES_CORE and its implementation crypto/aes_core.c,
+which contains the existing key expansion routines, and default encrypt and
+decrypt routines that are not exposed as a crypto_cipher themselves, but
+can be pulled in by other AES drivers. These routines only depend on the two
+256 byte Sboxes
+
+Patch #3 switches the fallback in the AES-NI code to the new, generic encrypt
+and decrypt routines so it no longer depends on the x86 scalar code or
+[transitively] on AES-generic.
+
+Patch #4 removes the local copy of the AES sboxes from the arm64 NEON driver,
+and switches to the ones exposed by the new AES core module instead.
+
+Patch #5 repurposes the CRYPTO_AES Kconfig symbol as an abstract symbol that
+indicates whether some implementation of AES needs to be available. The
+existing generic code is now controlled by CRYPTO_AES_GENERIC.
+
+Patch #6 updates the Kconfig help text to be more descriptive of what they
+actually control, rather than duplicating AES's wikipedia entry a number of
+times.
+
+Patch #7 updates the Kconfig logic so CRYPTO_AES_GENERIC can be disabled if
+any CRYPTO_AES dependencies are satisfied by the fixed time driver.
+
+v3: - fix big-endian issue in refactored fixed-time AES driver
+    - improve Kconfig help texts
+    - add patch #4
+
+v2: - repurpose CRYPTO_AES and avoid HAVE_AES/NEED_AES Kconfig symbols
+    - don't factor out tables from AES generic to be reused by per arch drivers,
+      since the space saving is moderate (the generic code only), and the
+      drivers weren't made to be small anyway
+
+
+Ard Biesheuvel (7):
+  drivers/crypto/Kconfig: drop bogus CRYPTO_AES dependencies
+  crypto: aes - refactor shared routines into separate core module
+  crypto: x86/aes-ni - switch to generic fallback
+  crypto: arm64/aes-neon - reuse Sboxes from AES core module
+  crypto: aes - repurpose CRYPTO_AES and introduce CRYPTO_AES_GENERIC
+  crypto: aes - add meaningful help text to the various AES drivers
+  crypto: aes - allow generic AES to be replaced by fixed time AES
+
+ arch/arm/crypto/Kconfig            |  20 +-
+ arch/arm64/crypto/Kconfig          |  34 +-
+ arch/arm64/crypto/aes-neon.S       |  74 +----
+ arch/x86/crypto/aesni-intel_glue.c |   4 +-
+ crypto/Kconfig                     | 161 ++++------
+ crypto/Makefile                    |   3 +-
+ crypto/aes_core.c                  | 333 ++++++++++++++++++++
+ crypto/aes_generic.c               | 178 -----------
+ crypto/aes_ti.c                    | 315 ++----------------
+ drivers/crypto/Kconfig             |  13 +-
+ include/crypto/aes.h               |   6 +
+ net/sunrpc/Kconfig                 |   3 +-
+ 12 files changed, 486 insertions(+), 658 deletions(-)
+ create mode 100644 crypto/aes_core.c
+
 -- 
-2.13.0
+2.7.4
