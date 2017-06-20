@@ -1,61 +1,51 @@
 From: Jhih-Ming Huang <fbihjmeric@gmail.com>
-Subject: [PATCH 2/6] staging: ccree: move brace { to previous line for if.
-Date: Tue, 20 Jun 2017 22:52:00 +0800
-Message-ID: <1497970324-9725-3-git-send-email-fbihjmeric@gmail.com>
+Subject: [PATCH 3/6] staging: ccree: move '{' to next line for function.
+Date: Tue, 20 Jun 2017 22:52:01 +0800
+Message-ID: <1497970324-9725-4-git-send-email-fbihjmeric@gmail.com>
 References: <1497970324-9725-1-git-send-email-fbihjmeric@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
 Cc: Jhih-Ming Hunag <fbihjmeric@gmail.com>
 To: Gilad Ben-Yossef <gilad@benyossef.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- linux-crypto@vger.kernel.org, driverdev-devel@linuxdriverproject.org,
- devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1497970324-9725-1-git-send-email-fbihjmeric@gmail.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 From: Jhih-Ming Hunag <fbihjmeric@gmail.com>
 
-Move brace { to previous line for if.
+Move '{' to next line for function.
 
 Signed-off-by: Jhih-Ming Hunag <fbihjmeric@gmail.com>
 ---
- drivers/staging/ccree/ssi_aead.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ drivers/staging/ccree/ssi_aead.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/staging/ccree/ssi_aead.c b/drivers/staging/ccree/ssi_aead.c
-index ca3f11f..6bcab5a 100644
+index 6bcab5a..3d9957f 100644
 --- a/drivers/staging/ccree/ssi_aead.c
 +++ b/drivers/staging/ccree/ssi_aead.c
-@@ -1340,8 +1340,7 @@ static int validate_data_size(struct ssi_aead_ctx *ctx,
- 			goto data_size_err;
- 		if (ctx->cipher_mode == DRV_CIPHER_CCM)
- 			break;
--		if (ctx->cipher_mode == DRV_CIPHER_GCTR)
--		{
-+		if (ctx->cipher_mode == DRV_CIPHER_GCTR) {
- 			if (areq_ctx->plaintext_authenticate_only == true)
- 				areq_ctx->is_single_pass = false;
- 			break;
-@@ -1912,8 +1911,7 @@ static int config_gcm_context(struct aead_request *req) {
- 	memcpy(req_ctx->gcm_iv_inc1, req->iv, 16);
+@@ -1542,7 +1542,8 @@ static inline int ssi_aead_ccm(
+ 	return 0;
+ }
  
+-static int config_ccm_adata(struct aead_request *req) {
++static int config_ccm_adata(struct aead_request *req)
++{
+ 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
+ 	struct ssi_aead_ctx *ctx = crypto_aead_ctx(tfm);
+ 	struct aead_req_ctx *req_ctx = aead_request_ctx(req);
+@@ -1886,7 +1887,8 @@ static inline void ssi_aead_dump_gcm(
+ }
+ #endif
  
--	if (req_ctx->plaintext_authenticate_only == false)
--	{
-+	if (req_ctx->plaintext_authenticate_only == false) {
- 		__be64 temp64;
- 		temp64 = cpu_to_be64(req->assoclen * 8);
- 		memcpy ( &req_ctx->gcm_len_block.lenA , &temp64, sizeof(temp64) );
+-static int config_gcm_context(struct aead_request *req) {
++static int config_gcm_context(struct aead_request *req)
++{
+ 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
+ 	struct ssi_aead_ctx *ctx = crypto_aead_ctx(tfm);
+ 	struct aead_req_ctx *req_ctx = aead_request_ctx(req);
 -- 
 2.7.4
