@@ -1,81 +1,105 @@
-From: Antoine Tenart <antoine.tenart@free-electrons.com>
-Subject: Re: [PATCH v6 1/5] Documentation/bindings: Document the SafeXel
- cryptographic engine driver
-Date: Tue, 20 Jun 2017 08:21:24 +0200
-Message-ID: <20170620062124.GA14254@kwain>
-References: <20170524141035.21031-1-antoine.tenart@free-electrons.com>
- <20170524141035.21031-2-antoine.tenart@free-electrons.com>
- <20170611085353.GG31464@kwain>
- <20170620033747.GB17764@gondor.apana.org.au>
+From: Joel Stanley <joel@jms.id.au>
+Subject: Re: [kernel-hardening] Re: [PATCH] random: silence compiler warnings
+ and fix race
+Date: Tue, 20 Jun 2017 15:57:53 +0930
+Message-ID: <CACPK8Xd+RXu5gT9yA3TK-Y+1n5m4BYkgLDonNGh5tkHog9M5pA@mail.gmail.com>
+References: <20170614192838.3jz4sxpcuhxygx4z@breakpoint.cc>
+ <20170614224526.29076-1-Jason@zx2c4.com> <CAHmME9rv3EjOVF4LhYZ0VS2LYKjDr_-TxzNHvyE_mKZ_UX0+eA@mail.gmail.com>
+ <20170620060344.ngbnzg2mz5hvq4kw@thunk.org>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="5vNYLRcllDrimb99"
-Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
-        davem@davemloft.net, jason@lakedaemon.net, andrew@lunn.ch,
-        gregory.clement@free-electrons.com,
-        sebastian.hesselbarth@gmail.com, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        thomas.petazzoni@free-electrons.com, oferh@marvell.com,
-        igall@marvell.com, nadavh@marvell.com, robin.murphy@arm.com
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>, tglx@breakpoint.cc,
+        David Miller <davem@davemloft.net>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Eric Biggers <ebiggers3@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        kernel-hardening@lists.openwall.com,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:38455 "EHLO
-        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752017AbdFTGV1 (ORCPT
+Received: from mail-yb0-f195.google.com ([209.85.213.195]:34589 "EHLO
+        mail-yb0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750884AbdFTG2O (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Jun 2017 02:21:27 -0400
-Content-Disposition: inline
-In-Reply-To: <20170620033747.GB17764@gondor.apana.org.au>
+        Tue, 20 Jun 2017 02:28:14 -0400
+In-Reply-To: <20170620060344.ngbnzg2mz5hvq4kw@thunk.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+On Tue, Jun 20, 2017 at 3:33 PM, Theodore Ts'o <tytso@mit.edu> wrote:
+> On Mon, Jun 19, 2017 at 10:57:18PM +0200, Jason A. Donenfeld wrote:
+>>
+>> With rc6 already released and rc7 coming up, I'd really appreciate you
+>> stepping in here and either ACKing the above commit, or giving your
+>> two cents about it in case I need to roll something different.
+>
+> I actually had set up an earlier version of your patch for on Saturday
+> while I was in Beijing.  (Like Linus, I'm attending the LinuxCon China
+> conference Monday and Tuesday.)  I had even created the signed tag,
+> but I didn't send the pull request to Linus because I was waiting to
+> see about how discussions over the locking strategy and the spammy log
+> messages on PowerPC was going to get resolved.
+>
+> I've since respun the commit to reflect your newer patch (see the
+> random_for_linus_stable tag on random.git) and rebased the dev branch
+> on top of that.  Please take a look and comment.
+>
+> The other open issue I want to resolve before sending a pull request
+> this week is whether we want to change the default for
+> CONFIG_WARN_UNSEEDED_RANDOM so that the answer is 'n'.  It *is* spammy
+> for PowerPC, because they aren't getting their CRNG initialized
+> quickly enough, so several userspace processes are getting
+> fork/exec'ed with an uninitialized CRNG.
 
---5vNYLRcllDrimb99
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+It's very spammy for ARM as well. I booted next-20170619 on an Aspeed
+(32-bit ARM) board and by the time I made it to a shell the log buffer
+contained only warnings:
 
-On Tue, Jun 20, 2017 at 11:37:47AM +0800, Herbert Xu wrote:
-> On Sun, Jun 11, 2017 at 10:53:53AM +0200, Antoine Tenart wrote:
-> > On Wed, May 24, 2017 at 04:10:31PM +0200, Antoine Tenart wrote:
-> > > The Inside Secure Safexcel cryptographic engine is found on some Marv=
-ell
-> > > SoCs (7k/8k). Document the bindings used by its driver.
-> > >=20
-> > > Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
-> >=20
-> > Since you applied the Safexcel crypto driver patch, I think you should
-> > also apply this patch adding the corresponding bindings documentation.
->=20
-> OK I've restored it in the patch queue.
+[   10.452921] random: arch_pick_mmap_layout+0xa8/0xe8 get_random_u32
+called with crng_init=0
+[   10.461255] random: load_elf_binary+0x3c8/0x104c get_random_u32
+called with crng_init=0
+[   10.471464] random: arch_setup_additional_pages+0x6c/0x110
+get_random_u32 called with crng_init=0
+[   10.480429] random: randomize_page+0x44/0x58 get_random_u32 called
+with crng_init=0
+[   10.494802] random: arch_pick_mmap_layout+0xa8/0xe8 get_random_u32
+called with crng_init=0
+[   10.503141] random: load_elf_binary+0x3c8/0x104c get_random_u32
+called with crng_init=0
+[   10.511571] random: arch_setup_additional_pages+0x6c/0x110
+get_random_u32 called with crng_init=0
+[   10.520527] random: randomize_page+0x44/0x58 get_random_u32 called
+with crng_init=0
+[   10.537847] random: arch_pick_mmap_layout+0xa8/0xe8 get_random_u32
+called with crng_init=0
+[   10.546182] random: load_elf_binary+0x3c8/0x104c get_random_u32
+called with crng_init=0
+[   10.554611] random: arch_setup_additional_pages+0x6c/0x110
+get_random_u32 called with crng_init=0
+[   10.563563] random: randomize_page+0x44/0x58 get_random_u32 called
+with crng_init=0
 
-Thanks!
-Antoine
+So +1 for defaulting CONFIG_WARN_UNSEEDED_RANDOM=n.
 
---=20
-Antoine T=E9nart, Free Electrons
-Embedded Linux and Kernel engineering
-http://free-electrons.com
+Cheers,
 
---5vNYLRcllDrimb99
-Content-Type: application/pgp-signature; name="signature.asc"
+Joel
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
 
-iQIcBAABCgAGBQJZSL7iAAoJEFxNi8it27zYdLYP/2staQ3rpYIm2LxZndDbVhJs
-GfQjJoFO19kkToHDNSTyuchfdpCthsYXAFmKAdteipx8NEvb0Un1yF1n0g06YCTM
-OdkHWmoQOqucNmEZFttaUfyzY125f5XgQC1FYGOG8iV+KxAaBXgOXNTtOhLdTxc/
-C4nKK/1zmha3xXPGhqTAuUxViux0rCCrnZm/b63SmOR5eVDqZtm/Evhi2hpAAnY6
-RHifaAL9jcJrIXGWEyr7f7UqTc/9AtRhl2Nz1W4h1z7i0JMohfxL5FQpD5VteNYE
-UsSVEHegeIE/sA+hy7kH8kZ15ASqwJx3mI/tkn9AsLOKBqU+t7I3AW3L7BDgqdC2
-96+MkOjY5djTv+/jLnSDwQmAoE4BR687fhvy9+C1cRHJ59wefBsPpyxS9pUp9s66
-TrKddUKNxbwQGkcigQ8cIAtThF7YPNxkYebfen8MNG/lp518LYB9AZ/IvNDpEQUj
-mmbWcp1PH1h4SV81QAjQH4JrSrIKgX2ecdmcb/+k9VleDpLDjY0R6FPwePCyTXsr
-q7G7O2CWbw2W67Shct9be0DJc/wXjtlo1oWOu5097IsVUynSCIf5GD+/JQYQqkmD
-BFf+ZYPmXASSKd5sctmuFC9h4VkCGzU7B8ms+IrKMFNumIyrGF11XggXyRoYn3IP
-3WNzhmR7OD3RGHuTqZa/
-=adVM
------END PGP SIGNATURE-----
-
---5vNYLRcllDrimb99--
+> That being said, it is a
+> valid warning because it means that the initial stack canary for the
+> first couple of PowerPC processes are being created without a fully
+> initialized CRNG, which may mean that an attacker might be able to
+> circumvent the stack canary on the first couple of processes.  So that
+> could potentially be a real security issue on Power.  OTOH, most Power
+> users aren't going to be able to do anything about the fact the stack
+> canaries of the system daemons started during early boot don't have
+> strong randomness, so perhaps we should disable the warning by
+> default.
+>
+> Opinions?
+>
+>                                                 - Ted
