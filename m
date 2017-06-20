@@ -1,46 +1,48 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v6 1/5] Documentation/bindings: Document the SafeXel
- cryptographic engine driver
-Date: Tue, 20 Jun 2017 11:37:47 +0800
-Message-ID: <20170620033747.GB17764@gondor.apana.org.au>
-References: <20170524141035.21031-1-antoine.tenart@free-electrons.com>
- <20170524141035.21031-2-antoine.tenart@free-electrons.com>
- <20170611085353.GG31464@kwain>
+Subject: Re: [PATCH v2 0/3] add support of hardware random generator on
+ MediaTek MT7622
+Date: Tue, 20 Jun 2017 11:40:10 +0800
+Message-ID: <20170620034009.GD17764@gondor.apana.org.au>
+References: <cover.1497280813.git.sean.wang@mediatek.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, jason@lakedaemon.net, andrew@lunn.ch,
-        gregory.clement@free-electrons.com,
-        sebastian.hesselbarth@gmail.com, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        thomas.petazzoni@free-electrons.com, oferh@marvell.com,
-        igall@marvell.com, nadavh@marvell.com, robin.murphy@arm.com
-To: Antoine Tenart <antoine.tenart@free-electrons.com>
+Cc: mpm@selenic.com, robh+dt@kernel.org, mark.rutland@arm.com,
+        clabbe.montjoie@gmail.com, prasannatsmkumar@gmail.com,
+        romain.perier@free-electrons.com, shannon.nelson@oracle.com,
+        weiyongjun1@huawei.com, devicetree@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-mediatek@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        keyhaede@gmail.com
+To: sean.wang@mediatek.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:60866 "EHLO
+Received: from orcrist.hmeau.com ([104.223.48.154]:60894 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751895AbdFTDig (ORCPT
+        with ESMTP id S1750907AbdFTDlF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Jun 2017 23:38:36 -0400
+        Mon, 19 Jun 2017 23:41:05 -0400
 Content-Disposition: inline
-In-Reply-To: <20170611085353.GG31464@kwain>
+In-Reply-To: <cover.1497280813.git.sean.wang@mediatek.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Jun 11, 2017 at 10:53:53AM +0200, Antoine Tenart wrote:
-> Hi Herbert,
+On Mon, Jun 12, 2017 at 11:56:53PM +0800, sean.wang@mediatek.com wrote:
+> From: Sean Wang <sean.wang@mediatek.com>
 > 
-> On Wed, May 24, 2017 at 04:10:31PM +0200, Antoine Tenart wrote:
-> > The Inside Secure Safexcel cryptographic engine is found on some Marvell
-> > SoCs (7k/8k). Document the bindings used by its driver.
-> > 
-> > Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
+> Changes since v1:
+> - update the bindings with the specific "mediatek,mt7622-rng"
+>   instead of the generic one as "mediatek,generic-rng"
 > 
-> Since you applied the Safexcel crypto driver patch, I think you should
-> also apply this patch adding the corresponding bindings documentation.
+> The series add support of hardware RNG on MediaTek MT7622 and
+> , runtime PM support and add me as the maintainer for the existing
+> and following chipset.
+> 
+> Sean Wang (3):
+>   dt-bindings: rng: add MediaTek MT7622 Hardware Random Generator
+>     bindings
+>   hwrng: mtk - add runtime PM support
+>   MAINTAINERS: add entry for MediaTek Random Number Generator
 
-OK I've restored it in the patch queue.
-
-Cheers,
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
