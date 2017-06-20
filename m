@@ -1,30 +1,40 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH][crypto-next] crypto: cavium: fix spelling mistake
- "Revsion" -> "Revision"
-Date: Tue, 20 Jun 2017 11:41:17 +0800
-Message-ID: <20170620034117.GG17764@gondor.apana.org.au>
-References: <20170613085254.20855-1-colin.king@canonical.com>
+Subject: Re: [PATCH 0/9] Bug fixes and ctr mode of operation
+Date: Tue, 20 Jun 2017 11:41:33 +0800
+Message-ID: <20170620034133.GH17764@gondor.apana.org.au>
+References: <cover.1497506936.git.harsh@chelsio.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S . Miller" <davem@davemloft.net>,
-        Srikanth Jampala <Jampala.Srikanth@cavium.com>,
-        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: Colin King <colin.king@canonical.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+        ganeshgr@chelsio.com
+To: Harsh Jain <harsh@chelsio.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:60924 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750926AbdFTDly (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 19 Jun 2017 23:41:54 -0400
 Content-Disposition: inline
-In-Reply-To: <20170613085254.20855-1-colin.king@canonical.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <cover.1497506936.git.harsh@chelsio.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jun 13, 2017 at 09:52:54AM +0100, Colin King wrote:
-> From: Colin Ian King <colin.king@canonical.com>
+On Thu, Jun 15, 2017 at 12:43:38PM +0530, Harsh Jain wrote:
+> This series is based on cryptodev2.6 tree and includes bug fix ,ctr(aes), rfc3686(ctr(aes)) algo.
 > 
-> Trivial fix to spelling mistake in seq_printf message
-> 
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
+> Harsh Jain (7):
+>   crypto: chcr - Pass lcb bit setting to firmware
+>   crypto: chcr - Set fallback key
+>   crypto: chcr - Return correct error code
+>   crypto: chcr - Avoid changing request structure
+>   crypto:chcr - Add ctr mode and process large sg entries for cipher
+>   MAINTAINERS:Add maintainer for chelsio crypto driver
+>   crypto: chcr - Ensure Destination sg entry size less than      2k
+> Atul Gupta (2):
+>   chcr - Add debug counters
+>   crypto: chcr - Select device in Round Robin fashion
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
