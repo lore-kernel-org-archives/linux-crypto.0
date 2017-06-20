@@ -1,77 +1,61 @@
-From: Sean Wang <sean.wang@mediatek.com>
-Subject: Re: [PATCH v2 0/3] add support of hardware random generator on
- MediaTek MT7622
-Date: Wed, 21 Jun 2017 00:08:14 +0800
-Message-ID: <1497974894.31931.8.camel@mtkswgap22>
-References: <cover.1497280813.git.sean.wang@mediatek.com>
-         <20170620034009.GD17764@gondor.apana.org.au>
-         <1497968477.27946.5.camel@mtkswgap22> <20170620145933.GA4177@suse.de>
+From: Sandy Harris <sandyinchina@gmail.com>
+Subject: Re: [kernel-hardening] Re: [PATCH] random: silence compiler warnings
+ and fix race
+Date: Tue, 20 Jun 2017 13:50:19 -0400
+Message-ID: <CACXcFmkdMbn6xHnJvwtkPJQ0ZSUUK26-9DB+V0oq6Sj6U+gMTA@mail.gmail.com>
+References: <20170614192838.3jz4sxpcuhxygx4z@breakpoint.cc>
+ <20170614224526.29076-1-Jason@zx2c4.com> <CAHmME9rv3EjOVF4LhYZ0VS2LYKjDr_-TxzNHvyE_mKZ_UX0+eA@mail.gmail.com>
+ <20170620060344.ngbnzg2mz5hvq4kw@thunk.org> <CAHmME9oHZz44uQ1tq=M=Vrxc5NY-2r4xFjbwge-Hp=U-cCEYfQ@mail.gmail.com>
+ <CAH8yC8kLHL80_i2WRssgE3chL3iU-6dwvdkM-MoaPx4mtjx-kg@mail.gmail.com>
+ <CAHmME9rk-qrjJs6ZXQPoWV0sKBK_juq18tcE1h+pX8zSJJK1iQ@mail.gmail.com>
+ <20170620093642.3ri6dct5qkf7vhuc@thunk.org> <CAH8yC8nD3kn1DZVzvruvq3tMZ=JLED_9RWkfRGUWgsNx-gBKCQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, <mpm@selenic.com>,
-        <robh+dt@kernel.org>, <mark.rutland@arm.com>,
-        <clabbe.montjoie@gmail.com>, <prasannatsmkumar@gmail.com>,
-        <romain.perier@free-electrons.com>, <shannon.nelson@oracle.com>,
-        <weiyongjun1@huawei.com>, <devicetree@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>,
-        <linux-mediatek@lists.infradead.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, <keyhaede@gmail.com>
-To: Torsten Duwe <duwe@suse.de>
+Cc: "Theodore Ts'o" <tytso@mit.edu>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>, tglx@breakpoint.cc,
+        David Miller <davem@davemloft.net>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Eric Biggers <ebiggers3@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        kernel-hardening@lists.openwall.com,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>
+To: Jeffrey Walton <noloader@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailgw01.mediatek.com ([210.61.82.183]:10120 "EHLO
-        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751052AbdFTQI3 (ORCPT
+Received: from mail-wr0-f194.google.com ([209.85.128.194]:34596 "EHLO
+        mail-wr0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750923AbdFTRuW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Jun 2017 12:08:29 -0400
-In-Reply-To: <20170620145933.GA4177@suse.de>
+        Tue, 20 Jun 2017 13:50:22 -0400
+In-Reply-To: <CAH8yC8nD3kn1DZVzvruvq3tMZ=JLED_9RWkfRGUWgsNx-gBKCQ@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, 2017-06-20 at 16:59 +0200, Torsten Duwe wrote:
-> On Tue, Jun 20, 2017 at 10:21:17PM +0800, Sean Wang wrote:
-> > Hi Herbert,
-> > 
-> > thanks for effort reviewing on those patches.
-> > 
-> > By the way, also loop in Torsten
-> > 
-> > Could you kindly guide me how to determine appropriate 
-> > rng->ops.quality value used by the driver?
-> > 
-> > I have tested with rngtest on mtk-cir and the result is got as
-> > the below log shown.  If the rngtest always gives the result for
-> > success rate over 99.8%, can I set the rng->ops.quality 998?
-> > 
-> > rngtest: starting FIPS tests...
-> > rngtest: bits received from input: 20000032
-> > rngtest: FIPS 140-2 successes: 998
-> > rngtest: FIPS 140-2 failures: 2
-> 
-> No! You'd have to determine the failure threshold of the test and
-> apply some math to find a lower boundary of your RNG's entropy.
-> 
-> What the quality is for: your RNG produces bits, but not all of them
-> are completely independent of each other i.e. not completely random.
-> So you simply lower the quality rating to express the net entropy
-> contained in the data stream.
-> 
-> 	Torsten
-> 
+On Tue, Jun 20, 2017 at 5:49 AM, Jeffrey Walton <noloader@gmail.com> wrote:
+> On Tue, Jun 20, 2017 at 5:36 AM, Theodore Ts'o <tytso@mit.edu> wrote:
+>> On Tue, Jun 20, 2017 at 10:53:35AM +0200, Jason A. Donenfeld wrote:
 
+>>> > Suppressing all messages for all configurations cast a wider net than
+>>> > necessary. Configurations that could potentially be detected and fixed
+>>> > likely will go unnoticed. If the problem is not brought to light, then
+>>> > it won't be fixed.
 
-Hi Torsten,
+> Are there compelling reasons a single dmesg warning cannot be provided?
+>
+> A single message avoids spamming the logs. It also informs the system
+> owner of the problem. An individual or organization can then take
+> action based on their risk posture. Finally, it avoids the kernel
+> making policy decisions for a user or organization.
 
-Understood, appreciate your quick and clear explanation.
- 
-For the math, is there existing any well-known or recommended
-open source software assisting identify the lower boundary of
-RNG entropy? I think the logic should be common for all RNGs.
+I'd say the best solution is to have no configuration option
+specifically for these messages. Always give some, but let
+DEBUG_KERNEL control how many.
 
-thanks again
+If DEBUG_KERNEL is not set, emit exactly one message & ignore any
+other errors of this type. On some systems, that message may have to
+be ignored, on some it might start an incremental process where one
+problem gets fixed only to have another crop up & on some it might
+prompt the admin to explore further by compiling with DEBUG_KERNEL.
 
-	Sean
-
-
-	Sean
+If DEBUG_KERNEL is set, emit a message for every error of this type.
