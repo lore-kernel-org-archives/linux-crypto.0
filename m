@@ -1,36 +1,46 @@
-From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: Re: [PATCH] staging: ccree: fix coding style error
-Date: Tue, 20 Jun 2017 22:33:02 +0300
-Message-ID: <20170620193302.7uy6aj3rnubv4bjz@mwanda>
-References: <1497970324-9725-1-git-send-email-fbihjmeric@gmail.com>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: Re: Re: [PATCH] random: silence compiler warnings
+ and fix race
+Date: Tue, 20 Jun 2017 22:09:06 +0200
+Message-ID: <CAHmME9qNSUFr+NsmzELJM49pkHUnuZpRFhW4v5N7XcVn0c06rw@mail.gmail.com>
+References: <20170614192838.3jz4sxpcuhxygx4z@breakpoint.cc>
+ <20170614224526.29076-1-Jason@zx2c4.com> <CAHmME9rv3EjOVF4LhYZ0VS2LYKjDr_-TxzNHvyE_mKZ_UX0+eA@mail.gmail.com>
+ <20170620060344.ngbnzg2mz5hvq4kw@thunk.org> <CAHmME9oHZz44uQ1tq=M=Vrxc5NY-2r4xFjbwge-Hp=U-cCEYfQ@mail.gmail.com>
+ <CAH8yC8kLHL80_i2WRssgE3chL3iU-6dwvdkM-MoaPx4mtjx-kg@mail.gmail.com>
+ <CAHmME9rk-qrjJs6ZXQPoWV0sKBK_juq18tcE1h+pX8zSJJK1iQ@mail.gmail.com>
+ <20170620093642.3ri6dct5qkf7vhuc@thunk.org> <CAH8yC8nD3kn1DZVzvruvq3tMZ=JLED_9RWkfRGUWgsNx-gBKCQ@mail.gmail.com>
+ <CACXcFmkdMbn6xHnJvwtkPJQ0ZSUUK26-9DB+V0oq6Sj6U+gMTA@mail.gmail.com> <CAGXu5j+PQ1unqbJa6hh9OMxBx3+sKUmfycjFAb1FFH0e5C0FtQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: devel@driverdev.osuosl.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- driverdev-devel@linuxdriverproject.org, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org
-To: Jhih-Ming Huang <fbihjmeric@gmail.com>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-Content-Disposition: inline
-In-Reply-To: <1497970324-9725-1-git-send-email-fbihjmeric@gmail.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+Content-Type: text/plain; charset="UTF-8"
+Cc: Sandy Harris <sandyinchina@gmail.com>, Jeffrey Walton <noloader@gmail.com>,
+	"Theodore Ts'o" <tytso@mit.edu>, tglx@breakpoint.cc, David Miller <davem@davemloft.net>,
+	Linus Torvalds <torvalds@linux-foundation.org>, Eric Biggers <ebiggers3@gmail.com>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, Michael Ellerman <mpe@ellerman.id.au>
+To: Kees Cook <keescook@chromium.org>
+Return-path: <kernel-hardening-return-8704-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
+List-Post: <mailto:kernel-hardening@lists.openwall.com>
+List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
+List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
+List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
+In-Reply-To: <CAGXu5j+PQ1unqbJa6hh9OMxBx3+sKUmfycjFAb1FFH0e5C0FtQ@mail.gmail.com>
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Jun 20, 2017 at 10:51:58PM +0800, Jhih-Ming Huang wrote:
-> 
-> Hi,
-> 
-> This patch fix all coding style error in driver/staging/ccree/ssi_aead.c.
+On Tue, Jun 20, 2017 at 8:14 PM, Kees Cook <keescook@chromium.org> wrote:
+> How about doing this:
+>
+>    default DEBUG_KERNEL
+>
+> Most distro kernel select DEBUG_KERNEL because it unhides a bunch of
+> other useful configs. Since it doesn't strictly _depend_ on
+> DEBUG_KERNEL, I think it's probably a mistake to enforce a false
+> dependency. Using it as a hint for the default seems maybe like a good
+> middle ground. (And if people can't agree on that, then I guess
+> "default n"...)
 
-Much better.  Thanks!
+I didn't know you could do that with Kconfig. Great idea. I'll make
+this change and submit a new patch to Ted.
 
-regards,
-dan carpenter
+Jason
