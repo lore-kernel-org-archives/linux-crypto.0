@@ -1,50 +1,64 @@
-From: Jhih-Ming Huang <fbihjmeric@gmail.com>
-Subject: [PATCH 11/11] Fix ERROR: "foo* bar" should be "foo *bar"
-Date: Tue, 20 Jun 2017 13:23:08 +0800
-Message-ID: <1497936188-4979-1-git-send-email-fbihjmeric@gmail.com>
-References: <1497935984-4406-1-git-send-email-fbihjmeric@gmail.com>
+From: Theodore Ts'o <tytso@mit.edu>
+Subject: Re: [PATCH] random: silence compiler warnings and fix race
+Date: Tue, 20 Jun 2017 02:03:44 -0400
+Message-ID: <20170620060344.ngbnzg2mz5hvq4kw@thunk.org>
+References: <20170614192838.3jz4sxpcuhxygx4z@breakpoint.cc>
+ <20170614224526.29076-1-Jason@zx2c4.com>
+ <CAHmME9rv3EjOVF4LhYZ0VS2LYKjDr_-TxzNHvyE_mKZ_UX0+eA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Jhih-Ming Hunag <fbihjmeric@gmail.com>
-To: Gilad Ben-Yossef <gilad@benyossef.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- linux-crypto@vger.kernel.org, driverdev-devel@linuxdriverproject.org,
- devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-In-Reply-To: <1497935984-4406-1-git-send-email-fbihjmeric@gmail.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: tglx@breakpoint.cc, David Miller <davem@davemloft.net>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Eric Biggers <ebiggers3@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        kernel-hardening@lists.openwall.com,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from imap.thunk.org ([74.207.234.97]:47968 "EHLO imap.thunk.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750926AbdFTGEE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 20 Jun 2017 02:04:04 -0400
+Content-Disposition: inline
+In-Reply-To: <CAHmME9rv3EjOVF4LhYZ0VS2LYKjDr_-TxzNHvyE_mKZ_UX0+eA@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Jhih-Ming Hunag <fbihjmeric@gmail.com>
+On Mon, Jun 19, 2017 at 10:57:18PM +0200, Jason A. Donenfeld wrote:
+> 
+> With rc6 already released and rc7 coming up, I'd really appreciate you
+> stepping in here and either ACKing the above commit, or giving your
+> two cents about it in case I need to roll something different.
 
-Fixed 'ERROR: "foo* bar" should be "foo *bar"'.
+I actually had set up an earlier version of your patch for on Saturday
+while I was in Beijing.  (Like Linus, I'm attending the LinuxCon China
+conference Monday and Tuesday.)  I had even created the signed tag,
+but I didn't send the pull request to Linus because I was waiting to
+see about how discussions over the locking strategy and the spammy log
+messages on PowerPC was going to get resolved.
 
-Signed-off-by: Jhih-Ming Hunag <fbihjmeric@gmail.com>
----
- drivers/staging/ccree/ssi_aead.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I've since respun the commit to reflect your newer patch (see the
+random_for_linus_stable tag on random.git) and rebased the dev branch
+on top of that.  Please take a look and comment.
 
-diff --git a/drivers/staging/ccree/ssi_aead.c b/drivers/staging/ccree/ssi_aead.c
-index c148d81..c70e450 100644
---- a/drivers/staging/ccree/ssi_aead.c
-+++ b/drivers/staging/ccree/ssi_aead.c
-@@ -1843,7 +1843,7 @@ static inline int ssi_aead_gcm(
- 
- #ifdef CC_DEBUG
- static inline void ssi_aead_dump_gcm(
--	const char* title,
-+	const char *title,
- 	struct aead_request *req)
- {
- 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
--- 
-2.7.4
+The other open issue I want to resolve before sending a pull request
+this week is whether we want to change the default for
+CONFIG_WARN_UNSEEDED_RANDOM so that the answer is 'n'.  It *is* spammy
+for PowerPC, because they aren't getting their CRNG initialized
+quickly enough, so several userspace processes are getting
+fork/exec'ed with an uninitialized CRNG.  That being said, it is a
+valid warning because it means that the initial stack canary for the
+first couple of PowerPC processes are being created without a fully
+initialized CRNG, which may mean that an attacker might be able to
+circumvent the stack canary on the first couple of processes.  So that
+could potentially be a real security issue on Power.  OTOH, most Power
+users aren't going to be able to do anything about the fact the stack
+canaries of the system daemons started during early boot don't have
+strong randomness, so perhaps we should disable the warning by
+default.
+
+Opinions?
+
+						- Ted
