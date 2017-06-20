@@ -1,37 +1,41 @@
-From: INFO <mguerrero@huv.gov.co>
-Subject: Re: Reply Urgent
-Date: Mon, 19 Jun 2017 14:39:18 -0500
-Message-ID: <20170619143918.2132176qvnaamicm__2949.25974817506$1497917361$gmane$org@correo.huv.gov.co>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [RFC PATCH 1/2] crypto: caam - properly set IV after {en,de}crypt
+Date: Tue, 20 Jun 2017 09:28:58 +0800
+Message-ID: <20170620012858.GA16207@gondor.apana.org.au>
+References: <20170602122446.2427-1-david@sigma-star.at>
+ <20170602122446.2427-2-david@sigma-star.at>
+ <VI1PR0401MB2591177E3F43DEFA8AEA3D6D98C40@VI1PR0401MB2591.eurprd04.prod.outlook.com>
 Mime-Version: 1.0
-Content-Type: text/plain;
- charset=ISO-8859-1;
- DelSp="Yes";
- format="flowed"
-Content-Transfer-Encoding: 7bit
-To: undisclosed-recipients:;
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: David Gstir <david@sigma-star.at>,
+        Dan Douglass <dan.douglass@nxp.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "richard@sigma-star.at" <richard@sigma-star.at>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from correo.huv.gov.co ([190.6.160.84]:4695 "EHLO correo.huv.gov.co"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753205AbdFTAIX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Jun 2017 20:08:23 -0400
+Received: from orcrist.hmeau.com ([104.223.48.154]:60810 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750844AbdFTCWP (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 19 Jun 2017 22:22:15 -0400
 Content-Disposition: inline
+In-Reply-To: <VI1PR0401MB2591177E3F43DEFA8AEA3D6D98C40@VI1PR0401MB2591.eurprd04.prod.outlook.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello,
+On Mon, Jun 19, 2017 at 10:31:27AM +0000, Horia Geantă wrote:
+>
+> IIUC, IV update is required only in case of CBC.
+> Since this callback is used also for CTR, we should avoid the copy:
+> if ((ctx->cdata.algtype & OP_ALG_AAI_MASK) == OP_ALG_AAI_CBC) ...
 
-How are you doing? I have been sent to inform you that, We have an  
-inheritance of a deceased client with your surname. Contact Mr Andrew  
-Bailey Reply Email To: myinfand@gmail.com with your "Full Names" for  
-more info.  Thanks for your understanding.
+No it is needed for CTR too.
 
-Reply ASAP thank you.
-
-Melissa.
-----------------------------------
-Correo Corporativo Hospital Universitario del Valle E.S.E
-*******************************************************************************
-
-"Estamos re-dimensionandonos para crecer!"
-
-******************************************************************************
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
