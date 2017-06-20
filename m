@@ -1,7 +1,7 @@
 From: Jhih-Ming Huang <fbihjmeric@gmail.com>
-Subject: [PATCH 10/11] Fix ERROR: else should follow close brace '}'
-Date: Tue, 20 Jun 2017 13:22:55 +0800
-Message-ID: <1497936175-4927-1-git-send-email-fbihjmeric@gmail.com>
+Subject: [PATCH 11/11] Fix ERROR: "foo* bar" should be "foo *bar"
+Date: Tue, 20 Jun 2017 13:23:08 +0800
+Message-ID: <1497936188-4979-1-git-send-email-fbihjmeric@gmail.com>
 References: <1497935984-4406-1-git-send-email-fbihjmeric@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -26,26 +26,25 @@ List-Id: linux-crypto.vger.kernel.org
 
 From: Jhih-Ming Hunag <fbihjmeric@gmail.com>
 
-Fixied "ERROR: else should follow close brace '}'".
+Fixed 'ERROR: "foo* bar" should be "foo *bar"'.
 
 Signed-off-by: Jhih-Ming Hunag <fbihjmeric@gmail.com>
 ---
- drivers/staging/ccree/ssi_aead.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/staging/ccree/ssi_aead.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/staging/ccree/ssi_aead.c b/drivers/staging/ccree/ssi_aead.c
-index d697244..c148d81 100644
+index c148d81..c70e450 100644
 --- a/drivers/staging/ccree/ssi_aead.c
 +++ b/drivers/staging/ccree/ssi_aead.c
-@@ -1919,8 +1919,7 @@ static int config_gcm_context(struct aead_request *req)
- 		memcpy (&req_ctx->gcm_len_block.lenA, &temp64, sizeof(temp64));
- 		temp64 = cpu_to_be64(cryptlen * 8);
- 		memcpy (&req_ctx->gcm_len_block.lenC, &temp64, 8);
--	}
--	else { //rfc4543=>  all data(AAD,IV,Plain) are considered additional data that is nothing is encrypted.
-+	} else { //rfc4543=>  all data(AAD,IV,Plain) are considered additional data that is nothing is encrypted.
- 		__be64 temp64;
- 		temp64 = cpu_to_be64((req->assoclen+GCM_BLOCK_RFC4_IV_SIZE+cryptlen) * 8);
- 		memcpy (&req_ctx->gcm_len_block.lenA, &temp64, sizeof(temp64));
+@@ -1843,7 +1843,7 @@ static inline int ssi_aead_gcm(
+ 
+ #ifdef CC_DEBUG
+ static inline void ssi_aead_dump_gcm(
+-	const char* title,
++	const char *title,
+ 	struct aead_request *req)
+ {
+ 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
 -- 
 2.7.4
