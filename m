@@ -1,82 +1,65 @@
-From: Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: [kernel-hardening] Re: [PATCH] random: silence compiler warnings and fix race
-Date: Tue, 20 Jun 2017 16:59:49 +1000
-Message-ID: <871sqfuot6.fsf@concordia.ellerman.id.au>
-References: <20170614192838.3jz4sxpcuhxygx4z@breakpoint.cc> <20170614224526.29076-1-Jason@zx2c4.com> <CAHmME9rv3EjOVF4LhYZ0VS2LYKjDr_-TxzNHvyE_mKZ_UX0+eA@mail.gmail.com> <20170620060344.ngbnzg2mz5hvq4kw@thunk.org>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [PATCH] random: silence compiler warnings and fix race
+Date: Tue, 20 Jun 2017 10:14:29 +0200
+Message-ID: <CAHmME9oHZz44uQ1tq=M=Vrxc5NY-2r4xFjbwge-Hp=U-cCEYfQ@mail.gmail.com>
+References: <20170614192838.3jz4sxpcuhxygx4z@breakpoint.cc>
+ <20170614224526.29076-1-Jason@zx2c4.com> <CAHmME9rv3EjOVF4LhYZ0VS2LYKjDr_-TxzNHvyE_mKZ_UX0+eA@mail.gmail.com>
+ <20170620060344.ngbnzg2mz5hvq4kw@thunk.org>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: tglx@breakpoint.cc, David Miller <davem@davemloft.net>,
+Content-Type: text/plain; charset="UTF-8"
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>, tglx@breakpoint.cc,
+        David Miller <davem@davemloft.net>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         Eric Biggers <ebiggers3@gmail.com>,
         LKML <linux-kernel@vger.kernel.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         kernel-hardening@lists.openwall.com,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Theodore Ts'o <tytso@mit.edu>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ozlabs.org ([103.22.144.67]:58827 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750951AbdFTG7w (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Jun 2017 02:59:52 -0400
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20170620060344.ngbnzg2mz5hvq4kw@thunk.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Theodore Ts'o <tytso@mit.edu> writes:
+Hey Ted,
 
-> On Mon, Jun 19, 2017 at 10:57:18PM +0200, Jason A. Donenfeld wrote:
->> 
->> With rc6 already released and rc7 coming up, I'd really appreciate you
->> stepping in here and either ACKing the above commit, or giving your
->> two cents about it in case I need to roll something different.
->
+On Tue, Jun 20, 2017 at 02:03:44AM -0400, Theodore Ts'o wrote:
 > I actually had set up an earlier version of your patch for on Saturday
 > while I was in Beijing.  (Like Linus, I'm attending the LinuxCon China
 > conference Monday and Tuesday.)  I had even created the signed tag,
-> but I didn't send the pull request to Linus because I was waiting to
-> see about how discussions over the locking strategy and the spammy log
-> messages on PowerPC was going to get resolved.
->
 > I've since respun the commit to reflect your newer patch (see the
 > random_for_linus_stable tag on random.git) and rebased the dev branch
 > on top of that.  Please take a look and comment.
->
+
+So it looks like you've gone with 4a072c71f49. If that looks good
+(moving the lock, etc) to you, then great, we're done. If there are
+still locking objections (are there?), then we'll need to revisit.
+
+> but I didn't send the pull request to Linus because I was waiting to
+> see about how discussions over the locking strategy and the spammy log
+> messages on PowerPC was going to get resolved.
 > The other open issue I want to resolve before sending a pull request
 > this week is whether we want to change the default for
 > CONFIG_WARN_UNSEEDED_RANDOM so that the answer is 'n'.
 
-Yes please.
+In the v1 of this patch many moons ago, it was just vanilla, default y,
+but due to the spamminess, I thought folks would revolt. So I made a
+change:
 
-> It *is* spammy for PowerPC, because they aren't getting their CRNG
+Specifically, I added `depends on DEBUG_KERNEL`. This means that these
+useful warnings will only poke other kernel developers. This is probably
+exactly what we want. If the various associated developers see a warning
+coming from their particular subsystem, they'll be more motivated to
+fix it. Ordinary users on distribution kernels shouldn't see the
+warnings or the spam at all, since typically users aren't using
+DEBUG_KERNEL.
 
-*some* powerpc machines ...
+Then, to make things _even less_ annoying to kernel developers, you
+added a nice patch on top to squelch repeated messages.
 
-> initialized quickly enough, so several userspace processes are getting
-> fork/exec'ed with an uninitialized CRNG.  That being said, it is a
-> valid warning because it means that the initial stack canary for the
-> first couple of PowerPC processes are being created without a fully
-> initialized CRNG, which may mean that an attacker might be able to
-> circumvent the stack canary on the first couple of processes.  So that
-> could potentially be a real security issue on Power.  OTOH, most Power
-> users aren't going to be able to do anything about the fact the stack
-> canaries of the system daemons started during early boot don't have
-> strong randomness, so perhaps we should disable the warning by
-> default.
+So, I still think this current strategy is a good one, of default y, but
+depends on DEBUG_KERNEL.
 
-powerpc supports a wide range of hardware platforms, some of which are
-10-15 years old, and don't have a hardware RNG.
-
-Is there anything we can do on those machines? Seems like our only
-option would be to block the boot while some more "entropy" builds up,
-but that's unlikely to be popular with users.
-
-On our newer machines (>= Power8) we have a hardware RNG which we wire
-up to arch_get_random_seed_long(), so on those machines the warnings
-would be valid, because they'd indicate a bug.
-
-So I think it should be up to arches to decide whether this is turned on
-via their defconfigs, and the default should be 'n' because a lot of old
-hardware won't be able to do anything useful with the warnings.
-
-cheers
+Regards,
+Jason
