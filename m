@@ -1,52 +1,63 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v3 7/7] crypto: aes - allow generic AES to be replaced by fixed time AES
-Date: Tue, 20 Jun 2017 11:29:00 +0200
-Message-ID: <1497950940-24243-8-git-send-email-ard.biesheuvel@linaro.org>
-References: <1497950940-24243-1-git-send-email-ard.biesheuvel@linaro.org>
-Cc: herbert@gondor.apana.org.au, nico@linaro.org, ebiggers3@gmail.com,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f50.google.com ([74.125.82.50]:36983 "EHLO
-        mail-wm0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752049AbdFTJ3N (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Jun 2017 05:29:13 -0400
-Received: by mail-wm0-f50.google.com with SMTP id d73so14418313wma.0
-        for <linux-crypto@vger.kernel.org>; Tue, 20 Jun 2017 02:29:12 -0700 (PDT)
-In-Reply-To: <1497950940-24243-1-git-send-email-ard.biesheuvel@linaro.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Theodore Ts'o <tytso@mit.edu>
+Subject: Re: [PATCH] random: silence compiler warnings and fix race
+Date: Tue, 20 Jun 2017 05:36:42 -0400
+Message-ID: <20170620093642.3ri6dct5qkf7vhuc@thunk.org>
+References: <20170614192838.3jz4sxpcuhxygx4z@breakpoint.cc>
+ <20170614224526.29076-1-Jason@zx2c4.com>
+ <CAHmME9rv3EjOVF4LhYZ0VS2LYKjDr_-TxzNHvyE_mKZ_UX0+eA@mail.gmail.com>
+ <20170620060344.ngbnzg2mz5hvq4kw@thunk.org>
+ <CAHmME9oHZz44uQ1tq=M=Vrxc5NY-2r4xFjbwge-Hp=U-cCEYfQ@mail.gmail.com>
+ <CAH8yC8kLHL80_i2WRssgE3chL3iU-6dwvdkM-MoaPx4mtjx-kg@mail.gmail.com>
+ <CAHmME9rk-qrjJs6ZXQPoWV0sKBK_juq18tcE1h+pX8zSJJK1iQ@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: noloader@gmail.com, tglx@breakpoint.cc,
+	David Miller <davem@davemloft.net>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Eric Biggers <ebiggers3@gmail.com>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	kernel-hardening@lists.openwall.com,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Return-path: <kernel-hardening-return-8675-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
+List-Post: <mailto:kernel-hardening@lists.openwall.com>
+List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
+List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
+List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
+Content-Disposition: inline
+In-Reply-To: <CAHmME9rk-qrjJs6ZXQPoWV0sKBK_juq18tcE1h+pX8zSJJK1iQ@mail.gmail.com>
+List-Id: linux-crypto.vger.kernel.org
 
-On systems where a small memory footprint is important, the generic
-AES code with its 16 KB of lookup tables and fully unrolled encrypt
-and decrypt routines may be an unnecessary burden, especially given
-that modern SoCs often have dedicated instructions for AES. And even
-if they don't, a time invariant implementation may be preferred over
-a fast one that may be susceptible to cache timing attacks.
+On Tue, Jun 20, 2017 at 10:53:35AM +0200, Jason A. Donenfeld wrote:
+> > Suppressing all messages for all configurations cast a wider net than
+> > necessary. Configurations that could potentially be detected and fixed
+> > likely will go unnoticed. If the problem is not brought to light, then
+> > it won't be fixed.
+> 
+> I more or less agree with you that we should just turn this on for all
+> users and they'll just have to live with the spam and report odd
+> entries, and overtime we'll fix all the violations.
 
-So allow the declared dependency of other subsystems on AES to be
-fulfilled by either the generic table based AES or by the much smaller
-generic time invariant implementation.
+Fix all the problems *how*?  If you are on an old system which doesn't
+a hardware random number generator, and which doesn't have a high
+resolution cycle counter, and may not have a lot of entropy easily
+harvestable from the environment, there may not be a lot you can do.
+Sure, you can pretend that the cache (which by the way is usually
+determinstic) is ***so*** complicated that no one can figure it out,
+and essentially pretend that you have entropy when you probably don't;
+that just simply becomes a different way of handwaving and suppressing
+the warning messages.
 
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
- crypto/Kconfig | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+> But I think there's another camp that would mutiny in the face of this
+> kind of hubris.
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 87d9e03dcb74..dd0bc0d84789 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -899,7 +899,8 @@ config CRYPTO_AES_CORE
- 
- config CRYPTO_AES
- 	tristate
--	select CRYPTO_AES_GENERIC
-+	select CRYPTO_AES_GENERIC if (CRYPTO_AES=y && CRYPTO_AES_TI != y) || \
-+				     (CRYPTO_AES=m && !CRYPTO_AES_TI)
- 
- config CRYPTO_AES_GENERIC
- 	tristate "Generic table based AES cipher"
--- 
-2.7.4
+Blocking the boot for hours and hours until we have enough entropy to
+initialize the CRNG is ***not*** an acceptable way of making the
+warning messages go away.  Do that and the users **will** mutiny.
+
+It's this sort of attitude which is why Linus has in the past said
+that security people are sometimes insane....
+
+						- Ted
