@@ -1,7 +1,7 @@
 From: Gary R Hook <gary.hook@amd.com>
-Subject: [PATCH] crypto: ccp - Provide a roll-back method for debugfs setup
-Date: Wed, 21 Jun 2017 17:39:14 -0500
-Message-ID: <20170621223914.14697.61808.stgit@taos.amd.com>
+Subject: [PATCH 0/4] Enable full RSA support on CCPs
+Date: Wed, 21 Jun 2017 17:47:36 -0500
+Message-ID: <20170621224655.15132.20473.stgit@taos.amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
@@ -9,76 +9,39 @@ Cc: thomas.lendacky@amd.com, herbert@gondor.apana.org.au,
         davem@davemloft.net
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2nam01on0068.outbound.protection.outlook.com ([104.47.34.68]:10606
-        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
+Received: from mail-sn1nam01on0060.outbound.protection.outlook.com ([104.47.32.60]:43975
+        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751963AbdFUWj0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Jun 2017 18:39:26 -0400
+        id S1751755AbdFUWrt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 21 Jun 2017 18:47:49 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Signed-off-by: Gary R Hook <gary.hook@amd.com>
----
- drivers/crypto/ccp/ccp-debugfs.c |   18 +++++++++++++-----
- 1 file changed, 13 insertions(+), 5 deletions(-)
+The following series enables RSA operations on version 5 devices,
+adds a set-reqsize function (to provide uniformity with other cipher
+APIs), implements akcipher enablement in the crypto layer, and 
+makes a tweak for expanded v5 device capabilities.
 
-diff --git a/drivers/crypto/ccp/ccp-debugfs.c b/drivers/crypto/ccp/ccp-debugfs.c
-index 3cd6c83754e0..99aba1622613 100644
---- a/drivers/crypto/ccp/ccp-debugfs.c
-+++ b/drivers/crypto/ccp/ccp-debugfs.c
-@@ -291,6 +291,7 @@ void ccp5_debugfs_setup(struct ccp_device *ccp)
- 	struct dentry *debugfs_q_instance;
- 	struct dentry *debugfs_q_stats;
- 	unsigned long flags;
-+	int rc = 0;
- 	int i;
- 
- 	if (!debugfs_initialized())
-@@ -305,19 +306,19 @@ void ccp5_debugfs_setup(struct ccp_device *ccp)
- 
- 	ccp->debugfs_instance = debugfs_create_dir(ccp->name, ccp_debugfs_dir);
- 	if (!ccp->debugfs_instance)
--		return;
-+		goto err;
- 
- 	debugfs_info = debugfs_create_file("info", 0400,
- 					   ccp->debugfs_instance, ccp,
- 					   &ccp_debugfs_info_ops);
- 	if (!debugfs_info)
--		return;
-+		goto err;
- 
- 	debugfs_stats = debugfs_create_file("stats", 0600,
- 					    ccp->debugfs_instance, ccp,
- 					    &ccp_debugfs_stats_ops);
- 	if (!debugfs_stats)
--		return;
-+		goto err;
- 
- 	for (i = 0; i < ccp->cmd_q_count; i++) {
- 		cmd_q = &ccp->cmd_q[i];
-@@ -327,15 +328,22 @@ void ccp5_debugfs_setup(struct ccp_device *ccp)
- 		debugfs_q_instance =
- 			debugfs_create_dir(name, ccp->debugfs_instance);
- 		if (!debugfs_q_instance)
--			return;
-+			goto err;
- 
- 		debugfs_q_stats =
- 			debugfs_create_file("stats", 0600,
- 					    debugfs_q_instance, cmd_q,
- 					    &ccp_debugfs_queue_ops);
- 		if (!debugfs_q_stats)
--			return;
-+			goto err;
- 	}
-+	return;
-+
-+err:
-+	write_lock_irqsave(&ccp_debugfs_lock, flags);
-+	debugfs_remove_recursive(ccp_debugfs_dir);
-+	ccp_debugfs_dir = NULL;
-+	write_unlock_irqrestore(&ccp_debugfs_lock, flags);
- }
- 
- void ccp5_debugfs_destroy(void)
+---
+
+Gary R Hook (4):
+      crypto: ccp - Fix base RSA function for version 5 CCPs
+      crypto: Add akcipher_set_reqsize() function
+      crypto: ccp - Add support for RSA on the CCP
+      crypto: ccp - Expand RSA support for a v5 ccp
+
+
+ drivers/crypto/ccp/Makefile          |    1 
+ drivers/crypto/ccp/ccp-crypto-main.c |   21 ++
+ drivers/crypto/ccp/ccp-crypto-rsa.c  |  289 ++++++++++++++++++++++++++++++++++
+ drivers/crypto/ccp/ccp-crypto.h      |   32 ++++
+ drivers/crypto/ccp/ccp-debugfs.c     |    1 
+ drivers/crypto/ccp/ccp-dev-v3.c      |    1 
+ drivers/crypto/ccp/ccp-dev-v5.c      |   12 +
+ drivers/crypto/ccp/ccp-dev.c         |    1 
+ drivers/crypto/ccp/ccp-dev.h         |    2 
+ drivers/crypto/ccp/ccp-ops.c         |   98 +++++++-----
+ include/crypto/internal/akcipher.h   |    6 +
+ include/linux/ccp.h                  |    1 
+ 12 files changed, 421 insertions(+), 44 deletions(-)
+ create mode 100644 drivers/crypto/ccp/ccp-crypto-rsa.c
