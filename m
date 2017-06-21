@@ -1,46 +1,168 @@
 From: Cosar Dindar <cosardindar@gmail.com>
-Subject: [RESEND,PATCH v4 1/5] dt-bindings : Document the STM32F4 CRC32 binding
-Date: Thu, 22 Jun 2017 02:14:12 +0300
-Message-ID: <1498086852-104737-1-git-send-email-cosardindar@gmail.com>
-Cc: davem@davemloft.net, robh+dt@kernel.org, mark.rutland@arm.com,
-        mcoquelin.stm32@gmail.com, alexandre.torgue@st.com,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org, Cosar Dindar <cosardindar@gmail.com>
+Subject: [RESEND,PATCH v4 2/5] crypto : stm32 - Add STM32F4 CRC32 support
+Date: Thu, 22 Jun 2017 02:14:59 +0300
+Message-ID: <1498086899-104804-1-git-send-email-cosardindar@gmail.com>
+Cc: davem@davemloft.net, mcoquelin.stm32@gmail.com,
+        alexandre.torgue@st.com, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Cosar Dindar <cosardindar@gmail.com>
 To: herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wr0-f196.google.com ([209.85.128.196]:33661 "EHLO
-        mail-wr0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751901AbdFUXOv (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Jun 2017 19:14:51 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Add device tree binding for STM32F4.
+This patch adds CRC (CRC32 Crypto) support for STM32F4 series.
+
+As an hardware limitation polynomial and key setting are not supported.
+They are fixed as 0x4C11DB7 (poly) and 0xFFFFFFFF (key).
+CRC32C Castagnoli algorithm is not used.
 
 Signed-off-by: Cosar Dindar <cosardindar@gmail.com>
+Reviewed-by: Fabien Dessenne <fabien.dessenne@st.com>
 ---
 
- Changes in V4:
-	- Edited binding explanations.
+Changes in v4:
+	- Add Fabien Dessenne's Reviewed-by tag.
 
- Documentation/devicetree/bindings/crypto/st,stm32-crc.txt | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ drivers/crypto/stm32/stm32_crc32.c | 68 ++++++++++++++++++++++++++++++++------
+ 1 file changed, 58 insertions(+), 10 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/crypto/st,stm32-crc.txt b/Documentation/devicetree/bindings/crypto/st,stm32-crc.txt
-index 3ba92a5..1e9af69 100644
---- a/Documentation/devicetree/bindings/crypto/st,stm32-crc.txt
-+++ b/Documentation/devicetree/bindings/crypto/st,stm32-crc.txt
-@@ -1,7 +1,9 @@
- * STMicroelectronics STM32 CRC
+diff --git a/drivers/crypto/stm32/stm32_crc32.c b/drivers/crypto/stm32/stm32_crc32.c
+index ec83b1e..12fbd98 100644
+--- a/drivers/crypto/stm32/stm32_crc32.c
++++ b/drivers/crypto/stm32/stm32_crc32.c
+@@ -7,6 +7,7 @@
+ #include <linux/bitrev.h>
+ #include <linux/clk.h>
+ #include <linux/module.h>
++#include <linux/of.h>
+ #include <linux/platform_device.h>
  
- Required properties:
--- compatible: Should be "st,stm32f7-crc".
-+- compatible: Should be one of the following string.
-+	      "st,stm32f7-crc"
-+	      "st,stm32f4-crc"
- - reg: The address and length of the peripheral registers space
- - clocks: The input clock of the CRC instance
+ #include <crypto/internal/hash.h>
+@@ -39,6 +40,9 @@ struct stm32_crc {
+ 	struct clk       *clk;
+ 	u8               pending_data[sizeof(u32)];
+ 	size_t           nb_pending_bytes;
++	bool             key_support;
++	bool             poly_support;
++	bool             reverse_support;
+ };
  
+ struct stm32_crc_list {
+@@ -106,13 +110,31 @@ static int stm32_crc_init(struct shash_desc *desc)
+ 	}
+ 	spin_unlock_bh(&crc_list.lock);
+ 
+-	/* Reset, set key, poly and configure in bit reverse mode */
+-	writel(bitrev32(mctx->key), ctx->crc->regs + CRC_INIT);
+-	writel(bitrev32(mctx->poly), ctx->crc->regs + CRC_POL);
+-	writel(CRC_CR_RESET | CRC_CR_REVERSE, ctx->crc->regs + CRC_CR);
++	/* set key */
++	if (ctx->crc->key_support) {
++		writel(bitrev32(mctx->key), ctx->crc->regs + CRC_INIT);
++	} else if (mctx->key != CRC_INIT_DEFAULT) {
++		dev_err(ctx->crc->dev, "Unsupported key value! Should be: 0x%x\n",
++			CRC_INIT_DEFAULT);
++		return -EINVAL;
++	}
++
++	/* set poly */
++	if (ctx->crc->poly_support)
++		writel(bitrev32(mctx->poly), ctx->crc->regs + CRC_POL);
++
++	/* reset and configure in bit reverse mode if supported */
++	if (ctx->crc->reverse_support)
++		writel(CRC_CR_RESET | CRC_CR_REVERSE, ctx->crc->regs + CRC_CR);
++	else
++		writel(CRC_CR_RESET, ctx->crc->regs + CRC_CR);
++
++	/* store partial result */
++	if (!ctx->crc->reverse_support)
++		ctx->partial = bitrev32(readl(crc->regs + CRC_DR));
++	else
++		ctx->partial = readl(ctx->crc->regs + CRC_DR);
+ 
+-	/* Store partial result */
+-	ctx->partial = readl(ctx->crc->regs + CRC_DR);
+ 	ctx->crc->nb_pending_bytes = 0;
+ 
+ 	return 0;
+@@ -135,7 +157,12 @@ static int stm32_crc_update(struct shash_desc *desc, const u8 *d8,
+ 
+ 		if (crc->nb_pending_bytes == sizeof(u32)) {
+ 			/* Process completed pending data */
+-			writel(*(u32 *)crc->pending_data, crc->regs + CRC_DR);
++			if (!ctx->crc->reverse_support)
++				writel(bitrev32(*(u32 *)crc->pending_data),
++				       crc->regs + CRC_DR);
++			else
++				writel(*(u32 *)crc->pending_data,
++				       crc->regs + CRC_DR);
+ 			crc->nb_pending_bytes = 0;
+ 		}
+ 	}
+@@ -143,10 +170,16 @@ static int stm32_crc_update(struct shash_desc *desc, const u8 *d8,
+ 	d32 = (u32 *)d8;
+ 	for (i = 0; i < length >> 2; i++)
+ 		/* Process 32 bits data */
+-		writel(*(d32++), crc->regs + CRC_DR);
++		if (!ctx->crc->reverse_support)
++			writel(bitrev32(*(d32++)), crc->regs + CRC_DR);
++		else
++			writel(*(d32++), crc->regs + CRC_DR);
+ 
+ 	/* Store partial result */
+-	ctx->partial = readl(crc->regs + CRC_DR);
++	if (!ctx->crc->reverse_support)
++		ctx->partial = bitrev32(readl(crc->regs + CRC_DR));
++	else
++		ctx->partial = readl(crc->regs + CRC_DR);
+ 
+ 	/* Check for pending data (non 32 bits) */
+ 	length &= 3;
+@@ -243,6 +276,7 @@ static int stm32_crc_probe(struct platform_device *pdev)
+ 	struct stm32_crc *crc;
+ 	struct resource *res;
+ 	int ret;
++	int algs_size;
+ 
+ 	crc = devm_kzalloc(dev, sizeof(*crc), GFP_KERNEL);
+ 	if (!crc)
+@@ -269,13 +303,26 @@ static int stm32_crc_probe(struct platform_device *pdev)
+ 		return ret;
+ 	}
+ 
++	/* set key, poly and reverse support if device is of F7 series */
++	if (of_device_is_compatible(crc->dev->of_node, "st,stm32f7-crc")) {
++		crc->key_support = true;
++		crc->poly_support = true;
++		crc->reverse_support = true;
++	}
++
+ 	platform_set_drvdata(pdev, crc);
+ 
+ 	spin_lock(&crc_list.lock);
+ 	list_add(&crc->list, &crc_list.dev_list);
+ 	spin_unlock(&crc_list.lock);
+ 
+-	ret = crypto_register_shashes(algs, ARRAY_SIZE(algs));
++	/* For F4 series only CRC32 algorithm will be used */
++	if (of_device_is_compatible(crc->dev->of_node, "st,stm32f4-crc"))
++		algs_size = 1;
++	else
++		algs_size = ARRAY_SIZE(algs);
++
++	ret = crypto_register_shashes(algs, algs_size);
+ 	if (ret) {
+ 		dev_err(dev, "Failed to register\n");
+ 		clk_disable_unprepare(crc->clk);
+@@ -304,6 +351,7 @@ static int stm32_crc_remove(struct platform_device *pdev)
+ 
+ static const struct of_device_id stm32_dt_ids[] = {
+ 	{ .compatible = "st,stm32f7-crc", },
++	{ .compatible = "st,stm32f4-crc", },
+ 	{},
+ };
+ MODULE_DEVICE_TABLE(of, stm32_dt_ids);
 -- 
 2.7.4
