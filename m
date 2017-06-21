@@ -1,25 +1,41 @@
-From: =?utf-8?q?Bernhard_St=C3=B6ckl?= <sunrisefundingltd@gmail.com>
-Subject: =?utf-8?q?AW=3A?=  Wir geben =?utf-8?q?j=C3=A4hrlich?= Darlehen
- =?utf-8?q?f=C3=BCr?= 2% Zinsen aus
-Date: Thu, 22 Jun 2017 00:51:41 +0200
-Message-ID: <1b2-594af880-a9-75f20f80__47817.9842852571$1498086144$gmane$org@186293666>
-Reply-To: sunrisefunding@yahoo.com
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8BIT
-To: unlisted-recipients:; (no To-header on input)
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from purin.rz.uni-konstanz.de ([134.34.240.45]:55636 "EHLO
-        purin.rz.uni-konstanz.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751940AbdFUXCX (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Jun 2017 19:02:23 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Cosar Dindar <cosardindar@gmail.com>
+Subject: [RESEND,PATCH v4 0/5] Add support for the STM32F4 CRC32
+Date: Thu, 22 Jun 2017 02:13:07 +0300
+Message-ID: <1498086787-104647-1-git-send-email-cosardindar@gmail.com>
+Cc: davem@davemloft.net, robh+dt@kernel.org, mark.rutland@arm.com,
+        mcoquelin.stm32@gmail.com, alexandre.torgue@st.com,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org, Cosar Dindar <cosardindar@gmail.com>
+To: herbert@gondor.apana.org.au
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
+This patch series add hardware CRC32 ("Ethernet") calculation support
+for STMicroelectronics STM32F429.
 
-Wir vergeben Kredite mit einem Zinssatz von jährlich 2%.
+Polynomial and key setting are not supported, key is fixed as 0x4C11DB7
+and poly is 0xFFFFFFFF.
 
-Die Bearbeitung des Antrags erfolgt rasch, wir verlangen keine Gebühren, was sie beantragen werden wir annehmen. Wir bewilligen Kredite von bis zu 40 Millionen Euro und von mindestens 15.000 Euro. Sie können einen geschäftlichen oder privaten Kredit beantrage, wobei Sie bei Geschäftskrediten eine Zahlungsfrist von einem Jahr erhalten.
+Module is tested on STM32F429-disco board with crypto testmgr using
+cases within the key 0xFFFFFFFF.
 
-Anfragen bitte per Mail an: sunrisefunding01@hotmail.com 
+Changes in v4:
+  - Edited patch summary.
+
+Cosar Dindar (5):
+  dt-bindings : Document the STM32F4 CRC32 binding
+  crypto : stm32 - Add STM32F4 CRC32 support
+  ARM: dts: stm32: Add CRC support to stm32f429 (Merged-by Alexander TORGUE)
+  ARM: dts: stm32: enable CRC32 on stm32429-disco board (Merged-by Alexander TORGUE)
+  ARM: dts: stm32: enable CRC32 on stm32429i-eval board (Merged-by Alexander TORGUE)
+
+ .../devicetree/bindings/crypto/st,stm32-crc.txt    |  4 +-
+ arch/arm/boot/dts/stm32429i-eval.dts               |  4 ++
+ arch/arm/boot/dts/stm32f429-disco.dts              |  4 ++
+ arch/arm/boot/dts/stm32f429.dtsi                   |  7 +++
+ drivers/crypto/stm32/stm32_crc32.c                 | 68 ++++++++++++++++++----
+ 5 files changed, 75 insertions(+), 12 deletions(-)
+
+-- 
+2.7.4
