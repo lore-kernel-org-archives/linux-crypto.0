@@ -1,126 +1,25 @@
-From: Gary R Hook <gary.hook@amd.com>
-Subject: [PATCH 4/4] crypto: ccp - Expand RSA support for a v5 ccp
-Date: Wed, 21 Jun 2017 17:48:10 -0500
-Message-ID: <20170621224810.15132.93382.stgit@taos.amd.com>
-References: <20170621224655.15132.20473.stgit@taos.amd.com>
+From: =?utf-8?q?Bernhard_St=C3=B6ckl?= <sunrisefundingltd@gmail.com>
+Subject: =?utf-8?q?AW=3A?=  Wir geben =?utf-8?q?j=C3=A4hrlich?= Darlehen
+ =?utf-8?q?f=C3=BCr?= 2% Zinsen aus
+Date: Thu, 22 Jun 2017 00:51:41 +0200
+Message-ID: <1b2-594af880-a9-75f20f80__47817.9842852571$1498086144$gmane$org@186293666>
+Reply-To: sunrisefunding@yahoo.com
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: thomas.lendacky@amd.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net
-To: linux-crypto@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+To: unlisted-recipients:; (no To-header on input)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-cys01nam02on0079.outbound.protection.outlook.com ([104.47.37.79]:19808
-        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751755AbdFUWsV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Jun 2017 18:48:21 -0400
-In-Reply-To: <20170621224655.15132.20473.stgit@taos.amd.com>
+Received: from purin.rz.uni-konstanz.de ([134.34.240.45]:55636 "EHLO
+        purin.rz.uni-konstanz.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751940AbdFUXCX (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 21 Jun 2017 19:02:23 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-A V5 device can accommodate larger keys, as well as read the keys
-directly from memory instead of requiring them to be in a local
-storage block.
 
+Wir vergeben Kredite mit einem Zinssatz von jährlich 2%.
 
-Signed-off-by: Gary R Hook <gary.hook@amd.com>
----
- drivers/crypto/ccp/ccp-crypto-rsa.c |    5 ++++-
- drivers/crypto/ccp/ccp-crypto.h     |    1 +
- drivers/crypto/ccp/ccp-dev-v3.c     |    1 +
- drivers/crypto/ccp/ccp-dev-v5.c     |    2 ++
- drivers/crypto/ccp/ccp-dev.h        |    2 ++
- drivers/crypto/ccp/ccp-ops.c        |    3 ++-
- 6 files changed, 12 insertions(+), 2 deletions(-)
+Die Bearbeitung des Antrags erfolgt rasch, wir verlangen keine Gebühren, was sie beantragen werden wir annehmen. Wir bewilligen Kredite von bis zu 40 Millionen Euro und von mindestens 15.000 Euro. Sie können einen geschäftlichen oder privaten Kredit beantrage, wobei Sie bei Geschäftskrediten eine Zahlungsfrist von einem Jahr erhalten.
 
-diff --git a/drivers/crypto/ccp/ccp-crypto-rsa.c b/drivers/crypto/ccp/ccp-crypto-rsa.c
-index 4a2a71463594..93e6b00ce34d 100644
---- a/drivers/crypto/ccp/ccp-crypto-rsa.c
-+++ b/drivers/crypto/ccp/ccp-crypto-rsa.c
-@@ -43,7 +43,10 @@ static int ccp_rsa_complete(struct crypto_async_request *async_req, int ret)
- 
- static unsigned int ccp_rsa_maxsize(struct crypto_akcipher *tfm)
- {
--	return CCP_RSA_MAXMOD;
-+	if (ccp_version() > CCP_VERSION(3, 0))
-+		return CCP5_RSA_MAXMOD;
-+	else
-+		return CCP_RSA_MAXMOD;
- }
- 
- static int ccp_rsa_crypt(struct akcipher_request *req, bool encrypt)
-diff --git a/drivers/crypto/ccp/ccp-crypto.h b/drivers/crypto/ccp/ccp-crypto.h
-index 5d592ecc9af5..40598894113b 100644
---- a/drivers/crypto/ccp/ccp-crypto.h
-+++ b/drivers/crypto/ccp/ccp-crypto.h
-@@ -255,6 +255,7 @@ struct ccp_rsa_req_ctx {
- };
- 
- #define	CCP_RSA_MAXMOD	(4 * 1024 / 8)
-+#define	CCP5_RSA_MAXMOD	(16 * 1024 / 8)
- 
- /***** Common Context Structure *****/
- struct ccp_ctx {
-diff --git a/drivers/crypto/ccp/ccp-dev-v3.c b/drivers/crypto/ccp/ccp-dev-v3.c
-index 367c2e30656f..9b159b0a891e 100644
---- a/drivers/crypto/ccp/ccp-dev-v3.c
-+++ b/drivers/crypto/ccp/ccp-dev-v3.c
-@@ -592,4 +592,5 @@ static void ccp_destroy(struct ccp_device *ccp)
- 	.perform = &ccp3_actions,
- 	.bar = 2,
- 	.offset = 0x20000,
-+	.rsamax = CCP_RSA_MAX_WIDTH,
- };
-diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
-index 632518efd685..6043552322fd 100644
---- a/drivers/crypto/ccp/ccp-dev-v5.c
-+++ b/drivers/crypto/ccp/ccp-dev-v5.c
-@@ -1115,6 +1115,7 @@ static void ccp5other_config(struct ccp_device *ccp)
- 	.perform = &ccp5_actions,
- 	.bar = 2,
- 	.offset = 0x0,
-+	.rsamax = CCP5_RSA_MAX_WIDTH,
- };
- 
- const struct ccp_vdata ccpv5b = {
-@@ -1124,4 +1125,5 @@ static void ccp5other_config(struct ccp_device *ccp)
- 	.perform = &ccp5_actions,
- 	.bar = 2,
- 	.offset = 0x0,
-+	.rsamax = CCP5_RSA_MAX_WIDTH,
- };
-diff --git a/drivers/crypto/ccp/ccp-dev.h b/drivers/crypto/ccp/ccp-dev.h
-index a70154ac7405..8242cf54d90f 100644
---- a/drivers/crypto/ccp/ccp-dev.h
-+++ b/drivers/crypto/ccp/ccp-dev.h
-@@ -200,6 +200,7 @@
- #define CCP_SHA_SB_COUNT		1
- 
- #define CCP_RSA_MAX_WIDTH		4096
-+#define CCP5_RSA_MAX_WIDTH		16384
- 
- #define CCP_PASSTHRU_BLOCKSIZE		256
- #define CCP_PASSTHRU_MASKSIZE		32
-@@ -677,6 +678,7 @@ struct ccp_vdata {
- 	const struct ccp_actions *perform;
- 	const unsigned int bar;
- 	const unsigned int offset;
-+	const unsigned int rsamax;
- };
- 
- extern const struct ccp_vdata ccpv3;
-diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
-index 2cdd15a92178..ea5e4ede1eed 100644
---- a/drivers/crypto/ccp/ccp-ops.c
-+++ b/drivers/crypto/ccp/ccp-ops.c
-@@ -1737,7 +1737,8 @@ static int ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
- 	unsigned int key_size_bytes;
- 	int ret;
- 
--	if (rsa->key_size > CCP_RSA_MAX_WIDTH)
-+	/* Check against the maximum allowable size, in bits */
-+	if (rsa->key_size > cmd_q->ccp->vdata->rsamax)
- 		return -EINVAL;
- 
- 	if (!rsa->exp || !rsa->mod || !rsa->src || !rsa->dst)
+Anfragen bitte per Mail an: sunrisefunding01@hotmail.com 
