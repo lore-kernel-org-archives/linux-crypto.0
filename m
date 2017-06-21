@@ -1,82 +1,57 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [PATCH v9 1/2] crypto: skcipher AF_ALG - overhaul memory management
-Date: Wed, 21 Jun 2017 09:30:53 +0200
-Message-ID: <4569323.iShbTmMGM5@positron.chronox.de>
-References: <1529895.BiIeBiIAIs@positron.chronox.de> <2834834.Sa5QGNeBMP@positron.chronox.de> <20170620031042.GA17690@gondor.apana.org.au>
+From: Radu Solea <radu.solea@nxp.com>
+Subject: [RFC PATCH] gcm - fix setkey cache coherence issues
+Date: Wed, 21 Jun 2017 17:29:21 +0300
+Message-ID: <1498055361-12493-1-git-send-email-radu.solea@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain
+Cc: <linux-crypto@vger.kernel.org>, <horia.geanta@nxp.com>,
+        Radu Solea <radu.solea@nxp.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:60328 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752376AbdFUHaz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Jun 2017 03:30:55 -0400
-In-Reply-To: <20170620031042.GA17690@gondor.apana.org.au>
+Received: from mail-cys01nam02on0078.outbound.protection.outlook.com ([104.47.37.78]:21030
+        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752391AbdFUO3o (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 21 Jun 2017 10:29:44 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 20. Juni 2017, 05:10:42 CEST schrieb Herbert Xu:
+Generic GCM is likely to end up using a hardware accelerator to do
+part of the job. Allocating hash, iv and result in a contiguous memory
+area increases the risk of dma mapping multiple ranges on the same
+cacheline. Also having dma and cpu written data on the same cacheline
+will cause coherence issues.
 
-Hi Herbert,
+Signed-off-by: Radu Solea <radu.solea@nxp.com>
+---
+Hi!
 
-> > +		int err = _skcipher_recvmsg(sock, msg, ignored, flags);
-> > +
-> > +		/*
-> > +		 * This error covers -EIOCBQUEUED which implies that we can
-> > +		 * only handle one AIO request. If the caller wants to have
-> > +		 * multiple AIO requests in parallel, he must make multiple
-> > +		 * separate AIO calls.
-> > +		 */
-> > +		if (err < 0) {
-> > +			ret = err;
-> > +			goto out;
-> 
-> This looks like a semantic change.  The previous code would return
-> the number of bytes already successfully processed in case of a
-> subsequent error.  With your new code you will always return the
-> error.
+I've encountered cache coherence issues when using GCM with CAAM and this was
+one way of fixing them but it has its drawbacks. Another would be to allocate
+each element instead of all at once, but that only decreases the likelyhood of
+this happening. Does anyone know of a better way of fixing this?
 
-In the current code, the synchronous returns the processed bytes whereas the 
-async case returns EIOCBQUEUED if this error occurs without returning the 
-processed bytes.
+Thanks,
+Radu.
 
-Thus, would you like to change that code into
+ crypto/gcm.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-if (err < 0) {
-	if (err == -EIOCBQUEUED)
-		ret = err;
-
-	goto out;
-}
-
-?
-
-
-> 
-> > @@ -724,10 +737,9 @@ static unsigned int skcipher_poll(struct file *file,
-> > struct socket *sock,> 
-> >  	struct sock *sk = sock->sk;
-> >  	struct alg_sock *ask = alg_sk(sk);
-> >  	struct skcipher_ctx *ctx = ask->private;
-> > 
-> > -	unsigned int mask;
-> > +	unsigned int mask = 0;
-> > 
-> >  	sock_poll_wait(file, sk_sleep(sk), wait);
-> > 
-> > -	mask = 0;
-> > 
-> >  	if (ctx->used)
-> >  	
-> >  		mask |= POLLIN | POLLRDNORM;
-> 
-> Please remove this hunk as it has nothing to do with this patch.
-
-Removed.
-
-Thanks
-
-Ciao
-Stephan
+diff --git a/crypto/gcm.c b/crypto/gcm.c
+index b7ad808..657eefe 100644
+--- a/crypto/gcm.c
++++ b/crypto/gcm.c
+@@ -117,9 +117,9 @@ static int crypto_gcm_setkey(struct crypto_aead *aead, const u8 *key,
+ 	struct crypto_skcipher *ctr = ctx->ctr;
+ 	struct {
+ 		be128 hash;
+-		u8 iv[16];
++		u8 iv[16] ____cacheline_aligned;
+ 
+-		struct crypto_gcm_setkey_result result;
++		struct crypto_gcm_setkey_result result ____cacheline_aligned;
+ 
+ 		struct scatterlist sg[1];
+ 		struct skcipher_request req;
+-- 
+2.7.4
