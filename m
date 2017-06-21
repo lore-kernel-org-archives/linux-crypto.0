@@ -1,52 +1,67 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: sun4i-ss: support the Security System PRNG
-Date: Thu, 22 Jun 2017 07:47:10 +0800
-Message-ID: <20170621234710.GA22306@gondor.apana.org.au>
-References: <20170620085819.20114-1-clabbe.montjoie@gmail.com>
- <20170620095947.i3r3iym2cxz5jciw@flea.lan>
- <20170620114536.GA4766@Red>
- <20170621064855.z5mu4f3r3dt4kotc@flea.lan>
+From: Jeffrey Walton <noloader@gmail.com>
+Subject: Re: [PATCH] random: silence compiler warnings and fix race
+Date: Wed, 21 Jun 2017 19:50:48 -0400
+Message-ID: <CAH8yC8n-2SuRg3oD7pDRH8itJRoifSo=GQq13dDKBK1yjM_hoA@mail.gmail.com>
+References: <20170614192838.3jz4sxpcuhxygx4z@breakpoint.cc>
+ <20170614224526.29076-1-Jason@zx2c4.com> <CAHmME9rv3EjOVF4LhYZ0VS2LYKjDr_-TxzNHvyE_mKZ_UX0+eA@mail.gmail.com>
+ <20170620060344.ngbnzg2mz5hvq4kw@thunk.org> <CAHmME9oHZz44uQ1tq=M=Vrxc5NY-2r4xFjbwge-Hp=U-cCEYfQ@mail.gmail.com>
+ <CAH8yC8kLHL80_i2WRssgE3chL3iU-6dwvdkM-MoaPx4mtjx-kg@mail.gmail.com>
+ <CAHmME9rk-qrjJs6ZXQPoWV0sKBK_juq18tcE1h+pX8zSJJK1iQ@mail.gmail.com>
+ <20170620093642.3ri6dct5qkf7vhuc@thunk.org> <CAHmME9oOUo-A-0NA5qPvcbTRf+xYKxmOtXb9fXVCmLwLcWPWug@mail.gmail.com>
+ <20170620233836.75k5usug5w3xhwlw@thunk.org>
+Reply-To: noloader@gmail.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Corentin Labbe <clabbe.montjoie@gmail.com>, davem@davemloft.net,
-        wens@csie.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-To: Maxime Ripard <maxime.ripard@free-electrons.com>
+Content-Type: text/plain; charset="UTF-8"
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Jeffrey Walton <noloader@gmail.com>, tglx@breakpoint.cc,
+        David Miller <davem@davemloft.net>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Eric Biggers <ebiggers3@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        kernel-hardening@lists.openwall.com,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:33632 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751689AbdFUXrk (ORCPT
+Received: from mail-ot0-f178.google.com ([74.125.82.178]:36466 "EHLO
+        mail-ot0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752165AbdFUXut (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Jun 2017 19:47:40 -0400
-Content-Disposition: inline
-In-Reply-To: <20170621064855.z5mu4f3r3dt4kotc@flea.lan>
+        Wed, 21 Jun 2017 19:50:49 -0400
+In-Reply-To: <20170620233836.75k5usug5w3xhwlw@thunk.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jun 21, 2017 at 08:48:55AM +0200, Maxime Ripard wrote:
-> On Tue, Jun 20, 2017 at 01:45:36PM +0200, Corentin Labbe wrote:
-> > On Tue, Jun 20, 2017 at 11:59:47AM +0200, Maxime Ripard wrote:
-> > > Hi,
-> > > 
-> > > On Tue, Jun 20, 2017 at 10:58:19AM +0200, Corentin Labbe wrote:
-> > > > The Security System have a PRNG, this patch add support for it via
-> > > > crypto_rng.
-> > > 
-> > > This might be a dumb question, but is the CRYPTO_RNG code really
-> > > supposed to be used with PRNG?
-> > > 
-> > 
-> > Yes, see recently added drivers/crypto/exynos-rng.c
-> 
-> It's still not really clear from the commit log (if you're talking
-> about c46ea13f55b6) why and if using the RNG code for a PRNG is a good
-> idea.
+On Tue, Jun 20, 2017 at 7:38 PM, Theodore Ts'o <tytso@mit.edu> wrote:
+> On Tue, Jun 20, 2017 at 11:49:07AM +0200, Jason A. Donenfeld wrote:
+>> ...
+>>> I more or less agree with you that we should just turn this on for all
+>>> users and they'll just have to live with the spam and report odd
+>>> entries, and overtime we'll fix all the violations.
+>
+> There seems to be a fundamental misapprehension that it will be easy
+> to "fix all the violations".  For certain hardware types, this is
+> not easy, and the "eh, let them get spammed until we get around to
+> fixing it" attitude is precisely what I was pushing back against.
 
-The hwrng interface is meant for true hardware RNGs.  The crypto API
-rng interface is primarily intended for PRNGs.
+I can't speak for others, but for me: I think they will fall into
+three categories:
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+ 1. easy to fix
+ 2. difficult to fix
+ 3. unable to fix
+
+(1) is low hanging fruit and they will probably (hopefully?) be
+cleared easily.  Like systemd on x86_64 with rdrand and rdseed.
+There's no reason for systemd to find itself starved of entropy on
+that platform. (cf., http://github.com/systemd/systemd/issues/4167).
+
+Organizations that find themselves in (3) can choose to use a board or
+server and accept the risk, or they can choose to remediate it in
+another way. The "other way" may include a capital expenditure and a
+hardware refresh.
+
+The central point is, they know about the risk and they can make the decision.
+
+Jeff
