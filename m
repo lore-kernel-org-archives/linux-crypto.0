@@ -1,62 +1,70 @@
-From: Radu Solea <radu.solea@nxp.com>
-Subject: Re: [RFC PATCH] gcm - fix setkey cache coherence issues
-Date: Thu, 22 Jun 2017 13:56:40 +0000
-Message-ID: <1498139799.26231.10.camel@nxp.com>
-References: <1498055361-12493-1-git-send-email-radu.solea@nxp.com>
-         <20170622024051.GA24529@gondor.apana.org.au>
-         <DB6PR04MB317607AE27DD1AC235D0103C8BDB0@DB6PR04MB3176.eurprd04.prod.outlook.com>
-         <20170622075338.GA25314@gondor.apana.org.au>
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: Re: [PATCH v2 1/7] staging: ccree: fix hash import/export
+Date: Thu, 22 Jun 2017 16:58:11 +0300
+Message-ID: <20170622135811.4wbh7dqi634j5d2c@mwanda>
+References: <1498138623-6126-1-git-send-email-gilad@benyossef.com>
+ <1498138623-6126-2-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: "davem@davemloft.net" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        =?utf-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@nxp.com>
-To: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        Ofir Drang <ofir.drang@arm.com>
+To: Gilad Ben-Yossef <gilad@benyossef.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-eopbgr00078.outbound.protection.outlook.com ([40.107.0.78]:30432
-        "EHLO EUR02-AM5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1750812AbdFVN4m (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Jun 2017 09:56:42 -0400
-In-Reply-To: <20170622075338.GA25314@gondor.apana.org.au>
-Content-Language: en-US
-Content-ID: <086E9349E24A0F489069A1FA2E6ABD4C@eurprd04.prod.outlook.com>
+Received: from userp1040.oracle.com ([156.151.31.81]:33787 "EHLO
+        userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750847AbdFVN6e (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 22 Jun 2017 09:58:34 -0400
+Content-Disposition: inline
+In-Reply-To: <1498138623-6126-2-git-send-email-gilad@benyossef.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-T24gSm8sIDIwMTctMDYtMjIgYXQgMTU6NTMgKzA4MDAsIEhlcmJlcnQgWHUgd3JvdGU6DQo+IE9u
-IFRodSwgSnVuIDIyLCAyMDE3IGF0IDA1OjAzOjQ0QU0gKzAwMDAsIFJhZHUgU29sZWEgd3JvdGU6
-DQo+ID4gDQo+ID4gSSdtIGFkZGluZyBfX19fY2FjaGVsaW5lX2FsaWduZWQgdG8gaXYgYW5kIHJl
-c3VsdC4gVGhhdCBpcyBkb25lIHNvDQo+ID4gaGFzaCwgaXYgYW5kIHJlc3VsdCBuZXZlciBzaGFy
-ZSBhIGNhY2hlIGxpbmUuDQo+IFllcyBidXQgeW91J3JlIGRvaW5nIGl0IGluIGNyeXB0by9nY20u
-YyB3aGljaCBpc24ndCBldmVuIHVzZWQgYnkNCj4gY2FhbSBBRkFJSy4NCj4gDQo+IENoZWVycywN
-Cg0KTXkgYmFkLCBJIG5lZWQgdG8gcHV0IHRoaXMgaW4gY29udGV4dCBiZXR0ZXIuIEZpcnN0LCBJ
-IHNhdyB0aGlzIGlzc3VlDQp3aXRoIENBQU0sIGJ1dCBpdCBoYXMgdGhlIHBvdGVudGlhbCB0byBp
-bXBhY3QgYW55IGltcGxlbWVudGF0aW9uIHRoYXQNCnRyaWVzIHRvIGFjY2VzcyB0aG9zZSBmaWVs
-ZHMgdGhyb3VnaCBETUEuwqANCg0KQ0FBTSBoYXMgYSBudW1iZXIgb2YgdmFyaWF0aW9ucyBvbmUg
-b2YgdGhlbSBpcyBjYWxsZWQgQ0FBTSBMUCwgaXQNCmRvZXNuJ3Qgc3VwcG9ydCBHQ00gYnV0IGl0
-IGNhbiBvZmZsb2FkIGN0cihhZXMpLiBXaGljaCBpdCB0cmllcyB0byBkbywNCmJ1dCBiZWNhdXNl
-IG9mIGhvdyB0aGlzIG1lbW9yeSBpcyBhbGxvY2F0ZWQsIHdoZW4gdGhlIENQVSB3cml0ZXMNCnJl
-c3VsdCwgdGhlIGNhY2hlIG1lY2hhbmlzbSBvdmVyd3JpdGVzIGhhc2ggYW5kIGl2IHdpdGggd2hh
-dGV2ZXIgd2FzDQp0aGVyZSBiZWZvcmUgdGhlIG9mZmxvYWQgaGFwcGVuZWQuIFRoaXMgaXMgbm90
-IHRoZSBvbmx5IHByb2JsZW0sIERNQQ0Kd3JpdGluZyB0d28gZmllbGRzIG9uIHRoZSBzYW1lIGNh
-Y2hlbGluZSBpcyBsaWtlbHkgdG8gY2F1c2UgaXNzdWVzIHRvbzoNCg0KZnJvbcKgaHR0cHM6Ly93
-d3cua2VybmVsLm9yZy9kb2MvRG9jdW1lbnRhdGlvbi9ETUEtQVBJLnR4dA0KTWVtb3J5IGNvaGVy
-ZW5jeSBvcGVyYXRlcyBhdCBhIGdyYW51bGFyaXR5IGNhbGxlZCB0aGUgY2FjaGUNCmxpbmUgd2lk
-dGguwqDCoEluIG9yZGVyIGZvciBtZW1vcnkgbWFwcGVkIGJ5IHRoaXMgQVBJIHRvIG9wZXJhdGUN
-CmNvcnJlY3RseSwgdGhlIG1hcHBlZCByZWdpb24gbXVzdCBiZWdpbiBleGFjdGx5IG9uIGEgY2Fj
-aGUgbGluZQ0KYm91bmRhcnkgYW5kIGVuZCBleGFjdGx5IG9uIG9uZSAodG8gcHJldmVudCB0d28g
-c2VwYXJhdGVseSBtYXBwZWQNCnJlZ2lvbnMgZnJvbSBzaGFyaW5nIGEgc2luZ2xlIGNhY2hlIGxp
-bmUpLsKgwqBTaW5jZSB0aGUgY2FjaGUgbGluZSBzaXplDQptYXkgbm90IGJlIGtub3duIGF0IGNv
-bXBpbGUgdGltZSwgdGhlIEFQSSB3aWxsIG5vdCBlbmZvcmNlIHRoaXMNCnJlcXVpcmVtZW50LsKg
-wqBUaGVyZWZvcmUsIGl0IGlzIHJlY29tbWVuZGVkIHRoYXQgZHJpdmVyIHdyaXRlcnMgd2hvDQpk
-b24ndCB0YWtlIHNwZWNpYWwgY2FyZSB0byBkZXRlcm1pbmUgdGhlIGNhY2hlIGxpbmUgc2l6ZSBh
-dCBydW4gdGltZQ0Kb25seSBtYXAgdmlydHVhbCByZWdpb25zIHRoYXQgYmVnaW4gYW5kIGVuZCBv
-biBwYWdlIGJvdW5kYXJpZXMgKHdoaWNoDQphcmUgZ3VhcmFudGVlZCBhbHNvIHRvIGJlIGNhY2hl
-IGxpbmUgYm91bmRhcmllcykuDQoNClRoZXJlIGFyZSB0d28gd2F5cyBvZiBmaXhpbmcgdGhpcyBB
-RkFJSzogdGhlIGZpcnN0IGlzIGFkZGluZw0KY2FjaGVsaW5lX2FsaWduZWQgc28gdGhvc2UgZmll
-bGRzIGRvbid0IGZhbGwgaW50byB0aGUgc2FtZSBjYWNoZWxpbmUuDQpUaGUgc2Vjb25kIGlzIHRv
-IGt6YWxsb2MgaGFzaCBhbmQgaXYgc2VwYXJhdGVseS4ga21hbGxvYyBzaG91bGQgaG9ub3INCkFS
-Q0hfRE1BX01JTkFMSUdOIHdoaWNoIHdvdWxkIG1ha2UgdGhpcyBpc3N1ZSBnbyBhd2F5LsKgDQoN
-CkNoZWVycywNClJhZHUu
+On Thu, Jun 22, 2017 at 04:36:55PM +0300, Gilad Ben-Yossef wrote:
+>  static int ssi_ahash_export(struct ahash_request *req, void *out)
+>  {
+>  	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
+>  	struct ssi_hash_ctx *ctx = crypto_ahash_ctx(ahash);
+> +	struct device *dev = &ctx->drvdata->plat_dev->dev;
+> +	struct ahash_req_ctx *state = ahash_request_ctx(req);
+> +	u8 *curr_buff = state->buff_index ? state->buff1 : state->buff0;
+> +	u32 curr_buff_cnt = state->buff_index ? state->buff1_cnt :
+> +				state->buff0_cnt;
+> +	const u32 tmp = CC_EXPORT_MAGIC;
+> +
+> +	CHECK_AND_RETURN_UPON_FIPS_ERROR();
+>  
+> -	return ssi_hash_export(ctx, out);
+> +	memcpy(out, &tmp, sizeof(u32));
+> +	out += sizeof(u32);
+> +
+> +	dma_sync_single_for_cpu(dev, state->digest_buff_dma_addr,
+> +				ctx->inter_digestsize, DMA_BIDIRECTIONAL);
+> +	memcpy(out, state->digest_buff, ctx->inter_digestsize);
+> +	out += ctx->inter_digestsize;
+> +
+> +	if (state->digest_bytes_len_dma_addr) {
+> +		dma_sync_single_for_cpu(dev, state->digest_bytes_len_dma_addr,
+> +					HASH_LEN_SIZE, DMA_BIDIRECTIONAL);
+> +		memcpy(out, state->digest_bytes_len, HASH_LEN_SIZE);
+> +	}
+> +	out += HASH_LEN_SIZE;
+
+I'm sorry to ask this question now instead of on my first review.  I was
+waiting for my other computer to get ready so I could look up how this
+is called.  But now that I've looked at it, I'm still not sure how this
+is called.
+
+Anyway, my question is, is out zeroed memory?  Should we have something
+like:
+	} else {
+		memset(out, 0, HASH_LEN_SIZE);
+	}
+	out += HASH_LEN_SIZE;
+
+The ->import() function has a similar snippet.
+
+regards,
+dan carpenter
