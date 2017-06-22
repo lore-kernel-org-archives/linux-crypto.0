@@ -1,17 +1,17 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [PATCH V2] staging: ccree: - style fix, spaces and tabs
-Date: Thu, 22 Jun 2017 16:40:20 +0300
-Message-ID: <CAOtvUMdZkQhx_P4n4kHJsFuGJ1D1ptV2yZ5x9sXuT6hkSPTuRw@mail.gmail.com>
-References: <20170617024405.13672-1-robsonde@gmail.com>
+Subject: Re: [PATCH] staging: ccree: fix coding style error
+Date: Thu, 22 Jun 2017 16:42:10 +0300
+Message-ID: <CAOtvUMf=eNb3x1Tb-pKJeEZiwgBjMyOQaz6D=s++kbOu4u2ViQ@mail.gmail.com>
+References: <1497970324-9725-1-git-send-email-fbihjmeric@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Cc: devel@driverdev.osuosl.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
  driverdev-devel@linuxdriverproject.org, linux-crypto@vger.kernel.org,
  Linux kernel mailing list <linux-kernel@vger.kernel.org>
-To: Derek Robson <robsonde@gmail.com>
+To: Jhih-Ming Huang <fbihjmeric@gmail.com>
 Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-In-Reply-To: <20170617024405.13672-1-robsonde@gmail.com>
+In-Reply-To: <1497970324-9725-1-git-send-email-fbihjmeric@gmail.com>
 List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
  <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
 List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
@@ -23,20 +23,18 @@ Errors-To: driverdev-devel-bounces@linuxdriverproject.org
 Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-On Sat, Jun 17, 2017 at 5:44 AM, Derek Robson <robsonde@gmail.com> wrote:
-> Changed code indent to be tabs across whole driver
-> Found using checkpatch
+On Tue, Jun 20, 2017 at 5:51 PM, Jhih-Ming Huang <fbihjmeric@gmail.com> wrote:
 >
-> Signed-off-by: Derek Robson <robsonde@gmail.com>
+> Hi,
 >
-> V1 had vague subject.
+> This patch fix all coding style error in driver/staging/ccree/ssi_aead.c.
+
+For patches 1-6:
 
 Acked-by: Gilad Ben-Yossef <gilad@benyossef.com>
 
 Thanks you,
 Gilad
-
-
 
 
 -- 
