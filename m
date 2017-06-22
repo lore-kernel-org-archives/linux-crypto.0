@@ -1,36 +1,37 @@
-From: Logan Gunthorpe <logang@deltatee.com>
-Subject: Re: [PATCH 4/7] alpha: provide ioread64 and iowrite64 implementations
-Date: Thu, 22 Jun 2017 11:30:42 -0600
-Message-ID: <0d2f1f7c-d014-5ddf-ad5c-64f13cb5a64a@deltatee.com>
-References: <20170622164817.25515-1-logang@deltatee.com>
- <20170622164817.25515-5-logang@deltatee.com>
- <E70FB7EB-3A05-4A08-A85E-020F47751E3B@raithlin.com>
+From: Kyle McMartin <kyle@infradead.org>
+Subject: Re: [PATCH 1/1] cavium: Add firmware for CNN55XX crypto driver.
+Date: Thu, 22 Jun 2017 12:09:36 -0700
+Message-ID: <20170622190936.GL13400@bombadil.infradead.org>
+References: <20170616142226.3950-1-Jampala.Srikanth@cavium.com>
+ <20170616142226.3950-2-Jampala.Srikanth@cavium.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Richard Henderson <rth@twiddle.net>,
-        Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
-        Matt Turner <mattst88@gmail.com>
-To: Stephen Bates <sbates@raithlin.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
-        "linux-ntb@googlegroups.com" <linux-ntb@googlegroups.com>,
-        "linux-alpha@vger.kernel.org" <linux-alpha@vger.kernel.org>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <E70FB7EB-3A05-4A08-A85E-020F47751E3B@raithlin.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Sreerama.Gadam@cavium.com, linux-firmware@kernel.org
+To: Srikanth Jampala <Jampala.Srikanth@cavium.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([65.50.211.133]:47806 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751953AbdFVTJk (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 22 Jun 2017 15:09:40 -0400
+Content-Disposition: inline
+In-Reply-To: <20170616142226.3950-2-Jampala.Srikanth@cavium.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 6/22/2017 11:29 AM, Stephen  Bates wrote:
->> +#define iowrite64be(v,p) iowrite32(cpu_to_be64(v), (p))
->
-> Logan, thanks for taking this cleanup on. I think this should be iowrite64 not iowrite32?
+On Fri, Jun 16, 2017 at 07:52:26PM +0530, Srikanth Jampala wrote:
+> This patchset adds the firmware for CNN55XX cryto driver,
+> supports Symmetric crypto operations.
+> 
+> The version of the firmware is v07.
+> 
+> Signed-off-by: Srikanth Jampala <Jampala.Srikanth@cavium.com>
+> ---
+>  WHENCE        |   9 +++++++++
+>  cnn55xx_se.fw | Bin 0 -> 27698 bytes
 
-Yup, good catch. Thanks. I'll fix it in a v2 of this series.
+any chance i could convince you to put this in a cavium/ subdirectory?
 
-Logan
+--kyle
