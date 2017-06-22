@@ -1,18 +1,19 @@
-From: "Stephen  Bates" <sbates@raithlin.com>
+From: Logan Gunthorpe <logang@deltatee.com>
 Subject: Re: [PATCH 4/7] alpha: provide ioread64 and iowrite64 implementations
-Date: Thu, 22 Jun 2017 17:29:28 +0000
-Message-ID: <E70FB7EB-3A05-4A08-A85E-020F47751E3B@raithlin.com>
+Date: Thu, 22 Jun 2017 11:30:42 -0600
+Message-ID: <0d2f1f7c-d014-5ddf-ad5c-64f13cb5a64a@deltatee.com>
 References: <20170622164817.25515-1-logang@deltatee.com>
  <20170622164817.25515-5-logang@deltatee.com>
+ <E70FB7EB-3A05-4A08-A85E-020F47751E3B@raithlin.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Cc: Arnd Bergmann <arnd@arndb.de>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Richard Henderson <rth@twiddle.net>,
-        "Ivan Kokshaysky" <ink@jurassic.park.msu.ru>,
+        Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
         Matt Turner <mattst88@gmail.com>
-To: Logan Gunthorpe <logang@deltatee.com>,
+To: Stephen Bates <sbates@raithlin.com>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
         "linux-ntb@googlegroups.com" <linux-ntb@googlegroups.com>,
@@ -20,18 +21,16 @@ To: Logan Gunthorpe <logang@deltatee.com>,
         "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-eopbgr660109.outbound.protection.outlook.com ([40.107.66.109]:44213
-        "EHLO CAN01-QB1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751835AbdFVR3b (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Jun 2017 13:29:31 -0400
-In-Reply-To: <20170622164817.25515-5-logang@deltatee.com>
-Content-Language: en-US
-Content-ID: <5D9297D421B415469B6810A66E426463@CANPRD01.PROD.OUTLOOK.COM>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <E70FB7EB-3A05-4A08-A85E-020F47751E3B@raithlin.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-PiArI2RlZmluZSBpb3dyaXRlNjRiZSh2LHApIGlvd3JpdGUzMihjcHVfdG9fYmU2NCh2KSwgKHAp
-KQ0KIA0KTG9nYW4sIHRoYW5rcyBmb3IgdGFraW5nIHRoaXMgY2xlYW51cCBvbi4gSSB0aGluayB0
-aGlzIHNob3VsZCBiZSBpb3dyaXRlNjQgbm90IGlvd3JpdGUzMj8NCg0KU3RlcGhlbg0KDQoNCg==
+On 6/22/2017 11:29 AM, Stephen  Bates wrote:
+>> +#define iowrite64be(v,p) iowrite32(cpu_to_be64(v), (p))
+>
+> Logan, thanks for taking this cleanup on. I think this should be iowrite64 not iowrite32?
+
+Yup, good catch. Thanks. I'll fix it in a v2 of this series.
+
+Logan
