@@ -1,44 +1,57 @@
-From: Raj Ammanur <rammanur@arista.com>
-Subject: Re: XFRM Stats
-Date: Wed, 21 Jun 2017 22:20:05 -0700
-Message-ID: <CAMFBXf=9y=c7EP1rBKDL51e2QB0KqFTHaDAFaLPUMv+eCeyYww@mail.gmail.com>
-References: <CAMFBXfmPTjuSkC+Wv9woBG36cqYTexmqoYE4C-iW-jRjYvRdiA@mail.gmail.com>
- <20170622024211.GA24666@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: [PATCH 0/7] staging: ccree: bug fixes and TODO items for 4.13
+Date: Thu, 22 Jun 2017 10:07:46 +0300
+Message-ID: <1498115276-1601-1-git-send-email-gilad@benyossef.com>
+Cc: Ofir Drang <ofir.drang@arm.com>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ua0-f171.google.com ([209.85.217.171]:34397 "EHLO
-        mail-ua0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752486AbdFVFUH (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Jun 2017 01:20:07 -0400
-Received: by mail-ua0-f171.google.com with SMTP id z22so5726326uah.1
-        for <linux-crypto@vger.kernel.org>; Wed, 21 Jun 2017 22:20:06 -0700 (PDT)
-In-Reply-To: <20170622024211.GA24666@gondor.apana.org.au>
+Received: from foss.arm.com ([217.140.101.70]:33328 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751143AbdFVHIF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 22 Jun 2017 03:08:05 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-oops yes, completely forgot the lifetime stats. Thanks Herbert.
+An assortment of bug fixes and staging TODO items.
+Highlights includes the driver passing crypto testmgr boot tests
+and support of multiple HW revs. without build time changes.
 
-I will check this out, but after a rekey, are the stats still preserved?
+Gilad Ben-Yossef (7):
+  staging: ccree: fix hash import/export
+  staging: ccree: register setkey for none hash macs
+  staging: ccree: add support for older HW revisions
+  staging: ccree: remove unused function
+  staging: ccree: add clock management support
+  staging: ccree: add DT bus coherency detection
+  staging: ccree: use signal safe completion wait
 
-thanks
---Raj
+ drivers/staging/ccree/Kconfig            |   7 +-
+ drivers/staging/ccree/Makefile           |   2 +-
+ drivers/staging/ccree/cc_crypto_ctx.h    |  16 --
+ drivers/staging/ccree/cc_hw_queue_defs.h |  14 +-
+ drivers/staging/ccree/cc_regs.h          |   7 +-
+ drivers/staging/ccree/dx_crys_kernel.h   |   1 +
+ drivers/staging/ccree/dx_host.h          |   3 +
+ drivers/staging/ccree/dx_reg_common.h    |   2 -
+ drivers/staging/ccree/ssi_aead.c         |  36 ++-
+ drivers/staging/ccree/ssi_buffer_mgr.c   |  37 +--
+ drivers/staging/ccree/ssi_cipher.c       |  27 +-
+ drivers/staging/ccree/ssi_config.h       |  20 --
+ drivers/staging/ccree/ssi_driver.c       | 170 +++++++++---
+ drivers/staging/ccree/ssi_driver.h       |  32 ++-
+ drivers/staging/ccree/ssi_fips_ll.c      |  59 +++--
+ drivers/staging/ccree/ssi_hash.c         | 441 ++++++++++++++++++-------------
+ drivers/staging/ccree/ssi_hash.h         |  12 +-
+ drivers/staging/ccree/ssi_pm.c           |  13 +-
+ drivers/staging/ccree/ssi_pm_ext.c       |  60 -----
+ drivers/staging/ccree/ssi_pm_ext.h       |  33 ---
+ drivers/staging/ccree/ssi_request_mgr.c  |  22 +-
+ drivers/staging/ccree/ssi_sram_mgr.c     |  15 +-
+ 22 files changed, 564 insertions(+), 465 deletions(-)
+ delete mode 100644 drivers/staging/ccree/ssi_pm_ext.c
+ delete mode 100644 drivers/staging/ccree/ssi_pm_ext.h
 
-On Wed, Jun 21, 2017 at 7:42 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> Raj Ammanur <rammanur@arista.com> wrote:
->> Hi Crypto/Xfrm Team,
->>
->> I was wondering if there has been any discussion in the past
->> about adding stats in Xfrm to count the packets going in/out of
->> this sub-system? Right now we only have error stats.
->
-> Have you looked at ip -s x s?
->
-> Cheers,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+-- 
+2.1.4
