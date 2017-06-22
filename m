@@ -1,153 +1,314 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [PATCH 6/7] staging: ccree: add DT bus coherency detection
-Date: Thu, 22 Jun 2017 16:34:00 +0300
-Message-ID: <CAOtvUMc8Q2KxUuVCqJBdyhanQAwWiTxdcJepftdgYkNySrh-Rw@mail.gmail.com>
-References: <1498115276-1601-1-git-send-email-gilad@benyossef.com>
- <1498115276-1601-7-git-send-email-gilad@benyossef.com>
- <20170622090417.ww5lgtjlhve5wd74@mwanda>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: devel@driverdev.osuosl.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- driverdev-devel@linuxdriverproject.org,
- Linux kernel mailing list <linux-kernel@vger.kernel.org>,
- linux-crypto@vger.kernel.org, Ofir Drang <ofir.drang@arm.com>
-To: Dan Carpenter <dan.carpenter@oracle.com>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-In-Reply-To: <20170622090417.ww5lgtjlhve5wd74@mwanda>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+Subject: [PATCH v2 1/7] staging: ccree: fix hash import/export
+Date: Thu, 22 Jun 2017 16:36:55 +0300
+Message-ID: <1498138623-6126-2-git-send-email-gilad@benyossef.com>
+References: <1498138623-6126-1-git-send-email-gilad@benyossef.com>
+Cc: Ofir Drang <ofir.drang@arm.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1498138623-6126-1-git-send-email-gilad@benyossef.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jun 22, 2017 at 12:04 PM, Dan Carpenter
-<dan.carpenter@oracle.com> wrote:
-> On Thu, Jun 22, 2017 at 10:07:52AM +0300, Gilad Ben-Yossef wrote:
->> The ccree driver has build time configurable support
->> to work on top of coherent (e.g. ACP) vs. none coherent bus
->> connections. Turn it to run-time configurable option
->> based on device tree.
->>
->> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
->> ---
->>  drivers/staging/ccree/ssi_buffer_mgr.c | 37 ++++++++++++++++++----------------
->>  drivers/staging/ccree/ssi_config.h     | 20 ------------------
->>  drivers/staging/ccree/ssi_driver.c     | 14 +++++++++----
->>  drivers/staging/ccree/ssi_driver.h     |  3 +++
->>  4 files changed, 33 insertions(+), 41 deletions(-)
->>
->> diff --git a/drivers/staging/ccree/ssi_buffer_mgr.c b/drivers/staging/ccree/ssi_buffer_mgr.c
->> index 88ebda8..75810dc 100644
->> --- a/drivers/staging/ccree/ssi_buffer_mgr.c
->> +++ b/drivers/staging/ccree/ssi_buffer_mgr.c
->> @@ -627,6 +627,9 @@ void ssi_buffer_mgr_unmap_aead_request(
->>       struct aead_req_ctx *areq_ctx = aead_request_ctx(req);
->>       unsigned int hw_iv_size = areq_ctx->hw_iv_size;
->>       struct crypto_aead *tfm = crypto_aead_reqtfm(req);
->> +     struct ssi_drvdata *drvdata =
->> +             (struct ssi_drvdata *)dev_get_drvdata(dev);
->
-> The cast is not needed.
->
->> +
->
-> Don't put a blank in the middle of the declaration block.
->
->>       u32 dummy;
->>       bool chained;
->>       u32 size_to_unmap = 0;
+Hash import and export was saving and restoring the wrong context
+and therefore disabled. Fix it by restoring intermediate digest
+and additional state needed.
 
-Will fix.
+The hash and mac transform now pass testmgr partial hash tests.
 
->
-> [ snip ]
->
->> @@ -981,20 +983,22 @@ static inline int ssi_buffer_mgr_prepare_aead_data_mlli(
->>                        * MAC verification upon request completion
->>                        */
->>                       if (direct == DRV_CRYPTO_DIRECTION_DECRYPT) {
->> -#if !DX_HAS_ACP
->> -                             /* In ACP platform we already copying ICV
->> -                              * for any INPLACE-DECRYPT operation, hence
->> +                             if (!drvdata->coherent) {
->> +                             /* In coherent platforms (e.g. ACP)
->> +                              * already copying ICV for any
->> +                              * INPLACE-DECRYPT operation, hence
->>                                * we must neglect this code.
->>                                */
->> -                             u32 size_to_skip = req->assoclen;
->> -                             if (areq_ctx->is_gcm4543) {
->> -                                     size_to_skip += crypto_aead_ivsize(tfm);
->> +                                     u32 skip = req->assoclen;
->> +
->> +                                     if (areq_ctx->is_gcm4543)
->> +                                             skip += crypto_aead_ivsize(tfm);
->> +
->> +                                     ssi_buffer_mgr_copy_scatterlist_portion(
->> +areq_ctx->backup_mac, req->src,
->> +(skip + req->cryptlen - areq_ctx->req_authsize),
->> +skip + req->cryptlen, SSI_SG_TO_BUF);
->
->
-> Indenting is messed up.
+Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+---
+ drivers/staging/ccree/ssi_hash.c | 140 +++++++++++++++++++++++++++------------
+ drivers/staging/ccree/ssi_hash.h |   2 +
+ 2 files changed, 98 insertions(+), 44 deletions(-)
 
-Sigh... having a function with a name as long as
-ssi_buffer_mgr_copy_scatterlist_portion()
-with such a deep indentation level is what is really messed up (but
-that is for another patch
-to fix).
-
-I will indent it more sanely.
->
->>                               }
->> -                             ssi_buffer_mgr_copy_scatterlist_portion(
->> -                                     areq_ctx->backup_mac, req->src,
->> -                                     size_to_skip+ req->cryptlen - areq_ctx->req_authsize,
->> -                                     size_to_skip+ req->cryptlen, SSI_SG_TO_BUF);
->> -#endif
->>                               areq_ctx->icv_virt_addr = areq_ctx->backup_mac;
->>                       } else {
->>                               areq_ctx->icv_virt_addr = areq_ctx->mac_buf;
->
-> [ snip ]
->
->> @@ -533,7 +539,7 @@ int cc_clk_on(struct ssi_drvdata *drvdata)
->>       struct clk *clk = drvdata->clk;
->>
->>       if (IS_ERR(clk))
->> -     /* No all devices have a clock associated with CCREE */
->> +     /* Not all devices have a clock associated with CCREE */
->
-> This is not related.  Do unrelated things in different patches.  This
-> typo was introduced in an earlier patch.  There are a couple ways in git
-> to edit previous patches.
-
-Yes, this was not intended.
-
-
->
->>               goto out;
->>
->>       rc = clk_prepare_enable(clk);
->
-> regards,
-> dan carpenter
-
-Thanks for your time and great review comments!
-
-Gilad
-
-
+diff --git a/drivers/staging/ccree/ssi_hash.c b/drivers/staging/ccree/ssi_hash.c
+index ed1c672..c39e3be 100644
+--- a/drivers/staging/ccree/ssi_hash.c
++++ b/drivers/staging/ccree/ssi_hash.c
+@@ -976,22 +976,6 @@ static int ssi_hash_init(struct ahash_req_ctx *state, struct ssi_hash_ctx *ctx)
+ 	return 0;
+ }
+ 
+-#ifdef EXPORT_FIXED
+-static int ssi_hash_export(struct ssi_hash_ctx *ctx, void *out)
+-{
+-	CHECK_AND_RETURN_UPON_FIPS_ERROR();
+-	memcpy(out, ctx, sizeof(struct ssi_hash_ctx));
+-	return 0;
+-}
+-
+-static int ssi_hash_import(struct ssi_hash_ctx *ctx, const void *in)
+-{
+-	CHECK_AND_RETURN_UPON_FIPS_ERROR();
+-	memcpy(ctx, in, sizeof(struct ssi_hash_ctx));
+-	return 0;
+-}
+-#endif
+-
+ static int ssi_hash_setkey(void *hash,
+ 			   const u8 *key,
+ 			   unsigned int keylen,
+@@ -1782,23 +1766,104 @@ static int ssi_ahash_init(struct ahash_request *req)
+ 	return ssi_hash_init(state, ctx);
+ }
+ 
+-#ifdef EXPORT_FIXED
+ static int ssi_ahash_export(struct ahash_request *req, void *out)
+ {
+ 	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
+ 	struct ssi_hash_ctx *ctx = crypto_ahash_ctx(ahash);
++	struct device *dev = &ctx->drvdata->plat_dev->dev;
++	struct ahash_req_ctx *state = ahash_request_ctx(req);
++	u8 *curr_buff = state->buff_index ? state->buff1 : state->buff0;
++	u32 curr_buff_cnt = state->buff_index ? state->buff1_cnt :
++				state->buff0_cnt;
++	const u32 tmp = CC_EXPORT_MAGIC;
++
++	CHECK_AND_RETURN_UPON_FIPS_ERROR();
+ 
+-	return ssi_hash_export(ctx, out);
++	memcpy(out, &tmp, sizeof(u32));
++	out += sizeof(u32);
++
++	dma_sync_single_for_cpu(dev, state->digest_buff_dma_addr,
++				ctx->inter_digestsize, DMA_BIDIRECTIONAL);
++	memcpy(out, state->digest_buff, ctx->inter_digestsize);
++	out += ctx->inter_digestsize;
++
++	if (state->digest_bytes_len_dma_addr) {
++		dma_sync_single_for_cpu(dev, state->digest_bytes_len_dma_addr,
++					HASH_LEN_SIZE, DMA_BIDIRECTIONAL);
++		memcpy(out, state->digest_bytes_len, HASH_LEN_SIZE);
++	}
++	out += HASH_LEN_SIZE;
++
++	memcpy(out, &curr_buff_cnt, sizeof(u32));
++	out += sizeof(u32);
++
++	memcpy(out, curr_buff, curr_buff_cnt);
++
++	/* No sync for device ineeded since we did not change the data,
++	 * we only copy it
++	 */
++
++	return 0;
+ }
+ 
+ static int ssi_ahash_import(struct ahash_request *req, const void *in)
+ {
+ 	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
+ 	struct ssi_hash_ctx *ctx = crypto_ahash_ctx(ahash);
++	struct device *dev = &ctx->drvdata->plat_dev->dev;
++	struct ahash_req_ctx *state = ahash_request_ctx(req);
++	u32 tmp;
++	int rc;
++
++	CHECK_AND_RETURN_UPON_FIPS_ERROR();
+ 
+-	return ssi_hash_import(ctx, in);
++	memcpy(&tmp, in, sizeof(u32));
++	if (tmp != CC_EXPORT_MAGIC) {
++		rc = -EINVAL;
++		goto out;
++	}
++	in += sizeof(u32);
++
++	rc = ssi_hash_init(state, ctx);
++	if (rc)
++		goto out;
++
++	dma_sync_single_for_cpu(dev, state->digest_buff_dma_addr,
++				ctx->inter_digestsize, DMA_BIDIRECTIONAL);
++	memcpy(state->digest_buff, in, ctx->inter_digestsize);
++	in += ctx->inter_digestsize;
++
++	if (state->digest_bytes_len_dma_addr) {
++		dma_sync_single_for_cpu(dev, state->digest_bytes_len_dma_addr,
++					HASH_LEN_SIZE, DMA_BIDIRECTIONAL);
++		memcpy(state->digest_bytes_len, in, HASH_LEN_SIZE);
++	}
++	in += HASH_LEN_SIZE;
++
++	dma_sync_single_for_device(dev, state->digest_buff_dma_addr,
++				   ctx->inter_digestsize, DMA_BIDIRECTIONAL);
++
++	if (state->digest_bytes_len_dma_addr)
++		dma_sync_single_for_device(dev,
++					   state->digest_bytes_len_dma_addr,
++					   HASH_LEN_SIZE, DMA_BIDIRECTIONAL);
++
++	state->buff_index = 0;
++
++	/* Sanity check the data as much as possible */
++	memcpy(&tmp, in, sizeof(u32));
++	if (tmp > SSI_MAX_HASH_BLCK_SIZE) {
++		rc = -EINVAL;
++		goto out;
++	}
++	in += sizeof(u32);
++
++	state->buff0_cnt = tmp;
++	memcpy(state->buff0, in, state->buff0_cnt);
++
++out:
++	return rc;
+ }
+-#endif
+ 
+ static int ssi_ahash_setkey(struct crypto_ahash *ahash,
+ 			const u8 *key, unsigned int keylen)
+@@ -1820,6 +1885,9 @@ struct ssi_hash_template {
+ 	struct ssi_drvdata *drvdata;
+ };
+ 
++#define CC_STATE_SIZE(_x) \
++	((_x) + HASH_LEN_SIZE + SSI_MAX_HASH_BLCK_SIZE + (2 * sizeof(u32)))
++
+ /* hash descriptors */
+ static struct ssi_hash_template driver_hash[] = {
+ 	//Asynchronize hash template
+@@ -1836,14 +1904,12 @@ static struct ssi_hash_template driver_hash[] = {
+ 			.final = ssi_ahash_final,
+ 			.finup = ssi_ahash_finup,
+ 			.digest = ssi_ahash_digest,
+-#ifdef EXPORT_FIXED
+ 			.export = ssi_ahash_export,
+ 			.import = ssi_ahash_import,
+-#endif
+ 			.setkey = ssi_ahash_setkey,
+ 			.halg = {
+ 				.digestsize = SHA1_DIGEST_SIZE,
+-				.statesize = sizeof(struct sha1_state),
++				.statesize = CC_STATE_SIZE(SHA1_DIGEST_SIZE),
+ 			},
+ 		},
+ 		.hash_mode = DRV_HASH_SHA1,
+@@ -1862,14 +1928,12 @@ static struct ssi_hash_template driver_hash[] = {
+ 			.final = ssi_ahash_final,
+ 			.finup = ssi_ahash_finup,
+ 			.digest = ssi_ahash_digest,
+-#ifdef EXPORT_FIXED
+ 			.export = ssi_ahash_export,
+ 			.import = ssi_ahash_import,
+-#endif
+ 			.setkey = ssi_ahash_setkey,
+ 			.halg = {
+ 				.digestsize = SHA256_DIGEST_SIZE,
+-				.statesize = sizeof(struct sha256_state),
++				.statesize = CC_STATE_SIZE(SHA256_DIGEST_SIZE)
+ 			},
+ 		},
+ 		.hash_mode = DRV_HASH_SHA256,
+@@ -1888,14 +1952,12 @@ static struct ssi_hash_template driver_hash[] = {
+ 			.final = ssi_ahash_final,
+ 			.finup = ssi_ahash_finup,
+ 			.digest = ssi_ahash_digest,
+-#ifdef EXPORT_FIXED
+ 			.export = ssi_ahash_export,
+ 			.import = ssi_ahash_import,
+-#endif
+ 			.setkey = ssi_ahash_setkey,
+ 			.halg = {
+ 				.digestsize = SHA224_DIGEST_SIZE,
+-				.statesize = sizeof(struct sha256_state),
++				.statesize = CC_STATE_SIZE(SHA224_DIGEST_SIZE),
+ 			},
+ 		},
+ 		.hash_mode = DRV_HASH_SHA224,
+@@ -1915,14 +1977,12 @@ static struct ssi_hash_template driver_hash[] = {
+ 			.final = ssi_ahash_final,
+ 			.finup = ssi_ahash_finup,
+ 			.digest = ssi_ahash_digest,
+-#ifdef EXPORT_FIXED
+ 			.export = ssi_ahash_export,
+ 			.import = ssi_ahash_import,
+-#endif
+ 			.setkey = ssi_ahash_setkey,
+ 			.halg = {
+ 				.digestsize = SHA384_DIGEST_SIZE,
+-				.statesize = sizeof(struct sha512_state),
++				.statesize = CC_STATE_SIZE(SHA384_DIGEST_SIZE),
+ 			},
+ 		},
+ 		.hash_mode = DRV_HASH_SHA384,
+@@ -1941,14 +2001,12 @@ static struct ssi_hash_template driver_hash[] = {
+ 			.final = ssi_ahash_final,
+ 			.finup = ssi_ahash_finup,
+ 			.digest = ssi_ahash_digest,
+-#ifdef EXPORT_FIXED
+ 			.export = ssi_ahash_export,
+ 			.import = ssi_ahash_import,
+-#endif
+ 			.setkey = ssi_ahash_setkey,
+ 			.halg = {
+ 				.digestsize = SHA512_DIGEST_SIZE,
+-				.statesize = sizeof(struct sha512_state),
++				.statesize = CC_STATE_SIZE(SHA512_DIGEST_SIZE),
+ 			},
+ 		},
+ 		.hash_mode = DRV_HASH_SHA512,
+@@ -1968,14 +2026,12 @@ static struct ssi_hash_template driver_hash[] = {
+ 			.final = ssi_ahash_final,
+ 			.finup = ssi_ahash_finup,
+ 			.digest = ssi_ahash_digest,
+-#ifdef EXPORT_FIXED
+ 			.export = ssi_ahash_export,
+ 			.import = ssi_ahash_import,
+-#endif
+ 			.setkey = ssi_ahash_setkey,
+ 			.halg = {
+ 				.digestsize = MD5_DIGEST_SIZE,
+-				.statesize = sizeof(struct md5_state),
++				.statesize = CC_STATE_SIZE(MD5_DIGEST_SIZE),
+ 			},
+ 		},
+ 		.hash_mode = DRV_HASH_MD5,
+@@ -1993,13 +2049,11 @@ static struct ssi_hash_template driver_hash[] = {
+ 			.finup = ssi_mac_finup,
+ 			.digest = ssi_mac_digest,
+ 			.setkey = ssi_xcbc_setkey,
+-#ifdef EXPORT_FIXED
+ 			.export = ssi_ahash_export,
+ 			.import = ssi_ahash_import,
+-#endif
+ 			.halg = {
+ 				.digestsize = AES_BLOCK_SIZE,
+-				.statesize = sizeof(struct aeshash_state),
++				.statesize = CC_STATE_SIZE(AES_BLOCK_SIZE),
+ 			},
+ 		},
+ 		.hash_mode = DRV_HASH_NULL,
+@@ -2018,13 +2072,11 @@ static struct ssi_hash_template driver_hash[] = {
+ 			.finup = ssi_mac_finup,
+ 			.digest = ssi_mac_digest,
+ 			.setkey = ssi_cmac_setkey,
+-#ifdef EXPORT_FIXED
+ 			.export = ssi_ahash_export,
+ 			.import = ssi_ahash_import,
+-#endif
+ 			.halg = {
+ 				.digestsize = AES_BLOCK_SIZE,
+-				.statesize = sizeof(struct aeshash_state),
++				.statesize = CC_STATE_SIZE(AES_BLOCK_SIZE),
+ 			},
+ 		},
+ 		.hash_mode = DRV_HASH_NULL,
+diff --git a/drivers/staging/ccree/ssi_hash.h b/drivers/staging/ccree/ssi_hash.h
+index 7c94661..0bb99cb 100644
+--- a/drivers/staging/ccree/ssi_hash.h
++++ b/drivers/staging/ccree/ssi_hash.h
+@@ -39,6 +39,8 @@
+ #define XCBC_MAC_K2_OFFSET 16
+ #define XCBC_MAC_K3_OFFSET 32
+ 
++#define CC_EXPORT_MAGIC 0xC2EE1070U
++
+ // this struct was taken from drivers/crypto/nx/nx-aes-xcbc.c and it is used for xcbc/cmac statesize
+ struct aeshash_state {
+ 	u8 state[AES_BLOCK_SIZE];
 -- 
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-"If you take a class in large-scale robotics, can you end up in a
-situation where the homework eats your dog?"
- -- Jean-Baptiste Queru
+2.1.4
