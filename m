@@ -1,81 +1,29 @@
-From: Marek Vasut <marex@denx.de>
-Subject: Re: Regarding Porting of hardware cryptography to Linux kernel
-Date: Fri, 23 Jun 2017 20:13:51 +0200
-Message-ID: <1f623a19-10aa-b83b-8b0b-e490b34e60fc@denx.de>
-References: <CALWoFifFJVxnCX+_aq40zOdeZh86Gri47pP8oTmcFHAc-VjO_A@mail.gmail.com>
- <d96aa776-6693-8824-7da5-0487a6687169@denx.de>
- <CALWoFifTrdDP3jCR037JgnaR-Q3A4-EKVrb_TQxnKpEfdbvbng@mail.gmail.com>
+From: Pavel Machek <pavel@ucw.cz>
+Subject: Re: [PATCH 0/3] Introduce AMD Secure Processor device
+Date: Thu, 22 Jun 2017 15:25:40 +0200
+Message-ID: <20170622132539.GA14239@localhost>
+References: <20170622114204.4361-1-brijesh.singh@amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: sagar khadgi <sagar.khadgi@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-out.m-online.net ([212.18.0.9]:53732 "EHLO
-        mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754327AbdFWSci (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 23 Jun 2017 14:32:38 -0400
-In-Reply-To: <CALWoFifTrdDP3jCR037JgnaR-Q3A4-EKVrb_TQxnKpEfdbvbng@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        gary.hook@amd.com, thomas.lendacky@amd.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net
+To: Brijesh Singh <brijesh.singh@amd.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20170622114204.4361-1-brijesh.singh@amd.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 06/23/2017 07:16 AM, sagar khadgi wrote:
-> Hi Marek,
+On Thu 2017-06-22 06:42:01, Brijesh Singh wrote:
+> CCP device (drivers/crypto/ccp/ccp.ko) is part of AMD Secure Processor,
+> which is not dedicated solely to crypto. The AMD Secure Processor includes
+> CCP and PSP (Platform Secure Processor) devices.
+> 
+> This patch series adds a framework that allows functional component of the
+> AMD Secure Processor to be initialized and handled appropriately. The series
+> does not makes any logic modification into CCP - it refactors the code to
+> integerate CCP into AMD secure processor framework.
 
-Hi,
-
-> Thanks for replying.
-> 
-> Regarding Hardware:
-> 
-> I am using Xilinx zynq FPGA with Athena Core which as AES, RSA, DSA,
-> ECDSA, NRBG etc feature.
-> I am trying to integrate with Linux kernal. Can you please tell me is
-> there any document/example project/link which I can refer.
-
-Yes, see the link I posted in my previous email. Moreover, you can look
-into the drivers in the Linux kernel and inspire yourself there.
-
-> Thanks and regards,
-> Sagar
-> 
-> 
-> 
-> On Thu, Jun 22, 2017 at 5:27 PM, Marek Vasut <marex@denx.de
-> <mailto:marex@denx.de>> wrote:
-> 
->     On 06/22/2017 01:50 PM, sagar khadgi wrote:
->     > Hi Marek,
-> 
->     Hi,
-> 
->     > I am having one microcontroller which has AES, HMAC, SHA, DES, RSA, DSA,
->     > ECDSA cryptographic services. I want to port it to Linux Kernal so that
->     > I can access them through OpenSSL from user space.
->     >
->     > I am new to Linux. Can you please provide me any document or link for
->     > porting the hardware cryptography to Linux kernel.
-> 
->     Try https://www.kernel.org/doc/html/v4.11/crypto/index.html
->     <https://www.kernel.org/doc/html/v4.11/crypto/index.html>
-> 
->     unless you provide further details about your hardware, it's hard to
->     help you more.
-> 
->     > Thanking you in advance.
->     >
->     > Regards,
->     > Sagar
-> 
-> 
->     --
->     Best regards,
->     Marek Vasut
-> 
-> 
-
-
--- 
-Best regards,
-Marek Vasut
+Ok, so this is just preparation. When finished, what services will it provide
+to Linux userland?
