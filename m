@@ -1,316 +1,92 @@
-From: Gary R Hook <gary.hook@amd.com>
-Subject: Re: [PATCH 3/4] crypto: ccp - Add support for RSA on the CCP
-Date: Thu, 22 Jun 2017 12:09:23 -0500
-Message-ID: <41e00e7a-d93c-6493-5610-f337336e5ee5@amd.com>
-References: <20170621224655.15132.20473.stgit@taos.amd.com>
- <20170621224801.15132.99552.stgit@taos.amd.com>
- <1779770.Ceb2oF5o24@tauon.chronox.de>
+From: "Jiang, Dave" <dave.jiang@intel.com>
+Subject: RE: [PATCH 5/7] ntb: ntb_hw_intel: remove ioread64 and iowrite64 hacks
+Date: Thu, 22 Jun 2017 17:17:46 +0000
+Message-ID: <112A412BB11A1242B37129D931BCE53472F8DFF5@fmsmsx116.amr.corp.intel.com>
+References: <20170622164817.25515-1-logang@deltatee.com>
+ <20170622164817.25515-6-logang@deltatee.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 8bit
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>
-To: =?UTF-8?Q?Stephan_M=c3=bcller?= <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-dm3nam03on0056.outbound.protection.outlook.com ([104.47.41.56]:48544
-        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752392AbdFVRJg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Jun 2017 13:09:36 -0400
-In-Reply-To: <1779770.Ceb2oF5o24@tauon.chronox.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Jon Mason <jdmason@kudzu.us>, Allen Hubbe <Allen.Hubbe@emc.com>,
+ Arnd Bergmann <arnd@arndb.de>, Stephen Bates <sbates@raithlin.com>
+To: Logan Gunthorpe <logang@deltatee.com>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "linux-arch@vger.kernel.org"
+ <linux-arch@vger.kernel.org>, "linux-ntb@googlegroups.com"
+ <linux-ntb@googlegroups.com>, "linux-alpha@vger.kernel.org"
+ <linux-alpha@vger.kernel.org>, "linuxppc-dev@lists.ozlabs.org"
+ <linuxppc-dev@lists.ozlabs.org>, "linux-crypto@vger.kernel.org"
+ <linux-crypto@vger.kernel.org>, "dri-devel@lists.freedesktop.org"
+ <dri-devel@lists.freedesktop.org>
+Return-path: <dri-devel-bounces@lists.freedesktop.org>
+In-Reply-To: <20170622164817.25515-6-logang@deltatee.com>
+Content-Language: en-US
+List-Unsubscribe: <https://lists.freedesktop.org/mailman/options/dri-devel>,
+ <mailto:dri-devel-request@lists.freedesktop.org?subject=unsubscribe>
+List-Archive: <https://lists.freedesktop.org/archives/dri-devel>
+List-Post: <mailto:dri-devel@lists.freedesktop.org>
+List-Help: <mailto:dri-devel-request@lists.freedesktop.org?subject=help>
+List-Subscribe: <https://lists.freedesktop.org/mailman/listinfo/dri-devel>,
+ <mailto:dri-devel-request@lists.freedesktop.org?subject=subscribe>
+Errors-To: dri-devel-bounces@lists.freedesktop.org
+Sender: "dri-devel" <dri-devel-bounces@lists.freedesktop.org>
+List-Id: linux-crypto.vger.kernel.org
 
-On 06/22/2017 12:15 AM, Stephan Müller wrote:
-> Am Donnerstag, 22. Juni 2017, 00:48:01 CEST schrieb Gary R Hook:
->
-> Hi Gary,
-
-Thanks, Stephen. Good catch(es). I will re-work this, but it looks like 
-my changes should wait
-until after the patch set posted by Brijesh (Introduce AMD Secure 
-Processor device).
-
-Please ignore these for now.
-
-
->
->> Wire up the v3 CCP as a cipher provider.
->>
->> Signed-off-by: Gary R Hook <gary.hook@amd.com>
->> ---
->>  drivers/crypto/ccp/Makefile          |    1
->>  drivers/crypto/ccp/ccp-crypto-main.c |   21 ++
->>  drivers/crypto/ccp/ccp-crypto-rsa.c  |  286
->> ++++++++++++++++++++++++++++++++++ drivers/crypto/ccp/ccp-crypto.h      |
->> 31 ++++
->>  drivers/crypto/ccp/ccp-debugfs.c     |    1
->>  drivers/crypto/ccp/ccp-dev.c         |    1
->>  drivers/crypto/ccp/ccp-ops.c         |    2
->>  include/linux/ccp.h                  |    1
->>  8 files changed, 341 insertions(+), 3 deletions(-)
->>  create mode 100644 drivers/crypto/ccp/ccp-crypto-rsa.c
->>
->> diff --git a/drivers/crypto/ccp/Makefile b/drivers/crypto/ccp/Makefile
->> index 59493fd3a751..439bc2fcb464 100644
->> --- a/drivers/crypto/ccp/Makefile
->> +++ b/drivers/crypto/ccp/Makefile
->> @@ -15,4 +15,5 @@ ccp-crypto-objs := ccp-crypto-main.o \
->>                   ccp-crypto-aes-xts.o \
->>                   ccp-crypto-aes-galois.o \
->>                   ccp-crypto-des3.o \
->> +                ccp-crypto-rsa.o \
->>                   ccp-crypto-sha.o
->> diff --git a/drivers/crypto/ccp/ccp-crypto-main.c
->> b/drivers/crypto/ccp/ccp-crypto-main.c index 8dccbddabef1..dd7d00c680e7
->> 100644
->> --- a/drivers/crypto/ccp/ccp-crypto-main.c
->> +++ b/drivers/crypto/ccp/ccp-crypto-main.c
->> @@ -17,6 +17,7 @@
->>  #include <linux/ccp.h>
->>  #include <linux/scatterlist.h>
->>  #include <crypto/internal/hash.h>
->> +#include <crypto/internal/akcipher.h>
->>
->>  #include "ccp-crypto.h"
->>
->> @@ -37,10 +38,15 @@
->>  module_param(des3_disable, uint, 0444);
->>  MODULE_PARM_DESC(des3_disable, "Disable use of 3DES - any non-zero value");
->>
->> +static unsigned int rsa_disable;
->> +module_param(rsa_disable, uint, 0444);
->> +MODULE_PARM_DESC(rsa_disable, "Disable use of RSA - any non-zero value");
->> +
->>  /* List heads for the supported algorithms */
->>  static LIST_HEAD(hash_algs);
->>  static LIST_HEAD(cipher_algs);
->>  static LIST_HEAD(aead_algs);
->> +static LIST_HEAD(akcipher_algs);
->>
->>  /* For any tfm, requests for that tfm must be returned on the order
->>   * received.  With multiple queues available, the CCP can process more
->> @@ -358,6 +364,14 @@ static int ccp_register_algs(void)
->>                        return ret;
->>        }
->>
->> +     if (!rsa_disable) {
->> +             ret = ccp_register_rsa_algs(&akcipher_algs);
->> +             if (ret) {
->> +                     rsa_disable = 1;
->> +                     return ret;
->> +             }
->> +     }
->> +
->>        return 0;
->>  }
->>
->> @@ -366,6 +380,7 @@ static void ccp_unregister_algs(void)
->>        struct ccp_crypto_ahash_alg *ahash_alg, *ahash_tmp;
->>        struct ccp_crypto_ablkcipher_alg *ablk_alg, *ablk_tmp;
->>        struct ccp_crypto_aead *aead_alg, *aead_tmp;
->> +     struct ccp_crypto_akcipher_alg *akc_alg, *akc_tmp;
->>
->>        list_for_each_entry_safe(ahash_alg, ahash_tmp, &hash_algs, entry) {
->>                crypto_unregister_ahash(&ahash_alg->alg);
->> @@ -384,6 +399,12 @@ static void ccp_unregister_algs(void)
->>                list_del(&aead_alg->entry);
->>                kfree(aead_alg);
->>        }
->> +
->> +     list_for_each_entry_safe(akc_alg, akc_tmp, &akcipher_algs, entry) {
->> +             crypto_unregister_akcipher(&akc_alg->alg);
->> +             list_del(&akc_alg->entry);
->> +             kfree(akc_alg);
->> +     }
->>  }
->>
->>  static int ccp_crypto_init(void)
->> diff --git a/drivers/crypto/ccp/ccp-crypto-rsa.c
->> b/drivers/crypto/ccp/ccp-crypto-rsa.c new file mode 100644
->> index 000000000000..4a2a71463594
->> --- /dev/null
->> +++ b/drivers/crypto/ccp/ccp-crypto-rsa.c
->> @@ -0,0 +1,286 @@
->> +/*
->> + * AMD Cryptographic Coprocessor (CCP) RSA crypto API support
->> + *
->> + * Copyright (C) 2016 Advanced Micro Devices, Inc.
->> + *
->> + * Author: Gary R Hook <gary.hook@amd.com>
->> + *
->> + * This program is free software; you can redistribute it and/or modify
->> + * it under the terms of the GNU General Public License version 2 as
->> + * published by the Free Software Foundation.
->> + */
->> +
->> +#include <linux/module.h>
->> +#include <linux/sched.h>
->> +#include <linux/scatterlist.h>
->> +#include <linux/crypto.h>
->> +#include <crypto/algapi.h>
->> +#include <crypto/internal/rsa.h>
->> +#include <crypto/internal/akcipher.h>
->> +#include <crypto/akcipher.h>
->> +#include <crypto/scatterwalk.h>
->> +
->> +#include "ccp-crypto.h"
->> +
->> +static inline struct akcipher_request *akcipher_request_cast(
->> +     struct crypto_async_request *req)
->> +{
->> +     return container_of(req, struct akcipher_request, base);
->> +}
->> +
->> +static int ccp_rsa_complete(struct crypto_async_request *async_req, int
->> ret) +{
->> +     struct akcipher_request *req = akcipher_request_cast(async_req);
->> +     struct ccp_rsa_req_ctx *rctx = akcipher_request_ctx(req);
->> +
->> +     if (!ret)
->> +             req->dst_len = rctx->cmd.u.rsa.key_size >> 3;
->> +
->> +     ret = 0;
->> +
->> +     return ret;
->> +}
->> +
->> +static unsigned int ccp_rsa_maxsize(struct crypto_akcipher *tfm)
->> +{
->> +     return CCP_RSA_MAXMOD;
->> +}
->> +
->> +static int ccp_rsa_crypt(struct akcipher_request *req, bool encrypt)
->> +{
->> +     struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
->> +     struct ccp_ctx *ctx = akcipher_tfm_ctx(tfm);
->> +     struct ccp_rsa_req_ctx *rctx = akcipher_request_ctx(req);
->> +     int ret = 0;
->> +
->> +     memset(&rctx->cmd, 0, sizeof(rctx->cmd));
->> +     INIT_LIST_HEAD(&rctx->cmd.entry);
->> +     rctx->cmd.engine = CCP_ENGINE_RSA;
->> +
->> +     rctx->cmd.u.rsa.key_size = ctx->u.rsa.key_len; /* in bits */
->> +     if (encrypt) {
->> +             rctx->cmd.u.rsa.exp = &ctx->u.rsa.e_sg;
->> +             rctx->cmd.u.rsa.exp_len = ctx->u.rsa.e_len;
->> +     } else {
->> +             rctx->cmd.u.rsa.exp = &ctx->u.rsa.d_sg;
->> +             rctx->cmd.u.rsa.exp_len = ctx->u.rsa.d_len;
->> +     }
->> +     rctx->cmd.u.rsa.mod = &ctx->u.rsa.n_sg;
->> +     rctx->cmd.u.rsa.mod_len = ctx->u.rsa.n_len;
->> +     rctx->cmd.u.rsa.src = req->src;
->> +     rctx->cmd.u.rsa.src_len = req->src_len;
->> +     rctx->cmd.u.rsa.dst = req->dst;
->> +
->> +     ret = ccp_crypto_enqueue_request(&req->base, &rctx->cmd);
->> +
->> +     return ret;
->> +}
->> +
->> +static int ccp_rsa_encrypt(struct akcipher_request *req)
->> +{
->> +     return ccp_rsa_crypt(req, true);
->> +}
->> +
->> +static int ccp_rsa_decrypt(struct akcipher_request *req)
->> +{
->> +     return ccp_rsa_crypt(req, false);
->> +}
->> +
->> +static int ccp_check_key_length(unsigned int len)
->> +{
->> +     /* In bits */
->> +     if (len < 8 || len > 4096)
->> +             return -EINVAL;
->> +     return 0;
->> +}
->> +
->> +static void ccp_rsa_free_key_bufs(struct ccp_ctx *ctx)
->> +{
->> +     /* Clean up old key data */
->> +     kfree(ctx->u.rsa.e_buf);
->> +     ctx->u.rsa.e_buf = NULL;
->> +     ctx->u.rsa.e_len = 0;
->> +     kfree(ctx->u.rsa.n_buf);
->> +     ctx->u.rsa.n_buf = NULL;
->> +     ctx->u.rsa.n_len = 0;
->> +     kfree(ctx->u.rsa.d_buf);
->
-> kzfree, please
->
->> +     ctx->u.rsa.d_buf = NULL;
->> +     ctx->u.rsa.d_len = 0;
->> +}
->> +
->> +static int ccp_rsa_setkey(struct crypto_akcipher *tfm, const void *key,
->> +                       unsigned int keylen, bool private)
->> +{
->> +     struct ccp_ctx *ctx = akcipher_tfm_ctx(tfm);
->> +     struct rsa_key raw_key;
->> +     int key_len, i;
->> +     int ret;
->> +
->> +     ccp_rsa_free_key_bufs(ctx);
->> +     memset(&raw_key, 0, sizeof(raw_key));
->> +
->> +     /* Code borrowed from crypto/rsa.c */
->> +     if (private)
->> +             ret = rsa_parse_priv_key(&raw_key, key, keylen);
->> +     else
->> +             ret = rsa_parse_pub_key(&raw_key, key, keylen);
->> +     if (ret)
->> +             goto e_key;
->> +
->> +     /* Remove leading zeroes from the modulus (n) */
->
-> Three fragments doing the same -- isn't an inline cleaner here?
->
->> +     key_len = 0;
->> +     for (i = 0; i < raw_key.n_sz; i++)
->> +             if (raw_key.n[i]) {
->> +                     key_len = raw_key.n_sz - i;
->> +                     break;
->> +             }
->> +     ctx->u.rsa.key_len = key_len << 3; /* bits */
->> +     if (ccp_check_key_length(ctx->u.rsa.key_len)) {
->> +             ret = -EINVAL;
->> +             goto e_key;
->> +     }
->> +     ctx->u.rsa.n_len = key_len;
->> +     sg_init_one(&ctx->u.rsa.n_sg, raw_key.n + i, key_len);
->> +
->> +     /* Remove leading zeroes from the public key (e) */
->> +     key_len = 0;
->> +     for (i = 0; i < raw_key.e_sz; i++)
->> +             if (raw_key.e[i]) {
->> +                     key_len = raw_key.e_sz - i;
->> +                     break;
->> +             }
->> +     ctx->u.rsa.e_len = key_len;
->> +     sg_init_one(&ctx->u.rsa.e_sg, raw_key.e + i, key_len);
->> +
->> +     if (private) {
->> +             /* Remove leading zeroes from the private key (d) */
->> +             key_len = 0;
->> +             for (i = 0; i < raw_key.d_sz; i++)
->> +                     if (raw_key.d[i]) {
->> +                             key_len = raw_key.d_sz - i;
->> +                             break;
->> +                     }
->> +             ctx->u.rsa.d_len = key_len;
->> +             sg_init_one(&ctx->u.rsa.d_sg, raw_key.d + i, key_len);
->
-> As I see no memcpy for the key components, how is it ensured that the
-> caller's
-> memory holding the key will stay alive after a setkey call? Further,
-> wouldn'd
-> the ccp_rsa_free_key_bufs function cause a double free as it would act on
-> user-provided memory the user may also try to free?
->
-> Ciao
-> Stephan
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogbGludXgtbnRiQGdvb2ds
+ZWdyb3Vwcy5jb20gW21haWx0bzpsaW51eC1udGJAZ29vZ2xlZ3JvdXBzLmNvbV0gT24gQmVoYWxm
+IE9mIExvZ2FuIEd1bnRob3JwZQ0KPiBTZW50OiBUaHVyc2RheSwgSnVuZSAyMiwgMjAxNyA5OjQ4
+IEFNDQo+IFRvOiBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnOyBsaW51eC1hcmNoQHZnZXIu
+a2VybmVsLm9yZzsgbGludXgtbnRiQGdvb2dsZWdyb3Vwcy5jb207IGxpbnV4LWFscGhhQHZnZXIu
+a2VybmVsLm9yZzsgbGludXhwcGMtDQo+IGRldkBsaXN0cy5vemxhYnMub3JnOyBsaW51eC1jcnlw
+dG9Admdlci5rZXJuZWwub3JnOyBkcmktZGV2ZWxAbGlzdHMuZnJlZWRlc2t0b3Aub3JnDQo+IENj
+OiBBcm5kIEJlcmdtYW5uIDxhcm5kQGFybmRiLmRlPjsgR3JlZyBLcm9haC1IYXJ0bWFuIDxncmVn
+a2hAbGludXhmb3VuZGF0aW9uLm9yZz47IFN0ZXBoZW4gQmF0ZXMgPHNiYXRlc0ByYWl0aGxpbi5j
+b20+Ow0KPiBMb2dhbiBHdW50aG9ycGUgPGxvZ2FuZ0BkZWx0YXRlZS5jb20+OyBKb24gTWFzb24g
+PGpkbWFzb25Aa3VkenUudXM+OyBKaWFuZywgRGF2ZSA8ZGF2ZS5qaWFuZ0BpbnRlbC5jb20+OyBB
+bGxlbiBIdWJiZQ0KPiA8QWxsZW4uSHViYmVAZW1jLmNvbT4NCj4gU3ViamVjdDogW1BBVENIIDUv
+N10gbnRiOiBudGJfaHdfaW50ZWw6IHJlbW92ZSBpb3JlYWQ2NCBhbmQgaW93cml0ZTY0IGhhY2tz
+DQo+IA0KPiBOb3cgdGhhdCBpb3JlYWQ2NCBhbmQgaW93cml0ZTY0IGFyZSBhdmFpbGFibGUgZ2Vu
+ZXJpY2FsbHkgd2UgY2FuDQo+IHJlbW92ZSB0aGUgaGFjayBhdCB0aGUgdG9wIG9mIG50Yl9od19p
+bnRlbC5jIHRoYXQgcGF0Y2hlcyB0aGVtIGluDQo+IHdoZW4gdGhleSBhcmUgbm90IGF2YWlsYWJs
+ZS4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IExvZ2FuIEd1bnRob3JwZSA8bG9nYW5nQGRlbHRhdGVl
+LmNvbT4NCj4gQ2M6IEpvbiBNYXNvbiA8amRtYXNvbkBrdWR6dS51cz4NCj4gQ2M6IERhdmUgSmlh
+bmcgPGRhdmUuamlhbmdAaW50ZWwuY29tPg0KPiBDYzogQWxsZW4gSHViYmUgPEFsbGVuLkh1YmJl
+QGVtYy5jb20+DQoNClRoYW5rcyBmb3IgZG9pbmcgdGhpcyBMb2dhbi4gDQoNCkFja2VkLWJ5OiBE
+YXZlIEppYW5nIDxkYXZlLmppYW5nQGludGVsLmNvbT4NCg0KPiAtLS0NCj4gIGRyaXZlcnMvbnRi
+L2h3L2ludGVsL250Yl9od19pbnRlbC5jIHwgMzAgLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tDQo+ICAxIGZpbGUgY2hhbmdlZCwgMzAgZGVsZXRpb25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0
+IGEvZHJpdmVycy9udGIvaHcvaW50ZWwvbnRiX2h3X2ludGVsLmMgYi9kcml2ZXJzL250Yi9ody9p
+bnRlbC9udGJfaHdfaW50ZWwuYw0KPiBpbmRleCBjMDAyMzg0OTE2NzMuLjU2MjIxZDU0MGMyYiAx
+MDA2NDQNCj4gLS0tIGEvZHJpdmVycy9udGIvaHcvaW50ZWwvbnRiX2h3X2ludGVsLmMNCj4gKysr
+IGIvZHJpdmVycy9udGIvaHcvaW50ZWwvbnRiX2h3X2ludGVsLmMNCj4gQEAgLTE1MywzNSArMTUz
+LDYgQEAgTU9EVUxFX1BBUk1fREVTQyh4ZW9uX2IyYl9kc2RfYmFyNV9hZGRyMzIsDQo+ICBzdGF0
+aWMgaW5saW5lIGVudW0gbnRiX3RvcG8geGVvbl9wcGRfdG9wbyhzdHJ1Y3QgaW50ZWxfbnRiX2Rl
+diAqbmRldiwgdTggcHBkKTsNCj4gIHN0YXRpYyBpbnQgeGVvbl9pbml0X2lzcihzdHJ1Y3QgaW50
+ZWxfbnRiX2RldiAqbmRldik7DQo+IA0KPiAtI2lmbmRlZiBpb3JlYWQ2NA0KPiAtI2lmZGVmIHJl
+YWRxDQo+IC0jZGVmaW5lIGlvcmVhZDY0IHJlYWRxDQo+IC0jZWxzZQ0KPiAtI2RlZmluZSBpb3Jl
+YWQ2NCBfaW9yZWFkNjQNCj4gLXN0YXRpYyBpbmxpbmUgdTY0IF9pb3JlYWQ2NCh2b2lkIF9faW9t
+ZW0gKm1taW8pDQo+IC17DQo+IC0JdTY0IGxvdywgaGlnaDsNCj4gLQ0KPiAtCWxvdyA9IGlvcmVh
+ZDMyKG1taW8pOw0KPiAtCWhpZ2ggPSBpb3JlYWQzMihtbWlvICsgc2l6ZW9mKHUzMikpOw0KPiAt
+CXJldHVybiBsb3cgfCAoaGlnaCA8PCAzMik7DQo+IC19DQo+IC0jZW5kaWYNCj4gLSNlbmRpZg0K
+PiAtDQo+IC0jaWZuZGVmIGlvd3JpdGU2NA0KPiAtI2lmZGVmIHdyaXRlcQ0KPiAtI2RlZmluZSBp
+b3dyaXRlNjQgd3JpdGVxDQo+IC0jZWxzZQ0KPiAtI2RlZmluZSBpb3dyaXRlNjQgX2lvd3JpdGU2
+NA0KPiAtc3RhdGljIGlubGluZSB2b2lkIF9pb3dyaXRlNjQodTY0IHZhbCwgdm9pZCBfX2lvbWVt
+ICptbWlvKQ0KPiAtew0KPiAtCWlvd3JpdGUzMih2YWwsIG1taW8pOw0KPiAtCWlvd3JpdGUzMih2
+YWwgPj4gMzIsIG1taW8gKyBzaXplb2YodTMyKSk7DQo+IC19DQo+IC0jZW5kaWYNCj4gLSNlbmRp
+Zg0KPiAtDQo+ICBzdGF0aWMgaW5saW5lIGludCBwZGV2X2lzX2F0b20oc3RydWN0IHBjaV9kZXYg
+KnBkZXYpDQo+ICB7DQo+ICAJc3dpdGNoIChwZGV2LT5kZXZpY2UpIHsNCj4gQEAgLTMwMDgsNCAr
+Mjk3OSwzIEBAIHN0YXRpYyB2b2lkIF9fZXhpdCBpbnRlbF9udGJfcGNpX2RyaXZlcl9leGl0KHZv
+aWQpDQo+ICAJZGVidWdmc19yZW1vdmVfcmVjdXJzaXZlKGRlYnVnZnNfZGlyKTsNCj4gIH0NCj4g
+IG1vZHVsZV9leGl0KGludGVsX250Yl9wY2lfZHJpdmVyX2V4aXQpOw0KPiAtDQo+IC0tDQo+IDIu
+MTEuMA0KPiANCj4gLS0NCj4gWW91IHJlY2VpdmVkIHRoaXMgbWVzc2FnZSBiZWNhdXNlIHlvdSBh
+cmUgc3Vic2NyaWJlZCB0byB0aGUgR29vZ2xlIEdyb3VwcyAibGludXgtbnRiIiBncm91cC4NCj4g
+VG8gdW5zdWJzY3JpYmUgZnJvbSB0aGlzIGdyb3VwIGFuZCBzdG9wIHJlY2VpdmluZyBlbWFpbHMg
+ZnJvbSBpdCwgc2VuZCBhbiBlbWFpbCB0byBsaW51eC1udGIrdW5zdWJzY3JpYmVAZ29vZ2xlZ3Jv
+dXBzLmNvbS4NCj4gVG8gcG9zdCB0byB0aGlzIGdyb3VwLCBzZW5kIGVtYWlsIHRvIGxpbnV4LW50
+YkBnb29nbGVncm91cHMuY29tLg0KPiBUbyB2aWV3IHRoaXMgZGlzY3Vzc2lvbiBvbiB0aGUgd2Vi
+IHZpc2l0IGh0dHBzOi8vZ3JvdXBzLmdvb2dsZS5jb20vZC9tc2dpZC9saW51eC1udGIvMjAxNzA2
+MjIxNjQ4MTcuMjU1MTUtNi0NCj4gbG9nYW5nJTQwZGVsdGF0ZWUuY29tLg0KPiBGb3IgbW9yZSBv
+cHRpb25zLCB2aXNpdCBodHRwczovL2dyb3Vwcy5nb29nbGUuY29tL2Qvb3B0b3V0Lg0KX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KZHJpLWRldmVsIG1haWxp
+bmcgbGlzdApkcmktZGV2ZWxAbGlzdHMuZnJlZWRlc2t0b3Aub3JnCmh0dHBzOi8vbGlzdHMuZnJl
+ZWRlc2t0b3Aub3JnL21haWxtYW4vbGlzdGluZm8vZHJpLWRldmVsCg==
