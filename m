@@ -1,60 +1,46 @@
-From: Alan Cox <gnomes@lxorguk.ukuu.org.uk>
+From: Logan Gunthorpe <logang@deltatee.com>
 Subject: Re: [PATCH 3/7] asm-generic/io.h: make ioread64 and iowrite64
  universally available
-Date: Thu, 22 Jun 2017 21:14:31 +0100
-Message-ID: <20170622211431.14270378@alans-desktop>
+Date: Thu, 22 Jun 2017 14:24:58 -0600
+Message-ID: <e856de0b-e9a3-8228-7a73-4daa38cb4479@deltatee.com>
 References: <20170622164817.25515-1-logang@deltatee.com>
  <20170622164817.25515-4-logang@deltatee.com>
+ <20170622211431.14270378@alans-desktop>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: linux-arch@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-kernel@vger.kernel.org,
- dri-devel@lists.freedesktop.org, Stephen Bates <sbates@raithlin.com>,
- linux-crypto@vger.kernel.org, linux-alpha@vger.kernel.org,
- linux-ntb@googlegroups.com, linuxppc-dev@lists.ozlabs.org
-To: Logan Gunthorpe <logang@deltatee.com>
-Return-path: <dri-devel-bounces@lists.freedesktop.org>
-In-Reply-To: <20170622164817.25515-4-logang@deltatee.com>
-List-Unsubscribe: <https://lists.freedesktop.org/mailman/options/dri-devel>,
- <mailto:dri-devel-request@lists.freedesktop.org?subject=unsubscribe>
-List-Archive: <https://lists.freedesktop.org/archives/dri-devel>
-List-Post: <mailto:dri-devel@lists.freedesktop.org>
-List-Help: <mailto:dri-devel-request@lists.freedesktop.org?subject=help>
-List-Subscribe: <https://lists.freedesktop.org/mailman/listinfo/dri-devel>,
- <mailto:dri-devel-request@lists.freedesktop.org?subject=subscribe>
-Errors-To: dri-devel-bounces@lists.freedesktop.org
-Sender: "dri-devel" <dri-devel-bounces@lists.freedesktop.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-ntb@googlegroups.com, linux-alpha@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Stephen Bates <sbates@raithlin.com>
+To: Alan Cox <gnomes@lxorguk.ukuu.org.uk>
+Return-path: <linux-arch-owner@vger.kernel.org>
+In-Reply-To: <20170622211431.14270378@alans-desktop>
+Sender: linux-arch-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-T24gVGh1LCAyMiBKdW4gMjAxNyAxMDo0ODoxMyAtMDYwMApMb2dhbiBHdW50aG9ycGUgPGxvZ2Fu
-Z0BkZWx0YXRlZS5jb20+IHdyb3RlOgoKPiBDdXJyZW50bHksIGlvcmVhZDY0IGFuZCBpb3dyaXRl
-NjQgYXJlIG9ubHkgYXZhaWxhYmxlIGlvIENPTkZJR182NEJJVD15Cj4gYW5kIENPTkZJR19HRU5F
-UklDX0lPTUFQPW4uIFRodXMsIHNlZWluZyB0aGUgZnVuY3Rpb25zIGFyZSBub3QKPiB1bml2ZXJz
-YWxseSBhdmFpbGFibGUsIGl0IG1ha2VzIHRoZW0gdW51c2FibGUgZm9yIGRyaXZlciBkZXZlbG9w
-ZXJzLgo+IFRoaXMgbGVhZHMgdG8gdWdseSBoYWNrcyBzdWNoIGFzIHRob3NlIGF0IHRoZSB0b3Ag
-b2YKPiAKPiBkcml2ZXJzL250Yi9ody9pbnRlbC9udGJfaHdfaW50ZWwuYwo+IAo+IFRoaXMgcGF0
-Y2ggYWRkcyBmYWxsYmFjayBpbXBsZW1lbnRhdGlvbnMgZm9yIHdoZW4gQ09ORklHXzY0QklUIGFu
-ZAo+IENPTkZJR19HRU5FUklDX0lPTUFQIGFyZSBub3Qgc2V0LiBUaGVzZSBmdW5jdGlvbnMgdXNl
-IHR3byBpbzMyIGJhc2VkCj4gY2FsbHMgdG8gY29tcGxldGUgdGhlIG9wZXJhdGlvbi4KPiAKPiBO
-b3RlLCB3ZSBkbyBub3QgdXNlIHRoZSB2b2xhdGlsZSBrZXl3b3JkIGluIHRoZXNlIGZ1bmN0aW9u
-cyBsaWtlIHRoZQo+IG90aGVycyBpbiB0aGUgc2FtZSBmaWxlLiBJdCBpcyBuZWNlc3NhcnkgdG8g
-YXZvaWQgYSBjb21waWxlciB3YXJuaW5nCj4gb24gYXJtLgoKVGhpcyBpcyBhIHJlYWxseSByZWFs
-bHkgYmFkIGlkZWEgYXMgcGVyIHRoZSBBbHBoYSBjb21tZW50LgoKaW9yZWFkNjQgYW5kIGlvd3Jp
-dGU2NCBnZW5lcmF0ZSBhIHNpbmdsZSA2NGJpdCBidXMgdHJhbnNhY3Rpb24uIFRoZXJlIGlzCmhh
-cmR3YXJlIHdoZXJlIG1taW8gb3BlcmF0aW9ucyBoYXZlIHNpZGUgZWZmZWN0cyBzbyBzaW1wbHkg
-dXNpbmcgYSBwYWlyCm9mIDMyYml0IG9wZXJhdGlvbnMgYmxpbmRseSBkb2VzIG5vdCB3b3JrIChj
-b25zaWRlciBzb21ldGhpbmcgYXMgdHJpdmlhbAphcyByZWFkaW5nIGEgNjRiaXQgcGVyZm9ybWFu
-Y2UgY291bnRlciBvciBpbmNyZW1lbnRpbmcgcG9pbnRlcikuCgpJZiBhIHBsYXRmb3JtIGRvZXNu
-J3Qgc3VwcG9ydCA2NGJpdCBJL08gb3BlcmF0aW9ucyBmcm9tIHRoZSBDUFUgdGhlbiB5b3UKZWl0
-aGVyIG5lZWQgdG8gdXNlIHNvbWUga2luZCBvZiBwbGF0Zm9ybS9hcmNoaXRlY3R1cmUgc3BlY2lm
-aWMgaW50ZXJmYWNlCmlmIHByZXNlbnQgb3IgYWNjZXB0IHlvdSBkb24ndCBoYXZlIG9uZS4KCkl0
-J3Mgbm90IHNhZmUgdG8gc3BsaXQgaXQuIFBvc3NpYmx5IGZvciBzb21lIHVzZSBjYXNlcyB5b3Ug
-Y291bGQgYWRkIGFuCgppb3JlYWQ2NF9tYXlzcGxpdCgpCgpidXQgeW91IGNhbm5vdCBibGluZGx5
-IGJyZWFrIGlvcmVhZDY0L3dyaXRlNjQoKSBhbmQgZXhwZWN0IGl0IHRvCm1hZ2ljYWxseSBhbGxv
-dyB5b3UgdG8gdXNlIGRyaXZlcnMgdGhhdCBkZXBlbmQgdXBvbiBpdC4KCldoYXQgYnR3IGlzIHRo
-ZSBhY3R1YWwgQVJNIGNvbXBpbGVyIHdhcm5pbmcgPyBJcyB0aGUgY29tcGlsZXIgYWxzbyB0cnlp
-bmcKdG8gdGVsbCB5b3UgaXQncyBhIGJhZCBpZGVhID8KCkFsYW4KX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX18KZHJpLWRldmVsIG1haWxpbmcgbGlzdApkcmkt
-ZGV2ZWxAbGlzdHMuZnJlZWRlc2t0b3Aub3JnCmh0dHBzOi8vbGlzdHMuZnJlZWRlc2t0b3Aub3Jn
-L21haWxtYW4vbGlzdGluZm8vZHJpLWRldmVsCg==
+On 6/22/2017 2:14 PM, Alan Cox wrote:
+> If a platform doesn't support 64bit I/O operations from the CPU then you
+> either need to use some kind of platform/architecture specific interface
+> if present or accept you don't have one.
+
+Yes, I understand that.
+
+The thing is that every user that's currently using it right now is 
+patching in their own version that splits it on non-64bit systems.
+
+> It's not safe to split it. Possibly for some use cases you could add an
+> ioread64_maysplit()
+
+I'm open to doing something like that.
+
+> What btw is the actual ARM compiler warning ? Is the compiler also trying
+> to tell you it's a bad idea ?
+
+It's just the compiler noting that you are mixing volatile and 
+non-volatile pointers. Strangely some io{read|write}XX use volatile but 
+most do not. But it's nothing crazy.
+
+Logan
