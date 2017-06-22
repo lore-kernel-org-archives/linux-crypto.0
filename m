@@ -1,46 +1,62 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [PATCH] staging: ccree: fix coding style error
-Date: Thu, 22 Jun 2017 16:42:10 +0300
-Message-ID: <CAOtvUMf=eNb3x1Tb-pKJeEZiwgBjMyOQaz6D=s++kbOu4u2ViQ@mail.gmail.com>
-References: <1497970324-9725-1-git-send-email-fbihjmeric@gmail.com>
+From: Radu Solea <radu.solea@nxp.com>
+Subject: Re: [RFC PATCH] gcm - fix setkey cache coherence issues
+Date: Thu, 22 Jun 2017 13:56:40 +0000
+Message-ID: <1498139799.26231.10.camel@nxp.com>
+References: <1498055361-12493-1-git-send-email-radu.solea@nxp.com>
+         <20170622024051.GA24529@gondor.apana.org.au>
+         <DB6PR04MB317607AE27DD1AC235D0103C8BDB0@DB6PR04MB3176.eurprd04.prod.outlook.com>
+         <20170622075338.GA25314@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: devel@driverdev.osuosl.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- driverdev-devel@linuxdriverproject.org, linux-crypto@vger.kernel.org,
- Linux kernel mailing list <linux-kernel@vger.kernel.org>
-To: Jhih-Ming Huang <fbihjmeric@gmail.com>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-In-Reply-To: <1497970324-9725-1-git-send-email-fbihjmeric@gmail.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: "davem@davemloft.net" <davem@davemloft.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        =?utf-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@nxp.com>
+To: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-eopbgr00078.outbound.protection.outlook.com ([40.107.0.78]:30432
+        "EHLO EUR02-AM5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1750812AbdFVN4m (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 22 Jun 2017 09:56:42 -0400
+In-Reply-To: <20170622075338.GA25314@gondor.apana.org.au>
+Content-Language: en-US
+Content-ID: <086E9349E24A0F489069A1FA2E6ABD4C@eurprd04.prod.outlook.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jun 20, 2017 at 5:51 PM, Jhih-Ming Huang <fbihjmeric@gmail.com> wrote:
->
-> Hi,
->
-> This patch fix all coding style error in driver/staging/ccree/ssi_aead.c.
-
-For patches 1-6:
-
-Acked-by: Gilad Ben-Yossef <gilad@benyossef.com>
-
-Thanks you,
-Gilad
-
-
--- 
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-"If you take a class in large-scale robotics, can you end up in a
-situation where the homework eats your dog?"
- -- Jean-Baptiste Queru
+T24gSm8sIDIwMTctMDYtMjIgYXQgMTU6NTMgKzA4MDAsIEhlcmJlcnQgWHUgd3JvdGU6DQo+IE9u
+IFRodSwgSnVuIDIyLCAyMDE3IGF0IDA1OjAzOjQ0QU0gKzAwMDAsIFJhZHUgU29sZWEgd3JvdGU6
+DQo+ID4gDQo+ID4gSSdtIGFkZGluZyBfX19fY2FjaGVsaW5lX2FsaWduZWQgdG8gaXYgYW5kIHJl
+c3VsdC4gVGhhdCBpcyBkb25lIHNvDQo+ID4gaGFzaCwgaXYgYW5kIHJlc3VsdCBuZXZlciBzaGFy
+ZSBhIGNhY2hlIGxpbmUuDQo+IFllcyBidXQgeW91J3JlIGRvaW5nIGl0IGluIGNyeXB0by9nY20u
+YyB3aGljaCBpc24ndCBldmVuIHVzZWQgYnkNCj4gY2FhbSBBRkFJSy4NCj4gDQo+IENoZWVycywN
+Cg0KTXkgYmFkLCBJIG5lZWQgdG8gcHV0IHRoaXMgaW4gY29udGV4dCBiZXR0ZXIuIEZpcnN0LCBJ
+IHNhdyB0aGlzIGlzc3VlDQp3aXRoIENBQU0sIGJ1dCBpdCBoYXMgdGhlIHBvdGVudGlhbCB0byBp
+bXBhY3QgYW55IGltcGxlbWVudGF0aW9uIHRoYXQNCnRyaWVzIHRvIGFjY2VzcyB0aG9zZSBmaWVs
+ZHMgdGhyb3VnaCBETUEuwqANCg0KQ0FBTSBoYXMgYSBudW1iZXIgb2YgdmFyaWF0aW9ucyBvbmUg
+b2YgdGhlbSBpcyBjYWxsZWQgQ0FBTSBMUCwgaXQNCmRvZXNuJ3Qgc3VwcG9ydCBHQ00gYnV0IGl0
+IGNhbiBvZmZsb2FkIGN0cihhZXMpLiBXaGljaCBpdCB0cmllcyB0byBkbywNCmJ1dCBiZWNhdXNl
+IG9mIGhvdyB0aGlzIG1lbW9yeSBpcyBhbGxvY2F0ZWQsIHdoZW4gdGhlIENQVSB3cml0ZXMNCnJl
+c3VsdCwgdGhlIGNhY2hlIG1lY2hhbmlzbSBvdmVyd3JpdGVzIGhhc2ggYW5kIGl2IHdpdGggd2hh
+dGV2ZXIgd2FzDQp0aGVyZSBiZWZvcmUgdGhlIG9mZmxvYWQgaGFwcGVuZWQuIFRoaXMgaXMgbm90
+IHRoZSBvbmx5IHByb2JsZW0sIERNQQ0Kd3JpdGluZyB0d28gZmllbGRzIG9uIHRoZSBzYW1lIGNh
+Y2hlbGluZSBpcyBsaWtlbHkgdG8gY2F1c2UgaXNzdWVzIHRvbzoNCg0KZnJvbcKgaHR0cHM6Ly93
+d3cua2VybmVsLm9yZy9kb2MvRG9jdW1lbnRhdGlvbi9ETUEtQVBJLnR4dA0KTWVtb3J5IGNvaGVy
+ZW5jeSBvcGVyYXRlcyBhdCBhIGdyYW51bGFyaXR5IGNhbGxlZCB0aGUgY2FjaGUNCmxpbmUgd2lk
+dGguwqDCoEluIG9yZGVyIGZvciBtZW1vcnkgbWFwcGVkIGJ5IHRoaXMgQVBJIHRvIG9wZXJhdGUN
+CmNvcnJlY3RseSwgdGhlIG1hcHBlZCByZWdpb24gbXVzdCBiZWdpbiBleGFjdGx5IG9uIGEgY2Fj
+aGUgbGluZQ0KYm91bmRhcnkgYW5kIGVuZCBleGFjdGx5IG9uIG9uZSAodG8gcHJldmVudCB0d28g
+c2VwYXJhdGVseSBtYXBwZWQNCnJlZ2lvbnMgZnJvbSBzaGFyaW5nIGEgc2luZ2xlIGNhY2hlIGxp
+bmUpLsKgwqBTaW5jZSB0aGUgY2FjaGUgbGluZSBzaXplDQptYXkgbm90IGJlIGtub3duIGF0IGNv
+bXBpbGUgdGltZSwgdGhlIEFQSSB3aWxsIG5vdCBlbmZvcmNlIHRoaXMNCnJlcXVpcmVtZW50LsKg
+wqBUaGVyZWZvcmUsIGl0IGlzIHJlY29tbWVuZGVkIHRoYXQgZHJpdmVyIHdyaXRlcnMgd2hvDQpk
+b24ndCB0YWtlIHNwZWNpYWwgY2FyZSB0byBkZXRlcm1pbmUgdGhlIGNhY2hlIGxpbmUgc2l6ZSBh
+dCBydW4gdGltZQ0Kb25seSBtYXAgdmlydHVhbCByZWdpb25zIHRoYXQgYmVnaW4gYW5kIGVuZCBv
+biBwYWdlIGJvdW5kYXJpZXMgKHdoaWNoDQphcmUgZ3VhcmFudGVlZCBhbHNvIHRvIGJlIGNhY2hl
+IGxpbmUgYm91bmRhcmllcykuDQoNClRoZXJlIGFyZSB0d28gd2F5cyBvZiBmaXhpbmcgdGhpcyBB
+RkFJSzogdGhlIGZpcnN0IGlzIGFkZGluZw0KY2FjaGVsaW5lX2FsaWduZWQgc28gdGhvc2UgZmll
+bGRzIGRvbid0IGZhbGwgaW50byB0aGUgc2FtZSBjYWNoZWxpbmUuDQpUaGUgc2Vjb25kIGlzIHRv
+IGt6YWxsb2MgaGFzaCBhbmQgaXYgc2VwYXJhdGVseS4ga21hbGxvYyBzaG91bGQgaG9ub3INCkFS
+Q0hfRE1BX01JTkFMSUdOIHdoaWNoIHdvdWxkIG1ha2UgdGhpcyBpc3N1ZSBnbyBhd2F5LsKgDQoN
+CkNoZWVycywNClJhZHUu
