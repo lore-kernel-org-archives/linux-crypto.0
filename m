@@ -1,87 +1,316 @@
-From: Logan Gunthorpe <logang@deltatee.com>
-Subject: [PATCH 4/7] alpha: provide ioread64 and iowrite64 implementations
-Date: Thu, 22 Jun 2017 10:48:14 -0600
-Message-ID: <20170622164817.25515-5-logang@deltatee.com>
-References: <20170622164817.25515-1-logang@deltatee.com>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Stephen Bates <sbates@raithlin.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
-        Matt Turner <mattst88@gmail.com>
-To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-ntb@googlegroups.com, linux-alpha@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
-        dri-devel@lists.freedesktop.org
+From: Gary R Hook <gary.hook@amd.com>
+Subject: Re: [PATCH 3/4] crypto: ccp - Add support for RSA on the CCP
+Date: Thu, 22 Jun 2017 12:09:23 -0500
+Message-ID: <41e00e7a-d93c-6493-5610-f337336e5ee5@amd.com>
+References: <20170621224655.15132.20473.stgit@taos.amd.com>
+ <20170621224801.15132.99552.stgit@taos.amd.com>
+ <1779770.Ceb2oF5o24@tauon.chronox.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>
+To: =?UTF-8?Q?Stephan_M=c3=bcller?= <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ale.deltatee.com ([207.54.116.67]:53880 "EHLO ale.deltatee.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753301AbdFVQtW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Jun 2017 12:49:22 -0400
-In-Reply-To: <20170622164817.25515-1-logang@deltatee.com>
+Received: from mail-dm3nam03on0056.outbound.protection.outlook.com ([104.47.41.56]:48544
+        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752392AbdFVRJg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 22 Jun 2017 13:09:36 -0400
+In-Reply-To: <1779770.Ceb2oF5o24@tauon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Alpha implements its own io operation and doesn't use the
-common library. Thus to make ioread64 and iowrite64 globally
-available we need to add implementations for alpha.
+On 06/22/2017 12:15 AM, Stephan Müller wrote:
+> Am Donnerstag, 22. Juni 2017, 00:48:01 CEST schrieb Gary R Hook:
+>
+> Hi Gary,
 
-For this, we simply use calls that chain two 32-bit operations.
-(mostly because I don't really understand the alpha architecture.)
+Thanks, Stephen. Good catch(es). I will re-work this, but it looks like 
+my changes should wait
+until after the patch set posted by Brijesh (Introduce AMD Secure 
+Processor device).
 
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Ivan Kokshaysky <ink@jurassic.park.msu.ru>
-Cc: Matt Turner <mattst88@gmail.com>
----
- arch/alpha/include/asm/io.h |  2 ++
- arch/alpha/kernel/io.c      | 18 ++++++++++++++++++
- 2 files changed, 20 insertions(+)
+Please ignore these for now.
 
-diff --git a/arch/alpha/include/asm/io.h b/arch/alpha/include/asm/io.h
-index ff4049155c84..15588092c062 100644
---- a/arch/alpha/include/asm/io.h
-+++ b/arch/alpha/include/asm/io.h
-@@ -493,8 +493,10 @@ extern inline void writeq(u64 b, volatile void __iomem *addr)
- 
- #define ioread16be(p) be16_to_cpu(ioread16(p))
- #define ioread32be(p) be32_to_cpu(ioread32(p))
-+#define ioread64be(p) be64_to_cpu(ioread64(p))
- #define iowrite16be(v,p) iowrite16(cpu_to_be16(v), (p))
- #define iowrite32be(v,p) iowrite32(cpu_to_be32(v), (p))
-+#define iowrite64be(v,p) iowrite32(cpu_to_be64(v), (p))
- 
- #define inb_p		inb
- #define inw_p		inw
-diff --git a/arch/alpha/kernel/io.c b/arch/alpha/kernel/io.c
-index 19c5875ab398..8c28026f7849 100644
---- a/arch/alpha/kernel/io.c
-+++ b/arch/alpha/kernel/io.c
-@@ -59,6 +59,24 @@ EXPORT_SYMBOL(iowrite8);
- EXPORT_SYMBOL(iowrite16);
- EXPORT_SYMBOL(iowrite32);
- 
-+u64 ioread64(void __iomem *addr)
-+{
-+	u64 low, high;
-+
-+	low = ioread32(addr);
-+	high = ioread32(addr + sizeof(u32));
-+	return low | (high << 32);
-+}
-+
-+void iowrite64(u64 val, void __iomem *addr)
-+{
-+	iowrite32(val, addr);
-+	iowrite32(val >> 32, addr + sizeof(u32));
-+}
-+
-+EXPORT_SYMBOL(ioread64);
-+EXPORT_SYMBOL(iowrite64);
-+
- u8 inb(unsigned long port)
- {
- 	return ioread8(ioport_map(port, 1));
--- 
-2.11.0
+
+>
+>> Wire up the v3 CCP as a cipher provider.
+>>
+>> Signed-off-by: Gary R Hook <gary.hook@amd.com>
+>> ---
+>>  drivers/crypto/ccp/Makefile          |    1
+>>  drivers/crypto/ccp/ccp-crypto-main.c |   21 ++
+>>  drivers/crypto/ccp/ccp-crypto-rsa.c  |  286
+>> ++++++++++++++++++++++++++++++++++ drivers/crypto/ccp/ccp-crypto.h      |
+>> 31 ++++
+>>  drivers/crypto/ccp/ccp-debugfs.c     |    1
+>>  drivers/crypto/ccp/ccp-dev.c         |    1
+>>  drivers/crypto/ccp/ccp-ops.c         |    2
+>>  include/linux/ccp.h                  |    1
+>>  8 files changed, 341 insertions(+), 3 deletions(-)
+>>  create mode 100644 drivers/crypto/ccp/ccp-crypto-rsa.c
+>>
+>> diff --git a/drivers/crypto/ccp/Makefile b/drivers/crypto/ccp/Makefile
+>> index 59493fd3a751..439bc2fcb464 100644
+>> --- a/drivers/crypto/ccp/Makefile
+>> +++ b/drivers/crypto/ccp/Makefile
+>> @@ -15,4 +15,5 @@ ccp-crypto-objs := ccp-crypto-main.o \
+>>                   ccp-crypto-aes-xts.o \
+>>                   ccp-crypto-aes-galois.o \
+>>                   ccp-crypto-des3.o \
+>> +                ccp-crypto-rsa.o \
+>>                   ccp-crypto-sha.o
+>> diff --git a/drivers/crypto/ccp/ccp-crypto-main.c
+>> b/drivers/crypto/ccp/ccp-crypto-main.c index 8dccbddabef1..dd7d00c680e7
+>> 100644
+>> --- a/drivers/crypto/ccp/ccp-crypto-main.c
+>> +++ b/drivers/crypto/ccp/ccp-crypto-main.c
+>> @@ -17,6 +17,7 @@
+>>  #include <linux/ccp.h>
+>>  #include <linux/scatterlist.h>
+>>  #include <crypto/internal/hash.h>
+>> +#include <crypto/internal/akcipher.h>
+>>
+>>  #include "ccp-crypto.h"
+>>
+>> @@ -37,10 +38,15 @@
+>>  module_param(des3_disable, uint, 0444);
+>>  MODULE_PARM_DESC(des3_disable, "Disable use of 3DES - any non-zero value");
+>>
+>> +static unsigned int rsa_disable;
+>> +module_param(rsa_disable, uint, 0444);
+>> +MODULE_PARM_DESC(rsa_disable, "Disable use of RSA - any non-zero value");
+>> +
+>>  /* List heads for the supported algorithms */
+>>  static LIST_HEAD(hash_algs);
+>>  static LIST_HEAD(cipher_algs);
+>>  static LIST_HEAD(aead_algs);
+>> +static LIST_HEAD(akcipher_algs);
+>>
+>>  /* For any tfm, requests for that tfm must be returned on the order
+>>   * received.  With multiple queues available, the CCP can process more
+>> @@ -358,6 +364,14 @@ static int ccp_register_algs(void)
+>>                        return ret;
+>>        }
+>>
+>> +     if (!rsa_disable) {
+>> +             ret = ccp_register_rsa_algs(&akcipher_algs);
+>> +             if (ret) {
+>> +                     rsa_disable = 1;
+>> +                     return ret;
+>> +             }
+>> +     }
+>> +
+>>        return 0;
+>>  }
+>>
+>> @@ -366,6 +380,7 @@ static void ccp_unregister_algs(void)
+>>        struct ccp_crypto_ahash_alg *ahash_alg, *ahash_tmp;
+>>        struct ccp_crypto_ablkcipher_alg *ablk_alg, *ablk_tmp;
+>>        struct ccp_crypto_aead *aead_alg, *aead_tmp;
+>> +     struct ccp_crypto_akcipher_alg *akc_alg, *akc_tmp;
+>>
+>>        list_for_each_entry_safe(ahash_alg, ahash_tmp, &hash_algs, entry) {
+>>                crypto_unregister_ahash(&ahash_alg->alg);
+>> @@ -384,6 +399,12 @@ static void ccp_unregister_algs(void)
+>>                list_del(&aead_alg->entry);
+>>                kfree(aead_alg);
+>>        }
+>> +
+>> +     list_for_each_entry_safe(akc_alg, akc_tmp, &akcipher_algs, entry) {
+>> +             crypto_unregister_akcipher(&akc_alg->alg);
+>> +             list_del(&akc_alg->entry);
+>> +             kfree(akc_alg);
+>> +     }
+>>  }
+>>
+>>  static int ccp_crypto_init(void)
+>> diff --git a/drivers/crypto/ccp/ccp-crypto-rsa.c
+>> b/drivers/crypto/ccp/ccp-crypto-rsa.c new file mode 100644
+>> index 000000000000..4a2a71463594
+>> --- /dev/null
+>> +++ b/drivers/crypto/ccp/ccp-crypto-rsa.c
+>> @@ -0,0 +1,286 @@
+>> +/*
+>> + * AMD Cryptographic Coprocessor (CCP) RSA crypto API support
+>> + *
+>> + * Copyright (C) 2016 Advanced Micro Devices, Inc.
+>> + *
+>> + * Author: Gary R Hook <gary.hook@amd.com>
+>> + *
+>> + * This program is free software; you can redistribute it and/or modify
+>> + * it under the terms of the GNU General Public License version 2 as
+>> + * published by the Free Software Foundation.
+>> + */
+>> +
+>> +#include <linux/module.h>
+>> +#include <linux/sched.h>
+>> +#include <linux/scatterlist.h>
+>> +#include <linux/crypto.h>
+>> +#include <crypto/algapi.h>
+>> +#include <crypto/internal/rsa.h>
+>> +#include <crypto/internal/akcipher.h>
+>> +#include <crypto/akcipher.h>
+>> +#include <crypto/scatterwalk.h>
+>> +
+>> +#include "ccp-crypto.h"
+>> +
+>> +static inline struct akcipher_request *akcipher_request_cast(
+>> +     struct crypto_async_request *req)
+>> +{
+>> +     return container_of(req, struct akcipher_request, base);
+>> +}
+>> +
+>> +static int ccp_rsa_complete(struct crypto_async_request *async_req, int
+>> ret) +{
+>> +     struct akcipher_request *req = akcipher_request_cast(async_req);
+>> +     struct ccp_rsa_req_ctx *rctx = akcipher_request_ctx(req);
+>> +
+>> +     if (!ret)
+>> +             req->dst_len = rctx->cmd.u.rsa.key_size >> 3;
+>> +
+>> +     ret = 0;
+>> +
+>> +     return ret;
+>> +}
+>> +
+>> +static unsigned int ccp_rsa_maxsize(struct crypto_akcipher *tfm)
+>> +{
+>> +     return CCP_RSA_MAXMOD;
+>> +}
+>> +
+>> +static int ccp_rsa_crypt(struct akcipher_request *req, bool encrypt)
+>> +{
+>> +     struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
+>> +     struct ccp_ctx *ctx = akcipher_tfm_ctx(tfm);
+>> +     struct ccp_rsa_req_ctx *rctx = akcipher_request_ctx(req);
+>> +     int ret = 0;
+>> +
+>> +     memset(&rctx->cmd, 0, sizeof(rctx->cmd));
+>> +     INIT_LIST_HEAD(&rctx->cmd.entry);
+>> +     rctx->cmd.engine = CCP_ENGINE_RSA;
+>> +
+>> +     rctx->cmd.u.rsa.key_size = ctx->u.rsa.key_len; /* in bits */
+>> +     if (encrypt) {
+>> +             rctx->cmd.u.rsa.exp = &ctx->u.rsa.e_sg;
+>> +             rctx->cmd.u.rsa.exp_len = ctx->u.rsa.e_len;
+>> +     } else {
+>> +             rctx->cmd.u.rsa.exp = &ctx->u.rsa.d_sg;
+>> +             rctx->cmd.u.rsa.exp_len = ctx->u.rsa.d_len;
+>> +     }
+>> +     rctx->cmd.u.rsa.mod = &ctx->u.rsa.n_sg;
+>> +     rctx->cmd.u.rsa.mod_len = ctx->u.rsa.n_len;
+>> +     rctx->cmd.u.rsa.src = req->src;
+>> +     rctx->cmd.u.rsa.src_len = req->src_len;
+>> +     rctx->cmd.u.rsa.dst = req->dst;
+>> +
+>> +     ret = ccp_crypto_enqueue_request(&req->base, &rctx->cmd);
+>> +
+>> +     return ret;
+>> +}
+>> +
+>> +static int ccp_rsa_encrypt(struct akcipher_request *req)
+>> +{
+>> +     return ccp_rsa_crypt(req, true);
+>> +}
+>> +
+>> +static int ccp_rsa_decrypt(struct akcipher_request *req)
+>> +{
+>> +     return ccp_rsa_crypt(req, false);
+>> +}
+>> +
+>> +static int ccp_check_key_length(unsigned int len)
+>> +{
+>> +     /* In bits */
+>> +     if (len < 8 || len > 4096)
+>> +             return -EINVAL;
+>> +     return 0;
+>> +}
+>> +
+>> +static void ccp_rsa_free_key_bufs(struct ccp_ctx *ctx)
+>> +{
+>> +     /* Clean up old key data */
+>> +     kfree(ctx->u.rsa.e_buf);
+>> +     ctx->u.rsa.e_buf = NULL;
+>> +     ctx->u.rsa.e_len = 0;
+>> +     kfree(ctx->u.rsa.n_buf);
+>> +     ctx->u.rsa.n_buf = NULL;
+>> +     ctx->u.rsa.n_len = 0;
+>> +     kfree(ctx->u.rsa.d_buf);
+>
+> kzfree, please
+>
+>> +     ctx->u.rsa.d_buf = NULL;
+>> +     ctx->u.rsa.d_len = 0;
+>> +}
+>> +
+>> +static int ccp_rsa_setkey(struct crypto_akcipher *tfm, const void *key,
+>> +                       unsigned int keylen, bool private)
+>> +{
+>> +     struct ccp_ctx *ctx = akcipher_tfm_ctx(tfm);
+>> +     struct rsa_key raw_key;
+>> +     int key_len, i;
+>> +     int ret;
+>> +
+>> +     ccp_rsa_free_key_bufs(ctx);
+>> +     memset(&raw_key, 0, sizeof(raw_key));
+>> +
+>> +     /* Code borrowed from crypto/rsa.c */
+>> +     if (private)
+>> +             ret = rsa_parse_priv_key(&raw_key, key, keylen);
+>> +     else
+>> +             ret = rsa_parse_pub_key(&raw_key, key, keylen);
+>> +     if (ret)
+>> +             goto e_key;
+>> +
+>> +     /* Remove leading zeroes from the modulus (n) */
+>
+> Three fragments doing the same -- isn't an inline cleaner here?
+>
+>> +     key_len = 0;
+>> +     for (i = 0; i < raw_key.n_sz; i++)
+>> +             if (raw_key.n[i]) {
+>> +                     key_len = raw_key.n_sz - i;
+>> +                     break;
+>> +             }
+>> +     ctx->u.rsa.key_len = key_len << 3; /* bits */
+>> +     if (ccp_check_key_length(ctx->u.rsa.key_len)) {
+>> +             ret = -EINVAL;
+>> +             goto e_key;
+>> +     }
+>> +     ctx->u.rsa.n_len = key_len;
+>> +     sg_init_one(&ctx->u.rsa.n_sg, raw_key.n + i, key_len);
+>> +
+>> +     /* Remove leading zeroes from the public key (e) */
+>> +     key_len = 0;
+>> +     for (i = 0; i < raw_key.e_sz; i++)
+>> +             if (raw_key.e[i]) {
+>> +                     key_len = raw_key.e_sz - i;
+>> +                     break;
+>> +             }
+>> +     ctx->u.rsa.e_len = key_len;
+>> +     sg_init_one(&ctx->u.rsa.e_sg, raw_key.e + i, key_len);
+>> +
+>> +     if (private) {
+>> +             /* Remove leading zeroes from the private key (d) */
+>> +             key_len = 0;
+>> +             for (i = 0; i < raw_key.d_sz; i++)
+>> +                     if (raw_key.d[i]) {
+>> +                             key_len = raw_key.d_sz - i;
+>> +                             break;
+>> +                     }
+>> +             ctx->u.rsa.d_len = key_len;
+>> +             sg_init_one(&ctx->u.rsa.d_sg, raw_key.d + i, key_len);
+>
+> As I see no memcpy for the key components, how is it ensured that the
+> caller's
+> memory holding the key will stay alive after a setkey call? Further,
+> wouldn'd
+> the ccp_rsa_free_key_bufs function cause a double free as it would act on
+> user-provided memory the user may also try to free?
+>
+> Ciao
+> Stephan
