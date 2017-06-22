@@ -1,400 +1,578 @@
-From: frowand.list@gmail.com
-Subject: [PATCH v2] of: update ePAPR references to point to Devicetree Specification
-Date: Thu, 22 Jun 2017 09:15:39 -0700
-Message-ID: <1498148139-12770-1-git-send-email-frowand.list@gmail.com>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: [PATCH 3/4] crypto: ccp - Add support for RSA on the CCP
+Date: Thu, 22 Jun 2017 11:16:22 -0500
+Message-ID: <bff8b739-bef8-4c34-0702-53838dfd2281@amd.com>
+References: <20170621224655.15132.20473.stgit@taos.amd.com>
+ <20170621224801.15132.99552.stgit@taos.amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Cc: horia.geanta@nxp.com, Dan Douglass <dan.douglass@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Jason Cooper <jason@lakedaemon.net>,
-        Marc Zyngier <marc.zyngier@arm.com>,
-        Scott Wood <oss@buserror.net>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Jonathan Corbet <corbet@lwn.net>, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org
-To: Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net
+To: Gary R Hook <gary.hook@amd.com>, linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-sn1nam01on0077.outbound.protection.outlook.com ([104.47.32.77]:16527
+        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751148AbdFVQRG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 22 Jun 2017 12:17:06 -0400
+In-Reply-To: <20170621224801.15132.99552.stgit@taos.amd.com>
+Content-Language: en-US
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Frank Rowand <frank.rowand@sony.com>
+On 6/21/2017 5:48 PM, Gary R Hook wrote:
+> Wire up the v3 CCP as a cipher provider.
 
-The Devicetree Specification has superseded the ePAPR as the
-base specification for bindings.  Update files in Documentation
-to reference the new document.
+The V5 support will be invoked through this also.  Maybe something like:
 
-First reference to ePAPR in Documentation/devicetree/bindings/arm/cci.txt
-is generic, remove it.
+Wire up the CCP as an RSA cipher provider.
 
-Some files are not updated because there is no hypervisor chapter
-in the Devicetree Specification:
-   Documentation/devicetree/bindings/powerpc/fsl/msi-pic.txt
-   Documenation/virtual/kvm/api.txt
-   Documenation/virtual/kvm/ppc-pv.txt
+> 
+> Signed-off-by: Gary R Hook <gary.hook@amd.com>
+> ---
+>   drivers/crypto/ccp/Makefile          |    1
+>   drivers/crypto/ccp/ccp-crypto-main.c |   21 ++
+>   drivers/crypto/ccp/ccp-crypto-rsa.c  |  286 ++++++++++++++++++++++++++++++++++
+>   drivers/crypto/ccp/ccp-crypto.h      |   31 ++++
+>   drivers/crypto/ccp/ccp-debugfs.c     |    1
+>   drivers/crypto/ccp/ccp-dev.c         |    1
+>   drivers/crypto/ccp/ccp-ops.c         |    2
+>   include/linux/ccp.h                  |    1
+>   8 files changed, 341 insertions(+), 3 deletions(-)
+>   create mode 100644 drivers/crypto/ccp/ccp-crypto-rsa.c
+> 
+> diff --git a/drivers/crypto/ccp/Makefile b/drivers/crypto/ccp/Makefile
+> index 59493fd3a751..439bc2fcb464 100644
+> --- a/drivers/crypto/ccp/Makefile
+> +++ b/drivers/crypto/ccp/Makefile
+> @@ -15,4 +15,5 @@ ccp-crypto-objs := ccp-crypto-main.o \
+>   		   ccp-crypto-aes-xts.o \
+>   		   ccp-crypto-aes-galois.o \
+>   		   ccp-crypto-des3.o \
+> +		   ccp-crypto-rsa.o \
+>   		   ccp-crypto-sha.o
+> diff --git a/drivers/crypto/ccp/ccp-crypto-main.c b/drivers/crypto/ccp/ccp-crypto-main.c
+> index 8dccbddabef1..dd7d00c680e7 100644
+> --- a/drivers/crypto/ccp/ccp-crypto-main.c
+> +++ b/drivers/crypto/ccp/ccp-crypto-main.c
+> @@ -17,6 +17,7 @@
+>   #include <linux/ccp.h>
+>   #include <linux/scatterlist.h>
+>   #include <crypto/internal/hash.h>
+> +#include <crypto/internal/akcipher.h>
+>   
+>   #include "ccp-crypto.h"
+>   
+> @@ -37,10 +38,15 @@
+>   module_param(des3_disable, uint, 0444);
+>   MODULE_PARM_DESC(des3_disable, "Disable use of 3DES - any non-zero value");
+>   
+> +static unsigned int rsa_disable;
+> +module_param(rsa_disable, uint, 0444);
+> +MODULE_PARM_DESC(rsa_disable, "Disable use of RSA - any non-zero value");
+> +
+>   /* List heads for the supported algorithms */
+>   static LIST_HEAD(hash_algs);
+>   static LIST_HEAD(cipher_algs);
+>   static LIST_HEAD(aead_algs);
+> +static LIST_HEAD(akcipher_algs);
+>   
+>   /* For any tfm, requests for that tfm must be returned on the order
+>    * received.  With multiple queues available, the CCP can process more
+> @@ -358,6 +364,14 @@ static int ccp_register_algs(void)
+>   			return ret;
+>   	}
+>   
+> +	if (!rsa_disable) {
+> +		ret = ccp_register_rsa_algs(&akcipher_algs);
+> +		if (ret) {
+> +			rsa_disable = 1;
 
-Signed-off-by: Frank Rowand <frank.rowand@sony.com>
----
+Not sure what this does...  The return of the error code will cause the
+init to fail and unregister everything. This path won't be taken again
+to make use of the change in value.
 
-changes from v1:
-   - remove boilerplat ePAPR reference from cci.txt
+> +			return ret;
+> +		}
+> +	}
+> +
+>   	return 0;
+>   }
+>   
+> @@ -366,6 +380,7 @@ static void ccp_unregister_algs(void)
+>   	struct ccp_crypto_ahash_alg *ahash_alg, *ahash_tmp;
+>   	struct ccp_crypto_ablkcipher_alg *ablk_alg, *ablk_tmp;
+>   	struct ccp_crypto_aead *aead_alg, *aead_tmp;
+> +	struct ccp_crypto_akcipher_alg *akc_alg, *akc_tmp;
+>   
+>   	list_for_each_entry_safe(ahash_alg, ahash_tmp, &hash_algs, entry) {
+>   		crypto_unregister_ahash(&ahash_alg->alg);
+> @@ -384,6 +399,12 @@ static void ccp_unregister_algs(void)
+>   		list_del(&aead_alg->entry);
+>   		kfree(aead_alg);
+>   	}
+> +
+> +	list_for_each_entry_safe(akc_alg, akc_tmp, &akcipher_algs, entry) {
+> +		crypto_unregister_akcipher(&akc_alg->alg);
+> +		list_del(&akc_alg->entry);
+> +		kfree(akc_alg);
+> +	}
+>   }
+>   
+>   static int ccp_crypto_init(void)
+> diff --git a/drivers/crypto/ccp/ccp-crypto-rsa.c b/drivers/crypto/ccp/ccp-crypto-rsa.c
+> new file mode 100644
+> index 000000000000..4a2a71463594
+> --- /dev/null
+> +++ b/drivers/crypto/ccp/ccp-crypto-rsa.c
+> @@ -0,0 +1,286 @@
+> +/*
+> + * AMD Cryptographic Coprocessor (CCP) RSA crypto API support
+> + *
+> + * Copyright (C) 2016 Advanced Micro Devices, Inc.
+> + *
+> + * Author: Gary R Hook <gary.hook@amd.com>
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
+> + */
+> +
+> +#include <linux/module.h>
+> +#include <linux/sched.h>
+> +#include <linux/scatterlist.h>
+> +#include <linux/crypto.h>
+> +#include <crypto/algapi.h>
+> +#include <crypto/internal/rsa.h>
+> +#include <crypto/internal/akcipher.h>
+> +#include <crypto/akcipher.h>
+> +#include <crypto/scatterwalk.h>
+> +
+> +#include "ccp-crypto.h"
+> +
+> +static inline struct akcipher_request *akcipher_request_cast(
+> +	struct crypto_async_request *req)
+> +{
+> +	return container_of(req, struct akcipher_request, base);
+> +}
+> +
+> +static int ccp_rsa_complete(struct crypto_async_request *async_req, int ret)
+> +{
+> +	struct akcipher_request *req = akcipher_request_cast(async_req);
+> +	struct ccp_rsa_req_ctx *rctx = akcipher_request_ctx(req);
+> +
+> +	if (!ret)
+> +		req->dst_len = rctx->cmd.u.rsa.key_size >> 3;
+> +
+> +	ret = 0;
+> +
+> +	return ret;
 
- Documentation/devicetree/bindings/arm/cci.txt             | 15 ++++-----------
- Documentation/devicetree/bindings/arm/cpus.txt            | 13 +++++++------
- Documentation/devicetree/bindings/arm/idle-states.txt     |  4 ++--
- Documentation/devicetree/bindings/arm/l2c2x0.txt          |  4 ++--
- Documentation/devicetree/bindings/arm/topology.txt        |  4 ++--
- Documentation/devicetree/bindings/bus/simple-pm-bus.txt   |  2 +-
- Documentation/devicetree/bindings/chosen.txt              |  3 ++-
- Documentation/devicetree/bindings/common-properties.txt   |  2 +-
- Documentation/devicetree/bindings/crypto/fsl-sec4.txt     |  4 ++--
- Documentation/devicetree/bindings/crypto/fsl-sec6.txt     |  4 ++--
- .../devicetree/bindings/interrupt-controller/open-pic.txt |  5 ++---
- Documentation/devicetree/bindings/net/ethernet.txt        |  9 ++++++---
- Documentation/devicetree/bindings/powerpc/fsl/cpus.txt    |  6 +++---
- Documentation/devicetree/bindings/powerpc/fsl/l2cache.txt |  2 +-
- .../devicetree/bindings/powerpc/fsl/srio-rmu.txt          |  4 ++--
- Documentation/devicetree/bindings/powerpc/fsl/srio.txt    |  3 ++-
- Documentation/devicetree/booting-without-of.txt           |  2 +-
- Documentation/devicetree/usage-model.txt                  |  2 +-
- Documentation/xtensa/mmu.txt                              |  6 +++---
- 19 files changed, 46 insertions(+), 48 deletions(-)
+This seems odd.  You should probably make this similar to the other CCP
+complete functions:
 
-diff --git a/Documentation/devicetree/bindings/arm/cci.txt b/Documentation/devicetree/bindings/arm/cci.txt
-index 0f2153e8fa7e..9600761f2d5b 100644
---- a/Documentation/devicetree/bindings/arm/cci.txt
-+++ b/Documentation/devicetree/bindings/arm/cci.txt
-@@ -11,13 +11,6 @@ clusters, through memory mapped interface, with a global control register
- space and multiple sets of interface control registers, one per slave
- interface.
- 
--Bindings for the CCI node follow the ePAPR standard, available from:
--
--www.power.org/documentation/epapr-version-1-1/
--
--with the addition of the bindings described in this document which are
--specific to ARM.
--
- * CCI interconnect node
- 
- 	Description: Describes a CCI cache coherent Interconnect component
-@@ -50,10 +43,10 @@ specific to ARM.
- 			    as a tuple of cells, containing child address,
- 			    parent address and the size of the region in the
- 			    child address space.
--		Definition: A standard property. Follow rules in the ePAPR for
--			    hierarchical bus addressing. CCI interfaces
--			    addresses refer to the parent node addressing
--			    scheme to declare their register bases.
-+		Definition: A standard property. Follow rules in the Devicetree
-+			    Specification for hierarchical bus addressing. CCI
-+			    interfaces addresses refer to the parent node
-+			    addressing scheme to declare their register bases.
- 
- 	CCI interconnect node can define the following child nodes:
- 
-diff --git a/Documentation/devicetree/bindings/arm/cpus.txt b/Documentation/devicetree/bindings/arm/cpus.txt
-index 1030f5f50207..283c520a2224 100644
---- a/Documentation/devicetree/bindings/arm/cpus.txt
-+++ b/Documentation/devicetree/bindings/arm/cpus.txt
-@@ -6,9 +6,9 @@ The device tree allows to describe the layout of CPUs in a system through
- the "cpus" node, which in turn contains a number of subnodes (ie "cpu")
- defining properties for every cpu.
- 
--Bindings for CPU nodes follow the ePAPR v1.1 standard, available from:
-+Bindings for CPU nodes follow the Devicetree Specification, available from:
- 
--https://www.power.org/documentation/epapr-version-1-1/
-+https://www.devicetree.org/specifications/
- 
- with updates for 32-bit and 64-bit ARM systems provided in this document.
- 
-@@ -16,8 +16,8 @@ with updates for 32-bit and 64-bit ARM systems provided in this document.
- Convention used in this document
- ================================
- 
--This document follows the conventions described in the ePAPR v1.1, with
--the addition:
-+This document follows the conventions described in the Devicetree
-+Specification, with the addition:
- 
- - square brackets define bitfields, eg reg[7:0] value of the bitfield in
-   the reg property contained in bits 7 down to 0
-@@ -26,8 +26,9 @@ the addition:
- cpus and cpu node bindings definition
- =====================================
- 
--The ARM architecture, in accordance with the ePAPR, requires the cpus and cpu
--nodes to be present and contain the properties described below.
-+The ARM architecture, in accordance with the Devicetree Specification,
-+requires the cpus and cpu nodes to be present and contain the properties
-+described below.
- 
- - cpus node
- 
-diff --git a/Documentation/devicetree/bindings/arm/idle-states.txt b/Documentation/devicetree/bindings/arm/idle-states.txt
-index b8e41c148a3c..7a591333f2b1 100644
---- a/Documentation/devicetree/bindings/arm/idle-states.txt
-+++ b/Documentation/devicetree/bindings/arm/idle-states.txt
-@@ -695,5 +695,5 @@ cpus {
- [4] ARM Architecture Reference Manuals
-     http://infocenter.arm.com/help/index.jsp
- 
--[5] ePAPR standard
--    https://www.power.org/documentation/epapr-version-1-1/
-+[5] Devicetree Specification
-+    https://www.devicetree.org/specifications/
-diff --git a/Documentation/devicetree/bindings/arm/l2c2x0.txt b/Documentation/devicetree/bindings/arm/l2c2x0.txt
-index d9650c1788f4..fbe6cb21f4cf 100644
---- a/Documentation/devicetree/bindings/arm/l2c2x0.txt
-+++ b/Documentation/devicetree/bindings/arm/l2c2x0.txt
-@@ -4,8 +4,8 @@ ARM cores often have a separate L2C210/L2C220/L2C310 (also known as PL210/PL220/
- PL310 and variants) based level 2 cache controller. All these various implementations
- of the L2 cache controller have compatible programming models (Note 1).
- Some of the properties that are just prefixed "cache-*" are taken from section
--3.7.3 of the ePAPR v1.1 specification which can be found at:
--https://www.power.org/wp-content/uploads/2012/06/Power_ePAPR_APPROVED_v1.1.pdf
-+3.7.3 of the Devicetree Specification which can be found at:
-+https://www.devicetree.org/specifications/
- 
- The ARM L2 cache representation in the device tree should be done as follows:
- 
-diff --git a/Documentation/devicetree/bindings/arm/topology.txt b/Documentation/devicetree/bindings/arm/topology.txt
-index 1061faf5f602..de9eb0486630 100644
---- a/Documentation/devicetree/bindings/arm/topology.txt
-+++ b/Documentation/devicetree/bindings/arm/topology.txt
-@@ -29,9 +29,9 @@ corresponding to the system hierarchy; syntactically they are defined as device
- tree nodes.
- 
- The remainder of this document provides the topology bindings for ARM, based
--on the ePAPR standard, available from:
-+on the Devicetree Specification, available from:
- 
--http://www.power.org/documentation/epapr-version-1-1/
-+https://www.devicetree.org/specifications/
- 
- If not stated otherwise, whenever a reference to a cpu node phandle is made its
- value must point to a cpu node compliant with the cpu node bindings as
-diff --git a/Documentation/devicetree/bindings/bus/simple-pm-bus.txt b/Documentation/devicetree/bindings/bus/simple-pm-bus.txt
-index d032237512c2..6f15037131ed 100644
---- a/Documentation/devicetree/bindings/bus/simple-pm-bus.txt
-+++ b/Documentation/devicetree/bindings/bus/simple-pm-bus.txt
-@@ -10,7 +10,7 @@ enabled for child devices connected to the bus (either on-SoC or externally)
- to function.
- 
- While "simple-pm-bus" follows the "simple-bus" set of properties, as specified
--in ePAPR, it is not an extension of "simple-bus".
-+in the Devicetree Specification, it is not an extension of "simple-bus".
- 
- 
- Required properties:
-diff --git a/Documentation/devicetree/bindings/chosen.txt b/Documentation/devicetree/bindings/chosen.txt
-index b5e39af4ddc0..dee3f5d9df26 100644
---- a/Documentation/devicetree/bindings/chosen.txt
-+++ b/Documentation/devicetree/bindings/chosen.txt
-@@ -10,7 +10,8 @@ stdout-path property
- --------------------
- 
- Device trees may specify the device to be used for boot console output
--with a stdout-path property under /chosen, as described in ePAPR, e.g.
-+with a stdout-path property under /chosen, as described in the Devicetree
-+Specification, e.g.
- 
- / {
- 	chosen {
-diff --git a/Documentation/devicetree/bindings/common-properties.txt b/Documentation/devicetree/bindings/common-properties.txt
-index 3193979b1d05..697714f8d75c 100644
---- a/Documentation/devicetree/bindings/common-properties.txt
-+++ b/Documentation/devicetree/bindings/common-properties.txt
-@@ -1,6 +1,6 @@
- Common properties
- 
--The ePAPR specification does not define any properties related to hardware
-+The Devicetree Specification does not define any properties related to hardware
- byteswapping, but endianness issues show up frequently in porting Linux to
- different machine types.  This document attempts to provide a consistent
- way of handling byteswapping across drivers.
-diff --git a/Documentation/devicetree/bindings/crypto/fsl-sec4.txt b/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
-index 10a425f451fc..7aef0eae58d4 100644
---- a/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
-+++ b/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
-@@ -118,8 +118,8 @@ PROPERTIES
-       Definition: A list of clock name strings in the same order as the
-           clocks property.
- 
--   Note: All other standard properties (see the ePAPR) are allowed
--   but are optional.
-+   Note: All other standard properties (see the Devicetree Specification)
-+   are allowed but are optional.
- 
- 
- EXAMPLE
-diff --git a/Documentation/devicetree/bindings/crypto/fsl-sec6.txt b/Documentation/devicetree/bindings/crypto/fsl-sec6.txt
-index baf8a3c1b469..73b0eb950bb3 100644
---- a/Documentation/devicetree/bindings/crypto/fsl-sec6.txt
-+++ b/Documentation/devicetree/bindings/crypto/fsl-sec6.txt
-@@ -55,8 +55,8 @@ PROPERTIES
-            triplet that includes the child address, parent address, &
-            length.
- 
--   Note: All other standard properties (see the ePAPR) are allowed
--   but are optional.
-+   Note: All other standard properties (see the Devicetree Specification)
-+   are allowed but are optional.
- 
- EXAMPLE
- 	crypto@a0000 {
-diff --git a/Documentation/devicetree/bindings/interrupt-controller/open-pic.txt b/Documentation/devicetree/bindings/interrupt-controller/open-pic.txt
-index 909a902dff85..ccbbfdc53c72 100644
---- a/Documentation/devicetree/bindings/interrupt-controller/open-pic.txt
-+++ b/Documentation/devicetree/bindings/interrupt-controller/open-pic.txt
-@@ -92,7 +92,6 @@ Example 2:
- 
- * References
- 
--[1] Power.org (TM) Standard for Embedded Power Architecture (TM) Platform
--    Requirements (ePAPR), Version 1.0, July 2008.
--    (http://www.power.org/resources/downloads/Power_ePAPR_APPROVED_v1.0.pdf)
-+[1] Devicetree Specification
-+    (https://www.devicetree.org/specifications/)
- 
-diff --git a/Documentation/devicetree/bindings/net/ethernet.txt b/Documentation/devicetree/bindings/net/ethernet.txt
-index 3a6916909d90..08dd263beeb9 100644
---- a/Documentation/devicetree/bindings/net/ethernet.txt
-+++ b/Documentation/devicetree/bindings/net/ethernet.txt
-@@ -8,7 +8,8 @@ The following properties are common to the Ethernet controllers:
-   property;
- - max-speed: number, specifies maximum speed in Mbit/s supported by the device;
- - max-frame-size: number, maximum transfer unit (IEEE defined MTU), rather than
--  the maximum frame size (there's contradiction in ePAPR).
-+  the maximum frame size (there's contradiction in the Devicetree
-+  Specification).
- - phy-mode: string, operation mode of the PHY interface. This is now a de-facto
-   standard property; supported values are:
-   * "mii"
-@@ -32,9 +33,11 @@ The following properties are common to the Ethernet controllers:
-   * "2000base-x",
-   * "2500base-x",
-   * "rxaui"
--- phy-connection-type: the same as "phy-mode" property but described in ePAPR;
-+- phy-connection-type: the same as "phy-mode" property but described in the
-+  Devicetree Specification;
- - phy-handle: phandle, specifies a reference to a node representing a PHY
--  device; this property is described in ePAPR and so preferred;
-+  device; this property is described in the Devicetree Specification and so
-+  preferred;
- - phy: the same as "phy-handle" property, not recommended for new bindings.
- - phy-device: the same as "phy-handle" property, not recommended for new
-   bindings.
-diff --git a/Documentation/devicetree/bindings/powerpc/fsl/cpus.txt b/Documentation/devicetree/bindings/powerpc/fsl/cpus.txt
-index f8cd2397aa04..d63ab1dec16d 100644
---- a/Documentation/devicetree/bindings/powerpc/fsl/cpus.txt
-+++ b/Documentation/devicetree/bindings/powerpc/fsl/cpus.txt
-@@ -3,10 +3,10 @@ Power Architecture CPU Binding
- Copyright 2013 Freescale Semiconductor Inc.
- 
- Power Architecture CPUs in Freescale SOCs are represented in device trees as
--per the definition in ePAPR.
-+per the definition in the Devicetree Specification.
- 
--In addition to the ePAPR definitions, the properties defined below may be
--present on CPU nodes.
-+In addition to the the Devicetree Specification definitions, the properties
-+defined below may be present on CPU nodes.
- 
- PROPERTIES
- 
-diff --git a/Documentation/devicetree/bindings/powerpc/fsl/l2cache.txt b/Documentation/devicetree/bindings/powerpc/fsl/l2cache.txt
-index dc9bb3182525..8a70696395a7 100644
---- a/Documentation/devicetree/bindings/powerpc/fsl/l2cache.txt
-+++ b/Documentation/devicetree/bindings/powerpc/fsl/l2cache.txt
-@@ -1,7 +1,7 @@
- Freescale L2 Cache Controller
- 
- L2 cache is present in Freescale's QorIQ and QorIQ Qonverge platforms.
--The cache bindings explained below are ePAPR compliant
-+The cache bindings explained below are Devicetree Specification compliant
- 
- Required Properties:
- 
-diff --git a/Documentation/devicetree/bindings/powerpc/fsl/srio-rmu.txt b/Documentation/devicetree/bindings/powerpc/fsl/srio-rmu.txt
-index b9a8a2bcfae7..0496ada4bba4 100644
---- a/Documentation/devicetree/bindings/powerpc/fsl/srio-rmu.txt
-+++ b/Documentation/devicetree/bindings/powerpc/fsl/srio-rmu.txt
-@@ -124,8 +124,8 @@ Port-Write Unit:
- 		A single IRQ that handles port-write conditions is
- 		specified by this property.  (Typically shared with error).
- 
--   Note: All other standard properties (see the ePAPR) are allowed
--   but are optional.
-+   Note: All other standard properties (see the Devicetree Specification)
-+   are allowed but are optional.
- 
- Example:
- 	rmu: rmu@d3000 {
-diff --git a/Documentation/devicetree/bindings/powerpc/fsl/srio.txt b/Documentation/devicetree/bindings/powerpc/fsl/srio.txt
-index 07abf0f2f440..86ee6ea73754 100644
---- a/Documentation/devicetree/bindings/powerpc/fsl/srio.txt
-+++ b/Documentation/devicetree/bindings/powerpc/fsl/srio.txt
-@@ -72,7 +72,8 @@ the following properties:
- 		represents the LIODN associated with maintenance transactions
- 		for the port.
- 
--Note: All other standard properties (see ePAPR) are allowed but are optional.
-+Note: All other standard properties (see the Devicetree Specification)
-+are allowed but are optional.
- 
- Example:
- 
-diff --git a/Documentation/devicetree/booting-without-of.txt b/Documentation/devicetree/booting-without-of.txt
-index 280d283304bb..fb740445199f 100644
---- a/Documentation/devicetree/booting-without-of.txt
-+++ b/Documentation/devicetree/booting-without-of.txt
-@@ -1413,7 +1413,7 @@ Optional property:
- 	from DMA operations originating from the bus. It provides a means of
- 	defining a mapping or translation between the physical address space of
- 	the bus and the physical address space of the parent of the bus.
--	(for more information see ePAPR specification)
-+	(for more information see the Devicetree Specification)
- 
- * DMA Bus child
- Optional property:
-diff --git a/Documentation/devicetree/usage-model.txt b/Documentation/devicetree/usage-model.txt
-index 2b6b3d3f0388..33a8aaac02a8 100644
---- a/Documentation/devicetree/usage-model.txt
-+++ b/Documentation/devicetree/usage-model.txt
-@@ -387,7 +387,7 @@ static void __init harmony_init_machine(void)
- 	of_platform_populate(NULL, of_default_bus_match_table, NULL, NULL);
- }
- 
--"simple-bus" is defined in the ePAPR 1.0 specification as a property
-+"simple-bus" is defined in the Devicetree Specification as a property
- meaning a simple memory mapped bus, so the of_platform_populate() code
- could be written to just assume simple-bus compatible nodes will
- always be traversed.  However, we pass it in as an argument so that
-diff --git a/Documentation/xtensa/mmu.txt b/Documentation/xtensa/mmu.txt
-index 222a2c6748e6..5de8715d5bec 100644
---- a/Documentation/xtensa/mmu.txt
-+++ b/Documentation/xtensa/mmu.txt
-@@ -41,9 +41,9 @@ The scheme below assumes that the kernel is loaded below 0x40000000.
-  00..1F -> 00  -> 00  -> 00
- 
- The default location of IO peripherals is above 0xf0000000. This may be changed
--using a "ranges" property in a device tree simple-bus node. See ePAPR 1.1, §6.5
--for details on the syntax and semantic of simple-bus nodes. The following
--limitations apply:
-+using a "ranges" property in a device tree simple-bus node. See the Devicetree
-+Specification, section 4.5 for details on the syntax and semantics of
-+simple-bus nodes. The following limitations apply:
- 
- 1. Only top level simple-bus nodes are considered
- 
--- 
-Frank Rowand <frank.rowand@sony.com>
+	if (ret)
+		return ret;
+
+	req->dst_len = ...
+
+	return 0;
+
+> +}
+> +
+> +static unsigned int ccp_rsa_maxsize(struct crypto_akcipher *tfm)
+> +{
+> +	return CCP_RSA_MAXMOD;
+> +}
+> +
+> +static int ccp_rsa_crypt(struct akcipher_request *req, bool encrypt)
+> +{
+> +	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
+> +	struct ccp_ctx *ctx = akcipher_tfm_ctx(tfm);
+> +	struct ccp_rsa_req_ctx *rctx = akcipher_request_ctx(req);
+> +	int ret = 0;
+> +
+> +	memset(&rctx->cmd, 0, sizeof(rctx->cmd));
+> +	INIT_LIST_HEAD(&rctx->cmd.entry);
+> +	rctx->cmd.engine = CCP_ENGINE_RSA;
+> +
+> +	rctx->cmd.u.rsa.key_size = ctx->u.rsa.key_len; /* in bits */
+> +	if (encrypt) {
+> +		rctx->cmd.u.rsa.exp = &ctx->u.rsa.e_sg;
+> +		rctx->cmd.u.rsa.exp_len = ctx->u.rsa.e_len;
+> +	} else {
+> +		rctx->cmd.u.rsa.exp = &ctx->u.rsa.d_sg;
+> +		rctx->cmd.u.rsa.exp_len = ctx->u.rsa.d_len;
+> +	}
+> +	rctx->cmd.u.rsa.mod = &ctx->u.rsa.n_sg;
+> +	rctx->cmd.u.rsa.mod_len = ctx->u.rsa.n_len;
+> +	rctx->cmd.u.rsa.src = req->src;
+> +	rctx->cmd.u.rsa.src_len = req->src_len;
+> +	rctx->cmd.u.rsa.dst = req->dst;
+> +
+> +	ret = ccp_crypto_enqueue_request(&req->base, &rctx->cmd);
+> +
+> +	return ret;
+> +}
+> +
+> +static int ccp_rsa_encrypt(struct akcipher_request *req)
+> +{
+> +	return ccp_rsa_crypt(req, true);
+> +}
+> +
+> +static int ccp_rsa_decrypt(struct akcipher_request *req)
+> +{
+> +	return ccp_rsa_crypt(req, false);
+> +}
+> +
+> +static int ccp_check_key_length(unsigned int len)
+> +{
+> +	/* In bits */
+> +	if (len < 8 || len > 4096)
+> +		return -EINVAL;
+> +	return 0;
+> +}
+> +
+> +static void ccp_rsa_free_key_bufs(struct ccp_ctx *ctx)
+> +{
+> +	/* Clean up old key data */
+> +	kfree(ctx->u.rsa.e_buf);
+
+I don't see where this is ever set.
+
+> +	ctx->u.rsa.e_buf = NULL;
+> +	ctx->u.rsa.e_len = 0;
+> +	kfree(ctx->u.rsa.n_buf);
+
+I don't see where this is ever set.
+
+> +	ctx->u.rsa.n_buf = NULL;
+> +	ctx->u.rsa.n_len = 0;
+> +	kfree(ctx->u.rsa.d_buf);
+
+I don't see where this is ever set.
+
+> +	ctx->u.rsa.d_buf = NULL;
+> +	ctx->u.rsa.d_len = 0;
+> +}
+> +
+> +static int ccp_rsa_setkey(struct crypto_akcipher *tfm, const void *key,
+> +			  unsigned int keylen, bool private)
+> +{
+> +	struct ccp_ctx *ctx = akcipher_tfm_ctx(tfm);
+> +	struct rsa_key raw_key;
+> +	int key_len, i;
+> +	int ret;
+> +
+> +	ccp_rsa_free_key_bufs(ctx);
+> +	memset(&raw_key, 0, sizeof(raw_key));
+> +
+> +	/* Code borrowed from crypto/rsa.c */
+> +	if (private)
+> +		ret = rsa_parse_priv_key(&raw_key, key, keylen);
+> +	else
+> +		ret = rsa_parse_pub_key(&raw_key, key, keylen);
+> +	if (ret)
+> +		goto e_key;
+> +
+> +	/* Remove leading zeroes from the modulus (n) */
+> +	key_len = 0;
+> +	for (i = 0; i < raw_key.n_sz; i++)
+> +		if (raw_key.n[i]) {
+> +			key_len = raw_key.n_sz - i;
+> +			break;
+> +		}
+> +	ctx->u.rsa.key_len = key_len << 3; /* bits */
+> +	if (ccp_check_key_length(ctx->u.rsa.key_len)) {
+> +		ret = -EINVAL;
+> +		goto e_key;
+> +	}
+> +	ctx->u.rsa.n_len = key_len;
+> +	sg_init_one(&ctx->u.rsa.n_sg, raw_key.n + i, key_len);
+
+Shouldn't this be where u.rsa.n_buf is allocated and then the key
+copied to that buf.  Then the sg_init_one would be performed against
+the allocated buffer.
+
+> +
+> +	/* Remove leading zeroes from the public key (e) */
+> +	key_len = 0;
+> +	for (i = 0; i < raw_key.e_sz; i++)
+> +		if (raw_key.e[i]) {
+> +			key_len = raw_key.e_sz - i;
+> +			break;
+> +		}
+> +	ctx->u.rsa.e_len = key_len;
+> +	sg_init_one(&ctx->u.rsa.e_sg, raw_key.e + i, key_len);
+
+Ditto.
+
+> +
+> +	if (private) {
+> +		/* Remove leading zeroes from the private key (d) */
+> +		key_len = 0;
+> +		for (i = 0; i < raw_key.d_sz; i++)
+> +			if (raw_key.d[i]) {
+> +				key_len = raw_key.d_sz - i;
+> +				break;
+> +			}
+> +		ctx->u.rsa.d_len = key_len;
+> +		sg_init_one(&ctx->u.rsa.d_sg, raw_key.d + i, key_len);
+
+Ditto.
+
+> +	}
+> +
+> +	return 0;
+> +
+> +e_key:
+> +	return ret;
+> +}
+> +
+> +static int ccp_rsa_setprivkey(struct crypto_akcipher *tfm, const void *key,
+> +			      unsigned int keylen)
+> +{
+> +	return ccp_rsa_setkey(tfm, key, keylen, true);
+> +}
+> +
+> +static int ccp_rsa_setpubkey(struct crypto_akcipher *tfm, const void *key,
+> +			     unsigned int keylen)
+> +{
+> +	return ccp_rsa_setkey(tfm, key, keylen, false);
+> +}
+> +
+> +static int ccp_rsa_init_tfm(struct crypto_akcipher *tfm)
+> +{
+> +	struct ccp_ctx *ctx = akcipher_tfm_ctx(tfm);
+> +
+> +	akcipher_set_reqsize(tfm, sizeof(struct ccp_rsa_req_ctx));
+> +	ctx->complete = ccp_rsa_complete;
+> +
+> +	return 0;
+> +}
+> +
+> +static void ccp_rsa_exit_tfm(struct crypto_akcipher *tfm)
+> +{
+> +	struct ccp_ctx *ctx = crypto_tfm_ctx(&tfm->base);
+> +
+> +	ccp_rsa_free_key_bufs(ctx);
+> +}
+> +
+> +static struct akcipher_alg ccp_rsa_defaults = {
+> +	.encrypt = ccp_rsa_encrypt,
+> +	.decrypt = ccp_rsa_decrypt,
+> +	.sign = ccp_rsa_decrypt,
+> +	.verify = ccp_rsa_encrypt,
+> +	.set_pub_key = ccp_rsa_setpubkey,
+> +	.set_priv_key = ccp_rsa_setprivkey,
+> +	.max_size = ccp_rsa_maxsize,
+> +	.init = ccp_rsa_init_tfm,
+> +	.exit = ccp_rsa_exit_tfm,
+> +	.base = {
+> +		.cra_name = "rsa",
+> +		.cra_driver_name = "rsa-ccp",
+> +		.cra_priority = CCP_CRA_PRIORITY,
+> +		.cra_module = THIS_MODULE,
+> +		.cra_ctxsize = 2 * sizeof(struct ccp_ctx),
+> +	},
+> +};
+> +
+> +struct ccp_rsa_def {
+> +	unsigned int version;
+> +	const char *name;
+> +	const char *driver_name;
+> +	unsigned int reqsize;
+> +	struct akcipher_alg *alg_defaults;
+> +};
+> +
+> +static struct ccp_rsa_def rsa_algs[] = {
+> +	{
+> +		.version	= CCP_VERSION(3, 0),
+> +		.name		= "rsa",
+> +		.driver_name	= "rsa-ccp",
+> +		.reqsize	= sizeof(struct ccp_rsa_req_ctx),
+> +		.alg_defaults	= &ccp_rsa_defaults,
+> +	}
+> +};
+> +
+> +int ccp_register_rsa_alg(struct list_head *head, const struct ccp_rsa_def *def)
+> +{
+> +	struct ccp_crypto_akcipher_alg *ccp_alg;
+> +	struct akcipher_alg *alg;
+> +	int ret;
+> +
+> +	ccp_alg = kzalloc(sizeof(*ccp_alg), GFP_KERNEL);
+> +	if (!ccp_alg)
+> +		return -ENOMEM;
+> +
+> +	INIT_LIST_HEAD(&ccp_alg->entry);
+> +
+> +	alg = &ccp_alg->alg;
+> +	*alg = *def->alg_defaults;
+> +	snprintf(alg->base.cra_name, CRYPTO_MAX_ALG_NAME, "%s", def->name);
+> +	snprintf(alg->base.cra_driver_name, CRYPTO_MAX_ALG_NAME, "%s",
+> +		 def->driver_name);
+> +	ret = crypto_register_akcipher(alg);
+> +	if (ret) {
+> +		pr_err("%s akcipher algorithm registration error (%d)\n",
+> +		       alg->base.cra_name, ret);
+> +		kfree(ccp_alg);
+> +		return ret;
+> +	}
+> +
+> +	list_add(&ccp_alg->entry, head);
+> +
+> +	return 0;
+> +}
+> +
+> +int ccp_register_rsa_algs(struct list_head *head)
+> +{
+> +	int i, ret;
+> +	unsigned int ccpversion = ccp_version();
+> +
+> +	/* Register the RSA algorithm in standard mode
+> +	 * This works for CCP v3 and later
+> +	 */
+> +	for (i = 0; i < ARRAY_SIZE(rsa_algs); i++) {
+> +		if (rsa_algs[i].version > ccpversion)
+> +			continue;
+> +		ret = ccp_register_rsa_alg(head, &rsa_algs[i]);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +
+> +	return 0;
+> +}
+> diff --git a/drivers/crypto/ccp/ccp-crypto.h b/drivers/crypto/ccp/ccp-crypto.h
+> index dd5bf15f06e5..5d592ecc9af5 100644
+> --- a/drivers/crypto/ccp/ccp-crypto.h
+> +++ b/drivers/crypto/ccp/ccp-crypto.h
+> @@ -24,6 +24,8 @@
+>   #include <crypto/ctr.h>
+>   #include <crypto/hash.h>
+>   #include <crypto/sha.h>
+> +#include <crypto/akcipher.h>
+> +#include <crypto/internal/rsa.h>
+>   
+>   #define	CCP_LOG_LEVEL	KERN_INFO
+>   
+> @@ -58,6 +60,12 @@ struct ccp_crypto_ahash_alg {
+>   	struct ahash_alg alg;
+>   };
+>   
+> +struct ccp_crypto_akcipher_alg {
+> +	struct list_head entry;
+> +
+> +	struct akcipher_alg alg;
+> +};
+> +
+>   static inline struct ccp_crypto_ablkcipher_alg *
+>   	ccp_crypto_ablkcipher_alg(struct crypto_tfm *tfm)
+>   {
+> @@ -227,12 +235,34 @@ struct ccp_sha_exp_ctx {
+>   	u8 buf[MAX_SHA_BLOCK_SIZE];
+>   };
+>   
+> +/***** RSA related defines *****/
+> +
+> +struct ccp_rsa_ctx {
+> +	unsigned int key_len; /* in bits */
+> +	struct scatterlist e_sg;
+> +	u8 *e_buf;
+> +	unsigned int e_len;
+> +	struct scatterlist n_sg;
+> +	u8 *n_buf;
+> +	unsigned int n_len;
+> +	struct scatterlist d_sg;
+> +	u8 *d_buf;
+> +	unsigned int d_len;
+> +};
+> +
+> +struct ccp_rsa_req_ctx {
+> +	struct ccp_cmd cmd;
+> +};
+> +
+> +#define	CCP_RSA_MAXMOD	(4 * 1024 / 8)
+> +
+>   /***** Common Context Structure *****/
+>   struct ccp_ctx {
+>   	int (*complete)(struct crypto_async_request *req, int ret);
+>   
+>   	union {
+>   		struct ccp_aes_ctx aes;
+> +		struct ccp_rsa_ctx rsa;
+>   		struct ccp_sha_ctx sha;
+>   		struct ccp_des3_ctx des3;
+>   	} u;
+> @@ -249,5 +279,6 @@ struct scatterlist *ccp_crypto_sg_table_add(struct sg_table *table,
+>   int ccp_register_aes_aeads(struct list_head *head);
+>   int ccp_register_sha_algs(struct list_head *head);
+>   int ccp_register_des3_algs(struct list_head *head);
+> +int ccp_register_rsa_algs(struct list_head *head);
+>   
+>   #endif
+> diff --git a/drivers/crypto/ccp/ccp-debugfs.c b/drivers/crypto/ccp/ccp-debugfs.c
+> index 99aba1622613..88191c45ca7d 100644
+> --- a/drivers/crypto/ccp/ccp-debugfs.c
+> +++ b/drivers/crypto/ccp/ccp-debugfs.c
+> @@ -291,7 +291,6 @@ void ccp5_debugfs_setup(struct ccp_device *ccp)
+>   	struct dentry *debugfs_q_instance;
+>   	struct dentry *debugfs_q_stats;
+>   	unsigned long flags;
+> -	int rc = 0;
+
+Should be a separate patch.
+
+>   	int i;
+>   
+>   	if (!debugfs_initialized())
+> diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
+> index 2506b5025700..67cbb3e76888 100644
+> --- a/drivers/crypto/ccp/ccp-dev.c
+> +++ b/drivers/crypto/ccp/ccp-dev.c
+> @@ -415,6 +415,7 @@ static void ccp_do_cmd_complete(unsigned long data)
+>   	struct ccp_cmd *cmd = tdata->cmd;
+>   
+>   	cmd->callback(cmd->data, cmd->ret);
+> +
+
+Should be a separate patch.
+
+>   	complete(&tdata->completion);
+>   }
+>   
+> diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
+> index 11155e52c52c..2cdd15a92178 100644
+> --- a/drivers/crypto/ccp/ccp-ops.c
+> +++ b/drivers/crypto/ccp/ccp-ops.c
+> @@ -1786,7 +1786,7 @@ static int ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+>   	if (ret)
+>   		goto e_exp;
+>   
+> -	if (cmd_q->ccp->vdata->version < CCP_VERSION(4, 0)) {
+> +	if (cmd_q->ccp->vdata->version < CCP_VERSION(5, 0)) {
+
+Should be fixed based on the comment in the previous patch.
+
+>   		/* The RSA exponent may span multiple (32-byte) KSB entries and
+>   		 * must be in little endian format. Reverse copy each 32-byte
+>   		 * chunk of the exponent (En chunk to E0 chunk, E(n-1) chunk to
+> diff --git a/include/linux/ccp.h b/include/linux/ccp.h
+> index 3285c944194a..c03ee844a99d 100644
+> --- a/include/linux/ccp.h
+> +++ b/include/linux/ccp.h
+> @@ -20,7 +20,6 @@
+>   #include <crypto/aes.h>
+>   #include <crypto/sha.h>
+>   
+> -
+
+Should be a separate patch.
+
+Thanks,
+Tom
+
+>   struct ccp_device;
+>   struct ccp_cmd;
+>   
+> 
