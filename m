@@ -1,80 +1,57 @@
 From: Logan Gunthorpe <logang@deltatee.com>
-Subject: [PATCH 5/7] ntb: ntb_hw_intel: remove ioread64 and iowrite64 hacks
-Date: Thu, 22 Jun 2017 10:48:15 -0600
-Message-ID: <20170622164817.25515-6-logang@deltatee.com>
+Subject: [PATCH 1/7] drm/tilcdc: don't use volatile with iowrite64
+Date: Thu, 22 Jun 2017 10:48:11 -0600
+Message-ID: <20170622164817.25515-2-logang@deltatee.com>
 References: <20170622164817.25515-1-logang@deltatee.com>
 Cc: Arnd Bergmann <arnd@arndb.de>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Stephen Bates <sbates@raithlin.com>,
         Logan Gunthorpe <logang@deltatee.com>,
-        Jon Mason <jdmason@kudzu.us>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Allen Hubbe <Allen.Hubbe@emc.com>
+        Jyri Sarha <jsarha@ti.com>,
+        Tomi Valkeinen <tomi.valkeinen@ti.com>,
+        David Airlie <airlied@linux.ie>
 To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
         linux-ntb@googlegroups.com, linux-alpha@vger.kernel.org,
         linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
         dri-devel@lists.freedesktop.org
-Return-path: <linux-arch-owner@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20170622164817.25515-1-logang@deltatee.com>
-Sender: linux-arch-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Now that ioread64 and iowrite64 are available generically we can
-remove the hack at the top of ntb_hw_intel.c that patches them in
-when they are not available.
+This is a prep patch for adding a universal iowrite64.
+
+The patch is to prevent compiler warnings when we add iowrite64 that
+would occur because there is an unnecessary volatile in this driver.
 
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Cc: Jon Mason <jdmason@kudzu.us>
-Cc: Dave Jiang <dave.jiang@intel.com>
-Cc: Allen Hubbe <Allen.Hubbe@emc.com>
+Cc: Jyri Sarha <jsarha@ti.com>
+Cc: Tomi Valkeinen <tomi.valkeinen@ti.com>
+Cc: David Airlie <airlied@linux.ie>
 ---
- drivers/ntb/hw/intel/ntb_hw_intel.c | 30 ------------------------------
- 1 file changed, 30 deletions(-)
+ drivers/gpu/drm/tilcdc/tilcdc_regs.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/ntb/hw/intel/ntb_hw_intel.c b/drivers/ntb/hw/intel/ntb_hw_intel.c
-index c00238491673..56221d540c2b 100644
---- a/drivers/ntb/hw/intel/ntb_hw_intel.c
-+++ b/drivers/ntb/hw/intel/ntb_hw_intel.c
-@@ -153,35 +153,6 @@ MODULE_PARM_DESC(xeon_b2b_dsd_bar5_addr32,
- static inline enum ntb_topo xeon_ppd_topo(struct intel_ntb_dev *ndev, u8 ppd);
- static int xeon_init_isr(struct intel_ntb_dev *ndev);
- 
--#ifndef ioread64
--#ifdef readq
--#define ioread64 readq
--#else
--#define ioread64 _ioread64
--static inline u64 _ioread64(void __iomem *mmio)
--{
--	u64 low, high;
--
--	low = ioread32(mmio);
--	high = ioread32(mmio + sizeof(u32));
--	return low | (high << 32);
--}
--#endif
--#endif
--
--#ifndef iowrite64
--#ifdef writeq
--#define iowrite64 writeq
--#else
--#define iowrite64 _iowrite64
--static inline void _iowrite64(u64 val, void __iomem *mmio)
--{
--	iowrite32(val, mmio);
--	iowrite32(val >> 32, mmio + sizeof(u32));
--}
--#endif
--#endif
--
- static inline int pdev_is_atom(struct pci_dev *pdev)
+diff --git a/drivers/gpu/drm/tilcdc/tilcdc_regs.h b/drivers/gpu/drm/tilcdc/tilcdc_regs.h
+index 9d528c0a67a4..e9ce725698a9 100644
+--- a/drivers/gpu/drm/tilcdc/tilcdc_regs.h
++++ b/drivers/gpu/drm/tilcdc/tilcdc_regs.h
+@@ -131,14 +131,14 @@ static inline void tilcdc_write(struct drm_device *dev, u32 reg, u32 data)
+ static inline void tilcdc_write64(struct drm_device *dev, u32 reg, u64 data)
  {
- 	switch (pdev->device) {
-@@ -3008,4 +2979,3 @@ static void __exit intel_ntb_pci_driver_exit(void)
- 	debugfs_remove_recursive(debugfs_dir);
+ 	struct tilcdc_drm_private *priv = dev->dev_private;
+-	volatile void __iomem *addr = priv->mmio + reg;
++	void __iomem *addr = priv->mmio + reg;
+ 
+ #ifdef iowrite64
+ 	iowrite64(data, addr);
+ #else
+ 	__iowmb();
+ 	/* This compiles to strd (=64-bit write) on ARM7 */
+-	*(volatile u64 __force *)addr = __cpu_to_le64(data);
++	*(u64 __force *)addr = __cpu_to_le64(data);
+ #endif
  }
- module_exit(intel_ntb_pci_driver_exit);
--
+ 
 -- 
 2.11.0
