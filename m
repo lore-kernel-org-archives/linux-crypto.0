@@ -1,81 +1,36 @@
-From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: Re: [PATCH 5/7] staging: ccree: add clock management support
-Date: Thu, 22 Jun 2017 11:58:15 +0300
-Message-ID: <20170622085815.xaw6dn56t2yjrdm4@mwanda>
-References: <1498115276-1601-1-git-send-email-gilad@benyossef.com>
- <1498115276-1601-6-git-send-email-gilad@benyossef.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 1/1] crypto:drbg- Fixes panic in wait_for_completion call.
+Date: Thu, 22 Jun 2017 16:59:10 +0800
+Message-ID: <20170622085910.GA25859@gondor.apana.org.au>
+References: <ea78b839-5717-2edb-c073-82fa82a0b403@gmail.com>
+ <12466881.1IDO9Q7xg5@positron.chronox.de>
+ <20170610041727.GG14719@gondor.apana.org.au>
+ <CAFXBA=kWYZuVFDqKrrBEhDZa6n6SCTwM6g9ovx-_8B=RuqHjeA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: devel@driverdev.osuosl.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- driverdev-devel@linuxdriverproject.org, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org, Ofir Drang <ofir.drang@arm.com>
-To: Gilad Ben-Yossef <gilad@benyossef.com>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>,
+        linux-crypto@vger.kernel.org
+To: Harsh Jain <harshjain.prof@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:34650 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752783AbdFVI7d (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 22 Jun 2017 04:59:33 -0400
 Content-Disposition: inline
-In-Reply-To: <1498115276-1601-6-git-send-email-gilad@benyossef.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <CAFXBA=kWYZuVFDqKrrBEhDZa6n6SCTwM6g9ovx-_8B=RuqHjeA@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jun 22, 2017 at 10:07:51AM +0300, Gilad Ben-Yossef wrote:
-> +int cc_clk_on(struct ssi_drvdata *drvdata)
-> +{
-> +	int rc = 0;
-> +	struct clk *clk = drvdata->clk;
-> +
-> +	if (IS_ERR(clk))
-> +	/* No all devices have a clock associated with CCREE */
-> +		goto out;
+On Mon, Jun 12, 2017 at 12:00:49PM +0530, Harsh Jain wrote:
+> Hi Herbert,
+> 
+> Since It's a panic BUG.  Can we push this fix to stable kernel releases?
 
-Ugh...  I hate this.  The "goto out;" here is a waste of time
-do-nothing-goto that returns diretly.  It's equivalent to "return 0;".
-Is that intended?  Even with the comment, it's not clear...
+I have added it to crypto with a stable CC.
 
-People think do nothing gotos are a great idea but from reviewing tons
-and tons of real life errors, I can assure you that in real life (as
-opposed to theory) they don't prevent any future bugs and only introduce
-"forgot to set the error code" bugs.
-
-The indenting is messed up and multi-line indents get curly braces.
-
-> +
-> +	rc = clk_prepare_enable(clk);
-> +	if (rc) {
-> +		SSI_LOG_ERR("error enabling clock\n");
-> +		clk_disable_unprepare(clk);
-
-Don't unprepare something that hasn't been prepared.
-
-> +	}
-> +
-> +out:
-> +	return rc;
-> +}
-
-int cc_clk_on(struct ssi_drvdata *drvdata)
-{
-	struct clk *clk = drvdata->clk;
-	int rc;
-
-	if (IS_ERR(clk)) {
-		/* Not all devices have a clock associated with CCREE */
-		return 0;
-	}
-
-	rc = clk_prepare_enable(clk);
-	if (rc)
-		return rc;
-
-	return 0;
-}
-
-regards,
-dan carpenter
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
