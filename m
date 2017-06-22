@@ -1,244 +1,51 @@
-From: Tudor Ambarus <tudor.ambarus@microchip.com>
-Subject: [RFC PATCH] crypto: ecdh: fix concurrency on ecdh_ctx
-Date: Thu, 22 Jun 2017 14:03:53 +0300
-Message-ID: <1498129433-6874-1-git-send-email-tudor.ambarus@microchip.com>
+From: Brijesh Singh <brijesh.singh@amd.com>
+Subject: [PATCH 0/3] Introduce AMD Secure Processor device
+Date: Thu, 22 Jun 2017 06:42:01 -0500
+Message-ID: <20170622114204.4361-1-brijesh.singh@amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain
-Cc: <linux-crypto@vger.kernel.org>,
-        Tudor Ambarus <tudor.ambarus@microchip.com>
-To: <herbert@gondor.apana.org.au>
+Cc: gary.hook@amd.com, thomas.lendacky@amd.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        Brijesh Singh <brijesh.singh@amd.com>
+To: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from esa6.microchip.iphmx.com ([216.71.154.253]:8570 "EHLO
-        esa6.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752993AbdFVLEI (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Jun 2017 07:04:08 -0400
+Received: from mail-bl2nam02on0054.outbound.protection.outlook.com ([104.47.38.54]:58080
+        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1750852AbdFVLmh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 22 Jun 2017 07:42:37 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-ecdh_ctx contained static allocated data for the shared secret,
-for the public and private key.
+CCP device (drivers/crypto/ccp/ccp.ko) is part of AMD Secure Processor,
+which is not dedicated solely to crypto. The AMD Secure Processor includes
+CCP and PSP (Platform Secure Processor) devices.
 
-When talking about shared secret and public key, they were
-doomed to concurrency issues because they could be shared by
-multiple crypto requests. The requests were generating specific
-data to the same zone of memory without any protection.
+This patch series adds a framework that allows functional component of the
+AMD Secure Processor to be initialized and handled appropriately. The series
+does not makes any logic modification into CCP - it refactors the code to
+integerate CCP into AMD secure processor framework.
 
-The private key was subject to concurrency problems because
-multiple setkey calls could fight to memcpy to the same zone
-of memory.
+Brijesh Singh (3):
+  crypto: ccp - Use devres interface to allocate PCI/iomap and cleanup
+  crypto: ccp - Introduce the AMD Secure Processor device
+  crypto: cpp - Abstract interrupt registeration
 
-Shared secret and public key concurrency is fixed by allocating
-memory on heap for each request. In the end, the shared secret
-and public key are computed for each request, there is no reason
-to use shared memory.
+ drivers/crypto/Kconfig            |  10 +-
+ drivers/crypto/ccp/Kconfig        |  43 ++++--
+ drivers/crypto/ccp/Makefile       |   6 +-
+ drivers/crypto/ccp/ccp-dev-v3.c   |  17 ++-
+ drivers/crypto/ccp/ccp-dev-v5.c   |  12 +-
+ drivers/crypto/ccp/ccp-dev.c      | 124 ++++++++++------
+ drivers/crypto/ccp/ccp-dev.h      |  19 +--
+ drivers/crypto/ccp/ccp-pci.c      | 264 ++++++++++++---------------------
+ drivers/crypto/ccp/ccp-platform.c | 165 ++++++++-------------
+ drivers/crypto/ccp/sp-dev.c       | 305 ++++++++++++++++++++++++++++++++++++++
+ drivers/crypto/ccp/sp-dev.h       | 133 +++++++++++++++++
+ include/linux/ccp.h               |   3 +-
+ 12 files changed, 730 insertions(+), 371 deletions(-)
+ create mode 100644 drivers/crypto/ccp/sp-dev.c
+ create mode 100644 drivers/crypto/ccp/sp-dev.h
 
-Private key concurrency is fixed by allocating memory on heap
-for each setkey call, by memcopying the parsed/generated private
-key to the heap and by making the private key pointer from
-ecdh_ctx to point to the newly allocated data.
-
-On all systems running Linux, loads from and stores to pointers
-are atomic, that is, if a store to a pointer occurs at the same
-time as a load from that same pointer, the load will return either
-the initial value or the value stored, never some bitwise mashup
-of the two.
-
-With this, the private key will always point to a valid key,
-but to what setkey call it belongs, is the responsibility of the
-caller, as it is now in all crypto framework.
-
-Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
----
- crypto/ecc.h  |  2 --
- crypto/ecdh.c | 93 ++++++++++++++++++++++++++++++++++++++++++-----------------
- 2 files changed, 67 insertions(+), 28 deletions(-)
-
-diff --git a/crypto/ecc.h b/crypto/ecc.h
-index e4fd449..b35855b 100644
---- a/crypto/ecc.h
-+++ b/crypto/ecc.h
-@@ -26,8 +26,6 @@
- #ifndef _CRYPTO_ECC_H
- #define _CRYPTO_ECC_H
- 
--#define ECC_MAX_DIGITS	4 /* 256 */
--
- #define ECC_DIGITS_TO_BYTES_SHIFT 3
- 
- /**
-diff --git a/crypto/ecdh.c b/crypto/ecdh.c
-index 61c7708..30d954d 100644
---- a/crypto/ecdh.c
-+++ b/crypto/ecdh.c
-@@ -19,9 +19,7 @@
- struct ecdh_ctx {
- 	unsigned int curve_id;
- 	unsigned int ndigits;
--	u64 private_key[ECC_MAX_DIGITS];
--	u64 public_key[2 * ECC_MAX_DIGITS];
--	u64 shared_secret[ECC_MAX_DIGITS];
-+	const u64 *private_key;
- };
- 
- static inline struct ecdh_ctx *ecdh_get_ctx(struct crypto_kpp *tfm)
-@@ -38,13 +36,31 @@ static unsigned int ecdh_supported_curve(unsigned int curve_id)
- 	}
- }
- 
-+static int ecdh_gen_privkey(struct ecdh_ctx *ctx, u64 *private_key)
-+{
-+	int ret;
-+
-+	ret = ecc_gen_privkey(ctx->curve_id, ctx->ndigits, private_key);
-+	if (ret) {
-+		kzfree(private_key);
-+		return ret;
-+	}
-+
-+	ctx->private_key = private_key;
-+	return 0;
-+}
-+
- static int ecdh_set_secret(struct crypto_kpp *tfm, const void *buf,
- 			   unsigned int len)
- {
- 	struct ecdh_ctx *ctx = ecdh_get_ctx(tfm);
-+	u64 *private_key;
- 	struct ecdh params;
- 	unsigned int ndigits;
- 
-+	/* clear the old private key, if any */
-+	kzfree(ctx->private_key);
-+
- 	if (crypto_ecdh_decode_key(buf, len, &params) < 0)
- 		return -EINVAL;
- 
-@@ -52,59 +68,82 @@ static int ecdh_set_secret(struct crypto_kpp *tfm, const void *buf,
- 	if (!ndigits)
- 		return -EINVAL;
- 
-+	private_key = kzalloc(ndigits << ECC_DIGITS_TO_BYTES_SHIFT, GFP_KERNEL);
-+	if (!private_key)
-+		return -ENOMEM;
-+
- 	ctx->curve_id = params.curve_id;
- 	ctx->ndigits = ndigits;
- 
- 	if (!params.key || !params.key_size)
--		return ecc_gen_privkey(ctx->curve_id, ctx->ndigits,
--				       ctx->private_key);
-+		return ecdh_gen_privkey(ctx, private_key);
- 
- 	if (ecc_is_key_valid(ctx->curve_id, ctx->ndigits,
--			     (const u64 *)params.key, params.key_size) < 0)
-+			     (const u64 *)params.key, params.key_size) < 0) {
-+		kzfree(private_key);
- 		return -EINVAL;
-+	}
- 
--	memcpy(ctx->private_key, params.key, params.key_size);
-+	memcpy(private_key, params.key, params.key_size);
-+	ctx->private_key = private_key;
- 
- 	return 0;
- }
- 
- static int ecdh_compute_value(struct kpp_request *req)
- {
--	int ret = 0;
- 	struct crypto_kpp *tfm = crypto_kpp_reqtfm(req);
- 	struct ecdh_ctx *ctx = ecdh_get_ctx(tfm);
--	size_t copied, nbytes;
-+	u64 *public_key;
-+	u64 *shared_secret = NULL;
-+	size_t copied, nbytes, public_key_sz;
- 	void *buf;
-+	int ret = -ENOMEM;
- 
- 	nbytes = ctx->ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
-+	/* Public part is a point thus it has both coordinates */
-+	public_key_sz = 2 * nbytes;
-+
-+	public_key = kmalloc(public_key_sz, GFP_KERNEL);
-+	if (!public_key)
-+		return -ENOMEM;
- 
- 	if (req->src) {
--		copied = sg_copy_to_buffer(req->src, 1, ctx->public_key,
--					   2 * nbytes);
--		if (copied != 2 * nbytes)
--			return -EINVAL;
-+		shared_secret = kmalloc(nbytes, GFP_KERNEL);
-+		if (!shared_secret)
-+			goto free_pubkey;
-+
-+		copied = sg_copy_to_buffer(req->src, 1, public_key,
-+					   public_key_sz);
-+		if (copied != public_key_sz) {
-+			ret = -EINVAL;
-+			goto free_all;
-+		}
- 
- 		ret = crypto_ecdh_shared_secret(ctx->curve_id, ctx->ndigits,
--						ctx->private_key,
--						ctx->public_key,
--						ctx->shared_secret);
-+						ctx->private_key, public_key,
-+						shared_secret);
- 
--		buf = ctx->shared_secret;
-+		buf = shared_secret;
- 	} else {
- 		ret = ecc_make_pub_key(ctx->curve_id, ctx->ndigits,
--				       ctx->private_key, ctx->public_key);
--		buf = ctx->public_key;
--		/* Public part is a point thus it has both coordinates */
--		nbytes *= 2;
-+				       ctx->private_key, public_key);
-+		buf = public_key;
-+		nbytes = public_key_sz;
- 	}
- 
- 	if (ret < 0)
--		return ret;
-+		goto free_all;
- 
- 	copied = sg_copy_from_buffer(req->dst, 1, buf, nbytes);
- 	if (copied != nbytes)
--		return -EINVAL;
-+		ret = -EINVAL;
- 
-+	/* fall through */
-+free_all:
-+	kzfree(shared_secret);
-+free_pubkey:
-+	kfree(public_key);
- 	return ret;
- }
- 
-@@ -116,9 +155,11 @@ static unsigned int ecdh_max_size(struct crypto_kpp *tfm)
- 	return ctx->ndigits << (ECC_DIGITS_TO_BYTES_SHIFT + 1);
- }
- 
--static void no_exit_tfm(struct crypto_kpp *tfm)
-+static void ecdh_exit_tfm(struct crypto_kpp *tfm)
- {
--	return;
-+	struct ecdh_ctx *ctx = ecdh_get_ctx(tfm);
-+
-+	kzfree(ctx->private_key);
- }
- 
- static struct kpp_alg ecdh = {
-@@ -126,7 +167,7 @@ static struct kpp_alg ecdh = {
- 	.generate_public_key = ecdh_compute_value,
- 	.compute_shared_secret = ecdh_compute_value,
- 	.max_size = ecdh_max_size,
--	.exit = no_exit_tfm,
-+	.exit = ecdh_exit_tfm,
- 	.base = {
- 		.cra_name = "ecdh",
- 		.cra_driver_name = "ecdh-generic",
 -- 
-2.7.4
+2.9.4
