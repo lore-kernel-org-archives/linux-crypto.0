@@ -1,20 +1,19 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [PATCH 0/7] staging: ccree: bug fixes and TODO items for 4.13
-Date: Thu, 22 Jun 2017 11:37:47 +0300
-Message-ID: <CAOtvUMc-N5qVJr16f9fDEK7DOshhd9176iQJVBRjLj2pE6ufBw@mail.gmail.com>
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: Re: [PATCH 5/7] staging: ccree: add clock management support
+Date: Thu, 22 Jun 2017 11:58:15 +0300
+Message-ID: <20170622085815.xaw6dn56t2yjrdm4@mwanda>
 References: <1498115276-1601-1-git-send-email-gilad@benyossef.com>
- <CAOtvUMdwb44bCEM7kuOSuNVZjFOV083H1_+kqZ2F4ppQrPQh+A@mail.gmail.com>
- <20170622082813.akymrchk2xqctplw@mwanda>
+ <1498115276-1601-6-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Cc: devel@driverdev.osuosl.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- driverdev-devel@linuxdriverproject.org,
- Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+ driverdev-devel@linuxdriverproject.org, linux-kernel@vger.kernel.org,
  linux-crypto@vger.kernel.org, Ofir Drang <ofir.drang@arm.com>
-To: Dan Carpenter <dan.carpenter@oracle.com>
+To: Gilad Ben-Yossef <gilad@benyossef.com>
 Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-In-Reply-To: <20170622082813.akymrchk2xqctplw@mwanda>
+Content-Disposition: inline
+In-Reply-To: <1498115276-1601-6-git-send-email-gilad@benyossef.com>
 List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
  <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
 List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
@@ -26,43 +25,57 @@ Errors-To: driverdev-devel-bounces@linuxdriverproject.org
 Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jun 22, 2017 at 11:28 AM, Dan Carpenter
-<dan.carpenter@oracle.com> wrote:
-> On Thu, Jun 22, 2017 at 10:14:08AM +0300, Gilad Ben-Yossef wrote:
->> On Thu, Jun 22, 2017 at 10:07 AM, Gilad Ben-Yossef <gilad@benyossef.com> wrote:
->> > An assortment of bug fixes and staging TODO items.
->> > Highlights includes the driver passing crypto testmgr boot tests
->> > and support of multiple HW revs. without build time changes.
->> >
->> > Gilad Ben-Yossef (7):
->> >   staging: ccree: fix hash import/export
->> >   staging: ccree: register setkey for none hash macs
->> >   staging: ccree: add support for older HW revisions
->> >   staging: ccree: remove unused function
->> >   staging: ccree: add clock management support
->> >   staging: ccree: add DT bus coherency detection
->> >   staging: ccree: use signal safe completion wait
->>
->> One additional note: the patch set is on top of the current staging-next which
->> is d06838de4a015c7c4844ad3fcf63ad5e2c17b234 so it will conflict with
->> the coding style clean up patches from Jhin-Ming if you take them.
->>
->> If you wish me to merge this patch set on top those just let me know.
->>
->
-> Yes.  Those are fine and will be merged most likely.  It's strictly
-> first in, first out.
+On Thu, Jun 22, 2017 at 10:07:51AM +0300, Gilad Ben-Yossef wrote:
+> +int cc_clk_on(struct ssi_drvdata *drvdata)
+> +{
+> +	int rc = 0;
+> +	struct clk *clk = drvdata->clk;
+> +
+> +	if (IS_ERR(clk))
+> +	/* No all devices have a clock associated with CCREE */
+> +		goto out;
 
-Sure. I'll send an updated patch on top of those then.
+Ugh...  I hate this.  The "goto out;" here is a waste of time
+do-nothing-goto that returns diretly.  It's equivalent to "return 0;".
+Is that intended?  Even with the comment, it's not clear...
 
-Thanks,
-Gilad
+People think do nothing gotos are a great idea but from reviewing tons
+and tons of real life errors, I can assure you that in real life (as
+opposed to theory) they don't prevent any future bugs and only introduce
+"forgot to set the error code" bugs.
 
+The indenting is messed up and multi-line indents get curly braces.
 
--- 
-Gilad Ben-Yossef
-Chief Coffee Drinker
+> +
+> +	rc = clk_prepare_enable(clk);
+> +	if (rc) {
+> +		SSI_LOG_ERR("error enabling clock\n");
+> +		clk_disable_unprepare(clk);
 
-"If you take a class in large-scale robotics, can you end up in a
-situation where the homework eats your dog?"
- -- Jean-Baptiste Queru
+Don't unprepare something that hasn't been prepared.
+
+> +	}
+> +
+> +out:
+> +	return rc;
+> +}
+
+int cc_clk_on(struct ssi_drvdata *drvdata)
+{
+	struct clk *clk = drvdata->clk;
+	int rc;
+
+	if (IS_ERR(clk)) {
+		/* Not all devices have a clock associated with CCREE */
+		return 0;
+	}
+
+	rc = clk_prepare_enable(clk);
+	if (rc)
+		return rc;
+
+	return 0;
+}
+
+regards,
+dan carpenter
