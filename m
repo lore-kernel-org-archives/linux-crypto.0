@@ -1,12 +1,12 @@
-From: Alan Cox <gnomes@lxorguk.ukuu.org.uk>
-Subject: Re: [PATCH 4/7] alpha: provide ioread64 and iowrite64
- implementations
-Date: Thu, 22 Jun 2017 21:08:28 +0100
-Message-ID: <20170622210828.27304f6a@alans-desktop>
+From: Logan Gunthorpe <logang@deltatee.com>
+Subject: Re: [PATCH 4/7] alpha: provide ioread64 and iowrite64 implementations
+Date: Thu, 22 Jun 2017 14:09:55 -0600
+Message-ID: <401cdb64-6fdb-be30-b8bc-bf51c1a35074@deltatee.com>
 References: <20170622164817.25515-1-logang@deltatee.com>
-        <20170622164817.25515-5-logang@deltatee.com>
+ <20170622164817.25515-5-logang@deltatee.com>
+ <20170622210828.27304f6a@alans-desktop>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
 Cc: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
         linux-ntb@googlegroups.com, linux-alpha@vger.kernel.org,
@@ -17,26 +17,19 @@ Cc: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
         Richard Henderson <rth@twiddle.net>,
         Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
         Matt Turner <mattst88@gmail.com>
-To: Logan Gunthorpe <logang@deltatee.com>
-Return-path: <linux-arch-owner@vger.kernel.org>
-In-Reply-To: <20170622164817.25515-5-logang@deltatee.com>
-Sender: linux-arch-owner@vger.kernel.org
+To: Alan Cox <gnomes@lxorguk.ukuu.org.uk>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20170622210828.27304f6a@alans-desktop>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, 22 Jun 2017 10:48:14 -0600
-Logan Gunthorpe <logang@deltatee.com> wrote:
+On 6/22/2017 2:08 PM, Alan Cox wrote:
+> But this does not do the same thing as an ioread64 with regards to
+> atomicity or side effects on the device. The same is true of the other
+> hacks. You either have a real 64bit single read/write from MMIO space or
+> you don't. You can't fake it.
 
-> Alpha implements its own io operation and doesn't use the
-> common library. Thus to make ioread64 and iowrite64 globally
-> available we need to add implementations for alpha.
-> 
-> For this, we simply use calls that chain two 32-bit operations.
-> (mostly because I don't really understand the alpha architecture.)
+Yes, I know. But is it not better than having every driver that wants to 
+use these functions fake it themselves?
 
-But this does not do the same thing as an ioread64 with regards to
-atomicity or side effects on the device. The same is true of the other
-hacks. You either have a real 64bit single read/write from MMIO space or
-you don't. You can't fake it.
-
-
-Alan
+Logan
