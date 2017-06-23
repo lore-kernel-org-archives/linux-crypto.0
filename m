@@ -1,44 +1,79 @@
-From: Srikanth Jampala <Jampala.Srikanth@cavium.com>
-Subject: [PATCH][crypto-next] crypto: cavium/nitrox - Change in firmware path.
-Date: Fri, 23 Jun 2017 16:03:51 +0530
-Message-ID: <20170623103351.7153-1-Jampala.Srikanth@cavium.com>
+From: <archerrp@evms.edu>
+Subject: (unknown)
+Date: Fri, 23 Jun 2017 12:26:02 -0000
+Message-ID: <149822076287.4332.4658289526061379429@vnpt.vn>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Sreerama.Gadam@cavium.com,
-        Srikanth Jampala <Jampala.Srikanth@cavium.com>
-To: herbert@gondor.apana.org.au
+Content-Type: application/zip; name="EMAIL_553497223_linux-crypto.zip"
+Content-Transfer-Encoding: base64
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2nam03on0066.outbound.protection.outlook.com ([104.47.42.66]:39618
-        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1754510AbdFWKed (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 23 Jun 2017 06:34:33 -0400
+Received: from static.vnpt.vn ([113.176.7.182]:45786 "HELO vnpt.vn"
+        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with SMTP
+        id S1750932AbdFWM0L (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 23 Jun 2017 08:26:11 -0400
+Content-Disposition: attachment
+Subject: 
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Moved the firmware to "cavium" subdirectory as suggested by
-Kyle McMartin.
-
-Signed-off-by: Srikanth Jampala <Jampala.Srikanth@cavium.com>
----
- drivers/crypto/cavium/nitrox/nitrox_main.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/cavium/nitrox/nitrox_main.c b/drivers/crypto/cavium/nitrox/nitrox_main.c
-index ae44a46..9ccefb9 100644
---- a/drivers/crypto/cavium/nitrox/nitrox_main.c
-+++ b/drivers/crypto/cavium/nitrox/nitrox_main.c
-@@ -18,8 +18,9 @@
- #define SE_GROUP 0
- 
- #define DRIVER_VERSION "1.0"
-+#define FW_DIR "cavium/"
- /* SE microcode */
--#define SE_FW	"cnn55xx_se.fw"
-+#define SE_FW	FW_DIR "cnn55xx_se.fw"
- 
- static const char nitrox_driver_name[] = "CNN55XX";
- 
--- 
-2.9.4
+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
+AAAADQAAAAA=
