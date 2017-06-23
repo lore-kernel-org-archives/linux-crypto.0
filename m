@@ -1,45 +1,61 @@
-From: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
-Subject: [PATCH] crypto: brcm - software fallback for cryptlen zero
-Date: Fri, 23 Jun 2017 13:52:10 +0530
-Message-ID: <1498206130-15188-1-git-send-email-raveendra.padasalagi@broadcom.com>
-Cc: bcm-kernel-feedback-list@broadcom.com,
-        linux-kernel@vger.kernel.org,
-        Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Rob Rice <rob.rice@broadcom.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        Ray Jui <ray.jui@broadcom.com>,
-        Steve Lin <steven.lin1@broadcom.com>,
-        linux-crypto@vger.kernel.org
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [Patch V5 1/7] crypto: Multi-buffer encryption infrastructure
+ support
+Date: Fri, 23 Jun 2017 16:32:00 +0800
+Message-ID: <20170623083200.GA29882@gondor.apana.org.au>
+References: <1492721440-3698-1-git-send-email-megha.dey@linux.intel.com>
+ <1492721440-3698-2-git-send-email-megha.dey@linux.intel.com>
+ <20170424090024.GA20535@gondor.apana.org.au>
+ <1496951574.8042.15.camel@megha-Z97X-UD7-TH>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: tim.c.chen@linux.intel.com, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Megha Dey <megha.dey@intel.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1496951574.8042.15.camel@megha-Z97X-UD7-TH>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Zero length payload requests are not handled in
-Broadcom SPU2 engine, so this patch adds conditional
-check to fallback to software implementation for AES-GCM
-and AES-CCM algorithms.
+On Thu, Jun 08, 2017 at 12:52:54PM -0700, Megha Dey wrote:
+>
+> I will move this code to the mcryptd.c.
+> 
+> About the naming scheme, could you give me an example where the internal
+> and external algorithm have the same name? I tried searching but did not
+> find any.
+> 
+> When the outer and inner algorithm have the same name, I see a crash
+> when testing using tcrypt. This is because the wrong algortihm (with a
+> higher priority) is being picked up in __crypto_alg_lookup.  
+> 
+> Inner alg:
+> Currently:
+> alg name:__cbc(aes), driver name:__cbc-aes-aesni-mb
+> 
+> expected:
+> alg name:cbc(aes), driver name: cbc-aes-aesni-mb
+> 
+> Outer alg:
+> Currently:
+> alg name:cbc(aes), driver name:cbc-aes-aesni-mb
+> 
+> expected:
+> alg name:cbc(aes), driver name:mcryptd-cbc-aes-aesni-mb
 
-Signed-off-by: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
-Reviewed-by: Ray Jui <ray.jui@broadcom.com>
-Reviewed-by: Scott Branden <scott.branden@broadcom.com>
----
- drivers/crypto/bcm/cipher.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This all looks right.  So I'm not sure why you're getting the crash.
+We're relying on the INTERNAL flag to ensure the internal algorithm
+is not picked up except when we strictly ask for it.
 
-diff --git a/drivers/crypto/bcm/cipher.c b/drivers/crypto/bcm/cipher.c
-index cc0d5b9..6c80863 100644
---- a/drivers/crypto/bcm/cipher.c
-+++ b/drivers/crypto/bcm/cipher.c
-@@ -2625,7 +2625,7 @@ static int aead_need_fallback(struct aead_request *req)
- 	 */
- 	if (((ctx->cipher.mode == CIPHER_MODE_GCM) ||
- 	     (ctx->cipher.mode == CIPHER_MODE_CCM)) &&
--	    (req->assoclen == 0)) {
-+	    ((req->assoclen == 0) || (req->cryptlen == 0))) {
- 		if ((rctx->is_encrypt && (req->cryptlen == 0)) ||
- 		    (!rctx->is_encrypt && (req->cryptlen == ctx->digestsize))) {
- 			flow_log("AES GCM/CCM needs fallback for 0 len req\n");
+In fact I see something fishy in your testmgr code (the last patch
+in the series I think).  It's setting the INTERNAL bit when
+allocating tfms, that does not look right.
+
+The only one that should be setting this is mcryptd.
+
+Cheers,
 -- 
-1.9.1
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
