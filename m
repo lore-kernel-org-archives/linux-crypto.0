@@ -1,59 +1,36 @@
-From: Anup Patel <anup.patel@broadcom.com>
-Subject: Re: [PATCH] crypto: brcm - software fallback for cryptlen zero
-Date: Fri, 23 Jun 2017 14:04:15 +0530
-Message-ID: <CAALAos_08725iw7o8KUn4GOaK=yzycPe=ic5Rnsa54M=+dejeQ@mail.gmail.com>
-References: <1498206130-15188-1-git-send-email-raveendra.padasalagi@broadcom.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: encrypt_done called from interrupt context on rk3288 crypto
+ driver
+Date: Fri, 23 Jun 2017 16:37:17 +0800
+Message-ID: <20170623083717.GA30234@gondor.apana.org.au>
+References: <CAELSAVav4OQD1eTqtOey8_oZQPCBieO-HQQg1CaC23VmfD4KWQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Rob Rice <rob.rice@broadcom.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        Ray Jui <ray.jui@broadcom.com>,
-        Steve Lin <steven.lin1@broadcom.com>,
-        linux-crypto@vger.kernel.org,
-        BCM Kernel Feedback <bcm-kernel-feedback-list@broadcom.com>,
-        Linux Kernel <linux-kernel@vger.kernel.org>
-To: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1498206130-15188-1-git-send-email-raveendra.padasalagi@broadcom.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Zain Wang <zain.wang@rock-chips.com>, linux-crypto@vger.kernel.org
+To: Emil Karlson <jekarlson@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:35992 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751231AbdFWIhi (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 23 Jun 2017 04:37:38 -0400
+Content-Disposition: inline
+In-Reply-To: <CAELSAVav4OQD1eTqtOey8_oZQPCBieO-HQQg1CaC23VmfD4KWQ@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jun 23, 2017 at 1:52 PM, Raveendra Padasalagi
-<raveendra.padasalagi@broadcom.com> wrote:
-> Zero length payload requests are not handled in
-> Broadcom SPU2 engine, so this patch adds conditional
-> check to fallback to software implementation for AES-GCM
-> and AES-CCM algorithms.
->
-> Signed-off-by: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
-> Reviewed-by: Ray Jui <ray.jui@broadcom.com>
-> Reviewed-by: Scott Branden <scott.branden@broadcom.com>
-> ---
->  drivers/crypto/bcm/cipher.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/drivers/crypto/bcm/cipher.c b/drivers/crypto/bcm/cipher.c
-> index cc0d5b9..6c80863 100644
-> --- a/drivers/crypto/bcm/cipher.c
-> +++ b/drivers/crypto/bcm/cipher.c
-> @@ -2625,7 +2625,7 @@ static int aead_need_fallback(struct aead_request *req)
->          */
->         if (((ctx->cipher.mode == CIPHER_MODE_GCM) ||
->              (ctx->cipher.mode == CIPHER_MODE_CCM)) &&
-> -           (req->assoclen == 0)) {
-> +           ((req->assoclen == 0) || (req->cryptlen == 0))) {
->                 if ((rctx->is_encrypt && (req->cryptlen == 0)) ||
->                     (!rctx->is_encrypt && (req->cryptlen == ctx->digestsize))) {
->                         flow_log("AES GCM/CCM needs fallback for 0 len req\n");
-> --
-> 1.9.1
->
+On Thu, May 25, 2017 at 10:38:13PM +0300, Emil Karlson wrote:
+> Greetings
+> 
+> It seems to me that rk3288 crypto driver calls encrypt_done from
+> interrupt context which causes runtime tests to fail.
 
-This should go in linux-stable too.
+Zain, can you please take a look at this?
 
-Please CC Linux stable and include "Fixes:".
+It is illegal to call the completion function from hardirq context.
 
-Regards,
-Anup
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
