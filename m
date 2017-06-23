@@ -1,450 +1,81 @@
-From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: [PATCH v2 1/3] crypto: ccp - Use devres interface to allocate PCI/iomap and cleanup
-Date: Fri, 23 Jun 2017 11:06:28 -0500
-Message-ID: <20170623160630.63292-2-brijesh.singh@amd.com>
-References: <20170623160630.63292-1-brijesh.singh@amd.com>
+From: Tim Chen <tim.c.chen@linux.intel.com>
+Subject: Re: [bug] sha1-avx2 and read beyond
+Date: Fri, 23 Jun 2017 09:39:08 -0700
+Message-ID: <ea4d8991-7452-053e-8e53-8dcb6d28f69d@linux.intel.com>
+References: <1950313665.4516034.1493507041652.JavaMail.zimbra@redhat.com>
+ <502554512.20705544.1495630017500.JavaMail.zimbra@redhat.com>
+ <20170623084330.GA30353@gondor.apana.org.au>
+ <1943517473.41520875.1498207731142.JavaMail.zimbra@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: thomas.lendacky@amd.com, gary.hook@amd.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        Brijesh Singh <brijesh.singh@amd.com>
-To: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org,
+        ilya albrekht <ilya.albrekht@intel.com>,
+        maxim locktyukhin <maxim.locktyukhin@intel.com>,
+        ronen zohar <ronen.zohar@intel.com>, mouli@linux.intel.com,
+        minipli@googlemail.com, hpa@linux.intel.com, marex@denx.de
+To: Jan Stancek <jstancek@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        megha.dey@linux.intel.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn3nam01on0069.outbound.protection.outlook.com ([104.47.33.69]:49048
-        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1754179AbdFWQGy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 23 Jun 2017 12:06:54 -0400
-In-Reply-To: <20170623160630.63292-1-brijesh.singh@amd.com>
+Received: from mga05.intel.com ([192.55.52.43]:38333 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751488AbdFWQjJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 23 Jun 2017 12:39:09 -0400
+In-Reply-To: <1943517473.41520875.1498207731142.JavaMail.zimbra@redhat.com>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Update pci and platform files to use devres interface to allocate the PCI
-and iomap resources. Also add helper functions to consolicate module init,
-exit and power mangagement code duplication.
+On 06/23/2017 01:48 AM, Jan Stancek wrote:
+> 
+> 
+> ----- Original Message -----
+>> On Wed, May 24, 2017 at 08:46:57AM -0400, Jan Stancek wrote:
+>>>
+>>>
+>>> ----- Original Message -----
+>>>> Hi,
+>>>>
+>>>> I'm seeing rare crashes during NFS cthon with krb5 auth. After
+>>>> some digging I arrived at potential problem with sha1-avx2.
+>>>
+>>> Adding more sha1_avx2 experts to CC.
+>>>
+>>>>
+>>>> Problem appears to be that sha1_transform_avx2() reads beyond
+>>>> number of blocks you pass, if it is an odd number. It appears
+>>>> to try read one block more. This creates a problem if it falls
+>>>> beyond a page and there's nothing there.
+>>>
+>>> As noted in my reply, worst case appears to be read ahead
+>>> of up to 3 SHA1 blocks beyond end of data:
+>>>   http://marc.info/?l=linux-crypto-vger&m=149373371023377
+>>>
+>>>  +----------+---------+---------+---------+
+>>>  | 2*SHA1_BLOCK_SIZE  | 2*SHA1_BLOCK_SIZE |
+>>>  +----------+---------+---------+---------+
+>>>             ^ page boundary
+>>>     ^ data end
+>>>
+>>> It is still reproducible with 4.12-rc2.
+>>
+>> Can someone from Intel please look into this? Otherwise we'll have
+>> to disable sha-avx2.
+> 
+> So I take it my workaround patch [1] is not acceptable in
+> short-term as well?
+> 
+> [1] http://marc.info/?l=linux-crypto-vger&m=149373371023377
+> 
+> Regards,
+> Jan
+> 
 
-Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
----
- drivers/crypto/ccp/ccp-dev-v3.c   |   8 +++
- drivers/crypto/ccp/ccp-dev.c      |  61 ++++++++++++++++++++
- drivers/crypto/ccp/ccp-dev.h      |   6 ++
- drivers/crypto/ccp/ccp-pci.c      | 114 +++++++++-----------------------------
- drivers/crypto/ccp/ccp-platform.c |  56 ++-----------------
- 5 files changed, 107 insertions(+), 138 deletions(-)
+Megha,
 
-diff --git a/drivers/crypto/ccp/ccp-dev-v3.c b/drivers/crypto/ccp/ccp-dev-v3.c
-index 367c2e3..1cae5a3 100644
---- a/drivers/crypto/ccp/ccp-dev-v3.c
-+++ b/drivers/crypto/ccp/ccp-dev-v3.c
-@@ -586,6 +586,14 @@ static const struct ccp_actions ccp3_actions = {
- 	.irqhandler = ccp_irq_handler,
- };
- 
-+const struct ccp_vdata ccpv3_platform = {
-+	.version = CCP_VERSION(3, 0),
-+	.setup = NULL,
-+	.perform = &ccp3_actions,
-+	.bar = 2,
-+	.offset = 0,
-+};
-+
- const struct ccp_vdata ccpv3 = {
- 	.version = CCP_VERSION(3, 0),
- 	.setup = NULL,
-diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
-index 2506b50..ce35e43 100644
---- a/drivers/crypto/ccp/ccp-dev.c
-+++ b/drivers/crypto/ccp/ccp-dev.c
-@@ -538,8 +538,69 @@ bool ccp_queues_suspended(struct ccp_device *ccp)
- 
- 	return ccp->cmd_q_count == suspended;
- }
-+
-+int ccp_dev_suspend(struct ccp_device *ccp, pm_message_t state)
-+{
-+	unsigned long flags;
-+	unsigned int i;
-+
-+	spin_lock_irqsave(&ccp->cmd_lock, flags);
-+
-+	ccp->suspending = 1;
-+
-+	/* Wake all the queue kthreads to prepare for suspend */
-+	for (i = 0; i < ccp->cmd_q_count; i++)
-+		wake_up_process(ccp->cmd_q[i].kthread);
-+
-+	spin_unlock_irqrestore(&ccp->cmd_lock, flags);
-+
-+	/* Wait for all queue kthreads to say they're done */
-+	while (!ccp_queues_suspended(ccp))
-+		wait_event_interruptible(ccp->suspend_queue,
-+					 ccp_queues_suspended(ccp));
-+
-+	return 0;
-+}
-+
-+int ccp_dev_resume(struct ccp_device *ccp)
-+{
-+	unsigned long flags;
-+	unsigned int i;
-+
-+	spin_lock_irqsave(&ccp->cmd_lock, flags);
-+
-+	ccp->suspending = 0;
-+
-+	/* Wake up all the kthreads */
-+	for (i = 0; i < ccp->cmd_q_count; i++) {
-+		ccp->cmd_q[i].suspended = 0;
-+		wake_up_process(ccp->cmd_q[i].kthread);
-+	}
-+
-+	spin_unlock_irqrestore(&ccp->cmd_lock, flags);
-+
-+	return 0;
-+}
- #endif
- 
-+int ccp_dev_init(struct ccp_device *ccp)
-+{
-+	if (ccp->vdata->setup)
-+		ccp->vdata->setup(ccp);
-+
-+	ccp->io_regs = ccp->io_map + ccp->vdata->offset;
-+
-+	return ccp->vdata->perform->init(ccp);
-+}
-+
-+void ccp_dev_destroy(struct ccp_device *ccp)
-+{
-+	if (!ccp)
-+		return;
-+
-+	ccp->vdata->perform->destroy(ccp);
-+}
-+
- static int __init ccp_mod_init(void)
- {
- #ifdef CONFIG_X86
-diff --git a/drivers/crypto/ccp/ccp-dev.h b/drivers/crypto/ccp/ccp-dev.h
-index a70154a..df2e76e 100644
---- a/drivers/crypto/ccp/ccp-dev.h
-+++ b/drivers/crypto/ccp/ccp-dev.h
-@@ -652,6 +652,11 @@ void ccp_dmaengine_unregister(struct ccp_device *ccp);
- void ccp5_debugfs_setup(struct ccp_device *ccp);
- void ccp5_debugfs_destroy(void);
- 
-+int ccp_dev_init(struct ccp_device *ccp);
-+void ccp_dev_destroy(struct ccp_device *ccp);
-+int ccp_dev_suspend(struct ccp_device *ccp, pm_message_t state);
-+int ccp_dev_resume(struct ccp_device *ccp);
-+
- /* Structure for computation functions that are device-specific */
- struct ccp_actions {
- 	int (*aes)(struct ccp_op *);
-@@ -679,6 +684,7 @@ struct ccp_vdata {
- 	const unsigned int offset;
- };
- 
-+extern const struct ccp_vdata ccpv3_platform;
- extern const struct ccp_vdata ccpv3;
- extern const struct ccp_vdata ccpv5a;
- extern const struct ccp_vdata ccpv5b;
-diff --git a/drivers/crypto/ccp/ccp-pci.c b/drivers/crypto/ccp/ccp-pci.c
-index e880d4cf4..490ad0a 100644
---- a/drivers/crypto/ccp/ccp-pci.c
-+++ b/drivers/crypto/ccp/ccp-pci.c
-@@ -150,28 +150,13 @@ static void ccp_free_irqs(struct ccp_device *ccp)
- 	ccp->irq = 0;
- }
- 
--static int ccp_find_mmio_area(struct ccp_device *ccp)
--{
--	struct device *dev = ccp->dev;
--	struct pci_dev *pdev = to_pci_dev(dev);
--	resource_size_t io_len;
--	unsigned long io_flags;
--
--	io_flags = pci_resource_flags(pdev, ccp->vdata->bar);
--	io_len = pci_resource_len(pdev, ccp->vdata->bar);
--	if ((io_flags & IORESOURCE_MEM) &&
--	    (io_len >= (ccp->vdata->offset + 0x800)))
--		return ccp->vdata->bar;
--
--	return -EIO;
--}
--
- static int ccp_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- {
- 	struct ccp_device *ccp;
- 	struct ccp_pci *ccp_pci;
- 	struct device *dev = &pdev->dev;
--	unsigned int bar;
-+	void __iomem * const *iomap_table;
-+	int bar_mask;
- 	int ret;
- 
- 	ret = -ENOMEM;
-@@ -193,32 +178,34 @@ static int ccp_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	ccp->get_irq = ccp_get_irqs;
- 	ccp->free_irq = ccp_free_irqs;
- 
--	ret = pci_request_regions(pdev, "ccp");
-+	ret = pcim_enable_device(pdev);
- 	if (ret) {
--		dev_err(dev, "pci_request_regions failed (%d)\n", ret);
-+		dev_err(dev, "pcim_enable_device failed (%d)\n", ret);
- 		goto e_err;
- 	}
- 
--	ret = pci_enable_device(pdev);
-+	bar_mask = pci_select_bars(pdev, IORESOURCE_MEM);
-+	ret = pcim_iomap_regions(pdev, bar_mask, "ccp");
- 	if (ret) {
--		dev_err(dev, "pci_enable_device failed (%d)\n", ret);
--		goto e_regions;
-+		dev_err(dev, "pcim_iomap_regions failed (%d)\n", ret);
-+		goto e_err;
- 	}
- 
--	pci_set_master(pdev);
--
--	ret = ccp_find_mmio_area(ccp);
--	if (ret < 0)
--		goto e_device;
--	bar = ret;
-+	iomap_table = pcim_iomap_table(pdev);
-+	if (!iomap_table) {
-+		dev_err(dev, "pcim_iomap_table failed\n");
-+		ret = -ENOMEM;
-+		goto e_err;
-+	}
- 
--	ret = -EIO;
--	ccp->io_map = pci_iomap(pdev, bar, 0);
-+	ccp->io_map = iomap_table[ccp->vdata->bar];
- 	if (!ccp->io_map) {
--		dev_err(dev, "pci_iomap failed\n");
--		goto e_device;
-+		dev_err(dev, "ioremap failed\n");
-+		ret = -ENOMEM;
-+		goto e_err;
- 	}
--	ccp->io_regs = ccp->io_map + ccp->vdata->offset;
-+
-+	pci_set_master(pdev);
- 
- 	ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(48));
- 	if (ret) {
-@@ -226,32 +213,20 @@ static int ccp_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 		if (ret) {
- 			dev_err(dev, "dma_set_mask_and_coherent failed (%d)\n",
- 				ret);
--			goto e_iomap;
-+			goto e_err;
- 		}
- 	}
- 
- 	dev_set_drvdata(dev, ccp);
- 
--	if (ccp->vdata->setup)
--		ccp->vdata->setup(ccp);
--
--	ret = ccp->vdata->perform->init(ccp);
-+	ret = ccp_dev_init(ccp);
- 	if (ret)
--		goto e_iomap;
-+		goto e_err;
- 
- 	dev_notice(dev, "enabled\n");
- 
- 	return 0;
- 
--e_iomap:
--	pci_iounmap(pdev, ccp->io_map);
--
--e_device:
--	pci_disable_device(pdev);
--
--e_regions:
--	pci_release_regions(pdev);
--
- e_err:
- 	dev_notice(dev, "initialization failed\n");
- 	return ret;
-@@ -265,13 +240,7 @@ static void ccp_pci_remove(struct pci_dev *pdev)
- 	if (!ccp)
- 		return;
- 
--	ccp->vdata->perform->destroy(ccp);
--
--	pci_iounmap(pdev, ccp->io_map);
--
--	pci_disable_device(pdev);
--
--	pci_release_regions(pdev);
-+	ccp_dev_destroy(ccp);
- 
- 	dev_notice(dev, "disabled\n");
- }
-@@ -281,47 +250,16 @@ static int ccp_pci_suspend(struct pci_dev *pdev, pm_message_t state)
- {
- 	struct device *dev = &pdev->dev;
- 	struct ccp_device *ccp = dev_get_drvdata(dev);
--	unsigned long flags;
--	unsigned int i;
--
--	spin_lock_irqsave(&ccp->cmd_lock, flags);
--
--	ccp->suspending = 1;
--
--	/* Wake all the queue kthreads to prepare for suspend */
--	for (i = 0; i < ccp->cmd_q_count; i++)
--		wake_up_process(ccp->cmd_q[i].kthread);
- 
--	spin_unlock_irqrestore(&ccp->cmd_lock, flags);
--
--	/* Wait for all queue kthreads to say they're done */
--	while (!ccp_queues_suspended(ccp))
--		wait_event_interruptible(ccp->suspend_queue,
--					 ccp_queues_suspended(ccp));
--
--	return 0;
-+	return ccp_dev_suspend(ccp, state);
- }
- 
- static int ccp_pci_resume(struct pci_dev *pdev)
- {
- 	struct device *dev = &pdev->dev;
- 	struct ccp_device *ccp = dev_get_drvdata(dev);
--	unsigned long flags;
--	unsigned int i;
--
--	spin_lock_irqsave(&ccp->cmd_lock, flags);
--
--	ccp->suspending = 0;
- 
--	/* Wake up all the kthreads */
--	for (i = 0; i < ccp->cmd_q_count; i++) {
--		ccp->cmd_q[i].suspended = 0;
--		wake_up_process(ccp->cmd_q[i].kthread);
--	}
--
--	spin_unlock_irqrestore(&ccp->cmd_lock, flags);
--
--	return 0;
-+	return ccp_dev_resume(ccp);
- }
- #endif
- 
-diff --git a/drivers/crypto/ccp/ccp-platform.c b/drivers/crypto/ccp/ccp-platform.c
-index e26969e..4a970b1 100644
---- a/drivers/crypto/ccp/ccp-platform.c
-+++ b/drivers/crypto/ccp/ccp-platform.c
-@@ -102,19 +102,6 @@ static void ccp_free_irqs(struct ccp_device *ccp)
- 	free_irq(ccp->irq, dev);
- }
- 
--static struct resource *ccp_find_mmio_area(struct ccp_device *ccp)
--{
--	struct device *dev = ccp->dev;
--	struct platform_device *pdev = to_platform_device(dev);
--	struct resource *ior;
--
--	ior = platform_get_resource(pdev, IORESOURCE_MEM, 0);
--	if (ior && (resource_size(ior) >= 0x800))
--		return ior;
--
--	return NULL;
--}
--
- static int ccp_platform_probe(struct platform_device *pdev)
- {
- 	struct ccp_device *ccp;
-@@ -144,7 +131,7 @@ static int ccp_platform_probe(struct platform_device *pdev)
- 	ccp->get_irq = ccp_get_irqs;
- 	ccp->free_irq = ccp_free_irqs;
- 
--	ior = ccp_find_mmio_area(ccp);
-+	ior = platform_get_resource(pdev, IORESOURCE_MEM, 0);
- 	ccp->io_map = devm_ioremap_resource(dev, ior);
- 	if (IS_ERR(ccp->io_map)) {
- 		ret = PTR_ERR(ccp->io_map);
-@@ -172,7 +159,7 @@ static int ccp_platform_probe(struct platform_device *pdev)
- 
- 	dev_set_drvdata(dev, ccp);
- 
--	ret = ccp->vdata->perform->init(ccp);
-+	ret = ccp_dev_init(ccp);
- 	if (ret)
- 		goto e_err;
- 
-@@ -190,7 +177,7 @@ static int ccp_platform_remove(struct platform_device *pdev)
- 	struct device *dev = &pdev->dev;
- 	struct ccp_device *ccp = dev_get_drvdata(dev);
- 
--	ccp->vdata->perform->destroy(ccp);
-+	ccp_dev_destroy(ccp);
- 
- 	dev_notice(dev, "disabled\n");
- 
-@@ -203,47 +190,16 @@ static int ccp_platform_suspend(struct platform_device *pdev,
- {
- 	struct device *dev = &pdev->dev;
- 	struct ccp_device *ccp = dev_get_drvdata(dev);
--	unsigned long flags;
--	unsigned int i;
--
--	spin_lock_irqsave(&ccp->cmd_lock, flags);
- 
--	ccp->suspending = 1;
--
--	/* Wake all the queue kthreads to prepare for suspend */
--	for (i = 0; i < ccp->cmd_q_count; i++)
--		wake_up_process(ccp->cmd_q[i].kthread);
--
--	spin_unlock_irqrestore(&ccp->cmd_lock, flags);
--
--	/* Wait for all queue kthreads to say they're done */
--	while (!ccp_queues_suspended(ccp))
--		wait_event_interruptible(ccp->suspend_queue,
--					 ccp_queues_suspended(ccp));
--
--	return 0;
-+	return ccp_dev_suspend(ccp, state);
- }
- 
- static int ccp_platform_resume(struct platform_device *pdev)
- {
- 	struct device *dev = &pdev->dev;
- 	struct ccp_device *ccp = dev_get_drvdata(dev);
--	unsigned long flags;
--	unsigned int i;
--
--	spin_lock_irqsave(&ccp->cmd_lock, flags);
- 
--	ccp->suspending = 0;
--
--	/* Wake up all the kthreads */
--	for (i = 0; i < ccp->cmd_q_count; i++) {
--		ccp->cmd_q[i].suspended = 0;
--		wake_up_process(ccp->cmd_q[i].kthread);
--	}
--
--	spin_unlock_irqrestore(&ccp->cmd_lock, flags);
--
--	return 0;
-+	return ccp_dev_resume(ccp);
- }
- #endif
- 
-@@ -258,7 +214,7 @@ MODULE_DEVICE_TABLE(acpi, ccp_acpi_match);
- #ifdef CONFIG_OF
- static const struct of_device_id ccp_of_match[] = {
- 	{ .compatible = "amd,ccp-seattle-v1a",
--	  .data = (const void *)&ccpv3 },
-+	  .data = (const void *)&ccpv3_platform },
- 	{ },
- };
- MODULE_DEVICE_TABLE(of, ccp_of_match);
--- 
-2.9.4
+Can you take a look at this issue?
+
+Thanks.
+
+Tim
