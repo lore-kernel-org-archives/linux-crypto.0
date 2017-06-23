@@ -1,41 +1,66 @@
-From: kbuild test robot <fengguang.wu@intel.com>
-Subject: [RFC PATCH linux-next] crypto: cvm_encrypt() can be static
-Date: Fri, 23 Jun 2017 21:10:55 +0800
-Message-ID: <20170623131055.GA78777@lkp-sbx04>
-References: <201706232123.X4uTYxbf%fengguang.wu@intel.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: kbuild-all@01.org, Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: George Cherian <george.cherian@cavium.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <201706232123.X4uTYxbf%fengguang.wu@intel.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Antoine Tenart <antoine.tenart@free-electrons.com>
+Subject: [PATCH] crypto: inside-secure - do not parse the dma mask from dt
+Date: Fri, 23 Jun 2017 16:05:25 +0200
+Message-ID: <20170623140525.360-1-antoine.tenart@free-electrons.com>
+Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
+        thomas.petazzoni@free-electrons.com,
+        gregory.clement@free-electrons.com, oferh@marvell.com,
+        igall@marvell.com, nadavh@marvell.com, arnd@arndb.de,
+        linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au, davem@davemloft.net
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.free-electrons.com ([62.4.15.54]:46018 "EHLO
+        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754200AbdFWOGI (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 23 Jun 2017 10:06:08 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
+Remove the dma mask parsing from dt as this should not be encoded into
+the engine device tree node. Keep the fallback value for now, which
+should work for the boards already supported upstream.
 
-Signed-off-by: Fengguang Wu <fengguang.wu@intel.com>
+Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
 ---
- cptvf_algs.c |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/cavium/cpt/cptvf_algs.c b/drivers/crypto/cavium/cpt/cptvf_algs.c
-index 443c362..4303674 100644
---- a/drivers/crypto/cavium/cpt/cptvf_algs.c
-+++ b/drivers/crypto/cavium/cpt/cptvf_algs.c
-@@ -222,12 +222,12 @@ static inline int cvm_enc_dec(struct ablkcipher_request *req, u32 enc)
- 		return -EINPROGRESS;
- }
+Hi Herbert,
+
+As pointed our by Arnd (ic Cc) parsing the dma mask from the dt node of
+the engine is broken. This property will be removed from the device
+trees having an inside-secure safexcel engine node. While the
+inside-secure won't fail because of this (as it will fallback to a
+64 bits mask), the code handling the dma-mask property is dead. This
+patch removes it.
+
+Thanks!
+Antoine
+
+ drivers/crypto/inside-secure/safexcel.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
+index e7f87ac12685..1fabd4aee81b 100644
+--- a/drivers/crypto/inside-secure/safexcel.c
++++ b/drivers/crypto/inside-secure/safexcel.c
+@@ -773,7 +773,6 @@ static int safexcel_probe(struct platform_device *pdev)
+ 	struct device *dev = &pdev->dev;
+ 	struct resource *res;
+ 	struct safexcel_crypto_priv *priv;
+-	u64 dma_mask;
+ 	int i, ret;
  
--int cvm_encrypt(struct ablkcipher_request *req)
-+static int cvm_encrypt(struct ablkcipher_request *req)
- {
- 	return cvm_enc_dec(req, true);
- }
+ 	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
+@@ -802,9 +801,7 @@ static int safexcel_probe(struct platform_device *pdev)
+ 			return -EPROBE_DEFER;
+ 	}
  
--int cvm_decrypt(struct ablkcipher_request *req)
-+static int cvm_decrypt(struct ablkcipher_request *req)
- {
- 	return cvm_enc_dec(req, false);
- }
+-	if (of_property_read_u64(dev->of_node, "dma-mask", &dma_mask))
+-		dma_mask = DMA_BIT_MASK(64);
+-	ret = dma_set_mask_and_coherent(dev, dma_mask);
++	ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64));
+ 	if (ret)
+ 		goto err_clk;
+ 
+-- 
+2.9.4
