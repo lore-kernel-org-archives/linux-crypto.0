@@ -1,47 +1,59 @@
-From: Radu Solea <radu.solea@nxp.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [RFC PATCH] gcm - fix setkey cache coherence issues
-Date: Fri, 23 Jun 2017 07:33:20 +0000
-Message-ID: <1498203199.26231.21.camel@nxp.com>
+Date: Fri, 23 Jun 2017 15:43:59 +0800
+Message-ID: <20170623074359.GA29582@gondor.apana.org.au>
 References: <1498055361-12493-1-git-send-email-radu.solea@nxp.com>
-         <20170622024051.GA24529@gondor.apana.org.au>
-         <DB6PR04MB317607AE27DD1AC235D0103C8BDB0@DB6PR04MB3176.eurprd04.prod.outlook.com>
-         <20170622075338.GA25314@gondor.apana.org.au>
-         <1498139799.26231.10.camel@nxp.com>
-         <20170623063154.GA29002@gondor.apana.org.au>
+ <20170622024051.GA24529@gondor.apana.org.au>
+ <DB6PR04MB317607AE27DD1AC235D0103C8BDB0@DB6PR04MB3176.eurprd04.prod.outlook.com>
+ <20170622075338.GA25314@gondor.apana.org.au>
+ <1498139799.26231.10.camel@nxp.com>
+ <20170623063154.GA29002@gondor.apana.org.au>
+ <1498203199.26231.21.camel@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 Cc: "davem@davemloft.net" <davem@davemloft.net>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        =?utf-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@nxp.com>
-To: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
+        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
+To: Radu Solea <radu.solea@nxp.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-eopbgr40066.outbound.protection.outlook.com ([40.107.4.66]:13418
-        "EHLO EUR03-DB5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753374AbdFWHdZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 23 Jun 2017 03:33:25 -0400
-In-Reply-To: <20170623063154.GA29002@gondor.apana.org.au>
-Content-Language: en-US
-Content-ID: <7519C25382CFBC4892568D980E8D4225@eurprd04.prod.outlook.com>
+Received: from orcrist.hmeau.com ([104.223.48.154]:35952 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753849AbdFWHyP (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 23 Jun 2017 03:54:15 -0400
+Content-Disposition: inline
+In-Reply-To: <1498203199.26231.21.camel@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-T24gVmksIDIwMTctMDYtMjMgYXQgMTQ6MzEgKzA4MDAsIEhlcmJlcnQgWHUgd3JvdGU6DQo+IA0K
-PiBUaGUgY3J5cHRvIEFQSSBjYW5ub3QgcmVseSBvbiB1c2VycyBwcm92aWRpbmcgYWxpZ25lZCBi
-dWZmZXJzLsKgwqBTbw0KPiBpZiB5b3VyIGRyaXZlciBoYXMgYW4gYWxpZ25tZW50IHJlcXVpcmVt
-ZW50LCBpdCBlaXRoZXIgaGFzIHRvIHVzZQ0KPiB0aGUgZXhpc3RpbmcgY3J5cHRvIEFQSSBhbGln
-bm1hc2sgc2V0dGluZyB3aGljaCBjYW4gY29wZSB3aXRoIHNvbWUNCj4gdW5hbGlnbmVkIGlucHV0
-cywgZS5nLiwgdGhlIElWIGlmIHlvdSB1c2UgdGhlIHNrY2lwaGVyIHdhbGsNCj4gbWVjaGFuaXNt
-LA0KPiBvciB5b3UgbXVzdCBjb3B5IHVuYWxpZ25lZCBkYXRhIHlvdXJzZWxmIGJlZm9yZSBwZXJm
-b3JtaW5nIERNQSBvbg0KPiB0aGVtLg0KPiANCj4gQ2hlZXJzLA0KDQpOb3JtYWxseSBJIHdvdWxk
-IGFncmVlIHdpdGggeW91LCBpZiBpdCdzIGEgd2VpcmQgcmVxdWlyZW1lbnQgY29taW5nDQpmcm9t
-IGhhcmR3YXJlIG9yIGRyaXZlci4gSW4gdGhpcyBjYXNlIEkgdGhpbmsgaXQncyBkaWZmZXJlbnQu
-IFRoaXMgaXMNCm5vdCBhIGxpbWl0YXRpb24gY29taW5nIGZyb20gb25lIGRyaXZlciBvciBvbmUg
-cGFydGljdWxhciBoYXJkd2FyZQ0KdmFyaWV0eS4gSXQgYXBwbGllcyB0byBhbGwgcGxhdGZvcm1z
-IHRoYXQgZG8gbm90IGhhdmUgaHcgY2FjaGUNCmNvaGVyZW5jZSBhbmQgYSBsYXJnZSBlbm91Z2gg
-Y2FjaGVsaW5lLg0KwqANCkEgY291cGxlIG9mIGxpbmVzIGJlbG93IHRoZSBhbGxvY2F0aW9uIGhh
-c2ggaXMgbGlua2VkIGludG8gYQ0Kc2NhdHRlcmxpc3QsIGEgZGF0YSBzdHJ1Y3R1cmUgd2l0aCBy
-ZW1hcmthYmx5IGhpZ2ggY2hhbmNlcyBvZiBlbmRpbmcgdXANCmluIGEgRE1BIGVuZHBvaW50LCB5
-ZXQgd2UgY2hvb3NlIHRvIGlnbm9yZSBhbGwgb3RoZXIgRE1BIHJlcXVpcmVtZW50cz8NCg0KQ2hl
-ZXJzLA0KUmFkdS4=
+On Fri, Jun 23, 2017 at 07:33:20AM +0000, Radu Solea wrote:
+>
+> Normally I would agree with you, if it's a weird requirement coming
+> from hardware or driver. In this case I think it's different. This is
+> not a limitation coming from one driver or one particular hardware
+> variety. It applies to all platforms that do not have hw cache
+> coherence and a large enough cacheline.
+>  
+> A couple of lines below the allocation hash is linked into a
+> scatterlist, a data structure with remarkably high chances of ending up
+> in a DMA endpoint, yet we choose to ignore all other DMA requirements?
+
+What I'm saying is that you cannot rely on crypto API users to do
+this for you.  Sure we can fix this one spot in gcm.c.  But any
+other user of caam anywhere in the kernel can do exactly the same
+thing.
+
+You cannot expect them to know to allocate IVs at cacheline boundaries.
+So if you have this requirement (which the generic C version certainly
+does not), then you'll need to deal with it in the driver.
+
+Of course if every DMA driver needed to do the same thing, then it's
+something the crypto API should take care of, e.g., like we do for
+alignmask.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
