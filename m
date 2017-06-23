@@ -1,49 +1,51 @@
-From: "H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [PATCH 5/7] x86, boot, LLVM: Use regparm=0 for memcpy and memset
-Date: Thu, 22 Jun 2017 15:38:19 -0700
-Message-ID: <c6f5b08c-1de8-15a7-81c2-b41aad7d1c8b@zytor.com>
-References: <20170317001520.85223-1-md@google.com>
- <20170317001520.85223-6-md@google.com>
- <20170317120855.zwqame63yvy5afhg@hirez.programming.kicks-ass.net>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v10 1/2] crypto: skcipher AF_ALG - overhaul memory
+ management
+Date: Fri, 23 Jun 2017 14:10:48 +0800
+Message-ID: <20170623061048.GA28869@gondor.apana.org.au>
+References: <16464524.Q9cOxD7cVH@positron.chronox.de>
+ <8143872.gWNkduROBH@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: Michal Marek <mmarek@suse.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Shaohua Li <shli@kernel.org>,
-        Alexander Potapenko <glider@google.com>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Matthias Kaehlcke <mka@chromium.org>, x86@kernel.org,
-        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-raid@vger.kernel.org
-To: Peter Zijlstra <peterz@infradead.org>,
-        Michael Davidson <md@google.com>
-Return-path: <linux-kbuild-owner@vger.kernel.org>
-In-Reply-To: <20170317120855.zwqame63yvy5afhg@hirez.programming.kicks-ass.net>
-Content-Language: en-US
-Sender: linux-kbuild-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Cc: linux-crypto@vger.kernel.org
+To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:35906 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754412AbdFWGLK (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 23 Jun 2017 02:11:10 -0400
+Content-Disposition: inline
+In-Reply-To: <8143872.gWNkduROBH@positron.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 03/17/17 05:08, Peter Zijlstra wrote:
-> On Thu, Mar 16, 2017 at 05:15:18PM -0700, Michael Davidson wrote:
->> Use the standard regparm=0 calling convention for memcpy and
->> memset when building with clang.
->>
->> This is a work around for a long standing clang bug
->> (see https://llvm.org/bugs/show_bug.cgi?id=3997) where
->> clang always uses the standard regparm=0 calling convention
->> for any implcit calls to memcpy and memset that it generates
->> (eg for structure assignments and initialization) even if an
->> alternate calling convention such as regparm=3 has been specified.
-> 
-> Seriously, fix LLVM already.
-> 
+On Wed, Jun 21, 2017 at 10:03:02PM +0200, Stephan Müller wrote:
+>
+> +	/* convert iovecs of output buffers into RX SGL */
+> +	while (len < ctx->used && msg_data_left(msg)) {
 
-Yes, this is a real stinker, in no small part because once clang is
-fixed to DTRT then this is actually broken...
+How are we supposed to reach the wait path when ctx->used == 0?
 
-	-hpa
+> +		/*
+> +		 * This error covers -EIOCBQUEUED which implies that we can
+> +		 * only handle one AIO request. If the caller wants to have
+> +		 * multiple AIO requests in parallel, he must make multiple
+> +		 * separate AIO calls.
+> +		 */
+> +		if (err < 0) {
+> +			if (err == -EIOCBQUEUED)
+> +				ret = err;
+> +			goto out;
+>  		}
+> +		if (!err)
+> +			goto out;
 
+You can combine the two now as err <= 0.
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
