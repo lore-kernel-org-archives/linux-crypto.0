@@ -1,44 +1,45 @@
-From: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
-Subject: [PATCH] crypto: brcm - Fix SHA3-512 algorithm failure
-Date: Fri, 23 Jun 2017 12:15:47 +0530
-Message-ID: <1498200347-14580-1-git-send-email-raveendra.padasalagi@broadcom.com>
-Cc: bcm-kernel-feedback-list@broadcom.com,
-        linux-kernel@vger.kernel.org,
-        Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Rob Rice <rob.rice@broadcom.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        Ray Jui <ray.jui@broadcom.com>,
-        Steve Lin <steven.lin1@broadcom.com>,
-        linux-crypto@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2 2/2] crypto: engine - Permit to enqueue skcipher
+ request
+Date: Fri, 23 Jun 2017 14:48:37 +0800
+Message-ID: <20170623064837.GA29139@gondor.apana.org.au>
+References: <20170606134417.18850-1-clabbe.montjoie@gmail.com>
+ <20170606134417.18850-3-clabbe.montjoie@gmail.com>
+ <20170619052707.GA13180@gondor.apana.org.au>
+ <20170619075524.GA27419@Red>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Corentin Labbe <clabbe.montjoie@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:35922 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754277AbdFWGs6 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 23 Jun 2017 02:48:58 -0400
+Content-Disposition: inline
+In-Reply-To: <20170619075524.GA27419@Red>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-In Broadcom SPU driver, due to missing break statement
-in spu2_hash_xlate() while mapping SPU2 equivalent
-SHA3-512 value, -EINVAL is chosen and hence leading to
-failure of SHA3-512 algorithm. This patch fixes the same.
+On Mon, Jun 19, 2017 at 09:55:24AM +0200, Corentin Labbe wrote:
+>
+> Since there are two different user of "crypto engine + ablkcipher", it will be not easy to convert them in one serie. (I could do it, but I simply could not test it for OMAP (lack of hw))
+> And any new user which want to use crypto engine+skcipher (like me with the sun8i-ce driver) are simply stuck.
 
-Signed-off-by: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
-Reviewed-by: Ray Jui <ray.jui@broadcom.com>
-Reviewed-by: Scott Branden <scott.branden@broadcom.com>
----
- drivers/crypto/bcm/spu2.c | 1 +
- 1 file changed, 1 insertion(+)
+You're right.  We'll need to do this in a backwards-compatible way.  In fact
+we already do something similar in skcipher.c itself.  Simply look at the
+cra_type field and if it matches blkcipher/ablkcipher/givcipher then it's
+legacy ablkcipher, otherwise it's skcipher.
 
-diff --git a/drivers/crypto/bcm/spu2.c b/drivers/crypto/bcm/spu2.c
-index ef04c97..bf7ac62 100644
---- a/drivers/crypto/bcm/spu2.c
-+++ b/drivers/crypto/bcm/spu2.c
-@@ -302,6 +302,7 @@ static int spu2_hash_mode_xlate(enum hash_mode hash_mode,
- 		break;
- 	case HASH_ALG_SHA3_512:
- 		*spu2_type = SPU2_HASH_TYPE_SHA3_512;
-+		break;
- 	case HASH_ALG_LAST:
- 	default:
- 		err = -EINVAL;
+Also the way crypto_engine looks at the request type in the data-path is
+suboptimal.  This should really be built into the cra_type object.  For
+example, we can have cra_type->engine->prepare_request which would just
+do the right thing.
+
+Thanks,
 -- 
-1.9.1
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
