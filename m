@@ -1,56 +1,81 @@
-From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: [PATCH v6 0/2] IV Generation algorithms for dm-crypt
-Date: Fri, 23 Jun 2017 11:21:56 -0700
-Message-ID: <20170623182156.GB84943@gmail.com>
-References: <1498106510-19793-1-git-send-email-binoy.jayan@linaro.org>
- <20170623081341.GA29748@gondor.apana.org.au>
+From: Marek Vasut <marex@denx.de>
+Subject: Re: Regarding Porting of hardware cryptography to Linux kernel
+Date: Fri, 23 Jun 2017 20:13:51 +0200
+Message-ID: <1f623a19-10aa-b83b-8b0b-e490b34e60fc@denx.de>
+References: <CALWoFifFJVxnCX+_aq40zOdeZh86Gri47pP8oTmcFHAc-VjO_A@mail.gmail.com>
+ <d96aa776-6693-8824-7da5-0487a6687169@denx.de>
+ <CALWoFifTrdDP3jCR037JgnaR-Q3A4-EKVrb_TQxnKpEfdbvbng@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Binoy Jayan <binoy.jayan@linaro.org>, broonie@kernel.org,
-        arnd@arndb.de, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, dm-devel@redhat.com,
-        linux-raid@vger.kernel.org, rnayak@codeaurora.org,
-        David Gstir <david@sigma-star.at>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: sagar khadgi <sagar.khadgi@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:34044 "EHLO
-        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754327AbdFWSWA (ORCPT
+Received: from mail-out.m-online.net ([212.18.0.9]:53732 "EHLO
+        mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754327AbdFWSci (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 23 Jun 2017 14:22:00 -0400
-Content-Disposition: inline
-In-Reply-To: <20170623081341.GA29748@gondor.apana.org.au>
+        Fri, 23 Jun 2017 14:32:38 -0400
+In-Reply-To: <CALWoFifTrdDP3jCR037JgnaR-Q3A4-EKVrb_TQxnKpEfdbvbng@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jun 23, 2017 at 04:13:41PM +0800, Herbert Xu wrote:
-> Binoy Jayan <binoy.jayan@linaro.org> wrote:
-> > ===============================================================================
-> > dm-crypt optimization for larger block sizes
-> > ===============================================================================
-> > 
-> > Currently, the iv generation algorithms are implemented in dm-crypt.c. The goal
-> > is to move these algorithms from the dm layer to the kernel crypto layer by
-> > implementing them as template ciphers so they can be used in relation with
-> > algorithms like aes, and with multiple modes like cbc, ecb etc. As part of this
-> > patchset, the iv-generation code is moved from the dm layer to the crypto layer
-> > and adapt the dm-layer to send a whole 'bio' (as defined in the block layer)
-> > at a time. Each bio contains the in memory representation of physically
-> > contiguous disk blocks. Since the bio itself may not be contiguous in main
-> > memory, the dm layer sets up a chained scatterlist of these blocks split into
-> > physically contiguous segments in memory so that DMA can be performed.
+On 06/23/2017 07:16 AM, sagar khadgi wrote:
+> Hi Marek,
+
+Hi,
+
+> Thanks for replying.
 > 
-> There is currently a patch-set for fscrypt to add essiv support.  It
-> would be interesting to know whether your implementation of essiv
-> can also be used in that patchset.  That would confirm that we're on
-> the right track.
+> Regarding Hardware:
+> 
+> I am using Xilinx zynq FPGA with Athena Core which as AES, RSA, DSA,
+> ECDSA, NRBG etc feature.
+> I am trying to integrate with Linux kernal. Can you please tell me is
+> there any document/example project/link which I can refer.
+
+Yes, see the link I posted in my previous email. Moreover, you can look
+into the drivers in the Linux kernel and inspire yourself there.
+
+> Thanks and regards,
+> Sagar
+> 
+> 
+> 
+> On Thu, Jun 22, 2017 at 5:27 PM, Marek Vasut <marex@denx.de
+> <mailto:marex@denx.de>> wrote:
+> 
+>     On 06/22/2017 01:50 PM, sagar khadgi wrote:
+>     > Hi Marek,
+> 
+>     Hi,
+> 
+>     > I am having one microcontroller which has AES, HMAC, SHA, DES, RSA, DSA,
+>     > ECDSA cryptographic services. I want to port it to Linux Kernal so that
+>     > I can access them through OpenSSL from user space.
+>     >
+>     > I am new to Linux. Can you please provide me any document or link for
+>     > porting the hardware cryptography to Linux kernel.
+> 
+>     Try https://www.kernel.org/doc/html/v4.11/crypto/index.html
+>     <https://www.kernel.org/doc/html/v4.11/crypto/index.html>
+> 
+>     unless you provide further details about your hardware, it's hard to
+>     help you more.
+> 
+>     > Thanking you in advance.
+>     >
+>     > Regards,
+>     > Sagar
+> 
+> 
+>     --
+>     Best regards,
+>     Marek Vasut
+> 
 > 
 
-You can find the fscrypt patch at https://patchwork.kernel.org/patch/9795327/
 
-Note that it's encrypting 4096-byte blocks, not 512-byte.  Also, it's using
-AES-256 for the ESSIV tfm (since it uses a SHA-256 hash) but AES-128 for the
-"real" encryption.  It's possible this is a mistake and it should be AES-128 for
-both.  (If it is, it needs to be fixed before it's released in 4.13.)
-
-Eric
+-- 
+Best regards,
+Marek Vasut
