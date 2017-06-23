@@ -1,81 +1,65 @@
-From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: [bug] sha1-avx2 and read beyond
-Date: Fri, 23 Jun 2017 09:39:08 -0700
-Message-ID: <ea4d8991-7452-053e-8e53-8dcb6d28f69d@linux.intel.com>
-References: <1950313665.4516034.1493507041652.JavaMail.zimbra@redhat.com>
- <502554512.20705544.1495630017500.JavaMail.zimbra@redhat.com>
- <20170623084330.GA30353@gondor.apana.org.au>
- <1943517473.41520875.1498207731142.JavaMail.zimbra@redhat.com>
+From: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
+Subject: Re: [PATCH v1] crypto: brcm - software fallback for cryptlen zero
+Date: Fri, 23 Jun 2017 22:44:02 +0530
+Message-ID: <CAAFb_vpj4HMrXbJGL-skK7NS79YDQtDsCAVpcJOKDc_mTFctbA@mail.gmail.com>
+References: <1498208070-15584-1-git-send-email-raveendra.padasalagi@broadcom.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org,
-        ilya albrekht <ilya.albrekht@intel.com>,
-        maxim locktyukhin <maxim.locktyukhin@intel.com>,
-        ronen zohar <ronen.zohar@intel.com>, mouli@linux.intel.com,
-        minipli@googlemail.com, hpa@linux.intel.com, marex@denx.de
-To: Jan Stancek <jstancek@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        megha.dey@linux.intel.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga05.intel.com ([192.55.52.43]:38333 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751488AbdFWQjJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 23 Jun 2017 12:39:09 -0400
-In-Reply-To: <1943517473.41520875.1498207731142.JavaMail.zimbra@redhat.com>
-Content-Language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Cc: bcm-kernel-feedback-list <bcm-kernel-feedback-list@broadcom.com>,
+        linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+        Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Rice <rob.rice@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        Ray Jui <ray.jui@broadcom.com>,
+        Steve Lin <steven.lin1@broadcom.com>,
+        linux-crypto@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1498208070-15584-1-git-send-email-raveendra.padasalagi@broadcom.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 06/23/2017 01:48 AM, Jan Stancek wrote:
-> 
-> 
-> ----- Original Message -----
->> On Wed, May 24, 2017 at 08:46:57AM -0400, Jan Stancek wrote:
->>>
->>>
->>> ----- Original Message -----
->>>> Hi,
->>>>
->>>> I'm seeing rare crashes during NFS cthon with krb5 auth. After
->>>> some digging I arrived at potential problem with sha1-avx2.
->>>
->>> Adding more sha1_avx2 experts to CC.
->>>
->>>>
->>>> Problem appears to be that sha1_transform_avx2() reads beyond
->>>> number of blocks you pass, if it is an odd number. It appears
->>>> to try read one block more. This creates a problem if it falls
->>>> beyond a page and there's nothing there.
->>>
->>> As noted in my reply, worst case appears to be read ahead
->>> of up to 3 SHA1 blocks beyond end of data:
->>>   http://marc.info/?l=linux-crypto-vger&m=149373371023377
->>>
->>>  +----------+---------+---------+---------+
->>>  | 2*SHA1_BLOCK_SIZE  | 2*SHA1_BLOCK_SIZE |
->>>  +----------+---------+---------+---------+
->>>             ^ page boundary
->>>     ^ data end
->>>
->>> It is still reproducible with 4.12-rc2.
->>
->> Can someone from Intel please look into this? Otherwise we'll have
->> to disable sha-avx2.
-> 
-> So I take it my workaround patch [1] is not acceptable in
-> short-term as well?
-> 
-> [1] http://marc.info/?l=linux-crypto-vger&m=149373371023377
-> 
-> Regards,
-> Jan
-> 
+Need to consider some more scenarios.
+So NAKing this patch. Will send out re-vised version.
 
-Megha,
+Regards,
+Raveendra
 
-Can you take a look at this issue?
 
-Thanks.
-
-Tim
+On Fri, Jun 23, 2017 at 2:24 PM, Raveendra Padasalagi
+<raveendra.padasalagi@broadcom.com> wrote:
+> Zero length payload requests are not handled in
+> Broadcom SPU2 engine, so this patch adds conditional
+> check to fallback to software implementation for AES-GCM
+> and AES-CCM algorithms.
+>
+> Fixes: 9d12ba86f818 ("crypto: brcm - Add Broadcom SPU driver")
+> Signed-off-by: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
+> Reviewed-by: Ray Jui <ray.jui@broadcom.com>
+> Reviewed-by: Scott Branden <scott.branden@broadcom.com>
+> Cc: stable@vger.kernel.org
+> ---
+>
+> Changes in v1:
+>  - Added Cc tag in the Signed-off area to send the patch to stable kernel
+>
+>  drivers/crypto/bcm/cipher.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/crypto/bcm/cipher.c b/drivers/crypto/bcm/cipher.c
+> index cc0d5b9..6c80863 100644
+> --- a/drivers/crypto/bcm/cipher.c
+> +++ b/drivers/crypto/bcm/cipher.c
+> @@ -2625,7 +2625,7 @@ static int aead_need_fallback(struct aead_request *req)
+>          */
+>         if (((ctx->cipher.mode == CIPHER_MODE_GCM) ||
+>              (ctx->cipher.mode == CIPHER_MODE_CCM)) &&
+> -           (req->assoclen == 0)) {
+> +           ((req->assoclen == 0) || (req->cryptlen == 0))) {
+>                 if ((rctx->is_encrypt && (req->cryptlen == 0)) ||
+>                     (!rctx->is_encrypt && (req->cryptlen == ctx->digestsize))) {
+>                         flow_log("AES GCM/CCM needs fallback for 0 len req\n");
+> --
+> 1.9.1
+>
