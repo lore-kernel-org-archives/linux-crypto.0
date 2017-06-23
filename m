@@ -1,46 +1,44 @@
-From: srikanth jampala <jsrikanth@caviumnetworks.com>
-Subject: Re: [PATCH 1/1] cavium: Add firmware for CNN55XX crypto driver.
-Date: Fri, 23 Jun 2017 15:47:09 +0530
-Message-ID: <7199698d-883b-358d-a867-9c50559f70e5@caviumnetworks.com>
-References: <20170616142226.3950-1-Jampala.Srikanth@cavium.com>
- <20170616142226.3950-2-Jampala.Srikanth@cavium.com>
- <20170622190936.GL13400@bombadil.infradead.org>
+From: Srikanth Jampala <Jampala.Srikanth@cavium.com>
+Subject: [PATCH][crypto-next] crypto: cavium/nitrox - Change in firmware path.
+Date: Fri, 23 Jun 2017 16:03:51 +0530
+Message-ID: <20170623103351.7153-1-Jampala.Srikanth@cavium.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Sreerama.Gadam@cavium.com, linux-firmware@kernel.org
-To: Kyle McMartin <kyle@infradead.org>,
+Content-Type: text/plain
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Sreerama.Gadam@cavium.com,
         Srikanth Jampala <Jampala.Srikanth@cavium.com>
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2nam03on0063.outbound.protection.outlook.com ([104.47.42.63]:37120
+Received: from mail-by2nam03on0066.outbound.protection.outlook.com ([104.47.42.66]:39618
         "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1754621AbdFWKRd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 23 Jun 2017 06:17:33 -0400
-In-Reply-To: <20170622190936.GL13400@bombadil.infradead.org>
-Content-Language: en-US
+        id S1754510AbdFWKed (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 23 Jun 2017 06:34:33 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Sure kyle, I will work on this.
+Moved the firmware to "cavium" subdirectory as suggested by
+Kyle McMartin.
 
-Thanks.
+Signed-off-by: Srikanth Jampala <Jampala.Srikanth@cavium.com>
+---
+ drivers/crypto/cavium/nitrox/nitrox_main.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-On Friday 23 June 2017 12:39 AM, Kyle McMartin wrote:
-> On Fri, Jun 16, 2017 at 07:52:26PM +0530, Srikanth Jampala wrote:
->> This patchset adds the firmware for CNN55XX cryto driver,
->> supports Symmetric crypto operations.
->>
->> The version of the firmware is v07.
->>
->> Signed-off-by: Srikanth Jampala <Jampala.Srikanth@cavium.com>
->> ---
->>  WHENCE        |   9 +++++++++
->>  cnn55xx_se.fw | Bin 0 -> 27698 bytes
-> 
-> any chance i could convince you to put this in a cavium/ subdirectory?
-> 
-> --kyle
-> 
+diff --git a/drivers/crypto/cavium/nitrox/nitrox_main.c b/drivers/crypto/cavium/nitrox/nitrox_main.c
+index ae44a46..9ccefb9 100644
+--- a/drivers/crypto/cavium/nitrox/nitrox_main.c
++++ b/drivers/crypto/cavium/nitrox/nitrox_main.c
+@@ -18,8 +18,9 @@
+ #define SE_GROUP 0
+ 
+ #define DRIVER_VERSION "1.0"
++#define FW_DIR "cavium/"
+ /* SE microcode */
+-#define SE_FW	"cnn55xx_se.fw"
++#define SE_FW	FW_DIR "cnn55xx_se.fw"
+ 
+ static const char nitrox_driver_name[] = "CNN55XX";
+ 
+-- 
+2.9.4
