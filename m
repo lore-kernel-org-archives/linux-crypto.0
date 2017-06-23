@@ -1,45 +1,45 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v6 0/2] IV Generation algorithms for dm-crypt
-Date: Fri, 23 Jun 2017 16:13:41 +0800
-Message-ID: <20170623081341.GA29748@gondor.apana.org.au>
-References: <1498106510-19793-1-git-send-email-binoy.jayan@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: broonie@kernel.org, arnd@arndb.de, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, dm-devel@redhat.com,
-        linux-raid@vger.kernel.org, rnayak@codeaurora.org,
-        binoy.jayan@linaro.org, David Gstir <david@sigma-star.at>,
-        Eric Biggers <ebiggers3@gmail.com>
-To: Binoy Jayan <binoy.jayan@linaro.org>
+From: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
+Subject: [PATCH] crypto: brcm - software fallback for cryptlen zero
+Date: Fri, 23 Jun 2017 13:52:10 +0530
+Message-ID: <1498206130-15188-1-git-send-email-raveendra.padasalagi@broadcom.com>
+Cc: bcm-kernel-feedback-list@broadcom.com,
+        linux-kernel@vger.kernel.org,
+        Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Rice <rob.rice@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        Ray Jui <ray.jui@broadcom.com>,
+        Steve Lin <steven.lin1@broadcom.com>,
+        linux-crypto@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1498106510-19793-1-git-send-email-binoy.jayan@linaro.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Binoy Jayan <binoy.jayan@linaro.org> wrote:
-> ===============================================================================
-> dm-crypt optimization for larger block sizes
-> ===============================================================================
-> 
-> Currently, the iv generation algorithms are implemented in dm-crypt.c. The goal
-> is to move these algorithms from the dm layer to the kernel crypto layer by
-> implementing them as template ciphers so they can be used in relation with
-> algorithms like aes, and with multiple modes like cbc, ecb etc. As part of this
-> patchset, the iv-generation code is moved from the dm layer to the crypto layer
-> and adapt the dm-layer to send a whole 'bio' (as defined in the block layer)
-> at a time. Each bio contains the in memory representation of physically
-> contiguous disk blocks. Since the bio itself may not be contiguous in main
-> memory, the dm layer sets up a chained scatterlist of these blocks split into
-> physically contiguous segments in memory so that DMA can be performed.
+Zero length payload requests are not handled in
+Broadcom SPU2 engine, so this patch adds conditional
+check to fallback to software implementation for AES-GCM
+and AES-CCM algorithms.
 
-There is currently a patch-set for fscrypt to add essiv support.  It
-would be interesting to know whether your implementation of essiv
-can also be used in that patchset.  That would confirm that we're on
-the right track.
+Signed-off-by: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
+Reviewed-by: Ray Jui <ray.jui@broadcom.com>
+Reviewed-by: Scott Branden <scott.branden@broadcom.com>
+---
+ drivers/crypto/bcm/cipher.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Cheers,
+diff --git a/drivers/crypto/bcm/cipher.c b/drivers/crypto/bcm/cipher.c
+index cc0d5b9..6c80863 100644
+--- a/drivers/crypto/bcm/cipher.c
++++ b/drivers/crypto/bcm/cipher.c
+@@ -2625,7 +2625,7 @@ static int aead_need_fallback(struct aead_request *req)
+ 	 */
+ 	if (((ctx->cipher.mode == CIPHER_MODE_GCM) ||
+ 	     (ctx->cipher.mode == CIPHER_MODE_CCM)) &&
+-	    (req->assoclen == 0)) {
++	    ((req->assoclen == 0) || (req->cryptlen == 0))) {
+ 		if ((rctx->is_encrypt && (req->cryptlen == 0)) ||
+ 		    (!rctx->is_encrypt && (req->cryptlen == ctx->digestsize))) {
+ 			flow_log("AES GCM/CCM needs fallback for 0 len req\n");
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.9.1
