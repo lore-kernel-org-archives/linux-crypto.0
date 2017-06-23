@@ -1,51 +1,62 @@
-From: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
-Subject: [PATCH v1] crypto: brcm - Fix SHA3-512 algorithm failure
-Date: Fri, 23 Jun 2017 14:34:08 +0530
-Message-ID: <1498208648-15948-1-git-send-email-raveendra.padasalagi@broadcom.com>
-Cc: bcm-kernel-feedback-list@broadcom.com,
-        linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-        Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Rob Rice <rob.rice@broadcom.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        Ray Jui <ray.jui@broadcom.com>,
-        Steve Lin <steven.lin1@broadcom.com>,
-        linux-crypto@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: Re: [PATCH v10 1/2] crypto: skcipher AF_ALG - overhaul memory management
+Date: Fri, 23 Jun 2017 11:06:30 +0200
+Message-ID: <13379757.uGWUeJijgc@tauon.chronox.de>
+References: <16464524.Q9cOxD7cVH@positron.chronox.de> <8143872.gWNkduROBH@positron.chronox.de> <20170623061048.GA28869@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8BIT
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:60358 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753972AbdFWJGc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 23 Jun 2017 05:06:32 -0400
+In-Reply-To: <20170623061048.GA28869@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-In Broadcom SPU driver, due to missing break statement
-in spu2_hash_xlate() while mapping SPU2 equivalent
-SHA3-512 value, -EINVAL is chosen and hence leading to
-failure of SHA3-512 algorithm. This patch fixes the same.
+Am Freitag, 23. Juni 2017, 08:10:48 CEST schrieb Herbert Xu:
 
-Fixes: 9d12ba86f818 ("crypto: brcm - Add Broadcom SPU driver")
-Signed-off-by: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
-Reviewed-by: Ray Jui <ray.jui@broadcom.com>
-Reviewed-by: Scott Branden <scott.branden@broadcom.com>
-Cc: stable@vger.kernel.org
----
+Hi Herbert,
 
-Changes in v1:
- - Added Cc and fixes tag in the Signed-off area to send the patch
-   to stable kernel
+> On Wed, Jun 21, 2017 at 10:03:02PM +0200, Stephan Müller wrote:
+> > +	/* convert iovecs of output buffers into RX SGL */
+> > +	while (len < ctx->used && msg_data_left(msg)) {
+> 
+> How are we supposed to reach the wait path when ctx->used == 0?
 
- drivers/crypto/bcm/spu2.c | 1 +
- 1 file changed, 1 insertion(+)
+Right. 
 
-diff --git a/drivers/crypto/bcm/spu2.c b/drivers/crypto/bcm/spu2.c
-index ef04c97..bf7ac62 100644
---- a/drivers/crypto/bcm/spu2.c
-+++ b/drivers/crypto/bcm/spu2.c
-@@ -302,6 +302,7 @@ static int spu2_hash_mode_xlate(enum hash_mode hash_mode,
- 		break;
- 	case HASH_ALG_SHA3_512:
- 		*spu2_type = SPU2_HASH_TYPE_SHA3_512;
-+		break;
- 	case HASH_ALG_LAST:
- 	default:
- 		err = -EINVAL;
--- 
-1.9.1
+May I ask whether that wait is correct to begin with? The recvmsg is protected 
+by a lock_sock. Thus, if the code is waiting, the lock is still held. So, how 
+can data be inserted into the socket by sendmsg/sendpage while recvmsg is 
+waiting? Don't we have a deadlock here?
+> 
+> > +		/*
+> > +		 * This error covers -EIOCBQUEUED which implies that we can
+> > +		 * only handle one AIO request. If the caller wants to have
+> > +		 * multiple AIO requests in parallel, he must make multiple
+> > +		 * separate AIO calls.
+> > +		 */
+> > +		if (err < 0) {
+> > +			if (err == -EIOCBQUEUED)
+> > +				ret = err;
+> > +			goto out;
+> > 
+> >  		}
+> > 
+> > +		if (!err)
+> > +			goto out;
+> 
+> You can combine the two now as err <= 0.
+
+Fixed, thank you.
+> 
+> Thanks,
+
+
+
+Ciao
+Stephan
