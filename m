@@ -1,105 +1,80 @@
-From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH v2 7/7] crypto: caam: cleanup CONFIG_64BIT ifdefs when using io{read|write}64
-Date: Sat, 24 Jun 2017 14:57:07 +0300
-Message-ID: <20170624115707.30095-1-horia.geanta@nxp.com>
-References: <411c4bb0-2709-1902-778a-bf4d7734e3e1@deltatee.com>
+From: <archerrp@evms.edu>
+Subject: (unknown)
+Date: Sat, 24 Jun 2017 15:03:15 -0000
+Message-ID: <149831659569.4332.9437162793910877749@greatnet.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-Cc: Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Stephen Bates <sbates@raithlin.com>,
-        Dan Douglass <dan.douglass@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Radu Solea <radu.solea@nxp.com>,
-        Steve Cornelius <steve.cornelius@nxp.com>
-To: Logan Gunthorpe <logang@deltatee.com>,
-        <linux-kernel@vger.kernel.org>, <linux-arch@vger.kernel.org>,
-        <linux-ntb@googlegroups.com>, <linux-alpha@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>, <linux-crypto@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>
-Return-path: <linux-arch-owner@vger.kernel.org>
-In-Reply-To: <411c4bb0-2709-1902-778a-bf4d7734e3e1@deltatee.com>
-Sender: linux-arch-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: application/zip; name="EMAIL_9673882086_linux-crypto.zip"
+Content-Transfer-Encoding: base64
+To: <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from pp0.greatnet.de ([178.254.50.202]:38849 "HELO greatnet.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with SMTP
+        id S1751338AbdFXPDV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 24 Jun 2017 11:03:21 -0400
+Subject: 
+Content-Disposition: attachment
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Now that ioread64 and iowrite64 are always available we don't
-need the ugly ifdefs to change their implementation when they
-are not.
-
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Cc: Horia Geantă <horia.geanta@nxp.com>
-Cc: Dan Douglass <dan.douglass@nxp.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-
-Updated patch such that behaviour does not change
-from i.MX workaround point of view.
-
-Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
----
- drivers/crypto/caam/regs.h | 33 ++++-----------------------------
- 1 file changed, 4 insertions(+), 29 deletions(-)
-
-diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
-index 84d2f838a063..b893ebb24e65 100644
---- a/drivers/crypto/caam/regs.h
-+++ b/drivers/crypto/caam/regs.h
-@@ -134,50 +134,25 @@ static inline void clrsetbits_32(void __iomem *reg, u32 clear, u32 set)
-  *    base + 0x0000 : least-significant 32 bits
-  *    base + 0x0004 : most-significant 32 bits
-  */
--#ifdef CONFIG_64BIT
- static inline void wr_reg64(void __iomem *reg, u64 data)
- {
-+#ifndef CONFIG_CRYPTO_DEV_FSL_CAAM_IMX
- 	if (caam_little_end)
- 		iowrite64(data, reg);
- 	else
--		iowrite64be(data, reg);
--}
--
--static inline u64 rd_reg64(void __iomem *reg)
--{
--	if (caam_little_end)
--		return ioread64(reg);
--	else
--		return ioread64be(reg);
--}
--
--#else /* CONFIG_64BIT */
--static inline void wr_reg64(void __iomem *reg, u64 data)
--{
--#ifndef CONFIG_CRYPTO_DEV_FSL_CAAM_IMX
--	if (caam_little_end) {
--		wr_reg32((u32 __iomem *)(reg) + 1, data >> 32);
--		wr_reg32((u32 __iomem *)(reg), data);
--	} else
- #endif
--	{
--		wr_reg32((u32 __iomem *)(reg), data >> 32);
--		wr_reg32((u32 __iomem *)(reg) + 1, data);
--	}
-+		iowrite64be(data, reg);
- }
- 
- static inline u64 rd_reg64(void __iomem *reg)
- {
- #ifndef CONFIG_CRYPTO_DEV_FSL_CAAM_IMX
- 	if (caam_little_end)
--		return ((u64)rd_reg32((u32 __iomem *)(reg) + 1) << 32 |
--			(u64)rd_reg32((u32 __iomem *)(reg)));
-+		return ioread64(reg);
- 	else
- #endif
--		return ((u64)rd_reg32((u32 __iomem *)(reg)) << 32 |
--			(u64)rd_reg32((u32 __iomem *)(reg) + 1));
-+		return ioread64be(reg);
- }
--#endif /* CONFIG_64BIT  */
- 
- #ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
- #ifdef CONFIG_SOC_IMX7D
--- 
-2.12.0.264.gd6db3f216544
+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
