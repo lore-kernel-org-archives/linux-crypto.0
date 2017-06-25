@@ -1,58 +1,76 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [PATCH v2 2/7] staging: ccree: register setkey for none hash macs
-Date: Sun, 25 Jun 2017 09:28:29 +0300
-Message-ID: <CAOtvUMfdwzyf3wo7YTzxc9N1tYPw4nES=9e7twvpXcGbFHpQUA@mail.gmail.com>
-References: <1498138623-6126-1-git-send-email-gilad@benyossef.com>
- <1498138623-6126-3-git-send-email-gilad@benyossef.com> <20170623162919.GA24336@kroah.com>
+Subject: [PATCH v3 0/6] staging: ccree: bug fixes and TODO items for 4.13
+Date: Sun, 25 Jun 2017 10:47:18 +0300
+Message-ID: <1498376846-24136-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Linux kernel mailing list <linux-kernel@vger.kernel.org>,
-        linux-crypto@vger.kernel.org,
-        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Ofir Drang <ofir.drang@arm.com>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-yb0-f177.google.com ([209.85.213.177]:34477 "EHLO
-        mail-yb0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751181AbdFYG2a (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 25 Jun 2017 02:28:30 -0400
-Received: by mail-yb0-f177.google.com with SMTP id e201so21948030ybb.1
-        for <linux-crypto@vger.kernel.org>; Sat, 24 Jun 2017 23:28:30 -0700 (PDT)
-In-Reply-To: <20170623162919.GA24336@kroah.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Dan Carpenter <dan.carpenter@oracle.com>, Ofir Drang <ofir.drang@arm.com>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+ driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Jun 23, 2017 at 7:29 PM, Greg Kroah-Hartman
-<gregkh@linuxfoundation.org> wrote:
-> On Thu, Jun 22, 2017 at 04:36:56PM +0300, Gilad Ben-Yossef wrote:
->> Fix a bug where the transformation init code did
->> not register a setkey method for none hash based MACs.
->
-> "none hash based MACs"?  Is that the correct language, I don't
-> understand it, sorry, can you expand on it a bit in your v3 series?
+An assortment of bug fixes and staging TODO items.
+Highlights includes the driver passing crypto testmgr boot tests
+and relying on device tree for various HW config options as
+opposed to build time configuration.
 
-My apologies. English is not my mother tongue. This should have been
-"non-hash based MACs".
+CC: Dan Carpenter <dan.carpenter@oracle.com>
 
->
->> Fixes commit 50cfbbb7e627 ("staging: ccree: add ahash support").
->
-> This line should be written as:
-> Fixes: 50cfbbb7e627 ("staging: ccree: add ahash support").
->
+Gilad Ben-Yossef (6):
+  staging: ccree: fix hash import/export
+  staging: ccree: register setkey for none hash macs
+  staging: ccree: remove unused function
+  staging: ccree: add clock management support
+  staging: ccree: add DT bus coherency detection
+  staging: ccree: use signal safe completion wait
 
-I'll fix both.
+Changes from v2:
+- Rebased on latest staging-next.
+- Added poison of unused hash import field based
+  on review discussions with Dan Carpenter.
+- Dropped older HW support patches for staging
+  at GregKH request.
+- Rewrote for clarity hash setkey fix commit
+  message.
+- Added now no longer needed KConfig option to
+  code dropped by bus coherency being set by DT
+  patch.
 
-Thanks,
-Gilad
+Changes from v1:
+- Rebased on top of latest patches sent to mailing
+  list but not yet marged for same driver.
+- Address Dan Carpenter style review comments
+- Fix clk de-init being called on clk init failure
+  error path pointed out by Dan Carpenter.
 
+ drivers/staging/ccree/Kconfig            |   9 --
+ drivers/staging/ccree/Makefile           |   2 +-
+ drivers/staging/ccree/cc_hw_queue_defs.h |  12 --
+ drivers/staging/ccree/ssi_buffer_mgr.c   |  37 ++---
+ drivers/staging/ccree/ssi_config.h       |  20 ---
+ drivers/staging/ccree/ssi_driver.c       |  55 ++++++--
+ drivers/staging/ccree/ssi_driver.h       |   8 +-
+ drivers/staging/ccree/ssi_hash.c         | 226 +++++++++++++++++++------------
+ drivers/staging/ccree/ssi_hash.h         |   2 +
+ drivers/staging/ccree/ssi_pm.c           |  13 +-
+ drivers/staging/ccree/ssi_pm_ext.c       |  60 --------
+ drivers/staging/ccree/ssi_pm_ext.h       |  33 -----
+ drivers/staging/ccree/ssi_request_mgr.c  |   3 +-
+ 13 files changed, 227 insertions(+), 253 deletions(-)
+ delete mode 100644 drivers/staging/ccree/ssi_pm_ext.c
+ delete mode 100644 drivers/staging/ccree/ssi_pm_ext.h
 
 -- 
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-"If you take a class in large-scale robotics, can you end up in a
-situation where the homework eats your dog?"
- -- Jean-Baptiste Queru
+2.1.4
