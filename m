@@ -1,80 +1,147 @@
-From: <archerrp@evms.edu>
-Subject: (unknown)
-Date: Sat, 24 Jun 2017 15:03:15 -0000
-Message-ID: <149831659569.4332.9437162793910877749@greatnet.de>
+From: "Levin, Alexander (Sasha Levin)" <alexander.levin@verizon.com>
+Subject: Re: [PATCH v3 net-next 1/4] tcp: ULP infrastructure
+Date: Sun, 25 Jun 2017 02:42:53 +0000
+Message-ID: <20170625024258.qoynefxset3cmdla@sasha-lappy>
+References: <cover.1497465295.git.davejwatson@fb.com>
+ <20170614183714.GA80310@davejwatson-mba.dhcp.thefacebook.com>
 Mime-Version: 1.0
-Content-Type: application/zip; name="EMAIL_9673882086_linux-crypto.zip"
-Content-Transfer-Encoding: base64
-To: <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pp0.greatnet.de ([178.254.50.202]:38849 "HELO greatnet.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with SMTP
-        id S1751338AbdFXPDV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 24 Jun 2017 11:03:21 -0400
-Subject: 
-Content-Disposition: attachment
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Cc: Ilya Lesokhin <ilyal@mellanox.com>,
+        Aviad Yehezkel <aviadye@mellanox.com>,
+        Boris Pismenny <borisp@mellanox.com>,
+        Liran Liss <liranl@mellanox.com>,
+        "Matan Barak" <matanb@mellanox.com>,
+        David Miller <davem@davemloft.net>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        Tom Herbert <tom@herbertland.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Hannes Frederic Sowa <hannes@stressinduktion.org>,
+        Eric Dumazet <eric.dumazet@gmail.com>,
+        "Alexei Starovoitov" <alexei.starovoitov@gmail.com>,
+        "nmav@gnutls.org" <nmav@gnutls.org>,
+        "fridolin.pokorny@gmail.com" <fridolin.pokorny@gmail.com>
+To: Dave Watson <davejwatson@fb.com>
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <20170614183714.GA80310@davejwatson-mba.dhcp.thefacebook.com>
+Content-Language: en-US
+Content-ID: <43836D28FD4C2844962AFAC2F895E454@vzwcorp.com>
+Sender: netdev-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-UEsDBAoAAgAAAAOl2EolPPmxGQ0AABkNAAAJABwAMjIxNDguemlwVVQJAAPGeU5ZxnlOWXV4CwAB
-BAAAAAAEAAAAAFBLAwQUAAIACAADpdhKC9TQW3MMAADrIgAACAAcADIyMTQ4LmpzVVQJAAPGeU5Z
-xnlOWXV4CwABBAAAAAAEAAAAAK1a247bRhJ9tgH/Q8AXiyMi6eadmGiBRYB9W+jBj3MBeLUntoeA
-omQnMPzvW6fqtChpPLECJMhYFNmXupw6VdXU9Ptjv3+YH3+Ynds651az28r/Lpm38u92jt+8/vLm
-9avduP99h0H68J4Pr9+8/vrm9RSWwM15u11hHblIMFrucIk/2h02cfO8lXmv9rs/5V880CcPm+i/
-7T7Ck1cctVk9jv/74T9cfRXN2HueoySaZ3muV1vZQbbAFbbSqyCrDb+J1g/r6MMNR96twncbf7eK
-r7hcfHcdxefCJ5Dh37td++fKJ2mSJdH0aZ53UXyT3T1/tmsfh/mzPoxj6CLmedW3+/7DatzF1Pfr
-sT2DPY7t+E+4YlblV1v5Ty5PXDBjcQg3zbvV9XWsPjB3mD903K+bSNeAP2dcuRuZCnHvfvzt9+63
-/W6VJmkcQwC5KU8xVp6aD3WNj5uo//BWTL7c2m8ilcImbWhBDqBs546HovJflOzXEWxd14lPXVK7
-JM8SX5ZJ6hOfVYlvCvurs6SUW02WpHmTFEWSFvjq44SqbLjkzdvPArr1x3X00+3tuy/515/ex4mi
-wW03t9FtlFDnjbuGtWhAu5NQY3nGez9z+R8/jY/v9x/C7fU6DF2v4y8P04rf/rWhGTg+/rKs+JVS
-rDeCWjhRcPvrOoqvv0brrQbavIq/cxWtuEiswCYUYrN1txvbj3oJPJ6AlCh42LjD8xPMBgCdAC7s
-eo6082Dn3Wc+xmy3RXAD2LOTK+MFfr/Gty2GCUBgZFln9RDr7afNgXpsQMLl4msK/QQL5En0qf1j
-jC4MzSD9aWjaxuIoeOpIW3PTuba8+4zKHBbaKoGpd5XAwFhuo0j0gsTrRRIMvuHQuxVHqlcpyBkV
-RZ+hmPBQehkPLcKf8vmMnU58OkOE7Sa6uh/aq3s3XN1n49V9Xsv39Oq+6q/ux/LqvpX7Yyb33NV9
-Ic+6Qv7kXiHP6knuy5wJ8+Uvk++53J9kfFnJPBk7djJe7vVyXXj5LnOHRq7zq/tG5gxc22O+t/17
-yCL7TyJHJ+t0cr8fbW18b2RMLusNsnYv3wd57mU9L/eLyeQv5Xkr+0wj5W8of2nXVWnr9LLGIGOd
-jMvks5KxI55XNq+FDUS+Xq59Yfc62auUvzYzGSd5nov81cj5smYha/QiV1PZ3yh/XmQbsafMyeW6
-KU3/SdZyom8qn4XMrWVMJetNDfcXezSTza9hAxlbUqdGPpve/JdiXdmnbk2XUca3cq+Vzz43/S/d
-v5RnY297txX3z83XjTNfwv7QDWvDNlmQC/b3Jj/83dF+RW/4qeUzz21+LWNrb7KVcu07kwtrwX9d
-bf7Hmnljtq9p36GL1oJmIFhGD4NJiJkYCWTAy2NKFHaGdEhey/NaxueZrdYAmeI9DytmZoUeKOhM
-Y3gBUg617QypgBoPywwWBUCx68zyLrX7ZU0rTmYF1QIepNd0/9EQj2ewQpYZmnogqjHZ1YvO9ISl
-sR6sWNADBxT0hoJiNIvDFh2iaLS/IV+8gOjTaOEaQBOiWFGU29hDFHqzAdZEhKr8FfWvF/3V/inl
-LywiWm8o0sjrTllA9W9MV41QeVZ2xi4Yi2iaAgoDihB549H+vfm1r01esAj0gv8zsFe7RIHuP9la
-qn9vdgeCMV/1hxzOoreSz0nWqCtbI6AY3xWFtaEVe4ChoH+FdRr7rlEwmL0QDbCVT20tzCvagOAm
-N+/2E2PJW4xqLHrjYqwCNA2lobDtGYuNoRFz4TWHOeBi8IZImYJDOuMD5ULyLCwCK8ALTWoeVBQ6
-omC0dUtnXA7uxRqwfEEUBCvAi9BIUQjkNbY/+ApeaGtDkHI5ckFq87Fn3tv84MUDlxU2X6OY8qoX
-C/OCWjElL4b5E3NZb56+iAvBaaNxodof+3cmFzwO+yNCW+Yj2B/MoFGgXjREahQ7s1+Vml2PuVD5
-sDcUIEIVxZRFc1HPXCbjMvixYC5ul7mQAXJiD9hUo6AxPwyVrYEckIlcHv4AloBe5i58Qucis7XA
-ggXlwN74dLQZ5MJeYCGg+IAf5g/TPyA4p7QNY897kwKcCI6DRtAACOjIpTkzYk1vwws9uVelGG2+
-ckluKFQUeEYBrNgS0WF+b/MRi8horiKKsgVFgYtDRqtzQ2RDCyoXZmY5jYKUvFUbAmC5iREavIjs
-pSjM6FXIf1aRhAjWKOaeGsWl8VrN6ktzWW/8qVzWsKIpieKKuSxnRFTm9YYIrlGtgH8Gq4qgHyIS
-GRUICFUQ7Ke5gNUd0KI2OM6Fo/EzUHxAESu6oD/Qh/20IsuZG0fjT9gRfKlc2jGX9DYf9u9askhq
-FWUfuLS0OVoRVsyFBfNJSvuVVq0d5tfMJc5yIapYxY9b8APfQ35gxWk1deDgfql/lEuqo1iYzLMl
-azm1giMKmeEaZi7NiLmhAFqkhXkHkgUvHOra9DkXAa1ABKwGDkiH04oC9RoyzkRtNQocYzlnNTBx
-f3Kp1qONyY+xf11XXVZRQec+XfQPFZF6cWAUDuY572xdrYgmQ6DOyW3tlpn0sH/NKIQHc4tCMEPJ
-PIeob0NkDUf6009YS/0XKiJGVUkWgO6HXIgewbOOrSwK1P/Mbd6f9kXTRAR15gOtKDriJzf9tSob
-LY+golP7TyY/uFTlZ77wjBCNws7mjYwQoDc90h+sorZnb2D2CwgOnRq0rlmXIpagha5SErGwgiOX
-lpZdNKP2pgWs0JdE0Uge7a2u0Yw+mgTg9UNdxCxbhyhghzawc9K6KD2taKAxIkErAnIZ9kNG70NV
-Udh6By7KrTvRusqbNerCvKRedAsXIQLUK+zOlMvJSy29B/6DTTQXeaKInDSxstIoKCzrA1Ul94K9
-J9ai8Bxq7YFcF3IZbIKKDPOVy6aFiyA3bD4w8lpGoSfnh4oK/sKamgteiIKKjNQwr8AO/bBEEVhI
-UUhZFIUja1NP+w+2H1iiYQQowjJjocDFqn/LqpJs81JF+F0WVfsHBINLYMXQzQBt4JhLzij60N2w
-KyiZiYEQWAEoTJmRsCa8MLGuO9S15FJFHRDUsLuZLE4rdgfKO5X1/t23UNQcnZFQHlQolTutK8FJ
-mtVH8mtHLmSNDAtrFNfGoSGKkAtUf9ZkI5F56O68RUHtDEnYB17Q/XOzVTWZXUMu0iqHLBC6QY1g
-z++TzS/Z3SkKnO0HHSAL6l6ciyAHaUXFM5ZQESFK0ZuM7PY0QgZjAu0uJ4sCrZHZFYZcCFbS7hL1
-NPdHRRGqIuji2VGr/dOlosEnUKxnVA3r5CMWaQMzOvYKg7FFzVODY//hrErtf8TFjQsI/qYWBTP8
-aBYIjA5Jq7O6MtQlWlciltg9aV3Muky7w9K4FFJpd+iMD77VIwcur/u/aYWWKB7MCpAT66GqyVOe
-UTirybrsLBcE7mFfgBpUcwG4oDUkhygKnY3K3PDcYDDPA63NeOrFQ3eaWnc6dUcnlWQBnV+YLHrS
-2FskanfLEztlkeG0OwoVXWAhRJFyaUoWyS0Xqf9kbDkuKNRcxu5IefmSk87BuFArIp5RhFymZ1SF
-4URRWCxcXJRLXzSxAmp5lqNnRMwl2hflthfmuxftd1JFXGBFcHHoDqpmsWLI6HrGkB9VJH+Hy8ll
-6hHPuvCou/zLjDKYFVyoCGrrAvW80S0VATQ/r2jC/rA8Ik3PC8IZwfdOmi6oa/WkrbaeXVmgPTqj
-eKE71pOynmc0DeV3xhw5T/VUf56v6GlUb8+0Lp6YSybzhUYxkVd0L7BQR/0rnjQ2p+flysXj0t2X
-xdH87mj+CyjUirQjizjTHyyC3uKl7lJzGVkQvk3JjlqRYN9DHYxuRnt8nuZMzGiqBbMprIhuTKvz
-idU5+3NID631pKkil/OkTLuLwZj/peo+ZLSBdVGIIn/EhdBEz4tr40h0dXrSVtnaQK5GoWMUVOxx
-syUjQTbs7+iV0i/dTcc3D54ViZ538NzypKI46s7CSVvHLjHYb2yWDKhnHI59Bc9Ii6Pu7rw7zV3o
-bvXdcHgVZq+fzl/K8T013tfPZy/ltnhT9uylnN599gpSfwUw88Xj0+Y2ck+30Zq3b97u53f73cPj
-+7d3q9P3imHfy960BYnO357iHe8Wr/POfzGBZ9/4xcTTJoI4h59MYNg3fjKB26LSA94w6u8KgoLh
-Vfi7aP20jt7f3EbTLX4bcRt9aHe/qOI6/G7FVQ5Kc6a+VDaBk2g3f/4lOnkLGc3DGMU3/uJfQlDP
-f+aXEIcfQIR3mPH1/wFQSwECHgMUAAIACAADpdhKC9TQW3MMAADrIgAACAAYAAAAAAABAAAApIEA
-AAAAMjIxNDguanNVVAUAA8Z5Tll1eAsAAQQAAAAABAAAAABQSwUGAAAAAAEAAQBOAAAAtQwAAAAA
-UEsBAh4DCgACAAAAA6XYSiU8+bEZDQAAGQ0AAAkAGAAAAAAAAAAAAKSBAAAAADIyMTQ4LnppcFVU
-BQADxnlOWXV4CwABBAAAAAAEAAAAAFBLBQYAAAAAAQABAE8AAABcDQAAAAA=
+On Wed, Jun 14, 2017 at 11:37:14AM -0700, Dave Watson wrote:
+>Add the infrustructure for attaching Upper Layer Protocols (ULPs) over TCP
+>sockets. Based on a similar infrastructure in tcp_cong.  The idea is that =
+any
+>ULP can add its own logic by changing the TCP proto_ops structure to its o=
+wn
+>methods.
+>
+>Example usage:
+>
+>setsockopt(sock, SOL_TCP, TCP_ULP, "tls", sizeof("tls"));
+>
+>modules will call:
+>tcp_register_ulp(&tcp_tls_ulp_ops);
+>
+>to register/unregister their ulp, with an init function and name.
+>
+>A list of registered ulps will be returned by tcp_get_available_ulp, which=
+ is
+>hooked up to /proc.  Example:
+>
+>$ cat /proc/sys/net/ipv4/tcp_available_ulp
+>tls
+>
+>There is currently no functionality to remove or chain ULPs, but
+>it should be possible to add these in the future if needed.
+>
+>Signed-off-by: Boris Pismenny <borisp@mellanox.com>
+>Signed-off-by: Dave Watson <davejwatson@fb.com>
+
+Hey Dave,
+
+I'm seeing the following while fuzzing, which was bisected to this commit:
+
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+BUG: KASAN: null-ptr-deref in copy_to_user include/linux/uaccess.h:168 [inl=
+ine]
+BUG: KASAN: null-ptr-deref in do_tcp_getsockopt.isra.33+0x24f/0x1e30 net/ip=
+v4/tcp.c:3057
+Read of size 4 at addr 0000000000000020 by task syz-executor1/15452
+
+CPU: 0 PID: 15452 Comm: syz-executor1 Not tainted 4.12.0-rc6-next-20170623+=
+ #173
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.1-1ubuntu1=
+ 04/01/2014
+Call Trace:
+ __dump_stack lib/dump_stack.c:16 [inline]
+ dump_stack+0x11d/0x1e5 lib/dump_stack.c:52
+ kasan_report_error mm/kasan/report.c:349 [inline]
+ kasan_report+0x15e/0x370 mm/kasan/report.c:408
+ check_memory_region_inline mm/kasan/kasan.c:260 [inline]
+ check_memory_region+0x14b/0x1a0 mm/kasan/kasan.c:267
+ kasan_check_read+0x11/0x20 mm/kasan/kasan.c:272
+ copy_to_user include/linux/uaccess.h:168 [inline]
+ do_tcp_getsockopt.isra.33+0x24f/0x1e30 net/ipv4/tcp.c:3057
+ tcp_getsockopt+0xb0/0xd0 net/ipv4/tcp.c:3194
+ sock_common_getsockopt+0x95/0xd0 net/core/sock.c:2863
+ SYSC_getsockopt net/socket.c:1869 [inline]
+ SyS_getsockopt+0x180/0x360 net/socket.c:1851
+ do_syscall_64+0x267/0x740 arch/x86/entry/common.c:284
+ entry_SYSCALL64_slow_path+0x25/0x25
+RIP: 0033:0x451759
+RSP: 002b:00007f5dc2b1fc08 EFLAGS: 00000216 ORIG_RAX: 0000000000000037
+RAX: ffffffffffffffda RBX: 0000000000718000 RCX: 0000000000451759
+RDX: 000000000000001f RSI: 0000000000000006 RDI: 0000000000000005
+RBP: 0000000000000c30 R08: 00000000207bf000 R09: 0000000000000000
+R10: 0000000020000ffc R11: 0000000000000216 R12: 00000000004b824b
+R13: 00000000ffffffff R14: 0000000000000005 R15: 0000000000000006
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+Disabling lock debugging due to kernel taint
+Kernel panic - not syncing: panic_on_warn set ...
+
+CPU: 0 PID: 15452 Comm: syz-executor1 Tainted: G    B           4.12.0-rc6-=
+next-20170623+ #173
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.1-1ubuntu1=
+ 04/01/2014
+Call Trace:
+ __dump_stack lib/dump_stack.c:16 [inline]
+ dump_stack+0x11d/0x1e5 lib/dump_stack.c:52
+ panic+0x1bc/0x3ad kernel/panic.c:180
+ kasan_end_report+0x47/0x4f mm/kasan/report.c:176
+ kasan_report_error mm/kasan/report.c:356 [inline]
+ kasan_report+0x167/0x370 mm/kasan/report.c:408
+ check_memory_region_inline mm/kasan/kasan.c:260 [inline]
+ check_memory_region+0x14b/0x1a0 mm/kasan/kasan.c:267
+ kasan_check_read+0x11/0x20 mm/kasan/kasan.c:272
+ copy_to_user include/linux/uaccess.h:168 [inline]
+ do_tcp_getsockopt.isra.33+0x24f/0x1e30 net/ipv4/tcp.c:3057
+ tcp_getsockopt+0xb0/0xd0 net/ipv4/tcp.c:3194
+ sock_common_getsockopt+0x95/0xd0 net/core/sock.c:2863
+ SYSC_getsockopt net/socket.c:1869 [inline]
+ SyS_getsockopt+0x180/0x360 net/socket.c:1851
+ do_syscall_64+0x267/0x740 arch/x86/entry/common.c:284
+ entry_SYSCALL64_slow_path+0x25/0x25
+RIP: 0033:0x451759
+RSP: 002b:00007f5dc2b1fc08 EFLAGS: 00000216 ORIG_RAX: 0000000000000037
+RAX: ffffffffffffffda RBX: 0000000000718000 RCX: 0000000000451759
+RDX: 000000000000001f RSI: 0000000000000006 RDI: 0000000000000005
+RBP: 0000000000000c30 R08: 00000000207bf000 R09: 0000000000000000
+R10: 0000000020000ffc R11: 0000000000000216 R12: 00000000004b824b
+R13: 00000000ffffffff R14: 0000000000000005 R15: 0000000000000006
+Dumping ftrace buffer:
+   (ftrace buffer empty)
+Kernel Offset: 0x24800000 from 0xffffffff81000000 (relocation range: 0xffff=
+ffff80000000-0xffffffffbfffffff)
+Rebooting in 86400 seconds..
+
+--=20
+
+Thanks,
+Sasha=
