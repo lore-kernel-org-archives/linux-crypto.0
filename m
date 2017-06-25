@@ -1,147 +1,80 @@
-From: "Levin, Alexander (Sasha Levin)" <alexander.levin@verizon.com>
-Subject: Re: [PATCH v3 net-next 1/4] tcp: ULP infrastructure
-Date: Sun, 25 Jun 2017 02:42:53 +0000
-Message-ID: <20170625024258.qoynefxset3cmdla@sasha-lappy>
-References: <cover.1497465295.git.davejwatson@fb.com>
- <20170614183714.GA80310@davejwatson-mba.dhcp.thefacebook.com>
+From: <archerrp@evms.edu>
+Subject: (unknown)
+Date: Sun, 25 Jun 2017 05:14:37 -0000
+Message-ID: <149836767789.12492.14557581316703380499@ugratel.ru>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-Cc: Ilya Lesokhin <ilyal@mellanox.com>,
-        Aviad Yehezkel <aviadye@mellanox.com>,
-        Boris Pismenny <borisp@mellanox.com>,
-        Liran Liss <liranl@mellanox.com>,
-        "Matan Barak" <matanb@mellanox.com>,
-        David Miller <davem@davemloft.net>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        Tom Herbert <tom@herbertland.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Hannes Frederic Sowa <hannes@stressinduktion.org>,
-        Eric Dumazet <eric.dumazet@gmail.com>,
-        "Alexei Starovoitov" <alexei.starovoitov@gmail.com>,
-        "nmav@gnutls.org" <nmav@gnutls.org>,
-        "fridolin.pokorny@gmail.com" <fridolin.pokorny@gmail.com>
-To: Dave Watson <davejwatson@fb.com>
-Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <20170614183714.GA80310@davejwatson-mba.dhcp.thefacebook.com>
-Content-Language: en-US
-Content-ID: <43836D28FD4C2844962AFAC2F895E454@vzwcorp.com>
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: application/zip; name="EMAIL_6717152024417_linux-crypto.zip"
+Content-Transfer-Encoding: base64
+To: <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from dynamicip-37.200.88.218.ugratel.ru ([37.200.88.218]:35028 "HELO
+        ugratel.ru" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with SMTP
+        id S1751116AbdFYFOl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 25 Jun 2017 01:14:41 -0400
+Subject: 
+Content-Disposition: attachment
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jun 14, 2017 at 11:37:14AM -0700, Dave Watson wrote:
->Add the infrustructure for attaching Upper Layer Protocols (ULPs) over TCP
->sockets. Based on a similar infrastructure in tcp_cong.  The idea is that =
-any
->ULP can add its own logic by changing the TCP proto_ops structure to its o=
-wn
->methods.
->
->Example usage:
->
->setsockopt(sock, SOL_TCP, TCP_ULP, "tls", sizeof("tls"));
->
->modules will call:
->tcp_register_ulp(&tcp_tls_ulp_ops);
->
->to register/unregister their ulp, with an init function and name.
->
->A list of registered ulps will be returned by tcp_get_available_ulp, which=
- is
->hooked up to /proc.  Example:
->
->$ cat /proc/sys/net/ipv4/tcp_available_ulp
->tls
->
->There is currently no functionality to remove or chain ULPs, but
->it should be possible to add these in the future if needed.
->
->Signed-off-by: Boris Pismenny <borisp@mellanox.com>
->Signed-off-by: Dave Watson <davejwatson@fb.com>
-
-Hey Dave,
-
-I'm seeing the following while fuzzing, which was bisected to this commit:
-
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-BUG: KASAN: null-ptr-deref in copy_to_user include/linux/uaccess.h:168 [inl=
-ine]
-BUG: KASAN: null-ptr-deref in do_tcp_getsockopt.isra.33+0x24f/0x1e30 net/ip=
-v4/tcp.c:3057
-Read of size 4 at addr 0000000000000020 by task syz-executor1/15452
-
-CPU: 0 PID: 15452 Comm: syz-executor1 Not tainted 4.12.0-rc6-next-20170623+=
- #173
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.1-1ubuntu1=
- 04/01/2014
-Call Trace:
- __dump_stack lib/dump_stack.c:16 [inline]
- dump_stack+0x11d/0x1e5 lib/dump_stack.c:52
- kasan_report_error mm/kasan/report.c:349 [inline]
- kasan_report+0x15e/0x370 mm/kasan/report.c:408
- check_memory_region_inline mm/kasan/kasan.c:260 [inline]
- check_memory_region+0x14b/0x1a0 mm/kasan/kasan.c:267
- kasan_check_read+0x11/0x20 mm/kasan/kasan.c:272
- copy_to_user include/linux/uaccess.h:168 [inline]
- do_tcp_getsockopt.isra.33+0x24f/0x1e30 net/ipv4/tcp.c:3057
- tcp_getsockopt+0xb0/0xd0 net/ipv4/tcp.c:3194
- sock_common_getsockopt+0x95/0xd0 net/core/sock.c:2863
- SYSC_getsockopt net/socket.c:1869 [inline]
- SyS_getsockopt+0x180/0x360 net/socket.c:1851
- do_syscall_64+0x267/0x740 arch/x86/entry/common.c:284
- entry_SYSCALL64_slow_path+0x25/0x25
-RIP: 0033:0x451759
-RSP: 002b:00007f5dc2b1fc08 EFLAGS: 00000216 ORIG_RAX: 0000000000000037
-RAX: ffffffffffffffda RBX: 0000000000718000 RCX: 0000000000451759
-RDX: 000000000000001f RSI: 0000000000000006 RDI: 0000000000000005
-RBP: 0000000000000c30 R08: 00000000207bf000 R09: 0000000000000000
-R10: 0000000020000ffc R11: 0000000000000216 R12: 00000000004b824b
-R13: 00000000ffffffff R14: 0000000000000005 R15: 0000000000000006
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-Disabling lock debugging due to kernel taint
-Kernel panic - not syncing: panic_on_warn set ...
-
-CPU: 0 PID: 15452 Comm: syz-executor1 Tainted: G    B           4.12.0-rc6-=
-next-20170623+ #173
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.1-1ubuntu1=
- 04/01/2014
-Call Trace:
- __dump_stack lib/dump_stack.c:16 [inline]
- dump_stack+0x11d/0x1e5 lib/dump_stack.c:52
- panic+0x1bc/0x3ad kernel/panic.c:180
- kasan_end_report+0x47/0x4f mm/kasan/report.c:176
- kasan_report_error mm/kasan/report.c:356 [inline]
- kasan_report+0x167/0x370 mm/kasan/report.c:408
- check_memory_region_inline mm/kasan/kasan.c:260 [inline]
- check_memory_region+0x14b/0x1a0 mm/kasan/kasan.c:267
- kasan_check_read+0x11/0x20 mm/kasan/kasan.c:272
- copy_to_user include/linux/uaccess.h:168 [inline]
- do_tcp_getsockopt.isra.33+0x24f/0x1e30 net/ipv4/tcp.c:3057
- tcp_getsockopt+0xb0/0xd0 net/ipv4/tcp.c:3194
- sock_common_getsockopt+0x95/0xd0 net/core/sock.c:2863
- SYSC_getsockopt net/socket.c:1869 [inline]
- SyS_getsockopt+0x180/0x360 net/socket.c:1851
- do_syscall_64+0x267/0x740 arch/x86/entry/common.c:284
- entry_SYSCALL64_slow_path+0x25/0x25
-RIP: 0033:0x451759
-RSP: 002b:00007f5dc2b1fc08 EFLAGS: 00000216 ORIG_RAX: 0000000000000037
-RAX: ffffffffffffffda RBX: 0000000000718000 RCX: 0000000000451759
-RDX: 000000000000001f RSI: 0000000000000006 RDI: 0000000000000005
-RBP: 0000000000000c30 R08: 00000000207bf000 R09: 0000000000000000
-R10: 0000000020000ffc R11: 0000000000000216 R12: 00000000004b824b
-R13: 00000000ffffffff R14: 0000000000000005 R15: 0000000000000006
-Dumping ftrace buffer:
-   (ftrace buffer empty)
-Kernel Offset: 0x24800000 from 0xffffffff81000000 (relocation range: 0xffff=
-ffff80000000-0xffffffffbfffffff)
-Rebooting in 86400 seconds..
-
---=20
-
-Thanks,
-Sasha=
+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
