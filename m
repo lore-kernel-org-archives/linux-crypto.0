@@ -1,80 +1,106 @@
-From: <archerrp@evms.edu>
-Subject: (unknown)
-Date: Sun, 25 Jun 2017 05:14:37 -0000
-Message-ID: <149836767789.12492.14557581316703380499@ugratel.ru>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: Re: [PATCH v2 1/7] staging: ccree: fix hash import/export
+Date: Sun, 25 Jun 2017 09:21:30 +0300
+Message-ID: <CAOtvUMfKaMq_vG+fuDRpwWFkN-9Fz6MfZ=n8rjNSDL06_iXOuw@mail.gmail.com>
+References: <1498138623-6126-1-git-send-email-gilad@benyossef.com>
+ <1498138623-6126-2-git-send-email-gilad@benyossef.com> <20170622135811.4wbh7dqi634j5d2c@mwanda>
 Mime-Version: 1.0
-Content-Type: application/zip; name="EMAIL_6717152024417_linux-crypto.zip"
-Content-Transfer-Encoding: base64
-To: <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+        linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        Ofir Drang <ofir.drang@arm.com>
+To: Dan Carpenter <dan.carpenter@oracle.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from dynamicip-37.200.88.218.ugratel.ru ([37.200.88.218]:35028 "HELO
-        ugratel.ru" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with SMTP
-        id S1751116AbdFYFOl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 25 Jun 2017 01:14:41 -0400
-Subject: 
-Content-Disposition: attachment
+Received: from mail-yw0-f182.google.com ([209.85.161.182]:35519 "EHLO
+        mail-yw0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751184AbdFYGVb (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 25 Jun 2017 02:21:31 -0400
+Received: by mail-yw0-f182.google.com with SMTP id j11so8233011ywa.2
+        for <linux-crypto@vger.kernel.org>; Sat, 24 Jun 2017 23:21:31 -0700 (PDT)
+In-Reply-To: <20170622135811.4wbh7dqi634j5d2c@mwanda>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-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
+On Thu, Jun 22, 2017 at 4:58 PM, Dan Carpenter <dan.carpenter@oracle.com> wrote:
+> On Thu, Jun 22, 2017 at 04:36:55PM +0300, Gilad Ben-Yossef wrote:
+>>  static int ssi_ahash_export(struct ahash_request *req, void *out)
+>>  {
+>>       struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
+>>       struct ssi_hash_ctx *ctx = crypto_ahash_ctx(ahash);
+>> +     struct device *dev = &ctx->drvdata->plat_dev->dev;
+>> +     struct ahash_req_ctx *state = ahash_request_ctx(req);
+>> +     u8 *curr_buff = state->buff_index ? state->buff1 : state->buff0;
+>> +     u32 curr_buff_cnt = state->buff_index ? state->buff1_cnt :
+>> +                             state->buff0_cnt;
+>> +     const u32 tmp = CC_EXPORT_MAGIC;
+>> +
+>> +     CHECK_AND_RETURN_UPON_FIPS_ERROR();
+>>
+>> -     return ssi_hash_export(ctx, out);
+>> +     memcpy(out, &tmp, sizeof(u32));
+>> +     out += sizeof(u32);
+>> +
+>> +     dma_sync_single_for_cpu(dev, state->digest_buff_dma_addr,
+>> +                             ctx->inter_digestsize, DMA_BIDIRECTIONAL);
+>> +     memcpy(out, state->digest_buff, ctx->inter_digestsize);
+>> +     out += ctx->inter_digestsize;
+>> +
+>> +     if (state->digest_bytes_len_dma_addr) {
+>> +             dma_sync_single_for_cpu(dev, state->digest_bytes_len_dma_addr,
+>> +                                     HASH_LEN_SIZE, DMA_BIDIRECTIONAL);
+>> +             memcpy(out, state->digest_bytes_len, HASH_LEN_SIZE);
+>> +     }
+>> +     out += HASH_LEN_SIZE;
+>
+> I'm sorry to ask this question now instead of on my first review.  I was
+> waiting for my other computer to get ready so I could look up how this
+> is called.  But now that I've looked at it, I'm still not sure how this
+> is called.
+
+No reason to be sorry. I value every review I get, no matter the timing :-)
+
+>
+> Anyway, my question is, is out zeroed memory?  Should we have something
+> like:
+>         } else {
+>                 memset(out, 0, HASH_LEN_SIZE);
+>         }
+>         out += HASH_LEN_SIZE;
+>
+
+The export/import function serialize internal hash state into/from a
+user supplied
+buffer, which may or may not be zeroed.
+
+The import/output is an opaque struct to the user, and in these
+specific circumstances
+that field (location in hashed data) is simply not used.
+
+After thinking about it, I think the correct thing to do here is to
+poison the unused field,
+rather than zero it to make it easier to debug cases where someone
+passes to export
+an import of a different hash/parameters.
+
+Thanks for pointing it out.
+
+
+> The ->import() function has a similar snippet.
+
+That one is easier as the internal data that is being imported is
+simply not allocated
+in this scenario at all.
+
+Thanks!
+Gilad
+
+-- 
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+"If you take a class in large-scale robotics, can you end up in a
+situation where the homework eats your dog?"
+ -- Jean-Baptiste Queru
