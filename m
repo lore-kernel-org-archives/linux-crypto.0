@@ -1,44 +1,62 @@
-From: Logan Gunthorpe <logang@deltatee.com>
-Subject: Re: [PATCH 2/7] iomap: implement ioread64 and iowrite64
-Date: Mon, 26 Jun 2017 15:25:41 -0600
-Message-ID: <0746dbb0-9fc1-d24c-89c0-b079a3cd0c7b@deltatee.com>
-References: <20170622164817.25515-1-logang@deltatee.com>
- <20170622164817.25515-3-logang@deltatee.com>
- <CAK8P3a1Uh=PQbGi540KGLpkoEVH+KUW18mzqN3aiijroXwEMWQ@mail.gmail.com>
+From: Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH v2 1/3] crypto: ccp - Use devres interface to allocate
+ PCI/iomap and cleanup
+Date: Mon, 26 Jun 2017 17:22:10 -0500
+Message-ID: <ec17a9f8-0a5b-4d93-ca9c-a3755ff027ec@amd.com>
+References: <20170623160630.63292-1-brijesh.singh@amd.com>
+ <20170623160630.63292-2-brijesh.singh@amd.com>
+ <262828f7-b433-b271-3caf-dbb4a8a7c5dd@amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-arch <linux-arch@vger.kernel.org>,
-        linux-ntb@googlegroups.com, linux-alpha@vger.kernel.org,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        linux-crypto@vger.kernel.org,
-        dri-devel <dri-devel@lists.freedesktop.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Stephen Bates <sbates@raithlin.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Suresh Warrier <warrier@linux.vnet.ibm.com>,
-        Nicholas Piggin <npiggin@gmail.com>
-To: Arnd Bergmann <arnd@arndb.de>
-Return-path: <linux-arch-owner@vger.kernel.org>
-In-Reply-To: <CAK8P3a1Uh=PQbGi540KGLpkoEVH+KUW18mzqN3aiijroXwEMWQ@mail.gmail.com>
-Sender: linux-arch-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: brijesh.singh@amd.com, gary.hook@amd.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net
+To: Tom Lendacky <thomas.lendacky@amd.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-cys01nam02on0049.outbound.protection.outlook.com ([104.47.37.49]:45246
+        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751492AbdFZWWQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 26 Jun 2017 18:22:16 -0400
+In-Reply-To: <262828f7-b433-b271-3caf-dbb4a8a7c5dd@amd.com>
+Content-Language: en-US
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 6/26/2017 2:43 PM, Arnd Bergmann wrote:
-> This hardcodes the behavior of include/linux/io-64-nonatomic-hi-lo.h, which
-> I find rather confusing, as only about one in five drivers wants this
-> behavior.
->
-> I'd suggest you don't add it in lib/iomap.c at all for 32-bit architectures,
-> but rather use the same logic that we have for readq/writeq in
-> io-64-nonatomic-hi-lo.h and io-64-nonatomic-lo-hi.h, adding
-> {lo_hi,hi_lo}_{ioread,iowrite}{,be} to the same files, and provide
-> the {ioread,iowrite}{,be} macros only if they have not been defined
-> at that point.
 
-Thanks Arnd. Yes, I'm already reworking this patchset to do exactly that.
 
-Logan
+On 06/26/2017 04:17 PM, Tom Lendacky wrote:
+>> +const struct ccp_vdata ccpv3_platform = {
+>> +    .version = CCP_VERSION(3, 0),
+>> +    .setup = NULL,
+>> +    .perform = &ccp3_actions,
+>> +    .bar = 2,
+> 
+> Platform devices don't use BARs so should probably delete this (unless
+> you want to make it more generic and then use this value for the
+> IORESOURCE_MEM entry).
+> 
+
+Yep, we don't need bar for platform device, it was copy paste from existing
+ccpv3 structure. I will fix it in v3. thanks
+
+>> +}
+>>   #endif
+>> +int ccp_dev_init(struct ccp_device *ccp)
+>> +{
+>> +    if (ccp->vdata->setup)
+>> +        ccp->vdata->setup(ccp);
+>> +
+>> +    ccp->io_regs = ccp->io_map + ccp->vdata->offset;
+> 
+> This should be before the above call to setup().
+> 
+
+Good catch, actually the second patch takes care of it. But I agree with your
+feedback, I will make sure that io_regs is set before invoking the setup() in
+the first patch itself.
+
+
+Thanks
+Brijesh
