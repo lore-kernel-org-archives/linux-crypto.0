@@ -1,90 +1,45 @@
-From: "Nicholas A. Bellinger" <nab-IzHhD5pYlfBP7FQvKIMDCQ@public.gmane.org>
-Subject: Re: [kernel-hardening] Re: [PATCH v4 06/13] iscsi: ensure RNG is
- seeded before use
-Date: Sun, 25 Jun 2017 18:23:09 -0700
-Message-ID: <1498440189.26123.85.camel@haakon3.risingtidesystems.com>
-References: <20170606174804.31124-1-Jason@zx2c4.com>
-	 <CAHmME9rU_H6Jq7ArjDq1yByrYf1P7nyC4Y8tqkzG585U39MFLg@mail.gmail.com>
-	 <02d60ed4-4207-dd7d-8826-0f9f7f4e966d@suse.com>
-	 <2639082.PtrrGWOPPL@positron.chronox.de>
-Reply-To: open-iscsi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Cc: Lee Duncan <lduncan-IBi9RG/b67k@public.gmane.org>, "Jason A. Donenfeld" <Jason-OnJsPKxuuEcAvxtiuMwx3w@public.gmane.org>,
- Theodore Ts'o <tytso-3s7WtUTddSA@public.gmane.org>, Linux Crypto Mailing List
- <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
- kernel-hardening-ZwoEplunGu1jrUoiu81ncdBPR1lH4CV8@public.gmane.org, Greg Kroah-Hartman
- <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>, David Miller <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>, Eric
- Biggers <ebiggers3-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Chris Leech <cleech-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
- open-iscsi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org, target-devel <target-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
-Return-path: <open-iscsi+bncBDAIFWGVYMJRB76DYHFAKGQEDO6ZAZI-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-Sender: open-iscsi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
-In-Reply-To: <2639082.PtrrGWOPPL-jJGQKZiSfeo1haGO/jJMPxvVK+yQ3ZXh@public.gmane.org>
-List-Post: <https://groups.google.com/group/open-iscsi/post>, <mailto:open-iscsi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Help: <https://groups.google.com/support/>, <mailto:open-iscsi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Archive: <https://groups.google.com/group/open-iscsi
-List-Subscribe: <https://groups.google.com/group/open-iscsi/subscribe>, <mailto:open-iscsi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Unsubscribe: <mailto:googlegroups-manage+856124926423+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
- <https://groups.google.com/group/open-iscsi/subscribe>
-List-Id: linux-crypto.vger.kernel.org
+From: David Gstir <david@sigma-star.at>
+Subject: Re: [RFC PATCH 1/2] crypto: caam - properly set IV after {en,de}crypt
+Date: Mon, 26 Jun 2017 07:40:58 +0200
+Message-ID: <2EF4805B-514F-48AD-95BB-170AF7B24D36@sigma-star.at>
+References: <20170602122446.2427-1-david@sigma-star.at>
+ <20170602122446.2427-2-david@sigma-star.at>
+ <VI1PR0401MB2591177E3F43DEFA8AEA3D6D98C40@VI1PR0401MB2591.eurprd04.prod.outlook.com>
+ <20170620012858.GA16207@gondor.apana.org.au>
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
+Cc: =?utf-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>,
+        Dan Douglass <dan.douglass@nxp.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "richard@sigma-star.at" <richard@sigma-star.at>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.sigma-star.at ([95.130.255.111]:45996 "EHLO
+        mail.sigma-star.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750788AbdFZFlB (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 26 Jun 2017 01:41:01 -0400
+In-Reply-To: <20170620012858.GA16207@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Stephan, Lee & Jason,
+Herbert,
 
-(Adding target-devel CC')
+> On 20 Jun 2017, at 03:28, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> 
+> On Mon, Jun 19, 2017 at 10:31:27AM +0000, Horia Geantă wrote:
+>> 
+>> IIUC, IV update is required only in case of CBC.
+>> Since this callback is used also for CTR, we should avoid the copy:
+>> if ((ctx->cdata.algtype & OP_ALG_AAI_MASK) == OP_ALG_AAI_CBC) ...
+> 
+> No it is needed for CTR too.
 
-Apologies for coming late to the discussion.  Comments below.
+So, am I correct in assuming that it is required for all modes including AEAD modes like GCM?
+In that case I'll include a fix for the CAAM GCM mode too.
 
-On Sun, 2017-06-18 at 10:04 +0200, Stephan M=C3=BCller wrote:
-> Am Samstag, 17. Juni 2017, 05:45:57 CEST schrieb Lee Duncan:
->=20
-> Hi Lee,
->=20
-> > In your testing, how long might a process have to wait? Are we talking
-> > seconds? Longer? What about timeouts?
-> >
->=20
-> In current kernels (starting with 4.8) this timeout should clear within a=
- few=20
-> seconds after boot.
->=20
-> In older kernels (pre 4.8), my KVM takes up to 90 seconds to reach that=
-=20
-> seeding point. I have heard that on IBM System Z this trigger point requi=
-res=20
-> minutes to be reached.
->=20
-
-I share the same concern as Lee wrt to introducing latency into the
-existing iscsi-target login sequence.
-
-Namely in the use-cases where a single node is supporting ~1K unique
-iscsi-target IQNs, and fail-over + re-balancing of IQNs where 100s of
-login attempts are expected to occur in parallel.
-
-If environments exist that require non trivial amounts of time for RNG
-seeding to be ready for iscsi-target usage, then enforcing this
-requirement at iscsi login time can open up problems, especially when
-iscsi host environments may be sensitive to login timeouts, I/O
-timeouts, et al.
-
-That said, I'd prefer to simply wait for RNG to be seeded at modprobe
-iscsi_target_mod time, instead of trying to enforce randomness during
-login.
-
-This way, those of use who have distributed storage platforms can know
-to avoid putting a node into a state to accept iscsi-target IQN export
-migration, before modprobe iscsi_target_mod has successfully loaded and
-RNG seeding has been confirmed.
-
-WDYT..?
-
---=20
-You received this message because you are subscribed to the Google Groups "=
-open-iscsi" group.
-To unsubscribe from this group and stop receiving emails from it, send an e=
-mail to open-iscsi+unsubscribe-/JYPxA39Uh5TLH3MbocFF+G/Ez6ZCGd0@public.gmane.org
-To post to this group, send email to open-iscsi-/JYPxA39Uh5TLH3MbocFF+G/Ez6ZCGd0@public.gmane.org
-Visit this group at https://groups.google.com/group/open-iscsi.
-For more options, visit https://groups.google.com/d/optout.
+Thanks,
+David
