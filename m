@@ -1,42 +1,29 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC PATCH 1/2] crypto: caam - properly set IV after {en,de}crypt
-Date: Mon, 26 Jun 2017 14:47:44 +0800
-Message-ID: <20170626064744.GA3540@gondor.apana.org.au>
-References: <20170602122446.2427-1-david@sigma-star.at>
- <20170602122446.2427-2-david@sigma-star.at>
- <VI1PR0401MB2591177E3F43DEFA8AEA3D6D98C40@VI1PR0401MB2591.eurprd04.prod.outlook.com>
- <20170620012858.GA16207@gondor.apana.org.au>
- <2EF4805B-514F-48AD-95BB-170AF7B24D36@sigma-star.at>
+From: Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH] crypto: qat - avoid an uninitialized variable warning
+Date: Mon, 26 Jun 2017 09:03:26 +0200
+Message-ID: <20170626070326.GA10544@lst.de>
+References: <20170622123604.505337-1-arnd@arndb.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-        Dan Douglass <dan.douglass@nxp.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "richard@sigma-star.at" <richard@sigma-star.at>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-To: David Gstir <david@sigma-star.at>
+Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Salvatore Benedetto <salvatore.benedetto@intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Christoph Hellwig <hch@lst.de>,
+        Corentin LABBE <clabbe.montjoie@gmail.com>,
+        qat-linux@intel.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:38346 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751092AbdFZGsP (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 26 Jun 2017 02:48:15 -0400
+Received: from verein.lst.de ([213.95.11.211]:36777 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751232AbdFZHD2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 26 Jun 2017 03:03:28 -0400
 Content-Disposition: inline
-In-Reply-To: <2EF4805B-514F-48AD-95BB-170AF7B24D36@sigma-star.at>
+In-Reply-To: <20170622123604.505337-1-arnd@arndb.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jun 26, 2017 at 07:40:58AM +0200, David Gstir wrote:
->
-> So, am I correct in assuming that it is required for all modes including AEAD modes like GCM?
-> In that case I'll include a fix for the CAAM GCM mode too.
+Thanks Arnd,
 
-It's only required for skcihper.  As we do not do chunking/streaming
-with our AEAD interface it is not required for GCM.
-  
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+added to the dma-mapping tree.
