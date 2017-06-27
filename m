@@ -1,356 +1,228 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 08/14] staging: ccree: fix pointer location
-Date: Tue, 27 Jun 2017 10:27:20 +0300
-Message-ID: <1498548449-10803-9-git-send-email-gilad@benyossef.com>
+Subject: [PATCH 04/14] staging: ccree: remove redundant blank lines
+Date: Tue, 27 Jun 2017 10:27:16 +0300
+Message-ID: <1498548449-10803-5-git-send-email-gilad@benyossef.com>
 References: <1498548449-10803-1-git-send-email-gilad@benyossef.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Cc: Ofir Drang <ofir.drang@arm.com>
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-crypto@vger.kernel.org,
-        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
-        linux-kernel@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:52480 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752498AbdF0H2V (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 27 Jun 2017 03:28:21 -0400
+ linux-crypto@vger.kernel.org, driverdev-devel@linuxdriverproject.org,
+ devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
 In-Reply-To: <1498548449-10803-1-git-send-email-gilad@benyossef.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+List-Id: linux-crypto.vger.kernel.org
 
-Fix location of pointer in variables definitions and dereference.
+Remove redundant blank lines in brace blocks
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/ssi_aead.h        |  4 ++--
- drivers/staging/ccree/ssi_buffer_mgr.c  | 12 ++++++------
- drivers/staging/ccree/ssi_cipher.c      |  8 ++++----
- drivers/staging/ccree/ssi_fips_ll.c     | 24 ++++++++++++------------
- drivers/staging/ccree/ssi_fips_local.c  |  2 +-
- drivers/staging/ccree/ssi_hash.c        |  2 +-
- drivers/staging/ccree/ssi_hash.h        |  6 +++---
- drivers/staging/ccree/ssi_request_mgr.c | 10 +++++-----
- drivers/staging/ccree/ssi_sysfs.c       |  4 ++--
- 9 files changed, 36 insertions(+), 36 deletions(-)
+ drivers/staging/ccree/ssi_aead.c        | 2 --
+ drivers/staging/ccree/ssi_buffer_mgr.c  | 8 --------
+ drivers/staging/ccree/ssi_cipher.c      | 5 -----
+ drivers/staging/ccree/ssi_driver.c      | 1 -
+ drivers/staging/ccree/ssi_hash.c        | 2 --
+ drivers/staging/ccree/ssi_pm.c          | 1 -
+ drivers/staging/ccree/ssi_request_mgr.c | 1 -
+ 7 files changed, 20 deletions(-)
 
-diff --git a/drivers/staging/ccree/ssi_aead.h b/drivers/staging/ccree/ssi_aead.h
-index 07cab84..d69e729 100644
---- a/drivers/staging/ccree/ssi_aead.h
-+++ b/drivers/staging/ccree/ssi_aead.h
-@@ -98,8 +98,8 @@ struct aead_req_ctx {
- 	struct ssi_mlli assoc;
- 	struct ssi_mlli src;
- 	struct ssi_mlli dst;
--	struct scatterlist* srcSgl;
--	struct scatterlist* dstSgl;
-+	struct scatterlist *srcSgl;
-+	struct scatterlist *dstSgl;
- 	unsigned int srcOffset;
- 	unsigned int dstOffset;
- 	enum ssi_req_dma_buf_type assoc_buff_type;
+diff --git a/drivers/staging/ccree/ssi_aead.c b/drivers/staging/ccree/ssi_aead.c
+index 00375b6..5782c9d 100644
+--- a/drivers/staging/ccree/ssi_aead.c
++++ b/drivers/staging/ccree/ssi_aead.c
+@@ -2042,7 +2042,6 @@ static int ssi_aead_process(struct aead_request *req, enum drv_crypto_direction
+ 
+ 	/* do we need to generate IV? */
+ 	if (areq_ctx->backup_giv != NULL) {
+-
+ 		/* set the DMA mapped IV address*/
+ 		if (ctx->cipher_mode == DRV_CIPHER_CTR) {
+ 			ssi_req.ivgen_dma_addr[0] = areq_ctx->gen_ctx.iv_dma_addr + CTR_RFC3686_NONCE_SIZE;
+@@ -2181,7 +2180,6 @@ static int ssi_aead_decrypt(struct aead_request *req)
+ 		req->iv = areq_ctx->backup_iv;
+ 
+ 	return rc;
+-
+ }
+ 
+ #if SSI_CC_HAS_AES_CCM
 diff --git a/drivers/staging/ccree/ssi_buffer_mgr.c b/drivers/staging/ccree/ssi_buffer_mgr.c
-index e060ea1..1b41c12 100644
+index 3c74ae3..63f057e 100644
 --- a/drivers/staging/ccree/ssi_buffer_mgr.c
 +++ b/drivers/staging/ccree/ssi_buffer_mgr.c
-@@ -66,7 +66,7 @@ struct buffer_array {
- 	int total_data_len[MAX_NUM_OF_BUFFERS_IN_MLLI];
- 	enum dma_buffer_type type[MAX_NUM_OF_BUFFERS_IN_MLLI];
- 	bool is_last[MAX_NUM_OF_BUFFERS_IN_MLLI];
--	u32 * mlli_nents[MAX_NUM_OF_BUFFERS_IN_MLLI];
-+	u32 *mlli_nents[MAX_NUM_OF_BUFFERS_IN_MLLI];
- };
+@@ -608,7 +608,6 @@ int ssi_buffer_mgr_map_blkcipher_request(
+ 		rc = ssi_buffer_mgr_generate_mlli(dev, &sg_data, mlli_params);
+ 		if (unlikely(rc != 0))
+ 			goto ablkcipher_exit;
+-
+ 	}
  
- /**
-@@ -409,7 +409,7 @@ static int ssi_buffer_mgr_map_scatterlist(
- static inline int
- ssi_aead_handle_config_buf(struct device *dev,
- 	struct aead_req_ctx *areq_ctx,
--	u8* config_data,
-+	u8 *config_data,
- 	struct buffer_array *sg_data,
- 	unsigned int assoclen)
- {
-@@ -444,7 +444,7 @@ ssi_aead_handle_config_buf(struct device *dev,
+ 	SSI_LOG_DEBUG("areq_ctx->dma_buf_type = %s\n",
+@@ -877,7 +876,6 @@ static inline int ssi_buffer_mgr_aead_chain_assoc(
+ 	if (areq_ctx->ccm_hdr_size != ccm_header_size_null) {
+ 		if (unlikely((mapped_nents + 1) >
+ 			LLI_MAX_NUM_OF_ASSOC_DATA_ENTRIES)) {
+-
+ 			SSI_LOG_ERR("CCM case.Too many fragments. "
+ 				"Current %d max %d\n",
+ 				(areq_ctx->assoc.nents + 1),
+@@ -895,7 +893,6 @@ static inline int ssi_buffer_mgr_aead_chain_assoc(
  
- static inline int ssi_ahash_handle_curr_buf(struct device *dev,
- 					   struct ahash_req_ctx *areq_ctx,
--					   u8* curr_buff,
-+					   u8 *curr_buff,
- 					   u32 curr_buff_cnt,
- 					   struct buffer_array *sg_data)
- {
-@@ -1460,7 +1460,7 @@ int ssi_buffer_mgr_map_hash_request_final(
- {
- 	struct ahash_req_ctx *areq_ctx = (struct ahash_req_ctx *)ctx;
- 	struct device *dev = &drvdata->plat_dev->dev;
--	u8* curr_buff = areq_ctx->buff_index ? areq_ctx->buff1 :
-+	u8 *curr_buff = areq_ctx->buff_index ? areq_ctx->buff1 :
- 			areq_ctx->buff0;
- 	u32 *curr_buff_cnt = areq_ctx->buff_index ? &areq_ctx->buff1_cnt :
- 			&areq_ctx->buff0_cnt;
-@@ -1551,11 +1551,11 @@ int ssi_buffer_mgr_map_hash_request_update(
- {
- 	struct ahash_req_ctx *areq_ctx = (struct ahash_req_ctx *)ctx;
- 	struct device *dev = &drvdata->plat_dev->dev;
--	u8* curr_buff = areq_ctx->buff_index ? areq_ctx->buff1 :
-+	u8 *curr_buff = areq_ctx->buff_index ? areq_ctx->buff1 :
- 			areq_ctx->buff0;
- 	u32 *curr_buff_cnt = areq_ctx->buff_index ? &areq_ctx->buff1_cnt :
- 			&areq_ctx->buff0_cnt;
--	u8* next_buff = areq_ctx->buff_index ? areq_ctx->buff0 :
-+	u8 *next_buff = areq_ctx->buff_index ? areq_ctx->buff0 :
- 			areq_ctx->buff1;
- 	u32 *next_buff_cnt = areq_ctx->buff_index ? &areq_ctx->buff0_cnt :
- 			&areq_ctx->buff1_cnt;
+ 	if (unlikely((do_chain) ||
+ 		(areq_ctx->assoc_buff_type == SSI_DMA_BUF_MLLI))) {
+-
+ 		SSI_LOG_DEBUG("Chain assoc: buff_type=%s nents=%u\n",
+ 			GET_DMA_BUFFER_TYPE(areq_ctx->assoc_buff_type),
+ 			areq_ctx->assoc.nents);
+@@ -1178,7 +1175,6 @@ static inline int ssi_buffer_mgr_aead_chain_data(
+ 
+ 	//check where the data starts
+ 	while (sg_index <= size_to_skip) {
+-
+ 		offset -= areq_ctx->dstSgl->length;
+ 		areq_ctx->dstSgl = sg_next(areq_ctx->dstSgl);
+ 		//if have reached the end of the sgl, then this is unexpected
+@@ -1450,7 +1446,6 @@ int ssi_buffer_mgr_map_aead_request(
+ 	if (unlikely(
+ 		(areq_ctx->assoc_buff_type == SSI_DMA_BUF_MLLI) ||
+ 		(areq_ctx->data_buff_type == SSI_DMA_BUF_MLLI))) {
+-
+ 		mlli_params->curr_pool = buff_mgr->mlli_buffs_pool;
+ 		rc = ssi_buffer_mgr_generate_mlli(dev, &sg_data, mlli_params);
+ 		if (unlikely(rc != 0)) {
+@@ -1528,7 +1523,6 @@ int ssi_buffer_mgr_map_hash_request_final(
+ 		} else {
+ 			areq_ctx->data_dma_buf_type = SSI_DMA_BUF_MLLI;
+ 		}
+-
+ 	}
+ 
+ 	/*build mlli */
+@@ -1675,7 +1669,6 @@ int ssi_buffer_mgr_map_hash_request_update(
+ 						  mlli_params) != 0)) {
+ 			goto fail_unmap_din;
+ 		}
+-
+ 	}
+ 	areq_ctx->buff_index = (areq_ctx->buff_index ^ swap_index);
+ 
+@@ -1771,7 +1764,6 @@ int ssi_buffer_mgr_fini(struct ssi_drvdata *drvdata)
+ 		dma_pool_destroy(buff_mgr_handle->mlli_buffs_pool);
+ 		kfree(drvdata->buff_mgr_handle);
+ 		drvdata->buff_mgr_handle = NULL;
+-
+ 	}
+ 	return 0;
+ }
 diff --git a/drivers/staging/ccree/ssi_cipher.c b/drivers/staging/ccree/ssi_cipher.c
-index 1baa215..b4fc9a6 100644
+index 1dab3e6..722b307 100644
 --- a/drivers/staging/ccree/ssi_cipher.c
 +++ b/drivers/staging/ccree/ssi_cipher.c
-@@ -268,11 +268,11 @@ static const u8 zero_buff[] = {	0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
- static int ssi_fips_verify_3des_keys(const u8 *key, unsigned int keylen)
- {
- #ifdef CCREE_FIPS_SUPPORT
--	tdes_keys_t *tdes_key = (tdes_keys_t*)key;
-+	tdes_keys_t *tdes_key = (tdes_keys_t *)key;
- 
- 	/* verify key1 != key2 and key3 != key2*/
--	if (unlikely((memcmp((u8*)tdes_key->key1, (u8*)tdes_key->key2, sizeof(tdes_key->key1)) == 0) ||
--		      (memcmp((u8*)tdes_key->key3, (u8*)tdes_key->key2, sizeof(tdes_key->key3)) == 0))) {
-+	if (unlikely((memcmp((u8 *)tdes_key->key1, (u8 *)tdes_key->key2, sizeof(tdes_key->key1)) == 0) ||
-+		      (memcmp((u8 *)tdes_key->key3, (u8 *)tdes_key->key2, sizeof(tdes_key->key3)) == 0))) {
- 		return -ENOEXEC;
+@@ -104,7 +104,6 @@ static int validate_keys_sizes(struct ssi_ablkcipher_ctx *ctx_p, u32 size) {
+ #endif
+ 	default:
+ 		break;
+-
  	}
- #endif /* CCREE_FIPS_SUPPORT */
-@@ -342,7 +342,7 @@ static int ssi_blkcipher_setkey(struct crypto_tfm *tfm,
+ 	return -EINVAL;
+ }
+@@ -158,7 +157,6 @@ static int validate_data_size(struct ssi_ablkcipher_ctx *ctx_p, unsigned int siz
+ #endif /*SSI_CC_HAS_MULTI2*/
+ 	default:
+ 		break;
+-
+ 	}
+ 	return -EINVAL;
+ }
+@@ -498,7 +496,6 @@ ssi_blkcipher_create_setup_desc(
+ 		set_cipher_mode(&desc[*seq_size], cipher_mode);
+ 		set_cipher_config0(&desc[*seq_size], direction);
+ 		if (flow_mode == S_DIN_to_AES) {
+-
+ 			if (ssi_is_hw_key(tfm)) {
+ 				set_hw_crypto_key(&desc[*seq_size],
+ 						  ctx_p->hw.key1_slot);
+@@ -616,7 +613,6 @@ static inline void ssi_blkcipher_create_multi2_setup_desc(
+ 	set_cipher_mode(&desc[*seq_size], ctx_p->cipher_mode);
+ 	set_setup_mode(&desc[*seq_size], SETUP_LOAD_STATE1);
+ 	(*seq_size)++;
+-
+ }
+ #endif /*SSI_CC_HAS_MULTI2*/
  
- 	if (ssi_is_hw_key(tfm)) {
- 		/* setting HW key slots */
--		struct arm_hw_key_info *hki = (struct arm_hw_key_info*)key;
-+		struct arm_hw_key_info *hki = (struct arm_hw_key_info *)key;
+@@ -782,7 +778,6 @@ static int ssi_blkcipher_process(
+ 	}
+ 	/*For CTS in case of data size aligned to 16 use CBC mode*/
+ 	if (((nbytes % AES_BLOCK_SIZE) == 0) && (ctx_p->cipher_mode == DRV_CIPHER_CBC_CTS)) {
+-
+ 		ctx_p->cipher_mode = DRV_CIPHER_CBC;
+ 		cts_restore_flag = 1;
+ 	}
+diff --git a/drivers/staging/ccree/ssi_driver.c b/drivers/staging/ccree/ssi_driver.c
+index 05930e8..3168930 100644
+--- a/drivers/staging/ccree/ssi_driver.c
++++ b/drivers/staging/ccree/ssi_driver.c
+@@ -444,7 +444,6 @@ void fini_cc_regs(struct ssi_drvdata *drvdata)
+ 	/* Mask all interrupts */
+ 	WRITE_REGISTER(drvdata->cc_base +
+ 		       CC_REG_OFFSET(HOST_RGF, HOST_IMR), 0xFFFFFFFF);
+-
+ }
  
- 		if (unlikely(ctx_p->flow_mode != S_DIN_to_AES)) {
- 			SSI_LOG_ERR("HW key not supported for non-AES flows\n");
-diff --git a/drivers/staging/ccree/ssi_fips_ll.c b/drivers/staging/ccree/ssi_fips_ll.c
-index 804384d..4a11f15 100644
---- a/drivers/staging/ccree/ssi_fips_ll.c
-+++ b/drivers/staging/ccree/ssi_fips_ll.c
-@@ -430,7 +430,7 @@ ssi_cipher_fips_power_up_tests(struct ssi_drvdata *drvdata, void *cpu_addr_buffe
- 
- 	for (i = 0; i < FIPS_CIPHER_NUM_OF_TESTS; ++i)
- 	{
--		FipsCipherData *cipherData = (FipsCipherData*)&FipsCipherDataTable[i];
-+		FipsCipherData *cipherData = (FipsCipherData *)&FipsCipherDataTable[i];
- 		int rc = 0;
- 		size_t iv_size = cipherData->isAes ? NIST_AES_IV_SIZE : NIST_TDES_IV_SIZE;
- 
-@@ -558,7 +558,7 @@ ssi_cmac_fips_power_up_tests(struct ssi_drvdata *drvdata, void *cpu_addr_buffer,
- 
- 	for (i = 0; i < FIPS_CMAC_NUM_OF_TESTS; ++i)
- 	{
--		FipsCmacData *cmac_data = (FipsCmacData*)&FipsCmacDataTable[i];
-+		FipsCmacData *cmac_data = (FipsCmacData *)&FipsCmacDataTable[i];
- 		int rc = 0;
- 
- 		memset(cpu_addr_buffer, 0, sizeof(struct fips_cmac_ctx));
-@@ -704,7 +704,7 @@ ssi_hash_fips_power_up_tests(struct ssi_drvdata *drvdata, void *cpu_addr_buffer,
- 
- 	for (i = 0; i < FIPS_HASH_NUM_OF_TESTS; ++i)
- 	{
--		FipsHashData *hash_data = (FipsHashData*)&FipsHashDataTable[i];
-+		FipsHashData *hash_data = (FipsHashData *)&FipsHashDataTable[i];
- 		int rc = 0;
- 		enum drv_hash_hw_mode hw_mode = 0;
- 		int digest_size = 0;
-@@ -718,20 +718,20 @@ ssi_hash_fips_power_up_tests(struct ssi_drvdata *drvdata, void *cpu_addr_buffer,
- 			digest_size = CC_SHA1_DIGEST_SIZE;
- 			inter_digestsize = CC_SHA1_DIGEST_SIZE;
- 			/* copy the initial digest into the allocated cache coherent buffer */
--			memcpy(virt_ctx->initial_digest, (void*)sha1_init, CC_SHA1_DIGEST_SIZE);
-+			memcpy(virt_ctx->initial_digest, (void *)sha1_init, CC_SHA1_DIGEST_SIZE);
- 			break;
- 		case DRV_HASH_SHA256:
- 			hw_mode = DRV_HASH_HW_SHA256;
- 			digest_size = CC_SHA256_DIGEST_SIZE;
- 			inter_digestsize = CC_SHA256_DIGEST_SIZE;
--			memcpy(virt_ctx->initial_digest, (void*)sha256_init, CC_SHA256_DIGEST_SIZE);
-+			memcpy(virt_ctx->initial_digest, (void *)sha256_init, CC_SHA256_DIGEST_SIZE);
- 			break;
- #if (CC_SUPPORT_SHA > 256)
- 		case DRV_HASH_SHA512:
- 			hw_mode = DRV_HASH_HW_SHA512;
- 			digest_size = CC_SHA512_DIGEST_SIZE;
- 			inter_digestsize = CC_SHA512_DIGEST_SIZE;
--			memcpy(virt_ctx->initial_digest, (void*)sha512_init, CC_SHA512_DIGEST_SIZE);
-+			memcpy(virt_ctx->initial_digest, (void *)sha512_init, CC_SHA512_DIGEST_SIZE);
- 			break;
- #endif
- 		default:
-@@ -1024,7 +1024,7 @@ ssi_hmac_fips_power_up_tests(struct ssi_drvdata *drvdata, void *cpu_addr_buffer,
- 
- 	for (i = 0; i < FIPS_HMAC_NUM_OF_TESTS; ++i)
- 	{
--		FipsHmacData *hmac_data = (FipsHmacData*)&FipsHmacDataTable[i];
-+		FipsHmacData *hmac_data = (FipsHmacData *)&FipsHmacDataTable[i];
- 		int rc = 0;
- 		enum drv_hash_hw_mode hw_mode = 0;
- 		int digest_size = 0;
-@@ -1039,7 +1039,7 @@ ssi_hmac_fips_power_up_tests(struct ssi_drvdata *drvdata, void *cpu_addr_buffer,
- 			digest_size = CC_SHA1_DIGEST_SIZE;
- 			block_size = CC_SHA1_BLOCK_SIZE;
- 			inter_digestsize = CC_SHA1_DIGEST_SIZE;
--			memcpy(virt_ctx->initial_digest, (void*)sha1_init, CC_SHA1_DIGEST_SIZE);
-+			memcpy(virt_ctx->initial_digest, (void *)sha1_init, CC_SHA1_DIGEST_SIZE);
- 			memcpy(virt_ctx->digest_bytes_len, digest_len_init, HASH_LEN_SIZE);
- 			break;
- 		case DRV_HASH_SHA256:
-@@ -1047,7 +1047,7 @@ ssi_hmac_fips_power_up_tests(struct ssi_drvdata *drvdata, void *cpu_addr_buffer,
- 			digest_size = CC_SHA256_DIGEST_SIZE;
- 			block_size = CC_SHA256_BLOCK_SIZE;
- 			inter_digestsize = CC_SHA256_DIGEST_SIZE;
--			memcpy(virt_ctx->initial_digest, (void*)sha256_init, CC_SHA256_DIGEST_SIZE);
-+			memcpy(virt_ctx->initial_digest, (void *)sha256_init, CC_SHA256_DIGEST_SIZE);
- 			memcpy(virt_ctx->digest_bytes_len, digest_len_init, HASH_LEN_SIZE);
- 			break;
- #if (CC_SUPPORT_SHA > 256)
-@@ -1056,7 +1056,7 @@ ssi_hmac_fips_power_up_tests(struct ssi_drvdata *drvdata, void *cpu_addr_buffer,
- 			digest_size = CC_SHA512_DIGEST_SIZE;
- 			block_size = CC_SHA512_BLOCK_SIZE;
- 			inter_digestsize = CC_SHA512_DIGEST_SIZE;
--			memcpy(virt_ctx->initial_digest, (void*)sha512_init, CC_SHA512_DIGEST_SIZE);
-+			memcpy(virt_ctx->initial_digest, (void *)sha512_init, CC_SHA512_DIGEST_SIZE);
- 			memcpy(virt_ctx->digest_bytes_len, digest_len_sha512_init, HASH_LEN_SIZE);
- 			break;
- #endif
-@@ -1266,7 +1266,7 @@ ssi_ccm_fips_power_up_tests(struct ssi_drvdata *drvdata, void *cpu_addr_buffer,
- 
- 	for (i = 0; i < FIPS_CCM_NUM_OF_TESTS; ++i)
- 	{
--		FipsCcmData *ccmData = (FipsCcmData*)&FipsCcmDataTable[i];
-+		FipsCcmData *ccmData = (FipsCcmData *)&FipsCcmDataTable[i];
- 		int rc = 0;
- 
- 		memset(cpu_addr_buffer, 0, sizeof(struct fips_ccm_ctx));
-@@ -1566,7 +1566,7 @@ ssi_gcm_fips_power_up_tests(struct ssi_drvdata *drvdata, void *cpu_addr_buffer,
- 
- 	for (i = 0; i < FIPS_GCM_NUM_OF_TESTS; ++i)
- 	{
--		FipsGcmData *gcmData = (FipsGcmData*)&FipsGcmDataTable[i];
-+		FipsGcmData *gcmData = (FipsGcmData *)&FipsGcmDataTable[i];
- 		int rc = 0;
- 
- 		memset(cpu_addr_buffer, 0, sizeof(struct fips_gcm_ctx));
-diff --git a/drivers/staging/ccree/ssi_fips_local.c b/drivers/staging/ccree/ssi_fips_local.c
-index c571b85..50d7189 100644
---- a/drivers/staging/ccree/ssi_fips_local.c
-+++ b/drivers/staging/ccree/ssi_fips_local.c
-@@ -165,7 +165,7 @@ static void fips_dsr(unsigned long devarg)
- ssi_fips_error_t cc_fips_run_power_up_tests(struct ssi_drvdata *drvdata)
- {
- 	ssi_fips_error_t fips_error = CC_REE_FIPS_ERROR_OK;
--	void * cpu_addr_buffer = NULL;
-+	void *cpu_addr_buffer = NULL;
- 	dma_addr_t dma_handle;
- 	size_t alloc_buff_size = ssi_fips_max_mem_alloc_size();
- 	struct device *dev = &drvdata->plat_dev->dev;
+ static void cleanup_cc_resources(struct platform_device *plat_dev)
 diff --git a/drivers/staging/ccree/ssi_hash.c b/drivers/staging/ccree/ssi_hash.c
-index 7a70d87..79655bb 100644
+index 64e969e..9d5e54d 100644
 --- a/drivers/staging/ccree/ssi_hash.c
 +++ b/drivers/staging/ccree/ssi_hash.c
-@@ -1358,7 +1358,7 @@ static int ssi_hash_alloc_ctx(struct ssi_hash_ctx *ctx)
- static int ssi_ahash_cra_init(struct crypto_tfm *tfm)
- {
- 	struct ssi_hash_ctx *ctx = crypto_tfm_ctx(tfm);
--	struct hash_alg_common * hash_alg_common =
-+	struct hash_alg_common *hash_alg_common =
- 		container_of(tfm->__crt_alg, struct hash_alg_common, base);
- 	struct ahash_alg *ahash_alg =
- 		container_of(hash_alg_common, struct ahash_alg, halg);
-diff --git a/drivers/staging/ccree/ssi_hash.h b/drivers/staging/ccree/ssi_hash.h
-index 0bb99cb..2400e38 100644
---- a/drivers/staging/ccree/ssi_hash.h
-+++ b/drivers/staging/ccree/ssi_hash.h
-@@ -50,9 +50,9 @@ struct aeshash_state {
+@@ -1323,7 +1323,6 @@ static void ssi_hash_free_ctx(struct ssi_hash_ctx *ctx)
+ 	}
  
- /* ahash state */
- struct ahash_req_ctx {
--	u8* buff0;
--	u8* buff1;
--	u8* digest_result_buff;
-+	u8 *buff0;
-+	u8 *buff1;
-+	u8 *digest_result_buff;
- 	struct async_gen_req_ctx gen_ctx;
- 	enum ssi_req_dma_buf_type data_dma_buf_type;
- 	u8 *digest_buff;
+ 	ctx->key_params.keylen = 0;
+-
+ }
+ 
+ 
+@@ -2365,7 +2364,6 @@ int ssi_hash_free(struct ssi_drvdata *drvdata)
+ 	struct ssi_hash_handle *hash_handle = drvdata->hash_handle;
+ 
+ 	if (hash_handle != NULL) {
+-
+ 		list_for_each_entry_safe(t_hash_alg, hash_n, &hash_handle->hash_list, entry) {
+ 			crypto_unregister_ahash(&t_hash_alg->ahash_alg);
+ 			list_del(&t_hash_alg->entry);
+diff --git a/drivers/staging/ccree/ssi_pm.c b/drivers/staging/ccree/ssi_pm.c
+index ae1f7f0..d3ddfb1 100644
+--- a/drivers/staging/ccree/ssi_pm.c
++++ b/drivers/staging/ccree/ssi_pm.c
+@@ -115,7 +115,6 @@ int ssi_power_mgr_runtime_put_suspend(struct device *dev)
+ 		BUG();
+ 	}
+ 	return rc;
+-
+ }
+ 
+ #endif
 diff --git a/drivers/staging/ccree/ssi_request_mgr.c b/drivers/staging/ccree/ssi_request_mgr.c
-index ecd4a8b..f6f7ea8 100644
+index 3176578..8f7d2ec 100644
 --- a/drivers/staging/ccree/ssi_request_mgr.c
 +++ b/drivers/staging/ccree/ssi_request_mgr.c
-@@ -452,7 +452,7 @@ static void proc_completions(struct ssi_drvdata *drvdata)
- {
- 	struct ssi_crypto_req *ssi_req;
- 	struct platform_device *plat_dev = drvdata->plat_dev;
--	struct ssi_request_mgr_handle * request_mgr_handle =
-+	struct ssi_request_mgr_handle *request_mgr_handle =
- 						drvdata->request_mgr_handle;
- #if defined(CONFIG_PM_RUNTIME) || defined(CONFIG_PM_SLEEP)
- 	int rc = 0;
-@@ -511,7 +511,7 @@ static void comp_handler(unsigned long devarg)
- {
- 	struct ssi_drvdata *drvdata = (struct ssi_drvdata *)devarg;
- 	void __iomem *cc_base = drvdata->cc_base;
--	struct ssi_request_mgr_handle * request_mgr_handle =
-+	struct ssi_request_mgr_handle *request_mgr_handle =
- 						drvdata->request_mgr_handle;
- 
- 	u32 irq;
-@@ -559,7 +559,7 @@ static void comp_handler(unsigned long devarg)
- #if defined(CONFIG_PM_RUNTIME) || defined(CONFIG_PM_SLEEP)
- int ssi_request_mgr_runtime_resume_queue(struct ssi_drvdata *drvdata)
- {
--	struct ssi_request_mgr_handle * request_mgr_handle = drvdata->request_mgr_handle;
-+	struct ssi_request_mgr_handle *request_mgr_handle = drvdata->request_mgr_handle;
- 
- 	spin_lock_bh(&request_mgr_handle->hw_lock);
- 	request_mgr_handle->is_runtime_suspended = false;
-@@ -574,7 +574,7 @@ int ssi_request_mgr_runtime_resume_queue(struct ssi_drvdata *drvdata)
-  */
- int ssi_request_mgr_runtime_suspend_queue(struct ssi_drvdata *drvdata)
- {
--	struct ssi_request_mgr_handle * request_mgr_handle =
-+	struct ssi_request_mgr_handle *request_mgr_handle =
- 						drvdata->request_mgr_handle;
- 
- 	/* lock the send_request */
-@@ -592,7 +592,7 @@ int ssi_request_mgr_runtime_suspend_queue(struct ssi_drvdata *drvdata)
- 
- bool ssi_request_mgr_is_queue_runtime_suspend(struct ssi_drvdata *drvdata)
- {
--	struct ssi_request_mgr_handle * request_mgr_handle =
-+	struct ssi_request_mgr_handle *request_mgr_handle =
- 						drvdata->request_mgr_handle;
- 
- 	return	request_mgr_handle->is_runtime_suspended;
-diff --git a/drivers/staging/ccree/ssi_sysfs.c b/drivers/staging/ccree/ssi_sysfs.c
-index 8de4353..75c9a89 100644
---- a/drivers/staging/ccree/ssi_sysfs.c
-+++ b/drivers/staging/ccree/ssi_sysfs.c
-@@ -285,7 +285,7 @@ static ssize_t ssi_sys_regdump_show(struct kobject *kobj,
- {
- 	struct ssi_drvdata *drvdata = sys_get_drvdata();
- 	u32 register_value;
--	void __iomem* cc_base = drvdata->cc_base;
-+	void __iomem *cc_base = drvdata->cc_base;
- 	int offset = 0;
- 
- 	register_value = CC_HAL_READ_REGISTER(CC_REG_OFFSET(HOST_RGF, HOST_SIGNATURE));
-@@ -304,7 +304,7 @@ static ssize_t ssi_sys_regdump_show(struct kobject *kobj,
- static ssize_t ssi_sys_help_show(struct kobject *kobj,
- 		struct kobj_attribute *attr, char *buf)
- {
--	char* help_str[] = {
-+	char *help_str[] = {
- 				"cat reg_dump              ", "Print several of CC register values",
- 		#if defined CC_CYCLE_COUNT
- 				"cat stats_host            ", "Print host statistics",
+@@ -549,7 +549,6 @@ static void comp_handler(unsigned long devarg)
+ 			request_mgr_handle->axi_completed +=
+ 					cc_axi_comp_count(cc_base);
+ 		}
+-
+ 	}
+ 	/* after verifing that there is nothing to do, Unmask AXI completion interrupt */
+ 	CC_HAL_WRITE_REGISTER(CC_REG_OFFSET(HOST_RGF, HOST_IMR),
 -- 
 2.1.4
