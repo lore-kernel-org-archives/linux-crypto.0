@@ -1,7 +1,7 @@
 From: Gary R Hook <gary.hook@amd.com>
-Subject: [PATCH 2] crypto: ccp - Provide a roll-back method for debugfs setup
-Date: Tue, 27 Jun 2017 08:57:31 -0500
-Message-ID: <149857183214.26572.8412877312728402721.stgit@sosxen.amd.com>
+Subject: [PATCH] crypto: ccp - Fix some line spacing
+Date: Tue, 27 Jun 2017 08:58:04 -0500
+Message-ID: <149857188462.26646.9081906171244927473.stgit@sosxen.amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
@@ -9,71 +9,43 @@ Cc: thomas.lendacky@amd.com, herbert@gondor.apana.org.au,
         davem@davemloft.net
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-cys01nam02on0082.outbound.protection.outlook.com ([104.47.37.82]:36963
+Received: from mail-cys01nam02on0060.outbound.protection.outlook.com ([104.47.37.60]:41696
         "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751475AbdF0N5k (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 27 Jun 2017 09:57:40 -0400
+        id S1751492AbdF0N6M (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 27 Jun 2017 09:58:12 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Changes since v1:
- - Remove unneeded local variable
+Add/remove blank lines as appropriate.
 
 Signed-off-by: Gary R Hook <gary.hook@amd.com>
 ---
- drivers/crypto/ccp/ccp-debugfs.c |   17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
+ drivers/crypto/ccp/ccp-dev.c |    1 +
+ include/linux/ccp.h          |    1 -
+ 2 files changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/ccp/ccp-debugfs.c b/drivers/crypto/ccp/ccp-debugfs.c
-index 3cd6c83754e0..88191c45ca7d 100644
---- a/drivers/crypto/ccp/ccp-debugfs.c
-+++ b/drivers/crypto/ccp/ccp-debugfs.c
-@@ -305,19 +305,19 @@ void ccp5_debugfs_setup(struct ccp_device *ccp)
+diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
+index 2506b5025700..67cbb3e76888 100644
+--- a/drivers/crypto/ccp/ccp-dev.c
++++ b/drivers/crypto/ccp/ccp-dev.c
+@@ -415,6 +415,7 @@ static void ccp_do_cmd_complete(unsigned long data)
+ 	struct ccp_cmd *cmd = tdata->cmd;
  
- 	ccp->debugfs_instance = debugfs_create_dir(ccp->name, ccp_debugfs_dir);
- 	if (!ccp->debugfs_instance)
--		return;
-+		goto err;
- 
- 	debugfs_info = debugfs_create_file("info", 0400,
- 					   ccp->debugfs_instance, ccp,
- 					   &ccp_debugfs_info_ops);
- 	if (!debugfs_info)
--		return;
-+		goto err;
- 
- 	debugfs_stats = debugfs_create_file("stats", 0600,
- 					    ccp->debugfs_instance, ccp,
- 					    &ccp_debugfs_stats_ops);
- 	if (!debugfs_stats)
--		return;
-+		goto err;
- 
- 	for (i = 0; i < ccp->cmd_q_count; i++) {
- 		cmd_q = &ccp->cmd_q[i];
-@@ -327,15 +327,22 @@ void ccp5_debugfs_setup(struct ccp_device *ccp)
- 		debugfs_q_instance =
- 			debugfs_create_dir(name, ccp->debugfs_instance);
- 		if (!debugfs_q_instance)
--			return;
-+			goto err;
- 
- 		debugfs_q_stats =
- 			debugfs_create_file("stats", 0600,
- 					    debugfs_q_instance, cmd_q,
- 					    &ccp_debugfs_queue_ops);
- 		if (!debugfs_q_stats)
--			return;
-+			goto err;
- 	}
-+	return;
+ 	cmd->callback(cmd->data, cmd->ret);
 +
-+err:
-+	write_lock_irqsave(&ccp_debugfs_lock, flags);
-+	debugfs_remove_recursive(ccp_debugfs_dir);
-+	ccp_debugfs_dir = NULL;
-+	write_unlock_irqrestore(&ccp_debugfs_lock, flags);
+ 	complete(&tdata->completion);
  }
  
- void ccp5_debugfs_destroy(void)
+diff --git a/include/linux/ccp.h b/include/linux/ccp.h
+index 3285c944194a..c03ee844a99d 100644
+--- a/include/linux/ccp.h
++++ b/include/linux/ccp.h
+@@ -20,7 +20,6 @@
+ #include <crypto/aes.h>
+ #include <crypto/sha.h>
+ 
+-
+ struct ccp_device;
+ struct ccp_cmd;
+ 
