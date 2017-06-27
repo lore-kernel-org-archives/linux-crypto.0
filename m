@@ -1,50 +1,77 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 12/14] staging: ccree: remove unused type CCFipsSyncStatus_t
-Date: Tue, 27 Jun 2017 10:27:24 +0300
-Message-ID: <1498548449-10803-13-git-send-email-gilad@benyossef.com>
+Subject: [PATCH 06/14] staging: ccree: fix unmatched if/else braces
+Date: Tue, 27 Jun 2017 10:27:18 +0300
+Message-ID: <1498548449-10803-7-git-send-email-gilad@benyossef.com>
 References: <1498548449-10803-1-git-send-email-gilad@benyossef.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Cc: Ofir Drang <ofir.drang@arm.com>
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-crypto@vger.kernel.org,
-        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
-        linux-kernel@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:52524 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752550AbdF0H2n (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 27 Jun 2017 03:28:43 -0400
+ linux-crypto@vger.kernel.org, driverdev-devel@linuxdriverproject.org,
+ devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
 In-Reply-To: <1498548449-10803-1-git-send-email-gilad@benyossef.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+List-Id: linux-crypto.vger.kernel.org
 
-The CCFipsSyncStatus_t type was not being used in the code.
-Remove it.
+Fix mismatched braces between if and else.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/ssi_fips_local.h | 10 ----------
- 1 file changed, 10 deletions(-)
+ drivers/staging/ccree/ssi_buffer_mgr.c | 3 ++-
+ drivers/staging/ccree/ssi_cipher.c     | 7 +++----
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/staging/ccree/ssi_fips_local.h b/drivers/staging/ccree/ssi_fips_local.h
-index 0fbb1e0..4bc7f37 100644
---- a/drivers/staging/ccree/ssi_fips_local.h
-+++ b/drivers/staging/ccree/ssi_fips_local.h
-@@ -23,16 +23,6 @@
- #include "ssi_fips.h"
- struct ssi_drvdata;
+diff --git a/drivers/staging/ccree/ssi_buffer_mgr.c b/drivers/staging/ccree/ssi_buffer_mgr.c
+index 9e8a134..f9720fc 100644
+--- a/drivers/staging/ccree/ssi_buffer_mgr.c
++++ b/drivers/staging/ccree/ssi_buffer_mgr.c
+@@ -551,8 +551,9 @@ int ssi_buffer_mgr_map_blkcipher_request(
+ 		SSI_LOG_DEBUG("Mapped iv %u B at va=%pK to dma=0x%llX\n",
+ 			ivsize, info,
+ 			(unsigned long long)req_ctx->gen_ctx.iv_dma_addr);
+-	} else
++	} else {
+ 		req_ctx->gen_ctx.iv_dma_addr = 0;
++	}
  
--// IG - how to make 1 file for TEE and REE
--typedef enum CC_FipsSyncStatus {
--	CC_FIPS_SYNC_MODULE_OK		= 0x0,
--	CC_FIPS_SYNC_MODULE_ERROR	= 0x1,
--	CC_FIPS_SYNC_REE_STATUS		= 0x4,
--	CC_FIPS_SYNC_TEE_STATUS		= 0x8,
--	CC_FIPS_SYNC_STATUS_RESERVE32B	= S32_MAX
--} CCFipsSyncStatus_t;
--
--
- #define CHECK_AND_RETURN_UPON_FIPS_ERROR() {\
- 	if (ssi_fips_check_fips_error() != 0) {\
- 		return -ENOEXEC;\
+ 	/* Map the src SGL */
+ 	rc = ssi_buffer_mgr_map_scatterlist(dev, src,
+diff --git a/drivers/staging/ccree/ssi_cipher.c b/drivers/staging/ccree/ssi_cipher.c
+index c233b7c..88ed777 100644
+--- a/drivers/staging/ccree/ssi_cipher.c
++++ b/drivers/staging/ccree/ssi_cipher.c
+@@ -401,8 +401,9 @@ static int ssi_blkcipher_setkey(struct crypto_tfm *tfm,
+ 	/* STAT_PHASE_1: Copy key to ctx */
+ 	dma_sync_single_for_cpu(dev, ctx_p->user.key_dma_addr,
+ 					max_key_buf_size, DMA_TO_DEVICE);
+-#if SSI_CC_HAS_MULTI2
++
+ 	if (ctx_p->flow_mode == S_DIN_to_MULTI2) {
++#if SSI_CC_HAS_MULTI2
+ 		memcpy(ctx_p->user.key, key, CC_MULTI2_SYSTEM_N_DATA_KEY_SIZE);
+ 		ctx_p->key_round_number = key[CC_MULTI2_SYSTEM_N_DATA_KEY_SIZE];
+ 		if (ctx_p->key_round_number < CC_MULTI2_MIN_NUM_ROUNDS ||
+@@ -410,10 +411,8 @@ static int ssi_blkcipher_setkey(struct crypto_tfm *tfm,
+ 			crypto_tfm_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
+ 			SSI_LOG_DEBUG("ssi_blkcipher_setkey: SSI_CC_HAS_MULTI2 einval");
+ 			return -EINVAL;
+-		}
+-	} else
+ #endif /*SSI_CC_HAS_MULTI2*/
+-	{
++	} else {
+ 		memcpy(ctx_p->user.key, key, keylen);
+ 		if (keylen == 24)
+ 			memset(ctx_p->user.key + 24, 0, CC_AES_KEY_SIZE_MAX - 24);
 -- 
 2.1.4
