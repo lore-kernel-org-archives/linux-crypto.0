@@ -1,15 +1,14 @@
-From: bincy_k_philip@yahoo.co.in
-Subject: [PATCH] Stagingdriver  cctree: Fix for checkpatch warning
-Date: Tue, 27 Jun 2017 11:47:56 +0530
-Message-ID: <1498544276-5240-1-git-send-email-bincy_k_philip@yahoo.co.in>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: [PATCH 00/14] staging: ccree: coding style fixes
+Date: Tue, 27 Jun 2017 10:27:12 +0300
+Message-ID: <1498548449-10803-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: devel@driverdev.osuosl.org, Bincy K Philip <bincy_k_philip@yahoo.co.in>,
- driverdev-devel@linuxdriverproject.org, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org
-To: gilad@benyossef.com,
-	gregkh@linuxfoundation.org
+Cc: Ofir Drang <ofir.drang@arm.com>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ linux-crypto@vger.kernel.org, driverdev-devel@linuxdriverproject.org,
+ devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org
 Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
 List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
  <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
@@ -22,28 +21,54 @@ Errors-To: driverdev-devel-bounces@linuxdriverproject.org
 Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-From: Bincy K Philip <bincy_k_philip@yahoo.co.in>
+Fix a bunch of coding style across the whole ccree driver
 
-Trivial fix for Line over 80 characters
+Gilad Ben-Yossef (14):
+  staging: ccree: fix missing or redundant spaces
+  staging: ccree: drop comparsion to true/false
+  staging: ccree: fix else placement
+  staging: ccree: remove redundant blank lines
+  staging: ccree: no need for braces for single statements
+  staging: ccree: fix unmatched if/else braces
+  staging: ccree: remove comparisons to NULL
+  staging: ccree: fix pointer location
+  staging: ccree: remove custom type tdes_keys_t
+  staging: ccree: remove custom type ssi_fips_error_t
+  staging: ccree: remove custom type ssi_fips_state_t
+  staging: ccree: remove unused type CCFipsSyncStatus_t
+  staging: ccree: remove/add (un)needed blank lines
+  staging: ccree: fix block comment style
 
-Moved the comment to top of the definition
----
- drivers/staging/ccree/cc_hw_queue_defs.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/staging/ccree/Kconfig            |   2 +-
+ drivers/staging/ccree/cc_hw_queue_defs.h |   8 +-
+ drivers/staging/ccree/ssi_aead.c         | 142 ++++++---------
+ drivers/staging/ccree/ssi_aead.h         |  20 +-
+ drivers/staging/ccree/ssi_buffer_mgr.c   | 301 +++++++++++++++----------------
+ drivers/staging/ccree/ssi_buffer_mgr.h   |   1 -
+ drivers/staging/ccree/ssi_cipher.c       | 124 +++++--------
+ drivers/staging/ccree/ssi_cipher.h       |   6 -
+ drivers/staging/ccree/ssi_driver.c       |  50 +++--
+ drivers/staging/ccree/ssi_driver.h       |   4 +-
+ drivers/staging/ccree/ssi_fips.c         |  16 +-
+ drivers/staging/ccree/ssi_fips.h         |  15 +-
+ drivers/staging/ccree/ssi_fips_data.h    |  20 +-
+ drivers/staging/ccree/ssi_fips_ext.c     |  20 +-
+ drivers/staging/ccree/ssi_fips_ll.c      | 101 +++++------
+ drivers/staging/ccree/ssi_fips_local.c   | 107 +++++------
+ drivers/staging/ccree/ssi_fips_local.h   |  20 +-
+ drivers/staging/ccree/ssi_hash.c         | 101 +++++------
+ drivers/staging/ccree/ssi_hash.h         |   6 +-
+ drivers/staging/ccree/ssi_ivgen.c        |   9 +-
+ drivers/staging/ccree/ssi_ivgen.h        |   1 -
+ drivers/staging/ccree/ssi_pm.c           |  25 +--
+ drivers/staging/ccree/ssi_pm.h           |   5 +-
+ drivers/staging/ccree/ssi_request_mgr.c  | 102 +++++------
+ drivers/staging/ccree/ssi_request_mgr.h  |   6 +-
+ drivers/staging/ccree/ssi_sram_mgr.c     |   4 +-
+ drivers/staging/ccree/ssi_sram_mgr.h     |   1 -
+ drivers/staging/ccree/ssi_sysfs.c        |  66 ++++---
+ drivers/staging/ccree/ssi_sysfs.h        |   1 +
+ 29 files changed, 550 insertions(+), 734 deletions(-)
 
-diff --git a/drivers/staging/ccree/cc_hw_queue_defs.h b/drivers/staging/ccree/cc_hw_queue_defs.h
-index aaa56c8..a18e6c9 100644
---- a/drivers/staging/ccree/cc_hw_queue_defs.h
-+++ b/drivers/staging/ccree/cc_hw_queue_defs.h
-@@ -27,7 +27,8 @@
- ******************************************************************************/
- 
- #define HW_DESC_SIZE_WORDS		6
--#define HW_QUEUE_SLOTS_MAX              15 /* Max. available slots in HW queue */
-+/* Define max. available slots in HW queue */
-+#define HW_QUEUE_SLOTS_MAX              15
- 
- #define CC_REG_NAME(word, name) DX_DSCRPTR_QUEUE_WORD ## word ## _ ## name
- 
 -- 
-1.8.3.1
+2.1.4
