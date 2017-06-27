@@ -1,48 +1,91 @@
 From: Gary R Hook <gary.hook@amd.com>
-Subject: [PATCH] crypto: ccp - Change all references to use the JOB ID macro
-Date: Tue, 27 Jun 2017 08:58:16 -0500
-Message-ID: <149857189631.26668.7228199918497769629.stgit@sosxen.amd.com>
+Subject: Re: [PATCH 2] crypto: ccp - Provide a roll-back method for debugfs
+ setup
+Date: Tue, 27 Jun 2017 09:00:33 -0500
+Message-ID: <e453d409-9106-98cf-9bdd-151bbe309aad@amd.com>
+References: <149857183214.26572.8412877312728402721.stgit@sosxen.amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: thomas.lendacky@amd.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net
-To: linux-crypto@vger.kernel.org
+Cc: "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>
+To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-cys01nam02on0050.outbound.protection.outlook.com ([104.47.37.50]:11840
+Received: from mail-cys01nam02on0050.outbound.protection.outlook.com ([104.47.37.50]:50528
         "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751515AbdF0N60 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 27 Jun 2017 09:58:26 -0400
+        id S1751453AbdF0OAt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 27 Jun 2017 10:00:49 -0400
+In-Reply-To: <149857183214.26572.8412877312728402721.stgit@sosxen.amd.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Use the CCP_NEW_JOBID() macro when assigning an identifier
+On 06/27/2017 08:57 AM, Hook, Gary wrote:
+> Changes since v1:
+>  - Remove unneeded local variable
 
-Signed-off-by: Gary R Hook <gary.hook@amd.com>
----
- drivers/crypto/ccp/ccp-ops.c |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+My apologies for this patch... Pretty sure that the first version won't pass
+review anyway because of this.
 
-diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
-index c0dfdacbdff5..78f29d459df8 100644
---- a/drivers/crypto/ccp/ccp-ops.c
-+++ b/drivers/crypto/ccp/ccp-ops.c
-@@ -1756,7 +1756,7 @@ static int ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
- 
- 	memset(&op, 0, sizeof(op));
- 	op.cmd_q = cmd_q;
--	op.jobid = ccp_gen_jobid(cmd_q->ccp);
-+	op.jobid = CCP_NEW_JOBID(cmd_q->ccp);
- 	op.sb_key = cmd_q->ccp->vdata->perform->sballoc(cmd_q, sb_count);
- 
- 	if (!op.sb_key)
-@@ -1992,7 +1992,7 @@ static int ccp_run_passthru_nomap_cmd(struct ccp_cmd_queue *cmd_q,
- 
- 	memset(&op, 0, sizeof(op));
- 	op.cmd_q = cmd_q;
--	op.jobid = ccp_gen_jobid(cmd_q->ccp);
-+	op.jobid = CCP_NEW_JOBID(cmd_q->ccp);
- 
- 	if (pt->bit_mod != CCP_PASSTHRU_BITWISE_NOOP) {
- 		/* Load the mask */
+>
+> Signed-off-by: Gary R Hook <gary.hook@amd.com>
+> ---
+>  drivers/crypto/ccp/ccp-debugfs.c |   17 ++++++++++++-----
+>  1 file changed, 12 insertions(+), 5 deletions(-)
+>
+> diff --git a/drivers/crypto/ccp/ccp-debugfs.c
+> b/drivers/crypto/ccp/ccp-debugfs.c
+> index 3cd6c83754e0..88191c45ca7d 100644
+> --- a/drivers/crypto/ccp/ccp-debugfs.c
+> +++ b/drivers/crypto/ccp/ccp-debugfs.c
+> @@ -305,19 +305,19 @@ void ccp5_debugfs_setup(struct ccp_device *ccp)
+>
+>          ccp->debugfs_instance = debugfs_create_dir(ccp->name,
+> ccp_debugfs_dir);
+>          if (!ccp->debugfs_instance)
+> -               return;
+> +               goto err;
+>
+>          debugfs_info = debugfs_create_file("info", 0400,
+>                                             ccp->debugfs_instance, ccp,
+>                                             &ccp_debugfs_info_ops);
+>          if (!debugfs_info)
+> -               return;
+> +               goto err;
+>
+>          debugfs_stats = debugfs_create_file("stats", 0600,
+>                                              ccp->debugfs_instance, ccp,
+>                                              &ccp_debugfs_stats_ops);
+>          if (!debugfs_stats)
+> -               return;
+> +               goto err;
+>
+>          for (i = 0; i < ccp->cmd_q_count; i++) {
+>                  cmd_q = &ccp->cmd_q[i];
+> @@ -327,15 +327,22 @@ void ccp5_debugfs_setup(struct ccp_device *ccp)
+>                  debugfs_q_instance =
+>                          debugfs_create_dir(name, ccp->debugfs_instance);
+>                  if (!debugfs_q_instance)
+> -                       return;
+> +                       goto err;
+>
+>                  debugfs_q_stats =
+>                          debugfs_create_file("stats", 0600,
+>                                              debugfs_q_instance, cmd_q,
+>                                              &ccp_debugfs_queue_ops);
+>                  if (!debugfs_q_stats)
+> -                       return;
+> +                       goto err;
+>          }
+> +       return;
+> +
+> +err:
+> +       write_lock_irqsave(&ccp_debugfs_lock, flags);
+> +       debugfs_remove_recursive(ccp_debugfs_dir);
+> +       ccp_debugfs_dir = NULL;
+> +       write_unlock_irqrestore(&ccp_debugfs_lock, flags);
+>  }
+>
+>  void ccp5_debugfs_destroy(void)
+>
