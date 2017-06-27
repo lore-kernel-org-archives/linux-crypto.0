@@ -1,51 +1,50 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 09/14] staging: ccree: remove custom type tdes_keys_t
-Date: Tue, 27 Jun 2017 10:27:21 +0300
-Message-ID: <1498548449-10803-10-git-send-email-gilad@benyossef.com>
+Subject: [PATCH 12/14] staging: ccree: remove unused type CCFipsSyncStatus_t
+Date: Tue, 27 Jun 2017 10:27:24 +0300
+Message-ID: <1498548449-10803-13-git-send-email-gilad@benyossef.com>
 References: <1498548449-10803-1-git-send-email-gilad@benyossef.com>
 Cc: Ofir Drang <ofir.drang@arm.com>
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         linux-crypto@vger.kernel.org,
         driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
         linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from foss.arm.com ([217.140.101.70]:52524 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752550AbdF0H2n (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 27 Jun 2017 03:28:43 -0400
 In-Reply-To: <1498548449-10803-1-git-send-email-gilad@benyossef.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Replace references to type tdes_keys_t with struct tdes_keys.
-_
+The CCFipsSyncStatus_t type was not being used in the code.
+Remove it.
+
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/ssi_cipher.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/staging/ccree/ssi_fips_local.h | 10 ----------
+ 1 file changed, 10 deletions(-)
 
-diff --git a/drivers/staging/ccree/ssi_cipher.c b/drivers/staging/ccree/ssi_cipher.c
-index b4fc9a6..eb3e8e6 100644
---- a/drivers/staging/ccree/ssi_cipher.c
-+++ b/drivers/staging/ccree/ssi_cipher.c
-@@ -253,11 +253,11 @@ static void ssi_blkcipher_exit(struct crypto_tfm *tfm)
- }
+diff --git a/drivers/staging/ccree/ssi_fips_local.h b/drivers/staging/ccree/ssi_fips_local.h
+index 0fbb1e0..4bc7f37 100644
+--- a/drivers/staging/ccree/ssi_fips_local.h
++++ b/drivers/staging/ccree/ssi_fips_local.h
+@@ -23,16 +23,6 @@
+ #include "ssi_fips.h"
+ struct ssi_drvdata;
  
- 
--typedef struct tdes_keys {
-+struct tdes_keys {
- 	u8	key1[DES_KEY_SIZE];
- 	u8	key2[DES_KEY_SIZE];
- 	u8	key3[DES_KEY_SIZE];
--} tdes_keys_t;
-+};
- 
- static const u8 zero_buff[] = {	0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
- 				0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
-@@ -268,7 +268,7 @@ static const u8 zero_buff[] = {	0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
- static int ssi_fips_verify_3des_keys(const u8 *key, unsigned int keylen)
- {
- #ifdef CCREE_FIPS_SUPPORT
--	tdes_keys_t *tdes_key = (tdes_keys_t *)key;
-+	struct tdes_keys *tdes_key = (struct tdes_keys *)key;
- 
- 	/* verify key1 != key2 and key3 != key2*/
- 	if (unlikely((memcmp((u8 *)tdes_key->key1, (u8 *)tdes_key->key2, sizeof(tdes_key->key1)) == 0) ||
+-// IG - how to make 1 file for TEE and REE
+-typedef enum CC_FipsSyncStatus {
+-	CC_FIPS_SYNC_MODULE_OK		= 0x0,
+-	CC_FIPS_SYNC_MODULE_ERROR	= 0x1,
+-	CC_FIPS_SYNC_REE_STATUS		= 0x4,
+-	CC_FIPS_SYNC_TEE_STATUS		= 0x8,
+-	CC_FIPS_SYNC_STATUS_RESERVE32B	= S32_MAX
+-} CCFipsSyncStatus_t;
+-
+-
+ #define CHECK_AND_RETURN_UPON_FIPS_ERROR() {\
+ 	if (ssi_fips_check_fips_error() != 0) {\
+ 		return -ENOEXEC;\
 -- 
 2.1.4
