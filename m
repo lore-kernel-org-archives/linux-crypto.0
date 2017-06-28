@@ -1,49 +1,45 @@
-From: =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>
-Subject: Re: [PATCH] crypto: caam - properly set IV after {en,de}crypt
-Date: Wed, 28 Jun 2017 13:42:50 +0000
-Message-ID: <VI1PR0401MB2591AE2CA996495656C797B398DD0@VI1PR0401MB2591.eurprd04.prod.outlook.com>
-References: <20170602122446.2427-1-david@sigma-star.at>
- <20170628132710.97278-1-david@sigma-star.at>
+From: Tudor Ambarus <tudor.ambarus@gmail.com>
+Subject: [v2 RFC PATCH 0/2] crypto: ecdh, ecc fixes
+Date: Wed, 28 Jun 2017 16:55:22 +0300
+Message-ID: <1498658124-29780-1-git-send-email-tudor.ambarus@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
-Cc: "richard@sigma-star.at" <richard@sigma-star.at>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>
-To: David Gstir <david@sigma-star.at>,
-        Dan Douglass <dan.douglass@nxp.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>
+Content-Type: text/plain
+Cc: <davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
+        <nicolas.ferre@microchip.com>,
+        Tudor Ambarus <tudor.ambarus@gmail.com>
+To: <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ve1eur01on0066.outbound.protection.outlook.com ([104.47.1.66]:7232
-        "EHLO EUR01-VE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751469AbdF1Nmz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 28 Jun 2017 09:42:55 -0400
-Content-Language: en-US
+Received: from esa3.microchip.iphmx.com ([68.232.153.233]:41763 "EHLO
+        esa3.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751495AbdF1Nzd (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 28 Jun 2017 09:55:33 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 6/28/2017 4:27 PM, David Gstir wrote:=0A=
-> Certain cipher modes like CTS expect the IV (req->info) of=0A=
-> ablkcipher_request (or equivalently req->iv of skcipher_request) to=0A=
-> contain the last ciphertext block when the {en,de}crypt operation is done=
-.=0A=
-> This is currently not the case for the CAAM driver which in turn breaks=
-=0A=
-> e.g. cts(cbc(aes)) when the CAAM driver is enabled.=0A=
-> =0A=
-> This patch fixes the CAAM driver to properly set the IV after the=0A=
-> {en,de}crypt operation of ablkcipher finishes.=0A=
-> =0A=
-> This issue was revealed by the changes in the SW CTS mode in commit=0A=
-> 0605c41cc53ca ("crypto: cts - Convert to skcipher")=0A=
-> =0A=
-> Cc: <stable@vger.kernel.org> # 4.8+=0A=
-> Signed-off-by: David Gstir <david@sigma-star.at>=0A=
-Reviewed-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
-=0A=
-Thanks,=0A=
-Horia=0A=
-=0A=
+The first patch fixes concurrency on ecdh context
+and the second one let the caller decide whether
+sleeping is possible or not.
+
+Changes in v2:
+ - remove a function that freed a pointer received as function
+   argument
+ - let the user decide if sleeping is permitted
+ - kmalloc instead of kzalloc for the private key
+
+ - add "crypto: ecc: use caller's GFP flags" patch
+
+v1 can be found at:
+http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg26149.html
+
+Tudor Ambarus (2):
+  crypto: ecdh: fix concurrency on ecdh_ctx
+  crypto: ecc: use caller's GFP flags
+
+ crypto/ecc.c  | 22 +++++++-------
+ crypto/ecc.h  |  8 ++---
+ crypto/ecdh.c | 96 +++++++++++++++++++++++++++++++++++++++++------------------
+ 3 files changed, 82 insertions(+), 44 deletions(-)
+
+-- 
+2.7.4
