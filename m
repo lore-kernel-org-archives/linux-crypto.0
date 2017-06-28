@@ -1,33 +1,98 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [PATCH] crypto: testmgr - Reenable sha1/aes in FIPS mode
-Date: Wed, 28 Jun 2017 15:05:21 +0200
-Message-ID: <2993400.PYF8rrXN5v@positron.chronox.de>
-References: <20170628110907.GA14186@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: David Gstir <david@sigma-star.at>
+Subject: [PATCH] crypto: caam - properly set IV after {en,de}crypt
+Date: Wed, 28 Jun 2017 15:27:10 +0200
+Message-ID: <20170628132710.97278-1-david@sigma-star.at>
+References: <20170602122446.2427-1-david@sigma-star.at>
+Cc: richard@sigma-star.at, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, David Gstir <david@sigma-star.at>,
+        stable@vger.kernel.org
+To: horia.geanta@nxp.com, dan.douglass@nxp.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:60426 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751511AbdF1NFe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 28 Jun 2017 09:05:34 -0400
-In-Reply-To: <20170628110907.GA14186@gondor.apana.org.au>
+Received: from mail.sigma-star.at ([95.130.255.111]:45996 "EHLO
+        mail.sigma-star.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751515AbdF1N1l (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 28 Jun 2017 09:27:41 -0400
+In-Reply-To: <20170602122446.2427-1-david@sigma-star.at>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Mittwoch, 28. Juni 2017, 13:09:07 CEST schrieb Herbert Xu:
+Certain cipher modes like CTS expect the IV (req->info) of
+ablkcipher_request (or equivalently req->iv of skcipher_request) to
+contain the last ciphertext block when the {en,de}crypt operation is done.
+This is currently not the case for the CAAM driver which in turn breaks
+e.g. cts(cbc(aes)) when the CAAM driver is enabled.
 
-Hi Herbert,
+This patch fixes the CAAM driver to properly set the IV after the
+{en,de}crypt operation of ablkcipher finishes.
 
-> The combination of sha1 and aes was disabled in FIPS Mode
-> accidentally.  This patch reenables it.
-> 
-> Fixes: 284a0f6e87b0 ("crypto: testmgr - Disable fips-allowed for...")
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+This issue was revealed by the changes in the SW CTS mode in commit
+0605c41cc53ca ("crypto: cts - Convert to skcipher")
 
-Acked-by: Stephan Müller <smueller@chronox.de>
+Cc: <stable@vger.kernel.org> # 4.8+
+Signed-off-by: David Gstir <david@sigma-star.at>
+---
+ drivers/crypto/caam/caamalg.c | 20 ++++++++++++++++++--
+ 1 file changed, 18 insertions(+), 2 deletions(-)
 
-Ciao
-Stephan
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index 398807d1b77e..c45b5bf65254 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -882,10 +882,10 @@ static void ablkcipher_encrypt_done(struct device *jrdev, u32 *desc, u32 err,
+ {
+ 	struct ablkcipher_request *req = context;
+ 	struct ablkcipher_edesc *edesc;
+-#ifdef DEBUG
+ 	struct crypto_ablkcipher *ablkcipher = crypto_ablkcipher_reqtfm(req);
+ 	int ivsize = crypto_ablkcipher_ivsize(ablkcipher);
+ 
++#ifdef DEBUG
+ 	dev_err(jrdev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
+ #endif
+ 
+@@ -904,6 +904,14 @@ static void ablkcipher_encrypt_done(struct device *jrdev, u32 *desc, u32 err,
+ #endif
+ 
+ 	ablkcipher_unmap(jrdev, edesc, req);
++
++	/*
++	 * The crypto API expects us to set the IV (req->info) to the last
++	 * ciphertext block. This is used e.g. by the CTS mode.
++	 */
++	scatterwalk_map_and_copy(req->info, req->dst, req->nbytes - ivsize,
++				 ivsize, 0);
++
+ 	kfree(edesc);
+ 
+ 	ablkcipher_request_complete(req, err);
+@@ -914,10 +922,10 @@ static void ablkcipher_decrypt_done(struct device *jrdev, u32 *desc, u32 err,
+ {
+ 	struct ablkcipher_request *req = context;
+ 	struct ablkcipher_edesc *edesc;
+-#ifdef DEBUG
+ 	struct crypto_ablkcipher *ablkcipher = crypto_ablkcipher_reqtfm(req);
+ 	int ivsize = crypto_ablkcipher_ivsize(ablkcipher);
+ 
++#ifdef DEBUG
+ 	dev_err(jrdev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
+ #endif
+ 
+@@ -935,6 +943,14 @@ static void ablkcipher_decrypt_done(struct device *jrdev, u32 *desc, u32 err,
+ #endif
+ 
+ 	ablkcipher_unmap(jrdev, edesc, req);
++
++	/*
++	 * The crypto API expects us to set the IV (req->info) to the last
++	 * ciphertext block.
++	 */
++	scatterwalk_map_and_copy(req->info, req->src, req->nbytes - ivsize,
++				 ivsize, 0);
++
+ 	kfree(edesc);
+ 
+ 	ablkcipher_request_complete(req, err);
+-- 
+2.12.3
