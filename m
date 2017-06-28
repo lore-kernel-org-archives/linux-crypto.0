@@ -1,8 +1,8 @@
-From: Tudor Ambarus <tudor.ambarus@gmail.com>
-Subject: [v2 RFC PATCH 1/2] crypto: ecdh: fix concurrency on ecdh_ctx
-Date: Wed, 28 Jun 2017 16:55:23 +0300
-Message-ID: <1498658124-29780-2-git-send-email-tudor.ambarus@gmail.com>
-References: <1498658124-29780-1-git-send-email-tudor.ambarus@gmail.com>
+From: Tudor Ambarus <tudor.ambarus@microchip.com>
+Subject: [v3 RFC PATCH 1/2] crypto: ecdh: fix concurrency on ecdh_ctx
+Date: Wed, 28 Jun 2017 17:08:35 +0300
+Message-ID: <1498658916-11044-2-git-send-email-tudor.ambarus@microchip.com>
+References: <1498658916-11044-1-git-send-email-tudor.ambarus@microchip.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: <davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
@@ -10,16 +10,14 @@ Cc: <davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
         Tudor Ambarus <tudor.ambarus@microchip.com>
 To: <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from esa5.microchip.iphmx.com ([216.71.150.166]:48363 "EHLO
-        esa5.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751639AbdF1Nzk (ORCPT
+Received: from esa3.microchip.iphmx.com ([68.232.153.233]:45867 "EHLO
+        esa3.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751619AbdF1OIo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 28 Jun 2017 09:55:40 -0400
-In-Reply-To: <1498658124-29780-1-git-send-email-tudor.ambarus@gmail.com>
+        Wed, 28 Jun 2017 10:08:44 -0400
+In-Reply-To: <1498658916-11044-1-git-send-email-tudor.ambarus@microchip.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
-
-From: Tudor Ambarus <tudor.ambarus@microchip.com>
 
 ecdh_ctx contained static allocated data for the shared secret,
 for the public and private key.
