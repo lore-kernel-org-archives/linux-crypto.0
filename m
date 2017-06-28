@@ -1,110 +1,104 @@
-From: Logan Gunthorpe <logang@deltatee.com>
-Subject: [PATCH v2 3/3] crypto: caam: cleanup CONFIG_64BIT ifdefs when using io{read|write}64
-Date: Tue, 27 Jun 2017 17:02:04 -0600
-Message-ID: <20170627230204.16410-4-logang@deltatee.com>
-References: <20170627230204.16410-1-logang@deltatee.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Cc: Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jyri Sarha <jsarha@ti.com>,
-        Stephen Bates <sbates@raithlin.com>,
-        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Dan Douglass <dan.douglass@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170627230204.16410-1-logang@deltatee.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Megha Dey <megha.dey@linux.intel.com>
+Subject: [PATCH V6 0/7] crypto: AES CBC multibuffer implementation
+Date: Tue, 27 Jun 2017 17:26:08 -0700
+Message-ID: <1498609575-6217-1-git-send-email-megha.dey@linux.intel.com>
+Cc: tim.c.chen@linux.intel.com, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        megha.dey@intel.com, Megha Dey <megha.dey@linux.intel.com>
+To: herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga02.intel.com ([134.134.136.20]:18870 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753975AbdF1APH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 27 Jun 2017 20:15:07 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Horia Geantă <horia.geanta@nxp.com>
+In this patch series, we introduce AES CBC encryption that is parallelized on
+x86_64 cpu with XMM registers. The multi-buffer technique encrypt 8 data
+streams in parallel with SIMD instructions. Decryption is handled as in the
+existing AESNI Intel CBC implementation which can already parallelize decryption
+even for a single data stream.
 
-We can now make use of the io-64-nonatomic-hi-lo header to always
-provide 64 bit IO operations. So this patch cleans up the extra
-CONFIG_64BIT ifdefs.
+Please see the multi-buffer whitepaper for details of the technique:
+http://www.intel.com/content/www/us/en/communications/communications-ia-multi-buffer-paper.html
 
-Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Cc: Horia Geantă <horia.geanta@nxp.com>
-Cc: Dan Douglass <dan.douglass@nxp.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
----
- drivers/crypto/caam/regs.h | 35 +++++------------------------------
- 1 file changed, 5 insertions(+), 30 deletions(-)
+It is important that any driver uses this algorithm properly for scenarios
+where we have many data streams that can fill up the data lanes most of the
+time. It shouldn't be used when only a single data stream is expected mostly.
+Otherwise we may incur extra delays when we have frequent gaps in data lanes,
+causing us to wait till data come in to fill the data lanes before initiating
+encryption.  We may have to wait for flush operations to commence when no new
+data come in after some wait time. However we keep this extra delay to a
+minimum by opportunistically flushing the unfinished jobs if crypto daemon is
+the only active task running on a cpu.
 
-diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
-index 84d2f838a063..fdcf719ecfbe 100644
---- a/drivers/crypto/caam/regs.h
-+++ b/drivers/crypto/caam/regs.h
-@@ -9,7 +9,7 @@
- 
- #include <linux/types.h>
- #include <linux/bitops.h>
--#include <linux/io.h>
-+#include <linux/io-64-nonatomic-hi-lo.h>
- 
- /*
-  * Architecture-specific register access methods
-@@ -134,50 +134,25 @@ static inline void clrsetbits_32(void __iomem *reg, u32 clear, u32 set)
-  *    base + 0x0000 : least-significant 32 bits
-  *    base + 0x0004 : most-significant 32 bits
-  */
--#ifdef CONFIG_64BIT
- static inline void wr_reg64(void __iomem *reg, u64 data)
- {
-+#ifndef CONFIG_CRYPTO_DEV_FSL_CAAM_IMX
- 	if (caam_little_end)
- 		iowrite64(data, reg);
- 	else
--		iowrite64be(data, reg);
--}
--
--static inline u64 rd_reg64(void __iomem *reg)
--{
--	if (caam_little_end)
--		return ioread64(reg);
--	else
--		return ioread64be(reg);
--}
--
--#else /* CONFIG_64BIT */
--static inline void wr_reg64(void __iomem *reg, u64 data)
--{
--#ifndef CONFIG_CRYPTO_DEV_FSL_CAAM_IMX
--	if (caam_little_end) {
--		wr_reg32((u32 __iomem *)(reg) + 1, data >> 32);
--		wr_reg32((u32 __iomem *)(reg), data);
--	} else
- #endif
--	{
--		wr_reg32((u32 __iomem *)(reg), data >> 32);
--		wr_reg32((u32 __iomem *)(reg) + 1, data);
--	}
-+		iowrite64be(data, reg);
- }
- 
- static inline u64 rd_reg64(void __iomem *reg)
- {
- #ifndef CONFIG_CRYPTO_DEV_FSL_CAAM_IMX
- 	if (caam_little_end)
--		return ((u64)rd_reg32((u32 __iomem *)(reg) + 1) << 32 |
--			(u64)rd_reg32((u32 __iomem *)(reg)));
-+		return ioread64(reg);
- 	else
- #endif
--		return ((u64)rd_reg32((u32 __iomem *)(reg)) << 32 |
--			(u64)rd_reg32((u32 __iomem *)(reg) + 1));
-+		return ioread64be(reg);
- }
--#endif /* CONFIG_64BIT  */
- 
- #ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
- #ifdef CONFIG_SOC_IMX7D
+By using this technique, we saw a throughput increase of up to 5.7x under
+optimal conditions when we have fully loaded encryption jobs filling up all
+the data lanes.
+
+Change Log:
+
+v6
+1. Move away from the compat naming scheme and update the names of the inner
+   and outer algorithm
+2. Move wrapper code around synchronous internal algorithm from simd.c
+   to mcryptd.c
+
+v5
+1. Use an async implementation of the inner algorithm instead of sync and use
+   the latest skcipher interface instead of the older blkcipher interface.
+   (we have picked up this work after a while)
+
+v4
+1. Make the decrypt path also use ablkcpher walk.
+http://lkml.iu.edu/hypermail/linux/kernel/1512.0/01807.html
+
+v3
+1. Use ablkcipher_walk helpers to walk the scatter gather list
+and eliminated needs to modify blkcipher_walk for multibuffer cipher
+
+v2
+1. Update cpu feature check to make sure SSE is supported
+2. Fix up unloading of aes-cbc-mb module to properly free memory
+
+Megha Dey (7):
+  crypto: Multi-buffer encryption infrastructure support
+  crypto: AES CBC multi-buffer data structures
+  crypto: AES CBC multi-buffer scheduler
+  crypto: AES CBC by8 encryption
+  crypto: AES CBC multi-buffer glue code
+  crypto: AES vectors for AES CBC multibuffer testing
+  crypto: AES CBC multi-buffer tcrypt
+
+ arch/x86/crypto/Makefile                           |    1 +
+ arch/x86/crypto/aes-cbc-mb/Makefile                |   22 +
+ arch/x86/crypto/aes-cbc-mb/aes_cbc_enc_x8.S        |  775 ++++++++++
+ arch/x86/crypto/aes-cbc-mb/aes_cbc_mb.c            |  727 ++++++++++
+ arch/x86/crypto/aes-cbc-mb/aes_cbc_mb_ctx.h        |   97 ++
+ arch/x86/crypto/aes-cbc-mb/aes_cbc_mb_mgr.h        |  132 ++
+ arch/x86/crypto/aes-cbc-mb/aes_mb_mgr_init.c       |  146 ++
+ arch/x86/crypto/aes-cbc-mb/mb_mgr_datastruct.S     |  271 ++++
+ arch/x86/crypto/aes-cbc-mb/mb_mgr_inorder_x8_asm.S |  223 +++
+ arch/x86/crypto/aes-cbc-mb/mb_mgr_ooo_x8_asm.S     |  417 ++++++
+ arch/x86/crypto/aes-cbc-mb/reg_sizes.S             |  126 ++
+ crypto/Kconfig                                     |   15 +
+ crypto/mcryptd.c                                   |  474 +++++++
+ crypto/tcrypt.c                                    |  259 +++-
+ crypto/testmgr.c                                   |  707 +++++++++
+ crypto/testmgr.h                                   | 1496 ++++++++++++++++++++
+ include/crypto/mcryptd.h                           |   56 +
+ 17 files changed, 5942 insertions(+), 2 deletions(-)
+ create mode 100644 arch/x86/crypto/aes-cbc-mb/Makefile
+ create mode 100644 arch/x86/crypto/aes-cbc-mb/aes_cbc_enc_x8.S
+ create mode 100644 arch/x86/crypto/aes-cbc-mb/aes_cbc_mb.c
+ create mode 100644 arch/x86/crypto/aes-cbc-mb/aes_cbc_mb_ctx.h
+ create mode 100644 arch/x86/crypto/aes-cbc-mb/aes_cbc_mb_mgr.h
+ create mode 100644 arch/x86/crypto/aes-cbc-mb/aes_mb_mgr_init.c
+ create mode 100644 arch/x86/crypto/aes-cbc-mb/mb_mgr_datastruct.S
+ create mode 100644 arch/x86/crypto/aes-cbc-mb/mb_mgr_inorder_x8_asm.S
+ create mode 100644 arch/x86/crypto/aes-cbc-mb/mb_mgr_ooo_x8_asm.S
+ create mode 100644 arch/x86/crypto/aes-cbc-mb/reg_sizes.S
+
 -- 
-2.11.0
+1.9.1
