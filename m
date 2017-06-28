@@ -1,46 +1,35 @@
-From: David Gstir <david@sigma-star.at>
-Subject: Re: [RFC PATCH 1/2] crypto: caam - properly set IV after {en,de}crypt
-Date: Wed, 28 Jun 2017 11:03:50 +0200
-Message-ID: <75D616EC-B298-4DF2-8991-7CD48E16EF44@sigma-star.at>
-References: <20170602122446.2427-1-david@sigma-star.at>
- <20170602122446.2427-2-david@sigma-star.at>
- <VI1PR0401MB2591177E3F43DEFA8AEA3D6D98C40@VI1PR0401MB2591.eurprd04.prod.outlook.com>
- <VI1PR0401MB2591CC6A245731D9D53D42A598DD0@VI1PR0401MB2591.eurprd04.prod.outlook.com>
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-Cc: Dan Douglass <dan.douglass@nxp.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "richard@sigma-star.at" <richard@sigma-star.at>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-To: =?utf-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.sigma-star.at ([95.130.255.111]:45996 "EHLO
-        mail.sigma-star.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751469AbdF1JDw (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 28 Jun 2017 05:03:52 -0400
-In-Reply-To: <VI1PR0401MB2591CC6A245731D9D53D42A598DD0@VI1PR0401MB2591.eurprd04.prod.outlook.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: karthik@techveda.org
+Subject: [PATCH 0/2] staging: ccree: Fix coding style and remove warnings
+Date: Wed, 28 Jun 2017 15:07:11 +0530
+Message-ID: <1498642633-3260-1-git-send-email-karthik@techveda.org>
+Cc: linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        linux-kernel@vger.kernel.org, sunil.m@techveda.org,
+        Karthik Tummala <karthik@techveda.org>
+To: gilad@benyossef.com, gregkh@linuxfoundation.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Horia,
+From: Karthik Tummala <karthik@techveda.org>
 
-> On 28 Jun 2017, at 10:32, Horia Geantă <horia.geanta@nxp.com> wrote:
-> 
->>> +	sg_pcopy_to_buffer(req->dst, nents, req->info, ivsize,
->>> +			   req->nbytes - ivsize);
->> 
->> scatterwalk_map_and_copy() should be used instead.
->> 
-> David, IIUC this is the only change needed in this patch (applies both
-> for encryption and decryption, of course).
-> Will you formally resubmit?
+This patch series fixes coding style and removes the following
+checkpatch.pl warnings:
 
-Thanks for the reminder. I did not get arround it yet.
-Will send the new patch within the next few hours.
+Prefer using '"%s...", __func__' to using the function's name,
+in a string.
 
-Thanks,
-David
+Braces {} are not necessary for single statement blocks.
+
+Rebased on top of next-20170627.
+Patches were tested and built on next-20170627
+
+Karthik Tummala (2):
+  staging: ccree: Use __func__ instead of function name
+  staging: ccree: Remove braces {} for single statement blocks
+
+ drivers/staging/ccree/ssi_aead.c | 48 ++++++++++++++++------------------------
+ 1 file changed, 19 insertions(+), 29 deletions(-)
+
+-- 
+1.9.1
