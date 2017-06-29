@@ -1,54 +1,85 @@
-From: Frans Klaver <fransklaver@gmail.com>
-Subject: Re: [PATCH 14/14] staging: ccree: fix block comment style
-Date: Thu, 29 Jun 2017 16:38:14 +0200
-Message-ID: <CAH6sp9PD6FbZXQWdhig37PRQaTKzPk8a-3_X+nh_nvE0AMFubQ@mail.gmail.com>
-References: <1498548449-10803-1-git-send-email-gilad@benyossef.com>
- <1498548449-10803-15-git-send-email-gilad@benyossef.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: driverdevel <devel@driverdev.osuosl.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- driverdev-devel@linuxdriverproject.org,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- linux-crypto@vger.kernel.org, Ofir Drang <ofir.drang@arm.com>
-To: Gilad Ben-Yossef <gilad@benyossef.com>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-In-Reply-To: <1498548449-10803-15-git-send-email-gilad@benyossef.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+From: Logan Gunthorpe <logang@deltatee.com>
+Subject: [PATCH v3 3/4] ntb: ntb_hw_intel: use io-64-nonatomic instead of in-driver hacks
+Date: Thu, 29 Jun 2017 10:09:59 -0600
+Message-ID: <20170629161000.15563-4-logang@deltatee.com>
+References: <20170629161000.15563-1-logang@deltatee.com>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        Stephen Bates <sbates@raithlin.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Jon Mason <jdmason@kudzu.us>, Allen Hubbe <Allen.Hubbe@emc.com>
+To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org
+Return-path: <linux-arch-owner@vger.kernel.org>
+In-Reply-To: <20170629161000.15563-1-logang@deltatee.com>
+Sender: linux-arch-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Jun 27, 2017 at 9:27 AM, Gilad Ben-Yossef <gilad@benyossef.com> wrote:
-> Align block comments according to coding style.
->
-> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
-> ---
->  drivers/staging/ccree/cc_hw_queue_defs.h | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
->
-> diff --git a/drivers/staging/ccree/cc_hw_queue_defs.h b/drivers/staging/ccree/cc_hw_queue_defs.h
-> index f11487a..e6b8cea 100644
-> --- a/drivers/staging/ccree/cc_hw_queue_defs.h
-> +++ b/drivers/staging/ccree/cc_hw_queue_defs.h
-> @@ -23,8 +23,8 @@
->  #include <linux/bitfield.h>
->
->  /******************************************************************************
-> -*                              DEFINITIONS
-> -******************************************************************************/
-> + *                             DEFINITIONS
-> + ******************************************************************************/
+Now that ioread64 and iowrite64 are available in io-64-nonatomic,
+we can remove the hack at the top of ntb_hw_intel.c and replace it
+with an include.
 
-I think if you change to the preferred block comment format, you
-should also drop these lines full of asterisks. I'm not sure why a
-multi-line comment is warranted here, anyway.
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Cc: Jon Mason <jdmason@kudzu.us>
+Cc: Allen Hubbe <Allen.Hubbe@emc.com>
+Acked-by: Dave Jiang <dave.jiang@intel.com>
+---
+ drivers/ntb/hw/intel/ntb_hw_intel.c | 31 +------------------------------
+ 1 file changed, 1 insertion(+), 30 deletions(-)
 
-Frans
+diff --git a/drivers/ntb/hw/intel/ntb_hw_intel.c b/drivers/ntb/hw/intel/ntb_hw_intel.c
+index 7b3b6fd63d7d..13978bca47b8 100644
+--- a/drivers/ntb/hw/intel/ntb_hw_intel.c
++++ b/drivers/ntb/hw/intel/ntb_hw_intel.c
+@@ -57,6 +57,7 @@
+ #include <linux/random.h>
+ #include <linux/slab.h>
+ #include <linux/ntb.h>
++#include <linux/io-64-nonatomic-lo-hi.h>
+ 
+ #include "ntb_hw_intel.h"
+ 
+@@ -153,35 +154,6 @@ MODULE_PARM_DESC(xeon_b2b_dsd_bar5_addr32,
+ static inline enum ntb_topo xeon_ppd_topo(struct intel_ntb_dev *ndev, u8 ppd);
+ static int xeon_init_isr(struct intel_ntb_dev *ndev);
+ 
+-#ifndef ioread64
+-#ifdef readq
+-#define ioread64 readq
+-#else
+-#define ioread64 _ioread64
+-static inline u64 _ioread64(void __iomem *mmio)
+-{
+-	u64 low, high;
+-
+-	low = ioread32(mmio);
+-	high = ioread32(mmio + sizeof(u32));
+-	return low | (high << 32);
+-}
+-#endif
+-#endif
+-
+-#ifndef iowrite64
+-#ifdef writeq
+-#define iowrite64 writeq
+-#else
+-#define iowrite64 _iowrite64
+-static inline void _iowrite64(u64 val, void __iomem *mmio)
+-{
+-	iowrite32(val, mmio);
+-	iowrite32(val >> 32, mmio + sizeof(u32));
+-}
+-#endif
+-#endif
+-
+ static inline int pdev_is_atom(struct pci_dev *pdev)
+ {
+ 	switch (pdev->device) {
+@@ -3008,4 +2980,3 @@ static void __exit intel_ntb_pci_driver_exit(void)
+ 	debugfs_remove_recursive(debugfs_dir);
+ }
+ module_exit(intel_ntb_pci_driver_exit);
+-
+-- 
+2.11.0
