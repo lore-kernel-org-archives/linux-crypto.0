@@ -1,257 +1,185 @@
 From: Logan Gunthorpe <logang@deltatee.com>
-Subject: [PATCH v3 1/4] iomap: introduce io{read|write}64_{lo_hi|hi_lo}
-Date: Thu, 29 Jun 2017 10:09:57 -0600
-Message-ID: <20170629161000.15563-2-logang@deltatee.com>
+Subject: [PATCH v3 2/4] io-64-nonatomic: add io{read|write}64[be]{_lo_hi|_hi_lo} macros
+Date: Thu, 29 Jun 2017 10:09:58 -0600
+Message-ID: <20170629161000.15563-3-logang@deltatee.com>
 References: <20170629161000.15563-1-logang@deltatee.com>
 Cc: Arnd Bergmann <arnd@arndb.de>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
         Stephen Bates <sbates@raithlin.com>,
         Logan Gunthorpe <logang@deltatee.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Suresh Warrier <warrier@linux.vnet.ibm.com>,
-        Nicholas Piggin <npiggin@gmail.com>
+        Christoph Hellwig <hch@lst.de>,
+        Alan Cox <gnomes@lxorguk.ukuu.org.uk>
 To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
         linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ale.deltatee.com ([207.54.116.67]:51121 "EHLO ale.deltatee.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752601AbdF2QKK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 29 Jun 2017 12:10:10 -0400
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20170629161000.15563-1-logang@deltatee.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-In order to provide non-atomic functions for io{read|write}64 that will
-use readq and writeq when appropriate. We define a number of variants
-of these functions in the generic iomap that will do non-atomic
-operations on pio but atomic operations on mmio.
+This patch adds generic io{read|write}64[be]{_lo_hi|_hi_lo} macros if
+they are not already defined by the architecture. (As they are provided
+by the generic iomap library).
 
-These functions are only defined if readq and writeq are defined. If
-they are not, then the wrappers that always use non-atomic operations
-from include/linux/io-64-nonatomic*.h will be used.
+The patch also points io{read|write}64[be] to the variant specified by the
+header name.
+
+This is because new drivers are encouraged to use ioreadXX, et al instead
+of readX[1], et al -- and mixing ioreadXX with readq is pretty ugly.
+
+[1] ldd3: section 9.4.2
 
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Cc: Paul Mackerras <paulus@samba.org>
-Cc: Michael Ellerman <mpe@ellerman.id.au>
-Cc: Arnd Bergmann <arnd@arndb.de>
-Cc: Suresh Warrier <warrier@linux.vnet.ibm.com>
-Cc: Nicholas Piggin <npiggin@gmail.com>
----
- include/asm-generic/iomap.h |  26 +++++++--
- lib/iomap.c                 | 132 ++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 152 insertions(+), 6 deletions(-)
+cc: Christoph Hellwig <hch@lst.de>
+cc: Arnd Bergmann <arnd@arndb.de>
+cc: Alan Cox <gnomes@lxorguk.ukuu.org.uk>
+cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
-diff --git a/include/asm-generic/iomap.h b/include/asm-generic/iomap.h
-index 650fede33c25..e4601455ac4a 100644
---- a/include/asm-generic/iomap.h
-+++ b/include/asm-generic/iomap.h
-@@ -30,9 +30,16 @@ extern unsigned int ioread16(void __iomem *);
- extern unsigned int ioread16be(void __iomem *);
- extern unsigned int ioread32(void __iomem *);
- extern unsigned int ioread32be(void __iomem *);
--#ifdef CONFIG_64BIT
--extern u64 ioread64(void __iomem *);
--extern u64 ioread64be(void __iomem *);
-+
-+#ifdef readq
-+#define ioread64_lo_hi ioread64_lo_hi
+squash! io-64-nonatomic: add io{read|write}64[be] macros
+---
+ include/linux/io-64-nonatomic-hi-lo.h | 62 +++++++++++++++++++++++++++++++++++
+ include/linux/io-64-nonatomic-lo-hi.h | 60 +++++++++++++++++++++++++++++++++
+ 2 files changed, 122 insertions(+)
+
+diff --git a/include/linux/io-64-nonatomic-hi-lo.h b/include/linux/io-64-nonatomic-hi-lo.h
+index defcc4644ce3..845e67d4b1d2 100644
+--- a/include/linux/io-64-nonatomic-hi-lo.h
++++ b/include/linux/io-64-nonatomic-hi-lo.h
+@@ -54,4 +54,66 @@ static inline void hi_lo_writeq_relaxed(__u64 val, volatile void __iomem *addr)
+ #define writeq_relaxed hi_lo_writeq_relaxed
+ #endif
+ 
++#ifndef ioread64_hi_lo
 +#define ioread64_hi_lo ioread64_hi_lo
-+#define ioread64be_lo_hi ioread64be_lo_hi
-+#define ioread64be_hi_lo ioread64be_hi_lo
-+extern u64 ioread64_lo_hi(void __iomem *addr);
-+extern u64 ioread64_hi_lo(void __iomem *addr);
-+extern u64 ioread64be_lo_hi(void __iomem *addr);
-+extern u64 ioread64be_hi_lo(void __iomem *addr);
- #endif
- 
- extern void iowrite8(u8, void __iomem *);
-@@ -40,9 +47,16 @@ extern void iowrite16(u16, void __iomem *);
- extern void iowrite16be(u16, void __iomem *);
- extern void iowrite32(u32, void __iomem *);
- extern void iowrite32be(u32, void __iomem *);
--#ifdef CONFIG_64BIT
--extern void iowrite64(u64, void __iomem *);
--extern void iowrite64be(u64, void __iomem *);
++static inline u64 ioread64_hi_lo(void __iomem *addr)
++{
++	const u32 __iomem *p = addr;
++	u32 low, high;
 +
-+#ifdef writeq
-+#define iowrite64_lo_hi iowrite64_lo_hi
++	high = ioread32(p + 1);
++	low = ioread32(p);
++
++	return low + ((u64)high << 32);
++}
++#endif
++
++#ifndef iowrite64_hi_lo
 +#define iowrite64_hi_lo iowrite64_hi_lo
-+#define iowrite64be_lo_hi iowrite64be_lo_hi
++static inline void iowrite64_hi_lo(u64 val, void __iomem *addr)
++{
++	iowrite32(val >> 32, addr + sizeof(u32));
++	iowrite32(val, addr);
++}
++#endif
++
++#ifndef ioread64be_hi_lo
++#define ioread64be_hi_lo ioread64be_hi_lo
++static inline u64 ioread64be_hi_lo(void __iomem *addr)
++{
++	const u32 __iomem *p = addr;
++	u32 low, high;
++
++	high = ioread32be(p);
++	low = ioread32be(p + 1);
++
++	return low + ((u64)high << 32);
++}
++#endif
++
++#ifndef iowrite64be_hi_lo
 +#define iowrite64be_hi_lo iowrite64be_hi_lo
-+void iowrite64_lo_hi(u64 val, void __iomem *addr);
-+void iowrite64_hi_lo(u64 val, void __iomem *addr);
-+void iowrite64be_lo_hi(u64 val, void __iomem *addr);
-+void iowrite64be_hi_lo(u64 val, void __iomem *addr);
++static inline void iowrite64be_hi_lo(u64 val, void __iomem *addr)
++{
++	iowrite32be(val >> 32, addr);
++	iowrite32be(val, addr + sizeof(u32));
++}
++#endif
++
++#ifndef ioread64
++#define ioread64 ioread64_hi_lo
++#endif
++
++#ifndef iowrite64
++#define iowrite64 iowrite64_hi_lo
++#endif
++
++#ifndef ioread64be
++#define ioread64be(p) ioread64be_hi_lo
++#endif
++
++#ifndef iowrite64be
++#define iowrite64be(v, p) iowrite64be_hi_lo
++#endif
++
+ #endif	/* _LINUX_IO_64_NONATOMIC_HI_LO_H_ */
+diff --git a/include/linux/io-64-nonatomic-lo-hi.h b/include/linux/io-64-nonatomic-lo-hi.h
+index 084461a4e5ab..7ffa928a07fb 100644
+--- a/include/linux/io-64-nonatomic-lo-hi.h
++++ b/include/linux/io-64-nonatomic-lo-hi.h
+@@ -54,4 +54,64 @@ static inline void lo_hi_writeq_relaxed(__u64 val, volatile void __iomem *addr)
+ #define writeq_relaxed lo_hi_writeq_relaxed
  #endif
  
- /*
-diff --git a/lib/iomap.c b/lib/iomap.c
-index fc3dcb4b238e..b993400d60bd 100644
---- a/lib/iomap.c
-+++ b/lib/iomap.c
-@@ -66,6 +66,7 @@ static void bad_io_access(unsigned long port, const char *access)
- #ifndef mmio_read16be
- #define mmio_read16be(addr) be16_to_cpu(__raw_readw(addr))
- #define mmio_read32be(addr) be32_to_cpu(__raw_readl(addr))
-+#define mmio_read64be(addr) be64_to_cpu(__raw_readq(addr))
- #endif
- 
- unsigned int ioread8(void __iomem *addr)
-@@ -99,6 +100,80 @@ EXPORT_SYMBOL(ioread16be);
- EXPORT_SYMBOL(ioread32);
- EXPORT_SYMBOL(ioread32be);
- 
-+#ifdef readq
-+static u64 pio_read64_lo_hi(unsigned long port)
++#ifndef ioread64_lo_hi
++#define ioread64_lo_hi ioread64_lo_hi
++static inline u64 ioread64_lo_hi(void __iomem *addr)
 +{
-+	u64 lo, hi;
++	u32 low, high;
 +
-+	lo = inl(port);
-+	hi = inl(port + sizeof(u32));
++	low = ioread32(addr);
++	high = ioread32(addr + sizeof(u32));
 +
-+	return lo | (hi << 32);
++	return low + ((u64)high << 32);
 +}
++#endif
 +
-+static u64 pio_read64_hi_lo(unsigned long port)
++#ifndef iowrite64_lo_hi
++#define iowrite64_lo_hi iowrite64_lo_hi
++static inline void iowrite64_lo_hi(u64 val, void __iomem *addr)
 +{
-+	u64 lo, hi;
-+
-+	hi = inl(port + sizeof(u32));
-+	lo = inl(port);
-+
-+	return lo | (hi << 32);
++	iowrite32(val, addr);
++	iowrite32(val >> 32, addr + sizeof(u32));
 +}
++#endif
 +
-+static u64 pio_read64be_lo_hi(unsigned long port)
++#ifndef ioread64be_lo_hi
++#define ioread64be_lo_hi ioread64be_lo_hi
++static inline u64 ioread64be_lo_hi(void __iomem *addr)
 +{
-+	u64 lo, hi;
++	u32 low, high;
 +
-+	lo = pio_read32be(port + sizeof(u32));
-+	hi = pio_read32be(port);
++	low = ioread32be(addr + sizeof(u32));
++	high = ioread32be(addr);
 +
-+	return lo | (hi << 32);
++	return low + ((u64)high << 32);
 +}
++#endif
 +
-+static u64 pio_read64be_hi_lo(unsigned long port)
++#ifndef iowrite64be_lo_hi
++#define iowrite64be_lo_hi iowrite64be_lo_hi
++static inline void iowrite64be_lo_hi(u64 val, void __iomem *addr)
 +{
-+	u64 lo, hi;
-+
-+	hi = pio_read32be(port);
-+	lo = pio_read32be(port + sizeof(u32));
-+
-+	return lo | (hi << 32);
++	iowrite32be(val, addr + sizeof(u32));
++	iowrite32be(val >> 32, addr);
 +}
++#endif
 +
-+u64 ioread64_lo_hi(void __iomem *addr)
-+{
-+	IO_COND(addr, return pio_read64_lo_hi(port), return readq(addr));
-+	return 0xffffffffffffffffLL;
-+}
++#ifndef ioread64
++#define ioread64 ioread64_lo_hi
++#endif
 +
-+u64 ioread64_hi_lo(void __iomem *addr)
-+{
-+	IO_COND(addr, return pio_read64_hi_lo(port), return readq(addr));
-+	return 0xffffffffffffffffLL;
-+}
++#ifndef iowrite64
++#define iowrite64 iowrite64_lo_hi
++#endif
 +
-+u64 ioread64be_lo_hi(void __iomem *addr)
-+{
-+	IO_COND(addr, return pio_read64be_lo_hi(port),
-+		return mmio_read64be(addr));
-+	return 0xffffffffffffffffLL;
-+}
++#ifndef ioread64be
++#define ioread64be(p) ioread64be_lo_hi
++#endif
 +
-+u64 ioread64be_hi_lo(void __iomem *addr)
-+{
-+	IO_COND(addr, return pio_read64be_hi_lo(port),
-+		return mmio_read64be(addr));
-+	return 0xffffffffffffffffLL;
-+}
++#ifndef iowrite64be
++#define iowrite64be(v, p) iowrite64be_lo_hi
++#endif
 +
-+EXPORT_SYMBOL(ioread64_lo_hi);
-+EXPORT_SYMBOL(ioread64_hi_lo);
-+EXPORT_SYMBOL(ioread64be_lo_hi);
-+EXPORT_SYMBOL(ioread64be_hi_lo);
-+
-+#endif /* readq */
-+
- #ifndef pio_write16be
- #define pio_write16be(val,port) outw(swab16(val),port)
- #define pio_write32be(val,port) outl(swab32(val),port)
-@@ -107,6 +182,7 @@ EXPORT_SYMBOL(ioread32be);
- #ifndef mmio_write16be
- #define mmio_write16be(val,port) __raw_writew(be16_to_cpu(val),port)
- #define mmio_write32be(val,port) __raw_writel(be32_to_cpu(val),port)
-+#define mmio_write64be(val,port) __raw_writeq(be64_to_cpu(val),port)
- #endif
- 
- void iowrite8(u8 val, void __iomem *addr)
-@@ -135,6 +211,62 @@ EXPORT_SYMBOL(iowrite16be);
- EXPORT_SYMBOL(iowrite32);
- EXPORT_SYMBOL(iowrite32be);
- 
-+#ifdef writeq
-+static void pio_write64_lo_hi(u64 val, unsigned long port)
-+{
-+	outl(val, port);
-+	outl(val >> 32, port + sizeof(u32));
-+}
-+
-+static void pio_write64_hi_lo(u64 val, unsigned long port)
-+{
-+	outl(val >> 32, port + sizeof(u32));
-+	outl(val, port);
-+}
-+
-+static void pio_write64be_lo_hi(u64 val, unsigned long port)
-+{
-+	pio_write32be(val, port + sizeof(u32));
-+	pio_write32be(val >> 32, port);
-+}
-+
-+static void pio_write64be_hi_lo(u64 val, unsigned long port)
-+{
-+	pio_write32be(val >> 32, port);
-+	pio_write32be(val, port + sizeof(u32));
-+}
-+
-+void iowrite64_lo_hi(u64 val, void __iomem *addr)
-+{
-+	IO_COND(addr, pio_write64_lo_hi(val, port),
-+		writeq(val, addr));
-+}
-+
-+void iowrite64_hi_lo(u64 val, void __iomem *addr)
-+{
-+	IO_COND(addr, pio_write64_hi_lo(val, port),
-+		writeq(val, addr));
-+}
-+
-+void iowrite64be_lo_hi(u64 val, void __iomem *addr)
-+{
-+	IO_COND(addr, pio_write64be_lo_hi(val, port),
-+		mmio_write64be(val, addr));
-+}
-+
-+void iowrite64be_hi_lo(u64 val, void __iomem *addr)
-+{
-+	IO_COND(addr, pio_write64be_hi_lo(val, port),
-+		mmio_write64be(val, addr));
-+}
-+
-+EXPORT_SYMBOL(iowrite64_lo_hi);
-+EXPORT_SYMBOL(iowrite64_hi_lo);
-+EXPORT_SYMBOL(iowrite64be_lo_hi);
-+EXPORT_SYMBOL(iowrite64be_hi_lo);
-+
-+#endif /* readq */
-+
- /*
-  * These are the "repeat MMIO read/write" functions.
-  * Note the "__raw" accesses, since we don't want to
+ #endif	/* _LINUX_IO_64_NONATOMIC_LO_HI_H_ */
 -- 
 2.11.0
