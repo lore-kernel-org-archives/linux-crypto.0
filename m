@@ -1,69 +1,61 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: wait in atomic context for an i2c crypto device to finish its execution
-Date: Thu, 29 Jun 2017 13:12:41 +0300
-Message-ID: <CAOtvUMf4Zh2BieEyeq3p+-zgeLmiNx6YPcaQ_WRyXgJPB2aW5w@mail.gmail.com>
-References: <b55b7170-786b-3c84-483d-db05e163c14a@microchip.com>
+From: =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>
+Subject: Re: [PATCH] crypto: caam - properly set IV after {en,de}crypt
+Date: Thu, 29 Jun 2017 10:19:01 +0000
+Message-ID: <VI1PR0401MB2591C51C446CFA129B50022298D20@VI1PR0401MB2591.eurprd04.prod.outlook.com>
+References: <20170602122446.2427-1-david@sigma-star.at>
+ <20170628132710.97278-1-david@sigma-star.at>
+ <VI1PR0401MB2591AE2CA996495656C797B398DD0@VI1PR0401MB2591.eurprd04.prod.outlook.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Tudor Ambarus <tudor.ambarus@microchip.com>
+Content-Type: text/plain; charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
+Cc: "richard@sigma-star.at" <richard@sigma-star.at>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>
+To: David Gstir <david@sigma-star.at>,
+        Dan Douglass <dan.douglass@nxp.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-yw0-f178.google.com ([209.85.161.178]:36811 "EHLO
-        mail-yw0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751595AbdF2KMn (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 29 Jun 2017 06:12:43 -0400
-Received: by mail-yw0-f178.google.com with SMTP id t127so34917420ywc.3
-        for <linux-crypto@vger.kernel.org>; Thu, 29 Jun 2017 03:12:42 -0700 (PDT)
-In-Reply-To: <b55b7170-786b-3c84-483d-db05e163c14a@microchip.com>
+Received: from mail-ve1eur01on0070.outbound.protection.outlook.com ([104.47.1.70]:3456
+        "EHLO EUR01-VE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751595AbdF2KTH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 29 Jun 2017 06:19:07 -0400
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jun 29, 2017 at 1:05 PM, Tudor Ambarus
-<tudor.ambarus@microchip.com> wrote:
-> Hi, Herbert, all,
->
-> I need an advice. I'm writing a driver for a crypto device that
-> communicates over I2C. Reads and writes from/to the i2c device are
-> sequential, I use a lock to synchronize the requests.
->
-> There are no interrupts for the i2c client. Each request has to send
-> a command, to wait for an estimated time so that the device finishes to
-> execute the command and then to read the result.
->
-> The crypto requests can be in atomic context. The maximum execution time
-> of a command in my crypto device is 115 milliseconds. Using a spinlock
-> to synchronize the requests and udelay for waiting the device to finish
-> the execution will block the core for at least 115 milliseconds.
-> If someone floods me with requests in atomic context, the core will be
-> doomed.
->
-> As of now I see two possibilities when treating requests in atomic
-> context:
-> 1. fallback to the software implementation and hope that it's faster
->    than my hw. My device is capable of doing ecc privkey generation,
->    ecdh and ecdsa.
-> 2. use spinlock and udelay and block the core.
->
-
-Perhaps I missed something but it sounds like a classic case to use a
-work queue:
-
-Have the crypto request API post a work queue item and return with -EINPROGRESS
-Run all interaction with the I2C device in a work item that has no
-problem sleeping for as long as you need it.
-Call the completion callback from the work item.
-
-Unless I've missed something this should work.
-
-Hope it helps,
-Gilad
-
--- 
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-"If you take a class in large-scale robotics, can you end up in a
-situation where the homework eats your dog?"
- -- Jean-Baptiste Queru
+On 6/28/2017 4:42 PM, Horia Geant=E3 wrote:=0A=
+> On 6/28/2017 4:27 PM, David Gstir wrote:=0A=
+>> Certain cipher modes like CTS expect the IV (req->info) of=0A=
+>> ablkcipher_request (or equivalently req->iv of skcipher_request) to=0A=
+>> contain the last ciphertext block when the {en,de}crypt operation is don=
+e.=0A=
+>> This is currently not the case for the CAAM driver which in turn breaks=
+=0A=
+>> e.g. cts(cbc(aes)) when the CAAM driver is enabled.=0A=
+>>=0A=
+>> This patch fixes the CAAM driver to properly set the IV after the=0A=
+>> {en,de}crypt operation of ablkcipher finishes.=0A=
+>>=0A=
+>> This issue was revealed by the changes in the SW CTS mode in commit=0A=
+>> 0605c41cc53ca ("crypto: cts - Convert to skcipher")=0A=
+>>=0A=
+>> Cc: <stable@vger.kernel.org> # 4.8+=0A=
+>> Signed-off-by: David Gstir <david@sigma-star.at>=0A=
+> Reviewed-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
+> =0A=
+Btw, instead of updating the IV in SW, CAAM engine could be programmed=0A=
+to do it - by saving the Context Register of the AES accelerator.=0A=
+=0A=
+Unfortunately this would require changes in quite a few places: shared=0A=
+descriptor, HW S/G generation logic, IV dma (un)mapping and maybe others.=
+=0A=
+=0A=
+So it's better to have this fix now (which, considering size, is=0A=
+appropriate for -stable) and later, if needed, offload IV updating in HW.=
+=0A=
+=0A=
+Regards,=0A=
+Horia=0A=
