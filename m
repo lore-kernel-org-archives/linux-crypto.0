@@ -1,7 +1,7 @@
 From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: [PATCH v3 RESEND 1/5] crypto: ccp - Use devres interface to allocate PCI/iomap and cleanup
-Date: Thu, 29 Jun 2017 11:54:02 -0500
-Message-ID: <20170629165406.13463-2-brijesh.singh@amd.com>
+Subject: [PATCH v3 RESEND 3/5] crypto: cpp - Abstract interrupt registeration
+Date: Thu, 29 Jun 2017 11:54:04 -0500
+Message-ID: <20170629165406.13463-4-brijesh.singh@amd.com>
 References: <20170629165406.13463-1-brijesh.singh@amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -12,437 +12,564 @@ Return-path: <linux-crypto-owner@vger.kernel.org>
 Received: from mail-sn1nam01on0045.outbound.protection.outlook.com ([104.47.32.45]:61856
         "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752150AbdF2QyY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 29 Jun 2017 12:54:24 -0400
+        id S1752150AbdF2Qy1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 29 Jun 2017 12:54:27 -0400
 In-Reply-To: <20170629165406.13463-1-brijesh.singh@amd.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Update pci and platform files to use devres interface to allocate the PCI
-and iomap resources. Also add helper functions to consolicate module init,
-exit and power mangagement code duplication.
+The CCP and PSP devices part of AMD Secure Procesor may share the same
+interrupt. Hence we expand the SP device to register a common interrupt
+handler and provide functions to CCP and PSP devices to register their
+interrupt callback which will be invoked upon interrupt.
 
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- drivers/crypto/ccp/ccp-dev-v3.c   |   7 +++
- drivers/crypto/ccp/ccp-dev.c      |  61 ++++++++++++++++++++
- drivers/crypto/ccp/ccp-dev.h      |   6 ++
- drivers/crypto/ccp/ccp-pci.c      | 114 +++++++++-----------------------------
- drivers/crypto/ccp/ccp-platform.c |  56 ++-----------------
- 5 files changed, 106 insertions(+), 138 deletions(-)
+ drivers/crypto/ccp/ccp-dev-v3.c   |   6 +--
+ drivers/crypto/ccp/ccp-dev-v5.c   |   7 ++-
+ drivers/crypto/ccp/ccp-dev.c      |   3 +-
+ drivers/crypto/ccp/ccp-dev.h      |   2 -
+ drivers/crypto/ccp/ccp-pci.c      | 103 +++++++++++-------------------------
+ drivers/crypto/ccp/ccp-platform.c |  57 ++++++++++----------
+ drivers/crypto/ccp/sp-dev.c       | 107 ++++++++++++++++++++++++++++++++++++++
+ drivers/crypto/ccp/sp-dev.h       |  16 +++++-
+ 8 files changed, 186 insertions(+), 115 deletions(-)
 
 diff --git a/drivers/crypto/ccp/ccp-dev-v3.c b/drivers/crypto/ccp/ccp-dev-v3.c
-index 367c2e3..52aa88b 100644
+index 57179034..695fde8 100644
 --- a/drivers/crypto/ccp/ccp-dev-v3.c
 +++ b/drivers/crypto/ccp/ccp-dev-v3.c
-@@ -586,6 +586,13 @@ static const struct ccp_actions ccp3_actions = {
- 	.irqhandler = ccp_irq_handler,
+@@ -453,7 +453,7 @@ static int ccp_init(struct ccp_device *ccp)
+ 	iowrite32(ccp->qim, ccp->io_regs + IRQ_STATUS_REG);
+ 
+ 	/* Request an irq */
+-	ret = ccp->get_irq(ccp);
++	ret = sp_request_ccp_irq(ccp->sp, ccp_irq_handler, ccp->name, ccp);
+ 	if (ret) {
+ 		dev_err(dev, "unable to allocate an IRQ\n");
+ 		goto e_pool;
+@@ -510,7 +510,7 @@ static int ccp_init(struct ccp_device *ccp)
+ 		if (ccp->cmd_q[i].kthread)
+ 			kthread_stop(ccp->cmd_q[i].kthread);
+ 
+-	ccp->free_irq(ccp);
++	sp_free_ccp_irq(ccp->sp, ccp);
+ 
+ e_pool:
+ 	for (i = 0; i < ccp->cmd_q_count; i++)
+@@ -549,7 +549,7 @@ static void ccp_destroy(struct ccp_device *ccp)
+ 		if (ccp->cmd_q[i].kthread)
+ 			kthread_stop(ccp->cmd_q[i].kthread);
+ 
+-	ccp->free_irq(ccp);
++	sp_free_ccp_irq(ccp->sp, ccp);
+ 
+ 	for (i = 0; i < ccp->cmd_q_count; i++)
+ 		dma_pool_destroy(ccp->cmd_q[i].dma_pool);
+diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
+index 8ed2b37..b0391f0 100644
+--- a/drivers/crypto/ccp/ccp-dev-v5.c
++++ b/drivers/crypto/ccp/ccp-dev-v5.c
+@@ -880,7 +880,7 @@ static int ccp5_init(struct ccp_device *ccp)
+ 
+ 	dev_dbg(dev, "Requesting an IRQ...\n");
+ 	/* Request an irq */
+-	ret = ccp->get_irq(ccp);
++	ret = sp_request_ccp_irq(ccp->sp, ccp5_irq_handler, ccp->name, ccp);
+ 	if (ret) {
+ 		dev_err(dev, "unable to allocate an IRQ\n");
+ 		goto e_pool;
+@@ -986,7 +986,7 @@ static int ccp5_init(struct ccp_device *ccp)
+ 			kthread_stop(ccp->cmd_q[i].kthread);
+ 
+ e_irq:
+-	ccp->free_irq(ccp);
++	sp_free_ccp_irq(ccp->sp, ccp);
+ 
+ e_pool:
+ 	for (i = 0; i < ccp->cmd_q_count; i++)
+@@ -1036,7 +1036,7 @@ static void ccp5_destroy(struct ccp_device *ccp)
+ 		if (ccp->cmd_q[i].kthread)
+ 			kthread_stop(ccp->cmd_q[i].kthread);
+ 
+-	ccp->free_irq(ccp);
++	sp_free_ccp_irq(ccp->sp, ccp);
+ 
+ 	for (i = 0; i < ccp->cmd_q_count; i++) {
+ 		cmd_q = &ccp->cmd_q[i];
+@@ -1105,7 +1105,6 @@ static const struct ccp_actions ccp5_actions = {
+ 	.init = ccp5_init,
+ 	.destroy = ccp5_destroy,
+ 	.get_free_slots = ccp5_get_free_slots,
+-	.irqhandler = ccp5_irq_handler,
  };
  
-+const struct ccp_vdata ccpv3_platform = {
-+	.version = CCP_VERSION(3, 0),
-+	.setup = NULL,
-+	.perform = &ccp3_actions,
-+	.offset = 0,
-+};
-+
- const struct ccp_vdata ccpv3 = {
- 	.version = CCP_VERSION(3, 0),
- 	.setup = NULL,
+ const struct ccp_vdata ccpv5a = {
 diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
-index 2506b50..abb3d68 100644
+index 8a1674a..7c751bf 100644
 --- a/drivers/crypto/ccp/ccp-dev.c
 +++ b/drivers/crypto/ccp/ccp-dev.c
-@@ -538,8 +538,69 @@ bool ccp_queues_suspended(struct ccp_device *ccp)
+@@ -599,8 +599,7 @@ int ccp_dev_init(struct sp_device *sp)
+ 		goto e_err;
+ 	}
  
- 	return ccp->cmd_q_count == suspended;
- }
-+
-+int ccp_dev_suspend(struct ccp_device *ccp, pm_message_t state)
-+{
-+	unsigned long flags;
-+	unsigned int i;
-+
-+	spin_lock_irqsave(&ccp->cmd_lock, flags);
-+
-+	ccp->suspending = 1;
-+
-+	/* Wake all the queue kthreads to prepare for suspend */
-+	for (i = 0; i < ccp->cmd_q_count; i++)
-+		wake_up_process(ccp->cmd_q[i].kthread);
-+
-+	spin_unlock_irqrestore(&ccp->cmd_lock, flags);
-+
-+	/* Wait for all queue kthreads to say they're done */
-+	while (!ccp_queues_suspended(ccp))
-+		wait_event_interruptible(ccp->suspend_queue,
-+					 ccp_queues_suspended(ccp));
-+
-+	return 0;
-+}
-+
-+int ccp_dev_resume(struct ccp_device *ccp)
-+{
-+	unsigned long flags;
-+	unsigned int i;
-+
-+	spin_lock_irqsave(&ccp->cmd_lock, flags);
-+
-+	ccp->suspending = 0;
-+
-+	/* Wake up all the kthreads */
-+	for (i = 0; i < ccp->cmd_q_count; i++) {
-+		ccp->cmd_q[i].suspended = 0;
-+		wake_up_process(ccp->cmd_q[i].kthread);
-+	}
-+
-+	spin_unlock_irqrestore(&ccp->cmd_lock, flags);
-+
-+	return 0;
-+}
- #endif
+-	ccp->get_irq = sp->get_irq;
+-	ccp->free_irq = sp->free_irq;
++	ccp->use_tasklet = sp->use_tasklet;
  
-+int ccp_dev_init(struct ccp_device *ccp)
-+{
-+	ccp->io_regs = ccp->io_map + ccp->vdata->offset;
-+
-+	if (ccp->vdata->setup)
-+		ccp->vdata->setup(ccp);
-+
-+	return ccp->vdata->perform->init(ccp);
-+}
-+
-+void ccp_dev_destroy(struct ccp_device *ccp)
-+{
-+	if (!ccp)
-+		return;
-+
-+	ccp->vdata->perform->destroy(ccp);
-+}
-+
- static int __init ccp_mod_init(void)
- {
- #ifdef CONFIG_X86
+ 	ccp->io_regs = sp->io_map + ccp->vdata->offset;
+ 	if (ccp->vdata->setup)
 diff --git a/drivers/crypto/ccp/ccp-dev.h b/drivers/crypto/ccp/ccp-dev.h
-index a70154a..df2e76e 100644
+index ca44821..193f309 100644
 --- a/drivers/crypto/ccp/ccp-dev.h
 +++ b/drivers/crypto/ccp/ccp-dev.h
-@@ -652,6 +652,11 @@ void ccp_dmaengine_unregister(struct ccp_device *ccp);
- void ccp5_debugfs_setup(struct ccp_device *ccp);
- void ccp5_debugfs_destroy(void);
- 
-+int ccp_dev_init(struct ccp_device *ccp);
-+void ccp_dev_destroy(struct ccp_device *ccp);
-+int ccp_dev_suspend(struct ccp_device *ccp, pm_message_t state);
-+int ccp_dev_resume(struct ccp_device *ccp);
-+
- /* Structure for computation functions that are device-specific */
- struct ccp_actions {
- 	int (*aes)(struct ccp_op *);
-@@ -679,6 +684,7 @@ struct ccp_vdata {
- 	const unsigned int offset;
- };
- 
-+extern const struct ccp_vdata ccpv3_platform;
- extern const struct ccp_vdata ccpv3;
- extern const struct ccp_vdata ccpv5a;
- extern const struct ccp_vdata ccpv5b;
+@@ -351,8 +351,6 @@ struct ccp_device {
+ 	/* Bus specific device information
+ 	 */
+ 	void *dev_specific;
+-	int (*get_irq)(struct ccp_device *ccp);
+-	void (*free_irq)(struct ccp_device *ccp);
+ 	unsigned int qim;
+ 	unsigned int irq;
+ 	bool use_tasklet;
 diff --git a/drivers/crypto/ccp/ccp-pci.c b/drivers/crypto/ccp/ccp-pci.c
-index e880d4cf4..490ad0a 100644
+index ab2df96..b29a093 100644
 --- a/drivers/crypto/ccp/ccp-pci.c
 +++ b/drivers/crypto/ccp/ccp-pci.c
-@@ -150,28 +150,13 @@ static void ccp_free_irqs(struct ccp_device *ccp)
- 	ccp->irq = 0;
+@@ -28,67 +28,37 @@
+ 
+ #define MSIX_VECTORS			2
+ 
+-struct ccp_msix {
+-	u32 vector;
+-	char name[16];
+-};
+-
+ struct ccp_pci {
+ 	int msix_count;
+-	struct ccp_msix msix[MSIX_VECTORS];
++	struct msix_entry msix_entry[MSIX_VECTORS];
+ };
+ 
+-static int ccp_get_msix_irqs(struct ccp_device *ccp)
++static int ccp_get_msix_irqs(struct sp_device *sp)
+ {
+-	struct sp_device *sp = ccp->sp;
+ 	struct ccp_pci *ccp_pci = sp->dev_specific;
+-	struct device *dev = ccp->dev;
++	struct device *dev = sp->dev;
+ 	struct pci_dev *pdev = to_pci_dev(dev);
+-	struct msix_entry msix_entry[MSIX_VECTORS];
+-	unsigned int name_len = sizeof(ccp_pci->msix[0].name) - 1;
+ 	int v, ret;
+ 
+-	for (v = 0; v < ARRAY_SIZE(msix_entry); v++)
+-		msix_entry[v].entry = v;
++	for (v = 0; v < ARRAY_SIZE(ccp_pci->msix_entry); v++)
++		ccp_pci->msix_entry[v].entry = v;
+ 
+-	ret = pci_enable_msix_range(pdev, msix_entry, 1, v);
++	ret = pci_enable_msix_range(pdev, ccp_pci->msix_entry, 1, v);
+ 	if (ret < 0)
+ 		return ret;
+ 
+ 	ccp_pci->msix_count = ret;
+-	for (v = 0; v < ccp_pci->msix_count; v++) {
+-		/* Set the interrupt names and request the irqs */
+-		snprintf(ccp_pci->msix[v].name, name_len, "%s-%u",
+-			 sp->name, v);
+-		ccp_pci->msix[v].vector = msix_entry[v].vector;
+-		ret = request_irq(ccp_pci->msix[v].vector,
+-				  ccp->vdata->perform->irqhandler,
+-				  0, ccp_pci->msix[v].name, ccp);
+-		if (ret) {
+-			dev_notice(dev, "unable to allocate MSI-X IRQ (%d)\n",
+-				   ret);
+-			goto e_irq;
+-		}
+-	}
+-	ccp->use_tasklet = true;
++	sp->use_tasklet = true;
+ 
++	sp->psp_irq = ccp_pci->msix_entry[0].vector;
++	sp->ccp_irq = (ccp_pci->msix_count > 1) ? ccp_pci->msix_entry[1].vector
++					       : ccp_pci->msix_entry[0].vector;
+ 	return 0;
+-
+-e_irq:
+-	while (v--)
+-		free_irq(ccp_pci->msix[v].vector, dev);
+-
+-	pci_disable_msix(pdev);
+-
+-	ccp_pci->msix_count = 0;
+-
+-	return ret;
  }
  
--static int ccp_find_mmio_area(struct ccp_device *ccp)
--{
--	struct device *dev = ccp->dev;
--	struct pci_dev *pdev = to_pci_dev(dev);
--	resource_size_t io_len;
--	unsigned long io_flags;
--
--	io_flags = pci_resource_flags(pdev, ccp->vdata->bar);
--	io_len = pci_resource_len(pdev, ccp->vdata->bar);
--	if ((io_flags & IORESOURCE_MEM) &&
--	    (io_len >= (ccp->vdata->offset + 0x800)))
--		return ccp->vdata->bar;
--
--	return -EIO;
--}
--
- static int ccp_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+-static int ccp_get_msi_irq(struct ccp_device *ccp)
++static int ccp_get_msi_irq(struct sp_device *sp)
  {
- 	struct ccp_device *ccp;
- 	struct ccp_pci *ccp_pci;
- 	struct device *dev = &pdev->dev;
--	unsigned int bar;
-+	void __iomem * const *iomap_table;
-+	int bar_mask;
+-	struct sp_device *sp = ccp->sp;
+-	struct device *dev = ccp->dev;
++	struct device *dev = sp->dev;
+ 	struct pci_dev *pdev = to_pci_dev(dev);
  	int ret;
  
- 	ret = -ENOMEM;
-@@ -193,32 +178,34 @@ static int ccp_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	ccp->get_irq = ccp_get_irqs;
- 	ccp->free_irq = ccp_free_irqs;
- 
--	ret = pci_request_regions(pdev, "ccp");
-+	ret = pcim_enable_device(pdev);
- 	if (ret) {
--		dev_err(dev, "pci_request_regions failed (%d)\n", ret);
-+		dev_err(dev, "pcim_enable_device failed (%d)\n", ret);
- 		goto e_err;
- 	}
- 
--	ret = pci_enable_device(pdev);
-+	bar_mask = pci_select_bars(pdev, IORESOURCE_MEM);
-+	ret = pcim_iomap_regions(pdev, bar_mask, "ccp");
- 	if (ret) {
--		dev_err(dev, "pci_enable_device failed (%d)\n", ret);
--		goto e_regions;
-+		dev_err(dev, "pcim_iomap_regions failed (%d)\n", ret);
-+		goto e_err;
- 	}
- 
--	pci_set_master(pdev);
--
--	ret = ccp_find_mmio_area(ccp);
--	if (ret < 0)
--		goto e_device;
--	bar = ret;
-+	iomap_table = pcim_iomap_table(pdev);
-+	if (!iomap_table) {
-+		dev_err(dev, "pcim_iomap_table failed\n");
-+		ret = -ENOMEM;
-+		goto e_err;
-+	}
- 
--	ret = -EIO;
--	ccp->io_map = pci_iomap(pdev, bar, 0);
-+	ccp->io_map = iomap_table[ccp->vdata->bar];
- 	if (!ccp->io_map) {
--		dev_err(dev, "pci_iomap failed\n");
--		goto e_device;
-+		dev_err(dev, "ioremap failed\n");
-+		ret = -ENOMEM;
-+		goto e_err;
- 	}
--	ccp->io_regs = ccp->io_map + ccp->vdata->offset;
-+
-+	pci_set_master(pdev);
- 
- 	ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(48));
- 	if (ret) {
-@@ -226,32 +213,20 @@ static int ccp_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 		if (ret) {
- 			dev_err(dev, "dma_set_mask_and_coherent failed (%d)\n",
- 				ret);
--			goto e_iomap;
-+			goto e_err;
- 		}
- 	}
- 
- 	dev_set_drvdata(dev, ccp);
- 
--	if (ccp->vdata->setup)
--		ccp->vdata->setup(ccp);
--
--	ret = ccp->vdata->perform->init(ccp);
-+	ret = ccp_dev_init(ccp);
+@@ -96,35 +66,24 @@ static int ccp_get_msi_irq(struct ccp_device *ccp)
  	if (ret)
--		goto e_iomap;
-+		goto e_err;
+ 		return ret;
  
- 	dev_notice(dev, "enabled\n");
+-	ccp->irq = pdev->irq;
+-	ret = request_irq(ccp->irq, ccp->vdata->perform->irqhandler, 0,
+-			  sp->name, ccp);
+-	if (ret) {
+-		dev_notice(dev, "unable to allocate MSI IRQ (%d)\n", ret);
+-		goto e_msi;
+-	}
+-	ccp->use_tasklet = true;
++	sp->ccp_irq = pdev->irq;
++	sp->psp_irq = pdev->irq;
  
  	return 0;
+-
+-e_msi:
+-	pci_disable_msi(pdev);
+-
+-	return ret;
+ }
  
--e_iomap:
--	pci_iounmap(pdev, ccp->io_map);
--
--e_device:
--	pci_disable_device(pdev);
--
--e_regions:
--	pci_release_regions(pdev);
--
- e_err:
- 	dev_notice(dev, "initialization failed\n");
+-static int ccp_get_irqs(struct ccp_device *ccp)
++static int ccp_get_irqs(struct sp_device *sp)
+ {
+-	struct device *dev = ccp->dev;
++	struct device *dev = sp->dev;
+ 	int ret;
+ 
+-	ret = ccp_get_msix_irqs(ccp);
++	ret = ccp_get_msix_irqs(sp);
+ 	if (!ret)
+ 		return 0;
+ 
+ 	/* Couldn't get MSI-X vectors, try MSI */
+ 	dev_notice(dev, "could not enable MSI-X (%d), trying MSI\n", ret);
+-	ret = ccp_get_msi_irq(ccp);
++	ret = ccp_get_msi_irq(sp);
+ 	if (!ret)
+ 		return 0;
+ 
+@@ -134,23 +93,19 @@ static int ccp_get_irqs(struct ccp_device *ccp)
  	return ret;
-@@ -265,13 +240,7 @@ static void ccp_pci_remove(struct pci_dev *pdev)
- 	if (!ccp)
- 		return;
+ }
  
--	ccp->vdata->perform->destroy(ccp);
--
--	pci_iounmap(pdev, ccp->io_map);
--
--	pci_disable_device(pdev);
--
--	pci_release_regions(pdev);
-+	ccp_dev_destroy(ccp);
+-static void ccp_free_irqs(struct ccp_device *ccp)
++static void ccp_free_irqs(struct sp_device *sp)
+ {
+-	struct sp_device *sp = ccp->sp;
+ 	struct ccp_pci *ccp_pci = sp->dev_specific;
+-	struct device *dev = ccp->dev;
++	struct device *dev = sp->dev;
+ 	struct pci_dev *pdev = to_pci_dev(dev);
  
+-	if (ccp_pci->msix_count) {
+-		while (ccp_pci->msix_count--)
+-			free_irq(ccp_pci->msix[ccp_pci->msix_count].vector,
+-				 ccp);
++	if (ccp_pci->msix_count)
+ 		pci_disable_msix(pdev);
+-	} else if (ccp->irq) {
+-		free_irq(ccp->irq, ccp);
++	else if (sp->psp_irq)
+ 		pci_disable_msi(pdev);
+-	}
+-	ccp->irq = 0;
++
++	sp->ccp_irq = 0;
++	sp->psp_irq = 0;
+ }
+ 
+ static int ccp_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+@@ -178,8 +133,6 @@ static int ccp_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 		dev_err(dev, "missing driver data\n");
+ 		goto e_err;
+ 	}
+-	sp->get_irq = ccp_get_irqs;
+-	sp->free_irq = ccp_free_irqs;
+ 
+ 	ret = pcim_enable_device(pdev);
+ 	if (ret) {
+@@ -208,6 +161,10 @@ static int ccp_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 		goto e_err;
+ 	}
+ 
++	ret = ccp_get_irqs(sp);
++	if (ret)
++		goto e_err;
++
+ 	pci_set_master(pdev);
+ 
+ 	ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(48));
+@@ -245,6 +202,8 @@ static void ccp_pci_remove(struct pci_dev *pdev)
+ 
+ 	sp_destroy(sp);
+ 
++	ccp_free_irqs(sp);
++
  	dev_notice(dev, "disabled\n");
  }
-@@ -281,47 +250,16 @@ static int ccp_pci_suspend(struct pci_dev *pdev, pm_message_t state)
- {
- 	struct device *dev = &pdev->dev;
- 	struct ccp_device *ccp = dev_get_drvdata(dev);
--	unsigned long flags;
--	unsigned int i;
--
--	spin_lock_irqsave(&ccp->cmd_lock, flags);
--
--	ccp->suspending = 1;
--
--	/* Wake all the queue kthreads to prepare for suspend */
--	for (i = 0; i < ccp->cmd_q_count; i++)
--		wake_up_process(ccp->cmd_q[i].kthread);
- 
--	spin_unlock_irqrestore(&ccp->cmd_lock, flags);
--
--	/* Wait for all queue kthreads to say they're done */
--	while (!ccp_queues_suspended(ccp))
--		wait_event_interruptible(ccp->suspend_queue,
--					 ccp_queues_suspended(ccp));
--
--	return 0;
-+	return ccp_dev_suspend(ccp, state);
- }
- 
- static int ccp_pci_resume(struct pci_dev *pdev)
- {
- 	struct device *dev = &pdev->dev;
- 	struct ccp_device *ccp = dev_get_drvdata(dev);
--	unsigned long flags;
--	unsigned int i;
--
--	spin_lock_irqsave(&ccp->cmd_lock, flags);
--
--	ccp->suspending = 0;
- 
--	/* Wake up all the kthreads */
--	for (i = 0; i < ccp->cmd_q_count; i++) {
--		ccp->cmd_q[i].suspended = 0;
--		wake_up_process(ccp->cmd_q[i].kthread);
--	}
--
--	spin_unlock_irqrestore(&ccp->cmd_lock, flags);
--
--	return 0;
-+	return ccp_dev_resume(ccp);
- }
- #endif
  
 diff --git a/drivers/crypto/ccp/ccp-platform.c b/drivers/crypto/ccp/ccp-platform.c
-index e26969e..4a970b1 100644
+index b6bb22d..5228dd7 100644
 --- a/drivers/crypto/ccp/ccp-platform.c
 +++ b/drivers/crypto/ccp/ccp-platform.c
-@@ -102,19 +102,6 @@ static void ccp_free_irqs(struct ccp_device *ccp)
- 	free_irq(ccp->irq, dev);
+@@ -30,6 +30,7 @@
+ 
+ struct ccp_platform {
+ 	int coherent;
++	unsigned int irq_count;
+ };
+ 
+ static const struct acpi_device_id ccp_acpi_match[];
+@@ -59,45 +60,39 @@ static struct sp_dev_vdata *ccp_get_acpi_version(struct platform_device *pdev)
+ 	return NULL;
  }
  
--static struct resource *ccp_find_mmio_area(struct ccp_device *ccp)
+-static int ccp_get_irq(struct ccp_device *ccp)
++static int ccp_get_irqs(struct sp_device *sp)
+ {
+-	struct device *dev = ccp->dev;
++	struct ccp_platform *ccp_platform = sp->dev_specific;
++	struct device *dev = sp->dev;
+ 	struct platform_device *pdev = to_platform_device(dev);
++	unsigned int i, count;
+ 	int ret;
+ 
+-	ret = platform_get_irq(pdev, 0);
+-	if (ret < 0)
+-		return ret;
++	for (i = 0, count = 0; i < pdev->num_resources; i++) {
++		struct resource *res = &pdev->resource[i];
+ 
+-	ccp->irq = ret;
+-	ret = request_irq(ccp->irq, ccp->vdata->perform->irqhandler, 0,
+-			  ccp->name, ccp);
+-	if (ret) {
+-		dev_notice(dev, "unable to allocate IRQ (%d)\n", ret);
+-		return ret;
++		if (resource_type(res) == IORESOURCE_IRQ)
++			count++;
+ 	}
+ 
+-	return 0;
+-}
++	ccp_platform->irq_count = count;
+ 
+-static int ccp_get_irqs(struct ccp_device *ccp)
 -{
 -	struct device *dev = ccp->dev;
--	struct platform_device *pdev = to_platform_device(dev);
--	struct resource *ior;
+-	int ret;
 -
--	ior = platform_get_resource(pdev, IORESOURCE_MEM, 0);
--	if (ior && (resource_size(ior) >= 0x800))
--		return ior;
--
--	return NULL;
+-	ret = ccp_get_irq(ccp);
+-	if (!ret)
+-		return 0;
++	ret = platform_get_irq(pdev, 0);
++	if (ret < 0)
++		return ret;
+ 
+-	/* Couldn't get an interrupt */
+-	dev_notice(dev, "could not enable interrupts (%d)\n", ret);
++	sp->psp_irq = ret;
++	if (count == 1) {
++		sp->ccp_irq = ret;
++	} else {
++		ret = platform_get_irq(pdev, 1);
++		if (ret < 0)
++			return ret;
+ 
+-	return ret;
 -}
--
++		sp->ccp_irq = ret;
++	}
+ 
+-static void ccp_free_irqs(struct ccp_device *ccp)
+-{
+-	free_irq(ccp->irq, ccp);
++	return 0;
+ }
+ 
  static int ccp_platform_probe(struct platform_device *pdev)
- {
- 	struct ccp_device *ccp;
-@@ -144,7 +131,7 @@ static int ccp_platform_probe(struct platform_device *pdev)
- 	ccp->get_irq = ccp_get_irqs;
- 	ccp->free_irq = ccp_free_irqs;
- 
--	ior = ccp_find_mmio_area(ccp);
-+	ior = platform_get_resource(pdev, IORESOURCE_MEM, 0);
- 	ccp->io_map = devm_ioremap_resource(dev, ior);
- 	if (IS_ERR(ccp->io_map)) {
- 		ret = PTR_ERR(ccp->io_map);
-@@ -172,7 +159,7 @@ static int ccp_platform_probe(struct platform_device *pdev)
- 
- 	dev_set_drvdata(dev, ccp);
- 
--	ret = ccp->vdata->perform->init(ccp);
-+	ret = ccp_dev_init(ccp);
- 	if (ret)
+@@ -126,8 +121,6 @@ static int ccp_platform_probe(struct platform_device *pdev)
+ 		dev_err(dev, "missing driver data\n");
  		goto e_err;
+ 	}
+-	sp->get_irq = ccp_get_irqs;
+-	sp->free_irq = ccp_free_irqs;
  
-@@ -190,7 +177,7 @@ static int ccp_platform_remove(struct platform_device *pdev)
- 	struct device *dev = &pdev->dev;
- 	struct ccp_device *ccp = dev_get_drvdata(dev);
+ 	ior = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+ 	sp->io_map = devm_ioremap_resource(dev, ior);
+@@ -154,6 +147,10 @@ static int ccp_platform_probe(struct platform_device *pdev)
+ 		goto e_err;
+ 	}
  
--	ccp->vdata->perform->destroy(ccp);
-+	ccp_dev_destroy(ccp);
++	ret = ccp_get_irqs(sp);
++	if (ret)
++		goto e_err;
++
+ 	dev_set_drvdata(dev, sp);
  
- 	dev_notice(dev, "disabled\n");
- 
-@@ -203,47 +190,16 @@ static int ccp_platform_suspend(struct platform_device *pdev,
- {
- 	struct device *dev = &pdev->dev;
- 	struct ccp_device *ccp = dev_get_drvdata(dev);
--	unsigned long flags;
--	unsigned int i;
--
--	spin_lock_irqsave(&ccp->cmd_lock, flags);
- 
--	ccp->suspending = 1;
--
--	/* Wake all the queue kthreads to prepare for suspend */
--	for (i = 0; i < ccp->cmd_q_count; i++)
--		wake_up_process(ccp->cmd_q[i].kthread);
--
--	spin_unlock_irqrestore(&ccp->cmd_lock, flags);
--
--	/* Wait for all queue kthreads to say they're done */
--	while (!ccp_queues_suspended(ccp))
--		wait_event_interruptible(ccp->suspend_queue,
--					 ccp_queues_suspended(ccp));
--
--	return 0;
-+	return ccp_dev_suspend(ccp, state);
+ 	ret = sp_init(sp);
+diff --git a/drivers/crypto/ccp/sp-dev.c b/drivers/crypto/ccp/sp-dev.c
+index d1dda38..44e76e5 100644
+--- a/drivers/crypto/ccp/sp-dev.c
++++ b/drivers/crypto/ccp/sp-dev.c
+@@ -64,6 +64,113 @@ static void sp_del_device(struct sp_device *sp)
+ 	write_unlock_irqrestore(&sp_unit_lock, flags);
  }
  
- static int ccp_platform_resume(struct platform_device *pdev)
- {
- 	struct device *dev = &pdev->dev;
- 	struct ccp_device *ccp = dev_get_drvdata(dev);
--	unsigned long flags;
--	unsigned int i;
--
--	spin_lock_irqsave(&ccp->cmd_lock, flags);
++static irqreturn_t sp_irq_handler(int irq, void *data)
++{
++	struct sp_device *sp = data;
++
++	if (sp->ccp_irq_handler)
++		sp->ccp_irq_handler(irq, sp->ccp_irq_data);
++
++	if (sp->psp_irq_handler)
++		sp->psp_irq_handler(irq, sp->psp_irq_data);
++
++	return IRQ_HANDLED;
++}
++
++int sp_request_ccp_irq(struct sp_device *sp, irq_handler_t handler,
++		       const char *name, void *data)
++{
++	int ret;
++
++	if ((sp->psp_irq == sp->ccp_irq) && sp->dev_vdata->psp_vdata) {
++		/* Need a common routine to manage all interrupts */
++		sp->ccp_irq_data = data;
++		sp->ccp_irq_handler = handler;
++
++		if (!sp->irq_registered) {
++			ret = request_irq(sp->ccp_irq, sp_irq_handler, 0,
++					  sp->name, sp);
++			if (ret)
++				return ret;
++
++			sp->irq_registered = true;
++		}
++	} else {
++		/* Each sub-device can manage it's own interrupt */
++		ret = request_irq(sp->ccp_irq, handler, 0, name, data);
++		if (ret)
++			return ret;
++	}
++
++	return 0;
++}
++
++int sp_request_psp_irq(struct sp_device *sp, irq_handler_t handler,
++		       const char *name, void *data)
++{
++	int ret;
++
++	if ((sp->psp_irq == sp->ccp_irq) && sp->dev_vdata->ccp_vdata) {
++		/* Need a common routine to manage all interrupts */
++		sp->psp_irq_data = data;
++		sp->psp_irq_handler = handler;
++
++		if (!sp->irq_registered) {
++			ret = request_irq(sp->psp_irq, sp_irq_handler, 0,
++					  sp->name, sp);
++			if (ret)
++				return ret;
++
++			sp->irq_registered = true;
++		}
++	} else {
++		/* Each sub-device can manage it's own interrupt */
++		ret = request_irq(sp->psp_irq, handler, 0, name, data);
++		if (ret)
++			return ret;
++	}
++
++	return 0;
++}
++
++void sp_free_ccp_irq(struct sp_device *sp, void *data)
++{
++	if ((sp->psp_irq == sp->ccp_irq) && sp->dev_vdata->psp_vdata) {
++		/* Using common routine to manage all interrupts */
++		if (!sp->psp_irq_handler) {
++			/* Nothing else using it, so free it */
++			free_irq(sp->ccp_irq, sp);
++
++			sp->irq_registered = false;
++		}
++
++		sp->ccp_irq_handler = NULL;
++		sp->ccp_irq_data = NULL;
++	} else {
++		/* Each sub-device can manage it's own interrupt */
++		free_irq(sp->ccp_irq, data);
++	}
++}
++
++void sp_free_psp_irq(struct sp_device *sp, void *data)
++{
++	if ((sp->psp_irq == sp->ccp_irq) && sp->dev_vdata->ccp_vdata) {
++		/* Using common routine to manage all interrupts */
++		if (!sp->ccp_irq_handler) {
++			/* Nothing else using it, so free it */
++			free_irq(sp->psp_irq, sp);
++
++			sp->irq_registered = false;
++		}
++
++		sp->psp_irq_handler = NULL;
++		sp->psp_irq_data = NULL;
++	} else {
++		/* Each sub-device can manage it's own interrupt */
++		free_irq(sp->psp_irq, data);
++	}
++}
++
+ /**
+  * sp_alloc_struct - allocate and initialize the sp_device struct
+  *
+diff --git a/drivers/crypto/ccp/sp-dev.h b/drivers/crypto/ccp/sp-dev.h
+index 189e57e..3520da4 100644
+--- a/drivers/crypto/ccp/sp-dev.h
++++ b/drivers/crypto/ccp/sp-dev.h
+@@ -68,9 +68,15 @@ struct sp_device {
+ 	unsigned int axcache;
  
--	ccp->suspending = 0;
--
--	/* Wake up all the kthreads */
--	for (i = 0; i < ccp->cmd_q_count; i++) {
--		ccp->cmd_q[i].suspended = 0;
--		wake_up_process(ccp->cmd_q[i].kthread);
--	}
--
--	spin_unlock_irqrestore(&ccp->cmd_lock, flags);
--
--	return 0;
-+	return ccp_dev_resume(ccp);
- }
- #endif
+ 	bool irq_registered;
++	bool use_tasklet;
  
-@@ -258,7 +214,7 @@ MODULE_DEVICE_TABLE(acpi, ccp_acpi_match);
- #ifdef CONFIG_OF
- static const struct of_device_id ccp_of_match[] = {
- 	{ .compatible = "amd,ccp-seattle-v1a",
--	  .data = (const void *)&ccpv3 },
-+	  .data = (const void *)&ccpv3_platform },
- 	{ },
- };
- MODULE_DEVICE_TABLE(of, ccp_of_match);
+-	int (*get_irq)(struct ccp_device *ccp);
+-	void (*free_irq)(struct ccp_device *ccp);
++	unsigned int ccp_irq;
++	irq_handler_t ccp_irq_handler;
++	void *ccp_irq_data;
++
++	unsigned int psp_irq;
++	irq_handler_t psp_irq_handler;
++	void *psp_irq_data;
+ 
+ 	void *ccp_data;
+ 	void *psp_data;
+@@ -90,6 +96,12 @@ struct sp_device *sp_get_master(void);
+ 
+ int sp_suspend(struct sp_device *sp, pm_message_t state);
+ int sp_resume(struct sp_device *sp);
++int sp_request_ccp_irq(struct sp_device *sp, irq_handler_t handler,
++		       const char *name, void *data);
++void sp_free_ccp_irq(struct sp_device *sp, void *data);
++int sp_request_psp_irq(struct sp_device *sp, irq_handler_t handler,
++		       const char *name, void *data);
++void sp_free_psp_irq(struct sp_device *sp, void *data);
+ 
+ #ifdef CONFIG_CRYPTO_DEV_SP_CCP
+ 
 -- 
 2.9.4
