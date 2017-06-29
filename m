@@ -1,61 +1,74 @@
-From: =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>
-Subject: Re: [PATCH] crypto: caam - properly set IV after {en,de}crypt
-Date: Thu, 29 Jun 2017 10:19:01 +0000
-Message-ID: <VI1PR0401MB2591C51C446CFA129B50022298D20@VI1PR0401MB2591.eurprd04.prod.outlook.com>
-References: <20170602122446.2427-1-david@sigma-star.at>
- <20170628132710.97278-1-david@sigma-star.at>
- <VI1PR0401MB2591AE2CA996495656C797B398DD0@VI1PR0401MB2591.eurprd04.prod.outlook.com>
+From: karthik <karthik@techveda.org>
+Subject: Re: [PATCH 0/2] staging: ccree: Fix coding style and remove warnings
+Date: Thu, 29 Jun 2017 16:13:38 +0530
+Message-ID: <1f681a83-4413-8c9d-ab75-c223b6c8b55b@techveda.org>
+References: <1498642633-3260-1-git-send-email-karthik@techveda.org>
+ <CAOtvUMdpwFaMDh2qCnB=keZQAc6ssXM+u39GPaf0ASGr002OJA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
-Cc: "richard@sigma-star.at" <richard@sigma-star.at>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>
-To: David Gstir <david@sigma-star.at>,
-        Dan Douglass <dan.douglass@nxp.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+        sunil.m@techveda.org
+To: Gilad Ben-Yossef <gilad@benyossef.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ve1eur01on0070.outbound.protection.outlook.com ([104.47.1.70]:3456
-        "EHLO EUR01-VE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751595AbdF2KTH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 29 Jun 2017 06:19:07 -0400
+Received: from mail-pf0-f196.google.com ([209.85.192.196]:34411 "EHLO
+        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751804AbdF2Knn (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 29 Jun 2017 06:43:43 -0400
+Received: by mail-pf0-f196.google.com with SMTP id d5so12653000pfe.1
+        for <linux-crypto@vger.kernel.org>; Thu, 29 Jun 2017 03:43:42 -0700 (PDT)
+In-Reply-To: <CAOtvUMdpwFaMDh2qCnB=keZQAc6ssXM+u39GPaf0ASGr002OJA@mail.gmail.com>
 Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 6/28/2017 4:42 PM, Horia Geant=E3 wrote:=0A=
-> On 6/28/2017 4:27 PM, David Gstir wrote:=0A=
->> Certain cipher modes like CTS expect the IV (req->info) of=0A=
->> ablkcipher_request (or equivalently req->iv of skcipher_request) to=0A=
->> contain the last ciphertext block when the {en,de}crypt operation is don=
-e.=0A=
->> This is currently not the case for the CAAM driver which in turn breaks=
-=0A=
->> e.g. cts(cbc(aes)) when the CAAM driver is enabled.=0A=
->>=0A=
->> This patch fixes the CAAM driver to properly set the IV after the=0A=
->> {en,de}crypt operation of ablkcipher finishes.=0A=
->>=0A=
->> This issue was revealed by the changes in the SW CTS mode in commit=0A=
->> 0605c41cc53ca ("crypto: cts - Convert to skcipher")=0A=
->>=0A=
->> Cc: <stable@vger.kernel.org> # 4.8+=0A=
->> Signed-off-by: David Gstir <david@sigma-star.at>=0A=
-> Reviewed-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
-> =0A=
-Btw, instead of updating the IV in SW, CAAM engine could be programmed=0A=
-to do it - by saving the Context Register of the AES accelerator.=0A=
-=0A=
-Unfortunately this would require changes in quite a few places: shared=0A=
-descriptor, HW S/G generation logic, IV dma (un)mapping and maybe others.=
-=0A=
-=0A=
-So it's better to have this fix now (which, considering size, is=0A=
-appropriate for -stable) and later, if needed, offload IV updating in HW.=
-=0A=
-=0A=
-Regards,=0A=
-Horia=0A=
+On Wednesday 28 June 2017 03:15 PM, Gilad Ben-Yossef wrote:
+> Thank you Karthik,
+> 
+> On Wed, Jun 28, 2017 at 12:37 PM,  <karthik@techveda.org> wrote:
+>> From: Karthik Tummala <karthik@techveda.org>
+>>
+>> This patch series fixes coding style and removes the following
+>> checkpatch.pl warnings:
+>>
+>> Prefer using '"%s...", __func__' to using the function's name,
+>> in a string.
+> 
+> This one is good.
+>>
+>> Braces {} are not necessary for single statement blocks.
+> 
+> I have already sent a patch addressing this and some other things
+> yesterday/
+> 
+>>
+>> Rebased on top of next-20170627.
+>> Patches were tested and built on next-20170627
+> 
+> Can you please check patch 1 still applies after yesterdays patch series?
+Hi, I have applied your patch series and then tried to apply patch 1 and 
+it failed. Should I wait until the patch series gets accepted and then 
+continue my work on the new linux-next release ? or is there any other 
+option ?
+> 
+>>
+>> Karthik Tummala (2):
+>>    staging: ccree: Use __func__ instead of function name
+>>    staging: ccree: Remove braces {} for single statement blocks
+>>
+>>   drivers/staging/ccree/ssi_aead.c | 48 ++++++++++++++++------------------------
+>>   1 file changed, 19 insertions(+), 29 deletions(-)
+>>
+>> --
+>> 1.9.1
+>>
+> 
+> Thanks,
+> Gilad
+> 
+Thanks
+karthik
