@@ -1,7 +1,7 @@
 From: "Gustavo A. R. Silva" <garsilva@embeddedor.com>
-Subject: [PATCH] crypto: omap-aes: fix error return code in omap_aes_probe()
-Date: Fri, 30 Jun 2017 02:00:54 -0500
-Message-ID: <20170630070054.GA16513@embeddedgus>
+Subject: [PATCH] crypto: omap-des: fix error return code in omap_des_probe()
+Date: Fri, 30 Jun 2017 02:07:04 -0500
+Message-ID: <20170630070704.GA18278@embeddedgus>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -13,21 +13,23 @@ Content-Disposition: inline
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Propagate the return value of platform_get_irq on failure.
+Print and propagate the return value of platform_get_irq on failure.
 
 Signed-off-by: Gustavo A. R. Silva <garsilva@embeddedor.com>
 ---
- drivers/crypto/omap-aes.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/crypto/omap-des.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index 5120a17..c376a3e 100644
---- a/drivers/crypto/omap-aes.c
-+++ b/drivers/crypto/omap-aes.c
-@@ -1095,6 +1095,7 @@ static int omap_aes_probe(struct platform_device *pdev)
+diff --git a/drivers/crypto/omap-des.c b/drivers/crypto/omap-des.c
+index 0bcab00..d37c950 100644
+--- a/drivers/crypto/omap-des.c
++++ b/drivers/crypto/omap-des.c
+@@ -1023,7 +1023,8 @@ static int omap_des_probe(struct platform_device *pdev)
+ 
  		irq = platform_get_irq(pdev, 0);
  		if (irq < 0) {
- 			dev_err(dev, "can't get IRQ resource\n");
+-			dev_err(dev, "can't get IRQ resource\n");
++			dev_err(dev, "can't get IRQ resource: %d\n", irq);
 +			err = irq;
  			goto err_irq;
  		}
