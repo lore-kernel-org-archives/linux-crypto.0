@@ -1,7 +1,7 @@
 From: =?UTF-8?q?Simon=20Sandstr=C3=B6m?= <simon@nikanor.nu>
-Subject: [PATCH 04/10] staging: ccree: Fix alignment issues in ssi_driver.c
-Date: Sun,  2 Jul 2017 01:25:49 +0200
-Message-ID: <20170701232555.5538-5-simon@nikanor.nu>
+Subject: [PATCH 08/10] staging: ccree: Fix alignment issues in ssi_request_mgr.c
+Date: Sun,  2 Jul 2017 01:25:53 +0200
+Message-ID: <20170701232555.5538-9-simon@nikanor.nu>
 References: <20170701232555.5538-1-simon@nikanor.nu>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -11,13 +11,13 @@ Cc: gregkh@linuxfoundation.org, linux-crypto@vger.kernel.org,
         =?UTF-8?q?Simon=20Sandstr=C3=B6m?= <simon@nikanor.nu>
 To: gilad@benyossef.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-lf0-f41.google.com ([209.85.215.41]:33659 "EHLO
+Received: from mail-lf0-f41.google.com ([209.85.215.41]:35619 "EHLO
         mail-lf0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752054AbdGAX0c (ORCPT
+        with ESMTP id S1751976AbdGAX0h (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 1 Jul 2017 19:26:32 -0400
-Received: by mail-lf0-f41.google.com with SMTP id z78so44764649lff.0
-        for <linux-crypto@vger.kernel.org>; Sat, 01 Jul 2017 16:26:31 -0700 (PDT)
+        Sat, 1 Jul 2017 19:26:37 -0400
+Received: by mail-lf0-f41.google.com with SMTP id b207so86273092lfg.2
+        for <linux-crypto@vger.kernel.org>; Sat, 01 Jul 2017 16:26:36 -0700 (PDT)
 In-Reply-To: <20170701232555.5538-1-simon@nikanor.nu>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
@@ -26,133 +26,119 @@ Fixes checkpatch.pl alignment warnings.
 
 Signed-off-by: Simon Sandström <simon@nikanor.nu>
 ---
- drivers/staging/ccree/ssi_driver.c | 40 +++++++++++++++++++-------------------
- 1 file changed, 20 insertions(+), 20 deletions(-)
+ drivers/staging/ccree/ssi_request_mgr.c | 42 ++++++++++++++++-----------------
+ 1 file changed, 20 insertions(+), 22 deletions(-)
 
-diff --git a/drivers/staging/ccree/ssi_driver.c b/drivers/staging/ccree/ssi_driver.c
-index 78709b92736d..e26cf174cf2b 100644
---- a/drivers/staging/ccree/ssi_driver.c
-+++ b/drivers/staging/ccree/ssi_driver.c
-@@ -85,8 +85,7 @@ void dump_byte_array(const char *name, const u8 *the_array, unsigned long size)
- 		return;
- 	}
- 
--	ret = snprintf(line_buf, sizeof(line_buf), "%s[%lu]: ",
--		name, size);
-+	ret = snprintf(line_buf, sizeof(line_buf), "%s[%lu]: ", name, size);
- 	if (ret < 0) {
- 		SSI_LOG_ERR("snprintf returned %d . aborting buffer array dump\n", ret);
- 		return;
-@@ -95,8 +94,8 @@ void dump_byte_array(const char *name, const u8 *the_array, unsigned long size)
- 	for (i = 0, cur_byte = the_array;
- 	     (i < size) && (line_offset < sizeof(line_buf)); i++, cur_byte++) {
- 			ret = snprintf(line_buf + line_offset,
--					sizeof(line_buf) - line_offset,
--					"0x%02X ", *cur_byte);
-+				       sizeof(line_buf) - line_offset,
-+				       "0x%02X ", *cur_byte);
- 		if (ret < 0) {
- 			SSI_LOG_ERR("snprintf returned %d . aborting buffer array dump\n", ret);
- 			return;
-@@ -193,11 +192,11 @@ int init_cc_regs(struct ssi_drvdata *drvdata, bool is_probe)
- #ifdef DX_IRQ_DELAY
- 	/* Set CC IRQ delay */
- 	CC_HAL_WRITE_REGISTER(CC_REG_OFFSET(HOST_RGF, HOST_IRQ_TIMER_INIT_VAL),
--		DX_IRQ_DELAY);
-+			      DX_IRQ_DELAY);
- #endif
- 	if (CC_HAL_READ_REGISTER(CC_REG_OFFSET(HOST_RGF, HOST_IRQ_TIMER_INIT_VAL)) > 0) {
- 		SSI_LOG_DEBUG("irq_delay=%d CC cycles\n",
--			CC_HAL_READ_REGISTER(CC_REG_OFFSET(HOST_RGF, HOST_IRQ_TIMER_INIT_VAL)));
-+			      CC_HAL_READ_REGISTER(CC_REG_OFFSET(HOST_RGF, HOST_IRQ_TIMER_INIT_VAL)));
- 	}
- #endif
- 
-@@ -252,9 +251,9 @@ static int init_cc_resources(struct platform_device *plat_dev)
- 		goto init_cc_res_err;
- 	}
- 	SSI_LOG_DEBUG("Got MEM resource (%s): start=0x%llX end=0x%llX\n",
--		new_drvdata->res_mem->name,
--		(unsigned long long)new_drvdata->res_mem->start,
--		(unsigned long long)new_drvdata->res_mem->end);
-+		      new_drvdata->res_mem->name,
-+		      (unsigned long long)new_drvdata->res_mem->start,
-+		      (unsigned long long)new_drvdata->res_mem->end);
- 	/* Map registers space */
- 	req_mem_cc_regs = request_mem_region(new_drvdata->res_mem->start, resource_size(new_drvdata->res_mem), "arm_cc7x_regs");
- 	if (unlikely(!req_mem_cc_regs)) {
-@@ -266,7 +265,8 @@ static int init_cc_resources(struct platform_device *plat_dev)
- 	cc_base = ioremap(new_drvdata->res_mem->start, resource_size(new_drvdata->res_mem));
- 	if (unlikely(!cc_base)) {
- 		SSI_LOG_ERR("ioremap[CC](0x%08X,0x%08X) failed\n",
--			(unsigned int)new_drvdata->res_mem->start, (unsigned int)resource_size(new_drvdata->res_mem));
-+			    (unsigned int)new_drvdata->res_mem->start,
-+			    (unsigned int)resource_size(new_drvdata->res_mem));
+diff --git a/drivers/staging/ccree/ssi_request_mgr.c b/drivers/staging/ccree/ssi_request_mgr.c
+index 46d9396f9ff9..efdaeea0f394 100644
+--- a/drivers/staging/ccree/ssi_request_mgr.c
++++ b/drivers/staging/ccree/ssi_request_mgr.c
+@@ -129,7 +129,7 @@ int request_mgr_init(struct ssi_drvdata *drvdata)
+ 	SSI_LOG_DEBUG("hw_queue_size=0x%08X\n", req_mgr_h->hw_queue_size);
+ 	if (req_mgr_h->hw_queue_size < MIN_HW_QUEUE_SIZE) {
+ 		SSI_LOG_ERR("Invalid HW queue size = %u (Min. required is %u)\n",
+-			req_mgr_h->hw_queue_size, MIN_HW_QUEUE_SIZE);
++			    req_mgr_h->hw_queue_size, MIN_HW_QUEUE_SIZE);
  		rc = -ENOMEM;
- 		goto init_cc_res_err;
+ 		goto req_mgr_init_err;
  	}
-@@ -284,15 +284,15 @@ static int init_cc_resources(struct platform_device *plat_dev)
- 			 IRQF_SHARED, "arm_cc7x", new_drvdata);
- 	if (unlikely(rc != 0)) {
- 		SSI_LOG_ERR("Could not register to interrupt %llu\n",
--			(unsigned long long)new_drvdata->res_irq->start);
-+			    (unsigned long long)new_drvdata->res_irq->start);
- 		goto init_cc_res_err;
- 	}
- 	init_completion(&new_drvdata->icache_setup_completion);
- 
- 	irq_registered = true;
- 	SSI_LOG_DEBUG("Registered to IRQ (%s) %llu\n",
--		new_drvdata->res_irq->name,
--		(unsigned long long)new_drvdata->res_irq->start);
-+		      new_drvdata->res_irq->name,
-+		      (unsigned long long)new_drvdata->res_irq->start);
- 
- 	new_drvdata->plat_dev = plat_dev;
- 
-@@ -313,7 +313,7 @@ static int init_cc_resources(struct platform_device *plat_dev)
- 	signature_val = CC_HAL_READ_REGISTER(CC_REG_OFFSET(HOST_RGF, HOST_SIGNATURE));
- 	if (signature_val != DX_DEV_SIGNATURE) {
- 		SSI_LOG_ERR("Invalid CC signature: SIGNATURE=0x%08X != expected=0x%08X\n",
--			signature_val, (u32)DX_DEV_SIGNATURE);
-+			    signature_val, (u32)DX_DEV_SIGNATURE);
- 		rc = -EINVAL;
- 		goto init_cc_res_err;
- 	}
-@@ -428,7 +428,7 @@ static int init_cc_resources(struct platform_device *plat_dev)
- 				new_drvdata->cc_base = NULL;
- 			}
- 			release_mem_region(new_drvdata->res_mem->start,
--				resource_size(new_drvdata->res_mem));
-+					   resource_size(new_drvdata->res_mem));
- 			new_drvdata->res_mem = NULL;
- 		}
- 		kfree(new_drvdata);
-@@ -471,7 +471,7 @@ static void cleanup_cc_resources(struct platform_device *plat_dev)
- 	if (drvdata->cc_base) {
- 		iounmap(drvdata->cc_base);
- 		release_mem_region(drvdata->res_mem->start,
--			resource_size(drvdata->res_mem));
-+				   resource_size(drvdata->res_mem));
- 		drvdata->cc_base = NULL;
- 		drvdata->res_mem = NULL;
- 	}
-@@ -516,12 +516,12 @@ static int cc7x_probe(struct platform_device *plat_dev)
- 	asm volatile("mrc p15, 0, %0, c0, c0, 1" : "=r" (ctr));
- 	cacheline_size =  4 << ((ctr >> 16) & 0xf);
- 	SSI_LOG_DEBUG("CP15(L1_CACHE_BYTES) = %u , Kconfig(L1_CACHE_BYTES) = %u\n",
--		cacheline_size, L1_CACHE_BYTES);
-+		      cacheline_size, L1_CACHE_BYTES);
- 
- 	asm volatile("mrc p15, 0, %0, c0, c0, 0" : "=r" (ctr));
--	SSI_LOG_DEBUG("Main ID register (MIDR): Implementer 0x%02X, Arch 0x%01X,"
--		     " Part 0x%03X, Rev r%dp%d\n",
--		(ctr >> 24), (ctr >> 16) & 0xF, (ctr >> 4) & 0xFFF, (ctr >> 20) & 0xF, ctr & 0xF);
-+	SSI_LOG_DEBUG("Main ID register (MIDR): Implementer 0x%02X, Arch 0x%01X, Part 0x%03X, Rev r%dp%d\n",
-+		      (ctr >> 24), (ctr >> 16) & 0xF, (ctr >> 4) & 0xFFF,
-+		      (ctr >> 20) & 0xF, ctr & 0xF);
+@@ -177,7 +177,8 @@ static inline void enqueue_seq(
+ 		writel_relaxed(seq[i].word[5], (volatile void __iomem *)(cc_base + CC_REG_OFFSET(CRY_KERNEL, DSCRPTR_QUEUE_WORD0)));
+ #ifdef DX_DUMP_DESCS
+ 		SSI_LOG_DEBUG("desc[%02d]: 0x%08X 0x%08X 0x%08X 0x%08X 0x%08X 0x%08X\n", i,
+-			seq[i].word[0], seq[i].word[1], seq[i].word[2], seq[i].word[3], seq[i].word[4], seq[i].word[5]);
++			      seq[i].word[0], seq[i].word[1], seq[i].word[2],
++			      seq[i].word[3], seq[i].word[4], seq[i].word[5]);
  #endif
+ 	}
+ }
+@@ -211,7 +212,7 @@ static inline int request_mgr_queues_status_check(
+ 		      (MAX_REQUEST_QUEUE_SIZE - 1)) ==
+ 		     req_mgr_h->req_queue_tail)) {
+ 		SSI_LOG_ERR("SW FIFO is full. req_queue_head=%d sw_fifo_len=%d\n",
+-			   req_mgr_h->req_queue_head, MAX_REQUEST_QUEUE_SIZE);
++			    req_mgr_h->req_queue_head, MAX_REQUEST_QUEUE_SIZE);
+ 		return -EBUSY;
+ 	}
  
- 	/* Map registers space */
+@@ -221,9 +222,8 @@ static inline int request_mgr_queues_status_check(
+ 	/* Wait for space in HW queue. Poll constant num of iterations. */
+ 	for (poll_queue = 0; poll_queue < SSI_MAX_POLL_ITER ; poll_queue++) {
+ 		req_mgr_h->q_free_slots =
+-			CC_HAL_READ_REGISTER(
+-				CC_REG_OFFSET(CRY_KERNEL,
+-						 DSCRPTR_QUEUE_CONTENT));
++			CC_HAL_READ_REGISTER(CC_REG_OFFSET(CRY_KERNEL,
++							   DSCRPTR_QUEUE_CONTENT));
+ 		if (unlikely(req_mgr_h->q_free_slots <
+ 						req_mgr_h->min_free_hw_slots)) {
+ 			req_mgr_h->min_free_hw_slots = req_mgr_h->q_free_slots;
+@@ -235,7 +235,7 @@ static inline int request_mgr_queues_status_check(
+ 		}
+ 
+ 		SSI_LOG_DEBUG("HW FIFO is full. q_free_slots=%d total_seq_len=%d\n",
+-			req_mgr_h->q_free_slots, total_seq_len);
++			      req_mgr_h->q_free_slots, total_seq_len);
+ 	}
+ 	/* No room in the HW queue try again later */
+ 	SSI_LOG_DEBUG("HW FIFO full, timeout. req_queue_head=%d "
+@@ -291,9 +291,8 @@ int send_request(
+ 		 * in case iv gen add the max size and in case of no dout add 1
+ 		 * for the internal completion descriptor
+ 		 */
+-		rc = request_mgr_queues_status_check(req_mgr_h,
+-					       cc_base,
+-					       max_required_seq_len);
++		rc = request_mgr_queues_status_check(req_mgr_h, cc_base,
++						     max_required_seq_len);
+ 		if (likely(rc == 0))
+ 			/* There is enough place in the queue */
+ 			break;
+@@ -326,15 +325,16 @@ int send_request(
+ 
+ 	if (ssi_req->ivgen_dma_addr_len > 0) {
+ 		SSI_LOG_DEBUG("Acquire IV from pool into %d DMA addresses 0x%llX, 0x%llX, 0x%llX, IV-size=%u\n",
+-			ssi_req->ivgen_dma_addr_len,
+-			(unsigned long long)ssi_req->ivgen_dma_addr[0],
+-			(unsigned long long)ssi_req->ivgen_dma_addr[1],
+-			(unsigned long long)ssi_req->ivgen_dma_addr[2],
+-			ssi_req->ivgen_size);
++			      ssi_req->ivgen_dma_addr_len,
++			      (unsigned long long)ssi_req->ivgen_dma_addr[0],
++			      (unsigned long long)ssi_req->ivgen_dma_addr[1],
++			      (unsigned long long)ssi_req->ivgen_dma_addr[2],
++			      ssi_req->ivgen_size);
+ 
+ 		/* Acquire IV from pool */
+-		rc = ssi_ivgen_getiv(drvdata, ssi_req->ivgen_dma_addr, ssi_req->ivgen_dma_addr_len,
+-			ssi_req->ivgen_size, iv_seq, &iv_seq_len);
++		rc = ssi_ivgen_getiv(drvdata, ssi_req->ivgen_dma_addr,
++				     ssi_req->ivgen_dma_addr_len,
++				     ssi_req->ivgen_size, iv_seq, &iv_seq_len);
+ 
+ 		if (unlikely(rc != 0)) {
+ 			SSI_LOG_ERR("Failed to generate IV (rc=%d)\n", rc);
+@@ -418,9 +418,8 @@ int send_request_init(
+ 	enqueue_seq(cc_base, desc, len);
+ 
+ 	/* Update the free slots in HW queue */
+-	req_mgr_h->q_free_slots = CC_HAL_READ_REGISTER(
+-					CC_REG_OFFSET(CRY_KERNEL,
+-					 DSCRPTR_QUEUE_CONTENT));
++	req_mgr_h->q_free_slots = CC_HAL_READ_REGISTER(CC_REG_OFFSET(CRY_KERNEL,
++								     DSCRPTR_QUEUE_CONTENT));
+ 
+ 	return 0;
+ }
+@@ -545,8 +544,7 @@ static void comp_handler(unsigned long devarg)
+ 	}
+ 	/* after verifing that there is nothing to do, Unmask AXI completion interrupt */
+ 	CC_HAL_WRITE_REGISTER(CC_REG_OFFSET(HOST_RGF, HOST_IMR),
+-		CC_HAL_READ_REGISTER(
+-		CC_REG_OFFSET(HOST_RGF, HOST_IMR)) & ~irq);
++			      CC_HAL_READ_REGISTER(CC_REG_OFFSET(HOST_RGF, HOST_IMR)) & ~irq);
+ }
+ 
+ /*
 -- 
 2.11.0
