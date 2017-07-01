@@ -1,692 +1,208 @@
 From: =?UTF-8?q?Simon=20Sandstr=C3=B6m?= <simon@nikanor.nu>
-Subject: [PATCH 02/10] staging: ccree: Fix alignment issues in ssi_buffer_mgr.c
-Date: Sun,  2 Jul 2017 01:25:47 +0200
-Message-ID: <20170701232555.5538-3-simon@nikanor.nu>
+Subject: [PATCH 01/10] staging: ccree: Fix alignment issues in ssi_aead.c
+Date: Sun,  2 Jul 2017 01:25:46 +0200
+Message-ID: <20170701232555.5538-2-simon@nikanor.nu>
 References: <20170701232555.5538-1-simon@nikanor.nu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Cc: gregkh@linuxfoundation.org, linux-crypto@vger.kernel.org,
-        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
-        =?UTF-8?q?Simon=20Sandstr=C3=B6m?= <simon@nikanor.nu>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: devel@driverdev.osuosl.org, gregkh@linuxfoundation.org,
+ driverdev-devel@linuxdriverproject.org, linux-crypto@vger.kernel.org,
+ =?UTF-8?q?Simon=20Sandstr=C3=B6m?= <simon@nikanor.nu>
 To: gilad@benyossef.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-lf0-f48.google.com ([209.85.215.48]:33839 "EHLO
-        mail-lf0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751976AbdGAX0b (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 1 Jul 2017 19:26:31 -0400
-Received: by mail-lf0-f48.google.com with SMTP id l13so86397313lfl.1
-        for <linux-crypto@vger.kernel.org>; Sat, 01 Jul 2017 16:26:29 -0700 (PDT)
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
 In-Reply-To: <20170701232555.5538-1-simon@nikanor.nu>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+List-Id: linux-crypto.vger.kernel.org
 
-Fixes checkpatch.pl alignment warnings.
-
-Signed-off-by: Simon Sandström <simon@nikanor.nu>
----
- drivers/staging/ccree/ssi_buffer_mgr.c | 295 ++++++++++++++++++---------------
- 1 file changed, 164 insertions(+), 131 deletions(-)
-
-diff --git a/drivers/staging/ccree/ssi_buffer_mgr.c b/drivers/staging/ccree/ssi_buffer_mgr.c
-index b35871eeabd1..3f163d3f3f48 100644
---- a/drivers/staging/ccree/ssi_buffer_mgr.c
-+++ b/drivers/staging/ccree/ssi_buffer_mgr.c
-@@ -162,8 +162,8 @@ static inline int ssi_buffer_mgr_render_buff_to_mlli(
- 		cc_lli_set_addr(mlli_entry_p, buff_dma);
- 		cc_lli_set_size(mlli_entry_p, CC_MAX_MLLI_ENTRY_SIZE);
- 		SSI_LOG_DEBUG("entry[%d]: single_buff=0x%08X size=%08X\n", *curr_nents,
--			   mlli_entry_p[LLI_WORD0_OFFSET],
--			   mlli_entry_p[LLI_WORD1_OFFSET]);
-+			      mlli_entry_p[LLI_WORD0_OFFSET],
-+			      mlli_entry_p[LLI_WORD1_OFFSET]);
- 		buff_dma += CC_MAX_MLLI_ENTRY_SIZE;
- 		buff_size -= CC_MAX_MLLI_ENTRY_SIZE;
- 		mlli_entry_p = mlli_entry_p + 2;
-@@ -173,8 +173,8 @@ static inline int ssi_buffer_mgr_render_buff_to_mlli(
- 	cc_lli_set_addr(mlli_entry_p, buff_dma);
- 	cc_lli_set_size(mlli_entry_p, buff_size);
- 	SSI_LOG_DEBUG("entry[%d]: single_buff=0x%08X size=%08X\n", *curr_nents,
--		   mlli_entry_p[LLI_WORD0_OFFSET],
--		   mlli_entry_p[LLI_WORD1_OFFSET]);
-+		      mlli_entry_p[LLI_WORD0_OFFSET],
-+		      mlli_entry_p[LLI_WORD1_OFFSET]);
- 	mlli_entry_p = mlli_entry_p + 2;
- 	*mlli_entry_pp = mlli_entry_p;
- 	(*curr_nents)++;
-@@ -302,7 +302,7 @@ static inline void ssi_buffer_mgr_add_scatterlist_entry(
- 	unsigned int index = sgl_data->num_of_buffers;
- 
- 	SSI_LOG_DEBUG("index=%u nents=%u sgl=%pK data_len=0x%08X is_last=%d\n",
--		     index, nents, sgl, data_len, is_last_table);
-+		      index, nents, sgl, data_len, is_last_table);
- 	sgl_data->nents[index] = nents;
- 	sgl_data->entry[index].sgl = sgl;
- 	sgl_data->offset[index] = data_offset;
-@@ -317,7 +317,7 @@ static inline void ssi_buffer_mgr_add_scatterlist_entry(
- 
- static int
- ssi_buffer_mgr_dma_map_sg(struct device *dev, struct scatterlist *sg, u32 nents,
--			 enum dma_data_direction direction)
-+			  enum dma_data_direction direction)
- {
- 	u32 i, j;
- 	struct scatterlist *l_sg = sg;
-@@ -374,7 +374,7 @@ static int ssi_buffer_mgr_map_scatterlist(
- 		if (*nents > max_sg_nents) {
- 			*nents = 0;
- 			SSI_LOG_ERR("Too many fragments. current %d max %d\n",
--				   *nents, max_sg_nents);
-+				    *nents, max_sg_nents);
- 			return -ENOMEM;
- 		}
- 		if (!is_chained) {
-@@ -408,10 +408,10 @@ static int ssi_buffer_mgr_map_scatterlist(
- 
- static inline int
- ssi_aead_handle_config_buf(struct device *dev,
--	struct aead_req_ctx *areq_ctx,
--	u8 *config_data,
--	struct buffer_array *sg_data,
--	unsigned int assoclen)
-+			   struct aead_req_ctx *areq_ctx,
-+			   u8 *config_data,
-+			   struct buffer_array *sg_data,
-+			   unsigned int assoclen)
- {
- 	SSI_LOG_DEBUG(" handle additional data config set to   DLLI\n");
- 	/* create sg for the current buffer */
-@@ -433,19 +433,18 @@ ssi_aead_handle_config_buf(struct device *dev,
- 	/* prepare for case of MLLI */
- 	if (assoclen > 0) {
- 		ssi_buffer_mgr_add_scatterlist_entry(sg_data, 1,
--						    &areq_ctx->ccm_adata_sg,
--						    (AES_BLOCK_SIZE +
--						    areq_ctx->ccm_hdr_size), 0,
--						    false, NULL);
-+						     &areq_ctx->ccm_adata_sg,
-+						     (AES_BLOCK_SIZE + areq_ctx->ccm_hdr_size),
-+						     0, false, NULL);
- 	}
- 	return 0;
- }
- 
- static inline int ssi_ahash_handle_curr_buf(struct device *dev,
--					   struct ahash_req_ctx *areq_ctx,
--					   u8 *curr_buff,
--					   u32 curr_buff_cnt,
--					   struct buffer_array *sg_data)
-+					    struct ahash_req_ctx *areq_ctx,
-+					    u8 *curr_buff,
-+					    u32 curr_buff_cnt,
-+					    struct buffer_array *sg_data)
- {
- 	SSI_LOG_DEBUG(" handle curr buff %x set to   DLLI\n", curr_buff_cnt);
- 	/* create sg for the current buffer */
-@@ -469,7 +468,7 @@ static inline int ssi_ahash_handle_curr_buf(struct device *dev,
- 	areq_ctx->in_nents = 0;
- 	/* prepare for case of MLLI */
- 	ssi_buffer_mgr_add_scatterlist_entry(sg_data, 1, areq_ctx->buff_sg,
--				curr_buff_cnt, 0, false, NULL);
-+					     curr_buff_cnt, 0, false, NULL);
- 	return 0;
- }
- 
-@@ -484,8 +483,8 @@ void ssi_buffer_mgr_unmap_blkcipher_request(
- 
- 	if (likely(req_ctx->gen_ctx.iv_dma_addr != 0)) {
- 		SSI_LOG_DEBUG("Unmapped iv: iv_dma_addr=0x%llX iv_size=%u\n",
--			(unsigned long long)req_ctx->gen_ctx.iv_dma_addr,
--			ivsize);
-+			      (unsigned long long)req_ctx->gen_ctx.iv_dma_addr,
-+			      ivsize);
- 		dma_unmap_single(dev, req_ctx->gen_ctx.iv_dma_addr,
- 				 ivsize,
- 				 req_ctx->is_giv ? DMA_BIDIRECTIONAL :
-@@ -498,16 +497,12 @@ void ssi_buffer_mgr_unmap_blkcipher_request(
- 			      req_ctx->mlli_params.mlli_dma_addr);
- 	}
- 
--	dma_unmap_sg(dev, src, req_ctx->in_nents,
--		DMA_BIDIRECTIONAL);
--	SSI_LOG_DEBUG("Unmapped req->src=%pK\n",
--		     sg_virt(src));
-+	dma_unmap_sg(dev, src, req_ctx->in_nents, DMA_BIDIRECTIONAL);
-+	SSI_LOG_DEBUG("Unmapped req->src=%pK\n", sg_virt(src));
- 
- 	if (src != dst) {
--		dma_unmap_sg(dev, dst, req_ctx->out_nents,
--			DMA_BIDIRECTIONAL);
--		SSI_LOG_DEBUG("Unmapped req->dst=%pK\n",
--			sg_virt(dst));
-+		dma_unmap_sg(dev, dst, req_ctx->out_nents, DMA_BIDIRECTIONAL);
-+		SSI_LOG_DEBUG("Unmapped req->dst=%pK\n", sg_virt(dst));
- 	}
- }
- 
-@@ -542,22 +537,24 @@ int ssi_buffer_mgr_map_blkcipher_request(
- 				       req_ctx->is_giv ? DMA_BIDIRECTIONAL :
- 				       DMA_TO_DEVICE);
- 		if (unlikely(dma_mapping_error(dev,
--					req_ctx->gen_ctx.iv_dma_addr))) {
-+					       req_ctx->gen_ctx.iv_dma_addr))) {
- 			SSI_LOG_ERR("Mapping iv %u B at va=%pK "
- 				   "for DMA failed\n", ivsize, info);
- 			return -ENOMEM;
- 		}
- 		SSI_LOG_DEBUG("Mapped iv %u B at va=%pK to dma=0x%llX\n",
--			ivsize, info,
--			(unsigned long long)req_ctx->gen_ctx.iv_dma_addr);
-+			      ivsize, info,
-+			      (unsigned long long)req_ctx->gen_ctx.iv_dma_addr);
- 	} else {
- 		req_ctx->gen_ctx.iv_dma_addr = 0;
- 	}
- 
- 	/* Map the src SGL */
- 	rc = ssi_buffer_mgr_map_scatterlist(dev, src,
--		nbytes, DMA_BIDIRECTIONAL, &req_ctx->in_nents,
--		LLI_MAX_NUM_OF_DATA_ENTRIES, &dummy, &mapped_nents);
-+					    nbytes, DMA_BIDIRECTIONAL,
-+					    &req_ctx->in_nents,
-+					    LLI_MAX_NUM_OF_DATA_ENTRIES, &dummy,
-+					    &mapped_nents);
- 	if (unlikely(rc != 0)) {
- 		rc = -ENOMEM;
- 		goto ablkcipher_exit;
-@@ -570,8 +567,10 @@ int ssi_buffer_mgr_map_blkcipher_request(
- 		if (unlikely(req_ctx->dma_buf_type == SSI_DMA_BUF_MLLI)) {
- 			req_ctx->out_nents = 0;
- 			ssi_buffer_mgr_add_scatterlist_entry(&sg_data,
--				req_ctx->in_nents, src,
--				nbytes, 0, true, &req_ctx->in_mlli_nents);
-+							     req_ctx->in_nents,
-+							     src, nbytes, 0,
-+							     true,
-+							     &req_ctx->in_mlli_nents);
- 		}
- 	} else {
- 		/* Map the dst sg */
-@@ -588,13 +587,15 @@ int ssi_buffer_mgr_map_blkcipher_request(
- 
- 		if (unlikely((req_ctx->dma_buf_type == SSI_DMA_BUF_MLLI))) {
- 			ssi_buffer_mgr_add_scatterlist_entry(&sg_data,
--				req_ctx->in_nents, src,
--				nbytes, 0, true,
--				&req_ctx->in_mlli_nents);
-+							     req_ctx->in_nents,
-+							     src, nbytes, 0,
-+							     true,
-+							     &req_ctx->in_mlli_nents);
- 			ssi_buffer_mgr_add_scatterlist_entry(&sg_data,
--				req_ctx->out_nents, dst,
--				nbytes, 0, true,
--				&req_ctx->out_mlli_nents);
-+							     req_ctx->out_nents,
-+							     dst, nbytes, 0,
-+							     true,
-+							     &req_ctx->out_mlli_nents);
- 		}
- 	}
- 
-@@ -606,7 +607,7 @@ int ssi_buffer_mgr_map_blkcipher_request(
- 	}
- 
- 	SSI_LOG_DEBUG("areq_ctx->dma_buf_type = %s\n",
--		GET_DMA_BUFFER_TYPE(req_ctx->dma_buf_type));
-+		      GET_DMA_BUFFER_TYPE(req_ctx->dma_buf_type));
- 
- 	return 0;
- 
-@@ -628,7 +629,7 @@ void ssi_buffer_mgr_unmap_aead_request(
- 
- 	if (areq_ctx->mac_buf_dma_addr != 0) {
- 		dma_unmap_single(dev, areq_ctx->mac_buf_dma_addr,
--			MAX_MAC_SIZE, DMA_BIDIRECTIONAL);
-+				 MAX_MAC_SIZE, DMA_BIDIRECTIONAL);
- 	}
- 
- #if SSI_CC_HAS_AES_GCM
-@@ -645,12 +646,12 @@ void ssi_buffer_mgr_unmap_aead_request(
- 
- 		if (areq_ctx->gcm_iv_inc1_dma_addr != 0) {
- 			dma_unmap_single(dev, areq_ctx->gcm_iv_inc1_dma_addr,
--				AES_BLOCK_SIZE, DMA_TO_DEVICE);
-+					 AES_BLOCK_SIZE, DMA_TO_DEVICE);
- 		}
- 
- 		if (areq_ctx->gcm_iv_inc2_dma_addr != 0) {
- 			dma_unmap_single(dev, areq_ctx->gcm_iv_inc2_dma_addr,
--				AES_BLOCK_SIZE, DMA_TO_DEVICE);
-+					 AES_BLOCK_SIZE, DMA_TO_DEVICE);
- 		}
- 	}
- #endif
-@@ -658,7 +659,7 @@ void ssi_buffer_mgr_unmap_aead_request(
- 	if (areq_ctx->ccm_hdr_size != ccm_header_size_null) {
- 		if (areq_ctx->ccm_iv0_dma_addr != 0) {
- 			dma_unmap_single(dev, areq_ctx->ccm_iv0_dma_addr,
--				AES_BLOCK_SIZE, DMA_TO_DEVICE);
-+					 AES_BLOCK_SIZE, DMA_TO_DEVICE);
- 		}
- 
- 		dma_unmap_sg(dev, &areq_ctx->ccm_adata_sg, 1, DMA_TO_DEVICE);
-@@ -673,8 +674,8 @@ void ssi_buffer_mgr_unmap_aead_request(
- 	 */
- 	if (areq_ctx->mlli_params.curr_pool) {
- 		SSI_LOG_DEBUG("free MLLI buffer: dma=0x%08llX virt=%pK\n",
--			(unsigned long long)areq_ctx->mlli_params.mlli_dma_addr,
--			areq_ctx->mlli_params.mlli_virt_addr);
-+			      (unsigned long long)areq_ctx->mlli_params.mlli_dma_addr,
-+			      areq_ctx->mlli_params.mlli_virt_addr);
- 		dma_pool_free(areq_ctx->mlli_params.curr_pool,
- 			      areq_ctx->mlli_params.mlli_virt_addr,
- 			      areq_ctx->mlli_params.mlli_dma_addr);
-@@ -690,9 +691,13 @@ void ssi_buffer_mgr_unmap_aead_request(
- 	dma_unmap_sg(dev, req->src, ssi_buffer_mgr_get_sgl_nents(req->src, size_to_unmap, &dummy, &chained), DMA_BIDIRECTIONAL);
- 	if (unlikely(req->src != req->dst)) {
- 		SSI_LOG_DEBUG("Unmapping dst sgl: req->dst=%pK\n",
--			sg_virt(req->dst));
--		dma_unmap_sg(dev, req->dst, ssi_buffer_mgr_get_sgl_nents(req->dst, size_to_unmap, &dummy, &chained),
--			DMA_BIDIRECTIONAL);
-+			      sg_virt(req->dst));
-+		dma_unmap_sg(dev, req->dst,
-+			     ssi_buffer_mgr_get_sgl_nents(req->dst,
-+							  size_to_unmap,
-+							  &dummy,
-+							  &chained),
-+			     DMA_BIDIRECTIONAL);
- 	}
- 	if (drvdata->coherent &&
- 	    (areq_ctx->gen_ctx.op_type == DRV_CRYPTO_DIRECTION_DECRYPT) &&
-@@ -753,11 +758,11 @@ static inline int ssi_buffer_mgr_get_aead_icv_nents(
- 		*is_icv_fragmented = true;
- 	} else {
- 		SSI_LOG_ERR("Unsupported num. of ICV fragments (> %d)\n",
--			MAX_ICV_NENTS_SUPPORTED);
-+			    MAX_ICV_NENTS_SUPPORTED);
- 		nents = -1; /*unsupported*/
- 	}
- 	SSI_LOG_DEBUG("is_frag=%s icv_nents=%u\n",
--		(*is_icv_fragmented ? "true" : "false"), nents);
-+		      (*is_icv_fragmented ? "true" : "false"), nents);
- 
- 	return nents;
- }
-@@ -782,14 +787,14 @@ static inline int ssi_buffer_mgr_aead_chain_iv(
- 		hw_iv_size, DMA_BIDIRECTIONAL);
- 	if (unlikely(dma_mapping_error(dev, areq_ctx->gen_ctx.iv_dma_addr))) {
- 		SSI_LOG_ERR("Mapping iv %u B at va=%pK for DMA failed\n",
--			hw_iv_size, req->iv);
-+			    hw_iv_size, req->iv);
- 		rc = -ENOMEM;
- 		goto chain_iv_exit;
- 	}
- 
- 	SSI_LOG_DEBUG("Mapped iv %u B at va=%pK to dma=0x%llX\n",
--		hw_iv_size, req->iv,
--		(unsigned long long)areq_ctx->gen_ctx.iv_dma_addr);
-+		      hw_iv_size, req->iv,
-+		      (unsigned long long)areq_ctx->gen_ctx.iv_dma_addr);
- 	if (do_chain && areq_ctx->plaintext_authenticate_only) {  // TODO: what about CTR?? ask Ron
- 		struct crypto_aead *tfm = crypto_aead_reqtfm(req);
- 		unsigned int iv_size_to_authenc = crypto_aead_ivsize(tfm);
-@@ -833,8 +838,8 @@ static inline int ssi_buffer_mgr_aead_chain_assoc(
- 		areq_ctx->assoc.nents = 0;
- 		areq_ctx->assoc.mlli_nents = 0;
- 		SSI_LOG_DEBUG("Chain assoc of length 0: buff_type=%s nents=%u\n",
--			GET_DMA_BUFFER_TYPE(areq_ctx->assoc_buff_type),
--			areq_ctx->assoc.nents);
-+			      GET_DMA_BUFFER_TYPE(areq_ctx->assoc_buff_type),
-+			      areq_ctx->assoc.nents);
- 		goto chain_assoc_exit;
- 	}
- 
-@@ -868,10 +873,9 @@ static inline int ssi_buffer_mgr_aead_chain_assoc(
- 	if (areq_ctx->ccm_hdr_size != ccm_header_size_null) {
- 		if (unlikely((mapped_nents + 1) >
- 			LLI_MAX_NUM_OF_ASSOC_DATA_ENTRIES)) {
--			SSI_LOG_ERR("CCM case.Too many fragments. "
--				"Current %d max %d\n",
--				(areq_ctx->assoc.nents + 1),
--				LLI_MAX_NUM_OF_ASSOC_DATA_ENTRIES);
-+			SSI_LOG_ERR("CCM case.Too many fragments. Current %d max %d\n",
-+				    (areq_ctx->assoc.nents + 1),
-+				    LLI_MAX_NUM_OF_ASSOC_DATA_ENTRIES);
- 			rc = -ENOMEM;
- 			goto chain_assoc_exit;
- 		}
-@@ -884,10 +888,10 @@ static inline int ssi_buffer_mgr_aead_chain_assoc(
- 		areq_ctx->assoc_buff_type = SSI_DMA_BUF_MLLI;
- 
- 	if (unlikely((do_chain) ||
--		(areq_ctx->assoc_buff_type == SSI_DMA_BUF_MLLI))) {
-+		     (areq_ctx->assoc_buff_type == SSI_DMA_BUF_MLLI))) {
- 		SSI_LOG_DEBUG("Chain assoc: buff_type=%s nents=%u\n",
--			GET_DMA_BUFFER_TYPE(areq_ctx->assoc_buff_type),
--			areq_ctx->assoc.nents);
-+			      GET_DMA_BUFFER_TYPE(areq_ctx->assoc_buff_type),
-+			      areq_ctx->assoc.nents);
- 		ssi_buffer_mgr_add_scatterlist_entry(
- 			sg_data, areq_ctx->assoc.nents,
- 			req->src, req->assoclen, 0, is_last,
-@@ -951,13 +955,18 @@ static inline int ssi_buffer_mgr_prepare_aead_data_mlli(
- 	if (likely(req->src == req->dst)) {
- 		/*INPLACE*/
- 		ssi_buffer_mgr_add_scatterlist_entry(sg_data,
--			areq_ctx->src.nents, areq_ctx->srcSgl,
--			areq_ctx->cryptlen, areq_ctx->srcOffset, is_last_table,
--			&areq_ctx->src.mlli_nents);
-+						     areq_ctx->src.nents,
-+						     areq_ctx->srcSgl,
-+						     areq_ctx->cryptlen,
-+						     areq_ctx->srcOffset,
-+						     is_last_table,
-+						     &areq_ctx->src.mlli_nents);
- 
- 		icv_nents = ssi_buffer_mgr_get_aead_icv_nents(areq_ctx->srcSgl,
--			areq_ctx->src.nents, authsize, *src_last_bytes,
--			&areq_ctx->is_icv_fragmented);
-+							      areq_ctx->src.nents,
-+							      authsize,
-+							      *src_last_bytes,
-+							      &areq_ctx->is_icv_fragmented);
- 		if (unlikely(icv_nents < 0)) {
- 			rc = -ENOTSUPP;
- 			goto prepare_data_mlli_exit;
-@@ -1005,17 +1014,25 @@ static inline int ssi_buffer_mgr_prepare_aead_data_mlli(
- 	} else if (direct == DRV_CRYPTO_DIRECTION_DECRYPT) {
- 		/*NON-INPLACE and DECRYPT*/
- 		ssi_buffer_mgr_add_scatterlist_entry(sg_data,
--			areq_ctx->src.nents, areq_ctx->srcSgl,
--			areq_ctx->cryptlen, areq_ctx->srcOffset, is_last_table,
--			&areq_ctx->src.mlli_nents);
-+						     areq_ctx->src.nents,
-+						     areq_ctx->srcSgl,
-+						     areq_ctx->cryptlen,
-+						     areq_ctx->srcOffset,
-+						     is_last_table,
-+						     &areq_ctx->src.mlli_nents);
- 		ssi_buffer_mgr_add_scatterlist_entry(sg_data,
--			areq_ctx->dst.nents, areq_ctx->dstSgl,
--			areq_ctx->cryptlen, areq_ctx->dstOffset, is_last_table,
--			&areq_ctx->dst.mlli_nents);
-+						     areq_ctx->dst.nents,
-+						     areq_ctx->dstSgl,
-+						     areq_ctx->cryptlen,
-+						     areq_ctx->dstOffset,
-+						     is_last_table,
-+						     &areq_ctx->dst.mlli_nents);
- 
- 		icv_nents = ssi_buffer_mgr_get_aead_icv_nents(areq_ctx->srcSgl,
--			areq_ctx->src.nents, authsize, *src_last_bytes,
--			&areq_ctx->is_icv_fragmented);
-+							      areq_ctx->src.nents,
-+							      authsize,
-+							      *src_last_bytes,
-+							      &areq_ctx->is_icv_fragmented);
- 		if (unlikely(icv_nents < 0)) {
- 			rc = -ENOTSUPP;
- 			goto prepare_data_mlli_exit;
-@@ -1049,16 +1066,24 @@ static inline int ssi_buffer_mgr_prepare_aead_data_mlli(
- 	} else {
- 		/*NON-INPLACE and ENCRYPT*/
- 		ssi_buffer_mgr_add_scatterlist_entry(sg_data,
--			areq_ctx->dst.nents, areq_ctx->dstSgl,
--			areq_ctx->cryptlen, areq_ctx->dstOffset, is_last_table,
--			&areq_ctx->dst.mlli_nents);
-+						     areq_ctx->dst.nents,
-+						     areq_ctx->dstSgl,
-+						     areq_ctx->cryptlen,
-+						     areq_ctx->dstOffset,
-+						     is_last_table,
-+						     &areq_ctx->dst.mlli_nents);
- 		ssi_buffer_mgr_add_scatterlist_entry(sg_data,
--			areq_ctx->src.nents, areq_ctx->srcSgl,
--			areq_ctx->cryptlen, areq_ctx->srcOffset, is_last_table,
--			&areq_ctx->src.mlli_nents);
-+						     areq_ctx->src.nents,
-+						     areq_ctx->srcSgl,
-+						     areq_ctx->cryptlen,
-+						     areq_ctx->srcOffset,
-+						     is_last_table,
-+						     &areq_ctx->src.mlli_nents);
- 
- 		icv_nents = ssi_buffer_mgr_get_aead_icv_nents(areq_ctx->dstSgl,
--			areq_ctx->dst.nents, authsize, *dst_last_bytes,
-+							      areq_ctx->dst.nents,
-+							      authsize,
-+							      *dst_last_bytes,
- 			&areq_ctx->is_icv_fragmented);
- 		if (unlikely(icv_nents < 0)) {
- 			rc = -ENOTSUPP;
-@@ -1137,7 +1162,7 @@ static inline int ssi_buffer_mgr_aead_chain_data(
- 	if (unlikely(src_mapped_nents > LLI_MAX_NUM_OF_DATA_ENTRIES))
- 	{
- 		SSI_LOG_ERR("Too many fragments. current %d max %d\n",
--				src_mapped_nents, LLI_MAX_NUM_OF_DATA_ENTRIES);
-+			    src_mapped_nents, LLI_MAX_NUM_OF_DATA_ENTRIES);
- 			return -ENOMEM;
- 	}
- 
-@@ -1152,9 +1177,11 @@ static inline int ssi_buffer_mgr_aead_chain_data(
- 			size_for_map += crypto_aead_ivsize(tfm);
- 
- 		rc = ssi_buffer_mgr_map_scatterlist(dev, req->dst, size_for_map,
--			 DMA_BIDIRECTIONAL, &(areq_ctx->dst.nents),
--			 LLI_MAX_NUM_OF_DATA_ENTRIES, &dst_last_bytes,
--						   &dst_mapped_nents);
-+						    DMA_BIDIRECTIONAL,
-+						    &(areq_ctx->dst.nents),
-+						    LLI_MAX_NUM_OF_DATA_ENTRIES,
-+						    &dst_last_bytes,
-+						    &dst_mapped_nents);
- 		if (unlikely(rc != 0)) {
- 			rc = -ENOMEM;
- 			goto chain_data_exit;
-@@ -1189,8 +1216,11 @@ static inline int ssi_buffer_mgr_aead_chain_data(
- 	    (dst_mapped_nents  > 1) ||
- 	    do_chain) {
- 		areq_ctx->data_buff_type = SSI_DMA_BUF_MLLI;
--		rc = ssi_buffer_mgr_prepare_aead_data_mlli(drvdata, req, sg_data,
--			&src_last_bytes, &dst_last_bytes, is_last_table);
-+		rc = ssi_buffer_mgr_prepare_aead_data_mlli(drvdata, req,
-+							   sg_data,
-+							   &src_last_bytes,
-+							   &dst_last_bytes,
-+							   is_last_table);
- 	} else {
- 		areq_ctx->data_buff_type = SSI_DMA_BUF_DLLI;
- 		ssi_buffer_mgr_prepare_aead_data_dlli(
-@@ -1202,7 +1232,7 @@ static inline int ssi_buffer_mgr_aead_chain_data(
- }
- 
- static void ssi_buffer_mgr_update_aead_mlli_nents(struct ssi_drvdata *drvdata,
--					   struct aead_request *req)
-+						  struct aead_request *req)
- {
- 	struct aead_req_ctx *areq_ctx = aead_request_ctx(req);
- 	u32 curr_mlli_size = 0;
-@@ -1300,7 +1330,7 @@ int ssi_buffer_mgr_map_aead_request(
- 		areq_ctx->mac_buf, MAX_MAC_SIZE, DMA_BIDIRECTIONAL);
- 	if (unlikely(dma_mapping_error(dev, areq_ctx->mac_buf_dma_addr))) {
- 		SSI_LOG_ERR("Mapping mac_buf %u B at va=%pK for DMA failed\n",
--			MAX_MAC_SIZE, areq_ctx->mac_buf);
-+			    MAX_MAC_SIZE, areq_ctx->mac_buf);
- 		rc = -ENOMEM;
- 		goto aead_map_failure;
- 	}
-@@ -1319,7 +1349,8 @@ int ssi_buffer_mgr_map_aead_request(
- 			goto aead_map_failure;
- 		}
- 		if (ssi_aead_handle_config_buf(dev, areq_ctx,
--			areq_ctx->ccm_config, &sg_data, req->assoclen) != 0) {
-+					       areq_ctx->ccm_config, &sg_data,
-+					       req->assoclen) != 0) {
- 			rc = -ENOMEM;
- 			goto aead_map_failure;
- 		}
-@@ -1331,7 +1362,7 @@ int ssi_buffer_mgr_map_aead_request(
- 			areq_ctx->hkey, AES_BLOCK_SIZE, DMA_BIDIRECTIONAL);
- 		if (unlikely(dma_mapping_error(dev, areq_ctx->hkey_dma_addr))) {
- 			SSI_LOG_ERR("Mapping hkey %u B at va=%pK for DMA failed\n",
--				AES_BLOCK_SIZE, areq_ctx->hkey);
-+				    AES_BLOCK_SIZE, areq_ctx->hkey);
- 			rc = -ENOMEM;
- 			goto aead_map_failure;
- 		}
-@@ -1340,7 +1371,7 @@ int ssi_buffer_mgr_map_aead_request(
- 			&areq_ctx->gcm_len_block, AES_BLOCK_SIZE, DMA_TO_DEVICE);
- 		if (unlikely(dma_mapping_error(dev, areq_ctx->gcm_block_len_dma_addr))) {
- 			SSI_LOG_ERR("Mapping gcm_len_block %u B at va=%pK for DMA failed\n",
--				AES_BLOCK_SIZE, &areq_ctx->gcm_len_block);
-+				    AES_BLOCK_SIZE, &areq_ctx->gcm_len_block);
- 			rc = -ENOMEM;
- 			goto aead_map_failure;
- 		}
-@@ -1491,18 +1522,18 @@ int ssi_buffer_mgr_map_hash_request_final(
- 	/* map the previous buffer */
- 	if (*curr_buff_cnt != 0) {
- 		if (ssi_ahash_handle_curr_buf(dev, areq_ctx, curr_buff,
--					    *curr_buff_cnt, &sg_data) != 0) {
-+					      *curr_buff_cnt, &sg_data) != 0) {
- 			return -ENOMEM;
- 		}
- 	}
- 
- 	if (src && (nbytes > 0) && do_update) {
--		if (unlikely(ssi_buffer_mgr_map_scatterlist(dev, src,
--					  nbytes,
--					  DMA_TO_DEVICE,
--					  &areq_ctx->in_nents,
--					  LLI_MAX_NUM_OF_DATA_ENTRIES,
--					  &dummy, &mapped_nents))){
-+		if (unlikely(ssi_buffer_mgr_map_scatterlist(dev, src, nbytes,
-+							    DMA_TO_DEVICE,
-+							    &areq_ctx->in_nents,
-+							    LLI_MAX_NUM_OF_DATA_ENTRIES,
-+							    &dummy,
-+							    &mapped_nents))){
- 			goto unmap_curr_buff;
- 		}
- 		if (src && (mapped_nents == 1)
-@@ -1522,19 +1553,18 @@ int ssi_buffer_mgr_map_hash_request_final(
- 		mlli_params->curr_pool = buff_mgr->mlli_buffs_pool;
- 		/* add the src data to the sg_data */
- 		ssi_buffer_mgr_add_scatterlist_entry(&sg_data,
--					areq_ctx->in_nents,
--					src,
--					nbytes, 0,
--					true, &areq_ctx->mlli_nents);
-+						     areq_ctx->in_nents,
-+						     src, nbytes, 0, true,
-+						     &areq_ctx->mlli_nents);
- 		if (unlikely(ssi_buffer_mgr_generate_mlli(dev, &sg_data,
--						  mlli_params) != 0)) {
-+							  mlli_params) != 0)) {
- 			goto fail_unmap_din;
- 		}
- 	}
- 	/* change the buffer index for the unmap function */
- 	areq_ctx->buff_index = (areq_ctx->buff_index ^ 1);
- 	SSI_LOG_DEBUG("areq_ctx->data_dma_buf_type = %s\n",
--		GET_DMA_BUFFER_TYPE(areq_ctx->data_dma_buf_type));
-+		      GET_DMA_BUFFER_TYPE(areq_ctx->data_dma_buf_type));
- 	return 0;
- 
- fail_unmap_din:
-@@ -1588,8 +1618,8 @@ int ssi_buffer_mgr_map_hash_request_update(
- 			&curr_buff[*curr_buff_cnt]);
- 		areq_ctx->in_nents =
- 			ssi_buffer_mgr_get_sgl_nents(src,
--						    nbytes,
--						    &dummy, NULL);
-+						     nbytes,
-+						     &dummy, NULL);
- 		sg_copy_to_buffer(src, areq_ctx->in_nents,
- 				  &curr_buff[*curr_buff_cnt], nbytes);
- 		*curr_buff_cnt += nbytes;
-@@ -1612,15 +1642,15 @@ int ssi_buffer_mgr_map_hash_request_update(
- 			     (update_data_len - *curr_buff_cnt),
- 			     *next_buff_cnt);
- 		ssi_buffer_mgr_copy_scatterlist_portion(next_buff, src,
--			     (update_data_len - *curr_buff_cnt),
--			     nbytes, SSI_SG_TO_BUF);
-+							(update_data_len - *curr_buff_cnt),
-+							nbytes, SSI_SG_TO_BUF);
- 		/* change the buffer index for next operation */
- 		swap_index = 1;
- 	}
- 
- 	if (*curr_buff_cnt != 0) {
- 		if (ssi_ahash_handle_curr_buf(dev, areq_ctx, curr_buff,
--					    *curr_buff_cnt, &sg_data) != 0) {
-+					      *curr_buff_cnt, &sg_data) != 0) {
- 			return -ENOMEM;
- 		}
- 		/* change the buffer index for next operation */
-@@ -1629,11 +1659,12 @@ int ssi_buffer_mgr_map_hash_request_update(
- 
- 	if (update_data_len > *curr_buff_cnt) {
- 		if (unlikely(ssi_buffer_mgr_map_scatterlist(dev, src,
--					  (update_data_len - *curr_buff_cnt),
--					  DMA_TO_DEVICE,
--					  &areq_ctx->in_nents,
--					  LLI_MAX_NUM_OF_DATA_ENTRIES,
--					  &dummy, &mapped_nents))){
-+							    (update_data_len - *curr_buff_cnt),
-+							    DMA_TO_DEVICE,
-+							    &areq_ctx->in_nents,
-+							    LLI_MAX_NUM_OF_DATA_ENTRIES,
-+							    &dummy,
-+							    &mapped_nents))){
- 			goto unmap_curr_buff;
- 		}
- 		if ((mapped_nents == 1)
-@@ -1653,12 +1684,14 @@ int ssi_buffer_mgr_map_hash_request_update(
- 		mlli_params->curr_pool = buff_mgr->mlli_buffs_pool;
- 		/* add the src data to the sg_data */
- 		ssi_buffer_mgr_add_scatterlist_entry(&sg_data,
--					areq_ctx->in_nents,
--					src,
--					(update_data_len - *curr_buff_cnt), 0,
--					true, &areq_ctx->mlli_nents);
-+						     areq_ctx->in_nents,
-+						     src,
-+						     (update_data_len - *curr_buff_cnt),
-+						     0,
-+						     true,
-+						     &areq_ctx->mlli_nents);
- 		if (unlikely(ssi_buffer_mgr_generate_mlli(dev, &sg_data,
--						  mlli_params) != 0)) {
-+							  mlli_params) != 0)) {
- 			goto fail_unmap_din;
- 		}
- 	}
-@@ -1688,8 +1721,8 @@ void ssi_buffer_mgr_unmap_hash_request(
- 	 */
- 	if (areq_ctx->mlli_params.curr_pool) {
- 		SSI_LOG_DEBUG("free MLLI buffer: dma=0x%llX virt=%pK\n",
--			     (unsigned long long)areq_ctx->mlli_params.mlli_dma_addr,
--			     areq_ctx->mlli_params.mlli_virt_addr);
-+			      (unsigned long long)areq_ctx->mlli_params.mlli_dma_addr,
-+			      areq_ctx->mlli_params.mlli_virt_addr);
- 		dma_pool_free(areq_ctx->mlli_params.curr_pool,
- 			      areq_ctx->mlli_params.mlli_virt_addr,
- 			      areq_ctx->mlli_params.mlli_dma_addr);
-@@ -1697,9 +1730,9 @@ void ssi_buffer_mgr_unmap_hash_request(
- 
- 	if ((src) && likely(areq_ctx->in_nents != 0)) {
- 		SSI_LOG_DEBUG("Unmapped sg src: virt=%pK dma=0x%llX len=0x%X\n",
--			     sg_virt(src),
--			     (unsigned long long)sg_dma_address(src),
--			     sg_dma_len(src));
-+			      sg_virt(src),
-+			      (unsigned long long)sg_dma_address(src),
-+			      sg_dma_len(src));
- 		dma_unmap_sg(dev, src,
- 			     areq_ctx->in_nents, DMA_TO_DEVICE);
- 	}
--- 
-2.11.0
+Rml4ZXMgY2hlY2twYXRjaC5wbCBhbGlnbm1lbnQgd2FybmluZ3MuCgpTaWduZWQtb2ZmLWJ5OiBT
+aW1vbiBTYW5kc3Ryw7ZtIDxzaW1vbkBuaWthbm9yLm51PgotLS0KIGRyaXZlcnMvc3RhZ2luZy9j
+Y3JlZS9zc2lfYWVhZC5jIHwgNjcgKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0t
+LS0tLQogMSBmaWxlIGNoYW5nZWQsIDM1IGluc2VydGlvbnMoKyksIDMyIGRlbGV0aW9ucygtKQoK
+ZGlmZiAtLWdpdCBhL2RyaXZlcnMvc3RhZ2luZy9jY3JlZS9zc2lfYWVhZC5jIGIvZHJpdmVycy9z
+dGFnaW5nL2NjcmVlL3NzaV9hZWFkLmMKaW5kZXggMWZjMGIwNWVhMGQ1Li4xNDYxNzNiOGNiYjkg
+MTAwNjQ0Ci0tLSBhL2RyaXZlcnMvc3RhZ2luZy9jY3JlZS9zc2lfYWVhZC5jCisrKyBiL2RyaXZl
+cnMvc3RhZ2luZy9jY3JlZS9zc2lfYWVhZC5jCkBAIC05MywxNCArOTMsMTQgQEAgc3RhdGljIHZv
+aWQgc3NpX2FlYWRfZXhpdChzdHJ1Y3QgY3J5cHRvX2FlYWQgKnRmbSkKIAlzdHJ1Y3Qgc3NpX2Fl
+YWRfY3R4ICpjdHggPSBjcnlwdG9fYWVhZF9jdHgodGZtKTsKIAogCVNTSV9MT0dfREVCVUcoIkNs
+ZWFyaW5nIGNvbnRleHQgQCVwIGZvciAlc1xuIiwKLQkJY3J5cHRvX2FlYWRfY3R4KHRmbSksIGNy
+eXB0b190Zm1fYWxnX25hbWUoJih0Zm0tPmJhc2UpKSk7CisJCSAgICAgIGNyeXB0b19hZWFkX2N0
+eCh0Zm0pLCBjcnlwdG9fdGZtX2FsZ19uYW1lKCYodGZtLT5iYXNlKSkpOwogCiAJZGV2ID0gJmN0
+eC0+ZHJ2ZGF0YS0+cGxhdF9kZXYtPmRldjsKIAkvKiBVbm1hcCBlbmNrZXkgYnVmZmVyICovCiAJ
+aWYgKGN0eC0+ZW5ja2V5KSB7CiAJCWRtYV9mcmVlX2NvaGVyZW50KGRldiwgQUVTX01BWF9LRVlf
+U0laRSwgY3R4LT5lbmNrZXksIGN0eC0+ZW5ja2V5X2RtYV9hZGRyKTsKIAkJU1NJX0xPR19ERUJV
+RygiRnJlZWQgZW5ja2V5IERNQSBidWZmZXIgZW5ja2V5X2RtYV9hZGRyPTB4JWxsWFxuIiwKLQkJ
+CSh1bnNpZ25lZCBsb25nIGxvbmcpY3R4LT5lbmNrZXlfZG1hX2FkZHIpOworCQkJICAgICAgKHVu
+c2lnbmVkIGxvbmcgbG9uZyljdHgtPmVuY2tleV9kbWFfYWRkcik7CiAJCWN0eC0+ZW5ja2V5X2Rt
+YV9hZGRyID0gMDsKIAkJY3R4LT5lbmNrZXkgPSBOVUxMOwogCX0KQEAgLTEwOCwyOSArMTA4LDI5
+IEBAIHN0YXRpYyB2b2lkIHNzaV9hZWFkX2V4aXQoc3RydWN0IGNyeXB0b19hZWFkICp0Zm0pCiAJ
+aWYgKGN0eC0+YXV0aF9tb2RlID09IERSVl9IQVNIX1hDQkNfTUFDKSB7IC8qIFhDQkMgYXV0aGV0
+aWNhdGlvbiAqLwogCQlpZiAoY3R4LT5hdXRoX3N0YXRlLnhjYmMueGNiY19rZXlzKSB7CiAJCQlk
+bWFfZnJlZV9jb2hlcmVudChkZXYsIENDX0FFU18xMjhfQklUX0tFWV9TSVpFICogMywKLQkJCQlj
+dHgtPmF1dGhfc3RhdGUueGNiYy54Y2JjX2tleXMsCi0JCQkJY3R4LT5hdXRoX3N0YXRlLnhjYmMu
+eGNiY19rZXlzX2RtYV9hZGRyKTsKKwkJCQkJICBjdHgtPmF1dGhfc3RhdGUueGNiYy54Y2JjX2tl
+eXMsCisJCQkJCSAgY3R4LT5hdXRoX3N0YXRlLnhjYmMueGNiY19rZXlzX2RtYV9hZGRyKTsKIAkJ
+fQogCQlTU0lfTE9HX0RFQlVHKCJGcmVlZCB4Y2JjX2tleXMgRE1BIGJ1ZmZlciB4Y2JjX2tleXNf
+ZG1hX2FkZHI9MHglbGxYXG4iLAotCQkJKHVuc2lnbmVkIGxvbmcgbG9uZyljdHgtPmF1dGhfc3Rh
+dGUueGNiYy54Y2JjX2tleXNfZG1hX2FkZHIpOworCQkJICAgICAgKHVuc2lnbmVkIGxvbmcgbG9u
+ZyljdHgtPmF1dGhfc3RhdGUueGNiYy54Y2JjX2tleXNfZG1hX2FkZHIpOwogCQljdHgtPmF1dGhf
+c3RhdGUueGNiYy54Y2JjX2tleXNfZG1hX2FkZHIgPSAwOwogCQljdHgtPmF1dGhfc3RhdGUueGNi
+Yy54Y2JjX2tleXMgPSBOVUxMOwogCX0gZWxzZSBpZiAoY3R4LT5hdXRoX21vZGUgIT0gRFJWX0hB
+U0hfTlVMTCkgeyAvKiBITUFDIGF1dGguICovCiAJCWlmIChjdHgtPmF1dGhfc3RhdGUuaG1hYy5p
+cGFkX29wYWQpIHsKIAkJCWRtYV9mcmVlX2NvaGVyZW50KGRldiwgMiAqIE1BWF9ITUFDX0RJR0VT
+VF9TSVpFLAotCQkJCWN0eC0+YXV0aF9zdGF0ZS5obWFjLmlwYWRfb3BhZCwKLQkJCQljdHgtPmF1
+dGhfc3RhdGUuaG1hYy5pcGFkX29wYWRfZG1hX2FkZHIpOworCQkJCQkgIGN0eC0+YXV0aF9zdGF0
+ZS5obWFjLmlwYWRfb3BhZCwKKwkJCQkJICBjdHgtPmF1dGhfc3RhdGUuaG1hYy5pcGFkX29wYWRf
+ZG1hX2FkZHIpOwogCQkJU1NJX0xPR19ERUJVRygiRnJlZWQgaXBhZF9vcGFkIERNQSBidWZmZXIg
+aXBhZF9vcGFkX2RtYV9hZGRyPTB4JWxsWFxuIiwKLQkJCQkodW5zaWduZWQgbG9uZyBsb25nKWN0
+eC0+YXV0aF9zdGF0ZS5obWFjLmlwYWRfb3BhZF9kbWFfYWRkcik7CisJCQkJICAgICAgKHVuc2ln
+bmVkIGxvbmcgbG9uZyljdHgtPmF1dGhfc3RhdGUuaG1hYy5pcGFkX29wYWRfZG1hX2FkZHIpOwog
+CQkJY3R4LT5hdXRoX3N0YXRlLmhtYWMuaXBhZF9vcGFkX2RtYV9hZGRyID0gMDsKIAkJCWN0eC0+
+YXV0aF9zdGF0ZS5obWFjLmlwYWRfb3BhZCA9IE5VTEw7CiAJCX0KIAkJaWYgKGN0eC0+YXV0aF9z
+dGF0ZS5obWFjLnBhZGRlZF9hdXRoa2V5KSB7CiAJCQlkbWFfZnJlZV9jb2hlcmVudChkZXYsIE1B
+WF9ITUFDX0JMT0NLX1NJWkUsCi0JCQkJY3R4LT5hdXRoX3N0YXRlLmhtYWMucGFkZGVkX2F1dGhr
+ZXksCi0JCQkJY3R4LT5hdXRoX3N0YXRlLmhtYWMucGFkZGVkX2F1dGhrZXlfZG1hX2FkZHIpOwor
+CQkJCQkgIGN0eC0+YXV0aF9zdGF0ZS5obWFjLnBhZGRlZF9hdXRoa2V5LAorCQkJCQkgIGN0eC0+
+YXV0aF9zdGF0ZS5obWFjLnBhZGRlZF9hdXRoa2V5X2RtYV9hZGRyKTsKIAkJCVNTSV9MT0dfREVC
+VUcoIkZyZWVkIHBhZGRlZF9hdXRoa2V5IERNQSBidWZmZXIgcGFkZGVkX2F1dGhrZXlfZG1hX2Fk
+ZHI9MHglbGxYXG4iLAotCQkJCSh1bnNpZ25lZCBsb25nIGxvbmcpY3R4LT5hdXRoX3N0YXRlLmht
+YWMucGFkZGVkX2F1dGhrZXlfZG1hX2FkZHIpOworCQkJCSAgICAgICh1bnNpZ25lZCBsb25nIGxv
+bmcpY3R4LT5hdXRoX3N0YXRlLmhtYWMucGFkZGVkX2F1dGhrZXlfZG1hX2FkZHIpOwogCQkJY3R4
+LT5hdXRoX3N0YXRlLmhtYWMucGFkZGVkX2F1dGhrZXlfZG1hX2FkZHIgPSAwOwogCQkJY3R4LT5h
+dXRoX3N0YXRlLmhtYWMucGFkZGVkX2F1dGhrZXkgPSBOVUxMOwogCQl9CkBAIC0xODcsNyArMTg3
+LDcgQEAgc3RhdGljIGludCBzc2lfYWVhZF9pbml0KHN0cnVjdCBjcnlwdG9fYWVhZCAqdGZtKQog
+CQkJZ290byBpbml0X2ZhaWxlZDsKIAkJfQogCQlTU0lfTE9HX0RFQlVHKCJBbGxvY2F0ZWQgYXV0
+aGtleSBidWZmZXIgaW4gY29udGV4dCBjdHgtPmF1dGhrZXk9QCVwXG4iLAotCQkJY3R4LT5hdXRo
+X3N0YXRlLmhtYWMuaXBhZF9vcGFkKTsKKwkJCSAgICAgIGN0eC0+YXV0aF9zdGF0ZS5obWFjLmlw
+YWRfb3BhZCk7CiAKIAkJY3R4LT5hdXRoX3N0YXRlLmhtYWMucGFkZGVkX2F1dGhrZXkgPSBkbWFf
+YWxsb2NfY29oZXJlbnQoZGV2LAogCQkJTUFYX0hNQUNfQkxPQ0tfU0laRSwKQEAgLTIyMyw3ICsy
+MjMsNyBAQCBzdGF0aWMgdm9pZCBzc2lfYWVhZF9jb21wbGV0ZShzdHJ1Y3QgZGV2aWNlICpkZXYs
+IHZvaWQgKnNzaV9yZXEsIHZvaWQgX19pb21lbSAqYwogCiAJaWYgKGFyZXFfY3R4LT5nZW5fY3R4
+Lm9wX3R5cGUgPT0gRFJWX0NSWVBUT19ESVJFQ1RJT05fREVDUllQVCkgewogCQlpZiAobWVtY21w
+KGFyZXFfY3R4LT5tYWNfYnVmLCBhcmVxX2N0eC0+aWN2X3ZpcnRfYWRkciwKLQkJCWN0eC0+YXV0
+aHNpemUpICE9IDApIHsKKwkJCSAgIGN0eC0+YXV0aHNpemUpICE9IDApIHsKIAkJCVNTSV9MT0df
+REVCVUcoIlBheWxvYWQgYXV0aGVudGljYXRpb24gZmFpbHVyZSwgIgogCQkJCSIoYXV0aC1zaXpl
+PSVkLCBjaXBoZXI9JWQpLlxuIiwKIAkJCQljdHgtPmF1dGhzaXplLCBjdHgtPmNpcGhlcl9tb2Rl
+KTsKQEAgLTM2MSw3ICszNjEsNyBAQCBzdGF0aWMgaW50IGhtYWNfc2V0a2V5KHN0cnVjdCBjY19o
+d19kZXNjICpkZXNjLCBzdHJ1Y3Qgc3NpX2FlYWRfY3R4ICpjdHgpCiBzdGF0aWMgaW50IHZhbGlk
+YXRlX2tleXNfc2l6ZXMoc3RydWN0IHNzaV9hZWFkX2N0eCAqY3R4KQogewogCVNTSV9MT0dfREVC
+VUcoImVuY19rZXlsZW49JXUgIGF1dGhrZXlsZW49JXVcbiIsCi0JCWN0eC0+ZW5jX2tleWxlbiwg
+Y3R4LT5hdXRoX2tleWxlbik7CisJCSAgICAgIGN0eC0+ZW5jX2tleWxlbiwgY3R4LT5hdXRoX2tl
+eWxlbik7CiAKIAlzd2l0Y2ggKGN0eC0+YXV0aF9tb2RlKSB7CiAJY2FzZSBEUlZfSEFTSF9TSEEx
+OgpAQCAtMzg1LDcgKzM4NSw3IEBAIHN0YXRpYyBpbnQgdmFsaWRhdGVfa2V5c19zaXplcyhzdHJ1
+Y3Qgc3NpX2FlYWRfY3R4ICpjdHgpCiAJaWYgKHVubGlrZWx5KGN0eC0+Zmxvd19tb2RlID09IFNf
+RElOX3RvX0RFUykpIHsKIAkJaWYgKGN0eC0+ZW5jX2tleWxlbiAhPSBERVMzX0VERV9LRVlfU0la
+RSkgewogCQkJU1NJX0xPR19FUlIoIkludmFsaWQgY2lwaGVyKDNERVMpIGtleSBzaXplOiAldVxu
+IiwKLQkJCQljdHgtPmVuY19rZXlsZW4pOworCQkJCSAgICBjdHgtPmVuY19rZXlsZW4pOwogCQkJ
+cmV0dXJuIC1FSU5WQUw7CiAJCX0KIAl9IGVsc2UgeyAvKiBEZWZhdWx0IGFzc3VtZWQgdG8gYmUg
+QUVTIGNpcGhlcnMgKi8KQEAgLTM5Myw3ICszOTMsNyBAQCBzdGF0aWMgaW50IHZhbGlkYXRlX2tl
+eXNfc2l6ZXMoc3RydWN0IHNzaV9hZWFkX2N0eCAqY3R4KQogCQkgICAgKGN0eC0+ZW5jX2tleWxl
+biAhPSBBRVNfS0VZU0laRV8xOTIpICYmCiAJCSAgICAoY3R4LT5lbmNfa2V5bGVuICE9IEFFU19L
+RVlTSVpFXzI1NikpIHsKIAkJCVNTSV9MT0dfRVJSKCJJbnZhbGlkIGNpcGhlcihBRVMpIGtleSBz
+aXplOiAldVxuIiwKLQkJCQljdHgtPmVuY19rZXlsZW4pOworCQkJCSAgICBjdHgtPmVuY19rZXls
+ZW4pOwogCQkJcmV0dXJuIC1FSU5WQUw7CiAJCX0KIAl9CkBAIC01MzYsNyArNTM2LDggQEAgc3Np
+X2FlYWRfc2V0a2V5KHN0cnVjdCBjcnlwdG9fYWVhZCAqdGZtLCBjb25zdCB1OCAqa2V5LCB1bnNp
+Z25lZCBpbnQga2V5bGVuKQogCWludCBzZXFfbGVuID0gMCwgcmMgPSAtRUlOVkFMOwogCiAJU1NJ
+X0xPR19ERUJVRygiU2V0dGluZyBrZXkgaW4gY29udGV4dCBAJXAgZm9yICVzLiBrZXk9JXAga2V5
+bGVuPSV1XG4iLAotCQljdHgsIGNyeXB0b190Zm1fYWxnX25hbWUoY3J5cHRvX2FlYWRfdGZtKHRm
+bSkpLCBrZXksIGtleWxlbik7CisJCSAgICAgIGN0eCwgY3J5cHRvX3RmbV9hbGdfbmFtZShjcnlw
+dG9fYWVhZF90Zm0odGZtKSksCisJCSAgICAgIGtleSwga2V5bGVuKTsKIAogCUNIRUNLX0FORF9S
+RVRVUk5fVVBPTl9GSVBTX0VSUk9SKCk7CiAJLyogU1RBVF9QSEFTRV8wOiBJbml0IGFuZCBzYW5p
+dHkgY2hlY2tzICovCkBAIC02NjksNyArNjcwLDcgQEAgc3RhdGljIGludCBzc2lfYWVhZF9zZXRh
+dXRoc2l6ZSgKIAogI2lmIFNTSV9DQ19IQVNfQUVTX0NDTQogc3RhdGljIGludCBzc2lfcmZjNDMw
+OV9jY21fc2V0YXV0aHNpemUoc3RydWN0IGNyeXB0b19hZWFkICphdXRoZW5jLAotCQkJCSAgICAg
+IHVuc2lnbmVkIGludCBhdXRoc2l6ZSkKKwkJCQkgICAgICAgdW5zaWduZWQgaW50IGF1dGhzaXpl
+KQogewogCXN3aXRjaCAoYXV0aHNpemUpIHsKIAljYXNlIDg6CkBAIC02ODQsNyArNjg1LDcgQEAg
+c3RhdGljIGludCBzc2lfcmZjNDMwOV9jY21fc2V0YXV0aHNpemUoc3RydWN0IGNyeXB0b19hZWFk
+ICphdXRoZW5jLAogfQogCiBzdGF0aWMgaW50IHNzaV9jY21fc2V0YXV0aHNpemUoc3RydWN0IGNy
+eXB0b19hZWFkICphdXRoZW5jLAotCQkJCSAgICAgIHVuc2lnbmVkIGludCBhdXRoc2l6ZSkKKwkJ
+CSAgICAgICB1bnNpZ25lZCBpbnQgYXV0aHNpemUpCiB7CiAJc3dpdGNoIChhdXRoc2l6ZSkgewog
+CWNhc2UgNDoKQEAgLTExNjgsOCArMTE2OSw4IEBAIHN0YXRpYyBpbmxpbmUgdm9pZCBzc2lfYWVh
+ZF9sb2FkX21sbGlfdG9fc3JhbSgKIAkJKHJlcV9jdHgtPmRhdGFfYnVmZl90eXBlID09IFNTSV9E
+TUFfQlVGX01MTEkpIHx8CiAJCSFyZXFfY3R4LT5pc19zaW5nbGVfcGFzcykpIHsKIAkJU1NJX0xP
+R19ERUJVRygiQ29weS10by1zcmFtOiBtbGxpX2RtYT0lMDh4LCBtbGxpX3NpemU9JXVcbiIsCi0J
+CQkodW5zaWduZWQgaW50KWN0eC0+ZHJ2ZGF0YS0+bWxsaV9zcmFtX2FkZHIsCi0JCQlyZXFfY3R4
+LT5tbGxpX3BhcmFtcy5tbGxpX2xlbik7CisJCQkgICAgICAodW5zaWduZWQgaW50KWN0eC0+ZHJ2
+ZGF0YS0+bWxsaV9zcmFtX2FkZHIsCisJCQkgICAgICByZXFfY3R4LT5tbGxpX3BhcmFtcy5tbGxp
+X2xlbik7CiAJCS8qIENvcHkgTUxMSSB0YWJsZSBob3N0LXRvLXNyYW0gKi8KIAkJaHdfZGVzY19p
+bml0KCZkZXNjWypzZXFfc2l6ZV0pOwogCQlzZXRfZGluX3R5cGUoJmRlc2NbKnNlcV9zaXplXSwg
+RE1BX0RMTEksCkBAIC0xMzEzLDcgKzEzMTQsOCBAQCBzc2lfYWVhZF94Y2JjX2F1dGhlbmMoCiB9
+CiAKIHN0YXRpYyBpbnQgdmFsaWRhdGVfZGF0YV9zaXplKHN0cnVjdCBzc2lfYWVhZF9jdHggKmN0
+eCwKLQllbnVtIGRydl9jcnlwdG9fZGlyZWN0aW9uIGRpcmVjdCwgc3RydWN0IGFlYWRfcmVxdWVz
+dCAqcmVxKQorCQkJICAgICAgZW51bSBkcnZfY3J5cHRvX2RpcmVjdGlvbiBkaXJlY3QsCisJCQkg
+ICAgICBzdHJ1Y3QgYWVhZF9yZXF1ZXN0ICpyZXEpCiB7CiAJc3RydWN0IGFlYWRfcmVxX2N0eCAq
+YXJlcV9jdHggPSBhZWFkX3JlcXVlc3RfY3R4KHJlcSk7CiAJdW5zaWduZWQgaW50IGFzc29jbGVu
+ID0gcmVxLT5hc3NvY2xlbjsKQEAgLTEzMjEsNyArMTMyMyw3IEBAIHN0YXRpYyBpbnQgdmFsaWRh
+dGVfZGF0YV9zaXplKHN0cnVjdCBzc2lfYWVhZF9jdHggKmN0eCwKIAkJCShyZXEtPmNyeXB0bGVu
+IC0gY3R4LT5hdXRoc2l6ZSkgOiByZXEtPmNyeXB0bGVuOwogCiAJaWYgKHVubGlrZWx5KChkaXJl
+Y3QgPT0gRFJWX0NSWVBUT19ESVJFQ1RJT05fREVDUllQVCkgJiYKLQkJKHJlcS0+Y3J5cHRsZW4g
+PCBjdHgtPmF1dGhzaXplKSkpCisJCSAgICAgKHJlcS0+Y3J5cHRsZW4gPCBjdHgtPmF1dGhzaXpl
+KSkpCiAJCWdvdG8gZGF0YV9zaXplX2VycjsKIAogCWFyZXFfY3R4LT5pc19zaW5nbGVfcGFzcyA9
+IHRydWU7IC8qZGVmYXVsdGVkIHRvIGZhc3QgZmxvdyovCkBAIC0xMzI5LDcgKzEzMzEsNyBAQCBz
+dGF0aWMgaW50IHZhbGlkYXRlX2RhdGFfc2l6ZShzdHJ1Y3Qgc3NpX2FlYWRfY3R4ICpjdHgsCiAJ
+c3dpdGNoIChjdHgtPmZsb3dfbW9kZSkgewogCWNhc2UgU19ESU5fdG9fQUVTOgogCQlpZiAodW5s
+aWtlbHkoKGN0eC0+Y2lwaGVyX21vZGUgPT0gRFJWX0NJUEhFUl9DQkMpICYmCi0JCQkhSVNfQUxJ
+R05FRChjaXBoZXJsZW4sIEFFU19CTE9DS19TSVpFKSkpCisJCQkgICAgICFJU19BTElHTkVEKGNp
+cGhlcmxlbiwgQUVTX0JMT0NLX1NJWkUpKSkKIAkJCWdvdG8gZGF0YV9zaXplX2VycjsKIAkJaWYg
+KGN0eC0+Y2lwaGVyX21vZGUgPT0gRFJWX0NJUEhFUl9DQ00pCiAJCQlicmVhazsKQEAgLTE5NDQs
+OCArMTk0Niw5IEBAIHN0YXRpYyBpbnQgc3NpX2FlYWRfcHJvY2VzcyhzdHJ1Y3QgYWVhZF9yZXF1
+ZXN0ICpyZXEsIGVudW0gZHJ2X2NyeXB0b19kaXJlY3Rpb24KIAlzdHJ1Y3Qgc3NpX2NyeXB0b19y
+ZXEgc3NpX3JlcSA9IHt9OwogCiAJU1NJX0xPR19ERUJVRygiJXMgY29udGV4dD0lcCByZXE9JXAg
+aXY9JXAgc3JjPSVwIHNyY19vZnM9JWQgZHN0PSVwIGRzdF9vZnM9JWQgY3J5cHRvbGVuPSVkXG4i
+LAotCQkoKGRpcmVjdCA9PSBEUlZfQ1JZUFRPX0RJUkVDVElPTl9FTkNSWVBUKSA/ICJFbmNyeXB0
+IiA6ICJEZWNyeXB0IiksIGN0eCwgcmVxLCByZXEtPml2LAotCQlzZ192aXJ0KHJlcS0+c3JjKSwg
+cmVxLT5zcmMtPm9mZnNldCwgc2dfdmlydChyZXEtPmRzdCksIHJlcS0+ZHN0LT5vZmZzZXQsIHJl
+cS0+Y3J5cHRsZW4pOworCQkgICAgICAoKGRpcmVjdCA9PSBEUlZfQ1JZUFRPX0RJUkVDVElPTl9F
+TkNSWVBUKSA/ICJFbmNyeXB0IiA6ICJEZWNyeXB0IiksCisJCSAgICAgIGN0eCwgcmVxLCByZXEt
+Pml2LCBzZ192aXJ0KHJlcS0+c3JjKSwgcmVxLT5zcmMtPm9mZnNldCwKKwkJICAgICAgc2dfdmly
+dChyZXEtPmRzdCksIHJlcS0+ZHN0LT5vZmZzZXQsIHJlcS0+Y3J5cHRsZW4pOwogCUNIRUNLX0FO
+RF9SRVRVUk5fVVBPTl9GSVBTX0VSUk9SKCk7CiAKIAkvKiBTVEFUX1BIQVNFXzA6IEluaXQgYW5k
+IHNhbml0eSBjaGVja3MgKi8KQEAgLTE5NTMsNyArMTk1Niw3IEBAIHN0YXRpYyBpbnQgc3NpX2Fl
+YWRfcHJvY2VzcyhzdHJ1Y3QgYWVhZF9yZXF1ZXN0ICpyZXEsIGVudW0gZHJ2X2NyeXB0b19kaXJl
+Y3Rpb24KIAkvKiBDaGVjayBkYXRhIGxlbmd0aCBhY2NvcmRpbmcgdG8gbW9kZSAqLwogCWlmICh1
+bmxpa2VseSh2YWxpZGF0ZV9kYXRhX3NpemUoY3R4LCBkaXJlY3QsIHJlcSkgIT0gMCkpIHsKIAkJ
+U1NJX0xPR19FUlIoIlVuc3VwcG9ydGVkIGNyeXB0L2Fzc29jIGxlbiAlZC8lZC5cbiIsCi0JCQkJ
+cmVxLT5jcnlwdGxlbiwgcmVxLT5hc3NvY2xlbik7CisJCQkgICAgcmVxLT5jcnlwdGxlbiwgcmVx
+LT5hc3NvY2xlbik7CiAJCWNyeXB0b19hZWFkX3NldF9mbGFncyh0Zm0sIENSWVBUT19URk1fUkVT
+X0JBRF9CTE9DS19MRU4pOwogCQlyZXR1cm4gLUVJTlZBTDsKIAl9CkBAIC0xOTc2LDcgKzE5Nzks
+NyBAQCBzdGF0aWMgaW50IHNzaV9hZWFkX3Byb2Nlc3Moc3RydWN0IGFlYWRfcmVxdWVzdCAqcmVx
+LCBlbnVtIGRydl9jcnlwdG9fZGlyZWN0aW9uCiAJCW1lbWNweShhcmVxX2N0eC0+Y3RyX2l2LCBj
+dHgtPmN0cl9ub25jZSwgQ1RSX1JGQzM2ODZfTk9OQ0VfU0laRSk7CiAJCWlmICghYXJlcV9jdHgt
+PmJhY2t1cF9naXYpIC8qVXNlciBub25lLWdlbmVyYXRlZCBJViovCiAJCQltZW1jcHkoYXJlcV9j
+dHgtPmN0cl9pdiArIENUUl9SRkMzNjg2X05PTkNFX1NJWkUsCi0JCQkJcmVxLT5pdiwgQ1RSX1JG
+QzM2ODZfSVZfU0laRSk7CisJCQkgICAgICAgcmVxLT5pdiwgQ1RSX1JGQzM2ODZfSVZfU0laRSk7
+CiAJCS8qIEluaXRpYWxpemUgY291bnRlciBwb3J0aW9uIG9mIGNvdW50ZXIgYmxvY2sgKi8KIAkJ
+KihfX2JlMzIgKikoYXJlcV9jdHgtPmN0cl9pdiArIENUUl9SRkMzNjg2X05PTkNFX1NJWkUgKwog
+CQkJICAgIENUUl9SRkMzNjg2X0lWX1NJWkUpID0gY3B1X3RvX2JlMzIoMSk7CkBAIC0yMjMwLDcg
+KzIyMzMsNyBAQCBzdGF0aWMgaW50IHNzaV9yZmM0NTQzX2djbV9zZXRrZXkoc3RydWN0IGNyeXB0
+b19hZWFkICp0Zm0sIGNvbnN0IHU4ICprZXksIHVuc2lnbgogfQogCiBzdGF0aWMgaW50IHNzaV9n
+Y21fc2V0YXV0aHNpemUoc3RydWN0IGNyeXB0b19hZWFkICphdXRoZW5jLAotCQkJCSAgICAgIHVu
+c2lnbmVkIGludCBhdXRoc2l6ZSkKKwkJCSAgICAgICB1bnNpZ25lZCBpbnQgYXV0aHNpemUpCiB7
+CiAJc3dpdGNoIChhdXRoc2l6ZSkgewogCWNhc2UgNDoKQEAgLTIyNDksNyArMjI1Miw3IEBAIHN0
+YXRpYyBpbnQgc3NpX2djbV9zZXRhdXRoc2l6ZShzdHJ1Y3QgY3J5cHRvX2FlYWQgKmF1dGhlbmMs
+CiB9CiAKIHN0YXRpYyBpbnQgc3NpX3JmYzQxMDZfZ2NtX3NldGF1dGhzaXplKHN0cnVjdCBjcnlw
+dG9fYWVhZCAqYXV0aGVuYywKLQkJCQkgICAgICB1bnNpZ25lZCBpbnQgYXV0aHNpemUpCisJCQkJ
+ICAgICAgIHVuc2lnbmVkIGludCBhdXRoc2l6ZSkKIHsKIAlTU0lfTE9HX0RFQlVHKCJzc2lfcmZj
+NDEwNl9nY21fc2V0YXV0aHNpemUoKSAgYXV0aHNpemUgJWRcbiIsIGF1dGhzaXplKTsKIApAQCAt
+MjcyMCwxNCArMjcyMywxNCBAQCBpbnQgc3NpX2FlYWRfYWxsb2Moc3RydWN0IHNzaV9kcnZkYXRh
+ICpkcnZkYXRhKQogCQlpZiAoSVNfRVJSKHRfYWxnKSkgewogCQkJcmMgPSBQVFJfRVJSKHRfYWxn
+KTsKIAkJCVNTSV9MT0dfRVJSKCIlcyBhbGcgYWxsb2NhdGlvbiBmYWlsZWRcbiIsCi0JCQkJIGFl
+YWRfYWxnc1thbGddLmRyaXZlcl9uYW1lKTsKKwkJCQkgICAgYWVhZF9hbGdzW2FsZ10uZHJpdmVy
+X25hbWUpOwogCQkJZ290byBmYWlsMTsKIAkJfQogCQl0X2FsZy0+ZHJ2ZGF0YSA9IGRydmRhdGE7
+CiAJCXJjID0gY3J5cHRvX3JlZ2lzdGVyX2FlYWQoJnRfYWxnLT5hZWFkX2FsZyk7CiAJCWlmICh1
+bmxpa2VseShyYyAhPSAwKSkgewogCQkJU1NJX0xPR19FUlIoIiVzIGFsZyByZWdpc3RyYXRpb24g
+ZmFpbGVkXG4iLAotCQkJCXRfYWxnLT5hZWFkX2FsZy5iYXNlLmNyYV9kcml2ZXJfbmFtZSk7CisJ
+CQkJICAgIHRfYWxnLT5hZWFkX2FsZy5iYXNlLmNyYV9kcml2ZXJfbmFtZSk7CiAJCQlnb3RvIGZh
+aWwyOwogCQl9IGVsc2UgewogCQkJbGlzdF9hZGRfdGFpbCgmdF9hbGctPmVudHJ5LCAmYWVhZF9o
+YW5kbGUtPmFlYWRfbGlzdCk7Ci0tIAoyLjExLjAKCl9fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fCmRldmVsIG1haWxpbmcgbGlzdApkZXZlbEBsaW51eGRyaXZl
+cnByb2plY3Qub3JnCmh0dHA6Ly9kcml2ZXJkZXYubGludXhkcml2ZXJwcm9qZWN0Lm9yZy9tYWls
+bWFuL2xpc3RpbmZvL2RyaXZlcmRldi1kZXZlbAo=
