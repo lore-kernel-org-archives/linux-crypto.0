@@ -1,7 +1,7 @@
 From: =?UTF-8?q?Simon=20Sandstr=C3=B6m?= <simon@nikanor.nu>
-Subject: [PATCH 05/10] staging: ccree: Fix alignment issues in ssi_fips_local.c
-Date: Sun,  2 Jul 2017 01:25:50 +0200
-Message-ID: <20170701232555.5538-6-simon@nikanor.nu>
+Subject: [PATCH 09/10] staging: ccree: Fix alignment issues in ssi_sram_mgr.c
+Date: Sun,  2 Jul 2017 01:25:54 +0200
+Message-ID: <20170701232555.5538-10-simon@nikanor.nu>
 References: <20170701232555.5538-1-simon@nikanor.nu>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -11,13 +11,13 @@ Cc: gregkh@linuxfoundation.org, linux-crypto@vger.kernel.org,
         =?UTF-8?q?Simon=20Sandstr=C3=B6m?= <simon@nikanor.nu>
 To: gilad@benyossef.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-lf0-f43.google.com ([209.85.215.43]:36466 "EHLO
-        mail-lf0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751976AbdGAX0d (ORCPT
+Received: from mail-lf0-f49.google.com ([209.85.215.49]:35620 "EHLO
+        mail-lf0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752145AbdGAX0h (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 1 Jul 2017 19:26:33 -0400
-Received: by mail-lf0-f43.google.com with SMTP id h22so86298481lfk.3
-        for <linux-crypto@vger.kernel.org>; Sat, 01 Jul 2017 16:26:33 -0700 (PDT)
+        Sat, 1 Jul 2017 19:26:37 -0400
+Received: by mail-lf0-f49.google.com with SMTP id b207so86273145lfg.2
+        for <linux-crypto@vger.kernel.org>; Sat, 01 Jul 2017 16:26:36 -0700 (PDT)
 In-Reply-To: <20170701232555.5538-1-simon@nikanor.nu>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
@@ -26,22 +26,36 @@ Fixes checkpatch.pl alignment warnings.
 
 Signed-off-by: Simon Sandström <simon@nikanor.nu>
 ---
- drivers/staging/ccree/ssi_fips_local.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/staging/ccree/ssi_sram_mgr.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/staging/ccree/ssi_fips_local.c b/drivers/staging/ccree/ssi_fips_local.c
-index aefb71dc9e9a..c16bfab39699 100644
---- a/drivers/staging/ccree/ssi_fips_local.c
-+++ b/drivers/staging/ccree/ssi_fips_local.c
-@@ -150,8 +150,7 @@ static void fips_dsr(unsigned long devarg)
+diff --git a/drivers/staging/ccree/ssi_sram_mgr.c b/drivers/staging/ccree/ssi_sram_mgr.c
+index e05c0c13c2eb..f11116afe89a 100644
+--- a/drivers/staging/ccree/ssi_sram_mgr.c
++++ b/drivers/staging/ccree/ssi_sram_mgr.c
+@@ -58,7 +58,7 @@ int ssi_sram_mgr_init(struct ssi_drvdata *drvdata)
+ 			sizeof(struct ssi_sram_mgr_ctx), GFP_KERNEL);
+ 	if (!drvdata->sram_mgr_handle) {
+ 		SSI_LOG_ERR("Not enough memory to allocate SRAM_MGR ctx (%zu)\n",
+-			sizeof(struct ssi_sram_mgr_ctx));
++			    sizeof(struct ssi_sram_mgr_ctx));
+ 		rc = -ENOMEM;
+ 		goto out;
+ 	}
+@@ -90,12 +90,12 @@ ssi_sram_addr_t ssi_sram_mgr_alloc(struct ssi_drvdata *drvdata, u32 size)
  
- 	/* after verifing that there is nothing to do, Unmask AXI completion interrupt */
- 	CC_HAL_WRITE_REGISTER(CC_REG_OFFSET(HOST_RGF, HOST_IMR),
--		CC_HAL_READ_REGISTER(
--		CC_REG_OFFSET(HOST_RGF, HOST_IMR)) & ~irq);
-+			      CC_HAL_READ_REGISTER(CC_REG_OFFSET(HOST_RGF, HOST_IMR)) & ~irq);
- }
+ 	if (unlikely((size & 0x3) != 0)) {
+ 		SSI_LOG_ERR("Requested buffer size (%u) is not multiple of 4",
+-			size);
++			    size);
+ 		return NULL_SRAM_ADDR;
+ 	}
+ 	if (unlikely(size > (SSI_CC_SRAM_SIZE - smgr_ctx->sram_free_offset))) {
+ 		SSI_LOG_ERR("Not enough space to allocate %u B (at offset %llu)\n",
+-			size, smgr_ctx->sram_free_offset);
++			    size, smgr_ctx->sram_free_offset);
+ 		return NULL_SRAM_ADDR;
+ 	}
  
- enum cc_fips_error cc_fips_run_power_up_tests(struct ssi_drvdata *drvdata)
 -- 
 2.11.0
