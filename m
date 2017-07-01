@@ -1,208 +1,192 @@
 From: =?UTF-8?q?Simon=20Sandstr=C3=B6m?= <simon@nikanor.nu>
-Subject: [PATCH 01/10] staging: ccree: Fix alignment issues in ssi_aead.c
-Date: Sun,  2 Jul 2017 01:25:46 +0200
-Message-ID: <20170701232555.5538-2-simon@nikanor.nu>
+Subject: [PATCH 10/10] staging: ccree: Fix alignment issues in ssi_sysfs.c
+Date: Sun,  2 Jul 2017 01:25:55 +0200
+Message-ID: <20170701232555.5538-11-simon@nikanor.nu>
 References: <20170701232555.5538-1-simon@nikanor.nu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: devel@driverdev.osuosl.org, gregkh@linuxfoundation.org,
- driverdev-devel@linuxdriverproject.org, linux-crypto@vger.kernel.org,
- =?UTF-8?q?Simon=20Sandstr=C3=B6m?= <simon@nikanor.nu>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Cc: gregkh@linuxfoundation.org, linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        =?UTF-8?q?Simon=20Sandstr=C3=B6m?= <simon@nikanor.nu>
 To: gilad@benyossef.com
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-lf0-f41.google.com ([209.85.215.41]:33853 "EHLO
+        mail-lf0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752281AbdGAX0i (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 1 Jul 2017 19:26:38 -0400
+Received: by mail-lf0-f41.google.com with SMTP id l13so86397910lfl.1
+        for <linux-crypto@vger.kernel.org>; Sat, 01 Jul 2017 16:26:37 -0700 (PDT)
 In-Reply-To: <20170701232555.5538-1-simon@nikanor.nu>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Rml4ZXMgY2hlY2twYXRjaC5wbCBhbGlnbm1lbnQgd2FybmluZ3MuCgpTaWduZWQtb2ZmLWJ5OiBT
-aW1vbiBTYW5kc3Ryw7ZtIDxzaW1vbkBuaWthbm9yLm51PgotLS0KIGRyaXZlcnMvc3RhZ2luZy9j
-Y3JlZS9zc2lfYWVhZC5jIHwgNjcgKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0t
-LS0tLQogMSBmaWxlIGNoYW5nZWQsIDM1IGluc2VydGlvbnMoKyksIDMyIGRlbGV0aW9ucygtKQoK
-ZGlmZiAtLWdpdCBhL2RyaXZlcnMvc3RhZ2luZy9jY3JlZS9zc2lfYWVhZC5jIGIvZHJpdmVycy9z
-dGFnaW5nL2NjcmVlL3NzaV9hZWFkLmMKaW5kZXggMWZjMGIwNWVhMGQ1Li4xNDYxNzNiOGNiYjkg
-MTAwNjQ0Ci0tLSBhL2RyaXZlcnMvc3RhZ2luZy9jY3JlZS9zc2lfYWVhZC5jCisrKyBiL2RyaXZl
-cnMvc3RhZ2luZy9jY3JlZS9zc2lfYWVhZC5jCkBAIC05MywxNCArOTMsMTQgQEAgc3RhdGljIHZv
-aWQgc3NpX2FlYWRfZXhpdChzdHJ1Y3QgY3J5cHRvX2FlYWQgKnRmbSkKIAlzdHJ1Y3Qgc3NpX2Fl
-YWRfY3R4ICpjdHggPSBjcnlwdG9fYWVhZF9jdHgodGZtKTsKIAogCVNTSV9MT0dfREVCVUcoIkNs
-ZWFyaW5nIGNvbnRleHQgQCVwIGZvciAlc1xuIiwKLQkJY3J5cHRvX2FlYWRfY3R4KHRmbSksIGNy
-eXB0b190Zm1fYWxnX25hbWUoJih0Zm0tPmJhc2UpKSk7CisJCSAgICAgIGNyeXB0b19hZWFkX2N0
-eCh0Zm0pLCBjcnlwdG9fdGZtX2FsZ19uYW1lKCYodGZtLT5iYXNlKSkpOwogCiAJZGV2ID0gJmN0
-eC0+ZHJ2ZGF0YS0+cGxhdF9kZXYtPmRldjsKIAkvKiBVbm1hcCBlbmNrZXkgYnVmZmVyICovCiAJ
-aWYgKGN0eC0+ZW5ja2V5KSB7CiAJCWRtYV9mcmVlX2NvaGVyZW50KGRldiwgQUVTX01BWF9LRVlf
-U0laRSwgY3R4LT5lbmNrZXksIGN0eC0+ZW5ja2V5X2RtYV9hZGRyKTsKIAkJU1NJX0xPR19ERUJV
-RygiRnJlZWQgZW5ja2V5IERNQSBidWZmZXIgZW5ja2V5X2RtYV9hZGRyPTB4JWxsWFxuIiwKLQkJ
-CSh1bnNpZ25lZCBsb25nIGxvbmcpY3R4LT5lbmNrZXlfZG1hX2FkZHIpOworCQkJICAgICAgKHVu
-c2lnbmVkIGxvbmcgbG9uZyljdHgtPmVuY2tleV9kbWFfYWRkcik7CiAJCWN0eC0+ZW5ja2V5X2Rt
-YV9hZGRyID0gMDsKIAkJY3R4LT5lbmNrZXkgPSBOVUxMOwogCX0KQEAgLTEwOCwyOSArMTA4LDI5
-IEBAIHN0YXRpYyB2b2lkIHNzaV9hZWFkX2V4aXQoc3RydWN0IGNyeXB0b19hZWFkICp0Zm0pCiAJ
-aWYgKGN0eC0+YXV0aF9tb2RlID09IERSVl9IQVNIX1hDQkNfTUFDKSB7IC8qIFhDQkMgYXV0aGV0
-aWNhdGlvbiAqLwogCQlpZiAoY3R4LT5hdXRoX3N0YXRlLnhjYmMueGNiY19rZXlzKSB7CiAJCQlk
-bWFfZnJlZV9jb2hlcmVudChkZXYsIENDX0FFU18xMjhfQklUX0tFWV9TSVpFICogMywKLQkJCQlj
-dHgtPmF1dGhfc3RhdGUueGNiYy54Y2JjX2tleXMsCi0JCQkJY3R4LT5hdXRoX3N0YXRlLnhjYmMu
-eGNiY19rZXlzX2RtYV9hZGRyKTsKKwkJCQkJICBjdHgtPmF1dGhfc3RhdGUueGNiYy54Y2JjX2tl
-eXMsCisJCQkJCSAgY3R4LT5hdXRoX3N0YXRlLnhjYmMueGNiY19rZXlzX2RtYV9hZGRyKTsKIAkJ
-fQogCQlTU0lfTE9HX0RFQlVHKCJGcmVlZCB4Y2JjX2tleXMgRE1BIGJ1ZmZlciB4Y2JjX2tleXNf
-ZG1hX2FkZHI9MHglbGxYXG4iLAotCQkJKHVuc2lnbmVkIGxvbmcgbG9uZyljdHgtPmF1dGhfc3Rh
-dGUueGNiYy54Y2JjX2tleXNfZG1hX2FkZHIpOworCQkJICAgICAgKHVuc2lnbmVkIGxvbmcgbG9u
-ZyljdHgtPmF1dGhfc3RhdGUueGNiYy54Y2JjX2tleXNfZG1hX2FkZHIpOwogCQljdHgtPmF1dGhf
-c3RhdGUueGNiYy54Y2JjX2tleXNfZG1hX2FkZHIgPSAwOwogCQljdHgtPmF1dGhfc3RhdGUueGNi
-Yy54Y2JjX2tleXMgPSBOVUxMOwogCX0gZWxzZSBpZiAoY3R4LT5hdXRoX21vZGUgIT0gRFJWX0hB
-U0hfTlVMTCkgeyAvKiBITUFDIGF1dGguICovCiAJCWlmIChjdHgtPmF1dGhfc3RhdGUuaG1hYy5p
-cGFkX29wYWQpIHsKIAkJCWRtYV9mcmVlX2NvaGVyZW50KGRldiwgMiAqIE1BWF9ITUFDX0RJR0VT
-VF9TSVpFLAotCQkJCWN0eC0+YXV0aF9zdGF0ZS5obWFjLmlwYWRfb3BhZCwKLQkJCQljdHgtPmF1
-dGhfc3RhdGUuaG1hYy5pcGFkX29wYWRfZG1hX2FkZHIpOworCQkJCQkgIGN0eC0+YXV0aF9zdGF0
-ZS5obWFjLmlwYWRfb3BhZCwKKwkJCQkJICBjdHgtPmF1dGhfc3RhdGUuaG1hYy5pcGFkX29wYWRf
-ZG1hX2FkZHIpOwogCQkJU1NJX0xPR19ERUJVRygiRnJlZWQgaXBhZF9vcGFkIERNQSBidWZmZXIg
-aXBhZF9vcGFkX2RtYV9hZGRyPTB4JWxsWFxuIiwKLQkJCQkodW5zaWduZWQgbG9uZyBsb25nKWN0
-eC0+YXV0aF9zdGF0ZS5obWFjLmlwYWRfb3BhZF9kbWFfYWRkcik7CisJCQkJICAgICAgKHVuc2ln
-bmVkIGxvbmcgbG9uZyljdHgtPmF1dGhfc3RhdGUuaG1hYy5pcGFkX29wYWRfZG1hX2FkZHIpOwog
-CQkJY3R4LT5hdXRoX3N0YXRlLmhtYWMuaXBhZF9vcGFkX2RtYV9hZGRyID0gMDsKIAkJCWN0eC0+
-YXV0aF9zdGF0ZS5obWFjLmlwYWRfb3BhZCA9IE5VTEw7CiAJCX0KIAkJaWYgKGN0eC0+YXV0aF9z
-dGF0ZS5obWFjLnBhZGRlZF9hdXRoa2V5KSB7CiAJCQlkbWFfZnJlZV9jb2hlcmVudChkZXYsIE1B
-WF9ITUFDX0JMT0NLX1NJWkUsCi0JCQkJY3R4LT5hdXRoX3N0YXRlLmhtYWMucGFkZGVkX2F1dGhr
-ZXksCi0JCQkJY3R4LT5hdXRoX3N0YXRlLmhtYWMucGFkZGVkX2F1dGhrZXlfZG1hX2FkZHIpOwor
-CQkJCQkgIGN0eC0+YXV0aF9zdGF0ZS5obWFjLnBhZGRlZF9hdXRoa2V5LAorCQkJCQkgIGN0eC0+
-YXV0aF9zdGF0ZS5obWFjLnBhZGRlZF9hdXRoa2V5X2RtYV9hZGRyKTsKIAkJCVNTSV9MT0dfREVC
-VUcoIkZyZWVkIHBhZGRlZF9hdXRoa2V5IERNQSBidWZmZXIgcGFkZGVkX2F1dGhrZXlfZG1hX2Fk
-ZHI9MHglbGxYXG4iLAotCQkJCSh1bnNpZ25lZCBsb25nIGxvbmcpY3R4LT5hdXRoX3N0YXRlLmht
-YWMucGFkZGVkX2F1dGhrZXlfZG1hX2FkZHIpOworCQkJCSAgICAgICh1bnNpZ25lZCBsb25nIGxv
-bmcpY3R4LT5hdXRoX3N0YXRlLmhtYWMucGFkZGVkX2F1dGhrZXlfZG1hX2FkZHIpOwogCQkJY3R4
-LT5hdXRoX3N0YXRlLmhtYWMucGFkZGVkX2F1dGhrZXlfZG1hX2FkZHIgPSAwOwogCQkJY3R4LT5h
-dXRoX3N0YXRlLmhtYWMucGFkZGVkX2F1dGhrZXkgPSBOVUxMOwogCQl9CkBAIC0xODcsNyArMTg3
-LDcgQEAgc3RhdGljIGludCBzc2lfYWVhZF9pbml0KHN0cnVjdCBjcnlwdG9fYWVhZCAqdGZtKQog
-CQkJZ290byBpbml0X2ZhaWxlZDsKIAkJfQogCQlTU0lfTE9HX0RFQlVHKCJBbGxvY2F0ZWQgYXV0
-aGtleSBidWZmZXIgaW4gY29udGV4dCBjdHgtPmF1dGhrZXk9QCVwXG4iLAotCQkJY3R4LT5hdXRo
-X3N0YXRlLmhtYWMuaXBhZF9vcGFkKTsKKwkJCSAgICAgIGN0eC0+YXV0aF9zdGF0ZS5obWFjLmlw
-YWRfb3BhZCk7CiAKIAkJY3R4LT5hdXRoX3N0YXRlLmhtYWMucGFkZGVkX2F1dGhrZXkgPSBkbWFf
-YWxsb2NfY29oZXJlbnQoZGV2LAogCQkJTUFYX0hNQUNfQkxPQ0tfU0laRSwKQEAgLTIyMyw3ICsy
-MjMsNyBAQCBzdGF0aWMgdm9pZCBzc2lfYWVhZF9jb21wbGV0ZShzdHJ1Y3QgZGV2aWNlICpkZXYs
-IHZvaWQgKnNzaV9yZXEsIHZvaWQgX19pb21lbSAqYwogCiAJaWYgKGFyZXFfY3R4LT5nZW5fY3R4
-Lm9wX3R5cGUgPT0gRFJWX0NSWVBUT19ESVJFQ1RJT05fREVDUllQVCkgewogCQlpZiAobWVtY21w
-KGFyZXFfY3R4LT5tYWNfYnVmLCBhcmVxX2N0eC0+aWN2X3ZpcnRfYWRkciwKLQkJCWN0eC0+YXV0
-aHNpemUpICE9IDApIHsKKwkJCSAgIGN0eC0+YXV0aHNpemUpICE9IDApIHsKIAkJCVNTSV9MT0df
-REVCVUcoIlBheWxvYWQgYXV0aGVudGljYXRpb24gZmFpbHVyZSwgIgogCQkJCSIoYXV0aC1zaXpl
-PSVkLCBjaXBoZXI9JWQpLlxuIiwKIAkJCQljdHgtPmF1dGhzaXplLCBjdHgtPmNpcGhlcl9tb2Rl
-KTsKQEAgLTM2MSw3ICszNjEsNyBAQCBzdGF0aWMgaW50IGhtYWNfc2V0a2V5KHN0cnVjdCBjY19o
-d19kZXNjICpkZXNjLCBzdHJ1Y3Qgc3NpX2FlYWRfY3R4ICpjdHgpCiBzdGF0aWMgaW50IHZhbGlk
-YXRlX2tleXNfc2l6ZXMoc3RydWN0IHNzaV9hZWFkX2N0eCAqY3R4KQogewogCVNTSV9MT0dfREVC
-VUcoImVuY19rZXlsZW49JXUgIGF1dGhrZXlsZW49JXVcbiIsCi0JCWN0eC0+ZW5jX2tleWxlbiwg
-Y3R4LT5hdXRoX2tleWxlbik7CisJCSAgICAgIGN0eC0+ZW5jX2tleWxlbiwgY3R4LT5hdXRoX2tl
-eWxlbik7CiAKIAlzd2l0Y2ggKGN0eC0+YXV0aF9tb2RlKSB7CiAJY2FzZSBEUlZfSEFTSF9TSEEx
-OgpAQCAtMzg1LDcgKzM4NSw3IEBAIHN0YXRpYyBpbnQgdmFsaWRhdGVfa2V5c19zaXplcyhzdHJ1
-Y3Qgc3NpX2FlYWRfY3R4ICpjdHgpCiAJaWYgKHVubGlrZWx5KGN0eC0+Zmxvd19tb2RlID09IFNf
-RElOX3RvX0RFUykpIHsKIAkJaWYgKGN0eC0+ZW5jX2tleWxlbiAhPSBERVMzX0VERV9LRVlfU0la
-RSkgewogCQkJU1NJX0xPR19FUlIoIkludmFsaWQgY2lwaGVyKDNERVMpIGtleSBzaXplOiAldVxu
-IiwKLQkJCQljdHgtPmVuY19rZXlsZW4pOworCQkJCSAgICBjdHgtPmVuY19rZXlsZW4pOwogCQkJ
-cmV0dXJuIC1FSU5WQUw7CiAJCX0KIAl9IGVsc2UgeyAvKiBEZWZhdWx0IGFzc3VtZWQgdG8gYmUg
-QUVTIGNpcGhlcnMgKi8KQEAgLTM5Myw3ICszOTMsNyBAQCBzdGF0aWMgaW50IHZhbGlkYXRlX2tl
-eXNfc2l6ZXMoc3RydWN0IHNzaV9hZWFkX2N0eCAqY3R4KQogCQkgICAgKGN0eC0+ZW5jX2tleWxl
-biAhPSBBRVNfS0VZU0laRV8xOTIpICYmCiAJCSAgICAoY3R4LT5lbmNfa2V5bGVuICE9IEFFU19L
-RVlTSVpFXzI1NikpIHsKIAkJCVNTSV9MT0dfRVJSKCJJbnZhbGlkIGNpcGhlcihBRVMpIGtleSBz
-aXplOiAldVxuIiwKLQkJCQljdHgtPmVuY19rZXlsZW4pOworCQkJCSAgICBjdHgtPmVuY19rZXls
-ZW4pOwogCQkJcmV0dXJuIC1FSU5WQUw7CiAJCX0KIAl9CkBAIC01MzYsNyArNTM2LDggQEAgc3Np
-X2FlYWRfc2V0a2V5KHN0cnVjdCBjcnlwdG9fYWVhZCAqdGZtLCBjb25zdCB1OCAqa2V5LCB1bnNp
-Z25lZCBpbnQga2V5bGVuKQogCWludCBzZXFfbGVuID0gMCwgcmMgPSAtRUlOVkFMOwogCiAJU1NJ
-X0xPR19ERUJVRygiU2V0dGluZyBrZXkgaW4gY29udGV4dCBAJXAgZm9yICVzLiBrZXk9JXAga2V5
-bGVuPSV1XG4iLAotCQljdHgsIGNyeXB0b190Zm1fYWxnX25hbWUoY3J5cHRvX2FlYWRfdGZtKHRm
-bSkpLCBrZXksIGtleWxlbik7CisJCSAgICAgIGN0eCwgY3J5cHRvX3RmbV9hbGdfbmFtZShjcnlw
-dG9fYWVhZF90Zm0odGZtKSksCisJCSAgICAgIGtleSwga2V5bGVuKTsKIAogCUNIRUNLX0FORF9S
-RVRVUk5fVVBPTl9GSVBTX0VSUk9SKCk7CiAJLyogU1RBVF9QSEFTRV8wOiBJbml0IGFuZCBzYW5p
-dHkgY2hlY2tzICovCkBAIC02NjksNyArNjcwLDcgQEAgc3RhdGljIGludCBzc2lfYWVhZF9zZXRh
-dXRoc2l6ZSgKIAogI2lmIFNTSV9DQ19IQVNfQUVTX0NDTQogc3RhdGljIGludCBzc2lfcmZjNDMw
-OV9jY21fc2V0YXV0aHNpemUoc3RydWN0IGNyeXB0b19hZWFkICphdXRoZW5jLAotCQkJCSAgICAg
-IHVuc2lnbmVkIGludCBhdXRoc2l6ZSkKKwkJCQkgICAgICAgdW5zaWduZWQgaW50IGF1dGhzaXpl
-KQogewogCXN3aXRjaCAoYXV0aHNpemUpIHsKIAljYXNlIDg6CkBAIC02ODQsNyArNjg1LDcgQEAg
-c3RhdGljIGludCBzc2lfcmZjNDMwOV9jY21fc2V0YXV0aHNpemUoc3RydWN0IGNyeXB0b19hZWFk
-ICphdXRoZW5jLAogfQogCiBzdGF0aWMgaW50IHNzaV9jY21fc2V0YXV0aHNpemUoc3RydWN0IGNy
-eXB0b19hZWFkICphdXRoZW5jLAotCQkJCSAgICAgIHVuc2lnbmVkIGludCBhdXRoc2l6ZSkKKwkJ
-CSAgICAgICB1bnNpZ25lZCBpbnQgYXV0aHNpemUpCiB7CiAJc3dpdGNoIChhdXRoc2l6ZSkgewog
-CWNhc2UgNDoKQEAgLTExNjgsOCArMTE2OSw4IEBAIHN0YXRpYyBpbmxpbmUgdm9pZCBzc2lfYWVh
-ZF9sb2FkX21sbGlfdG9fc3JhbSgKIAkJKHJlcV9jdHgtPmRhdGFfYnVmZl90eXBlID09IFNTSV9E
-TUFfQlVGX01MTEkpIHx8CiAJCSFyZXFfY3R4LT5pc19zaW5nbGVfcGFzcykpIHsKIAkJU1NJX0xP
-R19ERUJVRygiQ29weS10by1zcmFtOiBtbGxpX2RtYT0lMDh4LCBtbGxpX3NpemU9JXVcbiIsCi0J
-CQkodW5zaWduZWQgaW50KWN0eC0+ZHJ2ZGF0YS0+bWxsaV9zcmFtX2FkZHIsCi0JCQlyZXFfY3R4
-LT5tbGxpX3BhcmFtcy5tbGxpX2xlbik7CisJCQkgICAgICAodW5zaWduZWQgaW50KWN0eC0+ZHJ2
-ZGF0YS0+bWxsaV9zcmFtX2FkZHIsCisJCQkgICAgICByZXFfY3R4LT5tbGxpX3BhcmFtcy5tbGxp
-X2xlbik7CiAJCS8qIENvcHkgTUxMSSB0YWJsZSBob3N0LXRvLXNyYW0gKi8KIAkJaHdfZGVzY19p
-bml0KCZkZXNjWypzZXFfc2l6ZV0pOwogCQlzZXRfZGluX3R5cGUoJmRlc2NbKnNlcV9zaXplXSwg
-RE1BX0RMTEksCkBAIC0xMzEzLDcgKzEzMTQsOCBAQCBzc2lfYWVhZF94Y2JjX2F1dGhlbmMoCiB9
-CiAKIHN0YXRpYyBpbnQgdmFsaWRhdGVfZGF0YV9zaXplKHN0cnVjdCBzc2lfYWVhZF9jdHggKmN0
-eCwKLQllbnVtIGRydl9jcnlwdG9fZGlyZWN0aW9uIGRpcmVjdCwgc3RydWN0IGFlYWRfcmVxdWVz
-dCAqcmVxKQorCQkJICAgICAgZW51bSBkcnZfY3J5cHRvX2RpcmVjdGlvbiBkaXJlY3QsCisJCQkg
-ICAgICBzdHJ1Y3QgYWVhZF9yZXF1ZXN0ICpyZXEpCiB7CiAJc3RydWN0IGFlYWRfcmVxX2N0eCAq
-YXJlcV9jdHggPSBhZWFkX3JlcXVlc3RfY3R4KHJlcSk7CiAJdW5zaWduZWQgaW50IGFzc29jbGVu
-ID0gcmVxLT5hc3NvY2xlbjsKQEAgLTEzMjEsNyArMTMyMyw3IEBAIHN0YXRpYyBpbnQgdmFsaWRh
-dGVfZGF0YV9zaXplKHN0cnVjdCBzc2lfYWVhZF9jdHggKmN0eCwKIAkJCShyZXEtPmNyeXB0bGVu
-IC0gY3R4LT5hdXRoc2l6ZSkgOiByZXEtPmNyeXB0bGVuOwogCiAJaWYgKHVubGlrZWx5KChkaXJl
-Y3QgPT0gRFJWX0NSWVBUT19ESVJFQ1RJT05fREVDUllQVCkgJiYKLQkJKHJlcS0+Y3J5cHRsZW4g
-PCBjdHgtPmF1dGhzaXplKSkpCisJCSAgICAgKHJlcS0+Y3J5cHRsZW4gPCBjdHgtPmF1dGhzaXpl
-KSkpCiAJCWdvdG8gZGF0YV9zaXplX2VycjsKIAogCWFyZXFfY3R4LT5pc19zaW5nbGVfcGFzcyA9
-IHRydWU7IC8qZGVmYXVsdGVkIHRvIGZhc3QgZmxvdyovCkBAIC0xMzI5LDcgKzEzMzEsNyBAQCBz
-dGF0aWMgaW50IHZhbGlkYXRlX2RhdGFfc2l6ZShzdHJ1Y3Qgc3NpX2FlYWRfY3R4ICpjdHgsCiAJ
-c3dpdGNoIChjdHgtPmZsb3dfbW9kZSkgewogCWNhc2UgU19ESU5fdG9fQUVTOgogCQlpZiAodW5s
-aWtlbHkoKGN0eC0+Y2lwaGVyX21vZGUgPT0gRFJWX0NJUEhFUl9DQkMpICYmCi0JCQkhSVNfQUxJ
-R05FRChjaXBoZXJsZW4sIEFFU19CTE9DS19TSVpFKSkpCisJCQkgICAgICFJU19BTElHTkVEKGNp
-cGhlcmxlbiwgQUVTX0JMT0NLX1NJWkUpKSkKIAkJCWdvdG8gZGF0YV9zaXplX2VycjsKIAkJaWYg
-KGN0eC0+Y2lwaGVyX21vZGUgPT0gRFJWX0NJUEhFUl9DQ00pCiAJCQlicmVhazsKQEAgLTE5NDQs
-OCArMTk0Niw5IEBAIHN0YXRpYyBpbnQgc3NpX2FlYWRfcHJvY2VzcyhzdHJ1Y3QgYWVhZF9yZXF1
-ZXN0ICpyZXEsIGVudW0gZHJ2X2NyeXB0b19kaXJlY3Rpb24KIAlzdHJ1Y3Qgc3NpX2NyeXB0b19y
-ZXEgc3NpX3JlcSA9IHt9OwogCiAJU1NJX0xPR19ERUJVRygiJXMgY29udGV4dD0lcCByZXE9JXAg
-aXY9JXAgc3JjPSVwIHNyY19vZnM9JWQgZHN0PSVwIGRzdF9vZnM9JWQgY3J5cHRvbGVuPSVkXG4i
-LAotCQkoKGRpcmVjdCA9PSBEUlZfQ1JZUFRPX0RJUkVDVElPTl9FTkNSWVBUKSA/ICJFbmNyeXB0
-IiA6ICJEZWNyeXB0IiksIGN0eCwgcmVxLCByZXEtPml2LAotCQlzZ192aXJ0KHJlcS0+c3JjKSwg
-cmVxLT5zcmMtPm9mZnNldCwgc2dfdmlydChyZXEtPmRzdCksIHJlcS0+ZHN0LT5vZmZzZXQsIHJl
-cS0+Y3J5cHRsZW4pOworCQkgICAgICAoKGRpcmVjdCA9PSBEUlZfQ1JZUFRPX0RJUkVDVElPTl9F
-TkNSWVBUKSA/ICJFbmNyeXB0IiA6ICJEZWNyeXB0IiksCisJCSAgICAgIGN0eCwgcmVxLCByZXEt
-Pml2LCBzZ192aXJ0KHJlcS0+c3JjKSwgcmVxLT5zcmMtPm9mZnNldCwKKwkJICAgICAgc2dfdmly
-dChyZXEtPmRzdCksIHJlcS0+ZHN0LT5vZmZzZXQsIHJlcS0+Y3J5cHRsZW4pOwogCUNIRUNLX0FO
-RF9SRVRVUk5fVVBPTl9GSVBTX0VSUk9SKCk7CiAKIAkvKiBTVEFUX1BIQVNFXzA6IEluaXQgYW5k
-IHNhbml0eSBjaGVja3MgKi8KQEAgLTE5NTMsNyArMTk1Niw3IEBAIHN0YXRpYyBpbnQgc3NpX2Fl
-YWRfcHJvY2VzcyhzdHJ1Y3QgYWVhZF9yZXF1ZXN0ICpyZXEsIGVudW0gZHJ2X2NyeXB0b19kaXJl
-Y3Rpb24KIAkvKiBDaGVjayBkYXRhIGxlbmd0aCBhY2NvcmRpbmcgdG8gbW9kZSAqLwogCWlmICh1
-bmxpa2VseSh2YWxpZGF0ZV9kYXRhX3NpemUoY3R4LCBkaXJlY3QsIHJlcSkgIT0gMCkpIHsKIAkJ
-U1NJX0xPR19FUlIoIlVuc3VwcG9ydGVkIGNyeXB0L2Fzc29jIGxlbiAlZC8lZC5cbiIsCi0JCQkJ
-cmVxLT5jcnlwdGxlbiwgcmVxLT5hc3NvY2xlbik7CisJCQkgICAgcmVxLT5jcnlwdGxlbiwgcmVx
-LT5hc3NvY2xlbik7CiAJCWNyeXB0b19hZWFkX3NldF9mbGFncyh0Zm0sIENSWVBUT19URk1fUkVT
-X0JBRF9CTE9DS19MRU4pOwogCQlyZXR1cm4gLUVJTlZBTDsKIAl9CkBAIC0xOTc2LDcgKzE5Nzks
-NyBAQCBzdGF0aWMgaW50IHNzaV9hZWFkX3Byb2Nlc3Moc3RydWN0IGFlYWRfcmVxdWVzdCAqcmVx
-LCBlbnVtIGRydl9jcnlwdG9fZGlyZWN0aW9uCiAJCW1lbWNweShhcmVxX2N0eC0+Y3RyX2l2LCBj
-dHgtPmN0cl9ub25jZSwgQ1RSX1JGQzM2ODZfTk9OQ0VfU0laRSk7CiAJCWlmICghYXJlcV9jdHgt
-PmJhY2t1cF9naXYpIC8qVXNlciBub25lLWdlbmVyYXRlZCBJViovCiAJCQltZW1jcHkoYXJlcV9j
-dHgtPmN0cl9pdiArIENUUl9SRkMzNjg2X05PTkNFX1NJWkUsCi0JCQkJcmVxLT5pdiwgQ1RSX1JG
-QzM2ODZfSVZfU0laRSk7CisJCQkgICAgICAgcmVxLT5pdiwgQ1RSX1JGQzM2ODZfSVZfU0laRSk7
-CiAJCS8qIEluaXRpYWxpemUgY291bnRlciBwb3J0aW9uIG9mIGNvdW50ZXIgYmxvY2sgKi8KIAkJ
-KihfX2JlMzIgKikoYXJlcV9jdHgtPmN0cl9pdiArIENUUl9SRkMzNjg2X05PTkNFX1NJWkUgKwog
-CQkJICAgIENUUl9SRkMzNjg2X0lWX1NJWkUpID0gY3B1X3RvX2JlMzIoMSk7CkBAIC0yMjMwLDcg
-KzIyMzMsNyBAQCBzdGF0aWMgaW50IHNzaV9yZmM0NTQzX2djbV9zZXRrZXkoc3RydWN0IGNyeXB0
-b19hZWFkICp0Zm0sIGNvbnN0IHU4ICprZXksIHVuc2lnbgogfQogCiBzdGF0aWMgaW50IHNzaV9n
-Y21fc2V0YXV0aHNpemUoc3RydWN0IGNyeXB0b19hZWFkICphdXRoZW5jLAotCQkJCSAgICAgIHVu
-c2lnbmVkIGludCBhdXRoc2l6ZSkKKwkJCSAgICAgICB1bnNpZ25lZCBpbnQgYXV0aHNpemUpCiB7
-CiAJc3dpdGNoIChhdXRoc2l6ZSkgewogCWNhc2UgNDoKQEAgLTIyNDksNyArMjI1Miw3IEBAIHN0
-YXRpYyBpbnQgc3NpX2djbV9zZXRhdXRoc2l6ZShzdHJ1Y3QgY3J5cHRvX2FlYWQgKmF1dGhlbmMs
-CiB9CiAKIHN0YXRpYyBpbnQgc3NpX3JmYzQxMDZfZ2NtX3NldGF1dGhzaXplKHN0cnVjdCBjcnlw
-dG9fYWVhZCAqYXV0aGVuYywKLQkJCQkgICAgICB1bnNpZ25lZCBpbnQgYXV0aHNpemUpCisJCQkJ
-ICAgICAgIHVuc2lnbmVkIGludCBhdXRoc2l6ZSkKIHsKIAlTU0lfTE9HX0RFQlVHKCJzc2lfcmZj
-NDEwNl9nY21fc2V0YXV0aHNpemUoKSAgYXV0aHNpemUgJWRcbiIsIGF1dGhzaXplKTsKIApAQCAt
-MjcyMCwxNCArMjcyMywxNCBAQCBpbnQgc3NpX2FlYWRfYWxsb2Moc3RydWN0IHNzaV9kcnZkYXRh
-ICpkcnZkYXRhKQogCQlpZiAoSVNfRVJSKHRfYWxnKSkgewogCQkJcmMgPSBQVFJfRVJSKHRfYWxn
-KTsKIAkJCVNTSV9MT0dfRVJSKCIlcyBhbGcgYWxsb2NhdGlvbiBmYWlsZWRcbiIsCi0JCQkJIGFl
-YWRfYWxnc1thbGddLmRyaXZlcl9uYW1lKTsKKwkJCQkgICAgYWVhZF9hbGdzW2FsZ10uZHJpdmVy
-X25hbWUpOwogCQkJZ290byBmYWlsMTsKIAkJfQogCQl0X2FsZy0+ZHJ2ZGF0YSA9IGRydmRhdGE7
-CiAJCXJjID0gY3J5cHRvX3JlZ2lzdGVyX2FlYWQoJnRfYWxnLT5hZWFkX2FsZyk7CiAJCWlmICh1
-bmxpa2VseShyYyAhPSAwKSkgewogCQkJU1NJX0xPR19FUlIoIiVzIGFsZyByZWdpc3RyYXRpb24g
-ZmFpbGVkXG4iLAotCQkJCXRfYWxnLT5hZWFkX2FsZy5iYXNlLmNyYV9kcml2ZXJfbmFtZSk7CisJ
-CQkJICAgIHRfYWxnLT5hZWFkX2FsZy5iYXNlLmNyYV9kcml2ZXJfbmFtZSk7CiAJCQlnb3RvIGZh
-aWwyOwogCQl9IGVsc2UgewogCQkJbGlzdF9hZGRfdGFpbCgmdF9hbGctPmVudHJ5LCAmYWVhZF9o
-YW5kbGUtPmFlYWRfbGlzdCk7Ci0tIAoyLjExLjAKCl9fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fCmRldmVsIG1haWxpbmcgbGlzdApkZXZlbEBsaW51eGRyaXZl
-cnByb2plY3Qub3JnCmh0dHA6Ly9kcml2ZXJkZXYubGludXhkcml2ZXJwcm9qZWN0Lm9yZy9tYWls
-bWFuL2xpc3RpbmZvL2RyaXZlcmRldi1kZXZlbAo=
+Fixes checkpatch.pl alignment warnings.
+
+Signed-off-by: Simon Sandström <simon@nikanor.nu>
+---
+ drivers/staging/ccree/ssi_sysfs.c | 59 ++++++++++++++++++++-------------------
+ 1 file changed, 31 insertions(+), 28 deletions(-)
+
+diff --git a/drivers/staging/ccree/ssi_sysfs.c b/drivers/staging/ccree/ssi_sysfs.c
+index dbcd1634aad1..ef23ed43fe9e 100644
+--- a/drivers/staging/ccree/ssi_sysfs.c
++++ b/drivers/staging/ccree/ssi_sysfs.c
+@@ -144,8 +144,12 @@ static void display_db(struct stat_item item[MAX_STAT_OP_TYPES][MAX_STAT_PHASES]
+ 				avg = (u64)item[i][j].sum;
+ 				do_div(avg, item[i][j].count);
+ 				SSI_LOG_ERR("%s, %s: min=%d avg=%d max=%d sum=%lld count=%d\n",
+-					stat_name_db[i].op_type_name, stat_name_db[i].stat_phase_name[j],
+-					item[i][j].min, (int)avg, item[i][j].max, (long long)item[i][j].sum, item[i][j].count);
++					    stat_name_db[i].op_type_name,
++					    stat_name_db[i].stat_phase_name[j],
++					    item[i][j].min, (int)avg,
++					    item[i][j].max,
++					    (long long)item[i][j].sum,
++					    item[i][j].count);
+ 			}
+ 		}
+ 	}
+@@ -156,21 +160,23 @@ static void display_db(struct stat_item item[MAX_STAT_OP_TYPES][MAX_STAT_PHASES]
+  **************************************/
+ 
+ static ssize_t ssi_sys_stats_host_db_clear(struct kobject *kobj,
+-	struct kobj_attribute *attr, const char *buf, size_t count)
++					   struct kobj_attribute *attr,
++					   const char *buf, size_t count)
+ {
+ 	init_db(stat_host_db);
+ 	return count;
+ }
+ 
+ static ssize_t ssi_sys_stats_cc_db_clear(struct kobject *kobj,
+-	struct kobj_attribute *attr, const char *buf, size_t count)
++					 struct kobj_attribute *attr,
++					 const char *buf, size_t count)
+ {
+ 	init_db(stat_cc_db);
+ 	return count;
+ }
+ 
+ static ssize_t ssi_sys_stat_host_db_show(struct kobject *kobj,
+-		struct kobj_attribute *attr, char *buf)
++					 struct kobj_attribute *attr, char *buf)
+ {
+ 	int i, j;
+ 	char line[512];
+@@ -179,7 +185,7 @@ static ssize_t ssi_sys_stat_host_db_show(struct kobject *kobj,
+ 	ssize_t buf_len, tmp_len = 0;
+ 
+ 	buf_len = scnprintf(buf, PAGE_SIZE,
+-		"phase\t\t\t\t\t\t\tmin[cy]\tavg[cy]\tmax[cy]\t#samples\n");
++			    "phase\t\t\t\t\t\t\tmin[cy]\tavg[cy]\tmax[cy]\t#samples\n");
+ 	if (buf_len < 0)/* scnprintf shouldn't return negative value according to its implementation*/
+ 		return buf_len;
+ 	for (i = STAT_OP_TYPE_ENCODE; i < MAX_STAT_OP_TYPES; i++) {
+@@ -193,11 +199,11 @@ static ssize_t ssi_sys_stat_host_db_show(struct kobject *kobj,
+ 				avg = min_cyc = max_cyc = 0;
+ 			}
+ 			tmp_len = scnprintf(line, 512,
+-				"%s::%s\t\t\t\t\t%6u\t%6u\t%6u\t%7u\n",
+-				stat_name_db[i].op_type_name,
+-				stat_name_db[i].stat_phase_name[j],
+-				min_cyc, (unsigned int)avg, max_cyc,
+-				stat_host_db[i][j].count);
++					    "%s::%s\t\t\t\t\t%6u\t%6u\t%6u\t%7u\n",
++					    stat_name_db[i].op_type_name,
++					    stat_name_db[i].stat_phase_name[j],
++					    min_cyc, (unsigned int)avg, max_cyc,
++					    stat_host_db[i][j].count);
+ 			if (tmp_len < 0)/* scnprintf shouldn't return negative value according to its implementation*/
+ 				return buf_len;
+ 			if (buf_len + tmp_len >= PAGE_SIZE)
+@@ -210,7 +216,7 @@ static ssize_t ssi_sys_stat_host_db_show(struct kobject *kobj,
+ }
+ 
+ static ssize_t ssi_sys_stat_cc_db_show(struct kobject *kobj,
+-		struct kobj_attribute *attr, char *buf)
++				       struct kobj_attribute *attr, char *buf)
+ {
+ 	int i;
+ 	char line[256];
+@@ -219,7 +225,7 @@ static ssize_t ssi_sys_stat_cc_db_show(struct kobject *kobj,
+ 	ssize_t buf_len, tmp_len = 0;
+ 
+ 	buf_len = scnprintf(buf, PAGE_SIZE,
+-		"phase\tmin[cy]\tavg[cy]\tmax[cy]\t#samples\n");
++			    "phase\tmin[cy]\tavg[cy]\tmax[cy]\t#samples\n");
+ 	if (buf_len < 0)/* scnprintf shouldn't return negative value according to its implementation*/
+ 		return buf_len;
+ 	for (i = STAT_OP_TYPE_ENCODE; i < MAX_STAT_OP_TYPES; i++) {
+@@ -231,13 +237,10 @@ static ssize_t ssi_sys_stat_cc_db_show(struct kobject *kobj,
+ 		} else {
+ 			avg = min_cyc = max_cyc = 0;
+ 		}
+-		tmp_len = scnprintf(line, 256,
+-			"%s\t%6u\t%6u\t%6u\t%7u\n",
+-			stat_name_db[i].op_type_name,
+-			min_cyc,
+-			(unsigned int)avg,
+-			max_cyc,
+-			stat_cc_db[i][STAT_PHASE_6].count);
++		tmp_len = scnprintf(line, 256, "%s\t%6u\t%6u\t%6u\t%7u\n",
++				    stat_name_db[i].op_type_name, min_cyc,
++				    (unsigned int)avg, max_cyc,
++				    stat_cc_db[i][STAT_PHASE_6].count);
+ 
+ 		if (tmp_len < 0)/* scnprintf shouldn't return negative value according to its implementation*/
+ 			return buf_len;
+@@ -277,7 +280,7 @@ void display_all_stat_db(void)
+ #endif /*CC_CYCLE_COUNT*/
+ 
+ static ssize_t ssi_sys_regdump_show(struct kobject *kobj,
+-		struct kobj_attribute *attr, char *buf)
++				    struct kobj_attribute *attr, char *buf)
+ {
+ 	struct ssi_drvdata *drvdata = sys_get_drvdata();
+ 	u32 register_value;
+@@ -298,7 +301,7 @@ static ssize_t ssi_sys_regdump_show(struct kobject *kobj,
+ }
+ 
+ static ssize_t ssi_sys_help_show(struct kobject *kobj,
+-		struct kobj_attribute *attr, char *buf)
++				 struct kobj_attribute *attr, char *buf)
+ {
+ 	char *help_str[] = {
+ 				"cat reg_dump              ", "Print several of CC register values",
+@@ -357,8 +360,8 @@ static struct ssi_drvdata *sys_get_drvdata(void)
+ }
+ 
+ static int sys_init_dir(struct sys_dir *sys_dir, struct ssi_drvdata *drvdata,
+-		 struct kobject *parent_dir_kobj, const char *dir_name,
+-		 struct kobj_attribute *attrs, u32 num_of_attrs)
++			struct kobject *parent_dir_kobj, const char *dir_name,
++			struct kobj_attribute *attrs, u32 num_of_attrs)
+ {
+ 	int i;
+ 
+@@ -375,7 +378,7 @@ static int sys_init_dir(struct sys_dir *sys_dir, struct ssi_drvdata *drvdata,
+ 	/* allocate memory for directory's attributes list */
+ 	sys_dir->sys_dir_attr_list =
+ 		kzalloc(sizeof(struct attribute *) * (num_of_attrs + 1),
+-				GFP_KERNEL);
++			GFP_KERNEL);
+ 
+ 	if (!(sys_dir->sys_dir_attr_list)) {
+ 		kobject_put(sys_dir->sys_dir_kobj);
+@@ -421,9 +424,9 @@ int ssi_sysfs_init(struct kobject *sys_dev_obj, struct ssi_drvdata *drvdata)
+ 	SSI_LOG_ERR("setup sysfs under %s\n", sys_dev_obj->name);
+ 
+ 	/* Initialize top directory */
+-	retval = sys_init_dir(&sys_top_dir, drvdata, sys_dev_obj,
+-				"cc_info", ssi_sys_top_level_attrs,
+-				ARRAY_SIZE(ssi_sys_top_level_attrs));
++	retval = sys_init_dir(&sys_top_dir, drvdata, sys_dev_obj, "cc_info",
++			      ssi_sys_top_level_attrs,
++			      ARRAY_SIZE(ssi_sys_top_level_attrs));
+ 	return retval;
+ }
+ 
+-- 
+2.11.0
