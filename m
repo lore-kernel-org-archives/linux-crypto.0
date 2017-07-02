@@ -1,8 +1,8 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH v3 10/28] fscrypt: use -EIOCBQUEUED for backlog
+Subject: [PATCH v3 11/28] cifs: use -EIOCBQUEUED for backlog
 	indication
-Date: Sun,  2 Jul 2017 17:41:52 +0300
-Message-ID: <1499006535-19760-11-git-send-email-gilad@benyossef.com>
+Date: Sun,  2 Jul 2017 17:41:53 +0300
+Message-ID: <1499006535-19760-12-git-send-email-gilad@benyossef.com>
 References: <1499006535-19760-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -46,21 +46,21 @@ Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 This patch should be squashed with the first patch in the series
 when applied.
 
- fs/crypto/crypto.c | 2 +-
+ fs/cifs/smb2ops.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/crypto/crypto.c b/fs/crypto/crypto.c
-index c7835df..c5c89ed 100644
---- a/fs/crypto/crypto.c
-+++ b/fs/crypto/crypto.c
-@@ -190,7 +190,7 @@ int fscrypt_do_page_crypto(const struct inode *inode, fscrypt_direction_t rw,
- 		res = crypto_skcipher_decrypt(req);
- 	else
- 		res = crypto_skcipher_encrypt(req);
--	if (res == -EINPROGRESS || res == -EBUSY) {
-+	if (res == -EINPROGRESS || res == -EIOCBQUEUED) {
- 		BUG_ON(req->base.data != &ecr);
- 		wait_for_completion(&ecr.completion);
- 		res = ecr.res;
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 941c40b..00b1143 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -1934,7 +1934,7 @@ crypt_message(struct TCP_Server_Info *server, struct smb_rqst *rqst, int enc)
+ 
+ 	rc = enc ? crypto_aead_encrypt(req) : crypto_aead_decrypt(req);
+ 
+-	if (rc == -EINPROGRESS || rc == -EBUSY) {
++	if (rc == -EINPROGRESS || rc == -EIOCBQUEUED) {
+ 		wait_for_completion(&result.completion);
+ 		rc = result.err;
+ 	}
 -- 
 2.1.4
