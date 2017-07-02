@@ -1,8 +1,8 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH v3 07/28] crypto: qce: use -EIOCBQUEUED for
+Subject: [PATCH v3 08/28] crypto: talitos: use -EIOCBQUEUED for
 	backlog indication
-Date: Sun,  2 Jul 2017 17:41:49 +0300
-Message-ID: <1499006535-19760-8-git-send-email-gilad@benyossef.com>
+Date: Sun,  2 Jul 2017 17:41:50 +0300
+Message-ID: <1499006535-19760-9-git-send-email-gilad@benyossef.com>
 References: <1499006535-19760-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -46,21 +46,21 @@ Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 This patch should be squashed with the first patch in the series
 when applied.
 
- drivers/crypto/qce/sha.c | 2 +-
+ drivers/crypto/talitos.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/qce/sha.c b/drivers/crypto/qce/sha.c
-index 47e114a..a21d2a1c 100644
---- a/drivers/crypto/qce/sha.c
-+++ b/drivers/crypto/qce/sha.c
-@@ -421,7 +421,7 @@ static int qce_ahash_hmac_setkey(struct crypto_ahash *tfm, const u8 *key,
- 	ahash_request_set_crypt(req, &sg, ctx->authkey, keylen);
- 
- 	ret = crypto_ahash_digest(req);
--	if (ret == -EINPROGRESS || ret == -EBUSY) {
-+	if (ret == -EINPROGRESS || ret == -EIOCBQUEUED) {
- 		ret = wait_for_completion_interruptible(&result.completion);
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index 79791c6..0ab3c4d 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -2082,7 +2082,7 @@ static int keyhash(struct crypto_ahash *tfm, const u8 *key, unsigned int keylen,
+ 	case 0:
+ 		break;
+ 	case -EINPROGRESS:
+-	case -EBUSY:
++	case -EIOCBQUEUED:
+ 		ret = wait_for_completion_interruptible(
+ 			&hresult.completion);
  		if (!ret)
- 			ret = result.error;
 -- 
 2.1.4
