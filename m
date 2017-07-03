@@ -1,66 +1,111 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [PATCH 00/10] Fix alignment issues in staging/ccree
-Date: Mon, 3 Jul 2017 10:19:31 +0300
-Message-ID: <CAOtvUMdp+xTAhW1Xd1o0Ch4GjzXgLPHYhyefB9T1p6xjTFVRQQ@mail.gmail.com>
-References: <20170701232555.5538-1-simon@nikanor.nu>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: devel@driverdev.osuosl.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- driverdev-devel@linuxdriverproject.org, linux-crypto@vger.kernel.org
-To: =?UTF-8?Q?Simon_Sandstr=C3=B6m?= <simon@nikanor.nu>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-In-Reply-To: <20170701232555.5538-1-simon@nikanor.nu>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
-List-Id: linux-crypto.vger.kernel.org
+From: Harald Freudenberger <freude@linux.vnet.ibm.com>
+Subject: [PATCH 1/3] crypto: hwrng use rng source with best quality
+Date: Mon,  3 Jul 2017 12:03:22 +0200
+Message-ID: <1499076204-18547-2-git-send-email-freude@linux.vnet.ibm.com>
+References: <1499076204-18547-1-git-send-email-freude@linux.vnet.ibm.com>
+Cc: herbert@gondor.apana.org.au, arnd@arndb.de,
+        gregkh@linuxfoundation.org, schwidefsky@de.ibm.com,
+        Harald Freudenberger <freude@linux.vnet.ibm.com>
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49653 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1753800AbdGCKDq (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 3 Jul 2017 06:03:46 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id v639wg2s065908
+        for <linux-crypto@vger.kernel.org>; Mon, 3 Jul 2017 06:03:45 -0400
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2bfdbcdh4r-1
+        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Mon, 03 Jul 2017 06:03:45 -0400
+Received: from localhost
+        by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-crypto@vger.kernel.org> from <freude@de.ibm.com>;
+        Mon, 3 Jul 2017 11:03:43 +0100
+In-Reply-To: <1499076204-18547-1-git-send-email-freude@linux.vnet.ibm.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-SGksCgpPbiBTdW4sIEp1bCAyLCAyMDE3IGF0IDI6MjUgQU0sIFNpbW9uIFNhbmRzdHLDtm0gPHNp
-bW9uQG5pa2Fub3IubnU+IHdyb3RlOgo+IEZpeGVzIGEgdG90YWwgb2YgMTk1IGFsaWdubWVudCBp
-c3N1ZXMgaW4gc3RhZ2luZy9jY3JlZSByZXBvcnRlZCBieQo+IGNoZWNrcGF0Y2gucGwuIEFkZHMg
-YSBmZXcgImxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzIiB3YXJuaW5ncyBhcyBhCj4gcmVzdWx0IG9m
-IHRoZSByZWFsaWdubWVudHMsIGJ1dCBJIGNvdWxkIHRyeSB0byBnZXQgcmlkIG9mIHRoZW0gaW4g
-dGhlCj4gc2FtZSBwYXRjaHNldCBpZiBuZWVkZWQuCgpGb3IgdGhlIGxhcmdlIG1ham9yaXR5IG9m
-IHdhcm5pbmdzIHRoZXJlIGlzIG5vdGhpbmcgeW91IGNhbiBkdWUgdGkgdGhlCmluZGVudGF0aW9u
-IGRlcHRoLApidXQgZm9yIHRoZSBmZXcgY2FzZXMgd2hlcmUgaXRzIGEgY29tcGxleCBleHByZXNz
-aW9uIHRoYXQgY2FuIGJlCmJyb2tlbiBkb3duIGxpa2UgdGhpcyBvbmU6CgpXQVJOSU5HOiBsaW5l
-IG92ZXIgODAgY2hhcmFjdGVycwojOTM6IEZJTEU6IGRyaXZlcnMvc3RhZ2luZy9jY3JlZS9zc2lf
-YnVmZmVyX21nci5jOjQzNzoKKyAgICAgKEFFU19CTE9DS19TSVpFICsgYXJlcV9jdHgtPmNjbV9o
-ZHJfc2l6ZSksCgpJdCB3b3VsZCBiZSBncmVhdCBpZiB5b3UgZml4IHRob3NlLgoKT3RoZXJ3aXNl
-IGl0IGxvb2tzIGdvb2QgdG8gbWUuCgpUaGFua3MgZm9yIGRvaW5nIGl0IQoKR2lsYWQKCgoKPgo+
-IC0tIFNpbW9uCj4KPiAtLS0KPgo+IFNpbW9uIFNhbmRzdHLDtm0gKDEwKToKPiAgIHN0YWdpbmc6
-IGNjcmVlOiBGaXggYWxpZ25tZW50IGlzc3VlcyBpbiBzc2lfYWVhZC5jCj4gICBzdGFnaW5nOiBj
-Y3JlZTogRml4IGFsaWdubWVudCBpc3N1ZXMgaW4gc3NpX2J1ZmZlcl9tZ3IuYwo+ICAgc3RhZ2lu
-ZzogY2NyZWU6IEZpeCBhbGlnbm1lbnQgaXNzdWVzIGluIHNzaV9jaXBoZXIuYwo+ICAgc3RhZ2lu
-ZzogY2NyZWU6IEZpeCBhbGlnbm1lbnQgaXNzdWVzIGluIHNzaV9kcml2ZXIuYwo+ICAgc3RhZ2lu
-ZzogY2NyZWU6IEZpeCBhbGlnbm1lbnQgaXNzdWVzIGluIHNzaV9maXBzX2xvY2FsLmMKPiAgIHN0
-YWdpbmc6IGNjcmVlOiBGaXggYWxpZ25tZW50IGlzc3VlcyBpbiBzc2lfaGFzaC5jCj4gICBzdGFn
-aW5nOiBjY3JlZTogRml4IGFsaWdubWVudCBpc3N1ZXMgaW4gc3NpX2l2Z2VuLmMKPiAgIHN0YWdp
-bmc6IGNjcmVlOiBGaXggYWxpZ25tZW50IGlzc3VlcyBpbiBzc2lfcmVxdWVzdF9tZ3IuYwo+ICAg
-c3RhZ2luZzogY2NyZWU6IEZpeCBhbGlnbm1lbnQgaXNzdWVzIGluIHNzaV9zcmFtX21nci5jCj4g
-ICBzdGFnaW5nOiBjY3JlZTogRml4IGFsaWdubWVudCBpc3N1ZXMgaW4gc3NpX3N5c2ZzLmMKPgo+
-ICBkcml2ZXJzL3N0YWdpbmcvY2NyZWUvc3NpX2FlYWQuYyAgICAgICAgfCAgNjcgKysrKy0tLS0K
-PiAgZHJpdmVycy9zdGFnaW5nL2NjcmVlL3NzaV9idWZmZXJfbWdyLmMgIHwgMjk1ICsrKysrKysr
-KysrKysrKysrKy0tLS0tLS0tLS0tLS0tCj4gIGRyaXZlcnMvc3RhZ2luZy9jY3JlZS9zc2lfY2lw
-aGVyLmMgICAgICB8ICA3NSArKysrLS0tLQo+ICBkcml2ZXJzL3N0YWdpbmcvY2NyZWUvc3NpX2Ry
-aXZlci5jICAgICAgfCAgNDAgKystLS0KPiAgZHJpdmVycy9zdGFnaW5nL2NjcmVlL3NzaV9maXBz
-X2xvY2FsLmMgIHwgICAzICstCj4gIGRyaXZlcnMvc3RhZ2luZy9jY3JlZS9zc2lfaGFzaC5jICAg
-ICAgICB8IDExNiArKysrKysrLS0tLS0tCj4gIGRyaXZlcnMvc3RhZ2luZy9jY3JlZS9zc2lfaXZn
-ZW4uYyAgICAgICB8ICAgMyArLQo+ICBkcml2ZXJzL3N0YWdpbmcvY2NyZWUvc3NpX3JlcXVlc3Rf
-bWdyLmMgfCAgNDIgKysrLS0KPiAgZHJpdmVycy9zdGFnaW5nL2NjcmVlL3NzaV9zcmFtX21nci5j
-ICAgIHwgICA2ICstCj4gIGRyaXZlcnMvc3RhZ2luZy9jY3JlZS9zc2lfc3lzZnMuYyAgICAgICB8
-ICA1OSArKysrLS0tCj4gIDEwIGZpbGVzIGNoYW5nZWQsIDM3MiBpbnNlcnRpb25zKCspLCAzMzQg
-ZGVsZXRpb25zKC0pCj4KPiAtLQo+IDIuMTEuMAo+CgoKCi0tIApHaWxhZCBCZW4tWW9zc2VmCkNo
-aWVmIENvZmZlZSBEcmlua2VyCgoiSWYgeW91IHRha2UgYSBjbGFzcyBpbiBsYXJnZS1zY2FsZSBy
-b2JvdGljcywgY2FuIHlvdSBlbmQgdXAgaW4gYQpzaXR1YXRpb24gd2hlcmUgdGhlIGhvbWV3b3Jr
-IGVhdHMgeW91ciBkb2c/IgogLS0gSmVhbi1CYXB0aXN0ZSBRdWVydQpfX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpkZXZlbCBtYWlsaW5nIGxpc3QKZGV2ZWxA
-bGludXhkcml2ZXJwcm9qZWN0Lm9yZwpodHRwOi8vZHJpdmVyZGV2LmxpbnV4ZHJpdmVycHJvamVj
-dC5vcmcvbWFpbG1hbi9saXN0aW5mby9kcml2ZXJkZXYtZGV2ZWwK
+This patch rewoks the hwrng to always use the
+rng source with best entropy quality.
+
+On registation and unregistration the hwrng now
+tries to choose the best (= highest quality value)
+rng source. The handling of the internal list
+of registered rng sources is now always sorted
+by quality and the top most rng chosen.
+
+Signed-off-by: Harald Freudenberger <freude@linux.vnet.ibm.com>
+---
+ drivers/char/hw_random/core.c | 25 +++++++++++++++++++------
+ 1 file changed, 19 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+index 503a41d..e9dda16 100644
+--- a/drivers/char/hw_random/core.c
++++ b/drivers/char/hw_random/core.c
+@@ -29,6 +29,7 @@
+ 
+ static struct hwrng *current_rng;
+ static struct task_struct *hwrng_fill;
++/* list of registered rngs, sorted decending by quality */
+ static LIST_HEAD(rng_list);
+ /* Protects rng_list and current_rng */
+ static DEFINE_MUTEX(rng_mutex);
+@@ -417,6 +418,7 @@ int hwrng_register(struct hwrng *rng)
+ {
+ 	int err = -EINVAL;
+ 	struct hwrng *old_rng, *tmp;
++	struct list_head *rng_list_ptr;
+ 
+ 	if (!rng->name || (!rng->data_read && !rng->read))
+ 		goto out;
+@@ -432,14 +434,25 @@ int hwrng_register(struct hwrng *rng)
+ 	init_completion(&rng->cleanup_done);
+ 	complete(&rng->cleanup_done);
+ 
++	/* rng_list is sorted by decreasing quality */
++	list_for_each(rng_list_ptr, &rng_list) {
++		tmp = list_entry(rng_list_ptr, struct hwrng, list);
++		if (tmp->quality < rng->quality)
++			break;
++	}
++	list_add_tail(&rng->list, rng_list_ptr);
++
+ 	old_rng = current_rng;
+ 	err = 0;
+-	if (!old_rng) {
++	if (!old_rng || (rng->quality > old_rng->quality)) {
++		/*
++		 * Set new rng as current as the new rng source
++		 * provides better entropy quality.
++		 */
+ 		err = set_current_rng(rng);
+ 		if (err)
+ 			goto out_unlock;
+ 	}
+-	list_add_tail(&rng->list, &rng_list);
+ 
+ 	if (old_rng && !rng->init) {
+ 		/*
+@@ -466,12 +479,12 @@ void hwrng_unregister(struct hwrng *rng)
+ 	list_del(&rng->list);
+ 	if (current_rng == rng) {
+ 		drop_current_rng();
++		/* rng_list is sorted by quality, use the best (=first) one */
+ 		if (!list_empty(&rng_list)) {
+-			struct hwrng *tail;
+-
+-			tail = list_entry(rng_list.prev, struct hwrng, list);
++			struct hwrng *new_rng;
+ 
+-			set_current_rng(tail);
++			new_rng = list_entry(rng_list.next, struct hwrng, list);
++			set_current_rng(new_rng);
+ 		}
+ 	}
+ 
+-- 
+2.7.4
