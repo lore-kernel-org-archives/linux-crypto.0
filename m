@@ -1,135 +1,66 @@
-From: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-Subject: [PATCH v3 28/28] crypto: adapt api sample to use async. op wait
-Date: Sun,  2 Jul 2017 17:42:10 +0300
-Message-ID: <1499006535-19760-29-git-send-email-gilad@benyossef.com>
-References: <1499006535-19760-1-git-send-email-gilad@benyossef.com>
-Cc: Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>
-To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-        "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-        Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>,
-        David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        Tom Lendacky <thomas.lendacky-5C7GfCeVMHo@public.gmane.org>,
-        Gary Hook <gary.hook-5C7GfCeVMHo@public.gmane.org>,
-        Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
-        Arnaud Ebalard <arno-LkuqDEemtHBg9hUCZPvPmw@public.gmane.org>,
-        Matthias Brugger <matthias.bgg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        Alasdair Kergon <agk-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        Mike Snitzer <snitzer-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, dm-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
-        Shaohua Li <shli-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-        "Theodore Y. Ts'o" <tytso-3s7WtUTddSA@public.gmane.org>,
-        Jaegeuk Kim <jaegeuk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        Mimi Zohar <zohar-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>,
-        Dmitry Kasatkin <dmitry.kasatkin-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        James Morris <james.l.morris-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
-        "Serge E. Hallyn" <serge-A9i7LUbDfNHQT0dZR+AlfA@public.gmane.org>, linux-crypto@v
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1499006535-19760-1-git-send-email-gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: Re: [PATCH 00/10] Fix alignment issues in staging/ccree
+Date: Mon, 3 Jul 2017 10:19:31 +0300
+Message-ID: <CAOtvUMdp+xTAhW1Xd1o0Ch4GjzXgLPHYhyefB9T1p6xjTFVRQQ@mail.gmail.com>
+References: <20170701232555.5538-1-simon@nikanor.nu>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: devel@driverdev.osuosl.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ driverdev-devel@linuxdriverproject.org, linux-crypto@vger.kernel.org
+To: =?UTF-8?Q?Simon_Sandstr=C3=B6m?= <simon@nikanor.nu>
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+In-Reply-To: <20170701232555.5538-1-simon@nikanor.nu>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-The code sample is waiting for an async. crypto op completion.
-Adapt sample to use the new generic infrastructure to do the same.
-
-This also fixes a possible data coruption bug created by the
-use of wait_for_completion_interruptible() without dealing
-correctly with an interrupt aborting the wait prior to the
-async op finishing.
-
-Signed-off-by: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
----
- Documentation/crypto/api-samples.rst | 52 +++++++-----------------------------
- 1 file changed, 10 insertions(+), 42 deletions(-)
-
-diff --git a/Documentation/crypto/api-samples.rst b/Documentation/crypto/api-samples.rst
-index c6aa4ba..006827e 100644
---- a/Documentation/crypto/api-samples.rst
-+++ b/Documentation/crypto/api-samples.rst
-@@ -7,59 +7,27 @@ Code Example For Symmetric Key Cipher Operation
- ::
- 
- 
--    struct tcrypt_result {
--        struct completion completion;
--        int err;
--    };
--
-     /* tie all data structures together */
-     struct skcipher_def {
-         struct scatterlist sg;
-         struct crypto_skcipher *tfm;
-         struct skcipher_request *req;
--        struct tcrypt_result result;
-+        struct crypto_wait wait;
-     };
- 
--    /* Callback function */
--    static void test_skcipher_cb(struct crypto_async_request *req, int error)
--    {
--        struct tcrypt_result *result = req->data;
--
--        if (error == -EINPROGRESS)
--            return;
--        result->err = error;
--        complete(&result->completion);
--        pr_info("Encryption finished successfully\n");
--    }
--
-     /* Perform cipher operation */
-     static unsigned int test_skcipher_encdec(struct skcipher_def *sk,
-                          int enc)
-     {
--        int rc = 0;
-+        int rc;
- 
-         if (enc)
--            rc = crypto_skcipher_encrypt(sk->req);
-+            rc = crypto_wait_req(crypto_skcipher_encrypt(sk->req), &sk->wait);
-         else
--            rc = crypto_skcipher_decrypt(sk->req);
--
--        switch (rc) {
--        case 0:
--            break;
--        case -EINPROGRESS:
--        case -EIOCBQUEUED:
--            rc = wait_for_completion_interruptible(
--                &sk->result.completion);
--            if (!rc && !sk->result.err) {
--                reinit_completion(&sk->result.completion);
--                break;
--            }
--        default:
--            pr_info("skcipher encrypt returned with %d result %d\n",
--                rc, sk->result.err);
--            break;
--        }
--        init_completion(&sk->result.completion);
-+            rc = crypto_wait_req(crypto_skcipher_decrypt(sk->req), &sk->wait);
-+
-+	if (rc)
-+		pr_info("skcipher encrypt returned with result %d\n", rc);
- 
-         return rc;
-     }
-@@ -89,8 +57,8 @@ Code Example For Symmetric Key Cipher Operation
-         }
- 
-         skcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
--                          test_skcipher_cb,
--                          &sk.result);
-+                          crypto_req_done,
-+                          &sk.wait);
- 
-         /* AES 256 with random key */
-         get_random_bytes(&key, 32);
-@@ -122,7 +90,7 @@ Code Example For Symmetric Key Cipher Operation
-         /* We encrypt one block */
-         sg_init_one(&sk.sg, scratchpad, 16);
-         skcipher_request_set_crypt(req, &sk.sg, &sk.sg, 16, ivdata);
--        init_completion(&sk.result.completion);
-+        crypto_init_wait(&sk.wait);
- 
-         /* encrypt data */
-         ret = test_skcipher_encdec(&sk, 1);
--- 
-2.1.4
+SGksCgpPbiBTdW4sIEp1bCAyLCAyMDE3IGF0IDI6MjUgQU0sIFNpbW9uIFNhbmRzdHLDtm0gPHNp
+bW9uQG5pa2Fub3IubnU+IHdyb3RlOgo+IEZpeGVzIGEgdG90YWwgb2YgMTk1IGFsaWdubWVudCBp
+c3N1ZXMgaW4gc3RhZ2luZy9jY3JlZSByZXBvcnRlZCBieQo+IGNoZWNrcGF0Y2gucGwuIEFkZHMg
+YSBmZXcgImxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzIiB3YXJuaW5ncyBhcyBhCj4gcmVzdWx0IG9m
+IHRoZSByZWFsaWdubWVudHMsIGJ1dCBJIGNvdWxkIHRyeSB0byBnZXQgcmlkIG9mIHRoZW0gaW4g
+dGhlCj4gc2FtZSBwYXRjaHNldCBpZiBuZWVkZWQuCgpGb3IgdGhlIGxhcmdlIG1ham9yaXR5IG9m
+IHdhcm5pbmdzIHRoZXJlIGlzIG5vdGhpbmcgeW91IGNhbiBkdWUgdGkgdGhlCmluZGVudGF0aW9u
+IGRlcHRoLApidXQgZm9yIHRoZSBmZXcgY2FzZXMgd2hlcmUgaXRzIGEgY29tcGxleCBleHByZXNz
+aW9uIHRoYXQgY2FuIGJlCmJyb2tlbiBkb3duIGxpa2UgdGhpcyBvbmU6CgpXQVJOSU5HOiBsaW5l
+IG92ZXIgODAgY2hhcmFjdGVycwojOTM6IEZJTEU6IGRyaXZlcnMvc3RhZ2luZy9jY3JlZS9zc2lf
+YnVmZmVyX21nci5jOjQzNzoKKyAgICAgKEFFU19CTE9DS19TSVpFICsgYXJlcV9jdHgtPmNjbV9o
+ZHJfc2l6ZSksCgpJdCB3b3VsZCBiZSBncmVhdCBpZiB5b3UgZml4IHRob3NlLgoKT3RoZXJ3aXNl
+IGl0IGxvb2tzIGdvb2QgdG8gbWUuCgpUaGFua3MgZm9yIGRvaW5nIGl0IQoKR2lsYWQKCgoKPgo+
+IC0tIFNpbW9uCj4KPiAtLS0KPgo+IFNpbW9uIFNhbmRzdHLDtm0gKDEwKToKPiAgIHN0YWdpbmc6
+IGNjcmVlOiBGaXggYWxpZ25tZW50IGlzc3VlcyBpbiBzc2lfYWVhZC5jCj4gICBzdGFnaW5nOiBj
+Y3JlZTogRml4IGFsaWdubWVudCBpc3N1ZXMgaW4gc3NpX2J1ZmZlcl9tZ3IuYwo+ICAgc3RhZ2lu
+ZzogY2NyZWU6IEZpeCBhbGlnbm1lbnQgaXNzdWVzIGluIHNzaV9jaXBoZXIuYwo+ICAgc3RhZ2lu
+ZzogY2NyZWU6IEZpeCBhbGlnbm1lbnQgaXNzdWVzIGluIHNzaV9kcml2ZXIuYwo+ICAgc3RhZ2lu
+ZzogY2NyZWU6IEZpeCBhbGlnbm1lbnQgaXNzdWVzIGluIHNzaV9maXBzX2xvY2FsLmMKPiAgIHN0
+YWdpbmc6IGNjcmVlOiBGaXggYWxpZ25tZW50IGlzc3VlcyBpbiBzc2lfaGFzaC5jCj4gICBzdGFn
+aW5nOiBjY3JlZTogRml4IGFsaWdubWVudCBpc3N1ZXMgaW4gc3NpX2l2Z2VuLmMKPiAgIHN0YWdp
+bmc6IGNjcmVlOiBGaXggYWxpZ25tZW50IGlzc3VlcyBpbiBzc2lfcmVxdWVzdF9tZ3IuYwo+ICAg
+c3RhZ2luZzogY2NyZWU6IEZpeCBhbGlnbm1lbnQgaXNzdWVzIGluIHNzaV9zcmFtX21nci5jCj4g
+ICBzdGFnaW5nOiBjY3JlZTogRml4IGFsaWdubWVudCBpc3N1ZXMgaW4gc3NpX3N5c2ZzLmMKPgo+
+ICBkcml2ZXJzL3N0YWdpbmcvY2NyZWUvc3NpX2FlYWQuYyAgICAgICAgfCAgNjcgKysrKy0tLS0K
+PiAgZHJpdmVycy9zdGFnaW5nL2NjcmVlL3NzaV9idWZmZXJfbWdyLmMgIHwgMjk1ICsrKysrKysr
+KysrKysrKysrKy0tLS0tLS0tLS0tLS0tCj4gIGRyaXZlcnMvc3RhZ2luZy9jY3JlZS9zc2lfY2lw
+aGVyLmMgICAgICB8ICA3NSArKysrLS0tLQo+ICBkcml2ZXJzL3N0YWdpbmcvY2NyZWUvc3NpX2Ry
+aXZlci5jICAgICAgfCAgNDAgKystLS0KPiAgZHJpdmVycy9zdGFnaW5nL2NjcmVlL3NzaV9maXBz
+X2xvY2FsLmMgIHwgICAzICstCj4gIGRyaXZlcnMvc3RhZ2luZy9jY3JlZS9zc2lfaGFzaC5jICAg
+ICAgICB8IDExNiArKysrKysrLS0tLS0tCj4gIGRyaXZlcnMvc3RhZ2luZy9jY3JlZS9zc2lfaXZn
+ZW4uYyAgICAgICB8ICAgMyArLQo+ICBkcml2ZXJzL3N0YWdpbmcvY2NyZWUvc3NpX3JlcXVlc3Rf
+bWdyLmMgfCAgNDIgKysrLS0KPiAgZHJpdmVycy9zdGFnaW5nL2NjcmVlL3NzaV9zcmFtX21nci5j
+ICAgIHwgICA2ICstCj4gIGRyaXZlcnMvc3RhZ2luZy9jY3JlZS9zc2lfc3lzZnMuYyAgICAgICB8
+ICA1OSArKysrLS0tCj4gIDEwIGZpbGVzIGNoYW5nZWQsIDM3MiBpbnNlcnRpb25zKCspLCAzMzQg
+ZGVsZXRpb25zKC0pCj4KPiAtLQo+IDIuMTEuMAo+CgoKCi0tIApHaWxhZCBCZW4tWW9zc2VmCkNo
+aWVmIENvZmZlZSBEcmlua2VyCgoiSWYgeW91IHRha2UgYSBjbGFzcyBpbiBsYXJnZS1zY2FsZSBy
+b2JvdGljcywgY2FuIHlvdSBlbmQgdXAgaW4gYQpzaXR1YXRpb24gd2hlcmUgdGhlIGhvbWV3b3Jr
+IGVhdHMgeW91ciBkb2c/IgogLS0gSmVhbi1CYXB0aXN0ZSBRdWVydQpfX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpkZXZlbCBtYWlsaW5nIGxpc3QKZGV2ZWxA
+bGludXhkcml2ZXJwcm9qZWN0Lm9yZwpodHRwOi8vZHJpdmVyZGV2LmxpbnV4ZHJpdmVycHJvamVj
+dC5vcmcvbWFpbG1hbi9saXN0aW5mby9kcml2ZXJkZXYtZGV2ZWwK
