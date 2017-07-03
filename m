@@ -1,94 +1,470 @@
-From: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-Subject: Re: [PATCH v3 01/28] crypto: change backlog return code to -EIOCBQUEUED
-Date: Mon, 3 Jul 2017 16:23:18 +0300
-Message-ID: <CAOtvUMdoMfrpZPuRfD_cQo4=FDp5Vn4uv51Vzc-0Gitmvr2V6g@mail.gmail.com>
-References: <1499006535-19760-1-git-send-email-gilad@benyossef.com>
- <1499006535-19760-2-git-send-email-gilad@benyossef.com> <20170703123515.GC30067@gondor.apana.org.au>
+From: Gary R Hook <gary.hook@amd.com>
+Subject: Re: [PATCH v3 RESEND 1/5] crypto: ccp - Use devres interface to
+ allocate PCI/iomap and cleanup
+Date: Mon, 3 Jul 2017 10:50:21 -0500
+Message-ID: <e227d81a-0788-22dd-be77-1bb7017e8789@amd.com>
+References: <20170629165406.13463-1-brijesh.singh@amd.com>
+ <20170629165406.13463-2-brijesh.singh@amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-        Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>,
-        David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        Tom Lendacky <thomas.lendacky-5C7GfCeVMHo@public.gmane.org>,
-        Gary Hook <gary.hook-5C7GfCeVMHo@public.gmane.org>,
-        Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
-        Arnaud Ebalard <arno-LkuqDEemtHBg9hUCZPvPmw@public.gmane.org>,
-        Matthias Brugger <matthias.bgg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        Alasdair Kergon <agk-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        Mike Snitzer <snitzer-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        device-mapper development <dm-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        Shaohua Li <shli-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-        "Theodore Y. Ts'o" <tytso-3s7WtUTddSA@public.gmane.org>,
-        Jaegeuk Kim <jaegeuk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        Mimi Zohar <zohar-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>,
-        Dmitry Kasatkin <dmitry.kasatkin-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        James Morris <james.l.morris-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
-        "Serge E. Hallyn" <serge-A9i7LUbDfNHQT0dZR+AlfA@public.gmane.org>, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170703123515.GC30067-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>
+To: "Singh, Brijesh" <brijesh.singh@amd.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-sn1nam02on0040.outbound.protection.outlook.com ([104.47.36.40]:22752
+        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1754627AbdGCPun (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 3 Jul 2017 11:50:43 -0400
+In-Reply-To: <20170629165406.13463-2-brijesh.singh@amd.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jul 3, 2017 at 3:35 PM, Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org> wrote:
-> On Sun, Jul 02, 2017 at 05:41:43PM +0300, Gilad Ben-Yossef wrote:
->> The crypto API was using the -EBUSY return value to indicate
->> both a hard failure to submit a crypto operation into a
->> transformation provider when the latter was busy and the backlog
->> mechanism was not enabled as well as a notification that the operation
->> was queued into the backlog when the backlog mechanism was enabled.
->>
->> Having the same return code indicate two very different conditions
->> depending on a flag is both error prone and requires extra runtime
->> check like the following to discern between the cases:
->>
->>       if (err == -EINPROGRESS ||
->>           (err == -EBUSY && (ahash_request_flags(req) &
->>                              CRYPTO_TFM_REQ_MAY_BACKLOG)))
->>
->> This patch changes the return code used to indicate a crypto op
->> was queued in the backlog to -EIOCBQUEUED, thus resolving both
->> issues.
->>
->> Signed-off-by: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
+On 06/29/2017 11:54 AM, Singh, Brijesh wrote:
+> Update pci and platform files to use devres interface to allocate the PCI
+> and iomap resources. Also add helper functions to consolicate module init,
+> exit and power mangagement code duplication.
 >
-> So you're changing the success case from EBUSY to EIOCBQUEUED.
-> This results in a lot of churn as you have to change every single
-> driver and caller.
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+
+Acked-by: Gary R Hook <gary.hook@amd.com>
+
+> ---
+>  drivers/crypto/ccp/ccp-dev-v3.c   |   7 +++
+>  drivers/crypto/ccp/ccp-dev.c      |  61 ++++++++++++++++++++
+>  drivers/crypto/ccp/ccp-dev.h      |   6 ++
+>  drivers/crypto/ccp/ccp-pci.c      | 114
+> +++++++++-----------------------------
+>  drivers/crypto/ccp/ccp-platform.c |  56 ++-----------------
+>  5 files changed, 106 insertions(+), 138 deletions(-)
 >
-> How about changing the error case to use something other than
-> EBUSY instead?
-
-That was indeed my first thought - I wanted to change EBUSY to EAGAIN.
-It might even be a more descriptive error message since the failure is
-transient.
-
-What stopped me was that I saw the algif interface passes this EBUSY value
-to user space. I don't know of any software that depends on this value but
-I'm really averse to changing user space API.
-
-Of course, we can just plant a (ret != AGAIN : ? EBUSY) in the algif interface
-return to user space code path but that felt like a kludge to me.
-
-And it doesn't really save any churn, I think - I'd still have to
-visit all the places that
-use the flags value to distinguish between the two EBUSY use cases and  I need
-to visit most places that check for EBUSY as backlog indication because I'm
-replacing the check with the generic replacement, so it doesn't look
-like in the end
-it will be a smaller change.
-
-Having said that, if you prefer me to replace the error case I'd
-happily do that.
-
-Thanks,
-Gilad
-
-
--- 
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-"If you take a class in large-scale robotics, can you end up in a
-situation where the homework eats your dog?"
- -- Jean-Baptiste Queru
+> diff --git a/drivers/crypto/ccp/ccp-dev-v3.c
+> b/drivers/crypto/ccp/ccp-dev-v3.c
+> index 367c2e3..52aa88b 100644
+> --- a/drivers/crypto/ccp/ccp-dev-v3.c
+> +++ b/drivers/crypto/ccp/ccp-dev-v3.c
+> @@ -586,6 +586,13 @@ static const struct ccp_actions ccp3_actions = {
+>          .irqhandler = ccp_irq_handler,
+>  };
+>
+> +const struct ccp_vdata ccpv3_platform = {
+> +       .version = CCP_VERSION(3, 0),
+> +       .setup = NULL,
+> +       .perform = &ccp3_actions,
+> +       .offset = 0,
+> +};
+> +
+>  const struct ccp_vdata ccpv3 = {
+>          .version = CCP_VERSION(3, 0),
+>          .setup = NULL,
+> diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
+> index 2506b50..abb3d68 100644
+> --- a/drivers/crypto/ccp/ccp-dev.c
+> +++ b/drivers/crypto/ccp/ccp-dev.c
+> @@ -538,8 +538,69 @@ bool ccp_queues_suspended(struct ccp_device *ccp)
+>
+>          return ccp->cmd_q_count == suspended;
+>  }
+> +
+> +int ccp_dev_suspend(struct ccp_device *ccp, pm_message_t state)
+> +{
+> +       unsigned long flags;
+> +       unsigned int i;
+> +
+> +       spin_lock_irqsave(&ccp->cmd_lock, flags);
+> +
+> +       ccp->suspending = 1;
+> +
+> +       /* Wake all the queue kthreads to prepare for suspend */
+> +       for (i = 0; i < ccp->cmd_q_count; i++)
+> +               wake_up_process(ccp->cmd_q[i].kthread);
+> +
+> +       spin_unlock_irqrestore(&ccp->cmd_lock, flags);
+> +
+> +       /* Wait for all queue kthreads to say they're done */
+> +       while (!ccp_queues_suspended(ccp))
+> +               wait_event_interruptible(ccp->suspend_queue,
+> +                                        ccp_queues_suspended(ccp));
+> +
+> +       return 0;
+> +}
+> +
+> +int ccp_dev_resume(struct ccp_device *ccp)
+> +{
+> +       unsigned long flags;
+> +       unsigned int i;
+> +
+> +       spin_lock_irqsave(&ccp->cmd_lock, flags);
+> +
+> +       ccp->suspending = 0;
+> +
+> +       /* Wake up all the kthreads */
+> +       for (i = 0; i < ccp->cmd_q_count; i++) {
+> +               ccp->cmd_q[i].suspended = 0;
+> +               wake_up_process(ccp->cmd_q[i].kthread);
+> +       }
+> +
+> +       spin_unlock_irqrestore(&ccp->cmd_lock, flags);
+> +
+> +       return 0;
+> +}
+>  #endif
+>
+> +int ccp_dev_init(struct ccp_device *ccp)
+> +{
+> +       ccp->io_regs = ccp->io_map + ccp->vdata->offset;
+> +
+> +       if (ccp->vdata->setup)
+> +               ccp->vdata->setup(ccp);
+> +
+> +       return ccp->vdata->perform->init(ccp);
+> +}
+> +
+> +void ccp_dev_destroy(struct ccp_device *ccp)
+> +{
+> +       if (!ccp)
+> +               return;
+> +
+> +       ccp->vdata->perform->destroy(ccp);
+> +}
+> +
+>  static int __init ccp_mod_init(void)
+>  {
+>  #ifdef CONFIG_X86
+> diff --git a/drivers/crypto/ccp/ccp-dev.h b/drivers/crypto/ccp/ccp-dev.h
+> index a70154a..df2e76e 100644
+> --- a/drivers/crypto/ccp/ccp-dev.h
+> +++ b/drivers/crypto/ccp/ccp-dev.h
+> @@ -652,6 +652,11 @@ void ccp_dmaengine_unregister(struct ccp_device *ccp);
+>  void ccp5_debugfs_setup(struct ccp_device *ccp);
+>  void ccp5_debugfs_destroy(void);
+>
+> +int ccp_dev_init(struct ccp_device *ccp);
+> +void ccp_dev_destroy(struct ccp_device *ccp);
+> +int ccp_dev_suspend(struct ccp_device *ccp, pm_message_t state);
+> +int ccp_dev_resume(struct ccp_device *ccp);
+> +
+>  /* Structure for computation functions that are device-specific */
+>  struct ccp_actions {
+>          int (*aes)(struct ccp_op *);
+> @@ -679,6 +684,7 @@ struct ccp_vdata {
+>          const unsigned int offset;
+>  };
+>
+> +extern const struct ccp_vdata ccpv3_platform;
+>  extern const struct ccp_vdata ccpv3;
+>  extern const struct ccp_vdata ccpv5a;
+>  extern const struct ccp_vdata ccpv5b;
+> diff --git a/drivers/crypto/ccp/ccp-pci.c b/drivers/crypto/ccp/ccp-pci.c
+> index e880d4cf4..490ad0a 100644
+> --- a/drivers/crypto/ccp/ccp-pci.c
+> +++ b/drivers/crypto/ccp/ccp-pci.c
+> @@ -150,28 +150,13 @@ static void ccp_free_irqs(struct ccp_device *ccp)
+>          ccp->irq = 0;
+>  }
+>
+> -static int ccp_find_mmio_area(struct ccp_device *ccp)
+> -{
+> -       struct device *dev = ccp->dev;
+> -       struct pci_dev *pdev = to_pci_dev(dev);
+> -       resource_size_t io_len;
+> -       unsigned long io_flags;
+> -
+> -       io_flags = pci_resource_flags(pdev, ccp->vdata->bar);
+> -       io_len = pci_resource_len(pdev, ccp->vdata->bar);
+> -       if ((io_flags & IORESOURCE_MEM) &&
+> -           (io_len >= (ccp->vdata->offset + 0x800)))
+> -               return ccp->vdata->bar;
+> -
+> -       return -EIO;
+> -}
+> -
+>  static int ccp_pci_probe(struct pci_dev *pdev, const struct
+> pci_device_id *id)
+>  {
+>          struct ccp_device *ccp;
+>          struct ccp_pci *ccp_pci;
+>          struct device *dev = &pdev->dev;
+> -       unsigned int bar;
+> +       void __iomem * const *iomap_table;
+> +       int bar_mask;
+>          int ret;
+>
+>          ret = -ENOMEM;
+> @@ -193,32 +178,34 @@ static int ccp_pci_probe(struct pci_dev *pdev,
+> const struct pci_device_id *id)
+>          ccp->get_irq = ccp_get_irqs;
+>          ccp->free_irq = ccp_free_irqs;
+>
+> -       ret = pci_request_regions(pdev, "ccp");
+> +       ret = pcim_enable_device(pdev);
+>          if (ret) {
+> -               dev_err(dev, "pci_request_regions failed (%d)\n", ret);
+> +               dev_err(dev, "pcim_enable_device failed (%d)\n", ret);
+>                  goto e_err;
+>          }
+>
+> -       ret = pci_enable_device(pdev);
+> +       bar_mask = pci_select_bars(pdev, IORESOURCE_MEM);
+> +       ret = pcim_iomap_regions(pdev, bar_mask, "ccp");
+>          if (ret) {
+> -               dev_err(dev, "pci_enable_device failed (%d)\n", ret);
+> -               goto e_regions;
+> +               dev_err(dev, "pcim_iomap_regions failed (%d)\n", ret);
+> +               goto e_err;
+>          }
+>
+> -       pci_set_master(pdev);
+> -
+> -       ret = ccp_find_mmio_area(ccp);
+> -       if (ret < 0)
+> -               goto e_device;
+> -       bar = ret;
+> +       iomap_table = pcim_iomap_table(pdev);
+> +       if (!iomap_table) {
+> +               dev_err(dev, "pcim_iomap_table failed\n");
+> +               ret = -ENOMEM;
+> +               goto e_err;
+> +       }
+>
+> -       ret = -EIO;
+> -       ccp->io_map = pci_iomap(pdev, bar, 0);
+> +       ccp->io_map = iomap_table[ccp->vdata->bar];
+>          if (!ccp->io_map) {
+> -               dev_err(dev, "pci_iomap failed\n");
+> -               goto e_device;
+> +               dev_err(dev, "ioremap failed\n");
+> +               ret = -ENOMEM;
+> +               goto e_err;
+>          }
+> -       ccp->io_regs = ccp->io_map + ccp->vdata->offset;
+> +
+> +       pci_set_master(pdev);
+>
+>          ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(48));
+>          if (ret) {
+> @@ -226,32 +213,20 @@ static int ccp_pci_probe(struct pci_dev *pdev,
+> const struct pci_device_id *id)
+>                  if (ret) {
+>                          dev_err(dev, "dma_set_mask_and_coherent failed
+> (%d)\n",
+>                                  ret);
+> -                       goto e_iomap;
+> +                       goto e_err;
+>                  }
+>          }
+>
+>          dev_set_drvdata(dev, ccp);
+>
+> -       if (ccp->vdata->setup)
+> -               ccp->vdata->setup(ccp);
+> -
+> -       ret = ccp->vdata->perform->init(ccp);
+> +       ret = ccp_dev_init(ccp);
+>          if (ret)
+> -               goto e_iomap;
+> +               goto e_err;
+>
+>          dev_notice(dev, "enabled\n");
+>
+>          return 0;
+>
+> -e_iomap:
+> -       pci_iounmap(pdev, ccp->io_map);
+> -
+> -e_device:
+> -       pci_disable_device(pdev);
+> -
+> -e_regions:
+> -       pci_release_regions(pdev);
+> -
+>  e_err:
+>          dev_notice(dev, "initialization failed\n");
+>          return ret;
+> @@ -265,13 +240,7 @@ static void ccp_pci_remove(struct pci_dev *pdev)
+>          if (!ccp)
+>                  return;
+>
+> -       ccp->vdata->perform->destroy(ccp);
+> -
+> -       pci_iounmap(pdev, ccp->io_map);
+> -
+> -       pci_disable_device(pdev);
+> -
+> -       pci_release_regions(pdev);
+> +       ccp_dev_destroy(ccp);
+>
+>          dev_notice(dev, "disabled\n");
+>  }
+> @@ -281,47 +250,16 @@ static int ccp_pci_suspend(struct pci_dev *pdev,
+> pm_message_t state)
+>  {
+>          struct device *dev = &pdev->dev;
+>          struct ccp_device *ccp = dev_get_drvdata(dev);
+> -       unsigned long flags;
+> -       unsigned int i;
+> -
+> -       spin_lock_irqsave(&ccp->cmd_lock, flags);
+> -
+> -       ccp->suspending = 1;
+> -
+> -       /* Wake all the queue kthreads to prepare for suspend */
+> -       for (i = 0; i < ccp->cmd_q_count; i++)
+> -               wake_up_process(ccp->cmd_q[i].kthread);
+>
+> -       spin_unlock_irqrestore(&ccp->cmd_lock, flags);
+> -
+> -       /* Wait for all queue kthreads to say they're done */
+> -       while (!ccp_queues_suspended(ccp))
+> -               wait_event_interruptible(ccp->suspend_queue,
+> -                                        ccp_queues_suspended(ccp));
+> -
+> -       return 0;
+> +       return ccp_dev_suspend(ccp, state);
+>  }
+>
+>  static int ccp_pci_resume(struct pci_dev *pdev)
+>  {
+>          struct device *dev = &pdev->dev;
+>          struct ccp_device *ccp = dev_get_drvdata(dev);
+> -       unsigned long flags;
+> -       unsigned int i;
+> -
+> -       spin_lock_irqsave(&ccp->cmd_lock, flags);
+> -
+> -       ccp->suspending = 0;
+>
+> -       /* Wake up all the kthreads */
+> -       for (i = 0; i < ccp->cmd_q_count; i++) {
+> -               ccp->cmd_q[i].suspended = 0;
+> -               wake_up_process(ccp->cmd_q[i].kthread);
+> -       }
+> -
+> -       spin_unlock_irqrestore(&ccp->cmd_lock, flags);
+> -
+> -       return 0;
+> +       return ccp_dev_resume(ccp);
+>  }
+>  #endif
+>
+> diff --git a/drivers/crypto/ccp/ccp-platform.c
+> b/drivers/crypto/ccp/ccp-platform.c
+> index e26969e..4a970b1 100644
+> --- a/drivers/crypto/ccp/ccp-platform.c
+> +++ b/drivers/crypto/ccp/ccp-platform.c
+> @@ -102,19 +102,6 @@ static void ccp_free_irqs(struct ccp_device *ccp)
+>          free_irq(ccp->irq, dev);
+>  }
+>
+> -static struct resource *ccp_find_mmio_area(struct ccp_device *ccp)
+> -{
+> -       struct device *dev = ccp->dev;
+> -       struct platform_device *pdev = to_platform_device(dev);
+> -       struct resource *ior;
+> -
+> -       ior = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+> -       if (ior && (resource_size(ior) >= 0x800))
+> -               return ior;
+> -
+> -       return NULL;
+> -}
+> -
+>  static int ccp_platform_probe(struct platform_device *pdev)
+>  {
+>          struct ccp_device *ccp;
+> @@ -144,7 +131,7 @@ static int ccp_platform_probe(struct platform_device
+> *pdev)
+>          ccp->get_irq = ccp_get_irqs;
+>          ccp->free_irq = ccp_free_irqs;
+>
+> -       ior = ccp_find_mmio_area(ccp);
+> +       ior = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+>          ccp->io_map = devm_ioremap_resource(dev, ior);
+>          if (IS_ERR(ccp->io_map)) {
+>                  ret = PTR_ERR(ccp->io_map);
+> @@ -172,7 +159,7 @@ static int ccp_platform_probe(struct platform_device
+> *pdev)
+>
+>          dev_set_drvdata(dev, ccp);
+>
+> -       ret = ccp->vdata->perform->init(ccp);
+> +       ret = ccp_dev_init(ccp);
+>          if (ret)
+>                  goto e_err;
+>
+> @@ -190,7 +177,7 @@ static int ccp_platform_remove(struct
+> platform_device *pdev)
+>          struct device *dev = &pdev->dev;
+>          struct ccp_device *ccp = dev_get_drvdata(dev);
+>
+> -       ccp->vdata->perform->destroy(ccp);
+> +       ccp_dev_destroy(ccp);
+>
+>          dev_notice(dev, "disabled\n");
+>
+> @@ -203,47 +190,16 @@ static int ccp_platform_suspend(struct
+> platform_device *pdev,
+>  {
+>          struct device *dev = &pdev->dev;
+>          struct ccp_device *ccp = dev_get_drvdata(dev);
+> -       unsigned long flags;
+> -       unsigned int i;
+> -
+> -       spin_lock_irqsave(&ccp->cmd_lock, flags);
+>
+> -       ccp->suspending = 1;
+> -
+> -       /* Wake all the queue kthreads to prepare for suspend */
+> -       for (i = 0; i < ccp->cmd_q_count; i++)
+> -               wake_up_process(ccp->cmd_q[i].kthread);
+> -
+> -       spin_unlock_irqrestore(&ccp->cmd_lock, flags);
+> -
+> -       /* Wait for all queue kthreads to say they're done */
+> -       while (!ccp_queues_suspended(ccp))
+> -               wait_event_interruptible(ccp->suspend_queue,
+> -                                        ccp_queues_suspended(ccp));
+> -
+> -       return 0;
+> +       return ccp_dev_suspend(ccp, state);
+>  }
+>
+>  static int ccp_platform_resume(struct platform_device *pdev)
+>  {
+>          struct device *dev = &pdev->dev;
+>          struct ccp_device *ccp = dev_get_drvdata(dev);
+> -       unsigned long flags;
+> -       unsigned int i;
+> -
+> -       spin_lock_irqsave(&ccp->cmd_lock, flags);
+>
+> -       ccp->suspending = 0;
+> -
+> -       /* Wake up all the kthreads */
+> -       for (i = 0; i < ccp->cmd_q_count; i++) {
+> -               ccp->cmd_q[i].suspended = 0;
+> -               wake_up_process(ccp->cmd_q[i].kthread);
+> -       }
+> -
+> -       spin_unlock_irqrestore(&ccp->cmd_lock, flags);
+> -
+> -       return 0;
+> +       return ccp_dev_resume(ccp);
+>  }
+>  #endif
+>
+> @@ -258,7 +214,7 @@ MODULE_DEVICE_TABLE(acpi, ccp_acpi_match);
+>  #ifdef CONFIG_OF
+>  static const struct of_device_id ccp_of_match[] = {
+>          { .compatible = "amd,ccp-seattle-v1a",
+> -         .data = (const void *)&ccpv3 },
+> +         .data = (const void *)&ccpv3_platform },
+>          { },
+>  };
+>  MODULE_DEVICE_TABLE(of, ccp_of_match);
+> --
+> 2.9.4
+>
