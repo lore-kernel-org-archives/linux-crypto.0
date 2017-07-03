@@ -1,10 +1,10 @@
 From: Gary R Hook <gary.hook@amd.com>
-Subject: Re: [PATCH v3 RESEND 2/5] crypto: ccp - Introduce the AMD Secure
- Processor device
-Date: Mon, 3 Jul 2017 10:50:38 -0500
-Message-ID: <3a2dea73-96f9-cd05-8e58-936d25a1b820@amd.com>
+Subject: Re: [PATCH v3 RESEND 4/5] crypto: ccp - rename ccp driver initialize
+ files as sp device
+Date: Mon, 3 Jul 2017 10:51:07 -0500
+Message-ID: <7d4ea998-2ed1-189d-0274-d03609f7e4dd@amd.com>
 References: <20170629165406.13463-1-brijesh.singh@amd.com>
- <20170629165406.13463-3-brijesh.singh@amd.com>
+ <20170629165406.13463-5-brijesh.singh@amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
@@ -14,1165 +14,574 @@ To: "Singh, Brijesh" <brijesh.singh@amd.com>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         "Lendacky, Thomas" <Thomas.Lendacky@amd.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-cys01nam02on0043.outbound.protection.outlook.com ([104.47.37.43]:7055
-        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
+Received: from mail-sn1nam01on0073.outbound.protection.outlook.com ([104.47.32.73]:45120
+        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753099AbdGCPu6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 3 Jul 2017 11:50:58 -0400
-In-Reply-To: <20170629165406.13463-3-brijesh.singh@amd.com>
+        id S1752639AbdGCPva (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 3 Jul 2017 11:51:30 -0400
+In-Reply-To: <20170629165406.13463-5-brijesh.singh@amd.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 On 06/29/2017 11:54 AM, Singh, Brijesh wrote:
-> The CCP device is part of the AMD Secure Processor. In order to expand
-> the usage of the AMD Secure Processor, create a framework that allows
-> functional components of the AMD Secure Processor to be initialized and
-> handled appropriately.
+> CCP device initializes is now integerated into higher level SP device,
+> to avoid the confusion lets rename the ccp driver initialization files
+> (ccp-platform.c->sp-platform.c, ccp-pci.c->sp-pci.c). The patch does not
+> make any functional changes other than renaming file and structures
 >
 > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 
 Acked-by: Gary R Hook <gary.hook@amd.com>
 
 > ---
->  drivers/crypto/Kconfig            |   6 +-
->  drivers/crypto/ccp/Kconfig        |  21 +++--
->  drivers/crypto/ccp/Makefile       |   4 +-
->  drivers/crypto/ccp/ccp-dev-v3.c   |   4 +-
->  drivers/crypto/ccp/ccp-dev-v5.c   |   5 +-
->  drivers/crypto/ccp/ccp-dev.c      | 106 +++++++++-------------
->  drivers/crypto/ccp/ccp-dev.h      |  21 +----
->  drivers/crypto/ccp/ccp-pci.c      |  81 +++++++++++------
->  drivers/crypto/ccp/ccp-platform.c |  70 ++++++++-------
->  drivers/crypto/ccp/sp-dev.c       | 180
-> ++++++++++++++++++++++++++++++++++++++
->  drivers/crypto/ccp/sp-dev.h       | 120 +++++++++++++++++++++++++
->  include/linux/ccp.h               |   7 +-
->  12 files changed, 461 insertions(+), 164 deletions(-)
->  create mode 100644 drivers/crypto/ccp/sp-dev.c
->  create mode 100644 drivers/crypto/ccp/sp-dev.h
+>  drivers/crypto/ccp/Makefile                        |  4 +-
+>  drivers/crypto/ccp/ccp-dev.h                       |  6 --
+>  drivers/crypto/ccp/sp-dev.c                        | 12 ++--
+>  drivers/crypto/ccp/{ccp-pci.c => sp-pci.c}         | 80
+> +++++++++++-----------
+>  .../crypto/ccp/{ccp-platform.c => sp-platform.c}   | 78
+> ++++++++++-----------
+>  5 files changed, 87 insertions(+), 93 deletions(-)
+>  rename drivers/crypto/ccp/{ccp-pci.c => sp-pci.c} (71%)
+>  rename drivers/crypto/ccp/{ccp-platform.c => sp-platform.c} (66%)
 >
-> diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-> index 0528a62..148b516 100644
-> --- a/drivers/crypto/Kconfig
-> +++ b/drivers/crypto/Kconfig
-> @@ -513,11 +513,11 @@ config CRYPTO_DEV_ATMEL_SHA
->            will be called atmel-sha.
->
->  config CRYPTO_DEV_CCP
-> -       bool "Support for AMD Cryptographic Coprocessor"
-> +       bool "Support for AMD Secure Processor"
->          depends on ((X86 && PCI) || (ARM64 && (OF_ADDRESS || ACPI))) &&
-> HAS_IOMEM
->          help
-> -         The AMD Cryptographic Coprocessor provides hardware offload
-> support
-> -         for encryption, hashing and related operations.
-> +         The AMD Secure Processor provides hardware offload support for
-> memory
-> +         encryption in virtualization and cryptographic hashing and
-> related operations.
->
->  if CRYPTO_DEV_CCP
->          source "drivers/crypto/ccp/Kconfig"
-> diff --git a/drivers/crypto/ccp/Kconfig b/drivers/crypto/ccp/Kconfig
-> index 2238f77..15b63fd 100644
-> --- a/drivers/crypto/ccp/Kconfig
-> +++ b/drivers/crypto/ccp/Kconfig
-> @@ -1,22 +1,29 @@
->  config CRYPTO_DEV_CCP_DD
-> -       tristate "Cryptographic Coprocessor device driver"
-> -       depends on CRYPTO_DEV_CCP
-> +       tristate "Secure Processor device driver"
->          default m
-> +       help
-> +         Provides AMD Secure Processor device driver.
-> +         If you choose 'M' here, this module will be called ccp.
-> +
-> +config CRYPTO_DEV_SP_CCP
-> +       bool "Cryptographic Coprocessor device"
-> +       default y
-> +       depends on CRYPTO_DEV_CCP_DD
->          select HW_RANDOM
->          select DMA_ENGINE
->          select DMADEVICES
->          select CRYPTO_SHA1
->          select CRYPTO_SHA256
->          help
-> -         Provides the interface to use the AMD Cryptographic Coprocessor
-> -         which can be used to offload encryption operations such as SHA,
-> -         AES and more. If you choose 'M' here, this module will be called
-> -         ccp.
-> +         Provides the support for AMD Cryptographic Coprocessor (CCP)
-> device
-> +         which can be used to offload encryption operations such as
-> SHA, AES
-> +         and more.
->
->  config CRYPTO_DEV_CCP_CRYPTO
->          tristate "Encryption and hashing offload support"
-> -       depends on CRYPTO_DEV_CCP_DD
->          default m
-> +       depends on CRYPTO_DEV_CCP_DD
-> +       depends on CRYPTO_DEV_SP_CCP
->          select CRYPTO_HASH
->          select CRYPTO_BLKCIPHER
->          select CRYPTO_AUTHENC
 > diff --git a/drivers/crypto/ccp/Makefile b/drivers/crypto/ccp/Makefile
-> index 59493fd..d2f1b52 100644
+> index d2f1b52..5f2adc5 100644
 > --- a/drivers/crypto/ccp/Makefile
 > +++ b/drivers/crypto/ccp/Makefile
-> @@ -1,9 +1,9 @@
+> @@ -1,12 +1,12 @@
 >  obj-$(CONFIG_CRYPTO_DEV_CCP_DD) += ccp.o
-> -ccp-objs := ccp-dev.o \
-> +ccp-objs  := sp-dev.o ccp-platform.o
-> +ccp-$(CONFIG_CRYPTO_DEV_SP_CCP) += ccp-dev.o \
+> -ccp-objs  := sp-dev.o ccp-platform.o
+> +ccp-objs  := sp-dev.o sp-platform.o
+>  ccp-$(CONFIG_CRYPTO_DEV_SP_CCP) += ccp-dev.o \
 >              ccp-ops.o \
 >              ccp-dev-v3.o \
 >              ccp-dev-v5.o \
-> -           ccp-platform.o \
 >              ccp-dmaengine.o \
 >              ccp-debugfs.o
->  ccp-$(CONFIG_PCI) += ccp-pci.o
-> diff --git a/drivers/crypto/ccp/ccp-dev-v3.c
-> b/drivers/crypto/ccp/ccp-dev-v3.c
-> index 52aa88b..57179034 100644
-> --- a/drivers/crypto/ccp/ccp-dev-v3.c
-> +++ b/drivers/crypto/ccp/ccp-dev-v3.c
-> @@ -359,8 +359,7 @@ static void ccp_irq_bh(unsigned long data)
+> -ccp-$(CONFIG_PCI) += ccp-pci.o
+> +ccp-$(CONFIG_PCI) += sp-pci.o
 >
->  static irqreturn_t ccp_irq_handler(int irq, void *data)
->  {
-> -       struct device *dev = data;
-> -       struct ccp_device *ccp = dev_get_drvdata(dev);
-> +       struct ccp_device *ccp = (struct ccp_device *)data;
->
->          ccp_disable_queue_interrupts(ccp);
->          if (ccp->use_tasklet)
-> @@ -597,6 +596,5 @@ const struct ccp_vdata ccpv3 = {
->          .version = CCP_VERSION(3, 0),
->          .setup = NULL,
->          .perform = &ccp3_actions,
-> -       .bar = 2,
->          .offset = 0x20000,
->  };
-> diff --git a/drivers/crypto/ccp/ccp-dev-v5.c
-> b/drivers/crypto/ccp/ccp-dev-v5.c
-> index b10d2d2..8ed2b37 100644
-> --- a/drivers/crypto/ccp/ccp-dev-v5.c
-> +++ b/drivers/crypto/ccp/ccp-dev-v5.c
-> @@ -769,8 +769,7 @@ static void ccp5_irq_bh(unsigned long data)
->
->  static irqreturn_t ccp5_irq_handler(int irq, void *data)
->  {
-> -       struct device *dev = data;
-> -       struct ccp_device *ccp = dev_get_drvdata(dev);
-> +       struct ccp_device *ccp = (struct ccp_device *)data;
->
->          ccp5_disable_queue_interrupts(ccp);
->          ccp->total_interrupts++;
-> @@ -1113,7 +1112,6 @@ const struct ccp_vdata ccpv5a = {
->          .version = CCP_VERSION(5, 0),
->          .setup = ccp5_config,
->          .perform = &ccp5_actions,
-> -       .bar = 2,
->          .offset = 0x0,
->  };
->
-> @@ -1122,6 +1120,5 @@ const struct ccp_vdata ccpv5b = {
->          .dma_chan_attr = DMA_PRIVATE,
->          .setup = ccp5other_config,
->          .perform = &ccp5_actions,
-> -       .bar = 2,
->          .offset = 0x0,
->  };
-> diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
-> index abb3d68..8a1674a 100644
-> --- a/drivers/crypto/ccp/ccp-dev.c
-> +++ b/drivers/crypto/ccp/ccp-dev.c
-> @@ -111,13 +111,6 @@ static LIST_HEAD(ccp_units);
->  static DEFINE_SPINLOCK(ccp_rr_lock);
->  static struct ccp_device *ccp_rr;
->
-> -/* Ever-increasing value to produce unique unit numbers */
-> -static atomic_t ccp_unit_ordinal;
-> -static unsigned int ccp_increment_unit_ordinal(void)
-> -{
-> -       return atomic_inc_return(&ccp_unit_ordinal);
-> -}
-> -
->  /**
->   * ccp_add_device - add a CCP device to the list
->   *
-> @@ -464,14 +457,17 @@ int ccp_cmd_queue_thread(void *data)
->   *
->   * @dev: device struct of the CCP
->   */
-> -struct ccp_device *ccp_alloc_struct(struct device *dev)
-> +struct ccp_device *ccp_alloc_struct(struct sp_device *sp)
->  {
-> +       struct device *dev = sp->dev;
->          struct ccp_device *ccp;
->
->          ccp = devm_kzalloc(dev, sizeof(*ccp), GFP_KERNEL);
->          if (!ccp)
->                  return NULL;
->          ccp->dev = dev;
-> +       ccp->sp = sp;
-> +       ccp->axcache = sp->axcache;
->
->          INIT_LIST_HEAD(&ccp->cmd);
->          INIT_LIST_HEAD(&ccp->backlog);
-> @@ -486,9 +482,8 @@ struct ccp_device *ccp_alloc_struct(struct device *dev)
->          init_waitqueue_head(&ccp->sb_queue);
->          init_waitqueue_head(&ccp->suspend_queue);
->
-> -       ccp->ord = ccp_increment_unit_ordinal();
-> -       snprintf(ccp->name, MAX_CCP_NAME_LEN, "ccp-%u", ccp->ord);
-> -       snprintf(ccp->rngname, MAX_CCP_NAME_LEN, "ccp-%u-rng", ccp->ord);
-> +       snprintf(ccp->name, MAX_CCP_NAME_LEN, "ccp-%u", sp->ord);
-> +       snprintf(ccp->rngname, MAX_CCP_NAME_LEN, "ccp-%u-rng", sp->ord);
->
->          return ccp;
->  }
-> @@ -539,8 +534,9 @@ bool ccp_queues_suspended(struct ccp_device *ccp)
->          return ccp->cmd_q_count == suspended;
->  }
->
-> -int ccp_dev_suspend(struct ccp_device *ccp, pm_message_t state)
-> +int ccp_dev_suspend(struct sp_device *sp, pm_message_t state)
->  {
-> +       struct ccp_device *ccp = sp->ccp_data;
->          unsigned long flags;
->          unsigned int i;
->
-> @@ -562,8 +558,9 @@ int ccp_dev_suspend(struct ccp_device *ccp,
-> pm_message_t state)
->          return 0;
->  }
->
-> -int ccp_dev_resume(struct ccp_device *ccp)
-> +int ccp_dev_resume(struct sp_device *sp)
->  {
-> +       struct ccp_device *ccp = sp->ccp_data;
->          unsigned long flags;
->          unsigned int i;
->
-> @@ -583,71 +580,54 @@ int ccp_dev_resume(struct ccp_device *ccp)
->  }
->  #endif
->
-> -int ccp_dev_init(struct ccp_device *ccp)
-> +int ccp_dev_init(struct sp_device *sp)
->  {
-> -       ccp->io_regs = ccp->io_map + ccp->vdata->offset;
-> -
-> -       if (ccp->vdata->setup)
-> -               ccp->vdata->setup(ccp);
-> -
-> -       return ccp->vdata->perform->init(ccp);
-> -}
-> +       struct device *dev = sp->dev;
-> +       struct ccp_device *ccp;
-> +       int ret;
->
-> -void ccp_dev_destroy(struct ccp_device *ccp)
-> -{
-> +       ret = -ENOMEM;
-> +       ccp = ccp_alloc_struct(sp);
->          if (!ccp)
-> -               return;
-> +               goto e_err;
-> +       sp->ccp_data = ccp;
-> +
-> +       ccp->vdata = (struct ccp_vdata *)sp->dev_vdata->ccp_vdata;
-> +       if (!ccp->vdata || !ccp->vdata->version) {
-> +               ret = -ENODEV;
-> +               dev_err(dev, "missing driver data\n");
-> +               goto e_err;
-> +       }
->
-> -       ccp->vdata->perform->destroy(ccp);
-> -}
-> +       ccp->get_irq = sp->get_irq;
-> +       ccp->free_irq = sp->free_irq;
->
-> -static int __init ccp_mod_init(void)
-> -{
-> -#ifdef CONFIG_X86
-> -       int ret;
-> +       ccp->io_regs = sp->io_map + ccp->vdata->offset;
-> +       if (ccp->vdata->setup)
-> +               ccp->vdata->setup(ccp);
->
-> -       ret = ccp_pci_init();
-> +       ret = ccp->vdata->perform->init(ccp);
->          if (ret)
-> -               return ret;
-> +               goto e_err;
->
-> -       /* Don't leave the driver loaded if init failed */
-> -       if (ccp_present() != 0) {
-> -               ccp_pci_exit();
-> -               return -ENODEV;
-> -       }
-> +       dev_notice(dev, "ccp enabled\n");
->
->          return 0;
-> -#endif
-> -
-> -#ifdef CONFIG_ARM64
-> -       int ret;
->
-> -       ret = ccp_platform_init();
-> -       if (ret)
-> -               return ret;
-> +e_err:
-> +       sp->ccp_data = NULL;
->
-> -       /* Don't leave the driver loaded if init failed */
-> -       if (ccp_present() != 0) {
-> -               ccp_platform_exit();
-> -               return -ENODEV;
-> -       }
-> -
-> -       return 0;
-> -#endif
-> +       dev_notice(dev, "ccp initialization failed\n");
->
-> -       return -ENODEV;
-> +       return ret;
->  }
->
-> -static void __exit ccp_mod_exit(void)
-> +void ccp_dev_destroy(struct sp_device *sp)
->  {
-> -#ifdef CONFIG_X86
-> -       ccp_pci_exit();
-> -#endif
-> +       struct ccp_device *ccp = sp->ccp_data;
->
-> -#ifdef CONFIG_ARM64
-> -       ccp_platform_exit();
-> -#endif
-> -}
-> +       if (!ccp)
-> +               return;
->
-> -module_init(ccp_mod_init);
-> -module_exit(ccp_mod_exit);
-> +       ccp->vdata->perform->destroy(ccp);
-> +}
+>  obj-$(CONFIG_CRYPTO_DEV_CCP_CRYPTO) += ccp-crypto.o
+>  ccp-crypto-objs := ccp-crypto-main.o \
 > diff --git a/drivers/crypto/ccp/ccp-dev.h b/drivers/crypto/ccp/ccp-dev.h
-> index df2e76e..ca44821 100644
+> index 193f309..b959e24 100644
 > --- a/drivers/crypto/ccp/ccp-dev.h
 > +++ b/drivers/crypto/ccp/ccp-dev.h
-> @@ -27,6 +27,8 @@
->  #include <linux/irqreturn.h>
->  #include <linux/dmaengine.h>
->
-> +#include "sp-dev.h"
-> +
->  #define MAX_CCP_NAME_LEN                16
->  #define MAX_DMAPOOL_NAME_LEN            32
->
-> @@ -344,6 +346,7 @@ struct ccp_device {
->          char rngname[MAX_CCP_NAME_LEN];
->
->          struct device *dev;
-> +       struct sp_device *sp;
->
->          /* Bus specific device information
->           */
-> @@ -362,7 +365,6 @@ struct ccp_device {
->           *   them.
->           */
->          struct mutex req_mutex ____cacheline_aligned;
-> -       void __iomem *io_map;
->          void __iomem *io_regs;
->
->          /* Master lists that all cmds are queued on. Because there can be
-> @@ -637,7 +639,7 @@ void ccp_del_device(struct ccp_device *ccp);
->
->  extern void ccp_log_error(struct ccp_device *, int);
->
-> -struct ccp_device *ccp_alloc_struct(struct device *dev);
-> +struct ccp_device *ccp_alloc_struct(struct sp_device *sp);
->  bool ccp_queues_suspended(struct ccp_device *ccp);
->  int ccp_cmd_queue_thread(void *data);
->  int ccp_trng_read(struct hwrng *rng, void *data, size_t max, bool wait);
-> @@ -652,11 +654,6 @@ void ccp_dmaengine_unregister(struct ccp_device *ccp);
->  void ccp5_debugfs_setup(struct ccp_device *ccp);
->  void ccp5_debugfs_destroy(void);
->
-> -int ccp_dev_init(struct ccp_device *ccp);
-> -void ccp_dev_destroy(struct ccp_device *ccp);
-> -int ccp_dev_suspend(struct ccp_device *ccp, pm_message_t state);
-> -int ccp_dev_resume(struct ccp_device *ccp);
-> -
->  /* Structure for computation functions that are device-specific */
->  struct ccp_actions {
->          int (*aes)(struct ccp_op *);
-> @@ -674,16 +671,6 @@ struct ccp_actions {
->          irqreturn_t (*irqhandler)(int, void *);
+> @@ -626,12 +626,6 @@ struct ccp5_desc {
+>          struct dword7 dw7;
 >  };
 >
-> -/* Structure to hold CCP version-specific values */
-> -struct ccp_vdata {
-> -       const unsigned int version;
-> -       const unsigned int dma_chan_attr;
-> -       void (*setup)(struct ccp_device *);
-> -       const struct ccp_actions *perform;
-> -       const unsigned int bar;
-> -       const unsigned int offset;
-> -};
+> -int ccp_pci_init(void);
+> -void ccp_pci_exit(void);
 > -
->  extern const struct ccp_vdata ccpv3_platform;
->  extern const struct ccp_vdata ccpv3;
->  extern const struct ccp_vdata ccpv5a;
-> diff --git a/drivers/crypto/ccp/ccp-pci.c b/drivers/crypto/ccp/ccp-pci.c
-> index 490ad0a..ab2df96 100644
-> --- a/drivers/crypto/ccp/ccp-pci.c
-> +++ b/drivers/crypto/ccp/ccp-pci.c
-> @@ -40,7 +40,8 @@ struct ccp_pci {
+> -int ccp_platform_init(void);
+> -void ccp_platform_exit(void);
+> -
+>  void ccp_add_device(struct ccp_device *ccp);
+>  void ccp_del_device(struct ccp_device *ccp);
 >
->  static int ccp_get_msix_irqs(struct ccp_device *ccp)
->  {
-> -       struct ccp_pci *ccp_pci = ccp->dev_specific;
-> +       struct sp_device *sp = ccp->sp;
-> +       struct ccp_pci *ccp_pci = sp->dev_specific;
->          struct device *dev = ccp->dev;
->          struct pci_dev *pdev = to_pci_dev(dev);
->          struct msix_entry msix_entry[MSIX_VECTORS];
-> @@ -58,11 +59,11 @@ static int ccp_get_msix_irqs(struct ccp_device *ccp)
->          for (v = 0; v < ccp_pci->msix_count; v++) {
->                  /* Set the interrupt names and request the irqs */
->                  snprintf(ccp_pci->msix[v].name, name_len, "%s-%u",
-> -                        ccp->name, v);
-> +                        sp->name, v);
->                  ccp_pci->msix[v].vector = msix_entry[v].vector;
->                  ret = request_irq(ccp_pci->msix[v].vector,
->                                    ccp->vdata->perform->irqhandler,
-> -                                 0, ccp_pci->msix[v].name, dev);
-> +                                 0, ccp_pci->msix[v].name, ccp);
->                  if (ret) {
->                          dev_notice(dev, "unable to allocate MSI-X IRQ
-> (%d)\n",
->                                     ret);
-> @@ -86,6 +87,7 @@ static int ccp_get_msix_irqs(struct ccp_device *ccp)
->
->  static int ccp_get_msi_irq(struct ccp_device *ccp)
->  {
-> +       struct sp_device *sp = ccp->sp;
->          struct device *dev = ccp->dev;
->          struct pci_dev *pdev = to_pci_dev(dev);
+> diff --git a/drivers/crypto/ccp/sp-dev.c b/drivers/crypto/ccp/sp-dev.c
+> index 44e76e5..edbf1bd9 100644
+> --- a/drivers/crypto/ccp/sp-dev.c
+> +++ b/drivers/crypto/ccp/sp-dev.c
+> @@ -240,13 +240,13 @@ static int __init sp_mod_init(void)
+>  #ifdef CONFIG_X86
 >          int ret;
-> @@ -96,7 +98,7 @@ static int ccp_get_msi_irq(struct ccp_device *ccp)
 >
->          ccp->irq = pdev->irq;
->          ret = request_irq(ccp->irq, ccp->vdata->perform->irqhandler, 0,
-> -                         ccp->name, dev);
-> +                         sp->name, ccp);
->          if (ret) {
->                  dev_notice(dev, "unable to allocate MSI IRQ (%d)\n", ret);
->                  goto e_msi;
-> @@ -134,17 +136,18 @@ static int ccp_get_irqs(struct ccp_device *ccp)
+> -       ret = ccp_pci_init();
+> +       ret = sp_pci_init();
+>          if (ret)
+>                  return ret;
 >
->  static void ccp_free_irqs(struct ccp_device *ccp)
+>          /* Don't leave the driver loaded if init failed */
+>          if (ccp_present() != 0) {
+> -               ccp_pci_exit();
+> +               sp_pci_exit();
+>                  return -ENODEV;
+>          }
+>
+> @@ -256,13 +256,13 @@ static int __init sp_mod_init(void)
+>  #ifdef CONFIG_ARM64
+>          int ret;
+>
+> -       ret = ccp_platform_init();
+> +       ret = sp_platform_init();
+>          if (ret)
+>                  return ret;
+>
+>          /* Don't leave the driver loaded if init failed */
+>          if (ccp_present() != 0) {
+> -               ccp_platform_exit();
+> +               sp_platform_exit();
+>                  return -ENODEV;
+>          }
+>
+> @@ -275,11 +275,11 @@ static int __init sp_mod_init(void)
+>  static void __exit sp_mod_exit(void)
 >  {
-> -       struct ccp_pci *ccp_pci = ccp->dev_specific;
-> +       struct sp_device *sp = ccp->sp;
-> +       struct ccp_pci *ccp_pci = sp->dev_specific;
->          struct device *dev = ccp->dev;
+>  #ifdef CONFIG_X86
+> -       ccp_pci_exit();
+> +       sp_pci_exit();
+>  #endif
+>
+>  #ifdef CONFIG_ARM64
+> -       ccp_platform_exit();
+> +       sp_platform_exit();
+>  #endif
+>  }
+>
+> diff --git a/drivers/crypto/ccp/ccp-pci.c b/drivers/crypto/ccp/sp-pci.c
+> similarity index 71%
+> rename from drivers/crypto/ccp/ccp-pci.c
+> rename to drivers/crypto/ccp/sp-pci.c
+> index b29a093..9859aa6 100644
+> --- a/drivers/crypto/ccp/ccp-pci.c
+> +++ b/drivers/crypto/ccp/sp-pci.c
+> @@ -1,5 +1,5 @@
+>  /*
+> - * AMD Cryptographic Coprocessor (CCP) driver
+> + * AMD Secure Processor device driver
+>   *
+>   * Copyright (C) 2013,2016 Advanced Micro Devices, Inc.
+>   *
+> @@ -28,35 +28,35 @@
+>
+>  #define MSIX_VECTORS                    2
+>
+> -struct ccp_pci {
+> +struct sp_pci {
+>          int msix_count;
+>          struct msix_entry msix_entry[MSIX_VECTORS];
+>  };
+>
+> -static int ccp_get_msix_irqs(struct sp_device *sp)
+> +static int sp_get_msix_irqs(struct sp_device *sp)
+>  {
+> -       struct ccp_pci *ccp_pci = sp->dev_specific;
+> +       struct sp_pci *sp_pci = sp->dev_specific;
+>          struct device *dev = sp->dev;
+>          struct pci_dev *pdev = to_pci_dev(dev);
+>          int v, ret;
+>
+> -       for (v = 0; v < ARRAY_SIZE(ccp_pci->msix_entry); v++)
+> -               ccp_pci->msix_entry[v].entry = v;
+> +       for (v = 0; v < ARRAY_SIZE(sp_pci->msix_entry); v++)
+> +               sp_pci->msix_entry[v].entry = v;
+>
+> -       ret = pci_enable_msix_range(pdev, ccp_pci->msix_entry, 1, v);
+> +       ret = pci_enable_msix_range(pdev, sp_pci->msix_entry, 1, v);
+>          if (ret < 0)
+>                  return ret;
+>
+> -       ccp_pci->msix_count = ret;
+> +       sp_pci->msix_count = ret;
+>          sp->use_tasklet = true;
+>
+> -       sp->psp_irq = ccp_pci->msix_entry[0].vector;
+> -       sp->ccp_irq = (ccp_pci->msix_count > 1) ?
+> ccp_pci->msix_entry[1].vector
+> -                                              :
+> ccp_pci->msix_entry[0].vector;
+> +       sp->psp_irq = sp_pci->msix_entry[0].vector;
+> +       sp->ccp_irq = (sp_pci->msix_count > 1) ?
+> sp_pci->msix_entry[1].vector
+> +                                              :
+> sp_pci->msix_entry[0].vector;
+>          return 0;
+>  }
+>
+> -static int ccp_get_msi_irq(struct sp_device *sp)
+> +static int sp_get_msi_irq(struct sp_device *sp)
+>  {
+>          struct device *dev = sp->dev;
+>          struct pci_dev *pdev = to_pci_dev(dev);
+> @@ -72,18 +72,18 @@ static int ccp_get_msi_irq(struct sp_device *sp)
+>          return 0;
+>  }
+>
+> -static int ccp_get_irqs(struct sp_device *sp)
+> +static int sp_get_irqs(struct sp_device *sp)
+>  {
+>          struct device *dev = sp->dev;
+>          int ret;
+>
+> -       ret = ccp_get_msix_irqs(sp);
+> +       ret = sp_get_msix_irqs(sp);
+>          if (!ret)
+>                  return 0;
+>
+>          /* Couldn't get MSI-X vectors, try MSI */
+>          dev_notice(dev, "could not enable MSI-X (%d), trying MSI\n", ret);
+> -       ret = ccp_get_msi_irq(sp);
+> +       ret = sp_get_msi_irq(sp);
+>          if (!ret)
+>                  return 0;
+>
+> @@ -93,13 +93,13 @@ static int ccp_get_irqs(struct sp_device *sp)
+>          return ret;
+>  }
+>
+> -static void ccp_free_irqs(struct sp_device *sp)
+> +static void sp_free_irqs(struct sp_device *sp)
+>  {
+> -       struct ccp_pci *ccp_pci = sp->dev_specific;
+> +       struct sp_pci *sp_pci = sp->dev_specific;
+>          struct device *dev = sp->dev;
 >          struct pci_dev *pdev = to_pci_dev(dev);
 >
->          if (ccp_pci->msix_count) {
->                  while (ccp_pci->msix_count--)
->                          free_irq(ccp_pci->msix[ccp_pci->msix_count].vector,
-> -                                dev);
-> +                                ccp);
+> -       if (ccp_pci->msix_count)
+> +       if (sp_pci->msix_count)
 >                  pci_disable_msix(pdev);
->          } else if (ccp->irq) {
-> -               free_irq(ccp->irq, dev);
-> +               free_irq(ccp->irq, ccp);
+>          else if (sp->psp_irq)
 >                  pci_disable_msi(pdev);
->          }
->          ccp->irq = 0;
-> @@ -152,7 +155,7 @@ static void ccp_free_irqs(struct ccp_device *ccp)
+> @@ -108,10 +108,10 @@ static void ccp_free_irqs(struct sp_device *sp)
+>          sp->psp_irq = 0;
+>  }
 >
->  static int ccp_pci_probe(struct pci_dev *pdev, const struct
+> -static int ccp_pci_probe(struct pci_dev *pdev, const struct
+> pci_device_id *id)
+> +static int sp_pci_probe(struct pci_dev *pdev, const struct
 > pci_device_id *id)
 >  {
-> -       struct ccp_device *ccp;
-> +       struct sp_device *sp;
->          struct ccp_pci *ccp_pci;
+>          struct sp_device *sp;
+> -       struct ccp_pci *ccp_pci;
+> +       struct sp_pci *sp_pci;
 >          struct device *dev = &pdev->dev;
 >          void __iomem * const *iomap_table;
-> @@ -160,23 +163,23 @@ static int ccp_pci_probe(struct pci_dev *pdev,
+>          int bar_mask;
+> @@ -122,11 +122,11 @@ static int ccp_pci_probe(struct pci_dev *pdev,
 > const struct pci_device_id *id)
->          int ret;
->
->          ret = -ENOMEM;
-> -       ccp = ccp_alloc_struct(dev);
-> -       if (!ccp)
-> +       sp = sp_alloc_struct(dev);
-> +       if (!sp)
+>          if (!sp)
 >                  goto e_err;
 >
->          ccp_pci = devm_kzalloc(dev, sizeof(*ccp_pci), GFP_KERNEL);
->          if (!ccp_pci)
+> -       ccp_pci = devm_kzalloc(dev, sizeof(*ccp_pci), GFP_KERNEL);
+> -       if (!ccp_pci)
+> +       sp_pci = devm_kzalloc(dev, sizeof(*sp_pci), GFP_KERNEL);
+> +       if (!sp_pci)
 >                  goto e_err;
 >
-> -       ccp->dev_specific = ccp_pci;
-> -       ccp->vdata = (struct ccp_vdata *)id->driver_data;
-> -       if (!ccp->vdata || !ccp->vdata->version) {
-> +       sp->dev_specific = ccp_pci;
-> +       sp->dev_vdata = (struct sp_dev_vdata *)id->driver_data;
-> +       if (!sp->dev_vdata) {
+> -       sp->dev_specific = ccp_pci;
+> +       sp->dev_specific = sp_pci;
+>          sp->dev_vdata = (struct sp_dev_vdata *)id->driver_data;
+>          if (!sp->dev_vdata) {
 >                  ret = -ENODEV;
->                  dev_err(dev, "missing driver data\n");
->                  goto e_err;
->          }
-> -       ccp->get_irq = ccp_get_irqs;
-> -       ccp->free_irq = ccp_free_irqs;
-> +       sp->get_irq = ccp_get_irqs;
-> +       sp->free_irq = ccp_free_irqs;
->
->          ret = pcim_enable_device(pdev);
->          if (ret) {
-> @@ -198,8 +201,8 @@ static int ccp_pci_probe(struct pci_dev *pdev, const
+> @@ -161,7 +161,7 @@ static int ccp_pci_probe(struct pci_dev *pdev, const
 > struct pci_device_id *id)
 >                  goto e_err;
 >          }
 >
-> -       ccp->io_map = iomap_table[ccp->vdata->bar];
-> -       if (!ccp->io_map) {
-> +       sp->io_map = iomap_table[sp->dev_vdata->bar];
-> +       if (!sp->io_map) {
->                  dev_err(dev, "ioremap failed\n");
->                  ret = -ENOMEM;
->                  goto e_err;
-> @@ -217,9 +220,9 @@ static int ccp_pci_probe(struct pci_dev *pdev, const
-> struct pci_device_id *id)
->                  }
->          }
->
-> -       dev_set_drvdata(dev, ccp);
-> +       dev_set_drvdata(dev, sp);
->
-> -       ret = ccp_dev_init(ccp);
-> +       ret = sp_init(sp);
+> -       ret = ccp_get_irqs(sp);
+> +       ret = sp_get_irqs(sp);
 >          if (ret)
 >                  goto e_err;
 >
-> @@ -235,12 +238,12 @@ static int ccp_pci_probe(struct pci_dev *pdev,
-> const struct pci_device_id *id)
->  static void ccp_pci_remove(struct pci_dev *pdev)
+> @@ -192,7 +192,7 @@ static int ccp_pci_probe(struct pci_dev *pdev, const
+> struct pci_device_id *id)
+>          return ret;
+>  }
+>
+> -static void ccp_pci_remove(struct pci_dev *pdev)
+> +static void sp_pci_remove(struct pci_dev *pdev)
 >  {
 >          struct device *dev = &pdev->dev;
-> -       struct ccp_device *ccp = dev_get_drvdata(dev);
-> +       struct sp_device *sp = dev_get_drvdata(dev);
+>          struct sp_device *sp = dev_get_drvdata(dev);
+> @@ -202,13 +202,13 @@ static void ccp_pci_remove(struct pci_dev *pdev)
 >
-> -       if (!ccp)
-> +       if (!sp)
->                  return;
+>          sp_destroy(sp);
 >
-> -       ccp_dev_destroy(ccp);
-> +       sp_destroy(sp);
+> -       ccp_free_irqs(sp);
+> +       sp_free_irqs(sp);
 >
 >          dev_notice(dev, "disabled\n");
 >  }
-> @@ -249,24 +252,44 @@ static void ccp_pci_remove(struct pci_dev *pdev)
->  static int ccp_pci_suspend(struct pci_dev *pdev, pm_message_t state)
+>
+>  #ifdef CONFIG_PM
+> -static int ccp_pci_suspend(struct pci_dev *pdev, pm_message_t state)
+> +static int sp_pci_suspend(struct pci_dev *pdev, pm_message_t state)
 >  {
 >          struct device *dev = &pdev->dev;
-> -       struct ccp_device *ccp = dev_get_drvdata(dev);
-> +       struct sp_device *sp = dev_get_drvdata(dev);
->
-> -       return ccp_dev_suspend(ccp, state);
-> +       return sp_suspend(sp, state);
+>          struct sp_device *sp = dev_get_drvdata(dev);
+> @@ -216,7 +216,7 @@ static int ccp_pci_suspend(struct pci_dev *pdev,
+> pm_message_t state)
+>          return sp_suspend(sp, state);
 >  }
 >
->  static int ccp_pci_resume(struct pci_dev *pdev)
+> -static int ccp_pci_resume(struct pci_dev *pdev)
+> +static int sp_pci_resume(struct pci_dev *pdev)
 >  {
 >          struct device *dev = &pdev->dev;
-> -       struct ccp_device *ccp = dev_get_drvdata(dev);
-> +       struct sp_device *sp = dev_get_drvdata(dev);
->
-> -       return ccp_dev_resume(ccp);
-> +       return sp_resume(sp);
->  }
+>          struct sp_device *sp = dev_get_drvdata(dev);
+> @@ -245,32 +245,32 @@ static const struct sp_dev_vdata dev_vdata[] = {
 >  #endif
->
-> +static const struct sp_dev_vdata dev_vdata[] = {
-> +       {
-> +               .bar = 2,
-> +#ifdef CONFIG_CRYPTO_DEV_SP_CCP
-> +               .ccp_vdata = &ccpv3,
-> +#endif
-> +       },
-> +       {
-> +               .bar = 2,
-> +#ifdef CONFIG_CRYPTO_DEV_SP_CCP
-> +               .ccp_vdata = &ccpv5a,
-> +#endif
-> +       },
-> +       {
-> +               .bar = 2,
-> +#ifdef CONFIG_CRYPTO_DEV_SP_CCP
-> +               .ccp_vdata = &ccpv5b,
-> +#endif
-> +       },
-> +};
->  static const struct pci_device_id ccp_pci_table[] = {
-> -       { PCI_VDEVICE(AMD, 0x1537), (kernel_ulong_t)&ccpv3 },
-> -       { PCI_VDEVICE(AMD, 0x1456), (kernel_ulong_t)&ccpv5a },
-> -       { PCI_VDEVICE(AMD, 0x1468), (kernel_ulong_t)&ccpv5b },
-> +       { PCI_VDEVICE(AMD, 0x1537), (kernel_ulong_t)&dev_vdata[0] },
-> +       { PCI_VDEVICE(AMD, 0x1456), (kernel_ulong_t)&dev_vdata[1] },
-> +       { PCI_VDEVICE(AMD, 0x1468), (kernel_ulong_t)&dev_vdata[2] },
+>          },
+>  };
+> -static const struct pci_device_id ccp_pci_table[] = {
+> +static const struct pci_device_id sp_pci_table[] = {
+>          { PCI_VDEVICE(AMD, 0x1537), (kernel_ulong_t)&dev_vdata[0] },
+>          { PCI_VDEVICE(AMD, 0x1456), (kernel_ulong_t)&dev_vdata[1] },
+>          { PCI_VDEVICE(AMD, 0x1468), (kernel_ulong_t)&dev_vdata[2] },
 >          /* Last entry must be zero */
 >          { 0, }
 >  };
-> diff --git a/drivers/crypto/ccp/ccp-platform.c
-> b/drivers/crypto/ccp/ccp-platform.c
-> index 4a970b1..b6bb22d 100644
-> --- a/drivers/crypto/ccp/ccp-platform.c
-> +++ b/drivers/crypto/ccp/ccp-platform.c
-> @@ -35,26 +35,26 @@ struct ccp_platform {
->  static const struct acpi_device_id ccp_acpi_match[];
->  static const struct of_device_id ccp_of_match[];
+> -MODULE_DEVICE_TABLE(pci, ccp_pci_table);
+> +MODULE_DEVICE_TABLE(pci, sp_pci_table);
 >
-> -static struct ccp_vdata *ccp_get_of_version(struct platform_device *pdev)
-> +static struct sp_dev_vdata *ccp_get_of_version(struct platform_device
+> -static struct pci_driver ccp_pci_driver = {
+> +static struct pci_driver sp_pci_driver = {
+>          .name = "ccp",
+> -       .id_table = ccp_pci_table,
+> -       .probe = ccp_pci_probe,
+> -       .remove = ccp_pci_remove,
+> +       .id_table = sp_pci_table,
+> +       .probe = sp_pci_probe,
+> +       .remove = sp_pci_remove,
+>  #ifdef CONFIG_PM
+> -       .suspend = ccp_pci_suspend,
+> -       .resume = ccp_pci_resume,
+> +       .suspend = sp_pci_suspend,
+> +       .resume = sp_pci_resume,
+>  #endif
+>  };
+>
+> -int ccp_pci_init(void)
+> +int sp_pci_init(void)
+>  {
+> -       return pci_register_driver(&ccp_pci_driver);
+> +       return pci_register_driver(&sp_pci_driver);
+>  }
+>
+> -void ccp_pci_exit(void)
+> +void sp_pci_exit(void)
+>  {
+> -       pci_unregister_driver(&ccp_pci_driver);
+> +       pci_unregister_driver(&sp_pci_driver);
+>  }
+> diff --git a/drivers/crypto/ccp/ccp-platform.c
+> b/drivers/crypto/ccp/sp-platform.c
+> similarity index 66%
+> rename from drivers/crypto/ccp/ccp-platform.c
+> rename to drivers/crypto/ccp/sp-platform.c
+> index 5228dd7..1785832 100644
+> --- a/drivers/crypto/ccp/ccp-platform.c
+> +++ b/drivers/crypto/ccp/sp-platform.c
+> @@ -1,5 +1,5 @@
+>  /*
+> - * AMD Cryptographic Coprocessor (CCP) driver
+> + * AMD Secure Processor device driver
+>   *
+>   * Copyright (C) 2014,2016 Advanced Micro Devices, Inc.
+>   *
+> @@ -28,41 +28,41 @@
+>
+>  #include "ccp-dev.h"
+>
+> -struct ccp_platform {
+> +struct sp_platform {
+>          int coherent;
+>          unsigned int irq_count;
+>  };
+>
+> -static const struct acpi_device_id ccp_acpi_match[];
+> -static const struct of_device_id ccp_of_match[];
+> +static const struct acpi_device_id sp_acpi_match[];
+> +static const struct of_device_id sp_of_match[];
+>
+> -static struct sp_dev_vdata *ccp_get_of_version(struct platform_device
 > *pdev)
+> +static struct sp_dev_vdata *sp_get_of_version(struct platform_device *pdev)
 >  {
 >  #ifdef CONFIG_OF
 >          const struct of_device_id *match;
 >
->          match = of_match_node(ccp_of_match, pdev->dev.of_node);
+> -       match = of_match_node(ccp_of_match, pdev->dev.of_node);
+> +       match = of_match_node(sp_of_match, pdev->dev.of_node);
 >          if (match && match->data)
-> -               return (struct ccp_vdata *)match->data;
-> +               return (struct sp_dev_vdata *)match->data;
+>                  return (struct sp_dev_vdata *)match->data;
 >  #endif
 >          return NULL;
 >  }
 >
-> -static struct ccp_vdata *ccp_get_acpi_version(struct platform_device *pdev)
-> +static struct sp_dev_vdata *ccp_get_acpi_version(struct platform_device
+> -static struct sp_dev_vdata *ccp_get_acpi_version(struct platform_device
+> *pdev)
+> +static struct sp_dev_vdata *sp_get_acpi_version(struct platform_device
 > *pdev)
 >  {
 >  #ifdef CONFIG_ACPI
 >          const struct acpi_device_id *match;
 >
->          match = acpi_match_device(ccp_acpi_match, &pdev->dev);
+> -       match = acpi_match_device(ccp_acpi_match, &pdev->dev);
+> +       match = acpi_match_device(sp_acpi_match, &pdev->dev);
 >          if (match && match->driver_data)
-> -               return (struct ccp_vdata *)match->driver_data;
-> +               return (struct sp_dev_vdata *)match->driver_data;
+>                  return (struct sp_dev_vdata *)match->driver_data;
 >  #endif
 >          return NULL;
 >  }
-> @@ -71,7 +71,7 @@ static int ccp_get_irq(struct ccp_device *ccp)
 >
->          ccp->irq = ret;
->          ret = request_irq(ccp->irq, ccp->vdata->perform->irqhandler, 0,
-> -                         ccp->name, dev);
-> +                         ccp->name, ccp);
->          if (ret) {
->                  dev_notice(dev, "unable to allocate IRQ (%d)\n", ret);
->                  return ret;
-> @@ -97,14 +97,12 @@ static int ccp_get_irqs(struct ccp_device *ccp)
->
->  static void ccp_free_irqs(struct ccp_device *ccp)
+> -static int ccp_get_irqs(struct sp_device *sp)
+> +static int sp_get_irqs(struct sp_device *sp)
 >  {
-> -       struct device *dev = ccp->dev;
-> -
-> -       free_irq(ccp->irq, dev);
-> +       free_irq(ccp->irq, ccp);
+> -       struct ccp_platform *ccp_platform = sp->dev_specific;
+> +       struct sp_platform *sp_platform = sp->dev_specific;
+>          struct device *dev = sp->dev;
+>          struct platform_device *pdev = to_platform_device(dev);
+>          unsigned int i, count;
+> @@ -75,7 +75,7 @@ static int ccp_get_irqs(struct sp_device *sp)
+>                          count++;
+>          }
+>
+> -       ccp_platform->irq_count = count;
+> +       sp_platform->irq_count = count;
+>
+>          ret = platform_get_irq(pdev, 0);
+>          if (ret < 0)
+> @@ -95,10 +95,10 @@ static int ccp_get_irqs(struct sp_device *sp)
+>          return 0;
 >  }
 >
->  static int ccp_platform_probe(struct platform_device *pdev)
+> -static int ccp_platform_probe(struct platform_device *pdev)
+> +static int sp_platform_probe(struct platform_device *pdev)
 >  {
-> -       struct ccp_device *ccp;
-> +       struct sp_device *sp;
->          struct ccp_platform *ccp_platform;
+>          struct sp_device *sp;
+> -       struct ccp_platform *ccp_platform;
+> +       struct sp_platform *sp_platform;
 >          struct device *dev = &pdev->dev;
 >          enum dev_dma_attr attr;
-> @@ -112,32 +110,31 @@ static int ccp_platform_probe(struct
+>          struct resource *ior;
+> @@ -109,13 +109,13 @@ static int ccp_platform_probe(struct
 > platform_device *pdev)
->          int ret;
->
->          ret = -ENOMEM;
-> -       ccp = ccp_alloc_struct(dev);
-> -       if (!ccp)
-> +       sp = sp_alloc_struct(dev);
-> +       if (!sp)
+>          if (!sp)
 >                  goto e_err;
 >
->          ccp_platform = devm_kzalloc(dev, sizeof(*ccp_platform),
-> GFP_KERNEL);
->          if (!ccp_platform)
+> -       ccp_platform = devm_kzalloc(dev, sizeof(*ccp_platform), GFP_KERNEL);
+> -       if (!ccp_platform)
+> +       sp_platform = devm_kzalloc(dev, sizeof(*sp_platform), GFP_KERNEL);
+> +       if (!sp_platform)
 >                  goto e_err;
 >
-> -       ccp->dev_specific = ccp_platform;
-> -       ccp->vdata = pdev->dev.of_node ? ccp_get_of_version(pdev)
-> +       sp->dev_specific = ccp_platform;
-> +       sp->dev_vdata = pdev->dev.of_node ? ccp_get_of_version(pdev)
->                                           : ccp_get_acpi_version(pdev);
-> -       if (!ccp->vdata || !ccp->vdata->version) {
-> +       if (!sp->dev_vdata) {
+> -       sp->dev_specific = ccp_platform;
+> -       sp->dev_vdata = pdev->dev.of_node ? ccp_get_of_version(pdev)
+> -                                        : ccp_get_acpi_version(pdev);
+> +       sp->dev_specific = sp_platform;
+> +       sp->dev_vdata = pdev->dev.of_node ? sp_get_of_version(pdev)
+> +                                        : sp_get_acpi_version(pdev);
+>          if (!sp->dev_vdata) {
 >                  ret = -ENODEV;
 >                  dev_err(dev, "missing driver data\n");
->                  goto e_err;
->          }
-> -       ccp->get_irq = ccp_get_irqs;
-> -       ccp->free_irq = ccp_free_irqs;
-> +       sp->get_irq = ccp_get_irqs;
-> +       sp->free_irq = ccp_free_irqs;
->
->          ior = platform_get_resource(pdev, IORESOURCE_MEM, 0);
-> -       ccp->io_map = devm_ioremap_resource(dev, ior);
-> -       if (IS_ERR(ccp->io_map)) {
-> -               ret = PTR_ERR(ccp->io_map);
-> +       sp->io_map = devm_ioremap_resource(dev, ior);
-> +       if (IS_ERR(sp->io_map)) {
-> +               ret = PTR_ERR(sp->io_map);
->                  goto e_err;
->          }
-> -       ccp->io_regs = ccp->io_map;
->
->          attr = device_get_dma_attr(dev);
->          if (attr == DEV_DMA_NOT_SUPPORTED) {
-> @@ -147,9 +144,9 @@ static int ccp_platform_probe(struct platform_device
+> @@ -135,8 +135,8 @@ static int ccp_platform_probe(struct platform_device
 > *pdev)
+>                  goto e_err;
+>          }
 >
->          ccp_platform->coherent = (attr == DEV_DMA_COHERENT);
->          if (ccp_platform->coherent)
-> -               ccp->axcache = CACHE_WB_NO_ALLOC;
-> +               sp->axcache = CACHE_WB_NO_ALLOC;
+> -       ccp_platform->coherent = (attr == DEV_DMA_COHERENT);
+> -       if (ccp_platform->coherent)
+> +       sp_platform->coherent = (attr == DEV_DMA_COHERENT);
+> +       if (sp_platform->coherent)
+>                  sp->axcache = CACHE_WB_NO_ALLOC;
 >          else
-> -               ccp->axcache = CACHE_NONE;
-> +               sp->axcache = CACHE_NONE;
->
->          ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(48));
->          if (ret) {
-> @@ -157,9 +154,9 @@ static int ccp_platform_probe(struct platform_device
+>                  sp->axcache = CACHE_NONE;
+> @@ -147,7 +147,7 @@ static int ccp_platform_probe(struct platform_device
 > *pdev)
 >                  goto e_err;
 >          }
 >
-> -       dev_set_drvdata(dev, ccp);
-> +       dev_set_drvdata(dev, sp);
->
-> -       ret = ccp_dev_init(ccp);
-> +       ret = sp_init(sp);
+> -       ret = ccp_get_irqs(sp);
+> +       ret = sp_get_irqs(sp);
 >          if (ret)
 >                  goto e_err;
 >
-> @@ -175,9 +172,9 @@ static int ccp_platform_probe(struct platform_device
+> @@ -166,7 +166,7 @@ static int ccp_platform_probe(struct platform_device
 > *pdev)
->  static int ccp_platform_remove(struct platform_device *pdev)
+>          return ret;
+>  }
+>
+> -static int ccp_platform_remove(struct platform_device *pdev)
+> +static int sp_platform_remove(struct platform_device *pdev)
 >  {
 >          struct device *dev = &pdev->dev;
-> -       struct ccp_device *ccp = dev_get_drvdata(dev);
-> +       struct sp_device *sp = dev_get_drvdata(dev);
+>          struct sp_device *sp = dev_get_drvdata(dev);
+> @@ -179,7 +179,7 @@ static int ccp_platform_remove(struct
+> platform_device *pdev)
+>  }
 >
-> -       ccp_dev_destroy(ccp);
-> +       sp_destroy(sp);
->
->          dev_notice(dev, "disabled\n");
->
-> @@ -189,23 +186,32 @@ static int ccp_platform_suspend(struct
-> platform_device *pdev,
+>  #ifdef CONFIG_PM
+> -static int ccp_platform_suspend(struct platform_device *pdev,
+> +static int sp_platform_suspend(struct platform_device *pdev,
 >                                  pm_message_t state)
 >  {
 >          struct device *dev = &pdev->dev;
-> -       struct ccp_device *ccp = dev_get_drvdata(dev);
-> +       struct sp_device *sp = dev_get_drvdata(dev);
->
-> -       return ccp_dev_suspend(ccp, state);
-> +       return sp_suspend(sp, state);
+> @@ -188,7 +188,7 @@ static int ccp_platform_suspend(struct
+> platform_device *pdev,
+>          return sp_suspend(sp, state);
 >  }
 >
->  static int ccp_platform_resume(struct platform_device *pdev)
+> -static int ccp_platform_resume(struct platform_device *pdev)
+> +static int sp_platform_resume(struct platform_device *pdev)
 >  {
 >          struct device *dev = &pdev->dev;
-> -       struct ccp_device *ccp = dev_get_drvdata(dev);
-> +       struct sp_device *sp = dev_get_drvdata(dev);
+>          struct sp_device *sp = dev_get_drvdata(dev);
+> @@ -207,46 +207,46 @@ static const struct sp_dev_vdata dev_vdata[] = {
+>  };
 >
-> -       return ccp_dev_resume(ccp);
-> +       return sp_resume(sp);
->  }
+>  #ifdef CONFIG_ACPI
+> -static const struct acpi_device_id ccp_acpi_match[] = {
+> +static const struct acpi_device_id sp_acpi_match[] = {
+>          { "AMDI0C00", (kernel_ulong_t)&dev_vdata[0] },
+>          { },
+>  };
+> -MODULE_DEVICE_TABLE(acpi, ccp_acpi_match);
+> +MODULE_DEVICE_TABLE(acpi, sp_acpi_match);
 >  #endif
 >
-> +static const struct sp_dev_vdata dev_vdata[] = {
-> +       {
-> +               .bar = 2,
-> +#ifdef CONFIG_CRYPTO_DEV_SP_CCP
-> +               .ccp_vdata = &ccpv3_platform,
-> +#endif
-> +       },
-> +};
-> +
->  #ifdef CONFIG_ACPI
->  static const struct acpi_device_id ccp_acpi_match[] = {
-> -       { "AMDI0C00", (kernel_ulong_t)&ccpv3 },
-> +       { "AMDI0C00", (kernel_ulong_t)&dev_vdata[0] },
->          { },
->  };
->  MODULE_DEVICE_TABLE(acpi, ccp_acpi_match);
-> @@ -214,7 +220,7 @@ MODULE_DEVICE_TABLE(acpi, ccp_acpi_match);
 >  #ifdef CONFIG_OF
->  static const struct of_device_id ccp_of_match[] = {
+> -static const struct of_device_id ccp_of_match[] = {
+> +static const struct of_device_id sp_of_match[] = {
 >          { .compatible = "amd,ccp-seattle-v1a",
-> -         .data = (const void *)&ccpv3_platform },
-> +         .data = (const void *)&dev_vdata[0] },
+>            .data = (const void *)&dev_vdata[0] },
 >          { },
 >  };
->  MODULE_DEVICE_TABLE(of, ccp_of_match);
-> diff --git a/drivers/crypto/ccp/sp-dev.c b/drivers/crypto/ccp/sp-dev.c
-> new file mode 100644
-> index 0000000..d1dda38
-> --- /dev/null
-> +++ b/drivers/crypto/ccp/sp-dev.c
-> @@ -0,0 +1,180 @@
-> +/*
-> + * AMD Secure Processor driver
-> + *
-> + * Copyright (C) 2017 Advanced Micro Devices, Inc.
-> + *
-> + * Author: Tom Lendacky <thomas.lendacky@amd.com>
-> + * Author: Gary R Hook <gary.hook@amd.com>
-> + * Author: Brijesh Singh <brijesh.singh@amd.com>
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License version 2 as
-> + * published by the Free Software Foundation.
-> + */
-> +
-> +#include <linux/module.h>
-> +#include <linux/kernel.h>
-> +#include <linux/kthread.h>
-> +#include <linux/sched.h>
-> +#include <linux/interrupt.h>
-> +#include <linux/spinlock.h>
-> +#include <linux/spinlock_types.h>
-> +#include <linux/types.h>
-> +#include <linux/ccp.h>
-> +
-> +#include "ccp-dev.h"
-> +#include "sp-dev.h"
-> +
-> +MODULE_AUTHOR("Tom Lendacky <thomas.lendacky@amd.com>");
-> +MODULE_AUTHOR("Gary R Hook <gary.hook@amd.com>");
-> +MODULE_LICENSE("GPL");
-> +MODULE_VERSION("1.1.0");
-> +MODULE_DESCRIPTION("AMD Secure Processor driver");
-> +
-> +/* List of SPs, SP count, read-write access lock, and access functions
-> + *
-> + * Lock structure: get sp_unit_lock for reading whenever we need to
-> + * examine the SP list.
-> + */
-> +static DEFINE_RWLOCK(sp_unit_lock);
-> +static LIST_HEAD(sp_units);
-> +
-> +/* Ever-increasing value to produce unique unit numbers */
-> +static atomic_t sp_ordinal;
-> +
-> +static void sp_add_device(struct sp_device *sp)
-> +{
-> +       unsigned long flags;
-> +
-> +       write_lock_irqsave(&sp_unit_lock, flags);
-> +
-> +       list_add_tail(&sp->entry, &sp_units);
-> +
-> +       write_unlock_irqrestore(&sp_unit_lock, flags);
-> +}
-> +
-> +static void sp_del_device(struct sp_device *sp)
-> +{
-> +       unsigned long flags;
-> +
-> +       write_lock_irqsave(&sp_unit_lock, flags);
-> +
-> +       list_del(&sp->entry);
-> +
-> +       write_unlock_irqrestore(&sp_unit_lock, flags);
-> +}
-> +
-> +/**
-> + * sp_alloc_struct - allocate and initialize the sp_device struct
-> + *
-> + * @dev: device struct of the SP
-> + */
-> +struct sp_device *sp_alloc_struct(struct device *dev)
-> +{
-> +       struct sp_device *sp;
-> +
-> +       sp = devm_kzalloc(dev, sizeof(*sp), GFP_KERNEL);
-> +       if (!sp)
-> +               return NULL;
-> +
-> +       sp->dev = dev;
-> +       sp->ord = atomic_inc_return(&sp_ordinal);
-> +       snprintf(sp->name, SP_MAX_NAME_LEN, "sp-%u", sp->ord);
-> +
-> +       return sp;
-> +}
-> +
-> +int sp_init(struct sp_device *sp)
-> +{
-> +       sp_add_device(sp);
-> +
-> +       if (sp->dev_vdata->ccp_vdata)
-> +               ccp_dev_init(sp);
-> +
-> +       return 0;
-> +}
-> +
-> +void sp_destroy(struct sp_device *sp)
-> +{
-> +       if (sp->dev_vdata->ccp_vdata)
-> +               ccp_dev_destroy(sp);
-> +
-> +       sp_del_device(sp);
-> +}
-> +
-> +int sp_suspend(struct sp_device *sp, pm_message_t state)
-> +{
-> +       int ret;
-> +
-> +       if (sp->dev_vdata->ccp_vdata) {
-> +               ret = ccp_dev_suspend(sp, state);
-> +               if (ret)
-> +                       return ret;
-> +       }
-> +
-> +       return 0;
-> +}
-> +
-> +int sp_resume(struct sp_device *sp)
-> +{
-> +       int ret;
-> +
-> +       if (sp->dev_vdata->ccp_vdata) {
-> +               ret = ccp_dev_resume(sp);
-> +               if (ret)
-> +                       return ret;
-> +       }
-> +
-> +       return 0;
-> +}
-> +
-> +static int __init sp_mod_init(void)
-> +{
-> +#ifdef CONFIG_X86
-> +       int ret;
-> +
-> +       ret = ccp_pci_init();
-> +       if (ret)
-> +               return ret;
-> +
-> +       /* Don't leave the driver loaded if init failed */
-> +       if (ccp_present() != 0) {
-> +               ccp_pci_exit();
-> +               return -ENODEV;
-> +       }
-> +
-> +       return 0;
-> +#endif
-> +
-> +#ifdef CONFIG_ARM64
-> +       int ret;
-> +
-> +       ret = ccp_platform_init();
-> +       if (ret)
-> +               return ret;
-> +
-> +       /* Don't leave the driver loaded if init failed */
-> +       if (ccp_present() != 0) {
-> +               ccp_platform_exit();
-> +               return -ENODEV;
-> +       }
-> +
-> +       return 0;
-> +#endif
-> +
-> +       return -ENODEV;
-> +}
-> +
-> +static void __exit sp_mod_exit(void)
-> +{
-> +#ifdef CONFIG_X86
-> +       ccp_pci_exit();
-> +#endif
-> +
-> +#ifdef CONFIG_ARM64
-> +       ccp_platform_exit();
-> +#endif
-> +}
-> +
-> +module_init(sp_mod_init);
-> +module_exit(sp_mod_exit);
-> diff --git a/drivers/crypto/ccp/sp-dev.h b/drivers/crypto/ccp/sp-dev.h
-> new file mode 100644
-> index 0000000..189e57e
-> --- /dev/null
-> +++ b/drivers/crypto/ccp/sp-dev.h
-> @@ -0,0 +1,120 @@
-> +/*
-> + * AMD Secure Processor driver
-> + *
-> + * Copyright (C) 2017 Advanced Micro Devices, Inc.
-> + *
-> + * Author: Tom Lendacky <thomas.lendacky@amd.com>
-> + * Author: Gary R Hook <gary.hook@amd.com>
-> + * Author: Brijesh Singh <brijesh.singh@amd.com>
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License version 2 as
-> + * published by the Free Software Foundation.
-> + */
-> +
-> +#ifndef __SP_DEV_H__
-> +#define __SP_DEV_H__
-> +
-> +#include <linux/device.h>
-> +#include <linux/pci.h>
-> +#include <linux/spinlock.h>
-> +#include <linux/mutex.h>
-> +#include <linux/list.h>
-> +#include <linux/wait.h>
-> +#include <linux/dmapool.h>
-> +#include <linux/hw_random.h>
-> +#include <linux/bitops.h>
-> +#include <linux/interrupt.h>
-> +#include <linux/irqreturn.h>
-> +
-> +#define SP_MAX_NAME_LEN                32
-> +
-> +#define CACHE_NONE                     0x00
-> +#define CACHE_WB_NO_ALLOC              0xb7
-> +
-> +/* Structure to hold CCP device data */
-> +struct ccp_device;
-> +struct ccp_vdata {
-> +       const unsigned int version;
-> +       const unsigned int dma_chan_attr;
-> +       void (*setup)(struct ccp_device *);
-> +       const struct ccp_actions *perform;
-> +       const unsigned int offset;
-> +};
-> +/* Structure to hold SP device data */
-> +struct sp_dev_vdata {
-> +       const unsigned int bar;
-> +
-> +       const struct ccp_vdata *ccp_vdata;
-> +       void *psp_vdata;
-> +};
-> +
-> +struct sp_device {
-> +       struct list_head entry;
-> +
-> +       struct device *dev;
-> +
-> +       struct sp_dev_vdata *dev_vdata;
-> +       unsigned int ord;
-> +       char name[SP_MAX_NAME_LEN];
-> +
-> +       /* Bus specific device information */
-> +       void *dev_specific;
-> +
-> +       /* I/O area used for device communication. */
-> +       void __iomem *io_map;
-> +
-> +       /* DMA caching attribute support */
-> +       unsigned int axcache;
-> +
-> +       bool irq_registered;
-> +
-> +       int (*get_irq)(struct ccp_device *ccp);
-> +       void (*free_irq)(struct ccp_device *ccp);
-> +
-> +       void *ccp_data;
-> +       void *psp_data;
-> +};
-> +
-> +int sp_pci_init(void);
-> +void sp_pci_exit(void);
-> +
-> +int sp_platform_init(void);
-> +void sp_platform_exit(void);
-> +
-> +struct sp_device *sp_alloc_struct(struct device *dev);
-> +
-> +int sp_init(struct sp_device *sp);
-> +void sp_destroy(struct sp_device *sp);
-> +struct sp_device *sp_get_master(void);
-> +
-> +int sp_suspend(struct sp_device *sp, pm_message_t state);
-> +int sp_resume(struct sp_device *sp);
-> +
-> +#ifdef CONFIG_CRYPTO_DEV_SP_CCP
-> +
-> +int ccp_dev_init(struct sp_device *sp);
-> +void ccp_dev_destroy(struct sp_device *sp);
-> +
-> +int ccp_dev_suspend(struct sp_device *sp, pm_message_t state);
-> +int ccp_dev_resume(struct sp_device *sp);
-> +
-> +#else  /* !CONFIG_CRYPTO_DEV_SP_CCP */
-> +
-> +static inline int ccp_dev_init(struct sp_device *sp)
-> +{
-> +       return 0;
-> +}
-> +static inline void ccp_dev_destroy(struct sp_device *sp) { }
-> +
-> +static inline int ccp_dev_suspend(struct sp_device *sp, pm_message_t state)
-> +{
-> +       return 0;
-> +}
-> +static inline int ccp_dev_resume(struct sp_device *sp)
-> +{
-> +       return 0;
-> +}
-> +#endif /* CONFIG_CRYPTO_DEV_SP_CCP */
-> +
-> +#endif
-> diff --git a/include/linux/ccp.h b/include/linux/ccp.h
-> index 3285c94..523a579 100644
-> --- a/include/linux/ccp.h
-> +++ b/include/linux/ccp.h
-> @@ -24,8 +24,7 @@
->  struct ccp_device;
->  struct ccp_cmd;
+> -MODULE_DEVICE_TABLE(of, ccp_of_match);
+> +MODULE_DEVICE_TABLE(of, sp_of_match);
+>  #endif
 >
-> -#if defined(CONFIG_CRYPTO_DEV_CCP_DD) || \
-> -       defined(CONFIG_CRYPTO_DEV_CCP_DD_MODULE)
-> +#if defined(CONFIG_CRYPTO_DEV_SP_CCP)
+> -static struct platform_driver ccp_platform_driver = {
+> +static struct platform_driver sp_platform_driver = {
+>          .driver = {
+>                  .name = "ccp",
+>  #ifdef CONFIG_ACPI
+> -               .acpi_match_table = ccp_acpi_match,
+> +               .acpi_match_table = sp_acpi_match,
+>  #endif
+>  #ifdef CONFIG_OF
+> -               .of_match_table = ccp_of_match,
+> +               .of_match_table = sp_of_match,
+>  #endif
+>          },
+> -       .probe = ccp_platform_probe,
+> -       .remove = ccp_platform_remove,
+> +       .probe = sp_platform_probe,
+> +       .remove = sp_platform_remove,
+>  #ifdef CONFIG_PM
+> -       .suspend = ccp_platform_suspend,
+> -       .resume = ccp_platform_resume,
+> +       .suspend = sp_platform_suspend,
+> +       .resume = sp_platform_resume,
+>  #endif
+>  };
 >
->  /**
->   * ccp_present - check if a CCP device is present
-> @@ -71,7 +70,7 @@ unsigned int ccp_version(void);
->   */
->  int ccp_enqueue_cmd(struct ccp_cmd *cmd);
->
-> -#else /* CONFIG_CRYPTO_DEV_CCP_DD is not enabled */
-> +#else /* CONFIG_CRYPTO_DEV_CCP_SP_DEV is not enabled */
->
->  static inline int ccp_present(void)
+> -int ccp_platform_init(void)
+> +int sp_platform_init(void)
 >  {
-> @@ -88,7 +87,7 @@ static inline int ccp_enqueue_cmd(struct ccp_cmd *cmd)
->          return -ENODEV;
+> -       return platform_driver_register(&ccp_platform_driver);
+> +       return platform_driver_register(&sp_platform_driver);
 >  }
 >
-> -#endif /* CONFIG_CRYPTO_DEV_CCP_DD */
-> +#endif /* CONFIG_CRYPTO_DEV_SP_CCP */
->
->
->  /***** AES engine *****/
+> -void ccp_platform_exit(void)
+> +void sp_platform_exit(void)
+>  {
+> -       platform_driver_unregister(&ccp_platform_driver);
+> +       platform_driver_unregister(&sp_platform_driver);
+>  }
 > --
 > 2.9.4
 >
