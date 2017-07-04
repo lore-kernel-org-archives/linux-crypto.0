@@ -1,255 +1,77 @@
-From: Corentin Labbe <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH v5] crypto: sun4i-ss: support the Security
- System PRNG
-Date: Mon,  3 Jul 2017 20:48:48 +0200
-Message-ID: <20170703184848.23699-1-clabbe.montjoie@gmail.com>
-Reply-To: clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [bug] sha1-avx2 and read beyond
+Date: Tue, 4 Jul 2017 12:21:12 +0800
+Message-ID: <20170704042112.GA32734@gondor.apana.org.au>
+References: <1950313665.4516034.1493507041652.JavaMail.zimbra@redhat.com>
+ <502554512.20705544.1495630017500.JavaMail.zimbra@redhat.com>
+ <20170623084330.GA30353@gondor.apana.org.au>
+ <1943517473.41520875.1498207731142.JavaMail.zimbra@redhat.com>
+ <ea4d8991-7452-053e-8e53-8dcb6d28f69d@linux.intel.com>
+ <E31A9F2A86F5F543BC6B7554E63385C5504A413B@fmsmsx115.amr.corp.intel.com>
+ <20170703123344.GB30067@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
-	linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org,
-	Corentin Labbe <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
-	davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
-	maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org,
-	wens-jdAy2FN1RRM@public.gmane.org
-Return-path: <linux-sunxi+bncBD7YLCN32UNBBTNE5LFAKGQEKAXHCGA-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
-List-Post: <https://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Help: <https://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Archive: <https://groups.google.com/group/linux-sunxi
-List-Subscribe: <https://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
- <https://groups.google.com/group/linux-sunxi/subscribe>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Tim Chen <tim.c.chen@linux.intel.com>,
+        Jan Stancek <jstancek@redhat.com>,
+        "megha.dey@linux.intel.com" <megha.dey@linux.intel.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "Locktyukhin, Maxim" <maxim.locktyukhin@intel.com>,
+        "Zohar, Ronen" <ronen.zohar@intel.com>,
+        "mouli@linux.intel.com" <mouli@linux.intel.com>,
+        "minipli@googlemail.com" <minipli@googlemail.com>,
+        "hpa@linux.intel.com" <hpa@linux.intel.com>,
+        "marex@denx.de" <marex@denx.de>
+To: "Albrekht, Ilya" <ilya.albrekht@intel.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:51870 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750820AbdGDEVt (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 4 Jul 2017 00:21:49 -0400
+Content-Disposition: inline
+In-Reply-To: <20170703123344.GB30067@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The Security System has a PRNG, this patch adds support for it via
-crypto_rng.
+On Mon, Jul 03, 2017 at 08:33:44PM +0800, Herbert Xu wrote:
+> On Sat, Jun 24, 2017 at 12:56:52AM +0000, Albrekht, Ilya wrote:
+> > Hello all,
+> > 
+> > I'm sorry for late reply (I was out of office for a month).
+> > 
+> > It's been a while since we touched this code. We are going to do our best to support it. I'll be back to the office earlier next week and will figure out the fix ASAP.
+> 
+> Any update on this?
 
-Signed-off-by: Corentin Labbe <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
----
+For the time being I'm going to disable this:
 
-Change since v4
-- Fixed some spelling issue in Kconfig and patch description
+---8<---
+Subject: crypto: sha1-ssse3 - Disable avx2
 
-Changes since v3 (note: the v3 miss changes and version tag sorry)
-- Replaced all len values with bits / BITS_PER_LONG or BITS_PER_BYTE
+It has been reported that sha1-avx2 can cause page faults by reading
+beyond the end of the input.  This patch disables it until it can be
+fixed.
 
-Changes since v2
- - converted to crypto_rng
+Cc: <stable@vger.kernel.org>
+Fixes: 7c1da8d0d046 ("crypto: sha - SHA1 transform x86_64 AVX2")
+Reported-by: Jan Stancek <jstancek@redhat.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Changes since v1:
- - Replaced all spin_lock_bh by simple spin_lock
- - Removed handling of size not modulo 4 which will never happen
- - Added add_random_ready_callback()
-
- drivers/crypto/Kconfig                  |  8 +++++
- drivers/crypto/sunxi-ss/Makefile        |  1 +
- drivers/crypto/sunxi-ss/sun4i-ss-core.c | 30 ++++++++++++++++++
- drivers/crypto/sunxi-ss/sun4i-ss-prng.c | 56 +++++++++++++++++++++++++++++++++
- drivers/crypto/sunxi-ss/sun4i-ss.h      | 11 +++++++
- 5 files changed, 106 insertions(+)
- create mode 100644 drivers/crypto/sunxi-ss/sun4i-ss-prng.c
-
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index ab82536d64e2..99245f9c9d58 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -618,6 +618,14 @@ config CRYPTO_DEV_SUN4I_SS
- 	  To compile this driver as a module, choose M here: the module
- 	  will be called sun4i-ss.
+diff --git a/arch/x86/crypto/sha1_ssse3_glue.c b/arch/x86/crypto/sha1_ssse3_glue.c
+index fc61739..f960a04 100644
+--- a/arch/x86/crypto/sha1_ssse3_glue.c
++++ b/arch/x86/crypto/sha1_ssse3_glue.c
+@@ -201,7 +201,7 @@ asmlinkage void sha1_transform_avx2(u32 *digest, const char *data,
  
-+config CRYPTO_DEV_SUN4I_SS_PRNG
-+	bool "Support for Allwinner Security System PRNG"
-+	depends on CRYPTO_DEV_SUN4I_SS
-+	select CRYPTO_RNG
-+	help
-+	  Select this option if you want to provide kernel-side support for
-+	  the Pseudo-Random Number Generator found in the Security System.
-+
- config CRYPTO_DEV_ROCKCHIP
- 	tristate "Rockchip's Cryptographic Engine driver"
- 	depends on OF && ARCH_ROCKCHIP
-diff --git a/drivers/crypto/sunxi-ss/Makefile b/drivers/crypto/sunxi-ss/Makefile
-index 8f4c7a273141..ccb893219079 100644
---- a/drivers/crypto/sunxi-ss/Makefile
-+++ b/drivers/crypto/sunxi-ss/Makefile
-@@ -1,2 +1,3 @@
- obj-$(CONFIG_CRYPTO_DEV_SUN4I_SS) += sun4i-ss.o
- sun4i-ss-y += sun4i-ss-core.o sun4i-ss-hash.o sun4i-ss-cipher.o
-+sun4i-ss-$(CONFIG_CRYPTO_DEV_SUN4I_SS_PRNG) += sun4i-ss-prng.o
-diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-core.c b/drivers/crypto/sunxi-ss/sun4i-ss-core.c
-index 02ad8256e900..1547cbe13dc2 100644
---- a/drivers/crypto/sunxi-ss/sun4i-ss-core.c
-+++ b/drivers/crypto/sunxi-ss/sun4i-ss-core.c
-@@ -213,6 +213,23 @@ static struct sun4i_ss_alg_template ss_algs[] = {
- 		}
- 	}
- },
-+#ifdef CONFIG_CRYPTO_DEV_SUN4I_SS_PRNG
-+{
-+	.type = CRYPTO_ALG_TYPE_RNG,
-+	.alg.rng = {
-+		.base = {
-+			.cra_name		= "stdrng",
-+			.cra_driver_name	= "sun4i_ss_rng",
-+			.cra_priority		= 300,
-+			.cra_ctxsize		= 0,
-+			.cra_module		= THIS_MODULE,
-+		},
-+		.generate               = sun4i_ss_prng_generate,
-+		.seed                   = sun4i_ss_prng_seed,
-+		.seedsize               = SS_SEED_LEN / BITS_PER_BYTE,
-+	}
-+},
-+#endif
- };
- 
- static int sun4i_ss_probe(struct platform_device *pdev)
-@@ -355,6 +372,13 @@ static int sun4i_ss_probe(struct platform_device *pdev)
- 				goto error_alg;
- 			}
- 			break;
-+		case CRYPTO_ALG_TYPE_RNG:
-+			err = crypto_register_rng(&ss_algs[i].alg.rng);
-+			if (err) {
-+				dev_err(ss->dev, "Fail to register %s\n",
-+					ss_algs[i].alg.rng.base.cra_name);
-+			}
-+			break;
- 		}
- 	}
- 	platform_set_drvdata(pdev, ss);
-@@ -369,6 +393,9 @@ static int sun4i_ss_probe(struct platform_device *pdev)
- 		case CRYPTO_ALG_TYPE_AHASH:
- 			crypto_unregister_ahash(&ss_algs[i].alg.hash);
- 			break;
-+		case CRYPTO_ALG_TYPE_RNG:
-+			crypto_unregister_rng(&ss_algs[i].alg.rng);
-+			break;
- 		}
- 	}
- 	if (ss->reset)
-@@ -393,6 +420,9 @@ static int sun4i_ss_remove(struct platform_device *pdev)
- 		case CRYPTO_ALG_TYPE_AHASH:
- 			crypto_unregister_ahash(&ss_algs[i].alg.hash);
- 			break;
-+		case CRYPTO_ALG_TYPE_RNG:
-+			crypto_unregister_rng(&ss_algs[i].alg.rng);
-+			break;
- 		}
- 	}
- 
-diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-prng.c b/drivers/crypto/sunxi-ss/sun4i-ss-prng.c
-new file mode 100644
-index 000000000000..0d01d1624252
---- /dev/null
-+++ b/drivers/crypto/sunxi-ss/sun4i-ss-prng.c
-@@ -0,0 +1,56 @@
-+#include "sun4i-ss.h"
-+
-+int sun4i_ss_prng_seed(struct crypto_rng *tfm, const u8 *seed,
-+		       unsigned int slen)
-+{
-+	struct sun4i_ss_alg_template *algt;
-+	struct rng_alg *alg = crypto_rng_alg(tfm);
-+
-+	algt = container_of(alg, struct sun4i_ss_alg_template, alg.rng);
-+	memcpy(algt->ss->seed, seed, slen);
-+
-+	return 0;
-+}
-+
-+int sun4i_ss_prng_generate(struct crypto_rng *tfm, const u8 *src,
-+			   unsigned int slen, u8 *dst, unsigned int dlen)
-+{
-+	struct sun4i_ss_alg_template *algt;
-+	struct rng_alg *alg = crypto_rng_alg(tfm);
-+	int i;
-+	u32 v;
-+	u32 *data = (u32 *)dst;
-+	const u32 mode = SS_OP_PRNG | SS_PRNG_CONTINUE | SS_ENABLED;
-+	size_t len;
-+	struct sun4i_ss_ctx *ss;
-+	unsigned int todo = (dlen / 4) * 4;
-+
-+	algt = container_of(alg, struct sun4i_ss_alg_template, alg.rng);
-+	ss = algt->ss;
-+
-+	spin_lock(&ss->slock);
-+
-+	writel(mode, ss->base + SS_CTL);
-+
-+	while (todo > 0) {
-+		/* write the seed */
-+		for (i = 0; i < SS_SEED_LEN / BITS_PER_LONG; i++)
-+			writel(ss->seed[i], ss->base + SS_KEY0 + i * 4);
-+
-+		/* Read the random data */
-+		len = min_t(size_t, SS_DATA_LEN / BITS_PER_BYTE, todo);
-+		readsl(ss->base + SS_TXFIFO, data, len / 4);
-+		data += len / 4;
-+		todo -= len;
-+
-+		/* Update the seed */
-+		for (i = 0; i < SS_SEED_LEN / BITS_PER_LONG; i++) {
-+			v = readl(ss->base + SS_KEY0 + i * 4);
-+			ss->seed[i] = v;
-+		}
-+	}
-+
-+	writel(0, ss->base + SS_CTL);
-+	spin_unlock(&ss->slock);
-+	return dlen;
-+}
-diff --git a/drivers/crypto/sunxi-ss/sun4i-ss.h b/drivers/crypto/sunxi-ss/sun4i-ss.h
-index a0e1efc1cb2a..f3ac90692ac6 100644
---- a/drivers/crypto/sunxi-ss/sun4i-ss.h
-+++ b/drivers/crypto/sunxi-ss/sun4i-ss.h
-@@ -32,6 +32,7 @@
- #include <crypto/aes.h>
- #include <crypto/des.h>
- #include <crypto/internal/rng.h>
-+#include <crypto/rng.h>
- 
- #define SS_CTL            0x00
- #define SS_KEY0           0x04
-@@ -127,6 +128,9 @@
- #define SS_RXFIFO_EMP_INT_ENABLE	(1 << 2)
- #define SS_TXFIFO_AVA_INT_ENABLE	(1 << 0)
- 
-+#define SS_SEED_LEN 192
-+#define SS_DATA_LEN 160
-+
- struct sun4i_ss_ctx {
- 	void __iomem *base;
- 	int irq;
-@@ -136,6 +140,9 @@ struct sun4i_ss_ctx {
- 	struct device *dev;
- 	struct resource *res;
- 	spinlock_t slock; /* control the use of the device */
-+#ifdef CONFIG_CRYPTO_DEV_SUN4I_SS_PRNG
-+	u32 seed[SS_SEED_LEN / BITS_PER_LONG];
-+#endif
- };
- 
- struct sun4i_ss_alg_template {
-@@ -144,6 +151,7 @@ struct sun4i_ss_alg_template {
- 	union {
- 		struct skcipher_alg crypto;
- 		struct ahash_alg hash;
-+		struct rng_alg rng;
- 	} alg;
- 	struct sun4i_ss_ctx *ss;
- };
-@@ -201,3 +209,6 @@ int sun4i_ss_des_setkey(struct crypto_skcipher *tfm, const u8 *key,
- 			unsigned int keylen);
- int sun4i_ss_des3_setkey(struct crypto_skcipher *tfm, const u8 *key,
- 			 unsigned int keylen);
-+int sun4i_ss_prng_generate(struct crypto_rng *tfm, const u8 *src,
-+			   unsigned int slen, u8 *dst, unsigned int dlen);
-+int sun4i_ss_prng_seed(struct crypto_rng *tfm, const u8 *seed, unsigned int slen);
+ static bool avx2_usable(void)
+ {
+-	if (avx_usable() && boot_cpu_has(X86_FEATURE_AVX2)
++	if (false && avx_usable() && boot_cpu_has(X86_FEATURE_AVX2)
+ 		&& boot_cpu_has(X86_FEATURE_BMI1)
+ 		&& boot_cpu_has(X86_FEATURE_BMI2))
+ 		return true;
+
 -- 
-2.13.0
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
