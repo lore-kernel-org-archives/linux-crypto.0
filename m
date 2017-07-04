@@ -1,77 +1,119 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [bug] sha1-avx2 and read beyond
-Date: Tue, 4 Jul 2017 12:21:12 +0800
-Message-ID: <20170704042112.GA32734@gondor.apana.org.au>
-References: <1950313665.4516034.1493507041652.JavaMail.zimbra@redhat.com>
- <502554512.20705544.1495630017500.JavaMail.zimbra@redhat.com>
- <20170623084330.GA30353@gondor.apana.org.au>
- <1943517473.41520875.1498207731142.JavaMail.zimbra@redhat.com>
- <ea4d8991-7452-053e-8e53-8dcb6d28f69d@linux.intel.com>
- <E31A9F2A86F5F543BC6B7554E63385C5504A413B@fmsmsx115.amr.corp.intel.com>
- <20170703123344.GB30067@gondor.apana.org.au>
+From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Subject: Re: [PATCH 3/3] crypto: hwrng add sysfs attribute to show user
+ selected rng
+Date: Tue, 4 Jul 2017 18:45:44 +0530
+Message-ID: <CANc+2y4SQhDdwbV+FLda9OwQpX=2fUsvDiD1eZE0QqQp1N+_hg@mail.gmail.com>
+References: <1499076204-18547-1-git-send-email-freude@linux.vnet.ibm.com> <1499076204-18547-4-git-send-email-freude@linux.vnet.ibm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Tim Chen <tim.c.chen@linux.intel.com>,
-        Jan Stancek <jstancek@redhat.com>,
-        "megha.dey@linux.intel.com" <megha.dey@linux.intel.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "Locktyukhin, Maxim" <maxim.locktyukhin@intel.com>,
-        "Zohar, Ronen" <ronen.zohar@intel.com>,
-        "mouli@linux.intel.com" <mouli@linux.intel.com>,
-        "minipli@googlemail.com" <minipli@googlemail.com>,
-        "hpa@linux.intel.com" <hpa@linux.intel.com>,
-        "marex@denx.de" <marex@denx.de>
-To: "Albrekht, Ilya" <ilya.albrekht@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Cc: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg KH <gregkh@linuxfoundation.org>, schwidefsky@de.ibm.com
+To: Harald Freudenberger <freude@linux.vnet.ibm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:51870 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750820AbdGDEVt (ORCPT
+Received: from mail-vk0-f65.google.com ([209.85.213.65]:36035 "EHLO
+        mail-vk0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751645AbdGDNPq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 4 Jul 2017 00:21:49 -0400
-Content-Disposition: inline
-In-Reply-To: <20170703123344.GB30067@gondor.apana.org.au>
+        Tue, 4 Jul 2017 09:15:46 -0400
+Received: by mail-vk0-f65.google.com with SMTP id y70so13042050vky.3
+        for <linux-crypto@vger.kernel.org>; Tue, 04 Jul 2017 06:15:46 -0700 (PDT)
+In-Reply-To: <1499076204-18547-4-git-send-email-freude@linux.vnet.ibm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jul 03, 2017 at 08:33:44PM +0800, Herbert Xu wrote:
-> On Sat, Jun 24, 2017 at 12:56:52AM +0000, Albrekht, Ilya wrote:
-> > Hello all,
-> > 
-> > I'm sorry for late reply (I was out of office for a month).
-> > 
-> > It's been a while since we touched this code. We are going to do our best to support it. I'll be back to the office earlier next week and will figure out the fix ASAP.
-> 
-> Any update on this?
+On 3 July 2017 at 15:33, Harald Freudenberger <freude@linux.vnet.ibm.com> wrote:
+> This patch introduces a new sysfs attribute file 'rng_selected'
+> which shows the the rng chosen by userspace.
+>
+> If a rng source is chosen by user via echo some valid string
+> to rng_current there should be a way to signal this choice to
+> userspace. The new attribute file 'rng_selected' shows either
+> the name of the rng chosen or 'none'.
+>
+> Signed-off-by: Harald Freudenberger <freude@linux.vnet.ibm.com>
+> ---
+>  drivers/char/hw_random/core.c | 22 +++++++++++++++++-----
+>  1 file changed, 17 insertions(+), 5 deletions(-)
+>
+> diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+> index ffd4e36..6a6276a 100644
+> --- a/drivers/char/hw_random/core.c
+> +++ b/drivers/char/hw_random/core.c
+> @@ -28,8 +28,8 @@
+>  #define RNG_MODULE_NAME                "hw_random"
+>
+>  static struct hwrng *current_rng;
+> -/* the current rng has been explicitly chosen by user via sysfs */
+> -static int cur_rng_set_by_user;
+> +/* the rng explicitly selected by user via sysfs */
+> +static struct hwrng *selected_rng;
+>  static struct task_struct *hwrng_fill;
+>  /* list of registered rngs, sorted decending by quality */
+>  static LIST_HEAD(rng_list);
+> @@ -306,7 +306,7 @@ static ssize_t hwrng_attr_current_store(struct device *dev,
+>         list_for_each_entry(rng, &rng_list, list) {
+>                 if (sysfs_streq(rng->name, buf)) {
+>                         err = 0;
+> -                       cur_rng_set_by_user = 1;
+> +                       selected_rng = rng;
+>                         if (rng != current_rng)
+>                                 err = set_current_rng(rng);
+>                         break;
+> @@ -355,16 +355,28 @@ static ssize_t hwrng_attr_available_show(struct device *dev,
+>         return strlen(buf);
+>  }
+>
+> +static ssize_t hwrng_attr_selected_show(struct device *dev,
+> +                                       struct device_attribute *attr,
+> +                                       char *buf)
+> +{
+> +       return snprintf(buf, PAGE_SIZE, "%s\n",
+> +                       selected_rng ? selected_rng->name : "none");
+> +}
+> +
+>  static DEVICE_ATTR(rng_current, S_IRUGO | S_IWUSR,
+>                    hwrng_attr_current_show,
+>                    hwrng_attr_current_store);
+>  static DEVICE_ATTR(rng_available, S_IRUGO,
+>                    hwrng_attr_available_show,
+>                    NULL);
+> +static DEVICE_ATTR(rng_selected, S_IRUGO,
+> +                  hwrng_attr_selected_show,
+> +                  NULL);
+>
+>  static struct attribute *rng_dev_attrs[] = {
+>         &dev_attr_rng_current.attr,
+>         &dev_attr_rng_available.attr,
+> +       &dev_attr_rng_selected.attr,
+>         NULL
+>  };
+>
+> @@ -448,7 +460,7 @@ int hwrng_register(struct hwrng *rng)
+>         old_rng = current_rng;
+>         err = 0;
+>         if (!old_rng ||
+> -           (!cur_rng_set_by_user && rng->quality > old_rng->quality)) {
+> +           (!selected_rng && rng->quality > old_rng->quality)) {
+>                 /*
+>                  * Set new rng as current as the new rng source
+>                  * provides better entropy quality and was not
+> @@ -484,7 +496,7 @@ void hwrng_unregister(struct hwrng *rng)
+>         list_del(&rng->list);
+>         if (current_rng == rng) {
+>                 drop_current_rng();
+> -               cur_rng_set_by_user = 0;
+> +               selected_rng = NULL;
+>                 /* rng_list is sorted by quality, use the best (=first) one */
+>                 if (!list_empty(&rng_list)) {
+>                         struct hwrng *new_rng;
+> --
+> 2.7.4
+>
 
-For the time being I'm going to disable this:
+The current_rng sysfs attribute shows currently selected rng. So this
+new attribute can contain 1 to indicate user's choice, 0 otherwise.
 
----8<---
-Subject: crypto: sha1-ssse3 - Disable avx2
-
-It has been reported that sha1-avx2 can cause page faults by reading
-beyond the end of the input.  This patch disables it until it can be
-fixed.
-
-Cc: <stable@vger.kernel.org>
-Fixes: 7c1da8d0d046 ("crypto: sha - SHA1 transform x86_64 AVX2")
-Reported-by: Jan Stancek <jstancek@redhat.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/arch/x86/crypto/sha1_ssse3_glue.c b/arch/x86/crypto/sha1_ssse3_glue.c
-index fc61739..f960a04 100644
---- a/arch/x86/crypto/sha1_ssse3_glue.c
-+++ b/arch/x86/crypto/sha1_ssse3_glue.c
-@@ -201,7 +201,7 @@ asmlinkage void sha1_transform_avx2(u32 *digest, const char *data,
- 
- static bool avx2_usable(void)
- {
--	if (avx_usable() && boot_cpu_has(X86_FEATURE_AVX2)
-+	if (false && avx_usable() && boot_cpu_has(X86_FEATURE_AVX2)
- 		&& boot_cpu_has(X86_FEATURE_BMI1)
- 		&& boot_cpu_has(X86_FEATURE_BMI2))
- 		return true;
-
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Regards,
+PrasannaKumar
