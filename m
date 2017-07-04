@@ -1,8 +1,8 @@
 From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Subject: Re: [PATCH 1/3] crypto: hwrng use rng source with best quality
-Date: Tue, 4 Jul 2017 18:47:20 +0530
-Message-ID: <CANc+2y6=0d_1Mpzj2bhDVRwgOne8RPsT2KkmCAKoRCpv0104ug@mail.gmail.com>
-References: <1499076204-18547-1-git-send-email-freude@linux.vnet.ibm.com> <1499076204-18547-2-git-send-email-freude@linux.vnet.ibm.com>
+Subject: Re: [PATCH 2/3] crypto: hwrng remember rng chosen by user
+Date: Tue, 4 Jul 2017 18:48:36 +0530
+Message-ID: <CANc+2y6PAsrxgJFfZfe_E1tx99nbNNgpH_qim-9Rohfwn1z+QA@mail.gmail.com>
+References: <1499076204-18547-1-git-send-email-freude@linux.vnet.ibm.com> <1499076204-18547-3-git-send-email-freude@linux.vnet.ibm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Cc: linux-crypto@vger.kernel.org,
@@ -11,103 +11,81 @@ Cc: linux-crypto@vger.kernel.org,
         Greg KH <gregkh@linuxfoundation.org>, schwidefsky@de.ibm.com
 To: Harald Freudenberger <freude@linux.vnet.ibm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-vk0-f65.google.com ([209.85.213.65]:34871 "EHLO
-        mail-vk0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751960AbdGDNRW (ORCPT
+Received: from mail-ua0-f196.google.com ([209.85.217.196]:36174 "EHLO
+        mail-ua0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751852AbdGDNSi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 4 Jul 2017 09:17:22 -0400
-Received: by mail-vk0-f65.google.com with SMTP id p193so13088308vkd.2
-        for <linux-crypto@vger.kernel.org>; Tue, 04 Jul 2017 06:17:21 -0700 (PDT)
-In-Reply-To: <1499076204-18547-2-git-send-email-freude@linux.vnet.ibm.com>
+        Tue, 4 Jul 2017 09:18:38 -0400
+Received: by mail-ua0-f196.google.com with SMTP id g40so15175155uaa.3
+        for <linux-crypto@vger.kernel.org>; Tue, 04 Jul 2017 06:18:37 -0700 (PDT)
+In-Reply-To: <1499076204-18547-3-git-send-email-freude@linux.vnet.ibm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Hi Harald,
+
 On 3 July 2017 at 15:33, Harald Freudenberger <freude@linux.vnet.ibm.com> wrote:
-> This patch rewoks the hwrng to always use the
-> rng source with best entropy quality.
->
-> On registation and unregistration the hwrng now
-> tries to choose the best (= highest quality value)
-> rng source. The handling of the internal list
-> of registered rng sources is now always sorted
-> by quality and the top most rng chosen.
+> When a user chooses a rng source via sysfs
+> attribute this rng should be sticky, even
+> when other sources with better quality to
+> register. This patch introduces a simple way
+> to remember the user's choise.
 >
 > Signed-off-by: Harald Freudenberger <freude@linux.vnet.ibm.com>
 > ---
->  drivers/char/hw_random/core.c | 25 +++++++++++++++++++------
->  1 file changed, 19 insertions(+), 6 deletions(-)
+>  drivers/char/hw_random/core.c | 10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
 >
 > diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
-> index 503a41d..e9dda16 100644
+> index e9dda16..ffd4e36 100644
 > --- a/drivers/char/hw_random/core.c
 > +++ b/drivers/char/hw_random/core.c
-> @@ -29,6 +29,7 @@
+> @@ -28,6 +28,8 @@
+>  #define RNG_MODULE_NAME                "hw_random"
 >
 >  static struct hwrng *current_rng;
+> +/* the current rng has been explicitly chosen by user via sysfs */
+> +static int cur_rng_set_by_user;
 >  static struct task_struct *hwrng_fill;
-> +/* list of registered rngs, sorted decending by quality */
+>  /* list of registered rngs, sorted decending by quality */
 >  static LIST_HEAD(rng_list);
->  /* Protects rng_list and current_rng */
->  static DEFINE_MUTEX(rng_mutex);
-> @@ -417,6 +418,7 @@ int hwrng_register(struct hwrng *rng)
->  {
->         int err = -EINVAL;
->         struct hwrng *old_rng, *tmp;
-> +       struct list_head *rng_list_ptr;
+> @@ -304,6 +306,7 @@ static ssize_t hwrng_attr_current_store(struct device *dev,
+>         list_for_each_entry(rng, &rng_list, list) {
+>                 if (sysfs_streq(rng->name, buf)) {
+>                         err = 0;
+> +                       cur_rng_set_by_user = 1;
+>                         if (rng != current_rng)
+>                                 err = set_current_rng(rng);
+>                         break;
+> @@ -444,10 +447,12 @@ int hwrng_register(struct hwrng *rng)
 >
->         if (!rng->name || (!rng->data_read && !rng->read))
->                 goto out;
-> @@ -432,14 +434,25 @@ int hwrng_register(struct hwrng *rng)
->         init_completion(&rng->cleanup_done);
->         complete(&rng->cleanup_done);
->
-> +       /* rng_list is sorted by decreasing quality */
-> +       list_for_each(rng_list_ptr, &rng_list) {
-> +               tmp = list_entry(rng_list_ptr, struct hwrng, list);
-> +               if (tmp->quality < rng->quality)
-> +                       break;
-> +       }
-> +       list_add_tail(&rng->list, rng_list_ptr);
-> +
 >         old_rng = current_rng;
 >         err = 0;
-> -       if (!old_rng) {
-> +       if (!old_rng || (rng->quality > old_rng->quality)) {
-> +               /*
-> +                * Set new rng as current as the new rng source
-> +                * provides better entropy quality.
-> +                */
+> -       if (!old_rng || (rng->quality > old_rng->quality)) {
+> +       if (!old_rng ||
+> +           (!cur_rng_set_by_user && rng->quality > old_rng->quality)) {
+>                 /*
+>                  * Set new rng as current as the new rng source
+> -                * provides better entropy quality.
+> +                * provides better entropy quality and was not
+> +                * chosen by userspace.
+>                  */
 >                 err = set_current_rng(rng);
 >                 if (err)
->                         goto out_unlock;
->         }
-> -       list_add_tail(&rng->list, &rng_list);
->
->         if (old_rng && !rng->init) {
->                 /*
-> @@ -466,12 +479,12 @@ void hwrng_unregister(struct hwrng *rng)
+> @@ -479,6 +484,7 @@ void hwrng_unregister(struct hwrng *rng)
 >         list_del(&rng->list);
 >         if (current_rng == rng) {
 >                 drop_current_rng();
-> +               /* rng_list is sorted by quality, use the best (=first) one */
+> +               cur_rng_set_by_user = 0;
+>                 /* rng_list is sorted by quality, use the best (=first) one */
 >                 if (!list_empty(&rng_list)) {
-> -                       struct hwrng *tail;
-> -
-> -                       tail = list_entry(rng_list.prev, struct hwrng, list);
-> +                       struct hwrng *new_rng;
->
-> -                       set_current_rng(tail);
-> +                       new_rng = list_entry(rng_list.next, struct hwrng, list);
-> +                       set_current_rng(new_rng);
->                 }
->         }
->
+>                         struct hwrng *new_rng;
 > --
 > 2.7.4
 >
 
-Looks good to me.
-Reviewed-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>.
+Looks good to me. Reviewed-by: PrasannaKumar Muralidharan
+<prasannatsmkumar@gmail.com>.
 
 Regards,
 PrasannaKumar
