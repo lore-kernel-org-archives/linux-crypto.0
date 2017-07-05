@@ -1,81 +1,57 @@
-From: "Ulrich Windl" <Ulrich.Windl-LOEJiUoeGm199bV2EpccEXqWYbMAw+HU@public.gmane.org>
-Subject: Antw: Re: [kernel-hardening] Re: [PATCH v4 06/13] iscsi:
- ensure RNG is seeded before use
-Date: Wed, 05 Jul 2017 09:08:41 +0200
-Message-ID: <595C9079020000A100026F37@gwsmtp1.uni-regensburg.de>
-References: <20170606174804.31124-1-Jason@zx2c4.com>
- <20170606174804.31124-7-Jason@zx2c4.com>
- <20170608024357.fhyyentj2qm7ti2q@thunk.org>
- <CAHmME9pViOqqDPyjXKLfCWSTnQrcE4OLJMdK1yaTiUvrOV+ecQ@mail.gmail.com>
- <fbca1b2b-c9ae-80ce-45ef-17c3d3b93e57@suse.com>
- <CAHmME9rU_H6Jq7ArjDq1yByrYf1P7nyC4Y8tqkzG585U39MFLg@mail.gmail.com>
- <02d60ed4-4207-dd7d-8826-0f9f7f4e966d@suse.com>
- <CAH8yC8nHX2r9cfQ0gNeJAUrgSfAS8V16dVHv35BRnLn-YprZCg@mail.gmail.com>
-Reply-To: open-iscsi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+From: Tudor Ambarus <tudor.ambarus@microchip.com>
+Subject: [PATCH 0/3] crypto: introduce Microchip / Atmel ECC driver
+Date: Wed, 5 Jul 2017 13:07:57 +0300
+Message-ID: <1499249280-31779-1-git-send-email-tudor.ambarus@microchip.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Cc: "David Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
- "Eric Biggers" <ebiggers3-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
- "open-iscsi" <open-iscsi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
- "Nicholas A.Bellinger" <nab-IzHhD5pYlfBP7FQvKIMDCQ@public.gmane.org>,
- "Greg Kroah-Hartman" <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>,
- "kernel-hardening-ZwoEplunGu1jrUoiu81ncdBPR1lH4CV8@public.gmane.org" <kernel-hardening-ZwoEplunGu1jrUoiu81ncdBPR1lH4CV8@public.gmane.org>,
- "Ted Ts'o" <tytso-3s7WtUTddSA@public.gmane.org>,"Chris Leech" <cleech-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
- "Linux Crypto Mailing List" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
- <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, "Jason A.Donenfeld" <Jason-OnJsPKxuuEcAvxtiuMwx3w@public.gmane.org>
-To: "Lee Duncan" <lduncan-IBi9RG/b67k@public.gmane.org>
-Return-path: <open-iscsi+bncBC6MFJWO34DBB7NA6LFAKGQELP4PU6I-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-Sender: open-iscsi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
-In-Reply-To: <CAH8yC8nHX2r9cfQ0gNeJAUrgSfAS8V16dVHv35BRnLn-YprZCg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Content-Disposition: inline
-List-Post: <https://groups.google.com/group/open-iscsi/post>, <mailto:open-iscsi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Help: <https://groups.google.com/support/>, <mailto:open-iscsi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Archive: <https://groups.google.com/group/open-iscsi
-List-Subscribe: <https://groups.google.com/group/open-iscsi/subscribe>, <mailto:open-iscsi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Unsubscribe: <mailto:googlegroups-manage+856124926423+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
- <https://groups.google.com/group/open-iscsi/subscribe>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain
+Cc: <linux-crypto@vger.kernel.org>, <wsa@the-dreams.de>,
+        <linux-i2c@vger.kernel.org>, <nicolas.ferre@microchip.com>,
+        Tudor Ambarus <tudor.ambarus@microchip.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from esa4.microchip.iphmx.com ([68.232.154.123]:38052 "EHLO
+        esa4.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752246AbdGEKII (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 5 Jul 2017 06:08:08 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
->>> Jeffrey Walton <noloader-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> schrieb am 17.06.2017 um 16:23 in N=
-achricht
-<CAH8yC8nHX2r9cfQ0gNeJAUrgSfAS8V16dVHv35BRnLn-YprZCg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>:
+Hi,
 
-[...]
-> But its not clear to me how to ensure uniqueness when its based on
-> randomness from the generators.
+This patch set introduces Microchip / Atmel ECC driver.
 
-Even with a perfect random generator non-unique values are possible (that's=
- why it's random). It's unlikely, but it can happen. The question is whethe=
-r the probability of non-unique values from /dev/urandom is any higher than=
- that for values read from /dev/random. One _might_ be able to predict the =
-values from /dev/urandom.
+The first patch adds some helpers that will be used by fallbacks to
+kpp software implementations.
 
-Regards,
-Ulrich
+The second patch adds ECDH support for the ATECC508A (I2C)
+cryptographic engine. The I2C interface is designed to operate
+at a maximum clock speed of 1MHz.
 
->=20
-> Jeff
->=20
-> --=20
-> You received this message because you are subscribed to the Google Groups=
-=20
-> "open-iscsi" group.
-> To unsubscribe from this group and stop receiving emails from it, send an=
-=20
-> email to open-iscsi+unsubscribe-/JYPxA39Uh5TLH3MbocFF+G/Ez6ZCGd0@public.gmane.org
-> To post to this group, send email to open-iscsi-/JYPxA39Uh5TLH3MbocFF+G/Ez6ZCGd0@public.gmane.org
-> Visit this group at https://groups.google.com/group/open-iscsi.
-> For more options, visit https://groups.google.com/d/optout.
+The device features hardware acceleration for the NIST standard
+P256 prime curve and supports the complete key life cycle from
+private key generation to ECDH key agreement.
 
+Random private key generation is supported internally within
+the device to ensure that the private key can never be known
+outside of the device. If the user wants to use its own private
+keys, the driver will fallback to the ecdh software implementation.
 
+Tudor Ambarus (3):
+  crypto: kpp: add get/set_flags helpers
+  crypto: introduce Microchip / Atmel ECC driver
+  MAINTAINERS: add a maintainer for Microchip / Atmel ECC driver
 
+ .../devicetree/bindings/crypto/atmel-crypto.txt    |  13 +
+ MAINTAINERS                                        |   6 +
+ drivers/crypto/Kconfig                             |  14 +
+ drivers/crypto/Makefile                            |   1 +
+ drivers/crypto/atmel-ecc.c                         | 781 +++++++++++++++++++++
+ drivers/crypto/atmel-ecc.h                         | 128 ++++
+ include/crypto/kpp.h                               |  10 +
+ 7 files changed, 953 insertions(+)
+ create mode 100644 drivers/crypto/atmel-ecc.c
+ create mode 100644 drivers/crypto/atmel-ecc.h
 
---=20
-You received this message because you are subscribed to the Google Groups "=
-open-iscsi" group.
-To unsubscribe from this group and stop receiving emails from it, send an e=
-mail to open-iscsi+unsubscribe-/JYPxA39Uh5TLH3MbocFF+G/Ez6ZCGd0@public.gmane.org
-To post to this group, send email to open-iscsi-/JYPxA39Uh5TLH3MbocFF+G/Ez6ZCGd0@public.gmane.org
-Visit this group at https://groups.google.com/group/open-iscsi.
-For more options, visit https://groups.google.com/d/optout.
+-- 
+2.7.4
