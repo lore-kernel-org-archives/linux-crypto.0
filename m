@@ -1,160 +1,60 @@
-From: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
-Subject: Re: [PATCH v2 6/6] ima: Support module-style appended signatures for appraisal
-Date: Tue, 04 Jul 2017 23:22:55 -0300
-Message-ID: <87fuebei68.fsf@linux.vnet.ibm.com>
-References: <1496886555-10082-1-git-send-email-bauerman@linux.vnet.ibm.com> <1496886555-10082-7-git-send-email-bauerman@linux.vnet.ibm.com> <1497443972.4287.38.camel@linux.vnet.ibm.com> <8760fpck0x.fsf@linux.vnet.ibm.com> <1498095237.5328.44.camel@linux.vnet.ibm.com>
+From: <agiva@centrum.cz>
+Subject: (unknown)
+Date: Wed, 05 Jul 2017 06:55:59 -0000
+Message-ID: <149923775968.19456.3589465238065798285@hinet.net>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: linux-security-module@vger.kernel.org,
-        linux-ima-devel@lists.sourceforge.net, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-kernel@vger.kernel.org,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        James Morris <james.l.morris@oracle.com>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Jessica Yu <jeyu@redhat.com>,
-        Rusty Russell <rusty@rustcorp.com.au>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "AKASHI\, Takahiro" <takahiro.akashi@linaro.org>
-To: Mimi Zohar <zohar@linux.vnet.ibm.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-reply-to: <1498095237.5328.44.camel@linux.vnet.ibm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: application/zip; name="EBAY_3538766534773_linux-crypto.zip"
+Content-Transfer-Encoding: base64
+To: <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from 61-227-75-220.dynamic-ip.hinet.net ([61.227.75.220]:33470 "HELO
+        hinet.net" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with SMTP
+        id S1751110AbdGEG4O (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 5 Jul 2017 02:56:14 -0400
+Subject: 
+Content-Disposition: attachment
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-
-Mimi Zohar <zohar@linux.vnet.ibm.com> writes:
-
-> On Wed, 2017-06-21 at 14:45 -0300, Thiago Jung Bauermann wrote:
->> Mimi Zohar <zohar@linux.vnet.ibm.com> writes:
->> > On Wed, 2017-06-07 at 22:49 -0300, Thiago Jung Bauermann wrote:
->> >> @@ -267,11 +276,18 @@ int ima_appraise_measurement(enum ima_hooks func,
->> >>  		status = INTEGRITY_PASS;
->> >>  		break;
->> >>  	case EVM_IMA_XATTR_DIGSIG:
->> >> +	case IMA_MODSIG:
->> >>  		iint->flags |= IMA_DIGSIG;
->> >> -		rc = integrity_digsig_verify(INTEGRITY_KEYRING_IMA,
->> >> -					     (const char *)xattr_value, rc,
->> >> -					     iint->ima_hash->digest,
->> >> -					     iint->ima_hash->length);
->> >> +
->> >> +		if (xattr_value->type == EVM_IMA_XATTR_DIGSIG)
->> >> +			rc = integrity_digsig_verify(INTEGRITY_KEYRING_IMA,
->> >> +						     (const char *)xattr_value,
->> >> +						     rc, iint->ima_hash->digest,
->> >> +						     iint->ima_hash->length);
->> >> +		else
->> >> +			rc = ima_modsig_verify(INTEGRITY_KEYRING_IMA,
->> >> +					       xattr_value);
->> >> +
->> >
->> > Perhaps allowing IMA_MODSIG to flow into EVM_IMA_XATTR_DIGSIG on
->> > failure, would help restore process_measurements() to the way it was.
->> > Further explanation below.
->> 
->> It's not possible to simply flow into EVM_IMA_XATTR_DIGSIG on failure
->> because after calling ima_read_xattr we need to run again all the logic
->> before the switch statement. Instead, I'm currently testing the
->> following change for v3, what do you think?
->
-> I don't think we can assume that the same algorithm will be used for
-> signing the kernel image. Different entities would be signing the
-> kernel image with different requirements.
->
-> Suppose for example a stock distro image comes signed using one
-> algorithm (appended signature), but the same kernel image is locally
-> signed using a different algorithm (xattr). Signature verification is
-> dependent on either the distro or local public key being loaded onto
-> the IMA keyring.
-
-This example is good, but it raises one question: should the xattr
-signature cover the entire contents of the stock distro image (i.e.,
-also cover the appended signature), or should it ignore the appended
-signature and thus cover the same contents that the appended signature
-covers?
-
-If the former, then we can't reuse the iint->ima_hash that was collected
-when trying to verify the appended signature because it doesn't cover
-the appended signature itself and won't match the hash expected by the
-xattr signature.
-
-If the latter, then evmctl ima_sign needs to be modified to check
-whether there's an appended signature in the given file and ignore it
-when calculating the xattr signature.
-
-Which is better?
-
->> >> @@ -226,30 +282,23 @@ static int process_measurement(struct file *file, char *buf, loff_t size,
->> >>  		goto out_digsig;
->> >>  	}
->> >> 
->> >> -	template_desc = ima_template_desc_current();
->> >> -	if ((action & IMA_APPRAISE_SUBMASK) ||
->> >> -		    strcmp(template_desc->name, IMA_TEMPLATE_IMA_NAME) != 0)
->> >> -		/* read 'security.ima' */
->> >> -		xattr_len = ima_read_xattr(file_dentry(file), &xattr_value);
->> >> -
->> >> -	hash_algo = ima_get_hash_algo(xattr_value, xattr_len);
->> >> -
->> >> -	rc = ima_collect_measurement(iint, file, buf, size, hash_algo);
->> >> -	if (rc != 0) {
->> >> -		if (file->f_flags & O_DIRECT)
->> >> -			rc = (iint->flags & IMA_PERMIT_DIRECTIO) ? 0 : -EACCES;
->> >> -		goto out_digsig;
->> >> -	}
->> >> -
->> >
->> > There are four stages: collect measurement, store measurement,
->> > appraise measurement and audit measurement. "Collect" needs to be
->> > done if any one of the other stages is needed.
->> >
->> >>  	if (!pathbuf)	/* ima_rdwr_violation possibly pre-fetched */
->> >>  		pathname = ima_d_path(&file->f_path, &pathbuf, filename);
->> >> 
->> >> +	if (iint->flags & IMA_MODSIG_ALLOWED)
->> >> +		rc = measure_and_appraise(file, buf, size, func, opened, action,
->> >> +					  iint, &xattr_value, &xattr_len,
->> >> +					  pathname, true);
->> >> +	if (!xattr_len)
->> >> +		rc = measure_and_appraise(file, buf, size, func, opened, action,
->> >> +					  iint, &xattr_value, &xattr_len,
->> >> +					  pathname, false);
->> >
->> > I would rather see "collect" extended to support an appended signature
->> > rather than trying to combine "collect" and "appraise" together.
->> 
->> I'm not sure I understand what you mean by "extend collect to support an
->> appended signature", but the fundamental problem is that we don't know
->> whether we need to fallback to the xattr sig until the appraise step
->> because that's when we verify the signature, and by then the collect and
->> store steps were already completed and would need to be done again if
->> the hash algorithm in the xattr sig is different.
->
-> The "appraise" stage could be moved before the "store" stage, like you
-> have. (This should be a separate patch explaining the need for moving
-> it.) Based on an argument to ima_collect_measurement() have it
-> "collect" either the appended signature or the xattr. Maybe something
-> like this:
->
-> loop [ appended signature, xattr ] { <== list based on policy flags
->   collect_measurement()
->   if failure
->     continue
->   appraise_measurement()
->   if success
->     break
-> }
->
-> store_measurement()
-
-Ok, the above is what v2 already does, so the only change I made was to
-rename the function from measure_and_appraise to collect_and_appraise to
-match the IMA jargon.
-
--- 
-Thiago Jung Bauermann
-IBM Linux Technology Center
+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
