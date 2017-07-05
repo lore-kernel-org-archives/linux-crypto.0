@@ -1,60 +1,168 @@
-From: <agiva@centrum.cz>
-Subject: (unknown)
-Date: Wed, 05 Jul 2017 06:55:59 -0000
-Message-ID: <149923775968.19456.3589465238065798285@hinet.net>
+From: "Ulrich Windl" <Ulrich.Windl-LOEJiUoeGm199bV2EpccEXqWYbMAw+HU@public.gmane.org>
+Subject: Antw: Re: [kernel-hardening] Re: [PATCH v4 06/13] iscsi:
+ ensure RNG is seeded before use
+Date: Wed, 05 Jul 2017 09:03:43 +0200
+Message-ID: <595C8F4F020000A100026F29@gwsmtp1.uni-regensburg.de>
+References: <20170606174804.31124-1-Jason@zx2c4.com>
+ <2639082.PtrrGWOPPL@positron.chronox.de>
+ <1498440189.26123.85.camel@haakon3.risingtidesystems.com>
+ <1678474.GnYBdSlWgs@tauon.chronox.de>
+Reply-To: open-iscsi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
 Mime-Version: 1.0
-Content-Type: application/zip; name="EBAY_3538766534773_linux-crypto.zip"
-Content-Transfer-Encoding: base64
-To: <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 61-227-75-220.dynamic-ip.hinet.net ([61.227.75.220]:33470 "HELO
-        hinet.net" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with SMTP
-        id S1751110AbdGEG4O (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 5 Jul 2017 02:56:14 -0400
-Subject: 
-Content-Disposition: attachment
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Cc: "David Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+ "Eric Biggers" <ebiggers3-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+ "open-iscsi" <open-iscsi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
+ "Greg Kroah-Hartman" <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>,
+ "kernel-hardening-ZwoEplunGu1jrUoiu81ncdBPR1lH4CV8@public.gmane.org" <kernel-hardening-ZwoEplunGu1jrUoiu81ncdBPR1lH4CV8@public.gmane.org>,
+ "Ted Ts'o" <tytso-3s7WtUTddSA@public.gmane.org>,"Chris Leech" <cleech-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+ "Lee Duncan" <lduncan-IBi9RG/b67k@public.gmane.org>,
+ "Linux Crypto Mailing List" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+ <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+ "target-devel" <target-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+ "Jason A.Donenfeld" <Jason-OnJsPKxuuEcAvxtiuMwx3w@public.gmane.org>
+To: "Nicholas A.Bellinger" <nab-IzHhD5pYlfBP7FQvKIMDCQ@public.gmane.org>
+Return-path: <open-iscsi+bncBC6MFJWO34DBBUU66LFAKGQE7FDIFVY-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+Sender: open-iscsi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+In-Reply-To: <1678474.GnYBdSlWgs-b2PLbiJbNv8ftSvlWXw0+g@public.gmane.org>
+Content-Disposition: inline
+List-Post: <https://groups.google.com/group/open-iscsi/post>, <mailto:open-iscsi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Help: <https://groups.google.com/support/>, <mailto:open-iscsi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Archive: <https://groups.google.com/group/open-iscsi
+List-Subscribe: <https://groups.google.com/group/open-iscsi/subscribe>, <mailto:open-iscsi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Unsubscribe: <mailto:googlegroups-manage+856124926423+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
+ <https://groups.google.com/group/open-iscsi/subscribe>
+List-Id: linux-crypto.vger.kernel.org
 
-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
+>>> Stephan M=C3=BCller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org> schrieb am 26.06.2017 um 19:3=
+8 in
+Nachricht <1678474.GnYBdSlWgs-b2PLbiJbNv8ftSvlWXw0+g@public.gmane.org>:
+> Am Montag, 26. Juni 2017, 03:23:09 CEST schrieb Nicholas A. Bellinger:
+>=20
+> Hi Nicholas,
+>=20
+>> Hi Stephan, Lee & Jason,
+>>=20
+>> (Adding target-devel CC')
+>>=20
+>> Apologies for coming late to the discussion.  Comments below.
+>>=20
+>> On Sun, 2017-06-18 at 10:04 +0200, Stephan M=C3=BCller wrote:
+>> > Am Samstag, 17. Juni 2017, 05:45:57 CEST schrieb Lee Duncan:
+>> >=20
+>> > Hi Lee,
+>> >=20
+>> > > In your testing, how long might a process have to wait? Are we talki=
+ng
+>> > > seconds? Longer? What about timeouts?
+>> >=20
+>> > In current kernels (starting with 4.8) this timeout should clear withi=
+n
+a
+>> > few seconds after boot.
+>> >=20
+>> > In older kernels (pre 4.8), my KVM takes up to 90 seconds to reach tha=
+t
+>> > seeding point. I have heard that on IBM System Z this trigger point
+>> > requires minutes to be reached.
+>>=20
+>> I share the same concern as Lee wrt to introducing latency into the
+>> existing iscsi-target login sequence.
+>>=20
+>> Namely in the use-cases where a single node is supporting ~1K unique
+>> iscsi-target IQNs, and fail-over + re-balancing of IQNs where 100s of
+>> login attempts are expected to occur in parallel.
+>>=20
+>> If environments exist that require non trivial amounts of time for RNG
+>> seeding to be ready for iscsi-target usage, then enforcing this
+>> requirement at iscsi login time can open up problems, especially when
+>> iscsi host environments may be sensitive to login timeouts, I/O
+>> timeouts, et al.
+>>=20
+>> That said, I'd prefer to simply wait for RNG to be seeded at modprobe
+>> iscsi_target_mod time, instead of trying to enforce randomness during
+>> login.
+>>=20
+>> This way, those of use who have distributed storage platforms can know
+>> to avoid putting a node into a state to accept iscsi-target IQN export
+>> migration, before modprobe iscsi_target_mod has successfully loaded and
+>> RNG seeding has been confirmed.
+>>=20
+>> WDYT..?
+>=20
+> We may have a chicken and egg problem when the wait is at the modprobe ti=
+me.
+
+>=20
+> Assume the modprobe happens during initramfs time to get access to the ro=
+ot
+
+> file system. In this case, you entire boot process will lock up for an=20
+> indefinite amount of time. The reason is that in order to obtain events=
+=20
+> detected by the RNG, devices need to be initialized and working. Such=20
+> devices=20
+> commonly start working after the the root partition is mounted as it=20
+> contains=20
+> all drivers, all configuration information etc.
+>=20
+> Note, during the development of my /dev/random implementation, I added th=
+e=20
+> getrandom-like blocking behavior to /dev/urandom (which is the equivalent=
+ to
+
+>=20
+> Jason's patch except that it applies to user space). The boot process loc=
+ked
+
+
+I thought reads from urandom never block by definition. An older manual pag=
+e
+(man urandom) also says: "A  read  from  the  /dev/urandom device will not
+block waiting for more entropy."
+
+Regards,
+Ulrich
+
+>=20
+> up since systemd wanted data from /dev/urandom while it processed the=20
+> initramfs. As it did not get any, the boot process did not commence that=
+=20
+> could=20
+> deliver new events to be picked up by the RNG.
+>=20
+> As I do not have such an iscsi system, I cannot test Jason's patch. But=
+=20
+> maybe=20
+> the mentioned chicken-and-egg problem I mentioned above is already visibl=
+e=20
+> with the current patch as it will lead to a blocking of the mounting of t=
+he
+
+> root partition in case the root partition is on an iscsi target.
+>=20
+> Ciao
+> Stephan
+>=20
+> --=20
+> You received this message because you are subscribed to the Google Groups=
+=20
+> "open-iscsi" group.
+> To unsubscribe from this group and stop receiving emails from it, send an=
+=20
+> email to open-iscsi+unsubscribe-/JYPxA39Uh5TLH3MbocFF+G/Ez6ZCGd0@public.gmane.org
+> To post to this group, send email to open-iscsi-/JYPxA39Uh5TLH3MbocFF+G/Ez6ZCGd0@public.gmane.org
+> Visit this group at https://groups.google.com/group/open-iscsi.
+> For more options, visit https://groups.google.com/d/optout.
+
+
+
+--=20
+You received this message because you are subscribed to the Google Groups "=
+open-iscsi" group.
+To unsubscribe from this group and stop receiving emails from it, send an e=
+mail to open-iscsi+unsubscribe-/JYPxA39Uh5TLH3MbocFF+G/Ez6ZCGd0@public.gmane.org
+To post to this group, send email to open-iscsi-/JYPxA39Uh5TLH3MbocFF+G/Ez6ZCGd0@public.gmane.org
+Visit this group at https://groups.google.com/group/open-iscsi.
+For more options, visit https://groups.google.com/d/optout.
