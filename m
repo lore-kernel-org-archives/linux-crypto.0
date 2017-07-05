@@ -1,56 +1,68 @@
-From: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCH 0/3] crypto: introduce Microchip / Atmel ECC driver
-Date: Wed, 5 Jul 2017 14:26:27 +0200
-Message-ID: <9200BD81-F559-4C1A-92DA-DC558BB34655@holtmann.org>
-References: <1499249280-31779-1-git-send-email-tudor.ambarus@microchip.com>
- <A53140BD-29A8-498B-A0C9-2891E3F0EF7E@holtmann.org>
- <3c858d4f-d583-61c3-0a51-d4d931ac8816@microchip.com>
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
+From: Theodore Ts'o <tytso@mit.edu>
+Subject: Re: Antw: Re: [kernel-hardening] Re: [PATCH v4 06/13] iscsi: ensure
+ RNG is seeded before use
+Date: Wed, 5 Jul 2017 08:35:21 -0400
+Message-ID: <20170705123521.hr662wo5c2ksc3se@thunk.org>
+References: <20170606174804.31124-1-Jason@zx2c4.com>
+ <2639082.PtrrGWOPPL@positron.chronox.de>
+ <1498440189.26123.85.camel@haakon3.risingtidesystems.com>
+ <1678474.GnYBdSlWgs@tauon.chronox.de>
+ <595C8F4F020000A100026F29@gwsmtp1.uni-regensburg.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: "Nicholas A.Bellinger" <nab@linux-iscsi.org>,
+        David Miller <davem@davemloft.net>,
+        Eric Biggers <ebiggers3@gmail.com>,
+        open-iscsi <open-iscsi@googlegroups.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "kernel-hardening@lists.openwall.com"
+        <kernel-hardening@lists.openwall.com>,
+        Chris Leech <cleech@redhat.com>, Lee Duncan <lduncan@suse.com>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        wsa@the-dreams.de, linux-i2c@vger.kernel.org,
-        nicolas.ferre@microchip.com
-To: Tudor Ambarus <tudor.ambarus@microchip.com>
-Return-path: <linux-i2c-owner@vger.kernel.org>
-In-Reply-To: <3c858d4f-d583-61c3-0a51-d4d931ac8816@microchip.com>
-Sender: linux-i2c-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+        linux-kernel@vger.kernel.org,
+        target-devel <target-devel@vger.kernel.org>,
+        "Jason A.Donenfeld" <Jason@zx2c4.com>
+To: Ulrich Windl <Ulrich.Windl@rz.uni-regensburg.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from imap.thunk.org ([74.207.234.97]:48912 "EHLO imap.thunk.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751743AbdGEMfh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 5 Jul 2017 08:35:37 -0400
+Content-Disposition: inline
+In-Reply-To: <595C8F4F020000A100026F29@gwsmtp1.uni-regensburg.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Tudor,
-
->>> This patch set introduces Microchip / Atmel ECC driver.
->>> 
->>> The first patch adds some helpers that will be used by fallbacks to
->>> kpp software implementations.
->>> 
->>> The second patch adds ECDH support for the ATECC508A (I2C)
->>> cryptographic engine. The I2C interface is designed to operate
->>> at a maximum clock speed of 1MHz.
->>> 
->>> The device features hardware acceleration for the NIST standard
->>> P256 prime curve and supports the complete key life cycle from
->>> private key generation to ECDH key agreement.
->>> 
->>> Random private key generation is supported internally within
->>> the device to ensure that the private key can never be known
->>> outside of the device. If the user wants to use its own private
->>> keys, the driver will fallback to the ecdh software implementation.
->> can we get this testing with the Bluetooth SMP code? I would really like to see this being offloaded to hardware. For Bluetooth SMP we never really need the private key either. The end result is an symmetric 128-bit key for AES. And we throw the generated key pairs away.
->> With the limitation of private is not available to Linux directly, we should make sure that KPP users that don’t require the private key are working properly and can utilize the offload.
+On Wed, Jul 05, 2017 at 09:03:43AM +0200, Ulrich Windl wrote:
+> > Note, during the development of my /dev/random implementation, I added the 
+> > getrandom-like blocking behavior to /dev/urandom (which is the equivalent to
+> > Jason's patch except that it applies to user space). The boot process locked
 > 
-> The driver was tested with testmgr, the offload worked.
-> 
-> I've extended recently the ecdh software implementation with
-> ecc privkey generation support. I also added a kpp test in
-> testmgr to prove that it works correctly (see [1]).
-> 
-> I will take a look at Bluetooth SMP code.
+> I thought reads from urandom never block by definition. An older manual page
+> (man urandom) also says: "A  read  from  the  /dev/urandom device will not
+> block waiting for more entropy."
 
-you can test this without Bluetooth hardware, just need to make sure you have hci_vhci module available. And then from the BlueZ user space source code, you run ./tools/smp-tester (no need to install) to exercise the pairing with ECDH P-256. If you run ./monitor/btmon in a separate terminal, then it will show you the public keys exchanged.
+As I said in my original message, I *tried* this as an experiment.
+Because lots of security-obsessed people were disputing my
+intelligence, my judgement, and in some cases, my paternity becuase I
+wouldn't change /dev/urandom not to block.
 
-Regards
+So I did the experiment so I could give them hard data about why we
+couldn't go down that path.
 
-Marcel
+> > up since systemd wanted data from /dev/urandom while it processed the 
+> > initramfs. As it did not get any, the boot process did not commence that 
+> > could 
+> > deliver new events to be picked up by the RNG.
+
+And indeed, making this change brick'ed at least one version of Ubuntu
+and one version of CeroWRT, as reported by the kernel's 0-day testing
+system.  As a result, this patch (which was always a proof of concept,
+not anything I thought had any chance of going upstream), was dropped.
+
+Since in the kernel, We Do Not Break Backwards Compatibility, this is
+why we have a new interface --- getrandom(2) --- instead of changing
+an existing interface.  (Well, there were multiple good reasons for
+getrandom, but this was definitely one of them.)
+
+	    	       	   	    - Ted
