@@ -1,52 +1,70 @@
-From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH v2 2/3] crypto: ccp - Introduce the AMD Secure Processor
- device
-Date: Thu, 6 Jul 2017 07:27:02 -0500
-Message-ID: <0bcf2fa4-651a-5425-831e-a2b8324f37a8@amd.com>
-References: <201707061641.wxDNmX4a%fengguang.wu@intel.com>
+From: Richard Weinberger <richard.weinberger@gmail.com>
+Subject: Re: [PATCH v3 net-next 0/4] kernel TLS
+Date: Thu, 6 Jul 2017 16:30:54 +0200
+Message-ID: <CAFLxGvz=OfvZ4uOggkZjN7KKM11dzUp6Sd2O76SP5Nu_8Ty1gA@mail.gmail.com>
+References: <20170614183654.GA80067@davejwatson-mba.dhcp.thefacebook.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: kbuild-all@01.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, thomas.lendacky@amd.com,
-        gary.hook@amd.com, herbert@gondor.apana.org.au, davem@davemloft.net
-To: kbuild test robot <lkp@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Cc: Ilya Lesokhin <ilyal@mellanox.com>,
+        Aviad Yehezkel <aviadye@mellanox.com>,
+        Boris Pismenny <borisp@mellanox.com>,
+        Liran Liss <liranl@mellanox.com>,
+        Matan Barak <matanb@mellanox.com>,
+        David Miller <davem@davemloft.net>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        Tom Herbert <tom@herbertland.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org,
+        Hannes Frederic Sowa <hannes@stressinduktion.org>,
+        Eric Dumazet <eric.dumazet@gmail.com>,
+        Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+        nmav@gnutls.org, fridolin.pokorny@gmail.com
+To: Dave Watson <davejwatson@fb.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2nam02on0088.outbound.protection.outlook.com ([104.47.38.88]:25191
-        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752010AbdGFM1I (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 6 Jul 2017 08:27:08 -0400
-In-Reply-To: <201707061641.wxDNmX4a%fengguang.wu@intel.com>
-Content-Language: en-US
+Received: from mail-oi0-f67.google.com ([209.85.218.67]:33085 "EHLO
+        mail-oi0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751816AbdGFOa4 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 6 Jul 2017 10:30:56 -0400
+In-Reply-To: <20170614183654.GA80067@davejwatson-mba.dhcp.thefacebook.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Dave,
 
-On 7/6/17 3:37 AM, kbuild test robot wrote:
-> Hi Brijesh,
->
-> [auto build test ERROR on cryptodev/master]
-> [also build test ERROR on next-20170705]
-> [cannot apply to v4.12]
-> [if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
->
-> url:    https://github.com/0day-ci/linux/commits/Brijesh-Singh/Introduce-AMD-Secure-Processor-device/20170625-064400
-> base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-> config: x86_64-randconfig-x016-07060921 (attached as .config)
-> compiler: gcc-6 (Debian 6.2.0-3) 6.2.0 20160901
-> reproduce:
->         # save the attached .config to linux build tree
->         make ARCH=x86_64 
->
-> All errors (new ones prefixed by >>):
->
->>> ERROR: "ccp_dev_resume" [drivers/crypto/ccp/ccp.ko] undefined!
->>> ERROR: "ccp_dev_suspend" [drivers/crypto/ccp/ccp.ko] undefined!
-I will send out v4 soon to fix it. We need to guard sp_dev_resume and
-sp_dev_suspend with CONFIG_PM. I think in my .config I had CONFIG_PM
-enabled, whereas the robot  config does not have CONFIG_PM.
+On Wed, Jun 14, 2017 at 8:36 PM, Dave Watson <davejwatson@fb.com> wrote:
+>  Documentation/networking/tls.txt   | 135 +++++++
+>  MAINTAINERS                        |  10 +
+>  include/linux/socket.h             |   1 +
+>  include/net/inet_connection_sock.h |   4 +
+>  include/net/tcp.h                  |  27 ++
+>  include/net/tls.h                  | 237 ++++++++++++
+>  include/uapi/linux/tcp.h           |   1 +
+>  include/uapi/linux/tls.h           |  79 ++++
+>  net/Kconfig                        |   1 +
+>  net/Makefile                       |   1 +
+>  net/ipv4/Makefile                  |   2 +-
+>  net/ipv4/sysctl_net_ipv4.c         |  25 ++
+>  net/ipv4/tcp.c                     |  33 +-
+>  net/ipv4/tcp_ipv4.c                |   2 +
+>  net/ipv4/tcp_rate.c                |   1 +
+>  net/ipv4/tcp_ulp.c                 | 134 +++++++
+>  net/tls/Kconfig                    |  12 +
+>  net/tls/Makefile                   |   7 +
+>  net/tls/tls_main.c                 | 487 +++++++++++++++++++++++
+>  net/tls/tls_sw.c                   | 772 +++++++++++++++++++++++++++++++++++++
+>  20 files changed, 1968 insertions(+), 3 deletions(-)
+>  create mode 100644 Documentation/networking/tls.txt
+>  create mode 100644 include/net/tls.h
+>  create mode 100644 include/uapi/linux/tls.h
+>  create mode 100644 net/ipv4/tcp_ulp.c
+>  create mode 100644 net/tls/Kconfig
+>  create mode 100644 net/tls/Makefile
+>  create mode 100644 net/tls/tls_main.c
+>  create mode 100644 net/tls/tls_sw.c
 
-> ---
-> 0-DAY kernel test infrastructure                Open Source Technology Center
-> https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+Sorry for the late question. Do I miss something or is this IPv4 only?
+
+-- 
+Thanks,
+//richard
