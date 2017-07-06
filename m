@@ -1,7 +1,7 @@
 From: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
-Subject: [PATCH v3 4/7] integrity: Introduce integrity_keyring_from_id
-Date: Thu,  6 Jul 2017 19:17:50 -0300
-Message-ID: <20170706221753.17380-5-bauerman@linux.vnet.ibm.com>
+Subject: [PATCH v3 5/7] integrity: Select CONFIG_KEYS instead of depending on it
+Date: Thu,  6 Jul 2017 19:17:51 -0300
+Message-ID: <20170706221753.17380-6-bauerman@linux.vnet.ibm.com>
 References: <20170706221753.17380-1-bauerman@linux.vnet.ibm.com>
 Cc: linux-ima-devel@lists.sourceforge.net, keyrings@vger.kernel.org,
         linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
@@ -19,85 +19,35 @@ Cc: linux-ima-devel@lists.sourceforge.net, keyrings@vger.kernel.org,
         "AKASHI, Takahiro" <takahiro.akashi@linaro.org>,
         Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
 To: linux-security-module@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-security-module-owner@vger.kernel.org>
 In-Reply-To: <20170706221753.17380-1-bauerman@linux.vnet.ibm.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Sender: owner-linux-security-module@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-IMA will need to obtain the keyring used to verify file signatures so that
-it can verify the module-style signature appended to files.
+This avoids a dependency cycle in CONFIG_IMA_APPRAISE_MODSIG (introduced by
+a later patch in this series): it will select CONFIG_MODULE_SIG_FORMAT
+which in turn selects CONFIG_KEYS. Kconfig then complains that
+CONFIG_INTEGRITY_SIGNATURE depends on CONFIG_KEYS.
 
 Signed-off-by: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
 ---
- security/integrity/digsig.c    | 28 +++++++++++++++++++---------
- security/integrity/integrity.h |  1 +
- 2 files changed, 20 insertions(+), 9 deletions(-)
+ security/integrity/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/security/integrity/digsig.c b/security/integrity/digsig.c
-index 06554c448dce..bb5328ba2848 100644
---- a/security/integrity/digsig.c
-+++ b/security/integrity/digsig.c
-@@ -48,11 +48,10 @@ static bool init_keyring __initdata;
- #define restrict_link_to_ima restrict_link_by_builtin_trusted
- #endif
+diff --git a/security/integrity/Kconfig b/security/integrity/Kconfig
+index da9565891738..0d642e0317c7 100644
+--- a/security/integrity/Kconfig
++++ b/security/integrity/Kconfig
+@@ -17,8 +17,8 @@ if INTEGRITY
  
--int integrity_digsig_verify(const unsigned int id, const char *sig, int siglen,
--			    const char *digest, int digestlen)
-+struct key *integrity_keyring_from_id(const unsigned int id)
- {
--	if (id >= INTEGRITY_KEYRING_MAX || siglen < 2)
--		return -EINVAL;
-+	if (id >= INTEGRITY_KEYRING_MAX)
-+		return ERR_PTR(-EINVAL);
- 
- 	if (!keyring[id]) {
- 		keyring[id] =
-@@ -61,18 +60,29 @@ int integrity_digsig_verify(const unsigned int id, const char *sig, int siglen,
- 			int err = PTR_ERR(keyring[id]);
- 			pr_err("no %s keyring: %d\n", keyring_name[id], err);
- 			keyring[id] = NULL;
--			return err;
-+			return ERR_PTR(err);
- 		}
- 	}
- 
-+	return keyring[id];
-+}
-+
-+int integrity_digsig_verify(const unsigned int id, const char *sig, int siglen,
-+			    const char *digest, int digestlen)
-+{
-+	struct key *keyring = integrity_keyring_from_id(id);
-+
-+	if (IS_ERR(keyring) || siglen < 2)
-+		return PTR_ERR(keyring);
-+
- 	switch (sig[1]) {
- 	case 1:
- 		/* v1 API expect signature without xattr type */
--		return digsig_verify(keyring[id], sig + 1, siglen - 1,
--				     digest, digestlen);
-+		return digsig_verify(keyring, sig + 1, siglen - 1, digest,
-+				     digestlen);
- 	case 2:
--		return asymmetric_verify(keyring[id], sig, siglen,
--					 digest, digestlen);
-+		return asymmetric_verify(keyring, sig, siglen, digest,
-+					 digestlen);
- 	}
- 
- 	return -EOPNOTSUPP;
-diff --git a/security/integrity/integrity.h b/security/integrity/integrity.h
-index 874211aba6e9..ba5f13f94ed3 100644
---- a/security/integrity/integrity.h
-+++ b/security/integrity/integrity.h
-@@ -129,6 +129,7 @@ int __init integrity_read_file(const char *path, char **data);
- 
- #ifdef CONFIG_INTEGRITY_SIGNATURE
- 
-+struct key *integrity_keyring_from_id(const unsigned int id);
- int integrity_digsig_verify(const unsigned int id, const char *sig, int siglen,
- 			    const char *digest, int digestlen);
- 
+ config INTEGRITY_SIGNATURE
+ 	bool "Digital signature verification using multiple keyrings"
+-	depends on KEYS
+ 	default n
++	select KEYS
+ 	select SIGNATURE
+ 	help
+ 	  This option enables digital signature verification support
 -- 
 2.13.0
+
