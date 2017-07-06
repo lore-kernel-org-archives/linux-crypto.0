@@ -1,63 +1,52 @@
-From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: [bug report] crypto: inside-secure - add SafeXcel EIP197 crypto
- engine driver
-Date: Thu, 6 Jul 2017 14:09:23 +0300
-Message-ID: <20170706110923.blcqo3kgdoyfhbgv@mwanda>
+From: Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH v2 2/3] crypto: ccp - Introduce the AMD Secure Processor
+ device
+Date: Thu, 6 Jul 2017 07:27:02 -0500
+Message-ID: <0bcf2fa4-651a-5425-831e-a2b8324f37a8@amd.com>
+References: <201707061641.wxDNmX4a%fengguang.wu@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: antoine.tenart@free-electrons.com
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Cc: kbuild-all@01.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, thomas.lendacky@amd.com,
+        gary.hook@amd.com, herbert@gondor.apana.org.au, davem@davemloft.net
+To: kbuild test robot <lkp@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from userp1040.oracle.com ([156.151.31.81]:36847 "EHLO
-        userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751892AbdGFLJi (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 6 Jul 2017 07:09:38 -0400
-Content-Disposition: inline
+Received: from mail-bl2nam02on0088.outbound.protection.outlook.com ([104.47.38.88]:25191
+        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752010AbdGFM1I (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 6 Jul 2017 08:27:08 -0400
+In-Reply-To: <201707061641.wxDNmX4a%fengguang.wu@intel.com>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello Antoine Tenart,
 
-The patch 1b44c5a60c13: "crypto: inside-secure - add SafeXcel EIP197
-crypto engine driver" from May 24, 2017, leads to the following
-static checker warning:
+On 7/6/17 3:37 AM, kbuild test robot wrote:
+> Hi Brijesh,
+>
+> [auto build test ERROR on cryptodev/master]
+> [also build test ERROR on next-20170705]
+> [cannot apply to v4.12]
+> [if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
+>
+> url:    https://github.com/0day-ci/linux/commits/Brijesh-Singh/Introduce-AMD-Secure-Processor-device/20170625-064400
+> base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+> config: x86_64-randconfig-x016-07060921 (attached as .config)
+> compiler: gcc-6 (Debian 6.2.0-3) 6.2.0 20160901
+> reproduce:
+>         # save the attached .config to linux build tree
+>         make ARCH=x86_64 
+>
+> All errors (new ones prefixed by >>):
+>
+>>> ERROR: "ccp_dev_resume" [drivers/crypto/ccp/ccp.ko] undefined!
+>>> ERROR: "ccp_dev_suspend" [drivers/crypto/ccp/ccp.ko] undefined!
+I will send out v4 soon to fix it. We need to guard sp_dev_resume and
+sp_dev_suspend with CONFIG_PM. I think in my .config I had CONFIG_PM
+enabled, whereas the robot  config does not have CONFIG_PM.
 
-	drivers/crypto/inside-secure/safexcel_hash.c:890 safexcel_hmac_sha1_setkey()
-	error: buffer overflow 'ctx->ipad' 5 <= 7
-
-drivers/crypto/inside-secure/safexcel_hash.c
-   875  static int safexcel_hmac_sha1_setkey(struct crypto_ahash *tfm, const u8 *key,
-   876                                       unsigned int keylen)
-   877  {
-   878          struct safexcel_ahash_ctx *ctx = crypto_tfm_ctx(crypto_ahash_tfm(tfm));
-   879          struct safexcel_ahash_export_state istate, ostate;
-   880          int ret, i;
-   881  
-   882          ret = safexcel_hmac_setkey("safexcel-sha1", key, keylen, &istate, &ostate);
-   883          if (ret)
-   884                  return ret;
-   885  
-   886          memcpy(ctx->ipad, &istate.state, SHA1_DIGEST_SIZE);
-                       ^^^^^^^^^
-   887          memcpy(ctx->opad, &ostate.state, SHA1_DIGEST_SIZE);
-                       ^^^^^^^^^
-These are SHA1_DIGEST_SIZE (20).
-
-   888  
-   889          for (i = 0; i < ARRAY_SIZE(istate.state); i++) {
-                                           ^^^^^^^^^^^^
-This is SHA256_DIGEST_SIZE (32) so it's bigger.
-
-   890                  if (ctx->ipad[i] != le32_to_cpu(istate.state[i]) ||
-   891                      ctx->opad[i] != le32_to_cpu(ostate.state[i])) {
-   892                          ctx->base.needs_inv = true;
-   893                          break;
-   894                  }
-   895          }
-   896  
-   897          return 0;
-   898  }
-
-regards,
-dan carpenter
+> ---
+> 0-DAY kernel test infrastructure                Open Source Technology Center
+> https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
