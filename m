@@ -1,7 +1,7 @@
 From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH 04/13] crypto: caam/qi - properly set IV after {en,de}crypt
-Date: Fri, 7 Jul 2017 16:05:14 +0300
-Message-ID: <20170707130523.32427-5-horia.geanta@nxp.com>
+Subject: [PATCH 05/13] crypto: caam/qi - handle large number of S/Gs case
+Date: Fri, 7 Jul 2017 16:05:15 +0300
+Message-ID: <20170707130523.32427-6-horia.geanta@nxp.com>
 References: <20170707130523.32427-1-horia.geanta@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
@@ -12,55 +12,200 @@ Cc: "David S. Miller" <davem@davemloft.net>,
         Tudor Ambarus <tudor.ambarus@microchip.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-sn1nam01on0045.outbound.protection.outlook.com ([104.47.32.45]:7728
-        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
+Received: from mail-cys01nam02on0079.outbound.protection.outlook.com ([104.47.37.79]:40304
+        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1750726AbdGGNFy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Jul 2017 09:05:54 -0400
+        id S1750977AbdGGNF4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 7 Jul 2017 09:05:56 -0400
 In-Reply-To: <20170707130523.32427-1-horia.geanta@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-caam/qi needs a fix similar to what was done for caam/jr in
-commit "crypto: caam/qi - properly set IV after {en,de}crypt",
-to allow for ablkcipher/skcipher chunking/streaming.
+For more than 16 S/G entries, driver currently corrupts memory
+on ARMv8, see below KASAN log.
+Note: this does not reproduce on PowerPC due to different (smaller)
+cache line size - 64 bytes on PPC vs. 128 bytes on ARMv8.
 
-Cc: <stable@vger.kernel.org>
+One such use case is one of the cbc(aes) test vectors - with 8 S/G
+entries and src != dst. Driver needs 1 (IV) + 2 x 8 = 17 entries,
+which goes over the 16 S/G entries limit:
+(CAAM_QI_MEMCACHE_SIZE - offsetof(struct ablkcipher_edesc, sgt)) /
+sizeof(struct qm_sg_entry) = 256 / 16 = 16 S/Gs
+
+Fix this by:
+-increasing object size in caamqicache pool from 512 to 768; this means
+the maximum number of S/G entries grows from (at least) 16 to 32
+(again, for ARMv8 case of 128-byte cache line)
+-add checks in the driver to fail gracefully (ENOMEM) in case the 32 S/G
+entries limit is exceeded
+
+==================================================================
+BUG: KASAN: slab-out-of-bounds in ablkcipher_edesc_alloc+0x4ec/0xf60
+Write of size 1 at addr ffff800021cb6003 by task cryptomgr_test/1394
+
+CPU: 3 PID: 1394 Comm: cryptomgr_test Not tainted 4.12.0-rc7-next-20170703-00023-g72badbcc1ea7-dirty #26
+Hardware name: LS1046A RDB Board (DT)
+Call trace:
+[<ffff20000808ac6c>] dump_backtrace+0x0/0x290
+[<ffff20000808b014>] show_stack+0x14/0x1c
+[<ffff200008d62c00>] dump_stack+0xa4/0xc8
+[<ffff200008264e40>] print_address_description+0x110/0x26c
+[<ffff200008265224>] kasan_report+0x1d0/0x2fc
+[<ffff2000082637b8>] __asan_store1+0x4c/0x54
+[<ffff200008b4884c>] ablkcipher_edesc_alloc+0x4ec/0xf60
+[<ffff200008b49304>] ablkcipher_encrypt+0x44/0xcc
+[<ffff20000848a61c>] skcipher_encrypt_ablkcipher+0x120/0x138
+[<ffff200008495014>] __test_skcipher+0xaec/0xe30
+[<ffff200008497088>] test_skcipher+0x6c/0xd8
+[<ffff200008497154>] alg_test_skcipher+0x60/0xe4
+[<ffff2000084974c4>] alg_test.part.13+0x130/0x304
+[<ffff2000084976d4>] alg_test+0x3c/0x68
+[<ffff2000084938ac>] cryptomgr_test+0x54/0x5c
+[<ffff20000810276c>] kthread+0x188/0x1c8
+[<ffff2000080836c0>] ret_from_fork+0x10/0x50
+
+Allocated by task 1394:
+ save_stack_trace_tsk+0x0/0x1ac
+ save_stack_trace+0x18/0x20
+ kasan_kmalloc.part.5+0x48/0x110
+ kasan_kmalloc+0x84/0xa0
+ kasan_slab_alloc+0x14/0x1c
+ kmem_cache_alloc+0x124/0x1e8
+ qi_cache_alloc+0x28/0x58
+ ablkcipher_edesc_alloc+0x244/0xf60
+ ablkcipher_encrypt+0x44/0xcc
+ skcipher_encrypt_ablkcipher+0x120/0x138
+ __test_skcipher+0xaec/0xe30
+ test_skcipher+0x6c/0xd8
+ alg_test_skcipher+0x60/0xe4
+ alg_test.part.13+0x130/0x304
+ alg_test+0x3c/0x68
+ cryptomgr_test+0x54/0x5c
+ kthread+0x188/0x1c8
+ ret_from_fork+0x10/0x50
+
+Freed by task 0:
+(stack is not available)
+
+The buggy address belongs to the object at ffff800021cb5e00
+ which belongs to the cache caamqicache of size 512
+The buggy address is located 3 bytes to the right of
+ 512-byte region [ffff800021cb5e00, ffff800021cb6000)
+The buggy address belongs to the page:
+page:ffff7e0000872d00 count:1 mapcount:0 mapping:          (null)
+index:0x0 compound_mapcount: 0
+flags: 0xfffc00000008100(slab|head)
+raw: 0fffc00000008100 0000000000000000 0000000000000000 0000000180190019
+raw: dead000000000100 dead000000000200 ffff800931268200 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+ ffff800021cb5f00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+ ffff800021cb5f80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>ffff800021cb6000: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+                   ^
+ ffff800021cb6080: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ ffff800021cb6100: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+==================================================================
+
 Fixes: b189817cf789 ("crypto: caam/qi - add ablkcipher and authenc algorithms")
-Suggested-by: David Gstir <david@sigma-star.at>
 Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 ---
- drivers/crypto/caam/caamalg_qi.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ drivers/crypto/caam/caamalg_qi.c | 24 +++++++++++++++++++++++-
+ drivers/crypto/caam/qi.c         |  3 ---
+ drivers/crypto/caam/qi.h         |  3 +++
+ 3 files changed, 26 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/crypto/caam/caamalg_qi.c b/drivers/crypto/caam/caamalg_qi.c
-index 2dde23abbd3a..a5d634e0aef3 100644
+index a5d634e0aef3..4ec8823ccc1a 100644
 --- a/drivers/crypto/caam/caamalg_qi.c
 +++ b/drivers/crypto/caam/caamalg_qi.c
-@@ -776,9 +776,9 @@ static void ablkcipher_done(struct caam_drv_req *drv_req, u32 status)
- 	struct crypto_ablkcipher *ablkcipher = crypto_ablkcipher_reqtfm(req);
- 	struct caam_ctx *caam_ctx = crypto_ablkcipher_ctx(ablkcipher);
- 	struct device *qidev = caam_ctx->qidev;
--#ifdef DEBUG
- 	int ivsize = crypto_ablkcipher_ivsize(ablkcipher);
+@@ -411,6 +411,9 @@ struct aead_edesc {
+ 	dma_addr_t qm_sg_dma;
+ 	dma_addr_t assoclen_dma;
+ 	struct caam_drv_req drv_req;
++#define CAAM_QI_MAX_AEAD_SG						\
++	((CAAM_QI_MEMCACHE_SIZE - offsetof(struct aead_edesc, sgt)) /	\
++	 sizeof(struct qm_sg_entry))
+ 	struct qm_sg_entry sgt[0];
+ };
  
-+#ifdef DEBUG
- 	dev_err(qidev, "%s %d: status 0x%x\n", __func__, __LINE__, status);
- #endif
+@@ -431,6 +434,9 @@ struct ablkcipher_edesc {
+ 	int qm_sg_bytes;
+ 	dma_addr_t qm_sg_dma;
+ 	struct caam_drv_req drv_req;
++#define CAAM_QI_MAX_ABLKCIPHER_SG					    \
++	((CAAM_QI_MEMCACHE_SIZE - offsetof(struct ablkcipher_edesc, sgt)) / \
++	 sizeof(struct qm_sg_entry))
+ 	struct qm_sg_entry sgt[0];
+ };
  
-@@ -799,6 +799,13 @@ static void ablkcipher_done(struct caam_drv_req *drv_req, u32 status)
- 	ablkcipher_unmap(qidev, edesc, req);
- 	qi_cache_free(edesc);
+@@ -660,6 +666,14 @@ static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
+ 	 */
+ 	qm_sg_ents = 1 + !!ivsize + mapped_src_nents +
+ 		     (mapped_dst_nents > 1 ? mapped_dst_nents : 0);
++	if (unlikely(qm_sg_ents > CAAM_QI_MAX_AEAD_SG)) {
++		dev_err(qidev, "Insufficient S/G entries: %d > %lu\n",
++			qm_sg_ents, CAAM_QI_MAX_AEAD_SG);
++		caam_unmap(qidev, req->src, req->dst, src_nents, dst_nents,
++			   iv_dma, ivsize, op_type, 0, 0);
++		qi_cache_free(edesc);
++		return ERR_PTR(-ENOMEM);
++	}
+ 	sg_table = &edesc->sgt[0];
+ 	qm_sg_bytes = qm_sg_ents * sizeof(*sg_table);
  
-+	/*
-+	 * The crypto API expects us to set the IV (req->info) to the last
-+	 * ciphertext block. This is used e.g. by the CTS mode.
-+	 */
-+	scatterwalk_map_and_copy(req->info, req->dst, req->nbytes - ivsize,
-+				 ivsize, 0);
+@@ -888,6 +902,15 @@ static struct ablkcipher_edesc *ablkcipher_edesc_alloc(struct ablkcipher_request
+ 	}
+ 	dst_sg_idx = qm_sg_ents;
+ 
++	qm_sg_ents += mapped_dst_nents > 1 ? mapped_dst_nents : 0;
++	if (unlikely(qm_sg_ents > CAAM_QI_MAX_ABLKCIPHER_SG)) {
++		dev_err(qidev, "Insufficient S/G entries: %d > %lu\n",
++			qm_sg_ents, CAAM_QI_MAX_ABLKCIPHER_SG);
++		caam_unmap(qidev, req->src, req->dst, src_nents, dst_nents,
++			   iv_dma, ivsize, op_type, 0, 0);
++		return ERR_PTR(-ENOMEM);
++	}
 +
- 	ablkcipher_request_complete(req, status);
- }
+ 	/* allocate space for base edesc and link tables */
+ 	edesc = qi_cache_alloc(GFP_DMA | flags);
+ 	if (unlikely(!edesc)) {
+@@ -900,7 +923,6 @@ static struct ablkcipher_edesc *ablkcipher_edesc_alloc(struct ablkcipher_request
+ 	edesc->src_nents = src_nents;
+ 	edesc->dst_nents = dst_nents;
+ 	edesc->iv_dma = iv_dma;
+-	qm_sg_ents += mapped_dst_nents > 1 ? mapped_dst_nents : 0;
+ 	sg_table = &edesc->sgt[0];
+ 	edesc->qm_sg_bytes = qm_sg_ents * sizeof(*sg_table);
+ 	edesc->drv_req.app_ctx = req;
+diff --git a/drivers/crypto/caam/qi.c b/drivers/crypto/caam/qi.c
+index 53aed5816416..01284faeee69 100644
+--- a/drivers/crypto/caam/qi.c
++++ b/drivers/crypto/caam/qi.c
+@@ -24,9 +24,6 @@
+  */
+ #define MAX_RSP_FQ_BACKLOG_PER_CPU	256
  
+-/* Length of a single buffer in the QI driver memory cache */
+-#define CAAM_QI_MEMCACHE_SIZE	512
+-
+ #define CAAM_QI_ENQUEUE_RETRIES	10000
+ 
+ #define CAAM_NAPI_WEIGHT	63
+diff --git a/drivers/crypto/caam/qi.h b/drivers/crypto/caam/qi.h
+index 33b0433f5f22..ecb21f207637 100644
+--- a/drivers/crypto/caam/qi.h
++++ b/drivers/crypto/caam/qi.h
+@@ -39,6 +39,9 @@
+  */
+ #define MAX_SDLEN	((CAAM_DESC_BYTES_MAX - DESC_JOB_IO_LEN) / CAAM_CMD_SZ)
+ 
++/* Length of a single buffer in the QI driver memory cache */
++#define CAAM_QI_MEMCACHE_SIZE	768
++
+ extern bool caam_congested __read_mostly;
+ 
+ /*
 -- 
 2.12.0.264.gd6db3f216544
