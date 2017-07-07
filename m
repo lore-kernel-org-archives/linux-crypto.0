@@ -1,7 +1,7 @@
 From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH 03/13] crypto: caam/qi - fix compilation with CONFIG_DEBUG_FORCE_WEAK_PER_CPU=y
-Date: Fri, 7 Jul 2017 16:05:13 +0300
-Message-ID: <20170707130523.32427-4-horia.geanta@nxp.com>
+Subject: [PATCH 04/13] crypto: caam/qi - properly set IV after {en,de}crypt
+Date: Fri, 7 Jul 2017 16:05:14 +0300
+Message-ID: <20170707130523.32427-5-horia.geanta@nxp.com>
 References: <20170707130523.32427-1-horia.geanta@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
@@ -12,45 +12,55 @@ Cc: "David S. Miller" <davem@davemloft.net>,
         Tudor Ambarus <tudor.ambarus@microchip.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-sn1nam01on0084.outbound.protection.outlook.com ([104.47.32.84]:63401
+Received: from mail-sn1nam01on0045.outbound.protection.outlook.com ([104.47.32.45]:7728
         "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1750878AbdGGNFx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Jul 2017 09:05:53 -0400
+        id S1750726AbdGGNFy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 7 Jul 2017 09:05:54 -0400
 In-Reply-To: <20170707130523.32427-1-horia.geanta@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-caam/qi driver fails to compile when CONFIG_DEBUG_FORCE_WEAK_PER_CPU=y.
-Fix it by making the offending local per_cpu variable global.
+caam/qi needs a fix similar to what was done for caam/jr in
+commit "crypto: caam/qi - properly set IV after {en,de}crypt",
+to allow for ablkcipher/skcipher chunking/streaming.
 
 Cc: <stable@vger.kernel.org>
-Fixes: 67c2315def06c ("crypto: caam - add Queue Interface (QI) backend support")
-Reported-by: kbuild test robot <fengguang.wu@intel.com>
+Fixes: b189817cf789 ("crypto: caam/qi - add ablkcipher and authenc algorithms")
+Suggested-by: David Gstir <david@sigma-star.at>
 Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 ---
- drivers/crypto/caam/qi.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/crypto/caam/caamalg_qi.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/caam/qi.c b/drivers/crypto/caam/qi.c
-index 1990ed460c46..53aed5816416 100644
---- a/drivers/crypto/caam/qi.c
-+++ b/drivers/crypto/caam/qi.c
-@@ -55,6 +55,7 @@ struct caam_qi_pcpu_priv {
- } ____cacheline_aligned;
+diff --git a/drivers/crypto/caam/caamalg_qi.c b/drivers/crypto/caam/caamalg_qi.c
+index 2dde23abbd3a..a5d634e0aef3 100644
+--- a/drivers/crypto/caam/caamalg_qi.c
++++ b/drivers/crypto/caam/caamalg_qi.c
+@@ -776,9 +776,9 @@ static void ablkcipher_done(struct caam_drv_req *drv_req, u32 status)
+ 	struct crypto_ablkcipher *ablkcipher = crypto_ablkcipher_reqtfm(req);
+ 	struct caam_ctx *caam_ctx = crypto_ablkcipher_ctx(ablkcipher);
+ 	struct device *qidev = caam_ctx->qidev;
+-#ifdef DEBUG
+ 	int ivsize = crypto_ablkcipher_ivsize(ablkcipher);
  
- static DEFINE_PER_CPU(struct caam_qi_pcpu_priv, pcpu_qipriv);
-+static DEFINE_PER_CPU(int, last_cpu);
++#ifdef DEBUG
+ 	dev_err(qidev, "%s %d: status 0x%x\n", __func__, __LINE__, status);
+ #endif
  
- /*
-  * caam_qi_priv - CAAM QI backend private params
-@@ -392,7 +393,6 @@ struct caam_drv_ctx *caam_drv_ctx_init(struct device *qidev,
- 	dma_addr_t hwdesc;
- 	struct caam_drv_ctx *drv_ctx;
- 	const cpumask_t *cpus = qman_affine_cpus();
--	static DEFINE_PER_CPU(int, last_cpu);
+@@ -799,6 +799,13 @@ static void ablkcipher_done(struct caam_drv_req *drv_req, u32 status)
+ 	ablkcipher_unmap(qidev, edesc, req);
+ 	qi_cache_free(edesc);
  
- 	num_words = desc_len(sh_desc);
- 	if (num_words > MAX_SDLEN) {
++	/*
++	 * The crypto API expects us to set the IV (req->info) to the last
++	 * ciphertext block. This is used e.g. by the CTS mode.
++	 */
++	scatterwalk_map_and_copy(req->info, req->dst, req->nbytes - ivsize,
++				 ivsize, 0);
++
+ 	ablkcipher_request_complete(req, status);
+ }
+ 
 -- 
 2.12.0.264.gd6db3f216544
