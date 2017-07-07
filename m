@@ -1,40 +1,76 @@
-From: =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>
-Subject: Re: [PATCH 12/13] crypto: caam - clean-up in caam_init_rng()
-Date: Fri, 7 Jul 2017 13:16:20 +0000
-Message-ID: <VI1PR0401MB2591AB06D5C5A58F1E02F6EE98AA0@VI1PR0401MB2591.eurprd04.prod.outlook.com>
-References: <20170707130523.32427-1-horia.geanta@nxp.com>
- <20170707130523.32427-13-horia.geanta@nxp.com>
+From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
+Subject: [RFC PATCH] crypto: caam - fix signals handling
+Date: Fri, 7 Jul 2017 16:57:06 +0300
+Message-ID: <20170707135706.5487-1-horia.geanta@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Cc: "David S. Miller" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Dan Douglass <dan.douglass@nxp.com>,
-        "Tudor Ambarus" <tudor.ambarus@microchip.com>
+        <linux-crypto@vger.kernel.org>, Dan Douglass <dan.douglass@nxp.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ve1eur01on0055.outbound.protection.outlook.com ([104.47.1.55]:28004
-        "EHLO EUR01-VE1-obe.outbound.protection.outlook.com"
+Received: from mail-by2nam01on0061.outbound.protection.outlook.com ([104.47.34.61]:4248
+        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1750726AbdGGNQY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Jul 2017 09:16:24 -0400
-Content-Language: en-US
+        id S1750892AbdGGN5U (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 7 Jul 2017 09:57:20 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 7/7/2017 4:06 PM, Horia Geant=E3 wrote:=0A=
-> From: Horia Geant=E3 <horia.geanta@freescale.com>=0A=
-> =0A=
-> Clean up the code, as indicated by Coccinelle.=0A=
-> =0A=
-> Cc: Julia Lawall <julia.lawall@lip6.fr>=0A=
-> Signed-off-by: Horia Geant=E3 <horia.geanta@freescale.com>=0A=
-> Signed-off-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
-=0A=
-Herbert,=0A=
-=0A=
-Please let me know if you could drop the Freescale e-mail address when=0A=
-applying this patch, or it's advisable to resubmit.=0A=
-=0A=
-Thanks,=0A=
-Horia=0A=
+Driver does not properly handle the case when signals interrupt
+wait_for_completion_interruptible():
+-it does not check for return value
+-completion structure is allocated on stack; in case a signal interrupts
+the sleep, it will go out of scope, causing the worker thread
+(caam_jr_dequeue) to fail when it accesses it
+
+wait_for_completion_interruptible() is replaced with uninterruptable
+wait_for_completion().
+We choose to block all signals while waiting for I/O (device executing
+the split key generation job descriptor) since the alternative - in
+order to have a deterministic device state - would be to flush the job
+ring (aborting *all* in-progress jobs).
+
+Cc: <stable@vger.kernel.org>
+Fixes: 045e36780f115 ("crypto: caam - ahash hmac support")
+Fixes: 4c1ec1f930154 ("crypto: caam - refactor key_gen, sg")
+Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+---
+
+Sending this as RFC, since I am not completely convinced that masking all
+signals is the proper thing to do.
+In case of I/O is this acceptable, or should the driver use instead
+wait_for_completion_killable()?
+
+ drivers/crypto/caam/caamhash.c | 2 +-
+ drivers/crypto/caam/key_gen.c  | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
+index da4f94eab3da..718a03293ab6 100644
+--- a/drivers/crypto/caam/caamhash.c
++++ b/drivers/crypto/caam/caamhash.c
+@@ -396,7 +396,7 @@ static int hash_digest_key(struct caam_hash_ctx *ctx, const u8 *key_in,
+ 	ret = caam_jr_enqueue(jrdev, desc, split_key_done, &result);
+ 	if (!ret) {
+ 		/* in progress */
+-		wait_for_completion_interruptible(&result.completion);
++		wait_for_completion(&result.completion);
+ 		ret = result.err;
+ #ifdef DEBUG
+ 		print_hex_dump(KERN_ERR,
+diff --git a/drivers/crypto/caam/key_gen.c b/drivers/crypto/caam/key_gen.c
+index 1bb2816a9b4d..c425d4adaf2a 100644
+--- a/drivers/crypto/caam/key_gen.c
++++ b/drivers/crypto/caam/key_gen.c
+@@ -149,7 +149,7 @@ int gen_split_key(struct device *jrdev, u8 *key_out,
+ 	ret = caam_jr_enqueue(jrdev, desc, split_key_done, &result);
+ 	if (!ret) {
+ 		/* in progress */
+-		wait_for_completion_interruptible(&result.completion);
++		wait_for_completion(&result.completion);
+ 		ret = result.err;
+ #ifdef DEBUG
+ 		print_hex_dump(KERN_ERR, "ctx.key@"__stringify(__LINE__)": ",
+-- 
+2.12.0.264.gd6db3f216544
