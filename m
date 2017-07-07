@@ -1,7 +1,7 @@
 From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH 07/13] crypto: caam/qi - explicitly set dma_ops
-Date: Fri, 7 Jul 2017 16:05:17 +0300
-Message-ID: <20170707130523.32427-8-horia.geanta@nxp.com>
+Subject: [PATCH 02/13] crypto: caam/qi - fix compilation with DEBUG enabled
+Date: Fri, 7 Jul 2017 16:05:12 +0300
+Message-ID: <20170707130523.32427-3-horia.geanta@nxp.com>
 References: <20170707130523.32427-1-horia.geanta@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
@@ -12,37 +12,236 @@ Cc: "David S. Miller" <davem@davemloft.net>,
         Tudor Ambarus <tudor.ambarus@microchip.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2nam01on0081.outbound.protection.outlook.com ([104.47.34.81]:8626
-        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
+Received: from mail-sn1nam02on0086.outbound.protection.outlook.com ([104.47.36.86]:48400
+        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1750726AbdGGNF7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Jul 2017 09:05:59 -0400
+        id S1750726AbdGGNFw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 7 Jul 2017 09:05:52 -0400
 In-Reply-To: <20170707130523.32427-1-horia.geanta@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Since ARM64 commit 1dccb598df549 ("arm64: simplify dma_get_ops"),
-dma_ops no longer default to swiotlb_dma_ops, but to dummy_dma_ops.
+caam/qi driver does not compile when DEBUG is enabled
+(CRYPTO_DEV_FSL_CAAM_DEBUG=y):
 
-dma_ops have to be explicitly set in the driver - at least for ARM64.
+drivers/crypto/caam/caamalg_qi.c: In function 'ablkcipher_done':
+drivers/crypto/caam/caamalg_qi.c:794:2: error: implicit declaration of function 'dbg_dump_sg' [-Werror=implicit-function-declaration]
+  dbg_dump_sg(KERN_ERR, "dst    @" __stringify(__LINE__)": ",
 
-Fixes: 67c2315def06 ("crypto: caam - add Queue Interface (QI) backend support")
+Since dbg_dump_sg() is shared between caam/jr and caam/qi, move it
+in a shared location and export it.
+
+At the same time:
+-reduce ifdeferry by providing a no-op implementation for !DEBUG case
+-rename it to caam_dump_sg() to be consistent in terms of
+exported symbols namespace (caam_*)
+
+Cc: <stable@vger.kernel.org>
+Fixes: b189817cf789 ("crypto: caam/qi - add ablkcipher and authenc algorithms")
 Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 ---
- drivers/crypto/caam/qi.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/crypto/caam/caamalg.c    | 66 +++++++++-------------------------------
+ drivers/crypto/caam/caamalg_qi.c |  6 ++--
+ drivers/crypto/caam/error.c      | 40 ++++++++++++++++++++++++
+ drivers/crypto/caam/error.h      |  4 +++
+ 4 files changed, 62 insertions(+), 54 deletions(-)
 
-diff --git a/drivers/crypto/caam/qi.c b/drivers/crypto/caam/qi.c
-index 01284faeee69..1c1f3faf6394 100644
---- a/drivers/crypto/caam/qi.c
-+++ b/drivers/crypto/caam/qi.c
-@@ -734,6 +734,7 @@ int caam_qi_init(struct platform_device *caam_pdev)
- 	qi_pdev = platform_device_register_full(&qi_pdev_info);
- 	if (IS_ERR(qi_pdev))
- 		return PTR_ERR(qi_pdev);
-+	set_dma_ops(&qi_pdev->dev, get_dma_ops(ctrldev));
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index 398807d1b77e..92fb15e0a4f7 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -81,40 +81,6 @@
+ #define debug(format, arg...)
+ #endif
  
- 	ctrlpriv = dev_get_drvdata(ctrldev);
- 	qidev = &qi_pdev->dev;
+-#ifdef DEBUG
+-#include <linux/highmem.h>
+-
+-static void dbg_dump_sg(const char *level, const char *prefix_str,
+-			int prefix_type, int rowsize, int groupsize,
+-			struct scatterlist *sg, size_t tlen, bool ascii)
+-{
+-	struct scatterlist *it;
+-	void *it_page;
+-	size_t len;
+-	void *buf;
+-
+-	for (it = sg; it != NULL && tlen > 0 ; it = sg_next(sg)) {
+-		/*
+-		 * make sure the scatterlist's page
+-		 * has a valid virtual memory mapping
+-		 */
+-		it_page = kmap_atomic(sg_page(it));
+-		if (unlikely(!it_page)) {
+-			printk(KERN_ERR "dbg_dump_sg: kmap failed\n");
+-			return;
+-		}
+-
+-		buf = it_page + it->offset;
+-		len = min_t(size_t, tlen, it->length);
+-		print_hex_dump(level, prefix_str, prefix_type, rowsize,
+-			       groupsize, buf, len, ascii);
+-		tlen -= len;
+-
+-		kunmap_atomic(it_page);
+-	}
+-}
+-#endif
+-
+ static struct list_head alg_list;
+ 
+ struct caam_alg_entry {
+@@ -898,10 +864,10 @@ static void ablkcipher_encrypt_done(struct device *jrdev, u32 *desc, u32 err,
+ 	print_hex_dump(KERN_ERR, "dstiv  @"__stringify(__LINE__)": ",
+ 		       DUMP_PREFIX_ADDRESS, 16, 4, req->info,
+ 		       edesc->src_nents > 1 ? 100 : ivsize, 1);
+-	dbg_dump_sg(KERN_ERR, "dst    @"__stringify(__LINE__)": ",
+-		    DUMP_PREFIX_ADDRESS, 16, 4, req->dst,
+-		    edesc->dst_nents > 1 ? 100 : req->nbytes, 1);
+ #endif
++	caam_dump_sg(KERN_ERR, "dst    @" __stringify(__LINE__)": ",
++		     DUMP_PREFIX_ADDRESS, 16, 4, req->dst,
++		     edesc->dst_nents > 1 ? 100 : req->nbytes, 1);
+ 
+ 	ablkcipher_unmap(jrdev, edesc, req);
+ 	kfree(edesc);
+@@ -929,10 +895,10 @@ static void ablkcipher_decrypt_done(struct device *jrdev, u32 *desc, u32 err,
+ 	print_hex_dump(KERN_ERR, "dstiv  @"__stringify(__LINE__)": ",
+ 		       DUMP_PREFIX_ADDRESS, 16, 4, req->info,
+ 		       ivsize, 1);
+-	dbg_dump_sg(KERN_ERR, "dst    @"__stringify(__LINE__)": ",
+-		    DUMP_PREFIX_ADDRESS, 16, 4, req->dst,
+-		    edesc->dst_nents > 1 ? 100 : req->nbytes, 1);
+ #endif
++	caam_dump_sg(KERN_ERR, "dst    @" __stringify(__LINE__)": ",
++		     DUMP_PREFIX_ADDRESS, 16, 4, req->dst,
++		     edesc->dst_nents > 1 ? 100 : req->nbytes, 1);
+ 
+ 	ablkcipher_unmap(jrdev, edesc, req);
+ 	kfree(edesc);
+@@ -1091,10 +1057,10 @@ static void init_ablkcipher_job(u32 *sh_desc, dma_addr_t ptr,
+ 		       ivsize, 1);
+ 	pr_err("asked=%d, nbytes%d\n",
+ 	       (int)edesc->src_nents > 1 ? 100 : req->nbytes, req->nbytes);
+-	dbg_dump_sg(KERN_ERR, "src    @"__stringify(__LINE__)": ",
+-		    DUMP_PREFIX_ADDRESS, 16, 4, req->src,
+-		    edesc->src_nents > 1 ? 100 : req->nbytes, 1);
+ #endif
++	caam_dump_sg(KERN_ERR, "src    @" __stringify(__LINE__)": ",
++		     DUMP_PREFIX_ADDRESS, 16, 4, req->src,
++		     edesc->src_nents > 1 ? 100 : req->nbytes, 1);
+ 
+ 	len = desc_len(sh_desc);
+ 	init_job_desc_shared(desc, ptr, len, HDR_SHARE_DEFER | HDR_REVERSE);
+@@ -1148,10 +1114,10 @@ static void init_ablkcipher_giv_job(u32 *sh_desc, dma_addr_t ptr,
+ 	print_hex_dump(KERN_ERR, "presciv@" __stringify(__LINE__) ": ",
+ 		       DUMP_PREFIX_ADDRESS, 16, 4, req->info,
+ 		       ivsize, 1);
+-	dbg_dump_sg(KERN_ERR, "src    @" __stringify(__LINE__) ": ",
+-		    DUMP_PREFIX_ADDRESS, 16, 4, req->src,
+-		    edesc->src_nents > 1 ? 100 : req->nbytes, 1);
+ #endif
++	caam_dump_sg(KERN_ERR, "src    @" __stringify(__LINE__) ": ",
++		     DUMP_PREFIX_ADDRESS, 16, 4, req->src,
++		     edesc->src_nents > 1 ? 100 : req->nbytes, 1);
+ 
+ 	len = desc_len(sh_desc);
+ 	init_job_desc_shared(desc, ptr, len, HDR_SHARE_DEFER | HDR_REVERSE);
+@@ -1433,11 +1399,9 @@ static int aead_decrypt(struct aead_request *req)
+ 	u32 *desc;
+ 	int ret = 0;
+ 
+-#ifdef DEBUG
+-	dbg_dump_sg(KERN_ERR, "dec src@"__stringify(__LINE__)": ",
+-		    DUMP_PREFIX_ADDRESS, 16, 4, req->src,
+-		    req->assoclen + req->cryptlen, 1);
+-#endif
++	caam_dump_sg(KERN_ERR, "dec src@" __stringify(__LINE__)": ",
++		     DUMP_PREFIX_ADDRESS, 16, 4, req->src,
++		     req->assoclen + req->cryptlen, 1);
+ 
+ 	/* allocate extended descriptor */
+ 	edesc = aead_edesc_alloc(req, AUTHENC_DESC_JOB_IO_LEN,
+diff --git a/drivers/crypto/caam/caamalg_qi.c b/drivers/crypto/caam/caamalg_qi.c
+index b63bc3019f42..2dde23abbd3a 100644
+--- a/drivers/crypto/caam/caamalg_qi.c
++++ b/drivers/crypto/caam/caamalg_qi.c
+@@ -791,9 +791,9 @@ static void ablkcipher_done(struct caam_drv_req *drv_req, u32 status)
+ 	print_hex_dump(KERN_ERR, "dstiv  @" __stringify(__LINE__)": ",
+ 		       DUMP_PREFIX_ADDRESS, 16, 4, req->info,
+ 		       edesc->src_nents > 1 ? 100 : ivsize, 1);
+-	dbg_dump_sg(KERN_ERR, "dst    @" __stringify(__LINE__)": ",
+-		    DUMP_PREFIX_ADDRESS, 16, 4, req->dst,
+-		    edesc->dst_nents > 1 ? 100 : req->nbytes, 1);
++	caam_dump_sg(KERN_ERR, "dst    @" __stringify(__LINE__)": ",
++		     DUMP_PREFIX_ADDRESS, 16, 4, req->dst,
++		     edesc->dst_nents > 1 ? 100 : req->nbytes, 1);
+ #endif
+ 
+ 	ablkcipher_unmap(qidev, edesc, req);
+diff --git a/drivers/crypto/caam/error.c b/drivers/crypto/caam/error.c
+index 6f44ccb55c63..3d639f3b45aa 100644
+--- a/drivers/crypto/caam/error.c
++++ b/drivers/crypto/caam/error.c
+@@ -9,6 +9,46 @@
+ #include "desc.h"
+ #include "error.h"
+ 
++#ifdef DEBUG
++#include <linux/highmem.h>
++
++void caam_dump_sg(const char *level, const char *prefix_str, int prefix_type,
++		  int rowsize, int groupsize, struct scatterlist *sg,
++		  size_t tlen, bool ascii)
++{
++	struct scatterlist *it;
++	void *it_page;
++	size_t len;
++	void *buf;
++
++	for (it = sg; it && tlen > 0 ; it = sg_next(sg)) {
++		/*
++		 * make sure the scatterlist's page
++		 * has a valid virtual memory mapping
++		 */
++		it_page = kmap_atomic(sg_page(it));
++		if (unlikely(!it_page)) {
++			pr_err("caam_dump_sg: kmap failed\n");
++			return;
++		}
++
++		buf = it_page + it->offset;
++		len = min_t(size_t, tlen, it->length);
++		print_hex_dump(level, prefix_str, prefix_type, rowsize,
++			       groupsize, buf, len, ascii);
++		tlen -= len;
++
++		kunmap_atomic(it_page);
++	}
++}
++#else
++void caam_dump_sg(const char *level, const char *prefix_str, int prefix_type,
++		  int rowsize, int groupsize, struct scatterlist *sg,
++		  size_t tlen, bool ascii)
++{}
++#endif /* DEBUG */
++EXPORT_SYMBOL(caam_dump_sg);
++
+ static const struct {
+ 	u8 value;
+ 	const char *error_text;
+diff --git a/drivers/crypto/caam/error.h b/drivers/crypto/caam/error.h
+index b6350b0d9153..250e1a21c473 100644
+--- a/drivers/crypto/caam/error.h
++++ b/drivers/crypto/caam/error.h
+@@ -8,4 +8,8 @@
+ #define CAAM_ERROR_H
+ #define CAAM_ERROR_STR_MAX 302
+ void caam_jr_strstatus(struct device *jrdev, u32 status);
++
++void caam_dump_sg(const char *level, const char *prefix_str, int prefix_type,
++		  int rowsize, int groupsize, struct scatterlist *sg,
++		  size_t tlen, bool ascii);
+ #endif /* CAAM_ERROR_H */
 -- 
 2.12.0.264.gd6db3f216544
