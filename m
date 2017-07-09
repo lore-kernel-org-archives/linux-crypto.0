@@ -1,62 +1,77 @@
 From: sleepingzucchini@gmail.com
-Subject: [PATCH 3/5] staging: ccree: remove assignement in conditional
-Date: Sun,  9 Jul 2017 17:10:45 -0400
-Message-ID: <b45c6eaded65c1abb45b7a4d88824f289913d7ce.1499608047.git.sleepingzucchini@gmail.com>
+Subject: [PATCH 5/5] staging: ccree: fix switch case indentation
+Date: Sun,  9 Jul 2017 17:10:47 -0400
+Message-ID: <81ec1fd439ab32793757242358a558c9a72aef3c.1499608047.git.sleepingzucchini@gmail.com>
 References: <cover.1499608047.git.sleepingzucchini@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: gregkh@linuxfoundation.orgc, driverdev-devel@linuxdriverproject.org,
- linux-crypto@vger.kernel.org, Tyler Olivieri <sleepingzucchini@gmail.com>
+Cc: gregkh@linuxfoundation.orgc, linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org,
+        Tyler Olivieri <sleepingzucchini@gmail.com>
 To: gilad@benyossef.com
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-qk0-f194.google.com ([209.85.220.194]:35020 "EHLO
+        mail-qk0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752820AbdGIWQC (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 9 Jul 2017 18:16:02 -0400
+Received: by mail-qk0-f194.google.com with SMTP id 16so10817774qkg.2
+        for <linux-crypto@vger.kernel.org>; Sun, 09 Jul 2017 15:16:02 -0700 (PDT)
 In-Reply-To: <cover.1499608047.git.sleepingzucchini@gmail.com>
 In-Reply-To: <cover.1499608047.git.sleepingzucchini@gmail.com>
 References: <cover.1499608047.git.sleepingzucchini@gmail.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 From: Tyler Olivieri <sleepingzucchini@gmail.com>
 
 Patch to fix following checkpatch error:
-ERROR: do not use assignment in if condition
+ERROR: switch and case should be at the same indent
 
 Signed-off-by: Tyler Olivieri <sleepingzucchini@gmail.com>
 ---
- drivers/staging/ccree/ssi_hash.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ drivers/staging/ccree/ssi_hash.c | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
 
 diff --git a/drivers/staging/ccree/ssi_hash.c b/drivers/staging/ccree/ssi_hash.c
-index 7e9f273..c66314f 100644
+index c66314f..4f596eb 100644
 --- a/drivers/staging/ccree/ssi_hash.c
 +++ b/drivers/staging/ccree/ssi_hash.c
-@@ -602,7 +602,8 @@ static int ssi_hash_update(struct ahash_req_ctx *state,
- 		return 0;
+@@ -1177,12 +1177,12 @@ static int ssi_xcbc_setkey(struct crypto_ahash *ahash,
+ 	CHECK_AND_RETURN_UPON_FIPS_ERROR();
+ 
+ 	switch (keylen) {
+-		case AES_KEYSIZE_128:
+-		case AES_KEYSIZE_192:
+-		case AES_KEYSIZE_256:
+-			break;
+-		default:
+-			return -EINVAL;
++	case AES_KEYSIZE_128:
++	case AES_KEYSIZE_192:
++	case AES_KEYSIZE_256:
++		break;
++	default:
++		return -EINVAL;
  	}
  
--	if (unlikely(rc = ssi_buffer_mgr_map_hash_request_update(ctx->drvdata, state, src, nbytes, block_size))) {
-+	rc = ssi_buffer_mgr_map_hash_request_update(ctx->drvdata, state, src, nbytes, block_size);
-+	if (unlikely(rc)) {
- 		if (rc == 1) {
- 			SSI_LOG_DEBUG(" data size not require HW update %x\n",
- 				     nbytes);
-@@ -1404,7 +1405,8 @@ static int ssi_mac_update(struct ahash_request *req)
+ 	ctx->key_params.keylen = keylen;
+@@ -1265,12 +1265,12 @@ static int ssi_cmac_setkey(struct crypto_ahash *ahash,
+ 	ctx->is_hmac = true;
  
- 	state->xcbc_count++;
+ 	switch (keylen) {
+-		case AES_KEYSIZE_128:
+-		case AES_KEYSIZE_192:
+-		case AES_KEYSIZE_256:
+-			break;
+-		default:
+-			return -EINVAL;
++	case AES_KEYSIZE_128:
++	case AES_KEYSIZE_192:
++	case AES_KEYSIZE_256:
++		break;
++	default:
++		return -EINVAL;
+ 	}
  
--	if (unlikely(rc = ssi_buffer_mgr_map_hash_request_update(ctx->drvdata, state, req->src, req->nbytes, block_size))) {
-+	rc = ssi_buffer_mgr_map_hash_request_update(ctx->drvdata, state, req->src, req->nbytes, block_size);
-+	if (unlikely(rc)) {
- 		if (rc == 1) {
- 			SSI_LOG_DEBUG(" data size not require HW update %x\n",
- 				     req->nbytes);
+ 	ctx->key_params.keylen = keylen;
 -- 
 2.9.4
