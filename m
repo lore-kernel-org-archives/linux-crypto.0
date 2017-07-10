@@ -1,7 +1,7 @@
 From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH v2 04/13] crypto: caam/qi - properly set IV after {en,de}crypt
-Date: Mon, 10 Jul 2017 08:40:30 +0300
-Message-ID: <20170710054039.21555-5-horia.geanta@nxp.com>
+Subject: [PATCH v2 09/13] crypto: caam/qi - lower driver verbosity
+Date: Mon, 10 Jul 2017 08:40:35 +0300
+Message-ID: <20170710054039.21555-10-horia.geanta@nxp.com>
 References: <20170707130523.32427-1-horia.geanta@nxp.com>
  <20170710054039.21555-1-horia.geanta@nxp.com>
 Mime-Version: 1.0
@@ -13,54 +13,54 @@ Cc: "David S. Miller" <davem@davemloft.net>,
         Tudor Ambarus <tudor.ambarus@microchip.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-sn1nam01on0061.outbound.protection.outlook.com ([104.47.32.61]:27973
-        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
+Received: from mail-cys01nam02on0048.outbound.protection.outlook.com ([104.47.37.48]:58775
+        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752402AbdGJFlG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Jul 2017 01:41:06 -0400
+        id S1751161AbdGJFlK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 10 Jul 2017 01:41:10 -0400
 In-Reply-To: <20170710054039.21555-1-horia.geanta@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-caam/qi needs a fix similar to what was done for caam/jr in
-commit "crypto: caam/qi - properly set IV after {en,de}crypt",
-to allow for ablkcipher/skcipher chunking/streaming.
+Change log level for some prints from dev_info() to dev_dbg(), low-level
+details are needed only when debugging.
 
-Cc: <stable@vger.kernel.org>
-Fixes: b189817cf789 ("crypto: caam/qi - add ablkcipher and authenc algorithms")
-Suggested-by: David Gstir <david@sigma-star.at>
 Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 ---
- drivers/crypto/caam/caamalg_qi.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ drivers/crypto/caam/qi.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/crypto/caam/caamalg_qi.c b/drivers/crypto/caam/caamalg_qi.c
-index 2dde23abbd3a..a5d634e0aef3 100644
---- a/drivers/crypto/caam/caamalg_qi.c
-+++ b/drivers/crypto/caam/caamalg_qi.c
-@@ -776,9 +776,9 @@ static void ablkcipher_done(struct caam_drv_req *drv_req, u32 status)
- 	struct crypto_ablkcipher *ablkcipher = crypto_ablkcipher_reqtfm(req);
- 	struct caam_ctx *caam_ctx = crypto_ablkcipher_ctx(ablkcipher);
- 	struct device *qidev = caam_ctx->qidev;
--#ifdef DEBUG
- 	int ivsize = crypto_ablkcipher_ivsize(ablkcipher);
+diff --git a/drivers/crypto/caam/qi.c b/drivers/crypto/caam/qi.c
+index 1c1f3faf6394..6d5a010a1881 100644
+--- a/drivers/crypto/caam/qi.c
++++ b/drivers/crypto/caam/qi.c
+@@ -201,8 +201,8 @@ static struct qman_fq *create_caam_req_fq(struct device *qidev,
+ 		goto init_req_fq_fail;
+ 	}
  
-+#ifdef DEBUG
- 	dev_err(qidev, "%s %d: status 0x%x\n", __func__, __LINE__, status);
- #endif
+-	dev_info(qidev, "Allocated request FQ %u for CPU %u\n", req_fq->fqid,
+-		 smp_processor_id());
++	dev_dbg(qidev, "Allocated request FQ %u for CPU %u\n", req_fq->fqid,
++		smp_processor_id());
+ 	return req_fq;
  
-@@ -799,6 +799,13 @@ static void ablkcipher_done(struct caam_drv_req *drv_req, u32 status)
- 	ablkcipher_unmap(qidev, edesc, req);
- 	qi_cache_free(edesc);
+ init_req_fq_fail:
+@@ -643,7 +643,7 @@ static int alloc_rsp_fq_cpu(struct device *qidev, unsigned int cpu)
  
-+	/*
-+	 * The crypto API expects us to set the IV (req->info) to the last
-+	 * ciphertext block. This is used e.g. by the CTS mode.
-+	 */
-+	scatterwalk_map_and_copy(req->info, req->dst, req->nbytes - ivsize,
-+				 ivsize, 0);
-+
- 	ablkcipher_request_complete(req, status);
+ 	per_cpu(pcpu_qipriv.rsp_fq, cpu) = fq;
+ 
+-	dev_info(qidev, "Allocated response FQ %u for CPU %u", fq->fqid, cpu);
++	dev_dbg(qidev, "Allocated response FQ %u for CPU %u", fq->fqid, cpu);
+ 	return 0;
+ }
+ 
+@@ -676,7 +676,7 @@ static int init_cgr(struct device *qidev)
+ 		return ret;
+ 	}
+ 
+-	dev_info(qidev, "Congestion threshold set to %llu\n", val);
++	dev_dbg(qidev, "Congestion threshold set to %llu\n", val);
+ 	return 0;
  }
  
 -- 
