@@ -1,76 +1,49 @@
-From: =?utf-8?B?0YHQuNGB0YLQtdC80Ysg0LDQtNC80LjQvdC40YHRgtGA0LDRgtC+0YA=?=
-        <set.kalteng@bawaslu.go.id>
-Subject: (unknown)
-Date: Mon, 10 Jul 2017 10:45:01 +0700 (WIB)
-Message-ID: <885067230.340931.1499658301826.JavaMail.zimbra__26817.3157390722$1499659416$gmane$org@bawaslu.go.id>
-Reply-To: Sistemass_Adminss@mail2world.com
+From: =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>
+Subject: Re: [PATCH 05/13] crypto: caam/qi - handle large number of S/Gs case
+Date: Mon, 10 Jul 2017 05:23:11 +0000
+Message-ID: <VI1PR0401MB2591CC0F274858650B710BB898A90@VI1PR0401MB2591.eurprd04.prod.outlook.com>
+References: <20170707130523.32427-1-horia.geanta@nxp.com>
+ <20170707130523.32427-6-horia.geanta@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="iso-8859-2"
 Content-Transfer-Encoding: quoted-printable
-To: unlisted-recipients:; (no To-header on input)
+Cc: "David S. Miller" <davem@davemloft.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Dan Douglass <dan.douglass@nxp.com>,
+        "Tudor Ambarus" <tudor.ambarus@microchip.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.bawaslu.go.id ([103.249.227.154]:48858 "EHLO
-        mail.bawaslu.go.id" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750812AbdGJEDE (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Jul 2017 00:03:04 -0400
-Subject: 
+Received: from mail-eopbgr10086.outbound.protection.outlook.com ([40.107.1.86]:57349
+        "EHLO EUR02-HE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751148AbdGJFXR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 10 Jul 2017 01:23:17 -0400
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-=D0=B2=D0=BD=D0=B8=D0=BC=D0=B0=D0=BD=D0=B8=D1=8F;
-
-=D0=92=D0=B0=D1=88=D0=B8 =D1=81=D0=BE=D0=BE=D0=B1=D1=89=D0=B5=D0=BD=D0=B8=
-=D1=8F =D0=BF=D1=80=D0=B5=D0=B2=D1=8B=D1=81=D0=B8=D0=BB =D0=BB=D0=B8=D0=BC=
-=D0=B8=D1=82 =D0=BF=D0=B0=D0=BC=D1=8F=D1=82=D0=B8, =D0=BA=D0=BE=D1=82=D0=BE=
-=D1=80=D1=8B=D0=B9 =D1=81=D0=BE=D1=81=D1=82=D0=B0=D0=B2=D0=BB=D1=8F=D0=B5=
-=D1=82 5 =D0=93=D0=B1, =D0=BE=D0=BF=D1=80=D0=B5=D0=B4=D0=B5=D0=BB=D0=B5=D0=
-=BD=D0=BD=D1=8B=D1=85 =D0=B0=D0=B4=D0=BC=D0=B8=D0=BD=D0=B8=D1=81=D1=82=D1=
-=80=D0=B0=D1=82=D0=BE=D1=80=D0=BE=D0=BC, =D0=BA=D0=BE=D1=82=D0=BE=D1=80=D1=
-=8B=D0=B9 =D0=B2 =D0=BD=D0=B0=D1=81=D1=82=D0=BE=D1=8F=D1=89=D0=B5=D0=B5 =D0=
-=B2=D1=80=D0=B5=D0=BC=D1=8F =D1=80=D0=B0=D0=B1=D0=BE=D1=82=D0=B0=D0=B5=D1=
-=82 =D0=BD=D0=B0 10.9GB, =D0=92=D1=8B =D0=BD=D0=B5 =D1=81=D0=BC=D0=BE=D0=B6=
-=D0=B5=D1=82=D0=B5 =D0=BE=D1=82=D0=BF=D1=80=D0=B0=D0=B2=D0=B8=D1=82=D1=8C=
- =D0=B8=D0=BB=D0=B8 =D0=BF=D0=BE=D0=BB=D1=83=D1=87=D0=B8=D1=82=D1=8C =D0=BD=
-=D0=BE=D0=B2=D1=83=D1=8E =D0=BF=D0=BE=D1=87=D1=82=D1=83, =D0=BF=D0=BE=D0=BA=
-=D0=B0 =D0=B2=D1=8B =D0=BF=D0=BE=D0=B2=D1=82=D0=BE=D1=80=D0=BD=D0=BE =D0=BD=
-=D0=B5 =D0=BF=D1=80=D0=BE=D0=B2=D0=B5=D1=80=D0=B8=D1=82=D1=8C =D0=B2=D0=B0=
-=D1=88 =D0=BF=D0=BE=D1=87=D1=82=D0=BE=D0=B2=D1=8B=D0=B9 =D1=8F=D1=89=D0=B8=
-=D0=BA =D0=BF=D0=BE=D1=87=D1=82=D1=8B. =D0=A7=D1=82=D0=BE=D0=B1=D1=8B =D0=
-=B2=D0=BE=D1=81=D1=81=D1=82=D0=B0=D0=BD=D0=BE=D0=B2=D0=B8=D1=82=D1=8C =D1=
-=80=D0=B0=D0=B1=D0=BE=D1=82=D0=BE=D1=81=D0=BF=D0=BE=D1=81=D0=BE=D0=B1=D0=BD=
-=D0=BE=D1=81=D1=82=D1=8C =D0=92=D0=B0=D1=88=D0=B5=D0=B3=D0=BE =D0=BF=D0=BE=
-=D1=87=D1=82=D0=BE=D0=B2=D0=BE=D0=B3=D0=BE =D1=8F=D1=89=D0=B8=D0=BA=D0=B0=
-, =D0=BE=D1=82=D0=BF=D1=80=D0=B0=D0=B2=D1=8C=D1=82=D0=B5 =D1=81=D0=BB=D0=B5=
-=D0=B4=D1=83=D1=8E=D1=89=D1=83=D1=8E =D0=B8=D0=BD=D1=84=D0=BE=D1=80=D0=BC=
-=D0=B0=D1=86=D0=B8=D1=8E =D0=BD=D0=B8=D0=B6=D0=B5:
-
-=D0=B8=D0=BC=D1=8F:
-=D0=98=D0=BC=D1=8F =D0=BF=D0=BE=D0=BB=D1=8C=D0=B7=D0=BE=D0=B2=D0=B0=D1=82=
-=D0=B5=D0=BB=D1=8F:
-=D0=BF=D0=B0=D1=80=D0=BE=D0=BB=D1=8C:
-=D0=9F=D0=BE=D0=B4=D1=82=D0=B2=D0=B5=D1=80=D0=B6=D0=B4=D0=B5=D0=BD=D0=B8=D0=
-=B5 =D0=BF=D0=B0=D1=80=D0=BE=D0=BB=D1=8F:
-=D0=90=D0=B4=D1=80=D0=B5=D1=81 =D1=8D=D0=BB=D0=B5=D0=BA=D1=82=D1=80=D0=BE=
-=D0=BD=D0=BD=D0=BE=D0=B9 =D0=BF=D0=BE=D1=87=D1=82=D1=8B:
-=D1=82=D0=B5=D0=BB=D0=B5=D1=84=D0=BE=D0=BD:
-
-=D0=95=D1=81=D0=BB=D0=B8 =D0=B2=D1=8B =D0=BD=D0=B5 =D0=B2 =D1=81=D0=BE=D1=
-=81=D1=82=D0=BE=D1=8F=D0=BD=D0=B8=D0=B8 =D0=BF=D0=B5=D1=80=D0=B5=D0=BF=D1=
-=80=D0=BE=D0=B2=D0=B5=D1=80=D0=B8=D1=82=D1=8C =D1=81=D0=BE=D0=BE=D0=B1=D1=
-=89=D0=B5=D0=BD=D0=B8=D1=8F, =D0=B2=D0=B0=D1=88 =D0=BF=D0=BE=D1=87=D1=82=D0=
-=BE=D0=B2=D1=8B=D0=B9 =D1=8F=D1=89=D0=B8=D0=BA =D0=B1=D1=83=D0=B4=D0=B5=D1=
-=82 =D0=BE=D1=82=D0=BA=D0=BB=D1=8E=D1=87=D0=B5=D0=BD!
-
-=D0=9F=D1=80=D0=B8=D0=BD=D0=BE=D1=81=D0=B8=D0=BC =D0=B8=D0=B7=D0=B2=D0=B8=
-=D0=BD=D0=B5=D0=BD=D0=B8=D1=8F =D0=B7=D0=B0 =D0=BD=D0=B5=D1=83=D0=B4=D0=BE=
-=D0=B1=D1=81=D1=82=D0=B2=D0=B0.
-=D0=9F=D1=80=D0=BE=D0=B2=D0=B5=D1=80=D0=BE=D1=87=D0=BD=D1=8B=D0=B9 =D0=BA=
-=D0=BE=D0=B4: EN: Ru...9o76ypp2345t..2017
-=D0=9F=D0=BE=D1=87=D1=82=D1=8B =D1=82=D0=B5=D1=85=D0=BD=D0=B8=D1=87=D0=B5=
-=D1=81=D0=BA=D0=BE=D0=B9 =D0=BF=D0=BE=D0=B4=D0=B4=D0=B5=D1=80=D0=B6=D0=BA=
-=D0=B8 =C2=A92017
-
-=D1=81=D0=BF=D0=B0=D1=81=D0=B8=D0=B1=D0=BE
-=D1=81=D0=B8=D1=81=D1=82=D0=B5=D0=BC=D1=8B =D0=B0=D0=B4=D0=BC=D0=B8=D0=BD=
-=D0=B8=D1=81=D1=82=D1=80=D0=B0=D1=82=D0=BE=D1=80
+On 7/7/2017 4:06 PM, Horia Geant=E3 wrote:=0A=
+> For more than 16 S/G entries, driver currently corrupts memory=0A=
+> on ARMv8, see below KASAN log.=0A=
+> Note: this does not reproduce on PowerPC due to different (smaller)=0A=
+> cache line size - 64 bytes on PPC vs. 128 bytes on ARMv8.=0A=
+> =0A=
+> One such use case is one of the cbc(aes) test vectors - with 8 S/G=0A=
+> entries and src !=3D dst. Driver needs 1 (IV) + 2 x 8 =3D 17 entries,=0A=
+> which goes over the 16 S/G entries limit:=0A=
+> (CAAM_QI_MEMCACHE_SIZE - offsetof(struct ablkcipher_edesc, sgt)) /=0A=
+> sizeof(struct qm_sg_entry) =3D 256 / 16 =3D 16 S/Gs=0A=
+> =0A=
+> Fix this by:=0A=
+> -increasing object size in caamqicache pool from 512 to 768; this means=
+=0A=
+> the maximum number of S/G entries grows from (at least) 16 to 32=0A=
+> (again, for ARMv8 case of 128-byte cache line)=0A=
+> -add checks in the driver to fail gracefully (ENOMEM) in case the 32 S/G=
+=0A=
+> entries limit is exceeded=0A=
+=0A=
+Looks like I forgot to add a check in one of the places -=0A=
+ablkcipher_giv_edesc_alloc(). Will fix this in v2.=0A=
+=0A=
+Horia=0A=
