@@ -1,65 +1,90 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [PATCH 0/5] staging: ccree: fix checkpatch errors
-Date: Tue, 11 Jul 2017 16:38:34 +0300
-Message-ID: <CAOtvUMeYKs2-6LgzP9Mfp2P7cDxXfF8Gki7ePO-v4V7=Nv6DYw@mail.gmail.com>
-References: <cover.1499608047.git.sleepingzucchini@gmail.com>
+Subject: Re: [PATCH v2] staging: ccree: Use __func__ instead of function name
+Date: Tue, 11 Jul 2017 16:40:03 +0300
+Message-ID: <CAOtvUMerfaZj8zzooUM0Kvn0qntGo8RR3rRUH_UZz70wyL-orA@mail.gmail.com>
+References: <20170629141829.GA29662@kroah.com> <1498756125-3330-1-git-send-email-karthik@techveda.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: gregkh@linuxfoundation.orgc, linux-crypto@vger.kernel.org,
-        driverdev-devel@linuxdriverproject.org
-To: sleepingzucchini@gmail.com
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+        sunil.m@techveda.org
+To: karthik@techveda.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-yb0-f194.google.com ([209.85.213.194]:36515 "EHLO
-        mail-yb0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932229AbdGKNig (ORCPT
+Received: from mail-yw0-f193.google.com ([209.85.161.193]:34846 "EHLO
+        mail-yw0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932430AbdGKNkE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Jul 2017 09:38:36 -0400
-Received: by mail-yb0-f194.google.com with SMTP id o195so5514980yba.3
-        for <linux-crypto@vger.kernel.org>; Tue, 11 Jul 2017 06:38:35 -0700 (PDT)
-In-Reply-To: <cover.1499608047.git.sleepingzucchini@gmail.com>
+        Tue, 11 Jul 2017 09:40:04 -0400
+Received: by mail-yw0-f193.google.com with SMTP id z21so7142802ywz.2
+        for <linux-crypto@vger.kernel.org>; Tue, 11 Jul 2017 06:40:04 -0700 (PDT)
+In-Reply-To: <1498756125-3330-1-git-send-email-karthik@techveda.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jul 10, 2017 at 12:10 AM,  <sleepingzucchini@gmail.com> wrote:
-> From: Tyler Olivieri <sleepingzucchini@gmail.com>
+Hello Karthik ,
+
+Thank you for the patch.
+
+On Thu, Jun 29, 2017 at 8:08 PM,  <karthik@techveda.org> wrote:
+> From: Karthik Tummala <karthik@techveda.org>
 >
-> This patchset fixes several checkpatch errors and warnings in /staging/ccree:
+> Fixed following checkpatch.pl warning:
+>         WARNING: Prefer using '"%s...", __func__' to using
+> the function's name, in a string
 >
-> ERROR: that open brace { should be on the previous line
-> ERROR: open brace '{' following function declarations go on the next line
-> WARNING: EXPORT_SYMBOL(foo); should immediately follow its function/variable
-> ERROR: do not use assignment in if condition
-> ERROR: switch and case should be at the same indent
-> WARNING: Statements terminations use 1 semicolon
+> It is prefered to use '%s & __func__' instead of function
+> name for logging.
 >
-> This is also a submission for the eudyptula challenge.
+> Signed-off-by: Karthik Tummala <karthik@techveda.org>
+> ---
+> Changes for v2:
+> v1 was a patch series, which consisted of two patches in which
+> second one was already submitted by Gilad Ben-Yossef, so dropped
+> that one.
 >
-> Tyler Olivieri (5):
->   staging: ccree: remove redudant semicolons
->   staging: ccree: fix placement of curly braces
->   staging: ccree: remove assignement in conditional
->   staging: ccree: export symbol immediately following function
->   staging: ccree: fix switch case indentation
+> Patch generated on staging-testing as suggested by Greg-K H.
+> ---
+>  drivers/staging/ccree/ssi_aead.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 >
->  drivers/staging/ccree/ssi_buffer_mgr.c | 14 ++----
->  drivers/staging/ccree/ssi_cipher.c     |  6 ++-
->  drivers/staging/ccree/ssi_driver.c     |  5 +-
->  drivers/staging/ccree/ssi_fips.c       |  2 -
->  drivers/staging/ccree/ssi_fips_ll.c    | 85 +++++++++++-----------------------
->  drivers/staging/ccree/ssi_hash.c       | 33 +++++++------
->  drivers/staging/ccree/ssi_sysfs.c      |  3 +-
->  7 files changed, 57 insertions(+), 91 deletions(-)
+> diff --git a/drivers/staging/ccree/ssi_aead.c b/drivers/staging/ccree/ssi_aead.c
+> index 1fc0b05..1168161 100644
+> --- a/drivers/staging/ccree/ssi_aead.c
+> +++ b/drivers/staging/ccree/ssi_aead.c
+> @@ -1886,7 +1886,7 @@ static int config_gcm_context(struct aead_request *req)
+>                                 (req->cryptlen - ctx->authsize);
+>         __be32 counter = cpu_to_be32(2);
 >
+> -       SSI_LOG_DEBUG("config_gcm_context() cryptlen = %d, req->assoclen = %d ctx->authsize = %d\n", cryptlen, req->assoclen, ctx->authsize);
+> +       SSI_LOG_DEBUG("%s() cryptlen = %d, req->assoclen = %d ctx->authsize = %d\n", __func__, cryptlen, req->assoclen, ctx->authsize);
+>
+>         memset(req_ctx->hkey, 0, AES_BLOCK_SIZE);
+>
+> @@ -2198,7 +2198,7 @@ static int ssi_rfc4106_gcm_setkey(struct crypto_aead *tfm, const u8 *key, unsign
+>         struct ssi_aead_ctx *ctx = crypto_aead_ctx(tfm);
+>         int rc = 0;
+>
+> -       SSI_LOG_DEBUG("ssi_rfc4106_gcm_setkey()  keylen %d, key %p\n", keylen, key);
+> +       SSI_LOG_DEBUG("%s()  keylen %d, key %p\n", __func__, keylen, key);
+>
+>         if (keylen < 4)
+>                 return -EINVAL;
+> @@ -2216,7 +2216,7 @@ static int ssi_rfc4543_gcm_setkey(struct crypto_aead *tfm, const u8 *key, unsign
+>         struct ssi_aead_ctx *ctx = crypto_aead_ctx(tfm);
+>         int rc = 0;
+>
+> -       SSI_LOG_DEBUG("ssi_rfc4543_gcm_setkey()  keylen %d, key %p\n", keylen, key);
+> +       SSI_LOG_DEBUG("%s()  keylen %d, key %p\n", __func__, keylen, key);
+>
+>         if (keylen < 4)
+>                 return -EINVAL;
 > --
-> 2.9.4
+> 1.9.1
 >
-
-
-Looks good to me.
 
 Acked-by: Gilad Ben-Yossef <gilad@benyossef.com>
-
-Thanks!
 
 Gilad
 
