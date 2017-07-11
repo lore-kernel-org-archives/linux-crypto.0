@@ -1,44 +1,74 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [PATCH 0/5] staging: ccree: fix checkpatch errors
-Date: Tue, 11 Jul 2017 16:43:20 +0300
-Message-ID: <CAOtvUMeBTqWUH60A8vNUr-CJJ65r+UpWfbxzPGirgoq6QQMYYw@mail.gmail.com>
-References: <cover.1499608047.git.sleepingzucchini@gmail.com>
- <CAOtvUMeYKs2-6LgzP9Mfp2P7cDxXfF8Gki7ePO-v4V7=Nv6DYw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] staging: ccree: remove unnecessary cast on kmalloc
+Date: Tue, 11 Jul 2017 16:44:42 +0300
+Message-ID: <CAOtvUMd6LrRTddMfuGYg81K9EwX08SZeEYOta7ipUNAjSk2ZKg@mail.gmail.com>
+References: <20170709054337.GA9031@embeddedgus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- driverdev-devel@linuxdriverproject.org, linux-crypto@vger.kernel.org
-To: sleepingzucchini@gmail.com
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-In-Reply-To: <CAOtvUMeYKs2-6LgzP9Mfp2P7cDxXfF8Gki7ePO-v4V7=Nv6DYw@mail.gmail.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
-List-Id: linux-crypto.vger.kernel.org
+        linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>
+To: "Gustavo A. R. Silva" <garsilva@embeddedor.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-yw0-f193.google.com ([209.85.161.193]:36582 "EHLO
+        mail-yw0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755423AbdGKNon (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 11 Jul 2017 09:44:43 -0400
+Received: by mail-yw0-f193.google.com with SMTP id l21so7139138ywb.3
+        for <linux-crypto@vger.kernel.org>; Tue, 11 Jul 2017 06:44:43 -0700 (PDT)
+In-Reply-To: <20170709054337.GA9031@embeddedgus>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Tyler,
+On Sun, Jul 9, 2017 at 8:43 AM, Gustavo A. R. Silva
+<garsilva@embeddedor.com> wrote:
+> The assignment operator implicitly converts a void pointer to the type of the
+> pointer it is assigned to.
+>
+> This issue was detected using Coccinelle and the following semantic patch:
+>
+> @@
+> expression * e;
+> expression arg1, arg2;
+> type T;
+> @@
+>
+> - e=(T*)
+> + e=
+> kmalloc(arg1, arg2);
+>
+> Signed-off-by: Gustavo A. R. Silva <garsilva@embeddedor.com>
 
+For both patches:
 
-On Tue, Jul 11, 2017 at 4:38 PM, Gilad Ben-Yossef <gilad@benyossef.com> wrote:
-> On Mon, Jul 10, 2017 at 12:10 AM,  <sleepingzucchini@gmail.com> wrote:
->> From: Tyler Olivieri <sleepingzucchini@gmail.com>
->>
->> This patchset fixes several checkpatch errors and warnings in /staging/ccree:
+Acked-by: Gilad Ben-Yossef <gilad@benyossef.com>
 
-You've messed Greg's email address, so my ACK bounced.
+> ---
+>  drivers/staging/ccree/ssi_buffer_mgr.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>
+> diff --git a/drivers/staging/ccree/ssi_buffer_mgr.c b/drivers/staging/ccree/ssi_buffer_mgr.c
+> index b35871e..18a8694 100644
+> --- a/drivers/staging/ccree/ssi_buffer_mgr.c
+> +++ b/drivers/staging/ccree/ssi_buffer_mgr.c
+> @@ -1725,8 +1725,7 @@ int ssi_buffer_mgr_init(struct ssi_drvdata *drvdata)
+>         struct buff_mgr_handle *buff_mgr_handle;
+>         struct device *dev = &drvdata->plat_dev->dev;
+>
+> -       buff_mgr_handle = (struct buff_mgr_handle *)
+> -               kmalloc(sizeof(struct buff_mgr_handle), GFP_KERNEL);
+> +       buff_mgr_handle = kmalloc(sizeof(struct buff_mgr_handle), GFP_KERNEL);
+>         if (!buff_mgr_handle)
+>                 return -ENOMEM;
+>
+> --
+> 2.5.0
+>
 
-The content is good, but I don't know if Greg saw the patch set.
-You might want to resend it.
-
-Gilad.
-
+Thanks,
+Gilad
 
 
 
