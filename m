@@ -1,36 +1,62 @@
-From: Greg KH <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH 00/10] Fix alignment issues in staging/ccree
-Date: Tue, 11 Jul 2017 19:00:33 +0200
-Message-ID: <20170711170033.GA22803@kroah.com>
-References: <20170701232555.5538-1-simon@nikanor.nu>
+From: Dave Watson <davejwatson@fb.com>
+Subject: Re: [PATCH v3 net-next 3/4] tls: kernel TLS support
+Date: Tue, 11 Jul 2017 11:53:11 -0700
+Message-ID: <20170711185311.GA200@davejwatson-mba.dhcp.thefacebook.com>
+References: <cover.1497465295.git.davejwatson@fb.com>
+ <20170614183739.GA80368@davejwatson-mba.dhcp.thefacebook.com>
+ <20170711062953.GE2631@secunet.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Cc: gilad@benyossef.com, devel@driverdev.osuosl.org,
-        driverdev-devel@linuxdriverproject.org,
-        linux-crypto@vger.kernel.org
-To: Simon =?iso-8859-1?Q?Sandstr=F6m?= <simon@nikanor.nu>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:56362 "EHLO
-        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755512AbdGKRAg (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Jul 2017 13:00:36 -0400
+Content-Type: text/plain; charset="us-ascii"
+Cc: Ilya Lesokhin <ilyal@mellanox.com>,
+        Aviad Yehezkel <aviadye@mellanox.com>,
+        Boris Pismenny <borisp@mellanox.com>,
+        Liran Liss <liranl@mellanox.com>,
+        Matan Barak <matanb@mellanox.com>,
+        David Miller <davem@davemloft.net>, <netdev@vger.kernel.org>,
+        Tom Herbert <tom@herbertland.com>,
+        <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>,
+        Hannes Frederic Sowa <hannes@stressinduktion.org>,
+        Eric Dumazet <eric.dumazet@gmail.com>,
+        Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+        <nmav@gnutls.org>, <fridolin.pokorny@gmail.com>
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Return-path: <netdev-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20170701232555.5538-1-simon@nikanor.nu>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20170711062953.GE2631@secunet.com>
+Sender: netdev-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Sun, Jul 02, 2017 at 01:25:45AM +0200, Simon Sandström wrote:
-> Fixes a total of 195 alignment issues in staging/ccree reported by
-> checkpatch.pl. Adds a few "line over 80 characters" warnings as a
-> result of the realignments, but I could try to get rid of them in the
-> same patchset if needed.
+On 07/11/17 08:29 AM, Steffen Klassert wrote:
+> Sorry for replying to old mail...
+> > +int tls_set_sw_offload(struct sock *sk, struct tls_context *ctx)
+> > +{
+> 
+> ...
+> 
+> > +
+> > +	if (!sw_ctx->aead_send) {
+> > +		sw_ctx->aead_send = crypto_alloc_aead("gcm(aes)", 0, 0);
+> > +		if (IS_ERR(sw_ctx->aead_send)) {
+> > +			rc = PTR_ERR(sw_ctx->aead_send);
+> > +			sw_ctx->aead_send = NULL;
+> > +			goto free_rec_seq;
+> > +		}
+> > +	}
+> > +
+> 
+> When I look on how you allocate the aead transformation, it seems
+> that you should either register an asynchronous callback with
+> aead_request_set_callback(), or request for a synchronous algorithm.
+> 
+> Otherwise you will crash on an asynchronous crypto return, no?
 
-Not all of these applied, some did, if you could rebase the remaining
-against my staging-testing branch at the moment, and resend, that would
-be great.
+The intention is for it to be synchronous, and gather directly from
+userspace buffers.  It looks like calling
+crypto_alloc_aead("gcm(aes)", 0, CRYPTO_ALG_ASYNC) is the correct way
+to request synchronous algorithms only?
 
-thanks,
+> Also, it seems that you have your scatterlists on a per crypto
+> transformation base istead of per crypto request. Is this intentional?
 
-greg k-h
+We hold the socket lock and only one crypto op can happen at a time,
+so we reuse the scatterlists.
