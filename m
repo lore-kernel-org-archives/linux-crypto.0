@@ -1,80 +1,48 @@
-From: Kamil Konieczny <k.konieczny@partner.samsung.com>
-Subject: HELP writing crypto driver for HW with blocksize hash
-Date: Tue, 11 Jul 2017 09:52:12 +0200
-Message-ID: <09fb0bef-ee22-edff-c651-a81e3ee6a2ae@partner.samsung.com>
-References: <CGME20170711075213eucas1p1816f12edc165dfe05cb791b155e6f658@eucas1p1.samsung.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: linux-newbie@vger.kernel.org
-To: linux-crypto@vger.kernel.org
-Return-path: <linux-newbie-owner@vger.kernel.org>
-Content-language: en-US
-Sender: linux-newbie-owner@vger.kernel.org
+From: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
+Subject: [PATCH] crypto: brcm - remove BCM_PDC_MBOX dependency in Kconfig
+Date: Tue, 11 Jul 2017 15:50:06 +0530
+Message-ID: <1499768406-8342-1-git-send-email-raveendra.padasalagi@broadcom.com>
+Cc: Scott Branden <sbranden@broadcom.com>,
+        Ray Jui <ray.jui@broadcom.com>,
+        Steve Lin <steven.lin1@broadcom.com>,
+        bcm-kernel-feedback-list@broadcom.com,
+        linux-kernel@vger.kernel.org,
+        Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>,
+        stable@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Rice <rob.rice@broadcom.com>, linux-crypto@vger.kernel.org
+Return-path: <stable-owner@vger.kernel.org>
+Sender: stable-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi,
+SPU driver is dependent on generic MAILBOX API's to
+communicate with underlying DMA engine driver.
 
-I am writing crypto driver for hash MD5/SHA1/SHA256 on Exynos 4412,
-and I am facing some (minor?) difficulties.
+So this patch removes BCM_PDC_MBOX "depends on" for SPU driver
+in Kconfig and adds MAILBOX as dependent module.
 
-In old days, hadware (HW) can only do basic hash block operation,
-so at the end it needed to finalize hash, and driver need to
-write some bits into buffer to get message hash. Time passes,
-and hardware (HW) was designed with improved cappabilities,
-so it can add itself bits after message and calculate hash,
-it can stop then export state, import and resume,
-but ... it can not process null-length (or zero-length) ending.
-So there is no more final method.
+Fixes: 9d12ba86f818 ("crypto: brcm - Add Broadcom SPU driver")
+Signed-off-by: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
+Reviewed-by: Ray Jui <ray.jui@broadcom.com>
+Reviewed-by: Scott Branden <scott.branden@broadcom.com>
+Cc: stable@vger.kernel.org
+---
+ drivers/crypto/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-It must be feeded with at least one message byte to produce hash.
-
-One more constrain is to process data in constant-sized chunks,
-here it is 64 bytes, the same as for AES block,
-i.e. it cannot stop and export state while in middle of block,
-example - if we feed 16 bytes, we must then feed 48 bytes
-to stop, but ideally we should feed it always 64 bytes.
-
-Some crypto drivers with similar problem(s):
-
-omap-sham.c - no final and blocksize needed,
-broadcom bcm/spu.c - no final,
-ccp/ccp-crypto-sha.c - no final,
-nx/nx-sha256.c - blocksize needed,
-
-One more thing - in algorithm description for methods:
-final, finup, update, digest, export, import
-there is note that finup is for those hardware 
-that cannot do final, but again,
-
-it looks like crypto framework is ignoring that and every finup
-is translated into "update, final".
-
-HW driver will do opposite - it will translate final into finup.
-
->From this follows that for every such HW crypto drivers authors
-duplicate code for keeping at least blocksize cache of message.
-
-One more point - use of block size in algo structure.
-It is for informing framework about HW limitation, 
-but seems to be ignored again...
-
-Any suggestions ?
-
-Can i keep some bytes unfeeded from ahash_request 
-and return -EINPROGRESS ?
-Should i set timer and copy rest bytes after some timeout,
-where no more requests are incoming ? Or not ? cause it is 
-async mode ? 
-can i wait for more requests for processing waiting one ?
-
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index fb1e60f..778fc1b 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -629,7 +629,7 @@ source "drivers/crypto/virtio/Kconfig"
+ config CRYPTO_DEV_BCM_SPU
+ 	tristate "Broadcom symmetric crypto/hash acceleration support"
+ 	depends on ARCH_BCM_IPROC
+-	depends on BCM_PDC_MBOX
++	depends on MAILBOX
+ 	default m
+ 	select CRYPTO_DES
+ 	select CRYPTO_MD5
 -- 
-Best regards,
-Kamil Konieczny
-Samsung R&D Institute Poland
-
---
-To unsubscribe from this list: send the line "unsubscribe linux-newbie" in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
-Please read the FAQ at http://www.linux-learn.org/faqs
+1.9.1
