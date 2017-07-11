@@ -1,84 +1,82 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: HELP writing crypto driver for HW with blocksize hash
-Date: Tue, 11 Jul 2017 13:59:27 +0300
-Message-ID: <CAOtvUMdnGscDTPoRDhVnbvHgK=zTnq6cHW2SUoUKWXLOXoyDxQ@mail.gmail.com>
-References: <CGME20170711075213eucas1p1816f12edc165dfe05cb791b155e6f658@eucas1p1.samsung.com>
- <09fb0bef-ee22-edff-c651-a81e3ee6a2ae@partner.samsung.com>
- <CAOtvUMf=CKjZPOi5m7DMzN10Ytd81v_qK3n6aTaCqP1gRMQ6Pg@mail.gmail.com> <6f26d70d-6222-a325-d66b-b00b3591f2ae@partner.samsung.com>
+Subject: Re: [PATCH 00/10] Fix alignment issues in staging/ccree
+Date: Tue, 11 Jul 2017 14:35:54 +0300
+Message-ID: <CAOtvUMdL=brohVZR3b0148Owe9kfdwWNaY8JVsdAqm75N3gFzQ@mail.gmail.com>
+References: <20170701232555.5538-1-simon@nikanor.nu> <CAOtvUMdp+xTAhW1Xd1o0Ch4GjzXgLPHYhyefB9T1p6xjTFVRQQ@mail.gmail.com>
+ <20170703122826.wslnsnhtzk4cczsj@epsilon.nikanor.nu>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: linux-crypto@vger.kernel.org, linux-newbie@vger.kernel.org
-To: Kamil Konieczny <k.konieczny@partner.samsung.com>
-Return-path: <linux-newbie-owner@vger.kernel.org>
-In-Reply-To: <6f26d70d-6222-a325-d66b-b00b3591f2ae@partner.samsung.com>
-Sender: linux-newbie-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org
+To: =?UTF-8?Q?Simon_Sandstr=C3=B6m?= <simon@nikanor.nu>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-yb0-f178.google.com ([209.85.213.178]:33191 "EHLO
+        mail-yb0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750929AbdGKLf4 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 11 Jul 2017 07:35:56 -0400
+Received: by mail-yb0-f178.google.com with SMTP id 84so36998883ybe.0
+        for <linux-crypto@vger.kernel.org>; Tue, 11 Jul 2017 04:35:55 -0700 (PDT)
+In-Reply-To: <20170703122826.wslnsnhtzk4cczsj@epsilon.nikanor.nu>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jul 11, 2017 at 1:50 PM, Kamil Konieczny
-<k.konieczny@partner.samsung.com> wrote:
-> On 11.07.2017 12:30, Gilad Ben-Yossef wrote:
->> On Tue, Jul 11, 2017 at 10:52 AM, Kamil Konieczny
->> <k.konieczny@partner.samsung.com> wrote:
->>>
->>>
->>> I am writing crypto driver for hash MD5/SHA1/SHA256 on Exynos 4412,
->>> and I am facing some (minor?) difficulties. [...]
->
->>> So there is no [...] final method.
->>>
->>> It must be feeded with at least one message byte to produce hash.
->>>
->>> One more constrain is to process data in constant-sized chunks,
->>> here it is 64 bytes, the same as for AES block,
->>> i.e. it cannot stop and export state while in middle of block,
->>> example - if we feed 16 bytes, we must then feed 48 bytes
->>> to stop, but ideally we should feed it always 64 bytes. [...]
->>>
->>> Any suggestions ?
->>>
->>> Can i keep some bytes unfeeded from ahash_request
->>> and return -EINPROGRESS ?
->>> Should i set timer and copy rest bytes after some timeout,
->>> where no more requests are incoming ? Or not ? cause it is
->>> async mode ?
->>> can i wait for more requests for processing waiting one ?
->> Your two constraints are actually inter-related -
+On Mon, Jul 3, 2017 at 3:28 PM, Simon Sandstr=C3=B6m <simon@nikanor.nu> wro=
+te:
+> On Mon, Jul 03, 2017 at 10:19:31AM +0300, Gilad Ben-Yossef wrote:
+>> but for the few cases where its a complex expression that can be
+>> broken down like this one:
 >>
->> If you can only feed the HW a constant size chunk, than indeed need to
->> keey bytes fed
->> to the driver the are below the chunk size in a software buffer, but
->> than you need the final()
->> method to feed these bytes (padded as needed) to the HW if they are
->> the last bytes
+>> WARNING: line over 80 characters
+>> #93: FILE: drivers/staging/ccree/ssi_buffer_mgr.c:437:
+>> +     (AES_BLOCK_SIZE + areq_ctx->ccm_hdr_size),
 >>
->> Gilad
+>> It would be great if you fix those.
 >
-> HW will done padding
+> Do you mean to fix them by just breaking the line after the ternary
+> operator? Is that OK according to the code style rules?
+
+Yes, it is.
+
 >
-> I want to avoid memcpy iff possible for async hash
+> If not, then the two warnings in ssi_aead_handle_config_buf can be
+> fixed by simply having a local variable:
+>
+> const unsigned int buflen =3D AES_BLOCK_SIZE + areq_ctx->ccm_hdr_size;
+>
+> but I'm not sure if the same can be done in
+> ssi_buffer_mgr_map_hash_request_update for (update_data_len - *curr_buf_c=
+nt)
+> as it's not always the case that update_data_len is greater than
+> *curr_buf_cnt. Even if it's safe to always calculate it I'm not
+> entierly sure what to call the variable.
 
-Why? you're talking about a copy of a single cache line at most.
-That hardly seem worth the trouble.
+No need not. I simply meant to break this:
 
+ (update_data_len - *curr_buf_cnt)
+
+To this:
+
+ (update_data_len -
+   *curr_buf_cnt)
+
+Assuming it made sense.
+
+> Other then those two functions I don't think that there are any more
+> lines that can be fixed without renaming functions / variables or
+> by rewriting them to decrease the indentation depth, as you wrote.
+
+No, not in this patch.
+
+Thanks!
 Gilad
 
->
-> --
-> Best regards,
-> Kamil Konieczny
-> Samsung R&D Institute Poland
-
-
-
--- 
+--=20
 Gilad Ben-Yossef
 Chief Coffee Drinker
 
 "If you take a class in large-scale robotics, can you end up in a
 situation where the homework eats your dog?"
  -- Jean-Baptiste Queru
---
-To unsubscribe from this list: send the line "unsubscribe linux-newbie" in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
-Please read the FAQ at http://www.linux-learn.org/faqs
