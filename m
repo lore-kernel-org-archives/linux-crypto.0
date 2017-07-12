@@ -1,75 +1,46 @@
-From: bincy <bincy_k_philip@yahoo.co.in>
-Subject: Re: [PATCH] Stagingdriver cctree: Fix for checkpatch warning
-Date: Wed, 12 Jul 2017 14:23:56 +0530
-Message-ID: <5e1bd391-3f79-f6d6-696a-cfd2ec9ea751@yahoo.co.in>
-References: <1498797169-3093-1-git-send-email-bincy_k_philip@yahoo.co.in>
- <CAOtvUMf3CU7O6x8VpNzPLNtvmKhXC0eDCrueYTpkXErmHcg_hA@mail.gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: change hwrng device default permissions to 0444
+Date: Wed, 12 Jul 2017 18:13:56 +0800
+Message-ID: <20170712101356.GA21862@gondor.apana.org.au>
+References: <1499078279-19135-1-git-send-email-freude@linux.vnet.ibm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
-Content-Transfer-Encoding: 7bit
-Cc: devel@driverdev.osuosl.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- driverdev-devel@linuxdriverproject.org, linux-crypto@vger.kernel.org
-To: Gilad Ben-Yossef <gilad@benyossef.com>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-In-Reply-To: <CAOtvUMf3CU7O6x8VpNzPLNtvmKhXC0eDCrueYTpkXErmHcg_hA@mail.gmail.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, arnd@arndb.de,
+        gregkh@linuxfoundation.org, schwidefsky@de.ibm.com,
+        Christian.Rund@de.ibm.com
+To: Harald Freudenberger <freude@linux.vnet.ibm.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:43396 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932712AbdGLKOa (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 12 Jul 2017 06:14:30 -0400
+Content-Disposition: inline
+In-Reply-To: <1499078279-19135-1-git-send-email-freude@linux.vnet.ibm.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Gilad,
+On Mon, Jul 03, 2017 at 12:37:59PM +0200, Harald Freudenberger wrote:
+> Currently /dev/hwrng uses default device node permissions
+> which is 0600. So by default the device node is not accessible
+> by an ordinary user. Some distros do rewrite the device node
+> permissions via udev rule, others don't. This patch provides
+> 0444 as the new mode value and so makes the device node
+> accessible for all users without the need to have udev rules
+> rewriting the access rights.
+> 
+> Signed-off-by: Harald Freudenberger <freude@linux.vnet.ibm.com>
 
-I have added your comments and resent the patch.Thanks
+Hmm, one usage scenario for /dev/hwrng is to feed rngd which then
+feeds into /dev/random.  In that case it may not be desirable to
+allow arbitrary access to hwrgn since it may cause the rate of
+entropy going into /dev/random to go down.
 
-On 11/07/17 17:16, Gilad Ben-Yossef wrote:
-> Hello Philip,
->
-> Thank your patch.
->
-> Your patch subject line is not descriptive and not formatted well.
->
-> A better subject would be something like:
->
-> staging: ccree: move comment to fit coding style
->
-> Thanks,
-> Gilad
->
-> On Fri, Jun 30, 2017 at 7:32 AM,  <bincy_k_philip@yahoo.co.in> wrote:
->> From: Bincy K Philip <bincy_k_philip@yahoo.co.in>
->>
->> Trivial fix for Line over 80 characters
->>
->> Moved the comment to top of the definition
->>
->> Signed-off-by: Bincy K Philip <bincy_k_philip@yahoo.co.in>
->> ---
->>  drivers/staging/ccree/cc_hw_queue_defs.h | 3 ++-
->>  1 file changed, 2 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/staging/ccree/cc_hw_queue_defs.h b/drivers/staging/ccree/cc_hw_queue_defs.h
->> index aaa56c8..a18e6c9 100644
->> --- a/drivers/staging/ccree/cc_hw_queue_defs.h
->> +++ b/drivers/staging/ccree/cc_hw_queue_defs.h
->> @@ -27,7 +27,8 @@
->>  ******************************************************************************/
->>
->>  #define HW_DESC_SIZE_WORDS             6
->> -#define HW_QUEUE_SLOTS_MAX              15 /* Max. available slots in HW queue */
->> +/* Define max. available slots in HW queue */
->> +#define HW_QUEUE_SLOTS_MAX              15
->>
->>  #define CC_REG_NAME(word, name) DX_DSCRPTR_QUEUE_WORD ## word ## _ ## name
->>
->> --
->> 1.8.3.1
->>
->
->
->
+In any case, as you noted userspace can change this anyway so I
+don't see why we need to make this policy change in the kernel.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
