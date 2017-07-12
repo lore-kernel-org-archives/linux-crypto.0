@@ -1,45 +1,32 @@
-From: David Miller <davem@davemloft.net>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [GIT] Networking
-Date: Tue, 11 Jul 2017 13:31:14 -0700 (PDT)
-Message-ID: <20170711.133114.2003805526568564614.davem@davemloft.net>
+Date: Wed, 12 Jul 2017 09:44:35 +0800
+Message-ID: <20170712014435.GA20764@gondor.apana.org.au>
 References: <20170710100531.GA14940@gondor.apana.org.au>
-        <20170710121002.GB21587@oracle.com>
-        <20170710140048.GA15408@gondor.apana.org.au>
+ <20170710121002.GB21587@oracle.com>
+ <20170710140048.GA15408@gondor.apana.org.au>
+ <20170711.133114.2003805526568564614.davem@davemloft.net>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Cc: sowmini.varadhan@oracle.com, torvalds@linux-foundation.org,
         akpm@linux-foundation.org, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         mitr@redhat.com
-To: herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from shards.monkeyblade.net ([184.105.139.130]:41528 "EHLO
-        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932577AbdGKUbQ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Jul 2017 16:31:16 -0400
-In-Reply-To: <20170710140048.GA15408@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+To: David Miller <davem@davemloft.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20170711.133114.2003805526568564614.davem@davemloft.net>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Date: Mon, 10 Jul 2017 22:00:48 +0800
+On Tue, Jul 11, 2017 at 01:31:14PM -0700, David Miller wrote:
+>
+> Acked-by: David S. Miller <davem@davemloft.net>
+> 
+> Looks good, is this going via my tree or your's?
 
-> crypto: af_alg - Avoid sock_graft call warning
-> 
-> The newly added sock_graft warning triggers in af_alg_accept.
-> It's harmless as we're essentially doing sock->sk = sock->sk.
-> 
-> The sock_graft call is actually redundant because all the work
-> it does is subsumed by sock_init_data.  However, it was added
-> to placate SELinux as it uses it to initialise its internal state.
-> 
-> This patch avoisd the warning by making the SELinux call directly.
-> 
-> Reported-by: Linus Torvalds <torvalds@linux-foundation.org>
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-Acked-by: David S. Miller <davem@davemloft.net>
-
-Looks good, is this going via my tree or your's?
+I'll push it along.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
