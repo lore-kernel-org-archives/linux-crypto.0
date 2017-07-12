@@ -1,45 +1,46 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: change hwrng device default permissions to 0444
-Date: Wed, 12 Jul 2017 18:13:56 +0800
-Message-ID: <20170712101356.GA21862@gondor.apana.org.au>
-References: <1499078279-19135-1-git-send-email-freude@linux.vnet.ibm.com>
+Subject: Re: [RFC PATCH] crypto: caam - fix signals handling
+Date: Wed, 12 Jul 2017 18:51:23 +0800
+Message-ID: <20170712105123.GA22109@gondor.apana.org.au>
+References: <20170707135706.5487-1-horia.geanta@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, arnd@arndb.de,
-        gregkh@linuxfoundation.org, schwidefsky@de.ibm.com,
-        Christian.Rund@de.ibm.com
-To: Harald Freudenberger <freude@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, Dan Douglass <dan.douglass@nxp.com>
+To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:43396 "EHLO
+Received: from orcrist.hmeau.com ([104.223.48.154]:45576 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932712AbdGLKOa (ORCPT
+        with ESMTP id S1755884AbdGLKvy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Jul 2017 06:14:30 -0400
+        Wed, 12 Jul 2017 06:51:54 -0400
 Content-Disposition: inline
-In-Reply-To: <1499078279-19135-1-git-send-email-freude@linux.vnet.ibm.com>
+In-Reply-To: <20170707135706.5487-1-horia.geanta@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jul 03, 2017 at 12:37:59PM +0200, Harald Freudenberger wrote:
-> Currently /dev/hwrng uses default device node permissions
-> which is 0600. So by default the device node is not accessible
-> by an ordinary user. Some distros do rewrite the device node
-> permissions via udev rule, others don't. This patch provides
-> 0444 as the new mode value and so makes the device node
-> accessible for all users without the need to have udev rules
-> rewriting the access rights.
+On Fri, Jul 07, 2017 at 04:57:06PM +0300, Horia Geantă wrote:
+> Driver does not properly handle the case when signals interrupt
+> wait_for_completion_interruptible():
+> -it does not check for return value
+> -completion structure is allocated on stack; in case a signal interrupts
+> the sleep, it will go out of scope, causing the worker thread
+> (caam_jr_dequeue) to fail when it accesses it
 > 
-> Signed-off-by: Harald Freudenberger <freude@linux.vnet.ibm.com>
+> wait_for_completion_interruptible() is replaced with uninterruptable
+> wait_for_completion().
+> We choose to block all signals while waiting for I/O (device executing
+> the split key generation job descriptor) since the alternative - in
+> order to have a deterministic device state - would be to flush the job
+> ring (aborting *all* in-progress jobs).
+> 
+> Cc: <stable@vger.kernel.org>
+> Fixes: 045e36780f115 ("crypto: caam - ahash hmac support")
+> Fixes: 4c1ec1f930154 ("crypto: caam - refactor key_gen, sg")
+> Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 
-Hmm, one usage scenario for /dev/hwrng is to feed rngd which then
-feeds into /dev/random.  In that case it may not be desirable to
-allow arbitrary access to hwrgn since it may cause the rate of
-entropy going into /dev/random to go down.
-
-In any case, as you noted userspace can change this anyway so I
-don't see why we need to make this policy change in the kernel.
-
-Cheers,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
