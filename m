@@ -1,75 +1,78 @@
-From: Dave Watson <davejwatson@fb.com>
-Subject: Re: [PATCH v3 net-next 3/4] tls: kernel TLS support
-Date: Wed, 12 Jul 2017 11:34:35 -0700
-Message-ID: <20170712183435.GA34250@davejwatson-mba.dhcp.thefacebook.com>
-References: <cover.1497465295.git.davejwatson@fb.com>
- <20170614183739.GA80368@davejwatson-mba.dhcp.thefacebook.com>
- <20170711062953.GE2631@secunet.com>
- <20170711185311.GA200@davejwatson-mba.dhcp.thefacebook.com>
- <20170712072012.GK2631@secunet.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Cc: Ilya Lesokhin <ilyal@mellanox.com>,
-        Aviad Yehezkel <aviadye@mellanox.com>,
-        Boris Pismenny <borisp@mellanox.com>,
-        Liran Liss <liranl@mellanox.com>,
-        Matan Barak <matanb@mellanox.com>,
-        David Miller <davem@davemloft.net>, <netdev@vger.kernel.org>,
-        Tom Herbert <tom@herbertland.com>,
-        <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>,
-        Hannes Frederic Sowa <hannes@stressinduktion.org>,
-        Eric Dumazet <eric.dumazet@gmail.com>,
-        Alexei Starovoitov <alexei.starovoitov@gmail.com>,
-        <nmav@gnutls.org>, <fridolin.pokorny@gmail.com>
-To: Steffen Klassert <steffen.klassert@secunet.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:40621 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1752347AbdGLSfM (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Jul 2017 14:35:12 -0400
-Content-Disposition: inline
-In-Reply-To: <20170712072012.GK2631@secunet.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Eric Biggers <ebiggers3@gmail.com>
+Subject: [PATCH 0/6] fscrypt: key verification and KDF improvement
+Date: Wed, 12 Jul 2017 14:00:29 -0700
+Message-ID: <20170712210035.51534-1-ebiggers3@gmail.com>
+Cc: linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-mtd@lists.infradead.org, linux-crypto@vger.kernel.org,
+        "Theodore Y . Ts'o" <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Alex Cope <alexcope@google.com>,
+        Eric Biggers <ebiggers@google.com>
+To: linux-fscrypt@vger.kernel.org
+Return-path: <linux-ext4-owner@vger.kernel.org>
+Sender: linux-ext4-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 07/12/17 09:20 AM, Steffen Klassert wrote:
-> On Tue, Jul 11, 2017 at 11:53:11AM -0700, Dave Watson wrote:
-> > On 07/11/17 08:29 AM, Steffen Klassert wrote:
-> > > Sorry for replying to old mail...
-> > > > +int tls_set_sw_offload(struct sock *sk, struct tls_context *ctx)
-> > > > +{
-> > > 
-> > > ...
-> > > 
-> > > > +
-> > > > +	if (!sw_ctx->aead_send) {
-> > > > +		sw_ctx->aead_send = crypto_alloc_aead("gcm(aes)", 0, 0);
-> > > > +		if (IS_ERR(sw_ctx->aead_send)) {
-> > > > +			rc = PTR_ERR(sw_ctx->aead_send);
-> > > > +			sw_ctx->aead_send = NULL;
-> > > > +			goto free_rec_seq;
-> > > > +		}
-> > > > +	}
-> > > > +
-> > > 
-> > > When I look on how you allocate the aead transformation, it seems
-> > > that you should either register an asynchronous callback with
-> > > aead_request_set_callback(), or request for a synchronous algorithm.
-> > > 
-> > > Otherwise you will crash on an asynchronous crypto return, no?
-> > 
-> > The intention is for it to be synchronous, and gather directly from
-> > userspace buffers.  It looks like calling
-> > crypto_alloc_aead("gcm(aes)", 0, CRYPTO_ALG_ASYNC) is the correct way
-> > to request synchronous algorithms only?
-> 
-> Yes, but then you loose the aes-ni based algorithms because they are
-> asynchronous. If you want to have good crypto performance, it is
-> better to implement the asynchronous callbacks.
+From: Eric Biggers <ebiggers@google.com>
 
-Right, the trick is we want both aesni, and to guarantee that we are
-done using the input buffers before sendmsg() returns.  For now I can
-set a callback, and wait on a completion.  The initial use case of
-userspace openssl integration shouldn't hit the aesni async case
-anyway (!irq_fpu_usable())
+This patch series solves two major problems which filesystem-level
+encryption has currently.  First, the user-supplied master keys are not
+verified, which means a malicious user can provide the wrong key for
+another user's file and cause a DOS attack or worse.  This flaw has been
+criticized in the past [1].  Second, the KDF (Key Derivation Function)
+used to derive per-file keys is ad-hoc and nonstandard.  While it meets
+the primary security requirement, it's inflexible and is missing some
+useful properties such as non-reversibility, which is important under
+some threat models.  This weakness was noted by Unterluggauer and
+Mangard (2016) [2] who also demonstrated an EM attack against the
+current AES-based KDF.
+
+These problems are solved together by introducing a new encryption
+policy version where the KDF is changed to HKDF-SHA512, i.e. RFC-5869
+[3] with SHA-512 as the underlying hash function.  HKDF is used to
+derive the per-file keys as well as to generate a "key hash" which is
+stored on-disk to allow key verification.  The HMAC transform for each
+master key is pre-keyed and cached, which in practice makes the new KDF
+about as fast or even faster than the old one which did not use the
+crypto API efficiently.
+
+Please give special consideration to the choice and usage of crypto
+algorithms and any other on-disk format and API changes, since we will
+be locked into these once merged.
+
+All these changes are independent of filesystem and encryption mode,
+i.e. the "v2" encryption policies can be used on any fscrypt-capable
+filesystem (ext4, f2fs, or ubifs currently) and with any of the
+supported encryption modes.
+
+References:
+  [1] https://blog.quarkslab.com/a-glimpse-of-ext4-filesystem-level-encryption.html
+
+  [2] Unterluggauer and Mangard (2016).  "Exploiting the Physical
+      Disparity: Side-Channel Attacks on Memory Encryption".
+      https://eprint.iacr.org/2016/473.pdf
+
+  [3] RFC 5869. "HMAC-based Extract-and-Expand Key Derivation Function
+      (HKDF)".  https://tools.ietf.org/html/rfc5869
+
+Eric Biggers (6):
+  fscrypt: add v2 encryption context and policy
+  fscrypt: rename ->ci_master_key to ->ci_master_key_descriptor
+  fscrypt: use HKDF-SHA512 to derive the per-inode encryption keys
+  fscrypt: verify that the correct master key was supplied
+  fscrypt: cache the HMAC transform for each master key
+  fscrypt: for v2 policies, support "fscrypt:" key prefix only
+
+ fs/crypto/Kconfig              |   2 +
+ fs/crypto/fscrypt_private.h    | 109 ++++++-
+ fs/crypto/keyinfo.c            | 669 ++++++++++++++++++++++++++++++++++-------
+ fs/crypto/policy.c             | 118 ++++++--
+ fs/super.c                     |   4 +
+ include/linux/fs.h             |   5 +
+ include/linux/fscrypt_common.h |   2 +-
+ include/uapi/linux/fs.h        |   6 +
+ 8 files changed, 766 insertions(+), 149 deletions(-)
+
+-- 
+2.13.2.932.g7449e964c-goog
