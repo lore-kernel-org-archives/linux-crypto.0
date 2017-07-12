@@ -1,37 +1,40 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: cavium: make several functions static
-Date: Wed, 12 Jul 2017 18:52:21 +0800
-Message-ID: <20170712105221.GE22109@gondor.apana.org.au>
-References: <20170620103550.7660-1-colin.king@canonical.com>
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+Subject: Decreasing time for `rsa_init`
+Date: Wed, 12 Jul 2017 12:59:58 +0200
+Message-ID: <4ec5a3f5-9605-cdcd-23cf-1df7b3af211c@molgen.mpg.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: George Cherian <george.cherian@cavium.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: Colin King <colin.king@canonical.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: linux-kernel@vger.kernel.org
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:45626 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756481AbdGLKwy (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Jul 2017 06:52:54 -0400
-Content-Disposition: inline
-In-Reply-To: <20170620103550.7660-1-colin.king@canonical.com>
+Received: from mx3.molgen.mpg.de ([141.14.17.11]:50000 "EHLO mx1.molgen.mpg.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1756559AbdGLLAB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 12 Jul 2017 07:00:01 -0400
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jun 20, 2017 at 11:35:50AM +0100, Colin King wrote:
-> From: Colin Ian King <colin.king@canonical.com>
-> 
-> The functions cvm_encrypt, cvm_decrypt, cvm_xts_setkey and
-> cvm_enc_dec_init does not need to be in global scope, so make
-> them static.
-> 
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
+Dear Linux crypto folks,
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
+Building CRYPTO_RSA not as module, but into the Linux kernel, 
+`rsa_init()` takes 130 ms on an ASRock E350M1.
+
+(Timings are shown by adding `initcall_debug` to Linux command line [1]. 
+The times are visualized by `analyze_boot.py` from pm-graph [2] or 
+`systemd-bootchart`.)
+
+This is quite a lot of time compared to other modules, and I wonder if 
+there are ways to decrease that time other than building it as a module, 
+and not signing modules?
+
+
+Kind regards,
+
+Paul
+
+
+[1] http://elinux.org/Initcall_Debug
+[2] https://github.com/01org/pm-graph
