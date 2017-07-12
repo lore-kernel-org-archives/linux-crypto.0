@@ -1,60 +1,75 @@
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-Subject: Re: Decreasing time for `rsa_init`
-Date: Wed, 12 Jul 2017 19:38:32 +0200
-Message-ID: <8d89fefa-b27d-ba32-e7b2-75312549ee90@molgen.mpg.de>
-References: <4ec5a3f5-9605-cdcd-23cf-1df7b3af211c@molgen.mpg.de>
- <3649766.4rHtxdK8Pi@tauon.chronox.de>
+From: Dave Watson <davejwatson@fb.com>
+Subject: Re: [PATCH v3 net-next 3/4] tls: kernel TLS support
+Date: Wed, 12 Jul 2017 11:34:35 -0700
+Message-ID: <20170712183435.GA34250@davejwatson-mba.dhcp.thefacebook.com>
+References: <cover.1497465295.git.davejwatson@fb.com>
+ <20170614183739.GA80368@davejwatson-mba.dhcp.thefacebook.com>
+ <20170711062953.GE2631@secunet.com>
+ <20170711185311.GA200@davejwatson-mba.dhcp.thefacebook.com>
+ <20170712072012.GK2631@secunet.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: =?UTF-8?Q?Stephan_M=c3=bcller?= <smueller@chronox.de>
+Content-Type: text/plain; charset="us-ascii"
+Cc: Ilya Lesokhin <ilyal@mellanox.com>,
+        Aviad Yehezkel <aviadye@mellanox.com>,
+        Boris Pismenny <borisp@mellanox.com>,
+        Liran Liss <liranl@mellanox.com>,
+        Matan Barak <matanb@mellanox.com>,
+        David Miller <davem@davemloft.net>, <netdev@vger.kernel.org>,
+        Tom Herbert <tom@herbertland.com>,
+        <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>,
+        Hannes Frederic Sowa <hannes@stressinduktion.org>,
+        Eric Dumazet <eric.dumazet@gmail.com>,
+        Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+        <nmav@gnutls.org>, <fridolin.pokorny@gmail.com>
+To: Steffen Klassert <steffen.klassert@secunet.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx3.molgen.mpg.de ([141.14.17.11]:51001 "EHLO mx1.molgen.mpg.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1750869AbdGLRie (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Jul 2017 13:38:34 -0400
-In-Reply-To: <3649766.4rHtxdK8Pi@tauon.chronox.de>
-Content-Language: en-US
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:40621 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1752347AbdGLSfM (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 12 Jul 2017 14:35:12 -0400
+Content-Disposition: inline
+In-Reply-To: <20170712072012.GK2631@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Dear Stephan,
-
-
-Thank you for the quick response.
-
-
-On 07/12/17 19:28, Stephan Müller wrote:
-> Am Mittwoch, 12. Juli 2017, 12:59:58 CEST schrieb Paul Menzel:
-
->> Building CRYPTO_RSA not as module, but into the Linux kernel,
->> `rsa_init()` takes 130 ms on an ASRock E350M1.
->>
->> (Timings are shown by adding `initcall_debug` to Linux command line [1].
->> The times are visualized by `analyze_boot.py` from pm-graph [2] or
->> `systemd-bootchart`.)
->>
->> This is quite a lot of time compared to other modules, and I wonder if
->> there are ways to decrease that time other than building it as a module,
->> and not signing modules?
+On 07/12/17 09:20 AM, Steffen Klassert wrote:
+> On Tue, Jul 11, 2017 at 11:53:11AM -0700, Dave Watson wrote:
+> > On 07/11/17 08:29 AM, Steffen Klassert wrote:
+> > > Sorry for replying to old mail...
+> > > > +int tls_set_sw_offload(struct sock *sk, struct tls_context *ctx)
+> > > > +{
+> > > 
+> > > ...
+> > > 
+> > > > +
+> > > > +	if (!sw_ctx->aead_send) {
+> > > > +		sw_ctx->aead_send = crypto_alloc_aead("gcm(aes)", 0, 0);
+> > > > +		if (IS_ERR(sw_ctx->aead_send)) {
+> > > > +			rc = PTR_ERR(sw_ctx->aead_send);
+> > > > +			sw_ctx->aead_send = NULL;
+> > > > +			goto free_rec_seq;
+> > > > +		}
+> > > > +	}
+> > > > +
+> > > 
+> > > When I look on how you allocate the aead transformation, it seems
+> > > that you should either register an asynchronous callback with
+> > > aead_request_set_callback(), or request for a synchronous algorithm.
+> > > 
+> > > Otherwise you will crash on an asynchronous crypto return, no?
+> > 
+> > The intention is for it to be synchronous, and gather directly from
+> > userspace buffers.  It looks like calling
+> > crypto_alloc_aead("gcm(aes)", 0, CRYPTO_ALG_ASYNC) is the correct way
+> > to request synchronous algorithms only?
 > 
-> Is the testmgr compiled? If yes, the self test may take that time.
+> Yes, but then you loose the aes-ni based algorithms because they are
+> asynchronous. If you want to have good crypto performance, it is
+> better to implement the asynchronous callbacks.
 
-It looks like it is, as the tests are not disabled.
-
-```
-$ grep MANAGER_DISABLE_TESTS .config
-# CONFIG_CRYPTO_MANAGER_DISABLE_TESTS is not set
-```
-
-I’ll try an image without the tests, and will report back.
-
-
-Kind regards,
-
-Paul
-
-
->> [1] http://elinux.org/Initcall_Debug
->> [2] https://github.com/01org/pm-graph
+Right, the trick is we want both aesni, and to guarantee that we are
+done using the input buffers before sendmsg() returns.  For now I can
+set a callback, and wait on a completion.  The initial use case of
+userspace openssl integration shouldn't hit the aesni async case
+anyway (!irq_fpu_usable())
