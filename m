@@ -1,76 +1,75 @@
-From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: Re: [PATCH v3 net-next 3/4] tls: kernel TLS support
-Date: Wed, 12 Jul 2017 09:20:13 +0200
-Message-ID: <20170712072012.GK2631@secunet.com>
-References: <cover.1497465295.git.davejwatson@fb.com>
- <20170614183739.GA80368@davejwatson-mba.dhcp.thefacebook.com>
- <20170711062953.GE2631@secunet.com>
- <20170711185311.GA200@davejwatson-mba.dhcp.thefacebook.com>
+From: bincy <bincy_k_philip@yahoo.co.in>
+Subject: Re: [PATCH] Stagingdriver cctree: Fix for checkpatch warning
+Date: Wed, 12 Jul 2017 14:23:56 +0530
+Message-ID: <5e1bd391-3f79-f6d6-696a-cfd2ec9ea751@yahoo.co.in>
+References: <1498797169-3093-1-git-send-email-bincy_k_philip@yahoo.co.in>
+ <CAOtvUMf3CU7O6x8VpNzPLNtvmKhXC0eDCrueYTpkXErmHcg_hA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Cc: Ilya Lesokhin <ilyal@mellanox.com>,
-        Aviad Yehezkel <aviadye@mellanox.com>,
-        Boris Pismenny <borisp@mellanox.com>,
-        Liran Liss <liranl@mellanox.com>,
-        "Matan Barak" <matanb@mellanox.com>,
-        David Miller <davem@davemloft.net>, <netdev@vger.kernel.org>,
-        Tom Herbert <tom@herbertland.com>,
-        <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>,
-        "Hannes Frederic Sowa" <hannes@stressinduktion.org>,
-        Eric Dumazet <eric.dumazet@gmail.com>,
-        Alexei Starovoitov <alexei.starovoitov@gmail.com>,
-        <nmav@gnutls.org>, <fridolin.pokorny@gmail.com>
-To: Dave Watson <davejwatson@fb.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([62.96.220.36]:49468 "EHLO a.mx.secunet.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1756775AbdGLHUV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Jul 2017 03:20:21 -0400
-Content-Disposition: inline
-In-Reply-To: <20170711185311.GA200@davejwatson-mba.dhcp.thefacebook.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: 7bit
+Cc: devel@driverdev.osuosl.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ driverdev-devel@linuxdriverproject.org, linux-crypto@vger.kernel.org
+To: Gilad Ben-Yossef <gilad@benyossef.com>
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+In-Reply-To: <CAOtvUMf3CU7O6x8VpNzPLNtvmKhXC0eDCrueYTpkXErmHcg_hA@mail.gmail.com>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Jul 11, 2017 at 11:53:11AM -0700, Dave Watson wrote:
-> On 07/11/17 08:29 AM, Steffen Klassert wrote:
-> > Sorry for replying to old mail...
-> > > +int tls_set_sw_offload(struct sock *sk, struct tls_context *ctx)
-> > > +{
-> > 
-> > ...
-> > 
-> > > +
-> > > +	if (!sw_ctx->aead_send) {
-> > > +		sw_ctx->aead_send = crypto_alloc_aead("gcm(aes)", 0, 0);
-> > > +		if (IS_ERR(sw_ctx->aead_send)) {
-> > > +			rc = PTR_ERR(sw_ctx->aead_send);
-> > > +			sw_ctx->aead_send = NULL;
-> > > +			goto free_rec_seq;
-> > > +		}
-> > > +	}
-> > > +
-> > 
-> > When I look on how you allocate the aead transformation, it seems
-> > that you should either register an asynchronous callback with
-> > aead_request_set_callback(), or request for a synchronous algorithm.
-> > 
-> > Otherwise you will crash on an asynchronous crypto return, no?
-> 
-> The intention is for it to be synchronous, and gather directly from
-> userspace buffers.  It looks like calling
-> crypto_alloc_aead("gcm(aes)", 0, CRYPTO_ALG_ASYNC) is the correct way
-> to request synchronous algorithms only?
+Hi Gilad,
 
-Yes, but then you loose the aes-ni based algorithms because they are
-asynchronous. If you want to have good crypto performance, it is
-better to implement the asynchronous callbacks.
+I have added your comments and resent the patch.Thanks
 
-> 
-> > Also, it seems that you have your scatterlists on a per crypto
-> > transformation base istead of per crypto request. Is this intentional?
-> 
-> We hold the socket lock and only one crypto op can happen at a time,
-> so we reuse the scatterlists.
-
-This is OK as long as the crypto happens synchronous. But as said above,
-I think this is not what you want.
+On 11/07/17 17:16, Gilad Ben-Yossef wrote:
+> Hello Philip,
+>
+> Thank your patch.
+>
+> Your patch subject line is not descriptive and not formatted well.
+>
+> A better subject would be something like:
+>
+> staging: ccree: move comment to fit coding style
+>
+> Thanks,
+> Gilad
+>
+> On Fri, Jun 30, 2017 at 7:32 AM,  <bincy_k_philip@yahoo.co.in> wrote:
+>> From: Bincy K Philip <bincy_k_philip@yahoo.co.in>
+>>
+>> Trivial fix for Line over 80 characters
+>>
+>> Moved the comment to top of the definition
+>>
+>> Signed-off-by: Bincy K Philip <bincy_k_philip@yahoo.co.in>
+>> ---
+>>  drivers/staging/ccree/cc_hw_queue_defs.h | 3 ++-
+>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/staging/ccree/cc_hw_queue_defs.h b/drivers/staging/ccree/cc_hw_queue_defs.h
+>> index aaa56c8..a18e6c9 100644
+>> --- a/drivers/staging/ccree/cc_hw_queue_defs.h
+>> +++ b/drivers/staging/ccree/cc_hw_queue_defs.h
+>> @@ -27,7 +27,8 @@
+>>  ******************************************************************************/
+>>
+>>  #define HW_DESC_SIZE_WORDS             6
+>> -#define HW_QUEUE_SLOTS_MAX              15 /* Max. available slots in HW queue */
+>> +/* Define max. available slots in HW queue */
+>> +#define HW_QUEUE_SLOTS_MAX              15
+>>
+>>  #define CC_REG_NAME(word, name) DX_DSCRPTR_QUEUE_WORD ## word ## _ ## name
+>>
+>> --
+>> 1.8.3.1
+>>
+>
+>
+>
