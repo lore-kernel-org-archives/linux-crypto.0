@@ -1,7 +1,7 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 01/12] staging: ccree remove unnecessary parentheses
-Date: Thu, 13 Jul 2017 11:19:51 +0300
-Message-ID: <1499934004-28513-2-git-send-email-gilad@benyossef.com>
+Subject: [PATCH 02/12] staging: ccree: clean up struct ssi_aead_ctx
+Date: Thu, 13 Jul 2017 11:19:52 +0300
+Message-ID: <1499934004-28513-3-git-send-email-gilad@benyossef.com>
 References: <1499934004-28513-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -23,158 +23,199 @@ Errors-To: driverdev-devel-bounces@linuxdriverproject.org
 Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-Remove unnecessary parentheses from ccree driver code.
+struct ssi_aead_ctx has some nested structure defined, resulting
+in code accessing them to be very unreadable.
+
+Move out the nested structure definitions out of the struct
+and use the change to make the code accessing it more readable
+and better coding style compliant by shortening lines and
+properly matching alignment,
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/ssi_aead.c        | 4 ++--
- drivers/staging/ccree/ssi_buffer_mgr.c  | 8 ++++----
- drivers/staging/ccree/ssi_driver.c      | 2 +-
- drivers/staging/ccree/ssi_ivgen.c       | 2 +-
- drivers/staging/ccree/ssi_request_mgr.c | 2 +-
- drivers/staging/ccree/ssi_sysfs.c       | 8 ++++----
- 6 files changed, 13 insertions(+), 13 deletions(-)
+ drivers/staging/ccree/ssi_aead.c | 108 +++++++++++++++++++++++----------------
+ 1 file changed, 64 insertions(+), 44 deletions(-)
 
 diff --git a/drivers/staging/ccree/ssi_aead.c b/drivers/staging/ccree/ssi_aead.c
-index 3a10c31..99eeeda 100644
+index 99eeeda..fd37dde 100644
 --- a/drivers/staging/ccree/ssi_aead.c
 +++ b/drivers/staging/ccree/ssi_aead.c
-@@ -92,7 +92,7 @@ static void ssi_aead_exit(struct crypto_aead *tfm)
- 	struct ssi_aead_ctx *ctx = crypto_aead_ctx(tfm);
+@@ -56,22 +56,26 @@ struct ssi_aead_handle {
+ 	struct list_head aead_list;
+ };
  
- 	SSI_LOG_DEBUG("Clearing context @%p for %s\n",
--		crypto_aead_ctx(tfm), crypto_tfm_alg_name(&(tfm->base)));
-+		crypto_aead_ctx(tfm), crypto_tfm_alg_name(&tfm->base));
++struct cc_hmac_s {
++	u8 *padded_authkey;
++	u8 *ipad_opad; /* IPAD, OPAD*/
++	dma_addr_t padded_authkey_dma_addr;
++	dma_addr_t ipad_opad_dma_addr;
++};
++
++struct cc_xcbc_s {
++	u8 *xcbc_keys; /* K1,K2,K3 */
++	dma_addr_t xcbc_keys_dma_addr;
++};
++
+ struct ssi_aead_ctx {
+ 	struct ssi_drvdata *drvdata;
+ 	u8 ctr_nonce[MAX_NONCE_SIZE]; /* used for ctr3686 iv and aes ccm */
+ 	u8 *enckey;
+ 	dma_addr_t enckey_dma_addr;
+ 	union {
+-		struct {
+-			u8 *padded_authkey;
+-			u8 *ipad_opad; /* IPAD, OPAD*/
+-			dma_addr_t padded_authkey_dma_addr;
+-			dma_addr_t ipad_opad_dma_addr;
+-		} hmac;
+-		struct {
+-			u8 *xcbc_keys; /* K1,K2,K3 */
+-			dma_addr_t xcbc_keys_dma_addr;
+-		} xcbc;
++		struct cc_hmac_s hmac;
++		struct cc_xcbc_s xcbc;
+ 	} auth_state;
+ 	unsigned int enc_keylen;
+ 	unsigned int auth_keylen;
+@@ -105,33 +109,37 @@ static void ssi_aead_exit(struct crypto_aead *tfm)
+ 	}
  
- 	dev = &ctx->drvdata->plat_dev->dev;
- 	/* Unmap enckey buffer */
-@@ -143,7 +143,7 @@ static int ssi_aead_init(struct crypto_aead *tfm)
- 	struct ssi_aead_ctx *ctx = crypto_aead_ctx(tfm);
- 	struct ssi_crypto_alg *ssi_alg =
- 			container_of(alg, struct ssi_crypto_alg, aead_alg);
--	SSI_LOG_DEBUG("Initializing context @%p for %s\n", ctx, crypto_tfm_alg_name(&(tfm->base)));
-+	SSI_LOG_DEBUG("Initializing context @%p for %s\n", ctx, crypto_tfm_alg_name(&tfm->base));
- 
- 	/* Initialize modes in instance */
- 	ctx->cipher_mode = ssi_alg->cipher_mode;
-diff --git a/drivers/staging/ccree/ssi_buffer_mgr.c b/drivers/staging/ccree/ssi_buffer_mgr.c
-index feeaf8d..4127f9f 100644
---- a/drivers/staging/ccree/ssi_buffer_mgr.c
-+++ b/drivers/staging/ccree/ssi_buffer_mgr.c
-@@ -221,7 +221,7 @@ static int ssi_buffer_mgr_generate_mlli(
- 	/* Allocate memory from the pointed pool */
- 	mlli_params->mlli_virt_addr = dma_pool_alloc(
- 			mlli_params->curr_pool, GFP_KERNEL,
--			&(mlli_params->mlli_dma_addr));
-+			&mlli_params->mlli_dma_addr);
- 	if (unlikely(!mlli_params->mlli_virt_addr)) {
- 		SSI_LOG_ERR("dma_pool_alloc() failed\n");
- 		rc = -ENOMEM;
-@@ -249,7 +249,7 @@ static int ssi_buffer_mgr_generate_mlli(
- 			/*Calculate the current MLLI table length for the
- 			 *length field in the descriptor
- 			 */
--			*(sg_data->mlli_nents[i]) +=
-+			*sg_data->mlli_nents[i] +=
- 				(total_nents - prev_total_nents);
- 			prev_total_nents = total_nents;
+ 	if (ctx->auth_mode == DRV_HASH_XCBC_MAC) { /* XCBC authetication */
+-		if (ctx->auth_state.xcbc.xcbc_keys) {
++		struct cc_xcbc_s *xcbc = &ctx->auth_state.xcbc;
++
++		if (xcbc->xcbc_keys) {
+ 			dma_free_coherent(dev, CC_AES_128_BIT_KEY_SIZE * 3,
+-				ctx->auth_state.xcbc.xcbc_keys,
+-				ctx->auth_state.xcbc.xcbc_keys_dma_addr);
++					  xcbc->xcbc_keys,
++					  xcbc->xcbc_keys_dma_addr);
  		}
-@@ -1176,7 +1176,7 @@ static inline int ssi_buffer_mgr_aead_chain_data(
- 
- 		rc = ssi_buffer_mgr_map_scatterlist(dev, req->dst, size_for_map,
- 						    DMA_BIDIRECTIONAL,
--						    &(areq_ctx->dst.nents),
-+						    &areq_ctx->dst.nents,
- 						    LLI_MAX_NUM_OF_DATA_ENTRIES,
- 						    &dst_last_bytes,
- 						    &dst_mapped_nents);
-@@ -1407,7 +1407,7 @@ int ssi_buffer_mgr_map_aead_request(
- 	if (is_gcm4543)
- 		size_to_map += crypto_aead_ivsize(tfm);
- 	rc = ssi_buffer_mgr_map_scatterlist(dev, req->src,
--					    size_to_map, DMA_BIDIRECTIONAL, &(areq_ctx->src.nents),
-+					    size_to_map, DMA_BIDIRECTIONAL, &areq_ctx->src.nents,
- 					    LLI_MAX_NUM_OF_ASSOC_DATA_ENTRIES + LLI_MAX_NUM_OF_DATA_ENTRIES, &dummy, &mapped_nents);
- 	if (unlikely(rc != 0)) {
- 		rc = -ENOMEM;
-diff --git a/drivers/staging/ccree/ssi_driver.c b/drivers/staging/ccree/ssi_driver.c
-index afb7c48..4246c9b 100644
---- a/drivers/staging/ccree/ssi_driver.c
-+++ b/drivers/staging/ccree/ssi_driver.c
-@@ -327,7 +327,7 @@ static int init_cc_resources(struct platform_device *plat_dev)
+ 		SSI_LOG_DEBUG("Freed xcbc_keys DMA buffer xcbc_keys_dma_addr=0x%llX\n",
+-			(unsigned long long)ctx->auth_state.xcbc.xcbc_keys_dma_addr);
+-		ctx->auth_state.xcbc.xcbc_keys_dma_addr = 0;
+-		ctx->auth_state.xcbc.xcbc_keys = NULL;
++			      (unsigned long long)xcbc->xcbc_keys_dma_addr);
++		xcbc->xcbc_keys_dma_addr = 0;
++		xcbc->xcbc_keys = NULL;
+ 	} else if (ctx->auth_mode != DRV_HASH_NULL) { /* HMAC auth. */
+-		if (ctx->auth_state.hmac.ipad_opad) {
++		struct cc_hmac_s *hmac = &ctx->auth_state.hmac;
++
++		if (hmac->ipad_opad) {
+ 			dma_free_coherent(dev, 2 * MAX_HMAC_DIGEST_SIZE,
+-				ctx->auth_state.hmac.ipad_opad,
+-				ctx->auth_state.hmac.ipad_opad_dma_addr);
++					  hmac->ipad_opad,
++					  hmac->ipad_opad_dma_addr);
+ 			SSI_LOG_DEBUG("Freed ipad_opad DMA buffer ipad_opad_dma_addr=0x%llX\n",
+-				(unsigned long long)ctx->auth_state.hmac.ipad_opad_dma_addr);
+-			ctx->auth_state.hmac.ipad_opad_dma_addr = 0;
+-			ctx->auth_state.hmac.ipad_opad = NULL;
++				      (unsigned long long)hmac->ipad_opad_dma_addr);
++			hmac->ipad_opad_dma_addr = 0;
++			hmac->ipad_opad = NULL;
+ 		}
+-		if (ctx->auth_state.hmac.padded_authkey) {
++		if (hmac->padded_authkey) {
+ 			dma_free_coherent(dev, MAX_HMAC_BLOCK_SIZE,
+-				ctx->auth_state.hmac.padded_authkey,
+-				ctx->auth_state.hmac.padded_authkey_dma_addr);
++					  hmac->padded_authkey,
++					  hmac->padded_authkey_dma_addr);
+ 			SSI_LOG_DEBUG("Freed padded_authkey DMA buffer padded_authkey_dma_addr=0x%llX\n",
+-				(unsigned long long)ctx->auth_state.hmac.padded_authkey_dma_addr);
+-			ctx->auth_state.hmac.padded_authkey_dma_addr = 0;
+-			ctx->auth_state.hmac.padded_authkey = NULL;
++				(unsigned long long)hmac->padded_authkey_dma_addr);
++			hmac->padded_authkey_dma_addr = 0;
++			hmac->padded_authkey = NULL;
+ 		}
  	}
- 
- #ifdef ENABLE_CC_SYSFS
--	rc = ssi_sysfs_init(&(plat_dev->dev.kobj), new_drvdata);
-+	rc = ssi_sysfs_init(&plat_dev->dev.kobj, new_drvdata);
- 	if (unlikely(rc != 0)) {
- 		SSI_LOG_ERR("init_stat_db failed\n");
- 		goto init_cc_res_err;
-diff --git a/drivers/staging/ccree/ssi_ivgen.c b/drivers/staging/ccree/ssi_ivgen.c
-index 5ff3368..025bff5 100644
---- a/drivers/staging/ccree/ssi_ivgen.c
-+++ b/drivers/staging/ccree/ssi_ivgen.c
-@@ -158,7 +158,7 @@ int ssi_ivgen_init_sram_pool(struct ssi_drvdata *drvdata)
- void ssi_ivgen_fini(struct ssi_drvdata *drvdata)
- {
- 	struct ssi_ivgen_ctx *ivgen_ctx = drvdata->ivgen_handle;
--	struct device *device = &(drvdata->plat_dev->dev);
-+	struct device *device = &drvdata->plat_dev->dev;
- 
- 	if (!ivgen_ctx)
- 		return;
-diff --git a/drivers/staging/ccree/ssi_request_mgr.c b/drivers/staging/ccree/ssi_request_mgr.c
-index 3d6020a..0c8988c 100644
---- a/drivers/staging/ccree/ssi_request_mgr.c
-+++ b/drivers/staging/ccree/ssi_request_mgr.c
-@@ -317,7 +317,7 @@ int send_request(
- 	if (!is_dout) {
- 		init_completion(&ssi_req->seq_compl);
- 		ssi_req->user_cb = request_mgr_complete;
--		ssi_req->user_arg = &(ssi_req->seq_compl);
-+		ssi_req->user_arg = &ssi_req->seq_compl;
- 		total_seq_len++;
- 	}
- 
-diff --git a/drivers/staging/ccree/ssi_sysfs.c b/drivers/staging/ccree/ssi_sysfs.c
-index 28a46c7..802fd49 100644
---- a/drivers/staging/ccree/ssi_sysfs.c
-+++ b/drivers/staging/ccree/ssi_sysfs.c
-@@ -257,7 +257,7 @@ void update_host_stat(unsigned int op_type, unsigned int phase, cycles_t result)
- 	unsigned long flags;
- 
- 	spin_lock_irqsave(&stat_lock, flags);
--	update_db(&(stat_host_db[op_type][phase]), (unsigned int)result);
-+	update_db(&stat_host_db[op_type][phase], (unsigned int)result);
- 	spin_unlock_irqrestore(&stat_lock, flags);
  }
+@@ -165,31 +173,42 @@ static int ssi_aead_init(struct crypto_aead *tfm)
+ 	/* Set default authlen value */
  
-@@ -266,7 +266,7 @@ void update_cc_stat(
- 	unsigned int phase,
- 	unsigned int elapsed_cycles)
- {
--	update_db(&(stat_cc_db[op_type][phase]), elapsed_cycles);
-+	update_db(&stat_cc_db[op_type][phase], elapsed_cycles);
- }
+ 	if (ctx->auth_mode == DRV_HASH_XCBC_MAC) { /* XCBC authetication */
++		struct cc_xcbc_s *xcbc = &ctx->auth_state.xcbc;
++		const unsigned int key_size = CC_AES_128_BIT_KEY_SIZE * 3;
++
+ 		/* Allocate dma-coherent buffer for XCBC's K1+K2+K3 */
+ 		/* (and temporary for user key - up to 256b) */
+-		ctx->auth_state.xcbc.xcbc_keys = dma_alloc_coherent(dev,
+-			CC_AES_128_BIT_KEY_SIZE * 3,
+-			&ctx->auth_state.xcbc.xcbc_keys_dma_addr, GFP_KERNEL);
+-		if (!ctx->auth_state.xcbc.xcbc_keys) {
++		xcbc->xcbc_keys = dma_alloc_coherent(dev, key_size,
++						     &xcbc->xcbc_keys_dma_addr,
++						     GFP_KERNEL);
++		if (!xcbc->xcbc_keys) {
+ 			SSI_LOG_ERR("Failed allocating buffer for XCBC keys\n");
+ 			goto init_failed;
+ 		}
+ 	} else if (ctx->auth_mode != DRV_HASH_NULL) { /* HMAC authentication */
++		struct cc_hmac_s *hmac = &ctx->auth_state.hmac;
++		const unsigned int digest_size = 2 * MAX_HMAC_DIGEST_SIZE;
++		dma_addr_t *pkey_dma = &hmac->padded_authkey_dma_addr;
++
+ 		/* Allocate dma-coherent buffer for IPAD + OPAD */
+-		ctx->auth_state.hmac.ipad_opad = dma_alloc_coherent(dev,
+-			2 * MAX_HMAC_DIGEST_SIZE,
+-			&ctx->auth_state.hmac.ipad_opad_dma_addr, GFP_KERNEL);
+-		if (!ctx->auth_state.hmac.ipad_opad) {
++		hmac->ipad_opad = dma_alloc_coherent(dev, digest_size,
++						     &hmac->ipad_opad_dma_addr,
++						     GFP_KERNEL);
++
++		if (!hmac->ipad_opad) {
+ 			SSI_LOG_ERR("Failed allocating IPAD/OPAD buffer\n");
+ 			goto init_failed;
+ 		}
++
+ 		SSI_LOG_DEBUG("Allocated authkey buffer in context ctx->authkey=@%p\n",
+-			ctx->auth_state.hmac.ipad_opad);
++			      hmac->ipad_opad);
++
++		hmac->padded_authkey = dma_alloc_coherent(dev,
++							  MAX_HMAC_BLOCK_SIZE,
++							  pkey_dma,
++							  GFP_KERNEL);
  
- void display_all_stat_db(void)
-@@ -388,7 +388,7 @@ static int sys_init_dir(struct sys_dir *sys_dir, struct ssi_drvdata *drvdata,
+-		ctx->auth_state.hmac.padded_authkey = dma_alloc_coherent(dev,
+-			MAX_HMAC_BLOCK_SIZE,
+-			&ctx->auth_state.hmac.padded_authkey_dma_addr, GFP_KERNEL);
+-		if (!ctx->auth_state.hmac.padded_authkey) {
++		if (!hmac->padded_authkey) {
+ 			SSI_LOG_ERR("failed to allocate padded_authkey\n");
+ 			goto init_failed;
+ 		}
+@@ -295,6 +314,7 @@ static int hmac_setkey(struct cc_hw_desc *desc, struct ssi_aead_ctx *ctx)
+ 			DRV_HASH_HW_SHA1 : DRV_HASH_HW_SHA256;
+ 	unsigned int digest_size = (ctx->auth_mode == DRV_HASH_SHA1) ?
+ 			CC_SHA1_DIGEST_SIZE : CC_SHA256_DIGEST_SIZE;
++	struct cc_hmac_s *hmac = &ctx->auth_state.hmac;
  
- 	/* initialize attributes list */
- 	for (i = 0; i < num_of_attrs; ++i)
--		sys_dir->sys_dir_attr_list[i] = &(attrs[i].attr);
-+		sys_dir->sys_dir_attr_list[i] = &attrs[i].attr;
- 
- 	/* last list entry should be NULL */
- 	sys_dir->sys_dir_attr_list[num_of_attrs] = NULL;
-@@ -396,7 +396,7 @@ static int sys_init_dir(struct sys_dir *sys_dir, struct ssi_drvdata *drvdata,
- 	sys_dir->sys_dir_attr_group.attrs = sys_dir->sys_dir_attr_list;
- 
- 	return sysfs_create_group(sys_dir->sys_dir_kobj,
--			&(sys_dir->sys_dir_attr_group));
-+			&sys_dir->sys_dir_attr_group);
- }
- 
- static void sys_free_dir(struct sys_dir *sys_dir)
+ 	int idx = 0;
+ 	int i;
+@@ -331,7 +351,7 @@ static int hmac_setkey(struct cc_hw_desc *desc, struct ssi_aead_ctx *ctx)
+ 		/* Perform HASH update */
+ 		hw_desc_init(&desc[idx]);
+ 		set_din_type(&desc[idx], DMA_DLLI,
+-			     ctx->auth_state.hmac.padded_authkey_dma_addr,
++			     hmac->padded_authkey_dma_addr,
+ 			     SHA256_BLOCK_SIZE, NS_BIT);
+ 		set_cipher_mode(&desc[idx], hash_mode);
+ 		set_xor_active(&desc[idx]);
+@@ -342,8 +362,8 @@ static int hmac_setkey(struct cc_hw_desc *desc, struct ssi_aead_ctx *ctx)
+ 		hw_desc_init(&desc[idx]);
+ 		set_cipher_mode(&desc[idx], hash_mode);
+ 		set_dout_dlli(&desc[idx],
+-			      (ctx->auth_state.hmac.ipad_opad_dma_addr +
+-			       digest_ofs), digest_size, NS_BIT, 0);
++			      (hmac->ipad_opad_dma_addr + digest_ofs),
++			      digest_size, NS_BIT, 0);
+ 		set_flow_mode(&desc[idx], S_HASH_to_DOUT);
+ 		set_setup_mode(&desc[idx], SETUP_WRITE_STATE0);
+ 		set_cipher_config1(&desc[idx], HASH_PADDING_DISABLED);
 -- 
 2.1.4
