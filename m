@@ -1,7 +1,7 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 10/12] staging: ccree: remove func name from log messages
-Date: Thu, 13 Jul 2017 11:20:00 +0300
-Message-ID: <1499934004-28513-11-git-send-email-gilad@benyossef.com>
+Subject: [PATCH 11/12] staging: ccree: kmalloc by sizeof var not type
+Date: Thu, 13 Jul 2017 11:20:01 +0300
+Message-ID: <1499934004-28513-12-git-send-email-gilad@benyossef.com>
 References: <1499934004-28513-1-git-send-email-gilad@benyossef.com>
 Cc: Ofir Drang <ofir.drang@arm.com>
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -13,150 +13,122 @@ In-Reply-To: <1499934004-28513-1-git-send-email-gilad@benyossef.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The SSI_LOG macros already add __func__ to log messages, so remove
-log message that add them a second time in the log message itself.
+Change places where we alloc memory by sizeof type to sizeof var.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/ssi_aead.c   |  4 ++--
- drivers/staging/ccree/ssi_cipher.c | 14 +++++++-------
- drivers/staging/ccree/ssi_driver.c |  2 +-
- drivers/staging/ccree/ssi_hash.c   |  2 +-
- drivers/staging/ccree/ssi_pm.c     |  4 ++--
- 5 files changed, 13 insertions(+), 13 deletions(-)
+ drivers/staging/ccree/ssi_aead.c        | 4 ++--
+ drivers/staging/ccree/ssi_cipher.c      | 4 ++--
+ drivers/staging/ccree/ssi_driver.c      | 2 +-
+ drivers/staging/ccree/ssi_hash.c        | 4 ++--
+ drivers/staging/ccree/ssi_ivgen.c       | 2 +-
+ drivers/staging/ccree/ssi_request_mgr.c | 2 +-
+ 6 files changed, 9 insertions(+), 9 deletions(-)
 
 diff --git a/drivers/staging/ccree/ssi_aead.c b/drivers/staging/ccree/ssi_aead.c
-index c6edef0..aa94839 100644
+index aa94839..15d05af 100644
 --- a/drivers/staging/ccree/ssi_aead.c
 +++ b/drivers/staging/ccree/ssi_aead.c
-@@ -2269,7 +2269,7 @@ static int ssi_gcm_setauthsize(struct crypto_aead *authenc,
- static int ssi_rfc4106_gcm_setauthsize(struct crypto_aead *authenc,
- 				       unsigned int authsize)
- {
--	SSI_LOG_DEBUG("ssi_rfc4106_gcm_setauthsize()  authsize %d\n", authsize);
-+	SSI_LOG_DEBUG("authsize %d\n", authsize);
+@@ -2659,7 +2659,7 @@ static struct ssi_crypto_alg *ssi_aead_create_alg(struct ssi_alg_template *templ
+ 	struct ssi_crypto_alg *t_alg;
+ 	struct aead_alg *alg;
  
- 	switch (authsize) {
- 	case 8:
-@@ -2286,7 +2286,7 @@ static int ssi_rfc4106_gcm_setauthsize(struct crypto_aead *authenc,
- static int ssi_rfc4543_gcm_setauthsize(struct crypto_aead *authenc,
- 				       unsigned int authsize)
- {
--	SSI_LOG_DEBUG("ssi_rfc4543_gcm_setauthsize()  authsize %d\n", authsize);
-+	SSI_LOG_DEBUG("authsize %d\n", authsize);
+-	t_alg = kzalloc(sizeof(struct ssi_crypto_alg), GFP_KERNEL);
++	t_alg = kzalloc(sizeof(*t_alg), GFP_KERNEL);
+ 	if (!t_alg) {
+ 		SSI_LOG_ERR("failed to allocate t_alg\n");
+ 		return ERR_PTR(-ENOMEM);
+@@ -2714,7 +2714,7 @@ int ssi_aead_alloc(struct ssi_drvdata *drvdata)
+ 	int rc = -ENOMEM;
+ 	int alg;
  
- 	if (authsize != 16)
- 		return -EINVAL;
+-	aead_handle = kmalloc(sizeof(struct ssi_aead_handle), GFP_KERNEL);
++	aead_handle = kmalloc(sizeof(*aead_handle), GFP_KERNEL);
+ 	if (!aead_handle) {
+ 		rc = -ENOMEM;
+ 		goto fail0;
 diff --git a/drivers/staging/ccree/ssi_cipher.c b/drivers/staging/ccree/ssi_cipher.c
-index 7e34236..3402022 100644
+index 3402022..06e6a89 100644
 --- a/drivers/staging/ccree/ssi_cipher.c
 +++ b/drivers/staging/ccree/ssi_cipher.c
-@@ -304,7 +304,7 @@ static int ssi_blkcipher_setkey(struct crypto_tfm *tfm,
- 		      ctx_p, crypto_tfm_alg_name(tfm), keylen);
- 	dump_byte_array("key", (u8 *)key, keylen);
+@@ -1214,7 +1214,7 @@ struct ssi_crypto_alg *ssi_ablkcipher_create_alg(struct ssi_alg_template *templa
+ 	struct ssi_crypto_alg *t_alg;
+ 	struct crypto_alg *alg;
  
--	SSI_LOG_DEBUG("ssi_blkcipher_setkey: after FIPS check");
-+	SSI_LOG_DEBUG("after FIPS check");
+-	t_alg = kzalloc(sizeof(struct ssi_crypto_alg), GFP_KERNEL);
++	t_alg = kzalloc(sizeof(*t_alg), GFP_KERNEL);
+ 	if (!t_alg) {
+ 		SSI_LOG_ERR("failed to allocate t_alg\n");
+ 		return ERR_PTR(-ENOMEM);
+@@ -1275,7 +1275,7 @@ int ssi_ablkcipher_alloc(struct ssi_drvdata *drvdata)
+ 	int rc = -ENOMEM;
+ 	int alg;
  
- 	/* STAT_PHASE_0: Init and sanity checks */
- 
-@@ -350,7 +350,7 @@ static int ssi_blkcipher_setkey(struct crypto_tfm *tfm,
- 		}
- 
- 		ctx_p->keylen = keylen;
--		SSI_LOG_DEBUG("ssi_blkcipher_setkey: ssi_is_hw_key ret 0");
-+		SSI_LOG_DEBUG("ssi_is_hw_key ret 0");
- 
- 		return 0;
- 	}
-@@ -360,19 +360,19 @@ static int ssi_blkcipher_setkey(struct crypto_tfm *tfm,
- 		if (unlikely(!des_ekey(tmp, key)) &&
- 		    (crypto_tfm_get_flags(tfm) & CRYPTO_TFM_REQ_WEAK_KEY)) {
- 			tfm->crt_flags |= CRYPTO_TFM_RES_WEAK_KEY;
--			SSI_LOG_DEBUG("ssi_blkcipher_setkey:  weak DES key");
-+			SSI_LOG_DEBUG("weak DES key");
- 			return -EINVAL;
- 		}
- 	}
- 	if ((ctx_p->cipher_mode == DRV_CIPHER_XTS) &&
- 	    xts_check_key(tfm, key, keylen) != 0) {
--		SSI_LOG_DEBUG("ssi_blkcipher_setkey: weak XTS key");
-+		SSI_LOG_DEBUG("weak XTS key");
- 		return -EINVAL;
- 	}
- 	if ((ctx_p->flow_mode == S_DIN_to_DES) &&
- 	    (keylen == DES3_EDE_KEY_SIZE) &&
- 	    ssi_verify_3des_keys(key, keylen) != 0) {
--		SSI_LOG_DEBUG("ssi_blkcipher_setkey: weak 3DES key");
-+		SSI_LOG_DEBUG("weak 3DES key");
- 		return -EINVAL;
- 	}
- 
-@@ -387,7 +387,7 @@ static int ssi_blkcipher_setkey(struct crypto_tfm *tfm,
- 		if (ctx_p->key_round_number < CC_MULTI2_MIN_NUM_ROUNDS ||
- 		    ctx_p->key_round_number > CC_MULTI2_MAX_NUM_ROUNDS) {
- 			crypto_tfm_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
--			SSI_LOG_DEBUG("ssi_blkcipher_setkey: SSI_CC_HAS_MULTI2 einval");
-+			SSI_LOG_DEBUG("SSI_CC_HAS_MULTI2 einval");
- 			return -EINVAL;
- #endif /*SSI_CC_HAS_MULTI2*/
- 	} else {
-@@ -414,7 +414,7 @@ static int ssi_blkcipher_setkey(struct crypto_tfm *tfm,
- 				   max_key_buf_size, DMA_TO_DEVICE);
- 	ctx_p->keylen = keylen;
- 
--	 SSI_LOG_DEBUG("ssi_blkcipher_setkey: return safely");
-+	 SSI_LOG_DEBUG("return safely");
- 	return 0;
- }
- 
+-	ablkcipher_handle = kmalloc(sizeof(struct ssi_blkcipher_handle),
++	ablkcipher_handle = kmalloc(sizeof(*ablkcipher_handle),
+ 				    GFP_KERNEL);
+ 	if (!ablkcipher_handle)
+ 		return -ENOMEM;
 diff --git a/drivers/staging/ccree/ssi_driver.c b/drivers/staging/ccree/ssi_driver.c
-index c07a028..d104dbd 100644
+index d104dbd..1cae2b7 100644
 --- a/drivers/staging/ccree/ssi_driver.c
 +++ b/drivers/staging/ccree/ssi_driver.c
-@@ -81,7 +81,7 @@ void dump_byte_array(const char *name, const u8 *the_array, unsigned long size)
- 	char line_buf[80];
- 
- 	if (!the_array) {
--		SSI_LOG_ERR("cannot dump_byte_array - NULL pointer\n");
-+		SSI_LOG_ERR("cannot dump array - NULL pointer\n");
- 		return;
- 	}
- 
+@@ -223,7 +223,7 @@ static int init_cc_resources(struct platform_device *plat_dev)
+ 	struct resource *req_mem_cc_regs = NULL;
+ 	void __iomem *cc_base = NULL;
+ 	bool irq_registered = false;
+-	struct ssi_drvdata *new_drvdata = kzalloc(sizeof(struct ssi_drvdata), GFP_KERNEL);
++	struct ssi_drvdata *new_drvdata = kzalloc(sizeof(*new_drvdata), GFP_KERNEL);
+ 	struct device *dev = &plat_dev->dev;
+ 	struct device_node *np = dev->of_node;
+ 	u32 signature_val;
 diff --git a/drivers/staging/ccree/ssi_hash.c b/drivers/staging/ccree/ssi_hash.c
-index 9c9c48b..292250e 100644
+index 292250e..11bbbc3 100644
 --- a/drivers/staging/ccree/ssi_hash.c
 +++ b/drivers/staging/ccree/ssi_hash.c
-@@ -974,7 +974,7 @@ static int ssi_hash_setkey(void *hash,
- 	struct cc_hw_desc desc[SSI_MAX_AHASH_SEQ_LEN];
- 	ssi_sram_addr_t larval_addr;
+@@ -2060,7 +2060,7 @@ ssi_hash_create_alg(struct ssi_hash_template *template, bool keyed)
+ 	struct crypto_alg *alg;
+ 	struct ahash_alg *halg;
  
--	 SSI_LOG_DEBUG("ssi_hash_setkey: start keylen: %d", keylen);
-+	 SSI_LOG_DEBUG("start keylen: %d", keylen);
+-	t_crypto_alg = kzalloc(sizeof(struct ssi_hash_alg), GFP_KERNEL);
++	t_crypto_alg = kzalloc(sizeof(*t_crypto_alg), GFP_KERNEL);
+ 	if (!t_crypto_alg) {
+ 		SSI_LOG_ERR("failed to allocate t_alg\n");
+ 		return ERR_PTR(-ENOMEM);
+@@ -2224,7 +2224,7 @@ int ssi_hash_alloc(struct ssi_drvdata *drvdata)
+ 	int rc = 0;
+ 	int alg;
  
- 	ctx = crypto_ahash_ctx(((struct crypto_ahash *)hash));
- 	blocksize = crypto_tfm_alg_blocksize(&((struct crypto_ahash *)hash)->base);
-diff --git a/drivers/staging/ccree/ssi_pm.c b/drivers/staging/ccree/ssi_pm.c
-index 52a8ed5..31325e6 100644
---- a/drivers/staging/ccree/ssi_pm.c
-+++ b/drivers/staging/ccree/ssi_pm.c
-@@ -40,7 +40,7 @@ int ssi_power_mgr_runtime_suspend(struct device *dev)
- 		(struct ssi_drvdata *)dev_get_drvdata(dev);
+-	hash_handle = kzalloc(sizeof(struct ssi_hash_handle), GFP_KERNEL);
++	hash_handle = kzalloc(sizeof(*hash_handle), GFP_KERNEL);
+ 	if (!hash_handle) {
+ 		SSI_LOG_ERR("kzalloc failed to allocate %zu B\n",
+ 			    sizeof(struct ssi_hash_handle));
+diff --git a/drivers/staging/ccree/ssi_ivgen.c b/drivers/staging/ccree/ssi_ivgen.c
+index c6f400f..8d6f8ad 100644
+--- a/drivers/staging/ccree/ssi_ivgen.c
++++ b/drivers/staging/ccree/ssi_ivgen.c
+@@ -191,7 +191,7 @@ int ssi_ivgen_init(struct ssi_drvdata *drvdata)
  	int rc;
  
--	SSI_LOG_DEBUG("ssi_power_mgr_runtime_suspend: set HOST_POWER_DOWN_EN\n");
-+	SSI_LOG_DEBUG("set HOST_POWER_DOWN_EN\n");
- 	WRITE_REGISTER(drvdata->cc_base + CC_REG_OFFSET(HOST_RGF, HOST_POWER_DOWN_EN), POWER_DOWN_ENABLE);
- 	rc = ssi_request_mgr_runtime_suspend_queue(drvdata);
- 	if (rc != 0) {
-@@ -58,7 +58,7 @@ int ssi_power_mgr_runtime_resume(struct device *dev)
- 	struct ssi_drvdata *drvdata =
- 		(struct ssi_drvdata *)dev_get_drvdata(dev);
+ 	/* Allocate "this" context */
+-	drvdata->ivgen_handle = kzalloc(sizeof(struct ssi_ivgen_ctx), GFP_KERNEL);
++	drvdata->ivgen_handle = kzalloc(sizeof(*drvdata->ivgen_handle), GFP_KERNEL);
+ 	if (!drvdata->ivgen_handle) {
+ 		SSI_LOG_ERR("Not enough memory to allocate IVGEN context (%zu B)\n",
+ 			    sizeof(struct ssi_ivgen_ctx));
+diff --git a/drivers/staging/ccree/ssi_request_mgr.c b/drivers/staging/ccree/ssi_request_mgr.c
+index 9a4bb5c..cae9904 100644
+--- a/drivers/staging/ccree/ssi_request_mgr.c
++++ b/drivers/staging/ccree/ssi_request_mgr.c
+@@ -100,7 +100,7 @@ int request_mgr_init(struct ssi_drvdata *drvdata)
+ 	struct ssi_request_mgr_handle *req_mgr_h;
+ 	int rc = 0;
  
--	SSI_LOG_DEBUG("ssi_power_mgr_runtime_resume , unset HOST_POWER_DOWN_EN\n");
-+	SSI_LOG_DEBUG("unset HOST_POWER_DOWN_EN\n");
- 	WRITE_REGISTER(drvdata->cc_base + CC_REG_OFFSET(HOST_RGF, HOST_POWER_DOWN_EN), POWER_DOWN_DISABLE);
- 
- 	rc = cc_clk_on(drvdata);
+-	req_mgr_h = kzalloc(sizeof(struct ssi_request_mgr_handle), GFP_KERNEL);
++	req_mgr_h = kzalloc(sizeof(*req_mgr_h), GFP_KERNEL);
+ 	if (!req_mgr_h) {
+ 		rc = -ENOMEM;
+ 		goto req_mgr_init_err;
 -- 
 2.1.4
