@@ -1,105 +1,96 @@
-From: <delaware.orders@nationalcorp.com>
-Subject: (unknown)
-Date: Thu, 13 Jul 2017 04:49:53 -0000
-Message-ID: <149992139373.2511.14184101355580322258@a-tc.net>
+From: =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>
+Subject: Re: [PATCH] crypto: caam - free qman_fq after kill_fq
+Date: Thu, 13 Jul 2017 07:01:05 +0000
+Message-ID: <VI1PR0401MB2591EA98C70A9701ED2981AE98AC0@VI1PR0401MB2591.eurprd04.prod.outlook.com>
+References: <20170711062107.182889-1-xulin.sun@windriver.com>
 Mime-Version: 1.0
-Content-Type: application/zip; name="EMAIL_649407635104319_linux-crypto.zip
-Content-Transfer-Encoding: base64
-To: <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "xulinsun@gmail.com" <xulinsun@gmail.com>
+To: Xulin Sun <xulin.sun@windriver.com>,
+        Dan Douglass <dan.douglass@nxp.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from n230-h91.a-tc.net ([212.107.230.91]:43449 "HELO a-tc.net"
-        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with SMTP
-        id S1750773AbdGMEt7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Jul 2017 00:49:59 -0400
-Content-Disposition: attachment
-Subject: 
+Received: from mail-ve1eur01on0083.outbound.protection.outlook.com ([104.47.1.83]:12224
+        "EHLO EUR01-VE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751036AbdGMHBN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 13 Jul 2017 03:01:13 -0400
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-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
-AAAAAAEAAQBjAAAAvxIAAAAA
+On 7/11/2017 9:21 AM, Xulin Sun wrote:=0A=
+> kill_fq removes a complete frame queue, it needs to free the qman_fq=0A=
+> in the last. Else kmemleak will report the below warning:=0A=
+> =0A=
+> unreferenced object 0xffff800073085c80 (size 128):=0A=
+>   comm "cryptomgr_test", pid 199, jiffies 4294937850 (age 67.840s)=0A=
+>   hex dump (first 32 bytes):=0A=
+>     00 00 00 00 00 00 00 00 a0 80 7e 00 00 80 ff ff=0A=
+>     00 00 00 00 00 00 00 00 04 00 04 00 5c 01 00 00=0A=
+>   backtrace:=0A=
+>     [<ffff8000001e5760>] create_object+0xf8/0x258=0A=
+>     [<ffff800000994e38>] kmemleak_alloc+0x58/0xa0=0A=
+>     [<ffff8000001d5f18>] kmem_cache_alloc_trace+0x2c8/0x358=0A=
+>     [<ffff8000007e8410>] create_caam_req_fq+0x40/0x170=0A=
+>     [<ffff8000007e870c>] caam_drv_ctx_update+0x54/0x248=0A=
+>     [<ffff8000007fca54>] aead_setkey+0x154/0x300=0A=
+>     [<ffff800000452120>] setkey+0x50/0xf0=0A=
+>     [<ffff80000045b144>] __test_aead+0x5ec/0x1028=0A=
+>     [<ffff80000045c28c>] test_aead+0x44/0xc8=0A=
+>     [<ffff80000045c368>] alg_test_aead+0x58/0xd0=0A=
+>     [<ffff80000045bdb4>] alg_test+0x14c/0x308=0A=
+>     [<ffff8000004588e8>] cryptomgr_test+0x50/0x58=0A=
+>     [<ffff8000000c3b2c>] kthread+0xdc/0xf0=0A=
+>     [<ffff800000083c00>] ret_from_fork+0x10/0x50=0A=
+> =0A=
+> And check where the function kill_fq() is called to remove=0A=
+> the additional kfree to qman_fq.=0A=
+> =0A=
+> Signed-off-by: Xulin Sun <xulin.sun@windriver.com>=0A=
+> ---=0A=
+>  drivers/crypto/caam/qi.c | 2 +-=0A=
+>  1 file changed, 1 insertion(+), 1 deletion(-)=0A=
+> =0A=
+> diff --git a/drivers/crypto/caam/qi.c b/drivers/crypto/caam/qi.c=0A=
+> index 1990ed4..c4b9173 100644=0A=
+> --- a/drivers/crypto/caam/qi.c=0A=
+> +++ b/drivers/crypto/caam/qi.c=0A=
+> @@ -277,6 +277,7 @@ static int kill_fq(struct device *qidev, struct qman_=
+fq *fq)=0A=
+>  		dev_err(qidev, "OOS of FQID: %u failed\n", fq->fqid);=0A=
+>  =0A=
+>  	qman_destroy_fq(fq);=0A=
+> +	kfree(fq);=0A=
+=0A=
+There is a case where kfree(fq) is executed and kill_fq() returns !=3D 0 -=
+=0A=
+that is when qman_oos_fq() returns !=3D 0.=0A=
+=0A=
+Thus please make sure there is no reference to "fq" after kill_fq(...,=0A=
+fq) is called, even if kill_fq() return code is !=3D 0.=0A=
+For e.g.:=0A=
+	if (kill_fq(qidev, new_fq))=0A=
+		dev_warn(qidev, "New CAAM FQ: %u kill failed\n",=0A=
+                         new_fq->fqid);=0A=
+                         ^^^^^^ already kfree-ed=0A=
+=0A=
+Thanks,=0A=
+Horia=0A=
+=0A=
+>  =0A=
+>  	return ret;=0A=
+>  }=0A=
+> @@ -511,7 +512,6 @@ int caam_qi_shutdown(struct device *qidev)=0A=
+>  =0A=
+>  		if (kill_fq(qidev, per_cpu(pcpu_qipriv.rsp_fq, i)))=0A=
+>  			dev_err(qidev, "Rsp FQ kill failed, cpu: %d\n", i);=0A=
+> -		kfree(per_cpu(pcpu_qipriv.rsp_fq, i));=0A=
+>  	}=0A=
+>  =0A=
+>  	/*=0A=
+> =0A=
