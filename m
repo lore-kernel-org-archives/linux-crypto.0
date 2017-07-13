@@ -1,85 +1,71 @@
-From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: [PATCH 3/6] fscrypt: use HKDF-SHA512 to derive the
- per-inode encryption keys
-Date: Thu, 13 Jul 2017 11:10:57 -0700
-Message-ID: <20170713181057.GA143898@gmail.com>
-References: <20170712210035.51534-1-ebiggers3@gmail.com>
-	<20170712210035.51534-4-ebiggers3@gmail.com>
-	<2034167.Brpu2WxA6s@tauon.chronox.de>
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+Subject: Re: Decreasing time for `rsa_init`
+Date: Thu, 13 Jul 2017 20:20:41 +0200
+Message-ID: <1499970041.1134.1.camel@molgen.mpg.de>
+References: <4ec5a3f5-9605-cdcd-23cf-1df7b3af211c@molgen.mpg.de>
+         <3649766.4rHtxdK8Pi@tauon.chronox.de>
+         <8d89fefa-b27d-ba32-e7b2-75312549ee90@molgen.mpg.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Cc: "Theodore Y . Ts'o" <tytso@mit.edu>, herbert@gondor.apana.org.au,
-	Eric Biggers <ebiggers@google.com>, Alex Cope <alexcope@google.com>,
-	linux-f2fs-devel@lists.sourceforge.net,
-	linux-fscrypt@vger.kernel.org, linux-mtd@lists.infradead.org,
-	linux-crypto@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	Jaegeuk Kim <jaegeuk@kernel.org>, linux-ext4@vger.kernel.org
-To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Return-path: <linux-f2fs-devel-bounces@lists.sourceforge.net>
-Content-Disposition: inline
-In-Reply-To: <2034167.Brpu2WxA6s@tauon.chronox.de>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/options/linux-f2fs-devel>,
-	<mailto:linux-f2fs-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=linux-f2fs-devel>
-List-Post: <mailto:linux-f2fs-devel@lists.sourceforge.net>
-List-Help: <mailto:linux-f2fs-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/linux-f2fs-devel>,
-	<mailto:linux-f2fs-devel-request@lists.sourceforge.net?subject=subscribe>
-Errors-To: linux-f2fs-devel-bounces@lists.sourceforge.net
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx3.molgen.mpg.de ([141.14.17.11]:59832 "EHLO mx1.molgen.mpg.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751017AbdGMSUo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 13 Jul 2017 14:20:44 -0400
+In-Reply-To: <8d89fefa-b27d-ba32-e7b2-75312549ee90@molgen.mpg.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Stephan,
-
-On Thu, Jul 13, 2017 at 04:54:55PM +0200, Stephan M=FCller wrote:
-> Am Mittwoch, 12. Juli 2017, 23:00:32 CEST schrieb Eric Biggers:
-> =
-
-> Hi Herbert,
-> =
-
-> This patch adds a second KDF to the kernel -- the first is found in the k=
-eys =
-
-> subsystem.
-> =
-
-> The next KDF that may come in is in the TLS scope.
-> =
-
-> Would it make sense to warm up the KDF patches adding generic KDF support=
- to =
-
-> the kernel crypto API that I supplied some time ago? The advantages would=
- be =
-
-> to have one location of KDF implementations and the benefit of the testmg=
-r.
-> =
+Dear Stephan,
 
 
-That may be a good idea.  Looking at the old thread, I share Herbert's conc=
-ern
-(http://www.spinics.net/lists/linux-crypto/msg21231.html) about there likel=
-y not
-being more than one implementation of each KDF algorithm.  So, perhaps some
-simple helper functions would be more appropriate.  However, making the KDF=
-s be
-covered by self-tests would be very nice.
+Am Mittwoch, den 12.07.2017, 19:38 +0200 schrieb Paul Menzel:
 
-Also, it seems your patch
-(http://www.spinics.net/lists/linux-crypto/msg21137.html) doesn't allow a s=
-alt
-to be passed in.  In order to fully support HKDF, crypto_rng_reset() (which=
- as I
-understand would be the way to invoke the "extract" step) would somehow nee=
-d to
-accept both the input keying material and salt, both of which are arbitrary
-length binary.
+> On 07/12/17 19:28, Stephan Müller wrote:
+> > Am Mittwoch, 12. Juli 2017, 12:59:58 CEST schrieb Paul Menzel:
+> > > Building CRYPTO_RSA not as module, but into the Linux kernel,
+> > > `rsa_init()` takes 130 ms on an ASRock E350M1.
+> > > 
+> > > (Timings are shown by adding `initcall_debug` to Linux command
+> > > line [1].
+> > > The times are visualized by `analyze_boot.py` from pm-graph [2]
+> > > or `systemd-bootchart`.)
+> > > 
+> > > This is quite a lot of time compared to other modules, and I
+> > > wonder if
+> > > there are ways to decrease that time other than building it as a
+> > > module,
+> > > and not signing modules?
+> > 
+> > Is the testmgr compiled? If yes, the self test may take that time.
+> 
+> It looks like it is, as the tests are not disabled.
+> 
+> ```
+> $ grep MANAGER_DISABLE_TESTS .config
+> # CONFIG_CRYPTO_MANAGER_DISABLE_TESTS is not set
+> ```
+> 
+> I’ll try an image without the tests, and will report back.
 
-Eric
+Thank you. That was it. Disabling the tests reduces the time to 51 μs.
 
----------------------------------------------------------------------------=
----
-Check out the vibrant tech community on one of the world's most
-engaging tech sites, Slashdot.org! http://sdm.link/slashdot
+```
+kernel: calling  rsa_init+0x0/0x40 @ 1
+kernel: initcall rsa_init+0x0/0x40 returned 0 after 51 usecs
+```
+
+It’d be nice to be able to disable the testmgr during run-time by
+adding an option to the Linux Kernel command line for example.
+
+
+Kind regards,
+
+Paul
+
+
+> > > [1] http://elinux.org/Initcall_Debug
+> > > [2] https://github.com/01org/pm-graph
