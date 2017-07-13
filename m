@@ -1,83 +1,54 @@
-From: Lionel Debieve <lionel.debieve@st.com>
-Subject: [PATCH 1/3] crypto: stm32 - CRC use relaxed function
-Date: Thu, 13 Jul 2017 15:06:31 +0200
-Message-ID: <05aae64aaee08aa97b53179d64be1a76e0d9c182.1499950409.git.lionel.debieve@st.com>
-References: <cover.1499950409.git.lionel.debieve@st.com>
+From: Lionel Debieve <lionel.debieve-qxv4g6HH51o@public.gmane.org>
+Subject: [PATCH 0/2] STM32 HASH crypto driver
+Date: Thu, 13 Jul 2017 15:32:25 +0200
+Message-ID: <1499952747-16423-1-git-send-email-lionel.debieve@st.com>
 Mime-Version: 1.0
 Content-Type: text/plain
-Cc: Benjamin Gaignard <benjamin.gaignard@st.com>,
-        Fabien Dessenne <fabien.dessenne@st.com>,
-        Ludovic Barre <ludovic.barre@st.com>,
-        Lionel Debieve <lionel.debieve@st.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        <linux-crypto@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx07-00178001.pphosted.com ([62.209.51.94]:28410 "EHLO
-        mx07-00178001.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752358AbdGMNHq (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Jul 2017 09:07:46 -0400
-In-Reply-To: <cover.1499950409.git.lionel.debieve@st.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: Benjamin Gaignard <benjamin.gaignard-qxv4g6HH51o@public.gmane.org>,
+        Fabien Dessenne <fabien.dessenne-qxv4g6HH51o@public.gmane.org>,
+        Ludovic Barre <ludovic.barre-qxv4g6HH51o@public.gmane.org>,
+        Lionel Debieve <lionel.debieve-qxv4g6HH51o@public.gmane.org>
+To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+        "David S . Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
+        Maxime Coquelin <mcoquelin.stm32-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        Alexandre Torgue <alexandre.torgue-qxv4g6HH51o@public.gmane.org>,
+        <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        <linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>,
+        <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-In case of arm soc support, readl and writel will
-be optimized using relaxed functions
+This set of patches adds a new crypto driver for STMicroelectronics stm32 HW.
+This drivers uses the crypto API and provides with HW-enabled md5, sha1,
+sha224, sha256 hash based algorithms.
+It makes use of the crypto engine to support ahash requests.
 
-Signed-off-by: Lionel Debieve <lionel.debieve@st.com>
-Reviewed-by: Fabien Dessenne <fabien.dessenne@st.com>
----
- drivers/crypto/stm32/stm32_crc32.c | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+This driver was successfully tested with tcrypt / testmgr.
 
-diff --git a/drivers/crypto/stm32/stm32_crc32.c b/drivers/crypto/stm32/stm32_crc32.c
-index ec83b1e..04d2f4b 100644
---- a/drivers/crypto/stm32/stm32_crc32.c
-+++ b/drivers/crypto/stm32/stm32_crc32.c
-@@ -107,12 +107,12 @@ static int stm32_crc_init(struct shash_desc *desc)
- 	spin_unlock_bh(&crc_list.lock);
- 
- 	/* Reset, set key, poly and configure in bit reverse mode */
--	writel(bitrev32(mctx->key), ctx->crc->regs + CRC_INIT);
--	writel(bitrev32(mctx->poly), ctx->crc->regs + CRC_POL);
--	writel(CRC_CR_RESET | CRC_CR_REVERSE, ctx->crc->regs + CRC_CR);
-+	writel_relaxed(bitrev32(mctx->key), ctx->crc->regs + CRC_INIT);
-+	writel_relaxed(bitrev32(mctx->poly), ctx->crc->regs + CRC_POL);
-+	writel_relaxed(CRC_CR_RESET | CRC_CR_REVERSE, ctx->crc->regs + CRC_CR);
- 
- 	/* Store partial result */
--	ctx->partial = readl(ctx->crc->regs + CRC_DR);
-+	ctx->partial = readl_relaxed(ctx->crc->regs + CRC_DR);
- 	ctx->crc->nb_pending_bytes = 0;
- 
- 	return 0;
-@@ -135,7 +135,8 @@ static int stm32_crc_update(struct shash_desc *desc, const u8 *d8,
- 
- 		if (crc->nb_pending_bytes == sizeof(u32)) {
- 			/* Process completed pending data */
--			writel(*(u32 *)crc->pending_data, crc->regs + CRC_DR);
-+			writel_relaxed(*(u32 *)crc->pending_data,
-+				       crc->regs + CRC_DR);
- 			crc->nb_pending_bytes = 0;
- 		}
- 	}
-@@ -143,10 +144,10 @@ static int stm32_crc_update(struct shash_desc *desc, const u8 *d8,
- 	d32 = (u32 *)d8;
- 	for (i = 0; i < length >> 2; i++)
- 		/* Process 32 bits data */
--		writel(*(d32++), crc->regs + CRC_DR);
-+		writel_relaxed(*(d32++), crc->regs + CRC_DR);
- 
- 	/* Store partial result */
--	ctx->partial = readl(crc->regs + CRC_DR);
-+	ctx->partial = readl_relaxed(crc->regs + CRC_DR);
- 
- 	/* Check for pending data (non 32 bits) */
- 	length &= 3;
+Note:
+Since two other set of patches (update of STM32 CRC32 and addition of STM32
+CRYP) are being proposed, it may happen that there are some minor conflicts in
+'Kconfig' and 'Makefile'. In that case, I will fix the issue in due course.
+
+Lionel Debieve (2):
+  dt-bindings: Document STM32 HASH bindings
+  crypto: stm32 - Support for STM32 HASH module
+
+ .../devicetree/bindings/crypto/st,stm32-hash.txt   |   30 +
+ drivers/crypto/stm32/Kconfig                       |   13 +
+ drivers/crypto/stm32/Makefile                      |    1 +
+ drivers/crypto/stm32/stm32-hash.c                  | 1576 ++++++++++++++++++++
+ 4 files changed, 1620 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/st,stm32-hash.txt
+ create mode 100644 drivers/crypto/stm32/stm32-hash.c
+
 -- 
 2.7.4
+
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
