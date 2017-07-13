@@ -1,7 +1,7 @@
 From: Lionel Debieve <lionel.debieve@st.com>
-Subject: [PATCH 3/3] crypto: stm32 - Rename module to use generic crypto
-Date: Thu, 13 Jul 2017 15:06:33 +0200
-Message-ID: <709e171911529fda19a611e6c01dc161a0166901.1499950409.git.lionel.debieve@st.com>
+Subject: [PATCH 1/3] crypto: stm32 - CRC use relaxed function
+Date: Thu, 13 Jul 2017 15:06:31 +0200
+Message-ID: <05aae64aaee08aa97b53179d64be1a76e0d9c182.1499950409.git.lionel.debieve@st.com>
 References: <cover.1499950409.git.lionel.debieve@st.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -16,57 +16,68 @@ To: Herbert Xu <herbert@gondor.apana.org.au>,
         <linux-crypto@vger.kernel.org>,
         <linux-arm-kernel@lists.infradead.org>,
         <linux-kernel@vger.kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx07-00178001.pphosted.com ([62.209.51.94]:28410 "EHLO
+        mx07-00178001.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1752358AbdGMNHq (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 13 Jul 2017 09:07:46 -0400
 In-Reply-To: <cover.1499950409.git.lionel.debieve@st.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The complete stm32 module is rename as crypto
-in order to use generic naming
+In case of arm soc support, readl and writel will
+be optimized using relaxed functions
 
 Signed-off-by: Lionel Debieve <lionel.debieve@st.com>
 Reviewed-by: Fabien Dessenne <fabien.dessenne@st.com>
 ---
- drivers/crypto/Makefile       | 2 +-
- drivers/crypto/stm32/Kconfig  | 6 +++---
- drivers/crypto/stm32/Makefile | 3 +--
- 3 files changed, 5 insertions(+), 6 deletions(-)
+ drivers/crypto/stm32/stm32_crc32.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
-index 463f335..d4d69cec 100644
---- a/drivers/crypto/Makefile
-+++ b/drivers/crypto/Makefile
-@@ -32,7 +32,7 @@ obj-$(CONFIG_CRYPTO_DEV_QCE) += qce/
- obj-$(CONFIG_CRYPTO_DEV_ROCKCHIP) += rockchip/
- obj-$(CONFIG_CRYPTO_DEV_S5P) += s5p-sss.o
- obj-$(CONFIG_CRYPTO_DEV_SAHARA) += sahara.o
--obj-$(CONFIG_CRYPTO_DEV_STM32) += stm32/
-+obj-$(CONFIG_ARCH_STM32) += stm32/
- obj-$(CONFIG_CRYPTO_DEV_SUN4I_SS) += sunxi-ss/
- obj-$(CONFIG_CRYPTO_DEV_TALITOS) += talitos.o
- obj-$(CONFIG_CRYPTO_DEV_UX500) += ux500/
-diff --git a/drivers/crypto/stm32/Kconfig b/drivers/crypto/stm32/Kconfig
-index 09b4ec8..7dd14f8 100644
---- a/drivers/crypto/stm32/Kconfig
-+++ b/drivers/crypto/stm32/Kconfig
-@@ -1,7 +1,7 @@
--config CRYPTO_DEV_STM32
--	tristate "Support for STM32 crypto accelerators"
-+config CRC_DEV_STM32
-+	tristate "Support for STM32 crc accelerators"
- 	depends on ARCH_STM32
- 	select CRYPTO_HASH
- 	help
-           This enables support for the CRC32 hw accelerator which can be found
--	  on STMicroelectronis STM32 SOC.
-+	  on STMicroelectronics STM32 SOC.
-diff --git a/drivers/crypto/stm32/Makefile b/drivers/crypto/stm32/Makefile
-index 73b4c6e..4db2f28 100644
---- a/drivers/crypto/stm32/Makefile
-+++ b/drivers/crypto/stm32/Makefile
-@@ -1,2 +1 @@
--obj-$(CONFIG_CRYPTO_DEV_STM32) += stm32_cryp.o
--stm32_cryp-objs := stm32_crc32.o
-+obj-$(CONFIG_CRC_DEV_STM32) += stm32_crc32.o
+diff --git a/drivers/crypto/stm32/stm32_crc32.c b/drivers/crypto/stm32/stm32_crc32.c
+index ec83b1e..04d2f4b 100644
+--- a/drivers/crypto/stm32/stm32_crc32.c
++++ b/drivers/crypto/stm32/stm32_crc32.c
+@@ -107,12 +107,12 @@ static int stm32_crc_init(struct shash_desc *desc)
+ 	spin_unlock_bh(&crc_list.lock);
+ 
+ 	/* Reset, set key, poly and configure in bit reverse mode */
+-	writel(bitrev32(mctx->key), ctx->crc->regs + CRC_INIT);
+-	writel(bitrev32(mctx->poly), ctx->crc->regs + CRC_POL);
+-	writel(CRC_CR_RESET | CRC_CR_REVERSE, ctx->crc->regs + CRC_CR);
++	writel_relaxed(bitrev32(mctx->key), ctx->crc->regs + CRC_INIT);
++	writel_relaxed(bitrev32(mctx->poly), ctx->crc->regs + CRC_POL);
++	writel_relaxed(CRC_CR_RESET | CRC_CR_REVERSE, ctx->crc->regs + CRC_CR);
+ 
+ 	/* Store partial result */
+-	ctx->partial = readl(ctx->crc->regs + CRC_DR);
++	ctx->partial = readl_relaxed(ctx->crc->regs + CRC_DR);
+ 	ctx->crc->nb_pending_bytes = 0;
+ 
+ 	return 0;
+@@ -135,7 +135,8 @@ static int stm32_crc_update(struct shash_desc *desc, const u8 *d8,
+ 
+ 		if (crc->nb_pending_bytes == sizeof(u32)) {
+ 			/* Process completed pending data */
+-			writel(*(u32 *)crc->pending_data, crc->regs + CRC_DR);
++			writel_relaxed(*(u32 *)crc->pending_data,
++				       crc->regs + CRC_DR);
+ 			crc->nb_pending_bytes = 0;
+ 		}
+ 	}
+@@ -143,10 +144,10 @@ static int stm32_crc_update(struct shash_desc *desc, const u8 *d8,
+ 	d32 = (u32 *)d8;
+ 	for (i = 0; i < length >> 2; i++)
+ 		/* Process 32 bits data */
+-		writel(*(d32++), crc->regs + CRC_DR);
++		writel_relaxed(*(d32++), crc->regs + CRC_DR);
+ 
+ 	/* Store partial result */
+-	ctx->partial = readl(crc->regs + CRC_DR);
++	ctx->partial = readl_relaxed(crc->regs + CRC_DR);
+ 
+ 	/* Check for pending data (non 32 bits) */
+ 	length &= 3;
 -- 
 2.7.4
