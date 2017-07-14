@@ -1,45 +1,34 @@
-From: Corentin Labbe <clabbe.montjoie@gmail.com>
-Subject: Re: [PATCH v2 2/2] crypto: engine - Permit to enqueue skcipher
- request
-Date: Fri, 14 Jul 2017 13:15:36 +0200
-Message-ID: <20170714111536.GA30440@Red>
-References: <20170606134417.18850-1-clabbe.montjoie@gmail.com>
- <20170606134417.18850-3-clabbe.montjoie@gmail.com>
- <20170619052707.GA13180@gondor.apana.org.au>
- <20170619075524.GA27419@Red>
- <20170623064837.GA29139@gondor.apana.org.au>
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH 00/12] staging: ccree: coding style fixes
+Date: Fri, 14 Jul 2017 13:39:40 +0200
+Message-ID: <20170714113940.GA5059@kroah.com>
+References: <1499934004-28513-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        linux-kernel@vger.kernel.org, Ofir Drang <ofir.drang@arm.com>
+To: Gilad Ben-Yossef <gilad@benyossef.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f42.google.com ([74.125.82.42]:33790 "EHLO
-        mail-wm0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753472AbdGNLP5 (ORCPT
+Received: from mail.linuxfoundation.org ([140.211.169.12]:42790 "EHLO
+        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753472AbdGNLjp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Jul 2017 07:15:57 -0400
+        Fri, 14 Jul 2017 07:39:45 -0400
 Content-Disposition: inline
-In-Reply-To: <20170623064837.GA29139@gondor.apana.org.au>
+In-Reply-To: <1499934004-28513-1-git-send-email-gilad@benyossef.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jun 23, 2017 at 02:48:37PM +0800, Herbert Xu wrote:
-> On Mon, Jun 19, 2017 at 09:55:24AM +0200, Corentin Labbe wrote:
-> >
-> > Since there are two different user of "crypto engine + ablkcipher", it will be not easy to convert them in one serie. (I could do it, but I simply could not test it for OMAP (lack of hw))
-> > And any new user which want to use crypto engine+skcipher (like me with the sun8i-ce driver) are simply stuck.
+On Thu, Jul 13, 2017 at 11:19:50AM +0300, Gilad Ben-Yossef wrote:
+> Another batch of ccree coding style fixes.
 > 
-> You're right.  We'll need to do this in a backwards-compatible way.  In fact
-> we already do something similar in skcipher.c itself.  Simply look at the
-> cra_type field and if it matches blkcipher/ablkcipher/givcipher then it's
-> legacy ablkcipher, otherwise it's skcipher.
-> 
-> Also the way crypto_engine looks at the request type in the data-path is
-> suboptimal.  This should really be built into the cra_type object.  For
-> example, we can have cra_type->engine->prepare_request which would just
-> do the right thing.
-> 
+> These goes on top of commit a8c4ae12 ("staging: ccree: Fix alignment issues in ssi_sysfs.c")
+> in staging-testing.
 
-Not sure to have well understand what you want.
-You want that I switch on cra_type instead of crypto_tfm_alg_type() ?
+Odd, some of these did not apply, but others did.  Please rebase your
+series and resend what I didn't pick up this time.
+
+thanks,
+
+greg k-h
