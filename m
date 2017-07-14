@@ -1,45 +1,45 @@
-From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: Re: [PATCH] Crypto_user: Make crypto user API available for all net
- ns
-Date: Fri, 14 Jul 2017 06:51:23 +0200
-Message-ID: <20170714045123.GO2631@secunet.com>
-References: <692d6ab1-d737-2683-5e55-b5f838f99b01@secunet.com>
- <2290757.F5Nm8BLmaV@tauon.chronox.de>
+From: Corentin Labbe <clabbe.montjoie@gmail.com>
+Subject: Re: [PATCH v2 2/2] crypto: engine - Permit to enqueue skcipher
+ request
+Date: Fri, 14 Jul 2017 13:15:36 +0200
+Message-ID: <20170714111536.GA30440@Red>
+References: <20170606134417.18850-1-clabbe.montjoie@gmail.com>
+ <20170606134417.18850-3-clabbe.montjoie@gmail.com>
+ <20170619052707.GA13180@gondor.apana.org.au>
+ <20170619075524.GA27419@Red>
+ <20170623064837.GA29139@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8bit
-Cc: Christian Langrock <christian.langrock@secunet.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Content-Type: text/plain; charset=us-ascii
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([62.96.220.36]:53786 "EHLO a.mx.secunet.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751008AbdGNEvd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Jul 2017 00:51:33 -0400
+Received: from mail-wm0-f42.google.com ([74.125.82.42]:33790 "EHLO
+        mail-wm0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753472AbdGNLP5 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 14 Jul 2017 07:15:57 -0400
 Content-Disposition: inline
-In-Reply-To: <2290757.F5Nm8BLmaV@tauon.chronox.de>
+In-Reply-To: <20170623064837.GA29139@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jul 13, 2017 at 04:51:10PM +0200, Stephan Müller wrote:
-> Am Donnerstag, 13. Juli 2017, 16:22:32 CEST schrieb Christian Langrock:
+On Fri, Jun 23, 2017 at 02:48:37PM +0800, Herbert Xu wrote:
+> On Mon, Jun 19, 2017 at 09:55:24AM +0200, Corentin Labbe wrote:
+> >
+> > Since there are two different user of "crypto engine + ablkcipher", it will be not easy to convert them in one serie. (I could do it, but I simply could not test it for OMAP (lack of hw))
+> > And any new user which want to use crypto engine+skcipher (like me with the sun8i-ce driver) are simply stuck.
 > 
-> Hi Christian,
+> You're right.  We'll need to do this in a backwards-compatible way.  In fact
+> we already do something similar in skcipher.c itself.  Simply look at the
+> cra_type field and if it matches blkcipher/ablkcipher/givcipher then it's
+> legacy ablkcipher, otherwise it's skcipher.
 > 
-> > With this patch it's possible to use crypto user API form all
-> > network namespaces, not only form the initial net ns.
+> Also the way crypto_engine looks at the request type in the data-path is
+> suboptimal.  This should really be built into the cra_type object.  For
+> example, we can have cra_type->engine->prepare_request which would just
+> do the right thing.
 > 
-> Is this wise?
-> 
-> The crypto_user interface allows root users to change settings in the kernel 
-> with a global scope. For example, you can deregister ciphers, change the prio 
-> of ciphers and so on. All of that is visible on a global scale and thus should 
-> not be possible from namespaces, IMHO.
 
-It is possible to use crypto from all namespaces, so would be nice if
-it would be possible to choose which algorithm to use. The problem is that
-you can change the global crypto configuration from within a namespace
-with this. Maybe crypto_alg_list etc. should be namespace aware first,
-then each namespace can have its own configuration.
+Not sure to have well understand what you want.
+You want that I switch on cra_type instead of crypto_tfm_alg_type() ?
