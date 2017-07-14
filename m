@@ -1,34 +1,71 @@
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH 00/12] staging: ccree: coding style fixes
-Date: Fri, 14 Jul 2017 13:39:40 +0200
-Message-ID: <20170714113940.GA5059@kroah.com>
-References: <1499934004-28513-1-git-send-email-gilad@benyossef.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Fixes for 4.13
+Date: Fri, 14 Jul 2017 22:18:55 +0800
+Message-ID: <20170714141855.GA29426@gondor.apana.org.au>
+References: <20161119102748.GA4277@gondor.apana.org.au>
+ <20161213132414.GA7898@gondor.apana.org.au>
+ <20170223125141.GA17400@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
-        linux-kernel@vger.kernel.org, Ofir Drang <ofir.drang@arm.com>
-To: Gilad Ben-Yossef <gilad@benyossef.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:42790 "EHLO
-        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753472AbdGNLjp (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Jul 2017 07:39:45 -0400
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1499934004-28513-1-git-send-email-gilad@benyossef.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20170223125141.GA17400@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jul 13, 2017 at 11:19:50AM +0300, Gilad Ben-Yossef wrote:
-> Another batch of ccree coding style fixes.
-> 
-> These goes on top of commit a8c4ae12 ("staging: ccree: Fix alignment issues in ssi_sysfs.c")
-> in staging-testing.
+Hi Linus: 
 
-Odd, some of these did not apply, but others did.  Please rebase your
-series and resend what I didn't pick up this time.
+This push fixes the following issues:
 
-thanks,
+- New compiler warnings in cavium.
+- Set post-op IV properly in caam (this fixes chaining).
+- Fix potential use-after-free in atmel in case of EBUSY.
+- Fix sleeping in softirq path in chcr.
+- Disable buggy sha1-avx2 driver (may overread and page fault).
+- Fix use-after-free on signals in caam.
+ 
 
-greg k-h
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+
+
+Colin Ian King (1):
+      crypto: cavium - make several functions static
+
+David Gstir (1):
+      crypto: caam - properly set IV after {en,de}crypt
+
+Gilad Ben-Yossef (1):
+      crypto: atmel - only treat EBUSY as transient if backlog
+
+Harsh Jain (1):
+      crypto: chcr - Avoid algo allocation in softirq.
+
+Herbert Xu (2):
+      crypto: sha1-ssse3 - Disable avx2
+
+Horia Geantă (1):
+      crypto: caam - fix signals handling
+
+ arch/x86/crypto/sha1_ssse3_glue.c      |    2 +-
+ crypto/af_alg.c                        |    2 +-
+ drivers/crypto/atmel-sha.c             |    4 +++-
+ drivers/crypto/caam/caamalg.c          |   20 ++++++++++++++++++--
+ drivers/crypto/caam/caamhash.c         |    2 +-
+ drivers/crypto/caam/key_gen.c          |    2 +-
+ drivers/crypto/cavium/cpt/cptvf_algs.c |    8 ++++----
+ drivers/crypto/chelsio/chcr_algo.c     |   23 +++++++++++++++--------
+ drivers/crypto/chelsio/chcr_crypto.h   |    1 +
+ 9 files changed, 45 insertions(+), 19 deletions(-)
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
