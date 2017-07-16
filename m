@@ -1,42 +1,50 @@
-From: Greg KH <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH 00/10] Fix alignment issues in staging/ccree
-Date: Sun, 16 Jul 2017 13:13:36 +0200
-Message-ID: <20170716111336.GA21455@kroah.com>
-References: <20170701232555.5538-1-simon@nikanor.nu>
- <20170711170033.GA22803@kroah.com>
- <20170716103316.ui2mnv4c3khnqcuc@epsilon.nikanor.nu>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Cc: gilad@benyossef.com, devel@driverdev.osuosl.org,
-        driverdev-devel@linuxdriverproject.org,
-        linux-crypto@vger.kernel.org
-To: Simon =?iso-8859-1?Q?Sandstr=F6m?= <simon@nikanor.nu>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: [PATCH] crypto/rng: ensure that the RNG is ready before using
+Date: Sun, 16 Jul 2017 19:22:06 +0200
+Message-ID: <20170716172206.6541-1-Jason@zx2c4.com>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+To: Neil Horman <nhorman@tuxdriver.com>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:38464 "EHLO
-        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751087AbdGPLNm (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 16 Jul 2017 07:13:42 -0400
-Content-Disposition: inline
-In-Reply-To: <20170716103316.ui2mnv4c3khnqcuc@epsilon.nikanor.nu>
+Received: from frisell.zx2c4.com ([192.95.5.64]:56941 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751158AbdGPRWM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 16 Jul 2017 13:22:12 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Jul 16, 2017 at 12:33:16PM +0200, Simon Sandström wrote:
-> Hi
-> 
-> On Tue, Jul 11, 2017 at 07:00:33PM +0200, Greg KH wrote:
-> > Not all of these applied, some did, if you could rebase the remaining
-> > against my staging-testing branch at the moment, and resend, that would
-> > be great.
-> 
-> I'm not sure about the preferred procedure. Is it OK to send the
-> rebased patches in this mail thread, or should I send them as a
-> new patchset in a new mail thread?
+Otherwise, we might be seeding the RNG using bad randomness, which is
+dangerous. The one use of this function from within the kernel -- not
+from userspace -- is being removed (keys/big_key), so that call site
+isn't relevant in assessing this.
 
-A whole new patchset would be fine, as I already took some of these.
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+---
+ crypto/rng.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-thanks,
-
-greg k-h
+diff --git a/crypto/rng.c b/crypto/rng.c
+index 5e8469244960..b4a618668161 100644
+--- a/crypto/rng.c
++++ b/crypto/rng.c
+@@ -43,12 +43,14 @@ int crypto_rng_reset(struct crypto_rng *tfm, const u8 *seed, unsigned int slen)
+ 		if (!buf)
+ 			return -ENOMEM;
+ 
+-		get_random_bytes(buf, slen);
++		err = get_random_bytes_wait(buf, slen);
++		if (err)
++			goto out;
+ 		seed = buf;
+ 	}
+ 
+ 	err = crypto_rng_alg(tfm)->seed(tfm, seed, slen);
+-
++out:
+ 	kzfree(buf);
+ 	return err;
+ }
+-- 
+2.13.3
