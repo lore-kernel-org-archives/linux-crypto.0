@@ -1,142 +1,37 @@
-From: sunil.m@techveda.org
-Subject: [PATCH 3/3] staging: ccree: Use platform_get_irq and devm_request_irq
-Date: Sat, 15 Jul 2017 13:21:56 +0530
-Message-ID: <1500105116-30290-4-git-send-email-sunil.m@techveda.org>
-References: <1500105116-30290-1-git-send-email-sunil.m@techveda.org>
+From: Simon =?utf-8?Q?Sandstr=C3=B6m?= <simon@nikanor.nu>
+Subject: Re: [PATCH 00/10] Fix alignment issues in staging/ccree
+Date: Sun, 16 Jul 2017 12:33:16 +0200
+Message-ID: <20170716103316.ui2mnv4c3khnqcuc@epsilon.nikanor.nu>
+References: <20170701232555.5538-1-simon@nikanor.nu>
+ <20170711170033.GA22803@kroah.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: devel@driverdev.osuosl.org, driverdev-devel@linuxdriverproject.org,
- karthik@techveda.org, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org, Suniel Mahesh <sunil.m@techveda.org>
-To: gregkh@linuxfoundation.org,
-	gilad@benyossef.com
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-In-Reply-To: <1500105116-30290-1-git-send-email-sunil.m@techveda.org>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: gilad@benyossef.com, devel@driverdev.osuosl.org,
+        driverdev-devel@linuxdriverproject.org,
+        linux-crypto@vger.kernel.org
+To: Greg KH <gregkh@linuxfoundation.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-lf0-f49.google.com ([209.85.215.49]:34878 "EHLO
+        mail-lf0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751048AbdGPKdV (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 16 Jul 2017 06:33:21 -0400
+Received: by mail-lf0-f49.google.com with SMTP id w198so4846422lff.2
+        for <linux-crypto@vger.kernel.org>; Sun, 16 Jul 2017 03:33:20 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <20170711170033.GA22803@kroah.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Suniel Mahesh <sunil.m@techveda.org>
+Hi
 
-It is recommended to use managed function devm_request_irq(),
-which simplifies driver cleanup paths and driver code.
-This patch does the following:
-(a) replace platform_get_resource(), request_irq() and corresponding
-error handling with platform_get_irq() and devm_request_irq().
-(b) remove struct resource pointer(res_irq) in struct ssi_drvdata as
-it seems redundant.
-(c) change type of member irq in struct ssi_drvdata from unsigned int
-to int, as return type of platform_get_irq is int and can be used in
-error handling.
-(d) remove irq_registered variable from driver probe as it seems
-redundant.
-(e) free_irq is not required any more, devm_request_irq() free's it
-on driver detach.
-(f) adjust log messages accordingly and remove any blank lines.
+On Tue, Jul 11, 2017 at 07:00:33PM +0200, Greg KH wrote:
+> Not all of these applied, some did, if you could rebase the remaining
+> against my staging-testing branch at the moment, and resend, that would
+> be great.
 
-Signed-off-by: Suniel Mahesh <sunil.m@techveda.org>
----
-Note:
-- Patch was tested and built(ARCH=arm) on next-20170714.
-  No build issues reported, however it was not tested on
-  real hardware.
----
- drivers/staging/ccree/ssi_driver.c | 29 +++++++++--------------------
- drivers/staging/ccree/ssi_driver.h |  3 +--
- 2 files changed, 10 insertions(+), 22 deletions(-)
+I'm not sure about the preferred procedure. Is it OK to send the
+rebased patches in this mail thread, or should I send them as a
+new patchset in a new mail thread?
 
-diff --git a/drivers/staging/ccree/ssi_driver.c b/drivers/staging/ccree/ssi_driver.c
-index dca0ce8..11b62d0 100644
---- a/drivers/staging/ccree/ssi_driver.c
-+++ b/drivers/staging/ccree/ssi_driver.c
-@@ -223,7 +223,6 @@ static int init_cc_resources(struct platform_device *plat_dev)
- {
- 	struct resource *req_mem_cc_regs = NULL;
- 	void __iomem *cc_base = NULL;
--	bool irq_registered = false;
- 	struct ssi_drvdata *new_drvdata;
- 	struct device *dev = &plat_dev->dev;
- 	struct device_node *np = dev->of_node;
-@@ -263,25 +262,22 @@ static int init_cc_resources(struct platform_device *plat_dev)
- 		      &req_mem_cc_regs->start, new_drvdata->cc_base);
- 	cc_base = new_drvdata->cc_base;
- 	/* Then IRQ */
--	new_drvdata->res_irq = platform_get_resource(plat_dev, IORESOURCE_IRQ, 0);
--	if (unlikely(!new_drvdata->res_irq)) {
-+	new_drvdata->irq = platform_get_irq(plat_dev, 0);
-+	if (new_drvdata->irq < 0) {
- 		SSI_LOG_ERR("Failed getting IRQ resource\n");
--		rc = -ENODEV;
-+		rc = new_drvdata->irq;
- 		goto init_cc_res_err;
- 	}
--	rc = request_irq(new_drvdata->res_irq->start, cc_isr,
--			 IRQF_SHARED, "arm_cc7x", new_drvdata);
--	if (unlikely(rc != 0)) {
--		SSI_LOG_ERR("Could not register to interrupt %llu\n",
--			(unsigned long long)new_drvdata->res_irq->start);
-+	rc = devm_request_irq(&plat_dev->dev, new_drvdata->irq, cc_isr,
-+			      IRQF_SHARED, "arm_cc7x", new_drvdata);
-+	if (rc) {
-+		SSI_LOG_ERR("Could not register to interrupt: %d\n",
-+			    new_drvdata->irq);
- 		goto init_cc_res_err;
- 	}
- 	init_completion(&new_drvdata->icache_setup_completion);
- 
--	irq_registered = true;
--	SSI_LOG_DEBUG("Registered to IRQ (%s) %llu\n",
--		new_drvdata->res_irq->name,
--		(unsigned long long)new_drvdata->res_irq->start);
-+	SSI_LOG_DEBUG("Registered to IRQ: %d\n", new_drvdata->irq);
- 
- 	new_drvdata->plat_dev = plat_dev;
- 
-@@ -408,10 +404,6 @@ static int init_cc_resources(struct platform_device *plat_dev)
- #ifdef ENABLE_CC_SYSFS
- 		ssi_sysfs_fini();
- #endif
--		if (irq_registered) {
--			free_irq(new_drvdata->res_irq->start, new_drvdata);
--			new_drvdata->res_irq = NULL;
--		}
- 		dev_set_drvdata(&plat_dev->dev, NULL);
- 	}
- 	return rc;
-@@ -441,11 +433,8 @@ static void cleanup_cc_resources(struct platform_device *plat_dev)
- #ifdef ENABLE_CC_SYSFS
- 	ssi_sysfs_fini();
- #endif
--
- 	fini_cc_regs(drvdata);
- 	cc_clk_off(drvdata);
--	free_irq(drvdata->res_irq->start, drvdata);
--	drvdata->res_irq = NULL;
- 	dev_set_drvdata(&plat_dev->dev, NULL);
- }
- 
-diff --git a/drivers/staging/ccree/ssi_driver.h b/drivers/staging/ccree/ssi_driver.h
-index 4b38fe2..6fcd151 100644
---- a/drivers/staging/ccree/ssi_driver.h
-+++ b/drivers/staging/ccree/ssi_driver.h
-@@ -129,9 +129,8 @@ struct ssi_crypto_req {
-  * @fw_ver:	SeP loaded firmware version
-  */
- struct ssi_drvdata {
--	struct resource *res_irq;
- 	void __iomem *cc_base;
--	unsigned int irq;
-+	int irq;
- 	u32 irq_mask;
- 	u32 fw_ver;
- 	/* Calibration time of start/stop
--- 
-1.9.1
+- Simon
