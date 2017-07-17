@@ -1,46 +1,54 @@
 From: Antoine Tenart <antoine.tenart@free-electrons.com>
-Subject: [PATCH 2/2] crypto: inside-secure - fix the sha state length in hmac_sha1_setkey
-Date: Mon, 17 Jul 2017 11:45:20 +0200
-Message-ID: <20170717094520.3497-2-antoine.tenart@free-electrons.com>
-References: <20170717094520.3497-1-antoine.tenart@free-electrons.com>
+Subject: [PATCH 1/2] crypto: inside-secure - fix invalidation check in hmac_sha1_setkey
+Date: Mon, 17 Jul 2017 11:45:19 +0200
+Message-ID: <20170717094520.3497-1-antoine.tenart@free-electrons.com>
 Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
         thomas.petazzoni@free-electrons.com,
         gregory.clement@free-electrons.com, oferh@marvell.com,
         igall@marvell.com, nadavh@marvell.com, linux-crypto@vger.kernel.org
 To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:45436 "EHLO
+Received: from mail.free-electrons.com ([62.4.15.54]:45438 "EHLO
         mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751279AbdGQJuD (ORCPT
+        with ESMTP id S1751288AbdGQJuD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Mon, 17 Jul 2017 05:50:03 -0400
-In-Reply-To: <20170717094520.3497-1-antoine.tenart@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-A check is performed on the ipad/opad in the safexcel_hmac_sha1_setkey
-function, but the index used by the loop doing it is wrong. It is
-currently the size of the state array while it should be the size of a
-sha1 state. This patch fixes it.
+The safexcel_hmac_sha1_setkey function checks if an invalidation command
+should be issued, i.e. when the context ipad/opad change. This checks is
+done after filling the ipad/opad which and it can't be true. The patch
+fixes this by moving the check before the ipad/opad memcpy operations.
 
-Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
 Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
 ---
- drivers/crypto/inside-secure/safexcel_hash.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/crypto/inside-secure/safexcel_hash.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
-index a11b2edb41b9..3f819399cd95 100644
+index 8527a5899a2f..a11b2edb41b9 100644
 --- a/drivers/crypto/inside-secure/safexcel_hash.c
 +++ b/drivers/crypto/inside-secure/safexcel_hash.c
-@@ -883,7 +883,7 @@ static int safexcel_hmac_sha1_setkey(struct crypto_ahash *tfm, const u8 *key,
+@@ -883,9 +883,6 @@ static int safexcel_hmac_sha1_setkey(struct crypto_ahash *tfm, const u8 *key,
  	if (ret)
  		return ret;
  
--	for (i = 0; i < ARRAY_SIZE(istate.state); i++) {
-+	for (i = 0; i < SHA1_DIGEST_SIZE / sizeof(u32); i++) {
+-	memcpy(ctx->ipad, &istate.state, SHA1_DIGEST_SIZE);
+-	memcpy(ctx->opad, &ostate.state, SHA1_DIGEST_SIZE);
+-
+ 	for (i = 0; i < ARRAY_SIZE(istate.state); i++) {
  		if (ctx->ipad[i] != le32_to_cpu(istate.state[i]) ||
  		    ctx->opad[i] != le32_to_cpu(ostate.state[i])) {
- 			ctx->base.needs_inv = true;
+@@ -894,6 +891,9 @@ static int safexcel_hmac_sha1_setkey(struct crypto_ahash *tfm, const u8 *key,
+ 		}
+ 	}
+ 
++	memcpy(ctx->ipad, &istate.state, SHA1_DIGEST_SIZE);
++	memcpy(ctx->opad, &ostate.state, SHA1_DIGEST_SIZE);
++
+ 	return 0;
+ }
+ 
 -- 
 2.13.3
