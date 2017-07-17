@@ -1,65 +1,67 @@
-From: Martin Kaiser <martin@kaiser.cx>
-Subject: Re: [PATCH v2 1/3] Documentation: devicetree: add Freescale RNGC
- binding
-Date: Mon, 17 Jul 2017 23:04:25 +0200
-Message-ID: <20170717210425.GB15429@reykholt.kaiser.cx>
+From: Martin Kaiser <martin-XxZfDwE/svGeZLLa646FqQ@public.gmane.org>
+Subject: [PATCH v3 1/3] Documentation: devicetree: add Freescale RNGC binding
+Date: Mon, 17 Jul 2017 23:16:01 +0200
+Message-ID: <1500326163-4556-1-git-send-email-martin@kaiser.cx>
 References: <1457705200-16951-1-git-send-email-s.trumtrar@pengutronix.de>
- <20160318194213.GA10766@rob-hp-laptop>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Mark Rutland <mark.rutland@arm.com>, devicetree@vger.kernel.org,
- Herbert Xu <herbert@gondor.apana.org.au>, Pawel Moll <pawel.moll@arm.com>,
- Ian Campbell <ijc+devicetree@hellion.org.uk>, Matt Mackall <mpm@selenic.com>,
- linux-crypto@vger.kernel.org, kernel@pengutronix.de,
- Kumar Gala <galak@codeaurora.org>,
- Steffen Trumtrar <s.trumtrar@pengutronix.de>, Shawn Guo <shawnguo@kernel.org>,
- linux-arm-kernel@lists.infradead.org
-To: Rob Herring <robh@kernel.org>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <20160318194213.GA10766@rob-hp-laptop>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Cc: Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        kernel-bIcnvbaLZ9MEGnE8C9+IrQ@public.gmane.org, Fabio Estevam <festevam-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        Martin Kaiser <martin-XxZfDwE/svGeZLLa646FqQ@public.gmane.org>
+To: Steffen Trumtrar <s.trumtrar-bIcnvbaLZ9MEGnE8C9+IrQ@public.gmane.org>,
+        Shawn Guo <shawnguo-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1457705200-16951-1-git-send-email-s.trumtrar-bIcnvbaLZ9MEGnE8C9+IrQ@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi,
+From: Steffen Trumtrar <s.trumtrar-bIcnvbaLZ9MEGnE8C9+IrQ@public.gmane.org>
 
-I'd like to pick this up and get the rngc driver merged finally.
+Add binding documentation for the Freescale RNGC found on
+some i.MX2/3 SoCs.
 
-Thus wrote Rob Herring (robh@kernel.org):
+Signed-off-by: Steffen Trumtrar <s.trumtrar-bIcnvbaLZ9MEGnE8C9+IrQ@public.gmane.org>
+Signed-off-by: Martin Kaiser <martin-XxZfDwE/svGeZLLa646FqQ@public.gmane.org>
+---
+Changes in v3:
+  - add compatible string for imx35
+  - remove imx5 from the commit message,
+    I couldn't find an i.MX5 soc that has an RNGC
 
-> The MXC name is still not dead?
+Changes in v2:
+  none
 
-looks like no. There's still CONFIG_ARCH_MXC etc. The other similar rng
-driver is called mxc-rnga.c so it makes sense to use mxc-rngc.
+ Documentation/devicetree/bindings/rng/mxc_rngc.txt | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/rng/mxc_rngc.txt
 
-> >  1 file changed, 16 insertions(+)
-> >  create mode 100644 Documentation/devicetree/bindings/rng/mxc_rngc.txt
+diff --git a/Documentation/devicetree/bindings/rng/mxc_rngc.txt b/Documentation/devicetree/bindings/rng/mxc_rngc.txt
+new file mode 100644
+index 0000000..5a12ada
+--- /dev/null
++++ b/Documentation/devicetree/bindings/rng/mxc_rngc.txt
+@@ -0,0 +1,16 @@
++Freescale RNGC (Random Number Generator Version C)
++
++Required properties:
++- compatible : Should be "fsl,imx25-rng" or "fsl,imx35-rng"
++- reg : Offset and length of the register set of this block
++- interrupts : the interrupt number for the RNG block
++- clocks: should contain the RNG clk source
++
++Example:
++
++rng@53fb0000 {
++	compatible = "fsl,imx25-rng";
++	reg = <0x53fb0000 0x4000>;
++	interrupts = <22>;
++	clocks = <&trng_clk>;
++};
+-- 
+2.1.4
 
-> > diff --git a/Documentation/devicetree/bindings/rng/mxc_rngc.txt b/Documentation/devicetree/bindings/rng/mxc_rngc.txt
-> > new file mode 100644
-> > index 000000000000..e147a6dde40a
-> > --- /dev/null
-> > +++ b/Documentation/devicetree/bindings/rng/mxc_rngc.txt
-> > @@ -0,0 +1,16 @@
-> > +Freescale RNGC (Random Number Generator Version C)
-> > +
-> > +Required properties:
-> > +- compatible : Should be "fsl,imx25-rng"
-
-> What about i.MX3/5 compatible strings?
-
-I couldn't find an imx5 chip that has this rng. I added a compatible
-string for imx35.
-
-Best regards,
-
-   Martin
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
