@@ -1,54 +1,68 @@
-From: Antoine Tenart <antoine.tenart@free-electrons.com>
-Subject: [PATCH 1/2] crypto: inside-secure - fix invalidation check in hmac_sha1_setkey
-Date: Mon, 17 Jul 2017 11:45:19 +0200
-Message-ID: <20170717094520.3497-1-antoine.tenart@free-electrons.com>
-Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
-        thomas.petazzoni@free-electrons.com,
-        gregory.clement@free-electrons.com, oferh@marvell.com,
-        igall@marvell.com, nadavh@marvell.com, linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au, davem@davemloft.net
+From: Greg KH <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH 1/3] staging: ccree: Replace kzalloc with devm_kzalloc
+Date: Mon, 17 Jul 2017 14:33:06 +0200
+Message-ID: <20170717123306.GF24503@kroah.com>
+References: <1500105116-30290-1-git-send-email-sunil.m@techveda.org>
+ <1500105116-30290-2-git-send-email-sunil.m@techveda.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: gilad@benyossef.com, devel@driverdev.osuosl.org,
+        driverdev-devel@linuxdriverproject.org, karthik@techveda.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: sunil.m@techveda.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:45438 "EHLO
-        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751288AbdGQJuD (ORCPT
+Received: from mail.linuxfoundation.org ([140.211.169.12]:45994 "EHLO
+        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751281AbdGQMdL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 Jul 2017 05:50:03 -0400
+        Mon, 17 Jul 2017 08:33:11 -0400
+Content-Disposition: inline
+In-Reply-To: <1500105116-30290-2-git-send-email-sunil.m@techveda.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The safexcel_hmac_sha1_setkey function checks if an invalidation command
-should be issued, i.e. when the context ipad/opad change. This checks is
-done after filling the ipad/opad which and it can't be true. The patch
-fixes this by moving the check before the ipad/opad memcpy operations.
+On Sat, Jul 15, 2017 at 01:21:54PM +0530, sunil.m@techveda.org wrote:
+> From: Suniel Mahesh <sunil.m@techveda.org>
+> 
+> It is recommended to use managed function devm_kzalloc, which
+> simplifies driver cleanup paths and driver code.
+> This patch does the following:
+> (a) replace kzalloc with devm_kzalloc.
+> (b) drop kfree(), because memory allocated with devm_kzalloc() is
+> automatically freed on driver detach, otherwise it leads to a double
+> free.
+> (c) remove unnecessary blank lines.
+> 
+> Signed-off-by: Suniel Mahesh <sunil.m@techveda.org>
+> ---
+> Note:
+> - Patch was tested and built(ARCH=arm) on next-20170714.
+>   No build issues reported, however it was not tested on
+>   real hardware.
+> ---
+>  drivers/staging/ccree/ssi_driver.c | 10 ++++------
+>  1 file changed, 4 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/staging/ccree/ssi_driver.c b/drivers/staging/ccree/ssi_driver.c
+> index 78709b92..f231ecf 100644
+> --- a/drivers/staging/ccree/ssi_driver.c
+> +++ b/drivers/staging/ccree/ssi_driver.c
+> @@ -224,13 +224,15 @@ static int init_cc_resources(struct platform_device *plat_dev)
+>  	struct resource *req_mem_cc_regs = NULL;
+>  	void __iomem *cc_base = NULL;
+>  	bool irq_registered = false;
+> -	struct ssi_drvdata *new_drvdata = kzalloc(sizeof(struct ssi_drvdata), GFP_KERNEL);
+> +	struct ssi_drvdata *new_drvdata;
+>  	struct device *dev = &plat_dev->dev;
+>  	struct device_node *np = dev->of_node;
+>  	u32 signature_val;
+>  	int rc = 0;
+>  
+> -	if (unlikely(!new_drvdata)) {
+> +	new_drvdata = devm_kzalloc(&plat_dev->dev, sizeof(struct ssi_drvdata),
 
-Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
----
- drivers/crypto/inside-secure/safexcel_hash.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+sizeof(*new_drvdata), right?
 
-diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
-index 8527a5899a2f..a11b2edb41b9 100644
---- a/drivers/crypto/inside-secure/safexcel_hash.c
-+++ b/drivers/crypto/inside-secure/safexcel_hash.c
-@@ -883,9 +883,6 @@ static int safexcel_hmac_sha1_setkey(struct crypto_ahash *tfm, const u8 *key,
- 	if (ret)
- 		return ret;
- 
--	memcpy(ctx->ipad, &istate.state, SHA1_DIGEST_SIZE);
--	memcpy(ctx->opad, &ostate.state, SHA1_DIGEST_SIZE);
--
- 	for (i = 0; i < ARRAY_SIZE(istate.state); i++) {
- 		if (ctx->ipad[i] != le32_to_cpu(istate.state[i]) ||
- 		    ctx->opad[i] != le32_to_cpu(ostate.state[i])) {
-@@ -894,6 +891,9 @@ static int safexcel_hmac_sha1_setkey(struct crypto_ahash *tfm, const u8 *key,
- 		}
- 	}
- 
-+	memcpy(ctx->ipad, &istate.state, SHA1_DIGEST_SIZE);
-+	memcpy(ctx->opad, &ostate.state, SHA1_DIGEST_SIZE);
-+
- 	return 0;
- }
- 
--- 
-2.13.3
+thanks,
+
+greg k-h
