@@ -1,7 +1,7 @@
 From: Gary R Hook <gary.hook@amd.com>
-Subject: [PATCH 3/4] crypto: ccp - Add support for RSA on the CCP
-Date: Mon, 17 Jul 2017 15:16:32 -0500
-Message-ID: <150032259238.102878.8731817810519834691.stgit@sosxen.amd.com>
+Subject: [PATCH 4/4] csrypto: ccp - Expand RSA support for a v5 ccp
+Date: Mon, 17 Jul 2017 15:16:42 -0500
+Message-ID: <150032260278.102878.17708144678881515908.stgit@sosxen.amd.com>
 References: <150032218639.102878.17376499349231172712.stgit@sosxen.amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -10,465 +10,119 @@ Cc: thomas.lendacky@amd.com, herbert@gondor.apana.org.au,
         davem@davemloft.net
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2nam01on0053.outbound.protection.outlook.com ([104.47.34.53]:11648
-        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
+Received: from mail-dm3nam03on0059.outbound.protection.outlook.com ([104.47.41.59]:41572
+        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751348AbdGQUQi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 Jul 2017 16:16:38 -0400
+        id S1751346AbdGQUQu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 17 Jul 2017 16:16:50 -0400
 In-Reply-To: <150032218639.102878.17376499349231172712.stgit@sosxen.amd.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Wire up the CCP as an RSA cipher provider.
+A version 5 CCP can handle an RSA modulus up to 16k bits.
 
 Signed-off-by: Gary R Hook <gary.hook@amd.com>
 ---
- drivers/crypto/ccp/Makefile          |    1 
- drivers/crypto/ccp/ccp-crypto-main.c |   19 ++
- drivers/crypto/ccp/ccp-crypto-rsa.c  |  296 ++++++++++++++++++++++++++++++++++
- drivers/crypto/ccp/ccp-crypto.h      |   31 ++++
- 4 files changed, 347 insertions(+)
- create mode 100644 drivers/crypto/ccp/ccp-crypto-rsa.c
+ drivers/crypto/ccp/ccp-crypto-rsa.c |    5 ++++-
+ drivers/crypto/ccp/ccp-crypto.h     |    1 +
+ drivers/crypto/ccp/ccp-dev-v3.c     |    1 +
+ drivers/crypto/ccp/ccp-dev-v5.c     |    2 ++
+ drivers/crypto/ccp/ccp-dev.h        |    1 +
+ drivers/crypto/ccp/ccp-ops.c        |    3 ++-
+ drivers/crypto/ccp/sp-dev.h         |    1 +
+ 7 files changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/ccp/Makefile b/drivers/crypto/ccp/Makefile
-index 5f2adc5facfe..57f8debfcfb3 100644
---- a/drivers/crypto/ccp/Makefile
-+++ b/drivers/crypto/ccp/Makefile
-@@ -15,4 +15,5 @@ ccp-crypto-objs := ccp-crypto-main.o \
- 		   ccp-crypto-aes-xts.o \
- 		   ccp-crypto-aes-galois.o \
- 		   ccp-crypto-des3.o \
-+		   ccp-crypto-rsa.o \
- 		   ccp-crypto-sha.o
-diff --git a/drivers/crypto/ccp/ccp-crypto-main.c b/drivers/crypto/ccp/ccp-crypto-main.c
-index 78b9d26a381f..35a9de7fd475 100644
---- a/drivers/crypto/ccp/ccp-crypto-main.c
-+++ b/drivers/crypto/ccp/ccp-crypto-main.c
-@@ -17,6 +17,7 @@
- #include <linux/ccp.h>
- #include <linux/scatterlist.h>
- #include <crypto/internal/hash.h>
-+#include <crypto/internal/akcipher.h>
- 
- #include "ccp-crypto.h"
- 
-@@ -37,10 +38,15 @@ static unsigned int des3_disable;
- module_param(des3_disable, uint, 0444);
- MODULE_PARM_DESC(des3_disable, "Disable use of 3DES - any non-zero value");
- 
-+static unsigned int rsa_disable;
-+module_param(rsa_disable, uint, 0444);
-+MODULE_PARM_DESC(rsa_disable, "Disable use of RSA - any non-zero value");
-+
- /* List heads for the supported algorithms */
- static LIST_HEAD(hash_algs);
- static LIST_HEAD(cipher_algs);
- static LIST_HEAD(aead_algs);
-+static LIST_HEAD(akcipher_algs);
- 
- /* For any tfm, requests for that tfm must be returned on the order
-  * received.  With multiple queues available, the CCP can process more
-@@ -358,6 +364,12 @@ static int ccp_register_algs(void)
- 			return ret;
- 	}
- 
-+	if (!rsa_disable) {
-+		ret = ccp_register_rsa_algs(&akcipher_algs);
-+		if (ret)
-+			return ret;
-+	}
-+
- 	return 0;
- }
- 
-@@ -366,6 +378,7 @@ static void ccp_unregister_algs(void)
- 	struct ccp_crypto_ahash_alg *ahash_alg, *ahash_tmp;
- 	struct ccp_crypto_ablkcipher_alg *ablk_alg, *ablk_tmp;
- 	struct ccp_crypto_aead *aead_alg, *aead_tmp;
-+	struct ccp_crypto_akcipher_alg *akc_alg, *akc_tmp;
- 
- 	list_for_each_entry_safe(ahash_alg, ahash_tmp, &hash_algs, entry) {
- 		crypto_unregister_ahash(&ahash_alg->alg);
-@@ -384,6 +397,12 @@ static void ccp_unregister_algs(void)
- 		list_del(&aead_alg->entry);
- 		kfree(aead_alg);
- 	}
-+
-+	list_for_each_entry_safe(akc_alg, akc_tmp, &akcipher_algs, entry) {
-+		crypto_unregister_akcipher(&akc_alg->alg);
-+		list_del(&akc_alg->entry);
-+		kfree(akc_alg);
-+	}
- }
- 
- static int ccp_crypto_init(void)
 diff --git a/drivers/crypto/ccp/ccp-crypto-rsa.c b/drivers/crypto/ccp/ccp-crypto-rsa.c
-new file mode 100644
-index 000000000000..d5544943f5f0
---- /dev/null
+index d5544943f5f0..e6db8672d89c 100644
+--- a/drivers/crypto/ccp/ccp-crypto-rsa.c
 +++ b/drivers/crypto/ccp/ccp-crypto-rsa.c
-@@ -0,0 +1,296 @@
-+/*
-+ * AMD Cryptographic Coprocessor (CCP) RSA crypto API support
-+ *
-+ * Copyright (C) 2017 Advanced Micro Devices, Inc.
-+ *
-+ * Author: Gary R Hook <gary.hook@amd.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ */
-+
-+#include <linux/module.h>
-+#include <linux/sched.h>
-+#include <linux/scatterlist.h>
-+#include <linux/crypto.h>
-+#include <crypto/algapi.h>
-+#include <crypto/internal/rsa.h>
-+#include <crypto/internal/akcipher.h>
-+#include <crypto/akcipher.h>
-+#include <crypto/scatterwalk.h>
-+
-+#include "ccp-crypto.h"
-+
-+static inline struct akcipher_request *akcipher_request_cast(
-+	struct crypto_async_request *req)
-+{
-+	return container_of(req, struct akcipher_request, base);
-+}
-+
-+static inline int ccp_copy_and_save_keypart(u8 **kpbuf, unsigned int *kplen,
-+					    const u8 *buf, size_t sz)
-+{
-+	int nskip;
-+
-+	for (nskip = 0; nskip < sz; nskip++)
-+		if (buf[nskip])
-+			break;
-+	*kplen = sz - nskip;
-+	*kpbuf = kzalloc(*kplen, GFP_KERNEL);
-+	if (!*kpbuf)
-+		return -ENOMEM;
-+	memcpy(*kpbuf, buf + nskip, *kplen);
-+
-+	return 0;
-+}
-+
-+static int ccp_rsa_complete(struct crypto_async_request *async_req, int ret)
-+{
-+	struct akcipher_request *req = akcipher_request_cast(async_req);
-+	struct ccp_rsa_req_ctx *rctx = akcipher_request_ctx(req);
-+
-+	if (ret)
-+		return ret;
-+
-+	req->dst_len = rctx->cmd.u.rsa.key_size >> 3;
-+
-+	return 0;
-+}
-+
-+static unsigned int ccp_rsa_maxsize(struct crypto_akcipher *tfm)
-+{
-+	return CCP_RSA_MAXMOD;
-+}
-+
-+static int ccp_rsa_crypt(struct akcipher_request *req, bool encrypt)
-+{
-+	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
-+	struct ccp_ctx *ctx = akcipher_tfm_ctx(tfm);
-+	struct ccp_rsa_req_ctx *rctx = akcipher_request_ctx(req);
-+	int ret = 0;
-+
-+	memset(&rctx->cmd, 0, sizeof(rctx->cmd));
-+	INIT_LIST_HEAD(&rctx->cmd.entry);
-+	rctx->cmd.engine = CCP_ENGINE_RSA;
-+
-+	rctx->cmd.u.rsa.key_size = ctx->u.rsa.key_len; /* in bits */
-+	if (encrypt) {
-+		rctx->cmd.u.rsa.exp = &ctx->u.rsa.e_sg;
-+		rctx->cmd.u.rsa.exp_len = ctx->u.rsa.e_len;
-+	} else {
-+		rctx->cmd.u.rsa.exp = &ctx->u.rsa.d_sg;
-+		rctx->cmd.u.rsa.exp_len = ctx->u.rsa.d_len;
-+	}
-+	rctx->cmd.u.rsa.mod = &ctx->u.rsa.n_sg;
-+	rctx->cmd.u.rsa.mod_len = ctx->u.rsa.n_len;
-+	rctx->cmd.u.rsa.src = req->src;
-+	rctx->cmd.u.rsa.src_len = req->src_len;
-+	rctx->cmd.u.rsa.dst = req->dst;
-+
-+	ret = ccp_crypto_enqueue_request(&req->base, &rctx->cmd);
-+
-+	return ret;
-+}
-+
-+static int ccp_rsa_encrypt(struct akcipher_request *req)
-+{
-+	return ccp_rsa_crypt(req, true);
-+}
-+
-+static int ccp_rsa_decrypt(struct akcipher_request *req)
-+{
-+	return ccp_rsa_crypt(req, false);
-+}
-+
-+static int ccp_check_key_length(unsigned int len)
-+{
-+	/* In bits */
-+	if (len < 8 || len > 4096)
-+		return -EINVAL;
-+	return 0;
-+}
-+
-+static void ccp_rsa_free_key_bufs(struct ccp_ctx *ctx)
-+{
-+	/* Clean up old key data */
-+	kzfree(ctx->u.rsa.e_buf);
-+	ctx->u.rsa.e_buf = NULL;
-+	ctx->u.rsa.e_len = 0;
-+	kzfree(ctx->u.rsa.n_buf);
-+	ctx->u.rsa.n_buf = NULL;
-+	ctx->u.rsa.n_len = 0;
-+	kzfree(ctx->u.rsa.d_buf);
-+	ctx->u.rsa.d_buf = NULL;
-+	ctx->u.rsa.d_len = 0;
-+}
-+
-+static int ccp_rsa_setkey(struct crypto_akcipher *tfm, const void *key,
-+			  unsigned int keylen, bool private)
-+{
-+	struct ccp_ctx *ctx = akcipher_tfm_ctx(tfm);
-+	struct rsa_key raw_key;
-+	int ret;
-+
-+	ccp_rsa_free_key_bufs(ctx);
-+	memset(&raw_key, 0, sizeof(raw_key));
-+
-+	/* Code borrowed from crypto/rsa.c */
-+	if (private)
-+		ret = rsa_parse_priv_key(&raw_key, key, keylen);
+@@ -60,7 +60,10 @@ static int ccp_rsa_complete(struct crypto_async_request *async_req, int ret)
+ 
+ static unsigned int ccp_rsa_maxsize(struct crypto_akcipher *tfm)
+ {
+-	return CCP_RSA_MAXMOD;
++	if (ccp_version() > CCP_VERSION(3, 0))
++		return CCP5_RSA_MAXMOD;
 +	else
-+		ret = rsa_parse_pub_key(&raw_key, key, keylen);
-+	if (ret)
-+		goto n_key;
-+
-+	ret = ccp_copy_and_save_keypart(&ctx->u.rsa.n_buf, &ctx->u.rsa.n_len,
-+					raw_key.n, raw_key.n_sz);
-+	if (ret)
-+		goto key_err;
-+	sg_init_one(&ctx->u.rsa.n_sg, ctx->u.rsa.n_buf, ctx->u.rsa.n_len);
-+
-+	ctx->u.rsa.key_len = ctx->u.rsa.n_len << 3; /* convert to bits */
-+	if (ccp_check_key_length(ctx->u.rsa.key_len)) {
-+		ret = -EINVAL;
-+		goto key_err;
-+	}
-+
-+	ret = ccp_copy_and_save_keypart(&ctx->u.rsa.e_buf, &ctx->u.rsa.e_len,
-+					raw_key.e, raw_key.e_sz);
-+	if (ret)
-+		goto key_err;
-+	sg_init_one(&ctx->u.rsa.e_sg, ctx->u.rsa.e_buf, ctx->u.rsa.e_len);
-+
-+	if (private) {
-+		ret = ccp_copy_and_save_keypart(&ctx->u.rsa.d_buf,
-+						&ctx->u.rsa.d_len,
-+						raw_key.d, raw_key.d_sz);
-+		if (ret)
-+			goto key_err;
-+		sg_init_one(&ctx->u.rsa.d_sg,
-+			    ctx->u.rsa.d_buf, ctx->u.rsa.d_len);
-+	}
-+
-+	return 0;
-+
-+key_err:
-+	ccp_rsa_free_key_bufs(ctx);
-+
-+n_key:
-+	return ret;
-+}
-+
-+static int ccp_rsa_setprivkey(struct crypto_akcipher *tfm, const void *key,
-+			      unsigned int keylen)
-+{
-+	return ccp_rsa_setkey(tfm, key, keylen, true);
-+}
-+
-+static int ccp_rsa_setpubkey(struct crypto_akcipher *tfm, const void *key,
-+			     unsigned int keylen)
-+{
-+	return ccp_rsa_setkey(tfm, key, keylen, false);
-+}
-+
-+static int ccp_rsa_init_tfm(struct crypto_akcipher *tfm)
-+{
-+	struct ccp_ctx *ctx = akcipher_tfm_ctx(tfm);
-+
-+	akcipher_set_reqsize(tfm, sizeof(struct ccp_rsa_req_ctx));
-+	ctx->complete = ccp_rsa_complete;
-+
-+	return 0;
-+}
-+
-+static void ccp_rsa_exit_tfm(struct crypto_akcipher *tfm)
-+{
-+	struct ccp_ctx *ctx = crypto_tfm_ctx(&tfm->base);
-+
-+	ccp_rsa_free_key_bufs(ctx);
-+}
-+
-+static struct akcipher_alg ccp_rsa_defaults = {
-+	.encrypt = ccp_rsa_encrypt,
-+	.decrypt = ccp_rsa_decrypt,
-+	.sign = ccp_rsa_decrypt,
-+	.verify = ccp_rsa_encrypt,
-+	.set_pub_key = ccp_rsa_setpubkey,
-+	.set_priv_key = ccp_rsa_setprivkey,
-+	.max_size = ccp_rsa_maxsize,
-+	.init = ccp_rsa_init_tfm,
-+	.exit = ccp_rsa_exit_tfm,
-+	.base = {
-+		.cra_name = "rsa",
-+		.cra_driver_name = "rsa-ccp",
-+		.cra_priority = CCP_CRA_PRIORITY,
-+		.cra_module = THIS_MODULE,
-+		.cra_ctxsize = 2 * sizeof(struct ccp_ctx),
-+	},
-+};
-+
-+struct ccp_rsa_def {
-+	unsigned int version;
-+	const char *name;
-+	const char *driver_name;
-+	unsigned int reqsize;
-+	struct akcipher_alg *alg_defaults;
-+};
-+
-+static struct ccp_rsa_def rsa_algs[] = {
-+	{
-+		.version	= CCP_VERSION(3, 0),
-+		.name		= "rsa",
-+		.driver_name	= "rsa-ccp",
-+		.reqsize	= sizeof(struct ccp_rsa_req_ctx),
-+		.alg_defaults	= &ccp_rsa_defaults,
-+	}
-+};
-+
-+int ccp_register_rsa_alg(struct list_head *head, const struct ccp_rsa_def *def)
-+{
-+	struct ccp_crypto_akcipher_alg *ccp_alg;
-+	struct akcipher_alg *alg;
-+	int ret;
-+
-+	ccp_alg = kzalloc(sizeof(*ccp_alg), GFP_KERNEL);
-+	if (!ccp_alg)
-+		return -ENOMEM;
-+
-+	INIT_LIST_HEAD(&ccp_alg->entry);
-+
-+	alg = &ccp_alg->alg;
-+	*alg = *def->alg_defaults;
-+	snprintf(alg->base.cra_name, CRYPTO_MAX_ALG_NAME, "%s", def->name);
-+	snprintf(alg->base.cra_driver_name, CRYPTO_MAX_ALG_NAME, "%s",
-+		 def->driver_name);
-+	ret = crypto_register_akcipher(alg);
-+	if (ret) {
-+		pr_err("%s akcipher algorithm registration error (%d)\n",
-+		       alg->base.cra_name, ret);
-+		kfree(ccp_alg);
-+		return ret;
-+	}
-+
-+	list_add(&ccp_alg->entry, head);
-+
-+	return 0;
-+}
-+
-+int ccp_register_rsa_algs(struct list_head *head)
-+{
-+	int i, ret;
-+	unsigned int ccpversion = ccp_version();
-+
-+	/* Register the RSA algorithm in standard mode
-+	 * This works for CCP v3 and later
-+	 */
-+	for (i = 0; i < ARRAY_SIZE(rsa_algs); i++) {
-+		if (rsa_algs[i].version > ccpversion)
-+			continue;
-+		ret = ccp_register_rsa_alg(head, &rsa_algs[i]);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	return 0;
-+}
++		return CCP_RSA_MAXMOD;
+ }
+ 
+ static int ccp_rsa_crypt(struct akcipher_request *req, bool encrypt)
 diff --git a/drivers/crypto/ccp/ccp-crypto.h b/drivers/crypto/ccp/ccp-crypto.h
-index 156b8233853f..aa53b97f6f00 100644
+index aa53b97f6f00..67c7620029e3 100644
 --- a/drivers/crypto/ccp/ccp-crypto.h
 +++ b/drivers/crypto/ccp/ccp-crypto.h
-@@ -24,6 +24,8 @@
- #include <crypto/ctr.h>
- #include <crypto/hash.h>
- #include <crypto/sha.h>
-+#include <crypto/akcipher.h>
-+#include <crypto/internal/rsa.h>
- 
- #define	CCP_LOG_LEVEL	KERN_INFO
- 
-@@ -58,6 +60,12 @@ struct ccp_crypto_ahash_alg {
- 	struct ahash_alg alg;
+@@ -255,6 +255,7 @@ struct ccp_rsa_req_ctx {
  };
  
-+struct ccp_crypto_akcipher_alg {
-+	struct list_head entry;
-+
-+	struct akcipher_alg alg;
-+};
-+
- static inline struct ccp_crypto_ablkcipher_alg *
- 	ccp_crypto_ablkcipher_alg(struct crypto_tfm *tfm)
- {
-@@ -227,12 +235,34 @@ struct ccp_sha_exp_ctx {
- 	u8 buf[MAX_SHA_BLOCK_SIZE];
- };
+ #define	CCP_RSA_MAXMOD	(4 * 1024 / 8)
++#define	CCP5_RSA_MAXMOD	(16 * 1024 / 8)
  
-+/***** RSA related defines *****/
-+
-+struct ccp_rsa_ctx {
-+	unsigned int key_len; /* in bits */
-+	struct scatterlist e_sg;
-+	u8 *e_buf;
-+	unsigned int e_len;
-+	struct scatterlist n_sg;
-+	u8 *n_buf;
-+	unsigned int n_len;
-+	struct scatterlist d_sg;
-+	u8 *d_buf;
-+	unsigned int d_len;
-+};
-+
-+struct ccp_rsa_req_ctx {
-+	struct ccp_cmd cmd;
-+};
-+
-+#define	CCP_RSA_MAXMOD	(4 * 1024 / 8)
-+
  /***** Common Context Structure *****/
  struct ccp_ctx {
- 	int (*complete)(struct crypto_async_request *req, int ret);
+diff --git a/drivers/crypto/ccp/ccp-dev-v3.c b/drivers/crypto/ccp/ccp-dev-v3.c
+index c2861749e2ad..240bebbcb8ac 100644
+--- a/drivers/crypto/ccp/ccp-dev-v3.c
++++ b/drivers/crypto/ccp/ccp-dev-v3.c
+@@ -597,4 +597,5 @@ const struct ccp_vdata ccpv3 = {
+ 	.setup = NULL,
+ 	.perform = &ccp3_actions,
+ 	.offset = 0x20000,
++	.rsamax = CCP_RSA_MAX_WIDTH,
+ };
+diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
+index b77ac0a638d5..3f574d50c0f8 100644
+--- a/drivers/crypto/ccp/ccp-dev-v5.c
++++ b/drivers/crypto/ccp/ccp-dev-v5.c
+@@ -1114,6 +1114,7 @@ const struct ccp_vdata ccpv5a = {
+ 	.setup = ccp5_config,
+ 	.perform = &ccp5_actions,
+ 	.offset = 0x0,
++	.rsamax = CCP5_RSA_MAX_WIDTH,
+ };
  
- 	union {
- 		struct ccp_aes_ctx aes;
-+		struct ccp_rsa_ctx rsa;
- 		struct ccp_sha_ctx sha;
- 		struct ccp_des3_ctx des3;
- 	} u;
-@@ -249,5 +279,6 @@ int ccp_register_aes_xts_algs(struct list_head *head);
- int ccp_register_aes_aeads(struct list_head *head);
- int ccp_register_sha_algs(struct list_head *head);
- int ccp_register_des3_algs(struct list_head *head);
-+int ccp_register_rsa_algs(struct list_head *head);
+ const struct ccp_vdata ccpv5b = {
+@@ -1122,4 +1123,5 @@ const struct ccp_vdata ccpv5b = {
+ 	.setup = ccp5other_config,
+ 	.perform = &ccp5_actions,
+ 	.offset = 0x0,
++	.rsamax = CCP5_RSA_MAX_WIDTH,
+ };
+diff --git a/drivers/crypto/ccp/ccp-dev.h b/drivers/crypto/ccp/ccp-dev.h
+index 3d51180199ac..6810b65c1939 100644
+--- a/drivers/crypto/ccp/ccp-dev.h
++++ b/drivers/crypto/ccp/ccp-dev.h
+@@ -203,6 +203,7 @@
+ #define CCP_SHA_SB_COUNT		1
  
- #endif
+ #define CCP_RSA_MAX_WIDTH		4096
++#define CCP5_RSA_MAX_WIDTH		16384
+ 
+ #define CCP_PASSTHRU_BLOCKSIZE		256
+ #define CCP_PASSTHRU_MASKSIZE		32
+diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
+index 72c0f938abd7..c269f41e0526 100644
+--- a/drivers/crypto/ccp/ccp-ops.c
++++ b/drivers/crypto/ccp/ccp-ops.c
+@@ -1770,7 +1770,8 @@ static int ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 	unsigned int sb_count, i_len, o_len;
+ 	int ret;
+ 
+-	if (rsa->key_size > CCP_RSA_MAX_WIDTH)
++	/* Check against the maximum allowable size, in bits */
++	if (rsa->key_size > cmd_q->ccp->vdata->rsamax)
+ 		return -EINVAL;
+ 
+ 	if (!rsa->exp || !rsa->mod || !rsa->src || !rsa->dst)
+diff --git a/drivers/crypto/ccp/sp-dev.h b/drivers/crypto/ccp/sp-dev.h
+index 3520da4e20cf..5ab486ade1ad 100644
+--- a/drivers/crypto/ccp/sp-dev.h
++++ b/drivers/crypto/ccp/sp-dev.h
+@@ -40,6 +40,7 @@ struct ccp_vdata {
+ 	void (*setup)(struct ccp_device *);
+ 	const struct ccp_actions *perform;
+ 	const unsigned int offset;
++	const unsigned int rsamax;
+ };
+ /* Structure to hold SP device data */
+ struct sp_dev_vdata {
