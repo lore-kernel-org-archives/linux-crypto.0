@@ -1,68 +1,39 @@
-From: Greg KH <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH 1/3] staging: ccree: Replace kzalloc with devm_kzalloc
-Date: Mon, 17 Jul 2017 14:33:06 +0200
-Message-ID: <20170717123306.GF24503@kroah.com>
-References: <1500105116-30290-1-git-send-email-sunil.m@techveda.org>
- <1500105116-30290-2-git-send-email-sunil.m@techveda.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: gilad@benyossef.com, devel@driverdev.osuosl.org,
-        driverdev-devel@linuxdriverproject.org, karthik@techveda.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: sunil.m@techveda.org
+From: Dhananjay Balan <mail@dbalan.in>
+Subject: [PATCH] drivers: staging: ccree: use __func__ to get function name in error messages.
+Date: Mon, 17 Jul 2017 15:53:05 +0200
+Message-ID: <20170717135305.28296-1-mail@dbalan.in>
+Cc: gregkh@linuxfoundation.org, linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        linux-kernel@vger.kernel.org, Dhananjay Balan <mail@dbalan.in>
+To: gilad@benyossef.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:45994 "EHLO
-        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751281AbdGQMdL (ORCPT
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:35275 "EHLO
+        out1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1751280AbdGQNya (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 Jul 2017 08:33:11 -0400
-Content-Disposition: inline
-In-Reply-To: <1500105116-30290-2-git-send-email-sunil.m@techveda.org>
+        Mon, 17 Jul 2017 09:54:30 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Jul 15, 2017 at 01:21:54PM +0530, sunil.m@techveda.org wrote:
-> From: Suniel Mahesh <sunil.m@techveda.org>
-> 
-> It is recommended to use managed function devm_kzalloc, which
-> simplifies driver cleanup paths and driver code.
-> This patch does the following:
-> (a) replace kzalloc with devm_kzalloc.
-> (b) drop kfree(), because memory allocated with devm_kzalloc() is
-> automatically freed on driver detach, otherwise it leads to a double
-> free.
-> (c) remove unnecessary blank lines.
-> 
-> Signed-off-by: Suniel Mahesh <sunil.m@techveda.org>
-> ---
-> Note:
-> - Patch was tested and built(ARCH=arm) on next-20170714.
->   No build issues reported, however it was not tested on
->   real hardware.
-> ---
->  drivers/staging/ccree/ssi_driver.c | 10 ++++------
->  1 file changed, 4 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/staging/ccree/ssi_driver.c b/drivers/staging/ccree/ssi_driver.c
-> index 78709b92..f231ecf 100644
-> --- a/drivers/staging/ccree/ssi_driver.c
-> +++ b/drivers/staging/ccree/ssi_driver.c
-> @@ -224,13 +224,15 @@ static int init_cc_resources(struct platform_device *plat_dev)
->  	struct resource *req_mem_cc_regs = NULL;
->  	void __iomem *cc_base = NULL;
->  	bool irq_registered = false;
-> -	struct ssi_drvdata *new_drvdata = kzalloc(sizeof(struct ssi_drvdata), GFP_KERNEL);
-> +	struct ssi_drvdata *new_drvdata;
->  	struct device *dev = &plat_dev->dev;
->  	struct device_node *np = dev->of_node;
->  	u32 signature_val;
->  	int rc = 0;
->  
-> -	if (unlikely(!new_drvdata)) {
-> +	new_drvdata = devm_kzalloc(&plat_dev->dev, sizeof(struct ssi_drvdata),
+fixes checkpatch warning.
 
-sizeof(*new_drvdata), right?
+Signed-off-by: Dhananjay Balan <mail@dbalan.in>
+---
+ drivers/staging/ccree/ssi_driver.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-thanks,
-
-greg k-h
+diff --git a/drivers/staging/ccree/ssi_driver.c b/drivers/staging/ccree/ssi_driver.c
+index d7b9a636d907..e0faca0a30a6 100644
+--- a/drivers/staging/ccree/ssi_driver.c
++++ b/drivers/staging/ccree/ssi_driver.c
+@@ -81,7 +81,7 @@ void dump_byte_array(const char *name, const u8 *the_array, unsigned long size)
+ 	char line_buf[80];
+ 
+ 	if (!the_array) {
+-		SSI_LOG_ERR("cannot dump_byte_array - NULL pointer\n");
++		SSI_LOG_ERR("cannot %s - NULL pointer\n", __func__);
+ 		return;
+ 	}
+ 
+-- 
+2.13.2
