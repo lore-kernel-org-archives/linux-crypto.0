@@ -1,7 +1,8 @@
 From: Haren Myneni <haren@linux.vnet.ibm.com>
-Subject: [PATCH V2 0/6] Enable NX 842 compression engine on Power9
-Date: Mon, 17 Jul 2017 16:43:19 -0700
-Message-ID: <1500334999.995.6.camel@hbabu-laptop>
+Subject: [PATCH V2 1/6] crypto/nx842: Rename nx842_powernv_function as
+ icswx function
+Date: Mon, 17 Jul 2017 16:45:02 -0700
+Message-ID: <1500335102.995.8.camel@hbabu-laptop>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
@@ -10,83 +11,111 @@ Cc: ddstreet@ieee.org, linuxppc-dev@lists.ozlabs.org,
         mikey@neuling.org, suka@us.ibm.com, hbabu@us.ibm.com
 To: mpe@ellerman.id.au, herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60031 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751427AbdGQXn3 (ORCPT
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34434 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1751455AbdGQXpN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 Jul 2017 19:43:29 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id v6HNdZ37082864
-        for <linux-crypto@vger.kernel.org>; Mon, 17 Jul 2017 19:43:29 -0400
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2bs1svmtpv-1
+        Mon, 17 Jul 2017 19:45:13 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id v6HNiPgA029451
+        for <linux-crypto@vger.kernel.org>; Mon, 17 Jul 2017 19:45:13 -0400
+Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2brqc78swn-1
         (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Mon, 17 Jul 2017 19:43:29 -0400
+        for <linux-crypto@vger.kernel.org>; Mon, 17 Jul 2017 19:45:13 -0400
 Received: from localhost
-        by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <linux-crypto@vger.kernel.org> from <haren@linux.vnet.ibm.com>;
-        Mon, 17 Jul 2017 19:43:27 -0400
+        Mon, 17 Jul 2017 19:45:12 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 
-[PATCH V2 0/6] Enable NX 842 compression engine on Power9
+Rename nx842_powernv_function to nx842_powernv_exec.
+nx842_powernv_exec points to nx842_exec_icswx and
+will be point to VAS exec function which will be added later
+for P9 NX support.
 
-P9 introduces Virtual Accelerator Switchboard (VAS) to communicate
-with NX 842 engine. icswx function is used to access NX before.
-On powerNV systems, NX-842 driver invokes VAS functions for
-configuring RxFIFO (receive window) per each NX engine. VAS uses
-this FIFO to communicate the request to NX. The kernel opens send
-window which is used to transfer compression/decompression requests
-to VAS. It maps the send window to the corresponding RxFIFO.
-copy/paste instructions are used to pass the CRB to VAS.
+Signed-off-by: Haren Myneni <haren@us.ibm.com>
+---
+ drivers/crypto/nx/nx-842-powernv.c | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
 
-This patch series adds P9 NX support for 842 compression engine.
-First 4 patches reorganize the current code so that VAS function
-can be added.
-- nx842_powernv_function points to VAS function if VAS feature is
-  available. Otherwise icswx function is used.
-- Move configure CRB code nx842_cfg_crb() 
-- In addition to freeing co-processor structs for initialization 
-  failures and exit, both send and receive windows have to closed
-  for VAS.
-- Move updating coprocessor info list to nx842_add_coprocs_list().
-
-The last 2 patches adds configuring and invoking VAS, and also
-checking P9 NX specific errors that are provided in co-processor
-status block (CSB) for failures.
-
-Patches have been tested on P9 DD1 system using VAS changes and
-on P8 HW to make sure no regression.
-
-This patchset depends on VAS kernel changes:
-https://lists.ozlabs.org/pipermail/linuxppc-dev/2017-May/158178.html
-
-Thanks to Sukadev Bhattiprolu for his review, input and testing with
-VAS changes. Also thanks to Michael Ellerman and Benjamin Herrenschmidt
-for their valuable guidance and comments.
-
-Changelog[v2]
-	- Open/close send windows in nx842_poernv_crypto_init/exit_vas().
-	- Changes for the new device-tree NX properties such as priority
-	  and compatible properties.
-	- Incorporate review comments from Michael Ellerman.
-	- Other minor issues found during HW testing.
-
-Haren Myneni (6):
-  crypto/nx842: Rename nx842_powernv_function as icswx function
-  crypto/nx: Create nx842_configure_crb function
-  crypto/nx: Create nx842_delete_coprocs function
-  crypto/nx: Add nx842_add_coprocs_list function
-  crypto/nx: Add P9 NX specific error codes for 842 engine
-  crypto/nx: Add P9 NX support for 842 compression engine.
-
- arch/powerpc/include/asm/icswx.h   |   3 +
- drivers/crypto/nx/Kconfig          |   1 +
- drivers/crypto/nx/nx-842-powernv.c | 499 +++++++++++++++++++++++++++++++++----
- drivers/crypto/nx/nx-842.c         |   2 +-
- drivers/crypto/nx/nx-842.h         |   8 +
- 5 files changed, 465 insertions(+), 48 deletions(-)
-
+diff --git a/drivers/crypto/nx/nx-842-powernv.c b/drivers/crypto/nx/nx-842-powernv.c
+index 3abb045cdba7..161987698bbc 100644
+--- a/drivers/crypto/nx/nx-842-powernv.c
++++ b/drivers/crypto/nx/nx-842-powernv.c
+@@ -54,7 +54,11 @@ struct nx842_coproc {
+ 
+ /* no cpu hotplug on powernv, so this list never changes after init */
+ static LIST_HEAD(nx842_coprocs);
+-static unsigned int nx842_ct;
++static unsigned int nx842_ct;	/* used in icswx function */
++
++static int (*nx842_powernv_exec)(const unsigned char *in,
++				unsigned int inlen, unsigned char *out,
++				unsigned int *outlenp, void *workmem, int fc);
+ 
+ /**
+  * setup_indirect_dde - Setup an indirect DDE
+@@ -355,7 +359,7 @@ static int wait_for_csb(struct nx842_workmem *wmem,
+ }
+ 
+ /**
+- * nx842_powernv_function - compress/decompress data using the 842 algorithm
++ * nx842_exec_icswx - compress/decompress data using the 842 algorithm
+  *
+  * (De)compression provided by the NX842 coprocessor on IBM PowerNV systems.
+  * This compresses or decompresses the provided input buffer into the provided
+@@ -385,7 +389,7 @@ static int wait_for_csb(struct nx842_workmem *wmem,
+  *   -ETIMEDOUT	hardware did not complete operation in reasonable time
+  *   -EINTR	operation was aborted
+  */
+-static int nx842_powernv_function(const unsigned char *in, unsigned int inlen,
++static int nx842_exec_icswx(const unsigned char *in, unsigned int inlen,
+ 				  unsigned char *out, unsigned int *outlenp,
+ 				  void *workmem, int fc)
+ {
+@@ -489,13 +493,13 @@ static int nx842_powernv_function(const unsigned char *in, unsigned int inlen,
+  * @workmem: working memory buffer pointer, size determined by
+  *           nx842_powernv_driver.workmem_size
+  *
+- * Returns: see @nx842_powernv_function()
++ * Returns: see @nx842_powernv_exec()
+  */
+ static int nx842_powernv_compress(const unsigned char *in, unsigned int inlen,
+ 				  unsigned char *out, unsigned int *outlenp,
+ 				  void *wmem)
+ {
+-	return nx842_powernv_function(in, inlen, out, outlenp,
++	return nx842_powernv_exec(in, inlen, out, outlenp,
+ 				      wmem, CCW_FC_842_COMP_CRC);
+ }
+ 
+@@ -517,13 +521,13 @@ static int nx842_powernv_compress(const unsigned char *in, unsigned int inlen,
+  * @workmem: working memory buffer pointer, size determined by
+  *           nx842_powernv_driver.workmem_size
+  *
+- * Returns: see @nx842_powernv_function()
++ * Returns: see @nx842_powernv_exec()
+  */
+ static int nx842_powernv_decompress(const unsigned char *in, unsigned int inlen,
+ 				    unsigned char *out, unsigned int *outlenp,
+ 				    void *wmem)
+ {
+-	return nx842_powernv_function(in, inlen, out, outlenp,
++	return nx842_powernv_exec(in, inlen, out, outlenp,
+ 				      wmem, CCW_FC_842_DECOMP_CRC);
+ }
+ 
+@@ -625,6 +629,8 @@ static __init int nx842_powernv_init(void)
+ 	if (!nx842_ct)
+ 		return -ENODEV;
+ 
++	nx842_powernv_exec = nx842_exec_icswx;
++
+ 	ret = crypto_register_alg(&nx842_powernv_alg);
+ 	if (ret) {
+ 		struct nx842_coproc *coproc, *n;
 -- 
 2.11.0
