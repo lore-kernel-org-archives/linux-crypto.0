@@ -1,77 +1,211 @@
-From: Kyle Rose <krose@krose.org>
-Subject: KPP questions and confusion
-Date: Mon, 17 Jul 2017 17:00:44 +0200
-Message-ID: <CAJU8_nUhapH=nKkL=NEa2uW5f-vdAX3kvi5Ua7b_bA8d=BjRLQ@mail.gmail.com>
+From: Cosar Dindar <cosardindar@gmail.com>
+Subject: Re: [RESEND,PATCH v4 3/3] crypto : stm32 - Add STM32F4 CRC32 support
+Date: Mon, 17 Jul 2017 19:14:43 +0300
+Message-ID: <20170717161443.GD62822@osboxes>
+References: <1500280056-46251-1-git-send-email-cosardindar@gmail.com>
+ <bc6634fb-22df-5f36-70ee-9b29f6ded05c@st.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "mcoquelin.stm32@gmail.com" <mcoquelin.stm32@gmail.com>,
+        Alexandre TORGUE <alexandre.torgue@st.com>,
+        Fabien DESSENNE <fabien.dessenne@st.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org"
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Lionel DEBIEVE <lionel.debieve@st.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-qt0-f182.google.com ([209.85.216.182]:35216 "EHLO
-        mail-qt0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751278AbdGQPAq (ORCPT
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:36703 "EHLO
+        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751286AbdGQQOu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 Jul 2017 11:00:46 -0400
-Received: by mail-qt0-f182.google.com with SMTP id b40so108290335qtb.2
-        for <linux-crypto@vger.kernel.org>; Mon, 17 Jul 2017 08:00:46 -0700 (PDT)
+        Mon, 17 Jul 2017 12:14:50 -0400
+Content-Disposition: inline
+In-Reply-To: <bc6634fb-22df-5f36-70ee-9b29f6ded05c@st.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-I am confused about several things in the new key agreement code.
+On Mon, Jul 17, 2017 at 02:23:44PM +0000, Lionel DEBIEVE wrote:
+> Hi Cosar,
+> 
+> -	ret = crypto_register_shashes(algs, ARRAY_SIZE(algs));
+> +	/* For F4 series only CRC32 algorithm will be used */
+> +	if (of_device_is_compatible(crc->dev->of_node, "st,stm32f4-crc"))
+> +		algs_size = 1;
+> +	else
+> +		algs_size = ARRAY_SIZE(algs);
+> +
+> +	ret = crypto_register_shashes(algs, algs_size);
+> 
+> Should it be better to have a dedicated array per platform data instead? Could be new platform update?
+> 
+> BR,
+> 
+> Lionel
+>
 
-net/bluetooth/smp.c in two places generates random bytes for the
-private_key argument to
-net/bluetooth/ecdh_helper.c:generate_ecdh_keys, which suggests the
-private key is static within the function. However, there is a do ...
-while(true) loop within generate_ecdh_keys, with the following near
-the end:
+Hi Lionel,
 
-/* Private key is not valid. Regenerate */
-if (err == -EINVAL)
-            continue;
+Thanks for the comment.
 
-which suggests that it expects a different private key to be generated
-on each iteration of the loop. But it looks like it runs through the
-loop yet again with the same private key generated in the caller,
-which suggests it would infinitely loop on a bad private key value. Is
-this incorrect?
+It might be better to seperate shash_alg array according to the platform, one alg array for F7 and one for M4.
+Adding a new array definition for M4 platform with only CRC-32 algorithm might be enough.
+This action would be necessary since it might cause problem while unregistering with your last patch.
 
-Furthermore, since req->src == NULL via the call to
-kpp_request_set_input, ecc_make_pub_key will always be called in
-ecdh.c:ecdh_compute_value, in which case -EINVAL would be returned
-only by invalid input (!private_key or bad curve_id) that AFAICT
-cannot happen, or at least wouldn't be resolved by another run through
-the loop.
+BR,
 
-OTOH, -EAGAIN would be returned by ecc_make_pub_key if the public key
-turns out to be the zero point, which is at least one reason why you'd
-want to generate a new private key (if that loop were to do that.)
-
-I'm a little confused about some other things:
-
-* The bluetooth code doesn't seem to use ecc_gen_privkey, opting to
-instead just generate random bytes and hope for the best.
-* There doesn't appear to be any way for ecc_gen_privkey to get called
-from crypto/ecdh.c:ecdh_set_secret, as it starts with a call to
-crypto/ecdh_helper.c:crypto_ecdh_decode_key that returns -EINVAL if
-decoding fails, meaning that both params.key != NULL and (if I'm
-reading this correctly) params.key_size > 0. Is that dead code, or is
-there a way it is intended to be used?
-
-The context for this email is that I have need for the same basic
-functionality in net/bluetooth/ecdh_helper.c for a non-BT purpose, so
-it seems like this should be part of crypto/ecdh_helper.c (abstracted
-to work for any curve). Basically, I need to do basic ECDH key
-agreement:
-
-* Generate a new (valid) ephemeral private key, or potentially re-use
-an existing one
-* Compute the corresponding public key for the curve
-* Compute the shared secret based on my private and peer's public
-
-Is KPP intended to be an abstract interface to all of the above, e.g.,
-for both ECDH and FFDH? Right now it seems like layer violations are
-required as there doesn't appear to be any way to (for example)
-generate a fresh private key via kpp_*.
-
-Thanks,
-Kyle
+Cosar
+ 
+> 
+> On 07/17/2017 10:27 AM, Cosar Dindar wrote:
+> > This patch adds CRC (CRC32 Crypto) support for STM32F4 series.
+> >
+> > As an hardware limitation polynomial and key setting are not supported.
+> > They are fixed as 0x4C11DB7 (poly) and 0xFFFFFFFF (key).
+> > CRC32C Castagnoli algorithm is not used.
+> >
+> > Signed-off-by: Cosar Dindar <cosardindar@gmail.com>
+> > Reviewed-by: Fabien Dessenne <fabien.dessenne@st.com>
+> > ---
+> >   drivers/crypto/stm32/stm32_crc32.c | 68 ++++++++++++++++++++++++++++++++------
+> >   1 file changed, 58 insertions(+), 10 deletions(-)
+> >
+> > diff --git a/drivers/crypto/stm32/stm32_crc32.c b/drivers/crypto/stm32/stm32_crc32.c
+> > index ec83b1e..12fbd98 100644
+> > --- a/drivers/crypto/stm32/stm32_crc32.c
+> > +++ b/drivers/crypto/stm32/stm32_crc32.c
+> > @@ -7,6 +7,7 @@
+> >   #include <linux/bitrev.h>
+> >   #include <linux/clk.h>
+> >   #include <linux/module.h>
+> > +#include <linux/of.h>
+> >   #include <linux/platform_device.h>
+> >   
+> >   #include <crypto/internal/hash.h>
+> > @@ -39,6 +40,9 @@ struct stm32_crc {
+> >   	struct clk       *clk;
+> >   	u8               pending_data[sizeof(u32)];
+> >   	size_t           nb_pending_bytes;
+> > +	bool             key_support;
+> > +	bool             poly_support;
+> > +	bool             reverse_support;
+> >   };
+> >   
+> >   struct stm32_crc_list {
+> > @@ -106,13 +110,31 @@ static int stm32_crc_init(struct shash_desc *desc)
+> >   	}
+> >   	spin_unlock_bh(&crc_list.lock);
+> >   
+> > -	/* Reset, set key, poly and configure in bit reverse mode */
+> > -	writel(bitrev32(mctx->key), ctx->crc->regs + CRC_INIT);
+> > -	writel(bitrev32(mctx->poly), ctx->crc->regs + CRC_POL);
+> > -	writel(CRC_CR_RESET | CRC_CR_REVERSE, ctx->crc->regs + CRC_CR);
+> > +	/* set key */
+> > +	if (ctx->crc->key_support) {
+> > +		writel(bitrev32(mctx->key), ctx->crc->regs + CRC_INIT);
+> > +	} else if (mctx->key != CRC_INIT_DEFAULT) {
+> > +		dev_err(ctx->crc->dev, "Unsupported key value! Should be: 0x%x\n",
+> > +			CRC_INIT_DEFAULT);
+> > +		return -EINVAL;
+> > +	}
+> > +
+> > +	/* set poly */
+> > +	if (ctx->crc->poly_support)
+> > +		writel(bitrev32(mctx->poly), ctx->crc->regs + CRC_POL);
+> > +
+> > +	/* reset and configure in bit reverse mode if supported */
+> > +	if (ctx->crc->reverse_support)
+> > +		writel(CRC_CR_RESET | CRC_CR_REVERSE, ctx->crc->regs + CRC_CR);
+> > +	else
+> > +		writel(CRC_CR_RESET, ctx->crc->regs + CRC_CR);
+> > +
+> > +	/* store partial result */
+> > +	if (!ctx->crc->reverse_support)
+> > +		ctx->partial = bitrev32(readl(crc->regs + CRC_DR));
+> > +	else
+> > +		ctx->partial = readl(ctx->crc->regs + CRC_DR);
+> >   
+> > -	/* Store partial result */
+> > -	ctx->partial = readl(ctx->crc->regs + CRC_DR);
+> >   	ctx->crc->nb_pending_bytes = 0;
+> >   
+> >   	return 0;
+> > @@ -135,7 +157,12 @@ static int stm32_crc_update(struct shash_desc *desc, const u8 *d8,
+> >   
+> >   		if (crc->nb_pending_bytes == sizeof(u32)) {
+> >   			/* Process completed pending data */
+> > -			writel(*(u32 *)crc->pending_data, crc->regs + CRC_DR);
+> > +			if (!ctx->crc->reverse_support)
+> > +				writel(bitrev32(*(u32 *)crc->pending_data),
+> > +				       crc->regs + CRC_DR);
+> > +			else
+> > +				writel(*(u32 *)crc->pending_data,
+> > +				       crc->regs + CRC_DR);
+> >   			crc->nb_pending_bytes = 0;
+> >   		}
+> >   	}
+> > @@ -143,10 +170,16 @@ static int stm32_crc_update(struct shash_desc *desc, const u8 *d8,
+> >   	d32 = (u32 *)d8;
+> >   	for (i = 0; i < length >> 2; i++)
+> >   		/* Process 32 bits data */
+> > -		writel(*(d32++), crc->regs + CRC_DR);
+> > +		if (!ctx->crc->reverse_support)
+> > +			writel(bitrev32(*(d32++)), crc->regs + CRC_DR);
+> > +		else
+> > +			writel(*(d32++), crc->regs + CRC_DR);
+> >   
+> >   	/* Store partial result */
+> > -	ctx->partial = readl(crc->regs + CRC_DR);
+> > +	if (!ctx->crc->reverse_support)
+> > +		ctx->partial = bitrev32(readl(crc->regs + CRC_DR));
+> > +	else
+> > +		ctx->partial = readl(crc->regs + CRC_DR);
+> >   
+> >   	/* Check for pending data (non 32 bits) */
+> >   	length &= 3;
+> > @@ -243,6 +276,7 @@ static int stm32_crc_probe(struct platform_device *pdev)
+> >   	struct stm32_crc *crc;
+> >   	struct resource *res;
+> >   	int ret;
+> > +	int algs_size;
+> >   
+> >   	crc = devm_kzalloc(dev, sizeof(*crc), GFP_KERNEL);
+> >   	if (!crc)
+> > @@ -269,13 +303,26 @@ static int stm32_crc_probe(struct platform_device *pdev)
+> >   		return ret;
+> >   	}
+> >   
+> > +	/* set key, poly and reverse support if device is of F7 series */
+> > +	if (of_device_is_compatible(crc->dev->of_node, "st,stm32f7-crc")) {
+> > +		crc->key_support = true;
+> > +		crc->poly_support = true;
+> > +		crc->reverse_support = true;
+> > +	}
+> > +
+> >   	platform_set_drvdata(pdev, crc);
+> >   
+> >   	spin_lock(&crc_list.lock);
+> >   	list_add(&crc->list, &crc_list.dev_list);
+> >   	spin_unlock(&crc_list.lock);
+> >   
+> > -	ret = crypto_register_shashes(algs, ARRAY_SIZE(algs));
+> > +	/* For F4 series only CRC32 algorithm will be used */
+> > +	if (of_device_is_compatible(crc->dev->of_node, "st,stm32f4-crc"))
+> > +		algs_size = 1;
+> > +	else
+> > +		algs_size = ARRAY_SIZE(algs);
+> > +
+> > +	ret = crypto_register_shashes(algs, algs_size);
+> >   	if (ret) {
+> >   		dev_err(dev, "Failed to register\n");
+> >   		clk_disable_unprepare(crc->clk);
+> > @@ -304,6 +351,7 @@ static int stm32_crc_remove(struct platform_device *pdev)
+> >   
+> >   static const struct of_device_id stm32_dt_ids[] = {
+> >   	{ .compatible = "st,stm32f7-crc", },
+> > +	{ .compatible = "st,stm32f4-crc", },
+> >   	{},
+> >   };
+> >   MODULE_DEVICE_TABLE(of, stm32_dt_ids);
