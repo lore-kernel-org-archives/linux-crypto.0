@@ -1,71 +1,137 @@
-From: Rob Herring <robh@kernel.org>
-Subject: Re: [PATCH 2/3] dt-bindings: Document STM32 CRYP bindings
-Date: Mon, 17 Jul 2017 12:49:31 -0500
-Message-ID: <20170717174931.b6uvhwz5yn52qvyi@rob-hp-laptop>
-References: <1499939979-8623-1-git-send-email-fabien.dessenne@st.com>
- <1499939979-8623-3-git-send-email-fabien.dessenne@st.com>
+From: Michael Halcrow <mhalcrow@google.com>
+Subject: Re: [PATCH 6/6] fscrypt: for v2 policies, support "fscrypt:" key
+ prefix only
+Date: Mon, 17 Jul 2017 10:54:52 -0700
+Message-ID: <20170717175452.GB32282@google.com>
+References: <20170712210035.51534-1-ebiggers3@gmail.com>
+ <20170712210035.51534-7-ebiggers3@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Benjamin Gaignard <benjamin.gaignard@st.com>,
-        Lionel Debieve <lionel.debieve@st.com>,
-        Ludovic Barre <ludovic.barre@st.com>
-To: Fabien Dessenne <fabien.dessenne@st.com>
+Cc: linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-mtd@lists.infradead.org, linux-crypto@vger.kernel.org,
+        "Theodore Y . Ts'o" <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Alex Cope <alexcope@google.com>,
+        Eric Biggers <ebiggers@google.com>
+To: Eric Biggers <ebiggers3@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pg0-f66.google.com ([74.125.83.66]:34823 "EHLO
-        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751293AbdGQRtd (ORCPT
+Received: from mail-pg0-f43.google.com ([74.125.83.43]:36362 "EHLO
+        mail-pg0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751315AbdGQRyz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 Jul 2017 13:49:33 -0400
+        Mon, 17 Jul 2017 13:54:55 -0400
+Received: by mail-pg0-f43.google.com with SMTP id u5so21063608pgq.3
+        for <linux-crypto@vger.kernel.org>; Mon, 17 Jul 2017 10:54:54 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <1499939979-8623-3-git-send-email-fabien.dessenne@st.com>
+In-Reply-To: <20170712210035.51534-7-ebiggers3@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jul 13, 2017 at 11:59:38AM +0200, Fabien Dessenne wrote:
-> Document device tree bindings for the STM32 CRYP.
+On Wed, Jul 12, 2017 at 02:00:35PM -0700, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
 > 
-> Signed-off-by: Fabien Dessenne <fabien.dessenne@st.com>
+> Since v2 encryption policies are opt-in, take the opportunity to also
+> drop support for the legacy filesystem-specific key description prefixes
+> "ext4:", "f2fs:", and "ubifs:", instead requiring the generic prefix
+> "fscrypt:".  The generic prefix is preferred since it works for all
+> filesystems.  Also there is a performance benefit from not having to
+> search the keyrings twice.
+> 
+> The old prefixes remain supported for v1 encryption policies.
+> 
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+
+Reviewed-by: Michael Halcrow <mhalcrow@google.com>
+
 > ---
->  .../devicetree/bindings/crypto/st,stm32-cryp.txt     | 20 ++++++++++++++++++++
->  1 file changed, 20 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/crypto/st,stm32-cryp.txt
+>  fs/crypto/fscrypt_private.h |  3 +--
+>  fs/crypto/keyinfo.c         | 16 ++++------------
+>  fs/crypto/policy.c          |  2 +-
+>  3 files changed, 6 insertions(+), 15 deletions(-)
 > 
-> diff --git a/Documentation/devicetree/bindings/crypto/st,stm32-cryp.txt b/Documentation/devicetree/bindings/crypto/st,stm32-cryp.txt
-> new file mode 100644
-> index 0000000..f631c37
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/crypto/st,stm32-cryp.txt
-> @@ -0,0 +1,20 @@
-> +* STMicroelectronics STM32 CRYP
-> +
-> +Required properties:
-> +- compatible: Should be "st,stm32f756-cryp".
-> +- reg: The address and length of the peripheral registers space
-> +- clocks: The input clock of the CRYP instance
-> +- interrupts: The CRYP interrupts
-
-More than 1? How many?
-
-> +
-> +Optional properties:
-> +- resets: The input reset of the CRYP instance
-> +
-> +Example:
-> +cryp1: cryp@50060000 {
-> +	compatible = "st,stm32f756-cryp";
-> +	reg = <0x50060000 0x400>;
-> +	interrupts = <79>;
-> +	clocks = <&rcc 0 STM32F7_AHB2_CLOCK(CRYP)>;
-> +	resets = <&rcc STM32F7_AHB2_RESET(CRYP)>;
-> +	status = "disabled";
-> +};
+> diff --git a/fs/crypto/fscrypt_private.h b/fs/crypto/fscrypt_private.h
+> index 4b158717a8c3..201906ff7033 100644
+> --- a/fs/crypto/fscrypt_private.h
+> +++ b/fs/crypto/fscrypt_private.h
+> @@ -167,8 +167,7 @@ extern struct page *fscrypt_alloc_bounce_page(struct fscrypt_ctx *ctx,
+>  					      gfp_t gfp_flags);
+>  
+>  /* keyinfo.c */
+> -extern int fscrypt_compute_key_hash(const struct inode *inode,
+> -				    const struct fscrypt_policy *policy,
+> +extern int fscrypt_compute_key_hash(const struct fscrypt_policy *policy,
+>  				    u8 hash[FSCRYPT_KEY_HASH_SIZE]);
+>  extern void __exit fscrypt_essiv_cleanup(void);
+>  
+> diff --git a/fs/crypto/keyinfo.c b/fs/crypto/keyinfo.c
+> index bf60e76f9599..e20b5e85c1b3 100644
+> --- a/fs/crypto/keyinfo.c
+> +++ b/fs/crypto/keyinfo.c
+> @@ -385,8 +385,7 @@ find_and_lock_keyring_key(const char *prefix,
+>  }
+>  
+>  static struct fscrypt_master_key *
+> -load_master_key_from_keyring(const struct inode *inode,
+> -			     const u8 descriptor[FS_KEY_DESCRIPTOR_SIZE],
+> +load_master_key_from_keyring(const u8 descriptor[FS_KEY_DESCRIPTOR_SIZE],
+>  			     unsigned int min_keysize)
+>  {
+>  	struct key *keyring_key;
+> @@ -395,11 +394,6 @@ load_master_key_from_keyring(const struct inode *inode,
+>  
+>  	keyring_key = find_and_lock_keyring_key(FS_KEY_DESC_PREFIX, descriptor,
+>  						min_keysize, &payload);
+> -	if (keyring_key == ERR_PTR(-ENOKEY) && inode->i_sb->s_cop->key_prefix) {
+> -		keyring_key = find_and_lock_keyring_key(
+> -					inode->i_sb->s_cop->key_prefix,
+> -					descriptor, min_keysize, &payload);
+> -	}
+>  	if (IS_ERR(keyring_key))
+>  		return ERR_CAST(keyring_key);
+>  
+> @@ -441,8 +435,7 @@ find_or_create_master_key(const struct inode *inode,
+>  	/*
+>  	 * The needed master key isn't in memory yet.  Load it from the keyring.
+>  	 */
+> -	master_key = load_master_key_from_keyring(inode,
+> -						  ctx->master_key_descriptor,
+> +	master_key = load_master_key_from_keyring(ctx->master_key_descriptor,
+>  						  min_keysize);
+>  	if (IS_ERR(master_key))
+>  		return master_key;
+> @@ -676,8 +669,7 @@ void __exit fscrypt_essiv_cleanup(void)
+>  	crypto_free_shash(essiv_hash_tfm);
+>  }
+>  
+> -int fscrypt_compute_key_hash(const struct inode *inode,
+> -			     const struct fscrypt_policy *policy,
+> +int fscrypt_compute_key_hash(const struct fscrypt_policy *policy,
+>  			     u8 hash[FSCRYPT_KEY_HASH_SIZE])
+>  {
+>  	struct fscrypt_master_key *k;
+> @@ -691,7 +683,7 @@ int fscrypt_compute_key_hash(const struct inode *inode,
+>  		max(available_modes[policy->contents_encryption_mode].keysize,
+>  		    available_modes[policy->filenames_encryption_mode].keysize);
+>  
+> -	k = load_master_key_from_keyring(inode, policy->master_key_descriptor,
+> +	k = load_master_key_from_keyring(policy->master_key_descriptor,
+>  					 min_keysize);
+>  	if (IS_ERR(k))
+>  		return PTR_ERR(k);
+> diff --git a/fs/crypto/policy.c b/fs/crypto/policy.c
+> index 7661c66a3533..cd8c9c7cc9a9 100644
+> --- a/fs/crypto/policy.c
+> +++ b/fs/crypto/policy.c
+> @@ -117,7 +117,7 @@ int fscrypt_ioctl_set_policy(struct file *filp, const void __user *arg)
+>  		pr_warn_once("%s (pid %d) is setting less secure v0 encryption policy; recommend upgrading to v2.\n",
+>  			     current->comm, current->pid);
+>  	} else {
+> -		ret = fscrypt_compute_key_hash(inode, &policy, key_hash);
+> +		ret = fscrypt_compute_key_hash(&policy, key_hash);
+>  		if (ret)
+>  			return ret;
+>  	}
 > -- 
-> 2.7.4
+> 2.13.2.932.g7449e964c-goog
 > 
