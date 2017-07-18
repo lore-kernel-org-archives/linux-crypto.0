@@ -1,53 +1,58 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 00/13] crypto: caam - fixes, clean-up
-Date: Tue, 18 Jul 2017 18:39:33 +0800
-Message-ID: <20170718103933.GT6479@gondor.apana.org.au>
-References: <20170707130523.32427-1-horia.geanta@nxp.com>
- <20170710054039.21555-1-horia.geanta@nxp.com>
+Subject: Re: [PATCH v2 0/2] crypto hwrng consider quality value, remember
+ user choice
+Date: Tue, 18 Jul 2017 18:39:51 +0800
+Message-ID: <20170718103951.GU6479@gondor.apana.org.au>
+References: <1499758583-14626-1-git-send-email-freude@linux.vnet.ibm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, Dan Douglass <dan.douglass@nxp.com>,
-        Tudor Ambarus <tudor.ambarus@microchip.com>
-To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, arnd@arndb.de,
+        gregkh@linuxfoundation.org, prasannatsmkumar@gmail.com,
+        schwidefsky@de.ibm.com
+To: Harald Freudenberger <freude@linux.vnet.ibm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:33350 "EHLO
+Received: from orcrist.hmeau.com ([104.223.48.154]:33364 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751580AbdGRKkA (ORCPT
+        with ESMTP id S1752182AbdGRKkS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Jul 2017 06:40:00 -0400
+        Tue, 18 Jul 2017 06:40:18 -0400
 Content-Disposition: inline
-In-Reply-To: <20170710054039.21555-1-horia.geanta@nxp.com>
+In-Reply-To: <1499758583-14626-1-git-send-email-freude@linux.vnet.ibm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jul 10, 2017 at 08:40:26AM +0300, Horia Geantă wrote:
-> [
-> Change log:
-> v1 -> v2
-> -patch 05/13 - add missing check in ablkcipher_giv_edesc_alloc(),
-> to make sure number of reserved S/G entries is not overflown
-> -patch 12/13 - fix author - replace my Freescale address with
-> corresponding NXP one
-> ]
+On Tue, Jul 11, 2017 at 09:36:21AM +0200, Harald Freudenberger wrote:
+> The hwrng core implementation currently doesn't consider the
+> quality field of the struct hwrng. So the first registered rng
+> is the winner and further rng sources even with much better
+> quality are ignored.
 > 
-> Hi,
+> The behavior should be that always the best rng with the highest
+> quality rate should be used as current rng source. Only if the
+> user explicitly chooses a rng source (via writing a rng name
+> to /sys/class/misc/hw_random/rng_current) the decision for the
+> best quality should be suppressed.
 > 
-> Current patch set consists of:
+> This two patches make hwrng always hold a list of registered
+> rng sources sorted decreasing by quality. On registration of a new
+> hwrng source the list is updated and if the current rng source was
+> not chosen by user and the new rng provides better quality set as
+> new current rng source. Similar on unregistration of an rng, if it
+> was the current used rng source the one with the next highest quality
+> is used. If a rng source has been set via sysfs from userland as
+> long as this one doesn't unregister it is kept as current rng
+> regardless of registration of 'better' rng sources.
 > 
-> Patches 1-4 fix some issues in caam/qi driver;
-> they should be sent to -stable.
-
-While they should go to stable eventually, I think as the bug has
-been around for so long we might as well wait for another cycle.
-
-> Patches 5-7 also fix some problems in caam/qi driver, however these are
-> ARM-specific. Considering that caam/qi does not have support for ARM in
-> kernel v4.12 (lacking one dependency - Queue Manager), there's no need
-> to be applied on v4.12.y.
+> Patch 1 introduces the sorted list of registered rngs and the
+> always use the best quality behavior.
 > 
-> Patches 8-13 contain code clean-up.
+> Patch 2 makes hwrng remember that the user has selected an
+> rng via echo to /sys/class/misc/hw_random/rng_current and
+> adds a new sysfs attribute file 'rng_selected' to the rng core.
+> 
+> Harald Freudenberger (2):
+>   crypto: hwrng use rng source with best quality
+>   crypto: hwrng remember rng chosen by user
 
 All patches applied.  Thanks.
 -- 
