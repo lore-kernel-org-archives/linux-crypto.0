@@ -1,35 +1,60 @@
 From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [RFC PATCH v12 1/4] crypto: make Jitter RNG directly accessible
-Date: Tue, 18 Jul 2017 10:53:13 +0200
-Message-ID: <9620599.PVNUmZQuZk@positron.chronox.de>
-References: <3910055.ntkqcq1Chb@positron.chronox.de> <5020806.nso7MErEBx@positron.chronox.de> <20170718084959.GA25267@kroah.com>
+Subject: Re: [RFC PATCH v12 4/4] LRNG - enable compile
+Date: Tue, 18 Jul 2017 10:56:49 +0200
+Message-ID: <2765965.2brO3pd8z3@positron.chronox.de>
+References: <3910055.ntkqcq1Chb@positron.chronox.de> <5071655.YFHJQhx4QD@positron.chronox.de> <CAK8P3a201uNh4nC2pQ49UE=DVHg5qSGf1q6LUfk8H106e+uxJw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8BIT
 Cc: "Jason A. Donenfeld" <jason@zx2c4.com>,
-        Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-crypto@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Arnd Bergmann <arnd@arndb.de>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170718084959.GA25267@kroah.com>
+In-Reply-To: <CAK8P3a201uNh4nC2pQ49UE=DVHg5qSGf1q6LUfk8H106e+uxJw@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Am Dienstag, 18. Juli 2017, 10:49:59 CEST schrieb Greg Kroah-Hartman:
+Am Dienstag, 18. Juli 2017, 10:51:41 CEST schrieb Arnd Bergmann:
 
-Hi Greg,
-> 
-> > This issue was discussed during the inclusion of the Jitter RNG C code
-> > into
-> > the kernel.
-> 
-> Ok, that was then, this is now, why not change it now?  How does
-> including types.h change anything?
+Hi Arnd,
 
-At the time of discussion, I had no issue compiling it with types.h, but on 
-other architectures, there were some issues. Allow me to check back with the 
-developer who notified me about this issue to see whether types.h can be 
-included.
+> On Tue, Jul 18, 2017 at 9:59 AM, Stephan Müller <smueller@chronox.de> wrote:
+> > Add LRNG compilation support.
+> > 
+> > diff --git a/drivers/char/Makefile b/drivers/char/Makefile
+> > index 53e3372..87e06ec 100644
+> > --- a/drivers/char/Makefile
+> > +++ b/drivers/char/Makefile
+> > @@ -2,7 +2,15 @@
+> > 
+> >  # Makefile for the kernel character device drivers.
+> >  #
+> > 
+> > -obj-y                          += mem.o random.o
+> > +obj-y                          += mem.o
+> > +
+> > +ifeq ($(CONFIG_LRNG),y)
+> > +  obj-$(CONFIG_LRNG)           += lrng.o
+> > +  lrng-y                       += lrng_base.o lrng_chacha20.o
+> > +else
+> > +  obj-y                                += random.o
+> > +endif
+> 
+> I think you can write the same in a more readable way without the
+> intermediate object:
+> 
+> ifdef CONFIG_LRNG
+>   obj-y                       += lrng_base.o lrng_chacha20.o
+> else
+>   obj-y                       += random.o
+> endif
+
+Thank you for the hint, it will be included.
+> 
+>       Arnd
+
 
 Ciao
 Stephan
