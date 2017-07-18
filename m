@@ -1,89 +1,71 @@
-From: "Allen Hubbe" <Allen.Hubbe@dell.com>
-Subject: RE: [PATCH v4 4/5] ntb: ntb_hw_intel: use io-64-nonatomic instead of in-driver hacks
-Date: Tue, 18 Jul 2017 13:49:51 -0400
-Message-ID: <000201d2ffee$42c4aa90$c84dffb0$@dell.com>
-References: <20170718165528.7383-1-logang@deltatee.com> <20170718165528.7383-5-logang@deltatee.com>
+From: Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>
+Subject: Re: [PATCH V2 0/6] Enable NX 842 compression engine on Power9
+Date: Tue, 18 Jul 2017 11:06:00 -0700
+Message-ID: <20170718180600.GB21838@us.ibm.com>
+References: <1500334999.995.6.camel@hbabu-laptop>
+ <20170718161444.72252c9c@roar.ozlabs.ibm.com>
 Mime-Version: 1.0
-Content-Type: text/plain;
-        charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: "'Arnd Bergmann'" <arnd@arndb.de>,
-        "'Greg Kroah-Hartman'" <gregkh@linuxfoundation.org>,
-        "=?utf-8?Q?'Horia_Geant=C4=83'?=" <horia.geanta@nxp.com>,
-        "'Stephen Bates'" <sbates@raithlin.com>,
-        "'Jon Mason'" <jdmason@kudzu.us>
-To: "'Logan Gunthorpe'" <logang@deltatee.com>,
-        <linux-kernel@vger.kernel.org>, <linux-arch@vger.kernel.org>,
-        <linux-ntb@googlegroups.com>, <linux-crypto@vger.kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170718165528.7383-5-logang@deltatee.com>
-Content-Language: en-us
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Haren Myneni <haren@linux.vnet.ibm.com>, mikey@neuling.org,
+        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, ddstreet@ieee.org
+To: Nicholas Piggin <nicholas.piggin@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58444 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1751392AbdGRSGH (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 18 Jul 2017 14:06:07 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id v6II5Plk001803
+        for <linux-crypto@vger.kernel.org>; Tue, 18 Jul 2017 14:06:07 -0400
+Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2bsdcfxs77-1
+        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Tue, 18 Jul 2017 14:06:06 -0400
+Received: from localhost
+        by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-crypto@vger.kernel.org> from <sukadev@linux.vnet.ibm.com>;
+        Tue, 18 Jul 2017 12:06:05 -0600
+Content-Disposition: inline
+In-Reply-To: <20170718161444.72252c9c@roar.ozlabs.ibm.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Logan Gunthorpe
-> Now that ioread64 and iowrite64 are available in io-64-nonatomic,
-> we can remove the hack at the top of ntb_hw_intel.c and replace it
-> with an include.
+Nicholas Piggin [nicholas.piggin@gmail.com] wrote:
+> On Mon, 17 Jul 2017 16:43:19 -0700
+> Haren Myneni <haren@linux.vnet.ibm.com> wrote:
 > 
-> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-> Cc: Jon Mason <jdmason@kudzu.us>
-> Cc: Allen Hubbe <Allen.Hubbe@emc.com>
-> Acked-by: Dave Jiang <dave.jiang@intel.com>
+> > [PATCH V2 0/6] Enable NX 842 compression engine on Power9
+> > This patchset depends on VAS kernel changes:
+> > https://lists.ozlabs.org/pipermail/linuxppc-dev/2017-May/158178.html
+> 
+> Just a question, we no longer invalidate the copy buffer on context
+> switch after this patch:
+> 
+> 07d2a628bc ("powerpc/64s: Avoid cpabort in context switch when possible")
+> 
+> If your vas address mappings are visible only to kernel, only used in
+> process / kthread context, and only used with kernel preemption disabled,
+> this is okay.
 
-Acked-by: Allen Hubbe <Allen.Hubbe@dell.com>
+Kernel preemption is not explicitly disabled in the NX driver I think
+and
 
-> ---
->  drivers/ntb/hw/intel/ntb_hw_intel.c | 30 +-----------------------------
->  1 file changed, 1 insertion(+), 29 deletions(-)
 > 
-> diff --git a/drivers/ntb/hw/intel/ntb_hw_intel.c b/drivers/ntb/hw/intel/ntb_hw_intel.c
-> index 2557e2c05b90..606c90f59d4b 100644
-> --- a/drivers/ntb/hw/intel/ntb_hw_intel.c
-> +++ b/drivers/ntb/hw/intel/ntb_hw_intel.c
-> @@ -59,6 +59,7 @@
->  #include <linux/random.h>
->  #include <linux/slab.h>
->  #include <linux/ntb.h>
-> +#include <linux/io-64-nonatomic-lo-hi.h>
-> 
->  #include "ntb_hw_intel.h"
-> 
-> @@ -155,35 +156,6 @@ MODULE_PARM_DESC(xeon_b2b_dsd_bar5_addr32,
->  static inline enum ntb_topo xeon_ppd_topo(struct intel_ntb_dev *ndev, u8 ppd);
->  static int xeon_init_isr(struct intel_ntb_dev *ndev);
-> 
-> -#ifndef ioread64
-> -#ifdef readq
-> -#define ioread64 readq
-> -#else
-> -#define ioread64 _ioread64
-> -static inline u64 _ioread64(void __iomem *mmio)
-> -{
-> -	u64 low, high;
-> -
-> -	low = ioread32(mmio);
-> -	high = ioread32(mmio + sizeof(u32));
-> -	return low | (high << 32);
-> -}
-> -#endif
-> -#endif
-> -
-> -#ifndef iowrite64
-> -#ifdef writeq
-> -#define iowrite64 writeq
-> -#else
-> -#define iowrite64 _iowrite64
-> -static inline void _iowrite64(u64 val, void __iomem *mmio)
-> -{
-> -	iowrite32(val, mmio);
-> -	iowrite32(val >> 32, mmio + sizeof(u32));
-> -}
-> -#endif
-> -#endif
-> -
->  static inline int pdev_is_atom(struct pci_dev *pdev)
->  {
->  	switch (pdev->device) {
-> --
-> 2.11.0
+> If userspace can possibly copy/paste to the mappings or if you need to
+> sleep or call this from interrupt context, we need to work out how to
+> invalidate the copy buffer.
+
+user space cannot copy/paste to the mappings yet (that mechanism is
+further out).
+
+NX driver calls:
+
+	vas_copy(&crb, ...);
+	vas_paste(addr, ...);
+
+but not from an interrupt context. Can/should we disable premption between
+the copy/paste and to avoid having to invalidate the copy buffer?
+
+Sukadev
