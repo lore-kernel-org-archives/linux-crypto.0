@@ -1,47 +1,43 @@
 From: =?UTF-8?q?Simon=20Sandstr=C3=B6m?= <simon@nikanor.nu>
-Subject: [PATCH 5/6] staging: ccree: Fix alignment issues in ssi_ivgen.c
-Date: Tue, 18 Jul 2017 22:03:56 +0200
-Message-ID: <20170718200357.32646-6-simon@nikanor.nu>
+Subject: [PATCH 4/6] staging: ccree: Fix alignment issues in ssi_cipher.c
+Date: Tue, 18 Jul 2017 22:03:55 +0200
+Message-ID: <20170718200357.32646-5-simon@nikanor.nu>
 References: <20170718200357.32646-1-simon@nikanor.nu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Cc: gregkh@linuxfoundation.org, linux-crypto@vger.kernel.org,
-        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
-        =?UTF-8?q?Simon=20Sandstr=C3=B6m?= <simon@nikanor.nu>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: devel@driverdev.osuosl.org, gregkh@linuxfoundation.org,
+ driverdev-devel@linuxdriverproject.org, linux-crypto@vger.kernel.org,
+ =?UTF-8?q?Simon=20Sandstr=C3=B6m?= <simon@nikanor.nu>
 To: gilad@benyossef.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-lf0-f47.google.com ([209.85.215.47]:36577 "EHLO
-        mail-lf0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751839AbdGRUFW (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Jul 2017 16:05:22 -0400
-Received: by mail-lf0-f47.google.com with SMTP id d78so17767220lfg.3
-        for <linux-crypto@vger.kernel.org>; Tue, 18 Jul 2017 13:05:22 -0700 (PDT)
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
 In-Reply-To: <20170718200357.32646-1-simon@nikanor.nu>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+List-Id: linux-crypto.vger.kernel.org
 
-Fixes checkpatch.pl alignment warnings.
-
-Signed-off-by: Simon Sandström <simon@nikanor.nu>
----
- drivers/staging/ccree/ssi_ivgen.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/staging/ccree/ssi_ivgen.c b/drivers/staging/ccree/ssi_ivgen.c
-index f140dbc5195c..86364f81acab 100644
---- a/drivers/staging/ccree/ssi_ivgen.c
-+++ b/drivers/staging/ccree/ssi_ivgen.c
-@@ -202,7 +202,8 @@ int ssi_ivgen_init(struct ssi_drvdata *drvdata)
- 
- 	/* Allocate pool's header for intial enc. key/IV */
- 	ivgen_ctx->pool_meta = dma_alloc_coherent(device, SSI_IVPOOL_META_SIZE,
--			&ivgen_ctx->pool_meta_dma, GFP_KERNEL);
-+						  &ivgen_ctx->pool_meta_dma,
-+						  GFP_KERNEL);
- 	if (!ivgen_ctx->pool_meta) {
- 		SSI_LOG_ERR("Not enough memory to allocate DMA of pool_meta "
- 			   "(%u B)\n", SSI_IVPOOL_META_SIZE);
--- 
-2.11.0
+Rml4ZXMgY2hlY2twYXRjaC5wbCBhbGlnbm1lbnQgd2FybmluZ3MuCgpTaWduZWQtb2ZmLWJ5OiBT
+aW1vbiBTYW5kc3Ryw7ZtIDxzaW1vbkBuaWthbm9yLm51PgotLS0KIGRyaXZlcnMvc3RhZ2luZy9j
+Y3JlZS9zc2lfY2lwaGVyLmMgfCAzICsrLQogMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygr
+KSwgMSBkZWxldGlvbigtKQoKZGlmZiAtLWdpdCBhL2RyaXZlcnMvc3RhZ2luZy9jY3JlZS9zc2lf
+Y2lwaGVyLmMgYi9kcml2ZXJzL3N0YWdpbmcvY2NyZWUvc3NpX2NpcGhlci5jCmluZGV4IGJmZTli
+MWNjYmYzNy4uYWVjN2MxNDgwMzM2IDEwMDY0NAotLS0gYS9kcml2ZXJzL3N0YWdpbmcvY2NyZWUv
+c3NpX2NpcGhlci5jCisrKyBiL2RyaXZlcnMvc3RhZ2luZy9jY3JlZS9zc2lfY2lwaGVyLmMKQEAg
+LTIwMyw3ICsyMDMsOCBAQCBzdGF0aWMgaW50IHNzaV9ibGtjaXBoZXJfaW5pdChzdHJ1Y3QgY3J5
+cHRvX3RmbSAqdGZtKQogCiAJLyogTWFwIGtleSBidWZmZXIgKi8KIAljdHhfcC0+dXNlci5rZXlf
+ZG1hX2FkZHIgPSBkbWFfbWFwX3NpbmdsZShkZXYsICh2b2lkICopY3R4X3AtPnVzZXIua2V5LAot
+CQkJCQkgICAgIG1heF9rZXlfYnVmX3NpemUsIERNQV9UT19ERVZJQ0UpOworCQkJCQkJICBtYXhf
+a2V5X2J1Zl9zaXplLAorCQkJCQkJICBETUFfVE9fREVWSUNFKTsKIAlpZiAoZG1hX21hcHBpbmdf
+ZXJyb3IoZGV2LCBjdHhfcC0+dXNlci5rZXlfZG1hX2FkZHIpKSB7CiAJCVNTSV9MT0dfRVJSKCJN
+YXBwaW5nIEtleSAldSBCIGF0IHZhPSVwSyBmb3IgRE1BIGZhaWxlZFxuIiwKIAkJCSAgICBtYXhf
+a2V5X2J1Zl9zaXplLCBjdHhfcC0+dXNlci5rZXkpOwotLSAKMi4xMS4wCgpfX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpkZXZlbCBtYWlsaW5nIGxpc3QKZGV2
+ZWxAbGludXhkcml2ZXJwcm9qZWN0Lm9yZwpodHRwOi8vZHJpdmVyZGV2LmxpbnV4ZHJpdmVycHJv
+amVjdC5vcmcvbWFpbG1hbi9saXN0aW5mby9kcml2ZXJkZXYtZGV2ZWwK
