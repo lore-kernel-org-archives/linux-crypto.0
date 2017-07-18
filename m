@@ -1,71 +1,48 @@
 From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: [RFC PATCH v12 4/4] LRNG - enable compile
-Date: Tue, 18 Jul 2017 09:59:29 +0200
-Message-ID: <5071655.YFHJQhx4QD@positron.chronox.de>
+Subject: [RFC PATCH v12 2/4] random: conditionally compile code depending on LRNG
+Date: Tue, 18 Jul 2017 09:58:31 +0200
+Message-ID: <1830340.t0pR7po4tk@positron.chronox.de>
 References: <3910055.ntkqcq1Chb@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: "Jason A. Donenfeld" <jason@zx2c4.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: "Jason A. Donenfeld" <jason@zx2c4.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Arnd Bergmann <arnd@arndb.de>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <3910055.ntkqcq1Chb@positron.chronox.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add LRNG compilation support.
+When selecting the LRNG for compilation, disable add_disk_randomness and
+its supporting function.
 
 CC: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 CC: Arnd Bergmann <arnd@arndb.de>
 CC: Jason A. Donenfeld <Jason@zx2c4.com>
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- drivers/char/Kconfig  | 10 ++++++++++
- drivers/char/Makefile | 10 +++++++++-
- 2 files changed, 19 insertions(+), 1 deletion(-)
+ include/linux/genhd.h | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/drivers/char/Kconfig b/drivers/char/Kconfig
-index ccd239a..88cc472 100644
---- a/drivers/char/Kconfig
-+++ b/drivers/char/Kconfig
-@@ -587,5 +587,15 @@ config TILE_SROM
+diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+index e619fae..7e08ebc 100644
+--- a/include/linux/genhd.h
++++ b/include/linux/genhd.h
+@@ -422,8 +422,13 @@ extern void disk_flush_events(struct gendisk *disk, unsigned int mask);
+ extern unsigned int disk_clear_events(struct gendisk *disk, unsigned int mask);
  
- source "drivers/char/xillybus/Kconfig"
+ /* drivers/char/random.c */
++#ifdef CONFIG_LRNG
++#define add_disk_randomness(disk) do {} while (0)
++#define rand_initialize_disk(disk) do {} while (0)
++#else
+ extern void add_disk_randomness(struct gendisk *disk) __latent_entropy;
+ extern void rand_initialize_disk(struct gendisk *disk);
++#endif
  
-+config LRNG
-+	bool "Linux Random Number Generator"
-+	select CRYPTO_DRBG_MENU
-+	select CRYPTO_CMAC if CRYPTO_DRBG_CTR
-+	help
-+	  The Linux Random Number Generator (LRNG) is the replacement
-+	  of the legacy /dev/random provided with drivers/char/random.c.
-+	  It generates entropy from different noise sources and
-+	  delivers significant entropy during boot.
-+
- endmenu
- 
-diff --git a/drivers/char/Makefile b/drivers/char/Makefile
-index 53e3372..87e06ec 100644
---- a/drivers/char/Makefile
-+++ b/drivers/char/Makefile
-@@ -2,7 +2,15 @@
- # Makefile for the kernel character device drivers.
- #
- 
--obj-y				+= mem.o random.o
-+obj-y				+= mem.o
-+
-+ifeq ($(CONFIG_LRNG),y)
-+  obj-$(CONFIG_LRNG)		+= lrng.o
-+  lrng-y			+= lrng_base.o lrng_chacha20.o
-+else
-+  obj-y				+= random.o
-+endif
-+
- obj-$(CONFIG_TTY_PRINTK)	+= ttyprintk.o
- obj-y				+= misc.o
- obj-$(CONFIG_ATARI_DSP56K)	+= dsp56k.o
+ static inline sector_t get_start_sect(struct block_device *bdev)
+ {
 -- 
 2.9.4
