@@ -1,62 +1,46 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [RFC PATCH v12 2/4] random: conditionally compile code depending on LRNG
-Date: Tue, 18 Jul 2017 10:50:10 +0200
-Message-ID: <3877747.RUAmeEdMP1@tauon.chronox.de>
-References: <3910055.ntkqcq1Chb@positron.chronox.de> <1590546.5d4hGCCWgT@positron.chronox.de> <CAK8P3a1mFxSgttJU9vUkdb6nT6mYPSceFDcRRg9cFprZCjWn5A@mail.gmail.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH 2/2] crypto/algapi - make crypto_xor() take separate dst
+ and src arguments
+Date: Tue, 18 Jul 2017 09:51:21 +0100
+Message-ID: <CAKv+Gu_9S4GHmoUE-H8ZLra90OYNPjOwVGi0PJ02WFNDe6udeg@mail.gmail.com>
+References: <20170710134548.20234-1-ard.biesheuvel@linaro.org>
+ <20170710134548.20234-3-ard.biesheuvel@linaro.org> <20170718083956.GA5813@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
-Cc: "Jason A. Donenfeld" <jason@zx2c4.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-crypto@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAK8P3a1mFxSgttJU9vUkdb6nT6mYPSceFDcRRg9cFprZCjWn5A@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Eric Biggers <ebiggers@google.com>,
+        "David S. Miller" <davem@davemloft.net>, dm-devel@redhat.com,
+        Johannes Berg <johannes@sipsolutions.net>,
+        "<linux-wireless@vger.kernel.org>" <linux-wireless@vger.kernel.org>,
+        "Alasdair G. Kergon" <agk@redhat.com>, snitzer@redhat.com
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-io0-f170.google.com ([209.85.223.170]:35153 "EHLO
+        mail-io0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751334AbdGRIvW (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 18 Jul 2017 04:51:22 -0400
+Received: by mail-io0-f170.google.com with SMTP id k71so9834910iod.2
+        for <linux-crypto@vger.kernel.org>; Tue, 18 Jul 2017 01:51:22 -0700 (PDT)
+In-Reply-To: <20170718083956.GA5813@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 18. Juli 2017, 10:47:00 CEST schrieb Arnd Bergmann:
+On 18 July 2017 at 09:39, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> On Mon, Jul 10, 2017 at 02:45:48PM +0100, Ard Biesheuvel wrote:
+>> There are quite a number of occurrences in the kernel of the pattern
+>>
+>>     if (dst != src)
+>>             memcpy(dst, src, walk.total % AES_BLOCK_SIZE);
+>>     crypto_xor(dst, final, walk.total % AES_BLOCK_SIZE);
+>>
+>> or
+>>
+>>     crypto_xor(keystream, src, nbytes);
+>>     memcpy(dst, keystream, nbytes);
+>
+> What keeping crypto_xor as it is and adding a new entry point for
+> the 4-argument case?
+>
 
-Hi Arnd,
-
-> On Tue, Jul 18, 2017 at 10:37 AM, Stephan Müller <smueller@chronox.de> 
-wrote:
-> > Am Dienstag, 18. Juli 2017, 10:13:55 CEST schrieb Arnd Bergmann:
-> >> On Tue, Jul 18, 2017 at 9:58 AM, Stephan Müller <smueller@chronox.de> 
-wrote:
-> >> > When selecting the LRNG for compilation, disable add_disk_randomness
-> >> > and
-> >> > its supporting function.
-> >> > 
-> >> > CC: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> >> > CC: Arnd Bergmann <arnd@arndb.de>
-> >> > CC: Jason A. Donenfeld <Jason@zx2c4.com>
-> >> > Signed-off-by: Stephan Mueller <smueller@chronox.de>
-> >> 
-> >> I think this needs a better explanation. Why do we ignore the extra
-> >> entropy here?
-> > 
-> > I was not sure whether to add all the details about the reason into the
-> > patch submission.
-> > 
-> > The reason is explained here in [1] page 3 and re-iterated in [2].
-> 
-> Ok, got it. A half-sentence summary of that ("... to avoid adding the
-> same event twice from interrupt and block") would be sufficient for
-> the patch description, longer is also fine.
-
-Perfect, thank you for that hint. I will add this information to a next 
-iteration.
-> 
-> Generally speaking, each patch description should describe why
-> that particular patch is required rather than describe what it does
-> (which in cases like this is plain to see from looking a few lines
-> down).
-> 
->         Arnd
-
-
-
-Ciao
-Stephan
+Also fine.
