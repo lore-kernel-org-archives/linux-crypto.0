@@ -1,115 +1,54 @@
-From: Logan Gunthorpe <logang@deltatee.com>
-Subject: [PATCH v4 5/5] crypto: caam: cleanup CONFIG_64BIT ifdefs when using io{read|write}64
-Date: Tue, 18 Jul 2017 10:55:28 -0600
-Message-ID: <20170718165528.7383-6-logang@deltatee.com>
-References: <20170718165528.7383-1-logang@deltatee.com>
+From: Gary R Hook <gary.hook@amd.com>
+Subject: Re: [PATCH] crypto: ccp - Fix XTS-AES support on a version 5 CCP
+Date: Tue, 18 Jul 2017 12:39:34 -0500
+Message-ID: <b188dac1-7617-b31f-190f-5616a19b7f16@amd.com>
+References: <150032210775.102848.1585950131204303137.stgit@sosxen.amd.com>
+ <8290106.IDex3JMMbd@tauon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 8bit
-Cc: Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-        Stephen Bates <sbates@raithlin.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Dan Douglass <dan.douglass@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170718165528.7383-1-logang@deltatee.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>
+To: =?UTF-8?Q?Stephan_M=c3=bcller?= <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-bl2nam02on0063.outbound.protection.outlook.com ([104.47.38.63]:19632
+        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751379AbdGRRkW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 18 Jul 2017 13:40:22 -0400
+In-Reply-To: <8290106.IDex3JMMbd@tauon.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Horia Geantă <horia.geanta@nxp.com>
+On 07/18/2017 01:28 AM, Stephan M�ller wrote:
+> Am Montag, 17. Juli 2017, 22:08:27 CEST schrieb Gary R Hook:
+>
+> Hi Gary,
+>
+>> Version 5 CCPs have differing requirements for XTS-AES: key components
+>> are stored in a 512-bit vector. The context must be little-endian
+>> justified. AES-256 is supported now, so propagate the cipher size to
+>> the command descriptor.
+>>
+>> Signed-off-by: Gary R Hook <gary.hook@amd.com>
+>> ---
+>>  drivers/crypto/ccp/ccp-crypto-aes-xts.c |   79
 
-We can now make use of the io-64-nonatomic-lo-hi header to always
-provide 64 bit IO operations. So this patch cleans up the extra
-CONFIG_64BIT ifdefs.
+...<snip>...
 
-To be consistent with CAAM engine HW spec: in case of 64-bit registers,
-irrespective of device endianness, the lower address should be read from
-/ written to first, followed by the upper address. Indeed the I/O
-accessors in CAAM driver currently don't follow the spec, however this
-is a good opportunity to fix the code.
+>> @@ -97,14 +77,20 @@ static int ccp_aes_xts_setkey(struct crypto_ablkcipher
+>> *tfm, const u8 *key, unsigned int key_len)
+>>  {
+>>        struct ccp_ctx *ctx = crypto_tfm_ctx(crypto_ablkcipher_tfm(tfm));
+>> +     unsigned int ccpversion = ccp_version();
+>>
+>>        /* Only support 128-bit AES key with a 128-bit Tweak key,
+>>         * otherwise use the fallback
+>>         */
+>> +
+>
+> Can you please add xts_check_key here?
 
-Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Cc: Horia Geantă <horia.geanta@nxp.com>
-Cc: Dan Douglass <dan.douglass@nxp.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
----
- drivers/crypto/caam/regs.h | 35 +++++------------------------------
- 1 file changed, 5 insertions(+), 30 deletions(-)
-
-diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
-index 84d2f838a063..0c45505458e7 100644
---- a/drivers/crypto/caam/regs.h
-+++ b/drivers/crypto/caam/regs.h
-@@ -9,7 +9,7 @@
- 
- #include <linux/types.h>
- #include <linux/bitops.h>
--#include <linux/io.h>
-+#include <linux/io-64-nonatomic-lo-hi.h>
- 
- /*
-  * Architecture-specific register access methods
-@@ -134,50 +134,25 @@ static inline void clrsetbits_32(void __iomem *reg, u32 clear, u32 set)
-  *    base + 0x0000 : least-significant 32 bits
-  *    base + 0x0004 : most-significant 32 bits
-  */
--#ifdef CONFIG_64BIT
- static inline void wr_reg64(void __iomem *reg, u64 data)
- {
-+#ifndef CONFIG_CRYPTO_DEV_FSL_CAAM_IMX
- 	if (caam_little_end)
- 		iowrite64(data, reg);
- 	else
--		iowrite64be(data, reg);
--}
--
--static inline u64 rd_reg64(void __iomem *reg)
--{
--	if (caam_little_end)
--		return ioread64(reg);
--	else
--		return ioread64be(reg);
--}
--
--#else /* CONFIG_64BIT */
--static inline void wr_reg64(void __iomem *reg, u64 data)
--{
--#ifndef CONFIG_CRYPTO_DEV_FSL_CAAM_IMX
--	if (caam_little_end) {
--		wr_reg32((u32 __iomem *)(reg) + 1, data >> 32);
--		wr_reg32((u32 __iomem *)(reg), data);
--	} else
- #endif
--	{
--		wr_reg32((u32 __iomem *)(reg), data >> 32);
--		wr_reg32((u32 __iomem *)(reg) + 1, data);
--	}
-+		iowrite64be(data, reg);
- }
- 
- static inline u64 rd_reg64(void __iomem *reg)
- {
- #ifndef CONFIG_CRYPTO_DEV_FSL_CAAM_IMX
- 	if (caam_little_end)
--		return ((u64)rd_reg32((u32 __iomem *)(reg) + 1) << 32 |
--			(u64)rd_reg32((u32 __iomem *)(reg)));
-+		return ioread64(reg);
- 	else
- #endif
--		return ((u64)rd_reg32((u32 __iomem *)(reg)) << 32 |
--			(u64)rd_reg32((u32 __iomem *)(reg) + 1));
-+		return ioread64be(reg);
- }
--#endif /* CONFIG_64BIT  */
- 
- #ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
- #ifdef CONFIG_SOC_IMX7D
--- 
-2.11.0
+Certainly!
