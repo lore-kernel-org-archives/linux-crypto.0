@@ -1,49 +1,54 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [RFC PATCH v12 3/4] Linux Random Number Generator
-Date: Tue, 18 Jul 2017 10:45:12 +0200
-Message-ID: <150039607.torZXMN7kc@positron.chronox.de>
-References: <3910055.ntkqcq1Chb@positron.chronox.de> <2686871.50X2Wu6ijA@positron.chronox.de> <20170718083210.GB18340@kroah.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [RFC PATCH v12 2/4] random: conditionally compile code depending
+ on LRNG
+Date: Tue, 18 Jul 2017 10:47:00 +0200
+Message-ID: <CAK8P3a1mFxSgttJU9vUkdb6nT6mYPSceFDcRRg9cFprZCjWn5A@mail.gmail.com>
+References: <3910055.ntkqcq1Chb@positron.chronox.de> <1830340.t0pR7po4tk@positron.chronox.de>
+ <CAK8P3a2aQ8nJUjo76Vwt-vkPUoa9BT616ZVZWsVykHHiz4Pdpw@mail.gmail.com> <1590546.5d4hGCCWgT@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Cc: "Jason A. Donenfeld" <jason@zx2c4.com>,
-        Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:60636 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751334AbdGRIpO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Jul 2017 04:45:14 -0400
-In-Reply-To: <20170718083210.GB18340@kroah.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-crypto@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1590546.5d4hGCCWgT@positron.chronox.de>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Dienstag, 18. Juli 2017, 10:32:10 CEST schrieb Greg Kroah-Hartman:
+On Tue, Jul 18, 2017 at 10:37 AM, Stephan M=C3=BCller <smueller@chronox.de>=
+ wrote:
+> Am Dienstag, 18. Juli 2017, 10:13:55 CEST schrieb Arnd Bergmann:
+>> On Tue, Jul 18, 2017 at 9:58 AM, Stephan M=C3=BCller <smueller@chronox.d=
+e> wrote:
+>> > When selecting the LRNG for compilation, disable add_disk_randomness a=
+nd
+>> > its supporting function.
+>> >
+>> > CC: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+>> > CC: Arnd Bergmann <arnd@arndb.de>
+>> > CC: Jason A. Donenfeld <Jason@zx2c4.com>
+>> > Signed-off-by: Stephan Mueller <smueller@chronox.de>
+>>
+>> I think this needs a better explanation. Why do we ignore the extra
+>> entropy here?
+>
+> I was not sure whether to add all the details about the reason into the p=
+atch
+> submission.
+>
+> The reason is explained here in [1] page 3 and re-iterated in [2].
+>
 
-Hi Greg,
+Ok, got it. A half-sentence summary of that ("... to avoid adding the
+same event twice from interrupt and block") would be sufficient for
+the patch description, longer is also fine.
 
-> external references do not last as long as the kernel change log does :(
+Generally speaking, each patch description should describe why
+that particular patch is required rather than describe what it does
+(which in cases like this is plain to see from looking a few lines
+down).
 
-What would be the best way to cite a 50+ page document? I got a suggestion to 
-include the ASCII version of the document into Documentation/ -- but for the 
-first inclusion request, I was not sure whether to add such large document.
-> 
-> Also a "wholesale" replacement of random.c is a major thing, why not
-> just submit patches to fix it up to add the needed changes you feel are
-> necessary?  We don't like to have major changes like this, that's not
-> how kernel development is done.
-
-I have to admit that I tried that over the last years. I sent numerous small 
-cleanup patches (not changing any logic) and larger patches (with logic 
-changes). Even after pinging, I hardly got a response to any of my patches, 
-let alone that patches were accepted.
-
-I have stated the core concerns I have with random.c in [1]. To remedy these 
-core concerns, major changes to random.c are needed. With the past experience, 
-I would doubt that I get the changes into random.c.
-
-[1] https://www.spinics.net/lists/linux-crypto/msg26316.html
-
-Ciao
-Stephan
+        Arnd
