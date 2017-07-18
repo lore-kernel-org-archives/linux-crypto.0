@@ -1,24 +1,26 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: ccp-platform: print error message on
- platform_get_irq failure
-Date: Tue, 18 Jul 2017 18:36:19 +0800
-Message-ID: <20170718103619.GI6479@gondor.apana.org.au>
-References: <20170630055952.GA6953@embeddedgus>
+Subject: Re: [PATCH] crypto: mxc-scc: fix error code in mxc_scc_probe()
+Date: Tue, 18 Jul 2017 18:36:35 +0800
+Message-ID: <20170718103635.GK6479@gondor.apana.org.au>
+References: <20170630064212.GA13371@embeddedgus>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>,
-        "David S. Miller" <davem@davemloft.net>,
+Cc: "David S. Miller" <davem@davemloft.net>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: "Gustavo A. R. Silva" <garsilva@embeddedor.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:33228 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752194AbdGRKhC (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 18 Jul 2017 06:37:02 -0400
 Content-Disposition: inline
-In-Reply-To: <20170630055952.GA6953@embeddedgus>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20170630064212.GA13371@embeddedgus>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jun 30, 2017 at 12:59:52AM -0500, Gustavo A. R. Silva wrote:
-> Print error message on platform_get_irq failure before return.
+On Fri, Jun 30, 2017 at 01:42:12AM -0500, Gustavo A. R. Silva wrote:
+> Print and propagate the return value of platform_get_irq on failure.
 > 
 > Signed-off-by: Gustavo A. R. Silva <garsilva@embeddedor.com>
 
