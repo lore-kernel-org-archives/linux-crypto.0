@@ -1,53 +1,52 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v3 0/7] crypto: aes - allow generic AES to be omitted
-Date: Tue, 18 Jul 2017 16:30:04 +0800
-Message-ID: <20170718083003.GA5648@gondor.apana.org.au>
-References: <1497950940-24243-1-git-send-email-ard.biesheuvel@linaro.org>
- <20170718052556.GA4532@gondor.apana.org.au>
- <CAKv+Gu_6Gw5dD7rnmL-AUUSFFC8W077F8FqDK7m_wYYUizmZFg@mail.gmail.com>
- <20170718071849.GA5536@gondor.apana.org.au>
- <CAKv+Gu-FAfcfAiPju_+X=3ZOC_NqGYo7DaMpx9YosH=OpWaVCw@mail.gmail.com>
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: [RFC PATCH v12 3/4] Linux Random Number Generator
+Date: Tue, 18 Jul 2017 10:32:10 +0200
+Message-ID: <20170718083210.GB18340@kroah.com>
+References: <3910055.ntkqcq1Chb@positron.chronox.de>
+ <2686871.50X2Wu6ijA@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "nico@linaro.org" <nico@linaro.org>,
-        Eric Biggers <ebiggers3@gmail.com>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:56366 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751349AbdGRIab (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Jul 2017 04:30:31 -0400
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Cc: "Jason A. Donenfeld" <jason@zx2c4.com>,
+        Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <CAKv+Gu-FAfcfAiPju_+X=3ZOC_NqGYo7DaMpx9YosH=OpWaVCw@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <2686871.50X2Wu6ijA@positron.chronox.de>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Jul 18, 2017 at 08:57:28AM +0100, Ard Biesheuvel wrote:
->
-> So if you care about security and/or the cache/memory footprint more
-> than about speed, you can disable the table based implementations that
-> exist for i586, x86, ARM and arm64 (all of which have faster and time
-> invariant implementations based on SIMD or special instructions
-> anyway, so for 95% of the cases, it does not really matter).
+On Tue, Jul 18, 2017 at 09:59:09AM +0200, Stephan Müller wrote:
+> The LRNG with the following properties:
+> 
+> * noise source: interrupts timing with fast boot time seeding
+> 
+> * lockless LFSR to collect raw entropy
+> 
+> * use of standalone ChaCha20 based RNG with the option to use a
+>   different DRNG selectable at compile time
+> 
+> * "atomic" seeding of secondary DRBG to ensure full entropy
+>   transport
+> 
+> * instantiate one DRNG per NUMA node
+> 
+> Further details including the rationale for the design choices and
+> properties of the LRNG together with testing is provided at [1].
+> In addition, the documentation explains the conducted regression
+> tests to verify that the LRNG is API and ABI compatible with the
+> legacy /dev/random implementation.
+> 
+> [1] http://www.chronox.de/lrng.html
 
-The thing is that anybody who cares about speed won't be using
-aes-generic anyway.  We have way too many AES implementations
-as it is, and having two C implementations is really getting
-silly.
+external references do not last as long as the kernel change log does :(
 
-So would it be possible for you to proceed with your work in
-such a way that we end up with just aes-ti as the generic C
-implementation?
+Also a "wholesale" replacement of random.c is a major thing, why not
+just submit patches to fix it up to add the needed changes you feel are
+necessary?  We don't like to have major changes like this, that's not
+how kernel development is done.
 
-As for the table-based asm implementations yes they can stay and
-work out some way of sharing that table at the source-code level.
-At run-time the table can just go into the asm module directly
-since you'd only have one on each platform, right?
+thanks,
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+greg k-h
