@@ -1,36 +1,29 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: brcm - remove BCM_PDC_MBOX dependency in Kconfig
-Date: Tue, 18 Jul 2017 18:40:06 +0800
-Message-ID: <20170718104006.GV6479@gondor.apana.org.au>
-References: <1499768406-8342-1-git-send-email-raveendra.padasalagi@broadcom.com>
+Subject: Re: [PATCH] crypto: ccp - Change all references to use the JOB ID
+ macro
+Date: Tue, 18 Jul 2017 18:35:59 +0800
+Message-ID: <20170718103559.GG6479@gondor.apana.org.au>
+References: <149857189631.26668.7228199918497769629.stgit@sosxen.amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Rob Rice <rob.rice@broadcom.com>, linux-crypto@vger.kernel.org,
-        Scott Branden <sbranden@broadcom.com>,
-        Ray Jui <ray.jui@broadcom.com>,
-        Steve Lin <steven.lin1@broadcom.com>,
-        bcm-kernel-feedback-list@broadcom.com,
-        linux-kernel@vger.kernel.org, stable@vger.kernel.org
-To: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
-Return-path: <stable-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org, thomas.lendacky@amd.com,
+        davem@davemloft.net
+To: Gary R Hook <gary.hook@amd.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:33186 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751740AbdGRKgY (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 18 Jul 2017 06:36:24 -0400
 Content-Disposition: inline
-In-Reply-To: <1499768406-8342-1-git-send-email-raveendra.padasalagi@broadcom.com>
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <149857189631.26668.7228199918497769629.stgit@sosxen.amd.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jul 11, 2017 at 03:50:06PM +0530, Raveendra Padasalagi wrote:
-> SPU driver is dependent on generic MAILBOX API's to
-> communicate with underlying DMA engine driver.
+On Tue, Jun 27, 2017 at 08:58:16AM -0500, Gary R Hook wrote:
+> Use the CCP_NEW_JOBID() macro when assigning an identifier
 > 
-> So this patch removes BCM_PDC_MBOX "depends on" for SPU driver
-> in Kconfig and adds MAILBOX as dependent module.
-> 
-> Fixes: 9d12ba86f818 ("crypto: brcm - Add Broadcom SPU driver")
-> Signed-off-by: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
-> Reviewed-by: Ray Jui <ray.jui@broadcom.com>
-> Reviewed-by: Scott Branden <scott.branden@broadcom.com>
-> Cc: stable@vger.kernel.org
+> Signed-off-by: Gary R Hook <gary.hook@amd.com>
 
 Patch applied.  Thanks.
 -- 
