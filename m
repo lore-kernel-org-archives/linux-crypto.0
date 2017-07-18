@@ -1,47 +1,44 @@
-From: Tudor Ambarus <tudor.ambarus@microchip.com>
-Subject: Re: [v3 RFC PATCH 2/2] crypto: ecc: use caller's GFP flags
-Date: Tue, 18 Jul 2017 16:15:44 +0300
-Message-ID: <3aaa1647-5bc2-6f2f-b532-6829fa2918cc@microchip.com>
-References: <1498658916-11044-1-git-send-email-tudor.ambarus@microchip.com>
- <1498658916-11044-3-git-send-email-tudor.ambarus@microchip.com>
- <20170718055209.GC4764@gondor.apana.org.au>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: Re: [RFC PATCH v12 3/4] Linux Random Number Generator
+Date: Tue, 18 Jul 2017 16:37:11 +0200
+Message-ID: <1780567.qGdv4EjEMp@positron.chronox.de>
+References: <3910055.ntkqcq1Chb@positron.chronox.de> <150039607.torZXMN7kc@positron.chronox.de> <20170718085212.GB25267@kroah.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: <davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
-        <nicolas.ferre@microchip.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from esa2.microchip.iphmx.com ([68.232.149.84]:62480 "EHLO
-        esa2.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751401AbdGRNQe (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Jul 2017 09:16:34 -0400
-In-Reply-To: <20170718055209.GC4764@gondor.apana.org.au>
-Content-Language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: "Jason A. Donenfeld" <jason@zx2c4.com>,
+        Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20170718085212.GB25267@kroah.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi, Herbert,
+Am Dienstag, 18. Juli 2017, 10:52:12 CEST schrieb Greg Kroah-Hartman:
 
-On 07/18/2017 08:52 AM, Herbert Xu wrote:
-> On Wed, Jun 28, 2017 at 05:08:36PM +0300, Tudor Ambarus wrote:
->> Using GFP_KERNEL when allocating data and implicitly
->> assuming that we can sleep was wrong because the caller
->> could be in atomic context. Let the caller decide whether
->> sleeping is possible or not.
->>
->> The caller (ecdh) was updated in the same patch in order
->> to not affect bissectability.
->>
->> Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
+Hi Greg,
+
 > 
-> Hmm, who wants to do asymmetric key crypto in interrupt context?
+> > I have stated the core concerns I have with random.c in [1]. To remedy
+> > these core concerns, major changes to random.c are needed. With the past
+> > experience, I would doubt that I get the changes into random.c.
+> > 
+> > [1] https://www.spinics.net/lists/linux-crypto/msg26316.html
+> 
+> Evolution is the correct way to do this, kernel development relies on
+> that.  We don't do the "use this totally different and untested file
+> instead!" method.
 
-I thought of a caller that doesn't set the CRYPTO_TFM_REQ_MAY_SLEEP
-flag. As of now I'm not aware of an user who wants asymmetric key
-crypto in interrupt context. We can consider this patch superfluous
-if CRYPTO_TFM_REQ_MAY_SLEEP is not meaningful for asymmetric key crypto.
+I am not sure I understand your reply. The offered patch set does not rip out 
+existing code. It adds a replacement implementation which can be enabled 
+during compile time. Yet it is even disabled per default (and thus the legacy 
+code is compiled).
 
-Thanks,
-ta
+I see such a development approach in numerous different kernel core areas: 
+memory allocators (SLAB, SLOB, SLUB), process schedulers, IRQ schedulers.
+
+What is so different for the realm of RNGs?
+
+Ciao
+Stephan
