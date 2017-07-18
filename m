@@ -1,55 +1,71 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH v3 0/7] crypto: aes - allow generic AES to be omitted
-Date: Tue, 18 Jul 2017 09:35:03 +0100
-Message-ID: <CAKv+Gu_ZEsPnFmb6q5c1YmoEQaPNLxTf5YO2=nJiW6SQO0pLsQ@mail.gmail.com>
-References: <1497950940-24243-1-git-send-email-ard.biesheuvel@linaro.org>
- <20170718052556.GA4532@gondor.apana.org.au> <CAKv+Gu_6Gw5dD7rnmL-AUUSFFC8W077F8FqDK7m_wYYUizmZFg@mail.gmail.com>
- <20170718071849.GA5536@gondor.apana.org.au> <CAKv+Gu-FAfcfAiPju_+X=3ZOC_NqGYo7DaMpx9YosH=OpWaVCw@mail.gmail.com>
- <20170718083003.GA5648@gondor.apana.org.au>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: Re: [RFC PATCH v12 2/4] random: conditionally compile code depending on LRNG
+Date: Tue, 18 Jul 2017 10:37:40 +0200
+Message-ID: <1590546.5d4hGCCWgT@positron.chronox.de>
+References: <3910055.ntkqcq1Chb@positron.chronox.de> <1830340.t0pR7po4tk@positron.chronox.de> <CAK8P3a2aQ8nJUjo76Vwt-vkPUoa9BT616ZVZWsVykHHiz4Pdpw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "nico@linaro.org" <nico@linaro.org>,
-        Eric Biggers <ebiggers3@gmail.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8BIT
+Cc: "Jason A. Donenfeld" <jason@zx2c4.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-crypto@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Arnd Bergmann <arnd@arndb.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-it0-f42.google.com ([209.85.214.42]:37922 "EHLO
-        mail-it0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751341AbdGRIfE (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Jul 2017 04:35:04 -0400
-Received: by mail-it0-f42.google.com with SMTP id h199so9709672ith.1
-        for <linux-crypto@vger.kernel.org>; Tue, 18 Jul 2017 01:35:04 -0700 (PDT)
-In-Reply-To: <20170718083003.GA5648@gondor.apana.org.au>
+Received: from mail.eperm.de ([89.247.134.16]:60620 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751357AbdGRIhz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 18 Jul 2017 04:37:55 -0400
+In-Reply-To: <CAK8P3a2aQ8nJUjo76Vwt-vkPUoa9BT616ZVZWsVykHHiz4Pdpw@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 18 July 2017 at 09:30, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> On Tue, Jul 18, 2017 at 08:57:28AM +0100, Ard Biesheuvel wrote:
->>
->> So if you care about security and/or the cache/memory footprint more
->> than about speed, you can disable the table based implementations that
->> exist for i586, x86, ARM and arm64 (all of which have faster and time
->> invariant implementations based on SIMD or special instructions
->> anyway, so for 95% of the cases, it does not really matter).
->
-> The thing is that anybody who cares about speed won't be using
-> aes-generic anyway.  We have way too many AES implementations
-> as it is, and having two C implementations is really getting
-> silly.
->
-> So would it be possible for you to proceed with your work in
-> such a way that we end up with just aes-ti as the generic C
-> implementation?
->
+Am Dienstag, 18. Juli 2017, 10:13:55 CEST schrieb Arnd Bergmann:
 
-Sure.
+Hi Arnd,
 
-> As for the table-based asm implementations yes they can stay and
-> work out some way of sharing that table at the source-code level.
-> At run-time the table can just go into the asm module directly
-> since you'd only have one on each platform, right?
->
+> On Tue, Jul 18, 2017 at 9:58 AM, Stephan Müller <smueller@chronox.de> wrote:
+> > When selecting the LRNG for compilation, disable add_disk_randomness and
+> > its supporting function.
+> > 
+> > CC: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> > CC: Arnd Bergmann <arnd@arndb.de>
+> > CC: Jason A. Donenfeld <Jason@zx2c4.com>
+> > Signed-off-by: Stephan Mueller <smueller@chronox.de>
+> 
+> I think this needs a better explanation. Why do we ignore the extra
+> entropy here?
 
-Indeed. And ARM only uses 4 of those 16 tables anyway (and really only
-needs two of them, so I will fix that as well)
+I was not sure whether to add all the details about the reason into the patch 
+submission.
+
+The reason is explained here in [1] page 3 and re-iterated in [2].
+
+The gist is the following:
+
+A HID or block device event providing entropy to the respective individual 
+noise sources processing generates an interrupt. These interrupts are also 
+processed by the interrupt noise source. The majority of entropy is delivered 
+by the high-resolution time stamp of the occurrence of such an event. Now, 
+that event is processed twice in the legacy /dev/random implementation: once 
+by the HID or block device noise source and once by the interrupt noise 
+source. Thus, the two time stamps of the one event (HID noise source and 
+interrupt noise source, or block device noise source and interrupt noise 
+source) used as a basis for entropy are highly correlated. Correlation or even 
+a possible reuse of the same random value diminishes entropy significantly.
+
+The additional data provided via the block noise source (block device number) 
+has no real entropy.
+
+Bottom line: for entropy, the HID and block device noise sources are just a 
+derivative of the interrupt noise source. Thus, discarding the block device 
+noise source will not lose any entropy. Regarding the HID noise source, only 
+the key/mouse event numbers are injected into the LRNG without attributing any 
+entropy to them.
+
+[1] http://www.chronox.de/lrng/doc/lrng.pdf
+
+[2] https://www.spinics.net/lists/linux-crypto/msg26316.html
+
+Ciao
+Stephan
