@@ -1,367 +1,137 @@
-From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta-3arQi8VN3Tc@public.gmane.org>
-Subject: [PATCH 1/4] crypto: caam/jr - add support for DPAA2 parts
-Date: Tue, 18 Jul 2017 18:30:47 +0300
-Message-ID: <20170718153050.15330-2-horia.geanta@nxp.com>
+From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
+Subject: [PATCH 2/4] arm64: dts: freescale: ls208xa: share aliases node
+Date: Tue, 18 Jul 2017 18:30:48 +0300
+Message-ID: <20170718153050.15330-3-horia.geanta@nxp.com>
 References: <20170718153050.15330-1-horia.geanta@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-Cc: "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
-        Dan Douglass <dan.douglass-3arQi8VN3Tc@public.gmane.org>,
-        <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        <linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
-To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-        Shawn Guo <shawnguo-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170718153050.15330-1-horia.geanta-3arQi8VN3Tc@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Dan Douglass <dan.douglass@nxp.com>,
+        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        Shawn Guo <shawnguo@kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-cys01nam02on0050.outbound.protection.outlook.com ([104.47.37.50]:65056
+        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751338AbdGRPb1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 18 Jul 2017 11:31:27 -0400
+In-Reply-To: <20170718153050.15330-1-horia.geanta@nxp.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Add support for using the caam/jr backend on DPAA2-based SoCs.
-These have some particularities we have to account for:
--HW S/G format is different
--Management Complex (MC) firmware initializes / manages (partially)
-the CAAM block: MCFGR, QI enablement in QICTL, RNG
+aliases node is identical for all boards, thus move it
+to the common file ls208xa.dtsi.
 
-Signed-off-by: Horia Geantă <horia.geanta-3arQi8VN3Tc@public.gmane.org>
+Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 ---
- drivers/crypto/caam/caamhash.c   |  7 ++--
- drivers/crypto/caam/ctrl.c       | 45 ++++++++++++++--------
- drivers/crypto/caam/ctrl.h       |  2 +
- drivers/crypto/caam/jr.c         |  7 +++-
- drivers/crypto/caam/regs.h       |  1 +
- drivers/crypto/caam/sg_sw_qm2.h  | 81 ++++++++++++++++++++++++++++++++++++++++
- drivers/crypto/caam/sg_sw_sec4.h | 30 +++++++++++++--
- 7 files changed, 148 insertions(+), 25 deletions(-)
- create mode 100644 drivers/crypto/caam/sg_sw_qm2.h
+ arch/arm64/boot/dts/freescale/fsl-ls2080a-qds.dts  | 5 -----
+ arch/arm64/boot/dts/freescale/fsl-ls2080a-rdb.dts  | 5 -----
+ arch/arm64/boot/dts/freescale/fsl-ls2080a-simu.dts | 5 -----
+ arch/arm64/boot/dts/freescale/fsl-ls2088a-qds.dts  | 5 -----
+ arch/arm64/boot/dts/freescale/fsl-ls2088a-rdb.dts  | 5 -----
+ arch/arm64/boot/dts/freescale/fsl-ls208xa.dtsi     | 5 +++++
+ 6 files changed, 5 insertions(+), 25 deletions(-)
 
-diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index 910ec61cae09..698580b60b2f 100644
---- a/drivers/crypto/caam/caamhash.c
-+++ b/drivers/crypto/caam/caamhash.c
-@@ -791,8 +791,8 @@ static int ahash_update_ctx(struct ahash_request *req)
- 							 to_hash - *buflen,
- 							 *next_buflen, 0);
- 		} else {
--			(edesc->sec4_sg + sec4_sg_src_index - 1)->len |=
--				cpu_to_caam32(SEC4_SG_LEN_FIN);
-+			sg_to_sec4_set_last(edesc->sec4_sg + sec4_sg_src_index -
-+					    1);
- 		}
+diff --git a/arch/arm64/boot/dts/freescale/fsl-ls2080a-qds.dts b/arch/arm64/boot/dts/freescale/fsl-ls2080a-qds.dts
+index ed209cd57283..3c99608b9b45 100644
+--- a/arch/arm64/boot/dts/freescale/fsl-ls2080a-qds.dts
++++ b/arch/arm64/boot/dts/freescale/fsl-ls2080a-qds.dts
+@@ -55,11 +55,6 @@
+ 	model = "Freescale Layerscape 2080a QDS Board";
+ 	compatible = "fsl,ls2080a-qds", "fsl,ls2080a";
  
- 		desc = edesc->hw_desc;
-@@ -882,8 +882,7 @@ static int ahash_final_ctx(struct ahash_request *req)
- 	if (ret)
- 		goto unmap_ctx;
+-	aliases {
+-		serial0 = &serial0;
+-		serial1 = &serial1;
+-	};
+-
+ 	chosen {
+ 		stdout-path = "serial0:115200n8";
+ 	};
+diff --git a/arch/arm64/boot/dts/freescale/fsl-ls2080a-rdb.dts b/arch/arm64/boot/dts/freescale/fsl-ls2080a-rdb.dts
+index 67ec3f9c81a1..a4e7de9f70d8 100644
+--- a/arch/arm64/boot/dts/freescale/fsl-ls2080a-rdb.dts
++++ b/arch/arm64/boot/dts/freescale/fsl-ls2080a-rdb.dts
+@@ -55,11 +55,6 @@
+ 	model = "Freescale Layerscape 2080a RDB Board";
+ 	compatible = "fsl,ls2080a-rdb", "fsl,ls2080a";
  
--	(edesc->sec4_sg + sec4_sg_src_index - 1)->len |=
--		cpu_to_caam32(SEC4_SG_LEN_FIN);
-+	sg_to_sec4_set_last(edesc->sec4_sg + sec4_sg_src_index - 1);
+-	aliases {
+-		serial0 = &serial0;
+-		serial1 = &serial1;
+-	};
+-
+ 	chosen {
+ 		stdout-path = "serial1:115200n8";
+ 	};
+diff --git a/arch/arm64/boot/dts/freescale/fsl-ls2080a-simu.dts b/arch/arm64/boot/dts/freescale/fsl-ls2080a-simu.dts
+index 3ee718f0aaf8..fbbb73e571c0 100644
+--- a/arch/arm64/boot/dts/freescale/fsl-ls2080a-simu.dts
++++ b/arch/arm64/boot/dts/freescale/fsl-ls2080a-simu.dts
+@@ -52,11 +52,6 @@
+ 	model = "Freescale Layerscape 2080a software Simulator model";
+ 	compatible = "fsl,ls2080a-simu", "fsl,ls2080a";
  
- 	edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
- 					    sec4_sg_bytes, DMA_TO_DEVICE);
-diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index 7338f15b8674..fdbcba13824c 100644
---- a/drivers/crypto/caam/ctrl.c
-+++ b/drivers/crypto/caam/ctrl.c
-@@ -17,6 +17,8 @@
+-	aliases {
+-		serial0 = &serial0;
+-		serial1 = &serial1;
+-	};
+-
+ 	ethernet@2210000 {
+ 		compatible = "smsc,lan91c111";
+ 		reg = <0x0 0x2210000 0x0 0x100>;
+diff --git a/arch/arm64/boot/dts/freescale/fsl-ls2088a-qds.dts b/arch/arm64/boot/dts/freescale/fsl-ls2088a-qds.dts
+index 4a1df5ce3229..eaee5b1c3a44 100644
+--- a/arch/arm64/boot/dts/freescale/fsl-ls2088a-qds.dts
++++ b/arch/arm64/boot/dts/freescale/fsl-ls2088a-qds.dts
+@@ -54,11 +54,6 @@
+ 	model = "Freescale Layerscape 2088A QDS Board";
+ 	compatible = "fsl,ls2088a-qds", "fsl,ls2088a";
  
- bool caam_little_end;
- EXPORT_SYMBOL(caam_little_end);
-+bool caam_dpaa2;
-+EXPORT_SYMBOL(caam_dpaa2);
+-	aliases {
+-		serial0 = &serial0;
+-		serial1 = &serial1;
+-	};
+-
+ 	chosen {
+ 		stdout-path = "serial0:115200n8";
+ 	};
+diff --git a/arch/arm64/boot/dts/freescale/fsl-ls2088a-rdb.dts b/arch/arm64/boot/dts/freescale/fsl-ls2088a-rdb.dts
+index a76d4b4debd1..c411442cac62 100644
+--- a/arch/arm64/boot/dts/freescale/fsl-ls2088a-rdb.dts
++++ b/arch/arm64/boot/dts/freescale/fsl-ls2088a-rdb.dts
+@@ -54,11 +54,6 @@
+ 	model = "Freescale Layerscape 2088A RDB Board";
+ 	compatible = "fsl,ls2088a-rdb", "fsl,ls2088a";
  
- #ifdef CONFIG_CAAM_QI
- #include "qi.h"
-@@ -319,8 +321,11 @@ static int caam_remove(struct platform_device *pdev)
- 		caam_qi_shutdown(ctrlpriv->qidev);
- #endif
+-	aliases {
+-		serial0 = &serial0;
+-		serial1 = &serial1;
+-	};
+-
+ 	chosen {
+ 		stdout-path = "serial1:115200n8";
+ 	};
+diff --git a/arch/arm64/boot/dts/freescale/fsl-ls208xa.dtsi b/arch/arm64/boot/dts/freescale/fsl-ls208xa.dtsi
+index 94cdd3045037..f135b987d13b 100644
+--- a/arch/arm64/boot/dts/freescale/fsl-ls208xa.dtsi
++++ b/arch/arm64/boot/dts/freescale/fsl-ls208xa.dtsi
+@@ -53,6 +53,11 @@
+ 	#address-cells = <2>;
+ 	#size-cells = <2>;
  
--	/* De-initialize RNG state handles initialized by this driver. */
--	if (ctrlpriv->rng4_sh_init)
-+	/*
-+	 * De-initialize RNG state handles initialized by this driver.
-+	 * In case of DPAA 2.x, RNG is managed by MC firmware.
-+	 */
-+	if (!caam_dpaa2 && ctrlpriv->rng4_sh_init)
- 		deinstantiate_rng(ctrldev, ctrlpriv->rng4_sh_init);
- 
- 	/* Shut down debug views */
-@@ -552,12 +557,17 @@ static int caam_probe(struct platform_device *pdev)
- 
- 	/*
- 	 * Enable DECO watchdogs and, if this is a PHYS_ADDR_T_64BIT kernel,
--	 * long pointers in master configuration register
-+	 * long pointers in master configuration register.
-+	 * In case of DPAA 2.x, Management Complex firmware performs
-+	 * the configuration.
- 	 */
--	clrsetbits_32(&ctrl->mcr, MCFGR_AWCACHE_MASK | MCFGR_LONG_PTR,
--		      MCFGR_AWCACHE_CACH | MCFGR_AWCACHE_BUFF |
--		      MCFGR_WDENABLE | MCFGR_LARGE_BURST |
--		      (sizeof(dma_addr_t) == sizeof(u64) ? MCFGR_LONG_PTR : 0));
-+	caam_dpaa2 = !!(comp_params & CTPR_MS_DPAA2);
-+	if (!caam_dpaa2)
-+		clrsetbits_32(&ctrl->mcr, MCFGR_AWCACHE_MASK | MCFGR_LONG_PTR,
-+			      MCFGR_AWCACHE_CACH | MCFGR_AWCACHE_BUFF |
-+			      MCFGR_WDENABLE | MCFGR_LARGE_BURST |
-+			      (sizeof(dma_addr_t) == sizeof(u64) ?
-+			       MCFGR_LONG_PTR : 0));
- 
- 	/*
- 	 *  Read the Compile Time paramters and SCFGR to determine
-@@ -586,7 +596,9 @@ static int caam_probe(struct platform_device *pdev)
- 			      JRSTART_JR3_START);
- 
- 	if (sizeof(dma_addr_t) == sizeof(u64)) {
--		if (of_device_is_compatible(nprop, "fsl,sec-v5.0"))
-+		if (caam_dpaa2)
-+			ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(49));
-+		else if (of_device_is_compatible(nprop, "fsl,sec-v5.0"))
- 			ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(40));
- 		else
- 			ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(36));
-@@ -629,11 +641,9 @@ static int caam_probe(struct platform_device *pdev)
- 			ring++;
- 		}
- 
--	/* Check to see if QI present. If so, enable */
--	ctrlpriv->qi_present =
--			!!(rd_reg32(&ctrl->perfmon.comp_parms_ms) &
--			   CTPR_MS_QI_MASK);
--	if (ctrlpriv->qi_present) {
-+	/* Check to see if (DPAA 1.x) QI present. If so, enable */
-+	ctrlpriv->qi_present = !!(comp_params & CTPR_MS_QI_MASK);
-+	if (ctrlpriv->qi_present && !caam_dpaa2) {
- 		ctrlpriv->qi = (struct caam_queue_if __iomem __force *)
- 			       ((__force uint8_t *)ctrl +
- 				 BLOCK_OFFSET * QI_BLOCK_NUMBER
-@@ -661,8 +671,10 @@ static int caam_probe(struct platform_device *pdev)
- 	/*
- 	 * If SEC has RNG version >= 4 and RNG state handle has not been
- 	 * already instantiated, do RNG instantiation
-+	 * In case of DPAA 2.x, RNG is managed by MC firmware.
- 	 */
--	if ((cha_vid_ls & CHA_ID_LS_RNG_MASK) >> CHA_ID_LS_RNG_SHIFT >= 4) {
-+	if (!caam_dpaa2 &&
-+	    (cha_vid_ls & CHA_ID_LS_RNG_MASK) >> CHA_ID_LS_RNG_SHIFT >= 4) {
- 		ctrlpriv->rng4_sh_init =
- 			rd_reg32(&ctrl->r4tst[0].rdsta);
- 		/*
-@@ -730,8 +742,9 @@ static int caam_probe(struct platform_device *pdev)
- 	/* Report "alive" for developer to see */
- 	dev_info(dev, "device ID = 0x%016llx (Era %d)\n", caam_id,
- 		 caam_get_era());
--	dev_info(dev, "job rings = %d, qi = %d\n",
--		 ctrlpriv->total_jobrs, ctrlpriv->qi_present);
-+	dev_info(dev, "job rings = %d, qi = %d, dpaa2 = %s\n",
-+		 ctrlpriv->total_jobrs, ctrlpriv->qi_present,
-+		 caam_dpaa2 ? "yes" : "no");
- 
- #ifdef CONFIG_DEBUG_FS
- 
-diff --git a/drivers/crypto/caam/ctrl.h b/drivers/crypto/caam/ctrl.h
-index cac5402a46eb..7e7bf68c9ef5 100644
---- a/drivers/crypto/caam/ctrl.h
-+++ b/drivers/crypto/caam/ctrl.h
-@@ -10,4 +10,6 @@
- /* Prototypes for backend-level services exposed to APIs */
- int caam_get_era(void);
- 
-+extern bool caam_dpaa2;
++	aliases {
++		serial0 = &serial0;
++		serial1 = &serial1;
++	};
 +
- #endif /* CTRL_H */
-diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
-index 1ccfb317d468..d258953ff488 100644
---- a/drivers/crypto/caam/jr.c
-+++ b/drivers/crypto/caam/jr.c
-@@ -9,6 +9,7 @@
- #include <linux/of_address.h>
- 
- #include "compat.h"
-+#include "ctrl.h"
- #include "regs.h"
- #include "jr.h"
- #include "desc.h"
-@@ -499,7 +500,11 @@ static int caam_jr_probe(struct platform_device *pdev)
- 	jrpriv->rregs = (struct caam_job_ring __iomem __force *)ctrl;
- 
- 	if (sizeof(dma_addr_t) == sizeof(u64)) {
--		if (of_device_is_compatible(nprop, "fsl,sec-v5.0-job-ring"))
-+		if (caam_dpaa2)
-+			error = dma_set_mask_and_coherent(jrdev,
-+							  DMA_BIT_MASK(49));
-+		else if (of_device_is_compatible(nprop,
-+						 "fsl,sec-v5.0-job-ring"))
- 			error = dma_set_mask_and_coherent(jrdev,
- 							  DMA_BIT_MASK(40));
- 		else
-diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
-index 84d2f838a063..2b5efff9ec3c 100644
---- a/drivers/crypto/caam/regs.h
-+++ b/drivers/crypto/caam/regs.h
-@@ -293,6 +293,7 @@ struct caam_perfmon {
- 	u32 cha_rev_ls;		/* CRNR - CHA Rev No. Least significant half*/
- #define CTPR_MS_QI_SHIFT	25
- #define CTPR_MS_QI_MASK		(0x1ull << CTPR_MS_QI_SHIFT)
-+#define CTPR_MS_DPAA2		BIT(13)
- #define CTPR_MS_VIRT_EN_INCL	0x00000001
- #define CTPR_MS_VIRT_EN_POR	0x00000002
- #define CTPR_MS_PG_SZ_MASK	0x10
-diff --git a/drivers/crypto/caam/sg_sw_qm2.h b/drivers/crypto/caam/sg_sw_qm2.h
-new file mode 100644
-index 000000000000..31b440757146
---- /dev/null
-+++ b/drivers/crypto/caam/sg_sw_qm2.h
-@@ -0,0 +1,81 @@
-+/*
-+ * Copyright 2015-2016 Freescale Semiconductor, Inc.
-+ * Copyright 2017 NXP
-+ *
-+ * Redistribution and use in source and binary forms, with or without
-+ * modification, are permitted provided that the following conditions are met:
-+ *     * Redistributions of source code must retain the above copyright
-+ *	 notice, this list of conditions and the following disclaimer.
-+ *     * Redistributions in binary form must reproduce the above copyright
-+ *	 notice, this list of conditions and the following disclaimer in the
-+ *	 documentation and/or other materials provided with the distribution.
-+ *     * Neither the names of the above-listed copyright holders nor the
-+ *	 names of any contributors may be used to endorse or promote products
-+ *	 derived from this software without specific prior written permission.
-+ *
-+ *
-+ * ALTERNATIVELY, this software may be distributed under the terms of the
-+ * GNU General Public License ("GPL") as published by the Free Software
-+ * Foundation, either version 2 of that License or (at your option) any
-+ * later version.
-+ *
-+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE
-+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-+ * POSSIBILITY OF SUCH DAMAGE.
-+ */
-+
-+#ifndef _SG_SW_QM2_H_
-+#define _SG_SW_QM2_H_
-+
-+#include "../../../drivers/staging/fsl-mc/include/dpaa2-fd.h"
-+
-+static inline void dma_to_qm_sg_one(struct dpaa2_sg_entry *qm_sg_ptr,
-+				    dma_addr_t dma, u32 len, u16 offset)
-+{
-+	dpaa2_sg_set_addr(qm_sg_ptr, dma);
-+	dpaa2_sg_set_format(qm_sg_ptr, dpaa2_sg_single);
-+	dpaa2_sg_set_final(qm_sg_ptr, false);
-+	dpaa2_sg_set_len(qm_sg_ptr, len);
-+	dpaa2_sg_set_bpid(qm_sg_ptr, 0);
-+	dpaa2_sg_set_offset(qm_sg_ptr, offset);
-+}
-+
-+/*
-+ * convert scatterlist to h/w link table format
-+ * but does not have final bit; instead, returns last entry
-+ */
-+static inline struct dpaa2_sg_entry *
-+sg_to_qm_sg(struct scatterlist *sg, int sg_count,
-+	    struct dpaa2_sg_entry *qm_sg_ptr, u16 offset)
-+{
-+	while (sg_count && sg) {
-+		dma_to_qm_sg_one(qm_sg_ptr, sg_dma_address(sg),
-+				 sg_dma_len(sg), offset);
-+		qm_sg_ptr++;
-+		sg = sg_next(sg);
-+		sg_count--;
-+	}
-+	return qm_sg_ptr - 1;
-+}
-+
-+/*
-+ * convert scatterlist to h/w link table format
-+ * scatterlist must have been previously dma mapped
-+ */
-+static inline void sg_to_qm_sg_last(struct scatterlist *sg, int sg_count,
-+				    struct dpaa2_sg_entry *qm_sg_ptr,
-+				    u16 offset)
-+{
-+	qm_sg_ptr = sg_to_qm_sg(sg, sg_count, qm_sg_ptr, offset);
-+	dpaa2_sg_set_final(qm_sg_ptr, true);
-+}
-+
-+#endif /* _SG_SW_QM2_H_ */
-diff --git a/drivers/crypto/caam/sg_sw_sec4.h b/drivers/crypto/caam/sg_sw_sec4.h
-index 2f6bf162bb6c..936b1b630058 100644
---- a/drivers/crypto/caam/sg_sw_sec4.h
-+++ b/drivers/crypto/caam/sg_sw_sec4.h
-@@ -5,7 +5,13 @@
-  *
-  */
- 
-+#ifndef _SG_SW_SEC4_H_
-+#define _SG_SW_SEC4_H_
-+
-+#include "ctrl.h"
- #include "regs.h"
-+#include "sg_sw_qm2.h"
-+#include "../../../drivers/staging/fsl-mc/include/dpaa2-fd.h"
- 
- struct sec4_sg_entry {
- 	u64 ptr;
-@@ -19,9 +25,15 @@ struct sec4_sg_entry {
- static inline void dma_to_sec4_sg_one(struct sec4_sg_entry *sec4_sg_ptr,
- 				      dma_addr_t dma, u32 len, u16 offset)
- {
--	sec4_sg_ptr->ptr = cpu_to_caam_dma64(dma);
--	sec4_sg_ptr->len = cpu_to_caam32(len);
--	sec4_sg_ptr->bpid_offset = cpu_to_caam32(offset & SEC4_SG_OFFSET_MASK);
-+	if (caam_dpaa2) {
-+		dma_to_qm_sg_one((struct dpaa2_sg_entry *)sec4_sg_ptr, dma, len,
-+				 offset);
-+	} else {
-+		sec4_sg_ptr->ptr = cpu_to_caam_dma64(dma);
-+		sec4_sg_ptr->len = cpu_to_caam32(len);
-+		sec4_sg_ptr->bpid_offset = cpu_to_caam32(offset &
-+							 SEC4_SG_OFFSET_MASK);
-+	}
- #ifdef DEBUG
- 	print_hex_dump(KERN_ERR, "sec4_sg_ptr@: ",
- 		       DUMP_PREFIX_ADDRESS, 16, 4, sec4_sg_ptr,
-@@ -47,6 +59,14 @@ sg_to_sec4_sg(struct scatterlist *sg, int sg_count,
- 	return sec4_sg_ptr - 1;
- }
- 
-+static inline void sg_to_sec4_set_last(struct sec4_sg_entry *sec4_sg_ptr)
-+{
-+	if (caam_dpaa2)
-+		dpaa2_sg_set_final((struct dpaa2_sg_entry *)sec4_sg_ptr, true);
-+	else
-+		sec4_sg_ptr->len |= cpu_to_caam32(SEC4_SG_LEN_FIN);
-+}
-+
- /*
-  * convert scatterlist to h/w link table format
-  * scatterlist must have been previously dma mapped
-@@ -56,5 +76,7 @@ static inline void sg_to_sec4_sg_last(struct scatterlist *sg, int sg_count,
- 				      u16 offset)
- {
- 	sec4_sg_ptr = sg_to_sec4_sg(sg, sg_count, sec4_sg_ptr, offset);
--	sec4_sg_ptr->len |= cpu_to_caam32(SEC4_SG_LEN_FIN);
-+	sg_to_sec4_set_last(sec4_sg_ptr);
- }
-+
-+#endif /* _SG_SW_SEC4_H_ */
+ 	cpu: cpus {
+ 		#address-cells = <1>;
+ 		#size-cells = <0>;
 -- 
 2.12.0.264.gd6db3f216544
-
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
