@@ -1,27 +1,26 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: ccp - Change all references to use the JOB ID
- macro
-Date: Tue, 18 Jul 2017 18:35:59 +0800
-Message-ID: <20170718103559.GG6479@gondor.apana.org.au>
-References: <149857189631.26668.7228199918497769629.stgit@sosxen.amd.com>
+Subject: Re: [PATCH] crypto: ccp - Fix some line spacing
+Date: Tue, 18 Jul 2017 18:35:51 +0800
+Message-ID: <20170718103551.GF6479@gondor.apana.org.au>
+References: <149857188462.26646.9081906171244927473.stgit@sosxen.amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org, thomas.lendacky@amd.com,
         davem@davemloft.net
 To: Gary R Hook <gary.hook@amd.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:33186 "EHLO
+Received: from orcrist.hmeau.com ([104.223.48.154]:33178 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751740AbdGRKgY (ORCPT
+        with ESMTP id S1751633AbdGRKgR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Jul 2017 06:36:24 -0400
+        Tue, 18 Jul 2017 06:36:17 -0400
 Content-Disposition: inline
-In-Reply-To: <149857189631.26668.7228199918497769629.stgit@sosxen.amd.com>
+In-Reply-To: <149857188462.26646.9081906171244927473.stgit@sosxen.amd.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jun 27, 2017 at 08:58:16AM -0500, Gary R Hook wrote:
-> Use the CCP_NEW_JOBID() macro when assigning an identifier
+On Tue, Jun 27, 2017 at 08:58:04AM -0500, Gary R Hook wrote:
+> Add/remove blank lines as appropriate.
 > 
 > Signed-off-by: Gary R Hook <gary.hook@amd.com>
 
