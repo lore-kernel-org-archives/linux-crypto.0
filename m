@@ -1,7 +1,7 @@
 From: Ard Biesheuvel <ard.biesheuvel-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Subject: [PATCH v2 1/2] crypto/algapi - use separate dst and src operands for __crypto_xor()
-Date: Tue, 18 Jul 2017 10:19:11 +0100
-Message-ID: <20170718091912.14104-2-ard.biesheuvel@linaro.org>
+Subject: [PATCH v2 2/2] crypto/algapi - make crypto_xor() take separate dst and src arguments
+Date: Tue, 18 Jul 2017 10:19:12 +0100
+Message-ID: <20170718091912.14104-3-ard.biesheuvel@linaro.org>
 References: <20170718091912.14104-1-ard.biesheuvel@linaro.org>
 Cc: ebiggers-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org, dm-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
         johannes-cdvu00un1VgdHxzADdlk8Q@public.gmane.org, linux-wireless-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
@@ -13,106 +13,307 @@ In-Reply-To: <20170718091912.14104-1-ard.biesheuvel-QSEj5FYQhm4dnm+yROfE0A@publi
 Sender: linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-In preparation of introducing crypto_xor_cpy(), which will use separate
-operands for input and output, modify the __crypto_xor() implementation,
-which it will share with the existing crypto_xor(), which provides the
-actual functionality when not using the inline version.
+There are quite a number of occurrences in the kernel of the pattern
+
+  if (dst != src)
+  	memcpy(dst, src, walk.total % AES_BLOCK_SIZE);
+  crypto_xor(dst, final, walk.total % AES_BLOCK_SIZE);
+
+or
+
+  crypto_xor(keystream, src, nbytes);
+  memcpy(dst, keystream, nbytes);
+
+where crypto_xor() is preceded or followed by a memcpy() invocation
+that is only there because crypto_xor() uses its output parameter as
+one of the inputs. To avoid having to add new instances of this pattern
+in the arm64 code, which will be refactored to implement non-SIMD
+fallbacks, add an alternative implementation called crypto_xor_cpy(),
+taking separate input and output arguments. This removes the need for
+the separate memcpy().
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
 ---
- crypto/algapi.c         | 25 ++++++++++++--------
- include/crypto/algapi.h |  4 ++--
- 2 files changed, 17 insertions(+), 12 deletions(-)
+ arch/arm/crypto/aes-ce-glue.c       |  4 +---
+ arch/arm/crypto/aes-neonbs-glue.c   |  5 ++---
+ arch/arm64/crypto/aes-glue.c        |  4 +---
+ arch/arm64/crypto/aes-neonbs-glue.c |  5 ++---
+ arch/sparc/crypto/aes_glue.c        |  3 +--
+ arch/x86/crypto/aesni-intel_glue.c  |  4 ++--
+ arch/x86/crypto/blowfish_glue.c     |  3 +--
+ arch/x86/crypto/cast5_avx_glue.c    |  3 +--
+ arch/x86/crypto/des3_ede_glue.c     |  3 +--
+ crypto/ctr.c                        |  3 +--
+ crypto/pcbc.c                       | 12 ++++--------
+ drivers/crypto/vmx/aes_ctr.c        |  3 +--
+ drivers/md/dm-crypt.c               | 11 +++++------
+ include/crypto/algapi.h             | 19 +++++++++++++++++++
+ 14 files changed, 42 insertions(+), 40 deletions(-)
 
-diff --git a/crypto/algapi.c b/crypto/algapi.c
-index e4cc7615a139..aa699ff6c876 100644
---- a/crypto/algapi.c
-+++ b/crypto/algapi.c
-@@ -975,13 +975,15 @@ void crypto_inc(u8 *a, unsigned int size)
+diff --git a/arch/arm/crypto/aes-ce-glue.c b/arch/arm/crypto/aes-ce-glue.c
+index 0f966a8ca1ce..d0a9cec73707 100644
+--- a/arch/arm/crypto/aes-ce-glue.c
++++ b/arch/arm/crypto/aes-ce-glue.c
+@@ -285,9 +285,7 @@ static int ctr_encrypt(struct skcipher_request *req)
+ 
+ 		ce_aes_ctr_encrypt(tail, NULL, (u8 *)ctx->key_enc,
+ 				   num_rounds(ctx), blocks, walk.iv);
+-		if (tdst != tsrc)
+-			memcpy(tdst, tsrc, nbytes);
+-		crypto_xor(tdst, tail, nbytes);
++		crypto_xor_cpy(tdst, tsrc, tail, nbytes);
+ 		err = skcipher_walk_done(&walk, 0);
+ 	}
+ 	kernel_neon_end();
+diff --git a/arch/arm/crypto/aes-neonbs-glue.c b/arch/arm/crypto/aes-neonbs-glue.c
+index c76377961444..18768f330449 100644
+--- a/arch/arm/crypto/aes-neonbs-glue.c
++++ b/arch/arm/crypto/aes-neonbs-glue.c
+@@ -221,9 +221,8 @@ static int ctr_encrypt(struct skcipher_request *req)
+ 			u8 *dst = walk.dst.virt.addr + blocks * AES_BLOCK_SIZE;
+ 			u8 *src = walk.src.virt.addr + blocks * AES_BLOCK_SIZE;
+ 
+-			if (dst != src)
+-				memcpy(dst, src, walk.total % AES_BLOCK_SIZE);
+-			crypto_xor(dst, final, walk.total % AES_BLOCK_SIZE);
++			crypto_xor_cpy(dst, src, final,
++				       walk.total % AES_BLOCK_SIZE);
+ 
+ 			err = skcipher_walk_done(&walk, 0);
+ 			break;
+diff --git a/arch/arm64/crypto/aes-glue.c b/arch/arm64/crypto/aes-glue.c
+index bcf596b0197e..0da30e3b0e4b 100644
+--- a/arch/arm64/crypto/aes-glue.c
++++ b/arch/arm64/crypto/aes-glue.c
+@@ -241,9 +241,7 @@ static int ctr_encrypt(struct skcipher_request *req)
+ 
+ 		aes_ctr_encrypt(tail, NULL, (u8 *)ctx->key_enc, rounds,
+ 				blocks, walk.iv, first);
+-		if (tdst != tsrc)
+-			memcpy(tdst, tsrc, nbytes);
+-		crypto_xor(tdst, tail, nbytes);
++		crypto_xor_cpy(tdst, tsrc, tail, nbytes);
+ 		err = skcipher_walk_done(&walk, 0);
+ 	}
+ 	kernel_neon_end();
+diff --git a/arch/arm64/crypto/aes-neonbs-glue.c b/arch/arm64/crypto/aes-neonbs-glue.c
+index db2501d93550..9001aec16007 100644
+--- a/arch/arm64/crypto/aes-neonbs-glue.c
++++ b/arch/arm64/crypto/aes-neonbs-glue.c
+@@ -224,9 +224,8 @@ static int ctr_encrypt(struct skcipher_request *req)
+ 			u8 *dst = walk.dst.virt.addr + blocks * AES_BLOCK_SIZE;
+ 			u8 *src = walk.src.virt.addr + blocks * AES_BLOCK_SIZE;
+ 
+-			if (dst != src)
+-				memcpy(dst, src, walk.total % AES_BLOCK_SIZE);
+-			crypto_xor(dst, final, walk.total % AES_BLOCK_SIZE);
++			crypto_xor_cpy(dst, src, final,
++				       walk.total % AES_BLOCK_SIZE);
+ 
+ 			err = skcipher_walk_done(&walk, 0);
+ 			break;
+diff --git a/arch/sparc/crypto/aes_glue.c b/arch/sparc/crypto/aes_glue.c
+index c90930de76ba..3cd4f6b198b6 100644
+--- a/arch/sparc/crypto/aes_glue.c
++++ b/arch/sparc/crypto/aes_glue.c
+@@ -344,8 +344,7 @@ static void ctr_crypt_final(struct crypto_sparc64_aes_ctx *ctx,
+ 
+ 	ctx->ops->ecb_encrypt(&ctx->key[0], (const u64 *)ctrblk,
+ 			      keystream, AES_BLOCK_SIZE);
+-	crypto_xor((u8 *) keystream, src, nbytes);
+-	memcpy(dst, keystream, nbytes);
++	crypto_xor_cpy(dst, (u8 *) keystream, src, nbytes);
+ 	crypto_inc(ctrblk, AES_BLOCK_SIZE);
  }
- EXPORT_SYMBOL_GPL(crypto_inc);
  
--void __crypto_xor(u8 *dst, const u8 *src, unsigned int len)
-+void __crypto_xor(u8 *dst, const u8 *src1, const u8 *src2, unsigned int len)
- {
- 	int relalign = 0;
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index 4a55cdcdc008..5c15d6b57329 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -475,8 +475,8 @@ static void ctr_crypt_final(struct crypto_aes_ctx *ctx,
+ 	unsigned int nbytes = walk->nbytes;
  
- 	if (!IS_ENABLED(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS)) {
- 		int size = sizeof(unsigned long);
--		int d = ((unsigned long)dst ^ (unsigned long)src) & (size - 1);
-+		int d = (((unsigned long)dst ^ (unsigned long)src1) |
-+			 ((unsigned long)dst ^ (unsigned long)src2)) &
-+			(size - 1);
- 
- 		relalign = d ? 1 << __ffs(d) : size;
- 
-@@ -992,34 +994,37 @@ void __crypto_xor(u8 *dst, const u8 *src, unsigned int len)
- 		 * process the remainder of the input using optimal strides.
- 		 */
- 		while (((unsigned long)dst & (relalign - 1)) && len > 0) {
--			*dst++ ^= *src++;
-+			*dst++ = *src1++ ^ *src2++;
- 			len--;
- 		}
- 	}
- 
- 	while (IS_ENABLED(CONFIG_64BIT) && len >= 8 && !(relalign & 7)) {
--		*(u64 *)dst ^= *(u64 *)src;
-+		*(u64 *)dst = *(u64 *)src1 ^  *(u64 *)src2;
- 		dst += 8;
--		src += 8;
-+		src1 += 8;
-+		src2 += 8;
- 		len -= 8;
- 	}
- 
- 	while (len >= 4 && !(relalign & 3)) {
--		*(u32 *)dst ^= *(u32 *)src;
-+		*(u32 *)dst = *(u32 *)src1 ^ *(u32 *)src2;
- 		dst += 4;
--		src += 4;
-+		src1 += 4;
-+		src2 += 4;
- 		len -= 4;
- 	}
- 
- 	while (len >= 2 && !(relalign & 1)) {
--		*(u16 *)dst ^= *(u16 *)src;
-+		*(u16 *)dst = *(u16 *)src1 ^ *(u16 *)src2;
- 		dst += 2;
--		src += 2;
-+		src1 += 2;
-+		src2 += 2;
- 		len -= 2;
- 	}
- 
- 	while (len--)
--		*dst++ ^= *src++;
-+		*dst++ = *src1++ ^ *src2++;
+ 	aesni_enc(ctx, keystream, ctrblk);
+-	crypto_xor(keystream, src, nbytes);
+-	memcpy(dst, keystream, nbytes);
++	crypto_xor_cpy(dst, keystream, src, nbytes);
++
+ 	crypto_inc(ctrblk, AES_BLOCK_SIZE);
  }
- EXPORT_SYMBOL_GPL(__crypto_xor);
  
+diff --git a/arch/x86/crypto/blowfish_glue.c b/arch/x86/crypto/blowfish_glue.c
+index 17c05531dfd1..f9eca34301e2 100644
+--- a/arch/x86/crypto/blowfish_glue.c
++++ b/arch/x86/crypto/blowfish_glue.c
+@@ -271,8 +271,7 @@ static void ctr_crypt_final(struct bf_ctx *ctx, struct blkcipher_walk *walk)
+ 	unsigned int nbytes = walk->nbytes;
+ 
+ 	blowfish_enc_blk(ctx, keystream, ctrblk);
+-	crypto_xor(keystream, src, nbytes);
+-	memcpy(dst, keystream, nbytes);
++	crypto_xor_cpy(dst, keystream, src, nbytes);
+ 
+ 	crypto_inc(ctrblk, BF_BLOCK_SIZE);
+ }
+diff --git a/arch/x86/crypto/cast5_avx_glue.c b/arch/x86/crypto/cast5_avx_glue.c
+index 8648158f3916..dbea6020ffe7 100644
+--- a/arch/x86/crypto/cast5_avx_glue.c
++++ b/arch/x86/crypto/cast5_avx_glue.c
+@@ -256,8 +256,7 @@ static void ctr_crypt_final(struct blkcipher_desc *desc,
+ 	unsigned int nbytes = walk->nbytes;
+ 
+ 	__cast5_encrypt(ctx, keystream, ctrblk);
+-	crypto_xor(keystream, src, nbytes);
+-	memcpy(dst, keystream, nbytes);
++	crypto_xor_cpy(dst, keystream, src, nbytes);
+ 
+ 	crypto_inc(ctrblk, CAST5_BLOCK_SIZE);
+ }
+diff --git a/arch/x86/crypto/des3_ede_glue.c b/arch/x86/crypto/des3_ede_glue.c
+index d6fc59aaaadf..30c0a37f4882 100644
+--- a/arch/x86/crypto/des3_ede_glue.c
++++ b/arch/x86/crypto/des3_ede_glue.c
+@@ -277,8 +277,7 @@ static void ctr_crypt_final(struct des3_ede_x86_ctx *ctx,
+ 	unsigned int nbytes = walk->nbytes;
+ 
+ 	des3_ede_enc_blk(ctx, keystream, ctrblk);
+-	crypto_xor(keystream, src, nbytes);
+-	memcpy(dst, keystream, nbytes);
++	crypto_xor_cpy(dst, keystream, src, nbytes);
+ 
+ 	crypto_inc(ctrblk, DES3_EDE_BLOCK_SIZE);
+ }
+diff --git a/crypto/ctr.c b/crypto/ctr.c
+index 477d9226ccaa..854d924f9d8e 100644
+--- a/crypto/ctr.c
++++ b/crypto/ctr.c
+@@ -65,8 +65,7 @@ static void crypto_ctr_crypt_final(struct blkcipher_walk *walk,
+ 	unsigned int nbytes = walk->nbytes;
+ 
+ 	crypto_cipher_encrypt_one(tfm, keystream, ctrblk);
+-	crypto_xor(keystream, src, nbytes);
+-	memcpy(dst, keystream, nbytes);
++	crypto_xor_cpy(dst, keystream, src, nbytes);
+ 
+ 	crypto_inc(ctrblk, bsize);
+ }
+diff --git a/crypto/pcbc.c b/crypto/pcbc.c
+index 29dd2b4a3b85..d9e45a958720 100644
+--- a/crypto/pcbc.c
++++ b/crypto/pcbc.c
+@@ -55,8 +55,7 @@ static int crypto_pcbc_encrypt_segment(struct skcipher_request *req,
+ 	do {
+ 		crypto_xor(iv, src, bsize);
+ 		crypto_cipher_encrypt_one(tfm, dst, iv);
+-		memcpy(iv, dst, bsize);
+-		crypto_xor(iv, src, bsize);
++		crypto_xor_cpy(iv, dst, src, bsize);
+ 
+ 		src += bsize;
+ 		dst += bsize;
+@@ -79,8 +78,7 @@ static int crypto_pcbc_encrypt_inplace(struct skcipher_request *req,
+ 		memcpy(tmpbuf, src, bsize);
+ 		crypto_xor(iv, src, bsize);
+ 		crypto_cipher_encrypt_one(tfm, src, iv);
+-		memcpy(iv, tmpbuf, bsize);
+-		crypto_xor(iv, src, bsize);
++		crypto_xor_cpy(iv, tmpbuf, src, bsize);
+ 
+ 		src += bsize;
+ 	} while ((nbytes -= bsize) >= bsize);
+@@ -127,8 +125,7 @@ static int crypto_pcbc_decrypt_segment(struct skcipher_request *req,
+ 	do {
+ 		crypto_cipher_decrypt_one(tfm, dst, src);
+ 		crypto_xor(dst, iv, bsize);
+-		memcpy(iv, src, bsize);
+-		crypto_xor(iv, dst, bsize);
++		crypto_xor_cpy(iv, dst, src, bsize);
+ 
+ 		src += bsize;
+ 		dst += bsize;
+@@ -153,8 +150,7 @@ static int crypto_pcbc_decrypt_inplace(struct skcipher_request *req,
+ 		memcpy(tmpbuf, src, bsize);
+ 		crypto_cipher_decrypt_one(tfm, src, src);
+ 		crypto_xor(src, iv, bsize);
+-		memcpy(iv, tmpbuf, bsize);
+-		crypto_xor(iv, src, bsize);
++		crypto_xor_cpy(iv, src, tmpbuf, bsize);
+ 
+ 		src += bsize;
+ 	} while ((nbytes -= bsize) >= bsize);
+diff --git a/drivers/crypto/vmx/aes_ctr.c b/drivers/crypto/vmx/aes_ctr.c
+index 9c26d9e8dbea..15a23f7e2e24 100644
+--- a/drivers/crypto/vmx/aes_ctr.c
++++ b/drivers/crypto/vmx/aes_ctr.c
+@@ -104,8 +104,7 @@ static void p8_aes_ctr_final(struct p8_aes_ctr_ctx *ctx,
+ 	pagefault_enable();
+ 	preempt_enable();
+ 
+-	crypto_xor(keystream, src, nbytes);
+-	memcpy(dst, keystream, nbytes);
++	crypto_xor(dst, keystream, src, nbytes);
+ 	crypto_inc(ctrblk, AES_BLOCK_SIZE);
+ }
+ 
+diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
+index ebf9e72d479b..44f70b6271d7 100644
+--- a/drivers/md/dm-crypt.c
++++ b/drivers/md/dm-crypt.c
+@@ -745,9 +745,8 @@ static int crypt_iv_tcw_whitening(struct crypt_config *cc,
+ 	int i, r;
+ 
+ 	/* xor whitening with sector number */
+-	memcpy(buf, tcw->whitening, TCW_WHITENING_SIZE);
+-	crypto_xor(buf, (u8 *)&sector, 8);
+-	crypto_xor(&buf[8], (u8 *)&sector, 8);
++	crypto_xor_cpy(buf, tcw->whitening, (u8 *)&sector, 8);
++	crypto_xor_cpy(&buf[8], tcw->whitening + 8, (u8 *)&sector, 8);
+ 
+ 	/* calculate crc32 for every 32bit part and xor it */
+ 	desc->tfm = tcw->crc32_tfm;
+@@ -792,10 +791,10 @@ static int crypt_iv_tcw_gen(struct crypt_config *cc, u8 *iv,
+ 	}
+ 
+ 	/* Calculate IV */
+-	memcpy(iv, tcw->iv_seed, cc->iv_size);
+-	crypto_xor(iv, (u8 *)&sector, 8);
++	crypto_xor_cpy(iv, tcw->iv_seed, (u8 *)&sector, 8);
+ 	if (cc->iv_size > 8)
+-		crypto_xor(&iv[8], (u8 *)&sector, cc->iv_size - 8);
++		crypto_xor_cpy(&iv[8], tcw->iv_seed + 8, (u8 *)&sector,
++			       cc->iv_size - 8);
+ 
+ 	return r;
+ }
 diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
-index 436c4c2683c7..fd547f946bf8 100644
+index fd547f946bf8..e3cebf640c00 100644
 --- a/include/crypto/algapi.h
 +++ b/include/crypto/algapi.h
-@@ -192,7 +192,7 @@ static inline unsigned int crypto_queue_len(struct crypto_queue *queue)
- }
- 
- void crypto_inc(u8 *a, unsigned int size);
--void __crypto_xor(u8 *dst, const u8 *src, unsigned int size);
-+void __crypto_xor(u8 *dst, const u8 *src1, const u8 *src2, unsigned int size);
- 
- static inline void crypto_xor(u8 *dst, const u8 *src, unsigned int size)
- {
-@@ -207,7 +207,7 @@ static inline void crypto_xor(u8 *dst, const u8 *src, unsigned int size)
- 			size -= sizeof(unsigned long);
- 		}
- 	} else {
--		__crypto_xor(dst, src, size);
-+		__crypto_xor(dst, dst, src, size);
+@@ -211,6 +211,25 @@ static inline void crypto_xor(u8 *dst, const u8 *src, unsigned int size)
  	}
  }
  
++static inline void crypto_xor_cpy(u8 *dst, const u8 *src1, const u8 *src2,
++				  unsigned int size)
++{
++	if (IS_ENABLED(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS) &&
++	    __builtin_constant_p(size) &&
++	    (size % sizeof(unsigned long)) == 0) {
++		unsigned long *d = (unsigned long *)dst;
++		unsigned long *s1 = (unsigned long *)src1;
++		unsigned long *s2 = (unsigned long *)src2;
++
++		while (size > 0) {
++			*d++ = *s1++ ^ *s2++;
++			size -= sizeof(unsigned long);
++		}
++	} else {
++		__crypto_xor(dst, src1, src2, size);
++	}
++}
++
+ int blkcipher_walk_done(struct blkcipher_desc *desc,
+ 			struct blkcipher_walk *walk, int err);
+ int blkcipher_walk_virt(struct blkcipher_desc *desc,
 -- 
 2.9.3
