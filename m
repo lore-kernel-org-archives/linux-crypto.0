@@ -1,36 +1,63 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [RFC PATCH v12 1/4] crypto: make Jitter RNG directly accessible
-Date: Tue, 18 Jul 2017 11:17:44 +0200
-Message-ID: <3285940.H0AFyT7Fqa@positron.chronox.de>
-References: <3910055.ntkqcq1Chb@positron.chronox.de> <5156735.IWW3yRWKpB@tauon.chronox.de> <CAK8P3a3687Na9Rhi78_46trr94_kPjCFzTCWFJrzUGo90bwN6w@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Jason A. Donenfeld" <jason@zx2c4.com>,
-        linux-crypto@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:60674 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751334AbdGRJRv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Jul 2017 05:17:51 -0400
-In-Reply-To: <CAK8P3a3687Na9Rhi78_46trr94_kPjCFzTCWFJrzUGo90bwN6w@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Ard Biesheuvel <ard.biesheuvel-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Subject: [PATCH v2 0/2] crypto/algapi - refactor crypto_xor() to avoid memcpy()s
+Date: Tue, 18 Jul 2017 10:19:10 +0100
+Message-ID: <20170718091912.14104-1-ard.biesheuvel@linaro.org>
+Cc: ebiggers-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org, dm-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
+        johannes-cdvu00un1VgdHxzADdlk8Q@public.gmane.org, linux-wireless-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        agk-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, snitzer-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
+        Ard Biesheuvel <ard.biesheuvel-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+To: linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org
+Return-path: <linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Dienstag, 18. Juli 2017, 11:16:10 CEST schrieb Arnd Bergmann:
+>From 2/2:
 
-Hi Arnd,
+"""
+There are quite a number of occurrences in the kernel of the pattern
 
-> I guess ideally you just move the inner half of lrng_get_jent(),
-> i.e. everything inside of the spinlock, plus the buffer, into that file.
-> That should keep the low-level side separate from the caller.
+    if (dst != src)
+            memcpy(dst, src, walk.total % AES_BLOCK_SIZE);
+    crypto_xor(dst, final, walk.total % AES_BLOCK_SIZE);
 
-Yes, I concur.
+or
 
-Thanks.
+    crypto_xor(keystream, src, nbytes);
+    memcpy(dst, keystream, nbytes);
 
-Ciao
-Stephan
+where crypto_xor() is preceded or followed by a memcpy() invocation
+that is only there because crypto_xor() uses its output parameter as
+one of the inputs.
+"""
+
+Patch #1 is a preparatory patch, which is split off for ease of review.
+
+Patch #2 updates all occurrences of crypto_xor() involving a memcpy() to
+use a new API function crypto_xor_cpy() which combines the two operations.
+
+v2: - keep existing crypto_xor() as-is, and add crypto_xor_cpy() for the
+      cases where a redundant memcpy() can be eliminated.
+
+Ard Biesheuvel (2):
+  crypto/algapi - use separate dst and src operands for __crypto_xor()
+  crypto/algapi - make crypto_xor() take separate dst and src arguments
+
+ arch/arm/crypto/aes-ce-glue.c       |  4 +---
+ arch/arm/crypto/aes-neonbs-glue.c   |  5 ++--
+ arch/arm64/crypto/aes-glue.c        |  4 +---
+ arch/arm64/crypto/aes-neonbs-glue.c |  5 ++--
+ arch/sparc/crypto/aes_glue.c        |  3 +--
+ arch/x86/crypto/aesni-intel_glue.c  |  4 ++--
+ arch/x86/crypto/blowfish_glue.c     |  3 +--
+ arch/x86/crypto/cast5_avx_glue.c    |  3 +--
+ arch/x86/crypto/des3_ede_glue.c     |  3 +--
+ crypto/algapi.c                     | 25 ++++++++++++--------
+ crypto/ctr.c                        |  3 +--
+ crypto/pcbc.c                       | 12 ++++------
+ drivers/crypto/vmx/aes_ctr.c        |  3 +--
+ drivers/md/dm-crypt.c               | 11 ++++-----
+ include/crypto/algapi.h             | 23 ++++++++++++++++--
+ 15 files changed, 59 insertions(+), 52 deletions(-)
+
+-- 
+2.9.3
