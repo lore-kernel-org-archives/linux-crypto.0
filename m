@@ -1,186 +1,153 @@
-From: Rob Herring <robh@kernel.org>
-Subject: [PATCH] crypto: n2_core: Convert to using %pOF instead of full_name
-Date: Tue, 18 Jul 2017 16:42:56 -0500
-Message-ID: <20170718214339.7774-16-robh@kernel.org>
-Cc: linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Thomas Garnier <thgarnie@google.com>
+Subject: x86: PIE support and option to extend KASLR randomization
+Date: Tue, 18 Jul 2017 15:33:11 -0700
+Message-ID: <20170718223333.110371-1-thgarnie@google.com>
+Cc: x86@kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	xen-devel@lists.xenproject.org,
+	kvm@vger.kernel.org,
+	linux-pm@vger.kernel.org,
+	linux-arch@vger.kernel.org,
+	linux-sparse@vger.kernel.org,
+	kernel-hardening@lists.openwall.com
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	"H . Peter Anvin" <hpa@zytor.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Josh Poimboeuf <jpoimboe@redhat.com>,
+	Thomas Garnier <thgarnie@google.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Matthias Kaehlcke <mka@chromium.org>,
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+	Juergen Gross <jgross@suse.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	=?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+	Joerg Roedel <joro@8bytes.org>,
+	Andy Lutomirski <luto@kernel.org>,
+	Borislav Petkov <bp@alien8.de>,
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+	Brian Gerst <brgerst@gmail.com>,
+	Borislav Petkov <bp@suse.de>,
+	Christian Borntraeger <borntraeger@de.ibm.com>,
+	"Rafael J . Wysocki" <rjw@rjwysocki.net>,
+	Len Brown <l
+Return-path: <kernel-hardening-return-8999-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
+List-Post: <mailto:kernel-hardening@lists.openwall.com>
+List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
+List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
+List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
 List-Id: linux-crypto.vger.kernel.org
 
-Now that we have a custom printf format specifier, convert users of
-full_name to use %pOF instead. This is preparation to remove storing
-of the full path string for each node.
+These patches make the changes necessary to build the kernel as Position
+Independent Executable (PIE) on x86_64. A PIE kernel can be relocated below
+the top 2G of the virtual address space. It allows to optionally extend the
+KASLR randomization range from 1G to 3G.
 
-Signed-off-by: Rob Herring <robh@kernel.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org
----
- drivers/crypto/n2_core.c | 60 ++++++++++++++++++++++--------------------------
- 1 file changed, 28 insertions(+), 32 deletions(-)
+Thanks a lot to Ard Biesheuvel & Kees Cook on their feedback on compiler
+changes, PIE support and KASLR in general.
 
-diff --git a/drivers/crypto/n2_core.c b/drivers/crypto/n2_core.c
-index 269451375b63..a9fd8b9e86cd 100644
---- a/drivers/crypto/n2_core.c
-+++ b/drivers/crypto/n2_core.c
-@@ -1730,8 +1730,8 @@ static int spu_mdesc_walk_arcs(struct mdesc_handle *mdesc,
- 			continue;
- 		id = mdesc_get_property(mdesc, tgt, "id", NULL);
- 		if (table[*id] != NULL) {
--			dev_err(&dev->dev, "%s: SPU cpu slot already set.\n",
--				dev->dev.of_node->full_name);
-+			dev_err(&dev->dev, "%pOF: SPU cpu slot already set.\n",
-+				dev->dev.of_node);
- 			return -EINVAL;
- 		}
- 		cpumask_set_cpu(*id, &p->sharing);
-@@ -1751,8 +1751,8 @@ static int handle_exec_unit(struct spu_mdesc_info *ip, struct list_head *list,
+The patches:
+ - 1-3, 5-15: Change in assembly code to be PIE compliant.
+ - 4: Add a new _ASM_GET_PTR macro to fetch a symbol address generically.
+ - 16: Adapt percpu design to work correctly when PIE is enabled.
+ - 17: Provide an option to default visibility to hidden except for key symbols.
+       It removes errors between compilation units.
+ - 18: Adapt relocation tool to handle PIE binary correctly.
+ - 19: Add the CONFIG_X86_PIE option (off by default)
+ - 20: Adapt relocation tool to generate a 64-bit relocation table.
+ - 21: Add options to build modules as mcmodel=large and dynamically create a
+       PLT for relative references out of range (adapted from arm64).
+ - 22: Add the CONFIG_RANDOMIZE_BASE_LARGE option to increase relocation range
+       from 1G to 3G (off by default).
 
- 	p = kzalloc(sizeof(struct spu_queue), GFP_KERNEL);
- 	if (!p) {
--		dev_err(&dev->dev, "%s: Could not allocate SPU queue.\n",
--			dev->dev.of_node->full_name);
-+		dev_err(&dev->dev, "%pOF: Could not allocate SPU queue.\n",
-+			dev->dev.of_node);
- 		return -ENOMEM;
- 	}
+Performance/Size impact:
 
-@@ -1981,41 +1981,39 @@ static void n2_spu_driver_version(void)
- static int n2_crypto_probe(struct platform_device *dev)
- {
- 	struct mdesc_handle *mdesc;
--	const char *full_name;
- 	struct n2_crypto *np;
- 	int err;
+Hackbench (50% and 1600% loads):
+ - PIE disabled: no significant change (-0.50% / +0.50%)
+ - PIE enabled: 7% to 8% on half load, 10% on heavy load.
 
- 	n2_spu_driver_version();
+These results are aligned with the different research on user-mode PIE
+impact on cpu intensive benchmarks (around 10% on x86_64).
 
--	full_name = dev->dev.of_node->full_name;
--	pr_info("Found N2CP at %s\n", full_name);
-+	pr_info("Found N2CP at %pOF\n", dev->dev.of_node);
+slab_test (average of 10 runs):
+ - PIE disabled: no significant change (-1% / +1%)
+ - PIE enabled: 3% to 4%
 
- 	np = alloc_n2cp();
- 	if (!np) {
--		dev_err(&dev->dev, "%s: Unable to allocate n2cp.\n",
--			full_name);
-+		dev_err(&dev->dev, "%pOF: Unable to allocate n2cp.\n",
-+			dev->dev.of_node);
- 		return -ENOMEM;
- 	}
+Kernbench (average of 10 Half and Optimal runs):
+ Elapsed Time:
+ - PIE disabled: no significant change (-0.22% / +0.06%)
+ - PIE enabled: around 0.50%
+ System Time:
+ - PIE disabled: no significant change (-0.99% / -1.28%)
+ - PIE enabled: 5% to 6%
 
- 	err = grab_global_resources();
- 	if (err) {
--		dev_err(&dev->dev, "%s: Unable to grab "
--			"global resources.\n", full_name);
-+		dev_err(&dev->dev, "%pOF: Unable to grab global resources.\n",
-+			dev->dev.of_node);
- 		goto out_free_n2cp;
- 	}
+Size of vmlinux (Ubuntu configuration):
+ File size:
+ - PIE disabled: 472928672 bytes (-0.000169% from baseline)
+ - PIE enabled: 216878461 bytes (-54.14% from baseline)
+ .text sections:
+ - PIE disabled: 9373572 bytes (+0.04% from baseline)
+ - PIE enabled: 9499138 bytes (+1.38% from baseline)
 
- 	mdesc = mdesc_grab();
+The big decrease in vmlinux file size is due to the lower number of
+relocations appended to the file.
 
- 	if (!mdesc) {
--		dev_err(&dev->dev, "%s: Unable to grab MDESC.\n",
--			full_name);
-+		dev_err(&dev->dev, "%pOF: Unable to grab MDESC.\n",
-+			dev->dev.of_node);
- 		err = -ENODEV;
- 		goto out_free_global;
- 	}
- 	err = grab_mdesc_irq_props(mdesc, dev, &np->cwq_info, "n2cp");
- 	if (err) {
--		dev_err(&dev->dev, "%s: Unable to grab IRQ props.\n",
--			full_name);
-+		dev_err(&dev->dev, "%pOF: Unable to grab IRQ props.\n",
-+			dev->dev.of_node);
- 		mdesc_release(mdesc);
- 		goto out_free_global;
- 	}
-@@ -2026,15 +2024,15 @@ static int n2_crypto_probe(struct platform_device *dev)
- 	mdesc_release(mdesc);
-
- 	if (err) {
--		dev_err(&dev->dev, "%s: CWQ MDESC scan failed.\n",
--			full_name);
-+		dev_err(&dev->dev, "%pOF: CWQ MDESC scan failed.\n",
-+			dev->dev.of_node);
- 		goto out_free_global;
- 	}
-
- 	err = n2_register_algs();
- 	if (err) {
--		dev_err(&dev->dev, "%s: Unable to register algorithms.\n",
--			full_name);
-+		dev_err(&dev->dev, "%pOF: Unable to register algorithms.\n",
-+			dev->dev.of_node);
- 		goto out_free_spu_list;
- 	}
-
-@@ -2092,42 +2090,40 @@ static void free_ncp(struct n2_mau *mp)
- static int n2_mau_probe(struct platform_device *dev)
- {
- 	struct mdesc_handle *mdesc;
--	const char *full_name;
- 	struct n2_mau *mp;
- 	int err;
-
- 	n2_spu_driver_version();
-
--	full_name = dev->dev.of_node->full_name;
--	pr_info("Found NCP at %s\n", full_name);
-+	pr_info("Found NCP at %pOF\n", dev->dev.of_node);
-
- 	mp = alloc_ncp();
- 	if (!mp) {
--		dev_err(&dev->dev, "%s: Unable to allocate ncp.\n",
--			full_name);
-+		dev_err(&dev->dev, "%pOF: Unable to allocate ncp.\n",
-+			dev->dev.of_node);
- 		return -ENOMEM;
- 	}
-
- 	err = grab_global_resources();
- 	if (err) {
--		dev_err(&dev->dev, "%s: Unable to grab "
--			"global resources.\n", full_name);
-+		dev_err(&dev->dev, "%pOF: Unable to grab global resources.\n",
-+			dev->dev.of_node);
- 		goto out_free_ncp;
- 	}
-
- 	mdesc = mdesc_grab();
-
- 	if (!mdesc) {
--		dev_err(&dev->dev, "%s: Unable to grab MDESC.\n",
--			full_name);
-+		dev_err(&dev->dev, "%pOF: Unable to grab MDESC.\n",
-+			dev->dev.of_node);
- 		err = -ENODEV;
- 		goto out_free_global;
- 	}
-
- 	err = grab_mdesc_irq_props(mdesc, dev, &mp->mau_info, "ncp");
- 	if (err) {
--		dev_err(&dev->dev, "%s: Unable to grab IRQ props.\n",
--			full_name);
-+		dev_err(&dev->dev, "%pOF: Unable to grab IRQ props.\n",
-+			dev->dev.of_node);
- 		mdesc_release(mdesc);
- 		goto out_free_global;
- 	}
-@@ -2138,8 +2134,8 @@ static int n2_mau_probe(struct platform_device *dev)
- 	mdesc_release(mdesc);
-
- 	if (err) {
--		dev_err(&dev->dev, "%s: MAU MDESC scan failed.\n",
--			full_name);
-+		dev_err(&dev->dev, "%pOF: MAU MDESC scan failed.\n",
-+			dev->dev.of_node);
- 		goto out_free_global;
- 	}
-
---
-2.11.0
+diffstat:
+ arch/x86/Kconfig                             |   37 +++++
+ arch/x86/Makefile                            |   17 ++
+ arch/x86/boot/boot.h                         |    2 
+ arch/x86/boot/compressed/Makefile            |    5 
+ arch/x86/boot/compressed/misc.c              |   10 +
+ arch/x86/crypto/aes-x86_64-asm_64.S          |   45 +++---
+ arch/x86/crypto/aesni-intel_asm.S            |   14 +
+ arch/x86/crypto/aesni-intel_avx-x86_64.S     |    6 
+ arch/x86/crypto/camellia-aesni-avx-asm_64.S  |   42 ++---
+ arch/x86/crypto/camellia-aesni-avx2-asm_64.S |   44 +++---
+ arch/x86/crypto/camellia-x86_64-asm_64.S     |    8 -
+ arch/x86/crypto/cast5-avx-x86_64-asm_64.S    |   50 +++---
+ arch/x86/crypto/cast6-avx-x86_64-asm_64.S    |   44 +++---
+ arch/x86/crypto/des3_ede-asm_64.S            |   96 ++++++++-----
+ arch/x86/crypto/ghash-clmulni-intel_asm.S    |    4 
+ arch/x86/crypto/glue_helper-asm-avx.S        |    4 
+ arch/x86/crypto/glue_helper-asm-avx2.S       |    6 
+ arch/x86/entry/entry_64.S                    |   26 ++-
+ arch/x86/include/asm/asm.h                   |   13 +
+ arch/x86/include/asm/bug.h                   |    2 
+ arch/x86/include/asm/jump_label.h            |    8 -
+ arch/x86/include/asm/kvm_host.h              |    6 
+ arch/x86/include/asm/module.h                |   16 ++
+ arch/x86/include/asm/page_64_types.h         |    9 +
+ arch/x86/include/asm/paravirt_types.h        |   12 +
+ arch/x86/include/asm/percpu.h                |   25 ++-
+ arch/x86/include/asm/pm-trace.h              |    2 
+ arch/x86/include/asm/processor.h             |    8 -
+ arch/x86/include/asm/setup.h                 |    2 
+ arch/x86/kernel/Makefile                     |    2 
+ arch/x86/kernel/acpi/wakeup_64.S             |   31 ++--
+ arch/x86/kernel/cpu/common.c                 |    4 
+ arch/x86/kernel/head64.c                     |   28 +++
+ arch/x86/kernel/head_64.S                    |   47 +++++-
+ arch/x86/kernel/kvm.c                        |    6 
+ arch/x86/kernel/module-plts.c                |  198 +++++++++++++++++++++++++++
+ arch/x86/kernel/module.c                     |   18 +-
+ arch/x86/kernel/module.lds                   |    4 
+ arch/x86/kernel/relocate_kernel_64.S         |    2 
+ arch/x86/kernel/setup_percpu.c               |    2 
+ arch/x86/kernel/vmlinux.lds.S                |   13 +
+ arch/x86/kvm/svm.c                           |    4 
+ arch/x86/lib/cmpxchg16b_emu.S                |    8 -
+ arch/x86/power/hibernate_asm_64.S            |    4 
+ arch/x86/tools/relocs.c                      |  134 +++++++++++++++---
+ arch/x86/tools/relocs.h                      |    4 
+ arch/x86/tools/relocs_common.c               |   15 +-
+ arch/x86/xen/xen-asm.S                       |   12 -
+ arch/x86/xen/xen-asm.h                       |    3 
+ arch/x86/xen/xen-head.S                      |    9 -
+ include/asm-generic/sections.h               |    6 
+ include/linux/compiler.h                     |    8 +
+ init/Kconfig                                 |    9 +
+ kernel/kallsyms.c                            |   16 +-
+ 54 files changed, 868 insertions(+), 282 deletions(-)
