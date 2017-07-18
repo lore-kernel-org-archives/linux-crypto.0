@@ -1,151 +1,56 @@
-From: Thomas Garnier <thgarnie@google.com>
-Subject: [RFC 20/22] x86/relocs: Add option to generate 64-bit
-	relocations
-Date: Tue, 18 Jul 2017 15:33:31 -0700
-Message-ID: <20170718223333.110371-21-thgarnie@google.com>
-References: <20170718223333.110371-1-thgarnie@google.com>
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Subject: [PATCH] crypto: omap-sham: remove unnecessary static in
+ omap_sham_remove()
+Date: Tue, 18 Jul 2017 18:03:11 -0500
+Message-ID: <20170718230311.GA24035@embeddedgus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: linux-arch@vger.kernel.org, kvm@vger.kernel.org, linux-pm@vger.kernel.org,
- x86@kernel.org, linux-kernel@vger.kernel.org, linux-sparse@vger.kernel.org,
- linux-crypto@vger.kernel.org, kernel-hardening@lists.openwall.com,
- xen-devel@lists.xenproject.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
- "David S . Miller" <davem@davemloft.net>,
- Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- "H . Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>,
- Josh Poimboeuf <jpoimboe@redhat.com>, Thomas Garnier <thgarnie@google.com>,
- Arnd Bergmann <arnd@arndb.de>, Matthias Kaehlcke <mka@chromium.org>,
- Boris Ostrovsky <boris.ostrovsky@oracle.com>,
- Juergen Gross <jgross@suse.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
- Joerg Roedel <joro@8bytes.org>, Andy Lutomirski <luto@kernel.org>,
- Borislav Petkov <bp@alien8.de>,
- "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
- Brian Gerst <brgerst@gmail.com>, Borislav Petkov <bp@suse.de>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- "Rafael J . Wysocki" <rjw@rjwysocki.net>, Len Brown <len.brown
-Return-path: <xen-devel-bounces@lists.xen.org>
-In-Reply-To: <20170718223333.110371-1-thgarnie@google.com>
-List-Unsubscribe: <https://lists.xen.org/cgi-bin/mailman/options/xen-devel>,
- <mailto:xen-devel-request@lists.xen.org?subject=unsubscribe>
-List-Post: <mailto:xen-devel@lists.xen.org>
-List-Help: <mailto:xen-devel-request@lists.xen.org?subject=help>
-List-Subscribe: <https://lists.xen.org/cgi-bin/mailman/listinfo/xen-devel>,
- <mailto:xen-devel-request@lists.xen.org?subject=subscribe>
-Errors-To: xen-devel-bounces@lists.xen.org
-Sender: "Xen-devel" <xen-devel-bounces@lists.xen.org>
+        "David S. Miller" <davem@davemloft.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-VGhlIHg4NiByZWxvY2F0aW9uIHRvb2wgZ2VuZXJhdGVzIGEgbGlzdCBvZiAzMi1iaXQgc2lnbmVk
-IGludGVnZXJzLiBUaGVyZQp3YXMgbm8gbmVlZCB0byB1c2UgNjQtYml0IGludGVnZXJzIGJlY2F1
-c2UgYWxsIGFkZHJlc3NlcyB3aGVyZSBhYm92ZSB0aGUgMkcKdG9wIG9mIHRoZSBtZW1vcnkuCgpU
-aGlzIGNoYW5nZSBhZGQgYSBsYXJnZS1yZWxvYyBvcHRpb24gdG8gZ2VuZXJhdGUgNjQtYml0IHVu
-c2lnbmVkIGludGVnZXJzLgpJdCBjYW4gYmUgdXNlZCB3aGVuIHRoZSBrZXJuZWwgcGxhbiB0byBn
-byBiZWxvdyB0aGUgdG9wIDJHIGFuZCAzMi1iaXQKaW50ZWdlcnMgYXJlIG5vdCBlbm91Z2guCgpT
-aWduZWQtb2ZmLWJ5OiBUaG9tYXMgR2FybmllciA8dGhnYXJuaWVAZ29vZ2xlLmNvbT4KLS0tCiBh
-cmNoL3g4Ni90b29scy9yZWxvY3MuYyAgICAgICAgfCA2MCArKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKystLS0tLS0tLS0KIGFyY2gveDg2L3Rvb2xzL3JlbG9jcy5oICAgICAgICB8ICA0
-ICstLQogYXJjaC94ODYvdG9vbHMvcmVsb2NzX2NvbW1vbi5jIHwgMTUgKysrKysrKy0tLS0KIDMg
-ZmlsZXMgY2hhbmdlZCwgNjAgaW5zZXJ0aW9ucygrKSwgMTkgZGVsZXRpb25zKC0pCgpkaWZmIC0t
-Z2l0IGEvYXJjaC94ODYvdG9vbHMvcmVsb2NzLmMgYi9hcmNoL3g4Ni90b29scy9yZWxvY3MuYwpp
-bmRleCA3MGY1MjNkZDY4ZmYuLjE5YjNlNmM1OTRiMSAxMDA2NDQKLS0tIGEvYXJjaC94ODYvdG9v
-bHMvcmVsb2NzLmMKKysrIGIvYXJjaC94ODYvdG9vbHMvcmVsb2NzLmMKQEAgLTEyLDggKzEyLDE0
-IEBACiAKIHN0YXRpYyBFbGZfRWhkciBlaGRyOwogCisjaWYgRUxGX0JJVFMgPT0gNjQKK3R5cGVk
-ZWYgdWludDY0X3QgcmVsX29mZl90OworI2Vsc2UKK3R5cGVkZWYgdWludDMyX3QgcmVsX29mZl90
-OworI2VuZGlmCisKIHN0cnVjdCByZWxvY3MgewotCXVpbnQzMl90CSpvZmZzZXQ7CisJcmVsX29m
-Zl90CSpvZmZzZXQ7CiAJdW5zaWduZWQgbG9uZwljb3VudDsKIAl1bnNpZ25lZCBsb25nCXNpemU7
-CiB9OwpAQCAtNjI3LDcgKzYzMyw3IEBAIHN0YXRpYyB2b2lkIHByaW50X2Fic29sdXRlX3JlbG9j
-cyh2b2lkKQogCQlwcmludGYoIlxuIik7CiB9CiAKLXN0YXRpYyB2b2lkIGFkZF9yZWxvYyhzdHJ1
-Y3QgcmVsb2NzICpyLCB1aW50MzJfdCBvZmZzZXQpCitzdGF0aWMgdm9pZCBhZGRfcmVsb2Moc3Ry
-dWN0IHJlbG9jcyAqciwgcmVsX29mZl90IG9mZnNldCkKIHsKIAlpZiAoci0+Y291bnQgPT0gci0+
-c2l6ZSkgewogCQl1bnNpZ25lZCBsb25nIG5ld3NpemUgPSByLT5zaXplICsgNTAwMDA7CkBAIC05
-ODMsMjYgKzk4OSw0OCBAQCBzdGF0aWMgdm9pZCBzb3J0X3JlbG9jcyhzdHJ1Y3QgcmVsb2NzICpy
-KQogCXFzb3J0KHItPm9mZnNldCwgci0+Y291bnQsIHNpemVvZihyLT5vZmZzZXRbMF0pLCBjbXBf
-cmVsb2NzKTsKIH0KIAotc3RhdGljIGludCB3cml0ZTMyKHVpbnQzMl90IHYsIEZJTEUgKmYpCitz
-dGF0aWMgaW50IHdyaXRlMzIocmVsX29mZl90IHJlbCwgRklMRSAqZikKIHsKLQl1bnNpZ25lZCBj
-aGFyIGJ1Zls0XTsKKwl1bnNpZ25lZCBjaGFyIGJ1ZltzaXplb2YodWludDMyX3QpXTsKKwl1aW50
-MzJfdCB2ID0gKHVpbnQzMl90KXJlbDsKIAogCXB1dF91bmFsaWduZWRfbGUzMih2LCBidWYpOwot
-CXJldHVybiBmd3JpdGUoYnVmLCAxLCA0LCBmKSA9PSA0ID8gMCA6IC0xOworCXJldHVybiBmd3Jp
-dGUoYnVmLCAxLCBzaXplb2YoYnVmKSwgZikgPT0gc2l6ZW9mKGJ1ZikgPyAwIDogLTE7CiB9CiAK
-LXN0YXRpYyBpbnQgd3JpdGUzMl9hc190ZXh0KHVpbnQzMl90IHYsIEZJTEUgKmYpCitzdGF0aWMg
-aW50IHdyaXRlMzJfYXNfdGV4dChyZWxfb2ZmX3QgcmVsLCBGSUxFICpmKQogeworCXVpbnQzMl90
-IHYgPSAodWludDMyX3QpcmVsOwogCXJldHVybiBmcHJpbnRmKGYsICJcdC5sb25nIDB4JTA4IlBS
-SXgzMiJcbiIsIHYpID4gMCA/IDAgOiAtMTsKIH0KIAotc3RhdGljIHZvaWQgZW1pdF9yZWxvY3Mo
-aW50IGFzX3RleHQsIGludCB1c2VfcmVhbF9tb2RlKQorc3RhdGljIGludCB3cml0ZTY0KHJlbF9v
-ZmZfdCByZWwsIEZJTEUgKmYpCit7CisJdW5zaWduZWQgY2hhciBidWZbc2l6ZW9mKHVpbnQ2NF90
-KV07CisJdWludDY0X3QgdiA9ICh1aW50NjRfdClyZWw7CisKKwlwdXRfdW5hbGlnbmVkX2xlNjQo
-diwgYnVmKTsKKwlyZXR1cm4gZndyaXRlKGJ1ZiwgMSwgc2l6ZW9mKGJ1ZiksIGYpID09IHNpemVv
-ZihidWYpID8gMCA6IC0xOworfQorCitzdGF0aWMgaW50IHdyaXRlNjRfYXNfdGV4dChyZWxfb2Zm
-X3QgcmVsLCBGSUxFICpmKQoreworCXVpbnQ2NF90IHYgPSAodWludDY0X3QpcmVsOworCXJldHVy
-biBmcHJpbnRmKGYsICJcdC5xdWFkIDB4JTAxNiJQUkl4NjQiXG4iLCB2KSA+IDAgPyAwIDogLTE7
-Cit9CisKK3N0YXRpYyB2b2lkIGVtaXRfcmVsb2NzKGludCBhc190ZXh0LCBpbnQgdXNlX3JlYWxf
-bW9kZSwgaW50IHVzZV9sYXJnZV9yZWxvYykKIHsKIAlpbnQgaTsKLQlpbnQgKCp3cml0ZV9yZWxv
-YykodWludDMyX3QsIEZJTEUgKikgPSB3cml0ZTMyOworCWludCAoKndyaXRlX3JlbG9jKShyZWxf
-b2ZmX3QsIEZJTEUgKik7CiAJaW50ICgqZG9fcmVsb2MpKHN0cnVjdCBzZWN0aW9uICpzZWMsIEVs
-Zl9SZWwgKnJlbCwgRWxmX1N5bSAqc3ltLAogCQkJY29uc3QgY2hhciAqc3ltbmFtZSk7CiAKKwlp
-ZiAodXNlX2xhcmdlX3JlbG9jKQorCQl3cml0ZV9yZWxvYyA9IHdyaXRlNjQ7CisJZWxzZQorCQl3
-cml0ZV9yZWxvYyA9IHdyaXRlMzI7CisKICNpZiBFTEZfQklUUyA9PSA2NAogCWlmICghdXNlX3Jl
-YWxfbW9kZSkKIAkJZG9fcmVsb2MgPSBkb19yZWxvYzY0OwpAQCAtMTAxMyw2ICsxMDQxLDkgQEAg
-c3RhdGljIHZvaWQgZW1pdF9yZWxvY3MoaW50IGFzX3RleHQsIGludCB1c2VfcmVhbF9tb2RlKQog
-CQlkb19yZWxvYyA9IGRvX3JlbG9jMzI7CiAJZWxzZQogCQlkb19yZWxvYyA9IGRvX3JlbG9jX3Jl
-YWw7CisKKwkvKiBMYXJnZSByZWxvY2F0aW9ucyBvbmx5IGZvciA2NC1iaXQgKi8KKwl1c2VfbGFy
-Z2VfcmVsb2MgPSAwOwogI2VuZGlmCiAKIAkvKiBDb2xsZWN0IHVwIHRoZSByZWxvY2F0aW9ucyAq
-LwpAQCAtMTAzNiw4ICsxMDY3LDEzIEBAIHN0YXRpYyB2b2lkIGVtaXRfcmVsb2NzKGludCBhc190
-ZXh0LCBpbnQgdXNlX3JlYWxfbW9kZSkKIAkJICogZ2FzIHdpbGwgbGlrZS4KIAkJICovCiAJCXBy
-aW50ZigiLnNlY3Rpb24gXCIuZGF0YS5yZWxvY1wiLFwiYVwiXG4iKTsKLQkJcHJpbnRmKCIuYmFs
-aWduIDRcbiIpOwotCQl3cml0ZV9yZWxvYyA9IHdyaXRlMzJfYXNfdGV4dDsKKwkJaWYgKHVzZV9s
-YXJnZV9yZWxvYykgeworCQkJcHJpbnRmKCIuYmFsaWduIDhcbiIpOworCQkJd3JpdGVfcmVsb2Mg
-PSB3cml0ZTY0X2FzX3RleHQ7CisJCX0gZWxzZSB7CisJCQlwcmludGYoIi5iYWxpZ24gNFxuIik7
-CisJCQl3cml0ZV9yZWxvYyA9IHdyaXRlMzJfYXNfdGV4dDsKKwkJfQogCX0KIAogCWlmICh1c2Vf
-cmVhbF9tb2RlKSB7CkBAIC0xMTMxLDcgKzExNjcsNyBAQCBzdGF0aWMgdm9pZCBwcmludF9yZWxv
-Y19pbmZvKHZvaWQpCiAKIHZvaWQgcHJvY2VzcyhGSUxFICpmcCwgaW50IHVzZV9yZWFsX21vZGUs
-IGludCBhc190ZXh0LAogCSAgICAgaW50IHNob3dfYWJzb2x1dGVfc3ltcywgaW50IHNob3dfYWJz
-b2x1dGVfcmVsb2NzLAotCSAgICAgaW50IHNob3dfcmVsb2NfaW5mbykKKwkgICAgIGludCBzaG93
-X3JlbG9jX2luZm8sIGludCB1c2VfbGFyZ2VfcmVsb2MpCiB7CiAJcmVnZXhfaW5pdCh1c2VfcmVh
-bF9tb2RlKTsKIAlyZWFkX2VoZHIoZnApOwpAQCAtMTE1Myw1ICsxMTg5LDUgQEAgdm9pZCBwcm9j
-ZXNzKEZJTEUgKmZwLCBpbnQgdXNlX3JlYWxfbW9kZSwgaW50IGFzX3RleHQsCiAJCXByaW50X3Jl
-bG9jX2luZm8oKTsKIAkJcmV0dXJuOwogCX0KLQllbWl0X3JlbG9jcyhhc190ZXh0LCB1c2VfcmVh
-bF9tb2RlKTsKKwllbWl0X3JlbG9jcyhhc190ZXh0LCB1c2VfcmVhbF9tb2RlLCB1c2VfbGFyZ2Vf
-cmVsb2MpOwogfQpkaWZmIC0tZ2l0IGEvYXJjaC94ODYvdG9vbHMvcmVsb2NzLmggYi9hcmNoL3g4
-Ni90b29scy9yZWxvY3MuaAppbmRleCAxZDIzYmY5NTNhNGEuLmNiNzcxY2M0NDEyZCAxMDA2NDQK
-LS0tIGEvYXJjaC94ODYvdG9vbHMvcmVsb2NzLmgKKysrIGIvYXJjaC94ODYvdG9vbHMvcmVsb2Nz
-LmgKQEAgLTMwLDggKzMwLDggQEAgZW51bSBzeW10eXBlIHsKIAogdm9pZCBwcm9jZXNzXzMyKEZJ
-TEUgKmZwLCBpbnQgdXNlX3JlYWxfbW9kZSwgaW50IGFzX3RleHQsCiAJCWludCBzaG93X2Fic29s
-dXRlX3N5bXMsIGludCBzaG93X2Fic29sdXRlX3JlbG9jcywKLQkJaW50IHNob3dfcmVsb2NfaW5m
-byk7CisJCWludCBzaG93X3JlbG9jX2luZm8sIGludCB1c2VfbGFyZ2VfcmVsb2MpOwogdm9pZCBw
-cm9jZXNzXzY0KEZJTEUgKmZwLCBpbnQgdXNlX3JlYWxfbW9kZSwgaW50IGFzX3RleHQsCiAJCWlu
-dCBzaG93X2Fic29sdXRlX3N5bXMsIGludCBzaG93X2Fic29sdXRlX3JlbG9jcywKLQkJaW50IHNo
-b3dfcmVsb2NfaW5mbyk7CisJCWludCBzaG93X3JlbG9jX2luZm8sIGludCB1c2VfbGFyZ2VfcmVs
-b2MpOwogI2VuZGlmIC8qIFJFTE9DU19IICovCmRpZmYgLS1naXQgYS9hcmNoL3g4Ni90b29scy9y
-ZWxvY3NfY29tbW9uLmMgYi9hcmNoL3g4Ni90b29scy9yZWxvY3NfY29tbW9uLmMKaW5kZXggYWNh
-YjYzNmJjYjM0Li45Y2YxMzkxYWY1MGEgMTAwNjQ0Ci0tLSBhL2FyY2gveDg2L3Rvb2xzL3JlbG9j
-c19jb21tb24uYworKysgYi9hcmNoL3g4Ni90b29scy9yZWxvY3NfY29tbW9uLmMKQEAgLTExLDE0
-ICsxMSwxNCBAQCB2b2lkIGRpZShjaGFyICpmbXQsIC4uLikKIAogc3RhdGljIHZvaWQgdXNhZ2Uo
-dm9pZCkKIHsKLQlkaWUoInJlbG9jcyBbLS1hYnMtc3ltc3wtLWFicy1yZWxvY3N8LS1yZWxvYy1p
-bmZvfC0tdGV4dHwtLXJlYWxtb2RlXSIgXAotCSAgICAiIHZtbGludXhcbiIpOworCWRpZSgicmVs
-b2NzIFstLWFicy1zeW1zfC0tYWJzLXJlbG9jc3wtLXJlbG9jLWluZm98LS10ZXh0fC0tcmVhbG1v
-ZGV8IiBcCisJICAgICItLWxhcmdlLXJlbG9jXSAgdm1saW51eFxuIik7CiB9CiAKIGludCBtYWlu
-KGludCBhcmdjLCBjaGFyICoqYXJndikKIHsKIAlpbnQgc2hvd19hYnNvbHV0ZV9zeW1zLCBzaG93
-X2Fic29sdXRlX3JlbG9jcywgc2hvd19yZWxvY19pbmZvOwotCWludCBhc190ZXh0LCB1c2VfcmVh
-bF9tb2RlOworCWludCBhc190ZXh0LCB1c2VfcmVhbF9tb2RlLCB1c2VfbGFyZ2VfcmVsb2M7CiAJ
-Y29uc3QgY2hhciAqZm5hbWU7CiAJRklMRSAqZnA7CiAJaW50IGk7CkBAIC0yOSw2ICsyOSw3IEBA
-IGludCBtYWluKGludCBhcmdjLCBjaGFyICoqYXJndikKIAlzaG93X3JlbG9jX2luZm8gPSAwOwog
-CWFzX3RleHQgPSAwOwogCXVzZV9yZWFsX21vZGUgPSAwOworCXVzZV9sYXJnZV9yZWxvYyA9IDA7
-CiAJZm5hbWUgPSBOVUxMOwogCWZvciAoaSA9IDE7IGkgPCBhcmdjOyBpKyspIHsKIAkJY2hhciAq
-YXJnID0gYXJndltpXTsKQEAgLTUzLDYgKzU0LDEwIEBAIGludCBtYWluKGludCBhcmdjLCBjaGFy
-ICoqYXJndikKIAkJCQl1c2VfcmVhbF9tb2RlID0gMTsKIAkJCQljb250aW51ZTsKIAkJCX0KKwkJ
-CWlmIChzdHJjbXAoYXJnLCAiLS1sYXJnZS1yZWxvYyIpID09IDApIHsKKwkJCQl1c2VfbGFyZ2Vf
-cmVsb2MgPSAxOworCQkJCWNvbnRpbnVlOworCQkJfQogCQl9CiAJCWVsc2UgaWYgKCFmbmFtZSkg
-ewogCQkJZm5hbWUgPSBhcmc7CkBAIC03NCwxMSArNzksMTEgQEAgaW50IG1haW4oaW50IGFyZ2Ms
-IGNoYXIgKiphcmd2KQogCWlmIChlX2lkZW50W0VJX0NMQVNTXSA9PSBFTEZDTEFTUzY0KQogCQlw
-cm9jZXNzXzY0KGZwLCB1c2VfcmVhbF9tb2RlLCBhc190ZXh0LAogCQkJICAgc2hvd19hYnNvbHV0
-ZV9zeW1zLCBzaG93X2Fic29sdXRlX3JlbG9jcywKLQkJCSAgIHNob3dfcmVsb2NfaW5mbyk7CisJ
-CQkgICBzaG93X3JlbG9jX2luZm8sIHVzZV9sYXJnZV9yZWxvYyk7CiAJZWxzZQogCQlwcm9jZXNz
-XzMyKGZwLCB1c2VfcmVhbF9tb2RlLCBhc190ZXh0LAogCQkJICAgc2hvd19hYnNvbHV0ZV9zeW1z
-LCBzaG93X2Fic29sdXRlX3JlbG9jcywKLQkJCSAgIHNob3dfcmVsb2NfaW5mbyk7CisJCQkgICBz
-aG93X3JlbG9jX2luZm8sIHVzZV9sYXJnZV9yZWxvYyk7CiAJZmNsb3NlKGZwKTsKIAlyZXR1cm4g
-MDsKIH0KLS0gCjIuMTMuMi45MzIuZzc0NDllOTY0Yy1nb29nCgoKX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX18KWGVuLWRldmVsIG1haWxpbmcgbGlzdApYZW4t
-ZGV2ZWxAbGlzdHMueGVuLm9yZwpodHRwczovL2xpc3RzLnhlbi5vcmcveGVuLWRldmVsCg==
+Remove unnecessary static on local variable dd. Such variable
+is initialized before being used, on every execution path throughout
+the function. The static has no benefit and, removing it reduces the
+object file size.
+
+This issue was detected using Coccinelle and the following semantic patch:
+https://github.com/GustavoARSilva/coccinelle/blob/master/static/static_unused.cocci
+
+In the following log you can see a difference in the object file size.
+This log is the output of the size command, before and after the code
+change:
+
+before:
+   text    data     bss     dec     hex filename
+  26135   11944     128   38207    953f drivers/crypto/omap-sham.o
+
+after:
+   text    data     bss     dec     hex filename
+  26084   11856      64   38004    9474 drivers/crypto/omap-sham.o
+
+Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
+---
+ drivers/crypto/omap-sham.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+index 9ad9d39..c40ac30 100644
+--- a/drivers/crypto/omap-sham.c
++++ b/drivers/crypto/omap-sham.c
+@@ -2133,7 +2133,7 @@ static int omap_sham_probe(struct platform_device *pdev)
+ 
+ static int omap_sham_remove(struct platform_device *pdev)
+ {
+-	static struct omap_sham_dev *dd;
++	struct omap_sham_dev *dd;
+ 	int i, j;
+ 
+ 	dd = platform_get_drvdata(pdev);
+-- 
+2.5.0
