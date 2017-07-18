@@ -1,26 +1,28 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] drivers: crypto: geode-aes: fixed coding style warnings
- and error
-Date: Tue, 18 Jul 2017 18:38:25 +0800
-Message-ID: <20170718103825.GR6479@gondor.apana.org.au>
-References: <1499366696-7243-1-git-send-email-chrisjohgorman@gmail.com>
+Subject: Re: [PATCH] crypto: brcm: add NULL check on of_match_device() return
+ value
+Date: Tue, 18 Jul 2017 18:38:36 +0800
+Message-ID: <20170718103836.GS6479@gondor.apana.org.au>
+References: <20170707063333.GA18377@embeddedgus>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-geode@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: Chris Gorman <chrisjohgorman@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "Gustavo A. R. Silva" <garsilva@mebeddedor.com>
+To: "Gustavo A. R. Silva" <garsilva@embeddedor.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1499366696-7243-1-git-send-email-chrisjohgorman@gmail.com>
+In-Reply-To: <20170707063333.GA18377@embeddedgus>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jul 06, 2017 at 02:44:56PM -0400, Chris Gorman wrote:
-> fixed WARNING: Block comments should align the * on each line
-> fixed WARNINGs: Missing a blank line after declarations
-> fixed ERROR: space prohibited before that ',' (ctx:WxE)
+On Fri, Jul 07, 2017 at 01:33:33AM -0500, Gustavo A. R. Silva wrote:
+> Check return value from call to of_match_device()
+> in order to prevent a NULL pointer dereference.
 > 
-> Signed-off-by: Chris Gorman <chrisjohgorman@gmail.com>
+> In case of NULL print error message and return -ENODEV
+> 
+> Signed-off-by: Gustavo A. R. Silva <garsilva@embeddedor.com>
 
 Patch applied.  Thanks.
 -- 
