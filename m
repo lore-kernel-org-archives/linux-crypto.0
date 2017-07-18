@@ -1,8 +1,8 @@
 From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Subject: [PATCH] crypto: atmel-tdes: remove unnecessary static in
- atmel_tdes_remove()
-Date: Tue, 18 Jul 2017 18:05:50 -0500
-Message-ID: <20170718230550.GA11042@embeddedgus>
+Subject: [PATCH] crypto: img-hash: remove unnecessary static in
+ img_hash_remove()
+Date: Tue, 18 Jul 2017 18:07:12 -0500
+Message-ID: <20170718230712.GA15507@embeddedgus>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -14,7 +14,7 @@ Content-Disposition: inline
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Remove unnecessary static on local variable tdes_dd. Such variable
+Remove unnecessary static on local variable hdev. Such variable
 is initialized before being used, on every execution path throughout
 the function. The static has no benefit and, removing it reduces the
 object file size.
@@ -28,29 +28,29 @@ the code change:
 
 before:
    text    data     bss     dec     hex filename
-  17079    8704     128   25911    6537 drivers/crypto/atmel-tdes.o
+  14842    6464     128   21434    53ba drivers/crypto/img-hash.o
 
 after:
    text    data     bss     dec     hex filename
-  17039    8616      64   25719    6477 drivers/crypto/atmel-tdes.o
+  14789    6376      64   21229    52ed drivers/crypto/img-hash.o
 
 Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
 ---
- drivers/crypto/atmel-tdes.c | 2 +-
+ drivers/crypto/img-hash.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/atmel-tdes.c b/drivers/crypto/atmel-tdes.c
-index b25f1b3..f4b335d 100644
---- a/drivers/crypto/atmel-tdes.c
-+++ b/drivers/crypto/atmel-tdes.c
-@@ -1487,7 +1487,7 @@ static int atmel_tdes_probe(struct platform_device *pdev)
+diff --git a/drivers/crypto/img-hash.c b/drivers/crypto/img-hash.c
+index 0c6a917..b87000a 100644
+--- a/drivers/crypto/img-hash.c
++++ b/drivers/crypto/img-hash.c
+@@ -1054,7 +1054,7 @@ static int img_hash_probe(struct platform_device *pdev)
  
- static int atmel_tdes_remove(struct platform_device *pdev)
+ static int img_hash_remove(struct platform_device *pdev)
  {
--	static struct atmel_tdes_dev *tdes_dd;
-+	struct atmel_tdes_dev *tdes_dd;
+-	static struct img_hash_dev *hdev;
++	struct img_hash_dev *hdev;
  
- 	tdes_dd = platform_get_drvdata(pdev);
- 	if (!tdes_dd)
+ 	hdev = platform_get_drvdata(pdev);
+ 	spin_lock(&img_hash.lock);
 -- 
 2.5.0
