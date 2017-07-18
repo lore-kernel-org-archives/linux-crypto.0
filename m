@@ -1,56 +1,55 @@
-From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH 4/4] arm64: dts: freescale: ls1088a: add crypto node
-Date: Tue, 18 Jul 2017 18:30:50 +0300
-Message-ID: <20170718153050.15330-5-horia.geanta@nxp.com>
+From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta-3arQi8VN3Tc@public.gmane.org>
+Subject: [PATCH 3/4] arm64: dts: freescale: ls208xa: add crypto node
+Date: Tue, 18 Jul 2017 18:30:49 +0300
+Message-ID: <20170718153050.15330-4-horia.geanta@nxp.com>
 References: <20170718153050.15330-1-horia.geanta@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Dan Douglass <dan.douglass@nxp.com>,
-        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        Shawn Guo <shawnguo@kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn3nam01on0082.outbound.protection.outlook.com ([104.47.33.82]:4692
-        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751446AbdGRPbd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Jul 2017 11:31:33 -0400
-In-Reply-To: <20170718153050.15330-1-horia.geanta@nxp.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
+        Dan Douglass <dan.douglass-3arQi8VN3Tc@public.gmane.org>,
+        <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        <linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+        Shawn Guo <shawnguo-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20170718153050.15330-1-horia.geanta-3arQi8VN3Tc@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-LS1088A has a SEC v5.3 security engine.
+LS208xA has a SEC v5.1 security engine.
 
-Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+Signed-off-by: Horia Geantă <horia.geanta-3arQi8VN3Tc@public.gmane.org>
 ---
- arch/arm64/boot/dts/freescale/fsl-ls1088a.dtsi | 43 ++++++++++++++++++++++++++
- 1 file changed, 43 insertions(+)
+ arch/arm64/boot/dts/freescale/fsl-ls208xa.dtsi | 41 ++++++++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
 
-diff --git a/arch/arm64/boot/dts/freescale/fsl-ls1088a.dtsi b/arch/arm64/boot/dts/freescale/fsl-ls1088a.dtsi
-index c144d06a6e33..6c22d75bc504 100644
---- a/arch/arm64/boot/dts/freescale/fsl-ls1088a.dtsi
-+++ b/arch/arm64/boot/dts/freescale/fsl-ls1088a.dtsi
-@@ -52,6 +52,10 @@
- 	#address-cells = <2>;
+diff --git a/arch/arm64/boot/dts/freescale/fsl-ls208xa.dtsi b/arch/arm64/boot/dts/freescale/fsl-ls208xa.dtsi
+index f135b987d13b..fc1234dc90f9 100644
+--- a/arch/arm64/boot/dts/freescale/fsl-ls208xa.dtsi
++++ b/arch/arm64/boot/dts/freescale/fsl-ls208xa.dtsi
+@@ -46,6 +46,7 @@
+  */
+ 
+ #include <dt-bindings/thermal/thermal.h>
++#include <dt-bindings/interrupt-controller/arm-gic.h>
+ 
+ / {
+ 	compatible = "fsl,ls2080a";
+@@ -54,6 +55,7 @@
  	#size-cells = <2>;
  
-+	aliases {
+ 	aliases {
 +		crypto = &crypto;
-+	};
-+
- 	cpus {
- 		#address-cells = <1>;
- 		#size-cells = <0>;
-@@ -369,6 +373,45 @@
- 			dma-coherent;
- 			status = "disabled";
+ 		serial0 = &serial0;
+ 		serial1 = &serial1;
+ 	};
+@@ -306,6 +308,45 @@
+ 			clock-names = "apb_pclk", "wdog_clk";
  		};
-+
+ 
 +		crypto: crypto@8000000 {
 +			compatible = "fsl,sec-v5.0", "fsl,sec-v4.0";
 +			fsl,sec-era = <8>;
@@ -89,8 +88,14 @@ index c144d06a6e33..6c22d75bc504 100644
 +				interrupts = <GIC_SPI 143 IRQ_TYPE_LEVEL_HIGH>;
 +			};
 +		};
- 	};
- 
- };
++
+ 		fsl_mc: fsl-mc@80c000000 {
+ 			compatible = "fsl,qoriq-mc";
+ 			reg = <0x00000008 0x0c000000 0 0x40>,	 /* MC portal base */
 -- 
 2.12.0.264.gd6db3f216544
+
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
