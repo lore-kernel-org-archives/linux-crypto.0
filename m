@@ -1,80 +1,108 @@
-From: Tudor Ambarus <tudor.ambarus@microchip.com>
-Subject: Re: [v3 RFC PATCH 1/2] crypto: ecdh: fix concurrency on ecdh_ctx
-Date: Tue, 18 Jul 2017 15:52:19 +0300
-Message-ID: <60b15bac-d295-36f4-c55f-a3ff3f8267fd@microchip.com>
-References: <1498658916-11044-1-git-send-email-tudor.ambarus@microchip.com>
- <1498658916-11044-2-git-send-email-tudor.ambarus@microchip.com>
- <20170718055015.GB4764@gondor.apana.org.au>
+From: Antoine Tenart <antoine.tenart@free-electrons.com>
+Subject: Re: [PATCH 1/2] crypto: inside-secure - fix invalidation check in
+ hmac_sha1_setkey
+Date: Tue, 18 Jul 2017 15:07:32 +0200
+Message-ID: <20170718130732.GF2563@kwain>
+References: <20170717094520.3497-1-antoine.tenart@free-electrons.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: <davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
-        <nicolas.ferre@microchip.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="tmoQ0UElFV5VgXgH"
+Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
+        thomas.petazzoni@free-electrons.com,
+        gregory.clement@free-electrons.com, oferh@marvell.com,
+        igall@marvell.com, nadavh@marvell.com, linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from esa3.microchip.iphmx.com ([68.232.153.233]:48606 "EHLO
-        esa3.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751371AbdGRMxJ (ORCPT
+Received: from mail.free-electrons.com ([62.4.15.54]:57437 "EHLO
+        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751378AbdGRNHn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Jul 2017 08:53:09 -0400
-In-Reply-To: <20170718055015.GB4764@gondor.apana.org.au>
-Content-Language: en-US
+        Tue, 18 Jul 2017 09:07:43 -0400
+Content-Disposition: inline
+In-Reply-To: <20170717094520.3497-1-antoine.tenart@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi, Herbert,
 
-On 07/18/2017 08:50 AM, Herbert Xu wrote:
-> On Wed, Jun 28, 2017 at 05:08:35PM +0300, Tudor Ambarus wrote:
->> ecdh_ctx contained static allocated data for the shared secret,
->> for the public and private key.
->>
->> When talking about shared secret and public key, they were
->> doomed to concurrency issues because they could be shared by
->> multiple crypto requests. The requests were generating specific
->> data to the same zone of memory without any protection.
->>
->> The private key was subject to concurrency problems because
->> multiple setkey calls could fight to memcpy to the same zone
->> of memory.
->>
->> Shared secret and public key concurrency is fixed by allocating
->> memory on heap for each request. In the end, the shared secret
->> and public key are computed for each request, there is no reason
->> to use shared memory.
->>
->> Private key concurrency is fixed by allocating memory on heap
->> for each setkey call, by memcopying the parsed/generated private
->> key to the heap and by making the private key pointer from
->> ecdh_ctx to point to the newly allocated data.
->>
->> On all systems running Linux, loads from and stores to pointers
->> are atomic, that is, if a store to a pointer occurs at the same
->> time as a load from that same pointer, the load will return either
->> the initial value or the value stored, never some bitwise mashup
->> of the two.
->>
->> With this, the private key will always point to a valid key,
->> but to what setkey call it belongs, is the responsibility of the
->> caller, as it is now in all crypto framework.
-> 
-> I don't get it.  You're replacing a per-tfm shared secret with
-> a per-tfm dynamically allocated shared secret.  As far as I can
-> see nothing has changed?
+--tmoQ0UElFV5VgXgH
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I'm replacing a per-tfm shared secret with a per-request dynamically
-allocated shared secret. The same for the public key, I'm replacing
-a per-tfm public key with a per-request dynamically allocated public
-key. No shared memory, no concurrency.
+Hi,
 
-> If the caller is making simultaneous setkey calls on the same tfm,
-> then it's their problem.
-> 
+On Mon, Jul 17, 2017 at 11:45:19AM +0200, Antoine Tenart wrote:
+> The safexcel_hmac_sha1_setkey function checks if an invalidation command
+> should be issued, i.e. when the context ipad/opad change. This checks is
+> done after filling the ipad/opad which and it can't be true. The patch
+> fixes this by moving the check before the ipad/opad memcpy operations.
+>=20
+> Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
 
-For the private key I wanted to be sure that we don't interleave data
-from multiple setkey calls. As of now, the setkey calls can fight to
-memcopy to the same zone of memory. I'm making sure that the private key
-is valid and not a mash of multiple private keys.
+This patch should have stable: and fixes: tags. I'll add them and send a
+v2.
 
 Thanks,
-ta
+Antoine
+
+> ---
+>  drivers/crypto/inside-secure/safexcel_hash.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypt=
+o/inside-secure/safexcel_hash.c
+> index 8527a5899a2f..a11b2edb41b9 100644
+> --- a/drivers/crypto/inside-secure/safexcel_hash.c
+> +++ b/drivers/crypto/inside-secure/safexcel_hash.c
+> @@ -883,9 +883,6 @@ static int safexcel_hmac_sha1_setkey(struct crypto_ah=
+ash *tfm, const u8 *key,
+>  	if (ret)
+>  		return ret;
+> =20
+> -	memcpy(ctx->ipad, &istate.state, SHA1_DIGEST_SIZE);
+> -	memcpy(ctx->opad, &ostate.state, SHA1_DIGEST_SIZE);
+> -
+>  	for (i =3D 0; i < ARRAY_SIZE(istate.state); i++) {
+>  		if (ctx->ipad[i] !=3D le32_to_cpu(istate.state[i]) ||
+>  		    ctx->opad[i] !=3D le32_to_cpu(ostate.state[i])) {
+> @@ -894,6 +891,9 @@ static int safexcel_hmac_sha1_setkey(struct crypto_ah=
+ash *tfm, const u8 *key,
+>  		}
+>  	}
+> =20
+> +	memcpy(ctx->ipad, &istate.state, SHA1_DIGEST_SIZE);
+> +	memcpy(ctx->opad, &ostate.state, SHA1_DIGEST_SIZE);
+> +
+>  	return 0;
+>  }
+> =20
+> --=20
+> 2.13.3
+>=20
+
+--=20
+Antoine T=E9nart, Free Electrons
+Embedded Linux and Kernel engineering
+http://free-electrons.com
+
+--tmoQ0UElFV5VgXgH
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEM7Tg8N8kXOlT7hOhXE2LyK3bvNgFAlluCBQACgkQXE2LyK3b
+vNgTQw//SA0mpFUfuNUDkLFga0Wu7ZdhFI3S8Wi8stlMEHixAMkNJo7CBJmXph7r
+XkC/Lxw530bgWWat3vltfV86KzODCuhgrD4D2IRydb2iLsbHJgoNAM3orSLR6uLy
+NsOTr3CWCCl+GXBuyVDJucQTSC6rrSD1JWELL6OORxC+F9dMEJXuQMLoBHcoNQJj
+7LUSUNkCf+CCVuQekfhfOIddKZtrlG+LcQ4kl/Ety5l1zq9zGvgBlUR57cyecOlm
+E7Xun1hzAuOY6Beyul39PGkzwGtNZId4qwI4MF4vjTGwwi5pmRwtrqhVKJ1If6Lm
+9+f+RAJTfIsVgVCUKPspwN4qrvAcrFFh26CZh+dHPk2go1L5K9fWiDhtz9RRWNUb
+PXnWIXDyplfll6GMgUIf5fh7PRXkXmjyxqjIlJBscYFxV2HvMMHt3iVyU8wqD3bv
+hFdUEljn5gw0PLwWGjNAMG5t8q59iQwpqCVMKUgrO2Lrlobk6pX6dL5e2dYHXV4T
+OIQe39995rmJSHbwP5J1TQLajdKUwMXFvDEFRwhiyV17KwtTef+lK/NqKVK5iHkr
+Tk7N/x8Iq5R5rMHTrKshtOI6T4T4OQgzCcyF7VdLE4JtYVp9J50Tc3/WPMOJF5r/
+BkZZcopmTl5Q5gCwj+9sbfMTPUELzsrYEDEImklGM6twKDmpIqw=
+=x/Nk
+-----END PGP SIGNATURE-----
+
+--tmoQ0UElFV5VgXgH--
