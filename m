@@ -1,101 +1,53 @@
-From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta-3arQi8VN3Tc@public.gmane.org>
-Subject: [PATCH 3/4] arm64: dts: freescale: ls208xa: add crypto node
-Date: Tue, 18 Jul 2017 18:30:49 +0300
-Message-ID: <20170718153050.15330-4-horia.geanta@nxp.com>
-References: <20170718153050.15330-1-horia.geanta@nxp.com>
+From: Logan Gunthorpe <logang@deltatee.com>
+Subject: [PATCH v4 0/5] make io{read|write}64 globally usable
+Date: Tue, 18 Jul 2017 10:55:23 -0600
+Message-ID: <20170718165528.7383-1-logang@deltatee.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Cc: "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
-        Dan Douglass <dan.douglass-3arQi8VN3Tc@public.gmane.org>,
-        <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        <linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
-To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-        Shawn Guo <shawnguo-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170718153050.15330-1-horia.geanta-3arQi8VN3Tc@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        Stephen Bates <sbates@raithlin.com>,
+        Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from ale.deltatee.com ([207.54.116.67]:36456 "EHLO ale.deltatee.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751363AbdGRQzf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 18 Jul 2017 12:55:35 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-LS208xA has a SEC v5.1 security engine.
+This is version four of my patchset to enable drivers to use
+io{read|write}64 on all arches.
 
-Signed-off-by: Horia Geantă <horia.geanta-3arQi8VN3Tc@public.gmane.org>
----
- arch/arm64/boot/dts/freescale/fsl-ls208xa.dtsi | 41 ++++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
+Changes since v3:
 
-diff --git a/arch/arm64/boot/dts/freescale/fsl-ls208xa.dtsi b/arch/arm64/boot/dts/freescale/fsl-ls208xa.dtsi
-index f135b987d13b..fc1234dc90f9 100644
---- a/arch/arm64/boot/dts/freescale/fsl-ls208xa.dtsi
-+++ b/arch/arm64/boot/dts/freescale/fsl-ls208xa.dtsi
-@@ -46,6 +46,7 @@
-  */
- 
- #include <dt-bindings/thermal/thermal.h>
-+#include <dt-bindings/interrupt-controller/arm-gic.h>
- 
- / {
- 	compatible = "fsl,ls2080a";
-@@ -54,6 +55,7 @@
- 	#size-cells = <2>;
- 
- 	aliases {
-+		crypto = &crypto;
- 		serial0 = &serial0;
- 		serial1 = &serial1;
- 	};
-@@ -306,6 +308,45 @@
- 			clock-names = "apb_pclk", "wdog_clk";
- 		};
- 
-+		crypto: crypto@8000000 {
-+			compatible = "fsl,sec-v5.0", "fsl,sec-v4.0";
-+			fsl,sec-era = <8>;
-+			#address-cells = <1>;
-+			#size-cells = <1>;
-+			ranges = <0x0 0x00 0x8000000 0x100000>;
-+			reg = <0x00 0x8000000 0x0 0x100000>;
-+			interrupts = <GIC_SPI 139 IRQ_TYPE_LEVEL_HIGH>;
-+			dma-coherent;
-+
-+			sec_jr0: jr@10000 {
-+				compatible = "fsl,sec-v5.0-job-ring",
-+					     "fsl,sec-v4.0-job-ring";
-+				reg	   = <0x10000 0x10000>;
-+				interrupts = <GIC_SPI 140 IRQ_TYPE_LEVEL_HIGH>;
-+			};
-+
-+			sec_jr1: jr@20000 {
-+				compatible = "fsl,sec-v5.0-job-ring",
-+					     "fsl,sec-v4.0-job-ring";
-+				reg	   = <0x20000 0x10000>;
-+				interrupts = <GIC_SPI 141 IRQ_TYPE_LEVEL_HIGH>;
-+			};
-+
-+			sec_jr2: jr@30000 {
-+				compatible = "fsl,sec-v5.0-job-ring",
-+					     "fsl,sec-v4.0-job-ring";
-+				reg	   = <0x30000 0x10000>;
-+				interrupts = <GIC_SPI 142 IRQ_TYPE_LEVEL_HIGH>;
-+			};
-+
-+			sec_jr3: jr@40000 {
-+				compatible = "fsl,sec-v5.0-job-ring",
-+					     "fsl,sec-v4.0-job-ring";
-+				reg	   = <0x40000 0x10000>;
-+				interrupts = <GIC_SPI 143 IRQ_TYPE_LEVEL_HIGH>;
-+			};
-+		};
-+
- 		fsl_mc: fsl-mc@80c000000 {
- 			compatible = "fsl,qoriq-mc";
- 			reg = <0x00000008 0x0c000000 0 0x40>,	 /* MC portal base */
--- 
-2.12.0.264.gd6db3f216544
+- I noticed powerpc didn't use the appropriate functions seeing
+readq/writeq were not defined when iomap.h was included. Thus I've
+included a patch to adjust this
+- Fixed some mistakes with a couple of the defines in io-64-nonatomic*
+headers
+- Fixed a typo noticed by Horia.
 
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+Horia Geantă (1):
+  crypto: caam: cleanup CONFIG_64BIT ifdefs when using io{read|write}64
+
+Logan Gunthorpe (4):
+  powerpc: io.h: move iomap.h include so that it can use readq/writeq
+    defs
+  iomap: introduce io{read|write}64_{lo_hi|hi_lo}
+  io-64-nonatomic: add io{read|write}64[be]{_lo_hi|_hi_lo} macros
+  ntb: ntb_hw_intel: use io-64-nonatomic instead of in-driver hacks
+
+ arch/powerpc/include/asm/io.h         |   6 +-
+ drivers/crypto/caam/regs.h            |  35 ++-------
+ drivers/ntb/hw/intel/ntb_hw_intel.c   |  30 +-------
+ include/asm-generic/iomap.h           |  26 +++++--
+ include/linux/io-64-nonatomic-hi-lo.h |  60 ++++++++++++++++
+ include/linux/io-64-nonatomic-lo-hi.h |  60 ++++++++++++++++
+ lib/iomap.c                           | 132 ++++++++++++++++++++++++++++++++++
+ 7 files changed, 282 insertions(+), 67 deletions(-)
