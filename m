@@ -1,67 +1,73 @@
-From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH] crypto: tcrypt - remove AES-XTS-192 speed tests
-Date: Wed, 19 Jul 2017 19:40:32 +0300
-Message-ID: <20170719164032.17731-1-horia.geanta@nxp.com>
-References: <1787722.TLPNYLEBHS@tauon.chronox.de>
+From: =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>
+Subject: Re: [PATCH v1] crypto: caam - set hwrng quality level
+Date: Wed, 19 Jul 2017 16:53:21 +0000
+Message-ID: <VI1PR0401MB25917848BA4AF6626E8DF1AD98A60@VI1PR0401MB2591.eurprd04.prod.outlook.com>
+References: <20170719074458.9247-1-o.rempel@pengutronix.de>
+ <VI1PR0401MB2591B52EB2EF7B7B900FBCC998A60@VI1PR0401MB2591.eurprd04.prod.outlook.com>
+ <20170719163248.sn7mvnq2s3fm2hvh@pengutronix.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Stephan Mueller <smueller@chronox.de>,
+Content-Type: text/plain; charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+        "kernel@pengutronix.de" <kernel@pengutronix.de>,
         Dan Douglass <dan.douglass@nxp.com>,
-        <linux-crypto@vger.kernel.org>, <dm-devel@redhat.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-sn1nam01on0052.outbound.protection.outlook.com ([104.47.32.52]:54352
-        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S933101AbdGSQkw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 19 Jul 2017 12:40:52 -0400
-In-Reply-To: <1787722.TLPNYLEBHS@tauon.chronox.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Harald Freudenberger" <freude@linux.vnet.ibm.com>,
+        Martin Schwidefsky <schwidefsky@de.ibm.com>
+To: Oleksij Rempel <ore@pengutronix.de>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Remove xts(aes) speed tests with 2 x 192-bit keys, since implementations
-adhering strictly to IEEE 1619-2007 standard cannot cope with key sizes
-other than 2 x 128, 2 x 256 bits - i.e. AES-XTS-{128,256}:
-[...]
-tcrypt: test 5 (384 bit key, 16 byte blocks):
-caam_jr 8020000.jr: key size mismatch
-tcrypt: setkey() failed flags=200000
-[...]
-
-Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
----
- crypto/tcrypt.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index 0dd6a432d6ca..0022a18d36ee 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -1404,9 +1404,9 @@ static int do_test(const char *alg, u32 type, u32 mask, int m)
- 		test_cipher_speed("lrw(aes)", DECRYPT, sec, NULL, 0,
- 				speed_template_32_40_48);
- 		test_cipher_speed("xts(aes)", ENCRYPT, sec, NULL, 0,
--				speed_template_32_48_64);
-+				speed_template_32_64);
- 		test_cipher_speed("xts(aes)", DECRYPT, sec, NULL, 0,
--				speed_template_32_48_64);
-+				speed_template_32_64);
- 		test_cipher_speed("cts(cbc(aes))", ENCRYPT, sec, NULL, 0,
- 				speed_template_16_24_32);
- 		test_cipher_speed("cts(cbc(aes))", DECRYPT, sec, NULL, 0,
-@@ -1837,9 +1837,9 @@ static int do_test(const char *alg, u32 type, u32 mask, int m)
- 		test_acipher_speed("lrw(aes)", DECRYPT, sec, NULL, 0,
- 				   speed_template_32_40_48);
- 		test_acipher_speed("xts(aes)", ENCRYPT, sec, NULL, 0,
--				   speed_template_32_48_64);
-+				   speed_template_32_64);
- 		test_acipher_speed("xts(aes)", DECRYPT, sec, NULL, 0,
--				   speed_template_32_48_64);
-+				   speed_template_32_64);
- 		test_acipher_speed("cts(cbc(aes))", ENCRYPT, sec, NULL, 0,
- 				   speed_template_16_24_32);
- 		test_acipher_speed("cts(cbc(aes))", DECRYPT, sec, NULL, 0,
--- 
-2.12.0.264.gd6db3f216544
+On 7/19/2017 7:32 PM, Oleksij Rempel wrote:=0A=
+> On Wed, Jul 19, 2017 at 12:49:47PM +0000, Horia Geant=E3 wrote:=0A=
+>> On 7/19/2017 10:45 AM, Oleksij Rempel wrote:=0A=
+>>> According documentation, it is NIST certified TRNG.=0A=
+>>> So, set high quality to let the HWRNG framework automatically use it.=
+=0A=
+>>>=0A=
+>>> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>=0A=
+>>> ---=0A=
+>>>  drivers/crypto/caam/caamrng.c | 6 ++++++=0A=
+>>>  1 file changed, 6 insertions(+)=0A=
+>>>=0A=
+>>> diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrn=
+g.c=0A=
+>>> index 41398da3edf4..684c0bc88dfd 100644=0A=
+>>> --- a/drivers/crypto/caam/caamrng.c=0A=
+>>> +++ b/drivers/crypto/caam/caamrng.c=0A=
+>>> @@ -292,10 +292,16 @@ static int caam_init_rng(struct caam_rng_ctx *ctx=
+, struct device *jrdev)=0A=
+>>>  	return 0;=0A=
+>>>  }=0A=
+>>>  =0A=
+>>> +/*=0A=
+>>> + * hwrng register struct=0A=
+>>> + * The trng is suppost to have 100% entropy, and thus=0A=
+>>> + * we register with a very high quality value.=0A=
+>>> + */=0A=
+>>>  static struct hwrng caam_rng =3D {=0A=
+>>>  	.name		=3D "rng-caam",=0A=
+>>>  	.cleanup	=3D caam_cleanup,=0A=
+>>>  	.read		=3D caam_read,=0A=
+>>> +	.quality	=3D 999,=0A=
+>>=0A=
+>> Why not 1024, i.e. where is 999 coming from?=0A=
+> =0A=
+> It comes from s390-trng.c driver.=0A=
+> Should I use 1024 instead?=0A=
+> =0A=
+AFAICT the range for quality is from 0 to 1024 (no entropy -> perfect=0A=
+entropy).=0A=
+=0A=
+1024 should be used since I'd expect a HW TRNG to provide perfect=0A=
+entropy unless otherwise stated.=0A=
+=0A=
+[Cc-ing Harald and Martin for awareness wrt. s390/trng.]=0A=
+=0A=
+Thanks,=0A=
+Horia=0A=
