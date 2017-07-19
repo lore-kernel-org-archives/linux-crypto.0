@@ -1,60 +1,104 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [RFC 06/22] kvm: Adapt assembly for PIE support
-Date: Wed, 19 Jul 2017 23:58:07 +0100
-Message-ID: <CAKv+Gu_0o+PrMAWRSP5Y4R7QO87+zAYf=B=VDF1icqJvWL0PoA@mail.gmail.com>
-References: <20170718223333.110371-1-thgarnie@google.com> <20170718223333.110371-7-thgarnie@google.com>
- <CAMzpN2gF7QxDbVG-6ad3Qarcn1N_JT5tit9CMvQL95LQGeZivA@mail.gmail.com>
- <CAJcbSZGqY=btU=+eWfgdhF0je0Yn_GxkymFHn+OV-1BuzgbRYw@mail.gmail.com> <0cdd02e1-8bf2-41cd-f085-c338c2fd8e25@zytor.com>
+From: "H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [RFC 07/22] x86: relocate_kernel - Adapt assembly for PIE support
+Date: Wed, 19 Jul 2017 15:58:41 -0700
+Message-ID: <73652a62-579d-a28a-dc89-0ff8795f0f00@zytor.com>
+References: <20170718223333.110371-1-thgarnie@google.com>
+ <20170718223333.110371-8-thgarnie@google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Thomas Garnier <thgarnie@google.com>, Brian Gerst <brgerst@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>,
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@redhat.com>,
-	Arnd Bergmann <arnd@arndb.de>, Matthias Kaehlcke <mka@chromium.org>,
-	Boris Ostrovsky <boris.ostrovsky@oracle.com>, Juergen Gross <jgross@suse.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-	Joerg Roedel <joro@8bytes.org>, Andy Lutomirski <luto@kernel.org>, Borislav Petkov <bp@alien8.de>,
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Borislav Petkov <bp@suse.de>,
-	Christian Borntraeger <borntraeger@de.ibm.com>, "Rafael J . Wysocki" <rjw@rjwysocki.net>,
-	Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.c
-To: "H. Peter Anvin" <hpa@zytor.com>
-Return-path: <kernel-hardening-return-9072-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: x86@kernel.org, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
+        linux-pm@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-sparse@vger.kernel.org, kernel-hardening@lists.openwall.com
+To: Thomas Garnier <thgarnie@google.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
+        Matthias Kaehlcke <mka@chromium.org>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Juergen Gross
+ <jgross@suse.com>, Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>, Andy Lutomirski <luto@kernel.org>,
+        Borislav Petkov <bp@alien8.de>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Brian Gerst <brgerst@gmail.com>, Borislav Petkov <bp@suse.de>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+Return-path: <kernel-hardening-return-9075-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
 List-Post: <mailto:kernel-hardening@lists.openwall.com>
 List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
 List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
 List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
-In-Reply-To: <0cdd02e1-8bf2-41cd-f085-c338c2fd8e25@zytor.com>
+In-Reply-To: <20170718223333.110371-8-thgarnie@google.com>
+Content-Language: en-US
 List-Id: linux-crypto.vger.kernel.org
 
-On 19 July 2017 at 23:27, H. Peter Anvin <hpa@zytor.com> wrote:
-> On 07/19/17 08:40, Thomas Garnier wrote:
->>>
->>> This doesn't look right.  It's accessing a per-cpu variable.  The
->>> per-cpu section is an absolute, zero-based section and not subject to
->>> relocation.
->>
->> PIE does not respect the zero-based section, it tries to have
->> everything relative. Patch 16/22 also adapt per-cpu to work with PIE
->> (while keeping the zero absolute design by default).
->>
->
-> This is silly.  The right thing is for PIE is to be explicitly absolute,
-> without (%rip).  The use of (%rip) memory references for percpu is just
-> an optimization.
->
+On 07/18/17 15:33, Thomas Garnier wrote:
+> Change the assembly code to use only relative references of symbols for the
+> kernel to be PIE compatible.
+> 
+> Position Independent Executable (PIE) support will allow to extended the
+> KASLR randomization range below the -2G memory limit.
+> 
+> Signed-off-by: Thomas Garnier <thgarnie@google.com>
+> ---
+>  arch/x86/kernel/relocate_kernel_64.S | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kernel/relocate_kernel_64.S b/arch/x86/kernel/relocate_kernel_64.S
+> index 98111b38ebfd..da817d1628ac 100644
+> --- a/arch/x86/kernel/relocate_kernel_64.S
+> +++ b/arch/x86/kernel/relocate_kernel_64.S
+> @@ -186,7 +186,7 @@ identity_mapped:
+>  	movq	%rax, %cr3
+>  	lea	PAGE_SIZE(%r8), %rsp
+>  	call	swap_pages
+> -	movq	$virtual_mapped, %rax
+> +	leaq	virtual_mapped(%rip), %rax
+>  	pushq	%rax
+>  	ret
+>  
 
-Sadly, there is an issue in binutils that may prevent us from doing
-this as cleanly as we would want.
+This is completely wrong.  The whole point is that %rip here is on an
+identity-mapped page, which means that its offset to the actual symbol
+is ill-defined.
 
-For historical reasons, bfd.ld emits special symbols like
-__GLOBAL_OFFSET_TABLE__ as absolute symbols with a section index of
-SHN_ABS, even though it is quite obvious that they are relative like
-any other symbol that points into the image. Unfortunately, this means
-that binutils needs to emit R_X86_64_RELATIVE relocations even for
-SHN_ABS symbols, which means we lose the ability to use both absolute
-and relocatable symbols in the same PIE image (unless the reloc tool
-can filter them out)
+The use of pushq/ret to do an indirect jump is bizarre, though, instead of:
 
-More info here:
-https://sourceware.org/bugzilla/show_bug.cgi?id=19818
+	pushq %r8
+	ret
+
+one ought to simply do
+
+	jmpq *%r8
+
+I think the author of this code was confused by the fact that we have to
+use this construct to do a *far* jump.
+
+There are some other very bizarre constructs in this file, that I can
+only assume comes from clumsy porting from 32 bits, for example:
+
+	call 1f
+1:
+	popq %r8
+	subq $(1b - relocate_kernel), %r8
+
+... instead of the much simpler ...
+
+	leaq relocate_kernel(%rip), %r8
+
+With this value in %r8 anyway, you can simply do:
+
+	leaq (virtual_mapped - relocate_kernel)(%r8), %rax
+	jmpq *%rax
+
+This patchset scares me.  There seems to be a lot of places where you
+have not been very aware of what is actually happening in the code, nor
+have done research about how the ABIs actually work and affect things.
+
+Sorry.
+
+	-hpa
