@@ -1,55 +1,65 @@
-From: Colin King <colin.king@canonical.com>
-Subject: [PATCH] Crypto: atmel-ecc: Make a couple of local functions static
-Date: Wed, 19 Jul 2017 10:24:15 +0100
-Message-ID: <20170719092415.9553-1-colin.king@canonical.com>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: Re: AES-XTS key size
+Date: Wed, 19 Jul 2017 11:26:52 +0200
+Message-ID: <1787722.TLPNYLEBHS@tauon.chronox.de>
+References: <VI1PR0401MB2591C3B11125DDEF82F266E398A60@VI1PR0401MB2591.eurprd04.prod.outlook.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Tudor Ambarus <tudor.ambarus@microchip.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>
+To: Horia =?utf-8?B?R2VhbnTEgw==?= <horia.geanta@nxp.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:60728 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753725AbdGSJ0y (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 19 Jul 2017 05:26:54 -0400
+In-Reply-To: <VI1PR0401MB2591C3B11125DDEF82F266E398A60@VI1PR0401MB2591.eurprd04.prod.outlook.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Colin Ian King <colin.king@canonical.com>
+Am Mittwoch, 19. Juli 2017, 10:20:07 CEST schrieb Horia Geantă:
 
-Functions atmel_ecc_i2c_client_alloc and atmel_ecc_i2c_client_free are
-local to the source and no not need to be in the global scope. Make
-them static.
+Hi Horia,
 
-Cleans up sparse warnings:
-symbol 'atmel_ecc_i2c_client_alloc' was not declared. Should it be static?
-symbol 'atmel_ecc_i2c_client_free' was not declared. Should it be static?
+> Hi,
+> 
+> AFAICS, IEEE 1619-2007 standard mentions only XTS-AES-128 and
+> XTS-AES-256, meaning that the keys should be either 256 or 512 bits.
+> 
+> Further, NIST SP800-38E mentions that an implementation may restrict
+> support to only one of XTS-AES-{128,256}, but does not explicitly allow
+> other cipher suites.
+> 
+> I don't see this enforcement in crypto/xts.c (XTS SW implementation),
+> though I noticed that XTS mode is used for other ciphers besides AES.
+> 
+> More, tcrypt has xts(aes) speed tests checking also for XTS-AES-192.
+> For HW crypto engines adhering strictly to IEEE P1619-2007 this is a
+> problem:
+> [...]
+> tcrypt: test 5 (384 bit key, 16 byte blocks):
+> caam_jr 8020000.jr: key size mismatch
+> tcrypt: setkey() failed flags=200000
+> [...]
+> 
+> Is the kernel more permissive than the standard?
 
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
----
- drivers/crypto/atmel-ecc.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+The standard(s) only define XTS for AES 128/256. It does not (according to my 
+knowledge) prohibit the use of other key sizes (or even other ciphers, such as 
+xts(serpent)).
 
-diff --git a/drivers/crypto/atmel-ecc.c b/drivers/crypto/atmel-ecc.c
-index 66ab1021eba5..c6e8de2b28dd 100644
---- a/drivers/crypto/atmel-ecc.c
-+++ b/drivers/crypto/atmel-ecc.c
-@@ -492,7 +492,7 @@ static int atmel_ecdh_compute_shared_secret(struct kpp_request *req)
- 	return ret;
- }
- 
--struct i2c_client *atmel_ecc_i2c_client_alloc(void)
-+static struct i2c_client *atmel_ecc_i2c_client_alloc(void)
- {
- 	struct atmel_ecc_i2c_client_priv *i2c_priv, *min_i2c_priv = NULL;
- 	struct i2c_client *client = ERR_PTR(-ENODEV);
-@@ -527,7 +527,7 @@ struct i2c_client *atmel_ecc_i2c_client_alloc(void)
- 	return client;
- }
- 
--void atmel_ecc_i2c_client_free(struct i2c_client *client)
-+static void atmel_ecc_i2c_client_free(struct i2c_client *client)
- {
- 	struct atmel_ecc_i2c_client_priv *i2c_priv = i2c_get_clientdata(client);
- 
--- 
-2.11.0
+Thus, I would say that the kernel implements the standard and allows a more 
+flexible use than the standard specifies.
+
+Unfortunately, the kernel crypto API only allows a min and max keysize 
+specification in the cipher definition structure.
+
+Once solution could be to introduce another flag. When that flag is set, 
+xts_check_key() could deny any key other than 256 or 512 bits. But maybe that 
+solution is more of a hack than a real solution.
+
+Or tcrypt could be changed to not use XTS with 192/384 bit keys.
+
+Ciao
+Stephan
