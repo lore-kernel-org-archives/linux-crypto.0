@@ -1,53 +1,72 @@
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: [RFC PATCH v12 3/4] Linux Random Number Generator
-Date: Wed, 19 Jul 2017 08:34:47 +0200
-Message-ID: <20170719063447.GA13740@kroah.com>
-References: <3910055.ntkqcq1Chb@positron.chronox.de>
- <1780567.qGdv4EjEMp@positron.chronox.de>
- <20170718210816.o6c4iziaqj5dnnd3@thunk.org>
- <4766174.b2XBWsRgGl@positron.chronox.de>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH V6 5/7] crypto: AES CBC multi-buffer glue code
+Date: Wed, 19 Jul 2017 15:02:17 +0800
+Message-ID: <20170719070217.GA9374@gondor.apana.org.au>
+References: <1498609575-6217-1-git-send-email-megha.dey@linux.intel.com>
+ <1498609575-6217-6-git-send-email-megha.dey@linux.intel.com>
+ <20170718054142.GA4764@gondor.apana.org.au>
+ <da15ba80-a3b1-0d79-47ea-5528c0d12b20@linux.intel.com>
+ <1500427139.32379.0.camel@megha-Z97X-UD7-TH>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Cc: Theodore Ts'o <tytso@mit.edu>,
-        "Jason A. Donenfeld" <jason@zx2c4.com>,
-        Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Tim Chen <tim.c.chen@linux.intel.com>, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Megha Dey <megha.dey@intel.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:48474 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753103AbdGSHC6 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 19 Jul 2017 03:02:58 -0400
 Content-Disposition: inline
-In-Reply-To: <4766174.b2XBWsRgGl@positron.chronox.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1500427139.32379.0.camel@megha-Z97X-UD7-TH>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jul 19, 2017 at 08:22:18AM +0200, Stephan Müller wrote:
-> Am Dienstag, 18. Juli 2017, 23:08:16 CEST schrieb Theodore Ts'o:
+On Tue, Jul 18, 2017 at 06:18:59PM -0700, Megha Dey wrote:
+>
+> > >> +/*
+> > >> + * CRYPTO_ALG_ASYNC flag is passed to indicate we have an ablk
+> > >> + * scatter-gather walk.
+> > >> + */
+> > >> +static struct skcipher_alg aes_cbc_mb_alg = {
+> > >> +	.base = {
+> > >> +		.cra_name		= "cbc(aes)",
+> > >> +		.cra_driver_name	= "cbc-aes-aesni-mb",
+> > >> +		.cra_priority		= 500,
+> > >> +		.cra_flags		= CRYPTO_ALG_INTERNAL,
+> > >> +		.cra_blocksize		= AES_BLOCK_SIZE,
+> > >> +		.cra_ctxsize		= CRYPTO_AES_CTX_SIZE,
+> > >> +		.cra_module		= THIS_MODULE,
+> > >> +	},
+> > >> +	.min_keysize	= AES_MIN_KEY_SIZE,
+> > >> +	.max_keysize	= AES_MAX_KEY_SIZE,
+> > >> +	.ivsize		= AES_BLOCK_SIZE,
+> > >> +	.setkey		= aes_set_key,
+> > >> +	.encrypt	= mb_aes_cbc_encrypt,
+> > >> +	.decrypt	= mb_aes_cbc_decrypt
+> > >> +};
+> > > 
+> > > So this claims to be a sync algorithm.  Is this really the case?
 > 
-> Hi Theodore,
-> > 
-> > I've been trying to take the best features and suggestions from your
-> > proposal and integrating them into /dev/random already.  Things that
-> > I've chosen not take is basically because I disbelieve that the Jitter
-> > RNG is valid.  And that's mostly becuase I trust Peter Anvin (who has
-> > access to Intel chip architects, who has expressed unease) more than
-> > you.  (No hard feelings).
-> 
-> I am unsure why you always point to the Jitter RNG. This is one noise source 
-> to keep or to remove -- at least it provides more data during early boot than 
-> any other noise source we currently have.
-> 
-> In the email [1] I have expressed the core concerns I see -- none of them 
-> address the need to keep the Jitter RNG as one noise source. To address those, 
-> a very deep dive into random.c needs to be made.
-> 
-> Such deep dive has the potential to be disruptive. Therefore, doesn't it make 
-> more sense to have such conceptual changes rather covered in a separate 
-> implementation?
+> yes, the inner algorithm is sync whereas the outer algorithm is async.
 
-No, it makes more sense to send individual patches addressing your
-concerns to the existing random driver.  Again, that's how
-kernel development has always worked.
+Are you saying that once mb_aes_cbc_encrypt returns it will never
+touch the input/output again? This doesn't seem to agree with the
+actual code:
 
-thanks,
++       if (!ret_rctx) {
++               /* we submitted a job, but none completed */
++               /* just notify the caller */
++               notify_callback(rctx, cstate, -EINPROGRESS);
++               return 0;
++       }
 
-greg k-h
+Just because an algorithm is internal doesn't mean that it can
+arbitrarily violate the crypto API requirements.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
