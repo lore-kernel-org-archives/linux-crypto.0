@@ -1,12 +1,13 @@
 From: Brian Gerst <brgerst@gmail.com>
-Subject: Re: [RFC 16/22] x86/percpu: Adapt percpu for PIE support
-Date: Tue, 18 Jul 2017 23:08:34 -0400
-Message-ID: <CAMzpN2g5YkFZTY7yfvG03QUKc-=asKMZbqke9g4e2oT_pgg7Yw@mail.gmail.com>
-References: <20170718223333.110371-1-thgarnie@google.com> <20170718223333.110371-17-thgarnie@google.com>
+Subject: Re: [RFC 21/22] x86/module: Add support for mcmodel large and PLTs
+Date: Tue, 18 Jul 2017 23:59:49 -0400
+Message-ID: <CAMzpN2j+Z27uudHXqqMhbk=s=pnk7LdA2FPkgmsdZzO3ysemsQ@mail.gmail.com>
+References: <20170718223333.110371-1-thgarnie@google.com> <20170718223333.110371-22-thgarnie@google.com>
+ <c0bc2d98-d6eb-e3db-3799-2e28e9919f3d@zytor.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>,
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>,
+Cc: Thomas Garnier <thgarnie@google.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
 	Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@redhat.com>,
 	Arnd Bergmann <arnd@arndb.de>, Matthias Kaehlcke <mka@chromium.org>,
 	Boris Ostrovsky <boris.ostrovsky@oracle.com>, Juergen Gross <jgross@suse.com>,
@@ -15,33 +16,35 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemlof
 	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Borislav Petkov <bp@suse.de>,
 	Christian Borntraeger <borntraeger@de.ibm.com>, "Rafael J . Wysocki" <rjw@rjwysocki.net>,
 	Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>, Tejun Heo <tj@kernel.org>,
-	Chris
-To: Thomas Garnier <thgarnie@google.com>
-Return-path: <kernel-hardening-return-9027-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
+	Ch
+To: "H. Peter Anvin" <hpa@zytor.com>
+Return-path: <kernel-hardening-return-9028-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
 List-Post: <mailto:kernel-hardening@lists.openwall.com>
 List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
 List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
 List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
-In-Reply-To: <20170718223333.110371-17-thgarnie@google.com>
+In-Reply-To: <c0bc2d98-d6eb-e3db-3799-2e28e9919f3d@zytor.com>
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Jul 18, 2017 at 6:33 PM, Thomas Garnier <thgarnie@google.com> wrote:
-> Perpcu uses a clever design where the .percu ELF section has a virtual
-> address of zero and the relocation code avoid relocating specific
-> symbols. It makes the code simple and easily adaptable with or without
-> SMP support.
+On Tue, Jul 18, 2017 at 9:35 PM, H. Peter Anvin <hpa@zytor.com> wrote:
+> On 07/18/17 15:33, Thomas Garnier wrote:
+>> With PIE support and KASLR extended range, the modules may be further
+>> away from the kernel than before breaking mcmodel=kernel expectations.
+>>
+>> Add an option to build modules with mcmodel=large. The modules generated
+>> code will make no assumptions on placement in memory.
+>>
+>> Despite this option, modules still expect kernel functions to be within
+>> 2G and generate relative calls. To solve this issue, the PLT arm64 code
+>> was adapted for x86_64. When a relative relocation go outside its range,
+>> a dynamic PLT entry is used to correctly jump to the destination.
 >
-> This design is incompatible with PIE because generated code always try to
-> access the zero virtual address relative to the default mapping address.
-> It becomes impossible when KASLR is configured to go below -2G. This
-> patch solves this problem by removing the zero mapping and adapting the GS
-> base to be relative to the expected address. These changes are done only
-> when PIE is enabled. The original implementation is kept as-is
-> by default.
+> Why large as opposed to medium or medium-PIC?
 
-The reason the per-cpu section is zero-based on x86-64 is to
-workaround GCC hardcoding the stack protector canary at %gs:40.  So
-this patch is incompatible with CONFIG_STACK_PROTECTOR.
+Or for that matter, why not small-PIC?  We aren't changing the size of
+the kernel to be larger than 2G text or data.  Small-PIC would still
+allow it to be placed anywhere in the address space, and would
+generate far better code.
 
 --
 Brian Gerst
