@@ -1,46 +1,49 @@
-From: Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: [PATCH v4 1/5] powerpc: io.h: move iomap.h include so that it can use readq/writeq defs
-Date: Wed, 19 Jul 2017 15:57:11 +1000
-Message-ID: <87iniphsug.fsf@concordia.ellerman.id.au>
-References: <20170718165528.7383-1-logang@deltatee.com> <20170718165528.7383-2-logang@deltatee.com>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: Re: [RFC PATCH v12 3/4] Linux Random Number Generator
+Date: Wed, 19 Jul 2017 08:22:18 +0200
+Message-ID: <4766174.b2XBWsRgGl@positron.chronox.de>
+References: <3910055.ntkqcq1Chb@positron.chronox.de> <1780567.qGdv4EjEMp@positron.chronox.de> <20170718210816.o6c4iziaqj5dnnd3@thunk.org>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-        Stephen Bates <sbates@raithlin.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Suresh Warrier <warrier@linux.vnet.ibm.com>,
-        Oliver O'Halloran <oohall@gmail.com>
-To: Logan Gunthorpe <logang@deltatee.com>,
-        linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org
-Return-path: <linux-arch-owner@vger.kernel.org>
-In-Reply-To: <20170718165528.7383-2-logang@deltatee.com>
-Sender: linux-arch-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Jason A. Donenfeld" <jason@zx2c4.com>,
+        Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Theodore Ts'o <tytso@mit.edu>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:60698 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751376AbdGSGWV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 19 Jul 2017 02:22:21 -0400
+In-Reply-To: <20170718210816.o6c4iziaqj5dnnd3@thunk.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Logan Gunthorpe <logang@deltatee.com> writes:
+Am Dienstag, 18. Juli 2017, 23:08:16 CEST schrieb Theodore Ts'o:
 
-> Subsequent patches in this series makes use of the readq and writeq
-> defines in iomap.h. However, as is, they get missed on the powerpc
-> platform seeing the include comes before the define. This patch
-> moves the include down to fix this.
->
-> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-> Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-> Cc: Paul Mackerras <paulus@samba.org>
-> Cc: Michael Ellerman <mpe@ellerman.id.au>
-> Cc: Nicholas Piggin <npiggin@gmail.com>
-> Cc: Suresh Warrier <warrier@linux.vnet.ibm.com>
-> Cc: "Oliver O'Halloran" <oohall@gmail.com>
-> ---
->  arch/powerpc/include/asm/io.h | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+Hi Theodore,
+> 
+> I've been trying to take the best features and suggestions from your
+> proposal and integrating them into /dev/random already.  Things that
+> I've chosen not take is basically because I disbelieve that the Jitter
+> RNG is valid.  And that's mostly becuase I trust Peter Anvin (who has
+> access to Intel chip architects, who has expressed unease) more than
+> you.  (No hard feelings).
 
-Seems fair enough, have you tested it at all?
+I am unsure why you always point to the Jitter RNG. This is one noise source 
+to keep or to remove -- at least it provides more data during early boot than 
+any other noise source we currently have.
 
-cheers
+In the email [1] I have expressed the core concerns I see -- none of them 
+address the need to keep the Jitter RNG as one noise source. To address those, 
+a very deep dive into random.c needs to be made.
+
+Such deep dive has the potential to be disruptive. Therefore, doesn't it make 
+more sense to have such conceptual changes rather covered in a separate 
+implementation?
+
+[1] https://www.spinics.net/lists/linux-crypto/msg26316.html
+
+Ciao
+Stephan
