@@ -1,69 +1,46 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH V6 5/7] crypto: AES CBC multi-buffer glue code
-Date: Wed, 19 Jul 2017 15:02:17 +0800
-Message-ID: <20170719070217.GA9374@gondor.apana.org.au>
-References: <1498609575-6217-1-git-send-email-megha.dey@linux.intel.com>
- <1498609575-6217-6-git-send-email-megha.dey@linux.intel.com>
- <20170718054142.GA4764@gondor.apana.org.au>
- <da15ba80-a3b1-0d79-47ea-5528c0d12b20@linux.intel.com>
- <1500427139.32379.0.camel@megha-Z97X-UD7-TH>
+Subject: Re: [v3 RFC PATCH 1/2] crypto: ecdh: fix concurrency on ecdh_ctx
+Date: Wed, 19 Jul 2017 15:04:21 +0800
+Message-ID: <20170719070421.GA9426@gondor.apana.org.au>
+References: <1498658916-11044-1-git-send-email-tudor.ambarus@microchip.com>
+ <1498658916-11044-2-git-send-email-tudor.ambarus@microchip.com>
+ <20170718055015.GB4764@gondor.apana.org.au>
+ <60b15bac-d295-36f4-c55f-a3ff3f8267fd@microchip.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Tim Chen <tim.c.chen@linux.intel.com>, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Megha Dey <megha.dey@intel.com>
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+        nicolas.ferre@microchip.com
+To: Tudor Ambarus <tudor.ambarus@microchip.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:48474 "EHLO
+Received: from orcrist.hmeau.com ([104.223.48.154]:48498 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753103AbdGSHC6 (ORCPT
+        with ESMTP id S1751754AbdGSHEt (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 19 Jul 2017 03:02:58 -0400
+        Wed, 19 Jul 2017 03:04:49 -0400
 Content-Disposition: inline
-In-Reply-To: <1500427139.32379.0.camel@megha-Z97X-UD7-TH>
+In-Reply-To: <60b15bac-d295-36f4-c55f-a3ff3f8267fd@microchip.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jul 18, 2017 at 06:18:59PM -0700, Megha Dey wrote:
+On Tue, Jul 18, 2017 at 03:52:19PM +0300, Tudor Ambarus wrote:
 >
-> > >> +/*
-> > >> + * CRYPTO_ALG_ASYNC flag is passed to indicate we have an ablk
-> > >> + * scatter-gather walk.
-> > >> + */
-> > >> +static struct skcipher_alg aes_cbc_mb_alg = {
-> > >> +	.base = {
-> > >> +		.cra_name		= "cbc(aes)",
-> > >> +		.cra_driver_name	= "cbc-aes-aesni-mb",
-> > >> +		.cra_priority		= 500,
-> > >> +		.cra_flags		= CRYPTO_ALG_INTERNAL,
-> > >> +		.cra_blocksize		= AES_BLOCK_SIZE,
-> > >> +		.cra_ctxsize		= CRYPTO_AES_CTX_SIZE,
-> > >> +		.cra_module		= THIS_MODULE,
-> > >> +	},
-> > >> +	.min_keysize	= AES_MIN_KEY_SIZE,
-> > >> +	.max_keysize	= AES_MAX_KEY_SIZE,
-> > >> +	.ivsize		= AES_BLOCK_SIZE,
-> > >> +	.setkey		= aes_set_key,
-> > >> +	.encrypt	= mb_aes_cbc_encrypt,
-> > >> +	.decrypt	= mb_aes_cbc_decrypt
-> > >> +};
-> > > 
-> > > So this claims to be a sync algorithm.  Is this really the case?
-> 
-> yes, the inner algorithm is sync whereas the outer algorithm is async.
+> I'm replacing a per-tfm shared secret with a per-request dynamically
+> allocated shared secret. The same for the public key, I'm replacing
+> a per-tfm public key with a per-request dynamically allocated public
+> key. No shared memory, no concurrency.
 
-Are you saying that once mb_aes_cbc_encrypt returns it will never
-touch the input/output again? This doesn't seem to agree with the
-actual code:
+For the pre-request bits that's fine.  But in setkey you're still
+allocating a per-tfm data structure instead of just putting things
+into the tfm context.  This is totally pointless.
 
-+       if (!ret_rctx) {
-+               /* we submitted a job, but none completed */
-+               /* just notify the caller */
-+               notify_callback(rctx, cstate, -EINPROGRESS);
-+               return 0;
-+       }
+> For the private key I wanted to be sure that we don't interleave data
+> from multiple setkey calls. As of now, the setkey calls can fight to
+> memcopy to the same zone of memory. I'm making sure that the private key
+> is valid and not a mash of multiple private keys.
 
-Just because an algorithm is internal doesn't mean that it can
-arbitrarily violate the crypto API requirements.
+As I said, if the caller is making simultaneous setkey calls then
+it's broken.  You can never fix that in your driver, so don't even
+try.
 
 Cheers,
 -- 
