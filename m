@@ -1,105 +1,53 @@
-From: Theodore Ts'o <tytso@mit.edu>
-Subject: Re: [RFC PATCH v12 3/4] Linux Random Number Generator
-Date: Tue, 18 Jul 2017 21:51:33 -0400
-Message-ID: <20170719015133.aijabk36g7m6daek@thunk.org>
-References: <3910055.ntkqcq1Chb@positron.chronox.de>
- <150039607.torZXMN7kc@positron.chronox.de>
- <20170718085212.GB25267@kroah.com>
- <1780567.qGdv4EjEMp@positron.chronox.de>
- <20170718210816.o6c4iziaqj5dnnd3@thunk.org>
- <CACXcFmmFGYb-JteJZB8gS+uGJZ4zNLMU=AwPQf0td+xiG0+9Qw@mail.gmail.com>
+From: "H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [RFC 21/22] x86/module: Add support for mcmodel large and PLTs
+Date: Tue, 18 Jul 2017 18:35:05 -0700
+Message-ID: <c0bc2d98-d6eb-e3db-3799-2e28e9919f3d@zytor.com>
+References: <20170718223333.110371-1-thgarnie@google.com>
+ <20170718223333.110371-22-thgarnie@google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Jason A. Donenfeld" <jason@zx2c4.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-To: Sandy Harris <sandyinchina@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CACXcFmmFGYb-JteJZB8gS+uGJZ4zNLMU=AwPQf0td+xiG0+9Qw@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: x86@kernel.org, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
+        linux-pm@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-sparse@vger.kernel.org, kernel-hardening@lists.openwall.com
+To: Thomas Garnier <thgarnie@google.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
+        Matthias Kaehlcke <mka@chromium.org>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Juergen Gross
+ <jgross@suse.com>, Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>, Andy Lutomirski <luto@kernel.org>,
+        Borislav Petkov <bp@alien8.de>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Brian Gerst <brgerst@gmail.com>, Borislav Petkov <bp@suse.de>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+Return-path: <kernel-hardening-return-9025-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
+List-Post: <mailto:kernel-hardening@lists.openwall.com>
+List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
+List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
+List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
+In-Reply-To: <20170718223333.110371-22-thgarnie@google.com>
+Content-Language: en-US
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Jul 18, 2017 at 09:00:10PM -0400, Sandy Harris wrote:
-> The only really good solution I know of is to find a way to provide a
-> chunk of randomness early in the boot process. John Denker has a good
-> discussion of doing this by modifying the kernel image & Ted talks of
-> doing it via the boot loader. Neither looks remarkably easy. Other
-> approaches like making the kernel read a seed file or passing a
-> parameter on the kernel command line have been suggested but, if I
-> recall right, rejected.
-
-It's actually not that _hard_ to modify the boot loader.  It's not
-finicky work like, say, adding support for metadata checksums or xattr
-deduplication to ext4.  It's actually mostly plumbing.  It's just that
-we haven't found a lot of people willing to do it as paid work, and
-the hobbyists haven't been interested.
-
-> As I see it, the questions about Jitter, or any other in-kernel
-> generator based on timing, are whether it is good enough to be useful
-> until we have one of the above solutions or useful as a
-> defense-in-depth trick after we have one. I'd say yes to both.
+On 07/18/17 15:33, Thomas Garnier wrote:
+> With PIE support and KASLR extended range, the modules may be further
+> away from the kernel than before breaking mcmodel=kernel expectations.
 > 
-> There's been a lot of analysis. Stephan has a detailed rationale & a
-> lot of test data in his papers & the Havege papers also discuss
-> getting entropy from timer operations. I'd say the best paper is
-> McGuire et al:
-> https://static.lwn.net/images/conf/rtlws11/random-hardware.pdf
+> Add an option to build modules with mcmodel=large. The modules generated
+> code will make no assumptions on placement in memory.
+> 
+> Despite this option, modules still expect kernel functions to be within
+> 2G and generate relative calls. To solve this issue, the PLT arm64 code
+> was adapted for x86_64. When a relative relocation go outside its range,
+> a dynamic PLT entry is used to correctly jump to the destination.
 
-So here's the problem that I have with most of these analyses.  Most
-of them are done using the x86 as the CPU.  This is true of the
-McGuire, Okech, and Schiesser paper you've cited above.  But things
-are largely irrelevant on the x86, because we have RDRAND.  And while
-I like to mix in environmental noise before generating personal
-long-term public keys.  I'm actually mostly OK with relying on RDRAND
-for initializing the seeds for hash table to protect against network
-denial of service attacks.  (Which is currently the first user of the
-not-yet-initialized CRNG on my laptop during kernel boot.)
+Why large as opposed to medium or medium-PIC?
 
-The real problem is with the non-x86 systems that don't have a
-hardware RNG, and there depending timing events which don't depend on
-external devices is much more dodgy.  Remember that on most embedded
-devices there is only a single oscillator driving the entire system.
-It's not like you even have multiple crystal oscillators beating
-against one another.
-
-So if you are only depending on CPU timing loops, you basically have a
-very complex state machine, driven by a single oscillator, and you're
-trying to kid yourself that you're getting entropy out the other end.
-How is that any different from using AES in counter mode and claiming
-because you don't know the seed, that it's "true randomness"?  It
-certainly passes all of the statistical tests!
-
-Hence, we have to rely on external events outside of the CPU and so we
-need to depend on interrupt timing --- and that's what we do in
-drivers/char/random.c already!  You can debate whether we are being
-too conservative with when we judge that we've collective enough
-unpredictability to count it as a "bit" of randomness.  So it's
-trivially easy to turn the knob and make sure the CRNG gets
-initialized more quickly using fewer interrupt timings, and boom!
-Problem solved.
-
-Simply turning the knob to make our entropy estimator more lax makes
-people uncomfortable, and since they don't have access to the internal
-microarchitecture of the CPU, they take comfort in the fact that it's
-really, really complicated, and so something like the Jitter RNG
-*must* be a more secure way to do things.  But that's really an illusion.
-
-If the real unpredictability is really coming from the interrupts
-changing the state of the CPU microarchitecture, the real question is
-how many interrupts do you need before you consider things
-"unpredictable" to an adequate level of security?  Arguing that we
-should turn down the "interrupts per bit of entropy" in
-drivers/char/random.c is a much more honest way of having that
-discussion.
-
-					- Ted
-
-P.S.  In the McGuire paper you cited, it assumes that the system is
-fully booted and there are multiple processes running which are
-influencing the kernel scheduler.  This makes the paper **not** an
-applicable at all.  So if you think that is the most compelling
-analysis, I'm definitely not impressed....
+	-hpa
