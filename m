@@ -1,11 +1,11 @@
 From: "H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [RFC 20/22] x86/relocs: Add option to generate 64-bit relocations
-Date: Wed, 19 Jul 2017 16:08:27 -0700
-Message-ID: <89b77a4a-ef77-f746-1ae5-79bfc0d12ab0@zytor.com>
+Subject: Re: [RFC 16/22] x86/percpu: Adapt percpu for PIE support
+Date: Wed, 19 Jul 2017 16:33:17 -0700
+Message-ID: <25a2974a-fbb4-ea4b-d090-582d6d0de7fd@zytor.com>
 References: <20170718223333.110371-1-thgarnie@google.com>
- <20170718223333.110371-21-thgarnie@google.com>
- <e499e745-e276-a4c9-2cd6-0977ca025448@zytor.com>
- <CAJcbSZE3fQ5vgUm4648kwExY_-p7a3d+QdNQ8K8tbhZVhOHFtA@mail.gmail.com>
+ <20170718223333.110371-17-thgarnie@google.com>
+ <CAMzpN2g5YkFZTY7yfvG03QUKc-=asKMZbqke9g4e2oT_pgg7Yw@mail.gmail.com>
+ <CAJcbSZFXrDZikh9P5M81ztkiMv7EhO4x0bzBdYE8RYC=HMZgqg@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
@@ -22,38 +22,75 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
         Joerg Roedel <joro@8bytes.org>, Andy Lutomirski <luto@kernel.org>,
         Borislav Petkov <bp@alien8.de>,
         "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Brian Gerst <brgerst@gmail.com>, Borislav Petkov <bp@suse.de>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Borislav Petkov <bp@suse.de>,
+        Christian Borntraeger
+ <borntraeger@de.ibm.com>,
         "Rafael J . Wysocki" <rjw@rjwysocki.net>,
-To: Thomas Garnier <thgarnie@google.com>
-Return-path: <kernel-hardening-return-9079-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
+        Len Brown <len.brown@intel.
+To: Thomas Garnier <thgarnie@google.com>, Brian Gerst <brgerst@gmail.com>
+Return-path: <kernel-hardening-return-9081-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
 List-Post: <mailto:kernel-hardening@lists.openwall.com>
 List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
 List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
 List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
-In-Reply-To: <CAJcbSZE3fQ5vgUm4648kwExY_-p7a3d+QdNQ8K8tbhZVhOHFtA@mail.gmail.com>
+In-Reply-To: <CAJcbSZFXrDZikh9P5M81ztkiMv7EhO4x0bzBdYE8RYC=HMZgqg@mail.gmail.com>
 Content-Language: en-US
 List-Id: linux-crypto.vger.kernel.org
 
-On 07/19/17 15:47, Thomas Garnier wrote:
-> On Wed, Jul 19, 2017 at 3:33 PM, H. Peter Anvin <hpa@zytor.com> wrote:
->> On 07/18/17 15:33, Thomas Garnier wrote:
->>> The x86 relocation tool generates a list of 32-bit signed integers. There
->>> was no need to use 64-bit integers because all addresses where above the 2G
->>> top of the memory.
+On 07/19/17 11:26, Thomas Garnier wrote:
+> On Tue, Jul 18, 2017 at 8:08 PM, Brian Gerst <brgerst@gmail.com> wrote:
+>> On Tue, Jul 18, 2017 at 6:33 PM, Thomas Garnier <thgarnie@google.com> wrote:
+>>> Perpcu uses a clever design where the .percu ELF section has a virtual
+>>> address of zero and the relocation code avoid relocating specific
+>>> symbols. It makes the code simple and easily adaptable with or without
+>>> SMP support.
 >>>
->>> This change add a large-reloc option to generate 64-bit unsigned integers.
->>> It can be used when the kernel plan to go below the top 2G and 32-bit
->>> integers are not enough.
+>>> This design is incompatible with PIE because generated code always try to
+>>> access the zero virtual address relative to the default mapping address.
+>>> It becomes impossible when KASLR is configured to go below -2G. This
+>>> patch solves this problem by removing the zero mapping and adapting the GS
+>>> base to be relative to the expected address. These changes are done only
+>>> when PIE is enabled. The original implementation is kept as-is
+>>> by default.
 >>
->> Why on Earth?  This would only be necessary if the *kernel itself* was
->> more than 2G, which isn't going to happen for the forseeable future.
+>> The reason the per-cpu section is zero-based on x86-64 is to
+>> workaround GCC hardcoding the stack protector canary at %gs:40.  So
+>> this patch is incompatible with CONFIG_STACK_PROTECTOR.
 > 
-> Because the relocation integer is an absolute address, not an offset
-> in the binary. Next iteration, I can try using a 32-bit offset for
-> everyone.
+> Ok, that make sense. I don't want this feature to not work with
+> CONFIG_CC_STACKPROTECTOR*. One way to fix that would be adding a GDT
+> entry for gs so gs:40 points to the correct memory address and
+> gs:[rip+XX] works correctly through the MSR.
 
-It is an absolute address *as the kernel was originally linked*, for
-obvious reasons.
+What are you talking about?  A GDT entry and the MSR do the same thing,
+except that a GDT entry is limited to an offset of 0-0xffffffff (which
+doesn't work for us, obviously.)
+
+> Given the separate
+> discussion on mcmodel, I am going first to check if we can move from
+> PIE to PIC with a mcmodel=small or medium that would remove the percpu
+> change requirement. I tried before without success but I understand
+> better percpu and other components so maybe I can make it work.
+
+>> This is silly.  The right thing is for PIE is to be explicitly absolute,
+>> without (%rip).  The use of (%rip) memory references for percpu is just
+>> an optimization.
+> 
+> I agree that it is odd but that's how the compiler generates code. I
+> will re-explore PIC options with mcmodel=small or medium, as mentioned
+> on other threads.
+
+Why should the way compiler generates code affect the way we do things
+in assembly?
+
+That being said, the compiler now has support for generating this kind
+of code explicitly via the __seg_gs pointer modifier.  That should let
+us drop the __percpu_prefix and just use variables directly.  I suspect
+we want to declare percpu variables as "volatile __seg_gs" to account
+for the possibility of CPU switches.
+
+Older compilers won't be able to work with this, of course, but I think
+that it is acceptable for those older compilers to not be able to
+support PIE.
 
 	-hpa
