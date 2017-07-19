@@ -1,61 +1,48 @@
-From: Brian Gerst <brgerst@gmail.com>
-Subject: Re: [RFC 21/22] x86/module: Add support for mcmodel large and PLTs
-Date: Wed, 19 Jul 2017 13:34:46 -0400
-Message-ID: <CAMzpN2jWTS8R5V6i5q=bq4NGW_svELw5bjgWTOX=Ow3ddWx-6Q@mail.gmail.com>
-References: <20170718223333.110371-1-thgarnie@google.com> <20170718223333.110371-22-thgarnie@google.com>
- <c0bc2d98-d6eb-e3db-3799-2e28e9919f3d@zytor.com> <CAMzpN2j+Z27uudHXqqMhbk=s=pnk7LdA2FPkgmsdZzO3ysemsQ@mail.gmail.com>
- <CAJcbSZFphkF8bcodkcwpK-oi3D7GTQXyTkOLPkmtWSPLPkvB0Q@mail.gmail.com>
+From: Eric Biggers <ebiggers3@gmail.com>
+Subject: Re: [PATCH 5/6] fscrypt: cache the HMAC transform for each master key
+Date: Wed, 19 Jul 2017 10:37:44 -0700
+Message-ID: <20170719173744.GB78811@gmail.com>
+References: <20170712210035.51534-1-ebiggers3@gmail.com>
+ <20170712210035.51534-6-ebiggers3@gmail.com>
+ <20170717174551.GA32282@google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: "H. Peter Anvin" <hpa@zytor.com>, Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@redhat.com>,
-	Arnd Bergmann <arnd@arndb.de>, Matthias Kaehlcke <mka@chromium.org>,
-	Boris Ostrovsky <boris.ostrovsky@oracle.com>, Juergen Gross <jgross@suse.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-	Joerg Roedel <joro@8bytes.org>, Andy Lutomirski <luto@kernel.org>, Borislav Petkov <bp@alien8.de>,
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Borislav Petkov <bp@suse.de>,
-	Christian Borntraeger <borntraeger@de.ibm.com>, "Rafael J . Wysocki" <rjw@rjwysocki.net>,
-	Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>, Tejun Heo <tj@kernel.org>,
-	Christ
-To: Thomas Garnier <thgarnie@google.com>
-Return-path: <kernel-hardening-return-9055-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
-List-Post: <mailto:kernel-hardening@lists.openwall.com>
-List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
-List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
-List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
-In-Reply-To: <CAJcbSZFphkF8bcodkcwpK-oi3D7GTQXyTkOLPkmtWSPLPkvB0Q@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-mtd@lists.infradead.org, linux-crypto@vger.kernel.org,
+        "Theodore Y . Ts'o" <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Alex Cope <alexcope@google.com>,
+        Eric Biggers <ebiggers@google.com>
+To: Michael Halcrow <mhalcrow@google.com>
+Return-path: <linux-ext4-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20170717174551.GA32282@google.com>
+Sender: linux-ext4-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Jul 19, 2017 at 11:58 AM, Thomas Garnier <thgarnie@google.com> wrote:
-> On Tue, Jul 18, 2017 at 8:59 PM, Brian Gerst <brgerst@gmail.com> wrote:
->> On Tue, Jul 18, 2017 at 9:35 PM, H. Peter Anvin <hpa@zytor.com> wrote:
->>> On 07/18/17 15:33, Thomas Garnier wrote:
->>>> With PIE support and KASLR extended range, the modules may be further
->>>> away from the kernel than before breaking mcmodel=kernel expectations.
->>>>
->>>> Add an option to build modules with mcmodel=large. The modules generated
->>>> code will make no assumptions on placement in memory.
->>>>
->>>> Despite this option, modules still expect kernel functions to be within
->>>> 2G and generate relative calls. To solve this issue, the PLT arm64 code
->>>> was adapted for x86_64. When a relative relocation go outside its range,
->>>> a dynamic PLT entry is used to correctly jump to the destination.
->>>
->>> Why large as opposed to medium or medium-PIC?
->>
->> Or for that matter, why not small-PIC?  We aren't changing the size of
->> the kernel to be larger than 2G text or data.  Small-PIC would still
->> allow it to be placed anywhere in the address space, and would
->> generate far better code.
->
-> My understanding was that small=PIC and medium=PIC assume that the
-> module code is in the lower 2G of memory. I will do additional testing
-> on the modules to confirm that.
+On Mon, Jul 17, 2017 at 10:45:51AM -0700, Michael Halcrow wrote:
+> > +/*
+> > + * Get the fscrypt_master_key identified by the specified v2+ encryption
+> > + * context, or create it if not found.
+> > + *
+> > + * Returns the fscrypt_master_key with a reference taken, or an ERR_PTR().
+> > + */
+> > +static struct fscrypt_master_key *
+> > +find_or_create_master_key(const struct inode *inode,
+> > +			  const struct fscrypt_context *ctx,
+> > +			  unsigned int min_keysize)
+> > +{
+> > +	struct fscrypt_master_key *master_key;
+> > +
+> > +	if (WARN_ON(ctx->version < FSCRYPT_CONTEXT_V2))
+> > +		return ERR_PTR(-EINVAL);
+> 
+> Isn't this a programming error?  If so, consider either BUG_ON() or
+> omit the check.
+> 
 
-That is only for small/medium absolute (non-PIC) code.  Think about
-userspace shared libraries.  They are not limited to being mapped in
-the lower 2G of the address space.
+Yes, but BUG_ON() is discouraged in cases where there is a straightforward way
+to recover from the error.  checkpatch actually warns about using it these days.
 
---
-Brian Gerst
+Eric
