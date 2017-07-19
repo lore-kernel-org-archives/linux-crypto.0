@@ -1,51 +1,44 @@
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-Subject: [PATCH v1] crypto: caam - set hwrng quality level
-Date: Wed, 19 Jul 2017 09:44:58 +0200
-Message-ID: <20170719074458.9247-1-o.rempel@pengutronix.de>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>
-To: kernel@pengutronix.de,
-        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-        Dan Douglass <dan.douglass@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+From: =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>
+Subject: AES-XTS key size
+Date: Wed, 19 Jul 2017 08:20:07 +0000
+Message-ID: <VI1PR0401MB2591C3B11125DDEF82F266E398A60@VI1PR0401MB2591.eurprd04.prod.outlook.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
+To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:52923 "EHLO
-        metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752190AbdGSHpX (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 19 Jul 2017 03:45:23 -0400
+Received: from mail-eopbgr00078.outbound.protection.outlook.com ([40.107.0.78]:9548
+        "EHLO EUR02-AM5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1753162AbdGSIUJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 19 Jul 2017 04:20:09 -0400
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-According documentation, it is NIST certified TRNG.
-So, set high quality to let the HWRNG framework automatically use it.
-
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
- drivers/crypto/caam/caamrng.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
-index 41398da3edf4..684c0bc88dfd 100644
---- a/drivers/crypto/caam/caamrng.c
-+++ b/drivers/crypto/caam/caamrng.c
-@@ -292,10 +292,16 @@ static int caam_init_rng(struct caam_rng_ctx *ctx, struct device *jrdev)
- 	return 0;
- }
- 
-+/*
-+ * hwrng register struct
-+ * The trng is suppost to have 100% entropy, and thus
-+ * we register with a very high quality value.
-+ */
- static struct hwrng caam_rng = {
- 	.name		= "rng-caam",
- 	.cleanup	= caam_cleanup,
- 	.read		= caam_read,
-+	.quality	= 999,
- };
- 
- static void __exit caam_rng_exit(void)
--- 
-2.11.0
+Hi,=0A=
+=0A=
+AFAICS, IEEE 1619-2007 standard mentions only XTS-AES-128 and=0A=
+XTS-AES-256, meaning that the keys should be either 256 or 512 bits.=0A=
+=0A=
+Further, NIST SP800-38E mentions that an implementation may restrict=0A=
+support to only one of XTS-AES-{128,256}, but does not explicitly allow=0A=
+other cipher suites.=0A=
+=0A=
+I don't see this enforcement in crypto/xts.c (XTS SW implementation),=0A=
+though I noticed that XTS mode is used for other ciphers besides AES.=0A=
+=0A=
+More, tcrypt has xts(aes) speed tests checking also for XTS-AES-192.=0A=
+For HW crypto engines adhering strictly to IEEE P1619-2007 this is a=0A=
+problem:=0A=
+[...]=0A=
+tcrypt: test 5 (384 bit key, 16 byte blocks):=0A=
+caam_jr 8020000.jr: key size mismatch=0A=
+tcrypt: setkey() failed flags=3D200000=0A=
+[...]=0A=
+=0A=
+Is the kernel more permissive than the standard?=0A=
+=0A=
+Thanks,=0A=
+Horia=0A=
