@@ -1,83 +1,66 @@
-From: Oleksij Rempel <ore@pengutronix.de>
-Subject: Re: [PATCH v1] crypto: caam - set hwrng quality level
-Date: Wed, 19 Jul 2017 20:13:03 +0200
-Message-ID: <20170719181303.rj4fyjj7qplatrzk@pengutronix.de>
-References: <20170719074458.9247-1-o.rempel@pengutronix.de>
- <VI1PR0401MB2591B52EB2EF7B7B900FBCC998A60@VI1PR0401MB2591.eurprd04.prod.outlook.com>
- <20170719163248.sn7mvnq2s3fm2hvh@pengutronix.de>
- <VI1PR0401MB25917848BA4AF6626E8DF1AD98A60@VI1PR0401MB2591.eurprd04.prod.outlook.com>
+From: Thomas Garnier <thgarnie@google.com>
+Subject: Re: [RFC 16/22] x86/percpu: Adapt percpu for PIE support
+Date: Wed, 19 Jul 2017 11:26:32 -0700
+Message-ID: <CAJcbSZFXrDZikh9P5M81ztkiMv7EhO4x0bzBdYE8RYC=HMZgqg@mail.gmail.com>
+References: <20170718223333.110371-1-thgarnie@google.com> <20170718223333.110371-17-thgarnie@google.com>
+ <CAMzpN2g5YkFZTY7yfvG03QUKc-=asKMZbqke9g4e2oT_pgg7Yw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Harald Freudenberger <freude@linux.vnet.ibm.com>,
-        Oleksij Rempel <o.rempel@pengutronix.de>,
-        Dan Douglass <dan.douglass@nxp.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "kernel@pengutronix.de" <kernel@pengutronix.de>,
-        Martin Schwidefsky <schwidefsky@de.ibm.com>,
-        "David S. Miller" <davem@davemloft.net>
-To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:50849 "EHLO
-        metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1754360AbdGSSNM (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 19 Jul 2017 14:13:12 -0400
-Content-Disposition: inline
-In-Reply-To: <VI1PR0401MB25917848BA4AF6626E8DF1AD98A60@VI1PR0401MB2591.eurprd04.prod.outlook.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>,
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>,
+	Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@redhat.com>,
+	Arnd Bergmann <arnd@arndb.de>, Matthias Kaehlcke <mka@chromium.org>,
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>, Juergen Gross <jgross@suse.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+	Joerg Roedel <joro@8bytes.org>, Andy Lutomirski <luto@kernel.org>, Borislav Petkov <bp@alien8.de>,
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Borislav Petkov <bp@suse.de>,
+	Christian Borntraeger <borntraeger@de.ibm.com>, "Rafael J . Wysocki" <rjw@rjwysocki.net>,
+	Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>, Tejun Heo <tj@kernel.org>,
+	Chris
+To: Brian Gerst <brgerst@gmail.com>
+Return-path: <kernel-hardening-return-9059-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
+List-Post: <mailto:kernel-hardening@lists.openwall.com>
+List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
+List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
+List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
+In-Reply-To: <CAMzpN2g5YkFZTY7yfvG03QUKc-=asKMZbqke9g4e2oT_pgg7Yw@mail.gmail.com>
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Jul 19, 2017 at 04:53:21PM +0000, Horia Geantă wrote:
-> On 7/19/2017 7:32 PM, Oleksij Rempel wrote:
-> > On Wed, Jul 19, 2017 at 12:49:47PM +0000, Horia Geantă wrote:
-> >> On 7/19/2017 10:45 AM, Oleksij Rempel wrote:
-> >>> According documentation, it is NIST certified TRNG.
-> >>> So, set high quality to let the HWRNG framework automatically use it.
-> >>>
-> >>> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> >>> ---
-> >>>  drivers/crypto/caam/caamrng.c | 6 ++++++
-> >>>  1 file changed, 6 insertions(+)
-> >>>
-> >>> diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
-> >>> index 41398da3edf4..684c0bc88dfd 100644
-> >>> --- a/drivers/crypto/caam/caamrng.c
-> >>> +++ b/drivers/crypto/caam/caamrng.c
-> >>> @@ -292,10 +292,16 @@ static int caam_init_rng(struct caam_rng_ctx *ctx, struct device *jrdev)
-> >>>  	return 0;
-> >>>  }
-> >>>  
-> >>> +/*
-> >>> + * hwrng register struct
-> >>> + * The trng is suppost to have 100% entropy, and thus
-> >>> + * we register with a very high quality value.
-> >>> + */
-> >>>  static struct hwrng caam_rng = {
-> >>>  	.name		= "rng-caam",
-> >>>  	.cleanup	= caam_cleanup,
-> >>>  	.read		= caam_read,
-> >>> +	.quality	= 999,
-> >>
-> >> Why not 1024, i.e. where is 999 coming from?
-> > 
-> > It comes from s390-trng.c driver.
-> > Should I use 1024 instead?
-> > 
-> AFAICT the range for quality is from 0 to 1024 (no entropy -> perfect
-> entropy).
-> 
-> 1024 should be used since I'd expect a HW TRNG to provide perfect
-> entropy unless otherwise stated.
+On Tue, Jul 18, 2017 at 8:08 PM, Brian Gerst <brgerst@gmail.com> wrote:
+> On Tue, Jul 18, 2017 at 6:33 PM, Thomas Garnier <thgarnie@google.com> wrote:
+>> Perpcu uses a clever design where the .percu ELF section has a virtual
+>> address of zero and the relocation code avoid relocating specific
+>> symbols. It makes the code simple and easily adaptable with or without
+>> SMP support.
+>>
+>> This design is incompatible with PIE because generated code always try to
+>> access the zero virtual address relative to the default mapping address.
+>> It becomes impossible when KASLR is configured to go below -2G. This
+>> patch solves this problem by removing the zero mapping and adapting the GS
+>> base to be relative to the expected address. These changes are done only
+>> when PIE is enabled. The original implementation is kept as-is
+>> by default.
+>
+> The reason the per-cpu section is zero-based on x86-64 is to
+> workaround GCC hardcoding the stack protector canary at %gs:40.  So
+> this patch is incompatible with CONFIG_STACK_PROTECTOR.
 
-I assume 1024 can be given only on verified HW with accessible verilog
-files and compared with resulting chip :)
-May be this would be a good example https://www.sifive.com/
+Ok, that make sense. I don't want this feature to not work with
+CONFIG_CC_STACKPROTECTOR*. One way to fix that would be adding a GDT
+entry for gs so gs:40 points to the correct memory address and
+gs:[rip+XX] works correctly through the MSR. Given the separate
+discussion on mcmodel, I am going first to check if we can move from
+PIE to PIC with a mcmodel=small or medium that would remove the percpu
+change requirement. I tried before without success but I understand
+better percpu and other components so maybe I can make it work.
+
+Thanks a lot for the feedback.
+
+>
+> --
+> Brian Gerst
+
+
 
 -- 
-Pengutronix e.K.                           |                             |
-Industrial Linux Solutions                 | http://www.pengutronix.de/  |
-Peiner Str. 6-8, 31137 Hildesheim, Germany | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Thomas
