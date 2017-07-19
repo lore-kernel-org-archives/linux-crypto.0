@@ -1,83 +1,70 @@
-From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: [PATCH V6 5/7] crypto: AES CBC multi-buffer glue code
-Date: Tue, 18 Jul 2017 17:52:34 -0700
-Message-ID: <da15ba80-a3b1-0d79-47ea-5528c0d12b20@linux.intel.com>
-References: <1498609575-6217-1-git-send-email-megha.dey@linux.intel.com>
- <1498609575-6217-6-git-send-email-megha.dey@linux.intel.com>
- <20170718054142.GA4764@gondor.apana.org.au>
+From: Sandy Harris <sandyinchina@gmail.com>
+Subject: Re: [RFC PATCH v12 3/4] Linux Random Number Generator
+Date: Tue, 18 Jul 2017 21:00:10 -0400
+Message-ID: <CACXcFmmFGYb-JteJZB8gS+uGJZ4zNLMU=AwPQf0td+xiG0+9Qw@mail.gmail.com>
+References: <3910055.ntkqcq1Chb@positron.chronox.de> <150039607.torZXMN7kc@positron.chronox.de>
+ <20170718085212.GB25267@kroah.com> <1780567.qGdv4EjEMp@positron.chronox.de> <20170718210816.o6c4iziaqj5dnnd3@thunk.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, megha.dey@intel.com
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        Megha Dey <megha.dey@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Jason A. Donenfeld" <jason@zx2c4.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga05.intel.com ([192.55.52.43]:20034 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752020AbdGSAwf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Jul 2017 20:52:35 -0400
-In-Reply-To: <20170718054142.GA4764@gondor.apana.org.au>
-Content-Language: en-US
+Received: from mail-wm0-f44.google.com ([74.125.82.44]:38867 "EHLO
+        mail-wm0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751906AbdGSBAM (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 18 Jul 2017 21:00:12 -0400
+In-Reply-To: <20170718210816.o6c4iziaqj5dnnd3@thunk.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 07/17/2017 10:41 PM, Herbert Xu wrote:
-> On Tue, Jun 27, 2017 at 05:26:13PM -0700, Megha Dey wrote:
->>
->> +static void completion_callback(struct mcryptd_skcipher_request_ctx *rctx,
->> +			    struct mcryptd_alg_cstate *cstate,
->> +			    int err)
->> +{
->> +	struct skcipher_request *req = cast_mcryptd_ctx_to_req(rctx);
->> +
->> +       /* remove from work list and invoke completion callback */
->> +	spin_lock(&cstate->work_lock);
->> +	list_del(&rctx->waiter);
->> +	spin_unlock(&cstate->work_lock);
->> +
->> +	if (irqs_disabled())
->> +		rctx->complete(&req->base, err);
->> +	else {
->> +		local_bh_disable();
->> +		rctx->complete(&req->base, err);
->> +		local_bh_enable();
->> +	}
->> +}
-> 
-> The fact that you need to do this check means that this design is
-> wrong.  You should always know what context you are in.
-> 
+On Tue, Jul 18, 2017 at 5:08 PM, Theodore Ts'o <tytso@mit.edu> wrote:
 
-I think you are right.  The irqs_disabled check is not necessary
-as we only call this function in the context of the mcryptd thread.
-When I wrote the original mb algorithms I was probably unsure
-and put this check in as a precaution in other mb algorithms and
-Megha did the same.
+> I've been trying to take the best features and suggestions from your
+> proposal and integrating them into /dev/random already.
 
->> +/*
->> + * CRYPTO_ALG_ASYNC flag is passed to indicate we have an ablk
->> + * scatter-gather walk.
->> + */
->> +static struct skcipher_alg aes_cbc_mb_alg = {
->> +	.base = {
->> +		.cra_name		= "cbc(aes)",
->> +		.cra_driver_name	= "cbc-aes-aesni-mb",
->> +		.cra_priority		= 500,
->> +		.cra_flags		= CRYPTO_ALG_INTERNAL,
->> +		.cra_blocksize		= AES_BLOCK_SIZE,
->> +		.cra_ctxsize		= CRYPTO_AES_CTX_SIZE,
->> +		.cra_module		= THIS_MODULE,
->> +	},
->> +	.min_keysize	= AES_MIN_KEY_SIZE,
->> +	.max_keysize	= AES_MAX_KEY_SIZE,
->> +	.ivsize		= AES_BLOCK_SIZE,
->> +	.setkey		= aes_set_key,
->> +	.encrypt	= mb_aes_cbc_encrypt,
->> +	.decrypt	= mb_aes_cbc_decrypt
->> +};
-> 
-> So this claims to be a sync algorithm.  Is this really the case?
-> 
-> Cheers,
-> 
+A good approach.
+
+> Things that I've chosen not take is basically because I disbelieve
+> that the Jitter RNG is valid. ...
+
+The biggest problem with random(4) is that you cannot generate good
+output without a good seed & just after boot, especially first boot on
+a new system, you may not have enough entropy. A user space process
+cannot do it soon enough and all the in-kernel solutions (unless you
+have a hardware RNG) pose difficulties.
+
+The only really good solution I know of is to find a way to provide a
+chunk of randomness early in the boot process. John Denker has a good
+discussion of doing this by modifying the kernel image & Ted talks of
+doing it via the boot loader. Neither looks remarkably easy. Other
+approaches like making the kernel read a seed file or passing a
+parameter on the kernel command line have been suggested but, if I
+recall right, rejected.
+
+As I see it, the questions about Jitter, or any other in-kernel
+generator based on timing, are whether it is good enough to be useful
+until we have one of the above solutions or useful as a
+defense-in-depth trick after we have one. I'd say yes to both.
+
+There's been a lot of analysis. Stephan has a detailed rationale & a
+lot of test data in his papers & the Havege papers also discuss
+getting entropy from timer operations. I'd say the best paper is
+McGuire et al:
+https://static.lwn.net/images/conf/rtlws11/random-hardware.pdf
+
+There is enough there to convince me that grabbing some (256?) bits
+from such a generator early in the initialization is worthwhile.
+
+> So I have been trying to do the evolution thing already.
+> ...
+
+> I'm obviously biased, but I don't see I see the Raison d'Etre for
+> merging LRNG into the kernel.
+
+Nor I.
