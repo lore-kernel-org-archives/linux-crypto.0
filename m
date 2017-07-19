@@ -1,89 +1,61 @@
-From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: [PATCH 3/6] fscrypt: use HKDF-SHA512 to derive the per-inode
- encryption keys
-Date: Wed, 19 Jul 2017 10:32:37 -0700
-Message-ID: <20170719173237.GA78811@gmail.com>
-References: <20170712210035.51534-1-ebiggers3@gmail.com>
- <20170712210035.51534-4-ebiggers3@gmail.com>
- <20170714162440.GB25453@google.com>
+From: Brian Gerst <brgerst@gmail.com>
+Subject: Re: [RFC 21/22] x86/module: Add support for mcmodel large and PLTs
+Date: Wed, 19 Jul 2017 13:34:46 -0400
+Message-ID: <CAMzpN2jWTS8R5V6i5q=bq4NGW_svELw5bjgWTOX=Ow3ddWx-6Q@mail.gmail.com>
+References: <20170718223333.110371-1-thgarnie@google.com> <20170718223333.110371-22-thgarnie@google.com>
+ <c0bc2d98-d6eb-e3db-3799-2e28e9919f3d@zytor.com> <CAMzpN2j+Z27uudHXqqMhbk=s=pnk7LdA2FPkgmsdZzO3ysemsQ@mail.gmail.com>
+ <CAJcbSZFphkF8bcodkcwpK-oi3D7GTQXyTkOLPkmtWSPLPkvB0Q@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        linux-mtd@lists.infradead.org, linux-crypto@vger.kernel.org,
-        "Theodore Y . Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Alex Cope <alexcope@google.com>,
-        Eric Biggers <ebiggers@google.com>
-To: Michael Halcrow <mhalcrow@google.com>
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20170714162440.GB25453@google.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: "H. Peter Anvin" <hpa@zytor.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@redhat.com>,
+	Arnd Bergmann <arnd@arndb.de>, Matthias Kaehlcke <mka@chromium.org>,
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>, Juergen Gross <jgross@suse.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+	Joerg Roedel <joro@8bytes.org>, Andy Lutomirski <luto@kernel.org>, Borislav Petkov <bp@alien8.de>,
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Borislav Petkov <bp@suse.de>,
+	Christian Borntraeger <borntraeger@de.ibm.com>, "Rafael J . Wysocki" <rjw@rjwysocki.net>,
+	Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>, Tejun Heo <tj@kernel.org>,
+	Christ
+To: Thomas Garnier <thgarnie@google.com>
+Return-path: <kernel-hardening-return-9055-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
+List-Post: <mailto:kernel-hardening@lists.openwall.com>
+List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
+List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
+List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
+In-Reply-To: <CAJcbSZFphkF8bcodkcwpK-oi3D7GTQXyTkOLPkmtWSPLPkvB0Q@mail.gmail.com>
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Jul 14, 2017 at 09:24:40AM -0700, Michael Halcrow wrote:
-> > +static int hkdf_expand(struct crypto_shash *hmac, u8 context,
-> > +		       const u8 *info, unsigned int infolen,
-> > +		       u8 *okm, unsigned int okmlen)
-> > +{
-> > +	SHASH_DESC_ON_STACK(desc, hmac);
-> > +	int err;
-> > +	const u8 *prev = NULL;
-> > +	unsigned int i;
-> > +	u8 counter = 1;
-> > +	u8 tmp[HKDF_HASHLEN];
-> > +
-> > +	desc->tfm = hmac;
-> > +	desc->flags = 0;
-> > +
-> > +	if (unlikely(okmlen > 255 * HKDF_HASHLEN))
-> > +		return -EINVAL;
-> > +
-> > +	for (i = 0; i < okmlen; i += HKDF_HASHLEN) {
-> > +
-> > +		err = crypto_shash_init(desc);
-> > +		if (err)
-> > +			goto out;
-> > +
-> > +		if (prev) {
-> > +			err = crypto_shash_update(desc, prev, HKDF_HASHLEN);
-> > +			if (err)
-> > +				goto out;
-> > +		}
-> > +
-> > +		err = crypto_shash_update(desc, &context, 1);
-> 
-> One potential shortcut would be to just increment context on each
-> iteration rather than maintain the counter.
-> 
+On Wed, Jul 19, 2017 at 11:58 AM, Thomas Garnier <thgarnie@google.com> wrote:
+> On Tue, Jul 18, 2017 at 8:59 PM, Brian Gerst <brgerst@gmail.com> wrote:
+>> On Tue, Jul 18, 2017 at 9:35 PM, H. Peter Anvin <hpa@zytor.com> wrote:
+>>> On 07/18/17 15:33, Thomas Garnier wrote:
+>>>> With PIE support and KASLR extended range, the modules may be further
+>>>> away from the kernel than before breaking mcmodel=kernel expectations.
+>>>>
+>>>> Add an option to build modules with mcmodel=large. The modules generated
+>>>> code will make no assumptions on placement in memory.
+>>>>
+>>>> Despite this option, modules still expect kernel functions to be within
+>>>> 2G and generate relative calls. To solve this issue, the PLT arm64 code
+>>>> was adapted for x86_64. When a relative relocation go outside its range,
+>>>> a dynamic PLT entry is used to correctly jump to the destination.
+>>>
+>>> Why large as opposed to medium or medium-PIC?
+>>
+>> Or for that matter, why not small-PIC?  We aren't changing the size of
+>> the kernel to be larger than 2G text or data.  Small-PIC would still
+>> allow it to be placed anywhere in the address space, and would
+>> generate far better code.
+>
+> My understanding was that small=PIC and medium=PIC assume that the
+> module code is in the lower 2G of memory. I will do additional testing
+> on the modules to confirm that.
 
-That's not a good idea because then it wouldn't be standard HKDF, and it would
-be relying on the "feedback" mode to keep the HMAC inputs unique which isn't
-guaranteed to be sufficient.
+That is only for small/medium absolute (non-PIC) code.  Think about
+userspace shared libraries.  They are not limited to being mapped in
+the lower 2G of the address space.
 
-> >  
-> > -	res = validate_user_key(crypt_info, &ctx, raw_key, FS_KEY_DESC_PREFIX,
-> > -				keysize);
-> > -	if (res && inode->i_sb->s_cop->key_prefix) {
-> > -		int res2 = validate_user_key(crypt_info, &ctx, raw_key,
-> > -					     inode->i_sb->s_cop->key_prefix,
-> > -					     keysize);
-> > -		if (res2) {
-> > -			if (res2 == -ENOKEY)
-> > -				res = -ENOKEY;
-> > +	if (ctx.version == FSCRYPT_CONTEXT_V1) {
-> > +		res = find_and_derive_key_v1(inode, &ctx, derived_key,
-> > +					     derived_keysize);
-> 
-> Why not make this consistent with the else clause, i.e. doing
-> load_master_key_from_keyring() followed by derive_key_v1()?
-> 
-
-struct fscrypt_master_key contains the HMAC transform but not the raw master
-key.  For the v1 key derivation we need the raw master key.  We could put it in
-the fscrypt_master_key and then try to allow fscrypt_master_key's both with and
-without HMAC transforms depending on the policy versions they are used for, but
-there's no point in doing so currently.
-
-Eric
+--
+Brian Gerst
