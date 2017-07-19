@@ -1,44 +1,50 @@
-From: =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>
-Subject: AES-XTS key size
-Date: Wed, 19 Jul 2017 08:20:07 +0000
-Message-ID: <VI1PR0401MB2591C3B11125DDEF82F266E398A60@VI1PR0401MB2591.eurprd04.prod.outlook.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
-To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>
+From: Antoine Tenart <antoine.tenart@free-electrons.com>
+Subject: [PATCH v2 2/2] crypto: inside-secure - fix the sha state length in hmac_sha1_setkey
+Date: Wed, 19 Jul 2017 11:02:31 +0200
+Message-ID: <20170719090231.9949-2-antoine.tenart@free-electrons.com>
+References: <20170719090231.9949-1-antoine.tenart@free-electrons.com>
+Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
+        thomas.petazzoni@free-electrons.com,
+        gregory.clement@free-electrons.com, oferh@marvell.com,
+        igall@marvell.com, nadavh@marvell.com, linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-eopbgr00078.outbound.protection.outlook.com ([40.107.0.78]:9548
-        "EHLO EUR02-AM5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753162AbdGSIUJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 19 Jul 2017 04:20:09 -0400
-Content-Language: en-US
+Received: from mail.free-electrons.com ([62.4.15.54]:56475 "EHLO
+        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751998AbdGSJFD (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 19 Jul 2017 05:05:03 -0400
+In-Reply-To: <20170719090231.9949-1-antoine.tenart@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,=0A=
-=0A=
-AFAICS, IEEE 1619-2007 standard mentions only XTS-AES-128 and=0A=
-XTS-AES-256, meaning that the keys should be either 256 or 512 bits.=0A=
-=0A=
-Further, NIST SP800-38E mentions that an implementation may restrict=0A=
-support to only one of XTS-AES-{128,256}, but does not explicitly allow=0A=
-other cipher suites.=0A=
-=0A=
-I don't see this enforcement in crypto/xts.c (XTS SW implementation),=0A=
-though I noticed that XTS mode is used for other ciphers besides AES.=0A=
-=0A=
-More, tcrypt has xts(aes) speed tests checking also for XTS-AES-192.=0A=
-For HW crypto engines adhering strictly to IEEE P1619-2007 this is a=0A=
-problem:=0A=
-[...]=0A=
-tcrypt: test 5 (384 bit key, 16 byte blocks):=0A=
-caam_jr 8020000.jr: key size mismatch=0A=
-tcrypt: setkey() failed flags=3D200000=0A=
-[...]=0A=
-=0A=
-Is the kernel more permissive than the standard?=0A=
-=0A=
-Thanks,=0A=
-Horia=0A=
+A check is performed on the ipad/opad in the safexcel_hmac_sha1_setkey
+function, but the index used by the loop doing it is wrong. It is
+currently the size of the state array while it should be the size of a
+sha1 state. This patch fixes it.
+
+Fixes: 1b44c5a60c13 ("crypto: inside-secure - add SafeXcel EIP197 crypto engine driver")
+Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
+Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
+---
+
+Since v1: added the Fixes tag.
+
+ drivers/crypto/inside-secure/safexcel_hash.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
+index a11b2edb41b9..3f819399cd95 100644
+--- a/drivers/crypto/inside-secure/safexcel_hash.c
++++ b/drivers/crypto/inside-secure/safexcel_hash.c
+@@ -883,7 +883,7 @@ static int safexcel_hmac_sha1_setkey(struct crypto_ahash *tfm, const u8 *key,
+ 	if (ret)
+ 		return ret;
+ 
+-	for (i = 0; i < ARRAY_SIZE(istate.state); i++) {
++	for (i = 0; i < SHA1_DIGEST_SIZE / sizeof(u32); i++) {
+ 		if (ctx->ipad[i] != le32_to_cpu(istate.state[i]) ||
+ 		    ctx->opad[i] != le32_to_cpu(ostate.state[i])) {
+ 			ctx->base.needs_inv = true;
+-- 
+2.13.3
