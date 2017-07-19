@@ -1,97 +1,57 @@
-From: Thomas Garnier <thgarnie@google.com>
-Subject: Re: [RFC 06/22] kvm: Adapt assembly for PIE support
-Date: Wed, 19 Jul 2017 08:40:14 -0700
-Message-ID: <CAJcbSZGqY=btU=+eWfgdhF0je0Yn_GxkymFHn+OV-1BuzgbRYw@mail.gmail.com>
-References: <20170718223333.110371-1-thgarnie@google.com> <20170718223333.110371-7-thgarnie@google.com>
- <CAMzpN2gF7QxDbVG-6ad3Qarcn1N_JT5tit9CMvQL95LQGeZivA@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>,
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>,
-	Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@redhat.com>,
-	Arnd Bergmann <arnd@arndb.de>, Matthias Kaehlcke <mka@chromium.org>,
-	Boris Ostrovsky <boris.ostrovsky@oracle.com>, Juergen Gross <jgross@suse.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-	Joerg Roedel <joro@8bytes.org>, Andy Lutomirski <luto@kernel.org>, Borislav Petkov <bp@alien8.de>,
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Borislav Petkov <bp@suse.de>,
-	Christian Borntraeger <borntraeger@de.ibm.com>, "Rafael J . Wysocki" <rjw@rjwysocki.net>,
-	Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>, Tejun Heo <tj@kernel.org>,
-	Chris
-To: Brian Gerst <brgerst@gmail.com>
-Return-path: <kernel-hardening-return-9038-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
-List-Post: <mailto:kernel-hardening@lists.openwall.com>
-List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
-List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
-List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
-In-Reply-To: <CAMzpN2gF7QxDbVG-6ad3Qarcn1N_JT5tit9CMvQL95LQGeZivA@mail.gmail.com>
-List-Id: linux-crypto.vger.kernel.org
+From: Philipp Zabel <p.zabel@pengutronix.de>
+Subject: [PATCH 014/102] crypto: sun4i-ss - request exclusive reset control
+Date: Wed, 19 Jul 2017 17:25:18 +0200
+Message-ID: <20170719152646.25903-15-p.zabel@pengutronix.de>
+References: <20170719152646.25903-1-p.zabel@pengutronix.de>
+Cc: Philipp Zabel <p.zabel@pengutronix.de>,
+        Corentin Labbe <clabbe.montjoie@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Maxime Ripard <maxime.ripard@free-electrons.com>,
+        Chen-Yu Tsai <wens@csie.org>, linux-crypto@vger.kernel.org
+To: linux-kernel@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:38071 "EHLO
+        metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1755347AbdGSP14 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 19 Jul 2017 11:27:56 -0400
+In-Reply-To: <20170719152646.25903-1-p.zabel@pengutronix.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jul 18, 2017 at 7:49 PM, Brian Gerst <brgerst@gmail.com> wrote:
-> On Tue, Jul 18, 2017 at 6:33 PM, Thomas Garnier <thgarnie@google.com> wrote:
->> Change the assembly code to use only relative references of symbols for the
->> kernel to be PIE compatible. The new __ASM_GET_PTR_PRE macro is used to
->> get the address of a symbol on both 32 and 64-bit with PIE support.
->>
->> Position Independent Executable (PIE) support will allow to extended the
->> KASLR randomization range below the -2G memory limit.
->>
->> Signed-off-by: Thomas Garnier <thgarnie@google.com>
->> ---
->>  arch/x86/include/asm/kvm_host.h | 6 ++++--
->>  arch/x86/kernel/kvm.c           | 6 ++++--
->>  arch/x86/kvm/svm.c              | 4 ++--
->>  3 files changed, 10 insertions(+), 6 deletions(-)
->>
->> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
->> index 87ac4fba6d8e..3041201a3aeb 100644
->> --- a/arch/x86/include/asm/kvm_host.h
->> +++ b/arch/x86/include/asm/kvm_host.h
->> @@ -1352,9 +1352,11 @@ asmlinkage void kvm_spurious_fault(void);
->>         ".pushsection .fixup, \"ax\" \n" \
->>         "667: \n\t" \
->>         cleanup_insn "\n\t"                   \
->> -       "cmpb $0, kvm_rebooting \n\t"         \
->> +       "cmpb $0, kvm_rebooting" __ASM_SEL(,(%%rip)) " \n\t" \
->>         "jne 668b \n\t"                       \
->> -       __ASM_SIZE(push) " $666b \n\t"        \
->> +       __ASM_SIZE(push) "%%" _ASM_AX " \n\t"           \
->> +       __ASM_GET_PTR_PRE(666b) "%%" _ASM_AX "\n\t"     \
->> +       "xchg %%" _ASM_AX ", (%%" _ASM_SP ") \n\t"      \
->>         "call kvm_spurious_fault \n\t"        \
->>         ".popsection \n\t" \
->>         _ASM_EXTABLE(666b, 667b)
->> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
->> index 71c17a5be983..53b8ad162589 100644
->> --- a/arch/x86/kernel/kvm.c
->> +++ b/arch/x86/kernel/kvm.c
->> @@ -618,8 +618,10 @@ asm(
->>  ".global __raw_callee_save___kvm_vcpu_is_preempted;"
->>  ".type __raw_callee_save___kvm_vcpu_is_preempted, @function;"
->>  "__raw_callee_save___kvm_vcpu_is_preempted:"
->> -"movq  __per_cpu_offset(,%rdi,8), %rax;"
->> -"cmpb  $0, " __stringify(KVM_STEAL_TIME_preempted) "+steal_time(%rax);"
->> +"leaq  __per_cpu_offset(%rip), %rax;"
->> +"movq  (%rax,%rdi,8), %rax;"
->> +"addq  " __stringify(KVM_STEAL_TIME_preempted) "+steal_time(%rip), %rax;"
->
-> This doesn't look right.  It's accessing a per-cpu variable.  The
-> per-cpu section is an absolute, zero-based section and not subject to
-> relocation.
->
+Commit a53e35db70d1 ("reset: Ensure drivers are explicit when requesting
+reset lines") started to transition the reset control request API calls
+to explicitly state whether the driver needs exclusive or shared reset
+control behavior. Convert all drivers requesting exclusive resets to the
+explicit API call so the temporary transition helpers can be removed.
 
-PIE does not respect the zero-based section, it tries to have
-everything relative. Patch 16/22 also adapt per-cpu to work with PIE
-(while keeping the zero absolute design by default).
+No functional changes.
 
->> +"cmpb  $0, (%rax);
->>  "setne %al;"
->>  "ret;"
->>  ".popsection");
->
-> --
-> Brian Gerst
+Cc: Corentin Labbe <clabbe.montjoie@gmail.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Maxime Ripard <maxime.ripard@free-electrons.com>
+Cc: Chen-Yu Tsai <wens@csie.org>
+Cc: linux-crypto@vger.kernel.org
+Signed-off-by: Philipp Zabel <p.zabel@pengutronix.de>
+---
+ drivers/crypto/sunxi-ss/sun4i-ss-core.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-
-
+diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-core.c b/drivers/crypto/sunxi-ss/sun4i-ss-core.c
+index 02ad8256e9002..69374e42ad05f 100644
+--- a/drivers/crypto/sunxi-ss/sun4i-ss-core.c
++++ b/drivers/crypto/sunxi-ss/sun4i-ss-core.c
+@@ -255,7 +255,8 @@ static int sun4i_ss_probe(struct platform_device *pdev)
+ 	}
+ 	dev_dbg(&pdev->dev, "clock ahb_ss acquired\n");
+ 
+-	ss->reset = devm_reset_control_get_optional(&pdev->dev, "ahb");
++	ss->reset = devm_reset_control_get_optional_exclusive(&pdev->dev,
++							      "ahb");
+ 	if (IS_ERR(ss->reset)) {
+ 		if (PTR_ERR(ss->reset) == -EPROBE_DEFER)
+ 			return PTR_ERR(ss->reset);
 -- 
-Thomas
+2.11.0
