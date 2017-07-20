@@ -1,84 +1,66 @@
 From: "H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [RFC 06/22] kvm: Adapt assembly for PIE support
-Date: Wed, 19 Jul 2017 16:47:45 -0700
-Message-ID: <201707192348.v6JNm8Rg003916__13425.7778795019$1500509877$gmane$org@mail.zytor.com>
-References: <20170718223333.110371-1-thgarnie@google.com> <20170718223333.110371-7-thgarnie@google.com> <CAMzpN2gF7QxDbVG-6ad3Qarcn1N_JT5tit9CMvQL95LQGeZivA@mail.gmail.com> <CAJcbSZGqY=btU=+eWfgdhF0je0Yn_GxkymFHn+OV-1BuzgbRYw@mail.gmail.com> <0cdd02e1-8bf2-41cd-f085-c338c2fd8e25@zytor.com> <CAKv+Gu_0o+PrMAWRSP5Y4R7QO87+zAYf=B=VDF1icqJvWL0PoA@mail.gmail.com>
+Subject: Re: [RFC 16/22] x86/percpu: Adapt percpu for PIE support
+Date: Wed, 19 Jul 2017 19:21:50 -0700
+Message-ID: <9b152d55-8a1a-75b5-58df-0fe33458107a@zytor.com>
+References: <20170718223333.110371-1-thgarnie@google.com>
+ <20170718223333.110371-17-thgarnie@google.com>
+ <CAMzpN2g5YkFZTY7yfvG03QUKc-=asKMZbqke9g4e2oT_pgg7Yw@mail.gmail.com>
+ <CAJcbSZFXrDZikh9P5M81ztkiMv7EhO4x0bzBdYE8RYC=HMZgqg@mail.gmail.com>
+ <25a2974a-fbb4-ea4b-d090-582d6d0de7fd@zytor.com>
 Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 8BIT
-Cc: Thomas Garnier <thgarnie@google.com>,
-        Brian Gerst <brgerst@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S . Miller" <davem@davemloft.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
         Peter Zijlstra <peterz@infradead.org>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        Arnd Bergmann <arnd@arndb.de>,
+        Josh Poimboeuf <jpoimboe@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
         Matthias Kaehlcke <mka@chromium.org>,
         Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Juergen Gross <jgross@suse.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        Juergen Gross
+ <jgross@suse.com>, Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Andy Lutomirski <luto@kernel.org>,
+        Joerg Roedel <joro@8bytes.org>, Andy Lutomirski <luto@kernel.org>,
         Borislav Petkov <bp@alien8.de>,
         "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
         Borislav Petkov <bp@suse.de>,
-        Christian Borntr
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([65.50.211.136]:60193 "EHLO mail.zytor.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932791AbdGTARI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 19 Jul 2017 20:17:08 -0400
-In-Reply-To: <CAKv+Gu_0o+PrMAWRSP5Y4R7QO87+zAYf=B=VDF1icqJvWL0PoA@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+        Christian Borntraeger
+ <borntraeger@de.ibm.com>,
+        "Rafael J . Wysocki" <rjw@rjwysocki.net>,
+        Len Brown <len.brown@intel.
+To: Thomas Garnier <thgarnie@google.com>, Brian Gerst <brgerst@gmail.com>
+Return-path: <kernel-hardening-return-9082-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
+List-Post: <mailto:kernel-hardening@lists.openwall.com>
+List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
+List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
+List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
+In-Reply-To: <25a2974a-fbb4-ea4b-d090-582d6d0de7fd@zytor.com>
+Content-Language: en-US
+List-Id: linux-crypto.vger.kernel.org
 
-<paul.gortmaker@windriver.com>,Chris Metcalf <cmetcalf@mellanox.com>,"Paul E . McKenney" <paulmck@linux.vnet.ibm.com>,Andrew Morton <akpm@linux-foundation.org>,Christopher Li <sparse@chrisli.org>,Dou Liyang <douly.fnst@cn.fujitsu.com>,Masahiro Yamada <yamada.masahiro@socionext.com>,Daniel Borkmann <daniel@iogearbox.net>,Markus Trippelsdorf <markus@trippelsdorf.de>,Peter Foley <pefoley2@pefoley.com>,Steven Rostedt <rostedt@goodmis.org>,Tim Chen <tim.c.chen@linux.intel.com>,Catalin Marinas <catalin.marinas@arm.com>,Matthew Wilcox <mawilcox@microsoft.com>,Michal Hocko <mhocko@suse.com>,Rob Landley <rob@landley.net>,Jiri Kosina <jkosina@suse.cz>,"H . J . Lu" <hjl.tools@gmail.com>,Paul Bolle <pebolle@tiscali.nl>,Baoquan He <bhe@redhat.com>,Daniel Micay <danielmicay@gmail.com>,the arch/x86 maint
- ainers <x86@kernel.org>,"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,xen-devel@lists.xenproject.org,kvm list
-<kvm@vger.kernel.org>,linux-pm <linux-pm@vger.kernel.org>,linux-arch <linux-arch@vger.kernel.org>,Linux-Sparse <linux-sparse@vger.kernel.org>,Kernel Hardening <kernel-hardening@lists.openwall.com>
-From: hpa@zytor.com
-Message-ID: <83BA7600-BC8D-4C91-812C-DD2A0BF4474B@zytor.com>
-
-On July 19, 2017 3:58:07 PM PDT, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
->On 19 July 2017 at 23:27, H. Peter Anvin <hpa@zytor.com> wrote:
->> On 07/19/17 08:40, Thomas Garnier wrote:
->>>>
->>>> This doesn't look right.  It's accessing a per-cpu variable.  The
->>>> per-cpu section is an absolute, zero-based section and not subject
->to
->>>> relocation.
->>>
->>> PIE does not respect the zero-based section, it tries to have
->>> everything relative. Patch 16/22 also adapt per-cpu to work with PIE
->>> (while keeping the zero absolute design by default).
->>>
+On 07/19/17 16:33, H. Peter Anvin wrote:
 >>
->> This is silly.  The right thing is for PIE is to be explicitly
->absolute,
->> without (%rip).  The use of (%rip) memory references for percpu is
->just
->> an optimization.
->>
->
->Sadly, there is an issue in binutils that may prevent us from doing
->this as cleanly as we would want.
->
->For historical reasons, bfd.ld emits special symbols like
->__GLOBAL_OFFSET_TABLE__ as absolute symbols with a section index of
->SHN_ABS, even though it is quite obvious that they are relative like
->any other symbol that points into the image. Unfortunately, this means
->that binutils needs to emit R_X86_64_RELATIVE relocations even for
->SHN_ABS symbols, which means we lose the ability to use both absolute
->and relocatable symbols in the same PIE image (unless the reloc tool
->can filter them out)
->
->More info here:
->https://sourceware.org/bugzilla/show_bug.cgi?id=19818
+>> I agree that it is odd but that's how the compiler generates code. I
+>> will re-explore PIC options with mcmodel=small or medium, as mentioned
+>> on other threads.
+> 
+> Why should the way compiler generates code affect the way we do things
+> in assembly?
+> 
+> That being said, the compiler now has support for generating this kind
+> of code explicitly via the __seg_gs pointer modifier.  That should let
+> us drop the __percpu_prefix and just use variables directly.  I suspect
+> we want to declare percpu variables as "volatile __seg_gs" to account
+> for the possibility of CPU switches.
+> 
+> Older compilers won't be able to work with this, of course, but I think
+> that it is acceptable for those older compilers to not be able to
+> support PIE.
+> 
 
-The reloc tool already has the ability to filter symbols.
--- 
-Sent from my Android device with K-9 Mail. Please excuse my brevity.
+Grump.  It turns out that the compiler doesn't do the right thing for
+symbols marked with the __seg_[fg]s markers.  __thread does the right
+thing, but __thread a) has %fs: hard-coded, still, and b) I believe can
+still cache %seg:0 arbitrarily long.
+
+	-hpa
