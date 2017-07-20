@@ -1,93 +1,109 @@
-From: Philipp Zabel <p.zabel@pengutronix.de>
-Subject: Re: [PATCH 000/102] Convert drivers to explicit reset API
-Date: Thu, 20 Jul 2017 14:55:12 +0200
-Message-ID: <1500555312.2354.75.camel@pengutronix.de>
-References: <20170719152646.25903-1-p.zabel@pengutronix.de>
-         <20170719211515.46a1196c@windsurf>
-         <1500543415.2354.37.camel@pengutronix.de>
-         <20170720123640.43c2ce01@windsurf>
+From: Harald Freudenberger <freude@linux.vnet.ibm.com>
+Subject: Re: [PATCH v1] crypto: caam - set hwrng quality level
+Date: Thu, 20 Jul 2017 15:08:43 +0200
+Message-ID: <4e42d639-9f83-dcbb-9a2a-91686656c7dd@linux.vnet.ibm.com>
+References: <20170719074458.9247-1-o.rempel@pengutronix.de>
+ <VI1PR0401MB2591B52EB2EF7B7B900FBCC998A60@VI1PR0401MB2591.eurprd04.prod.outlook.com>
+ <20170719163248.sn7mvnq2s3fm2hvh@pengutronix.de>
+ <VI1PR0401MB25917848BA4AF6626E8DF1AD98A60@VI1PR0401MB2591.eurprd04.prod.outlook.com>
+ <20170719181303.rj4fyjj7qplatrzk@pengutronix.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-kernel@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
-        Prashant Gaikwad <pgaikwad@nvidia.com>,
-        Heiko Stuebner <heiko@sntech.de>,
-        Peter Chen <Peter.Chen@nxp.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        dri-devel@lists.freedesktop.org, Marc Dietrich <marvin24@gmx.de>,
-        Rakesh Iyer <riyer@nvidia.com>,
-        Peter Meerwald-Stadler <pmeerw@pmeerw.net>,
-        linux-clk@vger.kernel.org, Wim Van Sebroeck <wim@iguana.be>,
-        Wolfram Sang <wsa@the-dreams.de>,
-        Xinliang Liu <z.liuxinliang@hisilicon.com>,
-        Chanwoo Choi <cw00.choi@samsung.com>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Jiri Slaby <jslaby@suse.com>,
-        Michael Turquette <mturquette@baylibre.com>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Ohad Ben-Cohen <ohad@wizery.com>, linux-pm@vger.kernel.org,
-        Thomas Gleixner <tglx
-To: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
-Return-path: <linux-mips-bounce@linux-mips.org>
-In-Reply-To: <20170720123640.43c2ce01@windsurf>
-Sender: linux-mips-bounce@linux-mips.org
-Errors-to: linux-mips-bounce@linux-mips.org
-List-help: <mailto:ecartis@linux-mips.org?Subject=help>
-List-unsubscribe: <mailto:ecartis@linux-mips.org?subject=unsubscribe%20linux-mips>
-List-software: Ecartis version 1.0.0
-List-subscribe: <mailto:ecartis@linux-mips.org?subject=subscribe%20linux-mips>
-List-owner: <mailto:ralf@linux-mips.org>
-List-post: <mailto:linux-mips@linux-mips.org>
-List-archive: <http://www.linux-mips.org/archives/linux-mips/>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Oleksij Rempel <o.rempel@pengutronix.de>,
+        Dan Douglass <dan.douglass@nxp.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "kernel@pengutronix.de" <kernel@pengutronix.de>,
+        Martin Schwidefsky <schwidefsky@de.ibm.com>,
+        "David S. Miller" <davem@davemloft.net>
+To: Oleksij Rempel <ore@pengutronix.de>,
+        =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20170719181303.rj4fyjj7qplatrzk@pengutronix.de>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Thomas,
+On 07/19/2017 08:13 PM, Oleksij Rempel wrote:
+> On Wed, Jul 19, 2017 at 04:53:21PM +0000, Horia Geantă wrote:
+>> On 7/19/2017 7:32 PM, Oleksij Rempel wrote:
+>>> On Wed, Jul 19, 2017 at 12:49:47PM +0000, Horia Geantă wrote:
+>>>> On 7/19/2017 10:45 AM, Oleksij Rempel wrote:
+>>>>> According documentation, it is NIST certified TRNG.
+>>>>> So, set high quality to let the HWRNG framework automatically use it.
+>>>>>
+>>>>> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+>>>>> ---
+>>>>>  drivers/crypto/caam/caamrng.c | 6 ++++++
+>>>>>  1 file changed, 6 insertions(+)
+>>>>>
+>>>>> diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
+>>>>> index 41398da3edf4..684c0bc88dfd 100644
+>>>>> --- a/drivers/crypto/caam/caamrng.c
+>>>>> +++ b/drivers/crypto/caam/caamrng.c
+>>>>> @@ -292,10 +292,16 @@ static int caam_init_rng(struct caam_rng_ctx *ctx, struct device *jrdev)
+>>>>>  	return 0;
+>>>>>  }
+>>>>>  
+>>>>> +/*
+>>>>> + * hwrng register struct
+>>>>> + * The trng is suppost to have 100% entropy, and thus
+>>>>> + * we register with a very high quality value.
+>>>>> + */
+>>>>>  static struct hwrng caam_rng = {
+>>>>>  	.name		= "rng-caam",
+>>>>>  	.cleanup	= caam_cleanup,
+>>>>>  	.read		= caam_read,
+>>>>> +	.quality	= 999,
+>>>> Why not 1024, i.e. where is 999 coming from?
+>>> It comes from s390-trng.c driver.
+>>> Should I use 1024 instead?
+>>>
+>> AFAICT the range for quality is from 0 to 1024 (no entropy -> perfect
+>> entropy).
+>>
+>> 1024 should be used since I'd expect a HW TRNG to provide perfect
+>> entropy unless otherwise stated.
+> I assume 1024 can be given only on verified HW with accessible verilog
+> files and compared with resulting chip :)
+> May be this would be a good example https://www.sifive.com/
+>
+Well, the header file says:
+...
+/**
+ * struct hwrng - Hardware Random Number Generator driver
+ * @name:               Unique RNG name.
+ * @init:               Initialization callback (can be NULL).
+ * @cleanup:            Cleanup callback (can be NULL).
+ * @data_present:       Callback to determine if data is available
+ *                      on the RNG. If NULL, it is assumed that
+ *                      there is always data available.  *OBSOLETE*
+ * @data_read:          Read data from the RNG device.
+ *                      Returns the number of lower random bytes in "data".
+ *                      Must not be NULL.    *OBSOLETE*
+ * @read:               New API. drivers can fill up to max bytes of data
+ *                      into the buffer. The buffer is aligned for any type
+ *                      and max is a multiple of 4 and >= 32 bytes.
+ * @priv:               Private data, for use by the RNG driver.
+ * @quality:            Estimation of true entropy in RNG's bitstream
+ *                      (per mill).
+ */
+...
+quality = estimation of true entropy per mill.
+I understand this as quality=1000 meaning 100% entropy.
+However, the core code currently does not really check this value.
+When more than one hwrng sources do register, simple the one with
+the higher quality value wins :-) The value is not even checked
+to be in a given range.
 
-On Thu, 2017-07-20 at 12:36 +0200, Thomas Petazzoni wrote:
-> Hello,
-> 
-> On Thu, 20 Jul 2017 11:36:55 +0200, Philipp Zabel wrote:
-> 
-> > > I don't know if it has been discussed in the past, so forgive me if it
-> > > has been. Have you considered adding a "int flags" argument to the
-> > > existing reset_control_get_*() functions, rather than introducing
-> > > separate exclusive variants ?
-> > > 
-> > > Indeed, with a "int flags" argument you could in the future add more
-> > > variants/behaviors without actually multiplying the number of
-> > > functions. Something like the "flags" argument for request_irq() for
-> > > example.  
-> > 
-> > I can't find the discussion right now, but I remember we had talked
-> > about this in the past.
-> > Behind the scenes, all the inline API functions already call common
-> > entry points with flags (well, currently separate bool parameters for
-> > shared and optional).
-> > One reason against exposing those as an int flags in the user facing API
-> > is the possibility to accidentally provide a wrong value.
-> 
-> This is a quite strange argument. You could also accidentally use the
-> wrong variant of the function, just like you could use the wrong flag.
-
-You can't accidentally use no flag at all or a completely bogus value
-with the "plethora of inline functions" variant.
-
-> Once again, the next time you have another parameter for those reset
-> functions, beyond the exclusive/shared variant, you will multiply again
-> by two the number of functions ? You already have the  exclusive/shared
-> and optional/mandatory variants, so 4 variants. When you'll add a new
-> parameter, you'll have 8 variants. Doesn't seem really good.
-
-I'd rather avoid adding more variants, if possible. The complexity
-increases regardless of whether the API is expressed as a bunch of
-functions or as a single function with a bunch of flags.
-
-> What about reset_control_get(struct device *, const char *, int flags)
-> to replace all those variants ?
-
-While I like how this looks, unfortunately (devm_)reset_control_get
-already exists without the flags, so we can't change to that with a
-gentle transition.
+I searched through some device drivers which do register at
+the hwrng and it looks like most of the drivers do not even
+set this value. My feeling is, you should use 999 when your
+hardware provides 'perfect' random. So there is a chance for
+an even 'more perfect' hardware coming up later to overrule
+your 'perfect' hardware.
 
 regards
-Philipp
+Harald Freudenberger
