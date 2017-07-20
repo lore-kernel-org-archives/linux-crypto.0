@@ -1,73 +1,67 @@
-From: =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>
-Subject: Re: [PATCH v4 1/5] powerpc: io.h: move iomap.h include so that it can
- use readq/writeq defs
-Date: Thu, 20 Jul 2017 10:27:14 +0000
-Message-ID: <VI1PR0401MB2591205D2621B5FEB4EAE2CC98A70@VI1PR0401MB2591.eurprd04.prod.outlook.com>
-References: <20170718165528.7383-1-logang@deltatee.com>
- <20170718165528.7383-2-logang@deltatee.com>
- <87iniphsug.fsf@concordia.ellerman.id.au>
- <15b6ea7d-5817-c0cd-aee4-c8a52d8808f9@deltatee.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
-Cc: Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Stephen Bates <sbates@raithlin.com>,
-        "Benjamin Herrenschmidt" <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Suresh Warrier <warrier@linux.vnet.ibm.com>,
-        Oliver O'Halloran <oohall@gmail.com>
-To: Logan Gunthorpe <logang@deltatee.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
-        "linux-ntb@googlegroups.com" <linux-ntb@googlegroups.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ve1eur01on0071.outbound.protection.outlook.com ([104.47.1.71]:60672
-        "EHLO EUR01-VE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S934383AbdGTK1S (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 20 Jul 2017 06:27:18 -0400
-Content-Language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Martin Kaiser <martin@kaiser.cx>
+Subject: [PATCH v4 1/3] Documentation: devicetree: add Freescale RNGC binding
+Date: Thu, 20 Jul 2017 12:27:13 +0200
+Message-ID: <1500546435-29905-1-git-send-email-martin@kaiser.cx>
+References: <1457705200-16951-1-git-send-email-s.trumtrar@pengutronix.de>
+Cc: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        devicetree@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
+        linux-crypto@vger.kernel.org, kernel@pengutronix.de,
+        Fabio Estevam <festevam@gmail.com>,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Martin Kaiser <martin@kaiser.cx>
+To: Steffen Trumtrar <s.trumtrar@pengutronix.de>,
+        Shawn Guo <shawnguo@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1457705200-16951-1-git-send-email-s.trumtrar@pengutronix.de>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 7/19/2017 7:04 PM, Logan Gunthorpe wrote:=0A=
-> =0A=
-> =0A=
-> On 18/07/17 11:57 PM, Michael Ellerman wrote:=0A=
->> Seems fair enough, have you tested it at all?=0A=
-> =0A=
-> It's only been compile tested and the kbuild robot has beat up on it a bi=
-t.=0A=
-> =0A=
-Looks like the patch set does not compile on PPC (.config generated=0A=
-using make corenet64_smp_defconfig):=0A=
-=0A=
-[...]=0A=
-  LD      vmlinux.o=0A=
-  MODPOST vmlinux.o=0A=
-drivers/crypto/caam/jr.o: In function `rd_reg64':=0A=
-/home/b05471/repos/cryptodev-2.6/drivers/crypto/caam/regs.h:154:=0A=
-undefined reference to `.ioread64be_lo_hi'=0A=
-/home/b05471/repos/cryptodev-2.6/drivers/crypto/caam/regs.h:151:=0A=
-undefined reference to `.ioread64_lo_hi'=0A=
-/home/b05471/repos/cryptodev-2.6/drivers/crypto/caam/regs.h:151:=0A=
-undefined reference to `.ioread64_lo_hi'=0A=
-/home/b05471/repos/cryptodev-2.6/drivers/crypto/caam/regs.h:154:=0A=
-undefined reference to `.ioread64be_lo_hi'=0A=
-drivers/crypto/caam/jr.o: In function `wr_reg64':=0A=
-/home/b05471/repos/cryptodev-2.6/drivers/crypto/caam/regs.h:141:=0A=
-undefined reference to `.iowrite64_lo_hi'=0A=
-/home/b05471/repos/cryptodev-2.6/drivers/crypto/caam/regs.h:141:=0A=
-undefined reference to `.iowrite64_lo_hi'=0A=
-/home/b05471/repos/cryptodev-2.6/drivers/crypto/caam/regs.h:144:=0A=
-undefined reference to `.iowrite64be_lo_hi'=0A=
-/home/b05471/repos/cryptodev-2.6/drivers/crypto/caam/regs.h:144:=0A=
-undefined reference to `.iowrite64be_lo_hi'=0A=
-make: *** [vmlinux] Error 1=0A=
-=0A=
-Regards,=0A=
-Horia=0A=
+From: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+
+Add binding documentation for the Freescale RNGC found on
+some i.MX2/3 SoCs.
+
+Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+Signed-off-by: Martin Kaiser <martin@kaiser.cx>
+---
+Changes in v4:
+  none
+
+Changes in v3:
+  - add compatible string for imx35
+  - remove imx5 from the commit message,
+    I couldn't find an i.MX SOC that has RNGC
+
+Changes in v2:
+  none
+
+ Documentation/devicetree/bindings/rng/mxc_rngc.txt | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/rng/mxc_rngc.txt
+
+diff --git a/Documentation/devicetree/bindings/rng/mxc_rngc.txt b/Documentation/devicetree/bindings/rng/mxc_rngc.txt
+new file mode 100644
+index 0000000..5a12ada
+--- /dev/null
++++ b/Documentation/devicetree/bindings/rng/mxc_rngc.txt
+@@ -0,0 +1,16 @@
++Freescale RNGC (Random Number Generator Version C)
++
++Required properties:
++- compatible : Should be "fsl,imx25-rng" or "fsl,imx35-rng"
++- reg : Offset and length of the register set of this block
++- interrupts : the interrupt number for the RNG block
++- clocks: should contain the RNG clk source
++
++Example:
++
++rng@53fb0000 {
++	compatible = "fsl,imx25-rng";
++	reg = <0x53fb0000 0x4000>;
++	interrupts = <22>;
++	clocks = <&trng_clk>;
++};
+-- 
+2.1.4
