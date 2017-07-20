@@ -1,9 +1,9 @@
 From: Lars Persson <lars.persson-VrBV9hrLPhE@public.gmane.org>
-Subject: [PATCH 1/4] dt-bindings: crypto: add ARTPEC crypto
-Date: Thu, 20 Jul 2017 15:44:29 +0200
-Message-ID: <b493a0eb939fe97f7e604c0c83916e0dac1d2bce.1500557664.git.larper@axis.com>
+Subject: [PATCH 2/4] crypto: add crypto_(un)register_ahashes()
+Date: Thu, 20 Jul 2017 15:44:30 +0200
+Message-ID: <5244eea458d4e85d69bc9e44d33873f2cdd086ca.1500557664.git.larper@axis.com>
 References: <cover.1500557664.git.larper@axis.com>
-Cc: Lars Persson <larper-VrBV9hrLPhE@public.gmane.org>
+Cc: Rabin Vincent <rabinv-VrBV9hrLPhE@public.gmane.org>, Lars Persson <larper-VrBV9hrLPhE@public.gmane.org>
 To: herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
         robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org,
         linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
@@ -14,37 +14,70 @@ References: <cover.1500557664.git.larper-VrBV9hrLPhE@public.gmane.org>
 Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-Document the device tree bindings for the ARTPEC crypto accelerator on
-ARTPEC-6 and ARTPEC-7 SoCs.
+From: Rabin Vincent <rabinv-VrBV9hrLPhE@public.gmane.org>
+
+There are already helpers to (un)register multiple normal
+and AEAD algos.  Add one for ahashes too.
 
 Signed-off-by: Lars Persson <larper-VrBV9hrLPhE@public.gmane.org>
 ---
- .../devicetree/bindings/crypto/artpec6-crypto.txt        | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/crypto/artpec6-crypto.txt
+ crypto/ahash.c                 | 29 +++++++++++++++++++++++++++++
+ include/crypto/internal/hash.h |  2 ++
+ 2 files changed, 31 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/crypto/artpec6-crypto.txt b/Documentation/devicetree/bindings/crypto/artpec6-crypto.txt
-new file mode 100644
-index 000000000000..d9cca4875bd6
---- /dev/null
-+++ b/Documentation/devicetree/bindings/crypto/artpec6-crypto.txt
-@@ -0,0 +1,16 @@
-+Axis crypto engine with PDMA interface.
+diff --git a/crypto/ahash.c b/crypto/ahash.c
+index 826cd7ab4d4a..5e8666e6ccae 100644
+--- a/crypto/ahash.c
++++ b/crypto/ahash.c
+@@ -588,6 +588,35 @@ int crypto_unregister_ahash(struct ahash_alg *alg)
+ }
+ EXPORT_SYMBOL_GPL(crypto_unregister_ahash);
+ 
++int crypto_register_ahashes(struct ahash_alg *algs, int count)
++{
++	int i, ret;
 +
-+Required properties:
-+- compatible : Should be one of the following strings:
-+	"axis,artpec6-crypto" for the version in the Axis ARTPEC-6 SoC
-+	"axis,artpec7-crypto" for the version in the Axis ARTPEC-7 SoC.
-+- reg: Base address and size for the PDMA register area.
-+- interrupts: Interrupt handle for the PDMA interrupt line.
++	for (i = 0; i < count; i++) {
++		ret = crypto_register_ahash(&algs[i]);
++		if (ret)
++			goto err;
++	}
 +
-+Example:
++	return 0;
 +
-+crypto@f4264000 {
-+	compatible = "axis,artpec6-crypto";
-+	reg = <0xf4264000 0x1000>;
-+	interrupts = <GIC_SPI 19 IRQ_TYPE_LEVEL_HIGH>;
-+};
++err:
++	for (--i; i >= 0; --i)
++		crypto_unregister_ahash(&algs[i]);
++
++	return ret;
++}
++EXPORT_SYMBOL_GPL(crypto_register_ahashes);
++
++void crypto_unregister_ahashes(struct ahash_alg *algs, int count)
++{
++	int i;
++
++	for (i = count - 1; i >= 0; --i)
++		crypto_unregister_ahash(&algs[i]);
++}
++EXPORT_SYMBOL_GPL(crypto_unregister_ahashes);
++
+ int ahash_register_instance(struct crypto_template *tmpl,
+ 			    struct ahash_instance *inst)
+ {
+diff --git a/include/crypto/internal/hash.h b/include/crypto/internal/hash.h
+index f6d9af3efa45..f0b44c16e88f 100644
+--- a/include/crypto/internal/hash.h
++++ b/include/crypto/internal/hash.h
+@@ -76,6 +76,8 @@ static inline int crypto_ahash_walk_last(struct crypto_hash_walk *walk)
+ 
+ int crypto_register_ahash(struct ahash_alg *alg);
+ int crypto_unregister_ahash(struct ahash_alg *alg);
++int crypto_register_ahashes(struct ahash_alg *algs, int count);
++void crypto_unregister_ahashes(struct ahash_alg *algs, int count);
+ int ahash_register_instance(struct crypto_template *tmpl,
+ 			    struct ahash_instance *inst);
+ void ahash_free_instance(struct crypto_instance *inst);
 -- 
 2.11.0
 
