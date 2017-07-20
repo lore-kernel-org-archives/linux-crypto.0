@@ -1,50 +1,52 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
-Subject: Re: [PATCH 3/4] crypto: axis: add ARTPEC-6/7 crypto accelerator driver
-Date: Thu, 20 Jul 2017 16:51:17 +0200
-Message-ID: <9168085.KJckqYBggK@tauon.chronox.de>
-References: <cover.1500557664.git.larper@axis.com> <b2d7ce4b0fecc4e811c12573f44bd7c45f0147e2.1500557664.git.larper@axis.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH] crypto: ixp4xx - Fix error handling path in 'aead_perform()'
+Date: Thu, 20 Jul 2017 17:04:28 +0200
+Message-ID: <CAK8P3a0kNP9sH68hJ=Mhc1cj1LDwja1qiihdVVrv2gvJ=ZYj-A@mail.gmail.com>
+References: <20170719214757.29203-1-christophe.jaillet@wanadoo.fr> <CAK8P3a3RuQmudGRGvpE1i=RwjJ_KVU1S+bDqX6Bp6VLB7G+2cg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
-        robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org,
-        linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        Lars Persson <larper-VrBV9hrLPhE@public.gmane.org>
-To: Lars Persson <lars.persson-VrBV9hrLPhE@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <b2d7ce4b0fecc4e811c12573f44bd7c45f0147e2.1500557664.git.larper-VrBV9hrLPhE@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        David Miller <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        kernel-janitors@vger.kernel.org
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <CAK8P3a3RuQmudGRGvpE1i=RwjJ_KVU1S+bDqX6Bp6VLB7G+2cg@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Am Donnerstag, 20. Juli 2017, 15:44:31 CEST schrieb Lars Persson:
+On Thu, Jul 20, 2017 at 9:37 AM, Arnd Bergmann <arnd@arndb.de> wrote:
+> On Wed, Jul 19, 2017 at 11:47 PM, Christophe JAILLET
+> <christophe.jaillet@wanadoo.fr> wrote:
+>> In commit 0f987e25cb8a, the source processing has been moved in front of
+>> the destination processing, but the error handling path has not been
+>> modified accordingly.
+>> Free resources in the correct order to avoid some leaks.
+>>
+>> Fixes: 0f987e25cb8a ("crypto: ixp4xx - Fix false lastlen uninitialised warning")
+>> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+>
+> Thanks for spotting my mistake!
+>
+> I've looked at it again and think it's unfortunately still wrong with
+> your patch,
+> as there is a 'goto free_buf_src' after dma_pool_alloc(), and that now needs
+> to jump to free_buf_dst instead. We may also need an extra check to make
+> sure we don't free an uninitialized pointer again.
+>
+> Can you have a look at this version below and send whatever you find
+> to be correct in the end?
+>
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-Hi Lars,
+Coincidentally, I just came across an older patch of mine that actually
+fixes the warning properly, but that for some reason ended up not
+getting merged:
 
-> +static int
-> +artpec6_crypto_cipher_set_key(struct crypto_skcipher *cipher, const u8
-> *key, +			      unsigned int keylen)
-> +{
-> +	struct artpec6_cryptotfm_context *ctx =
-> +		crypto_skcipher_ctx(cipher);
-> +
-> +	if (ctx->crypto_type == ARTPEC6_CRYPTO_CIPHER_NULL)
-> +		return 0;
-> +
-> +	switch (keylen) {
-> +	case 16:
-> +	case 24:
-> +	case 32:
-> +		break;
-> +	case 48:
-> +	case 64:
-> +		if (ctx->crypto_type == ARTPEC6_CRYPTO_CIPHER_AES_XTS)
+https://patchwork.kernel.org/patch/8236811/
 
-Could you please add xts_check_key for XTS keys?
+How about we just revert my broken 0f987e25cb8a patch, and I apply
+the mach-ixp4xx patch instead?
 
-
-Ciao
-Stephan
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+       Arnd
