@@ -1,96 +1,91 @@
-From: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Subject: Re: [PATCH 000/102] Convert drivers to explicit reset API
-Date: Thu, 20 Jul 2017 13:46:17 -0700
-Message-ID: <CAKdAkRTx8jd8UToz5_EgMmdW3V47i2uo++YvVB_yzytqSA=P1Q@mail.gmail.com>
-References: <20170719152646.25903-1-p.zabel@pengutronix.de>
- <20170719211515.46a1196c@windsurf> <1500543415.2354.37.camel@pengutronix.de>
- <20170720123640.43c2ce01@windsurf> <1500555312.2354.75.camel@pengutronix.de>
+From: Rob Herring <robh+dt@kernel.org>
+Subject: Re: [PATCH v5 1/3] Documentation: devicetree: add Freescale RNGC binding
+Date: Thu, 20 Jul 2017 16:34:30 -0500
+Message-ID: <CAL_Jsq+-PYDw80EXC-eOvvQX7v8O9rVke_0XuM0_Du3xKj_ZWQ@mail.gmail.com>
+References: <1457705200-16951-1-git-send-email-s.trumtrar@pengutronix.de> <1500582447-28607-1-git-send-email-martin@kaiser.cx>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-        lkml <linux-kernel@vger.kernel.org>,
-        Andrew Lunn <andrew@lunn.ch>,
-        Prashant Gaikwad <pgaikwad@nvidia.com>,
-        Heiko Stuebner <heiko@sntech.de>,
-        Peter Chen <Peter.Chen@nxp.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        DRI <dri-devel@lists.freedesktop.org>,
-        Marc Dietrich <marvin24@gmx.de>,
-        Rakesh Iyer <riyer@nvidia.com>,
-        Peter Meerwald-Stadler <pmeerw@pmeerw.net>,
-        linux-clk@vger.kernel.org, Wim Van Sebroeck <wim@iguana.be>,
-        Wolfram Sang <wsa@the-dreams.de>,
-        Xinliang Liu <z.liuxinliang@hisilicon.com>,
-        Chanwoo Choi <cw00.choi@samsung.com>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Jiri Slaby <jslaby@suse.com>,
-        Michael Turquette <mturquette@baylibre.com>,
-        Guenter Roeck <linux@roeck-us.net>,
-To: Philipp Zabel <p.zabel@pengutronix.de>
-Return-path: <linux-mips-bounce@linux-mips.org>
-In-Reply-To: <1500555312.2354.75.camel@pengutronix.de>
-Sender: linux-mips-bounce@linux-mips.org
-Errors-to: linux-mips-bounce@linux-mips.org
-List-help: <mailto:ecartis@linux-mips.org?Subject=help>
-List-unsubscribe: <mailto:ecartis@linux-mips.org?subject=unsubscribe%20linux-mips>
-List-software: Ecartis version 1.0.0
-List-subscribe: <mailto:ecartis@linux-mips.org?subject=subscribe%20linux-mips>
-List-owner: <mailto:ralf@linux-mips.org>
-List-post: <mailto:linux-mips@linux-mips.org>
-List-archive: <http://www.linux-mips.org/archives/linux-mips/>
-List-Id: linux-crypto.vger.kernel.org
+Cc: Steffen Trumtrar <s.trumtrar@pengutronix.de>,
+        Shawn Guo <shawnguo@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        linux-crypto@vger.kernel.org,
+        "kernel@pengutronix.de" <kernel@pengutronix.de>,
+        Fabio Estevam <festevam@gmail.com>,
+        "linux-arm-kernel@lists.infradead.org"
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Martin Kaiser <martin@kaiser.cx>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:33462 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S965669AbdGTVew (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 20 Jul 2017 17:34:52 -0400
+In-Reply-To: <1500582447-28607-1-git-send-email-martin@kaiser.cx>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jul 20, 2017 at 5:55 AM, Philipp Zabel <p.zabel@pengutronix.de> wrote:
-> Hi Thomas,
+On Thu, Jul 20, 2017 at 3:27 PM, Martin Kaiser <martin@kaiser.cx> wrote:
+> From: Steffen Trumtrar <s.trumtrar@pengutronix.de>
 >
-> On Thu, 2017-07-20 at 12:36 +0200, Thomas Petazzoni wrote:
->> Hello,
->>
->> On Thu, 20 Jul 2017 11:36:55 +0200, Philipp Zabel wrote:
->>
->> > > I don't know if it has been discussed in the past, so forgive me if it
->> > > has been. Have you considered adding a "int flags" argument to the
->> > > existing reset_control_get_*() functions, rather than introducing
->> > > separate exclusive variants ?
->> > >
->> > > Indeed, with a "int flags" argument you could in the future add more
->> > > variants/behaviors without actually multiplying the number of
->> > > functions. Something like the "flags" argument for request_irq() for
->> > > example.
->> >
->> > I can't find the discussion right now, but I remember we had talked
->> > about this in the past.
->> > Behind the scenes, all the inline API functions already call common
->> > entry points with flags (well, currently separate bool parameters for
->> > shared and optional).
->> > One reason against exposing those as an int flags in the user facing API
->> > is the possibility to accidentally provide a wrong value.
->>
->> This is a quite strange argument. You could also accidentally use the
->> wrong variant of the function, just like you could use the wrong flag.
+> Add binding documentation for the Freescale RNGC found on
+> some i.MX2/3 SoCs.
 >
-> You can't accidentally use no flag at all or a completely bogus value
-> with the "plethora of inline functions" variant.
+> Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+> Signed-off-by: Martin Kaiser <martin@kaiser.cx>
+> ---
+> Changes in v5:
+>   none
 >
->> Once again, the next time you have another parameter for those reset
->> functions, beyond the exclusive/shared variant, you will multiply again
->> by two the number of functions ? You already have the  exclusive/shared
->> and optional/mandatory variants, so 4 variants. When you'll add a new
->> parameter, you'll have 8 variants. Doesn't seem really good.
+> Changes in v4:
+>   none
 >
-> I'd rather avoid adding more variants, if possible. The complexity
-> increases regardless of whether the API is expressed as a bunch of
-> functions or as a single function with a bunch of flags.
->
->> What about reset_control_get(struct device *, const char *, int flags)
->> to replace all those variants ?
->
-> While I like how this looks, unfortunately (devm_)reset_control_get
-> already exists without the flags, so we can't change to that with a
-> gentle transition.
+> Changes in v3:
+>   - add compatible string for imx35
+>   - remove imx5 from the commit message,
+>     I couldn't find an i.MX SOC that has RNGC
 
-This was done for gpiod_get() and its flags argument with horrifying
-#define-ry, which thankfully was completely hidden from users.
+3 versions in 3 days... Give folks time to review.
 
--- 
-Dmitry
+> Changes in v2:
+>   none
+>
+>  Documentation/devicetree/bindings/rng/mxc_rngc.txt | 16 ++++++++++++++++
+
+Perhaps I wasn't clear. MXC is long dead. Use imx.
+
+>  1 file changed, 16 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/rng/mxc_rngc.txt
+>
+> diff --git a/Documentation/devicetree/bindings/rng/mxc_rngc.txt b/Documentation/devicetree/bindings/rng/mxc_rngc.txt
+> new file mode 100644
+> index 0000000..5a12ada
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/rng/mxc_rngc.txt
+> @@ -0,0 +1,16 @@
+> +Freescale RNGC (Random Number Generator Version C)
+> +
+> +Required properties:
+> +- compatible : Should be "fsl,imx25-rng" or "fsl,imx35-rng"
+
+rngc if that is what the block is called.
+
+Reformat to 1 valid set of compatibles per line.
+
+> +- reg : Offset and length of the register set of this block
+> +- interrupts : the interrupt number for the RNG block
+> +- clocks: should contain the RNG clk source
+> +
+> +Example:
+> +
+> +rng@53fb0000 {
+> +       compatible = "fsl,imx25-rng";
+> +       reg = <0x53fb0000 0x4000>;
+> +       interrupts = <22>;
+> +       clocks = <&trng_clk>;
+> +};
+> --
+> 2.1.4
+>
