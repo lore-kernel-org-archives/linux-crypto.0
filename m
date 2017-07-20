@@ -1,8 +1,9 @@
 From: Martin Kaiser <martin@kaiser.cx>
-Subject: [PATCH v4 1/3] Documentation: devicetree: add Freescale RNGC binding
-Date: Thu, 20 Jul 2017 12:27:13 +0200
-Message-ID: <1500546435-29905-1-git-send-email-martin@kaiser.cx>
+Subject: [PATCH v4 2/3] ARM: i.MX25: add RNGC node to dtsi
+Date: Thu, 20 Jul 2017 12:27:14 +0200
+Message-ID: <1500546435-29905-2-git-send-email-martin@kaiser.cx>
 References: <1457705200-16951-1-git-send-email-s.trumtrar@pengutronix.de>
+ <1500546435-29905-1-git-send-email-martin@kaiser.cx>
 Cc: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
         Mark Rutland <mark.rutland@arm.com>,
         devicetree@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
@@ -14,14 +15,13 @@ To: Steffen Trumtrar <s.trumtrar@pengutronix.de>,
         Shawn Guo <shawnguo@kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1457705200-16951-1-git-send-email-s.trumtrar@pengutronix.de>
+In-Reply-To: <1500546435-29905-1-git-send-email-martin@kaiser.cx>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 From: Steffen Trumtrar <s.trumtrar@pengutronix.de>
 
-Add binding documentation for the Freescale RNGC found on
-some i.MX2/3 SoCs.
+Add a devicetree entry for the Random Number Generator Version C (RNGC).
 
 Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
 Signed-off-by: Martin Kaiser <martin@kaiser.cx>
@@ -30,38 +30,31 @@ Changes in v4:
   none
 
 Changes in v3:
-  - add compatible string for imx35
-  - remove imx5 from the commit message,
-    I couldn't find an i.MX SOC that has RNGC
+  - remove clock-names from dtsi
 
 Changes in v2:
-  none
+  - remove interrupt-names from dtsi
 
- Documentation/devicetree/bindings/rng/mxc_rngc.txt | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/rng/mxc_rngc.txt
+ arch/arm/boot/dts/imx25.dtsi | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/rng/mxc_rngc.txt b/Documentation/devicetree/bindings/rng/mxc_rngc.txt
-new file mode 100644
-index 0000000..5a12ada
---- /dev/null
-+++ b/Documentation/devicetree/bindings/rng/mxc_rngc.txt
-@@ -0,0 +1,16 @@
-+Freescale RNGC (Random Number Generator Version C)
+diff --git a/arch/arm/boot/dts/imx25.dtsi b/arch/arm/boot/dts/imx25.dtsi
+index dfcc8e0..0d2f3a1 100644
+--- a/arch/arm/boot/dts/imx25.dtsi
++++ b/arch/arm/boot/dts/imx25.dtsi
+@@ -451,6 +451,13 @@
+ 				interrupt-names = "scm", "smn";
+ 			};
+ 
++			rng: rng@53fb0000 {
++				compatible = "fsl,imx25-rng";
++				reg = <0x53fb0000 0x4000>;
++				clocks = <&clks 109>;
++				interrupts = <22>;
++			};
 +
-+Required properties:
-+- compatible : Should be "fsl,imx25-rng" or "fsl,imx35-rng"
-+- reg : Offset and length of the register set of this block
-+- interrupts : the interrupt number for the RNG block
-+- clocks: should contain the RNG clk source
-+
-+Example:
-+
-+rng@53fb0000 {
-+	compatible = "fsl,imx25-rng";
-+	reg = <0x53fb0000 0x4000>;
-+	interrupts = <22>;
-+	clocks = <&trng_clk>;
-+};
+ 			esdhc1: esdhc@53fb4000 {
+ 				compatible = "fsl,imx25-esdhc";
+ 				reg = <0x53fb4000 0x4000>;
 -- 
 2.1.4
