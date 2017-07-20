@@ -1,126 +1,70 @@
-From: Tudor Ambarus <tudor.ambarus@microchip.com>
-Subject: [PATCH] crypto: ecdh: fix concurrency on shared secret and pubkey
-Date: Thu, 20 Jul 2017 10:37:39 +0300
-Message-ID: <20170720073739.8680-1-tudor.ambarus@microchip.com>
-References: <20170719070421.GA9426@gondor.apana.org.au>
+From: Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>
+Subject: Re: [PATCH 000/102] Convert drivers to explicit reset API
+Date: Thu, 20 Jul 2017 10:11:57 +0200
+Message-ID: <20170720081157.GA11630@kroah.com>
+References: <20170719152646.25903-1-p.zabel@pengutronix.de>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
-        <nicolas.ferre@microchip.com>,
-        Tudor Ambarus <tudor.ambarus@microchip.com>
-To: <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from esa6.microchip.iphmx.com ([216.71.154.253]:20707 "EHLO
-        esa6.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933883AbdGTHib (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 20 Jul 2017 03:38:31 -0400
-In-Reply-To: <20170719070421.GA9426@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Andrew Lunn <andrew-g2DYL2Zd6BY@public.gmane.org>, Prashant Gaikwad <pgaikwad-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>,
+ Heiko Stuebner <heiko-4mtYJXux2i+zQB+pC5nmwQ@public.gmane.org>, Peter Chen <Peter.Chen-3arQi8VN3Tc@public.gmane.org>,
+ Linus Walleij <linus.walleij-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, dri-devel-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org,
+ Marc Dietrich <marvin24-Mmb7MZpHnFY@public.gmane.org>, Rakesh Iyer <riyer-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>,
+ Peter Meerwald-Stadler <pmeerw-jW+XmwGofnusTnJN9+BGXg@public.gmane.org>, linux-clk-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+ Wim Van Sebroeck <wim-IQzOog9fTRqzQB+pC5nmwQ@public.gmane.org>, Wolfram Sang <wsa-z923LK4zBo2bacvFa/9K2g@public.gmane.org>,
+ Xinliang Liu <z.liuxinliang-C8/M+/jPZTeaMJb+Lgu22Q@public.gmane.org>,
+ Chanwoo Choi <cw00.choi-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>, Alan Stern <stern-nwvwT67g6+6dFdvTe/nMLpVzexx5G7lz@public.gmane.org>,
+ Jiri Slaby <jslaby-IBi9RG/b67k@public.gmane.org>, Michael Turquette <mturquette-rdvid1DuHRBWk0Htik3J/w@public.gmane.org>,
+ Guenter Roeck <linux-0h96xk9xTtrk1uMJSBkQmQ@public.gmane.org>, Ohad Ben-Cohen <ohad-Ix1uc/W3ht7QT0dZR+AlfA@public.gmane.org>,
+ linux-pm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Thomas Gleixner <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>,
+ Vincent Abriou <vincent.abriou-qxv4g6HH51o@public.gmane.org>, Bin Liu <b-liu-l0cyMroinI0@public.gmane.org>,
+ linux-usb-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-wireless-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+ linux-kernel@
+To: Philipp Zabel <p.zabel-bIcnvbaLZ9MEGnE8C9+IrQ@public.gmane.org>
+Return-path: <linux-mediatek-bounces+glpam-linux-mediatek=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20170719152646.25903-1-p.zabel-bIcnvbaLZ9MEGnE8C9+IrQ@public.gmane.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-mediatek>,
+ <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-mediatek/>
+List-Post: <mailto:linux-mediatek-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+List-Help: <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-mediatek>,
+ <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=subscribe>
+Sender: "Linux-mediatek" <linux-mediatek-bounces-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+Errors-To: linux-mediatek-bounces+glpam-linux-mediatek=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-ecdh_ctx contained static allocated data for the shared secret
-and public key.
+On Wed, Jul 19, 2017 at 05:25:04PM +0200, Philipp Zabel wrote:
+> The reset control API has two modes: exclusive access, where the driver
+> expects to have full and immediate control over the state of the reset
+> line, and shared (clock-like) access, where drivers only request reset
+> deassertion while active, but don't care about the state of the reset line
+> while inactive.
+> 
+> Commit a53e35db70d1 ("reset: Ensure drivers are explicit when requesting
+> reset lines") started to transition the reset control request API calls
+> to explicitly state whether the driver needs exclusive or shared reset
+> control behavior.
+> 
+> This series converts all drivers that currently implicitly request
+> exclusive reset controls to the corresponding explicit API call. It is,
+> for the most part, generated from the following semantic patch:
 
-The shared secret and the public key were doomed to concurrency
-issues because they could be shared by multiple crypto requests.
+Hey, I'm all for large api changes, but this really seems ackward, isn't
+there a "better" way to do this?
 
-The concurrency is fixed by replacing per-tfm shared secret and
-public key with per-request dynamically allocated shared secret
-and public key.
+Why not, as you say the "implicit" request is exclusive, just leave
+everything alone and state that the "reset_control_get()" call is
+exclusive and make the shared one the "odd" usage as that seems to not
+be the normal case.
 
-Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
----
- crypto/ecdh.c | 51 +++++++++++++++++++++++++++++++++------------------
- 1 file changed, 33 insertions(+), 18 deletions(-)
+That should be a much smaller patch right?
 
-diff --git a/crypto/ecdh.c b/crypto/ecdh.c
-index 61c7708..4271fc7 100644
---- a/crypto/ecdh.c
-+++ b/crypto/ecdh.c
-@@ -20,8 +20,6 @@ struct ecdh_ctx {
- 	unsigned int curve_id;
- 	unsigned int ndigits;
- 	u64 private_key[ECC_MAX_DIGITS];
--	u64 public_key[2 * ECC_MAX_DIGITS];
--	u64 shared_secret[ECC_MAX_DIGITS];
- };
- 
- static inline struct ecdh_ctx *ecdh_get_ctx(struct crypto_kpp *tfm)
-@@ -70,41 +68,58 @@ static int ecdh_set_secret(struct crypto_kpp *tfm, const void *buf,
- 
- static int ecdh_compute_value(struct kpp_request *req)
- {
--	int ret = 0;
- 	struct crypto_kpp *tfm = crypto_kpp_reqtfm(req);
- 	struct ecdh_ctx *ctx = ecdh_get_ctx(tfm);
--	size_t copied, nbytes;
-+	u64 *public_key;
-+	u64 *shared_secret = NULL;
- 	void *buf;
-+	size_t copied, nbytes, public_key_sz;
-+	int ret = -ENOMEM;
- 
- 	nbytes = ctx->ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
-+	/* Public part is a point thus it has both coordinates */
-+	public_key_sz = 2 * nbytes;
-+
-+	public_key = kmalloc(public_key_sz, GFP_KERNEL);
-+	if (!public_key)
-+		return -ENOMEM;
- 
- 	if (req->src) {
--		copied = sg_copy_to_buffer(req->src, 1, ctx->public_key,
--					   2 * nbytes);
--		if (copied != 2 * nbytes)
--			return -EINVAL;
-+		shared_secret = kmalloc(nbytes, GFP_KERNEL);
-+		if (!shared_secret)
-+			goto free_pubkey;
-+
-+		copied = sg_copy_to_buffer(req->src, 1, public_key,
-+					   public_key_sz);
-+		if (copied != public_key_sz) {
-+			ret = -EINVAL;
-+			goto free_all;
-+		}
- 
- 		ret = crypto_ecdh_shared_secret(ctx->curve_id, ctx->ndigits,
--						ctx->private_key,
--						ctx->public_key,
--						ctx->shared_secret);
-+						ctx->private_key, public_key,
-+						shared_secret);
- 
--		buf = ctx->shared_secret;
-+		buf = shared_secret;
- 	} else {
- 		ret = ecc_make_pub_key(ctx->curve_id, ctx->ndigits,
--				       ctx->private_key, ctx->public_key);
--		buf = ctx->public_key;
--		/* Public part is a point thus it has both coordinates */
--		nbytes *= 2;
-+				       ctx->private_key, public_key);
-+		buf = public_key;
-+		nbytes = public_key_sz;
- 	}
- 
- 	if (ret < 0)
--		return ret;
-+		goto free_all;
- 
- 	copied = sg_copy_from_buffer(req->dst, 1, buf, nbytes);
- 	if (copied != nbytes)
--		return -EINVAL;
-+		ret = -EINVAL;
- 
-+	/* fall through */
-+free_all:
-+	kzfree(shared_secret);
-+free_pubkey:
-+	kfree(public_key);
- 	return ret;
- }
- 
--- 
-2.9.4
+That way you don't break everything here, and require 100+ patches to
+just change the name of a function from one to another and do nothing
+else.
+
+thanks,
+
+greg k-h
