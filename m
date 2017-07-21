@@ -1,56 +1,48 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [RFC PATCH v12 3/4] Linux Random Number Generator
-Date: Fri, 21 Jul 2017 17:17:05 +0200
-Message-ID: <4074127.U4nTXhg6YI@tauon.chronox.de>
-References: <3910055.ntkqcq1Chb@positron.chronox.de> <2787001.lEj6P09Sfm@tauon.chronox.de> <CAK8P3a2+t1Wy1vgz-ie4h=Epsdy2hrM2ycmEsFptwNqwJ57CCQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
-Cc: Theodore Ts'o <tytso@mit.edu>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Jason A. Donenfeld" <jason@zx2c4.com>,
-        linux-crypto@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAK8P3a2+t1Wy1vgz-ie4h=Epsdy2hrM2ycmEsFptwNqwJ57CCQ@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH v2 2/3] crypto: scompress - free partially allocated scratch buffers on failure
+Date: Fri, 21 Jul 2017 16:42:37 +0100
+Message-ID: <20170721154238.21697-3-ard.biesheuvel@linaro.org>
+References: <20170721154238.21697-1-ard.biesheuvel@linaro.org>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+        giovanni.cabiddu@intel.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wm0-f48.google.com ([74.125.82.48]:38683 "EHLO
+        mail-wm0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750802AbdGUPnB (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 21 Jul 2017 11:43:01 -0400
+Received: by mail-wm0-f48.google.com with SMTP id w191so17403597wmw.1
+        for <linux-crypto@vger.kernel.org>; Fri, 21 Jul 2017 08:43:00 -0700 (PDT)
+In-Reply-To: <20170721154238.21697-1-ard.biesheuvel@linaro.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Am Freitag, 21. Juli 2017, 17:09:11 CEST schrieb Arnd Bergmann:
+When allocating the per-CPU scratch buffers, we allocate the source
+and destination buffers separately, but bail immediately if the second
+allocation fails, without freeing the first one. Fix that.
 
-Hi Arnd,
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+ crypto/scompress.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-> On Fri, Jul 21, 2017 at 10:57 AM, Stephan Müller <smueller@chronox.de> 
-wrote:
-> > Am Freitag, 21. Juli 2017, 05:08:47 CEST schrieb Theodore Ts'o:
-> >> Um, the timer is the largest number of interrupts on my system.  Compare:
-> >>             CPU0       CPU1       CPU2       CPU3
-> >>  
-> >>  LOC:    6396552    6038865    6558646    6057102   Local timer
-> >>  interrupts
-> >> 
-> >> with the number of disk related interrupts:
-> >>  120:      21492     139284      40513    1705886   PCI-MSI 376832-edge
-> >> 
-> >> ahci[0000:00:17.0]
-> > 
-> > They seem to be not picked up with the add_interrupt_randomness function.
-> 
-> On x86, the local APIC timer has some special handling in
-> arch/x86/entry/entry_64.S that does not go through handle_irq_event().
-> 
-> I would assume that this is different when you boot with the "noapictimer"
-> option and use the hpet clockevent instead.
-> 
-> On other architectures, the timer interrupt is often handled as a regular
-> IRQ as well.
-
-Thank you for the hint.
-
-Yet, I would think that timer interrupts can be identified by 
-add_interrupt_randomness, either by the IRQ or the stuck test that was is 
-suggested with the LRNG patch set.
-
-Ciao
-Stephan
+diff --git a/crypto/scompress.c b/crypto/scompress.c
+index 0b40d991d65f..2c07648305ad 100644
+--- a/crypto/scompress.c
++++ b/crypto/scompress.c
+@@ -125,8 +125,11 @@ static int crypto_scomp_alloc_all_scratches(void)
+ 		if (!scomp_src_scratches)
+ 			return -ENOMEM;
+ 		scomp_dst_scratches = crypto_scomp_alloc_scratches();
+-		if (!scomp_dst_scratches)
++		if (!scomp_dst_scratches) {
++			crypto_scomp_free_scratches(scomp_src_scratches);
++			scomp_src_scratches = NULL;
+ 			return -ENOMEM;
++		}
+ 	}
+ 	return 0;
+ }
+-- 
+2.11.0
