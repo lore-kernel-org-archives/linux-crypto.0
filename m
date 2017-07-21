@@ -1,189 +1,74 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [RFC PATCH v12 3/4] Linux Random Number Generator
-Date: Fri, 21 Jul 2017 10:57:11 +0200
-Message-ID: <2787001.lEj6P09Sfm@tauon.chronox.de>
-References: <3910055.ntkqcq1Chb@positron.chronox.de> <5238256.jqB5BlnSCf@positron.chronox.de> <20170721030846.m2r3ix4s2modahsw@thunk.org>
+From: Jan Glauber <jglauber@cavium.com>
+Subject: Re: Poor RNG performance on Ryzen
+Date: Fri, 21 Jul 2017 11:26:57 +0200
+Message-ID: <20170721092656.GA18604@wintermute>
+References: <1218e9b7-4eeb-d8a0-02b2-8ddd672ec454@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Jason A. Donenfeld" <jason@zx2c4.com>,
-        Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: Theodore Ts'o <tytso@mit.edu>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: Oliver Mangold <o.mangold@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:60776 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753938AbdGUI5O (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Jul 2017 04:57:14 -0400
-In-Reply-To: <20170721030846.m2r3ix4s2modahsw@thunk.org>
+Received: from mail-wm0-f42.google.com ([74.125.82.42]:38386 "EHLO
+        mail-wm0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932091AbdGUJ1A (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 21 Jul 2017 05:27:00 -0400
+Received: by mail-wm0-f42.google.com with SMTP id w191so8865688wmw.1
+        for <linux-crypto@vger.kernel.org>; Fri, 21 Jul 2017 02:26:59 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <1218e9b7-4eeb-d8a0-02b2-8ddd672ec454@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Freitag, 21. Juli 2017, 05:08:47 CEST schrieb Theodore Ts'o:
-
-Hi Theodore,
-
-> On Thu, Jul 20, 2017 at 09:00:02PM +0200, Stephan Müller wrote:
-> > I concur with your rationale where de-facto the correlation is effect is
-> > diminished and eliminated with the fast_pool and the minimal entropy
-> > estimation of interrupts.
-> > 
-> > But it does not address my concern. Maybe I was not clear, please allow me
-> > to explain it again.
-> > 
-> > We have lots of entropy in the system which is discarded by the
-> > aforementioned approach (if a high-res timer is present -- without it all
-> > bets are off anyway and this should be covered in a separate discussion).
-> > At boot time, this issue is fixed by injecting 256 interrupts in the CRNG
-> > and consider it seeded.
-> > 
-> > But at runtime, were we still need entropy to reseed the CRNG and to
-> > supply / dev/random. The accounting of entropy at runtime is much too
-> > conservative...
-> Practically no one uses /dev/random.  It's essentially a deprecated
-> interface; the primary interfaces that have been recommended for well
-> over a decade is /dev/urandom, and now, getrandom(2).  We only need
-> 384 bits of randomness every 5 minutes to reseed the CRNG, and that's
-> plenty even given the very conservative entropy estimation currently
-> being used.
-
-On a headless system with SSDs, this is not enough based on measurements where 
-entropy_avail is always low ...
+On Fri, Jul 21, 2017 at 09:12:01AM +0200, Oliver Mangold wrote:
+> Hi,
 > 
-> This was deliberate.  I care a lot more that we get the initial
-> boot-time CRNG initialization right on ARM32 and MIPS embedded
-> devices, far, far, more than I care about making plenty of
-> information-theoretic entropy available at /dev/random on an x86
-> system.  Further, I haven't seen an argument for the use case where
-> this would be valuable.
-
-My concern covers *both* /dev/random and /dev/urandom.
+> I was wondering why reading from /dev/urandom is much slower on
+> Ryzen than on Intel, and did some analysis. It turns out that the
+> RDRAND instruction is at fault, which takes much longer on AMD.
 > 
-> If you don't think they count because ARM32 and MIPS don't have a
-> high-res timer, then you have very different priorities than I do.  I
-> will point out that numerically there are huge number of these devices
-> --- and very, very few users of /dev/random.
-
-With only jiffies, you will not get suitable entropy from interrupts or HID or 
-block devices, as these actions can be monitored from user space with a 
-suitable degree of precision.
-
-The only real entropy provider would be HID as the entropy may come from the 
-key strokes. But that is observable and should not count as entropy.
+> if I read this correctly:
 > 
-> > You mentioned that you are super conservative for interrupts due to timer
-> > interrupts. In all measurements on the different systems I conducted, I
-> > have not seen that the timer triggers an interrupt picked up by
-> > add_interrupt_randomness.
+> --- drivers/char/random.c ---
+>     862         spin_lock_irqsave(&crng->lock, flags);
+>     863         if (arch_get_random_long(&v))
+>     864                 crng->state[14] ^= v;
+>     865         chacha20_block(&crng->state[0], out);
 > 
-> Um, the timer is the largest number of interrupts on my system.  Compare:
+> one call to RDRAND (with 64-bit operand) is issued per computation
+> of a chacha20 block. According to the measurements I did, it seems
+> on Ryzen this dominates the time usage:
 > 
->             CPU0       CPU1       CPU2       CPU3
->  LOC:    6396552    6038865    6558646    6057102   Local timer interrupts
+> On Broadwell E5-2650 v4:
 > 
-> with the number of disk related interrupts:
+> ---
+> # dd if=/dev/urandom of=/dev/null bs=1M status=progress
+> 28827451392 bytes (29 GB) copied, 143.290349 s, 201 MB/s
+> # perf top
+>   49.88%  [kernel]            [k] chacha20_block
+>   31.22%  [kernel]            [k] _extract_crng
+> ---
 > 
->  120:      21492     139284      40513    1705886   PCI-MSI 376832-edge     
-> ahci[0000:00:17.0]
-
-They seem to be not picked up with the add_interrupt_randomness function.
-
-Execute the follwing SystemTap script:
-
-global NUMSAMPLES = 10000;
-
-global num_events = 0;
-
-probe kernel.function("add_interrupt_randomness")
-{
-        printf("%d\n", $irq);
-        num_events++;
-
-        if (num_events > NUMSAMPLES)
-                exit();
-}
-
-The timer interrupt does not show up here.
-
+> On Ryzen 1800X:
 > 
-> ... and add_interrupt_randomness() gets called for **every**
-> interrupt.  On an mostly idle machine (I was in meetings most of
-> today) it's not surprising that time interrupts dominate.  That
-> doesn't matter for me as much because I don't really care about
-> /dev/random performance.  What's is **far** more important is that the
-> entropy estimations behave correctly, across all of Linux's
-> architectures, while the kernel is going through startup, before CRNG
-> is declared initialized.
+> ---
+> # dd if=/dev/urandom of=/dev/null bs=1M status=progress
+> 3169845248 bytes (3,2 GB, 3,0 GiB) copied, 42,0106 s, 75,5 MB/s
+> # perf top
+>   76,40%  [kernel]                       [k] _extract_crng
+>   13,05%  [kernel]                       [k] chacha20_block
+> ---
 > 
-> > As we have no formal model about entropy to begin with, we can only assume
-> > and hope we underestimate entropy with the entropy heuristic.
+> An easy improvement might be to replace the usage of
+> arch_get_random_long() by arch_get_random_int(), as the state array
+> contains just 32-bit elements, and (contrary to Intel) on Ryzen
+> 32-bit RDRAND is supposed to be faster by roughly a factor of 2.
+
+Nice catch. How much does the performance improve on Ryzen when you
+use arch_get_random_int()?
+
+--Jan
+
+> Best regards,
 > 
-> Yes, and that's why I use an ultra-conservative estimate.  If we start
-> using a more aggressive hueristic, we open ourselves up to potentially
-> very severe security bugs --- and for what?  What's the cost benefit
-> ratio here which makes this a worthwhile thing to risk?
-
-The benefit is that in case there is an entropy hog on the system, /dev/random 
-and /dev/urandom recover faster from that. Otherwise they do not get reseeded 
-at all.
-> 
-> > Finally, I still think it is helpful to allow (not mandate) to involve the
-> > kernel crypto API for the DRNG maintenance (i.e. the supplier for
-> > /dev/random and /dev/urandom). The reason is that now more and more DRNG
-> > implementations in hardware pop up. Why not allowing them to be used.
-> > I.e. random.c would only contain the logic to manage entropy but uses the
-> > DRNG requested by a user.
-> We *do* allow them to be used.  And we support a large number of
-> hardware random number generators already.  See drivers/char/hw_random.
-
-These are noise sources with RNGs, they are not the pure DRNGs without noise 
-source I am talking about.
-> 
-> BTW, I theorize that this is why the companies that could do the
-> bootloader random seen work haven't bothered.  Most of their products
-> have a TPM or equivalent, and with modern kernel the hw_random
-> interface now has a kernel thread that will automatically fill the
-> /dev/random entropy pool from the hw_random device.  So this all works
-> already, today, without needing a userspace rngd (which used to be
-> required).
-
-I am not talking about the input to /dev/random or /dev/urandom. I am talking 
-about the DRNG generating the output of /dev/random and /dev/urandom.
-> 
-> > In addition allowing a replacement of the DRNG component (at compile time
-> > at least) may get us away from having a separate DRNG solution in the
-> > kernel crypto API. Some users want their chosen or a standardized DRNG to
-> > deliver random numbers. Thus, we have several DRNGs in the kernel crypto
-> > API which are seeded by get_random_bytes. Or in user space, many folks
-> > need their own DRNG in user space in addition to the kernel. IMHO this is
-> > all a waste. If we could use the user-requested DRNG when producing
-> > random numbers for get_random_bytes or /dev/urandom or getrandom.
-> 
-> To be honest, I've never understood why that's there in the crypto API
-> at all.
-
-Exactly because some folks require a DRNG that meets certain criteria. The 
-DRNGs in the kernel crypto API are seeded by get_random_bytes and then produce 
-output for the callers just because get_random_bytes has a DRNG for outputting 
-data that is not suitable in their eyes.
-
-If get_random_bytes (or the user space interfaces) would be more flexible in 
-the output DRNG, the entire business with DRNGs in the kernel crypto API could 
-go away.
-
-> But adding more ways to switch out the DRNG for /dev/random
-> doesn't solve that problem; in fact it's moving things in the wrong
-> direction.
-
-I am always talking about /dev/random and /dev/urandom (as well as 
-get_random_bytes).
-> 
-> Cheers,
-> 
-> 						- Ted
-
-
-
-Ciao
-Stephan
+> OM
