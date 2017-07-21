@@ -1,38 +1,48 @@
-From: Gary R Hook <gary.hook@amd.com>
-Subject: Re: Poor RNG performance on Ryzen
-Date: Fri, 21 Jul 2017 10:04:16 -0500
-Message-ID: <842a138e-ff8f-4a2a-0bbe-3e419b008d65@amd.com>
-References: <1218e9b7-4eeb-d8a0-02b2-8ddd672ec454@gmail.com>
- <20170721092656.GA18604@wintermute>
- <09c9be2b-8b4d-ee06-8071-4f748fdb5970@gmail.com>
- <20170721144741.4igkvsd2fowptsy2@thunk.org>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [RFC PATCH v12 3/4] Linux Random Number Generator
+Date: Fri, 21 Jul 2017 17:09:11 +0200
+Message-ID: <CAK8P3a2+t1Wy1vgz-ie4h=Epsdy2hrM2ycmEsFptwNqwJ57CCQ@mail.gmail.com>
+References: <3910055.ntkqcq1Chb@positron.chronox.de> <5238256.jqB5BlnSCf@positron.chronox.de>
+ <20170721030846.m2r3ix4s2modahsw@thunk.org> <2787001.lEj6P09Sfm@tauon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Theodore Ts'o <tytso@mit.edu>, Oliver Mangold <o.mangold@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2nam02on0068.outbound.protection.outlook.com ([104.47.38.68]:25376
-        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1750849AbdGUPEv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Jul 2017 11:04:51 -0400
-In-Reply-To: <20170721144741.4igkvsd2fowptsy2@thunk.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Cc: "Theodore Ts'o" <tytso@mit.edu>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Jason A. Donenfeld" <jason@zx2c4.com>,
+        linux-crypto@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <2787001.lEj6P09Sfm@tauon.chronox.de>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 07/21/2017 09:47 AM, Theodore Ts'o wrote:
-> On Fri, Jul 21, 2017 at 01:39:13PM +0200, Oliver Mangold wrote:
->> Better, but obviously there is still much room for improvement by reducing
->> the number of calls to RDRAND.
->
-> Hmm, is there some way we can easily tell we are running on Ryzen?  Or
-> do we believe this is going to be true for all AMD devices?
->
-> I guess we could add some kind of "has_crappy_arch_get_random()" call
-> which could be defined by arch/x86, and change how aggressively we use
-> arch_get_random_*() depending on whether has_crappy_arch_get_random()
-> returns true or not....
+On Fri, Jul 21, 2017 at 10:57 AM, Stephan M=C3=BCller <smueller@chronox.de>=
+ wrote:
+> Am Freitag, 21. Juli 2017, 05:08:47 CEST schrieb Theodore Ts'o:
 
-Just a quick note to say that we are aware of the issue, and that it is
-being addressed.
+>> Um, the timer is the largest number of interrupts on my system.  Compare=
+:
+>>
+>>             CPU0       CPU1       CPU2       CPU3
+>>  LOC:    6396552    6038865    6558646    6057102   Local timer interrup=
+ts
+>>
+>> with the number of disk related interrupts:
+>>
+>>  120:      21492     139284      40513    1705886   PCI-MSI 376832-edge
+>> ahci[0000:00:17.0]
+>
+> They seem to be not picked up with the add_interrupt_randomness function.
+
+On x86, the local APIC timer has some special handling in
+arch/x86/entry/entry_64.S that does not go through handle_irq_event().
+
+I would assume that this is different when you boot with the "noapictimer"
+option and use the hpet clockevent instead.
+
+On other architectures, the timer interrupt is often handled as a regular
+IRQ as well.
+
+       Arnd
