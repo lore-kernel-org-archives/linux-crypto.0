@@ -1,7 +1,8 @@
 From: Gary R Hook <gary.hook@amd.com>
-Subject: [PATCH v2 0/4] Update support for XTS-AES on AMD CCPs
-Date: Fri, 21 Jul 2017 14:04:35 -0500
-Message-ID: <150066355075.49973.1565434199212056832.stgit@sosxen.amd.com>
+Subject: [PATCH v2 1/4] crypto: ccp - Add a call to xts_check_key()
+Date: Fri, 21 Jul 2017 14:04:45 -0500
+Message-ID: <150066388557.49973.11588709638848954248.stgit@sosxen.amd.com>
+References: <150066355075.49973.1565434199212056832.stgit@sosxen.amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
@@ -9,35 +10,46 @@ Cc: thomas.lendacky@amd.com, herbert@gondor.apana.org.au,
         davem@davemloft.net
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2nam03on0074.outbound.protection.outlook.com ([104.47.42.74]:63776
-        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
+Received: from mail-co1nam03on0081.outbound.protection.outlook.com ([104.47.40.81]:24639
+        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751504AbdGUTEl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Jul 2017 15:04:41 -0400
+        id S1754640AbdGUTEy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 21 Jul 2017 15:04:54 -0400
+In-Reply-To: <150066355075.49973.1565434199212056832.stgit@sosxen.amd.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The following series adds support for XS-AES on version 5 CCPs,
-both 128- and 256-bit, and enhances/clarifies/simplifies some
-crypto layer code.
+Vet the key using the available standard function
 
-Changes since v1:
- - rework the validation of the unit-size; move to a separate patch
- - expand the key buffer to accommodate 256-bit keys
- - use xts_check_key() in the crypto layer
-
+Signed-off-by: Gary R Hook <gary.hook@amd.com>
 ---
+ drivers/crypto/ccp/ccp-crypto-aes-xts.c |    9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-Gary R Hook (4):
-      crypto: ccp - Add a call to xts_check_key()
-      crypto: ccp - Enable XTS-AES-128 support on all CCPs
-      crypto: ccp - Rework the unit-size check for XTS-AES
-      crypto: ccp - Add XTS-AES-256 support for CCP version 5
-
-
- drivers/crypto/ccp/ccp-crypto-aes-xts.c |   98 +++++++++++++++++--------------
- drivers/crypto/ccp/ccp-crypto.h         |    2 -
- drivers/crypto/ccp/ccp-dev-v5.c         |    2 +
- drivers/crypto/ccp/ccp-dev.h            |    2 +
- drivers/crypto/ccp/ccp-ops.c            |   55 +++++++++++++++--
- 5 files changed, 106 insertions(+), 53 deletions(-)
+diff --git a/drivers/crypto/ccp/ccp-crypto-aes-xts.c b/drivers/crypto/ccp/ccp-crypto-aes-xts.c
+index 58a4244b4752..4a313f62dbea 100644
+--- a/drivers/crypto/ccp/ccp-crypto-aes-xts.c
++++ b/drivers/crypto/ccp/ccp-crypto-aes-xts.c
+@@ -15,6 +15,7 @@
+ #include <linux/delay.h>
+ #include <linux/scatterlist.h>
+ #include <crypto/aes.h>
++#include <crypto/xts.h>
+ #include <crypto/internal/skcipher.h>
+ #include <crypto/scatterwalk.h>
+ 
+@@ -96,7 +97,13 @@ static int ccp_aes_xts_complete(struct crypto_async_request *async_req, int ret)
+ static int ccp_aes_xts_setkey(struct crypto_ablkcipher *tfm, const u8 *key,
+ 			      unsigned int key_len)
+ {
+-	struct ccp_ctx *ctx = crypto_tfm_ctx(crypto_ablkcipher_tfm(tfm));
++	struct crypto_tfm *xfm = crypto_ablkcipher_tfm(tfm);
++	struct ccp_ctx *ctx = crypto_tfm_ctx(xfm);
++	int ret;
++
++	ret = xts_check_key(xfm, key, key_len);
++	if (ret)
++		return ret;
+ 
+ 	/* Only support 128-bit AES key with a 128-bit Tweak key,
+ 	 * otherwise use the fallback
