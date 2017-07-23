@@ -1,79 +1,96 @@
-From: Linus Walleij <linus.walleij@linaro.org>
-Subject: Re: [PATCH 000/102] Convert drivers to explicit reset API
-Date: Sun, 23 Jul 2017 20:41:48 +0200
-Message-ID: <CACRpkdaXOv7mX+b-q1K34CB5w0SWPXCKa21wHaxL7qjf91PJXQ@mail.gmail.com>
-References: <20170719152646.25903-1-p.zabel@pengutronix.de>
- <20170719211515.46a1196c@windsurf> <1500543415.2354.37.camel@pengutronix.de>
- <20170720123640.43c2ce01@windsurf> <1500555312.2354.75.camel@pengutronix.de> <CAKdAkRTx8jd8UToz5_EgMmdW3V47i2uo++YvVB_yzytqSA=P1Q@mail.gmail.com>
+From: Theodore Ts'o <tytso@mit.edu>
+Subject: Re: [RFC PATCH v12 3/4] Linux Random Number Generator
+Date: Sun, 23 Jul 2017 17:47:57 -0400
+Message-ID: <20170723214757.qil4p7s4d6xc2ker@thunk.org>
+References: <3910055.ntkqcq1Chb@positron.chronox.de>
+ <150039607.torZXMN7kc@positron.chronox.de>
+ <20170718085212.GB25267@kroah.com>
+ <1780567.qGdv4EjEMp@positron.chronox.de>
+ <20170718210816.o6c4iziaqj5dnnd3@thunk.org>
+ <CACXcFmmFGYb-JteJZB8gS+uGJZ4zNLMU=AwPQf0td+xiG0+9Qw@mail.gmail.com>
+ <CACXcFm=mQ9namu2R32fJDDRe_gEGxiAar=Hne6012Vnq9x+uRA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Philipp Zabel <p.zabel@pengutronix.de>,
-        Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-        lkml <linux-kernel@vger.kernel.org>,
-        Andrew Lunn <andrew@lunn.ch>,
-        Prashant Gaikwad <pgaikwad@nvidia.com>,
-        Heiko Stuebner <heiko@sntech.de>,
-        Peter Chen <Peter.Chen@nxp.com>,
-        DRI <dri-devel@lists.freedesktop.org>,
-        Marc Dietrich <marvin24@gmx.de>,
-        Rakesh Iyer <riyer@nvidia.com>,
-        Peter Meerwald-Stadler <pmeerw@pmeerw.net>,
-        linux-clk <linux-clk@vger.kernel.org>,
-        Wim Van Sebroeck <wim@iguana.be>,
-        Wolfram Sang <wsa@the-dreams.de>,
-        Xinliang Liu <z.liuxinliang@hisilicon.com>,
-        Chanwoo Choi <cw00.choi@samsung.com>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Jiri Slaby <jslaby@suse.com>,
-        Michael Turquette <mturquette@baylibre.com>,
-        Guenter Roeck <linux@r
-To: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Return-path: <linux-mips-bounce@linux-mips.org>
-In-Reply-To: <CAKdAkRTx8jd8UToz5_EgMmdW3V47i2uo++YvVB_yzytqSA=P1Q@mail.gmail.com>
-Sender: linux-mips-bounce@linux-mips.org
-Errors-to: linux-mips-bounce@linux-mips.org
-List-help: <mailto:ecartis@linux-mips.org?Subject=help>
-List-unsubscribe: <mailto:ecartis@linux-mips.org?subject=unsubscribe%20linux-mips>
-List-software: Ecartis version 1.0.0
-List-subscribe: <mailto:ecartis@linux-mips.org?subject=subscribe%20linux-mips>
-List-owner: <mailto:ralf@linux-mips.org>
-List-post: <mailto:linux-mips@linux-mips.org>
-List-archive: <http://www.linux-mips.org/archives/linux-mips/>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Jason A. Donenfeld" <jason@zx2c4.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+To: Sandy Harris <sandyinchina@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from imap.thunk.org ([74.207.234.97]:52226 "EHLO imap.thunk.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751427AbdGWVsE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 23 Jul 2017 17:48:04 -0400
+Content-Disposition: inline
+In-Reply-To: <CACXcFm=mQ9namu2R32fJDDRe_gEGxiAar=Hne6012Vnq9x+uRA@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jul 20, 2017 at 10:46 PM, Dmitry Torokhov
-<dmitry.torokhov@gmail.com> wrote:
-> On Thu, Jul 20, 2017 at 5:55 AM, Philipp Zabel <p.zabel@pengutronix.de> wrote:
+On Sun, Jul 23, 2017 at 02:05:38PM -0400, Sandy Harris wrote:
+> Sandy Harris <sandyinchina@gmail.com> wrote:
+> 
+> > The biggest problem with random(4) is that you cannot generate good
+> > output without a good seed & just after boot, ...
+> >
+> > The only really good solution I know of is to find a way to provide a
+> > chunk of randomness early in the boot process. John Denker has a good
+> > discussion of doing this by modifying the kernel image & Ted talks of
+> > doing it via the boot loader. ...
+> 
+> Would it be enough to have a kernel module that does more-or-less what
+> the current shell scripts do, but earlier in the boot process? Throw
+> the stored data into the random(4) driver at module init time & update
+> it periodically later. This would not help much for first boot on a
+> new system, unless its store could be updated during install; Denker's
+> point that you need each system provisioned differently is important.
+> However it looks like it would be enough on other boots.
 
->>> What about reset_control_get(struct device *, const char *, int flags)
->>> to replace all those variants ?
->>
->> While I like how this looks, unfortunately (devm_)reset_control_get
->> already exists without the flags, so we can't change to that with a
->> gentle transition.
->
-> This was done for gpiod_get() and its flags argument with horrifying
-> #define-ry, which thankfully was completely hidden from users.
+There are two things that make this hard.  The first is progamming
+environment for, say, the GRUB bootloader, is very different from that
+of, say, a System V init script.  The second is that it's not obvious
+where you can safely store the information across boots.
 
-For your reference:
+For a specific architecture --- say, a PC desktop/server using a MBR
+or GPT partition table, it's not that hard.  At which point, if you
+want to assume that you are using a distribution kernel which is using
+an initial ramdisk, you might not even need a kernel module; you could
+just do it in the initrd before systemd gets a chance to run, and then
+you can do it as a straight-forward shell script.  So that's actually
+not hard, and not that different from what we have today.
 
-commit bae48da237fcedd7ad09569025483b988635efb7
-"gpiolib: add gpiod_get() and gpiod_put() functions"
+It won't solve the problem for, say a Tails system, where you could be
+booting off of a DVD (in which case you might not have any place to
+store state), or a USB or SD card.  That's *also* not hard, but you
+end up having to have a different solution for that case.
 
-commit 39b2bbe3d715cf5013b5c48695ccdd25bd3bf120
-"gpio: add flags argument to gpiod_get*() functions"
+> It also looks like it might be easier to implement & test. In
+> particular it is an isolated do-one-thing-well tool; the programmer
+> only needs to worry about his or her module, not several different
+> boot loaders or the procedures that distros have for CD images or
+> manufacturers for device setup.
 
-commit 0dbc8b7afef6e4fddcfebcbacbeb269a0a3b06d5
-"gpio: move varargs hack outside #ifdef GPIOLIB"
+Unfortunately, you *do* still have to worry about multiple partition
+tables, and potential places where the entropy could be stored.  The
+solution for MBR, GPT, and Tails will all have to be slightly
+different.
 
-commit b17d1bf16cc72a374a48d748940f700009d40ff4
-"gpio: make flags mandatory for gpiod_get functions"
+Again, none of this is terribly tricky work.  There are lots of fiddly
+details, and if you get it right for one configuration, you will still
+have to do something else for the next configuration.  So it's a lot
+of grunt work, and since you can't come up for one solution that will
+solve it for all systems, it won't be terribly glorious.
 
-Retrospectively ... was that really a good idea... it was a LOT
-of trouble to add a flag, maybe it had been better to try and
-just slam all users in a single go.
+Note that you can also solve this problem by diddling the systemd unit
+files, if you can make sure that you can fix the dependencies such
+that the entropy setup is the very thing that happens after root file
+system is mounted read/write, and before anything that might try to
+generate keys is allowed to run.  That's going to be roughly the same
+level of coverage as a kernel module and doesn't require trying to
+store it in some partition-table unique place, but instead you have to
+learn a lot of about systemd unit file configuration.
 
-But it worked.
+Cheers,
 
-Yours,
-Linus Walleij
+						- Ted
