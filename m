@@ -1,49 +1,34 @@
-From: Sandy Harris <sandyinchina@gmail.com>
-Subject: Re: [RFC PATCH v12 3/4] Linux Random Number Generator
-Date: Sun, 23 Jul 2017 14:05:38 -0400
-Message-ID: <CACXcFm=mQ9namu2R32fJDDRe_gEGxiAar=Hne6012Vnq9x+uRA@mail.gmail.com>
-References: <3910055.ntkqcq1Chb@positron.chronox.de> <150039607.torZXMN7kc@positron.chronox.de>
- <20170718085212.GB25267@kroah.com> <1780567.qGdv4EjEMp@positron.chronox.de>
- <20170718210816.o6c4iziaqj5dnnd3@thunk.org> <CACXcFmmFGYb-JteJZB8gS+uGJZ4zNLMU=AwPQf0td+xiG0+9Qw@mail.gmail.com>
+From: "Mr.John Mark" <ibrahimkarim798@gmail.com>
+Subject: Good Day My Good Friend
+Date: Sun, 23 Jul 2017 11:39:47 -0700
+Message-ID: <CABT18Ln6pimET99=wbCgkM+L4mx+A18Z0jMpUx7+TUx4uG3A0w__11846.4454463266$1500835193$gmane$org@mail.gmail.com>
+Reply-To: mackj1891@gmail.com
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Jason A. Donenfeld" <jason@zx2c4.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
+To: undisclosed-recipients:;
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wr0-f195.google.com ([209.85.128.195]:36929 "EHLO
-        mail-wr0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751412AbdGWSFl (ORCPT
+Received: from mail-io0-f196.google.com ([209.85.223.196]:35434 "EHLO
+        mail-io0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751461AbdGWSjs (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 23 Jul 2017 14:05:41 -0400
-In-Reply-To: <CACXcFmmFGYb-JteJZB8gS+uGJZ4zNLMU=AwPQf0td+xiG0+9Qw@mail.gmail.com>
+        Sun, 23 Jul 2017 14:39:48 -0400
+Received: by mail-io0-f196.google.com with SMTP id f1so6230246ioj.2
+        for <linux-crypto@vger.kernel.org>; Sun, 23 Jul 2017 11:39:48 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Sandy Harris <sandyinchina@gmail.com> wrote:
+Good Day My Good Friend
 
-> The biggest problem with random(4) is that you cannot generate good
-> output without a good seed & just after boot, ...
->
-> The only really good solution I know of is to find a way to provide a
-> chunk of randomness early in the boot process. John Denker has a good
-> discussion of doing this by modifying the kernel image & Ted talks of
-> doing it via the boot loader. ...
+Let me start by introducing myself I am Mr. John Mark from Burkina
+Faso, I am writing you this liter busy on latest development in my
+bank which i we like to bring you in. The sum of Eleven Million United
+State Dollars ($ 11Million) this is legitimate Transition after the
+transfer we will share it, 50% for me and 50% for you. Let me know if
+you Can you help me, kindly Contact me for more details if you are
+interested in the deal
 
-Would it be enough to have a kernel module that does more-or-less what
-the current shell scripts do, but earlier in the boot process? Throw
-the stored data into the random(4) driver at module init time & update
-it periodically later. This would not help much for first boot on a
-new system, unless its store could be updated during install; Denker's
-point that you need each system provisioned differently is important.
-However it looks like it would be enough on other boots.
+Contact me here: john.mark79592@yahoo.com
 
-It also looks like it might be easier to implement & test. In
-particular it is an isolated do-one-thing-well tool; the programmer
-only needs to worry about his or her module, not several different
-boot loaders or the procedures that distros have for CD images or
-manufacturers for device setup.
+Kind Regards
+
+Mr.John Mark
