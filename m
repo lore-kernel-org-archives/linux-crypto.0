@@ -1,123 +1,141 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH resend 01/18] crypto/algapi - use separate dst and src operands for __crypto_xor()
-Date: Mon, 24 Jul 2017 11:28:03 +0100
-Message-ID: <20170724102820.16534-2-ard.biesheuvel@linaro.org>
+Subject: [PATCH resend 07/18] crypto: arm64/sha2-ce - add non-SIMD scalar fallback
+Date: Mon, 24 Jul 2017 11:28:09 +0100
+Message-ID: <20170724102820.16534-8-ard.biesheuvel@linaro.org>
 References: <20170724102820.16534-1-ard.biesheuvel@linaro.org>
 Cc: herbert@gondor.apana.org.au, dave.martin@arm.com,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f43.google.com ([74.125.82.43]:36236 "EHLO
-        mail-wm0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751482AbdGXK2b (ORCPT
+Received: from mail-wr0-f181.google.com ([209.85.128.181]:36452 "EHLO
+        mail-wr0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751766AbdGXK2o (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Jul 2017 06:28:31 -0400
-Received: by mail-wm0-f43.google.com with SMTP id t201so14634211wmt.1
-        for <linux-crypto@vger.kernel.org>; Mon, 24 Jul 2017 03:28:30 -0700 (PDT)
+        Mon, 24 Jul 2017 06:28:44 -0400
+Received: by mail-wr0-f181.google.com with SMTP id y43so104224371wrd.3
+        for <linux-crypto@vger.kernel.org>; Mon, 24 Jul 2017 03:28:43 -0700 (PDT)
 In-Reply-To: <20170724102820.16534-1-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-In preparation of introducing crypto_xor_cpy(), which will use separate
-operands for input and output, modify the __crypto_xor() implementation,
-which it will share with the existing crypto_xor(), which provides the
-actual functionality when not using the inline version.
+The arm64 kernel will shortly disallow nested kernel mode NEON, so
+add a fallback to scalar code that can be invoked in that case.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- crypto/algapi.c         | 25 ++++++++++++--------
- include/crypto/algapi.h |  4 ++--
- 2 files changed, 17 insertions(+), 12 deletions(-)
+ arch/arm64/crypto/Kconfig        |  3 +-
+ arch/arm64/crypto/sha2-ce-glue.c | 30 +++++++++++++++++---
+ arch/arm64/crypto/sha256-glue.c  |  1 +
+ 3 files changed, 29 insertions(+), 5 deletions(-)
 
-diff --git a/crypto/algapi.c b/crypto/algapi.c
-index e4cc7615a139..aa699ff6c876 100644
---- a/crypto/algapi.c
-+++ b/crypto/algapi.c
-@@ -975,13 +975,15 @@ void crypto_inc(u8 *a, unsigned int size)
- }
- EXPORT_SYMBOL_GPL(crypto_inc);
+diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
+index 5d5953545dad..8cd145f9c1ff 100644
+--- a/arch/arm64/crypto/Kconfig
++++ b/arch/arm64/crypto/Kconfig
+@@ -24,8 +24,9 @@ config CRYPTO_SHA1_ARM64_CE
  
--void __crypto_xor(u8 *dst, const u8 *src, unsigned int len)
-+void __crypto_xor(u8 *dst, const u8 *src1, const u8 *src2, unsigned int len)
+ config CRYPTO_SHA2_ARM64_CE
+ 	tristate "SHA-224/SHA-256 digest algorithm (ARMv8 Crypto Extensions)"
+-	depends on ARM64 && KERNEL_MODE_NEON
++	depends on KERNEL_MODE_NEON
+ 	select CRYPTO_HASH
++	select CRYPTO_SHA256_ARM64
+ 
+ config CRYPTO_GHASH_ARM64_CE
+ 	tristate "GHASH (for GCM chaining mode) using ARMv8 Crypto Extensions"
+diff --git a/arch/arm64/crypto/sha2-ce-glue.c b/arch/arm64/crypto/sha2-ce-glue.c
+index 0ed9486f75dd..fd1ff2b13dfa 100644
+--- a/arch/arm64/crypto/sha2-ce-glue.c
++++ b/arch/arm64/crypto/sha2-ce-glue.c
+@@ -1,7 +1,7 @@
+ /*
+  * sha2-ce-glue.c - SHA-224/SHA-256 using ARMv8 Crypto Extensions
+  *
+- * Copyright (C) 2014 Linaro Ltd <ard.biesheuvel@linaro.org>
++ * Copyright (C) 2014 - 2017 Linaro Ltd <ard.biesheuvel@linaro.org>
+  *
+  * This program is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License version 2 as
+@@ -9,6 +9,7 @@
+  */
+ 
+ #include <asm/neon.h>
++#include <asm/simd.h>
+ #include <asm/unaligned.h>
+ #include <crypto/internal/hash.h>
+ #include <crypto/sha.h>
+@@ -34,13 +35,19 @@ const u32 sha256_ce_offsetof_count = offsetof(struct sha256_ce_state,
+ const u32 sha256_ce_offsetof_finalize = offsetof(struct sha256_ce_state,
+ 						 finalize);
+ 
++asmlinkage void sha256_block_data_order(u32 *digest, u8 const *src, int blocks);
++
+ static int sha256_ce_update(struct shash_desc *desc, const u8 *data,
+ 			    unsigned int len)
  {
- 	int relalign = 0;
+ 	struct sha256_ce_state *sctx = shash_desc_ctx(desc);
  
- 	if (!IS_ENABLED(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS)) {
- 		int size = sizeof(unsigned long);
--		int d = ((unsigned long)dst ^ (unsigned long)src) & (size - 1);
-+		int d = (((unsigned long)dst ^ (unsigned long)src1) |
-+			 ((unsigned long)dst ^ (unsigned long)src2)) &
-+			(size - 1);
++	if (!may_use_simd())
++		return sha256_base_do_update(desc, data, len,
++				(sha256_block_fn *)sha256_block_data_order);
++
+ 	sctx->finalize = 0;
+-	kernel_neon_begin_partial(28);
++	kernel_neon_begin();
+ 	sha256_base_do_update(desc, data, len,
+ 			      (sha256_block_fn *)sha2_ce_transform);
+ 	kernel_neon_end();
+@@ -54,13 +61,22 @@ static int sha256_ce_finup(struct shash_desc *desc, const u8 *data,
+ 	struct sha256_ce_state *sctx = shash_desc_ctx(desc);
+ 	bool finalize = !sctx->sst.count && !(len % SHA256_BLOCK_SIZE);
  
- 		relalign = d ? 1 << __ffs(d) : size;
++	if (!may_use_simd()) {
++		if (len)
++			sha256_base_do_update(desc, data, len,
++				(sha256_block_fn *)sha256_block_data_order);
++		sha256_base_do_finalize(desc,
++				(sha256_block_fn *)sha256_block_data_order);
++		return sha256_base_finish(desc, out);
++	}
++
+ 	/*
+ 	 * Allow the asm code to perform the finalization if there is no
+ 	 * partial data and the input is a round multiple of the block size.
+ 	 */
+ 	sctx->finalize = finalize;
  
-@@ -992,34 +994,37 @@ void __crypto_xor(u8 *dst, const u8 *src, unsigned int len)
- 		 * process the remainder of the input using optimal strides.
- 		 */
- 		while (((unsigned long)dst & (relalign - 1)) && len > 0) {
--			*dst++ ^= *src++;
-+			*dst++ = *src1++ ^ *src2++;
- 			len--;
- 		}
- 	}
- 
- 	while (IS_ENABLED(CONFIG_64BIT) && len >= 8 && !(relalign & 7)) {
--		*(u64 *)dst ^= *(u64 *)src;
-+		*(u64 *)dst = *(u64 *)src1 ^  *(u64 *)src2;
- 		dst += 8;
--		src += 8;
-+		src1 += 8;
-+		src2 += 8;
- 		len -= 8;
- 	}
- 
- 	while (len >= 4 && !(relalign & 3)) {
--		*(u32 *)dst ^= *(u32 *)src;
-+		*(u32 *)dst = *(u32 *)src1 ^ *(u32 *)src2;
- 		dst += 4;
--		src += 4;
-+		src1 += 4;
-+		src2 += 4;
- 		len -= 4;
- 	}
- 
- 	while (len >= 2 && !(relalign & 1)) {
--		*(u16 *)dst ^= *(u16 *)src;
-+		*(u16 *)dst = *(u16 *)src1 ^ *(u16 *)src2;
- 		dst += 2;
--		src += 2;
-+		src1 += 2;
-+		src2 += 2;
- 		len -= 2;
- 	}
- 
- 	while (len--)
--		*dst++ ^= *src++;
-+		*dst++ = *src1++ ^ *src2++;
- }
- EXPORT_SYMBOL_GPL(__crypto_xor);
- 
-diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
-index 436c4c2683c7..fd547f946bf8 100644
---- a/include/crypto/algapi.h
-+++ b/include/crypto/algapi.h
-@@ -192,7 +192,7 @@ static inline unsigned int crypto_queue_len(struct crypto_queue *queue)
- }
- 
- void crypto_inc(u8 *a, unsigned int size);
--void __crypto_xor(u8 *dst, const u8 *src, unsigned int size);
-+void __crypto_xor(u8 *dst, const u8 *src1, const u8 *src2, unsigned int size);
- 
- static inline void crypto_xor(u8 *dst, const u8 *src, unsigned int size)
+-	kernel_neon_begin_partial(28);
++	kernel_neon_begin();
+ 	sha256_base_do_update(desc, data, len,
+ 			      (sha256_block_fn *)sha2_ce_transform);
+ 	if (!finalize)
+@@ -74,8 +90,14 @@ static int sha256_ce_final(struct shash_desc *desc, u8 *out)
  {
-@@ -207,7 +207,7 @@ static inline void crypto_xor(u8 *dst, const u8 *src, unsigned int size)
- 			size -= sizeof(unsigned long);
- 		}
- 	} else {
--		__crypto_xor(dst, src, size);
-+		__crypto_xor(dst, dst, src, size);
- 	}
- }
+ 	struct sha256_ce_state *sctx = shash_desc_ctx(desc);
  
++	if (!may_use_simd()) {
++		sha256_base_do_finalize(desc,
++				(sha256_block_fn *)sha256_block_data_order);
++		return sha256_base_finish(desc, out);
++	}
++
+ 	sctx->finalize = 0;
+-	kernel_neon_begin_partial(28);
++	kernel_neon_begin();
+ 	sha256_base_do_finalize(desc, (sha256_block_fn *)sha2_ce_transform);
+ 	kernel_neon_end();
+ 	return sha256_base_finish(desc, out);
+diff --git a/arch/arm64/crypto/sha256-glue.c b/arch/arm64/crypto/sha256-glue.c
+index a2226f841960..b064d925fe2a 100644
+--- a/arch/arm64/crypto/sha256-glue.c
++++ b/arch/arm64/crypto/sha256-glue.c
+@@ -29,6 +29,7 @@ MODULE_ALIAS_CRYPTO("sha256");
+ 
+ asmlinkage void sha256_block_data_order(u32 *digest, const void *data,
+ 					unsigned int num_blks);
++EXPORT_SYMBOL(sha256_block_data_order);
+ 
+ asmlinkage void sha256_block_neon(u32 *digest, const void *data,
+ 				  unsigned int num_blks);
 -- 
 2.9.3
