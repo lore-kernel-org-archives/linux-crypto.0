@@ -1,19 +1,19 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH resend 18/18] crypto: arm64/aes - avoid expanded lookup tables in the final round
-Date: Mon, 24 Jul 2017 11:28:20 +0100
-Message-ID: <20170724102820.16534-19-ard.biesheuvel@linaro.org>
+Subject: [PATCH resend 17/18] crypto: arm/aes - avoid expanded lookup tables in the final round
+Date: Mon, 24 Jul 2017 11:28:19 +0100
+Message-ID: <20170724102820.16534-18-ard.biesheuvel@linaro.org>
 References: <20170724102820.16534-1-ard.biesheuvel@linaro.org>
 Cc: herbert@gondor.apana.org.au, dave.martin@arm.com,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wr0-f180.google.com ([209.85.128.180]:37071 "EHLO
-        mail-wr0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752616AbdGXK3H (ORCPT
+Received: from mail-wm0-f48.google.com ([74.125.82.48]:37335 "EHLO
+        mail-wm0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752626AbdGXK3F (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Jul 2017 06:29:07 -0400
-Received: by mail-wr0-f180.google.com with SMTP id 33so47739146wrz.4
-        for <linux-crypto@vger.kernel.org>; Mon, 24 Jul 2017 03:29:07 -0700 (PDT)
+        Mon, 24 Jul 2017 06:29:05 -0400
+Received: by mail-wm0-f48.google.com with SMTP id c184so27692039wmd.0
+        for <linux-crypto@vger.kernel.org>; Mon, 24 Jul 2017 03:29:05 -0700 (PDT)
 In-Reply-To: <20170724102820.16534-1-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
@@ -29,103 +29,79 @@ This should significantly reduce the Dcache footprint of our code,
 which makes the code more robust against timing attacks. It does not
 introduce any additional module dependencies, given that we already
 rely on the core AES module for the shared key expansion routines.
-It also frees up register x18, which is not available as a scratch
-register on all platforms, which and so avoiding it improves
-shareability of this code.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm64/crypto/aes-cipher-core.S | 152 ++++++++++++++------
- 1 file changed, 107 insertions(+), 45 deletions(-)
+ arch/arm/crypto/aes-cipher-core.S | 88 +++++++++++++++-----
+ 1 file changed, 65 insertions(+), 23 deletions(-)
 
-diff --git a/arch/arm64/crypto/aes-cipher-core.S b/arch/arm64/crypto/aes-cipher-core.S
-index f2f9cc519309..6d2445d603cc 100644
---- a/arch/arm64/crypto/aes-cipher-core.S
-+++ b/arch/arm64/crypto/aes-cipher-core.S
+diff --git a/arch/arm/crypto/aes-cipher-core.S b/arch/arm/crypto/aes-cipher-core.S
+index c817a86c4ca8..54b384084637 100644
+--- a/arch/arm/crypto/aes-cipher-core.S
++++ b/arch/arm/crypto/aes-cipher-core.S
 @@ -10,6 +10,7 @@
+  */
  
  #include <linux/linkage.h>
- #include <asm/assembler.h>
 +#include <asm/cache.h>
  
  	.text
- 
-@@ -17,94 +18,155 @@
- 	out		.req	x1
- 	in		.req	x2
- 	rounds		.req	x3
--	tt		.req	x4
--	lt		.req	x2
-+	tt		.req	x2
- 
--	.macro		__pair, enc, reg0, reg1, in0, in1e, in1d, shift
-+	.macro		__pair1, sz, op, reg0, reg1, in0, in1e, in1d, shift
-+	.ifc		\op\shift, b0
-+	ubfiz		\reg0, \in0, #2, #8
-+	ubfiz		\reg1, \in1e, #2, #8
-+	.else
- 	ubfx		\reg0, \in0, #\shift, #8
--	.if		\enc
- 	ubfx		\reg1, \in1e, #\shift, #8
--	.else
--	ubfx		\reg1, \in1d, #\shift, #8
+ 	.align		5
+@@ -32,19 +33,19 @@
  	.endif
-+
-+	/*
-+	 * AArch64 cannot do byte size indexed loads from a table containing
-+	 * 32-bit quantities, i.e., 'ldrb w12, [tt, w12, uxtw #2]' is not a
-+	 * valid instruction. So perform the shift explicitly first for the
-+	 * high bytes (the low byte is shifted implicitly by using ubfiz rather
-+	 * than ubfx above)
-+	 */
-+	.ifnc		\op, b
- 	ldr		\reg0, [tt, \reg0, uxtw #2]
- 	ldr		\reg1, [tt, \reg1, uxtw #2]
-+	.else
-+	.if		\shift > 0
-+	lsl		\reg0, \reg0, #2
-+	lsl		\reg1, \reg1, #2
-+	.endif
-+	ldrb		\reg0, [tt, \reg0, uxtw]
-+	ldrb		\reg1, [tt, \reg1, uxtw]
-+	.endif
  	.endm
  
--	.macro		__hround, out0, out1, in0, in1, in2, in3, t0, t1, enc
-+	.macro		__pair0, sz, op, reg0, reg1, in0, in1e, in1d, shift
-+	ubfx		\reg0, \in0, #\shift, #8
-+	ubfx		\reg1, \in1d, #\shift, #8
-+	ldr\op		\reg0, [tt, \reg0, uxtw #\sz]
-+	ldr\op		\reg1, [tt, \reg1, uxtw #\sz]
-+	.endm
-+
-+	.macro		__hround, out0, out1, in0, in1, in2, in3, t0, t1, enc, sz, op
- 	ldp		\out0, \out1, [rk], #8
+-	.macro		__load, out, in, idx
++	.macro		__load, out, in, idx, sz, op
+ 	.if		__LINUX_ARM_ARCH__ < 7 && \idx > 0
+-	ldr		\out, [ttab, \in, lsr #(8 * \idx) - 2]
++	ldr\op		\out, [ttab, \in, lsr #(8 * \idx) - \sz]
+ 	.else
+-	ldr		\out, [ttab, \in, lsl #2]
++	ldr\op		\out, [ttab, \in, lsl #\sz]
+ 	.endif
+ 	.endm
  
--	__pair		\enc, w13, w14, \in0, \in1, \in3, 0
--	__pair		\enc, w15, w16, \in1, \in2, \in0, 8
--	__pair		\enc, w17, w18, \in2, \in3, \in1, 16
--	__pair		\enc, \t0, \t1, \in3, \in0, \in2, 24
--
--	eor		\out0, \out0, w13
--	eor		\out1, \out1, w14
--	eor		\out0, \out0, w15, ror #24
--	eor		\out1, \out1, w16, ror #24
--	eor		\out0, \out0, w17, ror #16
--	eor		\out1, \out1, w18, ror #16
-+	__pair\enc	\sz, \op, w12, w13, \in0, \in1, \in3, 0
-+	__pair\enc	\sz, \op, w14, w15, \in1, \in2, \in0, 8
-+	__pair\enc	\sz, \op, w16, w17, \in2, \in3, \in1, 16
-+	__pair\enc	\sz, \op, \t0, \t1, \in3, \in0, \in2, 24
-+
-+	eor		\out0, \out0, w12
-+	eor		\out1, \out1, w13
-+	eor		\out0, \out0, w14, ror #24
-+	eor		\out1, \out1, w15, ror #24
-+	eor		\out0, \out0, w16, ror #16
-+	eor		\out1, \out1, w17, ror #16
- 	eor		\out0, \out0, \t0, ror #8
- 	eor		\out1, \out1, \t1, ror #8
+-	.macro		__hround, out0, out1, in0, in1, in2, in3, t3, t4, enc
++	.macro		__hround, out0, out1, in0, in1, in2, in3, t3, t4, enc, sz, op
+ 	__select	\out0, \in0, 0
+ 	__select	t0, \in1, 1
+-	__load		\out0, \out0, 0
+-	__load		t0, t0, 1
++	__load		\out0, \out0, 0, \sz, \op
++	__load		t0, t0, 1, \sz, \op
+ 
+ 	.if		\enc
+ 	__select	\out1, \in1, 0
+@@ -53,10 +54,10 @@
+ 	__select	\out1, \in3, 0
+ 	__select	t1, \in0, 1
+ 	.endif
+-	__load		\out1, \out1, 0
++	__load		\out1, \out1, 0, \sz, \op
+ 	__select	t2, \in2, 2
+-	__load		t1, t1, 1
+-	__load		t2, t2, 2
++	__load		t1, t1, 1, \sz, \op
++	__load		t2, t2, 2, \sz, \op
+ 
+ 	eor		\out0, \out0, t0, ror #24
+ 
+@@ -68,9 +69,9 @@
+ 	__select	\t3, \in1, 2
+ 	__select	\t4, \in2, 3
+ 	.endif
+-	__load		\t3, \t3, 2
+-	__load		t0, t0, 3
+-	__load		\t4, \t4, 3
++	__load		\t3, \t3, 2, \sz, \op
++	__load		t0, t0, 3, \sz, \op
++	__load		\t4, \t4, 3, \sz, \op
+ 
+ 	eor		\out1, \out1, t1, ror #24
+ 	eor		\out0, \out0, t2, ror #16
+@@ -82,14 +83,14 @@
+ 	eor		\out1, \out1, t2
  	.endm
  
 -	.macro		fround, out0, out1, out2, out3, in0, in1, in2, in3
@@ -144,69 +120,38 @@ index f2f9cc519309..6d2445d603cc 100644
 +	__hround	\out2, \out3, \in2, \in1, \in0, \in3, \in1, \in0, 0, \sz, \op
  	.endm
  
--	.macro		do_crypt, round, ttab, ltab
--	ldp		w5, w6, [in]
--	ldp		w7, w8, [in, #8]
--	ldp		w9, w10, [rk], #16
--	ldp		w11, w12, [rk, #-8]
-+	.macro		do_crypt, round, ttab, ltab, bsz
-+	ldp		w4, w5, [in]
-+	ldp		w6, w7, [in, #8]
-+	ldp		w8, w9, [rk], #16
-+	ldp		w10, w11, [rk, #-8]
- 
-+CPU_BE(	rev		w4, w4		)
- CPU_BE(	rev		w5, w5		)
- CPU_BE(	rev		w6, w6		)
- CPU_BE(	rev		w7, w7		)
--CPU_BE(	rev		w8, w8		)
- 
-+	eor		w4, w4, w8
- 	eor		w5, w5, w9
- 	eor		w6, w6, w10
- 	eor		w7, w7, w11
--	eor		w8, w8, w12
- 
- 	adr_l		tt, \ttab
--	adr_l		lt, \ltab
- 
- 	tbnz		rounds, #1, 1f
- 
--0:	\round		w9, w10, w11, w12, w5, w6, w7, w8
--	\round		w5, w6, w7, w8, w9, w10, w11, w12
-+0:	\round		w8, w9, w10, w11, w4, w5, w6, w7
-+	\round		w4, w5, w6, w7, w8, w9, w10, w11
- 
- 1:	subs		rounds, rounds, #4
--	\round		w9, w10, w11, w12, w5, w6, w7, w8
--	csel		tt, tt, lt, hi
--	\round		w5, w6, w7, w8, w9, w10, w11, w12
--	b.hi		0b
--
-+	\round		w8, w9, w10, w11, w4, w5, w6, w7
-+	b.ls		3f
-+2:	\round		w4, w5, w6, w7, w8, w9, w10, w11
-+	b		0b
-+3:	adr_l		tt, \ltab
-+	\round		w4, w5, w6, w7, w8, w9, w10, w11, \bsz, b
-+
-+CPU_BE(	rev		w4, w4		)
- CPU_BE(	rev		w5, w5		)
- CPU_BE(	rev		w6, w6		)
- CPU_BE(	rev		w7, w7		)
--CPU_BE(	rev		w8, w8		)
- 
--	stp		w5, w6, [out]
--	stp		w7, w8, [out, #8]
-+	stp		w4, w5, [out]
-+	stp		w6, w7, [out, #8]
- 	ret
+ 	.macro		__rev, out, in
+@@ -114,7 +115,7 @@
+ 	.endif
  	.endm
  
--	.align		5
+-	.macro		do_crypt, round, ttab, ltab
++	.macro		do_crypt, round, ttab, ltab, bsz
+ 	push		{r3-r11, lr}
+ 
+ 	ldr		r4, [in]
+@@ -146,9 +147,12 @@
+ 
+ 1:	subs		rounds, rounds, #4
+ 	\round		r8, r9, r10, r11, r4, r5, r6, r7
+-	__adrl		ttab, \ltab, ls
++	bls		2f
+ 	\round		r4, r5, r6, r7, r8, r9, r10, r11
+-	bhi		0b
++	b		0b
++
++2:	__adrl		ttab, \ltab
++	\round		r4, r5, r6, r7, r8, r9, r10, r11, \bsz, b
+ 
+ #ifdef CONFIG_CPU_BIG_ENDIAN
+ 	__rev		r4, r4
+@@ -170,10 +174,48 @@
+ 	.ltorg
+ 	.endm
+ 
 +	.align		L1_CACHE_SHIFT
-+	.type		__aes_arm64_inverse_sbox, %object
-+__aes_arm64_inverse_sbox:
++	.type		__aes_arm_inverse_sbox, %object
++__aes_arm_inverse_sbox:
 +	.byte		0x52, 0x09, 0x6a, 0xd5, 0x30, 0x36, 0xa5, 0x38
 +	.byte		0xbf, 0x40, 0xa3, 0x9e, 0x81, 0xf3, 0xd7, 0xfb
 +	.byte		0x7c, 0xe3, 0x39, 0x82, 0x9b, 0x2f, 0xff, 0x87
@@ -239,17 +184,17 @@ index f2f9cc519309..6d2445d603cc 100644
 +	.byte		0xc8, 0xeb, 0xbb, 0x3c, 0x83, 0x53, 0x99, 0x61
 +	.byte		0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6, 0x26
 +	.byte		0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d
-+	.size		__aes_arm64_inverse_sbox, . - __aes_arm64_inverse_sbox
++	.size		__aes_arm_inverse_sbox, . - __aes_arm_inverse_sbox
 +
- ENTRY(__aes_arm64_encrypt)
+ ENTRY(__aes_arm_encrypt)
 -	do_crypt	fround, crypto_ft_tab, crypto_fl_tab
 +	do_crypt	fround, crypto_ft_tab, crypto_ft_tab + 1, 2
- ENDPROC(__aes_arm64_encrypt)
+ ENDPROC(__aes_arm_encrypt)
  
- 	.align		5
- ENTRY(__aes_arm64_decrypt)
++	.align		5
+ ENTRY(__aes_arm_decrypt)
 -	do_crypt	iround, crypto_it_tab, crypto_il_tab
-+	do_crypt	iround, crypto_it_tab, __aes_arm64_inverse_sbox, 0
- ENDPROC(__aes_arm64_decrypt)
++	do_crypt	iround, crypto_it_tab, __aes_arm_inverse_sbox, 0
+ ENDPROC(__aes_arm_decrypt)
 -- 
 2.9.3
