@@ -1,19 +1,19 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH resend 15/18] crypto: arm/ghash - add NEON accelerated fallback for vmull.p64
-Date: Mon, 24 Jul 2017 11:28:17 +0100
-Message-ID: <20170724102820.16534-16-ard.biesheuvel@linaro.org>
+Subject: [PATCH resend 16/18] crypto: arm64/ghash - add NEON accelerated fallback for 64-bit PMULL
+Date: Mon, 24 Jul 2017 11:28:18 +0100
+Message-ID: <20170724102820.16534-17-ard.biesheuvel@linaro.org>
 References: <20170724102820.16534-1-ard.biesheuvel@linaro.org>
 Cc: herbert@gondor.apana.org.au, dave.martin@arm.com,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f42.google.com ([74.125.82.42]:33078 "EHLO
-        mail-wm0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752626AbdGXK3B (ORCPT
+Received: from mail-wr0-f169.google.com ([209.85.128.169]:34876 "EHLO
+        mail-wr0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752616AbdGXK3D (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Jul 2017 06:29:01 -0400
-Received: by mail-wm0-f42.google.com with SMTP id c184so9375348wmd.0
-        for <linux-crypto@vger.kernel.org>; Mon, 24 Jul 2017 03:29:01 -0700 (PDT)
+        Mon, 24 Jul 2017 06:29:03 -0400
+Received: by mail-wr0-f169.google.com with SMTP id k71so50757310wrc.2
+        for <linux-crypto@vger.kernel.org>; Mon, 24 Jul 2017 03:29:03 -0700 (PDT)
 In-Reply-To: <20170724102820.16534-1-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
@@ -23,194 +23,207 @@ no support for the optional 64x64->128 polynomial multiplication
 instruction that is part of the ARMv8 Crypto Extensions. It is based
 on the paper "Fast Software Polynomial Multiplication on ARM Processors
 Using the NEON Engine" by Danilo Camara, Conrado Gouvea, Julio Lopez and
-Ricardo Dahab (https://hal.inria.fr/hal-01506572)
+Ricardo Dahab (https://hal.inria.fr/hal-01506572), but has been reworked
+extensively for the AArch64 ISA.
 
-On a 32-bit guest executing under KVM on a Cortex-A57, the new code is
-not only 4x faster than the generic table based GHASH driver, it is also
-time invariant. (Note that the existing vmull.p64 code is 16x faster on
-this core).
+On a low-end core such as the Cortex-A53 found in the Raspberry Pi3, the
+NEON based implementation is 4x faster than the table based one, and
+is time invariant as well, making it less vulnerable to timing attacks.
+When combined with the bit-sliced NEON implementation of AES-CTR, the
+AES-GCM performance increases by 2x (from 58 to 29 cycles per byte).
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm/crypto/Kconfig         |   5 +-
- arch/arm/crypto/ghash-ce-core.S | 234 ++++++++++++++++----
- arch/arm/crypto/ghash-ce-glue.c |  24 +-
- 3 files changed, 215 insertions(+), 48 deletions(-)
+ arch/arm64/crypto/ghash-ce-core.S | 248 +++++++++++++++++---
+ arch/arm64/crypto/ghash-ce-glue.c |  40 +++-
+ 2 files changed, 252 insertions(+), 36 deletions(-)
 
-diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
-index b9adedcc5b2e..ec72752d5668 100644
---- a/arch/arm/crypto/Kconfig
-+++ b/arch/arm/crypto/Kconfig
-@@ -94,14 +94,15 @@ config CRYPTO_AES_ARM_CE
- 	  ARMv8 Crypto Extensions
- 
- config CRYPTO_GHASH_ARM_CE
--	tristate "PMULL-accelerated GHASH using ARMv8 Crypto Extensions"
-+	tristate "PMULL-accelerated GHASH using NEON/ARMv8 Crypto Extensions"
- 	depends on KERNEL_MODE_NEON
- 	select CRYPTO_HASH
- 	select CRYPTO_CRYPTD
- 	help
- 	  Use an implementation of GHASH (used by the GCM AEAD chaining mode)
- 	  that uses the 64x64 to 128 bit polynomial multiplication (vmull.p64)
--	  that is part of the ARMv8 Crypto Extensions
-+	  that is part of the ARMv8 Crypto Extensions, or a slower variant that
-+	  uses the vmull.p8 instruction that is part of the basic NEON ISA.
- 
- config CRYPTO_CRCT10DIF_ARM_CE
- 	tristate "CRCT10DIF digest algorithm using PMULL instructions"
-diff --git a/arch/arm/crypto/ghash-ce-core.S b/arch/arm/crypto/ghash-ce-core.S
-index f6ab8bcc9efe..2f78c10b1881 100644
---- a/arch/arm/crypto/ghash-ce-core.S
-+++ b/arch/arm/crypto/ghash-ce-core.S
+diff --git a/arch/arm64/crypto/ghash-ce-core.S b/arch/arm64/crypto/ghash-ce-core.S
+index cb22459eba85..11ebf1ae248a 100644
+--- a/arch/arm64/crypto/ghash-ce-core.S
++++ b/arch/arm64/crypto/ghash-ce-core.S
 @@ -1,7 +1,7 @@
  /*
-- * Accelerated GHASH implementation with ARMv8 vmull.p64 instructions.
-+ * Accelerated GHASH implementation with NEON/ARMv8 vmull.p8/64 instructions.
+  * Accelerated GHASH implementation with ARMv8 PMULL instructions.
   *
-- * Copyright (C) 2015 Linaro Ltd. <ard.biesheuvel@linaro.org>
-+ * Copyright (C) 2015 - 2017 Linaro Ltd. <ard.biesheuvel@linaro.org>
+- * Copyright (C) 2014 Linaro Ltd. <ard.biesheuvel@linaro.org>
++ * Copyright (C) 2014 - 2017 Linaro Ltd. <ard.biesheuvel@linaro.org>
   *
   * This program is free software; you can redistribute it and/or modify it
   * under the terms of the GNU General Public License version 2 as published
-@@ -12,40 +12,162 @@
+@@ -11,31 +11,215 @@
+ #include <linux/linkage.h>
  #include <asm/assembler.h>
  
- 	SHASH		.req	q0
--	SHASH2		.req	q1
--	T1		.req	q2
--	T2		.req	q3
--	MASK		.req	q4
--	XL		.req	q5
--	XM		.req	q6
--	XH		.req	q7
--	IN1		.req	q7
-+	T1		.req	q1
-+	XL		.req	q2
-+	XM		.req	q3
-+	XH		.req	q4
-+	IN1		.req	q4
- 
- 	SHASH_L		.req	d0
- 	SHASH_H		.req	d1
--	SHASH2_L	.req	d2
--	T1_L		.req	d4
--	MASK_L		.req	d8
--	XL_L		.req	d10
--	XL_H		.req	d11
--	XM_L		.req	d12
--	XM_H		.req	d13
--	XH_L		.req	d14
-+	T1_L		.req	d2
-+	T1_H		.req	d3
-+	XL_L		.req	d4
-+	XL_H		.req	d5
-+	XM_L		.req	d6
-+	XM_H		.req	d7
-+	XH_L		.req	d8
+-	SHASH	.req	v0
+-	SHASH2	.req	v1
+-	T1	.req	v2
+-	T2	.req	v3
+-	MASK	.req	v4
+-	XL	.req	v5
+-	XM	.req	v6
+-	XH	.req	v7
+-	IN1	.req	v7
++	SHASH		.req	v0
++	SHASH2		.req	v1
++	T1		.req	v2
++	T2		.req	v3
++	MASK		.req	v4
++	XL		.req	v5
++	XM		.req	v6
++	XH		.req	v7
++	IN1		.req	v7
 +
-+	t0l		.req	d10
-+	t0h		.req	d11
-+	t1l		.req	d12
-+	t1h		.req	d13
-+	t2l		.req	d14
-+	t2h		.req	d15
-+	t3l		.req	d16
-+	t3h		.req	d17
-+	t4l		.req	d18
-+	t4h		.req	d19
++	k00_16		.req	v8
++	k32_48		.req	v9
 +
-+	t0q		.req	q5
-+	t1q		.req	q6
-+	t2q		.req	q7
-+	t3q		.req	q8
-+	t4q		.req	q9
-+	T2		.req	q9
++	t3		.req	v10
++	t4		.req	v11
++	t5		.req	v12
++	t6		.req	v13
++	t7		.req	v14
++	t8		.req	v15
++	t9		.req	v16
 +
-+	s1l		.req	d20
-+	s1h		.req	d21
-+	s2l		.req	d22
-+	s2h		.req	d23
-+	s3l		.req	d24
-+	s3h		.req	d25
-+	s4l		.req	d26
-+	s4h		.req	d27
++	perm1		.req	v17
++	perm2		.req	v18
++	perm3		.req	v19
 +
-+	MASK		.req	d28
-+	SHASH2_p8	.req	d28
++	sh1		.req	v20
++	sh2		.req	v21
++	sh3		.req	v22
++	sh4		.req	v23
 +
-+	k16		.req	d29
-+	k32		.req	d30
-+	k48		.req	d31
-+	SHASH2_p64	.req	d31
++	ss1		.req	v24
++	ss2		.req	v25
++	ss3		.req	v26
++	ss4		.req	v27
  
  	.text
- 	.fpu		crypto-neon-fp-armv8
+ 	.arch		armv8-a+crypto
  
-+	.macro		__pmull_p64, rd, rn, rm, b1, b2, b3, b4
-+	vmull.p64	\rd, \rn, \rm
-+	.endm
-+
- 	/*
+-	/*
 -	 * void pmull_ghash_update(int blocks, u64 dg[], const char *src,
 -	 *			   struct ghash_key const *k, const char *head)
-+	 * This implementation of 64x64 -> 128 bit polynomial multiplication
-+	 * using vmull.p8 instructions (8x8 -> 16) is taken from the paper
-+	 * "Fast Software Polynomial Multiplication on ARM Processors Using
-+	 * the NEON Engine" by Danilo Camara, Conrado Gouvea, Julio Lopez and
-+	 * Ricardo Dahab (https://hal.inria.fr/hal-01506572)
-+	 *
-+	 * It has been slightly tweaked for in-order performance, and to allow
-+	 * 'rq' to overlap with 'ad' or 'bd'.
- 	 */
+-	 */
 -ENTRY(pmull_ghash_update)
--	vld1.64		{SHASH}, [r3]
-+	.macro		__pmull_p8, rq, ad, bd, b1=t4l, b2=t3l, b3=t4l, b4=t3l
-+	vext.8		t0l, \ad, \ad, #1	@ A1
-+	.ifc		\b1, t4l
-+	vext.8		t4l, \bd, \bd, #1	@ B1
-+	.endif
-+	vmull.p8	t0q, t0l, \bd		@ F = A1*B
-+	vext.8		t1l, \ad, \ad, #2	@ A2
-+	vmull.p8	t4q, \ad, \b1		@ E = A*B1
-+	.ifc		\b2, t3l
-+	vext.8		t3l, \bd, \bd, #2	@ B2
-+	.endif
-+	vmull.p8	t1q, t1l, \bd		@ H = A2*B
-+	vext.8		t2l, \ad, \ad, #3	@ A3
-+	vmull.p8	t3q, \ad, \b2		@ G = A*B2
-+	veor		t0q, t0q, t4q		@ L = E + F
-+	.ifc		\b3, t4l
-+	vext.8		t4l, \bd, \bd, #3	@ B3
-+	.endif
-+	vmull.p8	t2q, t2l, \bd		@ J = A3*B
-+	veor		t0l, t0l, t0h		@ t0 = (L) (P0 + P1) << 8
-+	veor		t1q, t1q, t3q		@ M = G + H
-+	.ifc		\b4, t3l
-+	vext.8		t3l, \bd, \bd, #4	@ B4
-+	.endif
-+	vmull.p8	t4q, \ad, \b3		@ I = A*B3
-+	veor		t1l, t1l, t1h		@ t1 = (M) (P2 + P3) << 16
-+	vmull.p8	t3q, \ad, \b4		@ K = A*B4
-+	vand		t0h, t0h, k48
-+	vand		t1h, t1h, k32
-+	veor		t2q, t2q, t4q		@ N = I + J
-+	veor		t0l, t0l, t0h
-+	veor		t1l, t1l, t1h
-+	veor		t2l, t2l, t2h		@ t2 = (N) (P4 + P5) << 24
-+	vand		t2h, t2h, k16
-+	veor		t3l, t3l, t3h		@ t3 = (K) (P6 + P7) << 32
-+	vmov.i64	t3h, #0
-+	vext.8		t0q, t0q, t0q, #15
-+	veor		t2l, t2l, t2h
-+	vext.8		t1q, t1q, t1q, #14
-+	vmull.p8	\rq, \ad, \bd		@ D = A*B
-+	vext.8		t2q, t2q, t2q, #13
-+	vext.8		t3q, t3q, t3q, #12
-+	veor		t0q, t0q, t1q
-+	veor		t2q, t2q, t3q
-+	veor		\rq, \rq, t0q
-+	veor		\rq, \rq, t2q
++	.macro		__pmull_p64, rd, rn, rm
++	pmull		\rd\().1q, \rn\().1d, \rm\().1d
++	.endm
++
++	.macro		__pmull2_p64, rd, rn, rm
++	pmull2		\rd\().1q, \rn\().2d, \rm\().2d
++	.endm
++
++	.macro		__pmull_p8, rq, ad, bd
++	ext		t3.8b, \ad\().8b, \ad\().8b, #1		// A1
++	ext		t5.8b, \ad\().8b, \ad\().8b, #2		// A2
++	ext		t7.8b, \ad\().8b, \ad\().8b, #3		// A3
++
++	__pmull_p8_\bd	\rq, \ad
++	.endm
++
++	.macro		__pmull2_p8, rq, ad, bd
++	tbl		t3.16b, {\ad\().16b}, perm1.16b		// A1
++	tbl		t5.16b, {\ad\().16b}, perm2.16b		// A2
++	tbl		t7.16b, {\ad\().16b}, perm3.16b		// A3
++
++	__pmull2_p8_\bd	\rq, \ad
++	.endm
++
++	.macro		__pmull_p8_SHASH, rq, ad
++	__pmull_p8_tail	\rq, \ad\().8b, SHASH.8b, 8b,, sh1, sh2, sh3, sh4
++	.endm
++
++	.macro		__pmull_p8_SHASH2, rq, ad
++	__pmull_p8_tail	\rq, \ad\().8b, SHASH2.8b, 8b,, ss1, ss2, ss3, ss4
++	.endm
++
++	.macro		__pmull2_p8_SHASH, rq, ad
++	__pmull_p8_tail	\rq, \ad\().16b, SHASH.16b, 16b, 2, sh1, sh2, sh3, sh4
++	.endm
++
++	.macro		__pmull_p8_tail, rq, ad, bd, nb, t, b1, b2, b3, b4
++	pmull\t		t3.8h, t3.\nb, \bd			// F = A1*B
++	pmull\t		t4.8h, \ad, \b1\().\nb			// E = A*B1
++	pmull\t		t5.8h, t5.\nb, \bd			// H = A2*B
++	pmull\t		t6.8h, \ad, \b2\().\nb			// G = A*B2
++	pmull\t		t7.8h, t7.\nb, \bd			// J = A3*B
++	pmull\t		t8.8h, \ad, \b3\().\nb			// I = A*B3
++	pmull\t		t9.8h, \ad, \b4\().\nb			// K = A*B4
++	pmull\t		\rq\().8h, \ad, \bd			// D = A*B
++
++	eor		t3.16b, t3.16b, t4.16b			// L = E + F
++	eor		t5.16b, t5.16b, t6.16b			// M = G + H
++	eor		t7.16b, t7.16b, t8.16b			// N = I + J
++
++	uzp1		t4.2d, t3.2d, t5.2d
++	uzp2		t3.2d, t3.2d, t5.2d
++	uzp1		t6.2d, t7.2d, t9.2d
++	uzp2		t7.2d, t7.2d, t9.2d
++
++	// t3 = (L) (P0 + P1) << 8
++	// t5 = (M) (P2 + P3) << 16
++	eor		t4.16b, t4.16b, t3.16b
++	and		t3.16b, t3.16b, k32_48.16b
++
++	// t7 = (N) (P4 + P5) << 24
++	// t9 = (K) (P6 + P7) << 32
++	eor		t6.16b, t6.16b, t7.16b
++	and		t7.16b, t7.16b, k00_16.16b
++
++	eor		t4.16b, t4.16b, t3.16b
++	eor		t6.16b, t6.16b, t7.16b
++
++	zip2		t5.2d, t4.2d, t3.2d
++	zip1		t3.2d, t4.2d, t3.2d
++	zip2		t9.2d, t6.2d, t7.2d
++	zip1		t7.2d, t6.2d, t7.2d
++
++	ext		t3.16b, t3.16b, t3.16b, #15
++	ext		t5.16b, t5.16b, t5.16b, #14
++	ext		t7.16b, t7.16b, t7.16b, #13
++	ext		t9.16b, t9.16b, t9.16b, #12
++
++	eor		t3.16b, t3.16b, t5.16b
++	eor		t7.16b, t7.16b, t9.16b
++	eor		\rq\().16b, \rq\().16b, t3.16b
++	eor		\rq\().16b, \rq\().16b, t7.16b
++	.endm
++
++	.macro		__pmull_pre_p64
++	movi		MASK.16b, #0xe1
++	shl		MASK.2d, MASK.2d, #57
++	.endm
++
++	.macro		__pmull_pre_p8
++	// k00_16 := 0x0000000000000000_000000000000ffff
++	// k32_48 := 0x00000000ffffffff_0000ffffffffffff
++	movi		k32_48.2d, #0xffffffff
++	mov		k32_48.h[2], k32_48.h[0]
++	ushr		k00_16.2d, k32_48.2d, #32
++
++	// prepare the permutation vectors
++	mov_q		x5, 0x080f0e0d0c0b0a09
++	movi		T1.8b, #8
++	dup		perm1.2d, x5
++	eor		perm1.16b, perm1.16b, T1.16b
++	ushr		perm2.2d, perm1.2d, #8
++	ushr		perm3.2d, perm1.2d, #16
++	ushr		T1.2d, perm1.2d, #24
++	sli		perm2.2d, perm1.2d, #56
++	sli		perm3.2d, perm1.2d, #48
++	sli		T1.2d, perm1.2d, #40
++
++	// precompute loop invariants
++	tbl		sh1.16b, {SHASH.16b}, perm1.16b
++	tbl		sh2.16b, {SHASH.16b}, perm2.16b
++	tbl		sh3.16b, {SHASH.16b}, perm3.16b
++	tbl		sh4.16b, {SHASH.16b}, T1.16b
++	ext		ss1.8b, SHASH2.8b, SHASH2.8b, #1
++	ext		ss2.8b, SHASH2.8b, SHASH2.8b, #2
++	ext		ss3.8b, SHASH2.8b, SHASH2.8b, #3
++	ext		ss4.8b, SHASH2.8b, SHASH2.8b, #4
 +	.endm
 +
 +	//
@@ -218,14 +231,15 @@ index f6ab8bcc9efe..2f78c10b1881 100644
 +	// it in a single instruction.
 +	//
 +	.macro		__pmull_reduce_p64
-+	vmull.p64	T1, XL_L, MASK
++	pmull		T2.1q, XL.1d, MASK.1d
++	eor		XM.16b, XM.16b, T1.16b
 +
-+	veor		XH_L, XH_L, XM_H
-+	vext.8		T1, T1, T1, #8
-+	veor		XL_H, XL_H, XM_L
-+	veor		T1, T1, XL
++	mov		XH.d[0], XM.d[1]
++	mov		XM.d[1], XL.d[0]
 +
-+	vmull.p64	XL, T1_H, MASK
++	eor		XL.16b, XM.16b, T2.16b
++	ext		T2.16b, XL.16b, XL.16b, #8
++	pmull		XL.1q, XL.1d, MASK.1d
 +	.endm
 +
 +	//
@@ -233,74 +247,75 @@ index f6ab8bcc9efe..2f78c10b1881 100644
 +	// 64x64->128 PMULL instruction
 +	//
 +	.macro		__pmull_reduce_p8
-+	veor		XL_H, XL_H, XM_L
-+	veor		XH_L, XH_L, XM_H
++	eor		XM.16b, XM.16b, T1.16b
 +
-+	vshl.i64	T1, XL, #57
-+	vshl.i64	T2, XL, #62
-+	veor		T1, T1, T2
-+	vshl.i64	T2, XL, #63
-+	veor		T1, T1, T2
-+	veor		XL_H, XL_H, T1_L
-+	veor		XH_L, XH_L, T1_H
++	mov		XL.d[1], XM.d[0]
++	mov		XH.d[0], XM.d[1]
 +
-+	vshr.u64	T1, XL, #1
-+	veor		XH, XH, XL
-+	veor		XL, XL, T1
-+	vshr.u64	T1, T1, #6
-+	vshr.u64	XL, XL, #1
++	shl		T1.2d, XL.2d, #57
++	shl		T2.2d, XL.2d, #62
++	eor		T2.16b, T2.16b, T1.16b
++	shl		T1.2d, XL.2d, #63
++	eor		T2.16b, T2.16b, T1.16b
++	ext		T1.16b, XL.16b, XH.16b, #8
++	eor		T2.16b, T2.16b, T1.16b
++
++	mov		XL.d[1], T2.d[0]
++	mov		XH.d[0], T2.d[1]
++
++	ushr		T2.2d, XL.2d, #1
++	eor		XH.16b, XH.16b, XL.16b
++	eor		XL.16b, XL.16b, T2.16b
++	ushr		T2.2d, T2.2d, #6
++	ushr		XL.2d, XL.2d, #1
 +	.endm
 +
-+	.macro		ghash_update, pn
- 	vld1.64		{XL}, [r1]
--	vmov.i8		MASK, #0xe1
--	vext.8		SHASH2, SHASH, SHASH, #8
--	vshl.u64	MASK, MASK, #57
--	veor		SHASH2, SHASH2, SHASH
++	.macro		__pmull_ghash, pn
+ 	ld1		{SHASH.2d}, [x3]
+ 	ld1		{XL.2d}, [x1]
+-	movi		MASK.16b, #0xe1
+ 	ext		SHASH2.16b, SHASH.16b, SHASH.16b, #8
+-	shl		MASK.2d, MASK.2d, #57
+ 	eor		SHASH2.16b, SHASH2.16b, SHASH.16b
  
++	__pmull_pre_\pn
++
  	/* do the head block first, if supplied */
- 	ldr		ip, [sp]
-@@ -62,33 +184,59 @@ ENTRY(pmull_ghash_update)
- #ifndef CONFIG_CPU_BIG_ENDIAN
- 	vrev64.8	T1, T1
- #endif
--	vext.8		T2, XL, XL, #8
- 	vext.8		IN1, T1, T1, #8
--	veor		T1, T1, T2
-+	veor		T1_L, T1_L, XL_H
- 	veor		XL, XL, IN1
+ 	cbz		x4, 0f
+ 	ld1		{T1.2d}, [x4]
+@@ -52,23 +236,17 @@ CPU_LE(	rev64		T1.16b, T1.16b	)
+ 	eor		T1.16b, T1.16b, T2.16b
+ 	eor		XL.16b, XL.16b, IN1.16b
  
--	vmull.p64	XH, SHASH_H, XL_H		@ a1 * b1
-+	__pmull_\pn	XH, XL_H, SHASH_H, s1h, s2h, s3h, s4h	@ a1 * b1
- 	veor		T1, T1, XL
--	vmull.p64	XL, SHASH_L, XL_L		@ a0 * b0
--	vmull.p64	XM, SHASH2_L, T1_L		@ (a1 + a0)(b1 + b0)
-+	__pmull_\pn	XL, XL_L, SHASH_L, s1l, s2l, s3l, s4l	@ a0 * b0
-+	__pmull_\pn	XM, T1_L, SHASH2_\pn			@ (a1+a0)(b1+b0)
+-	pmull2		XH.1q, SHASH.2d, XL.2d		// a1 * b1
++	__pmull2_\pn	XH, XL, SHASH			// a1 * b1
+ 	eor		T1.16b, T1.16b, XL.16b
+-	pmull		XL.1q, SHASH.1d, XL.1d		// a0 * b0
+-	pmull		XM.1q, SHASH2.1d, T1.1d		// (a1 + a0)(b1 + b0)
++	__pmull_\pn 	XL, XL, SHASH			// a0 * b0
++	__pmull_\pn	XM, T1, SHASH2			// (a1 + a0)(b1 + b0)
  
--	vext.8		T1, XL, XH, #8
--	veor		T2, XL, XH
-+	veor		T1, XL, XH
- 	veor		XM, XM, T1
--	veor		XM, XM, T2
--	vmull.p64	T2, XL_L, MASK_L
+-	ext		T1.16b, XL.16b, XH.16b, #8
+ 	eor		T2.16b, XL.16b, XH.16b
+-	eor		XM.16b, XM.16b, T1.16b
++	ext		T1.16b, XL.16b, XH.16b, #8
+ 	eor		XM.16b, XM.16b, T2.16b
+-	pmull		T2.1q, XL.1d, MASK.1d
  
--	vmov		XH_L, XM_H
--	vmov		XM_H, XL_L
+-	mov		XH.d[0], XM.d[1]
+-	mov		XM.d[1], XL.d[0]
 +	__pmull_reduce_\pn
  
--	veor		XL, XM, T2
--	vext.8		T2, XL, XL, #8
--	vmull.p64	XL, XL_L, MASK_L
--	veor		T2, T2, XH
--	veor		XL, XL, T2
-+	veor		T1, T1, XH
-+	veor		XL, XL, T1
+-	eor		XL.16b, XM.16b, T2.16b
+-	ext		T2.16b, XL.16b, XL.16b, #8
+-	pmull		XL.1q, XL.1d, MASK.1d
+ 	eor		T2.16b, T2.16b, XH.16b
+ 	eor		XL.16b, XL.16b, T2.16b
  
- 	bne		0b
+@@ -76,7 +254,19 @@ CPU_LE(	rev64		T1.16b, T1.16b	)
  
- 	vst1.64		{XL}, [r1]
- 	bx		lr
+ 	st1		{XL.2d}, [x1]
+ 	ret
 -ENDPROC(pmull_ghash_update)
 +	.endm
 +
@@ -309,48 +324,29 @@ index f6ab8bcc9efe..2f78c10b1881 100644
 +	 *			   struct ghash_key const *k, const char *head)
 +	 */
 +ENTRY(pmull_ghash_update_p64)
-+	vld1.64		{SHASH}, [r3]
-+	veor		SHASH2_p64, SHASH_L, SHASH_H
-+
-+	vmov.i8		MASK, #0xe1
-+	vshl.u64	MASK, MASK, #57
-+
-+	ghash_update	p64
++	__pmull_ghash	p64
 +ENDPROC(pmull_ghash_update_p64)
 +
 +ENTRY(pmull_ghash_update_p8)
-+	vld1.64		{SHASH}, [r3]
-+	veor		SHASH2_p8, SHASH_L, SHASH_H
-+
-+	vext.8		s1l, SHASH_L, SHASH_L, #1
-+	vext.8		s2l, SHASH_L, SHASH_L, #2
-+	vext.8		s3l, SHASH_L, SHASH_L, #3
-+	vext.8		s4l, SHASH_L, SHASH_L, #4
-+	vext.8		s1h, SHASH_H, SHASH_H, #1
-+	vext.8		s2h, SHASH_H, SHASH_H, #2
-+	vext.8		s3h, SHASH_H, SHASH_H, #3
-+	vext.8		s4h, SHASH_H, SHASH_H, #4
-+
-+	vmov.i64	k16, #0xffff
-+	vmov.i64	k32, #0xffffffff
-+	vmov.i64	k48, #0xffffffffffff
-+
-+	ghash_update	p8
++	__pmull_ghash	p8
 +ENDPROC(pmull_ghash_update_p8)
-diff --git a/arch/arm/crypto/ghash-ce-glue.c b/arch/arm/crypto/ghash-ce-glue.c
-index 6bac8bea9f1e..d9bb52cae2ac 100644
---- a/arch/arm/crypto/ghash-ce-glue.c
-+++ b/arch/arm/crypto/ghash-ce-glue.c
-@@ -22,6 +22,7 @@
- MODULE_DESCRIPTION("GHASH secure hash using ARMv8 Crypto Extensions");
+ 
+ 	KS		.req	v8
+ 	CTR		.req	v9
+diff --git a/arch/arm64/crypto/ghash-ce-glue.c b/arch/arm64/crypto/ghash-ce-glue.c
+index ee6aaac05905..cfc9c92814fd 100644
+--- a/arch/arm64/crypto/ghash-ce-glue.c
++++ b/arch/arm64/crypto/ghash-ce-glue.c
+@@ -26,6 +26,7 @@
+ MODULE_DESCRIPTION("GHASH and AES-GCM using ARMv8 Crypto Extensions");
  MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
  MODULE_LICENSE("GPL v2");
 +MODULE_ALIAS_CRYPTO("ghash");
  
  #define GHASH_BLOCK_SIZE	16
  #define GHASH_DIGEST_SIZE	16
-@@ -41,8 +42,17 @@ struct ghash_async_ctx {
- 	struct cryptd_ahash *cryptd_tfm;
+@@ -48,8 +49,17 @@ struct gcm_aes_ctx {
+ 	struct ghash_key	ghash_key;
  };
  
 -asmlinkage void pmull_ghash_update(int blocks, u64 dg[], const char *src,
@@ -367,28 +363,47 @@ index 6bac8bea9f1e..d9bb52cae2ac 100644
 +				  struct ghash_key const *k,
 +				  const char *head);
  
- static int ghash_init(struct shash_desc *desc)
+ asmlinkage void pmull_gcm_encrypt(int blocks, u64 dg[], u8 dst[],
+ 				  const u8 src[], struct ghash_key const *k,
+@@ -557,13 +567,24 @@ static int __init ghash_ce_mod_init(void)
  {
-@@ -312,6 +322,14 @@ static int __init ghash_ce_mod_init(void)
- {
- 	int err;
+ 	int ret;
  
-+	if (!(elf_hwcap & HWCAP_NEON))
+-	ret = crypto_register_aead(&gcm_aes_alg);
+-	if (ret)
+-		return ret;
++	if (!(elf_hwcap & HWCAP_ASIMD))
 +		return -ENODEV;
 +
-+	if (elf_hwcap2 & HWCAP2_PMULL)
++	if (elf_hwcap & HWCAP_PMULL)
 +		pmull_ghash_update = pmull_ghash_update_p64;
++
 +	else
 +		pmull_ghash_update = pmull_ghash_update_p8;
+ 
+ 	ret = crypto_register_shash(&ghash_alg);
+ 	if (ret)
+-		crypto_unregister_aead(&gcm_aes_alg);
++		return ret;
 +
- 	err = crypto_register_shash(&ghash_alg);
- 	if (err)
- 		return err;
-@@ -332,5 +350,5 @@ static void __exit ghash_ce_mod_exit(void)
- 	crypto_unregister_shash(&ghash_alg);
++	if (elf_hwcap & HWCAP_PMULL) {
++		ret = crypto_register_aead(&gcm_aes_alg);
++		if (ret)
++			crypto_unregister_shash(&ghash_alg);
++	}
+ 	return ret;
+ }
+ 
+@@ -573,5 +594,10 @@ static void __exit ghash_ce_mod_exit(void)
+ 	crypto_unregister_aead(&gcm_aes_alg);
  }
  
 -module_cpu_feature_match(PMULL, ghash_ce_mod_init);
++static const struct cpu_feature ghash_cpu_feature[] = {
++	{ cpu_feature(PMULL) }, { }
++};
++MODULE_DEVICE_TABLE(cpu, ghash_cpu_feature);
++
 +module_init(ghash_ce_mod_init);
  module_exit(ghash_ce_mod_exit);
 -- 
