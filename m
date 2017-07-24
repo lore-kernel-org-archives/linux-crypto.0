@@ -1,65 +1,102 @@
-From: Ram Pai <linuxram@us.ibm.com>
-Subject: Re: [PATCH V3 6/6] crypto/nx: Add P9 NX support for 842 compression
- engine
-Date: Mon, 24 Jul 2017 09:46:50 -0700
-Message-ID: <20170724164650.GA5628@ram.oc3035372033.ibm.com>
-References: <1500699702.23205.8.camel@hbabu-laptop>
-Reply-To: Ram Pai <linuxram@us.ibm.com>
+From: Eric Biggers <ebiggers3@gmail.com>
+Subject: Re: [PATCH v4 0/8] crypto: aes - retire table based generic AES
+Date: Mon, 24 Jul 2017 09:57:18 -0700
+Message-ID: <20170724165718.GA143373@gmail.com>
+References: <20170718120645.15880-1-ard.biesheuvel@linaro.org>
+ <CAKv+Gu8tzQOcehEtTu2nJVXRxxSNe5==-stKKkGjCzmvweNX1Q@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: mpe@ellerman.id.au, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        mikey@neuling.org, benh@kernel.crashing.org, suka@us.ibm.com,
-        ddstreet@ieee.org, npiggin@gmail.com, hbabu@us.ibm.com
-To: Haren Myneni <haren@linux.vnet.ibm.com>
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "nico@linaro.org" <nico@linaro.org>,
+        Eric Biggers <ebiggers@google.com>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54418 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1753780AbdGXQq7 (ORCPT
+Received: from mail-pf0-f194.google.com ([209.85.192.194]:36223 "EHLO
+        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753624AbdGXQ5W (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Jul 2017 12:46:59 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id v6OGiVAr073821
-        for <linux-crypto@vger.kernel.org>; Mon, 24 Jul 2017 12:46:59 -0400
-Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2bwf5j8fq1-1
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Mon, 24 Jul 2017 12:46:59 -0400
-Received: from localhost
-        by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-crypto@vger.kernel.org> from <linuxram@us.ibm.com>;
-        Mon, 24 Jul 2017 10:46:58 -0600
+        Mon, 24 Jul 2017 12:57:22 -0400
+Received: by mail-pf0-f194.google.com with SMTP id 1so2834669pfi.3
+        for <linux-crypto@vger.kernel.org>; Mon, 24 Jul 2017 09:57:22 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <1500699702.23205.8.camel@hbabu-laptop>
+In-Reply-To: <CAKv+Gu8tzQOcehEtTu2nJVXRxxSNe5==-stKKkGjCzmvweNX1Q@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jul 21, 2017 at 10:01:42PM -0700, Haren Myneni wrote:
+On Mon, Jul 24, 2017 at 07:59:43AM +0100, Ard Biesheuvel wrote:
+> On 18 July 2017 at 13:06, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+> > The generic AES driver uses 16 lookup tables of 1 KB each, and has
+> > encryption and decryption routines that are fully unrolled. Given how
+> > the dependencies between this code and other drivers are declared in
+> > Kconfig files, this code is always pulled into the core kernel, even
+> > if it is usually superseded at runtime by accelerated drivers that
+> > exist for many architectures.
+> >
+> > This leaves us with 25 KB of dead code in the kernel, which is negligible
+> > in typical environments, but which is actually a big deal for the IoT
+> > domain, where every kilobyte counts.
+> >
+> > Also, the scalar, table based AES routines that exist for ARM, arm64, i586
+> > and x86_64 share the lookup tables with AES generic, and may be invoked
+> > occasionally when the time-invariant AES-NI or other special instruction
+> > drivers are called in interrupt context, at which time the SIMD register
+> > file cannot be used. Pulling 16 KB of code and 9 KB of instructions into
+> > the L1s (and evicting what was already there) when a softirq happens to
+> > be handled in the context of an interrupt taken from kernel mode (which
+> > means no SIMD on x86) is also something that we may like to avoid, by
+> > falling back to a much smaller and moderately less performant driver.
+> > (Note that arm64 will be updated shortly to supply fallbacks for all
+> > SIMD based AES implementations, which will be based on the core routines)
+> >
+> > For the reasons above, this series refactors the way the various AES
+> > implementations are wired up, to allow the generic version in
+> > crypto/aes_generic.c to be omitted from the build entirely.
+> >
+> > Patch #1 removes some bogus 'select CRYPTO_AES' statement.
+> >
+> > Patch #2 factors out aes-generic's lookup tables, which are shared with
+> > arch-specific implementations in arch/x86, arch/arm and arch/arm64.
+> >
+> > Patch #3 replaces the table based aes-generic.o with a new aes.o based on
+> > the fixed time cipher, and uses it to fulfil dependencies on CRYPTO_AES.
+> >
+> > Patch #4 switches the fallback in the AES-NI code to the new, generic encrypt
+> > and decrypt routines so it no longer depends on the x86 scalar code or
+> > [transitively] on AES-generic.
+> >
+> > Patch #5 tweaks the ARM table based code to only use 2 KB + 256 bytes worth
+> > of lookup tables instead of 4 KB.
+> >
+> > Patch #6 does the same for arm64
+> >
+> > Patch #7 removes the local copy of the AES sboxes from the arm64 NEON driver,
+> > and switches to the ones exposed by the new AES core module instead.
+> >
+> > Patch #8 updates the Kconfig help text to be more descriptive of what they
+> > actually control, rather than duplicating AES's wikipedia entry a number of
+> > times.
+> >
+> > v4: - remove aes-generic altogether instead of allow a preference to be set
 > 
-> This patch adds P9 NX support for 842 compression engine. Virtual
-> Accelerator Switchboard (VAS) is used to access 842 engine on P9.
+> Actually, after benchmarking the x86_64 asm AES code, I am not so sure
+> we should remove AES_GENERIC at all, since it turns out to be faster.
+> Interestingly, I found a remark by Eric in the git log stating the
+> same, so if we want to cut down on AES variants, we should probably
+> start by deleting the x86 code instead.
 > 
-> For each NX engine per chip, setup receive window using
-> vas_rx_win_open() which configures RxFIFo with FIFO address, lpid,
-> pid and tid values. This unique (lpid, pid, tid) combination will
-> be used to identify the target engine.
-> 
-> For crypto open request, open send window on the NX engine for
-> the corresponding chip / cpu where the open request is executed.
-> This send window will be closed upon crypto close request.
-> 
-> NX provides high and normal priority FIFOs. For compression /
-> decompression requests, we use only hight priority FIFOs in kernel.
-> 
-> Each NX request will be communicated to VAS using copy/paste
-> instructions with vas_copy_crb() / vas_paste_crb() functions.
+> So please disregard this for now: I will rework the other stuff I have
+> so it no longer depends on this, and repost, because it is much more
+> important for me that that makes it into v4.14. This can wait for
+> v4.15, as far as I am concerned, and I will benchmark a bit more to
+> see if we can get rid of the i586 code as well.
 > 
 
-Reviewed-by: Ram Pai <linuxram@us.ibm.com>
+Yes I did notice that aes-generic was actually faster.  Probably the x86_64-asm
+implementation should be removed, but it may be worthwhile to try a few
+different gcc versions to see how well they compile aes-generic.  I expect that
+x86_64-asm used to be faster but gcc has gotten smarter.  Also x86_64-asm is
+only really useful on older CPUs, so ideally it should be benchmarked on an
+older CPU.
 
-> Signed-off-by: Haren Myneni <haren@us.ibm.com>
-> ---
->  drivers/crypto/nx/Kconfig          |   1 +
->  drivers/crypto/nx/nx-842-powernv.c | 375 ++++++++++++++++++++++++++++++++++++-
->  drivers/crypto/nx/nx-842.c         |   2 +-
->  3 files changed, 371 insertions(+), 7 deletions(-)
+Eric
