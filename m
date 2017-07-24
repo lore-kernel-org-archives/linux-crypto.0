@@ -1,200 +1,195 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH resend 17/18] crypto: arm/aes - avoid expanded lookup tables in the final round
-Date: Mon, 24 Jul 2017 11:28:19 +0100
-Message-ID: <20170724102820.16534-18-ard.biesheuvel@linaro.org>
-References: <20170724102820.16534-1-ard.biesheuvel@linaro.org>
-Cc: herbert@gondor.apana.org.au, dave.martin@arm.com,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+From: Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: [PATCH v2 2/4] crypto: ccp - Enable XTS-AES-128 support on all
+ CCPs
+Date: Mon, 24 Jul 2017 08:46:03 -0500
+Message-ID: <ad4dae7f-14d2-0ff1-415f-1bad94057974@amd.com>
+References: <150066355075.49973.1565434199212056832.stgit@sosxen.amd.com>
+ <150066389693.49973.12313958459155135198.stgit@sosxen.amd.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net
+To: Gary R Hook <gary.hook@amd.com>, linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f48.google.com ([74.125.82.48]:37335 "EHLO
-        mail-wm0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752626AbdGXK3F (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Jul 2017 06:29:05 -0400
-Received: by mail-wm0-f48.google.com with SMTP id c184so27692039wmd.0
-        for <linux-crypto@vger.kernel.org>; Mon, 24 Jul 2017 03:29:05 -0700 (PDT)
-In-Reply-To: <20170724102820.16534-1-ard.biesheuvel@linaro.org>
+Received: from mail-co1nam03on0075.outbound.protection.outlook.com ([104.47.40.75]:32640
+        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1753605AbdGXNrB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 24 Jul 2017 09:47:01 -0400
+In-Reply-To: <150066389693.49973.12313958459155135198.stgit@sosxen.amd.com>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-For the final round, avoid the expanded and padded lookup tables
-exported by the generic AES driver. Instead, for encryption, we can
-perform byte loads from the same table we used for the inner rounds,
-which will still be hot in the caches. For decryption, use the inverse
-AES Sbox directly, which is 4x smaller than the inverse lookup table
-exported by the generic driver.
+On 7/21/2017 2:04 PM, Gary R Hook wrote:
+> Version 5 CCPs have some new requirements for XTS-AES: the type field
+> must be specified, and the key requires 512 bits, with each part
+> occupying 256 bits and padded with zeroes.
 
-This should significantly reduce the Dcache footprint of our code,
-which makes the code more robust against timing attacks. It does not
-introduce any additional module dependencies, given that we already
-rely on the core AES module for the shared key expansion routines.
+This appears to be a fix and not a feature. You need to send this as
+a separate patch through the fix process and back through to the stable
+releases.
 
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
- arch/arm/crypto/aes-cipher-core.S | 88 +++++++++++++++-----
- 1 file changed, 65 insertions(+), 23 deletions(-)
+> 
+> Signed-off-by: Gary R Hook <ghook@amd.com>
+> ---
+>   drivers/crypto/ccp/ccp-dev-v5.c |    2 ++
+>   drivers/crypto/ccp/ccp-dev.h    |    2 ++
+>   drivers/crypto/ccp/ccp-ops.c    |   52 ++++++++++++++++++++++++++++++++-------
+>   3 files changed, 47 insertions(+), 9 deletions(-)
+> 
+> diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
+> index b3526336d608..0fb4519c5194 100644
+> --- a/drivers/crypto/ccp/ccp-dev-v5.c
+> +++ b/drivers/crypto/ccp/ccp-dev-v5.c
+> @@ -145,6 +145,7 @@ union ccp_function {
+>   #define	CCP_AES_MODE(p)		((p)->aes.mode)
+>   #define	CCP_AES_TYPE(p)		((p)->aes.type)
+>   #define	CCP_XTS_SIZE(p)		((p)->aes_xts.size)
+> +#define	CCP_XTS_TYPE(p)		((p)->aes_xts.type)
+>   #define	CCP_XTS_ENCRYPT(p)	((p)->aes_xts.encrypt)
+>   #define	CCP_DES3_SIZE(p)	((p)->des3.size)
+>   #define	CCP_DES3_ENCRYPT(p)	((p)->des3.encrypt)
+> @@ -346,6 +347,7 @@ static int ccp5_perform_xts_aes(struct ccp_op *op)
+>   	function.raw = 0;
+>   	CCP_XTS_ENCRYPT(&function) = op->u.xts.action;
+>   	CCP_XTS_SIZE(&function) = op->u.xts.unit_size;
+> +	CCP_XTS_TYPE(&function) = op->u.xts.type;
+>   	CCP5_CMD_FUNCTION(&desc) = function.raw;
+>   
+>   	CCP5_CMD_LEN(&desc) = op->src.u.dma.length;
+> diff --git a/drivers/crypto/ccp/ccp-dev.h b/drivers/crypto/ccp/ccp-dev.h
+> index 9320931d89da..3d51180199ac 100644
+> --- a/drivers/crypto/ccp/ccp-dev.h
+> +++ b/drivers/crypto/ccp/ccp-dev.h
+> @@ -194,6 +194,7 @@
+>   #define CCP_AES_CTX_SB_COUNT		1
+>   
+>   #define CCP_XTS_AES_KEY_SB_COUNT	1
+> +#define CCP5_XTS_AES_KEY_SB_COUNT	2
+>   #define CCP_XTS_AES_CTX_SB_COUNT	1
+>   
+>   #define CCP_DES3_KEY_SB_COUNT		1
+> @@ -497,6 +498,7 @@ struct ccp_aes_op {
+>   };
+>   
+>   struct ccp_xts_aes_op {
+> +	enum ccp_aes_type type;
+>   	enum ccp_aes_action action;
+>   	enum ccp_xts_aes_unit_size unit_size;
+>   };
+> diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
+> index e23d138fc1ce..8113355151d2 100644
+> --- a/drivers/crypto/ccp/ccp-ops.c
+> +++ b/drivers/crypto/ccp/ccp-ops.c
+> @@ -1038,6 +1038,8 @@ static int ccp_run_xts_aes_cmd(struct ccp_cmd_queue *cmd_q,
+>   	struct ccp_op op;
+>   	unsigned int unit_size, dm_offset;
+>   	bool in_place = false;
+> +	unsigned int sb_count = 0;
 
-diff --git a/arch/arm/crypto/aes-cipher-core.S b/arch/arm/crypto/aes-cipher-core.S
-index c817a86c4ca8..54b384084637 100644
---- a/arch/arm/crypto/aes-cipher-core.S
-+++ b/arch/arm/crypto/aes-cipher-core.S
-@@ -10,6 +10,7 @@
-  */
- 
- #include <linux/linkage.h>
-+#include <asm/cache.h>
- 
- 	.text
- 	.align		5
-@@ -32,19 +33,19 @@
- 	.endif
- 	.endm
- 
--	.macro		__load, out, in, idx
-+	.macro		__load, out, in, idx, sz, op
- 	.if		__LINUX_ARM_ARCH__ < 7 && \idx > 0
--	ldr		\out, [ttab, \in, lsr #(8 * \idx) - 2]
-+	ldr\op		\out, [ttab, \in, lsr #(8 * \idx) - \sz]
- 	.else
--	ldr		\out, [ttab, \in, lsl #2]
-+	ldr\op		\out, [ttab, \in, lsl #\sz]
- 	.endif
- 	.endm
- 
--	.macro		__hround, out0, out1, in0, in1, in2, in3, t3, t4, enc
-+	.macro		__hround, out0, out1, in0, in1, in2, in3, t3, t4, enc, sz, op
- 	__select	\out0, \in0, 0
- 	__select	t0, \in1, 1
--	__load		\out0, \out0, 0
--	__load		t0, t0, 1
-+	__load		\out0, \out0, 0, \sz, \op
-+	__load		t0, t0, 1, \sz, \op
- 
- 	.if		\enc
- 	__select	\out1, \in1, 0
-@@ -53,10 +54,10 @@
- 	__select	\out1, \in3, 0
- 	__select	t1, \in0, 1
- 	.endif
--	__load		\out1, \out1, 0
-+	__load		\out1, \out1, 0, \sz, \op
- 	__select	t2, \in2, 2
--	__load		t1, t1, 1
--	__load		t2, t2, 2
-+	__load		t1, t1, 1, \sz, \op
-+	__load		t2, t2, 2, \sz, \op
- 
- 	eor		\out0, \out0, t0, ror #24
- 
-@@ -68,9 +69,9 @@
- 	__select	\t3, \in1, 2
- 	__select	\t4, \in2, 3
- 	.endif
--	__load		\t3, \t3, 2
--	__load		t0, t0, 3
--	__load		\t4, \t4, 3
-+	__load		\t3, \t3, 2, \sz, \op
-+	__load		t0, t0, 3, \sz, \op
-+	__load		\t4, \t4, 3, \sz, \op
- 
- 	eor		\out1, \out1, t1, ror #24
- 	eor		\out0, \out0, t2, ror #16
-@@ -82,14 +83,14 @@
- 	eor		\out1, \out1, t2
- 	.endm
- 
--	.macro		fround, out0, out1, out2, out3, in0, in1, in2, in3
--	__hround	\out0, \out1, \in0, \in1, \in2, \in3, \out2, \out3, 1
--	__hround	\out2, \out3, \in2, \in3, \in0, \in1, \in1, \in2, 1
-+	.macro		fround, out0, out1, out2, out3, in0, in1, in2, in3, sz=2, op
-+	__hround	\out0, \out1, \in0, \in1, \in2, \in3, \out2, \out3, 1, \sz, \op
-+	__hround	\out2, \out3, \in2, \in3, \in0, \in1, \in1, \in2, 1, \sz, \op
- 	.endm
- 
--	.macro		iround, out0, out1, out2, out3, in0, in1, in2, in3
--	__hround	\out0, \out1, \in0, \in3, \in2, \in1, \out2, \out3, 0
--	__hround	\out2, \out3, \in2, \in1, \in0, \in3, \in1, \in0, 0
-+	.macro		iround, out0, out1, out2, out3, in0, in1, in2, in3, sz=2, op
-+	__hround	\out0, \out1, \in0, \in3, \in2, \in1, \out2, \out3, 0, \sz, \op
-+	__hround	\out2, \out3, \in2, \in1, \in0, \in3, \in1, \in0, 0, \sz, \op
- 	.endm
- 
- 	.macro		__rev, out, in
-@@ -114,7 +115,7 @@
- 	.endif
- 	.endm
- 
--	.macro		do_crypt, round, ttab, ltab
-+	.macro		do_crypt, round, ttab, ltab, bsz
- 	push		{r3-r11, lr}
- 
- 	ldr		r4, [in]
-@@ -146,9 +147,12 @@
- 
- 1:	subs		rounds, rounds, #4
- 	\round		r8, r9, r10, r11, r4, r5, r6, r7
--	__adrl		ttab, \ltab, ls
-+	bls		2f
- 	\round		r4, r5, r6, r7, r8, r9, r10, r11
--	bhi		0b
-+	b		0b
-+
-+2:	__adrl		ttab, \ltab
-+	\round		r4, r5, r6, r7, r8, r9, r10, r11, \bsz, b
- 
- #ifdef CONFIG_CPU_BIG_ENDIAN
- 	__rev		r4, r4
-@@ -170,10 +174,48 @@
- 	.ltorg
- 	.endm
- 
-+	.align		L1_CACHE_SHIFT
-+	.type		__aes_arm_inverse_sbox, %object
-+__aes_arm_inverse_sbox:
-+	.byte		0x52, 0x09, 0x6a, 0xd5, 0x30, 0x36, 0xa5, 0x38
-+	.byte		0xbf, 0x40, 0xa3, 0x9e, 0x81, 0xf3, 0xd7, 0xfb
-+	.byte		0x7c, 0xe3, 0x39, 0x82, 0x9b, 0x2f, 0xff, 0x87
-+	.byte		0x34, 0x8e, 0x43, 0x44, 0xc4, 0xde, 0xe9, 0xcb
-+	.byte		0x54, 0x7b, 0x94, 0x32, 0xa6, 0xc2, 0x23, 0x3d
-+	.byte		0xee, 0x4c, 0x95, 0x0b, 0x42, 0xfa, 0xc3, 0x4e
-+	.byte		0x08, 0x2e, 0xa1, 0x66, 0x28, 0xd9, 0x24, 0xb2
-+	.byte		0x76, 0x5b, 0xa2, 0x49, 0x6d, 0x8b, 0xd1, 0x25
-+	.byte		0x72, 0xf8, 0xf6, 0x64, 0x86, 0x68, 0x98, 0x16
-+	.byte		0xd4, 0xa4, 0x5c, 0xcc, 0x5d, 0x65, 0xb6, 0x92
-+	.byte		0x6c, 0x70, 0x48, 0x50, 0xfd, 0xed, 0xb9, 0xda
-+	.byte		0x5e, 0x15, 0x46, 0x57, 0xa7, 0x8d, 0x9d, 0x84
-+	.byte		0x90, 0xd8, 0xab, 0x00, 0x8c, 0xbc, 0xd3, 0x0a
-+	.byte		0xf7, 0xe4, 0x58, 0x05, 0xb8, 0xb3, 0x45, 0x06
-+	.byte		0xd0, 0x2c, 0x1e, 0x8f, 0xca, 0x3f, 0x0f, 0x02
-+	.byte		0xc1, 0xaf, 0xbd, 0x03, 0x01, 0x13, 0x8a, 0x6b
-+	.byte		0x3a, 0x91, 0x11, 0x41, 0x4f, 0x67, 0xdc, 0xea
-+	.byte		0x97, 0xf2, 0xcf, 0xce, 0xf0, 0xb4, 0xe6, 0x73
-+	.byte		0x96, 0xac, 0x74, 0x22, 0xe7, 0xad, 0x35, 0x85
-+	.byte		0xe2, 0xf9, 0x37, 0xe8, 0x1c, 0x75, 0xdf, 0x6e
-+	.byte		0x47, 0xf1, 0x1a, 0x71, 0x1d, 0x29, 0xc5, 0x89
-+	.byte		0x6f, 0xb7, 0x62, 0x0e, 0xaa, 0x18, 0xbe, 0x1b
-+	.byte		0xfc, 0x56, 0x3e, 0x4b, 0xc6, 0xd2, 0x79, 0x20
-+	.byte		0x9a, 0xdb, 0xc0, 0xfe, 0x78, 0xcd, 0x5a, 0xf4
-+	.byte		0x1f, 0xdd, 0xa8, 0x33, 0x88, 0x07, 0xc7, 0x31
-+	.byte		0xb1, 0x12, 0x10, 0x59, 0x27, 0x80, 0xec, 0x5f
-+	.byte		0x60, 0x51, 0x7f, 0xa9, 0x19, 0xb5, 0x4a, 0x0d
-+	.byte		0x2d, 0xe5, 0x7a, 0x9f, 0x93, 0xc9, 0x9c, 0xef
-+	.byte		0xa0, 0xe0, 0x3b, 0x4d, 0xae, 0x2a, 0xf5, 0xb0
-+	.byte		0xc8, 0xeb, 0xbb, 0x3c, 0x83, 0x53, 0x99, 0x61
-+	.byte		0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6, 0x26
-+	.byte		0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d
-+	.size		__aes_arm_inverse_sbox, . - __aes_arm_inverse_sbox
-+
- ENTRY(__aes_arm_encrypt)
--	do_crypt	fround, crypto_ft_tab, crypto_fl_tab
-+	do_crypt	fround, crypto_ft_tab, crypto_ft_tab + 1, 2
- ENDPROC(__aes_arm_encrypt)
- 
-+	.align		5
- ENTRY(__aes_arm_decrypt)
--	do_crypt	iround, crypto_it_tab, crypto_il_tab
-+	do_crypt	iround, crypto_it_tab, __aes_arm_inverse_sbox, 0
- ENDPROC(__aes_arm_decrypt)
--- 
-2.9.3
+No need to initialize to zero here.
+
+> +	enum ccp_aes_type aestype;
+>   	int ret;
+>   
+>   	switch (xts->unit_size) {
+> @@ -1061,9 +1063,12 @@ static int ccp_run_xts_aes_cmd(struct ccp_cmd_queue *cmd_q,
+>   		return -EINVAL;
+>   	}
+>   
+> -	if (xts->key_len != AES_KEYSIZE_128)
+> +	if (xts->key_len == AES_KEYSIZE_128)
+> +		aestype = CCP_AES_TYPE_128;
+> +	else
+>   		return -EINVAL;
+>   
+> +
+
+Remove extra blank line.
+
+>   	if (!xts->final && (xts->src_len & (AES_BLOCK_SIZE - 1)))
+>   		return -EINVAL;
+>   
+> @@ -1086,20 +1091,47 @@ static int ccp_run_xts_aes_cmd(struct ccp_cmd_queue *cmd_q,
+>   	op.u.xts.action = xts->action;
+>   	op.u.xts.unit_size = xts->unit_size;
+>   
+> -	/* All supported key sizes fit in a single (32-byte) SB entry
+> -	 * and must be in little endian format. Use the 256-bit byte
+> -	 * swap passthru option to convert from big endian to little
+> -	 * endian.
+> +	/* A version 3 device only supports 128-bit keys, which fits into a
+> +	 * single SB entry. A version 5 device uses a 512-bit vector, so two
+> +	 * SB entries.
+>   	 */
+> +	if (cmd_q->ccp->vdata->version == CCP_VERSION(3, 0))
+> +		sb_count = CCP_XTS_AES_KEY_SB_COUNT;
+> +	else
+> +		sb_count = CCP5_XTS_AES_KEY_SB_COUNT;
+>   	ret = ccp_init_dm_workarea(&key, cmd_q,
+> -				   CCP_XTS_AES_KEY_SB_COUNT * CCP_SB_BYTES,
+> +				   sb_count * CCP_SB_BYTES,
+>   				   DMA_TO_DEVICE);
+>   	if (ret)
+>   		return ret;
+>   
+> -	dm_offset = CCP_SB_BYTES - AES_KEYSIZE_128;
+> -	ccp_set_dm_area(&key, dm_offset, xts->key, 0, xts->key_len);
+> -	ccp_set_dm_area(&key, 0, xts->key, dm_offset, xts->key_len);
+> +	if (cmd_q->ccp->vdata->version == CCP_VERSION(3, 0)) {
+> +		/* All supported key sizes must be in little endian format.
+> +		 * Use the 256-bit byte swap passthru option to convert from
+> +		 * big endian to little endian.
+> +		 */
+> +		dm_offset = CCP_SB_BYTES - AES_KEYSIZE_128;
+> +		ccp_set_dm_area(&key, dm_offset, xts->key, 0, xts->key_len);
+> +		ccp_set_dm_area(&key, 0, xts->key, xts->key_len, xts->key_len);
+> +	} else {
+> +		/* The AES key is at the little end and the tweak key is
+> +		 * at the big end. Since the byteswap operation is only
+> +		 * 256-bit, load the buffer according to the way things
+> +		 * will end up.
+> +		 */
+
+The second half of your patch description better describes what you're
+doing here... that is, you need two SB entries with the key in one and
+the tweak in the other with appropriate padding.
+
+> +		unsigned int pad;
+> +
+> +		op.sb_key = cmd_q->ccp->vdata->perform->sballoc(cmd_q,
+> +								sb_count);
+> +		if (!op.sb_key)
+> +			return -EIO;
+
+So now you're always allocating SB entries.  Doesn't the initialization
+function already pre-allocate space for 2 SB entries for keys? I don't
+think you need to do this allocation.
+
+> +
+> +		dm_offset = CCP_SB_BYTES;
+> +		pad = dm_offset - xts->key_len;
+> +		ccp_set_dm_area(&key, pad, xts->key, 0, xts->key_len);
+> +		ccp_set_dm_area(&key, dm_offset + pad, xts->key, xts->key_len,
+> +				xts->key_len);
+> +	}
+>   	ret = ccp_copy_to_sb(cmd_q, &key, op.jobid, op.sb_key,
+>   			     CCP_PASSTHRU_BYTESWAP_256BIT);
+>   	if (ret) {
+> @@ -1188,6 +1220,8 @@ static int ccp_run_xts_aes_cmd(struct ccp_cmd_queue *cmd_q,
+>   
+>   e_key:
+>   	ccp_dm_free(&key);
+> +	if (cmd_q->ccp->vdata->version > CCP_VERSION(3, 0))
+> +		cmd_q->ccp->vdata->perform->sbfree(cmd_q, op.sb_key, sb_count);
+
+This can be removed if you end up using the pre-allocated entries.
+
+Thanks,
+Tom
+
+>   
+>   	return ret;
+>   }
+> 
