@@ -1,7 +1,7 @@
 From: zain wang <wzz@rock-chips.com>
-Subject: [RESEND PATCH 2/2] crypto: rockchip - return the err code when unable dequeue the crypto request
-Date: Mon, 24 Jul 2017 09:23:14 +0800
-Message-ID: <1500859394-1799-3-git-send-email-wzz@rock-chips.com>
+Subject: [RESEND PATCH 1/2] crypto: rockchip - move the crypto completion from interrupt context
+Date: Mon, 24 Jul 2017 09:23:13 +0800
+Message-ID: <1500859394-1799-2-git-send-email-wzz@rock-chips.com>
 References: <1500859394-1799-1-git-send-email-wzz@rock-chips.com>
 Cc: jekarlson@gmail.com, shawn.lin@rock-chips.com,
         linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
@@ -11,124 +11,163 @@ To: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         Heiko Stuebner <heiko@sntech.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from regular1.263xmail.com ([211.150.99.133]:60431 "EHLO
+Received: from regular1.263xmail.com ([211.150.99.135]:54277 "EHLO
         regular1.263xmail.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752218AbdGXBXb (ORCPT
+        with ESMTP id S1752014AbdGXBX1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 23 Jul 2017 21:23:31 -0400
+        Sun, 23 Jul 2017 21:23:27 -0400
 In-Reply-To: <1500859394-1799-1-git-send-email-wzz@rock-chips.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Sometime we would unable to dequeue the crypto request, in this case,
-we should finish crypto and return the err code.
+It's illegal to call the completion function from hardirq context,
+it will cause runtime tests to fail. Let's build a new task (done_task)
+for moving update operation from hardirq context.
 
 Signed-off-by: zain wang <wzz@rock-chips.com>
 ---
- drivers/crypto/rockchip/rk3288_crypto.c            | 19 -------------------
- drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c | 15 +++++++++++++++
- drivers/crypto/rockchip/rk3288_crypto_ahash.c      | 14 ++++++++++++++
- 3 files changed, 29 insertions(+), 19 deletions(-)
+ drivers/crypto/rockchip/rk3288_crypto.c            | 39 ++++++++++++++++------
+ drivers/crypto/rockchip/rk3288_crypto.h            |  4 ++-
+ drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c |  2 +-
+ drivers/crypto/rockchip/rk3288_crypto_ahash.c      |  2 +-
+ 4 files changed, 33 insertions(+), 14 deletions(-)
 
 diff --git a/drivers/crypto/rockchip/rk3288_crypto.c b/drivers/crypto/rockchip/rk3288_crypto.c
-index c2b1dd7..57c3783 100644
+index d0f80c6..c2b1dd7 100644
 --- a/drivers/crypto/rockchip/rk3288_crypto.c
 +++ b/drivers/crypto/rockchip/rk3288_crypto.c
-@@ -187,27 +187,8 @@ static irqreturn_t rk_crypto_irq_handle(int irq, void *dev_id)
- static void rk_crypto_queue_task_cb(unsigned long data)
+@@ -169,24 +169,22 @@ static irqreturn_t rk_crypto_irq_handle(int irq, void *dev_id)
+ {
+ 	struct rk_crypto_info *dev  = platform_get_drvdata(dev_id);
+ 	u32 interrupt_status;
+-	int err = 0;
+ 
+ 	spin_lock(&dev->lock);
+ 	interrupt_status = CRYPTO_READ(dev, RK_CRYPTO_INTSTS);
+ 	CRYPTO_WRITE(dev, RK_CRYPTO_INTSTS, interrupt_status);
++
+ 	if (interrupt_status & 0x0a) {
+ 		dev_warn(dev->dev, "DMA Error\n");
+-		err = -EFAULT;
+-	} else if (interrupt_status & 0x05) {
+-		err = dev->update(dev);
++		dev->err = -EFAULT;
+ 	}
+-	if (err)
+-		dev->complete(dev, err);
++	tasklet_schedule(&dev->done_task);
++
+ 	spin_unlock(&dev->lock);
+ 	return IRQ_HANDLED;
+ }
+ 
+-static void rk_crypto_tasklet_cb(unsigned long data)
++static void rk_crypto_queue_task_cb(unsigned long data)
  {
  	struct rk_crypto_info *dev = (struct rk_crypto_info *)data;
--	struct crypto_async_request *async_req, *backlog;
--	unsigned long flags;
- 	int err = 0;
- 
--	spin_lock_irqsave(&dev->lock, flags);
--	backlog   = crypto_get_backlog(&dev->queue);
--	async_req = crypto_dequeue_request(&dev->queue);
--	spin_unlock_irqrestore(&dev->lock, flags);
--	if (!async_req) {
--		dev_err(dev->dev, "async_req is NULL !!\n");
--		return;
--	}
--	if (backlog) {
--		backlog->complete(backlog, -EINPROGRESS);
--		backlog = NULL;
--	}
--
--	if (crypto_tfm_alg_type(async_req->tfm) == CRYPTO_ALG_TYPE_ABLKCIPHER)
--		dev->ablk_req = ablkcipher_request_cast(async_req);
--	else
--		dev->ahash_req = ahash_request_cast(async_req);
- 	dev->err = 0;
+ 	struct crypto_async_request *async_req, *backlog;
+@@ -210,11 +208,26 @@ static void rk_crypto_tasklet_cb(unsigned long data)
+ 		dev->ablk_req = ablkcipher_request_cast(async_req);
+ 	else
+ 		dev->ahash_req = ahash_request_cast(async_req);
++	dev->err = 0;
  	err = dev->start(dev);
  	if (err)
-diff --git a/drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c b/drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c
-index 8787e44..dbe78de 100644
---- a/drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c
-+++ b/drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c
-@@ -25,6 +25,7 @@ static int rk_handle_req(struct rk_crypto_info *dev,
- 			 struct ablkcipher_request *req)
- {
- 	unsigned long flags;
-+	struct crypto_async_request *async_req, *backlog;
- 	int err;
+ 		dev->complete(dev, err);
+ }
  
- 	if (!IS_ALIGNED(req->nbytes, dev->align_size))
-@@ -41,7 +42,21 @@ static int rk_handle_req(struct rk_crypto_info *dev,
- 
- 	spin_lock_irqsave(&dev->lock, flags);
- 	err = ablkcipher_enqueue_request(&dev->queue, req);
-+	backlog   = crypto_get_backlog(&dev->queue);
-+	async_req = crypto_dequeue_request(&dev->queue);
- 	spin_unlock_irqrestore(&dev->lock, flags);
++static void rk_crypto_done_task_cb(unsigned long data)
++{
++	struct rk_crypto_info *dev = (struct rk_crypto_info *)data;
 +
-+	if (!async_req) {
-+		dev_err(dev->dev, "async_req is NULL !!\n");
-+		return err;
-+	}
-+	if (backlog) {
-+		backlog->complete(backlog, -EINPROGRESS);
-+		backlog = NULL;
++	if (dev->err) {
++		dev->complete(dev, dev->err);
++		return;
 +	}
 +
-+	dev->ablk_req = ablkcipher_request_cast(async_req);
++	dev->err = dev->update(dev);
++	if (dev->err)
++		dev->complete(dev, dev->err);
++}
 +
- 	tasklet_schedule(&dev->queue_task);
+ static struct rk_crypto_tmp *rk_cipher_algs[] = {
+ 	&rk_ecb_aes_alg,
+ 	&rk_cbc_aes_alg,
+@@ -361,8 +374,10 @@ static int rk_crypto_probe(struct platform_device *pdev)
+ 	crypto_info->dev = &pdev->dev;
+ 	platform_set_drvdata(pdev, crypto_info);
+ 
+-	tasklet_init(&crypto_info->crypto_tasklet,
+-		     rk_crypto_tasklet_cb, (unsigned long)crypto_info);
++	tasklet_init(&crypto_info->queue_task,
++		     rk_crypto_queue_task_cb, (unsigned long)crypto_info);
++	tasklet_init(&crypto_info->done_task,
++		     rk_crypto_done_task_cb, (unsigned long)crypto_info);
+ 	crypto_init_queue(&crypto_info->queue, 50);
+ 
+ 	crypto_info->enable_clk = rk_crypto_enable_clk;
+@@ -380,7 +395,8 @@ static int rk_crypto_probe(struct platform_device *pdev)
+ 	return 0;
+ 
+ err_register_alg:
+-	tasklet_kill(&crypto_info->crypto_tasklet);
++	tasklet_kill(&crypto_info->queue_task);
++	tasklet_kill(&crypto_info->done_task);
+ err_crypto:
  	return err;
  }
+@@ -390,7 +406,8 @@ static int rk_crypto_remove(struct platform_device *pdev)
+ 	struct rk_crypto_info *crypto_tmp = platform_get_drvdata(pdev);
+ 
+ 	rk_crypto_unregister();
+-	tasklet_kill(&crypto_tmp->crypto_tasklet);
++	tasklet_kill(&crypto_tmp->done_task);
++	tasklet_kill(&crypto_tmp->queue_task);
+ 	return 0;
+ }
+ 
+diff --git a/drivers/crypto/rockchip/rk3288_crypto.h b/drivers/crypto/rockchip/rk3288_crypto.h
+index d7b71fe..65ad1c2 100644
+--- a/drivers/crypto/rockchip/rk3288_crypto.h
++++ b/drivers/crypto/rockchip/rk3288_crypto.h
+@@ -190,9 +190,11 @@ struct rk_crypto_info {
+ 	void __iomem			*reg;
+ 	int				irq;
+ 	struct crypto_queue		queue;
+-	struct tasklet_struct		crypto_tasklet;
++	struct tasklet_struct		queue_task;
++	struct tasklet_struct		done_task;
+ 	struct ablkcipher_request	*ablk_req;
+ 	struct ahash_request		*ahash_req;
++	int 				err;
+ 	/* device lock */
+ 	spinlock_t			lock;
+ 
+diff --git a/drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c b/drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c
+index b5a3afe..8787e44 100644
+--- a/drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c
++++ b/drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c
+@@ -42,7 +42,7 @@ static int rk_handle_req(struct rk_crypto_info *dev,
+ 	spin_lock_irqsave(&dev->lock, flags);
+ 	err = ablkcipher_enqueue_request(&dev->queue, req);
+ 	spin_unlock_irqrestore(&dev->lock, flags);
+-	tasklet_schedule(&dev->crypto_tasklet);
++	tasklet_schedule(&dev->queue_task);
+ 	return err;
+ }
+ 
 diff --git a/drivers/crypto/rockchip/rk3288_crypto_ahash.c b/drivers/crypto/rockchip/rk3288_crypto_ahash.c
-index 9b55585..ebc46e0 100644
+index 7185882..9b55585 100644
 --- a/drivers/crypto/rockchip/rk3288_crypto_ahash.c
 +++ b/drivers/crypto/rockchip/rk3288_crypto_ahash.c
-@@ -166,6 +166,7 @@ static int rk_ahash_digest(struct ahash_request *req)
- {
- 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
- 	struct rk_ahash_ctx *tctx = crypto_tfm_ctx(req->base.tfm);
-+	struct crypto_async_request *async_req, *backlog;
- 	struct rk_crypto_info *dev = NULL;
- 	unsigned long flags;
- 	int ret;
-@@ -202,8 +203,21 @@ static int rk_ahash_digest(struct ahash_request *req)
- 
- 	spin_lock_irqsave(&dev->lock, flags);
+@@ -204,7 +204,7 @@ static int rk_ahash_digest(struct ahash_request *req)
  	ret = crypto_enqueue_request(&dev->queue, &req->base);
-+	backlog   = crypto_get_backlog(&dev->queue);
-+	async_req = crypto_dequeue_request(&dev->queue);
  	spin_unlock_irqrestore(&dev->lock, flags);
  
-+	if (!async_req) {
-+		dev_err(dev->dev, "async_req is NULL !!\n");
-+		return ret;
-+	}
-+	if (backlog) {
-+		backlog->complete(backlog, -EINPROGRESS);
-+		backlog = NULL;
-+	}
-+
-+	dev->ahash_req = ahash_request_cast(async_req);
-+
- 	tasklet_schedule(&dev->queue_task);
+-	tasklet_schedule(&dev->crypto_tasklet);
++	tasklet_schedule(&dev->queue_task);
  
  	/*
+ 	 * it will take some time to process date after last dma transmission.
 -- 
 1.9.1
