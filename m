@@ -1,173 +1,92 @@
-From: zain wang <wzz@rock-chips.com>
-Subject: [RESEND PATCH 1/2] crypto: rockchip - move the crypto completion from interrupt context
-Date: Mon, 24 Jul 2017 09:23:13 +0800
-Message-ID: <1500859394-1799-2-git-send-email-wzz@rock-chips.com>
-References: <1500859394-1799-1-git-send-email-wzz@rock-chips.com>
-Cc: jekarlson@gmail.com, shawn.lin@rock-chips.com,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org,
-        zain wang <wzz@rock-chips.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Heiko Stuebner <heiko@sntech.de>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH v4 0/8] crypto: aes - retire table based generic AES
+Date: Mon, 24 Jul 2017 07:59:43 +0100
+Message-ID: <CAKv+Gu8tzQOcehEtTu2nJVXRxxSNe5==-stKKkGjCzmvweNX1Q@mail.gmail.com>
+References: <20170718120645.15880-1-ard.biesheuvel@linaro.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "nico@linaro.org" <nico@linaro.org>,
+        Eric Biggers <ebiggers@google.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from regular1.263xmail.com ([211.150.99.135]:54277 "EHLO
-        regular1.263xmail.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752014AbdGXBX1 (ORCPT
+Received: from mail-io0-f181.google.com ([209.85.223.181]:36054 "EHLO
+        mail-io0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753257AbdGXG7o (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 23 Jul 2017 21:23:27 -0400
-In-Reply-To: <1500859394-1799-1-git-send-email-wzz@rock-chips.com>
+        Mon, 24 Jul 2017 02:59:44 -0400
+Received: by mail-io0-f181.google.com with SMTP id g35so6993530ioi.3
+        for <linux-crypto@vger.kernel.org>; Sun, 23 Jul 2017 23:59:44 -0700 (PDT)
+In-Reply-To: <20170718120645.15880-1-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-It's illegal to call the completion function from hardirq context,
-it will cause runtime tests to fail. Let's build a new task (done_task)
-for moving update operation from hardirq context.
+On 18 July 2017 at 13:06, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+> The generic AES driver uses 16 lookup tables of 1 KB each, and has
+> encryption and decryption routines that are fully unrolled. Given how
+> the dependencies between this code and other drivers are declared in
+> Kconfig files, this code is always pulled into the core kernel, even
+> if it is usually superseded at runtime by accelerated drivers that
+> exist for many architectures.
+>
+> This leaves us with 25 KB of dead code in the kernel, which is negligible
+> in typical environments, but which is actually a big deal for the IoT
+> domain, where every kilobyte counts.
+>
+> Also, the scalar, table based AES routines that exist for ARM, arm64, i586
+> and x86_64 share the lookup tables with AES generic, and may be invoked
+> occasionally when the time-invariant AES-NI or other special instruction
+> drivers are called in interrupt context, at which time the SIMD register
+> file cannot be used. Pulling 16 KB of code and 9 KB of instructions into
+> the L1s (and evicting what was already there) when a softirq happens to
+> be handled in the context of an interrupt taken from kernel mode (which
+> means no SIMD on x86) is also something that we may like to avoid, by
+> falling back to a much smaller and moderately less performant driver.
+> (Note that arm64 will be updated shortly to supply fallbacks for all
+> SIMD based AES implementations, which will be based on the core routines)
+>
+> For the reasons above, this series refactors the way the various AES
+> implementations are wired up, to allow the generic version in
+> crypto/aes_generic.c to be omitted from the build entirely.
+>
+> Patch #1 removes some bogus 'select CRYPTO_AES' statement.
+>
+> Patch #2 factors out aes-generic's lookup tables, which are shared with
+> arch-specific implementations in arch/x86, arch/arm and arch/arm64.
+>
+> Patch #3 replaces the table based aes-generic.o with a new aes.o based on
+> the fixed time cipher, and uses it to fulfil dependencies on CRYPTO_AES.
+>
+> Patch #4 switches the fallback in the AES-NI code to the new, generic encrypt
+> and decrypt routines so it no longer depends on the x86 scalar code or
+> [transitively] on AES-generic.
+>
+> Patch #5 tweaks the ARM table based code to only use 2 KB + 256 bytes worth
+> of lookup tables instead of 4 KB.
+>
+> Patch #6 does the same for arm64
+>
+> Patch #7 removes the local copy of the AES sboxes from the arm64 NEON driver,
+> and switches to the ones exposed by the new AES core module instead.
+>
+> Patch #8 updates the Kconfig help text to be more descriptive of what they
+> actually control, rather than duplicating AES's wikipedia entry a number of
+> times.
+>
+> v4: - remove aes-generic altogether instead of allow a preference to be set
 
-Signed-off-by: zain wang <wzz@rock-chips.com>
----
- drivers/crypto/rockchip/rk3288_crypto.c            | 39 ++++++++++++++++------
- drivers/crypto/rockchip/rk3288_crypto.h            |  4 ++-
- drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c |  2 +-
- drivers/crypto/rockchip/rk3288_crypto_ahash.c      |  2 +-
- 4 files changed, 33 insertions(+), 14 deletions(-)
+Actually, after benchmarking the x86_64 asm AES code, I am not so sure
+we should remove AES_GENERIC at all, since it turns out to be faster.
+Interestingly, I found a remark by Eric in the git log stating the
+same, so if we want to cut down on AES variants, we should probably
+start by deleting the x86 code instead.
 
-diff --git a/drivers/crypto/rockchip/rk3288_crypto.c b/drivers/crypto/rockchip/rk3288_crypto.c
-index d0f80c6..c2b1dd7 100644
---- a/drivers/crypto/rockchip/rk3288_crypto.c
-+++ b/drivers/crypto/rockchip/rk3288_crypto.c
-@@ -169,24 +169,22 @@ static irqreturn_t rk_crypto_irq_handle(int irq, void *dev_id)
- {
- 	struct rk_crypto_info *dev  = platform_get_drvdata(dev_id);
- 	u32 interrupt_status;
--	int err = 0;
- 
- 	spin_lock(&dev->lock);
- 	interrupt_status = CRYPTO_READ(dev, RK_CRYPTO_INTSTS);
- 	CRYPTO_WRITE(dev, RK_CRYPTO_INTSTS, interrupt_status);
-+
- 	if (interrupt_status & 0x0a) {
- 		dev_warn(dev->dev, "DMA Error\n");
--		err = -EFAULT;
--	} else if (interrupt_status & 0x05) {
--		err = dev->update(dev);
-+		dev->err = -EFAULT;
- 	}
--	if (err)
--		dev->complete(dev, err);
-+	tasklet_schedule(&dev->done_task);
-+
- 	spin_unlock(&dev->lock);
- 	return IRQ_HANDLED;
- }
- 
--static void rk_crypto_tasklet_cb(unsigned long data)
-+static void rk_crypto_queue_task_cb(unsigned long data)
- {
- 	struct rk_crypto_info *dev = (struct rk_crypto_info *)data;
- 	struct crypto_async_request *async_req, *backlog;
-@@ -210,11 +208,26 @@ static void rk_crypto_tasklet_cb(unsigned long data)
- 		dev->ablk_req = ablkcipher_request_cast(async_req);
- 	else
- 		dev->ahash_req = ahash_request_cast(async_req);
-+	dev->err = 0;
- 	err = dev->start(dev);
- 	if (err)
- 		dev->complete(dev, err);
- }
- 
-+static void rk_crypto_done_task_cb(unsigned long data)
-+{
-+	struct rk_crypto_info *dev = (struct rk_crypto_info *)data;
-+
-+	if (dev->err) {
-+		dev->complete(dev, dev->err);
-+		return;
-+	}
-+
-+	dev->err = dev->update(dev);
-+	if (dev->err)
-+		dev->complete(dev, dev->err);
-+}
-+
- static struct rk_crypto_tmp *rk_cipher_algs[] = {
- 	&rk_ecb_aes_alg,
- 	&rk_cbc_aes_alg,
-@@ -361,8 +374,10 @@ static int rk_crypto_probe(struct platform_device *pdev)
- 	crypto_info->dev = &pdev->dev;
- 	platform_set_drvdata(pdev, crypto_info);
- 
--	tasklet_init(&crypto_info->crypto_tasklet,
--		     rk_crypto_tasklet_cb, (unsigned long)crypto_info);
-+	tasklet_init(&crypto_info->queue_task,
-+		     rk_crypto_queue_task_cb, (unsigned long)crypto_info);
-+	tasklet_init(&crypto_info->done_task,
-+		     rk_crypto_done_task_cb, (unsigned long)crypto_info);
- 	crypto_init_queue(&crypto_info->queue, 50);
- 
- 	crypto_info->enable_clk = rk_crypto_enable_clk;
-@@ -380,7 +395,8 @@ static int rk_crypto_probe(struct platform_device *pdev)
- 	return 0;
- 
- err_register_alg:
--	tasklet_kill(&crypto_info->crypto_tasklet);
-+	tasklet_kill(&crypto_info->queue_task);
-+	tasklet_kill(&crypto_info->done_task);
- err_crypto:
- 	return err;
- }
-@@ -390,7 +406,8 @@ static int rk_crypto_remove(struct platform_device *pdev)
- 	struct rk_crypto_info *crypto_tmp = platform_get_drvdata(pdev);
- 
- 	rk_crypto_unregister();
--	tasklet_kill(&crypto_tmp->crypto_tasklet);
-+	tasklet_kill(&crypto_tmp->done_task);
-+	tasklet_kill(&crypto_tmp->queue_task);
- 	return 0;
- }
- 
-diff --git a/drivers/crypto/rockchip/rk3288_crypto.h b/drivers/crypto/rockchip/rk3288_crypto.h
-index d7b71fe..65ad1c2 100644
---- a/drivers/crypto/rockchip/rk3288_crypto.h
-+++ b/drivers/crypto/rockchip/rk3288_crypto.h
-@@ -190,9 +190,11 @@ struct rk_crypto_info {
- 	void __iomem			*reg;
- 	int				irq;
- 	struct crypto_queue		queue;
--	struct tasklet_struct		crypto_tasklet;
-+	struct tasklet_struct		queue_task;
-+	struct tasklet_struct		done_task;
- 	struct ablkcipher_request	*ablk_req;
- 	struct ahash_request		*ahash_req;
-+	int 				err;
- 	/* device lock */
- 	spinlock_t			lock;
- 
-diff --git a/drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c b/drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c
-index b5a3afe..8787e44 100644
---- a/drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c
-+++ b/drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c
-@@ -42,7 +42,7 @@ static int rk_handle_req(struct rk_crypto_info *dev,
- 	spin_lock_irqsave(&dev->lock, flags);
- 	err = ablkcipher_enqueue_request(&dev->queue, req);
- 	spin_unlock_irqrestore(&dev->lock, flags);
--	tasklet_schedule(&dev->crypto_tasklet);
-+	tasklet_schedule(&dev->queue_task);
- 	return err;
- }
- 
-diff --git a/drivers/crypto/rockchip/rk3288_crypto_ahash.c b/drivers/crypto/rockchip/rk3288_crypto_ahash.c
-index 7185882..9b55585 100644
---- a/drivers/crypto/rockchip/rk3288_crypto_ahash.c
-+++ b/drivers/crypto/rockchip/rk3288_crypto_ahash.c
-@@ -204,7 +204,7 @@ static int rk_ahash_digest(struct ahash_request *req)
- 	ret = crypto_enqueue_request(&dev->queue, &req->base);
- 	spin_unlock_irqrestore(&dev->lock, flags);
- 
--	tasklet_schedule(&dev->crypto_tasklet);
-+	tasklet_schedule(&dev->queue_task);
- 
- 	/*
- 	 * it will take some time to process date after last dma transmission.
+So please disregard this for now: I will rework the other stuff I have
+so it no longer depends on this, and repost, because it is much more
+important for me that that makes it into v4.14. This can wait for
+v4.15, as far as I am concerned, and I will benchmark a bit more to
+see if we can get rid of the i586 code as well.
+
 -- 
-1.9.1
+Ard.
