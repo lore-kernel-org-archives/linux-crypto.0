@@ -1,45 +1,61 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: FW: [PATCH V6 5/7] crypto: AES CBC multi-buffer glue code
-Date: Tue, 25 Jul 2017 10:17:42 +0800
-Message-ID: <20170725021742.GA4151@gondor.apana.org.au>
-References: <1498609575-6217-1-git-send-email-megha.dey@linux.intel.com>
- <1498609575-6217-6-git-send-email-megha.dey@linux.intel.com>
- <20170718054142.GA4764@gondor.apana.org.au>
- <da15ba80-a3b1-0d79-47ea-5528c0d12b20@linux.intel.com>
- <1500427139.32379.0.camel@megha-Z97X-UD7-TH>
- <20170719070217.GA9374@gondor.apana.org.au>
- <C440BA31B54DCD4AAC682D2365C8FEE703DEC4CE@ORSMSX111.amr.corp.intel.com>
- <1500944996.3305.2.camel@megha-Z97X-UD7-TH>
+From: Harsh Jain <Harsh@chelsio.com>
+Subject: Re: [bug report] crypto: chcr - Select device in Round Robin fashion
+Date: Tue, 25 Jul 2017 10:12:35 +0530
+Message-ID: <482b055f-3509-0b92-e255-e5118e04a367@chelsio.com>
+References: <20170720103252.jrtckdbcnnsbf4v3@mwanda>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Cc: linux-crypto@vger.kernel.org
-To: Megha Dey <megha.dey@linux.intel.com>
+To: Dan Carpenter <dan.carpenter@oracle.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:39324 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755392AbdGYCRv (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Jul 2017 22:17:51 -0400
-Content-Disposition: inline
-In-Reply-To: <1500944996.3305.2.camel@megha-Z97X-UD7-TH>
+Received: from stargate.chelsio.com ([12.32.117.8]:42054 "EHLO l.chelsio.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1750778AbdGYEmm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 25 Jul 2017 00:42:42 -0400
+In-Reply-To: <20170720103252.jrtckdbcnnsbf4v3@mwanda>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jul 24, 2017 at 06:09:56PM -0700, Megha Dey wrote:
+
+
+On 20-07-2017 16:02, Dan Carpenter wrote:
+> Hello Harsh Jain,
 >
-> Under the skcipher interface, if both the outer and inner alg are async,
-> there should not be any problem right? Currently I do not see any
-> existing algorithms have both algorithms async.
-
-That's because the purpose of cryptd is to turn a sync algorithm
-into an async one.
-
-Your mcryptd is completely different.  We already went through
-this discussion for sha1-mb.  This is no different.  You should
-choose the type that fits your circumstances.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> The patch 14c19b178a01: "crypto: chcr - Select device in Round Robin
+> fashion" from Jun 15, 2017, leads to the following static checker
+> warning:
+>
+> 	drivers/crypto/chelsio/chcr_core.c:163 chcr_uld_add()
+> 	warn: overwrite may leak 'u_ctx'
+>
+> drivers/crypto/chelsio/chcr_core.c
+>    152  static void *chcr_uld_add(const struct cxgb4_lld_info *lld)
+>    153  {
+>    154          struct uld_ctx *u_ctx;
+>    155  
+>    156          /* Create the device and add it in the device list */
+>    157          u_ctx = kzalloc(sizeof(*u_ctx), GFP_KERNEL);
+>    158          if (!u_ctx) {
+>    159                  u_ctx = ERR_PTR(-ENOMEM);
+>    160                  goto out;
+>    161          }
+>    162          if (!(lld->ulp_crypto & ULP_CRYPTO_LOOKASIDE)) {
+>
+> Sure, we could move this check before the allocation, to prevent the
+> leak but is -ENOMEM really the right error code?  It feels like -EINVAL
+> with a WARN_ON_ONCE() message would be better but I don't really
+> understand this code.
+Will fix both issues in next change set. Thanks.
+>
+>    163                  u_ctx = ERR_PTR(-ENOMEM);
+>    164                  goto out;
+>    165          }
+>    166          u_ctx->lldi = *lld;
+>    167  out:
+>    168          return u_ctx;
+>    169  }
+>
+> regards,
+> dan carpenter
