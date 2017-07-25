@@ -1,57 +1,43 @@
 From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: Re: [PATCH v3 3/4] btrfs: Add zstd support
-Date: Wed, 26 Jul 2017 00:19:29 +0100
-Message-ID: <20170725231929.GA28789@silv-upstream1.ir.intel.com>
-References: <20170720212743.3351201-1-terrelln@fb.com>
- <20170720212743.3351201-4-terrelln@fb.com>
+Subject: Re: [PATCH v2 3/3] crypto: scompress - defer allocation of scratch
+ buffer to first use
+Date: Wed, 26 Jul 2017 00:36:53 +0100
+Message-ID: <20170725233653.GB28789@silv-upstream1.ir.intel.com>
+References: <20170721154238.21697-1-ard.biesheuvel@linaro.org>
+ <20170721154238.21697-4-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "Austin S . Hemmelgarn" <ahferroin7@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "kernel-team@fb.com" <kernel-team@fb.com>,
-        Chris Mason <clm@fb.com>, Yann Collet <cyan@fb.com>,
-        Adam Borowski <kilobyte@angband.pl>,
-        David Sterba <dsterba@suse.cz>,
-        "squashfs-devel@lists.sourceforge.net"
-        <squashfs-devel@lists.sourceforge.net>,
-        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Weigang Li <weigang.li@intel.com>,
-        Brian Will <brian.will@intel.com>,
-        Brian A Keating <brian.a.keating@intel.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@gmail.com>
-To: Nick Terrell <terrelln@fb.com>
+Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga06.intel.com ([134.134.136.31]:52089 "EHLO mga06.intel.com"
+Received: from mga14.intel.com ([192.55.52.115]:16380 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750896AbdGYXTe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 Jul 2017 19:19:34 -0400
+        id S1751097AbdGYXhM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 25 Jul 2017 19:37:12 -0400
 Content-Disposition: inline
-In-Reply-To: <20170720212743.3351201-4-terrelln@fb.com>
+In-Reply-To: <20170721154238.21697-4-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Nick,
+Hi Ard,
 
-On Thu, Jul 20, 2017 at 10:27:42PM +0100, Nick Terrell wrote:
-> Add zstd compression and decompression support to BtrFS. zstd at its
-> fastest level compresses almost as well as zlib, while offering much
-> faster compression and decompression, approaching lzo speeds.
-Can we look at integrating the zstd implementation below the acomp API
-available in the crypto subsystem?
-(https://github.com/torvalds/linux/blob/master/crypto/acompress.c)
-Acomp was designed to provide a generic and uniform API for compression
-in the kernel which hides algorithm specific details to frameworks.
-In future it would be nice to see btrfs using exclusively acomp
-for compression. This way when a new compression algorithm is exposed
-through acomp, it will be available immediately in btrfs.
-Furthermore, any framework in the kernel that will use acomp will be
-automatically enabled to use zstd.
-What do you think?
-
-Here is a prototype that shows how btrfs can be integrated with
-acomp: https://patchwork.kernel.org/patch/9201741/
+On Fri, Jul 21, 2017 at 04:42:38PM +0100, Ard Biesheuvel wrote:
+> +static int crypto_scomp_init_tfm(struct crypto_tfm *tfm)
+> +{
+> +	int ret;
+> +
+> +	mutex_lock(&scomp_lock);
+> +	ret = crypto_scomp_alloc_all_scratches();
+> +	mutex_unlock(&scomp_lock);
+> +
+> +	return ret;
+> +}
+If you allocate the scratch buffers at init_tfm, don't you end
+up with a situation where if you allocate two tfms of the same algo
+then you get twice the number of scratches?
+If that is the case, we should implement a reference count
+mechanism.
+Am I missing something?
 
 Regards,
 
