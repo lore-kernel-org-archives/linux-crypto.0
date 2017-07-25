@@ -1,65 +1,59 @@
-From: Gary R Hook <gary.hook@amd.com>
-Subject: Re: [PATCH v3 0/3] Update support for XTS-AES on AMD CCPs
-Date: Tue, 25 Jul 2017 17:43:08 -0500
-Message-ID: <e937bd4c-bbf5-88c5-1708-1095a5b825ae@amd.com>
-References: <150100997531.39154.470521200404215266.stgit@sosxen.amd.com>
+From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: Re: [PATCH v3 3/4] btrfs: Add zstd support
+Date: Wed, 26 Jul 2017 00:19:29 +0100
+Message-ID: <20170725231929.GA28789@silv-upstream1.ir.intel.com>
+References: <20170720212743.3351201-1-terrelln@fb.com>
+ <20170720212743.3351201-4-terrelln@fb.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>
-To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: "Austin S . Hemmelgarn" <ahferroin7@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "kernel-team@fb.com" <kernel-team@fb.com>,
+        Chris Mason <clm@fb.com>, Yann Collet <cyan@fb.com>,
+        Adam Borowski <kilobyte@angband.pl>,
+        David Sterba <dsterba@suse.cz>,
+        "squashfs-devel@lists.sourceforge.net"
+        <squashfs-devel@lists.sourceforge.net>,
+        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Weigang Li <weigang.li@intel.com>,
+        Brian Will <brian.will@intel.com>,
+        Brian A Keating <brian.a.keating@intel.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@gmail.com>
+To: Nick Terrell <terrelln@fb.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-sn1nam01on0050.outbound.protection.outlook.com ([104.47.32.50]:16416
-        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751804AbdGYWnr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 Jul 2017 18:43:47 -0400
-In-Reply-To: <150100997531.39154.470521200404215266.stgit@sosxen.amd.com>
+Received: from mga06.intel.com ([134.134.136.31]:52089 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750896AbdGYXTe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 25 Jul 2017 19:19:34 -0400
+Content-Disposition: inline
+In-Reply-To: <20170720212743.3351201-4-terrelln@fb.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 07/25/2017 02:21 PM, Hook, Gary wrote:
-> The following series adds support for XS-AES on version 5 CCPs, both
-> 128- and 256-bit, and enhances/clarifies/simplifies some crypto layer
-> code.
+Hi Nick,
 
-Herbert:
+On Thu, Jul 20, 2017 at 10:27:42PM +0100, Nick Terrell wrote:
+> Add zstd compression and decompression support to BtrFS. zstd at its
+> fastest level compresses almost as well as zlib, while offering much
+> faster compression and decompression, approaching lzo speeds.
+Can we look at integrating the zstd implementation below the acomp API
+available in the crypto subsystem?
+(https://github.com/torvalds/linux/blob/master/crypto/acompress.c)
+Acomp was designed to provide a generic and uniform API for compression
+in the kernel which hides algorithm specific details to frameworks.
+In future it would be nice to see btrfs using exclusively acomp
+for compression. This way when a new compression algorithm is exposed
+through acomp, it will be available immediately in btrfs.
+Furthermore, any framework in the kernel that will use acomp will be
+automatically enabled to use zstd.
+What do you think?
 
-Oops. The last patch in this series depends upon a fix that was sent 
-just prior
-to this. This series won't fully apply to cryptodev-2.6 without it, and thus
-will have to wait until "Fix XTS-AES-128 support on v5 CCPs" is processed.
+Here is a prototype that shows how btrfs can be integrated with
+acomp: https://patchwork.kernel.org/patch/9201741/
 
-Sorry about that.
+Regards,
 
->
-> Changes since v2:
->  - Move a CCP v5 fix out of this patch series and submit independently
->  - In the unit-size check patch:
->     - Edit comments
->     - Remove unnecessary variable
->     - Delay a change (that belongs in the CCP v5 patch)
->
-> Changes since v1:
->  - rework the validation of the unit-size; move to a separate patch
->  - expand the key buffer to accommodate 256-bit keys
->  - use xts_check_key() in the crypto layer
->
->
-> ---
->
-> Gary R Hook (3):
->       crypto: ccp - Add a call to xts_check_key()
->       crypto: ccp - Rework the unit-size check for XTS-AES
->       crypto: ccp - Add XTS-AES-256 support for CCP version 5
->
->
->  drivers/crypto/ccp/ccp-crypto-aes-xts.c |   92
-> +++++++++++++++++--------------
->  drivers/crypto/ccp/ccp-crypto.h         |    2 -
->  drivers/crypto/ccp/ccp-ops.c            |    2 +
->  3 files changed, 53 insertions(+), 43 deletions(-)
->
-> --
+-- 
+Giovanni
