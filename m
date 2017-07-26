@@ -1,44 +1,53 @@
-From: Megha Dey <megha.dey@linux.intel.com>
-Subject: Re: FW: [PATCH V6 5/7] crypto: AES CBC multi-buffer glue code
-Date: Tue, 25 Jul 2017 19:13:29 -0700
-Message-ID: <1501035209.2503.2.camel@megha-Z97X-UD7-TH>
-References: <1498609575-6217-1-git-send-email-megha.dey@linux.intel.com>
-         <1498609575-6217-6-git-send-email-megha.dey@linux.intel.com>
-         <20170718054142.GA4764@gondor.apana.org.au>
-         <da15ba80-a3b1-0d79-47ea-5528c0d12b20@linux.intel.com>
-         <1500427139.32379.0.camel@megha-Z97X-UD7-TH>
-         <20170719070217.GA9374@gondor.apana.org.au>
-         <C440BA31B54DCD4AAC682D2365C8FEE703DEC4CE@ORSMSX111.amr.corp.intel.com>
-         <1500944996.3305.2.camel@megha-Z97X-UD7-TH>
-         <20170725021742.GA4151@gondor.apana.org.au>
+From: Emil Karlson <jekarlson@gmail.com>
+Subject: Re: [RESEND PATCH 0/2] crypto/rockchip: fix some issue which causes
+ crypto failed
+Date: Wed, 26 Jul 2017 20:44:18 +0300
+Message-ID: <CAELSAVZAs=Tqz_yHb2u8StXFeC550Tm98jqmnRFZLRmFCqs0bA@mail.gmail.com>
+References: <1500859394-1799-1-git-send-email-wzz@rock-chips.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Heiko Stuebner <heiko@sntech.de>, shawn.lin@rock-chips.com,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org
+To: zain wang <wzz@rock-chips.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:17405 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751427AbdGZCBl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 Jul 2017 22:01:41 -0400
-In-Reply-To: <20170725021742.GA4151@gondor.apana.org.au>
+Received: from mail-qt0-f194.google.com ([209.85.216.194]:38087 "EHLO
+        mail-qt0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750897AbdGZRoT (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 26 Jul 2017 13:44:19 -0400
+In-Reply-To: <1500859394-1799-1-git-send-email-wzz@rock-chips.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, 2017-07-25 at 10:17 +0800, Herbert Xu wrote:
-> On Mon, Jul 24, 2017 at 06:09:56PM -0700, Megha Dey wrote:
-> >
-> > Under the skcipher interface, if both the outer and inner alg are async,
-> > there should not be any problem right? Currently I do not see any
-> > existing algorithms have both algorithms async.
-> 
-> That's because the purpose of cryptd is to turn a sync algorithm
-> into an async one.
-> 
-> Your mcryptd is completely different.  We already went through
-> this discussion for sha1-mb.  This is no different.  You should
-> choose the type that fits your circumstances.
+Greetings
 
-I have updated the inner algorithm to also be async in v7 patch series.
-> 
-> Cheers,
+While I am not getting the original error anymore, using dm-crypt
+still fails at cryptsetup luksOpen with [rk_ablk_rx:331] Lack of data
+https://users.aalto.fi/~jkarlson/files/rk3288-fail_2017-07-24.jpg
+
+Test platform: Asus chromebook C201/rk3288 linux-4.12.3+ this patchset
+
+Best Regards
+-Emil
+
+On Mon, Jul 24, 2017 at 4:23 AM, zain wang <wzz@rock-chips.com> wrote:
+> These patches fix some bugs on rockchip's crypto which would cause crypto failed.
+>
+> zain wang (2):
+>   crypto: rockchip - move the crypto completion from interrupt context
+>   crypto: rockchip - return the err code when unable dequeue the crypto
+>     request
+>
+>  drivers/crypto/rockchip/rk3288_crypto.c            | 58 +++++++++++-----------
+>  drivers/crypto/rockchip/rk3288_crypto.h            |  4 +-
+>  drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c | 17 ++++++-
+>  drivers/crypto/rockchip/rk3288_crypto_ahash.c      | 16 +++++-
+>  4 files changed, 62 insertions(+), 33 deletions(-)
+>
+> --
+> 1.9.1
+>
+>
