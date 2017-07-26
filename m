@@ -1,64 +1,102 @@
-From: Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-Subject: Re: [PATCH v6 1/3] Documentation: devicetree: add Freescale RNGC binding
-Date: Wed, 26 Jul 2017 17:55:47 -0500
-Message-ID: <CAL_Jsq+2Z94apqTsvs4HQdS49GdzT50XmPS4RvA7MDp_kK5Wow@mail.gmail.com>
-References: <1457705200-16951-1-git-send-email-s.trumtrar@pengutronix.de> <1500832146-8660-1-git-send-email-martin@kaiser.cx>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Steffen Trumtrar <s.trumtrar-bIcnvbaLZ9MEGnE8C9+IrQ@public.gmane.org>,
-        Shawn Guo <shawnguo-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-        PrasannaKumar Muralidharan <prasannatsmkumar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
-        "devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        "kernel-bIcnvbaLZ9MEGnE8C9+IrQ@public.gmane.org" <kernel-bIcnvbaLZ9MEGnE8C9+IrQ@public.gmane.org>,
-        Fabio Estevam <festevam-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        "linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org"
-        <linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>,
-        "linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Martin Kaiser <martin-XxZfDwE/svGeZLLa646FqQ@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1500832146-8660-1-git-send-email-martin-XxZfDwE/svGeZLLa646FqQ@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+From: Logan Gunthorpe <logang@deltatee.com>
+Subject: [PATCH v5 2/6] powerpc: iomap.c: introduce io{read|write}64_{lo_hi|hi_lo}
+Date: Wed, 26 Jul 2017 17:19:13 -0600
+Message-ID: <20170726231917.6073-3-logang@deltatee.com>
+References: <20170726231917.6073-1-logang@deltatee.com>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        Stephen Bates <sbates@raithlin.com>,
+        Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from ale.deltatee.com ([207.54.116.67]:41391 "EHLO ale.deltatee.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751078AbdGZXTX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 26 Jul 2017 19:19:23 -0400
+In-Reply-To: <20170726231917.6073-1-logang@deltatee.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Jul 23, 2017 at 12:49 PM, Martin Kaiser <martin-XxZfDwE/svGeZLLa646FqQ@public.gmane.org> wrote:
-> From: Steffen Trumtrar <s.trumtrar-bIcnvbaLZ9MEGnE8C9+IrQ@public.gmane.org>
->
-> Add binding documentation for the Freescale RNGC found on
-> some i.MX2/3 SoCs.
->
-> Signed-off-by: Steffen Trumtrar <s.trumtrar-bIcnvbaLZ9MEGnE8C9+IrQ@public.gmane.org>
-> Signed-off-by: Martin Kaiser <martin-XxZfDwE/svGeZLLa646FqQ@public.gmane.org>
-> ---
-> Changes in v6:
->   - be more precise about rngc and rngb
->   - get rid of mxc, rename the file to imx-rngc.txt
->   - reformat the compatible strings
->   - use RNGC instead of RNG
->   - clarify that clock is not optional (remove "should contain")
->
-> Changes in v5:
->   none
->
-> Changes in v4:
->   none
->
-> Changes in v3:
->   - add compatible string for imx35
->   - remove imx5 from the commit message,
->     I couldn't find an i.MX SOC that has RNGC
->
-> Changes in v2:
->   none
->
->  Documentation/devicetree/bindings/rng/imx-rngc.txt | 21 +++++++++++++++++++++
->  1 file changed, 21 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/rng/imx-rngc.txt
+These functions will be introduced into the generic iomap.c so
+they can deal with PIO accesses in hi-lo/lo-hi variants. Thus,
+the powerpc version of iomap.c will need to provide the same
+functions even though, in this arch, they are identical to the
+regular io{read|write}64 functions.
+---
+ arch/powerpc/kernel/iomap.c | 40 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
 
-Reviewed-by: Rob Herring <robh-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+diff --git a/arch/powerpc/kernel/iomap.c b/arch/powerpc/kernel/iomap.c
+index a1854d1ded8b..b43dbadfd24f 100644
+--- a/arch/powerpc/kernel/iomap.c
++++ b/arch/powerpc/kernel/iomap.c
+@@ -44,12 +44,32 @@ u64 ioread64(void __iomem *addr)
+ {
+ 	return readq(addr);
+ }
++u64 ioread64_lo_hi(void __iomem *addr)
++{
++	return readq(addr);
++}
++u64 ioread64_hi_lo(void __iomem *addr)
++{
++	return readq(addr);
++}
+ u64 ioread64be(void __iomem *addr)
+ {
+ 	return readq_be(addr);
+ }
++u64 ioread64be_lo_hi(void __iomem *addr)
++{
++	return readq_be(addr);
++}
++u64 ioread64be_hi_lo(void __iomem *addr)
++{
++	return readq_be(addr);
++}
+ EXPORT_SYMBOL(ioread64);
++EXPORT_SYMBOL(ioread64_lo_hi);
++EXPORT_SYMBOL(ioread64_hi_lo);
+ EXPORT_SYMBOL(ioread64be);
++EXPORT_SYMBOL(ioread64be_lo_hi);
++EXPORT_SYMBOL(ioread64be_hi_lo);
+ #endif /* __powerpc64__ */
+ 
+ void iowrite8(u8 val, void __iomem *addr)
+@@ -82,12 +102,32 @@ void iowrite64(u64 val, void __iomem *addr)
+ {
+ 	writeq(val, addr);
+ }
++void iowrite64_lo_hi(u64 val, void __iomem *addr)
++{
++	writeq(val, addr);
++}
++void iowrite64_hi_lo(u64 val, void __iomem *addr)
++{
++	writeq(val, addr);
++}
+ void iowrite64be(u64 val, void __iomem *addr)
+ {
+ 	writeq_be(val, addr);
+ }
++void iowrite64be_lo_hi(u64 val, void __iomem *addr)
++{
++	writeq_be(val, addr);
++}
++void iowrite64be_hi_lo(u64 val, void __iomem *addr)
++{
++	writeq_be(val, addr);
++}
+ EXPORT_SYMBOL(iowrite64);
++EXPORT_SYMBOL(iowrite64_lo_hi);
++EXPORT_SYMBOL(iowrite64_hi_lo);
+ EXPORT_SYMBOL(iowrite64be);
++EXPORT_SYMBOL(iowrite64be_lo_hi);
++EXPORT_SYMBOL(iowrite64be_hi_lo);
+ #endif /* __powerpc64__ */
+ 
+ /*
+-- 
+2.11.0
