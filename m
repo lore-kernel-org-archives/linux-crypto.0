@@ -1,15 +1,14 @@
 From: Logan Gunthorpe <logang@deltatee.com>
-Subject: [PATCH v5 4/6] io-64-nonatomic: add io{read|write}64[be]{_lo_hi|_hi_lo} macros
-Date: Wed, 26 Jul 2017 17:19:15 -0600
-Message-ID: <20170726231917.6073-5-logang@deltatee.com>
+Subject: [PATCH v5 5/6] ntb: ntb_hw_intel: use io-64-nonatomic instead of in-driver hacks
+Date: Wed, 26 Jul 2017 17:19:16 -0600
+Message-ID: <20170726231917.6073-6-logang@deltatee.com>
 References: <20170726231917.6073-1-logang@deltatee.com>
 Cc: Arnd Bergmann <arnd@arndb.de>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
         Stephen Bates <sbates@raithlin.com>,
         Logan Gunthorpe <logang@deltatee.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Alan Cox <gnomes@lxorguk.ukuu.org.uk>
+        Jon Mason <jdmason@kudzu.us>, Allen Hubbe <Allen.Hubbe@emc.com>
 To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
         linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org
 Return-path: <linux-arch-owner@vger.kernel.org>
@@ -17,165 +16,66 @@ In-Reply-To: <20170726231917.6073-1-logang@deltatee.com>
 Sender: linux-arch-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch adds generic io{read|write}64[be]{_lo_hi|_hi_lo} macros if
-they are not already defined by the architecture. (As they are provided
-by the generic iomap library).
-
-The patch also points io{read|write}64[be] to the variant specified by the
-header name.
-
-This is because new drivers are encouraged to use ioreadXX, et al instead
-of readX[1], et al -- and mixing ioreadXX with readq is pretty ugly.
-
-[1] ldd3: section 9.4.2
+Now that ioread64 and iowrite64 are available in io-64-nonatomic,
+we can remove the hack at the top of ntb_hw_intel.c and replace it
+with an include.
 
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-cc: Christoph Hellwig <hch@lst.de>
-cc: Arnd Bergmann <arnd@arndb.de>
-cc: Alan Cox <gnomes@lxorguk.ukuu.org.uk>
-cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Jon Mason <jdmason@kudzu.us>
+Cc: Allen Hubbe <Allen.Hubbe@emc.com>
+Acked-by: Dave Jiang <dave.jiang@intel.com>
+Acked-by: Allen Hubbe <Allen.Hubbe@dell.com>
 ---
- include/linux/io-64-nonatomic-hi-lo.h | 60 +++++++++++++++++++++++++++++++++++
- include/linux/io-64-nonatomic-lo-hi.h | 60 +++++++++++++++++++++++++++++++++++
- 2 files changed, 120 insertions(+)
+ drivers/ntb/hw/intel/ntb_hw_intel.c | 30 +-----------------------------
+ 1 file changed, 1 insertion(+), 29 deletions(-)
 
-diff --git a/include/linux/io-64-nonatomic-hi-lo.h b/include/linux/io-64-nonatomic-hi-lo.h
-index defcc4644ce3..31d28e981299 100644
---- a/include/linux/io-64-nonatomic-hi-lo.h
-+++ b/include/linux/io-64-nonatomic-hi-lo.h
-@@ -54,4 +54,64 @@ static inline void hi_lo_writeq_relaxed(__u64 val, volatile void __iomem *addr)
- #define writeq_relaxed hi_lo_writeq_relaxed
- #endif
+diff --git a/drivers/ntb/hw/intel/ntb_hw_intel.c b/drivers/ntb/hw/intel/ntb_hw_intel.c
+index 2557e2c05b90..606c90f59d4b 100644
+--- a/drivers/ntb/hw/intel/ntb_hw_intel.c
++++ b/drivers/ntb/hw/intel/ntb_hw_intel.c
+@@ -59,6 +59,7 @@
+ #include <linux/random.h>
+ #include <linux/slab.h>
+ #include <linux/ntb.h>
++#include <linux/io-64-nonatomic-lo-hi.h>
  
-+#ifndef ioread64_hi_lo
-+#define ioread64_hi_lo ioread64_hi_lo
-+static inline u64 ioread64_hi_lo(void __iomem *addr)
-+{
-+	u32 low, high;
-+
-+	high = ioread32(addr + sizeof(u32));
-+	low = ioread32(addr);
-+
-+	return low + ((u64)high << 32);
-+}
-+#endif
-+
-+#ifndef iowrite64_hi_lo
-+#define iowrite64_hi_lo iowrite64_hi_lo
-+static inline void iowrite64_hi_lo(u64 val, void __iomem *addr)
-+{
-+	iowrite32(val >> 32, addr + sizeof(u32));
-+	iowrite32(val, addr);
-+}
-+#endif
-+
-+#ifndef ioread64be_hi_lo
-+#define ioread64be_hi_lo ioread64be_hi_lo
-+static inline u64 ioread64be_hi_lo(void __iomem *addr)
-+{
-+	u32 low, high;
-+
-+	high = ioread32be(addr);
-+	low = ioread32be(addr + sizeof(u32));
-+
-+	return low + ((u64)high << 32);
-+}
-+#endif
-+
-+#ifndef iowrite64be_hi_lo
-+#define iowrite64be_hi_lo iowrite64be_hi_lo
-+static inline void iowrite64be_hi_lo(u64 val, void __iomem *addr)
-+{
-+	iowrite32be(val >> 32, addr);
-+	iowrite32be(val, addr + sizeof(u32));
-+}
-+#endif
-+
-+#ifndef ioread64
-+#define ioread64 ioread64_hi_lo
-+#endif
-+
-+#ifndef iowrite64
-+#define iowrite64 iowrite64_hi_lo
-+#endif
-+
-+#ifndef ioread64be
-+#define ioread64be ioread64be_hi_lo
-+#endif
-+
-+#ifndef iowrite64be
-+#define iowrite64be iowrite64be_hi_lo
-+#endif
-+
- #endif	/* _LINUX_IO_64_NONATOMIC_HI_LO_H_ */
-diff --git a/include/linux/io-64-nonatomic-lo-hi.h b/include/linux/io-64-nonatomic-lo-hi.h
-index 084461a4e5ab..437a34f20f5a 100644
---- a/include/linux/io-64-nonatomic-lo-hi.h
-+++ b/include/linux/io-64-nonatomic-lo-hi.h
-@@ -54,4 +54,64 @@ static inline void lo_hi_writeq_relaxed(__u64 val, volatile void __iomem *addr)
- #define writeq_relaxed lo_hi_writeq_relaxed
- #endif
+ #include "ntb_hw_intel.h"
  
-+#ifndef ioread64_lo_hi
-+#define ioread64_lo_hi ioread64_lo_hi
-+static inline u64 ioread64_lo_hi(void __iomem *addr)
-+{
-+	u32 low, high;
-+
-+	low = ioread32(addr);
-+	high = ioread32(addr + sizeof(u32));
-+
-+	return low + ((u64)high << 32);
-+}
-+#endif
-+
-+#ifndef iowrite64_lo_hi
-+#define iowrite64_lo_hi iowrite64_lo_hi
-+static inline void iowrite64_lo_hi(u64 val, void __iomem *addr)
-+{
-+	iowrite32(val, addr);
-+	iowrite32(val >> 32, addr + sizeof(u32));
-+}
-+#endif
-+
-+#ifndef ioread64be_lo_hi
-+#define ioread64be_lo_hi ioread64be_lo_hi
-+static inline u64 ioread64be_lo_hi(void __iomem *addr)
-+{
-+	u32 low, high;
-+
-+	low = ioread32be(addr + sizeof(u32));
-+	high = ioread32be(addr);
-+
-+	return low + ((u64)high << 32);
-+}
-+#endif
-+
-+#ifndef iowrite64be_lo_hi
-+#define iowrite64be_lo_hi iowrite64be_lo_hi
-+static inline void iowrite64be_lo_hi(u64 val, void __iomem *addr)
-+{
-+	iowrite32be(val, addr + sizeof(u32));
-+	iowrite32be(val >> 32, addr);
-+}
-+#endif
-+
-+#ifndef ioread64
-+#define ioread64 ioread64_lo_hi
-+#endif
-+
-+#ifndef iowrite64
-+#define iowrite64 iowrite64_lo_hi
-+#endif
-+
-+#ifndef ioread64be
-+#define ioread64be ioread64be_lo_hi
-+#endif
-+
-+#ifndef iowrite64be
-+#define iowrite64be iowrite64be_lo_hi
-+#endif
-+
- #endif	/* _LINUX_IO_64_NONATOMIC_LO_HI_H_ */
+@@ -155,35 +156,6 @@ MODULE_PARM_DESC(xeon_b2b_dsd_bar5_addr32,
+ static inline enum ntb_topo xeon_ppd_topo(struct intel_ntb_dev *ndev, u8 ppd);
+ static int xeon_init_isr(struct intel_ntb_dev *ndev);
+ 
+-#ifndef ioread64
+-#ifdef readq
+-#define ioread64 readq
+-#else
+-#define ioread64 _ioread64
+-static inline u64 _ioread64(void __iomem *mmio)
+-{
+-	u64 low, high;
+-
+-	low = ioread32(mmio);
+-	high = ioread32(mmio + sizeof(u32));
+-	return low | (high << 32);
+-}
+-#endif
+-#endif
+-
+-#ifndef iowrite64
+-#ifdef writeq
+-#define iowrite64 writeq
+-#else
+-#define iowrite64 _iowrite64
+-static inline void _iowrite64(u64 val, void __iomem *mmio)
+-{
+-	iowrite32(val, mmio);
+-	iowrite32(val >> 32, mmio + sizeof(u32));
+-}
+-#endif
+-#endif
+-
+ static inline int pdev_is_atom(struct pci_dev *pdev)
+ {
+ 	switch (pdev->device) {
 -- 
 2.11.0
