@@ -1,81 +1,45 @@
-From: Logan Gunthorpe <logang@deltatee.com>
-Subject: [PATCH v5 5/6] ntb: ntb_hw_intel: use io-64-nonatomic instead of in-driver hacks
-Date: Wed, 26 Jul 2017 17:19:16 -0600
-Message-ID: <20170726231917.6073-6-logang@deltatee.com>
-References: <20170726231917.6073-1-logang@deltatee.com>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-        Stephen Bates <sbates@raithlin.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Jon Mason <jdmason@kudzu.us>, Allen Hubbe <Allen.Hubbe@emc.com>
-To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org
-Return-path: <linux-arch-owner@vger.kernel.org>
-In-Reply-To: <20170726231917.6073-1-logang@deltatee.com>
-Sender: linux-arch-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: [PATCH 0/4] staging: ccree: coding style clean ups
+Date: Thu, 27 Jul 2017 13:43:14 +0300
+Message-ID: <1501152199-7671-1-git-send-email-gilad@benyossef.com>
+Cc: Ofir Drang <ofir.drang@arm.com>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        linux-kernel@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:44612 "EHLO
+        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750836AbdG0Kna (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 27 Jul 2017 06:43:30 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Now that ioread64 and iowrite64 are available in io-64-nonatomic,
-we can remove the hack at the top of ntb_hw_intel.c and replace it
-with an include.
+Misc. coding style fixes for ccree driver.
 
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Cc: Jon Mason <jdmason@kudzu.us>
-Cc: Allen Hubbe <Allen.Hubbe@emc.com>
-Acked-by: Dave Jiang <dave.jiang@intel.com>
-Acked-by: Allen Hubbe <Allen.Hubbe@dell.com>
----
- drivers/ntb/hw/intel/ntb_hw_intel.c | 30 +-----------------------------
- 1 file changed, 1 insertion(+), 29 deletions(-)
+These are the missing patches that failed to apply two weeks ago,
+rebased onto latest staging-next.
 
-diff --git a/drivers/ntb/hw/intel/ntb_hw_intel.c b/drivers/ntb/hw/intel/ntb_hw_intel.c
-index 2557e2c05b90..606c90f59d4b 100644
---- a/drivers/ntb/hw/intel/ntb_hw_intel.c
-+++ b/drivers/ntb/hw/intel/ntb_hw_intel.c
-@@ -59,6 +59,7 @@
- #include <linux/random.h>
- #include <linux/slab.h>
- #include <linux/ntb.h>
-+#include <linux/io-64-nonatomic-lo-hi.h>
- 
- #include "ntb_hw_intel.h"
- 
-@@ -155,35 +156,6 @@ MODULE_PARM_DESC(xeon_b2b_dsd_bar5_addr32,
- static inline enum ntb_topo xeon_ppd_topo(struct intel_ntb_dev *ndev, u8 ppd);
- static int xeon_init_isr(struct intel_ntb_dev *ndev);
- 
--#ifndef ioread64
--#ifdef readq
--#define ioread64 readq
--#else
--#define ioread64 _ioread64
--static inline u64 _ioread64(void __iomem *mmio)
--{
--	u64 low, high;
--
--	low = ioread32(mmio);
--	high = ioread32(mmio + sizeof(u32));
--	return low | (high << 32);
--}
--#endif
--#endif
--
--#ifndef iowrite64
--#ifdef writeq
--#define iowrite64 writeq
--#else
--#define iowrite64 _iowrite64
--static inline void _iowrite64(u64 val, void __iomem *mmio)
--{
--	iowrite32(val, mmio);
--	iowrite32(val >> 32, mmio + sizeof(u32));
--}
--#endif
--#endif
--
- static inline int pdev_is_atom(struct pci_dev *pdev)
- {
- 	switch (pdev->device) {
+By the way, I still do not understand why they failed to apply,
+as they applied just fine being cherry picked on top of latest
+staging-next apart for fixes for later changes. I hope these will
+be good.
+
+Gilad Ben-Yossef (4):
+  staging: ccree: fix parenthesis alignment
+  staging: ccree: fix split strings
+  staging: ccree: remove func name from log messages
+  staging: ccree: kmalloc by sizeof var not type
+
+ drivers/staging/ccree/ssi_aead.c        |  63 ++++++++-------
+ drivers/staging/ccree/ssi_buffer_mgr.c  | 116 ++++++++++++---------------
+ drivers/staging/ccree/ssi_cipher.c      |  47 +++++------
+ drivers/staging/ccree/ssi_driver.c      |   8 +-
+ drivers/staging/ccree/ssi_hash.c        | 137 ++++++++++++++++----------------
+ drivers/staging/ccree/ssi_ivgen.c       |  12 +--
+ drivers/staging/ccree/ssi_pm.c          |   4 +-
+ drivers/staging/ccree/ssi_request_mgr.c |  19 +++--
+ 8 files changed, 197 insertions(+), 209 deletions(-)
+
 -- 
-2.11.0
+2.1.4
