@@ -1,52 +1,40 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] crypto: caam - free qman_fq after kill_fq
-Date: Fri, 28 Jul 2017 21:49:49 +0800
-Message-ID: <20170728134949.GB21401@gondor.apana.org.au>
-References: <20170711062107.182889-1-xulin.sun@windriver.com>
- <20170713092101.145505-1-xulin.sun@windriver.com>
+Subject: Re: [PATCH 0/3] STM32 CRC update
+Date: Fri, 28 Jul 2017 21:50:06 +0800
+Message-ID: <20170728135006.GC21401@gondor.apana.org.au>
+References: <1499951193-14842-1-git-send-email-lionel.debieve@st.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: horia.geanta@nxp.com, dan.douglass@nxp.com, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        xulinsun@gmail.com
-To: Xulin Sun <xulin.sun@windriver.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@st.com>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org,
+        Benjamin Gaignard <benjamin.gaignard@st.com>,
+        Fabien Dessenne <fabien.dessenne@st.com>,
+        Ludovic Barre <ludovic.barre@st.com>
+To: Lionel Debieve <lionel.debieve@st.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20170713092101.145505-1-xulin.sun@windriver.com>
+In-Reply-To: <1499951193-14842-1-git-send-email-lionel.debieve@st.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jul 13, 2017 at 05:21:01AM -0400, Xulin Sun wrote:
-> kill_fq removes a complete frame queue, it needs to free the qman_fq
-> in the last. Else kmemleak will report the below warning:
+On Thu, Jul 13, 2017 at 03:06:30PM +0200, Lionel Debieve wrote:
+> This set of patches update the STM32 CRC driver.
+> It contains two corrections and one global Kconfig rework.
+> First correction is about the relaxed usage in scope of arm
+> platform usage, second about a unbind driver issue.
+> Last patch is about a Kconfig rework that make configuration
+> generic for STM32 crypto algos, HASH and CRYP are pushed
+> accordingly.
 > 
-> unreferenced object 0xffff800073085c80 (size 128):
->   comm "cryptomgr_test", pid 199, jiffies 4294937850 (age 67.840s)
->   hex dump (first 32 bytes):
->     00 00 00 00 00 00 00 00 a0 80 7e 00 00 80 ff ff
->     00 00 00 00 00 00 00 00 04 00 04 00 5c 01 00 00
->   backtrace:
->     [<ffff8000001e5760>] create_object+0xf8/0x258
->     [<ffff800000994e38>] kmemleak_alloc+0x58/0xa0
->     [<ffff8000001d5f18>] kmem_cache_alloc_trace+0x2c8/0x358
->     [<ffff8000007e8410>] create_caam_req_fq+0x40/0x170
->     [<ffff8000007e870c>] caam_drv_ctx_update+0x54/0x248
->     [<ffff8000007fca54>] aead_setkey+0x154/0x300
->     [<ffff800000452120>] setkey+0x50/0xf0
->     [<ffff80000045b144>] __test_aead+0x5ec/0x1028
->     [<ffff80000045c28c>] test_aead+0x44/0xc8
->     [<ffff80000045c368>] alg_test_aead+0x58/0xd0
->     [<ffff80000045bdb4>] alg_test+0x14c/0x308
->     [<ffff8000004588e8>] cryptomgr_test+0x50/0x58
->     [<ffff8000000c3b2c>] kthread+0xdc/0xf0
->     [<ffff800000083c00>] ret_from_fork+0x10/0x50
-> 
-> And check where the function kill_fq() is called to remove
-> the additional kfree to qman_fq and avoid re-calling the released qman_fq.
-> 
-> Signed-off-by: Xulin Sun <xulin.sun@windriver.com>
+> Lionel Debieve (3):
+>   crypto: stm32 - CRC use relaxed function
+>   crypto: stm32 - solve crc issue during unbind
+>   crypto: stm32 - Rename module to use generic crypto
 
-Patch applied.  Thanks.
+All patches applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
