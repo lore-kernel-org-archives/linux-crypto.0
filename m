@@ -1,113 +1,53 @@
-From: Tudor Ambarus <tudor.ambarus@microchip.com>
-Subject: Re: KPP questions and confusion
-Date: Fri, 28 Jul 2017 10:01:29 +0300
-Message-ID: <389a9dcf-05c1-2b59-90d9-ef9de5ff640b@microchip.com>
-References: <CAJU8_nUhapH=nKkL=NEa2uW5f-vdAX3kvi5Ua7b_bA8d=BjRLQ@mail.gmail.com>
- <9580BB6F-45D8-49CD-B859-09C39FD4D7D0@holtmann.org>
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: Re: [PATCH 2/3] staging: ccree: Convert to devm_ioremap_resource for
+ map, unmap
+Date: Fri, 28 Jul 2017 11:40:00 +0300
+Message-ID: <20170728084000.vrcr7ql6z72dzo4p@mwanda>
+References: <CAOtvUMeypygShtn4+nXCsepUrsDhBmZmqXMp60D116P8+2WT4A@mail.gmail.com>
+ <1501165654-30601-1-git-send-email-gilad@benyossef.com>
+ <1501165654-30601-2-git-send-email-gilad@benyossef.com>
+ <20170727194829.symnl663plxd23uo@mwanda>
+ <eb2031ea-82c3-c46d-d20a-b872115b75c9@techveda.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: <linux-crypto@vger.kernel.org>, <smueller@chronox.de>,
-        Nicolas Ferre <nicolas.ferre@microchip.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Kyle Rose <krose@krose.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from esa3.microchip.iphmx.com ([68.232.153.233]:36344 "EHLO
-        esa3.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751113AbdG1HBr (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 Jul 2017 03:01:47 -0400
-In-Reply-To: <9580BB6F-45D8-49CD-B859-09C39FD4D7D0@holtmann.org>
-Content-Language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: devel@driverdev.osuosl.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ driverdev-devel@linuxdriverproject.org, linux-kernel@vger.kernel.org,
+ linux-crypto@vger.kernel.org, Ofir Drang <ofir.drang@arm.com>
+To: Suniel Mahesh <sunil.m@techveda.org>
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+Content-Disposition: inline
+In-Reply-To: <eb2031ea-82c3-c46d-d20a-b872115b75c9@techveda.org>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+List-Id: linux-crypto.vger.kernel.org
 
-Hi, Marcel, Kyle,
-
-On 07/17/2017 09:17 PM, Marcel Holtmann wrote:
-> Hi Kyle,
+On Fri, Jul 28, 2017 at 09:59:41AM +0530, Suniel Mahesh wrote:
+> On Friday 28 July 2017 01:18 AM, Dan Carpenter wrote:
+> > On Thu, Jul 27, 2017 at 05:27:33PM +0300, Gilad Ben-Yossef wrote:
+> >> +	new_drvdata->cc_base = devm_ioremap_resource(&plat_dev->dev,
+> >> +						     req_mem_cc_regs);
+> >> +	if (IS_ERR(new_drvdata->cc_base)) {
+> >> +		rc = PTR_ERR(new_drvdata->cc_base);
+> >>  		goto init_cc_res_err;
+> >                 ^^^^^^^^^^^^^^^^^^^^
+> > (This code was in the original and not introduced by the patch.)
 > 
->> I am confused about several things in the new key agreement code.
->>
->> net/bluetooth/smp.c in two places generates random bytes for the
->> private_key argument to
->> net/bluetooth/ecdh_helper.c:generate_ecdh_keys, which suggests the
->> private key is static within the function. However, there is a do ...
->> while(true) loop within generate_ecdh_keys, with the following near
->> the end:
->>
->> /* Private key is not valid. Regenerate */
->> if (err == -EINVAL)
->>             continue;
->>
->> which suggests that it expects a different private key to be generated
->> on each iteration of the loop. But it looks like it runs through the
->> loop yet again with the same private key generated in the caller,
->> which suggests it would infinitely loop on a bad private key value. Is
->> this incorrect?
-> 
-> actually it seems that I screwed that up with commit 71653eb64bcca6110c42aadfd50b8d54d3a88079 where I moved the seeding of private_key outside of generate_ecdh_keys() function.
-> 
->> Furthermore, since req->src == NULL via the call to
->> kpp_request_set_input, ecc_make_pub_key will always be called in
->> ecdh.c:ecdh_compute_value, in which case -EINVAL would be returned
->> only by invalid input (!private_key or bad curve_id) that AFAICT
->> cannot happen, or at least wouldn't be resolved by another run through
->> the loop.
->>
->> OTOH, -EAGAIN would be returned by ecc_make_pub_key if the public key
->> turns out to be the zero point, which is at least one reason why you'd
->> want to generate a new private key (if that loop were to do that.)
->>
->> I'm a little confused about some other things:
->>
->> * The bluetooth code doesn't seem to use ecc_gen_privkey, opting to
->> instead just generate random bytes and hope for the best.
->> * There doesn't appear to be any way for ecc_gen_privkey to get called
->> from crypto/ecdh.c:ecdh_set_secret, as it starts with a call to
->> crypto/ecdh_helper.c:crypto_ecdh_decode_key that returns -EINVAL if
->> decoding fails, meaning that both params.key != NULL and (if I'm
->> reading this correctly) params.key_size > 0. Is that dead code, or is
->> there a way it is intended to be used?
-> 
-> I am fine switching to ecc_gen_privkey. Care to provide a patch for it?
+> Hi Dan, the above lines of code were not in the original except 
+> "goto init_cc_res_err;" which was doing the error handling at different
+> places.
 > 
 
-Marcel, regarding the ecdh offload to hw from Bluetooth SMP code, this
-is not possible as of know because SMP code uses it's own private keys.
-atmel-ecc driver will fallback to the ecdh software implementation if
-user wants to use it's own private keys.
+Yes, yes.  I wasn't commenting on the patch just the existing code.
 
-I can jump in the Bluetooth's ecdh handling, but at best effort, my
-primary goal is to add support for KPP in af_alg.
+The patch is fine.
 
->> The context for this email is that I have need for the same basic
->> functionality in net/bluetooth/ecdh_helper.c for a non-BT purpose, so
->> it seems like this should be part of crypto/ecdh_helper.c (abstracted
->> to work for any curve). Basically, I need to do basic ECDH key
->> agreement:
->>
->> * Generate a new (valid) ephemeral private key, or potentially re-use
->> an existing one
->> * Compute the corresponding public key for the curve
->> * Compute the shared secret based on my private and peer's public
->>
->> Is KPP intended to be an abstract interface to all of the above, e.g.,
->> for both ECDH and FFDH? Right now it seems like layer violations are
->> required as there doesn't appear to be any way to (for example)
->> generate a fresh private key via kpp_*.
-> 
-
-Kyle, you can do all of the above for ecdh. Look at alg_test_kpp from
-crypto/testmgr.c.
-
-FFDH private key generation is not supported yet.
-
-Cheers,
-ta
-
-> I think the whole goal is to abstract this. Mainly so that ECDH can also be offload to hardware.
-> 
-> Regards
-> 
-> Marcel
-> 
+regards,
+dan carpenter
