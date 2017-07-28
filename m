@@ -1,53 +1,68 @@
-From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: Re: [PATCH 2/3] staging: ccree: Convert to devm_ioremap_resource for
- map, unmap
-Date: Fri, 28 Jul 2017 11:40:00 +0300
-Message-ID: <20170728084000.vrcr7ql6z72dzo4p@mwanda>
-References: <CAOtvUMeypygShtn4+nXCsepUrsDhBmZmqXMp60D116P8+2WT4A@mail.gmail.com>
- <1501165654-30601-1-git-send-email-gilad@benyossef.com>
- <1501165654-30601-2-git-send-email-gilad@benyossef.com>
- <20170727194829.symnl663plxd23uo@mwanda>
- <eb2031ea-82c3-c46d-d20a-b872115b75c9@techveda.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Fixes for 4.13
+Date: Fri, 28 Jul 2017 16:49:55 +0800
+Message-ID: <20170728084955.GA19586@gondor.apana.org.au>
+References: <20161119102748.GA4277@gondor.apana.org.au>
+ <20161213132414.GA7898@gondor.apana.org.au>
+ <20170223125141.GA17400@gondor.apana.org.au>
+ <20170714141855.GA29426@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: devel@driverdev.osuosl.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- driverdev-devel@linuxdriverproject.org, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org, Ofir Drang <ofir.drang@arm.com>
-To: Suniel Mahesh <sunil.m@techveda.org>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:37938 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751722AbdG1IuM (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 28 Jul 2017 04:50:12 -0400
 Content-Disposition: inline
-In-Reply-To: <eb2031ea-82c3-c46d-d20a-b872115b75c9@techveda.org>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20170714141855.GA29426@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jul 28, 2017 at 09:59:41AM +0530, Suniel Mahesh wrote:
-> On Friday 28 July 2017 01:18 AM, Dan Carpenter wrote:
-> > On Thu, Jul 27, 2017 at 05:27:33PM +0300, Gilad Ben-Yossef wrote:
-> >> +	new_drvdata->cc_base = devm_ioremap_resource(&plat_dev->dev,
-> >> +						     req_mem_cc_regs);
-> >> +	if (IS_ERR(new_drvdata->cc_base)) {
-> >> +		rc = PTR_ERR(new_drvdata->cc_base);
-> >>  		goto init_cc_res_err;
-> >                 ^^^^^^^^^^^^^^^^^^^^
-> > (This code was in the original and not introduced by the patch.)
-> 
-> Hi Dan, the above lines of code were not in the original except 
-> "goto init_cc_res_err;" which was doing the error handling at different
-> places.
-> 
+Hi Linus: 
 
-Yes, yes.  I wasn't commenting on the patch just the existing code.
+This push fixes the following issues:
 
-The patch is fine.
+- Remove broken dt bindings in inside-secure.
+- Fix authencesn crash when used with digest_null.
+- Fix cavium/nitrox firmware path.
+- Fix SHA3 failure in brcm.
+- Fix Kconfig dependency for brcm.
 
-regards,
-dan carpenter
+
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+
+
+Antoine Tenart (2):
+      crypto: inside-secure - do not parse the dma mask from dt
+      Documentation/bindings: crypto: remove the dma-mask property
+
+Herbert Xu (1):
+      crypto: authencesn - Fix digest_null crash
+
+Srikanth Jampala (1):
+      crypto: cavium/nitrox - Change in firmware path.
+
+raveendra padasalagi (2):
+      crypto: brcm - Fix SHA3-512 algorithm failure
+      crypto: brcm - remove BCM_PDC_MBOX dependency in Kconfig
+
+ .../devicetree/bindings/crypto/inside-secure-safexcel.txt         |    2 --
+ crypto/authencesn.c                                               |    5 +++++
+ drivers/crypto/Kconfig                                            |    2 +-
+ drivers/crypto/bcm/spu2.c                                         |    1 +
+ drivers/crypto/cavium/nitrox/nitrox_main.c                        |    3 ++-
+ drivers/crypto/inside-secure/safexcel.c                           |    5 +----
+ 6 files changed, 10 insertions(+), 8 deletions(-)
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
