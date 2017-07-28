@@ -1,57 +1,52 @@
-From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: Re: [PATCH v2 3/3] crypto: scompress - defer allocation of scratch
- buffer to first use
-Date: Fri, 28 Jul 2017 10:13:56 +0100
-Message-ID: <20170728091356.GA11352@silv-upstream1.ir.intel.com>
-References: <20170721154238.21697-1-ard.biesheuvel@linaro.org>
- <20170721154238.21697-4-ard.biesheuvel@linaro.org>
- <20170725233653.GB28789@silv-upstream1.ir.intel.com>
- <E58FB1E5-1FA7-4410-B9FF-FECB647A75E6@linaro.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Fix dma unmap direction in iMX sahara aes calculation
+Date: Fri, 28 Jul 2017 17:57:45 +0800
+Message-ID: <20170728095745.GA20566@gondor.apana.org.au>
+References: <CACA-NJv69LnyR-xcJC8OU-_WRfg1Mtawq9UapswQczrdAonFDA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: linux-crypto@vger.kernel.org
+To: Mogens Lauridsen <mlauridsen171@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:56119 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751628AbdG1JN6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 Jul 2017 05:13:58 -0400
+Received: from orcrist.hmeau.com ([104.223.48.154]:38046 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751071AbdG1J5v (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 28 Jul 2017 05:57:51 -0400
 Content-Disposition: inline
-In-Reply-To: <E58FB1E5-1FA7-4410-B9FF-FECB647A75E6@linaro.org>
+In-Reply-To: <CACA-NJv69LnyR-xcJC8OU-_WRfg1Mtawq9UapswQczrdAonFDA@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jul 26, 2017 at 01:07:34AM +0100, Ard Biesheuvel wrote:
+Mogens Lauridsen <mlauridsen171@gmail.com> wrote:
+> Hi,
 > 
-> > On 26 Jul 2017, at 00:36, Giovanni Cabiddu <giovanni.cabiddu@intel.com> wrote:
-> > 
-> > Hi Ard,
-> > 
-> >> On Fri, Jul 21, 2017 at 04:42:38PM +0100, Ard Biesheuvel wrote:
-> >> +static int crypto_scomp_init_tfm(struct crypto_tfm *tfm)
-> >> +{
-> >> +    int ret;
-> >> +
-> >> +    mutex_lock(&scomp_lock);
-> >> +    ret = crypto_scomp_alloc_all_scratches();
-> >> +    mutex_unlock(&scomp_lock);
-> >> +
-> >> +    return ret;
-> >> +}
-> > If you allocate the scratch buffers at init_tfm, don't you end
-> > up with a situation where if you allocate two tfms of the same algo
-> > then you get twice the number of scratches?
-> > If that is the case, we should implement a reference count
-> > mechanism.
-> > Am I missing something?
-> > 
+> The direction used in dma_unmap_sg in aes calc in sahara.c is wrong.
+> This result in the cache not being invalidated correct when aes
+> calculation is done and result is dma'ed to memory.
+> This is seen as sporadic wrong result from aes calc.
 > 
-> Isn't the mutex supposed to take care of that?
-Ignore my previous question. There is already a reference count
-mechanism that prevents that to happen.
-Your change sounds correct to me.
+> Thanks,
+> Mogens
+> 
+> Signed-off-by: Mogens Lauridsen <mlauridsen171@gmail.com>
+> 
+> diff --git a/drivers/crypto/sahara.c b/drivers/crypto/sahara.c
+> index 1d9ecd3..9538c52 100644ae
+> --- a/drivers/crypto/sahara.c
+> +++ b/drivers/crypto/sahara.c
+> @@ -543,10 +543,10 @@ static int sahara_hw_descriptor_create(struct sahara_dev *
+> 
+> unmap_out:
+>        dma_unmap_sg(dev->device, dev->out_sg, dev->nb_out_sg,
+> -               DMA_TO_DEVICE);
+> +               DMA_FROM_DEVICE);
 
-Regards,
+Your patch is space-damaged and does not apply.  Please send your
+emails in a way that preserves white spaces.
 
+Thanks,
 -- 
-Giovanni
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
