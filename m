@@ -1,32 +1,37 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: ccp - Update copyright dates for 2017.
-Date: Fri, 28 Jul 2017 21:53:51 +0800
-Message-ID: <20170728135351.GG21401@gondor.apana.org.au>
-References: <150032164930.102823.3343010570529952742.stgit@sosxen.amd.com>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: Re: [PATCH v11 0/2] crypto: AF_ALG memory management fix
+Date: Fri, 28 Jul 2017 15:53:55 +0200
+Message-ID: <3098923.xryRsmobXR@tauon.chronox.de>
+References: <6602969.vlMq0gDBpR@positron.chronox.de> <20170728134936.GA21401@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, thomas.lendacky@amd.com,
-        davem@davemloft.net
-To: Gary R Hook <gary.hook@amd.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:39934 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751071AbdG1Nx5 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
+Received: from mail.eperm.de ([89.247.134.16]:60830 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751697AbdG1Nx5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Fri, 28 Jul 2017 09:53:57 -0400
-Content-Disposition: inline
-In-Reply-To: <150032164930.102823.3343010570529952742.stgit@sosxen.amd.com>
+In-Reply-To: <20170728134936.GA21401@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jul 17, 2017 at 03:00:49PM -0500, Gary R Hook wrote:
-> Some updates this year have not had copyright dates changed in modified
-> files. Correct this for 2017.
-> 
-> Signed-off-by: Gary R Hook <gary.hook@amd.com>
+Am Freitag, 28. Juli 2017, 15:49:36 CEST schrieb Herbert Xu:
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Hi Herbert,
+
+> All patches applied.  Yes please post follow-up patches to clean
+> up as necessary.
+
+Thank you. I will do that asap.
+
+I would add the common service code to crypto/af_alg.c or do you prefer a 
+separate or different file?
+
+As the copy-AAD patch is also outstanding, in which order would you like to 
+receive the patches (first the code consolidation patches or first the copy-
+AAD patch)?
+
+Ciao
+Stephan
