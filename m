@@ -1,36 +1,57 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC PATCH] crypto: caam - convert from ablkcipher -> skcipher
-Date: Fri, 28 Jul 2017 16:56:22 +0800
-Message-ID: <20170728085622.GC19664@gondor.apana.org.au>
-References: <1472479884-1887-1-git-send-email-horia.geanta@nxp.com>
- <20160901101257.GA3362@gondor.apana.org.au>
- <VI1PR0401MB2591F6D4CAD871490564A2EE98BF0@VI1PR0401MB2591.eurprd04.prod.outlook.com>
+From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: Re: [PATCH v2 3/3] crypto: scompress - defer allocation of scratch
+ buffer to first use
+Date: Fri, 28 Jul 2017 10:13:56 +0100
+Message-ID: <20170728091356.GA11352@silv-upstream1.ir.intel.com>
+References: <20170721154238.21697-1-ard.biesheuvel@linaro.org>
+ <20170721154238.21697-4-ard.biesheuvel@linaro.org>
+ <20170725233653.GB28789@silv-upstream1.ir.intel.com>
+ <E58FB1E5-1FA7-4410-B9FF-FECB647A75E6@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>
-To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:37948 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751713AbdG1I43 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 Jul 2017 04:56:29 -0400
+Received: from mga09.intel.com ([134.134.136.24]:56119 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751628AbdG1JN6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 28 Jul 2017 05:13:58 -0400
 Content-Disposition: inline
-In-Reply-To: <VI1PR0401MB2591F6D4CAD871490564A2EE98BF0@VI1PR0401MB2591.eurprd04.prod.outlook.com>
+In-Reply-To: <E58FB1E5-1FA7-4410-B9FF-FECB647A75E6@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jul 28, 2017 at 06:46:03AM +0000, Horia Geantă wrote:
->
-> If I am to add a new driver, would it be possible and/or advisable to
-> use skcipher?
+On Wed, Jul 26, 2017 at 01:07:34AM +0100, Ard Biesheuvel wrote:
+> 
+> > On 26 Jul 2017, at 00:36, Giovanni Cabiddu <giovanni.cabiddu@intel.com> wrote:
+> > 
+> > Hi Ard,
+> > 
+> >> On Fri, Jul 21, 2017 at 04:42:38PM +0100, Ard Biesheuvel wrote:
+> >> +static int crypto_scomp_init_tfm(struct crypto_tfm *tfm)
+> >> +{
+> >> +    int ret;
+> >> +
+> >> +    mutex_lock(&scomp_lock);
+> >> +    ret = crypto_scomp_alloc_all_scratches();
+> >> +    mutex_unlock(&scomp_lock);
+> >> +
+> >> +    return ret;
+> >> +}
+> > If you allocate the scratch buffers at init_tfm, don't you end
+> > up with a situation where if you allocate two tfms of the same algo
+> > then you get twice the number of scratches?
+> > If that is the case, we should implement a reference count
+> > mechanism.
+> > Am I missing something?
+> > 
+> 
+> Isn't the mutex supposed to take care of that?
+Ignore my previous question. There is already a reference count
+mechanism that prevents that to happen.
+Your change sounds correct to me.
 
-It should be OK.  Let me know if you have any issues with the API.
+Regards,
 
-Thanks,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Giovanni
