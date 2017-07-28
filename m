@@ -1,59 +1,34 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 2/2] crypto: engine - Permit to enqueue skcipher
- request
-Date: Fri, 28 Jul 2017 21:52:57 +0800
-Message-ID: <20170728135257.GE21401@gondor.apana.org.au>
-References: <20170606134417.18850-1-clabbe.montjoie@gmail.com>
- <20170606134417.18850-3-clabbe.montjoie@gmail.com>
- <20170619052707.GA13180@gondor.apana.org.au>
- <20170619075524.GA27419@Red>
- <20170623064837.GA29139@gondor.apana.org.au>
- <20170714111536.GA30440@Red>
+Subject: Re: [PATCH] crypto/rng: ensure that the RNG is ready before using
+Date: Fri, 28 Jul 2017 21:53:10 +0800
+Message-ID: <20170728135310.GF21401@gondor.apana.org.au>
+References: <20170716172206.6541-1-Jason@zx2c4.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+Cc: Neil Horman <nhorman@tuxdriver.com>, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org
-To: Corentin Labbe <clabbe.montjoie@gmail.com>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:39918 "EHLO
+Received: from orcrist.hmeau.com ([104.223.48.154]:39928 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751628AbdG1NxD (ORCPT
+        with ESMTP id S1751697AbdG1NxV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 Jul 2017 09:53:03 -0400
+        Fri, 28 Jul 2017 09:53:21 -0400
 Content-Disposition: inline
-In-Reply-To: <20170714111536.GA30440@Red>
+In-Reply-To: <20170716172206.6541-1-Jason@zx2c4.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jul 14, 2017 at 01:15:36PM +0200, Corentin Labbe wrote:
-> On Fri, Jun 23, 2017 at 02:48:37PM +0800, Herbert Xu wrote:
-> > On Mon, Jun 19, 2017 at 09:55:24AM +0200, Corentin Labbe wrote:
-> > >
-> > > Since there are two different user of "crypto engine + ablkcipher", it will be not easy to convert them in one serie. (I could do it, but I simply could not test it for OMAP (lack of hw))
-> > > And any new user which want to use crypto engine+skcipher (like me with the sun8i-ce driver) are simply stuck.
-> > 
-> > You're right.  We'll need to do this in a backwards-compatible way.  In fact
-> > we already do something similar in skcipher.c itself.  Simply look at the
-> > cra_type field and if it matches blkcipher/ablkcipher/givcipher then it's
-> > legacy ablkcipher, otherwise it's skcipher.
-> > 
-> > Also the way crypto_engine looks at the request type in the data-path is
-> > suboptimal.  This should really be built into the cra_type object.  For
-> > example, we can have cra_type->engine->prepare_request which would just
-> > do the right thing.
-> > 
+On Sun, Jul 16, 2017 at 07:22:06PM +0200, Jason A. Donenfeld wrote:
+> Otherwise, we might be seeding the RNG using bad randomness, which is
+> dangerous. The one use of this function from within the kernel -- not
+> from userspace -- is being removed (keys/big_key), so that call site
+> isn't relevant in assessing this.
 > 
-> Not sure to have well understand what you want.
-> You want that I switch on cra_type instead of crypto_tfm_alg_type() ?
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 
-No I mean that we should have an engine hooks object registered
-under cra_type so that you simply call
-
-	cra_type->engine->prepare_request()
-
-regardless of what type you're using.
-
-Cheers,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
