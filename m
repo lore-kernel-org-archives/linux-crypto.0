@@ -1,37 +1,42 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [PATCH v11 0/2] crypto: AF_ALG memory management fix
-Date: Fri, 28 Jul 2017 15:53:55 +0200
-Message-ID: <3098923.xryRsmobXR@tauon.chronox.de>
-References: <6602969.vlMq0gDBpR@positron.chronox.de> <20170728134936.GA21401@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 0/4] Enable RSA Support on the CCP
+Date: Fri, 28 Jul 2017 21:54:09 +0800
+Message-ID: <20170728135409.GH21401@gondor.apana.org.au>
+References: <150032218639.102878.17376499349231172712.stgit@sosxen.amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, thomas.lendacky@amd.com,
+        davem@davemloft.net
+To: Gary R Hook <gary.hook@amd.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:60830 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751697AbdG1Nx5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 Jul 2017 09:53:57 -0400
-In-Reply-To: <20170728134936.GA21401@gondor.apana.org.au>
+Received: from orcrist.hmeau.com ([104.223.48.154]:39942 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751673AbdG1NyP (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 28 Jul 2017 09:54:15 -0400
+Content-Disposition: inline
+In-Reply-To: <150032218639.102878.17376499349231172712.stgit@sosxen.amd.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Freitag, 28. Juli 2017, 15:49:36 CEST schrieb Herbert Xu:
+On Mon, Jul 17, 2017 at 03:16:02PM -0500, Gary R Hook wrote:
+> This series accomplishes the following:
+> 
+>  - Fix RSA support in the base CCP driver
+>  - Add the akcipher_set_reqsize() function
+>  - Enable RSA support in the crypto layer
+>  - Allow for a larger RSA modulus in a version 5 CCP
+> 
+> ---
+> 
+> Gary R Hook (4):
+>       crypto: ccp - Fix base RSA function for version 5 CCPs
+>       crypto: Add akcipher_set_reqsize() function
+>       crypto: ccp - Add support for RSA on the CCP
+>       csrypto: ccp - Expand RSA support for a v5 ccp
 
-Hi Herbert,
-
-> All patches applied.  Yes please post follow-up patches to clean
-> up as necessary.
-
-Thank you. I will do that asap.
-
-I would add the common service code to crypto/af_alg.c or do you prefer a 
-separate or different file?
-
-As the copy-AAD patch is also outstanding, in which order would you like to 
-receive the patches (first the code consolidation patches or first the copy-
-AAD patch)?
-
-Ciao
-Stephan
+All patches applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
