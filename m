@@ -1,11 +1,13 @@
 From: Tom Herbert <tom@herbertland.com>
 Subject: Re: [PATCH v3 net-next 1/4] tcp: ULP infrastructure
-Date: Sat, 29 Jul 2017 13:12:27 -0700
-Message-ID: <CALx6S35SmGC1ZSC9EiDH0gCUxGcFOJOTPOR-NzrgafKNC8oMYg@mail.gmail.com>
+Date: Sat, 29 Jul 2017 13:19:05 -0700
+Message-ID: <CALx6S37pcti4jb6ysb=qO622go6FD_bDmb59v6QOSk+9z4zUkA@mail.gmail.com>
 References: <cover.1497465295.git.davejwatson@fb.com> <20170614183714.GA80310@davejwatson-mba.dhcp.thefacebook.com>
+ <20170617001455.GB82626@Chimay.local>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: Ilya Lesokhin <ilyal@mellanox.com>,
+Cc: Dave Watson <davejwatson@fb.com>,
+        Ilya Lesokhin <ilyal@mellanox.com>,
         Aviad Yehezkel <aviadye@mellanox.com>,
         Boris Pismenny <borisp@mellanox.com>,
         Liran Liss <liranl@mellanox.com>,
@@ -19,36 +21,84 @@ Cc: Ilya Lesokhin <ilyal@mellanox.com>,
         Alexei Starovoitov <alexei.starovoitov@gmail.com>,
         Nikos Mavrogiannopoulos <nmav@gnutls.org>,
         =?UTF-8?B?RnJpZG9sw61uIFBva29ybsO9?= <fridolin.pokorny@gmail.com>
-To: Dave Watson <davejwatson@fb.com>
+To: Christoph Paasch <christoph.paasch@gmail.com>
 Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <20170614183714.GA80310@davejwatson-mba.dhcp.thefacebook.com>
+In-Reply-To: <20170617001455.GB82626@Chimay.local>
 Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Jun 14, 2017 at 11:37 AM, Dave Watson <davejwatson@fb.com> wrote:
-> Add the infrustructure for attaching Upper Layer Protocols (ULPs) over TCP
-> sockets. Based on a similar infrastructure in tcp_cong.  The idea is that any
-> ULP can add its own logic by changing the TCP proto_ops structure to its own
-> methods.
+On Fri, Jun 16, 2017 at 5:14 PM, Christoph Paasch
+<christoph.paasch@gmail.com> wrote:
+> Hello,
 >
-> Example usage:
+> On 14/06/17 - 11:37:14, Dave Watson wrote:
+>> Add the infrustructure for attaching Upper Layer Protocols (ULPs) over TCP
+>> sockets. Based on a similar infrastructure in tcp_cong.  The idea is that any
+>> ULP can add its own logic by changing the TCP proto_ops structure to its own
+>> methods.
+>>
+>> Example usage:
+>>
+>> setsockopt(sock, SOL_TCP, TCP_ULP, "tls", sizeof("tls"));
+>>
+>> modules will call:
+>> tcp_register_ulp(&tcp_tls_ulp_ops);
+>>
+>> to register/unregister their ulp, with an init function and name.
+>>
+>> A list of registered ulps will be returned by tcp_get_available_ulp, which is
+>> hooked up to /proc.  Example:
+>>
+>> $ cat /proc/sys/net/ipv4/tcp_available_ulp
+>> tls
+>>
+>> There is currently no functionality to remove or chain ULPs, but
+>> it should be possible to add these in the future if needed.
+>>
+>> Signed-off-by: Boris Pismenny <borisp@mellanox.com>
+>> Signed-off-by: Dave Watson <davejwatson@fb.com>
+>> ---
+>>  include/net/inet_connection_sock.h |   4 ++
+>>  include/net/tcp.h                  |  25 +++++++
+>>  include/uapi/linux/tcp.h           |   1 +
+>>  net/ipv4/Makefile                  |   2 +-
+>>  net/ipv4/sysctl_net_ipv4.c         |  25 +++++++
+>>  net/ipv4/tcp.c                     |  28 ++++++++
+>>  net/ipv4/tcp_ipv4.c                |   2 +
+>>  net/ipv4/tcp_ulp.c                 | 134 +++++++++++++++++++++++++++++++++++++
+>>  8 files changed, 220 insertions(+), 1 deletion(-)
+>>  create mode 100644 net/ipv4/tcp_ulp.c
 >
-> setsockopt(sock, SOL_TCP, TCP_ULP, "tls", sizeof("tls"));
+> I know I'm pretty late to the game (and maybe this has already been
+> discussed but I couldn't find anything in the archives), but I am wondering
+> what the take is on potential races of the setsockopt() vs other system-calls.
 >
-Hi Dave,
+> For example one might race the setsockopt() with a sendmsg() and the sendmsg
+> might end up blocking on the lock_sock in tcp_sendmsg, waiting for
+> tcp_set_ulp() to finish changing sk_prot. When the setsockopt() finishes, we
+> are then inside tcp_sendmsg() coming directly from sendmsg(), while we
+> should have been in the ULP's sendmsg.
+>
+> It seems like TLS-ULP is resilient to this (or at least, won't cause a panic),
+> but there might be more exotic users of ULP in the future, that change other
+> callbacks and then things might go wrong.
 
-Thanks for this work. I think this functionality is going to have many uses!
+Christoph,
 
-One question: is there a good reason why the ULP infrastructure should
-just be for TCP sockets. For example, I'd really like to be able
-something like:
+I noticed this also. I think the easiest answer would be to just
+assume the caller understands the race condition and can synchronize
+itself. Other than that we'd probably have wake up everyone blocking
+on the socket without something like EAGAIN so they're forced to retry
+the operation. But even that might not easily yield an obvious point
+at which the socket can be safely changed.
 
-setsockopt(sock, SOL_SOCKET, SO_ULP, &ulp_param, sizeof(ulp_param));
-
-Where ulp_param is a structure containing the ULP name as well as some
-ULP specific parameters that are passed to init_ulp. ulp_init could
-determine whether the socket family is appropriate for the ULP being
-requested.
-
-Thanks,
 Tom
+
+>
+>
+> Thoughts?
+>
+>
+> Thanks,
+> Christoph
+>
