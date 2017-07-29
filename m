@@ -1,104 +1,62 @@
-From: Tom Herbert <tom@herbertland.com>
-Subject: Re: [PATCH v3 net-next 1/4] tcp: ULP infrastructure
-Date: Sat, 29 Jul 2017 13:19:05 -0700
-Message-ID: <CALx6S37pcti4jb6ysb=qO622go6FD_bDmb59v6QOSk+9z4zUkA@mail.gmail.com>
-References: <cover.1497465295.git.davejwatson@fb.com> <20170614183714.GA80310@davejwatson-mba.dhcp.thefacebook.com>
- <20170617001455.GB82626@Chimay.local>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Dave Watson <davejwatson@fb.com>,
-        Ilya Lesokhin <ilyal@mellanox.com>,
-        Aviad Yehezkel <aviadye@mellanox.com>,
-        Boris Pismenny <borisp@mellanox.com>,
-        Liran Liss <liranl@mellanox.com>,
-        Matan Barak <matanb@mellanox.com>,
-        David Miller <davem@davemloft.net>,
-        Linux Kernel Network Developers <netdev@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Hannes Frederic Sowa <hannes@stressinduktion.org>,
-        Eric Dumazet <eric.dumazet@gmail.com>,
-        Alexei Starovoitov <alexei.starovoitov@gmail.com>,
-        Nikos Mavrogiannopoulos <nmav@gnutls.org>,
-        =?UTF-8?B?RnJpZG9sw61uIFBva29ybsO9?= <fridolin.pokorny@gmail.com>
-To: Christoph Paasch <christoph.paasch@gmail.com>
-Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <20170617001455.GB82626@Chimay.local>
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Fabio Estevam <festevam@gmail.com>
+Subject: [PATCH] crypto: caam/qi - Remove unused 'qi_congested' entry
+Date: Sat, 29 Jul 2017 19:55:01 -0300
+Message-ID: <1501368901-8248-1-git-send-email-festevam@gmail.com>
+Cc: horia.geanta@nxp.com, linux-crypto@vger.kernel.org,
+        Fabio Estevam <fabio.estevam@nxp.com>
+To: herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-qt0-f193.google.com ([209.85.216.193]:36832 "EHLO
+        mail-qt0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751754AbdG2WzK (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 29 Jul 2017 18:55:10 -0400
+Received: by mail-qt0-f193.google.com with SMTP id c15so10248534qta.3
+        for <linux-crypto@vger.kernel.org>; Sat, 29 Jul 2017 15:55:10 -0700 (PDT)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jun 16, 2017 at 5:14 PM, Christoph Paasch
-<christoph.paasch@gmail.com> wrote:
-> Hello,
->
-> On 14/06/17 - 11:37:14, Dave Watson wrote:
->> Add the infrustructure for attaching Upper Layer Protocols (ULPs) over TCP
->> sockets. Based on a similar infrastructure in tcp_cong.  The idea is that any
->> ULP can add its own logic by changing the TCP proto_ops structure to its own
->> methods.
->>
->> Example usage:
->>
->> setsockopt(sock, SOL_TCP, TCP_ULP, "tls", sizeof("tls"));
->>
->> modules will call:
->> tcp_register_ulp(&tcp_tls_ulp_ops);
->>
->> to register/unregister their ulp, with an init function and name.
->>
->> A list of registered ulps will be returned by tcp_get_available_ulp, which is
->> hooked up to /proc.  Example:
->>
->> $ cat /proc/sys/net/ipv4/tcp_available_ulp
->> tls
->>
->> There is currently no functionality to remove or chain ULPs, but
->> it should be possible to add these in the future if needed.
->>
->> Signed-off-by: Boris Pismenny <borisp@mellanox.com>
->> Signed-off-by: Dave Watson <davejwatson@fb.com>
->> ---
->>  include/net/inet_connection_sock.h |   4 ++
->>  include/net/tcp.h                  |  25 +++++++
->>  include/uapi/linux/tcp.h           |   1 +
->>  net/ipv4/Makefile                  |   2 +-
->>  net/ipv4/sysctl_net_ipv4.c         |  25 +++++++
->>  net/ipv4/tcp.c                     |  28 ++++++++
->>  net/ipv4/tcp_ipv4.c                |   2 +
->>  net/ipv4/tcp_ulp.c                 | 134 +++++++++++++++++++++++++++++++++++++
->>  8 files changed, 220 insertions(+), 1 deletion(-)
->>  create mode 100644 net/ipv4/tcp_ulp.c
->
-> I know I'm pretty late to the game (and maybe this has already been
-> discussed but I couldn't find anything in the archives), but I am wondering
-> what the take is on potential races of the setsockopt() vs other system-calls.
->
-> For example one might race the setsockopt() with a sendmsg() and the sendmsg
-> might end up blocking on the lock_sock in tcp_sendmsg, waiting for
-> tcp_set_ulp() to finish changing sk_prot. When the setsockopt() finishes, we
-> are then inside tcp_sendmsg() coming directly from sendmsg(), while we
-> should have been in the ULP's sendmsg.
->
-> It seems like TLS-ULP is resilient to this (or at least, won't cause a panic),
-> but there might be more exotic users of ULP in the future, that change other
-> callbacks and then things might go wrong.
+From: Fabio Estevam <fabio.estevam@nxp.com>
 
-Christoph,
+'qi_congested' member from structure caam_drv_private
+is never used at all, so it is safe to remove it.
 
-I noticed this also. I think the easiest answer would be to just
-assume the caller understands the race condition and can synchronize
-itself. Other than that we'd probably have wake up everyone blocking
-on the socket without something like EAGAIN so they're forced to retry
-the operation. But even that might not easily yield an obvious point
-at which the socket can be safely changed.
+Signed-off-by: Fabio Estevam <fabio.estevam@nxp.com>
+---
+ drivers/crypto/caam/intern.h | 3 ---
+ drivers/crypto/caam/qi.c     | 6 ++----
+ 2 files changed, 2 insertions(+), 7 deletions(-)
 
-Tom
-
->
->
-> Thoughts?
->
->
-> Thanks,
-> Christoph
->
+diff --git a/drivers/crypto/caam/intern.h b/drivers/crypto/caam/intern.h
+index 9e3f3e0..9625b2d 100644
+--- a/drivers/crypto/caam/intern.h
++++ b/drivers/crypto/caam/intern.h
+@@ -109,9 +109,6 @@ struct caam_drv_private {
+ 
+ 	struct debugfs_blob_wrapper ctl_kek_wrap, ctl_tkek_wrap, ctl_tdsk_wrap;
+ 	struct dentry *ctl_kek, *ctl_tkek, *ctl_tdsk;
+-#ifdef CONFIG_CAAM_QI
+-	struct dentry *qi_congested;
+-#endif
+ #endif
+ };
+ 
+diff --git a/drivers/crypto/caam/qi.c b/drivers/crypto/caam/qi.c
+index 6d5a010..b2f7a42 100644
+--- a/drivers/crypto/caam/qi.c
++++ b/drivers/crypto/caam/qi.c
+@@ -793,10 +793,8 @@ int caam_qi_init(struct platform_device *caam_pdev)
+ 	/* Done with the CGRs; restore the cpus allowed mask */
+ 	set_cpus_allowed_ptr(current, &old_cpumask);
+ #ifdef CONFIG_DEBUG_FS
+-	ctrlpriv->qi_congested = debugfs_create_file("qi_congested", 0444,
+-						     ctrlpriv->ctl,
+-						     &times_congested,
+-						     &caam_fops_u64_ro);
++	debugfs_create_file("qi_congested", 0444, ctrlpriv->ctl,
++			    &times_congested, &caam_fops_u64_ro);
+ #endif
+ 	dev_info(qidev, "Linux CAAM Queue I/F driver initialised\n");
+ 	return 0;
+-- 
+2.7.4
