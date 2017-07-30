@@ -1,144 +1,144 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH v2 2/6] staging: ccree: kmalloc by sizeof var not type
-Date: Sun, 30 Jul 2017 19:15:04 +0300
-Message-ID: <1501431309-27705-3-git-send-email-gilad@benyossef.com>
+Subject: [PATCH v2 4/6] staging: ccree: Convert to devm_ioremap_resource for map, unmap
+Date: Sun, 30 Jul 2017 19:15:06 +0300
+Message-ID: <1501431309-27705-5-git-send-email-gilad@benyossef.com>
 References: <1501431309-27705-1-git-send-email-gilad@benyossef.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Ofir Drang <ofir.drang@arm.com>
+Cc: Ofir Drang <ofir.drang@arm.com>,
+        Suniel Mahesh <sunil.m@techveda.org>
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- linux-crypto@vger.kernel.org, driverdev-devel@linuxdriverproject.org,
- devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+        linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        linux-kernel@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:43016 "EHLO
+        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1754255AbdG3QP2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 30 Jul 2017 12:15:28 -0400
 In-Reply-To: <1501431309-27705-1-git-send-email-gilad@benyossef.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Change places where we alloc memory by sizeof type to sizeof var.
+From: Suniel Mahesh <sunil.m@techveda.org>
 
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+It is recommended to use managed function devm_ioremap_resource(),
+which simplifies driver cleanup paths and driver code.
+This patch does the following:
+(a) replace request_mem_region(), ioremap() and corresponding error
+handling with devm_ioremap_resource().
+(b) remove struct resource pointer(res_mem) in struct ssi_drvdata as it
+seems redundant, use struct resource pointer which is defined locally and
+adjust return value of platform_get_resource() accordingly.
+(c) release_mem_region() and iounmap() are dropped, since devm_ioremap_
+resource() releases and unmaps mem region on driver detach.
+(d) adjust log messages accordingly and remove any blank lines.
+
+Signed-off-by: Suniel Mahesh <sunil.m@techveda.org>
+[gby: rebase on top of latest coding style fixes changes]
+Acked-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/ssi_aead.c        | 4 ++--
- drivers/staging/ccree/ssi_cipher.c      | 4 ++--
- drivers/staging/ccree/ssi_driver.c      | 2 +-
- drivers/staging/ccree/ssi_hash.c        | 4 ++--
- drivers/staging/ccree/ssi_ivgen.c       | 2 +-
- drivers/staging/ccree/ssi_request_mgr.c | 2 +-
- 6 files changed, 9 insertions(+), 9 deletions(-)
+ drivers/staging/ccree/ssi_driver.c | 60 ++++++++++----------------------------
+ drivers/staging/ccree/ssi_driver.h |  1 -
+ 2 files changed, 15 insertions(+), 46 deletions(-)
 
-diff --git a/drivers/staging/ccree/ssi_aead.c b/drivers/staging/ccree/ssi_aead.c
-index d8f2249..a8cb432 100644
---- a/drivers/staging/ccree/ssi_aead.c
-+++ b/drivers/staging/ccree/ssi_aead.c
-@@ -2658,7 +2658,7 @@ static struct ssi_crypto_alg *ssi_aead_create_alg(struct ssi_alg_template *templ
- 	struct ssi_crypto_alg *t_alg;
- 	struct aead_alg *alg;
- 
--	t_alg = kzalloc(sizeof(struct ssi_crypto_alg), GFP_KERNEL);
-+	t_alg = kzalloc(sizeof(*t_alg), GFP_KERNEL);
- 	if (!t_alg) {
- 		SSI_LOG_ERR("failed to allocate t_alg\n");
- 		return ERR_PTR(-ENOMEM);
-@@ -2713,7 +2713,7 @@ int ssi_aead_alloc(struct ssi_drvdata *drvdata)
- 	int rc = -ENOMEM;
- 	int alg;
- 
--	aead_handle = kmalloc(sizeof(struct ssi_aead_handle), GFP_KERNEL);
-+	aead_handle = kmalloc(sizeof(*aead_handle), GFP_KERNEL);
- 	if (!aead_handle) {
- 		rc = -ENOMEM;
- 		goto fail0;
-diff --git a/drivers/staging/ccree/ssi_cipher.c b/drivers/staging/ccree/ssi_cipher.c
-index 068b10b..d98178d 100644
---- a/drivers/staging/ccree/ssi_cipher.c
-+++ b/drivers/staging/ccree/ssi_cipher.c
-@@ -1215,7 +1215,7 @@ struct ssi_crypto_alg *ssi_ablkcipher_create_alg(struct ssi_alg_template *templa
- 	struct ssi_crypto_alg *t_alg;
- 	struct crypto_alg *alg;
- 
--	t_alg = kzalloc(sizeof(struct ssi_crypto_alg), GFP_KERNEL);
-+	t_alg = kzalloc(sizeof(*t_alg), GFP_KERNEL);
- 	if (!t_alg) {
- 		SSI_LOG_ERR("failed to allocate t_alg\n");
- 		return ERR_PTR(-ENOMEM);
-@@ -1276,7 +1276,7 @@ int ssi_ablkcipher_alloc(struct ssi_drvdata *drvdata)
- 	int rc = -ENOMEM;
- 	int alg;
- 
--	ablkcipher_handle = kmalloc(sizeof(struct ssi_blkcipher_handle),
-+	ablkcipher_handle = kmalloc(sizeof(*ablkcipher_handle),
- 				    GFP_KERNEL);
- 	if (!ablkcipher_handle)
- 		return -ENOMEM;
 diff --git a/drivers/staging/ccree/ssi_driver.c b/drivers/staging/ccree/ssi_driver.c
-index d104dbd..1cae2b7 100644
+index 97dfc2c..603eb03 100644
 --- a/drivers/staging/ccree/ssi_driver.c
 +++ b/drivers/staging/ccree/ssi_driver.c
-@@ -223,7 +223,7 @@ static int init_cc_resources(struct platform_device *plat_dev)
- 	struct resource *req_mem_cc_regs = NULL;
- 	void __iomem *cc_base = NULL;
- 	bool irq_registered = false;
--	struct ssi_drvdata *new_drvdata = kzalloc(sizeof(struct ssi_drvdata), GFP_KERNEL);
-+	struct ssi_drvdata *new_drvdata = kzalloc(sizeof(*new_drvdata), GFP_KERNEL);
- 	struct device *dev = &plat_dev->dev;
- 	struct device_node *np = dev->of_node;
- 	u32 signature_val;
-diff --git a/drivers/staging/ccree/ssi_hash.c b/drivers/staging/ccree/ssi_hash.c
-index 3a734df..6c08b1d 100644
---- a/drivers/staging/ccree/ssi_hash.c
-+++ b/drivers/staging/ccree/ssi_hash.c
-@@ -2055,7 +2055,7 @@ ssi_hash_create_alg(struct ssi_hash_template *template, bool keyed)
- 	struct crypto_alg *alg;
- 	struct ahash_alg *halg;
+@@ -246,35 +246,21 @@ static int init_cc_resources(struct platform_device *plat_dev)
+ 	dev_set_drvdata(&plat_dev->dev, new_drvdata);
+ 	/* Get device resources */
+ 	/* First CC registers space */
+-	new_drvdata->res_mem = platform_get_resource(plat_dev, IORESOURCE_MEM, 0);
+-	if (unlikely(!new_drvdata->res_mem)) {
+-		SSI_LOG_ERR("Failed getting IO memory resource\n");
+-		rc = -ENODEV;
+-		goto init_cc_res_err;
+-	}
+-	SSI_LOG_DEBUG("Got MEM resource (%s): start=%pad end=%pad\n",
+-		      new_drvdata->res_mem->name,
+-		      new_drvdata->res_mem->start,
+-		      new_drvdata->res_mem->end);
++	req_mem_cc_regs = platform_get_resource(plat_dev, IORESOURCE_MEM, 0);
+ 	/* Map registers space */
+-	req_mem_cc_regs = request_mem_region(new_drvdata->res_mem->start, resource_size(new_drvdata->res_mem), "arm_cc7x_regs");
+-	if (unlikely(!req_mem_cc_regs)) {
+-		SSI_LOG_ERR("Couldn't allocate registers memory region at 0x%08X\n",
+-			    (unsigned int)new_drvdata->res_mem->start);
+-		rc = -EBUSY;
+-		goto init_cc_res_err;
+-	}
+-	cc_base = ioremap(new_drvdata->res_mem->start, resource_size(new_drvdata->res_mem));
+-	if (unlikely(!cc_base)) {
+-		SSI_LOG_ERR("ioremap[CC](0x%08X,0x%08X) failed\n",
+-			    (unsigned int)new_drvdata->res_mem->start,
+-			    (unsigned int)resource_size(new_drvdata->res_mem));
+-		rc = -ENOMEM;
++	new_drvdata->cc_base = devm_ioremap_resource(&plat_dev->dev,
++						     req_mem_cc_regs);
++	if (IS_ERR(new_drvdata->cc_base)) {
++		rc = PTR_ERR(new_drvdata->cc_base);
+ 		goto init_cc_res_err;
+ 	}
+-	SSI_LOG_DEBUG("CC registers mapped from %pa to 0x%p\n", &new_drvdata->res_mem->start, cc_base);
+-	new_drvdata->cc_base = cc_base;
+-
++	SSI_LOG_DEBUG("Got MEM resource (%s): start=%pad end=%pad\n",
++		      req_mem_cc_regs->name,
++		      req_mem_cc_regs->start,
++		      req_mem_cc_regs->end);
++	SSI_LOG_DEBUG("CC registers mapped from %pa to 0x%p\n",
++		      &req_mem_cc_regs->start, new_drvdata->cc_base);
++	cc_base = new_drvdata->cc_base;
+ 	/* Then IRQ */
+ 	new_drvdata->res_irq = platform_get_resource(plat_dev, IORESOURCE_IRQ, 0);
+ 	if (unlikely(!new_drvdata->res_irq)) {
+@@ -424,17 +410,9 @@ static int init_cc_resources(struct platform_device *plat_dev)
+ #ifdef ENABLE_CC_SYSFS
+ 		ssi_sysfs_fini();
+ #endif
+-
+-		if (req_mem_cc_regs) {
+-			if (irq_registered) {
+-				free_irq(new_drvdata->res_irq->start, new_drvdata);
+-				new_drvdata->res_irq = NULL;
+-				iounmap(cc_base);
+-				new_drvdata->cc_base = NULL;
+-			}
+-			release_mem_region(new_drvdata->res_mem->start,
+-					   resource_size(new_drvdata->res_mem));
+-			new_drvdata->res_mem = NULL;
++		if (irq_registered) {
++			free_irq(new_drvdata->res_irq->start, new_drvdata);
++			new_drvdata->res_irq = NULL;
+ 		}
+ 		dev_set_drvdata(&plat_dev->dev, NULL);
+ 	}
+@@ -470,14 +448,6 @@ static void cleanup_cc_resources(struct platform_device *plat_dev)
+ 	cc_clk_off(drvdata);
+ 	free_irq(drvdata->res_irq->start, drvdata);
+ 	drvdata->res_irq = NULL;
+-
+-	if (drvdata->cc_base) {
+-		iounmap(drvdata->cc_base);
+-		release_mem_region(drvdata->res_mem->start,
+-				   resource_size(drvdata->res_mem));
+-		drvdata->cc_base = NULL;
+-		drvdata->res_mem = NULL;
+-	}
+ 	dev_set_drvdata(&plat_dev->dev, NULL);
+ }
  
--	t_crypto_alg = kzalloc(sizeof(struct ssi_hash_alg), GFP_KERNEL);
-+	t_crypto_alg = kzalloc(sizeof(*t_crypto_alg), GFP_KERNEL);
- 	if (!t_crypto_alg) {
- 		SSI_LOG_ERR("failed to allocate t_alg\n");
- 		return ERR_PTR(-ENOMEM);
-@@ -2221,7 +2221,7 @@ int ssi_hash_alloc(struct ssi_drvdata *drvdata)
- 	int rc = 0;
- 	int alg;
- 
--	hash_handle = kzalloc(sizeof(struct ssi_hash_handle), GFP_KERNEL);
-+	hash_handle = kzalloc(sizeof(*hash_handle), GFP_KERNEL);
- 	if (!hash_handle) {
- 		SSI_LOG_ERR("kzalloc failed to allocate %zu B\n",
- 			    sizeof(struct ssi_hash_handle));
-diff --git a/drivers/staging/ccree/ssi_ivgen.c b/drivers/staging/ccree/ssi_ivgen.c
-index bca44af..93a2a94 100644
---- a/drivers/staging/ccree/ssi_ivgen.c
-+++ b/drivers/staging/ccree/ssi_ivgen.c
-@@ -191,7 +191,7 @@ int ssi_ivgen_init(struct ssi_drvdata *drvdata)
- 	int rc;
- 
- 	/* Allocate "this" context */
--	drvdata->ivgen_handle = kzalloc(sizeof(struct ssi_ivgen_ctx), GFP_KERNEL);
-+	drvdata->ivgen_handle = kzalloc(sizeof(*drvdata->ivgen_handle), GFP_KERNEL);
- 	if (!drvdata->ivgen_handle) {
- 		SSI_LOG_ERR("Not enough memory to allocate IVGEN context (%zu B)\n",
- 			    sizeof(struct ssi_ivgen_ctx));
-diff --git a/drivers/staging/ccree/ssi_request_mgr.c b/drivers/staging/ccree/ssi_request_mgr.c
-index 9a4bb5c..cae9904 100644
---- a/drivers/staging/ccree/ssi_request_mgr.c
-+++ b/drivers/staging/ccree/ssi_request_mgr.c
-@@ -100,7 +100,7 @@ int request_mgr_init(struct ssi_drvdata *drvdata)
- 	struct ssi_request_mgr_handle *req_mgr_h;
- 	int rc = 0;
- 
--	req_mgr_h = kzalloc(sizeof(struct ssi_request_mgr_handle), GFP_KERNEL);
-+	req_mgr_h = kzalloc(sizeof(*req_mgr_h), GFP_KERNEL);
- 	if (!req_mgr_h) {
- 		rc = -ENOMEM;
- 		goto req_mgr_init_err;
+diff --git a/drivers/staging/ccree/ssi_driver.h b/drivers/staging/ccree/ssi_driver.h
+index b6ad89a..518c0bf 100644
+--- a/drivers/staging/ccree/ssi_driver.h
++++ b/drivers/staging/ccree/ssi_driver.h
+@@ -128,7 +128,6 @@ struct ssi_crypto_req {
+  * @fw_ver:	SeP loaded firmware version
+  */
+ struct ssi_drvdata {
+-	struct resource *res_mem;
+ 	struct resource *res_irq;
+ 	void __iomem *cc_base;
+ 	unsigned int irq;
 -- 
 2.1.4
