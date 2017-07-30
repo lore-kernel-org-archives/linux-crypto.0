@@ -1,364 +1,118 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: [PATCH] crypto: algif_aead - copy AAD from src to dst
-Date: Sun, 30 Jul 2017 14:32:58 +0200
-Message-ID: <2726753.0P7LaXD3sy@positron.chronox.de>
+From: =?UTF-8?q?Simon=20Sandstr=C3=B6m?= <simon@nikanor.nu>
+Subject: [PATCH] staging: ccree: Use sizeof(variable) in memory allocs
+Date: Sun, 30 Jul 2017 22:29:02 +0200
+Message-ID: <20170730202902.8953-1-simon@nikanor.nu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:60836 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754169AbdG3RmQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 30 Jul 2017 13:42:16 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: devel@driverdev.osuosl.org, gregkh@linuxfoundation.org,
+ driverdev-devel@linuxdriverproject.org, linux-crypto@vger.kernel.org,
+ =?UTF-8?q?Simon=20Sandstr=C3=B6m?= <simon@nikanor.nu>
+To: gilad@benyossef.com
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+List-Id: linux-crypto.vger.kernel.org
 
-Use the NULL cipher to copy the AAD and PT/CT from the TX SGL
-to the RX SGL. This allows an in-place crypto operation on the
-RX SGL for encryption, because the TX data is always smaller or
-equal to the RX data (the RX data will hold the tag).
-
-For decryption, a per-request TX SGL is created which will only hold
-the tag value. As the RX SGL will have no space for the tag value and
-an in-place operation will not write the tag buffer, the TX SGL with the
-tag value is chained to the RX SGL. This now allows an in-place
-crypto operation.
-
-For example:
-
-* without the patch:
-kcapi -x 2 -e -c "gcm(aes)" -p 89154d0d4129d322e4487bafaa4f6b46 -k c0ece3e63198af382b5603331cc23fa8 -i 7e489b83622e7228314d878d -a afcd7202d621e06ca53b70c2bdff7fb2 -l 16 -u -s
-00000000000000000000000000000000f4a3eacfbdadd3b1a17117b1d67ffc1f1e21efbbc6d83724a8c296e3bb8cda0c
-
-* with the patch:
-kcapi -x 2 -e -c "gcm(aes)" -p 89154d0d4129d322e4487bafaa4f6b46 -k c0ece3e63198af382b5603331cc23fa8 -i 7e489b83622e7228314d878d -a afcd7202d621e06ca53b70c2bdff7fb2 -l 16 -u -s
-afcd7202d621e06ca53b70c2bdff7fb2f4a3eacfbdadd3b1a17117b1d67ffc1f1e21efbbc6d83724a8c296e3bb8cda0c
-
-Tests covering this functionality have been added to libkcapi.
-
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- crypto/Kconfig      |   2 +
- crypto/algif_aead.c | 183 +++++++++++++++++++++++++++++++++++++++++++++-------
- 2 files changed, 162 insertions(+), 23 deletions(-)
-
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index caa770e535a2..0a121f9ddf8e 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -1753,6 +1753,8 @@ config CRYPTO_USER_API_AEAD
- 	tristate "User-space interface for AEAD cipher algorithms"
- 	depends on NET
- 	select CRYPTO_AEAD
-+	select CRYPTO_BLKCIPHER
-+	select CRYPTO_NULL
- 	select CRYPTO_USER_API
- 	help
- 	  This option enables the user-spaces interface for AEAD
-diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
-index 2de056c3139c..1f0696dd64f4 100644
---- a/crypto/algif_aead.c
-+++ b/crypto/algif_aead.c
-@@ -30,6 +30,8 @@
- #include <crypto/internal/aead.h>
- #include <crypto/scatterwalk.h>
- #include <crypto/if_alg.h>
-+#include <crypto/skcipher.h>
-+#include <crypto/null.h>
- #include <linux/init.h>
- #include <linux/list.h>
- #include <linux/kernel.h>
-@@ -70,6 +72,7 @@ struct aead_async_req {
- struct aead_tfm {
- 	struct crypto_aead *aead;
- 	bool has_key;
-+	struct crypto_skcipher *null_tfm;
- };
- 
- struct aead_ctx {
-@@ -168,7 +171,12 @@ static int aead_alloc_tsgl(struct sock *sk)
- 	return 0;
- }
- 
--static unsigned int aead_count_tsgl(struct sock *sk, size_t bytes)
-+/**
-+ * Count number of SG entries from the beginning of the SGL to @bytes. If
-+ * an offset is provided, the counting of the SG entries starts at the offset.
-+ */
-+static unsigned int aead_count_tsgl(struct sock *sk, size_t bytes,
-+				    size_t offset)
- {
- 	struct alg_sock *ask = alg_sk(sk);
- 	struct aead_ctx *ctx = ask->private;
-@@ -183,32 +191,55 @@ static unsigned int aead_count_tsgl(struct sock *sk, size_t bytes)
- 		struct scatterlist *sg = sgl->sg;
- 
- 		for (i = 0; i < sgl->cur; i++) {
-+			size_t bytes_count;
-+
-+			/* Skip offset */
-+			if (offset >= sg[i].length) {
-+				offset -= sg[i].length;
-+				bytes -= sg[i].length;
-+				continue;
-+			}
-+
-+			bytes_count = sg[i].length - offset;
-+
-+			offset = 0;
- 			sgl_count++;
--			if (sg[i].length >= bytes)
-+
-+			/* If we have seen requested number of bytes, stop */
-+			if (bytes_count >= bytes)
- 				return sgl_count;
- 
--			bytes -= sg[i].length;
-+			bytes -= bytes_count;
- 		}
- 	}
- 
- 	return sgl_count;
- }
- 
-+/**
-+ * Release the specified buffers from TX SGL pointed to by ctx->tsgl_list for
-+ * @used bytes.
-+ *
-+ * If @dst is non-null, reassign the pages to dst. The caller must release
-+ * the pages. If @dst_offset is given only reassign the pages to @dst starting
-+ * at the @dst_offset (byte). The caller must ensure that @dst is large
-+ * enough (e.g. by using aead_count_tsgl with the same offset).
-+ */
- static void aead_pull_tsgl(struct sock *sk, size_t used,
--			   struct scatterlist *dst)
-+			   struct scatterlist *dst, size_t dst_offset)
- {
- 	struct alg_sock *ask = alg_sk(sk);
- 	struct aead_ctx *ctx = ask->private;
- 	struct aead_tsgl *sgl;
- 	struct scatterlist *sg;
--	unsigned int i;
-+	unsigned int i, j;
- 
- 	while (!list_empty(&ctx->tsgl_list)) {
- 		sgl = list_first_entry(&ctx->tsgl_list, struct aead_tsgl,
- 				       list);
- 		sg = sgl->sg;
- 
--		for (i = 0; i < sgl->cur; i++) {
-+		for (i = 0, j = 0; i < sgl->cur; i++) {
- 			size_t plen = min_t(size_t, used, sg[i].length);
- 			struct page *page = sg_page(sg + i);
- 
-@@ -219,8 +250,20 @@ static void aead_pull_tsgl(struct sock *sk, size_t used,
- 			 * Assumption: caller created aead_count_tsgl(len)
- 			 * SG entries in dst.
- 			 */
--			if (dst)
--				sg_set_page(dst + i, page, plen, sg[i].offset);
-+			if (dst) {
-+				if (dst_offset >= plen) {
-+					/* discard page before offset */
-+					dst_offset -= plen;
-+					put_page(page);
-+				} else {
-+					/* reassign page to dst after offset */
-+					sg_set_page(dst + j, page,
-+						    plen - dst_offset,
-+						    sg[i].offset + dst_offset);
-+					dst_offset = 0;
-+					j++;
-+				}
-+			}
- 
- 			sg[i].length -= plen;
- 			sg[i].offset += plen;
-@@ -233,6 +276,7 @@ static void aead_pull_tsgl(struct sock *sk, size_t used,
- 
- 			if (!dst)
- 				put_page(page);
-+
- 			sg_assign_page(sg + i, NULL);
- 		}
- 
-@@ -583,6 +627,20 @@ static void aead_async_cb(struct crypto_async_request *_req, int err)
- 	release_sock(sk);
- }
- 
-+static int crypto_aead_copy_sgl(struct crypto_skcipher *null_tfm,
-+				struct scatterlist *src,
-+				struct scatterlist *dst, unsigned int len)
-+{
-+	SKCIPHER_REQUEST_ON_STACK(skreq, null_tfm);
-+
-+	skcipher_request_set_tfm(skreq, null_tfm);
-+	skcipher_request_set_callback(skreq, CRYPTO_TFM_REQ_MAY_BACKLOG,
-+				      NULL, NULL);
-+	skcipher_request_set_crypt(skreq, src, dst, len, NULL);
-+
-+	return crypto_skcipher_encrypt(skreq);
-+}
-+
- static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
- 			 size_t ignored, int flags)
- {
-@@ -593,11 +651,14 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
- 	struct aead_ctx *ctx = ask->private;
- 	struct aead_tfm *aeadc = pask->private;
- 	struct crypto_aead *tfm = aeadc->aead;
-+	struct crypto_skcipher *null_tfm = aeadc->null_tfm;
- 	unsigned int as = crypto_aead_authsize(tfm);
- 	unsigned int areqlen =
- 		sizeof(struct aead_async_req) + crypto_aead_reqsize(tfm);
- 	struct aead_async_req *areq;
- 	struct aead_rsgl *last_rsgl = NULL;
-+	struct aead_tsgl *tsgl;
-+	struct scatterlist *src;
- 	int err = 0;
- 	size_t used = 0;		/* [in]  TX bufs to be en/decrypted */
- 	size_t outlen = 0;		/* [out] RX bufs produced by kernel */
-@@ -716,25 +777,91 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
- 		outlen -= less;
- 	}
- 
-+	processed = used + ctx->aead_assoclen;
-+	tsgl = list_first_entry(&ctx->tsgl_list, struct aead_tsgl, list);
-+
- 	/*
--	 * Create a per request TX SGL for this request which tracks the
--	 * SG entries from the global TX SGL.
-+	 * Copy of AAD from source to destination
-+	 *
-+	 * The AAD is copied to the destination buffer without change. Even
-+	 * when user space uses an in-place cipher operation, the kernel
-+	 * will copy the data as it does not see whether such in-place operation
-+	 * is initiated.
-+	 *
-+	 * To ensure efficiency, the following implementation ensure that the
-+	 * ciphers are invoked to perform a crypto operation in-place. This
-+	 * is achieved by memory management specified as follows.
- 	 */
--	processed = used + ctx->aead_assoclen;
--	areq->tsgl_entries = aead_count_tsgl(sk, processed);
--	if (!areq->tsgl_entries)
--		areq->tsgl_entries = 1;
--	areq->tsgl = sock_kmalloc(sk, sizeof(*areq->tsgl) * areq->tsgl_entries,
--				  GFP_KERNEL);
--	if (!areq->tsgl) {
--		err = -ENOMEM;
--		goto free;
-+
-+	/* Use the RX SGL as source (and destination) for crypto op. */
-+	src = areq->first_rsgl.sgl.sg;
-+
-+	if (ctx->enc) {
-+		/*
-+		 * Encryption operation - The in-place cipher operation is
-+		 * achieved by the following operation:
-+		 *
-+		 * TX SGL: AAD || PT || Tag
-+		 *	    |	   |
-+		 *	    | copy |
-+		 *	    v	   v
-+		 * RX SGL: AAD || PT
-+		 */
-+		err = crypto_aead_copy_sgl(null_tfm, tsgl->sg,
-+					   areq->first_rsgl.sgl.sg, processed);
-+		if (err)
-+			goto free;
-+		aead_pull_tsgl(sk, processed, NULL, 0);
-+	} else {
-+		/*
-+		 * Decryption operation - To achieve an in-place cipher
-+		 * operation, the following  SGL structure is used:
-+		 *
-+		 * TX SGL: AAD || CT || Tag
-+		 *	    |	   |	 ^
-+		 *	    | copy |	 | Create SGL link.
-+		 *	    v	   v	 |
-+		 * RX SGL: AAD || CT ----+
-+		 */
-+
-+		 /* Copy AAD || CT to RX SGL buffer for in-place operation. */
-+		err = crypto_aead_copy_sgl(null_tfm, tsgl->sg,
-+					   areq->first_rsgl.sgl.sg, outlen);
-+		if (err)
-+			goto free;
-+
-+		/* Create TX SGL for tag and chain it to RX SGL. */
-+		areq->tsgl_entries = aead_count_tsgl(sk, processed,
-+						     processed - as);
-+		if (!areq->tsgl_entries)
-+			areq->tsgl_entries = 1;
-+		areq->tsgl = sock_kmalloc(sk, sizeof(*areq->tsgl) *
-+					      areq->tsgl_entries,
-+					  GFP_KERNEL);
-+		if (!areq->tsgl) {
-+			err = -ENOMEM;
-+			goto free;
-+		}
-+		sg_init_table(areq->tsgl, areq->tsgl_entries);
-+
-+		/* Release TX SGL, except for tag data and reassign tag data. */
-+		aead_pull_tsgl(sk, processed, areq->tsgl, processed - as);
-+
-+		/* chain the areq TX SGL holding the tag with RX SGL */
-+		if (last_rsgl) {
-+			/* RX SGL present */
-+			struct af_alg_sgl *sgl_prev = &last_rsgl->sgl;
-+
-+			sg_unmark_end(sgl_prev->sg + sgl_prev->npages - 1);
-+			sg_chain(sgl_prev->sg, sgl_prev->npages + 1,
-+				 areq->tsgl);
-+		} else
-+			/* no RX SGL present (e.g. authentication only) */
-+			src = areq->tsgl;
- 	}
--	sg_init_table(areq->tsgl, areq->tsgl_entries);
--	aead_pull_tsgl(sk, processed, areq->tsgl);
- 
- 	/* Initialize the crypto operation */
--	aead_request_set_crypt(&areq->aead_req, areq->tsgl,
-+	aead_request_set_crypt(&areq->aead_req, src,
- 			       areq->first_rsgl.sgl.sg, used, ctx->iv);
- 	aead_request_set_ad(&areq->aead_req, ctx->aead_assoclen);
- 	aead_request_set_tfm(&areq->aead_req, tfm);
-@@ -951,6 +1078,7 @@ static void *aead_bind(const char *name, u32 type, u32 mask)
- {
- 	struct aead_tfm *tfm;
- 	struct crypto_aead *aead;
-+	struct crypto_skcipher *null_tfm;
- 
- 	tfm = kzalloc(sizeof(*tfm), GFP_KERNEL);
- 	if (!tfm)
-@@ -962,7 +1090,15 @@ static void *aead_bind(const char *name, u32 type, u32 mask)
- 		return ERR_CAST(aead);
- 	}
- 
-+	null_tfm = crypto_get_default_null_skcipher2();
-+	if (IS_ERR(null_tfm)) {
-+		crypto_free_aead(aead);
-+		kfree(tfm);
-+		return ERR_CAST(null_tfm);
-+	}
-+
- 	tfm->aead = aead;
-+	tfm->null_tfm = null_tfm;
- 
- 	return tfm;
- }
-@@ -1003,7 +1139,8 @@ static void aead_sock_destruct(struct sock *sk)
- 	struct crypto_aead *tfm = aeadc->aead;
- 	unsigned int ivlen = crypto_aead_ivsize(tfm);
- 
--	aead_pull_tsgl(sk, ctx->used, NULL);
-+	aead_pull_tsgl(sk, ctx->used, NULL, 0);
-+	crypto_put_default_null_skcipher2();
- 	sock_kzfree_s(sk, ctx->iv, ivlen);
- 	sock_kfree_s(sk, ctx, ctx->len);
- 	af_alg_release_parent(sk);
--- 
-2.13.3
+Rml4ZXMgOSBjaGVja3BhdGNoLnBsIHdhcm5pbmdzIG9mIHR5cGUKIlByZWZlciBrbWFsbG9jKHNp
+emVvZih2YXJpYWJsZSkuLi4pIG92ZXIga21hbGxvYyhzaXplb2YodHlwZSkuLi4pIgppbiBzdGFn
+aW5nL2NjcmVlLgoKU2lnbmVkLW9mZi1ieTogU2ltb24gU2FuZHN0csO2bSA8c2ltb25AbmlrYW5v
+ci5udT4KLS0tCiBkcml2ZXJzL3N0YWdpbmcvY2NyZWUvc3NpX2FlYWQuYyAgICAgICAgfCA0ICsr
+LS0KIGRyaXZlcnMvc3RhZ2luZy9jY3JlZS9zc2lfY2lwaGVyLmMgICAgICB8IDUgKystLS0KIGRy
+aXZlcnMvc3RhZ2luZy9jY3JlZS9zc2lfZHJpdmVyLmMgICAgICB8IDMgKystCiBkcml2ZXJzL3N0
+YWdpbmcvY2NyZWUvc3NpX2hhc2guYyAgICAgICAgfCA4ICsrKystLS0tCiBkcml2ZXJzL3N0YWdp
+bmcvY2NyZWUvc3NpX2l2Z2VuLmMgICAgICAgfCA1ICsrKy0tCiBkcml2ZXJzL3N0YWdpbmcvY2Ny
+ZWUvc3NpX3JlcXVlc3RfbWdyLmMgfCAyICstCiA2IGZpbGVzIGNoYW5nZWQsIDE0IGluc2VydGlv
+bnMoKyksIDEzIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2RyaXZlcnMvc3RhZ2luZy9jY3Jl
+ZS9zc2lfYWVhZC5jIGIvZHJpdmVycy9zdGFnaW5nL2NjcmVlL3NzaV9hZWFkLmMKaW5kZXggZjVj
+YTBlMzVjNWQzLi41YWJlNmIyNGZmOGMgMTAwNjQ0Ci0tLSBhL2RyaXZlcnMvc3RhZ2luZy9jY3Jl
+ZS9zc2lfYWVhZC5jCisrKyBiL2RyaXZlcnMvc3RhZ2luZy9jY3JlZS9zc2lfYWVhZC5jCkBAIC0y
+NjU5LDcgKzI2NTksNyBAQCBzdGF0aWMgc3RydWN0IHNzaV9jcnlwdG9fYWxnICpzc2lfYWVhZF9j
+cmVhdGVfYWxnKHN0cnVjdCBzc2lfYWxnX3RlbXBsYXRlICp0ZW1wbAogCXN0cnVjdCBzc2lfY3J5
+cHRvX2FsZyAqdF9hbGc7CiAJc3RydWN0IGFlYWRfYWxnICphbGc7CiAKLQl0X2FsZyA9IGt6YWxs
+b2Moc2l6ZW9mKHN0cnVjdCBzc2lfY3J5cHRvX2FsZyksIEdGUF9LRVJORUwpOworCXRfYWxnID0g
+a3phbGxvYyhzaXplb2YoKnRfYWxnKSwgR0ZQX0tFUk5FTCk7CiAJaWYgKCF0X2FsZykgewogCQlT
+U0lfTE9HX0VSUigiZmFpbGVkIHRvIGFsbG9jYXRlIHRfYWxnXG4iKTsKIAkJcmV0dXJuIEVSUl9Q
+VFIoLUVOT01FTSk7CkBAIC0yNzE0LDcgKzI3MTQsNyBAQCBpbnQgc3NpX2FlYWRfYWxsb2Moc3Ry
+dWN0IHNzaV9kcnZkYXRhICpkcnZkYXRhKQogCWludCByYyA9IC1FTk9NRU07CiAJaW50IGFsZzsK
+IAotCWFlYWRfaGFuZGxlID0ga21hbGxvYyhzaXplb2Yoc3RydWN0IHNzaV9hZWFkX2hhbmRsZSks
+IEdGUF9LRVJORUwpOworCWFlYWRfaGFuZGxlID0ga21hbGxvYyhzaXplb2YoKmFlYWRfaGFuZGxl
+KSwgR0ZQX0tFUk5FTCk7CiAJaWYgKCFhZWFkX2hhbmRsZSkgewogCQlyYyA9IC1FTk9NRU07CiAJ
+CWdvdG8gZmFpbDA7CmRpZmYgLS1naXQgYS9kcml2ZXJzL3N0YWdpbmcvY2NyZWUvc3NpX2NpcGhl
+ci5jIGIvZHJpdmVycy9zdGFnaW5nL2NjcmVlL3NzaV9jaXBoZXIuYwppbmRleCA2MjE5YTkyMTg0
+YWEuLmFmOWFmZWFkN2JjYiAxMDA2NDQKLS0tIGEvZHJpdmVycy9zdGFnaW5nL2NjcmVlL3NzaV9j
+aXBoZXIuYworKysgYi9kcml2ZXJzL3N0YWdpbmcvY2NyZWUvc3NpX2NpcGhlci5jCkBAIC0xMjE4
+LDcgKzEyMTgsNyBAQCBzdHJ1Y3Qgc3NpX2NyeXB0b19hbGcgKnNzaV9hYmxrY2lwaGVyX2NyZWF0
+ZV9hbGcoc3RydWN0IHNzaV9hbGdfdGVtcGxhdGUgKnRlbXBsYQogCXN0cnVjdCBzc2lfY3J5cHRv
+X2FsZyAqdF9hbGc7CiAJc3RydWN0IGNyeXB0b19hbGcgKmFsZzsKIAotCXRfYWxnID0ga3phbGxv
+YyhzaXplb2Yoc3RydWN0IHNzaV9jcnlwdG9fYWxnKSwgR0ZQX0tFUk5FTCk7CisJdF9hbGcgPSBr
+emFsbG9jKHNpemVvZigqdF9hbGcpLCBHRlBfS0VSTkVMKTsKIAlpZiAoIXRfYWxnKSB7CiAJCVNT
+SV9MT0dfRVJSKCJmYWlsZWQgdG8gYWxsb2NhdGUgdF9hbGdcbiIpOwogCQlyZXR1cm4gRVJSX1BU
+UigtRU5PTUVNKTsKQEAgLTEyNzksOCArMTI3OSw3IEBAIGludCBzc2lfYWJsa2NpcGhlcl9hbGxv
+YyhzdHJ1Y3Qgc3NpX2RydmRhdGEgKmRydmRhdGEpCiAJaW50IHJjID0gLUVOT01FTTsKIAlpbnQg
+YWxnOwogCi0JYWJsa2NpcGhlcl9oYW5kbGUgPSBrbWFsbG9jKHNpemVvZihzdHJ1Y3Qgc3NpX2Js
+a2NpcGhlcl9oYW5kbGUpLAotCQkJCSAgICBHRlBfS0VSTkVMKTsKKwlhYmxrY2lwaGVyX2hhbmRs
+ZSA9IGttYWxsb2Moc2l6ZW9mKCphYmxrY2lwaGVyX2hhbmRsZSksIEdGUF9LRVJORUwpOwogCWlm
+ICghYWJsa2NpcGhlcl9oYW5kbGUpCiAJCXJldHVybiAtRU5PTUVNOwogCmRpZmYgLS1naXQgYS9k
+cml2ZXJzL3N0YWdpbmcvY2NyZWUvc3NpX2RyaXZlci5jIGIvZHJpdmVycy9zdGFnaW5nL2NjcmVl
+L3NzaV9kcml2ZXIuYwppbmRleCBhNGFiOWVmNGJhZjcuLjg4YjY4YzgxNTU2YyAxMDA2NDQKLS0t
+IGEvZHJpdmVycy9zdGFnaW5nL2NjcmVlL3NzaV9kcml2ZXIuYworKysgYi9kcml2ZXJzL3N0YWdp
+bmcvY2NyZWUvc3NpX2RyaXZlci5jCkBAIC0yMjMsNyArMjIzLDggQEAgc3RhdGljIGludCBpbml0
+X2NjX3Jlc291cmNlcyhzdHJ1Y3QgcGxhdGZvcm1fZGV2aWNlICpwbGF0X2RldikKIAlzdHJ1Y3Qg
+cmVzb3VyY2UgKnJlcV9tZW1fY2NfcmVncyA9IE5VTEw7CiAJdm9pZCBfX2lvbWVtICpjY19iYXNl
+ID0gTlVMTDsKIAlib29sIGlycV9yZWdpc3RlcmVkID0gZmFsc2U7Ci0Jc3RydWN0IHNzaV9kcnZk
+YXRhICpuZXdfZHJ2ZGF0YSA9IGt6YWxsb2Moc2l6ZW9mKHN0cnVjdCBzc2lfZHJ2ZGF0YSksIEdG
+UF9LRVJORUwpOworCXN0cnVjdCBzc2lfZHJ2ZGF0YSAqbmV3X2RydmRhdGEgPSBremFsbG9jKHNp
+emVvZigqbmV3X2RydmRhdGEpLAorCQkJCQkJICBHRlBfS0VSTkVMKTsKIAlzdHJ1Y3QgZGV2aWNl
+ICpkZXYgPSAmcGxhdF9kZXYtPmRldjsKIAlzdHJ1Y3QgZGV2aWNlX25vZGUgKm5wID0gZGV2LT5v
+Zl9ub2RlOwogCXUzMiBzaWduYXR1cmVfdmFsOwpkaWZmIC0tZ2l0IGEvZHJpdmVycy9zdGFnaW5n
+L2NjcmVlL3NzaV9oYXNoLmMgYi9kcml2ZXJzL3N0YWdpbmcvY2NyZWUvc3NpX2hhc2guYwppbmRl
+eCAxYTQwNWJiYWRmNmQuLjEzMjkxYWVhZjM1MCAxMDA2NDQKLS0tIGEvZHJpdmVycy9zdGFnaW5n
+L2NjcmVlL3NzaV9oYXNoLmMKKysrIGIvZHJpdmVycy9zdGFnaW5nL2NjcmVlL3NzaV9oYXNoLmMK
+QEAgLTIwNjAsOSArMjA2MCw5IEBAIHNzaV9oYXNoX2NyZWF0ZV9hbGcoc3RydWN0IHNzaV9oYXNo
+X3RlbXBsYXRlICp0ZW1wbGF0ZSwgYm9vbCBrZXllZCkKIAlzdHJ1Y3QgY3J5cHRvX2FsZyAqYWxn
+OwogCXN0cnVjdCBhaGFzaF9hbGcgKmhhbGc7CiAKLQl0X2NyeXB0b19hbGcgPSBremFsbG9jKHNp
+emVvZihzdHJ1Y3Qgc3NpX2hhc2hfYWxnKSwgR0ZQX0tFUk5FTCk7CisJdF9jcnlwdG9fYWxnID0g
+a3phbGxvYyhzaXplb2YoKnRfY3J5cHRvX2FsZyksIEdGUF9LRVJORUwpOwogCWlmICghdF9jcnlw
+dG9fYWxnKSB7Ci0JCVNTSV9MT0dfRVJSKCJmYWlsZWQgdG8gYWxsb2NhdGUgdF9hbGdcbiIpOwor
+CQlTU0lfTE9HX0VSUigiZmFpbGVkIHRvIGFsbG9jYXRlIHRfY3J5cHRvX2FsZ1xuIik7CiAJCXJl
+dHVybiBFUlJfUFRSKC1FTk9NRU0pOwogCX0KIApAQCAtMjIyNiwxMCArMjIyNiwxMCBAQCBpbnQg
+c3NpX2hhc2hfYWxsb2Moc3RydWN0IHNzaV9kcnZkYXRhICpkcnZkYXRhKQogCWludCByYyA9IDA7
+CiAJaW50IGFsZzsKIAotCWhhc2hfaGFuZGxlID0ga3phbGxvYyhzaXplb2Yoc3RydWN0IHNzaV9o
+YXNoX2hhbmRsZSksIEdGUF9LRVJORUwpOworCWhhc2hfaGFuZGxlID0ga3phbGxvYyhzaXplb2Yo
+Kmhhc2hfaGFuZGxlKSwgR0ZQX0tFUk5FTCk7CiAJaWYgKCFoYXNoX2hhbmRsZSkgewogCQlTU0lf
+TE9HX0VSUigia3phbGxvYyBmYWlsZWQgdG8gYWxsb2NhdGUgJXp1IEJcbiIsCi0JCQkgICAgc2l6
+ZW9mKHN0cnVjdCBzc2lfaGFzaF9oYW5kbGUpKTsKKwkJCSAgICBzaXplb2YoKmhhc2hfaGFuZGxl
+KSk7CiAJCXJjID0gLUVOT01FTTsKIAkJZ290byBmYWlsOwogCX0KZGlmZiAtLWdpdCBhL2RyaXZl
+cnMvc3RhZ2luZy9jY3JlZS9zc2lfaXZnZW4uYyBiL2RyaXZlcnMvc3RhZ2luZy9jY3JlZS9zc2lf
+aXZnZW4uYwppbmRleCA4NjM2NGY4MWFjYWIuLmIwMWUwMzIzMTk0NyAxMDA2NDQKLS0tIGEvZHJp
+dmVycy9zdGFnaW5nL2NjcmVlL3NzaV9pdmdlbi5jCisrKyBiL2RyaXZlcnMvc3RhZ2luZy9jY3Jl
+ZS9zc2lfaXZnZW4uYwpAQCAtMTkxLDEwICsxOTEsMTEgQEAgaW50IHNzaV9pdmdlbl9pbml0KHN0
+cnVjdCBzc2lfZHJ2ZGF0YSAqZHJ2ZGF0YSkKIAlpbnQgcmM7CiAKIAkvKiBBbGxvY2F0ZSAidGhp
+cyIgY29udGV4dCAqLwotCWRydmRhdGEtPml2Z2VuX2hhbmRsZSA9IGt6YWxsb2Moc2l6ZW9mKHN0
+cnVjdCBzc2lfaXZnZW5fY3R4KSwgR0ZQX0tFUk5FTCk7CisJZHJ2ZGF0YS0+aXZnZW5faGFuZGxl
+ID0ga3phbGxvYyhzaXplb2YoKmRydmRhdGEtPml2Z2VuX2hhbmRsZSksCisJCQkJCUdGUF9LRVJO
+RUwpOwogCWlmICghZHJ2ZGF0YS0+aXZnZW5faGFuZGxlKSB7CiAJCVNTSV9MT0dfRVJSKCJOb3Qg
+ZW5vdWdoIG1lbW9yeSB0byBhbGxvY2F0ZSBJVkdFTiBjb250ZXh0ICIKLQkJCSAgICIoJXp1IEIp
+XG4iLCBzaXplb2Yoc3RydWN0IHNzaV9pdmdlbl9jdHgpKTsKKwkJCSAgICIoJXp1IEIpXG4iLCBz
+aXplb2YoKmRydmRhdGEtPml2Z2VuX2hhbmRsZSkpOwogCQlyYyA9IC1FTk9NRU07CiAJCWdvdG8g
+b3V0OwogCX0KZGlmZiAtLWdpdCBhL2RyaXZlcnMvc3RhZ2luZy9jY3JlZS9zc2lfcmVxdWVzdF9t
+Z3IuYyBiL2RyaXZlcnMvc3RhZ2luZy9jY3JlZS9zc2lfcmVxdWVzdF9tZ3IuYwppbmRleCAyZWRh
+ODJmMzE3ZDIuLmU1YzJmOTI4NTdmNiAxMDA2NDQKLS0tIGEvZHJpdmVycy9zdGFnaW5nL2NjcmVl
+L3NzaV9yZXF1ZXN0X21nci5jCisrKyBiL2RyaXZlcnMvc3RhZ2luZy9jY3JlZS9zc2lfcmVxdWVz
+dF9tZ3IuYwpAQCAtMTAwLDcgKzEwMCw3IEBAIGludCByZXF1ZXN0X21ncl9pbml0KHN0cnVjdCBz
+c2lfZHJ2ZGF0YSAqZHJ2ZGF0YSkKIAlzdHJ1Y3Qgc3NpX3JlcXVlc3RfbWdyX2hhbmRsZSAqcmVx
+X21ncl9oOwogCWludCByYyA9IDA7CiAKLQlyZXFfbWdyX2ggPSBremFsbG9jKHNpemVvZihzdHJ1
+Y3Qgc3NpX3JlcXVlc3RfbWdyX2hhbmRsZSksIEdGUF9LRVJORUwpOworCXJlcV9tZ3JfaCA9IGt6
+YWxsb2Moc2l6ZW9mKCpyZXFfbWdyX2gpLCBHRlBfS0VSTkVMKTsKIAlpZiAoIXJlcV9tZ3JfaCkg
+ewogCQlyYyA9IC1FTk9NRU07CiAJCWdvdG8gcmVxX21ncl9pbml0X2VycjsKLS0gCjIuMTEuMAoK
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KZGV2ZWwgbWFp
+bGluZyBsaXN0CmRldmVsQGxpbnV4ZHJpdmVycHJvamVjdC5vcmcKaHR0cDovL2RyaXZlcmRldi5s
+aW51eGRyaXZlcnByb2plY3Qub3JnL21haWxtYW4vbGlzdGluZm8vZHJpdmVyZGV2LWRldmVsCg==
