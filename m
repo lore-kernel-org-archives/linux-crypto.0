@@ -1,58 +1,58 @@
-From: Andy Shevchenko <andy.shevchenko@gmail.com>
-Subject: Re: [PATCH v5 3/6] iomap: introduce io{read|write}64_{lo_hi|hi_lo}
-Date: Sun, 30 Jul 2017 19:03:30 +0300
-Message-ID: <CAHp75Vcv7UCpnGY+mL7CMU5u9hCUxwaYWNsg58BoWBJGAFX4tQ@mail.gmail.com>
-References: <20170726231917.6073-1-logang@deltatee.com> <20170726231917.6073-4-logang@deltatee.com>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: [PATCH v2 0/6] ccree style fixes and simplification
+Date: Sun, 30 Jul 2017 19:15:02 +0300
+Message-ID: <1501431309-27705-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Linux-Arch <linux-arch@vger.kernel.org>,
-        linux-ntb@googlegroups.com,
-        linux-crypto <linux-crypto@vger.kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>,
-        Stephen Bates <sbates@raithlin.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Suresh Warrier <warrier@linux.vnet.ibm.com>,
-        Nicholas Piggin <npiggin@gmail.com>
-To: Logan Gunthorpe <logang@deltatee.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-oi0-f41.google.com ([209.85.218.41]:34013 "EHLO
-        mail-oi0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753963AbdG3QDc (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 30 Jul 2017 12:03:32 -0400
-In-Reply-To: <20170726231917.6073-4-logang@deltatee.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Ofir Drang <ofir.drang@arm.com>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ linux-crypto@vger.kernel.org, driverdev-devel@linuxdriverproject.org,
+ devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jul 27, 2017 at 2:19 AM, Logan Gunthorpe <logang@deltatee.com> wrote:
-> In order to provide non-atomic functions for io{read|write}64 that will
-> use readq and writeq when appropriate. We define a number of variants
-> of these functions in the generic iomap that will do non-atomic
-> operations on pio but atomic operations on mmio.
->
-> These functions are only defined if readq and writeq are defined. If
-> they are not, then the wrappers that always use non-atomic operations
-> from include/linux/io-64-nonatomic*.h will be used.
+Various style code fixes and simplification from myself and Suniel.
 
-Don't you see here a slight problem?
+Changes from v2:
 
-In some cases we want to substitute atomic in favour of non-atomic
-when both are defined.
-So, please don't do this "smartly".
+- Rebase on top of current staging-next.
+- Added resource release on error simplification patch suggested by
+  Dan C. as part of the review.
 
-> +u64 ioread64_lo_hi(void __iomem *addr)
-> +{
-> +       IO_COND(addr, return pio_read64_lo_hi(port), return readq(addr));
-> +       return 0xffffffffffffffffLL;
-> +}
+I made sure the code applies on top both current staging-next
+(commit 0d0d4d21a09981e65b2bd386c999e8c0ecc6444e) as well as
+staging-testing and of course compiles and runs. If this doesn't
+apply cleanly I'm going to start suspecting Gremlins at out IT dept.
 
-U missed u.
+Gilad Ben-Yossef (3):
+  staging: ccree: fix split strings
+  staging: ccree: kmalloc by sizeof var not type
+  staging: ccree: simplify resource release on error
+
+Suniel Mahesh (3):
+  staging: ccree: Replace kzalloc with devm_kzalloc
+  staging: ccree: Convert to devm_ioremap_resource for map, unmap
+  staging: ccree: Use platform_get_irq and devm_request_irq
+
+ drivers/staging/ccree/ssi_aead.c        |  16 ++-
+ drivers/staging/ccree/ssi_buffer_mgr.c  |  86 ++++++--------
+ drivers/staging/ccree/ssi_cipher.c      |  34 +++---
+ drivers/staging/ccree/ssi_driver.c      | 192 +++++++++++++-------------------
+ drivers/staging/ccree/ssi_driver.h      |   4 +-
+ drivers/staging/ccree/ssi_hash.c        |  50 ++++-----
+ drivers/staging/ccree/ssi_ivgen.c       |  10 +-
+ drivers/staging/ccree/ssi_request_mgr.c |  15 +--
+ 8 files changed, 170 insertions(+), 237 deletions(-)
 
 -- 
-With Best Regards,
-Andy Shevchenko
+2.1.4
