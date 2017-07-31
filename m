@@ -1,168 +1,79 @@
-From: Fabio Estevam <festevam@gmail.com>
-Subject: [PATCH v2] crypto: caam: Remove unused dentry members
-Date: Mon, 31 Jul 2017 09:21:51 -0300
-Message-ID: <1501503711-12920-1-git-send-email-festevam@gmail.com>
-Cc: horia.geanta@nxp.com, linux-crypto@vger.kernel.org,
-        Fabio Estevam <festevam@gmail.com>
-To: herbert@gondor.apana.org.au
+From: Logan Gunthorpe <logang@deltatee.com>
+Subject: Re: [PATCH v5 3/6] iomap: introduce io{read|write}64_{lo_hi|hi_lo}
+Date: Mon, 31 Jul 2017 09:55:45 -0600
+Message-ID: <5c52d908-3b77-c5c6-99a7-1164d878ac95@deltatee.com>
+References: <20170726231917.6073-1-logang@deltatee.com>
+ <20170726231917.6073-4-logang@deltatee.com>
+ <CAHp75Vcv7UCpnGY+mL7CMU5u9hCUxwaYWNsg58BoWBJGAFX4tQ@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Linux-Arch <linux-arch@vger.kernel.org>,
+        linux-ntb@googlegroups.com,
+        linux-crypto <linux-crypto@vger.kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>,
+        Stephen Bates <sbates@raithlin.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Suresh Warrier <warrier@linux.vnet.ibm.com>,
+        Nicholas Piggin <npiggin@gmail.com>
+To: Andy Shevchenko <andy.shevchenko@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-qt0-f194.google.com ([209.85.216.194]:33512 "EHLO
-        mail-qt0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751054AbdGaMV7 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 31 Jul 2017 08:21:59 -0400
-Received: by mail-qt0-f194.google.com with SMTP id u19so15311948qtc.0
-        for <linux-crypto@vger.kernel.org>; Mon, 31 Jul 2017 05:21:59 -0700 (PDT)
+Received: from ale.deltatee.com ([207.54.116.67]:56211 "EHLO ale.deltatee.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752063AbdGaP4L (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 31 Jul 2017 11:56:11 -0400
+In-Reply-To: <CAHp75Vcv7UCpnGY+mL7CMU5u9hCUxwaYWNsg58BoWBJGAFX4tQ@mail.gmail.com>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Most of the dentry members from structure caam_drv_private
-are never used at all, so it is safe to remove them.
 
-Since debugfs_remove_recursive() is called, we don't need the
-file entries.
 
-Signed-off-by: Fabio Estevam <festevam@gmail.com>
----
-Changes since v1:
-- Remove all the unused dentry members (Horia)
+On 30/07/17 10:03 AM, Andy Shevchenko wrote:
+> On Thu, Jul 27, 2017 at 2:19 AM, Logan Gunthorpe <logang@deltatee.com> wrote:
+>> In order to provide non-atomic functions for io{read|write}64 that will
+>> use readq and writeq when appropriate. We define a number of variants
+>> of these functions in the generic iomap that will do non-atomic
+>> operations on pio but atomic operations on mmio.
+>>
+>> These functions are only defined if readq and writeq are defined. If
+>> they are not, then the wrappers that always use non-atomic operations
+>> from include/linux/io-64-nonatomic*.h will be used.
+> 
+> Don't you see here a slight problem?
+> 
+> In some cases we want to substitute atomic in favour of non-atomic
+> when both are defined.
+> So, please don't do this "smartly".
 
- drivers/crypto/caam/ctrl.c   | 81 ++++++++++++++++----------------------------
- drivers/crypto/caam/intern.h |  8 -----
- drivers/crypto/caam/qi.c     |  6 ++--
- 3 files changed, 32 insertions(+), 63 deletions(-)
+I'm not sure what you mean here. The driver should use ioread64 and
+include an io-64-nonatomic header. Then there are three cases:
 
-diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index 7338f15..dc65fed 100644
---- a/drivers/crypto/caam/ctrl.c
-+++ b/drivers/crypto/caam/ctrl.c
-@@ -734,59 +734,38 @@ static int caam_probe(struct platform_device *pdev)
- 		 ctrlpriv->total_jobrs, ctrlpriv->qi_present);
- 
- #ifdef CONFIG_DEBUG_FS
--
--	ctrlpriv->ctl_rq_dequeued =
--		debugfs_create_file("rq_dequeued",
--				    S_IRUSR | S_IRGRP | S_IROTH,
--				    ctrlpriv->ctl, &perfmon->req_dequeued,
--				    &caam_fops_u64_ro);
--	ctrlpriv->ctl_ob_enc_req =
--		debugfs_create_file("ob_rq_encrypted",
--				    S_IRUSR | S_IRGRP | S_IROTH,
--				    ctrlpriv->ctl, &perfmon->ob_enc_req,
--				    &caam_fops_u64_ro);
--	ctrlpriv->ctl_ib_dec_req =
--		debugfs_create_file("ib_rq_decrypted",
--				    S_IRUSR | S_IRGRP | S_IROTH,
--				    ctrlpriv->ctl, &perfmon->ib_dec_req,
--				    &caam_fops_u64_ro);
--	ctrlpriv->ctl_ob_enc_bytes =
--		debugfs_create_file("ob_bytes_encrypted",
--				    S_IRUSR | S_IRGRP | S_IROTH,
--				    ctrlpriv->ctl, &perfmon->ob_enc_bytes,
--				    &caam_fops_u64_ro);
--	ctrlpriv->ctl_ob_prot_bytes =
--		debugfs_create_file("ob_bytes_protected",
--				    S_IRUSR | S_IRGRP | S_IROTH,
--				    ctrlpriv->ctl, &perfmon->ob_prot_bytes,
--				    &caam_fops_u64_ro);
--	ctrlpriv->ctl_ib_dec_bytes =
--		debugfs_create_file("ib_bytes_decrypted",
--				    S_IRUSR | S_IRGRP | S_IROTH,
--				    ctrlpriv->ctl, &perfmon->ib_dec_bytes,
--				    &caam_fops_u64_ro);
--	ctrlpriv->ctl_ib_valid_bytes =
--		debugfs_create_file("ib_bytes_validated",
--				    S_IRUSR | S_IRGRP | S_IROTH,
--				    ctrlpriv->ctl, &perfmon->ib_valid_bytes,
--				    &caam_fops_u64_ro);
-+	debugfs_create_file("rq_dequeued",S_IRUSR | S_IRGRP | S_IROTH,
-+			    ctrlpriv->ctl, &perfmon->req_dequeued,
-+			    &caam_fops_u64_ro);
-+	debugfs_create_file("ob_rq_encrypted", S_IRUSR | S_IRGRP | S_IROTH,
-+			    ctrlpriv->ctl, &perfmon->ob_enc_req,
-+			    &caam_fops_u64_ro);
-+	debugfs_create_file("ib_rq_decrypted", S_IRUSR | S_IRGRP | S_IROTH,
-+			    ctrlpriv->ctl, &perfmon->ib_dec_req,
-+			    &caam_fops_u64_ro);
-+	debugfs_create_file("ob_bytes_encrypted", S_IRUSR | S_IRGRP | S_IROTH,
-+			    ctrlpriv->ctl, &perfmon->ob_enc_bytes,
-+			    &caam_fops_u64_ro);
-+	debugfs_create_file("ob_bytes_protected", S_IRUSR | S_IRGRP | S_IROTH,
-+			    ctrlpriv->ctl, &perfmon->ob_prot_bytes,
-+			    &caam_fops_u64_ro);
-+	debugfs_create_file("ib_bytes_decrypted", S_IRUSR | S_IRGRP | S_IROTH,
-+			    ctrlpriv->ctl, &perfmon->ib_dec_bytes,
-+			    &caam_fops_u64_ro);
-+	debugfs_create_file("ib_bytes_validated", S_IRUSR | S_IRGRP | S_IROTH,
-+			    ctrlpriv->ctl, &perfmon->ib_valid_bytes,
-+			    &caam_fops_u64_ro);
- 
- 	/* Controller level - global status values */
--	ctrlpriv->ctl_faultaddr =
--		debugfs_create_file("fault_addr",
--				    S_IRUSR | S_IRGRP | S_IROTH,
--				    ctrlpriv->ctl, &perfmon->faultaddr,
--				    &caam_fops_u32_ro);
--	ctrlpriv->ctl_faultdetail =
--		debugfs_create_file("fault_detail",
--				    S_IRUSR | S_IRGRP | S_IROTH,
--				    ctrlpriv->ctl, &perfmon->faultdetail,
--				    &caam_fops_u32_ro);
--	ctrlpriv->ctl_faultstatus =
--		debugfs_create_file("fault_status",
--				    S_IRUSR | S_IRGRP | S_IROTH,
--				    ctrlpriv->ctl, &perfmon->status,
--				    &caam_fops_u32_ro);
-+	debugfs_create_file("fault_addr", S_IRUSR | S_IRGRP | S_IROTH,
-+			    ctrlpriv->ctl, &perfmon->faultaddr,
-+			    &caam_fops_u32_ro);
-+	debugfs_create_file("fault_detail", S_IRUSR | S_IRGRP | S_IROTH,
-+			    ctrlpriv->ctl, &perfmon->faultdetail,
-+			    &caam_fops_u32_ro);
-+	debugfs_create_file("fault_status", S_IRUSR | S_IRGRP | S_IROTH,
-+			    ctrlpriv->ctl, &perfmon->status,
-+			    &caam_fops_u32_ro);
- 
- 	/* Internal covering keys (useful in non-secure mode only) */
- 	ctrlpriv->ctl_kek_wrap.data = (__force void *)&ctrlpriv->ctrl->kek[0];
-diff --git a/drivers/crypto/caam/intern.h b/drivers/crypto/caam/intern.h
-index 9e3f3e0..a523612 100644
---- a/drivers/crypto/caam/intern.h
-+++ b/drivers/crypto/caam/intern.h
-@@ -102,16 +102,8 @@ struct caam_drv_private {
- #ifdef CONFIG_DEBUG_FS
- 	struct dentry *dfs_root;
- 	struct dentry *ctl; /* controller dir */
--	struct dentry *ctl_rq_dequeued, *ctl_ob_enc_req, *ctl_ib_dec_req;
--	struct dentry *ctl_ob_enc_bytes, *ctl_ob_prot_bytes;
--	struct dentry *ctl_ib_dec_bytes, *ctl_ib_valid_bytes;
--	struct dentry *ctl_faultaddr, *ctl_faultdetail, *ctl_faultstatus;
--
- 	struct debugfs_blob_wrapper ctl_kek_wrap, ctl_tkek_wrap, ctl_tdsk_wrap;
- 	struct dentry *ctl_kek, *ctl_tkek, *ctl_tdsk;
--#ifdef CONFIG_CAAM_QI
--	struct dentry *qi_congested;
--#endif
- #endif
- };
- 
-diff --git a/drivers/crypto/caam/qi.c b/drivers/crypto/caam/qi.c
-index 9a4151a..e4cf000 100644
---- a/drivers/crypto/caam/qi.c
-+++ b/drivers/crypto/caam/qi.c
-@@ -791,10 +791,8 @@ int caam_qi_init(struct platform_device *caam_pdev)
- 	/* Done with the CGRs; restore the cpus allowed mask */
- 	set_cpus_allowed_ptr(current, &old_cpumask);
- #ifdef CONFIG_DEBUG_FS
--	ctrlpriv->qi_congested = debugfs_create_file("qi_congested", 0444,
--						     ctrlpriv->ctl,
--						     &times_congested,
--						     &caam_fops_u64_ro);
-+	debugfs_create_file("qi_congested", 0444, ctrlpriv->ctl,
-+			    &times_congested, &caam_fops_u64_ro);
- #endif
- 	dev_info(qidev, "Linux CAAM Queue I/F driver initialised\n");
- 	return 0;
--- 
-2.7.4
+1) The arch has no atomic 64 bit io operations defined. In this case it
+uses the non-atomic inline function in the io-64-nonatomic header.
+
+2) The arch uses CONFIG_GENERIC_IOMAP and has readq defined, but not
+ioread64 defined (likely because pio can't do atomic 64 bit operations
+but mmio can). In this case we need to use the ioread64_xx functions
+defined in iomap.c which do atomic mmio and non-atomic pio.
+
+3) The arch has ioread64 defined so the atomic operation is used.
+
+>> +u64 ioread64_lo_hi(void __iomem *addr)
+>> +{
+>> +       IO_COND(addr, return pio_read64_lo_hi(port), return readq(addr));
+>> +       return 0xffffffffffffffffLL;
+>> +}
+> 
+> U missed u.
+
+I'll fix this in the next revision.
+
+Thanks,
+
+Logan
