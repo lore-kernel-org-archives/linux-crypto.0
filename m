@@ -1,462 +1,180 @@
-From: Joe Perches <joe@perches.com>
-Subject: [PATCH V2] staging: ccree: Fix format/argument mismatches
-Date: Mon, 31 Jul 2017 03:49:55 -0700
-Message-ID: <1b852d136031c4ca8af3bc2857fcc56d9c36fe58.1501498024.git.joe@perches.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-crypto@vger.kernel.org,
-        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
-        linux-kernel@vger.kernel.org
-To: Gilad Ben-Yossef <gilad@benyossef.com>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: [PATCH 15/16] crypto: AF_ALG - consolidate AIO callback handler
+Date: Mon, 31 Jul 2017 14:10:36 +0200
+Message-ID: <3121944.yyITU6Zhgv@positron.chronox.de>
+References: <4570630.RBIQc1aA22@positron.chronox.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtprelay0007.hostedemail.com ([216.40.44.7]:57770 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1750847AbdGaKuA (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 31 Jul 2017 06:50:00 -0400
+Received: from mail.eperm.de ([89.247.134.16]:60846 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751825AbdGaMLf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 31 Jul 2017 08:11:35 -0400
+In-Reply-To: <4570630.RBIQc1aA22@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-By default, debug logging is disabled by CC_DEBUG not being defined.
+Consoliate aead_async_cb, skcipher_async_cb ==> af_alg_async_cb
 
-Convert SSI_LOG_DEBUG to use no_printk instead of an empty define
-to validate formats and arguments.
+algif_skcipher has been changed to store the number of output bytes in
+areq->outlen before the AIO callback is triggered.
 
-Fix fallout.
-
-Miscellanea:
-
-o One of the conversions now uses %pR instead of multiple uses of %pad
-
-Signed-off-by: Joe Perches <joe@perches.com>
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
+ crypto/af_alg.c         | 31 +++++++++++++++++++++++++++++++
+ crypto/algif_aead.c     | 23 +----------------------
+ crypto/algif_skcipher.c | 27 +++++----------------------
+ include/crypto/if_alg.h |  1 +
+ 4 files changed, 38 insertions(+), 44 deletions(-)
 
-On top of next-20170731
-
- drivers/staging/ccree/ssi_aead.c        |  8 ++++----
- drivers/staging/ccree/ssi_buffer_mgr.c  | 29 +++++++++++++---------------
- drivers/staging/ccree/ssi_cipher.c      | 10 +++++-----
- drivers/staging/ccree/ssi_driver.c      |  5 ++---
- drivers/staging/ccree/ssi_driver.h      |  2 +-
- drivers/staging/ccree/ssi_hash.c        | 34 ++++++++++++++++-----------------
- drivers/staging/ccree/ssi_request_mgr.c |  6 +++---
- 7 files changed, 45 insertions(+), 49 deletions(-)
-
-diff --git a/drivers/staging/ccree/ssi_aead.c b/drivers/staging/ccree/ssi_aead.c
-index f5ca0e35c5d3..6664ade43b70 100644
---- a/drivers/staging/ccree/ssi_aead.c
-+++ b/drivers/staging/ccree/ssi_aead.c
-@@ -103,7 +103,7 @@ static void ssi_aead_exit(struct crypto_aead *tfm)
- 	if (ctx->enckey) {
- 		dma_free_coherent(dev, AES_MAX_KEY_SIZE, ctx->enckey, ctx->enckey_dma_addr);
- 		SSI_LOG_DEBUG("Freed enckey DMA buffer enckey_dma_addr=%pad\n",
--			      ctx->enckey_dma_addr);
-+			      &ctx->enckey_dma_addr);
- 		ctx->enckey_dma_addr = 0;
- 		ctx->enckey = NULL;
- 	}
-@@ -117,7 +117,7 @@ static void ssi_aead_exit(struct crypto_aead *tfm)
- 					  xcbc->xcbc_keys_dma_addr);
- 		}
- 		SSI_LOG_DEBUG("Freed xcbc_keys DMA buffer xcbc_keys_dma_addr=%pad\n",
--			      xcbc->xcbc_keys_dma_addr);
-+			      &xcbc->xcbc_keys_dma_addr);
- 		xcbc->xcbc_keys_dma_addr = 0;
- 		xcbc->xcbc_keys = NULL;
- 	} else if (ctx->auth_mode != DRV_HASH_NULL) { /* HMAC auth. */
-@@ -128,7 +128,7 @@ static void ssi_aead_exit(struct crypto_aead *tfm)
- 					  hmac->ipad_opad,
- 					  hmac->ipad_opad_dma_addr);
- 			SSI_LOG_DEBUG("Freed ipad_opad DMA buffer ipad_opad_dma_addr=%pad\n",
--				      hmac->ipad_opad_dma_addr);
-+				      &hmac->ipad_opad_dma_addr);
- 			hmac->ipad_opad_dma_addr = 0;
- 			hmac->ipad_opad = NULL;
- 		}
-@@ -137,7 +137,7 @@ static void ssi_aead_exit(struct crypto_aead *tfm)
- 					  hmac->padded_authkey,
- 					  hmac->padded_authkey_dma_addr);
- 			SSI_LOG_DEBUG("Freed padded_authkey DMA buffer padded_authkey_dma_addr=%pad\n",
--				      hmac->padded_authkey_dma_addr);
-+				      &hmac->padded_authkey_dma_addr);
- 			hmac->padded_authkey_dma_addr = 0;
- 			hmac->padded_authkey = NULL;
- 		}
-diff --git a/drivers/staging/ccree/ssi_buffer_mgr.c b/drivers/staging/ccree/ssi_buffer_mgr.c
-index 63936091d524..88b36477ce6d 100644
---- a/drivers/staging/ccree/ssi_buffer_mgr.c
-+++ b/drivers/staging/ccree/ssi_buffer_mgr.c
-@@ -14,6 +14,7 @@
-  * along with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
- 
-+#include <linux/kernel.h>
- #include <linux/crypto.h>
- #include <linux/version.h>
- #include <crypto/algapi.h>
-@@ -33,14 +34,10 @@
- #include "ssi_hash.h"
- #include "ssi_aead.h"
- 
--#ifdef CC_DEBUG
- #define GET_DMA_BUFFER_TYPE(buff_type) ( \
- 	((buff_type) == SSI_DMA_BUF_NULL) ? "BUF_NULL" : \
- 	((buff_type) == SSI_DMA_BUF_DLLI) ? "BUF_DLLI" : \
- 	((buff_type) == SSI_DMA_BUF_MLLI) ? "BUF_MLLI" : "BUF_INVALID")
--#else
--#define GET_DMA_BUFFER_TYPE(buff_type)
--#endif
- 
- enum dma_buffer_type {
- 	DMA_NULL_TYPE = -1,
-@@ -262,7 +259,7 @@ static int ssi_buffer_mgr_generate_mlli(
- 	SSI_LOG_DEBUG("MLLI params: "
- 		     "virt_addr=%pK dma_addr=%pad mlli_len=0x%X\n",
- 		   mlli_params->mlli_virt_addr,
--		   mlli_params->mlli_dma_addr,
-+		   &mlli_params->mlli_dma_addr,
- 		   mlli_params->mlli_len);
- 
- build_mlli_exit:
-@@ -278,7 +275,7 @@ static inline void ssi_buffer_mgr_add_buffer_entry(
- 
- 	SSI_LOG_DEBUG("index=%u single_buff=%pad "
- 		     "buffer_len=0x%08X is_last=%d\n",
--		     index, buffer_dma, buffer_len, is_last_entry);
-+		     index, &buffer_dma, buffer_len, is_last_entry);
- 	sgl_data->nents[index] = 1;
- 	sgl_data->entry[index].buffer_dma = buffer_dma;
- 	sgl_data->offset[index] = 0;
-@@ -362,7 +359,7 @@ static int ssi_buffer_mgr_map_scatterlist(
- 		SSI_LOG_DEBUG("Mapped sg: dma_address=%pad "
- 			     "page=%p addr=%pK offset=%u "
- 			     "length=%u\n",
--			     sg_dma_address(sg),
-+			     &sg_dma_address(sg),
- 			     sg_page(sg),
- 			     sg_virt(sg),
- 			     sg->offset, sg->length);
-@@ -426,7 +423,7 @@ ssi_aead_handle_config_buf(struct device *dev,
- 	SSI_LOG_DEBUG("Mapped curr_buff: dma_address=%pad "
- 		     "page=%p addr=%pK "
- 		     "offset=%u length=%u\n",
--		     sg_dma_address(&areq_ctx->ccm_adata_sg),
-+		     &sg_dma_address(&areq_ctx->ccm_adata_sg),
- 		     sg_page(&areq_ctx->ccm_adata_sg),
- 		     sg_virt(&areq_ctx->ccm_adata_sg),
- 		     areq_ctx->ccm_adata_sg.offset,
-@@ -459,7 +456,7 @@ static inline int ssi_ahash_handle_curr_buf(struct device *dev,
- 	SSI_LOG_DEBUG("Mapped curr_buff: dma_address=%pad "
- 		     "page=%p addr=%pK "
- 		     "offset=%u length=%u\n",
--		     sg_dma_address(areq_ctx->buff_sg),
-+		     &sg_dma_address(areq_ctx->buff_sg),
- 		     sg_page(areq_ctx->buff_sg),
- 		     sg_virt(areq_ctx->buff_sg),
- 		     areq_ctx->buff_sg->offset,
-@@ -484,7 +481,7 @@ void ssi_buffer_mgr_unmap_blkcipher_request(
- 
- 	if (likely(req_ctx->gen_ctx.iv_dma_addr != 0)) {
- 		SSI_LOG_DEBUG("Unmapped iv: iv_dma_addr=%pad iv_size=%u\n",
--			      req_ctx->gen_ctx.iv_dma_addr,
-+			      &req_ctx->gen_ctx.iv_dma_addr,
- 			      ivsize);
- 		dma_unmap_single(dev, req_ctx->gen_ctx.iv_dma_addr,
- 				 ivsize,
-@@ -545,7 +542,7 @@ int ssi_buffer_mgr_map_blkcipher_request(
- 		}
- 		SSI_LOG_DEBUG("Mapped iv %u B at va=%pK to dma=%pad\n",
- 			      ivsize, info,
--			      req_ctx->gen_ctx.iv_dma_addr);
-+			      &req_ctx->gen_ctx.iv_dma_addr);
- 	} else {
- 		req_ctx->gen_ctx.iv_dma_addr = 0;
- 	}
-@@ -675,7 +672,7 @@ void ssi_buffer_mgr_unmap_aead_request(
- 	 */
- 	if (areq_ctx->mlli_params.curr_pool) {
- 		SSI_LOG_DEBUG("free MLLI buffer: dma=%pad virt=%pK\n",
--			      areq_ctx->mlli_params.mlli_dma_addr,
-+			      &areq_ctx->mlli_params.mlli_dma_addr,
- 			      areq_ctx->mlli_params.mlli_virt_addr);
- 		dma_pool_free(areq_ctx->mlli_params.curr_pool,
- 			      areq_ctx->mlli_params.mlli_virt_addr,
-@@ -794,7 +791,7 @@ static inline int ssi_buffer_mgr_aead_chain_iv(
- 
- 	SSI_LOG_DEBUG("Mapped iv %u B at va=%pK to dma=%pad\n",
- 		      hw_iv_size, req->iv,
--		      areq_ctx->gen_ctx.iv_dma_addr);
-+		      &areq_ctx->gen_ctx.iv_dma_addr);
- 	if (do_chain && areq_ctx->plaintext_authenticate_only) {  // TODO: what about CTR?? ask Ron
- 		struct crypto_aead *tfm = crypto_aead_reqtfm(req);
- 		unsigned int iv_size_to_authenc = crypto_aead_ivsize(tfm);
-@@ -1726,7 +1723,7 @@ void ssi_buffer_mgr_unmap_hash_request(
- 	 */
- 	if (areq_ctx->mlli_params.curr_pool) {
- 		SSI_LOG_DEBUG("free MLLI buffer: dma=%pad virt=%pK\n",
--			      areq_ctx->mlli_params.mlli_dma_addr,
-+			      &areq_ctx->mlli_params.mlli_dma_addr,
- 			      areq_ctx->mlli_params.mlli_virt_addr);
- 		dma_pool_free(areq_ctx->mlli_params.curr_pool,
- 			      areq_ctx->mlli_params.mlli_virt_addr,
-@@ -1736,7 +1733,7 @@ void ssi_buffer_mgr_unmap_hash_request(
- 	if ((src) && likely(areq_ctx->in_nents != 0)) {
- 		SSI_LOG_DEBUG("Unmapped sg src: virt=%pK dma=%pad len=0x%X\n",
- 			      sg_virt(src),
--			      sg_dma_address(src),
-+			      &sg_dma_address(src),
- 			      sg_dma_len(src));
- 		dma_unmap_sg(dev, src,
- 			     areq_ctx->in_nents, DMA_TO_DEVICE);
-@@ -1746,7 +1743,7 @@ void ssi_buffer_mgr_unmap_hash_request(
- 		SSI_LOG_DEBUG("Unmapped buffer: areq_ctx->buff_sg=%pK"
- 			     " dma=%pad len 0x%X\n",
- 				sg_virt(areq_ctx->buff_sg),
--				sg_dma_address(areq_ctx->buff_sg),
-+				&sg_dma_address(areq_ctx->buff_sg),
- 				sg_dma_len(areq_ctx->buff_sg));
- 		dma_unmap_sg(dev, areq_ctx->buff_sg, 1, DMA_TO_DEVICE);
- 		if (!do_revert) {
-diff --git a/drivers/staging/ccree/ssi_cipher.c b/drivers/staging/ccree/ssi_cipher.c
-index 6219a92184aa..d956b965a6b2 100644
---- a/drivers/staging/ccree/ssi_cipher.c
-+++ b/drivers/staging/ccree/ssi_cipher.c
-@@ -212,7 +212,7 @@ static int ssi_blkcipher_init(struct crypto_tfm *tfm)
- 	}
- 	SSI_LOG_DEBUG("Mapped key %u B at va=%pK to dma=%pad\n",
- 		      max_key_buf_size, ctx_p->user.key,
--		      ctx_p->user.key_dma_addr);
-+		      &ctx_p->user.key_dma_addr);
- 
- 	if (ctx_p->cipher_mode == DRV_CIPHER_ESSIV) {
- 		/* Alloc hash tfm for essiv */
-@@ -245,7 +245,7 @@ static void ssi_blkcipher_exit(struct crypto_tfm *tfm)
- 	dma_unmap_single(dev, ctx_p->user.key_dma_addr, max_key_buf_size,
- 			 DMA_TO_DEVICE);
- 	SSI_LOG_DEBUG("Unmapped key buffer key_dma_addr=%pad\n",
--		      ctx_p->user.key_dma_addr);
-+		      &ctx_p->user.key_dma_addr);
- 
- 	/* Free key buffer in context */
- 	kfree(ctx_p->user.key);
-@@ -621,9 +621,9 @@ ssi_blkcipher_create_data_desc(
- 	/* Process */
- 	if (likely(req_ctx->dma_buf_type == SSI_DMA_BUF_DLLI)) {
- 		SSI_LOG_DEBUG(" data params addr %pad length 0x%X\n",
--			      sg_dma_address(src), nbytes);
-+			      &sg_dma_address(src), nbytes);
- 		SSI_LOG_DEBUG(" data params addr %pad length 0x%X\n",
--			      sg_dma_address(dst), nbytes);
-+			      &sg_dma_address(dst), nbytes);
- 		hw_desc_init(&desc[*seq_size]);
- 		set_din_type(&desc[*seq_size], DMA_DLLI, sg_dma_address(src),
- 			     nbytes, NS_BIT);
-@@ -638,7 +638,7 @@ ssi_blkcipher_create_data_desc(
- 		/* bypass */
- 		SSI_LOG_DEBUG(" bypass params addr %pad "
- 			     "length 0x%X addr 0x%08X\n",
--			req_ctx->mlli_params.mlli_dma_addr,
-+			&req_ctx->mlli_params.mlli_dma_addr,
- 			req_ctx->mlli_params.mlli_len,
- 			(unsigned int)ctx_p->drvdata->mlli_sram_addr);
- 		hw_desc_init(&desc[*seq_size]);
-diff --git a/drivers/staging/ccree/ssi_driver.c b/drivers/staging/ccree/ssi_driver.c
-index a4ab9ef4baf7..ad9b2cfac6d6 100644
---- a/drivers/staging/ccree/ssi_driver.c
-+++ b/drivers/staging/ccree/ssi_driver.c
-@@ -250,10 +250,9 @@ static int init_cc_resources(struct platform_device *plat_dev)
- 		rc = -ENODEV;
- 		goto init_cc_res_err;
- 	}
--	SSI_LOG_DEBUG("Got MEM resource (%s): start=%pad end=%pad\n",
-+	SSI_LOG_DEBUG("Got MEM resource (%s): %pR\n",
- 		      new_drvdata->res_mem->name,
--		      new_drvdata->res_mem->start,
--		      new_drvdata->res_mem->end);
-+		      new_drvdata->res_mem);
- 	/* Map registers space */
- 	req_mem_cc_regs = request_mem_region(new_drvdata->res_mem->start, resource_size(new_drvdata->res_mem), "arm_cc7x_regs");
- 	if (unlikely(!req_mem_cc_regs)) {
-diff --git a/drivers/staging/ccree/ssi_driver.h b/drivers/staging/ccree/ssi_driver.h
-index b6ad89ae9bee..69a523321306 100644
---- a/drivers/staging/ccree/ssi_driver.h
-+++ b/drivers/staging/ccree/ssi_driver.h
-@@ -100,7 +100,7 @@
- #ifdef CC_DEBUG
- #define SSI_LOG_DEBUG(format, ...) SSI_LOG(KERN_DEBUG, format, ##__VA_ARGS__)
- #else /* Debug log messages are removed at compile time for non-DEBUG config. */
--#define SSI_LOG_DEBUG(format, ...) do {} while (0)
-+#define SSI_LOG_DEBUG(format, ...) no_printk(format, ##__VA_ARGS__)
- #endif
- 
- #define MIN(a, b) (((a) < (b)) ? (a) : (b))
-diff --git a/drivers/staging/ccree/ssi_hash.c b/drivers/staging/ccree/ssi_hash.c
-index 1a405bbadf6d..b422f33c6240 100644
---- a/drivers/staging/ccree/ssi_hash.c
-+++ b/drivers/staging/ccree/ssi_hash.c
-@@ -1,4 +1,4 @@
--/*
-+ /*
-  * Copyright (C) 2012-2017 ARM Limited or its affiliates.
-  *
-  * This program is free software; you can redistribute it and/or modify
-@@ -141,7 +141,7 @@ static int ssi_hash_map_result(struct device *dev,
- 	SSI_LOG_DEBUG("Mapped digest result buffer %u B "
- 		     "at va=%pK to dma=%pad\n",
- 		digestsize, state->digest_result_buff,
--		state->digest_result_dma_addr);
-+		&state->digest_result_dma_addr);
- 
- 	return 0;
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index 5a33d6629a67..ef37fc3a9015 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -1049,6 +1049,37 @@ ssize_t af_alg_sendpage(struct socket *sock, struct page *page,
  }
-@@ -205,7 +205,7 @@ static int ssi_hash_map_request(struct device *dev,
- 	}
- 	SSI_LOG_DEBUG("Mapped digest %d B at va=%pK to dma=%pad\n",
- 		      ctx->inter_digestsize, state->digest_buff,
--		      state->digest_buff_dma_addr);
-+		      &state->digest_buff_dma_addr);
+ EXPORT_SYMBOL_GPL(af_alg_sendpage);
  
- 	if (is_hmac) {
- 		dma_sync_single_for_cpu(dev, ctx->digest_buff_dma_addr, ctx->inter_digestsize, DMA_BIDIRECTIONAL);
-@@ -254,7 +254,7 @@ static int ssi_hash_map_request(struct device *dev,
- 		}
- 		SSI_LOG_DEBUG("Mapped digest len %u B at va=%pK to dma=%pad\n",
- 			      HASH_LEN_SIZE, state->digest_bytes_len,
--			      state->digest_bytes_len_dma_addr);
-+			      &state->digest_bytes_len_dma_addr);
++/**
++ * af_alg_async_cb - AIO callback handler
++ *
++ * This handler cleans up the struct af_alg_async_req upon completion of the
++ * AIO operation.
++ *
++ * The number of bytes to be generated with the AIO operation must be set
++ * in areq->outlen before the AIO callback handler is invoked.
++ */
++void af_alg_async_cb(struct crypto_async_request *_req, int err)
++{
++	struct af_alg_async_req *areq = _req->data;
++	struct sock *sk = areq->sk;
++	struct kiocb *iocb = areq->iocb;
++	unsigned int resultlen;
++
++	lock_sock(sk);
++
++	/* Buffer size written by crypto operation. */
++	resultlen = areq->outlen;
++
++	af_alg_free_areq_sgls(areq);
++	sock_kfree_s(sk, areq, areq->areqlen);
++	__sock_put(sk);
++
++	iocb->ki_complete(iocb, err ? err : resultlen, 0);
++
++	release_sock(sk);
++}
++EXPORT_SYMBOL_GPL(af_alg_async_cb);
++
+ static int __init af_alg_init(void)
+ {
+ 	int err = proto_register(&alg_proto, 0);
+diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
+index f655fadb9075..8add641cc667 100644
+--- a/crypto/algif_aead.c
++++ b/crypto/algif_aead.c
+@@ -76,27 +76,6 @@ static int aead_sendmsg(struct socket *sock, struct msghdr *msg, size_t size)
+ 	return af_alg_sendmsg(sock, msg, size, ivsize);
+ }
+ 
+-static void aead_async_cb(struct crypto_async_request *_req, int err)
+-{
+-	struct af_alg_async_req *areq = _req->data;
+-	struct sock *sk = areq->sk;
+-	struct kiocb *iocb = areq->iocb;
+-	unsigned int resultlen;
+-
+-	lock_sock(sk);
+-
+-	/* Buffer size written by crypto operation. */
+-	resultlen = areq->outlen;
+-
+-	af_alg_free_areq_sgls(areq);
+-	sock_kfree_s(sk, areq, areq->areqlen);
+-	__sock_put(sk);
+-
+-	iocb->ki_complete(iocb, err ? err : resultlen, 0);
+-
+-	release_sock(sk);
+-}
+-
+ static int crypto_aead_copy_sgl(struct crypto_skcipher *null_tfm,
+ 				struct scatterlist *src,
+ 				struct scatterlist *dst, unsigned int len)
+@@ -341,7 +320,7 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
+ 		areq->iocb = msg->msg_iocb;
+ 		aead_request_set_callback(&areq->cra_u.aead_req,
+ 					  CRYPTO_TFM_REQ_MAY_BACKLOG,
+-					  aead_async_cb, areq);
++					  af_alg_async_cb, areq);
+ 		err = ctx->enc ? crypto_aead_encrypt(&areq->cra_u.aead_req) :
+ 				 crypto_aead_decrypt(&areq->cra_u.aead_req);
  	} else {
- 		state->digest_bytes_len_dma_addr = 0;
- 	}
-@@ -269,7 +269,7 @@ static int ssi_hash_map_request(struct device *dev,
- 		}
- 		SSI_LOG_DEBUG("Mapped opad digest %d B at va=%pK to dma=%pad\n",
- 			      ctx->inter_digestsize, state->opad_digest_buff,
--			      state->opad_digest_dma_addr);
-+			      &state->opad_digest_dma_addr);
- 	} else {
- 		state->opad_digest_dma_addr = 0;
- 	}
-@@ -317,21 +317,21 @@ static void ssi_hash_unmap_request(struct device *dev,
- 		dma_unmap_single(dev, state->digest_buff_dma_addr,
- 				 ctx->inter_digestsize, DMA_BIDIRECTIONAL);
- 		SSI_LOG_DEBUG("Unmapped digest-buffer: digest_buff_dma_addr=%pad\n",
--			      state->digest_buff_dma_addr);
-+			      &state->digest_buff_dma_addr);
- 		state->digest_buff_dma_addr = 0;
- 	}
- 	if (state->digest_bytes_len_dma_addr != 0) {
- 		dma_unmap_single(dev, state->digest_bytes_len_dma_addr,
- 				 HASH_LEN_SIZE, DMA_BIDIRECTIONAL);
- 		SSI_LOG_DEBUG("Unmapped digest-bytes-len buffer: digest_bytes_len_dma_addr=%pad\n",
--			      state->digest_bytes_len_dma_addr);
-+			      &state->digest_bytes_len_dma_addr);
- 		state->digest_bytes_len_dma_addr = 0;
- 	}
- 	if (state->opad_digest_dma_addr != 0) {
- 		dma_unmap_single(dev, state->opad_digest_dma_addr,
- 				 ctx->inter_digestsize, DMA_BIDIRECTIONAL);
- 		SSI_LOG_DEBUG("Unmapped opad-digest: opad_digest_dma_addr=%pad\n",
--			      state->opad_digest_dma_addr);
-+			      &state->opad_digest_dma_addr);
- 		state->opad_digest_dma_addr = 0;
+diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
+index c577aaaa9fd8..5134df529833 100644
+--- a/crypto/algif_skcipher.c
++++ b/crypto/algif_skcipher.c
+@@ -57,27 +57,6 @@ static int skcipher_sendmsg(struct socket *sock, struct msghdr *msg,
+ 	return af_alg_sendmsg(sock, msg, size, ivsize);
+ }
+ 
+-static void skcipher_async_cb(struct crypto_async_request *req, int err)
+-{
+-	struct af_alg_async_req *areq = req->data;
+-	struct sock *sk = areq->sk;
+-	struct kiocb *iocb = areq->iocb;
+-	unsigned int resultlen;
+-
+-	lock_sock(sk);
+-
+-	/* Buffer size written by crypto operation. */
+-	resultlen = areq->cra_u.skcipher_req.cryptlen;
+-
+-	af_alg_free_areq_sgls(areq);
+-	sock_kfree_s(sk, areq, areq->areqlen);
+-	__sock_put(sk);
+-
+-	iocb->ki_complete(iocb, err ? err : resultlen, 0);
+-
+-	release_sock(sk);
+-}
+-
+ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
+ 			     size_t ignored, int flags)
+ {
+@@ -189,7 +168,7 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
+ 		areq->iocb = msg->msg_iocb;
+ 		skcipher_request_set_callback(&areq->cra_u.skcipher_req,
+ 					      CRYPTO_TFM_REQ_MAY_SLEEP,
+-					      skcipher_async_cb, areq);
++					      af_alg_async_cb, areq);
+ 		err = ctx->enc ?
+ 			crypto_skcipher_encrypt(&areq->cra_u.skcipher_req) :
+ 			crypto_skcipher_decrypt(&areq->cra_u.skcipher_req);
+@@ -209,6 +188,10 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
+ 	/* AIO operation in progress */
+ 	if (err == -EINPROGRESS) {
+ 		sock_hold(sk);
++
++		/* Remember output size that will be generated. */
++		areq->outlen = len;
++
+ 		return -EIOCBQUEUED;
  	}
  
-@@ -355,7 +355,7 @@ static void ssi_hash_unmap_result(struct device *dev,
- 		SSI_LOG_DEBUG("unmpa digest result buffer "
- 			     "va (%pK) pa (%pad) len %u\n",
- 			     state->digest_result_buff,
--			     state->digest_result_dma_addr,
-+			     &state->digest_result_dma_addr,
- 			     digestsize);
- 		memcpy(result,
- 		       state->digest_result_buff,
-@@ -999,7 +999,7 @@ static int ssi_hash_setkey(void *hash,
- 			return -ENOMEM;
- 		}
- 		SSI_LOG_DEBUG("mapping key-buffer: key_dma_addr=%pad "
--			     "keylen=%u\n", ctx->key_params.key_dma_addr,
-+			     "keylen=%u\n", &ctx->key_params.key_dma_addr,
- 			     ctx->key_params.keylen);
+diff --git a/include/crypto/if_alg.h b/include/crypto/if_alg.h
+index d271af60bfaf..ef08fb4a599e 100644
+--- a/include/crypto/if_alg.h
++++ b/include/crypto/if_alg.h
+@@ -253,5 +253,6 @@ int af_alg_sendmsg(struct socket *sock, struct msghdr *msg, size_t size,
+ 		   unsigned int ivsize);
+ ssize_t af_alg_sendpage(struct socket *sock, struct page *page,
+ 			int offset, size_t size, int flags);
++void af_alg_async_cb(struct crypto_async_request *_req, int err);
  
- 		if (keylen > blocksize) {
-@@ -1143,7 +1143,7 @@ static int ssi_hash_setkey(void *hash,
- 				 ctx->key_params.key_dma_addr,
- 				 ctx->key_params.keylen, DMA_TO_DEVICE);
- 		SSI_LOG_DEBUG("Unmapped key-buffer: key_dma_addr=%pad keylen=%u\n",
--			      ctx->key_params.key_dma_addr,
-+			      &ctx->key_params.key_dma_addr,
- 			      ctx->key_params.keylen);
- 	}
- 	return rc;
-@@ -1182,7 +1182,7 @@ static int ssi_xcbc_setkey(struct crypto_ahash *ahash,
- 	}
- 	SSI_LOG_DEBUG("mapping key-buffer: key_dma_addr=%pad "
- 		     "keylen=%u\n",
--		     ctx->key_params.key_dma_addr,
-+		     &ctx->key_params.key_dma_addr,
- 		     ctx->key_params.keylen);
- 
- 	ctx->is_hmac = true;
-@@ -1230,7 +1230,7 @@ static int ssi_xcbc_setkey(struct crypto_ahash *ahash,
- 			 ctx->key_params.key_dma_addr,
- 			 ctx->key_params.keylen, DMA_TO_DEVICE);
- 	SSI_LOG_DEBUG("Unmapped key-buffer: key_dma_addr=%pad keylen=%u\n",
--		      ctx->key_params.key_dma_addr,
-+		      &ctx->key_params.key_dma_addr,
- 		      ctx->key_params.keylen);
- 
- 	return rc;
-@@ -1286,7 +1286,7 @@ static void ssi_hash_free_ctx(struct ssi_hash_ctx *ctx)
- 				 sizeof(ctx->digest_buff), DMA_BIDIRECTIONAL);
- 		SSI_LOG_DEBUG("Unmapped digest-buffer: "
- 			     "digest_buff_dma_addr=%pad\n",
--			      ctx->digest_buff_dma_addr);
-+			      &ctx->digest_buff_dma_addr);
- 		ctx->digest_buff_dma_addr = 0;
- 	}
- 	if (ctx->opad_tmp_keys_dma_addr != 0) {
-@@ -1295,7 +1295,7 @@ static void ssi_hash_free_ctx(struct ssi_hash_ctx *ctx)
- 				 DMA_BIDIRECTIONAL);
- 		SSI_LOG_DEBUG("Unmapped opad-digest: "
- 			     "opad_tmp_keys_dma_addr=%pad\n",
--			      ctx->opad_tmp_keys_dma_addr);
-+			      &ctx->opad_tmp_keys_dma_addr);
- 		ctx->opad_tmp_keys_dma_addr = 0;
- 	}
- 
-@@ -1316,7 +1316,7 @@ static int ssi_hash_alloc_ctx(struct ssi_hash_ctx *ctx)
- 	}
- 	SSI_LOG_DEBUG("Mapped digest %zu B at va=%pK to dma=%pad\n",
- 		      sizeof(ctx->digest_buff), ctx->digest_buff,
--		      ctx->digest_buff_dma_addr);
-+		      &ctx->digest_buff_dma_addr);
- 
- 	ctx->opad_tmp_keys_dma_addr = dma_map_single(dev, (void *)ctx->opad_tmp_keys_buff, sizeof(ctx->opad_tmp_keys_buff), DMA_BIDIRECTIONAL);
- 	if (dma_mapping_error(dev, ctx->opad_tmp_keys_dma_addr)) {
-@@ -1327,7 +1327,7 @@ static int ssi_hash_alloc_ctx(struct ssi_hash_ctx *ctx)
- 	}
- 	SSI_LOG_DEBUG("Mapped opad_tmp_keys %zu B at va=%pK to dma=%pad\n",
- 		      sizeof(ctx->opad_tmp_keys_buff), ctx->opad_tmp_keys_buff,
--		      ctx->opad_tmp_keys_dma_addr);
-+		      &ctx->opad_tmp_keys_dma_addr);
- 
- 	ctx->is_hmac = false;
- 	return 0;
-diff --git a/drivers/staging/ccree/ssi_request_mgr.c b/drivers/staging/ccree/ssi_request_mgr.c
-index 2eda82f317d2..4597aad9a96e 100644
---- a/drivers/staging/ccree/ssi_request_mgr.c
-+++ b/drivers/staging/ccree/ssi_request_mgr.c
-@@ -326,9 +326,9 @@ int send_request(
- 	if (ssi_req->ivgen_dma_addr_len > 0) {
- 		SSI_LOG_DEBUG("Acquire IV from pool into %d DMA addresses %pad, %pad, %pad, IV-size=%u\n",
- 			      ssi_req->ivgen_dma_addr_len,
--			      ssi_req->ivgen_dma_addr[0],
--			      ssi_req->ivgen_dma_addr[1],
--			      ssi_req->ivgen_dma_addr[2],
-+			      &ssi_req->ivgen_dma_addr[0],
-+			      &ssi_req->ivgen_dma_addr[1],
-+			      &ssi_req->ivgen_dma_addr[2],
- 			      ssi_req->ivgen_size);
- 
- 		/* Acquire IV from pool */
+ #endif	/* _CRYPTO_IF_ALG_H */
 -- 
-2.10.0.rc2.1.g053435c
+2.13.3
