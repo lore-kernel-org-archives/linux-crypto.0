@@ -1,7 +1,7 @@
 From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: [PATCH 16/16] crypto: AF_ALG - consolidate poll syscall handler
-Date: Mon, 31 Jul 2017 14:11:13 +0200
-Message-ID: <4962248.kL35ls7QWF@positron.chronox.de>
+Subject: [PATCH 14/16] crypto: AF_ALG - consolidate sendpage implementation
+Date: Mon, 31 Jul 2017 14:10:14 +0200
+Message-ID: <8787512.vk6vViJ2Ag@positron.chronox.de>
 References: <4570630.RBIQc1aA22@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -9,170 +9,270 @@ Content-Transfer-Encoding: 7Bit
 Cc: linux-crypto@vger.kernel.org
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:60844 "EHLO mail.eperm.de"
+Received: from mail.eperm.de ([89.247.134.16]:60848 "EHLO mail.eperm.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752020AbdGaMLf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1751951AbdGaMLf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Mon, 31 Jul 2017 08:11:35 -0400
 In-Reply-To: <4570630.RBIQc1aA22@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Consoliate aead_poll, skcipher_poll ==> af_alg_poll
+Consoliate aead_sendpage, skcipher_sendpage
+==> af_alg_sendpage
 
-The POLLIN / POLLRDNORM is now set when either not more data is given or
-the kernel is supplied with data. This is consistent to the wakeup from
-sleep when the kernel waits for data.
+The following changes to aead_sendpage have been applied:
+
+* remove superfluous err = 0
 
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- crypto/af_alg.c         | 24 ++++++++++++++++++++++++
- crypto/algif_aead.c     | 24 ++----------------------
- crypto/algif_skcipher.c | 23 ++---------------------
+ crypto/af_alg.c         | 58 +++++++++++++++++++++++++++++++++++++++++++++++++
+ crypto/algif_aead.c     | 57 ++----------------------------------------------
+ crypto/algif_skcipher.c | 55 ++--------------------------------------------
  include/crypto/if_alg.h |  2 ++
- 4 files changed, 30 insertions(+), 43 deletions(-)
+ 4 files changed, 64 insertions(+), 108 deletions(-)
 
 diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index ef37fc3a9015..ae0e93103c76 100644
+index 716a73ff5309..5a33d6629a67 100644
 --- a/crypto/af_alg.c
 +++ b/crypto/af_alg.c
-@@ -1080,6 +1080,30 @@ void af_alg_async_cb(struct crypto_async_request *_req, int err)
+@@ -991,6 +991,64 @@ int af_alg_sendmsg(struct socket *sock, struct msghdr *msg, size_t size,
  }
- EXPORT_SYMBOL_GPL(af_alg_async_cb);
+ EXPORT_SYMBOL_GPL(af_alg_sendmsg);
  
 +/**
-+ * af_alg_poll - poll system call handler
++ * af_alg_sendpage - sendpage system call handler
++ *
++ * This is a generic implementation of sendpage to fill ctx->tsgl_list.
 + */
-+unsigned int af_alg_poll(struct file *file, struct socket *sock,
-+			 poll_table *wait)
++ssize_t af_alg_sendpage(struct socket *sock, struct page *page,
++			int offset, size_t size, int flags)
 +{
 +	struct sock *sk = sock->sk;
 +	struct alg_sock *ask = alg_sk(sk);
 +	struct af_alg_ctx *ctx = ask->private;
-+	unsigned int mask;
++	struct af_alg_tsgl *sgl;
++	int err = -EINVAL;
 +
-+	sock_poll_wait(file, sk_sleep(sk), wait);
-+	mask = 0;
++	if (flags & MSG_SENDPAGE_NOTLAST)
++		flags |= MSG_MORE;
 +
-+	if (!ctx->more || ctx->used)
-+		mask |= POLLIN | POLLRDNORM;
++	lock_sock(sk);
++	if (!ctx->more && ctx->used)
++		goto unlock;
 +
-+	if (af_alg_writable(sk))
-+		mask |= POLLOUT | POLLWRNORM | POLLWRBAND;
++	if (!size)
++		goto done;
 +
-+	return mask;
++	if (!af_alg_writable(sk)) {
++		err = af_alg_wait_for_wmem(sk, flags);
++		if (err)
++			goto unlock;
++	}
++
++	err = af_alg_alloc_tsgl(sk);
++	if (err)
++		goto unlock;
++
++	ctx->merge = 0;
++	sgl = list_entry(ctx->tsgl_list.prev, struct af_alg_tsgl, list);
++
++	if (sgl->cur)
++		sg_unmark_end(sgl->sg + sgl->cur - 1);
++
++	sg_mark_end(sgl->sg + sgl->cur);
++
++	get_page(page);
++	sg_set_page(sgl->sg + sgl->cur, page, size, offset);
++	sgl->cur++;
++	ctx->used += size;
++
++done:
++	ctx->more = flags & MSG_MORE;
++
++unlock:
++	af_alg_data_wakeup(sk);
++	release_sock(sk);
++
++	return err ?: size;
 +}
-+EXPORT_SYMBOL_GPL(af_alg_poll);
++EXPORT_SYMBOL_GPL(af_alg_sendpage);
 +
  static int __init af_alg_init(void)
  {
  	int err = proto_register(&alg_proto, 0);
 diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
-index 8add641cc667..478bacf30079 100644
+index 9cb934b3175a..f655fadb9075 100644
 --- a/crypto/algif_aead.c
 +++ b/crypto/algif_aead.c
-@@ -385,26 +385,6 @@ static int aead_recvmsg(struct socket *sock, struct msghdr *msg,
- 	return ret;
+@@ -76,59 +76,6 @@ static int aead_sendmsg(struct socket *sock, struct msghdr *msg, size_t size)
+ 	return af_alg_sendmsg(sock, msg, size, ivsize);
  }
  
--static unsigned int aead_poll(struct file *file, struct socket *sock,
--			      poll_table *wait)
+-static ssize_t aead_sendpage(struct socket *sock, struct page *page,
+-			     int offset, size_t size, int flags)
 -{
 -	struct sock *sk = sock->sk;
 -	struct alg_sock *ask = alg_sk(sk);
 -	struct af_alg_ctx *ctx = ask->private;
--	unsigned int mask;
+-	struct af_alg_tsgl *sgl;
+-	int err = -EINVAL;
 -
--	sock_poll_wait(file, sk_sleep(sk), wait);
--	mask = 0;
+-	if (flags & MSG_SENDPAGE_NOTLAST)
+-		flags |= MSG_MORE;
 -
--	if (!ctx->more)
--		mask |= POLLIN | POLLRDNORM;
+-	lock_sock(sk);
+-	if (!ctx->more && ctx->used)
+-		goto unlock;
 -
--	if (af_alg_writable(sk))
--		mask |= POLLOUT | POLLWRNORM | POLLWRBAND;
+-	if (!size)
+-		goto done;
 -
--	return mask;
+-	if (!af_alg_writable(sk)) {
+-		err = af_alg_wait_for_wmem(sk, flags);
+-		if (err)
+-			goto unlock;
+-	}
+-
+-	err = af_alg_alloc_tsgl(sk);
+-	if (err)
+-		goto unlock;
+-
+-	ctx->merge = 0;
+-	sgl = list_entry(ctx->tsgl_list.prev, struct af_alg_tsgl, list);
+-
+-	if (sgl->cur)
+-		sg_unmark_end(sgl->sg + sgl->cur - 1);
+-
+-	sg_mark_end(sgl->sg + sgl->cur);
+-
+-	get_page(page);
+-	sg_set_page(sgl->sg + sgl->cur, page, size, offset);
+-	sgl->cur++;
+-	ctx->used += size;
+-
+-	err = 0;
+-
+-done:
+-	ctx->more = flags & MSG_MORE;
+-unlock:
+-	af_alg_data_wakeup(sk);
+-	release_sock(sk);
+-
+-	return err ?: size;
 -}
 -
- static struct proto_ops algif_aead_ops = {
- 	.family		=	PF_ALG,
+ static void aead_async_cb(struct crypto_async_request *_req, int err)
+ {
+ 	struct af_alg_async_req *areq = _req->data;
+@@ -496,7 +443,7 @@ static struct proto_ops algif_aead_ops = {
  
-@@ -424,7 +404,7 @@ static struct proto_ops algif_aead_ops = {
+ 	.release	=	af_alg_release,
  	.sendmsg	=	aead_sendmsg,
- 	.sendpage	=	af_alg_sendpage,
+-	.sendpage	=	aead_sendpage,
++	.sendpage	=	af_alg_sendpage,
  	.recvmsg	=	aead_recvmsg,
--	.poll		=	aead_poll,
-+	.poll		=	af_alg_poll,
+ 	.poll		=	aead_poll,
  };
+@@ -560,7 +507,7 @@ static ssize_t aead_sendpage_nokey(struct socket *sock, struct page *page,
+ 	if (err)
+ 		return err;
  
- static int aead_check_key(struct socket *sock)
-@@ -520,7 +500,7 @@ static struct proto_ops algif_aead_ops_nokey = {
- 	.sendmsg	=	aead_sendmsg_nokey,
- 	.sendpage	=	aead_sendpage_nokey,
- 	.recvmsg	=	aead_recvmsg_nokey,
--	.poll		=	aead_poll,
-+	.poll		=	af_alg_poll,
- };
+-	return aead_sendpage(sock, page, offset, size, flags);
++	return af_alg_sendpage(sock, page, offset, size, flags);
+ }
  
- static void *aead_bind(const char *name, u32 type, u32 mask)
+ static int aead_recvmsg_nokey(struct socket *sock, struct msghdr *msg,
 diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
-index 5134df529833..5bd85c1dd188 100644
+index d5bc5de7a8a1..c577aaaa9fd8 100644
 --- a/crypto/algif_skcipher.c
 +++ b/crypto/algif_skcipher.c
-@@ -236,25 +236,6 @@ static int skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
- 	return ret;
+@@ -57,57 +57,6 @@ static int skcipher_sendmsg(struct socket *sock, struct msghdr *msg,
+ 	return af_alg_sendmsg(sock, msg, size, ivsize);
  }
  
--static unsigned int skcipher_poll(struct file *file, struct socket *sock,
--				  poll_table *wait)
+-static ssize_t skcipher_sendpage(struct socket *sock, struct page *page,
+-				 int offset, size_t size, int flags)
 -{
 -	struct sock *sk = sock->sk;
 -	struct alg_sock *ask = alg_sk(sk);
 -	struct af_alg_ctx *ctx = ask->private;
--	unsigned int mask;
+-	struct af_alg_tsgl *sgl;
+-	int err = -EINVAL;
 -
--	sock_poll_wait(file, sk_sleep(sk), wait);
--	mask = 0;
+-	if (flags & MSG_SENDPAGE_NOTLAST)
+-		flags |= MSG_MORE;
 -
--	if (ctx->used)
--		mask |= POLLIN | POLLRDNORM;
+-	lock_sock(sk);
+-	if (!ctx->more && ctx->used)
+-		goto unlock;
 -
--	if (af_alg_writable(sk))
--		mask |= POLLOUT | POLLWRNORM | POLLWRBAND;
+-	if (!size)
+-		goto done;
 -
--	return mask;
+-	if (!af_alg_writable(sk)) {
+-		err = af_alg_wait_for_wmem(sk, flags);
+-		if (err)
+-			goto unlock;
+-	}
+-
+-	err = af_alg_alloc_tsgl(sk);
+-	if (err)
+-		goto unlock;
+-
+-	ctx->merge = 0;
+-	sgl = list_entry(ctx->tsgl_list.prev, struct af_alg_tsgl, list);
+-
+-	if (sgl->cur)
+-		sg_unmark_end(sgl->sg + sgl->cur - 1);
+-
+-	sg_mark_end(sgl->sg + sgl->cur);
+-	get_page(page);
+-	sg_set_page(sgl->sg + sgl->cur, page, size, offset);
+-	sgl->cur++;
+-	ctx->used += size;
+-
+-done:
+-	ctx->more = flags & MSG_MORE;
+-
+-unlock:
+-	af_alg_data_wakeup(sk);
+-	release_sock(sk);
+-
+-	return err ?: size;
 -}
+-
+ static void skcipher_async_cb(struct crypto_async_request *req, int err)
+ {
+ 	struct af_alg_async_req *areq = req->data;
+@@ -341,7 +290,7 @@ static struct proto_ops algif_skcipher_ops = {
  
- static struct proto_ops algif_skcipher_ops = {
- 	.family		=	PF_ALG,
-@@ -275,7 +256,7 @@ static struct proto_ops algif_skcipher_ops = {
+ 	.release	=	af_alg_release,
  	.sendmsg	=	skcipher_sendmsg,
- 	.sendpage	=	af_alg_sendpage,
+-	.sendpage	=	skcipher_sendpage,
++	.sendpage	=	af_alg_sendpage,
  	.recvmsg	=	skcipher_recvmsg,
--	.poll		=	skcipher_poll,
-+	.poll		=	af_alg_poll,
+ 	.poll		=	skcipher_poll,
  };
+@@ -405,7 +354,7 @@ static ssize_t skcipher_sendpage_nokey(struct socket *sock, struct page *page,
+ 	if (err)
+ 		return err;
  
- static int skcipher_check_key(struct socket *sock)
-@@ -371,7 +352,7 @@ static struct proto_ops algif_skcipher_ops_nokey = {
- 	.sendmsg	=	skcipher_sendmsg_nokey,
- 	.sendpage	=	skcipher_sendpage_nokey,
- 	.recvmsg	=	skcipher_recvmsg_nokey,
--	.poll		=	skcipher_poll,
-+	.poll		=	af_alg_poll,
- };
+-	return skcipher_sendpage(sock, page, offset, size, flags);
++	return af_alg_sendpage(sock, page, offset, size, flags);
+ }
  
- static void *skcipher_bind(const char *name, u32 type, u32 mask)
+ static int skcipher_recvmsg_nokey(struct socket *sock, struct msghdr *msg,
 diff --git a/include/crypto/if_alg.h b/include/crypto/if_alg.h
-index ef08fb4a599e..7bac3fee6061 100644
+index c67d9a35ffd3..d271af60bfaf 100644
 --- a/include/crypto/if_alg.h
 +++ b/include/crypto/if_alg.h
-@@ -254,5 +254,7 @@ int af_alg_sendmsg(struct socket *sock, struct msghdr *msg, size_t size,
- ssize_t af_alg_sendpage(struct socket *sock, struct page *page,
- 			int offset, size_t size, int flags);
- void af_alg_async_cb(struct crypto_async_request *_req, int err);
-+unsigned int af_alg_poll(struct file *file, struct socket *sock,
-+			 poll_table *wait);
+@@ -251,5 +251,7 @@ int af_alg_wait_for_data(struct sock *sk, unsigned flags);
+ void af_alg_data_wakeup(struct sock *sk);
+ int af_alg_sendmsg(struct socket *sock, struct msghdr *msg, size_t size,
+ 		   unsigned int ivsize);
++ssize_t af_alg_sendpage(struct socket *sock, struct page *page,
++			int offset, size_t size, int flags);
  
  #endif	/* _CRYPTO_IF_ALG_H */
 -- 
