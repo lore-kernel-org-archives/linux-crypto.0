@@ -1,118 +1,72 @@
-From: =?UTF-8?q?Simon=20Sandstr=C3=B6m?= <simon@nikanor.nu>
-Subject: [PATCH] staging: ccree: Use sizeof(variable) in memory allocs
-Date: Sun, 30 Jul 2017 22:29:02 +0200
-Message-ID: <20170730202902.8953-1-simon@nikanor.nu>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: Re: [PATCH] ccree: Removed a sparse warning in ssi_fips.h
+Date: Mon, 31 Jul 2017 08:13:41 +0300
+Message-ID: <CAOtvUMeL+dee4vH66ZYhkSHxYfO6O-i0___sOdQng0xkMsFT1Q@mail.gmail.com>
+References: <1501424133-27810-1-git-send-email-rishabheudyptula@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: devel@driverdev.osuosl.org, gregkh@linuxfoundation.org,
- driverdev-devel@linuxdriverproject.org, linux-crypto@vger.kernel.org,
- =?UTF-8?q?Simon=20Sandstr=C3=B6m?= <simon@nikanor.nu>
-To: gilad@benyossef.com
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-crypto@vger.kernel.org
+To: rishabh hardas <rishabheudyptula@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-it0-f65.google.com ([209.85.214.65]:38291 "EHLO
+        mail-it0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750789AbdGaFNn (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 31 Jul 2017 01:13:43 -0400
+Received: by mail-it0-f65.google.com with SMTP id h199so13981291ith.5
+        for <linux-crypto@vger.kernel.org>; Sun, 30 Jul 2017 22:13:42 -0700 (PDT)
+In-Reply-To: <1501424133-27810-1-git-send-email-rishabheudyptula@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Rml4ZXMgOSBjaGVja3BhdGNoLnBsIHdhcm5pbmdzIG9mIHR5cGUKIlByZWZlciBrbWFsbG9jKHNp
-emVvZih2YXJpYWJsZSkuLi4pIG92ZXIga21hbGxvYyhzaXplb2YodHlwZSkuLi4pIgppbiBzdGFn
-aW5nL2NjcmVlLgoKU2lnbmVkLW9mZi1ieTogU2ltb24gU2FuZHN0csO2bSA8c2ltb25AbmlrYW5v
-ci5udT4KLS0tCiBkcml2ZXJzL3N0YWdpbmcvY2NyZWUvc3NpX2FlYWQuYyAgICAgICAgfCA0ICsr
-LS0KIGRyaXZlcnMvc3RhZ2luZy9jY3JlZS9zc2lfY2lwaGVyLmMgICAgICB8IDUgKystLS0KIGRy
-aXZlcnMvc3RhZ2luZy9jY3JlZS9zc2lfZHJpdmVyLmMgICAgICB8IDMgKystCiBkcml2ZXJzL3N0
-YWdpbmcvY2NyZWUvc3NpX2hhc2guYyAgICAgICAgfCA4ICsrKystLS0tCiBkcml2ZXJzL3N0YWdp
-bmcvY2NyZWUvc3NpX2l2Z2VuLmMgICAgICAgfCA1ICsrKy0tCiBkcml2ZXJzL3N0YWdpbmcvY2Ny
-ZWUvc3NpX3JlcXVlc3RfbWdyLmMgfCAyICstCiA2IGZpbGVzIGNoYW5nZWQsIDE0IGluc2VydGlv
-bnMoKyksIDEzIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2RyaXZlcnMvc3RhZ2luZy9jY3Jl
-ZS9zc2lfYWVhZC5jIGIvZHJpdmVycy9zdGFnaW5nL2NjcmVlL3NzaV9hZWFkLmMKaW5kZXggZjVj
-YTBlMzVjNWQzLi41YWJlNmIyNGZmOGMgMTAwNjQ0Ci0tLSBhL2RyaXZlcnMvc3RhZ2luZy9jY3Jl
-ZS9zc2lfYWVhZC5jCisrKyBiL2RyaXZlcnMvc3RhZ2luZy9jY3JlZS9zc2lfYWVhZC5jCkBAIC0y
-NjU5LDcgKzI2NTksNyBAQCBzdGF0aWMgc3RydWN0IHNzaV9jcnlwdG9fYWxnICpzc2lfYWVhZF9j
-cmVhdGVfYWxnKHN0cnVjdCBzc2lfYWxnX3RlbXBsYXRlICp0ZW1wbAogCXN0cnVjdCBzc2lfY3J5
-cHRvX2FsZyAqdF9hbGc7CiAJc3RydWN0IGFlYWRfYWxnICphbGc7CiAKLQl0X2FsZyA9IGt6YWxs
-b2Moc2l6ZW9mKHN0cnVjdCBzc2lfY3J5cHRvX2FsZyksIEdGUF9LRVJORUwpOworCXRfYWxnID0g
-a3phbGxvYyhzaXplb2YoKnRfYWxnKSwgR0ZQX0tFUk5FTCk7CiAJaWYgKCF0X2FsZykgewogCQlT
-U0lfTE9HX0VSUigiZmFpbGVkIHRvIGFsbG9jYXRlIHRfYWxnXG4iKTsKIAkJcmV0dXJuIEVSUl9Q
-VFIoLUVOT01FTSk7CkBAIC0yNzE0LDcgKzI3MTQsNyBAQCBpbnQgc3NpX2FlYWRfYWxsb2Moc3Ry
-dWN0IHNzaV9kcnZkYXRhICpkcnZkYXRhKQogCWludCByYyA9IC1FTk9NRU07CiAJaW50IGFsZzsK
-IAotCWFlYWRfaGFuZGxlID0ga21hbGxvYyhzaXplb2Yoc3RydWN0IHNzaV9hZWFkX2hhbmRsZSks
-IEdGUF9LRVJORUwpOworCWFlYWRfaGFuZGxlID0ga21hbGxvYyhzaXplb2YoKmFlYWRfaGFuZGxl
-KSwgR0ZQX0tFUk5FTCk7CiAJaWYgKCFhZWFkX2hhbmRsZSkgewogCQlyYyA9IC1FTk9NRU07CiAJ
-CWdvdG8gZmFpbDA7CmRpZmYgLS1naXQgYS9kcml2ZXJzL3N0YWdpbmcvY2NyZWUvc3NpX2NpcGhl
-ci5jIGIvZHJpdmVycy9zdGFnaW5nL2NjcmVlL3NzaV9jaXBoZXIuYwppbmRleCA2MjE5YTkyMTg0
-YWEuLmFmOWFmZWFkN2JjYiAxMDA2NDQKLS0tIGEvZHJpdmVycy9zdGFnaW5nL2NjcmVlL3NzaV9j
-aXBoZXIuYworKysgYi9kcml2ZXJzL3N0YWdpbmcvY2NyZWUvc3NpX2NpcGhlci5jCkBAIC0xMjE4
-LDcgKzEyMTgsNyBAQCBzdHJ1Y3Qgc3NpX2NyeXB0b19hbGcgKnNzaV9hYmxrY2lwaGVyX2NyZWF0
-ZV9hbGcoc3RydWN0IHNzaV9hbGdfdGVtcGxhdGUgKnRlbXBsYQogCXN0cnVjdCBzc2lfY3J5cHRv
-X2FsZyAqdF9hbGc7CiAJc3RydWN0IGNyeXB0b19hbGcgKmFsZzsKIAotCXRfYWxnID0ga3phbGxv
-YyhzaXplb2Yoc3RydWN0IHNzaV9jcnlwdG9fYWxnKSwgR0ZQX0tFUk5FTCk7CisJdF9hbGcgPSBr
-emFsbG9jKHNpemVvZigqdF9hbGcpLCBHRlBfS0VSTkVMKTsKIAlpZiAoIXRfYWxnKSB7CiAJCVNT
-SV9MT0dfRVJSKCJmYWlsZWQgdG8gYWxsb2NhdGUgdF9hbGdcbiIpOwogCQlyZXR1cm4gRVJSX1BU
-UigtRU5PTUVNKTsKQEAgLTEyNzksOCArMTI3OSw3IEBAIGludCBzc2lfYWJsa2NpcGhlcl9hbGxv
-YyhzdHJ1Y3Qgc3NpX2RydmRhdGEgKmRydmRhdGEpCiAJaW50IHJjID0gLUVOT01FTTsKIAlpbnQg
-YWxnOwogCi0JYWJsa2NpcGhlcl9oYW5kbGUgPSBrbWFsbG9jKHNpemVvZihzdHJ1Y3Qgc3NpX2Js
-a2NpcGhlcl9oYW5kbGUpLAotCQkJCSAgICBHRlBfS0VSTkVMKTsKKwlhYmxrY2lwaGVyX2hhbmRs
-ZSA9IGttYWxsb2Moc2l6ZW9mKCphYmxrY2lwaGVyX2hhbmRsZSksIEdGUF9LRVJORUwpOwogCWlm
-ICghYWJsa2NpcGhlcl9oYW5kbGUpCiAJCXJldHVybiAtRU5PTUVNOwogCmRpZmYgLS1naXQgYS9k
-cml2ZXJzL3N0YWdpbmcvY2NyZWUvc3NpX2RyaXZlci5jIGIvZHJpdmVycy9zdGFnaW5nL2NjcmVl
-L3NzaV9kcml2ZXIuYwppbmRleCBhNGFiOWVmNGJhZjcuLjg4YjY4YzgxNTU2YyAxMDA2NDQKLS0t
-IGEvZHJpdmVycy9zdGFnaW5nL2NjcmVlL3NzaV9kcml2ZXIuYworKysgYi9kcml2ZXJzL3N0YWdp
-bmcvY2NyZWUvc3NpX2RyaXZlci5jCkBAIC0yMjMsNyArMjIzLDggQEAgc3RhdGljIGludCBpbml0
-X2NjX3Jlc291cmNlcyhzdHJ1Y3QgcGxhdGZvcm1fZGV2aWNlICpwbGF0X2RldikKIAlzdHJ1Y3Qg
-cmVzb3VyY2UgKnJlcV9tZW1fY2NfcmVncyA9IE5VTEw7CiAJdm9pZCBfX2lvbWVtICpjY19iYXNl
-ID0gTlVMTDsKIAlib29sIGlycV9yZWdpc3RlcmVkID0gZmFsc2U7Ci0Jc3RydWN0IHNzaV9kcnZk
-YXRhICpuZXdfZHJ2ZGF0YSA9IGt6YWxsb2Moc2l6ZW9mKHN0cnVjdCBzc2lfZHJ2ZGF0YSksIEdG
-UF9LRVJORUwpOworCXN0cnVjdCBzc2lfZHJ2ZGF0YSAqbmV3X2RydmRhdGEgPSBremFsbG9jKHNp
-emVvZigqbmV3X2RydmRhdGEpLAorCQkJCQkJICBHRlBfS0VSTkVMKTsKIAlzdHJ1Y3QgZGV2aWNl
-ICpkZXYgPSAmcGxhdF9kZXYtPmRldjsKIAlzdHJ1Y3QgZGV2aWNlX25vZGUgKm5wID0gZGV2LT5v
-Zl9ub2RlOwogCXUzMiBzaWduYXR1cmVfdmFsOwpkaWZmIC0tZ2l0IGEvZHJpdmVycy9zdGFnaW5n
-L2NjcmVlL3NzaV9oYXNoLmMgYi9kcml2ZXJzL3N0YWdpbmcvY2NyZWUvc3NpX2hhc2guYwppbmRl
-eCAxYTQwNWJiYWRmNmQuLjEzMjkxYWVhZjM1MCAxMDA2NDQKLS0tIGEvZHJpdmVycy9zdGFnaW5n
-L2NjcmVlL3NzaV9oYXNoLmMKKysrIGIvZHJpdmVycy9zdGFnaW5nL2NjcmVlL3NzaV9oYXNoLmMK
-QEAgLTIwNjAsOSArMjA2MCw5IEBAIHNzaV9oYXNoX2NyZWF0ZV9hbGcoc3RydWN0IHNzaV9oYXNo
-X3RlbXBsYXRlICp0ZW1wbGF0ZSwgYm9vbCBrZXllZCkKIAlzdHJ1Y3QgY3J5cHRvX2FsZyAqYWxn
-OwogCXN0cnVjdCBhaGFzaF9hbGcgKmhhbGc7CiAKLQl0X2NyeXB0b19hbGcgPSBremFsbG9jKHNp
-emVvZihzdHJ1Y3Qgc3NpX2hhc2hfYWxnKSwgR0ZQX0tFUk5FTCk7CisJdF9jcnlwdG9fYWxnID0g
-a3phbGxvYyhzaXplb2YoKnRfY3J5cHRvX2FsZyksIEdGUF9LRVJORUwpOwogCWlmICghdF9jcnlw
-dG9fYWxnKSB7Ci0JCVNTSV9MT0dfRVJSKCJmYWlsZWQgdG8gYWxsb2NhdGUgdF9hbGdcbiIpOwor
-CQlTU0lfTE9HX0VSUigiZmFpbGVkIHRvIGFsbG9jYXRlIHRfY3J5cHRvX2FsZ1xuIik7CiAJCXJl
-dHVybiBFUlJfUFRSKC1FTk9NRU0pOwogCX0KIApAQCAtMjIyNiwxMCArMjIyNiwxMCBAQCBpbnQg
-c3NpX2hhc2hfYWxsb2Moc3RydWN0IHNzaV9kcnZkYXRhICpkcnZkYXRhKQogCWludCByYyA9IDA7
-CiAJaW50IGFsZzsKIAotCWhhc2hfaGFuZGxlID0ga3phbGxvYyhzaXplb2Yoc3RydWN0IHNzaV9o
-YXNoX2hhbmRsZSksIEdGUF9LRVJORUwpOworCWhhc2hfaGFuZGxlID0ga3phbGxvYyhzaXplb2Yo
-Kmhhc2hfaGFuZGxlKSwgR0ZQX0tFUk5FTCk7CiAJaWYgKCFoYXNoX2hhbmRsZSkgewogCQlTU0lf
-TE9HX0VSUigia3phbGxvYyBmYWlsZWQgdG8gYWxsb2NhdGUgJXp1IEJcbiIsCi0JCQkgICAgc2l6
-ZW9mKHN0cnVjdCBzc2lfaGFzaF9oYW5kbGUpKTsKKwkJCSAgICBzaXplb2YoKmhhc2hfaGFuZGxl
-KSk7CiAJCXJjID0gLUVOT01FTTsKIAkJZ290byBmYWlsOwogCX0KZGlmZiAtLWdpdCBhL2RyaXZl
-cnMvc3RhZ2luZy9jY3JlZS9zc2lfaXZnZW4uYyBiL2RyaXZlcnMvc3RhZ2luZy9jY3JlZS9zc2lf
-aXZnZW4uYwppbmRleCA4NjM2NGY4MWFjYWIuLmIwMWUwMzIzMTk0NyAxMDA2NDQKLS0tIGEvZHJp
-dmVycy9zdGFnaW5nL2NjcmVlL3NzaV9pdmdlbi5jCisrKyBiL2RyaXZlcnMvc3RhZ2luZy9jY3Jl
-ZS9zc2lfaXZnZW4uYwpAQCAtMTkxLDEwICsxOTEsMTEgQEAgaW50IHNzaV9pdmdlbl9pbml0KHN0
-cnVjdCBzc2lfZHJ2ZGF0YSAqZHJ2ZGF0YSkKIAlpbnQgcmM7CiAKIAkvKiBBbGxvY2F0ZSAidGhp
-cyIgY29udGV4dCAqLwotCWRydmRhdGEtPml2Z2VuX2hhbmRsZSA9IGt6YWxsb2Moc2l6ZW9mKHN0
-cnVjdCBzc2lfaXZnZW5fY3R4KSwgR0ZQX0tFUk5FTCk7CisJZHJ2ZGF0YS0+aXZnZW5faGFuZGxl
-ID0ga3phbGxvYyhzaXplb2YoKmRydmRhdGEtPml2Z2VuX2hhbmRsZSksCisJCQkJCUdGUF9LRVJO
-RUwpOwogCWlmICghZHJ2ZGF0YS0+aXZnZW5faGFuZGxlKSB7CiAJCVNTSV9MT0dfRVJSKCJOb3Qg
-ZW5vdWdoIG1lbW9yeSB0byBhbGxvY2F0ZSBJVkdFTiBjb250ZXh0ICIKLQkJCSAgICIoJXp1IEIp
-XG4iLCBzaXplb2Yoc3RydWN0IHNzaV9pdmdlbl9jdHgpKTsKKwkJCSAgICIoJXp1IEIpXG4iLCBz
-aXplb2YoKmRydmRhdGEtPml2Z2VuX2hhbmRsZSkpOwogCQlyYyA9IC1FTk9NRU07CiAJCWdvdG8g
-b3V0OwogCX0KZGlmZiAtLWdpdCBhL2RyaXZlcnMvc3RhZ2luZy9jY3JlZS9zc2lfcmVxdWVzdF9t
-Z3IuYyBiL2RyaXZlcnMvc3RhZ2luZy9jY3JlZS9zc2lfcmVxdWVzdF9tZ3IuYwppbmRleCAyZWRh
-ODJmMzE3ZDIuLmU1YzJmOTI4NTdmNiAxMDA2NDQKLS0tIGEvZHJpdmVycy9zdGFnaW5nL2NjcmVl
-L3NzaV9yZXF1ZXN0X21nci5jCisrKyBiL2RyaXZlcnMvc3RhZ2luZy9jY3JlZS9zc2lfcmVxdWVz
-dF9tZ3IuYwpAQCAtMTAwLDcgKzEwMCw3IEBAIGludCByZXF1ZXN0X21ncl9pbml0KHN0cnVjdCBz
-c2lfZHJ2ZGF0YSAqZHJ2ZGF0YSkKIAlzdHJ1Y3Qgc3NpX3JlcXVlc3RfbWdyX2hhbmRsZSAqcmVx
-X21ncl9oOwogCWludCByYyA9IDA7CiAKLQlyZXFfbWdyX2ggPSBremFsbG9jKHNpemVvZihzdHJ1
-Y3Qgc3NpX3JlcXVlc3RfbWdyX2hhbmRsZSksIEdGUF9LRVJORUwpOworCXJlcV9tZ3JfaCA9IGt6
-YWxsb2Moc2l6ZW9mKCpyZXFfbWdyX2gpLCBHRlBfS0VSTkVMKTsKIAlpZiAoIXJlcV9tZ3JfaCkg
-ewogCQlyYyA9IC1FTk9NRU07CiAJCWdvdG8gcmVxX21ncl9pbml0X2VycjsKLS0gCjIuMTEuMAoK
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KZGV2ZWwgbWFp
-bGluZyBsaXN0CmRldmVsQGxpbnV4ZHJpdmVycHJvamVjdC5vcmcKaHR0cDovL2RyaXZlcmRldi5s
-aW51eGRyaXZlcnByb2plY3Qub3JnL21haWxtYW4vbGlzdGluZm8vZHJpdmVyZGV2LWRldmVsCg==
+Hi Rishabh,
+
+Thanks you for spotting this.
+
+On Sun, Jul 30, 2017 at 5:15 PM, rishabh hardas
+<rishabheudyptula@gmail.com> wrote:
+> Sparse was giving out a warning 'warning: symbol 'cc_set_ree_fips_status' was not declared. Should it be static?'
+> which has been removed by making it static.
+>
+> Signed-off-by: rishabh hardas <rishabheudyptula@gmail.com>
+> ---
+>  drivers/staging/ccree/ssi_fips.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/staging/ccree/ssi_fips.h b/drivers/staging/ccree/ssi_fips.h
+> index 369ddf9..846bd55 100644
+> --- a/drivers/staging/ccree/ssi_fips.h
+> +++ b/drivers/staging/ccree/ssi_fips.h
+> @@ -40,7 +40,7 @@ static inline int ssi_fips_init(struct ssi_drvdata *p_drvdata)
+>  }
+>
+>  static inline void ssi_fips_fini(struct ssi_drvdata *drvdata) {}
+> -void cc_set_ree_fips_status(struct ssi_drvdata *drvdata, bool ok) {}
+> +static void cc_set_ree_fips_status(struct ssi_drvdata *drvdata, bool ok) {}
+>  void fips_handler(struct ssi_drvdata *drvdata) {}
+>
+>  #endif /* CONFIG_CRYPTO_FIPS */
+> --
+> 2.7.4
+>
+
+A better modifier here would be "static inline". While you're at it
+you can also apply it to the fips_handler() function below.
+
+Also, please use a descriptive title, maybe: "declare compiled out
+func  static inline"
+
+Last, please CC ALL the appropriate mailing lists. Use the kernel
+get_maintainer script to find out which if you are unsure.
+
+Thanks again,
+Gilad
+
+-- 
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+"If you take a class in large-scale robotics, can you end up in a
+situation where the homework eats your dog?"
+ -- Jean-Baptiste Queru
