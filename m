@@ -1,49 +1,61 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH] crypto: ccp - select CONFIG_CRYPTO_RSA
-Date: Mon, 31 Jul 2017 23:10:57 +0200
-Message-ID: <20170731211104.2012741-1-arnd@arndb.de>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>,
+From: Dave Watson <davejwatson@fb.com>
+Subject: Re: [PATCH v3 net-next 1/4] tcp: ULP infrastructure
+Date: Mon, 31 Jul 2017 15:16:14 -0700
+Message-ID: <20170731221614.GB93172@dhcp-172-20-173-153.dhcp.thefacebook.com>
+References: <cover.1497465295.git.davejwatson@fb.com>
+ <20170614183714.GA80310@davejwatson-mba.dhcp.thefacebook.com>
+ <CALx6S35SmGC1ZSC9EiDH0gCUxGcFOJOTPOR-NzrgafKNC8oMYg@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Cc: Ilya Lesokhin <ilyal@mellanox.com>,
+        Aviad Yehezkel <aviadye@mellanox.com>,
+        Boris Pismenny <borisp@mellanox.com>,
+        Liran Liss <liranl@mellanox.com>,
+        Matan Barak <matanb@mellanox.com>,
+        David Miller <davem@davemloft.net>,
+        Linux Kernel Network Developers <netdev@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Hannes Frederic Sowa <hannes@stressinduktion.org>,
+        Eric Dumazet <eric.dumazet@gmail.com>,
+        Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+        Nikos Mavrogiannopoulos <nmav@gnutls.org>,
+        =?iso-8859-1?Q?Fridol=EDn_Pokorn=FD?= <fridolin.pokorny@gmail.com>
+To: Tom Herbert <tom@herbertland.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([217.72.192.74]:53773 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751337AbdGaVLY (ORCPT
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:53592 "EHLO
+        mx0b-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1751017AbdGaWQn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 31 Jul 2017 17:11:24 -0400
+        Mon, 31 Jul 2017 18:16:43 -0400
+Content-Disposition: inline
+In-Reply-To: <CALx6S35SmGC1ZSC9EiDH0gCUxGcFOJOTPOR-NzrgafKNC8oMYg@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Without the base RSA code, we run into a link error:
+On 07/29/17 01:12 PM, Tom Herbert wrote:
+> On Wed, Jun 14, 2017 at 11:37 AM, Dave Watson <davejwatson@fb.com> wrote:
+> > Add the infrustructure for attaching Upper Layer Protocols (ULPs) over TCP
+> > sockets. Based on a similar infrastructure in tcp_cong.  The idea is that any
+> > ULP can add its own logic by changing the TCP proto_ops structure to its own
+> > methods.
+> >
+> > Example usage:
+> >
+> > setsockopt(sock, SOL_TCP, TCP_ULP, "tls", sizeof("tls"));
+> >
+> One question: is there a good reason why the ULP infrastructure should
+> just be for TCP sockets. For example, I'd really like to be able
+> something like:
+> 
+> setsockopt(sock, SOL_SOCKET, SO_ULP, &ulp_param, sizeof(ulp_param));
+> 
+> Where ulp_param is a structure containing the ULP name as well as some
+> ULP specific parameters that are passed to init_ulp. ulp_init could
+> determine whether the socket family is appropriate for the ULP being
+> requested.
 
-ERROR: "rsa_parse_pub_key" [drivers/crypto/ccp/ccp-crypto.ko] undefined!
-ERROR: "rsa_parse_priv_key" [drivers/crypto/ccp/ccp-crypto.ko] undefined!
-
-Like the other drivers implementing RSA in hardware, this
-can be avoided by always enabling the base support when we build
-CCP.
-
-Fixes: ceeec0afd684 ("crypto: ccp - Add support for RSA on the CCP")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/crypto/ccp/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/crypto/ccp/Kconfig b/drivers/crypto/ccp/Kconfig
-index 15b63fd3d180..6d626606b9c5 100644
---- a/drivers/crypto/ccp/Kconfig
-+++ b/drivers/crypto/ccp/Kconfig
-@@ -27,6 +27,7 @@ config CRYPTO_DEV_CCP_CRYPTO
- 	select CRYPTO_HASH
- 	select CRYPTO_BLKCIPHER
- 	select CRYPTO_AUTHENC
-+	select CRYPTO_RSA
- 	help
- 	  Support for using the cryptographic API with the AMD Cryptographic
- 	  Coprocessor. This module supports offload of SHA and AES algorithms.
--- 
-2.9.0
+Using SOL_SOCKET instead seems reasonable to me.  I can see how
+ulp_params could have some use, perhaps at a slight loss in clarity.
+TLS needs its own setsockopts anyway though, for renegotiate for
+example.
