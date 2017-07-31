@@ -1,43 +1,44 @@
-From: RishabhHardas <rishabheudyptula@gmail.com>
-Subject: [PATCH] staging/ccree: Declare compiled out fuctions static inline
-Date: Mon, 31 Jul 2017 14:47:23 +0530
-Message-ID: <1501492643-7087-1-git-send-email-rishabheudyptula@gmail.com>
-Cc: gregkh@linuxfoundation.org, linux-crypto@vger.kernel.org,
+From: Joe Perches <joe@perches.com>
+Subject: Re: [PATCH] staging: ccree: Fix format/argument mismatches
+Date: Mon, 31 Jul 2017 03:17:38 -0700
+Message-ID: <1501496258.22828.2.camel@perches.com>
+References: <ad38ad75c09fb836cc89127e5049c7619325927d.1501433084.git.joe@perches.com>
+         <CAOtvUMfru3VJiBoVrCcLYzuuJAhUOyNknH=Udjj8pAHTtCk4mQ@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-crypto@vger.kernel.org,
         driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
-        linux-kernel@vger.kernel.org,
-        RishabhHardas <rishabhhardas@gmail.com>
-To: gilad@benyossef.com
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>
+To: Gilad Ben-Yossef <gilad@benyossef.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pg0-f65.google.com ([74.125.83.65]:33867 "EHLO
-        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750807AbdGaJTp (ORCPT
+Received: from smtprelay0130.hostedemail.com ([216.40.44.130]:41145 "EHLO
+        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1750847AbdGaKRn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 31 Jul 2017 05:19:45 -0400
+        Mon, 31 Jul 2017 06:17:43 -0400
+In-Reply-To: <CAOtvUMfru3VJiBoVrCcLYzuuJAhUOyNknH=Udjj8pAHTtCk4mQ@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: RishabhHardas <rishabhhardas@gmail.com>
+On Mon, 2017-07-31 at 09:39 +0300, Gilad Ben-Yossef wrote:
+> On Sun, Jul 30, 2017 at 7:45 PM, Joe Perches <joe@perches.com> wrote:
+> > By default, debug logging is disabled by CC_DEBUG not being defined.
+> > 
+> > Convert SSI_LOG_DEBUG to use no_printk instead of an empty define
+> > to validate formats and arguments.
+> > 
+> > Fix fallout.
+> > 
+> > Miscellanea:
+> > 
+> > o One of the conversions now uses %pR instead of multiple uses of %pad
+> 
+> This looks great (I didn't know about no_printk) but does not seem to
+> apply on top of
+> staging-next.
 
-Sparse was giving out a warning for symbols 'cc_set_ree_fips_status' and 'fips_handler'
-that they were not declared and need to be made static. This patch makes both the symbols
-static inline, to remove the warnings.
+Applies to next-20170728
 
-Signed-off-by: RishabhHardas <rishabhhardas@gmail.com>
----
- drivers/staging/ccree/ssi_fips.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/staging/ccree/ssi_fips.h b/drivers/staging/ccree/ssi_fips.h
-index 369ddf9..63bcca7 100644
---- a/drivers/staging/ccree/ssi_fips.h
-+++ b/drivers/staging/ccree/ssi_fips.h
-@@ -40,1 +40,1 @@ static inline int ssi_fips_init(struct ssi_drvdata *p_drvdata)
- }
-
- static inline void ssi_fips_fini(struct ssi_drvdata *drvdata) {}
--void cc_set_ree_fips_status(struct ssi_drvdata *drvdata, bool ok) {}
--void fips_handler(struct ssi_drvdata *drvdata) {}
-+static inline void cc_set_ree_fips_status(struct ssi_drvdata *drvdata, bool ok) {}
-+static inline void fips_handler(struct ssi_drvdata *drvdata) {}
-
- #endif /* CONFIG_CRYPTO_FIPS */
+b2cf822e075f7a7e7ced8c50af600f9edf5ccc31
