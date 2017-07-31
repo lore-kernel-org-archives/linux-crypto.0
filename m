@@ -1,59 +1,168 @@
 From: Fabio Estevam <festevam@gmail.com>
-Subject: Re: [PATCH] crypto: caam/qi - Remove unused 'qi_congested' entry
-Date: Mon, 31 Jul 2017 09:14:26 -0300
-Message-ID: <CAOMZO5DYTRRShoJO0uTz9Y_j3Ojo-aErg-=92RSazW7s1a==+w@mail.gmail.com>
-References: <1501368901-8248-1-git-send-email-festevam@gmail.com> <VI1PR0401MB2591F4C20C9318D4F59424C898B20@VI1PR0401MB2591.eurprd04.prod.outlook.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Cc: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Fabio Estevam <fabio.estevam@nxp.com>
-To: =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>
+Subject: [PATCH v2] crypto: caam: Remove unused dentry members
+Date: Mon, 31 Jul 2017 09:21:51 -0300
+Message-ID: <1501503711-12920-1-git-send-email-festevam@gmail.com>
+Cc: horia.geanta@nxp.com, linux-crypto@vger.kernel.org,
+        Fabio Estevam <festevam@gmail.com>
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-vk0-f66.google.com ([209.85.213.66]:38480 "EHLO
-        mail-vk0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750979AbdGaMO1 (ORCPT
+Received: from mail-qt0-f194.google.com ([209.85.216.194]:33512 "EHLO
+        mail-qt0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751054AbdGaMV7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 31 Jul 2017 08:14:27 -0400
-Received: by mail-vk0-f66.google.com with SMTP id i133so4865514vka.5
-        for <linux-crypto@vger.kernel.org>; Mon, 31 Jul 2017 05:14:27 -0700 (PDT)
-In-Reply-To: <VI1PR0401MB2591F4C20C9318D4F59424C898B20@VI1PR0401MB2591.eurprd04.prod.outlook.com>
+        Mon, 31 Jul 2017 08:21:59 -0400
+Received: by mail-qt0-f194.google.com with SMTP id u19so15311948qtc.0
+        for <linux-crypto@vger.kernel.org>; Mon, 31 Jul 2017 05:21:59 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jul 31, 2017 at 4:22 AM, Horia Geant=C4=83 <horia.geanta@nxp.com> w=
-rote:
-> On 7/30/2017 1:55 AM, Fabio Estevam wrote:
->> From: Fabio Estevam <fabio.estevam@nxp.com>
->>
->> 'qi_congested' member from structure caam_drv_private
->> is never used at all, so it is safe to remove it.
->
-> Agree, though I would remove all the other dentry members not currently
-> used - since debugfs_remove_recursive() is called, we don't need the
-> file entries.
+Most of the dentry members from structure caam_drv_private
+are never used at all, so it is safe to remove them.
 
-Ok, it makes sense. Wil do it in v2.
+Since debugfs_remove_recursive() is called, we don't need the
+file entries.
 
->> diff --git a/drivers/crypto/caam/qi.c b/drivers/crypto/caam/qi.c
->> index 6d5a010..b2f7a42 100644
->> --- a/drivers/crypto/caam/qi.c
->> +++ b/drivers/crypto/caam/qi.c
->> @@ -793,10 +793,8 @@ int caam_qi_init(struct platform_device *caam_pdev)
->>       /* Done with the CGRs; restore the cpus allowed mask */
->>       set_cpus_allowed_ptr(current, &old_cpumask);
->>  #ifdef CONFIG_DEBUG_FS
->> -     ctrlpriv->qi_congested =3D debugfs_create_file("qi_congested", 044=
-4,
->> -                                                  ctrlpriv->ctl,
->> -                                                  &times_congested,
->> -                                                  &caam_fops_u64_ro);
->> +     debugfs_create_file("qi_congested", 0444, ctrlpriv->ctl,
->> +                         &times_congested, &caam_fops_u64_ro);
->
-> Either here or in a different patch the return value of debugfs_create_*
-> functions should be checked, such that if IS_ERR_OR_NULL(ret) we could
-> print a warning.
+Signed-off-by: Fabio Estevam <festevam@gmail.com>
+---
+Changes since v1:
+- Remove all the unused dentry members (Horia)
 
-I will leave the error checking for a separate patch then.
+ drivers/crypto/caam/ctrl.c   | 81 ++++++++++++++++----------------------------
+ drivers/crypto/caam/intern.h |  8 -----
+ drivers/crypto/caam/qi.c     |  6 ++--
+ 3 files changed, 32 insertions(+), 63 deletions(-)
+
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index 7338f15..dc65fed 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -734,59 +734,38 @@ static int caam_probe(struct platform_device *pdev)
+ 		 ctrlpriv->total_jobrs, ctrlpriv->qi_present);
+ 
+ #ifdef CONFIG_DEBUG_FS
+-
+-	ctrlpriv->ctl_rq_dequeued =
+-		debugfs_create_file("rq_dequeued",
+-				    S_IRUSR | S_IRGRP | S_IROTH,
+-				    ctrlpriv->ctl, &perfmon->req_dequeued,
+-				    &caam_fops_u64_ro);
+-	ctrlpriv->ctl_ob_enc_req =
+-		debugfs_create_file("ob_rq_encrypted",
+-				    S_IRUSR | S_IRGRP | S_IROTH,
+-				    ctrlpriv->ctl, &perfmon->ob_enc_req,
+-				    &caam_fops_u64_ro);
+-	ctrlpriv->ctl_ib_dec_req =
+-		debugfs_create_file("ib_rq_decrypted",
+-				    S_IRUSR | S_IRGRP | S_IROTH,
+-				    ctrlpriv->ctl, &perfmon->ib_dec_req,
+-				    &caam_fops_u64_ro);
+-	ctrlpriv->ctl_ob_enc_bytes =
+-		debugfs_create_file("ob_bytes_encrypted",
+-				    S_IRUSR | S_IRGRP | S_IROTH,
+-				    ctrlpriv->ctl, &perfmon->ob_enc_bytes,
+-				    &caam_fops_u64_ro);
+-	ctrlpriv->ctl_ob_prot_bytes =
+-		debugfs_create_file("ob_bytes_protected",
+-				    S_IRUSR | S_IRGRP | S_IROTH,
+-				    ctrlpriv->ctl, &perfmon->ob_prot_bytes,
+-				    &caam_fops_u64_ro);
+-	ctrlpriv->ctl_ib_dec_bytes =
+-		debugfs_create_file("ib_bytes_decrypted",
+-				    S_IRUSR | S_IRGRP | S_IROTH,
+-				    ctrlpriv->ctl, &perfmon->ib_dec_bytes,
+-				    &caam_fops_u64_ro);
+-	ctrlpriv->ctl_ib_valid_bytes =
+-		debugfs_create_file("ib_bytes_validated",
+-				    S_IRUSR | S_IRGRP | S_IROTH,
+-				    ctrlpriv->ctl, &perfmon->ib_valid_bytes,
+-				    &caam_fops_u64_ro);
++	debugfs_create_file("rq_dequeued",S_IRUSR | S_IRGRP | S_IROTH,
++			    ctrlpriv->ctl, &perfmon->req_dequeued,
++			    &caam_fops_u64_ro);
++	debugfs_create_file("ob_rq_encrypted", S_IRUSR | S_IRGRP | S_IROTH,
++			    ctrlpriv->ctl, &perfmon->ob_enc_req,
++			    &caam_fops_u64_ro);
++	debugfs_create_file("ib_rq_decrypted", S_IRUSR | S_IRGRP | S_IROTH,
++			    ctrlpriv->ctl, &perfmon->ib_dec_req,
++			    &caam_fops_u64_ro);
++	debugfs_create_file("ob_bytes_encrypted", S_IRUSR | S_IRGRP | S_IROTH,
++			    ctrlpriv->ctl, &perfmon->ob_enc_bytes,
++			    &caam_fops_u64_ro);
++	debugfs_create_file("ob_bytes_protected", S_IRUSR | S_IRGRP | S_IROTH,
++			    ctrlpriv->ctl, &perfmon->ob_prot_bytes,
++			    &caam_fops_u64_ro);
++	debugfs_create_file("ib_bytes_decrypted", S_IRUSR | S_IRGRP | S_IROTH,
++			    ctrlpriv->ctl, &perfmon->ib_dec_bytes,
++			    &caam_fops_u64_ro);
++	debugfs_create_file("ib_bytes_validated", S_IRUSR | S_IRGRP | S_IROTH,
++			    ctrlpriv->ctl, &perfmon->ib_valid_bytes,
++			    &caam_fops_u64_ro);
+ 
+ 	/* Controller level - global status values */
+-	ctrlpriv->ctl_faultaddr =
+-		debugfs_create_file("fault_addr",
+-				    S_IRUSR | S_IRGRP | S_IROTH,
+-				    ctrlpriv->ctl, &perfmon->faultaddr,
+-				    &caam_fops_u32_ro);
+-	ctrlpriv->ctl_faultdetail =
+-		debugfs_create_file("fault_detail",
+-				    S_IRUSR | S_IRGRP | S_IROTH,
+-				    ctrlpriv->ctl, &perfmon->faultdetail,
+-				    &caam_fops_u32_ro);
+-	ctrlpriv->ctl_faultstatus =
+-		debugfs_create_file("fault_status",
+-				    S_IRUSR | S_IRGRP | S_IROTH,
+-				    ctrlpriv->ctl, &perfmon->status,
+-				    &caam_fops_u32_ro);
++	debugfs_create_file("fault_addr", S_IRUSR | S_IRGRP | S_IROTH,
++			    ctrlpriv->ctl, &perfmon->faultaddr,
++			    &caam_fops_u32_ro);
++	debugfs_create_file("fault_detail", S_IRUSR | S_IRGRP | S_IROTH,
++			    ctrlpriv->ctl, &perfmon->faultdetail,
++			    &caam_fops_u32_ro);
++	debugfs_create_file("fault_status", S_IRUSR | S_IRGRP | S_IROTH,
++			    ctrlpriv->ctl, &perfmon->status,
++			    &caam_fops_u32_ro);
+ 
+ 	/* Internal covering keys (useful in non-secure mode only) */
+ 	ctrlpriv->ctl_kek_wrap.data = (__force void *)&ctrlpriv->ctrl->kek[0];
+diff --git a/drivers/crypto/caam/intern.h b/drivers/crypto/caam/intern.h
+index 9e3f3e0..a523612 100644
+--- a/drivers/crypto/caam/intern.h
++++ b/drivers/crypto/caam/intern.h
+@@ -102,16 +102,8 @@ struct caam_drv_private {
+ #ifdef CONFIG_DEBUG_FS
+ 	struct dentry *dfs_root;
+ 	struct dentry *ctl; /* controller dir */
+-	struct dentry *ctl_rq_dequeued, *ctl_ob_enc_req, *ctl_ib_dec_req;
+-	struct dentry *ctl_ob_enc_bytes, *ctl_ob_prot_bytes;
+-	struct dentry *ctl_ib_dec_bytes, *ctl_ib_valid_bytes;
+-	struct dentry *ctl_faultaddr, *ctl_faultdetail, *ctl_faultstatus;
+-
+ 	struct debugfs_blob_wrapper ctl_kek_wrap, ctl_tkek_wrap, ctl_tdsk_wrap;
+ 	struct dentry *ctl_kek, *ctl_tkek, *ctl_tdsk;
+-#ifdef CONFIG_CAAM_QI
+-	struct dentry *qi_congested;
+-#endif
+ #endif
+ };
+ 
+diff --git a/drivers/crypto/caam/qi.c b/drivers/crypto/caam/qi.c
+index 9a4151a..e4cf000 100644
+--- a/drivers/crypto/caam/qi.c
++++ b/drivers/crypto/caam/qi.c
+@@ -791,10 +791,8 @@ int caam_qi_init(struct platform_device *caam_pdev)
+ 	/* Done with the CGRs; restore the cpus allowed mask */
+ 	set_cpus_allowed_ptr(current, &old_cpumask);
+ #ifdef CONFIG_DEBUG_FS
+-	ctrlpriv->qi_congested = debugfs_create_file("qi_congested", 0444,
+-						     ctrlpriv->ctl,
+-						     &times_congested,
+-						     &caam_fops_u64_ro);
++	debugfs_create_file("qi_congested", 0444, ctrlpriv->ctl,
++			    &times_congested, &caam_fops_u64_ro);
+ #endif
+ 	dev_info(qidev, "Linux CAAM Queue I/F driver initialised\n");
+ 	return 0;
+-- 
+2.7.4
