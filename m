@@ -1,105 +1,63 @@
-From: Andy Shevchenko <andy.shevchenko@gmail.com>
+From: Logan Gunthorpe <logang@deltatee.com>
 Subject: Re: [PATCH v5 3/6] iomap: introduce io{read|write}64_{lo_hi|hi_lo}
-Date: Mon, 31 Jul 2017 19:10:59 +0300
-Message-ID: <CAHp75Ve619EE9ePy2zj+MjS7-MW3u_k2BQ5kc9iFBMYYQ9nMWQ@mail.gmail.com>
-References: <20170726231917.6073-1-logang@deltatee.com> <20170726231917.6073-4-logang@deltatee.com>
- <CAHp75Vcv7UCpnGY+mL7CMU5u9hCUxwaYWNsg58BoWBJGAFX4tQ@mail.gmail.com> <5c52d908-3b77-c5c6-99a7-1164d878ac95@deltatee.com>
+Date: Mon, 31 Jul 2017 10:31:58 -0600
+Message-ID: <3a4c9453-20be-8164-85eb-5ad4d596a299@deltatee.com>
+References: <20170726231917.6073-1-logang@deltatee.com>
+ <20170726231917.6073-4-logang@deltatee.com>
+ <CAHp75Vcv7UCpnGY+mL7CMU5u9hCUxwaYWNsg58BoWBJGAFX4tQ@mail.gmail.com>
+ <5c52d908-3b77-c5c6-99a7-1164d878ac95@deltatee.com>
+ <CAHp75Ve619EE9ePy2zj+MjS7-MW3u_k2BQ5kc9iFBMYYQ9nMWQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         Linux-Arch <linux-arch@vger.kernel.org>,
         linux-ntb@googlegroups.com,
         linux-crypto <linux-crypto@vger.kernel.org>,
         Arnd Bergmann <arnd@arndb.de>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>,
+        =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>,
         Stephen Bates <sbates@raithlin.com>,
         Benjamin Herrenschmidt <benh@kernel.crashing.org>,
         Paul Mackerras <paulus@samba.org>,
         Michael Ellerman <mpe@ellerman.id.au>,
         Suresh Warrier <warrier@linux.vnet.ibm.com>,
         Nicholas Piggin <npiggin@gmail.com>
-To: Logan Gunthorpe <logang@deltatee.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-oi0-f66.google.com ([209.85.218.66]:36928 "EHLO
-        mail-oi0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751978AbdGaQLA (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 31 Jul 2017 12:11:00 -0400
-In-Reply-To: <5c52d908-3b77-c5c6-99a7-1164d878ac95@deltatee.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+To: Andy Shevchenko <andy.shevchenko@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <CAHp75Ve619EE9ePy2zj+MjS7-MW3u_k2BQ5kc9iFBMYYQ9nMWQ@mail.gmail.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Jul 31, 2017 at 6:55 PM, Logan Gunthorpe <logang@deltatee.com> wrote:
-> On 30/07/17 10:03 AM, Andy Shevchenko wrote:
->> On Thu, Jul 27, 2017 at 2:19 AM, Logan Gunthorpe <logang@deltatee.com> wrote:
->>> In order to provide non-atomic functions for io{read|write}64 that will
->>> use readq and writeq when appropriate. We define a number of variants
->>> of these functions in the generic iomap that will do non-atomic
->>> operations on pio but atomic operations on mmio.
->>>
->>> These functions are only defined if readq and writeq are defined. If
->>> they are not, then the wrappers that always use non-atomic operations
->>> from include/linux/io-64-nonatomic*.h will be used.
->>
->> Don't you see here a slight problem?
->>
->> In some cases we want to substitute atomic in favour of non-atomic
->> when both are defined.
->> So, please don't do this "smartly".
->
-> I'm not sure what you mean here. The driver should use ioread64 and
-> include an io-64-nonatomic header. Then there are three cases:
->
-> 1) The arch has no atomic 64 bit io operations defined. In this case it
-> uses the non-atomic inline function in the io-64-nonatomic header.
 
-Okay
 
-> 2) The arch uses CONFIG_GENERIC_IOMAP and has readq defined, but not
-> ioread64 defined (likely because pio can't do atomic 64 bit operations
-> but mmio can). In this case we need to use the ioread64_xx functions
-> defined in iomap.c which do atomic mmio and non-atomic pio.
+On 31/07/17 10:10 AM, Andy Shevchenko wrote:
+> Some drivers (hardware) would like to have non-atomic MMIO accesses
+> when readq() defined
 
-Not okay.
+Huh? But that's the whole point of the io64-nonatomic header. If a
+driver wants a specific non-atomic access they should just code two 32
+bit accesses.
 
-Some drivers (hardware) would like to have non-atomic MMIO accesses
-when readq() defined
+> In case of readq() / writeq() it's defined by the order of inclusion:
+> 
+> 1)
+> include <...non-atomic...>
+> include <linux/io.h>
+> 
+> Always non-atomic will be used.
 
-> 3) The arch has ioread64 defined so the atomic operation is used.
+I'm afraid you're wrong about this. The io-64-nonatomic-xx header
+includes linux/io.h. Thus the order of the includes doesn't matter and
+it will always auto switch. In any case, making an interface do
+different things depending on the order of include files is *completely*
+insane.
 
-Not okay. Same reason as above.
+> P.S. I have done a table of comparison between IO accessors in Linux
+> kernel and it looks hell out of being consistent.
 
-In case of readq() / writeq() it's defined by the order of inclusion:
+There are a few corner oddities but it's really not that bad. Most
+things are done for a reason if you dig into them.
 
-1)
-include <...non-atomic...>
-include <linux/io.h>
-
-Always non-atomic will be used.
-
-2)
-include <linux/io.h>
-include <...non-atomic...>
-
-Auto switch like you described.
-
-I don't like above solution, since it's fragile, but few drivers depend on that.
-
-If you wish to do it always like 2) perhaps we need to split accessors
-to ones for fixed bus width and ones for atomic/non-atomic cases.
-OTOH, it would be done by introducing
-memcpyXX_fromio()
-memcpyXX_toio()
-memsetXX_io()
-
-Where XX = 64, 32, 16, 8.
-
-Note, that ioreadXX_rep() is not the same as above.
-
-P.S. I have done a table of comparison between IO accessors in Linux
-kernel and it looks hell out of being consistent.
-
--- 
-With Best Regards,
-Andy Shevchenko
+Logan
