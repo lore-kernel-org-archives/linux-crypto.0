@@ -1,61 +1,99 @@
-From: Tom Herbert <tom@herbertland.com>
-Subject: Re: [PATCH v3 net-next 1/4] tcp: ULP infrastructure
-Date: Tue, 1 Aug 2017 11:27:20 -0700
-Message-ID: <CALx6S364bOwz1pXgjWTLKR_k_So7kHspfSWQC0hkZZV_rA83dQ@mail.gmail.com>
-References: <cover.1497465295.git.davejwatson@fb.com> <20170614183714.GA80310@davejwatson-mba.dhcp.thefacebook.com>
- <CALx6S35SmGC1ZSC9EiDH0gCUxGcFOJOTPOR-NzrgafKNC8oMYg@mail.gmail.com> <20170731221614.GB93172@dhcp-172-20-173-153.dhcp.thefacebook.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH] crypto: ccp - avoid uninitialized variable warning
+Date: Tue, 1 Aug 2017 22:35:41 +0200
+Message-ID: <CAK8P3a3sCa9=yTwjkT_iyXgu-e08rBNAQoV+0wvpL5utJhumiw@mail.gmail.com>
+References: <20170731204936.1511542-1-arnd@arndb.de> <b803327a-63d8-441b-3083-4fe005aae599@amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: Ilya Lesokhin <ilyal@mellanox.com>,
-        Aviad Yehezkel <aviadye@mellanox.com>,
-        Boris Pismenny <borisp@mellanox.com>,
-        Liran Liss <liranl@mellanox.com>,
-        Matan Barak <matanb@mellanox.com>,
-        David Miller <davem@davemloft.net>,
-        Linux Kernel Network Developers <netdev@vger.kernel.org>,
+Cc: "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Hannes Frederic Sowa <hannes@stressinduktion.org>,
-        Eric Dumazet <eric.dumazet@gmail.com>,
-        Alexei Starovoitov <alexei.starovoitov@gmail.com>,
-        Nikos Mavrogiannopoulos <nmav@gnutls.org>,
-        =?UTF-8?B?RnJpZG9sw61uIFBva29ybsO9?= <fridolin.pokorny@gmail.com>
-To: Dave Watson <davejwatson@fb.com>
-Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <20170731221614.GB93172@dhcp-172-20-173-153.dhcp.thefacebook.com>
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+        "David S. Miller" <davem@davemloft.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Gary R Hook <gary.hook@amd.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-oi0-f67.google.com ([209.85.218.67]:33236 "EHLO
+        mail-oi0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752154AbdHAUfm (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 1 Aug 2017 16:35:42 -0400
+In-Reply-To: <b803327a-63d8-441b-3083-4fe005aae599@amd.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jul 31, 2017 at 3:16 PM, Dave Watson <davejwatson@fb.com> wrote:
-> On 07/29/17 01:12 PM, Tom Herbert wrote:
->> On Wed, Jun 14, 2017 at 11:37 AM, Dave Watson <davejwatson@fb.com> wrote:
->> > Add the infrustructure for attaching Upper Layer Protocols (ULPs) over TCP
->> > sockets. Based on a similar infrastructure in tcp_cong.  The idea is that any
->> > ULP can add its own logic by changing the TCP proto_ops structure to its own
->> > methods.
->> >
->> > Example usage:
->> >
->> > setsockopt(sock, SOL_TCP, TCP_ULP, "tls", sizeof("tls"));
->> >
->> One question: is there a good reason why the ULP infrastructure should
->> just be for TCP sockets. For example, I'd really like to be able
->> something like:
+On Tue, Aug 1, 2017 at 4:52 PM, Gary R Hook <gary.hook@amd.com> wrote:
+> On 07/31/2017 03:49 PM, Arnd Bergmann wrote:
 >>
->> setsockopt(sock, SOL_SOCKET, SO_ULP, &ulp_param, sizeof(ulp_param));
+>> The added support for version 5 CCPs introduced a false-positive
+>> warning in the RSA implementation:
 >>
->> Where ulp_param is a structure containing the ULP name as well as some
->> ULP specific parameters that are passed to init_ulp. ulp_init could
->> determine whether the socket family is appropriate for the ULP being
->> requested.
+>> drivers/crypto/ccp/ccp-ops.c: In function 'ccp_run_rsa_cmd':
+>> drivers/crypto/ccp/ccp-ops.c:1856:3: error: 'sb_count' may be used
+>> uninitialized in this function [-Werror=maybe-uninitialized]
+>>
+>> This changes the code in a way that should make it easier for
+>> the compiler to track the state of the sb_count variable, and
+>> avoid the warning.
+>>
+>> Fixes: 6ba46c7d4d7e ("crypto: ccp - Fix base RSA function for version 5
+>> CCPs")
+>> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+>> ---
+>>  drivers/crypto/ccp/ccp-ops.c | 3 ++-
+>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
+>> index 40c062ad8726..a8bc207b099a 100644
+>> --- a/drivers/crypto/ccp/ccp-ops.c
+>> +++ b/drivers/crypto/ccp/ccp-ops.c
+>> @@ -1758,6 +1758,7 @@ static int ccp_run_rsa_cmd(struct ccp_cmd_queue
+>> *cmd_q, struct ccp_cmd *cmd)
+>>         o_len = 32 * ((rsa->key_size + 255) / 256);
+>>         i_len = o_len * 2;
+>>
+>> +       sb_count = 0;
+>>         if (cmd_q->ccp->vdata->version < CCP_VERSION(5, 0)) {
+>>                 /* sb_count is the number of storage block slots required
+>>                  * for the modulus.
+>> @@ -1852,7 +1853,7 @@ static int ccp_run_rsa_cmd(struct ccp_cmd_queue
+>> *cmd_q, struct ccp_cmd *cmd)
+>>         ccp_dm_free(&exp);
+>>
+>>  e_sb:
+>> -       if (cmd_q->ccp->vdata->version < CCP_VERSION(5, 0))
+>> +       if (sb_count)
+>>                 cmd_q->ccp->vdata->perform->sbfree(cmd_q, op.sb_key,
+>> sb_count);
+>>
+>>         return ret;
+>>
 >
-> Using SOL_SOCKET instead seems reasonable to me.  I can see how
-> ulp_params could have some use, perhaps at a slight loss in clarity.
-> TLS needs its own setsockopts anyway though, for renegotiate for
-> example.
+> This is a fine solution. However, having lived with this annoyance for a
+> while, and even hoping that a
+> a later compiler fixes it, I would have preferred to either:
+>
+> 1) Initialize the local variable at declaration time, or
 
-I'll post the changes shortly. The reason to include parameters with
-the setsockopt is so that we can push the ULP and start operations in
-one shot.
+I try to never do that in general, see https://rusty.ozlabs.org/?p=232
 
-Tom
+> 2) Use this patch, which the compiler could optimize as it sees fit, and
+> maintains a clear distinction
+> for the code path for older devices:
+
+This seems fine.
+
+> @@ -1853,7 +1853,10 @@ static int ccp_run_rsa_cmd(struct ccp_cmd_queue
+> *cmd_q, struct ccp_cmd *cmd)
+>
+>  e_sb:
+>         if (cmd_q->ccp->vdata->version < CCP_VERSION(5, 0))
+> +       {
+> +               unsigned int sb_count = o_len / CCP_SB_BYTES;
+>                 cmd_q->ccp->vdata->perform->sbfree(cmd_q, op.sb_key,
+> sb_count);
+> +       }
+
+I would probably skip the local variable as well then, and just open-code the
+length, unless that adds ugly line-wraps.
+
+       Arnd
