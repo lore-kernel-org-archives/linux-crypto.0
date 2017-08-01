@@ -1,114 +1,111 @@
-From: Gary R Hook <gary.hook@amd.com>
-Subject: Re: [PATCH] crypto: ccp - avoid uninitialized variable warning
-Date: Tue, 1 Aug 2017 09:52:38 -0500
-Message-ID: <b803327a-63d8-441b-3083-4fe005aae599@amd.com>
-References: <20170731204936.1511542-1-arnd@arndb.de>
+From: Jon Mason <jdmason@kudzu.us>
+Subject: Re: [PATCH v5 5/6] ntb: ntb_hw_intel: use io-64-nonatomic instead of
+ in-driver hacks
+Date: Tue, 1 Aug 2017 13:47:22 -0400
+Message-ID: <20170801174722.GB4186@kudzu.us>
+References: <20170726231917.6073-1-logang@deltatee.com>
+ <20170726231917.6073-6-logang@deltatee.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+        Stephen Bates <sbates@raithlin.com>,
+        Allen Hubbe <Allen.Hubbe@emc.com>
+To: Logan Gunthorpe <logang@deltatee.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2nam01on0076.outbound.protection.outlook.com ([104.47.34.76]:17088
-        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751295AbdHAOxW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 1 Aug 2017 10:53:22 -0400
-In-Reply-To: <20170731204936.1511542-1-arnd@arndb.de>
+Received: from mail-qk0-f196.google.com ([209.85.220.196]:35943 "EHLO
+        mail-qk0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751910AbdHARrZ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 1 Aug 2017 13:47:25 -0400
+Received: by mail-qk0-f196.google.com with SMTP id d136so2261857qkg.3
+        for <linux-crypto@vger.kernel.org>; Tue, 01 Aug 2017 10:47:25 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <20170726231917.6073-6-logang@deltatee.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 07/31/2017 03:49 PM, Arnd Bergmann wrote:
-> The added support for version 5 CCPs introduced a false-positive
-> warning in the RSA implementation:
->
-> drivers/crypto/ccp/ccp-ops.c: In function 'ccp_run_rsa_cmd':
-> drivers/crypto/ccp/ccp-ops.c:1856:3: error: 'sb_count' may be used uninitialized in this function [-Werror=maybe-uninitialized]
->
-> This changes the code in a way that should make it easier for
-> the compiler to track the state of the sb_count variable, and
-> avoid the warning.
->
-> Fixes: 6ba46c7d4d7e ("crypto: ccp - Fix base RSA function for version 5 CCPs")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+On Wed, Jul 26, 2017 at 05:19:16PM -0600, Logan Gunthorpe wrote:
+> Now that ioread64 and iowrite64 are available in io-64-nonatomic,
+> we can remove the hack at the top of ntb_hw_intel.c and replace it
+> with an include.
+> 
+> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+> Cc: Jon Mason <jdmason@kudzu.us>
+
+This is okay by me, but I'm assuming that this patch will go through
+as part of the series (and not via my tree).  If this changes, please
+let me know.
+
+Acked-by: Jon Mason <jdmason@kudzu.us>
+
+> Cc: Allen Hubbe <Allen.Hubbe@emc.com>
+
+You already have Allen's Ack below.  So, you can remove this :)
+
+> Acked-by: Dave Jiang <dave.jiang@intel.com>
+> Acked-by: Allen Hubbe <Allen.Hubbe@dell.com>
 > ---
->  drivers/crypto/ccp/ccp-ops.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
-> index 40c062ad8726..a8bc207b099a 100644
-> --- a/drivers/crypto/ccp/ccp-ops.c
-> +++ b/drivers/crypto/ccp/ccp-ops.c
-> @@ -1758,6 +1758,7 @@ static int ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
->  	o_len = 32 * ((rsa->key_size + 255) / 256);
->  	i_len = o_len * 2;
->
-> +	sb_count = 0;
->  	if (cmd_q->ccp->vdata->version < CCP_VERSION(5, 0)) {
->  		/* sb_count is the number of storage block slots required
->  		 * for the modulus.
-> @@ -1852,7 +1853,7 @@ static int ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
->  	ccp_dm_free(&exp);
->
->  e_sb:
-> -	if (cmd_q->ccp->vdata->version < CCP_VERSION(5, 0))
-> +	if (sb_count)
->  		cmd_q->ccp->vdata->perform->sbfree(cmd_q, op.sb_key, sb_count);
->
->  	return ret;
->
-
-This is a fine solution. However, having lived with this annoyance for a 
-while, and even hoping that a
-a later compiler fixes it, I would have preferred to either:
-
-1) Initialize the local variable at declaration time, or
-
-2) Use this patch, which the compiler could optimize as it sees fit, and 
-maintains a clear distinction
-for the code path for older devices:
-
-diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
-index 40c062a..a3a884a 100644
---- a/drivers/crypto/ccp/ccp-ops.c
-+++ b/drivers/crypto/ccp/ccp-ops.c
-@@ -1733,7 +1733,7 @@ static int ccp_run_rsa_cmd(struct ccp_cmd_queue 
-*cmd_q, struct ccp_cmd *cmd)
-         struct ccp_rsa_engine *rsa = &cmd->u.rsa;
-         struct ccp_dm_workarea exp, src, dst;
-         struct ccp_op op;
--       unsigned int sb_count, i_len, o_len;
-+       unsigned int i_len, o_len;
-         int ret;
-
-         /* Check against the maximum allowable size, in bits */
-@@ -1762,7 +1762,7 @@ static int ccp_run_rsa_cmd(struct ccp_cmd_queue 
-*cmd_q, struct ccp_cmd *cmd)
-                 /* sb_count is the number of storage block slots required
-                  * for the modulus.
-                  */
--               sb_count = o_len / CCP_SB_BYTES;
-+               unsigned int sb_count = o_len / CCP_SB_BYTES;
-                 op.sb_key = cmd_q->ccp->vdata->perform->sballoc(cmd_q,
-                                                                 sb_count);
-                 if (!op.sb_key)
-@@ -1853,7 +1853,10 @@ static int ccp_run_rsa_cmd(struct ccp_cmd_queue 
-*cmd_q, struct ccp_cmd *cmd)
-
-  e_sb:
-         if (cmd_q->ccp->vdata->version < CCP_VERSION(5, 0))
-+       {
-+               unsigned int sb_count = o_len / CCP_SB_BYTES;
-                 cmd_q->ccp->vdata->perform->sbfree(cmd_q, op.sb_key, 
-sb_count);
-+       }
-
-         return ret;
-  }
-
-
-Discuss?
+>  drivers/ntb/hw/intel/ntb_hw_intel.c | 30 +-----------------------------
+>  1 file changed, 1 insertion(+), 29 deletions(-)
+> 
+> diff --git a/drivers/ntb/hw/intel/ntb_hw_intel.c b/drivers/ntb/hw/intel/ntb_hw_intel.c
+> index 2557e2c05b90..606c90f59d4b 100644
+> --- a/drivers/ntb/hw/intel/ntb_hw_intel.c
+> +++ b/drivers/ntb/hw/intel/ntb_hw_intel.c
+> @@ -59,6 +59,7 @@
+>  #include <linux/random.h>
+>  #include <linux/slab.h>
+>  #include <linux/ntb.h>
+> +#include <linux/io-64-nonatomic-lo-hi.h>
+>  
+>  #include "ntb_hw_intel.h"
+>  
+> @@ -155,35 +156,6 @@ MODULE_PARM_DESC(xeon_b2b_dsd_bar5_addr32,
+>  static inline enum ntb_topo xeon_ppd_topo(struct intel_ntb_dev *ndev, u8 ppd);
+>  static int xeon_init_isr(struct intel_ntb_dev *ndev);
+>  
+> -#ifndef ioread64
+> -#ifdef readq
+> -#define ioread64 readq
+> -#else
+> -#define ioread64 _ioread64
+> -static inline u64 _ioread64(void __iomem *mmio)
+> -{
+> -	u64 low, high;
+> -
+> -	low = ioread32(mmio);
+> -	high = ioread32(mmio + sizeof(u32));
+> -	return low | (high << 32);
+> -}
+> -#endif
+> -#endif
+> -
+> -#ifndef iowrite64
+> -#ifdef writeq
+> -#define iowrite64 writeq
+> -#else
+> -#define iowrite64 _iowrite64
+> -static inline void _iowrite64(u64 val, void __iomem *mmio)
+> -{
+> -	iowrite32(val, mmio);
+> -	iowrite32(val >> 32, mmio + sizeof(u32));
+> -}
+> -#endif
+> -#endif
+> -
+>  static inline int pdev_is_atom(struct pci_dev *pdev)
+>  {
+>  	switch (pdev->device) {
+> -- 
+> 2.11.0
+> 
+> -- 
+> You received this message because you are subscribed to the Google Groups "linux-ntb" group.
+> To unsubscribe from this group and stop receiving emails from it, send an email to linux-ntb+unsubscribe@googlegroups.com.
+> To post to this group, send email to linux-ntb@googlegroups.com.
+> To view this discussion on the web visit https://groups.google.com/d/msgid/linux-ntb/20170726231917.6073-6-logang%40deltatee.com.
+> For more options, visit https://groups.google.com/d/optout.
