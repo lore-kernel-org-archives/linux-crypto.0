@@ -1,111 +1,61 @@
-From: Jon Mason <jdmason@kudzu.us>
-Subject: Re: [PATCH v5 5/6] ntb: ntb_hw_intel: use io-64-nonatomic instead of
- in-driver hacks
-Date: Tue, 1 Aug 2017 13:47:22 -0400
-Message-ID: <20170801174722.GB4186@kudzu.us>
-References: <20170726231917.6073-1-logang@deltatee.com>
- <20170726231917.6073-6-logang@deltatee.com>
+From: Tom Herbert <tom@herbertland.com>
+Subject: Re: [PATCH v3 net-next 1/4] tcp: ULP infrastructure
+Date: Tue, 1 Aug 2017 11:27:20 -0700
+Message-ID: <CALx6S364bOwz1pXgjWTLKR_k_So7kHspfSWQC0hkZZV_rA83dQ@mail.gmail.com>
+References: <cover.1497465295.git.davejwatson@fb.com> <20170614183714.GA80310@davejwatson-mba.dhcp.thefacebook.com>
+ <CALx6S35SmGC1ZSC9EiDH0gCUxGcFOJOTPOR-NzrgafKNC8oMYg@mail.gmail.com> <20170731221614.GB93172@dhcp-172-20-173-153.dhcp.thefacebook.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-        Stephen Bates <sbates@raithlin.com>,
-        Allen Hubbe <Allen.Hubbe@emc.com>
-To: Logan Gunthorpe <logang@deltatee.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-qk0-f196.google.com ([209.85.220.196]:35943 "EHLO
-        mail-qk0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751910AbdHARrZ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 1 Aug 2017 13:47:25 -0400
-Received: by mail-qk0-f196.google.com with SMTP id d136so2261857qkg.3
-        for <linux-crypto@vger.kernel.org>; Tue, 01 Aug 2017 10:47:25 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <20170726231917.6073-6-logang@deltatee.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Cc: Ilya Lesokhin <ilyal@mellanox.com>,
+        Aviad Yehezkel <aviadye@mellanox.com>,
+        Boris Pismenny <borisp@mellanox.com>,
+        Liran Liss <liranl@mellanox.com>,
+        Matan Barak <matanb@mellanox.com>,
+        David Miller <davem@davemloft.net>,
+        Linux Kernel Network Developers <netdev@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Hannes Frederic Sowa <hannes@stressinduktion.org>,
+        Eric Dumazet <eric.dumazet@gmail.com>,
+        Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+        Nikos Mavrogiannopoulos <nmav@gnutls.org>,
+        =?UTF-8?B?RnJpZG9sw61uIFBva29ybsO9?= <fridolin.pokorny@gmail.com>
+To: Dave Watson <davejwatson@fb.com>
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <20170731221614.GB93172@dhcp-172-20-173-153.dhcp.thefacebook.com>
+Sender: netdev-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Jul 26, 2017 at 05:19:16PM -0600, Logan Gunthorpe wrote:
-> Now that ioread64 and iowrite64 are available in io-64-nonatomic,
-> we can remove the hack at the top of ntb_hw_intel.c and replace it
-> with an include.
-> 
-> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-> Cc: Jon Mason <jdmason@kudzu.us>
+On Mon, Jul 31, 2017 at 3:16 PM, Dave Watson <davejwatson@fb.com> wrote:
+> On 07/29/17 01:12 PM, Tom Herbert wrote:
+>> On Wed, Jun 14, 2017 at 11:37 AM, Dave Watson <davejwatson@fb.com> wrote:
+>> > Add the infrustructure for attaching Upper Layer Protocols (ULPs) over TCP
+>> > sockets. Based on a similar infrastructure in tcp_cong.  The idea is that any
+>> > ULP can add its own logic by changing the TCP proto_ops structure to its own
+>> > methods.
+>> >
+>> > Example usage:
+>> >
+>> > setsockopt(sock, SOL_TCP, TCP_ULP, "tls", sizeof("tls"));
+>> >
+>> One question: is there a good reason why the ULP infrastructure should
+>> just be for TCP sockets. For example, I'd really like to be able
+>> something like:
+>>
+>> setsockopt(sock, SOL_SOCKET, SO_ULP, &ulp_param, sizeof(ulp_param));
+>>
+>> Where ulp_param is a structure containing the ULP name as well as some
+>> ULP specific parameters that are passed to init_ulp. ulp_init could
+>> determine whether the socket family is appropriate for the ULP being
+>> requested.
+>
+> Using SOL_SOCKET instead seems reasonable to me.  I can see how
+> ulp_params could have some use, perhaps at a slight loss in clarity.
+> TLS needs its own setsockopts anyway though, for renegotiate for
+> example.
 
-This is okay by me, but I'm assuming that this patch will go through
-as part of the series (and not via my tree).  If this changes, please
-let me know.
+I'll post the changes shortly. The reason to include parameters with
+the setsockopt is so that we can push the ULP and start operations in
+one shot.
 
-Acked-by: Jon Mason <jdmason@kudzu.us>
-
-> Cc: Allen Hubbe <Allen.Hubbe@emc.com>
-
-You already have Allen's Ack below.  So, you can remove this :)
-
-> Acked-by: Dave Jiang <dave.jiang@intel.com>
-> Acked-by: Allen Hubbe <Allen.Hubbe@dell.com>
-> ---
->  drivers/ntb/hw/intel/ntb_hw_intel.c | 30 +-----------------------------
->  1 file changed, 1 insertion(+), 29 deletions(-)
-> 
-> diff --git a/drivers/ntb/hw/intel/ntb_hw_intel.c b/drivers/ntb/hw/intel/ntb_hw_intel.c
-> index 2557e2c05b90..606c90f59d4b 100644
-> --- a/drivers/ntb/hw/intel/ntb_hw_intel.c
-> +++ b/drivers/ntb/hw/intel/ntb_hw_intel.c
-> @@ -59,6 +59,7 @@
->  #include <linux/random.h>
->  #include <linux/slab.h>
->  #include <linux/ntb.h>
-> +#include <linux/io-64-nonatomic-lo-hi.h>
->  
->  #include "ntb_hw_intel.h"
->  
-> @@ -155,35 +156,6 @@ MODULE_PARM_DESC(xeon_b2b_dsd_bar5_addr32,
->  static inline enum ntb_topo xeon_ppd_topo(struct intel_ntb_dev *ndev, u8 ppd);
->  static int xeon_init_isr(struct intel_ntb_dev *ndev);
->  
-> -#ifndef ioread64
-> -#ifdef readq
-> -#define ioread64 readq
-> -#else
-> -#define ioread64 _ioread64
-> -static inline u64 _ioread64(void __iomem *mmio)
-> -{
-> -	u64 low, high;
-> -
-> -	low = ioread32(mmio);
-> -	high = ioread32(mmio + sizeof(u32));
-> -	return low | (high << 32);
-> -}
-> -#endif
-> -#endif
-> -
-> -#ifndef iowrite64
-> -#ifdef writeq
-> -#define iowrite64 writeq
-> -#else
-> -#define iowrite64 _iowrite64
-> -static inline void _iowrite64(u64 val, void __iomem *mmio)
-> -{
-> -	iowrite32(val, mmio);
-> -	iowrite32(val >> 32, mmio + sizeof(u32));
-> -}
-> -#endif
-> -#endif
-> -
->  static inline int pdev_is_atom(struct pci_dev *pdev)
->  {
->  	switch (pdev->device) {
-> -- 
-> 2.11.0
-> 
-> -- 
-> You received this message because you are subscribed to the Google Groups "linux-ntb" group.
-> To unsubscribe from this group and stop receiving emails from it, send an email to linux-ntb+unsubscribe@googlegroups.com.
-> To post to this group, send email to linux-ntb@googlegroups.com.
-> To view this discussion on the web visit https://groups.google.com/d/msgid/linux-ntb/20170726231917.6073-6-logang%40deltatee.com.
-> For more options, visit https://groups.google.com/d/optout.
+Tom
