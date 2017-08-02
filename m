@@ -1,92 +1,47 @@
-From: Jan Stancek <jstancek@redhat.com>
-Subject: Re: [Patch V2] crypto: x86/sha1 : Fix reads beyond the number of
- blocks passed
-Date: Wed, 2 Aug 2017 12:39:53 +0200
-Message-ID: <902d020b-5127-8611-9656-bf0062d1e09b@redhat.com>
-References: <1501634312-22788-1-git-send-email-megha.dey@linux.intel.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH v3] crypto: ixp4xx - Fix error handling path in 'aead_perform()'
+Date: Wed, 2 Aug 2017 12:59:07 +0200
+Message-ID: <CAK8P3a0Rx75vugf0o=ifi5TXR_UTxJJXSG-bZdfHuFc3OyWv=Q@mail.gmail.com>
+References: <20170719214757.29203-1-christophe.jaillet@wanadoo.fr>
+ <CAK8P3a3RuQmudGRGvpE1i=RwjJ_KVU1S+bDqX6Bp6VLB7G+2cg@mail.gmail.com> <20170802084046.GA6740@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: tim.c.chen@linux.intel.com, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ilya.albrekht@intel.com, megha.dey@intel.com, jstancek@redhat.com
-To: Megha Dey <megha.dey@linux.intel.com>, herbert@gondor.apana.org.au
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1501634312-22788-1-git-send-email-megha.dey@linux.intel.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        David Miller <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        kernel-janitors@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-oi0-f52.google.com ([209.85.218.52]:35256 "EHLO
+        mail-oi0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752657AbdHBK7J (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 2 Aug 2017 06:59:09 -0400
+In-Reply-To: <20170802084046.GA6740@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 08/02/2017 02:38 AM, Megha Dey wrote:
-> It was reported that the sha1 AVX2 function(sha1_transform_avx2) is
-> reading ahead beyond its intended data, and causing a crash if the next
-> block is beyond page boundary:
-> http://marc.info/?l=linux-crypto-vger&m=149373371023377
-> 
-> This patch makes sure that there is no overflow for any buffer length.
-> 
-> It passes the tests written by Jan Stancek that revealed this problem:
-> https://github.com/jstancek/sha1-avx2-crash
-> 
-> Jan, can you verify this fix?
+On Wed, Aug 2, 2017 at 10:40 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> On Thu, Jul 20, 2017 at 09:37:10AM +0200, Arnd Bergmann wrote:
+>
+> Oops, looks like I introduced the bug.  Anyway, such is the danger
+> of fixing compiler warnings in rarely used code.
+>
+> For some reason your patch is corrupted in patchwork.  Also we don't
+> need to check crypt->dst as free_buf_chain is a no-op if we didn't do
+> the allocation at all.  So how about this patch?
 
-Hi,
+Looks good to me.
 
-Looks good, my tests (below) PASS-ed.
+> ---8<---
+> In commit 0f987e25cb8a, the source processing has been moved in front of
+> the destination processing, but the error handling path has not been
+> modified accordingly.
+> Free resources in the correct order to avoid some leaks.
+>
+> Fixes: 0f987e25cb8a ("crypto: ixp4xx - Fix false lastlen uninitialised warning")
+> Reported-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-I updated reproducer at [1] to try more than just single scenario. It
-now tries thousands of combinations with different starting offset within
-page and sizes of data chunks.
-
-(without patch) v4.13-rc3-102-g26c5ceb with avx2 enabled:
-[  106.455175] sha_test module loaded
-[  106.460458] data is at 0xffff8c88e58f8000, page_after_data: 0xffff8c88e58fa000
-[  106.468625] sha_test testing hash: sha1-generic, maxlen: 8192
-[  127.091237] sha_test hash: sha1-generic calculated 1764032 hashes
-[  127.098038] sha_test testing hash: sha1-ni, maxlen: 8192
-[  127.108805] failed to alloc sha1-ni
-[  127.112703] sha_test testing hash: sha1-avx, maxlen: 8192
-[  141.166611] sha_test hash: sha1-avx calculated 1764032 hashes
-[  141.173023] sha_test testing hash: sha1-avx2, maxlen: 8192
-[  141.180046] BUG: unable to handle kernel paging request at ffff8c88e58fa000
-[  141.187817] IP: _begin+0x28/0x187
-[  141.191512] PGD 89c578067
-[  141.191513] P4D 89c578067
-[  141.194529] PUD c61f0a063
-[  141.197545] PMD c64cb1063
-[  141.200561] PTE 8000000c658fa062
-[  141.203577]
-[  141.208832] Oops: 0000 [#1] SMP
-...
-
-With patch "[Patch V2] crypto: x86/sha1 : Fix reads beyond the number of blocks passed":
-[  406.323781] sha_test module loaded
-[  406.329062] data is at 0xffff93ab97108000, page_after_data: 0xffff93ab9710a000
-[  406.337185] sha_test testing hash: sha1-generic, maxlen: 8192
-[  426.157242] sha_test hash: sha1-generic calculated 1764032 hashes
-[  426.164043] sha_test testing hash: sha1-ni, maxlen: 8192
-[  426.174244] failed to alloc sha1-ni
-[  426.178139] sha_test testing hash: sha1-avx, maxlen: 8192
-[  440.226240] sha_test hash: sha1-avx calculated 1764032 hashes
-[  440.232651] sha_test testing hash: sha1-avx2, maxlen: 8192
-[  452.497988] sha_test hash: sha1-avx2 calculated 1764032 hashes
-[  452.504495] sha_test testing hash: sha1-ssse3, maxlen: 8192
-[  467.319316] sha_test hash: sha1-ssse3 calculated 1764032 hashes
-[  467.325922] sha_test done
-[  471.827083] sha_test module unloaded
-
-I also ran a test at [2], which is comparing hashes produced by
-kernel with hashes produced by user-space utilities (e.g. 'sha1sum').
-This test also PASS-ed.
-
-Regards,
-Jan
-
-[1] https://github.com/jstancek/sha1-avx2-crash
-[2] https://github.com/jstancek/kernel_sha_test/tree/sha1-avx2-4.13
-
-> Herbert, can you re-enable sha1-avx2 once Jan has checked it out and
-> revert commit b82ce24426a4071da9529d726057e4e642948667 ?
-> 
-> Originally-by: Ilya Albrekht <ilya.albrekht@intel.com>
-> Signed-off-by: Megha Dey <megha.dey@linux.intel.com>
-> Reported-by: Jan Stancek <jstancek@redhat.com>
+Reviewed-by: Arnd Bergmann <arnd@arndb.de>
