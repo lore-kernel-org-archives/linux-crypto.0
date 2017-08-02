@@ -1,213 +1,243 @@
-From: Megha Dey <megha.dey@linux.intel.com>
-Subject: [Patch V3] crypto: x86/sha1 : Fix reads beyond the number of blocks passed
-Date: Wed,  2 Aug 2017 10:13:35 -0700
-Message-ID: <1501694015-10203-1-git-send-email-megha.dey@linux.intel.com>
-Cc: tim.c.chen@linux.intel.com, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        jstancek@redhat.com, ilya.albrekht@intel.com, megha.dey@intel.com,
-        Megha Dey <megha.dey@linux.intel.com>
-To: herbert@gondor.apana.org.au
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
+Subject: Re: [PATCH v3 1/7] integrity: Introduce struct evm_hmac_xattr
+Date: Wed, 02 Aug 2017 14:17:05 -0300
+Message-ID: <87h8xpyjn2.fsf@linux.vnet.ibm.com>
+References: <20170706221753.17380-1-bauerman@linux.vnet.ibm.com> <20170706221753.17380-2-bauerman@linux.vnet.ibm.com> <1501245566.10288.35.camel@linux.vnet.ibm.com>
+Mime-Version: 1.0
+Content-Type: text/plain
+Cc: linux-security-module@vger.kernel.org,
+        linux-ima-devel@lists.sourceforge.net, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-kernel@vger.kernel.org,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        James Morris <james.l.morris@oracle.com>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Jessica Yu <jeyu@redhat.com>,
+        Rusty Russell <rusty@rustcorp.com.au>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "AKASHI\, Takahiro" <takahiro.akashi@linaro.org>
+To: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54578 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1751172AbdHBRRY (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 2 Aug 2017 13:17:24 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id v72HE8A4127312
+        for <linux-crypto@vger.kernel.org>; Wed, 2 Aug 2017 13:17:23 -0400
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2c3ety5r78-1
+        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Wed, 02 Aug 2017 13:17:23 -0400
+Received: from localhost
+        by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-crypto@vger.kernel.org> from <bauerman@linux.vnet.ibm.com>;
+        Wed, 2 Aug 2017 13:17:23 -0400
+In-reply-to: <1501245566.10288.35.camel@linux.vnet.ibm.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-It was reported that the sha1 AVX2 function(sha1_transform_avx2) is
-reading ahead beyond its intended data, and causing a crash if the next
-block is beyond page boundary:
-http://marc.info/?l=linux-crypto-vger&m=149373371023377
 
-This patch makes sure that there is no overflow for any buffer length.
+Hello Mimi,
 
-It passes the tests written by Jan Stancek that revealed this problem:
-https://github.com/jstancek/sha1-avx2-crash
+Thanks for your review!
 
-I have re-enabled sha1-avx2 by reverting commit
-b82ce24426a4071da9529d726057e4e642948667
+The patch at the end of the email implements your suggestions, what do
+you think?
 
-Originally-by: Ilya Albrekht <ilya.albrekht@intel.com>
-Signed-off-by: Megha Dey <megha.dey@linux.intel.com>
-Reported-by: Jan Stancek <jstancek@redhat.com>
----
- arch/x86/crypto/sha1_avx2_x86_64_asm.S | 67 ++++++++++++++++++----------------
- arch/x86/crypto/sha1_ssse3_glue.c      |  2 +-
- 2 files changed, 37 insertions(+), 32 deletions(-)
+Mimi Zohar <zohar@linux.vnet.ibm.com> writes:
+> On Thu, 2017-07-06 at 19:17 -0300, Thiago Jung Bauermann wrote:
+>> A separate struct evm_hmac_xattr is introduced, with the original
+>> definition of evm_ima_xattr_data to be used in the places that actually
+>> expect that definition.
+>
+> The new structure name implies that the xattr can only be an HMAC. By
+> moving the new structure to evm.h we also loose the connection that it
+> has to theevm_ima_xattr_type enumeration.
 
-diff --git a/arch/x86/crypto/sha1_avx2_x86_64_asm.S b/arch/x86/crypto/sha1_avx2_x86_64_asm.S
-index 1cd792d..1eab79c 100644
---- a/arch/x86/crypto/sha1_avx2_x86_64_asm.S
-+++ b/arch/x86/crypto/sha1_avx2_x86_64_asm.S
-@@ -117,11 +117,10 @@
- 	.set T1, REG_T1
- .endm
- 
--#define K_BASE		%r8
- #define HASH_PTR	%r9
-+#define BLOCKS_CTR	%r8
- #define BUFFER_PTR	%r10
- #define BUFFER_PTR2	%r13
--#define BUFFER_END	%r11
- 
- #define PRECALC_BUF	%r14
- #define WK_BUF		%r15
-@@ -205,14 +204,14 @@
- 		 * blended AVX2 and ALU instruction scheduling
- 		 * 1 vector iteration per 8 rounds
- 		 */
--		vmovdqu ((i * 2) + PRECALC_OFFSET)(BUFFER_PTR), W_TMP
-+		vmovdqu (i * 2)(BUFFER_PTR), W_TMP
- 	.elseif ((i & 7) == 1)
--		vinsertf128 $1, (((i-1) * 2)+PRECALC_OFFSET)(BUFFER_PTR2),\
-+		vinsertf128 $1, ((i-1) * 2)(BUFFER_PTR2),\
- 			 WY_TMP, WY_TMP
- 	.elseif ((i & 7) == 2)
- 		vpshufb YMM_SHUFB_BSWAP, WY_TMP, WY
- 	.elseif ((i & 7) == 4)
--		vpaddd  K_XMM(K_BASE), WY, WY_TMP
-+		vpaddd  K_XMM + K_XMM_AR(%rip), WY, WY_TMP
- 	.elseif ((i & 7) == 7)
- 		vmovdqu  WY_TMP, PRECALC_WK(i&~7)
- 
-@@ -255,7 +254,7 @@
- 		vpxor	WY, WY_TMP, WY_TMP
- 	.elseif ((i & 7) == 7)
- 		vpxor	WY_TMP2, WY_TMP, WY
--		vpaddd	K_XMM(K_BASE), WY, WY_TMP
-+		vpaddd  K_XMM + K_XMM_AR(%rip), WY, WY_TMP
- 		vmovdqu	WY_TMP, PRECALC_WK(i&~7)
- 
- 		PRECALC_ROTATE_WY
-@@ -291,7 +290,7 @@
- 		vpsrld	$30, WY, WY
- 		vpor	WY, WY_TMP, WY
- 	.elseif ((i & 7) == 7)
--		vpaddd	K_XMM(K_BASE), WY, WY_TMP
-+		vpaddd  K_XMM + K_XMM_AR(%rip), WY, WY_TMP
- 		vmovdqu	WY_TMP, PRECALC_WK(i&~7)
- 
- 		PRECALC_ROTATE_WY
-@@ -446,6 +445,16 @@
- 
- .endm
- 
-+/* Add constant only if (%2 > %3) condition met (uses RTA as temp)
-+ * %1 + %2 >= %3 ? %4 : 0
-+ */
-+.macro ADD_IF_GE a, b, c, d
-+	mov     \a, RTA
-+	add     $\d, RTA
-+	cmp     $\c, \b
-+	cmovge  RTA, \a
-+.endm
-+
- /*
-  * macro implements 80 rounds of SHA-1, for multiple blocks with s/w pipelining
-  */
-@@ -463,13 +472,16 @@
- 	lea	(2*4*80+32)(%rsp), WK_BUF
- 
- 	# Precalc WK for first 2 blocks
--	PRECALC_OFFSET = 0
-+	ADD_IF_GE BUFFER_PTR2, BLOCKS_CTR, 2, 64
- 	.set i, 0
- 	.rept    160
- 		PRECALC i
- 		.set i, i + 1
- 	.endr
--	PRECALC_OFFSET = 128
-+
-+	/* Go to next block if needed */
-+	ADD_IF_GE BUFFER_PTR, BLOCKS_CTR, 3, 128
-+	ADD_IF_GE BUFFER_PTR2, BLOCKS_CTR, 4, 128
- 	xchg	WK_BUF, PRECALC_BUF
- 
- 	.align 32
-@@ -479,8 +491,8 @@ _loop:
- 	 * we use K_BASE value as a signal of a last block,
- 	 * it is set below by: cmovae BUFFER_PTR, K_BASE
- 	 */
--	cmp	K_BASE, BUFFER_PTR
--	jne	_begin
-+	test BLOCKS_CTR, BLOCKS_CTR
-+	jnz _begin
- 	.align 32
- 	jmp	_end
- 	.align 32
-@@ -512,10 +524,10 @@ _loop0:
- 		.set j, j+2
- 	.endr
- 
--	add	$(2*64), BUFFER_PTR       /* move to next odd-64-byte block */
--	cmp	BUFFER_END, BUFFER_PTR    /* is current block the last one? */
--	cmovae	K_BASE, BUFFER_PTR	/* signal the last iteration smartly */
--
-+	/* Update Counter */
-+	sub $1, BLOCKS_CTR
-+	/* Move to the next block only if needed*/
-+	ADD_IF_GE BUFFER_PTR, BLOCKS_CTR, 4, 128
- 	/*
- 	 * rounds
- 	 * 60,62,64,66,68
-@@ -532,8 +544,8 @@ _loop0:
- 	UPDATE_HASH	12(HASH_PTR), D
- 	UPDATE_HASH	16(HASH_PTR), E
- 
--	cmp	K_BASE, BUFFER_PTR	/* is current block the last one? */
--	je	_loop
-+	test	BLOCKS_CTR, BLOCKS_CTR
-+	jz	_loop
- 
- 	mov	TB, B
- 
-@@ -575,10 +587,10 @@ _loop2:
- 		.set j, j+2
- 	.endr
- 
--	add	$(2*64), BUFFER_PTR2      /* move to next even-64-byte block */
--
--	cmp	BUFFER_END, BUFFER_PTR2   /* is current block the last one */
--	cmovae	K_BASE, BUFFER_PTR       /* signal the last iteration smartly */
-+	/* update counter */
-+	sub     $1, BLOCKS_CTR
-+	/* Move to the next block only if needed*/
-+	ADD_IF_GE BUFFER_PTR2, BLOCKS_CTR, 4, 128
- 
- 	jmp	_loop3
- _loop3:
-@@ -641,19 +653,12 @@ _loop3:
- 
- 	avx2_zeroupper
- 
--	lea	K_XMM_AR(%rip), K_BASE
--
-+	/* Setup initial values */
- 	mov	CTX, HASH_PTR
- 	mov	BUF, BUFFER_PTR
--	lea	64(BUF), BUFFER_PTR2
--
--	shl	$6, CNT			/* mul by 64 */
--	add	BUF, CNT
--	add	$64, CNT
--	mov	CNT, BUFFER_END
- 
--	cmp	BUFFER_END, BUFFER_PTR2
--	cmovae	K_BASE, BUFFER_PTR2
-+	mov	BUF, BUFFER_PTR2
-+	mov	CNT, BLOCKS_CTR
- 
- 	xmm_mov	BSWAP_SHUFB_CTL(%rip), YMM_SHUFB_BSWAP
- 
-diff --git a/arch/x86/crypto/sha1_ssse3_glue.c b/arch/x86/crypto/sha1_ssse3_glue.c
-index f960a04..fc61739 100644
---- a/arch/x86/crypto/sha1_ssse3_glue.c
-+++ b/arch/x86/crypto/sha1_ssse3_glue.c
-@@ -201,7 +201,7 @@ asmlinkage void sha1_transform_avx2(u32 *digest, const char *data,
- 
- static bool avx2_usable(void)
- {
--	if (false && avx_usable() && boot_cpu_has(X86_FEATURE_AVX2)
-+	if (avx_usable() && boot_cpu_has(X86_FEATURE_AVX2)
- 		&& boot_cpu_has(X86_FEATURE_BMI1)
- 		&& boot_cpu_has(X86_FEATURE_BMI2))
- 		return true;
+Ok, I renamed it to struct evm_xattr.
+
+> Instead, how about defining the new struct in terms of the modified
+> evm_ima_xattr_data struct?
+
+IMHO IMA and EVM's practice of mixing and matching structs to compose
+its data structures makes the code somewhat confusing and harder to see
+where the actual storage used by a given field is actually allocated.
+
+But I don't feel strongly about it, so the patch at the end of this
+emails defines it as:
+
+struct evm_xattr {
+	struct evm_ima_xattr_data data;
+	u8 digest[SHA1_DIGEST_SIZE];
+} __packed;
+
+Another disadvantage of the above is that you have two fields pointing
+to the same place: evm_xattr.data.data and evm_xattr.digest.
+
+> Please leave the new structure in integrity.h.
+
+I think that moving the structure in evm.h is helpful. It immediately
+conveys that nothing outside of security/integrity/evm/ interprets the
+xattr data in the way defined by struct evm_xattr.
+
+But I also don't feel strongly about it, so I moved it to integrity.h.
+
 -- 
-1.9.1
+Thiago Jung Bauermann
+IBM Linux Technology Center
+
+
+>From df2e29f29c99f5c986d8005d8af8409b3c4d115c Mon Sep 17 00:00:00 2001
+From: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
+Date: Tue, 16 May 2017 17:14:49 -0300
+Subject: [PATCH v4 1/7] integrity: Introduce struct evm_xattr
+
+Even though struct evm_ima_xattr_data includes a fixed-size array to hold a
+SHA1 digest, most of the code ignores the array and uses the struct to mean
+"type indicator followed by data of unspecified size" and tracks the real
+size of what the struct represents in a separate length variable.
+
+The only exception to that is the EVM code, which correctly uses the
+definition of struct evm_ima_xattr_data.
+
+This patch makes this explicit in the code by removing the length
+specification from the array in struct evm_ima_xattr_data. It also changes
+the name of the element from digest to data, since in most places the array
+doesn't hold a digest.
+
+A separate struct evm_xattr is introduced, with the original definition of
+evm_ima_xattr_data to be used in the places that actually expect that
+definition.
+
+Signed-off-by: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
+---
+ security/integrity/evm/evm_crypto.c   |  4 ++--
+ security/integrity/evm/evm_main.c     | 10 +++++-----
+ security/integrity/ima/ima_appraise.c |  7 ++++---
+ security/integrity/integrity.h        |  5 +++++
+ 4 files changed, 16 insertions(+), 10 deletions(-)
+
+diff --git a/security/integrity/evm/evm_crypto.c b/security/integrity/evm/evm_crypto.c
+index d7f282d75cc1..d902a18ef66f 100644
+--- a/security/integrity/evm/evm_crypto.c
++++ b/security/integrity/evm/evm_crypto.c
+@@ -252,13 +252,13 @@ int evm_update_evmxattr(struct dentry *dentry, const char *xattr_name,
+ 			const char *xattr_value, size_t xattr_value_len)
+ {
+ 	struct inode *inode = d_backing_inode(dentry);
+-	struct evm_ima_xattr_data xattr_data;
++	struct evm_xattr xattr_data;
+ 	int rc = 0;
+ 
+ 	rc = evm_calc_hmac(dentry, xattr_name, xattr_value,
+ 			   xattr_value_len, xattr_data.digest);
+ 	if (rc == 0) {
+-		xattr_data.type = EVM_XATTR_HMAC;
++		xattr_data.data.type = EVM_XATTR_HMAC;
+ 		rc = __vfs_setxattr_noperm(dentry, XATTR_NAME_EVM,
+ 					   &xattr_data,
+ 					   sizeof(xattr_data), 0);
+diff --git a/security/integrity/evm/evm_main.c b/security/integrity/evm/evm_main.c
+index 063d38aef64e..536694499515 100644
+--- a/security/integrity/evm/evm_main.c
++++ b/security/integrity/evm/evm_main.c
+@@ -116,7 +116,7 @@ static enum integrity_status evm_verify_hmac(struct dentry *dentry,
+ 					     struct integrity_iint_cache *iint)
+ {
+ 	struct evm_ima_xattr_data *xattr_data = NULL;
+-	struct evm_ima_xattr_data calc;
++	struct evm_xattr calc;
+ 	enum integrity_status evm_status = INTEGRITY_PASS;
+ 	int rc, xattr_len;
+ 
+@@ -147,7 +147,7 @@ static enum integrity_status evm_verify_hmac(struct dentry *dentry,
+ 	/* check value type */
+ 	switch (xattr_data->type) {
+ 	case EVM_XATTR_HMAC:
+-		if (xattr_len != sizeof(struct evm_ima_xattr_data)) {
++		if (xattr_len != sizeof(struct evm_xattr)) {
+ 			evm_status = INTEGRITY_FAIL;
+ 			goto out;
+ 		}
+@@ -155,7 +155,7 @@ static enum integrity_status evm_verify_hmac(struct dentry *dentry,
+ 				   xattr_value_len, calc.digest);
+ 		if (rc)
+ 			break;
+-		rc = crypto_memneq(xattr_data->digest, calc.digest,
++		rc = crypto_memneq(xattr_data->data, calc.digest,
+ 			    sizeof(calc.digest));
+ 		if (rc)
+ 			rc = -EINVAL;
+@@ -467,7 +467,7 @@ int evm_inode_init_security(struct inode *inode,
+ 				 const struct xattr *lsm_xattr,
+ 				 struct xattr *evm_xattr)
+ {
+-	struct evm_ima_xattr_data *xattr_data;
++	struct evm_xattr *xattr_data;
+ 	int rc;
+ 
+ 	if (!evm_initialized || !evm_protected_xattr(lsm_xattr->name))
+@@ -477,7 +477,7 @@ int evm_inode_init_security(struct inode *inode,
+ 	if (!xattr_data)
+ 		return -ENOMEM;
+ 
+-	xattr_data->type = EVM_XATTR_HMAC;
++	xattr_data->data.type = EVM_XATTR_HMAC;
+ 	rc = evm_init_hmac(inode, lsm_xattr, xattr_data->digest);
+ 	if (rc < 0)
+ 		goto out;
+diff --git a/security/integrity/ima/ima_appraise.c b/security/integrity/ima/ima_appraise.c
+index 809ba70fbbbf..87d2b601cf8e 100644
+--- a/security/integrity/ima/ima_appraise.c
++++ b/security/integrity/ima/ima_appraise.c
+@@ -156,7 +156,8 @@ enum hash_algo ima_get_hash_algo(struct evm_ima_xattr_data *xattr_value,
+ 		return sig->hash_algo;
+ 		break;
+ 	case IMA_XATTR_DIGEST_NG:
+-		ret = xattr_value->digest[0];
++		/* first byte contains algorithm id */
++		ret = xattr_value->data[0];
+ 		if (ret < HASH_ALGO__LAST)
+ 			return ret;
+ 		break;
+@@ -164,7 +165,7 @@ enum hash_algo ima_get_hash_algo(struct evm_ima_xattr_data *xattr_value,
+ 		/* this is for backward compatibility */
+ 		if (xattr_len == 21) {
+ 			unsigned int zero = 0;
+-			if (!memcmp(&xattr_value->digest[16], &zero, 4))
++			if (!memcmp(&xattr_value->data[16], &zero, 4))
+ 				return HASH_ALGO_MD5;
+ 			else
+ 				return HASH_ALGO_SHA1;
+@@ -253,7 +254,7 @@ int ima_appraise_measurement(enum ima_hooks func,
+ 			/* xattr length may be longer. md5 hash in previous
+ 			   version occupied 20 bytes in xattr, instead of 16
+ 			 */
+-			rc = memcmp(&xattr_value->digest[hash_start],
++			rc = memcmp(&xattr_value->data[hash_start],
+ 				    iint->ima_hash->digest,
+ 				    iint->ima_hash->length);
+ 		else
+diff --git a/security/integrity/integrity.h b/security/integrity/integrity.h
+index a53e7e4ab06c..9b1762076f38 100644
+--- a/security/integrity/integrity.h
++++ b/security/integrity/integrity.h
+@@ -63,6 +63,11 @@ enum evm_ima_xattr_type {
+ 
+ struct evm_ima_xattr_data {
+ 	u8 type;
++	u8 data[];
++} __packed;
++
++struct evm_xattr {
++	struct evm_ima_xattr_data data;
+ 	u8 digest[SHA1_DIGEST_SIZE];
+ } __packed;
+ 
+-- 
+2.13.0
