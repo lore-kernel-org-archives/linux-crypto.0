@@ -1,8 +1,8 @@
 From: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
-Subject: Re: [PATCH v3 1/7] integrity: Introduce struct evm_hmac_xattr
-Date: Wed, 02 Aug 2017 14:17:05 -0300
-Message-ID: <87h8xpyjn2.fsf@linux.vnet.ibm.com>
-References: <20170706221753.17380-1-bauerman@linux.vnet.ibm.com> <20170706221753.17380-2-bauerman@linux.vnet.ibm.com> <1501245566.10288.35.camel@linux.vnet.ibm.com>
+Subject: Re: [PATCH v3 7/7] ima: Support module-style appended signatures for appraisal
+Date: Wed, 02 Aug 2017 14:42:47 -0300
+Message-ID: <87fud9yig8.fsf@linux.vnet.ibm.com>
+References: <20170706221753.17380-1-bauerman@linux.vnet.ibm.com> <20170706221753.17380-8-bauerman@linux.vnet.ibm.com> <1501424988.9230.67.camel@linux.vnet.ibm.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: linux-security-module@vger.kernel.org,
@@ -20,224 +20,210 @@ Cc: linux-security-module@vger.kernel.org,
         "David S. Miller" <davem@davemloft.net>,
         "AKASHI\, Takahiro" <takahiro.akashi@linaro.org>
 To: Mimi Zohar <zohar@linux.vnet.ibm.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54578 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1751172AbdHBRRY (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Aug 2017 13:17:24 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id v72HE8A4127312
-        for <linux-crypto@vger.kernel.org>; Wed, 2 Aug 2017 13:17:23 -0400
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2c3ety5r78-1
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Wed, 02 Aug 2017 13:17:23 -0400
-Received: from localhost
-        by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-crypto@vger.kernel.org> from <bauerman@linux.vnet.ibm.com>;
-        Wed, 2 Aug 2017 13:17:23 -0400
-In-reply-to: <1501245566.10288.35.camel@linux.vnet.ibm.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-security-module-owner@vger.kernel.org>
+In-reply-to: <1501424988.9230.67.camel@linux.vnet.ibm.com>
+Sender: owner-linux-security-module@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-
-Hello Mimi,
-
-Thanks for your review!
-
-The patch at the end of the email implements your suggestions, what do
-you think?
 
 Mimi Zohar <zohar@linux.vnet.ibm.com> writes:
+
 > On Thu, 2017-07-06 at 19:17 -0300, Thiago Jung Bauermann wrote:
->> A separate struct evm_hmac_xattr is introduced, with the original
->> definition of evm_ima_xattr_data to be used in the places that actually
->> expect that definition.
+>> --- a/security/integrity/ima/ima_appraise.c
+>> +++ b/security/integrity/ima/ima_appraise.c
+>> @@ -200,18 +200,40 @@ int ima_read_xattr(struct dentry *dentry,
+>>   */
+>>  int ima_appraise_measurement(enum ima_hooks func,
+>>  			     struct integrity_iint_cache *iint,
+>> -			     struct file *file, const unsigned char *filename,
+>> -			     struct evm_ima_xattr_data *xattr_value,
+>> -			     int xattr_len, int opened)
+>> +			     struct file *file, const void *buf, loff_t size,
+>> +			     const unsigned char *filename,
+>> +			     struct evm_ima_xattr_data **xattr_value_,
+>> +			     int *xattr_len_, int opened)
+>>  {
+>>  	static const char op[] = "appraise_data";
+>>  	char *cause = "unknown";
+>>  	struct dentry *dentry = file_dentry(file);
+>>  	struct inode *inode = d_backing_inode(dentry);
+>>  	enum integrity_status status = INTEGRITY_UNKNOWN;
+>> -	int rc = xattr_len, hash_start = 0;
+>> +	struct evm_ima_xattr_data *xattr_value = *xattr_value_;
+>> +	int xattr_len = *xattr_len_, rc = xattr_len, hash_start = 0;
+>> +	bool appraising_modsig = false;
+>> +	void *xattr_value_evm;
+>> +	size_t xattr_len_evm;
+>> +
+>> +	if (iint->flags & IMA_MODSIG_ALLOWED) {
+>> +		/*
+>> +		 * Not supposed to happen. Hooks that support modsig are
+>> +		 * whitelisted when parsing the policy using
+>> +		 * ima_hooks_supports_modsig.
+>> +		 */
+>> +		if (!buf || !size)
+>> +			WARN_ONCE(true, "%s doesn't support modsig\n",
+>> +				  func_tokens[func]);
 >
-> The new structure name implies that the xattr can only be an HMAC. By
-> moving the new structure to evm.h we also loose the connection that it
-> has to theevm_ima_xattr_type enumeration.
+> ima _appraise_measurement() is getting kind of long. Is there any
+> reason we can't move this comment and test to ima_read_modsig()?
 
-Ok, I renamed it to struct evm_xattr.
+I didn't do that because then I would need to pass func as an argument
+to ima_read_modsig just to print the warning above. But it does simplify
+the code so it may be worth it. I'll make that change in v4.
 
-> Instead, how about defining the new struct in terms of the modified
-> evm_ima_xattr_data struct?
+>> @@ -229,8 +251,24 @@ int ima_appraise_measurement(enum ima_hooks func,
+>>  		goto out;
+>>  	}
+>> 
+>> -	status = evm_verifyxattr(dentry, XATTR_NAME_IMA, xattr_value, rc, iint);
+>> -	if ((status != INTEGRITY_PASS) && (status != INTEGRITY_UNKNOWN)) {
+>> +	/*
+>> +	 * Appended signatures aren't protected by EVM but we still call
+>> +	 * evm_verifyxattr to check other security xattrs, if they exist.
+>> +	 */
+>> +	if (appraising_modsig) {
+>> +		xattr_value_evm = NULL;
+>> +		xattr_len_evm = 0;
+>> +	} else {
+>> +		xattr_value_evm = xattr_value;
+>> +		xattr_len_evm = xattr_len;
+>> +	}
+>> +
+>> +	status = evm_verifyxattr(dentry, XATTR_NAME_IMA, xattr_value_evm,
+>> +				 xattr_len_evm, iint);
+>> +	if (appraising_modsig && status == INTEGRITY_FAIL) {
+>> +		cause = "invalid-HMAC";
+>> +		goto out;
+>
+> "modsig" is special, because having any security xattrs is not
+> required. This test doesn't prevent status from being set to
+> "missing-HMAC". This test is redundant with the original tests below.
 
-IMHO IMA and EVM's practice of mixing and matching structs to compose
-its data structures makes the code somewhat confusing and harder to see
-where the actual storage used by a given field is actually allocated.
+Indeed, that is wrong. I'm still a bit fuzzy about how EVM works and how
+it interacts with IMA. The only way I can think of singling out modsig
+without reintroduced the complex expression you didn't like in v2 is as
+below. What do you think?
 
-But I don't feel strongly about it, so the patch at the end of this
-emails defines it as:
+@@ -229,8 +241,25 @@ int ima_appraise_measurement(enum ima_hooks func,
+ 		goto out;
+ 	}
+ 
+-	status = evm_verifyxattr(dentry, XATTR_NAME_IMA, xattr_value, rc, iint);
+-	if ((status != INTEGRITY_PASS) && (status != INTEGRITY_UNKNOWN)) {
++	/*
++	 * Appended signatures aren't protected by EVM but we still call
++	 * evm_verifyxattr to check other security xattrs, if they exist.
++	 */
++	if (appraising_modsig) {
++		xattr_value_evm = NULL;
++		xattr_len_evm = 0;
++	} else {
++		xattr_value_evm = xattr_value;
++		xattr_len_evm = xattr_len;
++	}
++
++	status = evm_verifyxattr(dentry, XATTR_NAME_IMA, xattr_value_evm,
++				 xattr_len_evm, iint);
++	if (appraising_modsig && (status == INTEGRITY_NOLABEL
++				  || status == INTEGRITY_NOXATTRS))
++		/* It's ok if there's no xattr in the case of modsig. */
++		;
++	else if (status != INTEGRITY_PASS && status != INTEGRITY_UNKNOWN) {
+ 		if ((status == INTEGRITY_NOLABEL)
+ 		    || (status == INTEGRITY_NOXATTRS))
+ 			cause = "missing-HMAC";
 
-struct evm_xattr {
-	struct evm_ima_xattr_data data;
-	u8 digest[SHA1_DIGEST_SIZE];
-} __packed;
+>> +	} else if (status != INTEGRITY_PASS && status != INTEGRITY_UNKNOWN) {
+>>  		if ((status == INTEGRITY_NOLABEL)
+>>  		    || (status == INTEGRITY_NOXATTRS))
+>>  			cause = "missing-HMAC";
+>> @@ -281,6 +319,43 @@ int ima_appraise_measurement(enum ima_hooks func,
+>>  			status = INTEGRITY_PASS;
+>>  		}
+>
+> Calling evm_verifyxattr() with the IMA xattr value prevents EVM from
+> having to re-read the IMA xattr, but isn't necessary.On modsig
+> signature verification failure, calling evm_verifyxattr() a second
+> time isn't necessary.
 
-Another disadvantage of the above is that you have two fields pointing
-to the same place: evm_xattr.data.data and evm_xattr.digest.
+So even for the IMA xattr sig case, the evm_verifyxattr call in
+ima_appraise_measurement is an optimization and can be skipped?
 
-> Please leave the new structure in integrity.h.
+>> +	case IMA_MODSIG:
+>> +		/*
+>> +		 * To avoid being tricked into recursion, we don't allow a
+>> +		 * modsig stored in the xattr.
+>> +		 */
+>> +		if (!appraising_modsig) {
+>> +			status = INTEGRITY_UNKNOWN;
+>> +			cause = "unknown-ima-data";
+>> +
+>> +			break;
+>> +		}
+>> +
+>> +		rc = ima_modsig_verify(INTEGRITY_KEYRING_IMA, xattr_value);
+>> +		if (!rc) {
+>> +			iint->flags |= IMA_DIGSIG;
+>> +			status = 
+>> +
+>> +			kfree(*xattr_value_);
+>> +			*xattr_value_ = xattr_value;
+>> +			*xattr_len_ = xattr_len;
+>> +
+>> +			break;
+>> +		}
+>
+> When including the appended signature in the measurement list, the
+> corresponding file hash needs to be included in the measurement list,
+> which might be different than the previously calculated file hash
+> based on the hash algorithm as defined in the IMA xattr.
+>
+> Including the file hash and signature in the measurement list allows
+> the attestation server, with just a public key, to verify the file
+> signature against the file hash. No need for a white list.
+>
+> ima_modsig_verify() must calculate the file hash in order to verify
+> the file signature. This file hash value somehow needs to be returned
+> in order for it to be included in the measurement list.
 
-I think that moving the structure in evm.h is helpful. It immediately
-conveys that nothing outside of security/integrity/evm/ interprets the
-xattr data in the way defined by struct evm_xattr.
+In that case, patch 6/7 "ima: Store measurement after appraisal" isn't
+enough and we have to go back to v2's change in ima_main.c which ties
+together the collect and appraise steps in process_measurement (In that
+version I called the function measure_and_appraise but it should be
+called collect_and_appraise instead). That is because if the modsig
+verification fails, the hash needs to be recalculated for the xattr
+signature verification.
 
-But I also don't feel strongly about it, so I moved it to integrity.h.
+Either that, or I add another call to ima_collect_measurement inside
+ima_appraise_measurement if the modsig verification fails. Which do you
+prefer?
+
+>> +		/*
+>> +		 * The appended signature failed verification. Let's try
+>> +		 * reading a signature from the extended attribute instead.
+>> +		 */
+>> +
+>> +		pr_debug("modsig didn't verify, trying the xattr signature\n");
+>> +
+>> +		ima_free_xattr_data(xattr_value);
+>> +		iint->flags &= ~IMA_MODSIG_ALLOWED;
+>> +
+>> +		return ima_appraise_measurement(func, iint, file, buf, size,
+>> +						filename, xattr_value_,
+>> +						xattr_len_, opened);
+>
+> Most of the code before "switch" needs to be done only once. Is
+> recursion necessary? Or can we just retry the "switch" using the IMA
+> xattr, assuming there is an IMA xattr?
+
+I used recursion to avoid duplicating two blocks of code: the logic in
+the "if (rc <= 0)" block which needs to be done again when verifying the
+xattr sig, and also the logic of interpreting the return value of
+evm_verifyxattr which I also thought needed to be done again, but you
+seem to be saying that is just an optimization and can be skipped.
 
 -- 
 Thiago Jung Bauermann
 IBM Linux Technology Center
 
-
->From df2e29f29c99f5c986d8005d8af8409b3c4d115c Mon Sep 17 00:00:00 2001
-From: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
-Date: Tue, 16 May 2017 17:14:49 -0300
-Subject: [PATCH v4 1/7] integrity: Introduce struct evm_xattr
-
-Even though struct evm_ima_xattr_data includes a fixed-size array to hold a
-SHA1 digest, most of the code ignores the array and uses the struct to mean
-"type indicator followed by data of unspecified size" and tracks the real
-size of what the struct represents in a separate length variable.
-
-The only exception to that is the EVM code, which correctly uses the
-definition of struct evm_ima_xattr_data.
-
-This patch makes this explicit in the code by removing the length
-specification from the array in struct evm_ima_xattr_data. It also changes
-the name of the element from digest to data, since in most places the array
-doesn't hold a digest.
-
-A separate struct evm_xattr is introduced, with the original definition of
-evm_ima_xattr_data to be used in the places that actually expect that
-definition.
-
-Signed-off-by: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
----
- security/integrity/evm/evm_crypto.c   |  4 ++--
- security/integrity/evm/evm_main.c     | 10 +++++-----
- security/integrity/ima/ima_appraise.c |  7 ++++---
- security/integrity/integrity.h        |  5 +++++
- 4 files changed, 16 insertions(+), 10 deletions(-)
-
-diff --git a/security/integrity/evm/evm_crypto.c b/security/integrity/evm/evm_crypto.c
-index d7f282d75cc1..d902a18ef66f 100644
---- a/security/integrity/evm/evm_crypto.c
-+++ b/security/integrity/evm/evm_crypto.c
-@@ -252,13 +252,13 @@ int evm_update_evmxattr(struct dentry *dentry, const char *xattr_name,
- 			const char *xattr_value, size_t xattr_value_len)
- {
- 	struct inode *inode = d_backing_inode(dentry);
--	struct evm_ima_xattr_data xattr_data;
-+	struct evm_xattr xattr_data;
- 	int rc = 0;
- 
- 	rc = evm_calc_hmac(dentry, xattr_name, xattr_value,
- 			   xattr_value_len, xattr_data.digest);
- 	if (rc == 0) {
--		xattr_data.type = EVM_XATTR_HMAC;
-+		xattr_data.data.type = EVM_XATTR_HMAC;
- 		rc = __vfs_setxattr_noperm(dentry, XATTR_NAME_EVM,
- 					   &xattr_data,
- 					   sizeof(xattr_data), 0);
-diff --git a/security/integrity/evm/evm_main.c b/security/integrity/evm/evm_main.c
-index 063d38aef64e..536694499515 100644
---- a/security/integrity/evm/evm_main.c
-+++ b/security/integrity/evm/evm_main.c
-@@ -116,7 +116,7 @@ static enum integrity_status evm_verify_hmac(struct dentry *dentry,
- 					     struct integrity_iint_cache *iint)
- {
- 	struct evm_ima_xattr_data *xattr_data = NULL;
--	struct evm_ima_xattr_data calc;
-+	struct evm_xattr calc;
- 	enum integrity_status evm_status = INTEGRITY_PASS;
- 	int rc, xattr_len;
- 
-@@ -147,7 +147,7 @@ static enum integrity_status evm_verify_hmac(struct dentry *dentry,
- 	/* check value type */
- 	switch (xattr_data->type) {
- 	case EVM_XATTR_HMAC:
--		if (xattr_len != sizeof(struct evm_ima_xattr_data)) {
-+		if (xattr_len != sizeof(struct evm_xattr)) {
- 			evm_status = INTEGRITY_FAIL;
- 			goto out;
- 		}
-@@ -155,7 +155,7 @@ static enum integrity_status evm_verify_hmac(struct dentry *dentry,
- 				   xattr_value_len, calc.digest);
- 		if (rc)
- 			break;
--		rc = crypto_memneq(xattr_data->digest, calc.digest,
-+		rc = crypto_memneq(xattr_data->data, calc.digest,
- 			    sizeof(calc.digest));
- 		if (rc)
- 			rc = -EINVAL;
-@@ -467,7 +467,7 @@ int evm_inode_init_security(struct inode *inode,
- 				 const struct xattr *lsm_xattr,
- 				 struct xattr *evm_xattr)
- {
--	struct evm_ima_xattr_data *xattr_data;
-+	struct evm_xattr *xattr_data;
- 	int rc;
- 
- 	if (!evm_initialized || !evm_protected_xattr(lsm_xattr->name))
-@@ -477,7 +477,7 @@ int evm_inode_init_security(struct inode *inode,
- 	if (!xattr_data)
- 		return -ENOMEM;
- 
--	xattr_data->type = EVM_XATTR_HMAC;
-+	xattr_data->data.type = EVM_XATTR_HMAC;
- 	rc = evm_init_hmac(inode, lsm_xattr, xattr_data->digest);
- 	if (rc < 0)
- 		goto out;
-diff --git a/security/integrity/ima/ima_appraise.c b/security/integrity/ima/ima_appraise.c
-index 809ba70fbbbf..87d2b601cf8e 100644
---- a/security/integrity/ima/ima_appraise.c
-+++ b/security/integrity/ima/ima_appraise.c
-@@ -156,7 +156,8 @@ enum hash_algo ima_get_hash_algo(struct evm_ima_xattr_data *xattr_value,
- 		return sig->hash_algo;
- 		break;
- 	case IMA_XATTR_DIGEST_NG:
--		ret = xattr_value->digest[0];
-+		/* first byte contains algorithm id */
-+		ret = xattr_value->data[0];
- 		if (ret < HASH_ALGO__LAST)
- 			return ret;
- 		break;
-@@ -164,7 +165,7 @@ enum hash_algo ima_get_hash_algo(struct evm_ima_xattr_data *xattr_value,
- 		/* this is for backward compatibility */
- 		if (xattr_len == 21) {
- 			unsigned int zero = 0;
--			if (!memcmp(&xattr_value->digest[16], &zero, 4))
-+			if (!memcmp(&xattr_value->data[16], &zero, 4))
- 				return HASH_ALGO_MD5;
- 			else
- 				return HASH_ALGO_SHA1;
-@@ -253,7 +254,7 @@ int ima_appraise_measurement(enum ima_hooks func,
- 			/* xattr length may be longer. md5 hash in previous
- 			   version occupied 20 bytes in xattr, instead of 16
- 			 */
--			rc = memcmp(&xattr_value->digest[hash_start],
-+			rc = memcmp(&xattr_value->data[hash_start],
- 				    iint->ima_hash->digest,
- 				    iint->ima_hash->length);
- 		else
-diff --git a/security/integrity/integrity.h b/security/integrity/integrity.h
-index a53e7e4ab06c..9b1762076f38 100644
---- a/security/integrity/integrity.h
-+++ b/security/integrity/integrity.h
-@@ -63,6 +63,11 @@ enum evm_ima_xattr_type {
- 
- struct evm_ima_xattr_data {
- 	u8 type;
-+	u8 data[];
-+} __packed;
-+
-+struct evm_xattr {
-+	struct evm_ima_xattr_data data;
- 	u8 digest[SHA1_DIGEST_SIZE];
- } __packed;
- 
--- 
-2.13.0
