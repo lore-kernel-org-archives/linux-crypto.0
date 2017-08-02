@@ -1,17 +1,17 @@
 From: Megha Dey <megha.dey@linux.intel.com>
-Subject: [PATCH] crypto: x86/sha1 : Fix reads beyond the number of blocks passed
-Date: Tue,  1 Aug 2017 17:03:30 -0700
-Message-ID: <1501632210-11661-1-git-send-email-megha.dey@linux.intel.com>
+Subject: [Patch V2] crypto: x86/sha1 : Fix reads beyond the number of blocks passed
+Date: Tue,  1 Aug 2017 17:38:32 -0700
+Message-ID: <1501634312-22788-1-git-send-email-megha.dey@linux.intel.com>
 Cc: tim.c.chen@linux.intel.com, davem@davemloft.net,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        jstancek@redhat.com, megha.dey@intel.com,
+        jstancek@redhat.com, ilya.albrekht@intel.com, megha.dey@intel.com,
         Megha Dey <megha.dey@linux.intel.com>
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:25598 "EHLO mga11.intel.com"
+Received: from mga04.intel.com ([192.55.52.120]:27824 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750947AbdHAXv3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 1 Aug 2017 19:51:29 -0400
+        id S1751029AbdHBA0d (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 1 Aug 2017 20:26:33 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
@@ -29,6 +29,7 @@ Jan, can you verify this fix?
 Herbert, can you re-enable sha1-avx2 once Jan has checked it out and
 revert commit b82ce24426a4071da9529d726057e4e642948667 ?
 
+Originally-by: Ilya Albrekht <ilya.albrekht@intel.com>
 Signed-off-by: Megha Dey <megha.dey@linux.intel.com>
 Reported-by: Jan Stancek <jstancek@redhat.com>
 ---
