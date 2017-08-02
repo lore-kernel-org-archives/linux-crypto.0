@@ -1,214 +1,241 @@
-From: Megha Dey <megha.dey@linux.intel.com>
-Subject: [Patch V4] crypto: x86/sha1 : Fix reads beyond the number of blocks passed
-Date: Wed,  2 Aug 2017 13:49:09 -0700
-Message-ID: <1501706949-24322-1-git-send-email-megha.dey@linux.intel.com>
-Cc: tim.c.chen@linux.intel.com, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        jstancek@redhat.com, ilya.albrekht@intel.com, megha.dey@intel.com,
-        Megha Dey <megha.dey@linux.intel.com>
-To: herbert@gondor.apana.org.au
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Subject: Re: [PATCH v3 7/7] ima: Support module-style appended signatures
+ for appraisal
+Date: Wed, 02 Aug 2017 18:52:14 -0400
+Message-ID: <1501714334.27872.38.camel@linux.vnet.ibm.com>
+References: <20170706221753.17380-1-bauerman@linux.vnet.ibm.com>
+         <20170706221753.17380-8-bauerman@linux.vnet.ibm.com>
+         <1501424988.9230.67.camel@linux.vnet.ibm.com>
+         <87fud9yig8.fsf@linux.vnet.ibm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Cc: linux-security-module@vger.kernel.org,
+        linux-ima-devel@lists.sourceforge.net, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-kernel@vger.kernel.org,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        James Morris <james.l.morris@oracle.com>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Jessica Yu <jeyu@redhat.com>,
+        Rusty Russell <rusty@rustcorp.com.au>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "AKASHI, Takahiro" <takahiro.akashi@linaro.org>
+To: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46916 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1751058AbdHBWwa (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 2 Aug 2017 18:52:30 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id v72MoJoa114571
+        for <linux-crypto@vger.kernel.org>; Wed, 2 Aug 2017 18:52:30 -0400
+Received: from e23smtp03.au.ibm.com (e23smtp03.au.ibm.com [202.81.31.145])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2c3h6r2y7h-1
+        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Wed, 02 Aug 2017 18:52:30 -0400
+Received: from localhost
+        by e23smtp03.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-crypto@vger.kernel.org> from <zohar@linux.vnet.ibm.com>;
+        Thu, 3 Aug 2017 08:52:27 +1000
+In-Reply-To: <87fud9yig8.fsf@linux.vnet.ibm.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-It was reported that the sha1 AVX2 function(sha1_transform_avx2) is
-reading ahead beyond its intended data, and causing a crash if the next
-block is beyond page boundary:
-http://marc.info/?l=linux-crypto-vger&m=149373371023377
+On Wed, 2017-08-02 at 14:42 -0300, Thiago Jung Bauermann wrote:
+> Mimi Zohar <zohar@linux.vnet.ibm.com> writes:
+> 
+> > On Thu, 2017-07-06 at 19:17 -0300, Thiago Jung Bauermann wrote:
+> >> --- a/security/integrity/ima/ima_appraise.c
+> >> +++ b/security/integrity/ima/ima_appraise.c
+> >> @@ -200,18 +200,40 @@ int ima_read_xattr(struct dentry *dentry,
+> >>   */
+> >>  int ima_appraise_measurement(enum ima_hooks func,
+> >>  			     struct integrity_iint_cache *iint,
+> >> -			     struct file *file, const unsigned char *filename,
+> >> -			     struct evm_ima_xattr_data *xattr_value,
+> >> -			     int xattr_len, int opened)
+> >> +			     struct file *file, const void *buf, loff_t size,
+> >> +			     const unsigned char *filename,
+> >> +			     struct evm_ima_xattr_data **xattr_value_,
+> >> +			     int *xattr_len_, int opened)
+> >>  {
+> >>  	static const char op[] = "appraise_data";
+> >>  	char *cause = "unknown";
+> >>  	struct dentry *dentry = file_dentry(file);
+> >>  	struct inode *inode = d_backing_inode(dentry);
+> >>  	enum integrity_status status = INTEGRITY_UNKNOWN;
+> >> -	int rc = xattr_len, hash_start = 0;
+> >> +	struct evm_ima_xattr_data *xattr_value = *xattr_value_;
+> >> +	int xattr_len = *xattr_len_, rc = xattr_len, hash_start = 0;
+> >> +	bool appraising_modsig = false;
+> >> +	void *xattr_value_evm;
+> >> +	size_t xattr_len_evm;
+> >> +
+> >> +	if (iint->flags & IMA_MODSIG_ALLOWED) {
+> >> +		/*
+> >> +		 * Not supposed to happen. Hooks that support modsig are
+> >> +		 * whitelisted when parsing the policy using
+> >> +		 * ima_hooks_supports_modsig.
+> >> +		 */
+> >> +		if (!buf || !size)
+> >> +			WARN_ONCE(true, "%s doesn't support modsig\n",
+> >> +				  func_tokens[func]);
+> >
+> > ima _appraise_measurement() is getting kind of long. Is there any
+> > reason we can't move this comment and test to ima_read_modsig()?
+> 
+> I didn't do that because then I would need to pass func as an argument
+> to ima_read_modsig just to print the warning above. But it does simplify
+> the code so it may be worth it. I'll make that change in v4.
 
-This patch makes sure that there is no overflow for any buffer length.
+Makes sense.
 
-It passes the tests written by Jan Stancek that revealed this problem:
-https://github.com/jstancek/sha1-avx2-crash
+> >> @@ -229,8 +251,24 @@ int ima_appraise_measurement(enum ima_hooks func,
+> >>  		goto out;
+> >>  	}
+> >> 
+> >> -	status = evm_verifyxattr(dentry, XATTR_NAME_IMA, xattr_value, rc, iint);
+> >> -	if ((status != INTEGRITY_PASS) && (status != INTEGRITY_UNKNOWN)) {
+> >> +	/*
+> >> +	 * Appended signatures aren't protected by EVM but we still call
+> >> +	 * evm_verifyxattr to check other security xattrs, if they exist.
+> >> +	 */
+> >> +	if (appraising_modsig) {
+> >> +		xattr_value_evm = NULL;
+> >> +		xattr_len_evm = 0;
+> >> +	} else {
+> >> +		xattr_value_evm = xattr_value;
+> >> +		xattr_len_evm = xattr_len;
+> >> +	}
+> >> +
+> >> +	status = evm_verifyxattr(dentry, XATTR_NAME_IMA, xattr_value_evm,
+> >> +				 xattr_len_evm, iint);
+> >> +	if (appraising_modsig && status == INTEGRITY_FAIL) {
+> >> +		cause = "invalid-HMAC";
+> >> +		goto out;
+> >
+> > "modsig" is special, because having any security xattrs is not
+> > required. This test doesn't prevent status from being set to
+> > "missing-HMAC". This test is redundant with the original tests below.
+> 
+> Indeed, that is wrong. I'm still a bit fuzzy about how EVM works and how
+> it interacts with IMA. The only way I can think of singling out modsig
+> without reintroduced the complex expression you didn't like in v2 is as
+> below. What do you think?
 
-I have re-enabled sha1-avx2 by reverting commit
-b82ce24426a4071da9529d726057e4e642948667
+The original code, without any extra tests, should be fine.
 
-Originally-by: Ilya Albrekht <ilya.albrekht@intel.com>
-Tested-by: Jan Stancek <jstancek@redhat.com>
-Signed-off-by: Megha Dey <megha.dey@linux.intel.com>
-Reported-by: Jan Stancek <jstancek@redhat.com>
----
- arch/x86/crypto/sha1_avx2_x86_64_asm.S | 67 ++++++++++++++++++----------------
- arch/x86/crypto/sha1_ssse3_glue.c      |  2 +-
- 2 files changed, 37 insertions(+), 32 deletions(-)
+> 
+> @@ -229,8 +241,25 @@ int ima_appraise_measurement(enum ima_hooks func,
+>  		goto out;
+>  	}
+> 
+> -	status = evm_verifyxattr(dentry, XATTR_NAME_IMA, xattr_value, rc, iint);
+> -	if ((status != INTEGRITY_PASS) && (status != INTEGRITY_UNKNOWN)) {
+> +	/*
+> +	 * Appended signatures aren't protected by EVM but we still call
+> +	 * evm_verifyxattr to check other security xattrs, if they exist.
+> +	 */
+> +	if (appraising_modsig) {
+> +		xattr_value_evm = NULL;
+> +		xattr_len_evm = 0;
+> +	} else {
+> +		xattr_value_evm = xattr_value;
+> +		xattr_len_evm = xattr_len;
+> +	}
+> +
+> +	status = evm_verifyxattr(dentry, XATTR_NAME_IMA, xattr_value_evm,
+> +				 xattr_len_evm, iint);
+> +	if (appraising_modsig && (status == INTEGRITY_NOLABEL
+> +				  || status == INTEGRITY_NOXATTRS))
+> +		/* It's ok if there's no xattr in the case of modsig. */
+> +		;
+> +	else if (status != INTEGRITY_PASS && status != INTEGRITY_UNKNOWN) {
+>  		if ((status == INTEGRITY_NOLABEL)
+>  		    || (status == INTEGRITY_NOXATTRS))
+>  			cause = "missing-HMAC";
+> 
+> >> +	} else if (status != INTEGRITY_PASS && status != INTEGRITY_UNKNOWN) {
+> >>  		if ((status == INTEGRITY_NOLABEL)
+> >>  		    || (status == INTEGRITY_NOXATTRS))
+> >>  			cause = "missing-HMAC";
+> >> @@ -281,6 +319,43 @@ int ima_appraise_measurement(enum ima_hooks func,
+> >>  			status = INTEGRITY_PASS;
+> >>  		}
+> >
+> > Calling evm_verifyxattr() with the IMA xattr value prevents EVM from
+> > having to re-read the IMA xattr, but isn't necessary.On modsig
+> > signature verification failure, calling evm_verifyxattr() a second
+> > time isn't necessary.
+> 
+> So even for the IMA xattr sig case, the evm_verifyxattr call in
+> ima_appraise_measurement is an optimization and can be skipped?
 
-diff --git a/arch/x86/crypto/sha1_avx2_x86_64_asm.S b/arch/x86/crypto/sha1_avx2_x86_64_asm.S
-index 1cd792d..1eab79c 100644
---- a/arch/x86/crypto/sha1_avx2_x86_64_asm.S
-+++ b/arch/x86/crypto/sha1_avx2_x86_64_asm.S
-@@ -117,11 +117,10 @@
- 	.set T1, REG_T1
- .endm
- 
--#define K_BASE		%r8
- #define HASH_PTR	%r9
-+#define BLOCKS_CTR	%r8
- #define BUFFER_PTR	%r10
- #define BUFFER_PTR2	%r13
--#define BUFFER_END	%r11
- 
- #define PRECALC_BUF	%r14
- #define WK_BUF		%r15
-@@ -205,14 +204,14 @@
- 		 * blended AVX2 and ALU instruction scheduling
- 		 * 1 vector iteration per 8 rounds
- 		 */
--		vmovdqu ((i * 2) + PRECALC_OFFSET)(BUFFER_PTR), W_TMP
-+		vmovdqu (i * 2)(BUFFER_PTR), W_TMP
- 	.elseif ((i & 7) == 1)
--		vinsertf128 $1, (((i-1) * 2)+PRECALC_OFFSET)(BUFFER_PTR2),\
-+		vinsertf128 $1, ((i-1) * 2)(BUFFER_PTR2),\
- 			 WY_TMP, WY_TMP
- 	.elseif ((i & 7) == 2)
- 		vpshufb YMM_SHUFB_BSWAP, WY_TMP, WY
- 	.elseif ((i & 7) == 4)
--		vpaddd  K_XMM(K_BASE), WY, WY_TMP
-+		vpaddd  K_XMM + K_XMM_AR(%rip), WY, WY_TMP
- 	.elseif ((i & 7) == 7)
- 		vmovdqu  WY_TMP, PRECALC_WK(i&~7)
- 
-@@ -255,7 +254,7 @@
- 		vpxor	WY, WY_TMP, WY_TMP
- 	.elseif ((i & 7) == 7)
- 		vpxor	WY_TMP2, WY_TMP, WY
--		vpaddd	K_XMM(K_BASE), WY, WY_TMP
-+		vpaddd  K_XMM + K_XMM_AR(%rip), WY, WY_TMP
- 		vmovdqu	WY_TMP, PRECALC_WK(i&~7)
- 
- 		PRECALC_ROTATE_WY
-@@ -291,7 +290,7 @@
- 		vpsrld	$30, WY, WY
- 		vpor	WY, WY_TMP, WY
- 	.elseif ((i & 7) == 7)
--		vpaddd	K_XMM(K_BASE), WY, WY_TMP
-+		vpaddd  K_XMM + K_XMM_AR(%rip), WY, WY_TMP
- 		vmovdqu	WY_TMP, PRECALC_WK(i&~7)
- 
- 		PRECALC_ROTATE_WY
-@@ -446,6 +445,16 @@
- 
- .endm
- 
-+/* Add constant only if (%2 > %3) condition met (uses RTA as temp)
-+ * %1 + %2 >= %3 ? %4 : 0
-+ */
-+.macro ADD_IF_GE a, b, c, d
-+	mov     \a, RTA
-+	add     $\d, RTA
-+	cmp     $\c, \b
-+	cmovge  RTA, \a
-+.endm
-+
- /*
-  * macro implements 80 rounds of SHA-1, for multiple blocks with s/w pipelining
-  */
-@@ -463,13 +472,16 @@
- 	lea	(2*4*80+32)(%rsp), WK_BUF
- 
- 	# Precalc WK for first 2 blocks
--	PRECALC_OFFSET = 0
-+	ADD_IF_GE BUFFER_PTR2, BLOCKS_CTR, 2, 64
- 	.set i, 0
- 	.rept    160
- 		PRECALC i
- 		.set i, i + 1
- 	.endr
--	PRECALC_OFFSET = 128
-+
-+	/* Go to next block if needed */
-+	ADD_IF_GE BUFFER_PTR, BLOCKS_CTR, 3, 128
-+	ADD_IF_GE BUFFER_PTR2, BLOCKS_CTR, 4, 128
- 	xchg	WK_BUF, PRECALC_BUF
- 
- 	.align 32
-@@ -479,8 +491,8 @@ _loop:
- 	 * we use K_BASE value as a signal of a last block,
- 	 * it is set below by: cmovae BUFFER_PTR, K_BASE
- 	 */
--	cmp	K_BASE, BUFFER_PTR
--	jne	_begin
-+	test BLOCKS_CTR, BLOCKS_CTR
-+	jnz _begin
- 	.align 32
- 	jmp	_end
- 	.align 32
-@@ -512,10 +524,10 @@ _loop0:
- 		.set j, j+2
- 	.endr
- 
--	add	$(2*64), BUFFER_PTR       /* move to next odd-64-byte block */
--	cmp	BUFFER_END, BUFFER_PTR    /* is current block the last one? */
--	cmovae	K_BASE, BUFFER_PTR	/* signal the last iteration smartly */
--
-+	/* Update Counter */
-+	sub $1, BLOCKS_CTR
-+	/* Move to the next block only if needed*/
-+	ADD_IF_GE BUFFER_PTR, BLOCKS_CTR, 4, 128
- 	/*
- 	 * rounds
- 	 * 60,62,64,66,68
-@@ -532,8 +544,8 @@ _loop0:
- 	UPDATE_HASH	12(HASH_PTR), D
- 	UPDATE_HASH	16(HASH_PTR), E
- 
--	cmp	K_BASE, BUFFER_PTR	/* is current block the last one? */
--	je	_loop
-+	test	BLOCKS_CTR, BLOCKS_CTR
-+	jz	_loop
- 
- 	mov	TB, B
- 
-@@ -575,10 +587,10 @@ _loop2:
- 		.set j, j+2
- 	.endr
- 
--	add	$(2*64), BUFFER_PTR2      /* move to next even-64-byte block */
--
--	cmp	BUFFER_END, BUFFER_PTR2   /* is current block the last one */
--	cmovae	K_BASE, BUFFER_PTR       /* signal the last iteration smartly */
-+	/* update counter */
-+	sub     $1, BLOCKS_CTR
-+	/* Move to the next block only if needed*/
-+	ADD_IF_GE BUFFER_PTR2, BLOCKS_CTR, 4, 128
- 
- 	jmp	_loop3
- _loop3:
-@@ -641,19 +653,12 @@ _loop3:
- 
- 	avx2_zeroupper
- 
--	lea	K_XMM_AR(%rip), K_BASE
--
-+	/* Setup initial values */
- 	mov	CTX, HASH_PTR
- 	mov	BUF, BUFFER_PTR
--	lea	64(BUF), BUFFER_PTR2
--
--	shl	$6, CNT			/* mul by 64 */
--	add	BUF, CNT
--	add	$64, CNT
--	mov	CNT, BUFFER_END
- 
--	cmp	BUFFER_END, BUFFER_PTR2
--	cmovae	K_BASE, BUFFER_PTR2
-+	mov	BUF, BUFFER_PTR2
-+	mov	CNT, BLOCKS_CTR
- 
- 	xmm_mov	BSWAP_SHUFB_CTL(%rip), YMM_SHUFB_BSWAP
- 
-diff --git a/arch/x86/crypto/sha1_ssse3_glue.c b/arch/x86/crypto/sha1_ssse3_glue.c
-index f960a04..fc61739 100644
---- a/arch/x86/crypto/sha1_ssse3_glue.c
-+++ b/arch/x86/crypto/sha1_ssse3_glue.c
-@@ -201,7 +201,7 @@ asmlinkage void sha1_transform_avx2(u32 *digest, const char *data,
- 
- static bool avx2_usable(void)
- {
--	if (false && avx_usable() && boot_cpu_has(X86_FEATURE_AVX2)
-+	if (avx_usable() && boot_cpu_has(X86_FEATURE_AVX2)
- 		&& boot_cpu_has(X86_FEATURE_BMI1)
- 		&& boot_cpu_has(X86_FEATURE_BMI2))
- 		return true;
--- 
-1.9.1
+Right, it is just an optimization.  The evm xattr needs to be verified
+just once.
+
+> >> +	case IMA_MODSIG:
+> >> +		/*
+> >> +		 * To avoid being tricked into recursion, we don't allow a
+> >> +		 * modsig stored in the xattr.
+> >> +		 */
+> >> +		if (!appraising_modsig) {
+> >> +			status = INTEGRITY_UNKNOWN;
+> >> +			cause = "unknown-ima-data";
+> >> +
+> >> +			break;
+> >> +		}
+> >> +
+> >> +		rc = ima_modsig_verify(INTEGRITY_KEYRING_IMA, xattr_value);
+> >> +		if (!rc) {
+> >> +			iint->flags |= IMA_DIGSIG;
+> >> +			status = 
+> >> +
+> >> +			kfree(*xattr_value_);
+> >> +			*xattr_value_ = xattr_value;
+> >> +			*xattr_len_ = xattr_len;
+> >> +
+> >> +			break;
+> >> +		}
+> >
+> > When including the appended signature in the measurement list, the
+> > corresponding file hash needs to be included in the measurement list,
+> > which might be different than the previously calculated file hash
+> > based on the hash algorithm as defined in the IMA xattr.
+> >
+> > Including the file hash and signature in the measurement list allows
+> I> the attestation server, with just a public key, to verify the file
+> > signature against the file hash. No need for a white list.
+> >
+> > ima_modsig_verify() must calculate the file hash in order to verify
+> > the file signature. This file hash value somehow needs to be returned
+> > in order for it to be included in the measurement list.
+> 
+> In that case, patch 6/7 "ima: Store measurement after appraisal" isn't
+> enough and we have to go back to v2's change in ima_main.c which ties
+> together the collect and appraise steps in process_measurement (In that
+> version I called the function measure_and_appraise but it should be
+> called collect_and_appraise instead). That is because if the modsig
+> verification fails, the hash needs to be recalculated for the xattr
+> signature verification.
+
+> Either that, or I add another call to ima_collect_measurement inside
+> ima_appraise_measurement if the modsig verification fails. Which do you
+> prefer?
+
+The file hash (without the appended signature) is already being
+calculated by verify_pkcs7_message_sig().  There's no reason to
+calculate it twice.
+
+If the appended signature verification succeeds, that means the file
+hash stored in the appended signature was valid.  Somehow we need
+access to sig->digest, sig->digest_size and sig->hash_algo, which was
+compared against the calculated hash.  Refer to
+public_key_verify_signature().
+
+Mimi
