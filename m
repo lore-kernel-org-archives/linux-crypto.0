@@ -1,142 +1,90 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH resend 00/18] crypto: ARM/arm64 roundup for v4.14
-Date: Wed, 2 Aug 2017 15:46:16 +0100
-Message-ID: <20170802144613.GH6321@e103592.cambridge.arm.com>
-References: <20170724102820.16534-1-ard.biesheuvel@linaro.org>
+From: Tim Chen <tim.c.chen@linux.intel.com>
+Subject: Re: [Patch V2] crypto: x86/sha1 : Fix reads beyond the number of
+ blocks passed
+Date: Wed, 2 Aug 2017 09:05:11 -0700
+Message-ID: <78e1ae83-8d30-2824-3772-b01f5c79b6a0@linux.intel.com>
+References: <1501634312-22788-1-git-send-email-megha.dey@linux.intel.com>
+ <902d020b-5127-8611-9656-bf0062d1e09b@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        herbert@gondor.apana.org.au,
-        Catalin Marinas <catalin.marinas@arm.com>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:55114 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752014AbdHBOqU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Aug 2017 10:46:20 -0400
-Content-Disposition: inline
-In-Reply-To: <20170724102820.16534-1-ard.biesheuvel@linaro.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, ilya.albrekht@intel.com,
+        megha.dey@intel.com
+To: Jan Stancek <jstancek@redhat.com>,
+        Megha Dey <megha.dey@linux.intel.com>,
+        herbert@gondor.apana.org.au
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <902d020b-5127-8611-9656-bf0062d1e09b@redhat.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Herbert,
+On 08/02/2017 03:39 AM, Jan Stancek wrote:
+> On 08/02/2017 02:38 AM, Megha Dey wrote:
+>> It was reported that the sha1 AVX2 function(sha1_transform_avx2) is
+>> reading ahead beyond its intended data, and causing a crash if the next
+>> block is beyond page boundary:
+>> http://marc.info/?l=linux-crypto-vger&m=149373371023377
+>>
+>> This patch makes sure that there is no overflow for any buffer length.
+>>
+>> It passes the tests written by Jan Stancek that revealed this problem:
+>> https://github.com/jstancek/sha1-avx2-crash
+>>
+>> Jan, can you verify this fix?
+> 
+> Hi,
+> 
+> Looks good, my tests (below) PASS-ed.
+> 
+> I updated reproducer at [1] to try more than just single scenario. It
+> now tries thousands of combinations with different starting offset within
+> page and sizes of data chunks.
+> 
+> (without patch) v4.13-rc3-102-g26c5ceb with avx2 enabled:
+> [  106.455175] sha_test module loaded
+> [  106.460458] data is at 0xffff8c88e58f8000, page_after_data: 0xffff8c88e58fa000
+> [  106.468625] sha_test testing hash: sha1-generic, maxlen: 8192
+> [  127.091237] sha_test hash: sha1-generic calculated 1764032 hashes
+> [  127.098038] sha_test testing hash: sha1-ni, maxlen: 8192
+> [  127.108805] failed to alloc sha1-ni
+> [  127.112703] sha_test testing hash: sha1-avx, maxlen: 8192
+> [  141.166611] sha_test hash: sha1-avx calculated 1764032 hashes
+> [  141.173023] sha_test testing hash: sha1-avx2, maxlen: 8192
+> [  141.180046] BUG: unable to handle kernel paging request at ffff8c88e58fa000
+> [  141.187817] IP: _begin+0x28/0x187
+> [  141.191512] PGD 89c578067
+> [  141.191513] P4D 89c578067
+> [  141.194529] PUD c61f0a063
+> [  141.197545] PMD c64cb1063
+> [  141.200561] PTE 8000000c658fa062
+> [  141.203577]
+> [  141.208832] Oops: 0000 [#1] SMP
+> ...
+> 
+> With patch "[Patch V2] crypto: x86/sha1 : Fix reads beyond the number of blocks passed":
+> [  406.323781] sha_test module loaded
+> [  406.329062] data is at 0xffff93ab97108000, page_after_data: 0xffff93ab9710a000
+> [  406.337185] sha_test testing hash: sha1-generic, maxlen: 8192
+> [  426.157242] sha_test hash: sha1-generic calculated 1764032 hashes
+> [  426.164043] sha_test testing hash: sha1-ni, maxlen: 8192
+> [  426.174244] failed to alloc sha1-ni
+> [  426.178139] sha_test testing hash: sha1-avx, maxlen: 8192
+> [  440.226240] sha_test hash: sha1-avx calculated 1764032 hashes
+> [  440.232651] sha_test testing hash: sha1-avx2, maxlen: 8192
+> [  452.497988] sha_test hash: sha1-avx2 calculated 1764032 hashes
+> [  452.504495] sha_test testing hash: sha1-ssse3, maxlen: 8192
+> [  467.319316] sha_test hash: sha1-ssse3 calculated 1764032 hashes
+> [  467.325922] sha_test done
+> [  471.827083] sha_test module unloaded
+> 
+> I also ran a test at [2], which is comparing hashes produced by
+> kernel with hashes produced by user-space utilities (e.g. 'sha1sum').
+> This test also PASS-ed.
 
-This series from Ard is a prerequisite for an arm64 series [1] that I'd
-like to get merged this cycle (because it is in turn a prerequisite for
-another major series I want to progress).
+Great.  Should the fix be picked up also in the stable branches since
+it was disabled in the stable releases?  Or the changes are too
+much for stable?
 
-[1] without this series will break the kernel, whereas this series
-without [1] won't break the kernel, but will cause performance
-regressions in the arm64 crypto code due to unnecessary execution of C
-fallbacks.
-
-So it would be good to get both merged this cycle.
-
-Can Ard's series be merged for v4.14, do you think?
-
-I'll let Catalin comment the readiness of [1] for merging via arm64.
-(I just need to repost it to fold in a late squash.)
-
-Cheers
----Dave
-
-[1] [RFC PATCH v4 0/5] Simplify kernel-mode NEON
-http://lists.infradead.org/pipermail/linux-arm-kernel/2017-July/521838.html
-
-
-On Mon, Jul 24, 2017 at 11:28:02AM +0100, Ard Biesheuvel wrote:
-> This is a resend of all the patches I sent out recently that I would
-> like to be considered for v4.14. Their main purpose is to prepare the
-> arm64 crypto code to deal with situations where the SIMD register file
-> is unavailable, which never occurs at present, but this will change in
-> the future when support for SVE is added.
-> 
-> Patches #1 and #2 have been sent out last week as 'crypto/algapi - refactor
-> crypto_xor() to avoid memcpy()s' (v2). This version of #2 fixes an error
-> caught by kbuild. The non-SIMD fallback code added in the remaining patches
-> relies on crypto_xor() extensively, which is why these patches have been
-> included here.
-> 
-> Patches #3 - #13 implement the non-SIMD fallbacks for the various NEON
-> based drivers.
-> 
-> Patch #14 implements AES-GCM natively instead of relying on the generic
-> GCM module to wire accelerated AES-CTR and GHASH together, resulting in
-> a ~37% speedup.
-> 
-> Patches #15 and #16 implement an accelerated GHASH algorithm for ARM cores
-> that lack the 64x64 PMULL instruction.
-> 
-> Patches #17 and #18 update the scalar AES implementations to stop using
-> the expanded lookup tables for the final round. This reduces the Dcache
-> footprint, and thus the key correlated jitter.
-> 
-> This supersedes all other crypto patches I have outstanding, including the
-> AES refactor ones which I will rework later.
-> 
-> Ard Biesheuvel (18):
->   crypto/algapi - use separate dst and src operands for __crypto_xor()
->   crypto/algapi - make crypto_xor() take separate dst and src arguments
->   crypto: arm64/ghash-ce - add non-SIMD scalar fallback
->   crypto: arm64/crct10dif - add non-SIMD generic fallback
->   crypto: arm64/crc32 - add non-SIMD scalar fallback
->   crypto: arm64/sha1-ce - add non-SIMD generic fallback
->   crypto: arm64/sha2-ce - add non-SIMD scalar fallback
->   crypto: arm64/aes-ce-cipher - match round key endianness with generic
->     code
->   crypto: arm64/aes-ce-cipher: add non-SIMD generic fallback
->   crypto: arm64/aes-ce-ccm: add non-SIMD generic fallback
->   crypto: arm64/aes-blk - add a non-SIMD fallback for synchronous CTR
->   crypto: arm64/chacha20 - take may_use_simd() into account
->   crypto: arm64/aes-bs - implement non-SIMD fallback for AES-CTR
->   crypto: arm64/gcm - implement native driver using v8 Crypto Extensions
->   crypto: arm/ghash - add NEON accelerated fallback for vmull.p64
->   crypto: arm64/ghash - add NEON accelerated fallback for 64-bit PMULL
->   crypto: arm/aes - avoid expanded lookup tables in the final round
->   crypto: arm64/aes - avoid expanded lookup tables in the final round
-> 
->  arch/arm/crypto/Kconfig                |   5 +-
->  arch/arm/crypto/aes-ce-glue.c          |   4 +-
->  arch/arm/crypto/aes-cipher-core.S      |  88 +++-
->  arch/arm/crypto/aes-neonbs-glue.c      |   5 +-
->  arch/arm/crypto/ghash-ce-core.S        | 234 +++++++--
->  arch/arm/crypto/ghash-ce-glue.c        |  24 +-
->  arch/arm64/crypto/Kconfig              |  22 +-
->  arch/arm64/crypto/aes-ce-ccm-core.S    |  30 +-
->  arch/arm64/crypto/aes-ce-ccm-glue.c    | 174 +++++--
->  arch/arm64/crypto/aes-ce-cipher.c      |  55 ++-
->  arch/arm64/crypto/aes-ce.S             |  12 +-
->  arch/arm64/crypto/aes-cipher-core.S    | 152 ++++--
->  arch/arm64/crypto/aes-ctr-fallback.h   |  53 ++
->  arch/arm64/crypto/aes-glue.c           |  63 ++-
->  arch/arm64/crypto/aes-neonbs-glue.c    |  53 +-
->  arch/arm64/crypto/chacha20-neon-glue.c |   5 +-
->  arch/arm64/crypto/crc32-ce-glue.c      |  11 +-
->  arch/arm64/crypto/crct10dif-ce-glue.c  |  13 +-
->  arch/arm64/crypto/ghash-ce-core.S      | 401 ++++++++++++++-
->  arch/arm64/crypto/ghash-ce-glue.c      | 517 ++++++++++++++++++--
->  arch/arm64/crypto/sha1-ce-glue.c       |  18 +-
->  arch/arm64/crypto/sha2-ce-glue.c       |  30 +-
->  arch/arm64/crypto/sha256-glue.c        |   1 +
->  arch/sparc/crypto/aes_glue.c           |   3 +-
->  arch/x86/crypto/aesni-intel_glue.c     |   4 +-
->  arch/x86/crypto/blowfish_glue.c        |   3 +-
->  arch/x86/crypto/cast5_avx_glue.c       |   3 +-
->  arch/x86/crypto/des3_ede_glue.c        |   3 +-
->  crypto/algapi.c                        |  25 +-
->  crypto/ctr.c                           |   3 +-
->  crypto/pcbc.c                          |  12 +-
->  drivers/crypto/vmx/aes_ctr.c           |   3 +-
->  drivers/md/dm-crypt.c                  |  11 +-
->  include/crypto/algapi.h                |  23 +-
->  34 files changed, 1719 insertions(+), 344 deletions(-)
->  create mode 100644 arch/arm64/crypto/aes-ctr-fallback.h
-> 
-> -- 
-> 2.9.3
-> 
-> 
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+Tim
