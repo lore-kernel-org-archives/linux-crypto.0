@@ -1,46 +1,214 @@
-From: Jan Stancek <jstancek@redhat.com>
-Subject: Re: [Patch V3] crypto: x86/sha1 : Fix reads beyond the number of
- blocks passed
-Date: Wed, 2 Aug 2017 15:18:50 -0400 (EDT)
-Message-ID: <964539021.65400093.1501701530053.JavaMail.zimbra@redhat.com>
-References: <1501694015-10203-1-git-send-email-megha.dey@linux.intel.com> <1501698918.9349.1.camel@megha-Z97X-UD7-TH>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au,
-        tim c chen <tim.c.chen@linux.intel.com>, davem@davemloft.net,
+From: Megha Dey <megha.dey@linux.intel.com>
+Subject: [Patch V4] crypto: x86/sha1 : Fix reads beyond the number of blocks passed
+Date: Wed,  2 Aug 2017 13:49:09 -0700
+Message-ID: <1501706949-24322-1-git-send-email-megha.dey@linux.intel.com>
+Cc: tim.c.chen@linux.intel.com, davem@davemloft.net,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ilya albrekht <ilya.albrekht@intel.com>
-To: Megha Dey <megha.dey@intel.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:59822 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751956AbdHBTSw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Aug 2017 15:18:52 -0400
-In-Reply-To: <1501698918.9349.1.camel@megha-Z97X-UD7-TH>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+        jstancek@redhat.com, ilya.albrekht@intel.com, megha.dey@intel.com,
+        Megha Dey <megha.dey@linux.intel.com>
+To: herbert@gondor.apana.org.au
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
+It was reported that the sha1 AVX2 function(sha1_transform_avx2) is
+reading ahead beyond its intended data, and causing a crash if the next
+block is beyond page boundary:
+http://marc.info/?l=linux-crypto-vger&m=149373371023377
 
+This patch makes sure that there is no overflow for any buffer length.
 
+It passes the tests written by Jan Stancek that revealed this problem:
+https://github.com/jstancek/sha1-avx2-crash
 
------ Original Message -----
-> On Wed, 2017-08-02 at 10:13 -0700, Megha Dey wrote:
-> > It was reported that the sha1 AVX2 function(sha1_transform_avx2) is
-> > reading ahead beyond its intended data, and causing a crash if the next
-> > block is beyond page boundary:
-> > http://marc.info/?l=linux-crypto-vger&m=149373371023377
-> > 
-> > This patch makes sure that there is no overflow for any buffer length.
-> > 
-> > It passes the tests written by Jan Stancek that revealed this problem:
-> > https://github.com/jstancek/sha1-avx2-crash
-> 
-> Hi Jan,
-> 
-> Is it ok to add your Tested-by?
+I have re-enabled sha1-avx2 by reverting commit
+b82ce24426a4071da9529d726057e4e642948667
 
-Yes, v3 patch is exactly the diff I was testing.
+Originally-by: Ilya Albrekht <ilya.albrekht@intel.com>
+Tested-by: Jan Stancek <jstancek@redhat.com>
+Signed-off-by: Megha Dey <megha.dey@linux.intel.com>
+Reported-by: Jan Stancek <jstancek@redhat.com>
+---
+ arch/x86/crypto/sha1_avx2_x86_64_asm.S | 67 ++++++++++++++++++----------------
+ arch/x86/crypto/sha1_ssse3_glue.c      |  2 +-
+ 2 files changed, 37 insertions(+), 32 deletions(-)
 
-Regards,
-Jan
+diff --git a/arch/x86/crypto/sha1_avx2_x86_64_asm.S b/arch/x86/crypto/sha1_avx2_x86_64_asm.S
+index 1cd792d..1eab79c 100644
+--- a/arch/x86/crypto/sha1_avx2_x86_64_asm.S
++++ b/arch/x86/crypto/sha1_avx2_x86_64_asm.S
+@@ -117,11 +117,10 @@
+ 	.set T1, REG_T1
+ .endm
+ 
+-#define K_BASE		%r8
+ #define HASH_PTR	%r9
++#define BLOCKS_CTR	%r8
+ #define BUFFER_PTR	%r10
+ #define BUFFER_PTR2	%r13
+-#define BUFFER_END	%r11
+ 
+ #define PRECALC_BUF	%r14
+ #define WK_BUF		%r15
+@@ -205,14 +204,14 @@
+ 		 * blended AVX2 and ALU instruction scheduling
+ 		 * 1 vector iteration per 8 rounds
+ 		 */
+-		vmovdqu ((i * 2) + PRECALC_OFFSET)(BUFFER_PTR), W_TMP
++		vmovdqu (i * 2)(BUFFER_PTR), W_TMP
+ 	.elseif ((i & 7) == 1)
+-		vinsertf128 $1, (((i-1) * 2)+PRECALC_OFFSET)(BUFFER_PTR2),\
++		vinsertf128 $1, ((i-1) * 2)(BUFFER_PTR2),\
+ 			 WY_TMP, WY_TMP
+ 	.elseif ((i & 7) == 2)
+ 		vpshufb YMM_SHUFB_BSWAP, WY_TMP, WY
+ 	.elseif ((i & 7) == 4)
+-		vpaddd  K_XMM(K_BASE), WY, WY_TMP
++		vpaddd  K_XMM + K_XMM_AR(%rip), WY, WY_TMP
+ 	.elseif ((i & 7) == 7)
+ 		vmovdqu  WY_TMP, PRECALC_WK(i&~7)
+ 
+@@ -255,7 +254,7 @@
+ 		vpxor	WY, WY_TMP, WY_TMP
+ 	.elseif ((i & 7) == 7)
+ 		vpxor	WY_TMP2, WY_TMP, WY
+-		vpaddd	K_XMM(K_BASE), WY, WY_TMP
++		vpaddd  K_XMM + K_XMM_AR(%rip), WY, WY_TMP
+ 		vmovdqu	WY_TMP, PRECALC_WK(i&~7)
+ 
+ 		PRECALC_ROTATE_WY
+@@ -291,7 +290,7 @@
+ 		vpsrld	$30, WY, WY
+ 		vpor	WY, WY_TMP, WY
+ 	.elseif ((i & 7) == 7)
+-		vpaddd	K_XMM(K_BASE), WY, WY_TMP
++		vpaddd  K_XMM + K_XMM_AR(%rip), WY, WY_TMP
+ 		vmovdqu	WY_TMP, PRECALC_WK(i&~7)
+ 
+ 		PRECALC_ROTATE_WY
+@@ -446,6 +445,16 @@
+ 
+ .endm
+ 
++/* Add constant only if (%2 > %3) condition met (uses RTA as temp)
++ * %1 + %2 >= %3 ? %4 : 0
++ */
++.macro ADD_IF_GE a, b, c, d
++	mov     \a, RTA
++	add     $\d, RTA
++	cmp     $\c, \b
++	cmovge  RTA, \a
++.endm
++
+ /*
+  * macro implements 80 rounds of SHA-1, for multiple blocks with s/w pipelining
+  */
+@@ -463,13 +472,16 @@
+ 	lea	(2*4*80+32)(%rsp), WK_BUF
+ 
+ 	# Precalc WK for first 2 blocks
+-	PRECALC_OFFSET = 0
++	ADD_IF_GE BUFFER_PTR2, BLOCKS_CTR, 2, 64
+ 	.set i, 0
+ 	.rept    160
+ 		PRECALC i
+ 		.set i, i + 1
+ 	.endr
+-	PRECALC_OFFSET = 128
++
++	/* Go to next block if needed */
++	ADD_IF_GE BUFFER_PTR, BLOCKS_CTR, 3, 128
++	ADD_IF_GE BUFFER_PTR2, BLOCKS_CTR, 4, 128
+ 	xchg	WK_BUF, PRECALC_BUF
+ 
+ 	.align 32
+@@ -479,8 +491,8 @@ _loop:
+ 	 * we use K_BASE value as a signal of a last block,
+ 	 * it is set below by: cmovae BUFFER_PTR, K_BASE
+ 	 */
+-	cmp	K_BASE, BUFFER_PTR
+-	jne	_begin
++	test BLOCKS_CTR, BLOCKS_CTR
++	jnz _begin
+ 	.align 32
+ 	jmp	_end
+ 	.align 32
+@@ -512,10 +524,10 @@ _loop0:
+ 		.set j, j+2
+ 	.endr
+ 
+-	add	$(2*64), BUFFER_PTR       /* move to next odd-64-byte block */
+-	cmp	BUFFER_END, BUFFER_PTR    /* is current block the last one? */
+-	cmovae	K_BASE, BUFFER_PTR	/* signal the last iteration smartly */
+-
++	/* Update Counter */
++	sub $1, BLOCKS_CTR
++	/* Move to the next block only if needed*/
++	ADD_IF_GE BUFFER_PTR, BLOCKS_CTR, 4, 128
+ 	/*
+ 	 * rounds
+ 	 * 60,62,64,66,68
+@@ -532,8 +544,8 @@ _loop0:
+ 	UPDATE_HASH	12(HASH_PTR), D
+ 	UPDATE_HASH	16(HASH_PTR), E
+ 
+-	cmp	K_BASE, BUFFER_PTR	/* is current block the last one? */
+-	je	_loop
++	test	BLOCKS_CTR, BLOCKS_CTR
++	jz	_loop
+ 
+ 	mov	TB, B
+ 
+@@ -575,10 +587,10 @@ _loop2:
+ 		.set j, j+2
+ 	.endr
+ 
+-	add	$(2*64), BUFFER_PTR2      /* move to next even-64-byte block */
+-
+-	cmp	BUFFER_END, BUFFER_PTR2   /* is current block the last one */
+-	cmovae	K_BASE, BUFFER_PTR       /* signal the last iteration smartly */
++	/* update counter */
++	sub     $1, BLOCKS_CTR
++	/* Move to the next block only if needed*/
++	ADD_IF_GE BUFFER_PTR2, BLOCKS_CTR, 4, 128
+ 
+ 	jmp	_loop3
+ _loop3:
+@@ -641,19 +653,12 @@ _loop3:
+ 
+ 	avx2_zeroupper
+ 
+-	lea	K_XMM_AR(%rip), K_BASE
+-
++	/* Setup initial values */
+ 	mov	CTX, HASH_PTR
+ 	mov	BUF, BUFFER_PTR
+-	lea	64(BUF), BUFFER_PTR2
+-
+-	shl	$6, CNT			/* mul by 64 */
+-	add	BUF, CNT
+-	add	$64, CNT
+-	mov	CNT, BUFFER_END
+ 
+-	cmp	BUFFER_END, BUFFER_PTR2
+-	cmovae	K_BASE, BUFFER_PTR2
++	mov	BUF, BUFFER_PTR2
++	mov	CNT, BLOCKS_CTR
+ 
+ 	xmm_mov	BSWAP_SHUFB_CTL(%rip), YMM_SHUFB_BSWAP
+ 
+diff --git a/arch/x86/crypto/sha1_ssse3_glue.c b/arch/x86/crypto/sha1_ssse3_glue.c
+index f960a04..fc61739 100644
+--- a/arch/x86/crypto/sha1_ssse3_glue.c
++++ b/arch/x86/crypto/sha1_ssse3_glue.c
+@@ -201,7 +201,7 @@ asmlinkage void sha1_transform_avx2(u32 *digest, const char *data,
+ 
+ static bool avx2_usable(void)
+ {
+-	if (false && avx_usable() && boot_cpu_has(X86_FEATURE_AVX2)
++	if (avx_usable() && boot_cpu_has(X86_FEATURE_AVX2)
+ 		&& boot_cpu_has(X86_FEATURE_BMI1)
+ 		&& boot_cpu_has(X86_FEATURE_BMI2))
+ 		return true;
+-- 
+1.9.1
