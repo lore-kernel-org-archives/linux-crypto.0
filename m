@@ -1,43 +1,59 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH resend 00/18] crypto: ARM/arm64 roundup for v4.14
-Date: Thu, 3 Aug 2017 13:16:19 +0800
-Message-ID: <20170803051619.GA11594@gondor.apana.org.au>
-References: <20170724102820.16534-1-ard.biesheuvel@linaro.org>
- <20170802144613.GH6321@e103592.cambridge.arm.com>
+Subject: Re: [PATCH V7 5/7] crypto: AES CBC multi-buffer glue code
+Date: Thu, 3 Aug 2017 13:27:33 +0800
+Message-ID: <20170803052733.GA11871@gondor.apana.org.au>
+References: <1501035000-6283-1-git-send-email-megha.dey@linux.intel.com>
+ <1501035000-6283-6-git-send-email-megha.dey@linux.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        Catalin Marinas <catalin.marinas@arm.com>
-To: Dave Martin <Dave.Martin@arm.com>
+Cc: tim.c.chen@linux.intel.com, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        megha.dey@intel.com
+To: Megha Dey <megha.dey@linux.intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:58132 "EHLO
+Received: from orcrist.hmeau.com ([104.223.48.154]:58184 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750850AbdHCFQd (ORCPT
+        with ESMTP id S1750937AbdHCF1u (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Aug 2017 01:16:33 -0400
+        Thu, 3 Aug 2017 01:27:50 -0400
 Content-Disposition: inline
-In-Reply-To: <20170802144613.GH6321@e103592.cambridge.arm.com>
+In-Reply-To: <1501035000-6283-6-git-send-email-megha.dey@linux.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Aug 02, 2017 at 03:46:16PM +0100, Dave Martin wrote:
-> Hi Herbert,
-> 
-> This series from Ard is a prerequisite for an arm64 series [1] that I'd
-> like to get merged this cycle (because it is in turn a prerequisite for
-> another major series I want to progress).
-> 
-> [1] without this series will break the kernel, whereas this series
-> without [1] won't break the kernel, but will cause performance
-> regressions in the arm64 crypto code due to unnecessary execution of C
-> fallbacks.
-> 
-> So it would be good to get both merged this cycle.
-> 
-> Can Ard's series be merged for v4.14, do you think?
+On Tue, Jul 25, 2017 at 07:09:58PM -0700, Megha Dey wrote:
+>
+> +/* notify the caller of progress ; request still stays in queue */
+> +
+> +static void notify_callback(struct mcryptd_skcipher_request_ctx *rctx,
+> +			    struct mcryptd_alg_cstate *cstate,
+> +			    int err)
+> +{
+> +	struct skcipher_request *req = cast_mcryptd_ctx_to_req(rctx);
+> +
+> +	local_bh_disable();
+> +	rctx->complete(&req->base, err);
+> +	local_bh_enable();
+> +}
 
-I don't see any issues with this making 4.14.
+Please explain why you have this crazy construct that does async
+operations behind the crypto API's back while pretending to be sync
+by always returning zero?
+
+Why is this even needed now that you have switched the underlying
+implementation to be async?
+
+> +	/* from mcryptd, we need to callback */
+> +	if (irqs_disabled())
+> +		rctx->complete(&req->base, err);
+> +	else {
+> +		local_bh_disable();
+> +		rctx->complete(&req->base, err);
+> +		local_bh_enable();
+> +	}
+
+I complained about this the first time around and yet this crap is
+still there.
 
 Cheers,
 -- 
