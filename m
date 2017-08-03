@@ -1,59 +1,235 @@
-From: Mogens Lauridsen <mlauridsen171@gmail.com>
-Subject: [PATCH] crypto: sahara - Fix dma unmap direction
-Date: Thu,  3 Aug 2017 15:34:12 +0200
-Message-ID: <20170803133412.14322-1-mlauridsen171@gmail.com>
-Cc: linux-crypto@vger.kernel.org,
-        Mogens Lauridsen <mlauridsen171@gmail.com>
+From: Cosar Dindar <cosardindar@gmail.com>
+Subject: [PATCH v5] crypto : stm32 - Add STM32F4 CRC32 support
+Date: Thu,  3 Aug 2017 16:46:03 +0300
+Message-ID: <408e795dea80840a909bab590ea498848e5e3800.1501766734.git.cosardindar@gmail.com>
+Cc: davem@davemloft.net, mcoquelin.stm32@gmail.com,
+        alexandre.torgue@st.com, fabien.dessenne@st.com,
+        weiyongjun1@huawei.com, lionel.debieve@st.com,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org, Cosar Dindar <cosardindar@gmail.com>
 To: herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:38430 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751143AbdHCNeX (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Aug 2017 09:34:23 -0400
-Received: by mail-wm0-f68.google.com with SMTP id y206so2194952wmd.5
-        for <linux-crypto@vger.kernel.org>; Thu, 03 Aug 2017 06:34:22 -0700 (PDT)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-The direction used in dma_unmap_sg in aes calc is wrong.
-This result in the cache not being invalidated correct when aes
-calculation is done and result has been dma'ed to memory.
-This is seen as sporadic wrong result from aes calc.
+This patch adds CRC (CRC32 Crypto) support for STM32F4 series.
 
-Signed-off-by: Mogens Lauridsen <mlauridsen171@gmail.com>
+As an hardware limitation polynomial and key setting are not supported.
+They are fixed as 0x4C11DB7 (poly) and 0xFFFFFFFF (key).
+CRC32C Castagnoli algorithm is not used.
+
+Signed-off-by: Cosar Dindar <cosardindar@gmail.com>
 ---
- drivers/crypto/sahara.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Changes in v5:
+  - shash_alg struct definitons are defined seperately according to 
+    the platform type.
+Changes in v4:
+  - Edited patch summary.
+Changes in v3:
+  - Rearranged patch order to fix build test error.
+Changes in v2:
+  - Patchset created instead of one patch.
 
-diff --git a/drivers/crypto/sahara.c b/drivers/crypto/sahara.c
-index c2174ec88e2a..474da36bdd2c 100644
---- a/drivers/crypto/sahara.c
-+++ b/drivers/crypto/sahara.c
-@@ -543,10 +543,10 @@ static int sahara_hw_descriptor_create(struct sahara_dev *dev)
+ drivers/crypto/stm32/stm32_crc32.c | 101 ++++++++++++++++++++++++++++++++-----
+ 1 file changed, 89 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/crypto/stm32/stm32_crc32.c b/drivers/crypto/stm32/stm32_crc32.c
+index ec83b1e..39b28b8 100644
+--- a/drivers/crypto/stm32/stm32_crc32.c
++++ b/drivers/crypto/stm32/stm32_crc32.c
+@@ -1,12 +1,14 @@
+ /*
+  * Copyright (C) STMicroelectronics SA 2017
+  * Author: Fabien Dessenne <fabien.dessenne@st.com>
++ * Author: Cosar Dindar <cosardindar@gmail.com>
+  * License terms:  GNU General Public License (GPL), version 2
+  */
  
- unmap_out:
- 	dma_unmap_sg(dev->device, dev->out_sg, dev->nb_out_sg,
--		DMA_TO_DEVICE);
-+		DMA_FROM_DEVICE);
- unmap_in:
- 	dma_unmap_sg(dev->device, dev->in_sg, dev->nb_in_sg,
--		DMA_FROM_DEVICE);
-+		DMA_TO_DEVICE);
+ #include <linux/bitrev.h>
+ #include <linux/clk.h>
+ #include <linux/module.h>
++#include <linux/of.h>
+ #include <linux/platform_device.h>
  
- 	return -EINVAL;
- }
-@@ -594,9 +594,9 @@ static int sahara_aes_process(struct ablkcipher_request *req)
+ #include <crypto/internal/hash.h>
+@@ -37,8 +39,12 @@ struct stm32_crc {
+ 	struct device    *dev;
+ 	void __iomem     *regs;
+ 	struct clk       *clk;
++	struct shash_alg *algs;
+ 	u8               pending_data[sizeof(u32)];
+ 	size_t           nb_pending_bytes;
++	bool             key_support;
++	bool             poly_support;
++	bool             reverse_support;
+ };
+ 
+ struct stm32_crc_list {
+@@ -106,13 +112,31 @@ static int stm32_crc_init(struct shash_desc *desc)
  	}
+ 	spin_unlock_bh(&crc_list.lock);
  
- 	dma_unmap_sg(dev->device, dev->out_sg, dev->nb_out_sg,
--		DMA_TO_DEVICE);
--	dma_unmap_sg(dev->device, dev->in_sg, dev->nb_in_sg,
- 		DMA_FROM_DEVICE);
-+	dma_unmap_sg(dev->device, dev->in_sg, dev->nb_in_sg,
-+		DMA_TO_DEVICE);
+-	/* Reset, set key, poly and configure in bit reverse mode */
+-	writel(bitrev32(mctx->key), ctx->crc->regs + CRC_INIT);
+-	writel(bitrev32(mctx->poly), ctx->crc->regs + CRC_POL);
+-	writel(CRC_CR_RESET | CRC_CR_REVERSE, ctx->crc->regs + CRC_CR);
++	/* set key */
++	if (ctx->crc->key_support) {
++		writel(bitrev32(mctx->key), ctx->crc->regs + CRC_INIT);
++	} else if (mctx->key != CRC_INIT_DEFAULT) {
++		dev_err(ctx->crc->dev, "Unsupported key value! Should be: 0x%x\n",
++			CRC_INIT_DEFAULT);
++		return -EINVAL;
++	}
++
++	/* set poly */
++	if (ctx->crc->poly_support)
++		writel(bitrev32(mctx->poly), ctx->crc->regs + CRC_POL);
++
++	/* reset and configure in bit reverse mode if supported */
++	if (ctx->crc->reverse_support)
++		writel(CRC_CR_RESET | CRC_CR_REVERSE, ctx->crc->regs + CRC_CR);
++	else
++		writel(CRC_CR_RESET, ctx->crc->regs + CRC_CR);
++
++	/* store partial result */
++	if (!ctx->crc->reverse_support)
++		ctx->partial = bitrev32(readl(crc->regs + CRC_DR));
++	else
++		ctx->partial = readl(ctx->crc->regs + CRC_DR);
+ 
+-	/* Store partial result */
+-	ctx->partial = readl(ctx->crc->regs + CRC_DR);
+ 	ctx->crc->nb_pending_bytes = 0;
  
  	return 0;
+@@ -135,7 +159,12 @@ static int stm32_crc_update(struct shash_desc *desc, const u8 *d8,
+ 
+ 		if (crc->nb_pending_bytes == sizeof(u32)) {
+ 			/* Process completed pending data */
+-			writel(*(u32 *)crc->pending_data, crc->regs + CRC_DR);
++			if (!ctx->crc->reverse_support)
++				writel(bitrev32(*(u32 *)crc->pending_data),
++				       crc->regs + CRC_DR);
++			else
++				writel(*(u32 *)crc->pending_data,
++				       crc->regs + CRC_DR);
+ 			crc->nb_pending_bytes = 0;
+ 		}
+ 	}
+@@ -143,10 +172,16 @@ static int stm32_crc_update(struct shash_desc *desc, const u8 *d8,
+ 	d32 = (u32 *)d8;
+ 	for (i = 0; i < length >> 2; i++)
+ 		/* Process 32 bits data */
+-		writel(*(d32++), crc->regs + CRC_DR);
++		if (!ctx->crc->reverse_support)
++			writel(bitrev32(*(d32++)), crc->regs + CRC_DR);
++		else
++			writel(*(d32++), crc->regs + CRC_DR);
+ 
+ 	/* Store partial result */
+-	ctx->partial = readl(crc->regs + CRC_DR);
++	if (!ctx->crc->reverse_support)
++		ctx->partial = bitrev32(readl(crc->regs + CRC_DR));
++	else
++		ctx->partial = readl(crc->regs + CRC_DR);
+ 
+ 	/* Check for pending data (non 32 bits) */
+ 	length &= 3;
+@@ -192,7 +227,7 @@ static int stm32_crc_digest(struct shash_desc *desc, const u8 *data,
+ 	return stm32_crc_init(desc) ?: stm32_crc_finup(desc, data, length, out);
  }
+ 
+-static struct shash_alg algs[] = {
++static struct shash_alg algs_for_f7[] = {
+ 	/* CRC-32 */
+ 	{
+ 		.setkey         = stm32_crc_setkey,
+@@ -237,12 +272,37 @@ static struct shash_alg algs[] = {
+ 	}
+ };
+ 
++static struct shash_alg algs_for_f4[] = {
++	/* CRC-32 */
++	{
++		.setkey         = stm32_crc_setkey,
++		.init           = stm32_crc_init,
++		.update         = stm32_crc_update,
++		.final          = stm32_crc_final,
++		.finup          = stm32_crc_finup,
++		.digest         = stm32_crc_digest,
++		.descsize       = sizeof(struct stm32_crc_desc_ctx),
++		.digestsize     = CHKSUM_DIGEST_SIZE,
++		.base           = {
++			.cra_name               = "crc32",
++			.cra_driver_name        = DRIVER_NAME,
++			.cra_priority           = 200,
++			.cra_blocksize          = CHKSUM_BLOCK_SIZE,
++			.cra_alignmask          = 3,
++			.cra_ctxsize            = sizeof(struct stm32_crc_ctx),
++			.cra_module             = THIS_MODULE,
++			.cra_init               = stm32_crc32_cra_init,
++		}
++	}
++};
++
+ static int stm32_crc_probe(struct platform_device *pdev)
+ {
+ 	struct device *dev = &pdev->dev;
+ 	struct stm32_crc *crc;
+ 	struct resource *res;
+ 	int ret;
++	int algs_size;
+ 
+ 	crc = devm_kzalloc(dev, sizeof(*crc), GFP_KERNEL);
+ 	if (!crc)
+@@ -269,13 +329,29 @@ static int stm32_crc_probe(struct platform_device *pdev)
+ 		return ret;
+ 	}
+ 
++	/* set key, poly and reverse support if device is of F7 series */
++	if (of_device_is_compatible(crc->dev->of_node, "st,stm32f7-crc")) {
++		crc->key_support = true;
++		crc->poly_support = true;
++		crc->reverse_support = true;
++	}
++
+ 	platform_set_drvdata(pdev, crc);
+ 
+ 	spin_lock(&crc_list.lock);
+ 	list_add(&crc->list, &crc_list.dev_list);
+ 	spin_unlock(&crc_list.lock);
+ 
+-	ret = crypto_register_shashes(algs, ARRAY_SIZE(algs));
++	/* For F4 series only CRC32 algorithm will be used */
++	if (of_device_is_compatible(crc->dev->of_node, "st,stm32f4-crc")) {
++		crc->algs = algs_for_f4;
++		algs_size = ARRAY_SIZE(algs_for_f4);
++	} else {
++		crc->algs = algs_for_f7;
++		algs_size = ARRAY_SIZE(algs_for_f7);
++	}
++
++	ret = crypto_register_shashes(crc->algs, algs_size);
+ 	if (ret) {
+ 		dev_err(dev, "Failed to register\n");
+ 		clk_disable_unprepare(crc->clk);
+@@ -295,7 +371,7 @@ static int stm32_crc_remove(struct platform_device *pdev)
+ 	list_del(&crc->list);
+ 	spin_unlock(&crc_list.lock);
+ 
+-	crypto_unregister_shash(algs);
++	crypto_unregister_shash(crc->algs);
+ 
+ 	clk_disable_unprepare(crc->clk);
+ 
+@@ -304,6 +380,7 @@ static int stm32_crc_remove(struct platform_device *pdev)
+ 
+ static const struct of_device_id stm32_dt_ids[] = {
+ 	{ .compatible = "st,stm32f7-crc", },
++	{ .compatible = "st,stm32f4-crc", },
+ 	{},
+ };
+ MODULE_DEVICE_TABLE(of, stm32_dt_ids);
 -- 
-2.13.4
+2.7.4
