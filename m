@@ -1,61 +1,34 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH V7 5/7] crypto: AES CBC multi-buffer glue code
-Date: Thu, 3 Aug 2017 13:27:33 +0800
-Message-ID: <20170803052733.GA11871@gondor.apana.org.au>
-References: <1501035000-6283-1-git-send-email-megha.dey@linux.intel.com>
- <1501035000-6283-6-git-send-email-megha.dey@linux.intel.com>
+Subject: Re: [RESEND,PATCH v4 3/3] crypto : stm32 - Add STM32F4 CRC32 support
+Date: Thu, 3 Aug 2017 13:44:23 +0800
+Message-ID: <20170803054423.GA11926@gondor.apana.org.au>
+References: <1500280056-46251-1-git-send-email-cosardindar@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: tim.c.chen@linux.intel.com, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        megha.dey@intel.com
-To: Megha Dey <megha.dey@linux.intel.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:58184 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750937AbdHCF1u (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Aug 2017 01:27:50 -0400
+Cc: davem@davemloft.net, mcoquelin.stm32@gmail.com,
+        alexandre.torgue@st.com, fabien.dessenne@st.com,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+To: Cosar Dindar <cosardindar@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1501035000-6283-6-git-send-email-megha.dey@linux.intel.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1500280056-46251-1-git-send-email-cosardindar@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Jul 25, 2017 at 07:09:58PM -0700, Megha Dey wrote:
->
-> +/* notify the caller of progress ; request still stays in queue */
-> +
-> +static void notify_callback(struct mcryptd_skcipher_request_ctx *rctx,
-> +			    struct mcryptd_alg_cstate *cstate,
-> +			    int err)
-> +{
-> +	struct skcipher_request *req = cast_mcryptd_ctx_to_req(rctx);
-> +
-> +	local_bh_disable();
-> +	rctx->complete(&req->base, err);
-> +	local_bh_enable();
-> +}
+On Mon, Jul 17, 2017 at 11:27:36AM +0300, Cosar Dindar wrote:
+> This patch adds CRC (CRC32 Crypto) support for STM32F4 series.
+> 
+> As an hardware limitation polynomial and key setting are not supported.
+> They are fixed as 0x4C11DB7 (poly) and 0xFFFFFFFF (key).
+> CRC32C Castagnoli algorithm is not used.
+> 
+> Signed-off-by: Cosar Dindar <cosardindar@gmail.com>
+> Reviewed-by: Fabien Dessenne <fabien.dessenne@st.com>
 
-Please explain why you have this crazy construct that does async
-operations behind the crypto API's back while pretending to be sync
-by always returning zero?
+This patch doesn't apply anymore.  Please rebase.
 
-Why is this even needed now that you have switched the underlying
-implementation to be async?
-
-> +	/* from mcryptd, we need to callback */
-> +	if (irqs_disabled())
-> +		rctx->complete(&req->base, err);
-> +	else {
-> +		local_bh_disable();
-> +		rctx->complete(&req->base, err);
-> +		local_bh_enable();
-> +	}
-
-I complained about this the first time around and yet this crap is
-still there.
-
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
