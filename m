@@ -1,82 +1,51 @@
-From: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: KPP questions and confusion
-Date: Thu, 3 Aug 2017 10:40:26 +0200
-Message-ID: <625119CA-F823-4B9B-88F6-EAFFA58D965D@holtmann.org>
-References: <CAJU8_nUhapH=nKkL=NEa2uW5f-vdAX3kvi5Ua7b_bA8d=BjRLQ@mail.gmail.com>
- <9580BB6F-45D8-49CD-B859-09C39FD4D7D0@holtmann.org>
- <389a9dcf-05c1-2b59-90d9-ef9de5ff640b@microchip.com>
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Cosar Dindar <cosardindar@gmail.com>
+Subject: Re: [RESEND,PATCH v4 3/3] crypto : stm32 - Add STM32F4 CRC32 support
+Date: Thu, 3 Aug 2017 11:44:17 +0300
+Message-ID: <20170803084417.GA81719@osboxes>
+References: <1500280056-46251-1-git-send-email-cosardindar@gmail.com>
+ <20170803054423.GA11926@gondor.apana.org.au>
+Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 8BIT
-Cc: Kyle Rose <krose@krose.org>, linux-crypto@vger.kernel.org,
-        smueller@chronox.de, Nicolas Ferre <nicolas.ferre@microchip.com>
-To: Tudor Ambarus <tudor.ambarus@microchip.com>
+Cc: davem@davemloft.net, mcoquelin.stm32@gmail.com,
+        alexandre.torgue@st.com, fabien.dessenne@st.com,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from coyote.holtmann.net ([212.227.132.17]:42619 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751223AbdHCIk3 (ORCPT
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:34087 "EHLO
+        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751200AbdHCIo3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Aug 2017 04:40:29 -0400
-In-Reply-To: <389a9dcf-05c1-2b59-90d9-ef9de5ff640b@microchip.com>
+        Thu, 3 Aug 2017 04:44:29 -0400
+Content-Disposition: inline
+In-Reply-To: <20170803054423.GA11926@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Tudor,
-
->>> I am confused about several things in the new key agreement code.
->>> 
->>> net/bluetooth/smp.c in two places generates random bytes for the
->>> private_key argument to
->>> net/bluetooth/ecdh_helper.c:generate_ecdh_keys, which suggests the
->>> private key is static within the function. However, there is a do ...
->>> while(true) loop within generate_ecdh_keys, with the following near
->>> the end:
->>> 
->>> /* Private key is not valid. Regenerate */
->>> if (err == -EINVAL)
->>>            continue;
->>> 
->>> which suggests that it expects a different private key to be generated
->>> on each iteration of the loop. But it looks like it runs through the
->>> loop yet again with the same private key generated in the caller,
->>> which suggests it would infinitely loop on a bad private key value. Is
->>> this incorrect?
->> actually it seems that I screwed that up with commit 71653eb64bcca6110c42aadfd50b8d54d3a88079 where I moved the seeding of private_key outside of generate_ecdh_keys() function.
->>> Furthermore, since req->src == NULL via the call to
->>> kpp_request_set_input, ecc_make_pub_key will always be called in
->>> ecdh.c:ecdh_compute_value, in which case -EINVAL would be returned
->>> only by invalid input (!private_key or bad curve_id) that AFAICT
->>> cannot happen, or at least wouldn't be resolved by another run through
->>> the loop.
->>> 
->>> OTOH, -EAGAIN would be returned by ecc_make_pub_key if the public key
->>> turns out to be the zero point, which is at least one reason why you'd
->>> want to generate a new private key (if that loop were to do that.)
->>> 
->>> I'm a little confused about some other things:
->>> 
->>> * The bluetooth code doesn't seem to use ecc_gen_privkey, opting to
->>> instead just generate random bytes and hope for the best.
->>> * There doesn't appear to be any way for ecc_gen_privkey to get called
->>> from crypto/ecdh.c:ecdh_set_secret, as it starts with a call to
->>> crypto/ecdh_helper.c:crypto_ecdh_decode_key that returns -EINVAL if
->>> decoding fails, meaning that both params.key != NULL and (if I'm
->>> reading this correctly) params.key_size > 0. Is that dead code, or is
->>> there a way it is intended to be used?
->> I am fine switching to ecc_gen_privkey. Care to provide a patch for it?
+On Thu, Aug 03, 2017 at 01:44:23PM +0800, Herbert Xu wrote:
+> On Mon, Jul 17, 2017 at 11:27:36AM +0300, Cosar Dindar wrote:
+> > This patch adds CRC (CRC32 Crypto) support for STM32F4 series.
+> > 
+> > As an hardware limitation polynomial and key setting are not supported.
+> > They are fixed as 0x4C11DB7 (poly) and 0xFFFFFFFF (key).
+> > CRC32C Castagnoli algorithm is not used.
+> > 
+> > Signed-off-by: Cosar Dindar <cosardindar@gmail.com>
+> > Reviewed-by: Fabien Dessenne <fabien.dessenne@st.com>
 > 
-> Marcel, regarding the ecdh offload to hw from Bluetooth SMP code, this
-> is not possible as of know because SMP code uses it's own private keys.
-> atmel-ecc driver will fallback to the ecdh software implementation if
-> user wants to use it's own private keys.
+> This patch doesn't apply anymore.  Please rebase.
 > 
-> I can jump in the Bluetooth's ecdh handling, but at best effort, my
-> primary goal is to add support for KPP in af_alg.
+> Thanks,
 
-then we need a better abstraction inside KPP. Since even for Bluetooth SMP the keys are temporary. The only thing we have to check is against a well know public/private key pair that was designated as debug key for sniffer purposes.
+OK, I'll rebase and send a new patch including new changes.
 
-Essentially we do what all other key exchange procedure do. Generate a private/public key pair, give the public key to the other side, run DH with the value from the other side. That Bluetooth SMP knows about the private key is really pointless. Since the detection of debug key usage is actually via the public key portion.
+Thanks, 
 
-Regards
+Best Regards,
+ 
+Cosar.
 
-Marcel
+> -- 
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
