@@ -1,49 +1,54 @@
-From: Mogens Lauridsen <mlauridsen171@gmail.com>
-Subject: [PATCH] crypto: sahara - Remove leftover from previous used spinlock
-Date: Thu,  3 Aug 2017 15:46:35 +0200
-Message-ID: <20170803134635.14726-1-mlauridsen171@gmail.com>
-Cc: linux-crypto@vger.kernel.org,
-        Mogens Lauridsen <mlauridsen171@gmail.com>
-To: herbert@gondor.apana.org.au
+From: Joe Perches <joe@perches.com>
+Subject: Re: [PATCH V2] staging: ccree: Fix format/argument mismatches
+Date: Thu, 03 Aug 2017 06:49:59 -0700
+Message-ID: <1501768199.31625.17.camel@perches.com>
+References: <201708031730.VcP8Q0DJ%fengguang.wu@intel.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
+Cc: kbuild-all@01.org, Gilad Ben-Yossef <gilad@benyossef.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        linux-kernel@vger.kernel.org
+To: kbuild test robot <lkp@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:37169 "EHLO
-        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752012AbdHCNql (ORCPT
+Received: from smtprelay0176.hostedemail.com ([216.40.44.176]:57200 "EHLO
+        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1751154AbdHCNuE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Aug 2017 09:46:41 -0400
-Received: by mail-wm0-f67.google.com with SMTP id t138so2251199wmt.4
-        for <linux-crypto@vger.kernel.org>; Thu, 03 Aug 2017 06:46:41 -0700 (PDT)
+        Thu, 3 Aug 2017 09:50:04 -0400
+In-Reply-To: <201708031730.VcP8Q0DJ%fengguang.wu@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This driver previously used a spinlock. The spinlock is not
-used any more, but the spinlock variable was still there
-and also being initialized.
+On Thu, 2017-08-03 at 17:09 +0800, kbuild test robot wrote:
+> Hi Joe,
+> 
+> [auto build test WARNING on staging/staging-testing]
+> [also build test WARNING on next-20170803]
+> [cannot apply to v4.13-rc3]
+> [if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
 
-Signed-off-by: Mogens Lauridsen <mlauridsen171@gmail.com>
----
- drivers/crypto/sahara.c | 2 --
- 1 file changed, 2 deletions(-)
+Pretty odd that m32r has ioread32 as _readl and so unsigned long
+Seems silly to have to cast it.
 
-diff --git a/drivers/crypto/sahara.c b/drivers/crypto/sahara.c
-index 474da36bdd2c..03a8abad7e76 100644
---- a/drivers/crypto/sahara.c
-+++ b/drivers/crypto/sahara.c
-@@ -202,7 +202,6 @@ struct sahara_dev {
- 	struct completion	dma_completion;
- 
- 	struct sahara_ctx	*ctx;
--	spinlock_t		lock;
- 	struct crypto_queue	queue;
- 	unsigned long		flags;
- 
-@@ -1487,7 +1486,6 @@ static int sahara_probe(struct platform_device *pdev)
- 
- 	crypto_init_queue(&dev->queue, SAHARA_QUEUE_LENGTH);
- 
--	spin_lock_init(&dev->lock);
- 	mutex_init(&dev->queue_mutex);
- 
- 	dev_ptr = dev;
--- 
-2.13.4
+Gilad, is this actually a supported platform for ccree?
+
+> url:    https://github.com/0day-ci/linux/commits/Joe-Perches/staging-ccree-Fix-format-argument-mismatches/20170731-191055
+> config: m32r-allmodconfig (attached as .config)
+> compiler: m32r-linux-gcc (GCC) 6.2.0
+> reproduce:
+>         wget https://raw.githubusercontent.com/01org/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+>         chmod +x ~/bin/make.cross
+>         # save the attached .config to linux build tree
+>         make.cross ARCH=m32r 
+> 
+> All warnings (new ones prefixed by >>):
+> 
+>    In file included from include/linux/kernel.h:13:0,
+>                     from drivers/staging/ccree/ssi_driver.c:17:
+>    drivers/staging/ccree/ssi_driver.c: In function 'init_cc_regs':
+> > > drivers/staging/ccree/ssi_driver.c:180:16: warning: format '%X' expects argument of type 'unsigned int', but argument 2 has type 'long unsigned int' [-Wformat=]
+> 
+>      SSI_LOG_DEBUG("AXIM_CFG=0x%08X\n", CC_HAL_READ_REGISTER(CC_REG_OFFSET(CRY_KERNEL, AXIM_CFG)));
