@@ -1,36 +1,47 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 2/2] crypto: inside-secure - fix the sha state length
- in hmac_sha1_setkey
-Date: Thu, 3 Aug 2017 14:10:41 +0800
-Message-ID: <20170803061041.GD12039@gondor.apana.org.au>
-References: <20170719090231.9949-1-antoine.tenart@free-electrons.com>
- <20170719090231.9949-2-antoine.tenart@free-electrons.com>
+Subject: Re: [PATCH] crypto: omap-sham: remove unnecessary static in
+ omap_sham_remove()
+Date: Thu, 3 Aug 2017 14:11:23 +0800
+Message-ID: <20170803061122.GA12238@gondor.apana.org.au>
+References: <20170718230311.GA24035@embeddedgus>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, thomas.petazzoni@free-electrons.com,
-        gregory.clement@free-electrons.com, oferh@marvell.com,
-        igall@marvell.com, nadavh@marvell.com, linux-crypto@vger.kernel.org
-To: Antoine Tenart <antoine.tenart@free-electrons.com>
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, gustavo@embeddedor.com
+To: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:58352 "EHLO
+Received: from orcrist.hmeau.com ([104.223.48.154]:58356 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751230AbdHCGKv (ORCPT
+        with ESMTP id S1750937AbdHCGL3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Aug 2017 02:10:51 -0400
+        Thu, 3 Aug 2017 02:11:29 -0400
 Content-Disposition: inline
-In-Reply-To: <20170719090231.9949-2-antoine.tenart@free-electrons.com>
+In-Reply-To: <20170718230311.GA24035@embeddedgus>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jul 19, 2017 at 11:02:31AM +0200, Antoine Tenart wrote:
-> A check is performed on the ipad/opad in the safexcel_hmac_sha1_setkey
-> function, but the index used by the loop doing it is wrong. It is
-> currently the size of the state array while it should be the size of a
-> sha1 state. This patch fixes it.
+Gustavo A. R. Silva <gustavo@embeddedor.com> wrote:
+> Remove unnecessary static on local variable dd. Such variable
+> is initialized before being used, on every execution path throughout
+> the function. The static has no benefit and, removing it reduces the
+> object file size.
 > 
-> Fixes: 1b44c5a60c13 ("crypto: inside-secure - add SafeXcel EIP197 crypto engine driver")
-> Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
-> Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
+> This issue was detected using Coccinelle and the following semantic patch:
+> https://github.com/GustavoARSilva/coccinelle/blob/master/static/static_unused.cocci
+> 
+> In the following log you can see a difference in the object file size.
+> This log is the output of the size command, before and after the code
+> change:
+> 
+> before:
+>   text    data     bss     dec     hex filename
+>  26135   11944     128   38207    953f drivers/crypto/omap-sham.o
+> 
+> after:
+>   text    data     bss     dec     hex filename
+>  26084   11856      64   38004    9474 drivers/crypto/omap-sham.o
+> 
+> Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
 
 Patch applied.  Thanks.
 -- 
