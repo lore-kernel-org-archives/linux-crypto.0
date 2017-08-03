@@ -1,39 +1,43 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] Crypto: atmel-ecc: Make a couple of local functions
- static
-Date: Thu, 3 Aug 2017 14:22:40 +0800
-Message-ID: <20170803062239.GE12039@gondor.apana.org.au>
-References: <20170719092415.9553-1-colin.king@canonical.com>
+Subject: Re: [PATCH] crypto: ccp: remove duplicate module version and author
+ entry
+Date: Thu, 3 Aug 2017 14:23:12 +0800
+Message-ID: <20170803062312.GG12039@gondor.apana.org.au>
+References: <20170720032908.48902-1-brijesh.singh@amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Tudor Ambarus <tudor.ambarus@microchip.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: Colin King <colin.king@canonical.com>
+Cc: linux-crypto@vger.kernel.org,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Gary R Hook <gary.hook@amd.com>,
+        "David S . Miller" <davem@davemloft.net>
+To: Brijesh Singh <brijesh.singh@amd.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:58394 "EHLO
+Received: from orcrist.hmeau.com ([104.223.48.154]:58406 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751032AbdHCGWz (ORCPT
+        with ESMTP id S1751032AbdHCGXT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Aug 2017 02:22:55 -0400
+        Thu, 3 Aug 2017 02:23:19 -0400
 Content-Disposition: inline
-In-Reply-To: <20170719092415.9553-1-colin.king@canonical.com>
+In-Reply-To: <20170720032908.48902-1-brijesh.singh@amd.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jul 19, 2017 at 10:24:15AM +0100, Colin King wrote:
-> From: Colin Ian King <colin.king@canonical.com>
+On Wed, Jul 19, 2017 at 10:29:08PM -0500, Brijesh Singh wrote:
+> commit 720419f01832 ("crypto: ccp - Introduce the AMD Secure Processor device")
+> moved the module registeration from ccp-dev.c to sp-dev.c but patch missed
+> removing the module version and author entry from ccp-dev.c.
 > 
-> Functions atmel_ecc_i2c_client_alloc and atmel_ecc_i2c_client_free are
-> local to the source and no not need to be in the global scope. Make
-> them static.
+> It causes the below warning during boot when CONFIG_CRYPTO_DEV_SP_CCP=y
+> and CONFIG_CRYPTO_DEV_CCP_CRYPTO=y is set.
 > 
-> Cleans up sparse warnings:
-> symbol 'atmel_ecc_i2c_client_alloc' was not declared. Should it be static?
-> symbol 'atmel_ecc_i2c_client_free' was not declared. Should it be static?
+> [ 0.187825] sysfs: cannot create duplicate filename '/module/ccp/version'
+> [ 0.187825] sysfs: cannot create duplicate filename '/module/ccp/version'
 > 
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Cc: Gary R Hook <gary.hook@amd.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: David S. Miller <davem@davemloft.net>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 
 Patch applied.  Thanks.
 -- 
