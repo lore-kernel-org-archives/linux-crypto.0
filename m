@@ -1,26 +1,32 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 4/4] MAINTAINERS: Add ARTPEC crypto maintainer
-Date: Thu, 3 Aug 2017 14:26:40 +0800
-Message-ID: <20170803062640.GQ12039@gondor.apana.org.au>
-References: <cover.1500879613.git.larper@axis.com>
- <d3a86c7e8137ec82ff350be4796c6b67a1b96d09.1500879613.git.larper@axis.com>
+Subject: Re: [PATCH] crypto: ccp - Fix XTS-AES-128 support on v5 CCPs
+Date: Thu, 3 Aug 2017 14:27:20 +0800
+Message-ID: <20170803062720.GS12039@gondor.apana.org.au>
+References: <150100993132.39127.12837177440399767043.stgit@sosxen.amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, robh+dt@kernel.org, mark.rutland@arm.com,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Lars Persson <larper@axis.com>
-To: Lars Persson <lars.persson@axis.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org, thomas.lendacky@amd.com,
+        davem@davemloft.net
+To: Gary R Hook <gary.hook@amd.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:58558 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751220AbdHCG11 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 3 Aug 2017 02:27:27 -0400
 Content-Disposition: inline
-In-Reply-To: <d3a86c7e8137ec82ff350be4796c6b67a1b96d09.1500879613.git.larper@axis.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <150100993132.39127.12837177440399767043.stgit@sosxen.amd.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jul 24, 2017 at 09:07:32AM +0200, Lars Persson wrote:
-> Assign the Axis kernel team as maintainer for crypto drivers under
-> drivers/crypto/axis.
+On Tue, Jul 25, 2017 at 02:12:11PM -0500, Gary R Hook wrote:
+> Version 5 CCPs have some new requirements for XTS-AES: the type field
+> must be specified, and the key requires 512 bits, with each part
+> occupying 256 bits and padded with zeroes.
 > 
-> Signed-off-by: Lars Persson <larper@axis.com>
+> cc: <stable@vger.kernel.org> # 4.9.x+
+> 
+> Signed-off-by: Gary R Hook <ghook@amd.com>
 
 Patch applied.  Thanks.
 -- 
