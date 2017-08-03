@@ -1,49 +1,69 @@
-From: =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>
-Subject: Re: [PATCH v1] crypto: caam - set hwrng quality level
-Date: Thu, 3 Aug 2017 07:48:51 +0000
-Message-ID: <VI1PR0401MB25919FFF2B07150E1BD02AE298B10@VI1PR0401MB2591.eurprd04.prod.outlook.com>
-References: <20170719074458.9247-1-o.rempel@pengutronix.de>
- <VI1PR0401MB2591B52EB2EF7B7B900FBCC998A60@VI1PR0401MB2591.eurprd04.prod.outlook.com>
- <20170719163248.sn7mvnq2s3fm2hvh@pengutronix.de>
- <VI1PR0401MB25917848BA4AF6626E8DF1AD98A60@VI1PR0401MB2591.eurprd04.prod.outlook.com>
- <20170719181303.rj4fyjj7qplatrzk@pengutronix.de>
- <4e42d639-9f83-dcbb-9a2a-91686656c7dd@linux.vnet.ibm.com>
- <VI1PR0401MB25914FE46AC61475A45172B198B00@VI1PR0401MB2591.eurprd04.prod.outlook.com>
- <20170803031652.GA10515@gondor.apana.org.au>
+From: =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta-3arQi8VN3Tc@public.gmane.org>
+Subject: Re: [PATCH 0/4] crypto: caam - add Job Ring support for DPAA2 parts
+Date: Thu, 3 Aug 2017 08:07:04 +0000
+Message-ID: <VI1PR0401MB2591CA6951BDA1C4F5834D9F98B10@VI1PR0401MB2591.eurprd04.prod.outlook.com>
+References: <20170718153050.15330-1-horia.geanta@nxp.com>
+ <20170725132129.GB29754@dragon>
+ <VI1PR0401MB2591E386907CD8EA92DED08498B80@VI1PR0401MB2591.eurprd04.prod.outlook.com>
+ <20170725135000.GC29754@dragon>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="iso-8859-2"
 Content-Transfer-Encoding: quoted-printable
-Cc: Harald Freudenberger <freude@linux.vnet.ibm.com>,
-        Oleksij Rempel <ore@pengutronix.de>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Oleksij Rempel <o.rempel@pengutronix.de>,
-        "Dan Douglass" <dan.douglass@nxp.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "kernel@pengutronix.de" <kernel@pengutronix.de>,
-        Martin Schwidefsky <schwidefsky@de.ibm.com>,
-        "David S. Miller" <davem@davemloft.net>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
+        "devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+        "Dan Douglass" <dan.douglass-3arQi8VN3Tc@public.gmane.org>,
+        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        "linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+        "linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org"
+        <linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+To: Shawn Guo <shawnguo-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 8/3/2017 6:17 AM, Herbert Xu wrote:=0A=
-> On Wed, Aug 02, 2017 at 02:03:14PM +0000, Horia Geant=E3 wrote:=0A=
->>=0A=
->> Take CAAM's engine HWRNG: it can work both as a TRNG and as a=0A=
->> TRNG-seeded DRBG (that's how it's currently configured).=0A=
->> IIUC, both setups are fit as source for the entropy pool.=0A=
-> =0A=
-> So which is it? If it's a DRBG then it should not be exposed through=0A=
-> the hwrng interface.  Only TRNG should go through hwrng.  DRBGs=0A=
-> can use the crypto rng API.=0A=
+On 7/25/2017 4:50 PM, Shawn Guo wrote:=0A=
+> On Tue, Jul 25, 2017 at 01:31:52PM +0000, Horia Geant=E3 wrote:=0A=
+>> On 7/25/2017 4:22 PM, Shawn Guo wrote:=0A=
+>>> On Tue, Jul 18, 2017 at 06:30:46PM +0300, Horia Geant=E3 wrote:=0A=
+>>>> This patch set adds support for CAAM's legacy Job Ring backend / inter=
+face=0A=
+>>>> on platforms having DPAA2 (Datapath Acceleration Architecture v2), lik=
+e=0A=
+>>>> LS1088A or LS2088A.=0A=
+>>>>=0A=
+>>>> I would like to get the DT patches through the crypto list (to make su=
+re=0A=
+>>>> they don't end up merged before driver support).=0A=
+>>>=0A=
+>>> Unless it's really urgent (usually critical bug fix), the DTS patches=
 =0A=
-Right now it's configured as a DRBG.=0A=
-If I read correctly, it doesn't matter it's using the internal TRNG for=0A=
-(automated) seeding, it still shouldn't use hwrng.=0A=
-This means it's broken since the very beginning:=0A=
-e24f7c9e87d4 crypto: caam - hwrng support=0A=
+>>> should go through arm-soc tree.  We usually take DTS patches after the=
+=0A=
+>>> driver counterpart has been accepted by subsystem maintainers, or in th=
+e=0A=
+>>> best case, has landed on mainline.=0A=
+>>=0A=
+>> Thanks for the clarification.=0A=
+>>=0A=
+>> Do I have to re-post the DTS patches once the driver is accepted or a=0A=
+>> ping should suffice or...?=0A=
+> =0A=
+> A ping is sufficient.=0A=
+=0A=
+Shawn,=0A=
+=0A=
+Driver support (patch 1/4) has just been applied to the cryptodev-2.6 tree:=
+=0A=
+297b9cebd2fc crypto: caam/jr - add support for DPAA2 parts=0A=
+=0A=
+Could you please pick up the DTS patches (2-4/4) in this series?=0A=
 =0A=
 Thanks,=0A=
 Horia=0A=
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
