@@ -1,42 +1,39 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: img-hash: remove unnecessary static in
- img_hash_remove()
-Date: Thu, 3 Aug 2017 14:11:48 +0800
-Message-ID: <20170803061148.GA12295@gondor.apana.org.au>
-References: <20170718230712.GA15507@embeddedgus>
+Subject: Re: [PATCH] Crypto: atmel-ecc: Make a couple of local functions
+ static
+Date: Thu, 3 Aug 2017 14:22:40 +0800
+Message-ID: <20170803062239.GE12039@gondor.apana.org.au>
+References: <20170719092415.9553-1-colin.king@canonical.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, gustavo@embeddedor.com
-To: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: Tudor Ambarus <tudor.ambarus@microchip.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Colin King <colin.king@canonical.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:58394 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751032AbdHCGWz (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 3 Aug 2017 02:22:55 -0400
 Content-Disposition: inline
-In-Reply-To: <20170718230712.GA15507@embeddedgus>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20170719092415.9553-1-colin.king@canonical.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Gustavo A. R. Silva <gustavo@embeddedor.com> wrote:
-> Remove unnecessary static on local variable hdev. Such variable
-> is initialized before being used, on every execution path throughout
-> the function. The static has no benefit and, removing it reduces the
-> object file size.
+On Wed, Jul 19, 2017 at 10:24:15AM +0100, Colin King wrote:
+> From: Colin Ian King <colin.king@canonical.com>
 > 
-> This issue was detected using Coccinelle and the following semantic patch:
-> https://github.com/GustavoARSilva/coccinelle/blob/master/static/static_unused.cocci
+> Functions atmel_ecc_i2c_client_alloc and atmel_ecc_i2c_client_free are
+> local to the source and no not need to be in the global scope. Make
+> them static.
 > 
-> In the following log you can see a significant difference in the object
-> file size. This log is the output of the size command, before and after
-> the code change:
+> Cleans up sparse warnings:
+> symbol 'atmel_ecc_i2c_client_alloc' was not declared. Should it be static?
+> symbol 'atmel_ecc_i2c_client_free' was not declared. Should it be static?
 > 
-> before:
->   text    data     bss     dec     hex filename
->  14842    6464     128   21434    53ba drivers/crypto/img-hash.o
-> 
-> after:
->   text    data     bss     dec     hex filename
->  14789    6376      64   21229    52ed drivers/crypto/img-hash.o
-> 
-> Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
+> Signed-off-by: Colin Ian King <colin.king@canonical.com>
 
 Patch applied.  Thanks.
 -- 
