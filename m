@@ -1,69 +1,82 @@
-From: =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta-3arQi8VN3Tc@public.gmane.org>
-Subject: Re: [PATCH 0/4] crypto: caam - add Job Ring support for DPAA2 parts
-Date: Thu, 3 Aug 2017 08:07:04 +0000
-Message-ID: <VI1PR0401MB2591CA6951BDA1C4F5834D9F98B10@VI1PR0401MB2591.eurprd04.prod.outlook.com>
-References: <20170718153050.15330-1-horia.geanta@nxp.com>
- <20170725132129.GB29754@dragon>
- <VI1PR0401MB2591E386907CD8EA92DED08498B80@VI1PR0401MB2591.eurprd04.prod.outlook.com>
- <20170725135000.GC29754@dragon>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
-Cc: Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
-        "devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-        "Dan Douglass" <dan.douglass-3arQi8VN3Tc@public.gmane.org>,
-        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        "linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-        "linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org"
-        <linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
-To: Shawn Guo <shawnguo-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Language: en-US
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+From: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: KPP questions and confusion
+Date: Thu, 3 Aug 2017 10:40:26 +0200
+Message-ID: <625119CA-F823-4B9B-88F6-EAFFA58D965D@holtmann.org>
+References: <CAJU8_nUhapH=nKkL=NEa2uW5f-vdAX3kvi5Ua7b_bA8d=BjRLQ@mail.gmail.com>
+ <9580BB6F-45D8-49CD-B859-09C39FD4D7D0@holtmann.org>
+ <389a9dcf-05c1-2b59-90d9-ef9de5ff640b@microchip.com>
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 8BIT
+Cc: Kyle Rose <krose@krose.org>, linux-crypto@vger.kernel.org,
+        smueller@chronox.de, Nicolas Ferre <nicolas.ferre@microchip.com>
+To: Tudor Ambarus <tudor.ambarus@microchip.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from coyote.holtmann.net ([212.227.132.17]:42619 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751223AbdHCIk3 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 3 Aug 2017 04:40:29 -0400
+In-Reply-To: <389a9dcf-05c1-2b59-90d9-ef9de5ff640b@microchip.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 7/25/2017 4:50 PM, Shawn Guo wrote:=0A=
-> On Tue, Jul 25, 2017 at 01:31:52PM +0000, Horia Geant=E3 wrote:=0A=
->> On 7/25/2017 4:22 PM, Shawn Guo wrote:=0A=
->>> On Tue, Jul 18, 2017 at 06:30:46PM +0300, Horia Geant=E3 wrote:=0A=
->>>> This patch set adds support for CAAM's legacy Job Ring backend / inter=
-face=0A=
->>>> on platforms having DPAA2 (Datapath Acceleration Architecture v2), lik=
-e=0A=
->>>> LS1088A or LS2088A.=0A=
->>>>=0A=
->>>> I would like to get the DT patches through the crypto list (to make su=
-re=0A=
->>>> they don't end up merged before driver support).=0A=
->>>=0A=
->>> Unless it's really urgent (usually critical bug fix), the DTS patches=
-=0A=
->>> should go through arm-soc tree.  We usually take DTS patches after the=
-=0A=
->>> driver counterpart has been accepted by subsystem maintainers, or in th=
-e=0A=
->>> best case, has landed on mainline.=0A=
->>=0A=
->> Thanks for the clarification.=0A=
->>=0A=
->> Do I have to re-post the DTS patches once the driver is accepted or a=0A=
->> ping should suffice or...?=0A=
-> =0A=
-> A ping is sufficient.=0A=
-=0A=
-Shawn,=0A=
-=0A=
-Driver support (patch 1/4) has just been applied to the cryptodev-2.6 tree:=
-=0A=
-297b9cebd2fc crypto: caam/jr - add support for DPAA2 parts=0A=
-=0A=
-Could you please pick up the DTS patches (2-4/4) in this series?=0A=
-=0A=
-Thanks,=0A=
-Horia=0A=
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Hi Tudor,
+
+>>> I am confused about several things in the new key agreement code.
+>>> 
+>>> net/bluetooth/smp.c in two places generates random bytes for the
+>>> private_key argument to
+>>> net/bluetooth/ecdh_helper.c:generate_ecdh_keys, which suggests the
+>>> private key is static within the function. However, there is a do ...
+>>> while(true) loop within generate_ecdh_keys, with the following near
+>>> the end:
+>>> 
+>>> /* Private key is not valid. Regenerate */
+>>> if (err == -EINVAL)
+>>>            continue;
+>>> 
+>>> which suggests that it expects a different private key to be generated
+>>> on each iteration of the loop. But it looks like it runs through the
+>>> loop yet again with the same private key generated in the caller,
+>>> which suggests it would infinitely loop on a bad private key value. Is
+>>> this incorrect?
+>> actually it seems that I screwed that up with commit 71653eb64bcca6110c42aadfd50b8d54d3a88079 where I moved the seeding of private_key outside of generate_ecdh_keys() function.
+>>> Furthermore, since req->src == NULL via the call to
+>>> kpp_request_set_input, ecc_make_pub_key will always be called in
+>>> ecdh.c:ecdh_compute_value, in which case -EINVAL would be returned
+>>> only by invalid input (!private_key or bad curve_id) that AFAICT
+>>> cannot happen, or at least wouldn't be resolved by another run through
+>>> the loop.
+>>> 
+>>> OTOH, -EAGAIN would be returned by ecc_make_pub_key if the public key
+>>> turns out to be the zero point, which is at least one reason why you'd
+>>> want to generate a new private key (if that loop were to do that.)
+>>> 
+>>> I'm a little confused about some other things:
+>>> 
+>>> * The bluetooth code doesn't seem to use ecc_gen_privkey, opting to
+>>> instead just generate random bytes and hope for the best.
+>>> * There doesn't appear to be any way for ecc_gen_privkey to get called
+>>> from crypto/ecdh.c:ecdh_set_secret, as it starts with a call to
+>>> crypto/ecdh_helper.c:crypto_ecdh_decode_key that returns -EINVAL if
+>>> decoding fails, meaning that both params.key != NULL and (if I'm
+>>> reading this correctly) params.key_size > 0. Is that dead code, or is
+>>> there a way it is intended to be used?
+>> I am fine switching to ecc_gen_privkey. Care to provide a patch for it?
+> 
+> Marcel, regarding the ecdh offload to hw from Bluetooth SMP code, this
+> is not possible as of know because SMP code uses it's own private keys.
+> atmel-ecc driver will fallback to the ecdh software implementation if
+> user wants to use it's own private keys.
+> 
+> I can jump in the Bluetooth's ecdh handling, but at best effort, my
+> primary goal is to add support for KPP in af_alg.
+
+then we need a better abstraction inside KPP. Since even for Bluetooth SMP the keys are temporary. The only thing we have to check is against a well know public/private key pair that was designated as debug key for sniffer purposes.
+
+Essentially we do what all other key exchange procedure do. Generate a private/public key pair, give the public key to the other side, run DH with the value from the other side. That Bluetooth SMP knows about the private key is really pointless. Since the detection of debug key usage is actually via the public key portion.
+
+Regards
+
+Marcel
