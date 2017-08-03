@@ -1,41 +1,38 @@
-From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Subject: Re: [PATCH 1/4] crypto: caam/jr - add support for DPAA2 parts
-Date: Thu, 3 Aug 2017 14:09:50 +0800
-Message-ID: <20170803060950.GA12039@gondor.apana.org.au>
-References: <20170718153050.15330-1-horia.geanta@nxp.com>
- <20170718153050.15330-2-horia.geanta@nxp.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: n2_core: Convert to using %pOF instead of
+ full_name
+Date: Thu, 3 Aug 2017 14:10:12 +0800
+Message-ID: <20170803061012.GB12039@gondor.apana.org.au>
+References: <20170718214339.7774-16-robh@kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: Shawn Guo <shawnguo-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
-        Dan Douglass <dan.douglass-3arQi8VN3Tc@public.gmane.org>,
-        linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
-To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta-3arQi8VN3Tc@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
+To: Rob Herring <robh@kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:58332 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751079AbdHCGKV (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 3 Aug 2017 02:10:21 -0400
 Content-Disposition: inline
-In-Reply-To: <20170718153050.15330-2-horia.geanta-3arQi8VN3Tc@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20170718214339.7774-16-robh@kernel.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jul 18, 2017 at 06:30:47PM +0300, Horia Geantă wrote:
-> Add support for using the caam/jr backend on DPAA2-based SoCs.
-> These have some particularities we have to account for:
-> -HW S/G format is different
-> -Management Complex (MC) firmware initializes / manages (partially)
-> the CAAM block: MCFGR, QI enablement in QICTL, RNG
+On Tue, Jul 18, 2017 at 04:42:56PM -0500, Rob Herring wrote:
+> Now that we have a custom printf format specifier, convert users of
+> full_name to use %pOF instead. This is preparation to remove storing
+> of the full path string for each node.
 > 
-> Signed-off-by: Horia Geantă <horia.geanta-3arQi8VN3Tc@public.gmane.org>
+> Signed-off-by: Rob Herring <robh@kernel.org>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: linux-crypto@vger.kernel.org
 
 Patch applied.  Thanks.
 -- 
-Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
