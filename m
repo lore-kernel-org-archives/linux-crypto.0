@@ -1,9 +1,9 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: atmel-tdes: remove unnecessary static in
- atmel_tdes_remove()
-Date: Thu, 3 Aug 2017 14:11:40 +0800
-Message-ID: <20170803061140.GA12276@gondor.apana.org.au>
-References: <20170718230550.GA11042@embeddedgus>
+Subject: Re: [PATCH] crypto: img-hash: remove unnecessary static in
+ img_hash_remove()
+Date: Thu, 3 Aug 2017 14:11:48 +0800
+Message-ID: <20170803061148.GA12295@gondor.apana.org.au>
+References: <20170718230712.GA15507@embeddedgus>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
@@ -11,12 +11,12 @@ Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
 To: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20170718230550.GA11042@embeddedgus>
+In-Reply-To: <20170718230712.GA15507@embeddedgus>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 Gustavo A. R. Silva <gustavo@embeddedor.com> wrote:
-> Remove unnecessary static on local variable tdes_dd. Such variable
+> Remove unnecessary static on local variable hdev. Such variable
 > is initialized before being used, on every execution path throughout
 > the function. The static has no benefit and, removing it reduces the
 > object file size.
@@ -30,11 +30,11 @@ Gustavo A. R. Silva <gustavo@embeddedor.com> wrote:
 > 
 > before:
 >   text    data     bss     dec     hex filename
->  17079    8704     128   25911    6537 drivers/crypto/atmel-tdes.o
+>  14842    6464     128   21434    53ba drivers/crypto/img-hash.o
 > 
 > after:
 >   text    data     bss     dec     hex filename
->  17039    8616      64   25719    6477 drivers/crypto/atmel-tdes.o
+>  14789    6376      64   21229    52ed drivers/crypto/img-hash.o
 > 
 > Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
 
