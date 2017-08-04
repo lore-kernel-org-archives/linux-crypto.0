@@ -1,89 +1,39 @@
-From: Lars Persson <lars.persson-VrBV9hrLPhE@public.gmane.org>
-Subject: [PATCH v3 2/4] crypto: add crypto_(un)register_ahashes()
-Date: Fri,  4 Aug 2017 09:18:46 +0200
-Message-ID: <88d84f7cbf8d2e462db06a68db92ed60758078ae.1501830919.git.larper@axis.com>
+From: Lars Persson <lars.persson@axis.com>
+Subject: [PATCH v3 4/4] MAINTAINERS: Add ARTPEC crypto maintainer
+Date: Fri,  4 Aug 2017 09:18:48 +0200
+Message-ID: <19f3801d5a934767319ed4dc8bf7849d6187d73d.1501830919.git.larper@axis.com>
 References: <cover.1501830919.git.larper@axis.com>
-Cc: Rabin Vincent <rabinv-VrBV9hrLPhE@public.gmane.org>, Lars Persson <larper-VrBV9hrLPhE@public.gmane.org>
-To: herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
-        robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org,
-        linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <cover.1501830919.git.larper-VrBV9hrLPhE@public.gmane.org>
-In-Reply-To: <cover.1501830919.git.larper-VrBV9hrLPhE@public.gmane.org>
-References: <cover.1501830919.git.larper-VrBV9hrLPhE@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: Lars Persson <larper@axis.com>
+To: herbert@gondor.apana.org.au, davem@davemloft.net,
+        robh+dt@kernel.org, mark.rutland@arm.com,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <cover.1501830919.git.larper@axis.com>
+In-Reply-To: <cover.1501830919.git.larper@axis.com>
+References: <cover.1501830919.git.larper@axis.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-From: Rabin Vincent <rabinv-VrBV9hrLPhE@public.gmane.org>
+Assign the Axis kernel team as maintainer for crypto drivers under
+drivers/crypto/axis.
 
-There are already helpers to (un)register multiple normal
-and AEAD algos.  Add one for ahashes too.
-
-Signed-off-by: Lars Persson <larper-VrBV9hrLPhE@public.gmane.org>
-Signed-off-by: Rabin Vincent <rabinv-VrBV9hrLPhE@public.gmane.org>
+Signed-off-by: Lars Persson <larper@axis.com>
 ---
- crypto/ahash.c                 | 29 +++++++++++++++++++++++++++++
- include/crypto/internal/hash.h |  2 ++
- 2 files changed, 31 insertions(+)
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/crypto/ahash.c b/crypto/ahash.c
-index 826cd7ab4d4a..5e8666e6ccae 100644
---- a/crypto/ahash.c
-+++ b/crypto/ahash.c
-@@ -588,6 +588,35 @@ int crypto_unregister_ahash(struct ahash_alg *alg)
- }
- EXPORT_SYMBOL_GPL(crypto_unregister_ahash);
+diff --git a/MAINTAINERS b/MAINTAINERS
+index d5b6c71e783e..72186cf9820d 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1129,6 +1129,7 @@ L:	linux-arm-kernel@axis.com
+ F:	arch/arm/mach-artpec
+ F:	arch/arm/boot/dts/artpec6*
+ F:	drivers/clk/axis
++F:	drivers/crypto/axis
+ F:	drivers/pinctrl/pinctrl-artpec*
+ F:	Documentation/devicetree/bindings/pinctrl/axis,artpec6-pinctrl.txt
  
-+int crypto_register_ahashes(struct ahash_alg *algs, int count)
-+{
-+	int i, ret;
-+
-+	for (i = 0; i < count; i++) {
-+		ret = crypto_register_ahash(&algs[i]);
-+		if (ret)
-+			goto err;
-+	}
-+
-+	return 0;
-+
-+err:
-+	for (--i; i >= 0; --i)
-+		crypto_unregister_ahash(&algs[i]);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(crypto_register_ahashes);
-+
-+void crypto_unregister_ahashes(struct ahash_alg *algs, int count)
-+{
-+	int i;
-+
-+	for (i = count - 1; i >= 0; --i)
-+		crypto_unregister_ahash(&algs[i]);
-+}
-+EXPORT_SYMBOL_GPL(crypto_unregister_ahashes);
-+
- int ahash_register_instance(struct crypto_template *tmpl,
- 			    struct ahash_instance *inst)
- {
-diff --git a/include/crypto/internal/hash.h b/include/crypto/internal/hash.h
-index f6d9af3efa45..f0b44c16e88f 100644
---- a/include/crypto/internal/hash.h
-+++ b/include/crypto/internal/hash.h
-@@ -76,6 +76,8 @@ static inline int crypto_ahash_walk_last(struct crypto_hash_walk *walk)
- 
- int crypto_register_ahash(struct ahash_alg *alg);
- int crypto_unregister_ahash(struct ahash_alg *alg);
-+int crypto_register_ahashes(struct ahash_alg *algs, int count);
-+void crypto_unregister_ahashes(struct ahash_alg *algs, int count);
- int ahash_register_instance(struct crypto_template *tmpl,
- 			    struct ahash_instance *inst);
- void ahash_free_instance(struct crypto_instance *inst);
 -- 
 2.11.0
-
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
