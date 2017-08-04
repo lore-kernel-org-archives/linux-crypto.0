@@ -1,7 +1,7 @@
 From: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
-Subject: [PATCH v4 5/7] integrity: Select CONFIG_KEYS instead of depending on it
-Date: Fri,  4 Aug 2017 19:03:28 -0300
-Message-ID: <20170804220330.30026-6-bauerman@linux.vnet.ibm.com>
+Subject: [PATCH v4 6/7] ima: Store measurement after appraisal
+Date: Fri,  4 Aug 2017 19:03:29 -0300
+Message-ID: <20170804220330.30026-7-bauerman@linux.vnet.ibm.com>
 References: <20170804220330.30026-1-bauerman@linux.vnet.ibm.com>
 Cc: linux-ima-devel@lists.sourceforge.net, keyrings@vger.kernel.org,
         linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
@@ -24,29 +24,42 @@ In-Reply-To: <20170804220330.30026-1-bauerman@linux.vnet.ibm.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This avoids a dependency cycle in CONFIG_IMA_APPRAISE_MODSIG (introduced by
-a later patch in this series): it will select CONFIG_MODULE_SIG_FORMAT
-which in turn selects CONFIG_KEYS. Kconfig then complains that
-CONFIG_INTEGRITY_SIGNATURE depends on CONFIG_KEYS.
+When module-style signatures appended at the end of files are supported for
+IMA appraisal, the code will fallback to the xattr signature if the
+appended one fails to verify.
+
+The problem is that we don't know whether we need to fallback to the xattr
+signature until the appraise step, and by then the measure step was already
+completed and would need to be done again in case the template includes the
+signature.
+
+To avoid this problem, do the appraisal first so that the correct signature
+is stored by the template in the measure step.
 
 Signed-off-by: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
 ---
- security/integrity/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ security/integrity/ima/ima_main.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/security/integrity/Kconfig b/security/integrity/Kconfig
-index da9565891738..0d642e0317c7 100644
---- a/security/integrity/Kconfig
-+++ b/security/integrity/Kconfig
-@@ -17,8 +17,8 @@ if INTEGRITY
+diff --git a/security/integrity/ima/ima_main.c b/security/integrity/ima/ima_main.c
+index 2aebb7984437..0b4845e7248d 100644
+--- a/security/integrity/ima/ima_main.c
++++ b/security/integrity/ima/ima_main.c
+@@ -244,12 +244,12 @@ static int process_measurement(struct file *file, char *buf, loff_t size,
+ 	if (!pathbuf)	/* ima_rdwr_violation possibly pre-fetched */
+ 		pathname = ima_d_path(&file->f_path, &pathbuf, filename);
  
- config INTEGRITY_SIGNATURE
- 	bool "Digital signature verification using multiple keyrings"
--	depends on KEYS
- 	default n
-+	select KEYS
- 	select SIGNATURE
- 	help
- 	  This option enables digital signature verification support
+-	if (action & IMA_MEASURE)
+-		ima_store_measurement(iint, file, pathname,
+-				      xattr_value, xattr_len, pcr);
+ 	if (action & IMA_APPRAISE_SUBMASK)
+ 		rc = ima_appraise_measurement(func, iint, file, pathname,
+ 					      xattr_value, xattr_len, opened);
++	if (action & IMA_MEASURE)
++		ima_store_measurement(iint, file, pathname,
++				      xattr_value, xattr_len, pcr);
+ 	if (action & IMA_AUDIT)
+ 		ima_audit_measurement(iint, pathname);
+ 
 -- 
 2.13.0
