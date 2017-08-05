@@ -1,43 +1,66 @@
-From: Shawn Guo <shawnguo-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-Subject: Re: [PATCH 0/4] crypto: caam - add Job Ring support for DPAA2 parts
-Date: Sat, 5 Aug 2017 09:54:45 +0800
-Message-ID: <20170805015444.GN31819@dragon>
-References: <20170718153050.15330-1-horia.geanta@nxp.com>
+From: Jyri Sarha <jsarha@ti.com>
+Subject: Re: [PATCH v6 1/7] drm/tilcdc: ensure nonatomic iowrite64 is not used
+Date: Sat, 5 Aug 2017 16:30:35 +0300
+Message-ID: <cf74e6d6-5028-6d1b-a014-2617b9102a78@ti.com>
+References: <20170803183018.5889-1-logang@deltatee.com>
+ <20170803183018.5889-2-logang@deltatee.com>
+ <2b41b02c-07e3-b927-f276-a29480f94285@ti.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
-        devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Dan Douglass <dan.douglass-3arQi8VN3Tc@public.gmane.org>,
-        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-        linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
-To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta-3arQi8VN3Tc@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <20170718153050.15330-1-horia.geanta-3arQi8VN3Tc@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andy Shevchenko <andy.shevchenko@gmail.com>,
+        =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>,
+        Stephen Bates <sbates@raithlin.com>,
+        David Airlie <airlied@linux.ie>
+To: Tomi Valkeinen <tomi.valkeinen@ti.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        <linux-kernel@vger.kernel.org>, <linux-arch@vger.kernel.org>,
+        <linux-ntb@googlegroups.com>, <linux-crypto@vger.kernel.org>
+Return-path: <linux-arch-owner@vger.kernel.org>
+In-Reply-To: <2b41b02c-07e3-b927-f276-a29480f94285@ti.com>
+Content-Language: en-GB
+Sender: linux-arch-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Jul 18, 2017 at 06:30:46PM +0300, Horia Geantă wrote:
-> This patch set adds support for CAAM's legacy Job Ring backend / interface
-> on platforms having DPAA2 (Datapath Acceleration Architecture v2), like
-> LS1088A or LS2088A.
+On 08/04/17 16:03, Tomi Valkeinen wrote:
+> On 03/08/17 21:30, Logan Gunthorpe wrote:
+>> Add a check to ensure iowrite64 is only used if it is atomic.
+>>
+>> It was decided in [1] that the tilcdc driver should not be using an
+>> atomic operation (so it was left out of this patchset). However, it turns
+>> out that through the drm code, a nonatomic header is actually included:
+>>
+>> include/linux/io-64-nonatomic-lo-hi.h
+>> is included from include/drm/drm_os_linux.h:9:0,
+>>             from include/drm/drmP.h:74,
+>>             from include/drm/drm_modeset_helper.h:26,
+>>             from include/drm/drm_atomic_helper.h:33,
+>>             from drivers/gpu/drm/tilcdc/tilcdc_crtc.c:19:
+>>
+>> And thus, without this change, this patchset would inadvertantly
+>> change the behaviour of the tilcdc driver.
 > 
-> I would like to get the DT patches through the crypto list (to make sure
-> they don't end up merged before driver support).
+> I haven't really followed the discussion on this, but if the tilcdc's
+> use of iowrite64 causes (real) problems/complications elsewhere, I think
+> we could drop it.
 > 
-> Thanks,
-> Horia
+> The problem is that the HW has a race issue, and the two registers in
+> question should be written as close to each other as possible. We
+> thought a single 64bit write, writing to both registers in one go, would
+> improve that slightly, compared to two 32 bit writes.
 > 
-> Horia Geantă (4):
->   crypto: caam/jr - add support for DPAA2 parts
->   arm64: dts: freescale: ls208xa: share aliases node
->   arm64: dts: freescale: ls208xa: add crypto node
->   arm64: dts: freescale: ls1088a: add crypto node
+> Jyri, correct me if I'm wrong, but we have no proof that it actually
+> helps, and it might be that even if it helps, the difference is
+> theoretical. Probably if we ensure the irqs are off when we do two 32
+> bit writes, we're already close enough to the optimal case.
+> 
 
-Applied 3 dts patches, thanks.
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+For the sake of this particular case you are right, the atomicity is
+probably not that important here. But in general ARM7 has an atomic
+64bit write and I think it is a shame if it can not be easily used in
+linux kernel.
+
+Best regards,
+Jyri
