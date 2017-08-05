@@ -1,34 +1,43 @@
-From: Shawn Guo <shawnguo@kernel.org>
-Subject: Re: [PATCH v6 2/3] ARM: i.MX25: add RNGB node to dtsi
-Date: Sat, 5 Aug 2017 09:23:38 +0800
-Message-ID: <20170805012337.GK31819@dragon>
-References: <1457705200-16951-1-git-send-email-s.trumtrar@pengutronix.de>
- <1500832146-8660-1-git-send-email-martin@kaiser.cx>
- <1500832146-8660-2-git-send-email-martin@kaiser.cx>
+From: Shawn Guo <shawnguo-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Subject: Re: [PATCH 0/4] crypto: caam - add Job Ring support for DPAA2 parts
+Date: Sat, 5 Aug 2017 09:54:45 +0800
+Message-ID: <20170805015444.GN31819@dragon>
+References: <20170718153050.15330-1-horia.geanta@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Steffen Trumtrar <s.trumtrar@pengutronix.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        devicetree@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
-        linux-crypto@vger.kernel.org, kernel@pengutronix.de,
-        Fabio Estevam <festevam@gmail.com>,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-To: Martin Kaiser <martin@kaiser.cx>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
+        devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Dan Douglass <dan.douglass-3arQi8VN3Tc@public.gmane.org>,
+        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+        linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
+To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta-3arQi8VN3Tc@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <1500832146-8660-2-git-send-email-martin@kaiser.cx>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <20170718153050.15330-1-horia.geanta-3arQi8VN3Tc@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sun, Jul 23, 2017 at 07:49:05PM +0200, Martin Kaiser wrote:
-> From: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+On Tue, Jul 18, 2017 at 06:30:46PM +0300, Horia Geantă wrote:
+> This patch set adds support for CAAM's legacy Job Ring backend / interface
+> on platforms having DPAA2 (Datapath Acceleration Architecture v2), like
+> LS1088A or LS2088A.
 > 
-> Add a devicetree entry for the Random Number Generator Version B (RNGB).
-> The driver for RNGC supports version B as well.
+> I would like to get the DT patches through the crypto list (to make sure
+> they don't end up merged before driver support).
 > 
-> Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
-> Signed-off-by: Martin Kaiser <martin@kaiser.cx>
+> Thanks,
+> Horia
+> 
+> Horia Geantă (4):
+>   crypto: caam/jr - add support for DPAA2 parts
+>   arm64: dts: freescale: ls208xa: share aliases node
+>   arm64: dts: freescale: ls208xa: add crypto node
+>   arm64: dts: freescale: ls1088a: add crypto node
 
-Applied, thanks.
+Applied 3 dts patches, thanks.
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
