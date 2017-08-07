@@ -1,75 +1,105 @@
-From: Carlo Caione <carlo@caione.org>
-Subject: [PATCH RESEND] X.509: Recognize the legacy OID 1.3.14.3.2.29 (sha1WithRSASignature)
-Date: Mon,  7 Aug 2017 10:01:51 +0200
-Message-ID: <20170807080151.5313-1-carlo@caione.org>
-Cc: Carlo Caione <carlo@endlessm.com>
-To: dhowells@redhat.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux@endlessm.com
+From: Stefan Agner <stefan@agner.ch>
+Subject: [PATCH RESEND] lib/mpi: fix build with clang
+Date: Mon,  7 Aug 2017 10:31:20 -0700
+Message-ID: <20170807173120.15463-1-stefan@agner.ch>
+Cc: arnd@arndb.de, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Stefan Agner <stefan@agner.ch>
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wr0-f195.google.com ([209.85.128.195]:37514 "EHLO
-        mail-wr0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751914AbdHGIB5 (ORCPT
+Received: from mail.kmu-office.ch ([178.209.48.109]:38443 "EHLO
+        mail.kmu-office.ch" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751506AbdHGRbe (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Aug 2017 04:01:57 -0400
+        Mon, 7 Aug 2017 13:31:34 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Carlo Caione <carlo@endlessm.com>
+Use just @ to denote comments which works with gcc and clang.
+Otherwise clang reports an escape sequence error:
+  error: invalid % escape in inline assembly string
 
-We have found some ACER laptops shipping with certificates signed using
-the 1.3.14.3.2.29 OID. This is causing the message
+Use %0-%3 as operand references, this avoids:
+  error: invalid operand in inline asm: 'umull ${1:r}, ${0:r}, ${2:r}, ${3:r}'
 
-   EFI: Problem loading in-kernel X.509 certificate (-65)
+Also remove superfluous casts on output operands to avoid warnings
+such as:
+  warning: invalid use of a cast in an inline asm context requiring an l-value
 
-to be printed at boot.
-
-This OID is Rivest, Shamir and Adleman (RSA) algorithm that uses the
-Secure Hash Algorithm 1 (SHA1) (obsolete), usually referred to as
-sha1WithRSASignature.
-
-sha1WithRSASignature is a deprecated equivalent of
-sha1WithRSAEncryption. It originates from the NIST Open Systems
-Environment (OSE) Implementor's Workshop (OIW).
-
-It is supported for compatibility with Microsoft's certificate APIs
-and tools, particularly makecert.exe, which default(ed/s) to this
-OID for SHA-1.
-
-We introduce sha1WithRSASignature as new supported OID making it
-equivalent to sha1WithRSAEncryption. This is solving the issue when
-loading the in-kernel X.509 certificates that can now be correctly read.
-
-Signed-off-by: Carlo Caione <carlo@endlessm.com>
+Signed-off-by: Stefan Agner <stefan@agner.ch>
+Acked-by: Arnd Bergmann <arnd@arndb.de>
 ---
- crypto/asymmetric_keys/x509_cert_parser.c | 1 +
- include/linux/oid_registry.h              | 1 +
- 2 files changed, 2 insertions(+)
+I checked the output of gcc with -S switch before and after this change,
+gcc generated the same assembly.
 
-diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
-index dd03fead1ca3..cdbc8c2def79 100644
---- a/crypto/asymmetric_keys/x509_cert_parser.c
-+++ b/crypto/asymmetric_keys/x509_cert_parser.c
-@@ -203,6 +203,7 @@ int x509_note_pkey_algo(void *context, size_t hdrlen,
- 		break;
- 
- 	case OID_sha1WithRSAEncryption:
-+	case OID_sha1WithRSASignature:
- 		ctx->cert->sig->hash_algo = "sha1";
- 		ctx->cert->sig->pkey_algo = "rsa";
- 		break;
-diff --git a/include/linux/oid_registry.h b/include/linux/oid_registry.h
-index d2fa9ca42e9a..26faee80357f 100644
---- a/include/linux/oid_registry.h
-+++ b/include/linux/oid_registry.h
-@@ -62,6 +62,7 @@ enum OID {
- 
- 	OID_certAuthInfoAccess,		/* 1.3.6.1.5.5.7.1.1 */
- 	OID_sha1,			/* 1.3.14.3.2.26 */
-+	OID_sha1WithRSASignature,	/* 1.3.14.3.2.29 */
- 	OID_sha256,			/* 2.16.840.1.101.3.4.2.1 */
- 	OID_sha384,			/* 2.16.840.1.101.3.4.2.2 */
- 	OID_sha512,			/* 2.16.840.1.101.3.4.2.3 */
+Resend this time with linux-crypto ML.
+
+--
+Stefan
+
+ lib/mpi/longlong.h | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/lib/mpi/longlong.h b/lib/mpi/longlong.h
+index 93336502af08..57fd45ab7af1 100644
+--- a/lib/mpi/longlong.h
++++ b/lib/mpi/longlong.h
+@@ -176,8 +176,8 @@ extern UDItype __udiv_qrnnd(UDItype *, UDItype, UDItype, UDItype);
+ #define add_ssaaaa(sh, sl, ah, al, bh, bl) \
+ 	__asm__ ("adds %1, %4, %5\n" \
+ 		"adc  %0, %2, %3" \
+-	: "=r" ((USItype)(sh)), \
+-		"=&r" ((USItype)(sl)) \
++	: "=r" (sh), \
++		"=&r" (sl) \
+ 	: "%r" ((USItype)(ah)), \
+ 		"rI" ((USItype)(bh)), \
+ 		"%r" ((USItype)(al)), \
+@@ -185,15 +185,15 @@ extern UDItype __udiv_qrnnd(UDItype *, UDItype, UDItype, UDItype);
+ #define sub_ddmmss(sh, sl, ah, al, bh, bl) \
+ 	__asm__ ("subs %1, %4, %5\n" \
+ 		"sbc  %0, %2, %3" \
+-	: "=r" ((USItype)(sh)), \
+-		"=&r" ((USItype)(sl)) \
++	: "=r" (sh), \
++		"=&r" (sl) \
+ 	: "r" ((USItype)(ah)), \
+ 		"rI" ((USItype)(bh)), \
+ 		"r" ((USItype)(al)), \
+ 		"rI" ((USItype)(bl)))
+ #if defined __ARM_ARCH_2__ || defined __ARM_ARCH_3__
+ #define umul_ppmm(xh, xl, a, b) \
+-	__asm__ ("%@ Inlined umul_ppmm\n" \
++	__asm__ ("@ Inlined umul_ppmm\n" \
+ 		"mov	%|r0, %2, lsr #16		@ AAAA\n" \
+ 		"mov	%|r2, %3, lsr #16		@ BBBB\n" \
+ 		"bic	%|r1, %2, %|r0, lsl #16		@ aaaa\n" \
+@@ -206,19 +206,19 @@ extern UDItype __udiv_qrnnd(UDItype *, UDItype, UDItype, UDItype);
+ 		"addcs	%|r2, %|r2, #65536\n" \
+ 		"adds	%1, %|r1, %|r0, lsl #16\n" \
+ 		"adc	%0, %|r2, %|r0, lsr #16" \
+-	: "=&r" ((USItype)(xh)), \
+-		"=r" ((USItype)(xl)) \
++	: "=&r" (xh), \
++		"=r" (xl) \
+ 	: "r" ((USItype)(a)), \
+ 		"r" ((USItype)(b)) \
+ 	: "r0", "r1", "r2")
+ #else
+ #define umul_ppmm(xh, xl, a, b) \
+-	__asm__ ("%@ Inlined umul_ppmm\n" \
+-		"umull %r1, %r0, %r2, %r3" \
+-	: "=&r" ((USItype)(xh)), \
+-			"=&r" ((USItype)(xl)) \
++	__asm__ ("@ Inlined umul_ppmm\n" \
++		"umull %1, %0, %2, %3" \
++	: "=&r" (xh), \
++		"=&r" (xl) \
+ 	: "r" ((USItype)(a)), \
+-			"r" ((USItype)(b)) \
++		"r" ((USItype)(b)) \
+ 	: "r0", "r1")
+ #endif
+ #define UMUL_TIME 20
 -- 
-2.13.3
+2.12.2
