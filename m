@@ -1,53 +1,100 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v4 06/19] crypto: move algif to generic async
-	completion
-Date: Tue, 08 Aug 2017 15:10:01 +0200
-Message-ID: <8585274.Umn6qnzcUd@tauon.chronox.de>
+From: Gary R Hook <gary.hook@amd.com>
+Subject: Re: [PATCH v4 02/19] crypto: ccm: use -EAGAIN for transient busy
+ indication
+Date: Tue, 8 Aug 2017 10:24:49 -0500
+Message-ID: <4600c898-a2f2-f95f-15b4-0adcc6acc0b5__20058.0783574425$1502205951$gmane$org@amd.com>
 References: <1502193834-11289-1-git-send-email-gilad@benyossef.com>
-	<1502193834-11289-7-git-send-email-gilad@benyossef.com>
+ <1502193834-11289-3-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: Mike Snitzer <snitzer@redhat.com>, linux-doc@vger.kernel.org,
-	Gary Hook <gary.hook@amd.com>, David Howells <dhowells@redhat.com>,
-	samba.-technical@lists.samba.org, dm-devel@redhat.com,
-	keyrings@vger.kernel.org, linux-ima-devel@lists.sourceforge.net,
-	Alasdair Kergon <agk@redhat.com>,
-	Boris Brezillon <boris.brezillon@free-electrons.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, Jonathan Corbet <corbet@lwn.net>,
-	Mimi Zohar <zohar@linux.vnet.ibm.com>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	linux-cifs@vger.kernel.org, linux-ima-user@lists.sourceforge.net,
-	Arnaud Ebalard <arno@natisbad.org>, linux-raid@vger.kernel.org,
-	linux-fscrypt@vger.kernel.org, linux-mediatek@lists.infradead.org,
-	James Morris <james.l.morris@oracle.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	Jaegeuk Kim <jaegeuk@kernel.org>, linux-arm-kernel@lists.infradead.o
-To: Gilad Ben-Yossef <gilad@benyossef.com>
-Return-path: <dm-devel-bounces@redhat.com>
-In-Reply-To: <1502193834-11289-7-git-send-email-gilad@benyossef.com>
-List-Unsubscribe: <https://www.redhat.com/mailman/options/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
-List-Archive: <https://www.redhat.com/archives/dm-devel>
-List-Post: <mailto:dm-devel@redhat.com>
-List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
-List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=subscribe>
-Sender: dm-devel-bounces@redhat.com
-Errors-To: dm-devel-bounces@redhat.com
-List-Id: linux-crypto.vger.kernel.org
+Cc: Ofir Drang <ofir.drang@arm.com>
+To: Gilad Ben-Yossef <gilad@benyossef.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        David Howells <dhowells@redhat.com>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        Boris Brezillon <boris.brezillon@free-electrons.com>,
+        Arnaud Ebalard <arno@natisbad.org>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        Shaohua Li <shli@kernel.org>, Steve French <sfrench@samba.org>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        James Morris <james.l.morris@oracle.com>,
+        "Serg
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-sn1nam02on0083.outbound.protection.outlook.com ([104.47.36.83]:52754
+        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752059AbdHHPZl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 8 Aug 2017 11:25:41 -0400
+In-Reply-To: <1502193834-11289-3-git-send-email-gilad@benyossef.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 8. August 2017, 14:03:37 CEST schrieb Gilad Ben-Yossef:
+On 08/08/2017 07:03 AM, Gilad Ben-Yossef wrote:
+> Replace -EBUSY with -EAGAIN when reporting transient busy
+> indication in the absence of backlog.
+>
+> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 
-Hi Gilad,
+Could we use "ccp" in the subject line, please?
 
-> algif starts several async crypto ops and waits for their completion.
-> Move it over to generic code doing the same.
-
-Just FYI: your patch set and my patch [1] will clash.
-
-[1] https://patchwork.kernel.org/patch/9875959/
-
-Ciao
-Stephan
+> ---
+>  drivers/crypto/ccp/ccp-crypto-main.c | 8 +++-----
+>  drivers/crypto/ccp/ccp-dev.c         | 7 +++++--
+>  2 files changed, 8 insertions(+), 7 deletions(-)
+>
+> diff --git a/drivers/crypto/ccp/ccp-crypto-main.c b/drivers/crypto/ccp/ccp-crypto-main.c
+> index 35a9de7..403ff0a 100644
+> --- a/drivers/crypto/ccp/ccp-crypto-main.c
+> +++ b/drivers/crypto/ccp/ccp-crypto-main.c
+> @@ -222,9 +222,10 @@ static int ccp_crypto_enqueue_cmd(struct ccp_crypto_cmd *crypto_cmd)
+>
+>  	/* Check if the cmd can/should be queued */
+>  	if (req_queue.cmd_count >= CCP_CRYPTO_MAX_QLEN) {
+> -		ret = -EBUSY;
+> -		if (!(crypto_cmd->cmd->flags & CCP_CMD_MAY_BACKLOG))
+> +		if (!(crypto_cmd->cmd->flags & CCP_CMD_MAY_BACKLOG)) {
+> +			ret = -EAGAIN;
+>  			goto e_lock;
+> +		}
+>  	}
+>
+>  	/* Look for an entry with the same tfm.  If there is a cmd
+> @@ -243,9 +244,6 @@ static int ccp_crypto_enqueue_cmd(struct ccp_crypto_cmd *crypto_cmd)
+>  		ret = ccp_enqueue_cmd(crypto_cmd->cmd);
+>  		if (!ccp_crypto_success(ret))
+>  			goto e_lock;	/* Error, don't queue it */
+> -		if ((ret == -EBUSY) &&
+> -		    !(crypto_cmd->cmd->flags & CCP_CMD_MAY_BACKLOG))
+> -			goto e_lock;	/* Not backlogging, don't queue it */
+>  	}
+>
+>  	if (req_queue.cmd_count >= CCP_CRYPTO_MAX_QLEN) {
+> diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
+> index 4e029b1..3d637e3 100644
+> --- a/drivers/crypto/ccp/ccp-dev.c
+> +++ b/drivers/crypto/ccp/ccp-dev.c
+> @@ -292,9 +292,12 @@ int ccp_enqueue_cmd(struct ccp_cmd *cmd)
+>  	i = ccp->cmd_q_count;
+>
+>  	if (ccp->cmd_count >= MAX_CMD_QLEN) {
+> -		ret = -EBUSY;
+> -		if (cmd->flags & CCP_CMD_MAY_BACKLOG)
+> +		if (cmd->flags & CCP_CMD_MAY_BACKLOG) {
+> +			ret = -EBUSY;
+>  			list_add_tail(&cmd->entry, &ccp->backlog);
+> +		} else {
+> +			ret = -EAGAIN;
+> +		}
+>  	} else {
+>  		ret = -EINPROGRESS;
+>  		ccp->cmd_count++;
+>
