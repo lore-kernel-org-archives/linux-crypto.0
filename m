@@ -1,42 +1,61 @@
-From: Pan Bian <bianpan2016@163.com>
-Subject: crypto: ccp: use dma_mapping_error to check map error
-Date: Tue,  8 Aug 2017 21:42:47 +0800
-Message-ID: <1502199767-2578-1-git-send-email-bianpan2016@163.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Pan Bian <bianpan2016@163.com>
-To: Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from m12-14.163.com ([220.181.12.14]:43387 "EHLO m12-14.163.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752082AbdHHNnm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Aug 2017 09:43:42 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
+Subject: Re: [PATCH v4 06/19] crypto: move algif to generic async completion
+Date: Tue, 8 Aug 2017 16:45:36 +0300
+Message-ID: <CAOtvUMfp7Hie_RA8XNmWS084PvyO_xB0VAf2Vt9nR68cQhz3=g@mail.gmail.com>
+References: <1502193834-11289-1-git-send-email-gilad@benyossef.com>
+ <1502193834-11289-7-git-send-email-gilad@benyossef.com> <8585274.Umn6qnzcUd@tauon.chronox.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Cc: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+        "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+        Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>,
+        David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+        Tom Lendacky <thomas.lendacky-5C7GfCeVMHo@public.gmane.org>,
+        Gary Hook <gary.hook-5C7GfCeVMHo@public.gmane.org>,
+        Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
+        Arnaud Ebalard <arno-LkuqDEemtHBg9hUCZPvPmw@public.gmane.org>,
+        Matthias Brugger <matthias.bgg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        Alasdair Kergon <agk-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+        Mike Snitzer <snitzer-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+        device-mapper development <dm-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+        Shaohua Li <shli-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+        "Theodore Y. Ts'o" <tytso-3s7WtUTddSA@public.gmane.org>,
+        Jaegeuk Kim <jaegeuk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        Mimi Zohar <zohar-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>,
+        Dmitry Kasatkin <dmitry.kasatkin-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        James Morris <james.l.morris-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
+        "Serge E. Hallyn
+To: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <8585274.Umn6qnzcUd-b2PLbiJbNv8ftSvlWXw0+g@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-The return value of dma_map_single() should be checked by
-dma_mapping_error(). However, in function ccp_init_dm_workarea(), its
-return value is checked against NULL, which could result in failures.
+On Tue, Aug 8, 2017 at 4:10 PM, Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org> wrote:
+> Am Dienstag, 8. August 2017, 14:03:37 CEST schrieb Gilad Ben-Yossef:
+>
+> Hi Gilad,
+>
+>> algif starts several async crypto ops and waits for their completion.
+>> Move it over to generic code doing the same.
+>
+> Just FYI: your patch set and my patch [1] will clash.
+>
+> [1] https://patchwork.kernel.org/patch/9875959/
 
-Signed-off-by: Pan Bian <bianpan2016@163.com>
----
- drivers/crypto/ccp/ccp-ops.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I'll try to rebase on linux-next + your patch than.
 
-diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
-index c0dfdac..ca83d19 100644
---- a/drivers/crypto/ccp/ccp-ops.c
-+++ b/drivers/crypto/ccp/ccp-ops.c
-@@ -168,7 +168,7 @@ static int ccp_init_dm_workarea(struct ccp_dm_workarea *wa,
- 
- 		wa->dma.address = dma_map_single(wa->dev, wa->address, len,
- 						 dir);
--		if (!wa->dma.address)
-+		if (dma_mapping_error(wa->dev, wa->dma.address))
- 			return -ENOMEM;
- 
- 		wa->dma.length = len;
+Thanks for letting me know.
+
+Gilad
+
+
+
+
 -- 
-1.9.1
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+"If you take a class in large-scale robotics, can you end up in a
+situation where the homework eats your dog?"
+ -- Jean-Baptiste Queru
