@@ -1,101 +1,51 @@
-From: Gary R Hook <gary.hook-5C7GfCeVMHo@public.gmane.org>
-Subject: Re: [PATCH v4 02/19] crypto: ccm: use -EAGAIN for transient busy
- indication
-Date: Tue, 8 Aug 2017 10:24:49 -0500
-Message-ID: <4600c898-a2f2-f95f-15b4-0adcc6acc0b5__11767.675940837$1502205985$gmane$org@amd.com>
-References: <1502193834-11289-1-git-send-email-gilad@benyossef.com>
- <1502193834-11289-3-git-send-email-gilad@benyossef.com>
+From: Gary R Hook <gary.hook@amd.com>
+Subject: Re: crypto: ccp: use dma_mapping_error to check map error
+Date: Tue, 8 Aug 2017 10:26:50 -0500
+Message-ID: <d51e705d-bfc9-997b-957a-416da2d3782a@amd.com>
+References: <1502199767-2578-1-git-send-email-bianpan2016@163.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>
-To: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>,
- Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
- "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>, Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>,
- David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
- "Lendacky, Thomas" <Thomas.Lendacky-5C7GfCeVMHo@public.gmane.org>,
- Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
- Arnaud Ebalard <arno-LkuqDEemtHBg9hUCZPvPmw@public.gmane.org>, Matthias Brugger
- <matthias.bgg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Alasdair Kergon <agk-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
- Mike Snitzer <snitzer-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, "dm-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org"
- <dm-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Shaohua Li <shli-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
- Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, "Theodore Y. Ts'o" <tytso-3s7WtUTddSA@public.gmane.org>,
- Jaegeuk Kim <jaegeuk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Mimi Zohar <zohar-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>,
- Dmitry Kasatkin <dmitry.kasatkin-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
- James Morris <james.l.morris-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>, "Serge E. Hallyn"
- <serge-A9i7LUbDfNHQT0dZR+AlfA@public.gmane.org>,
- "linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
- "linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <lin
-Return-path: <linux-mediatek-bounces+glpam-linux-mediatek=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
-In-Reply-To: <1502193834-11289-3-git-send-email-gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-mediatek>,
- <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-mediatek/>
-List-Post: <mailto:linux-mediatek-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
-List-Help: <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-mediatek>,
- <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=subscribe>
-Sender: "Linux-mediatek" <linux-mediatek-bounces-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
-Errors-To: linux-mediatek-bounces+glpam-linux-mediatek=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Pan Bian <bianpan2016@163.com>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-bn3nam01on0080.outbound.protection.outlook.com ([104.47.33.80]:48960
+        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752030AbdHHP1l (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 8 Aug 2017 11:27:41 -0400
+In-Reply-To: <1502199767-2578-1-git-send-email-bianpan2016@163.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 08/08/2017 07:03 AM, Gilad Ben-Yossef wrote:
-> Replace -EBUSY with -EAGAIN when reporting transient busy
-> indication in the absence of backlog.
+On 08/08/2017 08:42 AM, Pan Bian wrote:
+> The return value of dma_map_single() should be checked by
+> dma_mapping_error(). However, in function ccp_init_dm_workarea(), its
+> return value is checked against NULL, which could result in failures.
 >
-> Signed-off-by: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
+> Signed-off-by: Pan Bian <bianpan2016@163.com>
 
-Could we use "ccp" in the subject line, please?
+Acked-by: Gary R Hook <gary.hook@amd.com>
 
 > ---
->  drivers/crypto/ccp/ccp-crypto-main.c | 8 +++-----
->  drivers/crypto/ccp/ccp-dev.c         | 7 +++++--
->  2 files changed, 8 insertions(+), 7 deletions(-)
+>  drivers/crypto/ccp/ccp-ops.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/drivers/crypto/ccp/ccp-crypto-main.c b/drivers/crypto/ccp/ccp-crypto-main.c
-> index 35a9de7..403ff0a 100644
-> --- a/drivers/crypto/ccp/ccp-crypto-main.c
-> +++ b/drivers/crypto/ccp/ccp-crypto-main.c
-> @@ -222,9 +222,10 @@ static int ccp_crypto_enqueue_cmd(struct ccp_crypto_cmd *crypto_cmd)
+> diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
+> index c0dfdac..ca83d19 100644
+> --- a/drivers/crypto/ccp/ccp-ops.c
+> +++ b/drivers/crypto/ccp/ccp-ops.c
+> @@ -168,7 +168,7 @@ static int ccp_init_dm_workarea(struct ccp_dm_workarea *wa,
 >
->  	/* Check if the cmd can/should be queued */
->  	if (req_queue.cmd_count >= CCP_CRYPTO_MAX_QLEN) {
-> -		ret = -EBUSY;
-> -		if (!(crypto_cmd->cmd->flags & CCP_CMD_MAY_BACKLOG))
-> +		if (!(crypto_cmd->cmd->flags & CCP_CMD_MAY_BACKLOG)) {
-> +			ret = -EAGAIN;
->  			goto e_lock;
-> +		}
->  	}
+>  		wa->dma.address = dma_map_single(wa->dev, wa->address, len,
+>  						 dir);
+> -		if (!wa->dma.address)
+> +		if (dma_mapping_error(wa->dev, wa->dma.address))
+>  			return -ENOMEM;
 >
->  	/* Look for an entry with the same tfm.  If there is a cmd
-> @@ -243,9 +244,6 @@ static int ccp_crypto_enqueue_cmd(struct ccp_crypto_cmd *crypto_cmd)
->  		ret = ccp_enqueue_cmd(crypto_cmd->cmd);
->  		if (!ccp_crypto_success(ret))
->  			goto e_lock;	/* Error, don't queue it */
-> -		if ((ret == -EBUSY) &&
-> -		    !(crypto_cmd->cmd->flags & CCP_CMD_MAY_BACKLOG))
-> -			goto e_lock;	/* Not backlogging, don't queue it */
->  	}
->
->  	if (req_queue.cmd_count >= CCP_CRYPTO_MAX_QLEN) {
-> diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
-> index 4e029b1..3d637e3 100644
-> --- a/drivers/crypto/ccp/ccp-dev.c
-> +++ b/drivers/crypto/ccp/ccp-dev.c
-> @@ -292,9 +292,12 @@ int ccp_enqueue_cmd(struct ccp_cmd *cmd)
->  	i = ccp->cmd_q_count;
->
->  	if (ccp->cmd_count >= MAX_CMD_QLEN) {
-> -		ret = -EBUSY;
-> -		if (cmd->flags & CCP_CMD_MAY_BACKLOG)
-> +		if (cmd->flags & CCP_CMD_MAY_BACKLOG) {
-> +			ret = -EBUSY;
->  			list_add_tail(&cmd->entry, &ccp->backlog);
-> +		} else {
-> +			ret = -EAGAIN;
-> +		}
->  	} else {
->  		ret = -EINPROGRESS;
->  		ccp->cmd_count++;
+>  		wa->dma.length = len;
 >
