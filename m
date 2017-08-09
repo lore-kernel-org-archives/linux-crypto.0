@@ -1,61 +1,37 @@
-From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: [bug report] crypto: stm32 - Support for STM32 HASH module
-Date: Thu, 10 Aug 2017 00:27:18 +0300
-Message-ID: <20170809212718.7xcib3rhexiy52cb@mwanda>
+From: Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH v3 1/4] dt-bindings: crypto: add ARTPEC crypto
+Date: Wed, 9 Aug 2017 18:26:20 -0500
+Message-ID: <20170809232620.xvygh4bhyfyfuoqq@rob-hp-laptop>
+References: <cover.1501830919.git.larper@axis.com>
+ <b493a0eb939fe97f7e604c0c83916e0dac1d2bce.1501830919.git.larper@axis.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: lionel.debieve@st.com
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+        mark.rutland@arm.com, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Lars Persson <larper@axis.com>
+To: Lars Persson <lars.persson@axis.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from userp1040.oracle.com ([156.151.31.81]:19062 "EHLO
-        userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751890AbdHIV1i (ORCPT
+Received: from mail-yw0-f196.google.com ([209.85.161.196]:38646 "EHLO
+        mail-yw0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752091AbdHIX0W (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Aug 2017 17:27:38 -0400
+        Wed, 9 Aug 2017 19:26:22 -0400
 Content-Disposition: inline
+In-Reply-To: <b493a0eb939fe97f7e604c0c83916e0dac1d2bce.1501830919.git.larper@axis.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello lionel.debieve@st.com,
+On Fri, Aug 04, 2017 at 09:18:45AM +0200, Lars Persson wrote:
+> Document the device tree bindings for the ARTPEC crypto accelerator on
+> ARTPEC-6 and ARTPEC-7 SoCs.
+> 
+> Signed-off-by: Lars Persson <larper@axis.com>
+> ---
+>  .../devicetree/bindings/crypto/artpec6-crypto.txt        | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/crypto/artpec6-crypto.txt
 
-The patch 8a1012d3f2ab: "crypto: stm32 - Support for STM32 HASH
-module" from Jul 13, 2017, leads to the following static checker
-warning:
+I acked v2. Please add acks when posting new versions.
 
-	drivers/crypto/stm32/stm32-hash.c:1088 stm32_hash_irq_thread()
-	error: uninitialized symbol 'err'.
-
-drivers/crypto/stm32/stm32-hash.c
-  1067  static irqreturn_t stm32_hash_irq_thread(int irq, void *dev_id)
-  1068  {
-  1069          struct stm32_hash_dev *hdev = dev_id;
-  1070          int err;
-                ^^^^^^^^
-  1071  
-  1072          if (HASH_FLAGS_CPU & hdev->flags) {
-  1073                  if (HASH_FLAGS_OUTPUT_READY & hdev->flags) {
-  1074                          hdev->flags &= ~HASH_FLAGS_OUTPUT_READY;
-  1075                          goto finish;
-  1076                  }
-  1077          } else if (HASH_FLAGS_DMA_READY & hdev->flags) {
-  1078                  if (HASH_FLAGS_DMA_ACTIVE & hdev->flags) {
-  1079                          hdev->flags &= ~HASH_FLAGS_DMA_ACTIVE;
-  1080                                  goto finish;
-  1081                  }
-  1082          }
-  1083  
-  1084          return IRQ_HANDLED;
-  1085  
-  1086  finish:
-  1087          /*Finish current request */
-  1088          stm32_hash_finish_req(hdev->req, err);
-                                                 ^^^
-Never initialized.
-
-  1089  
-  1090          return IRQ_HANDLED;
-  1091  }
-
-
-regards,
-dan carpenter
+Acked-by: Rob Herring <robh@kernel.org>
