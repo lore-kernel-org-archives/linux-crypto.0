@@ -1,39 +1,44 @@
-From: =?utf-8?B?0YHQuNGB0YLQtdC80Ysg0LDQtNC80LjQvdC40YHRgtGA0LDRgtC+0YA=?=
-        <set.sultra@bawaslu.go.id>
-Subject: (unknown)
-Date: Wed, 9 Aug 2017 17:20:16 +0700 (WIB)
-Message-ID: <1144845852.64097.1502274016662.JavaMail.zimbra__32819.9297575795$1502279041$gmane$org@bawaslu.go.id>
-Reply-To: Sistemass_Adminss@mail2world.com
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Fixes for 4.13
+Date: Wed, 9 Aug 2017 20:04:24 +0800
+Message-ID: <20170809120424.GA32740@gondor.apana.org.au>
+References: <20161119102748.GA4277@gondor.apana.org.au>
+ <20161213132414.GA7898@gondor.apana.org.au>
+ <20170223125141.GA17400@gondor.apana.org.au>
+ <20170714141855.GA29426@gondor.apana.org.au>
+ <20170728084955.GA19586@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-To: unlisted-recipients:; (no To-header on input)
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.bawaslu.go.id ([103.249.227.189]:44118 "EHLO
-        mail.bawaslu.go.id" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752260AbdHILnl (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Aug 2017 07:43:41 -0400
-Subject: 
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20170728084955.GA19586@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-внимания;
+Hi Linus: 
 
-Ваши сообщения превысил лимит памяти, который составляет 5 Гб, определенных администратором, который в настоящее время работает на 10.9GB, Вы не сможете отправить или получить новую почту, пока вы повторно не проверить ваш почтовый ящик почты. Чтобы восстановить работоспособность Вашего почтового ящика, отправьте следующую информацию ниже:
+This push fixes two regressions in the inside-secure driver with
+respect to hmac(sha1).
 
-имя:
-Имя пользователя:
-пароль:
-Подтверждение пароля:
-Адрес электронной почты:
-телефон:
 
-Если вы не в состоянии перепроверить сообщения, ваш почтовый ящик будет отключен!
+Please pull from
 
-Приносим извинения за неудобства.
-Проверочный код: EN: Ru...9o76ypp2345t..2017
-Почты технической поддержки ©2017
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
 
-спасибо
-системы администратор
+
+Antoine Tenart (2):
+      crypto: inside-secure - fix invalidation check in hmac_sha1_setkey
+      crypto: inside-secure - fix the sha state length in hmac_sha1_setkey
+
+ drivers/crypto/inside-secure/safexcel_hash.c |    8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+ 
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
