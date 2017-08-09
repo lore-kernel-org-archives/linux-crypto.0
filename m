@@ -1,55 +1,70 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [PATCH v4 02/19] crypto: ccm: use -EAGAIN for transient busy indication
-Date: Wed, 9 Aug 2017 08:18:03 +0300
-Message-ID: <CAOtvUMeUHk9KxQumhuvJ52dp-_-LFOD8XGvCWvhU6LjEZhEF7A@mail.gmail.com>
-References: <1502193834-11289-1-git-send-email-gilad@benyossef.com>
- <1502193834-11289-3-git-send-email-gilad@benyossef.com> <4600c898-a2f2-f95f-15b4-0adcc6acc0b5@amd.com>
+From: Corentin Labbe <clabbe.montjoie@gmail.com>
+Subject: Re: [PATCH v2 2/2] crypto: engine - Permit to enqueue skcipher
+ request
+Date: Wed, 9 Aug 2017 11:40:12 +0200
+Message-ID: <20170809094012.GC7137@Red>
+References: <20170606134417.18850-1-clabbe.montjoie@gmail.com>
+ <20170606134417.18850-3-clabbe.montjoie@gmail.com>
+ <20170619052707.GA13180@gondor.apana.org.au>
+ <20170619075524.GA27419@Red>
+ <20170623064837.GA29139@gondor.apana.org.au>
+ <20170714111536.GA30440@Red>
+ <20170728135257.GE21401@gondor.apana.org.au>
+ <20170728150119.GD7221@Red>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        David Howells <dhowells@redhat.com>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        Boris Brezillon <boris.brezillon@free-electrons.com>,
-        Arnaud Ebalard <arno@natisbad.org>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        Shaohua Li <shli@kernel.org>, Steve French <sfrench@samba.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        James Morris <james.l.morris@oracle.com>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        "linux-
-To: Gary R Hook <gary.hook@amd.com>
-Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <4600c898-a2f2-f95f-15b4-0adcc6acc0b5@amd.com>
-Sender: owner-linux-security-module@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wm0-f49.google.com ([74.125.82.49]:35852 "EHLO
+        mail-wm0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751932AbdHIJkS (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 9 Aug 2017 05:40:18 -0400
+Content-Disposition: inline
+In-Reply-To: <20170728150119.GD7221@Red>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Aug 8, 2017 at 6:24 PM, Gary R Hook <gary.hook@amd.com> wrote:
-> On 08/08/2017 07:03 AM, Gilad Ben-Yossef wrote:
->>
->> Replace -EBUSY with -EAGAIN when reporting transient busy
->> indication in the absence of backlog.
->>
->> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
->
->
-> Could we use "ccp" in the subject line, please?
+On Fri, Jul 28, 2017 at 05:01:19PM +0200, Corentin Labbe wrote:
+> On Fri, Jul 28, 2017 at 09:52:57PM +0800, Herbert Xu wrote:
+> > On Fri, Jul 14, 2017 at 01:15:36PM +0200, Corentin Labbe wrote:
+> > > On Fri, Jun 23, 2017 at 02:48:37PM +0800, Herbert Xu wrote:
+> > > > On Mon, Jun 19, 2017 at 09:55:24AM +0200, Corentin Labbe wrote:
+> > > > >
+> > > > > Since there are two different user of "crypto engine + ablkcipher", it will be not easy to convert them in one serie. (I could do it, but I simply could not test it for OMAP (lack of hw))
+> > > > > And any new user which want to use crypto engine+skcipher (like me with the sun8i-ce driver) are simply stuck.
+> > > > 
+> > > > You're right.  We'll need to do this in a backwards-compatible way.  In fact
+> > > > we already do something similar in skcipher.c itself.  Simply look at the
+> > > > cra_type field and if it matches blkcipher/ablkcipher/givcipher then it's
+> > > > legacy ablkcipher, otherwise it's skcipher.
+> > > > 
+> > > > Also the way crypto_engine looks at the request type in the data-path is
+> > > > suboptimal.  This should really be built into the cra_type object.  For
+> > > > example, we can have cra_type->engine->prepare_request which would just
+> > > > do the right thing.
+> > > > 
+> > > 
+> > > Not sure to have well understand what you want.
+> > > You want that I switch on cra_type instead of crypto_tfm_alg_type() ?
+> > 
+> > No I mean that we should have an engine hooks object registered
+> > under cra_type so that you simply call
+> > 
+> > 	cra_type->engine->prepare_request()
+> > 
+> > regardless of what type you're using.
+> > 
+> 
+> I am sorry, I didnt see how to do that.
 
-Of course, sorry about the the typo.
+Hello
 
-Gilad
+I really didnt see how to do that since cra_type is const.
+Anyway, I think it cannot be possible since we could have two different engine with two different prepare_request().
 
--- 
-Gilad Ben-Yossef
-Chief Coffee Drinker
+I will really appreciate any advice on what you want exactly.
 
-"If you take a class in large-scale robotics, can you end up in a
-situation where the homework eats your dog?"
- -- Jean-Baptiste Queru
+Regards
