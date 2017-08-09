@@ -1,47 +1,42 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [Patch V4] crypto: x86/sha1 : Fix reads beyond the number of
- blocks passed
-Date: Wed, 9 Aug 2017 21:57:46 +0800
-Message-ID: <20170809135746.GH743@gondor.apana.org.au>
-References: <1501706949-24322-1-git-send-email-megha.dey@linux.intel.com>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: [PATCH] crypto: algif_aead - fix comment regarding memory layout
+Date: Wed, 09 Aug 2017 16:20:00 +0200
+Message-ID: <1863751.KMZUYKXSmc@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: tim.c.chen@linux.intel.com, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        jstancek@redhat.com, ilya.albrekht@intel.com, megha.dey@intel.com
-To: Megha Dey <megha.dey@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:36844 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752652AbdHIN6B (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Aug 2017 09:58:01 -0400
-Content-Disposition: inline
-In-Reply-To: <1501706949-24322-1-git-send-email-megha.dey@linux.intel.com>
+Received: from mail.eperm.de ([89.247.134.16]:58404 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751944AbdHIOUC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 9 Aug 2017 10:20:02 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Aug 02, 2017 at 01:49:09PM -0700, Megha Dey wrote:
-> It was reported that the sha1 AVX2 function(sha1_transform_avx2) is
-> reading ahead beyond its intended data, and causing a crash if the next
-> block is beyond page boundary:
-> http://marc.info/?l=linux-crypto-vger&m=149373371023377
-> 
-> This patch makes sure that there is no overflow for any buffer length.
-> 
-> It passes the tests written by Jan Stancek that revealed this problem:
-> https://github.com/jstancek/sha1-avx2-crash
-> 
-> I have re-enabled sha1-avx2 by reverting commit
-> b82ce24426a4071da9529d726057e4e642948667
-> 
-> Originally-by: Ilya Albrekht <ilya.albrekht@intel.com>
-> Tested-by: Jan Stancek <jstancek@redhat.com>
-> Signed-off-by: Megha Dey <megha.dey@linux.intel.com>
-> Reported-by: Jan Stancek <jstancek@redhat.com>
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/algif_aead.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Patch applied.  Thanks.
+diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
+index 48d46e74ed0d..516b38c3a169 100644
+--- a/crypto/algif_aead.c
++++ b/crypto/algif_aead.c
+@@ -201,11 +201,11 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
+ 		 * Encryption operation - The in-place cipher operation is
+ 		 * achieved by the following operation:
+ 		 *
+-		 * TX SGL: AAD || PT || Tag
++		 * TX SGL: AAD || PT
+ 		 *	    |	   |
+ 		 *	    | copy |
+ 		 *	    v	   v
+-		 * RX SGL: AAD || PT
++		 * RX SGL: AAD || PT || Tag
+ 		 */
+ 		err = crypto_aead_copy_sgl(null_tfm, tsgl->sg,
+ 					   areq->first_rsgl.sgl.sg, processed);
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.13.4
