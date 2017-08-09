@@ -1,34 +1,31 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: ccp - select CONFIG_CRYPTO_RSA
-Date: Wed, 9 Aug 2017 21:57:12 +0800
-Message-ID: <20170809135712.GE743@gondor.apana.org.au>
-References: <20170731211104.2012741-1-arnd@arndb.de>
+Subject: Re: [PATCH v3] crypto: caam: Remove unused dentry members
+Date: Wed, 9 Aug 2017 21:57:21 +0800
+Message-ID: <20170809135721.GF743@gondor.apana.org.au>
+References: <1501595101-13919-1-git-send-email-festevam@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Arnd Bergmann <arnd@arndb.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: horia.geanta@nxp.com, linux-crypto@vger.kernel.org
+To: Fabio Estevam <festevam@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:36830 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752461AbdHIN5a (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 9 Aug 2017 09:57:30 -0400
 Content-Disposition: inline
-In-Reply-To: <20170731211104.2012741-1-arnd@arndb.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1501595101-13919-1-git-send-email-festevam@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jul 31, 2017 at 11:10:57PM +0200, Arnd Bergmann wrote:
-> Without the base RSA code, we run into a link error:
+On Tue, Aug 01, 2017 at 10:45:01AM -0300, Fabio Estevam wrote:
+> Most of the dentry members from structure caam_drv_private
+> are never used at all, so it is safe to remove them.
 > 
-> ERROR: "rsa_parse_pub_key" [drivers/crypto/ccp/ccp-crypto.ko] undefined!
-> ERROR: "rsa_parse_priv_key" [drivers/crypto/ccp/ccp-crypto.ko] undefined!
+> Since debugfs_remove_recursive() is called, we don't need the
+> file entries.
 > 
-> Like the other drivers implementing RSA in hardware, this
-> can be avoided by always enabling the base support when we build
-> CCP.
-> 
-> Fixes: ceeec0afd684 ("crypto: ccp - Add support for RSA on the CCP")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> Signed-off-by: Fabio Estevam <festevam@gmail.com>
 
 Patch applied.  Thanks.
 -- 
