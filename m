@@ -1,7 +1,7 @@
 From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [RFC PATCH 03/10] staging: fsl-mc: dpio: add order preservation support
-Date: Thu, 10 Aug 2017 20:42:46 +0300
-Message-ID: <20170810174253.20951-4-horia.geanta@nxp.com>
+Subject: [RFC PATCH 07/10] crypto: caam - add Queue Interface v2 error codes
+Date: Thu, 10 Aug 2017 20:42:50 +0300
+Message-ID: <20170810174253.20951-8-horia.geanta@nxp.com>
 References: <20170810174253.20951-1-horia.geanta@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
@@ -21,144 +21,166 @@ To: Herbert Xu <herbert@gondor.apana.org.au>,
         Catalin Marinas <catalin.marinas@arm.com>,
         Will Deacon <will.deacon@arm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2nam01on0084.outbound.protection.outlook.com ([104.47.34.84]:24512
+Received: from mail-by2nam01on0077.outbound.protection.outlook.com ([104.47.34.77]:22368
         "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753126AbdHJRnk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Aug 2017 13:43:40 -0400
+        id S1753114AbdHJRnw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 10 Aug 2017 13:43:52 -0400
 In-Reply-To: <20170810174253.20951-1-horia.geanta@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Radu Alexe <radu.alexe@nxp.com>
+Add support to translate error codes returned by QI v2, i.e.
+Queue Interface present on DataPath Acceleration Architecture
+v2 (DPAA2).
 
-Order preservation is a feature that will be supported
-in dpni, dpseci and dpci devices.
-This is a preliminary patch for the changes to be
-introduced in the corresponding drivers.
-
-Signed-off-by: Radu Alexe <radu.alexe@nxp.com>
 Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 ---
- drivers/staging/fsl-mc/include/dpopr.h | 110 +++++++++++++++++++++++++++++++++
- 1 file changed, 110 insertions(+)
- create mode 100644 drivers/staging/fsl-mc/include/dpopr.h
+ drivers/crypto/caam/error.c | 75 +++++++++++++++++++++++++++++++++++++++++++--
+ drivers/crypto/caam/error.h |  6 +++-
+ drivers/crypto/caam/regs.h  |  2 ++
+ 3 files changed, 79 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/staging/fsl-mc/include/dpopr.h b/drivers/staging/fsl-mc/include/dpopr.h
-new file mode 100644
-index 000000000000..e1110af2fe54
---- /dev/null
-+++ b/drivers/staging/fsl-mc/include/dpopr.h
-@@ -0,0 +1,110 @@
-+/*
-+ * Copyright 2017 NXP
-+ *
-+ * Redistribution and use in source and binary forms, with or without
-+ * modification, are permitted provided that the following conditions are met:
-+ * * Redistributions of source code must retain the above copyright
-+ * notice, this list of conditions and the following disclaimer.
-+ * * Redistributions in binary form must reproduce the above copyright
-+ * notice, this list of conditions and the following disclaimer in the
-+ * documentation and/or other materials provided with the distribution.
-+ * * Neither the name of the above-listed copyright holders nor the
-+ * names of any contributors may be used to endorse or promote products
-+ * derived from this software without specific prior written permission.
-+ *
-+ *
-+ * ALTERNATIVELY, this software may be distributed under the terms of the
-+ * GNU General Public License ("GPL") as published by the Free Software
-+ * Foundation, either version 2 of that License or (at your option) any
-+ * later version.
-+ *
-+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE
-+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-+ * POSSIBILITY OF SUCH DAMAGE.
-+ */
-+#ifndef __FSL_DPOPR_H_
-+#define __FSL_DPOPR_H_
-+
-+/* Data Path Order Restoration API
-+ * Contains initialization APIs and runtime APIs for the Order Restoration
-+ */
-+
-+/** Order Restoration properties */
-+
-+/**
-+ * Create a new Order Point Record option
-+ */
-+#define OPR_OPT_CREATE 0x1
-+/**
-+ * Retire an existing Order Point Record option
-+ */
-+#define OPR_OPT_RETIRE 0x2
-+
-+/**
-+ * struct opr_cfg - Structure representing OPR configuration
-+ * @oprrws: Order point record (OPR) restoration window size (0 to 5)
-+ *			0 - Window size is 32 frames.
-+ *			1 - Window size is 64 frames.
-+ *			2 - Window size is 128 frames.
-+ *			3 - Window size is 256 frames.
-+ *			4 - Window size is 512 frames.
-+ *			5 - Window size is 1024 frames.
-+ * @oa: OPR auto advance NESN window size (0 disabled, 1 enabled)
-+ * @olws: OPR acceptable late arrival window size (0 to 3)
-+ *			0 - Disabled. Late arrivals are always rejected.
-+ *			1 - Window size is 32 frames.
-+ *			2 - Window size is the same as the OPR restoration
-+ *				window size configured in the OPRRWS field.
-+ *			3 - Window size is 8192 frames. Late arrivals are
-+ *				always accepted.
-+ * @oeane: Order restoration list (ORL) resource exhaustion
-+ *			advance NESN enable (0 disabled, 1 enabled)
-+ * @oloe: OPR loose ordering enable (0 disabled, 1 enabled)
-+ */
-+struct opr_cfg {
-+	u8 oprrws;
-+	u8 oa;
-+	u8 olws;
-+	u8 oeane;
-+	u8 oloe;
+diff --git a/drivers/crypto/caam/error.c b/drivers/crypto/caam/error.c
+index 3d639f3b45aa..65756bab800f 100644
+--- a/drivers/crypto/caam/error.c
++++ b/drivers/crypto/caam/error.c
+@@ -107,6 +107,54 @@ static const struct {
+ 	{ 0xF1, "3GPP HFN matches or exceeds the Threshold" },
+ };
+ 
++static const struct {
++	u8 value;
++	const char *error_text;
++} qi_error_list[] = {
++	{ 0x1F, "Job terminated by FQ or ICID flush" },
++	{ 0x20, "FD format error"},
++	{ 0x21, "FD command format error"},
++	{ 0x23, "FL format error"},
++	{ 0x25, "CRJD specified in FD, but not enabled in FLC"},
++	{ 0x30, "Max. buffer size too small"},
++	{ 0x31, "DHR exceeds max. buffer size (allocate mode, S/G format)"},
++	{ 0x32, "SGT exceeds max. buffer size (allocate mode, S/G format"},
++	{ 0x33, "Size over/underflow (allocate mode)"},
++	{ 0x34, "Size over/underflow (reuse mode)"},
++	{ 0x35, "Length exceeds max. short length (allocate mode, S/G/ format)"},
++	{ 0x36, "Memory footprint exceeds max. value (allocate mode, S/G/ format)"},
++	{ 0x41, "SBC frame format not supported (allocate mode)"},
++	{ 0x42, "Pool 0 invalid / pool 1 size < pool 0 size (allocate mode)"},
++	{ 0x43, "Annotation output enabled but ASAR = 0 (allocate mode)"},
++	{ 0x44, "Unsupported or reserved frame format or SGHR = 1 (reuse mode)"},
++	{ 0x45, "DHR correction underflow (reuse mode, single buffer format)"},
++	{ 0x46, "Annotation length exceeds offset (reuse mode)"},
++	{ 0x48, "Annotation output enabled but ASA limited by ASAR (reuse mode)"},
++	{ 0x49, "Data offset correction exceeds input frame data length (reuse mode)"},
++	{ 0x4B, "Annotation output enabled but ASA cannote be expanded (frame list)"},
++	{ 0x51, "Unsupported IF reuse mode"},
++	{ 0x52, "Unsupported FL use mode"},
++	{ 0x53, "Unsupported RJD use mode"},
++	{ 0x54, "Unsupported inline descriptor use mode"},
++	{ 0xC0, "Table buffer pool 0 depletion"},
++	{ 0xC1, "Table buffer pool 1 depletion"},
++	{ 0xC2, "Data buffer pool 0 depletion, no OF allocated"},
++	{ 0xC3, "Data buffer pool 1 depletion, no OF allocated"},
++	{ 0xC4, "Data buffer pool 0 depletion, partial OF allocated"},
++	{ 0xC5, "Data buffer pool 1 depletion, partial OF allocated"},
++	{ 0xD0, "FLC read error"},
++	{ 0xD1, "FL read error"},
++	{ 0xD2, "FL write error"},
++	{ 0xD3, "OF SGT write error"},
++	{ 0xD4, "PTA read error"},
++	{ 0xD5, "PTA write error"},
++	{ 0xD6, "OF SGT F-bit write error"},
++	{ 0xD7, "ASA write error"},
++	{ 0xE1, "FLC[ICR]=0 ICID error"},
++	{ 0xE2, "FLC[ICR]=1 ICID error"},
++	{ 0xE4, "source of ICID flush not trusted (BDI = 0)"},
 +};
 +
-+/**
-+ * struct opr_qry - Structure representing OPR configuration
-+ * @enable: Enabled state
-+ * @rip: Retirement In Progress
-+ * @ndsn: Next dispensed sequence number
-+ * @nesn: Next expected sequence number
-+ * @ea_hseq: Early arrival head sequence number
-+ * @hseq_nlis: HSEQ not last in sequence
-+ * @ea_tseq: Early arrival tail sequence number
-+ * @tseq_nlis: TSEQ not last in sequence
-+ * @ea_tptr: Early arrival tail pointer
-+ * @ea_hptr: Early arrival head pointer
-+ * @opr_id: Order Point Record ID
-+ * @opr_vid: Order Point Record Virtual ID
-+ */
-+struct opr_qry {
-+	char enable;
-+	char rip;
-+	u16 ndsn;
-+	u16 nesn;
-+	u16 ea_hseq;
-+	char hseq_nlis;
-+	u16 ea_tseq;
-+	char tseq_nlis;
-+	u16 ea_tptr;
-+	u16 ea_hptr;
-+	u16 opr_id;
-+	u16 opr_vid;
-+};
+ static const char * const cha_id_list[] = {
+ 	"",
+ 	"AES",
+@@ -235,6 +283,27 @@ static void report_deco_status(struct device *jrdev, const u32 status,
+ 		status, error, idx_str, idx, err_str, err_err_code);
+ }
+ 
++static void report_qi_status(struct device *qidev, const u32 status,
++			     const char *error)
++{
++	u8 err_id = status & JRSTA_QIERR_ERROR_MASK;
++	const char *err_str = "unidentified error value 0x";
++	char err_err_code[3] = { 0 };
++	int i;
 +
-+#endif /* __FSL_DPOPR_H_ */
++	for (i = 0; i < ARRAY_SIZE(qi_error_list); i++)
++		if (qi_error_list[i].value == err_id)
++			break;
++
++	if (i != ARRAY_SIZE(qi_error_list) && qi_error_list[i].error_text)
++		err_str = qi_error_list[i].error_text;
++	else
++		snprintf(err_err_code, sizeof(err_err_code), "%02x", err_id);
++
++	dev_err(qidev, "%08x: %s: %s%s\n",
++		status, error, err_str, err_err_code);
++}
++
+ static void report_jr_status(struct device *jrdev, const u32 status,
+ 			     const char *error)
+ {
+@@ -249,7 +318,7 @@ static void report_cond_code_status(struct device *jrdev, const u32 status,
+ 		status, error, __func__);
+ }
+ 
+-void caam_jr_strstatus(struct device *jrdev, u32 status)
++void caam_strstatus(struct device *jrdev, u32 status, bool qi_v2)
+ {
+ 	static const struct stat_src {
+ 		void (*report_ssed)(struct device *jrdev, const u32 status,
+@@ -261,7 +330,7 @@ void caam_jr_strstatus(struct device *jrdev, u32 status)
+ 		{ report_ccb_status, "CCB" },
+ 		{ report_jump_status, "Jump" },
+ 		{ report_deco_status, "DECO" },
+-		{ NULL, "Queue Manager Interface" },
++		{ report_qi_status, "Queue Manager Interface" },
+ 		{ report_jr_status, "Job Ring" },
+ 		{ report_cond_code_status, "Condition Code" },
+ 		{ NULL, NULL },
+@@ -287,4 +356,4 @@ void caam_jr_strstatus(struct device *jrdev, u32 status)
+ 	else
+ 		dev_err(jrdev, "%d: unknown error source\n", ssrc);
+ }
+-EXPORT_SYMBOL(caam_jr_strstatus);
++EXPORT_SYMBOL(caam_strstatus);
+diff --git a/drivers/crypto/caam/error.h b/drivers/crypto/caam/error.h
+index 250e1a21c473..751ddcacf6cd 100644
+--- a/drivers/crypto/caam/error.h
++++ b/drivers/crypto/caam/error.h
+@@ -7,7 +7,11 @@
+ #ifndef CAAM_ERROR_H
+ #define CAAM_ERROR_H
+ #define CAAM_ERROR_STR_MAX 302
+-void caam_jr_strstatus(struct device *jrdev, u32 status);
++
++void caam_strstatus(struct device *dev, u32 status, bool qi_v2);
++
++#define caam_jr_strstatus(jrdev, status) caam_strstatus(jrdev, status, false)
++#define caam_qi2_strstatus(qidev, status) caam_strstatus(qidev, status, true)
+ 
+ void caam_dump_sg(const char *level, const char *prefix_str, int prefix_type,
+ 		  int rowsize, int groupsize, struct scatterlist *sg,
+diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
+index 2b5efff9ec3c..7d9a8e745ae2 100644
+--- a/drivers/crypto/caam/regs.h
++++ b/drivers/crypto/caam/regs.h
+@@ -629,6 +629,8 @@ struct caam_job_ring {
+ #define JRSTA_DECOERR_INVSIGN       0x86
+ #define JRSTA_DECOERR_DSASIGN       0x87
+ 
++#define JRSTA_QIERR_ERROR_MASK      0x00ff
++
+ #define JRSTA_CCBERR_JUMP           0x08000000
+ #define JRSTA_CCBERR_INDEX_MASK     0xff00
+ #define JRSTA_CCBERR_INDEX_SHIFT    8
 -- 
 2.12.0.264.gd6db3f216544
