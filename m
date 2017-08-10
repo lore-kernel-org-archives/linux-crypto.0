@@ -1,448 +1,69 @@
-From: Nick Terrell <terrelln@fb.com>
-Subject: [PATCH v5 5/5] crypto: Add zstd support
-Date: Wed, 9 Aug 2017 19:43:29 -0700
-Message-ID: <20170810024329.3248159-1-terrelln@fb.com>
-References: <20170810023553.3200875-1-terrelln@fb.com>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: [PATCH] crypto: MPI - kunmap after finishing accessing buffer
+Date: Thu, 10 Aug 2017 08:06:18 +0200
+Message-ID: <3348160.hjCpAHFZrS@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, <kernel-team@fb.com>,
-        <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>
-To: Nick Terrell <terrelln@fb.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:35657 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1752264AbdHJCng (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Aug 2017 22:43:36 -0400
-Received: from pps.filterd (m0001255.ppops.net [127.0.0.1])
-        by mx0b-00082601.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id v7A2fp50003853
-        for <linux-crypto@vger.kernel.org>; Wed, 9 Aug 2017 19:43:36 -0700
-Received: from mail.thefacebook.com ([199.201.64.23])
-        by mx0b-00082601.pphosted.com with ESMTP id 2c8a3mrw77-1
-        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Wed, 09 Aug 2017 19:43:36 -0700
-Received: from facebook.com (2401:db00:21:6023:face:0:9:0)      by
- mx-out.facebook.com (10.212.232.59) with ESMTP id
- b3e9f46e7d7511e7ae240002c991e86a-163d9150 for <linux-crypto@vger.kernel.org>;
-        Wed, 09 Aug 2017 19:43:34 -0700
-In-Reply-To: <20170810023553.3200875-1-terrelln@fb.com>
+Received: from mail.eperm.de ([89.247.134.16]:58428 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750735AbdHJGGV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 10 Aug 2017 02:06:21 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Adds zstd support to crypto and scompress. Only supports the default
-level.
+Hi Herbert,
 
-Signed-off-by: Nick Terrell <terrelln@fb.com>
+I found that issue while playing around with edge conditions in my
+algif_akcipher implementation. This issue only manifests in a
+segmentation violation on 32 bit machines and with an SGL where each
+SG points to one byte. SGLs with larger buffers seem to be not
+affected by this issue.
+
+Yet this access-after-unmap should be a candidate for stable, IMHO.
+
+---8<---
+
+Using sg_miter_start and sg_miter_next, the buffer of an SG is kmap'ed
+to *buff. The current code calls sg_miter_stop (and thus kunmap) on the
+SG entry before the last access of *buff.
+
+The patch moves the sg_miter_stop call after the last access to *buff to
+ensure that the memory pointed to by *buff is still mapped.
+
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- crypto/Kconfig   |   9 ++
- crypto/Makefile  |   1 +
- crypto/testmgr.c |  10 +++
- crypto/testmgr.h |  71 +++++++++++++++
- crypto/zstd.c    | 265 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 356 insertions(+)
- create mode 100644 crypto/zstd.c
+ lib/mpi/mpicoder.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index caa770e..4fc3936 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -1662,6 +1662,15 @@ config CRYPTO_LZ4HC
- 	help
- 	  This is the LZ4 high compression mode algorithm.
-
-+config CRYPTO_ZSTD
-+	tristate "Zstd compression algorithm"
-+	select CRYPTO_ALGAPI
-+	select CRYPTO_ACOMP2
-+	select ZSTD_COMPRESS
-+	select ZSTD_DECOMPRESS
-+	help
-+	  This is the zstd algorithm.
-+
- comment "Random Number Generation"
-
- config CRYPTO_ANSI_CPRNG
-diff --git a/crypto/Makefile b/crypto/Makefile
-index d41f033..b22e1e8 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -133,6 +133,7 @@ obj-$(CONFIG_CRYPTO_USER_API_HASH) += algif_hash.o
- obj-$(CONFIG_CRYPTO_USER_API_SKCIPHER) += algif_skcipher.o
- obj-$(CONFIG_CRYPTO_USER_API_RNG) += algif_rng.o
- obj-$(CONFIG_CRYPTO_USER_API_AEAD) += algif_aead.o
-+obj-$(CONFIG_CRYPTO_ZSTD) += zstd.o
-
- ecdh_generic-y := ecc.o
- ecdh_generic-y += ecdh.o
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 7125ba3..8a124d3 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -3603,6 +3603,16 @@ static const struct alg_test_desc alg_test_descs[] = {
- 				.decomp = __VECS(zlib_deflate_decomp_tv_template)
- 			}
- 		}
-+	}, {
-+		.alg = "zstd",
-+		.test = alg_test_comp,
-+		.fips_allowed = 1,
-+		.suite = {
-+			.comp = {
-+				.comp = __VECS(zstd_comp_tv_template),
-+				.decomp = __VECS(zstd_decomp_tv_template)
-+			}
-+		}
+diff --git a/lib/mpi/mpicoder.c b/lib/mpi/mpicoder.c
+index 5a0f75a3bf01..eead4b339466 100644
+--- a/lib/mpi/mpicoder.c
++++ b/lib/mpi/mpicoder.c
+@@ -364,11 +364,11 @@ MPI mpi_read_raw_from_sgl(struct scatterlist *sgl, unsigned int nbytes)
  	}
- };
-
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 6ceb0e2..e6b5920 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -34631,4 +34631,75 @@ static const struct comp_testvec lz4hc_decomp_tv_template[] = {
- 	},
- };
-
-+static const struct comp_testvec zstd_comp_tv_template[] = {
-+	{
-+		.inlen	= 68,
-+		.outlen	= 39,
-+		.input	= "The algorithm is zstd. "
-+			  "The algorithm is zstd. "
-+			  "The algorithm is zstd.",
-+		.output	= "\x28\xb5\x2f\xfd\x00\x50\xf5\x00\x00\xb8\x54\x68\x65"
-+			  "\x20\x61\x6c\x67\x6f\x72\x69\x74\x68\x6d\x20\x69\x73"
-+			  "\x20\x7a\x73\x74\x64\x2e\x20\x01\x00\x55\x73\x36\x01"
-+			  ,
-+	},
-+	{
-+		.inlen	= 244,
-+		.outlen	= 151,
-+		.input	= "zstd, short for Zstandard, is a fast lossless "
-+			  "compression algorithm, targeting real-time "
-+			  "compression scenarios at zlib-level and better "
-+			  "compression ratios. The zstd compression library "
-+			  "provides in-memory compression and decompression "
-+			  "functions.",
-+		.output	= "\x28\xb5\x2f\xfd\x00\x50\x75\x04\x00\x42\x4b\x1e\x17"
-+			  "\x90\x81\x31\x00\xf2\x2f\xe4\x36\xc9\xef\x92\x88\x32"
-+			  "\xc9\xf2\x24\x94\xd8\x68\x9a\x0f\x00\x0c\xc4\x31\x6f"
-+			  "\x0d\x0c\x38\xac\x5c\x48\x03\xcd\x63\x67\xc0\xf3\xad"
-+			  "\x4e\x90\xaa\x78\xa0\xa4\xc5\x99\xda\x2f\xb6\x24\x60"
-+			  "\xe2\x79\x4b\xaa\xb6\x6b\x85\x0b\xc9\xc6\x04\x66\x86"
-+			  "\xe2\xcc\xe2\x25\x3f\x4f\x09\xcd\xb8\x9d\xdb\xc1\x90"
-+			  "\xa9\x11\xbc\x35\x44\x69\x2d\x9c\x64\x4f\x13\x31\x64"
-+			  "\xcc\xfb\x4d\x95\x93\x86\x7f\x33\x7f\x1a\xef\xe9\x30"
-+			  "\xf9\x67\xa1\x94\x0a\x69\x0f\x60\xcd\xc3\xab\x99\xdc"
-+			  "\x42\xed\x97\x05\x00\x33\xc3\x15\x95\x3a\x06\xa0\x0e"
-+			  "\x20\xa9\x0e\x82\xb9\x43\x45\x01",
-+	},
-+};
+ 
+ 	miter.consumed = lzeros;
+-	sg_miter_stop(&miter);
+ 
+ 	nbytes -= lzeros;
+ 	nbits = nbytes * 8;
+ 	if (nbits > MAX_EXTERN_MPI_BITS) {
++		sg_miter_stop(&miter);
+ 		pr_info("MPI: mpi too large (%u bits)\n", nbits);
+ 		return NULL;
+ 	}
+@@ -376,6 +376,8 @@ MPI mpi_read_raw_from_sgl(struct scatterlist *sgl, unsigned int nbytes)
+ 	if (nbytes > 0)
+ 		nbits -= count_leading_zeros(*buff) - (BITS_PER_LONG - 8);
+ 
++	sg_miter_stop(&miter);
 +
-+static const struct comp_testvec zstd_decomp_tv_template[] = {
-+	{
-+		.inlen	= 43,
-+		.outlen	= 68,
-+		.input	= "\x28\xb5\x2f\xfd\x04\x50\xf5\x00\x00\xb8\x54\x68\x65"
-+			  "\x20\x61\x6c\x67\x6f\x72\x69\x74\x68\x6d\x20\x69\x73"
-+			  "\x20\x7a\x73\x74\x64\x2e\x20\x01\x00\x55\x73\x36\x01"
-+			  "\x6b\xf4\x13\x35",
-+		.output	= "The algorithm is zstd. "
-+			  "The algorithm is zstd. "
-+			  "The algorithm is zstd.",
-+	},
-+	{
-+		.inlen	= 155,
-+		.outlen	= 244,
-+		.input	= "\x28\xb5\x2f\xfd\x04\x50\x75\x04\x00\x42\x4b\x1e\x17"
-+			  "\x90\x81\x31\x00\xf2\x2f\xe4\x36\xc9\xef\x92\x88\x32"
-+			  "\xc9\xf2\x24\x94\xd8\x68\x9a\x0f\x00\x0c\xc4\x31\x6f"
-+			  "\x0d\x0c\x38\xac\x5c\x48\x03\xcd\x63\x67\xc0\xf3\xad"
-+			  "\x4e\x90\xaa\x78\xa0\xa4\xc5\x99\xda\x2f\xb6\x24\x60"
-+			  "\xe2\x79\x4b\xaa\xb6\x6b\x85\x0b\xc9\xc6\x04\x66\x86"
-+			  "\xe2\xcc\xe2\x25\x3f\x4f\x09\xcd\xb8\x9d\xdb\xc1\x90"
-+			  "\xa9\x11\xbc\x35\x44\x69\x2d\x9c\x64\x4f\x13\x31\x64"
-+			  "\xcc\xfb\x4d\x95\x93\x86\x7f\x33\x7f\x1a\xef\xe9\x30"
-+			  "\xf9\x67\xa1\x94\x0a\x69\x0f\x60\xcd\xc3\xab\x99\xdc"
-+			  "\x42\xed\x97\x05\x00\x33\xc3\x15\x95\x3a\x06\xa0\x0e"
-+			  "\x20\xa9\x0e\x82\xb9\x43\x45\x01\xaa\x6d\xda\x0d",
-+		.output	= "zstd, short for Zstandard, is a fast lossless "
-+			  "compression algorithm, targeting real-time "
-+			  "compression scenarios at zlib-level and better "
-+			  "compression ratios. The zstd compression library "
-+			  "provides in-memory compression and decompression "
-+			  "functions.",
-+	},
-+};
- #endif	/* _CRYPTO_TESTMGR_H */
-diff --git a/crypto/zstd.c b/crypto/zstd.c
-new file mode 100644
-index 0000000..9a76b3e
---- /dev/null
-+++ b/crypto/zstd.c
-@@ -0,0 +1,265 @@
-+/*
-+ * Cryptographic API.
-+ *
-+ * Copyright (c) 2017-present, Facebook, Inc.
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License version 2 as published by
-+ * the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ */
-+#include <linux/crypto.h>
-+#include <linux/init.h>
-+#include <linux/interrupt.h>
-+#include <linux/mm.h>
-+#include <linux/module.h>
-+#include <linux/net.h>
-+#include <linux/vmalloc.h>
-+#include <linux/zstd.h>
-+#include <crypto/internal/scompress.h>
-+
-+
-+#define ZSTD_DEF_LEVEL	3
-+
-+struct zstd_ctx {
-+	ZSTD_CCtx *cctx;
-+	ZSTD_DCtx *dctx;
-+	void *cwksp;
-+	void *dwksp;
-+};
-+
-+static ZSTD_parameters zstd_params(void)
-+{
-+	return ZSTD_getParams(ZSTD_DEF_LEVEL, 0, 0);
-+}
-+
-+static int zstd_comp_init(struct zstd_ctx *ctx)
-+{
-+	int ret = 0;
-+	const ZSTD_parameters params = zstd_params();
-+	const size_t wksp_size = ZSTD_CCtxWorkspaceBound(params.cParams);
-+
-+	ctx->cwksp = vzalloc(wksp_size);
-+	if (!ctx->cwksp) {
-+		ret = -ENOMEM;
-+		goto out;
-+	}
-+
-+	ctx->cctx = ZSTD_initCCtx(ctx->cwksp, wksp_size);
-+	if (!ctx->cctx) {
-+		ret = -EINVAL;
-+		goto out_free;
-+	}
-+out:
-+	return ret;
-+out_free:
-+	vfree(ctx->cwksp);
-+	goto out;
-+}
-+
-+static int zstd_decomp_init(struct zstd_ctx *ctx)
-+{
-+	int ret = 0;
-+	const size_t wksp_size = ZSTD_DCtxWorkspaceBound();
-+
-+	ctx->dwksp = vzalloc(wksp_size);
-+	if (!ctx->dwksp) {
-+		ret = -ENOMEM;
-+		goto out;
-+	}
-+
-+	ctx->dctx = ZSTD_initDCtx(ctx->dwksp, wksp_size);
-+	if (!ctx->dctx) {
-+		ret = -EINVAL;
-+		goto out_free;
-+	}
-+out:
-+	return ret;
-+out_free:
-+	vfree(ctx->dwksp);
-+	goto out;
-+}
-+
-+static void zstd_comp_exit(struct zstd_ctx *ctx)
-+{
-+	vfree(ctx->cwksp);
-+	ctx->cwksp = NULL;
-+	ctx->cctx = NULL;
-+}
-+
-+static void zstd_decomp_exit(struct zstd_ctx *ctx)
-+{
-+	vfree(ctx->dwksp);
-+	ctx->dwksp = NULL;
-+	ctx->dctx = NULL;
-+}
-+
-+static int __zstd_init(void *ctx)
-+{
-+	int ret;
-+
-+	ret = zstd_comp_init(ctx);
-+	if (ret)
-+		return ret;
-+	ret = zstd_decomp_init(ctx);
-+	if (ret)
-+		zstd_comp_exit(ctx);
-+	return ret;
-+}
-+
-+static void *zstd_alloc_ctx(struct crypto_scomp *tfm)
-+{
-+	int ret;
-+	struct zstd_ctx *ctx;
-+
-+	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
-+	if (!ctx)
-+		return ERR_PTR(-ENOMEM);
-+
-+	ret = __zstd_init(ctx);
-+	if (ret) {
-+		kfree(ctx);
-+		return ERR_PTR(ret);
-+	}
-+
-+	return ctx;
-+}
-+
-+static int zstd_init(struct crypto_tfm *tfm)
-+{
-+	struct zstd_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	return __zstd_init(ctx);
-+}
-+
-+static void __zstd_exit(void *ctx)
-+{
-+	zstd_comp_exit(ctx);
-+	zstd_decomp_exit(ctx);
-+}
-+
-+static void zstd_free_ctx(struct crypto_scomp *tfm, void *ctx)
-+{
-+	__zstd_exit(ctx);
-+	kzfree(ctx);
-+}
-+
-+static void zstd_exit(struct crypto_tfm *tfm)
-+{
-+	struct zstd_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	__zstd_exit(ctx);
-+}
-+
-+static int __zstd_compress(const u8 *src, unsigned int slen,
-+			   u8 *dst, unsigned int *dlen, void *ctx)
-+{
-+	size_t out_len;
-+	struct zstd_ctx *zctx = ctx;
-+	const ZSTD_parameters params = zstd_params();
-+
-+	out_len = ZSTD_compressCCtx(zctx->cctx, dst, *dlen, src, slen, params);
-+	if (ZSTD_isError(out_len))
-+		return -EINVAL;
-+	*dlen = out_len;
-+	return 0;
-+}
-+
-+static int zstd_compress(struct crypto_tfm *tfm, const u8 *src,
-+			 unsigned int slen, u8 *dst, unsigned int *dlen)
-+{
-+	struct zstd_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	return __zstd_compress(src, slen, dst, dlen, ctx);
-+}
-+
-+static int zstd_scompress(struct crypto_scomp *tfm, const u8 *src,
-+			  unsigned int slen, u8 *dst, unsigned int *dlen,
-+			  void *ctx)
-+{
-+	return __zstd_compress(src, slen, dst, dlen, ctx);
-+}
-+
-+static int __zstd_decompress(const u8 *src, unsigned int slen,
-+			     u8 *dst, unsigned int *dlen, void *ctx)
-+{
-+	size_t out_len;
-+	struct zstd_ctx *zctx = ctx;
-+
-+	out_len = ZSTD_decompressDCtx(zctx->dctx, dst, *dlen, src, slen);
-+	if (ZSTD_isError(out_len))
-+		return -EINVAL;
-+	*dlen = out_len;
-+	return 0;
-+}
-+
-+static int zstd_decompress(struct crypto_tfm *tfm, const u8 *src,
-+			   unsigned int slen, u8 *dst, unsigned int *dlen)
-+{
-+	struct zstd_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	return __zstd_decompress(src, slen, dst, dlen, ctx);
-+}
-+
-+static int zstd_sdecompress(struct crypto_scomp *tfm, const u8 *src,
-+			    unsigned int slen, u8 *dst, unsigned int *dlen,
-+			    void *ctx)
-+{
-+	return __zstd_decompress(src, slen, dst, dlen, ctx);
-+}
-+
-+static struct crypto_alg alg = {
-+	.cra_name		= "zstd",
-+	.cra_flags		= CRYPTO_ALG_TYPE_COMPRESS,
-+	.cra_ctxsize		= sizeof(struct zstd_ctx),
-+	.cra_module		= THIS_MODULE,
-+	.cra_init		= zstd_init,
-+	.cra_exit		= zstd_exit,
-+	.cra_u			= { .compress = {
-+	.coa_compress		= zstd_compress,
-+	.coa_decompress		= zstd_decompress } }
-+};
-+
-+static struct scomp_alg scomp = {
-+	.alloc_ctx		= zstd_alloc_ctx,
-+	.free_ctx		= zstd_free_ctx,
-+	.compress		= zstd_scompress,
-+	.decompress		= zstd_sdecompress,
-+	.base			= {
-+		.cra_name	= "zstd",
-+		.cra_driver_name = "zstd-scomp",
-+		.cra_module	 = THIS_MODULE,
-+	}
-+};
-+
-+static int __init zstd_mod_init(void)
-+{
-+	int ret;
-+
-+	ret = crypto_register_alg(&alg);
-+	if (ret)
-+		return ret;
-+
-+	ret = crypto_register_scomp(&scomp);
-+	if (ret)
-+		crypto_unregister_alg(&alg);
-+
-+	return ret;
-+}
-+
-+static void __exit zstd_mod_fini(void)
-+{
-+	crypto_unregister_alg(&alg);
-+	crypto_unregister_scomp(&scomp);
-+}
-+
-+module_init(zstd_mod_init);
-+module_exit(zstd_mod_fini);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("Zstd Compression Algorithm");
-+MODULE_ALIAS_CRYPTO("zstd");
+ 	nlimbs = DIV_ROUND_UP(nbytes, BYTES_PER_MPI_LIMB);
+ 	val = mpi_alloc(nlimbs);
+ 	if (!val)
+-- 
+2.13.4
