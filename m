@@ -1,72 +1,38 @@
-From: Thomas Garnier <thgarnie@google.com>
-Subject: [RFC v2 14/23] x86/paravirt: Adapt assembly for PIE
-	support
-Date: Thu, 10 Aug 2017 10:26:06 -0700
-Message-ID: <20170810172615.51965-15-thgarnie@google.com>
-References: <20170810172615.51965-1-thgarnie@google.com>
+From: Eric Biggers <ebiggers3@gmail.com>
+Subject: Re: [PATCH v5 2/5] lib: Add zstd modules
+Date: Thu, 10 Aug 2017 10:36:51 -0700
+Message-ID: <20170810173651.GB90916@gmail.com>
+References: <20170810023553.3200875-1-terrelln@fb.com>
+ <20170810023553.3200875-3-terrelln@fb.com>
+ <20170810083017.GA10462@zzz.localdomain>
+ <ba64934b-0170-1718-fc1e-0acb462abb20@gmail.com>
+ <671b5ffb-0a8b-4e70-e3ac-9754cea54829@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: linux-arch@vger.kernel.org, kvm@vger.kernel.org, linux-pm@vger.kernel.org,
- x86@kernel.org, linux-kernel@vger.kernel.org, linux-sparse@vger.kernel.org,
- linux-crypto@vger.kernel.org, kernel-hardening@lists.openwall.com,
- xen-devel@lists.xenproject.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
- "David S . Miller" <davem@davemloft.net>,
- Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- "H . Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>,
- Josh Poimboeuf <jpoimboe@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
- Thomas Garnier <thgarnie@google.com>, Matthias Kaehlcke <mka@chromium.org>,
- Boris Ostrovsky <boris.ostrovsky@oracle.com>,
- Juergen Gross <jgross@suse.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
- Joerg Roedel <joro@8bytes.org>, Tom Lendacky <thomas.lendacky@amd.com>,
- Andy Lutomirski <luto@kernel.org>, Borislav Petkov <bp@suse.de>,
- Brian Gerst <brgerst@gmail.com>,
- "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
- "Rafael J . Wysocki" <rjw@rjwysocki.net>, Len Brown <len.brown@intel.com>,
- Pavel Machek <pavel@ucw.cz>
-Return-path: <xen-devel-bounces@lists.xen.org>
-In-Reply-To: <20170810172615.51965-1-thgarnie@google.com>
-List-Unsubscribe: <https://lists.xen.org/cgi-bin/mailman/options/xen-devel>,
- <mailto:xen-devel-request@lists.xen.org?subject=unsubscribe>
-List-Post: <mailto:xen-devel@lists.xen.org>
-List-Help: <mailto:xen-devel-request@lists.xen.org?subject=help>
-List-Subscribe: <https://lists.xen.org/cgi-bin/mailman/listinfo/xen-devel>,
- <mailto:xen-devel-request@lists.xen.org?subject=subscribe>
-Errors-To: xen-devel-bounces@lists.xen.org
-Sender: "Xen-devel" <xen-devel-bounces@lists.xen.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Nick Terrell <terrelln@fb.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>, kernel-team@fb.com,
+        squashfs-devel@lists.sourceforge.net, linux-btrfs@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: "Austin S. Hemmelgarn" <ahferroin7@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <671b5ffb-0a8b-4e70-e3ac-9754cea54829@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-aWYgUElFIGlzIGVuYWJsZWQsIHN3aXRjaCB0aGUgcGFyYXZpcnQgYXNzZW1ibHkgY29uc3RyYWlu
-dHMgdG8gYmUKY29tcGF0aWJsZS4gVGhlICVjL2kgY29uc3RyYWlucyBnZW5lcmF0ZSBzbWFsbGVy
-IGNvZGUgc28gaXMga2VwdCBieQpkZWZhdWx0LgoKUG9zaXRpb24gSW5kZXBlbmRlbnQgRXhlY3V0
-YWJsZSAoUElFKSBzdXBwb3J0IHdpbGwgYWxsb3cgdG8gZXh0ZW5kZWQgdGhlCktBU0xSIHJhbmRv
-bWl6YXRpb24gcmFuZ2UgYmVsb3cgdGhlIC0yRyBtZW1vcnkgbGltaXQuCgpTaWduZWQtb2ZmLWJ5
-OiBUaG9tYXMgR2FybmllciA8dGhnYXJuaWVAZ29vZ2xlLmNvbT4KLS0tCiBhcmNoL3g4Ni9pbmNs
-dWRlL2FzbS9wYXJhdmlydF90eXBlcy5oIHwgMTIgKysrKysrKysrKy0tCiAxIGZpbGUgY2hhbmdl
-ZCwgMTAgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9hcmNoL3g4
-Ni9pbmNsdWRlL2FzbS9wYXJhdmlydF90eXBlcy5oIGIvYXJjaC94ODYvaW5jbHVkZS9hc20vcGFy
-YXZpcnRfdHlwZXMuaAppbmRleCA5ZmZjMzZiZmU0Y2QuLjZmNjdjMTA2NzJlYyAxMDA2NDQKLS0t
-IGEvYXJjaC94ODYvaW5jbHVkZS9hc20vcGFyYXZpcnRfdHlwZXMuaAorKysgYi9hcmNoL3g4Ni9p
-bmNsdWRlL2FzbS9wYXJhdmlydF90eXBlcy5oCkBAIC0zNDcsOSArMzQ3LDE3IEBAIGV4dGVybiBz
-dHJ1Y3QgcHZfbG9ja19vcHMgcHZfbG9ja19vcHM7CiAjZGVmaW5lIFBBUkFWSVJUX1BBVENIKHgp
-CQkJCQlcCiAJKG9mZnNldG9mKHN0cnVjdCBwYXJhdmlydF9wYXRjaF90ZW1wbGF0ZSwgeCkgLyBz
-aXplb2Yodm9pZCAqKSkKIAorI2lmZGVmIENPTkZJR19YODZfUElFCisjZGVmaW5lIHBhcmF2aXJ0
-X29wcHRyX2NhbGwgImEiCisjZGVmaW5lIHBhcmF2aXJ0X29wcHRyX3R5cGUgInAiCisjZWxzZQor
-I2RlZmluZSBwYXJhdmlydF9vcHB0cl9jYWxsICJjIgorI2RlZmluZSBwYXJhdmlydF9vcHB0cl90
-eXBlICJpIgorI2VuZGlmCisKICNkZWZpbmUgcGFyYXZpcnRfdHlwZShvcCkJCQkJXAogCVtwYXJh
-dmlydF90eXBlbnVtXSAiaSIgKFBBUkFWSVJUX1BBVENIKG9wKSksCVwKLQlbcGFyYXZpcnRfb3Bw
-dHJdICJpIiAoJihvcCkpCisJW3BhcmF2aXJ0X29wcHRyXSBwYXJhdmlydF9vcHB0cl90eXBlICgm
-KG9wKSkKICNkZWZpbmUgcGFyYXZpcnRfY2xvYmJlcihjbG9iYmVyKQkJXAogCVtwYXJhdmlydF9j
-bG9iYmVyXSAiaSIgKGNsb2JiZXIpCiAKQEAgLTQwMyw3ICs0MTEsNyBAQCBpbnQgcGFyYXZpcnRf
-ZGlzYWJsZV9pb3NwYWNlKHZvaWQpOwogICogb2Zmc2V0IGludG8gdGhlIHBhcmF2aXJ0X3BhdGNo
-X3RlbXBsYXRlIHN0cnVjdHVyZSwgYW5kIGNhbiB0aGVyZWZvcmUgYmUKICAqIGZyZWVseSBjb252
-ZXJ0ZWQgYmFjayBpbnRvIGEgc3RydWN0dXJlIG9mZnNldC4KICAqLwotI2RlZmluZSBQQVJBVklS
-VF9DQUxMCSJjYWxsIColY1twYXJhdmlydF9vcHB0cl07IgorI2RlZmluZSBQQVJBVklSVF9DQUxM
-CSJjYWxsIColIiBwYXJhdmlydF9vcHB0cl9jYWxsICJbcGFyYXZpcnRfb3BwdHJdOyIKIAogLyoK
-ICAqIFRoZXNlIG1hY3JvcyBhcmUgaW50ZW5kZWQgdG8gd3JhcCBjYWxscyB0aHJvdWdoIG9uZSBv
-ZiB0aGUgcGFyYXZpcnQKLS0gCjIuMTQuMC40MzQuZzk4MDk2ZmQ3YTgtZ29vZwoKCl9fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fClhlbi1kZXZlbCBtYWlsaW5n
-IGxpc3QKWGVuLWRldmVsQGxpc3RzLnhlbi5vcmcKaHR0cHM6Ly9saXN0cy54ZW4ub3JnL3hlbi1k
-ZXZlbAo=
+On Thu, Aug 10, 2017 at 10:57:01AM -0400, Austin S. Hemmelgarn wrote:
+> Also didn't think to mention this, but I could see the max level
+> being very popular for use with SquashFS root filesystems used in
+> LiveCD's. Currently, they have to decide between read performance
+> and image size, while zstd would provide both.
+
+The high compression levels of Zstandard are indeed a great fit for SquashFS,
+but SquashFS images are created in userspace by squashfs-tools.  The kernel only
+needs to be able to decompress them.
+
+(Also, while Zstandard provides very good tradeoffs and will probably become the
+preferred algorithm for SquashFS, it's misleading to imply that users won't have
+to make decisions anymore.  It does not compress as well as XZ or decompress as
+fast as LZ4, except maybe in very carefully crafted benchmarks.)
+
+Eric
