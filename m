@@ -1,8 +1,7 @@
 From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [RFC PATCH 01/10] staging: fsl-mc: dpio: add frame list format support
-Date: Thu, 10 Aug 2017 20:42:44 +0300
-Message-ID: <20170810174253.20951-2-horia.geanta@nxp.com>
-References: <20170810174253.20951-1-horia.geanta@nxp.com>
+Subject: [RFC PATCH 00/10] crypto: caam - add DPAA2 (DPSECI) driver
+Date: Thu, 10 Aug 2017 20:42:43 +0300
+Message-ID: <20170810174253.20951-1-horia.geanta@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
@@ -21,288 +20,86 @@ To: Herbert Xu <herbert@gondor.apana.org.au>,
         Catalin Marinas <catalin.marinas@arm.com>,
         Will Deacon <will.deacon@arm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-sn1nam01on0061.outbound.protection.outlook.com ([104.47.32.61]:28624
-        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
+Received: from mail-bl2nam02on0071.outbound.protection.outlook.com ([104.47.38.71]:52768
+        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753141AbdHJRnd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Aug 2017 13:43:33 -0400
-In-Reply-To: <20170810174253.20951-1-horia.geanta@nxp.com>
+        id S1753126AbdHJRnb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 10 Aug 2017 13:43:31 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add support for dpaa2_fd_list format, i.e. dpaa2_fl_entry structure
-and accessors.
+Hi,
 
-Frame list entries (FLEs) are similar, but not identical to frame
-descriptors (FDs):
-+ "F" (final) bit
-- FMT[b'01] is reserved
-- DD, SC, DROPP bits (covered by "FD compatibility" field in FLE case)
-- FLC[5:0] not used for stashing
+This patch set adds the CAAM crypto engine driver for DPAA2
+(Data Path Acceleration Architecture v2) found on ARMv8-based SoCs
+like LS1088A, LS2088A.
 
-Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
----
- drivers/staging/fsl-mc/include/dpaa2-fd.h | 243 ++++++++++++++++++++++++++++++
- 1 file changed, 243 insertions(+)
+Driver consists of:
+-DPSECI (Data Path SEC Interface) backend - low-level API that allows
+to manage DPSECI devices (DPAA2 objects) that sit on
+the Management Complex (MC) fsl-mc bus
+-algorithms frontend - AEAD and ablkcipher algorithms implementation
 
-diff --git a/drivers/staging/fsl-mc/include/dpaa2-fd.h b/drivers/staging/fsl-mc/include/dpaa2-fd.h
-index cf7857f00a5c..992fdc7ba5b8 100644
---- a/drivers/staging/fsl-mc/include/dpaa2-fd.h
-+++ b/drivers/staging/fsl-mc/include/dpaa2-fd.h
-@@ -91,6 +91,15 @@ struct dpaa2_fd {
- #define SG_BPID_MASK		0x3FFF
- #define SG_FINAL_FLAG_MASK	0x1
- #define SG_FINAL_FLAG_SHIFT	15
-+#define FL_SHORT_LEN_FLAG_MASK	0x1
-+#define FL_SHORT_LEN_FLAG_SHIFT	14
-+#define FL_SHORT_LEN_MASK	0x3FFFF
-+#define FL_OFFSET_MASK		0x0FFF
-+#define FL_FORMAT_MASK		0x3
-+#define FL_FORMAT_SHIFT		12
-+#define FL_BPID_MASK		0x3FFF
-+#define FL_FINAL_FLAG_MASK	0x1
-+#define FL_FINAL_FLAG_SHIFT	15
- 
- enum dpaa2_fd_format {
- 	dpaa2_fd_single = 0,
-@@ -448,4 +457,238 @@ static inline void dpaa2_sg_set_final(struct dpaa2_sg_entry *sg, bool final)
- 	sg->format_offset |= cpu_to_le16(final << SG_FINAL_FLAG_SHIFT);
- }
- 
-+/**
-+ * struct dpaa2_fl_entry - structure for frame list entry.
-+ * @addr:          address in the FLE
-+ * @len:           length in the FLE
-+ * @bpid:          buffer pool ID
-+ * @format_offset: format, offset, and short-length fields
-+ * @frc:           frame context
-+ * @ctrl:          control bits...including pta, pvt1, pvt2, err, etc
-+ * @flc:           flow context address
-+ */
-+struct dpaa2_fl_entry {
-+	__le64 addr;
-+	__le32 len;
-+	__le16 bpid;
-+	__le16 format_offset;
-+	__le32 frc;
-+	__le32 ctrl;
-+	__le64 flc;
-+};
-+
-+enum dpaa2_fl_format {
-+	dpaa2_fl_single = 0,
-+	dpaa2_fl_res,
-+	dpaa2_fl_sg
-+};
-+
-+/**
-+ * dpaa2_fl_get_addr() - get the addr field of FLE
-+ * @fle: the given frame list entry
-+ *
-+ * Return the address in the frame list entry.
-+ */
-+static inline dma_addr_t dpaa2_fl_get_addr(const struct dpaa2_fl_entry *fle)
-+{
-+	return (dma_addr_t)le64_to_cpu(fle->addr);
-+}
-+
-+/**
-+ * dpaa2_fl_set_addr() - Set the addr field of FLE
-+ * @fle: the given frame list entry
-+ * @addr: the address needs to be set in frame list entry
-+ */
-+static inline void dpaa2_fl_set_addr(struct dpaa2_fl_entry *fle,
-+				     dma_addr_t addr)
-+{
-+	fle->addr = cpu_to_le64(addr);
-+}
-+
-+/**
-+ * dpaa2_fl_get_frc() - Get the frame context in the FLE
-+ * @fle: the given frame list entry
-+ *
-+ * Return the frame context field in the frame lsit entry.
-+ */
-+static inline u32 dpaa2_fl_get_frc(const struct dpaa2_fl_entry *fle)
-+{
-+	return le32_to_cpu(fle->frc);
-+}
-+
-+/**
-+ * dpaa2_fl_set_frc() - Set the frame context in the FLE
-+ * @fle: the given frame list entry
-+ * @frc: the frame context needs to be set in frame list entry
-+ */
-+static inline void dpaa2_fl_set_frc(struct dpaa2_fl_entry *fle, u32 frc)
-+{
-+	fle->frc = cpu_to_le32(frc);
-+}
-+
-+/**
-+ * dpaa2_fl_get_ctrl() - Get the control bits in the FLE
-+ * @fle: the given frame list entry
-+ *
-+ * Return the control bits field in the frame list entry.
-+ */
-+static inline u32 dpaa2_fl_get_ctrl(const struct dpaa2_fl_entry *fle)
-+{
-+	return le32_to_cpu(fle->ctrl);
-+}
-+
-+/**
-+ * dpaa2_fl_set_ctrl() - Set the control bits in the FLE
-+ * @fle: the given frame list entry
-+ * @ctrl: the control bits to be set in the frame list entry
-+ */
-+static inline void dpaa2_fl_set_ctrl(struct dpaa2_fl_entry *fle, u32 ctrl)
-+{
-+	fle->ctrl = cpu_to_le32(ctrl);
-+}
-+
-+/**
-+ * dpaa2_fl_get_flc() - Get the flow context in the FLE
-+ * @fle: the given frame list entry
-+ *
-+ * Return the flow context in the frame list entry.
-+ */
-+static inline dma_addr_t dpaa2_fl_get_flc(const struct dpaa2_fl_entry *fle)
-+{
-+	return (dma_addr_t)le64_to_cpu(fle->flc);
-+}
-+
-+/**
-+ * dpaa2_fl_set_flc() - Set the flow context field of FLE
-+ * @fle: the given frame list entry
-+ * @flc_addr: the flow context needs to be set in frame list entry
-+ */
-+static inline void dpaa2_fl_set_flc(struct dpaa2_fl_entry *fle,
-+				    dma_addr_t flc_addr)
-+{
-+	fle->flc = cpu_to_le64(flc_addr);
-+}
-+
-+static inline bool dpaa2_fl_short_len(const struct dpaa2_fl_entry *fle)
-+{
-+	return !!((le16_to_cpu(fle->format_offset) >>
-+		  FL_SHORT_LEN_FLAG_SHIFT) & FL_SHORT_LEN_FLAG_MASK);
-+}
-+
-+/**
-+ * dpaa2_fl_get_len() - Get the length in the FLE
-+ * @fle: the given frame list entry
-+ *
-+ * Return the length field in the frame list entry.
-+ */
-+static inline u32 dpaa2_fl_get_len(const struct dpaa2_fl_entry *fle)
-+{
-+	if (dpaa2_fl_short_len(fle))
-+		return le32_to_cpu(fle->len) & FL_SHORT_LEN_MASK;
-+
-+	return le32_to_cpu(fle->len);
-+}
-+
-+/**
-+ * dpaa2_fl_set_len() - Set the length field of FLE
-+ * @fle: the given frame list entry
-+ * @len: the length needs to be set in frame list entry
-+ */
-+static inline void dpaa2_fl_set_len(struct dpaa2_fl_entry *fle, u32 len)
-+{
-+	fle->len = cpu_to_le32(len);
-+}
-+
-+/**
-+ * dpaa2_fl_get_offset() - Get the offset field in the frame list entry
-+ * @fle: the given frame list entry
-+ *
-+ * Return the offset.
-+ */
-+static inline u16 dpaa2_fl_get_offset(const struct dpaa2_fl_entry *fle)
-+{
-+	return le16_to_cpu(fle->format_offset) & FL_OFFSET_MASK;
-+}
-+
-+/**
-+ * dpaa2_fl_set_offset() - Set the offset field of FLE
-+ * @fle: the given frame list entry
-+ * @offset: the offset needs to be set in frame list entry
-+ */
-+static inline void dpaa2_fl_set_offset(struct dpaa2_fl_entry *fle, u16 offset)
-+{
-+	fle->format_offset &= cpu_to_le16(~FL_OFFSET_MASK);
-+	fle->format_offset |= cpu_to_le16(offset);
-+}
-+
-+/**
-+ * dpaa2_fl_get_format() - Get the format field in the FLE
-+ * @fle: the given frame list entry
-+ *
-+ * Return the format.
-+ */
-+static inline enum dpaa2_fl_format dpaa2_fl_get_format(
-+					const struct dpaa2_fl_entry *fle)
-+{
-+	return (enum dpaa2_fl_format)((le16_to_cpu(fle->format_offset) >>
-+				       FL_FORMAT_SHIFT) & FL_FORMAT_MASK);
-+}
-+
-+/**
-+ * dpaa2_fl_set_format() - Set the format field of FLE
-+ * @fle: the given frame list entry
-+ * @format: the format needs to be set in frame list entry
-+ */
-+static inline void dpaa2_fl_set_format(struct dpaa2_fl_entry *fle,
-+				       enum dpaa2_fl_format format)
-+{
-+	fle->format_offset &= cpu_to_le16(~(FL_FORMAT_MASK << FL_FORMAT_SHIFT));
-+	fle->format_offset |= cpu_to_le16(format << FL_FORMAT_SHIFT);
-+}
-+
-+/**
-+ * dpaa2_fl_get_bpid() - Get the bpid field in the FLE
-+ * @fle: the given frame list entry
-+ *
-+ * Return the buffer pool id.
-+ */
-+static inline u16 dpaa2_fl_get_bpid(const struct dpaa2_fl_entry *fle)
-+{
-+	return le16_to_cpu(fle->bpid) & FL_BPID_MASK;
-+}
-+
-+/**
-+ * dpaa2_fl_set_bpid() - Set the bpid field of FLE
-+ * @fle: the given frame list entry
-+ * @bpid: buffer pool id to be set
-+ */
-+static inline void dpaa2_fl_set_bpid(struct dpaa2_fl_entry *fle, u16 bpid)
-+{
-+	fle->bpid &= cpu_to_le16(~(FL_BPID_MASK));
-+	fle->bpid |= cpu_to_le16(bpid);
-+}
-+
-+/**
-+ * dpaa2_fl_is_final() - Check final bit in FLE
-+ * @fle: the given frame list entry
-+ *
-+ * Return bool.
-+ */
-+static inline bool dpaa2_fl_is_final(const struct dpaa2_fl_entry *fle)
-+{
-+	return !!(le16_to_cpu(fle->format_offset) >> FL_FINAL_FLAG_SHIFT);
-+}
-+
-+/**
-+ * dpaa2_fl_set_final() - Set the final bit in FLE
-+ * @fle: the given frame list entry
-+ * @final: the final boolean to be set
-+ */
-+static inline void dpaa2_fl_set_final(struct dpaa2_fl_entry *fle, bool final)
-+{
-+	fle->format_offset &= cpu_to_le16(~(FL_FINAL_FLAG_MASK <<
-+					    FL_FINAL_FLAG_SHIFT));
-+	fle->format_offset |= cpu_to_le16(final << FL_FINAL_FLAG_SHIFT);
-+}
-+
- #endif /* __FSL_DPAA2_FD_H */
+Patches 1-4 include DPIO object dependencies.
+I am aware that DPIO is currently in staging, however I don't consider
+these to be a large feature set. Anyhow, please let me know if going
+with the patches through staging is acceptable.
+
+Patches 5-9 are the core of the patch set, adding the driver.
+For symmetric encryption the legacy ablkcipher interface is used; the
+plan is to convert to skcipher all CAAM frontends at once at a certain
+point in time.
+
+Patch 10 enables driver on arm64. It will be built only if dependency
+on DPIO (CONFIG_FSL_MC_DPIO) is satisfied.
+
+Thanks,
+Horia
+
+Horia Geantă (9):
+  staging: fsl-mc: dpio: add frame list format support
+  staging: fsl-mc: dpio: add congestion notification support
+  staging: fsl-dpaa2/eth: move generic FD defines to DPIO
+  crypto: caam/qi - prepare for gcm(aes) support
+  crypto: caam - add DPAA2-CAAM (DPSECI) backend API
+  crypto: caam - add Queue Interface v2 error codes
+  crypto: caam/qi2 - add DPAA2-CAAM driver
+  crypto: caam/qi2 - add ablkcipher algorithms
+  arm64: defconfig: enable CAAM crypto engine on QorIQ DPAA2 SoCs
+
+Radu Alexe (1):
+  staging: fsl-mc: dpio: add order preservation support
+
+ arch/arm64/configs/defconfig                   |    1 +
+ drivers/crypto/Makefile                        |    2 +-
+ drivers/crypto/caam/Kconfig                    |   57 +-
+ drivers/crypto/caam/Makefile                   |    9 +-
+ drivers/crypto/caam/caamalg.c                  |   19 +-
+ drivers/crypto/caam/caamalg_desc.c             |  165 +-
+ drivers/crypto/caam/caamalg_desc.h             |   24 +-
+ drivers/crypto/caam/caamalg_qi2.c              | 3949 ++++++++++++++++++++++++
+ drivers/crypto/caam/caamalg_qi2.h              |  243 ++
+ drivers/crypto/caam/compat.h                   |    1 +
+ drivers/crypto/caam/dpseci.c                   |  858 +++++
+ drivers/crypto/caam/dpseci.h                   |  395 +++
+ drivers/crypto/caam/dpseci_cmd.h               |  261 ++
+ drivers/crypto/caam/error.c                    |   75 +-
+ drivers/crypto/caam/error.h                    |    6 +-
+ drivers/crypto/caam/key_gen.c                  |   30 -
+ drivers/crypto/caam/key_gen.h                  |   30 +
+ drivers/crypto/caam/regs.h                     |    2 +
+ drivers/staging/fsl-dpaa2/ethernet/dpaa2-eth.c |    8 +-
+ drivers/staging/fsl-dpaa2/ethernet/dpaa2-eth.h |   19 +-
+ drivers/staging/fsl-mc/include/dpaa2-fd.h      |  255 ++
+ drivers/staging/fsl-mc/include/dpaa2-io.h      |   43 +
+ drivers/staging/fsl-mc/include/dpopr.h         |  110 +
+ 23 files changed, 6463 insertions(+), 99 deletions(-)
+ create mode 100644 drivers/crypto/caam/caamalg_qi2.c
+ create mode 100644 drivers/crypto/caam/caamalg_qi2.h
+ create mode 100644 drivers/crypto/caam/dpseci.c
+ create mode 100644 drivers/crypto/caam/dpseci.h
+ create mode 100644 drivers/crypto/caam/dpseci_cmd.h
+ create mode 100644 drivers/staging/fsl-mc/include/dpopr.h
+
 -- 
 2.12.0.264.gd6db3f216544
