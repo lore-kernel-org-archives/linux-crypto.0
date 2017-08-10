@@ -1,90 +1,89 @@
-From: Nick Terrell <terrelln@fb.com>
+From: Hugo Mills <hugo@carfax.org.uk>
 Subject: Re: [PATCH v5 2/5] lib: Add zstd modules
-Date: Thu, 10 Aug 2017 19:24:59 +0000
-Message-ID: <A7F36E6F-D224-4064-811B-9548AEF9601A@fb.com>
+Date: Thu, 10 Aug 2017 19:25:06 +0000
+Message-ID: <20170810192506.GF7140@carfax.org.uk>
 References: <20170810023553.3200875-1-terrelln@fb.com>
  <20170810023553.3200875-3-terrelln@fb.com>
  <20170810083017.GA10462@zzz.localdomain>
- <ba64934b-0170-1718-fc1e-0acb462abb20@gmail.com>
- <20170810172342.GA90916@gmail.com>
- <724f5a31-9ebf-3770-5911-3ee9cb67faca@gmail.com>
+ <0ceeccb4-1a0f-cacb-dd2b-2913e1cf73ab@fb.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Kernel Team <Kernel-team@fb.com>,
-        "squashfs-devel@lists.sourceforge.net"
-        <squashfs-devel@lists.sourceforge.net>,
-        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: "Austin S. Hemmelgarn" <ahferroin7@gmail.com>,
-        Eric Biggers <ebiggers3@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <724f5a31-9ebf-3770-5911-3ee9cb67faca@gmail.com>
-Content-Language: en-US
-Content-ID: <255F6C75A948DF40A8396B0B1E037E73@namprd15.prod.outlook.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="vMk55pD2JuhdWiRw"
+Cc: Eric Biggers <ebiggers3@gmail.com>, Nick Terrell <terrelln@fb.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>, kernel-team@fb.com,
+        squashfs-devel@lists.sourceforge.net, linux-btrfs@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Chris Mason <clm@fb.com>
+Return-path: <linux-btrfs-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <0ceeccb4-1a0f-cacb-dd2b-2913e1cf73ab@fb.com>
+Sender: linux-btrfs-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-T24gOC8xMC8xNywgMTA6NDggQU0sICJBdXN0aW4gUy4gSGVtbWVsZ2FybiIgPGFoZmVycm9pbjdA
-Z21haWwuY29tPiB3cm90ZToNCj5PbiAyMDE3LTA4LTEwIDEzOjI0LCBFcmljIEJpZ2dlcnMgd3Jv
-dGU6DQo+Pk9uIFRodSwgQXVnIDEwLCAyMDE3IGF0IDA3OjMyOjE4QU0gLTA0MDAsIEF1c3RpbiBT
-LiBIZW1tZWxnYXJuIHdyb3RlOg0KPj4+T24gMjAxNy0wOC0xMCAwNDozMCwgRXJpYyBCaWdnZXJz
-IHdyb3RlOg0KPj4+Pk9uIFdlZCwgQXVnIDA5LCAyMDE3IGF0IDA3OjM1OjUzUE0gLTA3MDAsIE5p
-Y2sgVGVycmVsbCB3cm90ZToNCj4+Pj4+DQo+Pj4+PiBJdCBjYW4gY29tcHJlc3MgYXQgc3BlZWRz
-IGFwcHJvYWNoaW5nIGx6NCwgYW5kIHF1YWxpdHkgYXBwcm9hY2hpbmcgbHptYS4NCj4+Pj4NCj4+
-Pj4gV2VsbCwgZm9yIGEgdmVyeSBsb29zZSBkZWZpbml0aW9uIG9mICJhcHByb2FjaGluZyIsIGFu
-ZCBjZXJ0YWlubHkgbm90IGF0IHRoZQ0KPj4+PiBzYW1lIHRpbWUuICBJIGRvdWJ0IHRoZXJlJ3Mg
-YSB1c2UgY2FzZSBmb3IgdXNpbmcgdGhlIGhpZ2hlc3QgY29tcHJlc3Npb24gbGV2ZWxzDQo+Pj4+
-IGluIGtlcm5lbCBtb2RlIC0tLSBlc3BlY2lhbGx5IHRoZSBvbmVzIHVzaW5nIHpzdGRfb3B0Lmgu
-DQo+Pj4gTGFyZ2UgZGF0YS1zZXRzIHdpdGggV09STSBhY2Nlc3MgcGF0dGVybnMgYW5kIGluZnJl
-cXVlbnQgd3JpdGVzDQo+Pj4gaW1tZWRpYXRlbHkgY29tZSB0byBtaW5kIGFzIGEgdXNlIGNhc2Ug
-Zm9yIHRoZSBoaWdoZXN0IGNvbXByZXNzaW9uDQo+Pj4gbGV2ZWwuDQo+Pj4NCj4+PiBBcyBhIG1v
-cmUgc3BlY2lmaWMgZXhhbXBsZSwgdGhlIGNvbXBhbnkgSSB3b3JrIGZvciBoYXMgYSB2ZXJ5IGxh
-cmdlDQo+Pj4gYW1vdW50IG9mIGRvY3VtZW50YXRpb24sIGFuZCB3ZSBrZWVwIGFsbCBvbGQgdmVy
-c2lvbnMuICBUaGlzIGlzIGFsbA0KPj4+IHN0b3JlZCBvbiBhIGZpbGUgc2VydmVyIHdoaWNoIGlz
-IGN1cnJlbnRseSB1c2luZyBCVFJGUy4gIE9uY2UgYQ0KPj4+IGRvY3VtZW50IGlzIHdyaXR0ZW4s
-IGl0J3MgYWxtb3N0IG5ldmVyIHJld3JpdHRlbiwgc28gd3JpdGUNCj4+PiBwZXJmb3JtYW5jZSBv
-bmx5IG1hdHRlcnMgZm9yIHRoZSBmaXJzdCB3cml0ZS4gIEhvd2V2ZXIsIHRoZXkncmUgcmVhZA0K
-Pj4+IGJhY2sgcHJldHR5IGZyZXF1ZW50bHksIHNvIHdlIG5lZWQgZ29vZCByZWFkIHBlcmZvcm1h
-bmNlLiAgQXMgb2YNCj4+PiByaWdodCBub3csIHRoZSBzeXN0ZW0gaXMgc2V0IHRvIHVzZSBMWk8g
-Y29tcHJlc3Npb24gYnkgZGVmYXVsdCwgYW5kDQo+Pj4gdGhlbiB3aGVuIGEgbmV3IGRvY3VtZW50
-IGlzIGFkZGVkLCB0aGUgcHJldmlvdXMgdmVyc2lvbiBvZiB0aGF0DQo+Pj4gZG9jdW1lbnQgZ2V0
-cyByZS1jb21wcmVzc2VkIHVzaW5nIHpsaWIgY29tcHJlc3Npb24sIHdoaWNoIGFjdHVhbGx5DQo+
-Pj4gcmVzdWx0cyBpbiBwcmV0dHkgc2lnbmlmaWNhbnQgc3BhY2Ugc2F2aW5ncyBtb3N0IG9mIHRo
-ZSB0aW1lLiAgSQ0KPj4+IHdvdWxkIGFic29sdXRlbHkgbG92ZSB0byB1c2UgenN0ZCBjb21wcmVz
-c2lvbiB3aXRoIHRoaXMgc3lzdGVtIHdpdGgNCj4+PiB0aGUgaGlnaGVzdCBjb21wcmVzc2lvbiBs
-ZXZlbCwgYmVjYXVzZSBtb3N0IHBlb3BsZSBkb24ndCBjYXJlIGhvdw0KPj4+IGxvbmcgaXQgdGFr
-ZXMgdG8gd3JpdGUgdGhlIGZpbGUgb3V0LCBidXQgdGhleSBkbyBjYXJlIGhvdyBsb25nIGl0DQo+
-Pj4gdGFrZXMgdG8gcmVhZCBhIGZpbGUgKGV2ZW4gaWYgaXQncyBhbiBvbGRlciB2ZXJzaW9uKS4N
-Cj4+IA0KPj4gVGhpcyBtYXkgYmUgYSByZWFzb25hYmxlIHVzZSBjYXNlLCBidXQgbm90ZSB0aGlz
-IGNhbm5vdCBqdXN0IGJlIHRoZSByZWd1bGFyDQo+PiAienN0ZCIgY29tcHJlc3Npb24gc2V0dGlu
-Zywgc2luY2UgZmlsZXN5c3RlbSBjb21wcmVzc2lvbiBieSBkZWZhdWx0IG11c3QgcHJvdmlkZQ0K
-Pj4gcmVhc29uYWJsZSBwZXJmb3JtYW5jZSBmb3IgbWFueSBkaWZmZXJlbnQgYWNjZXNzIHBhdHRl
-cm5zLiAgU2VlIHRoZSBwYXRjaCBpbg0KPj4gdGhpcyBzZXJpZXMgd2hpY2ggYWN0dWFsbHkgYWRk
-cyB6c3RkIGNvbXByZXNzaW9uIHRvIGJ0cmZzOyBpdCBvbmx5IHVzZXMgbGV2ZWwgMS4NCj4+IEkg
-ZG8gbm90IHNlZSBhIHBhdGNoIHdoaWNoIGFkZHMgYSBoaWdoZXIgY29tcHJlc3Npb24gbW9kZS4g
-IEl0IHdvdWxkIG5lZWQgdG8gYmUNCj4+IGEgc3BlY2lhbCBzZXR0aW5nIGxpa2UgInpzdGRoYyIg
-dGhhdCB1c2VycyBjb3VsZCBvcHQtaW4gdG8gb24gc3BlY2lmaWMNCj4+IGRpcmVjdG9yaWVzLiAg
-SXQgYWxzbyB3b3VsZCBuZWVkIHRvIGJlIGNvbXBhcmVkIHRvIHNpbXBseSBjb21wcmVzc2luZyBp
-bg0KPj4gdXNlcnNwYWNlLiAgSW4gbWFueSBjYXNlcyBjb21wcmVzc2luZyBpbiB1c2Vyc3BhY2Ug
-aXMgcHJvYmFibHkgdGhlIGJldHRlcg0KPj4gc29sdXRpb24gZm9yIHRoZSB1c2UgY2FzZSBpbiBx
-dWVzdGlvbiBiZWNhdXNlIGl0IHdvcmtzIG9uIGFueSBmaWxlc3lzdGVtLCBhbGxvd3MNCj4+IHVz
-aW5nIGFueSBjb21wcmVzc2lvbiBhbGdvcml0aG0sIGFuZCBpZiByYW5kb20gYWNjZXNzIGlzIG5v
-dCBuZWVkZWQgaXQgaXMNCj4+IHBvc3NpYmxlIHRvIGNvbXByZXNzIGVhY2ggZmlsZSBhcyBhIHNp
-bmdsZSBzdHJlYW0gKGxpa2UgYSAueHogZmlsZSksIHdoaWNoDQo+PiBwcm9kdWNlcyBhIG11Y2gg
-YmV0dGVyIGNvbXByZXNzaW9uIHJhdGlvIHRoYW4gdGhlIGJsb2NrLWJ5LWJsb2NrIGNvbXByZXNz
-aW9uDQo+PiB0aGF0IGZpbGVzeXN0ZW1zIGhhdmUgdG8gdXNlLg0KPiBUaGVyZSBoYXMgYmVlbiBk
-aXNjdXNzaW9uIGFzIHdlbGwgYXMgKEkgdGhpbmspIGluaXRpYWwgcGF0Y2hlcyBtZXJnZWQgDQo+
-IGZvciBzdXBwb3J0IG9mIHNwZWNpZnlpbmcgdGhlIGNvbXByZXNzaW9uIGxldmVsIGZvciBhbGdv
-cml0aG1zIHdoaWNoIA0KPiBzdXBwb3J0IG11bHRpcGxlIGNvbXByZXNzaW9uIGxldmVscyBpbiBC
-VFJGUy4gIEkgd2FzIGFjdHVhbGx5IHVuZGVyIHRoZSANCj4gaW1wcmVzc2lvbiB0aGF0IHdlIGhh
-ZCBkZWNpZGVkIHRvIHVzZSBsZXZlbCAzIGFzIHRoZSBkZWZhdWx0IGZvciB6c3RkLCANCj4gYnV0
-IHRoYXQgYXBwYXJlbnRseSBpc24ndCB0aGUgY2FzZSwgYW5kIHdpdGggdGhlIGJlbmNobWFyayBp
-c3N1ZXMsIGl0IA0KPiBtYXkgbm90IGJlIG9uY2UgcHJvcGVyIGJlbmNobWFya3MgYXJlIHJ1bi4N
-Cg0KVGhlcmUgYXJlIHNvbWUgaW5pdGlhbCBwYXRjaGVzIHRvIGFkZCBjb21wcmVzc2lvbiBsZXZl
-bHMgdG8gQnRyRlMgWzFdLiBPbmNlDQppdCdzIHJlYWR5LCB3ZSBjYW4gYWRkIGNvbXByZXNzaW9u
-IGxldmVscyB0byB6c3RkLiBUaGUgZGVmYXVsdCBjb21wcmVzc2lvbg0KbGV2ZWwgaW4gdGhlIGN1
-cnJlbnQgcGF0Y2ggaXMgMy4NCg0KWzFdIGh0dHBzOi8vbGttbC5rZXJuZWwub3JnL3IvMjAxNzA3
-MjQxNzI5MzkuMjQ1MjctMS1kc3RlcmJhQHN1c2UuY29tDQoNCg0K
+
+--vMk55pD2JuhdWiRw
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+On Thu, Aug 10, 2017 at 01:41:21PM -0400, Chris Mason wrote:
+> On 08/10/2017 04:30 AM, Eric Biggers wrote:
+> >
+> >Theses benchmarks are misleading because they compress the whole file as a
+> >single stream without resetting the dictionary, which isn't how data will
+> >typically be compressed in kernel mode.  With filesystem compression the data
+> >has to be divided into small chunks that can each be decompressed independently.
+> >That eliminates one of the primary advantages of Zstandard (support for large
+> >dictionary sizes).
+> 
+> I did btrfs benchmarks of kernel trees and other normal data sets as
+> well.  The numbers were in line with what Nick is posting here.
+> zstd is a big win over both lzo and zlib from a btrfs point of view.
+> 
+> It's true Nick's patches only support a single compression level in
+> btrfs, but that's because btrfs doesn't have a way to pass in the
+> compression ratio.  It could easily be a mount option, it was just
+> outside the scope of Nick's initial work.
+
+   Could we please not add more mount options? I get that they're easy
+to implement, but it's a very blunt instrument. What we tend to see
+(with both nodatacow and compress) is people using the mount options,
+then asking for exceptions, discovering that they can't do that, and
+then falling back to doing it with attributes or btrfs properties.
+Could we just start with btrfs properties this time round, and cut out
+the mount option part of this cycle.
+
+   In the long run, it'd be great to see most of the btrfs-specific
+mount options get deprecated and ultimately removed entirely, in
+favour of attributes/properties, where feasible.
+
+   Hugo.
+
+-- 
+Hugo Mills             | Klytus! Are your men on the right pills? Maybe you
+hugo@... carfax.org.uk | should execute their trainer!
+http://carfax.org.uk/  |
+PGP: E2AB1DE4          |                      Ming the Merciless, Flash Gordon
+
+--vMk55pD2JuhdWiRw
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQIcBAEBAgAGBQJZjLMRAAoJEFheFHXiqx3kedQP/A3+EFG+DMMW0h6GspoeN4Wy
+dvp4dInu85BiKF2Po4EncmtE7fvtjsrvAejreSToBTsnpHY8WBW8YCB7G0ZL8mU7
+eal2tviCB8OTaMj8StjzewJJOxx7HKd46K9F/A6oNj7dx+uRUrX9Wn+luq7zR23y
+x0kVrFWRRO8nF3Pq6Efo21vQ9LhTLNlh+g0NwSTkjbm//Acy51NEJpeGz4ZVBYMR
+Fty/cQe6v54FLlVHb49tQ+5Tsrlqm9QsUXg2xJrFmdeNr/b/fS+FRvG8UsjhWhPA
+QP3pwGYX6PtATojZ8IK0sSeBdW64X0xxIvP/FjXDtWVQPauwJuAiLoaLvAoY8Z6G
+uBiA9eqSdKhCR/Eu/X96GTENIl54hoYwupnbqIDDJulPWGRVjH4Cyuog9Q7gmIJJ
+Q88RKs6YU21g6trq6GLGLrfkPfTepINnwkmhZK9eYE1sZs/uoP9lnIKjlKHmRekR
+D3icZaU/MnmUBVrWcRDEIsi0WsNXokLb2Ww9emPZlSlwlebGMTYcKeqObRnkGeZ2
+z4JqLDZk/nW9xjpxFmNrc0juN3Bi2YdRjjXm2Yq8ZUFqg6M156vFqdcRTwJpJC+G
+AwOx7MXH2rvRbpH3hVuqnZCdCShQDngacssxpylobtJU/dBe4RY6cS/14JLrrUgl
+ZGavyNViPMHIEv7BMRJ7
+=hnJL
+-----END PGP SIGNATURE-----
+
+--vMk55pD2JuhdWiRw--
