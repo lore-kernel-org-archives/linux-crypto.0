@@ -1,7 +1,7 @@
 From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [RFC PATCH 04/10] staging: fsl-dpaa2/eth: move generic FD defines to DPIO
-Date: Thu, 10 Aug 2017 20:42:47 +0300
-Message-ID: <20170810174253.20951-5-horia.geanta@nxp.com>
+Subject: [RFC PATCH 02/10] staging: fsl-mc: dpio: add congestion notification support
+Date: Thu, 10 Aug 2017 20:42:45 +0300
+Message-ID: <20170810174253.20951-3-horia.geanta@nxp.com>
 References: <20170810174253.20951-1-horia.geanta@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
@@ -21,121 +21,77 @@ To: Herbert Xu <herbert@gondor.apana.org.au>,
         Catalin Marinas <catalin.marinas@arm.com>,
         Will Deacon <will.deacon@arm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-sn1nam02on0043.outbound.protection.outlook.com ([104.47.36.43]:51168
-        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
+Received: from mail-sn1nam01on0046.outbound.protection.outlook.com ([104.47.32.46]:23979
+        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753126AbdHJRnn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Aug 2017 13:43:43 -0400
+        id S1753126AbdHJRng (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 10 Aug 2017 13:43:36 -0400
 In-Reply-To: <20170810174253.20951-1-horia.geanta@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Previous commits:
-6e2387e8f19e ("staging: fsl-dpaa2/eth: Add Freescale DPAA2 Ethernet driver")
-39163c0ce0f4 ("staging: fsl-dpaa2/eth: Errors checking update")
-have added bits that are not specific to the WRIOP accelerator.
+Add support for Congestion State Change Notifications (CSCN), which
+allow DPIO users to be notified when a congestion group changes its
+state (due to hitting the entrance / exit threshold).
 
-Move these where they belong (in DPIO) such that other accelerators
-can make use of them.
-
-While here, fix the values of FD_CTRL_FSE and FD_CTRL_FAERR, which
-were shifted off by one bit.
-
+Signed-off-by: Ioana Radulescu <ruxandra.radulescu@nxp.com>
+Signed-off-by: Radu Alexe <radu.alexe@nxp.com>
 Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 ---
- drivers/staging/fsl-dpaa2/ethernet/dpaa2-eth.c |  8 +++-----
- drivers/staging/fsl-dpaa2/ethernet/dpaa2-eth.h | 19 +++++--------------
- drivers/staging/fsl-mc/include/dpaa2-fd.h      | 12 ++++++++++++
- 3 files changed, 20 insertions(+), 19 deletions(-)
+ drivers/staging/fsl-mc/include/dpaa2-io.h | 43 +++++++++++++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
 
-diff --git a/drivers/staging/fsl-dpaa2/ethernet/dpaa2-eth.c b/drivers/staging/fsl-dpaa2/ethernet/dpaa2-eth.c
-index b9a0a315e6fb..a1d5c371e1c4 100644
---- a/drivers/staging/fsl-dpaa2/ethernet/dpaa2-eth.c
-+++ b/drivers/staging/fsl-dpaa2/ethernet/dpaa2-eth.c
-@@ -410,8 +410,7 @@ static int build_sg_fd(struct dpaa2_eth_priv *priv,
- 	dpaa2_fd_set_format(fd, dpaa2_fd_sg);
- 	dpaa2_fd_set_addr(fd, addr);
- 	dpaa2_fd_set_len(fd, skb->len);
--	dpaa2_fd_set_ctrl(fd, DPAA2_FD_CTRL_ASAL | DPAA2_FD_CTRL_PTA |
--			  DPAA2_FD_CTRL_PTV1);
-+	dpaa2_fd_set_ctrl(fd, DPAA2_FD_CTRL_ASAL | FD_CTRL_PTA | FD_CTRL_PTV1);
+diff --git a/drivers/staging/fsl-mc/include/dpaa2-io.h b/drivers/staging/fsl-mc/include/dpaa2-io.h
+index 002829cecd75..e7af7d647ab1 100644
+--- a/drivers/staging/fsl-mc/include/dpaa2-io.h
++++ b/drivers/staging/fsl-mc/include/dpaa2-io.h
+@@ -136,4 +136,47 @@ struct dpaa2_io_store *dpaa2_io_store_create(unsigned int max_frames,
+ void dpaa2_io_store_destroy(struct dpaa2_io_store *s);
+ struct dpaa2_dq *dpaa2_io_store_next(struct dpaa2_io_store *s, int *is_last);
  
- 	return 0;
- 
-@@ -464,8 +463,7 @@ static int build_single_fd(struct dpaa2_eth_priv *priv,
- 	dpaa2_fd_set_offset(fd, (u16)(skb->data - buffer_start));
- 	dpaa2_fd_set_len(fd, skb->len);
- 	dpaa2_fd_set_format(fd, dpaa2_fd_single);
--	dpaa2_fd_set_ctrl(fd, DPAA2_FD_CTRL_ASAL | DPAA2_FD_CTRL_PTA |
--			  DPAA2_FD_CTRL_PTV1);
-+	dpaa2_fd_set_ctrl(fd, DPAA2_FD_CTRL_ASAL | FD_CTRL_PTA | FD_CTRL_PTV1);
- 
- 	return 0;
- }
-@@ -653,7 +651,7 @@ static void dpaa2_eth_tx_conf(struct dpaa2_eth_priv *priv,
- 		/* We only check error bits in the FAS field if corresponding
- 		 * FAERR bit is set in FD and the FAS field is marked as valid
- 		 */
--		has_fas_errors = (fd_errors & DPAA2_FD_CTRL_FAERR) &&
-+		has_fas_errors = (fd_errors & FD_CTRL_FAERR) &&
- 				 !!(dpaa2_fd_get_frc(fd) & DPAA2_FD_FRC_FASV);
- 		if (net_ratelimit())
- 			netdev_dbg(priv->net_dev, "TX frame FD error: %x08\n",
-diff --git a/drivers/staging/fsl-dpaa2/ethernet/dpaa2-eth.h b/drivers/staging/fsl-dpaa2/ethernet/dpaa2-eth.h
-index e6d28a249fc1..dfbb60b15555 100644
---- a/drivers/staging/fsl-dpaa2/ethernet/dpaa2-eth.h
-+++ b/drivers/staging/fsl-dpaa2/ethernet/dpaa2-eth.h
-@@ -120,23 +120,14 @@ struct dpaa2_eth_swa {
- #define DPAA2_FD_FRC_FASWOV		0x0800
- #define DPAA2_FD_FRC_FAICFDV		0x0400
- 
--/* Error bits in FD CTRL */
--#define DPAA2_FD_CTRL_UFD		0x00000004
--#define DPAA2_FD_CTRL_SBE		0x00000008
--#define DPAA2_FD_CTRL_FSE		0x00000010
--#define DPAA2_FD_CTRL_FAERR		0x00000020
--
--#define DPAA2_FD_RX_ERR_MASK		(DPAA2_FD_CTRL_SBE	| \
--					 DPAA2_FD_CTRL_FAERR)
--#define DPAA2_FD_TX_ERR_MASK		(DPAA2_FD_CTRL_UFD	| \
--					 DPAA2_FD_CTRL_SBE	| \
--					 DPAA2_FD_CTRL_FSE	| \
--					 DPAA2_FD_CTRL_FAERR)
-+#define DPAA2_FD_RX_ERR_MASK		(FD_CTRL_SBE | FD_CTRL_FAERR)
-+#define DPAA2_FD_TX_ERR_MASK		(FD_CTRL_UFD	| \
-+					 FD_CTRL_SBE	| \
-+					 FD_CTRL_FSE	| \
-+					 FD_CTRL_FAERR)
- 
- /* Annotation bits in FD CTRL */
- #define DPAA2_FD_CTRL_ASAL		0x00020000	/* ASAL = 128 */
--#define DPAA2_FD_CTRL_PTA		0x00800000
--#define DPAA2_FD_CTRL_PTV1		0x00400000
- 
- /* Frame annotation status */
- struct dpaa2_fas {
-diff --git a/drivers/staging/fsl-mc/include/dpaa2-fd.h b/drivers/staging/fsl-mc/include/dpaa2-fd.h
-index 992fdc7ba5b8..72328415c26d 100644
---- a/drivers/staging/fsl-mc/include/dpaa2-fd.h
-+++ b/drivers/staging/fsl-mc/include/dpaa2-fd.h
-@@ -101,6 +101,18 @@ struct dpaa2_fd {
- #define FL_FINAL_FLAG_MASK	0x1
- #define FL_FINAL_FLAG_SHIFT	15
- 
-+/* Error bits in FD CTRL */
-+#define FD_CTRL_ERR_MASK	0x000000FF
-+#define FD_CTRL_UFD		0x00000004
-+#define FD_CTRL_SBE		0x00000008
-+#define FD_CTRL_FLC		0x00000010
-+#define FD_CTRL_FSE		0x00000020
-+#define FD_CTRL_FAERR		0x00000040
++/***************/
++/* CSCN        */
++/***************/
 +
-+/* Annotation bits in FD CTRL */
-+#define FD_CTRL_PTA		0x00800000
-+#define FD_CTRL_PTV1		0x00400000
++/**
++ * struct dpaa2_cscn - The CSCN message format
++ * @verb: identifies the type of message (should be 0x27).
++ * @stat: status bits related to dequeuing response (not used)
++ * @state: bit 0 = 0/1 if CG is no/is congested
++ * @reserved: reserved byte
++ * @cgid: congest grp ID - the first 16 bits
++ * @ctx: context data
++ *
++ * Congestion management can be implemented in software through
++ * the use of Congestion State Change Notifications (CSCN). These
++ * are messages written by DPAA2 hardware to memory whenever the
++ * instantaneous count (I_CNT field in the CG) exceeds the
++ * Congestion State (CS) entrance threshold, signifying congestion
++ * entrance, or when the instantaneous count returns below exit
++ * threshold, signifying congestion exit. The format of the message
++ * is given by the dpaa2_cscn structure. Bit 0 of the state field
++ * represents congestion state written by the hardware.
++ */
++struct dpaa2_cscn {
++	u8 verb;
++	u8 stat;
++	u8 state;
++	u8 reserved;
++	__le32 cgid;
++	__le64 ctx;
++};
 +
- enum dpaa2_fd_format {
- 	dpaa2_fd_single = 0,
- 	dpaa2_fd_list,
++#define DPAA2_CSCN_SIZE                        64
++#define DPAA2_CSCN_ALIGN               16
++
++#define DPAA2_CSCN_STATE_MASK          0x1
++#define DPAA2_CSCN_CONGESTED           1
++
++static inline bool dpaa2_cscn_state_congested(struct dpaa2_cscn *cscn)
++{
++	return ((cscn->state & DPAA2_CSCN_STATE_MASK) == DPAA2_CSCN_CONGESTED);
++}
++
+ #endif /* __FSL_DPAA2_IO_H */
 -- 
 2.12.0.264.gd6db3f216544
