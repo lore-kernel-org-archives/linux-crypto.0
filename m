@@ -1,168 +1,61 @@
 From: Thomas Garnier <thgarnie@google.com>
-Subject: x86: PIE support and option to extend KASLR randomization
-Date: Thu, 10 Aug 2017 10:25:52 -0700
-Message-ID: <20170810172615.51965-1-thgarnie@google.com>
-Cc: x86@kernel.org,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	xen-devel@lists.xenproject.org,
-	kvm@vger.kernel.org,
-	linux-pm@vger.kernel.org,
-	linux-arch@vger.kernel.org,
-	linux-sparse@vger.kernel.org,
-	kernel-hardening@lists.openwall.com
+Subject: [RFC v2 02/23] x86: Use symbol name on bug table for
+	PIE support
+Date: Thu, 10 Aug 2017 10:25:54 -0700
+Message-ID: <20170810172615.51965-3-thgarnie@google.com>
+References: <20170810172615.51965-1-thgarnie@google.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: linux-arch@vger.kernel.org, kvm@vger.kernel.org, linux-pm@vger.kernel.org,
+ x86@kernel.org, linux-kernel@vger.kernel.org, linux-sparse@vger.kernel.org,
+ linux-crypto@vger.kernel.org, kernel-hardening@lists.openwall.com,
+ xen-devel@lists.xenproject.org
 To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	"H . Peter Anvin" <hpa@zytor.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Josh Poimboeuf <jpoimboe@redhat.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Thomas Garnier <thgarnie@google.com>,
-	Matthias Kaehlcke <mka@chromium.org>,
-	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-	Juergen Gross <jgross@suse.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	=?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-	Joerg Roedel <joro@8bytes.org>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Borislav Petkov <bp@suse.de>,
-	Brian Gerst <brgerst@gmail.com>,
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-	"Rafael J . Wysocki" <rjw@rjwysocki.net>,
-	Len Brown <len.brown@intel.com>,
-	Pavel Machek <pavel
-Return-path: <kernel-hardening-return-9309-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
-List-Post: <mailto:kernel-hardening@lists.openwall.com>
-List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
-List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
-List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
+ "David S . Miller" <davem@davemloft.net>,
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ "H . Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>,
+ Josh Poimboeuf <jpoimboe@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
+ Thomas Garnier <thgarnie@google.com>, Matthias Kaehlcke <mka@chromium.org>,
+ Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+ Juergen Gross <jgross@suse.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+ Joerg Roedel <joro@8bytes.org>, Tom Lendacky <thomas.lendacky@amd.com>,
+ Andy Lutomirski <luto@kernel.org>, Borislav Petkov <bp@suse.de>,
+ Brian Gerst <brgerst@gmail.com>,
+ "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+ "Rafael J . Wysocki" <rjw@rjwysocki.net>, Len Brown <len.brown@intel.com>,
+ Pavel Machek <pavel@ucw.cz>
+Return-path: <xen-devel-bounces@lists.xen.org>
+In-Reply-To: <20170810172615.51965-1-thgarnie@google.com>
+List-Unsubscribe: <https://lists.xen.org/cgi-bin/mailman/options/xen-devel>,
+ <mailto:xen-devel-request@lists.xen.org?subject=unsubscribe>
+List-Post: <mailto:xen-devel@lists.xen.org>
+List-Help: <mailto:xen-devel-request@lists.xen.org?subject=help>
+List-Subscribe: <https://lists.xen.org/cgi-bin/mailman/listinfo/xen-devel>,
+ <mailto:xen-devel-request@lists.xen.org?subject=subscribe>
+Errors-To: xen-devel-bounces@lists.xen.org
+Sender: "Xen-devel" <xen-devel-bounces@lists.xen.org>
 List-Id: linux-crypto.vger.kernel.org
 
-Changes:
- - v2:
-   - Add support for global stack cookie while compiler default to fs without
-     mcmodel=kernel
-   - Change patch 7 to correctly jump out of the identity mapping on kexec load
-     preserve.
-
-These patches make the changes necessary to build the kernel as Position
-Independent Executable (PIE) on x86_64. A PIE kernel can be relocated below
-the top 2G of the virtual address space. It allows to optionally extend the
-KASLR randomization range from 1G to 3G.
-
-Thanks a lot to Ard Biesheuvel & Kees Cook on their feedback on compiler
-changes, PIE support and KASLR in general.
-
-The patches:
- - 1-3, 5-15: Change in assembly code to be PIE compliant.
- - 4: Add a new _ASM_GET_PTR macro to fetch a symbol address generically.
- - 16: Adapt percpu design to work correctly when PIE is enabled.
- - 17: Provide an option to default visibility to hidden except for key symbols.
-       It removes errors between compilation units.
- - 18: Adapt relocation tool to handle PIE binary correctly.
- - 19: Add support for global cookie
- - 20: Add the CONFIG_X86_PIE option (off by default)
- - 21: Adapt relocation tool to generate a 64-bit relocation table.
- - 22: Add options to build modules as mcmodel=large and dynamically create a
-       PLT for relative references out of range (adapted from arm64).
- - 23: Add the CONFIG_RANDOMIZE_BASE_LARGE option to increase relocation range
-       from 1G to 3G (off by default).
-
-Performance/Size impact:
-
-Hackbench (50% and 1600% loads):
- - PIE disabled: no significant change (-0.50% / +0.50%)
- - PIE enabled: 7% to 8% on half load, 10% on heavy load.
-
-These results are aligned with the different research on user-mode PIE
-impact on cpu intensive benchmarks (around 10% on x86_64).
-
-slab_test (average of 10 runs):
- - PIE disabled: no significant change (-1% / +1%)
- - PIE enabled: 3% to 4%
-
-Kernbench (average of 10 Half and Optimal runs):
- Elapsed Time:
- - PIE disabled: no significant change (-0.22% / +0.06%)
- - PIE enabled: around 0.50%
- System Time:
- - PIE disabled: no significant change (-0.99% / -1.28%)
- - PIE enabled: 5% to 6%
-
-Size of vmlinux (Ubuntu configuration):
- File size:
- - PIE disabled: 472928672 bytes (-0.000169% from baseline)
- - PIE enabled: 216878461 bytes (-54.14% from baseline)
- .text sections:
- - PIE disabled: 9373572 bytes (+0.04% from baseline)
- - PIE enabled: 9499138 bytes (+1.38% from baseline)
-
-The big decrease in vmlinux file size is due to the lower number of
-relocations appended to the file.
-
-diffstat:
- arch/x86/Kconfig                             |   42 +++++
- arch/x86/Makefile                            |   28 +++
- arch/x86/boot/boot.h                         |    2 
- arch/x86/boot/compressed/Makefile            |    5 
- arch/x86/boot/compressed/misc.c              |   10 +
- arch/x86/crypto/aes-x86_64-asm_64.S          |   45 +++---
- arch/x86/crypto/aesni-intel_asm.S            |   14 +
- arch/x86/crypto/aesni-intel_avx-x86_64.S     |    6 
- arch/x86/crypto/camellia-aesni-avx-asm_64.S  |   42 ++---
- arch/x86/crypto/camellia-aesni-avx2-asm_64.S |   44 +++---
- arch/x86/crypto/camellia-x86_64-asm_64.S     |    8 -
- arch/x86/crypto/cast5-avx-x86_64-asm_64.S    |   50 +++---
- arch/x86/crypto/cast6-avx-x86_64-asm_64.S    |   44 +++---
- arch/x86/crypto/des3_ede-asm_64.S            |   96 ++++++++-----
- arch/x86/crypto/ghash-clmulni-intel_asm.S    |    4 
- arch/x86/crypto/glue_helper-asm-avx.S        |    4 
- arch/x86/crypto/glue_helper-asm-avx2.S       |    6 
- arch/x86/entry/entry_32.S                    |    3 
- arch/x86/entry/entry_64.S                    |   29 ++-
- arch/x86/include/asm/asm.h                   |   13 +
- arch/x86/include/asm/bug.h                   |    2 
- arch/x86/include/asm/jump_label.h            |    8 -
- arch/x86/include/asm/kvm_host.h              |    6 
- arch/x86/include/asm/module.h                |   17 ++
- arch/x86/include/asm/page_64_types.h         |    9 +
- arch/x86/include/asm/paravirt_types.h        |   12 +
- arch/x86/include/asm/percpu.h                |   25 ++-
- arch/x86/include/asm/pm-trace.h              |    2 
- arch/x86/include/asm/processor.h             |   11 -
- arch/x86/include/asm/setup.h                 |    2 
- arch/x86/include/asm/stackprotector.h        |   19 +-
- arch/x86/kernel/Makefile                     |    2 
- arch/x86/kernel/acpi/wakeup_64.S             |   31 ++--
- arch/x86/kernel/asm-offsets.c                |    3 
- arch/x86/kernel/asm-offsets_32.c             |    3 
- arch/x86/kernel/asm-offsets_64.c             |    3 
- arch/x86/kernel/cpu/common.c                 |    7 
- arch/x86/kernel/head64.c                     |   30 +++-
- arch/x86/kernel/head_32.S                    |    3 
- arch/x86/kernel/head_64.S                    |   46 +++++-
- arch/x86/kernel/kvm.c                        |    6 
- arch/x86/kernel/module-plts.c                |  198 +++++++++++++++++++++++++++
- arch/x86/kernel/module.c                     |   18 +-
- arch/x86/kernel/module.lds                   |    4 
- arch/x86/kernel/process.c                    |    5 
- arch/x86/kernel/relocate_kernel_64.S         |    8 -
- arch/x86/kernel/setup_percpu.c               |    2 
- arch/x86/kernel/vmlinux.lds.S                |   13 +
- arch/x86/kvm/svm.c                           |    4 
- arch/x86/lib/cmpxchg16b_emu.S                |    8 -
- arch/x86/power/hibernate_asm_64.S            |    4 
- arch/x86/tools/relocs.c                      |  134 +++++++++++++++---
- arch/x86/tools/relocs.h                      |    4 
- arch/x86/tools/relocs_common.c               |   15 +-
- arch/x86/xen/xen-asm.S                       |   12 -
- arch/x86/xen/xen-asm.h                       |    3 
- arch/x86/xen/xen-head.S                      |    9 -
- include/asm-generic/sections.h               |    6 
- include/linux/compiler.h                     |    8 +
- init/Kconfig                                 |    9 +
- kernel/kallsyms.c                            |   16 +-
- 61 files changed, 923 insertions(+), 299 deletions(-)
+UmVwbGFjZSB0aGUgJWMgY29uc3RyYWludCB3aXRoICVQLiBUaGUgJWMgaXMgaW5jb21wYXRpYmxl
+IHdpdGggUElFCmJlY2F1c2UgaXQgaW1wbGllcyBhbiBpbW1lZGlhdGUgdmFsdWUgd2hlcmVhcyAl
+UCByZWZlcmVuY2UgYSBzeW1ib2wuCgpQb3NpdGlvbiBJbmRlcGVuZGVudCBFeGVjdXRhYmxlIChQ
+SUUpIHN1cHBvcnQgd2lsbCBhbGxvdyB0byBleHRlbmRlZCB0aGUKS0FTTFIgcmFuZG9taXphdGlv
+biByYW5nZSBiZWxvdyB0aGUgLTJHIG1lbW9yeSBsaW1pdC4KClNpZ25lZC1vZmYtYnk6IFRob21h
+cyBHYXJuaWVyIDx0aGdhcm5pZUBnb29nbGUuY29tPgotLS0KIGFyY2gveDg2L2luY2x1ZGUvYXNt
+L2J1Zy5oIHwgMiArLQogMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCAxIGRlbGV0aW9u
+KC0pCgpkaWZmIC0tZ2l0IGEvYXJjaC94ODYvaW5jbHVkZS9hc20vYnVnLmggYi9hcmNoL3g4Ni9p
+bmNsdWRlL2FzbS9idWcuaAppbmRleCBhYTZiMjAyM2Q4ZjguLjEyMTBkMjJhZDU0NyAxMDA2NDQK
+LS0tIGEvYXJjaC94ODYvaW5jbHVkZS9hc20vYnVnLmgKKysrIGIvYXJjaC94ODYvaW5jbHVkZS9h
+c20vYnVnLmgKQEAgLTM3LDcgKzM3LDcgQEAgZG8gewkJCQkJCQkJCVwKIAlhc20gdm9sYXRpbGUo
+IjE6XHQiIGlucyAiXG4iCQkJCQlcCiAJCSAgICAgIi5wdXNoc2VjdGlvbiBfX2J1Z190YWJsZSxc
+ImF3XCJcbiIJCVwKIAkJICAgICAiMjpcdCIgX19CVUdfUkVMKDFiKSAiXHQjIGJ1Z19lbnRyeTo6
+YnVnX2FkZHJcbiIJXAotCQkgICAgICJcdCIgIF9fQlVHX1JFTCglYzApICJcdCMgYnVnX2VudHJ5
+OjpmaWxlXG4iCVwKKwkJICAgICAiXHQiICBfX0JVR19SRUwoJVAwKSAiXHQjIGJ1Z19lbnRyeTo6
+ZmlsZVxuIglcCiAJCSAgICAgIlx0LndvcmQgJWMxIiAgICAgICAgIlx0IyBidWdfZW50cnk6Omxp
+bmVcbiIJXAogCQkgICAgICJcdC53b3JkICVjMiIgICAgICAgICJcdCMgYnVnX2VudHJ5OjpmbGFn
+c1xuIglcCiAJCSAgICAgIlx0Lm9yZyAyYislYzNcbiIJCQkJCVwKLS0gCjIuMTQuMC40MzQuZzk4
+MDk2ZmQ3YTgtZ29vZwoKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fClhlbi1kZXZlbCBtYWlsaW5nIGxpc3QKWGVuLWRldmVsQGxpc3RzLnhlbi5vcmcKaHR0
+cHM6Ly9saXN0cy54ZW4ub3JnL3hlbi1kZXZlbAo=
