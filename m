@@ -1,35 +1,111 @@
-From: Sandy Harris <sandyinchina@gmail.com>
-Subject: Re: [Freedombox-discuss] Hardware Crypto
-Date: Thu, 10 Aug 2017 10:23:44 -0400
-Message-ID: <CACXcFmn_5a-Ygv9RRLA8Jey+XWH7Ez6KdUDE9jE5TRqvuECMuw@mail.gmail.com>
-References: <87pqldrq15.fsf@freedomboxfoundation.org> <CAMhXSQpkScTzZB4fZ0KGbTPKmtiwv_o7cz7MrWXc_rqrCfO3Pg@mail.gmail.com>
- <4E1FF66C.6010908@mray.de> <87wrfe1acu.fsf@freedomboxfoundation.org>
- <CA+FSnD1NO97U1zQQZV=VD+dbCGR0oQTgEYBmH6VupGUKo8uRFA@mail.gmail.com>
- <87r55m175w.fsf@freedomboxfoundation.org> <CAJVWO9aUCLb6k87do-ckOdkV-1U7d2SiG3gtBOVVXouog04Tpw@mail.gmail.com>
- <CAJVWO9YDKD72Sbb9_wWvxFVEppDg=4+XfBAY3uxvxcZ0b2t3yg@mail.gmail.com>
- <20110720063824.GA15748@havelock.liw.fi> <CAJVWO9bXs7_bx8-37O++n8kSJTuASC_benwmyeLgfiik8nGrmA@mail.gmail.com>
- <8762mx14co.fsf@freedomboxfoundation.org> <6556610b-9ddf-4bc2-b235-a2c91598a040@email.android.com>
- <201107220153.p6M1rVDn004794@new.toad.com> <CACXcFm=CBZmSaiwt7RaGUtS1u-q5HUrACKrvj=7Y201R6Fzmtw@mail.gmail.com>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: [PATCH] crypto: AF_ALG - get_page upon reassignment to TX SGL
+Date: Thu, 10 Aug 2017 16:40:03 +0200
+Message-ID: <2704295.VBAGuigrBX@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wr0-f182.google.com ([209.85.128.182]:38076 "EHLO
-        mail-wr0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752666AbdHJOXq (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Aug 2017 10:23:46 -0400
-Received: by mail-wr0-f182.google.com with SMTP id f21so3577611wrf.5
-        for <linux-crypto@vger.kernel.org>; Thu, 10 Aug 2017 07:23:45 -0700 (PDT)
-In-Reply-To: <CACXcFm=CBZmSaiwt7RaGUtS1u-q5HUrACKrvj=7Y201R6Fzmtw@mail.gmail.com>
+Received: from mail.eperm.de ([89.247.134.16]:58480 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752091AbdHJOkF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 10 Aug 2017 10:40:05 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-To me it seems obvious that if the hardware provides a real RNG, that
-should be used to feed random(4). This solves a genuine problem and,
-even if calls to the hardware are expensive, overall overhead will not
-be high because random(4) does not need huge amounts of input.
+Hi Herbert,
 
-I'm much less certain hardware acceleration is worthwhile for ciphers
-& hashes, except where the CPU itself includes instructions to speed
-them up.
+The error can be triggered with the following test. Invoking that test
+in a while [ 1 ] loop shows that no memory is leaked.
+
+#include <stdio.h>
+#include <kcapi.h>
+
+int main(int argc, char *argv[])
+{
+	char buf[8192];
+	struct kcapi_handle *handle;
+	struct iovec iov;
+	int ret;
+
+	(void)argc;
+	(void)argv;
+
+	iov.iov_base = buf;
+
+	ret = kcapi_cipher_init(&handle, "ctr(aes)", 0);
+	if (ret)
+		return ret;
+
+	ret = kcapi_cipher_setkey(handle, (unsigned char *)"0123456789abcdef", 16);
+	if (ret)
+		return ret;
+
+	ret = kcapi_cipher_stream_init_enc(handle, (unsigned char *)"0123456789abcdef", NULL, 0);
+	if (ret < 0)
+		return ret;
+
+	iov.iov_len = 4152;
+	ret = kcapi_cipher_stream_update(handle, &iov, 1);
+	if (ret < 0)
+		return ret;
+
+	iov.iov_len = 4096;
+	ret = kcapi_cipher_stream_op(handle, &iov, 1);
+	if (ret < 0)
+		return ret;
+
+	kcapi_cipher_destroy(handle);
+
+	return 0;
+}
+
+---8<---
+
+When a page is assigned to a TX SGL, call get_page to increment the
+reference counter. It is possible that one page is referenced in
+multiple SGLs:
+
+- in the global TX SGL in case a previous af_alg_pull_tsgl only
+reassigned parts of a page to a per-request TX SGL
+
+- in the per-request TX SGL as assigned by af_alg_pull_tsgl
+
+Note, multiple requests can be active at the same time whose TX SGLs all
+point to different parts of the same page.
+
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/af_alg.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index d6936c0e08d9..ffa9f4ccd9b4 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -641,9 +641,9 @@ void af_alg_pull_tsgl(struct sock *sk, size_t used, struct scatterlist *dst,
+ 				if (dst_offset >= plen) {
+ 					/* discard page before offset */
+ 					dst_offset -= plen;
+-					put_page(page);
+ 				} else {
+ 					/* reassign page to dst after offset */
++					get_page(page);
+ 					sg_set_page(dst + j, page,
+ 						    plen - dst_offset,
+ 						    sg[i].offset + dst_offset);
+@@ -661,9 +661,7 @@ void af_alg_pull_tsgl(struct sock *sk, size_t used, struct scatterlist *dst,
+ 			if (sg[i].length)
+ 				return;
+ 
+-			if (!dst)
+-				put_page(page);
+-
++			put_page(page);
+ 			sg_assign_page(sg + i, NULL);
+ 		}
+ 
+-- 
+2.13.4
