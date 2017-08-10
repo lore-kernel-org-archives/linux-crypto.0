@@ -1,96 +1,131 @@
-From: Chris Mason <clm@fb.com>
+From: Nick Terrell <terrelln@fb.com>
 Subject: Re: [PATCH v5 2/5] lib: Add zstd modules
-Date: Thu, 10 Aug 2017 15:07:33 -0400
-Message-ID: <5a7c09dd-3415-0c00-c0f2-a605a0656499@fb.com>
+Date: Thu, 10 Aug 2017 19:16:45 +0000
+Message-ID: <A38BC5B4-7951-4045-B3F0-F1D923C08EB7@fb.com>
 References: <20170810023553.3200875-1-terrelln@fb.com>
  <20170810023553.3200875-3-terrelln@fb.com>
  <20170810083017.GA10462@zzz.localdomain>
- <0ceeccb4-1a0f-cacb-dd2b-2913e1cf73ab@fb.com>
- <20170810190055.GA97400@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: Nick Terrell <terrelln@fb.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>, <kernel-team@fb.com>,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        Kernel Team <Kernel-team@fb.com>,
+        "squashfs-devel@lists.sourceforge.net"
         <squashfs-devel@lists.sourceforge.net>,
-        <linux-btrfs@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>
+        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
 To: Eric Biggers <ebiggers3@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:46723 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752756AbdHJTHx (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Aug 2017 15:07:53 -0400
-In-Reply-To: <20170810190055.GA97400@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20170810083017.GA10462@zzz.localdomain>
 Content-Language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-ID: <5E8A4049CFBE464E9623314C6849120C@namprd15.prod.outlook.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 08/10/2017 03:00 PM, Eric Biggers wrote:
-> On Thu, Aug 10, 2017 at 01:41:21PM -0400, Chris Mason wrote:
->> On 08/10/2017 04:30 AM, Eric Biggers wrote:
->>> On Wed, Aug 09, 2017 at 07:35:53PM -0700, Nick Terrell wrote:
->>
->>>> The memory reported is the amount of memory the compressor requests.
->>>>
->>>> | Method   | Size (B) | Time (s) | Ratio | MB/s    | Adj MB/s | Mem (MB) |
->>>> |----------|----------|----------|-------|---------|----------|----------|
->>>> | none     | 11988480 |    0.100 |     1 | 2119.88 |        - |        - |
->>>> | zstd -1  | 73645762 |    1.044 | 2.878 |  203.05 |   224.56 |     1.23 |
->>>> | zstd -3  | 66988878 |    1.761 | 3.165 |  120.38 |   127.63 |     2.47 |
->>>> | zstd -5  | 65001259 |    2.563 | 3.261 |   82.71 |    86.07 |     2.86 |
->>>> | zstd -10 | 60165346 |   13.242 | 3.523 |   16.01 |    16.13 |    13.22 |
->>>> | zstd -15 | 58009756 |   47.601 | 3.654 |    4.45 |     4.46 |    21.61 |
->>>> | zstd -19 | 54014593 |  102.835 | 3.925 |    2.06 |     2.06 |    60.15 |
->>>> | zlib -1  | 77260026 |    2.895 | 2.744 |   73.23 |    75.85 |     0.27 |
->>>> | zlib -3  | 72972206 |    4.116 | 2.905 |   51.50 |    52.79 |     0.27 |
->>>> | zlib -6  | 68190360 |    9.633 | 3.109 |   22.01 |    22.24 |     0.27 |
->>>> | zlib -9  | 67613382 |   22.554 | 3.135 |    9.40 |     9.44 |     0.27 |
->>>>
->>>
->>> Theses benchmarks are misleading because they compress the whole file as a
->>> single stream without resetting the dictionary, which isn't how data will
->>> typically be compressed in kernel mode.  With filesystem compression the data
->>> has to be divided into small chunks that can each be decompressed independently.
->>> That eliminates one of the primary advantages of Zstandard (support for large
->>> dictionary sizes).
->>
->> I did btrfs benchmarks of kernel trees and other normal data sets as
->> well.  The numbers were in line with what Nick is posting here.
->> zstd is a big win over both lzo and zlib from a btrfs point of view.
->>
->> It's true Nick's patches only support a single compression level in
->> btrfs, but that's because btrfs doesn't have a way to pass in the
->> compression ratio.  It could easily be a mount option, it was just
->> outside the scope of Nick's initial work.
->>
-> 
-> I am not surprised --- Zstandard is closer to the state of the art, both
-> format-wise and implementation-wise, than the other choices in BTRFS.  My point
-> is that benchmarks need to account for how much data is compressed at a time.
-> This is a common mistake when comparing different compression algorithms; the
-> algorithm name and compression level do not tell the whole story.  The
-> dictionary size is extremely significant.  No one is going to compress or
-> decompress a 200 MB file as a single stream in kernel mode, so it does not make
-> sense to justify adding Zstandard *to the kernel* based on such a benchmark.  It
-> is going to be divided into chunks.  How big are the chunks in BTRFS?  I thought
-> that it compressed only one page (4 KiB) at a time, but I hope that has been, or
-> is being, improved; 32 KiB - 128 KiB should be a better amount.  (And if the
-> amount of data compressed at a time happens to be different between the
-> different algorithms, note that BTRFS benchmarks are likely to be measuring that
-> as much as the algorithms themselves.)
-
-Btrfs hooks the compression code into the delayed allocation mechanism 
-we use to gather large extents for COW.  So if you write 100MB to a 
-file, we'll have 100MB to compress at a time (within the limits of the 
-amount of pages we allow to collect before forcing it down).
-
-But we want to balance how much memory you might need to uncompress 
-during random reads.  So we have an artificial limit of 128KB that we 
-send at a time to the compression code.  It's easy to change this, it's 
-just a tradeoff made to limit the cost of reading small bits.
-
-It's the same for zlib,lzo and the new zstd patch.
-
--chris
+T24gOC8xMC8xNywgMTozMCBBTSwgIkVyaWMgQmlnZ2VycyIgPGViaWdnZXJzM0BnbWFpbC5jb20+
+IHdyb3RlOg0KPiBPbiBXZWQsIEF1ZyAwOSwgMjAxNyBhdCAwNzozNTo1M1BNIC0wNzAwLCBOaWNr
+IFRlcnJlbGwgd3JvdGU6DQo+Pg0KPj4gSXQgY2FuIGNvbXByZXNzIGF0IHNwZWVkcyBhcHByb2Fj
+aGluZyBsejQsIGFuZCBxdWFsaXR5IGFwcHJvYWNoaW5nIGx6bWEuDQo+IA0KPiBXZWxsLCBmb3Ig
+YSB2ZXJ5IGxvb3NlIGRlZmluaXRpb24gb2YgImFwcHJvYWNoaW5nIiwgYW5kIGNlcnRhaW5seSBu
+b3QgYXQgdGhlDQo+IHNhbWUgdGltZS4gIEkgZG91YnQgdGhlcmUncyBhIHVzZSBjYXNlIGZvciB1
+c2luZyB0aGUgaGlnaGVzdCBjb21wcmVzc2lvbiBsZXZlbHMNCj4gaW4ga2VybmVsIG1vZGUgLS0t
+IGVzcGVjaWFsbHkgdGhlIG9uZXMgdXNpbmcgenN0ZF9vcHQuaC4NCj4gDQo+PiANCj4+IFRoZSBj
+b2RlIHdhcyBwb3J0ZWQgZnJvbSB0aGUgdXBzdHJlYW0genN0ZCBzb3VyY2UgcmVwb3NpdG9yeS4N
+Cj4gDQo+IFdoYXQgdmVyc2lvbj8NCg0KenN0ZC0xLjEuNCB3aXRoIHBhdGNoZXMgYXBwbGllZCBm
+cm9tIHVwc3RyZWFtLiBJJ2xsIGluY2x1ZGUgaXQgaW4gdGhlDQpuZXh0IHBhdGNoIHZlcnNpb24u
+DQoNCj4+IGBsaW51eC96c3RkLmhgIGhlYWRlciB3YXMgbW9kaWZpZWQgdG8gbWF0Y2ggbGludXgg
+a2VybmVsIHN0eWxlLg0KPj4gVGhlIGNyb3NzLXBsYXRmb3JtIGFuZCBhbGxvY2F0aW9uIGNvZGUg
+d2FzIHN0cmlwcGVkIG91dC4gSW5zdGVhZCB6c3RkDQo+PiByZXF1aXJlcyB0aGUgY2FsbGVyIHRv
+IHBhc3MgYSBwcmVhbGxvY2F0ZWQgd29ya3NwYWNlLiBUaGUgc291cmNlIGZpbGVzDQo+PiB3ZXJl
+IGNsYW5nLWZvcm1hdHRlZCBbMV0gdG8gbWF0Y2ggdGhlIExpbnV4IEtlcm5lbCBzdHlsZSBhcyBt
+dWNoIGFzDQo+PiBwb3NzaWJsZS4gDQo+IA0KPiBJdCB3b3VsZCBiZSBlYXNpZXIgdG8gY29tcGFy
+ZSB0byB0aGUgdXBzdHJlYW0gdmVyc2lvbiBpZiBpdCB3YXMgbm90IGFsbA0KPiByZWZvcm1hdHRl
+ZC4gIFRoZXJlIGlzIGEgY2hhbmNlIHRoYXQgYnVncyB3ZXJlIGludHJvZHVjZWQgYnkgTGludXgt
+c3BlY2lmaWMNCj4gY2hhbmdlcywgYW5kIGl0IHdvdWxkIGJlIG5pY2UgaWYgdGhleSBjb3VsZCBi
+ZSBlYXNpbHkgcmV2aWV3ZWQuICAoQWxzbyBJIGRvbid0DQo+IGtub3cgd2hhdCBjbGFuZy1mb3Jt
+YXQgc2V0dGluZ3MgeW91IHVzZWQsIGJ1dCB0aGVyZSBhcmUgc3RpbGwgYSBsb3Qgb2YNCj4gZGlm
+ZmVyZW5jZXMgZnJvbSB0aGUgTGludXggY29kaW5nIHN0eWxlLikNCg0KVGhlIGNsYW5nLWZvcm1h
+dCBzZXR0aW5ncyBJIHVzZWQgYXJlIGF2YWlsYWJsZSBpbiB0aGUgenN0ZCByZXBvIFsxXS4gSSBs
+ZWZ0DQp0aGUgbGluZSBsZW5ndGggbG9uZywgc2luY2UgaXQgbG9va2VkIHRlcnJpYmxlIG90aGVy
+d2lzZS5JIHNldCB1cCBhIGJyYW5jaA0KaW4gbXkgenN0ZCBHaXRIdWIgZm9yayBjYWxsZWQgIm9y
+aWdpbmFsLWZvcm1hdHRlZCIgWzJdLiBJJ3ZlIHRha2VuIHRoZSBzb3VyY2UNCkkgYmFzZWQgdGhl
+IGtlcm5lbCBwYXRjaGVzIG9mZiBvZiBbM10gYW5kIHJhbiBjbGFuZy1mb3JtYXQgd2l0aG91dCBh
+bnkgb3RoZXINCmNoYW5nZXMuIElmIHlvdSBoYXZlIGFueSBzdWdnZXN0aW9ucyB0byBpbXByb3Zl
+IHRoZSBjbGFuZy1mb3JtYXR0aW5nDQpwbGVhc2UgbGV0IG1lIGtub3cuDQoNCj4+IA0KPj4gSSBi
+ZW5jaG1hcmtlZCB6c3RkIGNvbXByZXNzaW9uIGFzIGEgc3BlY2lhbCBjaGFyYWN0ZXIgZGV2aWNl
+LiBJIHJhbiB6c3RkDQo+PiBhbmQgemxpYiBjb21wcmVzc2lvbiBhdCBzZXZlcmFsIGxldmVscywg
+YXMgd2VsbCBhcyBwZXJmb3JtaW5nIG5vDQo+PiBjb21wcmVzc2lvbiwgd2hpY2ggbWVhc3VyZSB0
+aGUgdGltZSBzcGVudCBjb3B5aW5nIHRoZSBkYXRhIHRvIGtlcm5lbCBzcGFjZS4NCj4+IERhdGEg
+aXMgcGFzc2VkIHRvIHRoZSBjb21wcmVzc2VyIDQwOTYgQiBhdCBhIHRpbWUuIFRoZSBiZW5jaG1h
+cmsgZmlsZSBpcw0KPj4gbG9jYXRlZCBpbiB0aGUgdXBzdHJlYW0genN0ZCBzb3VyY2UgcmVwb3Np
+dG9yeSB1bmRlcg0KPj4gYGNvbnRyaWIvbGludXgta2VybmVsL3pzdGRfY29tcHJlc3NfdGVzdC5j
+YCBbMl0uDQo+PiANCj4+IEkgcmFuIHRoZSBiZW5jaG1hcmtzIG9uIGEgVWJ1bnR1IDE0LjA0IFZN
+IHdpdGggMiBjb3JlcyBhbmQgNCBHaUIgb2YgUkFNLg0KPj4gVGhlIFZNIGlzIHJ1bm5pbmcgb24g
+YSBNYWNCb29rIFBybyB3aXRoIGEgMy4xIEdIeiBJbnRlbCBDb3JlIGk3IHByb2Nlc3NvciwNCj4+
+IDE2IEdCIG9mIFJBTSwgYW5kIGEgU1NELiBJIGJlbmNobWFya2VkIHVzaW5nIGBzaWxlc2lhLnRh
+cmAgWzNdLCB3aGljaCBpcw0KPj4gMjExLDk4OCw0ODAgQiBsYXJnZS4gUnVuIHRoZSBmb2xsb3dp
+bmcgY29tbWFuZHMgZm9yIHRoZSBiZW5jaG1hcms6DQo+PiANCj4+ICAgICBzdWRvIG1vZHByb2Jl
+IHpzdGRfY29tcHJlc3NfdGVzdA0KPj4gICAgIHN1ZG8gbWtub2QgenN0ZF9jb21wcmVzc190ZXN0
+IGMgMjQ1IDANCj4+ICAgICBzdWRvIGNwIHNpbGVzaWEudGFyIHpzdGRfY29tcHJlc3NfdGVzdA0K
+Pj4gDQo+PiBUaGUgdGltZSBpcyByZXBvcnRlZCBieSB0aGUgdGltZSBvZiB0aGUgdXNlcmxhbmQg
+YGNwYC4NCj4+IFRoZSBNQi9zIGlzIGNvbXB1dGVkIHdpdGgNCj4+IA0KPj4gICAgIDEsNTM2LDIx
+NywwMDggQiAvIHRpbWUoYnVmZmVyIHNpemUsIGhhc2gpDQo+PiANCj4+IHdoaWNoIGluY2x1ZGVz
+IHRoZSB0aW1lIHRvIGNvcHkgZnJvbSB1c2VybGFuZC4NCj4+IFRoZSBBZGp1c3RlZCBNQi9zIGlz
+IGNvbXB1dGVkIHdpdGgNCj4+IA0KPj4gICAgIDEsNTM2LDIxNywwODggQiAvICh0aW1lKGJ1ZmZl
+ciBzaXplLCBoYXNoKSAtIHRpbWUoYnVmZmVyIHNpemUsIG5vbmUpKS4NCj4+IA0KPj4gVGhlIG1l
+bW9yeSByZXBvcnRlZCBpcyB0aGUgYW1vdW50IG9mIG1lbW9yeSB0aGUgY29tcHJlc3NvciByZXF1
+ZXN0cy4NCj4+IA0KPj4gfCBNZXRob2QgICB8IFNpemUgKEIpIHwgVGltZSAocykgfCBSYXRpbyB8
+IE1CL3MgICAgfCBBZGogTUIvcyB8IE1lbSAoTUIpIHwNCj4+IHwtLS0tLS0tLS0tfC0tLS0tLS0t
+LS18LS0tLS0tLS0tLXwtLS0tLS0tfC0tLS0tLS0tLXwtLS0tLS0tLS0tfC0tLS0tLS0tLS18DQo+
+PiB8IG5vbmUgICAgIHwgMTE5ODg0ODAgfCAgICAwLjEwMCB8ICAgICAxIHwgMjExOS44OCB8ICAg
+ICAgICAtIHwgICAgICAgIC0gfA0KPj4gfCB6c3RkIC0xICB8IDczNjQ1NzYyIHwgICAgMS4wNDQg
+fCAyLjg3OCB8ICAyMDMuMDUgfCAgIDIyNC41NiB8ICAgICAxLjIzIHwNCj4+IHwgenN0ZCAtMyAg
+fCA2Njk4ODg3OCB8ICAgIDEuNzYxIHwgMy4xNjUgfCAgMTIwLjM4IHwgICAxMjcuNjMgfCAgICAg
+Mi40NyB8DQo+PiB8IHpzdGQgLTUgIHwgNjUwMDEyNTkgfCAgICAyLjU2MyB8IDMuMjYxIHwgICA4
+Mi43MSB8ICAgIDg2LjA3IHwgICAgIDIuODYgfA0KPj4gfCB6c3RkIC0xMCB8IDYwMTY1MzQ2IHwg
+ICAxMy4yNDIgfCAzLjUyMyB8ICAgMTYuMDEgfCAgICAxNi4xMyB8ICAgIDEzLjIyIHwNCj4+IHwg
+enN0ZCAtMTUgfCA1ODAwOTc1NiB8ICAgNDcuNjAxIHwgMy42NTQgfCAgICA0LjQ1IHwgICAgIDQu
+NDYgfCAgICAyMS42MSB8DQo+PiB8IHpzdGQgLTE5IHwgNTQwMTQ1OTMgfCAgMTAyLjgzNSB8IDMu
+OTI1IHwgICAgMi4wNiB8ICAgICAyLjA2IHwgICAgNjAuMTUgfA0KPj4gfCB6bGliIC0xICB8IDc3
+MjYwMDI2IHwgICAgMi44OTUgfCAyLjc0NCB8ICAgNzMuMjMgfCAgICA3NS44NSB8ICAgICAwLjI3
+IHwNCj4+IHwgemxpYiAtMyAgfCA3Mjk3MjIwNiB8ICAgIDQuMTE2IHwgMi45MDUgfCAgIDUxLjUw
+IHwgICAgNTIuNzkgfCAgICAgMC4yNyB8DQo+PiB8IHpsaWIgLTYgIHwgNjgxOTAzNjAgfCAgICA5
+LjYzMyB8IDMuMTA5IHwgICAyMi4wMSB8ICAgIDIyLjI0IHwgICAgIDAuMjcgfA0KPj4gfCB6bGli
+IC05ICB8IDY3NjEzMzgyIHwgICAyMi41NTQgfCAzLjEzNSB8ICAgIDkuNDAgfCAgICAgOS40NCB8
+ICAgICAwLjI3IHwNCj4+IA0KPiANCj4gVGhlc2VzIGJlbmNobWFya3MgYXJlIG1pc2xlYWRpbmcg
+YmVjYXVzZSB0aGV5IGNvbXByZXNzIHRoZSB3aG9sZSBmaWxlIGFzIGENCj4gc2luZ2xlIHN0cmVh
+bSB3aXRob3V0IHJlc2V0dGluZyB0aGUgZGljdGlvbmFyeSwgd2hpY2ggaXNuJ3QgaG93IGRhdGEg
+d2lsbA0KPiB0eXBpY2FsbHkgYmUgY29tcHJlc3NlZCBpbiBrZXJuZWwgbW9kZS4gIFdpdGggZmls
+ZXN5c3RlbSBjb21wcmVzc2lvbiB0aGUgZGF0YQ0KPiBoYXMgdG8gYmUgZGl2aWRlZCBpbnRvIHNt
+YWxsIGNodW5rcyB0aGF0IGNhbiBlYWNoIGJlIGRlY29tcHJlc3NlZCBpbmRlcGVuZGVudGx5Lg0K
+PiBUaGF0IGVsaW1pbmF0ZXMgb25lIG9mIHRoZSBwcmltYXJ5IGFkdmFudGFnZXMgb2YgWnN0YW5k
+YXJkIChzdXBwb3J0IGZvciBsYXJnZQ0KPiBkaWN0aW9uYXJ5IHNpemVzKS4NCg0KVGhpcyBiZW5j
+aG1hcmsgaXNuJ3QgbWVhbnQgdG8gYmUgcmVwcmVzZW50YXRpdmUgb2YgYSBmaWxlc3lzdGVtIHNj
+ZW5hcmlvLiBJDQp3YW50ZWQgdG8gc2hvdyBvZmYgenN0ZCB3aXRob3V0IGFueXRoaW5nIGVsc2Ug
+Z29pbmcgb24uIEV2ZW4gaW4gZmlsZXN5c3RlbXMNCndoZXJlIHRoZSBkYXRhIGlzIGNodW5rZWQs
+IHpzdGQgdXNlcyB0aGUgd2hvbGUgY2h1bmsgYXMgdGhlIHdpbmRvdyAoMTI4IEtCDQppbiBCdHJG
+UyBhbmQgU3F1YXNoRlMgYnkgZGVmYXVsdCksIHdoZXJlIHpsaWIgdXNlcyAzMiBLQi4gSSBoYXZl
+IGJlbmNobWFya3MNCmZvciBCdHJGUyBhbmQgU3F1YXNoRlMgaW4gdGhlaXIgcmVzcGVjdGl2ZSBw
+YXRjaGVzIFs0XVs1XSwgYW5kIEkndmUgY29waWVkDQp0aGUgQnRyRlMgdGFibGUgYmVsb3cgKHdo
+aWNoIHdhcyBydW4gd2l0aCAyIHRocmVhZHMpLg0KDQp8IE1ldGhvZCAgfCBSYXRpbyB8IENvbXBy
+ZXNzaW9uIE1CL3MgfCBEZWNvbXByZXNzaW9uIHNwZWVkIHwNCnwtLS0tLS0tLS18LS0tLS0tLXwt
+LS0tLS0tLS0tLS0tLS0tLS18LS0tLS0tLS0tLS0tLS0tLS0tLS0tfA0KfCBOb25lICAgIHwgIDAu
+OTkgfCAgICAgICAgICAgICAgNTA0IHwgICAgICAgICAgICAgICAgIDY4NiB8DQp8IGx6byAgICAg
+fCAgMS42NiB8ICAgICAgICAgICAgICAzOTggfCAgICAgICAgICAgICAgICAgNDQyIHwNCnwgemxp
+YiAgICB8ICAyLjU4IHwgICAgICAgICAgICAgICA2NSB8ICAgICAgICAgICAgICAgICAyNDEgfA0K
+fCB6c3RkIDEgIHwgIDIuNTcgfCAgICAgICAgICAgICAgMjYwIHwgICAgICAgICAgICAgICAgIDM4
+MyB8DQp8IHpzdGQgMyAgfCAgMi43MSB8ICAgICAgICAgICAgICAxNzQgfCAgICAgICAgICAgICAg
+ICAgNDA4IHwNCnwgenN0ZCA2ICB8ICAyLjg3IHwgICAgICAgICAgICAgICA3MCB8ICAgICAgICAg
+ICAgICAgICAzOTggfA0KfCB6c3RkIDkgIHwgIDIuOTIgfCAgICAgICAgICAgICAgIDQzIHwgICAg
+ICAgICAgICAgICAgIDQwNiB8DQp8IHpzdGQgMTIgfCAgMi45MyB8ICAgICAgICAgICAgICAgMjEg
+fCAgICAgICAgICAgICAgICAgNDA4IHwNCnwgenN0ZCAxNSB8ICAzLjAxIHwgICAgICAgICAgICAg
+ICAxMSB8ICAgICAgICAgICAgICAgICAzNTQgfA0KDQo+IA0KPiBFcmljDQo+IA0KDQpbMV0gaHR0
+cHM6Ly9naXRodWIuY29tL2ZhY2Vib29rL3pzdGQvYmxvYi9kZXYvY29udHJpYi9saW51eC1rZXJu
+ZWwvbGliL3pzdGQvLmNsYW5nLWZvcm1hdA0KWzJdIGh0dHBzOi8vZ2l0aHViLmNvbS90ZXJyZWxs
+bi96c3RkL3RyZWUvb3JpZ2luYWwtZm9ybWF0dGVkL2NvbnRyaWIvbGludXgta2VybmVsL29yaWdp
+bmFsLWZvcm1hdHRlZA0KWzNdIGh0dHBzOi8vZ2l0aHViLmNvbS9mYWNlYm9vay96c3RkL2NvbW1p
+dC9iMWM2YmI4NzAyMjQwNGRhNTZjYzMwMTVjODU0OTRjMGZmY2VjNTIwDQpbNF0gaHR0cHM6Ly9s
+a21sLmtlcm5lbC5vcmcvci8yMDE3MDgxMDAyMzkwMi4zMjMxMzI0LTEtdGVycmVsbG5AZmIuY29t
+DQpbNV0gaHR0cHM6Ly9sa21sLmtlcm5lbC5vcmcvci8yMDE3MDgxMDAyNDIzNi4zMjQzOTQxLTEt
+dGVycmVsbG5AZmIuY29tDQoNCg==
