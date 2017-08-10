@@ -1,44 +1,53 @@
-From: Lars Persson <lars.persson-VrBV9hrLPhE@public.gmane.org>
-Subject: Re: [PATCH v4 2/4] crypto: add crypto_(un)register_ahashes()
-Date: Thu, 10 Aug 2017 16:54:16 +0200
-Message-ID: <6d27d00b-cac9-d613-90ec-782815266b87@axis.com>
-References: <cover.1502368677.git.larper@axis.com>
- <01cfbf11707a9907d87c59fb47385c4178a08688.1502368677.git.larper@axis.com>
+From: "Austin S. Hemmelgarn" <ahferroin7@gmail.com>
+Subject: Re: [PATCH v5 2/5] lib: Add zstd modules
+Date: Thu, 10 Aug 2017 10:57:01 -0400
+Message-ID: <671b5ffb-0a8b-4e70-e3ac-9754cea54829@gmail.com>
+References: <20170810023553.3200875-1-terrelln@fb.com>
+ <20170810023553.3200875-3-terrelln@fb.com>
+ <20170810083017.GA10462@zzz.localdomain>
+ <ba64934b-0170-1718-fc1e-0acb462abb20@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: Rabin Vincent <rabinv-VrBV9hrLPhE@public.gmane.org>
-To: <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>, <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-        <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
-        <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <01cfbf11707a9907d87c59fb47385c4178a08688.1502368677.git.larper-VrBV9hrLPhE@public.gmane.org>
-Content-Language: sv
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, kernel-team@fb.com,
+        squashfs-devel@lists.sourceforge.net, linux-btrfs@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Eric Biggers <ebiggers3@gmail.com>, Nick Terrell <terrelln@fb.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <ba64934b-0170-1718-fc1e-0acb462abb20@gmail.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-
-
-On 08/10/2017 02:53 PM, Lars Persson wrote:
-> From: Rabin Vincent <rabinv-VrBV9hrLPhE@public.gmane.org>
+On 2017-08-10 07:32, Austin S. Hemmelgarn wrote:
+> On 2017-08-10 04:30, Eric Biggers wrote:
+>> On Wed, Aug 09, 2017 at 07:35:53PM -0700, Nick Terrell wrote:
+>>>
+>>> It can compress at speeds approaching lz4, and quality approaching lzma.
+>>
+>> Well, for a very loose definition of "approaching", and certainly not 
+>> at the
+>> same time.  I doubt there's a use case for using the highest 
+>> compression levels
+>> in kernel mode --- especially the ones using zstd_opt.h.
+> Large data-sets with WORM access patterns and infrequent writes 
+> immediately come to mind as a use case for the highest compression level.
 > 
-> There are already helpers to (un)register multiple normal
-> and AEAD algos.  Add one for ahashes too.
-> 
-> Signed-off-by: Lars Persson <larper-VrBV9hrLPhE@public.gmane.org>
-> Signed-off-by: Rabin Vincent <rabinv-VrBV9hrLPhE@public.gmane.org>
-> ---
-> v4: crypto_register_skciphers was used where crypto_unregister_skciphers
->      was intended.
->
-
-The v4 change comment above in fact belongs to patch 3/4 of this series. 
-Sorry for the confusion.
-
-BR,
-  Lars
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> As a more specific example, the company I work for has a very large 
+> amount of documentation, and we keep all old versions.  This is all 
+> stored on a file server which is currently using BTRFS.  Once a document 
+> is written, it's almost never rewritten, so write performance only 
+> matters for the first write.  However, they're read back pretty 
+> frequently, so we need good read performance.  As of right now, the 
+> system is set to use LZO compression by default, and then when a new 
+> document is added, the previous version of that document gets 
+> re-compressed using zlib compression, which actually results in pretty 
+> significant space savings most of the time.  I would absolutely love to 
+> use zstd compression with this system with the highest compression 
+> level, because most people don't care how long it takes to write the 
+> file out, but they do care how long it takes to read a file (even if 
+> it's an older version).
+Also didn't think to mention this, but I could see the max level being 
+very popular for use with SquashFS root filesystems used in LiveCD's. 
+Currently, they have to decide between read performance and image size, 
+while zstd would provide both.
