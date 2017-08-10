@@ -1,69 +1,106 @@
 From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: [PATCH] crypto: MPI - kunmap after finishing accessing buffer
-Date: Thu, 10 Aug 2017 08:06:18 +0200
-Message-ID: <3348160.hjCpAHFZrS@positron.chronox.de>
+Subject: [PATCH v8 2/4] crypto: AF_ALG -- add setpubkey setsockopt call
+Date: Thu, 10 Aug 2017 08:39:48 +0200
+Message-ID: <7259895.M4DYgURfM1@positron.chronox.de>
+References: <26359147.tCiuJ5s8mz@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
 Cc: linux-crypto@vger.kernel.org
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:58428 "EHLO mail.eperm.de"
+Received: from mail.eperm.de ([89.247.134.16]:58442 "EHLO mail.eperm.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750735AbdHJGGV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Aug 2017 02:06:21 -0400
+        id S1752120AbdHJGkr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 10 Aug 2017 02:40:47 -0400
+In-Reply-To: <26359147.tCiuJ5s8mz@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
-
-I found that issue while playing around with edge conditions in my
-algif_akcipher implementation. This issue only manifests in a
-segmentation violation on 32 bit machines and with an SGL where each
-SG points to one byte. SGLs with larger buffers seem to be not
-affected by this issue.
-
-Yet this access-after-unmap should be a candidate for stable, IMHO.
-
----8<---
-
-Using sg_miter_start and sg_miter_next, the buffer of an SG is kmap'ed
-to *buff. The current code calls sg_miter_stop (and thus kunmap) on the
-SG entry before the last access of *buff.
-
-The patch moves the sg_miter_stop call after the last access to *buff to
-ensure that the memory pointed to by *buff is still mapped.
+For supporting asymmetric ciphers, user space must be able to set the
+public key. The patch adds a new setsockopt call for setting the public
+key.
 
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- lib/mpi/mpicoder.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ crypto/af_alg.c             | 18 +++++++++++++-----
+ include/crypto/if_alg.h     |  1 +
+ include/uapi/linux/if_alg.h |  1 +
+ 3 files changed, 15 insertions(+), 5 deletions(-)
 
-diff --git a/lib/mpi/mpicoder.c b/lib/mpi/mpicoder.c
-index 5a0f75a3bf01..eead4b339466 100644
---- a/lib/mpi/mpicoder.c
-+++ b/lib/mpi/mpicoder.c
-@@ -364,11 +364,11 @@ MPI mpi_read_raw_from_sgl(struct scatterlist *sgl, unsigned int nbytes)
- 	}
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index a35a9f854a04..176921d7593a 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -203,13 +203,17 @@ static int alg_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
+ }
  
- 	miter.consumed = lzeros;
--	sg_miter_stop(&miter);
+ static int alg_setkey(struct sock *sk, char __user *ukey,
+-		      unsigned int keylen)
++		      unsigned int keylen,
++		      int (*setkey)(void *private, const u8 *key,
++				    unsigned int keylen))
+ {
+ 	struct alg_sock *ask = alg_sk(sk);
+-	const struct af_alg_type *type = ask->type;
+ 	u8 *key;
+ 	int err;
  
- 	nbytes -= lzeros;
- 	nbits = nbytes * 8;
- 	if (nbits > MAX_EXTERN_MPI_BITS) {
-+		sg_miter_stop(&miter);
- 		pr_info("MPI: mpi too large (%u bits)\n", nbits);
- 		return NULL;
- 	}
-@@ -376,6 +376,8 @@ MPI mpi_read_raw_from_sgl(struct scatterlist *sgl, unsigned int nbytes)
- 	if (nbytes > 0)
- 		nbits -= count_leading_zeros(*buff) - (BITS_PER_LONG - 8);
- 
-+	sg_miter_stop(&miter);
++	if (!setkey)
++		return -ENOPROTOOPT;
 +
- 	nlimbs = DIV_ROUND_UP(nbytes, BYTES_PER_MPI_LIMB);
- 	val = mpi_alloc(nlimbs);
- 	if (!val)
+ 	key = sock_kmalloc(sk, keylen, GFP_KERNEL);
+ 	if (!key)
+ 		return -ENOMEM;
+@@ -218,7 +222,7 @@ static int alg_setkey(struct sock *sk, char __user *ukey,
+ 	if (copy_from_user(key, ukey, keylen))
+ 		goto out;
+ 
+-	err = type->setkey(ask->private, key, keylen);
++	err = setkey(ask->private, key, keylen);
+ 
+ out:
+ 	sock_kzfree_s(sk, key, keylen);
+@@ -248,10 +252,14 @@ static int alg_setsockopt(struct socket *sock, int level, int optname,
+ 	case ALG_SET_KEY:
+ 		if (sock->state == SS_CONNECTED)
+ 			goto unlock;
+-		if (!type->setkey)
++
++		err = alg_setkey(sk, optval, optlen, type->setkey);
++		break;
++	case ALG_SET_PUBKEY:
++		if (sock->state == SS_CONNECTED)
+ 			goto unlock;
+ 
+-		err = alg_setkey(sk, optval, optlen);
++		err = alg_setkey(sk, optval, optlen, type->setpubkey);
+ 		break;
+ 	case ALG_SET_AEAD_AUTHSIZE:
+ 		if (sock->state == SS_CONNECTED)
+diff --git a/include/crypto/if_alg.h b/include/crypto/if_alg.h
+index 50a21488f3ba..d1de8ed3e77b 100644
+--- a/include/crypto/if_alg.h
++++ b/include/crypto/if_alg.h
+@@ -55,6 +55,7 @@ struct af_alg_type {
+ 	void *(*bind)(const char *name, u32 type, u32 mask);
+ 	void (*release)(void *private);
+ 	int (*setkey)(void *private, const u8 *key, unsigned int keylen);
++	int (*setpubkey)(void *private, const u8 *key, unsigned int keylen);
+ 	int (*accept)(void *private, struct sock *sk);
+ 	int (*accept_nokey)(void *private, struct sock *sk);
+ 	int (*setauthsize)(void *private, unsigned int authsize);
+diff --git a/include/uapi/linux/if_alg.h b/include/uapi/linux/if_alg.h
+index d81dcca5bdd7..02e61627e089 100644
+--- a/include/uapi/linux/if_alg.h
++++ b/include/uapi/linux/if_alg.h
+@@ -34,6 +34,7 @@ struct af_alg_iv {
+ #define ALG_SET_OP			3
+ #define ALG_SET_AEAD_ASSOCLEN		4
+ #define ALG_SET_AEAD_AUTHSIZE		5
++#define ALG_SET_PUBKEY			6
+ 
+ /* Operations */
+ #define ALG_OP_DECRYPT			0
 -- 
 2.13.4
