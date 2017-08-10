@@ -1,39 +1,62 @@
-From: Lars Persson <lars.persson@axis.com>
-Subject: [PATCH v4 4/4] MAINTAINERS: Add ARTPEC crypto maintainer
-Date: Thu, 10 Aug 2017 14:53:54 +0200
-Message-ID: <ea2baf287bd5d52ebe99246f93adae9a878a9edc.1502368677.git.larper@axis.com>
-References: <cover.1502368677.git.larper@axis.com>
-Cc: Lars Persson <larper@axis.com>
-To: herbert@gondor.apana.org.au, davem@davemloft.net,
-        robh+dt@kernel.org, mark.rutland@arm.com,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <cover.1502368677.git.larper@axis.com>
-In-Reply-To: <cover.1502368677.git.larper@axis.com>
-References: <cover.1502368677.git.larper@axis.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH v8 1/4] crypto: AF_ALG -- add sign/verify API
+Date: Thu, 10 Aug 2017 15:03:39 +0200
+Message-ID: <5164071.4MUeWmsg9v@tauon.chronox.de>
+References: <26359147.tCiuJ5s8mz@positron.chronox.de> <1701667.ajpEH4uy8Y@positron.chronox.de> <45021398-1ff4-77af-2fea-92a02b4a33c4@microchip.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
+To: Tudor Ambarus <tudor.ambarus@microchip.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:58466 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752729AbdHJNDl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 10 Aug 2017 09:03:41 -0400
+In-Reply-To: <45021398-1ff4-77af-2fea-92a02b4a33c4@microchip.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Assign the Axis kernel team as maintainer for crypto drivers under
-drivers/crypto/axis.
+Am Donnerstag, 10. August 2017, 14:49:39 CEST schrieb Tudor Ambarus:
 
-Signed-off-by: Lars Persson <larper@axis.com>
----
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
+Hi Tudor,
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index d5b6c71e783e..72186cf9820d 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1129,6 +1129,7 @@ L:	linux-arm-kernel@axis.com
- F:	arch/arm/mach-artpec
- F:	arch/arm/boot/dts/artpec6*
- F:	drivers/clk/axis
-+F:	drivers/crypto/axis
- F:	drivers/pinctrl/pinctrl-artpec*
- F:	Documentation/devicetree/bindings/pinctrl/axis,artpec6-pinctrl.txt
- 
--- 
-2.11.0
+thanks for reviewing
+
+> > 
+> > -		err = ctx->enc ? crypto_aead_encrypt(&areq->cra_u.aead_req) :
+> > -				 crypto_aead_decrypt(&areq->cra_u.aead_req);
+> > -	} else {
+> > +	} else
+> 
+> Unbalanced braces around else statement.
+
+Is there a style requirement for that? checkpatch.pl does not complain. I 
+thought that one liners in a conditional should not have braces?
+
+> > -	ctx->enc = 0;
+> > +	ctx->op = 0;
+> 
+> This implies decryption. Should we change the value of ALG_OP_DECRYPT?
+
+ALG_OP_DECRYPT is a user space interface, so we cannot change it.
+
+Do you see harm in leaving it as is? Note, I did not want to introduce 
+functional changes that have no bearing on the addition of the sign/verify 
+API. If you think this is problematic, I would like to add another patch that 
+is dedicated to fix this.
+
+> > -		err = ctx->enc ?
+> > -			crypto_skcipher_encrypt(&areq->cra_u.skcipher_req) :
+> > -			crypto_skcipher_decrypt(&areq->cra_u.skcipher_req);
+> > -	} else {
+> > +	} else
+> 
+> Unbalanced braces around else statement.
+
+Same as above.
+
+Thanks a lot!
+
+Ciao
+Stephan
