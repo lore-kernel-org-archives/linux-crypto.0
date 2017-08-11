@@ -1,68 +1,71 @@
-From: Chris Mason <clm@fb.com>
-Subject: Re: [PATCH v5 2/5] lib: Add zstd modules
-Date: Fri, 11 Aug 2017 09:20:10 -0400
-Message-ID: <6cd9c58a-1bcb-02c2-9329-c5acc0e79121@fb.com>
-References: <20170810023553.3200875-1-terrelln@fb.com>
- <20170810023553.3200875-3-terrelln@fb.com>
- <20170810083017.GA10462@zzz.localdomain>
- <0ceeccb4-1a0f-cacb-dd2b-2913e1cf73ab@fb.com>
- <20170810192506.GF7140@carfax.org.uk>
+From: Thomas Garnier <thgarnie@google.com>
+Subject: Re: x86: PIE support and option to extend KASLR randomization
+Date: Fri, 11 Aug 2017 08:09:04 -0700
+Message-ID: <CAJcbSZFTX3uiS2g8JriS6+z_+WrG8z3hrQo4OSuyHpiyUDJWYA@mail.gmail.com>
+References: <20170810172615.51965-1-thgarnie@google.com> <20170811124127.kkb5pnkljz4umxuj@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-To: Hugo Mills <hugo@carfax.org.uk>,
-        Eric Biggers <ebiggers3@gmail.com>,
-        Nick Terrell <terrelln@fb.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>, <kernel-team@fb.com>,
-        <squashfs-devel@lists.sourceforge.net>,
-        <linux-btrfs@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>
-Return-path: <linux-btrfs-owner@vger.kernel.org>
-In-Reply-To: <20170810192506.GF7140@carfax.org.uk>
-Content-Language: en-US
-Sender: linux-btrfs-owner@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>,
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>,
+	Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@redhat.com>,
+	Arnd Bergmann <arnd@arndb.de>, Matthias Kaehlcke <mka@chromium.org>,
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>, Juergen Gross <jgross@suse.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+	Joerg Roedel <joro@8bytes.org>, Tom Lendacky <thomas.lendacky@amd.com>,
+	Andy Lutomirski <luto@kernel.org>, Borislav Petkov <bp@suse.de>, Brian Gerst <brgerst@gmail.com>,
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, "Rafael J . Wysocki" <rjw@rjwysocki.net>,
+	Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>, Tejun Heo <tj@kernel.org>,
+	Christoph La
+To: Ingo Molnar <mingo@kernel.org>
+Return-path: <kernel-hardening-return-9339-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
+List-Post: <mailto:kernel-hardening@lists.openwall.com>
+List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
+List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
+List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
+In-Reply-To: <20170811124127.kkb5pnkljz4umxuj@gmail.com>
 List-Id: linux-crypto.vger.kernel.org
 
-
-
-On 08/10/2017 03:25 PM, Hugo Mills wrote:
-> On Thu, Aug 10, 2017 at 01:41:21PM -0400, Chris Mason wrote:
->> On 08/10/2017 04:30 AM, Eric Biggers wrote:
->>>
->>> Theses benchmarks are misleading because they compress the whole file as a
->>> single stream without resetting the dictionary, which isn't how data will
->>> typically be compressed in kernel mode.  With filesystem compression the data
->>> has to be divided into small chunks that can each be decompressed independently.
->>> That eliminates one of the primary advantages of Zstandard (support for large
->>> dictionary sizes).
+On Fri, Aug 11, 2017 at 5:41 AM, Ingo Molnar <mingo@kernel.org> wrote:
+>
+> * Thomas Garnier <thgarnie@google.com> wrote:
+>
+>> Changes:
+>>  - v2:
+>>    - Add support for global stack cookie while compiler default to fs without
+>>      mcmodel=kernel
+>>    - Change patch 7 to correctly jump out of the identity mapping on kexec load
+>>      preserve.
 >>
->> I did btrfs benchmarks of kernel trees and other normal data sets as
->> well.  The numbers were in line with what Nick is posting here.
->> zstd is a big win over both lzo and zlib from a btrfs point of view.
->>
->> It's true Nick's patches only support a single compression level in
->> btrfs, but that's because btrfs doesn't have a way to pass in the
->> compression ratio.  It could easily be a mount option, it was just
->> outside the scope of Nick's initial work.
-> 
->     Could we please not add more mount options? I get that they're easy
-> to implement, but it's a very blunt instrument. What we tend to see
-> (with both nodatacow and compress) is people using the mount options,
-> then asking for exceptions, discovering that they can't do that, and
-> then falling back to doing it with attributes or btrfs properties.
-> Could we just start with btrfs properties this time round, and cut out
-> the mount option part of this cycle.
-> 
->     In the long run, it'd be great to see most of the btrfs-specific
-> mount options get deprecated and ultimately removed entirely, in
-> favour of attributes/properties, where feasible.
-> 
+>> These patches make the changes necessary to build the kernel as Position
+>> Independent Executable (PIE) on x86_64. A PIE kernel can be relocated below
+>> the top 2G of the virtual address space. It allows to optionally extend the
+>> KASLR randomization range from 1G to 3G.
+>
+> So this:
+>
+>  61 files changed, 923 insertions(+), 299 deletions(-)
+>
+> ... is IMHO an _awful_ lot of churn and extra complexity in pretty fragile pieces
+> of code, to gain what appears to be only ~1.5 more bits of randomization!
 
-It's a good point, and as was commented later down I'd just do mount -o 
-compress=zstd:3 or something.
+The range increase is a way to use PIE right away.
 
-But I do prefer properties in general for this.  My big point was just 
-that next step is outside of Nick's scope.
+>
+> Do these changes get us closer to being able to build the kernel as truly position
+> independent, i.e. to place it anywhere in the valid x86-64 address space? Or any
+> other advantages?
 
--chris
+Yes, PIE allows us to put the kernel anywhere in memory. It will allow
+us to have a full randomized address space where position and order of
+sections are completely random. There is still some work to get there
+but being able to build a PIE kernel is a significant step.
 
+>
+> Thanks,
+>
+>         Ingo
+
+
+
+-- 
+Thomas
