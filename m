@@ -1,34 +1,68 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v8 4/4] crypto: algif_akcipher - enable compilation
-Date: Fri, 11 Aug 2017 15:03:15 +0200
-Message-ID: <2591729.zCCz3vkklE@tauon.chronox.de>
-References: <26359147.tCiuJ5s8mz@positron.chronox.de> <2936451.27GRxPPosH@positron.chronox.de> <1d8f2d85-2f6f-6beb-eec1-d2d980e2dbeb@microchip.com>
+From: Chris Mason <clm@fb.com>
+Subject: Re: [PATCH v5 2/5] lib: Add zstd modules
+Date: Fri, 11 Aug 2017 09:20:10 -0400
+Message-ID: <6cd9c58a-1bcb-02c2-9329-c5acc0e79121@fb.com>
+References: <20170810023553.3200875-1-terrelln@fb.com>
+ <20170810023553.3200875-3-terrelln@fb.com>
+ <20170810083017.GA10462@zzz.localdomain>
+ <0ceeccb4-1a0f-cacb-dd2b-2913e1cf73ab@fb.com>
+ <20170810192506.GF7140@carfax.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
-To: Tudor Ambarus <tudor.ambarus@microchip.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:58566 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752951AbdHKNDV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Aug 2017 09:03:21 -0400
-In-Reply-To: <1d8f2d85-2f6f-6beb-eec1-d2d980e2dbeb@microchip.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
-
-Am Freitag, 11. August 2017, 14:56:18 CEST schrieb Tudor Ambarus:
-
-Hi Tudor,
-
-> Any reason why you keep this patch separately?
-> I think you can squash this patch with patch 3/4.
-
-There is no real reason. If you think it makes sense to add it to patch 3, I 
-will do that.
-
-Thanks.
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+To: Hugo Mills <hugo@carfax.org.uk>,
+        Eric Biggers <ebiggers3@gmail.com>,
+        Nick Terrell <terrelln@fb.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>, <kernel-team@fb.com>,
+        <squashfs-devel@lists.sourceforge.net>,
+        <linux-btrfs@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>
+Return-path: <linux-btrfs-owner@vger.kernel.org>
+In-Reply-To: <20170810192506.GF7140@carfax.org.uk>
+Content-Language: en-US
+Sender: linux-btrfs-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 
-Ciao
-Stephan
+
+On 08/10/2017 03:25 PM, Hugo Mills wrote:
+> On Thu, Aug 10, 2017 at 01:41:21PM -0400, Chris Mason wrote:
+>> On 08/10/2017 04:30 AM, Eric Biggers wrote:
+>>>
+>>> Theses benchmarks are misleading because they compress the whole file as a
+>>> single stream without resetting the dictionary, which isn't how data will
+>>> typically be compressed in kernel mode.  With filesystem compression the data
+>>> has to be divided into small chunks that can each be decompressed independently.
+>>> That eliminates one of the primary advantages of Zstandard (support for large
+>>> dictionary sizes).
+>>
+>> I did btrfs benchmarks of kernel trees and other normal data sets as
+>> well.  The numbers were in line with what Nick is posting here.
+>> zstd is a big win over both lzo and zlib from a btrfs point of view.
+>>
+>> It's true Nick's patches only support a single compression level in
+>> btrfs, but that's because btrfs doesn't have a way to pass in the
+>> compression ratio.  It could easily be a mount option, it was just
+>> outside the scope of Nick's initial work.
+> 
+>     Could we please not add more mount options? I get that they're easy
+> to implement, but it's a very blunt instrument. What we tend to see
+> (with both nodatacow and compress) is people using the mount options,
+> then asking for exceptions, discovering that they can't do that, and
+> then falling back to doing it with attributes or btrfs properties.
+> Could we just start with btrfs properties this time round, and cut out
+> the mount option part of this cycle.
+> 
+>     In the long run, it'd be great to see most of the btrfs-specific
+> mount options get deprecated and ultimately removed entirely, in
+> favour of attributes/properties, where feasible.
+> 
+
+It's a good point, and as was commented later down I'd just do mount -o 
+compress=zstd:3 or something.
+
+But I do prefer properties in general for this.  My big point was just 
+that next step is outside of Nick's scope.
+
+-chris
+
