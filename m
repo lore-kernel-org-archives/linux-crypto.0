@@ -1,66 +1,600 @@
-From: Ingo Molnar <mingo@kernel.org>
-Subject: Re: x86: PIE support and option to extend KASLR randomization
-Date: Fri, 11 Aug 2017 14:41:27 +0200
-Message-ID: <20170811124127.kkb5pnkljz4umxuj@gmail.com>
-References: <20170810172615.51965-1-thgarnie@google.com>
+From: Tudor Ambarus <tudor.ambarus@microchip.com>
+Subject: Re: [PATCH v8 3/4] crypto: AF_ALG -- add asymmetric cipher
+Date: Fri, 11 Aug 2017 15:51:10 +0300
+Message-ID: <8450990a-61bb-0f7c-70dd-643a45220d3f@microchip.com>
+References: <26359147.tCiuJ5s8mz@positron.chronox.de>
+ <2379311.RoATi6cCiZ@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Josh Poimboeuf <jpoimboe@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
-	Matthias Kaehlcke <mka@chromium.org>,
-	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-	Juergen Gross <jgross@suse.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-	Joerg Roedel <joro@8bytes.org>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Andy Lutomirski <luto@kernel.org>, Borislav Petkov <bp@suse.de>,
-	Brian Gerst <brgerst@gmail.com>,
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-	"Rafael J . Wysocki" <rjw@rjwysocki.net>,
-	Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
-	Tejun Heo <tj@kernel.org>, Christoph Lamete
-To: Thomas Garnier <thgarnie@google.com>
-Return-path: <kernel-hardening-return-9338-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
-List-Post: <mailto:kernel-hardening@lists.openwall.com>
-List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
-List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
-List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
-Sender: Ingo Molnar <mingo.kernel.org@gmail.com>
-Content-Disposition: inline
-In-Reply-To: <20170810172615.51965-1-thgarnie@google.com>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Cc: <linux-crypto@vger.kernel.org>
+To: =?UTF-8?Q?Stephan_M=c3=bcller?= <smueller@chronox.de>,
+        <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from esa4.microchip.iphmx.com ([68.232.154.123]:31413 "EHLO
+        esa4.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753086AbdHKMv3 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 11 Aug 2017 08:51:29 -0400
+In-Reply-To: <2379311.RoATi6cCiZ@positron.chronox.de>
+Content-Language: en-US
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
+Hi, Stephan,
 
-* Thomas Garnier <thgarnie@google.com> wrote:
-
-> Changes:
->  - v2:
->    - Add support for global stack cookie while compiler default to fs without
->      mcmodel=kernel
->    - Change patch 7 to correctly jump out of the identity mapping on kexec load
->      preserve.
+On 08/10/2017 09:40 AM, Stephan Müller wrote:
+> This patch adds the user space interface for asymmetric ciphers. The
+> interface allows the use of sendmsg as well as vmsplice to provide data.
 > 
-> These patches make the changes necessary to build the kernel as Position
-> Independent Executable (PIE) on x86_64. A PIE kernel can be relocated below
-> the top 2G of the virtual address space. It allows to optionally extend the
-> KASLR randomization range from 1G to 3G.
+> The akcipher interface implementation uses the common AF_ALG interface
+> code regarding TX and RX SGL handling.
+> 
+> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+> ---
+>   crypto/algif_akcipher.c | 466 ++++++++++++++++++++++++++++++++++++++++++++++++
+>   include/crypto/if_alg.h |   2 +
+>   2 files changed, 468 insertions(+)
+>   create mode 100644 crypto/algif_akcipher.c
+> 
+> diff --git a/crypto/algif_akcipher.c b/crypto/algif_akcipher.c
+> new file mode 100644
+> index 000000000000..1b36eb0b6e8f
+> --- /dev/null
+> +++ b/crypto/algif_akcipher.c
+> @@ -0,0 +1,466 @@
+> +/*
+> + * algif_akcipher: User-space interface for asymmetric cipher algorithms
+> + *
+> + * Copyright (C) 2017, Stephan Mueller <smueller@chronox.de>
+> + *
+> + * This file provides the user-space API for asymmetric ciphers.
+> + *
+> + * This program is free software; you can redistribute it and/or modify it
+> + * under the terms of the GNU General Public License as published by the Free
+> + * Software Foundation; either version 2 of the License, or (at your option)
+> + * any later version.
+> + *
+> + * The following concept of the memory management is used:
+> + *
+> + * The kernel maintains two SGLs, the TX SGL and the RX SGL. The TX SGL is
+> + * filled by user space with the data submitted via sendpage/sendmsg. Filling
+> + * up the TX SGL does not cause a crypto operation -- the data will only be
+> + * tracked by the kernel. Upon receipt of one recvmsg call, the caller must
+> + * provide a buffer which is tracked with the RX SGL.
+> + *
+> + * During the processing of the recvmsg operation, the cipher request is
+> + * allocated and prepared. As part of the recvmsg operation, the processed
+> + * TX buffers are extracted from the TX SGL into a separate SGL.
+> + *
+> + * After the completion of the crypto operation, the RX SGL and the cipher
+> + * request is released. The extracted TX SGL parts are released together with
+> + * the RX SGL release.
+> + */
+> +
+> +#include <crypto/akcipher.h>
+> +#include <crypto/scatterwalk.h>
+> +#include <crypto/if_alg.h>
+> +#include <linux/init.h>
+> +#include <linux/list.h>
+> +#include <linux/kernel.h>
+> +#include <linux/mm.h>
+> +#include <linux/module.h>
+> +#include <linux/net.h>
+> +#include <net/sock.h>
 
-So this:
+I like that you ordered these alphabetically. Is there a reason why
+crypto/scatterwalk.h is not after crypto/if_alg.h?
 
- 61 files changed, 923 insertions(+), 299 deletions(-)
+> +
+> +struct akcipher_tfm {
+> +	struct crypto_akcipher *akcipher;
+> +	bool has_key;
+> +};
+> +
+> +static int akcipher_sendmsg(struct socket *sock, struct msghdr *msg,
+> +			    size_t size)
+> +{
+> +	return af_alg_sendmsg(sock, msg, size, 0);
+> +}
+> +
+> +static int _akcipher_recvmsg(struct socket *sock, struct msghdr *msg,
+> +			     size_t ignored, int flags)
+> +{
+> +	struct sock *sk = sock->sk;
+> +	struct alg_sock *ask = alg_sk(sk);
+> +	struct sock *psk = ask->parent;
+> +	struct alg_sock *pask = alg_sk(psk);
+> +	struct af_alg_ctx *ctx = ask->private;
+> +	struct akcipher_tfm *akc = pask->private;
+> +	struct crypto_akcipher *tfm = akc->akcipher;
+> +	struct af_alg_async_req *areq;
+> +	int err = 0;
 
-... is IMHO an _awful_ lot of churn and extra complexity in pretty fragile pieces 
-of code, to gain what appears to be only ~1.5 more bits of randomization!
+initialization not needed.
 
-Do these changes get us closer to being able to build the kernel as truly position 
-independent, i.e. to place it anywhere in the valid x86-64 address space? Or any 
-other advantages?
+> +	int maxsize;
+> +	size_t len = 0;
 
-Thanks,
+initialization not needed. len will be initialized in af_alg_get_rsgl.
 
-	Ingo
+Also, size_t could be 32 or 64 bit wide. Could you declare the size_t
+variables before the int ones? This will avoid stack padding on 64bit
+systems if one adds a new int variable in the same place where the ints
+are now.
+
+> +	size_t used = 0;
+
+initialization to zero not needed. You can directly initialize to
+ctx->used or don't initialize at all.
+
+> +
+> +	maxsize = crypto_akcipher_maxsize(tfm);
+> +	if (maxsize < 0)
+> +		return maxsize;
+> +
+> +	/* Allocate cipher request for current operation. */
+> +	areq = af_alg_alloc_areq(sk, sizeof(struct af_alg_async_req) +
+> +				     crypto_akcipher_reqsize(tfm));
+> +	if (IS_ERR(areq))
+> +		return PTR_ERR(areq);
+> +
+> +	/* convert iovecs of output buffers into RX SGL */
+> +	err = af_alg_get_rsgl(sk, msg, flags, areq, maxsize, &len);
+> +	if (err)
+> +		goto free;
+> +
+> +	/* ensure output buffer is sufficiently large */
+> +	if (len < maxsize) {
+> +		err = -EMSGSIZE;
+> +		goto free;
+> +	}
+> +
+> +	/*
+> +	 * Create a per request TX SGL for this request which tracks the
+> +	 * SG entries from the global TX SGL.
+> +	 */
+> +	used = ctx->used;
+> +	areq->tsgl_entries = af_alg_count_tsgl(sk, used, 0);
+> +	if (!areq->tsgl_entries)
+> +		areq->tsgl_entries = 1;
+> +	areq->tsgl = sock_kmalloc(sk, sizeof(*areq->tsgl) * areq->tsgl_entries,
+> +				  GFP_KERNEL);
+> +	if (!areq->tsgl) {
+> +		err = -ENOMEM;
+> +		goto free;
+> +	}
+> +	sg_init_table(areq->tsgl, areq->tsgl_entries);
+> +	af_alg_pull_tsgl(sk, used, areq->tsgl, 0);
+> +
+> +	/* Initialize the crypto operation */
+> +	akcipher_request_set_tfm(&areq->cra_u.akcipher_req, tfm);
+> +	akcipher_request_set_crypt(&areq->cra_u.akcipher_req, areq->tsgl,
+> +				   areq->first_rsgl.sgl.sg, used, len);
+> +
+> +	if (msg->msg_iocb && !is_sync_kiocb(msg->msg_iocb)) {
+> +		/* AIO operation */
+> +		areq->iocb = msg->msg_iocb;
+> +		akcipher_request_set_callback(&areq->cra_u.akcipher_req,
+> +					      CRYPTO_TFM_REQ_MAY_SLEEP,
+> +					      af_alg_async_cb, areq);
+> +	} else
+
+Unbalanced braces around else statement.
+
+> +		/* Synchronous operation */
+> +		akcipher_request_set_callback(&areq->cra_u.akcipher_req,
+> +					      CRYPTO_TFM_REQ_MAY_SLEEP |
+> +					      CRYPTO_TFM_REQ_MAY_BACKLOG,
+> +					      af_alg_complete,
+> +					      &ctx->completion);
+> +
+> +	switch (ctx->op) {
+> +	case ALG_OP_ENCRYPT:
+> +		err = crypto_akcipher_encrypt(&areq->cra_u.akcipher_req);
+> +		break;
+> +	case ALG_OP_DECRYPT:
+> +		err = crypto_akcipher_decrypt(&areq->cra_u.akcipher_req);
+> +		break;
+> +	case ALG_OP_SIGN:
+> +		err = crypto_akcipher_sign(&areq->cra_u.akcipher_req);
+> +		break;
+> +	case ALG_OP_VERIFY:
+> +		err = crypto_akcipher_verify(&areq->cra_u.akcipher_req);
+> +		break;
+> +	default:
+> +		err = -EOPNOTSUPP;
+> +		goto free;
+> +	}
+> +
+> +	/* Wait for synchronous operation completion */
+> +	if (msg->msg_iocb && !is_sync_kiocb(msg->msg_iocb))
+> +		err = af_alg_wait_for_completion(err, &ctx->completion);
+> +
+> +	/* AIO operation in progress */
+> +	if (err == -EINPROGRESS) {
+> +		sock_hold(sk);
+> +
+> +		/* Remember output size that will be generated. */
+> +		areq->outlen = areq->cra_u.akcipher_req.dst_len;
+
+don't you have the dst_len value in len variable?
+
+> +
+> +		return -EIOCBQUEUED;
+> +	}
+> +
+> +free:
+> +	af_alg_free_areq_sgls(areq);
+> +	sock_kfree_s(sk, areq, areq->areqlen);
+> +
+> +	return err ? err : areq->cra_u.akcipher_req.dst_len;
+> +}
+> +
+> +static int akcipher_recvmsg(struct socket *sock, struct msghdr *msg,
+> +			    size_t ignored, int flags)
+> +{
+> +	struct sock *sk = sock->sk;
+> +	struct alg_sock *ask = alg_sk(sk);
+> +	struct sock *psk = ask->parent;
+> +	struct alg_sock *pask = alg_sk(psk);
+> +	struct akcipher_tfm *akc = pask->private;
+> +	struct crypto_akcipher *tfm = akc->akcipher;
+> +
+
+blank line
+
+> +	int ret = 0;
+> +
+> +	lock_sock(sk);
+> +
+> +	while (msg_data_left(msg)) {
+> +		int err = _akcipher_recvmsg(sock, msg, ignored, flags);
+
+If the compiler will not make any optimization, you will end up in
+allocating an int on the stack for each iteration.
+
+> +
+> +		/*
+> +		 * This error covers -EIOCBQUEUED which implies that we can
+> +		 * only handle one AIO request. If the caller wants to have
+> +		 * multiple AIO requests in parallel, he must make multiple
+> +		 * separate AIO calls.
+> +		 */
+> +		if (err <= 0) {
+
+why the equal?
+
+> +			if (err == -EIOCBQUEUED || err == -EBADMSG || !ret)
+> +				ret = err;
+> +			goto out;
+> +		}
+> +
+> +		ret += err;
+> +
+> +		/*
+> +		 * The caller must provide crypto_akcipher_maxsize per request.
+> +		 * If he provides more, we conclude that multiple akcipher
+> +		 * operations are requested.
+> +		 */
+> +		iov_iter_advance(&msg->msg_iter,
+> +				 crypto_akcipher_maxsize(tfm) - err);
+> +	}
+> +
+> +out:
+> +	af_alg_wmem_wakeup(sk);
+> +	release_sock(sk);
+> +	return ret;
+> +}
+> +
+> +static struct proto_ops algif_akcipher_ops = {
+
+static const struct?
+
+> +	.family		=	PF_ALG,
+> +
+> +	.connect	=	sock_no_connect,
+> +	.socketpair	=	sock_no_socketpair,
+> +	.getname	=	sock_no_getname,
+> +	.ioctl		=	sock_no_ioctl,
+> +	.listen		=	sock_no_listen,
+> +	.shutdown	=	sock_no_shutdown,
+> +	.getsockopt	=	sock_no_getsockopt,
+> +	.mmap		=	sock_no_mmap,
+> +	.bind		=	sock_no_bind,
+> +	.accept		=	sock_no_accept,
+> +	.setsockopt	=	sock_no_setsockopt,
+> +
+> +	.release	=	af_alg_release,
+> +	.sendmsg	=	akcipher_sendmsg,
+> +	.sendpage	=	af_alg_sendpage,
+> +	.recvmsg	=	akcipher_recvmsg,
+> +	.poll		=	af_alg_poll,
+> +};
+> +
+> +static int akcipher_check_key(struct socket *sock)
+> +{
+> +	int err = 0;
+
+initialization not needed.
+You can avoid stack padding on 64bit systems if you move the int after
+pointers.
+
+> +	struct sock *psk;
+> +	struct alg_sock *pask;
+> +	struct akcipher_tfm *tfm;
+> +	struct sock *sk = sock->sk;
+> +	struct alg_sock *ask = alg_sk(sk);
+> +
+> +	lock_sock(sk);
+> +	if (ask->refcnt)
+> +		goto unlock_child;
+> +
+> +	psk = ask->parent;
+> +	pask = alg_sk(ask->parent);
+> +	tfm = pask->private;
+> +
+> +	err = -ENOKEY;
+
+see https://rusty.ozlabs.org/?p=232
+
+> +	lock_sock_nested(psk, SINGLE_DEPTH_NESTING);
+> +	if (!tfm->has_key)
+> +		goto unlock;
+> +
+> +	if (!pask->refcnt++)
+> +		sock_hold(psk);
+> +
+> +	ask->refcnt = 1;
+> +	sock_put(psk);
+> +
+> +	err = 0;
+> +
+> +unlock:
+> +	release_sock(psk);
+> +unlock_child:
+> +	release_sock(sk);
+> +
+> +	return err;
+> +}
+> +
+> +static int akcipher_sendmsg_nokey(struct socket *sock, struct msghdr *msg,
+> +				  size_t size)
+> +{
+> +	int err;
+> +
+> +	err = akcipher_check_key(sock);
+> +	if (err)
+> +		return err;
+> +
+> +	return akcipher_sendmsg(sock, msg, size);
+> +}
+> +
+> +static ssize_t akcipher_sendpage_nokey(struct socket *sock, struct page *page,
+> +				       int offset, size_t size, int flags)
+> +{
+> +	int err;
+> +
+> +	err = akcipher_check_key(sock);
+> +	if (err)
+> +		return err;
+> +
+> +	return af_alg_sendpage(sock, page, offset, size, flags);
+> +}
+> +
+> +static int akcipher_recvmsg_nokey(struct socket *sock, struct msghdr *msg,
+> +				  size_t ignored, int flags)
+> +{
+> +	int err;
+> +
+> +	err = akcipher_check_key(sock);
+> +	if (err)
+> +		return err;
+> +
+> +	return akcipher_recvmsg(sock, msg, ignored, flags);
+> +}
+> +
+> +static struct proto_ops algif_akcipher_ops_nokey = {
+
+static const struct?
+
+> +	.family		=	PF_ALG,
+> +
+> +	.connect	=	sock_no_connect,
+> +	.socketpair	=	sock_no_socketpair,
+> +	.getname	=	sock_no_getname,
+> +	.ioctl		=	sock_no_ioctl,
+> +	.listen		=	sock_no_listen,
+> +	.shutdown	=	sock_no_shutdown,
+> +	.getsockopt	=	sock_no_getsockopt,
+> +	.mmap		=	sock_no_mmap,
+> +	.bind		=	sock_no_bind,
+> +	.accept		=	sock_no_accept,
+> +	.setsockopt	=	sock_no_setsockopt,
+> +
+> +	.release	=	af_alg_release,
+> +	.sendmsg	=	akcipher_sendmsg_nokey,
+> +	.sendpage	=	akcipher_sendpage_nokey,
+> +	.recvmsg	=	akcipher_recvmsg_nokey,
+> +	.poll		=	af_alg_poll,
+> +};
+> +
+> +static void *akcipher_bind(const char *name, u32 type, u32 mask)
+> +{
+> +	struct akcipher_tfm *tfm;
+> +	struct crypto_akcipher *akcipher;
+> +
+> +	tfm = kzalloc(sizeof(*tfm), GFP_KERNEL);
+> +	if (!tfm)
+> +		return ERR_PTR(-ENOMEM);
+> +
+> +	akcipher = crypto_alloc_akcipher(name, type, mask);
+> +	if (IS_ERR(akcipher)) {
+> +		kfree(tfm);
+> +		return ERR_CAST(akcipher);
+> +	}
+> +
+> +	tfm->akcipher = akcipher;
+
+tfm->akcipher was initialized to zero and now you overwrite it.
+Maybe it's better to use kmalloc and tfm->has_key = false so you
+can get rid of the superfluous initialization.
+
+> +
+> +	return tfm;
+> +}
+> +
+> +static void akcipher_release(void *private)
+> +{
+> +	struct akcipher_tfm *tfm = private;
+> +	struct crypto_akcipher *akcipher = tfm->akcipher;
+> +
+> +	crypto_free_akcipher(akcipher);
+> +	kfree(tfm);
+> +}
+> +
+> +static int akcipher_setprivkey(void *private, const u8 *key,
+> +			       unsigned int keylen)
+> +{
+> +	struct akcipher_tfm *tfm = private;
+> +	struct crypto_akcipher *akcipher = tfm->akcipher;
+> +	int err;
+> +
+> +	err = crypto_akcipher_set_priv_key(akcipher, key, keylen);
+> +	tfm->has_key = !err;
+> +
+> +	/* Return the maximum size of the akcipher operation. */
+> +	if (!err)
+> +		err = crypto_akcipher_maxsize(akcipher);
+
+crypto subsystem returns zero when setkey is successful and introduces
+a new function for determining the maxsize. Should we comply with that?
+
+> +
+> +	return err;
+> +}
+> +
+> +static int akcipher_setpubkey(void *private, const u8 *key, unsigned int keylen)
+> +{
+> +	struct akcipher_tfm *tfm = private;
+> +	struct crypto_akcipher *akcipher = tfm->akcipher;
+> +	int err;
+> +
+> +	err = crypto_akcipher_set_pub_key(akcipher, key, keylen);
+> +	tfm->has_key = !err;
+> +
+> +	/* Return the maximum size of the akcipher operation. */
+> +	if (!err)
+> +		err = crypto_akcipher_maxsize(akcipher);
+> +
+> +	return err;
+> +}
+> +
+> +static void akcipher_sock_destruct(struct sock *sk)
+> +{
+> +	struct alg_sock *ask = alg_sk(sk);
+> +	struct af_alg_ctx *ctx = ask->private;
+> +
+> +	af_alg_pull_tsgl(sk, ctx->used, NULL, 0);
+> +	sock_kfree_s(sk, ctx, ctx->len);
+> +	af_alg_release_parent(sk);
+> +}
+> +
+> +static int akcipher_accept_parent_nokey(void *private, struct sock *sk)
+> +{
+> +	struct af_alg_ctx *ctx;
+> +	struct alg_sock *ask = alg_sk(sk);
+> +	unsigned int len = sizeof(*ctx);
+> +
+> +	ctx = sock_kmalloc(sk, len, GFP_KERNEL);
+> +	if (!ctx)
+> +		return -ENOMEM;
+> +	memset(ctx, 0, len);
+
+do you really need the memset? you can initialize the members that you
+will use as you did below.
+
+> +
+> +	INIT_LIST_HEAD(&ctx->tsgl_list);
+> +	ctx->len = len;
+> +	ctx->used = 0;
+> +	ctx->rcvused = 0;
+> +	ctx->more = 0;
+> +	ctx->merge = 0;
+> +	ctx->op = 0;
+> +	af_alg_init_completion(&ctx->completion);
+> +
+> +	ask->private = ctx;
+> +
+> +	sk->sk_destruct = akcipher_sock_destruct;
+> +
+> +	return 0;
+> +}
+> +
+> +static int akcipher_accept_parent(void *private, struct sock *sk)
+> +{
+> +	struct akcipher_tfm *tfm = private;
+> +
+> +	if (!tfm->has_key)
+> +		return -ENOKEY;
+> +
+> +	return akcipher_accept_parent_nokey(private, sk);
+> +}
+> +
+> +static const struct af_alg_type algif_type_akcipher = {
+> +	.bind		=	akcipher_bind,
+> +	.release	=	akcipher_release,
+> +	.setkey		=	akcipher_setprivkey,
+> +	.setpubkey	=	akcipher_setpubkey,
+> +	.setauthsize	=	NULL,
+> +	.accept		=	akcipher_accept_parent,
+> +	.accept_nokey	=	akcipher_accept_parent_nokey,
+> +	.ops		=	&algif_akcipher_ops,
+> +	.ops_nokey	=	&algif_akcipher_ops_nokey,
+> +	.name		=	"akcipher",
+> +	.owner		=	THIS_MODULE
+> +};
+> +
+> +static int __init algif_akcipher_init(void)
+> +{
+> +	return af_alg_register_type(&algif_type_akcipher);
+> +}
+> +
+> +static void __exit algif_akcipher_exit(void)
+> +{
+> +	int err = af_alg_unregister_type(&algif_type_akcipher);
+
+checkpatch suggests to insert a blank line after declaration.
+
+Cheers,
+ta
+
+> +	BUG_ON(err);
+> +}
+> +
+> +module_init(algif_akcipher_init);
+> +module_exit(algif_akcipher_exit);
+> +MODULE_LICENSE("GPL");
+> +MODULE_AUTHOR("Stephan Mueller <smueller@chronox.de>");
+> +MODULE_DESCRIPTION("Asymmetric kernel crypto API user space interface");
+> diff --git a/include/crypto/if_alg.h b/include/crypto/if_alg.h
+> index d1de8ed3e77b..a2b396756e24 100644
+> --- a/include/crypto/if_alg.h
+> +++ b/include/crypto/if_alg.h
+> @@ -22,6 +22,7 @@
+>   
+>   #include <crypto/aead.h>
+>   #include <crypto/skcipher.h>
+> +#include <crypto/akcipher.h>
+>   
+>   #define ALG_MAX_PAGES			16
+>   
+> @@ -119,6 +120,7 @@ struct af_alg_async_req {
+>   	union {
+>   		struct aead_request aead_req;
+>   		struct skcipher_request skcipher_req;
+> +		struct akcipher_request akcipher_req;
+>   	} cra_u;
+>   
+>   	/* req ctx trails this struct */
+> 
