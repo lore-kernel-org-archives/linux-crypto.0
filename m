@@ -1,8 +1,9 @@
 From: Thomas Garnier <thgarnie@google.com>
-Subject: Re: x86: PIE support and option to extend KASLR randomization
-Date: Fri, 11 Aug 2017 08:09:04 -0700
-Message-ID: <CAJcbSZFTX3uiS2g8JriS6+z_+WrG8z3hrQo4OSuyHpiyUDJWYA@mail.gmail.com>
-References: <20170810172615.51965-1-thgarnie@google.com> <20170811124127.kkb5pnkljz4umxuj@gmail.com>
+Subject: Re: [RFC v2 13/23] x86/power/64: Adapt assembly for PIE support
+Date: Fri, 11 Aug 2017 08:09:41 -0700
+Message-ID: <CAJcbSZEiuMQ9+VOFywyRhs4sEZs9AHSzYqpg1yDZFxQ8vvgcWw@mail.gmail.com>
+References: <20170810172615.51965-1-thgarnie@google.com> <20170810172615.51965-14-thgarnie@google.com>
+ <20170811123618.GC16126@amd>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>,
@@ -14,56 +15,56 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemlof
 	Joerg Roedel <joro@8bytes.org>, Tom Lendacky <thomas.lendacky@amd.com>,
 	Andy Lutomirski <luto@kernel.org>, Borislav Petkov <bp@suse.de>, Brian Gerst <brgerst@gmail.com>,
 	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, "Rafael J . Wysocki" <rjw@rjwysocki.net>,
-	Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>, Tejun Heo <tj@kernel.org>,
-	Christoph La
-To: Ingo Molnar <mingo@kernel.org>
-Return-path: <kernel-hardening-return-9339-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
+	Len Brown <len.brown@intel.com>, Tejun Heo <tj@kernel.org>, Christoph Lameter <cl@linux.com>,
+	Paul Go
+To: Pavel Machek <pavel@ucw.cz>
+Return-path: <kernel-hardening-return-9340-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
 List-Post: <mailto:kernel-hardening@lists.openwall.com>
 List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
 List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
 List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
-In-Reply-To: <20170811124127.kkb5pnkljz4umxuj@gmail.com>
+In-Reply-To: <20170811123618.GC16126@amd>
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Aug 11, 2017 at 5:41 AM, Ingo Molnar <mingo@kernel.org> wrote:
->
-> * Thomas Garnier <thgarnie@google.com> wrote:
->
->> Changes:
->>  - v2:
->>    - Add support for global stack cookie while compiler default to fs without
->>      mcmodel=kernel
->>    - Change patch 7 to correctly jump out of the identity mapping on kexec load
->>      preserve.
+On Fri, Aug 11, 2017 at 5:36 AM, Pavel Machek <pavel@ucw.cz> wrote:
+> On Thu 2017-08-10 10:26:05, Thomas Garnier wrote:
+>> Change the assembly code to use only relative references of symbols for the
+>> kernel to be PIE compatible.
 >>
->> These patches make the changes necessary to build the kernel as Position
->> Independent Executable (PIE) on x86_64. A PIE kernel can be relocated below
->> the top 2G of the virtual address space. It allows to optionally extend the
->> KASLR randomization range from 1G to 3G.
+>> Position Independent Executable (PIE) support will allow to extended the
+>> KASLR randomization range below the -2G memory limit.
+>>
+>> Signed-off-by: Thomas Garnier <thgarnie@google.com>
 >
-> So this:
->
->  61 files changed, 923 insertions(+), 299 deletions(-)
->
-> ... is IMHO an _awful_ lot of churn and extra complexity in pretty fragile pieces
-> of code, to gain what appears to be only ~1.5 more bits of randomization!
+> Acked-by: Pavel Machek <pavel@ucw.cz>
 
-The range increase is a way to use PIE right away.
+Thanks Pavel!
 
 >
-> Do these changes get us closer to being able to build the kernel as truly position
-> independent, i.e. to place it anywhere in the valid x86-64 address space? Or any
-> other advantages?
-
-Yes, PIE allows us to put the kernel anywhere in memory. It will allow
-us to have a full randomized address space where position and order of
-sections are completely random. There is still some work to get there
-but being able to build a PIE kernel is a significant step.
-
+>> --- a/arch/x86/power/hibernate_asm_64.S
+>> +++ b/arch/x86/power/hibernate_asm_64.S
+>> @@ -24,7 +24,7 @@
+>>  #include <asm/frame.h>
+>>
+>>  ENTRY(swsusp_arch_suspend)
+>> -     movq    $saved_context, %rax
+>> +     leaq    saved_context(%rip), %rax
+>>       movq    %rsp, pt_regs_sp(%rax)
+>>       movq    %rbp, pt_regs_bp(%rax)
+>>       movq    %rsi, pt_regs_si(%rax)
+>> @@ -115,7 +115,7 @@ ENTRY(restore_registers)
+>>       movq    %rax, %cr4;  # turn PGE back on
+>>
+>>       /* We don't restore %rax, it must be 0 anyway */
+>> -     movq    $saved_context, %rax
+>> +     leaq    saved_context(%rip), %rax
+>>       movq    pt_regs_sp(%rax), %rsp
+>>       movq    pt_regs_bp(%rax), %rbp
+>>       movq    pt_regs_si(%rax), %rsi
 >
-> Thanks,
->
->         Ingo
+> --
+> (english) http://www.livejournal.com/~pavelmachek
+> (cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
 
 
 
