@@ -1,61 +1,57 @@
-From: Corentin Labbe <clabbe.montjoie@gmail.com>
-Subject: [PATCH 1/3] crypto: skcipher - export crypto_skcipher_type2
-Date: Mon, 14 Aug 2017 15:17:23 +0200
-Message-ID: <20170814131725.9402-2-clabbe.montjoie@gmail.com>
-References: <20170814131725.9402-1-clabbe.montjoie@gmail.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Corentin Labbe <clabbe.montjoie@gmail.com>
-To: herbert@gondor.apana.org.au, davem@davemloft.net
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH 2/2] crypto: testmgr - add chunked test cases for chacha20
+Date: Mon, 14 Aug 2017 14:28:15 +0100
+Message-ID: <20170814132815.24524-2-ard.biesheuvel@linaro.org>
+References: <20170814132815.24524-1-ard.biesheuvel@linaro.org>
+Cc: herbert@gondor.apana.org.au, steffen.klassert@secunet.com,
+        tobias@strongswan.org, martin@strongswan.org,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wr0-f194.google.com ([209.85.128.194]:36085 "EHLO
-        mail-wr0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750965AbdHNNTh (ORCPT
+Received: from mail-wr0-f175.google.com ([209.85.128.175]:33436 "EHLO
+        mail-wr0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752026AbdHNN2d (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Aug 2017 09:19:37 -0400
-In-Reply-To: <20170814131725.9402-1-clabbe.montjoie@gmail.com>
+        Mon, 14 Aug 2017 09:28:33 -0400
+Received: by mail-wr0-f175.google.com with SMTP id b65so9849106wrd.0
+        for <linux-crypto@vger.kernel.org>; Mon, 14 Aug 2017 06:28:32 -0700 (PDT)
+In-Reply-To: <20170814132815.24524-1-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch export crypto_skcipher_type2 like others cra_type
+We failed to catch a bug in the chacha20 code after porting it to the
+skcipher API. We would have caught it if any chunked tests had been
+defined, so define some now so we will catch future regressions.
 
-Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- crypto/skcipher.c       | 3 ++-
- include/crypto/algapi.h | 1 +
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ crypto/testmgr.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-index 4faa0fd53b0c..c6523826890f 100644
---- a/crypto/skcipher.c
-+++ b/crypto/skcipher.c
-@@ -893,7 +893,7 @@ static int crypto_skcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
- }
- #endif
- 
--static const struct crypto_type crypto_skcipher_type2 = {
-+const struct crypto_type crypto_skcipher_type2 = {
- 	.extsize = crypto_skcipher_extsize,
- 	.init_tfm = crypto_skcipher_init_tfm,
- 	.free = crypto_skcipher_free_instance,
-@@ -906,6 +906,7 @@ static const struct crypto_type crypto_skcipher_type2 = {
- 	.type = CRYPTO_ALG_TYPE_SKCIPHER,
- 	.tfmsize = offsetof(struct crypto_skcipher, base),
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index 6ceb0e2758bb..d54971d2d1c8 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -32675,6 +32675,10 @@ static const struct cipher_testvec chacha20_enc_tv_template[] = {
+ 			  "\x5b\x86\x2f\x37\x30\xe3\x7c\xfd"
+ 			  "\xc4\xfd\x80\x6c\x22\xf2\x21",
+ 		.rlen	= 375,
++		.also_non_np = 1,
++		.np	= 3,
++		.tap	= { 375 - 20, 4, 16 },
++
+ 	}, { /* RFC7539 A.2. Test Vector #3 */
+ 		.key	= "\x1c\x92\x40\xa5\xeb\x55\xd3\x8a"
+ 			  "\xf3\x33\x88\x86\x04\xf6\xb5\xf0"
+@@ -33049,6 +33053,9 @@ static const struct cipher_testvec chacha20_enc_tv_template[] = {
+ 			  "\xa1\xed\xad\xd5\x76\xfa\x24\x8f"
+ 			  "\x98",
+ 		.rlen	= 1281,
++		.also_non_np = 1,
++		.np	= 3,
++		.tap	= { 1200, 1, 80 },
+ 	},
  };
-+EXPORT_SYMBOL_GPL(crypto_skcipher_type2);
- 
- int crypto_grab_skcipher(struct crypto_skcipher_spawn *spawn,
- 			  const char *name, u32 type, u32 mask)
-diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
-index e3cebf640c00..c6a4090ed2ed 100644
---- a/include/crypto/algapi.h
-+++ b/include/crypto/algapi.h
-@@ -130,6 +130,7 @@ struct ablkcipher_walk {
- 
- extern const struct crypto_type crypto_ablkcipher_type;
- extern const struct crypto_type crypto_blkcipher_type;
-+extern const struct crypto_type crypto_skcipher_type2;
- 
- void crypto_mod_put(struct crypto_alg *alg);
  
 -- 
-2.13.0
+2.11.0
