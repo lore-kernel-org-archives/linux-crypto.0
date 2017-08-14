@@ -1,82 +1,109 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [PATCH] crypto: caam - properly set IV after {en,de}crypt
-Date: Mon, 14 Aug 2017 10:59:20 +0300
-Message-ID: <CAOtvUMfa66v6_MfasHRG8Qk9h81GMTnObuBSObBGcSL4QoOMDQ@mail.gmail.com>
-References: <20170602122446.2427-1-david@sigma-star.at> <20170628132710.97278-1-david@sigma-star.at>
- <VI1PR0401MB2591AE2CA996495656C797B398DD0@VI1PR0401MB2591.eurprd04.prod.outlook.com>
- <VI1PR0401MB2591C51C446CFA129B50022298D20@VI1PR0401MB2591.eurprd04.prod.outlook.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: random.c: LFSR polynomials are not irreducible/primitive
+Date: Mon, 14 Aug 2017 10:20:18 +0200
+Message-ID: <10436695.bPChAg2egJ@tauon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Cc: David Gstir <david@sigma-star.at>,
-        Dan Douglass <dan.douglass@nxp.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "richard@sigma-star.at" <richard@sigma-star.at>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>
-To: =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
+To: Ted Tso <tytso@mit.edu>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-yw0-f193.google.com ([209.85.161.193]:34186 "EHLO
-        mail-yw0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752449AbdHNH7V (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Aug 2017 03:59:21 -0400
-Received: by mail-yw0-f193.google.com with SMTP id t139so5754398ywg.1
-        for <linux-crypto@vger.kernel.org>; Mon, 14 Aug 2017 00:59:21 -0700 (PDT)
-In-Reply-To: <VI1PR0401MB2591C51C446CFA129B50022298D20@VI1PR0401MB2591.eurprd04.prod.outlook.com>
+Received: from mail.eperm.de ([89.247.134.16]:58786 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751542AbdHNIUV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 14 Aug 2017 04:20:21 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+Hi Ted,
 
-On Thu, Jun 29, 2017 at 1:19 PM, Horia Geant=C4=83 <horia.geanta@nxp.com> w=
-rote:
-> On 6/28/2017 4:42 PM, Horia Geant=C4=83 wrote:
->> On 6/28/2017 4:27 PM, David Gstir wrote:
->>> Certain cipher modes like CTS expect the IV (req->info) of
->>> ablkcipher_request (or equivalently req->iv of skcipher_request) to
->>> contain the last ciphertext block when the {en,de}crypt operation is do=
-ne.
->>> This is currently not the case for the CAAM driver which in turn breaks
->>> e.g. cts(cbc(aes)) when the CAAM driver is enabled.
->>>
->>> This patch fixes the CAAM driver to properly set the IV after the
->>> {en,de}crypt operation of ablkcipher finishes.
->>>
->>> This issue was revealed by the changes in the SW CTS mode in commit
->>> 0605c41cc53ca ("crypto: cts - Convert to skcipher")
->>>
->>> Cc: <stable@vger.kernel.org> # 4.8+
->>> Signed-off-by: David Gstir <david@sigma-star.at>
->> Reviewed-by: Horia Geant=C4=83 <horia.geanta@nxp.com>
->>
-> Btw, instead of updating the IV in SW, CAAM engine could be programmed
-> to do it - by saving the Context Register of the AES accelerator.
->
-> Unfortunately this would require changes in quite a few places: shared
-> descriptor, HW S/G generation logic, IV dma (un)mapping and maybe others.
->
-> So it's better to have this fix now (which, considering size, is
-> appropriate for -stable) and later, if needed, offload IV updating in HW.
->
+drivers/char/random.c contains the following comment:
 
-My apologies for reviving this thread from the dead, but doesn't the patch =
-fail
-for in-place decryption since we are copying from req->dst after
-the operation is done, and therefore it no longer contains the ciphertext?
+"""
+ * Our mixing functions were analyzed by Lacharme, Roeck, Strubel, and
+ * Videau in their paper, "The Linux Pseudorandom Number Generator
+ * Revisited" (see: http://eprint.iacr.org/2012/251.pdf).  In their
+ * paper, they point out that we are not using a true Twisted GFSR,
+ * since Matsumoto & Kurita used a trinomial feedback polynomial (that
+ * is, with only three taps, instead of the six that we are using).
+ * As a result, the resulting polynomial is neither primitive nor
+ * irreducible, and hence does not have a maximal period over
+ * GF(2**32).  They suggest a slight change to the generator
+ * polynomial which improves the resulting TGFSR polynomial to be
+ * irreducible, which we have made here.
+"""
 
-I'm asking since I ran into a similar issue in the ccree driver and thought
-to deploy a similar fix but could not convince myself why this works.
+This comment leads me to belief that the current polynomial is primitive (and 
+irreducible).
 
-Thanks!
-Gilad
+Strangely, this is not the case as seen with the following code that can be 
+used with the mathematical tool called magma. There is a free online version 
+of magma available to recheck it: http://magma.maths.usyd.edu.au/calc/
 
---=20
-Gilad Ben-Yossef
-Chief Coffee Drinker
+Note, the polynomials used up till 3.12 were primitive and irreducible.
 
-"If you take a class in large-scale robotics, can you end up in a
-situation where the homework eats your dog?"
- -- Jean-Baptiste Queru
+Could you please help me understanding why the current polynomials are better 
+than the old ones?
+
+Thanks a lot.
+
+F:=GF(2);
+F;
+
+P<x>:=PolynomialRing(F);
+P;
+
+print "Old polynomials:";
+
+P<x>:=x^128 + x^103 + x^76 + x^51 +x^25 + x + 1;
+P;
+print "is irreducible: "; IsIrreducible(P);
+print "is primitive: "; IsPrimitive(P);
+
+P<x>:=x^32 + x^26 + x^20 + x^14 + x^7 + x + 1;
+P;
+print "is irreducible: "; IsIrreducible(P);
+print "is primitive: "; IsPrimitive(P);
+
+print "New polynomials:";
+
+P<x>:=x^128 + x^104 + x^76 + x^51 +x^25 + x + 1;
+P;
+print "is irreducible: "; IsIrreducible(P);
+print "is primitive: "; IsPrimitive(P);
+
+P<x>:=x^32 + x^26 + x^19 + x^14 + x^7 + x + 1;
+P;
+print "is irreducible: "; IsIrreducible(P);
+print "is primitive: "; IsPrimitive(P);
+
+And obtained:
+
+Finite field of size 2
+Univariate Polynomial Ring in x over GF(2)
+Old polynomials:
+x^128 + x^103 + x^76 + x^51 + x^25 + x + 1
+is irreducible:
+true
+is primitive:
+true
+x^32 + x^26 + x^20 + x^14 + x^7 + x + 1
+is irreducible:
+true
+is primitive:
+true
+New polynomials:
+x^128 + x^104 + x^76 + x^51 + x^25 + x + 1
+is irreducible:
+false
+is primitive:
+false
+x^32 + x^26 + x^19 + x^14 + x^7 + x + 1
+is irreducible:
+false
+is primitive:
+false
+
+
+Ciao
+Stephan
