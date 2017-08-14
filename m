@@ -1,78 +1,147 @@
-From: David Sterba <dsterba@suse.cz>
-Subject: Re: [PATCH v5 2/5] lib: Add zstd modules
-Date: Mon, 14 Aug 2017 15:30:37 +0200
-Message-ID: <20170814133037.GT2866@twin.jikos.cz>
-References: <20170810023553.3200875-1-terrelln@fb.com>
- <20170810023553.3200875-3-terrelln@fb.com>
- <20170810083017.GA10462@zzz.localdomain>
- <0ceeccb4-1a0f-cacb-dd2b-2913e1cf73ab@fb.com>
- <20170810192506.GF7140@carfax.org.uk>
- <6cd9c58a-1bcb-02c2-9329-c5acc0e79121@fb.com>
-Reply-To: dsterba@suse.cz
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Hugo Mills <hugo@carfax.org.uk>,
-        Eric Biggers <ebiggers3@gmail.com>,
-        Nick Terrell <terrelln@fb.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>, kernel-team@fb.com,
-        squashfs-devel@lists.sourceforge.net, linux-btrfs@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Chris Mason <clm@fb.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:39829 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751529AbdHNNcB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Aug 2017 09:32:01 -0400
-Content-Disposition: inline
-In-Reply-To: <6cd9c58a-1bcb-02c2-9329-c5acc0e79121@fb.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: [PATCH v5 00/19] simplify crypto wait for async op
+Date: Mon, 14 Aug 2017 18:21:10 +0300
+Message-ID: <1502724094-23305-1-git-send-email-gilad@benyossef.com>
+Cc: Ofir Drang <ofir.drang@arm.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        David Howells <dhowells@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Gary Hook <gary.hook@amd.com>,
+        Boris Brezillon <boris.brezillon@free-electrons.com>,
+        Arnaud Ebalard <arno@natisbad.org>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Shaohua Li <shli@kernel.org>, Steve French <sfrench@samba.org>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        James Morris <james.l.morris@oracle.com>,
+        "Serge E. Hallyn" <serge@hallyn.com>, linux-crypto@v
+Return-path: <linux-doc-owner@vger.kernel.org>
+Sender: linux-doc-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Aug 11, 2017 at 09:20:10AM -0400, Chris Mason wrote:
-> 
-> 
-> On 08/10/2017 03:25 PM, Hugo Mills wrote:
-> > On Thu, Aug 10, 2017 at 01:41:21PM -0400, Chris Mason wrote:
-> >> On 08/10/2017 04:30 AM, Eric Biggers wrote:
-> >>>
-> >>> Theses benchmarks are misleading because they compress the whole file as a
-> >>> single stream without resetting the dictionary, which isn't how data will
-> >>> typically be compressed in kernel mode.  With filesystem compression the data
-> >>> has to be divided into small chunks that can each be decompressed independently.
-> >>> That eliminates one of the primary advantages of Zstandard (support for large
-> >>> dictionary sizes).
-> >>
-> >> I did btrfs benchmarks of kernel trees and other normal data sets as
-> >> well.  The numbers were in line with what Nick is posting here.
-> >> zstd is a big win over both lzo and zlib from a btrfs point of view.
-> >>
-> >> It's true Nick's patches only support a single compression level in
-> >> btrfs, but that's because btrfs doesn't have a way to pass in the
-> >> compression ratio.  It could easily be a mount option, it was just
-> >> outside the scope of Nick's initial work.
-> > 
-> >     Could we please not add more mount options? I get that they're easy
-> > to implement, but it's a very blunt instrument. What we tend to see
-> > (with both nodatacow and compress) is people using the mount options,
-> > then asking for exceptions, discovering that they can't do that, and
-> > then falling back to doing it with attributes or btrfs properties.
-> > Could we just start with btrfs properties this time round, and cut out
-> > the mount option part of this cycle.
-> > 
-> >     In the long run, it'd be great to see most of the btrfs-specific
-> > mount options get deprecated and ultimately removed entirely, in
-> > favour of attributes/properties, where feasible.
-> > 
-> 
-> It's a good point, and as was commented later down I'd just do mount -o 
-> compress=zstd:3 or something.
+Many users of kernel async. crypto services have a pattern of
+starting an async. crypto op and than using a completion
+to wait for it to end.
 
-We've solved that already, here's a proposed patch that extends current
-mount options,
+This patch set simplifies this common use case in two ways:
 
-https://www.mail-archive.com/linux-btrfs@vger.kernel.org/msg66248.html
+First, by separating the return codes of the case where a
+request is queued to a backlog due to the provider being
+busy (-EBUSY) from the case the request has failed due
+to the provider being busy and backlogging is not enabled
+(-EAGAIN).
 
-and a patch that could be backported to older kernels so the new mount
-options do not break mounts on older kernels with the new syntax
+Next, this change is than built on to create a generic API
+to wait for a async. crypto operation to complete.
 
-https://patchwork.kernel.org/patch/9845697/
+The end result is a smaller code base and an API that is
+easier to use and more difficult to get wrong.
+
+The patch set was boot tested on x86_64 and arm64 which
+at the very least tests the crypto users via testmgr and
+tcrypt but I do note that I do not have access to some
+of the HW whose drivers are modified nor do I claim I was
+able to test all of the corner cases.
+
+The patch set is based upon linux-next release tagged
+next-20170811.
+
+Changes from v4:
+- Rebase on top of latest algif changes from Stephan
+  Mueller.
+- Fix typo in ccp patch title.
+
+Changes from v3:
+- Instead of changing the return code to indicate
+  backlog queueing, change the return code to indicate
+  transient busy state, as suggested by Herbert Xu.
+
+Changes from v2:
+- Patch title changed from "introduce crypto wait for
+  async op" to better reflect the current state.
+- Rebase on top of latest linux-next.
+- Add a new return code of -EIOCBQUEUED for backlog
+  queueing, as suggested by Herbert Xu.
+- Transform more users to the new API.
+- Update the drbg change to account for new init as
+  indicated by Stephan Muller.
+
+Changes from v1:
+- Address review comments from Eric Biggers.
+- Separated out bug fixes of existing code and rebase
+  on top of that patch set.
+- Rename 'ecr' to 'wait' in fscrypto code.
+- Split patch introducing the new API from the change
+  moving over the algif code which it originated from
+  to the new API.
+- Inline crypto_wait_req().
+- Some code indentation fixes.
+
+Gilad Ben-Yossef (19):
+  crypto: change transient busy return code to -EAGAIN
+  crypto: ccp: use -EAGAIN for transient busy indication
+  crypto: remove redundant backlog checks on EBUSY
+  crypto: marvell/cesa: remove redundant backlog checks on EBUSY
+  crypto: introduce crypto wait for async op
+  crypto: move algif to generic async completion
+  crypto: move pub key to generic async completion
+  crypto: move drbg to generic async completion
+  crypto: move gcm to generic async completion
+  crypto: move testmgr to generic async completion
+  fscrypt: move to generic async completion
+  dm: move dm-verity to generic async completion
+  cifs: move to generic async completion
+  ima: move to generic async completion
+  crypto: tcrypt: move to generic async completion
+  crypto: talitos: move to generic async completion
+  crypto: qce: move to generic async completion
+  crypto: mediatek: move to generic async completion
+  crypto: adapt api sample to use async. op wait
+
+ Documentation/crypto/api-samples.rst |  52 ++-------
+ crypto/af_alg.c                      |  27 -----
+ crypto/ahash.c                       |  12 +--
+ crypto/algapi.c                      |   6 +-
+ crypto/algif_aead.c                  |   8 +-
+ crypto/algif_hash.c                  |  50 +++++----
+ crypto/algif_skcipher.c              |   9 +-
+ crypto/api.c                         |  13 +++
+ crypto/asymmetric_keys/public_key.c  |  28 +----
+ crypto/cryptd.c                      |   4 +-
+ crypto/cts.c                         |   6 +-
+ crypto/drbg.c                        |  36 ++-----
+ crypto/gcm.c                         |  32 ++----
+ crypto/lrw.c                         |   8 +-
+ crypto/rsa-pkcs1pad.c                |  16 +--
+ crypto/tcrypt.c                      |  84 +++++----------
+ crypto/testmgr.c                     | 204 ++++++++++++-----------------------
+ crypto/xts.c                         |   8 +-
+ drivers/crypto/ccp/ccp-crypto-main.c |   8 +-
+ drivers/crypto/ccp/ccp-dev.c         |   7 +-
+ drivers/crypto/marvell/cesa.c        |   3 +-
+ drivers/crypto/marvell/cesa.h        |   2 +-
+ drivers/crypto/mediatek/mtk-aes.c    |  31 +-----
+ drivers/crypto/qce/sha.c             |  30 +-----
+ drivers/crypto/talitos.c             |  38 +------
+ drivers/md/dm-verity-target.c        |  81 ++++----------
+ drivers/md/dm-verity.h               |   5 -
+ fs/cifs/smb2ops.c                    |  30 +-----
+ fs/crypto/crypto.c                   |  28 +----
+ fs/crypto/fname.c                    |  36 ++-----
+ fs/crypto/fscrypt_private.h          |  10 --
+ fs/crypto/keyinfo.c                  |  21 +---
+ include/crypto/drbg.h                |   3 +-
+ include/crypto/if_alg.h              |  15 +--
+ include/linux/crypto.h               |  41 +++++++
+ security/integrity/ima/ima_crypto.c  |  56 +++-------
+ 36 files changed, 311 insertions(+), 737 deletions(-)
+
+-- 
+2.1.4
+
