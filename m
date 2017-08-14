@@ -1,56 +1,70 @@
 From: Stephan Mueller <smueller@chronox.de>
 Subject: Re: [PATCH v8 0/4] crypto: add algif_akcipher user space API
-Date: Mon, 14 Aug 2017 08:01:52 +0200
-Message-ID: <7295901.5kiTlHVF8D@tauon.chronox.de>
-References: <26359147.tCiuJ5s8mz@positron.chronox.de> <1E882887-3F56-4A4C-AADF-2F25F4D3A7C9@holtmann.org> <CAOtvUMfcEDmyO976H0g5=s7BacHsxUf+JoPXLc0hGaPs_LduAQ@mail.gmail.com>
+Date: Mon, 14 Aug 2017 08:03:19 +0200
+Message-ID: <3253864.NSkFVeIncy@tauon.chronox.de>
+References: <26359147.tCiuJ5s8mz@positron.chronox.de> <CAOq732KZ6nNkix6P1yxYCcfRrF7Zby5qeP9WpcBR6Z_=7MFaNA@mail.gmail.com> <alpine.OSX.2.21.1708111158510.37345@bciftcio-mobl.amr.corp.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-        Mat Martineau <mathew.j.martineau@linux.intel.com>,
+Cc: Andrew Zaborowski <balrogg@googlemail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         David Howells <dhowells@redhat.com>
-To: Gilad Ben-Yossef <gilad@benyossef.com>
+To: Mat Martineau <mathew.j.martineau@linux.intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:58730 "EHLO mail.eperm.de"
+Received: from mail.eperm.de ([89.247.134.16]:58746 "EHLO mail.eperm.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752246AbdHNGBy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Aug 2017 02:01:54 -0400
-In-Reply-To: <CAOtvUMfcEDmyO976H0g5=s7BacHsxUf+JoPXLc0hGaPs_LduAQ@mail.gmail.com>
+        id S1752244AbdHNGDV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 14 Aug 2017 02:03:21 -0400
+In-Reply-To: <alpine.OSX.2.21.1708111158510.37345@bciftcio-mobl.amr.corp.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Sonntag, 13. August 2017, 10:52:00 CEST schrieb Gilad Ben-Yossef:
+Am Freitag, 11. August 2017, 21:43:15 CEST schrieb Mat Martineau:
 
-Hi Gilad,
+Hi Mat,
 
-> While I don't have anything to contribute to the choice between
-> keyctl() vs ALG_IF as interfaces for asymmetric  cryptography, I would
-> like to point out that there is both interest and HW support for
-> private symmetric key operations as well, for example for storage
-> encryption via DM-Crypt and fscrypt, so I do hope (and will work on)
-> adding some sort of HW key support the crypto API, community
-> acceptance withstanding of course.
 > 
-> So I hope we won't treat the idea of crypto API lack of support for HW
-> keys as a long standing immutable argument.
+> I also would like to have more of those algorithms exposed to userspace,
+> and I'd like to make sure the API is a good fit. There was extensive
+> discussion of AF_ALG akcipher last year. v8 of the patch set updates the
+> implementation but doesn't address the API concerns that kept the previous
+> versions from being merged, so we seem to be at just as much of an impasse
+> as before.
 
-See the patch set that was offered by Tudor regarding the in-kernel or in-
-hardware generation of the ECDH private keys. There is nothing that prevents 
-us having such API for akcipher. In fact, it would even be more or less a 
-copy-n-paste job.
+During last year's discussion, I think we have concluded (and please correct 
+me if I miss something), that the export of the asymmetric HW implementations 
+to user space should
 
-Exporting that logic to user space could be done as follows:
+- allow a streaming mode where the user space uses the kernel as an 
+accelerator (maybe user space has another way of storing keys)
 
-- keyctl API is used to trigger the key generation process and to obtain a 
-handle
+- allow the private key to be retained in kernel space (or even in hardware 
+only) -- i.e. user space only has a handle to the key for a full asym 
+operation
 
-- AF_ALG to perform the asym operation where the key handle from keyctl is 
-handed into the kernel. I am aware that this link between AF_ALG and keyctl is 
-yet missing. But it on my desk and I am willing to integrate it. The 
-integration should even not be specific to algif_akcipher, but to all cipher 
-types.
+The first part is clearly where AF_ALG fits and keyctl does not. This is 
+provided with the current patch set. As the keyctl API only handles, well, 
+keys, access to the raw ciphers may not be possible through this API. And let 
+us face it, a lot of user space code shall support many different OSes. Thus, 
+if you have a crypto lib in user space who has its own key management (which 
+is a core element of such libraries and thus cannot be put into an 
+architecture-dependent code part), having only the keyctl API on Linux for 
+accelerated asym support may not be helpful.
+
+The second part is a keyctl domain. I see in-kernel support for this scenario, 
+but have not yet seen the kernel/user interface nor the user space support.
+
+Both options are orthogonal, IMHO.
+
+Tadeusz Struck provided a patch to link the kernel crypto API / algif_akcipher 
+with the keys subsystem to allow the second requirement to be implemented in 
+algif_akcipher. That patch is on my desk and I plan to integrate it and even 
+make it generic to allow its use for all different cipher types. I have not 
+yet integrated it to allow a small patch set to be reviewed. If it is the will 
+of the council, I can surely add that code to the initial patch set and 
+resubmit.
+
 
 Ciao
 Stephan
