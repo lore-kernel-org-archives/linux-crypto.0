@@ -1,70 +1,110 @@
 From: Stephan Mueller <smueller@chronox.de>
 Subject: Re: [PATCH v8 0/4] crypto: add algif_akcipher user space API
-Date: Mon, 14 Aug 2017 08:03:19 +0200
-Message-ID: <3253864.NSkFVeIncy@tauon.chronox.de>
-References: <26359147.tCiuJ5s8mz@positron.chronox.de> <CAOq732KZ6nNkix6P1yxYCcfRrF7Zby5qeP9WpcBR6Z_=7MFaNA@mail.gmail.com> <alpine.OSX.2.21.1708111158510.37345@bciftcio-mobl.amr.corp.intel.com>
+Date: Mon, 14 Aug 2017 08:24:51 +0200
+Message-ID: <30055124.HBDiccPrro@tauon.chronox.de>
+References: <26359147.tCiuJ5s8mz@positron.chronox.de> <4460438.43jVvca0Xd@positron.chronox.de> <B3DDB822-FCDC-41A2-A5AB-9956866D6725@holtmann.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: Andrew Zaborowski <balrogg@googlemail.com>,
+Cc: Mat Martineau <mathew.j.martineau@linux.intel.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        David Howells <dhowells@redhat.com>
-To: Mat Martineau <mathew.j.martineau@linux.intel.com>
+        dhowells@redhat.com
+To: Marcel Holtmann <marcel@holtmann.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:58746 "EHLO mail.eperm.de"
+Received: from mail.eperm.de ([89.247.134.16]:58764 "EHLO mail.eperm.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752244AbdHNGDV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Aug 2017 02:03:21 -0400
-In-Reply-To: <alpine.OSX.2.21.1708111158510.37345@bciftcio-mobl.amr.corp.intel.com>
+        id S1751196AbdHNGYx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 14 Aug 2017 02:24:53 -0400
+In-Reply-To: <B3DDB822-FCDC-41A2-A5AB-9956866D6725@holtmann.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Freitag, 11. August 2017, 21:43:15 CEST schrieb Mat Martineau:
+Am Freitag, 11. August 2017, 18:02:55 CEST schrieb Marcel Holtmann:
 
-Hi Mat,
+Hi Marcel,
 
+> > Thanks for the reminder. I have looked at that but I am unsure about
+> > whether this one covers asym crypto appropriately, too.
+> > 
+> > The issue is that some hardware may only offer accelerators without a full
+> > blown RSA siggen/ver logic (that pulls in PKCS or OAEP or others). How do
+> > you propose to cover raw primitives with keyctl?
 > 
-> I also would like to have more of those algorithms exposed to userspace,
-> and I'd like to make sure the API is a good fit. There was extensive
-> discussion of AF_ALG akcipher last year. v8 of the patch set updates the
-> implementation but doesn't address the API concerns that kept the previous
-> versions from being merged, so we seem to be at just as much of an impasse
-> as before.
+> where is such a hardware?
 
-During last year's discussion, I think we have concluded (and please correct 
-me if I miss something), that the export of the asymmetric HW implementations 
-to user space should
+Strangely, I see such support all the time in embedded devices where 
+asymmetric acceleration is really necessary.
 
-- allow a streaming mode where the user space uses the kernel as an 
-accelerator (maybe user space has another way of storing keys)
+> And what is the usage of it? Look at what we are
+> using asymmetric crypto for at the moment. It is either for sign and verify
+> with secure boot etc. Or it is for key exchange purposes.
 
-- allow the private key to be retained in kernel space (or even in hardware 
-only) -- i.e. user space only has a handle to the key for a full asym 
-operation
+I understand that this is the core purpose of asymmetric ciphers. Yet, 
+asymmetric ciphers are complex and we as kernel developers do not know (or 
+shall not mandate?) where the complexity shall be implemented. By forcing all 
+into the keyctl, we would insist that the entire complexity of the full-blown 
+asym cipher is in the kernel without an option that user space may implement 
+it.
 
-The first part is clearly where AF_ALG fits and keyctl does not. This is 
-provided with the current patch set. As the keyctl API only handles, well, 
-keys, access to the raw ciphers may not be possible through this API. And let 
-us face it, a lot of user space code shall support many different OSes. Thus, 
-if you have a crypto lib in user space who has its own key management (which 
-is a core element of such libraries and thus cannot be put into an 
-architecture-dependent code part), having only the keyctl API on Linux for 
-accelerated asym support may not be helpful.
+What we are currently seemingly discuss is the choice of
 
-The second part is a keyctl domain. I see in-kernel support for this scenario, 
-but have not yet seen the kernel/user interface nor the user space support.
+- keyctl: having all complexity of the entire asym logic including its key 
+handling in the kernel with the benefit of the kernel protection of the 
+private key
 
-Both options are orthogonal, IMHO.
+- algif_akcipher (maybe with a link to keyctl): only exporting the cipher 
+support and allow user space to decide where the complexity lies
 
-Tadeusz Struck provided a patch to link the kernel crypto API / algif_akcipher 
-with the keys subsystem to allow the second requirement to be implemented in 
-algif_akcipher. That patch is on my desk and I plan to integrate it and even 
-make it generic to allow its use for all different cipher types. I have not 
-yet integrated it to allow a small patch set to be reviewed. If it is the will 
-of the council, I can surely add that code to the initial patch set and 
-resubmit.
+Just to give you an example: A full blown RSA operation (excluding the hashing 
+part for signatures) consists of padding and the asymmetric operation. For the 
+asymmetric operation, we have sign/verify and encrypt/decrypt (keywrap). There 
+are a gazillion padding types out there:
 
+- PKCS1
+
+- OAEP
+
+- SP800-56B: RSAEP, RSADP, RSASVE, RSA-OAEP, RSA-KEM-KWS
+
+And there may be others.
+
+When we talk about encryption/decryption we have to consider the KDFs 
+(SP800-108, RFC5689, SP800-56A).
+
+When we consider the KDFs, we have to think of the KDF data styles (ASN.1, 
+concatenation)
+
+With keyctl to me it seems that we need to integrate all that logic into the 
+kernel. As all of that is just processing logic, securing it in the kernel may 
+not be the right way as this code does not need the elevated privileges in the 
+kernel for that.
+
+Yet, some hardware may provide some/all of this logic. And we want to make 
+that available to user space.
+> 
+> The asymmetric crypto is a means to an end. If it is not for certification
+> verification, then it for is creating a symmetric key to be used with a
+> symmetric cipher. We have the the asymmetric_keys subsystem for
+> representing the nature of this crypto. Also the list of asymmetric ciphers
+> is a lot smaller than the symmetric ones.
+> 
+> What raw primitives? When we are using for example ECDH for Bluetooth where
+> you need to create a pairwise symmetric key, then what you really want from
+> the cryptographic primitives is this:
+> 
+> 1) Create public/private key pair
+
+See above, it is my opinion that with asym ciphers, there is a lot of 
+complexity and lots of options. I do not think that the kernel API should be a 
+limiting factor here, because the kernel simply does not implement a specific 
+cipher type.
+
+> 2) Give public key to applications and store the private key safely
+> 3) Retrieve public key from remote side and challenge
+
+This assumes that always the Linux kernel is the manager of keys (or the 
+gatekeeper to the key store). Are we sure that this is always the case?
 
 Ciao
 Stephan
