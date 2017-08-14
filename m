@@ -1,66 +1,82 @@
-From: Philipp Zabel <p.zabel@pengutronix.de>
-Subject: Re: [PATCH 000/102] Convert drivers to explicit reset API
-Date: Mon, 14 Aug 2017 09:36:38 +0200
-Message-ID: <1502696198.2287.7.camel@pengutronix.de>
-References: <20170719152646.25903-1-p.zabel@pengutronix.de>
-         <20170719211515.46a1196c@windsurf>
-         <1500543415.2354.37.camel@pengutronix.de>
-         <20170720123640.43c2ce01@windsurf>
-         <1500555312.2354.75.camel@pengutronix.de>
-         <CAKdAkRTx8jd8UToz5_EgMmdW3V47i2uo++YvVB_yzytqSA=P1Q@mail.gmail.com>
-         <CACRpkdaXOv7mX+b-q1K34CB5w0SWPXCKa21wHaxL7qjf91PJXQ@mail.gmail.com>
-         <1500885221.2391.50.camel@pengutronix.de>
-         <20170812114357.v4ru75dw5hq7wemx@ninjato>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: Re: [PATCH] crypto: caam - properly set IV after {en,de}crypt
+Date: Mon, 14 Aug 2017 10:59:20 +0300
+Message-ID: <CAOtvUMfa66v6_MfasHRG8Qk9h81GMTnObuBSObBGcSL4QoOMDQ@mail.gmail.com>
+References: <20170602122446.2427-1-david@sigma-star.at> <20170628132710.97278-1-david@sigma-star.at>
+ <VI1PR0401MB2591AE2CA996495656C797B398DD0@VI1PR0401MB2591.eurprd04.prod.outlook.com>
+ <VI1PR0401MB2591C51C446CFA129B50022298D20@VI1PR0401MB2591.eurprd04.prod.outlook.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Linus Walleij <linus.walleij@linaro.org>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-        lkml <linux-kernel@vger.kernel.org>,
-        Andrew Lunn <andrew@lunn.ch>,
-        Prashant Gaikwad <pgaikwad@nvidia.com>,
-        Heiko Stuebner <heiko@sntech.de>,
-        Peter Chen <Peter.Chen@nxp.com>,
-        DRI <dri-devel@lists.freedesktop.org>,
-        Marc Dietrich <marvin24@gmx.de>,
-        Rakesh Iyer <riyer@nvidia.com>,
-        Peter Meerwald-Stadler <pmeerw@pmeerw.net>,
-        linux-clk <linux-clk@vger.kernel.org>,
-        Wim Van Sebroeck <wim@iguana.be>,
-        Xinliang Liu <z.liuxinliang@hisilicon.com>,
-        Chanwoo Choi <cw00.choi@samsung.com>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Jiri Slaby <jslaby@suse.com>,
-        Michael Turquette <mturquette@baylibre.com>,
-        Guenter R
-To: Wolfram Sang <wsa@the-dreams.de>
-Return-path: <linux-mips-bounce@linux-mips.org>
-In-Reply-To: <20170812114357.v4ru75dw5hq7wemx@ninjato>
-Sender: linux-mips-bounce@linux-mips.org
-Errors-to: linux-mips-bounce@linux-mips.org
-List-help: <mailto:ecartis@linux-mips.org?Subject=help>
-List-unsubscribe: <mailto:ecartis@linux-mips.org?subject=unsubscribe%20linux-mips>
-List-software: Ecartis version 1.0.0
-List-subscribe: <mailto:ecartis@linux-mips.org?subject=subscribe%20linux-mips>
-List-owner: <mailto:ralf@linux-mips.org>
-List-post: <mailto:linux-mips@linux-mips.org>
-List-archive: <http://www.linux-mips.org/archives/linux-mips/>
-List-Id: linux-crypto.vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Cc: David Gstir <david@sigma-star.at>,
+        Dan Douglass <dan.douglass@nxp.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "richard@sigma-star.at" <richard@sigma-star.at>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>
+To: =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-yw0-f193.google.com ([209.85.161.193]:34186 "EHLO
+        mail-yw0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752449AbdHNH7V (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 14 Aug 2017 03:59:21 -0400
+Received: by mail-yw0-f193.google.com with SMTP id t139so5754398ywg.1
+        for <linux-crypto@vger.kernel.org>; Mon, 14 Aug 2017 00:59:21 -0700 (PDT)
+In-Reply-To: <VI1PR0401MB2591C51C446CFA129B50022298D20@VI1PR0401MB2591.eurprd04.prod.outlook.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, 2017-08-12 at 13:43 +0200, Wolfram Sang wrote:
-> > Thanks for the hint and the references. It seems this turned out
-> > okay,
-> > but I wouldn't dare to introduce such macro horror^Wmagic.
-> > I'd rather have all users converted to the _exclusive/_shared
-> > function
-> > calls and maybe then replace the internal __reset_control_get with
-> > Thomas' suggestion.
-> 
-> I didn't follow the discussion closely. Shall I still apply the i2c
-> patches?
+Hi,
 
-Yes, please.
+On Thu, Jun 29, 2017 at 1:19 PM, Horia Geant=C4=83 <horia.geanta@nxp.com> w=
+rote:
+> On 6/28/2017 4:42 PM, Horia Geant=C4=83 wrote:
+>> On 6/28/2017 4:27 PM, David Gstir wrote:
+>>> Certain cipher modes like CTS expect the IV (req->info) of
+>>> ablkcipher_request (or equivalently req->iv of skcipher_request) to
+>>> contain the last ciphertext block when the {en,de}crypt operation is do=
+ne.
+>>> This is currently not the case for the CAAM driver which in turn breaks
+>>> e.g. cts(cbc(aes)) when the CAAM driver is enabled.
+>>>
+>>> This patch fixes the CAAM driver to properly set the IV after the
+>>> {en,de}crypt operation of ablkcipher finishes.
+>>>
+>>> This issue was revealed by the changes in the SW CTS mode in commit
+>>> 0605c41cc53ca ("crypto: cts - Convert to skcipher")
+>>>
+>>> Cc: <stable@vger.kernel.org> # 4.8+
+>>> Signed-off-by: David Gstir <david@sigma-star.at>
+>> Reviewed-by: Horia Geant=C4=83 <horia.geanta@nxp.com>
+>>
+> Btw, instead of updating the IV in SW, CAAM engine could be programmed
+> to do it - by saving the Context Register of the AES accelerator.
+>
+> Unfortunately this would require changes in quite a few places: shared
+> descriptor, HW S/G generation logic, IV dma (un)mapping and maybe others.
+>
+> So it's better to have this fix now (which, considering size, is
+> appropriate for -stable) and later, if needed, offload IV updating in HW.
+>
 
-regards
-Philipp
+My apologies for reviving this thread from the dead, but doesn't the patch =
+fail
+for in-place decryption since we are copying from req->dst after
+the operation is done, and therefore it no longer contains the ciphertext?
+
+I'm asking since I ran into a similar issue in the ccree driver and thought
+to deploy a similar fix but could not convince myself why this works.
+
+Thanks!
+Gilad
+
+--=20
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+"If you take a class in large-scale robotics, can you end up in a
+situation where the homework eats your dog?"
+ -- Jean-Baptiste Queru
