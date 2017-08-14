@@ -1,109 +1,125 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: random.c: LFSR polynomials are not irreducible/primitive
-Date: Mon, 14 Aug 2017 10:20:18 +0200
-Message-ID: <10436695.bPChAg2egJ@tauon.chronox.de>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: Re: [Freedombox-discuss] Hardware Crypto
+Date: Mon, 14 Aug 2017 11:40:42 +0300
+Message-ID: <CAOtvUMdrwg4cq6XxDZrC_t57yCmOU+MDR1iz-b6+A-_G9eiaDg@mail.gmail.com>
+References: <87pqldrq15.fsf@freedomboxfoundation.org> <CAMhXSQpkScTzZB4fZ0KGbTPKmtiwv_o7cz7MrWXc_rqrCfO3Pg@mail.gmail.com>
+ <4E1FF66C.6010908@mray.de> <87wrfe1acu.fsf@freedomboxfoundation.org>
+ <CA+FSnD1NO97U1zQQZV=VD+dbCGR0oQTgEYBmH6VupGUKo8uRFA@mail.gmail.com>
+ <87r55m175w.fsf@freedomboxfoundation.org> <CAJVWO9aUCLb6k87do-ckOdkV-1U7d2SiG3gtBOVVXouog04Tpw@mail.gmail.com>
+ <CAJVWO9YDKD72Sbb9_wWvxFVEppDg=4+XfBAY3uxvxcZ0b2t3yg@mail.gmail.com>
+ <20110720063824.GA15748@havelock.liw.fi> <CAJVWO9bXs7_bx8-37O++n8kSJTuASC_benwmyeLgfiik8nGrmA@mail.gmail.com>
+ <8762mx14co.fsf@freedomboxfoundation.org> <6556610b-9ddf-4bc2-b235-a2c91598a040@email.android.com>
+ <201107220153.p6M1rVDn004794@new.toad.com> <CACXcFm=CBZmSaiwt7RaGUtS1u-q5HUrACKrvj=7Y201R6Fzmtw@mail.gmail.com>
+ <CACXcFm=Kea6fOgeqYrgg5z3F=aVOS3YHYuU0S7FespD+C02AZg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
-To: Ted Tso <tytso@mit.edu>
+Content-Type: text/plain; charset="UTF-8"
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Sandy Harris <sandyinchina@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:58786 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751542AbdHNIUV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Aug 2017 04:20:21 -0400
+Received: from mail-yw0-f174.google.com ([209.85.161.174]:33067 "EHLO
+        mail-yw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752199AbdHNIko (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 14 Aug 2017 04:40:44 -0400
+Received: by mail-yw0-f174.google.com with SMTP id p68so51267821ywg.0
+        for <linux-crypto@vger.kernel.org>; Mon, 14 Aug 2017 01:40:43 -0700 (PDT)
+In-Reply-To: <CACXcFm=Kea6fOgeqYrgg5z3F=aVOS3YHYuU0S7FespD+C02AZg@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Ted,
+Hi,
 
-drivers/char/random.c contains the following comment:
+On Sun, Aug 13, 2017 at 8:21 PM, Sandy Harris <sandyinchina@gmail.com> wrote:
+> Showing only the key parts of the message:
+>
+>> From: John Gilmore <gnu@toad.com>
+>
+> An exceedingly knowledgeable guy, one we should probably take seriously.
+> https://en.wikipedia.org/wiki/John_Gilmore_(activist)
+>
+>> Most hardware crypto accelerators are useless, ...
+>> ... you might as well have
+>> just computed the answer in userspace using ordinary instructions.
+>
+> A strong claim, but one I'm inclined to believe. In the cases where it
+> applies, it may be a problem for much of the Linux crypto work.
 
-"""
- * Our mixing functions were analyzed by Lacharme, Roeck, Strubel, and
- * Videau in their paper, "The Linux Pseudorandom Number Generator
- * Revisited" (see: http://eprint.iacr.org/2012/251.pdf).  In their
- * paper, they point out that we are not using a true Twisted GFSR,
- * since Matsumoto & Kurita used a trinomial feedback polynomial (that
- * is, with only three taps, instead of the six that we are using).
- * As a result, the resulting polynomial is neither primitive nor
- * irreducible, and hence does not have a maximal period over
- * GF(2**32).  They suggest a slight change to the generator
- * polynomial which improves the resulting TGFSR polynomial to be
- * irreducible, which we have made here.
-"""
+The claim is mostly true if the data to be processed is in user space,
+simply because context switches are so expensive.
 
-This comment leads me to belief that the current polynomial is primitive (and 
-irreducible).
+However, in case of in-kernel producers of data, such as DMcrypt.
+Fscrypt and the recent TLS socket frame work, this is not the case.
 
-Strangely, this is not the case as seen with the following code that can be 
-used with the mathematical tool called magma. There is a free online version 
-of magma available to recheck it: http://magma.maths.usyd.edu.au/calc/
+In that scenario, processing context and the data are already in kernel space
+and then it becomes a question of what is more efficient - DMA to/from
+a crypto HW or doing it on the core - and the result is often measured not
+in pure latency of operation but in performance per watt, since in some cases
+you might be better off letting CPU cores idle and perform computation on
+HW that is more power conserving.
 
-Note, the polynomials used up till 3.12 were primitive and irreducible.
+So it really depends on the specific hardware, work load and operating
+conditions.
 
-Could you please help me understanding why the current polynomials are better 
-than the old ones?
+>
+> Some CPUs have special instructions to speed up some crypto
+> operations, and not just AES. For example, Intel has them for several
+> hashes and for elliptic curve calculations:
+> https://software.intel.com/en-us/articles/intel-sha-extensions
+> https://en.wikipedia.org/wiki/CLMUL_instruction_set
+> https://www.intel.com/content/dam/www/public/us/en/documents/white-papers/polynomial-multiplication-instructions-paper.pdf
+>
+> These move the goalposts; if doing it "using ordinary instructions" is
+> sometimes faster than hardware, then doing it with
+> application-specific instructions is even more likely to be faster.
+>
+>> Even if a /dev/crypto interface existed and was faster for some kinds
+>> of operations than just doing the crypto manually, the standard crypto
+>> libraries would have to be portably tuned to detect when to use
+>> hardware and when to use software.  The libraries generally use
+>> hardware if it's available, since they were written with the
+>> assumption that nobody would bother with hardware crypto if it was
+>> slower than software.
+>>
+>> "Just make it fast for all cases" is hard when the hardware is poorly
+>> designed.  When the hardware is well designed, it *is* faster for all
+>> cases.  But that's uncommon.
+>>
+>> Making this determination in realtime would be a substantial
+>> enhancement to each crypto library.  Since it'd have to be written
+>> portably (or the maintainers of the portable crypto libraries won't
+>> take it back), it couldn't assume any particular timings of any
+>> particular driver, either in hardware or software.  So it would have
+>> to run some fraction of the calls (perhaps 1%) in more than one
+>> driver, and time each one, and then make decisions on which driver to
+>> use by default for the other 99% of the calls.  The resulting times
+>> differ dramatically, based on many factors, ...
+>>
+>> One advantage of running some of the calls using both hardware and
+>> software is that the library can check that the results match exactly,
+>> and abort with a clear message.  That would likely have caught some bugs
+>> that snuck through in earlier crypto libraries.
+>
+> I'm not at all sure I'd want run-time testing of this since, at least
+> as a general rule, introducing complications to crypto code is rarely
+> a good idea. Such tests at development time seem like a fine idea,
+> though; do we have those already?
+>
+> What about testing when it is time to decide on kernel configuration;
+> include a particular module or not? Another issue is whether the
+> module choice is all-or-nothing; if there is a hardware RNG can one
+> use that without loading the rest of the code for the crypto
+> accelerator?
 
-Thanks a lot.
+The choice is modular.
 
-F:=GF(2);
-F;
-
-P<x>:=PolynomialRing(F);
-P;
-
-print "Old polynomials:";
-
-P<x>:=x^128 + x^103 + x^76 + x^51 +x^25 + x + 1;
-P;
-print "is irreducible: "; IsIrreducible(P);
-print "is primitive: "; IsPrimitive(P);
-
-P<x>:=x^32 + x^26 + x^20 + x^14 + x^7 + x + 1;
-P;
-print "is irreducible: "; IsIrreducible(P);
-print "is primitive: "; IsPrimitive(P);
-
-print "New polynomials:";
-
-P<x>:=x^128 + x^104 + x^76 + x^51 +x^25 + x + 1;
-P;
-print "is irreducible: "; IsIrreducible(P);
-print "is primitive: "; IsPrimitive(P);
-
-P<x>:=x^32 + x^26 + x^19 + x^14 + x^7 + x + 1;
-P;
-print "is irreducible: "; IsIrreducible(P);
-print "is primitive: "; IsPrimitive(P);
-
-And obtained:
-
-Finite field of size 2
-Univariate Polynomial Ring in x over GF(2)
-Old polynomials:
-x^128 + x^103 + x^76 + x^51 + x^25 + x + 1
-is irreducible:
-true
-is primitive:
-true
-x^32 + x^26 + x^20 + x^14 + x^7 + x + 1
-is irreducible:
-true
-is primitive:
-true
-New polynomials:
-x^128 + x^104 + x^76 + x^51 + x^25 + x + 1
-is irreducible:
-false
-is primitive:
-false
-x^32 + x^26 + x^19 + x^14 + x^7 + x + 1
-is irreducible:
-false
-is primitive:
-false
+Gilad
 
 
-Ciao
-Stephan
+
+-- 
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+"If you take a class in large-scale robotics, can you end up in a
+situation where the homework eats your dog?"
+ -- Jean-Baptiste Queru
