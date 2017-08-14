@@ -2,41 +2,42 @@ From: Gary R Hook <gary.hook@amd.com>
 Subject: Re: [PATCH v5 02/19] crypto: ccp: use -EAGAIN for transient busy
  indication
 Date: Mon, 14 Aug 2017 11:55:44 -0500
-Message-ID: <28b9a7d4-d329-bb1e-d4eb-6530795eaa0b__45089.2344968908$1502729825$gmane$org@amd.com>
+Message-ID: <28b9a7d4-d329-bb1e-d4eb-6530795eaa0b__21127.7046044872$1502729843$gmane$org@amd.com>
 References: <1502724094-23305-1-git-send-email-gilad@benyossef.com>
  <1502724094-23305-3-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
 Cc: Ofir Drang <ofir.drang@arm.com>
 To: Gilad Ben-Yossef <gilad@benyossef.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        David Howells <dhowells@redhat.com>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        Boris Brezillon <boris.brezillon@free-electrons.com>,
-        Arnaud Ebalard <arno@natisbad.org>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        Shaohua Li <shli@kernel.org>, Steve French <sfrench@samba.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        James Morris <james.l.morris@oracle.com>,
-        "Serg
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-co1nam03on0042.outbound.protection.outlook.com ([104.47.40.42]:1048
-        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752147AbdHNQ4s (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Aug 2017 12:56:48 -0400
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>, Jonathan Corbet <corbet@lwn.net>,
+ David Howells <dhowells@redhat.com>,
+ "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+ Boris Brezillon <boris.brezillon@free-electrons.com>,
+ Arnaud Ebalard <arno@natisbad.org>, Matthias Brugger
+ <matthias.bgg@gmail.com>, Alasdair Kergon <agk@redhat.com>,
+ Mike Snitzer <snitzer@redhat.com>, "dm-devel@redhat.com"
+ <dm-devel@redhat.com>, Shaohua Li <shli@kernel.org>,
+ Steve French <sfrench@samba.org>, "Theodore Y. Ts'o" <tytso@mit.edu>,
+ Jaegeuk Kim <jaegeuk@kernel.org>, Mimi Zohar <zohar@linux.vnet.ibm.com>,
+ Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+ James Morris <james.l.morris@oracle.com>, "Serge E. Hallyn"
+ <serge@hallyn.com>,
+ "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+ "linux-doc@vger.kernel.org" <lin
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 In-Reply-To: <1502724094-23305-3-git-send-email-gilad@benyossef.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
 On 08/14/2017 10:21 AM, Gilad Ben-Yossef wrote:
 > Replace -EBUSY with -EAGAIN when reporting transient busy
