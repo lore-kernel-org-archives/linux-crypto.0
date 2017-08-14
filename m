@@ -1,48 +1,42 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: scatterwalk.c: Nullpointer dereference
-Date: Mon, 14 Aug 2017 14:37:32 +0200
-Message-ID: <2773822.4WQlVsijTS@tauon.chronox.de>
-References: <1415BA6E-28BB-4AA6-8049-1FB19FE3BBE1@hpi.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: "Plauth, Max" <Max.Plauth@hpi.de>
+From: Corentin Labbe <clabbe.montjoie@gmail.com>
+Subject: [PATCH 0/3 v3] crypto: engine - Permit to enqueue skcipher request
+Date: Mon, 14 Aug 2017 15:17:22 +0200
+Message-ID: <20170814131725.9402-1-clabbe.montjoie@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Corentin Labbe <clabbe.montjoie@gmail.com>
+To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:58798 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753143AbdHNMhf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Aug 2017 08:37:35 -0400
-In-Reply-To: <1415BA6E-28BB-4AA6-8049-1FB19FE3BBE1@hpi.de>
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:35350 "EHLO
+        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750876AbdHNNTf (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 14 Aug 2017 09:19:35 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Montag, 14. August 2017, 14:25:49 CEST schrieb Plauth, Max:
+Hello
 
-Hi Max,
+The crypto engine could actually only enqueue hash and ablkcipher request.
+This patch serie permit it to enqueue skcipher requests by adding all necessary
+functions.
 
-> Dear linux-crypto community,
-> 
-> I think I might have run into a bug in crypto/scatterwalk.c:
-> - at the end of scatterwalk_pagedone, sg_next(walk->sg) is fed as an
-> argument to scatterwalk_start(...) - sg_next (lib/scatterlist.c) returns
-> NULL in the case of sg_is_last(sg) - In this case, NULL is being fed into
-> scatterwalk_start
-> - there, a NULL value of *sg leads to a NULL pointer dereference:
-> walk->sg = sg;
-> walk->offset = sg->offset;
-> 
-> I stumbled across this issue when I tried to extend the cryptodev-linux
-> Kernel module with support for compression algorithms
-> (https://github.com/plauth/cryptodev-linux).
+Changes since v2
+- added two patch for finding request type according to its cra_type
 
-You are quite right that this looks like a nullpointer. But you should never 
-run into this problem because the scatterwalk length definition should ensure 
-that this never happens. I.e. the scatterwalk length should not be longer than 
-the underlying SGL.
+Changes since v1
+- Aligned to column struct *dev in include
+- Added missing mutex_unlock in crypto_engine_start()
 
-Thus, the bug you report is rather a bug in the scatterlist / scatterwalk 
-length definition.
+Corentin Labbe (3):
+  crypto: skcipher - export crypto_skcipher_type2
+  crypto: engine - find request type with cra_type
+  crypto: engine - Permit to enqueue skcipher request
 
-Ciao
-Stephan
+ crypto/crypto_engine.c  | 133 ++++++++++++++++++++++++++++++++++++++++++++----
+ crypto/skcipher.c       |   3 +-
+ include/crypto/algapi.h |   1 +
+ include/crypto/engine.h |  14 +++++
+ 4 files changed, 139 insertions(+), 12 deletions(-)
+
+-- 
+2.13.0
