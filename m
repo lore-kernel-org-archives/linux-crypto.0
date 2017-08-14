@@ -1,61 +1,78 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH 1/2] crypto/chacha20: fix handling of chunked input
-Date: Mon, 14 Aug 2017 14:28:14 +0100
-Message-ID: <20170814132815.24524-1-ard.biesheuvel@linaro.org>
-Cc: herbert@gondor.apana.org.au, steffen.klassert@secunet.com,
-        tobias@strongswan.org, martin@strongswan.org,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: linux-crypto@vger.kernel.org
+From: David Sterba <dsterba@suse.cz>
+Subject: Re: [PATCH v5 2/5] lib: Add zstd modules
+Date: Mon, 14 Aug 2017 15:30:37 +0200
+Message-ID: <20170814133037.GT2866@twin.jikos.cz>
+References: <20170810023553.3200875-1-terrelln@fb.com>
+ <20170810023553.3200875-3-terrelln@fb.com>
+ <20170810083017.GA10462@zzz.localdomain>
+ <0ceeccb4-1a0f-cacb-dd2b-2913e1cf73ab@fb.com>
+ <20170810192506.GF7140@carfax.org.uk>
+ <6cd9c58a-1bcb-02c2-9329-c5acc0e79121@fb.com>
+Reply-To: dsterba@suse.cz
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: Hugo Mills <hugo@carfax.org.uk>,
+        Eric Biggers <ebiggers3@gmail.com>,
+        Nick Terrell <terrelln@fb.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>, kernel-team@fb.com,
+        squashfs-devel@lists.sourceforge.net, linux-btrfs@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Chris Mason <clm@fb.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f54.google.com ([74.125.82.54]:38426 "EHLO
-        mail-wm0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752026AbdHNN2a (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Aug 2017 09:28:30 -0400
-Received: by mail-wm0-f54.google.com with SMTP id f15so43779885wmg.1
-        for <linux-crypto@vger.kernel.org>; Mon, 14 Aug 2017 06:28:30 -0700 (PDT)
+Received: from mx2.suse.de ([195.135.220.15]:39829 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751529AbdHNNcB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 14 Aug 2017 09:32:01 -0400
+Content-Disposition: inline
+In-Reply-To: <6cd9c58a-1bcb-02c2-9329-c5acc0e79121@fb.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Commit 9ae433bc79f9 ("crypto: chacha20 - convert generic and x86 versions
-to skcipher") ported the existing chacha20 code to use the new skcipher
-API, and introduced a bug along the way. Unfortunately, the tcrypt tests
-did not catch the error, and it was only found recently by Tobias.
+On Fri, Aug 11, 2017 at 09:20:10AM -0400, Chris Mason wrote:
+> 
+> 
+> On 08/10/2017 03:25 PM, Hugo Mills wrote:
+> > On Thu, Aug 10, 2017 at 01:41:21PM -0400, Chris Mason wrote:
+> >> On 08/10/2017 04:30 AM, Eric Biggers wrote:
+> >>>
+> >>> Theses benchmarks are misleading because they compress the whole file as a
+> >>> single stream without resetting the dictionary, which isn't how data will
+> >>> typically be compressed in kernel mode.  With filesystem compression the data
+> >>> has to be divided into small chunks that can each be decompressed independently.
+> >>> That eliminates one of the primary advantages of Zstandard (support for large
+> >>> dictionary sizes).
+> >>
+> >> I did btrfs benchmarks of kernel trees and other normal data sets as
+> >> well.  The numbers were in line with what Nick is posting here.
+> >> zstd is a big win over both lzo and zlib from a btrfs point of view.
+> >>
+> >> It's true Nick's patches only support a single compression level in
+> >> btrfs, but that's because btrfs doesn't have a way to pass in the
+> >> compression ratio.  It could easily be a mount option, it was just
+> >> outside the scope of Nick's initial work.
+> > 
+> >     Could we please not add more mount options? I get that they're easy
+> > to implement, but it's a very blunt instrument. What we tend to see
+> > (with both nodatacow and compress) is people using the mount options,
+> > then asking for exceptions, discovering that they can't do that, and
+> > then falling back to doing it with attributes or btrfs properties.
+> > Could we just start with btrfs properties this time round, and cut out
+> > the mount option part of this cycle.
+> > 
+> >     In the long run, it'd be great to see most of the btrfs-specific
+> > mount options get deprecated and ultimately removed entirely, in
+> > favour of attributes/properties, where feasible.
+> > 
+> 
+> It's a good point, and as was commented later down I'd just do mount -o 
+> compress=zstd:3 or something.
 
-Stefan kindly diagnosed the error, and proposed a fix which is similar
-to the one below, with the exception that 'walk.stride' is used rather
-than the hardcoded block size. This does not actually matter in this
-case, but it's a better example of how to use the skcipher walk API.
+We've solved that already, here's a proposed patch that extends current
+mount options,
 
-Fixes: 9ae433bc79f9 ("crypto: chacha20 - convert generic and x86 ...")
-Cc: <stable@vger.kernel.org> # v4.11+
-Cc: Steffen Klassert <steffen.klassert@secunet.com>
-Reported-by: Tobias Brunner <tobias@strongswan.org>
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
- crypto/chacha20_generic.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+https://www.mail-archive.com/linux-btrfs@vger.kernel.org/msg66248.html
 
-diff --git a/crypto/chacha20_generic.c b/crypto/chacha20_generic.c
-index 8b3c04d625c3..4a45fa4890c0 100644
---- a/crypto/chacha20_generic.c
-+++ b/crypto/chacha20_generic.c
-@@ -91,9 +91,14 @@ int crypto_chacha20_crypt(struct skcipher_request *req)
- 	crypto_chacha20_init(state, ctx, walk.iv);
- 
- 	while (walk.nbytes > 0) {
-+		unsigned int nbytes = walk.nbytes;
-+
-+		if (nbytes < walk.total)
-+			nbytes = round_down(nbytes, walk.stride);
-+
- 		chacha20_docrypt(state, walk.dst.virt.addr, walk.src.virt.addr,
--				 walk.nbytes);
--		err = skcipher_walk_done(&walk, 0);
-+				 nbytes);
-+		err = skcipher_walk_done(&walk, walk.nbytes - nbytes);
- 	}
- 
- 	return err;
--- 
-2.11.0
+and a patch that could be backported to older kernels so the new mount
+options do not break mounts on older kernels with the new syntax
+
+https://patchwork.kernel.org/patch/9845697/
