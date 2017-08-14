@@ -1,125 +1,48 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [Freedombox-discuss] Hardware Crypto
-Date: Mon, 14 Aug 2017 11:40:42 +0300
-Message-ID: <CAOtvUMdrwg4cq6XxDZrC_t57yCmOU+MDR1iz-b6+A-_G9eiaDg@mail.gmail.com>
-References: <87pqldrq15.fsf@freedomboxfoundation.org> <CAMhXSQpkScTzZB4fZ0KGbTPKmtiwv_o7cz7MrWXc_rqrCfO3Pg@mail.gmail.com>
- <4E1FF66C.6010908@mray.de> <87wrfe1acu.fsf@freedomboxfoundation.org>
- <CA+FSnD1NO97U1zQQZV=VD+dbCGR0oQTgEYBmH6VupGUKo8uRFA@mail.gmail.com>
- <87r55m175w.fsf@freedomboxfoundation.org> <CAJVWO9aUCLb6k87do-ckOdkV-1U7d2SiG3gtBOVVXouog04Tpw@mail.gmail.com>
- <CAJVWO9YDKD72Sbb9_wWvxFVEppDg=4+XfBAY3uxvxcZ0b2t3yg@mail.gmail.com>
- <20110720063824.GA15748@havelock.liw.fi> <CAJVWO9bXs7_bx8-37O++n8kSJTuASC_benwmyeLgfiik8nGrmA@mail.gmail.com>
- <8762mx14co.fsf@freedomboxfoundation.org> <6556610b-9ddf-4bc2-b235-a2c91598a040@email.android.com>
- <201107220153.p6M1rVDn004794@new.toad.com> <CACXcFm=CBZmSaiwt7RaGUtS1u-q5HUrACKrvj=7Y201R6Fzmtw@mail.gmail.com>
- <CACXcFm=Kea6fOgeqYrgg5z3F=aVOS3YHYuU0S7FespD+C02AZg@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Sandy Harris <sandyinchina@gmail.com>
+From: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [PATCH v8 0/4] crypto: add algif_akcipher user space API
+Date: Mon, 14 Aug 2017 11:26:43 +0200
+Message-ID: <744D2EC6-01B1-4BE3-94A1-8FC7704D67A0@holtmann.org>
+References: <26359147.tCiuJ5s8mz@positron.chronox.de>
+ <3253864.NSkFVeIncy@tauon.chronox.de>
+ <959CA6EF-E63F-4116-A02C-153D5C436879@holtmann.org>
+ <2880013.tS8KcRZytZ@tauon.chronox.de>
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 8BIT
+Cc: Mat Martineau <mathew.j.martineau@linux.intel.com>,
+        Andrew Zaborowski <balrogg@googlemail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <david@woodhou.se>
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-yw0-f174.google.com ([209.85.161.174]:33067 "EHLO
-        mail-yw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752199AbdHNIko (ORCPT
+Received: from coyote.holtmann.net ([212.227.132.17]:53162 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752246AbdHNJ0p (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Aug 2017 04:40:44 -0400
-Received: by mail-yw0-f174.google.com with SMTP id p68so51267821ywg.0
-        for <linux-crypto@vger.kernel.org>; Mon, 14 Aug 2017 01:40:43 -0700 (PDT)
-In-Reply-To: <CACXcFm=Kea6fOgeqYrgg5z3F=aVOS3YHYuU0S7FespD+C02AZg@mail.gmail.com>
+        Mon, 14 Aug 2017 05:26:45 -0400
+In-Reply-To: <2880013.tS8KcRZytZ@tauon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+Hi Stephan,
 
-On Sun, Aug 13, 2017 at 8:21 PM, Sandy Harris <sandyinchina@gmail.com> wrote:
-> Showing only the key parts of the message:
->
->> From: John Gilmore <gnu@toad.com>
->
-> An exceedingly knowledgeable guy, one we should probably take seriously.
-> https://en.wikipedia.org/wiki/John_Gilmore_(activist)
->
->> Most hardware crypto accelerators are useless, ...
->> ... you might as well have
->> just computed the answer in userspace using ordinary instructions.
->
-> A strong claim, but one I'm inclined to believe. In the cases where it
-> applies, it may be a problem for much of the Linux crypto work.
+>>> The first part is clearly where AF_ALG fits and keyctl does not. This is
+>>> provided with the current patch set. As the keyctl API only handles, well,
+>>> keys, access to the raw ciphers may not be possible through this API. And
+>>> let us face it, a lot of user space code shall support many different
+>>> OSes. Thus, if you have a crypto lib in user space who has its own key
+>>> management (which is a core element of such libraries and thus cannot be
+>>> put into an architecture-dependent code part), having only the keyctl API
+>>> on Linux for accelerated asym support may not be helpful.
+>> 
+>> That argument is just non-sense.
+> 
+> How interesting. For example, what about NSS with its own key database?
 
-The claim is mostly true if the data to be processed is in user space,
-simply because context switches are so expensive.
+a lot of applications create their own key or certificate database. It also means they need to reload and reload them over and over again for each process. A lot of things are possible, but why keep doing things more complicated than they need to be. As I said before, if you only have a hammer ..
 
-However, in case of in-kernel producers of data, such as DMcrypt.
-Fscrypt and the recent TLS socket frame work, this is not the case.
+Regards
 
-In that scenario, processing context and the data are already in kernel space
-and then it becomes a question of what is more efficient - DMA to/from
-a crypto HW or doing it on the core - and the result is often measured not
-in pure latency of operation but in performance per watt, since in some cases
-you might be better off letting CPU cores idle and perform computation on
-HW that is more power conserving.
-
-So it really depends on the specific hardware, work load and operating
-conditions.
-
->
-> Some CPUs have special instructions to speed up some crypto
-> operations, and not just AES. For example, Intel has them for several
-> hashes and for elliptic curve calculations:
-> https://software.intel.com/en-us/articles/intel-sha-extensions
-> https://en.wikipedia.org/wiki/CLMUL_instruction_set
-> https://www.intel.com/content/dam/www/public/us/en/documents/white-papers/polynomial-multiplication-instructions-paper.pdf
->
-> These move the goalposts; if doing it "using ordinary instructions" is
-> sometimes faster than hardware, then doing it with
-> application-specific instructions is even more likely to be faster.
->
->> Even if a /dev/crypto interface existed and was faster for some kinds
->> of operations than just doing the crypto manually, the standard crypto
->> libraries would have to be portably tuned to detect when to use
->> hardware and when to use software.  The libraries generally use
->> hardware if it's available, since they were written with the
->> assumption that nobody would bother with hardware crypto if it was
->> slower than software.
->>
->> "Just make it fast for all cases" is hard when the hardware is poorly
->> designed.  When the hardware is well designed, it *is* faster for all
->> cases.  But that's uncommon.
->>
->> Making this determination in realtime would be a substantial
->> enhancement to each crypto library.  Since it'd have to be written
->> portably (or the maintainers of the portable crypto libraries won't
->> take it back), it couldn't assume any particular timings of any
->> particular driver, either in hardware or software.  So it would have
->> to run some fraction of the calls (perhaps 1%) in more than one
->> driver, and time each one, and then make decisions on which driver to
->> use by default for the other 99% of the calls.  The resulting times
->> differ dramatically, based on many factors, ...
->>
->> One advantage of running some of the calls using both hardware and
->> software is that the library can check that the results match exactly,
->> and abort with a clear message.  That would likely have caught some bugs
->> that snuck through in earlier crypto libraries.
->
-> I'm not at all sure I'd want run-time testing of this since, at least
-> as a general rule, introducing complications to crypto code is rarely
-> a good idea. Such tests at development time seem like a fine idea,
-> though; do we have those already?
->
-> What about testing when it is time to decide on kernel configuration;
-> include a particular module or not? Another issue is whether the
-> module choice is all-or-nothing; if there is a hardware RNG can one
-> use that without loading the rest of the code for the crypto
-> accelerator?
-
-The choice is modular.
-
-Gilad
-
-
-
--- 
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-"If you take a class in large-scale robotics, can you end up in a
-situation where the homework eats your dog?"
- -- Jean-Baptiste Queru
+Marcel
