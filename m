@@ -1,101 +1,55 @@
-From: Gary R Hook <gary.hook-5C7GfCeVMHo@public.gmane.org>
-Subject: Re: [PATCH v5 02/19] crypto: ccp: use -EAGAIN for transient busy
- indication
-Date: Mon, 14 Aug 2017 11:55:44 -0500
-Message-ID: <28b9a7d4-d329-bb1e-d4eb-6530795eaa0b__11535.8983086937$1502729868$gmane$org@amd.com>
-References: <1502724094-23305-1-git-send-email-gilad@benyossef.com>
- <1502724094-23305-3-git-send-email-gilad@benyossef.com>
+From: Theodore Ts'o <tytso@mit.edu>
+Subject: Re: random.c: LFSR polynomials are not irreducible/primitive
+Date: Mon, 14 Aug 2017 18:21:05 -0400
+Message-ID: <20170814222105.oyswoj3xjyd5qu3c@thunk.org>
+References: <10436695.bPChAg2egJ@tauon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
-Content-Transfer-Encoding: 7bit
-Cc: Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>
-To: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>,
- Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
- "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>, Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>,
- David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
- "Lendacky, Thomas" <Thomas.Lendacky-5C7GfCeVMHo@public.gmane.org>,
- Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
- Arnaud Ebalard <arno-LkuqDEemtHBg9hUCZPvPmw@public.gmane.org>, Matthias Brugger
- <matthias.bgg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Alasdair Kergon <agk-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
- Mike Snitzer <snitzer-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, "dm-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org"
- <dm-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Shaohua Li <shli-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
- Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, "Theodore Y. Ts'o" <tytso-3s7WtUTddSA@public.gmane.org>,
- Jaegeuk Kim <jaegeuk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Mimi Zohar <zohar-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>,
- Dmitry Kasatkin <dmitry.kasatkin-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
- James Morris <james.l.morris-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>, "Serge E. Hallyn"
- <serge-A9i7LUbDfNHQT0dZR+AlfA@public.gmane.org>,
- "linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
- "linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <lin
-Return-path: <linux-mediatek-bounces+glpam-linux-mediatek=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
-In-Reply-To: <1502724094-23305-3-git-send-email-gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-mediatek>,
- <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-mediatek/>
-List-Post: <mailto:linux-mediatek-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
-List-Help: <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-mediatek>,
- <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=subscribe>
-Sender: "Linux-mediatek" <linux-mediatek-bounces-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
-Errors-To: linux-mediatek-bounces+glpam-linux-mediatek=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from imap.thunk.org ([74.207.234.97]:43206 "EHLO imap.thunk.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752408AbdHNWVI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 14 Aug 2017 18:21:08 -0400
+Content-Disposition: inline
+In-Reply-To: <10436695.bPChAg2egJ@tauon.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 08/14/2017 10:21 AM, Gilad Ben-Yossef wrote:
-> Replace -EBUSY with -EAGAIN when reporting transient busy
-> indication in the absence of backlog.
->
-> Signed-off-by: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
+On Mon, Aug 14, 2017 at 10:20:18AM +0200, Stephan Mueller wrote:
+> Hi Ted,
+> 
+> drivers/char/random.c contains the following comment:
+> 
+> """
+>  * Our mixing functions were analyzed by Lacharme, Roeck, Strubel, and
+>  * Videau in their paper, "The Linux Pseudorandom Number Generator
+>  * Revisited" (see: http://eprint.iacr.org/2012/251.pdf).  In their
+>  * paper, they point out that we are not using a true Twisted GFSR,
+>  * since Matsumoto & Kurita used a trinomial feedback polynomial (that
+>  * is, with only three taps, instead of the six that we are using).
+>  * As a result, the resulting polynomial is neither primitive nor
+>  * irreducible, and hence does not have a maximal period over
+>  * GF(2**32).  They suggest a slight change to the generator
+>  * polynomial which improves the resulting TGFSR polynomial to be
+>  * irreducible, which we have made here.
+> """
+> 
+> This comment leads me to belief that the current polynomial is primitive (and 
+> irreducible).
+> 
+> Strangely, this is not the case as seen with the following code that can be 
+> used with the mathematical tool called magma. There is a free online version 
+> of magma available to recheck it: http://magma.maths.usyd.edu.au/calc/
+> 
+> Note, the polynomials used up till 3.12 were primitive and irreducible.
+> 
+> Could you please help me understanding why the current polynomials are better 
+> than the old ones?
 
-Reviewed-by: Gary R Hook <gary.hook-5C7GfCeVMHo@public.gmane.org>
+Have you looked at section 3.1.1 of the above cited paper?
 
-> ---
->  drivers/crypto/ccp/ccp-crypto-main.c | 8 +++-----
->  drivers/crypto/ccp/ccp-dev.c         | 7 +++++--
->  2 files changed, 8 insertions(+), 7 deletions(-)
->
-> diff --git a/drivers/crypto/ccp/ccp-crypto-main.c b/drivers/crypto/ccp/ccp-crypto-main.c
-> index 35a9de7..403ff0a 100644
-> --- a/drivers/crypto/ccp/ccp-crypto-main.c
-> +++ b/drivers/crypto/ccp/ccp-crypto-main.c
-> @@ -222,9 +222,10 @@ static int ccp_crypto_enqueue_cmd(struct ccp_crypto_cmd *crypto_cmd)
->
->  	/* Check if the cmd can/should be queued */
->  	if (req_queue.cmd_count >= CCP_CRYPTO_MAX_QLEN) {
-> -		ret = -EBUSY;
-> -		if (!(crypto_cmd->cmd->flags & CCP_CMD_MAY_BACKLOG))
-> +		if (!(crypto_cmd->cmd->flags & CCP_CMD_MAY_BACKLOG)) {
-> +			ret = -EAGAIN;
->  			goto e_lock;
-> +		}
->  	}
->
->  	/* Look for an entry with the same tfm.  If there is a cmd
-> @@ -243,9 +244,6 @@ static int ccp_crypto_enqueue_cmd(struct ccp_crypto_cmd *crypto_cmd)
->  		ret = ccp_enqueue_cmd(crypto_cmd->cmd);
->  		if (!ccp_crypto_success(ret))
->  			goto e_lock;	/* Error, don't queue it */
-> -		if ((ret == -EBUSY) &&
-> -		    !(crypto_cmd->cmd->flags & CCP_CMD_MAY_BACKLOG))
-> -			goto e_lock;	/* Not backlogging, don't queue it */
->  	}
->
->  	if (req_queue.cmd_count >= CCP_CRYPTO_MAX_QLEN) {
-> diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
-> index 4e029b1..3d637e3 100644
-> --- a/drivers/crypto/ccp/ccp-dev.c
-> +++ b/drivers/crypto/ccp/ccp-dev.c
-> @@ -292,9 +292,12 @@ int ccp_enqueue_cmd(struct ccp_cmd *cmd)
->  	i = ccp->cmd_q_count;
->
->  	if (ccp->cmd_count >= MAX_CMD_QLEN) {
-> -		ret = -EBUSY;
-> -		if (cmd->flags & CCP_CMD_MAY_BACKLOG)
-> +		if (cmd->flags & CCP_CMD_MAY_BACKLOG) {
-> +			ret = -EBUSY;
->  			list_add_tail(&cmd->entry, &ccp->backlog);
-> +		} else {
-> +			ret = -EAGAIN;
-> +		}
->  	} else {
->  		ret = -EINPROGRESS;
->  		ccp->cmd_count++;
->
+	http://eprint.iacr.org/2012/251.pdf
+
+							- Ted
