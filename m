@@ -1,102 +1,149 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH v3 21/22] staging: ccree: save ciphertext for CTS IV
-Date: Tue, 15 Aug 2017 09:26:49 +0300
-Message-ID: <1502778412-16255-22-git-send-email-gilad@benyossef.com>
+Subject: [PATCH v3 22/22] staging: ccree: remove BUG macro usage
+Date: Tue, 15 Aug 2017 09:26:50 +0300
+Message-ID: <1502778412-16255-23-git-send-email-gilad@benyossef.com>
 References: <1502778412-16255-1-git-send-email-gilad@benyossef.com>
 Cc: Ofir Drang <ofir.drang@arm.com>
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         linux-crypto@vger.kernel.org,
         driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
         linux-kernel@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:48240 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753686AbdHOG2p (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Aug 2017 02:28:45 -0400
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1502778412-16255-1-git-send-email-gilad@benyossef.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-The crypto API requires saving the last blocks of ciphertext
-in req->info for use as IV for CTS mode. The ccree driver
-was not doing it and so failing tcrypt tests in some
-situations. This patch fixes the issue.
+Replace BUG() macro usage that crash the kernel with alternatives
+that signal error and/or try to recover.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/ssi_cipher.c | 31 +++++++++++++++++++++++++++++--
- 1 file changed, 29 insertions(+), 2 deletions(-)
+ drivers/staging/ccree/ssi_buffer_mgr.c  | 14 ++++++--------
+ drivers/staging/ccree/ssi_cipher.c      |  1 -
+ drivers/staging/ccree/ssi_pm.c          |  3 ++-
+ drivers/staging/ccree/ssi_request_mgr.c | 23 +++++++++++++++++------
+ 4 files changed, 25 insertions(+), 16 deletions(-)
 
+diff --git a/drivers/staging/ccree/ssi_buffer_mgr.c b/drivers/staging/ccree/ssi_buffer_mgr.c
+index 051d948..6d5af50 100644
+--- a/drivers/staging/ccree/ssi_buffer_mgr.c
++++ b/drivers/staging/ccree/ssi_buffer_mgr.c
+@@ -86,11 +86,6 @@ static unsigned int ssi_buffer_mgr_get_sgl_nents(
+ 	unsigned int nents = 0;
+ 
+ 	while (nbytes != 0) {
+-		if (sg_is_chain(sg_list)) {
+-			SSI_LOG_ERR("Unexpected chained entry in sg (entry =0x%X)\n",
+-				    nents);
+-			BUG();
+-		}
+ 		if (sg_list->length != 0) {
+ 			nents++;
+ 			/* get the number of bytes in the last entry */
+@@ -861,7 +856,8 @@ static inline int ssi_buffer_mgr_aead_chain_assoc(
+ 			 * unexpected
+ 			 */			if (!current_sg) {
+ 				SSI_LOG_ERR("reached end of sg list. unexpected\n");
+-				BUG();
++				rc = -EINVAL;
++				goto chain_assoc_exit;
+ 			}
+ 			sg_index += current_sg->length;
+ 			mapped_nents++;
+@@ -1163,7 +1159,8 @@ static inline int ssi_buffer_mgr_aead_chain_data(
+ 		//if have reached the end of the sgl, then this is unexpected
+ 		if (!areq_ctx->src_sgl) {
+ 			SSI_LOG_ERR("reached end of sg list. unexpected\n");
+-			BUG();
++			return -EINVAL;
++			goto chain_data_exit;
+ 		}
+ 		sg_index += areq_ctx->src_sgl->length;
+ 		src_mapped_nents--;
+@@ -1207,7 +1204,8 @@ static inline int ssi_buffer_mgr_aead_chain_data(
+ 		//if have reached the end of the sgl, then this is unexpected
+ 		if (!areq_ctx->dst_sgl) {
+ 			SSI_LOG_ERR("reached end of sg list. unexpected\n");
+-			BUG();
++			rc = -EINVAL;
++			goto chain_data_exit;
+ 		}
+ 		sg_index += areq_ctx->dst_sgl->length;
+ 		dst_mapped_nents--;
 diff --git a/drivers/staging/ccree/ssi_cipher.c b/drivers/staging/ccree/ssi_cipher.c
-index aa722e1..cc550b5 100644
+index cc550b5..73ba4eb 100644
 --- a/drivers/staging/ccree/ssi_cipher.c
 +++ b/drivers/staging/ccree/ssi_cipher.c
-@@ -24,6 +24,7 @@
- #include <crypto/ctr.h>
- #include <crypto/des.h>
- #include <crypto/xts.h>
-+#include <crypto/scatterwalk.h>
- 
- #include "ssi_config.h"
- #include "ssi_driver.h"
-@@ -696,6 +697,7 @@ static int ssi_blkcipher_complete(struct device *dev,
- {
- 	int completion_error = 0;
- 	u32 inflight_counter;
-+	struct ablkcipher_request *req = (struct ablkcipher_request *)areq;
- 
- 	ssi_buffer_mgr_unmap_blkcipher_request(dev, req_ctx, ivsize, src, dst);
- 
-@@ -706,6 +708,22 @@ static int ssi_blkcipher_complete(struct device *dev,
- 		ctx_p->drvdata->inflight_counter--;
- 
- 	if (areq) {
-+		/*
-+		 * The crypto API expects us to set the req->info to the last
-+		 * ciphertext block. For encrypt, simply copy from the result.
-+		 * For decrypt, we must copy from a saved buffer since this
-+		 * could be an in-place decryption operation and the src is
-+		 * lost by this point.
-+		 */
-+		if (req_ctx->gen_ctx.op_type == DRV_CRYPTO_DIRECTION_DECRYPT)  {
-+			memcpy(req->info, req_ctx->backup_info, ivsize);
-+			kfree(req_ctx->backup_info);
-+		} else {
-+			scatterwalk_map_and_copy(req->info, req->dst,
-+						 (req->nbytes - ivsize),
-+						 ivsize, 0);
-+		}
-+
- 		ablkcipher_request_complete(areq, completion_error);
- 		return 0;
+@@ -543,7 +543,6 @@ ssi_blkcipher_create_setup_desc(
+ 		break;
+ 	default:
+ 		SSI_LOG_ERR("Unsupported cipher mode (%d)\n", cipher_mode);
+-		BUG();
  	}
-@@ -859,7 +877,6 @@ static int ssi_ablkcipher_encrypt(struct ablkcipher_request *req)
- 	struct blkcipher_req_ctx *req_ctx = ablkcipher_request_ctx(req);
- 	unsigned int ivsize = crypto_ablkcipher_ivsize(ablk_tfm);
- 
--	req_ctx->backup_info = req->info;
- 	req_ctx->is_giv = false;
- 
- 	return ssi_blkcipher_process(tfm, req_ctx, req->dst, req->src, req->nbytes, req->info, ivsize, (void *)req, DRV_CRYPTO_DIRECTION_ENCRYPT);
-@@ -872,8 +889,18 @@ static int ssi_ablkcipher_decrypt(struct ablkcipher_request *req)
- 	struct blkcipher_req_ctx *req_ctx = ablkcipher_request_ctx(req);
- 	unsigned int ivsize = crypto_ablkcipher_ivsize(ablk_tfm);
- 
--	req_ctx->backup_info = req->info;
-+	/*
-+	 * Allocate and save the last IV sized bytes of the source, which will
-+	 * be lost in case of in-place decryption and might be needed for CTS.
-+	 */
-+	req_ctx->backup_info = kmalloc(ivsize, GFP_KERNEL);
-+	if (!req_ctx->backup_info)
-+		return -ENOMEM;
-+
-+	scatterwalk_map_and_copy(req_ctx->backup_info, req->src,
-+				 (req->nbytes - ivsize), ivsize, 0);
- 	req_ctx->is_giv = false;
-+
- 	return ssi_blkcipher_process(tfm, req_ctx, req->dst, req->src, req->nbytes, req->info, ivsize, (void *)req, DRV_CRYPTO_DIRECTION_DECRYPT);
  }
  
+diff --git a/drivers/staging/ccree/ssi_pm.c b/drivers/staging/ccree/ssi_pm.c
+index 31325e6..a50671a 100644
+--- a/drivers/staging/ccree/ssi_pm.c
++++ b/drivers/staging/ccree/ssi_pm.c
+@@ -109,7 +109,8 @@ int ssi_power_mgr_runtime_put_suspend(struct device *dev)
+ 		rc = pm_runtime_put_autosuspend(dev);
+ 	} else {
+ 		/* Something wrong happens*/
+-		BUG();
++		SSI_LOG_ERR("request to suspend already suspended queue");
++		rc = -EBUSY;
+ 	}
+ 	return rc;
+ }
+diff --git a/drivers/staging/ccree/ssi_request_mgr.c b/drivers/staging/ccree/ssi_request_mgr.c
+index b671eff..8bf72e7 100644
+--- a/drivers/staging/ccree/ssi_request_mgr.c
++++ b/drivers/staging/ccree/ssi_request_mgr.c
+@@ -366,11 +366,16 @@ int send_request(
+ 	enqueue_seq(cc_base, &req_mgr_h->compl_desc, (is_dout ? 0 : 1));
+ 
+ 	if (unlikely(req_mgr_h->q_free_slots < total_seq_len)) {
+-		/*This means that there was a problem with the resume*/
+-		BUG();
++		/* This situation should never occur. Maybe indicating problem
++		 * with resuming power. Set the free slot count to 0 and hope
++		 * for the best.
++		 */
++		SSI_LOG_ERR("HW free slot count mismatch.");
++		req_mgr_h->q_free_slots = 0;
++	} else {
++		/* Update the free slots in HW queue */
++		req_mgr_h->q_free_slots -= total_seq_len;
+ 	}
+-	/* Update the free slots in HW queue */
+-	req_mgr_h->q_free_slots -= total_seq_len;
+ 
+ 	spin_unlock_bh(&req_mgr_h->hw_lock);
+ 
+@@ -459,8 +464,13 @@ static void proc_completions(struct ssi_drvdata *drvdata)
+ 
+ 		/* Dequeue request */
+ 		if (unlikely(request_mgr_handle->req_queue_head == request_mgr_handle->req_queue_tail)) {
+-			SSI_LOG_ERR("Request queue is empty req_queue_head==req_queue_tail==%u\n", request_mgr_handle->req_queue_head);
+-			BUG();
++			/* We are supposed to handle a completion but our
++			 * queue is empty. This is not normal. Return and
++			 * hope for the best.
++			 */
++			SSI_LOG_ERR("Request queue is empty head == tail %u\n",
++				    request_mgr_handle->req_queue_head);
++			goto out;
+ 		}
+ 
+ 		ssi_req = &request_mgr_handle->req_queue[request_mgr_handle->req_queue_tail];
+@@ -486,6 +496,7 @@ static void proc_completions(struct ssi_drvdata *drvdata)
+ 		request_mgr_handle->req_queue_tail = (request_mgr_handle->req_queue_tail + 1) & (MAX_REQUEST_QUEUE_SIZE - 1);
+ 		SSI_LOG_DEBUG("Dequeue request tail=%u\n", request_mgr_handle->req_queue_tail);
+ 		SSI_LOG_DEBUG("Request completed. axi_completed=%d\n", request_mgr_handle->axi_completed);
++out:
+ #if defined(CONFIG_PM_RUNTIME) || defined(CONFIG_PM_SLEEP)
+ 		rc = ssi_power_mgr_runtime_put_suspend(&plat_dev->dev);
+ 		if (rc != 0)
 -- 
 2.1.4
