@@ -1,78 +1,96 @@
-From: Boris Brezillon <boris.brezillon@free-electrons.com>
-Subject: Re: [PATCH v5 04/19] crypto: marvell/cesa: remove redundant backlog
- checks on EBUSY
-Date: Tue, 15 Aug 2017 10:16:29 +0200
-Message-ID: <20170815101629.7d323845@bbrezillon>
-References: <1502724094-23305-1-git-send-email-gilad@benyossef.com>
-        <1502724094-23305-5-git-send-email-gilad@benyossef.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: random.c: LFSR polynomials are not irreducible/primitive
+Date: Tue, 15 Aug 2017 10:45:17 +0200
+Message-ID: <5311487.93A5fcTOOn@tauon.chronox.de>
+References: <10436695.bPChAg2egJ@tauon.chronox.de> <20170814222105.oyswoj3xjyd5qu3c@thunk.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        David Howells <dhowells@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>,
-        Arnaud Ebalard <arno@natisbad.org>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Shaohua Li <shli@kernel.org>, Steve French <sfrench@samba.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        James Morris <james.l.morris@oracle.com>,
-        "Serge E. Hallyn" <serge@hallyn.com>, linux-crypto@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kerne
-To: Gilad Ben-Yossef <gilad@benyossef.com>
-Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <1502724094-23305-5-git-send-email-gilad@benyossef.com>
-Sender: owner-linux-security-module@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
+To: Theodore Ts'o <tytso@mit.edu>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:58850 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751518AbdHOIpU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 15 Aug 2017 04:45:20 -0400
+In-Reply-To: <20170814222105.oyswoj3xjyd5qu3c@thunk.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Le Mon, 14 Aug 2017 18:21:14 +0300,
-Gilad Ben-Yossef <gilad@benyossef.com> a écrit :
+Am Dienstag, 15. August 2017, 00:21:05 CEST schrieb Theodore Ts'o:
 
-> Now that -EBUSY return code only indicates backlog queueing
-> we can safely remove the now redundant check for the
-> CRYPTO_TFM_REQ_MAY_BACKLOG flag when -EBUSY is returned.
+Hi Theodore,
+
+> Have you looked at section 3.1.1 of the above cited paper?
 > 
-> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+> 	http://eprint.iacr.org/2012/251.pdf
 
-Acked-by: Boris Brezillon <boris.brezillon@free-electrons.com>
+Thanks for the hint, but that does not seem to solve the mystery either.
 
-> ---
->  drivers/crypto/marvell/cesa.c | 3 +--
->  drivers/crypto/marvell/cesa.h | 2 +-
->  2 files changed, 2 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/crypto/marvell/cesa.c b/drivers/crypto/marvell/cesa.c
-> index 6e7a5c7..269737f 100644
-> --- a/drivers/crypto/marvell/cesa.c
-> +++ b/drivers/crypto/marvell/cesa.c
-> @@ -183,8 +183,7 @@ int mv_cesa_queue_req(struct crypto_async_request *req,
->  	spin_lock_bh(&engine->lock);
->  	ret = crypto_enqueue_request(&engine->queue, req);
->  	if ((mv_cesa_req_get_type(creq) == CESA_DMA_REQ) &&
-> -	    (ret == -EINPROGRESS ||
-> -	    (ret == -EBUSY && req->flags & CRYPTO_TFM_REQ_MAY_BACKLOG)))
-> +	    (ret == -EINPROGRESS || ret == -EBUSY)
->  		mv_cesa_tdma_chain(engine, creq);
->  	spin_unlock_bh(&engine->lock);
->  
-> diff --git a/drivers/crypto/marvell/cesa.h b/drivers/crypto/marvell/cesa.h
-> index b7872f6..63c8457 100644
-> --- a/drivers/crypto/marvell/cesa.h
-> +++ b/drivers/crypto/marvell/cesa.h
-> @@ -763,7 +763,7 @@ static inline int mv_cesa_req_needs_cleanup(struct crypto_async_request *req,
->  	 * the backlog and will be processed later. There's no need to
->  	 * clean it up.
->  	 */
-> -	if (ret == -EBUSY && req->flags & CRYPTO_TFM_REQ_MAY_BACKLOG)
-> +	if (ret == -EBUSY)
->  		return false;
->  
->  	/* Request wasn't queued, we need to clean it up */
+When I use magma with GF(2^32), I see that all polynomials are neither 
+primitive nor irreducible:
 
+F:=GF(4294967296);
+F;
+
+P<x>:=PolynomialRing(F);
+P;
+print "Old polynomials:";
+
+P<x>:=x^128 + x^103 + x^76 + x^51 +x^25 + x + 1;
+P;
+print "is irreducible: "; IsIrreducible(P);
+print "is primitive: "; IsPrimitive(P);
+
+P<x>:=x^32 + x^26 + x^20 + x^14 + x^7 + x + 1;
+P;
+print "is irreducible: "; IsIrreducible(P);
+print "is primitive: "; IsPrimitive(P);
+
+print "New polynomials:";
+
+P<x>:=x^128 + x^104 + x^76 + x^51 +x^25 + x + 1;
+P;
+print "is irreducible: "; IsIrreducible(P);
+print "is primitive: "; IsPrimitive(P);
+
+P<x>:=x^32 + x^26 + x^19 + x^14 + x^7 + x + 1;
+P;
+print "is irreducible: "; IsIrreducible(P);
+print "is primitive: "; IsPrimitive(P);
+
+
+
+The output is:
+
+Finite field of size 2^32
+Univariate Polynomial Ring in x over GF(2^32)
+Old polynomials:
+x^128 + x^103 + x^76 + x^51 + x^25 + x + 1
+is irreducible:
+false
+is primitive:
+false
+x^32 + x^26 + x^20 + x^14 + x^7 + x + 1
+is irreducible:
+false
+is primitive:
+false
+New polynomials:
+x^128 + x^104 + x^76 + x^51 + x^25 + x + 1
+is irreducible:
+false
+is primitive:
+false
+x^32 + x^26 + x^19 + x^14 + x^7 + x + 1
+is irreducible:
+false
+is primitive:
+false
+
+
+Thus, I am unsure how the referenced document concludes that the new 
+polynomials are irreducible over GF(2^32).
+
+Ciao
+Stephan
