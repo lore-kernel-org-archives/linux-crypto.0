@@ -1,92 +1,78 @@
-From: Ingo Molnar <mingo@kernel.org>
-Subject: Re: x86: PIE support and option to extend KASLR randomization
-Date: Tue, 15 Aug 2017 09:56:09 +0200
-Message-ID: <20170815075609.mmzbfwritjzvrpsn@gmail.com>
-References: <20170810172615.51965-1-thgarnie@google.com>
- <20170811124127.kkb5pnkljz4umxuj@gmail.com>
- <CAJcbSZFTX3uiS2g8JriS6+z_+WrG8z3hrQo4OSuyHpiyUDJWYA@mail.gmail.com>
+From: Boris Brezillon <boris.brezillon@free-electrons.com>
+Subject: Re: [PATCH v5 04/19] crypto: marvell/cesa: remove redundant backlog
+ checks on EBUSY
+Date: Tue, 15 Aug 2017 10:16:29 +0200
+Message-ID: <20170815101629.7d323845@bbrezillon>
+References: <1502724094-23305-1-git-send-email-gilad@benyossef.com>
+        <1502724094-23305-5-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Josh Poimboeuf <jpoimboe@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
-	Matthias Kaehlcke <mka@chromium.org>,
-	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-	Juergen Gross <jgross@suse.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-	Joerg Roedel <joro@8bytes.org>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Andy Lutomirski <luto@kernel.org>, Borislav Petkov <bp@suse.de>,
-	Brian Gerst <brgerst@gmail.com>,
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-	"Rafael J . Wysocki" <rjw@rjwysocki.net>,
-	Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
-	Tejun Heo <tj@kernel.org>, Christoph Lamete
-To: Thomas Garnier <thgarnie@google.com>
-Return-path: <kernel-hardening-return-9438-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
-List-Post: <mailto:kernel-hardening@lists.openwall.com>
-List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
-List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
-List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
-Sender: Ingo Molnar <mingo.kernel.org@gmail.com>
-Content-Disposition: inline
-In-Reply-To: <CAJcbSZFTX3uiS2g8JriS6+z_+WrG8z3hrQo4OSuyHpiyUDJWYA@mail.gmail.com>
+        "David S. Miller" <davem@davemloft.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        David Howells <dhowells@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Gary Hook <gary.hook@amd.com>,
+        Arnaud Ebalard <arno@natisbad.org>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Shaohua Li <shli@kernel.org>, Steve French <sfrench@samba.org>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        James Morris <james.l.morris@oracle.com>,
+        "Serge E. Hallyn" <serge@hallyn.com>, linux-crypto@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kerne
+To: Gilad Ben-Yossef <gilad@benyossef.com>
+Return-path: <linux-security-module-owner@vger.kernel.org>
+In-Reply-To: <1502724094-23305-5-git-send-email-gilad@benyossef.com>
+Sender: owner-linux-security-module@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+Le Mon, 14 Aug 2017 18:21:14 +0300,
+Gilad Ben-Yossef <gilad@benyossef.com> a écrit :
 
-* Thomas Garnier <thgarnie@google.com> wrote:
-
-> > Do these changes get us closer to being able to build the kernel as truly 
-> > position independent, i.e. to place it anywhere in the valid x86-64 address 
-> > space? Or any other advantages?
+> Now that -EBUSY return code only indicates backlog queueing
+> we can safely remove the now redundant check for the
+> CRYPTO_TFM_REQ_MAY_BACKLOG flag when -EBUSY is returned.
 > 
-> Yes, PIE allows us to put the kernel anywhere in memory. It will allow us to 
-> have a full randomized address space where position and order of sections are 
-> completely random. There is still some work to get there but being able to build 
-> a PIE kernel is a significant step.
+> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 
-So I _really_ dislike the whole PIE approach, because of the huge slowdown:
+Acked-by: Boris Brezillon <boris.brezillon@free-electrons.com>
 
-+config RANDOMIZE_BASE_LARGE
-+       bool "Increase the randomization range of the kernel image"
-+       depends on X86_64 && RANDOMIZE_BASE
-+       select X86_PIE
-+       select X86_MODULE_PLTS if MODULES
-+       default n
-+       ---help---
-+         Build the kernel as a Position Independent Executable (PIE) and
-+         increase the available randomization range from 1GB to 3GB.
-+
-+         This option impacts performance on kernel CPU intensive workloads up
-+         to 10% due to PIE generated code. Impact on user-mode processes and
-+         typical usage would be significantly less (0.50% when you build the
-+         kernel).
-+
-+         The kernel and modules will generate slightly more assembly (1 to 2%
-+         increase on the .text sections). The vmlinux binary will be
-+         significantly smaller due to less relocations.
+> ---
+>  drivers/crypto/marvell/cesa.c | 3 +--
+>  drivers/crypto/marvell/cesa.h | 2 +-
+>  2 files changed, 2 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/crypto/marvell/cesa.c b/drivers/crypto/marvell/cesa.c
+> index 6e7a5c7..269737f 100644
+> --- a/drivers/crypto/marvell/cesa.c
+> +++ b/drivers/crypto/marvell/cesa.c
+> @@ -183,8 +183,7 @@ int mv_cesa_queue_req(struct crypto_async_request *req,
+>  	spin_lock_bh(&engine->lock);
+>  	ret = crypto_enqueue_request(&engine->queue, req);
+>  	if ((mv_cesa_req_get_type(creq) == CESA_DMA_REQ) &&
+> -	    (ret == -EINPROGRESS ||
+> -	    (ret == -EBUSY && req->flags & CRYPTO_TFM_REQ_MAY_BACKLOG)))
+> +	    (ret == -EINPROGRESS || ret == -EBUSY)
+>  		mv_cesa_tdma_chain(engine, creq);
+>  	spin_unlock_bh(&engine->lock);
+>  
+> diff --git a/drivers/crypto/marvell/cesa.h b/drivers/crypto/marvell/cesa.h
+> index b7872f6..63c8457 100644
+> --- a/drivers/crypto/marvell/cesa.h
+> +++ b/drivers/crypto/marvell/cesa.h
+> @@ -763,7 +763,7 @@ static inline int mv_cesa_req_needs_cleanup(struct crypto_async_request *req,
+>  	 * the backlog and will be processed later. There's no need to
+>  	 * clean it up.
+>  	 */
+> -	if (ret == -EBUSY && req->flags & CRYPTO_TFM_REQ_MAY_BACKLOG)
+> +	if (ret == -EBUSY)
+>  		return false;
+>  
+>  	/* Request wasn't queued, we need to clean it up */
 
-To put 10% kernel overhead into perspective: enabling this option wipes out about 
-5-10 years worth of painstaking optimizations we've done to keep the kernel fast 
-... (!!)
-
-I think the fundamental flaw is the assumption that we need a PIE executable to 
-have a freely relocatable kernel on 64-bit CPUs.
-
-Have you considered a kernel with -mcmodel=small (or medium) instead of -fpie 
--mcmodel=large? We can pick a random 2GB window in the (non-kernel) canonical 
-x86-64 address space to randomize the location of kernel text. The location of 
-modules can be further randomized within that 2GB window.
-
-It should have far less performance impact than the register-losing and 
-overhead-inducing -fpie / -mcmodel=large (for modules) execution models.
-
-My quick guess is tha the performance impact might be close to zero in fact.
-
-Thanks,
-
-	Ingo
