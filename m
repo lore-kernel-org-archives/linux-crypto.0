@@ -1,127 +1,92 @@
-From: Fabien DESSENNE <fabien.dessenne@st.com>
-Subject: RE: [PATCH 2/3] crypto: engine - find request type with cra_type
-Date: Tue, 15 Aug 2017 07:51:14 +0000
-Message-ID: <f2185b14d944433c9737cabc32e3cef9@SFHDAG5NODE3.st.com>
-References: <20170814131725.9402-1-clabbe.montjoie@gmail.com>
- <20170814131725.9402-3-clabbe.montjoie@gmail.com>
+From: Ingo Molnar <mingo@kernel.org>
+Subject: Re: x86: PIE support and option to extend KASLR randomization
+Date: Tue, 15 Aug 2017 09:56:09 +0200
+Message-ID: <20170815075609.mmzbfwritjzvrpsn@gmail.com>
+References: <20170810172615.51965-1-thgarnie@google.com>
+ <20170811124127.kkb5pnkljz4umxuj@gmail.com>
+ <CAJcbSZFTX3uiS2g8JriS6+z_+WrG8z3hrQo4OSuyHpiyUDJWYA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-To: Corentin Labbe <clabbe.montjoie@gmail.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx08-00178001.pphosted.com ([91.207.212.93]:37780 "EHLO
-        mx07-00178001.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1753232AbdHOHv2 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Aug 2017 03:51:28 -0400
-In-Reply-To: <20170814131725.9402-3-clabbe.montjoie@gmail.com>
-Content-Language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Josh Poimboeuf <jpoimboe@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
+	Matthias Kaehlcke <mka@chromium.org>,
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+	Juergen Gross <jgross@suse.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+	Joerg Roedel <joro@8bytes.org>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Andy Lutomirski <luto@kernel.org>, Borislav Petkov <bp@suse.de>,
+	Brian Gerst <brgerst@gmail.com>,
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+	"Rafael J . Wysocki" <rjw@rjwysocki.net>,
+	Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
+	Tejun Heo <tj@kernel.org>, Christoph Lamete
+To: Thomas Garnier <thgarnie@google.com>
+Return-path: <kernel-hardening-return-9438-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
+List-Post: <mailto:kernel-hardening@lists.openwall.com>
+List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
+List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
+List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
+Sender: Ingo Molnar <mingo.kernel.org@gmail.com>
+Content-Disposition: inline
+In-Reply-To: <CAJcbSZFTX3uiS2g8JriS6+z_+WrG8z3hrQo4OSuyHpiyUDJWYA@mail.gmail.com>
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Corentin,
 
-Since I have just sent a patch to add the support of "aead_request" to crypto engine, I am wondering if your proposed change (checking cra_type instead of crypto_tfm_alg_type) and mine are compatible.
-It looks like they are (assuming we export crypto_aead_type): can you confirm?
-BR
+* Thomas Garnier <thgarnie@google.com> wrote:
 
-Fabien.
+> > Do these changes get us closer to being able to build the kernel as truly 
+> > position independent, i.e. to place it anywhere in the valid x86-64 address 
+> > space? Or any other advantages?
+> 
+> Yes, PIE allows us to put the kernel anywhere in memory. It will allow us to 
+> have a full randomized address space where position and order of sections are 
+> completely random. There is still some work to get there but being able to build 
+> a PIE kernel is a significant step.
 
->-----Original Message-----
->From: linux-crypto-owner@vger.kernel.org [mailto:linux-crypto-
->owner@vger.kernel.org] On Behalf Of Corentin Labbe
->Sent: lundi 14 août 2017 15:17
->To: herbert@gondor.apana.org.au; davem@davemloft.net
->Cc: linux-crypto@vger.kernel.org; linux-kernel@vger.kernel.org; Corentin Labbe
-><clabbe.montjoie@gmail.com>
->Subject: [PATCH 2/3] crypto: engine - find request type with cra_type
->
->The current method for finding request type is based on crypto_tfm_alg_type.
->
->But in case of skcipher, it is the same than ablkcipher.
->Using cra_type for this work permits to make the distinction between the two.
->
->Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
->---
-> crypto/crypto_engine.c | 19 ++++++++-----------
-> 1 file changed, 8 insertions(+), 11 deletions(-)
->
->diff --git a/crypto/crypto_engine.c b/crypto/crypto_engine.c index
->61e7c4e02fd2..74b840749074 100644
->--- a/crypto/crypto_engine.c
->+++ b/crypto/crypto_engine.c
->@@ -38,7 +38,8 @@ static void crypto_pump_requests(struct crypto_engine
->*engine,
-> 	struct ablkcipher_request *breq;
-> 	unsigned long flags;
-> 	bool was_busy = false;
->-	int ret, rtype;
->+	int ret;
->+	const struct crypto_type *cratype;
->
-> 	spin_lock_irqsave(&engine->queue_lock, flags);
->
->@@ -94,7 +95,7 @@ static void crypto_pump_requests(struct crypto_engine
->*engine,
->
-> 	spin_unlock_irqrestore(&engine->queue_lock, flags);
->
->-	rtype = crypto_tfm_alg_type(engine->cur_req->tfm);
->+	cratype = engine->cur_req->tfm->__crt_alg->cra_type;
-> 	/* Until here we get the request need to be encrypted successfully */
-> 	if (!was_busy && engine->prepare_crypt_hardware) {
-> 		ret = engine->prepare_crypt_hardware(engine);
->@@ -104,8 +105,7 @@ static void crypto_pump_requests(struct crypto_engine
->*engine,
-> 		}
-> 	}
->
->-	switch (rtype) {
->-	case CRYPTO_ALG_TYPE_AHASH:
->+	if (cratype == &crypto_ahash_type) {
-> 		hreq = ahash_request_cast(engine->cur_req);
-> 		if (engine->prepare_hash_request) {
-> 			ret = engine->prepare_hash_request(engine, hreq); @@
->-122,7 +122,7 @@ static void crypto_pump_requests(struct crypto_engine
->*engine,
-> 			goto req_err;
-> 		}
-> 		return;
->-	case CRYPTO_ALG_TYPE_ABLKCIPHER:
->+	} else if (cratype == &crypto_ablkcipher_type) {
-> 		breq = ablkcipher_request_cast(engine->cur_req);
-> 		if (engine->prepare_cipher_request) {
-> 			ret = engine->prepare_cipher_request(engine, breq);
->@@ -139,21 +139,18 @@ static void crypto_pump_requests(struct
->crypto_engine *engine,
-> 			goto req_err;
-> 		}
-> 		return;
->-	default:
->+	} else {
-> 		dev_err(engine->dev, "failed to prepare request of unknown
->type\n");
-> 		return;
-> 	}
->
-> req_err:
->-	switch (rtype) {
->-	case CRYPTO_ALG_TYPE_AHASH:
->+	if (cratype == &crypto_ahash_type) {
-> 		hreq = ahash_request_cast(engine->cur_req);
-> 		crypto_finalize_hash_request(engine, hreq, ret);
->-		break;
->-	case CRYPTO_ALG_TYPE_ABLKCIPHER:
->+	} else if (cratype == &crypto_ablkcipher_type) {
-> 		breq = ablkcipher_request_cast(engine->cur_req);
-> 		crypto_finalize_cipher_request(engine, breq, ret);
->-		break;
-> 	}
-> 	return;
->
->--
->2.13.0
+So I _really_ dislike the whole PIE approach, because of the huge slowdown:
+
++config RANDOMIZE_BASE_LARGE
++       bool "Increase the randomization range of the kernel image"
++       depends on X86_64 && RANDOMIZE_BASE
++       select X86_PIE
++       select X86_MODULE_PLTS if MODULES
++       default n
++       ---help---
++         Build the kernel as a Position Independent Executable (PIE) and
++         increase the available randomization range from 1GB to 3GB.
++
++         This option impacts performance on kernel CPU intensive workloads up
++         to 10% due to PIE generated code. Impact on user-mode processes and
++         typical usage would be significantly less (0.50% when you build the
++         kernel).
++
++         The kernel and modules will generate slightly more assembly (1 to 2%
++         increase on the .text sections). The vmlinux binary will be
++         significantly smaller due to less relocations.
+
+To put 10% kernel overhead into perspective: enabling this option wipes out about 
+5-10 years worth of painstaking optimizations we've done to keep the kernel fast 
+... (!!)
+
+I think the fundamental flaw is the assumption that we need a PIE executable to 
+have a freely relocatable kernel on 64-bit CPUs.
+
+Have you considered a kernel with -mcmodel=small (or medium) instead of -fpie 
+-mcmodel=large? We can pick a random 2GB window in the (non-kernel) canonical 
+x86-64 address space to randomize the location of kernel text. The location of 
+modules can be further randomized within that 2GB window.
+
+It should have far less performance impact than the register-losing and 
+overhead-inducing -fpie / -mcmodel=large (for modules) execution models.
+
+My quick guess is tha the performance impact might be close to zero in fact.
+
+Thanks,
+
+	Ingo
