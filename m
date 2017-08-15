@@ -1,636 +1,127 @@
-From: zain wang <wzz@rock-chips.com>
-Subject: [PATCH] crypto: rockchip: Don't dequeue the request when device is busy
-Date: Tue, 15 Aug 2017 15:48:15 +0800
-Message-ID: <1502783295-25621-1-git-send-email-wzz@rock-chips.com>
-Cc: jekarlson@gmail.com, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org,
-        zain wang <wzz@rock-chips.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Heiko Stuebner <heiko@sntech.de>
+From: Fabien DESSENNE <fabien.dessenne@st.com>
+Subject: RE: [PATCH 2/3] crypto: engine - find request type with cra_type
+Date: Tue, 15 Aug 2017 07:51:14 +0000
+Message-ID: <f2185b14d944433c9737cabc32e3cef9@SFHDAG5NODE3.st.com>
+References: <20170814131725.9402-1-clabbe.montjoie@gmail.com>
+ <20170814131725.9402-3-clabbe.montjoie@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8BIT
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Corentin Labbe <clabbe.montjoie@gmail.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from regular1.263xmail.com ([211.150.99.135]:35575 "EHLO
-        regular1.263xmail.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753232AbdHOHsf (ORCPT
+Received: from mx08-00178001.pphosted.com ([91.207.212.93]:37780 "EHLO
+        mx07-00178001.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1753232AbdHOHv2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Aug 2017 03:48:35 -0400
+        Tue, 15 Aug 2017 03:51:28 -0400
+In-Reply-To: <20170814131725.9402-3-clabbe.montjoie@gmail.com>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The device can only process one request at a time. So if multiple
-requests came at the same time, we can enqueue them first, and
-dequeue them one by one when the device is idle.
+Hi Corentin,
 
-Signed-off-by: zain wang <wzz@rock-chips.com>
----
- drivers/crypto/rockchip/rk3288_crypto.c            |  46 ++++++-
- drivers/crypto/rockchip/rk3288_crypto.h            |  11 +-
- drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c | 118 ++++++++----------
- drivers/crypto/rockchip/rk3288_crypto_ahash.c      | 133 ++++++++++-----------
- 4 files changed, 160 insertions(+), 148 deletions(-)
+Since I have just sent a patch to add the support of "aead_request" to crypto engine, I am wondering if your proposed change (checking cra_type instead of crypto_tfm_alg_type) and mine are compatible.
+It looks like they are (assuming we export crypto_aead_type): can you confirm?
+BR
 
-diff --git a/drivers/crypto/rockchip/rk3288_crypto.c b/drivers/crypto/rockchip/rk3288_crypto.c
-index 57c3783..c9d622a 100644
---- a/drivers/crypto/rockchip/rk3288_crypto.c
-+++ b/drivers/crypto/rockchip/rk3288_crypto.c
-@@ -184,15 +184,53 @@ static irqreturn_t rk_crypto_irq_handle(int irq, void *dev_id)
- 	return IRQ_HANDLED;
- }
- 
-+static int rk_crypto_enqueue(struct rk_crypto_info *dev,
-+			      struct crypto_async_request *async_req)
-+{
-+	unsigned long flags;
-+	int ret;
-+
-+	spin_lock_irqsave(&dev->lock, flags);
-+	ret = crypto_enqueue_request(&dev->queue, async_req);
-+	if (dev->busy) {
-+		spin_unlock_irqrestore(&dev->lock, flags);
-+		return ret;
-+	}
-+	dev->busy = true;
-+	spin_unlock_irqrestore(&dev->lock, flags);
-+	tasklet_schedule(&dev->queue_task);
-+
-+	return ret;
-+}
-+
- static void rk_crypto_queue_task_cb(unsigned long data)
- {
- 	struct rk_crypto_info *dev = (struct rk_crypto_info *)data;
-+	struct crypto_async_request *async_req, *backlog;
-+	unsigned long flags;
- 	int err = 0;
- 
- 	dev->err = 0;
-+	spin_lock_irqsave(&dev->lock, flags);
-+	backlog   = crypto_get_backlog(&dev->queue);
-+	async_req = crypto_dequeue_request(&dev->queue);
-+
-+	if (!async_req) {
-+		dev->busy = false;
-+		spin_unlock_irqrestore(&dev->lock, flags);
-+		return;
-+	}
-+	spin_unlock_irqrestore(&dev->lock, flags);
-+
-+	if (backlog) {
-+		backlog->complete(backlog, -EINPROGRESS);
-+		backlog = NULL;
-+	}
-+
-+	dev->async_req = async_req;
- 	err = dev->start(dev);
- 	if (err)
--		dev->complete(dev, err);
-+		dev->complete(dev->async_req, err);
- }
- 
- static void rk_crypto_done_task_cb(unsigned long data)
-@@ -200,13 +238,13 @@ static void rk_crypto_done_task_cb(unsigned long data)
- 	struct rk_crypto_info *dev = (struct rk_crypto_info *)data;
- 
- 	if (dev->err) {
--		dev->complete(dev, dev->err);
-+		dev->complete(dev->async_req, dev->err);
- 		return;
- 	}
- 
- 	dev->err = dev->update(dev);
- 	if (dev->err)
--		dev->complete(dev, dev->err);
-+		dev->complete(dev->async_req, dev->err);
- }
- 
- static struct rk_crypto_tmp *rk_cipher_algs[] = {
-@@ -365,6 +403,8 @@ static int rk_crypto_probe(struct platform_device *pdev)
- 	crypto_info->disable_clk = rk_crypto_disable_clk;
- 	crypto_info->load_data = rk_load_data;
- 	crypto_info->unload_data = rk_unload_data;
-+	crypto_info->enqueue = rk_crypto_enqueue;
-+	crypto_info->busy = false;
- 
- 	err = rk_crypto_register(crypto_info);
- 	if (err) {
-diff --git a/drivers/crypto/rockchip/rk3288_crypto.h b/drivers/crypto/rockchip/rk3288_crypto.h
-index 65ad1c2..ab6a1b4 100644
---- a/drivers/crypto/rockchip/rk3288_crypto.h
-+++ b/drivers/crypto/rockchip/rk3288_crypto.h
-@@ -192,8 +192,7 @@ struct rk_crypto_info {
- 	struct crypto_queue		queue;
- 	struct tasklet_struct		queue_task;
- 	struct tasklet_struct		done_task;
--	struct ablkcipher_request	*ablk_req;
--	struct ahash_request		*ahash_req;
-+	struct crypto_async_request	*async_req;
- 	int 				err;
- 	/* device lock */
- 	spinlock_t			lock;
-@@ -210,18 +209,20 @@ struct rk_crypto_info {
- 	size_t				nents;
- 	unsigned int			total;
- 	unsigned int			count;
--	u32				mode;
- 	dma_addr_t			addr_in;
- 	dma_addr_t			addr_out;
-+	bool				busy;
- 	int (*start)(struct rk_crypto_info *dev);
- 	int (*update)(struct rk_crypto_info *dev);
--	void (*complete)(struct rk_crypto_info *dev, int err);
-+	void (*complete)(struct crypto_async_request *base, int err);
- 	int (*enable_clk)(struct rk_crypto_info *dev);
- 	void (*disable_clk)(struct rk_crypto_info *dev);
- 	int (*load_data)(struct rk_crypto_info *dev,
- 			 struct scatterlist *sg_src,
- 			 struct scatterlist *sg_dst);
- 	void (*unload_data)(struct rk_crypto_info *dev);
-+	int (*enqueue)(struct rk_crypto_info *dev,
-+		       struct crypto_async_request *async_req);
- };
- 
- /* the private variable of hash */
-@@ -234,12 +235,14 @@ struct rk_ahash_ctx {
- /* the privete variable of hash for fallback */
- struct rk_ahash_rctx {
- 	struct ahash_request		fallback_req;
-+	u32				mode;
- };
- 
- /* the private variable of cipher */
- struct rk_cipher_ctx {
- 	struct rk_crypto_info		*dev;
- 	unsigned int			keylen;
-+	u32				mode;
- };
- 
- enum alg_type {
-diff --git a/drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c b/drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c
-index dbe78de..639c15c 100644
---- a/drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c
-+++ b/drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c
-@@ -15,50 +15,19 @@
- 
- #define RK_CRYPTO_DEC			BIT(0)
- 
--static void rk_crypto_complete(struct rk_crypto_info *dev, int err)
-+static void rk_crypto_complete(struct crypto_async_request *base, int err)
- {
--	if (dev->ablk_req->base.complete)
--		dev->ablk_req->base.complete(&dev->ablk_req->base, err);
-+	if (base->complete)
-+		base->complete(base, err);
- }
- 
- static int rk_handle_req(struct rk_crypto_info *dev,
- 			 struct ablkcipher_request *req)
- {
--	unsigned long flags;
--	struct crypto_async_request *async_req, *backlog;
--	int err;
--
- 	if (!IS_ALIGNED(req->nbytes, dev->align_size))
- 		return -EINVAL;
--
--	dev->left_bytes = req->nbytes;
--	dev->total = req->nbytes;
--	dev->sg_src = req->src;
--	dev->first = req->src;
--	dev->nents = sg_nents(req->src);
--	dev->sg_dst = req->dst;
--	dev->aligned = 1;
--	dev->ablk_req = req;
--
--	spin_lock_irqsave(&dev->lock, flags);
--	err = ablkcipher_enqueue_request(&dev->queue, req);
--	backlog   = crypto_get_backlog(&dev->queue);
--	async_req = crypto_dequeue_request(&dev->queue);
--	spin_unlock_irqrestore(&dev->lock, flags);
--
--	if (!async_req) {
--		dev_err(dev->dev, "async_req is NULL !!\n");
--		return err;
--	}
--	if (backlog) {
--		backlog->complete(backlog, -EINPROGRESS);
--		backlog = NULL;
--	}
--
--	dev->ablk_req = ablkcipher_request_cast(async_req);
--
--	tasklet_schedule(&dev->queue_task);
--	return err;
-+	else
-+		return dev->enqueue(dev, &req->base);
- }
- 
- static int rk_aes_setkey(struct crypto_ablkcipher *cipher,
-@@ -108,7 +77,7 @@ static int rk_aes_ecb_encrypt(struct ablkcipher_request *req)
- 	struct rk_cipher_ctx *ctx = crypto_ablkcipher_ctx(tfm);
- 	struct rk_crypto_info *dev = ctx->dev;
- 
--	dev->mode = RK_CRYPTO_AES_ECB_MODE;
-+	ctx->mode = RK_CRYPTO_AES_ECB_MODE;
- 	return rk_handle_req(dev, req);
- }
- 
-@@ -118,7 +87,7 @@ static int rk_aes_ecb_decrypt(struct ablkcipher_request *req)
- 	struct rk_cipher_ctx *ctx = crypto_ablkcipher_ctx(tfm);
- 	struct rk_crypto_info *dev = ctx->dev;
- 
--	dev->mode = RK_CRYPTO_AES_ECB_MODE | RK_CRYPTO_DEC;
-+	ctx->mode = RK_CRYPTO_AES_ECB_MODE | RK_CRYPTO_DEC;
- 	return rk_handle_req(dev, req);
- }
- 
-@@ -128,7 +97,7 @@ static int rk_aes_cbc_encrypt(struct ablkcipher_request *req)
- 	struct rk_cipher_ctx *ctx = crypto_ablkcipher_ctx(tfm);
- 	struct rk_crypto_info *dev = ctx->dev;
- 
--	dev->mode = RK_CRYPTO_AES_CBC_MODE;
-+	ctx->mode = RK_CRYPTO_AES_CBC_MODE;
- 	return rk_handle_req(dev, req);
- }
- 
-@@ -138,7 +107,7 @@ static int rk_aes_cbc_decrypt(struct ablkcipher_request *req)
- 	struct rk_cipher_ctx *ctx = crypto_ablkcipher_ctx(tfm);
- 	struct rk_crypto_info *dev = ctx->dev;
- 
--	dev->mode = RK_CRYPTO_AES_CBC_MODE | RK_CRYPTO_DEC;
-+	ctx->mode = RK_CRYPTO_AES_CBC_MODE | RK_CRYPTO_DEC;
- 	return rk_handle_req(dev, req);
- }
- 
-@@ -148,7 +117,7 @@ static int rk_des_ecb_encrypt(struct ablkcipher_request *req)
- 	struct rk_cipher_ctx *ctx = crypto_ablkcipher_ctx(tfm);
- 	struct rk_crypto_info *dev = ctx->dev;
- 
--	dev->mode = 0;
-+	ctx->mode = 0;
- 	return rk_handle_req(dev, req);
- }
- 
-@@ -158,7 +127,7 @@ static int rk_des_ecb_decrypt(struct ablkcipher_request *req)
- 	struct rk_cipher_ctx *ctx = crypto_ablkcipher_ctx(tfm);
- 	struct rk_crypto_info *dev = ctx->dev;
- 
--	dev->mode = RK_CRYPTO_DEC;
-+	ctx->mode = RK_CRYPTO_DEC;
- 	return rk_handle_req(dev, req);
- }
- 
-@@ -168,7 +137,7 @@ static int rk_des_cbc_encrypt(struct ablkcipher_request *req)
- 	struct rk_cipher_ctx *ctx = crypto_ablkcipher_ctx(tfm);
- 	struct rk_crypto_info *dev = ctx->dev;
- 
--	dev->mode = RK_CRYPTO_TDES_CHAINMODE_CBC;
-+	ctx->mode = RK_CRYPTO_TDES_CHAINMODE_CBC;
- 	return rk_handle_req(dev, req);
- }
- 
-@@ -178,7 +147,7 @@ static int rk_des_cbc_decrypt(struct ablkcipher_request *req)
- 	struct rk_cipher_ctx *ctx = crypto_ablkcipher_ctx(tfm);
- 	struct rk_crypto_info *dev = ctx->dev;
- 
--	dev->mode = RK_CRYPTO_TDES_CHAINMODE_CBC | RK_CRYPTO_DEC;
-+	ctx->mode = RK_CRYPTO_TDES_CHAINMODE_CBC | RK_CRYPTO_DEC;
- 	return rk_handle_req(dev, req);
- }
- 
-@@ -188,7 +157,7 @@ static int rk_des3_ede_ecb_encrypt(struct ablkcipher_request *req)
- 	struct rk_cipher_ctx *ctx = crypto_ablkcipher_ctx(tfm);
- 	struct rk_crypto_info *dev = ctx->dev;
- 
--	dev->mode = RK_CRYPTO_TDES_SELECT;
-+	ctx->mode = RK_CRYPTO_TDES_SELECT;
- 	return rk_handle_req(dev, req);
- }
- 
-@@ -198,7 +167,7 @@ static int rk_des3_ede_ecb_decrypt(struct ablkcipher_request *req)
- 	struct rk_cipher_ctx *ctx = crypto_ablkcipher_ctx(tfm);
- 	struct rk_crypto_info *dev = ctx->dev;
- 
--	dev->mode = RK_CRYPTO_TDES_SELECT | RK_CRYPTO_DEC;
-+	ctx->mode = RK_CRYPTO_TDES_SELECT | RK_CRYPTO_DEC;
- 	return rk_handle_req(dev, req);
- }
- 
-@@ -208,7 +177,7 @@ static int rk_des3_ede_cbc_encrypt(struct ablkcipher_request *req)
- 	struct rk_cipher_ctx *ctx = crypto_ablkcipher_ctx(tfm);
- 	struct rk_crypto_info *dev = ctx->dev;
- 
--	dev->mode = RK_CRYPTO_TDES_SELECT | RK_CRYPTO_TDES_CHAINMODE_CBC;
-+	ctx->mode = RK_CRYPTO_TDES_SELECT | RK_CRYPTO_TDES_CHAINMODE_CBC;
- 	return rk_handle_req(dev, req);
- }
- 
-@@ -218,15 +187,16 @@ static int rk_des3_ede_cbc_decrypt(struct ablkcipher_request *req)
- 	struct rk_cipher_ctx *ctx = crypto_ablkcipher_ctx(tfm);
- 	struct rk_crypto_info *dev = ctx->dev;
- 
--	dev->mode = RK_CRYPTO_TDES_SELECT | RK_CRYPTO_TDES_CHAINMODE_CBC |
-+	ctx->mode = RK_CRYPTO_TDES_SELECT | RK_CRYPTO_TDES_CHAINMODE_CBC |
- 		    RK_CRYPTO_DEC;
- 	return rk_handle_req(dev, req);
- }
- 
- static void rk_ablk_hw_init(struct rk_crypto_info *dev)
- {
--	struct crypto_ablkcipher *cipher =
--		crypto_ablkcipher_reqtfm(dev->ablk_req);
-+	struct ablkcipher_request *req =
-+		ablkcipher_request_cast(dev->async_req);
-+	struct crypto_ablkcipher *cipher = crypto_ablkcipher_reqtfm(req);
- 	struct crypto_tfm *tfm = crypto_ablkcipher_tfm(cipher);
- 	struct rk_cipher_ctx *ctx = crypto_ablkcipher_ctx(cipher);
- 	u32 ivsize, block, conf_reg = 0;
-@@ -235,25 +205,23 @@ static void rk_ablk_hw_init(struct rk_crypto_info *dev)
- 	ivsize = crypto_ablkcipher_ivsize(cipher);
- 
- 	if (block == DES_BLOCK_SIZE) {
--		dev->mode |= RK_CRYPTO_TDES_FIFO_MODE |
-+		ctx->mode |= RK_CRYPTO_TDES_FIFO_MODE |
- 			     RK_CRYPTO_TDES_BYTESWAP_KEY |
- 			     RK_CRYPTO_TDES_BYTESWAP_IV;
--		CRYPTO_WRITE(dev, RK_CRYPTO_TDES_CTRL, dev->mode);
--		memcpy_toio(dev->reg + RK_CRYPTO_TDES_IV_0,
--			    dev->ablk_req->info, ivsize);
-+		CRYPTO_WRITE(dev, RK_CRYPTO_TDES_CTRL, ctx->mode);
-+		memcpy_toio(dev->reg + RK_CRYPTO_TDES_IV_0, req->info, ivsize);
- 		conf_reg = RK_CRYPTO_DESSEL;
- 	} else {
--		dev->mode |= RK_CRYPTO_AES_FIFO_MODE |
-+		ctx->mode |= RK_CRYPTO_AES_FIFO_MODE |
- 			     RK_CRYPTO_AES_KEY_CHANGE |
- 			     RK_CRYPTO_AES_BYTESWAP_KEY |
- 			     RK_CRYPTO_AES_BYTESWAP_IV;
- 		if (ctx->keylen == AES_KEYSIZE_192)
--			dev->mode |= RK_CRYPTO_AES_192BIT_key;
-+			ctx->mode |= RK_CRYPTO_AES_192BIT_key;
- 		else if (ctx->keylen == AES_KEYSIZE_256)
--			dev->mode |= RK_CRYPTO_AES_256BIT_key;
--		CRYPTO_WRITE(dev, RK_CRYPTO_AES_CTRL, dev->mode);
--		memcpy_toio(dev->reg + RK_CRYPTO_AES_IV_0,
--			    dev->ablk_req->info, ivsize);
-+			ctx->mode |= RK_CRYPTO_AES_256BIT_key;
-+		CRYPTO_WRITE(dev, RK_CRYPTO_AES_CTRL, ctx->mode);
-+		memcpy_toio(dev->reg + RK_CRYPTO_AES_IV_0, req->info, ivsize);
- 	}
- 	conf_reg |= RK_CRYPTO_BYTESWAP_BTFIFO |
- 		    RK_CRYPTO_BYTESWAP_BRFIFO;
-@@ -283,8 +251,18 @@ static int rk_set_data_start(struct rk_crypto_info *dev)
- 
- static int rk_ablk_start(struct rk_crypto_info *dev)
- {
-+	struct ablkcipher_request *req =
-+		ablkcipher_request_cast(dev->async_req);
- 	unsigned long flags;
--	int err;
-+	int err = 0;
-+
-+	dev->left_bytes = req->nbytes;
-+	dev->total = req->nbytes;
-+	dev->sg_src = req->src;
-+	dev->first = req->src;
-+	dev->nents = sg_nents(req->src);
-+	dev->sg_dst = req->dst;
-+	dev->aligned = 1;
- 
- 	spin_lock_irqsave(&dev->lock, flags);
- 	rk_ablk_hw_init(dev);
-@@ -295,15 +273,16 @@ static int rk_ablk_start(struct rk_crypto_info *dev)
- 
- static void rk_iv_copyback(struct rk_crypto_info *dev)
- {
--	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(dev->ablk_req);
-+	struct ablkcipher_request *req =
-+		ablkcipher_request_cast(dev->async_req);
-+	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
- 	u32 ivsize = crypto_ablkcipher_ivsize(tfm);
- 
- 	if (ivsize == DES_BLOCK_SIZE)
--		memcpy_fromio(dev->ablk_req->info,
--			      dev->reg + RK_CRYPTO_TDES_IV_0, ivsize);
-+		memcpy_fromio(req->info, dev->reg + RK_CRYPTO_TDES_IV_0,
-+			      ivsize);
- 	else if (ivsize == AES_BLOCK_SIZE)
--		memcpy_fromio(dev->ablk_req->info,
--			      dev->reg + RK_CRYPTO_AES_IV_0, ivsize);
-+		memcpy_fromio(req->info, dev->reg + RK_CRYPTO_AES_IV_0, ivsize);
- }
- 
- /* return:
-@@ -313,10 +292,12 @@ static void rk_iv_copyback(struct rk_crypto_info *dev)
- static int rk_ablk_rx(struct rk_crypto_info *dev)
- {
- 	int err = 0;
-+	struct ablkcipher_request *req =
-+		ablkcipher_request_cast(dev->async_req);
- 
- 	dev->unload_data(dev);
- 	if (!dev->aligned) {
--		if (!sg_pcopy_from_buffer(dev->ablk_req->dst, dev->nents,
-+		if (!sg_pcopy_from_buffer(req->dst, dev->nents,
- 					  dev->addr_vir, dev->count,
- 					  dev->total - dev->left_bytes -
- 					  dev->count)) {
-@@ -339,7 +320,8 @@ static int rk_ablk_rx(struct rk_crypto_info *dev)
- 	} else {
- 		rk_iv_copyback(dev);
- 		/* here show the calculation is over without any err */
--		dev->complete(dev, 0);
-+		dev->complete(dev->async_req, 0);
-+		tasklet_schedule(&dev->queue_task);
- 	}
- out_rx:
- 	return err;
-diff --git a/drivers/crypto/rockchip/rk3288_crypto_ahash.c b/drivers/crypto/rockchip/rk3288_crypto_ahash.c
-index ebc46e0..821a506 100644
---- a/drivers/crypto/rockchip/rk3288_crypto_ahash.c
-+++ b/drivers/crypto/rockchip/rk3288_crypto_ahash.c
-@@ -40,14 +40,16 @@ static int zero_message_process(struct ahash_request *req)
- 	return 0;
- }
- 
--static void rk_ahash_crypto_complete(struct rk_crypto_info *dev, int err)
-+static void rk_ahash_crypto_complete(struct crypto_async_request *base, int err)
- {
--	if (dev->ahash_req->base.complete)
--		dev->ahash_req->base.complete(&dev->ahash_req->base, err);
-+	if (base->complete)
-+		base->complete(base, err);
- }
- 
- static void rk_ahash_reg_init(struct rk_crypto_info *dev)
- {
-+	struct ahash_request *req = ahash_request_cast(dev->async_req);
-+	struct rk_ahash_rctx *rctx = ahash_request_ctx(req);
- 	int reg_status = 0;
- 
- 	reg_status = CRYPTO_READ(dev, RK_CRYPTO_CTRL) |
-@@ -67,7 +69,7 @@ static void rk_ahash_reg_init(struct rk_crypto_info *dev)
- 	CRYPTO_WRITE(dev, RK_CRYPTO_INTSTS, RK_CRYPTO_HRDMA_ERR_INT |
- 					    RK_CRYPTO_HRDMA_DONE_INT);
- 
--	CRYPTO_WRITE(dev, RK_CRYPTO_HASH_CTRL, dev->mode |
-+	CRYPTO_WRITE(dev, RK_CRYPTO_HASH_CTRL, rctx->mode |
- 					       RK_CRYPTO_HASH_SWAP_DO);
- 
- 	CRYPTO_WRITE(dev, RK_CRYPTO_CONF, RK_CRYPTO_BYTESWAP_HRFIFO |
-@@ -164,78 +166,13 @@ static int rk_ahash_export(struct ahash_request *req, void *out)
- 
- static int rk_ahash_digest(struct ahash_request *req)
- {
--	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
- 	struct rk_ahash_ctx *tctx = crypto_tfm_ctx(req->base.tfm);
--	struct crypto_async_request *async_req, *backlog;
--	struct rk_crypto_info *dev = NULL;
--	unsigned long flags;
--	int ret;
-+	struct rk_crypto_info *dev = tctx->dev;
- 
- 	if (!req->nbytes)
- 		return zero_message_process(req);
--
--	dev = tctx->dev;
--	dev->total = req->nbytes;
--	dev->left_bytes = req->nbytes;
--	dev->aligned = 0;
--	dev->mode = 0;
--	dev->align_size = 4;
--	dev->sg_dst = NULL;
--	dev->sg_src = req->src;
--	dev->first = req->src;
--	dev->nents = sg_nents(req->src);
--
--	switch (crypto_ahash_digestsize(tfm)) {
--	case SHA1_DIGEST_SIZE:
--		dev->mode = RK_CRYPTO_HASH_SHA1;
--		break;
--	case SHA256_DIGEST_SIZE:
--		dev->mode = RK_CRYPTO_HASH_SHA256;
--		break;
--	case MD5_DIGEST_SIZE:
--		dev->mode = RK_CRYPTO_HASH_MD5;
--		break;
--	default:
--		return -EINVAL;
--	}
--
--	rk_ahash_reg_init(dev);
--
--	spin_lock_irqsave(&dev->lock, flags);
--	ret = crypto_enqueue_request(&dev->queue, &req->base);
--	backlog   = crypto_get_backlog(&dev->queue);
--	async_req = crypto_dequeue_request(&dev->queue);
--	spin_unlock_irqrestore(&dev->lock, flags);
--
--	if (!async_req) {
--		dev_err(dev->dev, "async_req is NULL !!\n");
--		return ret;
--	}
--	if (backlog) {
--		backlog->complete(backlog, -EINPROGRESS);
--		backlog = NULL;
--	}
--
--	dev->ahash_req = ahash_request_cast(async_req);
--
--	tasklet_schedule(&dev->queue_task);
--
--	/*
--	 * it will take some time to process date after last dma transmission.
--	 *
--	 * waiting time is relative with the last date len,
--	 * so cannot set a fixed time here.
--	 * 10-50 makes system not call here frequently wasting
--	 * efficiency, and make it response quickly when dma
--	 * complete.
--	 */
--	while (!CRYPTO_READ(dev, RK_CRYPTO_HASH_STS))
--		usleep_range(10, 50);
--
--	memcpy_fromio(req->result, dev->reg + RK_CRYPTO_HASH_DOUT_0,
--		      crypto_ahash_digestsize(tfm));
--
--	return 0;
-+	else
-+		return dev->enqueue(dev, &req->base);
- }
- 
- static void crypto_ahash_dma_start(struct rk_crypto_info *dev)
-@@ -258,12 +195,45 @@ static int rk_ahash_set_data_start(struct rk_crypto_info *dev)
- 
- static int rk_ahash_start(struct rk_crypto_info *dev)
- {
-+	struct ahash_request *req = ahash_request_cast(dev->async_req);
-+	struct crypto_ahash *tfm;
-+	struct rk_ahash_rctx *rctx;
-+
-+	dev->total = req->nbytes;
-+	dev->left_bytes = req->nbytes;
-+	dev->aligned = 0;
-+	dev->align_size = 4;
-+	dev->sg_dst = NULL;
-+	dev->sg_src = req->src;
-+	dev->first = req->src;
-+	dev->nents = sg_nents(req->src);
-+	rctx = ahash_request_ctx(req);
-+	rctx->mode = 0;
-+
-+	tfm = crypto_ahash_reqtfm(req);
-+	switch (crypto_ahash_digestsize(tfm)) {
-+	case SHA1_DIGEST_SIZE:
-+		rctx->mode = RK_CRYPTO_HASH_SHA1;
-+		break;
-+	case SHA256_DIGEST_SIZE:
-+		rctx->mode = RK_CRYPTO_HASH_SHA256;
-+		break;
-+	case MD5_DIGEST_SIZE:
-+		rctx->mode = RK_CRYPTO_HASH_MD5;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	rk_ahash_reg_init(dev);
- 	return rk_ahash_set_data_start(dev);
- }
- 
- static int rk_ahash_crypto_rx(struct rk_crypto_info *dev)
- {
- 	int err = 0;
-+	struct ahash_request *req = ahash_request_cast(dev->async_req);
-+	struct crypto_ahash *tfm;
- 
- 	dev->unload_data(dev);
- 	if (dev->left_bytes) {
-@@ -278,7 +248,24 @@ static int rk_ahash_crypto_rx(struct rk_crypto_info *dev)
- 		}
- 		err = rk_ahash_set_data_start(dev);
- 	} else {
--		dev->complete(dev, 0);
-+		/*
-+		 * it will take some time to process date after last dma
-+		 * transmission.
-+		 *
-+		 * waiting time is relative with the last date len,
-+		 * so cannot set a fixed time here.
-+		 * 10us makes system not call here frequently wasting
-+		 * efficiency, and make it response quickly when dma
-+		 * complete.
-+		 */
-+		while (!CRYPTO_READ(dev, RK_CRYPTO_HASH_STS))
-+			udelay(10);
-+
-+		tfm = crypto_ahash_reqtfm(req);
-+		memcpy_fromio(req->result, dev->reg + RK_CRYPTO_HASH_DOUT_0,
-+			      crypto_ahash_digestsize(tfm));
-+		dev->complete(dev->async_req, 0);
-+		tasklet_schedule(&dev->queue_task);
- 	}
- 
- out_rx:
--- 
-1.9.1
+Fabien.
+
+>-----Original Message-----
+>From: linux-crypto-owner@vger.kernel.org [mailto:linux-crypto-
+>owner@vger.kernel.org] On Behalf Of Corentin Labbe
+>Sent: lundi 14 août 2017 15:17
+>To: herbert@gondor.apana.org.au; davem@davemloft.net
+>Cc: linux-crypto@vger.kernel.org; linux-kernel@vger.kernel.org; Corentin Labbe
+><clabbe.montjoie@gmail.com>
+>Subject: [PATCH 2/3] crypto: engine - find request type with cra_type
+>
+>The current method for finding request type is based on crypto_tfm_alg_type.
+>
+>But in case of skcipher, it is the same than ablkcipher.
+>Using cra_type for this work permits to make the distinction between the two.
+>
+>Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+>---
+> crypto/crypto_engine.c | 19 ++++++++-----------
+> 1 file changed, 8 insertions(+), 11 deletions(-)
+>
+>diff --git a/crypto/crypto_engine.c b/crypto/crypto_engine.c index
+>61e7c4e02fd2..74b840749074 100644
+>--- a/crypto/crypto_engine.c
+>+++ b/crypto/crypto_engine.c
+>@@ -38,7 +38,8 @@ static void crypto_pump_requests(struct crypto_engine
+>*engine,
+> 	struct ablkcipher_request *breq;
+> 	unsigned long flags;
+> 	bool was_busy = false;
+>-	int ret, rtype;
+>+	int ret;
+>+	const struct crypto_type *cratype;
+>
+> 	spin_lock_irqsave(&engine->queue_lock, flags);
+>
+>@@ -94,7 +95,7 @@ static void crypto_pump_requests(struct crypto_engine
+>*engine,
+>
+> 	spin_unlock_irqrestore(&engine->queue_lock, flags);
+>
+>-	rtype = crypto_tfm_alg_type(engine->cur_req->tfm);
+>+	cratype = engine->cur_req->tfm->__crt_alg->cra_type;
+> 	/* Until here we get the request need to be encrypted successfully */
+> 	if (!was_busy && engine->prepare_crypt_hardware) {
+> 		ret = engine->prepare_crypt_hardware(engine);
+>@@ -104,8 +105,7 @@ static void crypto_pump_requests(struct crypto_engine
+>*engine,
+> 		}
+> 	}
+>
+>-	switch (rtype) {
+>-	case CRYPTO_ALG_TYPE_AHASH:
+>+	if (cratype == &crypto_ahash_type) {
+> 		hreq = ahash_request_cast(engine->cur_req);
+> 		if (engine->prepare_hash_request) {
+> 			ret = engine->prepare_hash_request(engine, hreq); @@
+>-122,7 +122,7 @@ static void crypto_pump_requests(struct crypto_engine
+>*engine,
+> 			goto req_err;
+> 		}
+> 		return;
+>-	case CRYPTO_ALG_TYPE_ABLKCIPHER:
+>+	} else if (cratype == &crypto_ablkcipher_type) {
+> 		breq = ablkcipher_request_cast(engine->cur_req);
+> 		if (engine->prepare_cipher_request) {
+> 			ret = engine->prepare_cipher_request(engine, breq);
+>@@ -139,21 +139,18 @@ static void crypto_pump_requests(struct
+>crypto_engine *engine,
+> 			goto req_err;
+> 		}
+> 		return;
+>-	default:
+>+	} else {
+> 		dev_err(engine->dev, "failed to prepare request of unknown
+>type\n");
+> 		return;
+> 	}
+>
+> req_err:
+>-	switch (rtype) {
+>-	case CRYPTO_ALG_TYPE_AHASH:
+>+	if (cratype == &crypto_ahash_type) {
+> 		hreq = ahash_request_cast(engine->cur_req);
+> 		crypto_finalize_hash_request(engine, hreq, ret);
+>-		break;
+>-	case CRYPTO_ALG_TYPE_ABLKCIPHER:
+>+	} else if (cratype == &crypto_ablkcipher_type) {
+> 		breq = ablkcipher_request_cast(engine->cur_req);
+> 		crypto_finalize_cipher_request(engine, breq, ret);
+>-		break;
+> 	}
+> 	return;
+>
+>--
+>2.13.0
