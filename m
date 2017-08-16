@@ -1,41 +1,39 @@
 From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Subject: [PATCH] crypto: inside-secure - fix an error handling path in safexcel_probe()
-Date: Tue, 15 Aug 2017 21:33:24 +0200
-Message-ID: <20170815193324.8193-1-christophe.jaillet@wanadoo.fr>
+Subject: [PATCH] crypto: cavium/nitrox - Fix an error handling path in 'nitrox_probe()'
+Date: Wed, 16 Aug 2017 07:16:06 +0200
+Message-ID: <20170816051606.14950-1-christophe.jaillet@wanadoo.fr>
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         kernel-janitors@vger.kernel.org,
         Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To: antoine.tenart@free-electrons.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net
+To: herbert@gondor.apana.org.au, davem@davemloft.net,
+        Jampala.Srikanth@cavium.com
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-'ret' is known to be 0 at this point.
-If 'safexcel_request_ring_irq()' fails, it returns an error code.
-Return this value instead of 0 which means success.
+'err' is known to be 0 at this point.
+If 'kzalloc()' fails, returns -ENOMEM instead of 0 which means success.
 
 Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
 ---
- drivers/crypto/inside-secure/safexcel.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ drivers/crypto/cavium/nitrox/nitrox_main.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
-index 1fabd4aee81b..89ba9e85c0f3 100644
---- a/drivers/crypto/inside-secure/safexcel.c
-+++ b/drivers/crypto/inside-secure/safexcel.c
-@@ -839,9 +839,10 @@ static int safexcel_probe(struct platform_device *pdev)
- 		snprintf(irq_name, 6, "ring%d", i);
- 		irq = safexcel_request_ring_irq(pdev, irq_name, safexcel_irq_ring,
- 						ring_irq);
--
--		if (irq < 0)
-+		if (irq < 0) {
-+			ret = irq;
- 			goto err_clk;
-+		}
+diff --git a/drivers/crypto/cavium/nitrox/nitrox_main.c b/drivers/crypto/cavium/nitrox/nitrox_main.c
+index 9ccefb9b7232..fee7cb2ce747 100644
+--- a/drivers/crypto/cavium/nitrox/nitrox_main.c
++++ b/drivers/crypto/cavium/nitrox/nitrox_main.c
+@@ -513,8 +513,10 @@ static int nitrox_probe(struct pci_dev *pdev,
+ 	pci_set_master(pdev);
  
- 		priv->ring[i].work_data.priv = priv;
- 		priv->ring[i].work_data.ring = i;
+ 	ndev = kzalloc(sizeof(*ndev), GFP_KERNEL);
+-	if (!ndev)
++	if (!ndev) {
++		err = -ENOMEM;
+ 		goto ndev_fail;
++	}
+ 
+ 	pci_set_drvdata(pdev, ndev);
+ 	ndev->pdev = pdev;
 -- 
 2.11.0
