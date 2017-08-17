@@ -1,70 +1,77 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH 3/6] crypto: jz4780-rng: Add Ingenic JZ4780 hardware PRNG driver
-Date: Thu, 17 Aug 2017 20:52:49 +0200
-Message-ID: <20325029.4QLNKKN8OS@tauon.chronox.de>
-References: <20170817182520.20102-1-prasannatsmkumar@gmail.com> <20170817182520.20102-4-prasannatsmkumar@gmail.com>
+From: Rob Herring <robh-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Subject: Re: [PATCH v2 2/3] dt-bindings: Document STM32 CRYP bindings
+Date: Thu, 17 Aug 2017 16:11:04 -0500
+Message-ID: <20170817211104.qiixtzbetrssp4k2@rob-hp-laptop>
+References: <1502781584-18468-1-git-send-email-fabien.dessenne@st.com>
+ <1502781584-18468-3-git-send-email-fabien.dessenne@st.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: herbert@gondor.apana.org.au, robh+dt@kernel.org,
-        mark.rutland@arm.com, ralf@linux-mips.org, mturquette@baylibre.com,
-        sboyd@codeaurora.org, davem@davemloft.net, paul@crapouillou.net,
-        linux-crypto@vger.kernel.org, linux-mips@linux-mips.org
-To: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:58976 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752236AbdHQSwv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Aug 2017 14:52:51 -0400
-In-Reply-To: <20170817182520.20102-4-prasannatsmkumar@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+        "David S . Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
+        Maxime Coquelin <mcoquelin.stm32-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        Alexandre Torgue <alexandre.torgue-qxv4g6HH51o@public.gmane.org>,
+        linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        Benjamin Gaignard <benjamin.gaignard-qxv4g6HH51o@public.gmane.org>,
+        Lionel Debieve <lionel.debieve-qxv4g6HH51o@public.gmane.org>,
+        Ludovic Barre <ludovic.barre-qxv4g6HH51o@public.gmane.org>
+To: Fabien Dessenne <fabien.dessenne-qxv4g6HH51o@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <1502781584-18468-3-git-send-email-fabien.dessenne-qxv4g6HH51o@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Donnerstag, 17. August 2017, 20:25:17 CEST schrieb PrasannaKumar 
-Muralidharan:
-
-Hi PrasannaKumar,
-
+On Tue, Aug 15, 2017 at 09:19:43AM +0200, Fabien Dessenne wrote:
+> Document device tree bindings for the STM32 CRYP.
+> 
+> Signed-off-by: Fabien Dessenne <fabien.dessenne-qxv4g6HH51o@public.gmane.org>
+> ---
+>  .../devicetree/bindings/crypto/st,stm32-cryp.txt     | 20 ++++++++++++++++++++
+>  1 file changed, 20 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/crypto/st,stm32-cryp.txt
+> 
+> diff --git a/Documentation/devicetree/bindings/crypto/st,stm32-cryp.txt b/Documentation/devicetree/bindings/crypto/st,stm32-cryp.txt
+> new file mode 100644
+> index 0000000..7c6d599
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/crypto/st,stm32-cryp.txt
+> @@ -0,0 +1,20 @@
+> +* STMicroelectronics STM32 CRYP
 > +
-> +static int jz4780_rng_generate(struct crypto_rng *tfm,
-> +			       const u8 *src, unsigned int slen,
-> +			       u8 *dst, unsigned int dlen)
-> +{
-> +	struct jz4780_rng_ctx *ctx = crypto_rng_ctx(tfm);
-> +	struct jz4780_rng *rng = ctx->rng;
-> +	u32 data;
+> +Required properties:
+> +- compatible: Should be "st,stm32f756-cryp".
+> +- reg: The address and length of the peripheral registers space
+> +- clocks: The input clock of the CRYP instance
+> +- interrupts: The CRYP interrupt
 > +
-> +	/*
-> +	 * JZ4780 Programmers manual says the RNG should not run continuously
-> +	 * for more than 1s. So enable RNG, read data and disable it.
-> +	 * NOTE: No issue was observed with MIPS creator CI20 board even when
-> +	 * RNG ran continuously for longer periods. This is just a precaution.
-> +	 *
-> +	 * A delay is required so that the current RNG data is not bit shifted
-> +	 * version of previous RNG data which could happen if random data is
-> +	 * read continuously from this device.
-> +	 */
-> +	jz4780_rng_writel(rng, 1, REG_RNG_CTRL);
-> +	do {
-> +		data = jz4780_rng_readl(rng, REG_RNG_DATA);
-> +		memcpy((void *)dst, (void *)&data, 4);
-
-How do you know that dst is a multiple of 4 bytes? When dlen is only 3, you 
-overflow the buffer.
-
-> +		dlen -= 4;
-> +		dst += 4;
-> +		udelay(20);
-> +	} while (dlen >= 4);
+> +Optional properties:
+> +- resets: The input reset of the CRYP instance
 > +
-> +	if (dlen > 0) {
-> +		data = jz4780_rng_readl(rng, REG_RNG_DATA);
-> +		memcpy((void *)dst, (void *)&data, dlen);
-> +	}
-> +	jz4780_rng_writel(rng, 0, REG_RNG_CTRL);
-> +
-> +	return 0;
-> +}
+> +Example:
+> +cryp1: cryp@50060000 {
 
-Ciao
-Stephan
+crypto@..
+
+> +	compatible = "st,stm32f756-cryp";
+> +	reg = <0x50060000 0x400>;
+> +	interrupts = <79>;
+> +	clocks = <&rcc 0 STM32F7_AHB2_CLOCK(CRYP)>;
+> +	resets = <&rcc STM32F7_AHB2_RESET(CRYP)>;
+> +	status = "disabled";
+
+Don't show status in examples.
+
+Otherwise,
+
+Acked-by: Rob Herring <robh-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+
+> +};
+> -- 
+> 2.7.4
+> 
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
