@@ -1,80 +1,78 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: random.c: LFSR polynomials are not irreducible/primitive
-Date: Thu, 17 Aug 2017 08:07:21 +0200
-Message-ID: <3391688.VOOQBju3Jz@tauon.chronox.de>
-References: <10436695.bPChAg2egJ@tauon.chronox.de> <5311487.93A5fcTOOn@tauon.chronox.de> <20170815151224.jff5kvmin44lhkot@thunk.org>
+From: Ingo Molnar <mingo@kernel.org>
+Subject: Re: x86: PIE support and option to extend KASLR randomization
+Date: Thu, 17 Aug 2017 10:09:20 +0200
+Message-ID: <20170817080920.5ljlkktngw2cisfg@gmail.com>
+References: <20170810172615.51965-1-thgarnie@google.com>
+ <20170811124127.kkb5pnkljz4umxuj@gmail.com>
+ <CAJcbSZFTX3uiS2g8JriS6+z_+WrG8z3hrQo4OSuyHpiyUDJWYA@mail.gmail.com>
+ <20170815075609.mmzbfwritjzvrpsn@gmail.com>
+ <CAJcbSZE+TiY2whT94WqCJNXzR=2ATOHcQ10H5RqBZA1j=k1VHQ@mail.gmail.com>
+ <20170816151235.oamkdva6cwpc4cex@gmail.com>
+ <CAJcbSZFM_zpL1av1JVaow8NdsGeH+6oZKeDnMPdXR0PGfynzsg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org,
-        david.fontaine@capgemini.com, olivier.vivolo@orange.com
-To: Theodore Ts'o <tytso@mit.edu>, noloader@gmail.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:58948 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750817AbdHQGHX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Aug 2017 02:07:23 -0400
-In-Reply-To: <20170815151224.jff5kvmin44lhkot@thunk.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Josh Poimboeuf <jpoimboe@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
+	Matthias Kaehlcke <mka@chromium.org>,
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+	Juergen Gross <jgross@suse.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+	Joerg Roedel <joro@8bytes.org>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Andy Lutomirski <luto@kernel.org>, Borislav Petkov <bp@suse.de>,
+	Brian Gerst <brgerst@gmail.com>,
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+	"Rafael J . Wysocki" <rjw@rjwysocki.net>,
+	Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
+	Tejun Heo <tj@kernel.org>, Christoph Lamete
+To: Thomas Garnier <thgarnie@google.com>
+Return-path: <kernel-hardening-return-9498-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
+List-Post: <mailto:kernel-hardening@lists.openwall.com>
+List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
+List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
+List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
+Sender: Ingo Molnar <mingo.kernel.org@gmail.com>
+Content-Disposition: inline
+In-Reply-To: <CAJcbSZFM_zpL1av1JVaow8NdsGeH+6oZKeDnMPdXR0PGfynzsg@mail.gmail.com>
+List-Id: linux-crypto.vger.kernel.org
 
-Am Dienstag, 15. August 2017, 17:12:24 CEST schrieb Theodore Ts'o:
 
-Hi Theodore, Jeffrey,
+* Thomas Garnier <thgarnie@google.com> wrote:
+
+> > > -model=small/medium assume you are on the low 32-bit. It generates 
+> > > instructions where the virtual addresses have the high 32-bit to be zero.
+> >
+> > How are these assumptions hardcoded by GCC? Most of the instructions should be 
+> > relocatable straight away, as most call/jump/branch instructions are 
+> > RIP-relative.
 > 
-> Stephan, if you have any comments on the proposal made by David
-> Fontaine and Olivier Vivolo, I'd appreciate hearing them!
+> I think PIE is capable to use relative instructions well. mcmodel=large assumes 
+> symbols can be anywhere.
 
-(from Jefferey):
+So if the numbers in your changelog and Kconfig text cannot be trusted, there's 
+this description of the size impact which I suspect is less susceptible to 
+measurement error:
 
-> This may be helpful, too. I use it to look up minimal weight
-> irreducibles when I need them.
-> http://www.hpl.hp.com/techreports/98/HPL-98-135.pdf
++         The kernel and modules will generate slightly more assembly (1 to 2%
++         increase on the .text sections). The vmlinux binary will be
++         significantly smaller due to less relocations.
 
-Thanks for the list of polynomials. There is even another list that I used for 
-my LRNG: http://courses.cse.tamu.edu/csce680/walker/lfsr_table.pdf.
+... but describing a 1-2% kernel text size increase as "slightly more assembly" 
+shows a gratituous disregard to kernel code generation quality! In reality that's 
+a huge size increase that in most cases will almost directly transfer to a 1-2% 
+slowdown for kernel intense workloads.
 
-The problem with all of these polynomials is that their taps are very close 
-together and are mostly in the high parts. As there is a chance that adjacent 
-event values that shall be processed with the LFSR have some form of 
-correlation, having taps close together is not good, especially when they are 
-in the high parts of the polynomial.
+Where does that size increase come from, if PIE is capable of using relative 
+instructins well? Does it come from the loss of a generic register and the 
+resulting increase in register pressure, stack spills, etc.?
 
-To counter that effect, either polynomials with spaced-out taps are good (as 
-sought by Ted).
+So I'm still unhappy about this all, and about the attitude surrounding it.
 
-There is another solution that I found which was confirmed by mathematicians 
-to be of no effect regarding the polynomial behavior: instead of updating 
-adjacent words in the entropy pool, update words that are more spaced apart. 
-The key is that the spacing must ensure that still all words are evenly 
-updated. Updating more spaced-apart words will effectively counter potential 
-correlations in adjacent input data when these adjacent values are XORed due 
-to polynomials with close taps.
+Thanks,
 
-In my LRNG I use the value 67 (a prime number), since I have taps that are 
-close together in the high parts. The value 67 is somewhat in the middle of 
-the smallest pool size (having 128 words) and thus should have the largest 
-spacing possible for the smallest pool. The spacing does not need to be a 
-prime number, it is sufficient that this value is odd to ensure that all words 
-are evenly accessed by the spacing.
-
-Translating that consideration into the code found in random.c, the following 
-line is affected:
-
-                i = (i - 1) & wordmask;
-
-This line could be changed to something like:
-
-                i = (i - 13) & wordmask;
-
-Why 13? Well, it is a prime number (I like primes :-) ) and it is somewhat in 
-the middle of the smallest pool size of 32 words.
-
-Though, as we have polynomials that are spread out more evenly, we do not need 
-that change. Yet, if the impact on having such large polynomials (and thus 
-doing that many XORs for each byte in the event value) is considered to great 
-speed-wise, we could use much smaller polynomials, even when their taps are 
-not spaced apart.
-
-Ciao
-Stephan
+	Ingo
