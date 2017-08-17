@@ -1,87 +1,80 @@
-From: Tudor Ambarus <tudor.ambarus@microchip.com>
-Subject: Re: [PATCH v8 0/4] crypto: add algif_akcipher user space API
-Date: Thu, 17 Aug 2017 16:17:34 +0300
-Message-ID: <92b13089-acbf-6cf9-6e03-24a3b58a4f41@microchip.com>
-References: <26359147.tCiuJ5s8mz@positron.chronox.de>
- <alpine.OSX.2.21.1708101619530.33607@cjee-mobl1.amr.corp.intel.com>
- <3151047.7kO17u1kNV@tauon.chronox.de>
- <1E882887-3F56-4A4C-AADF-2F25F4D3A7C9@holtmann.org>
+From: Thomas Garnier <thgarnie@google.com>
+Subject: Re: x86: PIE support and option to extend KASLR randomization
+Date: Thu, 17 Aug 2017 07:10:31 -0700
+Message-ID: <CAJcbSZGbtc-i0X1NiBAvZA7cxpGkwSLKNB7oDNCsFxOCdhkR_g@mail.gmail.com>
+References: <20170810172615.51965-1-thgarnie@google.com> <20170811124127.kkb5pnkljz4umxuj@gmail.com>
+ <CAJcbSZFTX3uiS2g8JriS6+z_+WrG8z3hrQo4OSuyHpiyUDJWYA@mail.gmail.com>
+ <20170815075609.mmzbfwritjzvrpsn@gmail.com> <CAJcbSZE+TiY2whT94WqCJNXzR=2ATOHcQ10H5RqBZA1j=k1VHQ@mail.gmail.com>
+ <20170816151235.oamkdva6cwpc4cex@gmail.com> <CAJcbSZFM_zpL1av1JVaow8NdsGeH+6oZKeDnMPdXR0PGfynzsg@mail.gmail.com>
+ <20170817080920.5ljlkktngw2cisfg@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Cc: Mat Martineau <mathew.j.martineau@linux.intel.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        <dhowells@redhat.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-        Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from esa5.microchip.iphmx.com ([216.71.150.166]:15859 "EHLO
-        esa5.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752305AbdHQNSU (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Aug 2017 09:18:20 -0400
-In-Reply-To: <1E882887-3F56-4A4C-AADF-2F25F4D3A7C9@holtmann.org>
-Content-Language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>,
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>,
+	Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@redhat.com>,
+	Arnd Bergmann <arnd@arndb.de>, Matthias Kaehlcke <mka@chromium.org>,
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>, Juergen Gross <jgross@suse.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+	Joerg Roedel <joro@8bytes.org>, Tom Lendacky <thomas.lendacky@amd.com>,
+	Andy Lutomirski <luto@kernel.org>, Borislav Petkov <bp@suse.de>, Brian Gerst <brgerst@gmail.com>,
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, "Rafael J . Wysocki" <rjw@rjwysocki.net>,
+	Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>, Tejun Heo <tj@kernel.org>,
+	Christoph La
+To: Ingo Molnar <mingo@kernel.org>
+Return-path: <kernel-hardening-return-9500-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
+List-Post: <mailto:kernel-hardening@lists.openwall.com>
+List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
+List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
+List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
+In-Reply-To: <20170817080920.5ljlkktngw2cisfg@gmail.com>
+List-Id: linux-crypto.vger.kernel.org
 
-Hi, all,
+On Thu, Aug 17, 2017 at 1:09 AM, Ingo Molnar <mingo@kernel.org> wrote:
+>
+>
+> * Thomas Garnier <thgarnie@google.com> wrote:
+>
+> > > > -model=small/medium assume you are on the low 32-bit. It generates
+> > > > instructions where the virtual addresses have the high 32-bit to be zero.
+> > >
+> > > How are these assumptions hardcoded by GCC? Most of the instructions should be
+> > > relocatable straight away, as most call/jump/branch instructions are
+> > > RIP-relative.
+> >
+> > I think PIE is capable to use relative instructions well. mcmodel=large assumes
+> > symbols can be anywhere.
+>
+> So if the numbers in your changelog and Kconfig text cannot be trusted, there's
+> this description of the size impact which I suspect is less susceptible to
+> measurement error:
+>
+> +         The kernel and modules will generate slightly more assembly (1 to 2%
+> +         increase on the .text sections). The vmlinux binary will be
+> +         significantly smaller due to less relocations.
+>
+> ... but describing a 1-2% kernel text size increase as "slightly more assembly"
+> shows a gratituous disregard to kernel code generation quality! In reality that's
+> a huge size increase that in most cases will almost directly transfer to a 1-2%
+> slowdown for kernel intense workloads.
+>
+>
+> Where does that size increase come from, if PIE is capable of using relative
+> instructins well? Does it come from the loss of a generic register and the
+> resulting increase in register pressure, stack spills, etc.?
 
-On 08/11/2017 07:05 PM, Marcel Holtmann wrote:
-> Hi Stephan,
-> 
->>> AF_ALG is best suited for crypto use cases where a socket is set up once
->>> and there are lots of reads and writes to justify the setup cost. With
->>> asymmetric crypto, the setup cost is high when you might only use the
->>> socket for a brief time to do one verify or encrypt operation.
->>
->> To me, the entire AF_ALG purpose is solely to export hardware support to user
->> space. That said, if user space wants an accelerator, a socket would be opened
->> once followed by numerous read/write requests.
->>
->> Besides, I am aware of Tadeusz' patch to link algif_akcipher to the keyring
->> and I planned to port it to the current implementation. But I thought I offer
->> a small patch focusing on the externalization of the akcipher API first.
->>
->> I think the keyctl and AF_ALG are no opponents, but rather are orthogonal to
->> each other. The statement I made for the KPP AF_ALG RFC applies here too:
->>
->> """
->> I am aware and in fact supported development of the DH support in the keys
->> subsystem. The question will be raised whether the AF_ALG KPP interface is
->> superfluous in light of the keys DH support. My answer is that AF_ALG KPP is
->> orthogonal to the keys DH support. The keys DH support use case is that
->> the keys are managed inside the kernel and thus has the focus on the
->> key management. Contrary, AF_ALG KPP does not really focus on key management
->> but simply externalizes the DH/ECDH support found in the kernel including
->> hardware acceleration. User space is in full control of the key life cycle.
->> This way, AF_ALG could be used to complement user-space network protocol
->> implementations like TLS or IKE to offload the resource intense DH
->> calculations to accelerators.
->> “""
-> 
-> we do not need two interfaces for doing the same thing. Especially not one that can not handle hardware backed keys. And more important if you can not abstract an accelerator that doesn’t expose the private key at all.
+I will try to gather more information on the size increase. The size
+increase might be smaller with gcc 4.9 given performance was much
+better.
 
-I'm working with a crypto accelerator (find it at [1]) that is capable
-of generating random ecc private keys internally within the device that
-are never revealed outside of it. The keys can be further used for ECDH
-and ECDSA.
+>
+> So I'm still unhappy about this all, and about the attitude surrounding it.
+>
+> Thanks,
+>
+>         Ingo
 
-The simplest way to access my device from user-space is to go through
-af_alg. We can permit the users to provide NULL keys, and if so, we can
-generate the keys inside the kernel/hardware. If hardware supports
-key generation and retention, it will use it, else the keys
-will be generated inside the kernel. Either way it's a win, we don't
-reveal the private keys to user-space. Going through the keyring
-subsystem seems superfluous in this case.
 
-My use case compared with the one of using keyring subsystem to access
-keys from TPMs or Intel's sgx enclave seem orthogonal. What do you
-think?
 
-Cheers,
-ta
 
-[1] http://www.microchip.com/wwwproducts/en/ATECC508A
-The driver can be found in drivers/crypto/atmel-ecc* in Herbert's tree.
+-- 
+Thomas
