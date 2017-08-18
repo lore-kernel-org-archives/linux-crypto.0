@@ -1,245 +1,53 @@
-From: Corentin Labbe <clabbe.montjoie@gmail.com>
-Subject: [PATCH v4 1/1] crypto: engine - Permit to enqueue skcipher request
-Date: Fri, 18 Aug 2017 13:42:27 +0200
-Message-ID: <20170818114227.15739-2-clabbe.montjoie@gmail.com>
-References: <20170818114227.15739-1-clabbe.montjoie@gmail.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Corentin Labbe <clabbe.montjoie@gmail.com>
-To: herbert@gondor.apana.org.au, davem@davemloft.net
+From: Lionel Debieve <lionel.debieve@st.com>
+Subject: [PATCH 1/1] crypto: stm32/hash - Remove uninitialized symbol
+Date: Fri, 18 Aug 2017 15:54:01 +0200
+Message-ID: <1503064441-19964-1-git-send-email-lionel.debieve@st.com>
+Mime-Version: 1.0
+Content-Type: text/plain
+Cc: Benjamin Gaignard <benjamin.gaignard@st.com>,
+        Fabien Dessenne <fabien.dessenne@st.com>,
+        Ludovic Barre <ludovic.barre@st.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@st.com>,
+        <linux-crypto@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170818114227.15739-1-clabbe.montjoie@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The crypto engine could actually only enqueue hash and ablkcipher request.
-This patch permit it to enqueue skcipher requests by adding all necessary
-functions.
+Remove err symbol as this is not used in the thread context
+and the variable is not initialized.
 
-Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+Signed-off-by: Lionel Debieve <lionel.debieve@st.com>
 ---
- crypto/crypto_engine.c  | 120 ++++++++++++++++++++++++++++++++++++++++++++++++
- include/crypto/engine.h |  14 ++++++
- 2 files changed, 134 insertions(+)
+ drivers/crypto/stm32/stm32-hash.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/crypto/crypto_engine.c b/crypto/crypto_engine.c
-index 61e7c4e02fd2..d5ee2a615339 100644
---- a/crypto/crypto_engine.c
-+++ b/crypto/crypto_engine.c
-@@ -36,9 +36,11 @@ static void crypto_pump_requests(struct crypto_engine *engine,
- 	struct crypto_async_request *async_req, *backlog;
- 	struct ahash_request *hreq;
- 	struct ablkcipher_request *breq;
-+	struct skcipher_request *skreq;
- 	unsigned long flags;
- 	bool was_busy = false;
- 	int ret, rtype;
-+	const struct crypto_type *cratype;
+diff --git a/drivers/crypto/stm32/stm32-hash.c b/drivers/crypto/stm32/stm32-hash.c
+index b585ce5..b34ee85 100644
+--- a/drivers/crypto/stm32/stm32-hash.c
++++ b/drivers/crypto/stm32/stm32-hash.c
+@@ -1067,7 +1067,6 @@ static int stm32_hash_cra_sha256_init(struct crypto_tfm *tfm)
+ static irqreturn_t stm32_hash_irq_thread(int irq, void *dev_id)
+ {
+ 	struct stm32_hash_dev *hdev = dev_id;
+-	int err;
  
- 	spin_lock_irqsave(&engine->queue_lock, flags);
+ 	if (HASH_FLAGS_CPU & hdev->flags) {
+ 		if (HASH_FLAGS_OUTPUT_READY & hdev->flags) {
+@@ -1084,8 +1083,8 @@ static irqreturn_t stm32_hash_irq_thread(int irq, void *dev_id)
+ 	return IRQ_HANDLED;
  
-@@ -123,6 +125,25 @@ static void crypto_pump_requests(struct crypto_engine *engine,
- 		}
- 		return;
- 	case CRYPTO_ALG_TYPE_ABLKCIPHER:
-+		cratype = engine->cur_req->tfm->__crt_alg->cra_type;
-+		if (cratype != &crypto_ablkcipher_type) {
-+			skreq = skcipher_request_cast(engine->cur_req);
-+			if (engine->prepare_skcipher_request) {
-+				ret = engine->prepare_skcipher_request(engine, skreq);
-+				if (ret) {
-+					dev_err(engine->dev, "failed to prepare request: %d\n",
-+						ret);
-+					goto req_err;
-+				}
-+				engine->cur_req_prepared = true;
-+			}
-+			ret = engine->skcipher_one_request(engine, skreq);
-+			if (ret) {
-+				dev_err(engine->dev, "failed to cipher one request from queue\n");
-+				goto req_err;
-+			}
-+			return;
-+		}
- 		breq = ablkcipher_request_cast(engine->cur_req);
- 		if (engine->prepare_cipher_request) {
- 			ret = engine->prepare_cipher_request(engine, breq);
-@@ -151,6 +172,12 @@ static void crypto_pump_requests(struct crypto_engine *engine,
- 		crypto_finalize_hash_request(engine, hreq, ret);
- 		break;
- 	case CRYPTO_ALG_TYPE_ABLKCIPHER:
-+		cratype = engine->cur_req->tfm->__crt_alg->cra_type;
-+		if (cratype != &crypto_ablkcipher_type) {
-+			skreq = skcipher_request_cast(engine->cur_req);
-+			crypto_finalize_skcipher_request(engine, skreq, ret);
-+			break;
-+		}
- 		breq = ablkcipher_request_cast(engine->cur_req);
- 		crypto_finalize_cipher_request(engine, breq, ret);
- 		break;
-@@ -213,6 +240,49 @@ int crypto_transfer_cipher_request_to_engine(struct crypto_engine *engine,
- EXPORT_SYMBOL_GPL(crypto_transfer_cipher_request_to_engine);
+ finish:
+-	/*Finish current request */
+-	stm32_hash_finish_req(hdev->req, err);
++	/* Finish current request */
++	stm32_hash_finish_req(hdev->req, 0);
  
- /**
-+ * crypto_transfer_skcipher_request - transfer the new request into the
-+ * enginequeue
-+ * @engine: the hardware engine
-+ * @req: the request need to be listed into the engine queue
-+ */
-+int crypto_transfer_skcipher_request(struct crypto_engine *engine,
-+				     struct skcipher_request *req,
-+				     bool need_pump)
-+{
-+	unsigned long flags;
-+	int ret;
-+
-+	spin_lock_irqsave(&engine->queue_lock, flags);
-+
-+	if (!engine->running) {
-+		spin_unlock_irqrestore(&engine->queue_lock, flags);
-+		return -ESHUTDOWN;
-+	}
-+
-+	ret = crypto_enqueue_request(&engine->queue, &req->base);
-+
-+	if (!engine->busy && need_pump)
-+		kthread_queue_work(engine->kworker, &engine->pump_requests);
-+
-+	spin_unlock_irqrestore(&engine->queue_lock, flags);
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(crypto_transfer_skcipher_request);
-+
-+/**
-+ * crypto_transfer_skcipher_request_to_engine - transfer one request to list
-+ * into the engine queue
-+ * @engine: the hardware engine
-+ * @req: the request need to be listed into the engine queue
-+ */
-+int crypto_transfer_skcipher_request_to_engine(struct crypto_engine *engine,
-+					       struct skcipher_request *req)
-+{
-+	return crypto_transfer_skcipher_request(engine, req, true);
-+}
-+EXPORT_SYMBOL_GPL(crypto_transfer_skcipher_request_to_engine);
-+
-+/**
-  * crypto_transfer_hash_request - transfer the new request into the
-  * enginequeue
-  * @engine: the hardware engine
-@@ -292,6 +362,43 @@ void crypto_finalize_cipher_request(struct crypto_engine *engine,
- EXPORT_SYMBOL_GPL(crypto_finalize_cipher_request);
- 
- /**
-+ * crypto_finalize_skcipher_request - finalize one request if the request is done
-+ * @engine: the hardware engine
-+ * @req: the request need to be finalized
-+ * @err: error number
-+ */
-+void crypto_finalize_skcipher_request(struct crypto_engine *engine,
-+				      struct skcipher_request *req, int err)
-+{
-+	unsigned long flags;
-+	bool finalize_cur_req = false;
-+	int ret;
-+
-+	spin_lock_irqsave(&engine->queue_lock, flags);
-+	if (engine->cur_req == &req->base)
-+		finalize_cur_req = true;
-+	spin_unlock_irqrestore(&engine->queue_lock, flags);
-+
-+	if (finalize_cur_req) {
-+		if (engine->cur_req_prepared &&
-+		    engine->unprepare_skcipher_request) {
-+			ret = engine->unprepare_skcipher_request(engine, req);
-+			if (ret)
-+				dev_err(engine->dev, "failed to unprepare request\n");
-+		}
-+		spin_lock_irqsave(&engine->queue_lock, flags);
-+		engine->cur_req = NULL;
-+		engine->cur_req_prepared = false;
-+		spin_unlock_irqrestore(&engine->queue_lock, flags);
-+	}
-+
-+	req->base.complete(&req->base, err);
-+
-+	kthread_queue_work(engine->kworker, &engine->pump_requests);
-+}
-+EXPORT_SYMBOL_GPL(crypto_finalize_skcipher_request);
-+
-+/**
-  * crypto_finalize_hash_request - finalize one request if the request is done
-  * @engine: the hardware engine
-  * @req: the request need to be finalized
-@@ -345,6 +452,19 @@ int crypto_engine_start(struct crypto_engine *engine)
- 		return -EBUSY;
- 	}
- 
-+	if (!engine->skcipher_one_request && !engine->cipher_one_request &&
-+	    !engine->hash_one_request) {
-+		spin_unlock_irqrestore(&engine->queue_lock, flags);
-+		dev_err(engine->dev, "need at least one request type\n");
-+		return -EINVAL;
-+	}
-+
-+	if (engine->skcipher_one_request && engine->cipher_one_request) {
-+		spin_unlock_irqrestore(&engine->queue_lock, flags);
-+		dev_err(engine->dev, "Cannot use both skcipher and ablkcipher\n");
-+		return -EINVAL;
-+	}
-+
- 	engine->running = true;
- 	spin_unlock_irqrestore(&engine->queue_lock, flags);
- 
-diff --git a/include/crypto/engine.h b/include/crypto/engine.h
-index dd04c1699b51..a8f6e6ed377b 100644
---- a/include/crypto/engine.h
-+++ b/include/crypto/engine.h
-@@ -18,6 +18,7 @@
- #include <linux/kthread.h>
- #include <crypto/algapi.h>
- #include <crypto/hash.h>
-+#include <crypto/skcipher.h>
- 
- #define ENGINE_NAME_LEN	30
- /*
-@@ -69,12 +70,18 @@ struct crypto_engine {
- 				      struct ablkcipher_request *req);
- 	int (*unprepare_cipher_request)(struct crypto_engine *engine,
- 					struct ablkcipher_request *req);
-+	int (*prepare_skcipher_request)(struct crypto_engine *engine,
-+					struct skcipher_request *req);
-+	int (*unprepare_skcipher_request)(struct crypto_engine *engine,
-+					  struct skcipher_request *req);
- 	int (*prepare_hash_request)(struct crypto_engine *engine,
- 				    struct ahash_request *req);
- 	int (*unprepare_hash_request)(struct crypto_engine *engine,
- 				      struct ahash_request *req);
- 	int (*cipher_one_request)(struct crypto_engine *engine,
- 				  struct ablkcipher_request *req);
-+	int (*skcipher_one_request)(struct crypto_engine *engine,
-+				    struct skcipher_request *req);
- 	int (*hash_one_request)(struct crypto_engine *engine,
- 				struct ahash_request *req);
- 
-@@ -90,12 +97,19 @@ int crypto_transfer_cipher_request(struct crypto_engine *engine,
- 				   bool need_pump);
- int crypto_transfer_cipher_request_to_engine(struct crypto_engine *engine,
- 					     struct ablkcipher_request *req);
-+int crypto_transfer_skcipher_request(struct crypto_engine *engine,
-+				     struct skcipher_request *req,
-+				     bool need_pump);
-+int crypto_transfer_skcipher_request_to_engine(struct crypto_engine *engine,
-+					       struct skcipher_request *req);
- int crypto_transfer_hash_request(struct crypto_engine *engine,
- 				 struct ahash_request *req, bool need_pump);
- int crypto_transfer_hash_request_to_engine(struct crypto_engine *engine,
- 					   struct ahash_request *req);
- void crypto_finalize_cipher_request(struct crypto_engine *engine,
- 				    struct ablkcipher_request *req, int err);
-+void crypto_finalize_skcipher_request(struct crypto_engine *engine,
-+				      struct skcipher_request *req, int err);
- void crypto_finalize_hash_request(struct crypto_engine *engine,
- 				  struct ahash_request *req, int err);
- int crypto_engine_start(struct crypto_engine *engine);
+ 	return IRQ_HANDLED;
+ }
 -- 
-2.13.0
+2.7.4
