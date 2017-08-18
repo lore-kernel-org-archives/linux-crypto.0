@@ -1,89 +1,55 @@
-From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Subject: Re: [PATCH 3/6] crypto: jz4780-rng: Add Ingenic JZ4780 hardware PRNG driver
-Date: Fri, 18 Aug 2017 19:36:43 +0530
-Message-ID: <CANc+2y5zEg7NeE7a8JK+ALwtPN0FJ6Ajo2PxBGGZ=fBzxtKbjA@mail.gmail.com>
-References: <20170817182520.20102-1-prasannatsmkumar@gmail.com>
- <20170817182520.20102-4-prasannatsmkumar@gmail.com> <20325029.4QLNKKN8OS@tauon.chronox.de>
+From: David Sterba <dsterba@suse.cz>
+Subject: Re: [PATCH v3 3/4] btrfs: Add zstd support
+Date: Fri, 18 Aug 2017 17:37:14 +0200
+Message-ID: <20170818153714.GZ2866@twin.jikos.cz>
+References: <20170720212743.3351201-1-terrelln@fb.com>
+ <20170720212743.3351201-4-terrelln@fb.com>
+ <20170725231929.GA28789@silv-upstream1.ir.intel.com>
+Reply-To: dsterba@suse.cz
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Ralf Baechle <ralf@linux-mips.org>,
-        Michael Turquette <mturquette@baylibre.com>,
-        sboyd@codeaurora.org, "David S . Miller" <davem@davemloft.net>,
-        Paul Cercueil <paul@crapouillou.net>,
-        linux-crypto@vger.kernel.org, linux-mips@linux-mips.org
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-io0-f193.google.com ([209.85.223.193]:34759 "EHLO
-        mail-io0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751055AbdHROGp (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Aug 2017 10:06:45 -0400
-Received: by mail-io0-f193.google.com with SMTP id m88so5738649iod.1
-        for <linux-crypto@vger.kernel.org>; Fri, 18 Aug 2017 07:06:44 -0700 (PDT)
-In-Reply-To: <20325029.4QLNKKN8OS@tauon.chronox.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Nick Terrell <terrelln@fb.com>,
+        "Austin S . Hemmelgarn" <ahferroin7@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "kernel-team@fb.com" <kernel-team@fb.com>,
+        Chris Mason <clm@fb.com>, Yann Collet <cyan@fb.com>,
+        Adam Borowski <kilobyte@angband.pl>,
+        David Sterba <dsterba@suse.cz>,
+        "squashfs-devel@lists.sourceforge.net"
+        <squashfs-devel@lists.sourceforge.net>,
+        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Weigang Li <weigang.li@intel.com>,
+        Brian Will <brian.will@intel.com>,
+        Brian A Keating <brian.a.keating@intel.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@gmail.com>
+To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20170725231929.GA28789@silv-upstream1.ir.intel.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Stephan,
+On Wed, Jul 26, 2017 at 12:19:29AM +0100, Giovanni Cabiddu wrote:
+> Hi Nick,
+> 
+> On Thu, Jul 20, 2017 at 10:27:42PM +0100, Nick Terrell wrote:
+> > Add zstd compression and decompression support to BtrFS. zstd at its
+> > fastest level compresses almost as well as zlib, while offering much
+> > faster compression and decompression, approaching lzo speeds.
+> Can we look at integrating the zstd implementation below the acomp API
+> available in the crypto subsystem?
+> (https://github.com/torvalds/linux/blob/master/crypto/acompress.c)
+> Acomp was designed to provide a generic and uniform API for compression
+> in the kernel which hides algorithm specific details to frameworks.
+> In future it would be nice to see btrfs using exclusively acomp
+> for compression. This way when a new compression algorithm is exposed
+> through acomp, it will be available immediately in btrfs.
 
-On 18 August 2017 at 00:22, Stephan Mueller <smueller@chronox.de> wrote:
-> Am Donnerstag, 17. August 2017, 20:25:17 CEST schrieb PrasannaKumar
-> Muralidharan:
->
-> Hi PrasannaKumar,
->
->> +
->> +static int jz4780_rng_generate(struct crypto_rng *tfm,
->> +                            const u8 *src, unsigned int slen,
->> +                            u8 *dst, unsigned int dlen)
->> +{
->> +     struct jz4780_rng_ctx *ctx = crypto_rng_ctx(tfm);
->> +     struct jz4780_rng *rng = ctx->rng;
->> +     u32 data;
->> +
->> +     /*
->> +      * JZ4780 Programmers manual says the RNG should not run continuously
->> +      * for more than 1s. So enable RNG, read data and disable it.
->> +      * NOTE: No issue was observed with MIPS creator CI20 board even when
->> +      * RNG ran continuously for longer periods. This is just a precaution.
->> +      *
->> +      * A delay is required so that the current RNG data is not bit shifted
->> +      * version of previous RNG data which could happen if random data is
->> +      * read continuously from this device.
->> +      */
->> +     jz4780_rng_writel(rng, 1, REG_RNG_CTRL);
->> +     do {
->> +             data = jz4780_rng_readl(rng, REG_RNG_DATA);
->> +             memcpy((void *)dst, (void *)&data, 4);
->
-> How do you know that dst is a multiple of 4 bytes? When dlen is only 3, you
-> overflow the buffer.
-
-You are right. I initially used hw_random framework for this driver.
-But later realised that PRNG driver should use crypto framework. When
-I started using crypto I reused most of the code. This was because of
-porting. Will change it and send next version.
-
->
->> +             dlen -= 4;
->> +             dst += 4;
->> +             udelay(20);
->> +     } while (dlen >= 4);
->> +
->> +     if (dlen > 0) {
->> +             data = jz4780_rng_readl(rng, REG_RNG_DATA);
->> +             memcpy((void *)dst, (void *)&data, dlen);
->> +     }
->> +     jz4780_rng_writel(rng, 0, REG_RNG_CTRL);
->> +
->> +     return 0;
->> +}
->
-> Ciao
-> Stephan
-
-Thanks,
-PrasannaKumar
+The compression algorithm is considered part of the filesystem format
+and must be covered by an incompatibility bit. Regarding the acomp API,
+I don't see much point adding the extra abstraction layer for the two
+currently supported algorithms. We only call 2 functions, for
+compression and decompression, no need to allocate the acomp helper
+structures and call the functions indirectly.
