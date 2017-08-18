@@ -1,39 +1,60 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 2/3] crypto: engine - find request type with cra_type
-Date: Fri, 18 Aug 2017 16:28:37 +0800
-Message-ID: <20170818082836.GA29641@gondor.apana.org.au>
-References: <20170814131725.9402-1-clabbe.montjoie@gmail.com>
- <20170814131725.9402-3-clabbe.montjoie@gmail.com>
+From: Fabien Dessenne <fabien.dessenne@st.com>
+Subject: [PATCH v3 0/3] STM32 CRYP crypto driver
+Date: Fri, 18 Aug 2017 11:19:03 +0200
+Message-ID: <1503047946-27799-1-git-send-email-fabien.dessenne@st.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: Corentin Labbe <clabbe.montjoie@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:49980 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750709AbdHRI2s (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Aug 2017 04:28:48 -0400
-Content-Disposition: inline
-In-Reply-To: <20170814131725.9402-3-clabbe.montjoie@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Lionel Debieve <lionel.debieve@st.com>,
+ Benjamin Gaignard <benjamin.gaignard@st.com>,
+ Ludovic Barre <ludovic.barre@st.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller"
+ <davem@davemloft.net>, Rob Herring <robh+dt@kernel.org>, Mark Rutland
+ <mark.rutland@arm.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@st.com>,
+ <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
+ <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Aug 14, 2017 at 03:17:24PM +0200, Corentin Labbe wrote:
-> The current method for finding request type is based on crypto_tfm_alg_type.
-> 
-> But in case of skcipher, it is the same than ablkcipher.
-> Using cra_type for this work permits to make the distinction between the two.
-> 
-> Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+This set of patches adds a new crypto driver for STMicroelectronics stm32 HW.
+This drivers uses the crypto API and provides with HW-enabled AEAD and block
+cipher algorithms.
+It makes use of the crypto engine which is upgraded in order to support AEAD
+requests.
 
-I think you misunderstood my suggestion.  I'm not saying that
-you should use cra_type to distinguish all crypto types, it should
-only be used to distinguish ablkcipher from skcipher.
+This driver was successfully tested with tcrypt / testmgr.
 
-Thanks,
+Changes since v3:
+- update dt-bindings with Rob Herring remarks
+
+Changes since v2:
+- update dt-bindings (interrupts description)
+- rebase on STM32 crypto patches (L. Debieve : update CRC32 + add HASH)
+
+Fabien Dessenne (3):
+  crypto: engine - permit to enqueue aead_request
+  dt-bindings: Document STM32 CRYP bindings
+  crypto: stm32 - Support for STM32 CRYP crypto module
+
+ .../devicetree/bindings/crypto/st,stm32-cryp.txt   |   19 +
+ crypto/crypto_engine.c                             |  101 +
+ drivers/crypto/stm32/Kconfig                       |    9 +
+ drivers/crypto/stm32/Makefile                      |    3 +-
+ drivers/crypto/stm32/stm32-cryp.c                  | 1962 ++++++++++++++++++++
+ include/crypto/engine.h                            |   16 +
+ 6 files changed, 2109 insertions(+), 1 deletion(-)
+ create mode 100644 Documentation/devicetree/bindings/crypto/st,stm32-cryp.txt
+ create mode 100644 drivers/crypto/stm32/stm32-cryp.c
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.7.4
