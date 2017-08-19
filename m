@@ -1,49 +1,71 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: ccp - Fix XTS-AES-128 support on v5 CCPs
-Date: Sat, 19 Aug 2017 12:02:26 +0800
-Message-ID: <20170819040226.GB29641@gondor.apana.org.au>
-References: <150032210775.102848.1585950131204303137.stgit@sosxen.amd.com>
- <14a02623-b19e-b4ae-c078-57912a83cd4b@amd.com>
- <f5714d71-4e4a-b942-7e1e-58f478a5ff21@amd.com>
- <32d0b50e-e5d5-6041-0ee9-f8384c7c79a3@amd.com>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: Re: [PATCH v8 3/4] crypto: AF_ALG -- add asymmetric cipher
+Date: Sat, 19 Aug 2017 15:53:10 +0200
+Message-ID: <5370549.LiGXVyRayf@positron.chronox.de>
+References: <26359147.tCiuJ5s8mz@positron.chronox.de> <2379311.RoATi6cCiZ@positron.chronox.de> <8450990a-61bb-0f7c-70dd-643a45220d3f@microchip.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Gary R Hook <gary.hook@amd.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
+To: Tudor Ambarus <tudor.ambarus@microchip.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:46358 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750716AbdHSECi (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 19 Aug 2017 00:02:38 -0400
-Content-Disposition: inline
-In-Reply-To: <32d0b50e-e5d5-6041-0ee9-f8384c7c79a3@amd.com>
+Received: from mail.eperm.de ([89.247.134.16]:59068 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751012AbdHSNxN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 19 Aug 2017 09:53:13 -0400
+In-Reply-To: <8450990a-61bb-0f7c-70dd-643a45220d3f@microchip.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Aug 18, 2017 at 11:41:04AM -0500, Gary R Hook wrote:
-> >On Tue, Jul 25, 2017 at 02:12:11PM -0500, Gary R Hook wrote:
-> >> Version 5 CCPs have some new requirements for XTS-AES: the type field
-> >> must be specified, and the key requires 512 bits, with each part
-> >> occupying 256 bits and padded with zeroes.
-> >>
-> >> cc: <stable@vger.kernel.org> # 4.9.x+
-> >>
-> >> Signed-off-by: Gary R Hook <ghook@amd.com>
-> >
-> >Patch applied.  Thanks.
-> 
-> Herbert,
-> 
-> *ping*
-> 
-> This is a bug fix, Could we push this into 4.13, please?
+Am Freitag, 11. August 2017, 14:51:10 CEST schrieb Tudor Ambarus:
 
-I don't think this one is critical enough to go in right now.
-Is there any reason why it can't wait until the next merge window?
+Hi Tudor,
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+I have covered all your requests
+> 
+> > +	size_t used = 0;
+> 
+> initialization to zero not needed. You can directly initialize to
+> ctx->used or don't initialize at all.
+
+It is not initialized now. We cannot use ctx->used here as the socket (and 
+thus the ctx data structure) is not locked yet.
+
+> > +
+> > +		/*
+> > +		 * This error covers -EIOCBQUEUED which implies that we can
+> > +		 * only handle one AIO request. If the caller wants to have
+> > +		 * multiple AIO requests in parallel, he must make multiple
+> > +		 * separate AIO calls.
+> > +		 */
+> > +		if (err <= 0) {
+> 
+> why the equal?
+
+We must get something out of the cipher operation as otherwise something is 
+wrong. In this case I would like to error out to prevent an endless loop here.
+
+> > +static int akcipher_setprivkey(void *private, const u8 *key,
+> > +			       unsigned int keylen)
+> > +{
+> > +	struct akcipher_tfm *tfm = private;
+> > +	struct crypto_akcipher *akcipher = tfm->akcipher;
+> > +	int err;
+> > +
+> > +	err = crypto_akcipher_set_priv_key(akcipher, key, keylen);
+> > +	tfm->has_key = !err;
+> > +
+> > +	/* Return the maximum size of the akcipher operation. */
+> > +	if (!err)
+> > +		err = crypto_akcipher_maxsize(akcipher);
+> 
+> crypto subsystem returns zero when setkey is successful and introduces
+> a new function for determining the maxsize. Should we comply with that?
+
+The idea is that only when the the setting of the priv key fails, it returns 
+the size of the expected privkey.
+
+Which new function are you referring to?
+
+Ciao
+Stephan
