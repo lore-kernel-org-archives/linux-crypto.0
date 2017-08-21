@@ -1,65 +1,66 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [PATCH v5 05/19] crypto: introduce crypto wait for async op
-Date: Mon, 21 Aug 2017 15:49:41 +0300
-Message-ID: <CAOtvUMfJaG-Uomc1EnD1+HySz+X8SUaRUm1SEx4DusquWfOF0w@mail.gmail.com>
-References: <1502724094-23305-1-git-send-email-gilad@benyossef.com>
- <1502724094-23305-6-git-send-email-gilad@benyossef.com> <20170815032303.000042b2@huawei.com>
+From: Peter Zijlstra <peterz@infradead.org>
+Subject: Re: x86: PIE support and option to extend KASLR randomization
+Date: Mon, 21 Aug 2017 15:32:22 +0200
+Message-ID: <20170821133222.2ek6bhqgdeoymxsg@hirez.programming.kicks-ass.net>
+References: <20170810172615.51965-1-thgarnie@google.com>
+ <20170811124127.kkb5pnkljz4umxuj@gmail.com>
+ <CAJcbSZFTX3uiS2g8JriS6+z_+WrG8z3hrQo4OSuyHpiyUDJWYA@mail.gmail.com>
+ <20170815075609.mmzbfwritjzvrpsn@gmail.com>
+ <CAJcbSZE+TiY2whT94WqCJNXzR=2ATOHcQ10H5RqBZA1j=k1VHQ@mail.gmail.com>
+ <20170816151235.oamkdva6cwpc4cex@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        David Howells <dhowells@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>,
-        Boris Brezillon <boris.brezillon@free-electrons.com>,
-        Arnaud Ebalard <arno@natisbad.org>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        device-mapper development <dm-devel@redhat.com>,
-        Shaohua Li <shli@kernel.org>, Steve French <sfrench@samba.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        James Morris <james.l.morris@oracle.com>,
-        "Serge E. Hallyn
-To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <20170815032303.000042b2@huawei.com>
-Sender: owner-linux-security-module@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Thomas Garnier <thgarnie@google.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>,
+	Josh Poimboeuf <jpoimboe@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
+	Matthias Kaehlcke <mka@chromium.org>,
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+	Juergen Gross <jgross@suse.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+	Joerg Roedel <joro@8bytes.org>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Andy Lutomirski <luto@kernel.org>, Borislav Petkov <bp@suse.de>,
+	Brian Gerst <brgerst@gmail.com>,
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+	"Rafael J . Wysocki" <rjw@rjwysocki.net>,
+	Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
+	Tejun Heo <tj@kernel.org>, Christoph Lameter
+To: Ingo Molnar <mingo@kernel.org>
+Return-path: <kernel-hardening-return-9535-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
+List-Post: <mailto:kernel-hardening@lists.openwall.com>
+List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
+List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
+List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
+Content-Disposition: inline
+In-Reply-To: <20170816151235.oamkdva6cwpc4cex@gmail.com>
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Aug 15, 2017 at 5:23 AM, Jonathan Cameron
-<Jonathan.Cameron@huawei.com> wrote:
-> On Mon, 14 Aug 2017 18:21:15 +0300
-> Gilad Ben-Yossef <gilad@benyossef.com> wrote:
->
->> Invoking a possibly async. crypto op and waiting for completion
->> while correctly handling backlog processing is a common task
->> in the crypto API implementation and outside users of it.
->>
->> This patch adds a generic implementation for doing so in
->> preparation for using it across the board instead of hand
->> rolled versions.
+On Wed, Aug 16, 2017 at 05:12:35PM +0200, Ingo Molnar wrote:
+> Unfortunately mcmodel=large looks pretty heavy too AFAICS, at the machine 
+> instruction level.
+> 
+> Function calls look like this:
+> 
+>  -mcmodel=medium:
+> 
+>    757:   e8 98 ff ff ff          callq  6f4 <test_code>
+> 
+>  -mcmodel=large
+> 
+>    77b:   48 b8 10 f7 df ff ff    movabs $0xffffffffffdff710,%rax
+>    782:   ff ff ff 
+>    785:   48 8d 04 03             lea    (%rbx,%rax,1),%rax
+>    789:   ff d0                   callq  *%rax
+> 
+> And we'd do this for _EVERY_ function call in the kernel. That kind of crap is 
+> totally unacceptable.
 
->
-> Trivial observation.  Shouldn't have this bonus blank line inserted here.
->
->>  #endif       /* _LINUX_CRYPTO_H */
->>
->
+So why does this need to be computed for every single call? How often
+will we move the kernel around at runtime?
 
-Indeed. Will be fixed.
-
-Thanks,
-Gilad
-
--- 
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-"If you take a class in large-scale robotics, can you end up in a
-situation where the homework eats your dog?"
- -- Jean-Baptiste Queru
+Why can't we process the relocation at load time and then discard the
+relocation tables along with the rest of __init ?
