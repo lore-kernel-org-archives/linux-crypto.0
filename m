@@ -1,50 +1,35 @@
-From: Colin King <colin.king@canonical.com>
-Subject: [PATCH] crypto: aesni: make arrays aesni_simd_skciphers and aesni_simd_skciphers2 static
-Date: Sun, 20 Aug 2017 22:34:38 +0100
-Message-ID: <20170820213438.14686-1-colin.king@canonical.com>
+From: Carlo Caione <carlo@caione.org>
+Subject: Re: [PATCH RESEND] X.509: Recognize the legacy OID 1.3.14.3.2.29 (sha1WithRSASignature)
+Date: Mon, 21 Aug 2017 09:27:18 +0200
+Message-ID: <CAOQ7t2Y+QX_GWj=Sii6VKbY4N9UfZc5cFriC3RfFWVxSobd-Xw@mail.gmail.com>
+References: <20170807080151.5313-1-carlo@caione.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        linux-crypto@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: dhowells@redhat.com, Herbert Xu <herbert@gondor.apana.org.au>,
+        davem@davemloft.net, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
+        open list <linux-kernel@vger.kernel.org>,
+        Linux Upstreaming Team <linux@endlessm.com>,
+        Carlo Caione <carlo@endlessm.com>
+To: Carlo Caione <carlo@caione.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-oi0-f67.google.com ([209.85.218.67]:37212 "EHLO
+        mail-oi0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751188AbdHUH1U (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 21 Aug 2017 03:27:20 -0400
+In-Reply-To: <20170807080151.5313-1-carlo@caione.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Colin Ian King <colin.king@canonical.com>
+On Mon, Aug 7, 2017 at 10:01 AM, Carlo Caione <carlo@caione.org> wrote:
+> From: Carlo Caione <carlo@endlessm.com>
+>
+> We have found some ACER laptops shipping with certificates signed using
+> the 1.3.14.3.2.29 OID. This is causing the message
+/cut
 
-Arrays aesni_simd_skciphers and aesni_simd_skciphers2 are local to the
-source and do not need to be in global scope, so make them static.
+Ping on this (literally) two lines patch.
 
-Cleans up sparse warnings:
-symbol 'aesni_simd_skciphers' was not declared. Should it be static?
-symbol 'aesni_simd_skciphers2' was not declared. Should it be static?
-
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
----
- arch/x86/crypto/aesni-intel_glue.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index 5c15d6b57329..c4c20286f27e 100644
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -1067,9 +1067,10 @@ static struct skcipher_alg aesni_skciphers[] = {
- 	}
- };
- 
-+static
- struct simd_skcipher_alg *aesni_simd_skciphers[ARRAY_SIZE(aesni_skciphers)];
- 
--struct {
-+static struct {
- 	const char *algname;
- 	const char *drvname;
- 	const char *basename;
 -- 
-2.11.0
+Carlo Caione
