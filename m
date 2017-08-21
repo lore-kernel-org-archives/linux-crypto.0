@@ -1,59 +1,87 @@
-From: Thomas Garnier <thgarnie@google.com>
-Subject: Re: x86: PIE support and option to extend KASLR randomization
-Date: Mon, 21 Aug 2017 08:57:58 -0700
-Message-ID: <CAJcbSZFVg=5o3sDA=iwButtzn4CCpzGfZpX_DBtj7JRWzBHUjQ@mail.gmail.com>
-References: <20170810172615.51965-1-thgarnie@google.com> <20170811124127.kkb5pnkljz4umxuj@gmail.com>
- <CAJcbSZFTX3uiS2g8JriS6+z_+WrG8z3hrQo4OSuyHpiyUDJWYA@mail.gmail.com>
- <20170815075609.mmzbfwritjzvrpsn@gmail.com> <CAJcbSZE+TiY2whT94WqCJNXzR=2ATOHcQ10H5RqBZA1j=k1VHQ@mail.gmail.com>
- <20170821143117.22sekggxizt3mhze@hirez.programming.kicks-ass.net>
+From: Paul Burton <paul.burton@imgtec.com>
+Subject: Re: [PATCH 2/6] crypto: jz4780-rng: Make ingenic CGU driver use syscon
+Date: Mon, 21 Aug 2017 09:04:16 -0700
+Message-ID: <45556677.8n3yGzOkJs@np-p-burton>
+References: <20170817182520.20102-1-prasannatsmkumar@gmail.com> <3563032.h0vdzx9HfC@np-p-burton> <CANc+2y6tRe_kkWyGX+-BT-ugb5JiZhKpPoHWkAn=2ZC6cb6uKA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Ingo Molnar <mingo@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
-	"H . Peter Anvin" <hpa@zytor.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
-	Matthias Kaehlcke <mka@chromium.org>, Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-	Juergen Gross <jgross@suse.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	=?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-	Joerg Roedel <joro@8bytes.org>, Tom Lendacky <thomas.lendacky@amd.com>,
-	Andy Lutomirski <luto@kernel.org>, Borislav Petkov <bp@suse.de>, Brian Gerst <brgerst@gmail.com>,
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, "Rafael J . Wysocki" <rjw@rjwysocki.net>,
-	Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>, Tejun Heo <tj@kernel.org>,
-	Christoph Lameter <
-To: Peter Zijlstra <peterz@infradead.org>
-Return-path: <kernel-hardening-return-9538-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
-List-Post: <mailto:kernel-hardening@lists.openwall.com>
-List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
-List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
-List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
-In-Reply-To: <20170821143117.22sekggxizt3mhze@hirez.programming.kicks-ass.net>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: multipart/signed; boundary="nextPart8306877.L2Sq6hHNpB";
+        micalg=pgp-sha256; protocol="application/pgp-signature"
+Cc: <linux-mips@linux-mips.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Ralf Baechle <ralf@linux-mips.org>,
+        Michael Turquette <mturquette@baylibre.com>,
+        <sboyd@codeaurora.org>, "David S . Miller" <davem@davemloft.net>,
+        Paul Cercueil <paul@crapouillou.net>,
+        <linux-crypto@vger.kernel.org>
+To: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mailapp01.imgtec.com ([195.59.15.196]:6272 "EHLO
+        mailapp01.imgtec.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754270AbdHUQEY (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 21 Aug 2017 12:04:24 -0400
+In-Reply-To: <CANc+2y6tRe_kkWyGX+-BT-ugb5JiZhKpPoHWkAn=2ZC6cb6uKA@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Aug 21, 2017 at 7:31 AM, Peter Zijlstra <peterz@infradead.org> wrote:
-> On Tue, Aug 15, 2017 at 07:20:38AM -0700, Thomas Garnier wrote:
->> On Tue, Aug 15, 2017 at 12:56 AM, Ingo Molnar <mingo@kernel.org> wrote:
->
->> > Have you considered a kernel with -mcmodel=small (or medium) instead of -fpie
->> > -mcmodel=large? We can pick a random 2GB window in the (non-kernel) canonical
->> > x86-64 address space to randomize the location of kernel text. The location of
->> > modules can be further randomized within that 2GB window.
->>
->> -model=small/medium assume you are on the low 32-bit. It generates
->> instructions where the virtual addresses have the high 32-bit to be
->> zero.
->
-> That's a compiler fail, right? Because the SDM states that for "CALL
-> rel32" the 32bit displacement is sign extended on x86_64.
->
+--nextPart8306877.L2Sq6hHNpB
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 
-That's different than what I expected at first too.
+Hi PrasannaKumar,
 
-Now, I think I have an alternative of using mcmodel=large. I could use
--fPIC and ensure modules are never far away from the main kernel
-(moving the module section start close to the random kernel end). I
-looked at it and that seems possible but will require more work. I
-plan to start with the mcmodel=large support and add this mode in a
-way that could benefit classic KASLR (without -fPIC) because it
-randomize where modules start based on the kernel.
+On Sunday, 20 August 2017 09:12:12 PDT PrasannaKumar Muralidharan wrote:
+> > Could you instead perhaps:
+> >  - Just add "syscon" as a second compatible string to the CGU node in the
+> >  
+> >    device tree, but otherwise leave it as-is without the extra
+> >    cgu_registers
+> >    node.
+> >  
+> >  - Have your RNG device node as a child of the CGU node, which should let
+> >  it
+> >  
+> >    pick up the regmap via syscon_node_to_regmap() as it already does.
+> >  
+> >  - Leave the CGU driver as-is, so it can continue accessing memory
+> >  directly
+> >  
+> >    rather than via regmap.
+> 
+> As per my understanding, CGU driver and syscon will map the same
+> register set. Is that fine?
 
--- 
-Thomas
+That should work fine.
+
+It's only risky if you have 2 drivers using the same registers in ways that 
+might race with one another or clobber one another's data. In this case each 
+of the 2 drivers is using a different subset of registers that just happen to 
+be in the same address range, so there shouldn't be an issue.
+
+Thanks,
+    Paul
+--nextPart8306877.L2Sq6hHNpB
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part.
+Content-Transfer-Encoding: 7Bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEELIGR03D5+Fg+69wPgiDZ+mk8HGUFAlmbBIAACgkQgiDZ+mk8
+HGVe1Q/6Au2TClXs/W79i3QnmUiwaV9otdtoqCPYhvX6pFQ3vlrPt+Dn1FsvoRwL
+dccm/fueHvkdYvueUbkqmjUDuiWrt3tv4YoVnih81gtmBWVeF9hQ9hLqd3nlZhbS
+9aFryozQ8mO6AHP4N58Iv8aPubtoYunDasCdMZ72cq9T3SxIaAl9B2AEQEls5JO8
+mgESbB7kGrv5d484ktOGGRr4KjNlCxFxOVWxZq7zPQxuCMRbsIAZEnpW9ei1OXuV
+b2VGa/o8oz3WnPiCrxwgNHH7ckp6LBjdtv4Rq+oxiOs9ONWRZoXXC0ygvdc1Pv6a
+9Y1DCZWzQrzali8g1YAytuEQgql+i/xId9uoNxQy3Fw0SGIRsNkEXjqASFzUF/wb
+Z/8jvxuia4EQEUsgb5UWlDP2zy2q7zCCj/IB3pvAn9u4vD8WtQRrZIhR7W0qOd3f
+P8Q1Eq/u4rnyPdNV9x7TrFSRlIJ90FTytYCfKDu0qeGcsfYi39vrVPEEESgzSPmM
+UVD4/biG80szEmkCNeGFsaViNoUCE1/5sw4nvCmStsH0IIYaXHV3hLDi4J0L90JY
+PsDssx1NUF+ySLeaNYLfIfg5ySRJlnFRN7kdC2fcp85D1bx4xBc5qqDuo2MIXR5K
+G9jZOj2H2DzoVI22SW2mbRJYSwTWIApkMzyfBXPcGUByUm1QCQM=
+=fpS/
+-----END PGP SIGNATURE-----
+
+--nextPart8306877.L2Sq6hHNpB--
