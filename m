@@ -1,46 +1,45 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v8 3/4] crypto: AF_ALG -- add asymmetric cipher
-Date: Mon, 21 Aug 2017 11:39:00 +0200
-Message-ID: <4583599.LkPvL0jah8@tauon.chronox.de>
-References: <26359147.tCiuJ5s8mz@positron.chronox.de> <fbc8c754-e519-e98b-a8f8-5a975cba013a@microchip.com> <3b25c721-bde7-8427-be2f-2d5ca9fdbd22@microchip.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
-To: Tudor Ambarus <tudor.ambarus@microchip.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:59182 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752533AbdHUJjG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Aug 2017 05:39:06 -0400
-In-Reply-To: <3b25c721-bde7-8427-be2f-2d5ca9fdbd22@microchip.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: [PATCH 0/2] crypto: add OSCCA SM3 secure hash and tests
+Date: Mon, 21 Aug 2017 13:51:27 +0300
+Message-ID: <1503312690-2770-1-git-send-email-gilad@benyossef.com>
+Cc: Ofir Drang <ofir.drang@arm.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Montag, 21. August 2017, 11:23:55 CEST schrieb Tudor Ambarus:
+Add OSCCA SM3 secure hash (OSCCA GM/T 0004-2012 SM3)
+generic hash transformation, testmgr and tcrypt tests.
 
-Hi Tudor,
+SM3 is a secure hash function which is part of the Chinese
+"Commercial Cryptography" suite of algorithms which use is
+required for certain commercial applications in China.
 
-> 
-> Oops, I missed the negation. When crypto_akcipher_set_priv_key succeeds
-> you return the akcipher_maxsize. Not a bad idea, you save few cpu
-> cycles.
+References:
+ http://www.oscca.gov.cn/UpFile/20101222141857786.pdf
+ https://datatracker.ietf.org/doc/html/draft-shen-sm3-hash
 
-I was hoping to save some context switches.
-> 
-> > crypto akcipher uses a dedicated function for determining the length of
-> > the output buffer, crypto_akcipher_maxsize. Should we add a new function
-> > pointer in struct af_alg_type that returns the maxsize?
-> 
-> Your API is different from crypto's akcipher. Should we make them
-> identical?
+Tested via testmgr and tcrypt on Arm 64 and 32 bit. Compile
+tested for x86_64.
 
-In the early days of the akcipher API it used to be the way algif_akcipher 
-implements it today.
+Gilad Ben-Yossef (2):
+  crypto: add OSCCA SM3 secure hash
+  crypto: add SM3 test vectors
 
-Do you see a case where user space wants to deliberately ask for this value? 
-As this value never changes after setting a key, I thought we can skip it for 
-the user space interface.
+ crypto/Kconfig            |  11 +++
+ crypto/Makefile           |   1 +
+ crypto/sm3_generic.c      | 210 ++++++++++++++++++++++++++++++++++++++++++++++
+ crypto/tcrypt.c           |  14 +++-
+ crypto/testmgr.c          |   6 ++
+ crypto/testmgr.h          |  67 +++++++++++++++
+ include/crypto/sm3.h      |  40 +++++++++
+ include/crypto/sm3_base.h | 117 ++++++++++++++++++++++++++
+ 8 files changed, 465 insertions(+), 1 deletion(-)
+ create mode 100644 crypto/sm3_generic.c
+ create mode 100644 include/crypto/sm3.h
+ create mode 100644 include/crypto/sm3_base.h
 
-Ciao
-Stephan
+-- 
+2.1.4
