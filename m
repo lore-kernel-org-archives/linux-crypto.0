@@ -1,166 +1,313 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 2/2] crypto: add SM3 test vectors
-Date: Mon, 21 Aug 2017 13:51:29 +0300
-Message-ID: <1503312690-2770-3-git-send-email-gilad@benyossef.com>
-References: <1503312690-2770-1-git-send-email-gilad@benyossef.com>
-Cc: Ofir Drang <ofir.drang@arm.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1503312690-2770-1-git-send-email-gilad@benyossef.com>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
+Subject: Re: [dm-devel] [PATCH v5 12/19] dm: move dm-verity to generic async completion
+Date: Mon, 21 Aug 2017 15:48:05 +0300
+Message-ID: <CAOtvUMdwH0u+1mOEJZxsgYCZ3mA-39_34bS+sCw8nMAX5bNXNQ@mail.gmail.com>
+References: <1502724094-23305-1-git-send-email-gilad@benyossef.com>
+ <1502724094-23305-13-git-send-email-gilad@benyossef.com> <alpine.LRH.2.02.1708191605370.2380@file01.intranet.prod.int.rdu2.redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Cc: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+        "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+        Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>,
+        David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+        Tom Lendacky <thomas.lendacky-5C7GfCeVMHo@public.gmane.org>,
+        Gary Hook <gary.hook-5C7GfCeVMHo@public.gmane.org>,
+        Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
+        Arnaud Ebalard <arno-LkuqDEemtHBg9hUCZPvPmw@public.gmane.org>,
+        Matthias Brugger <matthias.bgg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        Alasdair Kergon <agk-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+        Mike Snitzer <snitzer-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+        device-mapper development <dm-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+        Shaohua Li <shli-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+        "Theodore Y. Ts'o" <tytso-3s7WtUTddSA@public.gmane.org>,
+        Jaegeuk Kim <jaegeuk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        Mimi Zohar <zohar-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>,
+        Dmitry Kasatkin <dmitry.kasatkin-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        James Morris <james.l.morris-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
+        "Serge E. Hallyn
+To: Mikulas Patocka <mpatocka-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <alpine.LRH.2.02.1708191605370.2380-Hpncn10jQN4oNljnaZt3ZvA+iT7yCHsGwRM8/txMwJMAicBL8TP8PQ@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add testmgr and tcrypt tests and vectors for SM3 secure hash.
+On Sat, Aug 19, 2017 at 11:08 PM, Mikulas Patocka <mpatocka-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+>
+>
+>
+> On Mon, 14 Aug 2017, Gilad Ben-Yossef wrote:
+>
+> > dm-verity is starting async. crypto ops and waiting for them to complete.
+> > Move it over to generic code doing the same.
+> >
+> > This also fixes a possible data coruption bug created by the
+> > use of wait_for_completion_interruptible() without dealing
+> > correctly with an interrupt aborting the wait prior to the
+> > async op finishing.
+>
+> What is the exact problem there? The interruptible sleep is called from a
+> workqueue and workqueues have all signals blocked. Are signals unblocked
+> for some reason there?
 
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
----
- crypto/tcrypt.c  | 14 +++++++++++-
- crypto/testmgr.c |  6 +++++
- crypto/testmgr.h | 67 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 86 insertions(+), 1 deletion(-)
 
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index 0dd6a43..baa3e7c 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -70,7 +70,7 @@ static int mode;
- static char *tvmem[TVMEMSIZE];
- 
- static char *check[] = {
--	"des", "md5", "des3_ede", "rot13", "sha1", "sha224", "sha256",
-+	"des", "md5", "des3_ede", "rot13", "sha1", "sha224", "sha256", "sm3",
- 	"blowfish", "twofish", "serpent", "sha384", "sha512", "md4", "aes",
- 	"cast6", "arc4", "michael_mic", "deflate", "crc32c", "tea", "xtea",
- 	"khazad", "wp512", "wp384", "wp256", "tnepres", "xeta",  "fcrypt",
-@@ -1269,6 +1269,10 @@ static int do_test(const char *alg, u32 type, u32 mask, int m)
- 		ret += tcrypt_test("sha3-512");
- 		break;
- 
-+	case 52:
-+		ret += tcrypt_test("sm3");
-+		break;
-+
- 	case 100:
- 		ret += tcrypt_test("hmac(md5)");
- 		break;
-@@ -1712,6 +1716,10 @@ static int do_test(const char *alg, u32 type, u32 mask, int m)
- 		test_hash_speed("sha3-512", sec, generic_hash_speed_template);
- 		if (mode > 300 && mode < 400) break;
- 
-+	case 326:
-+		test_hash_speed("sm3", sec, generic_hash_speed_template);
-+		if (mode > 300 && mode < 400) break;
-+
- 	case 399:
- 		break;
- 
-@@ -1820,6 +1828,10 @@ static int do_test(const char *alg, u32 type, u32 mask, int m)
- 		test_mb_ahash_speed("sha512", sec, generic_hash_speed_template);
- 		if (mode > 400 && mode < 500) break;
- 
-+	case 425:
-+		test_mb_ahash_speed("sm3", sec, generic_hash_speed_template);
-+		if (mode > 400 && mode < 500) break;
-+
- 	case 499:
- 		break;
- 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 7125ba3..baf96cec 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -3500,6 +3500,12 @@ static const struct alg_test_desc alg_test_descs[] = {
- 			.hash = __VECS(sha512_tv_template)
- 		}
- 	}, {
-+		.alg = "sm3",
-+		.test = alg_test_hash,
-+		.suite = {
-+			.hash = __VECS(sm3_tv_template)
-+		}
-+	}, {
- 		.alg = "tgr128",
- 		.test = alg_test_hash,
- 		.suite = {
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 6ceb0e2..c4d20ea 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -1497,6 +1497,73 @@ static const struct hash_testvec crct10dif_tv_template[] = {
- 	}
- };
- 
-+/* Example vectors below taken from
-+ * http://www.oscca.gov.cn/UpFile/20101222141857786.pdf
-+ *
-+ * The rest taken from
-+ * https://github.com/adamws/oscca-sm3
-+ */
-+static const struct hash_testvec sm3_tv_template[] = {
-+	{
-+		.plaintext = "",
-+		.psize = 0,
-+		.digest = (u8 *)(u8 []) {
-+			0x1A, 0xB2, 0x1D, 0x83, 0x55, 0xCF, 0xA1, 0x7F,
-+			0x8e, 0x61, 0x19, 0x48, 0x31, 0xE8, 0x1A, 0x8F,
-+			0x22, 0xBE, 0xC8, 0xC7, 0x28, 0xFE, 0xFB, 0x74,
-+			0x7E, 0xD0, 0x35, 0xEB, 0x50, 0x82, 0xAA, 0x2B }
-+	}, {
-+		.plaintext = "a",
-+		.psize = 1,
-+		.digest = (u8 *)(u8 []) {
-+			0x62, 0x34, 0x76, 0xAC, 0x18, 0xF6, 0x5A, 0x29,
-+			0x09, 0xE4, 0x3C, 0x7F, 0xEC, 0x61, 0xB4, 0x9C,
-+			0x7E, 0x76, 0x4A, 0x91, 0xA1, 0x8C, 0xCB, 0x82,
-+			0xF1, 0x91, 0x7A, 0x29, 0xC8, 0x6C, 0x5E, 0x88 }
-+	}, {
-+		/* A.1. Example 1 */
-+		.plaintext = "abc",
-+		.psize = 3,
-+		.digest = (u8 *)(u8 []) {
-+			0x66, 0xC7, 0xF0, 0xF4, 0x62, 0xEE, 0xED, 0xD9,
-+			0xD1, 0xF2, 0xD4, 0x6B, 0xDC, 0x10, 0xE4, 0xE2,
-+			0x41, 0x67, 0xC4, 0x87, 0x5C, 0xF2, 0xF7, 0xA2,
-+			0x29, 0x7D, 0xA0, 0x2B, 0x8F, 0x4B, 0xA8, 0xE0 }
-+	}, {
-+		.plaintext = "abcdefghijklmnopqrstuvwxyz",
-+		.psize = 26,
-+		.digest = (u8 *)(u8 []) {
-+			0xB8, 0x0F, 0xE9, 0x7A, 0x4D, 0xA2, 0x4A, 0xFC,
-+			0x27, 0x75, 0x64, 0xF6, 0x6A, 0x35, 0x9E, 0xF4,
-+			0x40, 0x46, 0x2A, 0xD2, 0x8D, 0xCC, 0x6D, 0x63,
-+			0xAD, 0xB2, 0x4D, 0x5C, 0x20, 0xA6, 0x15, 0x95 }
-+	}, {
-+		/* A.1. Example 2 */
-+		.plaintext = "abcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdab"
-+			     "cdabcdabcdabcdabcd",
-+		.psize = 64,
-+		.digest = (u8 *)(u8 []) {
-+			0xDE, 0xBE, 0x9F, 0xF9, 0x22, 0x75, 0xB8, 0xA1,
-+			0x38, 0x60, 0x48, 0x89, 0xC1, 0x8E, 0x5A, 0x4D,
-+			0x6F, 0xDB, 0x70, 0xE5, 0x38, 0x7E, 0x57, 0x65,
-+			0x29, 0x3D, 0xCB, 0xA3, 0x9C, 0x0C, 0x57, 0x32 }
-+	}, {
-+		.plaintext = "abcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcd"
-+			     "abcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcd"
-+			     "abcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcd"
-+			     "abcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcd"
-+			     "abcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcd"
-+			     "abcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcd"
-+			     "abcdabcdabcdabcdabcdabcdabcdabcd",
-+		.psize = 256,
-+		.digest = (u8 *)(u8 []) {
-+			0xB9, 0x65, 0x76, 0x4C, 0x8B, 0xEB, 0xB0, 0x91,
-+			0xC7, 0x60, 0x2B, 0x74, 0xAF, 0xD3, 0x4E, 0xEF,
-+			0xB5, 0x31, 0xDC, 0xCB, 0x4E, 0x00, 0x76, 0xD9,
-+			0xB7, 0xCD, 0x81, 0x31, 0x99, 0xB4, 0x59, 0x71 }
-+	}
-+};
-+
- /*
-  * SHA1 test vectors  from from FIPS PUB 180-1
-  * Long vector from CAVS 5.0
+I should have used "potential" rather then "possible". My bad.
+
+My point was that the use of wait_for_completion_interruptible() is wrong
+because we are not really ready to handle a signal *if* it arrives.
+
+Yes, since we are being called from a workqueue this will not happen, but:
+
+a. we (or rather I, since I wrote the offending code...) shouldn't call
+*_interruptible() in a function that is executing with signals masked
+unconditionally. It makes not sense.
+
+b. someone might move the context this is executing in in the future, or make
+some other change that will enable signals and create a very subtle bug.
+
+>
+>
+> Should there be another patch for stable kernels that fixes the
+> interruptible sleep?
+
+
+No, for the reason you pointed yourself - signals are blocked here, so this
+is a potential bug only but can't be triggered.
+
+I already sent a patch set fixing similar places that had the
+same issue and it went into stable - e.g.
+https://patchwork.kernel.org/patch/9781693/
+
+Thanks,
+Gilad
+
+>
+>
+> Mikulas
+>
+> > Signed-off-by: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
+> > ---
+> >  drivers/md/dm-verity-target.c | 81 +++++++++++--------------------------------
+> >  drivers/md/dm-verity.h        |  5 ---
+> >  2 files changed, 20 insertions(+), 66 deletions(-)
+> >
+> > diff --git a/drivers/md/dm-verity-target.c b/drivers/md/dm-verity-target.c
+> > index 79f18d4..8df08a8 100644
+> > --- a/drivers/md/dm-verity-target.c
+> > +++ b/drivers/md/dm-verity-target.c
+> > @@ -92,74 +92,33 @@ static sector_t verity_position_at_level(struct dm_verity *v, sector_t block,
+> >       return block >> (level * v->hash_per_block_bits);
+> >  }
+> >
+> > -/*
+> > - * Callback function for asynchrnous crypto API completion notification
+> > - */
+> > -static void verity_op_done(struct crypto_async_request *base, int err)
+> > -{
+> > -     struct verity_result *res = (struct verity_result *)base->data;
+> > -
+> > -     if (err == -EINPROGRESS)
+> > -             return;
+> > -
+> > -     res->err = err;
+> > -     complete(&res->completion);
+> > -}
+> > -
+> > -/*
+> > - * Wait for async crypto API callback
+> > - */
+> > -static inline int verity_complete_op(struct verity_result *res, int ret)
+> > -{
+> > -     switch (ret) {
+> > -     case 0:
+> > -             break;
+> > -
+> > -     case -EINPROGRESS:
+> > -     case -EBUSY:
+> > -             ret = wait_for_completion_interruptible(&res->completion);
+> > -             if (!ret)
+> > -                     ret = res->err;
+> > -             reinit_completion(&res->completion);
+> > -             break;
+> > -
+> > -     default:
+> > -             DMERR("verity_wait_hash: crypto op submission failed: %d", ret);
+> > -     }
+> > -
+> > -     if (unlikely(ret < 0))
+> > -             DMERR("verity_wait_hash: crypto op failed: %d", ret);
+> > -
+> > -     return ret;
+> > -}
+> > -
+> >  static int verity_hash_update(struct dm_verity *v, struct ahash_request *req,
+> >                               const u8 *data, size_t len,
+> > -                             struct verity_result *res)
+> > +                             struct crypto_wait *wait)
+> >  {
+> >       struct scatterlist sg;
+> >
+> >       sg_init_one(&sg, data, len);
+> >       ahash_request_set_crypt(req, &sg, NULL, len);
+> >
+> > -     return verity_complete_op(res, crypto_ahash_update(req));
+> > +     return crypto_wait_req(crypto_ahash_update(req), wait);
+> >  }
+> >
+> >  /*
+> >   * Wrapper for crypto_ahash_init, which handles verity salting.
+> >   */
+> >  static int verity_hash_init(struct dm_verity *v, struct ahash_request *req,
+> > -                             struct verity_result *res)
+> > +                             struct crypto_wait *wait)
+> >  {
+> >       int r;
+> >
+> >       ahash_request_set_tfm(req, v->tfm);
+> >       ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP |
+> >                                       CRYPTO_TFM_REQ_MAY_BACKLOG,
+> > -                                     verity_op_done, (void *)res);
+> > -     init_completion(&res->completion);
+> > +                                     crypto_req_done, (void *)wait);
+> > +     crypto_init_wait(wait);
+> >
+> > -     r = verity_complete_op(res, crypto_ahash_init(req));
+> > +     r = crypto_wait_req(crypto_ahash_init(req), wait);
+> >
+> >       if (unlikely(r < 0)) {
+> >               DMERR("crypto_ahash_init failed: %d", r);
+> > @@ -167,18 +126,18 @@ static int verity_hash_init(struct dm_verity *v, struct ahash_request *req,
+> >       }
+> >
+> >       if (likely(v->salt_size && (v->version >= 1)))
+> > -             r = verity_hash_update(v, req, v->salt, v->salt_size, res);
+> > +             r = verity_hash_update(v, req, v->salt, v->salt_size, wait);
+> >
+> >       return r;
+> >  }
+> >
+> >  static int verity_hash_final(struct dm_verity *v, struct ahash_request *req,
+> > -                          u8 *digest, struct verity_result *res)
+> > +                          u8 *digest, struct crypto_wait *wait)
+> >  {
+> >       int r;
+> >
+> >       if (unlikely(v->salt_size && (!v->version))) {
+> > -             r = verity_hash_update(v, req, v->salt, v->salt_size, res);
+> > +             r = verity_hash_update(v, req, v->salt, v->salt_size, wait);
+> >
+> >               if (r < 0) {
+> >                       DMERR("verity_hash_final failed updating salt: %d", r);
+> > @@ -187,7 +146,7 @@ static int verity_hash_final(struct dm_verity *v, struct ahash_request *req,
+> >       }
+> >
+> >       ahash_request_set_crypt(req, NULL, digest, 0);
+> > -     r = verity_complete_op(res, crypto_ahash_final(req));
+> > +     r = crypto_wait_req(crypto_ahash_final(req), wait);
+> >  out:
+> >       return r;
+> >  }
+> > @@ -196,17 +155,17 @@ int verity_hash(struct dm_verity *v, struct ahash_request *req,
+> >               const u8 *data, size_t len, u8 *digest)
+> >  {
+> >       int r;
+> > -     struct verity_result res;
+> > +     struct crypto_wait wait;
+> >
+> > -     r = verity_hash_init(v, req, &res);
+> > +     r = verity_hash_init(v, req, &wait);
+> >       if (unlikely(r < 0))
+> >               goto out;
+> >
+> > -     r = verity_hash_update(v, req, data, len, &res);
+> > +     r = verity_hash_update(v, req, data, len, &wait);
+> >       if (unlikely(r < 0))
+> >               goto out;
+> >
+> > -     r = verity_hash_final(v, req, digest, &res);
+> > +     r = verity_hash_final(v, req, digest, &wait);
+> >
+> >  out:
+> >       return r;
+> > @@ -389,7 +348,7 @@ int verity_hash_for_block(struct dm_verity *v, struct dm_verity_io *io,
+> >   * Calculates the digest for the given bio
+> >   */
+> >  int verity_for_io_block(struct dm_verity *v, struct dm_verity_io *io,
+> > -                     struct bvec_iter *iter, struct verity_result *res)
+> > +                     struct bvec_iter *iter, struct crypto_wait *wait)
+> >  {
+> >       unsigned int todo = 1 << v->data_dev_block_bits;
+> >       struct bio *bio = dm_bio_from_per_bio_data(io, v->ti->per_io_data_size);
+> > @@ -414,7 +373,7 @@ int verity_for_io_block(struct dm_verity *v, struct dm_verity_io *io,
+> >                */
+> >               sg_set_page(&sg, bv.bv_page, len, bv.bv_offset);
+> >               ahash_request_set_crypt(req, &sg, NULL, len);
+> > -             r = verity_complete_op(res, crypto_ahash_update(req));
+> > +             r = crypto_wait_req(crypto_ahash_update(req), wait);
+> >
+> >               if (unlikely(r < 0)) {
+> >                       DMERR("verity_for_io_block crypto op failed: %d", r);
+> > @@ -482,7 +441,7 @@ static int verity_verify_io(struct dm_verity_io *io)
+> >       struct dm_verity *v = io->v;
+> >       struct bvec_iter start;
+> >       unsigned b;
+> > -     struct verity_result res;
+> > +     struct crypto_wait wait;
+> >
+> >       for (b = 0; b < io->n_blocks; b++) {
+> >               int r;
+> > @@ -507,17 +466,17 @@ static int verity_verify_io(struct dm_verity_io *io)
+> >                       continue;
+> >               }
+> >
+> > -             r = verity_hash_init(v, req, &res);
+> > +             r = verity_hash_init(v, req, &wait);
+> >               if (unlikely(r < 0))
+> >                       return r;
+> >
+> >               start = io->iter;
+> > -             r = verity_for_io_block(v, io, &io->iter, &res);
+> > +             r = verity_for_io_block(v, io, &io->iter, &wait);
+> >               if (unlikely(r < 0))
+> >                       return r;
+> >
+> >               r = verity_hash_final(v, req, verity_io_real_digest(v, io),
+> > -                                     &res);
+> > +                                     &wait);
+> >               if (unlikely(r < 0))
+> >                       return r;
+> >
+> > diff --git a/drivers/md/dm-verity.h b/drivers/md/dm-verity.h
+> > index a59e0ad..b675bc0 100644
+> > --- a/drivers/md/dm-verity.h
+> > +++ b/drivers/md/dm-verity.h
+> > @@ -90,11 +90,6 @@ struct dm_verity_io {
+> >        */
+> >  };
+> >
+> > -struct verity_result {
+> > -     struct completion completion;
+> > -     int err;
+> > -};
+> > -
+> >  static inline struct ahash_request *verity_io_hash_req(struct dm_verity *v,
+> >                                                    struct dm_verity_io *io)
+> >  {
+> > --
+> > 2.1.4
+> >
+> > --
+> > dm-devel mailing list
+> > dm-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
+> > https://www.redhat.com/mailman/listinfo/dm-devel
+> >
+
+
+
+
 -- 
-2.1.4
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+"If you take a class in large-scale robotics, can you end up in a
+situation where the homework eats your dog?"
+ -- Jean-Baptiste Queru
