@@ -1,69 +1,67 @@
-From: Corentin Labbe <clabbe.montjoie@gmail.com>
-Subject: [PATCH 11/11] crypto: aesni - Use GCM IV size constant
-Date: Tue, 22 Aug 2017 10:08:18 +0200
-Message-ID: <20170822080818.12486-12-clabbe.montjoie@gmail.com>
-References: <20170822080818.12486-1-clabbe.montjoie@gmail.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-mediatek@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
-        Corentin Labbe <clabbe.montjoie@gmail.com>
-To: herbert@gondor.apana.org.au, davem@davemloft.net,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        x86@kernel.org, horia.geanta@nxp.com, dan.douglass@nxp.com,
-        thomas.lendacky@amd.com, gary.hook@amd.com, harsh@chelsio.com,
-        matthias.bgg@gmail.com, leosilva@linux.vnet.ibm.com,
-        pfsmorigo@linux.vnet.ibm.com, benh@kernel.crashing.org,
-        paulus@samba.org, mpe@ellerman.id.au
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170822080818.12486-1-clabbe.montjoie@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Rishabh Hardas <rishabhhardas@gmail.com>
+Subject: Re: [PATCH] staging/ccree: Declare compiled out fuctions static
+ inline
+Date: Tue, 22 Aug 2017 16:51:16 +0530
+Message-ID: <20170822112010.GA20667@rishabh-linux>
+References: <1501492643-7087-1-git-send-email-rishabheudyptula@gmail.com>
+ <20170816220909.GB29988@kroah.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: gilad@benyossef.com, linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        linux-kernel@vger.kernel.org
+To: Greg KH <gregkh@linuxfoundation.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pf0-f195.google.com ([209.85.192.195]:38681 "EHLO
+        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932350AbdHVLVd (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 22 Aug 2017 07:21:33 -0400
+Content-Disposition: inline
+In-Reply-To: <20170816220909.GB29988@kroah.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-This patch replace GCM IV size value by their constant name.
+On Wed, Aug 16, 2017 at 03:09:09PM -0700, Greg KH wrote:
+> On Mon, Jul 31, 2017 at 02:47:23PM +0530, RishabhHardas wrote:
+> > From: RishabhHardas <rishabhhardas@gmail.com>
+> > 
+> > Sparse was giving out a warning for symbols 'cc_set_ree_fips_status' and 'fips_handler'
+> > that they were not declared and need to be made static. This patch makes both the symbols
+> > static inline, to remove the warnings.
+> > 
+> > Signed-off-by: RishabhHardas <rishabhhardas@gmail.com>
+> 
+> I doubt you sign your name on legal documents without a ' ' somewhere in
+> it :(
+> 
+> Please fix up and resend.
+> 
+> thanks,
+> 
+> greg k-h
+From: Rishabh Hardas <rishabhhardas@gmail.com>
 
-Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+Sparse was giving out a warning for symbols 'cc_set_ree_fips_status' and 'fips_handler'
+that they were not declared and need to be made static. This patch makes both the symbols
+static inline, to remove the warnings.
+
+Signed-off-by: Rishabh Hardas <rishabhhardas@gmail.com>
 ---
- arch/x86/crypto/aesni-intel_glue.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ drivers/staging/ccree/ssi_fips.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index 5c15d6b57329..80664368bf14 100644
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -28,6 +28,7 @@
- #include <crypto/cryptd.h>
- #include <crypto/ctr.h>
- #include <crypto/b128ops.h>
-+#include <crypto/gcm.h>
- #include <crypto/xts.h>
- #include <asm/cpu_device_id.h>
- #include <asm/fpu/api.h>
-@@ -1131,7 +1132,7 @@ static struct aead_alg aesni_aead_algs[] = { {
- 	.setauthsize		= common_rfc4106_set_authsize,
- 	.encrypt		= helper_rfc4106_encrypt,
- 	.decrypt		= helper_rfc4106_decrypt,
--	.ivsize			= 8,
-+	.ivsize			= GCM_RFC4106_IV_SIZE,
- 	.maxauthsize		= 16,
- 	.base = {
- 		.cra_name		= "__gcm-aes-aesni",
-@@ -1149,7 +1150,7 @@ static struct aead_alg aesni_aead_algs[] = { {
- 	.setauthsize		= rfc4106_set_authsize,
- 	.encrypt		= rfc4106_encrypt,
- 	.decrypt		= rfc4106_decrypt,
--	.ivsize			= 8,
-+	.ivsize			= GCM_RFC4106_IV_SIZE,
- 	.maxauthsize		= 16,
- 	.base = {
- 		.cra_name		= "rfc4106(gcm(aes))",
-@@ -1165,7 +1166,7 @@ static struct aead_alg aesni_aead_algs[] = { {
- 	.setauthsize		= generic_gcmaes_set_authsize,
- 	.encrypt		= generic_gcmaes_encrypt,
- 	.decrypt		= generic_gcmaes_decrypt,
--	.ivsize			= 12,
-+	.ivsize			= GCM_AES_IV_SIZE,
- 	.maxauthsize		= 16,
- 	.base = {
- 		.cra_name		= "gcm(aes)",
--- 
-2.13.0
+diff --git a/drivers/staging/ccree/ssi_fips.h b/drivers/staging/ccree/ssi_fips.h
+index 369ddf9..63bcca7 100644
+--- a/drivers/staging/ccree/ssi_fips.h
++++ b/drivers/staging/ccree/ssi_fips.h
+@@ -40,1 +40,1 @@ static inline int ssi_fips_init(struct ssi_drvdata *p_drvdata)
+ }
+
+ static inline void ssi_fips_fini(struct ssi_drvdata *drvdata) {}
+-void cc_set_ree_fips_status(struct ssi_drvdata *drvdata, bool ok) {}
+-void fips_handler(struct ssi_drvdata *drvdata) {}
++static inline void cc_set_ree_fips_status(struct ssi_drvdata *drvdata, bool ok) {}
++static inline void fips_handler(struct ssi_drvdata *drvdata) {}
+
+ #endif /* CONFIG_CRYPTO_FIPS */
