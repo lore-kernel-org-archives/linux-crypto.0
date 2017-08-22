@@ -1,10 +1,10 @@
 From: Andy Shevchenko <andy.shevchenko@gmail.com>
-Subject: Re: [PATCH v7 6/7] ntb: ntb_hw_intel: use io-64-nonatomic instead of
- in-driver hacks
-Date: Tue, 22 Aug 2017 23:14:50 +0300
-Message-ID: <CAHp75Ve-3JnD2b5Wn5zPX+jW91Wcw3utpAJ5gPkz5zHsG+2reQ@mail.gmail.com>
-References: <20170822170228.17196-1-logang@deltatee.com> <20170822170228.17196-7-logang@deltatee.com>
- <CAHp75VfPXjw-gTX=xQsk_0vUhyeTEYiTvoacTzw43RgyGKKaVg@mail.gmail.com> <b4b38bb0-b97f-2240-0ddc-ef5444e289ef@deltatee.com>
+Subject: Re: [PATCH v7 5/7] io-64-nonatomic: add io{read|write}64[be]{_lo_hi|_hi_lo}
+ macros
+Date: Wed, 23 Aug 2017 00:07:57 +0300
+Message-ID: <CAHp75VedQ_t0vo51QXNOKoGDdt4sp8nyreNkteHpu0=zKxO8rw@mail.gmail.com>
+References: <20170822170228.17196-1-logang@deltatee.com> <20170822170228.17196-6-logang@deltatee.com>
+ <CAHp75Ve3gG6KdjVBmJZAw25uXRmzfCMUv1kFvg0TbhN7ebTqdw@mail.gmail.com> <ac32fc61-8a54-faf9-55ad-cd2da5fd6503@deltatee.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
@@ -14,42 +14,33 @@ Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         Arnd Bergmann <arnd@arndb.de>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>,
-        Stephen Bates <sbates@raithlin.com>
+        Stephen Bates <sbates@raithlin.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Alan Cox <gnomes@lxorguk.ukuu.org.uk>
 To: Logan Gunthorpe <logang@deltatee.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-qk0-f193.google.com ([209.85.220.193]:36452 "EHLO
-        mail-qk0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752451AbdHVUOw (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Aug 2017 16:14:52 -0400
-In-Reply-To: <b4b38bb0-b97f-2240-0ddc-ef5444e289ef@deltatee.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-arch-owner@vger.kernel.org>
+In-Reply-To: <ac32fc61-8a54-faf9-55ad-cd2da5fd6503@deltatee.com>
+Sender: linux-arch-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Aug 22, 2017 at 8:56 PM, Logan Gunthorpe <logang@deltatee.com> wrote:
->
->
-> On 22/08/17 11:41 AM, Andy Shevchenko wrote:
->>>
->>> @@ -59,6 +59,7 @@
->>>   #include <linux/random.h>
->>>   #include <linux/slab.h>
->>>   #include <linux/ntb.h>
->>> +#include <linux/io-64-nonatomic-lo-hi.h>
->>
->>
->> I would rather try to squeeze to most alpabetiacelly ordered part of this
->> block.
->> Otherwise it's a pretty nice clean up!
->>
->
-> I don't understand. The includes were not alphabetically in any order
-> originally and I'd rather not reorder them in my patch.
+On Tue, Aug 22, 2017 at 8:55 PM, Logan Gunthorpe <logang@deltatee.com> wrote:
+> On 22/08/17 11:40 AM, Andy Shevchenko wrote:
+>> Recomendation is kinda arguable. I doubt modern architectures make
+>> difference between IO operations and MMIO.
+>> Does, for example, PCI requires some special signal (message / wire)
+>> handling when pio_*() accessors used vs. mmio_*() ones?
 
-In excerpt I see if you put your include before random.h you will get
-3 headers in order.
-There may be even better sequence, I didn't check.
+> Sort of. There is a difference between the two in x86.
 
+Yes, the difference is in signaling. The question is if it's still in
+use. Looks like yes...
+
+> But really if it's
+> not a valid recommendation someone should just go through and deprecate one
+> of them or document better when one should be used over the other. In any
+> case it's still really ugly to mix the two types in the same driver.
+
+Mixing is ugly, totally agree.
 
 -- 
 With Best Regards,
