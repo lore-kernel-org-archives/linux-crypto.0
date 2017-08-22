@@ -1,37 +1,38 @@
-From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: Re: [PATCH] staging/ccree: Declare compiled out fuctions static inline
-Date: Tue, 22 Aug 2017 16:53:24 +0300
-Message-ID: <20170822135324.y7c76u7b5feome7x@mwanda>
-References: <1501492643-7087-1-git-send-email-rishabheudyptula@gmail.com>
- <20170816220909.GB29988@kroah.com>
- <20170822133910.GA20940@rishabh-linux>
+From: Tudor Ambarus <tudor.ambarus@microchip.com>
+Subject: Re: Re: [PATCH 0/6] Add support for ECDSA algorithm
+Date: Tue, 22 Aug 2017 19:14:59 +0300
+Message-ID: <87fcb3cf-b8ae-47de-550e-c76ae47af431@microchip.com>
+References: <1484912161-5932-1-git-send-email-nkumbhar@nvidia.com>
+ <20170123142417.GD19957@gondor.apana.org.au>
+ <113d3ef8-ef34-0651-71e7-be09ef55727e@nvidia.com>
+ <20170202135721.GA5289@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: devel@driverdev.osuosl.org, Greg KH <gregkh@linuxfoundation.org>,
- driverdev-devel@linuxdriverproject.org, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org
-To: Rishabh Hardas <rishabhhardas@gmail.com>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-Content-Disposition: inline
-In-Reply-To: <20170822133910.GA20940@rishabh-linux>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
-List-Id: linux-crypto.vger.kernel.org
+Cc: <davem@davemloft.net>, <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        Nitin Kumbhar <nkumbhar@nvidia.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from esa3.microchip.iphmx.com ([68.232.153.233]:45241 "EHLO
+        esa3.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750962AbdHVQPV (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 22 Aug 2017 12:15:21 -0400
+In-Reply-To: <20170202135721.GA5289@gondor.apana.org.au>
+Content-Language: en-US
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Try saving this email and then do `cat email.txt | git am`.  It is
-corrupted.  This is not how to send a v2 patch.  Please read:
+Hi, Herbert,
 
-https://kernelnewbies.org/FirstKernelPatch#head-5c81b3c517a1d0bbc24f92594cb734e155fcbbcb
+On 02/02/2017 03:57 PM, Herbert Xu wrote:
+> Yes but RSA had an in-kernel user in the form of module signature
+> verification.  We don't add algorithms to the kernel without
+> actual users.  So this patch-set needs to come with an actual
+> in-kernel user of ECDSA.
 
-Look through the email archives for examples of other v2 patches.
+ECDSA can be used by the kernel module signing facility too. Is there
+any interest in using ECDSA by the kernel module signing facility?
 
-regards,
-dan carpenter
+Thanks,
+ta
