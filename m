@@ -1,7 +1,7 @@
 From: Corentin Labbe <clabbe.montjoie@gmail.com>
-Subject: [PATCH 02/11] crypto: caam - Use GCM IV size constant
-Date: Tue, 22 Aug 2017 10:08:09 +0200
-Message-ID: <20170822080818.12486-3-clabbe.montjoie@gmail.com>
+Subject: [PATCH 03/11] crypto: ccp - Use GCM IV size constant
+Date: Tue, 22 Aug 2017 10:08:10 +0200
+Message-ID: <20170822080818.12486-4-clabbe.montjoie@gmail.com>
 References: <20170822080818.12486-1-clabbe.montjoie@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -32,70 +32,48 @@ This patch replace GCM IV size value by their constant name.
 
 Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
 ---
- drivers/crypto/caam/caamalg.c | 10 +++++-----
- drivers/crypto/caam/compat.h  |  1 +
- 2 files changed, 6 insertions(+), 5 deletions(-)
+ drivers/crypto/ccp/ccp-crypto-aes-galois.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index 54f3b375a453..baa8dd52472d 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -992,7 +992,7 @@ static void init_gcm_job(struct aead_request *req,
- 	struct caam_ctx *ctx = crypto_aead_ctx(aead);
- 	unsigned int ivsize = crypto_aead_ivsize(aead);
- 	u32 *desc = edesc->hw_desc;
--	bool generic_gcm = (ivsize == 12);
-+	bool generic_gcm = (ivsize == GCM_AES_IV_SIZE);
- 	unsigned int last;
- 
- 	init_aead_job(req, edesc, all_contig, encrypt);
-@@ -1004,7 +1004,7 @@ static void init_gcm_job(struct aead_request *req,
- 
- 	/* Read GCM IV */
- 	append_cmd(desc, CMD_FIFO_LOAD | FIFOLD_CLASS_CLASS1 | IMMEDIATE |
--			 FIFOLD_TYPE_IV | FIFOLD_TYPE_FLUSH1 | 12 | last);
-+			 FIFOLD_TYPE_IV | FIFOLD_TYPE_FLUSH1 | GCM_AES_IV_SIZE | last);
- 	/* Append Salt */
- 	if (!generic_gcm)
- 		append_data(desc, ctx->key + ctx->cdata.keylen, 4);
-@@ -1953,7 +1953,7 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.setauthsize = rfc4106_setauthsize,
- 			.encrypt = ipsec_gcm_encrypt,
- 			.decrypt = ipsec_gcm_decrypt,
--			.ivsize = 8,
-+			.ivsize = GCM_RFC4106_IV_SIZE,
- 			.maxauthsize = AES_BLOCK_SIZE,
- 		},
- 		.caam = {
-@@ -1971,7 +1971,7 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.setauthsize = rfc4543_setauthsize,
- 			.encrypt = ipsec_gcm_encrypt,
- 			.decrypt = ipsec_gcm_decrypt,
--			.ivsize = 8,
-+			.ivsize = GCM_RFC4543_IV_SIZE,
- 			.maxauthsize = AES_BLOCK_SIZE,
- 		},
- 		.caam = {
-@@ -1990,7 +1990,7 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.setauthsize = gcm_setauthsize,
- 			.encrypt = gcm_encrypt,
- 			.decrypt = gcm_decrypt,
--			.ivsize = 12,
-+			.ivsize = GCM_AES_IV_SIZE,
- 			.maxauthsize = AES_BLOCK_SIZE,
- 		},
- 		.caam = {
-diff --git a/drivers/crypto/caam/compat.h b/drivers/crypto/caam/compat.h
-index 7149cd2492e0..5b8d930f3dd8 100644
---- a/drivers/crypto/caam/compat.h
-+++ b/drivers/crypto/caam/compat.h
-@@ -31,6 +31,7 @@
+diff --git a/drivers/crypto/ccp/ccp-crypto-aes-galois.c b/drivers/crypto/ccp/ccp-crypto-aes-galois.c
+index 52313524a4dd..ff02b713c6f6 100644
+--- a/drivers/crypto/ccp/ccp-crypto-aes-galois.c
++++ b/drivers/crypto/ccp/ccp-crypto-aes-galois.c
+@@ -19,13 +19,12 @@
+ #include <crypto/algapi.h>
  #include <crypto/aes.h>
  #include <crypto/ctr.h>
- #include <crypto/des.h>
 +#include <crypto/gcm.h>
- #include <crypto/sha.h>
- #include <crypto/md5.h>
- #include <crypto/internal/aead.h>
+ #include <crypto/scatterwalk.h>
+ #include <linux/delay.h>
+ 
+ #include "ccp-crypto.h"
+ 
+-#define	AES_GCM_IVSIZE	12
+-
+ static int ccp_aes_gcm_complete(struct crypto_async_request *async_req, int ret)
+ {
+ 	return ret;
+@@ -95,9 +94,9 @@ static int ccp_aes_gcm_crypt(struct aead_request *req, bool encrypt)
+ 	 */
+ 
+ 	/* Prepare the IV: 12 bytes + an integer (counter) */
+-	memcpy(rctx->iv, req->iv, AES_GCM_IVSIZE);
++	memcpy(rctx->iv, req->iv, GCM_AES_IV_SIZE);
+ 	for (i = 0; i < 3; i++)
+-		rctx->iv[i + AES_GCM_IVSIZE] = 0;
++		rctx->iv[i + GCM_AES_IV_SIZE] = 0;
+ 	rctx->iv[AES_BLOCK_SIZE - 1] = 1;
+ 
+ 	/* Set up a scatterlist for the IV */
+@@ -160,7 +159,7 @@ static struct aead_alg ccp_aes_gcm_defaults = {
+ 	.encrypt = ccp_aes_gcm_encrypt,
+ 	.decrypt = ccp_aes_gcm_decrypt,
+ 	.init = ccp_aes_gcm_cra_init,
+-	.ivsize = AES_GCM_IVSIZE,
++	.ivsize = GCM_AES_IV_SIZE,
+ 	.maxauthsize = AES_BLOCK_SIZE,
+ 	.base = {
+ 		.cra_flags	= CRYPTO_ALG_TYPE_ABLKCIPHER |
 -- 
 2.13.0
