@@ -1,116 +1,48 @@
-From: Logan Gunthorpe <logang@deltatee.com>
-Subject: [PATCH v7 7/7] crypto: caam: cleanup CONFIG_64BIT ifdefs when using io{read|write}64
-Date: Tue, 22 Aug 2017 11:02:28 -0600
-Message-ID: <20170822170228.17196-8-logang@deltatee.com>
-References: <20170822170228.17196-1-logang@deltatee.com>
+From: Sandy Harris <sandyinchina@gmail.com>
+Subject: Re: Re: [PATCH 0/6] Add support for ECDSA algorithm
+Date: Tue, 22 Aug 2017 13:22:48 -0400
+Message-ID: <CACXcFmk5mAfjW=SSQm7SM7oP0orwrFJ6m5UaXVB76VwMyXcyKQ@mail.gmail.com>
+References: <1484912161-5932-1-git-send-email-nkumbhar@nvidia.com>
+ <20170123142417.GD19957@gondor.apana.org.au> <113d3ef8-ef34-0651-71e7-be09ef55727e@nvidia.com>
+ <20170202135721.GA5289@gondor.apana.org.au> <87fcb3cf-b8ae-47de-550e-c76ae47af431@microchip.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Cc: Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andy Shevchenko <andy.shevchenko@gmail.com>,
-        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-        Stephen Bates <sbates@raithlin.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Dan Douglass <dan.douglass@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170822170228.17196-1-logang@deltatee.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        Nitin Kumbhar <nkumbhar@nvidia.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Tudor Ambarus <tudor.ambarus@microchip.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wr0-f196.google.com ([209.85.128.196]:35572 "EHLO
+        mail-wr0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751668AbdHVRWu (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 22 Aug 2017 13:22:50 -0400
+Received: by mail-wr0-f196.google.com with SMTP id p8so20736886wrf.2
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Aug 2017 10:22:50 -0700 (PDT)
+In-Reply-To: <87fcb3cf-b8ae-47de-550e-c76ae47af431@microchip.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Horia Geantă <horia.geanta@nxp.com>
+On Tue, Aug 22, 2017 at 12:14 PM, Tudor Ambarus
+<tudor.ambarus@microchip.com> wrote:
+> Hi, Herbert,
+>
+> On 02/02/2017 03:57 PM, Herbert Xu wrote:
+>>
+>> Yes but RSA had an in-kernel user in the form of module signature
+>> verification.  We don't add algorithms to the kernel without
+>> actual users.  So this patch-set needs to come with an actual
+>> in-kernel user of ECDSA.
+>
+>
+> ECDSA can be used by the kernel module signing facility too. Is there
+> any interest in using ECDSA by the kernel module signing facility?
 
-We can now make use of the io-64-nonatomic-lo-hi header to always
-provide 64 bit IO operations. So this patch cleans up the extra
-CONFIG_64BIT ifdefs.
+I'd say keep it simple wherever possible; adding an algorithm should
+need "is required by" not just "can be used by".
 
-To be consistent with CAAM engine HW spec: in case of 64-bit registers,
-irrespective of device endianness, the lower address should be read from
-/ written to first, followed by the upper address. Indeed the I/O
-accessors in CAAM driver currently don't follow the spec, however this
-is a good opportunity to fix the code.
-
-Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Cc: Horia Geantă <horia.geanta@nxp.com>
-Cc: Dan Douglass <dan.douglass@nxp.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
----
- drivers/crypto/caam/regs.h | 35 +++++------------------------------
- 1 file changed, 5 insertions(+), 30 deletions(-)
-
-diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
-index 84d2f838a063..0c45505458e7 100644
---- a/drivers/crypto/caam/regs.h
-+++ b/drivers/crypto/caam/regs.h
-@@ -9,7 +9,7 @@
- 
- #include <linux/types.h>
- #include <linux/bitops.h>
--#include <linux/io.h>
-+#include <linux/io-64-nonatomic-lo-hi.h>
- 
- /*
-  * Architecture-specific register access methods
-@@ -134,50 +134,25 @@ static inline void clrsetbits_32(void __iomem *reg, u32 clear, u32 set)
-  *    base + 0x0000 : least-significant 32 bits
-  *    base + 0x0004 : most-significant 32 bits
-  */
--#ifdef CONFIG_64BIT
- static inline void wr_reg64(void __iomem *reg, u64 data)
- {
-+#ifndef CONFIG_CRYPTO_DEV_FSL_CAAM_IMX
- 	if (caam_little_end)
- 		iowrite64(data, reg);
- 	else
--		iowrite64be(data, reg);
--}
--
--static inline u64 rd_reg64(void __iomem *reg)
--{
--	if (caam_little_end)
--		return ioread64(reg);
--	else
--		return ioread64be(reg);
--}
--
--#else /* CONFIG_64BIT */
--static inline void wr_reg64(void __iomem *reg, u64 data)
--{
--#ifndef CONFIG_CRYPTO_DEV_FSL_CAAM_IMX
--	if (caam_little_end) {
--		wr_reg32((u32 __iomem *)(reg) + 1, data >> 32);
--		wr_reg32((u32 __iomem *)(reg), data);
--	} else
- #endif
--	{
--		wr_reg32((u32 __iomem *)(reg), data >> 32);
--		wr_reg32((u32 __iomem *)(reg) + 1, data);
--	}
-+		iowrite64be(data, reg);
- }
- 
- static inline u64 rd_reg64(void __iomem *reg)
- {
- #ifndef CONFIG_CRYPTO_DEV_FSL_CAAM_IMX
- 	if (caam_little_end)
--		return ((u64)rd_reg32((u32 __iomem *)(reg) + 1) << 32 |
--			(u64)rd_reg32((u32 __iomem *)(reg)));
-+		return ioread64(reg);
- 	else
- #endif
--		return ((u64)rd_reg32((u32 __iomem *)(reg)) << 32 |
--			(u64)rd_reg32((u32 __iomem *)(reg) + 1));
-+		return ioread64be(reg);
- }
--#endif /* CONFIG_64BIT  */
- 
- #ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
- #ifdef CONFIG_SOC_IMX7D
--- 
-2.11.0
+Even then, there is room for questions. In particular, whether such a
+fragile algorithm should be trusted at all, let alone for signatures
+on infrastructure modules that the whole OS will trust.
+https://en.wikipedia.org/wiki/Elliptic_Curve_Digital_Signature_Algorithm#Security
