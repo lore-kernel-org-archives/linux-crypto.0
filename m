@@ -1,48 +1,57 @@
-From: Sandy Harris <sandyinchina@gmail.com>
-Subject: Re: Re: [PATCH 0/6] Add support for ECDSA algorithm
-Date: Tue, 22 Aug 2017 13:22:48 -0400
-Message-ID: <CACXcFmk5mAfjW=SSQm7SM7oP0orwrFJ6m5UaXVB76VwMyXcyKQ@mail.gmail.com>
-References: <1484912161-5932-1-git-send-email-nkumbhar@nvidia.com>
- <20170123142417.GD19957@gondor.apana.org.au> <113d3ef8-ef34-0651-71e7-be09ef55727e@nvidia.com>
- <20170202135721.GA5289@gondor.apana.org.au> <87fcb3cf-b8ae-47de-550e-c76ae47af431@microchip.com>
+From: Andy Shevchenko <andy.shevchenko@gmail.com>
+Subject: Re: [PATCH v7 5/7] io-64-nonatomic: add io{read|write}64[be]{_lo_hi|_hi_lo}
+ macros
+Date: Tue, 22 Aug 2017 20:40:06 +0300
+Message-ID: <CAHp75Ve3gG6KdjVBmJZAw25uXRmzfCMUv1kFvg0TbhN7ebTqdw@mail.gmail.com>
+References: <20170822170228.17196-1-logang@deltatee.com> <20170822170228.17196-6-logang@deltatee.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Nitin Kumbhar <nkumbhar@nvidia.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Tudor Ambarus <tudor.ambarus@microchip.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wr0-f196.google.com ([209.85.128.196]:35572 "EHLO
-        mail-wr0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751668AbdHVRWu (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Aug 2017 13:22:50 -0400
-Received: by mail-wr0-f196.google.com with SMTP id p8so20736886wrf.2
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Aug 2017 10:22:50 -0700 (PDT)
-In-Reply-To: <87fcb3cf-b8ae-47de-550e-c76ae47af431@microchip.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Linux-Arch <linux-arch@vger.kernel.org>,
+        linux-ntb@googlegroups.com,
+        linux-crypto <linux-crypto@vger.kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>,
+        Stephen Bates <sbates@raithlin.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Alan Cox <gnomes@lxorguk.ukuu.org.uk>
+To: Logan Gunthorpe <logang@deltatee.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20170822170228.17196-6-logang@deltatee.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Aug 22, 2017 at 12:14 PM, Tudor Ambarus
-<tudor.ambarus@microchip.com> wrote:
-> Hi, Herbert,
+On Tue, Aug 22, 2017 at 8:02 PM, Logan Gunthorpe <logang@deltatee.com> wrote:
+> This patch adds generic io{read|write}64[be]{_lo_hi|_hi_lo} macros if
+> they are not already defined by the architecture. (As they are provided
+> by the generic iomap library).
 >
-> On 02/02/2017 03:57 PM, Herbert Xu wrote:
->>
->> Yes but RSA had an in-kernel user in the form of module signature
->> verification.  We don't add algorithms to the kernel without
->> actual users.  So this patch-set needs to come with an actual
->> in-kernel user of ECDSA.
+> The patch also points io{read|write}64[be] to the variant specified by the
+> header name.
 >
+> This is because new drivers are encouraged to use ioreadXX, et al instead
+> of readX[1], et al -- and mixing ioreadXX with readq is pretty ugly.
 >
-> ECDSA can be used by the kernel module signing facility too. Is there
-> any interest in using ECDSA by the kernel module signing facility?
+> [1] ldd3: section 9.4.2
 
-I'd say keep it simple wherever possible; adding an algorithm should
-need "is required by" not just "can be used by".
+ldd -> LDD
 
-Even then, there is room for questions. In particular, whether such a
-fragile algorithm should be trusted at all, let alone for signatures
-on infrastructure modules that the whole OS will trust.
-https://en.wikipedia.org/wiki/Elliptic_Curve_Digital_Signature_Algorithm#Security
+It's a pretty outdated book, though quite many chapters are actual for
+these days.
+
+Recomendation is kinda arguable. I doubt modern architectures make
+difference between IO operations and MMIO.
+Does, for example, PCI requires some special signal (message / wire)
+handling when pio_*() accessors used vs. mmio_*() ones?
+
+> cc: Christoph Hellwig <hch@lst.de>
+> cc: Arnd Bergmann <arnd@arndb.de>
+> cc: Alan Cox <gnomes@lxorguk.ukuu.org.uk>
+> cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+cc -> Cc ?
+
+-- 
+With Best Regards,
+Andy Shevchenko
