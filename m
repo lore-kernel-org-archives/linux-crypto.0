@@ -1,7 +1,7 @@
 From: Logan Gunthorpe <logang@deltatee.com>
-Subject: [PATCH v7 2/7] powerpc: io.h: move iomap.h include so that it can use readq/writeq defs
-Date: Tue, 22 Aug 2017 11:02:23 -0600
-Message-ID: <20170822170228.17196-3-logang@deltatee.com>
+Subject: [PATCH v7 1/7] drm/tilcdc: ensure nonatomic iowrite64 is not used
+Date: Tue, 22 Aug 2017 11:02:22 -0600
+Message-ID: <20170822170228.17196-2-logang@deltatee.com>
 References: <20170822170228.17196-1-logang@deltatee.com>
 Cc: Arnd Bergmann <arnd@arndb.de>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -9,57 +9,59 @@ Cc: Arnd Bergmann <arnd@arndb.de>,
         =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
         Stephen Bates <sbates@raithlin.com>,
         Logan Gunthorpe <logang@deltatee.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Suresh Warrier <warrier@linux.vnet.ibm.com>,
-        "Oliver O'Halloran" <oohall@gmail.com>
+        Jyri Sarha <jsarha@ti.com>,
+        Tomi Valkeinen <tomi.valkeinen@ti.com>,
+        David Airlie <airlied@linux.ie>
 To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
         linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from ale.deltatee.com ([207.54.116.67]:41152 "EHLO ale.deltatee.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751061AbdHVRCs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 22 Aug 2017 13:02:48 -0400
 In-Reply-To: <20170822170228.17196-1-logang@deltatee.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Subsequent patches in this series makes use of the readq and writeq
-defines in iomap.h. However, as is, they get missed on the powerpc
-platform seeing the include comes before the define. This patch
-moves the include down to fix this.
+Add a check to ensure iowrite64 is only used if it is atomic.
+
+It was decided in [1] that the tilcdc driver should not be using an
+atomic operation (so it was left out of this patchset). However, it turns
+out that through the drm code, a nonatomic header is actually included:
+
+include/linux/io-64-nonatomic-lo-hi.h
+is included from include/drm/drm_os_linux.h:9:0,
+            from include/drm/drmP.h:74,
+            from include/drm/drm_modeset_helper.h:26,
+            from include/drm/drm_atomic_helper.h:33,
+            from drivers/gpu/drm/tilcdc/tilcdc_crtc.c:19:
+
+And thus, without this change, this patchset would inadvertantly
+change the behaviour of the tilcdc driver.
+
+[1] lkml.kernel.org/r/CAK8P3a2HhO_zCnsTzq7hmWSz5La5Thu19FWZpun16iMnyyNreQ@mail.gmail.com
 
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Acked-By: Michael Ellerman <mpe@ellerman.id.au>
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Cc: Paul Mackerras <paulus@samba.org>
-Cc: Michael Ellerman <mpe@ellerman.id.au>
-Cc: Nicholas Piggin <npiggin@gmail.com>
-Cc: Suresh Warrier <warrier@linux.vnet.ibm.com>
-Cc: "Oliver O'Halloran" <oohall@gmail.com>
+Cc: Jyri Sarha <jsarha@ti.com>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Cc: Tomi Valkeinen <tomi.valkeinen@ti.com>
+Cc: David Airlie <airlied@linux.ie>
 ---
- arch/powerpc/include/asm/io.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/gpu/drm/tilcdc/tilcdc_regs.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/powerpc/include/asm/io.h b/arch/powerpc/include/asm/io.h
-index 422f99cf9924..af074923d598 100644
---- a/arch/powerpc/include/asm/io.h
-+++ b/arch/powerpc/include/asm/io.h
-@@ -33,8 +33,6 @@ extern struct pci_dev *isa_bridge_pcidev;
- #include <asm/mmu.h>
- #include <asm/ppc_asm.h>
+diff --git a/drivers/gpu/drm/tilcdc/tilcdc_regs.h b/drivers/gpu/drm/tilcdc/tilcdc_regs.h
+index 9d528c0a67a4..5048ebb86835 100644
+--- a/drivers/gpu/drm/tilcdc/tilcdc_regs.h
++++ b/drivers/gpu/drm/tilcdc/tilcdc_regs.h
+@@ -133,7 +133,7 @@ static inline void tilcdc_write64(struct drm_device *dev, u32 reg, u64 data)
+ 	struct tilcdc_drm_private *priv = dev->dev_private;
+ 	volatile void __iomem *addr = priv->mmio + reg;
  
--#include <asm-generic/iomap.h>
--
- #ifdef CONFIG_PPC64
- #include <asm/paca.h>
- #endif
-@@ -663,6 +661,8 @@ static inline void name at					\
- #define writel_relaxed(v, addr)	writel(v, addr)
- #define writeq_relaxed(v, addr)	writeq(v, addr)
- 
-+#include <asm-generic/iomap.h>
-+
- #ifdef CONFIG_PPC32
- #define mmiowb()
+-#ifdef iowrite64
++#if defined(iowrite64) && !defined(iowrite64_is_nonatomic)
+ 	iowrite64(data, addr);
  #else
+ 	__iowmb();
 -- 
 2.11.0
