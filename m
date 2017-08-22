@@ -1,7 +1,7 @@
 From: Corentin Labbe <clabbe.montjoie@gmail.com>
-Subject: [PATCH 04/11] crypto: nx - Use GCM IV size constant
-Date: Tue, 22 Aug 2017 10:08:11 +0200
-Message-ID: <20170822080818.12486-5-clabbe.montjoie@gmail.com>
+Subject: [PATCH 01/11] crypto: gcm - add GCM IV size constant
+Date: Tue, 22 Aug 2017 10:08:08 +0200
+Message-ID: <20170822080818.12486-2-clabbe.montjoie@gmail.com>
 References: <20170822080818.12486-1-clabbe.montjoie@gmail.com>
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org,
@@ -14,70 +14,34 @@ To: herbert@gondor.apana.org.au, davem@davemloft.net,
         matthias.bgg@gmail.com, leosilva@linux.vnet.ibm.com,
         pfsmorigo@linux.vnet.ibm.com, benh@kernel.crashing.org,
         paulus@samba.org, mpe@ellerman.id.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wr0-f194.google.com ([209.85.128.194]:34227 "EHLO
-        mail-wr0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932230AbdHVIKk (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Aug 2017 04:10:40 -0400
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20170822080818.12486-1-clabbe.montjoie@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-This patch replace GCM IV size value by their constant name.
+Many GCM users use directly GCM IV size instead of using some constant.
+
+This patch add all IV size constant used by GCM.
 
 Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
 ---
- drivers/crypto/nx/nx-aes-gcm.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ include/crypto/gcm.h | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+ create mode 100644 include/crypto/gcm.h
 
-diff --git a/drivers/crypto/nx/nx-aes-gcm.c b/drivers/crypto/nx/nx-aes-gcm.c
-index abd465f479c4..a810596b97c2 100644
---- a/drivers/crypto/nx/nx-aes-gcm.c
-+++ b/drivers/crypto/nx/nx-aes-gcm.c
-@@ -22,6 +22,7 @@
- #include <crypto/internal/aead.h>
- #include <crypto/aes.h>
- #include <crypto/algapi.h>
-+#include <crypto/gcm.h>
- #include <crypto/scatterwalk.h>
- #include <linux/module.h>
- #include <linux/types.h>
-@@ -433,7 +434,7 @@ static int gcm_aes_nx_encrypt(struct aead_request *req)
- 	struct nx_gcm_rctx *rctx = aead_request_ctx(req);
- 	char *iv = rctx->iv;
- 
--	memcpy(iv, req->iv, 12);
-+	memcpy(iv, req->iv, GCM_AES_IV_SIZE);
- 
- 	return gcm_aes_nx_crypt(req, 1, req->assoclen);
- }
-@@ -443,7 +444,7 @@ static int gcm_aes_nx_decrypt(struct aead_request *req)
- 	struct nx_gcm_rctx *rctx = aead_request_ctx(req);
- 	char *iv = rctx->iv;
- 
--	memcpy(iv, req->iv, 12);
-+	memcpy(iv, req->iv, GCM_AES_IV_SIZE);
- 
- 	return gcm_aes_nx_crypt(req, 0, req->assoclen);
- }
-@@ -498,7 +499,7 @@ struct aead_alg nx_gcm_aes_alg = {
- 	},
- 	.init        = nx_crypto_ctx_aes_gcm_init,
- 	.exit        = nx_crypto_ctx_aead_exit,
--	.ivsize      = 12,
-+	.ivsize      = GCM_AES_IV_SIZE,
- 	.maxauthsize = AES_BLOCK_SIZE,
- 	.setkey      = gcm_aes_nx_set_key,
- 	.encrypt     = gcm_aes_nx_encrypt,
-@@ -516,7 +517,7 @@ struct aead_alg nx_gcm4106_aes_alg = {
- 	},
- 	.init        = nx_crypto_ctx_aes_gcm_init,
- 	.exit        = nx_crypto_ctx_aead_exit,
--	.ivsize      = 8,
-+	.ivsize      = GCM_RFC4106_IV_SIZE,
- 	.maxauthsize = AES_BLOCK_SIZE,
- 	.setkey      = gcm4106_aes_nx_set_key,
- 	.setauthsize = gcm4106_aes_nx_setauthsize,
+diff --git a/include/crypto/gcm.h b/include/crypto/gcm.h
+new file mode 100644
+index 000000000000..c50e057ea17e
+--- /dev/null
++++ b/include/crypto/gcm.h
+@@ -0,0 +1,8 @@
++#ifndef _CRYPTO_GCM_H
++#define _CRYPTO_GCM_H
++
++#define GCM_AES_IV_SIZE 12
++#define GCM_RFC4106_IV_SIZE 8
++#define GCM_RFC4543_IV_SIZE 8
++
++#endif
 -- 
 2.13.0
