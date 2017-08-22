@@ -1,50 +1,79 @@
-From: Gary R Hook <gary.hook@amd.com>
-Subject: Re: [PATCH] crypto: ccp - Fix XTS-AES-128 support on v5 CCPs
-Date: Tue, 22 Aug 2017 13:24:16 -0500
-Message-ID: <9aaee2ee-93c7-556b-1199-344822397f14@amd.com>
-References: <150032210775.102848.1585950131204303137.stgit@sosxen.amd.com>
- <14a02623-b19e-b4ae-c078-57912a83cd4b@amd.com>
- <f5714d71-4e4a-b942-7e1e-58f478a5ff21@amd.com>
- <32d0b50e-e5d5-6041-0ee9-f8384c7c79a3@amd.com>
- <20170819040226.GB29641@gondor.apana.org.au>
+From: linux-crypto-owner@vger.kernel.org
+Subject: =?utf-8?B?4piFYmVpamluZy0t4oCcSkVDIHdvcmxk?=
+        =?utf-8?B?IDIwMTgg5LiW55WM5aSN5ZCI5p2Q5paZ5bGV6KeI5Y+K5Lya6K6u4oCd5bCG5LqO?=
+        =?utf-8?B?4oCcM+aciDA2LTA45pel4oCd5Zyo4oCc5rOV5Zu95be06buO4oCd5Li+6KGMIA==?=
+        =?utf-8?B?ICAg77yI5Zyw5Y+zUDEtTC1NZe+8iQ==?=
+Date: Wed, 23 Aug 2017 02:07:54 +0800
+Message-ID: <20170823020805346175@cww.net.cn>
+Reply-To: <EMAILQUNFA@163.COM>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain;
+        charset="utf-8"
+Content-Transfer-Encoding: base64
+To: unlisted-recipients:; (no To-header on input)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2nam03on0078.outbound.protection.outlook.com ([104.47.42.78]:57538
-        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751807AbdHVSY2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Aug 2017 14:24:28 -0400
-In-Reply-To: <20170819040226.GB29641@gondor.apana.org.au>
+Received: from [111.205.110.81] ([111.205.110.81]:4268 "EHLO cww.net.cn"
+        rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752209AbdHVSjq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 22 Aug 2017 14:39:46 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 08/18/2017 11:02 PM, Herbert Xu wrote:
-> On Fri, Aug 18, 2017 at 11:41:04AM -0500, Gary R Hook wrote:
->>> On Tue, Jul 25, 2017 at 02:12:11PM -0500, Gary R Hook wrote:
->>>> Version 5 CCPs have some new requirements for XTS-AES: the type field
->>>> must be specified, and the key requires 512 bits, with each part
->>>> occupying 256 bits and padded with zeroes.
->>>>
->>>> cc: <stable@vger.kernel.org> # 4.9.x+
->>>>
->>>> Signed-off-by: Gary R Hook <ghook@amd.com>
->>>
->>> Patch applied.  Thanks.
->>
->> Herbert,
->>
->> *ping*
->>
->> This is a bug fix, Could we push this into 4.13, please?
->
-> I don't think this one is critical enough to go in right now.
-> Is there any reason why it can't wait until the next merge window?
-
-I am happy to defer to your expertise in this area. My concern was
-whether the patch had been overlooked. I see now that it had not.
-
-Thank you, sir.
+5bCK5pWs55qEIGJlaWppbmdAY3BhaGtsdGQuY29tIOS8geS4mumihuWvvC/lhazlj7jotJ/otKPk
+urov5Lia55WM5LiT5a6277yM5oKo5aW977yaDQrjgIDjgIANCuOAgOOAgOaWsOadkOaWmeS4ujIx
+5LiW57qq5LiJ5aSn5YWx5oCn5YWz6ZSu5oqA5pyv5LmL5LiA77yM5bey5oiQ5Li65YWo55CD57uP
+5rWO6L+F6YCf5aKe6ZW/55qE5rqQ5Yqo5Yqb5ZKM5o+Q5Y2H5qC45b+D56ue5LqJ5Yqb55qE5oiY
+55Wl54Sm54K544CC5p2Q5paZ5L2c5Li65Yi26YCg5Lia55qE5Z+656GA77yM54m55Yir5piv5paw
+5p2Q5paZ56CU56m25ZKM5Lqn5Lia5Y+R5bGV55qE5rC05bmz5LiO6KeE5qih77yM5bey57uP5oiQ
+5Li66KGh6YeP5LiA5Liq5Zu95a6256eR5oqA6L+b5q2l5ZKM57u85ZCI5a6e5Yqb55qE6YeN6KaB
+5qCH5b+X44CC5Zyo5paw5p2Q5paZ5Y+R5bGV5LiO5bqU55So5Lit77yM5aSN5ZCI5p2Q5paZ5Y2g
+5pyJ55u45b2T6YeN6KaB55qE5Zyw5L2N77yM54m55Yir5bm/5rOb55qE5bqU55So5Zyo5rG96L2m
+44CB5Lqk6YCa44CB6aOO6IO944CB6Iiq56m644CB6Iiq5aSp44CB5YW15Zmo44CB6Ii56Ii244CB
+5Zu96Ziy44CB5py65qKw44CB55S15a2Q44CB5YyW5bel44CB5bu6562R44CB5Yac5Lia44CB5riU
+5Lia44CB57q657uH44CB6L+Q5Yqo5Zmo5p2Q562J6aKG5Z+f77yM5LiA55u05piv5LiW55WM5ZCE
+5Zu95LyY5YWI5Y+R5bGV5ZKM56ue5LqJ5r+A54OI55qE6YeN6KaB6KGM5Lia44CCDQrjgIDjgIAN
+CuOAgOOAgOKAnEpFQ+S4lueVjOWkjeWQiOadkOaWmeWxleiniOWPiuS8muiuruKAne+8iEpFQyB3
+b3JsZCBDb21wb3NpdGVzIFNob3cgJiBDb25mZXJlbmNlc++8ieWIm+WKnuS6jjE5NjPlubTvvIzm
+r4/lubTkuL7lip7kuIDlsYrvvIzoh7MyMDE35bm05oC75YWx5Li+5Yqe5LqGNTLlsYrvvIzkuLvl
+ip7ljZXkvY3mmK/ms5Xlm71KRUPlpI3lkIjmnZDmlpnlj5HlsZXkv4Pov5vkvJovSkVD6ZuG5Zui
+77yM5Lit5Zu95oC75bGV5Zui5bGV5ZWG57uE57uH5Y2V5L2N5Li65pig5b635Zu96ZmF5Lya5bGV
+6ZuG5Zui5Lit5Zu95Luj6KGo5aSE77yM5Zyo5YyX5Lqs44CB5LiK5rW3562J5Zyw6K6+5pyJ5YiG
+5pSv5py65p6E77yM6LSf6LSj6K+l5bGV5Lya5Zyo5Lit5Zu955qE5o6o5bm/5ZKM5oub5ZWG5bel
+5L2c77yISkVD5Lit5Zu95oC75bGV5Zui5oql5ZCN54Ot57q/77yaNDAwMC02ODAtODYw6L2sODE0
+NOOAgTUyMjDvvInjgIJKRUPlpI3lkIjmnZDmlpnlsZXlt7LmiJDkuLrkuJbnlYzkuIrljoblj7Lm
+nIDmgqDkuYXjgIHop4TmqKHmnIDlpKfnmoTlpI3lkIjmnZDmlpnooYzkuJrkuJPkuJrlsZXop4jk
+vJrvvIzlsZXnpLrlkozlj43mmKDkuoblvZPliY3lpI3lkIjmnZDmlpnooYzkuJrnmoTmnIDmlrDm
+ioDmnK/lkozlupTnlKjmiJDmnpzjgIINCuOAgOOAgA0K44CA44CA5Li65LqG5aKe6L+b5Zu95YaF
+5aSW5aSN5ZCI5p2Q5paZ6KGM5Lia55qE5Lqk5rWB5LiO5ZCI5L2c77yM5ZCM5pe25bGV56S65oiR
+5Zu95aSN5ZCI5p2Q5paZ5Lqn5Lia55qE5Y+R5bGV5LiO5oiQ5bCx77yM5biu5Yqp5aKD5YaF5LyB
+5Lia5byA5ouT5Zu95YaF5aSW5biC5Zy677yM5Lit5Zu95Zu96ZmF5aSN5p2Q5Y2P5Lya44CB5pig
+5b635Zu96ZmF5Lya5bGV6ZuG5Zui77yIWU9ORCBFWFBP77yJ5Lit5Zu95Luj6KGo5aSE5bey6L+R
+5Y2B5bm057uE57uH5Lit5Zu95LyB5Lia5Y+C5LiO6K+l5bGV5Lya77yM5Li65Lit5Zu95aSN5ZCI
+5p2Q5paZ6ZuG5Zui44CB5Lit5p2Q56eR5oqA44CB5Lit6ZKi6ZuG5Zui44CB5Lit5Zu95bu65p2Q
+6ZuG5Zui44CB5Lit5Zu95ZWG6aOe44CB5YyX5Lqs54676ZKi6Zmi44CB5LiK5rW35p2w5LqL5p2w
+5paw5p2Q5paZ6ZuG5Zui44CB6YeN5bqG5Zu96ZmF5aSN5ZCI5p2Q5paZ44CB5Lit5Y2X5o6n6IKh
+6ZuG5Zui44CB56em55qH5bKb6ICA5Y2O546755KD6ZKi44CB54Of5Y+w5rCo57q244CB5aSp6ams
+6ZuG5Zui44CB5Y2O5Lic55CG5bel5aSn5a2m44CB5ZOI5bCU5ruo5bel5Lia5aSn5a2m44CB5beo
+55+z6ZuG5Zui44CB5Lit5Ya26ZuG5Zui44CB6YeR5YWJ6ZuG5Zui44CB5rGf6IuP5oGS56We57qk
+57u05p2Q5paZ44CB6YeN5bqG5aSn5a2m44CB5LiK5rW3546755KD6ZKi56CU56m26Zmi44CB5Lit
+5Y2X5aSn5a2m44CB5ZOI5bCU5ruo546755KD6ZKi56CU56m26Zmi562J5LyX5aSa6KGM5Lia5beo
+5aS05ZKM55+l5ZCN5py65p6E5o+Q5L6b5LqG5LyY6LSo6auY5pWI55qE5aKD5aSW5bGV6LS45pyN
+5Yqh44CCDQrjgIDjgIANCuOAgOOAgOKAnEpFQyB3b3JsZCAyMDE4IOesrOS6lOWNgeS4ieS4lueV
+jOWkjeWQiOadkOaWmeWxleiniOWPiuS8muiuruKAneWwhuS6juKAnDPmnIgwNi0wOOaXpeKAneWc
+qOKAnOazleWbveW3tOm7juWxleiniOS8muiuruS4reW/g+KAneWGjeW6puS4vuihjO+8jOaIkeS7
+rOivmumCgOWFqOWbveWQhOWcsOWkjeWQiOadkOaWmeWPiuaWsOadkOaWmeebuOWFs+WNleS9jeS4
+juS4mueVjOS6uuWjq+WKoOWFpeWSseS7rOeahOS4reWbveaAu+WxleWbouWJjeW+gOWPguWxleWP
+guinguOAguOAgOOAgA0K44CA44CADQrjgIDjgIDmnInlhbPlj4LlsZXlj4Lop4LigJxKRUPkuJbn
+lYzlpI3lkIjmnZDmlpnlsZXigJ3kuovlrpzvvIzor7fogZTnu5zjgJDkuK3lm73mgLvlsZXlm6Lj
+gJHnu4Tlip7mlrnigJTigJQg5YWo5Zu957uf5LiA5a6i5pyN54Ot57q/77yaNDAwMC01ODAtODUw
+77yI6L2sNTIyMOOAgTgxNDTjgIE4ODg477yJ44CBMDEw4oCUNjkyMy02OTQ077ybIOmCrueusS9R
+Ue+8mjEyODA5Mzk1I3FxLmNvbe+8myDlvq7kv6HvvJogQ2FuWmhhblhpYW9Yae+8iOWPguWxlea2
+iOaBr++8ieOAgVpoYW5TaGFuZ1poaUppYe+8iOWxleWVhuS5i+Wutu+8ie+8myDlvq7ljZrvvJpo
+dHRwOi8vd2VpYm8uY29tL2plY3Nob3fvvIjlsZXkvJrvvInjgIFodHRwOi8vd2VpYm8uY29tL3lp
+bmdkZWh1aXpoYW7vvIjlhazlj7jvvInjgIINCuOAgOOAgA0K44CA44CA5Y+C5YqgSkVD5bGV5Lya
+5piv5LiA5Liq5aSN5ZCI5p2Q5paZ5Y+K5paw5p2Q5paZ5LyB5Lia6LWw5ZCR5Zu96ZmF5YyW55qE
+5qCH5b+X5ZKM6YCU5b6E77yBDQrjgIDjgIANCuOAgOOAgA0K44CA44CADQrjgIDjgIANCl9fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX1/jgIDjgIANCu+8iOeZvuS4h+e+pOWPkeezu+e7n3zkuLrmgqjl
+j5HpgIF85aaC5LiN5biM5pyb5YaN5pS25Yiw5q2k6KGM5Lia6LWE6K6vfOivt+WbnuWkjeKAnFRE
+K0pFQ+KAneiHs+mCrueusTEwNTU4MDA4MTJAcXEuY29t77yJDQo=
