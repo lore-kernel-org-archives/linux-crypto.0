@@ -1,74 +1,75 @@
-From: Tudor Ambarus <tudor.ambarus@microchip.com>
-Subject: Re: [PATCH 0/6] Add support for ECDSA algorithm
-Date: Wed, 23 Aug 2017 16:40:55 +0300
-Message-ID: <cefbcaf7-8eaf-af34-dee3-4fd438febdab@microchip.com>
-References: <1484912161-5932-1-git-send-email-nkumbhar@nvidia.com>
- <20170123142417.GD19957@gondor.apana.org.au>
- <113d3ef8-ef34-0651-71e7-be09ef55727e@nvidia.com>
- <20170202135721.GA5289@gondor.apana.org.au>
- <87fcb3cf-b8ae-47de-550e-c76ae47af431@microchip.com>
- <CACXcFmk5mAfjW=SSQm7SM7oP0orwrFJ6m5UaXVB76VwMyXcyKQ@mail.gmail.com>
+From: PrasannaKumar Muralidharan <prasannatsmkumar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH v2 4/4] crypto: jz4780-rng: Enable PRNG support in CI20 defconfig
+Date: Wed, 23 Aug 2017 20:20:07 +0530
+Message-ID: <CANc+2y6LPFf6a-oJJ8=Sf59mCOH0q2s6Na5zCAMhnBAiOMjDcQ@mail.gmail.com>
+References: <20170823025707.27888-1-prasannatsmkumar@gmail.com>
+ <20170823025707.27888-5-prasannatsmkumar@gmail.com> <9da7ab8b-aa81-e012-596c-54355758da83@imgtec.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Nitin Kumbhar <nkumbhar@nvidia.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Sandy Harris <sandyinchina@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from esa5.microchip.iphmx.com ([216.71.150.166]:52324 "EHLO
-        esa5.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754001AbdHWNlm (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Aug 2017 09:41:42 -0400
-In-Reply-To: <CACXcFmk5mAfjW=SSQm7SM7oP0orwrFJ6m5UaXVB76VwMyXcyKQ@mail.gmail.com>
-Content-Language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Cc: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+        "David S . Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
+        Ralf Baechle <ralf-6z/3iImG2C8G8FEW9MqTrA@public.gmane.org>,
+        Paul Cercueil <paul-icTtO2rgO2OTuSrc4Mpeew@public.gmane.org>,
+        linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-mips-6z/3iImG2C8G8FEW9MqTrA@public.gmane.org, Mathieu Malaterre <malat-8fiUuRrzOP0dnm+yROfE0A@public.gmane.org>,
+        noloader-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: Harvey Hunt <Harvey.Hunt-1AXoQHu6uovQT0dZR+AlfA@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <9da7ab8b-aa81-e012-596c-54355758da83-1AXoQHu6uovQT0dZR+AlfA@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi, Sandy,
+Hi Harvey,
 
-On 08/22/2017 08:22 PM, Sandy Harris wrote:
-> On Tue, Aug 22, 2017 at 12:14 PM, Tudor Ambarus
-> <tudor.ambarus@microchip.com> wrote:
->> Hi, Herbert,
+On 23 August 2017 at 14:39, Harvey Hunt <Harvey.Hunt-1AXoQHu6uovQT0dZR+AlfA@public.gmane.org> wrote:
+> Hi PrasannaKumar,
+>
+> On 23/08/17 03:57, PrasannaKumar Muralidharan wrote:
 >>
->> On 02/02/2017 03:57 PM, Herbert Xu wrote:
->>>
->>> Yes but RSA had an in-kernel user in the form of module signature
->>> verification.  We don't add algorithms to the kernel without
->>> actual users.  So this patch-set needs to come with an actual
->>> in-kernel user of ECDSA.
+>> Enable PRNG driver support in MIPS Creator CI20 default config.
 >>
+>> Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>> ---
+>> No changes in v2
 >>
->> ECDSA can be used by the kernel module signing facility too. Is there
->> any interest in using ECDSA by the kernel module signing facility?
-> 
-> I'd say keep it simple wherever possible; adding an algorithm should
-> need "is required by" not just "can be used by".
-> 
-> Even then, there is room for questions. In particular, whether such a
-> fragile algorithm should be trusted at all, let alone for signatures
-> on infrastructure modules that the whole OS will trust.
-> https://en.wikipedia.org/wiki/Elliptic_Curve_Digital_Signature_Algorithm#Security
-> 
+>>   arch/mips/configs/ci20_defconfig | 5 +++++
+>>   1 file changed, 5 insertions(+)
+>>
+>> diff --git a/arch/mips/configs/ci20_defconfig
+>> b/arch/mips/configs/ci20_defconfig
+>> index b42cfa7..9f48f2c 100644
+>> --- a/arch/mips/configs/ci20_defconfig
+>> +++ b/arch/mips/configs/ci20_defconfig
+>> @@ -88,6 +88,11 @@ CONFIG_SERIAL_8250_RUNTIME_UARTS=5
+>>   CONFIG_SERIAL_8250_INGENIC=y
+>>   CONFIG_SERIAL_OF_PLATFORM=y
+>>   # CONFIG_HW_RANDOM is not set
+>> +CONFIG_CRYPTO_USER=y
+>> +CONFIG_CRYPTO_USER_API=y
+>> +CONFIG_CRYPTO_USER_API_RNG=y
+>> +CONFIG_CRYPTO_HW=y
+>> +CONFIG_CRYPTO_DEV_JZ4780_RNG=y
+>>   CONFIG_I2C=y
+>>   CONFIG_I2C_JZ4780=y
+>>   CONFIG_GPIO_SYSFS=y
+>>
+>
+> You need to regenerate your defconfig as it is missing CONFIG_MFD_SYSCON.
+>
+> Thanks,
+>
+> Harvey
 
-ECDSA is a better alternative to RSA for digital signatures assuming
-that you don't have implementation bugs.
+CONFIG_MFD_SYSCON gets selected when CONFIG_CRYPTO_DEV_JZ4780_RNG is
+selected. Please see the Kconfig changes. Given that should I add it
+in ci20_defconfig? If it is required I will add and send a new
+version.
 
-ECDSA requires a much smaller key length in order to provide the same
-security strength as RSA (see [1]):
-
-security strength | RSA key length (bits) | ECDSA key lengths (bits)
-        112                   2048                    224-255
-        128                   3072                    256-383
-
-When comparing to RSA, ECDSA promises better computational efficiency,
-signature size and bandwith (see [2]).
-
-Cheers,
-ta
-
-[1] NIST.SP.800-57pt1r4, section 5.6.1,  table 2
-[2] rfc4754, rfc6979
+Thanks,
+PrasannaKumar
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
