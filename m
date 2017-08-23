@@ -1,95 +1,49 @@
-From: Harvey Hunt <Harvey.Hunt@imgtec.com>
-Subject: Re: [PATCH v2 4/4] crypto: jz4780-rng: Enable PRNG support in CI20
- defconfig
-Date: Wed, 23 Aug 2017 15:51:45 +0100
-Message-ID: <02fb41c2-c740-ec2c-d82f-aabecfa798ea@imgtec.com>
-References: <20170823025707.27888-1-prasannatsmkumar@gmail.com>
- <20170823025707.27888-5-prasannatsmkumar@gmail.com>
- <9da7ab8b-aa81-e012-596c-54355758da83@imgtec.com>
- <CANc+2y6LPFf6a-oJJ8=Sf59mCOH0q2s6Na5zCAMhnBAiOMjDcQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Ralf Baechle <ralf@linux-mips.org>,
-        Paul Cercueil <paul@crapouillou.net>,
-        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-mips@linux-mips.org>, Mathieu Malaterre <malat@debian.org>,
-        <noloader@gmail.com>
-To: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Subject: [PATCH v2] dt/bindings: exynos-rng: Move dt binding documentation to bindings/crypto
+Date: Wed, 23 Aug 2017 20:34:43 +0530
+Message-ID: <20170823150443.8399-1-prasannatsmkumar@gmail.com>
+Cc: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+To: mchehab@kernel.org, kgene@kernel.org,
+        linux-samsung-soc@vger.kernel.org, krzk@kernel.org,
+        linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailapp01.imgtec.com ([195.59.15.196]:22382 "EHLO
-        mailapp01.imgtec.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932107AbdHWOvr (ORCPT
+Received: from mail-pg0-f65.google.com ([74.125.83.65]:33769 "EHLO
+        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754130AbdHWPFw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Aug 2017 10:51:47 -0400
-In-Reply-To: <CANc+2y6LPFf6a-oJJ8=Sf59mCOH0q2s6Na5zCAMhnBAiOMjDcQ@mail.gmail.com>
-Content-Language: en-US
+        Wed, 23 Aug 2017 11:05:52 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi PrasannaKumar,
+Samsung exynos PRNG driver is using crypto framework instead of
+hw_random framework. So move the devicetree binding to crypto folder.
 
-On 23/08/17 15:50, PrasannaKumar Muralidharan wrote:
-> Hi Harvey,
-> 
-> On 23 August 2017 at 14:39, Harvey Hunt <Harvey.Hunt@imgtec.com> wrote:
->> Hi PrasannaKumar,
->>
->> On 23/08/17 03:57, PrasannaKumar Muralidharan wrote:
->>>
->>> Enable PRNG driver support in MIPS Creator CI20 default config.
->>>
->>> Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
->>> ---
->>> No changes in v2
->>>
->>>    arch/mips/configs/ci20_defconfig | 5 +++++
->>>    1 file changed, 5 insertions(+)
->>>
->>> diff --git a/arch/mips/configs/ci20_defconfig
->>> b/arch/mips/configs/ci20_defconfig
->>> index b42cfa7..9f48f2c 100644
->>> --- a/arch/mips/configs/ci20_defconfig
->>> +++ b/arch/mips/configs/ci20_defconfig
->>> @@ -88,6 +88,11 @@ CONFIG_SERIAL_8250_RUNTIME_UARTS=5
->>>    CONFIG_SERIAL_8250_INGENIC=y
->>>    CONFIG_SERIAL_OF_PLATFORM=y
->>>    # CONFIG_HW_RANDOM is not set
->>> +CONFIG_CRYPTO_USER=y
->>> +CONFIG_CRYPTO_USER_API=y
->>> +CONFIG_CRYPTO_USER_API_RNG=y
->>> +CONFIG_CRYPTO_HW=y
->>> +CONFIG_CRYPTO_DEV_JZ4780_RNG=y
->>>    CONFIG_I2C=y
->>>    CONFIG_I2C_JZ4780=y
->>>    CONFIG_GPIO_SYSFS=y
->>>
->>
->> You need to regenerate your defconfig as it is missing CONFIG_MFD_SYSCON.
->>
->> Thanks,
->>
->> Harvey
-> 
-> CONFIG_MFD_SYSCON gets selected when CONFIG_CRYPTO_DEV_JZ4780_RNG is
-> selected. Please see the Kconfig changes. Given that should I add it
-> in ci20_defconfig? If it is required I will add and send a new
-> version.
+Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+---
+Changes in v2:
+* Modify MAINTAINERS file to reflect file rename
 
-Oops, I hadn't noticed that - just skimmed the patches before my morning 
-coffee. :-)
+ .../devicetree/bindings/{rng => crypto}/samsung,exynos-rng4.txt         | 0
+ MAINTAINERS                                                             | 2 +-
+ 2 files changed, 1 insertion(+), 1 deletion(-)
+ rename Documentation/devicetree/bindings/{rng => crypto}/samsung,exynos-rng4.txt (100%)
 
-It's fine as is, excuse the noise.
-
-> 
-> Thanks,
-> PrasannaKumar
-> 
-
-Thanks,
-
-Harvey
+diff --git a/Documentation/devicetree/bindings/rng/samsung,exynos-rng4.txt b/Documentation/devicetree/bindings/crypto/samsung,exynos-rng4.txt
+similarity index 100%
+rename from Documentation/devicetree/bindings/rng/samsung,exynos-rng4.txt
+rename to Documentation/devicetree/bindings/crypto/samsung,exynos-rng4.txt
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 4d284c7..3e0b822 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -11500,7 +11500,7 @@ L:	linux-crypto@vger.kernel.org
+ L:	linux-samsung-soc@vger.kernel.org
+ S:	Maintained
+ F:	drivers/crypto/exynos-rng.c
+-F:	Documentation/devicetree/bindings/rng/samsung,exynos-rng4.txt
++F:	Documentation/devicetree/bindings/crypto/samsung,exynos-rng4.txt
+ 
+ SAMSUNG FRAMEBUFFER DRIVER
+ M:	Jingoo Han <jingoohan1@gmail.com>
+-- 
+2.10.0
