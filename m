@@ -1,49 +1,95 @@
-From: Ralf Baechle <ralf@linux-mips.org>
-Subject: Re: [PATCH v2 3/4] crypto: jz4780-rng: Add RNG node to jz4780.dtsi
-Date: Wed, 23 Aug 2017 16:51:09 +0200
-Message-ID: <20170823145109.GA7433@linux-mips.org>
+From: Harvey Hunt <Harvey.Hunt@imgtec.com>
+Subject: Re: [PATCH v2 4/4] crypto: jz4780-rng: Enable PRNG support in CI20
+ defconfig
+Date: Wed, 23 Aug 2017 15:51:45 +0100
+Message-ID: <02fb41c2-c740-ec2c-d82f-aabecfa798ea@imgtec.com>
 References: <20170823025707.27888-1-prasannatsmkumar@gmail.com>
- <20170823025707.27888-4-prasannatsmkumar@gmail.com>
+ <20170823025707.27888-5-prasannatsmkumar@gmail.com>
+ <9da7ab8b-aa81-e012-596c-54355758da83@imgtec.com>
+ <CANc+2y6LPFf6a-oJJ8=Sf59mCOH0q2s6Na5zCAMhnBAiOMjDcQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-        robh+dt@kernel.org, mark.rutland@arm.com, paul@crapouillou.net,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-mips@linux-mips.org, malat@debian.org, noloader@gmail.com
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Ralf Baechle <ralf@linux-mips.org>,
+        Paul Cercueil <paul@crapouillou.net>,
+        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-mips@linux-mips.org>, Mathieu Malaterre <malat@debian.org>,
+        <noloader@gmail.com>
 To: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Return-path: <linux-mips-bounce@linux-mips.org>
-Content-Disposition: inline
-In-Reply-To: <20170823025707.27888-4-prasannatsmkumar@gmail.com>
-Sender: linux-mips-bounce@linux-mips.org
-Errors-to: linux-mips-bounce@linux-mips.org
-List-help: <mailto:ecartis@linux-mips.org?Subject=help>
-List-unsubscribe: <mailto:ecartis@linux-mips.org?subject=unsubscribe%20linux-mips>
-List-software: Ecartis version 1.0.0
-List-subscribe: <mailto:ecartis@linux-mips.org?subject=subscribe%20linux-mips>
-List-owner: <mailto:ralf@linux-mips.org>
-List-post: <mailto:linux-mips@linux-mips.org>
-List-archive: <http://www.linux-mips.org/archives/linux-mips/>
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mailapp01.imgtec.com ([195.59.15.196]:22382 "EHLO
+        mailapp01.imgtec.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932107AbdHWOvr (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 23 Aug 2017 10:51:47 -0400
+In-Reply-To: <CANc+2y6LPFf6a-oJJ8=Sf59mCOH0q2s6Na5zCAMhnBAiOMjDcQ@mail.gmail.com>
+Content-Language: en-US
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Aug 23, 2017 at 08:27:06AM +0530, PrasannaKumar Muralidharan wrote:
+Hi PrasannaKumar,
 
-> Add RNG node to jz4780 dtsi. This driver uses registers that are part of
-> the register set used by Ingenic CGU driver. Make RNG node as child of
-> CGU node.
+On 23/08/17 15:50, PrasannaKumar Muralidharan wrote:
+> Hi Harvey,
 > 
-> Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-> ---
-> Changes in v2:
-> * Add "syscon" in CGU node's compatible section
-> * Make RNG child node of CGU.
+> On 23 August 2017 at 14:39, Harvey Hunt <Harvey.Hunt@imgtec.com> wrote:
+>> Hi PrasannaKumar,
+>>
+>> On 23/08/17 03:57, PrasannaKumar Muralidharan wrote:
+>>>
+>>> Enable PRNG driver support in MIPS Creator CI20 default config.
+>>>
+>>> Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+>>> ---
+>>> No changes in v2
+>>>
+>>>    arch/mips/configs/ci20_defconfig | 5 +++++
+>>>    1 file changed, 5 insertions(+)
+>>>
+>>> diff --git a/arch/mips/configs/ci20_defconfig
+>>> b/arch/mips/configs/ci20_defconfig
+>>> index b42cfa7..9f48f2c 100644
+>>> --- a/arch/mips/configs/ci20_defconfig
+>>> +++ b/arch/mips/configs/ci20_defconfig
+>>> @@ -88,6 +88,11 @@ CONFIG_SERIAL_8250_RUNTIME_UARTS=5
+>>>    CONFIG_SERIAL_8250_INGENIC=y
+>>>    CONFIG_SERIAL_OF_PLATFORM=y
+>>>    # CONFIG_HW_RANDOM is not set
+>>> +CONFIG_CRYPTO_USER=y
+>>> +CONFIG_CRYPTO_USER_API=y
+>>> +CONFIG_CRYPTO_USER_API_RNG=y
+>>> +CONFIG_CRYPTO_HW=y
+>>> +CONFIG_CRYPTO_DEV_JZ4780_RNG=y
+>>>    CONFIG_I2C=y
+>>>    CONFIG_I2C_JZ4780=y
+>>>    CONFIG_GPIO_SYSFS=y
+>>>
+>>
+>> You need to regenerate your defconfig as it is missing CONFIG_MFD_SYSCON.
+>>
+>> Thanks,
+>>
+>> Harvey
 > 
->  arch/mips/boot/dts/ingenic/jz4780.dtsi | 6 +++++-
+> CONFIG_MFD_SYSCON gets selected when CONFIG_CRYPTO_DEV_JZ4780_RNG is
+> selected. Please see the Kconfig changes. Given that should I add it
+> in ci20_defconfig? If it is required I will add and send a new
+> version.
 
-This barely touched arch/mips so probably should be funnelled along with
-the rest of the series:
+Oops, I hadn't noticed that - just skimmed the patches before my morning 
+coffee. :-)
 
-Acked-by: Ralf Baechle <ralf@linux-mips.org>
+It's fine as is, excuse the noise.
 
-Or I can take everything.
+> 
+> Thanks,
+> PrasannaKumar
+> 
 
-  Ralf
+Thanks,
+
+Harvey
