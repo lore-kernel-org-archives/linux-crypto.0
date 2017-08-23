@@ -1,47 +1,46 @@
-From: Andy Shevchenko <andy.shevchenko@gmail.com>
-Subject: Re: [PATCH v7 5/7] io-64-nonatomic: add io{read|write}64[be]{_lo_hi|_hi_lo}
- macros
-Date: Wed, 23 Aug 2017 00:07:57 +0300
-Message-ID: <CAHp75VedQ_t0vo51QXNOKoGDdt4sp8nyreNkteHpu0=zKxO8rw@mail.gmail.com>
-References: <20170822170228.17196-1-logang@deltatee.com> <20170822170228.17196-6-logang@deltatee.com>
- <CAHp75Ve3gG6KdjVBmJZAw25uXRmzfCMUv1kFvg0TbhN7ebTqdw@mail.gmail.com> <ac32fc61-8a54-faf9-55ad-cd2da5fd6503@deltatee.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Linux-Arch <linux-arch@vger.kernel.org>,
-        linux-ntb@googlegroups.com,
-        linux-crypto <linux-crypto@vger.kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>,
-        Stephen Bates <sbates@raithlin.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Alan Cox <gnomes@lxorguk.ukuu.org.uk>
-To: Logan Gunthorpe <logang@deltatee.com>
-Return-path: <linux-arch-owner@vger.kernel.org>
-In-Reply-To: <ac32fc61-8a54-faf9-55ad-cd2da5fd6503@deltatee.com>
-Sender: linux-arch-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Subject: [PATCH v2 0/4] crypto: Add driver for JZ4780 PRNG
+Date: Wed, 23 Aug 2017 08:27:03 +0530
+Message-ID: <20170823025707.27888-1-prasannatsmkumar@gmail.com>
+Cc: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+To: herbert@gondor.apana.org.au, davem@davemloft.net,
+        robh+dt@kernel.org, mark.rutland@arm.com, ralf@linux-mips.org,
+        paul@crapouillou.net, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-mips@linux-mips.org,
+        malat@debian.org, noloader@gmail.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pg0-f65.google.com ([74.125.83.65]:34880 "EHLO
+        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753084AbdHWC5b (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 22 Aug 2017 22:57:31 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Aug 22, 2017 at 8:55 PM, Logan Gunthorpe <logang@deltatee.com> wrote:
-> On 22/08/17 11:40 AM, Andy Shevchenko wrote:
->> Recomendation is kinda arguable. I doubt modern architectures make
->> difference between IO operations and MMIO.
->> Does, for example, PCI requires some special signal (message / wire)
->> handling when pio_*() accessors used vs. mmio_*() ones?
+This patch series adds support of pseudo random number generator found
+in Ingenic's JZ4780 and X1000 SoC.
 
-> Sort of. There is a difference between the two in x86.
+Based on Paul's review comments, add 'syscon' compatible in CGU node in
+jz4780.dtsi. jz4780-rng driver uses regmap exposed via syscon interface
+to access the RNG registers. CGU driver is not modified in this patch
+set as registers used by CGU driver and this driver are different.
 
-Yes, the difference is in signaling. The question is if it's still in
-use. Looks like yes...
+PrasannaKumar Muralidharan (4):
+  crypto: jz4780-rng: Add JZ4780 PRNG devicetree binding documentation
+  crypto: jz4780-rng: Add Ingenic JZ4780 hardware PRNG driver
+  crypto: jz4780-rng: Add RNG node to jz4780.dtsi
+  crypto: jz4780-rng: Enable PRNG support in CI20 defconfig
 
-> But really if it's
-> not a valid recommendation someone should just go through and deprecate one
-> of them or document better when one should be used over the other. In any
-> case it's still really ugly to mix the two types in the same driver.
-
-Mixing is ugly, totally agree.
+ .../bindings/crypto/ingenic,jz4780-rng.txt         |  20 +++
+ MAINTAINERS                                        |   5 +
+ arch/mips/boot/dts/ingenic/jz4780.dtsi             |   6 +-
+ arch/mips/configs/ci20_defconfig                   |   5 +
+ drivers/crypto/Kconfig                             |  19 +++
+ drivers/crypto/Makefile                            |   1 +
+ drivers/crypto/jz4780-rng.c                        | 168 +++++++++++++++++++++
+ 7 files changed, 223 insertions(+), 1 deletion(-)
+ create mode 100644 Documentation/devicetree/bindings/crypto/ingenic,jz4780-rng.txt
+ create mode 100644 drivers/crypto/jz4780-rng.c
 
 -- 
-With Best Regards,
-Andy Shevchenko
+2.10.0
