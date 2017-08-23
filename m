@@ -1,68 +1,98 @@
-From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Subject: Re: [PATCH] hw_random: timeriomem-rng: Remove 'max < 4' condition check
-Date: Wed, 23 Aug 2017 08:32:18 +0530
-Message-ID: <CANc+2y5gt_yMJvs9uDzhRSdpD-M6vnsxPOWziodKsy_v_yvv+w@mail.gmail.com>
-References: <20170822162224.26801-1-prasannatsmkumar@gmail.com> <CAPLgG==6YgPO9CxRucbqEyfL5hb8m6YWqBfr_DPcBh5v2_=25Q@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org
-To: Rick Altherr <raltherr@google.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-io0-f194.google.com ([209.85.223.194]:34801 "EHLO
-        mail-io0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753057AbdHWDCT (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Aug 2017 23:02:19 -0400
-Received: by mail-io0-f194.google.com with SMTP id p141so600687iop.1
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Aug 2017 20:02:19 -0700 (PDT)
-In-Reply-To: <CAPLgG==6YgPO9CxRucbqEyfL5hb8m6YWqBfr_DPcBh5v2_=25Q@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: [BUGFIX PATCH] staging: ccree: save ciphertext for CTS IV
+Date: Wed, 23 Aug 2017 10:41:11 +0300
+Message-ID: <1503474071-7049-1-git-send-email-gilad@benyossef.com>
+Cc: Ofir Drang <ofir.drang@arm.com>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Rick,
+The crypto API requires saving the last blocks of ciphertext
+in req->info for use as IV for CTS mode. The ccree driver
+was not doing this. This patch fixes that.
 
-On 22 August 2017 at 22:23, Rick Altherr <raltherr@google.com> wrote:
-> On Tue, Aug 22, 2017 at 9:22 AM, PrasannaKumar Muralidharan
-> <prasannatsmkumar@gmail.com> wrote:
->>
->> In read routiene max is always >= 4. The check whether 'max < 4' is not
->> necessary. Remove it.
->
-> Missed that in the header.
+The bug was manifested with cts(cbc(aes)) mode in tcrypt tests.
 
-It was added recently so you could have not missed it.
+Fixes: 302ef8ebb4b2 ("Add CryptoCell skcipher support")
+Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+---
+ drivers/staging/ccree/ssi_cipher.c | 31 +++++++++++++++++++++++++++++--
+ 1 file changed, 29 insertions(+), 2 deletions(-)
 
->
-> Acked-By: Rick Altherr <raltherr@google.com>
->
->>
->> Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
->> ---
->>  drivers/char/hw_random/timeriomem-rng.c | 7 -------
->>  1 file changed, 7 deletions(-)
->>
->> diff --git a/drivers/char/hw_random/timeriomem-rng.c b/drivers/char/hw_random/timeriomem-rng.c
->> index 03ff548..f615684 100644
->> --- a/drivers/char/hw_random/timeriomem-rng.c
->> +++ b/drivers/char/hw_random/timeriomem-rng.c
->> @@ -53,13 +53,6 @@ static int timeriomem_rng_read(struct hwrng *hwrng, void *data,
->>         int period_us = ktime_to_us(priv->period);
->>
->>         /*
->> -        * The RNG provides 32-bits per read.  Ensure there is enough space for
->> -        * at minimum one read.
->> -        */
->> -       if (max < sizeof(u32))
->> -               return 0;
->> -
->> -       /*
->>          * There may not have been enough time for new data to be generated
->>          * since the last request.  If the caller doesn't want to wait, let them
->>          * bail out.  Otherwise, wait for the completion.  If the new data has
->> --
->> 2.10.0
->>
-
-Regards,
-PrasannaKumar
+diff --git a/drivers/staging/ccree/ssi_cipher.c b/drivers/staging/ccree/ssi_cipher.c
+index af9afea..01011a2 100644
+--- a/drivers/staging/ccree/ssi_cipher.c
++++ b/drivers/staging/ccree/ssi_cipher.c
+@@ -24,6 +24,7 @@
+ #include <crypto/ctr.h>
+ #include <crypto/des.h>
+ #include <crypto/xts.h>
++#include <crypto/scatterwalk.h>
+ 
+ #include "ssi_config.h"
+ #include "ssi_driver.h"
+@@ -697,6 +698,7 @@ static int ssi_blkcipher_complete(struct device *dev,
+ {
+ 	int completion_error = 0;
+ 	u32 inflight_counter;
++	struct ablkcipher_request *req = (struct ablkcipher_request *)areq;
+ 
+ 	ssi_buffer_mgr_unmap_blkcipher_request(dev, req_ctx, ivsize, src, dst);
+ 
+@@ -707,6 +709,22 @@ static int ssi_blkcipher_complete(struct device *dev,
+ 		ctx_p->drvdata->inflight_counter--;
+ 
+ 	if (areq) {
++		/*
++		 * The crypto API expects us to set the req->info to the last
++		 * ciphertext block. For encrypt, simply copy from the result.
++		 * For decrypt, we must copy from a saved buffer since this
++		 * could be an in-place decryption operation and the src is
++		 * lost by this point.
++		 */
++		if (req_ctx->gen_ctx.op_type == DRV_CRYPTO_DIRECTION_DECRYPT)  {
++			memcpy(req->info, req_ctx->backup_info, ivsize);
++			kfree(req_ctx->backup_info);
++		} else {
++			scatterwalk_map_and_copy(req->info, req->dst,
++						 (req->nbytes - ivsize),
++						 ivsize, 0);
++		}
++
+ 		ablkcipher_request_complete(areq, completion_error);
+ 		return 0;
+ 	}
+@@ -858,7 +876,6 @@ static int ssi_ablkcipher_encrypt(struct ablkcipher_request *req)
+ 	struct blkcipher_req_ctx *req_ctx = ablkcipher_request_ctx(req);
+ 	unsigned int ivsize = crypto_ablkcipher_ivsize(ablk_tfm);
+ 
+-	req_ctx->backup_info = req->info;
+ 	req_ctx->is_giv = false;
+ 
+ 	return ssi_blkcipher_process(tfm, req_ctx, req->dst, req->src, req->nbytes, req->info, ivsize, (void *)req, DRV_CRYPTO_DIRECTION_ENCRYPT);
+@@ -871,8 +888,18 @@ static int ssi_ablkcipher_decrypt(struct ablkcipher_request *req)
+ 	struct blkcipher_req_ctx *req_ctx = ablkcipher_request_ctx(req);
+ 	unsigned int ivsize = crypto_ablkcipher_ivsize(ablk_tfm);
+ 
+-	req_ctx->backup_info = req->info;
++	/*
++	 * Allocate and save the last IV sized bytes of the source, which will
++	 * be lost in case of in-place decryption and might be needed for CTS.
++	 */
++	req_ctx->backup_info = kmalloc(ivsize, GFP_KERNEL);
++	if (!req_ctx->backup_info)
++		return -ENOMEM;
++
++	scatterwalk_map_and_copy(req_ctx->backup_info, req->src,
++				 (req->nbytes - ivsize), ivsize, 0);
+ 	req_ctx->is_giv = false;
++
+ 	return ssi_blkcipher_process(tfm, req_ctx, req->dst, req->src, req->nbytes, req->info, ivsize, (void *)req, DRV_CRYPTO_DIRECTION_DECRYPT);
+ }
+ 
+-- 
+2.1.4
