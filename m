@@ -1,7 +1,7 @@
 From: PrasannaKumar Muralidharan <prasannatsmkumar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH v2 3/4] crypto: jz4780-rng: Add RNG node to jz4780.dtsi
-Date: Wed, 23 Aug 2017 08:27:06 +0530
-Message-ID: <20170823025707.27888-4-prasannatsmkumar@gmail.com>
+Subject: [PATCH v2 4/4] crypto: jz4780-rng: Enable PRNG support in CI20 defconfig
+Date: Wed, 23 Aug 2017 08:27:07 +0530
+Message-ID: <20170823025707.27888-5-prasannatsmkumar@gmail.com>
 References: <20170823025707.27888-1-prasannatsmkumar@gmail.com>
 Cc: PrasannaKumar Muralidharan <prasannatsmkumar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
@@ -14,42 +14,31 @@ In-Reply-To: <20170823025707.27888-1-prasannatsmkumar-Re5JQEeQqe8AvxtiuMwx3w@pub
 Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add RNG node to jz4780 dtsi. This driver uses registers that are part of
-the register set used by Ingenic CGU driver. Make RNG node as child of
-CGU node.
+Enable PRNG driver support in MIPS Creator CI20 default config.
 
 Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
-Changes in v2:
-* Add "syscon" in CGU node's compatible section
-* Make RNG child node of CGU.
+No changes in v2
 
- arch/mips/boot/dts/ingenic/jz4780.dtsi | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ arch/mips/configs/ci20_defconfig | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/arch/mips/boot/dts/ingenic/jz4780.dtsi b/arch/mips/boot/dts/ingenic/jz4780.dtsi
-index 4853ef6..411e16c 100644
---- a/arch/mips/boot/dts/ingenic/jz4780.dtsi
-+++ b/arch/mips/boot/dts/ingenic/jz4780.dtsi
-@@ -35,13 +35,17 @@
- 	};
- 
- 	cgu: jz4780-cgu@10000000 {
--		compatible = "ingenic,jz4780-cgu";
-+		compatible = "ingenic,jz4780-cgu", "syscon";
- 		reg = <0x10000000 0x100>;
- 
- 		clocks = <&ext>, <&rtc>;
- 		clock-names = "ext", "rtc";
- 
- 		#clock-cells = <1>;
-+
-+		rng: rng@d8 {
-+			compatible = "ingenic,jz480-rng";
-+		};
- 	};
- 
- 	pinctrl: pin-controller@10010000 {
+diff --git a/arch/mips/configs/ci20_defconfig b/arch/mips/configs/ci20_defconfig
+index b42cfa7..9f48f2c 100644
+--- a/arch/mips/configs/ci20_defconfig
++++ b/arch/mips/configs/ci20_defconfig
+@@ -88,6 +88,11 @@ CONFIG_SERIAL_8250_RUNTIME_UARTS=5
+ CONFIG_SERIAL_8250_INGENIC=y
+ CONFIG_SERIAL_OF_PLATFORM=y
+ # CONFIG_HW_RANDOM is not set
++CONFIG_CRYPTO_USER=y
++CONFIG_CRYPTO_USER_API=y
++CONFIG_CRYPTO_USER_API_RNG=y
++CONFIG_CRYPTO_HW=y
++CONFIG_CRYPTO_DEV_JZ4780_RNG=y
+ CONFIG_I2C=y
+ CONFIG_I2C_JZ4780=y
+ CONFIG_GPIO_SYSFS=y
 -- 
 2.10.0
 
