@@ -1,135 +1,113 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH v7 19/19] crypto: adapt api sample to use async. op wait
-Date: Thu, 24 Aug 2017 17:19:06 +0300
-Message-ID: <1503584350-7831-20-git-send-email-gilad@benyossef.com>
-References: <1503584350-7831-1-git-send-email-gilad@benyossef.com>
-Cc: Ofir Drang <ofir.drang@arm.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        David Howells <dhowells@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>,
-        Boris Brezillon <boris.brezillon@free-electrons.com>,
-        Arnaud Ebalard <arno@natisbad.org>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Shaohua Li <shli@kernel.org>, Steve French <sfrench@samba.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        James Morris <james.l.morris@oracle.com>,
-        "Serge E. Hallyn" <serge@hallyn.com>, linux-crypto@v
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1503584350-7831-1-git-send-email-gilad@benyossef.com>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Thomas Garnier <thgarnie@google.com>
+Subject: Re: x86: PIE support and option to extend KASLR randomization
+Date: Thu, 24 Aug 2017 14:13:38 -0700
+Message-ID: <CAJcbSZGhvwt=5ERtBHLJnwS=6AXBZLTMfrafzeUCqYy=-MKWDg@mail.gmail.com>
+References: <20170810172615.51965-1-thgarnie@google.com> <20170811124127.kkb5pnkljz4umxuj@gmail.com>
+ <CAJcbSZFTX3uiS2g8JriS6+z_+WrG8z3hrQo4OSuyHpiyUDJWYA@mail.gmail.com>
+ <20170815075609.mmzbfwritjzvrpsn@gmail.com> <CAJcbSZE+TiY2whT94WqCJNXzR=2ATOHcQ10H5RqBZA1j=k1VHQ@mail.gmail.com>
+ <20170816151235.oamkdva6cwpc4cex@gmail.com> <CAJcbSZFM_zpL1av1JVaow8NdsGeH+6oZKeDnMPdXR0PGfynzsg@mail.gmail.com>
+ <20170817080920.5ljlkktngw2cisfg@gmail.com> <CAJcbSZGbtc-i0X1NiBAvZA7cxpGkwSLKNB7oDNCsFxOCdhkR_g@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>,
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>,
+	Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@redhat.com>,
+	Arnd Bergmann <arnd@arndb.de>, Matthias Kaehlcke <mka@chromium.org>,
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>, Juergen Gross <jgross@suse.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+	Joerg Roedel <joro@8bytes.org>, Tom Lendacky <thomas.lendacky@amd.com>,
+	Andy Lutomirski <luto@kernel.org>, Borislav Petkov <bp@suse.de>, Brian Gerst <brgerst@gmail.com>,
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, "Rafael J . Wysocki" <rjw@rjwysocki.net>,
+	Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>, Tejun Heo <tj@kernel.org>,
+	Christoph La
+To: Ingo Molnar <mingo@kernel.org>
+Return-path: <kernel-hardening-return-9555-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
+List-Post: <mailto:kernel-hardening@lists.openwall.com>
+List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
+List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
+List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
+In-Reply-To: <CAJcbSZGbtc-i0X1NiBAvZA7cxpGkwSLKNB7oDNCsFxOCdhkR_g@mail.gmail.com>
 List-Id: linux-crypto.vger.kernel.org
 
-The code sample is waiting for an async. crypto op completion.
-Adapt sample to use the new generic infrastructure to do the same.
+On Thu, Aug 17, 2017 at 7:10 AM, Thomas Garnier <thgarnie@google.com> wrote:
+>
+> On Thu, Aug 17, 2017 at 1:09 AM, Ingo Molnar <mingo@kernel.org> wrote:
+> >
+> >
+> > * Thomas Garnier <thgarnie@google.com> wrote:
+> >
+> > > > > -model=small/medium assume you are on the low 32-bit. It generates
+> > > > > instructions where the virtual addresses have the high 32-bit to be zero.
+> > > >
+> > > > How are these assumptions hardcoded by GCC? Most of the instructions should be
+> > > > relocatable straight away, as most call/jump/branch instructions are
+> > > > RIP-relative.
+> > >
+> > > I think PIE is capable to use relative instructions well. mcmodel=large assumes
+> > > symbols can be anywhere.
+> >
+> > So if the numbers in your changelog and Kconfig text cannot be trusted, there's
+> > this description of the size impact which I suspect is less susceptible to
+> > measurement error:
+> >
+> > +         The kernel and modules will generate slightly more assembly (1 to 2%
+> > +         increase on the .text sections). The vmlinux binary will be
+> > +         significantly smaller due to less relocations.
+> >
+> > ... but describing a 1-2% kernel text size increase as "slightly more assembly"
+> > shows a gratituous disregard to kernel code generation quality! In reality that's
+> > a huge size increase that in most cases will almost directly transfer to a 1-2%
+> > slowdown for kernel intense workloads.
+> >
+> >
+> > Where does that size increase come from, if PIE is capable of using relative
+> > instructins well? Does it come from the loss of a generic register and the
+> > resulting increase in register pressure, stack spills, etc.?
+>
+> I will try to gather more information on the size increase. The size
+> increase might be smaller with gcc 4.9 given performance was much
+> better.
 
-This also fixes a possible data coruption bug created by the
-use of wait_for_completion_interruptible() without dealing
-correctly with an interrupt aborting the wait prior to the
-async op finishing.
+Coming back on this thread as I identified the root cause of the
+performance issue.
 
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
----
- Documentation/crypto/api-samples.rst | 52 +++++++-----------------------------
- 1 file changed, 10 insertions(+), 42 deletions(-)
+My original performance testing was done with an Ubuntu generic
+configuration. This configuration has the CONFIG_FUNCTION_TRACER
+option which was incompatible with PIE. The tracer failed to replace
+the __fentry__ call by a nop slide on each traceable function because
+the instruction was not the one expected. If PIE is enabled, gcc
+generates a difference call instruction based on the GOT without
+checking the visibility options (basically call *__fentry__@GOTPCREL).
 
-diff --git a/Documentation/crypto/api-samples.rst b/Documentation/crypto/api-samples.rst
-index 2531948..006827e 100644
---- a/Documentation/crypto/api-samples.rst
-+++ b/Documentation/crypto/api-samples.rst
-@@ -7,59 +7,27 @@ Code Example For Symmetric Key Cipher Operation
- ::
- 
- 
--    struct tcrypt_result {
--        struct completion completion;
--        int err;
--    };
--
-     /* tie all data structures together */
-     struct skcipher_def {
-         struct scatterlist sg;
-         struct crypto_skcipher *tfm;
-         struct skcipher_request *req;
--        struct tcrypt_result result;
-+        struct crypto_wait wait;
-     };
- 
--    /* Callback function */
--    static void test_skcipher_cb(struct crypto_async_request *req, int error)
--    {
--        struct tcrypt_result *result = req->data;
--
--        if (error == -EINPROGRESS)
--            return;
--        result->err = error;
--        complete(&result->completion);
--        pr_info("Encryption finished successfully\n");
--    }
--
-     /* Perform cipher operation */
-     static unsigned int test_skcipher_encdec(struct skcipher_def *sk,
-                          int enc)
-     {
--        int rc = 0;
-+        int rc;
- 
-         if (enc)
--            rc = crypto_skcipher_encrypt(sk->req);
-+            rc = crypto_wait_req(crypto_skcipher_encrypt(sk->req), &sk->wait);
-         else
--            rc = crypto_skcipher_decrypt(sk->req);
--
--        switch (rc) {
--        case 0:
--            break;
--        case -EINPROGRESS:
--        case -EBUSY:
--            rc = wait_for_completion_interruptible(
--                &sk->result.completion);
--            if (!rc && !sk->result.err) {
--                reinit_completion(&sk->result.completion);
--                break;
--            }
--        default:
--            pr_info("skcipher encrypt returned with %d result %d\n",
--                rc, sk->result.err);
--            break;
--        }
--        init_completion(&sk->result.completion);
-+            rc = crypto_wait_req(crypto_skcipher_decrypt(sk->req), &sk->wait);
-+
-+	if (rc)
-+		pr_info("skcipher encrypt returned with result %d\n", rc);
- 
-         return rc;
-     }
-@@ -89,8 +57,8 @@ Code Example For Symmetric Key Cipher Operation
-         }
- 
-         skcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
--                          test_skcipher_cb,
--                          &sk.result);
-+                          crypto_req_done,
-+                          &sk.wait);
- 
-         /* AES 256 with random key */
-         get_random_bytes(&key, 32);
-@@ -122,7 +90,7 @@ Code Example For Symmetric Key Cipher Operation
-         /* We encrypt one block */
-         sg_init_one(&sk.sg, scratchpad, 16);
-         skcipher_request_set_crypt(req, &sk.sg, &sk.sg, 16, ivdata);
--        init_completion(&sk.result.completion);
-+        crypto_init_wait(&sk.wait);
- 
-         /* encrypt data */
-         ret = test_skcipher_encdec(&sk, 1);
+With the fix for function tracing, the hackbench results have an
+average of +0.8 to +1.4% (from +8% to +10% before). With a default
+configuration, the numbers are closer to 0.8%.
+
+On the .text size, with gcc 4.9 I see +0.8% on default configuration
+and +1.180% on the ubuntu configuration.
+
+Next iteration should have an updated set of performance metrics (will
+try to use gcc 6.0 or higher) and incorporate the fix on function
+tracing.
+
+Let me know if you have questions and feedback.
+
+>
+> >
+> > So I'm still unhappy about this all, and about the attitude surrounding it.
+> >
+> > Thanks,
+> >
+> >         Ingo
+>
+>
+>
+>
+> --
+> Thomas
+
+
+
+
 -- 
-2.1.4
+Thomas
