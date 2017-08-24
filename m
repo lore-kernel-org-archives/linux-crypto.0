@@ -1,7 +1,7 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH v7 02/19] crypto: ccp: use -EAGAIN for transient busy indication
-Date: Thu, 24 Aug 2017 17:18:49 +0300
-Message-ID: <1503584350-7831-3-git-send-email-gilad@benyossef.com>
+Subject: [PATCH v7 04/19] crypto: marvell/cesa: remove redundant backlog checks on EBUSY
+Date: Thu, 24 Aug 2017 17:18:51 +0300
+Message-ID: <1503584350-7831-5-git-send-email-gilad@benyossef.com>
 References: <1503584350-7831-1-git-send-email-gilad@benyossef.com>
 Cc: Ofir Drang <ofir.drang@arm.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
@@ -22,66 +22,52 @@ To: Herbert Xu <herbert@gondor.apana.org.au>,
         Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
         James Morris <james.l.morris@oracle.com>,
         "Serge E. Hallyn" <serge@hallyn.com>, linux-crypto@v
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from foss.arm.com ([217.140.101.70]:41774 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752358AbdHXOUP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 24 Aug 2017 10:20:15 -0400
 In-Reply-To: <1503584350-7831-1-git-send-email-gilad@benyossef.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Replace -EBUSY with -EAGAIN when reporting transient busy
-indication in the absence of backlog.
+Now that -EBUSY return code only indicates backlog queueing
+we can safely remove the now redundant check for the
+CRYPTO_TFM_REQ_MAY_BACKLOG flag when -EBUSY is returned.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
-Reviewed-by: Gary R Hook <gary.hook@amd.com>
+Acked-by: Boris Brezillon <boris.brezillon@free-electrons.com>
 ---
- drivers/crypto/ccp/ccp-crypto-main.c | 8 +++-----
- drivers/crypto/ccp/ccp-dev.c         | 7 +++++--
- 2 files changed, 8 insertions(+), 7 deletions(-)
+ drivers/crypto/marvell/cesa.c | 3 +--
+ drivers/crypto/marvell/cesa.h | 2 +-
+ 2 files changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/ccp/ccp-crypto-main.c b/drivers/crypto/ccp/ccp-crypto-main.c
-index 35a9de7..403ff0a 100644
---- a/drivers/crypto/ccp/ccp-crypto-main.c
-+++ b/drivers/crypto/ccp/ccp-crypto-main.c
-@@ -222,9 +222,10 @@ static int ccp_crypto_enqueue_cmd(struct ccp_crypto_cmd *crypto_cmd)
+diff --git a/drivers/crypto/marvell/cesa.c b/drivers/crypto/marvell/cesa.c
+index 6e7a5c7..0c3909d 100644
+--- a/drivers/crypto/marvell/cesa.c
++++ b/drivers/crypto/marvell/cesa.c
+@@ -183,8 +183,7 @@ int mv_cesa_queue_req(struct crypto_async_request *req,
+ 	spin_lock_bh(&engine->lock);
+ 	ret = crypto_enqueue_request(&engine->queue, req);
+ 	if ((mv_cesa_req_get_type(creq) == CESA_DMA_REQ) &&
+-	    (ret == -EINPROGRESS ||
+-	    (ret == -EBUSY && req->flags & CRYPTO_TFM_REQ_MAY_BACKLOG)))
++	    (ret == -EINPROGRESS || ret == -EBUSY))
+ 		mv_cesa_tdma_chain(engine, creq);
+ 	spin_unlock_bh(&engine->lock);
  
- 	/* Check if the cmd can/should be queued */
- 	if (req_queue.cmd_count >= CCP_CRYPTO_MAX_QLEN) {
--		ret = -EBUSY;
--		if (!(crypto_cmd->cmd->flags & CCP_CMD_MAY_BACKLOG))
-+		if (!(crypto_cmd->cmd->flags & CCP_CMD_MAY_BACKLOG)) {
-+			ret = -EAGAIN;
- 			goto e_lock;
-+		}
- 	}
+diff --git a/drivers/crypto/marvell/cesa.h b/drivers/crypto/marvell/cesa.h
+index b7872f6..63c8457 100644
+--- a/drivers/crypto/marvell/cesa.h
++++ b/drivers/crypto/marvell/cesa.h
+@@ -763,7 +763,7 @@ static inline int mv_cesa_req_needs_cleanup(struct crypto_async_request *req,
+ 	 * the backlog and will be processed later. There's no need to
+ 	 * clean it up.
+ 	 */
+-	if (ret == -EBUSY && req->flags & CRYPTO_TFM_REQ_MAY_BACKLOG)
++	if (ret == -EBUSY)
+ 		return false;
  
- 	/* Look for an entry with the same tfm.  If there is a cmd
-@@ -243,9 +244,6 @@ static int ccp_crypto_enqueue_cmd(struct ccp_crypto_cmd *crypto_cmd)
- 		ret = ccp_enqueue_cmd(crypto_cmd->cmd);
- 		if (!ccp_crypto_success(ret))
- 			goto e_lock;	/* Error, don't queue it */
--		if ((ret == -EBUSY) &&
--		    !(crypto_cmd->cmd->flags & CCP_CMD_MAY_BACKLOG))
--			goto e_lock;	/* Not backlogging, don't queue it */
- 	}
- 
- 	if (req_queue.cmd_count >= CCP_CRYPTO_MAX_QLEN) {
-diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
-index 4e029b1..3d637e3 100644
---- a/drivers/crypto/ccp/ccp-dev.c
-+++ b/drivers/crypto/ccp/ccp-dev.c
-@@ -292,9 +292,12 @@ int ccp_enqueue_cmd(struct ccp_cmd *cmd)
- 	i = ccp->cmd_q_count;
- 
- 	if (ccp->cmd_count >= MAX_CMD_QLEN) {
--		ret = -EBUSY;
--		if (cmd->flags & CCP_CMD_MAY_BACKLOG)
-+		if (cmd->flags & CCP_CMD_MAY_BACKLOG) {
-+			ret = -EBUSY;
- 			list_add_tail(&cmd->entry, &ccp->backlog);
-+		} else {
-+			ret = -EAGAIN;
-+		}
- 	} else {
- 		ret = -EINPROGRESS;
- 		ccp->cmd_count++;
+ 	/* Request wasn't queued, we need to clean it up */
 -- 
 2.1.4
