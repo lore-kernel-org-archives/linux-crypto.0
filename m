@@ -1,7 +1,7 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH v7 04/19] crypto: marvell/cesa: remove redundant backlog checks on EBUSY
-Date: Thu, 24 Aug 2017 17:18:51 +0300
-Message-ID: <1503584350-7831-5-git-send-email-gilad@benyossef.com>
+Subject: [PATCH v7 03/19] crypto: remove redundant backlog checks on EBUSY
+Date: Thu, 24 Aug 2017 17:18:50 +0300
+Message-ID: <1503584350-7831-4-git-send-email-gilad@benyossef.com>
 References: <1503584350-7831-1-git-send-email-gilad@benyossef.com>
 Cc: Ofir Drang <ofir.drang@arm.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
@@ -22,52 +22,184 @@ To: Herbert Xu <herbert@gondor.apana.org.au>,
         Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
         James Morris <james.l.morris@oracle.com>,
         "Serge E. Hallyn" <serge@hallyn.com>, linux-crypto@v
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:41774 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752358AbdHXOUP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Aug 2017 10:20:15 -0400
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1503584350-7831-1-git-send-email-gilad@benyossef.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 Now that -EBUSY return code only indicates backlog queueing
 we can safely remove the now redundant check for the
 CRYPTO_TFM_REQ_MAY_BACKLOG flag when -EBUSY is returned.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
-Acked-by: Boris Brezillon <boris.brezillon@free-electrons.com>
 ---
- drivers/crypto/marvell/cesa.c | 3 +--
- drivers/crypto/marvell/cesa.h | 2 +-
- 2 files changed, 2 insertions(+), 3 deletions(-)
+ crypto/ahash.c        | 12 +++---------
+ crypto/cts.c          |  6 ++----
+ crypto/lrw.c          |  8 ++------
+ crypto/rsa-pkcs1pad.c | 16 ++++------------
+ crypto/xts.c          |  8 ++------
+ 5 files changed, 13 insertions(+), 37 deletions(-)
 
-diff --git a/drivers/crypto/marvell/cesa.c b/drivers/crypto/marvell/cesa.c
-index 6e7a5c7..0c3909d 100644
---- a/drivers/crypto/marvell/cesa.c
-+++ b/drivers/crypto/marvell/cesa.c
-@@ -183,8 +183,7 @@ int mv_cesa_queue_req(struct crypto_async_request *req,
- 	spin_lock_bh(&engine->lock);
- 	ret = crypto_enqueue_request(&engine->queue, req);
- 	if ((mv_cesa_req_get_type(creq) == CESA_DMA_REQ) &&
--	    (ret == -EINPROGRESS ||
--	    (ret == -EBUSY && req->flags & CRYPTO_TFM_REQ_MAY_BACKLOG)))
-+	    (ret == -EINPROGRESS || ret == -EBUSY))
- 		mv_cesa_tdma_chain(engine, creq);
- 	spin_unlock_bh(&engine->lock);
+diff --git a/crypto/ahash.c b/crypto/ahash.c
+index 5e8666e..3a35d67 100644
+--- a/crypto/ahash.c
++++ b/crypto/ahash.c
+@@ -334,9 +334,7 @@ static int ahash_op_unaligned(struct ahash_request *req,
+ 		return err;
  
-diff --git a/drivers/crypto/marvell/cesa.h b/drivers/crypto/marvell/cesa.h
-index b7872f6..63c8457 100644
---- a/drivers/crypto/marvell/cesa.h
-+++ b/drivers/crypto/marvell/cesa.h
-@@ -763,7 +763,7 @@ static inline int mv_cesa_req_needs_cleanup(struct crypto_async_request *req,
- 	 * the backlog and will be processed later. There's no need to
- 	 * clean it up.
- 	 */
--	if (ret == -EBUSY && req->flags & CRYPTO_TFM_REQ_MAY_BACKLOG)
-+	if (ret == -EBUSY)
- 		return false;
+ 	err = op(req);
+-	if (err == -EINPROGRESS ||
+-	    (err == -EBUSY && (ahash_request_flags(req) &
+-			       CRYPTO_TFM_REQ_MAY_BACKLOG)))
++	if (err == -EINPROGRESS || err == -EBUSY)
+ 		return err;
  
- 	/* Request wasn't queued, we need to clean it up */
+ 	ahash_restore_req(req, err);
+@@ -394,9 +392,7 @@ static int ahash_def_finup_finish1(struct ahash_request *req, int err)
+ 	req->base.complete = ahash_def_finup_done2;
+ 
+ 	err = crypto_ahash_reqtfm(req)->final(req);
+-	if (err == -EINPROGRESS ||
+-	    (err == -EBUSY && (ahash_request_flags(req) &
+-			       CRYPTO_TFM_REQ_MAY_BACKLOG)))
++	if (err == -EINPROGRESS || err == -EBUSY)
+ 		return err;
+ 
+ out:
+@@ -432,9 +428,7 @@ static int ahash_def_finup(struct ahash_request *req)
+ 		return err;
+ 
+ 	err = tfm->update(req);
+-	if (err == -EINPROGRESS ||
+-	    (err == -EBUSY && (ahash_request_flags(req) &
+-			       CRYPTO_TFM_REQ_MAY_BACKLOG)))
++	if (err == -EINPROGRESS || err == -EBUSY)
+ 		return err;
+ 
+ 	return ahash_def_finup_finish1(req, err);
+diff --git a/crypto/cts.c b/crypto/cts.c
+index 243f591..4773c18 100644
+--- a/crypto/cts.c
++++ b/crypto/cts.c
+@@ -136,8 +136,7 @@ static void crypto_cts_encrypt_done(struct crypto_async_request *areq, int err)
+ 		goto out;
+ 
+ 	err = cts_cbc_encrypt(req);
+-	if (err == -EINPROGRESS ||
+-	    (err == -EBUSY && req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
++	if (err == -EINPROGRESS || err == -EBUSY)
+ 		return;
+ 
+ out:
+@@ -229,8 +228,7 @@ static void crypto_cts_decrypt_done(struct crypto_async_request *areq, int err)
+ 		goto out;
+ 
+ 	err = cts_cbc_decrypt(req);
+-	if (err == -EINPROGRESS ||
+-	    (err == -EBUSY && req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
++	if (err == -EINPROGRESS || err == -EBUSY)
+ 		return;
+ 
+ out:
+diff --git a/crypto/lrw.c b/crypto/lrw.c
+index a8bfae4..695cea9 100644
+--- a/crypto/lrw.c
++++ b/crypto/lrw.c
+@@ -328,9 +328,7 @@ static int do_encrypt(struct skcipher_request *req, int err)
+ 		      crypto_skcipher_encrypt(subreq) ?:
+ 		      post_crypt(req);
+ 
+-		if (err == -EINPROGRESS ||
+-		    (err == -EBUSY &&
+-		     req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
++		if (err == -EINPROGRESS || err == -EBUSY)
+ 			return err;
+ 	}
+ 
+@@ -380,9 +378,7 @@ static int do_decrypt(struct skcipher_request *req, int err)
+ 		      crypto_skcipher_decrypt(subreq) ?:
+ 		      post_crypt(req);
+ 
+-		if (err == -EINPROGRESS ||
+-		    (err == -EBUSY &&
+-		     req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
++		if (err == -EINPROGRESS || err == -EBUSY)
+ 			return err;
+ 	}
+ 
+diff --git a/crypto/rsa-pkcs1pad.c b/crypto/rsa-pkcs1pad.c
+index 407c64b..2908f93 100644
+--- a/crypto/rsa-pkcs1pad.c
++++ b/crypto/rsa-pkcs1pad.c
+@@ -279,9 +279,7 @@ static int pkcs1pad_encrypt(struct akcipher_request *req)
+ 				   req->dst, ctx->key_size - 1, req->dst_len);
+ 
+ 	err = crypto_akcipher_encrypt(&req_ctx->child_req);
+-	if (err != -EINPROGRESS &&
+-			(err != -EBUSY ||
+-			 !(req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG)))
++	if (err != -EINPROGRESS && err != -EBUSY)
+ 		return pkcs1pad_encrypt_sign_complete(req, err);
+ 
+ 	return err;
+@@ -383,9 +381,7 @@ static int pkcs1pad_decrypt(struct akcipher_request *req)
+ 				   ctx->key_size);
+ 
+ 	err = crypto_akcipher_decrypt(&req_ctx->child_req);
+-	if (err != -EINPROGRESS &&
+-			(err != -EBUSY ||
+-			 !(req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG)))
++	if (err != -EINPROGRESS && err != -EBUSY)
+ 		return pkcs1pad_decrypt_complete(req, err);
+ 
+ 	return err;
+@@ -440,9 +436,7 @@ static int pkcs1pad_sign(struct akcipher_request *req)
+ 				   req->dst, ctx->key_size - 1, req->dst_len);
+ 
+ 	err = crypto_akcipher_sign(&req_ctx->child_req);
+-	if (err != -EINPROGRESS &&
+-			(err != -EBUSY ||
+-			 !(req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG)))
++	if (err != -EINPROGRESS && err != -EBUSY)
+ 		return pkcs1pad_encrypt_sign_complete(req, err);
+ 
+ 	return err;
+@@ -561,9 +555,7 @@ static int pkcs1pad_verify(struct akcipher_request *req)
+ 				   ctx->key_size);
+ 
+ 	err = crypto_akcipher_verify(&req_ctx->child_req);
+-	if (err != -EINPROGRESS &&
+-			(err != -EBUSY ||
+-			 !(req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG)))
++	if (err != -EINPROGRESS && err != -EBUSY)
+ 		return pkcs1pad_verify_complete(req, err);
+ 
+ 	return err;
+diff --git a/crypto/xts.c b/crypto/xts.c
+index d86c11a..af68012 100644
+--- a/crypto/xts.c
++++ b/crypto/xts.c
+@@ -269,9 +269,7 @@ static int do_encrypt(struct skcipher_request *req, int err)
+ 		      crypto_skcipher_encrypt(subreq) ?:
+ 		      post_crypt(req);
+ 
+-		if (err == -EINPROGRESS ||
+-		    (err == -EBUSY &&
+-		     req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
++		if (err == -EINPROGRESS || err == -EBUSY)
+ 			return err;
+ 	}
+ 
+@@ -321,9 +319,7 @@ static int do_decrypt(struct skcipher_request *req, int err)
+ 		      crypto_skcipher_decrypt(subreq) ?:
+ 		      post_crypt(req);
+ 
+-		if (err == -EINPROGRESS ||
+-		    (err == -EBUSY &&
+-		     req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
++		if (err == -EINPROGRESS || err == -EBUSY)
+ 			return err;
+ 	}
+ 
 -- 
 2.1.4
