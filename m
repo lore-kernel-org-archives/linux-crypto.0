@@ -1,62 +1,58 @@
-From: Ingo Molnar <mingo@kernel.org>
-Subject: Re: x86: PIE support and option to extend KASLR randomization
-Date: Fri, 25 Aug 2017 10:04:43 +0200
-Message-ID: <20170825080443.tvvr6wzs362cjcuu@gmail.com>
-References: <20170810172615.51965-1-thgarnie@google.com>
- <20170811124127.kkb5pnkljz4umxuj@gmail.com>
- <CAJcbSZFTX3uiS2g8JriS6+z_+WrG8z3hrQo4OSuyHpiyUDJWYA@mail.gmail.com>
- <20170815075609.mmzbfwritjzvrpsn@gmail.com>
- <CAJcbSZE+TiY2whT94WqCJNXzR=2ATOHcQ10H5RqBZA1j=k1VHQ@mail.gmail.com>
- <20170816151235.oamkdva6cwpc4cex@gmail.com>
- <CAJcbSZFM_zpL1av1JVaow8NdsGeH+6oZKeDnMPdXR0PGfynzsg@mail.gmail.com>
- <20170817080920.5ljlkktngw2cisfg@gmail.com>
- <CAJcbSZGbtc-i0X1NiBAvZA7cxpGkwSLKNB7oDNCsFxOCdhkR_g@mail.gmail.com>
- <CAJcbSZGhvwt=5ERtBHLJnwS=6AXBZLTMfrafzeUCqYy=-MKWDg@mail.gmail.com>
+From: Jaslin Ikhsan <dr.jaslin.ikhsan77@gmail.com>
+Subject: Dear God's Select,
+Date: Fri, 25 Aug 2017 04:54:58 -0700
+Message-ID: <CAHt0-7SyAgKnp5mywaJMySuG-y_sC-UBo_YFBqLttYsC4rSS4A@mail.gmail.com>
+Reply-To: mrs.jaslin.ikhsan12@gmail.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Josh Poimboeuf <jpoimboe@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
-	Matthias Kaehlcke <mka@chromium.org>,
-	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-	Juergen Gross <jgross@suse.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-	Joerg Roedel <joro@8bytes.org>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Andy Lutomirski <luto@kernel.org>, Borislav Petkov <bp@suse.de>,
-	Brian Gerst <brgerst@gmail.com>,
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-	"Rafael J . Wysocki" <rjw@rjwysocki.net>,
-	Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
-	Tejun Heo <tj@kernel.org>, Christoph Lamete
-To: Thomas Garnier <thgarnie@google.com>
-Return-path: <kernel-hardening-return-9560-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
-List-Post: <mailto:kernel-hardening@lists.openwall.com>
-List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
-List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
-List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
-Sender: Ingo Molnar <mingo.kernel.org@gmail.com>
-Content-Disposition: inline
-In-Reply-To: <CAJcbSZGhvwt=5ERtBHLJnwS=6AXBZLTMfrafzeUCqYy=-MKWDg@mail.gmail.com>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+To: undisclosed-recipients:;
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-qk0-f194.google.com ([209.85.220.194]:38676 "EHLO
+        mail-qk0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754625AbdHYLzA (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 25 Aug 2017 07:55:00 -0400
+Received: by mail-qk0-f194.google.com with SMTP id o63so1836289qkb.5
+        for <linux-crypto@vger.kernel.org>; Fri, 25 Aug 2017 04:54:59 -0700 (PDT)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
+Dear God's Select,
 
-* Thomas Garnier <thgarnie@google.com> wrote:
+I am writing this mail to you with heavy tears In my eyes and great
+sorrow in my heart, My Name is Mrs.Jaslin Ikhsan, and I am contacting
+you from my country Tunisia I want to tell you this because I don't
+have any other option than to tell you as I was touched to open up to
+you, I married to Mr. Ouedrago Daisy Brown who worked with Tunisia
+embassy in Burkina Faso for nine years before he died in the year
+2005.We were married for eleven years without a child.
 
-> With the fix for function tracing, the hackbench results have an
-> average of +0.8 to +1.4% (from +8% to +10% before). With a default
-> configuration, the numbers are closer to 0.8%.
-> 
-> On the .text size, with gcc 4.9 I see +0.8% on default configuration
-> and +1.180% on the ubuntu configuration.
+He died after a brief illness that lasted for only five days. Since
+his death I decided not to remarry, When my late husband was alive he
+deposited the sum of US$ 8.5m (Eight Million Five hundred Thousand
+Dollars) in a bank in Ouagadougou the capital city of Burkina Faso in
+west Africa Presently this money is still in bank. He made this money
+available for exportation of Gold from Burkina Faso mining.
 
-A 1% text size increase is still significant. Could you look at the disassembly, 
-where does the size increase come from?
+Recently, My Doctor told me that I would not last for the period of
+seven months due to cancer problem. The one that disturbs me most is
+my stroke sickness .Having known my condition I decided to hand you
+over this money to take care of the less-privileged people, you will
+utilize this money the way I am going to instruct herein.
 
-Thanks,
+I want you to take 30 Percent of the total money for your personal use
+While 70% of the money will go to charity" people in the street and
+helping the orphanage. I grew up as an Orphan and I don't have any
+body as my family member, just to endeavour that the house of God is
+maintained. Am doing this so that God will forgive my sins and accept
+my soul because these sicknesses have suffered me so much.
 
-	Ingo
+As soon a s I receive your reply I shall give you the contact of the
+bank in Burkina Faso and I will also instruct the Bank Manger to issue
+you an authority letter that will prove you the present beneficiary of
+the money in the bank that is if you assure me that you will act
+accordingly as I Stated herein.
+
+Always reply to my alternative for security purposes.
+Hoping to receive your reply:
+>From Mrs.Jaslin Ikhsan
