@@ -1,50 +1,39 @@
-From: Christopher Lameter <cl@linux.com>
-Subject: Re: Re: x86: PIE support and option to extend
- KASLR randomization
-Date: Fri, 25 Aug 2017 10:38:18 -0500 (CDT)
-Message-ID: <alpine.DEB.2.20.1708251036150.5830@nuc-kabylake>
-References: <20170810172615.51965-1-thgarnie@google.com> <20170811124127.kkb5pnkljz4umxuj@gmail.com> <CAJcbSZFTX3uiS2g8JriS6+z_+WrG8z3hrQo4OSuyHpiyUDJWYA@mail.gmail.com> <20170815075609.mmzbfwritjzvrpsn@gmail.com> <CAJcbSZE+TiY2whT94WqCJNXzR=2ATOHcQ10H5RqBZA1j=k1VHQ@mail.gmail.com>
- <20170816151235.oamkdva6cwpc4cex@gmail.com> <CAJcbSZFM_zpL1av1JVaow8NdsGeH+6oZKeDnMPdXR0PGfynzsg@mail.gmail.com> <20170817080920.5ljlkktngw2cisfg@gmail.com> <CAFUG7CdUEFYANSGRuNX0Xt1TJ0Z7f+M_ERgR03dUVxVqLENLpw@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Cc: Ingo Molnar <mingo@kernel.org>, Thomas Garnier <thgarnie@google.com>,
-    Herbert Xu <herbert@gondor.apana.org.au>,
-    "David S . Miller" <davem@davemloft.net>,
-    Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
-    "H . Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>,
-    Josh Poimboeuf <jpoimboe@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
-    Matthias Kaehlcke <mka@chromium.org>,
-    Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-    Juergen Gross <jgross@suse.com>, Paolo Bonzini <pbonzini@redhat.com>,
-    =?ISO-8859-2?Q?Radim_Kr=E8m=E1=F8?= <rkrcmar@redhat.com>,
-    Joerg Roedel <joro@8bytes.org>, Tom Lendacky <thomas.lendacky@amd.com>,
-    Andy Lutomirski <luto@kernel.org>, Borislav Petkov <bp@suse.de>,
-    Brian Gerst <brgerst@gmail.com>,
-    "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-    "Rafael J . Wysocki"
-To: Boris Lukashev <blukashev@sempervictus.com>
-Return-path: <kernel-hardening-return-9565-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
-List-Post: <mailto:kernel-hardening@lists.openwall.com>
-List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
-List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
-List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
-In-Reply-To: <CAFUG7CdUEFYANSGRuNX0Xt1TJ0Z7f+M_ERgR03dUVxVqLENLpw@mail.gmail.com>
-List-Id: linux-crypto.vger.kernel.org
+From: Arvind Yadav <arvind.yadav.cs@gmail.com>
+Subject: [PATCH] crypto: padlock-aes: constify x86_cpu_id
+Date: Fri, 25 Aug 2017 23:53:42 +0530
+Message-ID: <b9707729957fe75e016b7f99d11d801e7d993027.1503685229.git.arvind.yadav.cs@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au, davem@davemloft.net
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pg0-f67.google.com ([74.125.83.67]:38477 "EHLO
+        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756367AbdHYSXw (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 25 Aug 2017 14:23:52 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
+x86_cpu_id are not supposed to change at runtime. MODULE_DEVICE_TABLE
+and x86_match_cpu are working with const x86_cpu_id. So mark the
+non-const x86_cpu_id structs as const.
 
+Signed-off-by: Arvind Yadav <arvind.yadav.cs@gmail.com>
+---
+ drivers/crypto/padlock-aes.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On Thu, 17 Aug 2017, Boris Lukashev wrote:
-
-> Is the expectation then to have security functions also decrease size
-> and operational latency? Seems a bit unrealistic if so.
-> 1-2% performance hit on systems which have become at least several
-> hundred % faster over recent years is not a significant performance
-> regression compared to the baseline before.
-
-Where do you get these fantastic numbers? Where can I buy a system like
-that? Commonly we see regressions with single threaded integer
-performance on most newer processor generations.
-
-These hundreds of percent improvement can only come from floating point
-performance using specialized instructions. There are only a very limited
-number of applications that can make use of it.
+diff --git a/drivers/crypto/padlock-aes.c b/drivers/crypto/padlock-aes.c
+index b386974..4b6642a 100644
+--- a/drivers/crypto/padlock-aes.c
++++ b/drivers/crypto/padlock-aes.c
+@@ -482,7 +482,7 @@ static struct crypto_alg cbc_aes_alg = {
+ 	}
+ };
+ 
+-static struct x86_cpu_id padlock_cpu_id[] = {
++static const struct x86_cpu_id padlock_cpu_id[] = {
+ 	X86_FEATURE_MATCH(X86_FEATURE_XCRYPT),
+ 	{}
+ };
+-- 
+2.7.4
