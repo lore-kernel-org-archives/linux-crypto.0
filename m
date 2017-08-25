@@ -1,39 +1,77 @@
-From: Arvind Yadav <arvind.yadav.cs@gmail.com>
-Subject: [PATCH] crypto: padlock-sha: constify x86_cpu_id
-Date: Fri, 25 Aug 2017 23:53:59 +0530
-Message-ID: <65b824f997b05b65cdd76e41d2e6dda631d5b684.1503685310.git.arvind.yadav.cs@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au, davem@davemloft.net
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pg0-f67.google.com ([74.125.83.67]:36248 "EHLO
-        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1758012AbdHYSYK (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Aug 2017 14:24:10 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH v2 1/4] crypto: jz4780-rng: Add JZ4780 PRNG devicetree
+ binding documentation
+Date: Fri, 25 Aug 2017 16:57:34 -0500
+Message-ID: <20170825215734.f5rc7fzxpl3ynnwl@rob-hp-laptop>
+References: <20170823025707.27888-1-prasannatsmkumar@gmail.com>
+ <20170823025707.27888-2-prasannatsmkumar@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+        mark.rutland@arm.com, ralf@linux-mips.org, paul@crapouillou.net,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-mips@linux-mips.org, malat@debian.org, noloader@gmail.com
+To: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Return-path: <linux-mips-bounce@linux-mips.org>
+Content-Disposition: inline
+In-Reply-To: <20170823025707.27888-2-prasannatsmkumar@gmail.com>
+Sender: linux-mips-bounce@linux-mips.org
+Errors-to: linux-mips-bounce@linux-mips.org
+List-help: <mailto:ecartis@linux-mips.org?Subject=help>
+List-unsubscribe: <mailto:ecartis@linux-mips.org?subject=unsubscribe%20linux-mips>
+List-software: Ecartis version 1.0.0
+List-subscribe: <mailto:ecartis@linux-mips.org?subject=subscribe%20linux-mips>
+List-owner: <mailto:ralf@linux-mips.org>
+List-post: <mailto:linux-mips@linux-mips.org>
+List-archive: <http://www.linux-mips.org/archives/linux-mips/>
+List-Id: linux-crypto.vger.kernel.org
 
-x86_cpu_id are not supposed to change at runtime. MODULE_DEVICE_TABLE
-and x86_match_cpu are working with const x86_cpu_id. So mark the
-non-const x86_cpu_id structs as const.
+On Wed, Aug 23, 2017 at 08:27:04AM +0530, PrasannaKumar Muralidharan wrote:
+> Add devicetree bindings for hardware pseudo random number generator
+> present in Ingenic JZ4780 SoC.
+> 
+> Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+> ---
+> Changes in v2:
+> * Add "syscon" in CGU node's compatible section
+> * Make RNG child node of CGU.
+> 
+>  .../bindings/crypto/ingenic,jz4780-rng.txt           | 20 ++++++++++++++++++++
 
-Signed-off-by: Arvind Yadav <arvind.yadav.cs@gmail.com>
----
- drivers/crypto/padlock-sha.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+bindings/rng/ for RNG h/w.
 
-diff --git a/drivers/crypto/padlock-sha.c b/drivers/crypto/padlock-sha.c
-index bc72d20..d32c793 100644
---- a/drivers/crypto/padlock-sha.c
-+++ b/drivers/crypto/padlock-sha.c
-@@ -509,7 +509,7 @@ static struct shash_alg sha256_alg_nano = {
- 	}
- };
- 
--static struct x86_cpu_id padlock_sha_ids[] = {
-+static const struct x86_cpu_id padlock_sha_ids[] = {
- 	X86_FEATURE_MATCH(X86_FEATURE_PHE),
- 	{}
- };
--- 
-2.7.4
+>  1 file changed, 20 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/crypto/ingenic,jz4780-rng.txt
+> 
+> diff --git a/Documentation/devicetree/bindings/crypto/ingenic,jz4780-rng.txt b/Documentation/devicetree/bindings/crypto/ingenic,jz4780-rng.txt
+> new file mode 100644
+> index 0000000..a0c18e5
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/crypto/ingenic,jz4780-rng.txt
+> @@ -0,0 +1,20 @@
+> +Ingenic jz4780 RNG driver
+> +
+> +Required properties:
+> +- compatible : Should be "ingenic,jz4780-rng"
+> +
+> +Example:
+> +
+> +cgu: jz4780-cgu@10000000 {
+> +	compatible = "ingenic,jz4780-cgu", "syscon";
+> +	reg = <0x10000000 0x100>;
+> +
+> +	clocks = <&ext>, <&rtc>;
+> +	clock-names = "ext", "rtc";
+> +
+> +	#clock-cells = <1>;
+> +
+> +	rng: rng@d8 {
+
+unit-address requires reg property.
+
+> +		compatible = "ingenic,jz480-rng";
+> +	};
+> +};
+> -- 
+> 2.10.0
+> 
