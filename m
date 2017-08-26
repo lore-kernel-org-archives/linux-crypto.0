@@ -1,58 +1,40 @@
 From: Himanshu Jha <himanshujha199640@gmail.com>
-Subject: [PATCH 1/2] crypto: n2 - remove null check before kfree
-Date: Sun, 27 Aug 2017 02:45:29 +0530
-Message-ID: <1503782130-10137-2-git-send-email-himanshujha199640@gmail.com>
+Subject: [PATCH 2/2] crypto: inside-secure - remove null check before kfree
+Date: Sun, 27 Aug 2017 02:45:30 +0530
+Message-ID: <1503782130-10137-3-git-send-email-himanshujha199640@gmail.com>
 References: <1503782130-10137-1-git-send-email-himanshujha199640@gmail.com>
 Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         Himanshu Jha <himanshujha199640@gmail.com>
 To: herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pg0-f67.google.com ([74.125.83.67]:36572 "EHLO
-        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751083AbdHZVQI (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 26 Aug 2017 17:16:08 -0400
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1503782130-10137-1-git-send-email-himanshujha199640@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-kfree on NULL pointer is a no-op and therefore checking it is redundant.
+Kfree on NULL pointer is a no-op and therefore checking is redundant.
 
 Signed-off-by: Himanshu Jha <himanshujha199640@gmail.com>
 ---
- drivers/crypto/n2_core.c | 12 ++++--------
- 1 file changed, 4 insertions(+), 8 deletions(-)
+ drivers/crypto/inside-secure/safexcel_hash.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/crypto/n2_core.c b/drivers/crypto/n2_core.c
-index a9fd8b9..48de52c 100644
---- a/drivers/crypto/n2_core.c
-+++ b/drivers/crypto/n2_core.c
-@@ -1962,10 +1962,8 @@ static struct n2_crypto *alloc_n2cp(void)
- 
- static void free_n2cp(struct n2_crypto *np)
- {
--	if (np->cwq_info.ino_table) {
--		kfree(np->cwq_info.ino_table);
--		np->cwq_info.ino_table = NULL;
+diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
+index 3f81939..9c32bbb 100644
+--- a/drivers/crypto/inside-secure/safexcel_hash.c
++++ b/drivers/crypto/inside-secure/safexcel_hash.c
+@@ -308,10 +308,8 @@ static int safexcel_ahash_send(struct crypto_async_request *async, int ring,
+ 		ctx->base.cache_sz = 0;
+ 	}
+ free_cache:
+-	if (ctx->base.cache) {
+-		kfree(ctx->base.cache);
+-		ctx->base.cache = NULL;
 -	}
-+	kfree(np->cwq_info.ino_table);
-+	np->cwq_info.ino_table = NULL;
++	kfree(ctx->base.cache);
++	ctx->base.cache = NULL;
  
- 	kfree(np);
- }
-@@ -2079,10 +2077,8 @@ static struct n2_mau *alloc_ncp(void)
- 
- static void free_ncp(struct n2_mau *mp)
- {
--	if (mp->mau_info.ino_table) {
--		kfree(mp->mau_info.ino_table);
--		mp->mau_info.ino_table = NULL;
--	}
-+	kfree(mp->mau_info.ino_table);
-+	mp->mau_info.ino_table = NULL;
- 
- 	kfree(mp);
- }
+ unlock:
+ 	spin_unlock_bh(&priv->ring[ring].egress_lock);
 -- 
 2.7.4
