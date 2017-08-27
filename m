@@ -1,78 +1,67 @@
-From: Himanshu Jha <himanshujha199640@gmail.com>
-Subject: [PATCH] crypto: Use PTR_ERR_ZERO
-Date: Sun, 27 Aug 2017 11:52:48 +0530
-Message-ID: <1503814968-8798-1-git-send-email-himanshujha199640@gmail.com>
-Cc: davem@davemloft.net, arno@natisbad.org,
-        boris.brezillon@free-electrons.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Himanshu Jha <himanshujha199640@gmail.com>
-To: herbert@gondor.apana.org.au
+From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Subject: Re: [PATCH v2 0/4] crypto: Add driver for JZ4780 PRNG
+Date: Sun, 27 Aug 2017 12:09:58 +0530
+Message-ID: <CANc+2y4EmmeYX7DVdjR7evt1siK4YS9MenTwjJRvubOr-yfuVw@mail.gmail.com>
+References: <20170823025707.27888-1-prasannatsmkumar@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Cc: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Ralf Baechle <ralf@linux-mips.org>,
+        Paul Cercueil <paul@crapouillou.net>,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-mips@linux-mips.org, Mathieu Malaterre <malat@debian.org>,
+        noloader@gmail.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pg0-f65.google.com ([74.125.83.65]:35607 "EHLO
-        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750760AbdH0GXO (ORCPT
+Received: from mail-io0-f195.google.com ([209.85.223.195]:38174 "EHLO
+        mail-io0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751213AbdH0GkA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 27 Aug 2017 02:23:14 -0400
+        Sun, 27 Aug 2017 02:40:00 -0400
+In-Reply-To: <20170823025707.27888-1-prasannatsmkumar@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Use PTR_ERROR_ZERO rather than if(IS_ERR(...)) + PTR_ERR.
-Build successfully.
+On 23 August 2017 at 08:27, PrasannaKumar Muralidharan
+<prasannatsmkumar@gmail.com> wrote:
+> This patch series adds support of pseudo random number generator found
+> in Ingenic's JZ4780 and X1000 SoC.
+>
+> Based on Paul's review comments, add 'syscon' compatible in CGU node in
+> jz4780.dtsi. jz4780-rng driver uses regmap exposed via syscon interface
+> to access the RNG registers. CGU driver is not modified in this patch
+> set as registers used by CGU driver and this driver are different.
+>
+> PrasannaKumar Muralidharan (4):
+>   crypto: jz4780-rng: Add JZ4780 PRNG devicetree binding documentation
+>   crypto: jz4780-rng: Add Ingenic JZ4780 hardware PRNG driver
+>   crypto: jz4780-rng: Add RNG node to jz4780.dtsi
+>   crypto: jz4780-rng: Enable PRNG support in CI20 defconfig
+>
+>  .../bindings/crypto/ingenic,jz4780-rng.txt         |  20 +++
+>  MAINTAINERS                                        |   5 +
+>  arch/mips/boot/dts/ingenic/jz4780.dtsi             |   6 +-
+>  arch/mips/configs/ci20_defconfig                   |   5 +
+>  drivers/crypto/Kconfig                             |  19 +++
+>  drivers/crypto/Makefile                            |   1 +
+>  drivers/crypto/jz4780-rng.c                        | 168 +++++++++++++++++++++
+>  7 files changed, 223 insertions(+), 1 deletion(-)
+>  create mode 100644 Documentation/devicetree/bindings/crypto/ingenic,jz4780-rng.txt
+>  create mode 100644 drivers/crypto/jz4780-rng.c
+>
+> --
+> 2.10.0
+>
 
-Signed-off-by: Himanshu Jha <himanshujha199640@gmail.com>
----
- drivers/crypto/marvell/tdma.c   | 5 +----
- drivers/crypto/mv_cesa.c        | 5 +----
- drivers/crypto/qce/ablkcipher.c | 5 +----
- 3 files changed, 3 insertions(+), 12 deletions(-)
+The rng node which is the child node of CGU is ignored so the driver's
+probe is not called at all. Realised that the tests were using crng
+instead of this. Don't know how to get this working. Will submit a new
+version once the issue is fixed.
 
-diff --git a/drivers/crypto/marvell/tdma.c b/drivers/crypto/marvell/tdma.c
-index c76375f..d0ef171 100644
---- a/drivers/crypto/marvell/tdma.c
-+++ b/drivers/crypto/marvell/tdma.c
-@@ -304,10 +304,7 @@ int mv_cesa_dma_add_dummy_launch(struct mv_cesa_tdma_chain *chain, gfp_t flags)
- 	struct mv_cesa_tdma_desc *tdma;
- 
- 	tdma = mv_cesa_dma_add_desc(chain, flags);
--	if (IS_ERR(tdma))
--		return PTR_ERR(tdma);
--
--	return 0;
-+	return PTR_ERR_OR_ZERO(tdma);
- }
- 
- int mv_cesa_dma_add_dummy_end(struct mv_cesa_tdma_chain *chain, gfp_t flags)
-diff --git a/drivers/crypto/mv_cesa.c b/drivers/crypto/mv_cesa.c
-index bf25f41..c3883b4 100644
---- a/drivers/crypto/mv_cesa.c
-+++ b/drivers/crypto/mv_cesa.c
-@@ -1052,10 +1052,7 @@ static int mv_cesa_get_sram(struct platform_device *pdev,
- 		return -EINVAL;
- 
- 	cp->sram = devm_ioremap_resource(&pdev->dev, res);
--	if (IS_ERR(cp->sram))
--		return PTR_ERR(cp->sram);
--
--	return 0;
-+	return PTR_ERR_OR_ZERO(cp->sram);
- }
- 
- static int mv_probe(struct platform_device *pdev)
-diff --git a/drivers/crypto/qce/ablkcipher.c b/drivers/crypto/qce/ablkcipher.c
-index b04b42f..ea4d96b 100644
---- a/drivers/crypto/qce/ablkcipher.c
-+++ b/drivers/crypto/qce/ablkcipher.c
-@@ -248,10 +248,7 @@ static int qce_ablkcipher_init(struct crypto_tfm *tfm)
- 	ctx->fallback = crypto_alloc_skcipher(crypto_tfm_alg_name(tfm), 0,
- 					      CRYPTO_ALG_ASYNC |
- 					      CRYPTO_ALG_NEED_FALLBACK);
--	if (IS_ERR(ctx->fallback))
--		return PTR_ERR(ctx->fallback);
--
--	return 0;
-+	return PTR_ERR_OR_ZERO(ctx->fallback);
- }
- 
- static void qce_ablkcipher_exit(struct crypto_tfm *tfm)
--- 
-2.7.4
+Please do not take this patch series.
+
+Thanks,
+PrasannaKumar
