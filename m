@@ -1,113 +1,50 @@
-From: Pavel Machek <pavel@ucw.cz>
-Subject: Re: Re: x86: PIE support and option to extend
- KASLR randomization
-Date: Mon, 28 Aug 2017 11:59:23 +0200
-Message-ID: <20170828095922.GA18012@amd>
-References: <20170810172615.51965-1-thgarnie@google.com>
- <20170811124127.kkb5pnkljz4umxuj@gmail.com>
- <CAJcbSZFTX3uiS2g8JriS6+z_+WrG8z3hrQo4OSuyHpiyUDJWYA@mail.gmail.com>
- <20170815075609.mmzbfwritjzvrpsn@gmail.com>
- <CAJcbSZE+TiY2whT94WqCJNXzR=2ATOHcQ10H5RqBZA1j=k1VHQ@mail.gmail.com>
- <20170816151235.oamkdva6cwpc4cex@gmail.com>
- <CAJcbSZFM_zpL1av1JVaow8NdsGeH+6oZKeDnMPdXR0PGfynzsg@mail.gmail.com>
- <20170817080920.5ljlkktngw2cisfg@gmail.com>
- <CAFUG7CdUEFYANSGRuNX0Xt1TJ0Z7f+M_ERgR03dUVxVqLENLpw@mail.gmail.com>
+From: Tudor Ambarus <tudor.ambarus@microchip.com>
+Subject: Re: [PATCH 7/8] crypto: ecdh - constify key
+Date: Mon, 28 Aug 2017 13:34:01 +0300
+Message-ID: <cdf29df5-ff6f-3330-0ecb-1d854217c7bd@microchip.com>
+References: <2715753.J0rCo2lbig@positron.chronox.de>
+ <1694255.qHQGcMPfKl@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="WIyZ46R2i8wDzkSu"
-Cc: Ingo Molnar <mingo@kernel.org>, Thomas Garnier <thgarnie@google.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Josh Poimboeuf <jpoimboe@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
-	Matthias Kaehlcke <mka@chromium.org>,
-	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-	Juergen Gross <jgross@suse.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-	Joerg Roedel <joro@8bytes.org>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Andy Lutomirski <luto@kernel.org>, Borislav Petkov <bp@suse.de>,
-	Brian Gerst <brgerst@gmail.com>,
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-	"Rafael J . Wysocki" <rjw@rjwysocki.net>,
-	Len Brown <len.brown@intel.com>, Te
-To: Boris Lukashev <blukashev@sempervictus.com>
-Return-path: <kernel-hardening-return-9576-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
-List-Post: <mailto:kernel-hardening@lists.openwall.com>
-List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
-List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
-List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
-Content-Disposition: inline
-In-Reply-To: <CAFUG7CdUEFYANSGRuNX0Xt1TJ0Z7f+M_ERgR03dUVxVqLENLpw@mail.gmail.com>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Cc: "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>
+To: =?UTF-8?Q?Stephan_M=c3=bcller?= <smueller@chronox.de>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from esa3.microchip.iphmx.com ([68.232.153.233]:61718 "EHLO
+        esa3.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751190AbdH1Key (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 28 Aug 2017 06:34:54 -0400
+In-Reply-To: <1694255.qHQGcMPfKl@positron.chronox.de>
+Content-Language: en-US
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 
---WIyZ46R2i8wDzkSu
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-Hi!
+On 04/19/2017 02:07 AM, Stephan Müller wrote:
+> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+> ---
+>   include/crypto/ecdh.h | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/include/crypto/ecdh.h b/include/crypto/ecdh.h
+> index 03a64f6..b5bb149 100644
+> --- a/include/crypto/ecdh.h
+> +++ b/include/crypto/ecdh.h
+> @@ -40,7 +40,7 @@
+>    */
+>   struct ecdh {
+>   	unsigned short curve_id;
+> -	char *key;
+> +	const char *key;
+>   	unsigned short key_size;
+>   };
+>   
+> 
 
-> > +         The kernel and modules will generate slightly more assembly (=
-1 to 2%
-> > +         increase on the .text sections). The vmlinux binary will be
-> > +         significantly smaller due to less relocations.
-> >
-> > ... but describing a 1-2% kernel text size increase as "slightly more a=
-ssembly"
-> > shows a gratituous disregard to kernel code generation quality! In real=
-ity that's
-> > a huge size increase that in most cases will almost directly transfer t=
-o a 1-2%
-> > slowdown for kernel intense workloads.
-> >
-> > Where does that size increase come from, if PIE is capable of using rel=
-ative
-> > instructins well? Does it come from the loss of a generic register and =
-the
-> > resulting increase in register pressure, stack spills, etc.?
-> >
-> > So I'm still unhappy about this all, and about the attitude surrounding=
- it.
->=20
-> Is the expectation then to have security functions also decrease size
-> and operational latency? Seems a bit unrealistic if so.
-> 1-2% performance hit on systems which have become at least several
-> hundred % faster over recent years is not a significant performance
-> regression compared to the baseline before.
+I just came across this and remembered that Stephan already
+made a patch, so:
 
-We are probably willing to trade security for 2% performance impact...
-if you can show that same security advantage can't be achieved without
-the impact (and it is opt-in and documented and so on).
-
-Kernel is not really a bottleneck for many people. For me, even CPUs
-are not bottleneck, disk is.
-
-But what is not okay is "hey, this is security, I can slow things
-down. Merge it, because... security!".
-
-Best regards,
-
-									Pavel
---=20
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
-g.html
-
---WIyZ46R2i8wDzkSu
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iEYEARECAAYFAlmj6XoACgkQMOfwapXb+vKoAQCgxGEhuA4qK9TP8Gv7ryOV8XoZ
-v6QAoLsAwustidDVeUK6439ZUkIuqVMe
-=EZIN
------END PGP SIGNATURE-----
-
---WIyZ46R2i8wDzkSu--
+Acked-by: Tudor Ambarus <tudor.ambarus@microchip.com>
