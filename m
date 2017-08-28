@@ -1,97 +1,276 @@
-From: Rob Herring <robh-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-Subject: Re: [PATCH v2 1/4] crypto: jz4780-rng: Add JZ4780 PRNG devicetree
- binding documentation
-Date: Mon, 28 Aug 2017 13:31:12 -0500
-Message-ID: <CAL_Jsq+YO2DRVqudNuigefikkKZiv066wW6cM8qbn5Y31t-WTQ@mail.gmail.com>
-References: <20170823025707.27888-1-prasannatsmkumar@gmail.com>
- <20170823025707.27888-2-prasannatsmkumar@gmail.com> <20170825215734.f5rc7fzxpl3ynnwl@rob-hp-laptop>
- <CANc+2y7pD7EkSS-9ky4YDxGjk3wGW1PVZje2UXMRuOQJA=S+HA@mail.gmail.com>
+From: Michael Ellerman <mpe@ellerman.id.au>
+Subject: Re: [PATCH V3 6/6] crypto/nx: Add P9 NX support for 842 compression engine
+Date: Tue, 29 Aug 2017 09:25:04 +1000
+Message-ID: <878ti35l7z.fsf@concordia.ellerman.id.au>
+References: <1500699702.23205.8.camel@hbabu-laptop>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-        "David S . Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
-        Ralf Baechle <ralf-6z/3iImG2C8G8FEW9MqTrA@public.gmane.org>,
-        Paul Cercueil <paul-icTtO2rgO2OTuSrc4Mpeew@public.gmane.org>,
-        linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        "devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Linux-MIPS <linux-mips-6z/3iImG2C8G8FEW9MqTrA@public.gmane.org>,
-        Mathieu Malaterre <malat-8fiUuRrzOP0dnm+yROfE0A@public.gmane.org>, noloader-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-To: PrasannaKumar Muralidharan <prasannatsmkumar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CANc+2y7pD7EkSS-9ky4YDxGjk3wGW1PVZje2UXMRuOQJA=S+HA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain
+Cc: linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        mikey@neuling.org, benh@kernel.crashing.org, suka@us.ibm.com,
+        ddstreet@ieee.org, linuxram@us.ibm.com, npiggin@gmail.com,
+        hbabu@us.ibm.com
+To: Haren Myneni <haren@linux.vnet.ibm.com>,
+        herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from ozlabs.org ([103.22.144.67]:35123 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751189AbdH1XZH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 28 Aug 2017 19:25:07 -0400
+In-Reply-To: <1500699702.23205.8.camel@hbabu-laptop>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Aug 25, 2017 at 10:20 PM, PrasannaKumar Muralidharan
-<prasannatsmkumar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> Hi Rob,
->
-> On 26 August 2017 at 03:27, Rob Herring <robh-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org> wrote:
->> On Wed, Aug 23, 2017 at 08:27:04AM +0530, PrasannaKumar Muralidharan wrote:
->>> Add devicetree bindings for hardware pseudo random number generator
->>> present in Ingenic JZ4780 SoC.
->>>
->>> Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->>> ---
->>> Changes in v2:
->>> * Add "syscon" in CGU node's compatible section
->>> * Make RNG child node of CGU.
->>>
->>>  .../bindings/crypto/ingenic,jz4780-rng.txt           | 20 ++++++++++++++++++++
->>
->> bindings/rng/ for RNG h/w.
->
-> There are two subsystem for dealing with RNG hw. Hw_random subsystem
-> for true RNG (driver/char/hw_random) and crypto framework for pseudo
-> RNG (crypto/ and drviers/crypto). This HW is pseudo RNG so I have
-> placed the dt bindings in bindings/crypto as the driver itself is in
-> drivers/crypto folder. I am wondering if there is any relation between
-> driver folder and bindings folder. Can you please explain the folder
-> relation? Should this be put in bindings/rng or bindings/crypto?
+Hi Haren,
 
-There's not a 1-1 relationship though obviously there's a lot of
-overlap. I'd still say this should go in bindings/rng.
+Some comments inline ...
 
->>>  1 file changed, 20 insertions(+)
->>>  create mode 100644 Documentation/devicetree/bindings/crypto/ingenic,jz4780-rng.txt
->>>
->>> diff --git a/Documentation/devicetree/bindings/crypto/ingenic,jz4780-rng.txt b/Documentation/devicetree/bindings/crypto/ingenic,jz4780-rng.txt
->>> new file mode 100644
->>> index 0000000..a0c18e5
->>> --- /dev/null
->>> +++ b/Documentation/devicetree/bindings/crypto/ingenic,jz4780-rng.txt
->>> @@ -0,0 +1,20 @@
->>> +Ingenic jz4780 RNG driver
->>> +
->>> +Required properties:
->>> +- compatible : Should be "ingenic,jz4780-rng"
->>> +
->>> +Example:
->>> +
->>> +cgu: jz4780-cgu@10000000 {
->>> +     compatible = "ingenic,jz4780-cgu", "syscon";
->>> +     reg = <0x10000000 0x100>;
->>> +
->>> +     clocks = <&ext>, <&rtc>;
->>> +     clock-names = "ext", "rtc";
->>> +
->>> +     #clock-cells = <1>;
->>> +
->>> +     rng: rng@d8 {
->>
->> unit-address requires reg property.
->
-> The driver uses regmap to access the registers. In this case reg
-> property is not useful. Is reg property still needed? If not, how
-> should the node be declared?
+Haren Myneni <haren@linux.vnet.ibm.com> writes:
 
-What the driver (currently) does is irrelevant to the binding. Your
-choice is either add the reg property or name the node just "rng".
-Either is fine, but better to have more information than less IMO.
+> diff --git a/drivers/crypto/nx/nx-842-powernv.c b/drivers/crypto/nx/nx-842-powernv.c
+> index c0dd4c7e17d3..13089a0b9dfa 100644
+> --- a/drivers/crypto/nx/nx-842-powernv.c
+> +++ b/drivers/crypto/nx/nx-842-powernv.c
+> @@ -32,6 +33,9 @@ MODULE_ALIAS_CRYPTO("842-nx");
+>  
+>  #define WORKMEM_ALIGN	(CRB_ALIGN)
+>  #define CSB_WAIT_MAX	(5000) /* ms */
+> +#define VAS_RETRIES	(10)
 
-Rob
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Where does that number come from?
+
+Do we have any idea what the trade off is between retrying vs just
+falling back to doing the request in software?
+
+> +/* # of requests allowed per RxFIFO at a time. 0 for unlimited */
+> +#define MAX_CREDITS_PER_RXFIFO	(1024)
+>  
+>  struct nx842_workmem {
+>  	/* Below fields must be properly aligned */
+> @@ -42,16 +46,27 @@ struct nx842_workmem {
+>  
+>  	ktime_t start;
+>  
+> +	struct vas_window *txwin;	/* Used with VAS function */
+
+I don't understand how it makes sense to put txwin and start between the
+fields above, and the padding.
+
+If the workmem pointer you receive is not aligned, then PTR_ALIGN() will
+advance it and mean you end up writing over start and txwin.
+
+That's probably not your bug, the code is already like that.
+
+>  	char padding[WORKMEM_ALIGN]; /* unused, to allow alignment */
+>  } __packed __aligned(WORKMEM_ALIGN);
+
+> @@ -576,6 +690,198 @@ static inline void nx842_add_coprocs_list(struct nx842_coproc *coproc,
+>  	list_add(&coproc->list, &nx842_coprocs);
+>  }
+>  
+> +/*
+> + * Identify chip ID for each CPU and save coprocesor adddress for the
+> + * corresponding NX engine in percpu coproc_inst.
+> + * coproc_inst is used in crypto_init to open send window on the NX instance
+> + * for the corresponding CPU / chip where the open request is executed.
+> + */
+> +static void nx842_set_per_cpu_coproc(struct nx842_coproc *coproc)
+> +{
+> +	unsigned int i, chip_id;
+> +
+> +	for_each_possible_cpu(i) {
+> +		chip_id = cpu_to_chip_id(i);
+> +
+> +		if (coproc->chip_id == chip_id)
+> +			per_cpu(coproc_inst, i) = coproc;
+> +	}
+> +}
+> +
+> +
+> +static struct vas_window *nx842_alloc_txwin(struct nx842_coproc *coproc)
+> +{
+> +	struct vas_window *txwin = NULL;
+> +	struct vas_tx_win_attr txattr;
+> +
+> +	/*
+> +	 * Kernel requests will be high priority. So open send
+> +	 * windows only for high priority RxFIFO entries.
+> +	 */
+> +	vas_init_tx_win_attr(&txattr, coproc->ct);
+> +	txattr.lpid = 0;	/* lpid is 0 for kernel requests */
+> +	txattr.pid = mfspr(SPRN_PID);
+
+Should we be using SPRN_PID here? That makes it appear as if it comes
+from the current user process, which seems fishy.
+
+> +	/*
+> +	 * Open a VAS send window which is used to send request to NX.
+> +	 */
+> +	txwin = vas_tx_win_open(coproc->vas.id, coproc->ct, &txattr);
+> +	if (IS_ERR(txwin)) {
+> +		pr_err("ibm,nx-842: Can not open TX window: %ld\n",
+> +				PTR_ERR(txwin));
+> +		return NULL;
+> +	}
+> +
+> +	return txwin;
+> +}
+> +
+> +static int __init vas_cfg_coproc_info(struct device_node *dn, int chip_id,
+> +					int vasid)
+> +{
+> +	struct vas_window *rxwin = NULL;
+> +	struct vas_rx_win_attr rxattr;
+> +	struct nx842_coproc *coproc;
+> +	u32 lpid, pid, tid, fifo_size;
+> +	u64 rx_fifo;
+> +	const char *priority;
+> +	int ret;
+> +
+> +	ret = of_property_read_u64(dn, "rx-fifo-address", (void *)&rx_fifo);
+                                                          ^^^^^^^^
+                                                          Unnecessary cast.
+
+> +	if (ret) {
+> +		pr_err("Missing rx-fifo-address property\n");
+> +		return ret;
+> +	}
+> +
+> +	ret = of_property_read_u32(dn, "rx-fifo-size", &fifo_size);
+> +	if (ret) {
+> +		pr_err("Missing rx-fifo-size property\n");
+> +		return ret;
+> +	}
+> +
+> +	ret = of_property_read_u32(dn, "lpid", &lpid);
+> +	if (ret) {
+> +		pr_err("Missing lpid property\n");
+> +		return ret;
+> +	}
+> +
+> +	ret = of_property_read_u32(dn, "pid", &pid);
+> +	if (ret) {
+> +		pr_err("Missing pid property\n");
+> +		return ret;
+> +	}
+> +
+> +	ret = of_property_read_u32(dn, "tid", &tid);
+> +	if (ret) {
+> +		pr_err("Missing tid property\n");
+> +		return ret;
+> +	}
+> +
+> +	ret = of_property_read_string(dn, "priority", &priority);
+> +	if (ret) {
+> +		pr_err("Missing priority property\n");
+> +		return ret;
+> +	}
+> +
+> +	coproc = kzalloc(sizeof(*coproc), GFP_KERNEL);
+> +	if (!coproc)
+> +		return -ENOMEM;
+> +
+> +	if (!strcmp(priority, "High"))
+> +		coproc->ct = VAS_COP_TYPE_842_HIPRI;
+> +	else if (!strcmp(priority, "Normal"))
+> +		coproc->ct = VAS_COP_TYPE_842;
+> +	else {
+> +		pr_err("Invalid RxFIFO priority value\n");
+> +		ret =  -EINVAL;
+> +		goto err_out;
+> +	}
+> +
+> +	vas_init_rx_win_attr(&rxattr, coproc->ct);
+> +	rxattr.rx_fifo = (void *)rx_fifo;
+> +	rxattr.rx_fifo_size = fifo_size;
+> +	rxattr.lnotify_lpid = lpid;
+> +	rxattr.lnotify_pid = pid;
+> +	rxattr.lnotify_tid = tid;
+> +	rxattr.wcreds_max = MAX_CREDITS_PER_RXFIFO;
+> +
+> +	/*
+> +	 * Open a VAS receice window which is used to configure RxFIFO
+> +	 * for NX.
+> +	 */
+> +	rxwin = vas_rx_win_open(vasid, coproc->ct, &rxattr);
+> +	if (IS_ERR(rxwin)) {
+> +		ret = PTR_ERR(rxwin);
+> +		pr_err("setting RxFIFO with VAS failed: %d\n",
+> +			ret);
+> +		goto err_out;
+> +	}
+> +
+> +	coproc->vas.rxwin = rxwin;
+> +	coproc->vas.id = vasid;
+> +	nx842_add_coprocs_list(coproc, chip_id);
+> +
+> +	/*
+> +	 * Kernel requests use only high priority FIFOs. So save coproc
+> +	 * info in percpu coproc_inst which will be used to open send
+> +	 * windows for crypto open requests later.
+> +	 */
+> +	if (coproc->ct == VAS_COP_TYPE_842_HIPRI)
+> +		nx842_set_per_cpu_coproc(coproc);
+> +
+> +	return 0;
+> +
+> +err_out:
+> +	kfree(coproc);
+> +	return ret;
+> +}
+> +
+> +
+> +static int __init nx842_powernv_probe_vas(struct device_node *pn)
+> +{
+> +	struct device_node *dn;
+> +	int chip_id, vasid, ret = 0;
+> +	int nx_fifo_found = 0;
+> +
+> +	chip_id = of_get_ibm_chip_id(pn);
+> +	if (chip_id < 0) {
+> +		pr_err("ibm,chip-id missing\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	dn = of_find_compatible_node(pn, NULL, "ibm,power9-vas-x");
+
+That's the wrong compatible, that will find the raw node, not the one
+that's intended for Linux use.
+
+It's also not really the NX drivers business to be looking for VAS
+nodes. You should just look for the P9 NX nodes, and if VAS wasn't
+configured for some reason then the VAS window open will fail and you
+detect it then.
+
+> +	if (!dn) {
+> +		pr_err("Missing VAS device node\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (of_property_read_u32(dn, "ibm,vas-id", &vasid)) {
+> +		pr_err("Missing ibm,vas-id device property\n");
+> +		of_node_put(dn);
+> +		return -EINVAL;
+> +	}
+> +
+> +	of_node_put(dn);
+
+So basically just drop all of that above.
+
+> diff --git a/drivers/crypto/nx/nx-842.c b/drivers/crypto/nx/nx-842.c
+> index d94e25df503b..da3cb8c35ec7 100644
+> --- a/drivers/crypto/nx/nx-842.c
+> +++ b/drivers/crypto/nx/nx-842.c
+> @@ -116,7 +116,7 @@ int nx842_crypto_init(struct crypto_tfm *tfm, struct nx842_driver *driver)
+>  
+>  	spin_lock_init(&ctx->lock);
+>  	ctx->driver = driver;
+> -	ctx->wmem = kmalloc(driver->workmem_size, GFP_KERNEL);
+> +	ctx->wmem = kzalloc(driver->workmem_size, GFP_KERNEL);
+>  	ctx->sbounce = (u8 *)__get_free_pages(GFP_KERNEL, BOUNCE_BUFFER_ORDER);
+>  	ctx->dbounce = (u8 *)__get_free_pages(GFP_KERNEL, BOUNCE_BUFFER_ORDER);
+>  	if (!ctx->wmem || !ctx->sbounce || !ctx->dbounce) {
+
+That looks OK but should be split into a separate patch because it
+affects the Power8 code as well as the pseries code.
+
+cheers
