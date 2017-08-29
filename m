@@ -1,204 +1,295 @@
-From: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
-Subject: [PATCH] crypto: brcm - Explicity ACK mailbox message
-Date: Tue, 29 Aug 2017 15:08:10 +0530
-Message-ID: <1503999490-14527-1-git-send-email-raveendra.padasalagi@broadcom.com>
-Cc: bcm-kernel-feedback-list@broadcom.com,
-        Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>,
-        stable@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Steve Lin <steven.lin1@broadcom.com>,
-        Rob Rice <rob.rice@broadcom.com>,
-        Anup Patel <anup.patel@broadcom.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+From: Dan Streetman <ddstreet@ieee.org>
+Subject: Re: [PATCH V3 6/6] crypto/nx: Add P9 NX support for 842 compression engine
+Date: Tue, 29 Aug 2017 09:32:01 -0400
+Message-ID: <CALZtONDnFLiGhTRNs89VWr3nrY0Bp9VPRqFXA0iEaa6U_+w4Ag@mail.gmail.com>
+References: <1500699702.23205.8.camel@hbabu-laptop> <878ti35l7z.fsf@concordia.ellerman.id.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Cc: Haren Myneni <haren@linux.vnet.ibm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        mikey@neuling.org,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        suka@us.ibm.com, Ram Pai <linuxram@us.ibm.com>, npiggin@gmail.com,
+        Haren Myneni <hbabu@us.ibm.com>
+To: Michael Ellerman <mpe@ellerman.id.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wr0-f173.google.com ([209.85.128.173]:35981 "EHLO
-        mail-wr0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751371AbdH2JiY (ORCPT
+Received: from mail-io0-f178.google.com ([209.85.223.178]:36654 "EHLO
+        mail-io0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752942AbdH2Ncm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 29 Aug 2017 05:38:24 -0400
-Received: by mail-wr0-f173.google.com with SMTP id p14so8446446wrg.3
-        for <linux-crypto@vger.kernel.org>; Tue, 29 Aug 2017 02:38:24 -0700 (PDT)
+        Tue, 29 Aug 2017 09:32:42 -0400
+Received: by mail-io0-f178.google.com with SMTP id g33so15406931ioj.3
+        for <linux-crypto@vger.kernel.org>; Tue, 29 Aug 2017 06:32:42 -0700 (PDT)
+In-Reply-To: <878ti35l7z.fsf@concordia.ellerman.id.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add support to explicity ACK mailbox message
-because after sending message we can know
-the send status via error attribute of brcm_message.
+On Mon, Aug 28, 2017 at 7:25 PM, Michael Ellerman <mpe@ellerman.id.au> wrote:
+> Hi Haren,
+>
+> Some comments inline ...
+>
+> Haren Myneni <haren@linux.vnet.ibm.com> writes:
+>
+>> diff --git a/drivers/crypto/nx/nx-842-powernv.c b/drivers/crypto/nx/nx-842-powernv.c
+>> index c0dd4c7e17d3..13089a0b9dfa 100644
+>> --- a/drivers/crypto/nx/nx-842-powernv.c
+>> +++ b/drivers/crypto/nx/nx-842-powernv.c
+>> @@ -32,6 +33,9 @@ MODULE_ALIAS_CRYPTO("842-nx");
+>>
+>>  #define WORKMEM_ALIGN        (CRB_ALIGN)
+>>  #define CSB_WAIT_MAX (5000) /* ms */
+>> +#define VAS_RETRIES  (10)
+>
+> Where does that number come from?
+>
+> Do we have any idea what the trade off is between retrying vs just
+> falling back to doing the request in software?
+>
+>> +/* # of requests allowed per RxFIFO at a time. 0 for unlimited */
+>> +#define MAX_CREDITS_PER_RXFIFO       (1024)
+>>
+>>  struct nx842_workmem {
+>>       /* Below fields must be properly aligned */
+>> @@ -42,16 +46,27 @@ struct nx842_workmem {
+>>
+>>       ktime_t start;
+>>
+>> +     struct vas_window *txwin;       /* Used with VAS function */
+>
+> I don't understand how it makes sense to put txwin and start between the
+> fields above, and the padding.
 
-This is needed to support "txdone_ack" supported in
-mailbox controller driver.
+workmem is a scratch buffer and shouldn't be used for something
+persistent like this.
 
-Fixes: 9d12ba86f818 ("crypto: brcm - Add Broadcom SPU driver")
-Signed-off-by: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
-Reviewed-by: Anup Patel <anup.patel@broadcom.com>
-Reviewed-by: Scott Branden <scott.branden@broadcom.com>
-Cc: stable@vger.kernel.org
+>
+> If the workmem pointer you receive is not aligned, then PTR_ALIGN() will
+> advance it and mean you end up writing over start and txwin.
+>
+> That's probably not your bug, the code is already like that.
 
-diff --git a/drivers/crypto/bcm/cipher.c b/drivers/crypto/bcm/cipher.c
-index 9cfd36c..45440ac 100644
---- a/drivers/crypto/bcm/cipher.c
-+++ b/drivers/crypto/bcm/cipher.c
-@@ -258,6 +258,44 @@ static u8 select_channel(void)
- 	return 0;
- }
- 
-+static int mailbox_send_message(struct brcm_message *mssg, u32 flags,
-+				u8 chan_idx)
-+{
-+	int err;
-+	int retry_cnt = 0;
-+	struct device *dev = &(iproc_priv.pdev->dev);
-+
-+	err = mbox_send_message(iproc_priv.mbox[chan_idx], mssg);
-+	if (flags & CRYPTO_TFM_REQ_MAY_SLEEP) {
-+		while ((err == -ENOBUFS) && (retry_cnt < SPU_MB_RETRY_MAX)) {
-+			/*
-+			 * Mailbox queue is full. Since MAY_SLEEP is set, assume
-+			 * not in atomic context and we can wait and try again.
-+			 */
-+			retry_cnt++;
-+			usleep_range(MBOX_SLEEP_MIN, MBOX_SLEEP_MAX);
-+			err = mbox_send_message(iproc_priv.mbox[chan_idx],
-+						mssg);
-+			atomic_inc(&iproc_priv.mb_no_spc);
-+		}
-+	}
-+	if (err < 0) {
-+		atomic_inc(&iproc_priv.mb_send_fail);
-+		return err;
-+	}
-+
-+	/* Check error returned by mailbox controller */
-+	err = mssg->error;
-+	if (unlikely(err < 0)) {
-+		dev_err(dev, "message error %d", err);
-+		/* Signal txdone for mailbox channel */
-+	}
-+
-+	/* Signal txdone for mailbox channel */
-+	mbox_client_txdone(iproc_priv.mbox[chan_idx], err);
-+	return err;
-+}
-+
- /**
-  * handle_ablkcipher_req() - Submit as much of a block cipher request as fits in
-  * a single SPU request message, starting at the current position in the request
-@@ -295,7 +333,6 @@ static int handle_ablkcipher_req(struct iproc_reqctx_s *rctx)
- 	u32 pad_len;		/* total length of all padding */
- 	bool update_key = false;
- 	struct brcm_message *mssg;	/* mailbox message */
--	int retry_cnt = 0;
- 
- 	/* number of entries in src and dst sg in mailbox message. */
- 	u8 rx_frag_num = 2;	/* response header and STATUS */
-@@ -464,24 +501,9 @@ static int handle_ablkcipher_req(struct iproc_reqctx_s *rctx)
- 	if (err)
- 		return err;
- 
--	err = mbox_send_message(iproc_priv.mbox[rctx->chan_idx], mssg);
--	if (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) {
--		while ((err == -ENOBUFS) && (retry_cnt < SPU_MB_RETRY_MAX)) {
--			/*
--			 * Mailbox queue is full. Since MAY_SLEEP is set, assume
--			 * not in atomic context and we can wait and try again.
--			 */
--			retry_cnt++;
--			usleep_range(MBOX_SLEEP_MIN, MBOX_SLEEP_MAX);
--			err = mbox_send_message(iproc_priv.mbox[rctx->chan_idx],
--						mssg);
--			atomic_inc(&iproc_priv.mb_no_spc);
--		}
--	}
--	if (unlikely(err < 0)) {
--		atomic_inc(&iproc_priv.mb_send_fail);
-+	err = mailbox_send_message(mssg, req->base.flags, rctx->chan_idx);
-+	if (unlikely(err < 0))
- 		return err;
--	}
- 
- 	return -EINPROGRESS;
- }
-@@ -712,7 +734,6 @@ static int handle_ahash_req(struct iproc_reqctx_s *rctx)
- 	u32 spu_hdr_len;
- 	unsigned int digestsize;
- 	u16 rem = 0;
--	int retry_cnt = 0;
- 
- 	/*
- 	 * number of entries in src and dst sg. Always includes SPU msg header.
-@@ -906,24 +927,10 @@ static int handle_ahash_req(struct iproc_reqctx_s *rctx)
- 	if (err)
- 		return err;
- 
--	err = mbox_send_message(iproc_priv.mbox[rctx->chan_idx], mssg);
--	if (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) {
--		while ((err == -ENOBUFS) && (retry_cnt < SPU_MB_RETRY_MAX)) {
--			/*
--			 * Mailbox queue is full. Since MAY_SLEEP is set, assume
--			 * not in atomic context and we can wait and try again.
--			 */
--			retry_cnt++;
--			usleep_range(MBOX_SLEEP_MIN, MBOX_SLEEP_MAX);
--			err = mbox_send_message(iproc_priv.mbox[rctx->chan_idx],
--						mssg);
--			atomic_inc(&iproc_priv.mb_no_spc);
--		}
--	}
--	if (err < 0) {
--		atomic_inc(&iproc_priv.mb_send_fail);
-+	err = mailbox_send_message(mssg, req->base.flags, rctx->chan_idx);
-+	if (unlikely(err < 0))
- 		return err;
--	}
-+
- 	return -EINPROGRESS;
- }
- 
-@@ -1322,7 +1329,6 @@ static int handle_aead_req(struct iproc_reqctx_s *rctx)
- 	int assoc_nents = 0;
- 	bool incl_icv = false;
- 	unsigned int digestsize = ctx->digestsize;
--	int retry_cnt = 0;
- 
- 	/* number of entries in src and dst sg. Always includes SPU msg header.
- 	 */
-@@ -1560,24 +1566,9 @@ static int handle_aead_req(struct iproc_reqctx_s *rctx)
- 	if (err)
- 		return err;
- 
--	err = mbox_send_message(iproc_priv.mbox[rctx->chan_idx], mssg);
--	if (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) {
--		while ((err == -ENOBUFS) && (retry_cnt < SPU_MB_RETRY_MAX)) {
--			/*
--			 * Mailbox queue is full. Since MAY_SLEEP is set, assume
--			 * not in atomic context and we can wait and try again.
--			 */
--			retry_cnt++;
--			usleep_range(MBOX_SLEEP_MIN, MBOX_SLEEP_MAX);
--			err = mbox_send_message(iproc_priv.mbox[rctx->chan_idx],
--						mssg);
--			atomic_inc(&iproc_priv.mb_no_spc);
--		}
--	}
--	if (err < 0) {
--		atomic_inc(&iproc_priv.mb_send_fail);
-+	err = mailbox_send_message(mssg, req->base.flags, rctx->chan_idx);
-+	if (unlikely(err < 0))
- 		return err;
--	}
- 
- 	return -EINPROGRESS;
- }
-@@ -4534,7 +4525,7 @@ static int spu_mb_init(struct device *dev)
- 	mcl->dev = dev;
- 	mcl->tx_block = false;
- 	mcl->tx_tout = 0;
--	mcl->knows_txdone = false;
-+	mcl->knows_txdone = true;
- 	mcl->rx_callback = spu_rx_callback;
- 	mcl->tx_done = NULL;
- 
--- 
-1.9.1
+no, it's a bug in this patch, because workmem is scratch whose
+contents are only valid for the duration of each operation (compress
+or decompress).
+
+>
+>>       char padding[WORKMEM_ALIGN]; /* unused, to allow alignment */
+>>  } __packed __aligned(WORKMEM_ALIGN);
+>
+>> @@ -576,6 +690,198 @@ static inline void nx842_add_coprocs_list(struct nx842_coproc *coproc,
+>>       list_add(&coproc->list, &nx842_coprocs);
+>>  }
+>>
+>> +/*
+>> + * Identify chip ID for each CPU and save coprocesor adddress for the
+>> + * corresponding NX engine in percpu coproc_inst.
+>> + * coproc_inst is used in crypto_init to open send window on the NX instance
+>> + * for the corresponding CPU / chip where the open request is executed.
+>> + */
+>> +static void nx842_set_per_cpu_coproc(struct nx842_coproc *coproc)
+>> +{
+>> +     unsigned int i, chip_id;
+>> +
+>> +     for_each_possible_cpu(i) {
+>> +             chip_id = cpu_to_chip_id(i);
+>> +
+>> +             if (coproc->chip_id == chip_id)
+>> +                     per_cpu(coproc_inst, i) = coproc;
+>> +     }
+>> +}
+>> +
+>> +
+>> +static struct vas_window *nx842_alloc_txwin(struct nx842_coproc *coproc)
+>> +{
+>> +     struct vas_window *txwin = NULL;
+>> +     struct vas_tx_win_attr txattr;
+>> +
+>> +     /*
+>> +      * Kernel requests will be high priority. So open send
+>> +      * windows only for high priority RxFIFO entries.
+>> +      */
+>> +     vas_init_tx_win_attr(&txattr, coproc->ct);
+>> +     txattr.lpid = 0;        /* lpid is 0 for kernel requests */
+>> +     txattr.pid = mfspr(SPRN_PID);
+>
+> Should we be using SPRN_PID here? That makes it appear as if it comes
+> from the current user process, which seems fishy.
+>
+>> +     /*
+>> +      * Open a VAS send window which is used to send request to NX.
+>> +      */
+>> +     txwin = vas_tx_win_open(coproc->vas.id, coproc->ct, &txattr);
+>> +     if (IS_ERR(txwin)) {
+>> +             pr_err("ibm,nx-842: Can not open TX window: %ld\n",
+>> +                             PTR_ERR(txwin));
+>> +             return NULL;
+>> +     }
+>> +
+>> +     return txwin;
+>> +}
+>> +
+>> +static int __init vas_cfg_coproc_info(struct device_node *dn, int chip_id,
+>> +                                     int vasid)
+>> +{
+>> +     struct vas_window *rxwin = NULL;
+>> +     struct vas_rx_win_attr rxattr;
+>> +     struct nx842_coproc *coproc;
+>> +     u32 lpid, pid, tid, fifo_size;
+>> +     u64 rx_fifo;
+>> +     const char *priority;
+>> +     int ret;
+>> +
+>> +     ret = of_property_read_u64(dn, "rx-fifo-address", (void *)&rx_fifo);
+>                                                           ^^^^^^^^
+>                                                           Unnecessary cast.
+>
+>> +     if (ret) {
+>> +             pr_err("Missing rx-fifo-address property\n");
+>> +             return ret;
+>> +     }
+>> +
+>> +     ret = of_property_read_u32(dn, "rx-fifo-size", &fifo_size);
+>> +     if (ret) {
+>> +             pr_err("Missing rx-fifo-size property\n");
+>> +             return ret;
+>> +     }
+>> +
+>> +     ret = of_property_read_u32(dn, "lpid", &lpid);
+>> +     if (ret) {
+>> +             pr_err("Missing lpid property\n");
+>> +             return ret;
+>> +     }
+>> +
+>> +     ret = of_property_read_u32(dn, "pid", &pid);
+>> +     if (ret) {
+>> +             pr_err("Missing pid property\n");
+>> +             return ret;
+>> +     }
+>> +
+>> +     ret = of_property_read_u32(dn, "tid", &tid);
+>> +     if (ret) {
+>> +             pr_err("Missing tid property\n");
+>> +             return ret;
+>> +     }
+>> +
+>> +     ret = of_property_read_string(dn, "priority", &priority);
+>> +     if (ret) {
+>> +             pr_err("Missing priority property\n");
+>> +             return ret;
+>> +     }
+>> +
+>> +     coproc = kzalloc(sizeof(*coproc), GFP_KERNEL);
+>> +     if (!coproc)
+>> +             return -ENOMEM;
+>> +
+>> +     if (!strcmp(priority, "High"))
+>> +             coproc->ct = VAS_COP_TYPE_842_HIPRI;
+>> +     else if (!strcmp(priority, "Normal"))
+>> +             coproc->ct = VAS_COP_TYPE_842;
+>> +     else {
+>> +             pr_err("Invalid RxFIFO priority value\n");
+>> +             ret =  -EINVAL;
+>> +             goto err_out;
+>> +     }
+>> +
+>> +     vas_init_rx_win_attr(&rxattr, coproc->ct);
+>> +     rxattr.rx_fifo = (void *)rx_fifo;
+>> +     rxattr.rx_fifo_size = fifo_size;
+>> +     rxattr.lnotify_lpid = lpid;
+>> +     rxattr.lnotify_pid = pid;
+>> +     rxattr.lnotify_tid = tid;
+>> +     rxattr.wcreds_max = MAX_CREDITS_PER_RXFIFO;
+>> +
+>> +     /*
+>> +      * Open a VAS receice window which is used to configure RxFIFO
+>> +      * for NX.
+>> +      */
+>> +     rxwin = vas_rx_win_open(vasid, coproc->ct, &rxattr);
+>> +     if (IS_ERR(rxwin)) {
+>> +             ret = PTR_ERR(rxwin);
+>> +             pr_err("setting RxFIFO with VAS failed: %d\n",
+>> +                     ret);
+>> +             goto err_out;
+>> +     }
+>> +
+>> +     coproc->vas.rxwin = rxwin;
+>> +     coproc->vas.id = vasid;
+>> +     nx842_add_coprocs_list(coproc, chip_id);
+>> +
+>> +     /*
+>> +      * Kernel requests use only high priority FIFOs. So save coproc
+>> +      * info in percpu coproc_inst which will be used to open send
+>> +      * windows for crypto open requests later.
+>> +      */
+>> +     if (coproc->ct == VAS_COP_TYPE_842_HIPRI)
+>> +             nx842_set_per_cpu_coproc(coproc);
+>> +
+>> +     return 0;
+>> +
+>> +err_out:
+>> +     kfree(coproc);
+>> +     return ret;
+>> +}
+>> +
+>> +
+>> +static int __init nx842_powernv_probe_vas(struct device_node *pn)
+>> +{
+>> +     struct device_node *dn;
+>> +     int chip_id, vasid, ret = 0;
+>> +     int nx_fifo_found = 0;
+>> +
+>> +     chip_id = of_get_ibm_chip_id(pn);
+>> +     if (chip_id < 0) {
+>> +             pr_err("ibm,chip-id missing\n");
+>> +             return -EINVAL;
+>> +     }
+>> +
+>> +     dn = of_find_compatible_node(pn, NULL, "ibm,power9-vas-x");
+>
+> That's the wrong compatible, that will find the raw node, not the one
+> that's intended for Linux use.
+>
+> It's also not really the NX drivers business to be looking for VAS
+> nodes. You should just look for the P9 NX nodes, and if VAS wasn't
+> configured for some reason then the VAS window open will fail and you
+> detect it then.
+>
+>> +     if (!dn) {
+>> +             pr_err("Missing VAS device node\n");
+>> +             return -EINVAL;
+>> +     }
+>> +
+>> +     if (of_property_read_u32(dn, "ibm,vas-id", &vasid)) {
+>> +             pr_err("Missing ibm,vas-id device property\n");
+>> +             of_node_put(dn);
+>> +             return -EINVAL;
+>> +     }
+>> +
+>> +     of_node_put(dn);
+>
+> So basically just drop all of that above.
+>
+>> diff --git a/drivers/crypto/nx/nx-842.c b/drivers/crypto/nx/nx-842.c
+>> index d94e25df503b..da3cb8c35ec7 100644
+>> --- a/drivers/crypto/nx/nx-842.c
+>> +++ b/drivers/crypto/nx/nx-842.c
+>> @@ -116,7 +116,7 @@ int nx842_crypto_init(struct crypto_tfm *tfm, struct nx842_driver *driver)
+>>
+>>       spin_lock_init(&ctx->lock);
+>>       ctx->driver = driver;
+>> -     ctx->wmem = kmalloc(driver->workmem_size, GFP_KERNEL);
+>> +     ctx->wmem = kzalloc(driver->workmem_size, GFP_KERNEL);
+
+don't put persistent fields in the workmem, and you don't need to zero it.
+
+>>       ctx->sbounce = (u8 *)__get_free_pages(GFP_KERNEL, BOUNCE_BUFFER_ORDER);
+>>       ctx->dbounce = (u8 *)__get_free_pages(GFP_KERNEL, BOUNCE_BUFFER_ORDER);
+>>       if (!ctx->wmem || !ctx->sbounce || !ctx->dbounce) {
+>
+> That looks OK but should be split into a separate patch because it
+> affects the Power8 code as well as the pseries code.
+>
+> cheers
