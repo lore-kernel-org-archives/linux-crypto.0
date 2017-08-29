@@ -1,7 +1,7 @@
 From: Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: [PATCH 08/12] x86/crypto: Fix RBP usage in sha256-avx-asm.S
-Date: Tue, 29 Aug 2017 13:05:41 -0500
-Message-ID: <adab3617a99a9eff63a18f33c1e8643bed08a6bb.1504029132.git.jpoimboe@redhat.com>
+Subject: [PATCH 02/12] x86/crypto: Fix RBP usage in camellia-x86_64-asm_64.S
+Date: Tue, 29 Aug 2017 13:05:35 -0500
+Message-ID: <a3dab59f4b330a3246d1c7a32291e792386ebebf.1504029132.git.jpoimboe@redhat.com>
 References: <cover.1504029132.git.jpoimboe@redhat.com>
 Cc: linux-kernel@vger.kernel.org,
         Tim Chen <tim.c.chen@linux.intel.com>,
@@ -22,62 +22,127 @@ List-Id: linux-crypto.vger.kernel.org
 Using RBP as a temporary register breaks frame pointer convention and
 breaks stack traces when unwinding from an interrupt in the crypto code.
 
-Swap the usages of R12 and RBP.  Use R12 for the TBL register, and use
-RBP to store the pre-aligned stack pointer.
+Use R12 instead of RBP.  Both are callee-saved registers, so the
+substitution is straightforward.
 
 Reported-by: Eric Biggers <ebiggers@google.com>
 Reported-by: Peter Zijlstra <peterz@infradead.org>
 Signed-off-by: Josh Poimboeuf <jpoimboe@redhat.com>
 ---
- arch/x86/crypto/sha256-avx-asm.S | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
+ arch/x86/crypto/camellia-x86_64-asm_64.S | 26 +++++++++++++-------------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
 
-diff --git a/arch/x86/crypto/sha256-avx-asm.S b/arch/x86/crypto/sha256-avx-asm.S
-index e08888a1a5f2..001bbcf93c79 100644
---- a/arch/x86/crypto/sha256-avx-asm.S
-+++ b/arch/x86/crypto/sha256-avx-asm.S
-@@ -103,7 +103,7 @@ SRND = %rsi       # clobbers INP
- c = %ecx
- d = %r8d
- e = %edx
--TBL = %rbp
-+TBL = %r12
- a = %eax
- b = %ebx
+diff --git a/arch/x86/crypto/camellia-x86_64-asm_64.S b/arch/x86/crypto/camellia-x86_64-asm_64.S
+index 310319c601ed..95ba6956a7f6 100644
+--- a/arch/x86/crypto/camellia-x86_64-asm_64.S
++++ b/arch/x86/crypto/camellia-x86_64-asm_64.S
+@@ -75,17 +75,17 @@
+ #define RCD1bh %dh
  
-@@ -350,13 +350,13 @@ a = TMP_
- ENTRY(sha256_transform_avx)
- .align 32
- 	pushq   %rbx
--	pushq   %rbp
-+	pushq   %r12
- 	pushq   %r13
- 	pushq   %r14
- 	pushq   %r15
--	pushq   %r12
-+	pushq	%rbp
-+	movq	%rsp, %rbp
+ #define RT0 %rsi
+-#define RT1 %rbp
++#define RT1 %r12
+ #define RT2 %r8
  
--	mov	%rsp, %r12
- 	subq    $STACK_SIZE, %rsp	# allocate stack space
- 	and	$~15, %rsp		# align stack pointer
+ #define RT0d %esi
+-#define RT1d %ebp
++#define RT1d %r12d
+ #define RT2d %r8d
  
-@@ -452,13 +452,12 @@ loop2:
+ #define RT2bl %r8b
  
- done_hash:
+ #define RXOR %r9
+-#define RRBP %r10
++#define RR12 %r10
+ #define RDST %r11
  
--	mov	%r12, %rsp
--
--	popq	%r12
-+	mov	%rbp, %rsp
-+	popq	%rbp
- 	popq    %r15
- 	popq    %r14
- 	popq    %r13
--	popq    %rbp
-+	popq	%r12
- 	popq    %rbx
- 	ret
- ENDPROC(sha256_transform_avx)
+ #define RXORd %r9d
+@@ -197,7 +197,7 @@ ENTRY(__camellia_enc_blk)
+ 	 *	%rdx: src
+ 	 *	%rcx: bool xor
+ 	 */
+-	movq %rbp, RRBP;
++	movq %r12, RR12;
+ 
+ 	movq %rcx, RXOR;
+ 	movq %rsi, RDST;
+@@ -227,13 +227,13 @@ ENTRY(__camellia_enc_blk)
+ 
+ 	enc_outunpack(mov, RT1);
+ 
+-	movq RRBP, %rbp;
++	movq RR12, %r12;
+ 	ret;
+ 
+ .L__enc_xor:
+ 	enc_outunpack(xor, RT1);
+ 
+-	movq RRBP, %rbp;
++	movq RR12, %r12;
+ 	ret;
+ ENDPROC(__camellia_enc_blk)
+ 
+@@ -248,7 +248,7 @@ ENTRY(camellia_dec_blk)
+ 	movl $24, RXORd;
+ 	cmovel RXORd, RT2d; /* max */
+ 
+-	movq %rbp, RRBP;
++	movq %r12, RR12;
+ 	movq %rsi, RDST;
+ 	movq %rdx, RIO;
+ 
+@@ -271,7 +271,7 @@ ENTRY(camellia_dec_blk)
+ 
+ 	dec_outunpack();
+ 
+-	movq RRBP, %rbp;
++	movq RR12, %r12;
+ 	ret;
+ ENDPROC(camellia_dec_blk)
+ 
+@@ -433,7 +433,7 @@ ENTRY(__camellia_enc_blk_2way)
+ 	 */
+ 	pushq %rbx;
+ 
+-	movq %rbp, RRBP;
++	movq %r12, RR12;
+ 	movq %rcx, RXOR;
+ 	movq %rsi, RDST;
+ 	movq %rdx, RIO;
+@@ -461,14 +461,14 @@ ENTRY(__camellia_enc_blk_2way)
+ 
+ 	enc_outunpack2(mov, RT2);
+ 
+-	movq RRBP, %rbp;
++	movq RR12, %r12;
+ 	popq %rbx;
+ 	ret;
+ 
+ .L__enc2_xor:
+ 	enc_outunpack2(xor, RT2);
+ 
+-	movq RRBP, %rbp;
++	movq RR12, %r12;
+ 	popq %rbx;
+ 	ret;
+ ENDPROC(__camellia_enc_blk_2way)
+@@ -485,7 +485,7 @@ ENTRY(camellia_dec_blk_2way)
+ 	cmovel RXORd, RT2d; /* max */
+ 
+ 	movq %rbx, RXOR;
+-	movq %rbp, RRBP;
++	movq %r12, RR12;
+ 	movq %rsi, RDST;
+ 	movq %rdx, RIO;
+ 
+@@ -508,7 +508,7 @@ ENTRY(camellia_dec_blk_2way)
+ 
+ 	dec_outunpack2();
+ 
+-	movq RRBP, %rbp;
++	movq RR12, %r12;
+ 	movq RXOR, %rbx;
+ 	ret;
+ ENDPROC(camellia_dec_blk_2way)
 -- 
 2.13.5
