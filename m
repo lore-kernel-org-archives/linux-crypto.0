@@ -1,7 +1,7 @@
 From: Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: [PATCH 02/12] x86/crypto: Fix RBP usage in camellia-x86_64-asm_64.S
-Date: Tue, 29 Aug 2017 13:05:35 -0500
-Message-ID: <a3dab59f4b330a3246d1c7a32291e792386ebebf.1504029132.git.jpoimboe@redhat.com>
+Subject: [PATCH 12/12] x86/crypto: Fix RBP usage in twofish-avx-x86_64-asm_64.S
+Date: Tue, 29 Aug 2017 13:05:45 -0500
+Message-ID: <168e19f1ba77d5bdec3be71f04de01c9e97f27b1.1504029132.git.jpoimboe@redhat.com>
 References: <cover.1504029132.git.jpoimboe@redhat.com>
 Cc: linux-kernel@vger.kernel.org,
         Tim Chen <tim.c.chen@linux.intel.com>,
@@ -22,127 +22,66 @@ List-Id: linux-crypto.vger.kernel.org
 Using RBP as a temporary register breaks frame pointer convention and
 breaks stack traces when unwinding from an interrupt in the crypto code.
 
-Use R12 instead of RBP.  Both are callee-saved registers, so the
+Use R13 instead of RBP.  Both are callee-saved registers, so the
 substitution is straightforward.
 
 Reported-by: Eric Biggers <ebiggers@google.com>
 Reported-by: Peter Zijlstra <peterz@infradead.org>
 Signed-off-by: Josh Poimboeuf <jpoimboe@redhat.com>
 ---
- arch/x86/crypto/camellia-x86_64-asm_64.S | 26 +++++++++++++-------------
- 1 file changed, 13 insertions(+), 13 deletions(-)
+ arch/x86/crypto/twofish-avx-x86_64-asm_64.S | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/arch/x86/crypto/camellia-x86_64-asm_64.S b/arch/x86/crypto/camellia-x86_64-asm_64.S
-index 310319c601ed..95ba6956a7f6 100644
---- a/arch/x86/crypto/camellia-x86_64-asm_64.S
-+++ b/arch/x86/crypto/camellia-x86_64-asm_64.S
-@@ -75,17 +75,17 @@
- #define RCD1bh %dh
+diff --git a/arch/x86/crypto/twofish-avx-x86_64-asm_64.S b/arch/x86/crypto/twofish-avx-x86_64-asm_64.S
+index b3f49d286348..73b471da3622 100644
+--- a/arch/x86/crypto/twofish-avx-x86_64-asm_64.S
++++ b/arch/x86/crypto/twofish-avx-x86_64-asm_64.S
+@@ -76,8 +76,8 @@
+ #define RT %xmm14
+ #define RR %xmm15
  
- #define RT0 %rsi
--#define RT1 %rbp
-+#define RT1 %r12
- #define RT2 %r8
+-#define RID1  %rbp
+-#define RID1d %ebp
++#define RID1  %r13
++#define RID1d %r13d
+ #define RID2  %rsi
+ #define RID2d %esi
  
- #define RT0d %esi
--#define RT1d %ebp
-+#define RT1d %r12d
- #define RT2d %r8d
+@@ -259,7 +259,7 @@ __twofish_enc_blk8:
  
- #define RT2bl %r8b
+ 	vmovdqu w(CTX), RK1;
  
- #define RXOR %r9
--#define RRBP %r10
-+#define RR12 %r10
- #define RDST %r11
+-	pushq %rbp;
++	pushq %r13;
+ 	pushq %rbx;
+ 	pushq %rcx;
  
- #define RXORd %r9d
-@@ -197,7 +197,7 @@ ENTRY(__camellia_enc_blk)
- 	 *	%rdx: src
- 	 *	%rcx: bool xor
- 	 */
--	movq %rbp, RRBP;
-+	movq %r12, RR12;
+@@ -282,7 +282,7 @@ __twofish_enc_blk8:
  
- 	movq %rcx, RXOR;
- 	movq %rsi, RDST;
-@@ -227,13 +227,13 @@ ENTRY(__camellia_enc_blk)
+ 	popq %rcx;
+ 	popq %rbx;
+-	popq %rbp;
++	popq %r13;
  
- 	enc_outunpack(mov, RT1);
+ 	outunpack_blocks(RC1, RD1, RA1, RB1, RK1, RX0, RY0, RK2);
+ 	outunpack_blocks(RC2, RD2, RA2, RB2, RK1, RX0, RY0, RK2);
+@@ -301,7 +301,7 @@ __twofish_dec_blk8:
  
--	movq RRBP, %rbp;
-+	movq RR12, %r12;
- 	ret;
+ 	vmovdqu (w+4*4)(CTX), RK1;
  
- .L__enc_xor:
- 	enc_outunpack(xor, RT1);
- 
--	movq RRBP, %rbp;
-+	movq RR12, %r12;
- 	ret;
- ENDPROC(__camellia_enc_blk)
- 
-@@ -248,7 +248,7 @@ ENTRY(camellia_dec_blk)
- 	movl $24, RXORd;
- 	cmovel RXORd, RT2d; /* max */
- 
--	movq %rbp, RRBP;
-+	movq %r12, RR12;
- 	movq %rsi, RDST;
- 	movq %rdx, RIO;
- 
-@@ -271,7 +271,7 @@ ENTRY(camellia_dec_blk)
- 
- 	dec_outunpack();
- 
--	movq RRBP, %rbp;
-+	movq RR12, %r12;
- 	ret;
- ENDPROC(camellia_dec_blk)
- 
-@@ -433,7 +433,7 @@ ENTRY(__camellia_enc_blk_2way)
- 	 */
+-	pushq %rbp;
++	pushq %r13;
  	pushq %rbx;
  
--	movq %rbp, RRBP;
-+	movq %r12, RR12;
- 	movq %rcx, RXOR;
- 	movq %rsi, RDST;
- 	movq %rdx, RIO;
-@@ -461,14 +461,14 @@ ENTRY(__camellia_enc_blk_2way)
+ 	inpack_blocks(RC1, RD1, RA1, RB1, RK1, RX0, RY0, RK2);
+@@ -322,7 +322,7 @@ __twofish_dec_blk8:
+ 	vmovdqu (w)(CTX), RK1;
  
- 	enc_outunpack2(mov, RT2);
- 
--	movq RRBP, %rbp;
-+	movq RR12, %r12;
  	popq %rbx;
- 	ret;
+-	popq %rbp;
++	popq %r13;
  
- .L__enc2_xor:
- 	enc_outunpack2(xor, RT2);
- 
--	movq RRBP, %rbp;
-+	movq RR12, %r12;
- 	popq %rbx;
- 	ret;
- ENDPROC(__camellia_enc_blk_2way)
-@@ -485,7 +485,7 @@ ENTRY(camellia_dec_blk_2way)
- 	cmovel RXORd, RT2d; /* max */
- 
- 	movq %rbx, RXOR;
--	movq %rbp, RRBP;
-+	movq %r12, RR12;
- 	movq %rsi, RDST;
- 	movq %rdx, RIO;
- 
-@@ -508,7 +508,7 @@ ENTRY(camellia_dec_blk_2way)
- 
- 	dec_outunpack2();
- 
--	movq RRBP, %rbp;
-+	movq RR12, %r12;
- 	movq RXOR, %rbx;
- 	ret;
- ENDPROC(camellia_dec_blk_2way)
+ 	outunpack_blocks(RA1, RB1, RC1, RD1, RK1, RX0, RY0, RK2);
+ 	outunpack_blocks(RA2, RB2, RC2, RD2, RK1, RX0, RY0, RK2);
 -- 
 2.13.5
