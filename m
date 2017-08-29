@@ -1,7 +1,7 @@
 From: Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: [PATCH 01/12] x86/crypto: Fix RBP usage in blowfish-x86_64-asm_64.S
-Date: Tue, 29 Aug 2017 13:05:34 -0500
-Message-ID: <514346f7d956410e27efa6699631f21a572b2f43.1504029132.git.jpoimboe@redhat.com>
+Subject: [PATCH 03/12] x86/crypto: Fix RBP usage in cast5-avx-x86_64-asm_64.S
+Date: Tue, 29 Aug 2017 13:05:36 -0500
+Message-ID: <ef1a8cd94baef1b9903d7ba6fe496bfbe36d37a8.1504029132.git.jpoimboe@redhat.com>
 References: <cover.1504029132.git.jpoimboe@redhat.com>
 Cc: linux-kernel@vger.kernel.org,
         Tim Chen <tim.c.chen@linux.intel.com>,
@@ -22,8 +22,8 @@ List-Id: linux-crypto.vger.kernel.org
 Using RBP as a temporary register breaks frame pointer convention and
 breaks stack traces when unwinding from an interrupt in the crypto code.
 
-Use R12 instead of RBP.  R12 can't be used as the RT0 register because
-of x86 instruction encoding limitations.  So use R12 for CTX and RDI for
+Use R15 instead of RBP.  R15 can't be used as the RID1 register because
+of x86 instruction encoding limitations.  So use R15 for CTX and RDI for
 CTX.  This means that CTX is no longer an implicit function argument.
 Instead it needs to be explicitly copied from RDI.
 
@@ -31,171 +31,197 @@ Reported-by: Eric Biggers <ebiggers@google.com>
 Reported-by: Peter Zijlstra <peterz@infradead.org>
 Signed-off-by: Josh Poimboeuf <jpoimboe@redhat.com>
 ---
- arch/x86/crypto/blowfish-x86_64-asm_64.S | 48 +++++++++++++++++---------------
- 1 file changed, 26 insertions(+), 22 deletions(-)
+ arch/x86/crypto/cast5-avx-x86_64-asm_64.S | 47 ++++++++++++++++++++-----------
+ 1 file changed, 30 insertions(+), 17 deletions(-)
 
-diff --git a/arch/x86/crypto/blowfish-x86_64-asm_64.S b/arch/x86/crypto/blowfish-x86_64-asm_64.S
-index 246c67006ed0..8c1fcb6bad21 100644
---- a/arch/x86/crypto/blowfish-x86_64-asm_64.S
-+++ b/arch/x86/crypto/blowfish-x86_64-asm_64.S
-@@ -33,7 +33,7 @@
- #define s3	((16 + 2 + (3 * 256)) * 4)
- 
- /* register macros */
+diff --git a/arch/x86/crypto/cast5-avx-x86_64-asm_64.S b/arch/x86/crypto/cast5-avx-x86_64-asm_64.S
+index b4a8806234ea..86107c961bb4 100644
+--- a/arch/x86/crypto/cast5-avx-x86_64-asm_64.S
++++ b/arch/x86/crypto/cast5-avx-x86_64-asm_64.S
+@@ -47,7 +47,7 @@
+ /**********************************************************************
+   16-way AVX cast5
+  **********************************************************************/
 -#define CTX %rdi
-+#define CTX %r12
- #define RIO %rsi
++#define CTX %r15
  
- #define RX0 %rax
-@@ -56,12 +56,12 @@
- #define RX2bh %ch
- #define RX3bh %dh
+ #define RL1 %xmm0
+ #define RR1 %xmm1
+@@ -70,8 +70,8 @@
  
--#define RT0 %rbp
-+#define RT0 %rdi
- #define RT1 %rsi
- #define RT2 %r8
- #define RT3 %r9
+ #define RTMP %xmm15
  
--#define RT0d %ebp
-+#define RT0d %edi
- #define RT1d %esi
- #define RT2d %r8d
- #define RT3d %r9d
-@@ -120,13 +120,14 @@
+-#define RID1  %rbp
+-#define RID1d %ebp
++#define RID1  %rdi
++#define RID1d %edi
+ #define RID2  %rsi
+ #define RID2d %esi
  
- ENTRY(__blowfish_enc_blk)
+@@ -226,7 +226,7 @@
+ .align 16
+ __cast5_enc_blk16:
  	/* input:
 -	 *	%rdi: ctx, CTX
 +	 *	%rdi: ctx
- 	 *	%rsi: dst
- 	 *	%rdx: src
- 	 *	%rcx: bool, if true: xor output
+ 	 *	RL1: blocks 1 and 2
+ 	 *	RR1: blocks 3 and 4
+ 	 *	RL2: blocks 5 and 6
+@@ -246,9 +246,11 @@ __cast5_enc_blk16:
+ 	 *	RR4: encrypted blocks 15 and 16
  	 */
--	movq %rbp, %r11;
-+	movq %r12, %r11;
  
-+	movq %rdi, CTX;
- 	movq %rsi, %r10;
- 	movq %rdx, RIO;
- 
-@@ -142,7 +143,7 @@ ENTRY(__blowfish_enc_blk)
- 	round_enc(14);
- 	add_roundkey_enc(16);
- 
--	movq %r11, %rbp;
-+	movq %r11, %r12;
- 
- 	movq %r10, RIO;
- 	test %cl, %cl;
-@@ -157,12 +158,13 @@ ENDPROC(__blowfish_enc_blk)
- 
- ENTRY(blowfish_dec_blk)
- 	/* input:
--	 *	%rdi: ctx, CTX
-+	 *	%rdi: ctx
- 	 *	%rsi: dst
- 	 *	%rdx: src
- 	 */
--	movq %rbp, %r11;
-+	movq %r12, %r11;
- 
-+	movq %rdi, CTX;
- 	movq %rsi, %r10;
- 	movq %rdx, RIO;
- 
-@@ -181,7 +183,7 @@ ENTRY(blowfish_dec_blk)
- 	movq %r10, RIO;
- 	write_block();
- 
--	movq %r11, %rbp;
-+	movq %r11, %r12;
- 
- 	ret;
- ENDPROC(blowfish_dec_blk)
-@@ -298,20 +300,21 @@ ENDPROC(blowfish_dec_blk)
- 
- ENTRY(__blowfish_enc_blk_4way)
- 	/* input:
--	 *	%rdi: ctx, CTX
-+	 *	%rdi: ctx
- 	 *	%rsi: dst
- 	 *	%rdx: src
- 	 *	%rcx: bool, if true: xor output
- 	 */
 -	pushq %rbp;
-+	pushq %r12;
++	pushq %r15;
  	pushq %rbx;
- 	pushq %rcx;
  
--	preload_roundkey_enc(0);
--
-+	movq %rdi, CTX
- 	movq %rsi, %r11;
- 	movq %rdx, RIO;
- 
-+	preload_roundkey_enc(0);
++	movq %rdi, CTX;
 +
- 	read_block4();
+ 	vmovdqa .Lbswap_mask, RKM;
+ 	vmovd .Lfirst_mask, R1ST;
+ 	vmovd .L32_mask, R32;
+@@ -283,7 +285,7 @@ __cast5_enc_blk16:
  
- 	round_enc4(0);
-@@ -324,39 +327,40 @@ ENTRY(__blowfish_enc_blk_4way)
- 	round_enc4(14);
- 	add_preloaded_roundkey4();
- 
--	popq %rbp;
-+	popq %r12;
- 	movq %r11, RIO;
- 
--	test %bpl, %bpl;
-+	test %r12b, %r12b;
- 	jnz .L__enc_xor4;
- 
- 	write_block4();
- 
+ .L__skip_enc:
  	popq %rbx;
 -	popq %rbp;
-+	popq %r12;
- 	ret;
++	popq %r15;
  
- .L__enc_xor4:
- 	xor_block4();
+ 	vmovdqa .Lbswap_mask, RKM;
  
+@@ -298,7 +300,7 @@ ENDPROC(__cast5_enc_blk16)
+ .align 16
+ __cast5_dec_blk16:
+ 	/* input:
+-	 *	%rdi: ctx, CTX
++	 *	%rdi: ctx
+ 	 *	RL1: encrypted blocks 1 and 2
+ 	 *	RR1: encrypted blocks 3 and 4
+ 	 *	RL2: encrypted blocks 5 and 6
+@@ -318,9 +320,11 @@ __cast5_dec_blk16:
+ 	 *	RR4: decrypted blocks 15 and 16
+ 	 */
+ 
+-	pushq %rbp;
++	pushq %r15;
+ 	pushq %rbx;
+ 
++	movq %rdi, CTX;
++
+ 	vmovdqa .Lbswap_mask, RKM;
+ 	vmovd .Lfirst_mask, R1ST;
+ 	vmovd .L32_mask, R32;
+@@ -356,7 +360,7 @@ __cast5_dec_blk16:
+ 
+ 	vmovdqa .Lbswap_mask, RKM;
  	popq %rbx;
 -	popq %rbp;
-+	popq %r12;
- 	ret;
- ENDPROC(__blowfish_enc_blk_4way)
++	popq %r15;
  
- ENTRY(blowfish_dec_blk_4way)
+ 	outunpack_blocks(RR1, RL1, RTMP, RX, RKM);
+ 	outunpack_blocks(RR2, RL2, RTMP, RX, RKM);
+@@ -372,12 +376,14 @@ ENDPROC(__cast5_dec_blk16)
+ 
+ ENTRY(cast5_ecb_enc_16way)
  	/* input:
 -	 *	%rdi: ctx, CTX
 +	 *	%rdi: ctx
  	 *	%rsi: dst
  	 *	%rdx: src
  	 */
--	pushq %rbp;
-+	pushq %r12;
- 	pushq %rbx;
--	preload_roundkey_dec(17);
+ 	FRAME_BEGIN
++	pushq %r15;
  
--	movq %rsi, %r11;
 +	movq %rdi, CTX;
-+	movq %rsi, %r11
- 	movq %rdx, RIO;
+ 	movq %rsi, %r11;
  
-+	preload_roundkey_dec(17);
- 	read_block4();
+ 	vmovdqu (0*4*4)(%rdx), RL1;
+@@ -400,18 +406,22 @@ ENTRY(cast5_ecb_enc_16way)
+ 	vmovdqu RR4, (6*4*4)(%r11);
+ 	vmovdqu RL4, (7*4*4)(%r11);
  
- 	round_dec4(17);
-@@ -373,7 +377,7 @@ ENTRY(blowfish_dec_blk_4way)
- 	write_block4();
- 
- 	popq %rbx;
--	popq %rbp;
-+	popq %r12;
- 
++	popq %r15;
+ 	FRAME_END
  	ret;
- ENDPROC(blowfish_dec_blk_4way)
+ ENDPROC(cast5_ecb_enc_16way)
+ 
+ ENTRY(cast5_ecb_dec_16way)
+ 	/* input:
+-	 *	%rdi: ctx, CTX
++	 *	%rdi: ctx
+ 	 *	%rsi: dst
+ 	 *	%rdx: src
+ 	 */
+ 
+ 	FRAME_BEGIN
++	pushq %r15;
++
++	movq %rdi, CTX;
+ 	movq %rsi, %r11;
+ 
+ 	vmovdqu (0*4*4)(%rdx), RL1;
+@@ -434,20 +444,22 @@ ENTRY(cast5_ecb_dec_16way)
+ 	vmovdqu RR4, (6*4*4)(%r11);
+ 	vmovdqu RL4, (7*4*4)(%r11);
+ 
++	popq %r15;
+ 	FRAME_END
+ 	ret;
+ ENDPROC(cast5_ecb_dec_16way)
+ 
+ ENTRY(cast5_cbc_dec_16way)
+ 	/* input:
+-	 *	%rdi: ctx, CTX
++	 *	%rdi: ctx
+ 	 *	%rsi: dst
+ 	 *	%rdx: src
+ 	 */
+ 	FRAME_BEGIN
+-
+ 	pushq %r12;
++	pushq %r15;
+ 
++	movq %rdi, CTX;
+ 	movq %rsi, %r11;
+ 	movq %rdx, %r12;
+ 
+@@ -483,23 +495,24 @@ ENTRY(cast5_cbc_dec_16way)
+ 	vmovdqu RR4, (6*16)(%r11);
+ 	vmovdqu RL4, (7*16)(%r11);
+ 
++	popq %r15;
+ 	popq %r12;
+-
+ 	FRAME_END
+ 	ret;
+ ENDPROC(cast5_cbc_dec_16way)
+ 
+ ENTRY(cast5_ctr_16way)
+ 	/* input:
+-	 *	%rdi: ctx, CTX
++	 *	%rdi: ctx
+ 	 *	%rsi: dst
+ 	 *	%rdx: src
+ 	 *	%rcx: iv (big endian, 64bit)
+ 	 */
+ 	FRAME_BEGIN
+-
+ 	pushq %r12;
++	pushq %r15;
+ 
++	movq %rdi, CTX;
+ 	movq %rsi, %r11;
+ 	movq %rdx, %r12;
+ 
+@@ -558,8 +571,8 @@ ENTRY(cast5_ctr_16way)
+ 	vmovdqu RR4, (6*16)(%r11);
+ 	vmovdqu RL4, (7*16)(%r11);
+ 
++	popq %r15;
+ 	popq %r12;
+-
+ 	FRAME_END
+ 	ret;
+ ENDPROC(cast5_ctr_16way)
 -- 
 2.13.5
