@@ -1,7 +1,7 @@
 From: Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: [PATCH 05/12] x86/crypto: Fix RBP usage in des3_ede-asm_64.S
-Date: Tue, 29 Aug 2017 13:05:38 -0500
-Message-ID: <1ce08550f17bd6a93df664d7fe7950837b05cc9f.1504029132.git.jpoimboe@redhat.com>
+Subject: [PATCH 08/12] x86/crypto: Fix RBP usage in sha256-avx-asm.S
+Date: Tue, 29 Aug 2017 13:05:41 -0500
+Message-ID: <adab3617a99a9eff63a18f33c1e8643bed08a6bb.1504029132.git.jpoimboe@redhat.com>
 References: <cover.1504029132.git.jpoimboe@redhat.com>
 Cc: linux-kernel@vger.kernel.org,
         Tim Chen <tim.c.chen@linux.intel.com>,
@@ -22,100 +22,62 @@ List-Id: linux-crypto.vger.kernel.org
 Using RBP as a temporary register breaks frame pointer convention and
 breaks stack traces when unwinding from an interrupt in the crypto code.
 
-Use RSI instead of RBP for RT1.  Since RSI is also used as a the 'dst'
-function argument, it needs to be saved on the stack until the argument
-is needed.
+Swap the usages of R12 and RBP.  Use R12 for the TBL register, and use
+RBP to store the pre-aligned stack pointer.
 
 Reported-by: Eric Biggers <ebiggers@google.com>
 Reported-by: Peter Zijlstra <peterz@infradead.org>
 Signed-off-by: Josh Poimboeuf <jpoimboe@redhat.com>
 ---
- arch/x86/crypto/des3_ede-asm_64.S | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+ arch/x86/crypto/sha256-avx-asm.S | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/arch/x86/crypto/des3_ede-asm_64.S b/arch/x86/crypto/des3_ede-asm_64.S
-index f3e91647ca27..8e49ce117494 100644
---- a/arch/x86/crypto/des3_ede-asm_64.S
-+++ b/arch/x86/crypto/des3_ede-asm_64.S
-@@ -64,12 +64,12 @@
- #define RW2bh %ch
+diff --git a/arch/x86/crypto/sha256-avx-asm.S b/arch/x86/crypto/sha256-avx-asm.S
+index e08888a1a5f2..001bbcf93c79 100644
+--- a/arch/x86/crypto/sha256-avx-asm.S
++++ b/arch/x86/crypto/sha256-avx-asm.S
+@@ -103,7 +103,7 @@ SRND = %rsi       # clobbers INP
+ c = %ecx
+ d = %r8d
+ e = %edx
+-TBL = %rbp
++TBL = %r12
+ a = %eax
+ b = %ebx
  
- #define RT0 %r15
--#define RT1 %rbp
-+#define RT1 %rsi
- #define RT2 %r14
- #define RT3 %rdx
+@@ -350,13 +350,13 @@ a = TMP_
+ ENTRY(sha256_transform_avx)
+ .align 32
+ 	pushq   %rbx
+-	pushq   %rbp
++	pushq   %r12
+ 	pushq   %r13
+ 	pushq   %r14
+ 	pushq   %r15
+-	pushq   %r12
++	pushq	%rbp
++	movq	%rsp, %rbp
  
- #define RT0d %r15d
--#define RT1d %ebp
-+#define RT1d %esi
- #define RT2d %r14d
- #define RT3d %edx
+-	mov	%rsp, %r12
+ 	subq    $STACK_SIZE, %rsp	# allocate stack space
+ 	and	$~15, %rsp		# align stack pointer
  
-@@ -177,13 +177,14 @@ ENTRY(des3_ede_x86_64_crypt_blk)
- 	 *	%rsi: dst
- 	 *	%rdx: src
- 	 */
--	pushq %rbp;
- 	pushq %rbx;
- 	pushq %r12;
- 	pushq %r13;
- 	pushq %r14;
- 	pushq %r15;
+@@ -452,13 +452,12 @@ loop2:
  
-+	pushq %rsi; /* dst */
-+
- 	read_block(%rdx, RL0, RR0);
- 	initial_permutation(RL0, RR0);
+ done_hash:
  
-@@ -241,6 +242,8 @@ ENTRY(des3_ede_x86_64_crypt_blk)
- 	round1(32+15, RL0, RR0, dummy2);
- 
- 	final_permutation(RR0, RL0);
-+
-+	popq %rsi /* dst */
- 	write_block(%rsi, RR0, RL0);
- 
- 	popq %r15;
-@@ -248,7 +251,6 @@ ENTRY(des3_ede_x86_64_crypt_blk)
- 	popq %r13;
- 	popq %r12;
- 	popq %rbx;
--	popq %rbp;
- 
- 	ret;
- ENDPROC(des3_ede_x86_64_crypt_blk)
-@@ -432,13 +434,14 @@ ENTRY(des3_ede_x86_64_crypt_blk_3way)
- 	 *	%rdx: src (3 blocks)
- 	 */
- 
--	pushq %rbp;
- 	pushq %rbx;
- 	pushq %r12;
- 	pushq %r13;
- 	pushq %r14;
- 	pushq %r15;
- 
-+	pushq %rsi /* dst */
-+
- 	/* load input */
- 	movl 0 * 4(%rdx), RL0d;
- 	movl 1 * 4(%rdx), RR0d;
-@@ -520,6 +523,7 @@ ENTRY(des3_ede_x86_64_crypt_blk_3way)
- 	bswapl RR2d;
- 	bswapl RL2d;
- 
-+	popq %rsi /* dst */
- 	movl RR0d, 0 * 4(%rsi);
- 	movl RL0d, 1 * 4(%rsi);
- 	movl RR1d, 2 * 4(%rsi);
-@@ -532,7 +536,6 @@ ENTRY(des3_ede_x86_64_crypt_blk_3way)
- 	popq %r13;
- 	popq %r12;
- 	popq %rbx;
--	popq %rbp;
- 
- 	ret;
- ENDPROC(des3_ede_x86_64_crypt_blk_3way)
+-	mov	%r12, %rsp
+-
+-	popq	%r12
++	mov	%rbp, %rsp
++	popq	%rbp
+ 	popq    %r15
+ 	popq    %r14
+ 	popq    %r13
+-	popq    %rbp
++	popq	%r12
+ 	popq    %rbx
+ 	ret
+ ENDPROC(sha256_transform_avx)
 -- 
 2.13.5
