@@ -1,8 +1,11 @@
 From: Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: [PATCH 06/12] x86/crypto: Fix RBP usage in sha1_avx2_x86_64_asm.S
-Date: Tue, 29 Aug 2017 13:05:39 -0500
-Message-ID: <12db8df183584a6c605d233c22b1ca0a19e08c56.1504029132.git.jpoimboe@redhat.com>
+Subject: [PATCH 04/12] x86/crypto: Fix RBP usage in cast6-avx-x86_64-asm_64.S
+Date: Tue, 29 Aug 2017 13:05:37 -0500
+Message-ID: <a02d9dbace927149a9b68b5d6e57f1b267aba430.1504029132.git.jpoimboe@redhat.com>
 References: <cover.1504029132.git.jpoimboe@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Cc: linux-kernel@vger.kernel.org,
         Tim Chen <tim.c.chen@linux.intel.com>,
         Mathias Krause <minipli@googlemail.com>,
@@ -22,44 +25,231 @@ List-Id: linux-crypto.vger.kernel.org
 Using RBP as a temporary register breaks frame pointer convention and
 breaks stack traces when unwinding from an interrupt in the crypto code.
 
-Use R11 instead of RBP.  Since R11 isn't a callee-saved register, it
-doesn't need to be saved and restored on the stack.
+Use R15 instead of RBP.  R15 can't be used as the RID1 register because
+of x86 instruction encoding limitations.  So use R15 for CTX and RDI for
+CTX.  This means that CTX is no longer an implicit function argument.
+Instead it needs to be explicitly copied from RDI.
 
 Reported-by: Eric Biggers <ebiggers@google.com>
 Reported-by: Peter Zijlstra <peterz@infradead.org>
 Signed-off-by: Josh Poimboeuf <jpoimboe@redhat.com>
 ---
- arch/x86/crypto/sha1_avx2_x86_64_asm.S | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ arch/x86/crypto/cast6-avx-x86_64-asm_64.S | 50 +++++++++++++++++++++----------
+ 1 file changed, 34 insertions(+), 16 deletions(-)
 
-diff --git a/arch/x86/crypto/sha1_avx2_x86_64_asm.S b/arch/x86/crypto/sha1_avx2_x86_64_asm.S
-index 1eab79c9ac48..9f712a7dfd79 100644
---- a/arch/x86/crypto/sha1_avx2_x86_64_asm.S
-+++ b/arch/x86/crypto/sha1_avx2_x86_64_asm.S
-@@ -89,7 +89,7 @@
- #define	REG_RE	%rdx
- #define	REG_RTA	%r12
- #define	REG_RTB	%rbx
--#define	REG_T1	%ebp
-+#define	REG_T1	%r11d
- #define	xmm_mov	vmovups
- #define	avx2_zeroupper	vzeroupper
- #define	RND_F1	1
-@@ -637,7 +637,6 @@ _loop3:
- 	ENTRY(\name)
+diff --git a/arch/x86/crypto/cast6-avx-x86_64-asm_64.S b/arch/x86/crypto/cast6-avx-x86_64-asm_64.S
+index 952d3156a933..7f30b6f0d72c 100644
+--- a/arch/x86/crypto/cast6-avx-x86_64-asm_64.S
++++ b/arch/x86/crypto/cast6-avx-x86_64-asm_64.S
+@@ -47,7 +47,7 @@
+ /**********************************************************************
+   8-way AVX cast6
+  **********************************************************************/
+-#define CTX %rdi
++#define CTX %r15
  
- 	push	%rbx
--	push	%rbp
- 	push	%r12
- 	push	%r13
- 	push	%r14
-@@ -673,7 +672,6 @@ _loop3:
- 	pop	%r14
- 	pop	%r13
- 	pop	%r12
--	pop	%rbp
- 	pop	%rbx
+ #define RA1 %xmm0
+ #define RB1 %xmm1
+@@ -70,8 +70,8 @@
  
- 	ret
+ #define RTMP %xmm15
+ 
+-#define RID1  %rbp
+-#define RID1d %ebp
++#define RID1  %rdi
++#define RID1d %edi
+ #define RID2  %rsi
+ #define RID2d %esi
+ 
+@@ -264,15 +264,17 @@
+ .align 8
+ __cast6_enc_blk8:
+ 	/* input:
+-	 *	%rdi: ctx, CTX
++	 *	%rdi: ctx
+ 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: blocks
+ 	 * output:
+ 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: encrypted blocks
+ 	 */
+ 
+-	pushq %rbp;
++	pushq %r15;
+ 	pushq %rbx;
+ 
++	movq %rdi, CTX;
++
+ 	vmovdqa .Lbswap_mask, RKM;
+ 	vmovd .Lfirst_mask, R1ST;
+ 	vmovd .L32_mask, R32;
+@@ -297,7 +299,7 @@ __cast6_enc_blk8:
+ 	QBAR(11);
+ 
+ 	popq %rbx;
+-	popq %rbp;
++	popq %r15;
+ 
+ 	vmovdqa .Lbswap_mask, RKM;
+ 
+@@ -310,15 +312,17 @@ ENDPROC(__cast6_enc_blk8)
+ .align 8
+ __cast6_dec_blk8:
+ 	/* input:
+-	 *	%rdi: ctx, CTX
++	 *	%rdi: ctx
+ 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: encrypted blocks
+ 	 * output:
+ 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: decrypted blocks
+ 	 */
+ 
+-	pushq %rbp;
++	pushq %r15;
+ 	pushq %rbx;
+ 
++	movq %rdi, CTX;
++
+ 	vmovdqa .Lbswap_mask, RKM;
+ 	vmovd .Lfirst_mask, R1ST;
+ 	vmovd .L32_mask, R32;
+@@ -343,7 +347,7 @@ __cast6_dec_blk8:
+ 	QBAR(0);
+ 
+ 	popq %rbx;
+-	popq %rbp;
++	popq %r15;
+ 
+ 	vmovdqa .Lbswap_mask, RKM;
+ 	outunpack_blocks(RA1, RB1, RC1, RD1, RTMP, RX, RKRF, RKM);
+@@ -354,12 +358,14 @@ ENDPROC(__cast6_dec_blk8)
+ 
+ ENTRY(cast6_ecb_enc_8way)
+ 	/* input:
+-	 *	%rdi: ctx, CTX
++	 *	%rdi: ctx
+ 	 *	%rsi: dst
+ 	 *	%rdx: src
+ 	 */
+ 	FRAME_BEGIN
++	pushq %r15;
+ 
++	movq %rdi, CTX;
+ 	movq %rsi, %r11;
+ 
+ 	load_8way(%rdx, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
+@@ -368,18 +374,21 @@ ENTRY(cast6_ecb_enc_8way)
+ 
+ 	store_8way(%r11, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
+ 
++	popq %r15;
+ 	FRAME_END
+ 	ret;
+ ENDPROC(cast6_ecb_enc_8way)
+ 
+ ENTRY(cast6_ecb_dec_8way)
+ 	/* input:
+-	 *	%rdi: ctx, CTX
++	 *	%rdi: ctx
+ 	 *	%rsi: dst
+ 	 *	%rdx: src
+ 	 */
+ 	FRAME_BEGIN
++	pushq %r15;
+ 
++	movq %rdi, CTX;
+ 	movq %rsi, %r11;
+ 
+ 	load_8way(%rdx, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
+@@ -388,20 +397,22 @@ ENTRY(cast6_ecb_dec_8way)
+ 
+ 	store_8way(%r11, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
+ 
++	popq %r15;
+ 	FRAME_END
+ 	ret;
+ ENDPROC(cast6_ecb_dec_8way)
+ 
+ ENTRY(cast6_cbc_dec_8way)
+ 	/* input:
+-	 *	%rdi: ctx, CTX
++	 *	%rdi: ctx
+ 	 *	%rsi: dst
+ 	 *	%rdx: src
+ 	 */
+ 	FRAME_BEGIN
+-
+ 	pushq %r12;
++	pushq %r15;
+ 
++	movq %rdi, CTX;
+ 	movq %rsi, %r11;
+ 	movq %rdx, %r12;
+ 
+@@ -411,8 +422,8 @@ ENTRY(cast6_cbc_dec_8way)
+ 
+ 	store_cbc_8way(%r12, %r11, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
+ 
++	popq %r15;
+ 	popq %r12;
+-
+ 	FRAME_END
+ 	ret;
+ ENDPROC(cast6_cbc_dec_8way)
+@@ -425,9 +436,10 @@ ENTRY(cast6_ctr_8way)
+ 	 *	%rcx: iv (little endian, 128bit)
+ 	 */
+ 	FRAME_BEGIN
+-
+ 	pushq %r12;
++	pushq %r15
+ 
++	movq %rdi, CTX;
+ 	movq %rsi, %r11;
+ 	movq %rdx, %r12;
+ 
+@@ -438,8 +450,8 @@ ENTRY(cast6_ctr_8way)
+ 
+ 	store_ctr_8way(%r12, %r11, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
+ 
++	popq %r15;
+ 	popq %r12;
+-
+ 	FRAME_END
+ 	ret;
+ ENDPROC(cast6_ctr_8way)
+@@ -452,7 +464,9 @@ ENTRY(cast6_xts_enc_8way)
+ 	 *	%rcx: iv (t ⊕ αⁿ ∈ GF(2¹²⁸))
+ 	 */
+ 	FRAME_BEGIN
++	pushq %r15;
+ 
++	movq %rdi, CTX
+ 	movq %rsi, %r11;
+ 
+ 	/* regs <= src, dst <= IVs, regs <= regs xor IVs */
+@@ -464,6 +478,7 @@ ENTRY(cast6_xts_enc_8way)
+ 	/* dst <= regs xor IVs(in dst) */
+ 	store_xts_8way(%r11, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
+ 
++	popq %r15;
+ 	FRAME_END
+ 	ret;
+ ENDPROC(cast6_xts_enc_8way)
+@@ -476,7 +491,9 @@ ENTRY(cast6_xts_dec_8way)
+ 	 *	%rcx: iv (t ⊕ αⁿ ∈ GF(2¹²⁸))
+ 	 */
+ 	FRAME_BEGIN
++	pushq %r15;
+ 
++	movq %rdi, CTX
+ 	movq %rsi, %r11;
+ 
+ 	/* regs <= src, dst <= IVs, regs <= regs xor IVs */
+@@ -488,6 +505,7 @@ ENTRY(cast6_xts_dec_8way)
+ 	/* dst <= regs xor IVs(in dst) */
+ 	store_xts_8way(%r11, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
+ 
++	popq %r15;
+ 	FRAME_END
+ 	ret;
+ ENDPROC(cast6_xts_dec_8way)
 -- 
 2.13.5
