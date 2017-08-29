@@ -1,7 +1,7 @@
 From: Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: [PATCH 11/12] x86/crypto: Fix RBP usage in sha512-avx2-asm.S
-Date: Tue, 29 Aug 2017 13:05:44 -0500
-Message-ID: <9a0f9d601d4ee24f6896f4764f3e3d08c80fa806.1504029132.git.jpoimboe@redhat.com>
+Subject: [PATCH 10/12] x86/crypto: Fix RBP usage in sha256-ssse3-asm.S
+Date: Tue, 29 Aug 2017 13:05:43 -0500
+Message-ID: <6818de78fab761c9337063050bdfed699b52b5fa.1504029132.git.jpoimboe@redhat.com>
 References: <cover.1504029132.git.jpoimboe@redhat.com>
 Cc: linux-kernel@vger.kernel.org,
         Tim Chen <tim.c.chen@linux.intel.com>,
@@ -14,126 +14,70 @@ Cc: linux-kernel@vger.kernel.org,
         linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@google.com>,
         Andy Lutomirski <luto@kernel.org>, Jiri Slaby <jslaby@suse.cz>
 To: x86@kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:39772 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751514AbdH2SGb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 29 Aug 2017 14:06:31 -0400
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <cover.1504029132.git.jpoimboe@redhat.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 Using RBP as a temporary register breaks frame pointer convention and
 breaks stack traces when unwinding from an interrupt in the crypto code.
 
-Use R12 instead of RBP for the TBL register.  Since R12 is also used as
-another temporary register (T1), it gets clobbered in each round of
-computation.  So the TBL value needs to be freshly reloaded into R12
-each time it's used.  Since the value of TBL can change, store its
-permanent value on the stack at the frame_TBL offset.
+Swap the usages of R12 and RBP.  Use R12 for the TBL register, and use
+RBP to store the pre-aligned stack pointer.
 
-Also remove the unused y4 variable.
-
-Reported-by: Eric Biggers <ebiggers3@gmail.com>
+Reported-by: Eric Biggers <ebiggers@google.com>
 Reported-by: Peter Zijlstra <peterz@infradead.org>
 Signed-off-by: Josh Poimboeuf <jpoimboe@redhat.com>
 ---
- arch/x86/crypto/sha512-avx2-asm.S | 21 ++++++++++++++-------
- 1 file changed, 14 insertions(+), 7 deletions(-)
+ arch/x86/crypto/sha256-ssse3-asm.S | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/arch/x86/crypto/sha512-avx2-asm.S b/arch/x86/crypto/sha512-avx2-asm.S
-index 7f5f6c6ec72e..37cfc2004abd 100644
---- a/arch/x86/crypto/sha512-avx2-asm.S
-+++ b/arch/x86/crypto/sha512-avx2-asm.S
-@@ -81,7 +81,7 @@ d           = %r8
- e           = %rdx
- y3          = %rsi
+diff --git a/arch/x86/crypto/sha256-ssse3-asm.S b/arch/x86/crypto/sha256-ssse3-asm.S
+index 39b83c93e7fd..c6c05ed2c16a 100644
+--- a/arch/x86/crypto/sha256-ssse3-asm.S
++++ b/arch/x86/crypto/sha256-ssse3-asm.S
+@@ -95,7 +95,7 @@ SRND = %rsi       # clobbers INP
+ c = %ecx
+ d = %r8d
+ e = %edx
+-TBL = %rbp
++TBL = %r12
+ a = %eax
+ b = %ebx
  
--TBL   = %rbp
-+TBL   = %r12 # clobbered by T1
+@@ -356,13 +356,13 @@ a = TMP_
+ ENTRY(sha256_transform_ssse3)
+ .align 32
+ 	pushq   %rbx
+-	pushq   %rbp
++	pushq   %r12
+ 	pushq   %r13
+ 	pushq   %r14
+ 	pushq   %r15
+-	pushq   %r12
++	pushq   %rbp
++	mov	%rsp, %rbp
  
- a     = %rax
- b     = %rbx
-@@ -96,11 +96,10 @@ y0    = %r13
- y1    = %r14
- y2    = %r15
+-	mov	%rsp, %r12
+ 	subq    $STACK_SIZE, %rsp
+ 	and	$~15, %rsp
  
--y4    = %r12
+@@ -462,13 +462,12 @@ loop2:
+ 
+ done_hash:
+ 
+-	mov	%r12, %rsp
 -
- # Local variables (stack frame)
- XFER_SIZE = 4*8
- SRND_SIZE = 1*8
-+TBL_SIZE = 1*8
- INP_SIZE = 1*8
- INPEND_SIZE = 1*8
- RSPSAVE_SIZE = 1*8
-@@ -108,7 +107,8 @@ GPRSAVE_SIZE = 6*8
+-	popq    %r12
++	mov	%rbp, %rsp
++	popq	%rbp
+ 	popq    %r15
+ 	popq    %r14
+ 	popq    %r13
+-	popq    %rbp
++	popq    %r12
+ 	popq    %rbx
  
- frame_XFER = 0
- frame_SRND = frame_XFER + XFER_SIZE
--frame_INP = frame_SRND + SRND_SIZE
-+frame_TBL = frame_SRND + SRND_SIZE
-+frame_INP = frame_TBL + TBL_SIZE
- frame_INPEND = frame_INP + INP_SIZE
- frame_RSPSAVE = frame_INPEND + INPEND_SIZE
- frame_GPRSAVE = frame_RSPSAVE + RSPSAVE_SIZE
-@@ -601,7 +601,7 @@ ENTRY(sha512_transform_rorx)
- 	vmovdqa	PSHUFFLE_BYTE_FLIP_MASK(%rip), BYTE_FLIP_MASK
- 
- loop0:
--	lea	K512(%rip), TBL
-+	movq	$K512, frame_TBL(%rsp)
- 
- 	## byte swap first 16 dwords
- 	COPY_YMM_AND_BSWAP	Y_0, (INP), BYTE_FLIP_MASK
-@@ -616,39 +616,46 @@ loop0:
- 
- .align 16
- loop1:
-+	mov frame_TBL(%rsp), TBL
- 	vpaddq	(TBL), Y_0, XFER
- 	vmovdqa XFER, frame_XFER(%rsp)
- 	FOUR_ROUNDS_AND_SCHED
- 
-+	mov frame_TBL(%rsp), TBL
- 	vpaddq	1*32(TBL), Y_0, XFER
- 	vmovdqa XFER, frame_XFER(%rsp)
- 	FOUR_ROUNDS_AND_SCHED
- 
-+	mov frame_TBL(%rsp), TBL
- 	vpaddq	2*32(TBL), Y_0, XFER
- 	vmovdqa XFER, frame_XFER(%rsp)
- 	FOUR_ROUNDS_AND_SCHED
- 
-+	mov frame_TBL(%rsp), TBL
- 	vpaddq	3*32(TBL), Y_0, XFER
- 	vmovdqa XFER, frame_XFER(%rsp)
--	add	$(4*32), TBL
- 	FOUR_ROUNDS_AND_SCHED
- 
-+	addq	$(4*32), frame_TBL(%rsp)
- 	subq	$1, frame_SRND(%rsp)
- 	jne	loop1
- 
- 	movq	$2, frame_SRND(%rsp)
- loop2:
-+	mov frame_TBL(%rsp), TBL
- 	vpaddq	(TBL), Y_0, XFER
- 	vmovdqa XFER, frame_XFER(%rsp)
- 	DO_4ROUNDS
-+
-+	mov frame_TBL(%rsp), TBL
- 	vpaddq	1*32(TBL), Y_1, XFER
- 	vmovdqa XFER, frame_XFER(%rsp)
--	add	$(2*32), TBL
- 	DO_4ROUNDS
- 
- 	vmovdqa	Y_2, Y_0
- 	vmovdqa	Y_3, Y_1
- 
-+	add	$(2*32), frame_TBL(%rsp)
- 	subq	$1, frame_SRND(%rsp)
- 	jne	loop2
- 
+ 	ret
 -- 
 2.13.5
