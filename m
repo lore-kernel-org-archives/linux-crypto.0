@@ -1,9 +1,9 @@
 From: Haren Myneni <haren@linux.vnet.ibm.com>
 Subject: Re: [PATCH V3 6/6] crypto/nx: Add P9 NX support for 842 compression
  engine
-Date: Thu, 31 Aug 2017 12:03:00 -0700
-Message-ID: <59A85D64.5050801@linux.vnet.ibm.com>
-References: <1500699702.23205.8.camel@hbabu-laptop> <878ti35l7z.fsf@concordia.ellerman.id.au> <CALZtONDnFLiGhTRNs89VWr3nrY0Bp9VPRqFXA0iEaa6U_+w4Ag@mail.gmail.com> <59A7BE4E.1040806@linux.vnet.ibm.com> <CALZtONCmvVM1qu9RjP9iVn+C32rJ3fCHCJCbjkXJqNFfmVGgKg@mail.gmail.com>
+Date: Thu, 31 Aug 2017 12:09:02 -0700
+Message-ID: <59A85ECE.9080501@linux.vnet.ibm.com>
+References: <1500699702.23205.8.camel@hbabu-laptop> <CALZtONBGVQy2iwkb8WpVd-_QG7bLFTvUbnuub6CCXP55YpQiSQ@mail.gmail.com> <1504041817.2358.32.camel@kernel.crashing.org> <59A5E2AE.5060400@linux.vnet.ibm.com> <CALZtONBBvrfWkiFQipMrM9+VxsbBkHMFOAbgL0OBm5gb8yZ=LQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
@@ -15,111 +15,78 @@ Cc: Michael Neuling <mikey@neuling.org>,
         "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
 To: Dan Streetman <ddstreet@ieee.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39505 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751127AbdHaTDR (ORCPT
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41250 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1750968AbdHaTJR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 31 Aug 2017 15:03:17 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id v7VJ1c0r026927
-        for <linux-crypto@vger.kernel.org>; Thu, 31 Aug 2017 15:03:16 -0400
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2cpnp0fgya-1
+        Thu, 31 Aug 2017 15:09:17 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id v7VJ8CD3005445
+        for <linux-crypto@vger.kernel.org>; Thu, 31 Aug 2017 15:09:16 -0400
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2cpneg0fyv-1
         (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Thu, 31 Aug 2017 15:03:16 -0400
+        for <linux-crypto@vger.kernel.org>; Thu, 31 Aug 2017 15:09:16 -0400
 Received: from localhost
-        by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <linux-crypto@vger.kernel.org> from <haren@linux.vnet.ibm.com>;
-        Thu, 31 Aug 2017 15:03:15 -0400
-In-Reply-To: <CALZtONCmvVM1qu9RjP9iVn+C32rJ3fCHCJCbjkXJqNFfmVGgKg@mail.gmail.com>
+        Thu, 31 Aug 2017 13:09:15 -0600
+In-Reply-To: <CALZtONBBvrfWkiFQipMrM9+VxsbBkHMFOAbgL0OBm5gb8yZ=LQ@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 08/31/2017 06:40 AM, Dan Streetman wrote:
-> On Thu, Aug 31, 2017 at 3:44 AM, Haren Myneni <haren@linux.vnet.ibm.com> wrote:
->> Thanks MIchael and Dan for your review comments.
+On 08/31/2017 06:31 AM, Dan Streetman wrote:
+> On Tue, Aug 29, 2017 at 5:54 PM, Haren Myneni <haren@linux.vnet.ibm.com> wrote:
+>> On 08/29/2017 02:23 PM, Benjamin Herrenschmidt wrote:
+>>> On Tue, 2017-08-29 at 09:58 -0400, Dan Streetman wrote:
+>>>>> +
+>>>>> +       ret = -EINVAL;
+>>>>> +       if (coproc && coproc->vas.rxwin) {
+>>>>> +               wmem->txwin = nx842_alloc_txwin(coproc);
+>>>>
+>>>> this is wrong.  the workmem is scratch memory that's valid only for
+>>>> the duration of a single operation.
 >>
->>
->> On 08/29/2017 06:32 AM, Dan Streetman wrote:
->>> On Mon, Aug 28, 2017 at 7:25 PM, Michael Ellerman <mpe@ellerman.id.au> wrote:
->>>> Hi Haren,
->>>>
->>>> Some comments inline ...
->>>>
->>>> Haren Myneni <haren@linux.vnet.ibm.com> writes:
->>>>
->>>>> diff --git a/drivers/crypto/nx/nx-842-powernv.c b/drivers/crypto/nx/nx-842-powernv.c
->>>>> index c0dd4c7e17d3..13089a0b9dfa 100644
->>>>> --- a/drivers/crypto/nx/nx-842-powernv.c
->>>>> +++ b/drivers/crypto/nx/nx-842-powernv.c
->>>>> @@ -32,6 +33,9 @@ MODULE_ALIAS_CRYPTO("842-nx");
->>>>>
->>>>>  #define WORKMEM_ALIGN        (CRB_ALIGN)
->>>>>  #define CSB_WAIT_MAX (5000) /* ms */
->>>>> +#define VAS_RETRIES  (10)
->>>>
->>>> Where does that number come from?
->>
->> Sometimes HW returns copy/paste failures.
+>> Correct, workmem is used until crypto_free is called.
 > 
-> why?  what is causing the failure?
+> that's not a 'single operation'.  a single operation is compress() or
+> decompress().
 
-Vas can return RMA_busy for several reasons - receive / send windows does not have credits or cached and etc.
- 
+workmem is allocated in nx842_crypto_init (called from crypto_alloc) and freed in crypto_free(). We can have single compression / decompression() operation or multiple within this crypto session. In case of single operation, we will end up workmem, ctx->sbounce/dbounce alloc/free for each request.  
+
 > 
->> So we should retry the request again. With 10 retries, Test running
->> 12 hours was successful for repeated compression/decompression
->> requests with 1024 threads.
->>
 >>>>
->>>> Do we have any idea what the trade off is between retrying vs just
->>>> falling back to doing the request in software?
+>>>> do you actually need a txwin per crypto transform?  or do you need a
+>>>> txwin per coprocessor?  or txwin per processor?  either per-coproc or
+>>>> per-cpu should be created at driver init and held separately
+>>>> (globally) instead of a per-transform txwin.  I really don't see why
+>>>> you would need a txwin per transform, because the coproc should not
+>>>> care how many different transforms there are.
+>>>
+>>> We should only need a single window for the whole kernel really, plus
+>>> one per user process who wants direct access but that's not relevant
+>>> here.
 >>
->> Not checked the overhead with falling back to SW compression.
+>> Opening send window for each crypto transform (crypto_alloc,
+>> compression/decompression, ..., crypto_free) so that does not
+>> have to wait for the previous copy/paste complete.
+>> VAS will map send and receive windows, and can cache in send
+>> windows (up to 128). So I thought using the same send window
+>> (per chip) for more requests (say 1000) may be adding overhead.
+>>
+>> I will make changes if you prefer using 1 send window per chip.
 > 
-> SW is very, very, very slow, due to 842 being an unaligned compression format.
+> i don't have the spec, so i shouldn't be making the decision on it,
+> but i do know putting a persistent field into the workmem is the wrong
+> location.  If it's valid for the life of the transform, put it into
+> the transform context.  The workmem buffer is intended to be used only
+> during a single operation - it's "working memory" to perform each
+> individual crypto transformation.
 > 
 >>
->>>>
->>>>> +/* # of requests allowed per RxFIFO at a time. 0 for unlimited */
->>>>> +#define MAX_CREDITS_PER_RXFIFO       (1024)
->>>>>
->>>>>  struct nx842_workmem {
->>>>>       /* Below fields must be properly aligned */
->>>>> @@ -42,16 +46,27 @@ struct nx842_workmem {
->>>>>
->>>>>       ktime_t start;
->>>>>
->>>>> +     struct vas_window *txwin;       /* Used with VAS function */
->>>>
->>>> I don't understand how it makes sense to put txwin and start between the
->>>> fields above, and the padding.
 >>>
->>> workmem is a scratch buffer and shouldn't be used for something
->>> persistent like this.
+>>> Cheers,
+>>> Ben.
 >>>
->>>>
->>>> If the workmem pointer you receive is not aligned, then PTR_ALIGN() will
->>>> advance it and mean you end up writing over start and txwin.
->>
->> We always access workmem with PTR_ALIGN even when assigning txwin (nx842_powernv_crypto_init/exit_vas).
->> So we should not overwrite start and txwin,
->>
->> We can add txwin in nx842_crypto_ctx instead of workmem. But nx842_crypto_ctx is used for both powernv and pseries. Hence used workmem. But if nx842_crypto_ctx is preferred, I will send new patch soon.
->>
->>>>
->>>> That's probably not your bug, the code is already like that.
->>>
->>> no, it's a bug in this patch, because workmem is scratch whose
->>> contents are only valid for the duration of each operation (compress
->>> or decompress).
->>>
->>>>
->>>>>       char padding[WORKMEM_ALIGN]; /* unused, to allow alignment */
->>>>>  } __packed __aligned(WORKMEM_ALIGN);
->>>>
->>
->> Thanks
->> Haren
 >>
 > 
