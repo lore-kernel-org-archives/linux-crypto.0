@@ -1,92 +1,61 @@
-From: Haren Myneni <haren@linux.vnet.ibm.com>
-Subject: Re: [PATCH V3 6/6] crypto/nx: Add P9 NX support for 842 compression
- engine
-Date: Thu, 31 Aug 2017 12:09:02 -0700
-Message-ID: <59A85ECE.9080501@linux.vnet.ibm.com>
-References: <1500699702.23205.8.camel@hbabu-laptop> <CALZtONBGVQy2iwkb8WpVd-_QG7bLFTvUbnuub6CCXP55YpQiSQ@mail.gmail.com> <1504041817.2358.32.camel@kernel.crashing.org> <59A5E2AE.5060400@linux.vnet.ibm.com> <CALZtONBBvrfWkiFQipMrM9+VxsbBkHMFOAbgL0OBm5gb8yZ=LQ@mail.gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Fixes for 4.13
+Date: Fri, 1 Sep 2017 15:53:39 +0800
+Message-ID: <20170901075339.GA8289@gondor.apana.org.au>
+References: <20161119102748.GA4277@gondor.apana.org.au>
+ <20161213132414.GA7898@gondor.apana.org.au>
+ <20170223125141.GA17400@gondor.apana.org.au>
+ <20170714141855.GA29426@gondor.apana.org.au>
+ <20170728084955.GA19586@gondor.apana.org.au>
+ <20170809120424.GA32740@gondor.apana.org.au>
+ <20170814094347.GA13880@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Cc: Michael Neuling <mikey@neuling.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Ram Pai <linuxram@us.ibm.com>, npiggin@gmail.com,
-        suka@us.ibm.com,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
-To: Dan Streetman <ddstreet@ieee.org>
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41250 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1750968AbdHaTJR (ORCPT
+Received: from orcrist.hmeau.com ([104.223.48.154]:38598 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751519AbdIAHx6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 31 Aug 2017 15:09:17 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id v7VJ8CD3005445
-        for <linux-crypto@vger.kernel.org>; Thu, 31 Aug 2017 15:09:16 -0400
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2cpneg0fyv-1
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Thu, 31 Aug 2017 15:09:16 -0400
-Received: from localhost
-        by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-crypto@vger.kernel.org> from <haren@linux.vnet.ibm.com>;
-        Thu, 31 Aug 2017 13:09:15 -0600
-In-Reply-To: <CALZtONBBvrfWkiFQipMrM9+VxsbBkHMFOAbgL0OBm5gb8yZ=LQ@mail.gmail.com>
+        Fri, 1 Sep 2017 03:53:58 -0400
+Content-Disposition: inline
+In-Reply-To: <20170814094347.GA13880@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 08/31/2017 06:31 AM, Dan Streetman wrote:
-> On Tue, Aug 29, 2017 at 5:54 PM, Haren Myneni <haren@linux.vnet.ibm.com> wrote:
->> On 08/29/2017 02:23 PM, Benjamin Herrenschmidt wrote:
->>> On Tue, 2017-08-29 at 09:58 -0400, Dan Streetman wrote:
->>>>> +
->>>>> +       ret = -EINVAL;
->>>>> +       if (coproc && coproc->vas.rxwin) {
->>>>> +               wmem->txwin = nx842_alloc_txwin(coproc);
->>>>
->>>> this is wrong.  the workmem is scratch memory that's valid only for
->>>> the duration of a single operation.
->>
->> Correct, workmem is used until crypto_free is called.
-> 
-> that's not a 'single operation'.  a single operation is compress() or
-> decompress().
+Hi Linus: 
 
-workmem is allocated in nx842_crypto_init (called from crypto_alloc) and freed in crypto_free(). We can have single compression / decompression() operation or multiple within this crypto session. In case of single operation, we will end up workmem, ctx->sbounce/dbounce alloc/free for each request.  
+This push fixes the following issues:
 
-> 
->>>>
->>>> do you actually need a txwin per crypto transform?  or do you need a
->>>> txwin per coprocessor?  or txwin per processor?  either per-coproc or
->>>> per-cpu should be created at driver init and held separately
->>>> (globally) instead of a per-transform txwin.  I really don't see why
->>>> you would need a txwin per transform, because the coproc should not
->>>> care how many different transforms there are.
->>>
->>> We should only need a single window for the whole kernel really, plus
->>> one per user process who wants direct access but that's not relevant
->>> here.
->>
->> Opening send window for each crypto transform (crypto_alloc,
->> compression/decompression, ..., crypto_free) so that does not
->> have to wait for the previous copy/paste complete.
->> VAS will map send and receive windows, and can cache in send
->> windows (up to 128). So I thought using the same send window
->> (per chip) for more requests (say 1000) may be adding overhead.
->>
->> I will make changes if you prefer using 1 send window per chip.
-> 
-> i don't have the spec, so i shouldn't be making the decision on it,
-> but i do know putting a persistent field into the workmem is the wrong
-> location.  If it's valid for the life of the transform, put it into
-> the transform context.  The workmem buffer is intended to be used only
-> during a single operation - it's "working memory" to perform each
-> individual crypto transformation.
-> 
->>
->>>
->>> Cheers,
->>> Ben.
->>>
->>
-> 
+- Regression in chacha20 handling of chunked input.
+- Crash in algif_skcipher when used with async io.
+- Potential bogus pointer dereference in lib/mpi.
+
+
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+
+
+Ard Biesheuvel (2):
+      crypto: chacha20 - fix handling of chunked input
+      crypto: testmgr - add chunked test cases for chacha20
+
+Stephan Mueller (2):
+      lib/mpi: kunmap after finishing accessing buffer
+      crypto: algif_skcipher - only call put_page on referenced and used pages
+
+ crypto/algif_skcipher.c   |    9 +++++++--
+ crypto/chacha20_generic.c |    9 +++++++--
+ crypto/testmgr.h          |    7 +++++++
+ lib/mpi/mpicoder.c        |    4 +++-
+ 4 files changed, 24 insertions(+), 5 deletions(-)
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
