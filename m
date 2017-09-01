@@ -1,32 +1,220 @@
-From: Michael Ellerman <patch-notifications@ellerman.id.au>
-Subject: Re: [V4,1/7] crypto/nx: Rename nx842_powernv_function as icswx function
-Date: Fri,  1 Sep 2017 23:30:00 +1000 (AEST)
-Message-ID: <3xkKqF2jcvz9t3P@ozlabs.org>
-References: <1504163489.4681.4.camel@hbabu-laptop>
-Cc: mikey@neuling.org, linuxram@us.ibm.com, npiggin@gmail.com,
-        suka@us.ibm.com, linux-crypto@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, ddstreet@ieee.org
-To: Haren Myneni <haren@linux.vnet.ibm.com>,
-        herbert@gondor.apana.org.au
+From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
+Subject: [PATCH] crypto: caam - fix LS1021A support on ARMv7 multiplatform kernel
+Date: Fri, 1 Sep 2017 17:12:59 +0300
+Message-ID: <20170901141259.848-1-horia.geanta@nxp.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Cc: <linux-crypto@vger.kernel.org>,
+        "David S . Miller" <davem@davemloft.net>,
+        Dan Douglass <dan.douglass@nxp.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ozlabs.org ([103.22.144.67]:40059 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752212AbdIANaD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 1 Sep 2017 09:30:03 -0400
-In-Reply-To: <1504163489.4681.4.camel@hbabu-laptop>
+Received: from mail-dm3nam03on0077.outbound.protection.outlook.com ([104.47.41.77]:51897
+        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751985AbdIAONP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 1 Sep 2017 10:13:15 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, 2017-08-31 at 07:11:29 UTC, Haren Myneni wrote:
-> Rename nx842_powernv_function to nx842_powernv_exec.
-> nx842_powernv_exec points to nx842_exec_icswx and
-> will be point to VAS exec function which will be added later
-> for P9 NX support.
-> 
-> Signed-off-by: Haren Myneni <haren@us.ibm.com>
+When built using multi_v7_defconfig, driver does not work on LS1021A:
+[...]
+caam 1700000.crypto: can't identify CAAM ipg clk: -2
+caam: probe of 1700000.crypto failed with error -2
+[...]
 
-Series applied to powerpc next, thanks.
+It turns out we have to detect at runtime whether driver is running
+on an i.MX platform or not.
 
-https://git.kernel.org/powerpc/c/c97f8169fb227cae5adeac56cafa98
+Cc: <stable@vger.kernel.org>
+Fixes: 6c3af9559352 ("crypto: caam - add support for LS1021A")
+Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+---
+ drivers/crypto/caam/Kconfig |  5 +---
+ drivers/crypto/caam/ctrl.c  | 19 ++++++++-------
+ drivers/crypto/caam/regs.h  | 59 +++++++++++++++++++++------------------------
+ 3 files changed, 39 insertions(+), 44 deletions(-)
 
-cheers
+diff --git a/drivers/crypto/caam/Kconfig b/drivers/crypto/caam/Kconfig
+index e36aeacd7635..1eb852765469 100644
+--- a/drivers/crypto/caam/Kconfig
++++ b/drivers/crypto/caam/Kconfig
+@@ -1,6 +1,7 @@
+ config CRYPTO_DEV_FSL_CAAM
+ 	tristate "Freescale CAAM-Multicore driver backend"
+ 	depends on FSL_SOC || ARCH_MXC || ARCH_LAYERSCAPE
++	select SOC_BUS
+ 	help
+ 	  Enables the driver module for Freescale's Cryptographic Accelerator
+ 	  and Assurance Module (CAAM), also known as the SEC version 4 (SEC4).
+@@ -141,10 +142,6 @@ config CRYPTO_DEV_FSL_CAAM_RNG_API
+ 	  To compile this as a module, choose M here: the module
+ 	  will be called caamrng.
+ 
+-config CRYPTO_DEV_FSL_CAAM_IMX
+-	def_bool SOC_IMX6 || SOC_IMX7D
+-	depends on CRYPTO_DEV_FSL_CAAM
+-
+ config CRYPTO_DEV_FSL_CAAM_DEBUG
+ 	bool "Enable debug output in CAAM driver"
+ 	depends on CRYPTO_DEV_FSL_CAAM
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index dacb53fb690e..027e121c6f70 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -7,6 +7,7 @@
+ #include <linux/device.h>
+ #include <linux/of_address.h>
+ #include <linux/of_irq.h>
++#include <linux/sys_soc.h>
+ 
+ #include "compat.h"
+ #include "regs.h"
+@@ -19,6 +20,8 @@ bool caam_little_end;
+ EXPORT_SYMBOL(caam_little_end);
+ bool caam_dpaa2;
+ EXPORT_SYMBOL(caam_dpaa2);
++bool caam_imx;
++EXPORT_SYMBOL(caam_imx);
+ 
+ #ifdef CONFIG_CAAM_QI
+ #include "qi.h"
+@@ -28,19 +31,11 @@ EXPORT_SYMBOL(caam_dpaa2);
+  * i.MX targets tend to have clock control subsystems that can
+  * enable/disable clocking to our device.
+  */
+-#ifdef CONFIG_CRYPTO_DEV_FSL_CAAM_IMX
+ static inline struct clk *caam_drv_identify_clk(struct device *dev,
+ 						char *clk_name)
+ {
+-	return devm_clk_get(dev, clk_name);
++	return caam_imx ? devm_clk_get(dev, clk_name) : NULL;
+ }
+-#else
+-static inline struct clk *caam_drv_identify_clk(struct device *dev,
+-						char *clk_name)
+-{
+-	return NULL;
+-}
+-#endif
+ 
+ /*
+  * Descriptor to instantiate RNG State Handle 0 in normal mode and
+@@ -430,6 +425,10 @@ static int caam_probe(struct platform_device *pdev)
+ {
+ 	int ret, ring, gen_sk, ent_delay = RTSDCTL_ENT_DLY_MIN;
+ 	u64 caam_id;
++	static const struct soc_device_attribute imx_soc[] = {
++		{.family = "Freescale i.MX"},
++		{},
++	};
+ 	struct device *dev;
+ 	struct device_node *nprop, *np;
+ 	struct caam_ctrl __iomem *ctrl;
+@@ -451,6 +450,8 @@ static int caam_probe(struct platform_device *pdev)
+ 	dev_set_drvdata(dev, ctrlpriv);
+ 	nprop = pdev->dev.of_node;
+ 
++	caam_imx = (bool)soc_device_match(imx_soc);
++
+ 	/* Enable clocking */
+ 	clk = caam_drv_identify_clk(&pdev->dev, "ipg");
+ 	if (IS_ERR(clk)) {
+diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
+index 2b5efff9ec3c..17cfd23a38fa 100644
+--- a/drivers/crypto/caam/regs.h
++++ b/drivers/crypto/caam/regs.h
+@@ -67,6 +67,7 @@
+  */
+ 
+ extern bool caam_little_end;
++extern bool caam_imx;
+ 
+ #define caam_to_cpu(len)				\
+ static inline u##len caam##len ## _to_cpu(u##len val)	\
+@@ -154,13 +155,10 @@ static inline u64 rd_reg64(void __iomem *reg)
+ #else /* CONFIG_64BIT */
+ static inline void wr_reg64(void __iomem *reg, u64 data)
+ {
+-#ifndef CONFIG_CRYPTO_DEV_FSL_CAAM_IMX
+-	if (caam_little_end) {
++	if (!caam_imx && caam_little_end) {
+ 		wr_reg32((u32 __iomem *)(reg) + 1, data >> 32);
+ 		wr_reg32((u32 __iomem *)(reg), data);
+-	} else
+-#endif
+-	{
++	} else {
+ 		wr_reg32((u32 __iomem *)(reg), data >> 32);
+ 		wr_reg32((u32 __iomem *)(reg) + 1, data);
+ 	}
+@@ -168,41 +166,40 @@ static inline void wr_reg64(void __iomem *reg, u64 data)
+ 
+ static inline u64 rd_reg64(void __iomem *reg)
+ {
+-#ifndef CONFIG_CRYPTO_DEV_FSL_CAAM_IMX
+-	if (caam_little_end)
++	if (!caam_imx && caam_little_end)
+ 		return ((u64)rd_reg32((u32 __iomem *)(reg) + 1) << 32 |
+ 			(u64)rd_reg32((u32 __iomem *)(reg)));
+-	else
+-#endif
+-		return ((u64)rd_reg32((u32 __iomem *)(reg)) << 32 |
+-			(u64)rd_reg32((u32 __iomem *)(reg) + 1));
++
++	return ((u64)rd_reg32((u32 __iomem *)(reg)) << 32 |
++		(u64)rd_reg32((u32 __iomem *)(reg) + 1));
+ }
+ #endif /* CONFIG_64BIT  */
+ 
++static inline u64 cpu_to_caam_dma64(dma_addr_t value)
++{
++	if (caam_imx)
++		return (((u64)cpu_to_caam32(lower_32_bits(value)) << 32) |
++			 (u64)cpu_to_caam32(upper_32_bits(value)));
++
++	return cpu_to_caam64(value);
++}
++
++static inline u64 caam_dma64_to_cpu(u64 value)
++{
++	if (caam_imx)
++		return (((u64)caam32_to_cpu(lower_32_bits(value)) << 32) |
++			 (u64)caam32_to_cpu(upper_32_bits(value)));
++
++	return caam64_to_cpu(value);
++}
++
+ #ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
+-#ifdef CONFIG_SOC_IMX7D
+-#define cpu_to_caam_dma(value) \
+-		(((u64)cpu_to_caam32(lower_32_bits(value)) << 32) | \
+-		  (u64)cpu_to_caam32(upper_32_bits(value)))
+-#define caam_dma_to_cpu(value) \
+-		(((u64)caam32_to_cpu(lower_32_bits(value)) << 32) | \
+-		  (u64)caam32_to_cpu(upper_32_bits(value)))
+-#else
+-#define cpu_to_caam_dma(value) cpu_to_caam64(value)
+-#define caam_dma_to_cpu(value) caam64_to_cpu(value)
+-#endif /* CONFIG_SOC_IMX7D */
++#define cpu_to_caam_dma(value) cpu_to_caam_dma64(value)
++#define caam_dma_to_cpu(value) caam_dma64_to_cpu(value)
+ #else
+ #define cpu_to_caam_dma(value) cpu_to_caam32(value)
+ #define caam_dma_to_cpu(value) caam32_to_cpu(value)
+-#endif /* CONFIG_ARCH_DMA_ADDR_T_64BIT  */
+-
+-#ifdef CONFIG_CRYPTO_DEV_FSL_CAAM_IMX
+-#define cpu_to_caam_dma64(value) \
+-		(((u64)cpu_to_caam32(lower_32_bits(value)) << 32) | \
+-		 (u64)cpu_to_caam32(upper_32_bits(value)))
+-#else
+-#define cpu_to_caam_dma64(value) cpu_to_caam64(value)
+-#endif
++#endif /* CONFIG_ARCH_DMA_ADDR_T_64BIT */
+ 
+ /*
+  * jr_outentry
+-- 
+2.12.0.264.gd6db3f216544
