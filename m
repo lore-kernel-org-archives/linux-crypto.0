@@ -1,17 +1,15 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH v2 1/8] staging: ccree: Replace kzalloc with devm_kzalloc
-Date: Sun,  3 Sep 2017 17:57:36 +0300
-Message-ID: <1504450664-28252-2-git-send-email-gilad@benyossef.com>
-References: <1504450664-28252-1-git-send-email-gilad@benyossef.com>
+Subject: [PATCH 0/8] staging: ccree: more cleanup work for 4.14
+Date: Sun,  3 Sep 2017 17:57:35 +0300
+Message-ID: <1504450664-28252-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: Suniel Mahesh <sunil.m@techveda.org>, Ofir Drang <ofir.drang@arm.com>
+Cc: Ofir Drang <ofir.drang@arm.com>
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
  linux-crypto@vger.kernel.org, driverdev-devel@linuxdriverproject.org,
  devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org
 Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-In-Reply-To: <1504450664-28252-1-git-send-email-gilad@benyossef.com>
 List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
  <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
 List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
@@ -23,66 +21,40 @@ Errors-To: driverdev-devel-bounces@linuxdriverproject.org
 Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-From: Suniel Mahesh <sunil.m@techveda.org>
+More cleanup work from Sunil and myself.
 
-It is recommended to use managed function devm_kzalloc, which
-simplifies driver cleanup paths and driver code.
-This patch does the following:
-(a) replace kzalloc with devm_kzalloc.
-(b) drop kfree(), because memory allocated with devm_kzalloc() is
-automatically freed on driver detach, otherwise it leads to a double
-free.
-(c) remove unnecessary blank lines.
+I've previously sent some of these as part of a larger patch set.
+I've decided to split the patch set to smaller chunks to make it
+more manageable.
 
-Signed-off-by: Suniel Mahesh <sunil.m@techveda.org>
-[gby: rebase on top of latest coding style fixes changes]
-Acked-by: Gilad Ben-Yossef <gilad@benyossef.com>
----
- drivers/staging/ccree/ssi_driver.c | 11 ++++-------
- 1 file changed, 4 insertions(+), 7 deletions(-)
+This patch set applies on top of commit 28eb51f7468a
+("staging:rtl8188eu:core Fix remove unneccessary else block").
 
-diff --git a/drivers/staging/ccree/ssi_driver.c b/drivers/staging/ccree/ssi_driver.c
-index 9c6f120..47e0880 100644
---- a/drivers/staging/ccree/ssi_driver.c
-+++ b/drivers/staging/ccree/ssi_driver.c
-@@ -223,14 +223,15 @@ static int init_cc_resources(struct platform_device *plat_dev)
- 	struct resource *req_mem_cc_regs = NULL;
- 	void __iomem *cc_base = NULL;
- 	bool irq_registered = false;
--	struct ssi_drvdata *new_drvdata = kzalloc(sizeof(*new_drvdata),
--						  GFP_KERNEL);
-+	struct ssi_drvdata *new_drvdata;
- 	struct device *dev = &plat_dev->dev;
- 	struct device_node *np = dev->of_node;
- 	u32 signature_val;
- 	int rc = 0;
- 
--	if (unlikely(!new_drvdata)) {
-+	new_drvdata = devm_kzalloc(&plat_dev->dev, sizeof(*new_drvdata),
-+				   GFP_KERNEL);
-+	if (!new_drvdata) {
- 		SSI_LOG_ERR("Failed to allocate drvdata");
- 		rc = -ENOMEM;
- 		goto init_cc_res_err;
-@@ -435,10 +436,8 @@ static int init_cc_resources(struct platform_device *plat_dev)
- 					   resource_size(new_drvdata->res_mem));
- 			new_drvdata->res_mem = NULL;
- 		}
--		kfree(new_drvdata);
- 		dev_set_drvdata(&plat_dev->dev, NULL);
- 	}
--
- 	return rc;
- }
- 
-@@ -479,8 +478,6 @@ static void cleanup_cc_resources(struct platform_device *plat_dev)
- 		drvdata->cc_base = NULL;
- 		drvdata->res_mem = NULL;
- 	}
--
--	kfree(drvdata);
- 	dev_set_drvdata(&plat_dev->dev, NULL);
- }
- 
+Changes from v1:
+- Fix kbuild reported error of "label at end of compound statement"
+
+Gilad Ben-Yossef (5):
+  staging: ccree: simplify resource release on error
+  staging: ccree: remove unused completion
+  staging: ccree: move over to BIT macro for bit defines
+  staging: ccree: replace noop macro with inline
+  staging: ccree: remove BUG macro usage
+
+Suniel Mahesh (3):
+  staging: ccree: Replace kzalloc with devm_kzalloc
+  staging: ccree: Convert to devm_ioremap_resource for map, unmap
+  staging: ccree: Use platform_get_irq and devm_request_irq
+
+ drivers/staging/ccree/ssi_aead.c        |   3 +-
+ drivers/staging/ccree/ssi_buffer_mgr.c  |  14 +--
+ drivers/staging/ccree/ssi_cipher.c      |   4 +-
+ drivers/staging/ccree/ssi_cipher.h      |  10 +-
+ drivers/staging/ccree/ssi_driver.c      | 196 +++++++++++++-------------------
+ drivers/staging/ccree/ssi_driver.h      |  15 +--
+ drivers/staging/ccree/ssi_hash.c        |   3 +-
+ drivers/staging/ccree/ssi_pm.c          |   3 +-
+ drivers/staging/ccree/ssi_request_mgr.c |  22 +++-
+ 9 files changed, 118 insertions(+), 152 deletions(-)
+
 -- 
 2.1.4
