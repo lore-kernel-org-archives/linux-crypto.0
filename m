@@ -1,433 +1,498 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [PATCH v7 00/19] simplify crypto wait for async op
-Date: Sun, 3 Sep 2017 09:09:55 +0300
-Message-ID: <CAOtvUMcyPQC1o5fof_RrbkEkeKaq5GB0u8qj4m+R+oG+btpv1A@mail.gmail.com>
-References: <1503584350-7831-1-git-send-email-gilad@benyossef.com>
-	<CAFXBA=n6W_n1P=NKHEUAgpaDDrdmh4QwB4aYma9xyio7UFP3Vw@mail.gmail.com>
+From: Haren Myneni <haren@linux.vnet.ibm.com>
+Subject: Re: [PATCH V3 6/6] crypto/nx: Add P9 NX support for 842 compression
+ engine
+Date: Sun, 03 Sep 2017 01:32:11 -0700
+Message-ID: <59ABBE0B.8020301@linux.vnet.ibm.com>
+References: <1500699702.23205.8.camel@hbabu-laptop> <CALZtONBGVQy2iwkb8WpVd-_QG7bLFTvUbnuub6CCXP55YpQiSQ@mail.gmail.com> <59AA6E71.8070704@linux.vnet.ibm.com> <CALZtONB3sUTtxOeQqRpSqHs2yGP-uOusBNM5y2LT3wzCNOp+2A@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="===============4661010926525863906=="
-Cc: Mike Snitzer <snitzer@redhat.com>, linux-doc@vger.kernel.org,
-	Gary Hook <gary.hook@amd.com>, David Howells <dhowells@redhat.com>,
-	device-mapper development <dm-devel@redhat.com>,
-	keyrings@vger.kernel.org, linux-ima-devel@lists.sourceforge.net,
-	Alasdair Kergon <agk@redhat.com>,
-	Boris Brezillon <boris.brezillon@free-electrons.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, Jonathan Corbet <corbet@lwn.net>,
-	Mimi Zohar <zohar@linux.vnet.ibm.com>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	linux-cifs@vger.kernel.org, linux-ima-user@lists.sourceforge.net,
-	Arnaud Ebalard <arno@natisbad.org>, linux-raid@vger.kernel.org,
-	linux-fscrypt@vger.kernel.org, linux-mediatek@lists.infradead.org,
-	James Morris <james.l.morris@oracle.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	Jaegeuk Kim <jaegeuk@kernel.org>, linux-arm-kernel@lists.infradead.org,
-	O
-To: Harsh Jain <harshjain.prof@gmail.com>
-Return-path: <dm-devel-bounces@redhat.com>
-In-Reply-To: <CAFXBA=n6W_n1P=NKHEUAgpaDDrdmh4QwB4aYma9xyio7UFP3Vw@mail.gmail.com>
-List-Unsubscribe: <https://www.redhat.com/mailman/options/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
-List-Archive: <https://www.redhat.com/archives/dm-devel>
-List-Post: <mailto:dm-devel@redhat.com>
-List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
-List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=subscribe>
-Sender: dm-devel-bounces@redhat.com
-Errors-To: dm-devel-bounces@redhat.com
-List-Id: linux-crypto.vger.kernel.org
-
---===============4661010926525863906==
-Content-Type: multipart/alternative; boundary="001a113d31ced2d7d8055842d7df"
-
---001a113d31ced2d7d8055842d7df
-Content-Type: text/plain; charset="UTF-8"
-
-On Thu, Aug 31, 2017 at 3:31 PM, Harsh Jain <harshjain.prof@gmail.com>
-wrote:
-
-> HI Gilad,
->
-> I think we need an update in ESP also. Now EBUSY return means driver
-> has accepted, Packet should not be dropped in
->
-> esp_output_tail() function.
->
->
->
-Good catch. You are right and the same holds true for ah_output() in ah4.c.
-
-But I do wonder, the code there now treats -EBUSY as a special case and
-returns NET_XMIT_DROP
-but if an AEAD or AHASH transformation return some other error, like
--ENOMEM or -EINVAL shouldn't
-we return NET_XMIT_DROP in that case too?
-
-Any ideas?
-
-Gilad
-
-
->
->
-> On Thu, Aug 24, 2017 at 7:48 PM, Gilad Ben-Yossef <gilad@benyossef.com>
-> wrote:
-> > Many users of kernel async. crypto services have a pattern of
-> > starting an async. crypto op and than using a completion
-> > to wait for it to end.
-> >
-> > This patch set simplifies this common use case in two ways:
-> >
-> > First, by separating the return codes of the case where a
-> > request is queued to a backlog due to the provider being
-> > busy (-EBUSY) from the case the request has failed due
-> > to the provider being busy and backlogging is not enabled
-> > (-EAGAIN).
-> >
-> > Next, this change is than built on to create a generic API
-> > to wait for a async. crypto operation to complete.
-> >
-> > The end result is a smaller code base and an API that is
-> > easier to use and more difficult to get wrong.
-> >
-> > The patch set was boot tested on x86_64 and arm64 which
-> > at the very least tests the crypto users via testmgr and
-> > tcrypt but I do note that I do not have access to some
-> > of the HW whose drivers are modified nor do I claim I was
-> > able to test all of the corner cases.
-> >
-> > The patch set is based upon linux-next release tagged
-> > next-20170824.
-> >
-> > Changes from v6:
-> > - Fix brown paper bag compile error on marvell/cesa
-> >   code.
-> >
-> > Changes from v5:
-> > - Remove redundant new line as spotted by Jonathan
-> >   Cameron.
-> > - Reworded dm-verity change commit message to better
-> >   clarify potential issue averted by change as
-> >   pointed out by Mikulas Patocka.
-> >
-> > Changes from v4:
-> > - Rebase on top of latest algif changes from Stephan
-> >   Mueller.
-> > - Fix typo in ccp patch title.
-> >
-> > Changes from v3:
-> > - Instead of changing the return code to indicate
-> >   backlog queueing, change the return code to indicate
-> >   transient busy state, as suggested by Herbert Xu.
-> >
-> > Changes from v2:
-> > - Patch title changed from "introduce crypto wait for
-> >   async op" to better reflect the current state.
-> > - Rebase on top of latest linux-next.
-> > - Add a new return code of -EIOCBQUEUED for backlog
-> >   queueing, as suggested by Herbert Xu.
-> > - Transform more users to the new API.
-> > - Update the drbg change to account for new init as
-> >   indicated by Stephan Muller.
-> >
-> > Changes from v1:
-> > - Address review comments from Eric Biggers.
-> > - Separated out bug fixes of existing code and rebase
-> >   on top of that patch set.
-> > - Rename 'ecr' to 'wait' in fscrypto code.
-> > - Split patch introducing the new API from the change
-> >   moving over the algif code which it originated from
-> >   to the new API.
-> > - Inline crypto_wait_req().
-> > - Some code indentation fixes.
-> >
-> > Gilad Ben-Yossef (19):
-> >   crypto: change transient busy return code to -EAGAIN
-> >   crypto: ccp: use -EAGAIN for transient busy indication
-> >   crypto: remove redundant backlog checks on EBUSY
-> >   crypto: marvell/cesa: remove redundant backlog checks on EBUSY
-> >   crypto: introduce crypto wait for async op
-> >   crypto: move algif to generic async completion
-> >   crypto: move pub key to generic async completion
-> >   crypto: move drbg to generic async completion
-> >   crypto: move gcm to generic async completion
-> >   crypto: move testmgr to generic async completion
-> >   fscrypt: move to generic async completion
-> >   dm: move dm-verity to generic async completion
-> >   cifs: move to generic async completion
-> >   ima: move to generic async completion
-> >   crypto: tcrypt: move to generic async completion
-> >   crypto: talitos: move to generic async completion
-> >   crypto: qce: move to generic async completion
-> >   crypto: mediatek: move to generic async completion
-> >   crypto: adapt api sample to use async. op wait
-> >
-> >  Documentation/crypto/api-samples.rst |  52 ++-------
-> >  crypto/af_alg.c                      |  27 -----
-> >  crypto/ahash.c                       |  12 +--
-> >  crypto/algapi.c                      |   6 +-
-> >  crypto/algif_aead.c                  |   8 +-
-> >  crypto/algif_hash.c                  |  50 +++++----
-> >  crypto/algif_skcipher.c              |   9 +-
-> >  crypto/api.c                         |  13 +++
-> >  crypto/asymmetric_keys/public_key.c  |  28 +----
-> >  crypto/cryptd.c                      |   4 +-
-> >  crypto/cts.c                         |   6 +-
-> >  crypto/drbg.c                        |  36 ++-----
-> >  crypto/gcm.c                         |  32 ++----
-> >  crypto/lrw.c                         |   8 +-
-> >  crypto/rsa-pkcs1pad.c                |  16 +--
-> >  crypto/tcrypt.c                      |  84 +++++----------
-> >  crypto/testmgr.c                     | 204
-> ++++++++++++-----------------------
-> >  crypto/xts.c                         |   8 +-
-> >  drivers/crypto/ccp/ccp-crypto-main.c |   8 +-
-> >  drivers/crypto/ccp/ccp-dev.c         |   7 +-
-> >  drivers/crypto/marvell/cesa.c        |   3 +-
-> >  drivers/crypto/marvell/cesa.h        |   2 +-
-> >  drivers/crypto/mediatek/mtk-aes.c    |  31 +-----
-> >  drivers/crypto/qce/sha.c             |  30 +-----
-> >  drivers/crypto/talitos.c             |  38 +------
-> >  drivers/md/dm-verity-target.c        |  81 ++++----------
-> >  drivers/md/dm-verity.h               |   5 -
-> >  fs/cifs/smb2ops.c                    |  30 +-----
-> >  fs/crypto/crypto.c                   |  28 +----
-> >  fs/crypto/fname.c                    |  36 ++-----
-> >  fs/crypto/fscrypt_private.h          |  10 --
-> >  fs/crypto/keyinfo.c                  |  21 +---
-> >  include/crypto/drbg.h                |   3 +-
-> >  include/crypto/if_alg.h              |  15 +--
-> >  include/linux/crypto.h               |  40 +++++++
-> >  security/integrity/ima/ima_crypto.c  |  56 +++-------
-> >  36 files changed, 310 insertions(+), 737 deletions(-)
-> >
-> > --
-> > 2.1.4
-> >
->
-
-
-
--- 
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-"If you take a class in large-scale robotics, can you end up in a situation
-where the homework eats your dog?"
- -- Jean-Baptiste Queru
-
---001a113d31ced2d7d8055842d7df
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><br><div class=3D"gmail_extra"><br><div class=3D"gmail_quo=
-te">On Thu, Aug 31, 2017 at 3:31 PM, Harsh Jain <span dir=3D"ltr">&lt;<a hr=
-ef=3D"mailto:harshjain.prof@gmail.com" target=3D"_blank">harshjain.prof@gma=
-il.com</a>&gt;</span> wrote:<br><blockquote class=3D"gmail_quote" style=3D"=
-margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-lef=
-t:1ex">HI Gilad,<br>
-<br>
-I think we need an update in ESP also. Now EBUSY return means driver<br>
-has accepted, Packet should not be dropped in<br>
-<br>
-esp_output_tail() function.<br>
-<br><br></blockquote><div><br></div><div>Good catch. You are right and the =
-same holds true for ah_output() in ah4.c.</div><div><br></div><div>But I do=
- wonder, the code there now treats -EBUSY as a special case and returns=C2=
-=A0NET_XMIT_DROP</div><div>but if an AEAD or AHASH transformation return so=
-me other error, like -ENOMEM or -EINVAL shouldn&#39;t</div><div>we return N=
-ET_XMIT_DROP in that case too?=C2=A0</div><div><br></div><div>Any ideas?</d=
-iv><div><br></div><div>Gilad</div><div><br></div><blockquote class=3D"gmail=
-_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204=
-,204);padding-left:1ex"><div class=3D"gmail-HOEnZb"><div class=3D"gmail-h5"=
-><br>
-<br>
-<br>
-On Thu, Aug 24, 2017 at 7:48 PM, Gilad Ben-Yossef &lt;<a href=3D"mailto:gil=
-ad@benyossef.com">gilad@benyossef.com</a>&gt; wrote:<br>
-&gt; Many users of kernel async. crypto services have a pattern of<br>
-&gt; starting an async. crypto op and than using a completion<br>
-&gt; to wait for it to end.<br>
-&gt;<br>
-&gt; This patch set simplifies this common use case in two ways:<br>
-&gt;<br>
-&gt; First, by separating the return codes of the case where a<br>
-&gt; request is queued to a backlog due to the provider being<br>
-&gt; busy (-EBUSY) from the case the request has failed due<br>
-&gt; to the provider being busy and backlogging is not enabled<br>
-&gt; (-EAGAIN).<br>
-&gt;<br>
-&gt; Next, this change is than built on to create a generic API<br>
-&gt; to wait for a async. crypto operation to complete.<br>
-&gt;<br>
-&gt; The end result is a smaller code base and an API that is<br>
-&gt; easier to use and more difficult to get wrong.<br>
-&gt;<br>
-&gt; The patch set was boot tested on x86_64 and arm64 which<br>
-&gt; at the very least tests the crypto users via testmgr and<br>
-&gt; tcrypt but I do note that I do not have access to some<br>
-&gt; of the HW whose drivers are modified nor do I claim I was<br>
-&gt; able to test all of the corner cases.<br>
-&gt;<br>
-&gt; The patch set is based upon linux-next release tagged<br>
-&gt; next-20170824.<br>
-&gt;<br>
-&gt; Changes from v6:<br>
-&gt; - Fix brown paper bag compile error on marvell/cesa<br>
-&gt;=C2=A0 =C2=A0code.<br>
-&gt;<br>
-&gt; Changes from v5:<br>
-&gt; - Remove redundant new line as spotted by Jonathan<br>
-&gt;=C2=A0 =C2=A0Cameron.<br>
-&gt; - Reworded dm-verity change commit message to better<br>
-&gt;=C2=A0 =C2=A0clarify potential issue averted by change as<br>
-&gt;=C2=A0 =C2=A0pointed out by Mikulas Patocka.<br>
-&gt;<br>
-&gt; Changes from v4:<br>
-&gt; - Rebase on top of latest algif changes from Stephan<br>
-&gt;=C2=A0 =C2=A0Mueller.<br>
-&gt; - Fix typo in ccp patch title.<br>
-&gt;<br>
-&gt; Changes from v3:<br>
-&gt; - Instead of changing the return code to indicate<br>
-&gt;=C2=A0 =C2=A0backlog queueing, change the return code to indicate<br>
-&gt;=C2=A0 =C2=A0transient busy state, as suggested by Herbert Xu.<br>
-&gt;<br>
-&gt; Changes from v2:<br>
-&gt; - Patch title changed from &quot;introduce crypto wait for<br>
-&gt;=C2=A0 =C2=A0async op&quot; to better reflect the current state.<br>
-&gt; - Rebase on top of latest linux-next.<br>
-&gt; - Add a new return code of -EIOCBQUEUED for backlog<br>
-&gt;=C2=A0 =C2=A0queueing, as suggested by Herbert Xu.<br>
-&gt; - Transform more users to the new API.<br>
-&gt; - Update the drbg change to account for new init as<br>
-&gt;=C2=A0 =C2=A0indicated by Stephan Muller.<br>
-&gt;<br>
-&gt; Changes from v1:<br>
-&gt; - Address review comments from Eric Biggers.<br>
-&gt; - Separated out bug fixes of existing code and rebase<br>
-&gt;=C2=A0 =C2=A0on top of that patch set.<br>
-&gt; - Rename &#39;ecr&#39; to &#39;wait&#39; in fscrypto code.<br>
-&gt; - Split patch introducing the new API from the change<br>
-&gt;=C2=A0 =C2=A0moving over the algif code which it originated from<br>
-&gt;=C2=A0 =C2=A0to the new API.<br>
-&gt; - Inline crypto_wait_req().<br>
-&gt; - Some code indentation fixes.<br>
-&gt;<br>
-&gt; Gilad Ben-Yossef (19):<br>
-&gt;=C2=A0 =C2=A0crypto: change transient busy return code to -EAGAIN<br>
-&gt;=C2=A0 =C2=A0crypto: ccp: use -EAGAIN for transient busy indication<br>
-&gt;=C2=A0 =C2=A0crypto: remove redundant backlog checks on EBUSY<br>
-&gt;=C2=A0 =C2=A0crypto: marvell/cesa: remove redundant backlog checks on E=
-BUSY<br>
-&gt;=C2=A0 =C2=A0crypto: introduce crypto wait for async op<br>
-&gt;=C2=A0 =C2=A0crypto: move algif to generic async completion<br>
-&gt;=C2=A0 =C2=A0crypto: move pub key to generic async completion<br>
-&gt;=C2=A0 =C2=A0crypto: move drbg to generic async completion<br>
-&gt;=C2=A0 =C2=A0crypto: move gcm to generic async completion<br>
-&gt;=C2=A0 =C2=A0crypto: move testmgr to generic async completion<br>
-&gt;=C2=A0 =C2=A0fscrypt: move to generic async completion<br>
-&gt;=C2=A0 =C2=A0dm: move dm-verity to generic async completion<br>
-&gt;=C2=A0 =C2=A0cifs: move to generic async completion<br>
-&gt;=C2=A0 =C2=A0ima: move to generic async completion<br>
-&gt;=C2=A0 =C2=A0crypto: tcrypt: move to generic async completion<br>
-&gt;=C2=A0 =C2=A0crypto: talitos: move to generic async completion<br>
-&gt;=C2=A0 =C2=A0crypto: qce: move to generic async completion<br>
-&gt;=C2=A0 =C2=A0crypto: mediatek: move to generic async completion<br>
-&gt;=C2=A0 =C2=A0crypto: adapt api sample to use async. op wait<br>
-&gt;<br>
-&gt;=C2=A0 Documentation/crypto/api-<wbr>samples.rst |=C2=A0 52 ++-------<b=
-r>
-&gt;=C2=A0 crypto/af_alg.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 27 -----<br>
-&gt;=C2=A0 crypto/ahash.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 12 +--<br>
-&gt;=C2=A0 crypto/algapi.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A06 +-<br>
-&gt;=C2=A0 crypto/algif_aead.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A08 +-<br>
-&gt;=C2=A0 crypto/algif_hash.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 |=C2=A0 50 +++++----<br>
-&gt;=C2=A0 crypto/algif_skcipher.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 |=C2=A0 =C2=A09 +-<br>
-&gt;=C2=A0 crypto/api.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 13 +++<br>
-&gt;=C2=A0 crypto/asymmetric_keys/public_<wbr>key.c=C2=A0 |=C2=A0 28 +----<=
-br>
-&gt;=C2=A0 crypto/cryptd.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A04 +-<br>
-&gt;=C2=A0 crypto/cts.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A06 +-<br>
-&gt;=C2=A0 crypto/drbg.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 36 ++-----<br>
-&gt;=C2=A0 crypto/gcm.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 32 ++----<br>
-&gt;=C2=A0 crypto/lrw.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A08 +-<br>
-&gt;=C2=A0 crypto/rsa-pkcs1pad.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 |=C2=A0 16 +--<br>
-&gt;=C2=A0 crypto/tcrypt.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 84 +++++----------<br>
-&gt;=C2=A0 crypto/testmgr.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0| 204 ++++++++++++------------------<wbr>-----<=
-br>
-&gt;=C2=A0 crypto/xts.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A08 +-<br>
-&gt;=C2=A0 drivers/crypto/ccp/ccp-crypto-<wbr>main.c |=C2=A0 =C2=A08 +-<br>
-&gt;=C2=A0 drivers/crypto/ccp/ccp-dev.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=
-=C2=A0 =C2=A07 +-<br>
-&gt;=C2=A0 drivers/crypto/marvell/cesa.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0=
- =C2=A03 +-<br>
-&gt;=C2=A0 drivers/crypto/marvell/cesa.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0=
- =C2=A02 +-<br>
-&gt;=C2=A0 drivers/crypto/mediatek/mtk-<wbr>aes.c=C2=A0 =C2=A0 |=C2=A0 31 +=
------<br>
-&gt;=C2=A0 drivers/crypto/qce/sha.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0|=C2=A0 30 +-----<br>
-&gt;=C2=A0 drivers/crypto/talitos.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0|=C2=A0 38 +------<br>
-&gt;=C2=A0 drivers/md/dm-verity-target.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0=
- 81 ++++----------<br>
-&gt;=C2=A0 drivers/md/dm-verity.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0|=C2=A0 =C2=A05 -<br>
-&gt;=C2=A0 fs/cifs/smb2ops.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 30 +-----<br>
-&gt;=C2=A0 fs/crypto/crypto.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 28 +----<br>
-&gt;=C2=A0 fs/crypto/fname.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 36 ++-----<br>
-&gt;=C2=A0 fs/crypto/fscrypt_private.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=
-=C2=A0 10 --<br>
-&gt;=C2=A0 fs/crypto/keyinfo.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 |=C2=A0 21 +---<br>
-&gt;=C2=A0 include/crypto/drbg.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 |=C2=A0 =C2=A03 +-<br>
-&gt;=C2=A0 include/crypto/if_alg.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 |=C2=A0 15 +--<br>
-&gt;=C2=A0 include/linux/crypto.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0|=C2=A0 40 +++++++<br>
-&gt;=C2=A0 security/integrity/ima/ima_<wbr>crypto.c=C2=A0 |=C2=A0 56 +++---=
-----<br>
-&gt;=C2=A0 36 files changed, 310 insertions(+), 737 deletions(-)<br>
-&gt;<br>
-&gt; --<br>
-&gt; 2.1.4<br>
-&gt;<br>
-</div></div></blockquote></div><br><br clear=3D"all"><div><br></div>-- <br>=
-<div class=3D"gmail_signature">Gilad Ben-Yossef<br>Chief Coffee Drinker<br>=
-<br>&quot;If you take a class in large-scale robotics, can you end up in a =
-situation where the homework eats your dog?&quot;<br>=C2=A0-- Jean-Baptiste=
- Queru</div>
-</div></div>
-
---001a113d31ced2d7d8055842d7df--
-
-
---===============4661010926525863906==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Cc: Michael Neuling <mikey@neuling.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Ram Pai <linuxram@us.ibm.com>, npiggin@gmail.com,
+        suka@us.ibm.com,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
+To: Dan Streetman <ddstreet@ieee.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43074 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1751068AbdICIcc (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 3 Sep 2017 04:32:32 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id v838SnAX007043
+        for <linux-crypto@vger.kernel.org>; Sun, 3 Sep 2017 04:32:32 -0400
+Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2cqnhv1dvj-1
+        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Sun, 03 Sep 2017 04:32:32 -0400
+Received: from localhost
+        by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-crypto@vger.kernel.org> from <haren@linux.vnet.ibm.com>;
+        Sun, 3 Sep 2017 02:32:31 -0600
+In-Reply-To: <CALZtONB3sUTtxOeQqRpSqHs2yGP-uOusBNM5y2LT3wzCNOp+2A@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
+On 09/02/2017 09:17 AM, Dan Streetman wrote:
+> On Sat, Sep 2, 2017 at 4:40 AM, Haren Myneni <haren@linux.vnet.ibm.com> wrote:
+>> On 08/29/2017 06:58 AM, Dan Streetman wrote:
+>>> On Sat, Jul 22, 2017 at 1:01 AM, Haren Myneni <haren@linux.vnet.ibm.com> wrote:
+>>>>
+>>>> This patch adds P9 NX support for 842 compression engine. Virtual
+>>>> Accelerator Switchboard (VAS) is used to access 842 engine on P9.
+>>>>
+>>>> For each NX engine per chip, setup receive window using
+>>>> vas_rx_win_open() which configures RxFIFo with FIFO address, lpid,
+>>>> pid and tid values. This unique (lpid, pid, tid) combination will
+>>>> be used to identify the target engine.
+>>>>
+>>>> For crypto open request, open send window on the NX engine for
+>>>> the corresponding chip / cpu where the open request is executed.
+>>>> This send window will be closed upon crypto close request.
+>>>>
+>>>> NX provides high and normal priority FIFOs. For compression /
+>>>> decompression requests, we use only hight priority FIFOs in kernel.
+>>>>
+>>>> Each NX request will be communicated to VAS using copy/paste
+>>>> instructions with vas_copy_crb() / vas_paste_crb() functions.
+>>>>
+>>>> Signed-off-by: Haren Myneni <haren@us.ibm.com>
+>>>> ---
+>>>>  drivers/crypto/nx/Kconfig          |   1 +
+>>>>  drivers/crypto/nx/nx-842-powernv.c | 375 ++++++++++++++++++++++++++++++++++++-
+>>>>  drivers/crypto/nx/nx-842.c         |   2 +-
+>>>>  3 files changed, 371 insertions(+), 7 deletions(-)
+>>>>
+>>>> diff --git a/drivers/crypto/nx/Kconfig b/drivers/crypto/nx/Kconfig
+>>>> index ad7552a6998c..cd5dda9c48f4 100644
+>>>> --- a/drivers/crypto/nx/Kconfig
+>>>> +++ b/drivers/crypto/nx/Kconfig
+>>>> @@ -38,6 +38,7 @@ config CRYPTO_DEV_NX_COMPRESS_PSERIES
+>>>>  config CRYPTO_DEV_NX_COMPRESS_POWERNV
+>>>>         tristate "Compression acceleration support on PowerNV platform"
+>>>>         depends on PPC_POWERNV
+>>>> +       depends on PPC_VAS
+>>>>         default y
+>>>>         help
+>>>>           Support for PowerPC Nest (NX) compression acceleration. This
+>>>> diff --git a/drivers/crypto/nx/nx-842-powernv.c b/drivers/crypto/nx/nx-842-powernv.c
+>>>> index c0dd4c7e17d3..13089a0b9dfa 100644
+>>>> --- a/drivers/crypto/nx/nx-842-powernv.c
+>>>> +++ b/drivers/crypto/nx/nx-842-powernv.c
+>>>> @@ -23,6 +23,7 @@
+>>>>  #include <asm/prom.h>
+>>>>  #include <asm/icswx.h>
+>>>>  #include <asm/vas.h>
+>>>> +#include <asm/reg.h>
+>>>>
+>>>>  MODULE_LICENSE("GPL");
+>>>>  MODULE_AUTHOR("Dan Streetman <ddstreet@ieee.org>");
+>>>> @@ -32,6 +33,9 @@ MODULE_ALIAS_CRYPTO("842-nx");
+>>>>
+>>>>  #define WORKMEM_ALIGN  (CRB_ALIGN)
+>>>>  #define CSB_WAIT_MAX   (5000) /* ms */
+>>>> +#define VAS_RETRIES    (10)
+>>>> +/* # of requests allowed per RxFIFO at a time. 0 for unlimited */
+>>>> +#define MAX_CREDITS_PER_RXFIFO (1024)
+>>>>
+>>>>  struct nx842_workmem {
+>>>>         /* Below fields must be properly aligned */
+>>>> @@ -42,16 +46,27 @@ struct nx842_workmem {
+>>>>
+>>>>         ktime_t start;
+>>>>
+>>>> +       struct vas_window *txwin;       /* Used with VAS function */
+>>>>         char padding[WORKMEM_ALIGN]; /* unused, to allow alignment */
+>>>>  } __packed __aligned(WORKMEM_ALIGN);
+>>>>
+>>>>  struct nx842_coproc {
+>>>>         unsigned int chip_id;
+>>>>         unsigned int ct;
+>>>> -       unsigned int ci;
+>>>> +       unsigned int ci;        /* Coprocessor instance, used with icswx */
+>>>> +       struct {
+>>>> +               struct vas_window *rxwin;
+>>>> +               int id;
+>>>> +       } vas;
+>>>>         struct list_head list;
+>>>>  };
+>>>>
+>>>> +/*
+>>>> + * Send the request to NX engine on the chip for the corresponding CPU
+>>>> + * where the process is executing. Use with VAS function.
+>>>> + */
+>>>> +static DEFINE_PER_CPU(struct nx842_coproc *, coproc_inst);
+>>>> +
+>>>>  /* no cpu hotplug on powernv, so this list never changes after init */
+>>>>  static LIST_HEAD(nx842_coprocs);
+>>>>  static unsigned int nx842_ct;  /* used in icswx function */
+>>>> @@ -513,6 +528,105 @@ static int nx842_exec_icswx(const unsigned char *in, unsigned int inlen,
+>>>>  }
+>>>>
+>>>>  /**
+>>>> + * nx842_exec_vas - compress/decompress data using the 842 algorithm
+>>>> + *
+>>>> + * (De)compression provided by the NX842 coprocessor on IBM PowerNV systems.
+>>>> + * This compresses or decompresses the provided input buffer into the provided
+>>>> + * output buffer.
+>>>> + *
+>>>> + * Upon return from this function @outlen contains the length of the
+>>>> + * output data.  If there is an error then @outlen will be 0 and an
+>>>> + * error will be specified by the return code from this function.
+>>>> + *
+>>>> + * The @workmem buffer should only be used by one function call at a time.
+>>>> + *
+>>>> + * @in: input buffer pointer
+>>>> + * @inlen: input buffer size
+>>>> + * @out: output buffer pointer
+>>>> + * @outlenp: output buffer size pointer
+>>>> + * @workmem: working memory buffer pointer, size determined by
+>>>> + *           nx842_powernv_driver.workmem_size
+>>>> + * @fc: function code, see CCW Function Codes in nx-842.h
+>>>> + *
+>>>> + * Returns:
+>>>> + *   0         Success, output of length @outlenp stored in the buffer
+>>>> + *             at @out
+>>>> + *   -ENODEV   Hardware unavailable
+>>>> + *   -ENOSPC   Output buffer is to small
+>>>> + *   -EMSGSIZE Input buffer too large
+>>>> + *   -EINVAL   buffer constraints do not fix nx842_constraints
+>>>> + *   -EPROTO   hardware error during operation
+>>>> + *   -ETIMEDOUT        hardware did not complete operation in reasonable time
+>>>> + *   -EINTR    operation was aborted
+>>>> + */
+>>>> +static int nx842_exec_vas(const unsigned char *in, unsigned int inlen,
+>>>> +                                 unsigned char *out, unsigned int *outlenp,
+>>>> +                                 void *workmem, int fc)
+>>>> +{
+>>>> +       struct coprocessor_request_block *crb;
+>>>> +       struct coprocessor_status_block *csb;
+>>>> +       struct nx842_workmem *wmem;
+>>>> +       struct vas_window *txwin;
+>>>> +       int ret, i = 0;
+>>>> +       u32 ccw;
+>>>> +       unsigned int outlen = *outlenp;
+>>>> +
+>>>> +       wmem = PTR_ALIGN(workmem, WORKMEM_ALIGN);
+>>>> +
+>>>> +       *outlenp = 0;
+>>>> +
+>>>> +       crb = &wmem->crb;
+>>>> +       csb = &crb->csb;
+>>>> +
+>>>> +       ret = nx842_config_crb(in, inlen, out, outlen, wmem);
+>>>> +       if (ret)
+>>>> +               return ret;
+>>>> +
+>>>> +       ccw = 0;
+>>>> +       ccw = SET_FIELD(CCW_FC_842, ccw, fc);
+>>>> +       crb->ccw = cpu_to_be32(ccw);
+>>>> +
+>>>> +       txwin = wmem->txwin;
+>>>> +       /* shoudn't happen, we don't load without a coproc */
+>>>> +       if (!txwin) {
+>>>> +               pr_err_ratelimited("NX-842 coprocessor is not available");
+>>>> +               return -ENODEV;
+>>>> +       }
+>>>> +
+>>>> +       do {
+>>>> +               wmem->start = ktime_get();
+>>>> +               preempt_disable();
+>>>> +               /*
+>>>> +                * VAS copy CRB into L2 cache. Refer <asm/vas.h>.
+>>>> +                * @crb, @offset and @first (must be true)
+>>>> +                */
+>>>> +               vas_copy_crb(crb, 0, 1);
+>>>> +
+>>>> +               /*
+>>>> +                * VAS paste previously copied CRB to NX.
+>>>> +                * @txwin, @offset, @last (must be true) and @re is
+>>>> +                * expected/assumed to be true for NX windows.
+>>>> +                */
+>>>> +               ret = vas_paste_crb(txwin, 0, 1, 1);
+>>>> +               preempt_enable();
+>>>> +               /*
+>>>> +                * Retry copy/paste function for VAS failures.
+>>>> +                */
+>>>> +       } while (ret && (i++ < VAS_RETRIES));
+>>>> +
+>>>> +       if (ret) {
+>>>> +               pr_err_ratelimited("VAS copy/paste failed\n");
+>>>> +               return ret;
+>>>> +       }
+>>>> +
+>>>> +       ret = wait_for_csb(wmem, csb);
+>>>> +       if (!ret)
+>>>> +               *outlenp = be32_to_cpu(csb->count);
+>>>> +
+>>>> +       return ret;
+>>>> +}
+>>>> +
+>>>> +/**
+>>>>   * nx842_powernv_compress - Compress data using the 842 algorithm
+>>>>   *
+>>>>   * Compression provided by the NX842 coprocessor on IBM PowerNV systems.
+>>>> @@ -576,6 +690,198 @@ static inline void nx842_add_coprocs_list(struct nx842_coproc *coproc,
+>>>>         list_add(&coproc->list, &nx842_coprocs);
+>>>>  }
+>>>>
+>>>> +/*
+>>>> + * Identify chip ID for each CPU and save coprocesor adddress for the
+>>>> + * corresponding NX engine in percpu coproc_inst.
+>>>> + * coproc_inst is used in crypto_init to open send window on the NX instance
+>>>> + * for the corresponding CPU / chip where the open request is executed.
+>>>> + */
+>>>> +static void nx842_set_per_cpu_coproc(struct nx842_coproc *coproc)
+>>>> +{
+>>>> +       unsigned int i, chip_id;
+>>>> +
+>>>> +       for_each_possible_cpu(i) {
+>>>> +               chip_id = cpu_to_chip_id(i);
+>>>> +
+>>>> +               if (coproc->chip_id == chip_id)
+>>>> +                       per_cpu(coproc_inst, i) = coproc;
+>>>> +       }
+>>>> +}
+>>>> +
+>>>> +
+>>>> +static struct vas_window *nx842_alloc_txwin(struct nx842_coproc *coproc)
+>>>> +{
+>>>> +       struct vas_window *txwin = NULL;
+>>>> +       struct vas_tx_win_attr txattr;
+>>>> +
+>>>> +       /*
+>>>> +        * Kernel requests will be high priority. So open send
+>>>> +        * windows only for high priority RxFIFO entries.
+>>>> +        */
+>>>> +       vas_init_tx_win_attr(&txattr, coproc->ct);
+>>>> +       txattr.lpid = 0;        /* lpid is 0 for kernel requests */
+>>>> +       txattr.pid = mfspr(SPRN_PID);
+>>>> +
+>>>> +       /*
+>>>> +        * Open a VAS send window which is used to send request to NX.
+>>>> +        */
+>>>> +       txwin = vas_tx_win_open(coproc->vas.id, coproc->ct, &txattr);
+>>>> +       if (IS_ERR(txwin)) {
+>>>> +               pr_err("ibm,nx-842: Can not open TX window: %ld\n",
+>>>> +                               PTR_ERR(txwin));
+>>>> +               return NULL;
+>>>> +       }
+>>>> +
+>>>> +       return txwin;
+>>>> +}
+>>>> +
+>>>> +static int __init vas_cfg_coproc_info(struct device_node *dn, int chip_id,
+>>>> +                                       int vasid)
+>>>> +{
+>>>> +       struct vas_window *rxwin = NULL;
+>>>> +       struct vas_rx_win_attr rxattr;
+>>>> +       struct nx842_coproc *coproc;
+>>>> +       u32 lpid, pid, tid, fifo_size;
+>>>> +       u64 rx_fifo;
+>>>> +       const char *priority;
+>>>> +       int ret;
+>>>> +
+>>>> +       ret = of_property_read_u64(dn, "rx-fifo-address", (void *)&rx_fifo);
+>>>> +       if (ret) {
+>>>> +               pr_err("Missing rx-fifo-address property\n");
+>>>> +               return ret;
+>>>> +       }
+>>>> +
+>>>> +       ret = of_property_read_u32(dn, "rx-fifo-size", &fifo_size);
+>>>> +       if (ret) {
+>>>> +               pr_err("Missing rx-fifo-size property\n");
+>>>> +               return ret;
+>>>> +       }
+>>>> +
+>>>> +       ret = of_property_read_u32(dn, "lpid", &lpid);
+>>>> +       if (ret) {
+>>>> +               pr_err("Missing lpid property\n");
+>>>> +               return ret;
+>>>> +       }
+>>>> +
+>>>> +       ret = of_property_read_u32(dn, "pid", &pid);
+>>>> +       if (ret) {
+>>>> +               pr_err("Missing pid property\n");
+>>>> +               return ret;
+>>>> +       }
+>>>> +
+>>>> +       ret = of_property_read_u32(dn, "tid", &tid);
+>>>> +       if (ret) {
+>>>> +               pr_err("Missing tid property\n");
+>>>> +               return ret;
+>>>> +       }
+>>>> +
+>>>> +       ret = of_property_read_string(dn, "priority", &priority);
+>>>> +       if (ret) {
+>>>> +               pr_err("Missing priority property\n");
+>>>> +               return ret;
+>>>> +       }
+>>>> +
+>>>> +       coproc = kzalloc(sizeof(*coproc), GFP_KERNEL);
+>>>> +       if (!coproc)
+>>>> +               return -ENOMEM;
+>>>> +
+>>>> +       if (!strcmp(priority, "High"))
+>>>> +               coproc->ct = VAS_COP_TYPE_842_HIPRI;
+>>>> +       else if (!strcmp(priority, "Normal"))
+>>>> +               coproc->ct = VAS_COP_TYPE_842;
+>>>> +       else {
+>>>> +               pr_err("Invalid RxFIFO priority value\n");
+>>>> +               ret =  -EINVAL;
+>>>> +               goto err_out;
+>>>> +       }
+>>>> +
+>>>> +       vas_init_rx_win_attr(&rxattr, coproc->ct);
+>>>> +       rxattr.rx_fifo = (void *)rx_fifo;
+>>>> +       rxattr.rx_fifo_size = fifo_size;
+>>>> +       rxattr.lnotify_lpid = lpid;
+>>>> +       rxattr.lnotify_pid = pid;
+>>>> +       rxattr.lnotify_tid = tid;
+>>>> +       rxattr.wcreds_max = MAX_CREDITS_PER_RXFIFO;
+>>>> +
+>>>> +       /*
+>>>> +        * Open a VAS receice window which is used to configure RxFIFO
+>>>> +        * for NX.
+>>>> +        */
+>>>> +       rxwin = vas_rx_win_open(vasid, coproc->ct, &rxattr);
+>>>> +       if (IS_ERR(rxwin)) {
+>>>> +               ret = PTR_ERR(rxwin);
+>>>> +               pr_err("setting RxFIFO with VAS failed: %d\n",
+>>>> +                       ret);
+>>>> +               goto err_out;
+>>>> +       }
+>>>> +
+>>>> +       coproc->vas.rxwin = rxwin;
+>>>> +       coproc->vas.id = vasid;
+>>>> +       nx842_add_coprocs_list(coproc, chip_id);
+>>>> +
+>>>> +       /*
+>>>> +        * Kernel requests use only high priority FIFOs. So save coproc
+>>>> +        * info in percpu coproc_inst which will be used to open send
+>>>> +        * windows for crypto open requests later.
+>>>> +        */
+>>>> +       if (coproc->ct == VAS_COP_TYPE_842_HIPRI)
+>>>> +               nx842_set_per_cpu_coproc(coproc);
+>>>> +
+>>>> +       return 0;
+>>>> +
+>>>> +err_out:
+>>>> +       kfree(coproc);
+>>>> +       return ret;
+>>>> +}
+>>>> +
+>>>> +
+>>>> +static int __init nx842_powernv_probe_vas(struct device_node *pn)
+>>>> +{
+>>>> +       struct device_node *dn;
+>>>> +       int chip_id, vasid, ret = 0;
+>>>> +       int nx_fifo_found = 0;
+>>>> +
+>>>> +       chip_id = of_get_ibm_chip_id(pn);
+>>>> +       if (chip_id < 0) {
+>>>> +               pr_err("ibm,chip-id missing\n");
+>>>> +               return -EINVAL;
+>>>> +       }
+>>>> +
+>>>> +       dn = of_find_compatible_node(pn, NULL, "ibm,power9-vas-x");
+>>>> +
+>>>> +       if (!dn) {
+>>>> +               pr_err("Missing VAS device node\n");
+>>>> +               return -EINVAL;
+>>>> +       }
+>>>> +
+>>>> +       if (of_property_read_u32(dn, "ibm,vas-id", &vasid)) {
+>>>> +               pr_err("Missing ibm,vas-id device property\n");
+>>>> +               of_node_put(dn);
+>>>> +               return -EINVAL;
+>>>> +       }
+>>>> +
+>>>> +       of_node_put(dn);
+>>>> +
+>>>> +       for_each_child_of_node(pn, dn) {
+>>>> +               if (of_device_is_compatible(dn, "ibm,p9-nx-842")) {
+>>>> +                       ret = vas_cfg_coproc_info(dn, chip_id, vasid);
+>>>> +                       if (ret) {
+>>>> +                               of_node_put(dn);
+>>>> +                               return ret;
+>>>> +                       }
+>>>> +                       nx_fifo_found++;
+>>>> +               }
+>>>> +       }
+>>>> +
+>>>> +       if (!nx_fifo_found) {
+>>>> +               pr_err("NX842 FIFO nodes are missing\n");
+>>>> +               ret = -EINVAL;
+>>>> +       }
+>>>> +
+>>>> +       return ret;
+>>>> +}
+>>>> +
+>>>>  static int __init nx842_powernv_probe(struct device_node *dn)
+>>>>  {
+>>>>         struct nx842_coproc *coproc;
+>>>> @@ -622,6 +928,9 @@ static void nx842_delete_coprocs(void)
+>>>>         struct nx842_coproc *coproc, *n;
+>>>>
+>>>>         list_for_each_entry_safe(coproc, n, &nx842_coprocs, list) {
+>>>> +               if (coproc->vas.rxwin)
+>>>> +                       vas_win_close(coproc->vas.rxwin);
+>>>> +
+>>>>                 list_del(&coproc->list);
+>>>>                 kfree(coproc);
+>>>>         }
+>>>> @@ -643,6 +952,46 @@ static struct nx842_driver nx842_powernv_driver = {
+>>>>         .decompress =   nx842_powernv_decompress,
+>>>>  };
+>>>>
+>>>> +static int nx842_powernv_crypto_init_vas(struct crypto_tfm *tfm)
+>>>> +{
+>>>> +       struct nx842_crypto_ctx *ctx = crypto_tfm_ctx(tfm);
+>>>> +       struct nx842_workmem *wmem;
+>>>> +       struct nx842_coproc *coproc;
+>>>> +       int ret;
+>>>> +
+>>>> +       ret = nx842_crypto_init(tfm, &nx842_powernv_driver);
+>>>> +
+>>>> +       if (ret)
+>>>> +               return ret;
+>>>> +
+>>>> +       wmem = PTR_ALIGN((struct nx842_workmem *)ctx->wmem, WORKMEM_ALIGN);
+>>>> +       coproc = per_cpu(coproc_inst, smp_processor_id());
+>>>
+>>> this is wrong.  the crypto transform init function is not guaranteed
+>>> to be called by the same processor that later uses it.  Just because
+>>> that happens to be how zswap operates doesn't guarantee other crypto
+>>> users will do the same.
+>>
+>> Dan, Sorry missed this comment.
+>>
+>> Right, The actual crypto request can be executed on other processor than the CPU when the init is executed. The main goal is open send window on the NX engine which is on the same chip for the corresponding CPU. So we are OK if the request is scheduled on other CPU as long as it belongs to same chip. Otherwise in the worst case we will end up using remote NX.
+> 
+> ok, but there's no guarantee of future crypto calls being on the same
+> chip either, so i still don't understand why you're doing this.  if
+> you want each crypto comp/decomp call to be cpu-local or node-local,
+> then choose which corpco/txwin to use at comp/decomp time, not
+> transform init time.
 
---===============4661010926525863906==--
+On P8, requests are always send to same NX engine (nx842_ct) even though if the system has multiple NX coprocessors. Whereas on P9, requests will be forwarded to different NX engines, preferable to the local NX for the corresponding chip. 
+
+One way is open 1 send window for each NX during device probe and use the corresponding window for each request. But in this case we might have overhead with parallel requests (ex: 1024). 
+
+We can open limited number of send windows on each NX (including for 842, gzip - kernel and user space requests). So we can not keep send windows open forever. The current code is opening TX window for each crypto session during crpto alloc and closing it during crypto free. We do not want window open / close for each request (copy/paste). With this approach, the compression/decompression request can be scheduled on different chip than the one used during window open. So in the worst case, requests will be processed on the remote NX engine.
+
+One other way is reserve few windows (say 100) for each engine type and use them - open 100 windows during probe and manage these windows for different requests depends on the cpu / chip where these requests are executed. Our next plan is look at performance analysis as part of VAS/NX optimization once NX gzip support is added and make necessary changes.     
+
+ 
+> 
+> 
+>>
+>> Thanks
+>> Haren
+>>
+>>
+>>
+>>
+> 
