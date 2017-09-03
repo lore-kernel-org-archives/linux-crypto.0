@@ -1,139 +1,323 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH v2 3/8] staging: ccree: Use platform_get_irq and
- devm_request_irq
-Date: Sun,  3 Sep 2017 17:57:38 +0300
-Message-ID: <1504450664-28252-4-git-send-email-gilad@benyossef.com>
+Subject: [PATCH v2 4/8] staging: ccree: simplify resource release on error
+Date: Sun,  3 Sep 2017 17:57:39 +0300
+Message-ID: <1504450664-28252-5-git-send-email-gilad@benyossef.com>
 References: <1504450664-28252-1-git-send-email-gilad@benyossef.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Suniel Mahesh <sunil.m@techveda.org>, Ofir Drang <ofir.drang@arm.com>
+Cc: Ofir Drang <ofir.drang@arm.com>
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- linux-crypto@vger.kernel.org, driverdev-devel@linuxdriverproject.org,
- devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+        linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        linux-kernel@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from foss.arm.com ([217.140.101.70]:50882 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753063AbdICO6F (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 3 Sep 2017 10:58:05 -0400
 In-Reply-To: <1504450664-28252-1-git-send-email-gilad@benyossef.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Suniel Mahesh <sunil.m@techveda.org>
+The resource release on probe/init error was being handled
+in an awkward manner and possibly leaking memory on certain
+(unlikely) error path.
 
-It is recommended to use managed function devm_request_irq(),
-which simplifies driver cleanup paths and driver code.
-This patch does the following:
-(a) replace platform_get_resource(), request_irq() and corresponding
-error handling with platform_get_irq() and devm_request_irq().
-(b) remove struct resource pointer(res_irq) in struct ssi_drvdata as
-it seems redundant.
-(c) change type of member irq in struct ssi_drvdata from unsigned int
-to int, as return type of platform_get_irq is int and can be used in
-error handling.
-(d) remove irq_registered variable from driver probe as it seems
-redundant.
-(e) free_irq is not required any more, devm_request_irq() free's it
-on driver detach.
-(f) adjust log messages accordingly and remove any blank lines.
+Fix it by simplifying the error resource release and making
+it easier to track.
 
-Signed-off-by: Suniel Mahesh <sunil.m@techveda.org>
-Acked-by: Gilad Ben-Yossef <gilad@benyossef.com>
+Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
+Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/ssi_driver.c | 30 +++++++++---------------------
- drivers/staging/ccree/ssi_driver.h |  3 +--
- 2 files changed, 10 insertions(+), 23 deletions(-)
+ drivers/staging/ccree/ssi_aead.c   |   3 +-
+ drivers/staging/ccree/ssi_cipher.c |   3 +-
+ drivers/staging/ccree/ssi_driver.c | 102 ++++++++++++++++++++-----------------
+ drivers/staging/ccree/ssi_hash.c   |   3 +-
+ 4 files changed, 59 insertions(+), 52 deletions(-)
 
+diff --git a/drivers/staging/ccree/ssi_aead.c b/drivers/staging/ccree/ssi_aead.c
+index 5abe6b2..8191ec4 100644
+--- a/drivers/staging/ccree/ssi_aead.c
++++ b/drivers/staging/ccree/ssi_aead.c
+@@ -2720,6 +2720,7 @@ int ssi_aead_alloc(struct ssi_drvdata *drvdata)
+ 		goto fail0;
+ 	}
+ 
++	INIT_LIST_HEAD(&aead_handle->aead_list);
+ 	drvdata->aead_handle = aead_handle;
+ 
+ 	aead_handle->sram_workspace_addr = ssi_sram_mgr_alloc(
+@@ -2730,8 +2731,6 @@ int ssi_aead_alloc(struct ssi_drvdata *drvdata)
+ 		goto fail1;
+ 	}
+ 
+-	INIT_LIST_HEAD(&aead_handle->aead_list);
+-
+ 	/* Linux crypto */
+ 	for (alg = 0; alg < ARRAY_SIZE(aead_algs); alg++) {
+ 		t_alg = ssi_aead_create_alg(&aead_algs[alg]);
+diff --git a/drivers/staging/ccree/ssi_cipher.c b/drivers/staging/ccree/ssi_cipher.c
+index 8d31a93..4311746 100644
+--- a/drivers/staging/ccree/ssi_cipher.c
++++ b/drivers/staging/ccree/ssi_cipher.c
+@@ -1315,9 +1315,8 @@ int ssi_ablkcipher_alloc(struct ssi_drvdata *drvdata)
+ 	if (!ablkcipher_handle)
+ 		return -ENOMEM;
+ 
+-	drvdata->blkcipher_handle = ablkcipher_handle;
+-
+ 	INIT_LIST_HEAD(&ablkcipher_handle->blkcipher_alg_list);
++	drvdata->blkcipher_handle = ablkcipher_handle;
+ 
+ 	/* Linux crypto */
+ 	SSI_LOG_DEBUG("Number of algorithms = %zu\n", ARRAY_SIZE(blkcipher_algs));
 diff --git a/drivers/staging/ccree/ssi_driver.c b/drivers/staging/ccree/ssi_driver.c
-index cbe9a03..3e7193d 100644
+index 3e7193d..dc22f13 100644
 --- a/drivers/staging/ccree/ssi_driver.c
 +++ b/drivers/staging/ccree/ssi_driver.c
-@@ -222,7 +222,6 @@ static int init_cc_resources(struct platform_device *plat_dev)
- {
- 	struct resource *req_mem_cc_regs = NULL;
- 	void __iomem *cc_base = NULL;
--	bool irq_registered = false;
- 	struct ssi_drvdata *new_drvdata;
- 	struct device *dev = &plat_dev->dev;
- 	struct device_node *np = dev->of_node;
-@@ -262,26 +261,22 @@ static int init_cc_resources(struct platform_device *plat_dev)
- 		      &req_mem_cc_regs->start, new_drvdata->cc_base);
- 	cc_base = new_drvdata->cc_base;
- 	/* Then IRQ */
--	new_drvdata->res_irq = platform_get_resource(plat_dev, IORESOURCE_IRQ, 0);
--	if (unlikely(!new_drvdata->res_irq)) {
-+	new_drvdata->irq = platform_get_irq(plat_dev, 0);
-+	if (new_drvdata->irq < 0) {
- 		SSI_LOG_ERR("Failed getting IRQ resource\n");
--		rc = -ENODEV;
-+		rc = new_drvdata->irq;
- 		goto init_cc_res_err;
+@@ -233,16 +233,14 @@ static int init_cc_resources(struct platform_device *plat_dev)
+ 	if (!new_drvdata) {
+ 		SSI_LOG_ERR("Failed to allocate drvdata");
+ 		rc = -ENOMEM;
+-		goto init_cc_res_err;
++		goto post_drvdata_err;
  	}
--	rc = request_irq(new_drvdata->res_irq->start, cc_isr,
--			 IRQF_SHARED, "arm_cc7x", new_drvdata);
--	if (unlikely(rc != 0)) {
--		SSI_LOG_ERR("Could not register to interrupt %llu\n",
--			    (unsigned long long)new_drvdata->res_irq->start);
-+	rc = devm_request_irq(&plat_dev->dev, new_drvdata->irq, cc_isr,
-+			      IRQF_SHARED, "arm_cc7x", new_drvdata);
-+	if (rc) {
-+		SSI_LOG_ERR("Could not register to interrupt %d\n",
-+			    new_drvdata->irq);
- 		goto init_cc_res_err;
- 	}
- 	init_completion(&new_drvdata->icache_setup_completion);
++	dev_set_drvdata(&plat_dev->dev, new_drvdata);
++	new_drvdata->plat_dev = plat_dev;
  
--	irq_registered = true;
--	SSI_LOG_DEBUG("Registered to IRQ (%s) %llu\n",
--		      new_drvdata->res_irq->name,
--		      (unsigned long long)new_drvdata->res_irq->start);
+ 	new_drvdata->clk = of_clk_get(np, 0);
+ 	new_drvdata->coherent = of_dma_is_coherent(np);
+ 
+-	/*Initialize inflight counter used in dx_ablkcipher_secure_complete used for count of BYSPASS blocks operations*/
+-	new_drvdata->inflight_counter = 0;
 -
-+	SSI_LOG_DEBUG("Registered to IRQ: %d\n", new_drvdata->irq);
- 	new_drvdata->plat_dev = plat_dev;
+-	dev_set_drvdata(&plat_dev->dev, new_drvdata);
+ 	/* Get device resources */
+ 	/* First CC registers space */
+ 	req_mem_cc_regs = platform_get_resource(plat_dev, IORESOURCE_MEM, 0);
+@@ -250,38 +248,42 @@ static int init_cc_resources(struct platform_device *plat_dev)
+ 	new_drvdata->cc_base = devm_ioremap_resource(&plat_dev->dev,
+ 						     req_mem_cc_regs);
+ 	if (IS_ERR(new_drvdata->cc_base)) {
++		SSI_LOG_ERR("Failed to ioremap registers");
+ 		rc = PTR_ERR(new_drvdata->cc_base);
+-		goto init_cc_res_err;
++		goto post_drvdata_err;
+ 	}
++
+ 	SSI_LOG_DEBUG("Got MEM resource (%s): start=%pad end=%pad\n",
+ 		      req_mem_cc_regs->name,
+ 		      req_mem_cc_regs->start,
+ 		      req_mem_cc_regs->end);
+ 	SSI_LOG_DEBUG("CC registers mapped from %pa to 0x%p\n",
+ 		      &req_mem_cc_regs->start, new_drvdata->cc_base);
++
+ 	cc_base = new_drvdata->cc_base;
++
+ 	/* Then IRQ */
+ 	new_drvdata->irq = platform_get_irq(plat_dev, 0);
+ 	if (new_drvdata->irq < 0) {
+ 		SSI_LOG_ERR("Failed getting IRQ resource\n");
+ 		rc = new_drvdata->irq;
+-		goto init_cc_res_err;
++		goto post_drvdata_err;
+ 	}
++
+ 	rc = devm_request_irq(&plat_dev->dev, new_drvdata->irq, cc_isr,
+ 			      IRQF_SHARED, "arm_cc7x", new_drvdata);
+ 	if (rc) {
+ 		SSI_LOG_ERR("Could not register to interrupt %d\n",
+ 			    new_drvdata->irq);
+-		goto init_cc_res_err;
++		goto post_drvdata_err;
+ 	}
+-	init_completion(&new_drvdata->icache_setup_completion);
+-
+ 	SSI_LOG_DEBUG("Registered to IRQ: %d\n", new_drvdata->irq);
+-	new_drvdata->plat_dev = plat_dev;
++
++	init_completion(&new_drvdata->icache_setup_completion);
  
  	rc = cc_clk_on(new_drvdata);
-@@ -410,10 +405,6 @@ static int init_cc_resources(struct platform_device *plat_dev)
- #ifdef ENABLE_CC_SYSFS
- 		ssi_sysfs_fini();
- #endif
--		if (irq_registered) {
--			free_irq(new_drvdata->res_irq->start, new_drvdata);
--			new_drvdata->res_irq = NULL;
--		}
- 		dev_set_drvdata(&plat_dev->dev, NULL);
+ 	if (rc)
+-		goto init_cc_res_err;
++		goto post_drvdata_err;
+ 
+ 	if (!new_drvdata->plat_dev->dev.dma_mask)
+ 		new_drvdata->plat_dev->dev.dma_mask = &new_drvdata->plat_dev->dev.coherent_dma_mask;
+@@ -295,7 +297,7 @@ static int init_cc_resources(struct platform_device *plat_dev)
+ 		SSI_LOG_ERR("Invalid CC signature: SIGNATURE=0x%08X != expected=0x%08X\n",
+ 			    signature_val, (u32)DX_DEV_SIGNATURE);
+ 		rc = -EINVAL;
+-		goto init_cc_res_err;
++		goto post_clk_err;
  	}
- 	return rc;
-@@ -443,11 +434,8 @@ static void cleanup_cc_resources(struct platform_device *plat_dev)
+ 	SSI_LOG_DEBUG("CC SIGNATURE=0x%08X\n", signature_val);
+ 
+@@ -306,21 +308,26 @@ static int init_cc_resources(struct platform_device *plat_dev)
+ 	rc = init_cc_regs(new_drvdata, true);
+ 	if (unlikely(rc != 0)) {
+ 		SSI_LOG_ERR("init_cc_regs failed\n");
+-		goto init_cc_res_err;
++		goto post_clk_err;
+ 	}
+ 
  #ifdef ENABLE_CC_SYSFS
- 	ssi_sysfs_fini();
+ 	rc = ssi_sysfs_init(&plat_dev->dev.kobj, new_drvdata);
+ 	if (unlikely(rc != 0)) {
+ 		SSI_LOG_ERR("init_stat_db failed\n");
+-		goto init_cc_res_err;
++		goto post_regs_err;
+ 	}
  #endif
+ 
++	rc = ssi_fips_init(new_drvdata);
++	if (unlikely(rc != 0)) {
++		SSI_LOG_ERR("SSI_FIPS_INIT failed 0x%x\n", rc);
++		goto post_sysfs_err;
++	}
+ 	rc = ssi_sram_mgr_init(new_drvdata);
+ 	if (unlikely(rc != 0)) {
+ 		SSI_LOG_ERR("ssi_sram_mgr_init failed\n");
+-		goto init_cc_res_err;
++		goto post_fips_init_err;
+ 	}
+ 
+ 	new_drvdata->mlli_sram_addr =
+@@ -328,57 +335,51 @@ static int init_cc_resources(struct platform_device *plat_dev)
+ 	if (unlikely(new_drvdata->mlli_sram_addr == NULL_SRAM_ADDR)) {
+ 		SSI_LOG_ERR("Failed to alloc MLLI Sram buffer\n");
+ 		rc = -ENOMEM;
+-		goto init_cc_res_err;
++		goto post_sram_mgr_err;
+ 	}
+ 
+ 	rc = request_mgr_init(new_drvdata);
+ 	if (unlikely(rc != 0)) {
+ 		SSI_LOG_ERR("request_mgr_init failed\n");
+-		goto init_cc_res_err;
++		goto post_sram_mgr_err;
+ 	}
+ 
+ 	rc = ssi_buffer_mgr_init(new_drvdata);
+ 	if (unlikely(rc != 0)) {
+ 		SSI_LOG_ERR("buffer_mgr_init failed\n");
+-		goto init_cc_res_err;
++		goto post_req_mgr_err;
+ 	}
+ 
+ 	rc = ssi_power_mgr_init(new_drvdata);
+ 	if (unlikely(rc != 0)) {
+ 		SSI_LOG_ERR("ssi_power_mgr_init failed\n");
+-		goto init_cc_res_err;
+-	}
 -
- 	fini_cc_regs(drvdata);
- 	cc_clk_off(drvdata);
--	free_irq(drvdata->res_irq->start, drvdata);
--	drvdata->res_irq = NULL;
- 	dev_set_drvdata(&plat_dev->dev, NULL);
+-	rc = ssi_fips_init(new_drvdata);
+-	if (unlikely(rc != 0)) {
+-		SSI_LOG_ERR("SSI_FIPS_INIT failed 0x%x\n", rc);
+-		goto init_cc_res_err;
++		goto post_buf_mgr_err;
+ 	}
+ 
+ 	rc = ssi_ivgen_init(new_drvdata);
+ 	if (unlikely(rc != 0)) {
+ 		SSI_LOG_ERR("ssi_ivgen_init failed\n");
+-		goto init_cc_res_err;
++		goto post_power_mgr_err;
+ 	}
+ 
+ 	/* Allocate crypto algs */
+ 	rc = ssi_ablkcipher_alloc(new_drvdata);
+ 	if (unlikely(rc != 0)) {
+ 		SSI_LOG_ERR("ssi_ablkcipher_alloc failed\n");
+-		goto init_cc_res_err;
++		goto post_ivgen_err;
+ 	}
+ 
+ 	/* hash must be allocated before aead since hash exports APIs */
+ 	rc = ssi_hash_alloc(new_drvdata);
+ 	if (unlikely(rc != 0)) {
+ 		SSI_LOG_ERR("ssi_hash_alloc failed\n");
+-		goto init_cc_res_err;
++		goto post_cipher_err;
+ 	}
+ 
+ 	rc = ssi_aead_alloc(new_drvdata);
+ 	if (unlikely(rc != 0)) {
+ 		SSI_LOG_ERR("ssi_aead_alloc failed\n");
+-		goto init_cc_res_err;
++		goto post_hash_err;
+ 	}
+ 
+ 	/* If we got here and FIPS mode is enabled
+@@ -389,24 +390,33 @@ static int init_cc_resources(struct platform_device *plat_dev)
+ 
+ 	return 0;
+ 
+-init_cc_res_err:
+-	SSI_LOG_ERR("Freeing CC HW resources!\n");
+-
+-	if (new_drvdata) {
+-		ssi_aead_free(new_drvdata);
+-		ssi_hash_free(new_drvdata);
+-		ssi_ablkcipher_free(new_drvdata);
+-		ssi_ivgen_fini(new_drvdata);
+-		ssi_power_mgr_fini(new_drvdata);
+-		ssi_buffer_mgr_fini(new_drvdata);
+-		request_mgr_fini(new_drvdata);
+-		ssi_sram_mgr_fini(new_drvdata);
+-		ssi_fips_fini(new_drvdata);
++post_hash_err:
++	ssi_hash_free(new_drvdata);
++post_cipher_err:
++	ssi_ablkcipher_free(new_drvdata);
++post_ivgen_err:
++	ssi_ivgen_fini(new_drvdata);
++post_power_mgr_err:
++	ssi_power_mgr_fini(new_drvdata);
++post_buf_mgr_err:
++	 ssi_buffer_mgr_fini(new_drvdata);
++post_req_mgr_err:
++	request_mgr_fini(new_drvdata);
++post_sram_mgr_err:
++	ssi_sram_mgr_fini(new_drvdata);
++post_fips_init_err:
++	ssi_fips_fini(new_drvdata);
++post_sysfs_err:
+ #ifdef ENABLE_CC_SYSFS
+-		ssi_sysfs_fini();
++	ssi_sysfs_fini();
+ #endif
+-		dev_set_drvdata(&plat_dev->dev, NULL);
+-	}
++post_regs_err:
++	fini_cc_regs(new_drvdata);
++post_clk_err:
++	cc_clk_off(new_drvdata);
++post_drvdata_err:
++	SSI_LOG_ERR("ccree init error occurred!\n");
++	dev_set_drvdata(&plat_dev->dev, NULL);
+ 	return rc;
  }
  
-diff --git a/drivers/staging/ccree/ssi_driver.h b/drivers/staging/ccree/ssi_driver.h
-index 518c0bf..88ef370 100644
---- a/drivers/staging/ccree/ssi_driver.h
-+++ b/drivers/staging/ccree/ssi_driver.h
-@@ -128,9 +128,8 @@ struct ssi_crypto_req {
-  * @fw_ver:	SeP loaded firmware version
-  */
- struct ssi_drvdata {
--	struct resource *res_irq;
- 	void __iomem *cc_base;
--	unsigned int irq;
-+	int irq;
- 	u32 irq_mask;
- 	u32 fw_ver;
- 	/* Calibration time of start/stop
+diff --git a/drivers/staging/ccree/ssi_hash.c b/drivers/staging/ccree/ssi_hash.c
+index 13291ae..36495b5 100644
+--- a/drivers/staging/ccree/ssi_hash.c
++++ b/drivers/staging/ccree/ssi_hash.c
+@@ -2234,6 +2234,7 @@ int ssi_hash_alloc(struct ssi_drvdata *drvdata)
+ 		goto fail;
+ 	}
+ 
++	INIT_LIST_HEAD(&hash_handle->hash_list);
+ 	drvdata->hash_handle = hash_handle;
+ 
+ 	sram_size_to_alloc = sizeof(digest_len_init) +
+@@ -2264,8 +2265,6 @@ int ssi_hash_alloc(struct ssi_drvdata *drvdata)
+ 		goto fail;
+ 	}
+ 
+-	INIT_LIST_HEAD(&hash_handle->hash_list);
+-
+ 	/* ahash registration */
+ 	for (alg = 0; alg < ARRAY_SIZE(driver_hash); alg++) {
+ 		struct ssi_hash_alg *t_alg;
 -- 
 2.1.4
