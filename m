@@ -1,91 +1,91 @@
-From: =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>
-Subject: Re: [PATCH] crypto: caam - properly set IV after {en,de}crypt
-Date: Tue, 5 Sep 2017 15:33:01 +0000
-Message-ID: <VI1PR0402MB3342A3AB9EEC3B36A79F253698960@VI1PR0402MB3342.eurprd04.prod.outlook.com>
-References: <20170602122446.2427-1-david@sigma-star.at>
- <20170628132710.97278-1-david@sigma-star.at>
- <VI1PR0401MB2591AE2CA996495656C797B398DD0@VI1PR0401MB2591.eurprd04.prod.outlook.com>
- <VI1PR0401MB2591C51C446CFA129B50022298D20@VI1PR0401MB2591.eurprd04.prod.outlook.com>
- <CAOtvUMfa66v6_MfasHRG8Qk9h81GMTnObuBSObBGcSL4QoOMDQ@mail.gmail.com>
+From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Subject: Re: HWRNGs without quality attribute - are they used or not?
+Date: Tue, 05 Sep 2017 21:54:01 +0530
+Message-ID: <D1368E98-6796-4D3C-A565-B601D93B4786@gmail.com>
+References: <trinity-15517d84-3eec-425d-8519-7fa540b50125-1504619642848@3c-app-gmx-bs67>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-2"
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Cc: David Gstir <david@sigma-star.at>,
-        Dan Douglass <dan.douglass@nxp.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "richard@sigma-star.at" <richard@sigma-star.at>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>
-To: Gilad Ben-Yossef <gilad@benyossef.com>
-Return-path: <stable-owner@vger.kernel.org>
-Content-Language: en-US
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+To: Peter Huewe <PeterHuewe@gmx.de>, linux-crypto@vger.kernel.org,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pf0-f195.google.com ([209.85.192.195]:32776 "EHLO
+        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750858AbdIEQYK (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 5 Sep 2017 12:24:10 -0400
+Received: by mail-pf0-f195.google.com with SMTP id m1so1895969pfk.0
+        for <linux-crypto@vger.kernel.org>; Tue, 05 Sep 2017 09:24:10 -0700 (PDT)
+In-Reply-To: <trinity-15517d84-3eec-425d-8519-7fa540b50125-1504619642848@3c-app-gmx-bs67>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 8/14/2017 10:59 AM, Gilad Ben-Yossef wrote:=0A=
-> Hi,=0A=
-> =0A=
-> On Thu, Jun 29, 2017 at 1:19 PM, Horia Geant=E3 <horia.geanta@nxp.com> wr=
-ote:=0A=
->> On 6/28/2017 4:42 PM, Horia Geant=E3 wrote:=0A=
->>> On 6/28/2017 4:27 PM, David Gstir wrote:=0A=
->>>> Certain cipher modes like CTS expect the IV (req->info) of=0A=
->>>> ablkcipher_request (or equivalently req->iv of skcipher_request) to=0A=
->>>> contain the last ciphertext block when the {en,de}crypt operation is d=
-one.=0A=
->>>> This is currently not the case for the CAAM driver which in turn break=
-s=0A=
->>>> e.g. cts(cbc(aes)) when the CAAM driver is enabled.=0A=
->>>>=0A=
->>>> This patch fixes the CAAM driver to properly set the IV after the=0A=
->>>> {en,de}crypt operation of ablkcipher finishes.=0A=
->>>>=0A=
->>>> This issue was revealed by the changes in the SW CTS mode in commit=0A=
->>>> 0605c41cc53ca ("crypto: cts - Convert to skcipher")=0A=
->>>>=0A=
->>>> Cc: <stable@vger.kernel.org> # 4.8+=0A=
->>>> Signed-off-by: David Gstir <david@sigma-star.at>=0A=
->>> Reviewed-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
->>>=0A=
->> Btw, instead of updating the IV in SW, CAAM engine could be programmed=
-=0A=
->> to do it - by saving the Context Register of the AES accelerator.=0A=
->>=0A=
->> Unfortunately this would require changes in quite a few places: shared=
-=0A=
->> descriptor, HW S/G generation logic, IV dma (un)mapping and maybe others=
-.=0A=
->>=0A=
->> So it's better to have this fix now (which, considering size, is=0A=
->> appropriate for -stable) and later, if needed, offload IV updating in HW=
-.=0A=
->>=0A=
-> =0A=
-> My apologies for reviving this thread from the dead, but doesn't the patc=
-h fail=0A=
-> for in-place decryption since we are copying from req->dst after=0A=
-> the operation is done, and therefore it no longer contains the ciphertext=
-?=0A=
-> =0A=
-You are right, thanks! Will follow up with a fix.=0A=
-Though cts(cbc(aes)) in particular is working, see below.=0A=
-=0A=
-> I'm asking since I ran into a similar issue in the ccree driver and thoug=
-ht=0A=
-> to deploy a similar fix but could not convince myself why this works.=0A=
-> =0A=
-IIUC cts(cbc(aes)) in-place decryption (with cbc(aes) offloaded to CAAM=0A=
-engine) works since SW implementation of cts, when performing the=0A=
-ciphertext stealing phase in cts_cbc_decrypt() does not use req->iv, but=0A=
-a previously value, saved before staring decryption in crypto_cts_decrypt()=
-:=0A=
-=0A=
-if (cbc_blocks <=3D 1)=0A=
-	memcpy(space, req->iv, bsize);=0A=
-else=0A=
-	scatterwalk_map_and_copy(space, req->src, offset - 2 * bsize,=0A=
-                                 bsize, 0);=0A=
-=0A=
-Horia=0A=
+
+
+Hi Peter,
+
+On 5 September 2017 7:24:02 PM IST, Peter Huewe <PeterHuewe@gmx=2Ede> wrot=
+e:
+>Hi,
+>
+>while reading through the analysis of the Linux RNG by the BSI [1][2],
+>I was suprised by the lack of reflecting on the usage of HWRNGs except
+>RDRAND/RDSEED=2E
+>
+>In the paper it was mentioned that if the quality attribute of a
+>regular hwrng is not set
+>(or specified via the module parameter default_quality for all hwrng)
+>the HWRNG is not used at all=2E
+>Only very few set this attribute explictly, and the default is 0,
+>so even if we enable these HWRNGs in the kernel config, they are not
+>used?
+>
+>I read through the hw_random code and came to the same conclusion - but
+>is this correct and desired?
+
+If the quality of RNG source is not set or set to 0 then hwrng does not us=
+e the data to seed /dev/random=2E
+
+>Specifically since you can set the 'default value' only for every hwrng
+>but not overwrite the quality for a specific device=2E
+>e=2Eg=2E the quite good tpm hwrng of my ifx tpm would not be used and=20
+>if I set the default_quality to something other than 0, other devices
+>would be used, which I would not want to=2E
+
+Device with high quality will be used by default=2E But user space can tel=
+l hwrng to use a particular device even if it is not the best RNG source=2E=
+ But it won't be used for seeing /dev/random even in this case=2E
+
+Every instance of hw_random structure represents a RNG device=2E If you ca=
+n use different instance for every TPM chip then setting different quality =
+value is possible=2E
+
+I have an untested patch that allocates different hw_random structure inst=
+ance for every TPM chip and registers with hwrng on tpm_chip_register=2E I =
+made the change for fixing some other issue but did not get time to test it=
+=2E If that patch will be helpful I can find it out and post the patch as R=
+FC tomorrow=2E
+
+>
+>Is this understanding correct?
+>
+>
+>Thanks,
+>Peter
+>(tpm maintainer)
+>
+>
+>
+>[1]
+>https://www=2Ebsi=2Ebund=2Ede/DE/Publikationen/Studien/LinuxRNG/index_htm=
+=2Ehtml
+>[2]
+>https://www=2Ebsi=2Ebund=2Ede/SharedDocs/Downloads/DE/BSI/Publikationen/S=
+tudien/LinuxRNG/LinuxRNG_EN=2Epdf?__blob=3DpublicationFile&v=3D5
+
+Regards,
+PrasannaKumar
+--=20
+Sent from my Android device with K-9 Mail=2E Please excuse my brevity=2E
