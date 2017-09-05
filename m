@@ -1,14 +1,12 @@
 From: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-Subject: [PATCH v8 06/20] crypto: introduce crypto wait for async op
-Date: Tue,  5 Sep 2017 15:38:45 +0300
-Message-ID: <1504615144-29770-7-git-send-email-gilad__24739.6053317518$1504616313$gmane$org@benyossef.com>
+Subject: [PATCH v8 20/20] crypto: adapt api sample to use async. op wait
+Date: Tue,  5 Sep 2017 15:38:59 +0300
+Message-ID: <1504615144-29770-21-git-send-email-gilad__38940.5764792629$1504619396$gmane$org@benyossef.com>
 References: <1504615144-29770-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: Eric Biggers <ebiggers3-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
- Jonathan Cameron <Jonathan.Cameron-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>,
- Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>
+Cc: Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>
 To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
  "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>, Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>,
  David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
@@ -40,109 +38,109 @@ Sender: "Linux-mediatek" <linux-mediatek-bounces-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7
 Errors-To: linux-mediatek-bounces+glpam-linux-mediatek=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-Invoking a possibly async. crypto op and waiting for completion
-while correctly handling backlog processing is a common task
-in the crypto API implementation and outside users of it.
+The code sample is waiting for an async. crypto op completion.
+Adapt sample to use the new generic infrastructure to do the same.
 
-This patch adds a generic implementation for doing so in
-preparation for using it across the board instead of hand
-rolled versions.
+This also fixes a possible data coruption bug created by the
+use of wait_for_completion_interruptible() without dealing
+correctly with an interrupt aborting the wait prior to the
+async op finishing.
 
 Signed-off-by: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-CC: Eric Biggers <ebiggers3-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-CC: Jonathan Cameron <Jonathan.Cameron-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>
 ---
- crypto/api.c           | 13 +++++++++++++
- include/linux/crypto.h | 40 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 53 insertions(+)
+ Documentation/crypto/api-samples.rst | 52 +++++++-----------------------------
+ 1 file changed, 10 insertions(+), 42 deletions(-)
 
-diff --git a/crypto/api.c b/crypto/api.c
-index 941cd4c..2a2479d 100644
---- a/crypto/api.c
-+++ b/crypto/api.c
-@@ -24,6 +24,7 @@
- #include <linux/sched/signal.h>
- #include <linux/slab.h>
- #include <linux/string.h>
-+#include <linux/completion.h>
- #include "internal.h"
+diff --git a/Documentation/crypto/api-samples.rst b/Documentation/crypto/api-samples.rst
+index 2531948..006827e 100644
+--- a/Documentation/crypto/api-samples.rst
++++ b/Documentation/crypto/api-samples.rst
+@@ -7,59 +7,27 @@ Code Example For Symmetric Key Cipher Operation
+ ::
  
- LIST_HEAD(crypto_alg_list);
-@@ -595,5 +596,17 @@ int crypto_has_alg(const char *name, u32 type, u32 mask)
- }
- EXPORT_SYMBOL_GPL(crypto_has_alg);
  
-+void crypto_req_done(struct crypto_async_request *req, int err)
-+{
-+	struct crypto_wait *wait = req->data;
-+
-+	if (err == -EINPROGRESS)
-+		return;
-+
-+	wait->err = err;
-+	complete(&wait->completion);
-+}
-+EXPORT_SYMBOL_GPL(crypto_req_done);
-+
- MODULE_DESCRIPTION("Cryptographic core API");
- MODULE_LICENSE("GPL");
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index 84da997..78508ca 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -24,6 +24,7 @@
- #include <linux/slab.h>
- #include <linux/string.h>
- #include <linux/uaccess.h>
-+#include <linux/completion.h>
+-    struct tcrypt_result {
+-        struct completion completion;
+-        int err;
+-    };
+-
+     /* tie all data structures together */
+     struct skcipher_def {
+         struct scatterlist sg;
+         struct crypto_skcipher *tfm;
+         struct skcipher_request *req;
+-        struct tcrypt_result result;
++        struct crypto_wait wait;
+     };
  
- /*
-  * Autoloaded crypto modules should only use a prefixed name to avoid allowing
-@@ -468,6 +469,45 @@ struct crypto_alg {
- } CRYPTO_MINALIGN_ATTR;
+-    /* Callback function */
+-    static void test_skcipher_cb(struct crypto_async_request *req, int error)
+-    {
+-        struct tcrypt_result *result = req->data;
+-
+-        if (error == -EINPROGRESS)
+-            return;
+-        result->err = error;
+-        complete(&result->completion);
+-        pr_info("Encryption finished successfully\n");
+-    }
+-
+     /* Perform cipher operation */
+     static unsigned int test_skcipher_encdec(struct skcipher_def *sk,
+                          int enc)
+     {
+-        int rc = 0;
++        int rc;
  
- /*
-+ * A helper struct for waiting for completion of async crypto ops
-+ */
-+struct crypto_wait {
-+	struct completion completion;
-+	int err;
-+};
+         if (enc)
+-            rc = crypto_skcipher_encrypt(sk->req);
++            rc = crypto_wait_req(crypto_skcipher_encrypt(sk->req), &sk->wait);
+         else
+-            rc = crypto_skcipher_decrypt(sk->req);
+-
+-        switch (rc) {
+-        case 0:
+-            break;
+-        case -EINPROGRESS:
+-        case -EBUSY:
+-            rc = wait_for_completion_interruptible(
+-                &sk->result.completion);
+-            if (!rc && !sk->result.err) {
+-                reinit_completion(&sk->result.completion);
+-                break;
+-            }
+-        default:
+-            pr_info("skcipher encrypt returned with %d result %d\n",
+-                rc, sk->result.err);
+-            break;
+-        }
+-        init_completion(&sk->result.completion);
++            rc = crypto_wait_req(crypto_skcipher_decrypt(sk->req), &sk->wait);
 +
-+/*
-+ * Macro for declaring a crypto op async wait object on stack
-+ */
-+#define DECLARE_CRYPTO_WAIT(_wait) \
-+	struct crypto_wait _wait = { \
-+		COMPLETION_INITIALIZER_ONSTACK((_wait).completion), 0 }
-+
-+/*
-+ * Async ops completion helper functioons
-+ */
-+void crypto_req_done(struct crypto_async_request *req, int err);
-+
-+static inline int crypto_wait_req(int err, struct crypto_wait *wait)
-+{
-+	switch (err) {
-+	case -EINPROGRESS:
-+	case -EBUSY:
-+		wait_for_completion(&wait->completion);
-+		reinit_completion(&wait->completion);
-+		err = wait->err;
-+		break;
-+	};
-+
-+	return err;
-+}
-+
-+static inline void crypto_init_wait(struct crypto_wait *wait)
-+{
-+	init_completion(&wait->completion);
-+}
-+
-+/*
-  * Algorithm registration interface.
-  */
- int crypto_register_alg(struct crypto_alg *alg);
++	if (rc)
++		pr_info("skcipher encrypt returned with result %d\n", rc);
+ 
+         return rc;
+     }
+@@ -89,8 +57,8 @@ Code Example For Symmetric Key Cipher Operation
+         }
+ 
+         skcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+-                          test_skcipher_cb,
+-                          &sk.result);
++                          crypto_req_done,
++                          &sk.wait);
+ 
+         /* AES 256 with random key */
+         get_random_bytes(&key, 32);
+@@ -122,7 +90,7 @@ Code Example For Symmetric Key Cipher Operation
+         /* We encrypt one block */
+         sg_init_one(&sk.sg, scratchpad, 16);
+         skcipher_request_set_crypt(req, &sk.sg, &sk.sg, 16, ivdata);
+-        init_completion(&sk.result.completion);
++        crypto_init_wait(&sk.wait);
+ 
+         /* encrypt data */
+         ret = test_skcipher_encdec(&sk, 1);
 -- 
 2.1.4
