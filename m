@@ -1,119 +1,121 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH v8 17/20] crypto: talitos: move to generic async completion
-Date: Tue,  5 Sep 2017 15:38:56 +0300
-Message-ID: <1504615144-29770-18-git-send-email-gilad__47236.3701476299$1504615890$gmane$org@benyossef.com>
+From: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
+Subject: [PATCH v8 19/20] crypto: mediatek: move to generic async completion
+Date: Tue,  5 Sep 2017 15:38:58 +0300
+Message-ID: <1504615144-29770-20-git-send-email-gilad__5437.12791190973$1504615904$gmane$org@benyossef.com>
 References: <1504615144-29770-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: Ofir Drang <ofir.drang@arm.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, Jonathan Corbet <corbet@lwn.net>,
- David Howells <dhowells@redhat.com>,
- Tom Lendacky <thomas.lendacky@amd.com>, Gary Hook <gary.hook@amd.com>,
- Boris Brezillon <boris.brezillon@free-electrons.com>,
- Arnaud Ebalard <arno@natisbad.org>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@redhat.com>,
- dm-devel@redhat.com, Shaohua Li <shli@kernel.org>,
- Steve French <sfrench@samba.org>, "Theodore Y. Ts'o" <tytso@mit.edu>,
- Jaegeuk Kim <jaegeuk@kernel.org>,
- Steffen Klassert <steffen.klassert@secunet.com>,
- Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
- Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
- Mimi Zohar <zohar@linux.vnet.ibm.com>,
- Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
- James Morris <james.l.morris@oracle.com>,
- "Serge E. Hallyn" <serge@hallyn.com>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <1504615144-29770-1-git-send-email-gilad@benyossef.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Cc: Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>
+To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+ "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>, Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>,
+ David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+ Tom Lendacky <thomas.lendacky-5C7GfCeVMHo@public.gmane.org>, Gary Hook <gary.hook-5C7GfCeVMHo@public.gmane.org>,
+ Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
+ Arnaud Ebalard <arno-LkuqDEemtHBg9hUCZPvPmw@public.gmane.org>,
+ Matthias Brugger <matthias.bgg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+ Alasdair Kergon <agk-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Mike Snitzer <snitzer-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+ dm-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, Shaohua Li <shli-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+ Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, "Theodore Y. Ts'o" <tytso-3s7WtUTddSA@public.gmane.org>,
+ Jaegeuk Kim <jaegeuk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+ Steffen Klassert <steffen.klassert-opNxpl+3fjRBDgjK7y7TUQ@public.gmane.org>,
+ Alexey Kuznetsov <kuznet-v/Mj1YrvjDBInbfyfbPRSQ@public.gmane.org>,
+ Hideaki YOSHIFUJI <yoshfuji-VfPWfsRibaP+Ru+s062T9g@public.gmane.org>,
+ Mimi Zohar <zohar-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>,
+ Dmitry Kasatkin <dmitry.kasatkin-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+ James Morris <james.l.morris-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
+ "Serge E. Hallyn" <serge-A9i7LUbDfNHQT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-mediatek-bounces+glpam-linux-mediatek=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+In-Reply-To: <1504615144-29770-1-git-send-email-gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-mediatek>,
+ <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-mediatek/>
+List-Post: <mailto:linux-mediatek-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+List-Help: <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-mediatek>,
+ <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=subscribe>
+Sender: "Linux-mediatek" <linux-mediatek-bounces-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+Errors-To: linux-mediatek-bounces+glpam-linux-mediatek=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-The talitos driver starts several async crypto ops and  waits for their
+The mediatek driver starts several async crypto ops and waits for their
 completions. Move it over to generic code doing the same.
 
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+Signed-off-by: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
+Acked-by: Ryder Lee <ryder.lee-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>
 ---
- drivers/crypto/talitos.c | 38 +++++---------------------------------
- 1 file changed, 5 insertions(+), 33 deletions(-)
+ drivers/crypto/mediatek/mtk-aes.c | 31 +++++--------------------------
+ 1 file changed, 5 insertions(+), 26 deletions(-)
 
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index 79791c6..194a307 100644
---- a/drivers/crypto/talitos.c
-+++ b/drivers/crypto/talitos.c
-@@ -2037,22 +2037,6 @@ static int ahash_import(struct ahash_request *areq, const void *in)
- 	return 0;
- }
+diff --git a/drivers/crypto/mediatek/mtk-aes.c b/drivers/crypto/mediatek/mtk-aes.c
+index 9e845e8..e2c7c95 100644
+--- a/drivers/crypto/mediatek/mtk-aes.c
++++ b/drivers/crypto/mediatek/mtk-aes.c
+@@ -137,11 +137,6 @@ struct mtk_aes_gcm_ctx {
+ 	struct crypto_skcipher *ctr;
+ };
  
--struct keyhash_result {
--	struct completion completion;
+-struct mtk_aes_gcm_setkey_result {
 -	int err;
+-	struct completion completion;
 -};
 -
--static void keyhash_complete(struct crypto_async_request *req, int err)
+ struct mtk_aes_drv {
+ 	struct list_head dev_list;
+ 	/* Device list lock */
+@@ -936,17 +931,6 @@ static int mtk_aes_gcm_crypt(struct aead_request *req, u64 mode)
+ 				    &req->base);
+ }
+ 
+-static void mtk_gcm_setkey_done(struct crypto_async_request *req, int err)
 -{
--	struct keyhash_result *res = req->data;
+-	struct mtk_aes_gcm_setkey_result *result = req->data;
 -
 -	if (err == -EINPROGRESS)
 -		return;
 -
--	res->err = err;
--	complete(&res->completion);
+-	result->err = err;
+-	complete(&result->completion);
 -}
 -
- static int keyhash(struct crypto_ahash *tfm, const u8 *key, unsigned int keylen,
- 		   u8 *hash)
- {
-@@ -2060,10 +2044,10 @@ static int keyhash(struct crypto_ahash *tfm, const u8 *key, unsigned int keylen,
+ /*
+  * Because of the hardware limitation, we need to pre-calculate key(H)
+  * for the GHASH operation. The result of the encryption operation
+@@ -962,7 +946,7 @@ static int mtk_aes_gcm_setkey(struct crypto_aead *aead, const u8 *key,
+ 		u32 hash[4];
+ 		u8 iv[8];
  
- 	struct scatterlist sg[1];
- 	struct ahash_request *req;
--	struct keyhash_result hresult;
-+	struct crypto_wait wait;
- 	int ret;
+-		struct mtk_aes_gcm_setkey_result result;
++		struct crypto_wait wait;
  
--	init_completion(&hresult.completion);
-+	crypto_init_wait(&wait);
+ 		struct scatterlist sg[1];
+ 		struct skcipher_request req;
+@@ -1002,22 +986,17 @@ static int mtk_aes_gcm_setkey(struct crypto_aead *aead, const u8 *key,
+ 	if (!data)
+ 		return -ENOMEM;
  
- 	req = ahash_request_alloc(tfm, GFP_KERNEL);
- 	if (!req)
-@@ -2072,25 +2056,13 @@ static int keyhash(struct crypto_ahash *tfm, const u8 *key, unsigned int keylen,
- 	/* Keep tfm keylen == 0 during hash of the long key */
- 	ctx->keylen = 0;
- 	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
--				   keyhash_complete, &hresult);
-+				   crypto_req_done, &wait);
+-	init_completion(&data->result.completion);
++	crypto_init_wait(&data->wait);
+ 	sg_init_one(data->sg, &data->hash, AES_BLOCK_SIZE);
+ 	skcipher_request_set_tfm(&data->req, ctr);
+ 	skcipher_request_set_callback(&data->req, CRYPTO_TFM_REQ_MAY_SLEEP |
+ 				      CRYPTO_TFM_REQ_MAY_BACKLOG,
+-				      mtk_gcm_setkey_done, &data->result);
++				      crypto_req_done, &data->wait);
+ 	skcipher_request_set_crypt(&data->req, data->sg, data->sg,
+ 				   AES_BLOCK_SIZE, data->iv);
  
- 	sg_init_one(&sg[0], key, keylen);
- 
- 	ahash_request_set_crypt(req, sg, hash, keylen);
--	ret = crypto_ahash_digest(req);
--	switch (ret) {
--	case 0:
--		break;
--	case -EINPROGRESS:
--	case -EBUSY:
--		ret = wait_for_completion_interruptible(
--			&hresult.completion);
--		if (!ret)
--			ret = hresult.err;
--		break;
--	default:
--		break;
+-	err = crypto_skcipher_encrypt(&data->req);
+-	if (err == -EINPROGRESS || err == -EBUSY) {
+-		err = wait_for_completion_interruptible(
+-			&data->result.completion);
+-		if (!err)
+-			err = data->result.err;
 -	}
-+	ret = crypto_wait_req(crypto_ahash_digest(req), &wait);
-+
- 	ahash_request_free(req);
++	err = crypto_wait_req(crypto_skcipher_encrypt(&data->req),
++			      &data->wait);
+ 	if (err)
+ 		goto out;
  
- 	return ret;
 -- 
 2.1.4
