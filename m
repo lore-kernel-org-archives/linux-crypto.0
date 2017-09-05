@@ -1,9 +1,10 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH v8 15/20] ima: move to generic async completion
-Date: Tue,  5 Sep 2017 15:38:54 +0300
-Message-ID: <1504615144-29770-16-git-send-email-gilad__25866.0982399762$1504615610$gmane$org@benyossef.com>
+Subject: [PATCH v8 13/20] dm: move dm-verity to generic async completion
+Date: Tue,  5 Sep 2017 15:38:52 +0300
+Message-ID: <1504615144-29770-14-git-send-email-gilad__16692.1967677355$1504615618$gmane$org@benyossef.com>
 References: <1504615144-29770-1-git-send-email-gilad@benyossef.com>
-Cc: Ofir Drang <ofir.drang@arm.com>
+Cc: Ofir Drang <ofir.drang@arm.com>,
+        Mikulas Patocka <mpatocka@redhat.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         Jonathan Corbet <corbet@lwn.net>,
@@ -23,171 +24,231 @@ To: Herbert Xu <herbert@gondor.apana.org.au>,
         Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
         Mimi Zohar <zohar@linux.vnet.ibm.com>,
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:39748 "EHLO foss.arm.com"
+Received: from foss.arm.com ([217.140.101.70]:39648 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752143AbdIEMm6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 5 Sep 2017 08:42:58 -0400
+        id S1751564AbdIEMmb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 5 Sep 2017 08:42:31 -0400
 In-Reply-To: <1504615144-29770-1-git-send-email-gilad@benyossef.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-ima starts several async crypto ops and  waits for their completions.
+dm-verity is starting async. crypto ops and waiting for them to complete.
 Move it over to generic code doing the same.
 
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
-Acked-by: Mimi Zohar <zohar@linux.vnet.ibm.com>
----
- security/integrity/ima/ima_crypto.c | 56 +++++++++++--------------------------
- 1 file changed, 17 insertions(+), 39 deletions(-)
+This also avoids a future potential data coruption bug created
+by the use of wait_for_completion_interruptible() without dealing
+correctly with an interrupt aborting the wait prior to the
+async op finishing, should this code ever move to a context
+where signals are not masked.
 
-diff --git a/security/integrity/ima/ima_crypto.c b/security/integrity/ima/ima_crypto.c
-index a856d8c..9057b16 100644
---- a/security/integrity/ima/ima_crypto.c
-+++ b/security/integrity/ima/ima_crypto.c
-@@ -27,11 +27,6 @@
+Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+CC: Mikulas Patocka <mpatocka@redhat.com>
+---
+ drivers/md/dm-verity-target.c | 81 +++++++++++--------------------------------
+ drivers/md/dm-verity.h        |  5 ---
+ 2 files changed, 20 insertions(+), 66 deletions(-)
+
+diff --git a/drivers/md/dm-verity-target.c b/drivers/md/dm-verity-target.c
+index bda3cac..811ad28 100644
+--- a/drivers/md/dm-verity-target.c
++++ b/drivers/md/dm-verity-target.c
+@@ -92,74 +92,33 @@ static sector_t verity_position_at_level(struct dm_verity *v, sector_t block,
+ 	return block >> (level * v->hash_per_block_bits);
+ }
  
- #include "ima.h"
+-/*
+- * Callback function for asynchrnous crypto API completion notification
+- */
+-static void verity_op_done(struct crypto_async_request *base, int err)
+-{
+-	struct verity_result *res = (struct verity_result *)base->data;
+-
+-	if (err == -EINPROGRESS)
+-		return;
+-
+-	res->err = err;
+-	complete(&res->completion);
+-}
+-
+-/*
+- * Wait for async crypto API callback
+- */
+-static inline int verity_complete_op(struct verity_result *res, int ret)
+-{
+-	switch (ret) {
+-	case 0:
+-		break;
+-
+-	case -EINPROGRESS:
+-	case -EBUSY:
+-		ret = wait_for_completion_interruptible(&res->completion);
+-		if (!ret)
+-			ret = res->err;
+-		reinit_completion(&res->completion);
+-		break;
+-
+-	default:
+-		DMERR("verity_wait_hash: crypto op submission failed: %d", ret);
+-	}
+-
+-	if (unlikely(ret < 0))
+-		DMERR("verity_wait_hash: crypto op failed: %d", ret);
+-
+-	return ret;
+-}
+-
+ static int verity_hash_update(struct dm_verity *v, struct ahash_request *req,
+ 				const u8 *data, size_t len,
+-				struct verity_result *res)
++				struct crypto_wait *wait)
+ {
+ 	struct scatterlist sg;
  
--struct ahash_completion {
+ 	sg_init_one(&sg, data, len);
+ 	ahash_request_set_crypt(req, &sg, NULL, len);
+ 
+-	return verity_complete_op(res, crypto_ahash_update(req));
++	return crypto_wait_req(crypto_ahash_update(req), wait);
+ }
+ 
+ /*
+  * Wrapper for crypto_ahash_init, which handles verity salting.
+  */
+ static int verity_hash_init(struct dm_verity *v, struct ahash_request *req,
+-				struct verity_result *res)
++				struct crypto_wait *wait)
+ {
+ 	int r;
+ 
+ 	ahash_request_set_tfm(req, v->tfm);
+ 	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP |
+ 					CRYPTO_TFM_REQ_MAY_BACKLOG,
+-					verity_op_done, (void *)res);
+-	init_completion(&res->completion);
++					crypto_req_done, (void *)wait);
++	crypto_init_wait(wait);
+ 
+-	r = verity_complete_op(res, crypto_ahash_init(req));
++	r = crypto_wait_req(crypto_ahash_init(req), wait);
+ 
+ 	if (unlikely(r < 0)) {
+ 		DMERR("crypto_ahash_init failed: %d", r);
+@@ -167,18 +126,18 @@ static int verity_hash_init(struct dm_verity *v, struct ahash_request *req,
+ 	}
+ 
+ 	if (likely(v->salt_size && (v->version >= 1)))
+-		r = verity_hash_update(v, req, v->salt, v->salt_size, res);
++		r = verity_hash_update(v, req, v->salt, v->salt_size, wait);
+ 
+ 	return r;
+ }
+ 
+ static int verity_hash_final(struct dm_verity *v, struct ahash_request *req,
+-			     u8 *digest, struct verity_result *res)
++			     u8 *digest, struct crypto_wait *wait)
+ {
+ 	int r;
+ 
+ 	if (unlikely(v->salt_size && (!v->version))) {
+-		r = verity_hash_update(v, req, v->salt, v->salt_size, res);
++		r = verity_hash_update(v, req, v->salt, v->salt_size, wait);
+ 
+ 		if (r < 0) {
+ 			DMERR("verity_hash_final failed updating salt: %d", r);
+@@ -187,7 +146,7 @@ static int verity_hash_final(struct dm_verity *v, struct ahash_request *req,
+ 	}
+ 
+ 	ahash_request_set_crypt(req, NULL, digest, 0);
+-	r = verity_complete_op(res, crypto_ahash_final(req));
++	r = crypto_wait_req(crypto_ahash_final(req), wait);
+ out:
+ 	return r;
+ }
+@@ -196,17 +155,17 @@ int verity_hash(struct dm_verity *v, struct ahash_request *req,
+ 		const u8 *data, size_t len, u8 *digest)
+ {
+ 	int r;
+-	struct verity_result res;
++	struct crypto_wait wait;
+ 
+-	r = verity_hash_init(v, req, &res);
++	r = verity_hash_init(v, req, &wait);
+ 	if (unlikely(r < 0))
+ 		goto out;
+ 
+-	r = verity_hash_update(v, req, data, len, &res);
++	r = verity_hash_update(v, req, data, len, &wait);
+ 	if (unlikely(r < 0))
+ 		goto out;
+ 
+-	r = verity_hash_final(v, req, digest, &res);
++	r = verity_hash_final(v, req, digest, &wait);
+ 
+ out:
+ 	return r;
+@@ -389,7 +348,7 @@ int verity_hash_for_block(struct dm_verity *v, struct dm_verity_io *io,
+  * Calculates the digest for the given bio
+  */
+ int verity_for_io_block(struct dm_verity *v, struct dm_verity_io *io,
+-			struct bvec_iter *iter, struct verity_result *res)
++			struct bvec_iter *iter, struct crypto_wait *wait)
+ {
+ 	unsigned int todo = 1 << v->data_dev_block_bits;
+ 	struct bio *bio = dm_bio_from_per_bio_data(io, v->ti->per_io_data_size);
+@@ -414,7 +373,7 @@ int verity_for_io_block(struct dm_verity *v, struct dm_verity_io *io,
+ 		 */
+ 		sg_set_page(&sg, bv.bv_page, len, bv.bv_offset);
+ 		ahash_request_set_crypt(req, &sg, NULL, len);
+-		r = verity_complete_op(res, crypto_ahash_update(req));
++		r = crypto_wait_req(crypto_ahash_update(req), wait);
+ 
+ 		if (unlikely(r < 0)) {
+ 			DMERR("verity_for_io_block crypto op failed: %d", r);
+@@ -482,7 +441,7 @@ static int verity_verify_io(struct dm_verity_io *io)
+ 	struct dm_verity *v = io->v;
+ 	struct bvec_iter start;
+ 	unsigned b;
+-	struct verity_result res;
++	struct crypto_wait wait;
+ 
+ 	for (b = 0; b < io->n_blocks; b++) {
+ 		int r;
+@@ -507,17 +466,17 @@ static int verity_verify_io(struct dm_verity_io *io)
+ 			continue;
+ 		}
+ 
+-		r = verity_hash_init(v, req, &res);
++		r = verity_hash_init(v, req, &wait);
+ 		if (unlikely(r < 0))
+ 			return r;
+ 
+ 		start = io->iter;
+-		r = verity_for_io_block(v, io, &io->iter, &res);
++		r = verity_for_io_block(v, io, &io->iter, &wait);
+ 		if (unlikely(r < 0))
+ 			return r;
+ 
+ 		r = verity_hash_final(v, req, verity_io_real_digest(v, io),
+-					&res);
++					&wait);
+ 		if (unlikely(r < 0))
+ 			return r;
+ 
+diff --git a/drivers/md/dm-verity.h b/drivers/md/dm-verity.h
+index a59e0ad..b675bc0 100644
+--- a/drivers/md/dm-verity.h
++++ b/drivers/md/dm-verity.h
+@@ -90,11 +90,6 @@ struct dm_verity_io {
+ 	 */
+ };
+ 
+-struct verity_result {
 -	struct completion completion;
 -	int err;
 -};
 -
- /* minimum file size for ahash use */
- static unsigned long ima_ahash_minsize;
- module_param_named(ahash_minsize, ima_ahash_minsize, ulong, 0644);
-@@ -196,30 +191,13 @@ static void ima_free_atfm(struct crypto_ahash *tfm)
- 		crypto_free_ahash(tfm);
- }
- 
--static void ahash_complete(struct crypto_async_request *req, int err)
-+static inline int ahash_wait(int err, struct crypto_wait *wait)
+ static inline struct ahash_request *verity_io_hash_req(struct dm_verity *v,
+ 						     struct dm_verity_io *io)
  {
--	struct ahash_completion *res = req->data;
- 
--	if (err == -EINPROGRESS)
--		return;
--	res->err = err;
--	complete(&res->completion);
--}
-+	err = crypto_wait_req(err, wait);
- 
--static int ahash_wait(int err, struct ahash_completion *res)
--{
--	switch (err) {
--	case 0:
--		break;
--	case -EINPROGRESS:
--	case -EBUSY:
--		wait_for_completion(&res->completion);
--		reinit_completion(&res->completion);
--		err = res->err;
--		/* fall through */
--	default:
-+	if (err)
- 		pr_crit_ratelimited("ahash calculation failed: err: %d\n", err);
--	}
- 
- 	return err;
- }
-@@ -233,7 +211,7 @@ static int ima_calc_file_hash_atfm(struct file *file,
- 	int rc, read = 0, rbuf_len, active = 0, ahash_rc = 0;
- 	struct ahash_request *req;
- 	struct scatterlist sg[1];
--	struct ahash_completion res;
-+	struct crypto_wait wait;
- 	size_t rbuf_size[2];
- 
- 	hash->length = crypto_ahash_digestsize(tfm);
-@@ -242,12 +220,12 @@ static int ima_calc_file_hash_atfm(struct file *file,
- 	if (!req)
- 		return -ENOMEM;
- 
--	init_completion(&res.completion);
-+	crypto_init_wait(&wait);
- 	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG |
- 				   CRYPTO_TFM_REQ_MAY_SLEEP,
--				   ahash_complete, &res);
-+				   crypto_req_done, &wait);
- 
--	rc = ahash_wait(crypto_ahash_init(req), &res);
-+	rc = ahash_wait(crypto_ahash_init(req), &wait);
- 	if (rc)
- 		goto out1;
- 
-@@ -288,7 +266,7 @@ static int ima_calc_file_hash_atfm(struct file *file,
- 			 * read/request, wait for the completion of the
- 			 * previous ahash_update() request.
- 			 */
--			rc = ahash_wait(ahash_rc, &res);
-+			rc = ahash_wait(ahash_rc, &wait);
- 			if (rc)
- 				goto out3;
- 		}
-@@ -304,7 +282,7 @@ static int ima_calc_file_hash_atfm(struct file *file,
- 			 * read/request, wait for the completion of the
- 			 * previous ahash_update() request.
- 			 */
--			rc = ahash_wait(ahash_rc, &res);
-+			rc = ahash_wait(ahash_rc, &wait);
- 			if (rc)
- 				goto out3;
- 		}
-@@ -318,7 +296,7 @@ static int ima_calc_file_hash_atfm(struct file *file,
- 			active = !active; /* swap buffers, if we use two */
- 	}
- 	/* wait for the last update request to complete */
--	rc = ahash_wait(ahash_rc, &res);
-+	rc = ahash_wait(ahash_rc, &wait);
- out3:
- 	if (read)
- 		file->f_mode &= ~FMODE_READ;
-@@ -327,7 +305,7 @@ static int ima_calc_file_hash_atfm(struct file *file,
- out2:
- 	if (!rc) {
- 		ahash_request_set_crypt(req, NULL, hash->digest, 0);
--		rc = ahash_wait(crypto_ahash_final(req), &res);
-+		rc = ahash_wait(crypto_ahash_final(req), &wait);
- 	}
- out1:
- 	ahash_request_free(req);
-@@ -537,7 +515,7 @@ static int calc_buffer_ahash_atfm(const void *buf, loff_t len,
- {
- 	struct ahash_request *req;
- 	struct scatterlist sg;
--	struct ahash_completion res;
-+	struct crypto_wait wait;
- 	int rc, ahash_rc = 0;
- 
- 	hash->length = crypto_ahash_digestsize(tfm);
-@@ -546,12 +524,12 @@ static int calc_buffer_ahash_atfm(const void *buf, loff_t len,
- 	if (!req)
- 		return -ENOMEM;
- 
--	init_completion(&res.completion);
-+	crypto_init_wait(&wait);
- 	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG |
- 				   CRYPTO_TFM_REQ_MAY_SLEEP,
--				   ahash_complete, &res);
-+				   crypto_req_done, &wait);
- 
--	rc = ahash_wait(crypto_ahash_init(req), &res);
-+	rc = ahash_wait(crypto_ahash_init(req), &wait);
- 	if (rc)
- 		goto out;
- 
-@@ -561,10 +539,10 @@ static int calc_buffer_ahash_atfm(const void *buf, loff_t len,
- 	ahash_rc = crypto_ahash_update(req);
- 
- 	/* wait for the update request to complete */
--	rc = ahash_wait(ahash_rc, &res);
-+	rc = ahash_wait(ahash_rc, &wait);
- 	if (!rc) {
- 		ahash_request_set_crypt(req, NULL, hash->digest, 0);
--		rc = ahash_wait(crypto_ahash_final(req), &res);
-+		rc = ahash_wait(crypto_ahash_final(req), &wait);
- 	}
- out:
- 	ahash_request_free(req);
 -- 
 2.1.4
