@@ -1,128 +1,200 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH v8 10/20] crypto: move gcm to generic async completion
-Date: Tue,  5 Sep 2017 15:38:49 +0300
-Message-ID: <1504615144-29770-11-git-send-email-gilad__22852.9251683087$1504616274$gmane$org@benyossef.com>
+From: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
+Subject: [PATCH v8 15/20] ima: move to generic async completion
+Date: Tue,  5 Sep 2017 15:38:54 +0300
+Message-ID: <1504615144-29770-16-git-send-email-gilad__26840.1333516978$1504616275$gmane$org@benyossef.com>
 References: <1504615144-29770-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: Ofir Drang <ofir.drang@arm.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, Jonathan Corbet <corbet@lwn.net>,
- David Howells <dhowells@redhat.com>,
- Tom Lendacky <thomas.lendacky@amd.com>, Gary Hook <gary.hook@amd.com>,
- Boris Brezillon <boris.brezillon@free-electrons.com>,
- Arnaud Ebalard <arno@natisbad.org>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@redhat.com>,
- dm-devel@redhat.com, Shaohua Li <shli@kernel.org>,
- Steve French <sfrench@samba.org>, "Theodore Y. Ts'o" <tytso@mit.edu>,
- Jaegeuk Kim <jaegeuk@kernel.org>,
- Steffen Klassert <steffen.klassert@secunet.com>,
- Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
- Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
- Mimi Zohar <zohar@linux.vnet.ibm.com>,
- Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
- James Morris <james.l.morris@oracle.com>,
- "Serge E. Hallyn" <serge@hallyn.com>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <1504615144-29770-1-git-send-email-gilad@benyossef.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Cc: Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>
+To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+ "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>, Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>,
+ David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+ Tom Lendacky <thomas.lendacky-5C7GfCeVMHo@public.gmane.org>, Gary Hook <gary.hook-5C7GfCeVMHo@public.gmane.org>,
+ Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
+ Arnaud Ebalard <arno-LkuqDEemtHBg9hUCZPvPmw@public.gmane.org>,
+ Matthias Brugger <matthias.bgg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+ Alasdair Kergon <agk-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Mike Snitzer <snitzer-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+ dm-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, Shaohua Li <shli-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+ Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, "Theodore Y. Ts'o" <tytso-3s7WtUTddSA@public.gmane.org>,
+ Jaegeuk Kim <jaegeuk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+ Steffen Klassert <steffen.klassert-opNxpl+3fjRBDgjK7y7TUQ@public.gmane.org>,
+ Alexey Kuznetsov <kuznet-v/Mj1YrvjDBInbfyfbPRSQ@public.gmane.org>,
+ Hideaki YOSHIFUJI <yoshfuji-VfPWfsRibaP+Ru+s062T9g@public.gmane.org>,
+ Mimi Zohar <zohar-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>,
+ Dmitry Kasatkin <dmitry.kasatkin-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+ James Morris <james.l.morris-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
+ "Serge E. Hallyn" <serge-A9i7LUbDfNHQT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-mediatek-bounces+glpam-linux-mediatek=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+In-Reply-To: <1504615144-29770-1-git-send-email-gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-mediatek>,
+ <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-mediatek/>
+List-Post: <mailto:linux-mediatek-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+List-Help: <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-mediatek>,
+ <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=subscribe>
+Sender: "Linux-mediatek" <linux-mediatek-bounces-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+Errors-To: linux-mediatek-bounces+glpam-linux-mediatek=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-gcm is starting an async. crypto op and waiting for it complete.
+ima starts several async crypto ops and  waits for their completions.
 Move it over to generic code doing the same.
 
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+Signed-off-by: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
+Acked-by: Mimi Zohar <zohar-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>
 ---
- crypto/gcm.c | 32 ++++++--------------------------
- 1 file changed, 6 insertions(+), 26 deletions(-)
+ security/integrity/ima/ima_crypto.c | 56 +++++++++++--------------------------
+ 1 file changed, 17 insertions(+), 39 deletions(-)
 
-diff --git a/crypto/gcm.c b/crypto/gcm.c
-index 3841b5e..fb923a5 100644
---- a/crypto/gcm.c
-+++ b/crypto/gcm.c
-@@ -16,7 +16,6 @@
- #include <crypto/scatterwalk.h>
- #include <crypto/hash.h>
- #include "internal.h"
--#include <linux/completion.h>
- #include <linux/err.h>
- #include <linux/init.h>
- #include <linux/kernel.h>
-@@ -78,11 +77,6 @@ struct crypto_gcm_req_priv_ctx {
- 	} u;
- };
+diff --git a/security/integrity/ima/ima_crypto.c b/security/integrity/ima/ima_crypto.c
+index a856d8c..9057b16 100644
+--- a/security/integrity/ima/ima_crypto.c
++++ b/security/integrity/ima/ima_crypto.c
+@@ -27,11 +27,6 @@
  
--struct crypto_gcm_setkey_result {
--	int err;
+ #include "ima.h"
+ 
+-struct ahash_completion {
 -	struct completion completion;
+-	int err;
 -};
 -
- static struct {
- 	u8 buf[16];
- 	struct scatterlist sg;
-@@ -98,17 +92,6 @@ static inline struct crypto_gcm_req_priv_ctx *crypto_gcm_reqctx(
- 	return (void *)PTR_ALIGN((u8 *)aead_request_ctx(req), align + 1);
+ /* minimum file size for ahash use */
+ static unsigned long ima_ahash_minsize;
+ module_param_named(ahash_minsize, ima_ahash_minsize, ulong, 0644);
+@@ -196,30 +191,13 @@ static void ima_free_atfm(struct crypto_ahash *tfm)
+ 		crypto_free_ahash(tfm);
  }
  
--static void crypto_gcm_setkey_done(struct crypto_async_request *req, int err)
--{
--	struct crypto_gcm_setkey_result *result = req->data;
--
+-static void ahash_complete(struct crypto_async_request *req, int err)
++static inline int ahash_wait(int err, struct crypto_wait *wait)
+ {
+-	struct ahash_completion *res = req->data;
+ 
 -	if (err == -EINPROGRESS)
 -		return;
--
--	result->err = err;
--	complete(&result->completion);
+-	res->err = err;
+-	complete(&res->completion);
 -}
--
- static int crypto_gcm_setkey(struct crypto_aead *aead, const u8 *key,
- 			     unsigned int keylen)
- {
-@@ -119,7 +102,7 @@ static int crypto_gcm_setkey(struct crypto_aead *aead, const u8 *key,
- 		be128 hash;
- 		u8 iv[16];
++	err = crypto_wait_req(err, wait);
  
--		struct crypto_gcm_setkey_result result;
-+		struct crypto_wait wait;
+-static int ahash_wait(int err, struct ahash_completion *res)
+-{
+-	switch (err) {
+-	case 0:
+-		break;
+-	case -EINPROGRESS:
+-	case -EBUSY:
+-		wait_for_completion(&res->completion);
+-		reinit_completion(&res->completion);
+-		err = res->err;
+-		/* fall through */
+-	default:
++	if (err)
+ 		pr_crit_ratelimited("ahash calculation failed: err: %d\n", err);
+-	}
  
- 		struct scatterlist sg[1];
- 		struct skcipher_request req;
-@@ -140,21 +123,18 @@ static int crypto_gcm_setkey(struct crypto_aead *aead, const u8 *key,
- 	if (!data)
+ 	return err;
+ }
+@@ -233,7 +211,7 @@ static int ima_calc_file_hash_atfm(struct file *file,
+ 	int rc, read = 0, rbuf_len, active = 0, ahash_rc = 0;
+ 	struct ahash_request *req;
+ 	struct scatterlist sg[1];
+-	struct ahash_completion res;
++	struct crypto_wait wait;
+ 	size_t rbuf_size[2];
+ 
+ 	hash->length = crypto_ahash_digestsize(tfm);
+@@ -242,12 +220,12 @@ static int ima_calc_file_hash_atfm(struct file *file,
+ 	if (!req)
  		return -ENOMEM;
  
--	init_completion(&data->result.completion);
-+	crypto_init_wait(&data->wait);
- 	sg_init_one(data->sg, &data->hash, sizeof(data->hash));
- 	skcipher_request_set_tfm(&data->req, ctr);
- 	skcipher_request_set_callback(&data->req, CRYPTO_TFM_REQ_MAY_SLEEP |
- 						  CRYPTO_TFM_REQ_MAY_BACKLOG,
--				      crypto_gcm_setkey_done,
--				      &data->result);
-+				      crypto_req_done,
-+				      &data->wait);
- 	skcipher_request_set_crypt(&data->req, data->sg, data->sg,
- 				   sizeof(data->hash), data->iv);
+-	init_completion(&res.completion);
++	crypto_init_wait(&wait);
+ 	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG |
+ 				   CRYPTO_TFM_REQ_MAY_SLEEP,
+-				   ahash_complete, &res);
++				   crypto_req_done, &wait);
  
--	err = crypto_skcipher_encrypt(&data->req);
--	if (err == -EINPROGRESS || err == -EBUSY) {
--		wait_for_completion(&data->result.completion);
--		err = data->result.err;
--	}
-+	err = crypto_wait_req(crypto_skcipher_encrypt(&data->req),
-+							&data->wait);
+-	rc = ahash_wait(crypto_ahash_init(req), &res);
++	rc = ahash_wait(crypto_ahash_init(req), &wait);
+ 	if (rc)
+ 		goto out1;
  
- 	if (err)
+@@ -288,7 +266,7 @@ static int ima_calc_file_hash_atfm(struct file *file,
+ 			 * read/request, wait for the completion of the
+ 			 * previous ahash_update() request.
+ 			 */
+-			rc = ahash_wait(ahash_rc, &res);
++			rc = ahash_wait(ahash_rc, &wait);
+ 			if (rc)
+ 				goto out3;
+ 		}
+@@ -304,7 +282,7 @@ static int ima_calc_file_hash_atfm(struct file *file,
+ 			 * read/request, wait for the completion of the
+ 			 * previous ahash_update() request.
+ 			 */
+-			rc = ahash_wait(ahash_rc, &res);
++			rc = ahash_wait(ahash_rc, &wait);
+ 			if (rc)
+ 				goto out3;
+ 		}
+@@ -318,7 +296,7 @@ static int ima_calc_file_hash_atfm(struct file *file,
+ 			active = !active; /* swap buffers, if we use two */
+ 	}
+ 	/* wait for the last update request to complete */
+-	rc = ahash_wait(ahash_rc, &res);
++	rc = ahash_wait(ahash_rc, &wait);
+ out3:
+ 	if (read)
+ 		file->f_mode &= ~FMODE_READ;
+@@ -327,7 +305,7 @@ static int ima_calc_file_hash_atfm(struct file *file,
+ out2:
+ 	if (!rc) {
+ 		ahash_request_set_crypt(req, NULL, hash->digest, 0);
+-		rc = ahash_wait(crypto_ahash_final(req), &res);
++		rc = ahash_wait(crypto_ahash_final(req), &wait);
+ 	}
+ out1:
+ 	ahash_request_free(req);
+@@ -537,7 +515,7 @@ static int calc_buffer_ahash_atfm(const void *buf, loff_t len,
+ {
+ 	struct ahash_request *req;
+ 	struct scatterlist sg;
+-	struct ahash_completion res;
++	struct crypto_wait wait;
+ 	int rc, ahash_rc = 0;
+ 
+ 	hash->length = crypto_ahash_digestsize(tfm);
+@@ -546,12 +524,12 @@ static int calc_buffer_ahash_atfm(const void *buf, loff_t len,
+ 	if (!req)
+ 		return -ENOMEM;
+ 
+-	init_completion(&res.completion);
++	crypto_init_wait(&wait);
+ 	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG |
+ 				   CRYPTO_TFM_REQ_MAY_SLEEP,
+-				   ahash_complete, &res);
++				   crypto_req_done, &wait);
+ 
+-	rc = ahash_wait(crypto_ahash_init(req), &res);
++	rc = ahash_wait(crypto_ahash_init(req), &wait);
+ 	if (rc)
  		goto out;
+ 
+@@ -561,10 +539,10 @@ static int calc_buffer_ahash_atfm(const void *buf, loff_t len,
+ 	ahash_rc = crypto_ahash_update(req);
+ 
+ 	/* wait for the update request to complete */
+-	rc = ahash_wait(ahash_rc, &res);
++	rc = ahash_wait(ahash_rc, &wait);
+ 	if (!rc) {
+ 		ahash_request_set_crypt(req, NULL, hash->digest, 0);
+-		rc = ahash_wait(crypto_ahash_final(req), &res);
++		rc = ahash_wait(crypto_ahash_final(req), &wait);
+ 	}
+ out:
+ 	ahash_request_free(req);
 -- 
 2.1.4
