@@ -1,103 +1,110 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH v8 14/20] cifs: move to generic async completion
-Date: Tue,  5 Sep 2017 15:38:53 +0300
-Message-ID: <1504615144-29770-15-git-send-email-gilad@benyossef.com>
+From: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
+Subject: [PATCH v8 08/20] crypto: move pub key to generic async completion
+Date: Tue,  5 Sep 2017 15:38:47 +0300
+Message-ID: <1504615144-29770-9-git-send-email-gilad__49067.2465101399$1504615407$gmane$org@benyossef.com>
 References: <1504615144-29770-1-git-send-email-gilad@benyossef.com>
-Cc: Ofir Drang <ofir.drang@arm.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        David Howells <dhowells@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>,
-        Boris Brezillon <boris.brezillon@free-electrons.com>,
-        Arnaud Ebalard <arno@natisbad.org>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Shaohua Li <shli@kernel.org>, Steve French <sfrench@samba.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:39688 "EHLO
-        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751149AbdIEMmo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 5 Sep 2017 08:42:44 -0400
-In-Reply-To: <1504615144-29770-1-git-send-email-gilad@benyossef.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>
+To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+ "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>, Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>,
+ David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+ Tom Lendacky <thomas.lendacky-5C7GfCeVMHo@public.gmane.org>, Gary Hook <gary.hook-5C7GfCeVMHo@public.gmane.org>,
+ Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
+ Arnaud Ebalard <arno-LkuqDEemtHBg9hUCZPvPmw@public.gmane.org>,
+ Matthias Brugger <matthias.bgg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+ Alasdair Kergon <agk-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Mike Snitzer <snitzer-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+ dm-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, Shaohua Li <shli-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+ Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, "Theodore Y. Ts'o" <tytso-3s7WtUTddSA@public.gmane.org>,
+ Jaegeuk Kim <jaegeuk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+ Steffen Klassert <steffen.klassert-opNxpl+3fjRBDgjK7y7TUQ@public.gmane.org>,
+ Alexey Kuznetsov <kuznet-v/Mj1YrvjDBInbfyfbPRSQ@public.gmane.org>,
+ Hideaki YOSHIFUJI <yoshfuji-VfPWfsRibaP+Ru+s062T9g@public.gmane.org>,
+ Mimi Zohar <zohar-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>,
+ Dmitry Kasatkin <dmitry.kasatkin-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+ James Morris <james.l.morris-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
+ "Serge E. Hallyn" <serge-A9i7LUbDfNHQT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-mediatek-bounces+glpam-linux-mediatek=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+In-Reply-To: <1504615144-29770-1-git-send-email-gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-mediatek>,
+ <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-mediatek/>
+List-Post: <mailto:linux-mediatek-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+List-Help: <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-mediatek>,
+ <mailto:linux-mediatek-request-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org?subject=subscribe>
+Sender: "Linux-mediatek" <linux-mediatek-bounces-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+Errors-To: linux-mediatek-bounces+glpam-linux-mediatek=m.gmane.org-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-cifs starts an async. crypto op and waits for their completion.
-Move it over to generic code doing the same.
+public_key_verify_signature() is starting an async crypto op and
+waiting for it to complete. Move it over to generic code doing
+the same.
 
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
-Acked-by: Pavel Shilovsky <pshilov@microsoft.com>
+Signed-off-by: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
 ---
- fs/cifs/smb2ops.c | 30 ++++--------------------------
- 1 file changed, 4 insertions(+), 26 deletions(-)
+ crypto/asymmetric_keys/public_key.c | 28 ++++------------------------
+ 1 file changed, 4 insertions(+), 24 deletions(-)
 
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index fb2934b..982b39d 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -2066,22 +2066,6 @@ init_sg(struct smb_rqst *rqst, u8 *sign)
- 	return sg;
+diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
+index 3cd6e12..d916235 100644
+--- a/crypto/asymmetric_keys/public_key.c
++++ b/crypto/asymmetric_keys/public_key.c
+@@ -57,29 +57,13 @@ static void public_key_destroy(void *payload0, void *payload3)
+ 	public_key_signature_free(payload3);
  }
  
--struct cifs_crypt_result {
--	int err;
+-struct public_key_completion {
 -	struct completion completion;
+-	int err;
 -};
 -
--static void cifs_crypt_complete(struct crypto_async_request *req, int err)
+-static void public_key_verify_done(struct crypto_async_request *req, int err)
 -{
--	struct cifs_crypt_result *res = req->data;
+-	struct public_key_completion *compl = req->data;
 -
 -	if (err == -EINPROGRESS)
 -		return;
 -
--	res->err = err;
--	complete(&res->completion);
+-	compl->err = err;
+-	complete(&compl->completion);
 -}
 -
- static int
- smb2_get_enc_key(struct TCP_Server_Info *server, __u64 ses_id, int enc, u8 *key)
+ /*
+  * Verify a signature using a public key.
+  */
+ int public_key_verify_signature(const struct public_key *pkey,
+ 				const struct public_key_signature *sig)
  {
-@@ -2122,12 +2106,10 @@ crypt_message(struct TCP_Server_Info *server, struct smb_rqst *rqst, int enc)
- 	struct aead_request *req;
- 	char *iv;
- 	unsigned int iv_len;
--	struct cifs_crypt_result result = {0, };
-+	DECLARE_CRYPTO_WAIT(wait);
- 	struct crypto_aead *tfm;
- 	unsigned int crypt_len = le32_to_cpu(tr_hdr->OriginalMessageSize);
+-	struct public_key_completion compl;
++	struct crypto_wait cwait;
+ 	struct crypto_akcipher *tfm;
+ 	struct akcipher_request *req;
+ 	struct scatterlist sig_sg, digest_sg;
+@@ -131,20 +115,16 @@ int public_key_verify_signature(const struct public_key *pkey,
+ 	sg_init_one(&digest_sg, output, outlen);
+ 	akcipher_request_set_crypt(req, &sig_sg, &digest_sg, sig->s_size,
+ 				   outlen);
+-	init_completion(&compl.completion);
++	crypto_init_wait(&cwait);
+ 	akcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG |
+ 				      CRYPTO_TFM_REQ_MAY_SLEEP,
+-				      public_key_verify_done, &compl);
++				      crypto_req_done, &cwait);
  
--	init_completion(&result.completion);
--
- 	rc = smb2_get_enc_key(server, tr_hdr->SessionId, enc, key);
- 	if (rc) {
- 		cifs_dbg(VFS, "%s: Could not get %scryption key\n", __func__,
-@@ -2187,14 +2169,10 @@ crypt_message(struct TCP_Server_Info *server, struct smb_rqst *rqst, int enc)
- 	aead_request_set_ad(req, assoc_data_len);
- 
- 	aead_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
--				  cifs_crypt_complete, &result);
-+				  crypto_req_done, &wait);
- 
--	rc = enc ? crypto_aead_encrypt(req) : crypto_aead_decrypt(req);
--
--	if (rc == -EINPROGRESS || rc == -EBUSY) {
--		wait_for_completion(&result.completion);
--		rc = result.err;
+ 	/* Perform the verification calculation.  This doesn't actually do the
+ 	 * verification, but rather calculates the hash expected by the
+ 	 * signature and returns that to us.
+ 	 */
+-	ret = crypto_akcipher_verify(req);
+-	if ((ret == -EINPROGRESS) || (ret == -EBUSY)) {
+-		wait_for_completion(&compl.completion);
+-		ret = compl.err;
 -	}
-+	rc = crypto_wait_req(enc ? crypto_aead_encrypt(req)
-+				: crypto_aead_decrypt(req), &wait);
++	ret = crypto_wait_req(crypto_akcipher_verify(req), &cwait);
+ 	if (ret < 0)
+ 		goto out_free_output;
  
- 	if (!rc && enc)
- 		memcpy(&tr_hdr->Signature, sign, SMB2_SIGNATURE_SIZE);
 -- 
 2.1.4
