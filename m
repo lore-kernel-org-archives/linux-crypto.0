@@ -1,15 +1,19 @@
-From: Srishti Sharma <srishtishar@gmail.com>
-Subject: [PATCH] Staging: ccree: ssi_cipher.c: Correct spelling mistake.
-Date: Thu,  7 Sep 2017 00:54:23 +0530
-Message-ID: <1504725863-8495-1-git-send-email-srishtishar@gmail.com>
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: Re: [PATCH 8/8] staging: ccree: remove BUG macro usage
+Date: Wed, 6 Sep 2017 22:28:21 +0300
+Message-ID: <20170906192821.4ytcxj436uyug6pr@mwanda>
+References: <1504429011-25514-1-git-send-email-gilad@benyossef.com>
+ <1504429011-25514-9-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: devel@driverdev.osuosl.org, outreachy-kernel@googlegroups.com,
+Cc: devel@driverdev.osuosl.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
  driverdev-devel@linuxdriverproject.org, linux-kernel@vger.kernel.org,
- Srishti Sharma <srishtishar@gmail.com>, linux-crypto@vger.kernel.org
-To: gregkh@linuxfoundation.org
+ linux-crypto@vger.kernel.org, Ofir Drang <ofir.drang@arm.com>
+To: Gilad Ben-Yossef <gilad@benyossef.com>
 Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+Content-Disposition: inline
+In-Reply-To: <1504429011-25514-9-git-send-email-gilad@benyossef.com>
 List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
  <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
 List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
@@ -21,25 +25,21 @@ Errors-To: driverdev-devel-bounces@linuxdriverproject.org
 Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-Correct spelling of counter in comment .
+On Sun, Sep 03, 2017 at 11:56:50AM +0300, Gilad Ben-Yossef wrote:
+> @@ -1154,7 +1150,8 @@ static inline int ssi_buffer_mgr_aead_chain_data(
+>  		//if have reached the end of the sgl, then this is unexpected
+>  		if (!areq_ctx->src_sgl) {
+>  			SSI_LOG_ERR("reached end of sg list. unexpected\n");
+> -			BUG();
+> +			return -EINVAL;
+> +			goto chain_data_exit;
 
-Signed-off-by: Srishti Sharma <srishtishar@gmail.com>
----
- drivers/staging/ccree/ssi_cipher.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+You've got a direct return followed by a goto.
 
-diff --git a/drivers/staging/ccree/ssi_cipher.c b/drivers/staging/ccree/ssi_cipher.c
-index 8d31a93..99232b2 100644
---- a/drivers/staging/ccree/ssi_cipher.c
-+++ b/drivers/staging/ccree/ssi_cipher.c
-@@ -702,7 +702,7 @@ static int ssi_blkcipher_complete(struct device *dev,
+It's a do-nothing goto that just returns rc.  I hate those.  I've tried
+to review locking bugs to see if single returns prevent future
+programmers from introducing new error paths which don't unlock.  They
+don't really help...
 
- 	ssi_buffer_mgr_unmap_blkcipher_request(dev, req_ctx, ivsize, src, dst);
-
--	/*Set the inflight couter value to local variable*/
-+	/*Set the inflight counter value to local variable*/
- 	inflight_counter =  ctx_p->drvdata->inflight_counter;
- 	/*Decrease the inflight counter*/
- 	if (ctx_p->flow_mode == BYPASS && ctx_p->drvdata->inflight_counter > 0)
---
-2.7.4
+regards,
+dan carpenter
