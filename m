@@ -1,54 +1,93 @@
-From: Gary R Hook <gary.hook@amd.com>
-Subject: Re: [RFC Part2 PATCH v3 02/26] crypto: ccp: Add Platform Security
- Processor (PSP) device support
-Date: Wed, 6 Sep 2017 16:26:52 -0500
-Message-ID: <58daec6d-4c37-ff7f-1473-8ec64f0a9f3a@amd.com>
-References: <20170724200303.12197-1-brijesh.singh@amd.com>
- <20170724200303.12197-3-brijesh.singh@amd.com>
- <20170906170029.bvpii7e7x3fglhwt@pd.tnic>
- <e32a7c0b-5985-e600-6ac2-f6ce48ad530d@amd.com>
- <20170906204606.f34esvg464ynsrjn@pd.tnic>
+From: Srishti Sharma <srishtishar@gmail.com>
+Subject: Re: [Outreachy kernel] [PATCH v3] Staging: ccree: ssi_cipher.c:
+ Remove unused variable.
+Date: Thu, 7 Sep 2017 02:57:35 +0530
+Message-ID: <CAB3L5ozix75XLL6nPmV8jQaoz1xa6RuBKXrBBY=mwVmRd_7hOw@mail.gmail.com>
+References: <1504732426-9765-1-git-send-email-srishtishar@gmail.com>
+ <alpine.DEB.2.20.1709062316450.2984@hadrien> <CAB3L5owYErPk2hh3OnE68eHCyrbgqUY0cHj3TrU6DUL44ZbPgQ@mail.gmail.com>
+ <alpine.DEB.2.20.1709062325070.2984@hadrien>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Joerg Roedel <joro@8bytes.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?XCJSYWRpbSBLcsSNbcOhxZlcIg==?= <rkrcmar@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-To: Borislav Petkov <bp@suse.de>, Brijesh Singh <brijesh.singh@amd.com>
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20170906204606.f34esvg464ynsrjn@pd.tnic>
-Sender: kvm-owner@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: Greg KH <gregkh@linuxfoundation.org>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        linux-kernel@vger.kernel.org, outreachy-kernel@googlegroups.com
+To: Julia Lawall <julia.lawall@lip6.fr>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <alpine.DEB.2.20.1709062325070.2984@hadrien>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 09/06/2017 03:46 PM, Borislav Petkov wrote:
-> On Wed, Sep 06, 2017 at 03:38:38PM -0500, Brijesh Singh wrote:
->> This bit of my struggle -- tip/master is not in sync with cryptodev-2.6 [1].
+On Thu, Sep 7, 2017 at 2:56 AM, Julia Lawall <julia.lawall@lip6.fr> wrote:
 >
-> Aaha.
 >
->> In order to expand the CCP driver we need the following commits from the
->> cryptodev-2.6
->>
->> 57de3aefb73f crypto: ccp - remove ccp_present() check from device initialize
->> d0ebbc0c407a crypto: ccp - rename ccp driver initialize files as sp device
->> f4d18d656f88 crypto: ccp - Abstract interrupt registeration
->> 720419f01832 crypto: ccp - Introduce the AMD Secure Processor device
->> 970e8303cb8d crypto: ccp - Use devres interface to allocate PCI/iomap and cleanup
->>
->> I cherry-picked these patches into tip/master before starting the SEV work.
->>
->> Since these patches were already reviewed and accepted hence I did not include it
->> in my RFC series. I am not sure what is best way to handle it. Should I include
->> these patches in the series ? or just mention them in cover letter ? I am looking
->> for suggestions on how to best communicate it. thanks
+> On Thu, 7 Sep 2017, Srishti Sharma wrote:
 >
-> Right, so I'm assuming those will go upstream this merge window, no?
+>> On Thu, Sep 7, 2017 at 2:47 AM, Julia Lawall <julia.lawall@lip6.fr> wrote:
+>> >
+>> >
+>> > On Thu, 7 Sep 2017, Srishti Sharma wrote:
+>> >
+>> >> Remove local variable inflight_counter ,as it is never used.
+>> >
+>> > "counter ,as" -> "counter, as"
+>> >
+>> >> Signed-off-by: Srishti Sharma <srishtishar@gmail.com>
+>> >> ---
+>> >> Changes in v3:
+>> >>  - There was no longer a need to make the comment more comprehensible as
+>> >>    I have deleted the variable associated with it because it is unused .
+>> >>  drivers/staging/ccree/ssi_cipher.c | 5 +----
+>> >>  1 file changed, 1 insertion(+), 4 deletions(-)
+>> >>
+>> >> diff --git a/drivers/staging/ccree/ssi_cipher.c b/drivers/staging/ccree/ssi_cipher.c
+>> >> index fec2faa..609ebe4 100644
+>> >> --- a/drivers/staging/ccree/ssi_cipher.c
+>> >> +++ b/drivers/staging/ccree/ssi_cipher.c
+>> >> @@ -702,10 +702,7 @@ static int ssi_blkcipher_complete(struct device *dev,
+>> >>
+>> >>       ssi_buffer_mgr_unmap_blkcipher_request(dev, req_ctx, ivsize, src, dst);
+>> >>
+>> >> -     /*
+>> >> -      * Save inflight_counter in a local variable.
+>> >> -      */
+>> >> -     inflight_counter =  ctx_p->drvdata->inflight_counter;
+>> >> +
+>> >
+>> > This is a patch on your previous patch.  It should be a patch on the
+>> > original code.  Also, don't add a new blank line.  Just remove the line
+>> > completely.
+>>
+>>   so , when I resend it should I version it as v3 or send as a new
+>> patch as it is now fixing a different problem ?
+>
+> v3 (or maybe now v4?) would be fine.  It's still the same code that is
+> under consideration.  Then it will be clear that he previosu patches are
+> not needed.
 
-They were included in a pull request (for 4.14) from Herbert, dated Monday.
+ Okay , Thanks !
+ Regards,
+ Srishti
+>
+> julia
+>
+>>  Regards,
+>>  Srishti
+>> >
+>> > julia
+>> >
+>> >>       /*Decrease the inflight counter*/
+>> >>       if (ctx_p->flow_mode == BYPASS && ctx_p->drvdata->inflight_counter > 0)
+>> >>               ctx_p->drvdata->inflight_counter--;
+>> >> --
+>> >> 2.7.4
+>> >>
+>> >> --
+>> >> You received this message because you are subscribed to the Google Groups "outreachy-kernel" group.
+>> >> To unsubscribe from this group and stop receiving emails from it, send an email to outreachy-kernel+unsubscribe@googlegroups.com.
+>> >> To post to this group, send email to outreachy-kernel@googlegroups.com.
+>> >> To view this discussion on the web visit https://groups.google.com/d/msgid/outreachy-kernel/1504732426-9765-1-git-send-email-srishtishar%40gmail.com.
+>> >> For more options, visit https://groups.google.com/d/optout.
+>> >>
+>>
