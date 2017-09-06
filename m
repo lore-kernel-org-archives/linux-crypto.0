@@ -1,39 +1,48 @@
-From: Dan Carpenter <dan.carpenter@oracle.com>
+From: Srishti Sharma <srishtishar@gmail.com>
 Subject: Re: [PATCH v3] Staging: ccree: ssi_cipher.c: Remove unused variable.
-Date: Thu, 7 Sep 2017 00:32:43 +0300
-Message-ID: <20170906213243.gyttos3s64ckoswp@mwanda>
+Date: Thu, 7 Sep 2017 03:12:25 +0530
+Message-ID: <CAB3L5owK3M3fZJwXAiuSY9bggxVpn2x=pZ_MfBQiGfW00G7Eaw@mail.gmail.com>
 References: <1504732426-9765-1-git-send-email-srishtishar@gmail.com>
+ <20170906213243.gyttos3s64ckoswp@mwanda>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: gregkh@linuxfoundation.org, devel@driverdev.osuosl.org,
-        outreachy-kernel@googlegroups.com,
-        driverdev-devel@linuxdriverproject.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Srishti Sharma <srishtishar@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1504732426-9765-1-git-send-email-srishtishar@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: devel@driverdev.osuosl.org, Greg KH <gregkh@linuxfoundation.org>,
+ driverdev-devel@linuxdriverproject.org, linux-kernel@vger.kernel.org,
+ outreachy-kernel@googlegroups.com, linux-crypto@vger.kernel.org
+To: Dan Carpenter <dan.carpenter@oracle.com>
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+In-Reply-To: <20170906213243.gyttos3s64ckoswp@mwanda>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-Always compile your patches.
-
-  CC [M]  drivers/staging/ccree/ssi_cipher.o
-drivers/staging/ccree/ssi_cipher.c: In function ‘ssi_blkcipher_complete’:
-drivers/staging/ccree/ssi_cipher.c:700:6: warning: unused variable ‘inflight_counter’ [-Wunused-variable]
-  u32 inflight_counter;
-      ^~~~~~~~~~~~~~~~
-
-You need to delete the declaration as well.
-
-Don't be in a rush to resend patches.  I normally write them then let
-them sit in my outbox overnight and send them in the morning.  The extra
-delay helps me to calm down a bit and focus better.  Even though I've
-sent thousands of patches, it sometimes still stresses me out.  It's
-like you're disagreeing with the original author and the reviewers are
-disagreeing with you and everyone's trying to be nice about it but
-patches are fundamentally points of disagreement and that's stress.
-
-regards,
-dan carpenter
+T24gVGh1LCBTZXAgNywgMjAxNyBhdCAzOjAyIEFNLCBEYW4gQ2FycGVudGVyIDxkYW4uY2FycGVu
+dGVyQG9yYWNsZS5jb20+IHdyb3RlOgo+IEFsd2F5cyBjb21waWxlIHlvdXIgcGF0Y2hlcy4KPgo+
+ICAgQ0MgW01dICBkcml2ZXJzL3N0YWdpbmcvY2NyZWUvc3NpX2NpcGhlci5vCj4gZHJpdmVycy9z
+dGFnaW5nL2NjcmVlL3NzaV9jaXBoZXIuYzogSW4gZnVuY3Rpb24g4oCYc3NpX2Jsa2NpcGhlcl9j
+b21wbGV0ZeKAmToKPiBkcml2ZXJzL3N0YWdpbmcvY2NyZWUvc3NpX2NpcGhlci5jOjcwMDo2OiB3
+YXJuaW5nOiB1bnVzZWQgdmFyaWFibGUg4oCYaW5mbGlnaHRfY291bnRlcuKAmSBbLVd1bnVzZWQt
+dmFyaWFibGVdCj4gICB1MzIgaW5mbGlnaHRfY291bnRlcjsKPiAgICAgICBefn5+fn5+fn5+fn5+
+fn5+Cj4KPiBZb3UgbmVlZCB0byBkZWxldGUgdGhlIGRlY2xhcmF0aW9uIGFzIHdlbGwuCj4KPiBE
+b24ndCBiZSBpbiBhIHJ1c2ggdG8gcmVzZW5kIHBhdGNoZXMuICBJIG5vcm1hbGx5IHdyaXRlIHRo
+ZW0gdGhlbiBsZXQKPiB0aGVtIHNpdCBpbiBteSBvdXRib3ggb3Zlcm5pZ2h0IGFuZCBzZW5kIHRo
+ZW0gaW4gdGhlIG1vcm5pbmcuICBUaGUgZXh0cmEKPiBkZWxheSBoZWxwcyBtZSB0byBjYWxtIGRv
+d24gYSBiaXQgYW5kIGZvY3VzIGJldHRlci4gIEV2ZW4gdGhvdWdoIEkndmUKPiBzZW50IHRob3Vz
+YW5kcyBvZiBwYXRjaGVzLCBpdCBzb21ldGltZXMgc3RpbGwgc3RyZXNzZXMgbWUgb3V0LiAgSXQn
+cwo+IGxpa2UgeW91J3JlIGRpc2FncmVlaW5nIHdpdGggdGhlIG9yaWdpbmFsIGF1dGhvciBhbmQg
+dGhlIHJldmlld2VycyBhcmUKPiBkaXNhZ3JlZWluZyB3aXRoIHlvdSBhbmQgZXZlcnlvbmUncyB0
+cnlpbmcgdG8gYmUgbmljZSBhYm91dCBpdCBidXQKPiBwYXRjaGVzIGFyZSBmdW5kYW1lbnRhbGx5
+IHBvaW50cyBvZiBkaXNhZ3JlZW1lbnQgYW5kIHRoYXQncyBzdHJlc3MuCj4KPiByZWdhcmRzLAo+
+IGRhbiBjYXJwZW50ZXIKPgogVGhhbmtzICwgSSdsbCBiZSBtb3JlIGNhcmVmdWwgIQoKIFJlZ2Fy
+ZHMsCiBTcmlzaHRpCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fCmRldmVsIG1haWxpbmcgbGlzdApkZXZlbEBsaW51eGRyaXZlcnByb2plY3Qub3JnCmh0dHA6
+Ly9kcml2ZXJkZXYubGludXhkcml2ZXJwcm9qZWN0Lm9yZy9tYWlsbWFuL2xpc3RpbmZvL2RyaXZl
+cmRldi1kZXZlbAo=
