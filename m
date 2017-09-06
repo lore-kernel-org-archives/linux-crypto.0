@@ -1,93 +1,67 @@
-From: Julia Lawall <julia.lawall@lip6.fr>
-Subject: Re: [Outreachy kernel] Re: [PATCH] Staging: ccree: ssi_cipher.c:
- Correct spelling mistake.
-Date: Wed, 6 Sep 2017 22:39:54 +0200 (CEST)
-Message-ID: <alpine.DEB.2.20.1709062235350.2984@hadrien>
-References: <1504725863-8495-1-git-send-email-srishtishar@gmail.com> <2b8bde9c-6e84-48c5-ab93-76127f314429@googlegroups.com>
+From: Borislav Petkov <bp@suse.de>
+Subject: Re: [RFC Part2 PATCH v3 02/26] crypto: ccp: Add Platform Security
+ Processor (PSP) device support
+Date: Wed, 6 Sep 2017 22:46:06 +0200
+Message-ID: <20170906204606.f34esvg464ynsrjn@pd.tnic>
+References: <20170724200303.12197-1-brijesh.singh@amd.com>
+ <20170724200303.12197-3-brijesh.singh@amd.com>
+ <20170906170029.bvpii7e7x3fglhwt@pd.tnic>
+ <e32a7c0b-5985-e600-6ac2-f6ce48ad530d@amd.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; BOUNDARY="8323329-1658514752-1504730395=:2984"
-Cc: outreachy-kernel <outreachy-kernel@googlegroups.com>,
-        gregkh@linuxfoundation.org, gilad@benyossef.com,
-        linux-crypto@vger.kernel.org,
-        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
-        linux-kernel@vger.kernel.org
-To: Srishti Sharma <srishtishar@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <2b8bde9c-6e84-48c5-ab93-76127f314429@googlegroups.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Joerg Roedel <joro@8bytes.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?utf-8?B?XCJSYWRpbSBLcsSNbcOhxZlcIg==?= <rkrcmar@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Gary Hook <gary.hook@amd.com>, linux-crypto@vger.kernel.org
+To: Brijesh Singh <brijesh.singh@amd.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:42465 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752584AbdIFUq3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 6 Sep 2017 16:46:29 -0400
+Content-Disposition: inline
+In-Reply-To: <e32a7c0b-5985-e600-6ac2-f6ce48ad530d@amd.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+On Wed, Sep 06, 2017 at 03:38:38PM -0500, Brijesh Singh wrote:
+> This bit of my struggle -- tip/master is not in sync with cryptodev-2.6 [1].
 
---8323329-1658514752-1504730395=:2984
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Aaha.
 
+> In order to expand the CCP driver we need the following commits from the
+> cryptodev-2.6
+> 
+> 57de3aefb73f crypto: ccp - remove ccp_present() check from device initialize
+> d0ebbc0c407a crypto: ccp - rename ccp driver initialize files as sp device
+> f4d18d656f88 crypto: ccp - Abstract interrupt registeration
+> 720419f01832 crypto: ccp - Introduce the AMD Secure Processor device
+> 970e8303cb8d crypto: ccp - Use devres interface to allocate PCI/iomap and cleanup
+> 
+> I cherry-picked these patches into tip/master before starting the SEV work.
+> 
+> Since these patches were already reviewed and accepted hence I did not include it
+> in my RFC series. I am not sure what is best way to handle it. Should I include
+> these patches in the series ? or just mention them in cover letter ? I am looking
+> for suggestions on how to best communicate it. thanks
 
+Right, so I'm assuming those will go upstream this merge window, no?
 
-On Wed, 6 Sep 2017, Srishti Sharma wrote:
+Because if so, the rest of your patches will apply, once Linus merges
+them. I guess for the purposes of reviewing, I can cherrypick them too.
 
->
->
-> On Thursday, September 7, 2017 at 12:54:49 AM UTC+5:30, Srishti Sharma
-> wrote:
->       Correct spelling of counter in comment .
->
->       Signed-off-by: Srishti Sharma <srishtishar@gmail.com>
->       ---
->        drivers/staging/ccree/ssi_cipher.c | 2 +-
->        1 file changed, 1 insertion(+), 1 deletion(-)
->
->       diff --git a/drivers/staging/ccree/ssi_cipher.c
->       b/drivers/staging/ccree/ssi_cipher.c
->       index 8d31a93..99232b2 100644
->       --- a/drivers/staging/ccree/ssi_cipher.c
->       +++ b/drivers/staging/ccree/ssi_cipher.c
->       @@ -702,7 +702,7 @@ static int ssi_blkcipher_complete(struct
->       device *dev,
->
->                ssi_buffer_mgr_unmap_blkcipher_request(dev, req_ctx,
->       ivsize, src, dst);
->
->       -        /*Set the inflight couter value to local variable*/
->       +        /*Set the inflight counter value to local variable*/
->                inflight_counter =  ctx_p->drvdata->inflight_counter;
->                /*Decrease the inflight counter*/
->                if (ctx_p->flow_mode == BYPASS &&
->       ctx_p->drvdata->inflight_counter > 0)
->       --
->       2.7.4
->
->
->   Hey,
->
->   Can I say , /* store the value of inflight_counter variable from  driver
-> private data context to a local variable */  , to make it more
-> comprehensible ? 
+Thx.
 
-I think it could be a bit of overkill.  The "driver private data context"
-part can be seen from a quick glance at the code.  Also, it could be good
-to bring out the purpose rather than just what the code does.  So "save
-inflight_counter in a a local variable" could be better, because it
-focuses on the idea of saving some information for later use.  Good job on
-figuring out the formatting problem.
+-- 
+Regards/Gruss,
+    Boris.
 
-julia
-
->
-> Regards,
-> Srishti 
->
-> --
-> You received this message because you are subscribed to the Google Groups
-> "outreachy-kernel" group.
-> To unsubscribe from this group and stop receiving emails from it, send an
-> email to outreachy-kernel+unsubscribe@googlegroups.com.
-> To post to this group, send email to outreachy-kernel@googlegroups.com.
-> To view this discussion on the web visithttps://groups.google.com/d/msgid/outreachy-kernel/2b8bde9c-6e84-48c5-ab93-
-> 76127f314429%40googlegroups.com.
-> For more options, visit https://groups.google.com/d/optout.
->
->
---8323329-1658514752-1504730395=:2984--
+SUSE Linux GmbH, GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
+-- 
