@@ -1,65 +1,58 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [PATCH 8/8] staging: ccree: remove BUG macro usage
-Date: Thu, 7 Sep 2017 12:00:14 +0300
-Message-ID: <CAOtvUMd4XhmVS9xF8gaguD3toGfVhNc00VNPJuyb8wDvjT33+Q@mail.gmail.com>
-References: <1504429011-25514-1-git-send-email-gilad@benyossef.com>
- <1504429011-25514-9-git-send-email-gilad@benyossef.com> <20170906192821.4ytcxj436uyug6pr@mwanda>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+Subject: [PATCH v3 0/8] staging: ccree: more cleanup work for 4.15
+Date: Thu,  7 Sep 2017 12:00:08 +0300
+Message-ID: <1504774817-11984-1-git-send-email-gilad@benyossef.com>
+Cc: Ofir Drang <ofir.drang@arm.com>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-crypto@vger.kernel.org,
         driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
-        Ofir Drang <ofir.drang@arm.com>
-To: Dan Carpenter <dan.carpenter@oracle.com>
+        linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-oi0-f45.google.com ([209.85.218.45]:33193 "EHLO
-        mail-oi0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754404AbdIGJAP (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 7 Sep 2017 05:00:15 -0400
-Received: by mail-oi0-f45.google.com with SMTP id r20so26189962oie.0
-        for <linux-crypto@vger.kernel.org>; Thu, 07 Sep 2017 02:00:15 -0700 (PDT)
-In-Reply-To: <20170906192821.4ytcxj436uyug6pr@mwanda>
+Received: from foss.arm.com ([217.140.101.70]:57206 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1754109AbdIGJBV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 7 Sep 2017 05:01:21 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Sep 6, 2017 at 10:28 PM, Dan Carpenter <dan.carpenter@oracle.com> wrote:
-> On Sun, Sep 03, 2017 at 11:56:50AM +0300, Gilad Ben-Yossef wrote:
->> @@ -1154,7 +1150,8 @@ static inline int ssi_buffer_mgr_aead_chain_data(
->>               //if have reached the end of the sgl, then this is unexpected
->>               if (!areq_ctx->src_sgl) {
->>                       SSI_LOG_ERR("reached end of sg list. unexpected\n");
->> -                     BUG();
->> +                     return -EINVAL;
->> +                     goto chain_data_exit;
->
-> You've got a direct return followed by a goto.
+More cleanup work from Sunil and myself.
 
-Yes, that is silly. Thank you for spotting that.
+I've previously sent some of these as part of a larger patch set.
+I've decided to split the patch set to smaller chunks to make it
+more manageable.
 
->
-> It's a do-nothing goto that just returns rc.  I hate those.  I've tried
-> to review locking bugs to see if single returns prevent future
-> programmers from introducing new error paths which don't unlock.  They
-> don't really help...
+This patch set applies on top of commit 28eb51f7468a
+("staging:rtl8188eu:core Fix remove unneccessary else block").
 
+Changes from v2:
+- Cleanup return after error in BUG replacement patch
+  as suggested by Dan Carpenter
 
-I've replaced the error handling from goto to return as you suggested
-for the changes
-introduced by this patch.
+Changes from v1:
+- Fix kbuild reported error of "label at end of compound statement"
 
-Still need to clean up a lot of the other code doing this though.
+Gilad Ben-Yossef (5):
+  staging: ccree: simplify resource release on error
+  staging: ccree: remove unused completion
+  staging: ccree: move over to BIT macro for bit defines
+  staging: ccree: replace noop macro with inline
+  staging: ccree: remove BUG macro usage
 
-Gilad
+Suniel Mahesh (3):
+  staging: ccree: Replace kzalloc with devm_kzalloc
+  staging: ccree: Convert to devm_ioremap_resource for map, unmap
+  staging: ccree: Use platform_get_irq and devm_request_irq
 
-
-
+ drivers/staging/ccree/ssi_aead.c        |   3 +-
+ drivers/staging/ccree/ssi_buffer_mgr.c  |  18 +--
+ drivers/staging/ccree/ssi_cipher.c      |   4 +-
+ drivers/staging/ccree/ssi_cipher.h      |  10 +-
+ drivers/staging/ccree/ssi_driver.c      | 196 +++++++++++++-------------------
+ drivers/staging/ccree/ssi_driver.h      |  15 +--
+ drivers/staging/ccree/ssi_hash.c        |   3 +-
+ drivers/staging/ccree/ssi_pm.c          |   3 +-
+ drivers/staging/ccree/ssi_request_mgr.c |  22 +++-
+ 9 files changed, 118 insertions(+), 156 deletions(-)
 
 -- 
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-"If you take a class in large-scale robotics, can you end up in a
-situation where the homework eats your dog?"
- -- Jean-Baptiste Queru
+2.1.4
