@@ -1,37 +1,46 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: authenc - cryptlen must be at least AAD len
-Date: Thu, 7 Sep 2017 14:09:22 +0800
-Message-ID: <20170907060922.GA21281@gondor.apana.org.au>
-References: <4634467.01PS30tDXi@positron.chronox.de>
- <3142753.SSoe9WBuHN@positron.chronox.de>
- <20170907060108.GA21208@gondor.apana.org.au>
- <1950183.Or1rzax7nU@tauon.chronox.de>
+From: Joe Perches <joe@perches.com>
+Subject: Re: [PATCH v3] Staging: ccree: ssi_cipher.c: Remove unused variable.
+Date: Wed, 06 Sep 2017 23:16:52 -0700
+Message-ID: <1504765012.7546.12.camel@perches.com>
+References: <1504732426-9765-1-git-send-email-srishtishar@gmail.com>
+         <20170906213243.gyttos3s64ckoswp@mwanda>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: stable@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Cc: gregkh@linuxfoundation.org, devel@driverdev.osuosl.org,
+        outreachy-kernel@googlegroups.com,
+        driverdev-devel@linuxdriverproject.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Dan Carpenter <dan.carpenter@oracle.com>,
+        Srishti Sharma <srishtishar@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:56470 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753437AbdIGGJi (ORCPT
+Received: from smtprelay0250.hostedemail.com ([216.40.44.250]:41436 "EHLO
+        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1751369AbdIGGQ4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 7 Sep 2017 02:09:38 -0400
-Content-Disposition: inline
-In-Reply-To: <1950183.Or1rzax7nU@tauon.chronox.de>
+        Thu, 7 Sep 2017 02:16:56 -0400
+In-Reply-To: <20170906213243.gyttos3s64ckoswp@mwanda>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Sep 07, 2017 at 08:04:25AM +0200, Stephan Mueller wrote:
->
-> I sill send a new patch -- shall I first send it excluding stable so that we 
-> can review it before bothering the stable folks?
+On Thu, 2017-09-07 at 00:32 +0300, Dan Carpenter wrote:
+> Always compile your patches.
+> 
+>   CC [M]  drivers/staging/ccree/ssi_cipher.o
+> drivers/staging/ccree/ssi_cipher.c: In function ‘ssi_blkcipher_complete’:
+> drivers/staging/ccree/ssi_cipher.c:700:6: warning: unused variable ‘inflight_counter’ [-Wunused-variable]
+>   u32 inflight_counter;
+>       ^~~~~~~~~~~~~~~~
+> 
+> You need to delete the declaration as well.
+> 
+> Don't be in a rush to resend patches.  I normally write them then let
+> them sit in my outbox overnight and send them in the morning.  The extra
+> delay helps me to calm down a bit and focus better.  Even though I've
+> sent thousands of patches, it sometimes still stresses me out.  It's
+> like you're disagreeing with the original author and the reviewers are
+> disagreeing with you and everyone's trying to be nice about it but
+> patches are fundamentally points of disagreement and that's stress.
 
-You don't need to cc the email to stable@vger.kernel.org, just add
-a Cc: tag in the patch description and it'll automatically go to
-stable when it hits mainline.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+True, and you shouldn't add a blank link either.
+there's already one above the block you deleted.
