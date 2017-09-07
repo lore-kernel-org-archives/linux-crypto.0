@@ -1,52 +1,22 @@
-From: Srishti Sharma <srishtishar@gmail.com>
-Subject: [PATCH v5] Staging: ccree: Remove unused variable.
-Date: Thu,  7 Sep 2017 13:19:21 +0530
-Message-ID: <1504770561-5554-1-git-send-email-srishtishar@gmail.com>
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: Re: [PATCH v5] Staging: ccree: Remove unused variable.
+Date: Thu, 7 Sep 2017 10:54:39 +0300
+Message-ID: <20170907075439.3wf2saxv3vf2mxcu@mwanda>
+References: <1504770561-5554-1-git-send-email-srishtishar@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: devel@driverdev.osuosl.org, outreachy-kernel@googlegroups.com,
- driverdev-devel@linuxdriverproject.org, linux-kernel@vger.kernel.org,
- Srishti Sharma <srishtishar@gmail.com>, linux-crypto@vger.kernel.org
-To: gregkh@linuxfoundation.org
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: gregkh@linuxfoundation.org, devel@driverdev.osuosl.org,
+        outreachy-kernel@googlegroups.com,
+        driverdev-devel@linuxdriverproject.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Srishti Sharma <srishtishar@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1504770561-5554-1-git-send-email-srishtishar@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Remove the local variable inflight_counter as it is never used.
+Looks good.  Thanks!
 
-Signed-off-by: Srishti Sharma <srishtishar@gmail.com>
----
-Changes in v5:
- - Correct the format of the subject.
- drivers/staging/ccree/ssi_cipher.c | 3 ---
- 1 file changed, 3 deletions(-)
-
-diff --git a/drivers/staging/ccree/ssi_cipher.c b/drivers/staging/ccree/ssi_cipher.c
-index 8d31a93..1ff3c8a 100644
---- a/drivers/staging/ccree/ssi_cipher.c
-+++ b/drivers/staging/ccree/ssi_cipher.c
-@@ -697,13 +697,10 @@ static int ssi_blkcipher_complete(struct device *dev,
- 				  void __iomem *cc_base)
- {
- 	int completion_error = 0;
--	u32 inflight_counter;
- 	struct ablkcipher_request *req = (struct ablkcipher_request *)areq;
-
- 	ssi_buffer_mgr_unmap_blkcipher_request(dev, req_ctx, ivsize, src, dst);
-
--	/*Set the inflight couter value to local variable*/
--	inflight_counter =  ctx_p->drvdata->inflight_counter;
- 	/*Decrease the inflight counter*/
- 	if (ctx_p->flow_mode == BYPASS && ctx_p->drvdata->inflight_counter > 0)
- 		ctx_p->drvdata->inflight_counter--;
---
-2.7.4
+regards,
+dan carpenter
