@@ -1,61 +1,58 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [PATCH v5] Staging: ccree: Remove unused variable.
-Date: Thu, 7 Sep 2017 11:50:31 +0300
-Message-ID: <CAOtvUMc0zxtAnfZhL5M4A7mrYt9z-i58mr2SLtYpXJ5-eEo+QQ@mail.gmail.com>
-References: <1504770561-5554-1-git-send-email-srishtishar@gmail.com>
+Subject: Re: [PATCH 8/8] staging: ccree: remove BUG macro usage
+Date: Thu, 7 Sep 2017 12:00:14 +0300
+Message-ID: <CAOtvUMd4XhmVS9xF8gaguD3toGfVhNc00VNPJuyb8wDvjT33+Q@mail.gmail.com>
+References: <1504429011-25514-1-git-send-email-gilad@benyossef.com>
+ <1504429011-25514-9-git-send-email-gilad@benyossef.com> <20170906192821.4ytcxj436uyug6pr@mwanda>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
         Linux kernel mailing list <linux-kernel@vger.kernel.org>,
-        outreachy-kernel@googlegroups.com
-To: Srishti Sharma <srishtishar@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1504770561-5554-1-git-send-email-srishtishar@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+        Ofir Drang <ofir.drang@arm.com>
+To: Dan Carpenter <dan.carpenter@oracle.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-oi0-f45.google.com ([209.85.218.45]:33193 "EHLO
+        mail-oi0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754404AbdIGJAP (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 7 Sep 2017 05:00:15 -0400
+Received: by mail-oi0-f45.google.com with SMTP id r20so26189962oie.0
+        for <linux-crypto@vger.kernel.org>; Thu, 07 Sep 2017 02:00:15 -0700 (PDT)
+In-Reply-To: <20170906192821.4ytcxj436uyug6pr@mwanda>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
-
-On Thu, Sep 7, 2017 at 10:49 AM, Srishti Sharma <srishtishar@gmail.com> wrote:
-> Remove the local variable inflight_counter as it is never used.
+On Wed, Sep 6, 2017 at 10:28 PM, Dan Carpenter <dan.carpenter@oracle.com> wrote:
+> On Sun, Sep 03, 2017 at 11:56:50AM +0300, Gilad Ben-Yossef wrote:
+>> @@ -1154,7 +1150,8 @@ static inline int ssi_buffer_mgr_aead_chain_data(
+>>               //if have reached the end of the sgl, then this is unexpected
+>>               if (!areq_ctx->src_sgl) {
+>>                       SSI_LOG_ERR("reached end of sg list. unexpected\n");
+>> -                     BUG();
+>> +                     return -EINVAL;
+>> +                     goto chain_data_exit;
 >
-> Signed-off-by: Srishti Sharma <srishtishar@gmail.com>
-> ---
+> You've got a direct return followed by a goto.
 
-I've been meaning to clean that for some time now and never got around to do it.
-Thank you! :-)
+Yes, that is silly. Thank you for spotting that.
 
-Acked-by: Gilad Ben-Yossef <gilad@benyossef.com>
+>
+> It's a do-nothing goto that just returns rc.  I hate those.  I've tried
+> to review locking bugs to see if single returns prevent future
+> programmers from introducing new error paths which don't unlock.  They
+> don't really help...
 
 
-> Changes in v5:
->  - Correct the format of the subject.
->  drivers/staging/ccree/ssi_cipher.c | 3 ---
->  1 file changed, 3 deletions(-)
->
-> diff --git a/drivers/staging/ccree/ssi_cipher.c b/drivers/staging/ccree/ssi_cipher.c
-> index 8d31a93..1ff3c8a 100644
-> --- a/drivers/staging/ccree/ssi_cipher.c
-> +++ b/drivers/staging/ccree/ssi_cipher.c
-> @@ -697,13 +697,10 @@ static int ssi_blkcipher_complete(struct device *dev,
->                                   void __iomem *cc_base)
->  {
->         int completion_error = 0;
-> -       u32 inflight_counter;
->         struct ablkcipher_request *req = (struct ablkcipher_request *)areq;
->
->         ssi_buffer_mgr_unmap_blkcipher_request(dev, req_ctx, ivsize, src, dst);
->
-> -       /*Set the inflight couter value to local variable*/
-> -       inflight_counter =  ctx_p->drvdata->inflight_counter;
->         /*Decrease the inflight counter*/
->         if (ctx_p->flow_mode == BYPASS && ctx_p->drvdata->inflight_counter > 0)
->                 ctx_p->drvdata->inflight_counter--;
-> --
-> 2.7.4
->
+I've replaced the error handling from goto to return as you suggested
+for the changes
+introduced by this patch.
+
+Still need to clean up a lot of the other code doing this though.
+
+Gilad
+
 
 
 
