@@ -1,55 +1,37 @@
-From: Stephan Mueller <smueller@chronox.de>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH] crypto: authenc - cryptlen must be at least AAD len
-Date: Thu, 07 Sep 2017 08:04:25 +0200
-Message-ID: <1950183.Or1rzax7nU@tauon.chronox.de>
-References: <4634467.01PS30tDXi@positron.chronox.de> <3142753.SSoe9WBuHN@positron.chronox.de> <20170907060108.GA21208@gondor.apana.org.au>
+Date: Thu, 7 Sep 2017 14:09:22 +0800
+Message-ID: <20170907060922.GA21281@gondor.apana.org.au>
+References: <4634467.01PS30tDXi@positron.chronox.de>
+ <3142753.SSoe9WBuHN@positron.chronox.de>
+ <20170907060108.GA21208@gondor.apana.org.au>
+ <1950183.Or1rzax7nU@tauon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
 Cc: stable@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <20170907060108.GA21208@gondor.apana.org.au>
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:56470 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753437AbdIGGJi (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 7 Sep 2017 02:09:38 -0400
+Content-Disposition: inline
+In-Reply-To: <1950183.Or1rzax7nU@tauon.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Am Donnerstag, 7. September 2017, 08:01:08 CEST schrieb Herbert Xu:
+On Thu, Sep 07, 2017 at 08:04:25AM +0200, Stephan Mueller wrote:
+>
+> I sill send a new patch -- shall I first send it excluding stable so that we 
+> can review it before bothering the stable folks?
 
-Hi Herbert,
+You don't need to cc the email to stable@vger.kernel.org, just add
+a Cc: tag in the patch description and it'll automatically go to
+stable when it hits mainline.
 
-> On Thu, Sep 07, 2017 at 07:48:53AM +0200, Stephan Müller wrote:
-> > There is already such check:
-> > 
-> > static inline int crypto_aead_decrypt(struct aead_request *req)
-> > {
-> > 
-> >         struct crypto_aead *aead = crypto_aead_reqtfm(req);
-> >         
-> >         if (req->cryptlen < crypto_aead_authsize(aead))
-> >         
-> >                 return -EINVAL;
-> > 
-> > ...
-> 
-> That doesn't check assoclen, does it?
-
-Right, I mixed up the tag and the AAD, sorry for that.
-> 
-> > > Perhaps we can simply
-> > > truncate assoclen in aead_request_set_ad.
-> > 
-> > I am not sure that would work because at the time we set the AAD len, we
-> > may not yet have cryptlen. I.e. aead_request_set_ad may be called before
-> > aead_request_set_crypt.
-> 
-> We can add the truncation in both places.
-
-I sill send a new patch -- shall I first send it excluding stable so that we 
-can review it before bothering the stable folks?
-> 
-> Cheers,
-
-
-
-Ciao
-Stephan
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
