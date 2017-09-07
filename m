@@ -1,12 +1,12 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH v3 1/8] staging: ccree: Replace kzalloc with devm_kzalloc
-Date: Thu,  7 Sep 2017 12:00:09 +0300
-Message-ID: <1504774817-11984-2-git-send-email-gilad@benyossef.com>
+Subject: [PATCH v3 7/8] staging: ccree: replace noop macro with inline
+Date: Thu,  7 Sep 2017 12:00:15 +0300
+Message-ID: <1504774817-11984-8-git-send-email-gilad@benyossef.com>
 References: <1504774817-11984-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: Suniel Mahesh <sunil.m@techveda.org>, Ofir Drang <ofir.drang@arm.com>
+Cc: Ofir Drang <ofir.drang@arm.com>
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
  linux-crypto@vger.kernel.org, driverdev-devel@linuxdriverproject.org,
  devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org
@@ -23,66 +23,27 @@ Errors-To: driverdev-devel-bounces@linuxdriverproject.org
 Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-From: Suniel Mahesh <sunil.m@techveda.org>
+Replace noop macro with a noop inline function
 
-It is recommended to use managed function devm_kzalloc, which
-simplifies driver cleanup paths and driver code.
-This patch does the following:
-(a) replace kzalloc with devm_kzalloc.
-(b) drop kfree(), because memory allocated with devm_kzalloc() is
-automatically freed on driver detach, otherwise it leads to a double
-free.
-(c) remove unnecessary blank lines.
-
-Signed-off-by: Suniel Mahesh <sunil.m@techveda.org>
-[gby: rebase on top of latest coding style fixes changes]
-Acked-by: Gilad Ben-Yossef <gilad@benyossef.com>
+Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/ssi_driver.c | 11 ++++-------
- 1 file changed, 4 insertions(+), 7 deletions(-)
+ drivers/staging/ccree/ssi_driver.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/staging/ccree/ssi_driver.c b/drivers/staging/ccree/ssi_driver.c
-index 9c6f120..47e0880 100644
---- a/drivers/staging/ccree/ssi_driver.c
-+++ b/drivers/staging/ccree/ssi_driver.c
-@@ -223,14 +223,15 @@ static int init_cc_resources(struct platform_device *plat_dev)
- 	struct resource *req_mem_cc_regs = NULL;
- 	void __iomem *cc_base = NULL;
- 	bool irq_registered = false;
--	struct ssi_drvdata *new_drvdata = kzalloc(sizeof(*new_drvdata),
--						  GFP_KERNEL);
-+	struct ssi_drvdata *new_drvdata;
- 	struct device *dev = &plat_dev->dev;
- 	struct device_node *np = dev->of_node;
- 	u32 signature_val;
- 	int rc = 0;
+diff --git a/drivers/staging/ccree/ssi_driver.h b/drivers/staging/ccree/ssi_driver.h
+index 06a3c48..81ba827 100644
+--- a/drivers/staging/ccree/ssi_driver.h
++++ b/drivers/staging/ccree/ssi_driver.h
+@@ -187,8 +187,8 @@ struct async_gen_req_ctx {
+ #ifdef DX_DUMP_BYTES
+ void dump_byte_array(const char *name, const u8 *the_array, unsigned long size);
+ #else
+-#define dump_byte_array(name, array, size) do {	\
+-} while (0);
++static inline void dump_byte_array(const char *name, const u8 *the_array,
++				   unsigned long size) {};
+ #endif
  
--	if (unlikely(!new_drvdata)) {
-+	new_drvdata = devm_kzalloc(&plat_dev->dev, sizeof(*new_drvdata),
-+				   GFP_KERNEL);
-+	if (!new_drvdata) {
- 		SSI_LOG_ERR("Failed to allocate drvdata");
- 		rc = -ENOMEM;
- 		goto init_cc_res_err;
-@@ -435,10 +436,8 @@ static int init_cc_resources(struct platform_device *plat_dev)
- 					   resource_size(new_drvdata->res_mem));
- 			new_drvdata->res_mem = NULL;
- 		}
--		kfree(new_drvdata);
- 		dev_set_drvdata(&plat_dev->dev, NULL);
- 	}
--
- 	return rc;
- }
- 
-@@ -479,8 +478,6 @@ static void cleanup_cc_resources(struct platform_device *plat_dev)
- 		drvdata->cc_base = NULL;
- 		drvdata->res_mem = NULL;
- 	}
--
--	kfree(drvdata);
- 	dev_set_drvdata(&plat_dev->dev, NULL);
- }
- 
+ int init_cc_regs(struct ssi_drvdata *drvdata, bool is_probe);
 -- 
 2.1.4
