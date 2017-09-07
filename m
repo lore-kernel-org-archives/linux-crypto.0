@@ -1,45 +1,47 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH] crypto: authenc - cryptlen must be at least AAD len
-Date: Thu, 07 Sep 2017 07:48:53 +0200
-Message-ID: <3142753.SSoe9WBuHN@positron.chronox.de>
-References: <4634467.01PS30tDXi@positron.chronox.de> <2430903.zcKRVmhyml@positron.chronox.de> <20170907035405.GA20751@gondor.apana.org.au>
+Date: Thu, 7 Sep 2017 14:01:08 +0800
+Message-ID: <20170907060108.GA21208@gondor.apana.org.au>
+References: <4634467.01PS30tDXi@positron.chronox.de>
+ <2430903.zcKRVmhyml@positron.chronox.de>
+ <20170907035405.GA20751@gondor.apana.org.au>
+ <3142753.SSoe9WBuHN@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 Cc: stable@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
 Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <20170907035405.GA20751@gondor.apana.org.au>
+Content-Disposition: inline
+In-Reply-To: <3142753.SSoe9WBuHN@positron.chronox.de>
 Sender: stable-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Am Donnerstag, 7. September 2017, 05:54:05 CEST schrieb Herbert Xu:
-
-Hi Herbert,
-> > 
-> > What is your opinion: should this check be rather added to
-> > crypto_aead_encrypt (similar to a sanity check found in
-> > crypto_aead_decrypt)?
+On Thu, Sep 07, 2017 at 07:48:53AM +0200, Stephan Müller wrote:
+>
+> There is already such check:
 > 
-> Doesn't this apply to decryption as well?
+> static inline int crypto_aead_decrypt(struct aead_request *req)
+> {
+>         struct crypto_aead *aead = crypto_aead_reqtfm(req);
+> 
+>         if (req->cryptlen < crypto_aead_authsize(aead))
+>                 return -EINVAL;
+> ...
 
-There is already such check:
+That doesn't check assoclen, does it?
 
-static inline int crypto_aead_decrypt(struct aead_request *req)
-{
-        struct crypto_aead *aead = crypto_aead_reqtfm(req);
+> > Perhaps we can simply
+> > truncate assoclen in aead_request_set_ad.
+> 
+> I am not sure that would work because at the time we set the AAD len, we may 
+> not yet have cryptlen. I.e. aead_request_set_ad may be called before 
+> aead_request_set_crypt.
 
-        if (req->cryptlen < crypto_aead_authsize(aead))
-                return -EINVAL;
-...
+We can add the truncation in both places.
 
-> Perhaps we can simply
-> truncate assoclen in aead_request_set_ad.
-
-I am not sure that would work because at the time we set the AAD len, we may 
-not yet have cryptlen. I.e. aead_request_set_ad may be called before 
-aead_request_set_crypt.
-
-
-Ciao
-Stephan
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
