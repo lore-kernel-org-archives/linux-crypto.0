@@ -1,156 +1,140 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH v3 8/8] staging: ccree: remove BUG macro usage
-Date: Thu,  7 Sep 2017 12:00:16 +0300
-Message-ID: <1504774817-11984-9-git-send-email-gilad@benyossef.com>
+Subject: [PATCH v3 2/8] staging: ccree: Convert to devm_ioremap_resource for map, unmap
+Date: Thu,  7 Sep 2017 12:00:10 +0300
+Message-ID: <1504774817-11984-3-git-send-email-gilad@benyossef.com>
 References: <1504774817-11984-1-git-send-email-gilad@benyossef.com>
-Cc: Ofir Drang <ofir.drang@arm.com>
+Cc: Ofir Drang <ofir.drang@arm.com>,
+        Suniel Mahesh <sunil.m@techveda.org>
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         linux-crypto@vger.kernel.org,
         driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
         linux-kernel@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:57298 "EHLO
-        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755071AbdIGJBu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 7 Sep 2017 05:01:50 -0400
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1504774817-11984-1-git-send-email-gilad@benyossef.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Replace BUG() macro usage that crash the kernel with alternatives
-that signal error and/or try to recover.
+From: Suniel Mahesh <sunil.m@techveda.org>
 
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+It is recommended to use managed function devm_ioremap_resource(),
+which simplifies driver cleanup paths and driver code.
+This patch does the following:
+(a) replace request_mem_region(), ioremap() and corresponding error
+handling with devm_ioremap_resource().
+(b) remove struct resource pointer(res_mem) in struct ssi_drvdata as it
+seems redundant, use struct resource pointer which is defined locally and
+adjust return value of platform_get_resource() accordingly.
+(c) release_mem_region() and iounmap() are dropped, since devm_ioremap_
+resource() releases and unmaps mem region on driver detach.
+(d) adjust log messages accordingly and remove any blank lines.
+
+Signed-off-by: Suniel Mahesh <sunil.m@techveda.org>
+[gby: rebase on top of latest coding style fixes changes]
+Acked-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/ssi_buffer_mgr.c  | 18 ++++++------------
- drivers/staging/ccree/ssi_cipher.c      |  1 -
- drivers/staging/ccree/ssi_pm.c          |  3 ++-
- drivers/staging/ccree/ssi_request_mgr.c | 22 ++++++++++++++++------
- 4 files changed, 24 insertions(+), 20 deletions(-)
+ drivers/staging/ccree/ssi_driver.c | 60 ++++++++++----------------------------
+ drivers/staging/ccree/ssi_driver.h |  1 -
+ 2 files changed, 15 insertions(+), 46 deletions(-)
 
-diff --git a/drivers/staging/ccree/ssi_buffer_mgr.c b/drivers/staging/ccree/ssi_buffer_mgr.c
-index 6393609..67c3296 100644
---- a/drivers/staging/ccree/ssi_buffer_mgr.c
-+++ b/drivers/staging/ccree/ssi_buffer_mgr.c
-@@ -81,11 +81,6 @@ static unsigned int ssi_buffer_mgr_get_sgl_nents(
- 	unsigned int nents = 0;
- 
- 	while (nbytes != 0) {
--		if (sg_is_chain(sg_list)) {
--			SSI_LOG_ERR("Unexpected chained entry "
--				   "in sg (entry =0x%X)\n", nents);
--			BUG();
--		}
- 		if (sg_list->length != 0) {
- 			nents++;
- 			/* get the number of bytes in the last entry */
-@@ -854,7 +849,7 @@ static inline int ssi_buffer_mgr_aead_chain_assoc(
- 			//if have reached the end of the sgl, then this is unexpected
- 			if (!current_sg) {
- 				SSI_LOG_ERR("reached end of sg list. unexpected\n");
--				BUG();
-+				return -EINVAL;
- 			}
- 			sg_index += current_sg->length;
- 			mapped_nents++;
-@@ -1134,10 +1129,9 @@ static inline int ssi_buffer_mgr_aead_chain_data(
- 
- 	offset = size_to_skip;
- 
--	if (!sg_data) {
--		rc = -EINVAL;
--		goto chain_data_exit;
+diff --git a/drivers/staging/ccree/ssi_driver.c b/drivers/staging/ccree/ssi_driver.c
+index 47e0880..cbe9a03 100644
+--- a/drivers/staging/ccree/ssi_driver.c
++++ b/drivers/staging/ccree/ssi_driver.c
+@@ -246,35 +246,21 @@ static int init_cc_resources(struct platform_device *plat_dev)
+ 	dev_set_drvdata(&plat_dev->dev, new_drvdata);
+ 	/* Get device resources */
+ 	/* First CC registers space */
+-	new_drvdata->res_mem = platform_get_resource(plat_dev, IORESOURCE_MEM, 0);
+-	if (unlikely(!new_drvdata->res_mem)) {
+-		SSI_LOG_ERR("Failed getting IO memory resource\n");
+-		rc = -ENODEV;
+-		goto init_cc_res_err;
 -	}
-+	if (!sg_data)
-+		return -EINVAL;
-+
- 	areq_ctx->src_sgl = req->src;
- 	areq_ctx->dst_sgl = req->dst;
- 
-@@ -1154,7 +1148,7 @@ static inline int ssi_buffer_mgr_aead_chain_data(
- 		//if have reached the end of the sgl, then this is unexpected
- 		if (!areq_ctx->src_sgl) {
- 			SSI_LOG_ERR("reached end of sg list. unexpected\n");
--			BUG();
-+			return -EINVAL;
- 		}
- 		sg_index += areq_ctx->src_sgl->length;
- 		src_mapped_nents--;
-@@ -1198,7 +1192,7 @@ static inline int ssi_buffer_mgr_aead_chain_data(
- 		//if have reached the end of the sgl, then this is unexpected
- 		if (!areq_ctx->dst_sgl) {
- 			SSI_LOG_ERR("reached end of sg list. unexpected\n");
--			BUG();
-+			return -EINVAL;
- 		}
- 		sg_index += areq_ctx->dst_sgl->length;
- 		dst_mapped_nents--;
-diff --git a/drivers/staging/ccree/ssi_cipher.c b/drivers/staging/ccree/ssi_cipher.c
-index ab0349f..a462075 100644
---- a/drivers/staging/ccree/ssi_cipher.c
-+++ b/drivers/staging/ccree/ssi_cipher.c
-@@ -541,7 +541,6 @@ ssi_blkcipher_create_setup_desc(
- 		break;
- 	default:
- 		SSI_LOG_ERR("Unsupported cipher mode (%d)\n", cipher_mode);
--		BUG();
+-	SSI_LOG_DEBUG("Got MEM resource (%s): start=%pad end=%pad\n",
+-		      new_drvdata->res_mem->name,
+-		      new_drvdata->res_mem->start,
+-		      new_drvdata->res_mem->end);
++	req_mem_cc_regs = platform_get_resource(plat_dev, IORESOURCE_MEM, 0);
+ 	/* Map registers space */
+-	req_mem_cc_regs = request_mem_region(new_drvdata->res_mem->start, resource_size(new_drvdata->res_mem), "arm_cc7x_regs");
+-	if (unlikely(!req_mem_cc_regs)) {
+-		SSI_LOG_ERR("Couldn't allocate registers memory region at "
+-			     "0x%08X\n", (unsigned int)new_drvdata->res_mem->start);
+-		rc = -EBUSY;
+-		goto init_cc_res_err;
+-	}
+-	cc_base = ioremap(new_drvdata->res_mem->start, resource_size(new_drvdata->res_mem));
+-	if (unlikely(!cc_base)) {
+-		SSI_LOG_ERR("ioremap[CC](0x%08X,0x%08X) failed\n",
+-			    (unsigned int)new_drvdata->res_mem->start,
+-			    (unsigned int)resource_size(new_drvdata->res_mem));
+-		rc = -ENOMEM;
++	new_drvdata->cc_base = devm_ioremap_resource(&plat_dev->dev,
++						     req_mem_cc_regs);
++	if (IS_ERR(new_drvdata->cc_base)) {
++		rc = PTR_ERR(new_drvdata->cc_base);
+ 		goto init_cc_res_err;
  	}
+-	SSI_LOG_DEBUG("CC registers mapped from %pa to 0x%p\n", &new_drvdata->res_mem->start, cc_base);
+-	new_drvdata->cc_base = cc_base;
+-
++	SSI_LOG_DEBUG("Got MEM resource (%s): start=%pad end=%pad\n",
++		      req_mem_cc_regs->name,
++		      req_mem_cc_regs->start,
++		      req_mem_cc_regs->end);
++	SSI_LOG_DEBUG("CC registers mapped from %pa to 0x%p\n",
++		      &req_mem_cc_regs->start, new_drvdata->cc_base);
++	cc_base = new_drvdata->cc_base;
+ 	/* Then IRQ */
+ 	new_drvdata->res_irq = platform_get_resource(plat_dev, IORESOURCE_IRQ, 0);
+ 	if (unlikely(!new_drvdata->res_irq)) {
+@@ -424,17 +410,9 @@ static int init_cc_resources(struct platform_device *plat_dev)
+ #ifdef ENABLE_CC_SYSFS
+ 		ssi_sysfs_fini();
+ #endif
+-
+-		if (req_mem_cc_regs) {
+-			if (irq_registered) {
+-				free_irq(new_drvdata->res_irq->start, new_drvdata);
+-				new_drvdata->res_irq = NULL;
+-				iounmap(cc_base);
+-				new_drvdata->cc_base = NULL;
+-			}
+-			release_mem_region(new_drvdata->res_mem->start,
+-					   resource_size(new_drvdata->res_mem));
+-			new_drvdata->res_mem = NULL;
++		if (irq_registered) {
++			free_irq(new_drvdata->res_irq->start, new_drvdata);
++			new_drvdata->res_irq = NULL;
+ 		}
+ 		dev_set_drvdata(&plat_dev->dev, NULL);
+ 	}
+@@ -470,14 +448,6 @@ static void cleanup_cc_resources(struct platform_device *plat_dev)
+ 	cc_clk_off(drvdata);
+ 	free_irq(drvdata->res_irq->start, drvdata);
+ 	drvdata->res_irq = NULL;
+-
+-	if (drvdata->cc_base) {
+-		iounmap(drvdata->cc_base);
+-		release_mem_region(drvdata->res_mem->start,
+-				   resource_size(drvdata->res_mem));
+-		drvdata->cc_base = NULL;
+-		drvdata->res_mem = NULL;
+-	}
+ 	dev_set_drvdata(&plat_dev->dev, NULL);
  }
  
-diff --git a/drivers/staging/ccree/ssi_pm.c b/drivers/staging/ccree/ssi_pm.c
-index 31325e6..a50671a 100644
---- a/drivers/staging/ccree/ssi_pm.c
-+++ b/drivers/staging/ccree/ssi_pm.c
-@@ -109,7 +109,8 @@ int ssi_power_mgr_runtime_put_suspend(struct device *dev)
- 		rc = pm_runtime_put_autosuspend(dev);
- 	} else {
- 		/* Something wrong happens*/
--		BUG();
-+		SSI_LOG_ERR("request to suspend already suspended queue");
-+		rc = -EBUSY;
- 	}
- 	return rc;
- }
-diff --git a/drivers/staging/ccree/ssi_request_mgr.c b/drivers/staging/ccree/ssi_request_mgr.c
-index e5c2f92..97c2359 100644
---- a/drivers/staging/ccree/ssi_request_mgr.c
-+++ b/drivers/staging/ccree/ssi_request_mgr.c
-@@ -369,11 +369,16 @@ int send_request(
- 	enqueue_seq(cc_base, &req_mgr_h->compl_desc, (is_dout ? 0 : 1));
- 
- 	if (unlikely(req_mgr_h->q_free_slots < total_seq_len)) {
--		/*This means that there was a problem with the resume*/
--		BUG();
-+		/* This situation should never occur. Maybe indicating problem
-+		 * with resuming power. Set the free slot count to 0 and hope
-+		 * for the best.
-+		 */
-+		SSI_LOG_ERR("HW free slot count mismatch.");
-+		req_mgr_h->q_free_slots = 0;
-+	} else {
-+		/* Update the free slots in HW queue */
-+		req_mgr_h->q_free_slots -= total_seq_len;
- 	}
--	/* Update the free slots in HW queue */
--	req_mgr_h->q_free_slots -= total_seq_len;
- 
- 	spin_unlock_bh(&req_mgr_h->hw_lock);
- 
-@@ -460,8 +465,13 @@ static void proc_completions(struct ssi_drvdata *drvdata)
- 
- 		/* Dequeue request */
- 		if (unlikely(request_mgr_handle->req_queue_head == request_mgr_handle->req_queue_tail)) {
--			SSI_LOG_ERR("Request queue is empty req_queue_head==req_queue_tail==%u\n", request_mgr_handle->req_queue_head);
--			BUG();
-+			/* We are supposed to handle a completion but our
-+			 * queue is empty. This is not normal. Return and
-+			 * hope for the best.
-+			 */
-+			SSI_LOG_ERR("Request queue is empty head == tail %u\n",
-+				    request_mgr_handle->req_queue_head);
-+			break;
- 		}
- 
- 		ssi_req = &request_mgr_handle->req_queue[request_mgr_handle->req_queue_tail];
+diff --git a/drivers/staging/ccree/ssi_driver.h b/drivers/staging/ccree/ssi_driver.h
+index b6ad89a..518c0bf 100644
+--- a/drivers/staging/ccree/ssi_driver.h
++++ b/drivers/staging/ccree/ssi_driver.h
+@@ -128,7 +128,6 @@ struct ssi_crypto_req {
+  * @fw_ver:	SeP loaded firmware version
+  */
+ struct ssi_drvdata {
+-	struct resource *res_mem;
+ 	struct resource *res_irq;
+ 	void __iomem *cc_base;
+ 	unsigned int irq;
 -- 
 2.1.4
