@@ -1,38 +1,68 @@
-From: Carlo Caione <carlo@caione.org>
-Subject: Re: [PATCH RESEND] X.509: Recognize the legacy OID 1.3.14.3.2.29 (sha1WithRSASignature)
-Date: Thu, 7 Sep 2017 10:44:19 +0200
-Message-ID: <CAOQ7t2Zd+JaewCDkUEmh6bVJV85pN6XYmjVWpa515Cx2QrEtgQ@mail.gmail.com>
-References: <20170807080151.5313-1-carlo@caione.org> <CAOQ7t2Y+QX_GWj=Sii6VKbY4N9UfZc5cFriC3RfFWVxSobd-Xw@mail.gmail.com>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: Re: [PATCH v5] Staging: ccree: Remove unused variable.
+Date: Thu, 7 Sep 2017 11:50:31 +0300
+Message-ID: <CAOtvUMc0zxtAnfZhL5M4A7mrYt9z-i58mr2SLtYpXJ5-eEo+QQ@mail.gmail.com>
+References: <1504770561-5554-1-git-send-email-srishtishar@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: dhowells@redhat.com, Herbert Xu <herbert@gondor.apana.org.au>,
-        davem@davemloft.net, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org,
-        open list <linux-kernel@vger.kernel.org>,
-        Linux Upstreaming Team <linux@endlessm.com>,
-        Carlo Caione <carlo@endlessm.com>
-To: Carlo Caione <carlo@caione.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-oi0-f66.google.com ([209.85.218.66]:38175 "EHLO
-        mail-oi0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752778AbdIGIoU (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 7 Sep 2017 04:44:20 -0400
-In-Reply-To: <CAOQ7t2Y+QX_GWj=Sii6VKbY4N9UfZc5cFriC3RfFWVxSobd-Xw@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+        outreachy-kernel@googlegroups.com
+To: Srishti Sharma <srishtishar@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1504770561-5554-1-git-send-email-srishtishar@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Aug 21, 2017 at 9:27 AM, Carlo Caione <carlo@caione.org> wrote:
-> On Mon, Aug 7, 2017 at 10:01 AM, Carlo Caione <carlo@caione.org> wrote:
->> From: Carlo Caione <carlo@endlessm.com>
->>
->> We have found some ACER laptops shipping with certificates signed using
->> the 1.3.14.3.2.29 OID. This is causing the message
-> /cut
+Hi,
+
+On Thu, Sep 7, 2017 at 10:49 AM, Srishti Sharma <srishtishar@gmail.com> wrote:
+> Remove the local variable inflight_counter as it is never used.
 >
-> Ping on this (literally) two lines patch.
+> Signed-off-by: Srishti Sharma <srishtishar@gmail.com>
+> ---
 
-any feedback on this small patch?
+I've been meaning to clean that for some time now and never got around to do it.
+Thank you! :-)
+
+Acked-by: Gilad Ben-Yossef <gilad@benyossef.com>
+
+
+> Changes in v5:
+>  - Correct the format of the subject.
+>  drivers/staging/ccree/ssi_cipher.c | 3 ---
+>  1 file changed, 3 deletions(-)
+>
+> diff --git a/drivers/staging/ccree/ssi_cipher.c b/drivers/staging/ccree/ssi_cipher.c
+> index 8d31a93..1ff3c8a 100644
+> --- a/drivers/staging/ccree/ssi_cipher.c
+> +++ b/drivers/staging/ccree/ssi_cipher.c
+> @@ -697,13 +697,10 @@ static int ssi_blkcipher_complete(struct device *dev,
+>                                   void __iomem *cc_base)
+>  {
+>         int completion_error = 0;
+> -       u32 inflight_counter;
+>         struct ablkcipher_request *req = (struct ablkcipher_request *)areq;
+>
+>         ssi_buffer_mgr_unmap_blkcipher_request(dev, req_ctx, ivsize, src, dst);
+>
+> -       /*Set the inflight couter value to local variable*/
+> -       inflight_counter =  ctx_p->drvdata->inflight_counter;
+>         /*Decrease the inflight counter*/
+>         if (ctx_p->flow_mode == BYPASS && ctx_p->drvdata->inflight_counter > 0)
+>                 ctx_p->drvdata->inflight_counter--;
+> --
+> 2.7.4
+>
+
+
 
 -- 
-Carlo Caione
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+"If you take a class in large-scale robotics, can you end up in a
+situation where the homework eats your dog?"
+ -- Jean-Baptiste Queru
