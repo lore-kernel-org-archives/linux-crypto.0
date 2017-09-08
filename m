@@ -1,70 +1,124 @@
 From: Mathias Krause <minipli@googlemail.com>
-Subject: [PATCH 0/3] padata cpu awareness fixes
-Date: Fri,  8 Sep 2017 20:57:08 +0200
-Message-ID: <1504897031-27523-1-git-send-email-minipli@googlemail.com>
+Subject: [PATCH 2/3] padata: ensure the reorder timer callback runs on the correct CPU
+Date: Fri,  8 Sep 2017 20:57:10 +0200
+Message-ID: <1504897031-27523-3-git-send-email-minipli@googlemail.com>
+References: <1504897031-27523-1-git-send-email-minipli@googlemail.com>
 Cc: linux-crypto@vger.kernel.org,
         Mathias Krause <minipli@googlemail.com>
 To: Steffen Klassert <steffen.klassert@secunet.com>,
         Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:37304 "EHLO
-        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756210AbdIHS5U (ORCPT
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:33054 "EHLO
+        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756760AbdIHS5Z (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 8 Sep 2017 14:57:20 -0400
-Received: by mail-wm0-f66.google.com with SMTP id f4so2291270wmh.4
-        for <linux-crypto@vger.kernel.org>; Fri, 08 Sep 2017 11:57:20 -0700 (PDT)
+        Fri, 8 Sep 2017 14:57:25 -0400
+Received: by mail-wm0-f68.google.com with SMTP id 187so2315755wmn.0
+        for <linux-crypto@vger.kernel.org>; Fri, 08 Sep 2017 11:57:24 -0700 (PDT)
+In-Reply-To: <1504897031-27523-1-git-send-email-minipli@googlemail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Steffen, Herbert,
+The reorder timer function runs on the CPU where the timer interrupt was
+handled which is not necessarily one of the CPUs of the 'pcpu' CPU mask
+set.
 
-this series solves multiple issues of padata I ran into while trying to
-make use of pcrypt for IPsec.
+Ensure the padata_reorder() callback runs on the correct CPU, which is
+one in the 'pcpu' CPU mask set and, preferrably, the next expected one.
+Do so by comparing the current CPU with the expected target CPU. If they
+match, call padata_reorder() right away. If they differ, schedule a work
+item on the target CPU that does the padata_reorder() call for us.
 
-The first issue is that the reorder timer callback may run on a CPU that
-isn't part of the parallel set, as it runs on the CPU where the timer
-interrupt gets handled. As a result, padata_reorder() may run on a CPU
-with uninitialized per-cpu parallel queues, so the __this_cpu_read() in
-padata_get_next() refers to an uninitialized cpu_index. However, as
-per-cpu memory gets memset(0) on allocation time, it'll read 0. If the
-next CPU index we're waiting for is 0 too, the compare will succeed and
-we'll return with -ENODATA, making padata_reorder() think there's
-nothing to do, stop any pending timer and return immediately. This is
-wrong as the pending timer might have been the one to trigger the needed
-reordering, but, as it was canceled, will never happen -- if no other
-parallel requests arrive afterwards.
+Signed-off-by: Mathias Krause <minipli@googlemail.com>
+---
+ include/linux/padata.h |    2 ++
+ kernel/padata.c        |   43 ++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 44 insertions(+), 1 deletion(-)
 
-That issue is addressed with the first two patches, ensuring we're not
-using a bogus cpu_index value for the compare and thereby not wrongly
-cancel a pending timer. The second patch then ensures the reorder timer
-callback runs on the correct CPU or, at least, on a CPU from the
-parallel set to generate forward progress.
-
-The third patch addresses a similar issues for the serialization
-callback. We implicitly require padata_do_serial() to be called on the
-very same CPU padata_do_parallel() was called on to ensure the correct
-ordering of requests -- and correct functioning of padata, even. If the
-algorithm we're parallelizing is asynchronous itself, that invariant
-might not be true, as, e.g. crypto hardware may execute the callback on
-the CPU its interrupt gets handled on which isn't necessarily the one
-the request got issued on.
-
-To handle that issue we track the CPU we're supposed to handle the
-request on and ensure we'll call padata_reorder() on that CPU when
-padata_do_serial() gets called -- either by already running on the
-corect CPU or by deferring the call to a worker. 
-
-Please apply!
-
-Mathias Krause (3):
-  padata: set cpu_index of unused CPUs to -1
-  padata: ensure the reorder timer callback runs on the correct CPU
-  padata: ensure padata_do_serial() runs on the correct CPU
-
- include/linux/padata.h |    4 +++
- kernel/padata.c        |   71 ++++++++++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 72 insertions(+), 3 deletions(-)
-
+diff --git a/include/linux/padata.h b/include/linux/padata.h
+index 2f9c1f93b1ce..5c0175bbc179 100644
+--- a/include/linux/padata.h
++++ b/include/linux/padata.h
+@@ -85,6 +85,7 @@ struct padata_serial_queue {
+  * @swork: work struct for serialization.
+  * @pd: Backpointer to the internal control structure.
+  * @work: work struct for parallelization.
++ * @reorder_work: work struct for reordering.
+  * @num_obj: Number of objects that are processed by this cpu.
+  * @cpu_index: Index of the cpu.
+  */
+@@ -93,6 +94,7 @@ struct padata_parallel_queue {
+        struct padata_list    reorder;
+        struct parallel_data *pd;
+        struct work_struct    work;
++       struct work_struct    reorder_work;
+        atomic_t              num_obj;
+        int                   cpu_index;
+ };
+diff --git a/kernel/padata.c b/kernel/padata.c
+index 1b9b4bac4a9b..b4066147bce4 100644
+--- a/kernel/padata.c
++++ b/kernel/padata.c
+@@ -275,11 +275,51 @@ static void padata_reorder(struct parallel_data *pd)
+ 	return;
+ }
+ 
++static void invoke_padata_reorder(struct work_struct *work)
++{
++	struct padata_parallel_queue *pqueue;
++	struct parallel_data *pd;
++
++	local_bh_disable();
++	pqueue = container_of(work, struct padata_parallel_queue, reorder_work);
++	pd = pqueue->pd;
++	padata_reorder(pd);
++	local_bh_enable();
++}
++
+ static void padata_reorder_timer(unsigned long arg)
+ {
+ 	struct parallel_data *pd = (struct parallel_data *)arg;
++	unsigned int weight;
++	int target_cpu, cpu;
+ 
+-	padata_reorder(pd);
++	cpu = get_cpu();
++
++	/* We don't lock pd here to not interfere with parallel processing
++	 * padata_reorder() calls on other CPUs. We just need any CPU out of
++	 * the cpumask.pcpu set. It would be nice if it's the right one but
++	 * it doesn't matter if we're off to the next one by using an outdated
++	 * pd->processed value.
++	 */
++	weight = cpumask_weight(pd->cpumask.pcpu);
++	target_cpu = padata_index_to_cpu(pd, pd->processed % weight);
++
++	/* ensure to call the reorder callback on the correct CPU */
++	if (cpu != target_cpu) {
++		struct padata_parallel_queue *pqueue;
++		struct padata_instance *pinst;
++
++		/* The timer function is serialized wrt itself -- no locking
++		 * needed.
++		 */
++		pinst = pd->pinst;
++		pqueue = per_cpu_ptr(pd->pqueue, target_cpu);
++		queue_work_on(target_cpu, pinst->wq, &pqueue->reorder_work);
++	} else {
++		padata_reorder(pd);
++	}
++
++	put_cpu();
+ }
+ 
+ static void padata_serial_worker(struct work_struct *serial_work)
+@@ -399,6 +439,7 @@ static void padata_init_pqueues(struct parallel_data *pd)
+ 		__padata_list_init(&pqueue->reorder);
+ 		__padata_list_init(&pqueue->parallel);
+ 		INIT_WORK(&pqueue->work, padata_parallel_worker);
++		INIT_WORK(&pqueue->reorder_work, invoke_padata_reorder);
+ 		atomic_set(&pqueue->num_obj, 0);
+ 	}
+ }
 -- 
 1.7.10.4
