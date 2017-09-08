@@ -1,69 +1,70 @@
-From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: [PATCH 00/12] x86/crypto: Fix RBP usage in several crypto .S
- files
-Date: Fri, 8 Sep 2017 10:57:05 -0700
-Message-ID: <20170908175705.GA623@zzz.localdomain>
-References: <cover.1504029132.git.jpoimboe@redhat.com>
- <20170902000919.GA139193@gmail.com>
- <20170907071534.ztbxvyfoo7m7esmw@gmail.com>
- <20170907175800.GA92996@gmail.com>
- <20170907212646.q3y5wmhyaaqblg5m@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Josh Poimboeuf <jpoimboe@redhat.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        Mathias Krause <minipli@googlemail.com>,
-        Chandramouli Narayanan <mouli@linux.intel.com>,
-        Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@google.com>,
-        Andy Lutomirski <luto@kernel.org>, Jiri Slaby <jslaby@suse.cz>
-To: Ingo Molnar <mingo@kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20170907212646.q3y5wmhyaaqblg5m@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Mathias Krause <minipli@googlemail.com>
+Subject: [PATCH 0/3] padata cpu awareness fixes
+Date: Fri,  8 Sep 2017 20:57:08 +0200
+Message-ID: <1504897031-27523-1-git-send-email-minipli@googlemail.com>
+Cc: linux-crypto@vger.kernel.org,
+        Mathias Krause <minipli@googlemail.com>
+To: Steffen Klassert <steffen.klassert@secunet.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:37304 "EHLO
+        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756210AbdIHS5U (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 8 Sep 2017 14:57:20 -0400
+Received: by mail-wm0-f66.google.com with SMTP id f4so2291270wmh.4
+        for <linux-crypto@vger.kernel.org>; Fri, 08 Sep 2017 11:57:20 -0700 (PDT)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Sep 07, 2017 at 11:26:47PM +0200, Ingo Molnar wrote:
-> 
-> * Eric Biggers <ebiggers3@gmail.com> wrote:
-> 
-> > On Thu, Sep 07, 2017 at 09:15:34AM +0200, Ingo Molnar wrote:
-> > > 
-> > > * Eric Biggers <ebiggers3@gmail.com> wrote:
-> > > 
-> > > > Thanks for fixing these!  I don't have time to review these in detail, but I ran
-> > > > the crypto self-tests on the affected algorithms, and they all pass.  I also
-> > > > benchmarked them before and after; the only noticable performance difference was
-> > > > that sha256-avx2 and sha512-avx2 became a few percent slower.  I don't suppose
-> > > > there is a way around that?  Otherwise it's probably not a big deal.
-> > > 
-> > > Which CPU model did you use for the test?
-> > > 
-> > > Thanks,
-> > > 
-> > > 	Ingo
-> > 
-> > This was on Haswell, "Intel(R) Xeon(R) CPU E5-1650 v3 @ 3.50GHz".
-> 
-> Any chance to test this with the latest microarchitecture - any Skylake derivative 
-> Intel CPU you have access to?
-> 
-> Thanks,
-> 
-> 	Ingo
+Hi Steffen, Herbert,
 
-Tested with Skylake, "Intel(R) Core(TM) i5-6200U CPU @ 2.30GHz".  The results
-were the following which seemed a bit worse than Haswell:
+this series solves multiple issues of padata I ran into while trying to
+make use of pcrypt for IPsec.
 
-	sha256-avx2 became 3.5% slower
-	sha512-avx2 became 7.5% slower
+The first issue is that the reorder timer callback may run on a CPU that
+isn't part of the parallel set, as it runs on the CPU where the timer
+interrupt gets handled. As a result, padata_reorder() may run on a CPU
+with uninitialized per-cpu parallel queues, so the __this_cpu_read() in
+padata_get_next() refers to an uninitialized cpu_index. However, as
+per-cpu memory gets memset(0) on allocation time, it'll read 0. If the
+next CPU index we're waiting for is 0 too, the compare will succeed and
+we'll return with -ENODATA, making padata_reorder() think there's
+nothing to do, stop any pending timer and return immediately. This is
+wrong as the pending timer might have been the one to trigger the needed
+reordering, but, as it was canceled, will never happen -- if no other
+parallel requests arrive afterwards.
 
-Note: it's tricky to benchmark this, especially with just a few percent
-difference, so don't read too much into the exact numbers.
+That issue is addressed with the first two patches, ensuring we're not
+using a bogus cpu_index value for the compare and thereby not wrongly
+cancel a pending timer. The second patch then ensures the reorder timer
+callback runs on the correct CPU or, at least, on a CPU from the
+parallel set to generate forward progress.
 
-Eric
+The third patch addresses a similar issues for the serialization
+callback. We implicitly require padata_do_serial() to be called on the
+very same CPU padata_do_parallel() was called on to ensure the correct
+ordering of requests -- and correct functioning of padata, even. If the
+algorithm we're parallelizing is asynchronous itself, that invariant
+might not be true, as, e.g. crypto hardware may execute the callback on
+the CPU its interrupt gets handled on which isn't necessarily the one
+the request got issued on.
+
+To handle that issue we track the CPU we're supposed to handle the
+request on and ensure we'll call padata_reorder() on that CPU when
+padata_do_serial() gets called -- either by already running on the
+corect CPU or by deferring the call to a worker. 
+
+Please apply!
+
+Mathias Krause (3):
+  padata: set cpu_index of unused CPUs to -1
+  padata: ensure the reorder timer callback runs on the correct CPU
+  padata: ensure padata_do_serial() runs on the correct CPU
+
+ include/linux/padata.h |    4 +++
+ kernel/padata.c        |   71 ++++++++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 72 insertions(+), 3 deletions(-)
+
+-- 
+1.7.10.4
