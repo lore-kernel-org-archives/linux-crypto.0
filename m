@@ -1,58 +1,100 @@
-From: Mathias Krause <minipli@googlemail.com>
-Subject: [PATCH 1/3] padata: set cpu_index of unused CPUs to -1
-Date: Fri,  8 Sep 2017 20:57:09 +0200
-Message-ID: <1504897031-27523-2-git-send-email-minipli@googlemail.com>
-References: <1504897031-27523-1-git-send-email-minipli@googlemail.com>
-Cc: linux-crypto@vger.kernel.org,
-        Mathias Krause <minipli@googlemail.com>
-To: Steffen Klassert <steffen.klassert@secunet.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
+From: Srishti Sharma <srishtishar@gmail.com>
+Subject: [PATCH] Staging: ccree: Merge assignment with return
+Date: Sat,  9 Sep 2017 01:31:35 +0530
+Message-ID: <1504900895-13110-1-git-send-email-srishtishar@gmail.com>
+Cc: gregkh@linuxfoundation.org, linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        linux-kernel@vger.kernel.org, outreachy-kernel@googlegroups.com,
+        Srishti Sharma <srishtishar@gmail.com>
+To: gilad@benyossef.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:33045 "EHLO
-        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756760AbdIHS5W (ORCPT
+Received: from mail-pf0-f196.google.com ([209.85.192.196]:34607 "EHLO
+        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756799AbdIHUBp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 8 Sep 2017 14:57:22 -0400
-Received: by mail-wm0-f65.google.com with SMTP id 187so2315715wmn.0
-        for <linux-crypto@vger.kernel.org>; Fri, 08 Sep 2017 11:57:22 -0700 (PDT)
-In-Reply-To: <1504897031-27523-1-git-send-email-minipli@googlemail.com>
+        Fri, 8 Sep 2017 16:01:45 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The parallel queue per-cpu data structure gets initialized only for CPUs
-in the 'pcpu' CPU mask set. This is not sufficient as the reorder timer
-may run on a different CPU and might wrongly decide it's the target CPU
-for the next reorder item as per-cpu memory gets memset(0) and we might
-be waiting for the first CPU in cpumask.pcpu, i.e. cpu_index 0.
+Return the return value of a function directly, instead of first saving it in a variable and then returning it. This change was made using the following
+semantic patch by coccinelle.
 
-Make the '__this_cpu_read(pd->pqueue->cpu_index) == next_queue->cpu_index'
-compare in padata_get_next() fail in this case by initializing the
-cpu_index member of all per-cpu parallel queues. Use -1 for unused ones.
+@@
+local idexpression ret;
+expression e;
+@@
 
-Signed-off-by: Mathias Krause <minipli@googlemail.com>
+-ret =
++return
+     e;
+-return ret;
+
+Signed-off-by: Srishti Sharma <srishtishar@gmail.com>
 ---
- kernel/padata.c |    8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ drivers/staging/ccree/ssi_aead.c | 21 ++++++---------------
+ 1 file changed, 6 insertions(+), 15 deletions(-)
 
-diff --git a/kernel/padata.c b/kernel/padata.c
-index 868f947166d7..1b9b4bac4a9b 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -384,8 +384,14 @@ static void padata_init_pqueues(struct parallel_data *pd)
- 	struct padata_parallel_queue *pqueue;
- 
- 	cpu_index = 0;
--	for_each_cpu(cpu, pd->cpumask.pcpu) {
-+	for_each_possible_cpu(cpu) {
- 		pqueue = per_cpu_ptr(pd->pqueue, cpu);
+diff --git a/drivers/staging/ccree/ssi_aead.c b/drivers/staging/ccree/ssi_aead.c
+index 5abe6b2..6bb98f7 100644
+--- a/drivers/staging/ccree/ssi_aead.c
++++ b/drivers/staging/ccree/ssi_aead.c
+@@ -651,17 +651,14 @@ ssi_aead_setkey(struct crypto_aead *tfm, const u8 *key, unsigned int keylen)
+ static int ssi_rfc4309_ccm_setkey(struct crypto_aead *tfm, const u8 *key, unsigned int keylen)
+ {
+ 	struct ssi_aead_ctx *ctx = crypto_aead_ctx(tfm);
+-	int rc = 0;
+-
 +
-+		if (!cpumask_test_cpu(cpu, pd->cpumask.pcpu)) {
-+			pqueue->cpu_index = -1;
-+			continue;
-+		}
+ 	if (keylen < 3)
+ 		return -EINVAL;
+
+ 	keylen -= 3;
+ 	memcpy(ctx->ctr_nonce, key + keylen, 3);
+
+-	rc = ssi_aead_setkey(tfm, key, keylen);
+-
+-	return rc;
++	return ssi_aead_setkey(tfm, key, keylen);
+ }
+ #endif /*SSI_CC_HAS_AES_CCM*/
+
+@@ -2214,8 +2211,7 @@ static int ssi_rfc4309_ccm_decrypt(struct aead_request *req)
+ static int ssi_rfc4106_gcm_setkey(struct crypto_aead *tfm, const u8 *key, unsigned int keylen)
+ {
+ 	struct ssi_aead_ctx *ctx = crypto_aead_ctx(tfm);
+-	int rc = 0;
+-
 +
- 		pqueue->pd = pd;
- 		pqueue->cpu_index = cpu_index;
- 		cpu_index++;
--- 
-1.7.10.4
+ 	SSI_LOG_DEBUG("%s()  keylen %d, key %p\n", __func__, keylen, key);
+
+ 	if (keylen < 4)
+@@ -2224,16 +2220,13 @@ static int ssi_rfc4106_gcm_setkey(struct crypto_aead *tfm, const u8 *key, unsign
+ 	keylen -= 4;
+ 	memcpy(ctx->ctr_nonce, key + keylen, 4);
+
+-	rc = ssi_aead_setkey(tfm, key, keylen);
+-
+-	return rc;
++	return ssi_aead_setkey(tfm, key, keylen);
+ }
+
+ static int ssi_rfc4543_gcm_setkey(struct crypto_aead *tfm, const u8 *key, unsigned int keylen)
+ {
+ 	struct ssi_aead_ctx *ctx = crypto_aead_ctx(tfm);
+-	int rc = 0;
+-
++
+ 	SSI_LOG_DEBUG("%s()  keylen %d, key %p\n", __func__, keylen, key);
+
+ 	if (keylen < 4)
+@@ -2242,9 +2235,7 @@ static int ssi_rfc4543_gcm_setkey(struct crypto_aead *tfm, const u8 *key, unsign
+ 	keylen -= 4;
+ 	memcpy(ctx->ctr_nonce, key + keylen, 4);
+
+-	rc = ssi_aead_setkey(tfm, key, keylen);
+-
+-	return rc;
++	return ssi_aead_setkey(tfm, key, keylen);
+ }
+
+ static int ssi_gcm_setauthsize(struct crypto_aead *authenc,
