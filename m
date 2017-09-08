@@ -1,76 +1,87 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: Updated IV for XTS
-Date: Fri, 08 Sep 2017 13:02:54 +0200
-Message-ID: <1653545.QqfHqHTgVp@tauon.chronox.de>
-References: <e1a9f8a6-37d5-2cec-a1f1-dacd5e357e92@chelsio.com>
+From: Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [RFC Part2 PATCH v3 02/26] crypto: ccp: Add Platform Security
+ Processor (PSP) device support
+Date: Fri, 8 Sep 2017 08:54:17 -0500
+Message-ID: <628e9dbd-77ff-b931-50b1-e72d753612ee@amd.com>
+References: <20170724200303.12197-1-brijesh.singh@amd.com>
+ <20170724200303.12197-3-brijesh.singh@amd.com>
+ <20170907142737.g4aot7xatyopdfwp@pd.tnic>
+ <9de7139f-676e-e671-13a1-cbc5170cc816@amd.com>
+ <20170908084009.tb7wzm4j63vhgem4@pd.tnic>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org
-To: Harsh Jain <Harsh@chelsio.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34666 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751577AbdIHLC6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 8 Sep 2017 07:02:58 -0400
-In-Reply-To: <e1a9f8a6-37d5-2cec-a1f1-dacd5e357e92@chelsio.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: brijesh.singh@amd.com, linux-kernel@vger.kernel.org,
+        x86@kernel.org, kvm@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Joerg Roedel <joro@8bytes.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?XCJSYWRpbSBLcsSNbcOhxZlcIg==?= <rkrcmar@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Gary Hook <gary.hook@amd.com>, linux-crypto@vger.kernel.org
+To: Borislav Petkov <bp@suse.de>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20170908084009.tb7wzm4j63vhgem4@pd.tnic>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Freitag, 8. September 2017, 12:47:54 CEST schrieb Harsh Jain:
 
-Hi Harsh,
 
-> Hi,
+On 09/08/2017 03:40 AM, Borislav Petkov wrote:
+> On Thu, Sep 07, 2017 at 05:19:32PM -0500, Brijesh Singh wrote:
+>> At high level, AMD-SP (AMD Secure Processor) (i.e CCP driver) will provide the
+>> support for CCP, SEV and TEE FW commands.
+>>
+>>
+>>           +--- CCP
+>>           |
+>> AMD-SP --|
+>>           |            +--- SEV
+>>           |            |
+>>           +---- PSP ---*
+>>                        |
+>>                        +---- TEE
 > 
-> XTS template does not seems updating the IV after request completion. Same
-> output if we run belwo command in loop
+> I still don't see the need for such finegrained separation, though.
+> There's no "this is a separate compilation unit because... ". At least
+> the PSP branch could be a single driver without the interface.
 > 
-> [root@heptagon test]# ./kcapi -x 1 -d 4 -s  -e -c "xts(aes)" -i
-> 7fbc02ebf5b93322329df9bfccb635af -k
-> 8d7dd9b0170ce0b5f2f8e1aa768e01e91da8bfc67fd486d081b28254c99eb423 -p `perl
-> -e 'print "e" x  32'` 4ea328cd5b10d0cb3bbc7ab92d54072d
-> 4ea328cd5b10d0cb3bbc7ab92d54072d
-> 4ea328cd5b10d0cb3bbc7ab92d54072d
-> 4ea328cd5b10d0cb3bbc7ab92d54072d
+> For example, psp_request_sev_irq() is called only by sev_dev_init(). So
+> why is sev-dev a separate compilation unit? Is anything else going to
+> use the PSP interface?
 > 
-> Is IV update not required for XTS as we did for cbc,ctr mode.
+
+I don't know anything about the TEE support hence I don't have very strong
+reason for finegrained separation -- I just wanted to ensure that the SEV
+enablement does not interfere with TEE support in the future.
+
+
+> If not, just put it all in a psp-dev file and that's it. We have a
+> gazillion config options and having two more just because, is not a good
+> reason. You can always carve it out later if there's real need. But if
+> the SEV thing can't function without the PSP thing, then you can just as
+> well put it inside it.
 > 
-> Regards
-> Harsh Jain
+> This way you can save yourself a bunch of exported functions and the
+> like.
+> 
+> Another example for not optimal design is psp_request_tee_irq() - it
+> doesn't really request an irq by calling into the IRQ core but simply
+> assigns a handler. Which looks to me like you're simulating an interface
+> where one is not really needed. Ditto for the sev_irq version, btw.
+> 
 
-Hm, are you sure you sent the right command?
+It's possible that both TEE and SEV share the same interrupt but their
+interrupt handling approach could be totally different hence I tried to
+abstract it.
 
-../bin/kcapi -x 1 -d 4 -s  -e -c "xts(aes)" -i 
-7fbc02ebf5b93322329df9bfccb635af -k 
-8d7dd9b0170ce0b5f2f8e1aa768e01e91da8bfc67fd486d081b28254c99eb423 -p `perl -e 
-'print "e" x  32'`
-4ea328cd5b10d0cb3bbc7ab92d54072d
-24c7c1967a3768a17ff0afe976381a79
-5b23fff5d3a5c75090229e5b9ad807e7
-ffc8927be32448f2ba67bbe6e0087805
+I am making several assumption on TEE side without knowing in detail ;)
 
-vs
+I can go with your recommendation -- we can always crave it out later once
+the TEE support is visible.
 
-../bin/kcapi -x 1 -d 4 -e -c "xts(aes)" -i 7fbc02ebf5b93322329df9bfccb635af -k 
-8d7dd9b0170ce0b5f2f8e1aa768e01e91da8bfc67fd486d081b28254c99eb423 -p `perl -e 
-'print "e" x  32'`
-4ea328cd5b10d0cb3bbc7ab92d54072d
-4ea328cd5b10d0cb3bbc7ab92d54072d
-4ea328cd5b10d0cb3bbc7ab92d54072d
-4ea328cd5b10d0cb3bbc7ab92d54072d
-
-
-The key difference is the -s -- the stream mode.
-
-Note that only the stream mode API of libkcapi "keeps the cipher handle open" 
-(i.e. and thus the state).
-
-The "one-shot" API does one complete cipher operation and kills the state.
-
-See http://www.chronox.de/libkcapi/html/Usage.html#idm140613614152864 for 
-details.
-
-Ciao
-Stephan
+-Brijesh
