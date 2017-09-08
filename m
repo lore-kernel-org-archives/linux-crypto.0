@@ -1,94 +1,69 @@
-From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [RFC Part2 PATCH v3 02/26] crypto: ccp: Add Platform Security
- Processor (PSP) device support
-Date: Fri, 8 Sep 2017 11:06:27 -0500
-Message-ID: <32a123d5-0d7e-3864-c414-45d190e9d848@amd.com>
-References: <20170724200303.12197-1-brijesh.singh@amd.com>
- <20170724200303.12197-3-brijesh.singh@amd.com>
- <20170907142737.g4aot7xatyopdfwp@pd.tnic>
- <9de7139f-676e-e671-13a1-cbc5170cc816@amd.com>
- <20170908084009.tb7wzm4j63vhgem4@pd.tnic>
+From: Eric Biggers <ebiggers3@gmail.com>
+Subject: Re: [PATCH 00/12] x86/crypto: Fix RBP usage in several crypto .S
+ files
+Date: Fri, 8 Sep 2017 10:57:05 -0700
+Message-ID: <20170908175705.GA623@zzz.localdomain>
+References: <cover.1504029132.git.jpoimboe@redhat.com>
+ <20170902000919.GA139193@gmail.com>
+ <20170907071534.ztbxvyfoo7m7esmw@gmail.com>
+ <20170907175800.GA92996@gmail.com>
+ <20170907212646.q3y5wmhyaaqblg5m@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: brijesh.singh@amd.com, linux-kernel@vger.kernel.org,
-        x86@kernel.org, kvm@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Joerg Roedel <joro@8bytes.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?XCJSYWRpbSBLcsSNbcOhxZlcIg==?= <rkrcmar@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
+Content-Type: text/plain; charset=us-ascii
+Cc: Josh Poimboeuf <jpoimboe@redhat.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org,
+        Tim Chen <tim.c.chen@linux.intel.com>,
+        Mathias Krause <minipli@googlemail.com>,
+        Chandramouli Narayanan <mouli@linux.intel.com>,
+        Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+        Peter Zijlstra <peterz@infradead.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Gary Hook <gary.hook@amd.com>, linux-crypto@vger.kernel.org
-To: Borislav Petkov <bp@suse.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-co1nam03on0069.outbound.protection.outlook.com ([104.47.40.69]:45472
-        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751166AbdIHQGh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 8 Sep 2017 12:06:37 -0400
-In-Reply-To: <20170908084009.tb7wzm4j63vhgem4@pd.tnic>
-Content-Language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@google.com>,
+        Andy Lutomirski <luto@kernel.org>, Jiri Slaby <jslaby@suse.cz>
+To: Ingo Molnar <mingo@kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20170907212646.q3y5wmhyaaqblg5m@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-
-
-On 09/08/2017 03:40 AM, Borislav Petkov wrote:
-> On Thu, Sep 07, 2017 at 05:19:32PM -0500, Brijesh Singh wrote:
->> At high level, AMD-SP (AMD Secure Processor) (i.e CCP driver) will provide the
->> support for CCP, SEV and TEE FW commands.
->>
->>
->>           +--- CCP
->>           |
->> AMD-SP --|
->>           |            +--- SEV
->>           |            |
->>           +---- PSP ---*
->>                        |
->>                        +---- TEE
+On Thu, Sep 07, 2017 at 11:26:47PM +0200, Ingo Molnar wrote:
 > 
-> I still don't see the need for such finegrained separation, though.
-> There's no "this is a separate compilation unit because... ". At least
-> the PSP branch could be a single driver without the interface.
+> * Eric Biggers <ebiggers3@gmail.com> wrote:
 > 
-> For example, psp_request_sev_irq() is called only by sev_dev_init(). So
-> why is sev-dev a separate compilation unit? Is anything else going to
-> use the PSP interface?
-
-
-I don't know anything about the TEE support hence I don't have very strong
-reason for finegrained separation -- I just wanted to ensure that the SEV
-enablement does not interfere with TEE support in the future.
-
-
+> > On Thu, Sep 07, 2017 at 09:15:34AM +0200, Ingo Molnar wrote:
+> > > 
+> > > * Eric Biggers <ebiggers3@gmail.com> wrote:
+> > > 
+> > > > Thanks for fixing these!  I don't have time to review these in detail, but I ran
+> > > > the crypto self-tests on the affected algorithms, and they all pass.  I also
+> > > > benchmarked them before and after; the only noticable performance difference was
+> > > > that sha256-avx2 and sha512-avx2 became a few percent slower.  I don't suppose
+> > > > there is a way around that?  Otherwise it's probably not a big deal.
+> > > 
+> > > Which CPU model did you use for the test?
+> > > 
+> > > Thanks,
+> > > 
+> > > 	Ingo
+> > 
+> > This was on Haswell, "Intel(R) Xeon(R) CPU E5-1650 v3 @ 3.50GHz".
 > 
-> If not, just put it all in a psp-dev file and that's it. We have a
-> gazillion config options and having two more just because, is not a good
-> reason. You can always carve it out later if there's real need. But if
-> the SEV thing can't function without the PSP thing, then you can just as
-> well put it inside it.
+> Any chance to test this with the latest microarchitecture - any Skylake derivative 
+> Intel CPU you have access to?
 > 
-> This way you can save yourself a bunch of exported functions and the
-> like.
+> Thanks,
 > 
-> Another example for not optimal design is psp_request_tee_irq() - it
-> doesn't really request an irq by calling into the IRQ core but simply
-> assigns a handler. Which looks to me like you're simulating an interface
-> where one is not really needed. Ditto for the sev_irq version, btw.
-> 
+> 	Ingo
 
+Tested with Skylake, "Intel(R) Core(TM) i5-6200U CPU @ 2.30GHz".  The results
+were the following which seemed a bit worse than Haswell:
 
-It's possible that both TEE and SEV share the same interrupt but their
-interrupt handling approach could be totally different hence I tried to
-abstract it.
+	sha256-avx2 became 3.5% slower
+	sha512-avx2 became 7.5% slower
 
-I am making several assumption on TEE side without knowing in detail
+Note: it's tricky to benchmark this, especially with just a few percent
+difference, so don't read too much into the exact numbers.
 
-I can go with your recommendation -- we can always crave it out later once
-the TEE support is visible.
-
--Brijesh
+Eric
