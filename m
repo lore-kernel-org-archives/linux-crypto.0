@@ -1,8 +1,8 @@
 From: Brijesh Singh <brijesh.singh@amd.com>
 Subject: Re: [RFC Part2 PATCH v3 02/26] crypto: ccp: Add Platform Security
  Processor (PSP) device support
-Date: Fri, 8 Sep 2017 08:54:17 -0500
-Message-ID: <628e9dbd-77ff-b931-50b1-e72d753612ee@amd.com>
+Date: Fri, 8 Sep 2017 11:06:27 -0500
+Message-ID: <32a123d5-0d7e-3864-c414-45d190e9d848@amd.com>
 References: <20170724200303.12197-1-brijesh.singh@amd.com>
  <20170724200303.12197-3-brijesh.singh@amd.com>
  <20170907142737.g4aot7xatyopdfwp@pd.tnic>
@@ -23,11 +23,16 @@ Cc: brijesh.singh@amd.com, linux-kernel@vger.kernel.org,
         "David S . Miller" <davem@davemloft.net>,
         Gary Hook <gary.hook@amd.com>, linux-crypto@vger.kernel.org
 To: Borislav Petkov <bp@suse.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-co1nam03on0069.outbound.protection.outlook.com ([104.47.40.69]:45472
+        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751166AbdIHQGh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 8 Sep 2017 12:06:37 -0400
 In-Reply-To: <20170908084009.tb7wzm4j63vhgem4@pd.tnic>
 Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 
 
@@ -53,13 +58,14 @@ On 09/08/2017 03:40 AM, Borislav Petkov wrote:
 > For example, psp_request_sev_irq() is called only by sev_dev_init(). So
 > why is sev-dev a separate compilation unit? Is anything else going to
 > use the PSP interface?
-> 
+
 
 I don't know anything about the TEE support hence I don't have very strong
 reason for finegrained separation -- I just wanted to ensure that the SEV
 enablement does not interfere with TEE support in the future.
 
 
+> 
 > If not, just put it all in a psp-dev file and that's it. We have a
 > gazillion config options and having two more just because, is not a good
 > reason. You can always carve it out later if there's real need. But if
@@ -75,11 +81,12 @@ enablement does not interfere with TEE support in the future.
 > where one is not really needed. Ditto for the sev_irq version, btw.
 > 
 
+
 It's possible that both TEE and SEV share the same interrupt but their
 interrupt handling approach could be totally different hence I tried to
 abstract it.
 
-I am making several assumption on TEE side without knowing in detail ;)
+I am making several assumption on TEE side without knowing in detail
 
 I can go with your recommendation -- we can always crave it out later once
 the TEE support is visible.
