@@ -1,100 +1,132 @@
-From: Srishti Sharma <srishtishar@gmail.com>
-Subject: [PATCH] Staging: ccree: Merge assignment with return
-Date: Sat,  9 Sep 2017 01:31:35 +0530
-Message-ID: <1504900895-13110-1-git-send-email-srishtishar@gmail.com>
-Cc: gregkh@linuxfoundation.org, linux-crypto@vger.kernel.org,
-        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
-        linux-kernel@vger.kernel.org, outreachy-kernel@googlegroups.com,
-        Srishti Sharma <srishtishar@gmail.com>
-To: gilad@benyossef.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:34607 "EHLO
-        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756799AbdIHUBp (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 8 Sep 2017 16:01:45 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Julia Lawall <julia.lawall@lip6.fr>
+Subject: Re: [Outreachy kernel] [PATCH] Staging: ccree: Merge assignment with
+ return
+Date: Fri, 8 Sep 2017 22:12:28 +0200 (CEST)
+Message-ID: <alpine.DEB.2.20.1709082210410.2510@hadrien>
+References: <1504900895-13110-1-git-send-email-srishtishar@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: devel@driverdev.osuosl.org, outreachy-kernel@googlegroups.com,
+ gregkh@linuxfoundation.org, driverdev-devel@linuxdriverproject.org,
+ linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Srishti Sharma <srishtishar@gmail.com>
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+In-Reply-To: <1504900895-13110-1-git-send-email-srishtishar@gmail.com>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+List-Id: linux-crypto.vger.kernel.org
 
-Return the return value of a function directly, instead of first saving it in a variable and then returning it. This change was made using the following
-semantic patch by coccinelle.
 
-@@
-local idexpression ret;
-expression e;
-@@
 
--ret =
-+return
-     e;
--return ret;
+On Sat, 9 Sep 2017, Srishti Sharma wrote:
 
-Signed-off-by: Srishti Sharma <srishtishar@gmail.com>
----
- drivers/staging/ccree/ssi_aead.c | 21 ++++++---------------
- 1 file changed, 6 insertions(+), 15 deletions(-)
+> Return the return value of a function directly, instead of first saving it in a variable and then returning it. This change was made using the following
 
-diff --git a/drivers/staging/ccree/ssi_aead.c b/drivers/staging/ccree/ssi_aead.c
-index 5abe6b2..6bb98f7 100644
---- a/drivers/staging/ccree/ssi_aead.c
-+++ b/drivers/staging/ccree/ssi_aead.c
-@@ -651,17 +651,14 @@ ssi_aead_setkey(struct crypto_aead *tfm, const u8 *key, unsigned int keylen)
- static int ssi_rfc4309_ccm_setkey(struct crypto_aead *tfm, const u8 *key, unsigned int keylen)
- {
- 	struct ssi_aead_ctx *ctx = crypto_aead_ctx(tfm);
--	int rc = 0;
--
-+
- 	if (keylen < 3)
- 		return -EINVAL;
+Your commit message should respect the 80 character limit. The above is
+one very long line.
 
- 	keylen -= 3;
- 	memcpy(ctx->ctr_nonce, key + keylen, 3);
+> semantic patch by coccinelle.
+>
+> @@
+> local idexpression ret;
+> expression e;
+> @@
+>
+> -ret =
+> +return
+>      e;
+> -return ret;
+>
+> Signed-off-by: Srishti Sharma <srishtishar@gmail.com>
+> ---
+>  drivers/staging/ccree/ssi_aead.c | 21 ++++++---------------
+>  1 file changed, 6 insertions(+), 15 deletions(-)
+>
+> diff --git a/drivers/staging/ccree/ssi_aead.c b/drivers/staging/ccree/ssi_aead.c
+> index 5abe6b2..6bb98f7 100644
+> --- a/drivers/staging/ccree/ssi_aead.c
+> +++ b/drivers/staging/ccree/ssi_aead.c
+> @@ -651,17 +651,14 @@ ssi_aead_setkey(struct crypto_aead *tfm, const u8 *key, unsigned int keylen)
+>  static int ssi_rfc4309_ccm_setkey(struct crypto_aead *tfm, const u8 *key, unsigned int keylen)
+>  {
+>  	struct ssi_aead_ctx *ctx = crypto_aead_ctx(tfm);
+> -	int rc = 0;
+> -
+> +
 
--	rc = ssi_aead_setkey(tfm, key, keylen);
--
--	return rc;
-+	return ssi_aead_setkey(tfm, key, keylen);
- }
- #endif /*SSI_CC_HAS_AES_CCM*/
+I'm not sure what happened here, but you should not be removing and then
+adding back a blank line.  Likewise below.
 
-@@ -2214,8 +2211,7 @@ static int ssi_rfc4309_ccm_decrypt(struct aead_request *req)
- static int ssi_rfc4106_gcm_setkey(struct crypto_aead *tfm, const u8 *key, unsigned int keylen)
- {
- 	struct ssi_aead_ctx *ctx = crypto_aead_ctx(tfm);
--	int rc = 0;
--
-+
- 	SSI_LOG_DEBUG("%s()  keylen %d, key %p\n", __func__, keylen, key);
+julia
 
- 	if (keylen < 4)
-@@ -2224,16 +2220,13 @@ static int ssi_rfc4106_gcm_setkey(struct crypto_aead *tfm, const u8 *key, unsign
- 	keylen -= 4;
- 	memcpy(ctx->ctr_nonce, key + keylen, 4);
-
--	rc = ssi_aead_setkey(tfm, key, keylen);
--
--	return rc;
-+	return ssi_aead_setkey(tfm, key, keylen);
- }
-
- static int ssi_rfc4543_gcm_setkey(struct crypto_aead *tfm, const u8 *key, unsigned int keylen)
- {
- 	struct ssi_aead_ctx *ctx = crypto_aead_ctx(tfm);
--	int rc = 0;
--
-+
- 	SSI_LOG_DEBUG("%s()  keylen %d, key %p\n", __func__, keylen, key);
-
- 	if (keylen < 4)
-@@ -2242,9 +2235,7 @@ static int ssi_rfc4543_gcm_setkey(struct crypto_aead *tfm, const u8 *key, unsign
- 	keylen -= 4;
- 	memcpy(ctx->ctr_nonce, key + keylen, 4);
-
--	rc = ssi_aead_setkey(tfm, key, keylen);
--
--	return rc;
-+	return ssi_aead_setkey(tfm, key, keylen);
- }
-
- static int ssi_gcm_setauthsize(struct crypto_aead *authenc,
+>  	if (keylen < 3)
+>  		return -EINVAL;
+>
+>  	keylen -= 3;
+>  	memcpy(ctx->ctr_nonce, key + keylen, 3);
+>
+> -	rc = ssi_aead_setkey(tfm, key, keylen);
+> -
+> -	return rc;
+> +	return ssi_aead_setkey(tfm, key, keylen);
+>  }
+>  #endif /*SSI_CC_HAS_AES_CCM*/
+>
+> @@ -2214,8 +2211,7 @@ static int ssi_rfc4309_ccm_decrypt(struct aead_request *req)
+>  static int ssi_rfc4106_gcm_setkey(struct crypto_aead *tfm, const u8 *key, unsigned int keylen)
+>  {
+>  	struct ssi_aead_ctx *ctx = crypto_aead_ctx(tfm);
+> -	int rc = 0;
+> -
+> +
+>  	SSI_LOG_DEBUG("%s()  keylen %d, key %p\n", __func__, keylen, key);
+>
+>  	if (keylen < 4)
+> @@ -2224,16 +2220,13 @@ static int ssi_rfc4106_gcm_setkey(struct crypto_aead *tfm, const u8 *key, unsign
+>  	keylen -= 4;
+>  	memcpy(ctx->ctr_nonce, key + keylen, 4);
+>
+> -	rc = ssi_aead_setkey(tfm, key, keylen);
+> -
+> -	return rc;
+> +	return ssi_aead_setkey(tfm, key, keylen);
+>  }
+>
+>  static int ssi_rfc4543_gcm_setkey(struct crypto_aead *tfm, const u8 *key, unsigned int keylen)
+>  {
+>  	struct ssi_aead_ctx *ctx = crypto_aead_ctx(tfm);
+> -	int rc = 0;
+> -
+> +
+>  	SSI_LOG_DEBUG("%s()  keylen %d, key %p\n", __func__, keylen, key);
+>
+>  	if (keylen < 4)
+> @@ -2242,9 +2235,7 @@ static int ssi_rfc4543_gcm_setkey(struct crypto_aead *tfm, const u8 *key, unsign
+>  	keylen -= 4;
+>  	memcpy(ctx->ctr_nonce, key + keylen, 4);
+>
+> -	rc = ssi_aead_setkey(tfm, key, keylen);
+> -
+> -	return rc;
+> +	return ssi_aead_setkey(tfm, key, keylen);
+>  }
+>
+>  static int ssi_gcm_setauthsize(struct crypto_aead *authenc,
+> --
+> 2.7.4
+>
+> --
+> You received this message because you are subscribed to the Google Groups "outreachy-kernel" group.
+> To unsubscribe from this group and stop receiving emails from it, send an email to outreachy-kernel+unsubscribe@googlegroups.com.
+> To post to this group, send email to outreachy-kernel@googlegroups.com.
+> To view this discussion on the web visit https://groups.google.com/d/msgid/outreachy-kernel/1504900895-13110-1-git-send-email-srishtishar%40gmail.com.
+> For more options, visit https://groups.google.com/d/optout.
+>
