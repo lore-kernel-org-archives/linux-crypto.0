@@ -1,53 +1,60 @@
-From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: Re: [PATCH 7/8] staging: ccree: replace noop macro with inline
-Date: Sat, 9 Sep 2017 12:11:57 +0300
-Message-ID: <20170909091157.wsotu253vngrz5rt@mwanda>
-References: <1504429011-25514-1-git-send-email-gilad@benyossef.com>
- <1504429011-25514-8-git-send-email-gilad@benyossef.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-crypto@vger.kernel.org,
+From: Srishti Sharma <srishtishar@gmail.com>
+Subject: [PATCH] Staging: ccree: Merge assignment with return
+Date: Sat,  9 Sep 2017 16:14:21 +0530
+Message-ID: <1504953861-3221-1-git-send-email-srishtishar@gmail.com>
+Cc: gregkh@linuxfoundation.org, linux-crypto@vger.kernel.org,
         driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
-        linux-kernel@vger.kernel.org, Ofir Drang <ofir.drang@arm.com>
-To: Gilad Ben-Yossef <gilad@benyossef.com>
+        linux-kernel@vger.kernel.org, outreachy-kernel@googlegroups.com,
+        Srishti Sharma <srishtishar@gmail.com>
+To: gilad@benyossef.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from aserp1040.oracle.com ([141.146.126.69]:26070 "EHLO
-        aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1757293AbdIIJMX (ORCPT
+Received: from mail-pg0-f68.google.com ([74.125.83.68]:35064 "EHLO
+        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1757364AbdIIKo2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 9 Sep 2017 05:12:23 -0400
-Content-Disposition: inline
-In-Reply-To: <1504429011-25514-8-git-send-email-gilad@benyossef.com>
+        Sat, 9 Sep 2017 06:44:28 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Sep 03, 2017 at 11:56:49AM +0300, Gilad Ben-Yossef wrote:
-> Replace noop macro with a noop inline function
-> 
-> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
-> ---
->  drivers/staging/ccree/ssi_driver.h | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/staging/ccree/ssi_driver.h b/drivers/staging/ccree/ssi_driver.h
-> index 06a3c48..81ba827 100644
-> --- a/drivers/staging/ccree/ssi_driver.h
-> +++ b/drivers/staging/ccree/ssi_driver.h
-> @@ -187,8 +187,8 @@ struct async_gen_req_ctx {
->  #ifdef DX_DUMP_BYTES
->  void dump_byte_array(const char *name, const u8 *the_array, unsigned long size);
->  #else
-> -#define dump_byte_array(name, array, size) do {	\
-> -} while (0);
-> +static inline void dump_byte_array(const char *name, const u8 *the_array,
-> +				   unsigned long size) {};
+Merge the assignment and return statements to return the value
+directly. Done using coccinelle.
 
-Could you put the {} on the next line?  Also there is no need for the
-semi-colon after the end of a function.
+@@
+local idexpression ret;
+expression e;
+@@
 
-This is a style thing, so if you want to do it in a follow on patch
-that's fine
+-ret =
++return
+     e;
+-return ret;
 
-regards,
-dan carpenter
+Signed-off-by: Srishti Sharma <srishtishar@gmail.com>
+---
+ drivers/staging/ccree/ssi_sysfs.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/drivers/staging/ccree/ssi_sysfs.c b/drivers/staging/ccree/ssi_sysfs.c
+index 0655658..9fa7be0 100644
+--- a/drivers/staging/ccree/ssi_sysfs.c
++++ b/drivers/staging/ccree/ssi_sysfs.c
+@@ -412,7 +412,6 @@ static void sys_free_dir(struct sys_dir *sys_dir)
+
+ int ssi_sysfs_init(struct kobject *sys_dev_obj, struct ssi_drvdata *drvdata)
+ {
+-	int retval;
+
+ #if defined CC_CYCLE_COUNT
+ 	/* Init. statistics */
+@@ -423,10 +422,9 @@ int ssi_sysfs_init(struct kobject *sys_dev_obj, struct ssi_drvdata *drvdata)
+ 	SSI_LOG_ERR("setup sysfs under %s\n", sys_dev_obj->name);
+
+ 	/* Initialize top directory */
+-	retval = sys_init_dir(&sys_top_dir, drvdata, sys_dev_obj, "cc_info",
++	return sys_init_dir(&sys_top_dir, drvdata, sys_dev_obj, "cc_info",
+ 			      ssi_sys_top_level_attrs,
+ 			      ARRAY_SIZE(ssi_sys_top_level_attrs));
+-	return retval;
+ }
+
+ void ssi_sysfs_fini(void)
