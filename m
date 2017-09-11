@@ -1,20 +1,19 @@
-From: Sean Paul <seanpaul@chromium.org>
-Subject: Re: [Outreachy kernel] [PATCH v2] Staging: ccree: Remove unused
- variable monitor_lock
-Date: Mon, 11 Sep 2017 12:36:57 -0400
-Message-ID: <CAOw6vb+CZWz39-6_dtPzwi4=mxJkp_fQ=saUrLG8TfFORZkSkA@mail.gmail.com>
-References: <1505147317-13411-1-git-send-email-srishtishar@gmail.com>
+From: Srishti Sharma <srishtishar@gmail.com>
+Subject: Re: [PATCH v2] Staging: ccree: Prefer using BIT macro.
+Date: Mon, 11 Sep 2017 22:47:57 +0530
+Message-ID: <CAB3L5oysec19U1WBAJrSb_qck7kJ_p9gj=wae-0w3y-pDDoDVw@mail.gmail.com>
+References: <1504793692-8996-1-git-send-email-srishtishar@gmail.com>
+ <20170911162458.GA24025@kroah.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Cc: devel@driverdev.osuosl.org, outreachy-kernel@googlegroups.com,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
  driverdev-devel@linuxdriverproject.org,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux kernel mailing list <linux-kernel@vger.kernel.org>,
  Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Srishti Sharma <srishtishar@gmail.com>
+To: Greg KH <gregkh@linuxfoundation.org>
 Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-In-Reply-To: <1505147317-13411-1-git-send-email-srishtishar@gmail.com>
+In-Reply-To: <20170911162458.GA24025@kroah.com>
 List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
  <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
 List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
@@ -26,39 +25,22 @@ Errors-To: driverdev-devel-bounces@linuxdriverproject.org
 Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Sep 11, 2017 at 12:28 PM, Srishti Sharma <srishtishar@gmail.com> wrote:
-> Remove the variable monitor_lock as it is not used anywhere.
+On Mon, Sep 11, 2017 at 9:54 PM, Greg KH <gregkh@linuxfoundation.org> wrote:
+> On Thu, Sep 07, 2017 at 07:44:52PM +0530, Srishti Sharma wrote:
+>> Use BIT(x) instead of using (1<<x), reported by checkpatch.pl.
+>>
+>> Signed-off-by: Srishti Sharma <srishtishar@gmail.com>
+>> ---
+>> Changes in v2:
+>>  - Add tab spaces before BIT macro.
+>>
+>>  drivers/staging/ccree/ssi_cipher.h | 10 +++++-----
+>>  1 file changed, 5 insertions(+), 5 deletions(-)
 >
-> Signed-off-by: Srishti Sharma <srishtishar@gmail.com>
+> This change is already in my tree from someone else, sorry.
+Oh.. It's okay !
 
-Reviewed-by: Sean Paul <seanpaul@chromium.org>
-
-> ---
-> Changes in v2:
->  -The variable that was not to be declared as volatile can be
->   eliminated as it is not being used anywhere.
+Thanks,
+Srishti
 >
->  drivers/staging/ccree/ssi_request_mgr.c | 1 -
->  1 file changed, 1 deletion(-)
->
-> diff --git a/drivers/staging/ccree/ssi_request_mgr.c b/drivers/staging/ccree/ssi_request_mgr.c
-> index e5c2f92..b94a91f 100644
-> --- a/drivers/staging/ccree/ssi_request_mgr.c
-> +++ b/drivers/staging/ccree/ssi_request_mgr.c
-> @@ -49,7 +49,6 @@ struct ssi_request_mgr_handle {
->         dma_addr_t dummy_comp_buff_dma;
->         struct cc_hw_desc monitor_desc;
->
-> -       volatile unsigned long monitor_lock;
->  #ifdef COMP_IN_WQ
->         struct workqueue_struct *workq;
->         struct delayed_work compwork;
-> --
-> 2.7.4
->
-> --
-> You received this message because you are subscribed to the Google Groups "outreachy-kernel" group.
-> To unsubscribe from this group and stop receiving emails from it, send an email to outreachy-kernel+unsubscribe@googlegroups.com.
-> To post to this group, send email to outreachy-kernel@googlegroups.com.
-> To view this discussion on the web visit https://groups.google.com/d/msgid/outreachy-kernel/1505147317-13411-1-git-send-email-srishtishar%40gmail.com.
-> For more options, visit https://groups.google.com/d/optout.
+> greg k-h
