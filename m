@@ -1,39 +1,37 @@
-From: Julia Lawall <julia.lawall@lip6.fr>
-Subject: Re: [Outreachy kernel] [PATCH] Staging: ccree: Don't use volatile
- for monitor_lock
-Date: Mon, 11 Sep 2017 18:03:02 +0200 (CEST)
-Message-ID: <alpine.DEB.2.20.1709111801590.13726@hadrien>
+From: Greg KH <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH] Staging: ccree: Don't use volatile for monitor_lock
+Date: Mon, 11 Sep 2017 09:04:49 -0700
+Message-ID: <20170911160449.GA11886@kroah.com>
 References: <1505145571-11248-1-git-send-email-srishtishar@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Cc: gilad@benyossef.com, gregkh@linuxfoundation.org,
-        linux-crypto@vger.kernel.org,
-        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
-        linux-kernel@vger.kernel.org, outreachy-kernel@googlegroups.com
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: devel@driverdev.osuosl.org, outreachy-kernel@googlegroups.com,
+ driverdev-devel@linuxdriverproject.org, linux-kernel@vger.kernel.org,
+ linux-crypto@vger.kernel.org
 To: Srishti Sharma <srishtishar@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+Content-Disposition: inline
 In-Reply-To: <1505145571-11248-1-git-send-email-srishtishar@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-
-
-On Mon, 11 Sep 2017, Srishti Sharma wrote:
-
+On Mon, Sep 11, 2017 at 09:29:31PM +0530, Srishti Sharma wrote:
 > The use of volatile for the variable monitor_lock is unnecessary.
-
-You need to give more evidence of why this is the case.  How is the
-variable used?  I guess this comes from checkpatch, but checkpatch has
-only a local view of things, and doesn't know how the variable is used.
-
-julia
-
->
+> 
 > Signed-off-by: Srishti Sharma <srishtishar@gmail.com>
 > ---
 >  drivers/staging/ccree/ssi_request_mgr.c | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
->
+> 
 > diff --git a/drivers/staging/ccree/ssi_request_mgr.c b/drivers/staging/ccree/ssi_request_mgr.c
 > index e5c2f92..7d77941 100644
 > --- a/drivers/staging/ccree/ssi_request_mgr.c
@@ -41,19 +39,13 @@ julia
 > @@ -49,7 +49,7 @@ struct ssi_request_mgr_handle {
 >  	dma_addr_t dummy_comp_buff_dma;
 >  	struct cc_hw_desc monitor_desc;
->
+> 
 > -	volatile unsigned long monitor_lock;
 > +	unsigned long monitor_lock;
->  #ifdef COMP_IN_WQ
->  	struct workqueue_struct *workq;
->  	struct delayed_work compwork;
-> --
-> 2.7.4
->
-> --
-> You received this message because you are subscribed to the Google Groups "outreachy-kernel" group.
-> To unsubscribe from this group and stop receiving emails from it, send an email to outreachy-kernel+unsubscribe@googlegroups.com.
-> To post to this group, send email to outreachy-kernel@googlegroups.com.
-> To view this discussion on the web visit https://groups.google.com/d/msgid/outreachy-kernel/1505145571-11248-1-git-send-email-srishtishar%40gmail.com.
-> For more options, visit https://groups.google.com/d/optout.
->
+
+While volatile is not right, odds are, this is still totally wrong as
+well.  How about using a "real" lock instead?
+
+thanks,
+
+greg k-h
