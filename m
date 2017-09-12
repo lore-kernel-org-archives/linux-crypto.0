@@ -1,49 +1,55 @@
-From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: Re: [PATCH] Staging: ccree: Don't use volatile for monitor_lock
-Date: Tue, 12 Sep 2017 12:19:51 +0300
-Message-ID: <20170912091951.noslc3dlncyxonyg@mwanda>
-References: <1505145571-11248-1-git-send-email-srishtishar@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: devel@driverdev.osuosl.org, outreachy-kernel@googlegroups.com,
- gregkh@linuxfoundation.org, driverdev-devel@linuxdriverproject.org,
- linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Srishti Sharma <srishtishar@gmail.com>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-Content-Disposition: inline
-In-Reply-To: <1505145571-11248-1-git-send-email-srishtishar@gmail.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH 1/2] crypto: stm32 - Fix uninitialized data usage
+Date: Tue, 12 Sep 2017 11:35:38 +0200
+Message-ID: <20170912093553.2580986-1-arnd@arndb.de>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@st.com>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+To: Lionel Debieve <lionel.debieve@st.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Sep 11, 2017 at 09:29:31PM +0530, Srishti Sharma wrote:
-> The use of volatile for the variable monitor_lock is unnecessary.
-> 
-> Signed-off-by: Srishti Sharma <srishtishar@gmail.com>
-> ---
->  drivers/staging/ccree/ssi_request_mgr.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/staging/ccree/ssi_request_mgr.c b/drivers/staging/ccree/ssi_request_mgr.c
-> index e5c2f92..7d77941 100644
-> --- a/drivers/staging/ccree/ssi_request_mgr.c
-> +++ b/drivers/staging/ccree/ssi_request_mgr.c
-> @@ -49,7 +49,7 @@ struct ssi_request_mgr_handle {
->  	dma_addr_t dummy_comp_buff_dma;
->  	struct cc_hw_desc monitor_desc;
-> 
-> -	volatile unsigned long monitor_lock;
-> +	unsigned long monitor_lock;
+The error handling in stm32_hash_irq_thread passes
+uninitialized data into stm32_hash_finish_req, as gcc
+points out:
 
-The variable seems unused.  Try deleting it instead.
+drivers/crypto/stm32/stm32-hash.c: In function 'stm32_hash_irq_thread':
+drivers/crypto/stm32/stm32-hash.c:1088:2: error: 'err' may be used uninitialized in this function [-Werror=maybe-uninitialized]
 
-regards,
-dan carpenter
+I could not tell what data should be passed there instead,
+so this changes the code to always pass zero, making it
+well-defined, though possibly still wrong. Please check.
+
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ drivers/crypto/stm32/stm32-hash.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/drivers/crypto/stm32/stm32-hash.c b/drivers/crypto/stm32/stm32-hash.c
+index b585ce54a802..3c23a23e9ee5 100644
+--- a/drivers/crypto/stm32/stm32-hash.c
++++ b/drivers/crypto/stm32/stm32-hash.c
+@@ -1067,7 +1067,6 @@ static int stm32_hash_cra_sha256_init(struct crypto_tfm *tfm)
+ static irqreturn_t stm32_hash_irq_thread(int irq, void *dev_id)
+ {
+ 	struct stm32_hash_dev *hdev = dev_id;
+-	int err;
+ 
+ 	if (HASH_FLAGS_CPU & hdev->flags) {
+ 		if (HASH_FLAGS_OUTPUT_READY & hdev->flags) {
+@@ -1085,7 +1084,7 @@ static irqreturn_t stm32_hash_irq_thread(int irq, void *dev_id)
+ 
+ finish:
+ 	/*Finish current request */
+-	stm32_hash_finish_req(hdev->req, err);
++	stm32_hash_finish_req(hdev->req, 0);
+ 
+ 	return IRQ_HANDLED;
+ }
+-- 
+2.9.0
