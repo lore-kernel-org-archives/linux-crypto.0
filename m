@@ -1,44 +1,69 @@
-From: Christophe LEROY <christophe.leroy@c-s.fr>
-Subject: Re: md5sum (from libkcapi) fails as splice() returns -ENOKEY
-Date: Tue, 12 Sep 2017 11:07:26 +0200
-Message-ID: <6b0f315c-1414-0973-cdd9-4b17237c4362@c-s.fr>
-References: <dadd0e10-f2e8-015a-a432-e7174331ab46@c-s.fr>
- <85331bd3-b799-f4a1-d1da-085be723f5cb@c-s.fr>
- <5590856.XjYaqbyTry@tauon.chronox.de> <2813810.Wx4icNXN4V@tauon.chronox.de>
+From: Steffen Klassert <steffen.klassert@secunet.com>
+Subject: Re: [PATCH 0/3] padata cpu awareness fixes
+Date: Tue, 12 Sep 2017 11:07:53 +0200
+Message-ID: <20170912090753.GF31384@secunet.com>
+References: <1504897031-27523-1-git-send-email-minipli@googlemail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Cc: linux-crypto@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
+Content-Type: text/plain; charset="us-ascii"
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        <linux-crypto@vger.kernel.org>
+To: Mathias Krause <minipli@googlemail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pegase1.c-s.fr ([93.17.236.30]:37414 "EHLO pegase1.c-s.fr"
+Received: from a.mx.secunet.com ([62.96.220.36]:56658 "EHLO a.mx.secunet.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751251AbdILJH2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 12 Sep 2017 05:07:28 -0400
-In-Reply-To: <2813810.Wx4icNXN4V@tauon.chronox.de>
-Content-Language: fr
+        id S1751251AbdILJHz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 12 Sep 2017 05:07:55 -0400
+Content-Disposition: inline
+In-Reply-To: <1504897031-27523-1-git-send-email-minipli@googlemail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi again
-
-Le 12/09/2017 à 09:22, Stephan Mueller a écrit :
-> Am Dienstag, 12. September 2017, 09:20:41 CEST schrieb Stephan Mueller:
+On Fri, Sep 08, 2017 at 08:57:08PM +0200, Mathias Krause wrote:
+> Hi Steffen, Herbert,
 > 
->> I am thinking now to add AC_PREREQ([2.60]) to configure.ac.
+> this series solves multiple issues of padata I ran into while trying to
+> make use of pcrypt for IPsec.
 > 
-> I meant 2.69, of course? :-)
-
-Ok ... CentOS ships with 2.63 and no update seems available via 'yum 
-update'.
-
-Is 2.69 really necessary ? It seems to work just fine with 2.63 once the 
-modification is done.
-
-Christophe
-
-
+> The first issue is that the reorder timer callback may run on a CPU that
+> isn't part of the parallel set, as it runs on the CPU where the timer
+> interrupt gets handled. As a result, padata_reorder() may run on a CPU
+> with uninitialized per-cpu parallel queues, so the __this_cpu_read() in
+> padata_get_next() refers to an uninitialized cpu_index. However, as
+> per-cpu memory gets memset(0) on allocation time, it'll read 0. If the
+> next CPU index we're waiting for is 0 too, the compare will succeed and
+> we'll return with -ENODATA, making padata_reorder() think there's
+> nothing to do, stop any pending timer and return immediately. This is
+> wrong as the pending timer might have been the one to trigger the needed
+> reordering, but, as it was canceled, will never happen -- if no other
+> parallel requests arrive afterwards.
 > 
-> Ciao
-> Stephan
+> That issue is addressed with the first two patches, ensuring we're not
+> using a bogus cpu_index value for the compare and thereby not wrongly
+> cancel a pending timer. The second patch then ensures the reorder timer
+> callback runs on the correct CPU or, at least, on a CPU from the
+> parallel set to generate forward progress.
 > 
+> The third patch addresses a similar issues for the serialization
+> callback. We implicitly require padata_do_serial() to be called on the
+> very same CPU padata_do_parallel() was called on to ensure the correct
+> ordering of requests -- and correct functioning of padata, even. If the
+> algorithm we're parallelizing is asynchronous itself, that invariant
+> might not be true, as, e.g. crypto hardware may execute the callback on
+> the CPU its interrupt gets handled on which isn't necessarily the one
+> the request got issued on.
+> 
+> To handle that issue we track the CPU we're supposed to handle the
+> request on and ensure we'll call padata_reorder() on that CPU when
+> padata_do_serial() gets called -- either by already running on the
+> corect CPU or by deferring the call to a worker. 
+> 
+> Please apply!
+> 
+> Mathias Krause (3):
+>   padata: set cpu_index of unused CPUs to -1
+>   padata: ensure the reorder timer callback runs on the correct CPU
+>   padata: ensure padata_do_serial() runs on the correct CPU
+
+Looks good, thanks!
+
+Acked-by: Steffen Klassert <steffen.klassert@secunet.com>
