@@ -1,14 +1,15 @@
 From: Josh Poimboeuf <jpoimboe@redhat.com>
 Subject: Re: [PATCH 00/12] x86/crypto: Fix RBP usage in several crypto .S
  files
-Date: Wed, 13 Sep 2017 16:24:28 -0500
-Message-ID: <20170913212428.kibwbqs2f7dkeslb@treble>
+Date: Wed, 13 Sep 2017 17:33:03 -0500
+Message-ID: <20170913223303.pskmy2v7nto6rvtg@treble>
 References: <cover.1504029132.git.jpoimboe@redhat.com>
  <20170902000919.GA139193@gmail.com>
  <20170907071534.ztbxvyfoo7m7esmw@gmail.com>
  <20170907175800.GA92996@gmail.com>
  <20170907212646.q3y5wmhyaaqblg5m@gmail.com>
  <20170908175705.GA623@zzz.localdomain>
+ <20170913212428.kibwbqs2f7dkeslb@treble>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Cc: Ingo Molnar <mingo@kernel.org>, x86@kernel.org,
@@ -24,162 +25,226 @@ Cc: Ingo Molnar <mingo@kernel.org>, x86@kernel.org,
         Andy Lutomirski <luto@kernel.org>, Jiri Slaby <jslaby@suse.cz>
 To: Eric Biggers <ebiggers3@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:59774 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:34950 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751117AbdIMVYb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 13 Sep 2017 17:24:31 -0400
+        id S1751148AbdIMWdG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 13 Sep 2017 18:33:06 -0400
 Content-Disposition: inline
-In-Reply-To: <20170908175705.GA623@zzz.localdomain>
+In-Reply-To: <20170913212428.kibwbqs2f7dkeslb@treble>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Sep 08, 2017 at 10:57:05AM -0700, Eric Biggers wrote:
-> On Thu, Sep 07, 2017 at 11:26:47PM +0200, Ingo Molnar wrote:
-> > 
-> > * Eric Biggers <ebiggers3@gmail.com> wrote:
-> > 
-> > > On Thu, Sep 07, 2017 at 09:15:34AM +0200, Ingo Molnar wrote:
-> > > > 
-> > > > * Eric Biggers <ebiggers3@gmail.com> wrote:
-> > > > 
-> > > > > Thanks for fixing these!  I don't have time to review these in detail, but I ran
-> > > > > the crypto self-tests on the affected algorithms, and they all pass.  I also
-> > > > > benchmarked them before and after; the only noticable performance difference was
-> > > > > that sha256-avx2 and sha512-avx2 became a few percent slower.  I don't suppose
-> > > > > there is a way around that?  Otherwise it's probably not a big deal.
-> > > > 
-> > > > Which CPU model did you use for the test?
-> > > > 
-> > > > Thanks,
-> > > > 
-> > > > 	Ingo
+On Wed, Sep 13, 2017 at 04:24:28PM -0500, Josh Poimboeuf wrote:
+> On Fri, Sep 08, 2017 at 10:57:05AM -0700, Eric Biggers wrote:
+> > On Thu, Sep 07, 2017 at 11:26:47PM +0200, Ingo Molnar wrote:
 > > > 
-> > > This was on Haswell, "Intel(R) Xeon(R) CPU E5-1650 v3 @ 3.50GHz".
+> > > * Eric Biggers <ebiggers3@gmail.com> wrote:
+> > > 
+> > > > On Thu, Sep 07, 2017 at 09:15:34AM +0200, Ingo Molnar wrote:
+> > > > > 
+> > > > > * Eric Biggers <ebiggers3@gmail.com> wrote:
+> > > > > 
+> > > > > > Thanks for fixing these!  I don't have time to review these in detail, but I ran
+> > > > > > the crypto self-tests on the affected algorithms, and they all pass.  I also
+> > > > > > benchmarked them before and after; the only noticable performance difference was
+> > > > > > that sha256-avx2 and sha512-avx2 became a few percent slower.  I don't suppose
+> > > > > > there is a way around that?  Otherwise it's probably not a big deal.
+> > > > > 
+> > > > > Which CPU model did you use for the test?
+> > > > > 
+> > > > > Thanks,
+> > > > > 
+> > > > > 	Ingo
+> > > > 
+> > > > This was on Haswell, "Intel(R) Xeon(R) CPU E5-1650 v3 @ 3.50GHz".
+> > > 
+> > > Any chance to test this with the latest microarchitecture - any Skylake derivative 
+> > > Intel CPU you have access to?
+> > > 
+> > > Thanks,
+> > > 
+> > > 	Ingo
 > > 
-> > Any chance to test this with the latest microarchitecture - any Skylake derivative 
-> > Intel CPU you have access to?
+> > Tested with Skylake, "Intel(R) Core(TM) i5-6200U CPU @ 2.30GHz".  The results
+> > were the following which seemed a bit worse than Haswell:
 > > 
-> > Thanks,
+> > 	sha256-avx2 became 3.5% slower
+> > 	sha512-avx2 became 7.5% slower
 > > 
-> > 	Ingo
+> > Note: it's tricky to benchmark this, especially with just a few percent
+> > difference, so don't read too much into the exact numbers.
 > 
-> Tested with Skylake, "Intel(R) Core(TM) i5-6200U CPU @ 2.30GHz".  The results
-> were the following which seemed a bit worse than Haswell:
+> Here's a v2 for the sha256-avx2 patch, would you mind seeing if this
+> closes the performance gap?
 > 
-> 	sha256-avx2 became 3.5% slower
-> 	sha512-avx2 became 7.5% slower
-> 
-> Note: it's tricky to benchmark this, especially with just a few percent
-> difference, so don't read too much into the exact numbers.
+> I'm still looking at the other one (sha512-avx2), but so far I haven't
+> found a way to speed it back up.
 
-Here's a v2 for the sha256-avx2 patch, would you mind seeing if this
-closes the performance gap?
-
-I'm still looking at the other one (sha512-avx2), but so far I haven't
-found a way to speed it back up.
+And here's v2 of the sha512-avx2 patch.  It should hopefully gain back
+most of the performance lost by v1.
 
 From: Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: [PATCH] x86/crypto: Fix RBP usage in sha256-avx2-asm.S
+Subject: [PATCH] x86/crypto: Fix RBP usage in sha512-avx2-asm.S
 
 Using RBP as a temporary register breaks frame pointer convention and
 breaks stack traces when unwinding from an interrupt in the crypto code.
 
-There's no need to use RBP as a temporary register for the TBL value,
-because it always stores the same value: the address of the K256 table.
-Instead just reference the address of K256 directly.
+Mix things up a little bit to get rid of the RBP usage, without
+destroying performance.  Use RDI instead of RBP for the TBL pointer.
+That will clobber CTX, so save CTX on the stack and use RDI as CTX
+before it gets clobbered, and R12 as CTX after it gets clobbered.
 
-Reported-by: Eric Biggers <ebiggers@google.com>
+Also remove the unused y4 variable.
+
+Reported-by: Eric Biggers <ebiggers3@gmail.com>
 Reported-by: Peter Zijlstra <peterz@infradead.org>
 Signed-off-by: Josh Poimboeuf <jpoimboe@redhat.com>
 ---
- arch/x86/crypto/sha256-avx2-asm.S | 22 +++++++---------------
- 1 file changed, 7 insertions(+), 15 deletions(-)
+ arch/x86/crypto/sha512-avx2-asm.S | 75 ++++++++++++++++++++-------------------
+ 1 file changed, 39 insertions(+), 36 deletions(-)
 
-diff --git a/arch/x86/crypto/sha256-avx2-asm.S b/arch/x86/crypto/sha256-avx2-asm.S
-index 89c8f09787d2..1420db15dcdd 100644
---- a/arch/x86/crypto/sha256-avx2-asm.S
-+++ b/arch/x86/crypto/sha256-avx2-asm.S
-@@ -98,8 +98,6 @@ d	= %r8d
- e       = %edx	# clobbers NUM_BLKS
- y3	= %esi	# clobbers INP
+diff --git a/arch/x86/crypto/sha512-avx2-asm.S b/arch/x86/crypto/sha512-avx2-asm.S
+index 7f5f6c6ec72e..b16d56005162 100644
+--- a/arch/x86/crypto/sha512-avx2-asm.S
++++ b/arch/x86/crypto/sha512-avx2-asm.S
+@@ -69,8 +69,9 @@ XFER  = YTMP0
  
+ BYTE_FLIP_MASK  = %ymm9
+ 
+-# 1st arg
+-CTX         = %rdi
++# 1st arg is %rdi, which is saved to the stack and accessed later via %r12
++CTX1        = %rdi
++CTX2        = %r12
+ # 2nd arg
+ INP         = %rsi
+ # 3rd arg
+@@ -81,7 +82,7 @@ d           = %r8
+ e           = %rdx
+ y3          = %rsi
+ 
+-TBL   = %rbp
++TBL   = %rdi # clobbers CTX1
+ 
+ a     = %rax
+ b     = %rbx
+@@ -91,26 +92,26 @@ g     = %r10
+ h     = %r11
+ old_h = %r11
+ 
+-T1    = %r12
++T1    = %r12 # clobbers CTX2
+ y0    = %r13
+ y1    = %r14
+ y2    = %r15
+ 
+-y4    = %r12
 -
--TBL	= %rbp
- SRND	= CTX	# SRND is same register as CTX
+ # Local variables (stack frame)
+ XFER_SIZE = 4*8
+ SRND_SIZE = 1*8
+ INP_SIZE = 1*8
+ INPEND_SIZE = 1*8
++CTX_SIZE = 1*8
+ RSPSAVE_SIZE = 1*8
+-GPRSAVE_SIZE = 6*8
++GPRSAVE_SIZE = 5*8
  
- a = %eax
-@@ -531,7 +529,6 @@ STACK_SIZE	= _RSP      + _RSP_SIZE
- ENTRY(sha256_transform_rorx)
- .align 32
- 	pushq	%rbx
--	pushq	%rbp
- 	pushq	%r12
- 	pushq	%r13
- 	pushq	%r14
-@@ -568,8 +565,6 @@ ENTRY(sha256_transform_rorx)
- 	mov	CTX, _CTX(%rsp)
+ frame_XFER = 0
+ frame_SRND = frame_XFER + XFER_SIZE
+ frame_INP = frame_SRND + SRND_SIZE
+ frame_INPEND = frame_INP + INP_SIZE
+-frame_RSPSAVE = frame_INPEND + INPEND_SIZE
++frame_CTX = frame_INPEND + INPEND_SIZE
++frame_RSPSAVE = frame_CTX + CTX_SIZE
+ frame_GPRSAVE = frame_RSPSAVE + RSPSAVE_SIZE
+ frame_size = frame_GPRSAVE + GPRSAVE_SIZE
  
- loop0:
--	lea     K256(%rip), TBL
--
- 	## Load first 16 dwords from two blocks
- 	VMOVDQ	0*32(INP),XTMP0
- 	VMOVDQ	1*32(INP),XTMP1
-@@ -597,19 +592,19 @@ last_block_enter:
+@@ -576,12 +577,11 @@ ENTRY(sha512_transform_rorx)
+ 	mov	%rax, frame_RSPSAVE(%rsp)
  
- .align 16
- loop1:
--	vpaddd	0*32(TBL, SRND), X0, XFER
-+	vpaddd	K256+0*32(SRND), X0, XFER
- 	vmovdqa XFER, 0*32+_XFER(%rsp, SRND)
- 	FOUR_ROUNDS_AND_SCHED	_XFER + 0*32
+ 	# Save GPRs
+-	mov	%rbp, frame_GPRSAVE(%rsp)
+-	mov	%rbx, 8*1+frame_GPRSAVE(%rsp)
+-	mov	%r12, 8*2+frame_GPRSAVE(%rsp)
+-	mov	%r13, 8*3+frame_GPRSAVE(%rsp)
+-	mov	%r14, 8*4+frame_GPRSAVE(%rsp)
+-	mov	%r15, 8*5+frame_GPRSAVE(%rsp)
++	mov	%rbx, 8*0+frame_GPRSAVE(%rsp)
++	mov	%r12, 8*1+frame_GPRSAVE(%rsp)
++	mov	%r13, 8*2+frame_GPRSAVE(%rsp)
++	mov	%r14, 8*3+frame_GPRSAVE(%rsp)
++	mov	%r15, 8*4+frame_GPRSAVE(%rsp)
  
--	vpaddd	1*32(TBL, SRND), X0, XFER
-+	vpaddd	K256+1*32(SRND), X0, XFER
- 	vmovdqa XFER, 1*32+_XFER(%rsp, SRND)
- 	FOUR_ROUNDS_AND_SCHED	_XFER + 1*32
+ 	shl	$7, NUM_BLKS	# convert to bytes
+ 	jz	done_hash
+@@ -589,14 +589,17 @@ ENTRY(sha512_transform_rorx)
+ 	mov	NUM_BLKS, frame_INPEND(%rsp)
  
--	vpaddd	2*32(TBL, SRND), X0, XFER
-+	vpaddd	K256+2*32(SRND), X0, XFER
- 	vmovdqa XFER, 2*32+_XFER(%rsp, SRND)
- 	FOUR_ROUNDS_AND_SCHED	_XFER + 2*32
- 
--	vpaddd	3*32(TBL, SRND), X0, XFER
-+	vpaddd	K256+3*32(SRND), X0, XFER
- 	vmovdqa XFER, 3*32+_XFER(%rsp, SRND)
- 	FOUR_ROUNDS_AND_SCHED	_XFER + 3*32
- 
-@@ -619,10 +614,11 @@ loop1:
- 
- loop2:
- 	## Do last 16 rounds with no scheduling
--	vpaddd	0*32(TBL, SRND), X0, XFER
-+	vpaddd	K256+0*32(SRND), X0, XFER
- 	vmovdqa XFER, 0*32+_XFER(%rsp, SRND)
- 	DO_4ROUNDS	_XFER + 0*32
--	vpaddd	1*32(TBL, SRND), X1, XFER
+ 	## load initial digest
+-	mov	8*0(CTX),a
+-	mov	8*1(CTX),b
+-	mov	8*2(CTX),c
+-	mov	8*3(CTX),d
+-	mov	8*4(CTX),e
+-	mov	8*5(CTX),f
+-	mov	8*6(CTX),g
+-	mov	8*7(CTX),h
++	mov	8*0(CTX1), a
++	mov	8*1(CTX1), b
++	mov	8*2(CTX1), c
++	mov	8*3(CTX1), d
++	mov	8*4(CTX1), e
++	mov	8*5(CTX1), f
++	mov	8*6(CTX1), g
++	mov	8*7(CTX1), h
 +
-+	vpaddd	K256+1*32(SRND), X1, XFER
- 	vmovdqa XFER, 1*32+_XFER(%rsp, SRND)
- 	DO_4ROUNDS	_XFER + 1*32
- 	add	$2*32, SRND
-@@ -676,9 +672,6 @@ loop3:
- 	ja	done_hash
++	# save %rdi (CTX) before it gets clobbered
++	mov	%rdi, frame_CTX(%rsp)
  
- do_last_block:
--	#### do last block
--	lea	K256(%rip), TBL
--
- 	VMOVDQ	0*16(INP),XWORD0
- 	VMOVDQ	1*16(INP),XWORD1
- 	VMOVDQ	2*16(INP),XWORD2
-@@ -718,7 +711,6 @@ done_hash:
- 	popq	%r14
- 	popq	%r13
- 	popq	%r12
--	popq	%rbp
- 	popq	%rbx
- 	ret
- ENDPROC(sha256_transform_rorx)
+ 	vmovdqa	PSHUFFLE_BYTE_FLIP_MASK(%rip), BYTE_FLIP_MASK
+ 
+@@ -652,14 +655,15 @@ loop2:
+ 	subq	$1, frame_SRND(%rsp)
+ 	jne	loop2
+ 
+-	addm	8*0(CTX),a
+-	addm	8*1(CTX),b
+-	addm	8*2(CTX),c
+-	addm	8*3(CTX),d
+-	addm	8*4(CTX),e
+-	addm	8*5(CTX),f
+-	addm	8*6(CTX),g
+-	addm	8*7(CTX),h
++	mov	frame_CTX(%rsp), CTX2
++	addm	8*0(CTX2), a
++	addm	8*1(CTX2), b
++	addm	8*2(CTX2), c
++	addm	8*3(CTX2), d
++	addm	8*4(CTX2), e
++	addm	8*5(CTX2), f
++	addm	8*6(CTX2), g
++	addm	8*7(CTX2), h
+ 
+ 	mov	frame_INP(%rsp), INP
+ 	add	$128, INP
+@@ -669,12 +673,11 @@ loop2:
+ done_hash:
+ 
+ # Restore GPRs
+-	mov	frame_GPRSAVE(%rsp)     ,%rbp
+-	mov	8*1+frame_GPRSAVE(%rsp) ,%rbx
+-	mov	8*2+frame_GPRSAVE(%rsp) ,%r12
+-	mov	8*3+frame_GPRSAVE(%rsp) ,%r13
+-	mov	8*4+frame_GPRSAVE(%rsp) ,%r14
+-	mov	8*5+frame_GPRSAVE(%rsp) ,%r15
++	mov	8*0+frame_GPRSAVE(%rsp), %rbx
++	mov	8*1+frame_GPRSAVE(%rsp), %r12
++	mov	8*2+frame_GPRSAVE(%rsp), %r13
++	mov	8*3+frame_GPRSAVE(%rsp), %r14
++	mov	8*4+frame_GPRSAVE(%rsp), %r15
+ 
+ 	# Restore Stack Pointer
+ 	mov	frame_RSPSAVE(%rsp), %rsp
 -- 
 2.13.5
