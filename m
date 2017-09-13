@@ -1,7 +1,7 @@
 From: Allen Pais <allen.lkml@gmail.com>
-Subject: [PATCH 04/10] drivers:mpt: return -ENOMEM on allocation failure.
-Date: Wed, 13 Sep 2017 13:02:13 +0530
-Message-ID: <1505287939-14106-4-git-send-email-allen.lkml@gmail.com>
+Subject: [PATCH 06/10] drivers:ethernet: return -ENOMEM on allocation failure.
+Date: Wed, 13 Sep 2017 13:02:15 +0530
+Message-ID: <1505287939-14106-6-git-send-email-allen.lkml@gmail.com>
 References: <1505287939-14106-1-git-send-email-allen.lkml@gmail.com>
 Cc: nouveau@lists.freedesktop.org, linux-crypto@vger.kernel.org,
         dri-devel@lists.freedesktop.org, MPT-FusionLinux.pdl@broadcom.com,
@@ -11,54 +11,32 @@ Cc: nouveau@lists.freedesktop.org, linux-crypto@vger.kernel.org,
         Allen Pais <allen.lkml@gmail.com>
 To: linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pg0-f68.google.com ([74.125.83.68]:37187 "EHLO
-        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751712AbdIMHcq (ORCPT
+Received: from mail-pf0-f194.google.com ([209.85.192.194]:34854 "EHLO
+        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751712AbdIMHcz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 13 Sep 2017 03:32:46 -0400
+        Wed, 13 Sep 2017 03:32:55 -0400
 In-Reply-To: <1505287939-14106-1-git-send-email-allen.lkml@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 Signed-off-by: Allen Pais <allen.lkml@gmail.com>
 ---
- drivers/message/fusion/mptbase.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/sun/cassini.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/message/fusion/mptbase.c b/drivers/message/fusion/mptbase.c
-index 84eab28..7920b2b 100644
---- a/drivers/message/fusion/mptbase.c
-+++ b/drivers/message/fusion/mptbase.c
-@@ -4328,15 +4328,15 @@ initChainBuffers(MPT_ADAPTER *ioc)
- 	if (ioc->ReqToChain == NULL) {
- 		sz = ioc->req_depth * sizeof(int);
- 		mem = kmalloc(sz, GFP_ATOMIC);
--		if (mem == NULL)
+diff --git a/drivers/net/ethernet/sun/cassini.c b/drivers/net/ethernet/sun/cassini.c
+index 382993c..fc0ea3a 100644
+--- a/drivers/net/ethernet/sun/cassini.c
++++ b/drivers/net/ethernet/sun/cassini.c
+@@ -3984,7 +3984,7 @@ static inline int cas_alloc_rx_desc(struct cas *cp, int ring)
+ 	size = RX_DESC_RINGN_SIZE(ring);
+ 	for (i = 0; i < size; i++) {
+ 		if ((page[i] = cas_page_alloc(cp, GFP_KERNEL)) == NULL)
 -			return -1;
-+		if (!mem)
 +			return -ENOMEM;
- 
- 		ioc->ReqToChain = (int *) mem;
- 		dinitprintk(ioc, printk(MYIOC_s_DEBUG_FMT "ReqToChain alloc  @ %p, sz=%d bytes\n",
- 			 	ioc->name, mem, sz));
- 		mem = kmalloc(sz, GFP_ATOMIC);
--		if (mem == NULL)
--			return -1;
-+		if (!mem)
-+			return -ENOMEM;
- 
- 		ioc->RequestNB = (int *) mem;
- 		dinitprintk(ioc, printk(MYIOC_s_DEBUG_FMT "RequestNB alloc  @ %p, sz=%d bytes\n",
-@@ -4402,8 +4402,8 @@ initChainBuffers(MPT_ADAPTER *ioc)
- 	sz = num_chain * sizeof(int);
- 	if (ioc->ChainToChain == NULL) {
- 		mem = kmalloc(sz, GFP_ATOMIC);
--		if (mem == NULL)
--			return -1;
-+		if (!mem)
-+			return -ENOMEM;
- 
- 		ioc->ChainToChain = (int *) mem;
- 		dinitprintk(ioc, printk(MYIOC_s_DEBUG_FMT "ChainToChain alloc @ %p, sz=%d bytes\n",
+ 	}
+ 	return 0;
+ }
 -- 
 2.7.4
