@@ -1,56 +1,72 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: md5sum (from libkcapi) fails as splice() returns -ENOKEY
-Date: Mon, 11 Sep 2017 21:17:05 +0200
-Message-ID: <3811873.su3Mf2IGi3@positron.chronox.de>
-References: <dadd0e10-f2e8-015a-a432-e7174331ab46@c-s.fr>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
-To: christophe leroy <christophe.leroy@c-s.fr>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34684 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751286AbdIKTRI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 11 Sep 2017 15:17:08 -0400
-In-Reply-To: <dadd0e10-f2e8-015a-a432-e7174331ab46@c-s.fr>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Mathieu Malaterre <malat@debian.org>
+Subject: [RFC PATCH] crypto: make the seed() function optional
+Date: Wed, 13 Sep 2017 22:09:15 +0200
+Message-ID: <20170913200915.20738-1-malat@debian.org>
+Cc: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
+        Mathieu Malaterre <malat@debian.org>,
+        Neil Horman <nhorman@tuxdriver.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: unlisted-recipients:; (no To-header on input)
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Montag, 11. September 2017, 19:07:31 CEST schrieb christophe leroy:
+This makes it simplier for driver author to not provide the seed() function
+in case of a pseudo RNG where the seed operation is a no-op.
 
-Hi christophe,
+Document that the seed() function pointer is optional in header.
 
-> Hello Stephan,
-> 
-> I'm trying to use md5sum from the latest libkcapi 0.14 and I getting a
-> failure with return code -5.
-> 
-> What am I missing ? See strace below, splice() return -ENOKEY.
+Signed-off-by: Mathieu Malaterre <malat@debian.org>
+---
+The PRNG as found on Ingenic JZ4780 is one such example. This is found on a
+MIPS Creator CI20 SoC.
 
-The ENOKEY error is due to an accept() at the wrong location. But I do not see 
-that error:
+ crypto/rng.c         | 7 ++++++-
+ include/crypto/rng.h | 2 +-
+ 2 files changed, 7 insertions(+), 2 deletions(-)
 
-tar xvfJ libkcapi-0.14.0.tar.xz
-cd libkcapi-0.14.0
-autoreconf -i
-./configure --enable-kcapi-hasher
-make
-cd bin/.libs/ # I make no make install for testing
-ln kcapi-hasher md5sum # create md5sum app
-export LD_LIBRARY_PATH=../../.libs/ # location of current library
-
-$ ./md5sum md5sum 
-ddd1a82680b16fb6c241d81656b844df  md5sum
-
-So, it works for me.
-
-Can you please check whether you use the current library version? Note, 
-library version 0.10.1 fixed the aforementioned accept() call for kernel 4.4 
-and later.
-
-$ ./md5sum -v
-md5sum: libkcapi 0.14.0
-
-Ciao
-Stephan
+diff --git a/crypto/rng.c b/crypto/rng.c
+index 5e8469244960..ed08581901a9 100644
+--- a/crypto/rng.c
++++ b/crypto/rng.c
+@@ -35,9 +35,14 @@ static int crypto_default_rng_refcnt;
+ 
+ int crypto_rng_reset(struct crypto_rng *tfm, const u8 *seed, unsigned int slen)
+ {
++	struct rng_alg *ralg = crypto_rng_alg(tfm);
+ 	u8 *buf = NULL;
+ 	int err;
+ 
++	/* In case of PRNG, no need to seed */
++	if (!ralg->seed)
++		return 0;
++
+ 	if (!seed && slen) {
+ 		buf = kmalloc(slen, GFP_KERNEL);
+ 		if (!buf)
+@@ -47,7 +52,7 @@ int crypto_rng_reset(struct crypto_rng *tfm, const u8 *seed, unsigned int slen)
+ 		seed = buf;
+ 	}
+ 
+-	err = crypto_rng_alg(tfm)->seed(tfm, seed, slen);
++	err = ralg->seed(tfm, seed, slen);
+ 
+ 	kzfree(buf);
+ 	return err;
+diff --git a/include/crypto/rng.h b/include/crypto/rng.h
+index b95ede354a66..ac5d061d0297 100644
+--- a/include/crypto/rng.h
++++ b/include/crypto/rng.h
+@@ -32,7 +32,7 @@ struct crypto_rng;
+  *		random number generator requires a seed for setting
+  *		up a new state, the seed must be provided by the
+  *		consumer while invoking this function. The required
+- *		size of the seed is defined with @seedsize .
++ *		size of the seed is defined with @seedsize. Optional.
+  * @set_ent:	Set entropy that would otherwise be obtained from
+  *		entropy source.  Internal use only.
+  * @seedsize:	The seed size required for a random number generator
+-- 
+2.11.0
