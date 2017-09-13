@@ -1,130 +1,109 @@
-From: Borislav Petkov <bp@suse.de>
-Subject: Re: [RFC Part2 PATCH v3 03/26] crypto: ccp: Add Secure Encrypted
- Virtualization (SEV) device support
-Date: Wed, 13 Sep 2017 16:17:49 +0200
-Message-ID: <20170913141749.pvphgxgcsjam4us7@pd.tnic>
-References: <20170724200303.12197-1-brijesh.singh@amd.com>
- <20170724200303.12197-4-brijesh.singh@amd.com>
+From: Kamil Konieczny <k.konieczny@partner.samsung.com>
+Subject: Re: [PATCH] crypto: s5p-sss: Add HASH support for Exynos
+Date: Wed, 13 Sep 2017 16:24:05 +0200
+Message-ID: <77dbef9a-a648-8380-ca08-e6874b4d27fb@partner.samsung.com>
+References: <CGME20170913124433eucas1p11ac46af1676151477000f8952b0ca654@eucas1p1.samsung.com>
+        <51b3b386-22c0-7663-6f54-d166ebebd332@partner.samsung.com>
+        <CAJKOXPcQhn9gq2cm_1nc8N6MEbJ0ntZqfwmY9XDYwc5VEERvdA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Joerg Roedel <joro@8bytes.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?utf-8?B?XCJSYWRpbSBLcsSNbcOhxZlcIg==?= <rkrcmar@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Gary Hook <gary.hook@amd.com>, linux-crypto@vger.kernel.org
-To: Brijesh Singh <brijesh.singh@amd.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:47230 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1750999AbdIMOSC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 13 Sep 2017 10:18:02 -0400
-Content-Disposition: inline
-In-Reply-To: <20170724200303.12197-4-brijesh.singh@amd.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+        Vladimir Zapolskiy <vz@mleia.com>,
+        linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-reply-to: <CAJKOXPcQhn9gq2cm_1nc8N6MEbJ0ntZqfwmY9XDYwc5VEERvdA@mail.gmail.com>
+Content-language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Jul 24, 2017 at 03:02:40PM -0500, Brijesh Singh wrote:
-> AMDs new Secure Encrypted Virtualization (SEV) feature allows the memory
-> contents of a virtual machine to be transparently encrypted with a key
-> unique to the guest VM. The programming and management of the encryption
-> keys are handled by the AMD Secure Processor (AMD-SP), which exposes the
-> commands for these tasks. The complete spec for various commands are
-> available at:
-> http://support.amd.com/TechDocs/55766_SEV-KM%20API_Specification.pdf
+Hi Krzysztof,
+
+On 13.09.2017 15:18, Krzysztof Kozlowski wrote:
+> On Wed, Sep 13, 2017 at 2:44 PM, Kamil Konieczny
+> <k.konieczny@partner.samsung.com> wrote:
+>> Add support for MD5, SHA1, SHA256 hash algorithms for Exynos HW.
+>> It uses the crypto framework asynchronous hash api.
+>> It is based on omap-sham.c driver.
+>> S5P has some HW differencies and is not implemented.
+>>
+>> Modifications in s5p-sss:
+>>
+>> - Add hash supporting structures and functions.
+>>
+>> - Modify irq handler to handle both aes and hash signals.
+>>
+>> - Disable HASH in probe if Exynos PRNG is enabled.
+>>
+>> - Add new copyright line and new author.
+>>
+>> - Tested on Odroid-U3 with Exynos 4412 CPU, kernel 4.13-rc6
+>>   with crypto run-time self test testmgr
+>>   and with tcrypt module with: modprobe tcrypt sec=1 mode=N
+>>   where N=402, 403, 404 (MD5, SHA1, SHA256).
+>>
+>> Modifications in drivers/crypto/Kconfig:
+>>
+>> - Select sw algorithms MD5, SHA1 and SHA256 in S5P
+>>   as they are nedded for fallback.
+>>
+>> Signed-off-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
+>> ---
+>>  drivers/crypto/Kconfig   |    6 +
+>>  drivers/crypto/s5p-sss.c | 2062 +++++++++++++++++++++++++++++++++++++++++++---
+>>  2 files changed, 1939 insertions(+), 129 deletions(-)
+>>
 > 
-> This patch extends AMD-SP driver to provide:
+> Nice work, thanks!
 > 
->  - a in-kernel APIs to communicate with SEV device. The APIs can be used
->    by the hypervisor to create encryption context for the SEV guests.
-> 
->  - a userspace IOCTL to manage the platform certificates etc
-> 
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: David S. Miller <davem@davemloft.net>
-> Cc: Gary Hook <gary.hook@amd.com>
-> Cc: linux-crypto@vger.kernel.org
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> You need to split the patch, it is just too huge making it very
+> difficult to review. Please split it per logically sensible
+> improvements. 
 
-...
+Can you suggest how to break it up ?
 
-> +int sev_issue_cmd(int cmd, void *data, int *psp_ret)
-> +{
-> +	struct sev_device *sev = get_sev_master_device();
-> +	unsigned int phys_lsb, phys_msb;
-> +	unsigned int reg, ret;
-> +
-> +	if (!sev)
-> +		return -ENODEV;
-> +
-> +	if (psp_ret)
-> +		*psp_ret = 0;
+It is now big update, added working functionallity in one piece,
+but I agree it can be hard to read
+as git did some strange things,
+like delete few aes functions (and mixing this delete with '+' lines)
+and then adding the same aes without any change.
 
-So you set psp_ret to 0 here...
+> I see some cleanups mixed with new features - this
+> definitely must be split out.
 
-> +
-> +	/* Set the physical address for the PSP */
-> +	phys_lsb = data ? lower_32_bits(__psp_pa(data)) : 0;
-> +	phys_msb = data ? upper_32_bits(__psp_pa(data)) : 0;
-> +
-> +	dev_dbg(sev->dev, "sev command id %#x buffer 0x%08x%08x\n",
-> +			cmd, phys_msb, phys_lsb);
-> +	print_hex_dump_debug("(in):  ", DUMP_PREFIX_OFFSET, 16, 2, data,
-> +			sev_cmd_buffer_len(cmd), false);
-> +
-> +	/* Only one command at a time... */
-> +	mutex_lock(&sev_cmd_mutex);
-> +
-> +	iowrite32(phys_lsb, sev->io_regs + PSP_CMDBUFF_ADDR_LO);
-> +	iowrite32(phys_msb, sev->io_regs + PSP_CMDBUFF_ADDR_HI);
-> +	wmb();
-> +
-> +	reg = cmd;
-> +	reg <<= PSP_CMDRESP_CMD_SHIFT;
-> +	reg |= sev_poll ? 0 : PSP_CMDRESP_IOC;
-> +	iowrite32(reg, sev->io_regs + PSP_CMDRESP);
-> +
-> +	ret = sev_wait_cmd(sev, &reg);
-> +	if (ret)
-> +		goto unlock;
+What cleanups do you see ? 
+You mean this one "#if 0" ?
+ 
+> This looks more or less like an early work or RFC... because I see
+> things like "#if 0",
 
-... something fails here and you unlock...
+You are right, I will remove it.
 
-> +
-> +	if (psp_ret)
-> +		*psp_ret = reg & PSP_CMDRESP_ERR_MASK;
-> +
-> +	if (reg & PSP_CMDRESP_ERR_MASK) {
-> +		dev_dbg(sev->dev, "sev command %u failed (%#010x)\n",
-> +			cmd, reg & PSP_CMDRESP_ERR_MASK);
-> +		ret = -EIO;
-> +	}
-> +
-> +unlock:
-> +	mutex_unlock(&sev_cmd_mutex);
-> +	print_hex_dump_debug("(out): ", DUMP_PREFIX_OFFSET, 16, 2, data,
-> +			sev_cmd_buffer_len(cmd), false);
-> +	return ret;
+> "HACK" or "CONFIG_....". If so, ask the question
+> about your problems directly. Do not force readers to find them out...
 
-... and here you return psp_ret == 0 even though something failed.
+The problem is in dts there are described
+only AES registers (the range is too small),
+and HASH and PRNG uses the same HASH_CONTROL_1 register 
+(setting SecSS engine).
+Both AES and HASH must use FC control registers for irq
+and flow setting.
 
-What I think you should do is not touch @psp_ret when you return before
-the SEV command executes and *when* you return, set @psp_ret accordingly
-to denote the status of the command execution.
+So this 'hack' prevents using both exynos-prng and s5p-sss HASH,
+and in presence of exynos-prng it will load only s5p-sss aes part.
 
-Or if you're touching it before you execute the SEV
-command and you return early, it should say something like
-PSP_CMDRESP_COMMAND_DIDNT_EXECUTE or so, to tell the caller exactly what
-happened.
+This will disable exynos-prng in scenario:
+
+remove exynos-prng
+remove s5p-sss
+load s5p-sss
+
+now exynos-prng module will not load.
 
 -- 
-Regards/Gruss,
-    Boris.
-
-SUSE Linux GmbH, GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
--- 
+Best regards,
+Kamil Konieczny
+Samsung R&D Institute Poland
