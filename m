@@ -1,53 +1,43 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: [PATCH] crypto: DRBG - fix freeing of resources
-Date: Thu, 14 Sep 2017 17:10:28 +0200
-Message-ID: <5295371.QYDBsUotKj@positron.chronox.de>
+From: Colin King <colin.king@canonical.com>
+Subject: [PATCH] crypto: algboss: remove redundant setting of len to zero
+Date: Thu, 14 Sep 2017 19:02:19 +0100
+Message-ID: <20170914180219.12994-1-colin.king@canonical.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34722 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751131AbdINPKf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 14 Sep 2017 11:10:35 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-During the change to use aligned buffers, the deallocation code path was
-not updated correctly. The current code tries to free the aligned buffer
-pointer and not the original buffer pointer as it is supposed to.
+From: Colin Ian King <colin.king@canonical.com>
 
-Thus, the code is updated to free the original buffer pointer and set
-the aligned buffer pointer that is used throughout the code to NULL.
+The variable len is set to zero, never read and then later updated
+to p - name, so clearly the zero'ing of len is redundant and
+can be removed.
 
-Fixes: 3cfc3b9721123 ("crypto: drbg - use aligned buffers")
-CC: <stable@vger.kernel.org>
-CC: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
+Detected by clang scan-build:
+" warning: Value stored to 'len' is never read"
+
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
 ---
- crypto/drbg.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ crypto/algboss.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/crypto/drbg.c b/crypto/drbg.c
-index 633a88e93ab0..70018397e59a 100644
---- a/crypto/drbg.c
-+++ b/crypto/drbg.c
-@@ -1133,10 +1133,10 @@ static inline void drbg_dealloc_state(struct drbg_state *drbg)
- {
- 	if (!drbg)
- 		return;
--	kzfree(drbg->V);
--	drbg->Vbuf = NULL;
--	kzfree(drbg->C);
--	drbg->Cbuf = NULL;
-+	kzfree(drbg->Vbuf);
-+	drbg->V = NULL;
-+	kzfree(drbg->Cbuf);
-+	drbg->C = NULL;
- 	kzfree(drbg->scratchpadbuf);
- 	drbg->scratchpadbuf = NULL;
- 	drbg->reseed_ctr = 0;
+diff --git a/crypto/algboss.c b/crypto/algboss.c
+index 960d8548171b..5e6df2a087fa 100644
+--- a/crypto/algboss.c
++++ b/crypto/algboss.c
+@@ -122,7 +122,6 @@ static int cryptomgr_schedule_probe(struct crypto_larval *larval)
+ 		int notnum = 0;
+ 
+ 		name = ++p;
+-		len = 0;
+ 
+ 		for (; isalnum(*p) || *p == '-' || *p == '_'; p++)
+ 			notnum |= !isdigit(*p);
 -- 
-2.13.5
+2.14.1
