@@ -1,80 +1,75 @@
-From: Ingo Molnar <mingo@kernel.org>
-Subject: Re: [PATCH 00/12] x86/crypto: Fix RBP usage in several crypto .S
- files
-Date: Fri, 15 Sep 2017 23:06:29 +0200
-Message-ID: <20170915210629.p5tv42za4ux7s2sy@gmail.com>
-References: <20170902000919.GA139193@gmail.com>
- <20170907071534.ztbxvyfoo7m7esmw@gmail.com>
- <20170907175800.GA92996@gmail.com>
- <20170907212646.q3y5wmhyaaqblg5m@gmail.com>
- <20170908175705.GA623@zzz.localdomain>
- <20170913212428.kibwbqs2f7dkeslb@treble>
- <20170913223303.pskmy2v7nto6rvtg@treble>
- <20170915045451.GA26063@zzz.localdomain>
- <20170915053431.xizfyla7lobrwqn3@gmail.com>
- <20170915160732.GA687@zzz.localdomain>
+From: Harsh Jain <Harsh@chelsio.com>
+Subject: DMA error when sg->offset value is greater than PAGE_SIZE in Intel
+ IOMMU
+Date: Sat, 16 Sep 2017 11:41:23 +0530
+Message-ID: <be3bb850-a9f2-61fa-e378-eb44489256e0@chelsio.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Josh Poimboeuf <jpoimboe@redhat.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        Mathias Krause <minipli@googlemail.com>,
-        Chandramouli Narayanan <mouli@linux.intel.com>,
-        Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@google.com>,
-        Andy Lutomirski <luto@kernel.org>, Jiri Slaby <jslaby@suse.cz>
-To: Eric Biggers <ebiggers3@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20170915160732.GA687@zzz.localdomain>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: linux-kernel@vger.kernel.org, leedom@chelsio.com
+To: dwmw2@infradead.org, joro@8bytes.org, linux-crypto@vger.kernel.org,
+        iommu@lists.linux-foundation.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from stargate.chelsio.com ([12.32.117.8]:40491 "EHLO l.chelsio.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751203AbdIPGNW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 16 Sep 2017 02:13:22 -0400
+Content-Language: en-US
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
+
+Hi,
+
+While debugging DMA mapping error in chelsio crypto driver we observed that when scatter/gather list received by driver has some entry with page->offset > 4096 (PAGE_SIZE). It starts giving DMA error.  Without IOMMU it works fine.
+
+Before reaching to chelsio crypto driver(driver/crypto/chelsio) following entities change the sg'
+
+1) IN esp_output() "__skb_to_sgvec()" convert skb frags to scatter gather list. At that moment sg->offset was 4094.
+2) From esp_output control reaches to "crypto_authenc_encrypt()". Here in "scatterwalk_ffwd()" sg->offset become 4110.
+3) Same sg list received by chelsio crypto driver(chcr). When chcr try to do DMA mapping it starts giving DMA errors.
+
+Following error observed. first two prints are added for debugging in chcr. Kernel version used to reproduce is 4.9.28 on x86_64.
+
+Sep 15 12:40:52 heptagon kernel: process_cipher req src ffff8803cb41f0a8
+Sep 15 12:40:52 heptagon kernel: ========= issue    hit offset:4110 ======= dma_addr f24b000e ==> DMA mapped address returned by dma_map_sg()
+
+Sep 15 12:40:52 heptagon kernel: DMAR: DRHD: handling fault status reg 2
+Sep 15 12:40:52 heptagon kernel: DMAR: [DMA Write] Request device [02:00.4] fault addr f24b0000 [fault reason 05] PTE Write access is not set
+
+ By applying following hack in kernel. Things start working.
+
+diff --git a/crypto/scatterwalk.c b/crypto/scatterwalk.c
+index c16c94f8..1d75a3a 100644
+--- a/crypto/scatterwalk.c
++++ b/crypto/scatterwalk.c
+@@ -78,6 +78,8 @@ struct scatterlist *scatterwalk_ffwd(struct scatterlist dst[2]
+                                     struct scatterlist *src,
+                                     unsigned int len)
+ {
++       unsigned int mod_page_offset;
++
+        for (;;) {
+                if (!len)
+                        return src;
+@@ -90,7 +92,9 @@ struct scatterlist *scatterwalk_ffwd(struct scatterlist dst[2]
+        }
+
+        sg_init_table(dst, 2);
+-       sg_set_page(dst, sg_page(src), src->length - len, src->offset + len);
++        mod_page_offset = (src->offset + len) / PAGE_SIZE;
++       sg_set_page(dst, sg_page(src) + mod_page_offset, src->length - len,
++                   (src->offset + len) - (mod_page_offset * PAGE_SIZE));
+        scatterwalk_crypto_chain(dst, sg_next(src), 0, 2);
 
 
-* Eric Biggers <ebiggers3@gmail.com> wrote:
+1) We are not expecting issue in "scatterwalk_ffwd" because it is not the only place where kernel 
+updates src->offset without checking page boundary. similar logic used in "__skb_to_sgvec".
+ 
+2) It cannot be driver's responsibilty to update received sg entries to adjust offset and page 
+because we are not the only one who directly uses received sg list.
 
-> On Fri, Sep 15, 2017 at 07:34:31AM +0200, Ingo Molnar wrote:
-> > 
-> > * Eric Biggers <ebiggers3@gmail.com> wrote:
-> > 
-> > > Hi Josh,
-> > > 
-> > > On Wed, Sep 13, 2017 at 05:33:03PM -0500, Josh Poimboeuf wrote:
-> > > > And here's v2 of the sha512-avx2 patch.  It should hopefully gain back
-> > > > most of the performance lost by v1.
-> > > > 
-> > > > From: Josh Poimboeuf <jpoimboe@redhat.com>
-> > > > Subject: [PATCH] x86/crypto: Fix RBP usage in sha512-avx2-asm.S
-> > > > 
-> > > > Using RBP as a temporary register breaks frame pointer convention and
-> > > > breaks stack traces when unwinding from an interrupt in the crypto code.
-> > > > 
-> > > > Mix things up a little bit to get rid of the RBP usage, without
-> > > > destroying performance.  Use RDI instead of RBP for the TBL pointer.
-> > > > That will clobber CTX, so save CTX on the stack and use RDI as CTX
-> > > > before it gets clobbered, and R12 as CTX after it gets clobbered.
-> > > > 
-> > > > Also remove the unused y4 variable.
-> > > > 
-> > > 
-> > > I tested the v2 patches for both sha256-avx2 and sha512-avx2 on Skylake.  They
-> > > both pass the crypto self-tests, and there was no noticable performance
-> > > difference compared to the unpatched versions.  Thanks!
-> > 
-> > Cool, thanks for review and the testing! Can we add your Tested-by + Acked-by tags 
-> > to the patches?
-> > 
-> 
-> Yes, that's fine for all the patches in the series.
-> 
-> Will these patches go in through the crypto tree or through the x86 tree?
+3) Since Without IOMMU every thing works fine. We are expecting IOMMU bugs.
 
-Indeed, I suspect they should go through the crypto tree, these fixes are 
-independent, they don't depend on anything in the x86 tree.
+Regards
 
-Thanks,
-
-	Ingo
+Harsh Jain
