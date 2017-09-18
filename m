@@ -1,7 +1,7 @@
 From: Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: [PATCH v2 07/12] x86/crypto: Fix RBP usage in sha1_ssse3_asm.S
-Date: Mon, 18 Sep 2017 14:42:06 -0500
-Message-ID: <8b3301f8ec3f8c0e4144d6e5ccafbc006762b4e0.1505763153.git.jpoimboe@redhat.com>
+Subject: [PATCH v2 05/12] x86/crypto: Fix RBP usage in des3_ede-asm_64.S
+Date: Mon, 18 Sep 2017 14:42:04 -0500
+Message-ID: <246442b470d03336cd8b3dc6e26dcb46491768b9.1505763153.git.jpoimboe@redhat.com>
 References: <cover.1505763153.git.jpoimboe@redhat.com>
 Cc: x86@kernel.org, linux-kernel@vger.kernel.org,
         Tim Chen <tim.c.chen@linux.intel.com>,
@@ -20,8 +20,9 @@ List-Id: linux-crypto.vger.kernel.org
 Using RBP as a temporary register breaks frame pointer convention and
 breaks stack traces when unwinding from an interrupt in the crypto code.
 
-Swap the usages of R12 and RBP.  Use R12 for the REG_D register, and use
-RBP to store the pre-aligned stack pointer.
+Use RSI instead of RBP for RT1.  Since RSI is also used as a the 'dst'
+function argument, it needs to be saved on the stack until the argument
+is needed.
 
 Reported-by: Eric Biggers <ebiggers@google.com>
 Reported-by: Peter Zijlstra <peterz@infradead.org>
@@ -29,47 +30,92 @@ Tested-by: Eric Biggers <ebiggers@google.com>
 Acked-by: Eric Biggers <ebiggers@google.com>
 Signed-off-by: Josh Poimboeuf <jpoimboe@redhat.com>
 ---
- arch/x86/crypto/sha1_ssse3_asm.S | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+ arch/x86/crypto/des3_ede-asm_64.S | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/arch/x86/crypto/sha1_ssse3_asm.S b/arch/x86/crypto/sha1_ssse3_asm.S
-index a4109506a5e8..6204bd53528c 100644
---- a/arch/x86/crypto/sha1_ssse3_asm.S
-+++ b/arch/x86/crypto/sha1_ssse3_asm.S
-@@ -37,7 +37,7 @@
- #define REG_A	%ecx
- #define REG_B	%esi
- #define REG_C	%edi
--#define REG_D	%ebp
-+#define REG_D	%r12d
- #define REG_E	%edx
+diff --git a/arch/x86/crypto/des3_ede-asm_64.S b/arch/x86/crypto/des3_ede-asm_64.S
+index f3e91647ca27..8e49ce117494 100644
+--- a/arch/x86/crypto/des3_ede-asm_64.S
++++ b/arch/x86/crypto/des3_ede-asm_64.S
+@@ -64,12 +64,12 @@
+ #define RW2bh %ch
  
- #define REG_T1	%eax
-@@ -74,10 +74,10 @@
- 	ENTRY(\name)
+ #define RT0 %r15
+-#define RT1 %rbp
++#define RT1 %rsi
+ #define RT2 %r14
+ #define RT3 %rdx
  
- 	push	%rbx
--	push	%rbp
- 	push	%r12
-+	push	%rbp
-+	mov	%rsp, %rbp
+ #define RT0d %r15d
+-#define RT1d %ebp
++#define RT1d %esi
+ #define RT2d %r14d
+ #define RT3d %edx
  
--	mov	%rsp, %r12
- 	sub	$64, %rsp		# allocate workspace
- 	and	$~15, %rsp		# align stack
+@@ -177,13 +177,14 @@ ENTRY(des3_ede_x86_64_crypt_blk)
+ 	 *	%rsi: dst
+ 	 *	%rdx: src
+ 	 */
+-	pushq %rbp;
+ 	pushq %rbx;
+ 	pushq %r12;
+ 	pushq %r13;
+ 	pushq %r14;
+ 	pushq %r15;
  
-@@ -99,10 +99,9 @@
- 	xor	%rax, %rax
- 	rep stosq
++	pushq %rsi; /* dst */
++
+ 	read_block(%rdx, RL0, RR0);
+ 	initial_permutation(RL0, RR0);
  
--	mov	%r12, %rsp		# deallocate workspace
--
--	pop	%r12
-+	mov	%rbp, %rsp		# deallocate workspace
- 	pop	%rbp
-+	pop	%r12
- 	pop	%rbx
- 	ret
+@@ -241,6 +242,8 @@ ENTRY(des3_ede_x86_64_crypt_blk)
+ 	round1(32+15, RL0, RR0, dummy2);
  
+ 	final_permutation(RR0, RL0);
++
++	popq %rsi /* dst */
+ 	write_block(%rsi, RR0, RL0);
+ 
+ 	popq %r15;
+@@ -248,7 +251,6 @@ ENTRY(des3_ede_x86_64_crypt_blk)
+ 	popq %r13;
+ 	popq %r12;
+ 	popq %rbx;
+-	popq %rbp;
+ 
+ 	ret;
+ ENDPROC(des3_ede_x86_64_crypt_blk)
+@@ -432,13 +434,14 @@ ENTRY(des3_ede_x86_64_crypt_blk_3way)
+ 	 *	%rdx: src (3 blocks)
+ 	 */
+ 
+-	pushq %rbp;
+ 	pushq %rbx;
+ 	pushq %r12;
+ 	pushq %r13;
+ 	pushq %r14;
+ 	pushq %r15;
+ 
++	pushq %rsi /* dst */
++
+ 	/* load input */
+ 	movl 0 * 4(%rdx), RL0d;
+ 	movl 1 * 4(%rdx), RR0d;
+@@ -520,6 +523,7 @@ ENTRY(des3_ede_x86_64_crypt_blk_3way)
+ 	bswapl RR2d;
+ 	bswapl RL2d;
+ 
++	popq %rsi /* dst */
+ 	movl RR0d, 0 * 4(%rsi);
+ 	movl RL0d, 1 * 4(%rsi);
+ 	movl RR1d, 2 * 4(%rsi);
+@@ -532,7 +536,6 @@ ENTRY(des3_ede_x86_64_crypt_blk_3way)
+ 	popq %r13;
+ 	popq %r12;
+ 	popq %rbx;
+-	popq %rbp;
+ 
+ 	ret;
+ ENDPROC(des3_ede_x86_64_crypt_blk_3way)
 -- 
 2.13.5
