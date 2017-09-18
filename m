@@ -1,55 +1,50 @@
-From: Fabien DESSENNE <fabien.dessenne@st.com>
-Subject: Re: [PATCH v3 0/3] STM32 CRYP crypto driver
-Date: Mon, 18 Sep 2017 09:40:02 +0000
-Message-ID: <7be8c468-2e95-c781-3af3-d411acc80598@st.com>
-References: <1503047946-27799-1-git-send-email-fabien.dessenne@st.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Benjamin GAIGNARD <benjamin.gaignard@st.com>,
-        Lionel DEBIEVE <lionel.debieve@st.com>,
-        Ludovic BARRE <ludovic.barre@st.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre TORGUE <alexandre.torgue@st.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org"
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1503047946-27799-1-git-send-email-fabien.dessenne@st.com>
-Content-Language: en-US
-Content-ID: <8BDBEBD1600EBF48A5C5DAF1F4620718@st.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Subject: [PATCH v3 0/4] crypto: Add driver for JZ4780 PRNG
+Date: Mon, 18 Sep 2017 19:32:37 +0530
+Message-ID: <20170918140241.24003-1-prasannatsmkumar@gmail.com>
+Cc: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+To: herbert@gondor.apana.org.au, robh+dt@kernel.org,
+        ralf@linux-mips.org, davem@davemloft.net, paul@crapouillou.net,
+        linux-crypto@vger.kernel.org, linux-mips@linux-mips.org,
+        malat@debian.org, noloader@gmail.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pg0-f68.google.com ([74.125.83.68]:38680 "EHLO
+        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752150AbdIROD5 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 18 Sep 2017 10:03:57 -0400
+Received: by mail-pg0-f68.google.com with SMTP id m30so289974pgn.5
+        for <linux-crypto@vger.kernel.org>; Mon, 18 Sep 2017 07:03:57 -0700 (PDT)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-SnVzdCBhIGdlbnRsZSBwaW5nIC4uLiBvciBoYXZlIEkgbWlzc2VkIG91dCBvbiBhIHJlcGx5Pw0K
-DQoNCk9uIDE4LzA4LzE3IDExOjE5LCBGYWJpZW4gRGVzc2VubmUgd3JvdGU6DQo+IFRoaXMgc2V0
-IG9mIHBhdGNoZXMgYWRkcyBhIG5ldyBjcnlwdG8gZHJpdmVyIGZvciBTVE1pY3JvZWxlY3Ryb25p
-Y3Mgc3RtMzIgSFcuDQo+IFRoaXMgZHJpdmVycyB1c2VzIHRoZSBjcnlwdG8gQVBJIGFuZCBwcm92
-aWRlcyB3aXRoIEhXLWVuYWJsZWQgQUVBRCBhbmQgYmxvY2sNCj4gY2lwaGVyIGFsZ29yaXRobXMu
-DQo+IEl0IG1ha2VzIHVzZSBvZiB0aGUgY3J5cHRvIGVuZ2luZSB3aGljaCBpcyB1cGdyYWRlZCBp
-biBvcmRlciB0byBzdXBwb3J0IEFFQUQNCj4gcmVxdWVzdHMuDQo+DQo+IFRoaXMgZHJpdmVyIHdh
-cyBzdWNjZXNzZnVsbHkgdGVzdGVkIHdpdGggdGNyeXB0IC8gdGVzdG1nci4NCj4NCj4gQ2hhbmdl
-cyBzaW5jZSB2MzoNCj4gLSB1cGRhdGUgZHQtYmluZGluZ3Mgd2l0aCBSb2IgSGVycmluZyByZW1h
-cmtzDQo+DQo+IENoYW5nZXMgc2luY2UgdjI6DQo+IC0gdXBkYXRlIGR0LWJpbmRpbmdzIChpbnRl
-cnJ1cHRzIGRlc2NyaXB0aW9uKQ0KPiAtIHJlYmFzZSBvbiBTVE0zMiBjcnlwdG8gcGF0Y2hlcyAo
-TC4gRGViaWV2ZSA6IHVwZGF0ZSBDUkMzMiArIGFkZCBIQVNIKQ0KPg0KPiBGYWJpZW4gRGVzc2Vu
-bmUgKDMpOg0KPiAgICBjcnlwdG86IGVuZ2luZSAtIHBlcm1pdCB0byBlbnF1ZXVlIGFlYWRfcmVx
-dWVzdA0KPiAgICBkdC1iaW5kaW5nczogRG9jdW1lbnQgU1RNMzIgQ1JZUCBiaW5kaW5ncw0KPiAg
-ICBjcnlwdG86IHN0bTMyIC0gU3VwcG9ydCBmb3IgU1RNMzIgQ1JZUCBjcnlwdG8gbW9kdWxlDQo+
-DQo+ICAgLi4uL2RldmljZXRyZWUvYmluZGluZ3MvY3J5cHRvL3N0LHN0bTMyLWNyeXAudHh0ICAg
-fCAgIDE5ICsNCj4gICBjcnlwdG8vY3J5cHRvX2VuZ2luZS5jICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICB8ICAxMDEgKw0KPiAgIGRyaXZlcnMvY3J5cHRvL3N0bTMyL0tjb25maWcgICAgICAg
-ICAgICAgICAgICAgICAgIHwgICAgOSArDQo+ICAgZHJpdmVycy9jcnlwdG8vc3RtMzIvTWFrZWZp
-bGUgICAgICAgICAgICAgICAgICAgICAgfCAgICAzICstDQo+ICAgZHJpdmVycy9jcnlwdG8vc3Rt
-MzIvc3RtMzItY3J5cC5jICAgICAgICAgICAgICAgICAgfCAxOTYyICsrKysrKysrKysrKysrKysr
-KysrDQo+ICAgaW5jbHVkZS9jcnlwdG8vZW5naW5lLmggICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgfCAgIDE2ICsNCj4gICA2IGZpbGVzIGNoYW5nZWQsIDIxMDkgaW5zZXJ0aW9ucygrKSwgMSBk
-ZWxldGlvbigtKQ0KPiAgIGNyZWF0ZSBtb2RlIDEwMDY0NCBEb2N1bWVudGF0aW9uL2RldmljZXRy
-ZWUvYmluZGluZ3MvY3J5cHRvL3N0LHN0bTMyLWNyeXAudHh0DQo+ICAgY3JlYXRlIG1vZGUgMTAw
-NjQ0IGRyaXZlcnMvY3J5cHRvL3N0bTMyL3N0bTMyLWNyeXAuYw0KPg0K
+This patch series adds support of pseudo random number generator found
+in Ingenic's JZ4780 and X1000 SoC.
+
+Create cgublock node which has CGU and RNG node as its children. The
+cgublock node uses "simple-bus" compatible which helps in exposing CGU
+and RNG nodes without changing CGU driver. Add 'syscon' compatible in
+CGU node in jz4780.dtsi. The jz4780-rng driver uses regmap exposed via
+syscon interface to access the RNG registers. CGU driver is not
+modified in this patch set as registers used by CGU driver and this
+driver are different.
+
+PrasannaKumar Muralidharan (4):
+  crypto: jz4780-rng: Add JZ4780 PRNG devicetree binding documentation
+  crypto: jz4780-rng: Add Ingenic JZ4780 hardware PRNG driver
+  crypto: jz4780-rng: Add RNG node to jz4780.dtsi
+  crypto: jz4780-rng: Enable PRNG support in CI20 defconfig
+
+ .../devicetree/bindings/rng/ingenic,jz4780-rng.txt |  21 +++
+ MAINTAINERS                                        |   7 +
+ arch/mips/boot/dts/ingenic/jz4780.dtsi             |  25 ++-
+ arch/mips/configs/ci20_defconfig                   |   5 +
+ drivers/crypto/Kconfig                             |  19 ++
+ drivers/crypto/Makefile                            |   1 +
+ drivers/crypto/jz4780-rng.c                        | 193 +++++++++++++++++++++
+ 7 files changed, 266 insertions(+), 5 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/rng/ingenic,jz4780-rng.txt
+ create mode 100644 drivers/crypto/jz4780-rng.c
+
+-- 
+2.10.0
