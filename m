@@ -1,51 +1,64 @@
-From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Subject: [PATCH v3 4/4] crypto: jz4780-rng: Enable PRNG support in CI20 defconfig
-Date: Mon, 18 Sep 2017 19:32:41 +0530
-Message-ID: <20170918140241.24003-5-prasannatsmkumar@gmail.com>
-References: <20170918140241.24003-1-prasannatsmkumar@gmail.com>
-Cc: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-To: herbert@gondor.apana.org.au, robh+dt@kernel.org,
-        ralf@linux-mips.org, davem@davemloft.net, paul@crapouillou.net,
-        linux-crypto@vger.kernel.org, linux-mips@linux-mips.org,
-        malat@debian.org, noloader@gmail.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pg0-f65.google.com ([74.125.83.65]:35824 "EHLO
-        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751704AbdIROEZ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 18 Sep 2017 10:04:25 -0400
-Received: by mail-pg0-f65.google.com with SMTP id j16so296920pga.2
-        for <linux-crypto@vger.kernel.org>; Mon, 18 Sep 2017 07:04:25 -0700 (PDT)
-In-Reply-To: <20170918140241.24003-1-prasannatsmkumar@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Josh Poimboeuf <jpoimboe@redhat.com>
+Subject: [PATCH v2 00/12] x86/crypto: Fix RBP usage in several crypto .S files
+Date: Mon, 18 Sep 2017 14:41:59 -0500
+Message-ID: <cover.1505763153.git.jpoimboe@redhat.com>
+Cc: x86@kernel.org, linux-kernel@vger.kernel.org,
+        Tim Chen <tim.c.chen@linux.intel.com>,
+        Mathias Krause <minipli@googlemail.com>,
+        Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+        Peter Zijlstra <peterz@infradead.org>,
+        linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@google.com>,
+        Andy Lutomirski <luto@kernel.org>, Jiri Slaby <jslaby@suse.cz>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Enable PRNG driver support in MIPS Creator CI20 default config.
+v2:
+- fix performance issues in sha256-avx2-asm.S and sha512-avx2-asm.S
+  (Eric)
 
-Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
----
-No changes in v3
+Many of the x86 crypto functions use RBP as a temporary register.  This
+breaks frame pointer convention, and breaks stack traces when unwinding
+from an interrupt in the crypto code.
 
-No changes in v2
+Convert most* of them to leave RBP alone.
 
- arch/mips/configs/ci20_defconfig | 5 +++++
- 1 file changed, 5 insertions(+)
+These pass the crypto boot tests for me.  Any further testing would be
+appreciated!
 
-diff --git a/arch/mips/configs/ci20_defconfig b/arch/mips/configs/ci20_defconfig
-index b42cfa7..9f48f2c 100644
---- a/arch/mips/configs/ci20_defconfig
-+++ b/arch/mips/configs/ci20_defconfig
-@@ -88,6 +88,11 @@ CONFIG_SERIAL_8250_RUNTIME_UARTS=5
- CONFIG_SERIAL_8250_INGENIC=y
- CONFIG_SERIAL_OF_PLATFORM=y
- # CONFIG_HW_RANDOM is not set
-+CONFIG_CRYPTO_USER=y
-+CONFIG_CRYPTO_USER_API=y
-+CONFIG_CRYPTO_USER_API_RNG=y
-+CONFIG_CRYPTO_HW=y
-+CONFIG_CRYPTO_DEV_JZ4780_RNG=y
- CONFIG_I2C=y
- CONFIG_I2C_JZ4780=y
- CONFIG_GPIO_SYSFS=y
+[*] There are still a few crypto files left that need fixing, but the
+    fixes weren't trivial and nobody reported unwinder warnings about
+    them yet, so I'm skipping them for now.
+
+Josh Poimboeuf (12):
+  x86/crypto: Fix RBP usage in blowfish-x86_64-asm_64.S
+  x86/crypto: Fix RBP usage in camellia-x86_64-asm_64.S
+  x86/crypto: Fix RBP usage in cast5-avx-x86_64-asm_64.S
+  x86/crypto: Fix RBP usage in cast6-avx-x86_64-asm_64.S
+  x86/crypto: Fix RBP usage in des3_ede-asm_64.S
+  x86/crypto: Fix RBP usage in sha1_avx2_x86_64_asm.S
+  x86/crypto: Fix RBP usage in sha1_ssse3_asm.S
+  x86/crypto: Fix RBP usage in sha256-avx-asm.S
+  x86/crypto: Fix RBP usage in sha256-avx2-asm.S
+  x86/crypto: Fix RBP usage in sha256-ssse3-asm.S
+  x86/crypto: Fix RBP usage in sha512-avx2-asm.S
+  x86/crypto: Fix RBP usage in twofish-avx-x86_64-asm_64.S
+
+ arch/x86/crypto/blowfish-x86_64-asm_64.S    | 48 +++++++++---------
+ arch/x86/crypto/camellia-x86_64-asm_64.S    | 26 +++++-----
+ arch/x86/crypto/cast5-avx-x86_64-asm_64.S   | 47 +++++++++++-------
+ arch/x86/crypto/cast6-avx-x86_64-asm_64.S   | 50 +++++++++++++------
+ arch/x86/crypto/des3_ede-asm_64.S           | 15 +++---
+ arch/x86/crypto/sha1_avx2_x86_64_asm.S      |  4 +-
+ arch/x86/crypto/sha1_ssse3_asm.S            | 11 ++---
+ arch/x86/crypto/sha256-avx-asm.S            | 15 +++---
+ arch/x86/crypto/sha256-avx2-asm.S           | 22 +++------
+ arch/x86/crypto/sha256-ssse3-asm.S          | 15 +++---
+ arch/x86/crypto/sha512-avx2-asm.S           | 75 +++++++++++++++--------------
+ arch/x86/crypto/twofish-avx-x86_64-asm_64.S | 12 ++---
+ 12 files changed, 184 insertions(+), 156 deletions(-)
+
 -- 
-2.10.0
+2.13.5
