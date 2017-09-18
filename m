@@ -1,7 +1,8 @@
 From: Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: [PATCH v2 00/12] x86/crypto: Fix RBP usage in several crypto .S files
-Date: Mon, 18 Sep 2017 14:41:59 -0500
-Message-ID: <cover.1505763153.git.jpoimboe@redhat.com>
+Subject: [PATCH v2 06/12] x86/crypto: Fix RBP usage in sha1_avx2_x86_64_asm.S
+Date: Mon, 18 Sep 2017 14:42:05 -0500
+Message-ID: <baa31c30ff580cef019041e431f5cbcd0dc2d1c7.1505763153.git.jpoimboe@redhat.com>
+References: <cover.1505763153.git.jpoimboe@redhat.com>
 Cc: x86@kernel.org, linux-kernel@vger.kernel.org,
         Tim Chen <tim.c.chen@linux.intel.com>,
         Mathias Krause <minipli@googlemail.com>,
@@ -11,54 +12,58 @@ Cc: x86@kernel.org, linux-kernel@vger.kernel.org,
         Andy Lutomirski <luto@kernel.org>, Jiri Slaby <jslaby@suse.cz>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:58800 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750921AbdIRTmo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 18 Sep 2017 15:42:44 -0400
+In-Reply-To: <cover.1505763153.git.jpoimboe@redhat.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-v2:
-- fix performance issues in sha256-avx2-asm.S and sha512-avx2-asm.S
-  (Eric)
+Using RBP as a temporary register breaks frame pointer convention and
+breaks stack traces when unwinding from an interrupt in the crypto code.
 
-Many of the x86 crypto functions use RBP as a temporary register.  This
-breaks frame pointer convention, and breaks stack traces when unwinding
-from an interrupt in the crypto code.
+Use R11 instead of RBP.  Since R11 isn't a callee-saved register, it
+doesn't need to be saved and restored on the stack.
 
-Convert most* of them to leave RBP alone.
+Reported-by: Eric Biggers <ebiggers@google.com>
+Reported-by: Peter Zijlstra <peterz@infradead.org>
+Tested-by: Eric Biggers <ebiggers@google.com>
+Acked-by: Eric Biggers <ebiggers@google.com>
+Signed-off-by: Josh Poimboeuf <jpoimboe@redhat.com>
+---
+ arch/x86/crypto/sha1_avx2_x86_64_asm.S | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-These pass the crypto boot tests for me.  Any further testing would be
-appreciated!
-
-[*] There are still a few crypto files left that need fixing, but the
-    fixes weren't trivial and nobody reported unwinder warnings about
-    them yet, so I'm skipping them for now.
-
-Josh Poimboeuf (12):
-  x86/crypto: Fix RBP usage in blowfish-x86_64-asm_64.S
-  x86/crypto: Fix RBP usage in camellia-x86_64-asm_64.S
-  x86/crypto: Fix RBP usage in cast5-avx-x86_64-asm_64.S
-  x86/crypto: Fix RBP usage in cast6-avx-x86_64-asm_64.S
-  x86/crypto: Fix RBP usage in des3_ede-asm_64.S
-  x86/crypto: Fix RBP usage in sha1_avx2_x86_64_asm.S
-  x86/crypto: Fix RBP usage in sha1_ssse3_asm.S
-  x86/crypto: Fix RBP usage in sha256-avx-asm.S
-  x86/crypto: Fix RBP usage in sha256-avx2-asm.S
-  x86/crypto: Fix RBP usage in sha256-ssse3-asm.S
-  x86/crypto: Fix RBP usage in sha512-avx2-asm.S
-  x86/crypto: Fix RBP usage in twofish-avx-x86_64-asm_64.S
-
- arch/x86/crypto/blowfish-x86_64-asm_64.S    | 48 +++++++++---------
- arch/x86/crypto/camellia-x86_64-asm_64.S    | 26 +++++-----
- arch/x86/crypto/cast5-avx-x86_64-asm_64.S   | 47 +++++++++++-------
- arch/x86/crypto/cast6-avx-x86_64-asm_64.S   | 50 +++++++++++++------
- arch/x86/crypto/des3_ede-asm_64.S           | 15 +++---
- arch/x86/crypto/sha1_avx2_x86_64_asm.S      |  4 +-
- arch/x86/crypto/sha1_ssse3_asm.S            | 11 ++---
- arch/x86/crypto/sha256-avx-asm.S            | 15 +++---
- arch/x86/crypto/sha256-avx2-asm.S           | 22 +++------
- arch/x86/crypto/sha256-ssse3-asm.S          | 15 +++---
- arch/x86/crypto/sha512-avx2-asm.S           | 75 +++++++++++++++--------------
- arch/x86/crypto/twofish-avx-x86_64-asm_64.S | 12 ++---
- 12 files changed, 184 insertions(+), 156 deletions(-)
-
+diff --git a/arch/x86/crypto/sha1_avx2_x86_64_asm.S b/arch/x86/crypto/sha1_avx2_x86_64_asm.S
+index 1eab79c9ac48..9f712a7dfd79 100644
+--- a/arch/x86/crypto/sha1_avx2_x86_64_asm.S
++++ b/arch/x86/crypto/sha1_avx2_x86_64_asm.S
+@@ -89,7 +89,7 @@
+ #define	REG_RE	%rdx
+ #define	REG_RTA	%r12
+ #define	REG_RTB	%rbx
+-#define	REG_T1	%ebp
++#define	REG_T1	%r11d
+ #define	xmm_mov	vmovups
+ #define	avx2_zeroupper	vzeroupper
+ #define	RND_F1	1
+@@ -637,7 +637,6 @@ _loop3:
+ 	ENTRY(\name)
+ 
+ 	push	%rbx
+-	push	%rbp
+ 	push	%r12
+ 	push	%r13
+ 	push	%r14
+@@ -673,7 +672,6 @@ _loop3:
+ 	pop	%r14
+ 	pop	%r13
+ 	pop	%r12
+-	pop	%rbp
+ 	pop	%rbx
+ 
+ 	ret
 -- 
 2.13.5
