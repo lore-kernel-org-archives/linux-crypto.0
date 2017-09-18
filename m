@@ -1,7 +1,7 @@
 From: Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: [PATCH v2 09/12] x86/crypto: Fix RBP usage in sha256-avx2-asm.S
-Date: Mon, 18 Sep 2017 14:42:08 -0500
-Message-ID: <cf0e07a74068e8a2e19d22be2af98d10084aa6b5.1505763153.git.jpoimboe@redhat.com>
+Subject: [PATCH v2 07/12] x86/crypto: Fix RBP usage in sha1_ssse3_asm.S
+Date: Mon, 18 Sep 2017 14:42:06 -0500
+Message-ID: <8b3301f8ec3f8c0e4144d6e5ccafbc006762b4e0.1505763153.git.jpoimboe@redhat.com>
 References: <cover.1505763153.git.jpoimboe@redhat.com>
 Cc: x86@kernel.org, linux-kernel@vger.kernel.org,
         Tim Chen <tim.c.chen@linux.intel.com>,
@@ -20,9 +20,8 @@ List-Id: linux-crypto.vger.kernel.org
 Using RBP as a temporary register breaks frame pointer convention and
 breaks stack traces when unwinding from an interrupt in the crypto code.
 
-There's no need to use RBP as a temporary register for the TBL value,
-because it always stores the same value: the address of the K256 table.
-Instead just reference the address of K256 directly.
+Swap the usages of R12 and RBP.  Use R12 for the REG_D register, and use
+RBP to store the pre-aligned stack pointer.
 
 Reported-by: Eric Biggers <ebiggers@google.com>
 Reported-by: Peter Zijlstra <peterz@infradead.org>
@@ -30,94 +29,47 @@ Tested-by: Eric Biggers <ebiggers@google.com>
 Acked-by: Eric Biggers <ebiggers@google.com>
 Signed-off-by: Josh Poimboeuf <jpoimboe@redhat.com>
 ---
- arch/x86/crypto/sha256-avx2-asm.S | 22 +++++++---------------
- 1 file changed, 7 insertions(+), 15 deletions(-)
+ arch/x86/crypto/sha1_ssse3_asm.S | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
-diff --git a/arch/x86/crypto/sha256-avx2-asm.S b/arch/x86/crypto/sha256-avx2-asm.S
-index 89c8f09787d2..1420db15dcdd 100644
---- a/arch/x86/crypto/sha256-avx2-asm.S
-+++ b/arch/x86/crypto/sha256-avx2-asm.S
-@@ -98,8 +98,6 @@ d	= %r8d
- e       = %edx	# clobbers NUM_BLKS
- y3	= %esi	# clobbers INP
+diff --git a/arch/x86/crypto/sha1_ssse3_asm.S b/arch/x86/crypto/sha1_ssse3_asm.S
+index a4109506a5e8..6204bd53528c 100644
+--- a/arch/x86/crypto/sha1_ssse3_asm.S
++++ b/arch/x86/crypto/sha1_ssse3_asm.S
+@@ -37,7 +37,7 @@
+ #define REG_A	%ecx
+ #define REG_B	%esi
+ #define REG_C	%edi
+-#define REG_D	%ebp
++#define REG_D	%r12d
+ #define REG_E	%edx
  
+ #define REG_T1	%eax
+@@ -74,10 +74,10 @@
+ 	ENTRY(\name)
+ 
+ 	push	%rbx
+-	push	%rbp
+ 	push	%r12
++	push	%rbp
++	mov	%rsp, %rbp
+ 
+-	mov	%rsp, %r12
+ 	sub	$64, %rsp		# allocate workspace
+ 	and	$~15, %rsp		# align stack
+ 
+@@ -99,10 +99,9 @@
+ 	xor	%rax, %rax
+ 	rep stosq
+ 
+-	mov	%r12, %rsp		# deallocate workspace
 -
--TBL	= %rbp
- SRND	= CTX	# SRND is same register as CTX
- 
- a = %eax
-@@ -531,7 +529,6 @@ STACK_SIZE	= _RSP      + _RSP_SIZE
- ENTRY(sha256_transform_rorx)
- .align 32
- 	pushq	%rbx
--	pushq	%rbp
- 	pushq	%r12
- 	pushq	%r13
- 	pushq	%r14
-@@ -568,8 +565,6 @@ ENTRY(sha256_transform_rorx)
- 	mov	CTX, _CTX(%rsp)
- 
- loop0:
--	lea     K256(%rip), TBL
--
- 	## Load first 16 dwords from two blocks
- 	VMOVDQ	0*32(INP),XTMP0
- 	VMOVDQ	1*32(INP),XTMP1
-@@ -597,19 +592,19 @@ last_block_enter:
- 
- .align 16
- loop1:
--	vpaddd	0*32(TBL, SRND), X0, XFER
-+	vpaddd	K256+0*32(SRND), X0, XFER
- 	vmovdqa XFER, 0*32+_XFER(%rsp, SRND)
- 	FOUR_ROUNDS_AND_SCHED	_XFER + 0*32
- 
--	vpaddd	1*32(TBL, SRND), X0, XFER
-+	vpaddd	K256+1*32(SRND), X0, XFER
- 	vmovdqa XFER, 1*32+_XFER(%rsp, SRND)
- 	FOUR_ROUNDS_AND_SCHED	_XFER + 1*32
- 
--	vpaddd	2*32(TBL, SRND), X0, XFER
-+	vpaddd	K256+2*32(SRND), X0, XFER
- 	vmovdqa XFER, 2*32+_XFER(%rsp, SRND)
- 	FOUR_ROUNDS_AND_SCHED	_XFER + 2*32
- 
--	vpaddd	3*32(TBL, SRND), X0, XFER
-+	vpaddd	K256+3*32(SRND), X0, XFER
- 	vmovdqa XFER, 3*32+_XFER(%rsp, SRND)
- 	FOUR_ROUNDS_AND_SCHED	_XFER + 3*32
- 
-@@ -619,10 +614,11 @@ loop1:
- 
- loop2:
- 	## Do last 16 rounds with no scheduling
--	vpaddd	0*32(TBL, SRND), X0, XFER
-+	vpaddd	K256+0*32(SRND), X0, XFER
- 	vmovdqa XFER, 0*32+_XFER(%rsp, SRND)
- 	DO_4ROUNDS	_XFER + 0*32
--	vpaddd	1*32(TBL, SRND), X1, XFER
-+
-+	vpaddd	K256+1*32(SRND), X1, XFER
- 	vmovdqa XFER, 1*32+_XFER(%rsp, SRND)
- 	DO_4ROUNDS	_XFER + 1*32
- 	add	$2*32, SRND
-@@ -676,9 +672,6 @@ loop3:
- 	ja	done_hash
- 
- do_last_block:
--	#### do last block
--	lea	K256(%rip), TBL
--
- 	VMOVDQ	0*16(INP),XWORD0
- 	VMOVDQ	1*16(INP),XWORD1
- 	VMOVDQ	2*16(INP),XWORD2
-@@ -718,7 +711,6 @@ done_hash:
- 	popq	%r14
- 	popq	%r13
- 	popq	%r12
--	popq	%rbp
- 	popq	%rbx
+-	pop	%r12
++	mov	%rbp, %rsp		# deallocate workspace
+ 	pop	%rbp
++	pop	%r12
+ 	pop	%rbx
  	ret
- ENDPROC(sha256_transform_rorx)
+ 
 -- 
 2.13.5
