@@ -1,7 +1,7 @@
 From: Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: [PATCH v2 08/12] x86/crypto: Fix RBP usage in sha256-avx-asm.S
-Date: Mon, 18 Sep 2017 14:42:07 -0500
-Message-ID: <a95a7b819d884ef938be2438191824e8335edffe.1505763153.git.jpoimboe@redhat.com>
+Subject: [PATCH v2 11/12] x86/crypto: Fix RBP usage in sha512-avx2-asm.S
+Date: Mon, 18 Sep 2017 14:42:10 -0500
+Message-ID: <6922e04bbca0031dd045c5ad2f1f964c4b1897c4.1505763153.git.jpoimboe@redhat.com>
 References: <cover.1505763153.git.jpoimboe@redhat.com>
 Cc: x86@kernel.org, linux-kernel@vger.kernel.org,
         Tim Chen <tim.c.chen@linux.intel.com>,
@@ -12,72 +12,177 @@ Cc: x86@kernel.org, linux-kernel@vger.kernel.org,
         Andy Lutomirski <luto@kernel.org>, Jiri Slaby <jslaby@suse.cz>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:49664 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751544AbdIRTmw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 18 Sep 2017 15:42:52 -0400
 In-Reply-To: <cover.1505763153.git.jpoimboe@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 Using RBP as a temporary register breaks frame pointer convention and
 breaks stack traces when unwinding from an interrupt in the crypto code.
 
-Swap the usages of R12 and RBP.  Use R12 for the TBL register, and use
-RBP to store the pre-aligned stack pointer.
+Mix things up a little bit to get rid of the RBP usage, without hurting
+performance too much.  Use RDI instead of RBP for the TBL pointer.  That
+will clobber CTX, so spill CTX onto the stack and use R12 to read it in
+the outer loop.  R12 is used as a non-persistent temporary variable
+elsewhere, so it's safe to use.
 
-Reported-by: Eric Biggers <ebiggers@google.com>
+Also remove the unused y4 variable.
+
+Reported-by: Eric Biggers <ebiggers3@gmail.com>
 Reported-by: Peter Zijlstra <peterz@infradead.org>
 Tested-by: Eric Biggers <ebiggers@google.com>
 Acked-by: Eric Biggers <ebiggers@google.com>
 Signed-off-by: Josh Poimboeuf <jpoimboe@redhat.com>
 ---
- arch/x86/crypto/sha256-avx-asm.S | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
+ arch/x86/crypto/sha512-avx2-asm.S | 75 ++++++++++++++++++++-------------------
+ 1 file changed, 39 insertions(+), 36 deletions(-)
 
-diff --git a/arch/x86/crypto/sha256-avx-asm.S b/arch/x86/crypto/sha256-avx-asm.S
-index e08888a1a5f2..001bbcf93c79 100644
---- a/arch/x86/crypto/sha256-avx-asm.S
-+++ b/arch/x86/crypto/sha256-avx-asm.S
-@@ -103,7 +103,7 @@ SRND = %rsi       # clobbers INP
- c = %ecx
- d = %r8d
- e = %edx
--TBL = %rbp
-+TBL = %r12
- a = %eax
- b = %ebx
+diff --git a/arch/x86/crypto/sha512-avx2-asm.S b/arch/x86/crypto/sha512-avx2-asm.S
+index 7f5f6c6ec72e..b16d56005162 100644
+--- a/arch/x86/crypto/sha512-avx2-asm.S
++++ b/arch/x86/crypto/sha512-avx2-asm.S
+@@ -69,8 +69,9 @@ XFER  = YTMP0
  
-@@ -350,13 +350,13 @@ a = TMP_
- ENTRY(sha256_transform_avx)
- .align 32
- 	pushq   %rbx
--	pushq   %rbp
-+	pushq   %r12
- 	pushq   %r13
- 	pushq   %r14
- 	pushq   %r15
--	pushq   %r12
-+	pushq	%rbp
-+	movq	%rsp, %rbp
+ BYTE_FLIP_MASK  = %ymm9
  
--	mov	%rsp, %r12
- 	subq    $STACK_SIZE, %rsp	# allocate stack space
- 	and	$~15, %rsp		# align stack pointer
+-# 1st arg
+-CTX         = %rdi
++# 1st arg is %rdi, which is saved to the stack and accessed later via %r12
++CTX1        = %rdi
++CTX2        = %r12
+ # 2nd arg
+ INP         = %rsi
+ # 3rd arg
+@@ -81,7 +82,7 @@ d           = %r8
+ e           = %rdx
+ y3          = %rsi
  
-@@ -452,13 +452,12 @@ loop2:
+-TBL   = %rbp
++TBL   = %rdi # clobbers CTX1
  
+ a     = %rax
+ b     = %rbx
+@@ -91,26 +92,26 @@ g     = %r10
+ h     = %r11
+ old_h = %r11
+ 
+-T1    = %r12
++T1    = %r12 # clobbers CTX2
+ y0    = %r13
+ y1    = %r14
+ y2    = %r15
+ 
+-y4    = %r12
+-
+ # Local variables (stack frame)
+ XFER_SIZE = 4*8
+ SRND_SIZE = 1*8
+ INP_SIZE = 1*8
+ INPEND_SIZE = 1*8
++CTX_SIZE = 1*8
+ RSPSAVE_SIZE = 1*8
+-GPRSAVE_SIZE = 6*8
++GPRSAVE_SIZE = 5*8
+ 
+ frame_XFER = 0
+ frame_SRND = frame_XFER + XFER_SIZE
+ frame_INP = frame_SRND + SRND_SIZE
+ frame_INPEND = frame_INP + INP_SIZE
+-frame_RSPSAVE = frame_INPEND + INPEND_SIZE
++frame_CTX = frame_INPEND + INPEND_SIZE
++frame_RSPSAVE = frame_CTX + CTX_SIZE
+ frame_GPRSAVE = frame_RSPSAVE + RSPSAVE_SIZE
+ frame_size = frame_GPRSAVE + GPRSAVE_SIZE
+ 
+@@ -576,12 +577,11 @@ ENTRY(sha512_transform_rorx)
+ 	mov	%rax, frame_RSPSAVE(%rsp)
+ 
+ 	# Save GPRs
+-	mov	%rbp, frame_GPRSAVE(%rsp)
+-	mov	%rbx, 8*1+frame_GPRSAVE(%rsp)
+-	mov	%r12, 8*2+frame_GPRSAVE(%rsp)
+-	mov	%r13, 8*3+frame_GPRSAVE(%rsp)
+-	mov	%r14, 8*4+frame_GPRSAVE(%rsp)
+-	mov	%r15, 8*5+frame_GPRSAVE(%rsp)
++	mov	%rbx, 8*0+frame_GPRSAVE(%rsp)
++	mov	%r12, 8*1+frame_GPRSAVE(%rsp)
++	mov	%r13, 8*2+frame_GPRSAVE(%rsp)
++	mov	%r14, 8*3+frame_GPRSAVE(%rsp)
++	mov	%r15, 8*4+frame_GPRSAVE(%rsp)
+ 
+ 	shl	$7, NUM_BLKS	# convert to bytes
+ 	jz	done_hash
+@@ -589,14 +589,17 @@ ENTRY(sha512_transform_rorx)
+ 	mov	NUM_BLKS, frame_INPEND(%rsp)
+ 
+ 	## load initial digest
+-	mov	8*0(CTX),a
+-	mov	8*1(CTX),b
+-	mov	8*2(CTX),c
+-	mov	8*3(CTX),d
+-	mov	8*4(CTX),e
+-	mov	8*5(CTX),f
+-	mov	8*6(CTX),g
+-	mov	8*7(CTX),h
++	mov	8*0(CTX1), a
++	mov	8*1(CTX1), b
++	mov	8*2(CTX1), c
++	mov	8*3(CTX1), d
++	mov	8*4(CTX1), e
++	mov	8*5(CTX1), f
++	mov	8*6(CTX1), g
++	mov	8*7(CTX1), h
++
++	# save %rdi (CTX) before it gets clobbered
++	mov	%rdi, frame_CTX(%rsp)
+ 
+ 	vmovdqa	PSHUFFLE_BYTE_FLIP_MASK(%rip), BYTE_FLIP_MASK
+ 
+@@ -652,14 +655,15 @@ loop2:
+ 	subq	$1, frame_SRND(%rsp)
+ 	jne	loop2
+ 
+-	addm	8*0(CTX),a
+-	addm	8*1(CTX),b
+-	addm	8*2(CTX),c
+-	addm	8*3(CTX),d
+-	addm	8*4(CTX),e
+-	addm	8*5(CTX),f
+-	addm	8*6(CTX),g
+-	addm	8*7(CTX),h
++	mov	frame_CTX(%rsp), CTX2
++	addm	8*0(CTX2), a
++	addm	8*1(CTX2), b
++	addm	8*2(CTX2), c
++	addm	8*3(CTX2), d
++	addm	8*4(CTX2), e
++	addm	8*5(CTX2), f
++	addm	8*6(CTX2), g
++	addm	8*7(CTX2), h
+ 
+ 	mov	frame_INP(%rsp), INP
+ 	add	$128, INP
+@@ -669,12 +673,11 @@ loop2:
  done_hash:
  
--	mov	%r12, %rsp
--
--	popq	%r12
-+	mov	%rbp, %rsp
-+	popq	%rbp
- 	popq    %r15
- 	popq    %r14
- 	popq    %r13
--	popq    %rbp
-+	popq	%r12
- 	popq    %rbx
- 	ret
- ENDPROC(sha256_transform_avx)
+ # Restore GPRs
+-	mov	frame_GPRSAVE(%rsp)     ,%rbp
+-	mov	8*1+frame_GPRSAVE(%rsp) ,%rbx
+-	mov	8*2+frame_GPRSAVE(%rsp) ,%r12
+-	mov	8*3+frame_GPRSAVE(%rsp) ,%r13
+-	mov	8*4+frame_GPRSAVE(%rsp) ,%r14
+-	mov	8*5+frame_GPRSAVE(%rsp) ,%r15
++	mov	8*0+frame_GPRSAVE(%rsp), %rbx
++	mov	8*1+frame_GPRSAVE(%rsp), %r12
++	mov	8*2+frame_GPRSAVE(%rsp), %r13
++	mov	8*3+frame_GPRSAVE(%rsp), %r14
++	mov	8*4+frame_GPRSAVE(%rsp), %r15
+ 
+ 	# Restore Stack Pointer
+ 	mov	frame_RSPSAVE(%rsp), %rsp
 -- 
 2.13.5
