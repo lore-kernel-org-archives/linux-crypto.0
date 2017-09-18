@@ -1,8 +1,11 @@
 From: Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: [PATCH v2 02/12] x86/crypto: Fix RBP usage in camellia-x86_64-asm_64.S
-Date: Mon, 18 Sep 2017 14:42:01 -0500
-Message-ID: <c280894dc815d06a81f8ab625a73717d4d6fa6c1.1505763153.git.jpoimboe@redhat.com>
+Subject: [PATCH v2 04/12] x86/crypto: Fix RBP usage in cast6-avx-x86_64-asm_64.S
+Date: Mon, 18 Sep 2017 14:42:03 -0500
+Message-ID: <5aaab409603914306efa2529cb414116c76d863f.1505763153.git.jpoimboe@redhat.com>
 References: <cover.1505763153.git.jpoimboe@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Cc: x86@kernel.org, linux-kernel@vger.kernel.org,
         Tim Chen <tim.c.chen@linux.intel.com>,
         Mathias Krause <minipli@googlemail.com>,
@@ -20,8 +23,10 @@ List-Id: linux-crypto.vger.kernel.org
 Using RBP as a temporary register breaks frame pointer convention and
 breaks stack traces when unwinding from an interrupt in the crypto code.
 
-Use R12 instead of RBP.  Both are callee-saved registers, so the
-substitution is straightforward.
+Use R15 instead of RBP.  R15 can't be used as the RID1 register because
+of x86 instruction encoding limitations.  So use R15 for CTX and RDI for
+CTX.  This means that CTX is no longer an implicit function argument.
+Instead it needs to be explicitly copied from RDI.
 
 Reported-by: Eric Biggers <ebiggers@google.com>
 Reported-by: Peter Zijlstra <peterz@infradead.org>
@@ -29,120 +34,222 @@ Tested-by: Eric Biggers <ebiggers@google.com>
 Acked-by: Eric Biggers <ebiggers@google.com>
 Signed-off-by: Josh Poimboeuf <jpoimboe@redhat.com>
 ---
- arch/x86/crypto/camellia-x86_64-asm_64.S | 26 +++++++++++++-------------
- 1 file changed, 13 insertions(+), 13 deletions(-)
+ arch/x86/crypto/cast6-avx-x86_64-asm_64.S | 50 +++++++++++++++++++++----------
+ 1 file changed, 34 insertions(+), 16 deletions(-)
 
-diff --git a/arch/x86/crypto/camellia-x86_64-asm_64.S b/arch/x86/crypto/camellia-x86_64-asm_64.S
-index 310319c601ed..95ba6956a7f6 100644
---- a/arch/x86/crypto/camellia-x86_64-asm_64.S
-+++ b/arch/x86/crypto/camellia-x86_64-asm_64.S
-@@ -75,17 +75,17 @@
- #define RCD1bh %dh
+diff --git a/arch/x86/crypto/cast6-avx-x86_64-asm_64.S b/arch/x86/crypto/cast6-avx-x86_64-asm_64.S
+index 952d3156a933..7f30b6f0d72c 100644
+--- a/arch/x86/crypto/cast6-avx-x86_64-asm_64.S
++++ b/arch/x86/crypto/cast6-avx-x86_64-asm_64.S
+@@ -47,7 +47,7 @@
+ /**********************************************************************
+   8-way AVX cast6
+  **********************************************************************/
+-#define CTX %rdi
++#define CTX %r15
  
- #define RT0 %rsi
--#define RT1 %rbp
-+#define RT1 %r12
- #define RT2 %r8
+ #define RA1 %xmm0
+ #define RB1 %xmm1
+@@ -70,8 +70,8 @@
  
- #define RT0d %esi
--#define RT1d %ebp
-+#define RT1d %r12d
- #define RT2d %r8d
+ #define RTMP %xmm15
  
- #define RT2bl %r8b
+-#define RID1  %rbp
+-#define RID1d %ebp
++#define RID1  %rdi
++#define RID1d %edi
+ #define RID2  %rsi
+ #define RID2d %esi
  
- #define RXOR %r9
--#define RRBP %r10
-+#define RR12 %r10
- #define RDST %r11
- 
- #define RXORd %r9d
-@@ -197,7 +197,7 @@ ENTRY(__camellia_enc_blk)
- 	 *	%rdx: src
- 	 *	%rcx: bool xor
+@@ -264,15 +264,17 @@
+ .align 8
+ __cast6_enc_blk8:
+ 	/* input:
+-	 *	%rdi: ctx, CTX
++	 *	%rdi: ctx
+ 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: blocks
+ 	 * output:
+ 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: encrypted blocks
  	 */
--	movq %rbp, RRBP;
-+	movq %r12, RR12;
  
- 	movq %rcx, RXOR;
- 	movq %rsi, RDST;
-@@ -227,13 +227,13 @@ ENTRY(__camellia_enc_blk)
- 
- 	enc_outunpack(mov, RT1);
- 
--	movq RRBP, %rbp;
-+	movq RR12, %r12;
- 	ret;
- 
- .L__enc_xor:
- 	enc_outunpack(xor, RT1);
- 
--	movq RRBP, %rbp;
-+	movq RR12, %r12;
- 	ret;
- ENDPROC(__camellia_enc_blk)
- 
-@@ -248,7 +248,7 @@ ENTRY(camellia_dec_blk)
- 	movl $24, RXORd;
- 	cmovel RXORd, RT2d; /* max */
- 
--	movq %rbp, RRBP;
-+	movq %r12, RR12;
- 	movq %rsi, RDST;
- 	movq %rdx, RIO;
- 
-@@ -271,7 +271,7 @@ ENTRY(camellia_dec_blk)
- 
- 	dec_outunpack();
- 
--	movq RRBP, %rbp;
-+	movq RR12, %r12;
- 	ret;
- ENDPROC(camellia_dec_blk)
- 
-@@ -433,7 +433,7 @@ ENTRY(__camellia_enc_blk_2way)
- 	 */
+-	pushq %rbp;
++	pushq %r15;
  	pushq %rbx;
  
--	movq %rbp, RRBP;
-+	movq %r12, RR12;
- 	movq %rcx, RXOR;
- 	movq %rsi, RDST;
- 	movq %rdx, RIO;
-@@ -461,14 +461,14 @@ ENTRY(__camellia_enc_blk_2way)
++	movq %rdi, CTX;
++
+ 	vmovdqa .Lbswap_mask, RKM;
+ 	vmovd .Lfirst_mask, R1ST;
+ 	vmovd .L32_mask, R32;
+@@ -297,7 +299,7 @@ __cast6_enc_blk8:
+ 	QBAR(11);
  
- 	enc_outunpack2(mov, RT2);
- 
--	movq RRBP, %rbp;
-+	movq RR12, %r12;
  	popq %rbx;
- 	ret;
+-	popq %rbp;
++	popq %r15;
  
- .L__enc2_xor:
- 	enc_outunpack2(xor, RT2);
+ 	vmovdqa .Lbswap_mask, RKM;
  
--	movq RRBP, %rbp;
-+	movq RR12, %r12;
+@@ -310,15 +312,17 @@ ENDPROC(__cast6_enc_blk8)
+ .align 8
+ __cast6_dec_blk8:
+ 	/* input:
+-	 *	%rdi: ctx, CTX
++	 *	%rdi: ctx
+ 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: encrypted blocks
+ 	 * output:
+ 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: decrypted blocks
+ 	 */
+ 
+-	pushq %rbp;
++	pushq %r15;
+ 	pushq %rbx;
+ 
++	movq %rdi, CTX;
++
+ 	vmovdqa .Lbswap_mask, RKM;
+ 	vmovd .Lfirst_mask, R1ST;
+ 	vmovd .L32_mask, R32;
+@@ -343,7 +347,7 @@ __cast6_dec_blk8:
+ 	QBAR(0);
+ 
  	popq %rbx;
+-	popq %rbp;
++	popq %r15;
+ 
+ 	vmovdqa .Lbswap_mask, RKM;
+ 	outunpack_blocks(RA1, RB1, RC1, RD1, RTMP, RX, RKRF, RKM);
+@@ -354,12 +358,14 @@ ENDPROC(__cast6_dec_blk8)
+ 
+ ENTRY(cast6_ecb_enc_8way)
+ 	/* input:
+-	 *	%rdi: ctx, CTX
++	 *	%rdi: ctx
+ 	 *	%rsi: dst
+ 	 *	%rdx: src
+ 	 */
+ 	FRAME_BEGIN
++	pushq %r15;
+ 
++	movq %rdi, CTX;
+ 	movq %rsi, %r11;
+ 
+ 	load_8way(%rdx, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
+@@ -368,18 +374,21 @@ ENTRY(cast6_ecb_enc_8way)
+ 
+ 	store_8way(%r11, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
+ 
++	popq %r15;
+ 	FRAME_END
  	ret;
- ENDPROC(__camellia_enc_blk_2way)
-@@ -485,7 +485,7 @@ ENTRY(camellia_dec_blk_2way)
- 	cmovel RXORd, RT2d; /* max */
+ ENDPROC(cast6_ecb_enc_8way)
  
- 	movq %rbx, RXOR;
--	movq %rbp, RRBP;
-+	movq %r12, RR12;
- 	movq %rsi, RDST;
- 	movq %rdx, RIO;
+ ENTRY(cast6_ecb_dec_8way)
+ 	/* input:
+-	 *	%rdi: ctx, CTX
++	 *	%rdi: ctx
+ 	 *	%rsi: dst
+ 	 *	%rdx: src
+ 	 */
+ 	FRAME_BEGIN
++	pushq %r15;
  
-@@ -508,7 +508,7 @@ ENTRY(camellia_dec_blk_2way)
++	movq %rdi, CTX;
+ 	movq %rsi, %r11;
  
- 	dec_outunpack2();
+ 	load_8way(%rdx, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
+@@ -388,20 +397,22 @@ ENTRY(cast6_ecb_dec_8way)
  
--	movq RRBP, %rbp;
-+	movq RR12, %r12;
- 	movq RXOR, %rbx;
+ 	store_8way(%r11, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
+ 
++	popq %r15;
+ 	FRAME_END
  	ret;
- ENDPROC(camellia_dec_blk_2way)
+ ENDPROC(cast6_ecb_dec_8way)
+ 
+ ENTRY(cast6_cbc_dec_8way)
+ 	/* input:
+-	 *	%rdi: ctx, CTX
++	 *	%rdi: ctx
+ 	 *	%rsi: dst
+ 	 *	%rdx: src
+ 	 */
+ 	FRAME_BEGIN
+-
+ 	pushq %r12;
++	pushq %r15;
+ 
++	movq %rdi, CTX;
+ 	movq %rsi, %r11;
+ 	movq %rdx, %r12;
+ 
+@@ -411,8 +422,8 @@ ENTRY(cast6_cbc_dec_8way)
+ 
+ 	store_cbc_8way(%r12, %r11, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
+ 
++	popq %r15;
+ 	popq %r12;
+-
+ 	FRAME_END
+ 	ret;
+ ENDPROC(cast6_cbc_dec_8way)
+@@ -425,9 +436,10 @@ ENTRY(cast6_ctr_8way)
+ 	 *	%rcx: iv (little endian, 128bit)
+ 	 */
+ 	FRAME_BEGIN
+-
+ 	pushq %r12;
++	pushq %r15
+ 
++	movq %rdi, CTX;
+ 	movq %rsi, %r11;
+ 	movq %rdx, %r12;
+ 
+@@ -438,8 +450,8 @@ ENTRY(cast6_ctr_8way)
+ 
+ 	store_ctr_8way(%r12, %r11, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
+ 
++	popq %r15;
+ 	popq %r12;
+-
+ 	FRAME_END
+ 	ret;
+ ENDPROC(cast6_ctr_8way)
+@@ -452,7 +464,9 @@ ENTRY(cast6_xts_enc_8way)
+ 	 *	%rcx: iv (t ⊕ αⁿ ∈ GF(2¹²⁸))
+ 	 */
+ 	FRAME_BEGIN
++	pushq %r15;
+ 
++	movq %rdi, CTX
+ 	movq %rsi, %r11;
+ 
+ 	/* regs <= src, dst <= IVs, regs <= regs xor IVs */
+@@ -464,6 +478,7 @@ ENTRY(cast6_xts_enc_8way)
+ 	/* dst <= regs xor IVs(in dst) */
+ 	store_xts_8way(%r11, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
+ 
++	popq %r15;
+ 	FRAME_END
+ 	ret;
+ ENDPROC(cast6_xts_enc_8way)
+@@ -476,7 +491,9 @@ ENTRY(cast6_xts_dec_8way)
+ 	 *	%rcx: iv (t ⊕ αⁿ ∈ GF(2¹²⁸))
+ 	 */
+ 	FRAME_BEGIN
++	pushq %r15;
+ 
++	movq %rdi, CTX
+ 	movq %rsi, %r11;
+ 
+ 	/* regs <= src, dst <= IVs, regs <= regs xor IVs */
+@@ -488,6 +505,7 @@ ENTRY(cast6_xts_dec_8way)
+ 	/* dst <= regs xor IVs(in dst) */
+ 	store_xts_8way(%r11, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
+ 
++	popq %r15;
+ 	FRAME_END
+ 	ret;
+ ENDPROC(cast6_xts_dec_8way)
 -- 
 2.13.5
