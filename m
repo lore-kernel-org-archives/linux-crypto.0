@@ -1,7 +1,7 @@
 From: Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: [PATCH v2 10/12] x86/crypto: Fix RBP usage in sha256-ssse3-asm.S
-Date: Mon, 18 Sep 2017 14:42:09 -0500
-Message-ID: <b22b10e48bd5a0132f7918b3ea7a8879bfa9f702.1505763153.git.jpoimboe@redhat.com>
+Subject: [PATCH v2 08/12] x86/crypto: Fix RBP usage in sha256-avx-asm.S
+Date: Mon, 18 Sep 2017 14:42:07 -0500
+Message-ID: <a95a7b819d884ef938be2438191824e8335edffe.1505763153.git.jpoimboe@redhat.com>
 References: <cover.1505763153.git.jpoimboe@redhat.com>
 Cc: x86@kernel.org, linux-kernel@vger.kernel.org,
         Tim Chen <tim.c.chen@linux.intel.com>,
@@ -12,14 +12,10 @@ Cc: x86@kernel.org, linux-kernel@vger.kernel.org,
         Andy Lutomirski <luto@kernel.org>, Jiri Slaby <jslaby@suse.cz>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:44976 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751488AbdIRTmv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 18 Sep 2017 15:42:51 -0400
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <cover.1505763153.git.jpoimboe@redhat.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 Using RBP as a temporary register breaks frame pointer convention and
 breaks stack traces when unwinding from an interrupt in the crypto code.
@@ -33,14 +29,14 @@ Tested-by: Eric Biggers <ebiggers@google.com>
 Acked-by: Eric Biggers <ebiggers@google.com>
 Signed-off-by: Josh Poimboeuf <jpoimboe@redhat.com>
 ---
- arch/x86/crypto/sha256-ssse3-asm.S | 15 +++++++--------
+ arch/x86/crypto/sha256-avx-asm.S | 15 +++++++--------
  1 file changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/arch/x86/crypto/sha256-ssse3-asm.S b/arch/x86/crypto/sha256-ssse3-asm.S
-index 39b83c93e7fd..c6c05ed2c16a 100644
---- a/arch/x86/crypto/sha256-ssse3-asm.S
-+++ b/arch/x86/crypto/sha256-ssse3-asm.S
-@@ -95,7 +95,7 @@ SRND = %rsi       # clobbers INP
+diff --git a/arch/x86/crypto/sha256-avx-asm.S b/arch/x86/crypto/sha256-avx-asm.S
+index e08888a1a5f2..001bbcf93c79 100644
+--- a/arch/x86/crypto/sha256-avx-asm.S
++++ b/arch/x86/crypto/sha256-avx-asm.S
+@@ -103,7 +103,7 @@ SRND = %rsi       # clobbers INP
  c = %ecx
  d = %r8d
  e = %edx
@@ -49,8 +45,8 @@ index 39b83c93e7fd..c6c05ed2c16a 100644
  a = %eax
  b = %ebx
  
-@@ -356,13 +356,13 @@ a = TMP_
- ENTRY(sha256_transform_ssse3)
+@@ -350,13 +350,13 @@ a = TMP_
+ ENTRY(sha256_transform_avx)
  .align 32
  	pushq   %rbx
 -	pushq   %rbp
@@ -59,29 +55,29 @@ index 39b83c93e7fd..c6c05ed2c16a 100644
  	pushq   %r14
  	pushq   %r15
 -	pushq   %r12
-+	pushq   %rbp
-+	mov	%rsp, %rbp
++	pushq	%rbp
++	movq	%rsp, %rbp
  
 -	mov	%rsp, %r12
- 	subq    $STACK_SIZE, %rsp
- 	and	$~15, %rsp
+ 	subq    $STACK_SIZE, %rsp	# allocate stack space
+ 	and	$~15, %rsp		# align stack pointer
  
-@@ -462,13 +462,12 @@ loop2:
+@@ -452,13 +452,12 @@ loop2:
  
  done_hash:
  
 -	mov	%r12, %rsp
 -
--	popq    %r12
+-	popq	%r12
 +	mov	%rbp, %rsp
 +	popq	%rbp
  	popq    %r15
  	popq    %r14
  	popq    %r13
 -	popq    %rbp
-+	popq    %r12
++	popq	%r12
  	popq    %rbx
- 
  	ret
+ ENDPROC(sha256_transform_avx)
 -- 
 2.13.5
