@@ -1,11 +1,8 @@
 From: Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: [PATCH v2 04/12] x86/crypto: Fix RBP usage in cast6-avx-x86_64-asm_64.S
-Date: Mon, 18 Sep 2017 14:42:03 -0500
-Message-ID: <5aaab409603914306efa2529cb414116c76d863f.1505763153.git.jpoimboe@redhat.com>
+Subject: [PATCH v2 01/12] x86/crypto: Fix RBP usage in blowfish-x86_64-asm_64.S
+Date: Mon, 18 Sep 2017 14:42:00 -0500
+Message-ID: <222871f92dac114dd9fa4253ad39dde7254c00f5.1505763153.git.jpoimboe@redhat.com>
 References: <cover.1505763153.git.jpoimboe@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 Cc: x86@kernel.org, linux-kernel@vger.kernel.org,
         Tim Chen <tim.c.chen@linux.intel.com>,
         Mathias Krause <minipli@googlemail.com>,
@@ -23,8 +20,8 @@ List-Id: linux-crypto.vger.kernel.org
 Using RBP as a temporary register breaks frame pointer convention and
 breaks stack traces when unwinding from an interrupt in the crypto code.
 
-Use R15 instead of RBP.  R15 can't be used as the RID1 register because
-of x86 instruction encoding limitations.  So use R15 for CTX and RDI for
+Use R12 instead of RBP.  R12 can't be used as the RT0 register because
+of x86 instruction encoding limitations.  So use R12 for CTX and RDI for
 CTX.  This means that CTX is no longer an implicit function argument.
 Instead it needs to be explicitly copied from RDI.
 
@@ -34,222 +31,171 @@ Tested-by: Eric Biggers <ebiggers@google.com>
 Acked-by: Eric Biggers <ebiggers@google.com>
 Signed-off-by: Josh Poimboeuf <jpoimboe@redhat.com>
 ---
- arch/x86/crypto/cast6-avx-x86_64-asm_64.S | 50 +++++++++++++++++++++----------
- 1 file changed, 34 insertions(+), 16 deletions(-)
+ arch/x86/crypto/blowfish-x86_64-asm_64.S | 48 +++++++++++++++++---------------
+ 1 file changed, 26 insertions(+), 22 deletions(-)
 
-diff --git a/arch/x86/crypto/cast6-avx-x86_64-asm_64.S b/arch/x86/crypto/cast6-avx-x86_64-asm_64.S
-index 952d3156a933..7f30b6f0d72c 100644
---- a/arch/x86/crypto/cast6-avx-x86_64-asm_64.S
-+++ b/arch/x86/crypto/cast6-avx-x86_64-asm_64.S
-@@ -47,7 +47,7 @@
- /**********************************************************************
-   8-way AVX cast6
-  **********************************************************************/
+diff --git a/arch/x86/crypto/blowfish-x86_64-asm_64.S b/arch/x86/crypto/blowfish-x86_64-asm_64.S
+index 246c67006ed0..8c1fcb6bad21 100644
+--- a/arch/x86/crypto/blowfish-x86_64-asm_64.S
++++ b/arch/x86/crypto/blowfish-x86_64-asm_64.S
+@@ -33,7 +33,7 @@
+ #define s3	((16 + 2 + (3 * 256)) * 4)
+ 
+ /* register macros */
 -#define CTX %rdi
-+#define CTX %r15
++#define CTX %r12
+ #define RIO %rsi
  
- #define RA1 %xmm0
- #define RB1 %xmm1
-@@ -70,8 +70,8 @@
+ #define RX0 %rax
+@@ -56,12 +56,12 @@
+ #define RX2bh %ch
+ #define RX3bh %dh
  
- #define RTMP %xmm15
+-#define RT0 %rbp
++#define RT0 %rdi
+ #define RT1 %rsi
+ #define RT2 %r8
+ #define RT3 %r9
  
--#define RID1  %rbp
--#define RID1d %ebp
-+#define RID1  %rdi
-+#define RID1d %edi
- #define RID2  %rsi
- #define RID2d %esi
+-#define RT0d %ebp
++#define RT0d %edi
+ #define RT1d %esi
+ #define RT2d %r8d
+ #define RT3d %r9d
+@@ -120,13 +120,14 @@
  
-@@ -264,15 +264,17 @@
- .align 8
- __cast6_enc_blk8:
+ ENTRY(__blowfish_enc_blk)
  	/* input:
 -	 *	%rdi: ctx, CTX
 +	 *	%rdi: ctx
- 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: blocks
- 	 * output:
- 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: encrypted blocks
+ 	 *	%rsi: dst
+ 	 *	%rdx: src
+ 	 *	%rcx: bool, if true: xor output
  	 */
- 
--	pushq %rbp;
-+	pushq %r15;
- 	pushq %rbx;
+-	movq %rbp, %r11;
++	movq %r12, %r11;
  
 +	movq %rdi, CTX;
+ 	movq %rsi, %r10;
+ 	movq %rdx, RIO;
+ 
+@@ -142,7 +143,7 @@ ENTRY(__blowfish_enc_blk)
+ 	round_enc(14);
+ 	add_roundkey_enc(16);
+ 
+-	movq %r11, %rbp;
++	movq %r11, %r12;
+ 
+ 	movq %r10, RIO;
+ 	test %cl, %cl;
+@@ -157,12 +158,13 @@ ENDPROC(__blowfish_enc_blk)
+ 
+ ENTRY(blowfish_dec_blk)
+ 	/* input:
+-	 *	%rdi: ctx, CTX
++	 *	%rdi: ctx
+ 	 *	%rsi: dst
+ 	 *	%rdx: src
+ 	 */
+-	movq %rbp, %r11;
++	movq %r12, %r11;
+ 
++	movq %rdi, CTX;
+ 	movq %rsi, %r10;
+ 	movq %rdx, RIO;
+ 
+@@ -181,7 +183,7 @@ ENTRY(blowfish_dec_blk)
+ 	movq %r10, RIO;
+ 	write_block();
+ 
+-	movq %r11, %rbp;
++	movq %r11, %r12;
+ 
+ 	ret;
+ ENDPROC(blowfish_dec_blk)
+@@ -298,20 +300,21 @@ ENDPROC(blowfish_dec_blk)
+ 
+ ENTRY(__blowfish_enc_blk_4way)
+ 	/* input:
+-	 *	%rdi: ctx, CTX
++	 *	%rdi: ctx
+ 	 *	%rsi: dst
+ 	 *	%rdx: src
+ 	 *	%rcx: bool, if true: xor output
+ 	 */
+-	pushq %rbp;
++	pushq %r12;
+ 	pushq %rbx;
+ 	pushq %rcx;
+ 
+-	preload_roundkey_enc(0);
+-
++	movq %rdi, CTX
+ 	movq %rsi, %r11;
+ 	movq %rdx, RIO;
+ 
++	preload_roundkey_enc(0);
 +
- 	vmovdqa .Lbswap_mask, RKM;
- 	vmovd .Lfirst_mask, R1ST;
- 	vmovd .L32_mask, R32;
-@@ -297,7 +299,7 @@ __cast6_enc_blk8:
- 	QBAR(11);
+ 	read_block4();
+ 
+ 	round_enc4(0);
+@@ -324,39 +327,40 @@ ENTRY(__blowfish_enc_blk_4way)
+ 	round_enc4(14);
+ 	add_preloaded_roundkey4();
+ 
+-	popq %rbp;
++	popq %r12;
+ 	movq %r11, RIO;
+ 
+-	test %bpl, %bpl;
++	test %r12b, %r12b;
+ 	jnz .L__enc_xor4;
+ 
+ 	write_block4();
  
  	popq %rbx;
 -	popq %rbp;
-+	popq %r15;
++	popq %r12;
+ 	ret;
  
- 	vmovdqa .Lbswap_mask, RKM;
- 
-@@ -310,15 +312,17 @@ ENDPROC(__cast6_enc_blk8)
- .align 8
- __cast6_dec_blk8:
- 	/* input:
--	 *	%rdi: ctx, CTX
-+	 *	%rdi: ctx
- 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: encrypted blocks
- 	 * output:
- 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: decrypted blocks
- 	 */
- 
--	pushq %rbp;
-+	pushq %r15;
- 	pushq %rbx;
- 
-+	movq %rdi, CTX;
-+
- 	vmovdqa .Lbswap_mask, RKM;
- 	vmovd .Lfirst_mask, R1ST;
- 	vmovd .L32_mask, R32;
-@@ -343,7 +347,7 @@ __cast6_dec_blk8:
- 	QBAR(0);
+ .L__enc_xor4:
+ 	xor_block4();
  
  	popq %rbx;
 -	popq %rbp;
-+	popq %r15;
++	popq %r12;
+ 	ret;
+ ENDPROC(__blowfish_enc_blk_4way)
  
- 	vmovdqa .Lbswap_mask, RKM;
- 	outunpack_blocks(RA1, RB1, RC1, RD1, RTMP, RX, RKRF, RKM);
-@@ -354,12 +358,14 @@ ENDPROC(__cast6_dec_blk8)
- 
- ENTRY(cast6_ecb_enc_8way)
+ ENTRY(blowfish_dec_blk_4way)
  	/* input:
 -	 *	%rdi: ctx, CTX
 +	 *	%rdi: ctx
  	 *	%rsi: dst
  	 *	%rdx: src
  	 */
- 	FRAME_BEGIN
-+	pushq %r15;
+-	pushq %rbp;
++	pushq %r12;
+ 	pushq %rbx;
+-	preload_roundkey_dec(17);
  
+-	movq %rsi, %r11;
 +	movq %rdi, CTX;
- 	movq %rsi, %r11;
++	movq %rsi, %r11
+ 	movq %rdx, RIO;
  
- 	load_8way(%rdx, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
-@@ -368,18 +374,21 @@ ENTRY(cast6_ecb_enc_8way)
++	preload_roundkey_dec(17);
+ 	read_block4();
  
- 	store_8way(%r11, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
+ 	round_dec4(17);
+@@ -373,7 +377,7 @@ ENTRY(blowfish_dec_blk_4way)
+ 	write_block4();
  
-+	popq %r15;
- 	FRAME_END
+ 	popq %rbx;
+-	popq %rbp;
++	popq %r12;
+ 
  	ret;
- ENDPROC(cast6_ecb_enc_8way)
- 
- ENTRY(cast6_ecb_dec_8way)
- 	/* input:
--	 *	%rdi: ctx, CTX
-+	 *	%rdi: ctx
- 	 *	%rsi: dst
- 	 *	%rdx: src
- 	 */
- 	FRAME_BEGIN
-+	pushq %r15;
- 
-+	movq %rdi, CTX;
- 	movq %rsi, %r11;
- 
- 	load_8way(%rdx, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
-@@ -388,20 +397,22 @@ ENTRY(cast6_ecb_dec_8way)
- 
- 	store_8way(%r11, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
- 
-+	popq %r15;
- 	FRAME_END
- 	ret;
- ENDPROC(cast6_ecb_dec_8way)
- 
- ENTRY(cast6_cbc_dec_8way)
- 	/* input:
--	 *	%rdi: ctx, CTX
-+	 *	%rdi: ctx
- 	 *	%rsi: dst
- 	 *	%rdx: src
- 	 */
- 	FRAME_BEGIN
--
- 	pushq %r12;
-+	pushq %r15;
- 
-+	movq %rdi, CTX;
- 	movq %rsi, %r11;
- 	movq %rdx, %r12;
- 
-@@ -411,8 +422,8 @@ ENTRY(cast6_cbc_dec_8way)
- 
- 	store_cbc_8way(%r12, %r11, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
- 
-+	popq %r15;
- 	popq %r12;
--
- 	FRAME_END
- 	ret;
- ENDPROC(cast6_cbc_dec_8way)
-@@ -425,9 +436,10 @@ ENTRY(cast6_ctr_8way)
- 	 *	%rcx: iv (little endian, 128bit)
- 	 */
- 	FRAME_BEGIN
--
- 	pushq %r12;
-+	pushq %r15
- 
-+	movq %rdi, CTX;
- 	movq %rsi, %r11;
- 	movq %rdx, %r12;
- 
-@@ -438,8 +450,8 @@ ENTRY(cast6_ctr_8way)
- 
- 	store_ctr_8way(%r12, %r11, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
- 
-+	popq %r15;
- 	popq %r12;
--
- 	FRAME_END
- 	ret;
- ENDPROC(cast6_ctr_8way)
-@@ -452,7 +464,9 @@ ENTRY(cast6_xts_enc_8way)
- 	 *	%rcx: iv (t ⊕ αⁿ ∈ GF(2¹²⁸))
- 	 */
- 	FRAME_BEGIN
-+	pushq %r15;
- 
-+	movq %rdi, CTX
- 	movq %rsi, %r11;
- 
- 	/* regs <= src, dst <= IVs, regs <= regs xor IVs */
-@@ -464,6 +478,7 @@ ENTRY(cast6_xts_enc_8way)
- 	/* dst <= regs xor IVs(in dst) */
- 	store_xts_8way(%r11, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
- 
-+	popq %r15;
- 	FRAME_END
- 	ret;
- ENDPROC(cast6_xts_enc_8way)
-@@ -476,7 +491,9 @@ ENTRY(cast6_xts_dec_8way)
- 	 *	%rcx: iv (t ⊕ αⁿ ∈ GF(2¹²⁸))
- 	 */
- 	FRAME_BEGIN
-+	pushq %r15;
- 
-+	movq %rdi, CTX
- 	movq %rsi, %r11;
- 
- 	/* regs <= src, dst <= IVs, regs <= regs xor IVs */
-@@ -488,6 +505,7 @@ ENTRY(cast6_xts_dec_8way)
- 	/* dst <= regs xor IVs(in dst) */
- 	store_xts_8way(%r11, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
- 
-+	popq %r15;
- 	FRAME_END
- 	ret;
- ENDPROC(cast6_xts_dec_8way)
+ ENDPROC(blowfish_dec_blk_4way)
 -- 
 2.13.5
