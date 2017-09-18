@@ -1,7 +1,7 @@
 From: Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: [PATCH v2 05/12] x86/crypto: Fix RBP usage in des3_ede-asm_64.S
-Date: Mon, 18 Sep 2017 14:42:04 -0500
-Message-ID: <246442b470d03336cd8b3dc6e26dcb46491768b9.1505763153.git.jpoimboe@redhat.com>
+Subject: [PATCH v2 02/12] x86/crypto: Fix RBP usage in camellia-x86_64-asm_64.S
+Date: Mon, 18 Sep 2017 14:42:01 -0500
+Message-ID: <c280894dc815d06a81f8ab625a73717d4d6fa6c1.1505763153.git.jpoimboe@redhat.com>
 References: <cover.1505763153.git.jpoimboe@redhat.com>
 Cc: x86@kernel.org, linux-kernel@vger.kernel.org,
         Tim Chen <tim.c.chen@linux.intel.com>,
@@ -20,9 +20,8 @@ List-Id: linux-crypto.vger.kernel.org
 Using RBP as a temporary register breaks frame pointer convention and
 breaks stack traces when unwinding from an interrupt in the crypto code.
 
-Use RSI instead of RBP for RT1.  Since RSI is also used as a the 'dst'
-function argument, it needs to be saved on the stack until the argument
-is needed.
+Use R12 instead of RBP.  Both are callee-saved registers, so the
+substitution is straightforward.
 
 Reported-by: Eric Biggers <ebiggers@google.com>
 Reported-by: Peter Zijlstra <peterz@infradead.org>
@@ -30,92 +29,120 @@ Tested-by: Eric Biggers <ebiggers@google.com>
 Acked-by: Eric Biggers <ebiggers@google.com>
 Signed-off-by: Josh Poimboeuf <jpoimboe@redhat.com>
 ---
- arch/x86/crypto/des3_ede-asm_64.S | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+ arch/x86/crypto/camellia-x86_64-asm_64.S | 26 +++++++++++++-------------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
 
-diff --git a/arch/x86/crypto/des3_ede-asm_64.S b/arch/x86/crypto/des3_ede-asm_64.S
-index f3e91647ca27..8e49ce117494 100644
---- a/arch/x86/crypto/des3_ede-asm_64.S
-+++ b/arch/x86/crypto/des3_ede-asm_64.S
-@@ -64,12 +64,12 @@
- #define RW2bh %ch
+diff --git a/arch/x86/crypto/camellia-x86_64-asm_64.S b/arch/x86/crypto/camellia-x86_64-asm_64.S
+index 310319c601ed..95ba6956a7f6 100644
+--- a/arch/x86/crypto/camellia-x86_64-asm_64.S
++++ b/arch/x86/crypto/camellia-x86_64-asm_64.S
+@@ -75,17 +75,17 @@
+ #define RCD1bh %dh
  
- #define RT0 %r15
+ #define RT0 %rsi
 -#define RT1 %rbp
-+#define RT1 %rsi
- #define RT2 %r14
- #define RT3 %rdx
++#define RT1 %r12
+ #define RT2 %r8
  
- #define RT0d %r15d
+ #define RT0d %esi
 -#define RT1d %ebp
-+#define RT1d %esi
- #define RT2d %r14d
- #define RT3d %edx
++#define RT1d %r12d
+ #define RT2d %r8d
  
-@@ -177,13 +177,14 @@ ENTRY(des3_ede_x86_64_crypt_blk)
- 	 *	%rsi: dst
+ #define RT2bl %r8b
+ 
+ #define RXOR %r9
+-#define RRBP %r10
++#define RR12 %r10
+ #define RDST %r11
+ 
+ #define RXORd %r9d
+@@ -197,7 +197,7 @@ ENTRY(__camellia_enc_blk)
  	 *	%rdx: src
+ 	 *	%rcx: bool xor
  	 */
--	pushq %rbp;
- 	pushq %rbx;
- 	pushq %r12;
- 	pushq %r13;
- 	pushq %r14;
- 	pushq %r15;
+-	movq %rbp, RRBP;
++	movq %r12, RR12;
  
-+	pushq %rsi; /* dst */
-+
- 	read_block(%rdx, RL0, RR0);
- 	initial_permutation(RL0, RR0);
+ 	movq %rcx, RXOR;
+ 	movq %rsi, RDST;
+@@ -227,13 +227,13 @@ ENTRY(__camellia_enc_blk)
  
-@@ -241,6 +242,8 @@ ENTRY(des3_ede_x86_64_crypt_blk)
- 	round1(32+15, RL0, RR0, dummy2);
+ 	enc_outunpack(mov, RT1);
  
- 	final_permutation(RR0, RL0);
-+
-+	popq %rsi /* dst */
- 	write_block(%rsi, RR0, RL0);
- 
- 	popq %r15;
-@@ -248,7 +251,6 @@ ENTRY(des3_ede_x86_64_crypt_blk)
- 	popq %r13;
- 	popq %r12;
- 	popq %rbx;
--	popq %rbp;
- 
+-	movq RRBP, %rbp;
++	movq RR12, %r12;
  	ret;
- ENDPROC(des3_ede_x86_64_crypt_blk)
-@@ -432,13 +434,14 @@ ENTRY(des3_ede_x86_64_crypt_blk_3way)
- 	 *	%rdx: src (3 blocks)
+ 
+ .L__enc_xor:
+ 	enc_outunpack(xor, RT1);
+ 
+-	movq RRBP, %rbp;
++	movq RR12, %r12;
+ 	ret;
+ ENDPROC(__camellia_enc_blk)
+ 
+@@ -248,7 +248,7 @@ ENTRY(camellia_dec_blk)
+ 	movl $24, RXORd;
+ 	cmovel RXORd, RT2d; /* max */
+ 
+-	movq %rbp, RRBP;
++	movq %r12, RR12;
+ 	movq %rsi, RDST;
+ 	movq %rdx, RIO;
+ 
+@@ -271,7 +271,7 @@ ENTRY(camellia_dec_blk)
+ 
+ 	dec_outunpack();
+ 
+-	movq RRBP, %rbp;
++	movq RR12, %r12;
+ 	ret;
+ ENDPROC(camellia_dec_blk)
+ 
+@@ -433,7 +433,7 @@ ENTRY(__camellia_enc_blk_2way)
  	 */
- 
--	pushq %rbp;
  	pushq %rbx;
- 	pushq %r12;
- 	pushq %r13;
- 	pushq %r14;
- 	pushq %r15;
  
-+	pushq %rsi /* dst */
-+
- 	/* load input */
- 	movl 0 * 4(%rdx), RL0d;
- 	movl 1 * 4(%rdx), RR0d;
-@@ -520,6 +523,7 @@ ENTRY(des3_ede_x86_64_crypt_blk_3way)
- 	bswapl RR2d;
- 	bswapl RL2d;
+-	movq %rbp, RRBP;
++	movq %r12, RR12;
+ 	movq %rcx, RXOR;
+ 	movq %rsi, RDST;
+ 	movq %rdx, RIO;
+@@ -461,14 +461,14 @@ ENTRY(__camellia_enc_blk_2way)
  
-+	popq %rsi /* dst */
- 	movl RR0d, 0 * 4(%rsi);
- 	movl RL0d, 1 * 4(%rsi);
- 	movl RR1d, 2 * 4(%rsi);
-@@ -532,7 +536,6 @@ ENTRY(des3_ede_x86_64_crypt_blk_3way)
- 	popq %r13;
- 	popq %r12;
+ 	enc_outunpack2(mov, RT2);
+ 
+-	movq RRBP, %rbp;
++	movq RR12, %r12;
  	popq %rbx;
--	popq %rbp;
- 
  	ret;
- ENDPROC(des3_ede_x86_64_crypt_blk_3way)
+ 
+ .L__enc2_xor:
+ 	enc_outunpack2(xor, RT2);
+ 
+-	movq RRBP, %rbp;
++	movq RR12, %r12;
+ 	popq %rbx;
+ 	ret;
+ ENDPROC(__camellia_enc_blk_2way)
+@@ -485,7 +485,7 @@ ENTRY(camellia_dec_blk_2way)
+ 	cmovel RXORd, RT2d; /* max */
+ 
+ 	movq %rbx, RXOR;
+-	movq %rbp, RRBP;
++	movq %r12, RR12;
+ 	movq %rsi, RDST;
+ 	movq %rdx, RIO;
+ 
+@@ -508,7 +508,7 @@ ENTRY(camellia_dec_blk_2way)
+ 
+ 	dec_outunpack2();
+ 
+-	movq RRBP, %rbp;
++	movq RR12, %r12;
+ 	movq RXOR, %rbx;
+ 	ret;
+ ENDPROC(camellia_dec_blk_2way)
 -- 
 2.13.5
