@@ -1,7 +1,7 @@
 From: Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: [PATCH v2 06/12] x86/crypto: Fix RBP usage in sha1_avx2_x86_64_asm.S
-Date: Mon, 18 Sep 2017 14:42:05 -0500
-Message-ID: <baa31c30ff580cef019041e431f5cbcd0dc2d1c7.1505763153.git.jpoimboe@redhat.com>
+Subject: [PATCH v2 03/12] x86/crypto: Fix RBP usage in cast5-avx-x86_64-asm_64.S
+Date: Mon, 18 Sep 2017 14:42:02 -0500
+Message-ID: <b2b422d58bc2be350563ed453f5f29909de461d1.1505763153.git.jpoimboe@redhat.com>
 References: <cover.1505763153.git.jpoimboe@redhat.com>
 Cc: x86@kernel.org, linux-kernel@vger.kernel.org,
         Tim Chen <tim.c.chen@linux.intel.com>,
@@ -12,20 +12,18 @@ Cc: x86@kernel.org, linux-kernel@vger.kernel.org,
         Andy Lutomirski <luto@kernel.org>, Jiri Slaby <jslaby@suse.cz>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:58800 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750921AbdIRTmo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 18 Sep 2017 15:42:44 -0400
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <cover.1505763153.git.jpoimboe@redhat.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 Using RBP as a temporary register breaks frame pointer convention and
 breaks stack traces when unwinding from an interrupt in the crypto code.
 
-Use R11 instead of RBP.  Since R11 isn't a callee-saved register, it
-doesn't need to be saved and restored on the stack.
+Use R15 instead of RBP.  R15 can't be used as the RID1 register because
+of x86 instruction encoding limitations.  So use R15 for CTX and RDI for
+CTX.  This means that CTX is no longer an implicit function argument.
+Instead it needs to be explicitly copied from RDI.
 
 Reported-by: Eric Biggers <ebiggers@google.com>
 Reported-by: Peter Zijlstra <peterz@infradead.org>
@@ -33,37 +31,197 @@ Tested-by: Eric Biggers <ebiggers@google.com>
 Acked-by: Eric Biggers <ebiggers@google.com>
 Signed-off-by: Josh Poimboeuf <jpoimboe@redhat.com>
 ---
- arch/x86/crypto/sha1_avx2_x86_64_asm.S | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ arch/x86/crypto/cast5-avx-x86_64-asm_64.S | 47 ++++++++++++++++++++-----------
+ 1 file changed, 30 insertions(+), 17 deletions(-)
 
-diff --git a/arch/x86/crypto/sha1_avx2_x86_64_asm.S b/arch/x86/crypto/sha1_avx2_x86_64_asm.S
-index 1eab79c9ac48..9f712a7dfd79 100644
---- a/arch/x86/crypto/sha1_avx2_x86_64_asm.S
-+++ b/arch/x86/crypto/sha1_avx2_x86_64_asm.S
-@@ -89,7 +89,7 @@
- #define	REG_RE	%rdx
- #define	REG_RTA	%r12
- #define	REG_RTB	%rbx
--#define	REG_T1	%ebp
-+#define	REG_T1	%r11d
- #define	xmm_mov	vmovups
- #define	avx2_zeroupper	vzeroupper
- #define	RND_F1	1
-@@ -637,7 +637,6 @@ _loop3:
- 	ENTRY(\name)
+diff --git a/arch/x86/crypto/cast5-avx-x86_64-asm_64.S b/arch/x86/crypto/cast5-avx-x86_64-asm_64.S
+index b4a8806234ea..86107c961bb4 100644
+--- a/arch/x86/crypto/cast5-avx-x86_64-asm_64.S
++++ b/arch/x86/crypto/cast5-avx-x86_64-asm_64.S
+@@ -47,7 +47,7 @@
+ /**********************************************************************
+   16-way AVX cast5
+  **********************************************************************/
+-#define CTX %rdi
++#define CTX %r15
  
- 	push	%rbx
--	push	%rbp
- 	push	%r12
- 	push	%r13
- 	push	%r14
-@@ -673,7 +672,6 @@ _loop3:
- 	pop	%r14
- 	pop	%r13
- 	pop	%r12
--	pop	%rbp
- 	pop	%rbx
+ #define RL1 %xmm0
+ #define RR1 %xmm1
+@@ -70,8 +70,8 @@
  
- 	ret
+ #define RTMP %xmm15
+ 
+-#define RID1  %rbp
+-#define RID1d %ebp
++#define RID1  %rdi
++#define RID1d %edi
+ #define RID2  %rsi
+ #define RID2d %esi
+ 
+@@ -226,7 +226,7 @@
+ .align 16
+ __cast5_enc_blk16:
+ 	/* input:
+-	 *	%rdi: ctx, CTX
++	 *	%rdi: ctx
+ 	 *	RL1: blocks 1 and 2
+ 	 *	RR1: blocks 3 and 4
+ 	 *	RL2: blocks 5 and 6
+@@ -246,9 +246,11 @@ __cast5_enc_blk16:
+ 	 *	RR4: encrypted blocks 15 and 16
+ 	 */
+ 
+-	pushq %rbp;
++	pushq %r15;
+ 	pushq %rbx;
+ 
++	movq %rdi, CTX;
++
+ 	vmovdqa .Lbswap_mask, RKM;
+ 	vmovd .Lfirst_mask, R1ST;
+ 	vmovd .L32_mask, R32;
+@@ -283,7 +285,7 @@ __cast5_enc_blk16:
+ 
+ .L__skip_enc:
+ 	popq %rbx;
+-	popq %rbp;
++	popq %r15;
+ 
+ 	vmovdqa .Lbswap_mask, RKM;
+ 
+@@ -298,7 +300,7 @@ ENDPROC(__cast5_enc_blk16)
+ .align 16
+ __cast5_dec_blk16:
+ 	/* input:
+-	 *	%rdi: ctx, CTX
++	 *	%rdi: ctx
+ 	 *	RL1: encrypted blocks 1 and 2
+ 	 *	RR1: encrypted blocks 3 and 4
+ 	 *	RL2: encrypted blocks 5 and 6
+@@ -318,9 +320,11 @@ __cast5_dec_blk16:
+ 	 *	RR4: decrypted blocks 15 and 16
+ 	 */
+ 
+-	pushq %rbp;
++	pushq %r15;
+ 	pushq %rbx;
+ 
++	movq %rdi, CTX;
++
+ 	vmovdqa .Lbswap_mask, RKM;
+ 	vmovd .Lfirst_mask, R1ST;
+ 	vmovd .L32_mask, R32;
+@@ -356,7 +360,7 @@ __cast5_dec_blk16:
+ 
+ 	vmovdqa .Lbswap_mask, RKM;
+ 	popq %rbx;
+-	popq %rbp;
++	popq %r15;
+ 
+ 	outunpack_blocks(RR1, RL1, RTMP, RX, RKM);
+ 	outunpack_blocks(RR2, RL2, RTMP, RX, RKM);
+@@ -372,12 +376,14 @@ ENDPROC(__cast5_dec_blk16)
+ 
+ ENTRY(cast5_ecb_enc_16way)
+ 	/* input:
+-	 *	%rdi: ctx, CTX
++	 *	%rdi: ctx
+ 	 *	%rsi: dst
+ 	 *	%rdx: src
+ 	 */
+ 	FRAME_BEGIN
++	pushq %r15;
+ 
++	movq %rdi, CTX;
+ 	movq %rsi, %r11;
+ 
+ 	vmovdqu (0*4*4)(%rdx), RL1;
+@@ -400,18 +406,22 @@ ENTRY(cast5_ecb_enc_16way)
+ 	vmovdqu RR4, (6*4*4)(%r11);
+ 	vmovdqu RL4, (7*4*4)(%r11);
+ 
++	popq %r15;
+ 	FRAME_END
+ 	ret;
+ ENDPROC(cast5_ecb_enc_16way)
+ 
+ ENTRY(cast5_ecb_dec_16way)
+ 	/* input:
+-	 *	%rdi: ctx, CTX
++	 *	%rdi: ctx
+ 	 *	%rsi: dst
+ 	 *	%rdx: src
+ 	 */
+ 
+ 	FRAME_BEGIN
++	pushq %r15;
++
++	movq %rdi, CTX;
+ 	movq %rsi, %r11;
+ 
+ 	vmovdqu (0*4*4)(%rdx), RL1;
+@@ -434,20 +444,22 @@ ENTRY(cast5_ecb_dec_16way)
+ 	vmovdqu RR4, (6*4*4)(%r11);
+ 	vmovdqu RL4, (7*4*4)(%r11);
+ 
++	popq %r15;
+ 	FRAME_END
+ 	ret;
+ ENDPROC(cast5_ecb_dec_16way)
+ 
+ ENTRY(cast5_cbc_dec_16way)
+ 	/* input:
+-	 *	%rdi: ctx, CTX
++	 *	%rdi: ctx
+ 	 *	%rsi: dst
+ 	 *	%rdx: src
+ 	 */
+ 	FRAME_BEGIN
+-
+ 	pushq %r12;
++	pushq %r15;
+ 
++	movq %rdi, CTX;
+ 	movq %rsi, %r11;
+ 	movq %rdx, %r12;
+ 
+@@ -483,23 +495,24 @@ ENTRY(cast5_cbc_dec_16way)
+ 	vmovdqu RR4, (6*16)(%r11);
+ 	vmovdqu RL4, (7*16)(%r11);
+ 
++	popq %r15;
+ 	popq %r12;
+-
+ 	FRAME_END
+ 	ret;
+ ENDPROC(cast5_cbc_dec_16way)
+ 
+ ENTRY(cast5_ctr_16way)
+ 	/* input:
+-	 *	%rdi: ctx, CTX
++	 *	%rdi: ctx
+ 	 *	%rsi: dst
+ 	 *	%rdx: src
+ 	 *	%rcx: iv (big endian, 64bit)
+ 	 */
+ 	FRAME_BEGIN
+-
+ 	pushq %r12;
++	pushq %r15;
+ 
++	movq %rdi, CTX;
+ 	movq %rsi, %r11;
+ 	movq %rdx, %r12;
+ 
+@@ -558,8 +571,8 @@ ENTRY(cast5_ctr_16way)
+ 	vmovdqu RR4, (6*16)(%r11);
+ 	vmovdqu RL4, (7*16)(%r11);
+ 
++	popq %r15;
+ 	popq %r12;
+-
+ 	FRAME_END
+ 	ret;
+ ENDPROC(cast5_ctr_16way)
 -- 
 2.13.5
