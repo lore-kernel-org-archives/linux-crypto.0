@@ -1,7 +1,7 @@
 From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH 4/6] crypto: talitos - fix AEAD test failures
-Date: Tue, 19 Sep 2017 14:59:07 +0200 (CEST)
-Message-ID: <f715a42e1a9ac3f3301d1b637c4cfdcf4ca8e744.1505825623.git.christophe.leroy@c-s.fr>
+Subject: [PATCH 5/6] crypto: talitos - use kzalloc instead of kmalloc
+Date: Tue, 19 Sep 2017 14:59:09 +0200 (CEST)
+Message-ID: <0ef5b121c6d362b20d30c8eb37739287a2ee4905.1505825623.git.christophe.leroy@c-s.fr>
 References: <cover.1505825623.git.christophe.leroy@c-s.fr>
 Cc: linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
  linux-crypto@vger.kernel.org
@@ -21,120 +21,180 @@ Sender: "Linuxppc-dev"
  <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
 List-Id: linux-crypto.vger.kernel.org
 
-AEAD tests fail when destination SG list has more than 1 element.
-
-[    2.058752] alg: aead: Test 1 failed on encryption for authenc-hmac-sha1-cbc-aes-talitos
-[    2.066965] 00000000: 53 69 6e 67 6c 65 20 62 6c 6f 63 6b 20 6d 73 67
-00000010: c0 43 ff 74 c0 43 ff e0 de 83 d1 20 de 84 8e 54
-00000020: de 83 d7 c4
-[    2.082138] alg: aead: Test 1 failed on encryption for authenc-hmac-sha1-cbc-aes-talitos
-[    2.090435] 00000000: 53 69 6e 67 6c 65 20 62 6c 6f 63 6b 20 6d 73 67
-00000010: de 84 ea 58 c0 93 1a 24 de 84 e8 59 de 84 f1 20
-00000020: 00 00 00 00
-[    2.105721] alg: aead: Test 1 failed on encryption for authenc-hmac-sha1-cbc-3des-talitos
-[    2.114259] 00000000: 6f 54 20 6f 61 4d 79 6e 53 20 63 65 65 72 73 74
-00000010: 54 20 6f 6f 4d 20 6e 61 20 79 65 53 72 63 74 65
-00000020: 20 73 6f 54 20 6f 61 4d 79 6e 53 20 63 65 65 72
-00000030: 73 74 54 20 6f 6f 4d 20 6e 61 20 79 65 53 72 63
-00000040: 74 65 20 73 6f 54 20 6f 61 4d 79 6e 53 20 63 65
-00000050: 65 72 73 74 54 20 6f 6f 4d 20 6e 61 20 79 65 53
-00000060: 72 63 74 65 20 73 6f 54 20 6f 61 4d 79 6e 53 20
-00000070: 63 65 65 72 73 74 54 20 6f 6f 4d 20 6e 61 0a 79
-00000080: c0 50 f1 ac c0 50 f3 38 c0 50 f3 94 c0 50 f5 30
-00000090: c0 99 74 3c
-[    2.166410] alg: aead: Test 1 failed on encryption for authenc-hmac-sha1-cbc-3des-talitos
-[    2.174794] 00000000: 6f 54 20 6f 61 4d 79 6e 53 20 63 65 65 72 73 74
-00000010: 54 20 6f 6f 4d 20 6e 61 20 79 65 53 72 63 74 65
-00000020: 20 73 6f 54 20 6f 61 4d 79 6e 53 20 63 65 65 72
-00000030: 73 74 54 20 6f 6f 4d 20 6e 61 20 79 65 53 72 63
-00000040: 74 65 20 73 6f 54 20 6f 61 4d 79 6e 53 20 63 65
-00000050: 65 72 73 74 54 20 6f 6f 4d 20 6e 61 20 79 65 53
-00000060: 72 63 74 65 20 73 6f 54 20 6f 61 4d 79 6e 53 20
-00000070: 63 65 65 72 73 74 54 20 6f 6f 4d 20 6e 61 0a 79
-00000080: c0 50 f1 ac c0 50 f3 38 c0 50 f3 94 c0 50 f5 30
-00000090: c0 99 74 3c
-[    2.226486] alg: No test for authenc(hmac(sha224),cbc(aes)) (authenc-hmac-sha224-cbc-aes-talitos)
-[    2.236459] alg: No test for authenc(hmac(sha224),cbc(aes)) (authenc-hmac-sha224-cbc-aes-talitos)
-[    2.247196] alg: aead: Test 1 failed on encryption for authenc-hmac-sha224-cbc-3des-talitos
-[    2.255555] 00000000: 6f 54 20 6f 61 4d 79 6e 53 20 63 65 65 72 73 74
-00000010: 54 20 6f 6f 4d 20 6e 61 20 79 65 53 72 63 74 65
-00000020: 20 73 6f 54 20 6f 61 4d 79 6e 53 20 63 65 65 72
-00000030: 73 74 54 20 6f 6f 4d 20 6e 61 20 79 65 53 72 63
-00000040: 74 65 20 73 6f 54 20 6f 61 4d 79 6e 53 20 63 65
-00000050: 65 72 73 74 54 20 6f 6f 4d 20 6e 61 20 79 65 53
-00000060: 72 63 74 65 20 73 6f 54 20 6f 61 4d 79 6e 53 20
-00000070: 63 65 65 72 73 74 54 20 6f 6f 4d 20 6e 61 0a 79
-00000080: c0 50 f1 ac c0 50 f3 38 c0 50 f3 94 c0 50 f5 30
-00000090: c0 99 74 3c c0 96 e5 b8
-[    2.309004] alg: aead: Test 1 failed on encryption for authenc-hmac-sha224-cbc-3des-talitos
-[    2.317562] 00000000: 6f 54 20 6f 61 4d 79 6e 53 20 63 65 65 72 73 74
-00000010: 54 20 6f 6f 4d 20 6e 61 20 79 65 53 72 63 74 65
-00000020: 20 73 6f 54 20 6f 61 4d 79 6e 53 20 63 65 65 72
-00000030: 73 74 54 20 6f 6f 4d 20 6e 61 20 79 65 53 72 63
-00000040: 74 65 20 73 6f 54 20 6f 61 4d 79 6e 53 20 63 65
-00000050: 65 72 73 74 54 20 6f 6f 4d 20 6e 61 20 79 65 53
-00000060: 72 63 74 65 20 73 6f 54 20 6f 61 4d 79 6e 53 20
-00000070: 63 65 65 72 73 74 54 20 6f 6f 4d 20 6e 61 0a 79
-00000080: c0 50 f1 ac c0 50 f3 38 c0 50 f3 94 c0 50 f5 30
-00000090: c0 99 74 3c c0 96 e5 b8
-[    2.370710] alg: aead: Test 1 failed on encryption for authenc-hmac-sha256-cbc-aes-talitos
-[    2.379177] 00000000: 53 69 6e 67 6c 65 20 62 6c 6f 63 6b 20 6d 73 67
-00000010: 54 20 6f 6f 4d 20 6e 61 20 79 65 53 72 63 74 65
-00000020: 20 73 6f 54 20 6f 61 4d 79 6e 53 20 63 65 65 72
-[    2.397863] alg: aead: Test 1 failed on encryption for authenc-hmac-sha256-cbc-aes-talitos
-[    2.406134] 00000000: 53 69 6e 67 6c 65 20 62 6c 6f 63 6b 20 6d 73 67
-00000010: 54 20 6f 6f 4d 20 6e 61 20 79 65 53 72 63 74 65
-00000020: 20 73 6f 54 20 6f 61 4d 79 6e 53 20 63 65 65 72
-[    2.424789] alg: aead: Test 1 failed on encryption for authenc-hmac-sha256-cbc-3des-talitos
-[    2.433491] 00000000: 6f 54 20 6f 61 4d 79 6e 53 20 63 65 65 72 73 74
-00000010: 54 20 6f 6f 4d 20 6e 61 20 79 65 53 72 63 74 65
-00000020: 20 73 6f 54 20 6f 61 4d 79 6e 53 20 63 65 65 72
-00000030: 73 74 54 20 6f 6f 4d 20 6e 61 20 79 65 53 72 63
-00000040: 74 65 20 73 6f 54 20 6f 61 4d 79 6e 53 20 63 65
-00000050: 65 72 73 74 54 20 6f 6f 4d 20 6e 61 20 79 65 53
-00000060: 72 63 74 65 20 73 6f 54 20 6f 61 4d 79 6e 53 20
-00000070: 63 65 65 72 73 74 54 20 6f 6f 4d 20 6e 61 0a 79
-00000080: c0 50 f1 ac c0 50 f3 38 c0 50 f3 94 c0 50 f5 30
-00000090: c0 99 74 3c c0 96 e5 b8 c0 96 e9 20 c0 00 3d dc
-[    2.488832] alg: aead: Test 1 failed on encryption for authenc-hmac-sha256-cbc-3des-talitos
-[    2.497387] 00000000: 6f 54 20 6f 61 4d 79 6e 53 20 63 65 65 72 73 74
-00000010: 54 20 6f 6f 4d 20 6e 61 20 79 65 53 72 63 74 65
-00000020: 20 73 6f 54 20 6f 61 4d 79 6e 53 20 63 65 65 72
-00000030: 73 74 54 20 6f 6f 4d 20 6e 61 20 79 65 53 72 63
-00000040: 74 65 20 73 6f 54 20 6f 61 4d 79 6e 53 20 63 65
-00000050: 65 72 73 74 54 20 6f 6f 4d 20 6e 61 20 79 65 53
-00000060: 72 63 74 65 20 73 6f 54 20 6f 61 4d 79 6e 53 20
-00000070: 63 65 65 72 73 74 54 20 6f 6f 4d 20 6e 61 0a 79
-00000080: c0 50 f1 ac c0 50 f3 38 c0 50 f3 94 c0 50 f5 30
-00000090: c0 99 74 3c c0 96 e5 b8 c0 96 e9 20 c0 00 3d dc
-
-This patch fixes that.
+Use kzalloc() to zeroize the extended descriptor at allocation and
+further zeorising
 
 Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 ---
- drivers/crypto/talitos.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ drivers/crypto/talitos.c | 23 +----------------------
+ drivers/crypto/talitos.h |  2 --
+ 2 files changed, 1 insertion(+), 24 deletions(-)
 
 diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index dff88838dce7..cd8a37e60259 100644
+index cd8a37e60259..a5b608b54c74 100644
 --- a/drivers/crypto/talitos.c
 +++ b/drivers/crypto/talitos.c
-@@ -1232,12 +1232,11 @@ static int ipsec_esp(struct talitos_edesc *edesc, struct aead_request *areq,
- 			sg_link_tbl_len += authsize;
+@@ -75,7 +75,6 @@ static void to_talitos_ptr_len(struct talitos_ptr *ptr, unsigned int len,
+ 			       bool is_sec1)
+ {
+ 	if (is_sec1) {
+-		ptr->res = 0;
+ 		ptr->len1 = cpu_to_be16(len);
+ 	} else {
+ 		ptr->len = cpu_to_be16(len);
+@@ -118,7 +117,6 @@ static void map_single_talitos_ptr(struct device *dev,
+ 
+ 	to_talitos_ptr_len(ptr, len, is_sec1);
+ 	to_talitos_ptr(ptr, dma_addr, is_sec1);
+-	to_talitos_ptr_ext_set(ptr, 0, is_sec1);
+ }
+ 
+ /*
+@@ -287,7 +285,6 @@ int talitos_submit(struct device *dev, int ch, struct talitos_desc *desc,
+ 	/* map descriptor and save caller data */
+ 	if (is_sec1) {
+ 		desc->hdr1 = desc->hdr;
+-		desc->next_desc = 0;
+ 		request->dma_desc = dma_map_single(dev, &desc->hdr1,
+ 						   TALITOS_DESC_SIZE,
+ 						   DMA_BIDIRECTIONAL);
+@@ -1099,7 +1096,6 @@ static int sg_to_link_tbl_offset(struct scatterlist *sg, int sg_count,
+ 		to_talitos_ptr(link_tbl_ptr + count,
+ 			       sg_dma_address(sg) + offset, 0);
+ 		to_talitos_ptr_len(link_tbl_ptr + count, len, 0);
+-		to_talitos_ptr_ext_set(link_tbl_ptr + count, 0, 0);
+ 		count++;
+ 		cryptlen -= len;
+ 		offset = 0;
+@@ -1125,7 +1121,6 @@ int talitos_sg_map(struct device *dev, struct scatterlist *src,
+ 	bool is_sec1 = has_ftr_sec1(priv);
+ 
+ 	to_talitos_ptr_len(ptr, len, is_sec1);
+-	to_talitos_ptr_ext_set(ptr, 0, is_sec1);
+ 
+ 	if (sg_count == 1) {
+ 		to_talitos_ptr(ptr, sg_dma_address(src) + offset, is_sec1);
+@@ -1197,11 +1192,9 @@ static int ipsec_esp(struct talitos_edesc *edesc, struct aead_request *areq,
+ 	if (desc->hdr & DESC_HDR_TYPE_IPSEC_ESP) {
+ 		to_talitos_ptr(&desc->ptr[2], edesc->iv_dma, is_sec1);
+ 		to_talitos_ptr_len(&desc->ptr[2], ivsize, is_sec1);
+-		to_talitos_ptr_ext_set(&desc->ptr[2], 0, is_sec1);
+ 	} else {
+ 		to_talitos_ptr(&desc->ptr[3], edesc->iv_dma, is_sec1);
+ 		to_talitos_ptr_len(&desc->ptr[3], ivsize, is_sec1);
+-		to_talitos_ptr_ext_set(&desc->ptr[3], 0, is_sec1);
  	}
  
--	sg_count = talitos_sg_map(dev, areq->src, cryptlen, edesc,
--				  &desc->ptr[4], sg_count, areq->assoclen,
--				  tbl_off);
-+	ret = talitos_sg_map(dev, areq->src, cryptlen, edesc, &desc->ptr[4],
-+			     sg_count, areq->assoclen, tbl_off);
+ 	/* cipher key */
+@@ -1221,7 +1214,6 @@ static int ipsec_esp(struct talitos_edesc *edesc, struct aead_request *areq,
+ 	 * typically 12 for ipsec
+ 	 */
+ 	to_talitos_ptr_len(&desc->ptr[4], cryptlen, is_sec1);
+-	to_talitos_ptr_ext_set(&desc->ptr[4], 0, is_sec1);
  
--	if (sg_count > 1) {
--		tbl_off += sg_count;
-+	if (ret > 1) {
-+		tbl_off += ret;
+ 	sg_link_tbl_len = cryptlen;
+ 
+@@ -1275,8 +1267,6 @@ static int ipsec_esp(struct talitos_edesc *edesc, struct aead_request *areq,
+ 			to_talitos_ptr(tbl_ptr, edesc->dma_link_tbl + offset,
+ 				       is_sec1);
+ 		}
+-	} else {
+-		edesc->icv_ool = false;
+ 	}
+ 
+ 	/* ICV data */
+@@ -1386,7 +1376,7 @@ static struct talitos_edesc *talitos_edesc_alloc(struct device *dev,
+ 		alloc_len += icv_stashing ? authsize : 0;
+ 	}
+ 
+-	edesc = kmalloc(alloc_len, GFP_DMA | flags);
++	edesc = kzalloc(alloc_len, GFP_DMA | flags);
+ 	if (!edesc) {
+ 		dev_err(dev, "could not allocate edescriptor\n");
+ 		err = ERR_PTR(-ENOMEM);
+@@ -1467,7 +1457,6 @@ static int aead_decrypt(struct aead_request *req)
+ 				  DESC_HDR_MODE1_MDEU_CICV;
+ 
+ 		/* reset integrity check result bits */
+-		edesc->desc.hdr_lo = 0;
+ 
+ 		return ipsec_esp(edesc, req, ipsec_esp_decrypt_hwauth_done);
+ 	}
+@@ -1554,12 +1543,10 @@ static int common_nonsnoop(struct talitos_edesc *edesc,
+ 	bool is_sec1 = has_ftr_sec1(priv);
+ 
+ 	/* first DWORD empty */
+-	desc->ptr[0] = zero_entry;
+ 
+ 	/* cipher iv */
+ 	to_talitos_ptr(&desc->ptr[1], edesc->iv_dma, is_sec1);
+ 	to_talitos_ptr_len(&desc->ptr[1], ivsize, is_sec1);
+-	to_talitos_ptr_ext_set(&desc->ptr[1], 0, is_sec1);
+ 
+ 	/* cipher key */
+ 	map_single_talitos_ptr(dev, &desc->ptr[2], ctx->keylen,
+@@ -1598,7 +1585,6 @@ static int common_nonsnoop(struct talitos_edesc *edesc,
+ 			       DMA_FROM_DEVICE);
+ 
+ 	/* last DWORD empty */
+-	desc->ptr[6] = zero_entry;
+ 
+ 	if (sync_needed)
+ 		dma_sync_single_for_device(dev, edesc->dma_link_tbl,
+@@ -1744,7 +1730,6 @@ static int common_nonsnoop_hash(struct talitos_edesc *edesc,
+ 	int sg_count;
+ 
+ 	/* first DWORD empty */
+-	desc->ptr[0] = zero_entry;
+ 
+ 	/* hash context in */
+ 	if (!req_ctx->first || req_ctx->swinit) {
+@@ -1753,8 +1738,6 @@ static int common_nonsnoop_hash(struct talitos_edesc *edesc,
+ 				       (char *)req_ctx->hw_context,
+ 				       DMA_TO_DEVICE);
+ 		req_ctx->swinit = 0;
+-	} else {
+-		desc->ptr[1] = zero_entry;
+ 	}
+ 	/* Indicate next op is not the first. */
+ 	req_ctx->first = 0;
+@@ -1763,8 +1746,6 @@ static int common_nonsnoop_hash(struct talitos_edesc *edesc,
+ 	if (ctx->keylen)
+ 		map_single_talitos_ptr(dev, &desc->ptr[2], ctx->keylen,
+ 				       (char *)&ctx->key, DMA_TO_DEVICE);
+-	else
+-		desc->ptr[2] = zero_entry;
+ 
+ 	sg_count = edesc->src_nents ?: 1;
+ 	if (is_sec1 && sg_count > 1)
+@@ -1781,7 +1762,6 @@ static int common_nonsnoop_hash(struct talitos_edesc *edesc,
  		sync_needed = true;
- 	}
  
+ 	/* fifth DWORD empty */
+-	desc->ptr[4] = zero_entry;
+ 
+ 	/* hash/HMAC out -or- hash context out */
+ 	if (req_ctx->last)
+@@ -1794,7 +1774,6 @@ static int common_nonsnoop_hash(struct talitos_edesc *edesc,
+ 				       req_ctx->hw_context, DMA_FROM_DEVICE);
+ 
+ 	/* last DWORD empty */
+-	desc->ptr[6] = zero_entry;
+ 
+ 	if (is_sec1 && from_talitos_ptr_len(&desc->ptr[3], true) == 0)
+ 		talitos_handle_buggy_hash(ctx, edesc, &desc->ptr[3]);
+diff --git a/drivers/crypto/talitos.h b/drivers/crypto/talitos.h
+index 8dd8f40e2771..6112ff1fc334 100644
+--- a/drivers/crypto/talitos.h
++++ b/drivers/crypto/talitos.h
+@@ -52,8 +52,6 @@ struct talitos_ptr {
+ 	__be32 ptr;     /* address */
+ };
+ 
+-static const struct talitos_ptr zero_entry;
+-
+ /* descriptor */
+ struct talitos_desc {
+ 	__be32 hdr;                     /* header high bits */
 -- 
 2.13.3
