@@ -1,33 +1,37 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: vmx ghash buggy on ppc64le
-Date: Tue, 19 Sep 2017 11:18:45 +0800
-Message-ID: <20170919031845.GA28732@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:33852 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751074AbdISDTD (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 18 Sep 2017 23:19:03 -0400
-Content-Disposition: inline
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH 0/6] crypto: talitos - various fixes
+Date: Tue, 19 Sep 2017 14:58:59 +0200 (CEST)
+Message-ID: <cover.1505825623.git.christophe.leroy@c-s.fr>
+Cc: linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+ linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+ David S. Miller <davem@davemloft.net>
+Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
+List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
+List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
+List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
+List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
+Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+Sender: "Linuxppc-dev"
+ <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+List-Id: linux-crypto.vger.kernel.org
 
-Hi:
+This serie provide various fixes on the talitos driver.
 
-I have received a report that ghash on ppc64le does not interoperate
-with other implementations of ghash, e.g., on x86-64.
+Christophe Leroy (6):
+  crypto: talitos - Don't provide setkey for non hmac hashing algs.
+  crypto: talitos - fix hashing
+  crypto: talitos - fix sha224
+  crypto: talitos - fix AEAD test failures
+  crypto: talitos - use kzalloc instead of kmalloc
+  crypto: talitos - fix memory corruption on SEC2
 
-https://bugzilla.redhat.com/show_bug.cgi?id=1490972
+ drivers/crypto/talitos.c | 81 +++++++++++++++++++++---------------------------
+ drivers/crypto/talitos.h |  2 --
+ 2 files changed, 36 insertions(+), 47 deletions(-)
 
-Could you guys take a look at this and see if this is a bug in
-the mainline vmx driver too?
-
-Thanks!
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.13.3
