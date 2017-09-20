@@ -1,56 +1,55 @@
-From: Corentin Labbe <clabbe.montjoie@gmail.com>
-Subject: [PATCH] crypto: bcm: use of_device_get_match_data
-Date: Wed, 20 Sep 2017 20:47:26 +0200
-Message-ID: <20170920184726.22706-1-clabbe.montjoie@gmail.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Corentin Labbe <clabbe.montjoie@gmail.com>
-To: herbert@gondor.apana.org.au, davem@davemloft.net
+From: christophe leroy <christophe.leroy@c-s.fr>
+Subject: Re: [PATCH 0/6] crypto: talitos - various fixes
+Date: Wed, 20 Sep 2017 21:21:46 +0200
+Message-ID: <b708d7a7-1ee2-db0a-70ff-f5e36901a230@c-s.fr>
+References: <cover.1505825623.git.christophe.leroy@c-s.fr>
+ <d1a928d5-d5cd-baf6-a6bf-2375cce4b4a4@c-s.fr>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Cc: linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wr0-f196.google.com ([209.85.128.196]:35302 "EHLO
-        mail-wr0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751367AbdITStg (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Sep 2017 14:49:36 -0400
+Received: from pegase1.c-s.fr ([93.17.236.30]:36385 "EHLO pegase1.c-s.fr"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750938AbdITTVz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 20 Sep 2017 15:21:55 -0400
+In-Reply-To: <d1a928d5-d5cd-baf6-a6bf-2375cce4b4a4@c-s.fr>
+Content-Language: fr
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The usage of of_device_get_match_data reduce the code size a bit.
-Furthermore, it prevents an improbable dereference when
-of_match_device() return NULL.
+What's going wrong ? I have resent it and it the same again, the serie 
+is not dispatched on the linux-crypto list, but when I answer to a mail 
+of the serie, the answer shows up.
 
-Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+What could be the issue ?
+
+Christophe
+
+Le 20/09/2017 à 10:35, Christophe LEROY a écrit :
+> Looks like the linux-crypto list and patchwork was out of order when I 
+> sent this. I will send again, sorry for the noise on the other lists.
+> 
+> Le 19/09/2017 à 14:58, Christophe Leroy a écrit :
+>> This serie provide various fixes on the talitos driver.
+>>
+>> Christophe Leroy (6):
+>>    crypto: talitos - Don't provide setkey for non hmac hashing algs.
+>>    crypto: talitos - fix hashing
+>>    crypto: talitos - fix sha224
+>>    crypto: talitos - fix AEAD test failures
+>>    crypto: talitos - use kzalloc instead of kmalloc
+>>    crypto: talitos - fix memory corruption on SEC2
+>>
+>>   drivers/crypto/talitos.c | 81 
+>> +++++++++++++++++++++---------------------------
+>>   drivers/crypto/talitos.h |  2 --
+>>   2 files changed, 36 insertions(+), 47 deletions(-)
+>>
+
 ---
- drivers/crypto/bcm/cipher.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/crypto/bcm/cipher.c b/drivers/crypto/bcm/cipher.c
-index 537a67483aa3..92e97a6da811 100644
---- a/drivers/crypto/bcm/cipher.c
-+++ b/drivers/crypto/bcm/cipher.c
-@@ -4818,7 +4818,6 @@ static int spu_dt_read(struct platform_device *pdev)
- 	struct device *dev = &pdev->dev;
- 	struct spu_hw *spu = &iproc_priv.spu;
- 	struct resource *spu_ctrl_regs;
--	const struct of_device_id *match;
- 	const struct spu_type_subtype *matched_spu_type;
- 	struct device_node *dn = pdev->dev.of_node;
- 	int err, i;
-@@ -4826,14 +4825,12 @@ static int spu_dt_read(struct platform_device *pdev)
- 	/* Count number of mailbox channels */
- 	spu->num_chan = of_count_phandle_with_args(dn, "mboxes", "#mbox-cells");
- 
--	match = of_match_device(of_match_ptr(bcm_spu_dt_ids), dev);
--	if (!match) {
-+	matched_spu_type = of_device_get_match_data(dev);
-+	if (!matched_spu_type) {
- 		dev_err(&pdev->dev, "Failed to match device\n");
- 		return -ENODEV;
- 	}
- 
--	matched_spu_type = match->data;
--
- 	spu->spu_type = matched_spu_type->type;
- 	spu->spu_subtype = matched_spu_type->subtype;
- 
--- 
-2.13.5
+L'absence de virus dans ce courrier électronique a été vérifiée par le logiciel antivirus Avast.
+https://www.avast.com/antivirus
