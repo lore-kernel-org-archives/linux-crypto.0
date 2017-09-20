@@ -1,39 +1,38 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: AF_ALG - remove SGL end indicator when chaining
-Date: Wed, 20 Sep 2017 16:32:09 +0800
-Message-ID: <20170920083209.GA3395@gondor.apana.org.au>
-References: <1913314.pET67Fvxje@positron.chronox.de>
+Subject: Re: [PATCH] crypto: AF_ALG - update correct dst SGL entry
+Date: Wed, 20 Sep 2017 16:34:10 +0800
+Message-ID: <20170920083410.GB3395@gondor.apana.org.au>
+References: <2484753.VGNM65Hb0R@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: 8bit
-Cc: linux-crypto@vger.kernel.org, stable@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
 To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Return-path: <stable-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:43540 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751575AbdITIe1 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 20 Sep 2017 04:34:27 -0400
 Content-Disposition: inline
-In-Reply-To: <1913314.pET67Fvxje@positron.chronox.de>
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <2484753.VGNM65Hb0R@positron.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Aug 30, 2017 at 06:59:07PM +0200, Stephan Müller wrote:
-> The SGL is MAX_SGL_ENTS + 1 in size. The last SG entry is used for the
-> chaining and is properly updated with the sg_chain invocation. During
-> the filling-in of the initial SG entries, sg_mark_end is called for each
-> SG entry. This is appropriate as long as no additional SGL is chained
-> with the current SGL. However, when a new SGL is chained and the last
-> SG entry is updated with sg_chain, the last but one entry still contains
-> the end marker from the sg_mark_end. This end marker must be removed as
-> otherwise a walk of the chained SGLs will cause a NULL pointer
-> dereference at the last but one SG entry, because sg_next will return
-> NULL.
+On Wed, Aug 30, 2017 at 09:17:39AM +0200, Stephan Müller wrote:
+> When two adjacent TX SGL are processed and parts of both TX SGLs
+> are pulled into the per-request TX SGL, the wrong per-request
+> TX SGL entries were updated.
 > 
-> Fixes: 8ff590903d5fc ("crypto: algif_skcipher - User-space interface
-> for skcipher operations")
-> CC: <stable@vger.kernel.org>
-> CC: Herbert Xu <herbert@gondor.apana.org.au>
+> This fixes a NULL pointer dereference when a cipher implementation walks
+> the TX SGL where some of the SGL entries were NULL.
+> 
 > Signed-off-by: Stephan Mueller <smueller@chronox.de>
 
-Hmm, this patch does not apply against the current tree.  Is this
-a stable-only patch?
+Oops, looks like you already sent me this fix.  It should have
+this fixes header:
+
+Fixes: e870456d8e7c ("crypto: algif_skcipher - overhaul memory...")
 
 Cheers,
 -- 
