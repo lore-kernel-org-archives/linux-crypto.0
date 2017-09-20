@@ -1,41 +1,40 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: AF_ALG - update correct dst SGL entry
-Date: Wed, 20 Sep 2017 16:34:10 +0800
-Message-ID: <20170920083410.GB3395@gondor.apana.org.au>
-References: <2484753.VGNM65Hb0R@positron.chronox.de>
+From: Christophe LEROY <christophe.leroy@c-s.fr>
+Subject: Re: [PATCH 0/6] crypto: talitos - various fixes
+Date: Wed, 20 Sep 2017 10:35:41 +0200
+Message-ID: <d1a928d5-d5cd-baf6-a6bf-2375cce4b4a4@c-s.fr>
+References: <cover.1505825623.git.christophe.leroy@c-s.fr>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Cc: linux-crypto@vger.kernel.org
-To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Cc: linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:43540 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751575AbdITIe1 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Sep 2017 04:34:27 -0400
-Content-Disposition: inline
-In-Reply-To: <2484753.VGNM65Hb0R@positron.chronox.de>
+Received: from pegase1.c-s.fr ([93.17.236.30]:12248 "EHLO pegase1.c-s.fr"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751575AbdITIfn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 20 Sep 2017 04:35:43 -0400
+In-Reply-To: <cover.1505825623.git.christophe.leroy@c-s.fr>
+Content-Language: fr
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Aug 30, 2017 at 09:17:39AM +0200, Stephan M�ller wrote:
-> When two adjacent TX SGL are processed and parts of both TX SGLs
-> are pulled into the per-request TX SGL, the wrong per-request
-> TX SGL entries were updated.
+Looks like the linux-crypto list and patchwork was out of order when I 
+sent this. I will send again, sorry for the noise on the other lists.
+
+Le 19/09/2017 à 14:58, Christophe Leroy a écrit :
+> This serie provide various fixes on the talitos driver.
 > 
-> This fixes a NULL pointer dereference when a cipher implementation walks
-> the TX SGL where some of the SGL entries were NULL.
+> Christophe Leroy (6):
+>    crypto: talitos - Don't provide setkey for non hmac hashing algs.
+>    crypto: talitos - fix hashing
+>    crypto: talitos - fix sha224
+>    crypto: talitos - fix AEAD test failures
+>    crypto: talitos - use kzalloc instead of kmalloc
+>    crypto: talitos - fix memory corruption on SEC2
 > 
-> Signed-off-by: Stephan Mueller <smueller@chronox.de>
-
-Oops, looks like you already sent me this fix.  It should have
-this fixes header:
-
-Fixes: e870456d8e7c ("crypto: algif_skcipher - overhaul memory...")
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+>   drivers/crypto/talitos.c | 81 +++++++++++++++++++++---------------------------
+>   drivers/crypto/talitos.h |  2 --
+>   2 files changed, 36 insertions(+), 47 deletions(-)
+> 
