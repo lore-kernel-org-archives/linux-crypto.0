@@ -1,45 +1,60 @@
-From: Christophe LEROY <christophe.leroy@c-s.fr>
-Subject: Test
-Date: Wed, 20 Sep 2017 11:36:36 +0200
-Message-ID: <53ccf56e-67c8-2570-aac6-b6f7475ed33b@c-s.fr>
+From: Robin Murphy <robin.murphy@arm.com>
+Subject: Re: DMA error when sg->offset value is greater than PAGE_SIZE in
+ Intel IOMMU
+Date: Wed, 20 Sep 2017 11:12:08 +0100
+Message-ID: <26992a1e-edb3-ed78-ce8e-31e0739d75f4@arm.com>
+References: <20170920080151.GA3348@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pegase1.c-s.fr ([93.17.236.30]:53679 "EHLO pegase1.c-s.fr"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751499AbdITJgi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Sep 2017 05:36:38 -0400
-Received: from localhost (mailhub1-int [192.168.12.234])
-        by localhost (Postfix) with ESMTP id 3xxvky2fkCz9ttBh
-        for <linux-crypto@vger.kernel.org>; Wed, 20 Sep 2017 11:36:26 +0200 (CEST)
-Received: from pegase1.c-s.fr ([192.168.12.234])
-        by localhost (pegase1.c-s.fr [192.168.12.234]) (amavisd-new, port 10024)
-        with ESMTP id TyyfEl0slBJs for <linux-crypto@vger.kernel.org>;
-        Wed, 20 Sep 2017 11:36:26 +0200 (CEST)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-        by pegase1.c-s.fr (Postfix) with ESMTP id 3xxvky28Xrz9ttBL
-        for <linux-crypto@vger.kernel.org>; Wed, 20 Sep 2017 11:36:26 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-        by messagerie.si.c-s.fr (Postfix) with ESMTP id C86E88B84B
-        for <linux-crypto@vger.kernel.org>; Wed, 20 Sep 2017 11:36:36 +0200 (CEST)
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-        by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-        with ESMTP id DP614W17CNrw for <linux-crypto@vger.kernel.org>;
-        Wed, 20 Sep 2017 11:36:36 +0200 (CEST)
-Received: from PO15451 (po15451.idsi0.si.c-s.fr [172.25.231.1])
-        by messagerie.si.c-s.fr (Postfix) with ESMTP id 9DF6A8B795
-        for <linux-crypto@vger.kernel.org>; Wed, 20 Sep 2017 11:36:36 +0200 (CEST)
-Content-Language: fr
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: leedom@chelsio.com, linux-kernel@vger.kernel.org,
+        iommu@lists.linux-foundation.org, linux-crypto@vger.kernel.org,
+        dwmw2@infradead.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        Harsh Jain <Harsh@chelsio.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20170920080151.GA3348@gondor.apana.org.au>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Sorry for the noise, but I have twice tried to send a PATCH serie to 
-this list with a copy to linuxppc-dev@lists.ozlabs.org, it appears 
-properly in the linuxppc list/patchwork but it still doesn't appear on 
-linux-crypto.
+On 20/09/17 09:01, Herbert Xu wrote:
+> Harsh Jain <Harsh@chelsio.com> wrote:
+>>
+>> While debugging DMA mapping error in chelsio crypto driver we observed that when scatter/gather list received by driver has some entry with page->offset > 4096 (PAGE_SIZE). It starts giving DMA error.  Without IOMMU it works fine.
+> 
+> This is not a bug.  The network stack can and will feed us such
+> SG lists.
+> 
+>> 2) It cannot be driver's responsibilty to update received sg entries to adjust offset and page 
+>> because we are not the only one who directly uses received sg list.
+> 
+> No the driver must deal with this.  Having said that, if we can
+> improve our driver helper interface to make this easier then we
+> should do that too.  What we certainly shouldn't do is to take a
+> whack-a-mole approach like this patch does.
 
-Is there anything wrong with the list ?
+AFAICS this is entirely on intel-iommu - from a brief look it appears
+that all the IOVA calculations would handle the offset correctly, but
+then __domain_mapping() blindly uses sg_page() for the physical address,
+so if offset is larger than a page it would end up with the DMA mapping
+covering the wrong part of the buffer.
 
-Christophe
+Does the diff below help?
+
+Robin.
+
+----->8-----
+diff --git a/drivers/iommu/intel-iommu.c b/drivers/iommu/intel-iommu.c
+index b3914fce8254..2ed43d928135 100644
+--- a/drivers/iommu/intel-iommu.c
++++ b/drivers/iommu/intel-iommu.c
+@@ -2253,7 +2253,7 @@ static int __domain_mapping(struct dmar_domain *domain, unsigned long iov_pfn,
+ 			sg_res = aligned_nrpages(sg->offset, sg->length);
+ 			sg->dma_address = ((dma_addr_t)iov_pfn << VTD_PAGE_SHIFT) + sg->offset;
+ 			sg->dma_length = sg->length;
+-			pteval = page_to_phys(sg_page(sg)) | prot;
++			pteval = (sg_phys(sg) & PAGE_MASK) | prot;
+ 			phys_pfn = pteval >> VTD_PAGE_SHIFT;
+ 		}
+ 
