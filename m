@@ -1,36 +1,51 @@
-From: Greg KH <greg@kroah.com>
-Subject: Re: [PATCH] crypto: AF_ALG - remove SGL end indicator when chaining
-Date: Wed, 20 Sep 2017 19:31:33 +0200
-Message-ID: <20170920173133.GA16691@kroah.com>
-References: <1913314.pET67Fvxje@positron.chronox.de>
- <20170920083209.GA3395@gondor.apana.org.au>
- <4784255.BN0h4dhmNf@tauon.chronox.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org, stable@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <stable-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <4784255.BN0h4dhmNf@tauon.chronox.de>
-Sender: stable-owner@vger.kernel.org
+From: Corentin Labbe <clabbe.montjoie@gmail.com>
+Subject: [PATCH] crypto: stm32: use of_device_get_match_data
+Date: Wed, 20 Sep 2017 20:31:40 +0200
+Message-ID: <20170920183140.17018-1-clabbe.montjoie@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org,
+        Corentin Labbe <clabbe.montjoie@gmail.com>
+To: herbert@gondor.apana.org.au, davem@davemloft.net,
+        mcoquelin.stm32@gmail.com, alexandre.torgue@st.com
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Sep 20, 2017 at 03:47:46PM +0200, Stephan Mueller wrote:
-> Am Mittwoch, 20. September 2017, 10:32:09 CEST schrieb Herbert Xu:
-> 
-> Hi Herbert,
-> 
-> > 
-> > Hmm, this patch does not apply against the current tree.  Is this
-> > a stable-only patch?
-> 
-> This would be a stable-only patch. With the overhauling of the AF_ALG memory 
-> handling, this is a no-issue any more.
+The usage of of_device_get_match_data reduce the code size a bit.
+Furthermore, it prevents an improbable dereference when
+of_match_device() return NULL.
 
-If you want this as a stable-only patch, you need to resend it and
-justify it a bunch as to why it isn't in Linus's tree as well.
+Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+---
+ drivers/crypto/stm32/stm32-hash.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-thanks,
-
-greg k-h
+diff --git a/drivers/crypto/stm32/stm32-hash.c b/drivers/crypto/stm32/stm32-hash.c
+index b585ce54a802..1d9285c62606 100644
+--- a/drivers/crypto/stm32/stm32-hash.c
++++ b/drivers/crypto/stm32/stm32-hash.c
+@@ -1408,11 +1408,10 @@ MODULE_DEVICE_TABLE(of, stm32_hash_of_match);
+ static int stm32_hash_get_of_match(struct stm32_hash_dev *hdev,
+ 				   struct device *dev)
+ {
+-	const struct of_device_id *match;
+ 	int err;
+ 
+-	match = of_match_device(stm32_hash_of_match, dev);
+-	if (!match) {
++	hdev->pdata = of_device_get_match_data(dev);
++	if (!hdev->pdata) {
+ 		dev_err(dev, "no compatible OF match\n");
+ 		return -EINVAL;
+ 	}
+@@ -1420,8 +1419,6 @@ static int stm32_hash_get_of_match(struct stm32_hash_dev *hdev,
+ 	err = of_property_read_u32(dev->of_node, "dma-maxburst",
+ 				   &hdev->dma_maxburst);
+ 
+-	hdev->pdata = match->data;
+-
+ 	return err;
+ }
+ 
+-- 
+2.13.5
