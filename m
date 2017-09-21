@@ -1,52 +1,74 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH - RESEND] crypto: AF_ALG - remove SGL terminator
- indicator when  chaining
-Date: Thu, 21 Sep 2017 16:18:25 +0800
-Message-ID: <20170921081825.GA8887@gondor.apana.org.au>
-References: <5857040.2sfW0oRrdW@tauon.chronox.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: greg@kroah.com, linux-crypto@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:44950 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751521AbdIUISt (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Sep 2017 04:18:49 -0400
-Content-Disposition: inline
-In-Reply-To: <5857040.2sfW0oRrdW@tauon.chronox.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: sunil.m@techveda.org
+Subject: [PATCH] staging: ccree: Convert to platform_{get,set}_drvdata()
+Date: Thu, 21 Sep 2017 16:59:04 +0530
+Message-ID: <1505993344-18304-1-git-send-email-sunil.m@techveda.org>
+Cc: linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        linux-kernel@vger.kernel.org, karthik@techveda.org,
+        Suniel Mahesh <sunil.m@techveda.org>
+To: gilad@benyossef.com, gregkh@linuxfoundation.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Sep 21, 2017 at 10:16:53AM +0200, Stephan Mueller wrote:
-> The SGL is MAX_SGL_ENTS + 1 in size. The last SG entry is used for the
-> chaining and is properly updated with the sg_chain invocation. During
-> the filling-in of the initial SG entries, sg_mark_end is called for each
-> SG entry. This is appropriate as long as no additional SGL is chained
-> with the current SGL. However, when a new SGL is chained and the last
-> SG entry is updated with sg_chain, the last but one entry still contains
-> the end marker from the sg_mark_end. This end marker must be removed as
-> otherwise a walk of the chained SGLs will cause a NULL pointer
-> dereference at the last but one SG entry, because sg_next will return
-> NULL.
-> 
-> The patch only applies to all kernels up to and including 4.13. The
-> patch 2d97591ef43d0587be22ad1b0d758d6df4999a0b added to 4.14-rc1
-> introduced a complete new code base which addresses this bug in
-> a different way. Yet, that patch is too invasive for stable kernels
-> and was therefore not marked for stable.
-> 
-> Fixes: 8ff590903d5fc ("crypto: algif_skcipher - User-space interface
-> for skcipher operations")
-> CC: <stable@vger.kernel.org>
-> CC: Herbert Xu <herbert@gondor.apana.org.au>
-> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+From: Suniel Mahesh <sunil.m@techveda.org>
 
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+Platform devices are expected to use wrapper functions,
+platform_{get,set}_drvdata() with platform_device as argument,
+for getting and setting the driver data. dev_{get,set}_drvdata()
+are using &plat_dev->dev.
+For wrapper functions we can directly pass a struct platform_device.
 
-Thanks,
+dev_set_drvdata() is redundant and therefore removed. The driver core
+clears the driver data to NULL after device_release or on probe failure.
+
+Signed-off-by: Suniel Mahesh <sunil.m@techveda.org>
+---
+Note:
+- Patch was tested and built(ARCH=arm) on next-20170921.
+  No build issues reported, however it was not tested on
+  real hardware.
+---
+ drivers/staging/ccree/ssi_driver.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/staging/ccree/ssi_driver.c b/drivers/staging/ccree/ssi_driver.c
+index 6d16220..53b4a8c 100644
+--- a/drivers/staging/ccree/ssi_driver.c
++++ b/drivers/staging/ccree/ssi_driver.c
+@@ -236,7 +236,7 @@ static int init_cc_resources(struct platform_device *plat_dev)
+ 		rc = -ENOMEM;
+ 		goto post_drvdata_err;
+ 	}
+-	dev_set_drvdata(&plat_dev->dev, new_drvdata);
++	platform_set_drvdata(plat_dev, new_drvdata);
+ 	new_drvdata->plat_dev = plat_dev;
+ 
+ 	new_drvdata->clk = of_clk_get(np, 0);
+@@ -415,7 +415,6 @@ static int init_cc_resources(struct platform_device *plat_dev)
+ 	cc_clk_off(new_drvdata);
+ post_drvdata_err:
+ 	SSI_LOG_ERR("ccree init error occurred!\n");
+-	dev_set_drvdata(&plat_dev->dev, NULL);
+ 	return rc;
+ }
+ 
+@@ -429,7 +428,7 @@ void fini_cc_regs(struct ssi_drvdata *drvdata)
+ static void cleanup_cc_resources(struct platform_device *plat_dev)
+ {
+ 	struct ssi_drvdata *drvdata =
+-		(struct ssi_drvdata *)dev_get_drvdata(&plat_dev->dev);
++		(struct ssi_drvdata *)platform_get_drvdata(plat_dev);
+ 
+ 	ssi_aead_free(drvdata);
+ 	ssi_hash_free(drvdata);
+@@ -445,7 +444,6 @@ static void cleanup_cc_resources(struct platform_device *plat_dev)
+ #endif
+ 	fini_cc_regs(drvdata);
+ 	cc_clk_off(drvdata);
+-	dev_set_drvdata(&plat_dev->dev, NULL);
+ }
+ 
+ int cc_clk_on(struct ssi_drvdata *drvdata)
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.9.1
