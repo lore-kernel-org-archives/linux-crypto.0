@@ -1,70 +1,40 @@
-From: Janani Sankara Babu <jananis37@gmail.com>
-Subject: [PATCH] staging:ccree Fix code style issues
-Date: Thu, 21 Sep 2017 12:07:46 +0530
-Message-ID: <1505975866-28226-1-git-send-email-jananis37@gmail.com>
-Cc: gilad@benyossef.com, linux-crypto@vger.kernel.org,
-        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
-        linux-kernel@vger.kernel.org,
-        Janani Sankara Babu <jananis37@gmail.com>
-To: gregkh@linuxfoundation.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pg0-f65.google.com ([74.125.83.65]:35599 "EHLO
-        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751743AbdIUGml (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Sep 2017 02:42:41 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH] crypto: AF_ALG - remove SGL end indicator when chaining
+Date: Thu, 21 Sep 2017 08:43:28 +0200
+Message-ID: <2756839.ZIDvqujQOX@tauon.chronox.de>
+References: <1913314.pET67Fvxje@positron.chronox.de> <4784255.BN0h4dhmNf@tauon.chronox.de> <20170920173133.GA16691@kroah.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org, stable@vger.kernel.org
+To: Greg KH <greg@kroah.com>
+Return-path: <stable-owner@vger.kernel.org>
+In-Reply-To: <20170920173133.GA16691@kroah.com>
+Sender: stable-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-This patch solves the coding style issues by giving same indent for 
-switch and case
+Am Mittwoch, 20. September 2017, 19:31:33 CEST schrieb Greg KH:
 
-Signed-off-by: Janani Sankara Babu <jananis37@gmail.com>
----
- drivers/staging/ccree/ssi_hash.c | 24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
+Hi Herbert,
 
-diff --git a/drivers/staging/ccree/ssi_hash.c b/drivers/staging/ccree/ssi_hash.c
-index 08eaa56..60a13c2 100644
---- a/drivers/staging/ccree/ssi_hash.c
-+++ b/drivers/staging/ccree/ssi_hash.c
-@@ -1176,12 +1176,12 @@ static int ssi_xcbc_setkey(struct crypto_ahash *ahash,
- 	CHECK_AND_RETURN_UPON_FIPS_ERROR();
- 
- 	switch (keylen) {
--		case AES_KEYSIZE_128:
--		case AES_KEYSIZE_192:
--		case AES_KEYSIZE_256:
--			break;
--		default:
--			return -EINVAL;
-+	case AES_KEYSIZE_128:
-+	case AES_KEYSIZE_192:
-+	case AES_KEYSIZE_256:
-+		break;
-+	default:
-+		return -EINVAL;
- 	}
- 
- 	ctx->key_params.keylen = keylen;
-@@ -1264,12 +1264,12 @@ static int ssi_cmac_setkey(struct crypto_ahash *ahash,
- 	ctx->is_hmac = true;
- 
- 	switch (keylen) {
--		case AES_KEYSIZE_128:
--		case AES_KEYSIZE_192:
--		case AES_KEYSIZE_256:
--			break;
--		default:
--			return -EINVAL;
-+	case AES_KEYSIZE_128:
-+	case AES_KEYSIZE_192:
-+	case AES_KEYSIZE_256:
-+		break;
-+	default:
-+		return -EINVAL;
- 	}
- 
- 	ctx->key_params.keylen = keylen;
--- 
-1.9.1
+> On Wed, Sep 20, 2017 at 03:47:46PM +0200, Stephan Mueller wrote:
+> > Am Mittwoch, 20. September 2017, 10:32:09 CEST schrieb Herbert Xu:
+> > 
+> > Hi Herbert,
+> > 
+> > > Hmm, this patch does not apply against the current tree.  Is this
+> > > a stable-only patch?
+> > 
+> > This would be a stable-only patch. With the overhauling of the AF_ALG
+> > memory handling, this is a no-issue any more.
+> 
+> If you want this as a stable-only patch, you need to resend it and
+> justify it a bunch as to why it isn't in Linus's tree as well.
+
+Would you push it or shall I send it?
+
+Thanks
+
+Ciao
+Stephan
