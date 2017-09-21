@@ -1,80 +1,39 @@
-From: Janani Sankara Babu <jananis37@gmail.com>
-Subject: [PATCH] staging:ccree Fix avoid externs in .c files
-Date: Thu, 21 Sep 2017 12:13:17 +0530
-Message-ID: <1505976197-28467-1-git-send-email-jananis37@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: devel@driverdev.osuosl.org, driverdev-devel@linuxdriverproject.org,
- linux-kernel@vger.kernel.org, Janani Sankara Babu <jananis37@gmail.com>,
- linux-crypto@vger.kernel.org
-To: gregkh@linuxfoundation.org
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
-List-Id: linux-crypto.vger.kernel.org
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH 0/6] crypto: talitos - various fixes
+Date: Thu, 21 Sep 2017 09:19:45 +0200 (CEST)
+Message-ID: <cover.1575825623.git.christophe.leroy@c-s.fr>
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from pegase1.c-s.fr ([93.17.236.30]:24820 "EHLO pegase1.c-s.fr"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751484AbdIUHTr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 21 Sep 2017 03:19:47 -0400
+Received: from localhost (mailhub1-int [192.168.12.234])
+        by localhost (Postfix) with ESMTP id 3xySfY2nHdz9ttBX
+        for <linux-crypto@vger.kernel.org>; Thu, 21 Sep 2017 09:19:33 +0200 (CEST)
+Received: from pegase1.c-s.fr ([192.168.12.234])
+        by localhost (pegase1.c-s.fr [192.168.12.234]) (amavisd-new, port 10024)
+        with ESMTP id PdIuVnLgq-mK for <linux-crypto@vger.kernel.org>;
+        Thu, 21 Sep 2017 09:19:33 +0200 (CEST)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+        by pegase1.c-s.fr (Postfix) with ESMTP id 3xySfY1LJGz9ttBK
+        for <linux-crypto@vger.kernel.org>; Thu, 21 Sep 2017 09:19:33 +0200 (CEST)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-This patch solves the warning shown by the checkpatch script
-WARNING: externs should be avoided in .c files
+This serie provide various fixes on the talitos driver.
 
-Signed-off-by: Janani Sankara Babu <jananis37@gmail.com>
----
- drivers/staging/ccree/ssi_fips_local.c | 14 --------------
- drivers/staging/ccree/ssi_fips_local.h | 13 +++++++++++++
- 2 files changed, 13 insertions(+), 14 deletions(-)
+Christophe Leroy (6):
+  crypto: talitos - Don't provide setkey for non hmac hashing algs.
+  crypto: talitos - fix hashing
+  crypto: talitos - fix sha224
+  crypto: talitos - fix AEAD test failures
+  crypto: talitos - use kzalloc instead of kmalloc
+  crypto: talitos - fix memory corruption on SEC2
 
-diff --git a/drivers/staging/ccree/ssi_fips_local.c b/drivers/staging/ccree/ssi_fips_local.c
-index aefb71d..f019041 100644
---- a/drivers/staging/ccree/ssi_fips_local.c
-+++ b/drivers/staging/ccree/ssi_fips_local.c
-@@ -48,20 +48,6 @@ struct ssi_fips_handle {
- #endif
- };
- 
--extern int ssi_fips_get_state(enum cc_fips_state_t *p_state);
--extern int ssi_fips_get_error(enum cc_fips_error *p_err);
--extern int ssi_fips_ext_set_state(enum cc_fips_state_t state);
--extern int ssi_fips_ext_set_error(enum cc_fips_error err);
--
--/* FIPS power-up tests */
--extern enum cc_fips_error ssi_cipher_fips_power_up_tests(struct ssi_drvdata *drvdata, void *cpu_addr_buffer, dma_addr_t dma_coherent_buffer);
--extern enum cc_fips_error ssi_cmac_fips_power_up_tests(struct ssi_drvdata *drvdata, void *cpu_addr_buffer, dma_addr_t dma_coherent_buffer);
--extern enum cc_fips_error ssi_hash_fips_power_up_tests(struct ssi_drvdata *drvdata, void *cpu_addr_buffer, dma_addr_t dma_coherent_buffer);
--extern enum cc_fips_error ssi_hmac_fips_power_up_tests(struct ssi_drvdata *drvdata, void *cpu_addr_buffer, dma_addr_t dma_coherent_buffer);
--extern enum cc_fips_error ssi_ccm_fips_power_up_tests(struct ssi_drvdata *drvdata, void *cpu_addr_buffer, dma_addr_t dma_coherent_buffer);
--extern enum cc_fips_error ssi_gcm_fips_power_up_tests(struct ssi_drvdata *drvdata, void *cpu_addr_buffer, dma_addr_t dma_coherent_buffer);
--extern size_t ssi_fips_max_mem_alloc_size(void);
--
- /* The function called once at driver entry point to check whether TEE FIPS error occured.*/
- static enum ssi_fips_error ssi_fips_get_tee_error(struct ssi_drvdata *drvdata)
- {
-diff --git a/drivers/staging/ccree/ssi_fips_local.h b/drivers/staging/ccree/ssi_fips_local.h
-index 8c7994f..b906190 100644
---- a/drivers/staging/ccree/ssi_fips_local.h
-+++ b/drivers/staging/ccree/ssi_fips_local.h
-@@ -65,3 +65,16 @@ static inline void ssi_fips_fini(struct ssi_drvdata *drvdata) {}
- 
- #endif  /*__SSI_FIPS_LOCAL_H__*/
- 
-+extern int ssi_fips_get_state(enum cc_fips_state_t *p_state);
-+extern int ssi_fips_get_error(enum cc_fips_error *p_err);
-+extern int ssi_fips_ext_set_state(enum cc_fips_state_t state);
-+extern int ssi_fips_ext_set_error(enum cc_fips_error err);
-+
-+/* FIPS power-up tests */
-+extern enum cc_fips_error ssi_cipher_fips_power_up_tests(struct ssi_drvdata *drvdata, void *cpu_addr_buffer, dma_addr_t dma_coherent_buffer);
-+extern enum cc_fips_error ssi_cmac_fips_power_up_tests(struct ssi_drvdata *drvdata, void *cpu_addr_buffer, dma_addr_t dma_coherent_buffer);
-+extern enum cc_fips_error ssi_hash_fips_power_up_tests(struct ssi_drvdata *drvdata, void *cpu_addr_buffer, dma_addr_t dma_coherent_buffer);
-+extern enum cc_fips_error ssi_hmac_fips_power_up_tests(struct ssi_drvdata *drvdata, void *cpu_addr_buffer, dma_addr_t dma_coherent_buffer);
-+extern enum cc_fips_error ssi_ccm_fips_power_up_tests(struct ssi_drvdata *drvdata, void *cpu_addr_buffer, dma_addr_t dma_coherent_buffer);
-+extern enum cc_fips_error ssi_gcm_fips_power_up_tests(struct ssi_drvdata *drvdata, void *cpu_addr_buffer, dma_addr_t dma_coherent_buffer);
-+extern size_t ssi_fips_max_mem_alloc_size(void);
+ drivers/crypto/talitos.c | 81 +++++++++++++++++++++---------------------------
+ drivers/crypto/talitos.h |  2 --
+ 2 files changed, 36 insertions(+), 47 deletions(-)
+
 -- 
-1.9.1
+2.13.3
