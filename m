@@ -1,34 +1,40 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: talitos - fix hashing
-Date: Thu, 21 Sep 2017 16:06:29 +0800
-Message-ID: <20170921080629.GD7718@gondor.apana.org.au>
-References: <20170913104457.CA81D684D7@po15668-vm-win7.idsi0.si.c-s.fr>
+Subject: Re: [PATCH] crypto: caam - fix LS1021A support on ARMv7
+ multiplatform kernel
+Date: Thu, 21 Sep 2017 16:07:17 +0800
+Message-ID: <20170921080717.GG7718@gondor.apana.org.au>
+References: <20170901141259.848-1-horia.geanta@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-crypto@vger.kernel.org, Stephan Muller <smueller@chronox.de>
-To: Christophe Leroy <christophe.leroy@c-s.fr>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: linux-crypto@vger.kernel.org,
+        "David S . Miller" <davem@davemloft.net>,
+        Dan Douglass <dan.douglass@nxp.com>
+To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:44926 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751681AbdIUIHf (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 21 Sep 2017 04:07:35 -0400
 Content-Disposition: inline
-In-Reply-To: <20170913104457.CA81D684D7@po15668-vm-win7.idsi0.si.c-s.fr>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20170901141259.848-1-horia.geanta@nxp.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Sep 13, 2017 at 12:44:57PM +0200, Christophe Leroy wrote:
-> md5sum on some files gives wrong result
+On Fri, Sep 01, 2017 at 05:12:59PM +0300, Horia Geantă wrote:
+> When built using multi_v7_defconfig, driver does not work on LS1021A:
+> [...]
+> caam 1700000.crypto: can't identify CAAM ipg clk: -2
+> caam: probe of 1700000.crypto failed with error -2
+> [...]
 > 
-> Exemple:
+> It turns out we have to detect at runtime whether driver is running
+> on an i.MX platform or not.
 > 
-> With the md5sum from libkcapi:
-> c15115c05bad51113f81bdaee735dd09  test
-> 
-> With the original md5sum:
-> bbdf41d80ba7e8b2b7be3a0772be76cb  test
-> 
-> This patch fixes this issue
-> 
-> Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+> Cc: <stable@vger.kernel.org>
+> Fixes: 6c3af9559352 ("crypto: caam - add support for LS1021A")
+> Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 
 Patch applied.  Thanks.
 -- 
