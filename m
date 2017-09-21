@@ -1,36 +1,36 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: talitos - Don't provide setkey for non hmac
- hashing algs.
-Date: Thu, 21 Sep 2017 16:06:53 +0800
-Message-ID: <20170921080653.GE7718@gondor.apana.org.au>
-References: <20170912090339.56D8369CAD@po15668-vm-win7.idsi0.si.c-s.fr>
+Subject: Re: [PATCH] crypto: inside-secure - fix gcc-4.9 warnings
+Date: Thu, 21 Sep 2017 16:07:05 +0800
+Message-ID: <20170921080705.GF7718@gondor.apana.org.au>
+References: <20170912101232.3688217-1-arnd@arndb.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-crypto@vger.kernel.org, Stephan Muller <smueller@chronox.de>
-To: Christophe Leroy <christophe.leroy@c-s.fr>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Ofer Heifetz <oferh@marvell.com>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20170912090339.56D8369CAD@po15668-vm-win7.idsi0.si.c-s.fr>
+In-Reply-To: <20170912101232.3688217-1-arnd@arndb.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Sep 12, 2017 at 11:03:39AM +0200, Christophe Leroy wrote:
-> Today, md5sum fails with error -ENOKEY because a setkey
-> function is set for non hmac hashing algs, see strace output below:
+On Tue, Sep 12, 2017 at 12:12:16PM +0200, Arnd Bergmann wrote:
+> All older compiler versions up to gcc-4.9 produce these
+> harmless warnings:
 > 
-> mmap(NULL, 378880, PROT_READ, MAP_SHARED, 6, 0) = 0x77f50000
-> accept(3, 0, NULL)                      = 7
-> vmsplice(5, [{"bin/\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"..., 378880}], 1, SPLICE_F_MORE|SPLICE_F_GIFT) = 262144
-> splice(4, NULL, 7, NULL, 262144, SPLICE_F_MORE) = -1 ENOKEY (Required key not available)
-> write(2, "Generation of hash for file kcap"..., 50) = 50
-> munmap(0x77f50000, 378880)              = 0
+> drivers/crypto/inside-secure/safexcel_cipher.c:389:9: warning: missing braces around initializer [-Wmissing-braces]
+> drivers/crypto/inside-secure/safexcel_cipher.c:389:9: warning: (near initialization for ‘result.completion’) [-Wmissing-braces]
+> drivers/crypto/inside-secure/safexcel_hash.c:422:9: warning: missing braces around initializer [-Wmissing-braces]
+> drivers/crypto/inside-secure/safexcel_hash.c:422:9: warning: (near initialization for ‘result.completion’) [-Wmissing-braces]
 > 
-> This patch ensures that setkey() function is set only
-> for hmac hashing.
+> This changes the syntax to something that works on all versions
+> without warnings.
 > 
-> Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+> Fixes: 1b44c5a60c13 ("crypto: inside-secure - add SafeXcel EIP197 crypto engine driver")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
 Patch applied.  Thanks.
 -- 
