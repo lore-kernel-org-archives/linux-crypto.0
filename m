@@ -1,36 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: inside-secure - fix gcc-4.9 warnings
-Date: Thu, 21 Sep 2017 16:07:05 +0800
-Message-ID: <20170921080705.GF7718@gondor.apana.org.au>
-References: <20170912101232.3688217-1-arnd@arndb.de>
+Subject: Re: [PATCH] crypto: AF_ALG - update correct dst SGL entry
+Date: Thu, 21 Sep 2017 16:07:36 +0800
+Message-ID: <20170921080736.GH7718@gondor.apana.org.au>
+References: <2484753.VGNM65Hb0R@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: 8bit
-Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Ofer Heifetz <oferh@marvell.com>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: Arnd Bergmann <arnd@arndb.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org
+To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:44936 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751839AbdIUIHy (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 21 Sep 2017 04:07:54 -0400
 Content-Disposition: inline
-In-Reply-To: <20170912101232.3688217-1-arnd@arndb.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <2484753.VGNM65Hb0R@positron.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Sep 12, 2017 at 12:12:16PM +0200, Arnd Bergmann wrote:
-> All older compiler versions up to gcc-4.9 produce these
-> harmless warnings:
+On Wed, Aug 30, 2017 at 09:17:39AM +0200, Stephan M�ller wrote:
+> When two adjacent TX SGL are processed and parts of both TX SGLs
+> are pulled into the per-request TX SGL, the wrong per-request
+> TX SGL entries were updated.
 > 
-> drivers/crypto/inside-secure/safexcel_cipher.c:389:9: warning: missing braces around initializer [-Wmissing-braces]
-> drivers/crypto/inside-secure/safexcel_cipher.c:389:9: warning: (near initialization for ‘result.completion’) [-Wmissing-braces]
-> drivers/crypto/inside-secure/safexcel_hash.c:422:9: warning: missing braces around initializer [-Wmissing-braces]
-> drivers/crypto/inside-secure/safexcel_hash.c:422:9: warning: (near initialization for ‘result.completion’) [-Wmissing-braces]
+> This fixes a NULL pointer dereference when a cipher implementation walks
+> the TX SGL where some of the SGL entries were NULL.
 > 
-> This changes the syntax to something that works on all versions
-> without warnings.
-> 
-> Fixes: 1b44c5a60c13 ("crypto: inside-secure - add SafeXcel EIP197 crypto engine driver")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> Signed-off-by: Stephan Mueller <smueller@chronox.de>
 
 Patch applied.  Thanks.
 -- 
