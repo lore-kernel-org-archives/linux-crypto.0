@@ -1,53 +1,38 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: AF_ALG - remove SGL end indicator when chaining
-Date: Thu, 21 Sep 2017 16:04:26 +0800
-Message-ID: <20170921080426.GA8137@gondor.apana.org.au>
-References: <1913314.pET67Fvxje@positron.chronox.de>
- <4784255.BN0h4dhmNf@tauon.chronox.de>
- <20170920173133.GA16691@kroah.com>
- <2756839.ZIDvqujQOX@tauon.chronox.de>
+Subject: Re: [PATCH] crypto: DRBG - fix freeing of resources
+Date: Thu, 21 Sep 2017 16:05:31 +0800
+Message-ID: <20170921080530.GA7718@gondor.apana.org.au>
+References: <5295371.QYDBsUotKj@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Greg KH <greg@kroah.com>, linux-crypto@vger.kernel.org,
-        stable@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Cc: linux-crypto@vger.kernel.org
+To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:44846 "EHLO
+Received: from orcrist.hmeau.com ([104.223.48.154]:44852 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751676AbdIUIEy (ORCPT
+        with ESMTP id S1751676AbdIUIFu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Sep 2017 04:04:54 -0400
+        Thu, 21 Sep 2017 04:05:50 -0400
 Content-Disposition: inline
-In-Reply-To: <2756839.ZIDvqujQOX@tauon.chronox.de>
+In-Reply-To: <5295371.QYDBsUotKj@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Sep 21, 2017 at 08:43:28AM +0200, Stephan Mueller wrote:
-> Am Mittwoch, 20. September 2017, 19:31:33 CEST schrieb Greg KH:
+On Thu, Sep 14, 2017 at 05:10:28PM +0200, Stephan Müller wrote:
+> During the change to use aligned buffers, the deallocation code path was
+> not updated correctly. The current code tries to free the aligned buffer
+> pointer and not the original buffer pointer as it is supposed to.
 > 
-> Hi Herbert,
+> Thus, the code is updated to free the original buffer pointer and set
+> the aligned buffer pointer that is used throughout the code to NULL.
 > 
-> > On Wed, Sep 20, 2017 at 03:47:46PM +0200, Stephan Mueller wrote:
-> > > Am Mittwoch, 20. September 2017, 10:32:09 CEST schrieb Herbert Xu:
-> > > 
-> > > Hi Herbert,
-> > > 
-> > > > Hmm, this patch does not apply against the current tree.  Is this
-> > > > a stable-only patch?
-> > > 
-> > > This would be a stable-only patch. With the overhauling of the AF_ALG
-> > > memory handling, this is a no-issue any more.
-> > 
-> > If you want this as a stable-only patch, you need to resend it and
-> > justify it a bunch as to why it isn't in Linus's tree as well.
-> 
-> Would you push it or shall I send it?
+> Fixes: 3cfc3b9721123 ("crypto: drbg - use aligned buffers")
+> CC: <stable@vger.kernel.org>
+> CC: Herbert Xu <herbert@gondor.apana.org.au>
+> Signed-off-by: Stephan Mueller <smueller@chronox.de>
 
-Please resend it with details as to why this isn't needed on the
-mainline kernel, i.e., due to the new code-base which has addressed
-the bug in a different way but is too invasive for stable.
-
-Thanks,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
