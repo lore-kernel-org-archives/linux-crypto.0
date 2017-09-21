@@ -1,40 +1,44 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH] crypto: AF_ALG - remove SGL end indicator when chaining
-Date: Thu, 21 Sep 2017 08:43:28 +0200
-Message-ID: <2756839.ZIDvqujQOX@tauon.chronox.de>
-References: <1913314.pET67Fvxje@positron.chronox.de> <4784255.BN0h4dhmNf@tauon.chronox.de> <20170920173133.GA16691@kroah.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org, stable@vger.kernel.org
-To: Greg KH <greg@kroah.com>
-Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <20170920173133.GA16691@kroah.com>
-Sender: stable-owner@vger.kernel.org
+From: Janani Sankara Babu <jananis37@gmail.com>
+Subject: [PATCH] staging:ccree Fix use BIT macro
+Date: Thu, 21 Sep 2017 12:09:42 +0530
+Message-ID: <1505975982-28314-1-git-send-email-jananis37@gmail.com>
+Cc: gilad@benyossef.com, linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        linux-kernel@vger.kernel.org,
+        Janani Sankara Babu <jananis37@gmail.com>
+To: gregkh@linuxfoundation.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Am Mittwoch, 20. September 2017, 19:31:33 CEST schrieb Greg KH:
+This patch is created to solve the following warning shown by the checkpatch
+script Warning: Replace all occurences of (1<<x) by BIT(x)
 
-Hi Herbert,
+Signed-off-by: Janani Sankara Babu <jananis37@gmail.com>
+---
+ drivers/staging/ccree/ssi_cipher.h | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-> On Wed, Sep 20, 2017 at 03:47:46PM +0200, Stephan Mueller wrote:
-> > Am Mittwoch, 20. September 2017, 10:32:09 CEST schrieb Herbert Xu:
-> > 
-> > Hi Herbert,
-> > 
-> > > Hmm, this patch does not apply against the current tree.  Is this
-> > > a stable-only patch?
-> > 
-> > This would be a stable-only patch. With the overhauling of the AF_ALG
-> > memory handling, this is a no-issue any more.
-> 
-> If you want this as a stable-only patch, you need to resend it and
-> justify it a bunch as to why it isn't in Linus's tree as well.
-
-Would you push it or shall I send it?
-
-Thanks
-
-Ciao
-Stephan
+diff --git a/drivers/staging/ccree/ssi_cipher.h b/drivers/staging/ccree/ssi_cipher.h
+index 296b375..6fbcf9d 100644
+--- a/drivers/staging/ccree/ssi_cipher.h
++++ b/drivers/staging/ccree/ssi_cipher.h
+@@ -27,11 +27,11 @@
+ #include "ssi_buffer_mgr.h"
+ 
+ /* Crypto cipher flags */
+-#define CC_CRYPTO_CIPHER_KEY_KFDE0    (1 << 0)
+-#define CC_CRYPTO_CIPHER_KEY_KFDE1    (1 << 1)
+-#define CC_CRYPTO_CIPHER_KEY_KFDE2    (1 << 2)
+-#define CC_CRYPTO_CIPHER_KEY_KFDE3    (1 << 3)
+-#define CC_CRYPTO_CIPHER_DU_SIZE_512B (1 << 4)
++#define CC_CRYPTO_CIPHER_KEY_KFDE0    BIT(0)
++#define CC_CRYPTO_CIPHER_KEY_KFDE1    BIT(1)
++#define CC_CRYPTO_CIPHER_KEY_KFDE2    BIT(2)
++#define CC_CRYPTO_CIPHER_KEY_KFDE3    BIT(3)
++#define CC_CRYPTO_CIPHER_DU_SIZE_512B BIT(4)
+ 
+ #define CC_CRYPTO_CIPHER_KEY_KFDE_MASK (CC_CRYPTO_CIPHER_KEY_KFDE0 | CC_CRYPTO_CIPHER_KEY_KFDE1 | CC_CRYPTO_CIPHER_KEY_KFDE2 | CC_CRYPTO_CIPHER_KEY_KFDE3)
+ 
+-- 
+1.9.1
