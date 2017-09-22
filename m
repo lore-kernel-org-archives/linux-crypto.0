@@ -1,48 +1,100 @@
-From: kbuild test robot <lkp@intel.com>
-Subject: [PATCH] crypto: ccp: fix eno.cocci warnings
-Date: Sat, 23 Sep 2017 05:35:58 +0800
-Message-ID: <20170922213558.GA3023@lkp-wsm-ep2>
-References: <201709230544.TcZ8OD1t%fengguang.wu@intel.com>
+From: Thomas Garnier <thgarnie@google.com>
+Subject: Re: x86: PIE support and option to extend KASLR randomization
+Date: Fri, 22 Sep 2017 16:55:27 -0700
+Message-ID: <CAJcbSZHNXQH6V8-f5Yq_YGm=iFCRPQ1OMSa6znh=zKMbQZojog@mail.gmail.com>
+References: <20170815075609.mmzbfwritjzvrpsn@gmail.com> <CAJcbSZE+TiY2whT94WqCJNXzR=2ATOHcQ10H5RqBZA1j=k1VHQ@mail.gmail.com>
+ <20170816151235.oamkdva6cwpc4cex@gmail.com> <CAJcbSZFM_zpL1av1JVaow8NdsGeH+6oZKeDnMPdXR0PGfynzsg@mail.gmail.com>
+ <20170817080920.5ljlkktngw2cisfg@gmail.com> <CAJcbSZGbtc-i0X1NiBAvZA7cxpGkwSLKNB7oDNCsFxOCdhkR_g@mail.gmail.com>
+ <CAJcbSZGhvwt=5ERtBHLJnwS=6AXBZLTMfrafzeUCqYy=-MKWDg@mail.gmail.com>
+ <20170825080443.tvvr6wzs362cjcuu@gmail.com> <CAJcbSZFJQMKw21kLwr4QGoSM7DMgKRzzjWxkYBF2c1HciCzvGg@mail.gmail.com>
+ <CAJcbSZH6hwaWKrvUZR33ExYaZaWKMSv4tJJA3yZkniLvLbTFMw@mail.gmail.com>
+ <20170921155919.skpyt7dutod5ul4t@gmail.com> <CAKv+Gu8Uw18pW9nK8aVdBoyuybAV6_mhtagVrje_cBUHMGY4WA@mail.gmail.com>
+ <CAJcbSZGAsXwMNWnZUs28-3f--ssUYh75XW+aoQztPFYe0j52yQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: kbuild-all@01.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Brijesh Singh <brijesh.singh@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Borislav Petkov <bp@suse.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Gary Hook <gary.hook@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        linux-crypto@vger.kernel.org
-To: Brijesh Singh <brijesh.singh@amd.com>
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20170919204627.3875-8-brijesh.singh@amd.com>
-Sender: kvm-owner@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: Ingo Molnar <mingo@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+	"H . Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>,
+	Josh Poimboeuf <jpoimboe@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
+	Matthias Kaehlcke <mka@chromium.org>, Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+	Juergen Gross <jgross@suse.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	=?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+	Joerg Roedel <joro@8bytes.org>, Tom Lendacky <thomas.lendacky@amd.com>,
+	Andy Lutomirski <luto@kernel.org>, Borislav Petkov <bp@suse.de>, Brian Gerst <brgerst@gmail.com>,
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, "Rafael J . Wysocki" <rjw@rjwysocki.net>,
+	Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>, Tejun H
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Return-path: <kernel-hardening-return-9941-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
+List-Post: <mailto:kernel-hardening@lists.openwall.com>
+List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
+List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
+List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
+In-Reply-To: <CAJcbSZGAsXwMNWnZUs28-3f--ssUYh75XW+aoQztPFYe0j52yQ@mail.gmail.com>
 List-Id: linux-crypto.vger.kernel.org
 
-drivers/crypto/ccp/psp-dev.c:311:5-11: ERROR: allocation function on line 310 returns NULL not ERR_PTR on failure
+On Thu, Sep 21, 2017 at 2:21 PM, Thomas Garnier <thgarnie@google.com> wrote:
+> On Thu, Sep 21, 2017 at 9:10 AM, Ard Biesheuvel
+> <ard.biesheuvel@linaro.org> wrote:
+>>
+>> On 21 September 2017 at 08:59, Ingo Molnar <mingo@kernel.org> wrote:
+>> >
+>> > ( Sorry about the delay in answering this. I could blame the delay on the merge
+>> >   window, but in reality I've been procrastinating this is due to the permanent,
+>> >   non-trivial impact PIE has on generated C code. )
+>> >
+>> > * Thomas Garnier <thgarnie@google.com> wrote:
+>> >
+>> >> 1) PIE sometime needs two instructions to represent a single
+>> >> instruction on mcmodel=kernel.
+>> >
+>> > What again is the typical frequency of this occurring in an x86-64 defconfig
+>> > kernel, with the very latest GCC?
+>> >
+>> > Also, to make sure: which unwinder did you use for your measurements,
+>> > frame-pointers or ORC? Please use ORC only for future numbers, as
+>> > frame-pointers is obsolete from a performance measurement POV.
+>> >
+>> >> 2) GCC does not optimize switches in PIE in order to reduce relocations:
+>> >
+>> > Hopefully this can either be fixed in GCC or at least influenced via a compiler
+>> > switch in the future.
+>> >
+>>
+>> There are somewhat related concerns in the ARM world, so it would be
+>> good if we could work with the GCC developers to get a more high level
+>> and arch neutral command line option (-mkernel-pie? sounds yummy!)
+>> that stops the compiler from making inferences that only hold for
+>> shared libraries and/or other hosted executables (GOT indirections,
+>> avoiding text relocations etc). That way, we will also be able to drop
+>> the 'hidden' visibility override at some point, which we currently
+>> need to prevent the compiler from redirecting all global symbol
+>> references via entries in the GOT.
+>
+> My plan was to add a -mtls-reg=<fs|gs> to switch the default segment
+> register for stack cookies but I can see great benefits in having a
+> more general kernel flag that would allow to get rid of the GOT and
+> PLT when you are building position independent code for the kernel. It
+> could also include optimizations like folding switch tables etc...
+>
+> Should we start a separate discussion on that? Anyone that would be
+> more experienced than I to push that to gcc & clang upstream?
 
- The various basic memory allocation functions don't return ERR_PTR
+After separate discussion, opened:
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=82303
 
-Generated by: scripts/coccinelle/null/eno.cocci
+>
+>>
+>> All we really need is the ability to move the image around in virtual
+>> memory, and things like reducing the CoW footprint or enabling ELF
+>> symbol preemption are completely irrelevant for us.
+>
+>
+>
+>
+> --
+> Thomas
 
-Fixes: 7d4ce155f344 ("crypto: ccp: Add Secure Encrypted Virtualization (SEV) command support")
-CC: Brijesh Singh <brijesh.singh@amd.com>
-Signed-off-by: Fengguang Wu <fengguang.wu@intel.com>
----
 
- psp-dev.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
---- a/drivers/crypto/ccp/psp-dev.c
-+++ b/drivers/crypto/ccp/psp-dev.c
-@@ -308,7 +308,7 @@ static void *copy_user_blob(u64 __user u
- 		return ERR_PTR(-EINVAL);
- 
- 	data = kmalloc(len, GFP_KERNEL);
--	if (IS_ERR(data))
-+	if (!data)
- 		return ERR_PTR(-ENOMEM);
- 
- 	if (copy_from_user(data, (void __user *)(uintptr_t)uaddr, len))
+-- 
+Thomas
