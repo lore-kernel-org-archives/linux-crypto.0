@@ -1,30 +1,35 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/1] crypto: stm32/hash - Remove uninitialized symbol
-Date: Fri, 22 Sep 2017 18:13:23 +0800
-Message-ID: <20170922101323.GE16270@gondor.apana.org.au>
-References: <1503064441-19964-1-git-send-email-lionel.debieve@st.com>
+Subject: Re: [PATCH] crypto: aesni: make arrays aesni_simd_skciphers and
+ aesni_simd_skciphers2 static
+Date: Fri, 22 Sep 2017 18:13:29 +0800
+Message-ID: <20170922101329.GF16270@gondor.apana.org.au>
+References: <20170820213438.14686-1-colin.king@canonical.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: "David S . Miller" <davem@davemloft.net>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org,
-        Benjamin Gaignard <benjamin.gaignard@st.com>,
-        Fabien Dessenne <fabien.dessenne@st.com>,
-        Ludovic Barre <ludovic.barre@st.com>
-To: Lionel Debieve <lionel.debieve@st.com>
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Colin King <colin.king@canonical.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1503064441-19964-1-git-send-email-lionel.debieve@st.com>
+In-Reply-To: <20170820213438.14686-1-colin.king@canonical.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Aug 18, 2017 at 03:54:01PM +0200, Lionel Debieve wrote:
-> Remove err symbol as this is not used in the thread context
-> and the variable is not initialized.
+On Sun, Aug 20, 2017 at 10:34:38PM +0100, Colin King wrote:
+> From: Colin Ian King <colin.king@canonical.com>
 > 
-> Signed-off-by: Lionel Debieve <lionel.debieve@st.com>
+> Arrays aesni_simd_skciphers and aesni_simd_skciphers2 are local to the
+> source and do not need to be in global scope, so make them static.
+> 
+> Cleans up sparse warnings:
+> symbol 'aesni_simd_skciphers' was not declared. Should it be static?
+> symbol 'aesni_simd_skciphers2' was not declared. Should it be static?
+> 
+> Signed-off-by: Colin Ian King <colin.king@canonical.com>
 
 Patch applied.  Thanks.
 -- 
