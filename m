@@ -1,32 +1,47 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 01/12] crypto: crypto4xx: remove bad list_del
-Date: Fri, 22 Sep 2017 18:14:33 +0800
-Message-ID: <20170922101433.GK16270@gondor.apana.org.au>
-References: <71020bd2e3f4100c3c0668a13fdad9d22c8884a7.1503668705.git.chunkeey@googlemail.com>
+From: Greg KH <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH] staging:ccree Fix dont use assignment in if condition
+Date: Fri, 22 Sep 2017 12:59:07 +0200
+Message-ID: <20170922105907.GA6259@kroah.com>
+References: <1505975824-28175-1-git-send-email-jananis37@gmail.com>
+ <20170922085505.GA8720@kroah.com>
+ <CACHTOGqqZCzNDoxvnXfwZhMBg9WOgynx85eaBydz_wUz=-bQWA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, David Miller <davem@davemloft.net>
-To: Christian Lamparter <chunkeey@googlemail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:38760 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752249AbdIVKOv (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 22 Sep 2017 06:14:51 -0400
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Cc: devel@driverdev.osuosl.org, driverdev-devel@linuxdriverproject.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Janani Sankara Babu <jananis37@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <71020bd2e3f4100c3c0668a13fdad9d22c8884a7.1503668705.git.chunkeey@googlemail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <CACHTOGqqZCzNDoxvnXfwZhMBg9WOgynx85eaBydz_wUz=-bQWA@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Aug 25, 2017 at 03:47:14PM +0200, Christian Lamparter wrote:
-> alg entries are only added to the list, after the registration
-> was successful. If the registration failed, it was never added
-> to the list in the first place.
+
+A: Because it messes up the order in which people normally read text.
+Q: Why is top-posting such a bad thing?
+A: Top-posting.
+Q: What is the most annoying thing in e-mail?
+
+A: No.
+Q: Should I include quotations after my reply?
+
+
+http://daringfireball.net/2007/07/on_top
+
+On Fri, Sep 22, 2017 at 03:52:45PM +0530, Janani Sankara Babu wrote:
+> Hi Mr. Greg,
 > 
-> Signed-off-by: Christian Lamparter <chunkeey@googlemail.com>
+>      The patches that I have sent are independent of each other. There is
+> nothing  from one patch that will affect the other one and vice verse. I have
+> double checked the same.
 
-All applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+And how am I supposed to know that?  :)
+
+>      Kindly let me know if I have to do the ordering of patches.
+
+Please do, they are long-gone from my queue now.
+
+thanks,
+
+greg k-h
