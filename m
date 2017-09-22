@@ -1,25 +1,30 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] hwrng: pseries: constify vio_device_id
-Date: Fri, 22 Sep 2017 18:13:02 +0800
-Message-ID: <20170922101302.GD16270@gondor.apana.org.au>
-References: <ba527ef090617a90e6909bab75b09e1c1ac8be68.1502990171.git.arvind.yadav.cs@gmail.com>
+Subject: Re: [PATCH 1/1] crypto: stm32/hash - Remove uninitialized symbol
+Date: Fri, 22 Sep 2017 18:13:23 +0800
+Message-ID: <20170922101323.GE16270@gondor.apana.org.au>
+References: <1503064441-19964-1-git-send-email-lionel.debieve@st.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: mpm@selenic.com, mpe@ellerman.id.au, linux-kernel@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org
-To: Arvind Yadav <arvind.yadav.cs@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@st.com>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org,
+        Benjamin Gaignard <benjamin.gaignard@st.com>,
+        Fabien Dessenne <fabien.dessenne@st.com>,
+        Ludovic Barre <ludovic.barre@st.com>
+To: Lionel Debieve <lionel.debieve@st.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <ba527ef090617a90e6909bab75b09e1c1ac8be68.1502990171.git.arvind.yadav.cs@gmail.com>
+In-Reply-To: <1503064441-19964-1-git-send-email-lionel.debieve@st.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Aug 17, 2017 at 11:06:23PM +0530, Arvind Yadav wrote:
-> vio_device_id are not supposed to change at runtime. All functions
-> working with vio_device_id provided by <asm/vio.h> work with
-> const vio_device_id. So mark the non-const structs as const.
+On Fri, Aug 18, 2017 at 03:54:01PM +0200, Lionel Debieve wrote:
+> Remove err symbol as this is not used in the thread context
+> and the variable is not initialized.
 > 
-> Signed-off-by: Arvind Yadav <arvind.yadav.cs@gmail.com>
+> Signed-off-by: Lionel Debieve <lionel.debieve@st.com>
 
 Patch applied.  Thanks.
 -- 
