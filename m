@@ -1,95 +1,143 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 4.14
-Date: Fri, 22 Sep 2017 16:44:01 +0800
-Message-ID: <20170922084401.GA15541@gondor.apana.org.au>
-References: <20161119102748.GA4277@gondor.apana.org.au>
- <20161213132414.GA7898@gondor.apana.org.au>
- <20170223125141.GA17400@gondor.apana.org.au>
- <20170714141855.GA29426@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20170714141855.GA29426@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: karthik@techveda.org
+Subject: [PATCH] staging: ccree: Fix Kernel coding style issues
+Date: Fri, 22 Sep 2017 14:15:34 +0530
+Message-ID: <1506069934-28571-1-git-send-email-karthik@techveda.org>
+Cc: linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        linux-kernel@vger.kernel.org, sunil.m@techveda.org,
+        Karthik Tummala <karthik@techveda.org>
+To: gilad@benyossef.com, gregkh@linuxfoundation.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pg0-f68.google.com ([74.125.83.68]:38769 "EHLO
+        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751838AbdIVIps (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 22 Sep 2017 04:45:48 -0400
+Received: by mail-pg0-f68.google.com with SMTP id m30so280849pgn.5
+        for <linux-crypto@vger.kernel.org>; Fri, 22 Sep 2017 01:45:48 -0700 (PDT)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus: 
+From: Karthik Tummala <karthik@techveda.org>
 
-This push fixes the following issues:
+Fixed following checkpatch warnings & checks:
+CHECK: Unnecessary parentheses
+WARNING: suspect code indent for conditional statements
+WARNING: Missing a blank line after declarations
 
-- Fix compiler warnings in inside-secure.
-- Fix LS1021A support in caam.
-- Avoid using RBP in x86 crypto code.
-- Fix bug in talitos that prevents hashing with algif.
-- Fix bugs talitos hashing code that cause incorrect hash result.
-- Fix memory freeing path bug in drbg.
-- Fix af_alg crash when two SG lists are chained.
+Signed-off-by: Karthik Tummala <karthik@techveda.org>
+---
+Note:
+- Patch was tested & built (ARCH=arm) on staging, next trees.
+- No build issues reported.
+---
+ drivers/staging/ccree/ssi_cipher.c | 37 +++++++++++++++++++------------------
+ 1 file changed, 19 insertions(+), 18 deletions(-)
 
+diff --git a/drivers/staging/ccree/ssi_cipher.c b/drivers/staging/ccree/ssi_cipher.c
+index a462075..24dbe98 100644
+--- a/drivers/staging/ccree/ssi_cipher.c
++++ b/drivers/staging/ccree/ssi_cipher.c
+@@ -76,18 +76,18 @@ static int validate_keys_sizes(struct ssi_ablkcipher_ctx *ctx_p, u32 size)
+ 		switch (size) {
+ 		case CC_AES_128_BIT_KEY_SIZE:
+ 		case CC_AES_192_BIT_KEY_SIZE:
+-			if (likely((ctx_p->cipher_mode != DRV_CIPHER_XTS) &&
+-				   (ctx_p->cipher_mode != DRV_CIPHER_ESSIV) &&
+-				   (ctx_p->cipher_mode != DRV_CIPHER_BITLOCKER)))
++			if (likely(ctx_p->cipher_mode != DRV_CIPHER_XTS &&
++				   ctx_p->cipher_mode != DRV_CIPHER_ESSIV &&
++				   ctx_p->cipher_mode != DRV_CIPHER_BITLOCKER))
+ 				return 0;
+ 			break;
+ 		case CC_AES_256_BIT_KEY_SIZE:
+ 			return 0;
+ 		case (CC_AES_192_BIT_KEY_SIZE * 2):
+ 		case (CC_AES_256_BIT_KEY_SIZE * 2):
+-			if (likely((ctx_p->cipher_mode == DRV_CIPHER_XTS) ||
+-				   (ctx_p->cipher_mode == DRV_CIPHER_ESSIV) ||
+-				   (ctx_p->cipher_mode == DRV_CIPHER_BITLOCKER)))
++			if (likely(ctx_p->cipher_mode == DRV_CIPHER_XTS ||
++				   ctx_p->cipher_mode == DRV_CIPHER_ESSIV ||
++				   ctx_p->cipher_mode == DRV_CIPHER_BITLOCKER))
+ 				return 0;
+ 			break;
+ 		default:
+@@ -115,8 +115,8 @@ static int validate_data_size(struct ssi_ablkcipher_ctx *ctx_p, unsigned int siz
+ 	case S_DIN_to_AES:
+ 		switch (ctx_p->cipher_mode) {
+ 		case DRV_CIPHER_XTS:
+-			if ((size >= SSI_MIN_AES_XTS_SIZE) &&
+-			    (size <= SSI_MAX_AES_XTS_SIZE) &&
++			if (size >= SSI_MIN_AES_XTS_SIZE &&
++			    size <= SSI_MAX_AES_XTS_SIZE &&
+ 			    IS_ALIGNED(size, AES_BLOCK_SIZE))
+ 				return 0;
+ 			break;
+@@ -140,7 +140,7 @@ static int validate_data_size(struct ssi_ablkcipher_ctx *ctx_p, unsigned int siz
+ 		break;
+ 	case S_DIN_to_DES:
+ 		if (likely(IS_ALIGNED(size, DES_BLOCK_SIZE)))
+-				return 0;
++			return 0;
+ 		break;
+ #if SSI_CC_HAS_MULTI2
+ 	case S_DIN_to_MULTI2:
+@@ -337,9 +337,9 @@ static int ssi_blkcipher_setkey(struct crypto_tfm *tfm,
+ 			return -EINVAL;
+ 		}
 
-Please pull from
+-		if ((ctx_p->cipher_mode == DRV_CIPHER_XTS) ||
+-		    (ctx_p->cipher_mode == DRV_CIPHER_ESSIV) ||
+-		    (ctx_p->cipher_mode == DRV_CIPHER_BITLOCKER)) {
++		if (ctx_p->cipher_mode == DRV_CIPHER_XTS ||
++		    ctx_p->cipher_mode == DRV_CIPHER_ESSIV ||
++		    ctx_p->cipher_mode == DRV_CIPHER_BITLOCKER) {
+ 			if (unlikely(hki->hw_key1 == hki->hw_key2)) {
+ 				SSI_LOG_ERR("Illegal hw key numbers (%d,%d)\n", hki->hw_key1, hki->hw_key2);
+ 				return -EINVAL;
+@@ -366,13 +366,13 @@ static int ssi_blkcipher_setkey(struct crypto_tfm *tfm,
+ 			return -EINVAL;
+ 		}
+ 	}
+-	if ((ctx_p->cipher_mode == DRV_CIPHER_XTS) &&
++	if (ctx_p->cipher_mode == DRV_CIPHER_XTS &&
+ 	    xts_check_key(tfm, key, keylen) != 0) {
+ 		SSI_LOG_DEBUG("weak XTS key");
+ 		return -EINVAL;
+ 	}
+-	if ((ctx_p->flow_mode == S_DIN_to_DES) &&
+-	    (keylen == DES3_EDE_KEY_SIZE) &&
++	if (ctx_p->flow_mode == S_DIN_to_DES &&
++	    keylen == DES3_EDE_KEY_SIZE &&
+ 	    ssi_verify_3des_keys(key, keylen) != 0) {
+ 		SSI_LOG_DEBUG("weak 3DES key");
+ 		return -EINVAL;
+@@ -401,6 +401,7 @@ static int ssi_blkcipher_setkey(struct crypto_tfm *tfm,
+ 			/* sha256 for key2 - use sw implementation */
+ 			int key_len = keylen >> 1;
+ 			int err;
++
+ 			SHASH_DESC_ON_STACK(desc, ctx_p->shash_tfm);
 
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-
-
-Arnd Bergmann (1):
-      crypto: inside-secure - fix gcc-4.9 warnings
-
-Horia Geantă (1):
-      crypto: caam - fix LS1021A support on ARMv7 multiplatform kernel
-
-Josh Poimboeuf (12):
-      crypto: x86/blowfish - Fix RBP usage
-      crypto: x86/camellia - Fix RBP usage
-      crypto: x86/cast5 - Fix RBP usage
-      crypto: x86/cast6 - Fix RBP usage
-      crypto: x86/des3_ede - Fix RBP usage
-      crypto: x86/sha1-avx2 - Fix RBP usage
-      crypto: x86/sha1-ssse3 - Fix RBP usage
-      crypto: x86/sha256-avx - Fix RBP usage
-      crypto: x86/sha256-avx2 - Fix RBP usage
-      crypto: x86/sha256-ssse3 - Fix RBP usage
-      crypto: sha512-avx2 - Fix RBP usage
-      crypto: x86/twofish - Fix RBP usage
-
-LEROY Christophe (3):
-      crypto: talitos - fix sha224
-      crypto: talitos - fix hashing
-      crypto: talitos - Don't provide setkey for non hmac hashing algs.
-
-Stephan Mueller (2):
-      crypto: drbg - fix freeing of resources
-      crypto: af_alg - update correct dst SGL entry
-
- arch/x86/crypto/blowfish-x86_64-asm_64.S       |   48 ++++++++-------
- arch/x86/crypto/camellia-x86_64-asm_64.S       |   26 ++++----
- arch/x86/crypto/cast5-avx-x86_64-asm_64.S      |   47 +++++++++------
- arch/x86/crypto/cast6-avx-x86_64-asm_64.S      |   50 +++++++++++-----
- arch/x86/crypto/des3_ede-asm_64.S              |   15 +++--
- arch/x86/crypto/sha1_avx2_x86_64_asm.S         |    4 +-
- arch/x86/crypto/sha1_ssse3_asm.S               |   11 ++--
- arch/x86/crypto/sha256-avx-asm.S               |   15 +++--
- arch/x86/crypto/sha256-avx2-asm.S              |   22 +++----
- arch/x86/crypto/sha256-ssse3-asm.S             |   15 +++--
- arch/x86/crypto/sha512-avx2-asm.S              |   75 ++++++++++++------------
- arch/x86/crypto/twofish-avx-x86_64-asm_64.S    |   12 ++--
- crypto/af_alg.c                                |    4 +-
- crypto/drbg.c                                  |    8 +--
- drivers/crypto/caam/Kconfig                    |    5 +-
- drivers/crypto/caam/ctrl.c                     |   19 +++---
- drivers/crypto/caam/regs.h                     |   59 +++++++++----------
- drivers/crypto/inside-secure/safexcel_cipher.c |    2 +-
- drivers/crypto/inside-secure/safexcel_hash.c   |    2 +-
- drivers/crypto/talitos.c                       |    9 +--
- 20 files changed, 236 insertions(+), 212 deletions(-)
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+ 			desc->tfm = ctx_p->shash_tfm;
+@@ -457,8 +458,8 @@ static int ssi_blkcipher_setkey(struct crypto_tfm *tfm,
+ 		set_cipher_config0(&desc[*seq_size], direction);
+ 		set_flow_mode(&desc[*seq_size], flow_mode);
+ 		set_cipher_mode(&desc[*seq_size], cipher_mode);
+-		if ((cipher_mode == DRV_CIPHER_CTR) ||
+-		    (cipher_mode == DRV_CIPHER_OFB)) {
++		if (cipher_mode == DRV_CIPHER_CTR ||
++		    cipher_mode == DRV_CIPHER_OFB) {
+ 			set_setup_mode(&desc[*seq_size], SETUP_LOAD_STATE1);
+ 		} else {
+ 			set_setup_mode(&desc[*seq_size], SETUP_LOAD_STATE0);
+@@ -762,7 +763,7 @@ static int ssi_blkcipher_process(
+ 		goto exit_process;
+ 	}
+ 	/*For CTS in case of data size aligned to 16 use CBC mode*/
+-	if (((nbytes % AES_BLOCK_SIZE) == 0) && (ctx_p->cipher_mode == DRV_CIPHER_CBC_CTS)) {
++	if (((nbytes % AES_BLOCK_SIZE) == 0) && ctx_p->cipher_mode == DRV_CIPHER_CBC_CTS) {
+ 		ctx_p->cipher_mode = DRV_CIPHER_CBC;
+ 		cts_restore_flag = 1;
+ 	}
