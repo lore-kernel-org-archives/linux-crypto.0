@@ -1,36 +1,34 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v4 1/1] crypto: engine - Permit to enqueue skcipher
- request
-Date: Fri, 22 Sep 2017 17:10:16 +0800
-Message-ID: <20170922091016.GB15677@gondor.apana.org.au>
-References: <20170818114227.15739-1-clabbe.montjoie@gmail.com>
- <20170818114227.15739-2-clabbe.montjoie@gmail.com>
+Subject: Re: [PATCH] Documentation: hw_random: Fix issue related to feeding
+ entropy pool
+Date: Fri, 22 Sep 2017 17:17:49 +0800
+Message-ID: <20170922091749.GA15902@gondor.apana.org.au>
+References: <20170822161544.24958-1-prasannatsmkumar@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: Corentin Labbe <clabbe.montjoie@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:38520 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751800AbdIVJKe (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 22 Sep 2017 05:10:34 -0400
+Cc: corbet@lwn.net, linux-crypto@vger.kernel.org,
+        linux-doc@vger.kernel.org, prasannatsmkumar@gmail.com
+To: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Return-path: <linux-doc-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20170818114227.15739-2-clabbe.montjoie@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20170822161544.24958-1-prasannatsmkumar@gmail.com>
+Sender: linux-doc-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Aug 18, 2017 at 01:42:27PM +0200, Corentin Labbe wrote:
-> The crypto engine could actually only enqueue hash and ablkcipher request.
-> This patch permit it to enqueue skcipher requests by adding all necessary
-> functions.
+PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com> wrote:
+> There is no need to use rng-tools for feeding random data into kernel
+> entropy pool as hw_random core handles it. Documentation suggested that
+> rng-tools is required which is incorrect. So remove it.
 > 
-> Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+> Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
 
-Hmm, you have not addressed my suggestion in
+Hmm, the tool still exists and can still be used to feed /dev/random.
 
-https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1474434.html
+Feeding /dev/random directly from the kernel is just one way of
+using hwrng.
+
+So rather than removing it perhaps you can modify it to state that
+the kernel can now feed /dev/random as an option.
 
 Cheers,
 -- 
