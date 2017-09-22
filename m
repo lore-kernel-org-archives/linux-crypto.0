@@ -1,39 +1,31 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: brcm - Explicity ACK mailbox message
-Date: Fri, 22 Sep 2017 18:15:56 +0800
-Message-ID: <20170922101556.GQ16270@gondor.apana.org.au>
-References: <1503999490-14527-1-git-send-email-raveendra.padasalagi@broadcom.com>
+Subject: Re: [PATCH 01/12] crypto: crypto4xx: remove bad list_del
+Date: Fri, 22 Sep 2017 18:14:33 +0800
+Message-ID: <20170922101433.GK16270@gondor.apana.org.au>
+References: <71020bd2e3f4100c3c0668a13fdad9d22c8884a7.1503668705.git.chunkeey@googlemail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Steve Lin <steven.lin1@broadcom.com>,
-        Rob Rice <rob.rice@broadcom.com>,
-        Anup Patel <anup.patel@broadcom.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        bcm-kernel-feedback-list@broadcom.com, stable@vger.kernel.org
-To: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org, David Miller <davem@davemloft.net>
+To: Christian Lamparter <chunkeey@googlemail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:38760 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752249AbdIVKOv (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 22 Sep 2017 06:14:51 -0400
 Content-Disposition: inline
-In-Reply-To: <1503999490-14527-1-git-send-email-raveendra.padasalagi@broadcom.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <71020bd2e3f4100c3c0668a13fdad9d22c8884a7.1503668705.git.chunkeey@googlemail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Aug 29, 2017 at 03:08:10PM +0530, Raveendra Padasalagi wrote:
-> Add support to explicity ACK mailbox message
-> because after sending message we can know
-> the send status via error attribute of brcm_message.
+On Fri, Aug 25, 2017 at 03:47:14PM +0200, Christian Lamparter wrote:
+> alg entries are only added to the list, after the registration
+> was successful. If the registration failed, it was never added
+> to the list in the first place.
 > 
-> This is needed to support "txdone_ack" supported in
-> mailbox controller driver.
-> 
-> Fixes: 9d12ba86f818 ("crypto: brcm - Add Broadcom SPU driver")
-> Signed-off-by: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
-> Reviewed-by: Anup Patel <anup.patel@broadcom.com>
-> Reviewed-by: Scott Branden <scott.branden@broadcom.com>
-> Cc: stable@vger.kernel.org
+> Signed-off-by: Christian Lamparter <chunkeey@googlemail.com>
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
