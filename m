@@ -1,45 +1,27 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 00/11] crypto: gcm - add GCM IV size constant
-Date: Fri, 22 Sep 2017 18:14:05 +0800
-Message-ID: <20170922101405.GI16270@gondor.apana.org.au>
-References: <20170822080818.12486-1-clabbe.montjoie@gmail.com>
+Subject: Re: [PATCH] crypto: padlock-aes: constify x86_cpu_id
+Date: Fri, 22 Sep 2017 18:15:14 +0800
+Message-ID: <20170922101514.GL16270@gondor.apana.org.au>
+References: <b9707729957fe75e016b7f99d11d801e7d993027.1503685229.git.arvind.yadav.cs@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, tglx@linutronix.de, mingo@redhat.com,
-        hpa@zytor.com, x86@kernel.org, horia.geanta@nxp.com,
-        dan.douglass@nxp.com, thomas.lendacky@amd.com, gary.hook@amd.com,
-        harsh@chelsio.com, matthias.bgg@gmail.com,
-        leosilva@linux.vnet.ibm.com, pfsmorigo@linux.vnet.ibm.com,
-        benh@kernel.crashing.org, paulus@samba.org, mpe@ellerman.id.au,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-mediatek@lists.infradead.org, linuxppc-dev@lists.ozlabs.org
-To: Corentin Labbe <clabbe.montjoie@gmail.com>
+Cc: davem@davemloft.net, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+To: Arvind Yadav <arvind.yadav.cs@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20170822080818.12486-1-clabbe.montjoie@gmail.com>
+In-Reply-To: <b9707729957fe75e016b7f99d11d801e7d993027.1503685229.git.arvind.yadav.cs@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Aug 22, 2017 at 10:08:07AM +0200, Corentin Labbe wrote:
-> Many GCM users use directly GCM IV size instead of using some constant.
+On Fri, Aug 25, 2017 at 11:53:42PM +0530, Arvind Yadav wrote:
+> x86_cpu_id are not supposed to change at runtime. MODULE_DEVICE_TABLE
+> and x86_match_cpu are working with const x86_cpu_id. So mark the
+> non-const x86_cpu_id structs as const.
 > 
-> This patch add all IV size constant used by GCM and convert drivers for using them..
-> 
-> Corentin Labbe (11):
->   crypto: gcm - add GCM iv size constant
->   crypto: caam - Use GCM IV size constant
->   crypto: ccp - Use GCM IV size constant
->   crypto: nx - Use GCM IV size constant
->   crypto: atmel - Use GCM IV size constant
->   crypto: bcm - Use GCM IV size constant
->   crypto: mediatek - Use GCM IV size constant
->   crypto: chelsio - Use GCM IV size constant
->   crypto: omap - Use GCM IV size constant
->   crypto: gcm - Use GCM IV size constant
->   crypto: aesni - Use GCM IV size constant
+> Signed-off-by: Arvind Yadav <arvind.yadav.cs@gmail.com>
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
