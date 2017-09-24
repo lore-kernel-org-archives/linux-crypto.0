@@ -1,48 +1,52 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [PATCH 0/2] fix authenc() kernel crash
-Date: Sun, 24 Sep 2017 08:28:31 +0200
-Message-ID: <5715632.7er1IYYKWG@positron.chronox.de>
-References: <3874163.dZU00zCVt8@positron.chronox.de>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: Re: [PATCH] staging:ccree Fix use BIT macro
+Date: Sun, 24 Sep 2017 10:20:28 +0300
+Message-ID: <CAOtvUMcHOwE0Tc86wy=AGTwj_K+shJk_UZmZ51iahMV5=pMBEg@mail.gmail.com>
+References: <1505975982-28314-1-git-send-email-jananis37@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
-To: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34942 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751355AbdIXG2i (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 24 Sep 2017 02:28:38 -0400
-In-Reply-To: <3874163.dZU00zCVt8@positron.chronox.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: devel@driverdev.osuosl.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ driverdev-devel@linuxdriverproject.org,
+ Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+ Linux kernel mailing list <linux-kernel@vger.kernel.org>
+To: Janani Sankara Babu <jananis37@gmail.com>
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+In-Reply-To: <1505975982-28314-1-git-send-email-jananis37@gmail.com>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+List-Id: linux-crypto.vger.kernel.org
 
-Am Sonntag, 24. September 2017, 08:22:54 CEST schrieb Stephan Müller:
+Hi Janani,
 
-Hi Herbert,
+On Thu, Sep 21, 2017 at 9:39 AM, Janani Sankara Babu
+<jananis37@gmail.com> wrote:
+> This patch is created to solve the following warning shown by the checkpatch
+> script Warning: Replace all occurences of (1<<x) by BIT(x)
+>
+> Signed-off-by: Janani Sankara Babu <jananis37@gmail.com>
 
-(private)
+Thank you for the patch - unfortunately, such a fix s already present
+in the staging-next tree.
 
-> Hi Herbert,
-> 
-> The two patches together fix a kernel crash that can be triggered via
-> AF_ALG when using authenc() with zero plaintext.
-> 
-> The changes are also tested to verify that the hashing on null data
-> is still supported.
+I suggest you base your patches to ccree on that tree as it is the
+most current for this driver.
 
-You can test / verify the patch with the HEAD code of libkcapi found in [1].
-
-Please execute:
-
-./configure --enable-kcapi-test
-make
-bin/kcapi -h -x 2 -c "authenc(hmac(sha256),cbc(aes))" -d 2
-
-Note, the last command may take a couple of seconds.
-
-[1] https://github.com/smuellerDD/libkcapi
+Thanks again,
+Gilad
 
 
-Ciao
-Stephan
+-- 
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+"If you take a class in large-scale robotics, can you end up in a
+situation where the homework eats your dog?"
+ -- Jean-Baptiste Queru
