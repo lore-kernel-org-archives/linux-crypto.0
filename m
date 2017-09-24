@@ -1,64 +1,118 @@
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [PATCH 4.13 034/109] [PATCH - RESEND] crypto: AF_ALG - remove SGL terminator indicator when  chaining
-Date: Sun, 24 Sep 2017 22:32:55 +0200
-Message-ID: <20170924203354.455841357@linuxfoundation.org>
-References: <20170924203353.104695385@linuxfoundation.org>
+From: Pavel Machek <pavel@ucw.cz>
+Subject: Re: x86: PIE support and option to extend KASLR randomization
+Date: Mon, 25 Sep 2017 00:37:08 +0200
+Message-ID: <20170924223708.GA12616@amd>
+References: <20170810172615.51965-1-thgarnie@google.com>
+ <20170811124127.kkb5pnkljz4umxuj@gmail.com>
+ <CAJcbSZFTX3uiS2g8JriS6+z_+WrG8z3hrQo4OSuyHpiyUDJWYA@mail.gmail.com>
+ <20170815075609.mmzbfwritjzvrpsn@gmail.com>
+ <CAJcbSZE+TiY2whT94WqCJNXzR=2ATOHcQ10H5RqBZA1j=k1VHQ@mail.gmail.com>
+ <20170816151235.oamkdva6cwpc4cex@gmail.com>
+ <20170821133222.2ek6bhqgdeoymxsg@hirez.programming.kicks-ass.net>
+ <20170821142854.dmuusnbc2tsrai3v@hirez.programming.kicks-ass.net>
+ <c830ba59-65d3-187f-3868-732059269f28@zytor.com>
+ <20170923100029.6nzpui6c3ke76bbs@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Stephan Mueller <smueller@chronox.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-To: linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170924203353.104695385@linuxfoundation.org>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="+QahgC5+KEYLbs62"
+Cc: "H. Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>,
+	Thomas Garnier <thgarnie@google.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Josh Poimboeuf <jpoimboe@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
+	Matthias Kaehlcke <mka@chromium.org>,
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+	Juergen Gross <jgross@suse.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+	Joerg Roedel <joro@8bytes.org>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Andy Lutomirski <luto@kernel.org>, Borislav Petkov <bp@suse.de>,
+	Brian Gerst <brgerst@gmail.com>,
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+	"Rafael J . Wysocki" <rjw@rjwysocki.net>,
+	Len Brown <len.brown@intel.com>, Tejun Heo <tj@kernel.org>,
+	Christo
+To: Ingo Molnar <mingo@kernel.org>
+Return-path: <kernel-hardening-return-9949-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
+List-Post: <mailto:kernel-hardening@lists.openwall.com>
+List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
+List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
+List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
+Content-Disposition: inline
+In-Reply-To: <20170923100029.6nzpui6c3ke76bbs@gmail.com>
 List-Id: linux-crypto.vger.kernel.org
 
-4.13-stable review patch.  If anyone has any objections, please let me know.
 
-------------------
+--+QahgC5+KEYLbs62
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-From: Stephan Mueller <smueller@chronox.de>
+Hi!
 
-Fixed differently upstream as commit 2d97591ef43d ("crypto: af_alg - consolidation of duplicate code")
+> > We do need to consider how we want modules to fit into whatever model we
+> > choose, though.  They can be adjacent, or we could go with a more
+> > traditional dynamic link model where the modules can be separate, and
+> > chained together with the main kernel via the GOT.
+>=20
+> So I believe we should start with 'adjacent'. The thing is, having module=
+s=20
+> separately randomized mostly helps if any of the secret locations fails a=
+nd
+> we want to prevent hopping from one to the other. But if one the kernel-p=
+rivileged
+> secret location fails then KASLR has already failed to a significant degr=
+ee...
+>=20
+> So I think the large-PIC model for modules does not buy us any real advan=
+tages in=20
+> practice, and the disadvantages of large-PIC are real and most Linux user=
+s have to=20
+> pay that cost unconditionally, as distro kernels have half of their kerne=
+l=20
+> functionality living in modules.
+>=20
+> But I do see fundamental value in being able to hide the kernel somewhere=
+ in a ~48=20
+> bits address space, especially if we also implement Linus's suggestion to=
+ utilize=20
+> the lower bits as well. 0..281474976710656 is a nicely large range and wi=
+ll get=20
+> larger with time.
+>=20
+> But it should all be done smartly and carefully:
+>=20
+> For example, there would be collision with regular user-space mappings, r=
+ight?
+> Can local unprivileged users use mmap(MAP_FIXED) probing to figure out wh=
+ere
+> the kernel lives?
 
-The SGL is MAX_SGL_ENTS + 1 in size. The last SG entry is used for the
-chaining and is properly updated with the sg_chain invocation. During
-the filling-in of the initial SG entries, sg_mark_end is called for each
-SG entry. This is appropriate as long as no additional SGL is chained
-with the current SGL. However, when a new SGL is chained and the last
-SG entry is updated with sg_chain, the last but one entry still contains
-the end marker from the sg_mark_end. This end marker must be removed as
-otherwise a walk of the chained SGLs will cause a NULL pointer
-dereference at the last but one SG entry, because sg_next will return
-NULL.
+Local unpriviledged users can probably get your secret bits using
+cache probing and jump prediction buffers.
 
-The patch only applies to all kernels up to and including 4.13. The
-patch 2d97591ef43d0587be22ad1b0d758d6df4999a0b added to 4.14-rc1
-introduced a complete new code base which addresses this bug in
-a different way. Yet, that patch is too invasive for stable kernels
-and was therefore not marked for stable.
+Yes, you don't want to leak the information using mmap(MAP_FIXED), but
+CPU will leak it for you, anyway.
+									Pavel
 
-Fixes: 8ff590903d5fc ("crypto: algif_skcipher - User-space interface for skcipher operations")
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- crypto/algif_skcipher.c |    4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+--=20
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
+g.html
 
---- a/crypto/algif_skcipher.c
-+++ b/crypto/algif_skcipher.c
-@@ -144,8 +144,10 @@ static int skcipher_alloc_sgl(struct soc
- 		sg_init_table(sgl->sg, MAX_SGL_ENTS + 1);
- 		sgl->cur = 0;
- 
--		if (sg)
-+		if (sg) {
- 			sg_chain(sg, MAX_SGL_ENTS + 1, sgl->sg);
-+			sg_unmark_end(sg + (MAX_SGL_ENTS - 1));
-+		}
- 
- 		list_add_tail(&sgl->list, &ctx->tsgl);
- 	}
+--+QahgC5+KEYLbs62
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlnIM5QACgkQMOfwapXb+vJIOwCdHR6N9F/ftl4zHYKwJHnThgDz
+BhEAn2Rqlf4Dn3hmUmy6pDrdlrDma6Ry
+=oY77
+-----END PGP SIGNATURE-----
+
+--+QahgC5+KEYLbs62--
