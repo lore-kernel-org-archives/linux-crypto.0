@@ -1,45 +1,64 @@
-From: Marcel Holtmann <marcel-kz+m5ild9QBg9hUCZPvPmw@public.gmane.org>
-Subject: Re: [RFC PATCH 0/2] let the crypto subsystem generate the ecc privkey
-Date: Sun, 24 Sep 2017 21:35:54 +0200
-Message-ID: <FF969547-CA3C-4C5A-8628-5EE8D201C165@holtmann.org>
-References: <20170921154742.5631-1-tudor.ambarus@microchip.com>
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 8BIT
-Cc: "bluez mailin list (linux-bluetooth-u79uwXL29TY76Z2rM5mHXA@public.gmane.org)"
-        <linux-bluetooth-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Tudor Ambarus <tudor.ambarus-UWL1GkI3JZL3oGB3hsPCZA@public.gmane.org>
-Return-path: <linux-bluetooth-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170921154742.5631-1-tudor.ambarus-UWL1GkI3JZL3oGB3hsPCZA@public.gmane.org>
-Sender: linux-bluetooth-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: [PATCH 3.18 11/42] [PATCH - RESEND] crypto: AF_ALG - remove SGL terminator indicator when  chaining
+Date: Sun, 24 Sep 2017 22:27:46 +0200
+Message-ID: <20170924202650.436181168@linuxfoundation.org>
+References: <20170924202649.994060798@linuxfoundation.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Stephan Mueller <smueller@chronox.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+To: linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20170924202649.994060798@linuxfoundation.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Tudor,
+3.18-stable review patch.  If anyone has any objections, please let me know.
 
-> That Bluetooth SMP knows about the private key is pointless, since the
-> detection of debug key usage is actually via the public key portion.
-> With this patch set, the Bluetooth SMP will stop keeping a copy of the
-> ecdh private key, except when using debug keys. This way we let the
-> crypto subsystem to generate and handle the ecdh private key,
-> potentially benefiting of hardware ecc private key generation and
-> retention.
-> 
-> Tested with selftest and with btmon and smp-tester on top of hci_vhci,
-> with ecdh done in both software and hardware (through atmel-ecc driver).
-> All tests passed.
-> 
-> Tudor Ambarus (2):
->  Bluetooth: move ecdh allocation outside of ecdh_helper
->  Bluetooth: let the crypto subsystem generate the ecc privkey
-> 
-> net/bluetooth/ecdh_helper.c | 138 ++++++++++++++++++--------------------------
-> net/bluetooth/ecdh_helper.h |   8 ++-
-> net/bluetooth/selftest.c    |  29 +++++++---
-> net/bluetooth/smp.c         | 120 ++++++++++++++++++++++++--------------
-> 4 files changed, 159 insertions(+), 136 deletions(-)
+------------------
 
-I only saw the cover letter and the patches never made it to the mailing list.
+From: Stephan Mueller <smueller@chronox.de>
 
-Regards
+Fixed differently upstream as commit 2d97591ef43d ("crypto: af_alg - consolidation of duplicate code")
 
-Marcel
+The SGL is MAX_SGL_ENTS + 1 in size. The last SG entry is used for the
+chaining and is properly updated with the sg_chain invocation. During
+the filling-in of the initial SG entries, sg_mark_end is called for each
+SG entry. This is appropriate as long as no additional SGL is chained
+with the current SGL. However, when a new SGL is chained and the last
+SG entry is updated with sg_chain, the last but one entry still contains
+the end marker from the sg_mark_end. This end marker must be removed as
+otherwise a walk of the chained SGLs will cause a NULL pointer
+dereference at the last but one SG entry, because sg_next will return
+NULL.
+
+The patch only applies to all kernels up to and including 4.13. The
+patch 2d97591ef43d0587be22ad1b0d758d6df4999a0b added to 4.14-rc1
+introduced a complete new code base which addresses this bug in
+a different way. Yet, that patch is too invasive for stable kernels
+and was therefore not marked for stable.
+
+Fixes: 8ff590903d5fc ("crypto: algif_skcipher - User-space interface for skcipher operations")
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ crypto/algif_skcipher.c |    4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+--- a/crypto/algif_skcipher.c
++++ b/crypto/algif_skcipher.c
+@@ -92,8 +92,10 @@ static int skcipher_alloc_sgl(struct soc
+ 		sg_init_table(sgl->sg, MAX_SGL_ENTS + 1);
+ 		sgl->cur = 0;
+ 
+-		if (sg)
++		if (sg) {
+ 			scatterwalk_sg_chain(sg, MAX_SGL_ENTS + 1, sgl->sg);
++			sg_unmark_end(sg + (MAX_SGL_ENTS - 1));
++		}
+ 
+ 		list_add_tail(&sgl->list, &ctx->tsgl);
+ 	}
