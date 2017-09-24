@@ -1,8 +1,8 @@
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [PATCH 3.18 11/42] [PATCH - RESEND] crypto: AF_ALG - remove SGL terminator indicator when  chaining
-Date: Sun, 24 Sep 2017 22:27:46 +0200
-Message-ID: <20170924202650.436181168@linuxfoundation.org>
-References: <20170924202649.994060798@linuxfoundation.org>
+Subject: [PATCH 4.4 27/66] [PATCH - RESEND] crypto: AF_ALG - remove SGL terminator indicator when  chaining
+Date: Sun, 24 Sep 2017 22:31:22 +0200
+Message-ID: <20170924202921.694586877@linuxfoundation.org>
+References: <20170924202920.581603259@linuxfoundation.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -11,11 +11,11 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Herbert Xu <herbert@gondor.apana.org.au>
 To: linux-kernel@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170924202649.994060798@linuxfoundation.org>
+In-Reply-To: <20170924202920.581603259@linuxfoundation.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-3.18-stable review patch.  If anyone has any objections, please let me know.
+4.4-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
@@ -50,13 +50,13 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
 --- a/crypto/algif_skcipher.c
 +++ b/crypto/algif_skcipher.c
-@@ -92,8 +92,10 @@ static int skcipher_alloc_sgl(struct soc
+@@ -143,8 +143,10 @@ static int skcipher_alloc_sgl(struct soc
  		sg_init_table(sgl->sg, MAX_SGL_ENTS + 1);
  		sgl->cur = 0;
  
 -		if (sg)
 +		if (sg) {
- 			scatterwalk_sg_chain(sg, MAX_SGL_ENTS + 1, sgl->sg);
+ 			sg_chain(sg, MAX_SGL_ENTS + 1, sgl->sg);
 +			sg_unmark_end(sg + (MAX_SGL_ENTS - 1));
 +		}
  
