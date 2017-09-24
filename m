@@ -1,47 +1,34 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [PATCH] staging:ccree Fix avoid externs in .c files
-Date: Sun, 24 Sep 2017 10:23:28 +0300
-Message-ID: <CAOtvUMdYiY07R0eWg7wJo5bD2MgkchZmxnYB=anfYp7cvJta9g@mail.gmail.com>
-References: <1505976197-28467-1-git-send-email-jananis37@gmail.com>
+From: Johannes Berg <johannes@sipsolutions.net>
+Subject: Re: [PATCH] mac80211: aead api to reduce redundancy
+Date: Sun, 24 Sep 2017 17:05:31 +0200
+Message-ID: <1506265531.2909.5.camel@sipsolutions.net>
+References: <20170924054015.8958-1-qasdfgtyuiop@gmail.com>
+         (sfid-20170924_074130_810821_889115CC)
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Cc: devel@driverdev.osuosl.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- driverdev-devel@linuxdriverproject.org,
- Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
- Linux kernel mailing list <linux-kernel@vger.kernel.org>
-To: Janani Sankara Babu <jananis37@gmail.com>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-In-Reply-To: <1505976197-28467-1-git-send-email-jananis37@gmail.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
-List-Id: linux-crypto.vger.kernel.org
+To: Xiang Gao <qasdfgtyuiop@gmail.com>, herbert@gondor.apana.org.au,
+        davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+        netdev@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from s3.sipsolutions.net ([5.9.151.49]:52774 "EHLO sipsolutions.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752392AbdIXPFk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 24 Sep 2017 11:05:40 -0400
+In-Reply-To: <20170924054015.8958-1-qasdfgtyuiop@gmail.com> (sfid-20170924_074130_810821_889115CC)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Sep 21, 2017 at 9:43 AM, Janani Sankara Babu
-<jananis37@gmail.com> wrote:
-> This patch solves the warning shown by the checkpatch script
-> WARNING: externs should be avoided in .c files
+On Sun, 2017-09-24 at 01:40 -0400, Xiang Gao wrote:
+> Currently, the aes_ccm.c and aes_gcm.c are almost line by line
+> copy of each other. This patch reduce code redundancy by moving
+> the code in these two files to crypto/aead_api.c to make it a
+> higher level aead api. The aes_ccm.c and aes_gcm.c are removed
+> and all the functions are now implemented in their headers using
+> the newly added aead api.
+> 
+No objection from me, though I'd ask you to respin with the indentation
+fixed up a bit.
 
-I'm afraid here too the feedback is the same - you are working on the
-Linus master tree, therefore you are seeing
-things that are already gone from the downstream staging tree.
-
-
-Thanks,
-Gilad
-
-
--- 
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-"If you take a class in large-scale robotics, can you end up in a
-situation where the homework eats your dog?"
- -- Jean-Baptiste Queru
+johannes
