@@ -1,78 +1,43 @@
-From: Ingo Molnar <mingo@kernel.org>
-Subject: Re: x86: PIE support and option to extend KASLR randomization
-Date: Sat, 23 Sep 2017 12:00:29 +0200
-Message-ID: <20170923100029.6nzpui6c3ke76bbs@gmail.com>
-References: <20170810172615.51965-1-thgarnie@google.com>
- <20170811124127.kkb5pnkljz4umxuj@gmail.com>
- <CAJcbSZFTX3uiS2g8JriS6+z_+WrG8z3hrQo4OSuyHpiyUDJWYA@mail.gmail.com>
- <20170815075609.mmzbfwritjzvrpsn@gmail.com>
- <CAJcbSZE+TiY2whT94WqCJNXzR=2ATOHcQ10H5RqBZA1j=k1VHQ@mail.gmail.com>
- <20170816151235.oamkdva6cwpc4cex@gmail.com>
- <20170821133222.2ek6bhqgdeoymxsg@hirez.programming.kicks-ass.net>
- <20170821142854.dmuusnbc2tsrai3v@hirez.programming.kicks-ass.net>
- <c830ba59-65d3-187f-3868-732059269f28@zytor.com>
+From: Mr Soumaila Sorgho <nicolemarois7410@gmail.com>
+Subject: Greetings From Mr. Soumaila Sorgho
+Date: Sun, 24 Sep 2017 00:28:45 +0000
+Message-ID: <CAEPXuGP_S1nzOuCb92T8n+CdQLo_m87=bkNTKma0apv7oMyY3w__25492.9161318161$1506212938$gmane$org@mail.gmail.com>
+Reply-To: soumailasorgho@yandex.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Peter Zijlstra <peterz@infradead.org>,
-	Thomas Garnier <thgarnie@google.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Josh Poimboeuf <jpoimboe@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
-	Matthias Kaehlcke <mka@chromium.org>,
-	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-	Juergen Gross <jgross@suse.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-	Joerg Roedel <joro@8bytes.org>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Andy Lutomirski <luto@kernel.org>, Borislav Petkov <bp@suse.de>,
-	Brian Gerst <brgerst@gmail.com>,
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-	"Rafael J . Wysocki" <rjw@rjwysocki.net>,
-	Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
-	Tejun Heo <tj@kernel.org>, Christoph La
-To: "H. Peter Anvin" <hpa@zytor.com>
-Return-path: <kernel-hardening-return-9945-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
-List-Post: <mailto:kernel-hardening@lists.openwall.com>
-List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
-List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
-List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
-Sender: Ingo Molnar <mingo.kernel.org@gmail.com>
-Content-Disposition: inline
-In-Reply-To: <c830ba59-65d3-187f-3868-732059269f28@zytor.com>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+To: undisclosed-recipients:;
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-vk0-f67.google.com ([209.85.213.67]:32891 "EHLO
+        mail-vk0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751811AbdIXA2q (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 23 Sep 2017 20:28:46 -0400
+Received: by mail-vk0-f67.google.com with SMTP id j189so1111140vka.0
+        for <linux-crypto@vger.kernel.org>; Sat, 23 Sep 2017 17:28:46 -0700 (PDT)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
+-- 
+Greetings From Mr. Soumaila Sorgho
 
-* H. Peter Anvin <hpa@zytor.com> wrote:
+	I have a Mutual/Beneficial Business Project that would be beneficial
+to you. I only have two questions to ask of you, if you are
+interested.
 
-> We do need to consider how we want modules to fit into whatever model we
-> choose, though.  They can be adjacent, or we could go with a more
-> traditional dynamic link model where the modules can be separate, and
-> chained together with the main kernel via the GOT.
+1. Can you handle this project?
+2. Can I give you this trust?
 
-So I believe we should start with 'adjacent'. The thing is, having modules 
-separately randomized mostly helps if any of the secret locations fails and
-we want to prevent hopping from one to the other. But if one the kernel-privileged
-secret location fails then KASLR has already failed to a significant degree...
+Please note that the deal requires high level of maturity, honesty and
+secrecy. This will involve moving some money from my office, on trust
+to your hands or bank account. Also note that i will do everything to
+make sure that the money is moved as a purely legitimate fund, so you
+will not be exposed to any risk.
 
-So I think the large-PIC model for modules does not buy us any real advantages in 
-practice, and the disadvantages of large-PIC are real and most Linux users have to 
-pay that cost unconditionally, as distro kernels have half of their kernel 
-functionality living in modules.
+I request for your full co-operation. I will give you details and
+procedure when I receive your reply, to commence this transaction, I
+require you to immediately indicate your interest by a return reply. I
+will be waiting for your response in a timely manner.
 
-But I do see fundamental value in being able to hide the kernel somewhere in a ~48 
-bits address space, especially if we also implement Linus's suggestion to utilize 
-the lower bits as well. 0..281474976710656 is a nicely large range and will get 
-larger with time.
-
-But it should all be done smartly and carefully:
-
-For example, there would be collision with regular user-space mappings, right?
-Can local unprivileged users use mmap(MAP_FIXED) probing to figure out where
-the kernel lives?
-
-Thanks,
-
-	Ingo
+Contact  Email: soumailasorgho@yandex.com
+Best Regard,
+Mr. Soumaila Sorgho
