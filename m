@@ -1,55 +1,48 @@
 From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: [PATCH 2/2] crypto: shash - no kmap of zero SG
-Date: Sun, 24 Sep 2017 08:25:17 +0200
-Message-ID: <25135634.rNEetDmbAf@positron.chronox.de>
+Subject: Re: [PATCH 0/2] fix authenc() kernel crash
+Date: Sun, 24 Sep 2017 08:28:31 +0200
+Message-ID: <5715632.7er1IYYKWG@positron.chronox.de>
 References: <3874163.dZU00zCVt8@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8BIT
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
+To: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34928 "EHLO mail.eperm.de"
+Received: from mail.eperm.de ([89.247.134.16]:34942 "EHLO mail.eperm.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751059AbdIXGZs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 24 Sep 2017 02:25:48 -0400
+        id S1751355AbdIXG2i (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 24 Sep 2017 02:28:38 -0400
 In-Reply-To: <3874163.dZU00zCVt8@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-In case the caller provides an SG with zero data, prevent a kmap of the
-page pointed to by the SG. In this case, it is possible that the page
-does not exist.
+Am Sonntag, 24. September 2017, 08:22:54 CEST schrieb Stephan Müller:
 
-This fixes a crash in authenc() when the plaintext is zero and thus the
-encryption operation is a noop. In this case, no input data exists that
-can be hashed. The crash is triggerable via AF_ALG from unprivileged
-user space.
+Hi Herbert,
 
-Fixes: 3b2f6df08258e ("crypto: hash - Export shash through ahash")
-CC: Herbert Xu <herbert@gondor.apana.org.au>
-CC: <stable@vger.kernel.org>
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- crypto/shash.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+(private)
 
-diff --git a/crypto/shash.c b/crypto/shash.c
-index 5e31c8d776df..32d0e1806bf4 100644
---- a/crypto/shash.c
-+++ b/crypto/shash.c
-@@ -278,9 +278,11 @@ int shash_ahash_digest(struct ahash_request *req, struct shash_desc *desc)
- 	struct scatterlist *sg = req->src;
- 	unsigned int offset = sg->offset;
- 	unsigned int nbytes = req->nbytes;
-+	unsigned int process = min(sg->length,
-+				   ((unsigned int)(PAGE_SIZE)) - offset);
- 	int err;
- 
--	if (nbytes < min(sg->length, ((unsigned int)(PAGE_SIZE)) - offset)) {
-+	if (process && nbytes < process) {
- 		void *data;
- 
- 		data = kmap_atomic(sg_page(sg));
--- 
-2.13.5
+> Hi Herbert,
+> 
+> The two patches together fix a kernel crash that can be triggered via
+> AF_ALG when using authenc() with zero plaintext.
+> 
+> The changes are also tested to verify that the hashing on null data
+> is still supported.
+
+You can test / verify the patch with the HEAD code of libkcapi found in [1].
+
+Please execute:
+
+./configure --enable-kcapi-test
+make
+bin/kcapi -h -x 2 -c "authenc(hmac(sha256),cbc(aes))" -d 2
+
+Note, the last command may take a couple of seconds.
+
+[1] https://github.com/smuellerDD/libkcapi
+
+
+Ciao
+Stephan
