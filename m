@@ -1,70 +1,51 @@
-From: Kamil Konieczny <k.konieczny@partner.samsung.com>
-Subject: Re: [PATCH v2] crypto: s5p-sss: Add HASH support for Exynos
-Date: Mon, 25 Sep 2017 14:08:34 +0200
-Message-ID: <0d5028d7-6559-abe5-0825-01da230ce01c@partner.samsung.com>
-References: <CGME20170915175007eucas1p2912e7a9e1b44e976f96a53d8c8e442ec@eucas1p2.samsung.com>
-        <ee7efd48-434b-e07f-b391-9ceeee980e3e@partner.samsung.com>
-        <20170919190341.5vi5icaxnmynywre@kozik-lap>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Vladimir Zapolskiy <vz@mleia.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Krzysztof Kozlowski <krzk@kernel.org>
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH] crypto: talitos - fix setkey to check key weakness
+Date: Mon, 25 Sep 2017 14:57:21 +0200 (CEST)
+Message-ID: <20170925125721.388826896D@po15668-vm-win7.idsi0.si.c-s.fr>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-reply-to: <20170919190341.5vi5icaxnmynywre@kozik-lap>
-Content-language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+Crypto manager test report the following failures:
+[    3.061081] alg: skcipher: setkey failed on test 5 for ecb-des-talitos: flags=100
+[    3.069342] alg: skcipher-ddst: setkey failed on test 5 for ecb-des-talitos: flags=100
+[    3.077754] alg: skcipher-ddst: setkey failed on test 5 for ecb-des-talitos: flags=100
 
-On 19.09.2017 21:03, Krzysztof Kozlowski wrote:
-> On Fri, Sep 15, 2017 at 07:50:06PM +0200, Kamil Konieczny wrote:
->> Add support for MD5, SHA1, SHA256 hash algorithms for Exynos HW.
->> It uses the crypto framework asynchronous hash api.
->> It is based on omap-sham.c driver.
->> S5P has some HW differencies and is not implemented.
->>
->> Modifications in s5p-sss: [...]
+This is due to setkey being expected to detect weak keys.
 
-Below I will address only 'const' questions.
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+---
+ drivers/crypto/talitos.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
->>[...]
->> +	struct crypto_queue		hash_queue;
->> +	struct ahash_request		*hash_req;
->> +	struct scatterlist		*hash_sg_iter;
->> +	int				hash_sg_cnt;
->> +
->> +	struct samsung_aes_variant	*pdata;
-> 
-> This should be const as pdata should not be modified.
-
-I will remove this.
-
->>  [...]
->> -static const struct samsung_aes_variant s5p_aes_data = {
->> +static struct samsung_aes_variant s5p_aes_data = {
-> 
-> Why do you need to drop the const? This should not be modified.
-
-OK, I will not modify this.
-
-> [...]
->> [...]
->> + */
->> +static struct sss_hash_algs_info exynos_hash_algs_info[] = {
-> 
-> Can it be const?
-
-No, it contains '.registered' var, used at probe/error path/remove.
-
->>[...]
-
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index e7e31f8fd3d1..09a2cd3a31d2 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -1494,12 +1494,20 @@ static int ablkcipher_setkey(struct crypto_ablkcipher *cipher,
+ 			     const u8 *key, unsigned int keylen)
+ {
+ 	struct talitos_ctx *ctx = crypto_ablkcipher_ctx(cipher);
++	u32 tmp[DES_EXPKEY_WORDS];
+ 
+ 	if (keylen > TALITOS_MAX_KEY_SIZE) {
+ 		crypto_ablkcipher_set_flags(cipher, CRYPTO_TFM_RES_BAD_KEY_LEN);
+ 		return -EINVAL;
+ 	}
+ 
++	if (unlikely(crypto_ablkcipher_get_flags(cipher) &
++		     CRYPTO_TFM_REQ_WEAK_KEY) &&
++	    !des_ekey(tmp, key)) {
++		crypto_ablkcipher_set_flags(cipher, CRYPTO_TFM_RES_WEAK_KEY);
++		return -EINVAL;
++	}
++
+ 	memcpy(&ctx->key, key, keylen);
+ 	ctx->keylen = keylen;
+ 
 -- 
-Best regards,
-Kamil Konieczny
-Samsung R&D Institute Poland
+2.13.3
