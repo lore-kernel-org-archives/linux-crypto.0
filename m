@@ -1,338 +1,336 @@
 From: Marcel Holtmann <marcel-kz+m5ild9QBg9hUCZPvPmw@public.gmane.org>
-Subject: Re: [RESEND RFC PATCH 1/2] Bluetooth: move ecdh allocation outside of
- ecdh_helper
-Date: Mon, 25 Sep 2017 15:02:14 +0200
-Message-ID: <F95FB3E8-B1A5-4EB5-ABB5-50C8BD16D51C@holtmann.org>
+Subject: Re: [RESEND RFC PATCH 2/2] Bluetooth: let the crypto subsystem
+ generate the ecc privkey
+Date: Mon, 25 Sep 2017 15:15:43 +0200
+Message-ID: <BCB6F8AF-19AE-4F66-89E9-775545C3FB12@holtmann.org>
 References: <20170925102356.4427-1-tudor.ambarus@microchip.com>
- <20170925102356.4427-2-tudor.ambarus@microchip.com>
+ <20170925102356.4427-3-tudor.ambarus@microchip.com>
 Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 8BIT
 Cc: linux-bluetooth-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Tudor Ambarus <tudor.ambarus-UWL1GkI3JZL3oGB3hsPCZA@public.gmane.org>
 Return-path: <linux-bluetooth-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170925102356.4427-2-tudor.ambarus-UWL1GkI3JZL3oGB3hsPCZA@public.gmane.org>
+In-Reply-To: <20170925102356.4427-3-tudor.ambarus-UWL1GkI3JZL3oGB3hsPCZA@public.gmane.org>
 Sender: linux-bluetooth-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
 Hi Tudor,
 
-> This change is a prerequisite for letting the crypto subsystem generate
-> the ecc private key for ecdh. Before this change, a new crypto tfm was
-> allocated, each time, for both key generation and shared secret
-> computation. With this change, we allocate a single tfm for both cases.
-> We need to bind the key pair generation with the shared secret
-> computation via the same crypto tfm. Once the key is set, we can
-> compute the shared secret without referring to the private key.
+> That Bluetooth SMP knows about the private key is pointless, since the
+> detection of debug key usage is actually via the public key portion.
+> With this patch, the Bluetooth SMP will stop keeping a copy of the
+> ecdh private key, except when using debug keys. This way we let the
+> crypto subsystem to generate and handle the ecdh private key,
+> potentially benefiting of hardware ecc private key generation and
+> retention.
+> 
+> The loop that tries to generate a correct private key is now removed and
+> we trust the crypto subsystem to generate a correct private key. This
+> backup logic should be done in crypto, if really needed.
+> 
+> Keeping the private key in the crypto subsystem implies that we can't
+> check if we accidentally generated a debug key. As this event is
+> unlikely we can live with it when comparing with the benefit of the
+> overall change: hardware private key generation and retention.
 > 
 > Signed-off-by: Tudor Ambarus <tudor.ambarus-UWL1GkI3JZL3oGB3hsPCZA@public.gmane.org>
 > ---
-> net/bluetooth/ecdh_helper.c | 32 ++++---------------
-> net/bluetooth/ecdh_helper.h |  8 +++--
-> net/bluetooth/selftest.c    | 29 ++++++++++++-----
-> net/bluetooth/smp.c         | 77 +++++++++++++++++++++++++++++++++++++--------
-> 4 files changed, 96 insertions(+), 50 deletions(-)
+> net/bluetooth/ecdh_helper.c | 102 +++++++++++++++++++++-----------------------
+> net/bluetooth/smp.c         |  55 +++++++++---------------
+> 2 files changed, 67 insertions(+), 90 deletions(-)
 > 
 > diff --git a/net/bluetooth/ecdh_helper.c b/net/bluetooth/ecdh_helper.c
-> index c7b1a9a..ac2c708 100644
+> index ac2c708..56e9374 100644
 > --- a/net/bluetooth/ecdh_helper.c
 > +++ b/net/bluetooth/ecdh_helper.c
-> @@ -23,7 +23,6 @@
-> #include "ecdh_helper.h"
-> 
-> #include <linux/scatterlist.h>
-> -#include <crypto/kpp.h>
-> #include <crypto/ecdh.h>
-> 
-> struct ecdh_completion {
-> @@ -50,10 +49,9 @@ static inline void swap_digits(u64 *in, u64 *out, unsigned int ndigits)
-> 		out[i] = __swab64(in[ndigits - 1 - i]);
-> }
-> 
-> -bool compute_ecdh_secret(const u8 public_key[64], const u8 private_key[32],
-> -			 u8 secret[32])
-> +bool compute_ecdh_secret(struct crypto_kpp *tfm, const u8 public_key[64],
-> +			 const u8 private_key[32], u8 secret[32])
+> @@ -53,10 +53,10 @@ bool compute_ecdh_secret(struct crypto_kpp *tfm, const u8 public_key[64],
+> 			 const u8 private_key[32], u8 secret[32])
 > {
-> -	struct crypto_kpp *tfm;
 > 	struct kpp_request *req;
-> 	struct ecdh p;
+> -	struct ecdh p;
+> +	struct ecdh p = {0};
 > 	struct ecdh_completion result;
-> @@ -66,16 +64,9 @@ bool compute_ecdh_secret(const u8 public_key[64], const u8 private_key[32],
-> 	if (!tmp)
-> 		return false;
+> 	struct scatterlist src, dst;
+> -	u8 *tmp, *buf;
+> +	u8 *tmp, *buf = NULL;
+> 	unsigned int buf_len;
+> 	int err = -ENOMEM;
 > 
-> -	tfm = crypto_alloc_kpp("ecdh", CRYPTO_ALG_INTERNAL, 0);
-> -	if (IS_ERR(tfm)) {
-> -		pr_err("alg: kpp: Failed to load tfm for kpp: %ld\n",
-> -		       PTR_ERR(tfm));
-> -		goto free_tmp;
-> -	}
-> -
-> 	req = kpp_request_alloc(tfm, GFP_KERNEL);
-> 	if (!req)
-> -		goto free_kpp;
-> +		goto free_tmp;
+> @@ -70,25 +70,29 @@ bool compute_ecdh_secret(struct crypto_kpp *tfm, const u8 public_key[64],
 > 
 > 	init_completion(&result.completion);
 > 
-> @@ -126,16 +117,14 @@ bool compute_ecdh_secret(const u8 public_key[64], const u8 private_key[32],
-> 	kzfree(buf);
-> free_req:
-> 	kpp_request_free(req);
-> -free_kpp:
-> -	crypto_free_kpp(tfm);
-> free_tmp:
-> 	kfree(tmp);
-> 	return (err == 0);
-> }
+> -	/* Security Manager Protocol holds digits in litte-endian order
+> -	 * while ECC API expect big-endian data
+> -	 */
+> -	swap_digits((u64 *)private_key, (u64 *)tmp, 4);
+> -	p.key = (char *)tmp;
+> -	p.key_size = 32;
+> 	/* Set curve_id */
+> 	p.curve_id = ECC_CURVE_NIST_P256;
+> -	buf_len = crypto_ecdh_key_len(&p);
+> -	buf = kmalloc(buf_len, GFP_KERNEL);
+> -	if (!buf)
+> -		goto free_req;
 > 
-> -bool generate_ecdh_keys(u8 public_key[64], u8 private_key[32])
-> +bool generate_ecdh_keys(struct crypto_kpp *tfm, u8 public_key[64],
-> +			u8 private_key[32])
+> -	crypto_ecdh_encode_key(buf, buf_len, &p);
+> +	if (private_key) {
+> +		/* Security Manager Protocol holds digits in little-endian order
+> +		 * while ECC API expect big-endian data.
+> +		 */
+> +		swap_digits((u64 *)private_key, (u64 *)tmp, 4);
+> +		p.key = (char *)tmp;
+> +		p.key_size = 32;
+> 
+> -	/* Set A private Key */
+> -	err = crypto_kpp_set_secret(tfm, (void *)buf, buf_len);
+> -	if (err)
+> -		goto free_all;
+> +		buf_len = crypto_ecdh_key_len(&p);
+> +		buf = kmalloc(buf_len, GFP_KERNEL);
+> +		if (!buf)
+> +			goto free_req;
+> +
+> +		crypto_ecdh_encode_key(buf, buf_len, &p);
+> +
+> +		/* Set A private Key */
+> +		err = crypto_kpp_set_secret(tfm, (void *)buf, buf_len);
+> +		if (err)
+> +			goto free_all;
+> +	}
+> 
+> 	swap_digits((u64 *)public_key, (u64 *)tmp, 4); /* x */
+> 	swap_digits((u64 *)&public_key[32], (u64 *)&tmp[32], 4); /* y */
+> @@ -126,14 +130,12 @@ bool generate_ecdh_keys(struct crypto_kpp *tfm, u8 public_key[64],
+> 			u8 private_key[32])
 > {
-> -	struct crypto_kpp *tfm;
 > 	struct kpp_request *req;
-> 	struct ecdh p;
+> -	struct ecdh p;
+> +	struct ecdh p = {0};
 > 	struct ecdh_completion result;
-> @@ -150,16 +139,9 @@ bool generate_ecdh_keys(u8 public_key[64], u8 private_key[32])
-> 	if (!tmp)
-> 		return false;
+> 	struct scatterlist dst;
+> 	u8 *tmp, *buf;
+> 	unsigned int buf_len;
+> 	int err = -ENOMEM;
+> -	const unsigned short max_tries = 16;
+> -	unsigned short tries = 0;
 > 
-> -	tfm = crypto_alloc_kpp("ecdh", CRYPTO_ALG_INTERNAL, 0);
-> -	if (IS_ERR(tfm)) {
-> -		pr_err("alg: kpp: Failed to load tfm for kpp: %ld\n",
-> -		       PTR_ERR(tfm));
-> -		goto free_tmp;
-> -	}
-> -
-> 	req = kpp_request_alloc(tfm, GFP_KERNEL);
-> 	if (!req)
-> -		goto free_kpp;
-> +		goto free_tmp;
+> 	tmp = kmalloc(64, GFP_KERNEL);
+> 	if (!tmp)
+> @@ -145,56 +147,48 @@ bool generate_ecdh_keys(struct crypto_kpp *tfm, u8 public_key[64],
 > 
 > 	init_completion(&result.completion);
 > 
-> @@ -218,8 +200,6 @@ bool generate_ecdh_keys(u8 public_key[64], u8 private_key[32])
-> 	kzfree(buf);
-> free_req:
-> 	kpp_request_free(req);
-> -free_kpp:
-> -	crypto_free_kpp(tfm);
-> free_tmp:
-> 	kfree(tmp);
-> 	return (err == 0);
-> diff --git a/net/bluetooth/ecdh_helper.h b/net/bluetooth/ecdh_helper.h
-> index 7a423fa..5cde37d 100644
-> --- a/net/bluetooth/ecdh_helper.h
-> +++ b/net/bluetooth/ecdh_helper.h
-> @@ -20,8 +20,10 @@
->  * COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS, RELATING TO USE OF THIS
->  * SOFTWARE IS DISCLAIMED.
->  */
-> +#include <crypto/kpp.h>
-> #include <linux/types.h>
-> 
-> -bool compute_ecdh_secret(const u8 pub_a[64], const u8 priv_b[32],
-> -			 u8 secret[32]);
-> -bool generate_ecdh_keys(u8 public_key[64], u8 private_key[32]);
-> +bool compute_ecdh_secret(struct crypto_kpp *tfm, const u8 pub_a[64],
-> +			 const u8 priv_b[32], u8 secret[32]);
-> +bool generate_ecdh_keys(struct crypto_kpp *tfm, u8 public_key[64],
-> +			u8 private_key[32]);
-> diff --git a/net/bluetooth/selftest.c b/net/bluetooth/selftest.c
-> index 34a1227..126bdc5 100644
-> --- a/net/bluetooth/selftest.c
-> +++ b/net/bluetooth/selftest.c
-> @@ -138,9 +138,9 @@ static const u8 dhkey_3[32] __initconst = {
-> 	0x7c, 0x1c, 0xf9, 0x49, 0xe6, 0xd7, 0xaa, 0x70,
-> };
-> 
-> -static int __init test_ecdh_sample(const u8 priv_a[32], const u8 priv_b[32],
-> -				   const u8 pub_a[64], const u8 pub_b[64],
-> -				   const u8 dhkey[32])
-> +static int __init test_ecdh_sample(struct crypto_kpp *tfm, const u8 priv_a[32],
-> +				   const u8 priv_b[32], const u8 pub_a[64],
-> +				   const u8 pub_b[64], const u8 dhkey[32])
-> {
-> 	u8 *tmp, *dhkey_a, *dhkey_b;
-> 	int ret = 0;
-> @@ -152,8 +152,8 @@ static int __init test_ecdh_sample(const u8 priv_a[32], const u8 priv_b[32],
-> 	dhkey_a = &tmp[0];
-> 	dhkey_b = &tmp[32];
-> 
-> -	compute_ecdh_secret(pub_b, priv_a, dhkey_a);
-> -	compute_ecdh_secret(pub_a, priv_b, dhkey_b);
-> +	compute_ecdh_secret(tfm, pub_b, priv_a, dhkey_a);
-> +	compute_ecdh_secret(tfm, pub_a, priv_b, dhkey_b);
-> 
-> 	if (memcmp(dhkey_a, dhkey, 32)) {
-> 		ret = -EINVAL;
-> @@ -185,30 +185,43 @@ static const struct file_operations test_ecdh_fops = {
-> 
-> static int __init test_ecdh(void)
-> {
-> +	struct crypto_kpp *tfm;
-> 	ktime_t calltime, delta, rettime;
-> 	unsigned long long duration;
-> 	int err;
-> 
-> 	calltime = ktime_get();
-> 
-> -	err = test_ecdh_sample(priv_a_1, priv_b_1, pub_a_1, pub_b_1, dhkey_1);
-> +	tfm = crypto_alloc_kpp("ecdh", CRYPTO_ALG_INTERNAL, 0);
-> +	if (IS_ERR(tfm)) {
-> +		BT_ERR("Unable to create ECDH crypto context");
-> +		err = PTR_ERR(tfm);
-> +		goto done;
+> +	/* Set private Key */
+> +	if (private_key) {
+> +		p.key = (char *)private_key;
+> +		p.key_size = 32;
 > +	}
 > +
-> +	err = test_ecdh_sample(tfm, priv_a_1, priv_b_1, pub_a_1, pub_b_1,
-> +			       dhkey_1);
-> 	if (err) {
-> 		BT_ERR("ECDH sample 1 failed");
-> 		goto done;
-> 	}
+> 	/* Set curve_id */
+> 	p.curve_id = ECC_CURVE_NIST_P256;
+> -	p.key_size = 32;
+> 	buf_len = crypto_ecdh_key_len(&p);
+> 	buf = kmalloc(buf_len, GFP_KERNEL);
+> 	if (!buf)
+> 		goto free_req;
 > 
-> -	err = test_ecdh_sample(priv_a_2, priv_b_2, pub_a_2, pub_b_2, dhkey_2);
-> +	err = test_ecdh_sample(tfm, priv_a_2, priv_b_2, pub_a_2, pub_b_2,
-> +			       dhkey_2);
-> 	if (err) {
-> 		BT_ERR("ECDH sample 2 failed");
-> 		goto done;
-> 	}
+> -	do {
+> -		if (tries++ >= max_tries)
+> -			goto free_all;
+> -
+> -		/* Set private Key */
+> -		p.key = (char *)private_key;
+> -		crypto_ecdh_encode_key(buf, buf_len, &p);
+> -		err = crypto_kpp_set_secret(tfm, buf, buf_len);
+> -		if (err)
+> -			goto free_all;
+> -
+> -		sg_init_one(&dst, tmp, 64);
+> -		kpp_request_set_input(req, NULL, 0);
+> -		kpp_request_set_output(req, &dst, 64);
+> -		kpp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+> -					 ecdh_complete, &result);
+> -
+> -		err = crypto_kpp_generate_public_key(req);
+> -
+> -		if (err == -EINPROGRESS) {
+> -			wait_for_completion(&result.completion);
+> -			err = result.err;
+> -		}
+> +	crypto_ecdh_encode_key(buf, buf_len, &p);
+> +	err = crypto_kpp_set_secret(tfm, buf, buf_len);
+> +	if (err)
+> +		goto free_all;
 > 
-> -	err = test_ecdh_sample(priv_a_3, priv_a_3, pub_a_3, pub_a_3, dhkey_3);
-> +	err = test_ecdh_sample(tfm, priv_a_3, priv_a_3, pub_a_3, pub_a_3,
-> +			       dhkey_3);
-> 	if (err) {
-> 		BT_ERR("ECDH sample 3 failed");
-> 		goto done;
-> 	}
+> -		/* Private key is not valid. Regenerate */
+> -		if (err == -EINVAL)
+> -			continue;
+> +	sg_init_one(&dst, tmp, 64);
+> +	kpp_request_set_input(req, NULL, 0);
+> +	kpp_request_set_output(req, &dst, 64);
+> +	kpp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+> +				 ecdh_complete, &result);
 > 
-> +	crypto_free_kpp(tfm);
-> +
-> 	rettime = ktime_get();
-> 	delta = ktime_sub(rettime, calltime);
-> 	duration = (unsigned long long) ktime_to_ns(delta) >> 10;
+> -		if (err < 0)
+> -			goto free_all;
+> -		else
+> -			break;
+> +	err = crypto_kpp_generate_public_key(req);
+> 
+> -	} while (true);
+> +	if (err == -EINPROGRESS) {
+> +		wait_for_completion(&result.completion);
+> +		err = result.err;
+> +	}
+> +	if (err < 0)
+> +		goto free_all;
+> 
+> 	/* Keys are handed back in little endian as expected by Security
+> 	 * Manager Protocol
+> 	 */
+> 	swap_digits((u64 *)tmp, (u64 *)public_key, 4); /* x */
+> 	swap_digits((u64 *)&tmp[32], (u64 *)&public_key[32], 4); /* y */
+> -	swap_digits((u64 *)private_key, (u64 *)tmp, 4);
+> -	memcpy(private_key, tmp, 32);
+> +	if (private_key) {
+> +		swap_digits((u64 *)private_key, (u64 *)tmp, 4);
+> +		memcpy(private_key, tmp, 32);
+> +	}
+> 
+> free_all:
+> 	kzfree(buf);
 > diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-> index a0ef897..6532689 100644
+> index 6532689..9a8e826 100644
 > --- a/net/bluetooth/smp.c
 > +++ b/net/bluetooth/smp.c
-> @@ -26,6 +26,7 @@
-> #include <crypto/algapi.h>
-> #include <crypto/b128ops.h>
-> #include <crypto/hash.h>
-> +#include <crypto/kpp.h>
-> 
-> #include <net/bluetooth/bluetooth.h>
-> #include <net/bluetooth/hci_core.h>
-> @@ -92,6 +93,7 @@ struct smp_dev {
-> 
-> 	struct crypto_cipher	*tfm_aes;
-> 	struct crypto_shash	*tfm_cmac;
-> +	struct crypto_kpp	*tfm_ecdh;
-> };
-> 
-> struct smp_chan {
-> @@ -131,6 +133,7 @@ struct smp_chan {
-> 
-> 	struct crypto_cipher	*tfm_aes;
-> 	struct crypto_shash	*tfm_cmac;
-> +	struct crypto_kpp	*tfm_ecdh;
-> };
-> 
-> /* These debug key values are defined in the SMP section of the core
-> @@ -574,7 +577,8 @@ int smp_generate_oob(struct hci_dev *hdev, u8 hash[16], u8 rand[16])
-> 			get_random_bytes(smp->local_sk, 32);
-> 
-> 			/* Generate local key pair for Secure Connections */
-> -			if (!generate_ecdh_keys(smp->local_pk, smp->local_sk))
-> +			if (!generate_ecdh_keys(smp->tfm_ecdh, smp->local_pk,
-> +						smp->local_sk))
-> 				return -EIO;
-> 
-> 			/* This is unlikely, but we need to check that
-> @@ -771,6 +775,7 @@ static void smp_chan_destroy(struct l2cap_conn *conn)
-> 
-> 	crypto_free_cipher(smp->tfm_aes);
-> 	crypto_free_shash(smp->tfm_cmac);
-> +	crypto_free_kpp(smp->tfm_ecdh);
-> 
-> 	/* Ensure that we don't leave any debug key around if debug key
-> 	 * support hasn't been explicitly enabled.
-> @@ -1391,16 +1396,19 @@ static struct smp_chan *smp_chan_create(struct l2cap_conn *conn)
-> 	smp->tfm_aes = crypto_alloc_cipher("aes", 0, CRYPTO_ALG_ASYNC);
-> 	if (IS_ERR(smp->tfm_aes)) {
-> 		BT_ERR("Unable to create AES crypto context");
-> -		kzfree(smp);
-> -		return NULL;
-> +		goto zfree_smp;
+> @@ -571,28 +571,16 @@ int smp_generate_oob(struct hci_dev *hdev, u8 hash[16], u8 rand[16])
+> 		memcpy(smp->local_pk, debug_pk, 64);
+> 		memcpy(smp->local_sk, debug_sk, 32);
+> 		smp->debug_key = true;
+> +		SMP_DBG("OOB Private Key:  %32phN", smp->local_sk);
+> 	} else {
+> -		while (true) {
+> -			/* Seed private key with random number */
+> -			get_random_bytes(smp->local_sk, 32);
+> -
+> -			/* Generate local key pair for Secure Connections */
+> -			if (!generate_ecdh_keys(smp->tfm_ecdh, smp->local_pk,
+> -						smp->local_sk))
+> -				return -EIO;
+> -
+> -			/* This is unlikely, but we need to check that
+> -			 * we didn't accidentially generate a debug key.
+> -			 */
+> -			if (crypto_memneq(smp->local_sk, debug_sk, 32))
+> -				break;
+
+I would prefer if we do not loose this part. I mean if the crypto hardware accidentally generated the same private key as the private debug key, then we want to just redo it. We opted for comparing the private key instead of the public key because it is shorter, however just comparing the public key against the debug_pk is also just fine.
+
+This is really just some sort of paranoia, but it would be bad if we locally classify the generated long term key as real key and the remote side declares it as debug key.
+
+> -		}
+> +		/* Generate local key pair for Secure Connections */
+> +		if (!generate_ecdh_keys(smp->tfm_ecdh, smp->local_pk, NULL))
+> +			return -EIO;
+> 		smp->debug_key = false;
 > 	}
 > 
-> 	smp->tfm_cmac = crypto_alloc_shash("cmac(aes)", 0, 0);
-> 	if (IS_ERR(smp->tfm_cmac)) {
-> 		BT_ERR("Unable to create CMAC crypto context");
-> -		crypto_free_cipher(smp->tfm_aes);
-> -		kzfree(smp);
-> -		return NULL;
-> +		goto free_cipher;
-> +	}
-> +
-> +	smp->tfm_ecdh = crypto_alloc_kpp("ecdh", CRYPTO_ALG_INTERNAL, 0);
-> +	if (IS_ERR(smp->tfm_ecdh)) {
-> +		BT_ERR("Unable to create ECDH crypto context");
-> +		goto free_shash;
+> 	SMP_DBG("OOB Public Key X: %32phN", smp->local_pk);
+> 	SMP_DBG("OOB Public Key Y: %32phN", smp->local_pk + 32);
+> -	SMP_DBG("OOB Private Key:  %32phN", smp->local_sk);
+> 
+> 	get_random_bytes(smp->local_rand, 16);
+> 
+> @@ -1899,11 +1887,13 @@ static u8 sc_send_public_key(struct smp_chan *smp)
+> 		smp_dev = chan->data;
+> 
+> 		memcpy(smp->local_pk, smp_dev->local_pk, 64);
+> -		memcpy(smp->local_sk, smp_dev->local_sk, 32);
+> 		memcpy(smp->lr, smp_dev->local_rand, 16);
+> 
+> -		if (smp_dev->debug_key)
+> +		if (smp_dev->debug_key) {
+> 			set_bit(SMP_FLAG_DEBUG_KEY, &smp->flags);
+> +			memcpy(smp->local_sk, smp_dev->local_sk, 32);
+> +			SMP_DBG("Local Private Key:  %32phN", smp->local_sk);
+> +		}
+
+Do we need to keep the smp->local_sk variable at all? I would prefer that this is hidden the KPP. Since even in case of debug key generation (software fallback), we really do not care about it either. The only thing we tell the KPP is that we want it to use debug_sk as its private key and debug_pk as public key. So essentially key generation with fixed a fixed key-pair. I think it would make the Bluetooth SMP code a lot simpler.
+
+> 
+> 		goto done;
+> 	}
+> @@ -1913,28 +1903,16 @@ static u8 sc_send_public_key(struct smp_chan *smp)
+> 		memcpy(smp->local_pk, debug_pk, 64);
+> 		memcpy(smp->local_sk, debug_sk, 32);
+> 		set_bit(SMP_FLAG_DEBUG_KEY, &smp->flags);
+> +		SMP_DBG("Local Private Key:  %32phN", smp->local_sk);
+> 	} else {
+> -		while (true) {
+> -			/* Seed private key with random number */
+> -			get_random_bytes(smp->local_sk, 32);
+> -
+> -			/* Generate local key pair for Secure Connections */
+> -			if (!generate_ecdh_keys(smp->tfm_ecdh, smp->local_pk,
+> -						smp->local_sk))
+> -				return SMP_UNSPECIFIED;
+> -
+> -			/* This is unlikely, but we need to check that
+> -			 * we didn't accidentially generate a debug key.
+> -			 */
+> -			if (crypto_memneq(smp->local_sk, debug_sk, 32))
+> -				break;
+> -		}
+> +		/* Generate local key pair for Secure Connections */
+> +		if (!generate_ecdh_keys(smp->tfm_ecdh, smp->local_pk, NULL))
+> +			return SMP_UNSPECIFIED;
 > 	}
 > 
-> 	smp->conn = conn;
-> @@ -1413,6 +1421,14 @@ static struct smp_chan *smp_chan_create(struct l2cap_conn *conn)
-> 	hci_conn_hold(conn->hcon);
+> done:
+> 	SMP_DBG("Local Public Key X: %32phN", smp->local_pk);
+> 	SMP_DBG("Local Public Key Y: %32phN", smp->local_pk + 32);
+> -	SMP_DBG("Local Private Key:  %32phN", smp->local_sk);
 > 
-> 	return smp;
-> +
-> +free_shash:
-> +	crypto_free_shash(smp->tfm_cmac);
-> +free_cipher:
-> +	crypto_free_cipher(smp->tfm_aes);
-> +zfree_smp:
-> +	kzfree(smp);
-> +	return NULL;
-> }
+> 	smp_send_cmd(smp->conn, SMP_CMD_PUBLIC_KEY, 64, smp->local_pk);
 > 
-> static int sc_mackey_and_ltk(struct smp_chan *smp, u8 mackey[16], u8 ltk[16])
-> @@ -1903,7 +1919,8 @@ static u8 sc_send_public_key(struct smp_chan *smp)
-> 			get_random_bytes(smp->local_sk, 32);
-> 
-> 			/* Generate local key pair for Secure Connections */
-> -			if (!generate_ecdh_keys(smp->local_pk, smp->local_sk))
-> +			if (!generate_ecdh_keys(smp->tfm_ecdh, smp->local_pk,
-> +						smp->local_sk))
-> 				return SMP_UNSPECIFIED;
-> 
-> 			/* This is unlikely, but we need to check that
-> @@ -2645,6 +2662,7 @@ static int smp_cmd_public_key(struct l2cap_conn *conn, struct sk_buff *skb)
-> 	struct l2cap_chan *chan = conn->smp;
+> @@ -2663,6 +2641,7 @@ static int smp_cmd_public_key(struct l2cap_conn *conn, struct sk_buff *skb)
 > 	struct smp_chan *smp = chan->data;
 > 	struct hci_dev *hdev = hcon->hdev;
-> +	struct crypto_kpp *tfm;
+> 	struct crypto_kpp *tfm;
+> +	const u8 *local_sk;
 > 	struct smp_cmd_pairing_confirm cfm;
 > 	int err;
 > 
-> @@ -2677,7 +2695,16 @@ static int smp_cmd_public_key(struct l2cap_conn *conn, struct sk_buff *skb)
-> 	SMP_DBG("Remote Public Key X: %32phN", smp->remote_pk);
-> 	SMP_DBG("Remote Public Key Y: %32phN", smp->remote_pk + 32);
+> @@ -2703,8 +2682,12 @@ static int smp_cmd_public_key(struct l2cap_conn *conn, struct sk_buff *skb)
+> 		tfm = smp->tfm_ecdh;
+> 	}
 > 
-> -	if (!compute_ecdh_secret(smp->remote_pk, smp->local_sk, smp->dhkey))
-> +	if (test_bit(SMP_FLAG_LOCAL_OOB, &smp->flags)) {
-> +		struct smp_dev *smp_dev = chan->data;
+> -	if (!compute_ecdh_secret(tfm, smp->remote_pk, smp->local_sk,
+> -				 smp->dhkey))
+> +	if (hci_dev_test_flag(hdev, HCI_USE_DEBUG_KEYS))
+> +		local_sk = smp->local_sk;
+> +	else
+> +		local_sk = NULL;
 > +
-> +		tfm = smp_dev->tfm_ecdh;
-> +	} else {
-> +		tfm = smp->tfm_ecdh;
-> +	}
+> +	if (!compute_ecdh_secret(tfm, smp->remote_pk, local_sk, smp->dhkey))
+> 		return SMP_UNSPECIFIED;
 
-this looks all good, but I do not understand the need of this extra if clause here. Can you explain why OOB case is different or maybe add some comment in the code to make this clear.
+As with my comment above, should we make the practice a lot simpler here to make code less complex. I mean the difference is really in the key generation portion.
+
+	if (debug_key)
+		genarate_ecdh_debug_keys(tfm_ecdh, smp->local_pk)
+	else
+		generate_ecdh_keys(tfm_ecdh, smp->local_pk)
+
+And here the generate_ecdh_debug_keys is really just a dumb tfm_ecdh that we already know the private and public key pair. We do not have to actually generate anything.
+
+However now the secret computation can become simpler.
+
+	compute_ecdh_secret(tfm_ecdh, smp->remote_pk, smp->dhkey)
+
+No matter if it is a debug key or operational key usage, the tfm_ecdh has all the key information. If that private key is in hardware or not, or if hardware can be used or not, that is a KPP detail.
 
 Regards
 
