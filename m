@@ -1,25 +1,42 @@
-From: Tudor Ambarus <tudor.ambarus-UWL1GkI3JZL3oGB3hsPCZA@public.gmane.org>
-Subject: Re: [RESEND RFC PATCH 2/2] Bluetooth: let the crypto subsystem
- generate the ecc privkey
-Date: Mon, 25 Sep 2017 19:13:43 +0300
-Message-ID: <145355e2-f939-b526-f7c2-fab06d97c2f4@microchip.com>
-References: <20170925102356.4427-1-tudor.ambarus@microchip.com>
- <20170925102356.4427-3-tudor.ambarus@microchip.com>
- <BCB6F8AF-19AE-4F66-89E9-775545C3FB12@holtmann.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: <linux-bluetooth-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Marcel Holtmann <marcel-kz+m5ild9QBg9hUCZPvPmw@public.gmane.org>
-Return-path: <linux-bluetooth-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <BCB6F8AF-19AE-4F66-89E9-775545C3FB12-kz+m5ild9QBg9hUCZPvPmw@public.gmane.org>
-Content-Language: en-US
-Sender: linux-bluetooth-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Corentin Labbe <clabbe.montjoie@gmail.com>
+Subject: [PATCH] block: cryptoloop - Fix build warning
+Date: Mon, 25 Sep 2017 19:10:07 +0200
+Message-ID: <20170925171007.4660-1-clabbe.montjoie@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Corentin Labbe <clabbe.montjoie@gmail.com>
+To: axboe@kernel.dk, herbert@gondor.apana.org.au
+Return-path: <linux-block-owner@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi, Marcel,
+This patch fix the following build warning:
+drivers/block/cryptoloop.c:46:8: warning: variable 'cipher' set but not used [-Wunused-but-set-variable]
 
-Agreed on all suggestions, I will send a v2 patch set.
+Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+---
+ drivers/block/cryptoloop.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-Thanks,
-ta
+diff --git a/drivers/block/cryptoloop.c b/drivers/block/cryptoloop.c
+index 74e03aa537ad..7033a4beda66 100644
+--- a/drivers/block/cryptoloop.c
++++ b/drivers/block/cryptoloop.c
+@@ -43,7 +43,6 @@ cryptoloop_init(struct loop_device *lo, const struct loop_info64 *info)
+ 	int cipher_len;
+ 	int mode_len;
+ 	char cms[LO_NAME_SIZE];			/* cipher-mode string */
+-	char *cipher;
+ 	char *mode;
+ 	char *cmsp = cms;			/* c-m string pointer */
+ 	struct crypto_skcipher *tfm;
+@@ -56,7 +55,6 @@ cryptoloop_init(struct loop_device *lo, const struct loop_info64 *info)
+ 	strncpy(cms, info->lo_crypt_name, LO_NAME_SIZE);
+ 	cms[LO_NAME_SIZE - 1] = 0;
+ 
+-	cipher = cmsp;
+ 	cipher_len = strcspn(cmsp, "-");
+ 
+ 	mode = cmsp + cipher_len;
+-- 
+2.13.5
