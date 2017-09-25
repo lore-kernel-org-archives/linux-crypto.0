@@ -1,7 +1,7 @@
 From: Arvind Yadav <arvind.yadav.cs@gmail.com>
-Subject: [PATCH 2/5] crypto: virtio: pr_err() strings should end with newlines
-Date: Mon, 25 Sep 2017 16:06:13 +0530
-Message-ID: <1506335776-1887-3-git-send-email-arvind.yadav.cs@gmail.com>
+Subject: [PATCH 1/5] crypto: omap-aes: pr_err() strings should end with newlines
+Date: Mon, 25 Sep 2017 16:06:12 +0530
+Message-ID: <1506335776-1887-2-git-send-email-arvind.yadav.cs@gmail.com>
 References: <1506335776-1887-1-git-send-email-arvind.yadav.cs@gmail.com>
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: herbert@gondor.apana.org.au, davem@davemloft.net, mst@redhat.com,
@@ -17,21 +17,21 @@ other messages being concatenated onto the end.
 
 Signed-off-by: Arvind Yadav <arvind.yadav.cs@gmail.com>
 ---
- drivers/crypto/virtio/virtio_crypto_algs.c | 2 +-
+ drivers/crypto/omap-aes-gcm.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/virtio/virtio_crypto_algs.c b/drivers/crypto/virtio/virtio_crypto_algs.c
-index 5035b0d..abe8c15 100644
---- a/drivers/crypto/virtio/virtio_crypto_algs.c
-+++ b/drivers/crypto/virtio/virtio_crypto_algs.c
-@@ -319,7 +319,7 @@ static int virtio_crypto_ablkcipher_setkey(struct crypto_ablkcipher *tfm,
- 		struct virtio_crypto *vcrypto =
- 				      virtcrypto_get_dev_node(node);
- 		if (!vcrypto) {
--			pr_err("virtio_crypto: Could not find a virtio device in the system");
-+			pr_err("virtio_crypto: Could not find a virtio device in the system\n");
- 			return -ENODEV;
+diff --git a/drivers/crypto/omap-aes-gcm.c b/drivers/crypto/omap-aes-gcm.c
+index 7d4f8a4..9f8a1f7 100644
+--- a/drivers/crypto/omap-aes-gcm.c
++++ b/drivers/crypto/omap-aes-gcm.c
+@@ -214,7 +214,7 @@ static int do_encrypt_iv(struct aead_request *req, u32 *tag, u32 *iv)
  		}
+ 		/* fall through */
+ 	default:
+-		pr_err("Encryption of IV failed for GCM mode");
++		pr_err("Encryption of IV failed for GCM mode\n");
+ 		break;
+ 	}
  
 -- 
 1.9.1
