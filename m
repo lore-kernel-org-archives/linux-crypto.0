@@ -1,56 +1,66 @@
-From: Haren Myneni <haren@linux.vnet.ibm.com>
-Subject: [PATCH 2/2] crypto/nx: Do not initialize workmem allocation
-Date: Sun, 24 Sep 2017 23:44:13 -0700
-Message-ID: <1506321853.13257.6.camel@hbabu-laptop>
+From: Ingo Molnar <mingo@kernel.org>
+Subject: Re: x86: PIE support and option to extend KASLR randomization
+Date: Mon, 25 Sep 2017 09:33:42 +0200
+Message-ID: <20170925073342.2yoghmanhx6c75ho@gmail.com>
+References: <20170811124127.kkb5pnkljz4umxuj@gmail.com>
+ <CAJcbSZFTX3uiS2g8JriS6+z_+WrG8z3hrQo4OSuyHpiyUDJWYA@mail.gmail.com>
+ <20170815075609.mmzbfwritjzvrpsn@gmail.com>
+ <CAJcbSZE+TiY2whT94WqCJNXzR=2ATOHcQ10H5RqBZA1j=k1VHQ@mail.gmail.com>
+ <20170816151235.oamkdva6cwpc4cex@gmail.com>
+ <20170821133222.2ek6bhqgdeoymxsg@hirez.programming.kicks-ass.net>
+ <20170821142854.dmuusnbc2tsrai3v@hirez.programming.kicks-ass.net>
+ <c830ba59-65d3-187f-3868-732059269f28@zytor.com>
+ <20170923100029.6nzpui6c3ke76bbs@gmail.com>
+ <20170924223708.GA12616@amd>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-To: herbert@gondor.apana.org.au, mpe@ellerman.id.au, ddstreet@ieee.org,
-        mikey@neuling.org, suka@us.ibm.com, npiggin@gmail.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46756 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S932230AbdIYGod (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 25 Sep 2017 02:44:33 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id v8P6i2vj078356
-        for <linux-crypto@vger.kernel.org>; Mon, 25 Sep 2017 02:44:32 -0400
-Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2d6cc3u2b8-1
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Mon, 25 Sep 2017 02:44:32 -0400
-Received: from localhost
-        by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-crypto@vger.kernel.org> from <haren@linux.vnet.ibm.com>;
-        Mon, 25 Sep 2017 02:44:31 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: "H. Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>,
+	Thomas Garnier <thgarnie@google.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Josh Poimboeuf <jpoimboe@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
+	Matthias Kaehlcke <mka@chromium.org>,
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+	Juergen Gross <jgross@suse.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+	Joerg Roedel <joro@8bytes.org>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Andy Lutomirski <luto@kernel.org>, Borislav Petkov <bp@suse.de>,
+	Brian Gerst <brgerst@gmail.com>,
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+	"Rafael J . Wysocki" <rjw@rjwysocki.net>,
+	Len Brown <len.brown@intel.com>, Tejun Heo <tj@kernel.org>,
+	Christo
+To: Pavel Machek <pavel@ucw.cz>
+Return-path: <kernel-hardening-return-9950-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
+List-Post: <mailto:kernel-hardening@lists.openwall.com>
+List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
+List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
+List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
+Sender: Ingo Molnar <mingo.kernel.org@gmail.com>
+Content-Disposition: inline
+In-Reply-To: <20170924223708.GA12616@amd>
+List-Id: linux-crypto.vger.kernel.org
 
-[PATCH 2/2] crypto/nx: Do not initialize workmem allocation
 
-We are using percpu send window on P9 NX (powerNV) instead of opening /
-closing per each crypto session. Means txwin is removed from workmem.
-So we do not need to initialize workmem for each request.
+* Pavel Machek <pavel@ucw.cz> wrote:
 
-Signed-off-by: Haren Myneni <haren@us.ibm.com>
----
- drivers/crypto/nx/nx-842.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> > For example, there would be collision with regular user-space mappings, right? 
+> > Can local unprivileged users use mmap(MAP_FIXED) probing to figure out where 
+> > the kernel lives?
+> 
+> Local unpriviledged users can probably get your secret bits using cache probing 
+> and jump prediction buffers.
+> 
+> Yes, you don't want to leak the information using mmap(MAP_FIXED), but CPU will 
+> leak it for you, anyway.
 
-diff --git a/drivers/crypto/nx/nx-842.c b/drivers/crypto/nx/nx-842.c
-index da3cb8c..d94e25d 100644
---- a/drivers/crypto/nx/nx-842.c
-+++ b/drivers/crypto/nx/nx-842.c
-@@ -116,7 +116,7 @@ int nx842_crypto_init(struct crypto_tfm *tfm, struct nx842_driver *driver)
- 
- 	spin_lock_init(&ctx->lock);
- 	ctx->driver = driver;
--	ctx->wmem = kzalloc(driver->workmem_size, GFP_KERNEL);
-+	ctx->wmem = kmalloc(driver->workmem_size, GFP_KERNEL);
- 	ctx->sbounce = (u8 *)__get_free_pages(GFP_KERNEL, BOUNCE_BUFFER_ORDER);
- 	ctx->dbounce = (u8 *)__get_free_pages(GFP_KERNEL, BOUNCE_BUFFER_ORDER);
- 	if (!ctx->wmem || !ctx->sbounce || !ctx->dbounce) {
--- 
-1.8.3.1
+Depends on the CPU I think, and CPU vendors are busy trying to mitigate this 
+angle.
+
+Thanks,
+
+	Ingo
