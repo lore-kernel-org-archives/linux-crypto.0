@@ -1,56 +1,70 @@
-From: Casey Leedom <leedom@chelsio.com>
+From: "Raj, Ashok" <ashok.raj@intel.com>
 Subject: Re: DMA error when sg->offset value is greater than PAGE_SIZE in
  Intel IOMMU
-Date: Mon, 25 Sep 2017 20:19:21 +0000
-Message-ID: <MWHPR12MB16002A374CBB41BB201BA061C87A0@MWHPR12MB1600.namprd12.prod.outlook.com>
-References: <20170920080151.GA3348@gondor.apana.org.au>,<1506365131.5294.37.camel@infradead.org>
+Date: Mon, 25 Sep 2017 12:03:11 -0700
+Message-ID: <20170925190310.GA132175@otc-nc-03>
+References: <20170920080151.GA3348@gondor.apana.org.au>
+ <26992a1e-edb3-ed78-ce8e-31e0739d75f4@arm.com>
+ <MWHPR12MB160092A868C613FF64CA9EE9C87A0@MWHPR12MB1600.namprd12.prod.outlook.com>
+ <CAPcyv4j3J41eY2eR07nTvo75F0yCbL9bNHM8GmXEFOHDQUuf8Q@mail.gmail.com>
+ <MWHPR12MB1600948B2F57696189FC7C22C87A0@MWHPR12MB1600.namprd12.prod.outlook.com>
+ <CAPcyv4ihhJM5+iHTMzH2m5n7X5347MHkj0h2DC5KGobjby5nmg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Cc: "joro@8bytes.org" <joro@8bytes.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Michael Werner <werner@chelsio.com>
-To: David Woodhouse <dwmw2@infradead.org>,
+Content-Type: text/plain; charset=us-ascii
+Cc: Casey Leedom <leedom@chelsio.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "Harsh Jain" <Harsh@chelsio.com>
+        "dwmw2@infradead.org" <dwmw2@infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Harsh Jain <Harsh@chelsio.com>, Ashok Raj <ashok.raj@intel.com>
+To: Dan Williams <dan.j.williams@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2nam01on0121.outbound.protection.outlook.com ([104.47.34.121]:52670
-        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S966091AbdIYUTX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 25 Sep 2017 16:19:23 -0400
-In-Reply-To: <1506365131.5294.37.camel@infradead.org>
-Content-Language: en-US
+Received: from mga09.intel.com ([134.134.136.24]:56882 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932698AbdIYVsm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 25 Sep 2017 17:48:42 -0400
+Content-Disposition: inline
+In-Reply-To: <CAPcyv4ihhJM5+iHTMzH2m5n7X5347MHkj0h2DC5KGobjby5nmg@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-| From: David Woodhouse <dwmw2@infradead.org>
-| Sent: Monday, September 25, 2017 11:45 AM
-|
-| On Wed, 2017-09-20 at 16:01 +0800, Herbert Xu wrote:
-| > Harsh Jain <Harsh@chelsio.com> wrote:
-| > >
-| > > While debugging DMA mapping error in chelsio crypto driver we
-| > observed that when scatter/gather list received by driver has some
-| > entry with page->offset > 4096 (PAGE_SIZE). It starts giving DMA
-| > error.  Without IOMMU it works fine.
-| >
-| > This is not a bug.  The network stack can and will feed us such
-| > SG lists.
-|
-| Hm? Under what circumstances is the offset permitted to be >
-| PAGE_SIZE?
+Hi
 
-  As I noted earlier, this is an area of the kernel with which I'm not supe=
-r
-familiar.  Both Herbert Xu and our local VM Expert have said that having
-Scatter/Gather Lists with Offsets greater than Page Size is not a bug ...
+On Mon, Sep 25, 2017 at 01:11:04PM -0700, Dan Williams wrote:
+> On Mon, Sep 25, 2017 at 1:05 PM, Casey Leedom <leedom@chelsio.com> wrote:
+> > | From: Dan Williams <dan.j.williams@intel.com>
+> > | Sent: Monday, September 25, 2017 12:31 PM
+> > | ...
+> > | IIUC it looks like this has been broken ever since commit e1605495c716
+> > | "intel-iommu: Introduce domain_sg_mapping() to speed up
+> > | intel_map_sg()". I.e. it looks like the calculation for pte_val should
+> > | be:
+> > |
+> > |     pteval = (page_to_phys(sg_page(sg)) + sg->offset) | prot;
+> >
+> > Hhmmm, shouldn't that be:
+> >
+> >     pteval = (page_to_phys(sg_page(sg)) + (sg->offset>>PAGE_SHIFT)) | prot;
+> 
+> Yes, I think you're right. We do want to mask off the page-unaligned
+> portion of sg->offset.
 
-  I'm mostly trying to help out keeping focus on this because Harsh is in
-India (presumable enjoying a good night's sleep while we look at this.
-Hopefully we'll have a present of a bug fix for him when he wakes up ... :-=
-)
+Shoulnd't we normalize the entire sg_page(sg) + sg_offset.
 
-Casey
+if when you only mask the page-unaligned portion i suspect you might be
+pointing to a different region?
+
+something like (sg_page(sg) + (sg->offset << VTD_PAGE_SHIFT)) 
+
+then add the unaligned part.. sg->offset>>VTD_PAGE_SHIFT
+
+Is this happening because you are using a 2M page? not sure what triggers
+this or causes the driver to get passed in larger than 4K offset, or 
+running 32bit kernel?
+
+if its legal to get passed in such odd values, we should fix IOMMU driver to 
+handle it properly, otherwise we should atleast fail those requests.
+
+Cheers,
+Ashok
