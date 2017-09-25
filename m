@@ -1,33 +1,38 @@
-From: Arvind Yadav <arvind.yadav.cs@gmail.com>
-Subject: [PATCH] hwrng: pr_err() strings should end with newlines
-Date: Mon, 25 Sep 2017 13:15:00 +0530
-Message-ID: <83efca3fa5f581e0d150fa72b4efa38340fb0a31.1506325384.git.arvind.yadav.cs@gmail.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: mpm@selenic.com, herbert@gondor.apana.org.au, mingo@kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Tudor Ambarus <tudor.ambarus-UWL1GkI3JZL3oGB3hsPCZA@public.gmane.org>
+Subject: [RESEND RFC PATCH 0/2] Bluetooth: let the crypto subsystem generate the ecc privkey
+Date: Mon, 25 Sep 2017 13:23:54 +0300
+Message-ID: <20170925102356.4427-1-tudor.ambarus@microchip.com>
+Mime-Version: 1.0
+Content-Type: text/plain
+Cc: <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        Tudor Ambarus <tudor.ambarus-UWL1GkI3JZL3oGB3hsPCZA@public.gmane.org>
+To: <marcel-kz+m5ild9QBg9hUCZPvPmw@public.gmane.org>, <linux-bluetooth-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Return-path: <linux-bluetooth-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-bluetooth-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-pr_err() messages should terminated with a new-line to avoid
-other messages being concatenated onto the end.
+That Bluetooth SMP knows about the private key is pointless, since the
+detection of debug key usage is actually via the public key portion.
+With this patch set, the Bluetooth SMP will stop keeping a copy of the
+ecdh private key, except when using debug keys. This way we let the
+crypto subsystem to generate and handle the ecdh private key,
+potentially benefiting of hardware ecc private key generation and
+retention.
 
-Signed-off-by: Arvind Yadav <arvind.yadav.cs@gmail.com>
----
- drivers/char/hw_random/core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Tested with selftest and with btmon and smp-tester on top of hci_vhci,
+with ecdh done in both software and hardware (through atmel-ecc driver).
+All tests passed.
 
-diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
-index 9701ac7..ff79844 100644
---- a/drivers/char/hw_random/core.c
-+++ b/drivers/char/hw_random/core.c
-@@ -423,7 +423,7 @@ static void start_khwrngd(void)
- {
- 	hwrng_fill = kthread_run(hwrng_fillfn, NULL, "hwrng");
- 	if (IS_ERR(hwrng_fill)) {
--		pr_err("hwrng_fill thread creation failed");
-+		pr_err("hwrng_fill thread creation failed\n");
- 		hwrng_fill = NULL;
- 	}
- }
+
+Tudor Ambarus (2):
+  Bluetooth: move ecdh allocation outside of ecdh_helper
+  Bluetooth: let the crypto subsystem generate the ecc privkey
+
+ net/bluetooth/ecdh_helper.c | 134 ++++++++++++++++++--------------------------
+ net/bluetooth/ecdh_helper.h |   8 ++-
+ net/bluetooth/selftest.c    |  29 +++++++---
+ net/bluetooth/smp.c         | 120 +++++++++++++++++++++++++--------------
+ 4 files changed, 157 insertions(+), 134 deletions(-)
+
 -- 
-1.9.1
+2.9.4
