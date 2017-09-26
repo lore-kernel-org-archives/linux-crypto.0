@@ -1,82 +1,104 @@
-From: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Subject: Re: [PATCH v5 REPOST 1/6] hw_random: place mutex around read
- functions and buffers.
-Date: Tue, 26 Sep 2017 09:52:41 -0700
-Message-ID: <20170926165241.GB14833@dtor-ws>
-References: <1418028640-4891-1-git-send-email-akong@redhat.com>
- <1418028640-4891-2-git-send-email-akong@redhat.com>
- <CAKdAkRSF1qJv_03PJh44gkQ7NOJ3ccW2EwPckGvch=iUYY1-Qw@mail.gmail.com>
- <369186187.14365871.1506407817157.JavaMail.zimbra@redhat.com>
+From: "Raj, Ashok" <ashok.raj@intel.com>
+Subject: Re: DMA error when sg->offset value is greater than PAGE_SIZE in
+ Intel IOMMU
+Date: Tue, 26 Sep 2017 07:34:41 -0700
+Message-ID: <20170926143441.GA136940@otc-nc-03>
+References: <20170920080151.GA3348@gondor.apana.org.au>
+ <26992a1e-edb3-ed78-ce8e-31e0739d75f4@arm.com>
+ <MWHPR12MB160092A868C613FF64CA9EE9C87A0@MWHPR12MB1600.namprd12.prod.outlook.com>
+ <20170925155430.GB131920@otc-nc-03>
+ <MWHPR12MB16004E2A92CC3FFEC6313DDBC87A0@MWHPR12MB1600.namprd12.prod.outlook.com>
+ <afa02763-4556-0e14-7d1b-1c044cdc1ff7@chelsio.com>
+ <6d2af675-7b97-6eaf-4daa-d7bf80a05923@chelsio.com>
+ <437a9bd8-d4d6-22ca-1a64-1a3e73f1101a@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Amos Kong <akong@redhat.com>, linux-crypto@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Rusty Russell <rusty@rustcorp.com.au>, kvm@vger.kernel.org,
-        Michael Buesch <m@bues.ch>, Matt Mackall <mpm@selenic.com>,
-        amit shah <amit.shah@redhat.com>,
-        lkml <linux-kernel@vger.kernel.org>
-To: Pankaj Gupta <pagupta@redhat.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:34466 "EHLO
-        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S935998AbdIZQwp (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 Sep 2017 12:52:45 -0400
+Content-Type: multipart/mixed; boundary="KsGdsel6WgEHnImy"
+Cc: Harsh Jain <Harsh@chelsio.com>, Casey Leedom <leedom@chelsio.com>,
+        Herbert Xuy <herbert@gondor.apana.org.au>,
+        David Woodhouse <David.Woodhouse@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        "dwmw2@infradead.org" <dwmw2@infradead.org>,
+        Ashok Raj <ashok.raj@intel.com>
+To: Robin Murphy <robin.murphy@arm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <369186187.14365871.1506407817157.JavaMail.zimbra@redhat.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <437a9bd8-d4d6-22ca-1a64-1a3e73f1101a@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Sep 26, 2017 at 02:36:57AM -0400, Pankaj Gupta wrote:
-> 
-> > 
-> > A bit late to a party, but:
-> > 
-> > On Mon, Dec 8, 2014 at 12:50 AM, Amos Kong <akong@redhat.com> wrote:
-> > > From: Rusty Russell <rusty@rustcorp.com.au>
-> > >
-> > > There's currently a big lock around everything, and it means that we
-> > > can't query sysfs (eg /sys/devices/virtual/misc/hw_random/rng_current)
-> > > while the rng is reading.  This is a real problem when the rng is slow,
-> > > or blocked (eg. virtio_rng with qemu's default /dev/random backend)
-> > >
-> > > This doesn't help (it leaves the current lock untouched), just adds a
-> > > lock to protect the read function and the static buffers, in preparation
-> > > for transition.
-> > >
-> > > Signed-off-by: Rusty Russell <rusty@rustcorp.com.au>
-> > > ---
-> > ...
-> > >
-> > > @@ -160,13 +166,14 @@ static ssize_t rng_dev_read(struct file *filp, char
-> > > __user *buf,
-> > >                         goto out_unlock;
-> > >                 }
-> > >
-> > > +               mutex_lock(&reading_mutex);
-> > 
-> > I think this breaks O_NONBLOCK: we have hwrng core thread that is
-> > constantly pumps underlying rng for data; the thread takes the mutex
-> > and calls rng_get_data() that blocks until RNG responds. This means
-> > that even user specified O_NONBLOCK here we'll be waiting until
-> > [hwrng] thread releases reading_mutex before we can continue.
-> 
-> I think for 'virtio_rng' for 'O_NON_BLOCK' 'rng_get_data' returns
-> without waiting for data which can let mutex to be  used by other 
-> threads waiting if any?
-> 
-> rng_dev_read
->   rng_get_data
->     virtio_read
 
-As I said in the paragraph above the code that potentially holds the
-mutex for long time is the thread in hwrng core: hwrng_fillfn(). As it
-calls rng_get_data() with "wait" argument == 1 it may block while
-holding reading_mutex, which, in turn, will block rng_dev_read(), even
-if it was called with O_NONBLOCK.
+--KsGdsel6WgEHnImy
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Thanks.
+On Tue, Sep 26, 2017 at 03:22:47PM +0100, Robin Murphy wrote:
+> diff --git a/drivers/iommu/intel-iommu.c b/drivers/iommu/intel-iommu.c
+> index 6784a05dd6b2..d7f7def81613 100644
+> --- a/drivers/iommu/intel-iommu.c
+> +++ b/drivers/iommu/intel-iommu.c
+> @@ -2254,10 +2254,12 @@ static int __domain_mapping(struct dmar_domain *domain, unsigned long iov_pfn,
+>  		uint64_t tmp;
+>  
+>  		if (!sg_res) {
+> +			size_t off = sg->offset & ~PAGE_MASK;
 
--- 
-Dmitry
+Should this be VTD_PAGE_MASK?
+
+> +
+>  			sg_res = aligned_nrpages(sg->offset, sg->length);
+> -			sg->dma_address = ((dma_addr_t)iov_pfn << VTD_PAGE_SHIFT) + sg->offset;
+> +			sg->dma_address = ((dma_addr_t)iov_pfn << VTD_PAGE_SHIFT) + off;
+>  			sg->dma_length = sg->length;
+> -			pteval = page_to_phys(sg_page(sg)) | prot;
+> +			pteval = (page_to_phys(sg_page(sg)) + sg->offset - off) | prot;
+
+Something seems wrong here.. sg->offset can be > VTD_PAGE_SIZE, think 
+we should add sg->offset and then find the pteval?
+
+attached below another cut at fixing the same problem.. if there is something
+obvious i missed, let me know.
+
+again.. untested :-)
+
+Cheers,
+Ashok
+
+
+--KsGdsel6WgEHnImy
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename=fix-vtd-offset-gt4k
+
+Sometimes offset can be greater than 4K. vt-d needs to account for that.
+
+From: Ashok Raj <ashok.raj@intel.com>
+
+Signed-off-by: Ashok Raj <ashok.raj@intel.com>
+---
+ drivers/iommu/intel-iommu.c |    7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/iommu/intel-iommu.c b/drivers/iommu/intel-iommu.c
+index 6784a05..d43b566 100644
+--- a/drivers/iommu/intel-iommu.c
++++ b/drivers/iommu/intel-iommu.c
+@@ -2254,10 +2254,13 @@ static int __domain_mapping(struct dmar_domain *domain, unsigned long iov_pfn,
+ 		uint64_t tmp;
+ 
+ 		if (!sg_res) {
++			size_t off = sg->offset & ~VTD_PAGE_SHIFT;
+ 			sg_res = aligned_nrpages(sg->offset, sg->length);
+-			sg->dma_address = ((dma_addr_t)iov_pfn << VTD_PAGE_SHIFT) + sg->offset;
++			sg->dma_address = ((dma_addr_t)
++				(iov_pfn + sg->offset) << VTD_PAGE_SHIFT) + off;
+ 			sg->dma_length = sg->length;
+-			pteval = page_to_phys(sg_page(sg)) | prot;
++			pteval = (page_to_phys(sg_page(sg)) +
++				(sg->offset << VTD_PAGE_SHIFT)) | prot;
+ 			phys_pfn = pteval >> VTD_PAGE_SHIFT;
+ 		}
+ 
+
+--KsGdsel6WgEHnImy--
