@@ -1,54 +1,113 @@
-From: Harsh Jain <Harsh@chelsio.com>
+From: Robin Murphy <robin.murphy@arm.com>
 Subject: Re: DMA error when sg->offset value is greater than PAGE_SIZE in
  Intel IOMMU
-Date: Tue, 26 Sep 2017 18:34:54 +0530
-Message-ID: <9412dba0-8e52-3361-f51d-0a8c70364d7f@chelsio.com>
+Date: Tue, 26 Sep 2017 15:22:47 +0100
+Message-ID: <437a9bd8-d4d6-22ca-1a64-1a3e73f1101a@arm.com>
 References: <20170920080151.GA3348@gondor.apana.org.au>
  <26992a1e-edb3-ed78-ce8e-31e0739d75f4@arm.com>
  <MWHPR12MB160092A868C613FF64CA9EE9C87A0@MWHPR12MB1600.namprd12.prod.outlook.com>
- <CAPcyv4j3J41eY2eR07nTvo75F0yCbL9bNHM8GmXEFOHDQUuf8Q@mail.gmail.com>
- <MWHPR12MB1600948B2F57696189FC7C22C87A0@MWHPR12MB1600.namprd12.prod.outlook.com>
- <CAPcyv4ihhJM5+iHTMzH2m5n7X5347MHkj0h2DC5KGobjby5nmg@mail.gmail.com>
+ <20170925155430.GB131920@otc-nc-03>
+ <MWHPR12MB16004E2A92CC3FFEC6313DDBC87A0@MWHPR12MB1600.namprd12.prod.outlook.com>
+ <afa02763-4556-0e14-7d1b-1c044cdc1ff7@chelsio.com>
+ <6d2af675-7b97-6eaf-4daa-d7bf80a05923@chelsio.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Cc: Robin Murphy <robin.murphy@arm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        David Woodhouse <David.Woodhouse@intel.com>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "dwmw2@infradead.org" <dwmw2@infradead.org>,
-        David Woodhouse <David.Woodhouse@intel.com>
-To: Dan Williams <dan.j.williams@intel.com>,
-        Casey Leedom <leedom@chelsio.com>
+        Dan Williams <dan.j.williams@intel.com>,
+        "dwmw2@infradead.org" <dwmw2@infradead.org>
+To: Harsh Jain <Harsh@chelsio.com>, Casey Leedom <leedom@chelsio.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from stargate.chelsio.com ([12.32.117.8]:38379 "EHLO
-        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S965798AbdIZNFb (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 Sep 2017 09:05:31 -0400
-In-Reply-To: <CAPcyv4ihhJM5+iHTMzH2m5n7X5347MHkj0h2DC5KGobjby5nmg@mail.gmail.com>
+Received: from foss.arm.com ([217.140.101.70]:34854 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S969497AbdIZOWv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 26 Sep 2017 10:22:51 -0400
+In-Reply-To: <6d2af675-7b97-6eaf-4daa-d7bf80a05923@chelsio.com>
 Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+On 26/09/17 13:21, Harsh Jain wrote:
+> Find attached new set of log. After repeated tries it panics.
 
+Thanks, that makes things a bit clearer - looks like fixing the physical
+address/pteval calculation to not be off by a page in one direction wasn't
+helping much because the returned DMA address is actually also off by a
+page in the other direction, and thus overflowing past the allocated IOVA
+into whoever else's mapping happened to be there; complete carnage ensues.
 
-On 26-09-2017 01:41, Dan Williams wrote:
-> On Mon, Sep 25, 2017 at 1:05 PM, Casey Leedom <leedom@chelsio.com> wrote:
->> | From: Dan Williams <dan.j.williams@intel.com>
->> | Sent: Monday, September 25, 2017 12:31 PM
->> | ...
->> | IIUC it looks like this has been broken ever since commit e1605495c716
->> | "intel-iommu: Introduce domain_sg_mapping() to speed up
->> | intel_map_sg()". I.e. it looks like the calculation for pte_val should
->> | be:
->> |
->> |     pteval = (page_to_phys(sg_page(sg)) + sg->offset) | prot;
+After another look through the intel_map_sg() path, here's my second (still
+completely untested) guess at a possible fix.
+
+Robin.
+
+----->8-----
+diff --git a/drivers/iommu/intel-iommu.c b/drivers/iommu/intel-iommu.c
+index 6784a05dd6b2..d7f7def81613 100644
+--- a/drivers/iommu/intel-iommu.c
++++ b/drivers/iommu/intel-iommu.c
+@@ -2254,10 +2254,12 @@ static int __domain_mapping(struct dmar_domain *domain, unsigned long iov_pfn,
+ 		uint64_t tmp;
+ 
+ 		if (!sg_res) {
++			size_t off = sg->offset & ~PAGE_MASK;
++
+ 			sg_res = aligned_nrpages(sg->offset, sg->length);
+-			sg->dma_address = ((dma_addr_t)iov_pfn << VTD_PAGE_SHIFT) + sg->offset;
++			sg->dma_address = ((dma_addr_t)iov_pfn << VTD_PAGE_SHIFT) + off;
+ 			sg->dma_length = sg->length;
+-			pteval = page_to_phys(sg_page(sg)) | prot;
++			pteval = (page_to_phys(sg_page(sg)) + sg->offset - off) | prot;
+ 			phys_pfn = pteval >> VTD_PAGE_SHIFT;
+ 		}
+ 
+> 
+> 
+> On 26-09-2017 09:16, Harsh Jain wrote:
+>> On 26-09-2017 00:16, Casey Leedom wrote:
+>>> | From: Raj, Ashok <ashok.raj@intel.com>
+>>> | Sent: Monday, September 25, 2017 8:54 AM
+>>> |
+>>> | Not sure how the page->offset would end up being greater than page-size?
+>> Refer below
+>>> |
+>>> | If you have additional traces, please send them by.
+>>> |
+>>> | Is this a new driver? wondering how we didn't run into this?
+>>>
+>>>   According to Herbert Xu and one of our own engineers, it's actually legal
+>>> for Scatter/Gather Lists to have this.  This isn't my area of expertise
+>>> though so I'm just passing that on.
+>>>
+>>>   I've asked our team to produce a detailed trace of the exact
+>>> Scatter/Gather Lists they're seeing and what ends up coming out of the DMA
+>>> Mappings, etc.  They're in India, so I expect that they'll have this for you
+>>> by tomorrow morning.
+>> Below mentioned log was already there in 1st mail. Copied here for easy reference. Let me know if you need
+>> additional traces.
 >>
->> Hhmmm, shouldn't that be:
+>> 1) IN esp_output() "__skb_to_sgvec()" convert skb frags to scatter gather list. 
+>> At that moment sg->offset was 4094.
+>> 2) From esp_output control reaches to "crypto_authenc_encrypt()". Here in 
+>> "scatterwalk_ffwd()" sg->offset become 4110.
+>> 3) Same sg list received by chelsio crypto driver(chcr). When chcr try to do 
+>> DMA mapping it starts giving DMA errors.
 >>
->>     pteval = (page_to_phys(sg_page(sg)) + (sg->offset>>PAGE_SHIFT)) | prot;
-> Yes, I think you're right. We do want to mask off the page-unaligned
-> portion of sg->offset.
-Tried changing above line in "__domain_mapping" but didn't help.
+>> Following error observed. first two prints are added for debugging in chcr. 
+>> Kernel version used to reproduce is 4.9.28 on x86_64 with Page size 4K.
+>>
+>> Sep 15 12:40:52 heptagon kernel: process_cipher req src ffff8803cb41f0a8
+>> Sep 15 12:40:52 heptagon kernel: ========= issue    hit offset:4110 ======= 
+>> dma_addr f24b000e ==> DMA mapped address returned by dma_map_sg()
+>>
+>> Sep 15 12:40:52 heptagon kernel: DMAR: DRHD: handling fault status reg 2
+>> Sep 15 12:40:52 heptagon kernel: DMAR: [DMA Write] Request device [02:00.4] 
+>> fault addr f24b0000 [fault reason 05] PTE Write access is not set
+>>
+>>> Casey
+> 
