@@ -1,99 +1,59 @@
-From: Pankaj Gupta <pagupta@redhat.com>
-Subject: Re: [PATCH v5 REPOST 1/6] hw_random: place mutex around read
- functions and buffers.
-Date: Wed, 27 Sep 2017 02:35:25 -0400 (EDT)
-Message-ID: <1519544875.14829746.1506494125339.JavaMail.zimbra@redhat.com>
-References: <1418028640-4891-1-git-send-email-akong@redhat.com> <1418028640-4891-2-git-send-email-akong@redhat.com> <CAKdAkRSF1qJv_03PJh44gkQ7NOJ3ccW2EwPckGvch=iUYY1-Qw@mail.gmail.com> <369186187.14365871.1506407817157.JavaMail.zimbra@redhat.com> <20170926165241.GB14833@dtor-ws>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Question about ahash export and import
+Date: Wed, 27 Sep 2017 17:08:02 +0800
+Message-ID: <20170927090802.GA1547@gondor.apana.org.au>
+References: <0e54df51-7b4c-a01e-2054-3cdf204a429e@c-s.fr>
+ <CGME20170926103514epcas1p4494e6502b2b6835c732201a4aeff60b1@epcas1p4.samsung.com>
+ <CAOtvUMeHF8PZAEaniK+oGYVOF5rbD_kZKuGC3j5XXkF-w2pPDA@mail.gmail.com>
+ <be29fd42-2e64-5ca8-546c-e7f68a2d0da7@partner.samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: Amos Kong <akong@redhat.com>, linux-crypto@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Rusty Russell <rusty@rustcorp.com.au>, kvm@vger.kernel.org,
-        Michael Buesch <m@bues.ch>, Matt Mackall <mpm@selenic.com>,
-        amit shah <amit.shah@redhat.com>,
-        lkml <linux-kernel@vger.kernel.org>
-To: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170926165241.GB14833@dtor-ws>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Gilad Ben-Yossef <gilad@benyossef.com>,
+        Christophe LEROY <christophe.leroy@c-s.fr>,
+        Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Kamil Konieczny <k.konieczny@partner.samsung.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:44960 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751787AbdI0JIu (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 27 Sep 2017 05:08:50 -0400
+Content-Disposition: inline
+In-Reply-To: <be29fd42-2e64-5ca8-546c-e7f68a2d0da7@partner.samsung.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-
+On Tue, Sep 26, 2017 at 01:09:05PM +0200, Kamil Konieczny wrote:
 > 
-> On Tue, Sep 26, 2017 at 02:36:57AM -0400, Pankaj Gupta wrote:
-> > 
-> > > 
-> > > A bit late to a party, but:
-> > > 
-> > > On Mon, Dec 8, 2014 at 12:50 AM, Amos Kong <akong@redhat.com> wrote:
-> > > > From: Rusty Russell <rusty@rustcorp.com.au>
-> > > >
-> > > > There's currently a big lock around everything, and it means that we
-> > > > can't query sysfs (eg /sys/devices/virtual/misc/hw_random/rng_current)
-> > > > while the rng is reading.  This is a real problem when the rng is slow,
-> > > > or blocked (eg. virtio_rng with qemu's default /dev/random backend)
-> > > >
-> > > > This doesn't help (it leaves the current lock untouched), just adds a
-> > > > lock to protect the read function and the static buffers, in
-> > > > preparation
-> > > > for transition.
-> > > >
-> > > > Signed-off-by: Rusty Russell <rusty@rustcorp.com.au>
-> > > > ---
-> > > ...
-> > > >
-> > > > @@ -160,13 +166,14 @@ static ssize_t rng_dev_read(struct file *filp,
-> > > > char
-> > > > __user *buf,
-> > > >                         goto out_unlock;
-> > > >                 }
-> > > >
-> > > > +               mutex_lock(&reading_mutex);
-> > > 
-> > > I think this breaks O_NONBLOCK: we have hwrng core thread that is
-> > > constantly pumps underlying rng for data; the thread takes the mutex
-> > > and calls rng_get_data() that blocks until RNG responds. This means
-> > > that even user specified O_NONBLOCK here we'll be waiting until
-> > > [hwrng] thread releases reading_mutex before we can continue.
-> > 
-> > I think for 'virtio_rng' for 'O_NON_BLOCK' 'rng_get_data' returns
-> > without waiting for data which can let mutex to be  used by other
-> > threads waiting if any?
-> > 
-> > rng_dev_read
-> >   rng_get_data
-> >     virtio_read
-> 
-> As I said in the paragraph above the code that potentially holds the
-> mutex for long time is the thread in hwrng core: hwrng_fillfn(). As it
-> calls rng_get_data() with "wait" argument == 1 it may block while
-> holding reading_mutex, which, in turn, will block rng_dev_read(), even
-> if it was called with O_NONBLOCK.
+> Can import() be called without _any_ init(), for example
+> after reboot of machine ? Is following scenario valid:
 
-yes, 'hwrng_fillfn' does not consider O_NONBLOCK and can result in mutex wait
-for other tasks. What if we pass zero for wait to 'hwrng_fill' to return early 
-if there is no data?
+Of course it can.  import must restore the state of the request
+to that at the time when export was called.
 
---- a/drivers/char/hw_random/core.c
-+++ b/drivers/char/hw_random/core.c
-@@ -403,7 +403,7 @@ static int hwrng_fillfn(void *unused)
-                        break;
-                mutex_lock(&reading_mutex);
-                rc = rng_get_data(rng, rng_fillbuf,
--                                 rng_buffer_size(), 1);
-+                                 rng_buffer_size(), 0);
-                mutex_unlock(&reading_mutex);
-                put_rng(rng);
-                if (rc <= 0) {
+import does not need to be called after init.  init simply resets
+the hash state for new update/final calls.
 
-Thanks,
-Pankaj
+> init(), update() 0 or more times, export(),
+> save exported data to pernament storage
+> reboot machine
+> load crypto driver, import() saved state ?
 
-> 
-> Thanks.
-> 
-> --
-> Dmitry
-> 
+Yes this must be supported.
+
+Basically after any update call is complete (you've called the
+completion function), you should be able to call export and
+completely extract the partial (as opposed to finalised) hash
+state.
+
+Remember we need to support an arbitrarily large number of
+concurrent hashing operations.  So you cannot keep a hash state
+in hardware indefinitely just because the user has not called
+finalize on it.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
