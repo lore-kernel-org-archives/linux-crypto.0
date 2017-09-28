@@ -1,40 +1,44 @@
-From: Tudor Ambarus <tudor.ambarus-UWL1GkI3JZL3oGB3hsPCZA@public.gmane.org>
-Subject: [v2 PATCH 4/5] Bluetooth: ecdh_helper - fix leak of private key
-Date: Thu, 28 Sep 2017 17:14:54 +0300
-Message-ID: <20170928141455.15336-5-tudor.ambarus@microchip.com>
-References: <20170928141455.15336-1-tudor.ambarus@microchip.com>
+From: "Raj, Ashok" <ashok.raj@intel.com>
+Subject: Re: DMA error when sg->offset value is greater than PAGE_SIZE in
+ Intel IOMMU
+Date: Thu, 28 Sep 2017 06:05:50 -0700
+Message-ID: <20170928130549.GA99456@otc-nc-03>
+References: <afa02763-4556-0e14-7d1b-1c044cdc1ff7@chelsio.com>
+ <6d2af675-7b97-6eaf-4daa-d7bf80a05923@chelsio.com>
+ <437a9bd8-d4d6-22ca-1a64-1a3e73f1101a@arm.com>
+ <MWHPR12MB1600694D099E1CFAD6849A68C87B0@MWHPR12MB1600.namprd12.prod.outlook.com>
+ <CAPcyv4jtYMZJ6V5VoXkGrcZ+ykWvYp1=qXrqJkjknk8Q_BVwgA@mail.gmail.com>
+ <MWHPR12MB160060436AC70CB5BE8C0C6EC8780@MWHPR12MB1600.namprd12.prod.outlook.com>
+ <20170927181802.3dcd7efb@m750.lan>
+ <20170927144847.GA95654@otc-nc-03>
+ <MWHPR12MB16005D59D7A33F3D5BE43395C8780@MWHPR12MB1600.namprd12.prod.outlook.com>
+ <26d68681-a157-26d3-84cb-6684dcaf3135@chelsio.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Tudor Ambarus <tudor.ambarus-UWL1GkI3JZL3oGB3hsPCZA@public.gmane.org>
-To: <marcel-kz+m5ild9QBg9hUCZPvPmw@public.gmane.org>, <linux-bluetooth-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Return-path: <linux-bluetooth-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170928141455.15336-1-tudor.ambarus-UWL1GkI3JZL3oGB3hsPCZA@public.gmane.org>
-Sender: linux-bluetooth-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Casey Leedom <leedom@chelsio.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "dwmw2@infradead.org" <dwmw2@infradead.org>,
+        Michael Werner <werner@chelsio.com>, "nd@arm.com" <nd@arm.com>
+To: Harsh Jain <Harsh@chelsio.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <26d68681-a157-26d3-84cb-6684dcaf3135@chelsio.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-tmp buffer contains the swapped private key. In case the setkey call
-failed, the tmp buffer was freed without clearing the private key.
+Thanks for trying that Harsh. 
 
-Zeroize the temporary buffer so we don't leak the private key.
+sp_off turns of super page support. Which this mode, do you still see offsets greater than 4k?
 
-Signed-off-by: Tudor Ambarus <tudor.ambarus-UWL1GkI3JZL3oGB3hsPCZA@public.gmane.org>
----
- net/bluetooth/ecdh_helper.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Thu, Sep 28, 2017 at 07:08:21PM +0530, Harsh Jain wrote:
+> 
+> 
+> Today I tried with "Intel_iommu=sp_off" boot option. Traffic runs without any error for more than 1 hrs. What magic this option did? :)
 
-diff --git a/net/bluetooth/ecdh_helper.c b/net/bluetooth/ecdh_helper.c
-index 22c8daa..16e022f 100644
---- a/net/bluetooth/ecdh_helper.c
-+++ b/net/bluetooth/ecdh_helper.c
-@@ -122,7 +122,7 @@ int compute_ecdh_secret(struct crypto_kpp *tfm, const u8 public_key[64],
- free_req:
- 	kpp_request_free(req);
- free_tmp:
--	kfree(tmp);
-+	kzfree(tmp);
- 	return err;
- }
- 
--- 
-2.9.4
+Cheers,
+Ashok
