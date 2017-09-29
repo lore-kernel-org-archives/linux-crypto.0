@@ -1,394 +1,282 @@
-From: Marcel Holtmann <marcel-kz+m5ild9QBg9hUCZPvPmw@public.gmane.org>
-Subject: Re: [v2 PATCH 5/5] Bluetooth: let the crypto subsystem generate the
- ecc privkey
-Date: Fri, 29 Sep 2017 13:55:35 +0200
-Message-ID: <8FDB3B89-9F12-4AAB-B056-BB09AA10FCAC@holtmann.org>
-References: <20170928141455.15336-1-tudor.ambarus@microchip.com>
- <20170928141455.15336-6-tudor.ambarus@microchip.com>
- <5E848FF1-C029-4F16-AE9B-10D71C05E1F0@holtmann.org>
- <bb7544d4-a6e1-47bd-e6ed-04c6c8d4bfd5@microchip.com>
-Mime-Version: 1.0 (Mac OS X Mail 11.0 \(3445.1.6\))
-Content-Type: text/plain;
-        charset=us-ascii
-Content-Transfer-Encoding: 8BIT
-Cc: "bluez mailin list (linux-bluetooth-u79uwXL29TY76Z2rM5mHXA@public.gmane.org)"
-        <linux-bluetooth-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Tudor Ambarus <tudor.ambarus-UWL1GkI3JZL3oGB3hsPCZA@public.gmane.org>
-Return-path: <linux-bluetooth-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <bb7544d4-a6e1-47bd-e6ed-04c6c8d4bfd5-UWL1GkI3JZL3oGB3hsPCZA@public.gmane.org>
-Sender: linux-bluetooth-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+From: Borislav Petkov <bp@suse.de>
+Subject: Re: [Part2 PATCH v4 05/29] crypto: ccp: Add Platform Security
+ Processor (PSP) device support
+Date: Fri, 29 Sep 2017 17:16:07 +0200
+Message-ID: <20170929151607.zn4lmdkyn25sczfg@pd.tnic>
+References: <20170919204627.3875-1-brijesh.singh@amd.com>
+ <20170919204627.3875-6-brijesh.singh@amd.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Gary Hook <gary.hook@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        linux-crypto@vger.kernel.org
+To: Brijesh Singh <brijesh.singh@amd.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:55203 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752092AbdI2PQY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 29 Sep 2017 11:16:24 -0400
+Content-Disposition: inline
+In-Reply-To: <20170919204627.3875-6-brijesh.singh@amd.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Tudor,
+On Tue, Sep 19, 2017 at 03:46:03PM -0500, Brijesh Singh wrote:
+> Platform Security Processor (PSP) is part of AMD Secure Processor (AMD-SP),
 
->>> That Bluetooth SMP knows about the private key is pointless, since the
->>> detection of debug key usage is actually via the public key portion.
->>> With this patch, the Bluetooth SMP will stop keeping a copy of the
->>> ecdh private key and will let the crypto subsystem to generate and
->>> handle the ecdh private key, potentially benefiting of hardware
->>> ecc private key generation and retention.
->>> 
->>> The loop that tries to generate a correct private key is now removed and
->>> we trust the crypto subsystem to generate a correct private key. This
->>> backup logic should be done in crypto, if really needed.
->>> 
->>> Signed-off-by: Tudor Ambarus <tudor.ambarus-UWL1GkI3JZL3oGB3hsPCZA@public.gmane.org>
->>> ---
->>> net/bluetooth/ecdh_helper.c | 186 ++++++++++++++++++++++++--------------------
->>> net/bluetooth/ecdh_helper.h |   9 ++-
->>> net/bluetooth/selftest.c    |  14 +++-
->>> net/bluetooth/smp.c         |  66 +++++++---------
->>> 4 files changed, 147 insertions(+), 128 deletions(-)
->>> 
->>> diff --git a/net/bluetooth/ecdh_helper.c b/net/bluetooth/ecdh_helper.c
->>> index 16e022f..2155ce8 100644
->>> --- a/net/bluetooth/ecdh_helper.c
->>> +++ b/net/bluetooth/ecdh_helper.c
->>> @@ -49,15 +49,21 @@ static inline void swap_digits(u64 *in, u64 *out, unsigned int ndigits)
->>> 		out[i] = __swab64(in[ndigits - 1 - i]);
->>> }
->>> 
->>> +/* compute_ecdh_secret() - function assumes that the private key was
->>> + *                         already set.
->>> + * @tfm:          KPP tfm handle allocated with crypto_alloc_kpp().
->>> + * @public_key:   pair's ecc public key.
->>> + * secret:        memory where the ecdh computed shared secret will be saved.
->>> + *
->>> + * Return: zero on success; error code in case of error.
->>> + */
->>> int compute_ecdh_secret(struct crypto_kpp *tfm, const u8 public_key[64],
->>> -			const u8 private_key[32], u8 secret[32])
->>> +			u8 secret[32])
->>> {
->>> 	struct kpp_request *req;
->>> -	struct ecdh p;
->>> +	u8 *tmp;
->>> 	struct ecdh_completion result;
->>> 	struct scatterlist src, dst;
->>> -	u8 *tmp, *buf;
->>> -	unsigned int buf_len;
->>> 	int err;
->>> 
->>> 	tmp = kmalloc(64, GFP_KERNEL);
->>> @@ -72,28 +78,6 @@ int compute_ecdh_secret(struct crypto_kpp *tfm, const u8 public_key[64],
->>> 
->>> 	init_completion(&result.completion);
->>> 
->>> -	/* Security Manager Protocol holds digits in litte-endian order
->>> -	 * while ECC API expect big-endian data
->>> -	 */
->>> -	swap_digits((u64 *)private_key, (u64 *)tmp, 4);
->>> -	p.key = (char *)tmp;
->>> -	p.key_size = 32;
->>> -	/* Set curve_id */
->>> -	p.curve_id = ECC_CURVE_NIST_P256;
->>> -	buf_len = crypto_ecdh_key_len(&p);
->>> -	buf = kmalloc(buf_len, GFP_KERNEL);
->>> -	if (!buf) {
->>> -		err = -ENOMEM;
->>> -		goto free_req;
->>> -	}
->>> -
->>> -	crypto_ecdh_encode_key(buf, buf_len, &p);
->>> -
->>> -	/* Set A private Key */
->>> -	err = crypto_kpp_set_secret(tfm, (void *)buf, buf_len);
->>> -	if (err)
->>> -		goto free_all;
->>> -
->>> 	swap_digits((u64 *)public_key, (u64 *)tmp, 4); /* x */
->>> 	swap_digits((u64 *)&public_key[32], (u64 *)&tmp[32], 4); /* y */
->>> 
->>> @@ -118,26 +102,76 @@ int compute_ecdh_secret(struct crypto_kpp *tfm, const u8 public_key[64],
->>> 	memcpy(secret, tmp, 32);
->>> 
->>> free_all:
->>> -	kzfree(buf);
->>> -free_req:
->>> 	kpp_request_free(req);
->>> free_tmp:
->>> 	kzfree(tmp);
->>> 	return err;
->>> }
->>> 
->>> -int generate_ecdh_keys(struct crypto_kpp *tfm, u8 public_key[64],
->>> -		       u8 private_key[32])
->>> +/* set_ecdh_privkey() - set or generate ecc private key.
->>> + *
->>> + * Function generates an ecc private key in the crypto subsystem when receiving
->>> + * a NULL private key or sets the received key when not NULL.
->>> + *
->>> + * @tfm:           KPP tfm handle allocated with crypto_alloc_kpp().
->>> + * @private_key:   user's ecc private key. When not NULL, the key is expected
->>> + *                 in little endian format.
->>> + *
->>> + * Return: zero on success; error code in case of error.
->>> + */
->>> +int set_ecdh_privkey(struct crypto_kpp *tfm, const u8 private_key[32])
->>> +{
->>> +	u8 *buf, *tmp = NULL;
->>> +	unsigned int buf_len;
->>> +	int err;
->>> +	struct ecdh p = {0};
->>> +
->>> +	p.curve_id = ECC_CURVE_NIST_P256;
->>> +
->>> +	if (private_key) {
->>> +		tmp = kmalloc(32, GFP_KERNEL);
->>> +		if (!tmp)
->>> +			return -ENOMEM;
->>> +		swap_digits((u64 *)private_key, (u64 *)tmp, 4);
->>> +		p.key = tmp;
->>> +		p.key_size = 32;
->>> +	}
->>> +
->>> +	buf_len = crypto_ecdh_key_len(&p);
->>> +	buf = kmalloc(buf_len, GFP_KERNEL);
->>> +	if (!buf) {
->>> +		err = -ENOMEM;
->>> +		goto free_tmp;
->>> +	}
->>> +
->>> +	err = crypto_ecdh_encode_key(buf, buf_len, &p);
->>> +	if (err)
->>> +		goto free_all;
->>> +
->>> +	err = crypto_kpp_set_secret(tfm, buf, buf_len);
->>> +	/* fall through */
->>> +free_all:
->>> +	kzfree(buf);
->>> +free_tmp:
->>> +	kzfree(tmp);
->>> +	return err;
->>> +}
->>> +
->>> +/* generate_ecdh_public_key() - function assumes that the private key was
->>> + *                              already set.
->>> + *
->>> + * @tfm:          KPP tfm handle allocated with crypto_alloc_kpp().
->>> + * @public_key:   memory where the computed ecc public key will be saved.
->>> + *
->>> + * Return: zero on success; error code in case of error.
->>> + */
->>> +int generate_ecdh_public_key(struct crypto_kpp *tfm, u8 public_key[64])
->>> {
->>> 	struct kpp_request *req;
->>> -	struct ecdh p;
->>> +	u8 *tmp;
->>> 	struct ecdh_completion result;
->>> 	struct scatterlist dst;
->>> -	u8 *tmp, *buf;
->>> -	unsigned int buf_len;
->>> 	int err;
->>> -	const unsigned short max_tries = 16;
->>> -	unsigned short tries = 0;
->>> 
->>> 	tmp = kmalloc(64, GFP_KERNEL);
->>> 	if (!tmp)
->>> @@ -150,63 +184,47 @@ int generate_ecdh_keys(struct crypto_kpp *tfm, u8 public_key[64],
->>> 	}
->>> 
->>> 	init_completion(&result.completion);
->>> +	sg_init_one(&dst, tmp, 64);
->>> +	kpp_request_set_input(req, NULL, 0);
->>> +	kpp_request_set_output(req, &dst, 64);
->>> +	kpp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
->>> +				 ecdh_complete, &result);
->>> 
->>> -	/* Set curve_id */
->>> -	p.curve_id = ECC_CURVE_NIST_P256;
->>> -	p.key_size = 32;
->>> -	buf_len = crypto_ecdh_key_len(&p);
->>> -	buf = kmalloc(buf_len, GFP_KERNEL);
->>> -	if (!buf)
->>> -		goto free_req;
->>> -
->>> -	do {
->>> -		if (tries++ >= max_tries)
->>> -			goto free_all;
->>> -
->>> -		/* Set private Key */
->>> -		p.key = (char *)private_key;
->>> -		crypto_ecdh_encode_key(buf, buf_len, &p);
->>> -		err = crypto_kpp_set_secret(tfm, buf, buf_len);
->>> -		if (err)
->>> -			goto free_all;
->>> -
->>> -		sg_init_one(&dst, tmp, 64);
->>> -		kpp_request_set_input(req, NULL, 0);
->>> -		kpp_request_set_output(req, &dst, 64);
->>> -		kpp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
->>> -					 ecdh_complete, &result);
->>> -
->>> -		err = crypto_kpp_generate_public_key(req);
->>> -
->>> -		if (err == -EINPROGRESS) {
->>> -			wait_for_completion(&result.completion);
->>> -			err = result.err;
->>> -		}
->>> -
->>> -		/* Private key is not valid. Regenerate */
->>> -		if (err == -EINVAL)
->>> -			continue;
->>> -
->>> -		if (err < 0)
->>> -			goto free_all;
->>> -		else
->>> -			break;
->>> -
->>> -	} while (true);
->>> -
->>> -	/* Keys are handed back in little endian as expected by Security
->>> -	 * Manager Protocol
->>> +	err = crypto_kpp_generate_public_key(req);
->>> +	if (err == -EINPROGRESS) {
->>> +		wait_for_completion(&result.completion);
->>> +		err = result.err;
->>> +	}
->>> +	if (err < 0)
->>> +		goto free_all;
->>> +
->>> +	/* The public key is handed back in little endian as expected by
->>> +	 * the Security Manager Protocol.
->>> 	 */
->>> 	swap_digits((u64 *)tmp, (u64 *)public_key, 4); /* x */
->>> 	swap_digits((u64 *)&tmp[32], (u64 *)&public_key[32], 4); /* y */
->>> -	swap_digits((u64 *)private_key, (u64 *)tmp, 4);
->>> -	memcpy(private_key, tmp, 32);
->>> 
->>> free_all:
->>> -	kzfree(buf);
->>> -free_req:
->>> 	kpp_request_free(req);
->>> free_tmp:
->>> 	kfree(tmp);
->>> 	return err;
->>> }
->>> +
->>> +/* generate_ecdh_keys() - generate ecc key pair.
->>> + *
->>> + * @tfm:          KPP tfm handle allocated with crypto_alloc_kpp().
->>> + * @public_key:   memory where the computed ecc public key will be saved.
->>> + *
->>> + * Return: zero on success; error code in case of error.
->>> + */
->>> +int generate_ecdh_keys(struct crypto_kpp *tfm, u8 public_key[64])
->>> +{
->>> +	int err;
->>> +
->>> +	err = set_ecdh_privkey(tfm, NULL);
->>> +	if (err)
->>> +		return err;
->>> +
->>> +	return generate_ecdh_public_key(tfm, public_key);
->>> +}
->>> diff --git a/net/bluetooth/ecdh_helper.h b/net/bluetooth/ecdh_helper.h
->>> index 50e6676..a6f8d03 100644
->>> --- a/net/bluetooth/ecdh_helper.h
->>> +++ b/net/bluetooth/ecdh_helper.h
->>> @@ -23,7 +23,8 @@
->>> #include <crypto/kpp.h>
->>> #include <linux/types.h>
->>> 
->>> -int compute_ecdh_secret(struct crypto_kpp *tfm, const u8 pub_a[64],
->>> -			const u8 priv_b[32], u8 secret[32]);
->>> -int generate_ecdh_keys(struct crypto_kpp *tfm, u8 public_key[64],
->>> -		       u8 private_key[32]);
->>> +int compute_ecdh_secret(struct crypto_kpp *tfm, const u8 pair_public_key[64],
->>> +			u8 secret[32]);
->>> +int set_ecdh_privkey(struct crypto_kpp *tfm, const u8 *private_key);
->>> +int generate_ecdh_public_key(struct crypto_kpp *tfm, u8 public_key[64]);
->>> +int generate_ecdh_keys(struct crypto_kpp *tfm, u8 public_key[64]);
->>> diff --git a/net/bluetooth/selftest.c b/net/bluetooth/selftest.c
->>> index ce99648..2d1519d 100644
->>> --- a/net/bluetooth/selftest.c
->>> +++ b/net/bluetooth/selftest.c
->>> @@ -152,11 +152,11 @@ static int __init test_ecdh_sample(struct crypto_kpp *tfm, const u8 priv_a[32],
->>> 	dhkey_a = &tmp[0];
->>> 	dhkey_b = &tmp[32];
->>> 
->>> -	ret = compute_ecdh_secret(tfm, pub_b, priv_a, dhkey_a);
->>> +	ret = set_ecdh_privkey(tfm, priv_a);
->>> 	if (ret)
->>> 		goto out;
->>> 
->>> -	ret = compute_ecdh_secret(tfm, pub_a, priv_b, dhkey_b);
->>> +	ret = compute_ecdh_secret(tfm, pub_b, dhkey_a);
->>> 	if (ret)
->>> 		goto out;
->>> 
->>> @@ -165,9 +165,17 @@ static int __init test_ecdh_sample(struct crypto_kpp *tfm, const u8 priv_a[32],
->>> 		goto out;
->>> 	}
->>> 
->>> +	ret = set_ecdh_privkey(tfm, priv_b);
->>> +	if (ret)
->>> +		goto out;
->>> +
->>> +	ret = compute_ecdh_secret(tfm, pub_a, dhkey_b);
->>> +	if (ret)
->>> +		goto out;
->>> +
->>> 	if (memcmp(dhkey_b, dhkey, 32))
->>> 		ret = -EINVAL;
->>> -
->>> +	/* fall through*/
->>> out:
->>> 	kfree(tmp);
->>> 	return ret;
->>> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
->>> index af7e610..d41449b 100644
->>> --- a/net/bluetooth/smp.c
->>> +++ b/net/bluetooth/smp.c
->>> @@ -84,7 +84,6 @@ enum {
->>> struct smp_dev {
->>> 	/* Secure Connections OOB data */
->>> 	u8			local_pk[64];
->>> -	u8			local_sk[32];
->>> 	u8			local_rand[16];
->>> 	bool			debug_key;
->>> 
->>> @@ -126,7 +125,6 @@ struct smp_chan {
->>> 
->>> 	/* Secure Connections variables */
->>> 	u8			local_pk[64];
->>> -	u8			local_sk[32];
->>> 	u8			remote_pk[64];
->>> 	u8			dhkey[32];
->>> 	u8			mackey[16];
->>> @@ -568,24 +566,22 @@ int smp_generate_oob(struct hci_dev *hdev, u8 hash[16], u8 rand[16])
->>> 
->>> 	if (hci_dev_test_flag(hdev, HCI_USE_DEBUG_KEYS)) {
->>> 		BT_DBG("Using debug keys");
->>> +		err = set_ecdh_privkey(smp->tfm_ecdh, debug_sk);
->>> +		if (err)
->>> +			return err;
->>> 		memcpy(smp->local_pk, debug_pk, 64);
->>> -		memcpy(smp->local_sk, debug_sk, 32);
->>> 		smp->debug_key = true;
->> this all looks good, but I do wonder why not have a helper function here.
->> 	err = generate_ecdh_debug_keys(smp->tfm_ecdh, smp->local_pk);
->> And then have that function defined like this:
->> 	int generate_ecdh_debug_keys(struct crypto_kpp *tfm, u8 public_key[64])
->> 	{
->> 		int err;
->> 		err = set_ecdh_privkey(tfm, debug_sk);
->> 		if (err)
->> 			return err;
->> 		memcpy(public_key, debug_pk, 64);
->> 		return 0;
->> 	}
->> I know this seems duplicate, but I wonder if that reduces the number of functions that have to be public. I prefer having most function static if possible.
+The Platform...
+
+> PSP is a dedicated processor that provides the support for key management
+> commands in a Secure Encrypted Virtualiztion (SEV) mode, along with
+
+Virtualization
+
+Is integrating that spellchecker hard? Because what I do, for example,
+is press F7 in vim when I've written the commit message. And F7 is
+mapped to:
+
+map <F7> :set spell! spelllang=en_us spellfile=~/.vim/spellfile.add<CR><Bar>:echo "spellcheck: " . strpart("offon", 3 * &spell, 3)<CR>
+
+in my .vimrc
+
+And I'm pretty sure you can do a similar thing with other editors.
+
+> software-based Trusted Executation Environment (TEE) to enable the
+> third-party trusted applications.
 > 
-> You want set_ecdh_privkey() to be static in ecdh_helper.c?
-> test_ecdh_sample() and test_debug_key() don't need to copy the public
-> key, so they need set_ecdh_privkey() as public.
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: "Radim Krčmář" <rkrcmar@redhat.com>
+> Cc: Borislav Petkov <bp@suse.de>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: Gary Hook <gary.hook@amd.com>
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Cc: linux-crypto@vger.kernel.org
+> Cc: kvm@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  drivers/crypto/ccp/Kconfig   |  11 +++++
+>  drivers/crypto/ccp/Makefile  |   1 +
+>  drivers/crypto/ccp/psp-dev.c | 111 +++++++++++++++++++++++++++++++++++++++++++
+>  drivers/crypto/ccp/psp-dev.h |  61 ++++++++++++++++++++++++
+>  drivers/crypto/ccp/sp-dev.c  |  32 +++++++++++++
+>  drivers/crypto/ccp/sp-dev.h  |  27 ++++++++++-
+>  drivers/crypto/ccp/sp-pci.c  |  46 ++++++++++++++++++
+>  7 files changed, 288 insertions(+), 1 deletion(-)
+>  create mode 100644 drivers/crypto/ccp/psp-dev.c
+>  create mode 100644 drivers/crypto/ccp/psp-dev.h
 > 
-> I can make generate_ecdh_debug_keys() static to smp.c, but we will be
-> mixing helpers in smp.c and ecdh_helper.c.
+> diff --git a/drivers/crypto/ccp/Kconfig b/drivers/crypto/ccp/Kconfig
+> index 6d626606b9c5..1d927e13bf31 100644
+> --- a/drivers/crypto/ccp/Kconfig
+> +++ b/drivers/crypto/ccp/Kconfig
+> @@ -32,3 +32,14 @@ config CRYPTO_DEV_CCP_CRYPTO
+>  	  Support for using the cryptographic API with the AMD Cryptographic
+>  	  Coprocessor. This module supports offload of SHA and AES algorithms.
+>  	  If you choose 'M' here, this module will be called ccp_crypto.
+> +
+> +config CRYPTO_DEV_SP_PSP
+> +	bool "Platform Security Processor (PSP) device"
+> +	default y
+> +	depends on CRYPTO_DEV_CCP_DD
 
-would it make sense to just include the code from ecdh_helper.c in smp.c? I think that due to the usage of KPP it has shrunk a lot now. However we can do that in a follow up cleanup series. For now I am going to apply your patches.
+So this last symbol CRYPTO_DEV_CCP_DD is default m and it doesn't depend
+on anything. And I'm pretty sure it should depend on CPU_SUP_AMD as this
+is AMD-specific hw. You can add that dependency in a prepatch.
 
-Regards
+And what happened to adding dependencies on CONFIG_KVM_AMD? Or can you
+use the PSP without virtualization in any sensible way?
 
-Marcel
+> +	help
+> +	 Provide the support for AMD Platform Security Processor (PSP). PSP is
+
+			... for the AMD ... 				The PSP ... 
+
+> +	 a dedicated processor that provides the support for key management
+
+				that provides support for
+
+> +	 commands in in a Secure Encrypted Virtualiztion (SEV) mode, along with
+
+		... in Secure Encrypted Virtualization
+
+> +	 software-based Trusted Executation Environment (TEE) to enable the
+> +	 third-party trusted applications.
+> diff --git a/drivers/crypto/ccp/Makefile b/drivers/crypto/ccp/Makefile
+> index 57f8debfcfb3..008bae7e26ec 100644
+> --- a/drivers/crypto/ccp/Makefile
+> +++ b/drivers/crypto/ccp/Makefile
+> @@ -7,6 +7,7 @@ ccp-$(CONFIG_CRYPTO_DEV_SP_CCP) += ccp-dev.o \
+>  	    ccp-dmaengine.o \
+>  	    ccp-debugfs.o
+>  ccp-$(CONFIG_PCI) += sp-pci.o
+> +ccp-$(CONFIG_CRYPTO_DEV_SP_PSP) += psp-dev.o
+>  
+>  obj-$(CONFIG_CRYPTO_DEV_CCP_CRYPTO) += ccp-crypto.o
+>  ccp-crypto-objs := ccp-crypto-main.o \
+> diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
+> new file mode 100644
+> index 000000000000..e60e53272e71
+> --- /dev/null
+> +++ b/drivers/crypto/ccp/psp-dev.c
+> @@ -0,0 +1,111 @@
+> +/*
+> + * AMD Platform Security Processor (PSP) interface
+> + *
+> + * Copyright (C) 2016-2017 Advanced Micro Devices, Inc.
+> + *
+> + * Author: Brijesh Singh <brijesh.singh@amd.com>
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
+> + */
+> +
+> +#include <linux/module.h>
+> +#include <linux/kernel.h>
+> +#include <linux/kthread.h>
+> +#include <linux/sched.h>
+> +#include <linux/interrupt.h>
+> +#include <linux/spinlock.h>
+> +#include <linux/spinlock_types.h>
+> +#include <linux/types.h>
+> +#include <linux/mutex.h>
+> +#include <linux/delay.h>
+> +#include <linux/hw_random.h>
+> +#include <linux/ccp.h>
+> +
+> +#include "sp-dev.h"
+> +#include "psp-dev.h"
+> +
+> +const struct psp_vdata psp_entry = {
+> +	.offset = 0x10500,
+> +};
+> +
+> +static struct psp_device *psp_alloc_struct(struct sp_device *sp)
+> +{
+> +	struct device *dev = sp->dev;
+> +	struct psp_device *psp;
+> +
+> +	psp = devm_kzalloc(dev, sizeof(*psp), GFP_KERNEL);
+> +	if (!psp)
+> +		return NULL;
+> +
+> +	psp->dev = dev;
+> +	psp->sp = sp;
+> +
+> +	snprintf(psp->name, sizeof(psp->name), "psp-%u", sp->ord);
+> +
+> +	return psp;
+> +}
+> +
+> +irqreturn_t psp_irq_handler(int irq, void *data)
+
+Not static because... ?
+
+> +{
+> +	return IRQ_HANDLED;
+> +}
+> +
+> +int psp_dev_init(struct sp_device *sp)
+> +{
+> +	struct device *dev = sp->dev;
+> +	struct psp_device *psp;
+> +	int ret;
+> +
+> +	ret = -ENOMEM;
+> +	psp = psp_alloc_struct(sp);
+> +	if (!psp)
+> +		goto e_err;
+
+<---- newline here. I already pointed this out last time. Please be more
+careful when incorporating feedback. This is not the first time I'm
+writing this. :-\
+
+> +	sp->psp_data = psp;
+> +
+> +	psp->vdata = (struct psp_vdata *)sp->dev_vdata->psp_vdata;
+> +	if (!psp->vdata) {
+> +		ret = -ENODEV;
+> +		dev_err(dev, "missing driver data\n");
+> +		goto e_err;
+> +	}
+> +
+> +	psp->io_regs = sp->io_map + psp->vdata->offset;
+> +
+> +	/* Disable and clear interrupts until ready */
+> +	iowrite32(0, psp->io_regs + PSP_P2CMSG_INTEN);
+> +	iowrite32(-1, psp->io_regs + PSP_P2CMSG_INTSTS);
+> +
+> +	dev_dbg(dev, "requesting an IRQ ...\n");
+> +	/* Request an irq */
+> +	ret = sp_request_psp_irq(psp->sp, psp_irq_handler, psp->name, psp);
+> +	if (ret) {
+> +		dev_err(dev, "psp: unable to allocate an IRQ\n");
+> +		goto e_err;
+> +	}
+> +
+> +	sp_set_psp_master(sp);
+
+>From last review:
+
+> So this function is called only once and declared somewhere else. You
+> could simply do here:
+>
+>          if (sp->set_psp_master_device)
+>                  sp->set_psp_master_device(sp);
+>
+> and get rid of one more global function.
+
+and you said:
+
+> Sure I can do that.
+
+> +
+> +	/* Enable interrupt */
+> +	dev_dbg(dev, "Enabling interrupts ...\n");
+
+That statement is superfluous...
+
+> +	iowrite32(7, psp->io_regs + PSP_P2CMSG_INTEN);
+> +
+> +	dev_notice(dev, "psp enabled\n");
+
+... as this will issue anyway and there are no conditional code paths
+in-between.
+
+> +
+> +	return 0;
+> +
+> +e_err:
+> +	sp->psp_data = NULL;
+> +
+> +	dev_notice(dev, "psp initialization failed\n");
+> +
+> +	return ret;
+> +}
+> +
+> +void psp_dev_destroy(struct sp_device *sp)
+> +{
+> +	struct psp_device *psp = sp->psp_data;
+> +
+> +	sp_free_psp_irq(sp, psp);
+> +}
+
+So I'm going to stop right here. Please go over
+
+https://lkml.kernel.org/r/20170907142737.g4aot7xatyopdfwp@pd.tnic
+
+make sure you've addressed *every* piece of feedback and then send me a
+v4.1 for review.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+SUSE Linux GmbH, GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
+-- 
