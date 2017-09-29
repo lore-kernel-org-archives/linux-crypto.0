@@ -1,73 +1,80 @@
-From: "Raj, Ashok" <ashok.raj@intel.com>
-Subject: Re: [PATCH] iommu/vt-d: Fix scatterlist offset handling
-Date: Thu, 28 Sep 2017 08:43:46 -0700
-Message-ID: <20170928154345.GA101272@otc-nc-03>
-References: <644c3e01654f8bd48d669c36e424959d6ef0e27e.1506607370.git.robin.murphy@arm.com>
- <MWHPR12MB1600DA9DF9CF54221B752694C8790@MWHPR12MB1600.namprd12.prod.outlook.com>
- <20170928132942.GA99552@otc-nc-03>
- <a135090f-27e2-cf69-b3a7-c9d0e101bf07@arm.com>
+From: Xiang Gao <qasdfgtyuiop@gmail.com>
+Subject: Re: [lkp-robot] [mac80211] 31e9170bde: hwsim.sta_dynamic_down_up.fail
+Date: Thu, 28 Sep 2017 22:21:21 -0400
+Message-ID: <CAMtaSwQHT0pP+YRx2WSL2kyZ__iJzrkF4jCrLBVzTjO40u4EgQ@mail.gmail.com>
+References: <20170924054015.8958-1-qasdfgtyuiop@gmail.com> <20170928080614.GZ17200@yexl-desktop>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Casey Leedom <leedom@chelsio.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "dwmw2@infradead.org" <dwmw2@infradead.org>,
-        Harsh Jain <Harsh@chelsio.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Michael Werner <werner@chelsio.com>,
-        Atul Gupta <atul.gupta@chelsio.com>
-To: Robin Murphy <robin.murphy@arm.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga04.intel.com ([192.55.52.120]:27574 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750942AbdI1SjH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 28 Sep 2017 14:39:07 -0400
-Content-Disposition: inline
-In-Reply-To: <a135090f-27e2-cf69-b3a7-c9d0e101bf07@arm.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        linux-crypto@vger.kernel.org,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        linux-wireless@vger.kernel.org, netdev@vger.kernel.org, lkp@01.org
+To: kernel test robot <xiaolong.ye@intel.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20170928080614.GZ17200@yexl-desktop>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Robin
+Thanks, I will look into it.
+Xiang Gao
 
-thanks.. i have no idea.. i see all the other patches from you :-)
-my email has decided to play games with me i suppose :-)
 
-On Thu, Sep 28, 2017 at 05:59:11PM +0100, Robin Murphy wrote:
-> I hope our email server hasn't got blacklisted again... Said patch is
-> the top of this very thread we're replying on[1] - you were definitely
-> on cc :(
-
-        (sg->dma_address + sg->dma_len) ----+
-        sg->dma_address ---------+          |
-        iov_pfn------+           |          |
-                     |           |          |
-                     v           v          v
-    iova:   a        b        c        d        e        f
-            |--------|--------|--------|--------|--------|
-                              <...calculated....>
-                     [_____mapped______]
-    pfn:    0        1        2        3        4        5
-            |--------|--------|--------|--------|--------|
-                     ^           ^          ^
-                     |           |          |
-        sg->page ----+           |          |
-        sg->offset --------------+          |
-        (sg->offset + sg->length) ----------+
-
-The picture seems right. Looking at the code i'm not sure if i understand
-it correctly.
-
-pgoff = sg->offset & ~PAGE_MASK;
-
-this gets the offset past the start of page.
-
-sg->dma_address = ((dma_addr_t)iov_pfn << VTD_PAGE_SHIFT) + pgoff;
-
-this would set dma_address at b+off instead of starting at c+off correct?
-
-> 
-> Robin
-> 
-> [1]:https://lists.linuxfoundation.org/pipermail/iommu/2017-September/024371.html
+2017-09-28 4:06 GMT-04:00 kernel test robot <xiaolong.ye@intel.com>:
+>
+> FYI, we noticed the following commit:
+>
+> commit: 31e9170bdeb6ebe66426337b4e2b9924683a412b ("mac80211: aead api to reduce redundancy")
+> url: https://github.com/0day-ci/linux/commits/Xiang-Gao/mac80211-aead-api-to-reduce-redundancy/20170926-053110
+> base: https://git.kernel.org/cgit/linux/kernel/git/jberg/mac80211-next.git master
+>
+> in testcase: hwsim
+> with following parameters:
+>
+>         group: hwsim-10
+>
+>
+>
+> on test machine: qemu-system-x86_64 -enable-kvm -cpu host -smp 2 -m 2G
+>
+> caused below changes (please refer to attached dmesg/kmsg for entire log/backtrace):
+>
+>
+> 2017-09-27 16:04:27     ./run-tests.py sta_dynamic_down_up
+> DEV: wlan0: 02:00:00:00:00:00
+> DEV: wlan1: 02:00:00:00:01:00
+> DEV: wlan2: 02:00:00:00:02:00
+> APDEV: wlan3
+> APDEV: wlan4
+> START sta_dynamic_down_up 1/1
+> Test: Dynamically added wpa_supplicant interface down/up
+> Starting AP wlan3
+> Create a dynamic wpa_supplicant interface and connect
+> Connect STA wlan5 to AP
+> dev1->dev2 unicast data delivery failed
+> Traceback (most recent call last):
+>   File "./run-tests.py", line 453, in main
+>     t(dev, apdev)
+>   File "/lkp/benchmarks/hwsim/tests/hwsim/test_sta_dynamic.py", line 122, in test_sta_dynamic_down_up
+>     hwsim_utils.test_connectivity(wpas, hapd)
+>   File "/lkp/benchmarks/hwsim/tests/hwsim/hwsim_utils.py", line 165, in test_connectivity
+>     raise Exception(last_err)
+> Exception: dev1->dev2 unicast data delivery failed
+> FAIL sta_dynamic_down_up 5.397413 2017-09-27 16:04:32.540689
+> passed 0 test case(s)
+> skipped 0 test case(s)
+> failed tests: sta_dynamic_down_up
+>
+>
+>
+> To reproduce:
+>
+>         git clone https://github.com/intel/lkp-tests.git
+>         cd lkp-tests
+>         bin/lkp qemu -k <bzImage> job-script  # job-script is attached in this email
+>
+>
+>
+> Thanks,
+> Xiaolong
