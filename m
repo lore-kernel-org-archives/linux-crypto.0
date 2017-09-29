@@ -1,80 +1,68 @@
-From: Xiang Gao <qasdfgtyuiop@gmail.com>
-Subject: Re: [lkp-robot] [mac80211] 31e9170bde: hwsim.sta_dynamic_down_up.fail
-Date: Thu, 28 Sep 2017 22:21:21 -0400
-Message-ID: <CAMtaSwQHT0pP+YRx2WSL2kyZ__iJzrkF4jCrLBVzTjO40u4EgQ@mail.gmail.com>
-References: <20170924054015.8958-1-qasdfgtyuiop@gmail.com> <20170928080614.GZ17200@yexl-desktop>
+From: Harsh Jain <Harsh@chelsio.com>
+Subject: Re: DMA error when sg->offset value is greater than PAGE_SIZE in
+ Intel IOMMU
+Date: Fri, 29 Sep 2017 11:07:36 +0530
+Message-ID: <e950a8e0-5ad2-b4e7-196a-065dbf33f2c3@chelsio.com>
+References: <afa02763-4556-0e14-7d1b-1c044cdc1ff7@chelsio.com>
+ <6d2af675-7b97-6eaf-4daa-d7bf80a05923@chelsio.com>
+ <437a9bd8-d4d6-22ca-1a64-1a3e73f1101a@arm.com>
+ <MWHPR12MB1600694D099E1CFAD6849A68C87B0@MWHPR12MB1600.namprd12.prod.outlook.com>
+ <CAPcyv4jtYMZJ6V5VoXkGrcZ+ykWvYp1=qXrqJkjknk8Q_BVwgA@mail.gmail.com>
+ <MWHPR12MB160060436AC70CB5BE8C0C6EC8780@MWHPR12MB1600.namprd12.prod.outlook.com>
+ <20170927181802.3dcd7efb@m750.lan> <20170927144847.GA95654@otc-nc-03>
+ <MWHPR12MB16005D59D7A33F3D5BE43395C8780@MWHPR12MB1600.namprd12.prod.outlook.com>
+ <26d68681-a157-26d3-84cb-6684dcaf3135@chelsio.com>
+ <20170928130549.GA99456@otc-nc-03>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        linux-crypto@vger.kernel.org,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        linux-wireless@vger.kernel.org, netdev@vger.kernel.org, lkp@01.org
-To: kernel test robot <xiaolong.ye@intel.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170928080614.GZ17200@yexl-desktop>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: Casey Leedom <leedom@chelsio.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "dwmw2@infradead.org" <dwmw2@infradead.org>,
+        Michael Werner <werner@chelsio.com>, "nd@arm.com" <nd@arm.com>
+To: "Raj, Ashok" <ashok.raj@intel.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from stargate.chelsio.com ([12.32.117.8]:34556 "EHLO
+        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750996AbdI2Fif (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 29 Sep 2017 01:38:35 -0400
+In-Reply-To: <20170928130549.GA99456@otc-nc-03>
+Content-Language: en-US
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Thanks, I will look into it.
-Xiang Gao
 
+On 28-09-2017 18:35, Raj, Ashok wrote:
+> Thanks for trying that Harsh. 
+>
+> sp_off turns of super page support. Which this mode, do you still see offsets greater than 4k?
+Yes, offset greater than 4k is still there. Refer below.
+[56732.774872] offset 4110 len 76 dma addr 3a531200e dma len 76
+[56732.804187] offset 4110 len 84 dma addr 3a63b200e dma len 84
+[56732.805104] offset 4110 len 68 dma addr 3a531200e dma len 68
+[56732.806870] offset 4110 len 56 dma addr 3a531200e dma len 56
+[56732.808987] offset 4110 len 56 dma addr 3a531200e dma len 56
+[56732.811215] offset 4110 len 56 dma addr 3a531200e dma len 56
+[56732.813155] offset 4110 len 56 dma addr 3a531200e dma len 56
+[56732.814823] offset 4110 len 56 dma addr 3a531200e dma len 56
+[56732.816481] offset 4110 len 56 dma addr 3a531200e dma len 56
+[56732.818159] offset 4110 len 56 dma addr 3a531200e dma len 56
+[56732.819712] offset 4110 len 56 dma addr 3a531200e dma len 56
+[56732.821629] offset 4110 len 56 dma addr 3a531200e dma len 56
+[root@heptagon linux_t4_build]#
+[root@heptagon linux_t4_build]#
+[root@heptagon linux_t4_build]# cat /proc/cmdline
+BOOT_IMAGE=/vmlinuz-4.9.51 root=UUID=ccbb7f18-b3f0-43df-89de-07521e9c02fe ro intel_iommu=sp_off crashkernel=auto rhgb quiet rhgb quiet console=ttyS0,115200, console=tty0 LANG=en_US.UTF-8
 
-2017-09-28 4:06 GMT-04:00 kernel test robot <xiaolong.ye@intel.com>:
 >
-> FYI, we noticed the following commit:
->
-> commit: 31e9170bdeb6ebe66426337b4e2b9924683a412b ("mac80211: aead api to reduce redundancy")
-> url: https://github.com/0day-ci/linux/commits/Xiang-Gao/mac80211-aead-api-to-reduce-redundancy/20170926-053110
-> base: https://git.kernel.org/cgit/linux/kernel/git/jberg/mac80211-next.git master
->
-> in testcase: hwsim
-> with following parameters:
->
->         group: hwsim-10
->
->
->
-> on test machine: qemu-system-x86_64 -enable-kvm -cpu host -smp 2 -m 2G
->
-> caused below changes (please refer to attached dmesg/kmsg for entire log/backtrace):
->
->
-> 2017-09-27 16:04:27     ./run-tests.py sta_dynamic_down_up
-> DEV: wlan0: 02:00:00:00:00:00
-> DEV: wlan1: 02:00:00:00:01:00
-> DEV: wlan2: 02:00:00:00:02:00
-> APDEV: wlan3
-> APDEV: wlan4
-> START sta_dynamic_down_up 1/1
-> Test: Dynamically added wpa_supplicant interface down/up
-> Starting AP wlan3
-> Create a dynamic wpa_supplicant interface and connect
-> Connect STA wlan5 to AP
-> dev1->dev2 unicast data delivery failed
-> Traceback (most recent call last):
->   File "./run-tests.py", line 453, in main
->     t(dev, apdev)
->   File "/lkp/benchmarks/hwsim/tests/hwsim/test_sta_dynamic.py", line 122, in test_sta_dynamic_down_up
->     hwsim_utils.test_connectivity(wpas, hapd)
->   File "/lkp/benchmarks/hwsim/tests/hwsim/hwsim_utils.py", line 165, in test_connectivity
->     raise Exception(last_err)
-> Exception: dev1->dev2 unicast data delivery failed
-> FAIL sta_dynamic_down_up 5.397413 2017-09-27 16:04:32.540689
-> passed 0 test case(s)
-> skipped 0 test case(s)
-> failed tests: sta_dynamic_down_up
->
->
->
-> To reproduce:
->
->         git clone https://github.com/intel/lkp-tests.git
->         cd lkp-tests
->         bin/lkp qemu -k <bzImage> job-script  # job-script is attached in this email
->
->
->
-> Thanks,
-> Xiaolong
+> On Thu, Sep 28, 2017 at 07:08:21PM +0530, Harsh Jain wrote:
+>>
+>> Today I tried with "Intel_iommu=sp_off" boot option. Traffic runs without any error for more than 1 hrs. What magic this option did? :)
+> Cheers,
+> Ashok
