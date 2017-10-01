@@ -1,48 +1,222 @@
-From: Christoph Hellwig <hch@infradead.org>
-Subject: Re: DMA error when sg->offset value is greater than PAGE_SIZE in
- Intel IOMMU
-Date: Sun, 1 Oct 2017 01:59:13 -0700
-Message-ID: <20171001085913.GA29880@infradead.org>
-References: <MWHPR12MB160092A868C613FF64CA9EE9C87A0@MWHPR12MB1600.namprd12.prod.outlook.com>
- <20170925155430.GB131920@otc-nc-03>
- <MWHPR12MB16004E2A92CC3FFEC6313DDBC87A0@MWHPR12MB1600.namprd12.prod.outlook.com>
- <afa02763-4556-0e14-7d1b-1c044cdc1ff7@chelsio.com>
- <6d2af675-7b97-6eaf-4daa-d7bf80a05923@chelsio.com>
- <437a9bd8-d4d6-22ca-1a64-1a3e73f1101a@arm.com>
- <MWHPR12MB1600694D099E1CFAD6849A68C87B0@MWHPR12MB1600.namprd12.prod.outlook.com>
- <CAPcyv4jtYMZJ6V5VoXkGrcZ+ykWvYp1=qXrqJkjknk8Q_BVwgA@mail.gmail.com>
- <MWHPR12MB160060436AC70CB5BE8C0C6EC8780@MWHPR12MB1600.namprd12.prod.outlook.com>
- <CAPcyv4hL92Ru5x-b_5s80EwO=w37M=KEr289zrCRSM_8juvDzw@mail.gmail.com>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: [PATCH] crypto: keywrap - simplify code
+Date: Sun, 01 Oct 2017 17:19:43 +0200
+Message-ID: <83738816.byIHpQSsDj@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Casey Leedom <leedom@chelsio.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Harsh Jain <Harsh@chelsio.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        David Woodhouse <David.Woodhouse@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "dwmw2@infradead.org" <dwmw2@infradead.org>,
-        Michael Werner <werner@chelsio.com>
-To: Dan Williams <dan.j.williams@intel.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CAPcyv4hL92Ru5x-b_5s80EwO=w37M=KEr289zrCRSM_8juvDzw@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:34600 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751247AbdJAPTz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 1 Oct 2017 11:19:55 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Sep 27, 2017 at 10:13:51AM -0700, Dan Williams wrote:
-> As far as I can see "Offset can be greater than PAGE_SIZE" is the only
-> safe assumption for core code.
+The code is simplified by using two u64 values for the operation instead
+of using two arrays of u8. This allows to get rid of the memory
+alignment code. In addition, the crypto_xor can be replaced with a
+native XOR operation. Finally, the definition of the variables is
+re-arranged such that the data structures come before simple variables
+to potentially reduce memory space.
 
-It seems completely bogus to me, but if it is the current assumption
-we'll have to document it.  But this brings me back to that
-our scatterlists are a pretty horrible data structure to start
-with as they try to mix virtual and physical addressing together.
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/keywrap.c | 86 ++++++++++++++++++++------------------------------------
+ 1 file changed, 30 insertions(+), 56 deletions(-)
 
-We'd be much better of by passing a chain of bio_vecs where we
-just need virtual addresses, a chain of [bus_addr,len] pairs where
-we just need a physical address, and both where we need both instead
-of this giant structure that tries to do both at the same time..
+diff --git a/crypto/keywrap.c b/crypto/keywrap.c
+index 72014f963ba7..ce7a36fc6de4 100644
+--- a/crypto/keywrap.c
++++ b/crypto/keywrap.c
+@@ -93,18 +93,10 @@ struct crypto_kw_ctx {
+ 
+ struct crypto_kw_block {
+ #define SEMIBSIZE 8
+-	u8 A[SEMIBSIZE];
+-	u8 R[SEMIBSIZE];
++	u64 A;
++	u64 R;
+ };
+ 
+-/* convert 64 bit integer into its string representation */
+-static inline void crypto_kw_cpu_to_be64(u64 val, u8 *buf)
+-{
+-	__be64 *a = (__be64 *)buf;
+-
+-	*a = cpu_to_be64(val);
+-}
+-
+ /*
+  * Fast forward the SGL to the "end" length minus SEMIBSIZE.
+  * The start in the SGL defined by the fast-forward is returned with
+@@ -139,17 +131,10 @@ static int crypto_kw_decrypt(struct blkcipher_desc *desc,
+ 	struct crypto_blkcipher *tfm = desc->tfm;
+ 	struct crypto_kw_ctx *ctx = crypto_blkcipher_ctx(tfm);
+ 	struct crypto_cipher *child = ctx->child;
+-
+-	unsigned long alignmask = max_t(unsigned long, SEMIBSIZE,
+-					crypto_cipher_alignmask(child));
+-	unsigned int i;
+-
+-	u8 blockbuf[sizeof(struct crypto_kw_block) + alignmask];
+-	struct crypto_kw_block *block = (struct crypto_kw_block *)
+-					PTR_ALIGN(blockbuf + 0, alignmask + 1);
+-
+-	u64 t = 6 * ((nbytes) >> 3);
++	struct crypto_kw_block block;
+ 	struct scatterlist *lsrc, *ldst;
++	u64 t = 6 * ((nbytes) >> 3);
++	unsigned int i;
+ 	int ret = 0;
+ 
+ 	/*
+@@ -160,7 +145,7 @@ static int crypto_kw_decrypt(struct blkcipher_desc *desc,
+ 		return -EINVAL;
+ 
+ 	/* Place the IV into block A */
+-	memcpy(block->A, desc->info, SEMIBSIZE);
++	memcpy(&block.A, desc->info, SEMIBSIZE);
+ 
+ 	/*
+ 	 * src scatterlist is read-only. dst scatterlist is r/w. During the
+@@ -171,32 +156,30 @@ static int crypto_kw_decrypt(struct blkcipher_desc *desc,
+ 	ldst = dst;
+ 
+ 	for (i = 0; i < 6; i++) {
+-		u8 tbe_buffer[SEMIBSIZE + alignmask];
+-		/* alignment for the crypto_xor and the _to_be64 operation */
+-		u8 *tbe = PTR_ALIGN(tbe_buffer + 0, alignmask + 1);
+-		unsigned int tmp_nbytes = nbytes;
+ 		struct scatter_walk src_walk, dst_walk;
++		__be64 tbe;
++		unsigned int tmp_nbytes = nbytes;
+ 
+ 		while (tmp_nbytes) {
+ 			/* move pointer by tmp_nbytes in the SGL */
+ 			crypto_kw_scatterlist_ff(&src_walk, lsrc, tmp_nbytes);
+ 			/* get the source block */
+-			scatterwalk_copychunks(block->R, &src_walk, SEMIBSIZE,
++			scatterwalk_copychunks(&block.R, &src_walk, SEMIBSIZE,
+ 					       false);
+ 
+ 			/* perform KW operation: get counter as byte string */
+-			crypto_kw_cpu_to_be64(t, tbe);
++			tbe = cpu_to_be64(t);
+ 			/* perform KW operation: modify IV with counter */
+-			crypto_xor(block->A, tbe, SEMIBSIZE);
++			block.A ^= tbe;
+ 			t--;
+ 			/* perform KW operation: decrypt block */
+-			crypto_cipher_decrypt_one(child, (u8*)block,
+-						  (u8*)block);
++			crypto_cipher_decrypt_one(child, (u8*)&block,
++						  (u8*)&block);
+ 
+ 			/* move pointer by tmp_nbytes in the SGL */
+ 			crypto_kw_scatterlist_ff(&dst_walk, ldst, tmp_nbytes);
+ 			/* Copy block->R into place */
+-			scatterwalk_copychunks(block->R, &dst_walk, SEMIBSIZE,
++			scatterwalk_copychunks(&block.R, &dst_walk, SEMIBSIZE,
+ 					       true);
+ 
+ 			tmp_nbytes -= SEMIBSIZE;
+@@ -208,11 +191,10 @@ static int crypto_kw_decrypt(struct blkcipher_desc *desc,
+ 	}
+ 
+ 	/* Perform authentication check */
+-	if (crypto_memneq("\xA6\xA6\xA6\xA6\xA6\xA6\xA6\xA6", block->A,
+-			  SEMIBSIZE))
++	if (block.A != 0xa6a6a6a6a6a6a6a6)
+ 		ret = -EBADMSG;
+ 
+-	memzero_explicit(block, sizeof(struct crypto_kw_block));
++	memzero_explicit(&block, sizeof(struct crypto_kw_block));
+ 
+ 	return ret;
+ }
+@@ -224,17 +206,10 @@ static int crypto_kw_encrypt(struct blkcipher_desc *desc,
+ 	struct crypto_blkcipher *tfm = desc->tfm;
+ 	struct crypto_kw_ctx *ctx = crypto_blkcipher_ctx(tfm);
+ 	struct crypto_cipher *child = ctx->child;
+-
+-	unsigned long alignmask = max_t(unsigned long, SEMIBSIZE,
+-					crypto_cipher_alignmask(child));
+-	unsigned int i;
+-
+-	u8 blockbuf[sizeof(struct crypto_kw_block) + alignmask];
+-	struct crypto_kw_block *block = (struct crypto_kw_block *)
+-					PTR_ALIGN(blockbuf + 0, alignmask + 1);
+-
+-	u64 t = 1;
++	struct crypto_kw_block block;
+ 	struct scatterlist *lsrc, *ldst;
++	u64 t = 1;
++	unsigned int i;
+ 
+ 	/*
+ 	 * Require at least 2 semiblocks (note, the 3rd semiblock that is
+@@ -249,7 +224,7 @@ static int crypto_kw_encrypt(struct blkcipher_desc *desc,
+ 	 * Place the predefined IV into block A -- for encrypt, the caller
+ 	 * does not need to provide an IV, but he needs to fetch the final IV.
+ 	 */
+-	memcpy(block->A, "\xA6\xA6\xA6\xA6\xA6\xA6\xA6\xA6", SEMIBSIZE);
++	block.A = 0xa6a6a6a6a6a6a6a6;
+ 
+ 	/*
+ 	 * src scatterlist is read-only. dst scatterlist is r/w. During the
+@@ -260,30 +235,29 @@ static int crypto_kw_encrypt(struct blkcipher_desc *desc,
+ 	ldst = dst;
+ 
+ 	for (i = 0; i < 6; i++) {
+-		u8 tbe_buffer[SEMIBSIZE + alignmask];
+-		u8 *tbe = PTR_ALIGN(tbe_buffer + 0, alignmask + 1);
+-		unsigned int tmp_nbytes = nbytes;
+ 		struct scatter_walk src_walk, dst_walk;
++		__be64 tbe;
++		unsigned int tmp_nbytes = nbytes;
+ 
+ 		scatterwalk_start(&src_walk, lsrc);
+ 		scatterwalk_start(&dst_walk, ldst);
+ 
+ 		while (tmp_nbytes) {
+ 			/* get the source block */
+-			scatterwalk_copychunks(block->R, &src_walk, SEMIBSIZE,
++			scatterwalk_copychunks(&block.R, &src_walk, SEMIBSIZE,
+ 					       false);
+ 
+ 			/* perform KW operation: encrypt block */
+-			crypto_cipher_encrypt_one(child, (u8 *)block,
+-						  (u8 *)block);
++			crypto_cipher_encrypt_one(child, (u8 *)&block,
++						  (u8 *)&block);
+ 			/* perform KW operation: get counter as byte string */
+-			crypto_kw_cpu_to_be64(t, tbe);
++			tbe = cpu_to_be64(t);
+ 			/* perform KW operation: modify IV with counter */
+-			crypto_xor(block->A, tbe, SEMIBSIZE);
++			block.A ^= tbe;
+ 			t++;
+ 
+ 			/* Copy block->R into place */
+-			scatterwalk_copychunks(block->R, &dst_walk, SEMIBSIZE,
++			scatterwalk_copychunks(&block.R, &dst_walk, SEMIBSIZE,
+ 					       true);
+ 
+ 			tmp_nbytes -= SEMIBSIZE;
+@@ -295,9 +269,9 @@ static int crypto_kw_encrypt(struct blkcipher_desc *desc,
+ 	}
+ 
+ 	/* establish the IV for the caller to pick up */
+-	memcpy(desc->info, block->A, SEMIBSIZE);
++	memcpy(desc->info, &block.A, SEMIBSIZE);
+ 
+-	memzero_explicit(block, sizeof(struct crypto_kw_block));
++	memzero_explicit(&block, sizeof(struct crypto_kw_block));
+ 
+ 	return 0;
+ }
+-- 
+2.13.5
