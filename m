@@ -1,48 +1,75 @@
-From: Joe Perches <joe@perches.com>
-Subject: Re: [PATCH 2/4] staging: ccree: simplify access to struct device
-Date: Mon, 02 Oct 2017 03:00:22 -0700
-Message-ID: <1506938422.2274.11.camel@perches.com>
-References: <1506935008-14240-1-git-send-email-gilad@benyossef.com>
-         <1506935008-14240-3-git-send-email-gilad@benyossef.com>
+From: Mathias Krause <minipli@googlemail.com>
+Subject: Re: [PATCH 0/3] padata cpu awareness fixes
+Date: Mon, 2 Oct 2017 13:14:24 +0200
+Message-ID: <CA+rthh9Beexjh1mu3KUCs+GAvc=X5TTs5u49bueePV_1YBCGmA@mail.gmail.com>
+References: <1504897031-27523-1-git-send-email-minipli@googlemail.com> <20170912090753.GF31384@secunet.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-Cc: Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
-        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
-        linux-kernel@vger.kernel.org
-To: Gilad Ben-Yossef <gilad@benyossef.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Content-Type: text/plain; charset="UTF-8"
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Steffen Klassert <steffen.klassert@secunet.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtprelay0022.hostedemail.com ([216.40.44.22]:54135 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1750891AbdJBKA1 (ORCPT
+Received: from mail-yw0-f194.google.com ([209.85.161.194]:33476 "EHLO
+        mail-yw0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750962AbdJBLO0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 2 Oct 2017 06:00:27 -0400
-In-Reply-To: <1506935008-14240-3-git-send-email-gilad@benyossef.com>
+        Mon, 2 Oct 2017 07:14:26 -0400
+Received: by mail-yw0-f194.google.com with SMTP id p11so1004254ywg.0
+        for <linux-crypto@vger.kernel.org>; Mon, 02 Oct 2017 04:14:25 -0700 (PDT)
+In-Reply-To: <20170912090753.GF31384@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 2017-10-02 at 10:03 +0100, Gilad Ben-Yossef wrote:
-> Introduce a DEV macro to retrieve struct device from private
-> data structure in preparation to replacing custom logging
-> macros with proper dev_dbg and friends which require struct
-> device.
-[]
-> diff --git a/drivers/staging/ccree/ssi_driver.h b/drivers/staging/ccree/ssi_driver.h
-[]
-> @@ -103,6 +103,8 @@
->  #define SSI_LOG_DEBUG(format, ...) do {} while (0)
->  #endif
->  
-> +#define DEV(drvdata) ((&(drvdata)->plat_dev->dev))
+On 12 September 2017 at 11:07, Steffen Klassert
+<steffen.klassert@secunet.com> wrote:
+> On Fri, Sep 08, 2017 at 08:57:08PM +0200, Mathias Krause wrote:
+>> Hi Steffen, Herbert,
+>>
+>> this series solves multiple issues of padata I ran into while trying to
+>> make use of pcrypt for IPsec.
+>>
+>> The first issue is that the reorder timer callback may run on a CPU that
+>> isn't part of the parallel set, as it runs on the CPU where the timer
+>> interrupt gets handled. As a result, padata_reorder() may run on a CPU
+>> with uninitialized per-cpu parallel queues, so the __this_cpu_read() in
+>> padata_get_next() refers to an uninitialized cpu_index. However, as
+>> per-cpu memory gets memset(0) on allocation time, it'll read 0. If the
+>> next CPU index we're waiting for is 0 too, the compare will succeed and
+>> we'll return with -ENODATA, making padata_reorder() think there's
+>> nothing to do, stop any pending timer and return immediately. This is
+>> wrong as the pending timer might have been the one to trigger the needed
+>> reordering, but, as it was canceled, will never happen -- if no other
+>> parallel requests arrive afterwards.
+>>
+>> That issue is addressed with the first two patches, ensuring we're not
+>> using a bogus cpu_index value for the compare and thereby not wrongly
+>> cancel a pending timer. The second patch then ensures the reorder timer
+>> callback runs on the correct CPU or, at least, on a CPU from the
+>> parallel set to generate forward progress.
+>>
+>> The third patch addresses a similar issues for the serialization
+>> callback. We implicitly require padata_do_serial() to be called on the
+>> very same CPU padata_do_parallel() was called on to ensure the correct
+>> ordering of requests -- and correct functioning of padata, even. If the
+>> algorithm we're parallelizing is asynchronous itself, that invariant
+>> might not be true, as, e.g. crypto hardware may execute the callback on
+>> the CPU its interrupt gets handled on which isn't necessarily the one
+>> the request got issued on.
+>>
+>> To handle that issue we track the CPU we're supposed to handle the
+>> request on and ensure we'll call padata_reorder() on that CPU when
+>> padata_do_serial() gets called -- either by already running on the
+>> corect CPU or by deferring the call to a worker.
+>>
+>> Please apply!
+>>
+>> Mathias Krause (3):
+>>   padata: set cpu_index of unused CPUs to -1
+>>   padata: ensure the reorder timer callback runs on the correct CPU
+>>   padata: ensure padata_do_serial() runs on the correct CPU
+>
+> Looks good, thanks!
+>
+> Acked-by: Steffen Klassert <steffen.klassert@secunet.com>
 
-The name seems not particularly descriptive.
-It seems a longer name would
-not be too bad.
-
-Perhaps
-
-static inline struct device *drvdata_to_dev(struct ssi_drvdata *drvdata)
-{
-	return &drvdata->plat_dev->dev;
-}
+Ping! Herbert, will these patches go through your tree or Steffen's?
