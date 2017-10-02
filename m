@@ -1,75 +1,34 @@
-From: Mathias Krause <minipli@googlemail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH 0/3] padata cpu awareness fixes
-Date: Mon, 2 Oct 2017 13:14:24 +0200
-Message-ID: <CA+rthh9Beexjh1mu3KUCs+GAvc=X5TTs5u49bueePV_1YBCGmA@mail.gmail.com>
-References: <1504897031-27523-1-git-send-email-minipli@googlemail.com> <20170912090753.GF31384@secunet.com>
+Date: Mon, 2 Oct 2017 19:53:27 +0800
+Message-ID: <20171002115327.GA20663@gondor.apana.org.au>
+References: <1504897031-27523-1-git-send-email-minipli@googlemail.com>
+ <20170912090753.GF31384@secunet.com>
+ <CA+rthh9Beexjh1mu3KUCs+GAvc=X5TTs5u49bueePV_1YBCGmA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Steffen Klassert <steffen.klassert@secunet.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Mathias Krause <minipli@googlemail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-yw0-f194.google.com ([209.85.161.194]:33476 "EHLO
-        mail-yw0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750962AbdJBLO0 (ORCPT
+Received: from orcrist.hmeau.com ([104.223.48.154]:39718 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750957AbdJBLxz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 2 Oct 2017 07:14:26 -0400
-Received: by mail-yw0-f194.google.com with SMTP id p11so1004254ywg.0
-        for <linux-crypto@vger.kernel.org>; Mon, 02 Oct 2017 04:14:25 -0700 (PDT)
-In-Reply-To: <20170912090753.GF31384@secunet.com>
+        Mon, 2 Oct 2017 07:53:55 -0400
+Content-Disposition: inline
+In-Reply-To: <CA+rthh9Beexjh1mu3KUCs+GAvc=X5TTs5u49bueePV_1YBCGmA@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 12 September 2017 at 11:07, Steffen Klassert
-<steffen.klassert@secunet.com> wrote:
-> On Fri, Sep 08, 2017 at 08:57:08PM +0200, Mathias Krause wrote:
->> Hi Steffen, Herbert,
->>
->> this series solves multiple issues of padata I ran into while trying to
->> make use of pcrypt for IPsec.
->>
->> The first issue is that the reorder timer callback may run on a CPU that
->> isn't part of the parallel set, as it runs on the CPU where the timer
->> interrupt gets handled. As a result, padata_reorder() may run on a CPU
->> with uninitialized per-cpu parallel queues, so the __this_cpu_read() in
->> padata_get_next() refers to an uninitialized cpu_index. However, as
->> per-cpu memory gets memset(0) on allocation time, it'll read 0. If the
->> next CPU index we're waiting for is 0 too, the compare will succeed and
->> we'll return with -ENODATA, making padata_reorder() think there's
->> nothing to do, stop any pending timer and return immediately. This is
->> wrong as the pending timer might have been the one to trigger the needed
->> reordering, but, as it was canceled, will never happen -- if no other
->> parallel requests arrive afterwards.
->>
->> That issue is addressed with the first two patches, ensuring we're not
->> using a bogus cpu_index value for the compare and thereby not wrongly
->> cancel a pending timer. The second patch then ensures the reorder timer
->> callback runs on the correct CPU or, at least, on a CPU from the
->> parallel set to generate forward progress.
->>
->> The third patch addresses a similar issues for the serialization
->> callback. We implicitly require padata_do_serial() to be called on the
->> very same CPU padata_do_parallel() was called on to ensure the correct
->> ordering of requests -- and correct functioning of padata, even. If the
->> algorithm we're parallelizing is asynchronous itself, that invariant
->> might not be true, as, e.g. crypto hardware may execute the callback on
->> the CPU its interrupt gets handled on which isn't necessarily the one
->> the request got issued on.
->>
->> To handle that issue we track the CPU we're supposed to handle the
->> request on and ensure we'll call padata_reorder() on that CPU when
->> padata_do_serial() gets called -- either by already running on the
->> corect CPU or by deferring the call to a worker.
->>
->> Please apply!
->>
->> Mathias Krause (3):
->>   padata: set cpu_index of unused CPUs to -1
->>   padata: ensure the reorder timer callback runs on the correct CPU
->>   padata: ensure padata_do_serial() runs on the correct CPU
+On Mon, Oct 02, 2017 at 01:14:24PM +0200, Mathias Krause wrote:
 >
-> Looks good, thanks!
->
-> Acked-by: Steffen Klassert <steffen.klassert@secunet.com>
+> Ping! Herbert, will these patches go through your tree or Steffen's?
 
-Ping! Herbert, will these patches go through your tree or Steffen's?
+They are in my queue.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
