@@ -1,46 +1,46 @@
-From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [Part2 PATCH v4 05/29] crypto: ccp: Add Platform Security
- Processor (PSP) device support
-Date: Sun, 1 Oct 2017 15:05:11 -0500
-Message-ID: <55879570-04d7-a627-5f4b-b94f1604ece5@amd.com>
-References: <20170919204627.3875-1-brijesh.singh@amd.com>
- <20170919204627.3875-6-brijesh.singh@amd.com>
- <20170929151607.zn4lmdkyn25sczfg@pd.tnic>
- <1fc76eee-f25b-cd38-cc8d-0404ec94cf79@amd.com>
- <20170930161104.452sia6a5y5duyn4@pd.tnic>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: brijesh.singh@amd.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Gary Hook <gary.hook@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        linux-crypto@vger.kernel.org
-To: Borislav Petkov <bp@suse.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-sn1nam01on0088.outbound.protection.outlook.com ([104.47.32.88]:64841
-        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1750993AbdJAUFT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 1 Oct 2017 16:05:19 -0400
-In-Reply-To: <20170930161104.452sia6a5y5duyn4@pd.tnic>
-Content-Language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: [PATCH 0/4] staging: ccree: logging related coding style fixes
+Date: Mon,  2 Oct 2017 10:03:21 +0100
+Message-ID: <1506935008-14240-1-git-send-email-gilad@benyossef.com>
+Cc: Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        linux-kernel@vger.kernel.org
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
+The following patch set cleans up some code and builds upon this to replace
+ccree custom logging macros with the generic device dev_* facilities,
+handles the resulting fallout and further simplifies logging handling in
+some OOM error handling code path exposed by checkpatch following the
+change.
 
+Patch set based upon commit 1cd5929ab675 ("staging: greybus: light:
+remove unnecessary error check") in the staging-next tree.
 
-On 9/30/17 11:11 AM, Borislav Petkov wrote:
-> I think just from having CRYPTO_DEV_CCP_DD depend on CPU_SUP_AMD ||
-> ARM64, CRYPTO_DEV_SP_PSP gets almost the same dependency transitively.
-> But sure, let's make the PSP build only on x86. It should depend on
-> X86_64, to be precise.
+Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 
-I think theoretically a 32-bit host OS can invoke a PSP commands but
-currently PSP interface is exposing only the SEV FW command. And SEV
-feature is available when we are in 64-bit mode hence for now its okay
-to have depends on X86_64. I will add CRYPTO_DEV_CCP_DD depend on
-CPU_SUP_AMD || ARM64 and CRYPTO_DEV_SP_PSP depend on X86_64 and send you
-v4.2. thanks
+Gilad Ben-Yossef (4):
+  staging: ccree: remove sysfs if of deleted code
+  staging: ccree: simplify access to struct device
+  staging: ccree: move to generic device log infra
+  staging: ccree: simplify OOM handling
+
+ drivers/staging/ccree/ssi_aead.c        | 237 +++++++++++--------
+ drivers/staging/ccree/ssi_buffer_mgr.c  | 408 +++++++++++++++-----------------
+ drivers/staging/ccree/ssi_buffer_mgr.h  |   5 +-
+ drivers/staging/ccree/ssi_cipher.c      | 158 ++++++-------
+ drivers/staging/ccree/ssi_driver.c      | 163 ++++++-------
+ drivers/staging/ccree/ssi_driver.h      |  14 +-
+ drivers/staging/ccree/ssi_fips.c        |  12 +-
+ drivers/staging/ccree/ssi_hash.c        | 374 ++++++++++++++---------------
+ drivers/staging/ccree/ssi_ivgen.c       |  18 +-
+ drivers/staging/ccree/ssi_pm.c          |  30 +--
+ drivers/staging/ccree/ssi_request_mgr.c | 107 +++++----
+ drivers/staging/ccree/ssi_sram_mgr.c    |  30 +--
+ drivers/staging/ccree/ssi_sysfs.c       | 269 +--------------------
+ 13 files changed, 771 insertions(+), 1054 deletions(-)
+
+-- 
+2.7.4
