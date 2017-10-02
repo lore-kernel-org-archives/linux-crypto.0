@@ -1,327 +1,218 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 1/4] staging: ccree: remove sysfs if of deleted code
-Date: Mon,  2 Oct 2017 10:03:22 +0100
-Message-ID: <1506935008-14240-2-git-send-email-gilad@benyossef.com>
+Subject: [PATCH 4/4] staging: ccree: simplify OOM handling
+Date: Mon,  2 Oct 2017 10:03:25 +0100
+Message-ID: <1506935008-14240-5-git-send-email-gilad@benyossef.com>
 References: <1506935008-14240-1-git-send-email-gilad@benyossef.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org,
- driverdev-devel@linuxdriverproject.org, linux-crypto@vger.kernel.org,
- Ofir Drang <ofir.drang@arm.com>
+Cc: Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        linux-kernel@vger.kernel.org
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1506935008-14240-1-git-send-email-gilad@benyossef.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The ccree cycle count mechanism was removed in
-commit 7f821f0c6ffa ("staging: ccree: remove cycle count debug support")
-but the sysfs interface lingered on. Remove it now.
+Simplify handling of memory allocation failures and remove
+redundant log messages
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/ssi_sysfs.c | 266 --------------------------------------
- 1 file changed, 266 deletions(-)
+ drivers/staging/ccree/ssi_cipher.c   | 11 ++++------
+ drivers/staging/ccree/ssi_driver.c   |  1 -
+ drivers/staging/ccree/ssi_hash.c     | 42 +++++++++++++-----------------------
+ drivers/staging/ccree/ssi_ivgen.c    |  9 +++-----
+ drivers/staging/ccree/ssi_sram_mgr.c | 20 ++++++-----------
+ 5 files changed, 28 insertions(+), 55 deletions(-)
 
-diff --git a/drivers/staging/ccree/ssi_sysfs.c b/drivers/staging/ccree/ssi_sysfs.c
-index f7e0c502..e0810e2 100644
---- a/drivers/staging/ccree/ssi_sysfs.c
-+++ b/drivers/staging/ccree/ssi_sysfs.c
-@@ -24,260 +24,6 @@
+diff --git a/drivers/staging/ccree/ssi_cipher.c b/drivers/staging/ccree/ssi_cipher.c
+index cceaee8..3a74856 100644
+--- a/drivers/staging/ccree/ssi_cipher.c
++++ b/drivers/staging/ccree/ssi_cipher.c
+@@ -194,10 +194,9 @@ static int ssi_blkcipher_init(struct crypto_tfm *tfm)
  
- static struct ssi_drvdata *sys_get_drvdata(void);
+ 	/* Allocate key buffer, cache line aligned */
+ 	ctx_p->user.key = kmalloc(max_key_buf_size, GFP_KERNEL | GFP_DMA);
+-	if (!ctx_p->user.key) {
+-		dev_dbg(dev, "Allocating key buffer in context failed\n");
+-		rc = -ENOMEM;
+-	}
++	if (!ctx_p->user.key)
++		return -ENOMEM;
++
+ 	dev_dbg(dev, "Allocated key buffer in context. key=@%p\n",
+ 		ctx_p->user.key);
  
--#ifdef CC_CYCLE_COUNT
--
--#include <asm/timex.h>
--
--struct stat_item {
--	unsigned int min;
--	unsigned int max;
--	cycles_t sum;
--	unsigned int count;
--};
--
--struct stat_name {
--	const char *op_type_name;
--	const char *stat_phase_name[MAX_STAT_PHASES];
--};
--
--static struct stat_name stat_name_db[MAX_STAT_OP_TYPES] = {
--	{
--		/* STAT_OP_TYPE_NULL */
--		.op_type_name = "NULL",
--		.stat_phase_name = {NULL},
--	},
--	{
--		.op_type_name = "Encode",
--		.stat_phase_name[STAT_PHASE_0] = "Init and sanity checks",
--		.stat_phase_name[STAT_PHASE_1] = "Map buffers",
--		.stat_phase_name[STAT_PHASE_2] = "Create sequence",
--		.stat_phase_name[STAT_PHASE_3] = "Send Request",
--		.stat_phase_name[STAT_PHASE_4] = "HW-Q push",
--		.stat_phase_name[STAT_PHASE_5] = "Sequence completion",
--		.stat_phase_name[STAT_PHASE_6] = "HW cycles",
--	},
--	{	.op_type_name = "Decode",
--		.stat_phase_name[STAT_PHASE_0] = "Init and sanity checks",
--		.stat_phase_name[STAT_PHASE_1] = "Map buffers",
--		.stat_phase_name[STAT_PHASE_2] = "Create sequence",
--		.stat_phase_name[STAT_PHASE_3] = "Send Request",
--		.stat_phase_name[STAT_PHASE_4] = "HW-Q push",
--		.stat_phase_name[STAT_PHASE_5] = "Sequence completion",
--		.stat_phase_name[STAT_PHASE_6] = "HW cycles",
--	},
--	{	.op_type_name = "Setkey",
--		.stat_phase_name[STAT_PHASE_0] = "Init and sanity checks",
--		.stat_phase_name[STAT_PHASE_1] = "Copy key to ctx",
--		.stat_phase_name[STAT_PHASE_2] = "Create sequence",
--		.stat_phase_name[STAT_PHASE_3] = "Send Request",
--		.stat_phase_name[STAT_PHASE_4] = "HW-Q push",
--		.stat_phase_name[STAT_PHASE_5] = "Sequence completion",
--		.stat_phase_name[STAT_PHASE_6] = "HW cycles",
--	},
--	{
--		.op_type_name = "Generic",
--		.stat_phase_name[STAT_PHASE_0] = "Interrupt",
--		.stat_phase_name[STAT_PHASE_1] = "ISR-to-Tasklet",
--		.stat_phase_name[STAT_PHASE_2] = "Tasklet start-to-end",
--		.stat_phase_name[STAT_PHASE_3] = "Tasklet:user_cb()",
--		.stat_phase_name[STAT_PHASE_4] = "Tasklet:dx_X_complete() - w/o X_complete()",
--		.stat_phase_name[STAT_PHASE_5] = "",
--		.stat_phase_name[STAT_PHASE_6] = "HW cycles",
+@@ -1245,10 +1244,8 @@ struct ssi_crypto_alg *ssi_ablkcipher_create_alg(struct ssi_alg_template
+ 	struct crypto_alg *alg;
+ 
+ 	t_alg = kzalloc(sizeof(*t_alg), GFP_KERNEL);
+-	if (!t_alg) {
+-		dev_dbg(dev, "failed to allocate t_alg\n");
++	if (!t_alg)
+ 		return ERR_PTR(-ENOMEM);
 -	}
--};
--
--/*
-- * Structure used to create a directory
-- * and its attributes in sysfs.
-- */
--struct sys_dir {
--	struct kobject *sys_dir_kobj;
--	struct attribute_group sys_dir_attr_group;
--	struct attribute **sys_dir_attr_list;
--	u32 num_of_attrs;
--	struct ssi_drvdata *drvdata; /* Associated driver context */
--};
--
--/* top level directory structures */
--struct sys_dir sys_top_dir;
--
--static DEFINE_SPINLOCK(stat_lock);
--
--/* List of DBs */
--static struct stat_item stat_host_db[MAX_STAT_OP_TYPES][MAX_STAT_PHASES];
--static struct stat_item stat_cc_db[MAX_STAT_OP_TYPES][MAX_STAT_PHASES];
--
--static void init_db(struct stat_item item[MAX_STAT_OP_TYPES][MAX_STAT_PHASES])
--{
--	unsigned int i, j;
--
--	/* Clear db */
--	for (i = 0; i < MAX_STAT_OP_TYPES; i++) {
--		for (j = 0; j < MAX_STAT_PHASES; j++) {
--			item[i][j].min = 0xFFFFFFFF;
--			item[i][j].max = 0;
--			item[i][j].sum = 0;
--			item[i][j].count = 0;
+ 
+ 	alg = &t_alg->crypto_alg;
+ 
+diff --git a/drivers/staging/ccree/ssi_driver.c b/drivers/staging/ccree/ssi_driver.c
+index 43f2301..aada60e 100644
+--- a/drivers/staging/ccree/ssi_driver.c
++++ b/drivers/staging/ccree/ssi_driver.c
+@@ -212,7 +212,6 @@ static int init_cc_resources(struct platform_device *plat_dev)
+ 
+ 	new_drvdata = devm_kzalloc(dev, sizeof(*new_drvdata), GFP_KERNEL);
+ 	if (!new_drvdata) {
+-		dev_dbg(dev, "Failed to allocate drvdata");
+ 		rc = -ENOMEM;
+ 		goto post_drvdata_err;
+ 	}
+diff --git a/drivers/staging/ccree/ssi_hash.c b/drivers/staging/ccree/ssi_hash.c
+index cb4980a..8984a5b 100644
+--- a/drivers/staging/ccree/ssi_hash.c
++++ b/drivers/staging/ccree/ssi_hash.c
+@@ -157,34 +157,28 @@ static int ssi_hash_map_request(struct device *dev,
+ 	int rc = -ENOMEM;
+ 
+ 	state->buff0 = kzalloc(SSI_MAX_HASH_BLCK_SIZE, GFP_KERNEL | GFP_DMA);
+-	if (!state->buff0) {
+-		dev_err(dev, "Allocating buff0 in context failed\n");
++	if (!state->buff0)
+ 		goto fail0;
+-	}
++
+ 	state->buff1 = kzalloc(SSI_MAX_HASH_BLCK_SIZE, GFP_KERNEL | GFP_DMA);
+-	if (!state->buff1) {
+-		dev_err(dev, "Allocating buff1 in context failed\n");
++	if (!state->buff1)
+ 		goto fail_buff0;
+-	}
++
+ 	state->digest_result_buff = kzalloc(SSI_MAX_HASH_DIGEST_SIZE, GFP_KERNEL | GFP_DMA);
+-	if (!state->digest_result_buff) {
+-		dev_err(dev, "Allocating digest_result_buff in context failed\n");
++	if (!state->digest_result_buff)
+ 		goto fail_buff1;
+-	}
++
+ 	state->digest_buff = kzalloc(ctx->inter_digestsize, GFP_KERNEL | GFP_DMA);
+-	if (!state->digest_buff) {
+-		dev_err(dev, "Allocating digest-buffer in context failed\n");
++	if (!state->digest_buff)
+ 		goto fail_digest_result_buff;
+-	}
+ 
+ 	dev_dbg(dev, "Allocated digest-buffer in context ctx->digest_buff=@%p\n",
+ 		state->digest_buff);
+ 	if (ctx->hw_mode != DRV_CIPHER_XCBC_MAC) {
+ 		state->digest_bytes_len = kzalloc(HASH_LEN_SIZE, GFP_KERNEL | GFP_DMA);
+-		if (!state->digest_bytes_len) {
+-			dev_err(dev, "Allocating digest-bytes-len in context failed\n");
++		if (!state->digest_bytes_len)
+ 			goto fail1;
 -		}
++
+ 		dev_dbg(dev, "Allocated digest-bytes-len in context state->>digest_bytes_len=@%p\n",
+ 			state->digest_bytes_len);
+ 	} else {
+@@ -192,10 +186,9 @@ static int ssi_hash_map_request(struct device *dev,
+ 	}
+ 
+ 	state->opad_digest_buff = kzalloc(ctx->inter_digestsize, GFP_KERNEL | GFP_DMA);
+-	if (!state->opad_digest_buff) {
+-		dev_err(dev, "Allocating opad-digest-buffer in context failed\n");
++	if (!state->opad_digest_buff)
+ 		goto fail2;
 -	}
--}
--
--static void update_db(struct stat_item *item, unsigned int result)
--{
--	item->count++;
--	item->sum += result;
--	if (result < item->min)
--		item->min = result;
--	if (result > item->max)
--		item->max = result;
--}
--
--static void display_db(struct stat_item item[MAX_STAT_OP_TYPES][MAX_STAT_PHASES])
--{
--	unsigned int i, j;
--	u64 avg;
--
--	for (i = STAT_OP_TYPE_ENCODE; i < MAX_STAT_OP_TYPES; i++) {
--		for (j = 0; j < MAX_STAT_PHASES; j++) {
--			if (item[i][j].count > 0) {
--				avg = (u64)item[i][j].sum;
--				do_div(avg, item[i][j].count);
--				SSI_LOG_ERR("%s, %s: min=%d avg=%d max=%d sum=%lld count=%d\n",
--					    stat_name_db[i].op_type_name,
--					    stat_name_db[i].stat_phase_name[j],
--					    item[i][j].min, (int)avg,
--					    item[i][j].max,
--					    (long long)item[i][j].sum,
--					    item[i][j].count);
--			}
--		}
++
+ 	dev_dbg(dev, "Allocated opad-digest-buffer in context state->digest_bytes_len=@%p\n",
+ 		state->opad_digest_buff);
+ 
+@@ -2057,10 +2050,9 @@ ssi_hash_create_alg(struct ssi_hash_template *template, struct device *dev,
+ 	struct ahash_alg *halg;
+ 
+ 	t_crypto_alg = kzalloc(sizeof(*t_crypto_alg), GFP_KERNEL);
+-	if (!t_crypto_alg) {
+-		dev_dbg(dev, "failed to allocate t_crypto_alg\n");
++	if (!t_crypto_alg)
+ 		return ERR_PTR(-ENOMEM);
 -	}
--}
--
--/**************************************
-- * Attributes show functions section  *
-- **************************************/
--
--static ssize_t ssi_sys_stats_host_db_clear(struct kobject *kobj,
--					   struct kobj_attribute *attr,
--					   const char *buf, size_t count)
--{
--	init_db(stat_host_db);
--	return count;
--}
--
--static ssize_t ssi_sys_stats_cc_db_clear(struct kobject *kobj,
--					 struct kobj_attribute *attr,
--					 const char *buf, size_t count)
--{
--	init_db(stat_cc_db);
--	return count;
--}
--
--static ssize_t ssi_sys_stat_host_db_show(struct kobject *kobj,
--					 struct kobj_attribute *attr, char *buf)
--{
--	int i, j;
--	char line[512];
--	u32 min_cyc, max_cyc;
--	u64 avg;
--	ssize_t buf_len, tmp_len = 0;
--
--	buf_len = scnprintf(buf, PAGE_SIZE,
--			    "phase\t\t\t\t\t\t\tmin[cy]\tavg[cy]\tmax[cy]\t#samples\n");
--	if (buf_len < 0)/* scnprintf shouldn't return negative value according to its implementation*/
--		return buf_len;
--	for (i = STAT_OP_TYPE_ENCODE; i < MAX_STAT_OP_TYPES; i++) {
--		for (j = 0; j < MAX_STAT_PHASES - 1; j++) {
--			if (stat_host_db[i][j].count > 0) {
--				avg = (u64)stat_host_db[i][j].sum;
--				do_div(avg, stat_host_db[i][j].count);
--				min_cyc = stat_host_db[i][j].min;
--				max_cyc = stat_host_db[i][j].max;
--			} else {
--				avg = min_cyc = max_cyc = 0;
--			}
--			tmp_len = scnprintf(line, 512,
--					    "%s::%s\t\t\t\t\t%6u\t%6u\t%6u\t%7u\n",
--					    stat_name_db[i].op_type_name,
--					    stat_name_db[i].stat_phase_name[j],
--					    min_cyc, (unsigned int)avg, max_cyc,
--					    stat_host_db[i][j].count);
--			if (tmp_len < 0)/* scnprintf shouldn't return negative value according to its implementation*/
--				return buf_len;
--			if (buf_len + tmp_len >= PAGE_SIZE)
--				return buf_len;
--			buf_len += tmp_len;
--			strncat(buf, line, 512);
--		}
++
+ 
+ 	t_crypto_alg->ahash_alg = template->template_ahash;
+ 	halg = &t_crypto_alg->ahash_alg;
+@@ -2225,12 +2217,8 @@ int ssi_hash_alloc(struct ssi_drvdata *drvdata)
+ 	int alg;
+ 
+ 	hash_handle = kzalloc(sizeof(*hash_handle), GFP_KERNEL);
+-	if (!hash_handle) {
+-		dev_err(dev, "kzalloc failed to allocate %zu B\n",
+-			sizeof(*hash_handle));
+-		rc = -ENOMEM;
+-		goto fail;
 -	}
--	return buf_len;
--}
--
--static ssize_t ssi_sys_stat_cc_db_show(struct kobject *kobj,
--				       struct kobj_attribute *attr, char *buf)
--{
--	int i;
--	char line[256];
--	u32 min_cyc, max_cyc;
--	u64 avg;
--	ssize_t buf_len, tmp_len = 0;
--
--	buf_len = scnprintf(buf, PAGE_SIZE,
--			    "phase\tmin[cy]\tavg[cy]\tmax[cy]\t#samples\n");
--	if (buf_len < 0)/* scnprintf shouldn't return negative value according to its implementation*/
--		return buf_len;
--	for (i = STAT_OP_TYPE_ENCODE; i < MAX_STAT_OP_TYPES; i++) {
--		if (stat_cc_db[i][STAT_PHASE_6].count > 0) {
--			avg = (u64)stat_cc_db[i][STAT_PHASE_6].sum;
--			do_div(avg, stat_cc_db[i][STAT_PHASE_6].count);
--			min_cyc = stat_cc_db[i][STAT_PHASE_6].min;
--			max_cyc = stat_cc_db[i][STAT_PHASE_6].max;
--		} else {
--			avg = min_cyc = max_cyc = 0;
--		}
--		tmp_len = scnprintf(line, 256, "%s\t%6u\t%6u\t%6u\t%7u\n",
--				    stat_name_db[i].op_type_name, min_cyc,
--				    (unsigned int)avg, max_cyc,
--				    stat_cc_db[i][STAT_PHASE_6].count);
--
--		if (tmp_len < 0)/* scnprintf shouldn't return negative value according to its implementation*/
--			return buf_len;
--
--		if (buf_len + tmp_len >= PAGE_SIZE)
--			return buf_len;
--		buf_len += tmp_len;
--		strncat(buf, line, 256);
++	if (!hash_handle)
++		return -ENOMEM;
+ 
+ 	INIT_LIST_HEAD(&hash_handle->hash_list);
+ 	drvdata->hash_handle = hash_handle;
+diff --git a/drivers/staging/ccree/ssi_ivgen.c b/drivers/staging/ccree/ssi_ivgen.c
+index 245d6ad..7c2e99d 100644
+--- a/drivers/staging/ccree/ssi_ivgen.c
++++ b/drivers/staging/ccree/ssi_ivgen.c
+@@ -193,12 +193,9 @@ int ssi_ivgen_init(struct ssi_drvdata *drvdata)
+ 	/* Allocate "this" context */
+ 	drvdata->ivgen_handle = kzalloc(sizeof(*drvdata->ivgen_handle),
+ 					GFP_KERNEL);
+-	if (!drvdata->ivgen_handle) {
+-		dev_err(device, "Not enough memory to allocate IVGEN context (%zu B)\n",
+-			sizeof(*drvdata->ivgen_handle));
+-		rc = -ENOMEM;
+-		goto out;
 -	}
--	return buf_len;
--}
--
--void update_host_stat(unsigned int op_type, unsigned int phase, cycles_t result)
--{
--	unsigned long flags;
--
--	spin_lock_irqsave(&stat_lock, flags);
--	update_db(&stat_host_db[op_type][phase], (unsigned int)result);
--	spin_unlock_irqrestore(&stat_lock, flags);
--}
--
--void update_cc_stat(
--	unsigned int op_type,
--	unsigned int phase,
--	unsigned int elapsed_cycles)
--{
--	update_db(&stat_cc_db[op_type][phase], elapsed_cycles);
--}
--
--void display_all_stat_db(void)
--{
--	SSI_LOG_ERR("\n=======    CYCLE COUNT STATS    =======\n");
--	display_db(stat_host_db);
--	SSI_LOG_ERR("\n======= CC HW CYCLE COUNT STATS =======\n");
--	display_db(stat_cc_db);
--}
--#endif /*CC_CYCLE_COUNT*/
--
- static ssize_t ssi_sys_regdump_show(struct kobject *kobj,
- 				    struct kobj_attribute *attr, char *buf)
++	if (!drvdata->ivgen_handle)
++		return -ENOMEM;
++
+ 	ivgen_ctx = drvdata->ivgen_handle;
+ 
+ 	/* Allocate pool's header for intial enc. key/IV */
+diff --git a/drivers/staging/ccree/ssi_sram_mgr.c b/drivers/staging/ccree/ssi_sram_mgr.c
+index df51a2a..4b99704 100644
+--- a/drivers/staging/ccree/ssi_sram_mgr.c
++++ b/drivers/staging/ccree/ssi_sram_mgr.c
+@@ -51,28 +51,20 @@ void ssi_sram_mgr_fini(struct ssi_drvdata *drvdata)
+ int ssi_sram_mgr_init(struct ssi_drvdata *drvdata)
  {
-@@ -304,12 +50,6 @@ static ssize_t ssi_sys_help_show(struct kobject *kobj,
- {
- 	char *help_str[] = {
- 				"cat reg_dump              ", "Print several of CC register values",
--		#if defined CC_CYCLE_COUNT
--				"cat stats_host            ", "Print host statistics",
--				"echo <number> > stats_host", "Clear host statistics database",
--				"cat stats_cc              ", "Print CC statistics",
--				"echo <number> > stats_cc  ", "Clear CC statistics database",
--		#endif
- 				};
- 	int i = 0, offset = 0;
+ 	struct ssi_sram_mgr_ctx *smgr_ctx;
+-	struct device *dev = DEV(drvdata);
+-	int rc;
  
-@@ -414,12 +154,6 @@ int ssi_sysfs_init(struct kobject *sys_dev_obj, struct ssi_drvdata *drvdata)
- {
- 	int retval;
+ 	/* Allocate "this" context */
+-	drvdata->sram_mgr_handle = kzalloc(
+-			sizeof(struct ssi_sram_mgr_ctx), GFP_KERNEL);
+-	if (!drvdata->sram_mgr_handle) {
+-		dev_err(dev, "Not enough memory to allocate SRAM_MGR ctx (%zu)\n",
+-			sizeof(struct ssi_sram_mgr_ctx));
+-		rc = -ENOMEM;
+-		goto out;
+-	}
++	drvdata->sram_mgr_handle = kzalloc(sizeof(struct ssi_sram_mgr_ctx),
++					   GFP_KERNEL);
++
++	if (!drvdata->sram_mgr_handle)
++		return -ENOMEM;
++
+ 	smgr_ctx = drvdata->sram_mgr_handle;
  
--#if defined CC_CYCLE_COUNT
--	/* Init. statistics */
--	init_db(stat_host_db);
--	init_db(stat_cc_db);
--#endif
+ 	/* Pool starts at start of SRAM */
+ 	smgr_ctx->sram_free_offset = 0;
+ 
+ 	return 0;
 -
- 	SSI_LOG_ERR("setup sysfs under %s\n", sys_dev_obj->name);
+-out:
+-	ssi_sram_mgr_fini(drvdata);
+-	return rc;
+ }
  
- 	/* Initialize top directory */
+ /*!
 -- 
 2.7.4
