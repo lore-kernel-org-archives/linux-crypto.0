@@ -1,3829 +1,3154 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 3/4] staging: ccree: move to generic device log infra
-Date: Mon,  2 Oct 2017 10:03:24 +0100
-Message-ID: <1506935008-14240-4-git-send-email-gilad@benyossef.com>
-References: <1506935008-14240-1-git-send-email-gilad@benyossef.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org,
- driverdev-devel@linuxdriverproject.org, linux-crypto@vger.kernel.org,
- Ofir Drang <ofir.drang@arm.com>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-In-Reply-To: <1506935008-14240-1-git-send-email-gilad@benyossef.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+From: Jiri Slaby <jslaby-AlSwsSmVLrQ@public.gmane.org>
+Subject: [PATCH v4 23/27] x86_64: assembly, change all ENTRY+ENDPROC to SYM_FUNC_*
+Date: Mon,  2 Oct 2017 11:12:42 +0200
+Message-ID: <20171002091246.28432-23-jslaby@suse.cz>
+References: <20171002091246.28432-1-jslaby@suse.cz>
+Cc: tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org, hpa-YMNOUZJC4hwAvxtiuMwx3w@public.gmane.org, x86-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
+        linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Jiri Slaby <jslaby-AlSwsSmVLrQ@public.gmane.org>,
+        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+        "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+        "Rafael J. Wysocki" <rjw-LthD3rsA81gm4RdzfppkhA@public.gmane.org>,
+        Len Brown <len.brown-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>, Pavel Machek <pavel-+ZI9xUNit7I@public.gmane.org>,
+        Matt Fleming <matt-mF/unelCI9GS6iBeEJttW/XRex20P6io@public.gmane.org>,
+        Ard Biesheuvel <ard.biesheuvel-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
+        Boris Ostrovsky <boris.ostrovsky-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
+        Juergen Gross <jgross-IBi9RG/b67k@public.gmane.org>, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-pm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-efi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        xen-devel-GuqFBffKawtpuQazS67q72D2FQJk+8+b@public.gmane.org
+To: mingo-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
+Return-path: <linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20171002091246.28432-1-jslaby-AlSwsSmVLrQ@public.gmane.org>
+Sender: linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-Move over from using macro wrappers around to printk to
-dev_err, dev_dbg and friends and clean up resulting fallout.
+These are all functions which are invoked from elsewhere, so we annotate
+them as global using the new SYM_FUNC_START. And their ENDPROC's by
+SYM_FUNC_END.
 
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+And make sure ENTRY/ENDPROC is not defined on X86_64, given these were
+the last users.
+
+Signed-off-by: Jiri Slaby <jslaby-AlSwsSmVLrQ@public.gmane.org>
+Cc: "H. Peter Anvin" <hpa-YMNOUZJC4hwAvxtiuMwx3w@public.gmane.org>
+Cc: Thomas Gleixner <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>
+Cc: Ingo Molnar <mingo-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: x86-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
+Cc: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Cc: "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>
+Cc: "Rafael J. Wysocki" <rjw-LthD3rsA81gm4RdzfppkhA@public.gmane.org>
+Cc: Len Brown <len.brown-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
+Cc: Pavel Machek <pavel-+ZI9xUNit7I@public.gmane.org>
+Cc: Matt Fleming <matt-mF/unelCI9GS6iBeEJttW/XRex20P6io@public.gmane.org>
+Cc: Ard Biesheuvel <ard.biesheuvel-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Cc: Boris Ostrovsky <boris.ostrovsky-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
+Cc: Juergen Gross <jgross-IBi9RG/b67k@public.gmane.org>
+Cc: linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: linux-pm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: linux-efi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: xen-devel-GuqFBffKawtpuQazS67q72D2FQJk+8+b@public.gmane.org
 ---
- drivers/staging/ccree/ssi_aead.c        | 226 ++++++++++--------
- drivers/staging/ccree/ssi_buffer_mgr.c  | 394 +++++++++++++++-----------------
- drivers/staging/ccree/ssi_buffer_mgr.h  |   5 +-
- drivers/staging/ccree/ssi_cipher.c      | 138 +++++------
- drivers/staging/ccree/ssi_driver.c      | 142 +++++-------
- drivers/staging/ccree/ssi_driver.h      |  14 +-
- drivers/staging/ccree/ssi_fips.c        |  12 +-
- drivers/staging/ccree/ssi_hash.c        | 297 ++++++++++++------------
- drivers/staging/ccree/ssi_ivgen.c       |  13 +-
- drivers/staging/ccree/ssi_pm.c          |  15 +-
- drivers/staging/ccree/ssi_request_mgr.c |  85 +++----
- drivers/staging/ccree/ssi_sram_mgr.c    |  16 +-
- drivers/staging/ccree/ssi_sysfs.c       |   3 +-
- 13 files changed, 689 insertions(+), 671 deletions(-)
+ arch/x86/boot/compressed/efi_thunk_64.S            |  4 +-
+ arch/x86/boot/compressed/head_64.S                 | 16 ++++----
+ arch/x86/crypto/aes-i586-asm_32.S                  |  8 ++--
+ arch/x86/crypto/aes-x86_64-asm_64.S                |  4 +-
+ arch/x86/crypto/aes_ctrby8_avx-x86_64.S            | 12 +++---
+ arch/x86/crypto/aesni-intel_asm.S                  | 44 +++++++++++-----------
+ arch/x86/crypto/aesni-intel_avx-x86_64.S           | 24 ++++++------
+ arch/x86/crypto/blowfish-x86_64-asm_64.S           | 16 ++++----
+ arch/x86/crypto/camellia-aesni-avx-asm_64.S        | 24 ++++++------
+ arch/x86/crypto/camellia-aesni-avx2-asm_64.S       | 24 ++++++------
+ arch/x86/crypto/camellia-x86_64-asm_64.S           | 16 ++++----
+ arch/x86/crypto/cast5-avx-x86_64-asm_64.S          | 16 ++++----
+ arch/x86/crypto/cast6-avx-x86_64-asm_64.S          | 24 ++++++------
+ arch/x86/crypto/chacha20-avx2-x86_64.S             |  4 +-
+ arch/x86/crypto/chacha20-ssse3-x86_64.S            |  8 ++--
+ arch/x86/crypto/crc32-pclmul_asm.S                 |  4 +-
+ arch/x86/crypto/crc32c-pcl-intel-asm_64.S          |  4 +-
+ arch/x86/crypto/crct10dif-pcl-asm_64.S             |  4 +-
+ arch/x86/crypto/des3_ede-asm_64.S                  |  8 ++--
+ arch/x86/crypto/ghash-clmulni-intel_asm.S          |  8 ++--
+ arch/x86/crypto/poly1305-avx2-x86_64.S             |  4 +-
+ arch/x86/crypto/poly1305-sse2-x86_64.S             |  8 ++--
+ arch/x86/crypto/salsa20-x86_64-asm_64.S            | 12 +++---
+ arch/x86/crypto/serpent-avx-x86_64-asm_64.S        | 24 ++++++------
+ arch/x86/crypto/serpent-avx2-asm_64.S              | 24 ++++++------
+ arch/x86/crypto/serpent-sse2-x86_64-asm_64.S       |  8 ++--
+ arch/x86/crypto/sha1-mb/sha1_mb_mgr_flush_avx2.S   |  8 ++--
+ arch/x86/crypto/sha1-mb/sha1_mb_mgr_submit_avx2.S  |  4 +-
+ arch/x86/crypto/sha1-mb/sha1_x8_avx2.S             |  4 +-
+ arch/x86/crypto/sha1_avx2_x86_64_asm.S             |  4 +-
+ arch/x86/crypto/sha1_ni_asm.S                      |  4 +-
+ arch/x86/crypto/sha1_ssse3_asm.S                   |  4 +-
+ arch/x86/crypto/sha256-avx-asm.S                   |  4 +-
+ arch/x86/crypto/sha256-avx2-asm.S                  |  4 +-
+ .../crypto/sha256-mb/sha256_mb_mgr_flush_avx2.S    |  8 ++--
+ .../crypto/sha256-mb/sha256_mb_mgr_submit_avx2.S   |  4 +-
+ arch/x86/crypto/sha256-mb/sha256_x8_avx2.S         |  4 +-
+ arch/x86/crypto/sha256-ssse3-asm.S                 |  4 +-
+ arch/x86/crypto/sha256_ni_asm.S                    |  4 +-
+ arch/x86/crypto/sha512-avx-asm.S                   |  4 +-
+ arch/x86/crypto/sha512-avx2-asm.S                  |  4 +-
+ .../crypto/sha512-mb/sha512_mb_mgr_flush_avx2.S    |  8 ++--
+ .../crypto/sha512-mb/sha512_mb_mgr_submit_avx2.S   |  4 +-
+ arch/x86/crypto/sha512-mb/sha512_x4_avx2.S         |  4 +-
+ arch/x86/crypto/sha512-ssse3-asm.S                 |  4 +-
+ arch/x86/crypto/twofish-avx-x86_64-asm_64.S        | 24 ++++++------
+ arch/x86/crypto/twofish-x86_64-asm_64-3way.S       |  8 ++--
+ arch/x86/crypto/twofish-x86_64-asm_64.S            |  8 ++--
+ arch/x86/entry/entry_64.S                          | 10 ++---
+ arch/x86/entry/entry_64_compat.S                   |  8 ++--
+ arch/x86/kernel/acpi/wakeup_64.S                   |  8 ++--
+ arch/x86/kernel/head_64.S                          | 12 +++---
+ arch/x86/lib/checksum_32.S                         |  8 ++--
+ arch/x86/lib/clear_page_64.S                       | 12 +++---
+ arch/x86/lib/cmpxchg16b_emu.S                      |  4 +-
+ arch/x86/lib/cmpxchg8b_emu.S                       |  4 +-
+ arch/x86/lib/copy_page_64.S                        |  4 +-
+ arch/x86/lib/copy_user_64.S                        | 16 ++++----
+ arch/x86/lib/csum-copy_64.S                        |  4 +-
+ arch/x86/lib/getuser.S                             | 16 ++++----
+ arch/x86/lib/hweight.S                             |  8 ++--
+ arch/x86/lib/iomap_copy_64.S                       |  4 +-
+ arch/x86/lib/memcpy_64.S                           |  4 +-
+ arch/x86/lib/memmove_64.S                          |  4 +-
+ arch/x86/lib/memset_64.S                           |  4 +-
+ arch/x86/lib/msr-reg.S                             |  8 ++--
+ arch/x86/lib/putuser.S                             | 16 ++++----
+ arch/x86/lib/rwsem.S                               | 20 +++++-----
+ arch/x86/mm/mem_encrypt_boot.S                     |  8 ++--
+ arch/x86/platform/efi/efi_stub_64.S                |  4 +-
+ arch/x86/platform/efi/efi_thunk_64.S               |  4 +-
+ arch/x86/power/hibernate_asm_64.S                  |  8 ++--
+ arch/x86/xen/xen-asm.S                             | 20 +++++-----
+ arch/x86/xen/xen-asm_64.S                          | 16 ++++----
+ include/linux/linkage.h                            |  4 ++
+ 75 files changed, 361 insertions(+), 357 deletions(-)
 
-diff --git a/drivers/staging/ccree/ssi_aead.c b/drivers/staging/ccree/ssi_aead.c
-index 65be954..4d7aae3 100644
---- a/drivers/staging/ccree/ssi_aead.c
-+++ b/drivers/staging/ccree/ssi_aead.c
-@@ -95,14 +95,14 @@ static void ssi_aead_exit(struct crypto_aead *tfm)
- 	struct ssi_aead_ctx *ctx = crypto_aead_ctx(tfm);
- 	struct device *dev = DEV(ctx->drvdata);
+diff --git a/arch/x86/boot/compressed/efi_thunk_64.S b/arch/x86/boot/compressed/efi_thunk_64.S
+index c072711d8d62..b85b49c36da3 100644
+--- a/arch/x86/boot/compressed/efi_thunk_64.S
++++ b/arch/x86/boot/compressed/efi_thunk_64.S
+@@ -22,7 +22,7 @@
  
--	SSI_LOG_DEBUG("Clearing context @%p for %s\n",
--		      crypto_aead_ctx(tfm), crypto_tfm_alg_name(&tfm->base));
-+	dev_dbg(dev, "Clearing context @%p for %s\n", crypto_aead_ctx(tfm),
-+		crypto_tfm_alg_name(&tfm->base));
+ 	.code64
+ 	.text
+-ENTRY(efi64_thunk)
++SYM_FUNC_START(efi64_thunk)
+ 	push	%rbp
+ 	push	%rbx
  
- 	/* Unmap enckey buffer */
- 	if (ctx->enckey) {
- 		dma_free_coherent(dev, AES_MAX_KEY_SIZE, ctx->enckey, ctx->enckey_dma_addr);
--		SSI_LOG_DEBUG("Freed enckey DMA buffer enckey_dma_addr=%pad\n",
--			      ctx->enckey_dma_addr);
-+		dev_dbg(dev, "Freed enckey DMA buffer enckey_dma_addr=%pad\n",
-+			&ctx->enckey_dma_addr);
- 		ctx->enckey_dma_addr = 0;
- 		ctx->enckey = NULL;
- 	}
-@@ -115,8 +115,8 @@ static void ssi_aead_exit(struct crypto_aead *tfm)
- 					  xcbc->xcbc_keys,
- 					  xcbc->xcbc_keys_dma_addr);
- 		}
--		SSI_LOG_DEBUG("Freed xcbc_keys DMA buffer xcbc_keys_dma_addr=%pad\n",
--			      xcbc->xcbc_keys_dma_addr);
-+		dev_dbg(dev, "Freed xcbc_keys DMA buffer xcbc_keys_dma_addr=%pad\n",
-+			&xcbc->xcbc_keys_dma_addr);
- 		xcbc->xcbc_keys_dma_addr = 0;
- 		xcbc->xcbc_keys = NULL;
- 	} else if (ctx->auth_mode != DRV_HASH_NULL) { /* HMAC auth. */
-@@ -126,8 +126,8 @@ static void ssi_aead_exit(struct crypto_aead *tfm)
- 			dma_free_coherent(dev, 2 * MAX_HMAC_DIGEST_SIZE,
- 					  hmac->ipad_opad,
- 					  hmac->ipad_opad_dma_addr);
--			SSI_LOG_DEBUG("Freed ipad_opad DMA buffer ipad_opad_dma_addr=%pad\n",
--				      hmac->ipad_opad_dma_addr);
-+			dev_dbg(dev, "Freed ipad_opad DMA buffer ipad_opad_dma_addr=%pad\n",
-+				&hmac->ipad_opad_dma_addr);
- 			hmac->ipad_opad_dma_addr = 0;
- 			hmac->ipad_opad = NULL;
- 		}
-@@ -135,8 +135,8 @@ static void ssi_aead_exit(struct crypto_aead *tfm)
- 			dma_free_coherent(dev, MAX_HMAC_BLOCK_SIZE,
- 					  hmac->padded_authkey,
- 					  hmac->padded_authkey_dma_addr);
--			SSI_LOG_DEBUG("Freed padded_authkey DMA buffer padded_authkey_dma_addr=%pad\n",
--				      hmac->padded_authkey_dma_addr);
-+			dev_dbg(dev, "Freed padded_authkey DMA buffer padded_authkey_dma_addr=%pad\n",
-+				&hmac->padded_authkey_dma_addr);
- 			hmac->padded_authkey_dma_addr = 0;
- 			hmac->padded_authkey = NULL;
- 		}
-@@ -151,7 +151,8 @@ static int ssi_aead_init(struct crypto_aead *tfm)
- 			container_of(alg, struct ssi_crypto_alg, aead_alg);
- 	struct device *dev = DEV(ssi_alg->drvdata);
+@@ -96,7 +96,7 @@ ENTRY(efi64_thunk)
+ 	pop	%rbx
+ 	pop	%rbp
+ 	ret
+-ENDPROC(efi64_thunk)
++SYM_FUNC_END(efi64_thunk)
  
--	SSI_LOG_DEBUG("Initializing context @%p for %s\n", ctx, crypto_tfm_alg_name(&tfm->base));
-+	dev_dbg(dev, "Initializing context @%p for %s\n", ctx,
-+		crypto_tfm_alg_name(&tfm->base));
+ SYM_FUNC_START_LOCAL(efi_exit32)
+ 	movq	func_rt_ptr(%rip), %rax
+diff --git a/arch/x86/boot/compressed/head_64.S b/arch/x86/boot/compressed/head_64.S
+index 11b8ebc2f08a..fb7951632d66 100644
+--- a/arch/x86/boot/compressed/head_64.S
++++ b/arch/x86/boot/compressed/head_64.S
+@@ -43,7 +43,7 @@
  
- 	/* Initialize modes in instance */
- 	ctx->cipher_mode = ssi_alg->cipher_mode;
-@@ -164,10 +165,11 @@ static int ssi_aead_init(struct crypto_aead *tfm)
- 	ctx->enckey = dma_alloc_coherent(dev, AES_MAX_KEY_SIZE,
- 					 &ctx->enckey_dma_addr, GFP_KERNEL);
- 	if (!ctx->enckey) {
--		SSI_LOG_ERR("Failed allocating key buffer\n");
-+		dev_err(dev, "Failed allocating key buffer\n");
- 		goto init_failed;
- 	}
--	SSI_LOG_DEBUG("Allocated enckey buffer in context ctx->enckey=@%p\n", ctx->enckey);
-+	dev_dbg(dev, "Allocated enckey buffer in context ctx->enckey=@%p\n",
-+		ctx->enckey);
+ 	__HEAD
+ 	.code32
+-ENTRY(startup_32)
++SYM_FUNC_START(startup_32)
+ 	/*
+ 	 * 32bit entry is 0 and it is ABI so immutable!
+ 	 * If we come here directly from a bootloader,
+@@ -204,11 +204,11 @@ ENTRY(startup_32)
  
- 	/* Set default authlen value */
+ 	/* Jump from 32bit compatibility mode into 64bit mode. */
+ 	lret
+-ENDPROC(startup_32)
++SYM_FUNC_END(startup_32)
  
-@@ -181,7 +183,7 @@ static int ssi_aead_init(struct crypto_aead *tfm)
- 						     &xcbc->xcbc_keys_dma_addr,
- 						     GFP_KERNEL);
- 		if (!xcbc->xcbc_keys) {
--			SSI_LOG_ERR("Failed allocating buffer for XCBC keys\n");
-+			dev_err(dev, "Failed allocating buffer for XCBC keys\n");
- 			goto init_failed;
- 		}
- 	} else if (ctx->auth_mode != DRV_HASH_NULL) { /* HMAC authentication */
-@@ -195,12 +197,12 @@ static int ssi_aead_init(struct crypto_aead *tfm)
- 						     GFP_KERNEL);
+ #ifdef CONFIG_EFI_MIXED
+ 	.org 0x190
+-ENTRY(efi32_stub_entry)
++SYM_FUNC_START(efi32_stub_entry)
+ 	add	$0x4, %esp		/* Discard return address */
+ 	popl	%ecx
+ 	popl	%edx
+@@ -227,7 +227,7 @@ ENTRY(efi32_stub_entry)
+ 	movl	%eax, efi_config(%ebp)
  
- 		if (!hmac->ipad_opad) {
--			SSI_LOG_ERR("Failed allocating IPAD/OPAD buffer\n");
-+			dev_err(dev, "Failed allocating IPAD/OPAD buffer\n");
- 			goto init_failed;
- 		}
- 
--		SSI_LOG_DEBUG("Allocated authkey buffer in context ctx->authkey=@%p\n",
--			      hmac->ipad_opad);
-+		dev_dbg(dev, "Allocated authkey buffer in context ctx->authkey=@%p\n",
-+			hmac->ipad_opad);
- 
- 		hmac->padded_authkey = dma_alloc_coherent(dev,
- 							  MAX_HMAC_BLOCK_SIZE,
-@@ -208,7 +210,7 @@ static int ssi_aead_init(struct crypto_aead *tfm)
- 							  GFP_KERNEL);
- 
- 		if (!hmac->padded_authkey) {
--			SSI_LOG_ERR("failed to allocate padded_authkey\n");
-+			dev_err(dev, "failed to allocate padded_authkey\n");
- 			goto init_failed;
- 		}
- 	} else {
-@@ -239,8 +241,7 @@ static void ssi_aead_complete(struct device *dev, void *ssi_req, void __iomem *c
- 	if (areq_ctx->gen_ctx.op_type == DRV_CRYPTO_DIRECTION_DECRYPT) {
- 		if (memcmp(areq_ctx->mac_buf, areq_ctx->icv_virt_addr,
- 			   ctx->authsize) != 0) {
--			SSI_LOG_DEBUG("Payload authentication failure, "
--				"(auth-size=%d, cipher=%d).\n",
-+			dev_dbg(dev, "Payload authentication failure, (auth-size=%d, cipher=%d)\n",
- 				ctx->authsize, ctx->cipher_mode);
- 			/* In case of payload authentication failure, MUST NOT
- 			 * revealed the decrypted message --> zero its memory.
-@@ -251,8 +252,11 @@ static void ssi_aead_complete(struct device *dev, void *ssi_req, void __iomem *c
- 	} else { /*ENCRYPT*/
- 		if (unlikely(areq_ctx->is_icv_fragmented))
- 			ssi_buffer_mgr_copy_scatterlist_portion(
--				areq_ctx->mac_buf, areq_ctx->dst_sgl, areq->cryptlen + areq_ctx->dst_offset,
--				areq->cryptlen + areq_ctx->dst_offset + ctx->authsize, SSI_SG_FROM_BUF);
-+				dev, areq_ctx->mac_buf, areq_ctx->dst_sgl,
-+				areq->cryptlen + areq_ctx->dst_offset,
-+				(areq->cryptlen + areq_ctx->dst_offset +
-+				 ctx->authsize),
-+				SSI_SG_FROM_BUF);
- 
- 		/* If an IV was generated, copy it back to the user provided buffer. */
- 		if (areq_ctx->backup_giv) {
-@@ -376,8 +380,10 @@ static int hmac_setkey(struct cc_hw_desc *desc, struct ssi_aead_ctx *ctx)
- 
- static int validate_keys_sizes(struct ssi_aead_ctx *ctx)
- {
--	SSI_LOG_DEBUG("enc_keylen=%u  authkeylen=%u\n",
--		      ctx->enc_keylen, ctx->auth_keylen);
-+	struct device *dev = DEV(ctx->drvdata);
-+
-+	dev_dbg(dev, "enc_keylen=%u  authkeylen=%u\n",
-+		ctx->enc_keylen, ctx->auth_keylen);
- 
- 	switch (ctx->auth_mode) {
- 	case DRV_HASH_SHA1:
-@@ -394,22 +400,22 @@ static int validate_keys_sizes(struct ssi_aead_ctx *ctx)
- 			return -EINVAL;
- 		break;
- 	default:
--		SSI_LOG_ERR("Invalid auth_mode=%d\n", ctx->auth_mode);
-+		dev_err(dev, "Invalid auth_mode=%d\n", ctx->auth_mode);
- 		return -EINVAL;
- 	}
- 	/* Check cipher key size */
- 	if (unlikely(ctx->flow_mode == S_DIN_to_DES)) {
- 		if (ctx->enc_keylen != DES3_EDE_KEY_SIZE) {
--			SSI_LOG_ERR("Invalid cipher(3DES) key size: %u\n",
--				    ctx->enc_keylen);
-+			dev_err(dev, "Invalid cipher(3DES) key size: %u\n",
-+				ctx->enc_keylen);
- 			return -EINVAL;
- 		}
- 	} else { /* Default assumed to be AES ciphers */
- 		if ((ctx->enc_keylen != AES_KEYSIZE_128) &&
- 		    (ctx->enc_keylen != AES_KEYSIZE_192) &&
- 		    (ctx->enc_keylen != AES_KEYSIZE_256)) {
--			SSI_LOG_ERR("Invalid cipher(AES) key size: %u\n",
--				    ctx->enc_keylen);
-+			dev_err(dev, "Invalid cipher(AES) key size: %u\n",
-+				ctx->enc_keylen);
- 			return -EINVAL;
- 		}
- 	}
-@@ -454,8 +460,8 @@ ssi_get_plain_hmac_key(struct crypto_aead *tfm, const u8 *key, unsigned int keyl
- 	if (likely(keylen != 0)) {
- 		key_dma_addr = dma_map_single(dev, (void *)key, keylen, DMA_TO_DEVICE);
- 		if (unlikely(dma_mapping_error(dev, key_dma_addr))) {
--			SSI_LOG_ERR("Mapping key va=0x%p len=%u for"
--				   " DMA failed\n", key, keylen);
-+			dev_err(dev, "Mapping key va=0x%p len=%u for DMA failed\n",
-+				key, keylen);
- 			return -ENOMEM;
- 		}
- 		if (keylen > blocksize) {
-@@ -533,7 +539,7 @@ ssi_get_plain_hmac_key(struct crypto_aead *tfm, const u8 *key, unsigned int keyl
- 
- 	rc = send_request(ctx->drvdata, &ssi_req, desc, idx, 0);
- 	if (unlikely(rc != 0))
--		SSI_LOG_ERR("send_request() failed (rc=%d)\n", rc);
-+		dev_err(dev, "send_request() failed (rc=%d)\n", rc);
- 
- 	if (likely(key_dma_addr != 0))
- 		dma_unmap_single(dev, key_dma_addr, keylen, DMA_TO_DEVICE);
-@@ -550,10 +556,10 @@ ssi_aead_setkey(struct crypto_aead *tfm, const u8 *key, unsigned int keylen)
- 	struct crypto_authenc_key_param *param;
- 	struct cc_hw_desc desc[MAX_AEAD_SETKEY_SEQ];
- 	int seq_len = 0, rc = -EINVAL;
-+	struct device *dev = DEV(ctx->drvdata);
- 
--	SSI_LOG_DEBUG("Setting key in context @%p for %s. key=%p keylen=%u\n",
--		      ctx, crypto_tfm_alg_name(crypto_aead_tfm(tfm)),
--		      key, keylen);
-+	dev_dbg(dev, "Setting key in context @%p for %s. key=%p keylen=%u\n",
-+		ctx, crypto_tfm_alg_name(crypto_aead_tfm(tfm)), key, keylen);
- 
- 	/* STAT_PHASE_0: Init and sanity checks */
- 
-@@ -621,7 +627,7 @@ ssi_aead_setkey(struct crypto_aead *tfm, const u8 *key, unsigned int keylen)
- 	case DRV_HASH_NULL: /* non-authenc modes, e.g., CCM */
- 		break; /* No auth. key setup */
- 	default:
--		SSI_LOG_ERR("Unsupported authenc (%d)\n", ctx->auth_mode);
-+		dev_err(dev, "Unsupported authenc (%d)\n", ctx->auth_mode);
- 		rc = -ENOTSUPP;
- 		goto badkey;
- 	}
-@@ -631,7 +637,7 @@ ssi_aead_setkey(struct crypto_aead *tfm, const u8 *key, unsigned int keylen)
- 	if (seq_len > 0) { /* For CCM there is no sequence to setup the key */
- 		rc = send_request(ctx->drvdata, &ssi_req, desc, seq_len, 0);
- 		if (unlikely(rc != 0)) {
--			SSI_LOG_ERR("send_request() failed (rc=%d)\n", rc);
-+			dev_err(dev, "send_request() failed (rc=%d)\n", rc);
- 			goto setkey_error;
- 		}
- 	}
-@@ -666,6 +672,7 @@ static int ssi_aead_setauthsize(
- 	unsigned int authsize)
- {
- 	struct ssi_aead_ctx *ctx = crypto_aead_ctx(authenc);
-+	struct device *dev = DEV(ctx->drvdata);
- 
- 	/* Unsupported auth. sizes */
- 	if ((authsize == 0) ||
-@@ -674,7 +681,7 @@ static int ssi_aead_setauthsize(
- 	}
- 
- 	ctx->authsize = authsize;
--	SSI_LOG_DEBUG("authlen=%d\n", ctx->authsize);
-+	dev_dbg(dev, "authlen=%d\n", ctx->authsize);
- 
- 	return 0;
- }
-@@ -727,10 +734,11 @@ ssi_aead_create_assoc_desc(
- 	struct aead_req_ctx *areq_ctx = aead_request_ctx(areq);
- 	enum ssi_req_dma_buf_type assoc_dma_type = areq_ctx->assoc_buff_type;
- 	unsigned int idx = *seq_size;
-+	struct device *dev = DEV(ctx->drvdata);
- 
- 	switch (assoc_dma_type) {
- 	case SSI_DMA_BUF_DLLI:
--		SSI_LOG_DEBUG("ASSOC buffer type DLLI\n");
-+		dev_dbg(dev, "ASSOC buffer type DLLI\n");
- 		hw_desc_init(&desc[idx]);
- 		set_din_type(&desc[idx], DMA_DLLI, sg_dma_address(areq->src),
- 			     areq->assoclen, NS_BIT); set_flow_mode(&desc[idx],
-@@ -740,7 +748,7 @@ ssi_aead_create_assoc_desc(
- 			set_din_not_last_indication(&desc[idx]);
- 		break;
- 	case SSI_DMA_BUF_MLLI:
--		SSI_LOG_DEBUG("ASSOC buffer type MLLI\n");
-+		dev_dbg(dev, "ASSOC buffer type MLLI\n");
- 		hw_desc_init(&desc[idx]);
- 		set_din_type(&desc[idx], DMA_MLLI, areq_ctx->assoc.sram_addr,
- 			     areq_ctx->assoc.mlli_nents, NS_BIT);
-@@ -751,7 +759,7 @@ ssi_aead_create_assoc_desc(
- 		break;
- 	case SSI_DMA_BUF_NULL:
- 	default:
--		SSI_LOG_ERR("Invalid ASSOC buffer type\n");
-+		dev_err(dev, "Invalid ASSOC buffer type\n");
- 	}
- 
- 	*seq_size = (++idx);
-@@ -768,6 +776,9 @@ ssi_aead_process_authenc_data_desc(
- 	struct aead_req_ctx *areq_ctx = aead_request_ctx(areq);
- 	enum ssi_req_dma_buf_type data_dma_type = areq_ctx->data_buff_type;
- 	unsigned int idx = *seq_size;
-+	struct crypto_aead *tfm = crypto_aead_reqtfm(areq);
-+	struct ssi_aead_ctx *ctx = crypto_aead_ctx(tfm);
-+	struct device *dev = DEV(ctx->drvdata);
- 
- 	switch (data_dma_type) {
- 	case SSI_DMA_BUF_DLLI:
-@@ -779,7 +790,7 @@ ssi_aead_process_authenc_data_desc(
- 		unsigned int offset =
- 			(direct == DRV_CRYPTO_DIRECTION_ENCRYPT) ?
- 			areq_ctx->dst_offset : areq_ctx->src_offset;
--		SSI_LOG_DEBUG("AUTHENC: SRC/DST buffer type DLLI\n");
-+		dev_dbg(dev, "AUTHENC: SRC/DST buffer type DLLI\n");
- 		hw_desc_init(&desc[idx]);
- 		set_din_type(&desc[idx], DMA_DLLI,
- 			     (sg_dma_address(cipher) + offset),
-@@ -806,7 +817,7 @@ ssi_aead_process_authenc_data_desc(
- 			}
- 		}
- 
--		SSI_LOG_DEBUG("AUTHENC: SRC/DST buffer type MLLI\n");
-+		dev_dbg(dev, "AUTHENC: SRC/DST buffer type MLLI\n");
- 		hw_desc_init(&desc[idx]);
- 		set_din_type(&desc[idx], DMA_MLLI, mlli_addr, mlli_nents,
- 			     NS_BIT);
-@@ -815,7 +826,7 @@ ssi_aead_process_authenc_data_desc(
- 	}
- 	case SSI_DMA_BUF_NULL:
- 	default:
--		SSI_LOG_ERR("AUTHENC: Invalid SRC/DST buffer type\n");
-+		dev_err(dev, "AUTHENC: Invalid SRC/DST buffer type\n");
- 	}
- 
- 	*seq_size = (++idx);
-@@ -831,13 +842,16 @@ ssi_aead_process_cipher_data_desc(
- 	unsigned int idx = *seq_size;
- 	struct aead_req_ctx *areq_ctx = aead_request_ctx(areq);
- 	enum ssi_req_dma_buf_type data_dma_type = areq_ctx->data_buff_type;
-+	struct crypto_aead *tfm = crypto_aead_reqtfm(areq);
-+	struct ssi_aead_ctx *ctx = crypto_aead_ctx(tfm);
-+	struct device *dev = DEV(ctx->drvdata);
- 
- 	if (areq_ctx->cryptlen == 0)
- 		return; /*null processing*/
- 
- 	switch (data_dma_type) {
- 	case SSI_DMA_BUF_DLLI:
--		SSI_LOG_DEBUG("CIPHER: SRC/DST buffer type DLLI\n");
-+		dev_dbg(dev, "CIPHER: SRC/DST buffer type DLLI\n");
- 		hw_desc_init(&desc[idx]);
- 		set_din_type(&desc[idx], DMA_DLLI,
- 			     (sg_dma_address(areq_ctx->src_sgl) +
-@@ -849,7 +863,7 @@ ssi_aead_process_cipher_data_desc(
- 		set_flow_mode(&desc[idx], flow_mode);
- 		break;
- 	case SSI_DMA_BUF_MLLI:
--		SSI_LOG_DEBUG("CIPHER: SRC/DST buffer type MLLI\n");
-+		dev_dbg(dev, "CIPHER: SRC/DST buffer type MLLI\n");
- 		hw_desc_init(&desc[idx]);
- 		set_din_type(&desc[idx], DMA_MLLI, areq_ctx->src.sram_addr,
- 			     areq_ctx->src.mlli_nents, NS_BIT);
-@@ -859,7 +873,7 @@ ssi_aead_process_cipher_data_desc(
- 		break;
- 	case SSI_DMA_BUF_NULL:
- 	default:
--		SSI_LOG_ERR("CIPHER: Invalid SRC/DST buffer type\n");
-+		dev_err(dev, "CIPHER: Invalid SRC/DST buffer type\n");
- 	}
- 
- 	*seq_size = (++idx);
-@@ -1174,14 +1188,15 @@ static inline void ssi_aead_load_mlli_to_sram(
- 	struct aead_req_ctx *req_ctx = aead_request_ctx(req);
- 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
- 	struct ssi_aead_ctx *ctx = crypto_aead_ctx(tfm);
-+	struct device *dev = DEV(ctx->drvdata);
- 
- 	if (unlikely(
- 		(req_ctx->assoc_buff_type == SSI_DMA_BUF_MLLI) ||
- 		(req_ctx->data_buff_type == SSI_DMA_BUF_MLLI) ||
- 		!req_ctx->is_single_pass)) {
--		SSI_LOG_DEBUG("Copy-to-sram: mlli_dma=%08x, mlli_size=%u\n",
--			      (unsigned int)ctx->drvdata->mlli_sram_addr,
--			      req_ctx->mlli_params.mlli_len);
-+		dev_dbg(dev, "Copy-to-sram: mlli_dma=%08x, mlli_size=%u\n",
-+			(unsigned int)ctx->drvdata->mlli_sram_addr,
-+			req_ctx->mlli_params.mlli_len);
- 		/* Copy MLLI table host-to-sram */
- 		hw_desc_init(&desc[*seq_size]);
- 		set_din_type(&desc[*seq_size], DMA_DLLI,
-@@ -1329,6 +1344,7 @@ static int validate_data_size(struct ssi_aead_ctx *ctx,
- 			      struct aead_request *req)
- {
- 	struct aead_req_ctx *areq_ctx = aead_request_ctx(req);
-+	struct device *dev = DEV(ctx->drvdata);
- 	unsigned int assoclen = req->assoclen;
- 	unsigned int cipherlen = (direct == DRV_CRYPTO_DIRECTION_DECRYPT) ?
- 			(req->cryptlen - ctx->authsize) : req->cryptlen;
-@@ -1367,7 +1383,7 @@ static int validate_data_size(struct ssi_aead_ctx *ctx,
- 			areq_ctx->is_single_pass = false;
- 		break;
- 	default:
--		SSI_LOG_ERR("Unexpected flow mode (%d)\n", ctx->flow_mode);
-+		dev_err(dev, "Unexpected flow mode (%d)\n", ctx->flow_mode);
- 		goto data_size_err;
- 	}
- 
-@@ -1550,6 +1566,7 @@ static int config_ccm_adata(struct aead_request *req)
- {
- 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
- 	struct ssi_aead_ctx *ctx = crypto_aead_ctx(tfm);
-+	struct device *dev = DEV(ctx->drvdata);
- 	struct aead_req_ctx *req_ctx = aead_request_ctx(req);
- 	//unsigned int size_of_a = 0, rem_a_size = 0;
- 	unsigned int lp = req->iv[0];
-@@ -1571,7 +1588,7 @@ static int config_ccm_adata(struct aead_request *req)
- 	/* taken from crypto/ccm.c */
- 	/* 2 <= L <= 8, so 1 <= L' <= 7. */
- 	if (l < 2 || l > 8) {
--		SSI_LOG_ERR("illegal iv value %X\n", req->iv[0]);
-+		dev_err(dev, "illegal iv value %X\n", req->iv[0]);
- 		return -EINVAL;
- 	}
- 	memcpy(b0, req->iv, AES_BLOCK_SIZE);
-@@ -1584,8 +1601,10 @@ static int config_ccm_adata(struct aead_request *req)
- 		*b0 |= 64;  /* Enable bit 6 if Adata exists. */
- 
- 	rc = set_msg_len(b0 + 16 - l, cryptlen, l);  /* Write L'. */
--	if (rc != 0)
-+	if (rc != 0) {
-+		dev_err(dev, "message len overflow detected");
- 		return rc;
-+	}
- 	 /* END of "taken from crypto/ccm.c" */
- 
- 	/* l(a) - size of associated data. */
-@@ -1854,13 +1873,13 @@ static inline void ssi_aead_dump_gcm(
- 		return;
- 
- 	if (title) {
--		SSI_LOG_DEBUG("----------------------------------------------------------------------------------");
--		SSI_LOG_DEBUG("%s\n", title);
-+		dev_dbg(dev, "----------------------------------------------------------------------------------");
-+		dev_dbg(dev, "%s\n", title);
- 	}
- 
--	SSI_LOG_DEBUG("cipher_mode %d, authsize %d, enc_keylen %d, assoclen %d, cryptlen %d\n",
--		      ctx->cipher_mode, ctx->authsize, ctx->enc_keylen,
--		      req->assoclen, req_ctx->cryptlen);
-+	dev_dbg(dev, "cipher_mode %d, authsize %d, enc_keylen %d, assoclen %d, cryptlen %d\n",
-+		ctx->cipher_mode, ctx->authsize, ctx->enc_keylen,
-+		req->assoclen, req_ctx->cryptlen);
- 
- 	if (ctx->enckey)
- 		dump_byte_array("mac key", ctx->enckey, 16);
-@@ -1890,6 +1909,7 @@ static int config_gcm_context(struct aead_request *req)
- 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
- 	struct ssi_aead_ctx *ctx = crypto_aead_ctx(tfm);
- 	struct aead_req_ctx *req_ctx = aead_request_ctx(req);
-+	struct device *dev = DEV(ctx->drvdata);
- 
- 	unsigned int cryptlen = (req_ctx->gen_ctx.op_type ==
- 				 DRV_CRYPTO_DIRECTION_ENCRYPT) ?
-@@ -1897,7 +1917,8 @@ static int config_gcm_context(struct aead_request *req)
- 				(req->cryptlen - ctx->authsize);
- 	__be32 counter = cpu_to_be32(2);
- 
--	SSI_LOG_DEBUG("%s() cryptlen = %d, req->assoclen = %d ctx->authsize = %d\n", __func__, cryptlen, req->assoclen, ctx->authsize);
-+	dev_dbg(dev, "%s() cryptlen = %d, req->assoclen = %d ctx->authsize = %d\n",
-+		__func__, cryptlen, req->assoclen, ctx->authsize);
- 
- 	memset(req_ctx->hkey, 0, AES_BLOCK_SIZE);
- 
-@@ -1954,17 +1975,17 @@ static int ssi_aead_process(struct aead_request *req, enum drv_crypto_direction
- 	struct device *dev = DEV(ctx->drvdata);
- 	struct ssi_crypto_req ssi_req = {};
- 
--	SSI_LOG_DEBUG("%s context=%p req=%p iv=%p src=%p src_ofs=%d dst=%p dst_ofs=%d cryptolen=%d\n",
--		      ((direct == DRV_CRYPTO_DIRECTION_ENCRYPT) ? "Encrypt" : "Decrypt"),
--		      ctx, req, req->iv, sg_virt(req->src), req->src->offset,
--		      sg_virt(req->dst), req->dst->offset, req->cryptlen);
-+	dev_dbg(dev, "%s context=%p req=%p iv=%p src=%p src_ofs=%d dst=%p dst_ofs=%d cryptolen=%d\n",
-+		((direct == DRV_CRYPTO_DIRECTION_ENCRYPT) ? "Enc" : "Dec"),
-+		ctx, req, req->iv, sg_virt(req->src), req->src->offset,
-+		sg_virt(req->dst), req->dst->offset, req->cryptlen);
- 
- 	/* STAT_PHASE_0: Init and sanity checks */
- 
- 	/* Check data length according to mode */
- 	if (unlikely(validate_data_size(ctx, direct, req) != 0)) {
--		SSI_LOG_ERR("Unsupported crypt/assoc len %d/%d.\n",
--			    req->cryptlen, req->assoclen);
-+		dev_err(dev, "Unsupported crypt/assoc len %d/%d.\n",
-+			req->cryptlen, req->assoclen);
- 		crypto_aead_set_flags(tfm, CRYPTO_TFM_RES_BAD_BLOCK_LEN);
- 		return -EINVAL;
- 	}
-@@ -2010,7 +2031,8 @@ static int ssi_aead_process(struct aead_request *req, enum drv_crypto_direction
- 	if (ctx->cipher_mode == DRV_CIPHER_CCM) {
- 		rc = config_ccm_adata(req);
- 		if (unlikely(rc != 0)) {
--			SSI_LOG_ERR("config_ccm_adata() returned with a failure %d!", rc);
-+			dev_dbg(dev, "config_ccm_adata() returned with a failure %d!",
-+				rc);
- 			goto exit;
- 		}
- 	} else {
-@@ -2024,7 +2046,8 @@ static int ssi_aead_process(struct aead_request *req, enum drv_crypto_direction
- 	if (ctx->cipher_mode == DRV_CIPHER_GCTR) {
- 		rc = config_gcm_context(req);
- 		if (unlikely(rc != 0)) {
--			SSI_LOG_ERR("config_gcm_context() returned with a failure %d!", rc);
-+			dev_dbg(dev, "config_gcm_context() returned with a failure %d!",
-+				rc);
- 			goto exit;
- 		}
- 	}
-@@ -2032,7 +2055,7 @@ static int ssi_aead_process(struct aead_request *req, enum drv_crypto_direction
- 
- 	rc = ssi_buffer_mgr_map_aead_request(ctx->drvdata, req);
- 	if (unlikely(rc != 0)) {
--		SSI_LOG_ERR("map_request() failed\n");
-+		dev_err(dev, "map_request() failed\n");
- 		goto exit;
- 	}
- 
-@@ -2088,7 +2111,7 @@ static int ssi_aead_process(struct aead_request *req, enum drv_crypto_direction
- 			break;
+ 	jmp	startup_32
+-ENDPROC(efi32_stub_entry)
++SYM_FUNC_END(efi32_stub_entry)
  #endif
- 	default:
--		SSI_LOG_ERR("Unsupported authenc (%d)\n", ctx->auth_mode);
-+		dev_err(dev, "Unsupported authenc (%d)\n", ctx->auth_mode);
- 		ssi_buffer_mgr_unmap_aead_request(dev, req);
- 		rc = -ENOTSUPP;
- 		goto exit;
-@@ -2099,7 +2122,7 @@ static int ssi_aead_process(struct aead_request *req, enum drv_crypto_direction
- 	rc = send_request(ctx->drvdata, &ssi_req, desc, seq_len, 1);
  
- 	if (unlikely(rc != -EINPROGRESS)) {
--		SSI_LOG_ERR("send_request() failed (rc=%d)\n", rc);
-+		dev_err(dev, "send_request() failed (rc=%d)\n", rc);
- 		ssi_buffer_mgr_unmap_aead_request(dev, req);
- 	}
+ 	.code64
+@@ -357,7 +357,7 @@ SYM_CODE_END(startup_64)
+ #ifdef CONFIG_EFI_STUB
  
-@@ -2132,10 +2155,13 @@ static int ssi_rfc4309_ccm_encrypt(struct aead_request *req)
- 	/* Very similar to ssi_aead_encrypt() above. */
+ /* The entry point for the PE/COFF executable is efi_pe_entry. */
+-ENTRY(efi_pe_entry)
++SYM_FUNC_START(efi_pe_entry)
+ 	movq	%rcx, efi64_config(%rip)	/* Handle */
+ 	movq	%rdx, efi64_config+8(%rip) /* EFI System table pointer */
  
- 	struct aead_req_ctx *areq_ctx = aead_request_ctx(req);
-+	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
-+	struct ssi_aead_ctx *ctx = crypto_aead_ctx(tfm);
-+	struct device *dev = DEV(ctx->drvdata);
- 	int rc = -EINVAL;
+@@ -406,10 +406,10 @@ fail:
+ 	movl	BP_code32_start(%esi), %eax
+ 	leaq	startup_64(%rax), %rax
+ 	jmp	*%rax
+-ENDPROC(efi_pe_entry)
++SYM_FUNC_END(efi_pe_entry)
  
- 	if (!valid_assoclen(req)) {
--		SSI_LOG_ERR("invalid Assoclen:%u\n", req->assoclen);
-+		dev_err(dev, "invalid Assoclen:%u\n", req->assoclen);
- 		goto out;
- 	}
+ 	.org 0x390
+-ENTRY(efi64_stub_entry)
++SYM_FUNC_START(efi64_stub_entry)
+ 	movq	%rdi, efi64_config(%rip)	/* Handle */
+ 	movq	%rsi, efi64_config+8(%rip) /* EFI System table pointer */
  
-@@ -2176,13 +2202,14 @@ static int ssi_aead_decrypt(struct aead_request *req)
- #if SSI_CC_HAS_AES_CCM
- static int ssi_rfc4309_ccm_decrypt(struct aead_request *req)
- {
--	/* Very similar to ssi_aead_decrypt() above. */
--
-+	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
-+	struct ssi_aead_ctx *ctx = crypto_aead_ctx(tfm);
-+	struct device *dev = DEV(ctx->drvdata);
- 	struct aead_req_ctx *areq_ctx = aead_request_ctx(req);
- 	int rc = -EINVAL;
+@@ -418,7 +418,7 @@ ENTRY(efi64_stub_entry)
  
- 	if (!valid_assoclen(req)) {
--		SSI_LOG_ERR("invalid Assoclen:%u\n", req->assoclen);
-+		dev_err(dev, "invalid Assoclen:%u\n", req->assoclen);
- 		goto out;
- 	}
+ 	movq	%rdx, %rsi
+ 	jmp	handover_entry
+-ENDPROC(efi64_stub_entry)
++SYM_FUNC_END(efi64_stub_entry)
+ #endif
  
-@@ -2207,8 +2234,9 @@ static int ssi_rfc4309_ccm_decrypt(struct aead_request *req)
- static int ssi_rfc4106_gcm_setkey(struct crypto_aead *tfm, const u8 *key, unsigned int keylen)
- {
- 	struct ssi_aead_ctx *ctx = crypto_aead_ctx(tfm);
-+	struct device *dev = DEV(ctx->drvdata);
+ 	.text
+diff --git a/arch/x86/crypto/aes-i586-asm_32.S b/arch/x86/crypto/aes-i586-asm_32.S
+index 2849dbc59e11..5b2636c58527 100644
+--- a/arch/x86/crypto/aes-i586-asm_32.S
++++ b/arch/x86/crypto/aes-i586-asm_32.S
+@@ -223,7 +223,7 @@
+ .extern  crypto_ft_tab
+ .extern  crypto_fl_tab
  
--	SSI_LOG_DEBUG("%s()  keylen %d, key %p\n", __func__, keylen, key);
-+	dev_dbg(dev, "%s()  keylen %d, key %p\n", __func__, keylen, key);
+-ENTRY(aes_enc_blk)
++SYM_FUNC_START(aes_enc_blk)
+ 	push    %ebp
+ 	mov     ctx(%esp),%ebp
  
- 	if (keylen < 4)
- 		return -EINVAL;
-@@ -2222,8 +2250,9 @@ static int ssi_rfc4106_gcm_setkey(struct crypto_aead *tfm, const u8 *key, unsign
- static int ssi_rfc4543_gcm_setkey(struct crypto_aead *tfm, const u8 *key, unsigned int keylen)
- {
- 	struct ssi_aead_ctx *ctx = crypto_aead_ctx(tfm);
-+	struct device *dev = DEV(ctx->drvdata);
+@@ -287,7 +287,7 @@ ENTRY(aes_enc_blk)
+ 	mov     %r0,(%ebp)
+ 	pop     %ebp
+ 	ret
+-ENDPROC(aes_enc_blk)
++SYM_FUNC_END(aes_enc_blk)
  
--	SSI_LOG_DEBUG("%s()  keylen %d, key %p\n", __func__, keylen, key);
-+	dev_dbg(dev, "%s()  keylen %d, key %p\n", __func__, keylen, key);
+ // AES (Rijndael) Decryption Subroutine
+ /* void aes_dec_blk(struct crypto_aes_ctx *ctx, u8 *out_blk, const u8 *in_blk) */
+@@ -295,7 +295,7 @@ ENDPROC(aes_enc_blk)
+ .extern  crypto_it_tab
+ .extern  crypto_il_tab
  
- 	if (keylen < 4)
- 		return -EINVAL;
-@@ -2256,7 +2285,10 @@ static int ssi_gcm_setauthsize(struct crypto_aead *authenc,
- static int ssi_rfc4106_gcm_setauthsize(struct crypto_aead *authenc,
- 				       unsigned int authsize)
- {
--	SSI_LOG_DEBUG("authsize %d\n", authsize);
-+	struct ssi_aead_ctx *ctx = crypto_aead_ctx(authenc);
-+	struct device *dev = DEV(ctx->drvdata);
-+
-+	dev_dbg(dev, "authsize %d\n", authsize);
+-ENTRY(aes_dec_blk)
++SYM_FUNC_START(aes_dec_blk)
+ 	push    %ebp
+ 	mov     ctx(%esp),%ebp
  
- 	switch (authsize) {
- 	case 8:
-@@ -2273,7 +2305,10 @@ static int ssi_rfc4106_gcm_setauthsize(struct crypto_aead *authenc,
- static int ssi_rfc4543_gcm_setauthsize(struct crypto_aead *authenc,
- 				       unsigned int authsize)
- {
--	SSI_LOG_DEBUG("authsize %d\n", authsize);
-+	struct ssi_aead_ctx *ctx = crypto_aead_ctx(authenc);
-+	struct device *dev = DEV(ctx->drvdata);
-+
-+	dev_dbg(dev, "authsize %d\n", authsize);
+@@ -359,4 +359,4 @@ ENTRY(aes_dec_blk)
+ 	mov     %r0,(%ebp)
+ 	pop     %ebp
+ 	ret
+-ENDPROC(aes_dec_blk)
++SYM_FUNC_END(aes_dec_blk)
+diff --git a/arch/x86/crypto/aes-x86_64-asm_64.S b/arch/x86/crypto/aes-x86_64-asm_64.S
+index 8739cf7795de..22c44ad3ef42 100644
+--- a/arch/x86/crypto/aes-x86_64-asm_64.S
++++ b/arch/x86/crypto/aes-x86_64-asm_64.S
+@@ -49,7 +49,7 @@
+ #define R11	%r11
  
- 	if (authsize != 16)
- 		return -EINVAL;
-@@ -2285,11 +2320,14 @@ static int ssi_rfc4106_gcm_encrypt(struct aead_request *req)
- {
- 	/* Very similar to ssi_aead_encrypt() above. */
+ #define prologue(FUNC,KEY,B128,B192,r1,r2,r5,r6,r7,r8,r9,r10,r11) \
+-	ENTRY(FUNC);			\
++	SYM_FUNC_START(FUNC);		\
+ 	movq	r1,r2;			\
+ 	leaq	KEY+48(r8),r9;		\
+ 	movq	r10,r11;		\
+@@ -75,7 +75,7 @@
+ 	movl	r7 ## E,8(r9);		\
+ 	movl	r8 ## E,12(r9);		\
+ 	ret;				\
+-	ENDPROC(FUNC);
++	SYM_FUNC_END(FUNC);
  
-+	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
-+	struct ssi_aead_ctx *ctx = crypto_aead_ctx(tfm);
-+	struct device *dev = DEV(ctx->drvdata);
- 	struct aead_req_ctx *areq_ctx = aead_request_ctx(req);
- 	int rc = -EINVAL;
- 
- 	if (!valid_assoclen(req)) {
--		SSI_LOG_ERR("invalid Assoclen:%u\n", req->assoclen);
-+		dev_err(dev, "invalid Assoclen:%u\n", req->assoclen);
- 		goto out;
- 	}
- 
-@@ -2337,11 +2375,14 @@ static int ssi_rfc4106_gcm_decrypt(struct aead_request *req)
- {
- 	/* Very similar to ssi_aead_decrypt() above. */
- 
-+	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
-+	struct ssi_aead_ctx *ctx = crypto_aead_ctx(tfm);
-+	struct device *dev = DEV(ctx->drvdata);
- 	struct aead_req_ctx *areq_ctx = aead_request_ctx(req);
- 	int rc = -EINVAL;
- 
- 	if (!valid_assoclen(req)) {
--		SSI_LOG_ERR("invalid Assoclen:%u\n", req->assoclen);
-+		dev_err(dev, "invalid Assoclen:%u\n", req->assoclen);
- 		goto out;
- 	}
- 
-@@ -2641,16 +2682,17 @@ static struct ssi_alg_template aead_algs[] = {
- #endif /*SSI_CC_HAS_AES_GCM*/
- };
- 
--static struct ssi_crypto_alg *ssi_aead_create_alg(struct ssi_alg_template *template)
-+static struct ssi_crypto_alg *ssi_aead_create_alg(
-+			struct ssi_alg_template *template,
-+			struct device *dev)
- {
- 	struct ssi_crypto_alg *t_alg;
- 	struct aead_alg *alg;
- 
- 	t_alg = kzalloc(sizeof(*t_alg), GFP_KERNEL);
--	if (!t_alg) {
--		SSI_LOG_ERR("failed to allocate t_alg\n");
-+	if (!t_alg)
- 		return ERR_PTR(-ENOMEM);
--	}
-+
- 	alg = &template->template_aead;
- 
- 	snprintf(alg->base.cra_name, CRYPTO_MAX_ALG_NAME, "%s", template->name);
-@@ -2700,6 +2742,7 @@ int ssi_aead_alloc(struct ssi_drvdata *drvdata)
- 	struct ssi_crypto_alg *t_alg;
- 	int rc = -ENOMEM;
- 	int alg;
-+	struct device *dev = DEV(drvdata);
- 
- 	aead_handle = kmalloc(sizeof(*aead_handle), GFP_KERNEL);
- 	if (!aead_handle) {
-@@ -2713,29 +2756,30 @@ int ssi_aead_alloc(struct ssi_drvdata *drvdata)
- 	aead_handle->sram_workspace_addr = ssi_sram_mgr_alloc(
- 		drvdata, MAX_HMAC_DIGEST_SIZE);
- 	if (aead_handle->sram_workspace_addr == NULL_SRAM_ADDR) {
--		SSI_LOG_ERR("SRAM pool exhausted\n");
-+		dev_err(dev, "SRAM pool exhausted\n");
- 		rc = -ENOMEM;
- 		goto fail1;
- 	}
- 
- 	/* Linux crypto */
- 	for (alg = 0; alg < ARRAY_SIZE(aead_algs); alg++) {
--		t_alg = ssi_aead_create_alg(&aead_algs[alg]);
-+		t_alg = ssi_aead_create_alg(&aead_algs[alg], dev);
- 		if (IS_ERR(t_alg)) {
- 			rc = PTR_ERR(t_alg);
--			SSI_LOG_ERR("%s alg allocation failed\n",
--				    aead_algs[alg].driver_name);
-+			dev_err(dev, "%s alg allocation failed\n",
-+				aead_algs[alg].driver_name);
- 			goto fail1;
- 		}
- 		t_alg->drvdata = drvdata;
- 		rc = crypto_register_aead(&t_alg->aead_alg);
- 		if (unlikely(rc != 0)) {
--			SSI_LOG_ERR("%s alg registration failed\n",
--				    t_alg->aead_alg.base.cra_driver_name);
-+			dev_err(dev, "%s alg registration failed\n",
-+				t_alg->aead_alg.base.cra_driver_name);
- 			goto fail2;
- 		} else {
- 			list_add_tail(&t_alg->entry, &aead_handle->aead_list);
--			SSI_LOG_DEBUG("Registered %s\n", t_alg->aead_alg.base.cra_driver_name);
-+			dev_dbg(dev, "Registered %s\n",
-+				t_alg->aead_alg.base.cra_driver_name);
- 		}
- 	}
- 
-diff --git a/drivers/staging/ccree/ssi_buffer_mgr.c b/drivers/staging/ccree/ssi_buffer_mgr.c
-index a349bb1..36a118c 100644
---- a/drivers/staging/ccree/ssi_buffer_mgr.c
-+++ b/drivers/staging/ccree/ssi_buffer_mgr.c
-@@ -33,14 +33,10 @@
- #include "ssi_hash.h"
- #include "ssi_aead.h"
- 
--#ifdef CC_DEBUG
- #define GET_DMA_BUFFER_TYPE(buff_type) ( \
- 	((buff_type) == SSI_DMA_BUF_NULL) ? "BUF_NULL" : \
- 	((buff_type) == SSI_DMA_BUF_DLLI) ? "BUF_DLLI" : \
- 	((buff_type) == SSI_DMA_BUF_MLLI) ? "BUF_MLLI" : "BUF_INVALID")
--#else
--#define GET_DMA_BUFFER_TYPE(buff_type)
--#endif
- 
- enum dma_buffer_type {
- 	DMA_NULL_TYPE = -1,
-@@ -76,7 +72,8 @@ struct buffer_array {
-  * @lbytes: [OUT] Returns the amount of bytes at the last entry
+ #define round(TAB,OFFSET,r1,r2,r3,r4,r5,r6,r7,r8,ra,rb,rc,rd) \
+ 	movzbl	r2 ## H,r5 ## E;	\
+diff --git a/arch/x86/crypto/aes_ctrby8_avx-x86_64.S b/arch/x86/crypto/aes_ctrby8_avx-x86_64.S
+index 5f6a5af9c489..ec437db1fa54 100644
+--- a/arch/x86/crypto/aes_ctrby8_avx-x86_64.S
++++ b/arch/x86/crypto/aes_ctrby8_avx-x86_64.S
+@@ -544,11 +544,11 @@ ddq_add_8:
+  * aes_ctr_enc_128_avx_by8(void *in, void *iv, void *keys, void *out,
+  *			unsigned int num_bytes)
   */
- static unsigned int ssi_buffer_mgr_get_sgl_nents(
--	struct scatterlist *sg_list, unsigned int nbytes, u32 *lbytes, bool *is_chained)
-+	struct device *dev, struct scatterlist *sg_list,
-+	unsigned int nbytes, u32 *lbytes, bool *is_chained)
- {
- 	unsigned int nents = 0;
+-ENTRY(aes_ctr_enc_128_avx_by8)
++SYM_FUNC_START(aes_ctr_enc_128_avx_by8)
+ 	/* call the aes main loop */
+ 	do_aes_ctrmain KEY_128
  
-@@ -93,7 +90,7 @@ static unsigned int ssi_buffer_mgr_get_sgl_nents(
- 				*is_chained = true;
- 		}
- 	}
--	SSI_LOG_DEBUG("nents %d last bytes %d\n", nents, *lbytes);
-+	dev_dbg(dev, "nents %d last bytes %d\n", nents, *lbytes);
- 	return nents;
- }
+-ENDPROC(aes_ctr_enc_128_avx_by8)
++SYM_FUNC_END(aes_ctr_enc_128_avx_by8)
  
-@@ -129,20 +126,20 @@ void ssi_buffer_mgr_zero_sgl(struct scatterlist *sgl, u32 data_len)
-  * @direct:
+ /*
+  * routine to do AES192 CTR enc/decrypt "by8"
+@@ -557,11 +557,11 @@ ENDPROC(aes_ctr_enc_128_avx_by8)
+  * aes_ctr_enc_192_avx_by8(void *in, void *iv, void *keys, void *out,
+  *			unsigned int num_bytes)
   */
- void ssi_buffer_mgr_copy_scatterlist_portion(
--	u8 *dest, struct scatterlist *sg,
--	u32 to_skip,  u32 end,
--	enum ssi_sg_cpy_direct direct)
-+	struct device *dev, u8 *dest,
-+	struct scatterlist *sg, u32 to_skip,
-+	u32 end, enum ssi_sg_cpy_direct direct)
- {
- 	u32 nents, lbytes;
+-ENTRY(aes_ctr_enc_192_avx_by8)
++SYM_FUNC_START(aes_ctr_enc_192_avx_by8)
+ 	/* call the aes main loop */
+ 	do_aes_ctrmain KEY_192
  
--	nents = ssi_buffer_mgr_get_sgl_nents(sg, end, &lbytes, NULL);
-+	nents = ssi_buffer_mgr_get_sgl_nents(dev, sg, end, &lbytes, NULL);
- 	sg_copy_buffer(sg, nents, (void *)dest, (end - to_skip + 1), to_skip,
- 		       (direct == SSI_SG_TO_BUF));
- }
+-ENDPROC(aes_ctr_enc_192_avx_by8)
++SYM_FUNC_END(aes_ctr_enc_192_avx_by8)
  
- static inline int ssi_buffer_mgr_render_buff_to_mlli(
--	dma_addr_t buff_dma, u32 buff_size, u32 *curr_nents,
--	u32 **mlli_entry_pp)
-+	struct device *dev, dma_addr_t buff_dma, u32 buff_size,
-+	u32 *curr_nents, u32 **mlli_entry_pp)
- {
- 	u32 *mlli_entry_p = *mlli_entry_pp;
- 	u32 new_nents;
-@@ -156,9 +153,9 @@ static inline int ssi_buffer_mgr_render_buff_to_mlli(
- 	while (buff_size > CC_MAX_MLLI_ENTRY_SIZE) {
- 		cc_lli_set_addr(mlli_entry_p, buff_dma);
- 		cc_lli_set_size(mlli_entry_p, CC_MAX_MLLI_ENTRY_SIZE);
--		SSI_LOG_DEBUG("entry[%d]: single_buff=0x%08X size=%08X\n", *curr_nents,
--			      mlli_entry_p[LLI_WORD0_OFFSET],
--			      mlli_entry_p[LLI_WORD1_OFFSET]);
-+		dev_dbg(dev, "entry[%d]: single_buff=0x%08X size=%08X\n",
-+			*curr_nents, mlli_entry_p[LLI_WORD0_OFFSET],
-+			mlli_entry_p[LLI_WORD1_OFFSET]);
- 		buff_dma += CC_MAX_MLLI_ENTRY_SIZE;
- 		buff_size -= CC_MAX_MLLI_ENTRY_SIZE;
- 		mlli_entry_p = mlli_entry_p + 2;
-@@ -167,9 +164,9 @@ static inline int ssi_buffer_mgr_render_buff_to_mlli(
- 	/*Last entry */
- 	cc_lli_set_addr(mlli_entry_p, buff_dma);
- 	cc_lli_set_size(mlli_entry_p, buff_size);
--	SSI_LOG_DEBUG("entry[%d]: single_buff=0x%08X size=%08X\n", *curr_nents,
--		      mlli_entry_p[LLI_WORD0_OFFSET],
--		      mlli_entry_p[LLI_WORD1_OFFSET]);
-+	dev_dbg(dev, "entry[%d]: single_buff=0x%08X size=%08X\n",
-+		*curr_nents, mlli_entry_p[LLI_WORD0_OFFSET],
-+		mlli_entry_p[LLI_WORD1_OFFSET]);
- 	mlli_entry_p = mlli_entry_p + 2;
- 	*mlli_entry_pp = mlli_entry_p;
- 	(*curr_nents)++;
-@@ -177,8 +174,9 @@ static inline int ssi_buffer_mgr_render_buff_to_mlli(
- }
+ /*
+  * routine to do AES256 CTR enc/decrypt "by8"
+@@ -570,8 +570,8 @@ ENDPROC(aes_ctr_enc_192_avx_by8)
+  * aes_ctr_enc_256_avx_by8(void *in, void *iv, void *keys, void *out,
+  *			unsigned int num_bytes)
+  */
+-ENTRY(aes_ctr_enc_256_avx_by8)
++SYM_FUNC_START(aes_ctr_enc_256_avx_by8)
+ 	/* call the aes main loop */
+ 	do_aes_ctrmain KEY_256
  
- static inline int ssi_buffer_mgr_render_scatterlist_to_mlli(
--	struct scatterlist *sgl, u32 sgl_data_len, u32 sgl_offset,
--	u32 *curr_nents, u32 **mlli_entry_pp)
-+	struct device *dev, struct scatterlist *sgl,
-+	u32 sgl_data_len, u32 sgl_offset, u32 *curr_nents,
-+	u32 **mlli_entry_pp)
- {
- 	struct scatterlist *curr_sgl = sgl;
- 	u32 *mlli_entry_p = *mlli_entry_pp;
-@@ -192,8 +190,8 @@ static inline int ssi_buffer_mgr_render_scatterlist_to_mlli(
- 				sgl_data_len;
- 		sgl_data_len -= entry_data_len;
- 		rc = ssi_buffer_mgr_render_buff_to_mlli(
--			sg_dma_address(curr_sgl) + sgl_offset, entry_data_len,
--			curr_nents, &mlli_entry_p);
-+			dev, sg_dma_address(curr_sgl) + sgl_offset,
-+			entry_data_len, curr_nents, &mlli_entry_p);
- 		if (rc != 0)
- 			return rc;
+-ENDPROC(aes_ctr_enc_256_avx_by8)
++SYM_FUNC_END(aes_ctr_enc_256_avx_by8)
+diff --git a/arch/x86/crypto/aesni-intel_asm.S b/arch/x86/crypto/aesni-intel_asm.S
+index 426a22192d69..17445fe82660 100644
+--- a/arch/x86/crypto/aesni-intel_asm.S
++++ b/arch/x86/crypto/aesni-intel_asm.S
+@@ -1396,7 +1396,7 @@ _esb_loop_\@:
+ * poly = x^128 + x^127 + x^126 + x^121 + 1
+ *
+ *****************************************************************************/
+-ENTRY(aesni_gcm_dec)
++SYM_FUNC_START(aesni_gcm_dec)
+ 	push	%r12
+ 	push	%r13
+ 	push	%r14
+@@ -1587,7 +1587,7 @@ _return_T_done_decrypt:
+ 	pop	%r13
+ 	pop	%r12
+ 	ret
+-ENDPROC(aesni_gcm_dec)
++SYM_FUNC_END(aesni_gcm_dec)
  
-@@ -212,14 +210,14 @@ static int ssi_buffer_mgr_generate_mlli(
- 	u32 total_nents = 0, prev_total_nents = 0;
- 	int rc = 0, i;
  
--	SSI_LOG_DEBUG("NUM of SG's = %d\n", sg_data->num_of_buffers);
-+	dev_dbg(dev, "NUM of SG's = %d\n", sg_data->num_of_buffers);
+ /*****************************************************************************
+@@ -1673,7 +1673,7 @@ ENDPROC(aesni_gcm_dec)
+ *
+ * poly = x^128 + x^127 + x^126 + x^121 + 1
+ ***************************************************************************/
+-ENTRY(aesni_gcm_enc)
++SYM_FUNC_START(aesni_gcm_enc)
+ 	push	%r12
+ 	push	%r13
+ 	push	%r14
+@@ -1868,7 +1868,7 @@ _return_T_done_encrypt:
+ 	pop	%r13
+ 	pop	%r12
+ 	ret
+-ENDPROC(aesni_gcm_enc)
++SYM_FUNC_END(aesni_gcm_enc)
  
- 	/* Allocate memory from the pointed pool */
- 	mlli_params->mlli_virt_addr = dma_pool_alloc(
- 			mlli_params->curr_pool, GFP_KERNEL,
- 			&mlli_params->mlli_dma_addr);
- 	if (unlikely(!mlli_params->mlli_virt_addr)) {
--		SSI_LOG_ERR("dma_pool_alloc() failed\n");
-+		dev_err(dev, "dma_pool_alloc() failed\n");
- 		rc = -ENOMEM;
- 		goto build_mlli_exit;
- 	}
-@@ -229,12 +227,12 @@ static int ssi_buffer_mgr_generate_mlli(
- 	for (i = 0; i < sg_data->num_of_buffers; i++) {
- 		if (sg_data->type[i] == DMA_SGL_TYPE)
- 			rc = ssi_buffer_mgr_render_scatterlist_to_mlli(
--				sg_data->entry[i].sgl,
--				sg_data->total_data_len[i], sg_data->offset[i], &total_nents,
--				&mlli_p);
-+				dev, sg_data->entry[i].sgl,
-+				sg_data->total_data_len[i], sg_data->offset[i],
-+				&total_nents, &mlli_p);
- 		else /*DMA_BUFF_TYPE*/
- 			rc = ssi_buffer_mgr_render_buff_to_mlli(
--				sg_data->entry[i].buffer_dma,
-+				dev, sg_data->entry[i].buffer_dma,
- 				sg_data->total_data_len[i], &total_nents,
- 				&mlli_p);
- 		if (rc != 0)
-@@ -254,26 +252,23 @@ static int ssi_buffer_mgr_generate_mlli(
- 	/* Set MLLI size for the bypass operation */
- 	mlli_params->mlli_len = (total_nents * LLI_ENTRY_BYTE_SIZE);
+ #endif
  
--	SSI_LOG_DEBUG("MLLI params: "
--		     "virt_addr=%pK dma_addr=%pad mlli_len=0x%X\n",
--		   mlli_params->mlli_virt_addr,
--		   mlli_params->mlli_dma_addr,
--		   mlli_params->mlli_len);
-+	dev_dbg(dev, "MLLI params: virt_addr=%pK dma_addr=%pad mlli_len=0x%X\n",
-+		mlli_params->mlli_virt_addr, &mlli_params->mlli_dma_addr,
-+		mlli_params->mlli_len);
+@@ -1946,7 +1946,7 @@ SYM_FUNC_END(_key_expansion_256b)
+  * int aesni_set_key(struct crypto_aes_ctx *ctx, const u8 *in_key,
+  *                   unsigned int key_len)
+  */
+-ENTRY(aesni_set_key)
++SYM_FUNC_START(aesni_set_key)
+ 	FRAME_BEGIN
+ #ifndef __x86_64__
+ 	pushl KEYP
+@@ -2055,12 +2055,12 @@ ENTRY(aesni_set_key)
+ #endif
+ 	FRAME_END
+ 	ret
+-ENDPROC(aesni_set_key)
++SYM_FUNC_END(aesni_set_key)
  
- build_mlli_exit:
- 	return rc;
- }
+ /*
+  * void aesni_enc(struct crypto_aes_ctx *ctx, u8 *dst, const u8 *src)
+  */
+-ENTRY(aesni_enc)
++SYM_FUNC_START(aesni_enc)
+ 	FRAME_BEGIN
+ #ifndef __x86_64__
+ 	pushl KEYP
+@@ -2079,7 +2079,7 @@ ENTRY(aesni_enc)
+ #endif
+ 	FRAME_END
+ 	ret
+-ENDPROC(aesni_enc)
++SYM_FUNC_END(aesni_enc)
  
- static inline void ssi_buffer_mgr_add_buffer_entry(
--	struct buffer_array *sgl_data,
-+	struct device *dev, struct buffer_array *sgl_data,
- 	dma_addr_t buffer_dma, unsigned int buffer_len,
- 	bool is_last_entry, u32 *mlli_nents)
- {
- 	unsigned int index = sgl_data->num_of_buffers;
+ /*
+  * _aesni_enc1:		internal ABI
+@@ -2249,7 +2249,7 @@ SYM_FUNC_END(_aesni_enc4)
+ /*
+  * void aesni_dec (struct crypto_aes_ctx *ctx, u8 *dst, const u8 *src)
+  */
+-ENTRY(aesni_dec)
++SYM_FUNC_START(aesni_dec)
+ 	FRAME_BEGIN
+ #ifndef __x86_64__
+ 	pushl KEYP
+@@ -2269,7 +2269,7 @@ ENTRY(aesni_dec)
+ #endif
+ 	FRAME_END
+ 	ret
+-ENDPROC(aesni_dec)
++SYM_FUNC_END(aesni_dec)
  
--	SSI_LOG_DEBUG("index=%u single_buff=%pad "
--		     "buffer_len=0x%08X is_last=%d\n",
--		     index, buffer_dma, buffer_len, is_last_entry);
-+	dev_dbg(dev, "index=%u single_buff=%pad buffer_len=0x%08X is_last=%d\n",
-+		index, &buffer_dma, buffer_len, is_last_entry);
- 	sgl_data->nents[index] = 1;
- 	sgl_data->entry[index].buffer_dma = buffer_dma;
- 	sgl_data->offset[index] = 0;
-@@ -287,6 +282,7 @@ static inline void ssi_buffer_mgr_add_buffer_entry(
- }
+ /*
+  * _aesni_dec1:		internal ABI
+@@ -2440,7 +2440,7 @@ SYM_FUNC_END(_aesni_dec4)
+  * void aesni_ecb_enc(struct crypto_aes_ctx *ctx, const u8 *dst, u8 *src,
+  *		      size_t len)
+  */
+-ENTRY(aesni_ecb_enc)
++SYM_FUNC_START(aesni_ecb_enc)
+ 	FRAME_BEGIN
+ #ifndef __x86_64__
+ 	pushl LEN
+@@ -2494,13 +2494,13 @@ ENTRY(aesni_ecb_enc)
+ #endif
+ 	FRAME_END
+ 	ret
+-ENDPROC(aesni_ecb_enc)
++SYM_FUNC_END(aesni_ecb_enc)
  
- static inline void ssi_buffer_mgr_add_scatterlist_entry(
-+	struct device *dev,
- 	struct buffer_array *sgl_data,
- 	unsigned int nents,
- 	struct scatterlist *sgl,
-@@ -297,8 +293,8 @@ static inline void ssi_buffer_mgr_add_scatterlist_entry(
- {
- 	unsigned int index = sgl_data->num_of_buffers;
+ /*
+  * void aesni_ecb_dec(struct crypto_aes_ctx *ctx, const u8 *dst, u8 *src,
+  *		      size_t len);
+  */
+-ENTRY(aesni_ecb_dec)
++SYM_FUNC_START(aesni_ecb_dec)
+ 	FRAME_BEGIN
+ #ifndef __x86_64__
+ 	pushl LEN
+@@ -2555,13 +2555,13 @@ ENTRY(aesni_ecb_dec)
+ #endif
+ 	FRAME_END
+ 	ret
+-ENDPROC(aesni_ecb_dec)
++SYM_FUNC_END(aesni_ecb_dec)
  
--	SSI_LOG_DEBUG("index=%u nents=%u sgl=%pK data_len=0x%08X is_last=%d\n",
--		      index, nents, sgl, data_len, is_last_table);
-+	dev_dbg(dev, "index=%u nents=%u sgl=%pK data_len=0x%08X is_last=%d\n",
-+		index, nents, sgl, data_len, is_last_table);
- 	sgl_data->nents[index] = nents;
- 	sgl_data->entry[index].sgl = sgl;
- 	sgl_data->offset[index] = data_offset;
-@@ -322,7 +318,7 @@ ssi_buffer_mgr_dma_map_sg(struct device *dev, struct scatterlist *sg, u32 nents,
- 		if (!l_sg)
- 			break;
- 		if (unlikely(dma_map_sg(dev, l_sg, 1, direction) != 1)) {
--			SSI_LOG_ERR("dma_map_page() sg buffer failed\n");
-+			dev_err(dev, "dma_map_page() sg buffer failed\n");
- 			goto err;
- 		}
- 		l_sg = sg_next(l_sg);
-@@ -351,26 +347,22 @@ static int ssi_buffer_mgr_map_scatterlist(
- 	if (sg_is_last(sg)) {
- 		/* One entry only case -set to DLLI */
- 		if (unlikely(dma_map_sg(dev, sg, 1, direction) != 1)) {
--			SSI_LOG_ERR("dma_map_sg() single buffer failed\n");
-+			dev_err(dev, "dma_map_sg() single buffer failed\n");
- 			return -ENOMEM;
- 		}
--		SSI_LOG_DEBUG("Mapped sg: dma_address=%pad "
--			     "page=%p addr=%pK offset=%u "
--			     "length=%u\n",
--			     sg_dma_address(sg),
--			     sg_page(sg),
--			     sg_virt(sg),
--			     sg->offset, sg->length);
-+		dev_dbg(dev, "Mapped sg: dma_address=%pad page=%p addr=%pK offset=%u length=%u\n",
-+			&sg_dma_address(sg), sg_page(sg), sg_virt(sg),
-+			sg->offset, sg->length);
- 		*lbytes = nbytes;
- 		*nents = 1;
- 		*mapped_nents = 1;
- 	} else {  /*sg_is_last*/
--		*nents = ssi_buffer_mgr_get_sgl_nents(sg, nbytes, lbytes,
-+		*nents = ssi_buffer_mgr_get_sgl_nents(dev, sg, nbytes, lbytes,
- 						      &is_chained);
- 		if (*nents > max_sg_nents) {
- 			*nents = 0;
--			SSI_LOG_ERR("Too many fragments. current %d max %d\n",
--				    *nents, max_sg_nents);
-+			dev_err(dev, "Too many fragments. current %d max %d\n",
-+				*nents, max_sg_nents);
- 			return -ENOMEM;
- 		}
- 		if (!is_chained) {
-@@ -380,7 +372,7 @@ static int ssi_buffer_mgr_map_scatterlist(
- 			*mapped_nents = dma_map_sg(dev, sg, *nents, direction);
- 			if (unlikely(*mapped_nents == 0)) {
- 				*nents = 0;
--				SSI_LOG_ERR("dma_map_sg() sg buffer failed\n");
-+				dev_err(dev, "dma_map_sg() sg buffer failed\n");
- 				return -ENOMEM;
- 			}
- 		} else {
-@@ -393,7 +385,7 @@ static int ssi_buffer_mgr_map_scatterlist(
- 								  direction);
- 			if (unlikely(*mapped_nents != *nents)) {
- 				*nents = *mapped_nents;
--				SSI_LOG_ERR("dma_map_sg() sg buffer failed\n");
-+				dev_err(dev, "dma_map_sg() sg buffer failed\n");
- 				return -ENOMEM;
- 			}
- 		}
-@@ -409,26 +401,22 @@ ssi_aead_handle_config_buf(struct device *dev,
- 			   struct buffer_array *sg_data,
- 			   unsigned int assoclen)
- {
--	SSI_LOG_DEBUG(" handle additional data config set to   DLLI\n");
-+	dev_dbg(dev, " handle additional data config set to DLLI\n");
- 	/* create sg for the current buffer */
- 	sg_init_one(&areq_ctx->ccm_adata_sg, config_data, AES_BLOCK_SIZE + areq_ctx->ccm_hdr_size);
- 	if (unlikely(dma_map_sg(dev, &areq_ctx->ccm_adata_sg, 1,
- 				DMA_TO_DEVICE) != 1)) {
--			SSI_LOG_ERR("dma_map_sg() "
--			   "config buffer failed\n");
-+			dev_err(dev, "dma_map_sg() config buffer failed\n");
- 			return -ENOMEM;
- 	}
--	SSI_LOG_DEBUG("Mapped curr_buff: dma_address=%pad "
--		     "page=%p addr=%pK "
--		     "offset=%u length=%u\n",
--		     sg_dma_address(&areq_ctx->ccm_adata_sg),
--		     sg_page(&areq_ctx->ccm_adata_sg),
--		     sg_virt(&areq_ctx->ccm_adata_sg),
--		     areq_ctx->ccm_adata_sg.offset,
--		     areq_ctx->ccm_adata_sg.length);
-+	dev_dbg(dev, "Mapped curr_buff: dma_address=%pad page=%p addr=%pK offset=%u length=%u\n",
-+		&sg_dma_address(&areq_ctx->ccm_adata_sg),
-+		sg_page(&areq_ctx->ccm_adata_sg),
-+		sg_virt(&areq_ctx->ccm_adata_sg),
-+		areq_ctx->ccm_adata_sg.offset, areq_ctx->ccm_adata_sg.length);
- 	/* prepare for case of MLLI */
- 	if (assoclen > 0) {
--		ssi_buffer_mgr_add_scatterlist_entry(sg_data, 1,
-+		ssi_buffer_mgr_add_scatterlist_entry(dev, sg_data, 1,
- 						     &areq_ctx->ccm_adata_sg,
- 						     (AES_BLOCK_SIZE + areq_ctx->ccm_hdr_size),
- 						     0, false, NULL);
-@@ -442,28 +430,23 @@ static inline int ssi_ahash_handle_curr_buf(struct device *dev,
- 					    u32 curr_buff_cnt,
- 					    struct buffer_array *sg_data)
- {
--	SSI_LOG_DEBUG(" handle curr buff %x set to   DLLI\n", curr_buff_cnt);
-+	dev_dbg(dev, " handle curr buff %x set to   DLLI\n", curr_buff_cnt);
- 	/* create sg for the current buffer */
- 	sg_init_one(areq_ctx->buff_sg, curr_buff, curr_buff_cnt);
- 	if (unlikely(dma_map_sg(dev, areq_ctx->buff_sg, 1,
- 				DMA_TO_DEVICE) != 1)) {
--			SSI_LOG_ERR("dma_map_sg() "
--			   "src buffer failed\n");
-+			dev_err(dev, "dma_map_sg() src buffer failed\n");
- 			return -ENOMEM;
- 	}
--	SSI_LOG_DEBUG("Mapped curr_buff: dma_address=%pad "
--		     "page=%p addr=%pK "
--		     "offset=%u length=%u\n",
--		     sg_dma_address(areq_ctx->buff_sg),
--		     sg_page(areq_ctx->buff_sg),
--		     sg_virt(areq_ctx->buff_sg),
--		     areq_ctx->buff_sg->offset,
--		     areq_ctx->buff_sg->length);
-+	dev_dbg(dev, "Mapped curr_buff: dma_address=%pad page=%p addr=%pK offset=%u length=%u\n",
-+		&sg_dma_address(areq_ctx->buff_sg), sg_page(areq_ctx->buff_sg),
-+		sg_virt(areq_ctx->buff_sg), areq_ctx->buff_sg->offset,
-+		areq_ctx->buff_sg->length);
- 	areq_ctx->data_dma_buf_type = SSI_DMA_BUF_DLLI;
- 	areq_ctx->curr_sg = areq_ctx->buff_sg;
- 	areq_ctx->in_nents = 0;
- 	/* prepare for case of MLLI */
--	ssi_buffer_mgr_add_scatterlist_entry(sg_data, 1, areq_ctx->buff_sg,
-+	ssi_buffer_mgr_add_scatterlist_entry(dev, sg_data, 1, areq_ctx->buff_sg,
- 					     curr_buff_cnt, 0, false, NULL);
- 	return 0;
- }
-@@ -478,9 +461,8 @@ void ssi_buffer_mgr_unmap_blkcipher_request(
- 	struct blkcipher_req_ctx *req_ctx = (struct blkcipher_req_ctx *)ctx;
+ /*
+  * void aesni_cbc_enc(struct crypto_aes_ctx *ctx, const u8 *dst, u8 *src,
+  *		      size_t len, u8 *iv)
+  */
+-ENTRY(aesni_cbc_enc)
++SYM_FUNC_START(aesni_cbc_enc)
+ 	FRAME_BEGIN
+ #ifndef __x86_64__
+ 	pushl IVP
+@@ -2599,13 +2599,13 @@ ENTRY(aesni_cbc_enc)
+ #endif
+ 	FRAME_END
+ 	ret
+-ENDPROC(aesni_cbc_enc)
++SYM_FUNC_END(aesni_cbc_enc)
  
- 	if (likely(req_ctx->gen_ctx.iv_dma_addr != 0)) {
--		SSI_LOG_DEBUG("Unmapped iv: iv_dma_addr=%pad iv_size=%u\n",
--			      req_ctx->gen_ctx.iv_dma_addr,
--			      ivsize);
-+		dev_dbg(dev, "Unmapped iv: iv_dma_addr=%pad iv_size=%u\n",
-+			&req_ctx->gen_ctx.iv_dma_addr, ivsize);
- 		dma_unmap_single(dev, req_ctx->gen_ctx.iv_dma_addr,
- 				 ivsize,
- 				 req_ctx->is_giv ? DMA_BIDIRECTIONAL :
-@@ -494,11 +476,11 @@ void ssi_buffer_mgr_unmap_blkcipher_request(
- 	}
+ /*
+  * void aesni_cbc_dec(struct crypto_aes_ctx *ctx, const u8 *dst, u8 *src,
+  *		      size_t len, u8 *iv)
+  */
+-ENTRY(aesni_cbc_dec)
++SYM_FUNC_START(aesni_cbc_dec)
+ 	FRAME_BEGIN
+ #ifndef __x86_64__
+ 	pushl IVP
+@@ -2692,7 +2692,7 @@ ENTRY(aesni_cbc_dec)
+ #endif
+ 	FRAME_END
+ 	ret
+-ENDPROC(aesni_cbc_dec)
++SYM_FUNC_END(aesni_cbc_dec)
  
- 	dma_unmap_sg(dev, src, req_ctx->in_nents, DMA_BIDIRECTIONAL);
--	SSI_LOG_DEBUG("Unmapped req->src=%pK\n", sg_virt(src));
-+	dev_dbg(dev, "Unmapped req->src=%pK\n", sg_virt(src));
+ #ifdef __x86_64__
+ .pushsection .rodata
+@@ -2754,7 +2754,7 @@ SYM_FUNC_END(_aesni_inc)
+  * void aesni_ctr_enc(struct crypto_aes_ctx *ctx, const u8 *dst, u8 *src,
+  *		      size_t len, u8 *iv)
+  */
+-ENTRY(aesni_ctr_enc)
++SYM_FUNC_START(aesni_ctr_enc)
+ 	FRAME_BEGIN
+ 	cmp $16, LEN
+ 	jb .Lctr_enc_just_ret
+@@ -2811,7 +2811,7 @@ ENTRY(aesni_ctr_enc)
+ .Lctr_enc_just_ret:
+ 	FRAME_END
+ 	ret
+-ENDPROC(aesni_ctr_enc)
++SYM_FUNC_END(aesni_ctr_enc)
  
- 	if (src != dst) {
- 		dma_unmap_sg(dev, dst, req_ctx->out_nents, DMA_BIDIRECTIONAL);
--		SSI_LOG_DEBUG("Unmapped req->dst=%pK\n", sg_virt(dst));
-+		dev_dbg(dev, "Unmapped req->dst=%pK\n", sg_virt(dst));
- 	}
- }
+ /*
+  * _aesni_gf128mul_x_ble:		internal ABI
+@@ -2835,7 +2835,7 @@ ENDPROC(aesni_ctr_enc)
+  * void aesni_xts_crypt8(struct crypto_aes_ctx *ctx, const u8 *dst, u8 *src,
+  *			 bool enc, u8 *iv)
+  */
+-ENTRY(aesni_xts_crypt8)
++SYM_FUNC_START(aesni_xts_crypt8)
+ 	FRAME_BEGIN
+ 	cmpb $0, %cl
+ 	movl $0, %ecx
+@@ -2939,6 +2939,6 @@ ENTRY(aesni_xts_crypt8)
  
-@@ -534,13 +516,12 @@ int ssi_buffer_mgr_map_blkcipher_request(
- 				       DMA_TO_DEVICE);
- 		if (unlikely(dma_mapping_error(dev,
- 					       req_ctx->gen_ctx.iv_dma_addr))) {
--			SSI_LOG_ERR("Mapping iv %u B at va=%pK "
--				   "for DMA failed\n", ivsize, info);
-+			dev_err(dev, "Mapping iv %u B at va=%pK for DMA failed\n",
-+				ivsize, info);
- 			return -ENOMEM;
- 		}
--		SSI_LOG_DEBUG("Mapped iv %u B at va=%pK to dma=%pad\n",
--			      ivsize, info,
--			      req_ctx->gen_ctx.iv_dma_addr);
-+		dev_dbg(dev, "Mapped iv %u B at va=%pK to dma=%pad\n",
-+			ivsize, info, &req_ctx->gen_ctx.iv_dma_addr);
- 	} else {
- 		req_ctx->gen_ctx.iv_dma_addr = 0;
- 	}
-@@ -562,7 +543,7 @@ int ssi_buffer_mgr_map_blkcipher_request(
- 		/* Handle inplace operation */
- 		if (unlikely(req_ctx->dma_buf_type == SSI_DMA_BUF_MLLI)) {
- 			req_ctx->out_nents = 0;
--			ssi_buffer_mgr_add_scatterlist_entry(&sg_data,
-+			ssi_buffer_mgr_add_scatterlist_entry(dev, &sg_data,
- 							     req_ctx->in_nents,
- 							     src, nbytes, 0,
- 							     true,
-@@ -582,12 +563,12 @@ int ssi_buffer_mgr_map_blkcipher_request(
- 			req_ctx->dma_buf_type = SSI_DMA_BUF_MLLI;
+ 	FRAME_END
+ 	ret
+-ENDPROC(aesni_xts_crypt8)
++SYM_FUNC_END(aesni_xts_crypt8)
  
- 		if (unlikely((req_ctx->dma_buf_type == SSI_DMA_BUF_MLLI))) {
--			ssi_buffer_mgr_add_scatterlist_entry(&sg_data,
-+			ssi_buffer_mgr_add_scatterlist_entry(dev, &sg_data,
- 							     req_ctx->in_nents,
- 							     src, nbytes, 0,
- 							     true,
- 							     &req_ctx->in_mlli_nents);
--			ssi_buffer_mgr_add_scatterlist_entry(&sg_data,
-+			ssi_buffer_mgr_add_scatterlist_entry(dev, &sg_data,
- 							     req_ctx->out_nents,
- 							     dst, nbytes, 0,
- 							     true,
-@@ -602,8 +583,8 @@ int ssi_buffer_mgr_map_blkcipher_request(
- 			goto ablkcipher_exit;
- 	}
+ #endif
+diff --git a/arch/x86/crypto/aesni-intel_avx-x86_64.S b/arch/x86/crypto/aesni-intel_avx-x86_64.S
+index faecb1518bf8..ee056694e54d 100644
+--- a/arch/x86/crypto/aesni-intel_avx-x86_64.S
++++ b/arch/x86/crypto/aesni-intel_avx-x86_64.S
+@@ -1531,7 +1531,7 @@ _return_T_done\@:
+ #        (gcm_data     *my_ctx_data,
+ #        u8     *hash_subkey)# /* H, the Hash sub key input. Data starts on a 16-byte boundary. */
+ #############################################################
+-ENTRY(aesni_gcm_precomp_avx_gen2)
++SYM_FUNC_START(aesni_gcm_precomp_avx_gen2)
+         #the number of pushes must equal STACK_OFFSET
+         push    %r12
+         push    %r13
+@@ -1574,7 +1574,7 @@ ENTRY(aesni_gcm_precomp_avx_gen2)
+         pop     %r13
+         pop     %r12
+         ret
+-ENDPROC(aesni_gcm_precomp_avx_gen2)
++SYM_FUNC_END(aesni_gcm_precomp_avx_gen2)
  
--	SSI_LOG_DEBUG("areq_ctx->dma_buf_type = %s\n",
--		      GET_DMA_BUFFER_TYPE(req_ctx->dma_buf_type));
-+	dev_dbg(dev, "areq_ctx->dma_buf_type = %s\n",
-+		GET_DMA_BUFFER_TYPE(req_ctx->dma_buf_type));
+ ###############################################################################
+ #void   aesni_gcm_enc_avx_gen2(
+@@ -1592,10 +1592,10 @@ ENDPROC(aesni_gcm_precomp_avx_gen2)
+ #        u64     auth_tag_len)# /* Authenticated Tag Length in bytes.
+ #				Valid values are 16 (most likely), 12 or 8. */
+ ###############################################################################
+-ENTRY(aesni_gcm_enc_avx_gen2)
++SYM_FUNC_START(aesni_gcm_enc_avx_gen2)
+         GCM_ENC_DEC_AVX     ENC
+ 	ret
+-ENDPROC(aesni_gcm_enc_avx_gen2)
++SYM_FUNC_END(aesni_gcm_enc_avx_gen2)
  
- 	return 0;
+ ###############################################################################
+ #void   aesni_gcm_dec_avx_gen2(
+@@ -1613,10 +1613,10 @@ ENDPROC(aesni_gcm_enc_avx_gen2)
+ #        u64     auth_tag_len)# /* Authenticated Tag Length in bytes.
+ #				Valid values are 16 (most likely), 12 or 8. */
+ ###############################################################################
+-ENTRY(aesni_gcm_dec_avx_gen2)
++SYM_FUNC_START(aesni_gcm_dec_avx_gen2)
+         GCM_ENC_DEC_AVX     DEC
+ 	ret
+-ENDPROC(aesni_gcm_dec_avx_gen2)
++SYM_FUNC_END(aesni_gcm_dec_avx_gen2)
+ #endif /* CONFIG_AS_AVX */
  
-@@ -669,30 +650,34 @@ void ssi_buffer_mgr_unmap_aead_request(
- 	 *allocated and should be released
+ #ifdef CONFIG_AS_AVX2
+@@ -2855,7 +2855,7 @@ _return_T_done\@:
+ #        u8     *hash_subkey)# /* H, the Hash sub key input.
+ #				Data starts on a 16-byte boundary. */
+ #############################################################
+-ENTRY(aesni_gcm_precomp_avx_gen4)
++SYM_FUNC_START(aesni_gcm_precomp_avx_gen4)
+         #the number of pushes must equal STACK_OFFSET
+         push    %r12
+         push    %r13
+@@ -2898,7 +2898,7 @@ ENTRY(aesni_gcm_precomp_avx_gen4)
+         pop     %r13
+         pop     %r12
+         ret
+-ENDPROC(aesni_gcm_precomp_avx_gen4)
++SYM_FUNC_END(aesni_gcm_precomp_avx_gen4)
+ 
+ 
+ ###############################################################################
+@@ -2917,10 +2917,10 @@ ENDPROC(aesni_gcm_precomp_avx_gen4)
+ #        u64     auth_tag_len)# /* Authenticated Tag Length in bytes.
+ #				Valid values are 16 (most likely), 12 or 8. */
+ ###############################################################################
+-ENTRY(aesni_gcm_enc_avx_gen4)
++SYM_FUNC_START(aesni_gcm_enc_avx_gen4)
+         GCM_ENC_DEC_AVX2     ENC
+ 	ret
+-ENDPROC(aesni_gcm_enc_avx_gen4)
++SYM_FUNC_END(aesni_gcm_enc_avx_gen4)
+ 
+ ###############################################################################
+ #void   aesni_gcm_dec_avx_gen4(
+@@ -2938,9 +2938,9 @@ ENDPROC(aesni_gcm_enc_avx_gen4)
+ #        u64     auth_tag_len)# /* Authenticated Tag Length in bytes.
+ #				Valid values are 16 (most likely), 12 or 8. */
+ ###############################################################################
+-ENTRY(aesni_gcm_dec_avx_gen4)
++SYM_FUNC_START(aesni_gcm_dec_avx_gen4)
+         GCM_ENC_DEC_AVX2     DEC
+ 	ret
+-ENDPROC(aesni_gcm_dec_avx_gen4)
++SYM_FUNC_END(aesni_gcm_dec_avx_gen4)
+ 
+ #endif /* CONFIG_AS_AVX2 */
+diff --git a/arch/x86/crypto/blowfish-x86_64-asm_64.S b/arch/x86/crypto/blowfish-x86_64-asm_64.S
+index 8c1fcb6bad21..70c34850ee0b 100644
+--- a/arch/x86/crypto/blowfish-x86_64-asm_64.S
++++ b/arch/x86/crypto/blowfish-x86_64-asm_64.S
+@@ -118,7 +118,7 @@
+ 	bswapq 			RX0; \
+ 	xorq RX0, 		(RIO);
+ 
+-ENTRY(__blowfish_enc_blk)
++SYM_FUNC_START(__blowfish_enc_blk)
+ 	/* input:
+ 	 *	%rdi: ctx
+ 	 *	%rsi: dst
+@@ -154,9 +154,9 @@ ENTRY(__blowfish_enc_blk)
+ .L__enc_xor:
+ 	xor_block();
+ 	ret;
+-ENDPROC(__blowfish_enc_blk)
++SYM_FUNC_END(__blowfish_enc_blk)
+ 
+-ENTRY(blowfish_dec_blk)
++SYM_FUNC_START(blowfish_dec_blk)
+ 	/* input:
+ 	 *	%rdi: ctx
+ 	 *	%rsi: dst
+@@ -186,7 +186,7 @@ ENTRY(blowfish_dec_blk)
+ 	movq %r11, %r12;
+ 
+ 	ret;
+-ENDPROC(blowfish_dec_blk)
++SYM_FUNC_END(blowfish_dec_blk)
+ 
+ /**********************************************************************
+   4-way blowfish, four blocks parallel
+@@ -298,7 +298,7 @@ ENDPROC(blowfish_dec_blk)
+ 	bswapq 			RX3; \
+ 	xorq RX3,		24(RIO);
+ 
+-ENTRY(__blowfish_enc_blk_4way)
++SYM_FUNC_START(__blowfish_enc_blk_4way)
+ 	/* input:
+ 	 *	%rdi: ctx
+ 	 *	%rsi: dst
+@@ -345,9 +345,9 @@ ENTRY(__blowfish_enc_blk_4way)
+ 	popq %rbx;
+ 	popq %r12;
+ 	ret;
+-ENDPROC(__blowfish_enc_blk_4way)
++SYM_FUNC_END(__blowfish_enc_blk_4way)
+ 
+-ENTRY(blowfish_dec_blk_4way)
++SYM_FUNC_START(blowfish_dec_blk_4way)
+ 	/* input:
+ 	 *	%rdi: ctx
+ 	 *	%rsi: dst
+@@ -380,4 +380,4 @@ ENTRY(blowfish_dec_blk_4way)
+ 	popq %r12;
+ 
+ 	ret;
+-ENDPROC(blowfish_dec_blk_4way)
++SYM_FUNC_END(blowfish_dec_blk_4way)
+diff --git a/arch/x86/crypto/camellia-aesni-avx-asm_64.S b/arch/x86/crypto/camellia-aesni-avx-asm_64.S
+index 8b6a65524067..c055e844203f 100644
+--- a/arch/x86/crypto/camellia-aesni-avx-asm_64.S
++++ b/arch/x86/crypto/camellia-aesni-avx-asm_64.S
+@@ -892,7 +892,7 @@ SYM_FUNC_START_LOCAL(__camellia_dec_blk16)
+ 	jmp .Ldec_max24;
+ SYM_FUNC_END(__camellia_dec_blk16)
+ 
+-ENTRY(camellia_ecb_enc_16way)
++SYM_FUNC_START(camellia_ecb_enc_16way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst (16 blocks)
+@@ -915,9 +915,9 @@ ENTRY(camellia_ecb_enc_16way)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(camellia_ecb_enc_16way)
++SYM_FUNC_END(camellia_ecb_enc_16way)
+ 
+-ENTRY(camellia_ecb_dec_16way)
++SYM_FUNC_START(camellia_ecb_dec_16way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst (16 blocks)
+@@ -945,9 +945,9 @@ ENTRY(camellia_ecb_dec_16way)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(camellia_ecb_dec_16way)
++SYM_FUNC_END(camellia_ecb_dec_16way)
+ 
+-ENTRY(camellia_cbc_dec_16way)
++SYM_FUNC_START(camellia_cbc_dec_16way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst (16 blocks)
+@@ -996,7 +996,7 @@ ENTRY(camellia_cbc_dec_16way)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(camellia_cbc_dec_16way)
++SYM_FUNC_END(camellia_cbc_dec_16way)
+ 
+ #define inc_le128(x, minus_one, tmp) \
+ 	vpcmpeqq minus_one, x, tmp; \
+@@ -1004,7 +1004,7 @@ ENDPROC(camellia_cbc_dec_16way)
+ 	vpslldq $8, tmp, tmp; \
+ 	vpsubq tmp, x, x;
+ 
+-ENTRY(camellia_ctr_16way)
++SYM_FUNC_START(camellia_ctr_16way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst (16 blocks)
+@@ -1109,7 +1109,7 @@ ENTRY(camellia_ctr_16way)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(camellia_ctr_16way)
++SYM_FUNC_END(camellia_ctr_16way)
+ 
+ #define gf128mul_x_ble(iv, mask, tmp) \
+ 	vpsrad $31, iv, tmp; \
+@@ -1255,7 +1255,7 @@ SYM_FUNC_START_LOCAL(camellia_xts_crypt_16way)
+ 	ret;
+ SYM_FUNC_END(camellia_xts_crypt_16way)
+ 
+-ENTRY(camellia_xts_enc_16way)
++SYM_FUNC_START(camellia_xts_enc_16way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst (16 blocks)
+@@ -1267,9 +1267,9 @@ ENTRY(camellia_xts_enc_16way)
+ 	leaq __camellia_enc_blk16, %r9;
+ 
+ 	jmp camellia_xts_crypt_16way;
+-ENDPROC(camellia_xts_enc_16way)
++SYM_FUNC_END(camellia_xts_enc_16way)
+ 
+-ENTRY(camellia_xts_dec_16way)
++SYM_FUNC_START(camellia_xts_dec_16way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst (16 blocks)
+@@ -1285,4 +1285,4 @@ ENTRY(camellia_xts_dec_16way)
+ 	leaq __camellia_dec_blk16, %r9;
+ 
+ 	jmp camellia_xts_crypt_16way;
+-ENDPROC(camellia_xts_dec_16way)
++SYM_FUNC_END(camellia_xts_dec_16way)
+diff --git a/arch/x86/crypto/camellia-aesni-avx2-asm_64.S b/arch/x86/crypto/camellia-aesni-avx2-asm_64.S
+index 96b44ad85c59..0c1af357c86d 100644
+--- a/arch/x86/crypto/camellia-aesni-avx2-asm_64.S
++++ b/arch/x86/crypto/camellia-aesni-avx2-asm_64.S
+@@ -935,7 +935,7 @@ SYM_FUNC_START_LOCAL(__camellia_dec_blk32)
+ 	jmp .Ldec_max24;
+ SYM_FUNC_END(__camellia_dec_blk32)
+ 
+-ENTRY(camellia_ecb_enc_32way)
++SYM_FUNC_START(camellia_ecb_enc_32way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst (32 blocks)
+@@ -962,9 +962,9 @@ ENTRY(camellia_ecb_enc_32way)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(camellia_ecb_enc_32way)
++SYM_FUNC_END(camellia_ecb_enc_32way)
+ 
+-ENTRY(camellia_ecb_dec_32way)
++SYM_FUNC_START(camellia_ecb_dec_32way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst (32 blocks)
+@@ -996,9 +996,9 @@ ENTRY(camellia_ecb_dec_32way)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(camellia_ecb_dec_32way)
++SYM_FUNC_END(camellia_ecb_dec_32way)
+ 
+-ENTRY(camellia_cbc_dec_32way)
++SYM_FUNC_START(camellia_cbc_dec_32way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst (32 blocks)
+@@ -1064,7 +1064,7 @@ ENTRY(camellia_cbc_dec_32way)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(camellia_cbc_dec_32way)
++SYM_FUNC_END(camellia_cbc_dec_32way)
+ 
+ #define inc_le128(x, minus_one, tmp) \
+ 	vpcmpeqq minus_one, x, tmp; \
+@@ -1080,7 +1080,7 @@ ENDPROC(camellia_cbc_dec_32way)
+ 	vpslldq $8, tmp1, tmp1; \
+ 	vpsubq tmp1, x, x;
+ 
+-ENTRY(camellia_ctr_32way)
++SYM_FUNC_START(camellia_ctr_32way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst (32 blocks)
+@@ -1204,7 +1204,7 @@ ENTRY(camellia_ctr_32way)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(camellia_ctr_32way)
++SYM_FUNC_END(camellia_ctr_32way)
+ 
+ #define gf128mul_x_ble(iv, mask, tmp) \
+ 	vpsrad $31, iv, tmp; \
+@@ -1373,7 +1373,7 @@ SYM_FUNC_START_LOCAL(camellia_xts_crypt_32way)
+ 	ret;
+ SYM_FUNC_END(camellia_xts_crypt_32way)
+ 
+-ENTRY(camellia_xts_enc_32way)
++SYM_FUNC_START(camellia_xts_enc_32way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst (32 blocks)
+@@ -1386,9 +1386,9 @@ ENTRY(camellia_xts_enc_32way)
+ 	leaq __camellia_enc_blk32, %r9;
+ 
+ 	jmp camellia_xts_crypt_32way;
+-ENDPROC(camellia_xts_enc_32way)
++SYM_FUNC_END(camellia_xts_enc_32way)
+ 
+-ENTRY(camellia_xts_dec_32way)
++SYM_FUNC_START(camellia_xts_dec_32way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst (32 blocks)
+@@ -1404,4 +1404,4 @@ ENTRY(camellia_xts_dec_32way)
+ 	leaq __camellia_dec_blk32, %r9;
+ 
+ 	jmp camellia_xts_crypt_32way;
+-ENDPROC(camellia_xts_dec_32way)
++SYM_FUNC_END(camellia_xts_dec_32way)
+diff --git a/arch/x86/crypto/camellia-x86_64-asm_64.S b/arch/x86/crypto/camellia-x86_64-asm_64.S
+index 95ba6956a7f6..4d77c9dcddbd 100644
+--- a/arch/x86/crypto/camellia-x86_64-asm_64.S
++++ b/arch/x86/crypto/camellia-x86_64-asm_64.S
+@@ -190,7 +190,7 @@
+ 	bswapq				RAB0; \
+ 	movq RAB0,			4*2(RIO);
+ 
+-ENTRY(__camellia_enc_blk)
++SYM_FUNC_START(__camellia_enc_blk)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -235,9 +235,9 @@ ENTRY(__camellia_enc_blk)
+ 
+ 	movq RR12, %r12;
+ 	ret;
+-ENDPROC(__camellia_enc_blk)
++SYM_FUNC_END(__camellia_enc_blk)
+ 
+-ENTRY(camellia_dec_blk)
++SYM_FUNC_START(camellia_dec_blk)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -273,7 +273,7 @@ ENTRY(camellia_dec_blk)
+ 
+ 	movq RR12, %r12;
+ 	ret;
+-ENDPROC(camellia_dec_blk)
++SYM_FUNC_END(camellia_dec_blk)
+ 
+ /**********************************************************************
+   2-way camellia
+@@ -424,7 +424,7 @@ ENDPROC(camellia_dec_blk)
+ 		bswapq				RAB1; \
+ 		movq RAB1,			12*2(RIO);
+ 
+-ENTRY(__camellia_enc_blk_2way)
++SYM_FUNC_START(__camellia_enc_blk_2way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -471,9 +471,9 @@ ENTRY(__camellia_enc_blk_2way)
+ 	movq RR12, %r12;
+ 	popq %rbx;
+ 	ret;
+-ENDPROC(__camellia_enc_blk_2way)
++SYM_FUNC_END(__camellia_enc_blk_2way)
+ 
+-ENTRY(camellia_dec_blk_2way)
++SYM_FUNC_START(camellia_dec_blk_2way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -511,4 +511,4 @@ ENTRY(camellia_dec_blk_2way)
+ 	movq RR12, %r12;
+ 	movq RXOR, %rbx;
+ 	ret;
+-ENDPROC(camellia_dec_blk_2way)
++SYM_FUNC_END(camellia_dec_blk_2way)
+diff --git a/arch/x86/crypto/cast5-avx-x86_64-asm_64.S b/arch/x86/crypto/cast5-avx-x86_64-asm_64.S
+index b26df120413c..3789c61f6166 100644
+--- a/arch/x86/crypto/cast5-avx-x86_64-asm_64.S
++++ b/arch/x86/crypto/cast5-avx-x86_64-asm_64.S
+@@ -374,7 +374,7 @@ SYM_FUNC_START_LOCAL(__cast5_dec_blk16)
+ 	jmp .L__dec_tail;
+ SYM_FUNC_END(__cast5_dec_blk16)
+ 
+-ENTRY(cast5_ecb_enc_16way)
++SYM_FUNC_START(cast5_ecb_enc_16way)
+ 	/* input:
+ 	 *	%rdi: ctx
+ 	 *	%rsi: dst
+@@ -409,9 +409,9 @@ ENTRY(cast5_ecb_enc_16way)
+ 	popq %r15;
+ 	FRAME_END
+ 	ret;
+-ENDPROC(cast5_ecb_enc_16way)
++SYM_FUNC_END(cast5_ecb_enc_16way)
+ 
+-ENTRY(cast5_ecb_dec_16way)
++SYM_FUNC_START(cast5_ecb_dec_16way)
+ 	/* input:
+ 	 *	%rdi: ctx
+ 	 *	%rsi: dst
+@@ -447,9 +447,9 @@ ENTRY(cast5_ecb_dec_16way)
+ 	popq %r15;
+ 	FRAME_END
+ 	ret;
+-ENDPROC(cast5_ecb_dec_16way)
++SYM_FUNC_END(cast5_ecb_dec_16way)
+ 
+-ENTRY(cast5_cbc_dec_16way)
++SYM_FUNC_START(cast5_cbc_dec_16way)
+ 	/* input:
+ 	 *	%rdi: ctx
+ 	 *	%rsi: dst
+@@ -499,9 +499,9 @@ ENTRY(cast5_cbc_dec_16way)
+ 	popq %r12;
+ 	FRAME_END
+ 	ret;
+-ENDPROC(cast5_cbc_dec_16way)
++SYM_FUNC_END(cast5_cbc_dec_16way)
+ 
+-ENTRY(cast5_ctr_16way)
++SYM_FUNC_START(cast5_ctr_16way)
+ 	/* input:
+ 	 *	%rdi: ctx
+ 	 *	%rsi: dst
+@@ -575,4 +575,4 @@ ENTRY(cast5_ctr_16way)
+ 	popq %r12;
+ 	FRAME_END
+ 	ret;
+-ENDPROC(cast5_ctr_16way)
++SYM_FUNC_END(cast5_ctr_16way)
+diff --git a/arch/x86/crypto/cast6-avx-x86_64-asm_64.S b/arch/x86/crypto/cast6-avx-x86_64-asm_64.S
+index 0a68e42a00f9..e38ab4571a6b 100644
+--- a/arch/x86/crypto/cast6-avx-x86_64-asm_64.S
++++ b/arch/x86/crypto/cast6-avx-x86_64-asm_64.S
+@@ -356,7 +356,7 @@ SYM_FUNC_START_LOCAL(__cast6_dec_blk8)
+ 	ret;
+ SYM_FUNC_END(__cast6_dec_blk8)
+ 
+-ENTRY(cast6_ecb_enc_8way)
++SYM_FUNC_START(cast6_ecb_enc_8way)
+ 	/* input:
+ 	 *	%rdi: ctx
+ 	 *	%rsi: dst
+@@ -377,9 +377,9 @@ ENTRY(cast6_ecb_enc_8way)
+ 	popq %r15;
+ 	FRAME_END
+ 	ret;
+-ENDPROC(cast6_ecb_enc_8way)
++SYM_FUNC_END(cast6_ecb_enc_8way)
+ 
+-ENTRY(cast6_ecb_dec_8way)
++SYM_FUNC_START(cast6_ecb_dec_8way)
+ 	/* input:
+ 	 *	%rdi: ctx
+ 	 *	%rsi: dst
+@@ -400,9 +400,9 @@ ENTRY(cast6_ecb_dec_8way)
+ 	popq %r15;
+ 	FRAME_END
+ 	ret;
+-ENDPROC(cast6_ecb_dec_8way)
++SYM_FUNC_END(cast6_ecb_dec_8way)
+ 
+-ENTRY(cast6_cbc_dec_8way)
++SYM_FUNC_START(cast6_cbc_dec_8way)
+ 	/* input:
+ 	 *	%rdi: ctx
+ 	 *	%rsi: dst
+@@ -426,9 +426,9 @@ ENTRY(cast6_cbc_dec_8way)
+ 	popq %r12;
+ 	FRAME_END
+ 	ret;
+-ENDPROC(cast6_cbc_dec_8way)
++SYM_FUNC_END(cast6_cbc_dec_8way)
+ 
+-ENTRY(cast6_ctr_8way)
++SYM_FUNC_START(cast6_ctr_8way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -454,9 +454,9 @@ ENTRY(cast6_ctr_8way)
+ 	popq %r12;
+ 	FRAME_END
+ 	ret;
+-ENDPROC(cast6_ctr_8way)
++SYM_FUNC_END(cast6_ctr_8way)
+ 
+-ENTRY(cast6_xts_enc_8way)
++SYM_FUNC_START(cast6_xts_enc_8way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -481,9 +481,9 @@ ENTRY(cast6_xts_enc_8way)
+ 	popq %r15;
+ 	FRAME_END
+ 	ret;
+-ENDPROC(cast6_xts_enc_8way)
++SYM_FUNC_END(cast6_xts_enc_8way)
+ 
+-ENTRY(cast6_xts_dec_8way)
++SYM_FUNC_START(cast6_xts_dec_8way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -508,4 +508,4 @@ ENTRY(cast6_xts_dec_8way)
+ 	popq %r15;
+ 	FRAME_END
+ 	ret;
+-ENDPROC(cast6_xts_dec_8way)
++SYM_FUNC_END(cast6_xts_dec_8way)
+diff --git a/arch/x86/crypto/chacha20-avx2-x86_64.S b/arch/x86/crypto/chacha20-avx2-x86_64.S
+index 3a2dc3dc6cac..f06f181c572a 100644
+--- a/arch/x86/crypto/chacha20-avx2-x86_64.S
++++ b/arch/x86/crypto/chacha20-avx2-x86_64.S
+@@ -28,7 +28,7 @@ CTRINC:	.octa 0x00000003000000020000000100000000
+ 
+ .text
+ 
+-ENTRY(chacha20_8block_xor_avx2)
++SYM_FUNC_START(chacha20_8block_xor_avx2)
+ 	# %rdi: Input state matrix, s
+ 	# %rsi: 8 data blocks output, o
+ 	# %rdx: 8 data blocks input, i
+@@ -445,4 +445,4 @@ ENTRY(chacha20_8block_xor_avx2)
+ 	vzeroupper
+ 	mov		%r8,%rsp
+ 	ret
+-ENDPROC(chacha20_8block_xor_avx2)
++SYM_FUNC_END(chacha20_8block_xor_avx2)
+diff --git a/arch/x86/crypto/chacha20-ssse3-x86_64.S b/arch/x86/crypto/chacha20-ssse3-x86_64.S
+index 3f511a7d73b8..1e8b93bd2d93 100644
+--- a/arch/x86/crypto/chacha20-ssse3-x86_64.S
++++ b/arch/x86/crypto/chacha20-ssse3-x86_64.S
+@@ -23,7 +23,7 @@ CTRINC:	.octa 0x00000003000000020000000100000000
+ 
+ .text
+ 
+-ENTRY(chacha20_block_xor_ssse3)
++SYM_FUNC_START(chacha20_block_xor_ssse3)
+ 	# %rdi: Input state matrix, s
+ 	# %rsi: 1 data block output, o
+ 	# %rdx: 1 data block input, i
+@@ -143,9 +143,9 @@ ENTRY(chacha20_block_xor_ssse3)
+ 	movdqu		%xmm3,0x30(%rsi)
+ 
+ 	ret
+-ENDPROC(chacha20_block_xor_ssse3)
++SYM_FUNC_END(chacha20_block_xor_ssse3)
+ 
+-ENTRY(chacha20_4block_xor_ssse3)
++SYM_FUNC_START(chacha20_4block_xor_ssse3)
+ 	# %rdi: Input state matrix, s
+ 	# %rsi: 4 data blocks output, o
+ 	# %rdx: 4 data blocks input, i
+@@ -627,4 +627,4 @@ ENTRY(chacha20_4block_xor_ssse3)
+ 
+ 	mov		%r11,%rsp
+ 	ret
+-ENDPROC(chacha20_4block_xor_ssse3)
++SYM_FUNC_END(chacha20_4block_xor_ssse3)
+diff --git a/arch/x86/crypto/crc32-pclmul_asm.S b/arch/x86/crypto/crc32-pclmul_asm.S
+index f247304299a2..690d429ef5e7 100644
+--- a/arch/x86/crypto/crc32-pclmul_asm.S
++++ b/arch/x86/crypto/crc32-pclmul_asm.S
+@@ -102,7 +102,7 @@
+  *	                     size_t len, uint crc32)
+  */
+ 
+-ENTRY(crc32_pclmul_le_16) /* buffer and buffer size are 16 bytes aligned */
++SYM_FUNC_START(crc32_pclmul_le_16) /* buffer and buffer size are 16 bytes aligned */
+ 	movdqa  (BUF), %xmm1
+ 	movdqa  0x10(BUF), %xmm2
+ 	movdqa  0x20(BUF), %xmm3
+@@ -243,4 +243,4 @@ fold_64:
+ 	PEXTRD  0x01, %xmm1, %eax
+ 
+ 	ret
+-ENDPROC(crc32_pclmul_le_16)
++SYM_FUNC_END(crc32_pclmul_le_16)
+diff --git a/arch/x86/crypto/crc32c-pcl-intel-asm_64.S b/arch/x86/crypto/crc32c-pcl-intel-asm_64.S
+index 7a7de27c6f41..344ec8d9670b 100644
+--- a/arch/x86/crypto/crc32c-pcl-intel-asm_64.S
++++ b/arch/x86/crypto/crc32c-pcl-intel-asm_64.S
+@@ -73,7 +73,7 @@
+ # unsigned int crc_pcl(u8 *buffer, int len, unsigned int crc_init);
+ 
+ .text
+-ENTRY(crc_pcl)
++SYM_FUNC_START(crc_pcl)
+ #define    bufp		%rdi
+ #define    bufp_dw	%edi
+ #define    bufp_w	%di
+@@ -310,7 +310,7 @@ do_return:
+ 	popq    %rdi
+ 	popq    %rbx
+         ret
+-ENDPROC(crc_pcl)
++SYM_FUNC_END(crc_pcl)
+ 
+ .section	.rodata, "a", @progbits
+         ################################################################
+diff --git a/arch/x86/crypto/crct10dif-pcl-asm_64.S b/arch/x86/crypto/crct10dif-pcl-asm_64.S
+index de04d3e98d8d..f56b499541e0 100644
+--- a/arch/x86/crypto/crct10dif-pcl-asm_64.S
++++ b/arch/x86/crypto/crct10dif-pcl-asm_64.S
+@@ -68,7 +68,7 @@
+ 
+ #define        arg1_low32 %edi
+ 
+-ENTRY(crc_t10dif_pcl)
++SYM_FUNC_START(crc_t10dif_pcl)
+ .align 16
+ 
+ 	# adjust the 16-bit initial_crc value, scale it to 32 bits
+@@ -552,7 +552,7 @@ _only_less_than_2:
+ 
+ 	jmp	_barrett
+ 
+-ENDPROC(crc_t10dif_pcl)
++SYM_FUNC_END(crc_t10dif_pcl)
+ 
+ .section	.rodata, "a", @progbits
+ .align 16
+diff --git a/arch/x86/crypto/des3_ede-asm_64.S b/arch/x86/crypto/des3_ede-asm_64.S
+index 8e49ce117494..82779c08029b 100644
+--- a/arch/x86/crypto/des3_ede-asm_64.S
++++ b/arch/x86/crypto/des3_ede-asm_64.S
+@@ -171,7 +171,7 @@
+ 	movl   left##d,   (io); \
+ 	movl   right##d, 4(io);
+ 
+-ENTRY(des3_ede_x86_64_crypt_blk)
++SYM_FUNC_START(des3_ede_x86_64_crypt_blk)
+ 	/* input:
+ 	 *	%rdi: round keys, CTX
+ 	 *	%rsi: dst
+@@ -253,7 +253,7 @@ ENTRY(des3_ede_x86_64_crypt_blk)
+ 	popq %rbx;
+ 
+ 	ret;
+-ENDPROC(des3_ede_x86_64_crypt_blk)
++SYM_FUNC_END(des3_ede_x86_64_crypt_blk)
+ 
+ /***********************************************************************
+  * 3-way 3DES
+@@ -427,7 +427,7 @@ ENDPROC(des3_ede_x86_64_crypt_blk)
+ #define __movq(src, dst) \
+ 	movq src, dst;
+ 
+-ENTRY(des3_ede_x86_64_crypt_blk_3way)
++SYM_FUNC_START(des3_ede_x86_64_crypt_blk_3way)
+ 	/* input:
+ 	 *	%rdi: ctx, round keys
+ 	 *	%rsi: dst (3 blocks)
+@@ -538,7 +538,7 @@ ENTRY(des3_ede_x86_64_crypt_blk_3way)
+ 	popq %rbx;
+ 
+ 	ret;
+-ENDPROC(des3_ede_x86_64_crypt_blk_3way)
++SYM_FUNC_END(des3_ede_x86_64_crypt_blk_3way)
+ 
+ .section	.rodata, "a", @progbits
+ .align 16
+diff --git a/arch/x86/crypto/ghash-clmulni-intel_asm.S b/arch/x86/crypto/ghash-clmulni-intel_asm.S
+index c3db86842578..12e3a850257b 100644
+--- a/arch/x86/crypto/ghash-clmulni-intel_asm.S
++++ b/arch/x86/crypto/ghash-clmulni-intel_asm.S
+@@ -93,7 +93,7 @@ SYM_FUNC_START_LOCAL(__clmul_gf128mul_ble)
+ SYM_FUNC_END(__clmul_gf128mul_ble)
+ 
+ /* void clmul_ghash_mul(char *dst, const u128 *shash) */
+-ENTRY(clmul_ghash_mul)
++SYM_FUNC_START(clmul_ghash_mul)
+ 	FRAME_BEGIN
+ 	movups (%rdi), DATA
+ 	movups (%rsi), SHASH
+@@ -104,13 +104,13 @@ ENTRY(clmul_ghash_mul)
+ 	movups DATA, (%rdi)
+ 	FRAME_END
+ 	ret
+-ENDPROC(clmul_ghash_mul)
++SYM_FUNC_END(clmul_ghash_mul)
+ 
+ /*
+  * void clmul_ghash_update(char *dst, const char *src, unsigned int srclen,
+  *			   const u128 *shash);
+  */
+-ENTRY(clmul_ghash_update)
++SYM_FUNC_START(clmul_ghash_update)
+ 	FRAME_BEGIN
+ 	cmp $16, %rdx
+ 	jb .Lupdate_just_ret	# check length
+@@ -133,4 +133,4 @@ ENTRY(clmul_ghash_update)
+ .Lupdate_just_ret:
+ 	FRAME_END
+ 	ret
+-ENDPROC(clmul_ghash_update)
++SYM_FUNC_END(clmul_ghash_update)
+diff --git a/arch/x86/crypto/poly1305-avx2-x86_64.S b/arch/x86/crypto/poly1305-avx2-x86_64.S
+index 3b6e70d085da..68b0f4386dc4 100644
+--- a/arch/x86/crypto/poly1305-avx2-x86_64.S
++++ b/arch/x86/crypto/poly1305-avx2-x86_64.S
+@@ -83,7 +83,7 @@ ORMASK:	.octa 0x00000000010000000000000001000000
+ #define d3 %r12
+ #define d4 %r13
+ 
+-ENTRY(poly1305_4block_avx2)
++SYM_FUNC_START(poly1305_4block_avx2)
+ 	# %rdi: Accumulator h[5]
+ 	# %rsi: 64 byte input block m
+ 	# %rdx: Poly1305 key r[5]
+@@ -385,4 +385,4 @@ ENTRY(poly1305_4block_avx2)
+ 	pop		%r12
+ 	pop		%rbx
+ 	ret
+-ENDPROC(poly1305_4block_avx2)
++SYM_FUNC_END(poly1305_4block_avx2)
+diff --git a/arch/x86/crypto/poly1305-sse2-x86_64.S b/arch/x86/crypto/poly1305-sse2-x86_64.S
+index c88c670cb5fc..66715fbedc18 100644
+--- a/arch/x86/crypto/poly1305-sse2-x86_64.S
++++ b/arch/x86/crypto/poly1305-sse2-x86_64.S
+@@ -50,7 +50,7 @@ ORMASK:	.octa 0x00000000010000000000000001000000
+ #define d3 %r11
+ #define d4 %r12
+ 
+-ENTRY(poly1305_block_sse2)
++SYM_FUNC_START(poly1305_block_sse2)
+ 	# %rdi: Accumulator h[5]
+ 	# %rsi: 16 byte input block m
+ 	# %rdx: Poly1305 key r[5]
+@@ -276,7 +276,7 @@ ENTRY(poly1305_block_sse2)
+ 	pop		%r12
+ 	pop		%rbx
+ 	ret
+-ENDPROC(poly1305_block_sse2)
++SYM_FUNC_END(poly1305_block_sse2)
+ 
+ 
+ #define u0 0x00(%r8)
+@@ -301,7 +301,7 @@ ENDPROC(poly1305_block_sse2)
+ #undef d0
+ #define d0 %r13
+ 
+-ENTRY(poly1305_2block_sse2)
++SYM_FUNC_START(poly1305_2block_sse2)
+ 	# %rdi: Accumulator h[5]
+ 	# %rsi: 16 byte input block m
+ 	# %rdx: Poly1305 key r[5]
+@@ -581,4 +581,4 @@ ENTRY(poly1305_2block_sse2)
+ 	pop		%r12
+ 	pop		%rbx
+ 	ret
+-ENDPROC(poly1305_2block_sse2)
++SYM_FUNC_END(poly1305_2block_sse2)
+diff --git a/arch/x86/crypto/salsa20-x86_64-asm_64.S b/arch/x86/crypto/salsa20-x86_64-asm_64.S
+index 9279e0b2d60e..a5f3dd15a755 100644
+--- a/arch/x86/crypto/salsa20-x86_64-asm_64.S
++++ b/arch/x86/crypto/salsa20-x86_64-asm_64.S
+@@ -1,7 +1,7 @@
+ #include <linux/linkage.h>
+ 
+ # enter salsa20_encrypt_bytes
+-ENTRY(salsa20_encrypt_bytes)
++SYM_FUNC_START(salsa20_encrypt_bytes)
+ 	mov	%rsp,%r11
+ 	and	$31,%r11
+ 	add	$256,%r11
+@@ -801,10 +801,10 @@ ENTRY(salsa20_encrypt_bytes)
+ 	# comment:fp stack unchanged by jump
+ 	# goto bytesatleast1
+ 	jmp	._bytesatleast1
+-ENDPROC(salsa20_encrypt_bytes)
++SYM_FUNC_END(salsa20_encrypt_bytes)
+ 
+ # enter salsa20_keysetup
+-ENTRY(salsa20_keysetup)
++SYM_FUNC_START(salsa20_keysetup)
+ 	mov	%rsp,%r11
+ 	and	$31,%r11
+ 	add	$256,%r11
+@@ -890,10 +890,10 @@ ENTRY(salsa20_keysetup)
+ 	mov	%rdi,%rax
+ 	mov	%rsi,%rdx
+ 	ret
+-ENDPROC(salsa20_keysetup)
++SYM_FUNC_END(salsa20_keysetup)
+ 
+ # enter salsa20_ivsetup
+-ENTRY(salsa20_ivsetup)
++SYM_FUNC_START(salsa20_ivsetup)
+ 	mov	%rsp,%r11
+ 	and	$31,%r11
+ 	add	$256,%r11
+@@ -915,4 +915,4 @@ ENTRY(salsa20_ivsetup)
+ 	mov	%rdi,%rax
+ 	mov	%rsi,%rdx
+ 	ret
+-ENDPROC(salsa20_ivsetup)
++SYM_FUNC_END(salsa20_ivsetup)
+diff --git a/arch/x86/crypto/serpent-avx-x86_64-asm_64.S b/arch/x86/crypto/serpent-avx-x86_64-asm_64.S
+index c2d4a1fc9ee8..72de86a8091e 100644
+--- a/arch/x86/crypto/serpent-avx-x86_64-asm_64.S
++++ b/arch/x86/crypto/serpent-avx-x86_64-asm_64.S
+@@ -677,7 +677,7 @@ SYM_FUNC_START_LOCAL(__serpent_dec_blk8_avx)
+ 	ret;
+ SYM_FUNC_END(__serpent_dec_blk8_avx)
+ 
+-ENTRY(serpent_ecb_enc_8way_avx)
++SYM_FUNC_START(serpent_ecb_enc_8way_avx)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -693,9 +693,9 @@ ENTRY(serpent_ecb_enc_8way_avx)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(serpent_ecb_enc_8way_avx)
++SYM_FUNC_END(serpent_ecb_enc_8way_avx)
+ 
+-ENTRY(serpent_ecb_dec_8way_avx)
++SYM_FUNC_START(serpent_ecb_dec_8way_avx)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -711,9 +711,9 @@ ENTRY(serpent_ecb_dec_8way_avx)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(serpent_ecb_dec_8way_avx)
++SYM_FUNC_END(serpent_ecb_dec_8way_avx)
+ 
+-ENTRY(serpent_cbc_dec_8way_avx)
++SYM_FUNC_START(serpent_cbc_dec_8way_avx)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -729,9 +729,9 @@ ENTRY(serpent_cbc_dec_8way_avx)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(serpent_cbc_dec_8way_avx)
++SYM_FUNC_END(serpent_cbc_dec_8way_avx)
+ 
+-ENTRY(serpent_ctr_8way_avx)
++SYM_FUNC_START(serpent_ctr_8way_avx)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -749,9 +749,9 @@ ENTRY(serpent_ctr_8way_avx)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(serpent_ctr_8way_avx)
++SYM_FUNC_END(serpent_ctr_8way_avx)
+ 
+-ENTRY(serpent_xts_enc_8way_avx)
++SYM_FUNC_START(serpent_xts_enc_8way_avx)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -771,9 +771,9 @@ ENTRY(serpent_xts_enc_8way_avx)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(serpent_xts_enc_8way_avx)
++SYM_FUNC_END(serpent_xts_enc_8way_avx)
+ 
+-ENTRY(serpent_xts_dec_8way_avx)
++SYM_FUNC_START(serpent_xts_dec_8way_avx)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -793,4 +793,4 @@ ENTRY(serpent_xts_dec_8way_avx)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(serpent_xts_dec_8way_avx)
++SYM_FUNC_END(serpent_xts_dec_8way_avx)
+diff --git a/arch/x86/crypto/serpent-avx2-asm_64.S b/arch/x86/crypto/serpent-avx2-asm_64.S
+index 52c527ce4b18..b866f1632803 100644
+--- a/arch/x86/crypto/serpent-avx2-asm_64.S
++++ b/arch/x86/crypto/serpent-avx2-asm_64.S
+@@ -673,7 +673,7 @@ SYM_FUNC_START_LOCAL(__serpent_dec_blk16)
+ 	ret;
+ SYM_FUNC_END(__serpent_dec_blk16)
+ 
+-ENTRY(serpent_ecb_enc_16way)
++SYM_FUNC_START(serpent_ecb_enc_16way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -693,9 +693,9 @@ ENTRY(serpent_ecb_enc_16way)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(serpent_ecb_enc_16way)
++SYM_FUNC_END(serpent_ecb_enc_16way)
+ 
+-ENTRY(serpent_ecb_dec_16way)
++SYM_FUNC_START(serpent_ecb_dec_16way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -715,9 +715,9 @@ ENTRY(serpent_ecb_dec_16way)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(serpent_ecb_dec_16way)
++SYM_FUNC_END(serpent_ecb_dec_16way)
+ 
+-ENTRY(serpent_cbc_dec_16way)
++SYM_FUNC_START(serpent_cbc_dec_16way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -738,9 +738,9 @@ ENTRY(serpent_cbc_dec_16way)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(serpent_cbc_dec_16way)
++SYM_FUNC_END(serpent_cbc_dec_16way)
+ 
+-ENTRY(serpent_ctr_16way)
++SYM_FUNC_START(serpent_ctr_16way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst (16 blocks)
+@@ -763,9 +763,9 @@ ENTRY(serpent_ctr_16way)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(serpent_ctr_16way)
++SYM_FUNC_END(serpent_ctr_16way)
+ 
+-ENTRY(serpent_xts_enc_16way)
++SYM_FUNC_START(serpent_xts_enc_16way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst (16 blocks)
+@@ -789,9 +789,9 @@ ENTRY(serpent_xts_enc_16way)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(serpent_xts_enc_16way)
++SYM_FUNC_END(serpent_xts_enc_16way)
+ 
+-ENTRY(serpent_xts_dec_16way)
++SYM_FUNC_START(serpent_xts_dec_16way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst (16 blocks)
+@@ -815,4 +815,4 @@ ENTRY(serpent_xts_dec_16way)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(serpent_xts_dec_16way)
++SYM_FUNC_END(serpent_xts_dec_16way)
+diff --git a/arch/x86/crypto/serpent-sse2-x86_64-asm_64.S b/arch/x86/crypto/serpent-sse2-x86_64-asm_64.S
+index acc066c7c6b2..bdeee900df63 100644
+--- a/arch/x86/crypto/serpent-sse2-x86_64-asm_64.S
++++ b/arch/x86/crypto/serpent-sse2-x86_64-asm_64.S
+@@ -634,7 +634,7 @@
+ 	pxor t0,		x3; \
+ 	movdqu x3,		(3*4*4)(out);
+ 
+-ENTRY(__serpent_enc_blk_8way)
++SYM_FUNC_START(__serpent_enc_blk_8way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -697,9 +697,9 @@ ENTRY(__serpent_enc_blk_8way)
+ 	xor_blocks(%rax, RA2, RB2, RC2, RD2, RK0, RK1, RK2);
+ 
+ 	ret;
+-ENDPROC(__serpent_enc_blk_8way)
++SYM_FUNC_END(__serpent_enc_blk_8way)
+ 
+-ENTRY(serpent_dec_blk_8way)
++SYM_FUNC_START(serpent_dec_blk_8way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -751,4 +751,4 @@ ENTRY(serpent_dec_blk_8way)
+ 	write_blocks(%rax, RC2, RD2, RB2, RE2, RK0, RK1, RK2);
+ 
+ 	ret;
+-ENDPROC(serpent_dec_blk_8way)
++SYM_FUNC_END(serpent_dec_blk_8way)
+diff --git a/arch/x86/crypto/sha1-mb/sha1_mb_mgr_flush_avx2.S b/arch/x86/crypto/sha1-mb/sha1_mb_mgr_flush_avx2.S
+index 93b945597ecf..7623a16c3c5f 100644
+--- a/arch/x86/crypto/sha1-mb/sha1_mb_mgr_flush_avx2.S
++++ b/arch/x86/crypto/sha1-mb/sha1_mb_mgr_flush_avx2.S
+@@ -103,7 +103,7 @@ offset = \_offset
+ 
+ # JOB* sha1_mb_mgr_flush_avx2(MB_MGR *state)
+ # arg 1 : rcx : state
+-ENTRY(sha1_mb_mgr_flush_avx2)
++SYM_FUNC_START(sha1_mb_mgr_flush_avx2)
+ 	FRAME_BEGIN
+ 	push	%rbx
+ 
+@@ -220,13 +220,13 @@ return:
+ return_null:
+ 	xor     job_rax, job_rax
+ 	jmp     return
+-ENDPROC(sha1_mb_mgr_flush_avx2)
++SYM_FUNC_END(sha1_mb_mgr_flush_avx2)
+ 
+ 
+ #################################################################
+ 
+ .align 16
+-ENTRY(sha1_mb_mgr_get_comp_job_avx2)
++SYM_FUNC_START(sha1_mb_mgr_get_comp_job_avx2)
+ 	push    %rbx
+ 
+ 	## if bit 32+3 is set, then all lanes are empty
+@@ -279,7 +279,7 @@ ENTRY(sha1_mb_mgr_get_comp_job_avx2)
+ 	xor     job_rax, job_rax
+ 	pop     %rbx
+ 	ret
+-ENDPROC(sha1_mb_mgr_get_comp_job_avx2)
++SYM_FUNC_END(sha1_mb_mgr_get_comp_job_avx2)
+ 
+ .section	.rodata.cst16.clear_low_nibble, "aM", @progbits, 16
+ .align 16
+diff --git a/arch/x86/crypto/sha1-mb/sha1_mb_mgr_submit_avx2.S b/arch/x86/crypto/sha1-mb/sha1_mb_mgr_submit_avx2.S
+index 7a93b1c0d69a..a46e3b04385e 100644
+--- a/arch/x86/crypto/sha1-mb/sha1_mb_mgr_submit_avx2.S
++++ b/arch/x86/crypto/sha1-mb/sha1_mb_mgr_submit_avx2.S
+@@ -98,7 +98,7 @@ lane_data       = %r10
+ # JOB* submit_mb_mgr_submit_avx2(MB_MGR *state, job_sha1 *job)
+ # arg 1 : rcx : state
+ # arg 2 : rdx : job
+-ENTRY(sha1_mb_mgr_submit_avx2)
++SYM_FUNC_START(sha1_mb_mgr_submit_avx2)
+ 	FRAME_BEGIN
+ 	push	%rbx
+ 	push	%r12
+@@ -201,7 +201,7 @@ return_null:
+ 	xor     job_rax, job_rax
+ 	jmp     return
+ 
+-ENDPROC(sha1_mb_mgr_submit_avx2)
++SYM_FUNC_END(sha1_mb_mgr_submit_avx2)
+ 
+ .section	.rodata.cst16.clear_low_nibble, "aM", @progbits, 16
+ .align 16
+diff --git a/arch/x86/crypto/sha1-mb/sha1_x8_avx2.S b/arch/x86/crypto/sha1-mb/sha1_x8_avx2.S
+index 20f77aa633de..04d763520a82 100644
+--- a/arch/x86/crypto/sha1-mb/sha1_x8_avx2.S
++++ b/arch/x86/crypto/sha1-mb/sha1_x8_avx2.S
+@@ -294,7 +294,7 @@ W14  = TMP_
+ # arg 1 : pointer to array[4] of pointer to input data
+ # arg 2 : size (in blocks) ;; assumed to be >= 1
+ #
+-ENTRY(sha1_x8_avx2)
++SYM_FUNC_START(sha1_x8_avx2)
+ 
+ 	# save callee-saved clobbered registers to comply with C function ABI
+ 	push	%r12
+@@ -458,7 +458,7 @@ lloop:
+ 	pop	%r12
+ 
+ 	ret
+-ENDPROC(sha1_x8_avx2)
++SYM_FUNC_END(sha1_x8_avx2)
+ 
+ 
+ .section	.rodata.cst32.K00_19, "aM", @progbits, 32
+diff --git a/arch/x86/crypto/sha1_avx2_x86_64_asm.S b/arch/x86/crypto/sha1_avx2_x86_64_asm.S
+index 9f712a7dfd79..6decc85ef7b7 100644
+--- a/arch/x86/crypto/sha1_avx2_x86_64_asm.S
++++ b/arch/x86/crypto/sha1_avx2_x86_64_asm.S
+@@ -634,7 +634,7 @@ _loop3:
+  * param: function's name
+  */
+ .macro SHA1_VECTOR_ASM  name
+-	ENTRY(\name)
++	SYM_FUNC_START(\name)
+ 
+ 	push	%rbx
+ 	push	%r12
+@@ -676,7 +676,7 @@ _loop3:
+ 
+ 	ret
+ 
+-	ENDPROC(\name)
++	SYM_FUNC_END(\name)
+ .endm
+ 
+ .section .rodata
+diff --git a/arch/x86/crypto/sha1_ni_asm.S b/arch/x86/crypto/sha1_ni_asm.S
+index ebbdba72ae07..11efe3a45a1f 100644
+--- a/arch/x86/crypto/sha1_ni_asm.S
++++ b/arch/x86/crypto/sha1_ni_asm.S
+@@ -95,7 +95,7 @@
+  */
+ .text
+ .align 32
+-ENTRY(sha1_ni_transform)
++SYM_FUNC_START(sha1_ni_transform)
+ 	mov		%rsp, RSPSAVE
+ 	sub		$FRAME_SIZE, %rsp
+ 	and		$~0xF, %rsp
+@@ -291,7 +291,7 @@ ENTRY(sha1_ni_transform)
+ 	mov		RSPSAVE, %rsp
+ 
+ 	ret
+-ENDPROC(sha1_ni_transform)
++SYM_FUNC_END(sha1_ni_transform)
+ 
+ .section	.rodata.cst16.PSHUFFLE_BYTE_FLIP_MASK, "aM", @progbits, 16
+ .align 16
+diff --git a/arch/x86/crypto/sha1_ssse3_asm.S b/arch/x86/crypto/sha1_ssse3_asm.S
+index 6204bd53528c..c253255fd4c1 100644
+--- a/arch/x86/crypto/sha1_ssse3_asm.S
++++ b/arch/x86/crypto/sha1_ssse3_asm.S
+@@ -71,7 +71,7 @@
+  * param: function's name
+  */
+ .macro SHA1_VECTOR_ASM  name
+-	ENTRY(\name)
++	SYM_FUNC_START(\name)
+ 
+ 	push	%rbx
+ 	push	%r12
+@@ -105,7 +105,7 @@
+ 	pop	%rbx
+ 	ret
+ 
+-	ENDPROC(\name)
++	SYM_FUNC_END(\name)
+ .endm
+ 
+ /*
+diff --git a/arch/x86/crypto/sha256-avx-asm.S b/arch/x86/crypto/sha256-avx-asm.S
+index 001bbcf93c79..22e14c8dd2e4 100644
+--- a/arch/x86/crypto/sha256-avx-asm.S
++++ b/arch/x86/crypto/sha256-avx-asm.S
+@@ -347,7 +347,7 @@ a = TMP_
+ ## arg 3 : Num blocks
+ ########################################################################
+ .text
+-ENTRY(sha256_transform_avx)
++SYM_FUNC_START(sha256_transform_avx)
+ .align 32
+ 	pushq   %rbx
+ 	pushq   %r12
+@@ -460,7 +460,7 @@ done_hash:
+ 	popq	%r12
+ 	popq    %rbx
+ 	ret
+-ENDPROC(sha256_transform_avx)
++SYM_FUNC_END(sha256_transform_avx)
+ 
+ .section	.rodata.cst256.K256, "aM", @progbits, 256
+ .align 64
+diff --git a/arch/x86/crypto/sha256-avx2-asm.S b/arch/x86/crypto/sha256-avx2-asm.S
+index 1420db15dcdd..519b551ad576 100644
+--- a/arch/x86/crypto/sha256-avx2-asm.S
++++ b/arch/x86/crypto/sha256-avx2-asm.S
+@@ -526,7 +526,7 @@ STACK_SIZE	= _RSP      + _RSP_SIZE
+ ## arg 3 : Num blocks
+ ########################################################################
+ .text
+-ENTRY(sha256_transform_rorx)
++SYM_FUNC_START(sha256_transform_rorx)
+ .align 32
+ 	pushq	%rbx
+ 	pushq	%r12
+@@ -713,7 +713,7 @@ done_hash:
+ 	popq	%r12
+ 	popq	%rbx
+ 	ret
+-ENDPROC(sha256_transform_rorx)
++SYM_FUNC_END(sha256_transform_rorx)
+ 
+ .section	.rodata.cst512.K256, "aM", @progbits, 512
+ .align 64
+diff --git a/arch/x86/crypto/sha256-mb/sha256_mb_mgr_flush_avx2.S b/arch/x86/crypto/sha256-mb/sha256_mb_mgr_flush_avx2.S
+index 8fe6338bcc84..9681227be16c 100644
+--- a/arch/x86/crypto/sha256-mb/sha256_mb_mgr_flush_avx2.S
++++ b/arch/x86/crypto/sha256-mb/sha256_mb_mgr_flush_avx2.S
+@@ -101,7 +101,7 @@ offset = \_offset
+ 
+ # JOB_SHA256* sha256_mb_mgr_flush_avx2(MB_MGR *state)
+ # arg 1 : rcx : state
+-ENTRY(sha256_mb_mgr_flush_avx2)
++SYM_FUNC_START(sha256_mb_mgr_flush_avx2)
+ 	FRAME_BEGIN
+         push    %rbx
+ 
+@@ -220,12 +220,12 @@ return:
+ return_null:
+ 	xor	job_rax, job_rax
+ 	jmp	return
+-ENDPROC(sha256_mb_mgr_flush_avx2)
++SYM_FUNC_END(sha256_mb_mgr_flush_avx2)
+ 
+ ##############################################################################
+ 
+ .align 16
+-ENTRY(sha256_mb_mgr_get_comp_job_avx2)
++SYM_FUNC_START(sha256_mb_mgr_get_comp_job_avx2)
+ 	push	%rbx
+ 
+ 	## if bit 32+3 is set, then all lanes are empty
+@@ -282,7 +282,7 @@ ENTRY(sha256_mb_mgr_get_comp_job_avx2)
+ 	xor	job_rax, job_rax
+ 	pop	%rbx
+ 	ret
+-ENDPROC(sha256_mb_mgr_get_comp_job_avx2)
++SYM_FUNC_END(sha256_mb_mgr_get_comp_job_avx2)
+ 
+ .section	.rodata.cst16.clear_low_nibble, "aM", @progbits, 16
+ .align 16
+diff --git a/arch/x86/crypto/sha256-mb/sha256_mb_mgr_submit_avx2.S b/arch/x86/crypto/sha256-mb/sha256_mb_mgr_submit_avx2.S
+index b36ae7454084..2213c04a30dc 100644
+--- a/arch/x86/crypto/sha256-mb/sha256_mb_mgr_submit_avx2.S
++++ b/arch/x86/crypto/sha256-mb/sha256_mb_mgr_submit_avx2.S
+@@ -96,7 +96,7 @@ lane_data	= %r10
+ # JOB* sha256_mb_mgr_submit_avx2(MB_MGR *state, JOB_SHA256 *job)
+ # arg 1 : rcx : state
+ # arg 2 : rdx : job
+-ENTRY(sha256_mb_mgr_submit_avx2)
++SYM_FUNC_START(sha256_mb_mgr_submit_avx2)
+ 	FRAME_BEGIN
+ 	push	%rbx
+ 	push	%r12
+@@ -206,7 +206,7 @@ return_null:
+ 	xor	job_rax, job_rax
+ 	jmp	return
+ 
+-ENDPROC(sha256_mb_mgr_submit_avx2)
++SYM_FUNC_END(sha256_mb_mgr_submit_avx2)
+ 
+ .section	.rodata.cst16.clear_low_nibble, "aM", @progbits, 16
+ .align 16
+diff --git a/arch/x86/crypto/sha256-mb/sha256_x8_avx2.S b/arch/x86/crypto/sha256-mb/sha256_x8_avx2.S
+index 1687c80c5995..042d2381f435 100644
+--- a/arch/x86/crypto/sha256-mb/sha256_x8_avx2.S
++++ b/arch/x86/crypto/sha256-mb/sha256_x8_avx2.S
+@@ -280,7 +280,7 @@ a = TMP_
+ 	# general registers preserved in outer calling routine
+ 	# outer calling routine saves all the XMM registers
+ 	# save rsp, allocate 32-byte aligned for local variables
+-ENTRY(sha256_x8_avx2)
++SYM_FUNC_START(sha256_x8_avx2)
+ 
+ 	# save callee-saved clobbered registers to comply with C function ABI
+ 	push    %r12
+@@ -436,7 +436,7 @@ Lrounds_16_xx:
+ 	pop     %r12
+ 
+ 	ret
+-ENDPROC(sha256_x8_avx2)
++SYM_FUNC_END(sha256_x8_avx2)
+ 
+ .section	.rodata.K256_8, "a", @progbits
+ .align 64
+diff --git a/arch/x86/crypto/sha256-ssse3-asm.S b/arch/x86/crypto/sha256-ssse3-asm.S
+index c6c05ed2c16a..69cc2f91dc4c 100644
+--- a/arch/x86/crypto/sha256-ssse3-asm.S
++++ b/arch/x86/crypto/sha256-ssse3-asm.S
+@@ -353,7 +353,7 @@ a = TMP_
+ ## arg 3 : Num blocks
+ ########################################################################
+ .text
+-ENTRY(sha256_transform_ssse3)
++SYM_FUNC_START(sha256_transform_ssse3)
+ .align 32
+ 	pushq   %rbx
+ 	pushq   %r12
+@@ -471,7 +471,7 @@ done_hash:
+ 	popq    %rbx
+ 
+ 	ret
+-ENDPROC(sha256_transform_ssse3)
++SYM_FUNC_END(sha256_transform_ssse3)
+ 
+ .section	.rodata.cst256.K256, "aM", @progbits, 256
+ .align 64
+diff --git a/arch/x86/crypto/sha256_ni_asm.S b/arch/x86/crypto/sha256_ni_asm.S
+index fb58f58ecfbc..7abade04a3a3 100644
+--- a/arch/x86/crypto/sha256_ni_asm.S
++++ b/arch/x86/crypto/sha256_ni_asm.S
+@@ -97,7 +97,7 @@
+ 
+ .text
+ .align 32
+-ENTRY(sha256_ni_transform)
++SYM_FUNC_START(sha256_ni_transform)
+ 
+ 	shl		$6, NUM_BLKS		/*  convert to bytes */
+ 	jz		.Ldone_hash
+@@ -327,7 +327,7 @@ ENTRY(sha256_ni_transform)
+ .Ldone_hash:
+ 
+ 	ret
+-ENDPROC(sha256_ni_transform)
++SYM_FUNC_END(sha256_ni_transform)
+ 
+ .section	.rodata.cst256.K256, "aM", @progbits, 256
+ .align 64
+diff --git a/arch/x86/crypto/sha512-avx-asm.S b/arch/x86/crypto/sha512-avx-asm.S
+index 39235fefe6f7..3704ddd7e5d5 100644
+--- a/arch/x86/crypto/sha512-avx-asm.S
++++ b/arch/x86/crypto/sha512-avx-asm.S
+@@ -277,7 +277,7 @@ frame_size = frame_GPRSAVE + GPRSAVE_SIZE
+ # message blocks.
+ # L is the message length in SHA512 blocks
+ ########################################################################
+-ENTRY(sha512_transform_avx)
++SYM_FUNC_START(sha512_transform_avx)
+ 	cmp $0, msglen
+ 	je nowork
+ 
+@@ -365,7 +365,7 @@ updateblock:
+ 
+ nowork:
+ 	ret
+-ENDPROC(sha512_transform_avx)
++SYM_FUNC_END(sha512_transform_avx)
+ 
+ ########################################################################
+ ### Binary Data
+diff --git a/arch/x86/crypto/sha512-avx2-asm.S b/arch/x86/crypto/sha512-avx2-asm.S
+index b16d56005162..80d830e7ee09 100644
+--- a/arch/x86/crypto/sha512-avx2-asm.S
++++ b/arch/x86/crypto/sha512-avx2-asm.S
+@@ -569,7 +569,7 @@ frame_size = frame_GPRSAVE + GPRSAVE_SIZE
+ #   message blocks.
+ # L is the message length in SHA512 blocks
+ ########################################################################
+-ENTRY(sha512_transform_rorx)
++SYM_FUNC_START(sha512_transform_rorx)
+ 	# Allocate Stack Space
+ 	mov	%rsp, %rax
+ 	sub	$frame_size, %rsp
+@@ -682,7 +682,7 @@ done_hash:
+ 	# Restore Stack Pointer
+ 	mov	frame_RSPSAVE(%rsp), %rsp
+ 	ret
+-ENDPROC(sha512_transform_rorx)
++SYM_FUNC_END(sha512_transform_rorx)
+ 
+ ########################################################################
+ ### Binary Data
+diff --git a/arch/x86/crypto/sha512-mb/sha512_mb_mgr_flush_avx2.S b/arch/x86/crypto/sha512-mb/sha512_mb_mgr_flush_avx2.S
+index 7c629caebc05..8642f3a04388 100644
+--- a/arch/x86/crypto/sha512-mb/sha512_mb_mgr_flush_avx2.S
++++ b/arch/x86/crypto/sha512-mb/sha512_mb_mgr_flush_avx2.S
+@@ -107,7 +107,7 @@ offset = \_offset
+ 
+ # JOB* sha512_mb_mgr_flush_avx2(MB_MGR *state)
+ # arg 1 : rcx : state
+-ENTRY(sha512_mb_mgr_flush_avx2)
++SYM_FUNC_START(sha512_mb_mgr_flush_avx2)
+ 	FRAME_BEGIN
+ 	push	%rbx
+ 
+@@ -217,10 +217,10 @@ return:
+ return_null:
+         xor     job_rax, job_rax
+         jmp     return
+-ENDPROC(sha512_mb_mgr_flush_avx2)
++SYM_FUNC_END(sha512_mb_mgr_flush_avx2)
+ .align 16
+ 
+-ENTRY(sha512_mb_mgr_get_comp_job_avx2)
++SYM_FUNC_START(sha512_mb_mgr_get_comp_job_avx2)
+         push    %rbx
+ 
+ 	mov     _unused_lanes(state), unused_lanes
+@@ -279,7 +279,7 @@ ENTRY(sha512_mb_mgr_get_comp_job_avx2)
+         xor     job_rax, job_rax
+ 	pop     %rbx
+         ret
+-ENDPROC(sha512_mb_mgr_get_comp_job_avx2)
++SYM_FUNC_END(sha512_mb_mgr_get_comp_job_avx2)
+ 
+ .section	.rodata.cst8.one, "aM", @progbits, 8
+ .align 8
+diff --git a/arch/x86/crypto/sha512-mb/sha512_mb_mgr_submit_avx2.S b/arch/x86/crypto/sha512-mb/sha512_mb_mgr_submit_avx2.S
+index 4ba709ba78e5..62932723d6e9 100644
+--- a/arch/x86/crypto/sha512-mb/sha512_mb_mgr_submit_avx2.S
++++ b/arch/x86/crypto/sha512-mb/sha512_mb_mgr_submit_avx2.S
+@@ -98,7 +98,7 @@
+ # JOB* sha512_mb_mgr_submit_avx2(MB_MGR *state, JOB *job)
+ # arg 1 : rcx : state
+ # arg 2 : rdx : job
+-ENTRY(sha512_mb_mgr_submit_avx2)
++SYM_FUNC_START(sha512_mb_mgr_submit_avx2)
+ 	FRAME_BEGIN
+ 	push	%rbx
+ 	push	%r12
+@@ -208,7 +208,7 @@ return:
+ return_null:
+ 	xor     job_rax, job_rax
+ 	jmp     return
+-ENDPROC(sha512_mb_mgr_submit_avx2)
++SYM_FUNC_END(sha512_mb_mgr_submit_avx2)
+ 
+ /* UNUSED?
+ .section	.rodata.cst16, "aM", @progbits, 16
+diff --git a/arch/x86/crypto/sha512-mb/sha512_x4_avx2.S b/arch/x86/crypto/sha512-mb/sha512_x4_avx2.S
+index e22e907643a6..504065d19e03 100644
+--- a/arch/x86/crypto/sha512-mb/sha512_x4_avx2.S
++++ b/arch/x86/crypto/sha512-mb/sha512_x4_avx2.S
+@@ -239,7 +239,7 @@ a = TMP_
+ # void sha512_x4_avx2(void *STATE, const int INP_SIZE)
+ # arg 1 : STATE    : pointer to input data
+ # arg 2 : INP_SIZE : size of data in blocks (assumed >= 1)
+-ENTRY(sha512_x4_avx2)
++SYM_FUNC_START(sha512_x4_avx2)
+ 	# general registers preserved in outer calling routine
+ 	# outer calling routine saves all the XMM registers
+ 	# save callee-saved clobbered registers to comply with C function ABI
+@@ -359,7 +359,7 @@ Lrounds_16_xx:
+ 
+ 	# outer calling routine restores XMM and other GP registers
+ 	ret
+-ENDPROC(sha512_x4_avx2)
++SYM_FUNC_END(sha512_x4_avx2)
+ 
+ .section	.rodata.K512_4, "a", @progbits
+ .align 64
+diff --git a/arch/x86/crypto/sha512-ssse3-asm.S b/arch/x86/crypto/sha512-ssse3-asm.S
+index 66bbd9058a90..838f984e95d9 100644
+--- a/arch/x86/crypto/sha512-ssse3-asm.S
++++ b/arch/x86/crypto/sha512-ssse3-asm.S
+@@ -275,7 +275,7 @@ frame_size = frame_GPRSAVE + GPRSAVE_SIZE
+ #   message blocks.
+ # L is the message length in SHA512 blocks.
+ ########################################################################
+-ENTRY(sha512_transform_ssse3)
++SYM_FUNC_START(sha512_transform_ssse3)
+ 
+ 	cmp $0, msglen
+ 	je nowork
+@@ -364,7 +364,7 @@ updateblock:
+ 
+ nowork:
+ 	ret
+-ENDPROC(sha512_transform_ssse3)
++SYM_FUNC_END(sha512_transform_ssse3)
+ 
+ ########################################################################
+ ### Binary Data
+diff --git a/arch/x86/crypto/twofish-avx-x86_64-asm_64.S b/arch/x86/crypto/twofish-avx-x86_64-asm_64.S
+index 96ddfda4d7b2..16e53c98e6a0 100644
+--- a/arch/x86/crypto/twofish-avx-x86_64-asm_64.S
++++ b/arch/x86/crypto/twofish-avx-x86_64-asm_64.S
+@@ -330,7 +330,7 @@ SYM_FUNC_START_LOCAL(__twofish_dec_blk8)
+ 	ret;
+ SYM_FUNC_END(__twofish_dec_blk8)
+ 
+-ENTRY(twofish_ecb_enc_8way)
++SYM_FUNC_START(twofish_ecb_enc_8way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -348,9 +348,9 @@ ENTRY(twofish_ecb_enc_8way)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(twofish_ecb_enc_8way)
++SYM_FUNC_END(twofish_ecb_enc_8way)
+ 
+-ENTRY(twofish_ecb_dec_8way)
++SYM_FUNC_START(twofish_ecb_dec_8way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -368,9 +368,9 @@ ENTRY(twofish_ecb_dec_8way)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(twofish_ecb_dec_8way)
++SYM_FUNC_END(twofish_ecb_dec_8way)
+ 
+-ENTRY(twofish_cbc_dec_8way)
++SYM_FUNC_START(twofish_cbc_dec_8way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -393,9 +393,9 @@ ENTRY(twofish_cbc_dec_8way)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(twofish_cbc_dec_8way)
++SYM_FUNC_END(twofish_cbc_dec_8way)
+ 
+-ENTRY(twofish_ctr_8way)
++SYM_FUNC_START(twofish_ctr_8way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -420,9 +420,9 @@ ENTRY(twofish_ctr_8way)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(twofish_ctr_8way)
++SYM_FUNC_END(twofish_ctr_8way)
+ 
+-ENTRY(twofish_xts_enc_8way)
++SYM_FUNC_START(twofish_xts_enc_8way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -444,9 +444,9 @@ ENTRY(twofish_xts_enc_8way)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(twofish_xts_enc_8way)
++SYM_FUNC_END(twofish_xts_enc_8way)
+ 
+-ENTRY(twofish_xts_dec_8way)
++SYM_FUNC_START(twofish_xts_dec_8way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -468,4 +468,4 @@ ENTRY(twofish_xts_dec_8way)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(twofish_xts_dec_8way)
++SYM_FUNC_END(twofish_xts_dec_8way)
+diff --git a/arch/x86/crypto/twofish-x86_64-asm_64-3way.S b/arch/x86/crypto/twofish-x86_64-asm_64-3way.S
+index 1c3b7ceb36d2..ece306e35298 100644
+--- a/arch/x86/crypto/twofish-x86_64-asm_64-3way.S
++++ b/arch/x86/crypto/twofish-x86_64-asm_64-3way.S
+@@ -216,7 +216,7 @@
+ 	rorq $32,			RAB2; \
+ 	outunpack3(mov, RIO, 2, RAB, 2);
+ 
+-ENTRY(__twofish_enc_blk_3way)
++SYM_FUNC_START(__twofish_enc_blk_3way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -270,9 +270,9 @@ ENTRY(__twofish_enc_blk_3way)
+ 	popq %r14;
+ 	popq %r15;
+ 	ret;
+-ENDPROC(__twofish_enc_blk_3way)
++SYM_FUNC_END(__twofish_enc_blk_3way)
+ 
+-ENTRY(twofish_dec_blk_3way)
++SYM_FUNC_START(twofish_dec_blk_3way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -309,4 +309,4 @@ ENTRY(twofish_dec_blk_3way)
+ 	popq %r14;
+ 	popq %r15;
+ 	ret;
+-ENDPROC(twofish_dec_blk_3way)
++SYM_FUNC_END(twofish_dec_blk_3way)
+diff --git a/arch/x86/crypto/twofish-x86_64-asm_64.S b/arch/x86/crypto/twofish-x86_64-asm_64.S
+index a350c990dc86..74ef6c55d75f 100644
+--- a/arch/x86/crypto/twofish-x86_64-asm_64.S
++++ b/arch/x86/crypto/twofish-x86_64-asm_64.S
+@@ -215,7 +215,7 @@
+ 	xor	%r8d,		d ## D;\
+ 	ror	$1,		d ## D;
+ 
+-ENTRY(twofish_enc_blk)
++SYM_FUNC_START(twofish_enc_blk)
+ 	pushq    R1
+ 
+ 	/* %rdi contains the ctx address */
+@@ -266,9 +266,9 @@ ENTRY(twofish_enc_blk)
+ 	popq	R1
+ 	movl	$1,%eax
+ 	ret
+-ENDPROC(twofish_enc_blk)
++SYM_FUNC_END(twofish_enc_blk)
+ 
+-ENTRY(twofish_dec_blk)
++SYM_FUNC_START(twofish_dec_blk)
+ 	pushq    R1
+ 
+ 	/* %rdi contains the ctx address */
+@@ -318,4 +318,4 @@ ENTRY(twofish_dec_blk)
+ 	popq	R1
+ 	movl	$1,%eax
+ 	ret
+-ENDPROC(twofish_dec_blk)
++SYM_FUNC_END(twofish_dec_blk)
+diff --git a/arch/x86/entry/entry_64.S b/arch/x86/entry/entry_64.S
+index 02e15a18e132..c63d557ec214 100644
+--- a/arch/x86/entry/entry_64.S
++++ b/arch/x86/entry/entry_64.S
+@@ -14,7 +14,7 @@
+  *			at the top of the kernel process stack.
+  *
+  * Some macro usage:
+- * - ENTRY/END:		Define functions in the symbol table.
++ * - SYM_FUNC_START/END:Define functions in the symbol table.
+  * - TRACE_IRQ_*:	Trace hardirq state for lock debugging.
+  * - idtentry:		Define exception entry points.
+  */
+@@ -917,7 +917,7 @@ idtentry simd_coprocessor_error		do_simd_coprocessor_error	has_error_code=0
+ 	 * Reload gs selector with exception handling
+ 	 * edi:  new selector
  	 */
- 	if (areq_ctx->mlli_params.curr_pool) {
--		SSI_LOG_DEBUG("free MLLI buffer: dma=%pad virt=%pK\n",
--			      areq_ctx->mlli_params.mlli_dma_addr,
--			      areq_ctx->mlli_params.mlli_virt_addr);
-+		dev_dbg(dev, "free MLLI buffer: dma=%pad virt=%pK\n",
-+			&areq_ctx->mlli_params.mlli_dma_addr,
-+			areq_ctx->mlli_params.mlli_virt_addr);
- 		dma_pool_free(areq_ctx->mlli_params.curr_pool,
- 			      areq_ctx->mlli_params.mlli_virt_addr,
- 			      areq_ctx->mlli_params.mlli_dma_addr);
- 	}
- 
--	SSI_LOG_DEBUG("Unmapping src sgl: req->src=%pK areq_ctx->src.nents=%u areq_ctx->assoc.nents=%u assoclen:%u cryptlen=%u\n", sg_virt(req->src), areq_ctx->src.nents, areq_ctx->assoc.nents, req->assoclen, req->cryptlen);
-+	dev_dbg(dev, "Unmapping src sgl: req->src=%pK areq_ctx->src.nents=%u areq_ctx->assoc.nents=%u assoclen:%u cryptlen=%u\n",
-+		sg_virt(req->src), areq_ctx->src.nents, areq_ctx->assoc.nents,
-+		req->assoclen, req->cryptlen);
- 	size_to_unmap = req->assoclen + req->cryptlen;
- 	if (areq_ctx->gen_ctx.op_type == DRV_CRYPTO_DIRECTION_ENCRYPT)
- 		size_to_unmap += areq_ctx->req_authsize;
- 	if (areq_ctx->is_gcm4543)
- 		size_to_unmap += crypto_aead_ivsize(tfm);
- 
--	dma_unmap_sg(dev, req->src, ssi_buffer_mgr_get_sgl_nents(req->src, size_to_unmap, &dummy, &chained), DMA_BIDIRECTIONAL);
-+	dma_unmap_sg(dev, req->src,
-+		     ssi_buffer_mgr_get_sgl_nents(dev, req->src, size_to_unmap,
-+						  &dummy, &chained),
-+		     DMA_BIDIRECTIONAL);
- 	if (unlikely(req->src != req->dst)) {
--		SSI_LOG_DEBUG("Unmapping dst sgl: req->dst=%pK\n",
--			      sg_virt(req->dst));
-+		dev_dbg(dev, "Unmapping dst sgl: req->dst=%pK\n",
-+			sg_virt(req->dst));
- 		dma_unmap_sg(dev, req->dst,
--			     ssi_buffer_mgr_get_sgl_nents(req->dst,
-+			     ssi_buffer_mgr_get_sgl_nents(dev, req->dst,
- 							  size_to_unmap,
--							  &dummy,
--							  &chained),
-+							  &dummy, &chained),
- 			     DMA_BIDIRECTIONAL);
- 	}
- 	if (drvdata->coherent &&
-@@ -707,13 +692,14 @@ void ssi_buffer_mgr_unmap_aead_request(
- 		 * data memory overriding that caused by cache coherence problem.
- 		 */
- 		ssi_buffer_mgr_copy_scatterlist_portion(
--			areq_ctx->backup_mac, req->src,
-+			dev, areq_ctx->backup_mac, req->src,
- 			size_to_skip + req->cryptlen - areq_ctx->req_authsize,
- 			size_to_skip + req->cryptlen, SSI_SG_FROM_BUF);
- 	}
- }
- 
- static inline int ssi_buffer_mgr_get_aead_icv_nents(
-+	struct device *dev,
- 	struct scatterlist *sgl,
- 	unsigned int sgl_nents,
- 	unsigned int authsize,
-@@ -752,12 +738,12 @@ static inline int ssi_buffer_mgr_get_aead_icv_nents(
- 		nents = 2;
- 		*is_icv_fragmented = true;
- 	} else {
--		SSI_LOG_ERR("Unsupported num. of ICV fragments (> %d)\n",
--			    MAX_ICV_NENTS_SUPPORTED);
-+		dev_err(dev, "Unsupported num. of ICV fragments (> %d)\n",
-+			MAX_ICV_NENTS_SUPPORTED);
- 		nents = -1; /*unsupported*/
- 	}
--	SSI_LOG_DEBUG("is_frag=%s icv_nents=%u\n",
--		      (*is_icv_fragmented ? "true" : "false"), nents);
-+	dev_dbg(dev, "is_frag=%s icv_nents=%u\n",
-+		(*is_icv_fragmented ? "true" : "false"), nents);
- 
- 	return nents;
- }
-@@ -781,22 +767,22 @@ static inline int ssi_buffer_mgr_aead_chain_iv(
- 	areq_ctx->gen_ctx.iv_dma_addr = dma_map_single(dev, req->iv, hw_iv_size,
- 						       DMA_BIDIRECTIONAL);
- 	if (unlikely(dma_mapping_error(dev, areq_ctx->gen_ctx.iv_dma_addr))) {
--		SSI_LOG_ERR("Mapping iv %u B at va=%pK for DMA failed\n",
--			    hw_iv_size, req->iv);
-+		dev_err(dev, "Mapping iv %u B at va=%pK for DMA failed\n",
-+			hw_iv_size, req->iv);
- 		rc = -ENOMEM;
- 		goto chain_iv_exit;
- 	}
- 
--	SSI_LOG_DEBUG("Mapped iv %u B at va=%pK to dma=%pad\n",
--		      hw_iv_size, req->iv,
--		      areq_ctx->gen_ctx.iv_dma_addr);
-+	dev_dbg(dev, "Mapped iv %u B at va=%pK to dma=%pad\n",
-+		hw_iv_size, req->iv, &areq_ctx->gen_ctx.iv_dma_addr);
- 	if (do_chain && areq_ctx->plaintext_authenticate_only) {  // TODO: what about CTR?? ask Ron
- 		struct crypto_aead *tfm = crypto_aead_reqtfm(req);
- 		unsigned int iv_size_to_authenc = crypto_aead_ivsize(tfm);
- 		unsigned int iv_ofs = GCM_BLOCK_RFC4_IV_OFFSET;
- 		/* Chain to given list */
- 		ssi_buffer_mgr_add_buffer_entry(
--			sg_data, areq_ctx->gen_ctx.iv_dma_addr + iv_ofs,
-+			dev, sg_data,
-+			areq_ctx->gen_ctx.iv_dma_addr + iv_ofs,
- 			iv_size_to_authenc, is_last,
- 			&areq_ctx->assoc.mlli_nents);
- 		areq_ctx->assoc_buff_type = SSI_DMA_BUF_MLLI;
-@@ -819,6 +805,7 @@ static inline int ssi_buffer_mgr_aead_chain_assoc(
- 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
- 	unsigned int sg_index = 0;
- 	u32 size_of_assoc = req->assoclen;
-+	struct device *dev = DEV(drvdata);
- 
- 	if (areq_ctx->is_gcm4543)
- 		size_of_assoc += crypto_aead_ivsize(tfm);
-@@ -832,9 +819,9 @@ static inline int ssi_buffer_mgr_aead_chain_assoc(
- 		areq_ctx->assoc_buff_type = SSI_DMA_BUF_NULL;
- 		areq_ctx->assoc.nents = 0;
- 		areq_ctx->assoc.mlli_nents = 0;
--		SSI_LOG_DEBUG("Chain assoc of length 0: buff_type=%s nents=%u\n",
--			      GET_DMA_BUFFER_TYPE(areq_ctx->assoc_buff_type),
--			      areq_ctx->assoc.nents);
-+		dev_dbg(dev, "Chain assoc of length 0: buff_type=%s nents=%u\n",
-+			GET_DMA_BUFFER_TYPE(areq_ctx->assoc_buff_type),
-+			areq_ctx->assoc.nents);
- 		goto chain_assoc_exit;
- 	}
- 
-@@ -848,7 +835,7 @@ static inline int ssi_buffer_mgr_aead_chain_assoc(
- 			current_sg = sg_next(current_sg);
- 			//if have reached the end of the sgl, then this is unexpected
- 			if (!current_sg) {
--				SSI_LOG_ERR("reached end of sg list. unexpected\n");
-+				dev_err(dev, "reached end of sg list. unexpected\n");
- 				return -EINVAL;
- 			}
- 			sg_index += current_sg->length;
-@@ -856,8 +843,8 @@ static inline int ssi_buffer_mgr_aead_chain_assoc(
- 		}
- 	}
- 	if (unlikely(mapped_nents > LLI_MAX_NUM_OF_ASSOC_DATA_ENTRIES)) {
--		SSI_LOG_ERR("Too many fragments. current %d max %d\n",
--			    mapped_nents, LLI_MAX_NUM_OF_ASSOC_DATA_ENTRIES);
-+		dev_err(dev, "Too many fragments. current %d max %d\n",
-+			mapped_nents, LLI_MAX_NUM_OF_ASSOC_DATA_ENTRIES);
- 		return -ENOMEM;
- 	}
- 	areq_ctx->assoc.nents = mapped_nents;
-@@ -868,9 +855,9 @@ static inline int ssi_buffer_mgr_aead_chain_assoc(
- 	if (areq_ctx->ccm_hdr_size != ccm_header_size_null) {
- 		if (unlikely((mapped_nents + 1) >
- 			LLI_MAX_NUM_OF_ASSOC_DATA_ENTRIES)) {
--			SSI_LOG_ERR("CCM case.Too many fragments. Current %d max %d\n",
--				    (areq_ctx->assoc.nents + 1),
--				    LLI_MAX_NUM_OF_ASSOC_DATA_ENTRIES);
-+			dev_err(dev, "CCM case.Too many fragments. Current %d max %d\n",
-+				(areq_ctx->assoc.nents + 1),
-+				LLI_MAX_NUM_OF_ASSOC_DATA_ENTRIES);
- 			rc = -ENOMEM;
- 			goto chain_assoc_exit;
- 		}
-@@ -884,11 +871,11 @@ static inline int ssi_buffer_mgr_aead_chain_assoc(
- 
- 	if (unlikely((do_chain) ||
- 		     (areq_ctx->assoc_buff_type == SSI_DMA_BUF_MLLI))) {
--		SSI_LOG_DEBUG("Chain assoc: buff_type=%s nents=%u\n",
--			      GET_DMA_BUFFER_TYPE(areq_ctx->assoc_buff_type),
--			      areq_ctx->assoc.nents);
-+		dev_dbg(dev, "Chain assoc: buff_type=%s nents=%u\n",
-+			GET_DMA_BUFFER_TYPE(areq_ctx->assoc_buff_type),
-+			areq_ctx->assoc.nents);
- 		ssi_buffer_mgr_add_scatterlist_entry(
--			sg_data, areq_ctx->assoc.nents,
-+			dev, sg_data, areq_ctx->assoc.nents,
- 			req->src, req->assoclen, 0, is_last,
- 			&areq_ctx->assoc.mlli_nents);
- 		areq_ctx->assoc_buff_type = SSI_DMA_BUF_MLLI;
-@@ -946,10 +933,11 @@ static inline int ssi_buffer_mgr_prepare_aead_data_mlli(
- 	unsigned int authsize = areq_ctx->req_authsize;
- 	int rc = 0, icv_nents;
- 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
-+	struct device *dev = DEV(drvdata);
- 
- 	if (likely(req->src == req->dst)) {
- 		/*INPLACE*/
--		ssi_buffer_mgr_add_scatterlist_entry(sg_data,
-+		ssi_buffer_mgr_add_scatterlist_entry(dev, sg_data,
- 						     areq_ctx->src.nents,
- 						     areq_ctx->src_sgl,
- 						     areq_ctx->cryptlen,
-@@ -957,7 +945,8 @@ static inline int ssi_buffer_mgr_prepare_aead_data_mlli(
- 						     is_last_table,
- 						     &areq_ctx->src.mlli_nents);
- 
--		icv_nents = ssi_buffer_mgr_get_aead_icv_nents(areq_ctx->src_sgl,
-+		icv_nents = ssi_buffer_mgr_get_aead_icv_nents(dev,
-+							      areq_ctx->src_sgl,
- 							      areq_ctx->src.nents,
- 							      authsize,
- 							      *src_last_bytes,
-@@ -985,7 +974,8 @@ static inline int ssi_buffer_mgr_prepare_aead_data_mlli(
- 						skip += crypto_aead_ivsize(tfm);
- 
- 					ssi_buffer_mgr_copy_scatterlist_portion(
--						areq_ctx->backup_mac, req->src,
-+						dev, areq_ctx->backup_mac,
-+						req->src,
- 						(skip + req->cryptlen -
- 						 areq_ctx->req_authsize),
- 						skip + req->cryptlen,
-@@ -1008,14 +998,14 @@ static inline int ssi_buffer_mgr_prepare_aead_data_mlli(
- 
- 	} else if (direct == DRV_CRYPTO_DIRECTION_DECRYPT) {
- 		/*NON-INPLACE and DECRYPT*/
--		ssi_buffer_mgr_add_scatterlist_entry(sg_data,
-+		ssi_buffer_mgr_add_scatterlist_entry(dev, sg_data,
- 						     areq_ctx->src.nents,
- 						     areq_ctx->src_sgl,
- 						     areq_ctx->cryptlen,
- 						     areq_ctx->src_offset,
- 						     is_last_table,
- 						     &areq_ctx->src.mlli_nents);
--		ssi_buffer_mgr_add_scatterlist_entry(sg_data,
-+		ssi_buffer_mgr_add_scatterlist_entry(dev, sg_data,
- 						     areq_ctx->dst.nents,
- 						     areq_ctx->dst_sgl,
- 						     areq_ctx->cryptlen,
-@@ -1023,7 +1013,8 @@ static inline int ssi_buffer_mgr_prepare_aead_data_mlli(
- 						     is_last_table,
- 						     &areq_ctx->dst.mlli_nents);
- 
--		icv_nents = ssi_buffer_mgr_get_aead_icv_nents(areq_ctx->src_sgl,
-+		icv_nents = ssi_buffer_mgr_get_aead_icv_nents(dev,
-+							      areq_ctx->src_sgl,
- 							      areq_ctx->src.nents,
- 							      authsize,
- 							      *src_last_bytes,
-@@ -1044,9 +1035,9 @@ static inline int ssi_buffer_mgr_prepare_aead_data_mlli(
- 				  size_to_skip += crypto_aead_ivsize(tfm);
- 
- 			  ssi_buffer_mgr_copy_scatterlist_portion(
--				  areq_ctx->backup_mac, req->src,
--				  size_to_skip + req->cryptlen - areq_ctx->req_authsize,
--				  size_to_skip + req->cryptlen, SSI_SG_TO_BUF);
-+				dev, areq_ctx->backup_mac, req->src,
-+				size_to_skip + req->cryptlen - areq_ctx->req_authsize,
-+				size_to_skip + req->cryptlen, SSI_SG_TO_BUF);
- 			areq_ctx->icv_virt_addr = areq_ctx->backup_mac;
- 		} else { /* Contig. ICV */
- 			/*Should hanlde if the sg is not contig.*/
-@@ -1060,14 +1051,14 @@ static inline int ssi_buffer_mgr_prepare_aead_data_mlli(
- 
- 	} else {
- 		/*NON-INPLACE and ENCRYPT*/
--		ssi_buffer_mgr_add_scatterlist_entry(sg_data,
-+		ssi_buffer_mgr_add_scatterlist_entry(dev, sg_data,
- 						     areq_ctx->dst.nents,
- 						     areq_ctx->dst_sgl,
- 						     areq_ctx->cryptlen,
- 						     areq_ctx->dst_offset,
- 						     is_last_table,
- 						     &areq_ctx->dst.mlli_nents);
--		ssi_buffer_mgr_add_scatterlist_entry(sg_data,
-+		ssi_buffer_mgr_add_scatterlist_entry(dev, sg_data,
- 						     areq_ctx->src.nents,
- 						     areq_ctx->src_sgl,
- 						     areq_ctx->cryptlen,
-@@ -1075,7 +1066,8 @@ static inline int ssi_buffer_mgr_prepare_aead_data_mlli(
- 						     is_last_table,
- 						     &areq_ctx->src.mlli_nents);
- 
--		icv_nents = ssi_buffer_mgr_get_aead_icv_nents(areq_ctx->dst_sgl,
-+		icv_nents = ssi_buffer_mgr_get_aead_icv_nents(dev,
-+							      areq_ctx->dst_sgl,
- 							      areq_ctx->dst.nents,
- 							      authsize,
- 							      *dst_last_bytes,
-@@ -1139,7 +1131,10 @@ static inline int ssi_buffer_mgr_aead_chain_data(
- 		size_for_map += crypto_aead_ivsize(tfm);
- 
- 	size_for_map += (direct == DRV_CRYPTO_DIRECTION_ENCRYPT) ? authsize : 0;
--	src_mapped_nents = ssi_buffer_mgr_get_sgl_nents(req->src, size_for_map, &src_last_bytes, &chained);
-+	src_mapped_nents = ssi_buffer_mgr_get_sgl_nents(dev, req->src,
-+							size_for_map,
-+							&src_last_bytes,
-+							&chained);
- 	sg_index = areq_ctx->src_sgl->length;
- 	//check where the data starts
- 	while (sg_index <= size_to_skip) {
-@@ -1147,15 +1142,15 @@ static inline int ssi_buffer_mgr_aead_chain_data(
- 		areq_ctx->src_sgl = sg_next(areq_ctx->src_sgl);
- 		//if have reached the end of the sgl, then this is unexpected
- 		if (!areq_ctx->src_sgl) {
--			SSI_LOG_ERR("reached end of sg list. unexpected\n");
-+			dev_err(dev, "reached end of sg list. unexpected\n");
- 			return -EINVAL;
- 		}
- 		sg_index += areq_ctx->src_sgl->length;
- 		src_mapped_nents--;
- 	}
- 	if (unlikely(src_mapped_nents > LLI_MAX_NUM_OF_DATA_ENTRIES)) {
--		SSI_LOG_ERR("Too many fragments. current %d max %d\n",
--			    src_mapped_nents, LLI_MAX_NUM_OF_DATA_ENTRIES);
-+		dev_err(dev, "Too many fragments. current %d max %d\n",
-+			src_mapped_nents, LLI_MAX_NUM_OF_DATA_ENTRIES);
- 			return -ENOMEM;
- 	}
- 
-@@ -1181,7 +1176,10 @@ static inline int ssi_buffer_mgr_aead_chain_data(
- 		}
- 	}
- 
--	dst_mapped_nents = ssi_buffer_mgr_get_sgl_nents(req->dst, size_for_map, &dst_last_bytes, &chained);
-+	dst_mapped_nents = ssi_buffer_mgr_get_sgl_nents(dev, req->dst,
-+							size_for_map,
-+							&dst_last_bytes,
-+							&chained);
- 	sg_index = areq_ctx->dst_sgl->length;
- 	offset = size_to_skip;
- 
-@@ -1191,15 +1189,15 @@ static inline int ssi_buffer_mgr_aead_chain_data(
- 		areq_ctx->dst_sgl = sg_next(areq_ctx->dst_sgl);
- 		//if have reached the end of the sgl, then this is unexpected
- 		if (!areq_ctx->dst_sgl) {
--			SSI_LOG_ERR("reached end of sg list. unexpected\n");
-+			dev_err(dev, "reached end of sg list. unexpected\n");
- 			return -EINVAL;
- 		}
- 		sg_index += areq_ctx->dst_sgl->length;
- 		dst_mapped_nents--;
- 	}
- 	if (unlikely(dst_mapped_nents > LLI_MAX_NUM_OF_DATA_ENTRIES)) {
--		SSI_LOG_ERR("Too many fragments. current %d max %d\n",
--			    dst_mapped_nents, LLI_MAX_NUM_OF_DATA_ENTRIES);
-+		dev_err(dev, "Too many fragments. current %d max %d\n",
-+			dst_mapped_nents, LLI_MAX_NUM_OF_DATA_ENTRIES);
- 		return -ENOMEM;
- 	}
- 	areq_ctx->dst.nents = dst_mapped_nents;
-@@ -1306,7 +1304,7 @@ int ssi_buffer_mgr_map_aead_request(
- 		 * data memory overriding that caused by cache coherence problem.
- 		 */
- 		ssi_buffer_mgr_copy_scatterlist_portion(
--			areq_ctx->backup_mac, req->src,
-+			dev, areq_ctx->backup_mac, req->src,
- 			size_to_skip + req->cryptlen - areq_ctx->req_authsize,
- 			size_to_skip + req->cryptlen, SSI_SG_TO_BUF);
- 	}
-@@ -1321,8 +1319,8 @@ int ssi_buffer_mgr_map_aead_request(
- 						    MAX_MAC_SIZE,
- 						    DMA_BIDIRECTIONAL);
- 	if (unlikely(dma_mapping_error(dev, areq_ctx->mac_buf_dma_addr))) {
--		SSI_LOG_ERR("Mapping mac_buf %u B at va=%pK for DMA failed\n",
--			    MAX_MAC_SIZE, areq_ctx->mac_buf);
-+		dev_err(dev, "Mapping mac_buf %u B at va=%pK for DMA failed\n",
-+			MAX_MAC_SIZE, areq_ctx->mac_buf);
- 		rc = -ENOMEM;
- 		goto aead_map_failure;
- 	}
-@@ -1334,9 +1332,10 @@ int ssi_buffer_mgr_map_aead_request(
- 							    DMA_TO_DEVICE);
- 
- 		if (unlikely(dma_mapping_error(dev, areq_ctx->ccm_iv0_dma_addr))) {
--			SSI_LOG_ERR("Mapping mac_buf %u B at va=%pK "
--			"for DMA failed\n", AES_BLOCK_SIZE,
--			(areq_ctx->ccm_config + CCM_CTR_COUNT_0_OFFSET));
-+			dev_err(dev, "Mapping mac_buf %u B at va=%pK for DMA failed\n",
-+				AES_BLOCK_SIZE,
-+				(areq_ctx->ccm_config +
-+				 CCM_CTR_COUNT_0_OFFSET));
- 			areq_ctx->ccm_iv0_dma_addr = 0;
- 			rc = -ENOMEM;
- 			goto aead_map_failure;
-@@ -1356,8 +1355,8 @@ int ssi_buffer_mgr_map_aead_request(
- 							 AES_BLOCK_SIZE,
- 							 DMA_BIDIRECTIONAL);
- 		if (unlikely(dma_mapping_error(dev, areq_ctx->hkey_dma_addr))) {
--			SSI_LOG_ERR("Mapping hkey %u B at va=%pK for DMA failed\n",
--				    AES_BLOCK_SIZE, areq_ctx->hkey);
-+			dev_err(dev, "Mapping hkey %u B at va=%pK for DMA failed\n",
-+				AES_BLOCK_SIZE, areq_ctx->hkey);
- 			rc = -ENOMEM;
- 			goto aead_map_failure;
- 		}
-@@ -1367,8 +1366,8 @@ int ssi_buffer_mgr_map_aead_request(
- 								  AES_BLOCK_SIZE,
- 								  DMA_TO_DEVICE);
- 		if (unlikely(dma_mapping_error(dev, areq_ctx->gcm_block_len_dma_addr))) {
--			SSI_LOG_ERR("Mapping gcm_len_block %u B at va=%pK for DMA failed\n",
--				    AES_BLOCK_SIZE, &areq_ctx->gcm_len_block);
-+			dev_err(dev, "Mapping gcm_len_block %u B at va=%pK for DMA failed\n",
-+				AES_BLOCK_SIZE, &areq_ctx->gcm_len_block);
- 			rc = -ENOMEM;
- 			goto aead_map_failure;
- 		}
-@@ -1379,9 +1378,8 @@ int ssi_buffer_mgr_map_aead_request(
- 								DMA_TO_DEVICE);
- 
- 		if (unlikely(dma_mapping_error(dev, areq_ctx->gcm_iv_inc1_dma_addr))) {
--			SSI_LOG_ERR("Mapping gcm_iv_inc1 %u B at va=%pK "
--			"for DMA failed\n", AES_BLOCK_SIZE,
--			(areq_ctx->gcm_iv_inc1));
-+			dev_err(dev, "Mapping gcm_iv_inc1 %u B at va=%pK for DMA failed\n",
-+				AES_BLOCK_SIZE, (areq_ctx->gcm_iv_inc1));
- 			areq_ctx->gcm_iv_inc1_dma_addr = 0;
- 			rc = -ENOMEM;
- 			goto aead_map_failure;
-@@ -1393,9 +1391,8 @@ int ssi_buffer_mgr_map_aead_request(
- 								DMA_TO_DEVICE);
- 
- 		if (unlikely(dma_mapping_error(dev, areq_ctx->gcm_iv_inc2_dma_addr))) {
--			SSI_LOG_ERR("Mapping gcm_iv_inc2 %u B at va=%pK "
--			"for DMA failed\n", AES_BLOCK_SIZE,
--			(areq_ctx->gcm_iv_inc2));
-+			dev_err(dev, "Mapping gcm_iv_inc2 %u B at va=%pK for DMA failed\n",
-+				AES_BLOCK_SIZE, (areq_ctx->gcm_iv_inc2));
- 			areq_ctx->gcm_iv_inc2_dma_addr = 0;
- 			rc = -ENOMEM;
- 			goto aead_map_failure;
-@@ -1475,9 +1472,10 @@ int ssi_buffer_mgr_map_aead_request(
- 			goto aead_map_failure;
- 
- 		ssi_buffer_mgr_update_aead_mlli_nents(drvdata, req);
--		SSI_LOG_DEBUG("assoc params mn %d\n", areq_ctx->assoc.mlli_nents);
--		SSI_LOG_DEBUG("src params mn %d\n", areq_ctx->src.mlli_nents);
--		SSI_LOG_DEBUG("dst params mn %d\n", areq_ctx->dst.mlli_nents);
-+		dev_dbg(dev, "assoc params mn %d\n",
-+			areq_ctx->assoc.mlli_nents);
-+		dev_dbg(dev, "src params mn %d\n", areq_ctx->src.mlli_nents);
-+		dev_dbg(dev, "dst params mn %d\n", areq_ctx->dst.mlli_nents);
- 	}
- 	return 0;
- 
-@@ -1501,11 +1499,8 @@ int ssi_buffer_mgr_map_hash_request_final(
- 	u32 dummy = 0;
- 	u32 mapped_nents = 0;
- 
--	SSI_LOG_DEBUG(" final params : curr_buff=%pK "
--		     "curr_buff_cnt=0x%X nbytes = 0x%X "
--		     "src=%pK curr_index=%u\n",
--		     curr_buff, *curr_buff_cnt, nbytes,
--		     src, areq_ctx->buff_index);
-+	dev_dbg(dev, "final params : curr_buff=%pK curr_buff_cnt=0x%X nbytes = 0x%X src=%pK curr_index=%u\n",
-+		curr_buff, *curr_buff_cnt, nbytes, src, areq_ctx->buff_index);
- 	/* Init the type of the dma buffer */
- 	areq_ctx->data_dma_buf_type = SSI_DMA_BUF_NULL;
- 	mlli_params->curr_pool = NULL;
-@@ -1551,7 +1546,7 @@ int ssi_buffer_mgr_map_hash_request_final(
- 	if (unlikely(areq_ctx->data_dma_buf_type == SSI_DMA_BUF_MLLI)) {
- 		mlli_params->curr_pool = buff_mgr->mlli_buffs_pool;
- 		/* add the src data to the sg_data */
--		ssi_buffer_mgr_add_scatterlist_entry(&sg_data,
-+		ssi_buffer_mgr_add_scatterlist_entry(dev, &sg_data,
- 						     areq_ctx->in_nents,
- 						     src, nbytes, 0, true,
- 						     &areq_ctx->mlli_nents);
-@@ -1562,8 +1557,8 @@ int ssi_buffer_mgr_map_hash_request_final(
- 	}
- 	/* change the buffer index for the unmap function */
- 	areq_ctx->buff_index = (areq_ctx->buff_index ^ 1);
--	SSI_LOG_DEBUG("areq_ctx->data_dma_buf_type = %s\n",
--		      GET_DMA_BUFFER_TYPE(areq_ctx->data_dma_buf_type));
-+	dev_dbg(dev, "areq_ctx->data_dma_buf_type = %s\n",
-+		GET_DMA_BUFFER_TYPE(areq_ctx->data_dma_buf_type));
- 	return 0;
- 
- fail_unmap_din:
-@@ -1598,11 +1593,8 @@ int ssi_buffer_mgr_map_hash_request_update(
- 	u32 dummy = 0;
- 	u32 mapped_nents = 0;
- 
--	SSI_LOG_DEBUG(" update params : curr_buff=%pK "
--		     "curr_buff_cnt=0x%X nbytes=0x%X "
--		     "src=%pK curr_index=%u\n",
--		     curr_buff, *curr_buff_cnt, nbytes,
--		     src, areq_ctx->buff_index);
-+	dev_dbg(dev, " update params : curr_buff=%pK curr_buff_cnt=0x%X nbytes=0x%X src=%pK curr_index=%u\n",
-+		curr_buff, *curr_buff_cnt, nbytes, src, areq_ctx->buff_index);
- 	/* Init the type of the dma buffer */
- 	areq_ctx->data_dma_buf_type = SSI_DMA_BUF_NULL;
- 	mlli_params->curr_pool = NULL;
-@@ -1611,14 +1603,11 @@ int ssi_buffer_mgr_map_hash_request_update(
- 	areq_ctx->in_nents = 0;
- 
- 	if (unlikely(total_in_len < block_size)) {
--		SSI_LOG_DEBUG(" less than one block: curr_buff=%pK "
--			     "*curr_buff_cnt=0x%X copy_to=%pK\n",
--			curr_buff, *curr_buff_cnt,
--			&curr_buff[*curr_buff_cnt]);
-+		dev_dbg(dev, " less than one block: curr_buff=%pK *curr_buff_cnt=0x%X copy_to=%pK\n",
-+			curr_buff, *curr_buff_cnt, &curr_buff[*curr_buff_cnt]);
- 		areq_ctx->in_nents =
--			ssi_buffer_mgr_get_sgl_nents(src,
--						     nbytes,
--						     &dummy, NULL);
-+			ssi_buffer_mgr_get_sgl_nents(dev, src, nbytes, &dummy,
-+						     NULL);
- 		sg_copy_to_buffer(src, areq_ctx->in_nents,
- 				  &curr_buff[*curr_buff_cnt], nbytes);
- 		*curr_buff_cnt += nbytes;
-@@ -1630,17 +1619,15 @@ int ssi_buffer_mgr_map_hash_request_update(
- 	/* update data len */
- 	update_data_len = total_in_len - *next_buff_cnt;
- 
--	SSI_LOG_DEBUG(" temp length : *next_buff_cnt=0x%X "
--		     "update_data_len=0x%X\n",
-+	dev_dbg(dev, " temp length : *next_buff_cnt=0x%X update_data_len=0x%X\n",
- 		*next_buff_cnt, update_data_len);
- 
- 	/* Copy the new residue to next buffer */
- 	if (*next_buff_cnt != 0) {
--		SSI_LOG_DEBUG(" handle residue: next buff %pK skip data %u"
--			     " residue %u\n", next_buff,
--			     (update_data_len - *curr_buff_cnt),
--			     *next_buff_cnt);
--		ssi_buffer_mgr_copy_scatterlist_portion(next_buff, src,
-+		dev_dbg(dev, " handle residue: next buff %pK skip data %u residue %u\n",
-+			next_buff, (update_data_len - *curr_buff_cnt),
-+			*next_buff_cnt);
-+		ssi_buffer_mgr_copy_scatterlist_portion(dev, next_buff, src,
- 							(update_data_len - *curr_buff_cnt),
- 							nbytes, SSI_SG_TO_BUF);
- 		/* change the buffer index for next operation */
-@@ -1682,7 +1669,7 @@ int ssi_buffer_mgr_map_hash_request_update(
- 	if (unlikely(areq_ctx->data_dma_buf_type == SSI_DMA_BUF_MLLI)) {
- 		mlli_params->curr_pool = buff_mgr->mlli_buffs_pool;
- 		/* add the src data to the sg_data */
--		ssi_buffer_mgr_add_scatterlist_entry(&sg_data,
-+		ssi_buffer_mgr_add_scatterlist_entry(dev, &sg_data,
- 						     areq_ctx->in_nents,
- 						     src,
- 						     (update_data_len - *curr_buff_cnt),
-@@ -1719,29 +1706,26 @@ void ssi_buffer_mgr_unmap_hash_request(
- 	 *allocated and should be released
- 	 */
- 	if (areq_ctx->mlli_params.curr_pool) {
--		SSI_LOG_DEBUG("free MLLI buffer: dma=%pad virt=%pK\n",
--			      areq_ctx->mlli_params.mlli_dma_addr,
--			      areq_ctx->mlli_params.mlli_virt_addr);
-+		dev_dbg(dev, "free MLLI buffer: dma=%pad virt=%pK\n",
-+			&areq_ctx->mlli_params.mlli_dma_addr,
-+			areq_ctx->mlli_params.mlli_virt_addr);
- 		dma_pool_free(areq_ctx->mlli_params.curr_pool,
- 			      areq_ctx->mlli_params.mlli_virt_addr,
- 			      areq_ctx->mlli_params.mlli_dma_addr);
- 	}
- 
- 	if ((src) && likely(areq_ctx->in_nents != 0)) {
--		SSI_LOG_DEBUG("Unmapped sg src: virt=%pK dma=%pad len=0x%X\n",
--			      sg_virt(src),
--			      sg_dma_address(src),
--			      sg_dma_len(src));
-+		dev_dbg(dev, "Unmapped sg src: virt=%pK dma=%pad len=0x%X\n",
-+			sg_virt(src), &sg_dma_address(src), sg_dma_len(src));
- 		dma_unmap_sg(dev, src,
- 			     areq_ctx->in_nents, DMA_TO_DEVICE);
- 	}
- 
- 	if (*prev_len != 0) {
--		SSI_LOG_DEBUG("Unmapped buffer: areq_ctx->buff_sg=%pK"
--			     " dma=%pad len 0x%X\n",
--				sg_virt(areq_ctx->buff_sg),
--				sg_dma_address(areq_ctx->buff_sg),
--				sg_dma_len(areq_ctx->buff_sg));
-+		dev_dbg(dev, "Unmapped buffer: areq_ctx->buff_sg=%pK dma=%pad len 0x%X\n",
-+			sg_virt(areq_ctx->buff_sg),
-+			&sg_dma_address(areq_ctx->buff_sg),
-+			sg_dma_len(areq_ctx->buff_sg));
- 		dma_unmap_sg(dev, areq_ctx->buff_sg, 1, DMA_TO_DEVICE);
- 		if (!do_revert) {
- 			/* clean the previous data length for update operation */
-diff --git a/drivers/staging/ccree/ssi_buffer_mgr.h b/drivers/staging/ccree/ssi_buffer_mgr.h
-index 41f5223..1032f25 100644
---- a/drivers/staging/ccree/ssi_buffer_mgr.h
-+++ b/drivers/staging/ccree/ssi_buffer_mgr.h
-@@ -80,7 +80,10 @@ int ssi_buffer_mgr_map_hash_request_update(struct ssi_drvdata *drvdata, void *ct
- 
- void ssi_buffer_mgr_unmap_hash_request(struct device *dev, void *ctx, struct scatterlist *src, bool do_revert);
- 
--void ssi_buffer_mgr_copy_scatterlist_portion(u8 *dest, struct scatterlist *sg, u32 to_skip, u32 end, enum ssi_sg_cpy_direct direct);
-+void ssi_buffer_mgr_copy_scatterlist_portion(struct device *dev, u8 *dest,
-+					     struct scatterlist *sg,
-+					     u32 to_skip, u32 end,
-+					     enum ssi_sg_cpy_direct direct);
- 
- void ssi_buffer_mgr_zero_sgl(struct scatterlist *sgl, u32 data_len);
- 
-diff --git a/drivers/staging/ccree/ssi_cipher.c b/drivers/staging/ccree/ssi_cipher.c
-index 49e0110..cceaee8 100644
---- a/drivers/staging/ccree/ssi_cipher.c
-+++ b/drivers/staging/ccree/ssi_cipher.c
-@@ -185,8 +185,8 @@ static int ssi_blkcipher_init(struct crypto_tfm *tfm)
- 	int rc = 0;
- 	unsigned int max_key_buf_size = get_max_keysize(tfm);
- 
--	SSI_LOG_DEBUG("Initializing context @%p for %s\n",
--		      ctx_p, crypto_tfm_alg_name(tfm));
-+	dev_dbg(dev, "Initializing context @%p for %s\n", ctx_p,
-+		crypto_tfm_alg_name(tfm));
- 
- 	ctx_p->cipher_mode = ssi_alg->cipher_mode;
- 	ctx_p->flow_mode = ssi_alg->flow_mode;
-@@ -195,30 +195,29 @@ static int ssi_blkcipher_init(struct crypto_tfm *tfm)
- 	/* Allocate key buffer, cache line aligned */
- 	ctx_p->user.key = kmalloc(max_key_buf_size, GFP_KERNEL | GFP_DMA);
- 	if (!ctx_p->user.key) {
--		SSI_LOG_ERR("Allocating key buffer in context failed\n");
-+		dev_dbg(dev, "Allocating key buffer in context failed\n");
- 		rc = -ENOMEM;
- 	}
--	SSI_LOG_DEBUG("Allocated key buffer in context. key=@%p\n",
--		      ctx_p->user.key);
-+	dev_dbg(dev, "Allocated key buffer in context. key=@%p\n",
-+		ctx_p->user.key);
- 
- 	/* Map key buffer */
- 	ctx_p->user.key_dma_addr = dma_map_single(dev, (void *)ctx_p->user.key,
- 						  max_key_buf_size,
- 						  DMA_TO_DEVICE);
- 	if (dma_mapping_error(dev, ctx_p->user.key_dma_addr)) {
--		SSI_LOG_ERR("Mapping Key %u B at va=%pK for DMA failed\n",
--			    max_key_buf_size, ctx_p->user.key);
-+		dev_err(dev, "Mapping Key %u B at va=%pK for DMA failed\n",
-+			max_key_buf_size, ctx_p->user.key);
- 		return -ENOMEM;
- 	}
--	SSI_LOG_DEBUG("Mapped key %u B at va=%pK to dma=%pad\n",
--		      max_key_buf_size, ctx_p->user.key,
--		      ctx_p->user.key_dma_addr);
-+	dev_dbg(dev, "Mapped key %u B at va=%pK to dma=%pad\n",
-+		max_key_buf_size, ctx_p->user.key, &ctx_p->user.key_dma_addr);
- 
- 	if (ctx_p->cipher_mode == DRV_CIPHER_ESSIV) {
- 		/* Alloc hash tfm for essiv */
- 		ctx_p->shash_tfm = crypto_alloc_shash("sha256-generic", 0, 0);
- 		if (IS_ERR(ctx_p->shash_tfm)) {
--			SSI_LOG_ERR("Error allocating hash tfm for ESSIV.\n");
-+			dev_err(dev, "Error allocating hash tfm for ESSIV.\n");
- 			return PTR_ERR(ctx_p->shash_tfm);
- 		}
- 	}
-@@ -232,8 +231,8 @@ static void ssi_blkcipher_exit(struct crypto_tfm *tfm)
- 	struct device *dev = DEV(ctx_p->drvdata);
- 	unsigned int max_key_buf_size = get_max_keysize(tfm);
- 
--	SSI_LOG_DEBUG("Clearing context @%p for %s\n",
--		      crypto_tfm_ctx(tfm), crypto_tfm_alg_name(tfm));
-+	dev_dbg(dev, "Clearing context @%p for %s\n",
-+		crypto_tfm_ctx(tfm), crypto_tfm_alg_name(tfm));
- 
- 	if (ctx_p->cipher_mode == DRV_CIPHER_ESSIV) {
- 		/* Free hash tfm for essiv */
-@@ -244,12 +243,12 @@ static void ssi_blkcipher_exit(struct crypto_tfm *tfm)
- 	/* Unmap key buffer */
- 	dma_unmap_single(dev, ctx_p->user.key_dma_addr, max_key_buf_size,
- 			 DMA_TO_DEVICE);
--	SSI_LOG_DEBUG("Unmapped key buffer key_dma_addr=%pad\n",
--		      ctx_p->user.key_dma_addr);
-+	dev_dbg(dev, "Unmapped key buffer key_dma_addr=%pad\n",
-+		&ctx_p->user.key_dma_addr);
- 
- 	/* Free key buffer in context */
- 	kfree(ctx_p->user.key);
--	SSI_LOG_DEBUG("Free key buffer in context. key=@%p\n", ctx_p->user.key);
-+	dev_dbg(dev, "Free key buffer in context. key=@%p\n", ctx_p->user.key);
- }
- 
- struct tdes_keys {
-@@ -301,12 +300,10 @@ static int ssi_blkcipher_setkey(struct crypto_tfm *tfm,
- 	u32 tmp[DES_EXPKEY_WORDS];
- 	unsigned int max_key_buf_size = get_max_keysize(tfm);
- 
--	SSI_LOG_DEBUG("Setting key in context @%p for %s. keylen=%u\n",
--		      ctx_p, crypto_tfm_alg_name(tfm), keylen);
-+	dev_dbg(dev, "Setting key in context @%p for %s. keylen=%u\n",
-+		ctx_p, crypto_tfm_alg_name(tfm), keylen);
- 	dump_byte_array("key", (u8 *)key, keylen);
- 
--	SSI_LOG_DEBUG("after FIPS check");
--
- 	/* STAT_PHASE_0: Init and sanity checks */
- 
- #if SSI_CC_HAS_MULTI2
-@@ -316,7 +313,7 @@ static int ssi_blkcipher_setkey(struct crypto_tfm *tfm,
- #endif /*SSI_CC_HAS_MULTI2*/
- 
- 	if (unlikely(validate_keys_sizes(ctx_p, keylen) != 0)) {
--		SSI_LOG_ERR("Unsupported key size %d.\n", keylen);
-+		dev_err(dev, "Unsupported key size %d.\n", keylen);
- 		crypto_tfm_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
- 		return -EINVAL;
- 	}
-@@ -326,13 +323,14 @@ static int ssi_blkcipher_setkey(struct crypto_tfm *tfm,
- 		struct arm_hw_key_info *hki = (struct arm_hw_key_info *)key;
- 
- 		if (unlikely(ctx_p->flow_mode != S_DIN_to_AES)) {
--			SSI_LOG_ERR("HW key not supported for non-AES flows\n");
-+			dev_err(dev, "HW key not supported for non-AES flows\n");
- 			return -EINVAL;
- 		}
- 
- 		ctx_p->hw.key1_slot = hw_key_to_cc_hw_key(hki->hw_key1);
- 		if (unlikely(ctx_p->hw.key1_slot == END_OF_KEYS)) {
--			SSI_LOG_ERR("Unsupported hw key1 number (%d)\n", hki->hw_key1);
-+			dev_err(dev, "Unsupported hw key1 number (%d)\n",
-+				hki->hw_key1);
- 			return -EINVAL;
- 		}
- 
-@@ -340,18 +338,20 @@ static int ssi_blkcipher_setkey(struct crypto_tfm *tfm,
- 		    (ctx_p->cipher_mode == DRV_CIPHER_ESSIV) ||
- 		    (ctx_p->cipher_mode == DRV_CIPHER_BITLOCKER)) {
- 			if (unlikely(hki->hw_key1 == hki->hw_key2)) {
--				SSI_LOG_ERR("Illegal hw key numbers (%d,%d)\n", hki->hw_key1, hki->hw_key2);
-+				dev_err(dev, "Illegal hw key numbers (%d,%d)\n",
-+					hki->hw_key1, hki->hw_key2);
- 				return -EINVAL;
- 			}
- 			ctx_p->hw.key2_slot = hw_key_to_cc_hw_key(hki->hw_key2);
- 			if (unlikely(ctx_p->hw.key2_slot == END_OF_KEYS)) {
--				SSI_LOG_ERR("Unsupported hw key2 number (%d)\n", hki->hw_key2);
-+				dev_err(dev, "Unsupported hw key2 number (%d)\n",
-+					hki->hw_key2);
- 				return -EINVAL;
- 			}
- 		}
- 
- 		ctx_p->keylen = keylen;
--		SSI_LOG_DEBUG("ssi_is_hw_key ret 0");
-+		dev_dbg(dev, "ssi_is_hw_key ret 0");
- 
- 		return 0;
- 	}
-@@ -361,19 +361,19 @@ static int ssi_blkcipher_setkey(struct crypto_tfm *tfm,
- 		if (unlikely(!des_ekey(tmp, key)) &&
- 		    (crypto_tfm_get_flags(tfm) & CRYPTO_TFM_REQ_WEAK_KEY)) {
- 			tfm->crt_flags |= CRYPTO_TFM_RES_WEAK_KEY;
--			SSI_LOG_DEBUG("weak DES key");
-+			dev_dbg(dev, "weak DES key");
- 			return -EINVAL;
- 		}
- 	}
- 	if ((ctx_p->cipher_mode == DRV_CIPHER_XTS) &&
- 	    xts_check_key(tfm, key, keylen) != 0) {
--		SSI_LOG_DEBUG("weak XTS key");
-+		dev_dbg(dev, "weak XTS key");
- 		return -EINVAL;
- 	}
- 	if ((ctx_p->flow_mode == S_DIN_to_DES) &&
- 	    (keylen == DES3_EDE_KEY_SIZE) &&
- 	    ssi_verify_3des_keys(key, keylen) != 0) {
--		SSI_LOG_DEBUG("weak 3DES key");
-+		dev_dbg(dev, "weak 3DES key");
- 		return -EINVAL;
- 	}
- 
-@@ -388,7 +388,7 @@ static int ssi_blkcipher_setkey(struct crypto_tfm *tfm,
- 		if (ctx_p->key_round_number < CC_MULTI2_MIN_NUM_ROUNDS ||
- 		    ctx_p->key_round_number > CC_MULTI2_MAX_NUM_ROUNDS) {
- 			crypto_tfm_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
--			SSI_LOG_DEBUG("SSI_CC_HAS_MULTI2 einval");
-+			dev_dbg(dev, "SSI_CC_HAS_MULTI2 einval");
- 			return -EINVAL;
- #endif /*SSI_CC_HAS_MULTI2*/
- 	} else {
-@@ -406,7 +406,7 @@ static int ssi_blkcipher_setkey(struct crypto_tfm *tfm,
- 
- 			err = crypto_shash_digest(desc, ctx_p->user.key, key_len, ctx_p->user.key + key_len);
- 			if (err) {
--				SSI_LOG_ERR("Failed to hash ESSIV key.\n");
-+				dev_err(dev, "Failed to hash ESSIV key.\n");
- 				return err;
- 			}
- 		}
-@@ -415,7 +415,7 @@ static int ssi_blkcipher_setkey(struct crypto_tfm *tfm,
- 				   max_key_buf_size, DMA_TO_DEVICE);
- 	ctx_p->keylen = keylen;
- 
--	 SSI_LOG_DEBUG("return safely");
-+	 dev_dbg(dev, "return safely");
- 	return 0;
- }
- 
-@@ -429,6 +429,7 @@ ssi_blkcipher_create_setup_desc(
- 	unsigned int *seq_size)
- {
- 	struct ssi_ablkcipher_ctx *ctx_p = crypto_tfm_ctx(tfm);
-+	struct device *dev = DEV(ctx_p->drvdata);
- 	int cipher_mode = ctx_p->cipher_mode;
- 	int flow_mode = ctx_p->flow_mode;
- 	int direction = req_ctx->gen_ctx.op_type;
-@@ -539,7 +540,7 @@ ssi_blkcipher_create_setup_desc(
- 		(*seq_size)++;
- 		break;
- 	default:
--		SSI_LOG_ERR("Unsupported cipher mode (%d)\n", cipher_mode);
-+		dev_err(dev, "Unsupported cipher mode (%d)\n", cipher_mode);
- 	}
- }
- 
-@@ -599,6 +600,7 @@ ssi_blkcipher_create_data_desc(
- 	unsigned int *seq_size)
- {
- 	struct ssi_ablkcipher_ctx *ctx_p = crypto_tfm_ctx(tfm);
-+	struct device *dev = DEV(ctx_p->drvdata);
- 	unsigned int flow_mode = ctx_p->flow_mode;
- 
- 	switch (ctx_p->flow_mode) {
-@@ -614,15 +616,15 @@ ssi_blkcipher_create_data_desc(
- 		break;
- #endif /*SSI_CC_HAS_MULTI2*/
- 	default:
--		SSI_LOG_ERR("invalid flow mode, flow_mode = %d\n", flow_mode);
-+		dev_err(dev, "invalid flow mode, flow_mode = %d\n", flow_mode);
- 		return;
- 	}
- 	/* Process */
- 	if (likely(req_ctx->dma_buf_type == SSI_DMA_BUF_DLLI)) {
--		SSI_LOG_DEBUG(" data params addr %pad length 0x%X\n",
--			      sg_dma_address(src), nbytes);
--		SSI_LOG_DEBUG(" data params addr %pad length 0x%X\n",
--			      sg_dma_address(dst), nbytes);
-+		dev_dbg(dev, " data params addr %pad length 0x%X\n",
-+			&sg_dma_address(src), nbytes);
-+		dev_dbg(dev, " data params addr %pad length 0x%X\n",
-+			&sg_dma_address(dst), nbytes);
- 		hw_desc_init(&desc[*seq_size]);
- 		set_din_type(&desc[*seq_size], DMA_DLLI, sg_dma_address(src),
- 			     nbytes, NS_BIT);
-@@ -635,9 +637,8 @@ ssi_blkcipher_create_data_desc(
- 		(*seq_size)++;
- 	} else {
- 		/* bypass */
--		SSI_LOG_DEBUG(" bypass params addr %pad "
--			     "length 0x%X addr 0x%08X\n",
--			req_ctx->mlli_params.mlli_dma_addr,
-+		dev_dbg(dev, " bypass params addr %pad length 0x%X addr 0x%08X\n",
-+			&req_ctx->mlli_params.mlli_dma_addr,
- 			req_ctx->mlli_params.mlli_len,
- 			(unsigned int)ctx_p->drvdata->mlli_sram_addr);
- 		hw_desc_init(&desc[*seq_size]);
-@@ -655,21 +656,18 @@ ssi_blkcipher_create_data_desc(
- 			     ctx_p->drvdata->mlli_sram_addr,
- 			     req_ctx->in_mlli_nents, NS_BIT);
- 		if (req_ctx->out_nents == 0) {
--			SSI_LOG_DEBUG(" din/dout params addr 0x%08X "
--				     "addr 0x%08X\n",
--			(unsigned int)ctx_p->drvdata->mlli_sram_addr,
--			(unsigned int)ctx_p->drvdata->mlli_sram_addr);
-+			dev_dbg(dev, " din/dout params addr 0x%08X addr 0x%08X\n",
-+				(unsigned int)ctx_p->drvdata->mlli_sram_addr,
-+				(unsigned int)ctx_p->drvdata->mlli_sram_addr);
- 			set_dout_mlli(&desc[*seq_size],
- 				      ctx_p->drvdata->mlli_sram_addr,
- 				      req_ctx->in_mlli_nents, NS_BIT,
- 				      (!areq ? 0 : 1));
- 		} else {
--			SSI_LOG_DEBUG(" din/dout params "
--				     "addr 0x%08X addr 0x%08X\n",
-+			dev_dbg(dev, " din/dout params addr 0x%08X addr 0x%08X\n",
- 				(unsigned int)ctx_p->drvdata->mlli_sram_addr,
- 				(unsigned int)ctx_p->drvdata->mlli_sram_addr +
--				(u32)LLI_ENTRY_BYTE_SIZE *
--							req_ctx->in_nents);
-+				(u32)LLI_ENTRY_BYTE_SIZE * req_ctx->in_nents);
- 			set_dout_mlli(&desc[*seq_size],
- 				      (ctx_p->drvdata->mlli_sram_addr +
- 				       (LLI_ENTRY_BYTE_SIZE *
-@@ -742,15 +740,15 @@ static int ssi_blkcipher_process(
- 	struct ssi_crypto_req ssi_req = {};
- 	int rc, seq_len = 0, cts_restore_flag = 0;
- 
--	SSI_LOG_DEBUG("%s areq=%p info=%p nbytes=%d\n",
--		      ((direction == DRV_CRYPTO_DIRECTION_ENCRYPT) ? "Encrypt" : "Decrypt"),
--		      areq, info, nbytes);
-+	dev_dbg(dev, "%s areq=%p info=%p nbytes=%d\n",
-+		((direction == DRV_CRYPTO_DIRECTION_ENCRYPT) ?
-+		"Encrypt" : "Decrypt"), areq, info, nbytes);
- 
- 	/* STAT_PHASE_0: Init and sanity checks */
- 
- 	/* TODO: check data length according to mode */
- 	if (unlikely(validate_data_size(ctx_p, nbytes))) {
--		SSI_LOG_ERR("Unsupported data size %d.\n", nbytes);
-+		dev_err(dev, "Unsupported data size %d.\n", nbytes);
- 		crypto_tfm_set_flags(tfm, CRYPTO_TFM_RES_BAD_BLOCK_LEN);
- 		rc = -EINVAL;
- 		goto exit_process;
-@@ -783,7 +781,7 @@ static int ssi_blkcipher_process(
- 
- 	rc = ssi_buffer_mgr_map_blkcipher_request(ctx_p->drvdata, req_ctx, ivsize, nbytes, info, src, dst);
- 	if (unlikely(rc != 0)) {
--		SSI_LOG_ERR("map_request() failed\n");
-+		dev_err(dev, "map_request() failed\n");
- 		goto exit_process;
- 	}
- 
-@@ -1240,14 +1238,15 @@ static struct ssi_alg_template blkcipher_algs[] = {
- };
- 
- static
--struct ssi_crypto_alg *ssi_ablkcipher_create_alg(struct ssi_alg_template *template)
-+struct ssi_crypto_alg *ssi_ablkcipher_create_alg(struct ssi_alg_template
-+						 *template, struct device *dev)
- {
- 	struct ssi_crypto_alg *t_alg;
- 	struct crypto_alg *alg;
- 
- 	t_alg = kzalloc(sizeof(*t_alg), GFP_KERNEL);
- 	if (!t_alg) {
--		SSI_LOG_ERR("failed to allocate t_alg\n");
-+		dev_dbg(dev, "failed to allocate t_alg\n");
- 		return ERR_PTR(-ENOMEM);
- 	}
- 
-@@ -1299,6 +1298,7 @@ int ssi_ablkcipher_alloc(struct ssi_drvdata *drvdata)
- {
- 	struct ssi_blkcipher_handle *ablkcipher_handle;
- 	struct ssi_crypto_alg *t_alg;
-+	struct device *dev = DEV(drvdata);
- 	int rc = -ENOMEM;
- 	int alg;
- 
-@@ -1310,32 +1310,34 @@ int ssi_ablkcipher_alloc(struct ssi_drvdata *drvdata)
- 	drvdata->blkcipher_handle = ablkcipher_handle;
- 
- 	/* Linux crypto */
--	SSI_LOG_DEBUG("Number of algorithms = %zu\n", ARRAY_SIZE(blkcipher_algs));
-+	dev_dbg(dev, "Number of algorithms = %zu\n",
-+		ARRAY_SIZE(blkcipher_algs));
- 	for (alg = 0; alg < ARRAY_SIZE(blkcipher_algs); alg++) {
--		SSI_LOG_DEBUG("creating %s\n", blkcipher_algs[alg].driver_name);
--		t_alg = ssi_ablkcipher_create_alg(&blkcipher_algs[alg]);
-+		dev_dbg(dev, "creating %s\n", blkcipher_algs[alg].driver_name);
-+		t_alg = ssi_ablkcipher_create_alg(&blkcipher_algs[alg], dev);
- 		if (IS_ERR(t_alg)) {
- 			rc = PTR_ERR(t_alg);
--			SSI_LOG_ERR("%s alg allocation failed\n",
--				    blkcipher_algs[alg].driver_name);
-+			dev_err(dev, "%s alg allocation failed\n",
-+				blkcipher_algs[alg].driver_name);
- 			goto fail0;
- 		}
- 		t_alg->drvdata = drvdata;
- 
--		SSI_LOG_DEBUG("registering %s\n", blkcipher_algs[alg].driver_name);
-+		dev_dbg(dev, "registering %s\n",
-+			blkcipher_algs[alg].driver_name);
- 		rc = crypto_register_alg(&t_alg->crypto_alg);
--		SSI_LOG_DEBUG("%s alg registration rc = %x\n",
--			      t_alg->crypto_alg.cra_driver_name, rc);
-+		dev_dbg(dev, "%s alg registration rc = %x\n",
-+			t_alg->crypto_alg.cra_driver_name, rc);
- 		if (unlikely(rc != 0)) {
--			SSI_LOG_ERR("%s alg registration failed\n",
--				    t_alg->crypto_alg.cra_driver_name);
-+			dev_err(dev, "%s alg registration failed\n",
-+				t_alg->crypto_alg.cra_driver_name);
- 			kfree(t_alg);
- 			goto fail0;
- 		} else {
- 			list_add_tail(&t_alg->entry,
- 				      &ablkcipher_handle->blkcipher_alg_list);
--			SSI_LOG_DEBUG("Registered %s\n",
--				      t_alg->crypto_alg.cra_driver_name);
-+			dev_dbg(dev, "Registered %s\n",
-+				t_alg->crypto_alg.cra_driver_name);
- 		}
- 	}
- 	return 0;
-diff --git a/drivers/staging/ccree/ssi_driver.c b/drivers/staging/ccree/ssi_driver.c
-index 5342ab8..43f2301 100644
---- a/drivers/staging/ccree/ssi_driver.c
-+++ b/drivers/staging/ccree/ssi_driver.c
-@@ -74,41 +74,17 @@
- #include "ssi_fips.h"
- 
- #ifdef DX_DUMP_BYTES
--void dump_byte_array(const char *name, const u8 *the_array, unsigned long size)
-+void dump_byte_array(const char *name, const u8 *buf, size_t len)
- {
--	int i, line_offset = 0, ret = 0;
--	const u8 *cur_byte;
--	char line_buf[80];
-+	char prefix[NAME_LEN];
- 
--	if (!the_array) {
--		SSI_LOG_ERR("cannot dump array - NULL pointer\n");
-+	if (!buf)
- 		return;
--	}
- 
--	ret = snprintf(line_buf, sizeof(line_buf), "%s[%lu]: ", name, size);
--	if (ret < 0) {
--		SSI_LOG_ERR("snprintf returned %d . aborting buffer array dump\n", ret);
--		return;
--	}
--	line_offset = ret;
--	for (i = 0, cur_byte = the_array;
--	     (i < size) && (line_offset < sizeof(line_buf)); i++, cur_byte++) {
--			ret = snprintf(line_buf + line_offset,
--				       sizeof(line_buf) - line_offset,
--				       "0x%02X ", *cur_byte);
--		if (ret < 0) {
--			SSI_LOG_ERR("snprintf returned %d . aborting buffer array dump\n", ret);
--			return;
--		}
--		line_offset += ret;
--		if (line_offset > 75) { /* Cut before line end */
--			SSI_LOG_DEBUG("%s\n", line_buf);
--			line_offset = 0;
--		}
--	}
-+	snprintf(prefix, sizeof(prefix), "%s[%lu]: ", name, len);
- 
--	if (line_offset > 0) /* Dump remaining line */
--		SSI_LOG_DEBUG("%s\n", line_buf);
-+	print_hex_dump(KERN_DEBUG, prefix, DUMP_PREFIX_ADDRESS, 16, 1, len,
-+		       false);
- }
- #endif
- 
-@@ -116,6 +92,7 @@ static irqreturn_t cc_isr(int irq, void *dev_id)
- {
- 	struct ssi_drvdata *drvdata = (struct ssi_drvdata *)dev_id;
- 	void __iomem *cc_base = drvdata->cc_base;
-+	struct device *dev = DEV(drvdata);
- 	u32 irr;
- 	u32 imr;
- 
-@@ -123,9 +100,9 @@ static irqreturn_t cc_isr(int irq, void *dev_id)
- 
- 	/* read the interrupt status */
- 	irr = CC_HAL_READ_REGISTER(CC_REG_OFFSET(HOST_RGF, HOST_IRR));
--	SSI_LOG_DEBUG("Got IRR=0x%08X\n", irr);
-+	dev_dbg(dev, "Got IRR=0x%08X\n", irr);
- 	if (unlikely(irr == 0)) { /* Probably shared interrupt line */
--		SSI_LOG_ERR("Got interrupt with empty IRR\n");
-+		dev_err(dev, "Got interrupt with empty IRR\n");
- 		return IRQ_NONE;
- 	}
- 	imr = CC_HAL_READ_REGISTER(CC_REG_OFFSET(HOST_RGF, HOST_IMR));
-@@ -156,13 +133,15 @@ static irqreturn_t cc_isr(int irq, void *dev_id)
- 
- 		/* Read the AXI error ID */
- 		axi_err = CC_HAL_READ_REGISTER(CC_REG_OFFSET(CRY_KERNEL, AXIM_MON_ERR));
--		SSI_LOG_DEBUG("AXI completion error: axim_mon_err=0x%08X\n", axi_err);
-+		dev_dbg(dev, "AXI completion error: axim_mon_err=0x%08X\n",
-+			axi_err);
- 
- 		irr &= ~SSI_AXI_ERR_IRQ_MASK;
- 	}
- 
- 	if (unlikely(irr != 0)) {
--		SSI_LOG_DEBUG("IRR includes unknown cause bits (0x%08X)\n", irr);
-+		dev_dbg(dev, "IRR includes unknown cause bits (0x%08X)\n",
-+			irr);
- 		/* Just warning */
- 	}
- 
-@@ -173,15 +152,17 @@ int init_cc_regs(struct ssi_drvdata *drvdata, bool is_probe)
- {
- 	unsigned int val, cache_params;
- 	void __iomem *cc_base = drvdata->cc_base;
-+	struct device *dev = DEV(drvdata);
- 
- 	/* Unmask all AXI interrupt sources AXI_CFG1 register */
- 	val = CC_HAL_READ_REGISTER(CC_REG_OFFSET(CRY_KERNEL, AXIM_CFG));
- 	CC_HAL_WRITE_REGISTER(CC_REG_OFFSET(CRY_KERNEL, AXIM_CFG), val & ~SSI_AXI_IRQ_MASK);
--	SSI_LOG_DEBUG("AXIM_CFG=0x%08X\n", CC_HAL_READ_REGISTER(CC_REG_OFFSET(CRY_KERNEL, AXIM_CFG)));
-+	dev_dbg(dev, "AXIM_CFG=0x%08X\n",
-+		CC_HAL_READ_REGISTER(CC_REG_OFFSET(CRY_KERNEL, AXIM_CFG)));
- 
- 	/* Clear all pending interrupts */
- 	val = CC_HAL_READ_REGISTER(CC_REG_OFFSET(HOST_RGF, HOST_IRR));
--	SSI_LOG_DEBUG("IRR=0x%08X\n", val);
-+	dev_dbg(dev, "IRR=0x%08X\n", val);
- 	CC_HAL_WRITE_REGISTER(CC_REG_OFFSET(HOST_RGF, HOST_ICR), val);
- 
- 	/* Unmask relevant interrupt cause */
-@@ -196,8 +177,8 @@ int init_cc_regs(struct ssi_drvdata *drvdata, bool is_probe)
- 			      DX_IRQ_DELAY);
- #endif
- 	if (CC_HAL_READ_REGISTER(CC_REG_OFFSET(HOST_RGF, HOST_IRQ_TIMER_INIT_VAL)) > 0) {
--		SSI_LOG_DEBUG("irq_delay=%d CC cycles\n",
--			      CC_HAL_READ_REGISTER(CC_REG_OFFSET(HOST_RGF, HOST_IRQ_TIMER_INIT_VAL)));
-+		dev_dbg(dev, "irq_delay=%d CC cycles\n",
-+			CC_HAL_READ_REGISTER(CC_REG_OFFSET(HOST_RGF, HOST_IRQ_TIMER_INIT_VAL)));
- 	}
- #endif
- 
-@@ -206,15 +187,15 @@ int init_cc_regs(struct ssi_drvdata *drvdata, bool is_probe)
- 	val = CC_HAL_READ_REGISTER(CC_REG_OFFSET(CRY_KERNEL, AXIM_CACHE_PARAMS));
- 
- 	if (is_probe)
--		SSI_LOG_INFO("Cache params previous: 0x%08X\n", val);
-+		dev_info(dev, "Cache params previous: 0x%08X\n", val);
- 
- 	CC_HAL_WRITE_REGISTER(CC_REG_OFFSET(CRY_KERNEL, AXIM_CACHE_PARAMS),
- 			      cache_params);
- 	val = CC_HAL_READ_REGISTER(CC_REG_OFFSET(CRY_KERNEL, AXIM_CACHE_PARAMS));
- 
- 	if (is_probe)
--		SSI_LOG_INFO("Cache params current: 0x%08X (expect: 0x%08X)\n",
--			     val, cache_params);
-+		dev_info(dev, "Cache params current: 0x%08X (expect: 0x%08X)\n",
-+			 val, cache_params);
- 
- 	return 0;
- }
-@@ -231,7 +212,7 @@ static int init_cc_resources(struct platform_device *plat_dev)
- 
- 	new_drvdata = devm_kzalloc(dev, sizeof(*new_drvdata), GFP_KERNEL);
- 	if (!new_drvdata) {
--		SSI_LOG_ERR("Failed to allocate drvdata");
-+		dev_dbg(dev, "Failed to allocate drvdata");
- 		rc = -ENOMEM;
- 		goto post_drvdata_err;
- 	}
-@@ -247,24 +228,22 @@ static int init_cc_resources(struct platform_device *plat_dev)
- 	/* Map registers space */
- 	new_drvdata->cc_base = devm_ioremap_resource(dev, req_mem_cc_regs);
- 	if (IS_ERR(new_drvdata->cc_base)) {
--		SSI_LOG_ERR("Failed to ioremap registers");
-+		dev_err(dev, "Failed to ioremap registers");
- 		rc = PTR_ERR(new_drvdata->cc_base);
- 		goto post_drvdata_err;
- 	}
- 
--	SSI_LOG_DEBUG("Got MEM resource (%s): start=%pad end=%pad\n",
--		      req_mem_cc_regs->name,
--		      req_mem_cc_regs->start,
--		      req_mem_cc_regs->end);
--	SSI_LOG_DEBUG("CC registers mapped from %pa to 0x%p\n",
--		      &req_mem_cc_regs->start, new_drvdata->cc_base);
-+	dev_dbg(dev, "Got MEM resource (%s): %pR\n", req_mem_cc_regs->name,
-+		req_mem_cc_regs);
-+	dev_dbg(dev, "CC registers mapped from %pa to 0x%p\n",
-+		&req_mem_cc_regs->start, new_drvdata->cc_base);
- 
- 	cc_base = new_drvdata->cc_base;
- 
- 	/* Then IRQ */
- 	new_drvdata->irq = platform_get_irq(plat_dev, 0);
- 	if (new_drvdata->irq < 0) {
--		SSI_LOG_ERR("Failed getting IRQ resource\n");
-+		dev_err(dev, "Failed getting IRQ resource\n");
- 		rc = new_drvdata->irq;
- 		goto post_drvdata_err;
- 	}
-@@ -272,11 +251,11 @@ static int init_cc_resources(struct platform_device *plat_dev)
- 	rc = devm_request_irq(dev, new_drvdata->irq, cc_isr,
- 			      IRQF_SHARED, "arm_cc7x", new_drvdata);
- 	if (rc) {
--		SSI_LOG_ERR("Could not register to interrupt %d\n",
--			    new_drvdata->irq);
-+		dev_err(dev, "Could not register to interrupt %d\n",
-+			new_drvdata->irq);
- 		goto post_drvdata_err;
- 	}
--	SSI_LOG_DEBUG("Registered to IRQ: %d\n", new_drvdata->irq);
-+	dev_dbg(dev, "Registered to IRQ: %d\n", new_drvdata->irq);
- 
- 	rc = cc_clk_on(new_drvdata);
- 	if (rc)
-@@ -291,91 +270,93 @@ static int init_cc_resources(struct platform_device *plat_dev)
- 	/* Verify correct mapping */
- 	signature_val = CC_HAL_READ_REGISTER(CC_REG_OFFSET(HOST_RGF, HOST_SIGNATURE));
- 	if (signature_val != DX_DEV_SIGNATURE) {
--		SSI_LOG_ERR("Invalid CC signature: SIGNATURE=0x%08X != expected=0x%08X\n",
--			    signature_val, (u32)DX_DEV_SIGNATURE);
-+		dev_err(dev, "Invalid CC signature: SIGNATURE=0x%08X != expected=0x%08X\n",
-+			signature_val, (u32)DX_DEV_SIGNATURE);
- 		rc = -EINVAL;
- 		goto post_clk_err;
- 	}
--	SSI_LOG_DEBUG("CC SIGNATURE=0x%08X\n", signature_val);
-+	dev_dbg(dev, "CC SIGNATURE=0x%08X\n", signature_val);
- 
- 	/* Display HW versions */
--	SSI_LOG(KERN_INFO, "ARM CryptoCell %s Driver: HW version 0x%08X, Driver version %s\n", SSI_DEV_NAME_STR,
--		CC_HAL_READ_REGISTER(CC_REG_OFFSET(HOST_RGF, HOST_VERSION)), DRV_MODULE_VERSION);
-+	dev_info(dev, "ARM CryptoCell %s Driver: HW version 0x%08X, Driver version %s\n",
-+		 SSI_DEV_NAME_STR,
-+		 CC_HAL_READ_REGISTER(CC_REG_OFFSET(HOST_RGF, HOST_VERSION)),
-+		 DRV_MODULE_VERSION);
- 
- 	rc = init_cc_regs(new_drvdata, true);
- 	if (unlikely(rc != 0)) {
--		SSI_LOG_ERR("init_cc_regs failed\n");
-+		dev_err(dev, "init_cc_regs failed\n");
- 		goto post_clk_err;
- 	}
- 
- #ifdef ENABLE_CC_SYSFS
- 	rc = ssi_sysfs_init(&dev->kobj, new_drvdata);
- 	if (unlikely(rc != 0)) {
--		SSI_LOG_ERR("init_stat_db failed\n");
-+		dev_err(dev, "init_stat_db failed\n");
- 		goto post_regs_err;
- 	}
- #endif
- 
- 	rc = ssi_fips_init(new_drvdata);
- 	if (unlikely(rc != 0)) {
--		SSI_LOG_ERR("SSI_FIPS_INIT failed 0x%x\n", rc);
-+		dev_err(dev, "SSI_FIPS_INIT failed 0x%x\n", rc);
- 		goto post_sysfs_err;
- 	}
- 	rc = ssi_sram_mgr_init(new_drvdata);
- 	if (unlikely(rc != 0)) {
--		SSI_LOG_ERR("ssi_sram_mgr_init failed\n");
-+		dev_err(dev, "ssi_sram_mgr_init failed\n");
- 		goto post_fips_init_err;
- 	}
- 
- 	new_drvdata->mlli_sram_addr =
- 		ssi_sram_mgr_alloc(new_drvdata, MAX_MLLI_BUFF_SIZE);
- 	if (unlikely(new_drvdata->mlli_sram_addr == NULL_SRAM_ADDR)) {
--		SSI_LOG_ERR("Failed to alloc MLLI Sram buffer\n");
-+		dev_err(dev, "Failed to alloc MLLI Sram buffer\n");
- 		rc = -ENOMEM;
- 		goto post_sram_mgr_err;
- 	}
- 
- 	rc = request_mgr_init(new_drvdata);
- 	if (unlikely(rc != 0)) {
--		SSI_LOG_ERR("request_mgr_init failed\n");
-+		dev_err(dev, "request_mgr_init failed\n");
- 		goto post_sram_mgr_err;
- 	}
- 
- 	rc = ssi_buffer_mgr_init(new_drvdata);
- 	if (unlikely(rc != 0)) {
--		SSI_LOG_ERR("buffer_mgr_init failed\n");
-+		dev_err(dev, "buffer_mgr_init failed\n");
- 		goto post_req_mgr_err;
- 	}
- 
- 	rc = ssi_power_mgr_init(new_drvdata);
- 	if (unlikely(rc != 0)) {
--		SSI_LOG_ERR("ssi_power_mgr_init failed\n");
-+		dev_err(dev, "ssi_power_mgr_init failed\n");
- 		goto post_buf_mgr_err;
- 	}
- 
- 	rc = ssi_ivgen_init(new_drvdata);
- 	if (unlikely(rc != 0)) {
--		SSI_LOG_ERR("ssi_ivgen_init failed\n");
-+		dev_err(dev, "ssi_ivgen_init failed\n");
- 		goto post_power_mgr_err;
- 	}
- 
- 	/* Allocate crypto algs */
- 	rc = ssi_ablkcipher_alloc(new_drvdata);
- 	if (unlikely(rc != 0)) {
--		SSI_LOG_ERR("ssi_ablkcipher_alloc failed\n");
-+		dev_err(dev, "ssi_ablkcipher_alloc failed\n");
- 		goto post_ivgen_err;
- 	}
- 
- 	/* hash must be allocated before aead since hash exports APIs */
- 	rc = ssi_hash_alloc(new_drvdata);
- 	if (unlikely(rc != 0)) {
--		SSI_LOG_ERR("ssi_hash_alloc failed\n");
-+		dev_err(dev, "ssi_hash_alloc failed\n");
- 		goto post_cipher_err;
- 	}
- 
- 	rc = ssi_aead_alloc(new_drvdata);
- 	if (unlikely(rc != 0)) {
--		SSI_LOG_ERR("ssi_aead_alloc failed\n");
-+		dev_err(dev, "ssi_aead_alloc failed\n");
- 		goto post_hash_err;
- 	}
- 
-@@ -412,7 +393,7 @@ static int init_cc_resources(struct platform_device *plat_dev)
- post_clk_err:
- 	cc_clk_off(new_drvdata);
- post_drvdata_err:
--	SSI_LOG_ERR("ccree init error occurred!\n");
-+	dev_err(dev, "ccree init error occurred!\n");
- 	dev_set_drvdata(dev, NULL);
- 	return rc;
- }
-@@ -476,18 +457,19 @@ void cc_clk_off(struct ssi_drvdata *drvdata)
- static int cc7x_probe(struct platform_device *plat_dev)
- {
- 	int rc;
-+	struct device *dev = &plat_dev->dev;
- #if defined(CONFIG_ARM) && defined(CC_DEBUG)
- 	u32 ctr, cacheline_size;
- 
- 	asm volatile("mrc p15, 0, %0, c0, c0, 1" : "=r" (ctr));
- 	cacheline_size =  4 << ((ctr >> 16) & 0xf);
--	SSI_LOG_DEBUG("CP15(L1_CACHE_BYTES) = %u , Kconfig(L1_CACHE_BYTES) = %u\n",
--		      cacheline_size, L1_CACHE_BYTES);
-+	dev_dbg(dev, "CP15(L1_CACHE_BYTES) = %u , Kconfig(L1_CACHE_BYTES) = %u\n",
-+		cacheline_size, L1_CACHE_BYTES);
- 
- 	asm volatile("mrc p15, 0, %0, c0, c0, 0" : "=r" (ctr));
--	SSI_LOG_DEBUG("Main ID register (MIDR): Implementer 0x%02X, Arch 0x%01X, Part 0x%03X, Rev r%dp%d\n",
--		      (ctr >> 24), (ctr >> 16) & 0xF, (ctr >> 4) & 0xFFF,
--		      (ctr >> 20) & 0xF, ctr & 0xF);
-+	dev_dbg(dev, "Main ID register (MIDR): Implementer 0x%02X, Arch 0x%01X, Part 0x%03X, Rev r%dp%d\n",
-+		(ctr >> 24), (ctr >> 16) & 0xF, (ctr >> 4) & 0xFFF,
-+		(ctr >> 20) & 0xF, ctr & 0xF);
- #endif
- 
- 	/* Map registers space */
-@@ -495,18 +477,20 @@ static int cc7x_probe(struct platform_device *plat_dev)
- 	if (rc != 0)
- 		return rc;
- 
--	SSI_LOG(KERN_INFO, "ARM cc7x_ree device initialized\n");
-+	dev_info(dev, "ARM ccree device initialized\n");
- 
- 	return 0;
- }
- 
- static int cc7x_remove(struct platform_device *plat_dev)
- {
--	SSI_LOG_DEBUG("Releasing cc7x resources...\n");
-+	struct device *dev = &plat_dev->dev;
-+
-+	dev_dbg(dev, "Releasing cc7x resources...\n");
- 
- 	cleanup_cc_resources(plat_dev);
- 
--	SSI_LOG(KERN_INFO, "ARM cc7x_ree device terminated\n");
-+	dev_info(dev, "ARM ccree device terminated\n");
- 
- 	return 0;
- }
-diff --git a/drivers/staging/ccree/ssi_driver.h b/drivers/staging/ccree/ssi_driver.h
-index 4dfe5b9..3a170a1 100644
---- a/drivers/staging/ccree/ssi_driver.h
-+++ b/drivers/staging/ccree/ssi_driver.h
-@@ -37,6 +37,7 @@
- #include <crypto/hash.h>
- #include <linux/version.h>
- #include <linux/clk.h>
-+#include <linux/platform_device.h>
- 
- /* Registers definitions from shared/hw/ree_include */
- #include "dx_reg_base_host.h"
-@@ -90,19 +91,6 @@
-  * field in the HW descriptor. The DMA engine +8 that value.
+-ENTRY(native_load_gs_index)
++SYM_FUNC_START(native_load_gs_index)
+ 	FRAME_BEGIN
+ 	pushfq
+ 	DISABLE_INTERRUPTS(CLBR_ANY & ~CLBR_RDI)
+@@ -929,7 +929,7 @@ ENTRY(native_load_gs_index)
+ 	popfq
+ 	FRAME_END
+ 	ret
+-ENDPROC(native_load_gs_index)
++SYM_FUNC_END(native_load_gs_index)
+ EXPORT_SYMBOL(native_load_gs_index)
+ 
+ 	_ASM_EXTABLE(.Lgs_change, bad_gs)
+@@ -950,7 +950,7 @@ SYM_CODE_END(bad_gs)
+ 	.previous
+ 
+ /* Call softirq on interrupt stack. Interrupts are off. */
+-ENTRY(do_softirq_own_stack)
++SYM_FUNC_START(do_softirq_own_stack)
+ 	pushq	%rbp
+ 	mov	%rsp, %rbp
+ 	ENTER_IRQ_STACK regs=0 old_rsp=%r11
+@@ -958,7 +958,7 @@ ENTRY(do_softirq_own_stack)
+ 	LEAVE_IRQ_STACK regs=0
+ 	leaveq
+ 	ret
+-ENDPROC(do_softirq_own_stack)
++SYM_FUNC_END(do_softirq_own_stack)
+ 
+ #ifdef CONFIG_XEN
+ idtentry hypervisor_callback xen_do_hypervisor_callback has_error_code=0
+diff --git a/arch/x86/entry/entry_64_compat.S b/arch/x86/entry/entry_64_compat.S
+index 4815a8115c90..e0727197fdef 100644
+--- a/arch/x86/entry/entry_64_compat.S
++++ b/arch/x86/entry/entry_64_compat.S
+@@ -45,7 +45,7 @@
+  * ebp  user stack
+  * 0(%ebp) arg6
   */
- 
--/* Logging macros */
--#define SSI_LOG(level, format, ...) \
--	printk(level "cc715ree::%s: " format, __func__, ##__VA_ARGS__)
--#define SSI_LOG_ERR(format, ...) SSI_LOG(KERN_ERR, format, ##__VA_ARGS__)
--#define SSI_LOG_WARNING(format, ...) SSI_LOG(KERN_WARNING, format, ##__VA_ARGS__)
--#define SSI_LOG_NOTICE(format, ...) SSI_LOG(KERN_NOTICE, format, ##__VA_ARGS__)
--#define SSI_LOG_INFO(format, ...) SSI_LOG(KERN_INFO, format, ##__VA_ARGS__)
--#ifdef CC_DEBUG
--#define SSI_LOG_DEBUG(format, ...) SSI_LOG(KERN_DEBUG, format, ##__VA_ARGS__)
--#else /* Debug log messages are removed at compile time for non-DEBUG config. */
--#define SSI_LOG_DEBUG(format, ...) do {} while (0)
--#endif
--
- #define DEV(drvdata) ((&(drvdata)->plat_dev->dev))
- 
- #define MIN(a, b) (((a) < (b)) ? (a) : (b))
-diff --git a/drivers/staging/ccree/ssi_fips.c b/drivers/staging/ccree/ssi_fips.c
-index 33d53d6..adf7d89 100644
---- a/drivers/staging/ccree/ssi_fips.c
-+++ b/drivers/staging/ccree/ssi_fips.c
-@@ -76,18 +76,19 @@ void fips_handler(struct ssi_drvdata *drvdata)
- 	tasklet_schedule(&fips_handle_ptr->tasklet);
- }
- 
--static inline void tee_fips_error(void)
-+static inline void tee_fips_error(struct device *dev)
- {
- 	if (fips_enabled)
- 		panic("ccree: TEE reported cryptographic error in fips mode!\n");
- 	else
--		SSI_LOG_ERR("TEE reported error!\n");
-+		dev_err(dev, "TEE reported error!\n");
- }
- 
- /* Deferred service handler, run as interrupt-fired tasklet */
- static void fips_dsr(unsigned long devarg)
- {
- 	struct ssi_drvdata *drvdata = (struct ssi_drvdata *)devarg;
-+	struct device *dev = DEV(drvdata);
- 	void __iomem *cc_base = drvdata->cc_base;
- 	u32 irq, state, val;
- 
-@@ -97,7 +98,7 @@ static void fips_dsr(unsigned long devarg)
- 		state = CC_HAL_READ_REGISTER(CC_REG_OFFSET(HOST_RGF, GPR_HOST));
- 
- 		if (state != (CC_FIPS_SYNC_TEE_STATUS | CC_FIPS_SYNC_MODULE_OK))
--			tee_fips_error();
-+			tee_fips_error(dev);
- 	}
- 
- 	/* after verifing that there is nothing to do,
-@@ -111,6 +112,7 @@ static void fips_dsr(unsigned long devarg)
- int ssi_fips_init(struct ssi_drvdata *p_drvdata)
- {
- 	struct ssi_fips_handle *fips_h;
-+	struct device *dev = DEV(p_drvdata);
- 
- 	fips_h = kzalloc(sizeof(*fips_h), GFP_KERNEL);
- 	if (!fips_h)
-@@ -118,11 +120,11 @@ int ssi_fips_init(struct ssi_drvdata *p_drvdata)
- 
- 	p_drvdata->fips_handle = fips_h;
- 
--	SSI_LOG_DEBUG("Initializing fips tasklet\n");
-+	dev_dbg(dev, "Initializing fips tasklet\n");
- 	tasklet_init(&fips_h->tasklet, fips_dsr, (unsigned long)p_drvdata);
- 
- 	if (!cc_get_tee_fips_status(p_drvdata))
--		tee_fips_error();
-+		tee_fips_error(dev);
- 
- 	return 0;
- }
-diff --git a/drivers/staging/ccree/ssi_hash.c b/drivers/staging/ccree/ssi_hash.c
-index d66ea4e..cb4980a 100644
---- a/drivers/staging/ccree/ssi_hash.c
-+++ b/drivers/staging/ccree/ssi_hash.c
-@@ -134,14 +134,13 @@ static int ssi_hash_map_result(struct device *dev,
- 			       digestsize,
- 			       DMA_BIDIRECTIONAL);
- 	if (unlikely(dma_mapping_error(dev, state->digest_result_dma_addr))) {
--		SSI_LOG_ERR("Mapping digest result buffer %u B for DMA failed\n",
--			    digestsize);
-+		dev_err(dev, "Mapping digest result buffer %u B for DMA failed\n",
-+			digestsize);
- 		return -ENOMEM;
- 	}
--	SSI_LOG_DEBUG("Mapped digest result buffer %u B "
--		     "at va=%pK to dma=%pad\n",
-+	dev_dbg(dev, "Mapped digest result buffer %u B at va=%pK to dma=%pad\n",
- 		digestsize, state->digest_result_buff,
--		state->digest_result_dma_addr);
-+		&state->digest_result_dma_addr);
- 
- 	return 0;
- }
-@@ -159,53 +158,56 @@ static int ssi_hash_map_request(struct device *dev,
- 
- 	state->buff0 = kzalloc(SSI_MAX_HASH_BLCK_SIZE, GFP_KERNEL | GFP_DMA);
- 	if (!state->buff0) {
--		SSI_LOG_ERR("Allocating buff0 in context failed\n");
-+		dev_err(dev, "Allocating buff0 in context failed\n");
- 		goto fail0;
- 	}
- 	state->buff1 = kzalloc(SSI_MAX_HASH_BLCK_SIZE, GFP_KERNEL | GFP_DMA);
- 	if (!state->buff1) {
--		SSI_LOG_ERR("Allocating buff1 in context failed\n");
-+		dev_err(dev, "Allocating buff1 in context failed\n");
- 		goto fail_buff0;
- 	}
- 	state->digest_result_buff = kzalloc(SSI_MAX_HASH_DIGEST_SIZE, GFP_KERNEL | GFP_DMA);
- 	if (!state->digest_result_buff) {
--		SSI_LOG_ERR("Allocating digest_result_buff in context failed\n");
-+		dev_err(dev, "Allocating digest_result_buff in context failed\n");
- 		goto fail_buff1;
- 	}
- 	state->digest_buff = kzalloc(ctx->inter_digestsize, GFP_KERNEL | GFP_DMA);
- 	if (!state->digest_buff) {
--		SSI_LOG_ERR("Allocating digest-buffer in context failed\n");
-+		dev_err(dev, "Allocating digest-buffer in context failed\n");
- 		goto fail_digest_result_buff;
- 	}
- 
--	SSI_LOG_DEBUG("Allocated digest-buffer in context ctx->digest_buff=@%p\n", state->digest_buff);
-+	dev_dbg(dev, "Allocated digest-buffer in context ctx->digest_buff=@%p\n",
-+		state->digest_buff);
- 	if (ctx->hw_mode != DRV_CIPHER_XCBC_MAC) {
- 		state->digest_bytes_len = kzalloc(HASH_LEN_SIZE, GFP_KERNEL | GFP_DMA);
- 		if (!state->digest_bytes_len) {
--			SSI_LOG_ERR("Allocating digest-bytes-len in context failed\n");
-+			dev_err(dev, "Allocating digest-bytes-len in context failed\n");
- 			goto fail1;
- 		}
--		SSI_LOG_DEBUG("Allocated digest-bytes-len in context state->>digest_bytes_len=@%p\n", state->digest_bytes_len);
-+		dev_dbg(dev, "Allocated digest-bytes-len in context state->>digest_bytes_len=@%p\n",
-+			state->digest_bytes_len);
- 	} else {
- 		state->digest_bytes_len = NULL;
- 	}
- 
- 	state->opad_digest_buff = kzalloc(ctx->inter_digestsize, GFP_KERNEL | GFP_DMA);
- 	if (!state->opad_digest_buff) {
--		SSI_LOG_ERR("Allocating opad-digest-buffer in context failed\n");
-+		dev_err(dev, "Allocating opad-digest-buffer in context failed\n");
- 		goto fail2;
- 	}
--	SSI_LOG_DEBUG("Allocated opad-digest-buffer in context state->digest_bytes_len=@%p\n", state->opad_digest_buff);
-+	dev_dbg(dev, "Allocated opad-digest-buffer in context state->digest_bytes_len=@%p\n",
-+		state->opad_digest_buff);
- 
- 	state->digest_buff_dma_addr = dma_map_single(dev, (void *)state->digest_buff, ctx->inter_digestsize, DMA_BIDIRECTIONAL);
- 	if (dma_mapping_error(dev, state->digest_buff_dma_addr)) {
--		SSI_LOG_ERR("Mapping digest len %d B at va=%pK for DMA failed\n",
--			    ctx->inter_digestsize, state->digest_buff);
-+		dev_err(dev, "Mapping digest len %d B at va=%pK for DMA failed\n",
-+			ctx->inter_digestsize, state->digest_buff);
- 		goto fail3;
- 	}
--	SSI_LOG_DEBUG("Mapped digest %d B at va=%pK to dma=%pad\n",
--		      ctx->inter_digestsize, state->digest_buff,
--		      state->digest_buff_dma_addr);
-+	dev_dbg(dev, "Mapped digest %d B at va=%pK to dma=%pad\n",
-+		ctx->inter_digestsize, state->digest_buff,
-+		&state->digest_buff_dma_addr);
- 
- 	if (is_hmac) {
- 		dma_sync_single_for_cpu(dev, ctx->digest_buff_dma_addr, ctx->inter_digestsize, DMA_BIDIRECTIONAL);
-@@ -240,7 +242,7 @@ static int ssi_hash_map_request(struct device *dev,
- 
- 		rc = send_request(ctx->drvdata, &ssi_req, &desc, 1, 0);
- 		if (unlikely(rc != 0)) {
--			SSI_LOG_ERR("send_request() failed (rc=%d)\n", rc);
-+			dev_err(dev, "send_request() failed (rc=%d)\n", rc);
- 			goto fail4;
- 		}
- 	}
-@@ -248,13 +250,13 @@ static int ssi_hash_map_request(struct device *dev,
- 	if (ctx->hw_mode != DRV_CIPHER_XCBC_MAC) {
- 		state->digest_bytes_len_dma_addr = dma_map_single(dev, (void *)state->digest_bytes_len, HASH_LEN_SIZE, DMA_BIDIRECTIONAL);
- 		if (dma_mapping_error(dev, state->digest_bytes_len_dma_addr)) {
--			SSI_LOG_ERR("Mapping digest len %u B at va=%pK for DMA failed\n",
--				    HASH_LEN_SIZE, state->digest_bytes_len);
-+			dev_err(dev, "Mapping digest len %u B at va=%pK for DMA failed\n",
-+				HASH_LEN_SIZE, state->digest_bytes_len);
- 			goto fail4;
- 		}
--		SSI_LOG_DEBUG("Mapped digest len %u B at va=%pK to dma=%pad\n",
--			      HASH_LEN_SIZE, state->digest_bytes_len,
--			      state->digest_bytes_len_dma_addr);
-+		dev_dbg(dev, "Mapped digest len %u B at va=%pK to dma=%pad\n",
-+			HASH_LEN_SIZE, state->digest_bytes_len,
-+			&state->digest_bytes_len_dma_addr);
- 	} else {
- 		state->digest_bytes_len_dma_addr = 0;
- 	}
-@@ -262,14 +264,14 @@ static int ssi_hash_map_request(struct device *dev,
- 	if (is_hmac && ctx->hash_mode != DRV_HASH_NULL) {
- 		state->opad_digest_dma_addr = dma_map_single(dev, (void *)state->opad_digest_buff, ctx->inter_digestsize, DMA_BIDIRECTIONAL);
- 		if (dma_mapping_error(dev, state->opad_digest_dma_addr)) {
--			SSI_LOG_ERR("Mapping opad digest %d B at va=%pK for DMA failed\n",
--				    ctx->inter_digestsize,
--				    state->opad_digest_buff);
-+			dev_err(dev, "Mapping opad digest %d B at va=%pK for DMA failed\n",
-+				ctx->inter_digestsize,
-+				state->opad_digest_buff);
- 			goto fail5;
- 		}
--		SSI_LOG_DEBUG("Mapped opad digest %d B at va=%pK to dma=%pad\n",
--			      ctx->inter_digestsize, state->opad_digest_buff,
--			      state->opad_digest_dma_addr);
-+		dev_dbg(dev, "Mapped opad digest %d B at va=%pK to dma=%pad\n",
-+			ctx->inter_digestsize, state->opad_digest_buff,
-+			&state->opad_digest_dma_addr);
- 	} else {
- 		state->opad_digest_dma_addr = 0;
- 	}
-@@ -316,22 +318,22 @@ static void ssi_hash_unmap_request(struct device *dev,
- 	if (state->digest_buff_dma_addr != 0) {
- 		dma_unmap_single(dev, state->digest_buff_dma_addr,
- 				 ctx->inter_digestsize, DMA_BIDIRECTIONAL);
--		SSI_LOG_DEBUG("Unmapped digest-buffer: digest_buff_dma_addr=%pad\n",
--			      state->digest_buff_dma_addr);
-+		dev_dbg(dev, "Unmapped digest-buffer: digest_buff_dma_addr=%pad\n",
-+			&state->digest_buff_dma_addr);
- 		state->digest_buff_dma_addr = 0;
- 	}
- 	if (state->digest_bytes_len_dma_addr != 0) {
- 		dma_unmap_single(dev, state->digest_bytes_len_dma_addr,
- 				 HASH_LEN_SIZE, DMA_BIDIRECTIONAL);
--		SSI_LOG_DEBUG("Unmapped digest-bytes-len buffer: digest_bytes_len_dma_addr=%pad\n",
--			      state->digest_bytes_len_dma_addr);
-+		dev_dbg(dev, "Unmapped digest-bytes-len buffer: digest_bytes_len_dma_addr=%pad\n",
-+			&state->digest_bytes_len_dma_addr);
- 		state->digest_bytes_len_dma_addr = 0;
- 	}
- 	if (state->opad_digest_dma_addr != 0) {
- 		dma_unmap_single(dev, state->opad_digest_dma_addr,
- 				 ctx->inter_digestsize, DMA_BIDIRECTIONAL);
--		SSI_LOG_DEBUG("Unmapped opad-digest: opad_digest_dma_addr=%pad\n",
--			      state->opad_digest_dma_addr);
-+		dev_dbg(dev, "Unmapped opad-digest: opad_digest_dma_addr=%pad\n",
-+			&state->opad_digest_dma_addr);
- 		state->opad_digest_dma_addr = 0;
- 	}
- 
-@@ -352,11 +354,9 @@ static void ssi_hash_unmap_result(struct device *dev,
- 				 state->digest_result_dma_addr,
- 				 digestsize,
- 				  DMA_BIDIRECTIONAL);
--		SSI_LOG_DEBUG("unmpa digest result buffer "
--			     "va (%pK) pa (%pad) len %u\n",
--			     state->digest_result_buff,
--			     state->digest_result_dma_addr,
--			     digestsize);
-+		dev_dbg(dev, "unmpa digest result buffer va (%pK) pa (%pad) len %u\n",
-+			state->digest_result_buff,
-+			&state->digest_result_dma_addr, digestsize);
- 		memcpy(result,
- 		       state->digest_result_buff,
- 		       digestsize);
-@@ -369,7 +369,7 @@ static void ssi_hash_update_complete(struct device *dev, void *ssi_req, void __i
- 	struct ahash_request *req = (struct ahash_request *)ssi_req;
- 	struct ahash_req_ctx *state = ahash_request_ctx(req);
- 
--	SSI_LOG_DEBUG("req=%pK\n", req);
-+	dev_dbg(dev, "req=%pK\n", req);
- 
- 	ssi_buffer_mgr_unmap_hash_request(dev, state, req->src, false);
- 	req->base.complete(&req->base, 0);
-@@ -383,7 +383,7 @@ static void ssi_hash_digest_complete(struct device *dev, void *ssi_req, void __i
- 	struct ssi_hash_ctx *ctx = crypto_ahash_ctx(tfm);
- 	u32 digestsize = crypto_ahash_digestsize(tfm);
- 
--	SSI_LOG_DEBUG("req=%pK\n", req);
-+	dev_dbg(dev, "req=%pK\n", req);
- 
- 	ssi_buffer_mgr_unmap_hash_request(dev, state, req->src, false);
- 	ssi_hash_unmap_result(dev, state, digestsize, req->result);
-@@ -399,7 +399,7 @@ static void ssi_hash_complete(struct device *dev, void *ssi_req, void __iomem *c
- 	struct ssi_hash_ctx *ctx = crypto_ahash_ctx(tfm);
- 	u32 digestsize = crypto_ahash_digestsize(tfm);
- 
--	SSI_LOG_DEBUG("req=%pK\n", req);
-+	dev_dbg(dev, "req=%pK\n", req);
- 
- 	ssi_buffer_mgr_unmap_hash_request(dev, state, req->src, false);
- 	ssi_hash_unmap_result(dev, state, digestsize, req->result);
-@@ -423,20 +423,21 @@ static int ssi_hash_digest(struct ahash_req_ctx *state,
- 	int idx = 0;
- 	int rc = 0;
- 
--	SSI_LOG_DEBUG("===== %s-digest (%d) ====\n", is_hmac ? "hmac" : "hash", nbytes);
-+	dev_dbg(dev, "===== %s-digest (%d) ====\n", is_hmac ? "hmac" : "hash",
-+		nbytes);
- 
- 	if (unlikely(ssi_hash_map_request(dev, state, ctx) != 0)) {
--		SSI_LOG_ERR("map_ahash_source() failed\n");
-+		dev_err(dev, "map_ahash_source() failed\n");
- 		return -ENOMEM;
- 	}
- 
- 	if (unlikely(ssi_hash_map_result(dev, state, digestsize) != 0)) {
--		SSI_LOG_ERR("map_ahash_digest() failed\n");
-+		dev_err(dev, "map_ahash_digest() failed\n");
- 		return -ENOMEM;
- 	}
- 
- 	if (unlikely(ssi_buffer_mgr_map_hash_request_final(ctx->drvdata, state, src, nbytes, 1) != 0)) {
--		SSI_LOG_ERR("map_ahash_request_final() failed\n");
-+		dev_err(dev, "map_ahash_request_final() failed\n");
- 		return -ENOMEM;
- 	}
- 
-@@ -553,7 +554,7 @@ ctx->drvdata, ctx->hash_mode), HASH_LEN_SIZE);
- 	if (async_req) {
- 		rc = send_request(ctx->drvdata, &ssi_req, desc, idx, 1);
- 		if (unlikely(rc != -EINPROGRESS)) {
--			SSI_LOG_ERR("send_request() failed (rc=%d)\n", rc);
-+			dev_err(dev, "send_request() failed (rc=%d)\n", rc);
- 			ssi_buffer_mgr_unmap_hash_request(dev, state, src, true);
- 			ssi_hash_unmap_result(dev, state, digestsize, result);
- 			ssi_hash_unmap_request(dev, state, ctx);
-@@ -561,7 +562,7 @@ ctx->drvdata, ctx->hash_mode), HASH_LEN_SIZE);
- 	} else {
- 		rc = send_request(ctx->drvdata, &ssi_req, desc, idx, 0);
- 		if (rc != 0) {
--			SSI_LOG_ERR("send_request() failed (rc=%d)\n", rc);
-+			dev_err(dev, "send_request() failed (rc=%d)\n", rc);
- 			ssi_buffer_mgr_unmap_hash_request(dev, state, src, true);
- 		} else {
- 			ssi_buffer_mgr_unmap_hash_request(dev, state, src, false);
-@@ -585,8 +586,8 @@ static int ssi_hash_update(struct ahash_req_ctx *state,
- 	u32 idx = 0;
- 	int rc;
- 
--	SSI_LOG_DEBUG("===== %s-update (%d) ====\n", ctx->is_hmac ?
--					"hmac" : "hash", nbytes);
-+	dev_dbg(dev, "===== %s-update (%d) ====\n", ctx->is_hmac ?
-+		"hmac" : "hash", nbytes);
- 
- 	if (nbytes == 0) {
- 		/* no real updates required */
-@@ -596,12 +597,12 @@ static int ssi_hash_update(struct ahash_req_ctx *state,
- 	rc = ssi_buffer_mgr_map_hash_request_update(ctx->drvdata, state, src, nbytes, block_size);
- 	if (unlikely(rc)) {
- 		if (rc == 1) {
--			SSI_LOG_DEBUG(" data size not require HW update %x\n",
--				      nbytes);
-+			dev_dbg(dev, " data size not require HW update %x\n",
-+				nbytes);
- 			/* No hardware updates are required */
- 			return 0;
- 		}
--		SSI_LOG_ERR("map_ahash_request_update() failed\n");
-+		dev_err(dev, "map_ahash_request_update() failed\n");
- 		return -ENOMEM;
- 	}
- 
-@@ -653,13 +654,13 @@ static int ssi_hash_update(struct ahash_req_ctx *state,
- 	if (async_req) {
- 		rc = send_request(ctx->drvdata, &ssi_req, desc, idx, 1);
- 		if (unlikely(rc != -EINPROGRESS)) {
--			SSI_LOG_ERR("send_request() failed (rc=%d)\n", rc);
-+			dev_err(dev, "send_request() failed (rc=%d)\n", rc);
- 			ssi_buffer_mgr_unmap_hash_request(dev, state, src, true);
- 		}
- 	} else {
- 		rc = send_request(ctx->drvdata, &ssi_req, desc, idx, 0);
- 		if (rc != 0) {
--			SSI_LOG_ERR("send_request() failed (rc=%d)\n", rc);
-+			dev_err(dev, "send_request() failed (rc=%d)\n", rc);
- 			ssi_buffer_mgr_unmap_hash_request(dev, state, src, true);
- 		} else {
- 			ssi_buffer_mgr_unmap_hash_request(dev, state, src, false);
-@@ -683,14 +684,15 @@ static int ssi_hash_finup(struct ahash_req_ctx *state,
- 	int idx = 0;
- 	int rc;
- 
--	SSI_LOG_DEBUG("===== %s-finup (%d) ====\n", is_hmac ? "hmac" : "hash", nbytes);
-+	dev_dbg(dev, "===== %s-finup (%d) ====\n", is_hmac ? "hmac" : "hash",
-+		nbytes);
- 
- 	if (unlikely(ssi_buffer_mgr_map_hash_request_final(ctx->drvdata, state, src, nbytes, 1) != 0)) {
--		SSI_LOG_ERR("map_ahash_request_final() failed\n");
-+		dev_err(dev, "map_ahash_request_final() failed\n");
- 		return -ENOMEM;
- 	}
- 	if (unlikely(ssi_hash_map_result(dev, state, digestsize) != 0)) {
--		SSI_LOG_ERR("map_ahash_digest() failed\n");
-+		dev_err(dev, "map_ahash_digest() failed\n");
- 		return -ENOMEM;
- 	}
- 
-@@ -783,14 +785,14 @@ ctx->drvdata, ctx->hash_mode), HASH_LEN_SIZE);
- 	if (async_req) {
- 		rc = send_request(ctx->drvdata, &ssi_req, desc, idx, 1);
- 		if (unlikely(rc != -EINPROGRESS)) {
--			SSI_LOG_ERR("send_request() failed (rc=%d)\n", rc);
-+			dev_err(dev, "send_request() failed (rc=%d)\n", rc);
- 			ssi_buffer_mgr_unmap_hash_request(dev, state, src, true);
- 			ssi_hash_unmap_result(dev, state, digestsize, result);
- 		}
- 	} else {
- 		rc = send_request(ctx->drvdata, &ssi_req, desc, idx, 0);
- 		if (rc != 0) {
--			SSI_LOG_ERR("send_request() failed (rc=%d)\n", rc);
-+			dev_err(dev, "send_request() failed (rc=%d)\n", rc);
- 			ssi_buffer_mgr_unmap_hash_request(dev, state, src, true);
- 			ssi_hash_unmap_result(dev, state, digestsize, result);
- 		} else {
-@@ -817,15 +819,16 @@ static int ssi_hash_final(struct ahash_req_ctx *state,
- 	int idx = 0;
- 	int rc;
- 
--	SSI_LOG_DEBUG("===== %s-final (%d) ====\n", is_hmac ? "hmac" : "hash", nbytes);
-+	dev_dbg(dev, "===== %s-final (%d) ====\n", is_hmac ? "hmac" : "hash",
-+		nbytes);
- 
- 	if (unlikely(ssi_buffer_mgr_map_hash_request_final(ctx->drvdata, state, src, nbytes, 0) != 0)) {
--		SSI_LOG_ERR("map_ahash_request_final() failed\n");
-+		dev_err(dev, "map_ahash_request_final() failed\n");
- 		return -ENOMEM;
- 	}
- 
- 	if (unlikely(ssi_hash_map_result(dev, state, digestsize) != 0)) {
--		SSI_LOG_ERR("map_ahash_digest() failed\n");
-+		dev_err(dev, "map_ahash_digest() failed\n");
- 		return -ENOMEM;
- 	}
- 
-@@ -927,14 +930,14 @@ ctx->drvdata, ctx->hash_mode), HASH_LEN_SIZE);
- 	if (async_req) {
- 		rc = send_request(ctx->drvdata, &ssi_req, desc, idx, 1);
- 		if (unlikely(rc != -EINPROGRESS)) {
--			SSI_LOG_ERR("send_request() failed (rc=%d)\n", rc);
-+			dev_err(dev, "send_request() failed (rc=%d)\n", rc);
- 			ssi_buffer_mgr_unmap_hash_request(dev, state, src, true);
- 			ssi_hash_unmap_result(dev, state, digestsize, result);
- 		}
- 	} else {
- 		rc = send_request(ctx->drvdata, &ssi_req, desc, idx, 0);
- 		if (rc != 0) {
--			SSI_LOG_ERR("send_request() failed (rc=%d)\n", rc);
-+			dev_err(dev, "send_request() failed (rc=%d)\n", rc);
- 			ssi_buffer_mgr_unmap_hash_request(dev, state, src, true);
- 			ssi_hash_unmap_result(dev, state, digestsize, result);
- 		} else {
-@@ -972,10 +975,10 @@ static int ssi_hash_setkey(void *hash,
- 	ssi_sram_addr_t larval_addr;
- 	struct device *dev;
- 
--	 SSI_LOG_DEBUG("start keylen: %d", keylen);
--
- 	ctx = crypto_ahash_ctx(((struct crypto_ahash *)hash));
- 	dev = DEV(ctx->drvdata);
-+	dev_dbg(dev, "start keylen: %d", keylen);
-+
- 	blocksize = crypto_tfm_alg_blocksize(&((struct crypto_ahash *)hash)->base);
- 	digestsize = crypto_ahash_digestsize(((struct crypto_ahash *)hash));
- 
-@@ -995,13 +998,12 @@ static int ssi_hash_setkey(void *hash,
- 						keylen, DMA_TO_DEVICE);
- 		if (unlikely(dma_mapping_error(dev,
- 					       ctx->key_params.key_dma_addr))) {
--			SSI_LOG_ERR("Mapping key va=0x%p len=%u for"
--				   " DMA failed\n", key, keylen);
-+			dev_err(dev, "Mapping key va=0x%p len=%u for DMA failed\n",
-+				key, keylen);
- 			return -ENOMEM;
- 		}
--		SSI_LOG_DEBUG("mapping key-buffer: key_dma_addr=%pad "
--			     "keylen=%u\n", ctx->key_params.key_dma_addr,
--			     ctx->key_params.keylen);
-+		dev_dbg(dev, "mapping key-buffer: key_dma_addr=%pad keylen=%u\n",
-+			&ctx->key_params.key_dma_addr, ctx->key_params.keylen);
- 
- 		if (keylen > blocksize) {
- 			/* Load hash initial state */
-@@ -1080,7 +1082,7 @@ static int ssi_hash_setkey(void *hash,
- 
- 	rc = send_request(ctx->drvdata, &ssi_req, desc, idx, 0);
- 	if (unlikely(rc != 0)) {
--		SSI_LOG_ERR("send_request() failed (rc=%d)\n", rc);
-+		dev_err(dev, "send_request() failed (rc=%d)\n", rc);
- 		goto out;
- 	}
- 
-@@ -1142,9 +1144,8 @@ static int ssi_hash_setkey(void *hash,
- 	if (ctx->key_params.key_dma_addr) {
- 		dma_unmap_single(dev, ctx->key_params.key_dma_addr,
- 				 ctx->key_params.keylen, DMA_TO_DEVICE);
--		SSI_LOG_DEBUG("Unmapped key-buffer: key_dma_addr=%pad keylen=%u\n",
--			      ctx->key_params.key_dma_addr,
--			      ctx->key_params.keylen);
-+		dev_dbg(dev, "Unmapped key-buffer: key_dma_addr=%pad keylen=%u\n",
-+			&ctx->key_params.key_dma_addr, ctx->key_params.keylen);
- 	}
- 	return rc;
- }
-@@ -1158,7 +1159,7 @@ static int ssi_xcbc_setkey(struct crypto_ahash *ahash,
- 	int idx = 0, rc = 0;
- 	struct cc_hw_desc desc[SSI_MAX_AHASH_SEQ_LEN];
- 
--	SSI_LOG_DEBUG("===== setkey (%d) ====\n", keylen);
-+	dev_dbg(dev, "===== setkey (%d) ====\n", keylen);
- 
- 	switch (keylen) {
- 	case AES_KEYSIZE_128:
-@@ -1175,14 +1176,12 @@ static int ssi_xcbc_setkey(struct crypto_ahash *ahash,
- 					dev, (void *)key,
- 					keylen, DMA_TO_DEVICE);
- 	if (unlikely(dma_mapping_error(dev, ctx->key_params.key_dma_addr))) {
--		SSI_LOG_ERR("Mapping key va=0x%p len=%u for"
--			   " DMA failed\n", key, keylen);
-+		dev_err(dev, "Mapping key va=0x%p len=%u for DMA failed\n",
-+			key, keylen);
- 		return -ENOMEM;
- 	}
--	SSI_LOG_DEBUG("mapping key-buffer: key_dma_addr=%pad "
--		     "keylen=%u\n",
--		     ctx->key_params.key_dma_addr,
--		     ctx->key_params.keylen);
-+	dev_dbg(dev, "mapping key-buffer: key_dma_addr=%pad keylen=%u\n",
-+		&ctx->key_params.key_dma_addr, ctx->key_params.keylen);
- 
- 	ctx->is_hmac = true;
- 	/* 1. Load the AES key */
-@@ -1227,9 +1226,8 @@ static int ssi_xcbc_setkey(struct crypto_ahash *ahash,
- 
- 	dma_unmap_single(dev, ctx->key_params.key_dma_addr,
- 			 ctx->key_params.keylen, DMA_TO_DEVICE);
--	SSI_LOG_DEBUG("Unmapped key-buffer: key_dma_addr=%pad keylen=%u\n",
--		      ctx->key_params.key_dma_addr,
--		      ctx->key_params.keylen);
-+	dev_dbg(dev, "Unmapped key-buffer: key_dma_addr=%pad keylen=%u\n",
-+		&ctx->key_params.key_dma_addr, ctx->key_params.keylen);
- 
- 	return rc;
- }
-@@ -1241,7 +1239,7 @@ static int ssi_cmac_setkey(struct crypto_ahash *ahash,
- 	struct ssi_hash_ctx *ctx = crypto_ahash_ctx(ahash);
- 	struct device *dev = DEV(ctx->drvdata);
- 
--	SSI_LOG_DEBUG("===== setkey (%d) ====\n", keylen);
-+	dev_dbg(dev, "===== setkey (%d) ====\n", keylen);
- 
- 	ctx->is_hmac = true;
- 
-@@ -1281,18 +1279,16 @@ static void ssi_hash_free_ctx(struct ssi_hash_ctx *ctx)
- 	if (ctx->digest_buff_dma_addr != 0) {
- 		dma_unmap_single(dev, ctx->digest_buff_dma_addr,
- 				 sizeof(ctx->digest_buff), DMA_BIDIRECTIONAL);
--		SSI_LOG_DEBUG("Unmapped digest-buffer: "
--			     "digest_buff_dma_addr=%pad\n",
--			      ctx->digest_buff_dma_addr);
-+		dev_dbg(dev, "Unmapped digest-buffer: digest_buff_dma_addr=%pad\n",
-+			&ctx->digest_buff_dma_addr);
- 		ctx->digest_buff_dma_addr = 0;
- 	}
- 	if (ctx->opad_tmp_keys_dma_addr != 0) {
- 		dma_unmap_single(dev, ctx->opad_tmp_keys_dma_addr,
- 				 sizeof(ctx->opad_tmp_keys_buff),
- 				 DMA_BIDIRECTIONAL);
--		SSI_LOG_DEBUG("Unmapped opad-digest: "
--			     "opad_tmp_keys_dma_addr=%pad\n",
--			      ctx->opad_tmp_keys_dma_addr);
-+		dev_dbg(dev, "Unmapped opad-digest: opad_tmp_keys_dma_addr=%pad\n",
-+			&ctx->opad_tmp_keys_dma_addr);
- 		ctx->opad_tmp_keys_dma_addr = 0;
- 	}
- 
-@@ -1307,24 +1303,24 @@ static int ssi_hash_alloc_ctx(struct ssi_hash_ctx *ctx)
- 
- 	ctx->digest_buff_dma_addr = dma_map_single(dev, (void *)ctx->digest_buff, sizeof(ctx->digest_buff), DMA_BIDIRECTIONAL);
- 	if (dma_mapping_error(dev, ctx->digest_buff_dma_addr)) {
--		SSI_LOG_ERR("Mapping digest len %zu B at va=%pK for DMA failed\n",
--			    sizeof(ctx->digest_buff), ctx->digest_buff);
-+		dev_err(dev, "Mapping digest len %zu B at va=%pK for DMA failed\n",
-+			sizeof(ctx->digest_buff), ctx->digest_buff);
- 		goto fail;
- 	}
--	SSI_LOG_DEBUG("Mapped digest %zu B at va=%pK to dma=%pad\n",
--		      sizeof(ctx->digest_buff), ctx->digest_buff,
--		      ctx->digest_buff_dma_addr);
-+	dev_dbg(dev, "Mapped digest %zu B at va=%pK to dma=%pad\n",
-+		sizeof(ctx->digest_buff), ctx->digest_buff,
-+		&ctx->digest_buff_dma_addr);
- 
- 	ctx->opad_tmp_keys_dma_addr = dma_map_single(dev, (void *)ctx->opad_tmp_keys_buff, sizeof(ctx->opad_tmp_keys_buff), DMA_BIDIRECTIONAL);
- 	if (dma_mapping_error(dev, ctx->opad_tmp_keys_dma_addr)) {
--		SSI_LOG_ERR("Mapping opad digest %zu B at va=%pK for DMA failed\n",
--			    sizeof(ctx->opad_tmp_keys_buff),
--			    ctx->opad_tmp_keys_buff);
-+		dev_err(dev, "Mapping opad digest %zu B at va=%pK for DMA failed\n",
-+			sizeof(ctx->opad_tmp_keys_buff),
-+			ctx->opad_tmp_keys_buff);
- 		goto fail;
- 	}
--	SSI_LOG_DEBUG("Mapped opad_tmp_keys %zu B at va=%pK to dma=%pad\n",
--		      sizeof(ctx->opad_tmp_keys_buff), ctx->opad_tmp_keys_buff,
--		      ctx->opad_tmp_keys_dma_addr);
-+	dev_dbg(dev, "Mapped opad_tmp_keys %zu B at va=%pK to dma=%pad\n",
-+		sizeof(ctx->opad_tmp_keys_buff), ctx->opad_tmp_keys_buff,
-+		&ctx->opad_tmp_keys_dma_addr);
- 
- 	ctx->is_hmac = false;
- 	return 0;
-@@ -1358,8 +1354,9 @@ static int ssi_ahash_cra_init(struct crypto_tfm *tfm)
- static void ssi_hash_cra_exit(struct crypto_tfm *tfm)
- {
- 	struct ssi_hash_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct device *dev = DEV(ctx->drvdata);
- 
--	SSI_LOG_DEBUG("ssi_hash_cra_exit");
-+	dev_dbg(dev, "ssi_hash_cra_exit");
- 	ssi_hash_free_ctx(ctx);
- }
- 
-@@ -1385,12 +1382,12 @@ static int ssi_mac_update(struct ahash_request *req)
- 	rc = ssi_buffer_mgr_map_hash_request_update(ctx->drvdata, state, req->src, req->nbytes, block_size);
- 	if (unlikely(rc)) {
- 		if (rc == 1) {
--			SSI_LOG_DEBUG(" data size not require HW update %x\n",
--				      req->nbytes);
-+			dev_dbg(dev, " data size not require HW update %x\n",
-+				req->nbytes);
- 			/* No hardware updates are required */
- 			return 0;
- 		}
--		SSI_LOG_ERR("map_ahash_request_update() failed\n");
-+		dev_err(dev, "map_ahash_request_update() failed\n");
- 		return -ENOMEM;
- 	}
- 
-@@ -1417,7 +1414,7 @@ static int ssi_mac_update(struct ahash_request *req)
- 
- 	rc = send_request(ctx->drvdata, &ssi_req, desc, idx, 1);
- 	if (unlikely(rc != -EINPROGRESS)) {
--		SSI_LOG_ERR("send_request() failed (rc=%d)\n", rc);
-+		dev_err(dev, "send_request() failed (rc=%d)\n", rc);
- 		ssi_buffer_mgr_unmap_hash_request(dev, state, req->src, true);
- 	}
- 	return rc;
-@@ -1448,15 +1445,15 @@ static int ssi_mac_final(struct ahash_request *req)
- 		key_len =  ctx->key_params.keylen;
- 	}
- 
--	SSI_LOG_DEBUG("===== final  xcbc reminder (%d) ====\n", rem_cnt);
-+	dev_dbg(dev, "===== final  xcbc reminder (%d) ====\n", rem_cnt);
- 
- 	if (unlikely(ssi_buffer_mgr_map_hash_request_final(ctx->drvdata, state, req->src, req->nbytes, 0) != 0)) {
--		SSI_LOG_ERR("map_ahash_request_final() failed\n");
-+		dev_err(dev, "map_ahash_request_final() failed\n");
- 		return -ENOMEM;
- 	}
- 
- 	if (unlikely(ssi_hash_map_result(dev, state, digestsize) != 0)) {
--		SSI_LOG_ERR("map_ahash_digest() failed\n");
-+		dev_err(dev, "map_ahash_digest() failed\n");
- 		return -ENOMEM;
- 	}
- 
-@@ -1527,7 +1524,7 @@ static int ssi_mac_final(struct ahash_request *req)
- 
- 	rc = send_request(ctx->drvdata, &ssi_req, desc, idx, 1);
- 	if (unlikely(rc != -EINPROGRESS)) {
--		SSI_LOG_ERR("send_request() failed (rc=%d)\n", rc);
-+		dev_err(dev, "send_request() failed (rc=%d)\n", rc);
- 		ssi_buffer_mgr_unmap_hash_request(dev, state, req->src, true);
- 		ssi_hash_unmap_result(dev, state, digestsize, req->result);
- 	}
-@@ -1547,18 +1544,18 @@ static int ssi_mac_finup(struct ahash_request *req)
- 	u32 key_len = 0;
- 	u32 digestsize = crypto_ahash_digestsize(tfm);
- 
--	SSI_LOG_DEBUG("===== finup xcbc(%d) ====\n", req->nbytes);
-+	dev_dbg(dev, "===== finup xcbc(%d) ====\n", req->nbytes);
- 	if (state->xcbc_count > 0 && req->nbytes == 0) {
--		SSI_LOG_DEBUG("No data to update. Call to fdx_mac_final\n");
-+		dev_dbg(dev, "No data to update. Call to fdx_mac_final\n");
- 		return ssi_mac_final(req);
- 	}
- 
- 	if (unlikely(ssi_buffer_mgr_map_hash_request_final(ctx->drvdata, state, req->src, req->nbytes, 1) != 0)) {
--		SSI_LOG_ERR("map_ahash_request_final() failed\n");
-+		dev_err(dev, "map_ahash_request_final() failed\n");
- 		return -ENOMEM;
- 	}
- 	if (unlikely(ssi_hash_map_result(dev, state, digestsize) != 0)) {
--		SSI_LOG_ERR("map_ahash_digest() failed\n");
-+		dev_err(dev, "map_ahash_digest() failed\n");
- 		return -ENOMEM;
- 	}
- 
-@@ -1598,7 +1595,7 @@ static int ssi_mac_finup(struct ahash_request *req)
- 
- 	rc = send_request(ctx->drvdata, &ssi_req, desc, idx, 1);
- 	if (unlikely(rc != -EINPROGRESS)) {
--		SSI_LOG_ERR("send_request() failed (rc=%d)\n", rc);
-+		dev_err(dev, "send_request() failed (rc=%d)\n", rc);
- 		ssi_buffer_mgr_unmap_hash_request(dev, state, req->src, true);
- 		ssi_hash_unmap_result(dev, state, digestsize, req->result);
- 	}
-@@ -1618,19 +1615,19 @@ static int ssi_mac_digest(struct ahash_request *req)
- 	int idx = 0;
- 	int rc;
- 
--	SSI_LOG_DEBUG("===== -digest mac (%d) ====\n",  req->nbytes);
-+	dev_dbg(dev, "===== -digest mac (%d) ====\n",  req->nbytes);
- 
- 	if (unlikely(ssi_hash_map_request(dev, state, ctx) != 0)) {
--		SSI_LOG_ERR("map_ahash_source() failed\n");
-+		dev_err(dev, "map_ahash_source() failed\n");
- 		return -ENOMEM;
- 	}
- 	if (unlikely(ssi_hash_map_result(dev, state, digestsize) != 0)) {
--		SSI_LOG_ERR("map_ahash_digest() failed\n");
-+		dev_err(dev, "map_ahash_digest() failed\n");
- 		return -ENOMEM;
- 	}
- 
- 	if (unlikely(ssi_buffer_mgr_map_hash_request_final(ctx->drvdata, state, req->src, req->nbytes, 1) != 0)) {
--		SSI_LOG_ERR("map_ahash_request_final() failed\n");
-+		dev_err(dev, "map_ahash_request_final() failed\n");
- 		return -ENOMEM;
- 	}
- 
-@@ -1670,7 +1667,7 @@ static int ssi_mac_digest(struct ahash_request *req)
- 
- 	rc = send_request(ctx->drvdata, &ssi_req, desc, idx, 1);
- 	if (unlikely(rc != -EINPROGRESS)) {
--		SSI_LOG_ERR("send_request() failed (rc=%d)\n", rc);
-+		dev_err(dev, "send_request() failed (rc=%d)\n", rc);
- 		ssi_buffer_mgr_unmap_hash_request(dev, state, req->src, true);
- 		ssi_hash_unmap_result(dev, state, digestsize, req->result);
- 		ssi_hash_unmap_request(dev, state, ctx);
-@@ -1724,8 +1721,9 @@ static int ssi_ahash_init(struct ahash_request *req)
- 	struct ahash_req_ctx *state = ahash_request_ctx(req);
- 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
- 	struct ssi_hash_ctx *ctx = crypto_ahash_ctx(tfm);
-+	struct device *dev = DEV(ctx->drvdata);
- 
--	SSI_LOG_DEBUG("===== init (%d) ====\n", req->nbytes);
-+	dev_dbg(dev, "===== init (%d) ====\n", req->nbytes);
- 
- 	return ssi_hash_init(state, ctx);
- }
-@@ -2051,7 +2049,8 @@ static struct ssi_hash_template driver_hash[] = {
- };
- 
- static struct ssi_hash_alg *
--ssi_hash_create_alg(struct ssi_hash_template *template, bool keyed)
-+ssi_hash_create_alg(struct ssi_hash_template *template, struct device *dev,
-+		    bool keyed)
- {
- 	struct ssi_hash_alg *t_crypto_alg;
- 	struct crypto_alg *alg;
-@@ -2059,7 +2058,7 @@ ssi_hash_create_alg(struct ssi_hash_template *template, bool keyed)
- 
- 	t_crypto_alg = kzalloc(sizeof(*t_crypto_alg), GFP_KERNEL);
- 	if (!t_crypto_alg) {
--		SSI_LOG_ERR("failed to allocate t_crypto_alg\n");
-+		dev_dbg(dev, "failed to allocate t_crypto_alg\n");
- 		return ERR_PTR(-ENOMEM);
- 	}
- 
-@@ -2104,6 +2103,7 @@ int ssi_hash_init_sram_digest_consts(struct ssi_drvdata *drvdata)
- 	ssi_sram_addr_t sram_buff_ofs = hash_handle->digest_len_sram_addr;
- 	unsigned int larval_seq_len = 0;
- 	struct cc_hw_desc larval_seq[CC_DIGEST_SIZE_MAX / sizeof(u32)];
-+	struct device *dev = DEV(drvdata);
- 	int rc = 0;
- #if (DX_DEV_SHA_MAX > 256)
- 	int i;
-@@ -2188,7 +2188,7 @@ int ssi_hash_init_sram_digest_consts(struct ssi_drvdata *drvdata)
- 	}
- 	rc = send_request_init(drvdata, larval_seq, larval_seq_len);
- 	if (unlikely(rc != 0)) {
--		SSI_LOG_ERR("send_request() failed (rc = %d)\n", rc);
-+		dev_err(dev, "send_request() failed (rc = %d)\n", rc);
- 		goto init_digest_const_err;
- 	}
- 	larval_seq_len = 0;
-@@ -2206,7 +2206,7 @@ int ssi_hash_init_sram_digest_consts(struct ssi_drvdata *drvdata)
- 	}
- 	rc = send_request_init(drvdata, larval_seq, larval_seq_len);
- 	if (unlikely(rc != 0)) {
--		SSI_LOG_ERR("send_request() failed (rc = %d)\n", rc);
-+		dev_err(dev, "send_request() failed (rc = %d)\n", rc);
- 		goto init_digest_const_err;
- 	}
+-ENTRY(entry_SYSENTER_compat)
++SYM_FUNC_START(entry_SYSENTER_compat)
+ 	/* Interrupts are off on entry. */
+ 	SWAPGS_UNSAFE_STACK
+ 	movq	PER_CPU_VAR(cpu_current_top_of_stack), %rsp
+@@ -132,7 +132,7 @@ ENTRY(entry_SYSENTER_compat)
+ 	popfq
+ 	jmp	.Lsysenter_flags_fixed
+ SYM_CODE_INNER_LABEL_NOALIGN(__end_entry_SYSENTER_compat, SYM_V_GLOBAL)
+-ENDPROC(entry_SYSENTER_compat)
++SYM_FUNC_END(entry_SYSENTER_compat)
+ 
+ /*
+  * 32-bit SYSCALL entry.
+@@ -340,7 +340,7 @@ SYM_CODE_START(entry_INT80_compat)
+ 	jmp	restore_regs_and_iret
+ SYM_CODE_END(entry_INT80_compat)
+ 
+-ENTRY(stub32_clone)
++SYM_FUNC_START(stub32_clone)
+ 	/*
+ 	 * The 32-bit clone ABI is: clone(..., int tls_val, int *child_tidptr).
+ 	 * The 64-bit clone ABI is: clone(..., int *child_tidptr, int tls_val).
+@@ -350,4 +350,4 @@ ENTRY(stub32_clone)
+ 	 */
+ 	xchg	%r8, %rcx
+ 	jmp	sys_clone
+-ENDPROC(stub32_clone)
++SYM_FUNC_END(stub32_clone)
+diff --git a/arch/x86/kernel/acpi/wakeup_64.S b/arch/x86/kernel/acpi/wakeup_64.S
+index 987ef3d3aaf4..7767f8fffe73 100644
+--- a/arch/x86/kernel/acpi/wakeup_64.S
++++ b/arch/x86/kernel/acpi/wakeup_64.S
+@@ -13,7 +13,7 @@
+ 	/*
+ 	 * Hooray, we are in Long 64-bit mode (but still running in low memory)
+ 	 */
+-ENTRY(wakeup_long64)
++SYM_FUNC_START(wakeup_long64)
+ 	movq	saved_magic, %rax
+ 	movq	$0x123456789abcdef0, %rdx
+ 	cmpq	%rdx, %rax
+@@ -34,13 +34,13 @@ ENTRY(wakeup_long64)
+ 
+ 	movq	saved_rip, %rax
+ 	jmp	*%rax
+-ENDPROC(wakeup_long64)
++SYM_FUNC_END(wakeup_long64)
+ 
+ SYM_CODE_START_LOCAL(bogus_64_magic)
+ 	jmp	bogus_64_magic
+ SYM_CODE_END(bogus_64_magic)
+ 
+-ENTRY(do_suspend_lowlevel)
++SYM_FUNC_START(do_suspend_lowlevel)
+ 	FRAME_BEGIN
+ 	subq	$8, %rsp
+ 	xorl	%eax, %eax
+@@ -123,7 +123,7 @@ ENTRY(do_suspend_lowlevel)
+ 	addq	$8, %rsp
+ 	FRAME_END
+ 	jmp	restore_processor_state
+-ENDPROC(do_suspend_lowlevel)
++SYM_FUNC_END(do_suspend_lowlevel)
+ 
+ .data
+ saved_rbp:		.quad	0
+diff --git a/arch/x86/kernel/head_64.S b/arch/x86/kernel/head_64.S
+index f2f1f2f953bb..5775e86457c0 100644
+--- a/arch/x86/kernel/head_64.S
++++ b/arch/x86/kernel/head_64.S
+@@ -89,7 +89,7 @@ SYM_CODE_START_NOALIGN(startup_64)
+ 	jmp 1f
+ SYM_CODE_END(startup_64)
+ 
+-ENTRY(secondary_startup_64)
++SYM_CODE_START(secondary_startup_64)
+ 	UNWIND_HINT_EMPTY
+ 	/*
+ 	 * At this point the CPU runs in 64bit mode CS.L = 1 CS.D = 0,
+@@ -238,7 +238,7 @@ ENTRY(secondary_startup_64)
+ 	pushq	%rax		# target address in negative space
+ 	lretq
+ .Lafter_lret:
+-END(secondary_startup_64)
++SYM_CODE_END(secondary_startup_64)
+ 
+ #include "verify_cpu.S"
+ 
+@@ -248,11 +248,11 @@ END(secondary_startup_64)
+  * up already except stack. We just set up stack here. Then call
+  * start_secondary() via .Ljump_to_C_code.
+  */
+-ENTRY(start_cpu0)
++SYM_FUNC_START(start_cpu0)
+ 	movq	initial_stack(%rip), %rsp
+ 	UNWIND_HINT_EMPTY
+ 	jmp	.Ljump_to_C_code
+-ENDPROC(start_cpu0)
++SYM_FUNC_END(start_cpu0)
  #endif
-@@ -2220,13 +2220,14 @@ int ssi_hash_alloc(struct ssi_drvdata *drvdata)
- 	struct ssi_hash_handle *hash_handle;
- 	ssi_sram_addr_t sram_buff;
- 	u32 sram_size_to_alloc;
-+	struct device *dev = DEV(drvdata);
- 	int rc = 0;
- 	int alg;
  
- 	hash_handle = kzalloc(sizeof(*hash_handle), GFP_KERNEL);
- 	if (!hash_handle) {
--		SSI_LOG_ERR("kzalloc failed to allocate %zu B\n",
--			    sizeof(*hash_handle));
-+		dev_err(dev, "kzalloc failed to allocate %zu B\n",
-+			sizeof(*hash_handle));
- 		rc = -ENOMEM;
- 		goto fail;
- 	}
-@@ -2247,7 +2248,7 @@ int ssi_hash_alloc(struct ssi_drvdata *drvdata)
+ 	/* Both SMP bootup and ACPI suspend change these variables */
+@@ -269,7 +269,7 @@ SYM_DATA_SIMPLE(initial_stack,
+ 	__FINITDATA
  
- 	sram_buff = ssi_sram_mgr_alloc(drvdata, sram_size_to_alloc);
- 	if (sram_buff == NULL_SRAM_ADDR) {
--		SSI_LOG_ERR("SRAM pool exhausted\n");
-+		dev_err(dev, "SRAM pool exhausted\n");
- 		rc = -ENOMEM;
- 		goto fail;
- 	}
-@@ -2258,7 +2259,7 @@ int ssi_hash_alloc(struct ssi_drvdata *drvdata)
- 	/*must be set before the alg registration as it is being used there*/
- 	rc = ssi_hash_init_sram_digest_consts(drvdata);
- 	if (unlikely(rc != 0)) {
--		SSI_LOG_ERR("Init digest CONST failed (rc=%d)\n", rc);
-+		dev_err(dev, "Init digest CONST failed (rc=%d)\n", rc);
- 		goto fail;
- 	}
+ 	__INIT
+-ENTRY(early_idt_handler_array)
++SYM_CODE_START(early_idt_handler_array)
+ 	i = 0
+ 	.rept NUM_EXCEPTION_VECTORS
+ 	.ifeq (EXCEPTION_ERRCODE_MASK >> i) & 1
+@@ -285,7 +285,7 @@ ENTRY(early_idt_handler_array)
+ 	.fill early_idt_handler_array + i*EARLY_IDT_HANDLER_SIZE - ., 1, 0xcc
+ 	.endr
+ 	UNWIND_HINT_IRET_REGS offset=16
+-END(early_idt_handler_array)
++SYM_CODE_END(early_idt_handler_array)
  
-@@ -2268,19 +2269,19 @@ int ssi_hash_alloc(struct ssi_drvdata *drvdata)
- 		int hw_mode = driver_hash[alg].hw_mode;
+ SYM_CODE_START_LOCAL(early_idt_handler_common)
+ 	/*
+diff --git a/arch/x86/lib/checksum_32.S b/arch/x86/lib/checksum_32.S
+index 4d34bb548b41..a048436ce3ac 100644
+--- a/arch/x86/lib/checksum_32.S
++++ b/arch/x86/lib/checksum_32.S
+@@ -283,7 +283,7 @@ unsigned int csum_partial_copy_generic (const char *src, char *dst,
+ #define ARGBASE 16		
+ #define FP		12
+ 		
+-ENTRY(csum_partial_copy_generic)
++SYM_FUNC_START(csum_partial_copy_generic)
+ 	subl  $4,%esp	
+ 	pushl %edi
+ 	pushl %esi
+@@ -401,7 +401,7 @@ DST(	movb %cl, (%edi)	)
+ 	popl %edi
+ 	popl %ecx			# equivalent to addl $4,%esp
+ 	ret	
+-ENDPROC(csum_partial_copy_generic)
++SYM_FUNC_END(csum_partial_copy_generic)
  
- 		/* register hmac version */
--		t_alg = ssi_hash_create_alg(&driver_hash[alg], true);
-+		t_alg = ssi_hash_create_alg(&driver_hash[alg], dev, true);
- 		if (IS_ERR(t_alg)) {
- 			rc = PTR_ERR(t_alg);
--			SSI_LOG_ERR("%s alg allocation failed\n",
--				    driver_hash[alg].driver_name);
-+			dev_err(dev, "%s alg allocation failed\n",
-+				driver_hash[alg].driver_name);
- 			goto fail;
- 		}
- 		t_alg->drvdata = drvdata;
- 
- 		rc = crypto_register_ahash(&t_alg->ahash_alg);
- 		if (unlikely(rc)) {
--			SSI_LOG_ERR("%s alg registration failed\n",
--				    driver_hash[alg].driver_name);
-+			dev_err(dev, "%s alg registration failed\n",
-+				driver_hash[alg].driver_name);
- 			kfree(t_alg);
- 			goto fail;
- 		} else {
-@@ -2293,19 +2294,19 @@ int ssi_hash_alloc(struct ssi_drvdata *drvdata)
- 			continue;
- 
- 		/* register hash version */
--		t_alg = ssi_hash_create_alg(&driver_hash[alg], false);
-+		t_alg = ssi_hash_create_alg(&driver_hash[alg], dev, false);
- 		if (IS_ERR(t_alg)) {
- 			rc = PTR_ERR(t_alg);
--			SSI_LOG_ERR("%s alg allocation failed\n",
--				    driver_hash[alg].driver_name);
-+			dev_err(dev, "%s alg allocation failed\n",
-+				driver_hash[alg].driver_name);
- 			goto fail;
- 		}
- 		t_alg->drvdata = drvdata;
- 
- 		rc = crypto_register_ahash(&t_alg->ahash_alg);
- 		if (unlikely(rc)) {
--			SSI_LOG_ERR("%s alg registration failed\n",
--				    driver_hash[alg].driver_name);
-+			dev_err(dev, "%s alg registration failed\n",
-+				driver_hash[alg].driver_name);
- 			kfree(t_alg);
- 			goto fail;
- 		} else {
-@@ -2439,6 +2440,7 @@ static void ssi_hash_create_data_desc(struct ahash_req_ctx *areq_ctx,
- 				      unsigned int *seq_size)
- {
- 	unsigned int idx = *seq_size;
-+	struct device *dev = DEV(ctx->drvdata);
- 
- 	if (likely(areq_ctx->data_dma_buf_type == SSI_DMA_BUF_DLLI)) {
- 		hw_desc_init(&desc[idx]);
-@@ -2449,7 +2451,7 @@ static void ssi_hash_create_data_desc(struct ahash_req_ctx *areq_ctx,
- 		idx++;
- 	} else {
- 		if (areq_ctx->data_dma_buf_type == SSI_DMA_BUF_NULL) {
--			SSI_LOG_DEBUG(" NULL mode\n");
-+			dev_dbg(dev, " NULL mode\n");
- 			/* nothing to build */
- 			return;
- 		}
-@@ -2489,6 +2491,7 @@ ssi_sram_addr_t ssi_ahash_get_larval_digest_sram_addr(void *drvdata, u32 mode)
- {
- 	struct ssi_drvdata *_drvdata = (struct ssi_drvdata *)drvdata;
- 	struct ssi_hash_handle *hash_handle = _drvdata->hash_handle;
-+	struct device *dev = DEV(_drvdata);
- 
- 	switch (mode) {
- 	case DRV_HASH_NULL:
-@@ -2523,7 +2526,7 @@ ssi_sram_addr_t ssi_ahash_get_larval_digest_sram_addr(void *drvdata, u32 mode)
- 			sizeof(sha384_init));
- #endif
- 	default:
--		SSI_LOG_ERR("Invalid hash mode (%d)\n", mode);
-+		dev_err(dev, "Invalid hash mode (%d)\n", mode);
- 	}
- 
- 	/*This is valid wrong value to avoid kernel crash*/
-diff --git a/drivers/staging/ccree/ssi_ivgen.c b/drivers/staging/ccree/ssi_ivgen.c
-index b01e032..245d6ad 100644
---- a/drivers/staging/ccree/ssi_ivgen.c
-+++ b/drivers/staging/ccree/ssi_ivgen.c
-@@ -194,8 +194,8 @@ int ssi_ivgen_init(struct ssi_drvdata *drvdata)
- 	drvdata->ivgen_handle = kzalloc(sizeof(*drvdata->ivgen_handle),
- 					GFP_KERNEL);
- 	if (!drvdata->ivgen_handle) {
--		SSI_LOG_ERR("Not enough memory to allocate IVGEN context "
--			   "(%zu B)\n", sizeof(*drvdata->ivgen_handle));
-+		dev_err(device, "Not enough memory to allocate IVGEN context (%zu B)\n",
-+			sizeof(*drvdata->ivgen_handle));
- 		rc = -ENOMEM;
- 		goto out;
- 	}
-@@ -206,15 +206,15 @@ int ssi_ivgen_init(struct ssi_drvdata *drvdata)
- 						  &ivgen_ctx->pool_meta_dma,
- 						  GFP_KERNEL);
- 	if (!ivgen_ctx->pool_meta) {
--		SSI_LOG_ERR("Not enough memory to allocate DMA of pool_meta "
--			   "(%u B)\n", SSI_IVPOOL_META_SIZE);
-+		dev_err(device, "Not enough memory to allocate DMA of pool_meta (%u B)\n",
-+			SSI_IVPOOL_META_SIZE);
- 		rc = -ENOMEM;
- 		goto out;
- 	}
- 	/* Allocate IV pool in SRAM */
- 	ivgen_ctx->pool = ssi_sram_mgr_alloc(drvdata, SSI_IVPOOL_SIZE);
- 	if (ivgen_ctx->pool == NULL_SRAM_ADDR) {
--		SSI_LOG_ERR("SRAM pool exhausted\n");
-+		dev_err(device, "SRAM pool exhausted\n");
- 		rc = -ENOMEM;
- 		goto out;
- 	}
-@@ -248,6 +248,7 @@ int ssi_ivgen_getiv(
- {
- 	struct ssi_ivgen_ctx *ivgen_ctx = drvdata->ivgen_handle;
- 	unsigned int idx = *iv_seq_len;
-+	struct device *dev = DEV(drvdata);
- 	unsigned int t;
- 
- 	if ((iv_out_size != CC_AES_IV_SIZE) &&
-@@ -291,7 +292,7 @@ int ssi_ivgen_getiv(
- 	ivgen_ctx->next_iv_ofs += iv_out_size;
- 
- 	if ((SSI_IVPOOL_SIZE - ivgen_ctx->next_iv_ofs) < CC_AES_IV_SIZE) {
--		SSI_LOG_DEBUG("Pool exhausted, regenerating iv-pool\n");
-+		dev_dbg(dev, "Pool exhausted, regenerating iv-pool\n");
- 		/* pool is drained -regenerate it! */
- 		return ssi_ivgen_generate_pool(ivgen_ctx, iv_seq, iv_seq_len);
- 	}
-diff --git a/drivers/staging/ccree/ssi_pm.c b/drivers/staging/ccree/ssi_pm.c
-index 1aceb6f..30d92bf 100644
---- a/drivers/staging/ccree/ssi_pm.c
-+++ b/drivers/staging/ccree/ssi_pm.c
-@@ -40,11 +40,12 @@ int ssi_power_mgr_runtime_suspend(struct device *dev)
- 		(struct ssi_drvdata *)dev_get_drvdata(dev);
- 	int rc;
- 
--	SSI_LOG_DEBUG("set HOST_POWER_DOWN_EN\n");
-+	dev_dbg(dev, "set HOST_POWER_DOWN_EN\n");
- 	WRITE_REGISTER(drvdata->cc_base + CC_REG_OFFSET(HOST_RGF, HOST_POWER_DOWN_EN), POWER_DOWN_ENABLE);
- 	rc = ssi_request_mgr_runtime_suspend_queue(drvdata);
- 	if (rc != 0) {
--		SSI_LOG_ERR("ssi_request_mgr_runtime_suspend_queue (%x)\n", rc);
-+		dev_err(dev, "ssi_request_mgr_runtime_suspend_queue (%x)\n",
-+			rc);
- 		return rc;
- 	}
- 	fini_cc_regs(drvdata);
-@@ -58,24 +59,24 @@ int ssi_power_mgr_runtime_resume(struct device *dev)
- 	struct ssi_drvdata *drvdata =
- 		(struct ssi_drvdata *)dev_get_drvdata(dev);
- 
--	SSI_LOG_DEBUG("unset HOST_POWER_DOWN_EN\n");
-+	dev_dbg(dev, "unset HOST_POWER_DOWN_EN\n");
- 	WRITE_REGISTER(drvdata->cc_base + CC_REG_OFFSET(HOST_RGF, HOST_POWER_DOWN_EN), POWER_DOWN_DISABLE);
- 
- 	rc = cc_clk_on(drvdata);
- 	if (rc) {
--		SSI_LOG_ERR("failed getting clock back on. We're toast.\n");
-+		dev_err(dev, "failed getting clock back on. We're toast.\n");
- 		return rc;
- 	}
- 
- 	rc = init_cc_regs(drvdata, false);
- 	if (rc != 0) {
--		SSI_LOG_ERR("init_cc_regs (%x)\n", rc);
-+		dev_err(dev, "init_cc_regs (%x)\n", rc);
- 		return rc;
- 	}
- 
- 	rc = ssi_request_mgr_runtime_resume_queue(drvdata);
- 	if (rc != 0) {
--		SSI_LOG_ERR("ssi_request_mgr_runtime_resume_queue (%x)\n", rc);
-+		dev_err(dev, "ssi_request_mgr_runtime_resume_queue (%x)\n", rc);
- 		return rc;
- 	}
- 
-@@ -109,7 +110,7 @@ int ssi_power_mgr_runtime_put_suspend(struct device *dev)
- 		rc = pm_runtime_put_autosuspend(dev);
- 	} else {
- 		/* Something wrong happens*/
--		SSI_LOG_ERR("request to suspend already suspended queue");
-+		dev_err(dev, "request to suspend already suspended queue");
- 		rc = -EBUSY;
- 	}
- 	return rc;
-diff --git a/drivers/staging/ccree/ssi_request_mgr.c b/drivers/staging/ccree/ssi_request_mgr.c
-index 0687bde..6733fc6 100644
---- a/drivers/staging/ccree/ssi_request_mgr.c
-+++ b/drivers/staging/ccree/ssi_request_mgr.c
-@@ -78,9 +78,9 @@ void request_mgr_fini(struct ssi_drvdata *drvdata)
- 				  req_mgr_h->dummy_comp_buff_dma);
- 	}
- 
--	SSI_LOG_DEBUG("max_used_hw_slots=%d\n", (req_mgr_h->hw_queue_size -
-+	dev_dbg(dev, "max_used_hw_slots=%d\n", (req_mgr_h->hw_queue_size -
- 						req_mgr_h->min_free_hw_slots));
--	SSI_LOG_DEBUG("max_used_sw_slots=%d\n", req_mgr_h->max_used_sw_slots);
-+	dev_dbg(dev, "max_used_sw_slots=%d\n", req_mgr_h->max_used_sw_slots);
- 
- #ifdef COMP_IN_WQ
- 	flush_workqueue(req_mgr_h->workq);
-@@ -110,24 +110,24 @@ int request_mgr_init(struct ssi_drvdata *drvdata)
- 
- 	spin_lock_init(&req_mgr_h->hw_lock);
- #ifdef COMP_IN_WQ
--	SSI_LOG_DEBUG("Initializing completion workqueue\n");
-+	dev_dbg(dev, "Initializing completion workqueue\n");
- 	req_mgr_h->workq = create_singlethread_workqueue("arm_cc7x_wq");
- 	if (unlikely(!req_mgr_h->workq)) {
--		SSI_LOG_ERR("Failed creating work queue\n");
-+		dev_err(dev, "Failed creating work queue\n");
- 		rc = -ENOMEM;
- 		goto req_mgr_init_err;
- 	}
- 	INIT_DELAYED_WORK(&req_mgr_h->compwork, comp_work_handler);
  #else
--	SSI_LOG_DEBUG("Initializing completion tasklet\n");
-+	dev_dbg(dev, "Initializing completion tasklet\n");
- 	tasklet_init(&req_mgr_h->comptask, comp_handler, (unsigned long)drvdata);
+ 
+@@ -419,7 +419,7 @@ ENDPROC(csum_partial_copy_generic)
+ 
+ #define ARGBASE 12
+ 		
+-ENTRY(csum_partial_copy_generic)
++SYM_FUNC_START(csum_partial_copy_generic)
+ 	pushl %ebx
+ 	pushl %edi
+ 	pushl %esi
+@@ -486,7 +486,7 @@ DST(	movb %dl, (%edi)         )
+ 	popl %edi
+ 	popl %ebx
+ 	ret
+-ENDPROC(csum_partial_copy_generic)
++SYM_FUNC_END(csum_partial_copy_generic)
+ 				
+ #undef ROUND
+ #undef ROUND1		
+diff --git a/arch/x86/lib/clear_page_64.S b/arch/x86/lib/clear_page_64.S
+index 81b1635d67de..8c4c26c282fd 100644
+--- a/arch/x86/lib/clear_page_64.S
++++ b/arch/x86/lib/clear_page_64.S
+@@ -14,15 +14,15 @@
+  * Zero a page.
+  * %rdi	- page
+  */
+-ENTRY(clear_page_rep)
++SYM_FUNC_START(clear_page_rep)
+ 	movl $4096/8,%ecx
+ 	xorl %eax,%eax
+ 	rep stosq
+ 	ret
+-ENDPROC(clear_page_rep)
++SYM_FUNC_END(clear_page_rep)
+ EXPORT_SYMBOL_GPL(clear_page_rep)
+ 
+-ENTRY(clear_page_orig)
++SYM_FUNC_START(clear_page_orig)
+ 	xorl   %eax,%eax
+ 	movl   $4096/64,%ecx
+ 	.p2align 4
+@@ -41,13 +41,13 @@ ENTRY(clear_page_orig)
+ 	jnz	.Lloop
+ 	nop
+ 	ret
+-ENDPROC(clear_page_orig)
++SYM_FUNC_END(clear_page_orig)
+ EXPORT_SYMBOL_GPL(clear_page_orig)
+ 
+-ENTRY(clear_page_erms)
++SYM_FUNC_START(clear_page_erms)
+ 	movl $4096,%ecx
+ 	xorl %eax,%eax
+ 	rep stosb
+ 	ret
+-ENDPROC(clear_page_erms)
++SYM_FUNC_END(clear_page_erms)
+ EXPORT_SYMBOL_GPL(clear_page_erms)
+diff --git a/arch/x86/lib/cmpxchg16b_emu.S b/arch/x86/lib/cmpxchg16b_emu.S
+index 9b330242e740..b6ba6360b3ca 100644
+--- a/arch/x86/lib/cmpxchg16b_emu.S
++++ b/arch/x86/lib/cmpxchg16b_emu.S
+@@ -19,7 +19,7 @@
+  * %rcx : high 64 bits of new value
+  * %al  : Operation successful
+  */
+-ENTRY(this_cpu_cmpxchg16b_emu)
++SYM_FUNC_START(this_cpu_cmpxchg16b_emu)
+ 
+ #
+ # Emulate 'cmpxchg16b %gs:(%rsi)' except we return the result in %al not
+@@ -50,4 +50,4 @@ ENTRY(this_cpu_cmpxchg16b_emu)
+ 	xor %al,%al
+ 	ret
+ 
+-ENDPROC(this_cpu_cmpxchg16b_emu)
++SYM_FUNC_END(this_cpu_cmpxchg16b_emu)
+diff --git a/arch/x86/lib/cmpxchg8b_emu.S b/arch/x86/lib/cmpxchg8b_emu.S
+index 03a186fc06ea..77aa18db3968 100644
+--- a/arch/x86/lib/cmpxchg8b_emu.S
++++ b/arch/x86/lib/cmpxchg8b_emu.S
+@@ -19,7 +19,7 @@
+  * %ebx : low 32 bits of new value
+  * %ecx : high 32 bits of new value
+  */
+-ENTRY(cmpxchg8b_emu)
++SYM_FUNC_START(cmpxchg8b_emu)
+ 
+ #
+ # Emulate 'cmpxchg8b (%esi)' on UP except we don't
+@@ -48,5 +48,5 @@ ENTRY(cmpxchg8b_emu)
+ 	popfl
+ 	ret
+ 
+-ENDPROC(cmpxchg8b_emu)
++SYM_FUNC_END(cmpxchg8b_emu)
+ EXPORT_SYMBOL(cmpxchg8b_emu)
+diff --git a/arch/x86/lib/copy_page_64.S b/arch/x86/lib/copy_page_64.S
+index e1ee50bc161a..6ba635d23fcc 100644
+--- a/arch/x86/lib/copy_page_64.S
++++ b/arch/x86/lib/copy_page_64.S
+@@ -12,12 +12,12 @@
+  * prefetch distance based on SMP/UP.
+  */
+ 	ALIGN
+-ENTRY(copy_page)
++SYM_FUNC_START(copy_page)
+ 	ALTERNATIVE "jmp copy_page_regs", "", X86_FEATURE_REP_GOOD
+ 	movl	$4096/8, %ecx
+ 	rep	movsq
+ 	ret
+-ENDPROC(copy_page)
++SYM_FUNC_END(copy_page)
+ EXPORT_SYMBOL(copy_page)
+ 
+ SYM_FUNC_START_LOCAL(copy_page_regs)
+diff --git a/arch/x86/lib/copy_user_64.S b/arch/x86/lib/copy_user_64.S
+index 020f75cc8cf6..5e9e80c05a97 100644
+--- a/arch/x86/lib/copy_user_64.S
++++ b/arch/x86/lib/copy_user_64.S
+@@ -29,7 +29,7 @@
+  * Output:
+  * eax uncopied bytes or 0 if successful.
+  */
+-ENTRY(copy_user_generic_unrolled)
++SYM_FUNC_START(copy_user_generic_unrolled)
+ 	ASM_STAC
+ 	cmpl $8,%edx
+ 	jb 20f		/* less then 8 bytes, go to byte copy loop */
+@@ -112,7 +112,7 @@ ENTRY(copy_user_generic_unrolled)
+ 	_ASM_EXTABLE(19b,40b)
+ 	_ASM_EXTABLE(21b,50b)
+ 	_ASM_EXTABLE(22b,50b)
+-ENDPROC(copy_user_generic_unrolled)
++SYM_FUNC_END(copy_user_generic_unrolled)
+ EXPORT_SYMBOL(copy_user_generic_unrolled)
+ 
+ /* Some CPUs run faster using the string copy instructions.
+@@ -133,7 +133,7 @@ EXPORT_SYMBOL(copy_user_generic_unrolled)
+  * Output:
+  * eax uncopied bytes or 0 if successful.
+  */
+-ENTRY(copy_user_generic_string)
++SYM_FUNC_START(copy_user_generic_string)
+ 	ASM_STAC
+ 	cmpl $8,%edx
+ 	jb 2f		/* less than 8 bytes, go to byte copy loop */
+@@ -158,7 +158,7 @@ ENTRY(copy_user_generic_string)
+ 
+ 	_ASM_EXTABLE(1b,11b)
+ 	_ASM_EXTABLE(3b,12b)
+-ENDPROC(copy_user_generic_string)
++SYM_FUNC_END(copy_user_generic_string)
+ EXPORT_SYMBOL(copy_user_generic_string)
+ 
+ /*
+@@ -173,7 +173,7 @@ EXPORT_SYMBOL(copy_user_generic_string)
+  * Output:
+  * eax uncopied bytes or 0 if successful.
+  */
+-ENTRY(copy_user_enhanced_fast_string)
++SYM_FUNC_START(copy_user_enhanced_fast_string)
+ 	ASM_STAC
+ 	cmpl $64,%edx
+ 	jb .L_copy_short_string	/* less then 64 bytes, avoid the costly 'rep' */
+@@ -190,7 +190,7 @@ ENTRY(copy_user_enhanced_fast_string)
+ 	.previous
+ 
+ 	_ASM_EXTABLE(1b,12b)
+-ENDPROC(copy_user_enhanced_fast_string)
++SYM_FUNC_END(copy_user_enhanced_fast_string)
+ EXPORT_SYMBOL(copy_user_enhanced_fast_string)
+ 
+ /*
+@@ -202,7 +202,7 @@ EXPORT_SYMBOL(copy_user_enhanced_fast_string)
+  *  - Require 8-byte alignment when size is 8 bytes or larger.
+  *  - Require 4-byte alignment when size is 4 bytes.
+  */
+-ENTRY(__copy_user_nocache)
++SYM_FUNC_START(__copy_user_nocache)
+ 	ASM_STAC
+ 
+ 	/* If size is less than 8 bytes, go to 4-byte copy */
+@@ -341,5 +341,5 @@ ENTRY(__copy_user_nocache)
+ 	_ASM_EXTABLE(31b,.L_fixup_4b_copy)
+ 	_ASM_EXTABLE(40b,.L_fixup_1b_copy)
+ 	_ASM_EXTABLE(41b,.L_fixup_1b_copy)
+-ENDPROC(__copy_user_nocache)
++SYM_FUNC_END(__copy_user_nocache)
+ EXPORT_SYMBOL(__copy_user_nocache)
+diff --git a/arch/x86/lib/csum-copy_64.S b/arch/x86/lib/csum-copy_64.S
+index 45a53dfe1859..523e4964078f 100644
+--- a/arch/x86/lib/csum-copy_64.S
++++ b/arch/x86/lib/csum-copy_64.S
+@@ -45,7 +45,7 @@
+ 	.endm
+ 
+ 
+-ENTRY(csum_partial_copy_generic)
++SYM_FUNC_START(csum_partial_copy_generic)
+ 	cmpl	$3*64, %edx
+ 	jle	.Lignore
+ 
+@@ -221,4 +221,4 @@ ENTRY(csum_partial_copy_generic)
+ 	jz   .Lende
+ 	movl $-EFAULT, (%rax)
+ 	jmp .Lende
+-ENDPROC(csum_partial_copy_generic)
++SYM_FUNC_END(csum_partial_copy_generic)
+diff --git a/arch/x86/lib/getuser.S b/arch/x86/lib/getuser.S
+index e7473bf036cf..e691c21832f5 100644
+--- a/arch/x86/lib/getuser.S
++++ b/arch/x86/lib/getuser.S
+@@ -35,7 +35,7 @@
+ #include <asm/export.h>
+ 
+ 	.text
+-ENTRY(__get_user_1)
++SYM_FUNC_START(__get_user_1)
+ 	mov PER_CPU_VAR(current_task), %_ASM_DX
+ 	cmp TASK_addr_limit(%_ASM_DX),%_ASM_AX
+ 	jae bad_get_user
+@@ -44,10 +44,10 @@ ENTRY(__get_user_1)
+ 	xor %eax,%eax
+ 	ASM_CLAC
+ 	ret
+-ENDPROC(__get_user_1)
++SYM_FUNC_END(__get_user_1)
+ EXPORT_SYMBOL(__get_user_1)
+ 
+-ENTRY(__get_user_2)
++SYM_FUNC_START(__get_user_2)
+ 	add $1,%_ASM_AX
+ 	jc bad_get_user
+ 	mov PER_CPU_VAR(current_task), %_ASM_DX
+@@ -58,10 +58,10 @@ ENTRY(__get_user_2)
+ 	xor %eax,%eax
+ 	ASM_CLAC
+ 	ret
+-ENDPROC(__get_user_2)
++SYM_FUNC_END(__get_user_2)
+ EXPORT_SYMBOL(__get_user_2)
+ 
+-ENTRY(__get_user_4)
++SYM_FUNC_START(__get_user_4)
+ 	add $3,%_ASM_AX
+ 	jc bad_get_user
+ 	mov PER_CPU_VAR(current_task), %_ASM_DX
+@@ -72,10 +72,10 @@ ENTRY(__get_user_4)
+ 	xor %eax,%eax
+ 	ASM_CLAC
+ 	ret
+-ENDPROC(__get_user_4)
++SYM_FUNC_END(__get_user_4)
+ EXPORT_SYMBOL(__get_user_4)
+ 
+-ENTRY(__get_user_8)
++SYM_FUNC_START(__get_user_8)
+ #ifdef CONFIG_X86_64
+ 	add $7,%_ASM_AX
+ 	jc bad_get_user
+@@ -100,7 +100,7 @@ ENTRY(__get_user_8)
+ 	ASM_CLAC
+ 	ret
  #endif
- 	req_mgr_h->hw_queue_size = READ_REGISTER(drvdata->cc_base +
- 		CC_REG_OFFSET(CRY_KERNEL, DSCRPTR_QUEUE_SRAM_SIZE));
--	SSI_LOG_DEBUG("hw_queue_size=0x%08X\n", req_mgr_h->hw_queue_size);
-+	dev_dbg(dev, "hw_queue_size=0x%08X\n", req_mgr_h->hw_queue_size);
- 	if (req_mgr_h->hw_queue_size < MIN_HW_QUEUE_SIZE) {
--		SSI_LOG_ERR("Invalid HW queue size = %u (Min. required is %u)\n",
--			    req_mgr_h->hw_queue_size, MIN_HW_QUEUE_SIZE);
-+		dev_err(dev, "Invalid HW queue size = %u (Min. required is %u)\n",
-+			req_mgr_h->hw_queue_size, MIN_HW_QUEUE_SIZE);
- 		rc = -ENOMEM;
- 		goto req_mgr_init_err;
- 	}
-@@ -139,8 +139,8 @@ int request_mgr_init(struct ssi_drvdata *drvdata)
- 							&req_mgr_h->dummy_comp_buff_dma,
- 							GFP_KERNEL);
- 	if (!req_mgr_h->dummy_comp_buff) {
--		SSI_LOG_ERR("Not enough memory to allocate DMA (%zu) dropped "
--			   "buffer\n", sizeof(u32));
-+		dev_err(dev, "Not enough memory to allocate DMA (%zu) dropped buffer\n",
-+			sizeof(u32));
- 		rc = -ENOMEM;
- 		goto req_mgr_init_err;
- 	}
-@@ -175,9 +175,9 @@ static inline void enqueue_seq(
- 		wmb();
- 		writel_relaxed(seq[i].word[5], (volatile void __iomem *)(cc_base + CC_REG_OFFSET(CRY_KERNEL, DSCRPTR_QUEUE_WORD0)));
- #ifdef DX_DUMP_DESCS
--		SSI_LOG_DEBUG("desc[%02d]: 0x%08X 0x%08X 0x%08X 0x%08X 0x%08X 0x%08X\n", i,
--			      seq[i].word[0], seq[i].word[1], seq[i].word[2],
--			      seq[i].word[3], seq[i].word[4], seq[i].word[5]);
-+		dev_dbg(dev, "desc[%02d]: 0x%08X 0x%08X 0x%08X 0x%08X 0x%08X 0x%08X\n",
-+			i, seq[i].word[0], seq[i].word[1], seq[i].word[2],
-+			seq[i].word[3], seq[i].word[4], seq[i].word[5]);
+-ENDPROC(__get_user_8)
++SYM_FUNC_END(__get_user_8)
+ EXPORT_SYMBOL(__get_user_8)
+ 
+ 
+diff --git a/arch/x86/lib/hweight.S b/arch/x86/lib/hweight.S
+index 23d893cbc200..f520a1a92ef6 100644
+--- a/arch/x86/lib/hweight.S
++++ b/arch/x86/lib/hweight.S
+@@ -7,7 +7,7 @@
+  * unsigned int __sw_hweight32(unsigned int w)
+  * %rdi: w
+  */
+-ENTRY(__sw_hweight32)
++SYM_FUNC_START(__sw_hweight32)
+ 
+ #ifdef CONFIG_X86_64
+ 	movl %edi, %eax				# w
+@@ -32,10 +32,10 @@ ENTRY(__sw_hweight32)
+ 	shrl $24, %eax				# w = w_tmp >> 24
+ 	__ASM_SIZE(pop,) %__ASM_REG(dx)
+ 	ret
+-ENDPROC(__sw_hweight32)
++SYM_FUNC_END(__sw_hweight32)
+ EXPORT_SYMBOL(__sw_hweight32)
+ 
+-ENTRY(__sw_hweight64)
++SYM_FUNC_START(__sw_hweight64)
+ #ifdef CONFIG_X86_64
+ 	pushq   %rdi
+ 	pushq   %rdx
+@@ -78,5 +78,5 @@ ENTRY(__sw_hweight64)
+ 	popl    %ecx
+ 	ret
  #endif
- 	}
- }
-@@ -197,6 +197,7 @@ static void request_mgr_complete(struct device *dev, void *dx_compl_h, void __io
- }
+-ENDPROC(__sw_hweight64)
++SYM_FUNC_END(__sw_hweight64)
+ EXPORT_SYMBOL(__sw_hweight64)
+diff --git a/arch/x86/lib/iomap_copy_64.S b/arch/x86/lib/iomap_copy_64.S
+index 33147fef3452..2246fbf32fa8 100644
+--- a/arch/x86/lib/iomap_copy_64.S
++++ b/arch/x86/lib/iomap_copy_64.S
+@@ -20,8 +20,8 @@
+ /*
+  * override generic version in lib/iomap_copy.c
+  */
+-ENTRY(__iowrite32_copy)
++SYM_FUNC_START(__iowrite32_copy)
+ 	movl %edx,%ecx
+ 	rep movsd
+ 	ret
+-ENDPROC(__iowrite32_copy)
++SYM_FUNC_END(__iowrite32_copy)
+diff --git a/arch/x86/lib/memcpy_64.S b/arch/x86/lib/memcpy_64.S
+index 728703c47d58..9bec63e212a8 100644
+--- a/arch/x86/lib/memcpy_64.S
++++ b/arch/x86/lib/memcpy_64.S
+@@ -188,7 +188,7 @@ SYM_FUNC_END(memcpy_orig)
+  * Note that we only catch machine checks when reading the source addresses.
+  * Writes to target are posted and don't generate machine checks.
+  */
+-ENTRY(memcpy_mcsafe_unrolled)
++SYM_FUNC_START(memcpy_mcsafe_unrolled)
+ 	cmpl $8, %edx
+ 	/* Less than 8 bytes? Go to byte copy loop */
+ 	jb .L_no_whole_words
+@@ -276,7 +276,7 @@ ENTRY(memcpy_mcsafe_unrolled)
+ .L_done_memcpy_trap:
+ 	xorq %rax, %rax
+ 	ret
+-ENDPROC(memcpy_mcsafe_unrolled)
++SYM_FUNC_END(memcpy_mcsafe_unrolled)
+ EXPORT_SYMBOL_GPL(memcpy_mcsafe_unrolled)
  
- static inline int request_mgr_queues_status_check(
-+		struct device *dev,
- 		struct ssi_request_mgr_handle *req_mgr_h,
- 		void __iomem *cc_base,
- 		unsigned int total_seq_len)
-@@ -210,8 +211,8 @@ static inline int request_mgr_queues_status_check(
- 	if (unlikely(((req_mgr_h->req_queue_head + 1) &
- 		      (MAX_REQUEST_QUEUE_SIZE - 1)) ==
- 		     req_mgr_h->req_queue_tail)) {
--		SSI_LOG_ERR("SW FIFO is full. req_queue_head=%d sw_fifo_len=%d\n",
--			    req_mgr_h->req_queue_head, MAX_REQUEST_QUEUE_SIZE);
-+		dev_err(dev, "SW FIFO is full. req_queue_head=%d sw_fifo_len=%d\n",
-+			req_mgr_h->req_queue_head, MAX_REQUEST_QUEUE_SIZE);
- 		return -EBUSY;
- 	}
+ 	.section .fixup, "ax"
+diff --git a/arch/x86/lib/memmove_64.S b/arch/x86/lib/memmove_64.S
+index d22af97e5b27..4f3f6359fcf9 100644
+--- a/arch/x86/lib/memmove_64.S
++++ b/arch/x86/lib/memmove_64.S
+@@ -26,7 +26,7 @@
+ .weak memmove
  
-@@ -233,16 +234,13 @@ static inline int request_mgr_queues_status_check(
- 			return 0;
- 		}
+ SYM_FUNC_START_ALIAS(memmove)
+-ENTRY(__memmove)
++SYM_FUNC_START(__memmove)
  
--		SSI_LOG_DEBUG("HW FIFO is full. q_free_slots=%d total_seq_len=%d\n",
--			      req_mgr_h->q_free_slots, total_seq_len);
-+		dev_dbg(dev, "HW FIFO is full. q_free_slots=%d total_seq_len=%d\n",
-+			req_mgr_h->q_free_slots, total_seq_len);
- 	}
- 	/* No room in the HW queue try again later */
--	SSI_LOG_DEBUG("HW FIFO full, timeout. req_queue_head=%d "
--		   "sw_fifo_len=%d q_free_slots=%d total_seq_len=%d\n",
--		     req_mgr_h->req_queue_head,
--		   MAX_REQUEST_QUEUE_SIZE,
--		   req_mgr_h->q_free_slots,
--		   total_seq_len);
-+	dev_dbg(dev, "HW FIFO full, timeout. req_queue_head=%d sw_fifo_len=%d q_free_slots=%d total_seq_len=%d\n",
-+		req_mgr_h->req_queue_head, MAX_REQUEST_QUEUE_SIZE,
-+		req_mgr_h->q_free_slots, total_seq_len);
- 	return -EAGAIN;
- }
+ 	/* Handle more 32 bytes in loop */
+ 	mov %rdi, %rax
+@@ -206,7 +206,7 @@ ENTRY(__memmove)
+ 	movb %r11b, (%rdi)
+ 13:
+ 	retq
+-ENDPROC(__memmove)
++SYM_FUNC_END(__memmove)
+ SYM_FUNC_END_ALIAS(memmove)
+ EXPORT_SYMBOL(__memmove)
+ EXPORT_SYMBOL(memmove)
+diff --git a/arch/x86/lib/memset_64.S b/arch/x86/lib/memset_64.S
+index c63ae9987612..cee5514926e6 100644
+--- a/arch/x86/lib/memset_64.S
++++ b/arch/x86/lib/memset_64.S
+@@ -19,7 +19,7 @@
+  * rax   original destination
+  */
+ SYM_FUNC_START_ALIAS(memset)
+-ENTRY(__memset)
++SYM_FUNC_START(__memset)
+ 	/*
+ 	 * Some CPUs support enhanced REP MOVSB/STOSB feature. It is recommended
+ 	 * to use it when possible. If not available, use fast string instructions.
+@@ -42,7 +42,7 @@ ENTRY(__memset)
+ 	rep stosb
+ 	movq %r9,%rax
+ 	ret
+-ENDPROC(__memset)
++SYM_FUNC_END(__memset)
+ SYM_FUNC_END_ALIAS(memset)
+ EXPORT_SYMBOL(memset)
+ EXPORT_SYMBOL(__memset)
+diff --git a/arch/x86/lib/msr-reg.S b/arch/x86/lib/msr-reg.S
+index 10ffa7e8519f..713bd8fb48aa 100644
+--- a/arch/x86/lib/msr-reg.S
++++ b/arch/x86/lib/msr-reg.S
+@@ -11,7 +11,7 @@
+  *
+  */
+ .macro op_safe_regs op
+-ENTRY(\op\()_safe_regs)
++SYM_FUNC_START(\op\()_safe_regs)
+ 	pushq %rbx
+ 	pushq %r12
+ 	movq	%rdi, %r10	/* Save pointer */
+@@ -40,13 +40,13 @@ ENTRY(\op\()_safe_regs)
+ 	jmp     2b
  
-@@ -279,7 +277,7 @@ int send_request(
- #if defined(CONFIG_PM_RUNTIME) || defined(CONFIG_PM_SLEEP)
- 	rc = ssi_power_mgr_runtime_get(dev);
- 	if (rc != 0) {
--		SSI_LOG_ERR("ssi_power_mgr_runtime_get returned %x\n", rc);
-+		dev_err(dev, "ssi_power_mgr_runtime_get returned %x\n", rc);
- 		return rc;
- 	}
+ 	_ASM_EXTABLE(1b, 3b)
+-ENDPROC(\op\()_safe_regs)
++SYM_FUNC_END(\op\()_safe_regs)
+ .endm
+ 
+ #else /* X86_32 */
+ 
+ .macro op_safe_regs op
+-ENTRY(\op\()_safe_regs)
++SYM_FUNC_START(\op\()_safe_regs)
+ 	pushl %ebx
+ 	pushl %ebp
+ 	pushl %esi
+@@ -82,7 +82,7 @@ ENTRY(\op\()_safe_regs)
+ 	jmp     2b
+ 
+ 	_ASM_EXTABLE(1b, 3b)
+-ENDPROC(\op\()_safe_regs)
++SYM_FUNC_END(\op\()_safe_regs)
+ .endm
+ 
  #endif
-@@ -291,7 +289,7 @@ int send_request(
- 		 * in case iv gen add the max size and in case of no dout add 1
- 		 * for the internal completion descriptor
- 		 */
--		rc = request_mgr_queues_status_check(req_mgr_h, cc_base,
-+		rc = request_mgr_queues_status_check(dev, req_mgr_h, cc_base,
- 						     max_required_seq_len);
- 		if (likely(rc == 0))
- 			/* There is enough place in the queue */
-@@ -324,12 +322,12 @@ int send_request(
- 	}
+diff --git a/arch/x86/lib/putuser.S b/arch/x86/lib/putuser.S
+index bccc98d8f57c..63e16f46ef0d 100644
+--- a/arch/x86/lib/putuser.S
++++ b/arch/x86/lib/putuser.S
+@@ -35,7 +35,7 @@
+ 		ret
  
- 	if (ssi_req->ivgen_dma_addr_len > 0) {
--		SSI_LOG_DEBUG("Acquire IV from pool into %d DMA addresses %pad, %pad, %pad, IV-size=%u\n",
--			      ssi_req->ivgen_dma_addr_len,
--			      ssi_req->ivgen_dma_addr[0],
--			      ssi_req->ivgen_dma_addr[1],
--			      ssi_req->ivgen_dma_addr[2],
--			      ssi_req->ivgen_size);
-+		dev_dbg(dev, "Acquire IV from pool into %d DMA addresses %pad, %pad, %pad, IV-size=%u\n",
-+			ssi_req->ivgen_dma_addr_len,
-+			&ssi_req->ivgen_dma_addr[0],
-+			&ssi_req->ivgen_dma_addr[1],
-+			&ssi_req->ivgen_dma_addr[2],
-+			ssi_req->ivgen_size);
+ .text
+-ENTRY(__put_user_1)
++SYM_FUNC_START(__put_user_1)
+ 	ENTER
+ 	cmp TASK_addr_limit(%_ASM_BX),%_ASM_CX
+ 	jae bad_put_user
+@@ -43,10 +43,10 @@ ENTRY(__put_user_1)
+ 1:	movb %al,(%_ASM_CX)
+ 	xor %eax,%eax
+ 	EXIT
+-ENDPROC(__put_user_1)
++SYM_FUNC_END(__put_user_1)
+ EXPORT_SYMBOL(__put_user_1)
  
- 		/* Acquire IV from pool */
- 		rc = ssi_ivgen_getiv(drvdata, ssi_req->ivgen_dma_addr,
-@@ -337,7 +335,7 @@ int send_request(
- 				     ssi_req->ivgen_size, iv_seq, &iv_seq_len);
+-ENTRY(__put_user_2)
++SYM_FUNC_START(__put_user_2)
+ 	ENTER
+ 	mov TASK_addr_limit(%_ASM_BX),%_ASM_BX
+ 	sub $1,%_ASM_BX
+@@ -56,10 +56,10 @@ ENTRY(__put_user_2)
+ 2:	movw %ax,(%_ASM_CX)
+ 	xor %eax,%eax
+ 	EXIT
+-ENDPROC(__put_user_2)
++SYM_FUNC_END(__put_user_2)
+ EXPORT_SYMBOL(__put_user_2)
  
- 		if (unlikely(rc != 0)) {
--			SSI_LOG_ERR("Failed to generate IV (rc=%d)\n", rc);
-+			dev_err(dev, "Failed to generate IV (rc=%d)\n", rc);
- 			spin_unlock_bh(&req_mgr_h->hw_lock);
- #if defined(CONFIG_PM_RUNTIME) || defined(CONFIG_PM_SLEEP)
- 			ssi_power_mgr_runtime_put_suspend(dev);
-@@ -357,7 +355,7 @@ int send_request(
- 	req_mgr_h->req_queue_head = (req_mgr_h->req_queue_head + 1) & (MAX_REQUEST_QUEUE_SIZE - 1);
- 	/* TODO: Use circ_buf.h ? */
+-ENTRY(__put_user_4)
++SYM_FUNC_START(__put_user_4)
+ 	ENTER
+ 	mov TASK_addr_limit(%_ASM_BX),%_ASM_BX
+ 	sub $3,%_ASM_BX
+@@ -69,10 +69,10 @@ ENTRY(__put_user_4)
+ 3:	movl %eax,(%_ASM_CX)
+ 	xor %eax,%eax
+ 	EXIT
+-ENDPROC(__put_user_4)
++SYM_FUNC_END(__put_user_4)
+ EXPORT_SYMBOL(__put_user_4)
  
--	SSI_LOG_DEBUG("Enqueue request head=%u\n", req_mgr_h->req_queue_head);
-+	dev_dbg(dev, "Enqueue request head=%u\n", req_mgr_h->req_queue_head);
- 
- #ifdef FLUSH_CACHE_ALL
- 	flush_cache_all();
-@@ -373,7 +371,7 @@ int send_request(
- 		 * with resuming power. Set the free slot count to 0 and hope
- 		 * for the best.
- 		 */
--		SSI_LOG_ERR("HW free slot count mismatch.");
-+		dev_err(dev, "HW free slot count mismatch.");
- 		req_mgr_h->q_free_slots = 0;
- 	} else {
- 		/* Update the free slots in HW queue */
-@@ -408,13 +406,15 @@ int send_request(
- int send_request_init(
- 	struct ssi_drvdata *drvdata, struct cc_hw_desc *desc, unsigned int len)
- {
-+	struct device *dev = DEV(drvdata);
- 	void __iomem *cc_base = drvdata->cc_base;
- 	struct ssi_request_mgr_handle *req_mgr_h = drvdata->request_mgr_handle;
- 	unsigned int total_seq_len = len; /*initial sequence length*/
- 	int rc = 0;
- 
- 	/* Wait for space in HW and SW FIFO. Poll for as much as FIFO_TIMEOUT. */
--	rc = request_mgr_queues_status_check(req_mgr_h, cc_base, total_seq_len);
-+	rc = request_mgr_queues_status_check(dev, req_mgr_h, cc_base,
-+					     total_seq_len);
- 	if (unlikely(rc != 0))
- 		return rc;
- 
-@@ -469,8 +469,8 @@ static void proc_completions(struct ssi_drvdata *drvdata)
- 			 * queue is empty. This is not normal. Return and
- 			 * hope for the best.
- 			 */
--			SSI_LOG_ERR("Request queue is empty head == tail %u\n",
--				    request_mgr_handle->req_queue_head);
-+			dev_err(dev, "Request queue is empty head == tail %u\n",
-+				request_mgr_handle->req_queue_head);
- 			break;
- 		}
- 
-@@ -486,7 +486,7 @@ static void proc_completions(struct ssi_drvdata *drvdata)
- 			u32 axi_err;
- 			int i;
- 
--			SSI_LOG_INFO("Delay\n");
-+			dev_info(dev, "Delay\n");
- 			for (i = 0; i < 1000000; i++)
- 				axi_err = READ_REGISTER(drvdata->cc_base + CC_REG_OFFSET(CRY_KERNEL, AXIM_MON_ERR));
- 		}
-@@ -496,12 +496,15 @@ static void proc_completions(struct ssi_drvdata *drvdata)
- 			ssi_req->user_cb(dev, ssi_req->user_arg,
- 					 drvdata->cc_base);
- 		request_mgr_handle->req_queue_tail = (request_mgr_handle->req_queue_tail + 1) & (MAX_REQUEST_QUEUE_SIZE - 1);
--		SSI_LOG_DEBUG("Dequeue request tail=%u\n", request_mgr_handle->req_queue_tail);
--		SSI_LOG_DEBUG("Request completed. axi_completed=%d\n", request_mgr_handle->axi_completed);
-+		dev_dbg(dev, "Dequeue request tail=%u\n",
-+			request_mgr_handle->req_queue_tail);
-+		dev_dbg(dev, "Request completed. axi_completed=%d\n",
-+			request_mgr_handle->axi_completed);
- #if defined(CONFIG_PM_RUNTIME) || defined(CONFIG_PM_SLEEP)
- 		rc = ssi_power_mgr_runtime_put_suspend(dev);
- 		if (rc != 0)
--			SSI_LOG_ERR("Failed to set runtime suspension %d\n", rc);
-+			dev_err(dev, "Failed to set runtime suspension %d\n",
-+				rc);
+-ENTRY(__put_user_8)
++SYM_FUNC_START(__put_user_8)
+ 	ENTER
+ 	mov TASK_addr_limit(%_ASM_BX),%_ASM_BX
+ 	sub $7,%_ASM_BX
+@@ -85,7 +85,7 @@ ENTRY(__put_user_8)
  #endif
- 	}
- }
-diff --git a/drivers/staging/ccree/ssi_sram_mgr.c b/drivers/staging/ccree/ssi_sram_mgr.c
-index f11116a..df51a2a 100644
---- a/drivers/staging/ccree/ssi_sram_mgr.c
-+++ b/drivers/staging/ccree/ssi_sram_mgr.c
-@@ -51,14 +51,15 @@ void ssi_sram_mgr_fini(struct ssi_drvdata *drvdata)
- int ssi_sram_mgr_init(struct ssi_drvdata *drvdata)
- {
- 	struct ssi_sram_mgr_ctx *smgr_ctx;
-+	struct device *dev = DEV(drvdata);
- 	int rc;
+ 	xor %eax,%eax
+ 	EXIT
+-ENDPROC(__put_user_8)
++SYM_FUNC_END(__put_user_8)
+ EXPORT_SYMBOL(__put_user_8)
  
- 	/* Allocate "this" context */
- 	drvdata->sram_mgr_handle = kzalloc(
- 			sizeof(struct ssi_sram_mgr_ctx), GFP_KERNEL);
- 	if (!drvdata->sram_mgr_handle) {
--		SSI_LOG_ERR("Not enough memory to allocate SRAM_MGR ctx (%zu)\n",
--			    sizeof(struct ssi_sram_mgr_ctx));
-+		dev_err(dev, "Not enough memory to allocate SRAM_MGR ctx (%zu)\n",
-+			sizeof(struct ssi_sram_mgr_ctx));
- 		rc = -ENOMEM;
- 		goto out;
- 	}
-@@ -86,22 +87,23 @@ int ssi_sram_mgr_init(struct ssi_drvdata *drvdata)
- ssi_sram_addr_t ssi_sram_mgr_alloc(struct ssi_drvdata *drvdata, u32 size)
- {
- 	struct ssi_sram_mgr_ctx *smgr_ctx = drvdata->sram_mgr_handle;
-+	struct device *dev = DEV(drvdata);
- 	ssi_sram_addr_t p;
+ SYM_CODE_START_LOCAL(bad_put_user)
+diff --git a/arch/x86/lib/rwsem.S b/arch/x86/lib/rwsem.S
+index bf2c6074efd2..e3905664944d 100644
+--- a/arch/x86/lib/rwsem.S
++++ b/arch/x86/lib/rwsem.S
+@@ -86,7 +86,7 @@
+ #endif
  
- 	if (unlikely((size & 0x3) != 0)) {
--		SSI_LOG_ERR("Requested buffer size (%u) is not multiple of 4",
--			    size);
-+		dev_err(dev, "Requested buffer size (%u) is not multiple of 4",
-+			size);
- 		return NULL_SRAM_ADDR;
- 	}
- 	if (unlikely(size > (SSI_CC_SRAM_SIZE - smgr_ctx->sram_free_offset))) {
--		SSI_LOG_ERR("Not enough space to allocate %u B (at offset %llu)\n",
--			    size, smgr_ctx->sram_free_offset);
-+		dev_err(dev, "Not enough space to allocate %u B (at offset %llu)\n",
-+			size, smgr_ctx->sram_free_offset);
- 		return NULL_SRAM_ADDR;
- 	}
+ /* Fix up special calling conventions */
+-ENTRY(call_rwsem_down_read_failed)
++SYM_FUNC_START(call_rwsem_down_read_failed)
+ 	FRAME_BEGIN
+ 	save_common_regs
+ 	__ASM_SIZE(push,) %__ASM_REG(dx)
+@@ -96,9 +96,9 @@ ENTRY(call_rwsem_down_read_failed)
+ 	restore_common_regs
+ 	FRAME_END
+ 	ret
+-ENDPROC(call_rwsem_down_read_failed)
++SYM_FUNC_END(call_rwsem_down_read_failed)
  
- 	p = smgr_ctx->sram_free_offset;
- 	smgr_ctx->sram_free_offset += size;
--	SSI_LOG_DEBUG("Allocated %u B @ %u\n", size, (unsigned int)p);
-+	dev_dbg(dev, "Allocated %u B @ %u\n", size, (unsigned int)p);
- 	return p;
- }
+-ENTRY(call_rwsem_down_write_failed)
++SYM_FUNC_START(call_rwsem_down_write_failed)
+ 	FRAME_BEGIN
+ 	save_common_regs
+ 	movq %rax,%rdi
+@@ -106,9 +106,9 @@ ENTRY(call_rwsem_down_write_failed)
+ 	restore_common_regs
+ 	FRAME_END
+ 	ret
+-ENDPROC(call_rwsem_down_write_failed)
++SYM_FUNC_END(call_rwsem_down_write_failed)
  
-diff --git a/drivers/staging/ccree/ssi_sysfs.c b/drivers/staging/ccree/ssi_sysfs.c
-index e0810e2..614e5c14 100644
---- a/drivers/staging/ccree/ssi_sysfs.c
-+++ b/drivers/staging/ccree/ssi_sysfs.c
-@@ -153,8 +153,9 @@ static void sys_free_dir(struct sys_dir *sys_dir)
- int ssi_sysfs_init(struct kobject *sys_dev_obj, struct ssi_drvdata *drvdata)
- {
- 	int retval;
-+	struct device *dev = DEV(drvdata);
+-ENTRY(call_rwsem_down_write_failed_killable)
++SYM_FUNC_START(call_rwsem_down_write_failed_killable)
+ 	FRAME_BEGIN
+ 	save_common_regs
+ 	movq %rax,%rdi
+@@ -116,9 +116,9 @@ ENTRY(call_rwsem_down_write_failed_killable)
+ 	restore_common_regs
+ 	FRAME_END
+ 	ret
+-ENDPROC(call_rwsem_down_write_failed_killable)
++SYM_FUNC_END(call_rwsem_down_write_failed_killable)
  
--	SSI_LOG_ERR("setup sysfs under %s\n", sys_dev_obj->name);
-+	dev_info(dev, "setup sysfs under %s\n", sys_dev_obj->name);
+-ENTRY(call_rwsem_wake)
++SYM_FUNC_START(call_rwsem_wake)
+ 	FRAME_BEGIN
+ 	/* do nothing if still outstanding active readers */
+ 	__ASM_HALF_SIZE(dec) %__ASM_HALF_REG(dx)
+@@ -129,9 +129,9 @@ ENTRY(call_rwsem_wake)
+ 	restore_common_regs
+ 1:	FRAME_END
+ 	ret
+-ENDPROC(call_rwsem_wake)
++SYM_FUNC_END(call_rwsem_wake)
  
- 	/* Initialize top directory */
- 	retval = sys_init_dir(&sys_top_dir, drvdata, sys_dev_obj, "cc_info",
+-ENTRY(call_rwsem_downgrade_wake)
++SYM_FUNC_START(call_rwsem_downgrade_wake)
+ 	FRAME_BEGIN
+ 	save_common_regs
+ 	__ASM_SIZE(push,) %__ASM_REG(dx)
+@@ -141,4 +141,4 @@ ENTRY(call_rwsem_downgrade_wake)
+ 	restore_common_regs
+ 	FRAME_END
+ 	ret
+-ENDPROC(call_rwsem_downgrade_wake)
++SYM_FUNC_END(call_rwsem_downgrade_wake)
+diff --git a/arch/x86/mm/mem_encrypt_boot.S b/arch/x86/mm/mem_encrypt_boot.S
+index 730e6d541df1..4501765edff2 100644
+--- a/arch/x86/mm/mem_encrypt_boot.S
++++ b/arch/x86/mm/mem_encrypt_boot.S
+@@ -18,7 +18,7 @@
+ 
+ 	.text
+ 	.code64
+-ENTRY(sme_encrypt_execute)
++SYM_FUNC_START(sme_encrypt_execute)
+ 
+ 	/*
+ 	 * Entry parameters:
+@@ -67,9 +67,9 @@ ENTRY(sme_encrypt_execute)
+ 	pop	%rbp
+ 
+ 	ret
+-ENDPROC(sme_encrypt_execute)
++SYM_FUNC_END(sme_encrypt_execute)
+ 
+-ENTRY(__enc_copy)
++SYM_FUNC_START(__enc_copy)
+ /*
+  * Routine used to encrypt kernel.
+  *   This routine must be run outside of the kernel proper since
+@@ -146,4 +146,4 @@ ENTRY(__enc_copy)
+ 
+ 	ret
+ .L__enc_copy_end:
+-ENDPROC(__enc_copy)
++SYM_FUNC_END(__enc_copy)
+diff --git a/arch/x86/platform/efi/efi_stub_64.S b/arch/x86/platform/efi/efi_stub_64.S
+index cd95075944ab..90936c4e396e 100644
+--- a/arch/x86/platform/efi/efi_stub_64.S
++++ b/arch/x86/platform/efi/efi_stub_64.S
+@@ -38,7 +38,7 @@
+ 	mov %rsi, %cr0;			\
+ 	mov (%rsp), %rsp
+ 
+-ENTRY(efi_call)
++SYM_FUNC_START(efi_call)
+ 	pushq %rbp
+ 	movq %rsp, %rbp
+ 	SAVE_XMM
+@@ -54,4 +54,4 @@ ENTRY(efi_call)
+ 	RESTORE_XMM
+ 	popq %rbp
+ 	ret
+-ENDPROC(efi_call)
++SYM_FUNC_END(efi_call)
+diff --git a/arch/x86/platform/efi/efi_thunk_64.S b/arch/x86/platform/efi/efi_thunk_64.S
+index d18697df1fe9..012601609d81 100644
+--- a/arch/x86/platform/efi/efi_thunk_64.S
++++ b/arch/x86/platform/efi/efi_thunk_64.S
+@@ -24,7 +24,7 @@
+ 
+ 	.text
+ 	.code64
+-ENTRY(efi64_thunk)
++SYM_FUNC_START(efi64_thunk)
+ 	push	%rbp
+ 	push	%rbx
+ 
+@@ -59,7 +59,7 @@ ENTRY(efi64_thunk)
+ 	pop	%rbx
+ 	pop	%rbp
+ 	retq
+-ENDPROC(efi64_thunk)
++SYM_FUNC_END(efi64_thunk)
+ 
+ /*
+  * We run this function from the 1:1 mapping.
+diff --git a/arch/x86/power/hibernate_asm_64.S b/arch/x86/power/hibernate_asm_64.S
+index 44755a847856..c87ae08f9312 100644
+--- a/arch/x86/power/hibernate_asm_64.S
++++ b/arch/x86/power/hibernate_asm_64.S
+@@ -23,7 +23,7 @@
+ #include <asm/processor-flags.h>
+ #include <asm/frame.h>
+ 
+-ENTRY(swsusp_arch_suspend)
++SYM_FUNC_START(swsusp_arch_suspend)
+ 	movq	$saved_context, %rax
+ 	movq	%rsp, pt_regs_sp(%rax)
+ 	movq	%rbp, pt_regs_bp(%rax)
+@@ -51,7 +51,7 @@ ENTRY(swsusp_arch_suspend)
+ 	call swsusp_save
+ 	FRAME_END
+ 	ret
+-ENDPROC(swsusp_arch_suspend)
++SYM_FUNC_END(swsusp_arch_suspend)
+ 
+ SYM_CODE_START(restore_image)
+ 	/* prepare to jump to the image kernel */
+@@ -103,7 +103,7 @@ SYM_CODE_END(core_restore_code)
+ 
+ 	 /* code below belongs to the image kernel */
+ 	.align PAGE_SIZE
+-ENTRY(restore_registers)
++SYM_FUNC_START(restore_registers)
+ 	/* go back to the original page tables */
+ 	movq    %r9, %cr3
+ 
+@@ -145,4 +145,4 @@ ENTRY(restore_registers)
+ 	movq	%rax, in_suspend(%rip)
+ 
+ 	ret
+-ENDPROC(restore_registers)
++SYM_FUNC_END(restore_registers)
+diff --git a/arch/x86/xen/xen-asm.S b/arch/x86/xen/xen-asm.S
+index dcd31fa39b5d..676157789997 100644
+--- a/arch/x86/xen/xen-asm.S
++++ b/arch/x86/xen/xen-asm.S
+@@ -17,7 +17,7 @@
+  * event status with one and operation.  If there are pending events,
+  * then enter the hypervisor to get them handled.
+  */
+-ENTRY(xen_irq_enable_direct)
++SYM_FUNC_START(xen_irq_enable_direct)
+ 	FRAME_BEGIN
+ 	/* Unmask events */
+ 	movb $0, PER_CPU_VAR(xen_vcpu_info) + XEN_vcpu_info_mask
+@@ -36,17 +36,17 @@ ENTRY(xen_irq_enable_direct)
+ 1:
+ 	FRAME_END
+ 	ret
+-	ENDPROC(xen_irq_enable_direct)
++SYM_FUNC_END(xen_irq_enable_direct)
+ 
+ 
+ /*
+  * Disabling events is simply a matter of making the event mask
+  * non-zero.
+  */
+-ENTRY(xen_irq_disable_direct)
++SYM_FUNC_START(xen_irq_disable_direct)
+ 	movb $1, PER_CPU_VAR(xen_vcpu_info) + XEN_vcpu_info_mask
+ 	ret
+-ENDPROC(xen_irq_disable_direct)
++SYM_FUNC_END(xen_irq_disable_direct)
+ 
+ /*
+  * (xen_)save_fl is used to get the current interrupt enable status.
+@@ -57,12 +57,12 @@ ENDPROC(xen_irq_disable_direct)
+  * undefined.  We need to toggle the state of the bit, because Xen and
+  * x86 use opposite senses (mask vs enable).
+  */
+-ENTRY(xen_save_fl_direct)
++SYM_FUNC_START(xen_save_fl_direct)
+ 	testb $0xff, PER_CPU_VAR(xen_vcpu_info) + XEN_vcpu_info_mask
+ 	setz %ah
+ 	addb %ah, %ah
+ 	ret
+-	ENDPROC(xen_save_fl_direct)
++SYM_FUNC_END(xen_save_fl_direct)
+ 
+ 
+ /*
+@@ -72,7 +72,7 @@ ENTRY(xen_save_fl_direct)
+  * interrupt mask state, it checks for unmasked pending events and
+  * enters the hypervisor to get them delivered if so.
+  */
+-ENTRY(xen_restore_fl_direct)
++SYM_FUNC_START(xen_restore_fl_direct)
+ 	FRAME_BEGIN
+ #ifdef CONFIG_X86_64
+ 	testw $X86_EFLAGS_IF, %di
+@@ -93,14 +93,14 @@ ENTRY(xen_restore_fl_direct)
+ 1:
+ 	FRAME_END
+ 	ret
+-	ENDPROC(xen_restore_fl_direct)
++SYM_FUNC_END(xen_restore_fl_direct)
+ 
+ 
+ /*
+  * Force an event check by making a hypercall, but preserve regs
+  * before making the call.
+  */
+-ENTRY(check_events)
++SYM_FUNC_START(check_events)
+ 	FRAME_BEGIN
+ #ifdef CONFIG_X86_32
+ 	push %eax
+@@ -133,4 +133,4 @@ ENTRY(check_events)
+ #endif
+ 	FRAME_END
+ 	ret
+-ENDPROC(check_events)
++SYM_FUNC_END(check_events)
+diff --git a/arch/x86/xen/xen-asm_64.S b/arch/x86/xen/xen-asm_64.S
+index d18d2118a80a..a3693db40d52 100644
+--- a/arch/x86/xen/xen-asm_64.S
++++ b/arch/x86/xen/xen-asm_64.S
+@@ -108,7 +108,7 @@ SYM_CODE_END(xen_sysret64)
+  */
+ 
+ /* Normal 64-bit system call target */
+-ENTRY(xen_syscall_target)
++SYM_FUNC_START(xen_syscall_target)
+ 	popq %rcx
+ 	popq %r11
+ 
+@@ -121,12 +121,12 @@ ENTRY(xen_syscall_target)
+ 	movq $__USER_CS, 1*8(%rsp)
+ 
+ 	jmp entry_SYSCALL_64_after_hwframe
+-ENDPROC(xen_syscall_target)
++SYM_FUNC_END(xen_syscall_target)
+ 
+ #ifdef CONFIG_IA32_EMULATION
+ 
+ /* 32-bit compat syscall target */
+-ENTRY(xen_syscall32_target)
++SYM_FUNC_START(xen_syscall32_target)
+ 	popq %rcx
+ 	popq %r11
+ 
+@@ -139,25 +139,25 @@ ENTRY(xen_syscall32_target)
+ 	movq $__USER32_CS, 1*8(%rsp)
+ 
+ 	jmp entry_SYSCALL_compat_after_hwframe
+-ENDPROC(xen_syscall32_target)
++SYM_FUNC_END(xen_syscall32_target)
+ 
+ /* 32-bit compat sysenter target */
+-ENTRY(xen_sysenter_target)
++SYM_FUNC_START(xen_sysenter_target)
+ 	mov 0*8(%rsp), %rcx
+ 	mov 1*8(%rsp), %r11
+ 	mov 5*8(%rsp), %rsp
+ 	jmp entry_SYSENTER_compat
+-ENDPROC(xen_sysenter_target)
++SYM_FUNC_END(xen_sysenter_target)
+ 
+ #else /* !CONFIG_IA32_EMULATION */
+ 
+ SYM_FUNC_START_ALIAS(xen_syscall32_target)
+-ENTRY(xen_sysenter_target)
++SYM_FUNC_START(xen_sysenter_target)
+ 	lea 16(%rsp), %rsp	/* strip %rcx, %r11 */
+ 	mov $-ENOSYS, %rax
+ 	pushq $0
+ 	jmp hypercall_iret
+-ENDPROC(xen_sysenter_target)
++SYM_FUNC_END(xen_sysenter_target)
+ SYM_FUNC_END_ALIAS(xen_syscall32_target)
+ 
+ #endif	/* CONFIG_IA32_EMULATION */
+diff --git a/include/linux/linkage.h b/include/linux/linkage.h
+index 05b5591b5cf7..e64aa9fd24bb 100644
+--- a/include/linux/linkage.h
++++ b/include/linux/linkage.h
+@@ -104,11 +104,13 @@
+ 
+ /* === DEPRECATED annotations === */
+ 
++#ifndef CONFIG_X86_64
+ #ifndef ENTRY
+ /* deprecated, use SYM_FUNC_START */
+ #define ENTRY(name) \
+ 	SYM_FUNC_START(name)
+ #endif
++#endif /* CONFIG_X86_64 */
+ #endif /* LINKER_SCRIPT */
+ 
+ #ifndef WEAK
+@@ -123,6 +125,7 @@
+ 	.size name, .-name
+ #endif
+ 
++#ifndef CONFIG_X86_64
+ /* If symbol 'name' is treated as a subroutine (gets called, and returns)
+  * then please use ENDPROC to mark 'name' as STT_FUNC for the benefit of
+  * static analysis tools such as stack depth analyzer.
+@@ -132,6 +135,7 @@
+ #define ENDPROC(name) \
+ 	SYM_FUNC_END(name)
+ #endif
++#endif /* CONFIG_X86_64 */
+ 
+ /* === generic annotations === */
+ 
 -- 
-2.7.4
+2.14.2
