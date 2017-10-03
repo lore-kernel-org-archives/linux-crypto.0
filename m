@@ -1,47 +1,49 @@
-From: Casey Leedom <leedom@chelsio.com>
-Subject: Re: [PATCH] iommu/vt-d: Fix scatterlist offset handling
-Date: Tue, 3 Oct 2017 22:22:31 +0000
-Message-ID: <MWHPR12MB1600E4FC91BC6D99017D3FCDC8720@MWHPR12MB1600.namprd12.prod.outlook.com>
-References: <644c3e01654f8bd48d669c36e424959d6ef0e27e.1506607370.git.robin.murphy@arm.com>
- <fe25071a-18bf-e468-01e7-36515f2110e2@chelsio.com>
- <MWHPR12MB160034E91A834504FE85C07BC87E0@MWHPR12MB1600.namprd12.prod.outlook.com>,<e2c92d3a-3d5d-a0eb-7d5f-a9453e48cfd5@chelsio.com>
+From: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Subject: Re: [PATCH V2] Fix a sleep-in-atomic bug in shash_setkey_unaligned
+Date: Tue, 3 Oct 2017 19:33:08 -0300
+Message-ID: <20171003223308.GD19750@localhost.localdomain>
+References: <1506997522-26684-1-git-send-email-baijiaju1990@163.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Cc: "dwmw2@infradead.org" <dwmw2@infradead.org>,
-        "ashok.raj@intel.com" <ashok.raj@intel.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Atul Gupta <atul.gupta@chelsio.com>
-To: "Harsh  Jain" <Harsh@chelsio.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        "joro@8bytes.org" <joro@8bytes.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-sn1nam02on0115.outbound.protection.outlook.com ([104.47.36.115]:19252
-        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751135AbdJCWWh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Oct 2017 18:22:37 -0400
-In-Reply-To: <e2c92d3a-3d5d-a0eb-7d5f-a9453e48cfd5@chelsio.com>
-Content-Language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
+        nhorman@tuxdriver.com, vyasevich@gmail.com, luto@kernel.org,
+        kvalo@codeaurora.org, linux-crypto@vger.kernel.org,
+        netdev@vger.kernel.org, linux-sctp@vger.kernel.org,
+        linux-wireless@vger.kernel.org
+To: Jia-Ju Bai <baijiaju1990@163.com>
+Return-path: <netdev-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1506997522-26684-1-git-send-email-baijiaju1990@163.com>
+Sender: netdev-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-| From: Harsh Jain <Harsh@chelsio.com>
-| Sent: Tuesday, October 3, 2017 5:22 AM
-|
-| Hi Robin/Ashok,
-|
-| Find attached trace of DMA write error. I had a look on trace but didn't
-| find anything suspicious.
-|
-| Let me know if you need more trace.
+On Tue, Oct 03, 2017 at 10:25:22AM +0800, Jia-Ju Bai wrote:
+> The SCTP program may sleep under a spinlock, and the function call path is:
+> sctp_generate_t3_rtx_event (acquire the spinlock)
+>   sctp_do_sm
+>     sctp_side_effects
+>       sctp_cmd_interpreter
+>         sctp_make_init_ack
+>           sctp_pack_cookie
+>             crypto_shash_setkey
+>               shash_setkey_unaligned
+>                 kmalloc(GFP_KERNEL)
 
-As a reminder, Harsh and Atul will be waking up in a few hours, so if there
-are additional tests for which you'd like them to gather data, it would be
-good to ask now so it's available to them to work on while we're all off
-asleep ...
+Are you sure this can happen?
+The host is not supposed to store any information when replying to an
+INIT packet (which generated the INIT_ACK listed above). That said,
+it's weird to see the timer function triggering so.
 
-Casey
+Checking now, that code is dead actually:
+$ git grep -A 2 SCTP_CMD_GEN_INIT_ACK
+sm_sideeffect.c:                case SCTP_CMD_GEN_INIT_ACK:
+sm_sideeffect.c-                        /* Generate an INIT ACK chunk.
+*/
+sm_sideeffect.c-                        new_obj =
+sctp_make_init_ack(asoc, chunk, GFP_ATOMIC,
+
+Nobody is triggering a call to sctp_cmd_interpreter with
+SCTP_CMD_GEN_INIT_ACK command, which would generate the callstack
+above.
+
+  Marcelo
