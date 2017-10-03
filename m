@@ -1,110 +1,140 @@
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Subject: Re: [PATCH v3] crypto: s5p-sss: Add HASH support for Exynos
-Date: Tue, 3 Oct 2017 21:30:39 +0200
-Message-ID: <20171003193039.sadrgdxeeawu3jnx@kozik-lap>
-References: <CGME20170927122551eucas1p2ce5b868e59bfa99941672936ba3c7bed@eucas1p2.samsung.com>
- <fddf226a-b0d8-fd68-3713-347ac3a0de20@partner.samsung.com>
- <20170930195044.kyhiit2nqmjgcwtl@kozik-lap>
- <77ef8f3f-a686-0043-c55d-761033a11956@partner.samsung.com>
+From: David Woodhouse <dwmw2@infradead.org>
+Subject: Re: [PATCH] iommu/vt-d: Fix scatterlist offset handling
+Date: Tue, 03 Oct 2017 23:16:16 +0100
+Message-ID: <1507068976.29211.156.camel@infradead.org>
+References: <644c3e01654f8bd48d669c36e424959d6ef0e27e.1506607370.git.robin.murphy@arm.com>
+         <1507035334.29211.105.camel@infradead.org>
+         <db8c70d7-5978-20e8-d29a-91a4312f97dd@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-Cc: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Vladimir Zapolskiy <vz@mleia.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Kamil Konieczny <k.konieczny@partner.samsung.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/x-pkcs7-signature"; boundary="=-NTIDuqjczzBO7VMmmGCB"
+Cc: ashok.raj@intel.com, leedom@chelsio.com, Harsh@chelsio.com,
+        herbert@gondor.apana.org.au, iommu@lists.linux-foundation.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Robin Murphy <robin.murphy@arm.com>, joro@8bytes.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:33085 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750812AbdJCTao (ORCPT
+Received: from twosheds.infradead.org ([90.155.92.209]:54712 "EHLO
+        twosheds.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751115AbdJCWQj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Oct 2017 15:30:44 -0400
-Content-Disposition: inline
-In-Reply-To: <77ef8f3f-a686-0043-c55d-761033a11956@partner.samsung.com>
+        Tue, 3 Oct 2017 18:16:39 -0400
+In-Reply-To: <db8c70d7-5978-20e8-d29a-91a4312f97dd@arm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Oct 03, 2017 at 04:57:43PM +0200, Kamil Konieczny wrote:
- 
-> >> [...]
-> >> +static struct ahash_alg algs_sha256[] = {
-> >> +{
-> >> +	.init		= s5p_hash_init,
-> >> +	.update		= s5p_hash_update,
-> >> +	.final		= s5p_hash_final,
-> >> +	.finup		= s5p_hash_finup,
-> >> +	.digest		= s5p_hash_digest,
-> >> +	.halg.digestsize	= SHA256_DIGEST_SIZE,
-> >> +	.halg.base	= {
-> >> +		.cra_name		= "sha256",
-> >> +		.cra_driver_name	= "exynos-sha256",
-> >> +		.cra_priority		= 100,
-> >> +		.cra_flags		= CRYPTO_ALG_TYPE_AHASH |
-> >> +					  CRYPTO_ALG_KERN_DRIVER_ONLY |
-> >> +					  CRYPTO_ALG_ASYNC |
-> >> +					  CRYPTO_ALG_NEED_FALLBACK,
-> >> +		.cra_blocksize		= HASH_BLOCK_SIZE,
-> >> +		.cra_ctxsize		= sizeof(struct s5p_hash_ctx),
-> >> +		.cra_alignmask		= SSS_DMA_ALIGN_MASK,
-> >> +		.cra_module		= THIS_MODULE,
-> >> +		.cra_init		= s5p_hash_cra_init,
-> >> +		.cra_exit		= s5p_hash_cra_exit,
-> >> +	}
-> >> +}
-> >> +
-> >> +};
-> >> +
-> >> +static struct sss_hash_algs_info exynos_hash_algs_info[] = {
-> > 
-> > You have warnings in your code. Please be sure that all compiler,
-> > Smatch, Sparse, checkpatch and coccicheck warnings are fixed.
-> > 
-> > ../drivers/crypto/s5p-sss.c:1896:34: warning: ‘exynos_hash_algs_info’ defined but not used [-Wunused-variable]
-> >  static struct sss_hash_algs_info exynos_hash_algs_info[] = {
-> > 
-> > Probably this should be __maybe_unused.
-> 
-> You are right, I did not check this with EXYNOS_HASH disabled, I will
-> rewrite it.
-> 
-> > Also this should be const. I do not understand why you have to add one
-> > more static variable (which sticks the driver to only one instance...)
-> > and then modify it during runtime. Everything should be stored in device
-> > state container (s5p_aes_dev) - directly or through some other pointers.
-> 
-> There is .registered field which is incremented with each algo register.
-> I can move assignes to fields .import, .export and .statesize into struct.
-> When I tried add const, I got compiler warn:
-> drivers/crypto/s5p-sss.c: In function ‘s5p_aes_remove’:
-> drivers/crypto/s5p-sss.c:2397:6: warning: passing argument 1 of ‘crypto_unregister_ahash’ discards ‘const’ qualifier from pointer target type [-Wdiscarded-qualifiers]
->       &hash_algs_i[i].algs_list[j]);
-> so it was not designed to be const (in crypto framework).
-> In AES code the alg struct is also static:
-> static struct crypto_alg algs[] = {
 
-The crypto_alg and ahash_alg must indeed stay non-const but
-sss_hash_algs_info is different. You do not pass it to crypto-core.
+--=-NTIDuqjczzBO7VMmmGCB
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> What you mean by 'stick the driver to only one instance' ? In Exynos 4412 there
-> is only one SecSS block, in some other Exynos there is SlimSS, but it is not
-> the same (it has lower capabilities and other io addresses), so there should not
-> be two s5p_aes_dev drivers loaded at the same time. 
+On Tue, 2017-10-03 at 19:05 +0100, Robin Murphy wrote:
+>=20
+> Now, there are indeed plenty of drivers and subsystems which do work on
+> lists of explicitly single pages - anything doing some variant of
+> "addr =3D kmap_atomic(sg_page(sg)) + sg->offset;" is easy to spot - but I
+> don't think DMA API implementations are in a position to make any kind
+> of assumption; nearly all of them just shut up and handle sg->length
+> bytes from sg_phys(sg) without questioning the caller, and I reckon
+> that's exactly what they should be doing.
 
-Current driver matches hardware in one-to-one so indeed there cannot be
-two s5p_aes_dev devices. However this might change thus almost every
-driver tries to follow the pattern of state-container passed to device
-(e.g. platform_set_drvdata()). With this approach the code is nicely
-encapsulated and usually much easier to review. Globals (or file-scope
-variables) usually makes code more difficult to maintain.
+So what's the point in sg->page in the first place? If even the
+*offset* can be greater than page size, it isn't even the *first* page
+(as you called it). Why aren't we just using a physical address,
+instead of an arbitrary page and an offset from that?
 
-In this driver this is not entirely possible as some crypto-functions do
-not allow passing driver-supplied opaque pointer. But except this case,
-everywhere else the driver should follow common convention - do not use
-static variables.
+Can we have *negative* sg->offset too? :)
+
+--=-NTIDuqjczzBO7VMmmGCB
+Content-Type: application/x-pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCDzUw
+ggSvMIIDl6ADAgECAhEA4CPLFRKDU4mtYW56VGdrITANBgkqhkiG9w0BAQsFADBvMQswCQYDVQQG
+EwJTRTEUMBIGA1UEChMLQWRkVHJ1c3QgQUIxJjAkBgNVBAsTHUFkZFRydXN0IEV4dGVybmFsIFRU
+UCBOZXR3b3JrMSIwIAYDVQQDExlBZGRUcnVzdCBFeHRlcm5hbCBDQSBSb290MB4XDTE0MTIyMjAw
+MDAwMFoXDTIwMDUzMDEwNDgzOFowgZsxCzAJBgNVBAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1h
+bmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMUEw
+PwYDVQQDEzhDT01PRE8gU0hBLTI1NiBDbGllbnQgQXV0aGVudGljYXRpb24gYW5kIFNlY3VyZSBF
+bWFpbCBDQTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAImxDdp6UxlOcFIdvFamBia3
+uEngludRq/HwWhNJFaO0jBtgvHpRQqd5jKQi3xdhTpHVdiMKFNNKAn+2HQmAbqUEPdm6uxb+oYep
+LkNSQxZ8rzJQyKZPWukI2M+TJZx7iOgwZOak+FaA/SokFDMXmaxE5WmLo0YGS8Iz1OlAnwawsayT
+QLm1CJM6nCpToxDbPSBhPFUDjtlOdiUCISn6o3xxdk/u4V+B6ftUgNvDezVSt4TeIj0sMC0xf1m9
+UjewM2ktQ+v61qXxl3dnUYzZ7ifrvKUHOHaMpKk4/9+M9QOsSb7K93OZOg8yq5yVOhM9DkY6V3Rh
+UL7GQD/L5OKfoiECAwEAAaOCARcwggETMB8GA1UdIwQYMBaAFK29mHo0tCb3+sQmVO8DveAky1Qa
+MB0GA1UdDgQWBBSSYWuC4aKgqk/sZ/HCo/e0gADB7DAOBgNVHQ8BAf8EBAMCAYYwEgYDVR0TAQH/
+BAgwBgEB/wIBADAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwEQYDVR0gBAowCDAGBgRV
+HSAAMEQGA1UdHwQ9MDswOaA3oDWGM2h0dHA6Ly9jcmwudXNlcnRydXN0LmNvbS9BZGRUcnVzdEV4
+dGVybmFsQ0FSb290LmNybDA1BggrBgEFBQcBAQQpMCcwJQYIKwYBBQUHMAGGGWh0dHA6Ly9vY3Nw
+LnVzZXJ0cnVzdC5jb20wDQYJKoZIhvcNAQELBQADggEBABsqbqxVwTqriMXY7c1V86prYSvACRAj
+mQ/FZmpvsfW0tXdeDwJhAN99Bf4Ss6SAgAD8+x1banICCkG8BbrBWNUmwurVTYT7/oKYz1gb4yJj
+nFL4uwU2q31Ypd6rO2Pl2tVz7+zg+3vio//wQiOcyraNTT7kSxgDsqgt1Ni7QkuQaYUQ26Y3NOh7
+4AEQpZzKOsefT4g0bopl0BqKu6ncyso20fT8wmQpNa/WsadxEdIDQ7GPPprsnjJT9HaSyoY0B7ks
+yuYcStiZDcGG4pCS+1pCaiMhEOllx/XVu37qjIUgAmLq0ToHLFnFmTPyOInltukWeh95FPZKEBom
++nyK+5swggU9MIIEJaADAgECAhBqC1BYlVMtBFBN4igR/howMA0GCSqGSIb3DQEBCwUAMIGbMQsw
+CQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3Jk
+MRowGAYDVQQKExFDT01PRE8gQ0EgTGltaXRlZDFBMD8GA1UEAxM4Q09NT0RPIFNIQS0yNTYgQ2xp
+ZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTYxMjIwMDAwMDAwWhcN
+MTcxMjIwMjM1OTU5WjAkMSIwIAYJKoZIhvcNAQkBFhNkd213MkBpbmZyYWRlYWQub3JnMIIBIjAN
+BgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwbTrFaiGdvN2pThnR9q+4eaXB2wQZQNqhter5ZrJ
+pPO47e87bZ+f1tmYoh6+rB90G/XN24NErPRfvU4zVzNT9pCtCzSSVnBlZQBpaEYMKhcXo5PGKNsm
+An8BoGwNXjlxwbBNRaNO+ky0wNCaMNd1JLxEuvqg9J7rrcpHhWmnpXD5IKa8gv9GyVAJgOpiBOts
+p91sShc2kHvWJ5waPEWPCHDH9J+twGGKqKIIU7fdbURLUgUL1wlDSAHf/lgIAVCSj2H2HpoGqHpy
+HgOAClX9iRSLNa0Znj8HTaqfOwxXevsz1KkLFY+Ahm426GIEqdfkK2iT6Hhgc7tjNO3f8i5ALQID
+AQABo4IB8TCCAe0wHwYDVR0jBBgwFoAUkmFrguGioKpP7GfxwqP3tIAAwewwHQYDVR0OBBYEFILE
+dmHLtK6oxmFJZvBhTQhvqrS0MA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMCAGA1UdJQQZ
+MBcGCCsGAQUFBwMEBgsrBgEEAbIxAQMFAjARBglghkgBhvhCAQEEBAMCBSAwRgYDVR0gBD8wPTA7
+BgwrBgEEAbIxAQIBAQEwKzApBggrBgEFBQcCARYdaHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9D
+UFMwXQYDVR0fBFYwVDBSoFCgToZMaHR0cDovL2NybC5jb21vZG9jYS5jb20vQ09NT0RPU0hBMjU2
+Q2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNybDCBkAYIKwYBBQUHAQEEgYMw
+gYAwWAYIKwYBBQUHMAKGTGh0dHA6Ly9jcnQuY29tb2RvY2EuY29tL0NPTU9ET1NIQTI1NkNsaWVu
+dEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYIKwYBBQUHMAGGGGh0dHA6Ly9v
+Y3NwLmNvbW9kb2NhLmNvbTAeBgNVHREEFzAVgRNkd213MkBpbmZyYWRlYWQub3JnMA0GCSqGSIb3
+DQEBCwUAA4IBAQA+AfvNhFwtapF5Lzjapgul3zYuEnMfR538Ya1vhP8wuOkcoJeT2gEFXzVO2WUu
+eWM0g0/DumnRB53htV/Qq/+vsL0i6a2+iOO7kHi5O7bZkgbdNv0t2lzonDUHi6LTa7NUj+tv+j6y
+hW+iNquC3ACP1dIZH8gJmicHblW63qRgp6wxhn315MLBeavi3uiSag2eeKFePiTIwJjN2UYq6kWg
+PL5G/Ycf9x/xN1XBTfJiURc0FsXhrA98VMWnt52C5Lo4txhGjzTI+IZg40b3YDs6E7mTYb5KKmbc
+QZA9priOFDdj1z5W9BdWhU6I/D0P9y8Z4Tr6+ZscMUVD0RqWy2LeMIIFPTCCBCWgAwIBAgIQagtQ
+WJVTLQRQTeIoEf4aMDANBgkqhkiG9w0BAQsFADCBmzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdy
+ZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExp
+bWl0ZWQxQTA/BgNVBAMTOENPTU9ETyBTSEEtMjU2IENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQg
+U2VjdXJlIEVtYWlsIENBMB4XDTE2MTIyMDAwMDAwMFoXDTE3MTIyMDIzNTk1OVowJDEiMCAGCSqG
+SIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC
+ggEBAMG06xWohnbzdqU4Z0favuHmlwdsEGUDaobXq+WayaTzuO3vO22fn9bZmKIevqwfdBv1zduD
+RKz0X71OM1czU/aQrQs0klZwZWUAaWhGDCoXF6OTxijbJgJ/AaBsDV45ccGwTUWjTvpMtMDQmjDX
+dSS8RLr6oPSe663KR4Vpp6Vw+SCmvIL/RslQCYDqYgTrbKfdbEoXNpB71iecGjxFjwhwx/SfrcBh
+iqiiCFO33W1ES1IFC9cJQ0gB3/5YCAFQko9h9h6aBqh6ch4DgApV/YkUizWtGZ4/B02qnzsMV3r7
+M9SpCxWPgIZuNuhiBKnX5Ctok+h4YHO7YzTt3/IuQC0CAwEAAaOCAfEwggHtMB8GA1UdIwQYMBaA
+FJJha4LhoqCqT+xn8cKj97SAAMHsMB0GA1UdDgQWBBSCxHZhy7SuqMZhSWbwYU0Ib6q0tDAOBgNV
+HQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADAgBgNVHSUEGTAXBggrBgEFBQcDBAYLKwYBBAGyMQED
+BQIwEQYJYIZIAYb4QgEBBAQDAgUgMEYGA1UdIAQ/MD0wOwYMKwYBBAGyMQECAQEBMCswKQYIKwYB
+BQUHAgEWHWh0dHBzOi8vc2VjdXJlLmNvbW9kby5uZXQvQ1BTMF0GA1UdHwRWMFQwUqBQoE6GTGh0
+dHA6Ly9jcmwuY29tb2RvY2EuY29tL0NPTU9ET1NIQTI1NkNsaWVudEF1dGhlbnRpY2F0aW9uYW5k
+U2VjdXJlRW1haWxDQS5jcmwwgZAGCCsGAQUFBwEBBIGDMIGAMFgGCCsGAQUFBzAChkxodHRwOi8v
+Y3J0LmNvbW9kb2NhLmNvbS9DT01PRE9TSEEyNTZDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3Vy
+ZUVtYWlsQ0EuY3J0MCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20wHgYDVR0R
+BBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAPgH7zYRcLWqReS84
+2qYLpd82LhJzH0ed/GGtb4T/MLjpHKCXk9oBBV81TtllLnljNINPw7pp0Qed4bVf0Kv/r7C9Iumt
+vojju5B4uTu22ZIG3Tb9Ldpc6Jw1B4ui02uzVI/rb/o+soVvojargtwAj9XSGR/ICZonB25Vut6k
+YKesMYZ99eTCwXmr4t7okmoNnnihXj4kyMCYzdlGKupFoDy+Rv2HH/cf8TdVwU3yYlEXNBbF4awP
+fFTFp7edguS6OLcYRo80yPiGYONG92A7OhO5k2G+Sipm3EGQPaa4jhQ3Y9c+VvQXVoVOiPw9D/cv
+GeE6+vmbHDFFQ9Ealsti3jGCA9MwggPPAgEBMIGwMIGbMQswCQYDVQQGEwJHQjEbMBkGA1UECBMS
+R3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRowGAYDVQQKExFDT01PRE8gQ0Eg
+TGltaXRlZDFBMD8GA1UEAxM4Q09NT0RPIFNIQS0yNTYgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFu
+ZCBTZWN1cmUgRW1haWwgQ0ECEGoLUFiVUy0EUE3iKBH+GjAwDQYJYIZIAWUDBAIBBQCgggHzMBgG
+CSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTE3MTAwMzIyMTYxNlowLwYJ
+KoZIhvcNAQkEMSIEIKftRrzRrGoSj+iDuDZQDgXQf/nKtjKyow6zkdoEDRaFMIHBBgkrBgEEAYI3
+EAQxgbMwgbAwgZsxCzAJBgNVBAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAO
+BgNVBAcTB1NhbGZvcmQxGjAYBgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMUEwPwYDVQQDEzhDT01P
+RE8gU0hBLTI1NiBDbGllbnQgQXV0aGVudGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIQagtQ
+WJVTLQRQTeIoEf4aMDCBwwYLKoZIhvcNAQkQAgsxgbOggbAwgZsxCzAJBgNVBAYTAkdCMRswGQYD
+VQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNVBAoTEUNPTU9E
+TyBDQSBMaW1pdGVkMUEwPwYDVQQDEzhDT01PRE8gU0hBLTI1NiBDbGllbnQgQXV0aGVudGljYXRp
+b24gYW5kIFNlY3VyZSBFbWFpbCBDQQIQagtQWJVTLQRQTeIoEf4aMDANBgkqhkiG9w0BAQEFAASC
+AQB3BLb8WKTMElqPdDo/lWbDrJGZGJDIWEzPrbi8ttZ+/XJF3DmUcJvcFT4Ie7jEPqu3m3y/qnzC
+JazpsKCTHfKmCxQCTTox04jAOundSCnb62MIHWpZijJNyVuJCFY85gu1uIOGeFgPv7KrwdRVPp45
+xH1aGdxV27wwPDV0JTj1m06Zm9mutOBM5aQSSOZUWxq4FlsktOALQ8ElmqGgfB+OgCe4hIhkFXmH
+Ma/YaZgYroDleiUtXz32WIy1v8oORyhY/vSoJ+GNP9ny15VhJ1wtfD9J45fq8VhfBHdZuD79KKFo
++KPSEKJ5U4z7px3XlgcgeCG5qv+qnU8+aqnwO6MRAAAAAAAA
 
 
-Best regards,
-Krzysztof
+--=-NTIDuqjczzBO7VMmmGCB--
