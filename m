@@ -1,260 +1,40 @@
 From: Christian Lamparter <chunkeey@gmail.com>
-Subject: [PATCH 06/13] crypto: crypto4xx: use the correct LE32 format for IV and key defs
-Date: Wed,  4 Oct 2017 01:00:10 +0200
-Message-ID: <bd4aea377ea0ace4058420b789272164cb276b86.1507070985.git.chunkeey@gmail.com>
-References: <8c9b4bc7e3a88970fe0fc308034627b8ae972600.1507070985.git.chunkeey@gmail.com>
+Subject: [PATCH 01/13] crypto: crypto4xx: wire up hmac_mc to hmac_muting
+Date: Wed,  4 Oct 2017 01:00:05 +0200
+Message-ID: <8c9b4bc7e3a88970fe0fc308034627b8ae972600.1507070985.git.chunkeey@gmail.com>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wr0-f195.google.com ([209.85.128.195]:34533 "EHLO
-        mail-wr0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751135AbdJCXA1 (ORCPT
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:43757 "EHLO
+        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750865AbdJCXAU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Oct 2017 19:00:27 -0400
-Received: by mail-wr0-f195.google.com with SMTP id z1so6904591wre.1
-        for <linux-crypto@vger.kernel.org>; Tue, 03 Oct 2017 16:00:26 -0700 (PDT)
-In-Reply-To: <8c9b4bc7e3a88970fe0fc308034627b8ae972600.1507070985.git.chunkeey@gmail.com>
-In-Reply-To: <8c9b4bc7e3a88970fe0fc308034627b8ae972600.1507070985.git.chunkeey@gmail.com>
-References: <8c9b4bc7e3a88970fe0fc308034627b8ae972600.1507070985.git.chunkeey@gmail.com>
+        Tue, 3 Oct 2017 19:00:20 -0400
+Received: by mail-wm0-f68.google.com with SMTP id m72so12492305wmc.0
+        for <linux-crypto@vger.kernel.org>; Tue, 03 Oct 2017 16:00:19 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The hardware expects that the keys, IVs (and inner/outer hashes)
-are in the le32 format.
-
-This patch changes all hardware interface declarations to use
-the correct LE32 data format for each field.
-
-In order to pass __CHECK_ENDIAN__ checks, crypto4xx_memcpy_le
-has to be honest about the endianness of its parameters.
-The function was split and moved to the common crypto4xx_core.h
-header. This allows the compiler to generate better code if the
-sizes/len is a constant (various *_IV_LEN).
-
-Please note that the hardware isn't consistent with the endiannes
-of the save_digest field in the state record struct though.
-The hashes produced by GHASH and CBC (for CCM) will be in LE32.
-Whereas md5 and sha{1/,256,...} do not need any conversion.
+The hmac_mc parameter of set_dynamic_sa_command_1()
+was defined but not used. On closer inspection it
+turns out, it was never wired up.
 
 Signed-off-by: Christian Lamparter <chunkeey@gmail.com>
 ---
- drivers/crypto/amcc/crypto4xx_alg.c  |  4 +--
- drivers/crypto/amcc/crypto4xx_core.c | 40 ++----------------------------
- drivers/crypto/amcc/crypto4xx_core.h | 47 +++++++++++++++++++++++++++++++++---
- drivers/crypto/amcc/crypto4xx_sa.h   | 29 ++++++++++++----------
- 4 files changed, 64 insertions(+), 56 deletions(-)
+ drivers/crypto/amcc/crypto4xx_alg.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/drivers/crypto/amcc/crypto4xx_alg.c b/drivers/crypto/amcc/crypto4xx_alg.c
-index 57b1dcef4cb4..0e1d110a6405 100644
+index d08e4c94abed..57b1dcef4cb4 100644
 --- a/drivers/crypto/amcc/crypto4xx_alg.c
 +++ b/drivers/crypto/amcc/crypto4xx_alg.c
-@@ -149,8 +149,8 @@ static int crypto4xx_setkey_aes(struct crypto_ablkcipher *cipher,
- 				 SA_SEQ_MASK_OFF, SA_MC_ENABLE,
- 				 SA_NOT_COPY_PAD, SA_NOT_COPY_PAYLOAD,
- 				 SA_NOT_COPY_HDR);
--	crypto4xx_memcpy_le(get_dynamic_sa_key_field(sa),
--			    key, keylen);
-+	crypto4xx_memcpy_to_le32(get_dynamic_sa_key_field(sa),
-+				 key, keylen);
- 	sa->sa_contents.w = SA_AES_CONTENTS | (keylen << 2);
- 	sa->sa_command_1.bf.key_len = keylen >> 3;
- 	ctx->is_hash = 0;
-diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
-index abdf1db9b0eb..c936d68f19ad 100644
---- a/drivers/crypto/amcc/crypto4xx_core.c
-+++ b/drivers/crypto/amcc/crypto4xx_core.c
-@@ -614,42 +614,6 @@ static u32 crypto4xx_pd_done(struct crypto4xx_device *dev, u32 idx)
- 		return crypto4xx_ahash_done(dev, pd_uinfo);
- }
- 
--/**
-- * Note: Only use this function to copy items that is word aligned.
-- */
--void crypto4xx_memcpy_le(unsigned int *dst,
--			 const unsigned char *buf,
--			 int len)
--{
--	u8 *tmp;
--	for (; len >= 4; buf += 4, len -= 4)
--		*dst++ = cpu_to_le32(*(unsigned int *) buf);
--
--	tmp = (u8 *)dst;
--	switch (len) {
--	case 3:
--		*tmp++ = 0;
--		*tmp++ = *(buf+2);
--		*tmp++ = *(buf+1);
--		*tmp++ = *buf;
--		break;
--	case 2:
--		*tmp++ = 0;
--		*tmp++ = 0;
--		*tmp++ = *(buf+1);
--		*tmp++ = *buf;
--		break;
--	case 1:
--		*tmp++ = 0;
--		*tmp++ = 0;
--		*tmp++ = 0;
--		*tmp++ = *buf;
--		break;
--	default:
--		break;
--	}
--}
--
- static void crypto4xx_stop_all(struct crypto4xx_core_device *core_dev)
- {
- 	crypto4xx_destroy_pdr(core_dev->dev);
-@@ -809,8 +773,8 @@ u32 crypto4xx_build_pd(struct crypto_async_request *req,
- 			&pd_uinfo->sr_pa, 4);
- 
- 		if (iv_len)
--			crypto4xx_memcpy_le(pd_uinfo->sr_va->save_iv,
--					    iv, iv_len);
-+			crypto4xx_memcpy_to_le32(pd_uinfo->sr_va->save_iv,
-+						 iv, iv_len);
- 	} else {
- 		if (ctx->direction == DIR_INBOUND) {
- 			pd->sa = ctx->sa_in_dma_addr;
-diff --git a/drivers/crypto/amcc/crypto4xx_core.h b/drivers/crypto/amcc/crypto4xx_core.h
-index dbe29043e0c5..2df6874edee1 100644
---- a/drivers/crypto/amcc/crypto4xx_core.h
-+++ b/drivers/crypto/amcc/crypto4xx_core.h
-@@ -166,9 +166,7 @@ int crypto4xx_alloc_sa(struct crypto4xx_ctx *ctx, u32 size);
- void crypto4xx_free_sa(struct crypto4xx_ctx *ctx);
- void crypto4xx_free_ctx(struct crypto4xx_ctx *ctx);
- u32 crypto4xx_alloc_state_record(struct crypto4xx_ctx *ctx);
--void crypto4xx_memcpy_le(unsigned int *dst,
--			 const unsigned char *buf, int len);
--u32 crypto4xx_build_pd(struct crypto_async_request *req,
-+int crypto4xx_build_pd(struct crypto_async_request *req,
- 		       struct crypto4xx_ctx *ctx,
- 		       struct scatterlist *src,
- 		       struct scatterlist *dst,
-@@ -193,4 +191,47 @@ int crypto4xx_hash_digest(struct ahash_request *req);
- int crypto4xx_hash_final(struct ahash_request *req);
- int crypto4xx_hash_update(struct ahash_request *req);
- int crypto4xx_hash_init(struct ahash_request *req);
-+
-+/**
-+ * Note: Only use this function to copy items that is word aligned.
-+ */
-+static inline void crypto4xx_memcpy_swab32(u32 *dst, const void *buf,
-+					   size_t len)
-+{
-+	for (; len >= 4; buf += 4, len -= 4)
-+		*dst++ = __swab32p((u32 *) buf);
-+
-+	if (len) {
-+		const u8 *tmp = (u8 *)buf;
-+
-+		switch (len) {
-+		case 3:
-+			*dst = (tmp[2] << 16) |
-+			       (tmp[1] << 8) |
-+			       tmp[0];
-+			break;
-+		case 2:
-+			*dst = (tmp[1] << 8) |
-+			       tmp[0];
-+			break;
-+		case 1:
-+			*dst = tmp[0];
-+			break;
-+		default:
-+			break;
-+		}
-+	}
-+}
-+
-+static inline void crypto4xx_memcpy_from_le32(u32 *dst, const void *buf,
-+					      size_t len)
-+{
-+	crypto4xx_memcpy_swab32(dst, buf, len);
-+}
-+
-+static inline void crypto4xx_memcpy_to_le32(__le32 *dst, const void *buf,
-+					    size_t len)
-+{
-+	crypto4xx_memcpy_swab32((u32 *)dst, buf, len);
-+}
- #endif
-diff --git a/drivers/crypto/amcc/crypto4xx_sa.h b/drivers/crypto/amcc/crypto4xx_sa.h
-index 8040c82dc354..b79da98dc9a9 100644
---- a/drivers/crypto/amcc/crypto4xx_sa.h
-+++ b/drivers/crypto/amcc/crypto4xx_sa.h
-@@ -181,9 +181,12 @@ struct dynamic_sa_ctl {
-  * State Record for Security Association (SA)
-  */
- struct  sa_state_record {
--	u32 save_iv[4];
--	u32 save_hash_byte_cnt[2];
--	u32 save_digest[16];
-+	__le32 save_iv[4];
-+	__le32 save_hash_byte_cnt[2];
-+	union {
-+		u32 save_digest[16]; /* for MD5/SHA */
-+		__le32 save_digest_le32[16]; /* GHASH / CBC */
-+	};
- } __attribute__((packed));
- 
- /**
-@@ -192,8 +195,8 @@ struct  sa_state_record {
-  */
- struct dynamic_sa_aes128 {
- 	struct dynamic_sa_ctl	ctrl;
--	u32 key[4];
--	u32 iv[4]; /* for CBC, OFC, and CFB mode */
-+	__le32 key[4];
-+	__le32 iv[4]; /* for CBC, OFC, and CFB mode */
- 	u32 state_ptr;
- 	u32 reserved;
- } __attribute__((packed));
-@@ -206,8 +209,8 @@ struct dynamic_sa_aes128 {
-  */
- struct dynamic_sa_aes192 {
- 	struct dynamic_sa_ctl ctrl;
--	u32 key[6];
--	u32 iv[4]; /* for CBC, OFC, and CFB mode */
-+	__le32 key[6];
-+	__le32 iv[4]; /* for CBC, OFC, and CFB mode */
- 	u32 state_ptr;
- 	u32 reserved;
- } __attribute__((packed));
-@@ -220,8 +223,8 @@ struct dynamic_sa_aes192 {
-  */
- struct dynamic_sa_aes256 {
- 	struct dynamic_sa_ctl ctrl;
--	u32 key[8];
--	u32 iv[4]; /* for CBC, OFC, and CFB mode */
-+	__le32 key[8];
-+	__le32 iv[4]; /* for CBC, OFC, and CFB mode */
- 	u32 state_ptr;
- 	u32 reserved;
- } __attribute__((packed));
-@@ -235,8 +238,8 @@ struct dynamic_sa_aes256 {
-  */
- struct dynamic_sa_hash160 {
- 	struct dynamic_sa_ctl ctrl;
--	u32 inner_digest[5];
--	u32 outer_digest[5];
-+	__le32 inner_digest[5];
-+	__le32 outer_digest[5];
- 	u32 state_ptr;
- 	u32 reserved;
- } __attribute__((packed));
-@@ -266,9 +269,9 @@ get_dynamic_sa_offset_state_ptr_field(struct dynamic_sa_ctl *cts)
- 	return sizeof(struct dynamic_sa_ctl) + offset * 4;
- }
- 
--static inline u32 *get_dynamic_sa_key_field(struct dynamic_sa_ctl *cts)
-+static inline __le32 *get_dynamic_sa_key_field(struct dynamic_sa_ctl *cts)
- {
--	return (u32 *) ((unsigned long)cts + sizeof(struct dynamic_sa_ctl));
-+	return (__le32 *) ((unsigned long)cts + sizeof(struct dynamic_sa_ctl));
- }
- 
- #endif
+@@ -63,6 +63,7 @@ static void set_dynamic_sa_command_1(struct dynamic_sa_ctl *sa, u32 cm,
+ 	sa->sa_command_1.bf.crypto_mode9_8 = cm & 3;
+ 	sa->sa_command_1.bf.feedback_mode = cfb,
+ 	sa->sa_command_1.bf.sa_rev = 1;
++	sa->sa_command_1.bf.hmac_muting = hmac_mc;
+ 	sa->sa_command_1.bf.extended_seq_num = esn;
+ 	sa->sa_command_1.bf.seq_num_mask = sn_mask;
+ 	sa->sa_command_1.bf.mutable_bit_proc = mute;
 -- 
 2.14.2
