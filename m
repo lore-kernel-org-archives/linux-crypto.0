@@ -1,110 +1,110 @@
-From: Robin Murphy <robin.murphy@arm.com>
-Subject: Re: [PATCH] iommu/vt-d: Fix scatterlist offset handling
-Date: Tue, 3 Oct 2017 19:05:17 +0100
-Message-ID: <db8c70d7-5978-20e8-d29a-91a4312f97dd@arm.com>
-References: <644c3e01654f8bd48d669c36e424959d6ef0e27e.1506607370.git.robin.murphy@arm.com>
- <1507035334.29211.105.camel@infradead.org>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: Re: [PATCH v3] crypto: s5p-sss: Add HASH support for Exynos
+Date: Tue, 3 Oct 2017 21:30:39 +0200
+Message-ID: <20171003193039.sadrgdxeeawu3jnx@kozik-lap>
+References: <CGME20170927122551eucas1p2ce5b868e59bfa99941672936ba3c7bed@eucas1p2.samsung.com>
+ <fddf226a-b0d8-fd68-3713-347ac3a0de20@partner.samsung.com>
+ <20170930195044.kyhiit2nqmjgcwtl@kozik-lap>
+ <77ef8f3f-a686-0043-c55d-761033a11956@partner.samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: ashok.raj@intel.com, leedom@chelsio.com, Harsh@chelsio.com,
-        herbert@gondor.apana.org.au, iommu@lists.linux-foundation.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: David Woodhouse <dwmw2@infradead.org>, joro@8bytes.org
+Content-Transfer-Encoding: 8BIT
+Cc: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Vladimir Zapolskiy <vz@mleia.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Kamil Konieczny <k.konieczny@partner.samsung.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:52282 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750812AbdJCSFV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Oct 2017 14:05:21 -0400
-In-Reply-To: <1507035334.29211.105.camel@infradead.org>
-Content-Language: en-US
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:33085 "EHLO
+        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750812AbdJCTao (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 3 Oct 2017 15:30:44 -0400
+Content-Disposition: inline
+In-Reply-To: <77ef8f3f-a686-0043-c55d-761033a11956@partner.samsung.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 03/10/17 13:55, David Woodhouse wrote:
-> On Thu, 2017-09-28 at 15:14 +0100, Robin Murphy wrote:
->> The intel-iommu DMA ops fail to correctly handle scatterlists where
->> sg->offset is greater than PAGE_SIZE - the IOVA allocation is computed
->> appropriately based on the page-aligned portion of the offset, but the
->> mapping is set up relative to sg->page, which means it fails to actually
->> cover the whole buffer (and in the worst case doesn't cover it at all):
->>
->>     (sg->dma_address + sg->dma_len) ----+
->>     sg->dma_address ---------+          |
->>     iov_pfn------+           |          |
->>                  |           |          |
->>                  v           v          v
->> iova:   a        b        c        d        e        f
->>         |--------|--------|--------|--------|--------|
->>                           <...calculated....>
->>                  [_____mapped______]
->> pfn:    0        1        2        3        4        5
->>         |--------|--------|--------|--------|--------|
->>                  ^           ^          ^
->>                  |           |          |
->>     sg->page ----+           |          |
->>     sg->offset --------------+          |
->>     (sg->offset + sg->length) ----------+
+On Tue, Oct 03, 2017 at 04:57:43PM +0200, Kamil Konieczny wrote:
+ 
+> >> [...]
+> >> +static struct ahash_alg algs_sha256[] = {
+> >> +{
+> >> +	.init		= s5p_hash_init,
+> >> +	.update		= s5p_hash_update,
+> >> +	.final		= s5p_hash_final,
+> >> +	.finup		= s5p_hash_finup,
+> >> +	.digest		= s5p_hash_digest,
+> >> +	.halg.digestsize	= SHA256_DIGEST_SIZE,
+> >> +	.halg.base	= {
+> >> +		.cra_name		= "sha256",
+> >> +		.cra_driver_name	= "exynos-sha256",
+> >> +		.cra_priority		= 100,
+> >> +		.cra_flags		= CRYPTO_ALG_TYPE_AHASH |
+> >> +					  CRYPTO_ALG_KERN_DRIVER_ONLY |
+> >> +					  CRYPTO_ALG_ASYNC |
+> >> +					  CRYPTO_ALG_NEED_FALLBACK,
+> >> +		.cra_blocksize		= HASH_BLOCK_SIZE,
+> >> +		.cra_ctxsize		= sizeof(struct s5p_hash_ctx),
+> >> +		.cra_alignmask		= SSS_DMA_ALIGN_MASK,
+> >> +		.cra_module		= THIS_MODULE,
+> >> +		.cra_init		= s5p_hash_cra_init,
+> >> +		.cra_exit		= s5p_hash_cra_exit,
+> >> +	}
+> >> +}
+> >> +
+> >> +};
+> >> +
+> >> +static struct sss_hash_algs_info exynos_hash_algs_info[] = {
+> > 
+> > You have warnings in your code. Please be sure that all compiler,
+> > Smatch, Sparse, checkpatch and coccicheck warnings are fixed.
+> > 
+> > ../drivers/crypto/s5p-sss.c:1896:34: warning: ‘exynos_hash_algs_info’ defined but not used [-Wunused-variable]
+> >  static struct sss_hash_algs_info exynos_hash_algs_info[] = {
+> > 
+> > Probably this should be __maybe_unused.
 > 
-> I'd still dearly love to see some clear documentation of what it means
-> for sg->offset to be outside the page referenced by sg->page.
-
-I think the key is that for each SG segment, sg->page doesn't
-necessarily represent "a" page, but the first of one or more contiguous
-pages. Disregarding offsets for the moment, Here's a typical example of
-a 120KB buffer from the block layer as processed by iommu_dma_map_sg():
-
-[   16.092649] == initial (4) ==
-[   16.095591]  0: virt ffff800001372000	phys 0x0000000081372000	dma 0x0000000000000000
-[   16.095591] 		offset 0x00000000	length 0x0000e000	dma_len 0x00000000
-[   16.109541]  1: virt ffff800001380000	phys 0x0000000081380000	dma 0x0000000000000000
-[   16.109541] 		offset 0x00000000	length 0x0000d000	dma_len 0x00000000
-[   16.123491]  2: virt ffff80000138e000	phys 0x000000008138e000	dma 0x0000000000000000
-[   16.123491] 		offset 0x00000000	length 0x00002000	dma_len 0x00000000
-[   16.137440]  3: virt ffff800001390000	phys 0x0000000081390000	dma 0x0000000000000000
-[   16.137440] 		offset 0x00000000	length 0x00001000	dma_len 0x00000000
-[   16.216167] == final   (2) ==
-[   16.219106]  0: virt ffff800001372000	phys 0x0000000081372000	dma 0x00000000ffb60000
-[   16.219106] 		offset 0x00000000	length 0x0000e000	dma_len 0x0000e000
-[   16.233056]  1: virt ffff800001380000	phys 0x0000000081380000	dma 0x00000000ffb70000
-[   16.233056] 		offset 0x00000000	length 0x0000d000	dma_len 0x00010000
-
-i.e. segments of 14 pages, 13 pages, 2 pages and 1 page respectively
-(and we further merge the resulting DMA-contiguous segments on top of
-that).
-
-Now, there are indeed plenty of drivers and subsystems which do work on
-lists of explicitly single pages - anything doing some variant of
-"addr = kmap_atomic(sg_page(sg)) + sg->offset;" is easy to spot - but I
-don't think DMA API implementations are in a position to make any kind
-of assumption; nearly all of them just shut up and handle sg->length
-bytes from sg_phys(sg) without questioning the caller, and I reckon
-that's exactly what they should be doing.
-
-> Or is it really not "outside", and it's *only* valid for the offset to
-> be > PAGE_OFFSET when it's a huge page, so we can check that with a
-> BUG_ON() ? 
+> You are right, I did not check this with EXYNOS_HASH disabled, I will
+> rewrite it.
 > 
-> In particular, I'd like to know what is intended in the Xen PV case,
-> where there isn't a straight correspondence between pfn and mfn. Is the
-> out-of-range sg->offset intended to refer to the next *pfn* after sg-
->> page, or to the next *mfn* after sg->page? 
+> > Also this should be const. I do not understand why you have to add one
+> > more static variable (which sticks the driver to only one instance...)
+> > and then modify it during runtime. Everything should be stored in device
+> > state container (s5p_aes_dev) - directly or through some other pointers.
+> 
+> There is .registered field which is incremented with each algo register.
+> I can move assignes to fields .import, .export and .statesize into struct.
+> When I tried add const, I got compiler warn:
+> drivers/crypto/s5p-sss.c: In function ‘s5p_aes_remove’:
+> drivers/crypto/s5p-sss.c:2397:6: warning: passing argument 1 of ‘crypto_unregister_ahash’ discards ‘const’ qualifier from pointer target type [-Wdiscarded-qualifiers]
+>       &hash_algs_i[i].algs_list[j]);
+> so it was not designed to be const (in crypto framework).
+> In AES code the alg struct is also static:
+> static struct crypto_alg algs[] = {
 
-Logically, it should mean the same thing as whatever a length of more
-than 1 page means to Xen - judging by blkif_queue_rw_req() at least,
-that seems to be a BUG_ON() in both cases.
+The crypto_alg and ahash_alg must indeed stay non-const but
+sss_hash_algs_info is different. You do not pass it to crypto-core.
 
-> I confess I've only followed this thread vaguely, but I haven't seen a
-> *coherent* explanation except in the huge page case (in which case I
-> want to see that BUG_ON in the patch) of why this isn't just totally
-> bogus.
+> What you mean by 'stick the driver to only one instance' ? In Exynos 4412 there
+> is only one SecSS block, in some other Exynos there is SlimSS, but it is not
+> the same (it has lower capabilities and other io addresses), so there should not
+> be two s5p_aes_dev drivers loaded at the same time. 
 
-As I've said before, I'd certainly consider it a denormalised case, but
-not a bogus one, and certainly not something that is the DMA API's job
-to police. Having now audited every dma_map_ops::map_sg implementation I
-could find, the only ones not using sg_phys()/sg_virt() or some other
-construction immune to the absolute offset value (MIPS even explicitly
-normalises it) are intel-iommu and arch/frv, and the latter is clearly
-broken anyway as it ignores sg->length.
+Current driver matches hardware in one-to-one so indeed there cannot be
+two s5p_aes_dev devices. However this might change thus almost every
+driver tries to follow the pattern of state-container passed to device
+(e.g. platform_set_drvdata()). With this approach the code is nicely
+encapsulated and usually much easier to review. Globals (or file-scope
+variables) usually makes code more difficult to maintain.
 
-Robin.
+In this driver this is not entirely possible as some crypto-functions do
+not allow passing driver-supplied opaque pointer. But except this case,
+everywhere else the driver should follow common convention - do not use
+static variables.
+
+
+Best regards,
+Krzysztof
