@@ -1,54 +1,87 @@
-From: Marcelo Ricardo Leitner <marcelo.leitner-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH V2] Fix a sleep-in-atomic bug in shash_setkey_unaligned
-Date: Tue, 3 Oct 2017 19:46:32 -0300
-Message-ID: <20171003224632.GF19750@localhost.localdomain>
-References: <1506997522-26684-1-git-send-email-baijiaju1990@163.com>
- <20171003223308.GD19750@localhost.localdomain>
+From: "Raj, Ashok" <ashok.raj@intel.com>
+Subject: Re: [PATCH] iommu/vt-d: Fix scatterlist offset handling
+Date: Tue, 3 Oct 2017 12:36:53 -0700
+Message-ID: <20171003193653.GA244814@otc-nc-03>
+References: <644c3e01654f8bd48d669c36e424959d6ef0e27e.1506607370.git.robin.murphy@arm.com>
+ <MWHPR12MB1600DA9DF9CF54221B752694C8790@MWHPR12MB1600.namprd12.prod.outlook.com>
+ <20170928132942.GA99552@otc-nc-03>
+ <a135090f-27e2-cf69-b3a7-c9d0e101bf07@arm.com>
+ <20170928154345.GA101272@otc-nc-03>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org, herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
-        nhorman-2XuSBdqkA4R54TAoqtyWWQ@public.gmane.org, vyasevich-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, luto-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
-        kvalo-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-sctp-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        linux-wireless-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jia-Ju Bai <baijiaju1990-9Onoh4P/yGk@public.gmane.org>
-Return-path: <linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: Casey Leedom <leedom@chelsio.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Atul Gupta <atul.gupta@chelsio.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Michael Werner <werner@chelsio.com>,
+        "dwmw2@infradead.org" <dwmw2@infradead.org>,
+        Harsh Jain <Harsh@chelsio.com>
+To: Robin Murphy <robin.murphy@arm.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga09.intel.com ([134.134.136.24]:47042 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750865AbdJCWt6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 3 Oct 2017 18:49:58 -0400
 Content-Disposition: inline
-In-Reply-To: <20171003223308.GD19750-bi+AKbBUZKY6gyzm1THtWbp2dZbC/Bob@public.gmane.org>
-Sender: linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20170928154345.GA101272@otc-nc-03>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Oct 03, 2017 at 07:33:08PM -0300, Marcelo Ricardo Leitner wrote:
-> On Tue, Oct 03, 2017 at 10:25:22AM +0800, Jia-Ju Bai wrote:
-> > The SCTP program may sleep under a spinlock, and the function call path is:
-> > sctp_generate_t3_rtx_event (acquire the spinlock)
-> >   sctp_do_sm
-> >     sctp_side_effects
-> >       sctp_cmd_interpreter
-> >         sctp_make_init_ack
-> >           sctp_pack_cookie
-> >             crypto_shash_setkey
-> >               shash_setkey_unaligned
-> >                 kmalloc(GFP_KERNEL)
-> 
-> Are you sure this can happen?
-> The host is not supposed to store any information when replying to an
-> INIT packet (which generated the INIT_ACK listed above). That said,
-> it's weird to see the timer function triggering so.
-> 
-> Checking now, that code is dead actually:
-> $ git grep -A 2 SCTP_CMD_GEN_INIT_ACK
-> sm_sideeffect.c:                case SCTP_CMD_GEN_INIT_ACK:
-> sm_sideeffect.c-                        /* Generate an INIT ACK chunk.
-> */
-> sm_sideeffect.c-                        new_obj =
-> sctp_make_init_ack(asoc, chunk, GFP_ATOMIC,
-> 
-> Nobody is triggering a call to sctp_cmd_interpreter with
-> SCTP_CMD_GEN_INIT_ACK command, which would generate the callstack
-> above.
+Hi Robin
 
-Nevertheless, the issue is real through other call paths.
+I now see your patch and it does seem to be fix the problem.
 
-Thanks,
-Marcelo
+On Thu, Sep 28, 2017 at 08:43:46AM -0700, Ashok Raj wrote:
+> Hi Robin
+> 
+> 
+> On Thu, Sep 28, 2017 at 05:59:11PM +0100, Robin Murphy wrote:
+> > I hope our email server hasn't got blacklisted again... Said patch is
+> > the top of this very thread we're replying on[1] - you were definitely
+> > on cc :(
+> 
+>         (sg->dma_address + sg->dma_len) ----+
+>         sg->dma_address ---------+          |
+>         iov_pfn------+           |          |
+>                      |           |          |
+>                      v           v          v
+>     iova:   a        b        c        d        e        f
+>             |--------|--------|--------|--------|--------|
+>                               <...calculated....>
+>                      [_____mapped______]
+>     pfn:    0        1        2        3        4        5
+>             |--------|--------|--------|--------|--------|
+>                      ^           ^          ^
+>                      |           |          |
+>         sg->page ----+           |          |
+>         sg->offset --------------+          |
+>         (sg->offset + sg->length) ----------+
+> 
+> The picture seems right. Looking at the code i'm not sure if i understand
+> it correctly.
+> 
+> pgoff = sg->offset & ~PAGE_MASK;
+> 
+> this gets the offset past the start of page.
+> 
+> sg->dma_address = ((dma_addr_t)iov_pfn << VTD_PAGE_SHIFT) + pgoff;
+> 
+> this would set dma_address at b+off instead of starting at c+off correct?
+
+
+I assumed align_nrpages() would allocate 2 pages when
+the offset is over PAGE_SIZE, but it seems economical and only
+allocates 1 page to cover just the sg->length bytes.
+
+the pteval also seems correct now, since you changed to 
+sg_phys() that already accounts for sg->offset, so you 
+subtract pgoff.
+
+-           pteval = page_to_phys(sg_page(sg)) | prot;
++           pteval = (sg_phys(sg) - pgoff) | prot;
+
+
+Cheers,
+Ashok
