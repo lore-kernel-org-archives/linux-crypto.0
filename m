@@ -1,80 +1,42 @@
-From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [Part2 PATCH v4 05/29] crypto: ccp: Add Platform Security
- Processor (PSP) device support
-Date: Tue, 3 Oct 2017 11:19:48 -0500
-Message-ID: <cb8f574d-6077-74f1-7bb9-9d23c8a06cd2@amd.com>
-References: <20170919204627.3875-1-brijesh.singh@amd.com>
- <20170919204627.3875-6-brijesh.singh@amd.com>
- <20170929151607.zn4lmdkyn25sczfg@pd.tnic>
- <1fc76eee-f25b-cd38-cc8d-0404ec94cf79@amd.com>
- <20170930161104.452sia6a5y5duyn4@pd.tnic>
- <55879570-04d7-a627-5f4b-b94f1604ece5@amd.com>
- <20171003161718.mabp74olsxbmpewv@pd.tnic>
+From: Greg KH <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH v2] staging: ccree: Convert to
+ platform_{get,set}_drvdata()
+Date: Tue, 3 Oct 2017 18:29:20 +0200
+Message-ID: <20171003162920.GA11186@kroah.com>
+References: <1505993344-18304-1-git-send-email-sunil.m@techveda.org>
+ <1505996262-19137-1-git-send-email-sunil.m@techveda.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: brijesh.singh@amd.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Gary Hook <gary.hook@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        linux-crypto@vger.kernel.org
-To: Borislav Petkov <bp@suse.de>
+Content-Type: text/plain; charset=us-ascii
+Cc: gilad@benyossef.com, linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        linux-kernel@vger.kernel.org, karthik@techveda.org
+To: sunil.m@techveda.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-dm3nam03on0084.outbound.protection.outlook.com ([104.47.41.84]:32798
-        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1750820AbdJCQT4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Oct 2017 12:19:56 -0400
-In-Reply-To: <20171003161718.mabp74olsxbmpewv@pd.tnic>
-Content-Language: en-US
+Received: from mail.linuxfoundation.org ([140.211.169.12]:58108 "EHLO
+        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751964AbdJCQ3L (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 3 Oct 2017 12:29:11 -0400
+Content-Disposition: inline
+In-Reply-To: <1505996262-19137-1-git-send-email-sunil.m@techveda.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-
-
-On 10/03/2017 11:17 AM, Borislav Petkov wrote:
-...
-
+On Thu, Sep 21, 2017 at 05:47:42PM +0530, sunil.m@techveda.org wrote:
+> From: Suniel Mahesh <sunil.m@techveda.org>
 > 
-> No, please add my patch below to your set for the CRYPTO_DEV_CCP_DD
-> dependency as it is a separate thing. Your patch should concentrate only
-> on adding the PSP and its dependencies.
+> Platform devices are expected to use wrapper functions,
+> platform_{get,set}_drvdata() with platform_device as argument,
+> for getting and setting the driver data. dev_{get,set}_drvdata()
+> are using &plat_dev->dev.
+> For wrapper functions we can directly pass a struct platform_device.
 > 
-
-Sure, I will include your patch in my series. thanks
-
-
+> dev_set_drvdata() is redundant and therefore removed. The driver core
+> clears the driver data to NULL after device_release or on probe failure.
+> 
+> Signed-off-by: Suniel Mahesh <sunil.m@techveda.org>
 > ---
-> From: Borislav Petkov <bp@suse.de>
-> Date: Sat, 30 Sep 2017 10:06:27 +0200
-> Subject: [PATCH] crypto: ccp: Build the AMD secure processor driver only with
->   AMD CPU support
-> 
-> This is AMD-specific hardware so present it in Kconfig only when AMD
-> CPU support is enabled or on ARM64 where it is also used.
-> 
-> Signed-off-by: Borislav Petkov <bp@suse.de>
-> Cc: Brijesh Singh <brijesh.singh@amd.com>
-> Cc: Tom Lendacky <thomas.lendacky@amd.com>
-> Cc: Gary Hook <gary.hook@amd.com>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: linux-crypto@vger.kernel.org
-> ---
->   drivers/crypto/ccp/Kconfig | 1 +
->   1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/crypto/ccp/Kconfig b/drivers/crypto/ccp/Kconfig
-> index 627f3e61dcac..f19f57162225 100644
-> --- a/drivers/crypto/ccp/Kconfig
-> +++ b/drivers/crypto/ccp/Kconfig
-> @@ -1,5 +1,6 @@
->   config CRYPTO_DEV_CCP_DD
->   	tristate "Secure Processor device driver"
-> +	depends on CPU_SUP_AMD || ARM64
->   	default m
->   	help
->   	  Provides AMD Secure Processor device driver.
-> 
+> Changes for v2:
+> - Rebased on top of staging-testing.
+
+Can you rebase again, this still does not apply :(
