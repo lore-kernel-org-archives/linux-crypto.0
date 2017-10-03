@@ -1,87 +1,48 @@
-From: "Raj, Ashok" <ashok.raj@intel.com>
-Subject: Re: [PATCH] iommu/vt-d: Fix scatterlist offset handling
-Date: Tue, 3 Oct 2017 12:36:53 -0700
-Message-ID: <20171003193653.GA244814@otc-nc-03>
-References: <644c3e01654f8bd48d669c36e424959d6ef0e27e.1506607370.git.robin.murphy@arm.com>
- <MWHPR12MB1600DA9DF9CF54221B752694C8790@MWHPR12MB1600.namprd12.prod.outlook.com>
- <20170928132942.GA99552@otc-nc-03>
- <a135090f-27e2-cf69-b3a7-c9d0e101bf07@arm.com>
- <20170928154345.GA101272@otc-nc-03>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Casey Leedom <leedom@chelsio.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Atul Gupta <atul.gupta@chelsio.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Michael Werner <werner@chelsio.com>,
-        "dwmw2@infradead.org" <dwmw2@infradead.org>,
-        Harsh Jain <Harsh@chelsio.com>
-To: Robin Murphy <robin.murphy@arm.com>
+From: Christian Lamparter <chunkeey@gmail.com>
+Subject: [PATCH 03/13] crypto: crypto4xx: fix type mismatch compiler error
+Date: Wed,  4 Oct 2017 01:00:07 +0200
+Message-ID: <e53844a4a81ec2d60a3fc4dc4b17f54bb14f45e4.1507070985.git.chunkeey@gmail.com>
+References: <8c9b4bc7e3a88970fe0fc308034627b8ae972600.1507070985.git.chunkeey@gmail.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:47042 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750865AbdJCWt6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Oct 2017 18:49:58 -0400
-Content-Disposition: inline
-In-Reply-To: <20170928154345.GA101272@otc-nc-03>
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:51832 "EHLO
+        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751199AbdJCXAW (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 3 Oct 2017 19:00:22 -0400
+Received: by mail-wm0-f65.google.com with SMTP id f4so11743595wme.0
+        for <linux-crypto@vger.kernel.org>; Tue, 03 Oct 2017 16:00:21 -0700 (PDT)
+In-Reply-To: <8c9b4bc7e3a88970fe0fc308034627b8ae972600.1507070985.git.chunkeey@gmail.com>
+In-Reply-To: <8c9b4bc7e3a88970fe0fc308034627b8ae972600.1507070985.git.chunkeey@gmail.com>
+References: <8c9b4bc7e3a88970fe0fc308034627b8ae972600.1507070985.git.chunkeey@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Robin
+This patch fixes a type mismatch error that I accidentally
+introduced when I moved and refactored the dynamic_contents
+helpers.
 
-I now see your patch and it does seem to be fix the problem.
+Signed-off-by: Christian Lamparter <chunkeey@gmail.com>
+---
+ drivers/crypto/amcc/crypto4xx_sa.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-On Thu, Sep 28, 2017 at 08:43:46AM -0700, Ashok Raj wrote:
-> Hi Robin
-> 
-> 
-> On Thu, Sep 28, 2017 at 05:59:11PM +0100, Robin Murphy wrote:
-> > I hope our email server hasn't got blacklisted again... Said patch is
-> > the top of this very thread we're replying on[1] - you were definitely
-> > on cc :(
-> 
->         (sg->dma_address + sg->dma_len) ----+
->         sg->dma_address ---------+          |
->         iov_pfn------+           |          |
->                      |           |          |
->                      v           v          v
->     iova:   a        b        c        d        e        f
->             |--------|--------|--------|--------|--------|
->                               <...calculated....>
->                      [_____mapped______]
->     pfn:    0        1        2        3        4        5
->             |--------|--------|--------|--------|--------|
->                      ^           ^          ^
->                      |           |          |
->         sg->page ----+           |          |
->         sg->offset --------------+          |
->         (sg->offset + sg->length) ----------+
-> 
-> The picture seems right. Looking at the code i'm not sure if i understand
-> it correctly.
-> 
-> pgoff = sg->offset & ~PAGE_MASK;
-> 
-> this gets the offset past the start of page.
-> 
-> sg->dma_address = ((dma_addr_t)iov_pfn << VTD_PAGE_SHIFT) + pgoff;
-> 
-> this would set dma_address at b+off instead of starting at c+off correct?
-
-
-I assumed align_nrpages() would allocate 2 pages when
-the offset is over PAGE_SIZE, but it seems economical and only
-allocates 1 page to cover just the sg->length bytes.
-
-the pteval also seems correct now, since you changed to 
-sg_phys() that already accounts for sg->offset, so you 
-subtract pgoff.
-
--           pteval = page_to_phys(sg_page(sg)) | prot;
-+           pteval = (sg_phys(sg) - pgoff) | prot;
-
-
-Cheers,
-Ashok
+diff --git a/drivers/crypto/amcc/crypto4xx_sa.h b/drivers/crypto/amcc/crypto4xx_sa.h
+index 7cc04f1ff8a0..8040c82dc354 100644
+--- a/drivers/crypto/amcc/crypto4xx_sa.h
++++ b/drivers/crypto/amcc/crypto4xx_sa.h
+@@ -266,9 +266,9 @@ get_dynamic_sa_offset_state_ptr_field(struct dynamic_sa_ctl *cts)
+ 	return sizeof(struct dynamic_sa_ctl) + offset * 4;
+ }
+ 
+-static inline u8 *get_dynamic_sa_key_field(struct dynamic_sa_ctl *cts)
++static inline u32 *get_dynamic_sa_key_field(struct dynamic_sa_ctl *cts)
+ {
+-	return (u8 *) ((unsigned long)cts + sizeof(struct dynamic_sa_ctl));
++	return (u32 *) ((unsigned long)cts + sizeof(struct dynamic_sa_ctl));
+ }
+ 
+ #endif
+-- 
+2.14.2
