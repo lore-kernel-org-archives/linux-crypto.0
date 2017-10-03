@@ -1,42 +1,55 @@
-From: Greg KH <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH v2] staging: ccree: Convert to
- platform_{get,set}_drvdata()
-Date: Tue, 3 Oct 2017 18:29:20 +0200
-Message-ID: <20171003162920.GA11186@kroah.com>
-References: <1505993344-18304-1-git-send-email-sunil.m@techveda.org>
- <1505996262-19137-1-git-send-email-sunil.m@techveda.org>
+From: Andy Lutomirski <luto@kernel.org>
+Subject: Re: [PATCH V2] Fix a sleep-in-atomic bug in shash_setkey_unaligned
+Date: Tue, 3 Oct 2017 09:46:04 -0700
+Message-ID: <CALCETrVw1=XDOEf_mEN77Lpr1DZnx769RCs1w73JJ2w_9C6-Kg@mail.gmail.com>
+References: <1506997522-26684-1-git-send-email-baijiaju1990@163.com>
+ <CALCETrWdXjTTTywbb3duCEsLYNxkeGx7bf3SM4PYKeErCyiUNQ@mail.gmail.com> <20171003052643.GB22750@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: gilad@benyossef.com, linux-crypto@vger.kernel.org,
-        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
-        linux-kernel@vger.kernel.org, karthik@techveda.org
-To: sunil.m@techveda.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:58108 "EHLO
-        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751964AbdJCQ3L (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Oct 2017 12:29:11 -0400
-Content-Disposition: inline
-In-Reply-To: <1505996262-19137-1-git-send-email-sunil.m@techveda.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Cc: Andy Lutomirski <luto@kernel.org>,
+        Jia-Ju Bai <baijiaju1990@163.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Neil Horman <nhorman@tuxdriver.com>, vyasevich@gmail.com,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Network Development <netdev@vger.kernel.org>,
+        linux-sctp@vger.kernel.org,
+        Linux Wireless List <linux-wireless@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <20171003052643.GB22750@gondor.apana.org.au>
+Sender: netdev-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Sep 21, 2017 at 05:47:42PM +0530, sunil.m@techveda.org wrote:
-> From: Suniel Mahesh <sunil.m@techveda.org>
-> 
-> Platform devices are expected to use wrapper functions,
-> platform_{get,set}_drvdata() with platform_device as argument,
-> for getting and setting the driver data. dev_{get,set}_drvdata()
-> are using &plat_dev->dev.
-> For wrapper functions we can directly pass a struct platform_device.
-> 
-> dev_set_drvdata() is redundant and therefore removed. The driver core
-> clears the driver data to NULL after device_release or on probe failure.
-> 
-> Signed-off-by: Suniel Mahesh <sunil.m@techveda.org>
-> ---
-> Changes for v2:
-> - Rebased on top of staging-testing.
+On Mon, Oct 2, 2017 at 10:26 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> On Mon, Oct 02, 2017 at 09:18:24PM -0700, Andy Lutomirski wrote:
+>> > On Oct 2, 2017, at 7:25 PM, Jia-Ju Bai <baijiaju1990@163.com> wrote:
+>> >
+>> > The SCTP program may sleep under a spinlock, and the function call path is:
+>> > sctp_generate_t3_rtx_event (acquire the spinlock)
+>> >  sctp_do_sm
+>> >    sctp_side_effects
+>> >      sctp_cmd_interpreter
+>> >        sctp_make_init_ack
+>> >          sctp_pack_cookie
+>> >            crypto_shash_setkey
+>> >              shash_setkey_unaligned
+>> >                kmalloc(GFP_KERNEL)
+>>
+>> I'm going to go out on a limb here: why on Earth is out crypto API so
+>> full of indirection that we allocate memory at all here?
+>
+> The crypto API operates on a one key per-tfm basis.  So normally
+> tfm allocation and key setting is done once only and not done on
+> the data path.
+>
+> I have looked at the SCTP code and it appears to fit this paradigm.
+> That is, we should be able to allocate the tfm and set the key when
+> the key is actually generated via get_random_bytes, rather than every
+> time the key is used which is not only a waste but as you see runs
+> into API issues.
 
-Can you rebase again, this still does not apply :(
+It's a waste because it loses a pre-computation advantage.
+
+The fact that it has memory allocation issues is crypto API's fault,
+full stop.  There is no legit reason to need to allocate anything.
