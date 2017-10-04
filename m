@@ -1,250 +1,113 @@
-From: Ralf Baechle <ralf@linux-mips.org>
-Subject: Re: [PATCH v2 2/2] MIPS: crypto: Add crc32 and crc32c hw accelerated
- module
-Date: Wed, 4 Oct 2017 17:36:00 +0200
-Message-ID: <20171004153600.GB31821@linux-mips.org>
-References: <1507114133-9129-1-git-send-email-marcin.nowakowski@imgtec.com>
- <1507114133-9129-3-git-send-email-marcin.nowakowski@imgtec.com>
+From: Kamil Konieczny <k.konieczny@partner.samsung.com>
+Subject: Re: [PATCH v3] crypto: s5p-sss: Add HASH support for Exynos
+Date: Wed, 04 Oct 2017 18:18:24 +0200
+Message-ID: <7151125f-25b4-c9f5-627d-ba11a1c15b94@partner.samsung.com>
+References: <CGME20170927122551eucas1p2ce5b868e59bfa99941672936ba3c7bed@eucas1p2.samsung.com>
+        <fddf226a-b0d8-fd68-3713-347ac3a0de20@partner.samsung.com>
+        <20170930195044.kyhiit2nqmjgcwtl@kozik-lap>
+        <77ef8f3f-a686-0043-c55d-761033a11956@partner.samsung.com>
+        <20171003193039.sadrgdxeeawu3jnx@kozik-lap>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Linux MIPS Mailing List <linux-mips@linux-mips.org>,
-        linux-crypto@vger.kernel.org,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Cc: linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-To: Marcin Nowakowski <marcin.nowakowski@imgtec.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from eddie.linux-mips.org ([148.251.95.138]:60602 "EHLO
-        cvs.linux-mips.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752471AbdJDPgM (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 4 Oct 2017 11:36:12 -0400
-Received: from localhost.localdomain ([127.0.0.1]:40434 "EHLO linux-mips.org"
-        rhost-flags-OK-OK-OK-FAIL) by eddie.linux-mips.org with ESMTP
-        id S23990499AbdJDPgKHVMm2 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 4 Oct 2017 17:36:10 +0200
-Content-Disposition: inline
-In-Reply-To: <1507114133-9129-3-git-send-email-marcin.nowakowski@imgtec.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+        Vladimir Zapolskiy <vz@mleia.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Return-path: <linux-samsung-soc-owner@vger.kernel.org>
+In-reply-to: <20171003193039.sadrgdxeeawu3jnx@kozik-lap>
+Content-language: en-US
+Sender: linux-samsung-soc-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Oct 04, 2017 at 12:48:53PM +0200, Marcin Nowakowski wrote:
-
->  arch/mips/Kconfig             |   4 +
->  arch/mips/Makefile            |   3 +
->  arch/mips/crypto/Makefile     |   5 +
->  arch/mips/crypto/crc32-mips.c | 364 ++++++++++++++++++++++++++++++++++++++++++
->  crypto/Kconfig                |   9 ++
->  5 files changed, 385 insertions(+)
->  create mode 100644 arch/mips/crypto/Makefile
->  create mode 100644 arch/mips/crypto/crc32-mips.c
+On 03.10.2017 21:30, Krzysztof Kozlowski wrote:
+> On Tue, Oct 03, 2017 at 04:57:43PM +0200, Kamil Konieczny wrote:
+>  
+>>>> [...]
+>>>> +static struct ahash_alg algs_sha256[] = {
+>>>> +{
+>>>> +	.init		= s5p_hash_init,
+>>>> +	.update		= s5p_hash_update,
+>>>> +	.final		= s5p_hash_final,
+>>>> +	.finup		= s5p_hash_finup,
+>>>> +	.digest		= s5p_hash_digest,
+>>>> +	.halg.digestsize	= SHA256_DIGEST_SIZE,
+>>>> +	.halg.base	= {
+>>>> +		.cra_name		= "sha256",
+>>>> +		.cra_driver_name	= "exynos-sha256",
+>>>> +		.cra_priority		= 100,
+>>>> +		.cra_flags		= CRYPTO_ALG_TYPE_AHASH |
+>>>> +					  CRYPTO_ALG_KERN_DRIVER_ONLY |
+>>>> +					  CRYPTO_ALG_ASYNC |
+>>>> +					  CRYPTO_ALG_NEED_FALLBACK,
+>>>> +		.cra_blocksize		= HASH_BLOCK_SIZE,
+>>>> +		.cra_ctxsize		= sizeof(struct s5p_hash_ctx),
+>>>> +		.cra_alignmask		= SSS_DMA_ALIGN_MASK,
+>>>> +		.cra_module		= THIS_MODULE,
+>>>> +		.cra_init		= s5p_hash_cra_init,
+>>>> +		.cra_exit		= s5p_hash_cra_exit,
+>>>> +	}
+>>>> +}
+>>>> +
+>>>> +};
+>>>> +
+>>>> +static struct sss_hash_algs_info exynos_hash_algs_info[] = {
+>>>
+>>> You have warnings in your code. Please be sure that all compiler,
+>>> Smatch, Sparse, checkpatch and coccicheck warnings are fixed.
+>>>
+>>> ../drivers/crypto/s5p-sss.c:1896:34: warning: ‘exynos_hash_algs_info’ defined but not used [-Wunused-variable]
+>>>  static struct sss_hash_algs_info exynos_hash_algs_info[] = {
+>>>
+>>> Probably this should be __maybe_unused.
+>>
+>> You are right, I did not check this with EXYNOS_HASH disabled, I will
+>> rewrite it.
+>>
+>>> Also this should be const. I do not understand why you have to add one
+>>> more static variable (which sticks the driver to only one instance...)
+>>> and then modify it during runtime. Everything should be stored in device
+>>> state container (s5p_aes_dev) - directly or through some other pointers.
+>>
+>> There is .registered field which is incremented with each algo register.
+>> I can move assignes to fields .import, .export and .statesize into struct.
+>> When I tried add const, I got compiler warn:
+>> drivers/crypto/s5p-sss.c: In function ‘s5p_aes_remove’:
+>> drivers/crypto/s5p-sss.c:2397:6: warning: passing argument 1 of ‘crypto_unregister_ahash’ discards ‘const’ qualifier from pointer target type [-Wdiscarded-qualifiers]
+>>       &hash_algs_i[i].algs_list[j]);
+>> so it was not designed to be const (in crypto framework).
+>> In AES code the alg struct is also static:
+>> static struct crypto_alg algs[] = {
 > 
-> diff --git a/arch/mips/Kconfig b/arch/mips/Kconfig
-> index cb7fcc4..0f96812 100644
-> --- a/arch/mips/Kconfig
-> +++ b/arch/mips/Kconfig
-> @@ -2036,6 +2036,7 @@ config CPU_MIPSR6
->  	select CPU_HAS_RIXI
->  	select HAVE_ARCH_BITREVERSE
->  	select MIPS_ASID_BITS_VARIABLE
-> +	select MIPS_CRC_SUPPORT
->  	select MIPS_SPRAM
->  
->  config EVA
-> @@ -2503,6 +2504,9 @@ config MIPS_ASID_BITS
->  config MIPS_ASID_BITS_VARIABLE
->  	bool
->  
-> +config MIPS_CRC_SUPPORT
-> +	bool
-> +
->  #
->  # - Highmem only makes sense for the 32-bit kernel.
->  # - The current highmem code will only work properly on physically indexed
-> diff --git a/arch/mips/Makefile b/arch/mips/Makefile
-> index a96d97a..aa77536 100644
-> --- a/arch/mips/Makefile
-> +++ b/arch/mips/Makefile
-> @@ -216,6 +216,8 @@ cflags-$(toolchain-msa)			+= -DTOOLCHAIN_SUPPORTS_MSA
->  endif
->  toolchain-virt				:= $(call cc-option-yn,$(mips-cflags) -mvirt)
->  cflags-$(toolchain-virt)		+= -DTOOLCHAIN_SUPPORTS_VIRT
-> +toolchain-crc				:= $(call cc-option-yn,$(mips-cflags) -Wa$(comma)-mcrc)
-> +cflags-$(toolchain-crc)			+= -DTOOLCHAIN_SUPPORTS_CRC
->  
->  #
->  # Firmware support
-> @@ -324,6 +326,7 @@ libs-y			+= arch/mips/math-emu/
->  # See arch/mips/Kbuild for content of core part of the kernel
->  core-y += arch/mips/
->  
-> +drivers-$(CONFIG_MIPS_CRC_SUPPORT) += arch/mips/crypto/
->  drivers-$(CONFIG_OPROFILE)	+= arch/mips/oprofile/
->  
->  # suspend and hibernation support
-> diff --git a/arch/mips/crypto/Makefile b/arch/mips/crypto/Makefile
-> new file mode 100644
-> index 0000000..665c725
-> --- /dev/null
-> +++ b/arch/mips/crypto/Makefile
-> @@ -0,0 +1,5 @@
-> +#
-> +# Makefile for MIPS crypto files..
-> +#
-> +
-> +obj-$(CONFIG_CRYPTO_CRC32_MIPS) += crc32-mips.o
-> diff --git a/arch/mips/crypto/crc32-mips.c b/arch/mips/crypto/crc32-mips.c
-> new file mode 100644
-> index 0000000..f2f5db0
-> --- /dev/null
-> +++ b/arch/mips/crypto/crc32-mips.c
-> @@ -0,0 +1,364 @@
-> +/*
-> + * crc32-mips.c - CRC32 and CRC32C using optional MIPSr6 instructions
-> + *
-> + * Module based on arm64/crypto/crc32-arm.c
-> + *
-> + * Copyright (C) 2014 Linaro Ltd <yazen.ghannam@linaro.org>
-> + * Copyright (C) 2017 Imagination Technologies, Ltd.
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License version 2 as
-> + * published by the Free Software Foundation.
-> + */
-> +
-> +#include <linux/unaligned/access_ok.h>
-> +#include <linux/cpufeature.h>
-> +#include <linux/init.h>
-> +#include <linux/kernel.h>
-> +#include <linux/module.h>
-> +#include <linux/string.h>
-> +#include <asm/mipsregs.h>
-> +
-> +#include <crypto/internal/hash.h>
-> +
-> +enum crc_op_size {
-> +	b, h, w, d,
-> +};
-> +
-> +enum crc_type {
-> +	crc32,
-> +	crc32c,
-> +};
-> +
-> +#ifdef TOOLCHAIN_SUPPORTS_CRC
-> +
-> +#define _CRC32(crc, value, size, type)		\
-> +do {						\
-> +	__asm__ __volatile__(			\
-> +	".set	push\n\t"			\
-> +	".set	crc\n\t"			\
-> +	#type #size "	%0, %1, %0\n\t"		\
-> +	".set	pop"			\
-> +	: "+r" (crc)				\
-> +	: "r" (value)				\
-> +);						\
-> +} while(0)
-> +
-> +#define CRC_REGISTER
-> +
-> +#else	/* TOOLCHAIN_SUPPORTS_CRC */
-> +/*
-> + * Crc argument is currently ignored and the assembly below assumes
-> + * the crc is stored in $2. As the register number is encoded in the
-> + * instruction we can't let the compiler chose the register it wants.
-> + * An alternative is to change the code to do
-> + * move $2, %0
-> + * crc32
-> + * move %0, $2
-> + * but that adds unnecessary operations that the crc32 operation is
-> + * designed to avoid. This issue can go away once the assembler
-> + * is extended to support this operation and the compiler can make
-> + * the right register choice automatically
-> + */
-> +
-> +#define _CRC32(crc, value, size, type)						\
-> +do {										\
-> +	__asm__ __volatile__(							\
-> +	".set	push\n\t"							\
-> +	".set	noat\n\t"							\
-> +	"move	$at, %1\n\t"							\
-> +	"# " #type #size "	%0, $at, %0\n\t"				\
-> +	_ASM_INSN_IF_MIPS(0x7c00000f | (2 << 16) | (1 << 21) | (%2 << 6) | (%3 << 8))	\
-> +	_ASM_INSN32_IF_MM(0x00000030 | (1 << 16) | (2 << 21) | (%2 << 14) | (%3 << 3))	\
-> +	".set	pop"							\
-> +	: "+r" (crc)								\
-> +	: "r" (value), "i" (size), "i" (type)					\
-> +);										\
-> +} while(0)
-> +
-> +#define CRC_REGISTER __asm__("$2")
-> +#endif	/* !TOOLCHAIN_SUPPORTS_CRC */
+> The crypto_alg and ahash_alg must indeed stay non-const but
+> sss_hash_algs_info is different. You do not pass it to crypto-core.
 
-Over there years we've added so many inlines for instructions not yet
-supported by gas and the simply approach always requires extra move
-instructions.  So I finally cooked up something better which only relies
-on things that are in gas for as long as I can remember.  This illustrates
-it:
+It was again from omap driver, which has descriptions for omap2, omap4 and omap5,
+but here I over-complicated this. I will just remove it and simplify register
+and deregister hash algs.
 
-	.macro	parse var r
-	.ifc	\r, $0
-\var	=	0
-	.endif
-	.ifc	\r, $1
-\var	=	1
-	.endif
-	.ifc	\r, $2
-\var	=	2
-	.endif
-	.ifc	\r, $3
-\var	=	3
-	.endif
-	.endm
+> 
+>> What you mean by 'stick the driver to only one instance' ? In Exynos 4412 there
+>> is only one SecSS block, in some other Exynos there is SlimSS, but it is not
+>> the same (it has lower capabilities and other io addresses), so there should not
+>> be two s5p_aes_dev drivers loaded at the same time. 
+> 
+> Current driver matches hardware in one-to-one so indeed there cannot be
+> two s5p_aes_dev devices. However this might change thus almost every
+> driver tries to follow the pattern of state-container passed to device
+> (e.g. platform_set_drvdata()). With this approach the code is nicely
+> encapsulated and usually much easier to review. Globals (or file-scope
+> variables) usually makes code more difficult to maintain.
+> 
+> In this driver this is not entirely possible as some crypto-functions do
+> not allow passing driver-supplied opaque pointer. But except this case,
+> everywhere else the driver should follow common convention - do not use
+> static variables.
 
-	.macro	definsn opcode r1 r2 r3
-	parse	__definsn_r1 \r1
-	parse	__definsn_r2 \r2
-	parse	__definsn_r3 \r3
-	.word	\opcode | (__definsn_r1 << 16) | (__definsn_r2 << 20) | (__definsn_r3 << 24)
-	.endm
-
-	.macro	foo r1, r2, r3
-	definsn	42, \r1, \r2, \r3
-	.endm
-
-	foo	$1, $2, $3
-	foo	$3, $0, $1
-
-The advantages are obvious, the hypothetical instruction foo can be used
-just like it was actually supported by gas and no bloat by move
-instructions to shuffle operands in and results out.  Which for some
-very convoluted cases may also save you from an ICE.
-
-Above skeleton still needs a little polish, either by extending the
-parsing of register numbers to all 32 registers or by implementing that
-using another loop which probably would be implemented using a recursive
-gas macro.
-
-> +
-> +#define CRC32(crc, value, size) \
-> +	_CRC32(crc, value, size, crc32)
-> +
-> +#define CRC32C(crc, value, size) \
-> +	_CRC32(crc, value, size, crc32c)
-> +
-> +static u32 crc32_mips_le_hw(u32 crc_, const u8 *p, unsigned int len)
-> +{
-> +	register u32 crc CRC_REGISTER = crc_;
-> +
-> +#ifdef CONFIG_64BIT
-> +	while (len >= sizeof(u64)) {
-> +		register u64 value = get_unaligned_le64(p);
-
-Nice try but gcc will happily ignore the register keyword.  It only
-honors register when explicitly assigning a value to a register, something
-like register int foo asm("$42");.  Same for the other instances of
-register below.
-
-Cheers,
-
-  Ralf
+-- 
+Best regards,
+Kamil Konieczny
+Samsung R&D Institute Poland
