@@ -1,82 +1,107 @@
-From: sunil.m@techveda.org
-Subject: [PATCH v3] staging: ccree: Convert to platform_{get,set}_drvdata()
-Date: Wed,  4 Oct 2017 13:15:37 +0530
-Message-ID: <1507103137-9016-1-git-send-email-sunil.m@techveda.org>
-References: <20171003162920.GA11186@kroah.com>
-Cc: linux-crypto@vger.kernel.org,
-        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
-        linux-kernel@vger.kernel.org, karthik@techveda.org,
-        Suniel Mahesh <sunil.m@techveda.org>
-To: gilad@benyossef.com, gregkh@linuxfoundation.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20171003162920.GA11186@kroah.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Marcin Nowakowski <marcin.nowakowski@imgtec.com>
+Subject: Re: [PATCH 2/2] MIPS: crypto: Add crc32 and crc32c hw accelerated
+ module
+Date: Wed, 4 Oct 2017 09:49:06 +0200
+Message-ID: <057939a9-a17e-f304-44af-c7c0e3ada21e@imgtec.com>
+References: <1506514716-29470-1-git-send-email-marcin.nowakowski@imgtec.com>
+ <1506514716-29470-3-git-send-email-marcin.nowakowski@imgtec.com>
+ <20170929213451.GB24591@jhogan-linux.le.imgtec.org>
+ <CAOiHx=kMH+ujTw2myQ0uR3DxHnsBsmaGtmeVniGNf7VHytTa6g@mail.gmail.com>
+ <7d9d2e3a-a78f-bbb6-f957-1419473fb90e@imgtec.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Cc: Linux MIPS Mailing List <linux-mips@linux-mips.org>,
+        Ralf Baechle <ralf@linux-mips.org>,
+        <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+To: Jonas Gorski <jonas.gorski@gmail.com>,
+        James Hogan <james.hogan@imgtec.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mailapp01.imgtec.com ([195.59.15.196]:63350 "EHLO
+        mailapp01.imgtec.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751120AbdJDHtJ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 4 Oct 2017 03:49:09 -0400
+In-Reply-To: <7d9d2e3a-a78f-bbb6-f957-1419473fb90e@imgtec.com>
+Content-Language: en-US
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Suniel Mahesh <sunil.m@techveda.org>
+Hi James,
 
-Platform devices are expected to use wrapper functions,
-platform_{get,set}_drvdata() with platform_device as argument,
-for getting and setting the driver data. dev_{get,set}_drvdata()
-are using &plat_dev->dev.
-For wrapper functions we can directly pass a struct platform_device.
+On 03.10.2017 08:38, Marcin Nowakowski wrote:
 
-dev_set_drvdata() is redundant and therefore removed. The driver core
-clears the driver data to NULL after device_release or on probe failure.
+>>>
+>>> The need for 64-bit signed length is unfortunate. Do you get decent
+>>> assembly and comparable/better performance on 32-bit if you just use len
+>>> and only decrement it in the loops? i.e.
+>>>
+>>> -       while ((length -= sizeof(uXX)) >= 0) {
+>>> +       while (len >= sizeof(uXX)) {
+>>>                  register uXX value = get_unaligned_leXX(p);
+>>>
+>>>                  CRC32(crc, value, XX);
+>>>                  p += sizeof(uXX);
+>>> +               len -= sizeof(uXX);
+>>>          }
+>>>
+>>> That would be more readable too IMHO.
+>>
+>> or maybe just do some pointer arithmetic like
+>>
+>>    const u8 *end = p + len;
+>>
+>>    while ((end - p) >= sizeof(uXX)) {
+>>             register uXX value = get_unaligned_leXX(p);
+>>
+>>             CRC32(crc, value, XX);
+>>             p += sizeof(uXX);
+>>    }
+> 
+> Thank you both for these suggestions. All solutions are very similar in 
+> terms of the assembly produced, although the original code is the 
+> smallest of all:
+> 
+> original vs James':
+> crc32_mips_le_hw                             104     132     +28
+> vermagic                                      72      78      +6
+> chksumc_finup                                 40      44      +4
+> chksumc_digest                                44      48      +4
+> chksum_finup                                  92      96      +4
+> chksum_digest                                100     104      +4
+> 
+> original vs Jonas':
+> add/remove: 0/0 grow/shrink: 7/0 up/down: 90/0 (90)
+> function                                     old     new   delta
+> crc32_mips_le_hw                             104     148     +44
+> vermagic                                      72      78      +6
+> chksumc_finup                                 40      44      +4
+> chksumc_digest                                44      48      +4
+> chksum_finup                                  92      96      +4
+> chksum_digest                                100     104      +4
+> 
+> 
+> However - the key thing which is the processing loop is 6 instructions 
+> long in all variants. It's only the pre/post loop processing that adds 
+> the extra instructions so all these solutions should be roughly equal in 
+> terms of performance.
+> I find James' code a bit more readable so I'll go with it and post an 
+> updated patch.
+> 
 
-Signed-off-by: Suniel Mahesh <sunil.m@techveda.org>
----
-Changes for v3:
-- Rebased on top of staging-testing as suggested by Greg KH.
-- Patch was tested and built(ARCH=arm) on staging-testing.
----
-Changes for v2:
-- Rebased on top of staging-testing.
----
-Note:
-- No build issues reported, however it was not tested on
-  real hardware.
----
- drivers/staging/ccree/ssi_driver.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+The comparisons above were for 64-bit, where the difference is 
+negligible. On 32-bit builds, however, the difference is more significant:
 
-diff --git a/drivers/staging/ccree/ssi_driver.c b/drivers/staging/ccree/ssi_driver.c
-index 795a087..5f03c25 100644
---- a/drivers/staging/ccree/ssi_driver.c
-+++ b/drivers/staging/ccree/ssi_driver.c
-@@ -215,7 +215,7 @@ static int init_cc_resources(struct platform_device *plat_dev)
- 		rc = -ENOMEM;
- 		goto post_drvdata_err;
- 	}
--	dev_set_drvdata(dev, new_drvdata);
-+	platform_set_drvdata(plat_dev, new_drvdata);
- 	new_drvdata->plat_dev = plat_dev;
- 
- 	new_drvdata->clk = of_clk_get(np, 0);
-@@ -393,7 +393,6 @@ static int init_cc_resources(struct platform_device *plat_dev)
- 	cc_clk_off(new_drvdata);
- post_drvdata_err:
- 	dev_err(dev, "ccree init error occurred!\n");
--	dev_set_drvdata(dev, NULL);
- 	return rc;
- }
- 
-@@ -407,7 +406,7 @@ void fini_cc_regs(struct ssi_drvdata *drvdata)
- static void cleanup_cc_resources(struct platform_device *plat_dev)
- {
- 	struct ssi_drvdata *drvdata =
--		(struct ssi_drvdata *)dev_get_drvdata(&plat_dev->dev);
-+		(struct ssi_drvdata *)platform_get_drvdata(plat_dev);
- 
- 	ssi_aead_free(drvdata);
- 	ssi_hash_free(drvdata);
-@@ -423,7 +422,6 @@ static void cleanup_cc_resources(struct platform_device *plat_dev)
- #endif
- 	fini_cc_regs(drvdata);
- 	cc_clk_off(drvdata);
--	dev_set_drvdata(&plat_dev->dev, NULL);
- }
- 
- int cc_clk_on(struct ssi_drvdata *drvdata)
--- 
-1.9.1
+original vs James':
+
+function                                     old     new   delta
+vermagic                                      80      86      +6
+crc32c_mips_le_hw                            144     104     -40
+crc32_mips_le_hw                             144     104     -40
+
+and the main crc loop is down from 9 to 5 instructions, so it's a 
+significant reduction of the loop size.
+
+Marcin
