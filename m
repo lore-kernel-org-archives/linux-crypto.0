@@ -1,58 +1,82 @@
-From: P J P <ppandit@redhat.com>
-Subject: Re: [Part2 PATCH v4.1 07/29] crypto: ccp: Add Secure Encrypted
- Virtualization (SEV) command support
-Date: Wed, 4 Oct 2017 12:26:11 +0530 (IST)
-Message-ID: <nycvar.YSQ.7.76.1710041221390.19122@wniryva>
-References: <20170919204627.3875-8-brijesh.singh@amd.co> <20171002204831.5947-1-brijesh.singh@amd.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Cc: bp@suse.de, Paolo Bonzini <pbonzini@redhat.com>,
-        =?ISO-8859-2?Q?Radim_Kr=E8m=E1=F8?= <rkrcmar@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Gary Hook <gary.hook@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: Brijesh Singh <brijesh.singh@amd.com>
+From: sunil.m@techveda.org
+Subject: [PATCH v3] staging: ccree: Convert to platform_{get,set}_drvdata()
+Date: Wed,  4 Oct 2017 13:15:37 +0530
+Message-ID: <1507103137-9016-1-git-send-email-sunil.m@techveda.org>
+References: <20171003162920.GA11186@kroah.com>
+Cc: linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        linux-kernel@vger.kernel.org, karthik@techveda.org,
+        Suniel Mahesh <sunil.m@techveda.org>
+To: gilad@benyossef.com, gregkh@linuxfoundation.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20171002204831.5947-1-brijesh.singh@amd.com>
+In-Reply-To: <20171003162920.GA11186@kroah.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-+-- On Mon, 2 Oct 2017, Brijesh Singh wrote --+
-| +static int sev_cmd_buffer_len(int cmd)
-| +{
-| +	switch (cmd) {
-| +	case SEV_CMD_INIT:		return sizeof(struct sev_data_init);
-| +	case SEV_CMD_PLATFORM_STATUS:	return sizeof(struct sev_data_status);
-| +	case SEV_CMD_PEK_CSR:		return sizeof(struct sev_data_pek_csr);
-| +	case SEV_CMD_PEK_CERT_IMPORT:	return sizeof(struct sev_data_pek_cert_import);
-| +	case SEV_CMD_PDH_CERT_EXPORT:	return sizeof(struct sev_data_pdh_cert_export);
-| +	case SEV_CMD_LAUNCH_START:	return sizeof(struct sev_data_launch_start);
-| +	case SEV_CMD_LAUNCH_UPDATE_DATA:return sizeof(struct sev_data_launch_update_data);
-| +	case SEV_CMD_LAUNCH_UPDATE_VMSA:return sizeof(struct sev_data_launch_update_vmsa);
-| +	case SEV_CMD_LAUNCH_FINISH:	return sizeof(struct sev_data_launch_finish);
-| +	case SEV_CMD_LAUNCH_MEASURE:	return sizeof(struct sev_data_launch_measure);
-| +	case SEV_CMD_ACTIVATE:		return sizeof(struct sev_data_activate);
-| +	case SEV_CMD_DEACTIVATE:	return sizeof(struct sev_data_deactivate);
-| +	case SEV_CMD_DECOMMISSION:	return sizeof(struct sev_data_decommission);
-| +	case SEV_CMD_GUEST_STATUS:	return sizeof(struct sev_data_guest_status);
-| +	case SEV_CMD_DBG_DECRYPT:	return sizeof(struct sev_data_dbg);
-| +	case SEV_CMD_DBG_ENCRYPT:	return sizeof(struct sev_data_dbg);
-| +	case SEV_CMD_SEND_START:       	return sizeof(struct sev_data_send_start);
-| +	case SEV_CMD_SEND_UPDATE_DATA: 	return sizeof(struct sev_data_send_update_data);
-| +	case SEV_CMD_SEND_UPDATE_VMSA: 	return sizeof(struct sev_data_send_update_vmsa);
-| +	case SEV_CMD_SEND_FINISH:	return sizeof(struct sev_data_send_finish);
-| +	case SEV_CMD_RECEIVE_START:	return sizeof(struct sev_data_receive_start);
-| +	case SEV_CMD_RECEIVE_FINISH:	return sizeof(struct sev_data_receive_finish);
-| +	case SEV_CMD_RECEIVE_UPDATE_DATA:return sizeof(struct sev_data_receive_update_data);
-| +	case SEV_CMD_RECEIVE_UPDATE_VMSA:return sizeof(struct sev_data_receive_update_vmsa);
-| +	case SEV_CMD_LAUNCH_UPDATE_SECRET:return sizeof(struct sev_data_launch_secret);
-| +	default:			return 0;
-| +	}
+From: Suniel Mahesh <sunil.m@techveda.org>
 
-Each return above needs to be on its own line.
+Platform devices are expected to use wrapper functions,
+platform_{get,set}_drvdata() with platform_device as argument,
+for getting and setting the driver data. dev_{get,set}_drvdata()
+are using &plat_dev->dev.
+For wrapper functions we can directly pass a struct platform_device.
 
---
- - P J P
-47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
+dev_set_drvdata() is redundant and therefore removed. The driver core
+clears the driver data to NULL after device_release or on probe failure.
+
+Signed-off-by: Suniel Mahesh <sunil.m@techveda.org>
+---
+Changes for v3:
+- Rebased on top of staging-testing as suggested by Greg KH.
+- Patch was tested and built(ARCH=arm) on staging-testing.
+---
+Changes for v2:
+- Rebased on top of staging-testing.
+---
+Note:
+- No build issues reported, however it was not tested on
+  real hardware.
+---
+ drivers/staging/ccree/ssi_driver.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/staging/ccree/ssi_driver.c b/drivers/staging/ccree/ssi_driver.c
+index 795a087..5f03c25 100644
+--- a/drivers/staging/ccree/ssi_driver.c
++++ b/drivers/staging/ccree/ssi_driver.c
+@@ -215,7 +215,7 @@ static int init_cc_resources(struct platform_device *plat_dev)
+ 		rc = -ENOMEM;
+ 		goto post_drvdata_err;
+ 	}
+-	dev_set_drvdata(dev, new_drvdata);
++	platform_set_drvdata(plat_dev, new_drvdata);
+ 	new_drvdata->plat_dev = plat_dev;
+ 
+ 	new_drvdata->clk = of_clk_get(np, 0);
+@@ -393,7 +393,6 @@ static int init_cc_resources(struct platform_device *plat_dev)
+ 	cc_clk_off(new_drvdata);
+ post_drvdata_err:
+ 	dev_err(dev, "ccree init error occurred!\n");
+-	dev_set_drvdata(dev, NULL);
+ 	return rc;
+ }
+ 
+@@ -407,7 +406,7 @@ void fini_cc_regs(struct ssi_drvdata *drvdata)
+ static void cleanup_cc_resources(struct platform_device *plat_dev)
+ {
+ 	struct ssi_drvdata *drvdata =
+-		(struct ssi_drvdata *)dev_get_drvdata(&plat_dev->dev);
++		(struct ssi_drvdata *)platform_get_drvdata(plat_dev);
+ 
+ 	ssi_aead_free(drvdata);
+ 	ssi_hash_free(drvdata);
+@@ -423,7 +422,6 @@ static void cleanup_cc_resources(struct platform_device *plat_dev)
+ #endif
+ 	fini_cc_regs(drvdata);
+ 	cc_clk_off(drvdata);
+-	dev_set_drvdata(&plat_dev->dev, NULL);
+ }
+ 
+ int cc_clk_on(struct ssi_drvdata *drvdata)
+-- 
+1.9.1
