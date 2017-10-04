@@ -1,115 +1,250 @@
-From: <membership@instituteofcredit.org>
-Subject: (unknown)
-Date: Wed, 04 Oct 2017 15:33:01 -0000
-Message-ID: <150713118141.12042.7761649013250566698@chinaunicom.com>
+From: Ralf Baechle <ralf@linux-mips.org>
+Subject: Re: [PATCH v2 2/2] MIPS: crypto: Add crc32 and crc32c hw accelerated
+ module
+Date: Wed, 4 Oct 2017 17:36:00 +0200
+Message-ID: <20171004153600.GB31821@linux-mips.org>
+References: <1507114133-9129-1-git-send-email-marcin.nowakowski@imgtec.com>
+ <1507114133-9129-3-git-send-email-marcin.nowakowski@imgtec.com>
 Mime-Version: 1.0
-Content-Type: application/zip; name="1060824159.zip"
-Content-Transfer-Encoding: base64
-To: <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Linux MIPS Mailing List <linux-mips@linux-mips.org>,
+        linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+To: Marcin Nowakowski <marcin.nowakowski@imgtec.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from nz2l72.bb60246.ctm.net ([60.246.2.72]:47248 "HELO
-        chinaunicom.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with SMTP id S1752248AbdJDPdI (ORCPT
+Received: from eddie.linux-mips.org ([148.251.95.138]:60602 "EHLO
+        cvs.linux-mips.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752471AbdJDPgM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 4 Oct 2017 11:33:08 -0400
-Subject: 
-Content-Disposition: attachment
+        Wed, 4 Oct 2017 11:36:12 -0400
+Received: from localhost.localdomain ([127.0.0.1]:40434 "EHLO linux-mips.org"
+        rhost-flags-OK-OK-OK-FAIL) by eddie.linux-mips.org with ESMTP
+        id S23990499AbdJDPgKHVMm2 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 4 Oct 2017 17:36:10 +0200
+Content-Disposition: inline
+In-Reply-To: <1507114133-9129-3-git-send-email-marcin.nowakowski@imgtec.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-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
-WwAAAMAUAAAAAA==
+On Wed, Oct 04, 2017 at 12:48:53PM +0200, Marcin Nowakowski wrote:
+
+>  arch/mips/Kconfig             |   4 +
+>  arch/mips/Makefile            |   3 +
+>  arch/mips/crypto/Makefile     |   5 +
+>  arch/mips/crypto/crc32-mips.c | 364 ++++++++++++++++++++++++++++++++++++++++++
+>  crypto/Kconfig                |   9 ++
+>  5 files changed, 385 insertions(+)
+>  create mode 100644 arch/mips/crypto/Makefile
+>  create mode 100644 arch/mips/crypto/crc32-mips.c
+> 
+> diff --git a/arch/mips/Kconfig b/arch/mips/Kconfig
+> index cb7fcc4..0f96812 100644
+> --- a/arch/mips/Kconfig
+> +++ b/arch/mips/Kconfig
+> @@ -2036,6 +2036,7 @@ config CPU_MIPSR6
+>  	select CPU_HAS_RIXI
+>  	select HAVE_ARCH_BITREVERSE
+>  	select MIPS_ASID_BITS_VARIABLE
+> +	select MIPS_CRC_SUPPORT
+>  	select MIPS_SPRAM
+>  
+>  config EVA
+> @@ -2503,6 +2504,9 @@ config MIPS_ASID_BITS
+>  config MIPS_ASID_BITS_VARIABLE
+>  	bool
+>  
+> +config MIPS_CRC_SUPPORT
+> +	bool
+> +
+>  #
+>  # - Highmem only makes sense for the 32-bit kernel.
+>  # - The current highmem code will only work properly on physically indexed
+> diff --git a/arch/mips/Makefile b/arch/mips/Makefile
+> index a96d97a..aa77536 100644
+> --- a/arch/mips/Makefile
+> +++ b/arch/mips/Makefile
+> @@ -216,6 +216,8 @@ cflags-$(toolchain-msa)			+= -DTOOLCHAIN_SUPPORTS_MSA
+>  endif
+>  toolchain-virt				:= $(call cc-option-yn,$(mips-cflags) -mvirt)
+>  cflags-$(toolchain-virt)		+= -DTOOLCHAIN_SUPPORTS_VIRT
+> +toolchain-crc				:= $(call cc-option-yn,$(mips-cflags) -Wa$(comma)-mcrc)
+> +cflags-$(toolchain-crc)			+= -DTOOLCHAIN_SUPPORTS_CRC
+>  
+>  #
+>  # Firmware support
+> @@ -324,6 +326,7 @@ libs-y			+= arch/mips/math-emu/
+>  # See arch/mips/Kbuild for content of core part of the kernel
+>  core-y += arch/mips/
+>  
+> +drivers-$(CONFIG_MIPS_CRC_SUPPORT) += arch/mips/crypto/
+>  drivers-$(CONFIG_OPROFILE)	+= arch/mips/oprofile/
+>  
+>  # suspend and hibernation support
+> diff --git a/arch/mips/crypto/Makefile b/arch/mips/crypto/Makefile
+> new file mode 100644
+> index 0000000..665c725
+> --- /dev/null
+> +++ b/arch/mips/crypto/Makefile
+> @@ -0,0 +1,5 @@
+> +#
+> +# Makefile for MIPS crypto files..
+> +#
+> +
+> +obj-$(CONFIG_CRYPTO_CRC32_MIPS) += crc32-mips.o
+> diff --git a/arch/mips/crypto/crc32-mips.c b/arch/mips/crypto/crc32-mips.c
+> new file mode 100644
+> index 0000000..f2f5db0
+> --- /dev/null
+> +++ b/arch/mips/crypto/crc32-mips.c
+> @@ -0,0 +1,364 @@
+> +/*
+> + * crc32-mips.c - CRC32 and CRC32C using optional MIPSr6 instructions
+> + *
+> + * Module based on arm64/crypto/crc32-arm.c
+> + *
+> + * Copyright (C) 2014 Linaro Ltd <yazen.ghannam@linaro.org>
+> + * Copyright (C) 2017 Imagination Technologies, Ltd.
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
+> + */
+> +
+> +#include <linux/unaligned/access_ok.h>
+> +#include <linux/cpufeature.h>
+> +#include <linux/init.h>
+> +#include <linux/kernel.h>
+> +#include <linux/module.h>
+> +#include <linux/string.h>
+> +#include <asm/mipsregs.h>
+> +
+> +#include <crypto/internal/hash.h>
+> +
+> +enum crc_op_size {
+> +	b, h, w, d,
+> +};
+> +
+> +enum crc_type {
+> +	crc32,
+> +	crc32c,
+> +};
+> +
+> +#ifdef TOOLCHAIN_SUPPORTS_CRC
+> +
+> +#define _CRC32(crc, value, size, type)		\
+> +do {						\
+> +	__asm__ __volatile__(			\
+> +	".set	push\n\t"			\
+> +	".set	crc\n\t"			\
+> +	#type #size "	%0, %1, %0\n\t"		\
+> +	".set	pop"			\
+> +	: "+r" (crc)				\
+> +	: "r" (value)				\
+> +);						\
+> +} while(0)
+> +
+> +#define CRC_REGISTER
+> +
+> +#else	/* TOOLCHAIN_SUPPORTS_CRC */
+> +/*
+> + * Crc argument is currently ignored and the assembly below assumes
+> + * the crc is stored in $2. As the register number is encoded in the
+> + * instruction we can't let the compiler chose the register it wants.
+> + * An alternative is to change the code to do
+> + * move $2, %0
+> + * crc32
+> + * move %0, $2
+> + * but that adds unnecessary operations that the crc32 operation is
+> + * designed to avoid. This issue can go away once the assembler
+> + * is extended to support this operation and the compiler can make
+> + * the right register choice automatically
+> + */
+> +
+> +#define _CRC32(crc, value, size, type)						\
+> +do {										\
+> +	__asm__ __volatile__(							\
+> +	".set	push\n\t"							\
+> +	".set	noat\n\t"							\
+> +	"move	$at, %1\n\t"							\
+> +	"# " #type #size "	%0, $at, %0\n\t"				\
+> +	_ASM_INSN_IF_MIPS(0x7c00000f | (2 << 16) | (1 << 21) | (%2 << 6) | (%3 << 8))	\
+> +	_ASM_INSN32_IF_MM(0x00000030 | (1 << 16) | (2 << 21) | (%2 << 14) | (%3 << 3))	\
+> +	".set	pop"							\
+> +	: "+r" (crc)								\
+> +	: "r" (value), "i" (size), "i" (type)					\
+> +);										\
+> +} while(0)
+> +
+> +#define CRC_REGISTER __asm__("$2")
+> +#endif	/* !TOOLCHAIN_SUPPORTS_CRC */
+
+Over there years we've added so many inlines for instructions not yet
+supported by gas and the simply approach always requires extra move
+instructions.  So I finally cooked up something better which only relies
+on things that are in gas for as long as I can remember.  This illustrates
+it:
+
+	.macro	parse var r
+	.ifc	\r, $0
+\var	=	0
+	.endif
+	.ifc	\r, $1
+\var	=	1
+	.endif
+	.ifc	\r, $2
+\var	=	2
+	.endif
+	.ifc	\r, $3
+\var	=	3
+	.endif
+	.endm
+
+	.macro	definsn opcode r1 r2 r3
+	parse	__definsn_r1 \r1
+	parse	__definsn_r2 \r2
+	parse	__definsn_r3 \r3
+	.word	\opcode | (__definsn_r1 << 16) | (__definsn_r2 << 20) | (__definsn_r3 << 24)
+	.endm
+
+	.macro	foo r1, r2, r3
+	definsn	42, \r1, \r2, \r3
+	.endm
+
+	foo	$1, $2, $3
+	foo	$3, $0, $1
+
+The advantages are obvious, the hypothetical instruction foo can be used
+just like it was actually supported by gas and no bloat by move
+instructions to shuffle operands in and results out.  Which for some
+very convoluted cases may also save you from an ICE.
+
+Above skeleton still needs a little polish, either by extending the
+parsing of register numbers to all 32 registers or by implementing that
+using another loop which probably would be implemented using a recursive
+gas macro.
+
+> +
+> +#define CRC32(crc, value, size) \
+> +	_CRC32(crc, value, size, crc32)
+> +
+> +#define CRC32C(crc, value, size) \
+> +	_CRC32(crc, value, size, crc32c)
+> +
+> +static u32 crc32_mips_le_hw(u32 crc_, const u8 *p, unsigned int len)
+> +{
+> +	register u32 crc CRC_REGISTER = crc_;
+> +
+> +#ifdef CONFIG_64BIT
+> +	while (len >= sizeof(u64)) {
+> +		register u64 value = get_unaligned_le64(p);
+
+Nice try but gcc will happily ignore the register keyword.  It only
+honors register when explicitly assigning a value to a register, something
+like register int foo asm("$42");.  Same for the other instances of
+register below.
+
+Cheers,
+
+  Ralf
