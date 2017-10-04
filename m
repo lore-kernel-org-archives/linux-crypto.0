@@ -1,51 +1,42 @@
-From: Borislav Petkov <bp@suse.de>
-Subject: Re: [Part2 PATCH v4.1 07/29] crypto: ccp: Add Secure Encrypted
- Virtualization (SEV) command support
-Date: Wed, 4 Oct 2017 13:09:24 +0200
-Message-ID: <20171004110923.onuz7uavcbao4nbn@pd.tnic>
-References: <20170919204627.3875-8-brijesh.singh@amd.co>
- <20171002204831.5947-1-brijesh.singh@amd.com>
- <nycvar.YSQ.7.76.1710041221390.19122@wniryva>
- <20171004092152.4lmjlsqrg25dgaxu@pd.tnic>
- <nycvar.YSQ.7.76.1710041515170.22210@wniryva>
- <20171004100749.433dzszyea3oqcpn@pd.tnic>
- <nycvar.YSQ.7.76.1710041551490.23099@wniryva>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: Brijesh Singh <brijesh.singh@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+From: "Lee, Chun-Yi" <joeyli.kernel@gmail.com>
+Subject: [PATCH] KEYS: Fix the wrong index when checking the existence of second id
+Date: Wed,  4 Oct 2017 19:18:22 +0800
+Message-ID: <20171004111822.11141-1-jlee@suse.com>
+Cc: keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, "Lee, Chun-Yi" <jlee@suse.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Gary Hook <gary.hook@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: P J P <ppandit@redhat.com>
+        "David S. Miller" <davem@davemloft.net>
+To: David Howells <dhowells@redhat.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <nycvar.YSQ.7.76.1710041551490.23099@wniryva>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Oct 04, 2017 at 04:12:37PM +0530, P J P wrote:
->   Quick glance would work if it is readable. Currently it is not if
-> one is viewing it in 80 cols screen/window. They do that. Writing
-> return on the same line does not add specific value IMO.
+Fix the wrong index number when checking the existence of second
+id in function of finding asymmetric key. The id_1 is the second
+id that the index in array must be 1 but not 0.
 
-Then you'll have to scroll to the right like you have to do for the
-gazillion other places where the 80 cols rule is overridden for
-readability or string grepping or other reasons.
+Fix: 9eb029893(KEYS: Generalise x509_request_asymmetric_key())
 
-Or you should widen your windows.
+Cc: David Howells <dhowells@redhat.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Signed-off-by: "Lee, Chun-Yi" <jlee@suse.com>
+---
+ crypto/asymmetric_keys/asymmetric_type.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> Up to you; I pointed it out as 80 columns rule makes sense to me.
-
-It is up to the crypto maintainer in the end.
-
+diff --git a/crypto/asymmetric_keys/asymmetric_type.c b/crypto/asymmetric_keys/asymmetric_type.c
+index 3a3b028..39aecad 100644
+--- a/crypto/asymmetric_keys/asymmetric_type.c
++++ b/crypto/asymmetric_keys/asymmetric_type.c
+@@ -107,7 +107,7 @@ struct key *find_asymmetric_key(struct key *keyring,
+ 	if (id_0 && id_1) {
+ 		const struct asymmetric_key_ids *kids = asymmetric_key_ids(key);
+ 
+-		if (!kids->id[0]) {
++		if (!kids->id[1]) {
+ 			pr_debug("First ID matches, but second is missing\n");
+ 			goto reject;
+ 		}
 -- 
-Regards/Gruss,
-    Boris.
-
-SUSE Linux GmbH, GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
--- 
+2.10.2
