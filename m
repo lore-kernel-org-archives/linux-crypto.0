@@ -1,41 +1,49 @@
-From: Joe Perches <joe@perches.com>
-Subject: Re: [PATCH] staging: ccree: local variable "dev" not required
-Date: Thu, 05 Oct 2017 11:00:31 -0700
-Message-ID: <1507226431.4434.37.camel@perches.com>
-References: <1507144330-1672-1-git-send-email-sunil.m@techveda.org>
-         <CAOtvUMc3oVFxpgrj9i26_ETCG1CAr0Kj=77Lc2xVNdEPii-RkQ@mail.gmail.com>
+From: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Subject: Re: [PATCH V2] Fix a sleep-in-atomic bug in shash_setkey_unaligned
+Date: Thu, 5 Oct 2017 16:07:14 -0300
+Message-ID: <20171005190713.GA4326@localhost.localdomain>
+References: <20171003052643.GB22750@gondor.apana.org.au>
+ <20171003224505.GE19750@localhost.localdomain>
+ <20171005034054.GB31996@gondor.apana.org.au>
+ <20171004.213758.2210486785503998906.davem@davemloft.net>
+ <20171005101620.GA1246@gondor.apana.org.au>
+ <20171005131631.GA1553@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
-        karthik@techveda.org
-To: Gilad Ben-Yossef <gilad@benyossef.com>,
-        Suniel Mahesh <sunil.m@techveda.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: David Miller <davem@davemloft.net>, luto@kernel.org,
+        baijiaju1990@163.com, nhorman@tuxdriver.com, vyasevich@gmail.com,
+        kvalo@codeaurora.org, linux-crypto@vger.kernel.org,
+        netdev@vger.kernel.org, linux-sctp@vger.kernel.org,
+        linux-wireless@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtprelay0125.hostedemail.com ([216.40.44.125]:46381 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1751332AbdJESAf (ORCPT
+Received: from mail-qk0-f193.google.com ([209.85.220.193]:36826 "EHLO
+        mail-qk0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751667AbdJETHV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 5 Oct 2017 14:00:35 -0400
-In-Reply-To: <CAOtvUMc3oVFxpgrj9i26_ETCG1CAr0Kj=77Lc2xVNdEPii-RkQ@mail.gmail.com>
+        Thu, 5 Oct 2017 15:07:21 -0400
+Content-Disposition: inline
+In-Reply-To: <20171005131631.GA1553@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, 2017-10-05 at 10:07 +0300, Gilad Ben-Yossef wrote:
-> On Wed, Oct 4, 2017 at 10:12 PM,  <sunil.m@techveda.org> wrote:
-> > There is no need to create a local pointer variable "dev" and
-> > pass it various API's, instead use plat_dev which is enumerated
-> > by platform core on successful probe.
-[]
-> I'm sorry but I don't understand what is the problem you are trying to solve or
-> what is the improvement suggested.
+On Thu, Oct 05, 2017 at 09:16:31PM +0800, Herbert Xu wrote:
+> On Thu, Oct 05, 2017 at 06:16:20PM +0800, Herbert Xu wrote:
+> >
+> > That was my point.  Functions like sctp_pack_cookie shouldn't be
+> > setting the key in the first place.  The setkey should happen at
+> > the point when the key is generated.  That's sctp_endpoint_init
+> > which AFAICS only gets called in GFP_KERNEL context.
+> > 
+> > Or is there a code-path where sctp_endpoint_init is called in
+> > softirq context?
 > 
-> Why is having a local variable undesirable? I think having it makes
-> the code more readable, not less.
+> OK, there are indeed code paths where the key is derived in softirq
+> context.  Notably sctp_auth_calculate_hmac.
+> 
+> So I think this patch is the correct fix and I will push it upstream
+> as well as back to stable.
 
-IMO: The local variable is _not_ undesirable.
-     It does make the code more readable and
-     shortens line lengths too.
+Okay, thanks.
+
+  Marcelo
