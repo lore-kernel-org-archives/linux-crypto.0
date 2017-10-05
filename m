@@ -1,44 +1,45 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v3 1/3] crypto: engine - permit to enqueue aead_request
-Date: Thu, 5 Oct 2017 11:39:25 +0800
-Message-ID: <20171005033925.GA31996@gondor.apana.org.au>
-References: <1503047946-27799-1-git-send-email-fabien.dessenne@st.com>
- <1503047946-27799-2-git-send-email-fabien.dessenne@st.com>
- <20170922090921.GA15677@gondor.apana.org.au>
- <20206811-7075-5ca9-98cd-26a5709751fb@st.com>
+Subject: Re: [PATCH V2] Fix a sleep-in-atomic bug in shash_setkey_unaligned
+Date: Thu, 5 Oct 2017 11:40:54 +0800
+Message-ID: <20171005034054.GB31996@gondor.apana.org.au>
+References: <1506997522-26684-1-git-send-email-baijiaju1990@163.com>
+ <CALCETrWdXjTTTywbb3duCEsLYNxkeGx7bf3SM4PYKeErCyiUNQ@mail.gmail.com>
+ <20171003052643.GB22750@gondor.apana.org.au>
+ <20171003224505.GE19750@localhost.localdomain>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S . Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre TORGUE <alexandre.torgue@st.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org"
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Benjamin GAIGNARD <benjamin.gaignard@st.com>,
-        Lionel DEBIEVE <lionel.debieve@st.com>,
-        Ludovic BARRE <ludovic.barre@st.com>,
-        Corentin Labbe <clabbe.montjoie@gmail.com>
-To: Fabien DESSENNE <fabien.dessenne@st.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: Andy Lutomirski <luto@kernel.org>,
+        Jia-Ju Bai <baijiaju1990@163.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Neil Horman <nhorman@tuxdriver.com>, vyasevich@gmail.com,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Network Development <netdev@vger.kernel.org>,
+        linux-sctp@vger.kernel.org,
+        Linux Wireless List <linux-wireless@vger.kernel.org>
+To: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Return-path: <netdev-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20206811-7075-5ca9-98cd-26a5709751fb@st.com>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <20171003224505.GE19750@localhost.localdomain>
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Oct 03, 2017 at 07:48:08AM +0000, Fabien DESSENNE wrote:
+On Tue, Oct 03, 2017 at 07:45:06PM -0300, Marcelo Ricardo Leitner wrote:
 >
-> It looks like there is no more activity around this "crypto_engine 
-> interface clean up" task.
-> This unfortunately has been blocking the introduction of this new STM32 
-> crypto driver for 3 months now.
-> Would it make sense to have this driver reviewed first, and then 
-> reworked (I expect minor update here) when the interface update is ready?
+> > Usually if you're invoking setkey from a non-sleeping code-path
+> > you're probably doing something wrong.
+> 
+> Usually but not always. There are 3 calls to that function on SCTP
+> code:
+> - pack a cookie, which is sent on an INIT_ACK packet to the client
+> - unpack the cookie above, after it is sent back by the client on a
+>   COOKIE_ECHO packet
+> - send a chunk authenticated by a hash
 
-Hmm, is it possible to disable the AEAD part of the driver first?
+I'm not talking about the code-path in question.  I'm talking
+about the function which generates the secret key in the first
+place.  AFAICS that's only called in GFP_KERNEL context.  What
+am I missing?
 
 Cheers,
 -- 
