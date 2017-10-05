@@ -1,75 +1,41 @@
-From: Thomas Garnier <thgarnie@google.com>
-Subject: Re: [RFC v3 20/27] x86/ftrace: Adapt function tracing for PIE support
-Date: Thu, 5 Oct 2017 09:14:25 -0700
-Message-ID: <CAJcbSZGOYsoaYJBMPrLx4AffRRdaWCzGXNAPTRgP1DWeAkBkWA@mail.gmail.com>
-References: <20171004212003.28296-1-thgarnie@google.com> <20171004212003.28296-21-thgarnie@google.com>
- <20171005090633.5a6ce840@gandalf.local.home> <CAJcbSZHa3SyCR8zEm-Yor9CmBUfcjr0eE_6HMnaeq83gitdJNQ@mail.gmail.com>
- <20171005121132.7c1f4855@gandalf.local.home>
+From: Joe Perches <joe@perches.com>
+Subject: Re: [PATCH] staging: ccree: local variable "dev" not required
+Date: Thu, 05 Oct 2017 11:00:31 -0700
+Message-ID: <1507226431.4434.37.camel@perches.com>
+References: <1507144330-1672-1-git-send-email-sunil.m@techveda.org>
+         <CAOtvUMc3oVFxpgrj9i26_ETCG1CAr0Kj=77Lc2xVNdEPii-RkQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>,
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>,
-	Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@redhat.com>,
-	Arnd Bergmann <arnd@arndb.de>, Kees Cook <keescook@chromium.org>,
-	Matthias Kaehlcke <mka@chromium.org>, Tom Lendacky <thomas.lendacky@amd.com>,
-	Andy Lutomirski <luto@kernel.org>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-	Borislav Petkov <bp@suse.de>, "Rafael J . Wysocki" <rjw@rjwysocki.net>, Len Brown <len.brown@intel.com>,
-	Pavel Machek <pavel@ucw.cz>, Juergen Gross <jgross@suse.com>, Chris Wright <chrisw@sous-sol.org>,
-	Alok Kataria <akataria@vmware.com>, Rusty Russell <rusty@rustcorp.com.au>, Tejun Heo <tj@kernel.org>,
-	Christoph Lameter <cl@linux.com>, Boris Ostrovsky <boris.ostrovsky@orac
-To: Steven Rostedt <rostedt@goodmis.org>
-Return-path: <kernel-hardening-return-10087-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
-List-Post: <mailto:kernel-hardening@lists.openwall.com>
-List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
-List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
-List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
-In-Reply-To: <20171005121132.7c1f4855@gandalf.local.home>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+        karthik@techveda.org
+To: Gilad Ben-Yossef <gilad@benyossef.com>,
+        Suniel Mahesh <sunil.m@techveda.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from smtprelay0125.hostedemail.com ([216.40.44.125]:46381 "EHLO
+        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1751332AbdJESAf (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 5 Oct 2017 14:00:35 -0400
+In-Reply-To: <CAOtvUMc3oVFxpgrj9i26_ETCG1CAr0Kj=77Lc2xVNdEPii-RkQ@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Oct 5, 2017 at 9:11 AM, Steven Rostedt <rostedt@goodmis.org> wrote:
-> On Thu, 5 Oct 2017 09:01:14 -0700
-> Thomas Garnier <thgarnie@google.com> wrote:
->
->> On Thu, Oct 5, 2017 at 6:06 AM, Steven Rostedt <rostedt@goodmis.org> wrote:
->> > On Wed,  4 Oct 2017 14:19:56 -0700
->> > Thomas Garnier <thgarnie@google.com> wrote:
->> >
->> >> When using -fPIE/PIC with function tracing, the compiler generates a
->> >> call through the GOT (call *__fentry__@GOTPCREL). This instruction
->> >> takes 6 bytes instead of 5 on the usual relative call.
->> >>
->> >> With this change, function tracing supports 6 bytes on traceable
->> >> function and can still replace relative calls on the ftrace assembly
->> >> functions.
->> >>
->> >> Position Independent Executable (PIE) support will allow to extended the
->> >> KASLR randomization range below the -2G memory limit.
->> >
->> > Question: This 6 bytes is only the initial call that gcc creates. When
->> > function tracing is enabled, the calls are back to the normal call to
->> > the ftrace trampoline?
->>
->> That is correct.
->>
->
-> Then I think a better idea is to simply nop them out at compile time,
-> and have the code that updates them to nops to know about it.
->
-> See scripts/recordmcount.c
->
-> Could we simply add a 5 byte nop followed by a 1 byte nop, and treat it
-> the same as if it didn't exist? This code can be a little complex, and
-> can cause really nasty side effects if things go wrong. I would like to
-> keep from adding more variables to the changes here.
+On Thu, 2017-10-05 at 10:07 +0300, Gilad Ben-Yossef wrote:
+> On Wed, Oct 4, 2017 at 10:12 PM,  <sunil.m@techveda.org> wrote:
+> > There is no need to create a local pointer variable "dev" and
+> > pass it various API's, instead use plat_dev which is enumerated
+> > by platform core on successful probe.
+[]
+> I'm sorry but I don't understand what is the problem you are trying to solve or
+> what is the improvement suggested.
+> 
+> Why is having a local variable undesirable? I think having it makes
+> the code more readable, not less.
 
-Sure, I will simplify it for the next iteration.
-
-Thanks for the feedback.
-
->
-> -- Steve
-
-
-
--- 
-Thomas
+IMO: The local variable is _not_ undesirable.
+     It does make the code more readable and
+     shortens line lengths too.
