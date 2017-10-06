@@ -1,7 +1,8 @@
 From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH 14/18] crypto: talitos - simplify tests in ipsec_esp()
-Date: Fri,  6 Oct 2017 15:04:59 +0200 (CEST)
-Message-ID: <f69ca0d61b63cb08fb4de833a4254cf9ed279f69.1507284818.git.christophe.leroy@c-s.fr>
+Subject: [PATCH 12/18] crypto: talitos - don't check the number of channels at
+ each interrupt
+Date: Fri,  6 Oct 2017 15:04:55 +0200 (CEST)
+Message-ID: <50273eb4d8c1f2de846a8711e26883f51d83f8fb.1507284818.git.christophe.leroy@c-s.fr>
 References: <cover.1507284818.git.christophe.leroy@c-s.fr>
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         linuxppc-dev@lists.ozlabs.org
@@ -12,129 +13,119 @@ In-Reply-To: <cover.1507284818.git.christophe.leroy@c-s.fr>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Do (desc->hdr & DESC_HDR_TYPE_IPSEC_ESP) only once.
-Limit number of if/else paths
+The number of channels is known from the beginning, no need to
+test it everytime.
+This patch defines two additional done functions handling only channel 0.
+Then the probe registers the correct one based on the number of channels.
 
 Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 ---
- drivers/crypto/talitos.c | 42 ++++++++++++++++++++----------------------
- 1 file changed, 20 insertions(+), 22 deletions(-)
+ drivers/crypto/talitos.c | 27 +++++++++++++++------------
+ drivers/crypto/talitos.h |  4 ++++
+ 2 files changed, 19 insertions(+), 12 deletions(-)
 
 diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index 7e96db75347a..307d534a0f2f 100644
+index 83b2a70a1ba7..e7e1bada03df 100644
 --- a/drivers/crypto/talitos.c
 +++ b/drivers/crypto/talitos.c
-@@ -938,12 +938,15 @@ static void ipsec_esp_unmap(struct device *dev,
- 	struct crypto_aead *aead = crypto_aead_reqtfm(areq);
- 	struct talitos_ctx *ctx = crypto_aead_ctx(aead);
- 	unsigned int ivsize = crypto_aead_ivsize(aead);
-+	bool is_ipsec_esp = edesc->desc.hdr & DESC_HDR_TYPE_IPSEC_ESP;
-+	struct talitos_ptr *civ_ptr = &edesc->desc.ptr[is_ipsec_esp ? 2 : 3];
-+	struct talitos_ptr *ckey_ptr = &edesc->desc.ptr[is_ipsec_esp ? 3 : 2];
+@@ -390,8 +390,6 @@ static void talitos1_done_##name(unsigned long data)			\
+ 									\
+ 	if (ch_done_mask & 0x10000000)					\
+ 		flush_channel(dev, 0, 0, 0);			\
+-	if (priv->num_channels == 1)					\
+-		goto out;						\
+ 	if (ch_done_mask & 0x40000000)					\
+ 		flush_channel(dev, 1, 0, 0);			\
+ 	if (ch_done_mask & 0x00010000)					\
+@@ -399,7 +397,6 @@ static void talitos1_done_##name(unsigned long data)			\
+ 	if (ch_done_mask & 0x00040000)					\
+ 		flush_channel(dev, 3, 0, 0);			\
+ 									\
+-out:									\
+ 	/* At this point, all completed channels have been processed */	\
+ 	/* Unmask done interrupts for channels completed later on. */	\
+ 	spin_lock_irqsave(&priv->reg_lock, flags);			\
+@@ -409,6 +406,7 @@ out:									\
+ }
  
--	if (edesc->desc.hdr & DESC_HDR_TYPE_IPSEC_ESP)
-+	if (is_ipsec_esp)
- 		unmap_single_talitos_ptr(dev, &edesc->desc.ptr[6],
- 					 DMA_FROM_DEVICE);
--	unmap_single_talitos_ptr(dev, &edesc->desc.ptr[3], DMA_TO_DEVICE);
--	unmap_single_talitos_ptr(dev, &edesc->desc.ptr[2], DMA_TO_DEVICE);
-+	unmap_single_talitos_ptr(dev, ckey_ptr, DMA_TO_DEVICE);
-+	unmap_single_talitos_ptr(dev, civ_ptr, DMA_TO_DEVICE);
- 	unmap_single_talitos_ptr(dev, &edesc->desc.ptr[0], DMA_TO_DEVICE);
+ DEF_TALITOS1_DONE(4ch, TALITOS1_ISR_4CHDONE)
++DEF_TALITOS1_DONE(ch0, TALITOS1_ISR_CH_0_DONE)
  
- 	talitos_sg_unmap(dev, edesc, areq->src, areq->dst, areq->cryptlen,
-@@ -953,7 +956,7 @@ static void ipsec_esp_unmap(struct device *dev,
- 		dma_unmap_single(dev, edesc->dma_link_tbl, edesc->dma_len,
- 				 DMA_BIDIRECTIONAL);
+ #define DEF_TALITOS2_DONE(name, ch_done_mask)				\
+ static void talitos2_done_##name(unsigned long data)			\
+@@ -419,8 +417,6 @@ static void talitos2_done_##name(unsigned long data)			\
+ 									\
+ 	if (ch_done_mask & 1)						\
+ 		flush_channel(dev, 0, 0, 0);				\
+-	if (priv->num_channels == 1)					\
+-		goto out;						\
+ 	if (ch_done_mask & (1 << 2))					\
+ 		flush_channel(dev, 1, 0, 0);				\
+ 	if (ch_done_mask & (1 << 4))					\
+@@ -428,7 +424,6 @@ static void talitos2_done_##name(unsigned long data)			\
+ 	if (ch_done_mask & (1 << 6))					\
+ 		flush_channel(dev, 3, 0, 0);				\
+ 									\
+-out:									\
+ 	/* At this point, all completed channels have been processed */	\
+ 	/* Unmask done interrupts for channels completed later on. */	\
+ 	spin_lock_irqsave(&priv->reg_lock, flags);			\
+@@ -438,6 +433,7 @@ out:									\
+ }
  
--	if (!(edesc->desc.hdr & DESC_HDR_TYPE_IPSEC_ESP)) {
-+	if (!is_ipsec_esp) {
- 		unsigned int dst_nents = edesc->dst_nents ? : 1;
+ DEF_TALITOS2_DONE(4ch, TALITOS2_ISR_4CHDONE)
++DEF_TALITOS2_DONE(ch0, TALITOS2_ISR_CH_0_DONE)
+ DEF_TALITOS2_DONE(ch0_2, TALITOS2_ISR_CH_0_2_DONE)
+ DEF_TALITOS2_DONE(ch1_3, TALITOS2_ISR_CH_1_3_DONE)
  
- 		sg_pcopy_to_buffer(areq->dst, dst_nents, ctx->iv, ivsize,
-@@ -1156,6 +1159,9 @@ static int ipsec_esp(struct talitos_edesc *edesc, struct aead_request *areq,
- 	bool sync_needed = false;
- 	struct talitos_private *priv = dev_get_drvdata(dev);
- 	bool is_sec1 = has_ftr_sec1(priv);
-+	bool is_ipsec_esp = desc->hdr & DESC_HDR_TYPE_IPSEC_ESP;
-+	struct talitos_ptr *civ_ptr = &desc->ptr[is_ipsec_esp ? 2 : 3];
-+	struct talitos_ptr *ckey_ptr = &desc->ptr[is_ipsec_esp ? 3 : 2];
+@@ -3237,17 +3233,24 @@ static int talitos_probe(struct platform_device *ofdev)
+ 		goto err_out;
  
- 	/* hmac key */
- 	map_single_talitos_ptr(dev, &desc->ptr[0], ctx->authkeylen, &ctx->key,
-@@ -1180,20 +1186,12 @@ static int ipsec_esp(struct talitos_edesc *edesc, struct aead_request *areq,
- 	}
- 
- 	/* cipher iv */
--	if (desc->hdr & DESC_HDR_TYPE_IPSEC_ESP)
--		to_talitos_ptr(&desc->ptr[2], edesc->iv_dma, ivsize, is_sec1);
--	else
--		to_talitos_ptr(&desc->ptr[3], edesc->iv_dma, ivsize, is_sec1);
-+	to_talitos_ptr(civ_ptr, edesc->iv_dma, ivsize, is_sec1);
- 
- 	/* cipher key */
--	if (desc->hdr & DESC_HDR_TYPE_IPSEC_ESP)
--		map_single_talitos_ptr(dev, &desc->ptr[3], ctx->enckeylen,
--				       (char *)&ctx->key + ctx->authkeylen,
--				       DMA_TO_DEVICE);
--	else
--		map_single_talitos_ptr(dev, &desc->ptr[2], ctx->enckeylen,
--				       (char *)&ctx->key + ctx->authkeylen,
--				       DMA_TO_DEVICE);
-+	map_single_talitos_ptr(dev, ckey_ptr, ctx->enckeylen,
-+			       (char *)&ctx->key + ctx->authkeylen,
-+			       DMA_TO_DEVICE);
- 
- 	/*
- 	 * cipher in
-@@ -1203,10 +1201,10 @@ static int ipsec_esp(struct talitos_edesc *edesc, struct aead_request *areq,
- 	 */
- 	sg_link_tbl_len = cryptlen;
- 
--	if (desc->hdr & DESC_HDR_TYPE_IPSEC_ESP) {
-+	if (is_ipsec_esp) {
- 		to_talitos_ptr_ext_set(&desc->ptr[4], authsize, is_sec1);
- 
--		if (edesc->desc.hdr & DESC_HDR_MODE1_MDEU_CICV)
-+		if (desc->hdr & DESC_HDR_MODE1_MDEU_CICV)
- 			sg_link_tbl_len += authsize;
- 	}
- 
-@@ -1228,7 +1226,7 @@ static int ipsec_esp(struct talitos_edesc *edesc, struct aead_request *areq,
- 	ret = talitos_sg_map(dev, areq->dst, cryptlen, edesc, &desc->ptr[5],
- 			     sg_count, areq->assoclen, tbl_off);
- 
--	if (desc->hdr & DESC_HDR_TYPE_IPSEC_ESP)
-+	if (is_ipsec_esp)
- 		to_talitos_ptr_ext_or(&desc->ptr[5], authsize, is_sec1);
- 
- 	/* ICV data */
-@@ -1237,7 +1235,7 @@ static int ipsec_esp(struct talitos_edesc *edesc, struct aead_request *areq,
- 		edesc->icv_ool = true;
- 		sync_needed = true;
- 
--		if (desc->hdr & DESC_HDR_TYPE_IPSEC_ESP) {
-+		if (is_ipsec_esp) {
- 			struct talitos_ptr *tbl_ptr = &edesc->link_tbl[tbl_off];
- 			int offset = (edesc->src_nents + edesc->dst_nents + 2) *
- 				     sizeof(struct talitos_ptr) + authsize;
-@@ -1260,7 +1258,7 @@ static int ipsec_esp(struct talitos_edesc *edesc, struct aead_request *areq,
- 
- 			to_talitos_ptr(&desc->ptr[6], addr, authsize, is_sec1);
+ 	if (of_device_is_compatible(np, "fsl,sec1.0")) {
+-		tasklet_init(&priv->done_task[0], talitos1_done_4ch,
+-			     (unsigned long)dev);
+-	} else {
+-		if (!priv->irq[1]) {
+-			tasklet_init(&priv->done_task[0], talitos2_done_4ch,
++		if (priv->num_channels == 1)
++			tasklet_init(&priv->done_task[0], talitos1_done_ch0,
+ 				     (unsigned long)dev);
+-		} else {
++		else
++			tasklet_init(&priv->done_task[0], talitos1_done_4ch,
++				     (unsigned long)dev);
++	} else {
++		if (priv->irq[1]) {
+ 			tasklet_init(&priv->done_task[0], talitos2_done_ch0_2,
+ 				     (unsigned long)dev);
+ 			tasklet_init(&priv->done_task[1], talitos2_done_ch1_3,
+ 				     (unsigned long)dev);
++		} else if (priv->num_channels == 1) {
++			tasklet_init(&priv->done_task[0], talitos2_done_ch0,
++				     (unsigned long)dev);
++		} else {
++			tasklet_init(&priv->done_task[0], talitos2_done_4ch,
++				     (unsigned long)dev);
  		}
--	} else if (!(desc->hdr & DESC_HDR_TYPE_IPSEC_ESP)) {
-+	} else if (!is_ipsec_esp) {
- 		ret = talitos_sg_map(dev, areq->dst, authsize, edesc,
- 				     &desc->ptr[6], sg_count, areq->assoclen +
- 							      cryptlen,
-@@ -1277,7 +1275,7 @@ static int ipsec_esp(struct talitos_edesc *edesc, struct aead_request *areq,
  	}
  
- 	/* iv out */
--	if (desc->hdr & DESC_HDR_TYPE_IPSEC_ESP)
-+	if (is_ipsec_esp)
- 		map_single_talitos_ptr(dev, &desc->ptr[6], ivsize, ctx->iv,
- 				       DMA_FROM_DEVICE);
- 
+diff --git a/drivers/crypto/talitos.h b/drivers/crypto/talitos.h
+index 6112ff1fc334..2f04d83c3062 100644
+--- a/drivers/crypto/talitos.h
++++ b/drivers/crypto/talitos.h
+@@ -208,9 +208,13 @@ static inline bool has_ftr_sec1(struct talitos_private *priv)
+ #define TALITOS_ISR			0x1010  /* interrupt status register */
+ #define   TALITOS1_ISR_4CHERR		ISR1_FORMAT(0xa) /* 4 ch errors mask */
+ #define   TALITOS1_ISR_4CHDONE		ISR1_FORMAT(0x5) /* 4 ch done mask */
++#define   TALITOS1_ISR_CH_0_ERR		(2 << 28) /* ch 0 errors mask */
++#define   TALITOS1_ISR_CH_0_DONE	(1 << 28) /* ch 0 done mask */
+ #define   TALITOS1_ISR_TEA_ERR		0x00000040
+ #define   TALITOS2_ISR_4CHERR		ISR2_FORMAT(0xa) /* 4 ch errors mask */
+ #define   TALITOS2_ISR_4CHDONE		ISR2_FORMAT(0x5) /* 4 ch done mask */
++#define   TALITOS2_ISR_CH_0_ERR		2 /* ch 0 errors mask */
++#define   TALITOS2_ISR_CH_0_DONE	1 /* ch 0 done mask */
+ #define   TALITOS2_ISR_CH_0_2_ERR	ISR2_FORMAT(0x2) /* ch 0, 2 err mask */
+ #define   TALITOS2_ISR_CH_0_2_DONE	ISR2_FORMAT(0x1) /* ch 0, 2 done mask */
+ #define   TALITOS2_ISR_CH_1_3_ERR	ISR2_FORMAT(0x8) /* ch 1, 3 err mask */
 -- 
 2.13.3
