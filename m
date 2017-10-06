@@ -1,8 +1,7 @@
 From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH 16/18] crypto: talitos - do hw_context DMA mapping outside the
- requests
-Date: Fri,  6 Oct 2017 15:05:04 +0200 (CEST)
-Message-ID: <e47bf94ae44f23230b1647e31c9623f1075d3b79.1507284818.git.christophe.leroy@c-s.fr>
+Subject: [PATCH 13/18] crypto: talitos - remove to_talitos_ptr_len()
+Date: Fri,  6 Oct 2017 15:04:57 +0200 (CEST)
+Message-ID: <20ca74ad4fc3417744baa6ff34dd4c16a2a60506.1507284818.git.christophe.leroy@c-s.fr>
 References: <cover.1507284818.git.christophe.leroy@c-s.fr>
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         linuxppc-dev@lists.ozlabs.org
@@ -13,193 +12,162 @@ In-Reply-To: <cover.1507284818.git.christophe.leroy@c-s.fr>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-At every request, we map and unmap the same hash hw_context.
-
-This patch moves the dma mapping/unmapping in functions ahash_init()
-and ahash_import().
+to_talitos_ptr() and to_talitos_ptr_len() are always called together
+in order to fully set a ptr, so lets merge them into a single
+helper.
 
 Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 ---
- drivers/crypto/talitos.c | 80 ++++++++++++++++++++++++++++++++++--------------
- 1 file changed, 57 insertions(+), 23 deletions(-)
+ drivers/crypto/talitos.c | 56 ++++++++++++++++++------------------------------
+ 1 file changed, 21 insertions(+), 35 deletions(-)
 
 diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index ebfd6d982ed6..d495649d5267 100644
+index e7e1bada03df..7e96db75347a 100644
 --- a/drivers/crypto/talitos.c
 +++ b/drivers/crypto/talitos.c
-@@ -819,6 +819,7 @@ struct talitos_ctx {
- 	unsigned int keylen;
- 	unsigned int enckeylen;
- 	unsigned int authkeylen;
-+	dma_addr_t dma_hw_context;
- };
+@@ -56,28 +56,26 @@
+ #include "talitos.h"
  
- #define HASH_MAX_BLOCK_SIZE		SHA512_BLOCK_SIZE
-@@ -1663,18 +1664,9 @@ static void common_nonsnoop_hash_unmap(struct device *dev,
- 				       struct ahash_request *areq)
+ static void to_talitos_ptr(struct talitos_ptr *ptr, dma_addr_t dma_addr,
+-			   bool is_sec1)
++			   unsigned int len, bool is_sec1)
  {
- 	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
--	struct talitos_private *priv = dev_get_drvdata(dev);
--	bool is_sec1 = has_ftr_sec1(priv);
+ 	ptr->ptr = cpu_to_be32(lower_32_bits(dma_addr));
+-	if (!is_sec1)
++	if (is_sec1) {
++		ptr->len1 = cpu_to_be16(len);
++	} else {
++		ptr->len = cpu_to_be16(len);
+ 		ptr->eptr = upper_32_bits(dma_addr);
++	}
+ }
+ 
+ static void copy_talitos_ptr(struct talitos_ptr *dst_ptr,
+ 			     struct talitos_ptr *src_ptr, bool is_sec1)
+ {
+ 	dst_ptr->ptr = src_ptr->ptr;
+-	if (!is_sec1)
+-		dst_ptr->eptr = src_ptr->eptr;
+-}
 -
--	unmap_single_talitos_ptr(dev, &edesc->desc.ptr[5], DMA_FROM_DEVICE);
- 
- 	talitos_sg_unmap(dev, edesc, req_ctx->psrc, NULL, 0, 0);
- 
--	/* When using hashctx-in, must unmap it. */
--	if (from_talitos_ptr_len(&edesc->desc.ptr[1], is_sec1))
--		unmap_single_talitos_ptr(dev, &edesc->desc.ptr[1],
--					 DMA_TO_DEVICE);
--
- 	if (edesc->dma_len)
- 		dma_unmap_single(dev, edesc->dma_link_tbl, edesc->dma_len,
- 				 DMA_BIDIRECTIONAL);
-@@ -1744,10 +1736,8 @@ static int common_nonsnoop_hash(struct talitos_edesc *edesc,
- 
- 	/* hash context in */
- 	if (!req_ctx->first || req_ctx->swinit) {
--		map_single_talitos_ptr(dev, &desc->ptr[1],
--				       req_ctx->hw_context_size,
--				       (char *)req_ctx->hw_context,
--				       DMA_TO_DEVICE);
-+		to_talitos_ptr(&desc->ptr[1], ctx->dma_hw_context,
-+			       req_ctx->hw_context_size, is_sec1);
- 		req_ctx->swinit = 0;
+-static void to_talitos_ptr_len(struct talitos_ptr *ptr, unsigned int len,
+-			       bool is_sec1)
+-{
+ 	if (is_sec1) {
+-		ptr->len1 = cpu_to_be16(len);
++		dst_ptr->len1 = src_ptr->len1;
+ 	} else {
+-		ptr->len = cpu_to_be16(len);
++		dst_ptr->len = src_ptr->len;
++		dst_ptr->eptr = src_ptr->eptr;
  	}
- 	/* Indicate next op is not the first. */
-@@ -1780,9 +1770,8 @@ static int common_nonsnoop_hash(struct talitos_edesc *edesc,
- 				       crypto_ahash_digestsize(tfm),
- 				       areq->result, DMA_FROM_DEVICE);
- 	else
--		map_single_talitos_ptr(dev, &desc->ptr[5],
--				       req_ctx->hw_context_size,
--				       req_ctx->hw_context, DMA_FROM_DEVICE);
-+		to_talitos_ptr(&desc->ptr[5], ctx->dma_hw_context,
-+			       req_ctx->hw_context_size, is_sec1);
- 
- 	/* last DWORD empty */
- 
-@@ -1815,17 +1804,25 @@ static struct talitos_edesc *ahash_edesc_alloc(struct ahash_request *areq,
- static int ahash_init(struct ahash_request *areq)
- {
- 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
-+	struct talitos_ctx *ctx = crypto_ahash_ctx(tfm);
-+	struct device *dev = ctx->dev;
- 	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
-+	unsigned int size;
- 
- 	/* Initialize the context */
- 	req_ctx->nbuf = 0;
- 	req_ctx->first = 1; /* first indicates h/w must init its context */
- 	req_ctx->swinit = 0; /* assume h/w init of context */
--	req_ctx->hw_context_size =
--		(crypto_ahash_digestsize(tfm) <= SHA256_DIGEST_SIZE)
-+	size =	(crypto_ahash_digestsize(tfm) <= SHA256_DIGEST_SIZE)
- 			? TALITOS_MDEU_CONTEXT_SIZE_MD5_SHA1_SHA256
- 			: TALITOS_MDEU_CONTEXT_SIZE_SHA384_SHA512;
-+	req_ctx->hw_context_size = size;
- 
-+	if (ctx->dma_hw_context)
-+		dma_unmap_single(dev, ctx->dma_hw_context, size,
-+				 DMA_BIDIRECTIONAL);
-+	ctx->dma_hw_context = dma_map_single(dev, req_ctx->hw_context, size,
-+					     DMA_BIDIRECTIONAL);
- 	return 0;
  }
  
-@@ -1836,6 +1833,9 @@ static int ahash_init(struct ahash_request *areq)
- static int ahash_init_sha224_swinit(struct ahash_request *areq)
- {
- 	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
-+	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
-+	struct talitos_ctx *ctx = crypto_ahash_ctx(tfm);
-+	struct device *dev = ctx->dev;
+@@ -115,8 +113,7 @@ static void map_single_talitos_ptr(struct device *dev,
+ 	struct talitos_private *priv = dev_get_drvdata(dev);
+ 	bool is_sec1 = has_ftr_sec1(priv);
  
- 	ahash_init(areq);
- 	req_ctx->swinit = 1;/* prevent h/w initting context with sha256 values*/
-@@ -1853,6 +1853,9 @@ static int ahash_init_sha224_swinit(struct ahash_request *areq)
- 	req_ctx->hw_context[8] = 0;
- 	req_ctx->hw_context[9] = 0;
- 
-+	dma_sync_single_for_device(dev, ctx->dma_hw_context,
-+				   req_ctx->hw_context_size, DMA_TO_DEVICE);
-+
- 	return 0;
+-	to_talitos_ptr_len(ptr, len, is_sec1);
+-	to_talitos_ptr(ptr, dma_addr, is_sec1);
++	to_talitos_ptr(ptr, dma_addr, len, is_sec1);
  }
  
-@@ -1990,7 +1993,12 @@ static int ahash_export(struct ahash_request *areq, void *out)
- {
- 	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
- 	struct talitos_export_state *export = out;
-+	struct crypto_ahash *ahash = crypto_ahash_reqtfm(areq);
-+	struct talitos_ctx *ctx = crypto_ahash_ctx(ahash);
-+	struct device *dev = ctx->dev;
- 
-+	dma_sync_single_for_cpu(dev, ctx->dma_hw_context,
-+				req_ctx->hw_context_size, DMA_FROM_DEVICE);
- 	memcpy(export->hw_context, req_ctx->hw_context,
- 	       req_ctx->hw_context_size);
- 	memcpy(export->buf, req_ctx->buf, req_ctx->nbuf);
-@@ -2008,14 +2016,22 @@ static int ahash_import(struct ahash_request *areq, const void *in)
- 	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
- 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
- 	const struct talitos_export_state *export = in;
-+	unsigned int size;
-+	struct talitos_ctx *ctx = crypto_ahash_ctx(tfm);
-+	struct device *dev = ctx->dev;
- 
- 	memset(req_ctx, 0, sizeof(*req_ctx));
--	req_ctx->hw_context_size =
--		(crypto_ahash_digestsize(tfm) <= SHA256_DIGEST_SIZE)
-+	size = (crypto_ahash_digestsize(tfm) <= SHA256_DIGEST_SIZE)
- 			? TALITOS_MDEU_CONTEXT_SIZE_MD5_SHA1_SHA256
- 			: TALITOS_MDEU_CONTEXT_SIZE_SHA384_SHA512;
--	memcpy(req_ctx->hw_context, export->hw_context,
--	       req_ctx->hw_context_size);
-+	req_ctx->hw_context_size = size;
-+	if (ctx->dma_hw_context)
-+		dma_unmap_single(dev, ctx->dma_hw_context, size,
-+				 DMA_BIDIRECTIONAL);
-+
-+	memcpy(req_ctx->hw_context, export->hw_context, size);
-+	ctx->dma_hw_context = dma_map_single(dev, req_ctx->hw_context, size,
-+					     DMA_BIDIRECTIONAL);
- 	memcpy(req_ctx->buf, export->buf, export->nbuf);
- 	req_ctx->swinit = export->swinit;
- 	req_ctx->first = export->first;
-@@ -2954,6 +2970,24 @@ static void talitos_cra_exit(struct crypto_tfm *tfm)
- 		dma_unmap_single(dev, ctx->dma_key, ctx->keylen, DMA_TO_DEVICE);
- }
- 
-+static void talitos_cra_exit_ahash(struct crypto_tfm *tfm)
-+{
-+	struct talitos_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct device *dev = ctx->dev;
-+	unsigned int size;
-+
-+	talitos_cra_exit(tfm);
-+
-+	size = (crypto_ahash_digestsize(__crypto_ahash_cast(tfm)) <=
-+		SHA256_DIGEST_SIZE)
-+	       ? TALITOS_MDEU_CONTEXT_SIZE_MD5_SHA1_SHA256
-+	       : TALITOS_MDEU_CONTEXT_SIZE_SHA384_SHA512;
-+
-+	if (ctx->dma_hw_context)
-+		dma_unmap_single(dev, ctx->dma_hw_context, size,
-+				 DMA_BIDIRECTIONAL);
-+}
-+
  /*
-  * given the alg's descriptor header template, determine whether descriptor
-  * type and primary/secondary execution units required match the hw
-@@ -3052,7 +3086,7 @@ static struct talitos_crypto_alg *talitos_alg_alloc(struct device *dev,
- 	case CRYPTO_ALG_TYPE_AHASH:
- 		alg = &t_alg->algt.alg.hash.halg.base;
- 		alg->cra_init = talitos_cra_init_ahash;
--		alg->cra_exit = talitos_cra_exit;
-+		alg->cra_exit = talitos_cra_exit_ahash;
- 		alg->cra_type = &crypto_ahash_type;
- 		t_alg->algt.alg.hash.init = ahash_init;
- 		t_alg->algt.alg.hash.update = ahash_update;
+@@ -1090,8 +1087,7 @@ static int sg_to_link_tbl_offset(struct scatterlist *sg, int sg_count,
+ 			len = cryptlen;
+ 
+ 		to_talitos_ptr(link_tbl_ptr + count,
+-			       sg_dma_address(sg) + offset, 0);
+-		to_talitos_ptr_len(link_tbl_ptr + count, len, 0);
++			       sg_dma_address(sg) + offset, len, 0);
+ 		to_talitos_ptr_ext_set(link_tbl_ptr + count, 0, 0);
+ 		count++;
+ 		cryptlen -= len;
+@@ -1117,14 +1113,12 @@ static int talitos_sg_map(struct device *dev, struct scatterlist *src,
+ 	struct talitos_private *priv = dev_get_drvdata(dev);
+ 	bool is_sec1 = has_ftr_sec1(priv);
+ 
+-	to_talitos_ptr_len(ptr, len, is_sec1);
+-
+ 	if (sg_count == 1) {
+-		to_talitos_ptr(ptr, sg_dma_address(src) + offset, is_sec1);
++		to_talitos_ptr(ptr, sg_dma_address(src) + offset, len, is_sec1);
+ 		return sg_count;
+ 	}
+ 	if (is_sec1) {
+-		to_talitos_ptr(ptr, edesc->dma_link_tbl + offset, is_sec1);
++		to_talitos_ptr(ptr, edesc->dma_link_tbl + offset, len, is_sec1);
+ 		return sg_count;
+ 	}
+ 	sg_count = sg_to_link_tbl_offset(src, sg_count, offset, len,
+@@ -1135,7 +1129,7 @@ static int talitos_sg_map(struct device *dev, struct scatterlist *src,
+ 		return sg_count;
+ 	}
+ 	to_talitos_ptr(ptr, edesc->dma_link_tbl +
+-			    tbl_off * sizeof(struct talitos_ptr), is_sec1);
++			    tbl_off * sizeof(struct talitos_ptr), len, is_sec1);
+ 	to_talitos_ptr_ext_or(ptr, DESC_PTR_LNKTBL_JUMP, is_sec1);
+ 
+ 	return sg_count;
+@@ -1186,13 +1180,10 @@ static int ipsec_esp(struct talitos_edesc *edesc, struct aead_request *areq,
+ 	}
+ 
+ 	/* cipher iv */
+-	if (desc->hdr & DESC_HDR_TYPE_IPSEC_ESP) {
+-		to_talitos_ptr(&desc->ptr[2], edesc->iv_dma, is_sec1);
+-		to_talitos_ptr_len(&desc->ptr[2], ivsize, is_sec1);
+-	} else {
+-		to_talitos_ptr(&desc->ptr[3], edesc->iv_dma, is_sec1);
+-		to_talitos_ptr_len(&desc->ptr[3], ivsize, is_sec1);
+-	}
++	if (desc->hdr & DESC_HDR_TYPE_IPSEC_ESP)
++		to_talitos_ptr(&desc->ptr[2], edesc->iv_dma, ivsize, is_sec1);
++	else
++		to_talitos_ptr(&desc->ptr[3], edesc->iv_dma, ivsize, is_sec1);
+ 
+ 	/* cipher key */
+ 	if (desc->hdr & DESC_HDR_TYPE_IPSEC_ESP)
+@@ -1210,8 +1201,6 @@ static int ipsec_esp(struct talitos_edesc *edesc, struct aead_request *areq,
+ 	 * extent is bytes of HMAC postpended to ciphertext,
+ 	 * typically 12 for ipsec
+ 	 */
+-	to_talitos_ptr_len(&desc->ptr[4], cryptlen, is_sec1);
+-
+ 	sg_link_tbl_len = cryptlen;
+ 
+ 	if (desc->hdr & DESC_HDR_TYPE_IPSEC_ESP) {
+@@ -1257,11 +1246,10 @@ static int ipsec_esp(struct talitos_edesc *edesc, struct aead_request *areq,
+ 			to_talitos_ptr_ext_set(tbl_ptr - 1, 0, is_sec1);
+ 			to_talitos_ptr_ext_set(tbl_ptr, DESC_PTR_LNKTBL_RETURN,
+ 					       is_sec1);
+-			to_talitos_ptr_len(tbl_ptr, authsize, is_sec1);
+ 
+ 			/* icv data follows link tables */
+ 			to_talitos_ptr(tbl_ptr, edesc->dma_link_tbl + offset,
+-				       is_sec1);
++				       authsize, is_sec1);
+ 		} else {
+ 			dma_addr_t addr = edesc->dma_link_tbl;
+ 
+@@ -1270,8 +1258,7 @@ static int ipsec_esp(struct talitos_edesc *edesc, struct aead_request *areq,
+ 			else
+ 				addr += sizeof(struct talitos_ptr) * tbl_off;
+ 
+-			to_talitos_ptr(&desc->ptr[6], addr, is_sec1);
+-			to_talitos_ptr_len(&desc->ptr[6], authsize, is_sec1);
++			to_talitos_ptr(&desc->ptr[6], addr, authsize, is_sec1);
+ 		}
+ 	} else if (!(desc->hdr & DESC_HDR_TYPE_IPSEC_ESP)) {
+ 		ret = talitos_sg_map(dev, areq->dst, authsize, edesc,
+@@ -1567,8 +1554,7 @@ static int common_nonsnoop(struct talitos_edesc *edesc,
+ 	/* first DWORD empty */
+ 
+ 	/* cipher iv */
+-	to_talitos_ptr(&desc->ptr[1], edesc->iv_dma, is_sec1);
+-	to_talitos_ptr_len(&desc->ptr[1], ivsize, is_sec1);
++	to_talitos_ptr(&desc->ptr[1], edesc->iv_dma, ivsize, is_sec1);
+ 
+ 	/* cipher key */
+ 	map_single_talitos_ptr(dev, &desc->ptr[2], ctx->keylen,
 -- 
 2.13.3
