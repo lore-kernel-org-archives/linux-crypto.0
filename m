@@ -1,53 +1,100 @@
-From: Fabien DESSENNE <fabien.dessenne@st.com>
-Subject: Re: [PATCH v3 1/3] crypto: engine - permit to enqueue aead_request
-Date: Fri, 6 Oct 2017 09:26:07 +0000
-Message-ID: <9d89727b-f3cb-3322-6513-962e9df63ca8@st.com>
-References: <1503047946-27799-1-git-send-email-fabien.dessenne@st.com>
- <1503047946-27799-2-git-send-email-fabien.dessenne@st.com>
- <20170922090921.GA15677@gondor.apana.org.au>
- <20206811-7075-5ca9-98cd-26a5709751fb@st.com>
- <20171005033925.GA31996@gondor.apana.org.au>
+From: Pavel Machek <pavel@ucw.cz>
+Subject: Re: x86: PIE support and option to extend KASLR randomization
+Date: Fri, 6 Oct 2017 12:39:33 +0200
+Message-ID: <20171006103933.GA9497@amd>
+References: <CAJcbSZFTX3uiS2g8JriS6+z_+WrG8z3hrQo4OSuyHpiyUDJWYA@mail.gmail.com>
+ <20170815075609.mmzbfwritjzvrpsn@gmail.com>
+ <CAJcbSZE+TiY2whT94WqCJNXzR=2ATOHcQ10H5RqBZA1j=k1VHQ@mail.gmail.com>
+ <20170816151235.oamkdva6cwpc4cex@gmail.com>
+ <20170821133222.2ek6bhqgdeoymxsg@hirez.programming.kicks-ass.net>
+ <20170821142854.dmuusnbc2tsrai3v@hirez.programming.kicks-ass.net>
+ <c830ba59-65d3-187f-3868-732059269f28@zytor.com>
+ <20170923100029.6nzpui6c3ke76bbs@gmail.com>
+ <20170924223708.GA12616@amd>
+ <20170925073342.2yoghmanhx6c75ho@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Mark Rutland <mark.rutland@arm.com>,
- "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
- Alexandre TORGUE <alexandre.torgue@st.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- Lionel DEBIEVE <lionel.debieve@st.com>, Rob Herring <robh+dt@kernel.org>,
- Corentin Labbe <clabbe.montjoie@gmail.com>,
- "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Ludovic BARRE <ludovic.barre@st.com>, "David S . Miller" <davem@davemloft.net>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
- Benjamin GAIGNARD <benjamin.gaignard@st.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20171005033925.GA31996@gondor.apana.org.au>
-Content-Language: en-US
-Content-ID: <C0B609ED5768BF43A409E2B1F4009EE6@st.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="fUYQa+Pmc3FrFX/N"
+Cc: "H. Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>,
+	Thomas Garnier <thgarnie@google.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Josh Poimboeuf <jpoimboe@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
+	Matthias Kaehlcke <mka@chromium.org>,
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+	Juergen Gross <jgross@suse.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+	Joerg Roedel <joro@8bytes.org>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Andy Lutomirski <luto@kernel.org>, Borislav Petkov <bp@suse.de>,
+	Brian Gerst <brgerst@gmail.com>,
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+	"Rafael J . Wysocki" <rjw@rjwysocki.net>,
+	Len Brown <len.brown@intel.com>, Tejun Heo <tj@kernel.org>,
+	Christo
+To: Ingo Molnar <mingo@kernel.org>
+Return-path: <kernel-hardening-return-10092-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
+List-Post: <mailto:kernel-hardening@lists.openwall.com>
+List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
+List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
+List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
+Content-Disposition: inline
+In-Reply-To: <20170925073342.2yoghmanhx6c75ho@gmail.com>
 List-Id: linux-crypto.vger.kernel.org
 
-OK, I will send an initial version without the AEAD part.
 
+--fUYQa+Pmc3FrFX/N
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 05/10/17 05:39, Herbert Xu wrote:
-> On Tue, Oct 03, 2017 at 07:48:08AM +0000, Fabien DESSENNE wrote:
->> It looks like there is no more activity around this "crypto_engine
->> interface clean up" task.
->> This unfortunately has been blocking the introduction of this new STM32
->> crypto driver for 3 months now.
->> Would it make sense to have this driver reviewed first, and then
->> reworked (I expect minor update here) when the interface update is ready?
-> Hmm, is it possible to disable the AEAD part of the driver first?
->
-> Cheers,
+On Mon 2017-09-25 09:33:42, Ingo Molnar wrote:
+>=20
+> * Pavel Machek <pavel@ucw.cz> wrote:
+>=20
+> > > For example, there would be collision with regular user-space mapping=
+s, right?=20
+> > > Can local unprivileged users use mmap(MAP_FIXED) probing to figure ou=
+t where=20
+> > > the kernel lives?
+> >=20
+> > Local unpriviledged users can probably get your secret bits using cache=
+ probing=20
+> > and jump prediction buffers.
+> >=20
+> > Yes, you don't want to leak the information using mmap(MAP_FIXED), but =
+CPU will=20
+> > leak it for you, anyway.
+>=20
+> Depends on the CPU I think, and CPU vendors are busy trying to mitigate t=
+his=20
+> angle.
+
+I believe any x86 CPU running Linux will leak it. And with CPU vendors
+putting "artifical inteligence" into branch prediction, no, I don't
+think it is going to get better.
+
+That does not mean we shoudl not prevent mmap() info leak, but...
+
+									Pavel
+--=20
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
+g.html
+
+--fUYQa+Pmc3FrFX/N
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlnXXWUACgkQMOfwapXb+vLHdQCfT0gtt1DcnPzO7HUoTmQNbTIP
+73cAn2DmS20EcLXQtKA4VV7Dur1vaFqH
+=9iUT
+-----END PGP SIGNATURE-----
+
+--fUYQa+Pmc3FrFX/N--
