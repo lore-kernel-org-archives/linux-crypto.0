@@ -1,49 +1,45 @@
 From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH 00/18] crypto: talitos - fixes and performance improvement
-Date: Fri,  6 Oct 2017 15:04:31 +0200 (CEST)
-Message-ID: <cover.1507284818.git.christophe.leroy@c-s.fr>
+Subject: [PATCH 06/18] crypto: talitos - fix ctr-aes-talitos
+Date: Fri,  6 Oct 2017 15:04:43 +0200 (CEST)
+Message-ID: <16521c1a371ace21d7829c21aaef03c547959905.1507284818.git.christophe.leroy@c-s.fr>
+References: <cover.1507284818.git.christophe.leroy@c-s.fr>
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         linuxppc-dev@lists.ozlabs.org
 To: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <cover.1507284818.git.christophe.leroy@c-s.fr>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This serie fixes and improves the talitos crypto driver.
+ctr-aes-talitos test fails as follows on SEC2
 
-First 6 patchs are fixes of failures reported by the new tests in the
-kernel crypto test manager.
+[    0.837427] alg: skcipher: Test 1 failed (invalid result) on encryption for ctr-aes-talitos
+[    0.845763] 00000000: 16 36 d5 ee 34 f8 06 25 d7 7f 8e 56 ca 88 43 45
+[    0.852345] 00000010: f9 3f f7 17 2a b2 12 23 30 43 09 15 82 dd e1 97
+[    0.858940] 00000020: a7 f7 32 b5 eb 25 06 13 9a ec f5 29 25 f8 4d 66
+[    0.865366] 00000030: b0 03 5b 8e aa 9a 42 b6 19 33 8a e2 9d 65 96 95
 
-The 8 following patches are cleanups and simplifications.
+This patch fixes the descriptor type which is special for CTR AES
 
-The last 4 ones are performance improvement. The main improvement is
-in the one before the last, it divides by 2 the time needed for a md5
-hash on the SEC1.
+Fixes: 5e75ae1b3cef6 ("crypto: talitos - add new crypto modes")
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+---
+ drivers/crypto/talitos.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Christophe Leroy (18):
-  crypto: talitos - fix AEAD test failures
-  crypto: talitos - fix memory corruption on SEC2
-  crypto: talitos - fix setkey to check key weakness
-  crypto: talitos - fix AEAD for sha224 on non sha224 capable chips
-  crypto: talitos - fix use of sg_link_tbl_len
-  crypto: talitos - fix ctr-aes-talitos
-  crypto: talitos - zeroize the descriptor with memset()
-  crypto: talitos - declare local functions static
-  crypto: talitos - use devm_kmalloc()
-  crypto: talitos - use of_property_read_u32()
-  crypto: talitos - use devm_ioremap()
-  crypto: talitos - don't check the number of channels at each interrupt
-  crypto: talitos - remove to_talitos_ptr_len()
-  crypto: talitos - simplify tests in ipsec_esp()
-  crypto: talitos - DMA map key in setkey()
-  crypto: talitos - do hw_context DMA mapping outside the requests
-  crypto: talitos - chain in buffered data for ahash on SEC1
-  crypto: talitos - avoid useless copy
-
- drivers/crypto/talitos.c | 544 ++++++++++++++++++++++++++++++-----------------
- drivers/crypto/talitos.h |   7 +-
- 2 files changed, 356 insertions(+), 195 deletions(-)
-
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index cf5c9701b898..a19b5d0300a9 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -2635,7 +2635,7 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.ivsize = AES_BLOCK_SIZE,
+ 			}
+ 		},
+-		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
++		.desc_hdr_template = DESC_HDR_TYPE_AESU_CTR_NONSNOOP |
+ 				     DESC_HDR_SEL0_AESU |
+ 				     DESC_HDR_MODE0_AESU_CTR,
+ 	},
 -- 
 2.13.3
