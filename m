@@ -1,48 +1,101 @@
-From: Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH] iommu/vt-d: Fix scatterlist offset handling
-Date: Fri, 6 Oct 2017 16:43:09 +0200
-Message-ID: <20171006144309.GA30803@8bytes.org>
-References: <644c3e01654f8bd48d669c36e424959d6ef0e27e.1506607370.git.robin.murphy@arm.com>
- <1507035334.29211.105.camel@infradead.org>
- <db8c70d7-5978-20e8-d29a-91a4312f97dd@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: David Woodhouse <dwmw2@infradead.org>, ashok.raj@intel.com,
-        leedom@chelsio.com, Harsh@chelsio.com, herbert@gondor.apana.org.au,
-        iommu@lists.linux-foundation.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: Robin Murphy <robin.murphy@arm.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from 8bytes.org ([81.169.241.247]:39360 "EHLO theia.8bytes.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751491AbdJFOnL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 6 Oct 2017 10:43:11 -0400
-Content-Disposition: inline
-In-Reply-To: <db8c70d7-5978-20e8-d29a-91a4312f97dd@arm.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Romain Izard <romain.izard.pro@gmail.com>
+Subject: [PATCH] crypto: atmel-aes - properly set IV after {en,de}crypt
+Date: Fri,  6 Oct 2017 17:51:08 +0200
+Message-ID: <20171006155108.6581-1-romain.izard.pro@gmail.com>
+Cc: David Gstir <david@sigma-star.at>,
+        Nicolas Feignon <nicolas.feignon@mobile-devices.fr>,
+        Richard Weinberger <richard.weinberger@gmail.com>,
+        Cyrille Pitchen <cyrille.pitchen@microchip.com>,
+        linux-crypto@vger.kernel.org, linux-mtd@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        Romain Izard <romain.izard.pro@gmail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Oct 03, 2017 at 07:05:17PM +0100, Robin Murphy wrote:
-> Now, there are indeed plenty of drivers and subsystems which do work on
-> lists of explicitly single pages - anything doing some variant of
-> "addr = kmap_atomic(sg_page(sg)) + sg->offset;" is easy to spot - but I
-> don't think DMA API implementations are in a position to make any kind
-> of assumption; nearly all of them just shut up and handle sg->length
-> bytes from sg_phys(sg) without questioning the caller, and I reckon
-> that's exactly what they should be doing.
+Certain cipher modes like CTS expect the IV (req->info) of
+ablkcipher_request (or equivalently req->iv of skcipher_request) to
+contain the last ciphertext block when the {en,de}crypt operation is done.
 
-I agree with that, it is not explicitly forbidden to have an
-sg->offset > PAGE_SIZE and most IOMMU drivers handle this case.
+Fix this issue for the Atmel AES hardware engine. The tcrypt test
+case for cts(cbc(aes)) is now correctly passed.
 
-So this is a problem I'd like to see resolved in the VT-d driver too. If
-nobody comes up with a correct fix soon I'll apply this one and rip out
-the large-page support from __domain_mapping() to make it work.
+To handle the case of in-place decryption, copy the ciphertext in an
+intermediate buffer before decryption.
 
-Speaking of __domain_mapping(), this function is a big unmaintainable
-mess which should be split and rewritten. A clean and maintainable
-rewrite can alse re-add the large-page support.
+Signed-off-by: Romain Izard <romain.izard.pro@gmail.com>
+---
+ drivers/crypto/atmel-aes.c | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
-
-Regards,
-
-	Joerg
+diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
+index 29e20c37f3a6..f22300babb45 100644
+--- a/drivers/crypto/atmel-aes.c
++++ b/drivers/crypto/atmel-aes.c
+@@ -156,6 +156,7 @@ struct atmel_aes_authenc_ctx {
+ 
+ struct atmel_aes_reqctx {
+ 	unsigned long		mode;
++	u8			*backup_info;
+ };
+ 
+ #ifdef CONFIG_CRYPTO_DEV_ATMEL_AUTHENC
+@@ -496,6 +497,12 @@ static void atmel_aes_authenc_complete(struct atmel_aes_dev *dd, int err);
+ 
+ static inline int atmel_aes_complete(struct atmel_aes_dev *dd, int err)
+ {
++	struct ablkcipher_request *req = ablkcipher_request_cast(dd->areq);
++	struct crypto_ablkcipher *ablkcipher = crypto_ablkcipher_reqtfm(req);
++	struct atmel_aes_reqctx *rctx = ablkcipher_request_ctx(req);
++	int ivsize = crypto_ablkcipher_ivsize(ablkcipher);
++	bool enc = atmel_aes_is_encrypt(dd);
++
+ #ifdef CONFIG_CRYPTO_DEV_ATMEL_AUTHENC
+ 	atmel_aes_authenc_complete(dd, err);
+ #endif
+@@ -503,6 +510,15 @@ static inline int atmel_aes_complete(struct atmel_aes_dev *dd, int err)
+ 	clk_disable(dd->iclk);
+ 	dd->flags &= ~AES_FLAGS_BUSY;
+ 
++	if (enc) {
++		scatterwalk_map_and_copy(req->info, req->dst,
++					 req->nbytes - ivsize, ivsize, 0);
++	} else if (rctx->backup_info) {
++		memcpy(req->info, rctx->backup_info, ivsize);
++		kfree(rctx->backup_info);
++		rctx->backup_info = NULL;
++	}
++
+ 	if (dd->is_async)
+ 		dd->areq->complete(dd->areq, err);
+ 
+@@ -959,13 +975,25 @@ static int atmel_aes_transfer_complete(struct atmel_aes_dev *dd)
+ static int atmel_aes_start(struct atmel_aes_dev *dd)
+ {
+ 	struct ablkcipher_request *req = ablkcipher_request_cast(dd->areq);
++	struct crypto_ablkcipher *ablkcipher = crypto_ablkcipher_reqtfm(req);
+ 	struct atmel_aes_reqctx *rctx = ablkcipher_request_ctx(req);
++	int ivsize = crypto_ablkcipher_ivsize(ablkcipher);
++	bool enc = atmel_aes_is_encrypt(dd);
+ 	bool use_dma = (req->nbytes >= ATMEL_AES_DMA_THRESHOLD ||
+ 			dd->ctx->block_size != AES_BLOCK_SIZE);
+ 	int err;
+ 
+ 	atmel_aes_set_mode(dd, rctx);
+ 
++	if (!enc) {
++		rctx->backup_info = kzalloc(ivsize, GFP_KERNEL);
++		if (rctx->backup_info == NULL)
++			return atmel_aes_complete(dd, -ENOMEM);
++
++		scatterwalk_map_and_copy(rctx->backup_info, req->src,
++				 (req->nbytes - ivsize), ivsize, 0);
++	}
++
+ 	err = atmel_aes_hw_init(dd);
+ 	if (err)
+ 		return atmel_aes_complete(dd, err);
+-- 
+2.11.0
