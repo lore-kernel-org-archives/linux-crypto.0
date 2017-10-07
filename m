@@ -1,7 +1,7 @@
 From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: [Part2 PATCH v5.1 12.5/31] crypto: ccp: Implement SEV_PEK_GEN ioctl command
-Date: Fri,  6 Oct 2017 20:06:03 -0500
-Message-ID: <20171007010607.78088-5-brijesh.singh@amd.com>
+Subject: [Part2 PATCH v5.1 12.4/31] crypto: ccp: Implement SEV_PLATFORM_STATUS ioctl command
+Date: Fri,  6 Oct 2017 20:06:02 -0500
+Message-ID: <20171007010607.78088-4-brijesh.singh@amd.com>
 References: <20171004131412.13038-13-brijesh.singh@amd.com>
  <20171007010607.78088-1-brijesh.singh@amd.com>
 Mime-Version: 1.0
@@ -21,8 +21,9 @@ In-Reply-To: <20171007010607.78088-1-brijesh.singh@amd.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The SEV_PEK_GEN command is used to generate a new Platform Endorsement
-Key (PEK). The command is defined in SEV spec section 5.6.
+The SEV_PLATFORM_STATUS command can be used by the platform owner to
+get the current status of the platform. The command is defined in
+SEV spec section 5.5.
 
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: "Radim Krčmář" <rkrcmar@redhat.com>
@@ -35,19 +36,20 @@ Cc: kvm@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- drivers/crypto/ccp/psp-dev.c | 68 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 68 insertions(+)
+ drivers/crypto/ccp/psp-dev.c | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
 diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
-index d68303a06464..03d7bd03ad58 100644
+index 94a08c371bda..d68303a06464 100644
 --- a/drivers/crypto/ccp/psp-dev.c
 +++ b/drivers/crypto/ccp/psp-dev.c
-@@ -207,6 +207,70 @@ static int sev_ioctl_platform_status(struct sev_issue_cmd *argp)
+@@ -177,6 +177,36 @@ static int sev_handle_cmd(int cmd, void *data, int *psp_ret)
  	return ret;
  }
  
-+static int sev_platform_get_state(int *state, int *error)
++static int sev_ioctl_platform_status(struct sev_issue_cmd *argp)
 +{
++	struct sev_user_data_status out;
 +	struct sev_data_status *data;
 +	int ret;
 +
@@ -55,70 +57,35 @@ index d68303a06464..03d7bd03ad58 100644
 +	if (!data)
 +		return -ENOMEM;
 +
-+	ret = sev_handle_cmd(SEV_CMD_PLATFORM_STATUS, data, error);
-+	if (!ret)
-+		*state = data->state;
-+
-+	kfree(data);
-+	return ret;
-+}
-+
-+static int sev_firmware_init(int *error)
-+{
-+	struct sev_data_init *data;
-+	int rc;
-+
-+	data = kzalloc(sizeof(*data), GFP_KERNEL);
-+	if (!data)
-+		return -ENOMEM;
-+
-+	rc = sev_handle_cmd(SEV_CMD_INIT, data, error);
-+
-+	kfree(data);
-+	return rc;
-+}
-+
-+static int sev_ioctl_pek_gen(struct sev_issue_cmd *argp)
-+{
-+	int do_shutdown = 0;
-+	int ret, state;
-+
-+	/*
-+	 * PEK_GEN command can be issued only when firmware is in INIT state.
-+	 * If firmware is in UNINIT state then we transition it in INIT state
-+	 * and issue the command.
-+	 */
-+	ret = sev_platform_get_state(&state, &argp->error);
++	ret = sev_handle_cmd(SEV_CMD_PLATFORM_STATUS, data, &argp->error);
 +	if (ret)
-+		return ret;
++		goto e_free;
 +
-+	if (state == SEV_STATE_WORKING) {
-+		return -EBUSY;
-+	} else if (state == SEV_STATE_UNINIT) {
-+		ret = sev_firmware_init(&argp->error);
-+		if (ret)
-+			return ret;
++	out.api_major = data->api_major;
++	out.api_minor = data->api_minor;
++	out.state = data->state;
++	out.owner = data->owner;
++	out.config = data->config;
++	out.build = data->build;
++	out.guest_count = data->guest_count;
++	if (copy_to_user((void __user *)(uintptr_t) argp->data,
++			 &out, sizeof(struct sev_user_data_status)))
++		ret = -EFAULT;
 +
-+		do_shutdown = 1;
-+	}
-+
-+	ret = sev_handle_cmd(SEV_CMD_PEK_GEN, 0, &argp->error);
-+
-+	if (do_shutdown)
-+		sev_handle_cmd(SEV_CMD_SHUTDOWN, 0, NULL);
-+
++e_free:
++	kfree(data);
 +	return ret;
 +}
 +
  static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
  {
  	void __user *argp = (void __user *)arg;
-@@ -232,6 +296,10 @@ static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
- 		ret = sev_ioctl_platform_status(&input);
+@@ -198,6 +228,10 @@ static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
+ 		ret = sev_handle_cmd(SEV_CMD_FACTORY_RESET, 0, &input.error);
  		break;
  	}
-+	case SEV_PEK_GEN: {
-+		ret = sev_ioctl_pek_gen(&input);
++	case SEV_PLATFORM_STATUS: {
++		ret = sev_ioctl_platform_status(&input);
 +		break;
 +	}
  	default:
