@@ -1,7 +1,7 @@
 From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: [Part2 PATCH v5.1 12.8/31] crypto: ccp: Implement SEV_PEK_CERT_IMPORT ioctl command
-Date: Fri,  6 Oct 2017 20:06:06 -0500
-Message-ID: <20171007010607.78088-8-brijesh.singh@amd.com>
+Subject: [Part2 PATCH v5.1 12.5/31] crypto: ccp: Implement SEV_PEK_GEN ioctl command
+Date: Fri,  6 Oct 2017 20:06:03 -0500
+Message-ID: <20171007010607.78088-5-brijesh.singh@amd.com>
 References: <20171004131412.13038-13-brijesh.singh@amd.com>
  <20171007010607.78088-1-brijesh.singh@amd.com>
 Mime-Version: 1.0
@@ -21,8 +21,8 @@ In-Reply-To: <20171007010607.78088-1-brijesh.singh@amd.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The SEV_PEK_CERT_IMPORT command can be used to import the signed PEK
-certificate. The command is defined in SEV spec section 5.8.
+The SEV_PEK_GEN command is used to generate a new Platform Endorsement
+Key (PEK). The command is defined in SEV spec section 5.6.
 
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: "Radim Krčmář" <rkrcmar@redhat.com>
@@ -35,119 +35,90 @@ Cc: kvm@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- drivers/crypto/ccp/psp-dev.c | 97 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 97 insertions(+)
+ drivers/crypto/ccp/psp-dev.c | 68 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 68 insertions(+)
 
 diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
-index 8038ca7aef03..861c44bf2910 100644
+index d68303a06464..03d7bd03ad58 100644
 --- a/drivers/crypto/ccp/psp-dev.c
 +++ b/drivers/crypto/ccp/psp-dev.c
-@@ -380,6 +380,99 @@ static int sev_ioctl_pek_csr(struct sev_issue_cmd *argp)
+@@ -207,6 +207,70 @@ static int sev_ioctl_platform_status(struct sev_issue_cmd *argp)
  	return ret;
  }
  
-+static void *copy_user_blob(u64 __user uaddr, u32 len)
++static int sev_platform_get_state(int *state, int *error)
 +{
-+	void *data;
-+
-+	if (!uaddr || !len)
-+		return ERR_PTR(-EINVAL);
-+
-+	/* verify that blob length does not exceed our limit */
-+	if (len > SEV_FW_BLOB_MAX_SIZE)
-+		return ERR_PTR(-EINVAL);
-+
-+	data = kmalloc(len, GFP_KERNEL);
-+	if (!data)
-+		return ERR_PTR(-ENOMEM);
-+
-+	if (copy_from_user(data, (void __user *)(uintptr_t)uaddr, len))
-+		goto e_free;
-+
-+	return data;
-+
-+e_free:
-+	kfree(data);
-+	return ERR_PTR(-EFAULT);
-+}
-+
-+static int sev_ioctl_pek_cert_import(struct sev_issue_cmd *argp)
-+{
-+	struct sev_user_data_pek_cert_import input;
-+	struct sev_data_pek_cert_import *data;
-+	int ret, state, do_shutdown = 0;
-+	void *pek_blob, *oca_blob;
-+
-+	if (copy_from_user(&input, (void __user *)(uintptr_t) argp->data,
-+			   sizeof(struct sev_user_data_pek_cert_import)))
-+		return -EFAULT;
++	struct sev_data_status *data;
++	int ret;
 +
 +	data = kzalloc(sizeof(*data), GFP_KERNEL);
 +	if (!data)
 +		return -ENOMEM;
 +
-+	/* copy PEK certificate blobs from userspace */
-+	pek_blob = copy_user_blob(input.pek_cert_address, input.pek_cert_len);
-+	if (IS_ERR(pek_blob)) {
-+		ret = PTR_ERR(pek_blob);
-+		goto e_free;
-+	}
++	ret = sev_handle_cmd(SEV_CMD_PLATFORM_STATUS, data, error);
++	if (!ret)
++		*state = data->state;
 +
-+	data->pek_cert_address = __psp_pa(pek_blob);
-+	data->pek_cert_len = input.pek_cert_len;
++	kfree(data);
++	return ret;
++}
 +
-+	/* copy PEK certificate blobs from userspace */
-+	oca_blob = copy_user_blob(input.oca_cert_address, input.oca_cert_len);
-+	if (IS_ERR(oca_blob)) {
-+		ret = PTR_ERR(oca_blob);
-+		goto e_free_pek;
-+	}
++static int sev_firmware_init(int *error)
++{
++	struct sev_data_init *data;
++	int rc;
 +
-+	data->oca_cert_address = __psp_pa(oca_blob);
-+	data->oca_cert_len = input.oca_cert_len;
++	data = kzalloc(sizeof(*data), GFP_KERNEL);
++	if (!data)
++		return -ENOMEM;
 +
-+	ret = sev_platform_get_state(&state, &argp->error);
-+	if (ret)
-+		goto e_free_oca;
++	rc = sev_handle_cmd(SEV_CMD_INIT, data, error);
++
++	kfree(data);
++	return rc;
++}
++
++static int sev_ioctl_pek_gen(struct sev_issue_cmd *argp)
++{
++	int do_shutdown = 0;
++	int ret, state;
 +
 +	/*
-+	 * PEK_CERT_IMPORT command can be issued only when platform is in INIT
-+	 * state. If we are in UNINIT state then transition in INIT state
-+	 * before issuing the command.
++	 * PEK_GEN command can be issued only when firmware is in INIT state.
++	 * If firmware is in UNINIT state then we transition it in INIT state
++	 * and issue the command.
 +	 */
++	ret = sev_platform_get_state(&state, &argp->error);
++	if (ret)
++		return ret;
++
 +	if (state == SEV_STATE_WORKING) {
-+		ret = -EBUSY;
-+		goto e_free_oca;
++		return -EBUSY;
 +	} else if (state == SEV_STATE_UNINIT) {
 +		ret = sev_firmware_init(&argp->error);
 +		if (ret)
-+			goto e_free_oca;
++			return ret;
++
 +		do_shutdown = 1;
 +	}
 +
-+	ret = sev_handle_cmd(SEV_CMD_PEK_CERT_IMPORT, data, &argp->error);
++	ret = sev_handle_cmd(SEV_CMD_PEK_GEN, 0, &argp->error);
 +
 +	if (do_shutdown)
 +		sev_handle_cmd(SEV_CMD_SHUTDOWN, 0, NULL);
 +
-+e_free_oca:
-+	kfree(oca_blob);
-+e_free_pek:
-+	kfree(pek_blob);
-+e_free:
-+	kfree(data);
 +	return ret;
 +}
 +
  static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
  {
  	void __user *argp = (void __user *)arg;
-@@ -417,6 +510,10 @@ static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
- 		ret = sev_ioctl_pek_csr(&input);
+@@ -232,6 +296,10 @@ static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
+ 		ret = sev_ioctl_platform_status(&input);
  		break;
  	}
-+	case SEV_PEK_CERT_IMPORT: {
-+		ret = sev_ioctl_pek_cert_import(&input);
++	case SEV_PEK_GEN: {
++		ret = sev_ioctl_pek_gen(&input);
 +		break;
 +	}
  	default:
