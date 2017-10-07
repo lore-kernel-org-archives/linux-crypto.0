@@ -1,256 +1,95 @@
-From: Borislav Petkov <bp@suse.de>
-Subject: Re: [Part2 PATCH v5.1 12.1/31] crypto: ccp: Add Secure Encrypted
- Virtualization (SEV) command support
-Date: Sat, 7 Oct 2017 20:40:49 +0200
-Message-ID: <20171007184049.jrbxebb4jlciu3hj@pd.tnic>
-References: <20171004131412.13038-13-brijesh.singh@amd.com>
- <20171007010607.78088-1-brijesh.singh@amd.com>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: [ANNOUNCE] libkcapi v1.0.0 released
+Date: Sat, 07 Oct 2017 21:23:12 +0200
+Message-ID: <1581309.8npj5YphvV@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Gary Hook <gary.hook@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: Brijesh Singh <brijesh.singh@amd.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20171007010607.78088-1-brijesh.singh@amd.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:34734 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751251AbdJGTXQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 7 Oct 2017 15:23:16 -0400
+Received: from positron.chronox.de (50-255-10-49-static.hfc.comcastbusiness.net [50.255.10.49])
+        by mail.eperm.de (Postfix) with ESMTPA id 16DC818160CA
+        for <linux-crypto@vger.kernel.org>; Sat,  7 Oct 2017 21:23:14 +0200 (CEST)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Oct 06, 2017 at 08:05:59PM -0500, Brijesh Singh wrote:
-> AMD's new Secure Encrypted Virtualization (SEV) feature allows the
-> memory contents of virtual machines to be transparently encrypted with a
-> key unique to the VM. The programming and management of the encryption
-> keys are handled by the AMD Secure Processor (AMD-SP) which exposes the
-> commands for these tasks. The complete spec is available at:
-> 
-> http://support.amd.com/TechDocs/55766_SEV-KM%20API_Specification.pdf
-> 
-> Extend the AMD-SP driver to provide the following support:
-> 
->  - an in-kernel API to communicate with the SEV firmware. The API can be
->    used by the hypervisor to create encryption context for a SEV guest.
-> 
->  - a userspace IOCTL to manage the platform certificates.
-> 
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: "Radim Krčmář" <rkrcmar@redhat.com>
-> Cc: Borislav Petkov <bp@suse.de>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: Gary Hook <gary.hook@amd.com>
-> Cc: Tom Lendacky <thomas.lendacky@amd.com>
-> Cc: linux-crypto@vger.kernel.org
-> Cc: kvm@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Improvements-by: Borislav Petkov <bp@suse.de>
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
-> 
-> Based on Boris feedback split this patch in 9 logical patches, they are
-> numbers from 12.1 to 12.9.
-> 
->  drivers/crypto/ccp/psp-dev.c | 244 +++++++++++++++++++++++++++++++++++++++++++
->  drivers/crypto/ccp/psp-dev.h |  17 +++
->  include/linux/psp-sev.h      | 159 ++++++++++++++++++++++++++++
->  3 files changed, 420 insertions(+)
+Hi,
 
-A bunch of fixes ontop:
+The Linux kernel exports a network interface of type AF_ALG to allow user 
+space to utilize the kernel crypto API. libkcapi uses this network interface 
+and exports an easy to use API so that a developer does not need to consider 
+the low-level network interface handling. 
 
-* sev_fops_registered is superfluous if you can use psp->has_sev_fops
+The library does not implement any low level cipher algorithms. All consumer 
+requests are sent to the kernel for processing. Results from the kernel crypto 
+API are returned to the consumer via the library API.
 
-* s/sev_handle_cmd/sev_do_cmd/g - it really is sev_do_cmd(). "handle" is
-something else.
+The kernel interface and therefore this library can be used by unprivileged 
+processes. By using the convenience API functions, one API call performs one 
+complete cipher operation.
 
-* Flip misc dev reg logic in sev_ops_init()
+The library code archive also provides a drop-in replacement for the command 
+line tools of sha*sum, fipscheck/fipshmac and sha512hmac. It also contains 
+command line tools to use the hashing, symmetric ciphers and random number 
+generation on the command line.
 
-* PSP_P2CMSG needs arg eval
+The source code and the documentation is available at [1].
 
-* text streamlining
+[1] http://www.chronox.de/libkcapi.html
 
----
-diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
-index e9b776c3acb2..f0e0fc1fb512 100644
---- a/drivers/crypto/ccp/psp-dev.c
-+++ b/drivers/crypto/ccp/psp-dev.c
-@@ -31,7 +31,6 @@
- #define DEVICE_NAME	"sev"
- 
- static DEFINE_MUTEX(sev_cmd_mutex);
--static bool sev_fops_registered;
- 
- static struct psp_device *psp_alloc_struct(struct sp_device *sp)
- {
-@@ -121,7 +120,7 @@ static int sev_cmd_buffer_len(int cmd)
- 	return 0;
- }
- 
--static int sev_handle_cmd(int cmd, void *data, int *psp_ret)
-+static int sev_do_cmd(int cmd, void *data, int *psp_ret)
- {
- 	unsigned int phys_lsb, phys_msb;
- 	struct psp_device *psp;
-@@ -182,26 +181,26 @@ static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
- 	return -ENOTTY;
- }
- 
--const struct file_operations sev_fops = {
-+static const struct file_operations sev_fops = {
- 	.owner	= THIS_MODULE,
- 	.unlocked_ioctl = sev_ioctl,
- };
- 
- int sev_platform_init(struct sev_data_init *data, int *error)
- {
--	return sev_handle_cmd(SEV_CMD_INIT, data, error);
-+	return sev_do_cmd(SEV_CMD_INIT, data, error);
- }
- EXPORT_SYMBOL_GPL(sev_platform_init);
- 
- int sev_platform_shutdown(int *error)
- {
--	return sev_handle_cmd(SEV_CMD_SHUTDOWN, 0, error);
-+	return sev_do_cmd(SEV_CMD_SHUTDOWN, 0, error);
- }
- EXPORT_SYMBOL_GPL(sev_platform_shutdown);
- 
- int sev_platform_status(struct sev_data_status *data, int *error)
- {
--	return sev_handle_cmd(SEV_CMD_PLATFORM_STATUS, data, error);
-+	return sev_do_cmd(SEV_CMD_PLATFORM_STATUS, data, error);
- }
- EXPORT_SYMBOL_GPL(sev_platform_status);
- 
-@@ -211,58 +210,58 @@ int sev_issue_cmd_external_user(struct file *filep, unsigned int cmd,
- 	if (!filep || filep->f_op != &sev_fops)
- 		return -EBADF;
- 
--	return sev_handle_cmd(cmd, data, error);
-+	return sev_do_cmd(cmd, data, error);
- }
- EXPORT_SYMBOL_GPL(sev_issue_cmd_external_user);
- 
- int sev_guest_deactivate(struct sev_data_deactivate *data, int *error)
- {
--	return sev_handle_cmd(SEV_CMD_DEACTIVATE, data, error);
-+	return sev_do_cmd(SEV_CMD_DEACTIVATE, data, error);
- }
- EXPORT_SYMBOL_GPL(sev_guest_deactivate);
- 
- int sev_guest_activate(struct sev_data_activate *data, int *error)
- {
--	return sev_handle_cmd(SEV_CMD_ACTIVATE, data, error);
-+	return sev_do_cmd(SEV_CMD_ACTIVATE, data, error);
- }
- EXPORT_SYMBOL_GPL(sev_guest_activate);
- 
- int sev_guest_decommission(struct sev_data_decommission *data, int *error)
- {
--	return sev_handle_cmd(SEV_CMD_DECOMMISSION, data, error);
-+	return sev_do_cmd(SEV_CMD_DECOMMISSION, data, error);
- }
- EXPORT_SYMBOL_GPL(sev_guest_decommission);
- 
- int sev_guest_df_flush(int *error)
- {
--	return sev_handle_cmd(SEV_CMD_DF_FLUSH, 0, error);
-+	return sev_do_cmd(SEV_CMD_DF_FLUSH, 0, error);
- }
- EXPORT_SYMBOL_GPL(sev_guest_df_flush);
- 
- static int sev_ops_init(struct psp_device *psp)
- {
- 	struct miscdevice *misc = &psp->sev_misc;
--	int ret = 0;
-+	int ret;
- 
- 	/*
--	 * SEV feature support can be detected on the multiple devices but the
--	 * SEV FW commands must be issued on the master. During probe time we
--	 * do not know the master hence we create /dev/sev on the first device
--	 * probe. sev_handle_cmd() finds the right master device to when issuing
--	 * the command to the firmware.
-+	 * SEV feature support can be detected on multiple devices but the SEV
-+	 * FW commands must be issued on the master. During probe, we do not
-+	 * know the master hence we create /dev/sev on the first device probe.
-+	 * sev_do_cmd() finds the right master device to which to issue the
-+	 * command to the firmware.
- 	 */
--	if (!sev_fops_registered) {
--		misc->minor = MISC_DYNAMIC_MINOR;
--		misc->name = DEVICE_NAME;
--		misc->fops = &sev_fops;
--
--		ret = misc_register(misc);
--		if (!ret) {
--			sev_fops_registered = true;
--			psp->has_sev_fops = true;
--			init_waitqueue_head(&psp->sev_int_queue);
--			dev_info(psp->dev, "registered SEV device\n");
--		}
-+	if (psp->has_sev_fops)
-+		return 0;
-+
-+	misc->minor = MISC_DYNAMIC_MINOR;
-+	misc->name = DEVICE_NAME;
-+	misc->fops = &sev_fops;
-+
-+	ret = misc_register(misc);
-+	if (!ret) {
-+		psp->has_sev_fops = true;
-+		init_waitqueue_head(&psp->sev_int_queue);
-+		dev_info(psp->dev, "registered SEV device\n");
- 	}
- 
- 	return ret;
-diff --git a/drivers/crypto/ccp/psp-dev.h b/drivers/crypto/ccp/psp-dev.h
-index 6e8f83b41521..60a33f5ff79f 100644
---- a/drivers/crypto/ccp/psp-dev.h
-+++ b/drivers/crypto/ccp/psp-dev.h
-@@ -36,7 +36,7 @@
- #define PSP_CMDBUFF_ADDR_HI             PSP_C2PMSG(57)
- #define PSP_FEATURE_REG			PSP_C2PMSG(63)
- 
--#define PSP_P2CMSG(_num)		(_num << 2)
-+#define PSP_P2CMSG(_num)		((_num) << 2)
- #define PSP_CMD_COMPLETE_REG		1
- #define PSP_CMD_COMPLETE		PSP_P2CMSG(PSP_CMD_COMPLETE_REG)
- 
-diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-index 2b334fd853c9..10b843cce75f 100644
---- a/include/linux/psp-sev.h
-+++ b/include/linux/psp-sev.h
-@@ -512,8 +512,7 @@ struct sev_data_dbg {
- 	u32 len;				/* In */
- } __packed;
- 
--#if defined(CONFIG_CRYPTO_DEV_SP_PSP)
--
-+#ifdef CONFIG_CRYPTO_DEV_SP_PSP
- /**
-  * sev_platform_init - perform SEV INIT command
-  *
-@@ -562,9 +561,9 @@ int sev_platform_status(struct sev_data_status *status, int *error);
-  * sev_issue_cmd_external_user - issue SEV command by other driver with a file
-  * handle.
-  *
-- * The function can be used by other drivers to issue a SEV command on
-- * behalf by userspace. The caller must pass a valid SEV file descriptor
-- * so that we know that caller has access to SEV device.
-+ * This function can be used by other drivers to issue a SEV command on
-+ * behalf of userspace. The caller must pass a valid SEV file descriptor
-+ * so that we know that it has access to SEV device.
-  *
-  * @filep - SEV device file pointer
-  * @cmd - command to issue
+Changes 1.0.0
+ * Fix: Small compile fixes for new checks of GCC 7
+ * API Change: Rename all LOG_* enums to KCAPI_LOG_* to prevent namespace
+   poisoning
+ * Fix: soname and file name of library now compiles with
+   conventions (thanks to Marcus Meissner)
+ * Fix: kcapi-rng.c: unify FD/syscall read code and fix
+   __NR_getrandom resolution
+ * Enhancement: add kcapi-enc application to access symmetric encryption on
+   command line
+ * Fix: consolidate duplicate code in kcapi-hasher
+ * Enhancement: add kcapi-dgst application to access hashes on command line
+ * Enhancement: add kcapi-rng man page
+ * Enhancement: add kcapi-rng --hex command line option
+ * Fix: enable full symmetric AIO support
+ * Fix: consolidate all test code into test/ and invoke all tests
+   with test-invocation.sh
+ * Fix: fix memleaks in error code paths as reported by clang
+ * Fix: reduce memory footprint by rearranging data structures
+ * Fix: kcapi-hasher is now fully FIPS 140-2 compliant as it now
+   includes the integrity test for libkcapi.so
+ * Enhancement: Add speed tests for MV-CESA accelerated ciphers and hash
+   algorithms (thanks to Bastian Stender)
+ * Test Enhancement: add kcapi-enc-test-large.c test testing edge conditions
+   of AF_ALG
+ * Test Enhancement: add virttest.sh - use of test system based on
+   eudyptula-boot to test on linux-4.3.6, linux-4.4.86, linux-4.5, linux-4.7,
+   linux-4.10, linux-4.12
+ * Test Enhancement: add kcapi-fuzz-test.sh to support fuzzing the AF_ALG
+   interfaces
+ * Enhancement: add RPM SPEC file (tested with Fedora 26)
+ * API Change: replace --disable-lib-asym with --enable-lib-asym as the
+   algif_akcipher.c kernel interface is not likely to be added to the kernel
+   anytime soon
+ * API Enhancement: add KPP API which is not compiled by default, use
+   --enable-lib-kpp (the algif_kpp.c kernel interface is not likely to be
+   added to the Linux kernel any time soon)
+ * Test Enhancement: Add KPP tests
+ * Enhancement: Re-enable AIO support for symmetric and AEAD ciphers down to
+   Linux kernels 4.1 and 4.7, respectively. This is due to integrating a
+   fix against a kernel crash when using AIO.
+ * Fix: simply KDF code base
+ * API Enhancement: add message digest convenience functions kcapi_md_*sha*
+ * API Enhancement: add cipher convenience functions kcapi_cipher_*_aes_*
+ * API Enhancement: add rng convenience function kcapi_rng_get_bytes
+ * API Change: remove kcapi_aead_getdata, use kcapi_aead_getdata_input and
+   kcapi_aead_getdata_output instead
+ * API Change: remove kcapi_aead_outbuflen, use kcapi_aead_outbuflen_enc and
+   kcapi_aead_outbuflen_dec instead
 
--- 
-Regards/Gruss,
-    Boris.
-
-SUSE Linux GmbH, GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
--- 
+Ciao
+Stephan
