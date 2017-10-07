@@ -1,31 +1,36 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 02/10] drivers:crypto: return -ENOMEM on allocation
- failure.
-Date: Sat, 7 Oct 2017 12:21:14 +0800
-Message-ID: <20171007042114.GA30111@gondor.apana.org.au>
-References: <1505287939-14106-2-git-send-email-allen.lkml@gmail.com>
+Subject: Re: [PATCH] crypto: algboss: remove redundant setting of len to zero
+Date: Sat, 7 Oct 2017 12:36:33 +0800
+Message-ID: <20171007043633.GH29803@gondor.apana.org.au>
+References: <20170914180219.12994-1-colin.king@canonical.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, nouveau@lists.freedesktop.org,
-        linux-crypto@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        MPT-FusionLinux.pdl@broadcom.com, linux-scsi@vger.kernel.org,
-        netdev@vger.kernel.org, megaraidlinux.pdl@broadcom.com,
-        target-devel@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, allen.lkml@gmail.com
-To: Allen Pais <allen.lkml@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Colin King <colin.king@canonical.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:57428 "EHLO
+Received: from orcrist.hmeau.com ([104.223.48.154]:57482 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750765AbdJGEVk (ORCPT
+        with ESMTP id S1750750AbdJGEhB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 7 Oct 2017 00:21:40 -0400
+        Sat, 7 Oct 2017 00:37:01 -0400
 Content-Disposition: inline
-In-Reply-To: <1505287939-14106-2-git-send-email-allen.lkml@gmail.com>
+In-Reply-To: <20170914180219.12994-1-colin.king@canonical.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Allen Pais <allen.lkml@gmail.com> wrote:
-> Signed-off-by: Allen Pais <allen.lkml@gmail.com>
+On Thu, Sep 14, 2017 at 07:02:19PM +0100, Colin King wrote:
+> From: Colin Ian King <colin.king@canonical.com>
+> 
+> The variable len is set to zero, never read and then later updated
+> to p - name, so clearly the zero'ing of len is redundant and
+> can be removed.
+> 
+> Detected by clang scan-build:
+> " warning: Value stored to 'len' is never read"
+> 
+> Signed-off-by: Colin Ian King <colin.king@canonical.com>
 
 Patch applied.  Thanks.
 -- 
