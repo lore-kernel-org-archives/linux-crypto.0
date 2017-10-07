@@ -1,25 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: xts - Fix an error handling path in 'create()'
-Date: Sat, 7 Oct 2017 12:17:52 +0800
-Message-ID: <20171007041752.GA29803@gondor.apana.org.au>
-References: <20170926061744.31587-1-christophe.jaillet@wanadoo.fr>
+Subject: Re: [PATCH] crypto: ccp - unmap pages and remove unmap objects in
+ callback
+Date: Sat, 7 Oct 2017 12:18:20 +0800
+Message-ID: <20171007041820.GB29803@gondor.apana.org.au>
+References: <20170905220150.28464.76800.stgit@taos.amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org, thomas.lendacky@amd.com,
+        davem@davemloft.net
+To: Gary R Hook <gary.hook@amd.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:57356 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750921AbdJGESm (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 7 Oct 2017 00:18:42 -0400
 Content-Disposition: inline
-In-Reply-To: <20170926061744.31587-1-christophe.jaillet@wanadoo.fr>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20170905220150.28464.76800.stgit@taos.amd.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Sep 26, 2017 at 08:17:44AM +0200, Christophe JAILLET wrote:
-> All error handling paths 'goto err_drop_spawn' except this one.
-> In order to avoid some resources leak, we should do it as well here.
+On Tue, Sep 05, 2017 at 05:01:51PM -0500, Gary R Hook wrote:
+> From: amd <amd@sosxen2.amd.com>
 > 
-> Fixes: f1c131b45410 ("crypto: xts - Convert to skcipher")
-> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> Clean up the mapped pages and the unmap object once we are done with
+> it. This enables the final clean-up of the object once the transfer
+> is complete.
+> 
+> Signed-off-by: Gary R Hook <gary.hook@amd.com>
 
 Patch applied.  Thanks.
 -- 
