@@ -1,46 +1,33 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
 Subject: Re: [PATCH 1/2] crypto: skcipher - noop for enc/dec with NULL data
-Date: Sat, 7 Oct 2017 10:46:35 +0800
-Message-ID: <20171007024635.GB28489@gondor.apana.org.au>
-References: <3874163.dZU00zCVt8@positron.chronox.de>
- <1612247.TXa8PiMVpk@positron.chronox.de>
+Date: Sat, 07 Oct 2017 04:49:10 +0200
+Message-ID: <3683903.fccHZfxTmM@positron.chronox.de>
+References: <3874163.dZU00zCVt8@positron.chronox.de> <1612247.TXa8PiMVpk@positron.chronox.de> <20171007024635.GB28489@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
 Cc: linux-crypto@vger.kernel.org
-To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:57036 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751485AbdJGCqz (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 6 Oct 2017 22:46:55 -0400
-Content-Disposition: inline
-In-Reply-To: <1612247.TXa8PiMVpk@positron.chronox.de>
+Received: from mail.eperm.de ([89.247.134.16]:34718 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751485AbdJGCtY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 6 Oct 2017 22:49:24 -0400
+In-Reply-To: <20171007024635.GB28489@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Sep 24, 2017 at 08:24:58AM +0200, Stephan Müller wrote:
-> The encryption / decryption operation is a noop in case the caller
-> provides zero input data. As this noop is a "valid" operation, the API
-> calls will return no error, but simply skip any processing.
-> 
-> This fixes a kernel crash with authenc() ciphers and zero plaintext /
-> ciphertext that can be triggered via AF_ALG from unprivileged user
-> space.
-> 
-> Fixes: 7a7ffe65c8c5f ("crypto: skcipher - Add top-level skcipher
-> interface")
-> CC: Herbert Xu <herbert@gondor.apana.org.au>
-> CC: <stable@vger.kernel.org>
-> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+Am Samstag, 7. Oktober 2017, 04:46:35 CEST schrieb Herbert Xu:
 
-Hmm this just papers over bugs in the underlying code.  Which
-algorithm is causing the crash with a zero input? They're supposed
-to handle this case.
+Hi Herbert,
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> Hmm this just papers over bugs in the underlying code.  Which
+> algorithm is causing the crash with a zero input? They're supposed
+> to handle this case.
+
+The bug happens with authenc. It is surely possible to modify authenc. Yet I 
+thought that covering such issue at a central spot at least prevents similar 
+buts to be exploitable from userspace.
+
+Ciao
+Stephan
