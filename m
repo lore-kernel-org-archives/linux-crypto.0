@@ -1,82 +1,33 @@
-From: Harsh Jain <harsh@chelsio.com>
-Subject: [PATCH v2 2/7] crypto:chelsio: Check error code with IS_ERR macro
-Date: Sun,  8 Oct 2017 13:37:19 +0530
-Message-ID: <5bcbee612af4f7413a8785c3aa52e5febc130df5.1507449374.git.harsh@chelsio.com>
-References: <cover.1507010612.git.harsh@chelsio.com>
-Cc: Yeshaswi M R Gowda <yeshaswi@chelsio.com>,
-        Jitendra Lulla <jlulla@chelsio.com>,
-        Harsh Jain <harsh@chelsio.com>
-To: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        netdev@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from stargate.chelsio.com ([12.32.117.8]:41379 "EHLO
-        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751457AbdJHIHq (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 8 Oct 2017 04:07:46 -0400
-In-Reply-To: <cover.1507010612.git.harsh@chelsio.com>
-In-Reply-To: <cover.1507449374.git.harsh@chelsio.com>
-References: <cover.1507449374.git.harsh@chelsio.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Subject: [PATCH 0/2] crypto: lrw - Fixes for the 'create()' function
+Date: Sun,  8 Oct 2017 11:39:48 +0200
+Message-ID: <cover.1507445539.git.christophe.jaillet@wanadoo.fr>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-janitors@vger.kernel.org,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+To: herbert@gondor.apana.org.au, davem@davemloft.net
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-From: Yeshaswi M R Gowda <yeshaswi@chelsio.com>
+The first patch is the same as the one committed for crypto/xts.c applied a
+few days ago.
+(commit 5125e4e867ab ("crypto: xts - Fix an error handling path in 'create()'")
+in /git/herbert/crypto-2.6.git)
 
-Check and return proper error code.
+The 2nd one is a pure speculation from me.
+The create function in 'crypto/xts.c' and 'crypto/lrw.c' look very
+similar.
+However, there is one more sanity check in xts. This patch proposes to
+add the same test in lrw. Not sure at all if correct!
+I just send it for consistency.
 
-Signed-off-by: Jitendra Lulla <jlulla@chelsio.com>
-Signed-off-by: Harsh Jain <harsh@chelsio.com>
----
- drivers/crypto/chelsio/chcr_algo.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+Christophe JAILLET (2):
+  crypto: lrw - Fix an error handling path in 'create()'
+  crypto: lrw - Check for incorrect cipher name
 
-diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
-index bdb1014..e4bf32d 100644
---- a/drivers/crypto/chelsio/chcr_algo.c
-+++ b/drivers/crypto/chelsio/chcr_algo.c
-@@ -1455,8 +1455,8 @@ static int chcr_ahash_update(struct ahash_request *req)
- 	req_ctx->result = 0;
- 	req_ctx->data_len += params.sg_len + params.bfr_len;
- 	skb = create_hash_wr(req, &params);
--	if (!skb)
--		return -ENOMEM;
-+	if (IS_ERR(skb))
-+		return PTR_ERR(skb);
- 
- 	if (remainder) {
- 		u8 *temp;
-@@ -1519,8 +1519,8 @@ static int chcr_ahash_final(struct ahash_request *req)
- 		params.more = 0;
- 	}
- 	skb = create_hash_wr(req, &params);
--	if (!skb)
--		return -ENOMEM;
-+	if (IS_ERR(skb))
-+		return PTR_ERR(skb);
- 
- 	skb->dev = u_ctx->lldi.ports[0];
- 	set_wr_txq(skb, CPL_PRIORITY_DATA, ctx->tx_qidx);
-@@ -1570,8 +1570,8 @@ static int chcr_ahash_finup(struct ahash_request *req)
- 	}
- 
- 	skb = create_hash_wr(req, &params);
--	if (!skb)
--		return -ENOMEM;
-+	if (IS_ERR(skb))
-+		return PTR_ERR(skb);
- 
- 	skb->dev = u_ctx->lldi.ports[0];
- 	set_wr_txq(skb, CPL_PRIORITY_DATA, ctx->tx_qidx);
-@@ -1621,8 +1621,8 @@ static int chcr_ahash_digest(struct ahash_request *req)
- 	}
- 
- 	skb = create_hash_wr(req, &params);
--	if (!skb)
--		return -ENOMEM;
-+	if (IS_ERR(skb))
-+		return PTR_ERR(skb);
- 
- 	skb->dev = u_ctx->lldi.ports[0];
- 	set_wr_txq(skb, CPL_PRIORITY_DATA, ctx->tx_qidx);
+ crypto/lrw.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
 -- 
-2.1.4
+2.11.0
