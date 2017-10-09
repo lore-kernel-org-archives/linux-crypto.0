@@ -1,315 +1,58 @@
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Subject: [PATCH] crypto: tcrypt: mark expected switch fall-throughs in
- do_test()
-Date: Mon, 9 Oct 2017 14:43:21 -0500
-Message-ID: <20171009194321.GA10239@embeddedor.com>
+From: walter harms <wharms@bfs.de>
+Subject: Re: [PATCH 1/2] crypto: lrw - Fix an error handling path in 'create()'
+Date: Mon, 09 Oct 2017 23:22:36 +0200
+Message-ID: <59DBE89C.3090700@bfs.de>
+References: <cover.1507445539.git.christophe.jaillet@wanadoo.fr> <53e4cc621176b8aeeb58e493b133be853c66ef49.1507445539.git.christophe.jaillet@wanadoo.fr>
+Reply-To: wharms@bfs.de
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-janitors@vger.kernel.org
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
+In-Reply-To: <53e4cc621176b8aeeb58e493b133be853c66ef49.1507445539.git.christophe.jaillet@wanadoo.fr>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-In preparation to enabling -Wimplicit-fallthrough, mark switch cases
-where we are expecting to fall through.
 
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org
-Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
----
- crypto/tcrypt.c | 108 ++++++++++++++++++++++++++------------------------------
- 1 file changed, 51 insertions(+), 57 deletions(-)
 
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index a371c072..28bffa6 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -1606,119 +1606,116 @@ static int do_test(const char *alg, u32 type, u32 mask, int m)
- 				  speed_template_32);
- 		break;
- 
--
- 	case 300:
- 		if (alg) {
- 			test_hash_speed(alg, sec, generic_hash_speed_template);
- 			break;
- 		}
--
- 		/* fall through */
--
- 	case 301:
- 		test_hash_speed("md4", sec, generic_hash_speed_template);
- 		if (mode > 300 && mode < 400) break;
--
-+		/* fall through */
- 	case 302:
- 		test_hash_speed("md5", sec, generic_hash_speed_template);
- 		if (mode > 300 && mode < 400) break;
--
-+		/* fall through */
- 	case 303:
- 		test_hash_speed("sha1", sec, generic_hash_speed_template);
- 		if (mode > 300 && mode < 400) break;
--
-+		/* fall through */
- 	case 304:
- 		test_hash_speed("sha256", sec, generic_hash_speed_template);
- 		if (mode > 300 && mode < 400) break;
--
-+		/* fall through */
- 	case 305:
- 		test_hash_speed("sha384", sec, generic_hash_speed_template);
- 		if (mode > 300 && mode < 400) break;
--
-+		/* fall through */
- 	case 306:
- 		test_hash_speed("sha512", sec, generic_hash_speed_template);
- 		if (mode > 300 && mode < 400) break;
--
-+		/* fall through */
- 	case 307:
- 		test_hash_speed("wp256", sec, generic_hash_speed_template);
- 		if (mode > 300 && mode < 400) break;
--
-+		/* fall through */
- 	case 308:
- 		test_hash_speed("wp384", sec, generic_hash_speed_template);
- 		if (mode > 300 && mode < 400) break;
--
-+		/* fall through */
- 	case 309:
- 		test_hash_speed("wp512", sec, generic_hash_speed_template);
- 		if (mode > 300 && mode < 400) break;
--
-+		/* fall through */
- 	case 310:
- 		test_hash_speed("tgr128", sec, generic_hash_speed_template);
- 		if (mode > 300 && mode < 400) break;
--
-+		/* fall through */
- 	case 311:
- 		test_hash_speed("tgr160", sec, generic_hash_speed_template);
- 		if (mode > 300 && mode < 400) break;
--
-+		/* fall through */
- 	case 312:
- 		test_hash_speed("tgr192", sec, generic_hash_speed_template);
- 		if (mode > 300 && mode < 400) break;
--
-+		/* fall through */
- 	case 313:
- 		test_hash_speed("sha224", sec, generic_hash_speed_template);
- 		if (mode > 300 && mode < 400) break;
--
-+		/* fall through */
- 	case 314:
- 		test_hash_speed("rmd128", sec, generic_hash_speed_template);
- 		if (mode > 300 && mode < 400) break;
--
-+		/* fall through */
- 	case 315:
- 		test_hash_speed("rmd160", sec, generic_hash_speed_template);
- 		if (mode > 300 && mode < 400) break;
--
-+		/* fall through */
- 	case 316:
- 		test_hash_speed("rmd256", sec, generic_hash_speed_template);
- 		if (mode > 300 && mode < 400) break;
--
-+		/* fall through */
- 	case 317:
- 		test_hash_speed("rmd320", sec, generic_hash_speed_template);
- 		if (mode > 300 && mode < 400) break;
--
-+		/* fall through */
- 	case 318:
- 		test_hash_speed("ghash-generic", sec, hash_speed_template_16);
- 		if (mode > 300 && mode < 400) break;
--
-+		/* fall through */
- 	case 319:
- 		test_hash_speed("crc32c", sec, generic_hash_speed_template);
- 		if (mode > 300 && mode < 400) break;
--
-+		/* fall through */
- 	case 320:
- 		test_hash_speed("crct10dif", sec, generic_hash_speed_template);
- 		if (mode > 300 && mode < 400) break;
--
-+		/* fall through */
- 	case 321:
- 		test_hash_speed("poly1305", sec, poly1305_speed_template);
- 		if (mode > 300 && mode < 400) break;
--
-+		/* fall through */
- 	case 322:
- 		test_hash_speed("sha3-224", sec, generic_hash_speed_template);
- 		if (mode > 300 && mode < 400) break;
--
-+		/* fall through */
- 	case 323:
- 		test_hash_speed("sha3-256", sec, generic_hash_speed_template);
- 		if (mode > 300 && mode < 400) break;
--
-+		/* fall through */
- 	case 324:
- 		test_hash_speed("sha3-384", sec, generic_hash_speed_template);
- 		if (mode > 300 && mode < 400) break;
--
-+		/* fall through */
- 	case 325:
- 		test_hash_speed("sha3-512", sec, generic_hash_speed_template);
- 		if (mode > 300 && mode < 400) break;
--
-+		/* fall through */
- 	case 326:
- 		test_hash_speed("sm3", sec, generic_hash_speed_template);
- 		if (mode > 300 && mode < 400) break;
--
-+		/* fall through */
- 	case 399:
- 		break;
- 
-@@ -1727,110 +1724,107 @@ static int do_test(const char *alg, u32 type, u32 mask, int m)
- 			test_ahash_speed(alg, sec, generic_hash_speed_template);
- 			break;
- 		}
--
- 		/* fall through */
--
- 	case 401:
- 		test_ahash_speed("md4", sec, generic_hash_speed_template);
- 		if (mode > 400 && mode < 500) break;
--
-+		/* fall through */
- 	case 402:
- 		test_ahash_speed("md5", sec, generic_hash_speed_template);
- 		if (mode > 400 && mode < 500) break;
--
-+		/* fall through */
- 	case 403:
- 		test_ahash_speed("sha1", sec, generic_hash_speed_template);
- 		if (mode > 400 && mode < 500) break;
--
-+		/* fall through */
- 	case 404:
- 		test_ahash_speed("sha256", sec, generic_hash_speed_template);
- 		if (mode > 400 && mode < 500) break;
--
-+		/* fall through */
- 	case 405:
- 		test_ahash_speed("sha384", sec, generic_hash_speed_template);
- 		if (mode > 400 && mode < 500) break;
--
-+		/* fall through */
- 	case 406:
- 		test_ahash_speed("sha512", sec, generic_hash_speed_template);
- 		if (mode > 400 && mode < 500) break;
--
-+		/* fall through */
- 	case 407:
- 		test_ahash_speed("wp256", sec, generic_hash_speed_template);
- 		if (mode > 400 && mode < 500) break;
--
-+		/* fall through */
- 	case 408:
- 		test_ahash_speed("wp384", sec, generic_hash_speed_template);
- 		if (mode > 400 && mode < 500) break;
--
-+		/* fall through */
- 	case 409:
- 		test_ahash_speed("wp512", sec, generic_hash_speed_template);
- 		if (mode > 400 && mode < 500) break;
--
-+		/* fall through */
- 	case 410:
- 		test_ahash_speed("tgr128", sec, generic_hash_speed_template);
- 		if (mode > 400 && mode < 500) break;
--
-+		/* fall through */
- 	case 411:
- 		test_ahash_speed("tgr160", sec, generic_hash_speed_template);
- 		if (mode > 400 && mode < 500) break;
--
-+		/* fall through */
- 	case 412:
- 		test_ahash_speed("tgr192", sec, generic_hash_speed_template);
- 		if (mode > 400 && mode < 500) break;
--
-+		/* fall through */
- 	case 413:
- 		test_ahash_speed("sha224", sec, generic_hash_speed_template);
- 		if (mode > 400 && mode < 500) break;
--
-+		/* fall through */
- 	case 414:
- 		test_ahash_speed("rmd128", sec, generic_hash_speed_template);
- 		if (mode > 400 && mode < 500) break;
--
-+		/* fall through */
- 	case 415:
- 		test_ahash_speed("rmd160", sec, generic_hash_speed_template);
- 		if (mode > 400 && mode < 500) break;
--
-+		/* fall through */
- 	case 416:
- 		test_ahash_speed("rmd256", sec, generic_hash_speed_template);
- 		if (mode > 400 && mode < 500) break;
--
-+		/* fall through */
- 	case 417:
- 		test_ahash_speed("rmd320", sec, generic_hash_speed_template);
- 		if (mode > 400 && mode < 500) break;
--
-+		/* fall through */
- 	case 418:
- 		test_ahash_speed("sha3-224", sec, generic_hash_speed_template);
- 		if (mode > 400 && mode < 500) break;
--
-+		/* fall through */
- 	case 419:
- 		test_ahash_speed("sha3-256", sec, generic_hash_speed_template);
- 		if (mode > 400 && mode < 500) break;
--
-+		/* fall through */
- 	case 420:
- 		test_ahash_speed("sha3-384", sec, generic_hash_speed_template);
- 		if (mode > 400 && mode < 500) break;
--
--
-+		/* fall through */
- 	case 421:
- 		test_ahash_speed("sha3-512", sec, generic_hash_speed_template);
- 		if (mode > 400 && mode < 500) break;
--
-+		/* fall through */
- 	case 422:
- 		test_mb_ahash_speed("sha1", sec, generic_hash_speed_template);
- 		if (mode > 400 && mode < 500) break;
--
-+		/* fall through */
- 	case 423:
- 		test_mb_ahash_speed("sha256", sec, generic_hash_speed_template);
- 		if (mode > 400 && mode < 500) break;
--
-+		/* fall through */
- 	case 424:
- 		test_mb_ahash_speed("sha512", sec, generic_hash_speed_template);
- 		if (mode > 400 && mode < 500) break;
--
-+		/* fall through */
- 	case 425:
- 		test_mb_ahash_speed("sm3", sec, generic_hash_speed_template);
- 		if (mode > 400 && mode < 500) break;
--
-+		/* fall through */
- 	case 499:
- 		break;
- 
--- 
-2.7.4
+Am 08.10.2017 11:39, schrieb Christophe JAILLET:
+> All error handling paths 'goto err_drop_spawn' except this one.
+> In order to avoid some resources leak, we should do it as well here.
+> 
+> Fixes: 700cb3f5fe75 ("crypto: lrw - Convert to skcipher")
+> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> ---
+>  crypto/lrw.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/crypto/lrw.c b/crypto/lrw.c
+> index a8bfae4451bf..eb681e9fe574 100644
+> --- a/crypto/lrw.c
+> +++ b/crypto/lrw.c
+> @@ -610,8 +610,10 @@ static int create(struct crypto_template *tmpl, struct rtattr **tb)
+>  		ecb_name[len - 1] = 0;
+>  
+>  		if (snprintf(inst->alg.base.cra_name, CRYPTO_MAX_ALG_NAME,
+> -			     "lrw(%s)", ecb_name) >= CRYPTO_MAX_ALG_NAME)
+
+	this check can be done more easy,
+	the length of ecb_name is len
+	the length of inst->alg.base.cra_name is CRYPTO_MAX_ALG_NAME
+	if CRYPTO_MAX_ALG_NAME-len < "lrw()" < 5
+		no need to involve snprintf()
+
+	just my 2 cents
+	re,
+ 		wh
+
+> -			return -ENAMETOOLONG;
+> +			     "lrw(%s)", ecb_name) >= CRYPTO_MAX_ALG_NAME) {
+> +			err = -ENAMETOOLONG;
+> +			goto err_drop_spawn;
+> +		}
+>  	}
+>  
+>  	inst->alg.base.cra_flags = alg->base.cra_flags & CRYPTO_ALG_ASYNC;
