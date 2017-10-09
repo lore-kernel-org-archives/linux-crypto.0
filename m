@@ -1,85 +1,140 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [PATCH 1/2] crypto: skcipher - noop for enc/dec with NULL data
-Date: Mon, 09 Oct 2017 17:13:48 +0200
-Message-ID: <1629795.0592ersqdG@positron.chronox.de>
-References: <3874163.dZU00zCVt8@positron.chronox.de> <12183583.FhH6M9YiZ5@positron.chronox.de> <20171009141925.GA7592@gondor.apana.org.au>
+From: Borislav Petkov <bp@suse.de>
+Subject: Re: [Part2 PATCH v5.1 12.1/31] crypto: ccp: Add Secure Encrypted
+ Virtualization (SEV) command support
+Date: Mon, 9 Oct 2017 17:21:30 +0200
+Message-ID: <20171009152130.vo2lpwdvcs4lyb2l@pd.tnic>
+References: <20171004131412.13038-13-brijesh.singh@amd.com>
+ <20171007010607.78088-1-brijesh.singh@amd.com>
+ <20171007184049.jrbxebb4jlciu3hj@pd.tnic>
+ <c6ec79f7-5192-8ed3-4df3-260c09ceccb9@amd.com>
+ <20171008140019.flvyovgq2xpqdcoq@pd.tnic>
+ <7131ad30-6c07-16d5-8cfc-06d446a66dca@amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34822 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754649AbdJIPNw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 9 Oct 2017 11:13:52 -0400
-In-Reply-To: <20171009141925.GA7592@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Gary Hook <gary.hook@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Brijesh Singh <brijesh.singh@amd.com>
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <7131ad30-6c07-16d5-8cfc-06d446a66dca@amd.com>
+Sender: kvm-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Montag, 9. Oktober 2017, 16:19:25 CEST schrieb Herbert Xu:
-
-Hi Herbert,
-
-> On Sat, Oct 07, 2017 at 02:56:24PM +0200, Stephan M�ller wrote:
-> > Though, this opens up the shash issue I tried to fix.
+On Sun, Oct 08, 2017 at 07:11:04PM -0500, Brijesh Singh wrote:
+> There is a single security processor driver (ccp) which provides the
+> complete functionality including PSP.  But the driver should be able to
+> work with multiple devices. e.g In my 2P EPYC configuration, security
+> processor driver is used for the following devices
 > 
-> Does this patch fix the crash?
+> 02:00.2 Encryption controller: Advanced Micro Devices, Inc. [AMD] Device
+> 1456
 
-I get the following during boot:
+So we have a lot of drivers which claim more than one PCI device. It is
+not mandatory to have a driver per PCI device. Actually, the decisive
+argument is what is the easiest way to manage those devices and what
+makes the communication between them the easiest.
 
-[    1.042673] ------------[ cut here ]------------
-[    1.043208] kernel BUG at crypto/asymmetric_keys/public_key.c:96!
-[    1.044235] invalid opcode: 0000 [#1] SMP
-[    1.044661] Modules linked in:
-[    1.044964] CPU: 2 PID: 1 Comm: swapper/0 Not tainted 4.14.0-rc1+ #556
-[    1.045638] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 
-1.10.2-1.fc26 04/01/2014
-[    1.046397] task: ffff8ecefc880000 task.stack: ffffa776c031c000
-[    1.046943] RIP: 0010:public_key_verify_signature+0x25c/0x270
-[    1.047539] RSP: 0018:ffffa776c031fcd8 EFLAGS: 00010246
-[    1.047997] RAX: ffffffffa5cb1d5f RBX: ffff8eceb61f9780 RCX: 
-0000000000000000
-[    1.048618] RDX: ffff8eceb6169cc0 RSI: ffff8eceb6169cc0 RDI: 
-ffff8ecefc99be80
-[    1.049261] RBP: ffffa776c031fcf0 R08: 00000000000000c9 R09: 
-ffff8ecefd003800
-[    1.049870] R10: ffffc78580d88100 R11: 7fffffffffffffff R12: 
-0000000000000001
-[    1.050487] R13: ffff8eceb61fa2a0 R14: ffffffffa60c5870 R15: 
-0000000000000542
-[    1.051118] FS:  0000000000000000(0000) GS:ffff8eceffd00000(0000) knlGS:
-0000000000000000
-[    1.051805] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[    1.052295] CR2: 00007f89a5ee2000 CR3: 0000000036036004 CR4: 
-00000000003606e0
-[    1.052853] Call Trace:
-[    1.053069]  ? x509_check_for_self_signed+0x86/0xd0
-[    1.053446]  x509_cert_parse+0x15e/0x1c0
-[    1.053764]  x509_key_preparse+0x26/0x1e0
-[    1.054094]  asymmetric_key_preparse+0x5c/0xd0
-[    1.054438]  key_create_or_update+0x137/0x430
-[    1.054789]  ? set_debug_rodata+0x17/0x17
-[    1.055119]  load_system_certificate_list+0x99/0xfa
-[    1.055494]  ? system_trusted_keyring_init+0x66/0x66
-[    1.055890]  ? set_debug_rodata+0x17/0x17
-[    1.056221]  do_one_initcall+0x41/0x160
-[    1.056519]  kernel_init_freeable+0x173/0x201
-[    1.056867]  ? rest_init+0xb0/0xb0
-[    1.057161]  kernel_init+0xe/0x110
-[    1.057426]  ret_from_fork+0x25/0x30
-[    1.057714] Code: 40 00 85 c0 b8 7f ff ff ff 44 0f 45 f8 eb 8a 48 8d bd e0 
-fe ff ff e8 d4 ad 40 00 44 8b bd 00 ff ff ff e9 5a ff ff ff 0f 0b 0f 0b <0f> 
-0b 0f 0b 41 bf ea ff ff ff e9 7a ff ff ff 0f 1f 44 00 00 0f 
-[    1.059208] RIP: public_key_verify_signature+0x25c/0x270 RSP: 
-ffffa776c031fcd8
-[    1.059782] ---[ end trace 5363a8b61ab8b581 ]---
-[    1.060236] Kernel panic - not syncing: Attempted to kill init! 
-exitcode=0x0000000b
-[    1.060236] 
-[    1.061073] Kernel Offset: 0x24000000 from 0xffffffff81000000 (relocation 
-range: 0xffffffff80000000-0xffffffffbfffffff)
-[    1.061990] ---[ end Kernel panic - not syncing: Attempted to kill init! 
-exitcode=0x0000000b
-Ciao
-Stephan
+> 03:00.1 Encryption controller: Advanced Micro Devices, Inc. [AMD] Device
+> 1468
+> 13:00.2 Encryption controller: Advanced Micro Devices, Inc. [AMD] Device
+> 1456
+
+Btw, what do those PCI functions each do? Public PPR doesn't have them
+documented.
+
+> Some of the these devices support CCP only and some support both PSP and
+> CCP. It's possible that multiple devices support the PSP functionality
+> but only one of them is master which can be used for issuing SEV
+> commands. There isn't a register which we can read to determine whether
+> the device is master. We have to probe all the devices which supports
+> the PSP to determine which one of them is a master.
+
+Sure, and if you manage all the devices in a single driver, you can
+simply keep them all in a linked list or in an array and iterating over
+them is trivial.
+
+Because right now you have
+
+1. sp-pci.c::sp_pci_probe() execute upon the PCI device detection
+
+2. at some point, it does sp-dev.c::sp_init() which decides whether CCP or PSP
+
+3. If PSP, it calls pcp-dev.c::psp_dev_init() which gets that
+sp->dev_vdata->psp_vdata which is nothing more than a simple offset
+0x10500 which is where the PSP io regs are. For example, if this offset
+is hardcoded, why are we even passing that vdata? Just set psp->io_regs =
+0x10500. No need for all that passing of structs around.
+
+4. and finally, after that *whole* init has been done, you get to do
+->set_psp_master_device(sp);
+
+Or, you can save yourself all that jumping through hoops, merge sp-pci.c
+and sp-dev.c into a single sp.c and put *everything* sp-related into
+it. And then do the whole work of picking hw apart, detection and
+configuration in sp_pci_probe() and have helper functions preparing and
+configuring the device.
+
+At the end, it adds it to the list of devices sp.c manages and done. You
+actually have that list already:
+
+static LIST_HEAD(sp_units);
+
+in sp-dev.c.
+
+You don't need the set_master thing either - you simply set the
+sp_dev_master pointer inside sp.c
+
+sp_init() can then go and you can replace it with its function body,
+deciding whether it is a CCP or PSP and then call the respective
+function which is also in sp.c or ccp-dev.c
+
+And then all those separate compilation units and the interfaces between
+them disappear - you have only the calls into the PSP and that's it.
+
+Btw, the CCP thing could remain separate initially, I guess, with all
+that ccp-* stuff in there.
+
+> I was trying to follow the CCP  model -- in which sp-dev.c simply
+> forwards the call to ccp-dev.c which does the real work.
+
+And you don't really need that - you can do the real work directly in
+sp-dev.c or sp.c or whatever.
+
+> Currently, sev-dev.c contains barebone common code. IMO, keeping all
+> the PSP private functions and data structure outside the sp-dev.c/.h
+> is right thing.
+
+By this model probably, but it causes all that init and registration
+jump-through-hoops for no real reason. It is basically wasting cycles
+and energy.
+
+I'm all for splitting if it makes sense. But right now I don't see much
+sense in this - it is basically a bunch of small compilation units
+calling each other. And they could be merged into a single sp.c which
+does it all in one go, without a lot of blabla.
+
+> Additionally, I would like to highlight that if we decide to go with
+> moving all the PSP functionality in sp-dev.c then we have to add #ifdef
+> CONFIG_CRYPTO_DEV_SP_PSP because PSP feature depends on X86_66, whereas
+> the sp-dev.c gets compiled for all architectures (including aarch64,
+> i386 and x86_64).
+
+That's fine. You can build it on 32-bit but add to the init function
+
+	if (IS_ENABLED(CONFIG_X86_32))
+		return -ENODEV;
+
+and be done with it. No need for the ifdeffery.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+SUSE Linux GmbH, GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
+-- 
