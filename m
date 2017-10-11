@@ -1,87 +1,73 @@
-From: Thomas Garnier <thgarnie@google.com>
-Subject: [PATCH v1 18/27] kvm: Adapt assembly for PIE support
-Date: Wed, 11 Oct 2017 13:30:18 -0700
-Message-ID: <20171011203027.11248-19-thgarnie@google.com>
-References: <20171011203027.11248-1-thgarnie@google.com>
+From: Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [Part2 PATCH v5.1 12.4/31] crypto: ccp: Implement
+ SEV_PLATFORM_STATUS ioctl command
+Date: Wed, 11 Oct 2017 15:45:00 -0500
+Message-ID: <e3da0e38-b6e6-2db0-3adf-205f99c68808@amd.com>
+References: <20171004131412.13038-13-brijesh.singh@amd.com>
+ <20171007010607.78088-1-brijesh.singh@amd.com>
+ <20171007010607.78088-4-brijesh.singh@amd.com>
+ <20171011170205.qpu677qiqe4ludwm@pd.tnic>
+ <c75e2be7-117f-299b-2c83-7160f78cba7e@amd.com>
+ <20171011200444.3njniblsvxn2vhl6@pd.tnic>
+ <cd9e71bc-5187-fc88-ad80-4aa171370af6@amd.com>
+ <20171011202836.d3ur3ndrnea25ywi@pd.tnic>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: linux-arch@vger.kernel.org, kvm@vger.kernel.org, linux-pm@vger.kernel.org,
- x86@kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- virtualization@lists.linux-foundation.org, linux-sparse@vger.kernel.org,
- linux-crypto@vger.kernel.org, kernel-hardening@lists.openwall.com,
- xen-devel@lists.xenproject.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
- "David S . Miller" <davem@davemloft.net>,
- Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- "H . Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>,
- Josh Poimboeuf <jpoimboe@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
- Thomas Garnier <thgarnie@google.com>, Kees Cook <keescook@chromium.org>,
- Andrey Ryabinin <aryabinin@virtuozzo.com>,
- Matthias Kaehlcke <mka@chromium.org>,
- Tom Lendacky <thomas.lendacky@amd.com>, Andy Lutomirski <luto@kernel.org>,
- "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
- Borislav Petkov <bp@suse.de>, "Rafael J . Wysocki" <rjw@rjwysocki.net>,
- Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
- Juergen Gross <jgross@suse.com>, Chris Wright <chrisw@sous-sol.org>,
- Alok Kataria <akataria@vmware.com>, Rusty Russell <rusty@rustcorp.com.au>,
- Tejun Heo <tj@kernel.
-Return-path: <xen-devel-bounces@lists.xen.org>
-In-Reply-To: <20171011203027.11248-1-thgarnie@google.com>
-List-Unsubscribe: <https://lists.xen.org/cgi-bin/mailman/options/xen-devel>,
- <mailto:xen-devel-request@lists.xen.org?subject=unsubscribe>
-List-Post: <mailto:xen-devel@lists.xen.org>
-List-Help: <mailto:xen-devel-request@lists.xen.org?subject=help>
-List-Subscribe: <https://lists.xen.org/cgi-bin/mailman/listinfo/xen-devel>,
- <mailto:xen-devel-request@lists.xen.org?subject=subscribe>
-Errors-To: xen-devel-bounces@lists.xen.org
-Sender: "Xen-devel" <xen-devel-bounces@lists.xen.org>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: brijesh.singh@amd.com, Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Gary Hook <gary.hook@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Borislav Petkov <bp@suse.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-bn3nam01on0069.outbound.protection.outlook.com ([104.47.33.69]:61022
+        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751386AbdJKUpI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 11 Oct 2017 16:45:08 -0400
+In-Reply-To: <20171011202836.d3ur3ndrnea25ywi@pd.tnic>
+Content-Language: en-US
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Q2hhbmdlIHRoZSBhc3NlbWJseSBjb2RlIHRvIHVzZSBvbmx5IHJlbGF0aXZlIHJlZmVyZW5jZXMg
-b2Ygc3ltYm9scyBmb3IgdGhlCmtlcm5lbCB0byBiZSBQSUUgY29tcGF0aWJsZS4gVGhlIG5ldyBf
-X0FTTV9HRVRfUFRSX1BSRSBtYWNybyBpcyB1c2VkIHRvCmdldCB0aGUgYWRkcmVzcyBvZiBhIHN5
-bWJvbCBvbiBib3RoIDMyIGFuZCA2NC1iaXQgd2l0aCBQSUUgc3VwcG9ydC4KClBvc2l0aW9uIElu
-ZGVwZW5kZW50IEV4ZWN1dGFibGUgKFBJRSkgc3VwcG9ydCB3aWxsIGFsbG93IHRvIGV4dGVuZGVk
-IHRoZQpLQVNMUiByYW5kb21pemF0aW9uIHJhbmdlIGJlbG93IHRoZSAtMkcgbWVtb3J5IGxpbWl0
-LgoKU2lnbmVkLW9mZi1ieTogVGhvbWFzIEdhcm5pZXIgPHRoZ2FybmllQGdvb2dsZS5jb20+Ci0t
-LQogYXJjaC94ODYvaW5jbHVkZS9hc20va3ZtX2hvc3QuaCB8IDYgKysrKy0tCiBhcmNoL3g4Ni9r
-ZXJuZWwva3ZtLmMgICAgICAgICAgIHwgNiArKysrLS0KIGFyY2gveDg2L2t2bS9zdm0uYyAgICAg
-ICAgICAgICAgfCA0ICsrLS0KIDMgZmlsZXMgY2hhbmdlZCwgMTAgaW5zZXJ0aW9ucygrKSwgNiBk
-ZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9hcmNoL3g4Ni9pbmNsdWRlL2FzbS9rdm1faG9zdC5o
-IGIvYXJjaC94ODYvaW5jbHVkZS9hc20va3ZtX2hvc3QuaAppbmRleCA5ZDdkODU2YjJkODkuLjE0
-MDczZmRhNzVmYiAxMDA2NDQKLS0tIGEvYXJjaC94ODYvaW5jbHVkZS9hc20va3ZtX2hvc3QuaAor
-KysgYi9hcmNoL3g4Ni9pbmNsdWRlL2FzbS9rdm1faG9zdC5oCkBAIC0xMzQyLDkgKzEzNDIsMTEg
-QEAgYXNtbGlua2FnZSB2b2lkIGt2bV9zcHVyaW91c19mYXVsdCh2b2lkKTsKIAkiLnB1c2hzZWN0
-aW9uIC5maXh1cCwgXCJheFwiIFxuIiBcCiAJIjY2NzogXG5cdCIgXAogCWNsZWFudXBfaW5zbiAi
-XG5cdCIJCSAgICAgIFwKLQkiY21wYiAkMCwga3ZtX3JlYm9vdGluZyBcblx0IgkgICAgICBcCisJ
-ImNtcGIgJDAsIGt2bV9yZWJvb3RpbmciIF9fQVNNX1NFTCgsKCUlcmlwKSkgIiBcblx0IiBcCiAJ
-ImpuZSA2NjhiIFxuXHQiICAgICAgCQkgICAgICBcCi0JX19BU01fU0laRShwdXNoKSAiICQ2NjZi
-IFxuXHQiCSAgICAgIFwKKwlfX0FTTV9TSVpFKHB1c2gpICIlJSIgX0FTTV9BWCAiIFxuXHQiCQlc
-CisJX19BU01fR0VUX1BUUl9QUkUoNjY2YikgIiUlIiBfQVNNX0FYICJcblx0IglcCisJInhjaGcg
-JSUiIF9BU01fQVggIiwgKCUlIiBfQVNNX1NQICIpIFxuXHQiCVwKIAkiY2FsbCBrdm1fc3B1cmlv
-dXNfZmF1bHQgXG5cdCIJICAgICAgXAogCSIucG9wc2VjdGlvbiBcblx0IiBcCiAJX0FTTV9FWFRB
-QkxFKDY2NmIsIDY2N2IpCmRpZmYgLS1naXQgYS9hcmNoL3g4Ni9rZXJuZWwva3ZtLmMgYi9hcmNo
-L3g4Ni9rZXJuZWwva3ZtLmMKaW5kZXggOGJiOTU5NGQwNzYxLi40NDY0YzM2Njc4MzEgMTAwNjQ0
-Ci0tLSBhL2FyY2gveDg2L2tlcm5lbC9rdm0uYworKysgYi9hcmNoL3g4Ni9rZXJuZWwva3ZtLmMK
-QEAgLTYyNyw4ICs2MjcsMTAgQEAgYXNtKAogIi5nbG9iYWwgX19yYXdfY2FsbGVlX3NhdmVfX19r
-dm1fdmNwdV9pc19wcmVlbXB0ZWQ7IgogIi50eXBlIF9fcmF3X2NhbGxlZV9zYXZlX19fa3ZtX3Zj
-cHVfaXNfcHJlZW1wdGVkLCBAZnVuY3Rpb247IgogIl9fcmF3X2NhbGxlZV9zYXZlX19fa3ZtX3Zj
-cHVfaXNfcHJlZW1wdGVkOiIKLSJtb3ZxCV9fcGVyX2NwdV9vZmZzZXQoLCVyZGksOCksICVyYXg7
-IgotImNtcGIJJDAsICIgX19zdHJpbmdpZnkoS1ZNX1NURUFMX1RJTUVfcHJlZW1wdGVkKSAiK3N0
-ZWFsX3RpbWUoJXJheCk7IgorImxlYXEJX19wZXJfY3B1X29mZnNldCglcmlwKSwgJXJheDsiCisi
-bW92cQkoJXJheCwlcmRpLDgpLCAlcmF4OyIKKyJhZGRxCSIgX19zdHJpbmdpZnkoS1ZNX1NURUFM
-X1RJTUVfcHJlZW1wdGVkKSAiK3N0ZWFsX3RpbWUoJXJpcCksICVyYXg7IgorImNtcGIJJDAsICgl
-cmF4KTsiCiAic2V0bmUJJWFsOyIKICJyZXQ7IgogIi5wb3BzZWN0aW9uIik7CmRpZmYgLS1naXQg
-YS9hcmNoL3g4Ni9rdm0vc3ZtLmMgYi9hcmNoL3g4Ni9rdm0vc3ZtLmMKaW5kZXggMGU2OGYwYjNj
-YmY3Li4zNjQ1MzYwODA0MzggMTAwNjQ0Ci0tLSBhL2FyY2gveDg2L2t2bS9zdm0uYworKysgYi9h
-cmNoL3g4Ni9rdm0vc3ZtLmMKQEAgLTU2OCwxMiArNTY4LDEyIEBAIHN0YXRpYyB1MzIgc3ZtX21z
-cnBtX29mZnNldCh1MzIgbXNyKQogCiBzdGF0aWMgaW5saW5lIHZvaWQgY2xnaSh2b2lkKQogewot
-CWFzbSB2b2xhdGlsZSAoX19leChTVk1fQ0xHSSkpOworCWFzbSB2b2xhdGlsZSAoX19leChTVk1f
-Q0xHSSkgOiA6KTsKIH0KIAogc3RhdGljIGlubGluZSB2b2lkIHN0Z2kodm9pZCkKIHsKLQlhc20g
-dm9sYXRpbGUgKF9fZXgoU1ZNX1NUR0kpKTsKKwlhc20gdm9sYXRpbGUgKF9fZXgoU1ZNX1NUR0kp
-IDogOik7CiB9CiAKIHN0YXRpYyBpbmxpbmUgdm9pZCBpbnZscGdhKHVuc2lnbmVkIGxvbmcgYWRk
-ciwgdTMyIGFzaWQpCi0tIAoyLjE1LjAucmMwLjI3MS5nMzZiNjY5ZWRjYy1nb29nCgoKX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KWGVuLWRldmVsIG1haWxp
-bmcgbGlzdApYZW4tZGV2ZWxAbGlzdHMueGVuLm9yZwpodHRwczovL2xpc3RzLnhlbi5vcmcveGVu
-LWRldmVsCg==
+
+
+On 10/11/2017 03:28 PM, Borislav Petkov wrote:
+> On Wed, Oct 11, 2017 at 03:10:49PM -0500, Brijesh Singh wrote:
+>> The current 'struct sev_data_status' matches with the firmware names and the
+>> bit fields. Only thing I did was the fields with no name is called as
+>> "reservedX"
+> 
+> Ok, I see it. So what you actually wanna do is:
+> 
+> struct sev_data_status {
+>          u8 api_major;                           /* Out */
+>          u8 api_minor;                           /* Out */
+>          u8 state;                               /* Out */
+>          u8 flags;                               /* Out */
+>          u32 config;                             /* Out */
+>          u32 guest_count;                        /* Out */
+> } __packed;
+> 
+
+OK, if userspace is going to pick bits apart then how about this:
+
+  struct sev_data_status {
+          u8 api_major;                           /* Out */
+          u8 api_minor;                           /* Out */
+          u8 state;                               /* Out */
+          u32 flags;                              /* Out */
+          u8 build;                               /* Out */
+          u32 guest_count;                        /* Out */
+  } __packed;
+
+> 
+> Makes sense?
+> 
+
+Please let me know if you are okay with my above structure.
+
+-Brijesh
