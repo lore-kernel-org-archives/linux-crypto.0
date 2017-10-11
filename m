@@ -1,44 +1,59 @@
-From: =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>
-Subject: crypto API - async semantics
-Date: Wed, 11 Oct 2017 12:36:11 +0000
-Message-ID: <VI1PR0402MB3342DCCE076721CFD172C5FC984A0@VI1PR0402MB3342.eurprd04.prod.outlook.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Boris Brezillon <boris.brezillon@free-electrons.com>
+Subject: [PATCH 1/3] crypto: marvell - Add a platform_device_id table
+Date: Wed, 11 Oct 2017 15:16:17 +0200
+Message-ID: <20171011131619.30196-2-boris.brezillon@free-electrons.com>
+References: <20171011131619.30196-1-boris.brezillon@free-electrons.com>
+Cc: Russell King <linux@armlinux.org.uk>,
+        Arnaud Ebalard <arno@natisbad.org>,
+        Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+        Gregory CLEMENT <gregory.clement@free-electrons.com>,
+        Jason Cooper <jason@lakedaemon.net>,
+        Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+        Andrew Lunn <andrew@lunn.ch>,
+        Boris Brezillon <boris.brezillon@free-electrons.com>
+To: Arnd Bergmann <arnd@arndb.de>, Olof Johansson <olof@lixom.net>,
+        Kevin Hilman <khilman@kernel.org>,
+        linux-arm-kernel@lists.infradead.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ve1eur01on0048.outbound.protection.outlook.com ([104.47.1.48]:2176
-        "EHLO EUR01-VE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752006AbdJKMgN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 11 Oct 2017 08:36:13 -0400
-Content-Language: en-US
+Received: from mail.free-electrons.com ([62.4.15.54]:60306 "EHLO
+        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1757485AbdJKNQX (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 11 Oct 2017 09:16:23 -0400
+In-Reply-To: <20171011131619.30196-1-boris.brezillon@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,=0A=
-=0A=
-I am evaluating whether ahash implementation in caam crypto driver=0A=
-behaves correctly.=0A=
-One thing I've noticed is that for each ahash tfm there is support for=0A=
-at most two in-flight requests, and I would like to know whether this is=0A=
-an issue or not.=0A=
-=0A=
-In this context, could you please clarify whether your previous answer:=0A=
-https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg04029.html=0A=
-> If any async operation returns EINPROGRESS, the client must not=0A=
-> proceed until that operation has completed.=0A=
-refers only to ahash operations OR to any crypto API async operation?=0A=
-IIUC this would be equivalent to saying that crypto API allows only for=0A=
-one in-flight request per tfm, correct?=0A=
-=0A=
-If your answer applies to any async operation, then I see at least one=0A=
-in-kernel user not complying with the rule - dm-crypt.=0A=
-=0A=
-Does it actually apply to ahash and, generalizing, to any algorithm for=0A=
-which chunking is inherently serial (each crypto request having a data=0A=
-dependency on previous request)?=0A=
-=0A=
-Thanks,=0A=
-Horia=0A=
+Add a platform_device_id table to allow using this driver on orion
+platforms that have not been converted to DT.
+
+Signed-off-by: Boris Brezillon <boris.brezillon@free-electrons.com>
+---
+ drivers/crypto/marvell/cesa.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/drivers/crypto/marvell/cesa.c b/drivers/crypto/marvell/cesa.c
+index 6e7a5c77a00a..c14674c6c11d 100644
+--- a/drivers/crypto/marvell/cesa.c
++++ b/drivers/crypto/marvell/cesa.c
+@@ -599,9 +599,15 @@ static int mv_cesa_remove(struct platform_device *pdev)
+ 	return 0;
+ }
+ 
++static const struct platform_device_id mv_cesa_plat_id_table[] = {
++	{ .name = "mv_crypto" },
++};
++MODULE_DEVICE_TABLE(platform, mv_cesa_plat_id_table);
++
+ static struct platform_driver marvell_cesa = {
+ 	.probe		= mv_cesa_probe,
+ 	.remove		= mv_cesa_remove,
++	.id_table	= mv_cesa_plat_id_table,
+ 	.driver		= {
+ 		.name	= "marvell-cesa",
+ 		.of_match_table = mv_cesa_of_match_table,
+-- 
+2.11.0
