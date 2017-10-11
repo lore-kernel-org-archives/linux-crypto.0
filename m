@@ -1,567 +1,123 @@
-From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: [Part2 PATCH v5.2 12.2/31] crypto: ccp: Add Secure Encrypted Virtualization (SEV) command support
-Date: Wed, 11 Oct 2017 11:50:30 -0500
-Message-ID: <20171011165030.115696-1-brijesh.singh@amd.com>
-References: <20171007010607.78088-1-brijesh.singh@amd.com>
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Subject: Re: Fostering linux community collaboration on hardware
+ accelerators
+Date: Wed, 11 Oct 2017 17:49:57 +0100
+Message-ID: <20171011174957.00000f8c@huawei.com>
+References: <20171009112425.00003966@huawei.com>
+        <CACXcFmk3RDaKo0uasnXBeQvgq8aaX88vExv+GOqMAdZTL7=iXQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Cc: Brijesh Singh <brijesh.singh@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Gary Hook <gary.hook@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: bp@suse.de
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        John Gilmore <gnu@toad.com>, <linuxarm@huawei.com>
+To: Sandy Harris <sandyinchina@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2nam02on0047.outbound.protection.outlook.com ([104.47.38.47]:2658
-        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752065AbdJKQus (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 11 Oct 2017 12:50:48 -0400
-In-Reply-To: <20171007010607.78088-1-brijesh.singh@amd.com>
+Received: from szxga05-in.huawei.com ([45.249.212.191]:8006 "EHLO
+        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751691AbdJKQwJ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 11 Oct 2017 12:52:09 -0400
+In-Reply-To: <CACXcFmk3RDaKo0uasnXBeQvgq8aaX88vExv+GOqMAdZTL7=iXQ@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-AMD's new Secure Encrypted Virtualization (SEV) feature allows the
-memory contents of virtual machines to be transparently encrypted with a
-key unique to the VM. The programming and management of the encryption
-keys are handled by the AMD Secure Processor (AMD-SP) which exposes the
-commands for these tasks. The complete spec is available at:
+On Wed, 11 Oct 2017 11:51:49 -0400
+Sandy Harris <sandyinchina@gmail.com> wrote:
 
-http://support.amd.com/TechDocs/55766_SEV-KM%20API_Specification.pdf
+> I shortened the cc list radically. If the discussion continues, it may
+> be a good idea to add people back. I added John Gilmore since I cite
+> one of his posts below.
 
-Extend the AMD-SP driver to provide the following support:
+Fair enough - I have cc'd back in our internal list for now.
+I cynically take the view that people in this community are very
+good at ignoring emails they aren't interested in :)
 
- - an in-kernel API to communicate with the SEV firmware. The API can be
-   used by the hypervisor to create encryption context for a SEV guest.
+> 
+> Jonathan Cameron <Jonathan.Cameron@huawei.com> wrote:
+> 
+> > On behalf of Huawei, I am looking into options to foster a wider community
+> > around the various ongoing projects related to Accelerator support within
+> > Linux.  The particular area of interest to Huawei is that of harnessing
+> > accelerators from userspace, but in a collaborative way with the kernel
+> > still able to make efficient use of them, where appropriate.
+> >
+> > We are keen to foster a wider community than one just focused on
+> > our own current technology.  
+> 
+> Good stuff, but there are problems. e.g. see the thread starting
+> with my message here:
+> https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg27274.html
 
- - a userspace IOCTL to manage the platform certificates.
+An interesting email - we have heard (and observed) the same
+working with the optimized ARM algorithm implementations. In particular
+the point about 'when a given implementation is quickest' is important.
+This isn't even obvious for the various ARM options available in mainline.
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Radim Krčmář" <rkrcmar@redhat.com>
-Cc: Borislav Petkov <bp@suse.de>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Gary Hook <gary.hook@amd.com>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: linux-crypto@vger.kernel.org
-Cc: kvm@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Improvements-by: Borislav Petkov <bp@suse.de>
-Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
----
-Make it as a second patch in the series (changes from 12.1 -> 12.2)
+There is almost always more overhead (for now ;) in using a crypto
+accelerators than doing it on the CPU which puts an obvious issue
+in place for small data packets.
 
-Changes since v5.1:
- * text streamlining (from Boris)
- * rename sev_handle_cmd -> sev_do_cmd (from Boris)
- * PSP_P2CMSG needs arg eval (from Boris)
- * use #ifdef instead of #if defined() (from Boris)
+It's not easy - however not all crypto needs to come out of the kernel
+again and with care you can avoid duplicating the overheads. e.g. 
+* Kernel TLS moves the crypto down into the kernel so data goes in 
+  once (which has to happen anyway to get it to the network card).
+* Storage encryption - again data is going across the kernel boundary anyway.
 
- drivers/crypto/ccp/psp-dev.c | 251 +++++++++++++++++++++++++++++++++++++++++++
- drivers/crypto/ccp/psp-dev.h |  16 +++
- include/linux/psp-sev.h      | 159 +++++++++++++++++++++++++++
- 3 files changed, 426 insertions(+)
+> 
+> My perspective is that of a crypto guy working on general-purpose
+> CPUs, anything from 32-bit ARM up. There are certainly problems for
+> devices with massive loads like a high-end router or with more limited
+> CPUs that I will not even pretend to address.
 
-diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
-index b5789f878560..175cb3c3b8ef 100644
---- a/drivers/crypto/ccp/psp-dev.c
-+++ b/drivers/crypto/ccp/psp-dev.c
-@@ -23,9 +23,16 @@
- #include <linux/hw_random.h>
- #include <linux/ccp.h>
+Agreed - the application area is certainly not general. This stuff
+consumes a lot of silicon - you really have to need it to make it worth
+the expense.
  
-+#include <uapi/linux/psp-sev.h>
-+
- #include "sp-dev.h"
- #include "psp-dev.h"
- 
-+#define DEVICE_NAME	"sev"
-+
-+static DEFINE_MUTEX(sev_cmd_mutex);
-+static bool sev_fops_registered;
-+
- static struct psp_device *psp_alloc_struct(struct sp_device *sp)
- {
- 	struct device *dev = sp->dev;
-@@ -45,9 +52,246 @@ static struct psp_device *psp_alloc_struct(struct sp_device *sp)
- 
- static irqreturn_t psp_irq_handler(int irq, void *data)
- {
-+	struct psp_device *psp = data;
-+	unsigned int status;
-+	int reg;
-+
-+	/* Read the interrupt status: */
-+	status = ioread32(psp->io_regs + PSP_P2CMSG_INTSTS);
-+
-+	/* Check if it is command completion: */
-+	if (!(status & BIT(PSP_CMD_COMPLETE_REG)))
-+		goto done;
-+
-+	/* Check if it is SEV command completion: */
-+	reg = ioread32(psp->io_regs + PSP_CMDRESP);
-+	if (reg & PSP_CMDRESP_RESP) {
-+		psp->sev_int_rcvd = 1;
-+		wake_up(&psp->sev_int_queue);
-+	}
-+
-+done:
-+	/* Clear the interrupt status by writing the same value we read. */
-+	iowrite32(status, psp->io_regs + PSP_P2CMSG_INTSTS);
-+
- 	return IRQ_HANDLED;
- }
- 
-+static int sev_wait_cmd_ioc(struct psp_device *psp, unsigned int *reg)
-+{
-+	psp->sev_int_rcvd = 0;
-+
-+	wait_event(psp->sev_int_queue, psp->sev_int_rcvd);
-+	*reg = ioread32(psp->io_regs + PSP_CMDRESP);
-+
-+	return 0;
-+}
-+
-+static int sev_cmd_buffer_len(int cmd)
-+{
-+	switch (cmd) {
-+	case SEV_CMD_INIT:			return sizeof(struct sev_data_init);
-+	case SEV_CMD_PLATFORM_STATUS:		return sizeof(struct sev_data_status);
-+	case SEV_CMD_PEK_CSR:			return sizeof(struct sev_data_pek_csr);
-+	case SEV_CMD_PEK_CERT_IMPORT:		return sizeof(struct sev_data_pek_cert_import);
-+	case SEV_CMD_PDH_CERT_EXPORT:		return sizeof(struct sev_data_pdh_cert_export);
-+	case SEV_CMD_LAUNCH_START:		return sizeof(struct sev_data_launch_start);
-+	case SEV_CMD_LAUNCH_UPDATE_DATA:	return sizeof(struct sev_data_launch_update_data);
-+	case SEV_CMD_LAUNCH_UPDATE_VMSA:	return sizeof(struct sev_data_launch_update_vmsa);
-+	case SEV_CMD_LAUNCH_FINISH:		return sizeof(struct sev_data_launch_finish);
-+	case SEV_CMD_LAUNCH_MEASURE:		return sizeof(struct sev_data_launch_measure);
-+	case SEV_CMD_ACTIVATE:			return sizeof(struct sev_data_activate);
-+	case SEV_CMD_DEACTIVATE:		return sizeof(struct sev_data_deactivate);
-+	case SEV_CMD_DECOMMISSION:		return sizeof(struct sev_data_decommission);
-+	case SEV_CMD_GUEST_STATUS:		return sizeof(struct sev_data_guest_status);
-+	case SEV_CMD_DBG_DECRYPT:		return sizeof(struct sev_data_dbg);
-+	case SEV_CMD_DBG_ENCRYPT:		return sizeof(struct sev_data_dbg);
-+	case SEV_CMD_SEND_START:		return sizeof(struct sev_data_send_start);
-+	case SEV_CMD_SEND_UPDATE_DATA:		return sizeof(struct sev_data_send_update_data);
-+	case SEV_CMD_SEND_UPDATE_VMSA:		return sizeof(struct sev_data_send_update_vmsa);
-+	case SEV_CMD_SEND_FINISH:		return sizeof(struct sev_data_send_finish);
-+	case SEV_CMD_RECEIVE_START:		return sizeof(struct sev_data_receive_start);
-+	case SEV_CMD_RECEIVE_FINISH:		return sizeof(struct sev_data_receive_finish);
-+	case SEV_CMD_RECEIVE_UPDATE_DATA:	return sizeof(struct sev_data_receive_update_data);
-+	case SEV_CMD_RECEIVE_UPDATE_VMSA:	return sizeof(struct sev_data_receive_update_vmsa);
-+	case SEV_CMD_LAUNCH_UPDATE_SECRET:	return sizeof(struct sev_data_launch_secret);
-+	default:				return 0;
-+	}
-+
-+	return 0;
-+}
-+
-+static int sev_do_cmd(int cmd, void *data, int *psp_ret)
-+{
-+	unsigned int phys_lsb, phys_msb;
-+	struct psp_device *psp;
-+	unsigned int reg, ret;
-+	struct sp_device *sp;
-+
-+	sp = sp_get_psp_master_device();
-+	if (!sp)
-+		return -ENODEV;
-+
-+	psp = sp->psp_data;
-+	if (!psp)
-+		return -ENODEV;
-+
-+	/* Get the physical address of the command buffer */
-+	phys_lsb = data ? lower_32_bits(__psp_pa(data)) : 0;
-+	phys_msb = data ? upper_32_bits(__psp_pa(data)) : 0;
-+
-+	dev_dbg(psp->dev, "sev command id %#x buffer 0x%08x%08x\n",
-+		cmd, phys_msb, phys_lsb);
-+
-+	print_hex_dump_debug("(in):  ", DUMP_PREFIX_OFFSET, 16, 2, data,
-+			     sev_cmd_buffer_len(cmd), false);
-+
-+	/* Only one command at a time... */
-+	mutex_lock(&sev_cmd_mutex);
-+
-+	iowrite32(phys_lsb, psp->io_regs + PSP_CMDBUFF_ADDR_LO);
-+	iowrite32(phys_msb, psp->io_regs + PSP_CMDBUFF_ADDR_HI);
-+
-+	reg = cmd;
-+	reg <<= PSP_CMDRESP_CMD_SHIFT;
-+	reg |= PSP_CMDRESP_IOC;
-+	iowrite32(reg, psp->io_regs + PSP_CMDRESP);
-+
-+	ret = sev_wait_cmd_ioc(psp, &reg);
-+	if (ret)
-+		goto unlock;
-+
-+	if (psp_ret)
-+		*psp_ret = reg & PSP_CMDRESP_ERR_MASK;
-+
-+	if (reg & PSP_CMDRESP_ERR_MASK) {
-+		dev_dbg(psp->dev, "sev command %#x failed (%#010x)\n",
-+			cmd, reg & PSP_CMDRESP_ERR_MASK);
-+		ret = -EIO;
-+	}
-+
-+unlock:
-+	mutex_unlock(&sev_cmd_mutex);
-+	print_hex_dump_debug("(out): ", DUMP_PREFIX_OFFSET, 16, 2, data,
-+			     sev_cmd_buffer_len(cmd), false);
-+	return ret;
-+}
-+
-+static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
-+{
-+	return -ENOTTY;
-+}
-+
-+static const struct file_operations sev_fops = {
-+	.owner	= THIS_MODULE,
-+	.unlocked_ioctl = sev_ioctl,
-+};
-+
-+int sev_platform_init(struct sev_data_init *data, int *error)
-+{
-+	return sev_do_cmd(SEV_CMD_INIT, data, error);
-+}
-+EXPORT_SYMBOL_GPL(sev_platform_init);
-+
-+int sev_platform_shutdown(int *error)
-+{
-+	return sev_do_cmd(SEV_CMD_SHUTDOWN, 0, error);
-+}
-+EXPORT_SYMBOL_GPL(sev_platform_shutdown);
-+
-+int sev_platform_status(struct sev_data_status *data, int *error)
-+{
-+	return sev_do_cmd(SEV_CMD_PLATFORM_STATUS, data, error);
-+}
-+EXPORT_SYMBOL_GPL(sev_platform_status);
-+
-+int sev_issue_cmd_external_user(struct file *filep, unsigned int cmd,
-+				void *data, int *error)
-+{
-+	if (!filep || filep->f_op != &sev_fops)
-+		return -EBADF;
-+
-+	return sev_do_cmd(cmd, data, error);
-+}
-+EXPORT_SYMBOL_GPL(sev_issue_cmd_external_user);
-+
-+int sev_guest_deactivate(struct sev_data_deactivate *data, int *error)
-+{
-+	return sev_do_cmd(SEV_CMD_DEACTIVATE, data, error);
-+}
-+EXPORT_SYMBOL_GPL(sev_guest_deactivate);
-+
-+int sev_guest_activate(struct sev_data_activate *data, int *error)
-+{
-+	return sev_do_cmd(SEV_CMD_ACTIVATE, data, error);
-+}
-+EXPORT_SYMBOL_GPL(sev_guest_activate);
-+
-+int sev_guest_decommission(struct sev_data_decommission *data, int *error)
-+{
-+	return sev_do_cmd(SEV_CMD_DECOMMISSION, data, error);
-+}
-+EXPORT_SYMBOL_GPL(sev_guest_decommission);
-+
-+int sev_guest_df_flush(int *error)
-+{
-+	return sev_do_cmd(SEV_CMD_DF_FLUSH, 0, error);
-+}
-+EXPORT_SYMBOL_GPL(sev_guest_df_flush);
-+
-+static int sev_ops_init(struct psp_device *psp)
-+{
-+	struct device *dev = psp->dev;
-+	struct miscdevice *misc;
-+	int ret;
-+
-+	/*
-+	 * SEV feature support can be detected on multiple devices but the SEV
-+	 * FW commands must be issued on the master. During probe, we do not
-+	 * know the master hence we create /dev/sev on the first device probe.
-+	 * sev_do_cmd() finds the right master device to which to issue the
-+	 * command to the firmware.
-+	 */
-+	if (!sev_fops_registered) {
-+
-+		misc = devm_kzalloc(dev, sizeof(*misc), GFP_KERNEL);
-+		if (!misc)
-+			return -ENOMEM;
-+
-+		misc->minor = MISC_DYNAMIC_MINOR;
-+		misc->name = DEVICE_NAME;
-+		misc->fops = &sev_fops;
-+
-+		ret = misc_register(misc);
-+		if (ret)
-+			return ret;
-+
-+		sev_fops_registered = true;
-+		psp->sev_misc = misc;
-+		init_waitqueue_head(&psp->sev_int_queue);
-+		dev_info(dev, "registered SEV device\n");
-+	}
-+
-+	return 0;
-+}
-+
-+static int sev_init(struct psp_device *psp)
-+{
-+	/* Check if device supports SEV feature */
-+	if (!(ioread32(psp->io_regs + PSP_FEATURE_REG) & 1)) {
-+		dev_dbg(psp->dev, "device does not support SEV\n");
-+		return 1;
-+	}
-+
-+	return sev_ops_init(psp);
-+}
-+
-+static void sev_exit(struct psp_device *psp)
-+{
-+	if (psp->sev_misc)
-+		misc_deregister(psp->sev_misc);
-+}
-+
- int psp_dev_init(struct sp_device *sp)
- {
- 	struct device *dev = sp->dev;
-@@ -84,11 +328,17 @@ int psp_dev_init(struct sp_device *sp)
- 	if (sp->set_psp_master_device)
- 		sp->set_psp_master_device(sp);
- 
-+	ret = sev_init(psp);
-+	if (ret)
-+		goto e_irq;
-+
- 	/* Enable interrupt */
- 	iowrite32(-1, psp->io_regs + PSP_P2CMSG_INTEN);
- 
- 	return 0;
- 
-+e_irq:
-+	sp_free_psp_irq(psp->sp, psp);
- e_err:
- 	sp->psp_data = NULL;
- 
-@@ -101,5 +351,6 @@ void psp_dev_destroy(struct sp_device *sp)
- {
- 	struct psp_device *psp = sp->psp_data;
- 
-+	sev_exit(psp);
- 	sp_free_psp_irq(sp, psp);
- }
-diff --git a/drivers/crypto/ccp/psp-dev.h b/drivers/crypto/ccp/psp-dev.h
-index 55b7808367c3..7a781ec20684 100644
---- a/drivers/crypto/ccp/psp-dev.h
-+++ b/drivers/crypto/ccp/psp-dev.h
-@@ -25,9 +25,21 @@
- #include <linux/interrupt.h>
- #include <linux/irqreturn.h>
- #include <linux/dmaengine.h>
-+#include <linux/psp-sev.h>
-+#include <linux/miscdevice.h>
- 
- #include "sp-dev.h"
- 
-+#define PSP_C2PMSG(_num)		((_num) << 2)
-+#define PSP_CMDRESP			PSP_C2PMSG(32)
-+#define PSP_CMDBUFF_ADDR_LO		PSP_C2PMSG(56)
-+#define PSP_CMDBUFF_ADDR_HI             PSP_C2PMSG(57)
-+#define PSP_FEATURE_REG			PSP_C2PMSG(63)
-+
-+#define PSP_P2CMSG(_num)		((_num) << 2)
-+#define PSP_CMD_COMPLETE_REG		1
-+#define PSP_CMD_COMPLETE		PSP_P2CMSG(PSP_CMD_COMPLETE_REG)
-+
- #define PSP_P2CMSG_INTEN		0x0110
- #define PSP_P2CMSG_INTSTS		0x0114
- 
-@@ -54,6 +66,10 @@ struct psp_device {
- 	struct sp_device *sp;
- 
- 	void __iomem *io_regs;
-+
-+	unsigned int sev_int_rcvd;
-+	wait_queue_head_t sev_int_queue;
-+	struct miscdevice *sev_misc;
- };
- 
- #endif /* __PSP_DEV_H */
-diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-index 496375d7f6a9..5d562d49deac 100644
---- a/include/linux/psp-sev.h
-+++ b/include/linux/psp-sev.h
-@@ -512,4 +512,163 @@ struct sev_data_dbg {
- 	u32 len;				/* In */
- } __packed;
- 
-+#ifdef CONFIG_CRYPTO_DEV_SP_PSP
-+
-+/**
-+ * sev_platform_init - perform SEV INIT command
-+ *
-+ * @init: sev_data_init structure to be processed
-+ * @error: SEV command return code
-+ *
-+ * Returns:
-+ * 0 if the SEV successfully processed the command
-+ * -%ENODEV    if the SEV device is not available
-+ * -%ENOTSUPP  if the SEV does not support SEV
-+ * -%ETIMEDOUT if the SEV command timed out
-+ * -%EIO       if the SEV returned a non-zero return code
-+ */
-+int sev_platform_init(struct sev_data_init *init, int *error);
-+
-+/**
-+ * sev_platform_shutdown - perform SEV SHUTDOWN command
-+ *
-+ * @error: SEV command return code
-+ *
-+ * Returns:
-+ * 0 if the SEV successfully processed the command
-+ * -%ENODEV    if the SEV device is not available
-+ * -%ENOTSUPP  if the SEV does not support SEV
-+ * -%ETIMEDOUT if the SEV command timed out
-+ * -%EIO       if the SEV returned a non-zero return code
-+ */
-+int sev_platform_shutdown(int *error);
-+
-+/**
-+ * sev_platform_status - perform SEV PLATFORM_STATUS command
-+ *
-+ * @init: sev_data_status structure to be processed
-+ * @error: SEV command return code
-+ *
-+ * Returns:
-+ * 0 if the SEV successfully processed the command
-+ * -%ENODEV    if the SEV device is not available
-+ * -%ENOTSUPP  if the SEV does not support SEV
-+ * -%ETIMEDOUT if the SEV command timed out
-+ * -%EIO       if the SEV returned a non-zero return code
-+ */
-+int sev_platform_status(struct sev_data_status *status, int *error);
-+
-+/**
-+ * sev_issue_cmd_external_user - issue SEV command by other driver with a file
-+ * handle.
-+ *
-+ * This function can be used by other drivers to issue a SEV command on
-+ * behalf of userspace. The caller must pass a valid SEV file descriptor
-+ * so that we know that it has access to SEV device.
-+ *
-+ * @filep - SEV device file pointer
-+ * @cmd - command to issue
-+ * @data - command buffer
-+ * @error: SEV command return code
-+ *
-+ * Returns:
-+ * 0 if the SEV successfully processed the command
-+ * -%ENODEV    if the SEV device is not available
-+ * -%ENOTSUPP  if the SEV does not support SEV
-+ * -%ETIMEDOUT if the SEV command timed out
-+ * -%EIO       if the SEV returned a non-zero return code
-+ * -%EINVAL    if the SEV file descriptor is not valid
-+ */
-+int sev_issue_cmd_external_user(struct file *filep, unsigned int id,
-+				void *data, int *error);
-+
-+/**
-+ * sev_guest_deactivate - perform SEV DEACTIVATE command
-+ *
-+ * @deactivate: sev_data_deactivate structure to be processed
-+ * @sev_ret: sev command return code
-+ *
-+ * Returns:
-+ * 0 if the sev successfully processed the command
-+ * -%ENODEV    if the sev device is not available
-+ * -%ENOTSUPP  if the sev does not support SEV
-+ * -%ETIMEDOUT if the sev command timed out
-+ * -%EIO       if the sev returned a non-zero return code
-+ */
-+int sev_guest_deactivate(struct sev_data_deactivate *data, int *error);
-+
-+/**
-+ * sev_guest_activate - perform SEV ACTIVATE command
-+ *
-+ * @activate: sev_data_activate structure to be processed
-+ * @sev_ret: sev command return code
-+ *
-+ * Returns:
-+ * 0 if the sev successfully processed the command
-+ * -%ENODEV    if the sev device is not available
-+ * -%ENOTSUPP  if the sev does not support SEV
-+ * -%ETIMEDOUT if the sev command timed out
-+ * -%EIO       if the sev returned a non-zero return code
-+ */
-+int sev_guest_activate(struct sev_data_activate *data, int *error);
-+
-+/**
-+ * sev_guest_df_flush - perform SEV DF_FLUSH command
-+ *
-+ * @sev_ret: sev command return code
-+ *
-+ * Returns:
-+ * 0 if the sev successfully processed the command
-+ * -%ENODEV    if the sev device is not available
-+ * -%ENOTSUPP  if the sev does not support SEV
-+ * -%ETIMEDOUT if the sev command timed out
-+ * -%EIO       if the sev returned a non-zero return code
-+ */
-+int sev_guest_df_flush(int *error);
-+
-+/**
-+ * sev_guest_decommission - perform SEV DECOMMISSION command
-+ *
-+ * @decommission: sev_data_decommission structure to be processed
-+ * @sev_ret: sev command return code
-+ *
-+ * Returns:
-+ * 0 if the sev successfully processed the command
-+ * -%ENODEV    if the sev device is not available
-+ * -%ENOTSUPP  if the sev does not support SEV
-+ * -%ETIMEDOUT if the sev command timed out
-+ * -%EIO       if the sev returned a non-zero return code
-+ */
-+int sev_guest_decommission(struct sev_data_decommission *data, int *error);
-+
-+#else	/* !CONFIG_CRYPTO_DEV_SP_PSP */
-+
-+static inline int
-+sev_platform_status(struct sev_data_status *status, int *error) { return -ENODEV; }
-+
-+static inline int
-+sev_platform_init(struct sev_data_init *init, int *error) { return -ENODEV; }
-+
-+static inline int sev_platform_shutdown(int *error) { return -ENODEV; }
-+
-+static inline int
-+sev_guest_deactivate(struct sev_data_deactivate *data, int *error) { return -ENODEV; }
-+
-+static inline int
-+sev_guest_decommission(struct sev_data_decommission *data, int *error) { return -ENODEV; }
-+
-+static inline int
-+sev_guest_activate(struct sev_data_activate *data, int *error) { return -ENODEV; }
-+
-+static inline int sev_guest_df_flush(int *error) { return -ENODEV; }
-+
-+static inline int
-+sev_issue_cmd_external_user(struct file *filep,
-+			    unsigned int id, void *data, int *error)
-+{
-+	return -ENODEV;
-+}
-+
-+#endif	/* CONFIG_CRYPTO_DEV_SP_PSP */
-+
- #endif	/* __PSP_SEV_H__ */
--- 
-2.9.5
+> For me, far & away the biggest issue is having a good source of random
+> numbers; more-or-less all crypto depends on that. The Linux random(4)
+> RNG gets close, but there are cases where it may not be well
+> initialized soon enough on some systems. If a system provides a
+> hardware RNG, I will certainly use it to feed random(4). I do not care
+> nearly as much about anything else that might be in a hardware crypto
+> accelerator.
+
+Absolutely - that needs to be part of a complete solution.
+
+> 
+> Separate accelerator devices require management, separating accesses
+> by different kernel threads or by user processes if they are allowed
+> to play, keeping them from seeing each other's keys, perhaps saving &
+> restoring state sometimes. 
+
+This can be assisted a lot by hardware context management (this look similar
+to what you see on high end network cards with things that look like
+queue steering etc).  Note, what we are trying to avoid is everything
+going full userspace driver stack as has happened for some of those sorts of
+systems (e.g. Solarflare's offering)
+
+This hardware is appearing in crypto accelerators - until it is there
+I agree this is a really nasty problem - be it perhaps not an unsolvable
+one.  There are intermediate levels where the hardware can handle a small
+number of contexts but to be truely useful you need to be able to use lots
+and have the throughput to support them all with reasonable latency.
+
+> Things that can be built into the CPU --
+> RNG instruction or register, AES instructions, Intel's instruction for
+> 128-bit finite field multiplication which accelerates AES-GCM,
+> probably some I have not heard of -- require less management and are
+> usable by  any process, assuming either compiler support or some
+> assembler code. As a software guy, I'd far rather the hardware
+> designers gave me those than anything that needs a driver.
+
+I absolutely agree. If you can get away with doing crypto
+on a CPU (under constraints of power usage and other needs for the cpu)
+then do it that way. 
+
+The targets for this stuff are where crypto has become a bottleneck
+not cases where a good software implementation is quick enough.
+
+Our initial focus in my team at Huawei, has been crypto partly because we
+have a reasonably capable engine to play with - it is just one of
+many options moving forward.
+
+Jonathan
