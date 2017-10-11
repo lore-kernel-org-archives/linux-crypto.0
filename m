@@ -1,64 +1,175 @@
-From: Sandy Harris <sandyinchina@gmail.com>
-Subject: Re: Fostering linux community collaboration on hardware accelerators
-Date: Wed, 11 Oct 2017 11:51:49 -0400
-Message-ID: <CACXcFmk3RDaKo0uasnXBeQvgq8aaX88vExv+GOqMAdZTL7=iXQ@mail.gmail.com>
-References: <20171009112425.00003966@huawei.com>
+From: Brijesh Singh <brijesh.singh@amd.com>
+Subject: [Part2 PATCH v5.2 12.1/31] crypto: ccp: Define SEV userspace ioctl and command id
+Date: Wed, 11 Oct 2017 11:46:05 -0500
+Message-ID: <20171011164605.115592-1-brijesh.singh@amd.com>
+References: <20171007010607.78088-2-brijesh.singh@amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        John Gilmore <gnu@toad.com>
-To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:48663 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751462AbdJKPvv (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 11 Oct 2017 11:51:51 -0400
-Received: by mail-wm0-f68.google.com with SMTP id i124so5950983wmf.3
-        for <linux-crypto@vger.kernel.org>; Wed, 11 Oct 2017 08:51:50 -0700 (PDT)
-In-Reply-To: <20171009112425.00003966@huawei.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Cc: Brijesh Singh <brijesh.singh@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Gary Hook <gary.hook@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: bp@suse.de
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20171007010607.78088-2-brijesh.singh@amd.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-I shortened the cc list radically. If the discussion continues, it may
-be a good idea to add people back. I added John Gilmore since I cite
-one of his posts below.
+Add a include file which defines the ioctl and command id used for
+issuing SEV platform management specific commands.
 
-Jonathan Cameron <Jonathan.Cameron@huawei.com> wrote:
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Radim Krčmář" <rkrcmar@redhat.com>
+Cc: Borislav Petkov <bp@suse.de>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Gary Hook <gary.hook@amd.com>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: linux-crypto@vger.kernel.org
+Cc: kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Improvements-by: Borislav Petkov <bp@suse.de>
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+Reviewed-by: Borislav Petkov <bp@suse.de>
+---
+Make it as the first patch in the series (changed from 12.2/31 -> 12.1/31)
 
-> On behalf of Huawei, I am looking into options to foster a wider community
-> around the various ongoing projects related to Accelerator support within
-> Linux.  The particular area of interest to Huawei is that of harnessing
-> accelerators from userspace, but in a collaborative way with the kernel
-> still able to make efficient use of them, where appropriate.
->
-> We are keen to foster a wider community than one just focused on
-> our own current technology.
+Changes since v5.1:
+ * add __packed improvement from Boris
 
-Good stuff, but there are problems. e.g. see the thread starting
-with my message here:
-https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg27274.html
+The full tree is available at:
 
-My perspective is that of a crypto guy working on general-purpose
-CPUs, anything from 32-bit ARM up. There are certainly problems for
-devices with massive loads like a high-end router or with more limited
-CPUs that I will not even pretend to address.
+repo: https://github.com/codomania/kvm
+branch: sev-v5-p2+fixes
 
-For me, far & away the biggest issue is having a good source of random
-numbers; more-or-less all crypto depends on that. The Linux random(4)
-RNG gets close, but there are cases where it may not be well
-initialized soon enough on some systems. If a system provides a
-hardware RNG, I will certainly use it to feed random(4). I do not care
-nearly as much about anything else that might be in a hardware crypto
-accelerator.
+ include/uapi/linux/psp-sev.h | 115 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 115 insertions(+)
+ create mode 100644 include/uapi/linux/psp-sev.h
 
-Separate accelerator devices require management, separating accesses
-by different kernel threads or by user processes if they are allowed
-to play, keeping them from seeing each other's keys, perhaps saving &
-restoring state sometimes. Things that can be built into the CPU --
-RNG instruction or register, AES instructions, Intel's instruction for
-128-bit finite field multiplication which accelerates AES-GCM,
-probably some I have not heard of -- require less management and are
-usable by  any process, assuming either compiler support or some
-assembler code. As a software guy, I'd far rather the hardware
-designers gave me those than anything that needs a driver.
+diff --git a/include/uapi/linux/psp-sev.h b/include/uapi/linux/psp-sev.h
+new file mode 100644
+index 000000000000..b63e116f18c1
+--- /dev/null
++++ b/include/uapi/linux/psp-sev.h
+@@ -0,0 +1,115 @@
++/*
++ * Userspace interface for AMD Secure Encrypted Virtualization (SEV)
++ * platform management commands.
++ *
++ * Copyright (C) 2016-2017 Advanced Micro Devices, Inc.
++ *
++ * Author: Brijesh Singh <brijesh.singh@amd.com>
++ *
++ * SEV spec 0.14 is available at:
++ * http://support.amd.com/TechDocs/55766_SEV-KM%20API_Specification.pdf
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ */
++
++#ifndef __PSP_SEV_USER_H__
++#define __PSP_SEV_USER_H__
++
++#include <linux/types.h>
++
++/**
++ * SEV platform commands
++ */
++enum {
++	SEV_FACTORY_RESET = 0,
++	SEV_PLATFORM_STATUS,
++	SEV_PEK_GEN,
++	SEV_PEK_CSR,
++	SEV_PDH_GEN,
++	SEV_PDH_CERT_EXPORT,
++	SEV_PEK_CERT_IMPORT,
++
++	SEV_MAX,
++};
++
++/**
++ * struct sev_user_data_status - PLATFORM_STATUS command parameters
++ *
++ * @major: major API version
++ * @minor: minor API version
++ * @state: platform state
++ * @owner: self-owned or externally owned
++ * @config: platform config flags
++ * @build: firmware build id for API version
++ * @guest_count: number of active guests
++ */
++struct sev_user_data_status {
++	__u8 api_major;				/* Out */
++	__u8 api_minor;				/* Out */
++	__u8 state;				/* Out */
++	__u8 owner;				/* Out */
++	__u32 config;				/* Out */
++	__u8 build;				/* Out */
++	__u32 guest_count;			/* Out */
++} __packed;
++
++/**
++ * struct sev_user_data_pek_csr - PEK_CSR command parameters
++ *
++ * @address: PEK certificate chain
++ * @length: length of certificate
++ */
++struct sev_user_data_pek_csr {
++	__u64 address;				/* In */
++	__u32 length;				/* In/Out */
++} __packed;
++
++/**
++ * struct sev_user_data_cert_import - PEK_CERT_IMPORT command parameters
++ *
++ * @pek_address: PEK certificate chain
++ * @pek_len: length of PEK certificate
++ * @oca_address: OCA certificate chain
++ * @oca_len: length of OCA certificate
++ */
++struct sev_user_data_pek_cert_import {
++	__u64 pek_cert_address;			/* In */
++	__u32 pek_cert_len;			/* In */
++	__u64 oca_cert_address;			/* In */
++	__u32 oca_cert_len;			/* In */
++} __packed;
++
++/**
++ * struct sev_user_data_pdh_cert_export - PDH_CERT_EXPORT command parameters
++ *
++ * @pdh_address: PDH certificate address
++ * @pdh_len: length of PDH certificate
++ * @cert_chain_address: PDH certificate chain
++ * @cert_chain_len: length of PDH certificate chain
++ */
++struct sev_user_data_pdh_cert_export {
++	__u64 pdh_cert_address;			/* In */
++	__u32 pdh_cert_len;			/* In/Out */
++	__u64 cert_chain_address;		/* In */
++	__u32 cert_chain_len;			/* In/Out */
++} __packed;
++
++/**
++ * struct sev_issue_cmd - SEV ioctl parameters
++ *
++ * @cmd: SEV commands to execute
++ * @opaque: pointer to the command structure
++ * @error: SEV FW return code on failure
++ */
++struct sev_issue_cmd {
++	__u32 cmd;				/* In */
++	__u64 data;				/* In */
++	__u32 error;				/* Out */
++} __packed;
++
++#define SEV_IOC_TYPE		'S'
++#define SEV_ISSUE_CMD	_IOWR(SEV_IOC_TYPE, 0x0, struct sev_issue_cmd)
++
++#endif /* __PSP_USER_SEV_H */
+-- 
+2.9.5
