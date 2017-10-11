@@ -1,123 +1,89 @@
-From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Subject: Re: Fostering linux community collaboration on hardware
- accelerators
-Date: Wed, 11 Oct 2017 17:49:57 +0100
-Message-ID: <20171011174957.00000f8c@huawei.com>
-References: <20171009112425.00003966@huawei.com>
-        <CACXcFmk3RDaKo0uasnXBeQvgq8aaX88vExv+GOqMAdZTL7=iXQ@mail.gmail.com>
+From: Brijesh Singh <brijesh.singh@amd.com>
+Subject: [Part2 PATCH v5.2 12.3/31] crypto: ccp: Implement SEV_FACTORY_RESET ioctl command
+Date: Wed, 11 Oct 2017 11:55:21 -0500
+Message-ID: <20171011165521.115904-1-brijesh.singh@amd.com>
+References: <20171007010607.78088-3-brijesh.singh@amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        John Gilmore <gnu@toad.com>, <linuxarm@huawei.com>
-To: Sandy Harris <sandyinchina@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from szxga05-in.huawei.com ([45.249.212.191]:8006 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751691AbdJKQwJ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 11 Oct 2017 12:52:09 -0400
-In-Reply-To: <CACXcFmk3RDaKo0uasnXBeQvgq8aaX88vExv+GOqMAdZTL7=iXQ@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Cc: Brijesh Singh <brijesh.singh@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Gary Hook <gary.hook@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: bp@suse.de
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20171007010607.78088-3-brijesh.singh@amd.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, 11 Oct 2017 11:51:49 -0400
-Sandy Harris <sandyinchina@gmail.com> wrote:
+The SEV_FACTORY_RESET command can be used by the platform owner to
+reset the non-volatile SEV related data. The command is defined in
+SEV spec section 5.4
 
-> I shortened the cc list radically. If the discussion continues, it may
-> be a good idea to add people back. I added John Gilmore since I cite
-> one of his posts below.
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Radim Krčmář" <rkrcmar@redhat.com>
+Cc: Borislav Petkov <bp@suse.de>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Gary Hook <gary.hook@amd.com>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: linux-crypto@vger.kernel.org
+Cc: kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Improvements-by: Borislav Petkov <bp@suse.de>
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+---
 
-Fair enough - I have cc'd back in our internal list for now.
-I cynically take the view that people in this community are very
-good at ignoring emails they aren't interested in :)
+Changes since v5.1:
+ * rename sev_handle_cmd -> sev_do_cmd (from Boris)
+ * skip copy_to_user when invalid cmd id is passed (from Boris)
+ * use SEV_MAX instead of SEV_CMD_MAX to check for invalid command
 
-> 
-> Jonathan Cameron <Jonathan.Cameron@huawei.com> wrote:
-> 
-> > On behalf of Huawei, I am looking into options to foster a wider community
-> > around the various ongoing projects related to Accelerator support within
-> > Linux.  The particular area of interest to Huawei is that of harnessing
-> > accelerators from userspace, but in a collaborative way with the kernel
-> > still able to make efficient use of them, where appropriate.
-> >
-> > We are keen to foster a wider community than one just focused on
-> > our own current technology.  
-> 
-> Good stuff, but there are problems. e.g. see the thread starting
-> with my message here:
-> https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg27274.html
+ drivers/crypto/ccp/psp-dev.c | 29 ++++++++++++++++++++++++++++-
+ 1 file changed, 28 insertions(+), 1 deletion(-)
 
-An interesting email - we have heard (and observed) the same
-working with the optimized ARM algorithm implementations. In particular
-the point about 'when a given implementation is quickest' is important.
-This isn't even obvious for the various ARM options available in mainline.
-
-There is almost always more overhead (for now ;) in using a crypto
-accelerators than doing it on the CPU which puts an obvious issue
-in place for small data packets.
-
-It's not easy - however not all crypto needs to come out of the kernel
-again and with care you can avoid duplicating the overheads. e.g. 
-* Kernel TLS moves the crypto down into the kernel so data goes in 
-  once (which has to happen anyway to get it to the network card).
-* Storage encryption - again data is going across the kernel boundary anyway.
-
-> 
-> My perspective is that of a crypto guy working on general-purpose
-> CPUs, anything from 32-bit ARM up. There are certainly problems for
-> devices with massive loads like a high-end router or with more limited
-> CPUs that I will not even pretend to address.
-
-Agreed - the application area is certainly not general. This stuff
-consumes a lot of silicon - you really have to need it to make it worth
-the expense.
+diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
+index 175cb3c3b8ef..a9c885a39910 100644
+--- a/drivers/crypto/ccp/psp-dev.c
++++ b/drivers/crypto/ccp/psp-dev.c
+@@ -179,7 +179,34 @@ static int sev_do_cmd(int cmd, void *data, int *psp_ret)
  
-> For me, far & away the biggest issue is having a good source of random
-> numbers; more-or-less all crypto depends on that. The Linux random(4)
-> RNG gets close, but there are cases where it may not be well
-> initialized soon enough on some systems. If a system provides a
-> hardware RNG, I will certainly use it to feed random(4). I do not care
-> nearly as much about anything else that might be in a hardware crypto
-> accelerator.
-
-Absolutely - that needs to be part of a complete solution.
-
-> 
-> Separate accelerator devices require management, separating accesses
-> by different kernel threads or by user processes if they are allowed
-> to play, keeping them from seeing each other's keys, perhaps saving &
-> restoring state sometimes. 
-
-This can be assisted a lot by hardware context management (this look similar
-to what you see on high end network cards with things that look like
-queue steering etc).  Note, what we are trying to avoid is everything
-going full userspace driver stack as has happened for some of those sorts of
-systems (e.g. Solarflare's offering)
-
-This hardware is appearing in crypto accelerators - until it is there
-I agree this is a really nasty problem - be it perhaps not an unsolvable
-one.  There are intermediate levels where the hardware can handle a small
-number of contexts but to be truely useful you need to be able to use lots
-and have the throughput to support them all with reasonable latency.
-
-> Things that can be built into the CPU --
-> RNG instruction or register, AES instructions, Intel's instruction for
-> 128-bit finite field multiplication which accelerates AES-GCM,
-> probably some I have not heard of -- require less management and are
-> usable by  any process, assuming either compiler support or some
-> assembler code. As a software guy, I'd far rather the hardware
-> designers gave me those than anything that needs a driver.
-
-I absolutely agree. If you can get away with doing crypto
-on a CPU (under constraints of power usage and other needs for the cpu)
-then do it that way. 
-
-The targets for this stuff are where crypto has become a bottleneck
-not cases where a good software implementation is quick enough.
-
-Our initial focus in my team at Huawei, has been crypto partly because we
-have a reasonably capable engine to play with - it is just one of
-many options moving forward.
-
-Jonathan
+ static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
+ {
+-	return -ENOTTY;
++	void __user *argp = (void __user *)arg;
++	struct sev_issue_cmd input;
++	int ret = -EFAULT;
++
++	if (ioctl != SEV_ISSUE_CMD)
++		return -EINVAL;
++
++	if (copy_from_user(&input, argp, sizeof(struct sev_issue_cmd)))
++		return -EFAULT;
++
++	if (input.cmd > SEV_MAX)
++		return -EINVAL;
++
++	switch (input.cmd) {
++
++	case SEV_FACTORY_RESET: {
++		ret = sev_do_cmd(SEV_CMD_FACTORY_RESET, 0, &input.error);
++		break;
++	}
++	default:
++		ret = -EINVAL;
++		goto out;
++	}
++
++	if (copy_to_user(argp, &input, sizeof(struct sev_issue_cmd)))
++		ret = -EFAULT;
++out:
++	return ret;
+ }
+ 
+ static const struct file_operations sev_fops = {
+-- 
+2.9.5
