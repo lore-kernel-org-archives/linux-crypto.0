@@ -1,10 +1,10 @@
 From: Borislav Petkov <bp@suse.de>
-Subject: Re: [Part2 PATCH v5.2 12.2/31] crypto: ccp: Add Secure Encrypted
- Virtualization (SEV) command support
-Date: Thu, 12 Oct 2017 16:08:16 +0200
-Message-ID: <20171012140816.6siefvahj6ww7uzf@pd.tnic>
-References: <20171007010607.78088-1-brijesh.singh@amd.com>
- <20171011165030.115696-1-brijesh.singh@amd.com>
+Subject: Re: [Part2 PATCH v5.2 12.3/31] crypto: ccp: Implement
+ SEV_FACTORY_RESET ioctl command
+Date: Thu, 12 Oct 2017 16:13:12 +0200
+Message-ID: <20171012141312.trux34l66efvqnig@pd.tnic>
+References: <20171007010607.78088-3-brijesh.singh@amd.com>
+ <20171011165521.115904-1-brijesh.singh@amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
@@ -18,25 +18,14 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,
 To: Brijesh Singh <brijesh.singh@amd.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20171011165030.115696-1-brijesh.singh@amd.com>
+In-Reply-To: <20171011165521.115904-1-brijesh.singh@amd.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Oct 11, 2017 at 11:50:30AM -0500, Brijesh Singh wrote:
-> AMD's new Secure Encrypted Virtualization (SEV) feature allows the
-> memory contents of virtual machines to be transparently encrypted with a
-> key unique to the VM. The programming and management of the encryption
-> keys are handled by the AMD Secure Processor (AMD-SP) which exposes the
-> commands for these tasks. The complete spec is available at:
-> 
-> http://support.amd.com/TechDocs/55766_SEV-KM%20API_Specification.pdf
-> 
-> Extend the AMD-SP driver to provide the following support:
-> 
->  - an in-kernel API to communicate with the SEV firmware. The API can be
->    used by the hypervisor to create encryption context for a SEV guest.
-> 
->  - a userspace IOCTL to manage the platform certificates.
+On Wed, Oct 11, 2017 at 11:55:21AM -0500, Brijesh Singh wrote:
+> The SEV_FACTORY_RESET command can be used by the platform owner to
+> reset the non-volatile SEV related data. The command is defined in
+> SEV spec section 5.4
 > 
 > Cc: Paolo Bonzini <pbonzini@redhat.com>
 > Cc: "Radim Krčmář" <rkrcmar@redhat.com>
@@ -50,122 +39,55 @@ On Wed, Oct 11, 2017 at 11:50:30AM -0500, Brijesh Singh wrote:
 > Improvements-by: Borislav Petkov <bp@suse.de>
 > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 > ---
-> Make it as a second patch in the series (changes from 12.1 -> 12.2)
 > 
 > Changes since v5.1:
->  * text streamlining (from Boris)
 >  * rename sev_handle_cmd -> sev_do_cmd (from Boris)
->  * PSP_P2CMSG needs arg eval (from Boris)
->  * use #ifdef instead of #if defined() (from Boris)
+>  * skip copy_to_user when invalid cmd id is passed (from Boris)
+>  * use SEV_MAX instead of SEV_CMD_MAX to check for invalid command
 > 
->  drivers/crypto/ccp/psp-dev.c | 251 +++++++++++++++++++++++++++++++++++++++++++
->  drivers/crypto/ccp/psp-dev.h |  16 +++
->  include/linux/psp-sev.h      | 159 +++++++++++++++++++++++++++
->  3 files changed, 426 insertions(+)
+>  drivers/crypto/ccp/psp-dev.c | 29 ++++++++++++++++++++++++++++-
+>  1 file changed, 28 insertions(+), 1 deletion(-)
 > 
 > diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
-> index b5789f878560..175cb3c3b8ef 100644
+> index 175cb3c3b8ef..a9c885a39910 100644
 > --- a/drivers/crypto/ccp/psp-dev.c
 > +++ b/drivers/crypto/ccp/psp-dev.c
-> @@ -23,9 +23,16 @@
->  #include <linux/hw_random.h>
->  #include <linux/ccp.h>
+> @@ -179,7 +179,34 @@ static int sev_do_cmd(int cmd, void *data, int *psp_ret)
 >  
-> +#include <uapi/linux/psp-sev.h>
+>  static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
+>  {
+> -	return -ENOTTY;
+> +	void __user *argp = (void __user *)arg;
+> +	struct sev_issue_cmd input;
+> +	int ret = -EFAULT;
 > +
->  #include "sp-dev.h"
->  #include "psp-dev.h"
->  
-> +#define DEVICE_NAME	"sev"
+> +	if (ioctl != SEV_ISSUE_CMD)
+> +		return -EINVAL;
 > +
-> +static DEFINE_MUTEX(sev_cmd_mutex);
-> +static bool sev_fops_registered;
+> +	if (copy_from_user(&input, argp, sizeof(struct sev_issue_cmd)))
+> +		return -EFAULT;
+> +
+> +	if (input.cmd > SEV_MAX)
+> +		return -EINVAL;
+> +
+> +	switch (input.cmd) {
+> +
+> +	case SEV_FACTORY_RESET: {
+> +		ret = sev_do_cmd(SEV_CMD_FACTORY_RESET, 0, &input.error);
+> +		break;
+> +	}
 
-Well, if you're going to have a global var, why not pull up the misc
-device instead?
+Those curly braces are still here. Just use my diff I sent you by saving
+the mail to a file and doing
 
-And mind you, I've moved out this assignments:
+$ patch -p1 --dry-run -i /tmp/boris.mail
 
-+       psp->sev_misc = psp_misc_dev;
-+       init_waitqueue_head(&psp->sev_int_queue);
-+       dev_info(dev, "registered SEV device\n");
+ontop of this patch. If it applies ok, remove the --dry-run.
 
-outside of the if-conditional as I'm assuming you want to do this for
-each psp device for which sev_ops_init() is called.
+Then you can do changes ontop. This way you won't miss changes I've sent
+you.
 
-Or am I wrong here?
-
----
-diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
-index 175cb3c3b8ef..d50aaa1ca75b 100644
---- a/drivers/crypto/ccp/psp-dev.c
-+++ b/drivers/crypto/ccp/psp-dev.c
-@@ -31,7 +31,7 @@
- #define DEVICE_NAME	"sev"
- 
- static DEFINE_MUTEX(sev_cmd_mutex);
--static bool sev_fops_registered;
-+static struct miscdevice *psp_misc_dev;
- 
- static struct psp_device *psp_alloc_struct(struct sp_device *sp)
- {
-@@ -242,7 +242,6 @@ EXPORT_SYMBOL_GPL(sev_guest_df_flush);
- static int sev_ops_init(struct psp_device *psp)
- {
- 	struct device *dev = psp->dev;
--	struct miscdevice *misc;
- 	int ret;
- 
- 	/*
-@@ -252,26 +251,24 @@ static int sev_ops_init(struct psp_device *psp)
- 	 * sev_do_cmd() finds the right master device to which to issue the
- 	 * command to the firmware.
- 	 */
--	if (!sev_fops_registered) {
--
--		misc = devm_kzalloc(dev, sizeof(*misc), GFP_KERNEL);
--		if (!misc)
-+	if (!psp_misc_dev) {
-+		psp_misc_dev = devm_kzalloc(dev, sizeof(struct miscdevice), GFP_KERNEL);
-+		if (!psp_misc_dev)
- 			return -ENOMEM;
- 
--		misc->minor = MISC_DYNAMIC_MINOR;
--		misc->name = DEVICE_NAME;
--		misc->fops = &sev_fops;
-+		psp_misc_dev->minor = MISC_DYNAMIC_MINOR;
-+		psp_misc_dev->name = DEVICE_NAME;
-+		psp_misc_dev->fops = &sev_fops;
- 
--		ret = misc_register(misc);
-+		ret = misc_register(psp_misc_dev);
- 		if (ret)
- 			return ret;
--
--		sev_fops_registered = true;
--		psp->sev_misc = misc;
--		init_waitqueue_head(&psp->sev_int_queue);
--		dev_info(dev, "registered SEV device\n");
- 	}
- 
-+	psp->sev_misc = psp_misc_dev;
-+	init_waitqueue_head(&psp->sev_int_queue);
-+	dev_info(dev, "registered SEV device\n");
-+
- 	return 0;
- }
- 
-@@ -288,8 +285,8 @@ static int sev_init(struct psp_device *psp)
- 
- static void sev_exit(struct psp_device *psp)
- {
--	if (psp->sev_misc)
--		misc_deregister(psp->sev_misc);
-+	if (psp_misc_dev)
-+		misc_deregister(psp_misc_dev);
- }
- 
- int psp_dev_init(struct sp_device *sp)
+Thx.
 
 -- 
 Regards/Gruss,
