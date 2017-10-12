@@ -1,14 +1,11 @@
 From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [Part2 PATCH v5.1 12.5/31] crypto: ccp: Implement SEV_PEK_GEN
- ioctl command
-Date: Thu, 12 Oct 2017 15:34:54 -0500
-Message-ID: <26a451b8-2c34-979a-ccdc-15e4948abb80@amd.com>
-References: <20171004131412.13038-13-brijesh.singh@amd.com>
- <20171007010607.78088-1-brijesh.singh@amd.com>
- <20171007010607.78088-5-brijesh.singh@amd.com>
- <20171012182844.kjv5zab7o6fwwwdk@pd.tnic>
- <e2a67da0-5442-f9d6-6390-bfbb0a352639@amd.com>
- <20171012202152.dzlzka7vmojcxu6q@pd.tnic>
+Subject: Re: [Part2 PATCH v5.2 12.2/31] crypto: ccp: Add Secure Encrypted
+ Virtualization (SEV) command support
+Date: Thu, 12 Oct 2017 16:11:18 -0500
+Message-ID: <622585ce-c575-29ff-0484-404b7cf684fc@amd.com>
+References: <20171007010607.78088-1-brijesh.singh@amd.com>
+ <20171011165030.115696-1-brijesh.singh@amd.com>
+ <20171012140816.6siefvahj6ww7uzf@pd.tnic>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
@@ -20,48 +17,111 @@ Cc: brijesh.singh@amd.com, Paolo Bonzini <pbonzini@redhat.com>,
         linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
 To: Borislav Petkov <bp@suse.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-sn1nam01on0065.outbound.protection.outlook.com ([104.47.32.65]:6894
-        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752452AbdJLUfE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Oct 2017 16:35:04 -0400
-In-Reply-To: <20171012202152.dzlzka7vmojcxu6q@pd.tnic>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20171012140816.6siefvahj6ww7uzf@pd.tnic>
 Content-Language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 
 
-On 10/12/17 3:21 PM, Borislav Petkov wrote:
-> On Thu, Oct 12, 2017 at 03:11:07PM -0500, Brijesh Singh wrote:
->> Lets  consider this scenario
->> 1- platform is in uninit state, we transition it to INIT
->> 2- PEK_GEN command failed
->> 3- since we have transitioned the platform in INIT state hence we must
->> call the shutdown otherwise we will leave the system in wrong state. The
->> shutdown command will most probably succeed and we will look the ret value
-> Sure but what do you do if the main command, i.e., PEK_GEN succeeds but
-> the shutdown command fails?
->
-> You probably should carve out the whole shutdown order in separate
-> functions. I mean, the sequences do repeat in a couple of functions so
-> you could do:
->
-> ioctl:
->
-> 	case <CMD>:
->
-> 		init_platform()
-> 		do_main_cmd()
-> 		shutdown_platform()
-> 	break;
->
-> and this way you have everything nicely separated and retvals properly
-> tracked...
->
-> Hmmm?
+On 10/12/17 9:08 AM, Borislav Petkov wrote:
+...
 
-Some commands are allowed in INIT and WORKING, some in UINIT only,  some
-WORKING, and others in all the state. We need to follow the platform
-state machine. I will see what I can do. thanks
+> Well, if you're going to have a global var, why not pull up the misc
+> device instead?
+>
+> And mind you, I've moved out this assignments:
+>
+> +       psp->sev_misc = psp_misc_dev;
+> +       init_waitqueue_head(&psp->sev_int_queue);
+> +       dev_info(dev, "registered SEV device\n");
+>
+> outside of the if-conditional as I'm assuming you want to do this for
+> each psp device for which sev_ops_init() is called.
+>
+> Or am I wrong here?
+
+I am OK with your patch except  one minor issue highlighted below.
+
+> ---
+> diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
+> index 175cb3c3b8ef..d50aaa1ca75b 100644
+> --- a/drivers/crypto/ccp/psp-dev.c
+> +++ b/drivers/crypto/ccp/psp-dev.c
+> @@ -31,7 +31,7 @@
+>  #define DEVICE_NAME	"sev"
+>  
+>  static DEFINE_MUTEX(sev_cmd_mutex);
+> -static bool sev_fops_registered;
+> +static struct miscdevice *psp_misc_dev;
+>  
+>  static struct psp_device *psp_alloc_struct(struct sp_device *sp)
+>  {
+> @@ -242,7 +242,6 @@ EXPORT_SYMBOL_GPL(sev_guest_df_flush);
+>  static int sev_ops_init(struct psp_device *psp)
+>  {
+>  	struct device *dev = psp->dev;
+> -	struct miscdevice *misc;
+>  	int ret;
+>  
+>  	/*
+> @@ -252,26 +251,24 @@ static int sev_ops_init(struct psp_device *psp)
+>  	 * sev_do_cmd() finds the right master device to which to issue the
+>  	 * command to the firmware.
+>  	 */
+> -	if (!sev_fops_registered) {
+> -
+> -		misc = devm_kzalloc(dev, sizeof(*misc), GFP_KERNEL);
+> -		if (!misc)
+> +	if (!psp_misc_dev) {
+> +		psp_misc_dev = devm_kzalloc(dev, sizeof(struct miscdevice), GFP_KERNEL);
+> +		if (!psp_misc_dev)
+>  			return -ENOMEM;
+>  
+> -		misc->minor = MISC_DYNAMIC_MINOR;
+> -		misc->name = DEVICE_NAME;
+> -		misc->fops = &sev_fops;
+> +		psp_misc_dev->minor = MISC_DYNAMIC_MINOR;
+> +		psp_misc_dev->name = DEVICE_NAME;
+> +		psp_misc_dev->fops = &sev_fops;
+>  
+> -		ret = misc_register(misc);
+> +		ret = misc_register(psp_misc_dev);
+>  		if (ret)
+>  			return ret;
+> -
+> -		sev_fops_registered = true;
+> -		psp->sev_misc = misc;
+> -		init_waitqueue_head(&psp->sev_int_queue);
+> -		dev_info(dev, "registered SEV device\n");
+>  	}
+>  
+> +	psp->sev_misc = psp_misc_dev;
+> +	init_waitqueue_head(&psp->sev_int_queue);
+> +	dev_info(dev, "registered SEV device\n");
+> +
+>  	return 0;
+>  }
+>  
+> @@ -288,8 +285,8 @@ static int sev_init(struct psp_device *psp)
+>  
+>  static void sev_exit(struct psp_device *psp)
+>  {
+> -	if (psp->sev_misc)
+> -		misc_deregister(psp->sev_misc);
+> +	if (psp_misc_dev)
+> +		misc_deregister(psp_misc_dev);
+
+The sev_exit() will be called for all the psp_device instance. we need
+to set psp_misc_dev = NULL after deregistering the device.
+
+if (psp_misc_dev) {
+  misc_deregister(psp_misc_dev);
+   psp_misc_dev = NULL;
+}
+
+>  }
+>  
+>  int psp_dev_init(struct sp_device *sp)
+>
