@@ -1,31 +1,43 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 2/3] crypto: dh_helper - return unsigned value for
- crypto_dh_key_len()
-Date: Thu, 12 Oct 2017 23:19:10 +0800
-Message-ID: <20171012151909.GF31122@gondor.apana.org.au>
-References: <20170929092106.24276-1-tudor.ambarus@microchip.com>
- <20170929092106.24276-2-tudor.ambarus@microchip.com>
+Subject: Re: [PATCH v2] crypto: keywrap - simplify code
+Date: Thu, 12 Oct 2017 23:19:21 +0800
+Message-ID: <20171012151921.GG31122@gondor.apana.org.au>
+References: <83738816.byIHpQSsDj@positron.chronox.de>
+ <5659514.0BUO5u15Qm@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: dhowells@redhat.com, linux-crypto@vger.kernel.org,
-        keyrings@vger.kernel.org
-To: Tudor Ambarus <tudor.ambarus@microchip.com>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Cc: linux-crypto@vger.kernel.org
+To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:37348 "EHLO
+Received: from orcrist.hmeau.com ([104.223.48.154]:37352 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751441AbdJLPTd (ORCPT
+        with ESMTP id S1751370AbdJLPTo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Oct 2017 11:19:33 -0400
+        Thu, 12 Oct 2017 11:19:44 -0400
 Content-Disposition: inline
-In-Reply-To: <20170929092106.24276-2-tudor.ambarus@microchip.com>
+In-Reply-To: <5659514.0BUO5u15Qm@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Sep 29, 2017 at 12:21:05PM +0300, Tudor Ambarus wrote:
-> DH_KPP_SECRET_MIN_SIZE and dh_data_size() are both returning
-> unsigned values.
+On Tue, Oct 03, 2017 at 04:19:59AM +0200, Stephan Müller wrote:
+> Hi Herbert,
 > 
-> Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
+> Changes v2:
+> * use __be64 for A and R variables
+> * eliminate tbe variable
+> * use initial IV value with cpu_to_be64 when accessing variable A
+> 
+> ---8<---
+> 
+> The code is simplified by using two __be64 values for the operation
+> instead of using two arrays of u8. This allows to get rid of the memory
+> alignment code. In addition, the crypto_xor can be replaced with a
+> native XOR operation. Finally, the definition of the variables is
+> re-arranged such that the data structures come before simple variables
+> to potentially reduce memory space.
+> 
+> Signed-off-by: Stephan Mueller <smueller@chronox.de>
 
 Patch applied.  Thanks.
 -- 
