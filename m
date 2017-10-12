@@ -1,48 +1,193 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v3 0/4] crypto: Add driver for JZ4780 PRNG
-Date: Thu, 12 Oct 2017 22:30:11 +0800
-Message-ID: <20171012143011.GA30173@gondor.apana.org.au>
-References: <20170918140241.24003-1-prasannatsmkumar@gmail.com>
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Subject: Re: Fostering linux community collaboration on hardware
+ accelerators
+Date: Thu, 12 Oct 2017 15:57:10 +0100
+Message-ID: <20171012155710.000063d1@huawei.com>
+References: <201710101132.v9ABUs28138304@mx0a-001b2d01.pphosted.com>
+        <07d49485-e583-8434-5681-92a0b54005ca@au1.ibm.com>
+        <b7ceffd0-a07b-87c8-aec4-6a5effe997f4@linux.vnet.ibm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: robh+dt@kernel.org, ralf@linux-mips.org, davem@davemloft.net,
-        paul@crapouillou.net, linux-crypto@vger.kernel.org,
-        linux-mips@linux-mips.org, malat@debian.org, noloader@gmail.com
-To: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:37248 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751492AbdJLOal (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Oct 2017 10:30:41 -0400
-Content-Disposition: inline
-In-Reply-To: <20170918140241.24003-1-prasannatsmkumar@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 8BIT
+Cc: Andrew Donnellan <andrew.donnellan@au1.ibm.com>,
+        <jic23@kernel.org>, "Liguozhu (Kenneth)" <liguozhu@hisilicon.com>,
+        Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+        <francois.ozog@linaro.org>, <Prasad.Athreya@cavium.com>,
+        <arndbergmann@gmail.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Frederic Barrat <fbarrat@linux.vnet.ibm.com>,
+        Mark Brown <broonie@kernel.org>,
+        <Tirumalesh.Chalamarla@cavium.com>, <jcm@redhat.com>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        "Jean-Philippe Brucker" <jean-philippe.brucker@arm.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Eric Auger <eric.auger@redhat.com>, <kvm@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <linuxarm@huawei.com>
+To: Douglas Miller <dougmill@linux.vnet.ibm.com>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <b7ceffd0-a07b-87c8-aec4-6a5effe997f4@linux.vnet.ibm.com>
+Sender: kvm-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Sep 18, 2017 at 07:32:37PM +0530, PrasannaKumar Muralidharan wrote:
-> This patch series adds support of pseudo random number generator found
-> in Ingenic's JZ4780 and X1000 SoC.
+On Thu, 12 Oct 2017 08:31:36 -0500
+Douglas Miller <dougmill@linux.vnet.ibm.com> wrote:
+
+> Not sure if you're already plugged-in to this, but the OpenMP group is 
+> (has been) working on Accelerator support.
 > 
-> Create cgublock node which has CGU and RNG node as its children. The
-> cgublock node uses "simple-bus" compatible which helps in exposing CGU
-> and RNG nodes without changing CGU driver. Add 'syscon' compatible in
-> CGU node in jz4780.dtsi. The jz4780-rng driver uses regmap exposed via
-> syscon interface to access the RNG registers. CGU driver is not
-> modified in this patch set as registers used by CGU driver and this
-> driver are different.
+> http://www.openmp.org/updates/openmp-accelerator-support-gpus/
 > 
-> PrasannaKumar Muralidharan (4):
->   crypto: jz4780-rng: Add JZ4780 PRNG devicetree binding documentation
->   crypto: jz4780-rng: Add Ingenic JZ4780 hardware PRNG driver
->   crypto: jz4780-rng: Add RNG node to jz4780.dtsi
->   crypto: jz4780-rng: Enable PRNG support in CI20 defconfig
+> Maybe you are talking about a different aspect of accelerator support, 
+> but it seems prudent to involve OpenMP as much as makes sense.
 
-Please indicate which patches are intended to go through the crypto
-trees.
+That's certainly interesting and sits in the area of 'standard'
+userspace code but it is (I think) really addressing only one aspect
+of the wider support problem.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+I do like the emphasis on balancing between CPU and accelerator,
+that is certainly an open question even a the lowest levels in
+areas such as cryptography acceleration where you either run
+out of hardware resources on your accelerator or you actually
+have a usage pattern that would be quicker on the CPU due
+to inherent overheads in (current) non cpu crypto engines.
+
+Thanks for the pointer.  I can see we are going to need some location
+for resources like this to be gathered together.
+
+Jonathan
+
+> 
+> 
+> On 10/12/2017 12:22 AM, Andrew Donnellan wrote:
+> > On 10/10/17 22:28, Jonathan Cameron wrote:  
+> >> Hi All,
+> >>
+> >> Please forward this email to anyone you think may be interested.  
+> >
+> > Have forwarded this to a number of relevant IBMers.
+> >  
+> >> On behalf of Huawei, I am looking into options to foster a wider 
+> >> community
+> >> around the various ongoing projects related to Accelerator support 
+> >> within
+> >> Linux.  The particular area of interest to Huawei is that of harnessing
+> >> accelerators from userspace, but in a collaborative way with the kernel
+> >> still able to make efficient use of them, where appropriate.
+> >>
+> >> We are keen to foster a wider community than one just focused on
+> >> our own current technology.  This is a field with no clear answers, 
+> >> so the
+> >> widest possible range of input is needed!
+> >>
+> >> The address list of this email is drawn from people we have had 
+> >> discussions
+> >> with or who have been suggested in response to Kenneth Lee's wrapdrive
+> >> presentation at Linaro Connect and earlier presentations on the more 
+> >> general
+> >> issue. A few relevant lists added to hopefully catch anyone we missed.
+> >> My apologies to anyone who got swept up in this and isn't interested!
+> >>
+> >> Here we are defining accelerators fairly broadly - suggestions for a 
+> >> better
+> >> term are also welcome.
+> >>
+> >> The infrastructure may be appropriate for:
+> >> * Traditional offload engines - cryptography, compression and similar
+> >> * Upcoming AI accelerators
+> >> * ODP type requirements for access to elements of networking
+> >> * Systems utilizing SVM including CCIX and other cache coherent buses
+> >> * Many things we haven't thought of yet...
+> >>
+> >> As I see it, there are several aspects to this:
+> >>
+> >> 1) Kernel drivers for accelerators themselves.
+> >>     * Traditional drivers such as crypto etc
+> >>     - These already have their own communities. The main
+> >>            focus of such work will always be through them.
+> >>          - What a more general community could add here would be an
+> >>            overview of the shared infrastructure of such devices.
+> >>       This is particularly true around VFIO based (or similar)
+> >>       userspace interfaces with a non trivial userspace component.
+> >>     * How to support new types of accelerator?
+> >>
+> >> 2) The need for lightweight access paths from userspace that 'play 
+> >> well' and
+> >>     share resources etc with standard in-kernel drivers.  This is the 
+> >> area
+> >>     that Kenneth Lee and Huawei have been focusing on with their 
+> >> wrapdrive
+> >>     effort. We know there are other similar efforts going on in other 
+> >> companies.
+> >>     * This may involve interacting with existing kernel communities 
+> >> such as
+> >>       those around VFIO and mdev.
+> >>     * Resource management when we may have many consumers - not all 
+> >> hardware
+> >>       has appropriate features to deal with this.
+> >>
+> >> 3) Usecases for accelerators. e.g.
+> >>     * kTLS
+> >>     * Storage encryption
+> >>     * ODP - networking dataplane
+> >>     * AI toolkits
+> >>
+> >> Discussions we want to get started include:
+> >> * A wider range of hardware than we are currently considering. What 
+> >> makes
+> >>    sense to target / what hardware do people have they would like to 
+> >> support?
+> >> * Upstream paths - potential blockers and how to overcome them. The 
+> >> standard
+> >>    kernel drivers should be fairly straightforward, but once we start 
+> >> looking at
+> >>    systems with a heavier userspace component, things will get more
+> >>    controversial!
+> >> * Fostering stronger userspace communities to allow these these 
+> >> accelerators
+> >>    to be easily harnessed.
+> >>
+> >> So as ever with a linux community focusing on a particular topic, the
+> >> obvious solution is a mailing list. There are a number of options on how
+> >> do this.
+> >>
+> >> 1) Ask one of the industry bodies to host? Who?
+> >>
+> >> 2) Put together a compelling argument for 
+> >> linux-accelerators@vger.kernel.org
+> >> as probably the most generic location for such a list.  
+> >
+> > Happy to offer linux-accelerators@lists.ozlabs.org, which I can get 
+> > set up immediately (and if we want patchwork, patchwork.ozlabs.org is 
+> > available as always, no matter where the list is hosted).
+> >  
+> >> More open questions are
+> >> 1) Scope?
+> >>   * Would anyone ever use such an overarching list?
+> >>   * Are we better off with the usual adhoc list of 'interested 
+> >> parties' + lkml?
+> >>   * Do we actually need to define the full scope - are we better with 
+> >> a vague
+> >>     definition?  
+> >
+> > I think a list with a broad and vaguely defined scope is a good idea - 
+> > it would certainly be helpful to us to be able to follow what other 
+> > contributors are doing that could be relevant to our CAPI and OpenCAPI 
+> > work.
+> >  
+> >>
+> >> 2) Is there an existing community we can use to discuss these issues?
+> >>     (beyond the obvious firehose of LKML).
+> >>
+> >> 3) Who else to approach for input on these general questions?
+> >>
+> >> In parallel to this there are elements such as git / patchwork etc but
+> >> they can all be done as they are needed.
+> >>
+> >> Thanks
+> >>
+> >> -- 
+> >> Jonathan Cameron
+> >> Huawei
+> >>  
+> >  
+> 
