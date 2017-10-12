@@ -1,210 +1,157 @@
-From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH v1 00/27] x86: PIE support and option to
- extend KASLR randomization
-Date: Wed, 11 Oct 2017 16:34:21 -0500
-Message-ID: <22e56a56-978a-738f-52b9-2d0c17839c9e@amd.com>
-References: <20171011203027.11248-1-thgarnie@google.com>
+From: Andrew Donnellan <andrew.donnellan@au1.ibm.com>
+Subject: Re: Fostering linux community collaboration on hardware accelerators
+Date: Thu, 12 Oct 2017 16:22:29 +1100
+Message-ID: <07d49485-e583-8434-5681-92a0b54005ca@au1.ibm.com>
+References: <201710101132.v9ABUs28138304@mx0a-001b2d01.pphosted.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: linux-arch@vger.kernel.org, kvm@vger.kernel.org, linux-pm@vger.kernel.org,
- x86@kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- virtualization@lists.linux-foundation.org, linux-sparse@vger.kernel.org,
- linux-crypto@vger.kernel.org, kernel-hardening@lists.openwall.com,
- xen-devel@lists.xenproject.org
-To: Thomas Garnier <thgarnie@google.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S . Miller" <davem@davemloft.net>,
- Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- "H . Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>,
- Josh Poimboeuf <jpoimboe@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
- Kees Cook <keescook@chromium.org>, Andrey Ryabinin
- <aryabinin@virtuozzo.com>, Matthias Kaehlcke <mka@chromium.org>,
- Andy Lutomirski <luto@kernel.org>,
- "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
- Borislav Petkov <bp@suse.de>, "Rafael J . Wysocki" <rjw@rjwysocki.net>,
- Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
- Juergen Gross <jgross@suse.com>, Chris Wright <chrisw@sous-sol.org>,
- Alok Kataria <akataria@vmware.com>, Rusty Russell <rusty@rustcorp.com.au>,
- Tejun Heo <tj@kernel.org>, Christoph Lameter <cl@linux.com>,
-Return-path: <xen-devel-bounces@lists.xen.org>
-In-Reply-To: <20171011203027.11248-1-thgarnie@google.com>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.xen.org/cgi-bin/mailman/options/xen-devel>,
- <mailto:xen-devel-request@lists.xen.org?subject=unsubscribe>
-List-Post: <mailto:xen-devel@lists.xen.org>
-List-Help: <mailto:xen-devel-request@lists.xen.org?subject=help>
-List-Subscribe: <https://lists.xen.org/cgi-bin/mailman/listinfo/xen-devel>,
- <mailto:xen-devel-request@lists.xen.org?subject=subscribe>
-Errors-To: xen-devel-bounces@lists.xen.org
-Sender: "Xen-devel" <xen-devel-bounces@lists.xen.org>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+To: Jonathan Cameron <Jonathan.Cameron@huawei.com>, jic23@kernel.org,
+        "Liguozhu (Kenneth)" <liguozhu@hisilicon.com>,
+        Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+        francois.ozog@linaro.org, Prasad.Athreya@cavium.com,
+        arndbergmann@gmail.com,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Frederic Barrat <fbarrat@linux.vnet.ibm.com>,
+        Mark Brown <broonie@kernel.org>,
+        Tirumalesh.Chalamarla@cavium.com, jcm@redhat.com,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Jean-Philippe Brucker <jean-philippe.brucker@arm.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Eric Auger <eric.auger@redhat.com>, kvm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linuxarm@huawei.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47976 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1750766AbdJLFWh (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 12 Oct 2017 01:22:37 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id v9C5J0ig086510
+        for <linux-crypto@vger.kernel.org>; Thu, 12 Oct 2017 01:22:37 -0400
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2dj0qg3h2x-1
+        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Thu, 12 Oct 2017 01:22:37 -0400
+Received: from localhost
+        by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-crypto@vger.kernel.org> from <andrew.donnellan@au1.ibm.com>;
+        Thu, 12 Oct 2017 06:22:35 +0100
+In-Reply-To: <201710101132.v9ABUs28138304@mx0a-001b2d01.pphosted.com>
+Content-Language: en-AU
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-T24gMTAvMTEvMjAxNyAzOjMwIFBNLCBUaG9tYXMgR2FybmllciB3cm90ZToKPiBDaGFuZ2VzOgo+
-ICAgLSBwYXRjaCB2MToKPiAgICAgLSBTaW1wbGlmeSBmdHJhY2UgaW1wbGVtZW50YXRpb24uCj4g
-ICAgIC0gVXNlIGdjYyBtc3RhY2stcHJvdGVjdG9yLWd1YXJkLXJlZz0lZ3Mgd2l0aCBQSUUgd2hl
-biBwb3NzaWJsZS4KPiAgIC0gcmZjIHYzOgo+ICAgICAtIFVzZSAtLWVtaXQtcmVsb2NzIGluc3Rl
-YWQgb2YgLXBpZSB0byByZWR1Y2UgZHluYW1pYyByZWxvY2F0aW9uIHNwYWNlIG9uCj4gICAgICAg
-bWFwcGVkIG1lbW9yeS4gSXQgYWxzbyBzaW1wbGlmaWVzIHRoZSByZWxvY2F0aW9uIHByb2Nlc3Mu
-Cj4gICAgIC0gTW92ZSB0aGUgc3RhcnQgdGhlIG1vZHVsZSBzZWN0aW9uIG5leHQgdG8gdGhlIGtl
-cm5lbC4gUmVtb3ZlIHRoZSBuZWVkIGZvcgo+ICAgICAgIC1tY21vZGVsPWxhcmdlIG9uIG1vZHVs
-ZXMuIEV4dGVuZHMgbW9kdWxlIHNwYWNlIGZyb20gMSB0byAyRyBtYXhpbXVtLgo+ICAgICAtIFN1
-cHBvcnQgZm9yIFhFTiBQVkggYXMgMzItYml0IHJlbG9jYXRpb25zIGNhbiBiZSBpZ25vcmVkIHdp
-dGgKPiAgICAgICAtLWVtaXQtcmVsb2NzLgo+ICAgICAtIFN1cHBvcnQgZm9yIEdPVCByZWxvY2F0
-aW9ucyBwcmV2aW91c2x5IGRvbmUgYXV0b21hdGljYWxseSB3aXRoIC1waWUuCj4gICAgIC0gUmVt
-b3ZlIG5lZWQgZm9yIGR5bmFtaWMgUExUIGluIG1vZHVsZXMuCj4gICAgIC0gU3VwcG9ydCBkeW1h
-bWljIEdPVCBmb3IgbW9kdWxlcy4KPiAgIC0gcmZjIHYyOgo+ICAgICAtIEFkZCBzdXBwb3J0IGZv
-ciBnbG9iYWwgc3RhY2sgY29va2llIHdoaWxlIGNvbXBpbGVyIGRlZmF1bHQgdG8gZnMgd2l0aG91
-dAo+ICAgICAgIG1jbW9kZWw9a2VybmVsCj4gICAgIC0gQ2hhbmdlIHBhdGNoIDcgdG8gY29ycmVj
-dGx5IGp1bXAgb3V0IG9mIHRoZSBpZGVudGl0eSBtYXBwaW5nIG9uIGtleGVjIGxvYWQKPiAgICAg
-ICBwcmVzZXJ2ZS4KPiAKPiBUaGVzZSBwYXRjaGVzIG1ha2UgdGhlIGNoYW5nZXMgbmVjZXNzYXJ5
-IHRvIGJ1aWxkIHRoZSBrZXJuZWwgYXMgUG9zaXRpb24KPiBJbmRlcGVuZGVudCBFeGVjdXRhYmxl
-IChQSUUpIG9uIHg4Nl82NC4gQSBQSUUga2VybmVsIGNhbiBiZSByZWxvY2F0ZWQgYmVsb3cKPiB0
-aGUgdG9wIDJHIG9mIHRoZSB2aXJ0dWFsIGFkZHJlc3Mgc3BhY2UuIEl0IGFsbG93cyB0byBvcHRp
-b25hbGx5IGV4dGVuZCB0aGUKPiBLQVNMUiByYW5kb21pemF0aW9uIHJhbmdlIGZyb20gMUcgdG8g
-M0cuCgpIaSBUaG9tYXMsCgpJJ3ZlIGFwcGxpZWQgeW91ciBwYXRjaGVzIHNvIHRoYXQgSSBjYW4g
-dmVyaWZ5IHRoYXQgU01FIHdvcmtzIHdpdGggUElFLgpVbmZvcnR1bmF0ZWx5LCBJJ20gcnVubmlu
-ZyBpbnRvIGJ1aWxkIHdhcm5pbmdzIGFuZCBlcnJvcnMgd2hlbiBJIGVuYWJsZQpQSUUuCgpXaXRo
-IENPTkZJR19TVEFDS19WQUxJREFUSU9OPXkgSSByZWNlaXZlIGxvdHMgb2YgbWVzc2FnZXMgbGlr
-ZSB0aGlzOgoKICBkcml2ZXJzL3Njc2kvbGliZmMvZmNfZXhjaC5vOiB3YXJuaW5nOiBvYmp0b29s
-OiBmY19kZXN0cm95X2V4Y2hfbWdyKCkrMHgwOiBjYWxsIHdpdGhvdXQgZnJhbWUgcG9pbnRlciBz
-YXZlL3NldHVwCgpEaXNhYmxpbmcgQ09ORklHX1NUQUNLX1ZBTElEQVRJT04gc3VwcHJlc3NlcyB0
-aG9zZS4KCkJ1dCBuZWFyIHRoZSBlbmQgb2YgdGhlIGJ1aWxkLCBJIHJlY2VpdmUgZXJyb3JzIGxp
-a2UgdGhpczoKCiAgYXJjaC94ODYva2VybmVsL3NldHVwLm86IEluIGZ1bmN0aW9uIGBkdW1wX2tl
-cm5lbF9vZmZzZXQnOgogIC4uLi9hcmNoL3g4Ni9rZXJuZWwvc2V0dXAuYzo4MDE6KC50ZXh0KzB4
-MzIpOiByZWxvY2F0aW9uIHRydW5jYXRlZCB0byBmaXQ6IFJfWDg2XzY0XzMyUyBhZ2FpbnN0IHN5
-bWJvbCBgX3RleHQnIGRlZmluZWQgaW4gLnRleHQgc2VjdGlvbiBpbiAudG1wX3ZtbGludXgxCiAg
-LgogIC4gYWJvdXQgMTAgbW9yZSBvZiB0aGUgYWJvdmUgdHlwZSBtZXNzYWdlcwogIC4KICBtYWtl
-OiAqKiogW3ZtbGludXhdIEVycm9yIDEKICBFcnJvciBidWlsZGluZyBrZXJuZWwsIGV4aXRpbmcK
-CkFyZSB0aGVyZSBhbnkgY29uZmlnIG9wdGlvbnMgdGhhdCBzaG91bGQgb3Igc2hvdWxkIG5vdCBi
-ZSBlbmFibGVkIHdoZW4KYnVpbGRpbmcgd2l0aCBQSUUgZW5hYmxlZD8gIElzIHRoZXJlIGEgY29t
-cGlsZXIgcmVxdWlyZW1lbnQgZm9yIFBJRSAoSSdtCnVzaW5nIGdjYyB2ZXJzaW9uIDUuNC4wIDIw
-MTYwNjA5IChVYnVudHUgNS40LjAtNnVidW50dTF+MTYuMDQuNSkpPwoKVGhhbmtzLApUb20KCj4g
-Cj4gVGhhbmtzIGEgbG90IHRvIEFyZCBCaWVzaGV1dmVsICYgS2VlcyBDb29rIG9uIHRoZWlyIGZl
-ZWRiYWNrIG9uIGNvbXBpbGVyCj4gY2hhbmdlcywgUElFIHN1cHBvcnQgYW5kIEtBU0xSIGluIGdl
-bmVyYWwuIFRoYW5rcyB0byBSb2xhbmQgTWNHcmF0aCBvbiBoaXMKPiBmZWVkYmFjayBmb3IgdXNp
-bmcgLXBpZSB2ZXJzdXMgLS1lbWl0LXJlbG9jcyBhbmQgZGV0YWlscyBvbiBjb21waWxlciBjb2Rl
-Cj4gZ2VuZXJhdGlvbi4KPiAKPiBUaGUgcGF0Y2hlczoKPiAgIC0gMS0zLCA1LTEjLCAxNy0xODog
-Q2hhbmdlIGluIGFzc2VtYmx5IGNvZGUgdG8gYmUgUElFIGNvbXBsaWFudC4KPiAgIC0gNDogQWRk
-IGEgbmV3IF9BU01fR0VUX1BUUiBtYWNybyB0byBmZXRjaCBhIHN5bWJvbCBhZGRyZXNzIGdlbmVy
-aWNhbGx5Lgo+ICAgLSAxNDogQWRhcHQgcGVyY3B1IGRlc2lnbiB0byB3b3JrIGNvcnJlY3RseSB3
-aGVuIFBJRSBpcyBlbmFibGVkLgo+ICAgLSAxNTogUHJvdmlkZSBhbiBvcHRpb24gdG8gZGVmYXVs
-dCB2aXNpYmlsaXR5IHRvIGhpZGRlbiBleGNlcHQgZm9yIGtleSBzeW1ib2xzLgo+ICAgICAgICAg
-SXQgcmVtb3ZlcyBlcnJvcnMgYmV0d2VlbiBjb21waWxhdGlvbiB1bml0cy4KPiAgIC0gMTY6IEFk
-YXB0IHJlbG9jYXRpb24gdG9vbCB0byBoYW5kbGUgUElFIGJpbmFyeSBjb3JyZWN0bHkuCj4gICAt
-IDE5OiBBZGQgc3VwcG9ydCBmb3IgZ2xvYmFsIGNvb2tpZS4KPiAgIC0gMjA6IFN1cHBvcnQgZnRy
-YWNlIHdpdGggUElFICh1c2VkIG9uIFVidW50dSBjb25maWcpLgo+ICAgLSAyMTogRml4IGluY29y
-cmVjdCBhZGRyZXNzIG1hcmtlciBvbiBkdW1wX3BhZ2V0YWJsZXMuCj4gICAtIDIyOiBBZGQgb3B0
-aW9uIHRvIG1vdmUgdGhlIG1vZHVsZSBzZWN0aW9uIGp1c3QgYWZ0ZXIgdGhlIGtlcm5lbC4KPiAg
-IC0gMjM6IEFkYXB0IG1vZHVsZSBsb2FkaW5nIHRvIHN1cHBvcnQgUElFIHdpdGggZHluYW1pYyBH
-T1QuCj4gICAtIDI0OiBNYWtlIHRoZSBHT1QgcmVhZC1vbmx5Lgo+ICAgLSAyNTogQWRkIHRoZSBD
-T05GSUdfWDg2X1BJRSBvcHRpb24gKG9mZiBieSBkZWZhdWx0KS4KPiAgIC0gMjY6IEFkYXB0IHJl
-bG9jYXRpb24gdG9vbCB0byBnZW5lcmF0ZSBhIDY0LWJpdCByZWxvY2F0aW9uIHRhYmxlLgo+ICAg
-LSAyNzogQWRkIHRoZSBDT05GSUdfUkFORE9NSVpFX0JBU0VfTEFSR0Ugb3B0aW9uIHRvIGluY3Jl
-YXNlIHJlbG9jYXRpb24gcmFuZ2UKPiAgICAgICAgIGZyb20gMUcgdG8gM0cgKG9mZiBieSBkZWZh
-dWx0KS4KPiAKPiBQZXJmb3JtYW5jZS9TaXplIGltcGFjdDoKPiAKPiBTaXplIG9mIHZtbGludXgg
-KERlZmF1bHQgY29uZmlndXJhdGlvbik6Cj4gICBGaWxlIHNpemU6Cj4gICAtIFBJRSBkaXNhYmxl
-ZDogKzAuMDAwMDMxJQo+ICAgLSBQSUUgZW5hYmxlZDogLTMuMjEwJSAobGVzcyByZWxvY2F0aW9u
-cykKPiAgIC50ZXh0IHNlY3Rpb246Cj4gICAtIFBJRSBkaXNhYmxlZDogKzAuMDAwNjQ0JQo+ICAg
-LSBQSUUgZW5hYmxlZDogKzAuODM3JQo+IAo+IFNpemUgb2Ygdm1saW51eCAoVWJ1bnR1IGNvbmZp
-Z3VyYXRpb24pOgo+ICAgRmlsZSBzaXplOgo+ICAgLSBQSUUgZGlzYWJsZWQ6IC0wLjIwMSUKPiAg
-IC0gUElFIGVuYWJsZWQ6IC0wLjA4MiUKPiAgIC50ZXh0IHNlY3Rpb246Cj4gICAtIFBJRSBkaXNh
-YmxlZDogc2FtZQo+ICAgLSBQSUUgZW5hYmxlZDogKzEuMzE5JQo+IAo+IFNpemUgb2Ygdm1saW51
-eCAoRGVmYXVsdCBjb25maWd1cmF0aW9uICsgT1JDKToKPiAgIEZpbGUgc2l6ZToKPiAgIC0gUElF
-IGVuYWJsZWQ6IC0zLjE2NyUKPiAgIC50ZXh0IHNlY3Rpb246Cj4gICAtIFBJRSBlbmFibGVkOiAr
-MC44MTQlCj4gCj4gU2l6ZSBvZiB2bWxpbnV4IChVYnVudHUgY29uZmlndXJhdGlvbiArIE9SQyk6
-Cj4gICBGaWxlIHNpemU6Cj4gICAtIFBJRSBlbmFibGVkOiAtMy4xNjclCj4gICAudGV4dCBzZWN0
-aW9uOgo+ICAgLSBQSUUgZW5hYmxlZDogKzEuMjYlCj4gCj4gVGhlIHNpemUgaW5jcmVhc2UgaXMg
-bWFpbmx5IGR1ZSB0byBub3QgaGF2aW5nIGFjY2VzcyB0byB0aGUgMzItYml0IHNpZ25lZAo+IHJl
-bG9jYXRpb24gdGhhdCBjYW4gYmUgdXNlZCB3aXRoIG1jbW9kZWw9a2VybmVsLiBBIHNtYWxsIHBh
-cnQgaXMgZHVlIHRvIHJlZHVjZWQKPiBvcHRpbWl6YXRpb24gZm9yIFBJRSBjb2RlLiBUaGlzIGJ1
-ZyBbMV0gd2FzIG9wZW5lZCB3aXRoIGdjYyB0byBwcm92aWRlIGEgYmV0dGVyCj4gY29kZSBnZW5l
-cmF0aW9uIGZvciBrZXJuZWwgUElFLgo+IAo+IEhhY2tiZW5jaCAoNTAlIGFuZCAxNjAwJSBvbiB0
-aHJlYWQvcHJvY2VzcyBmb3IgcGlwZS9zb2NrZXRzKToKPiAgIC0gUElFIGRpc2FibGVkOiBubyBz
-aWduaWZpY2FudCBjaGFuZ2UgKGF2ZyArMC4xJSBvbiBsYXRlc3QgdGVzdCkuCj4gICAtIFBJRSBl
-bmFibGVkOiBiZXR3ZWVuIC0wLjUwJSB0byArMC44NiUgaW4gYXZlcmFnZSAoZGVmYXVsdCBhbmQg
-VWJ1bnR1IGNvbmZpZykuCj4gCj4gc2xhYl90ZXN0IChhdmVyYWdlIG9mIDEwIHJ1bnMpOgo+ICAg
-LSBQSUUgZGlzYWJsZWQ6IG5vIHNpZ25pZmljYW50IGNoYW5nZSAoLTIlIG9uIGxhdGVzdCBydW4s
-IGxpa2VseSBub2lzZSkuCj4gICAtIFBJRSBlbmFibGVkOiBiZXR3ZWVuIC0xJSBhbmQgKzAuOCUg
-b24gbGF0ZXN0IHJ1bnMuCj4gCj4gS2VybmJlbmNoIChhdmVyYWdlIG9mIDEwIEhhbGYgYW5kIE9w
-dGltYWwgcnVucyk6Cj4gICBFbGFwc2VkIFRpbWU6Cj4gICAtIFBJRSBkaXNhYmxlZDogbm8gc2ln
-bmlmaWNhbnQgY2hhbmdlIChhdmcgLTAuMjM5JSkKPiAgIC0gUElFIGVuYWJsZWQ6IGF2ZXJhZ2Ug
-KzAuMDclCj4gICBTeXN0ZW0gVGltZToKPiAgIC0gUElFIGRpc2FibGVkOiBubyBzaWduaWZpY2Fu
-dCBjaGFuZ2UgKGF2ZyAtMC4yNzclKQo+ICAgLSBQSUUgZW5hYmxlZDogYXZlcmFnZSArMC43JQo+
-IAo+IFsxXSBodHRwczovL2djYy5nbnUub3JnL2J1Z3ppbGxhL3Nob3dfYnVnLmNnaT9pZD04MjMw
-Mwo+IAo+IGRpZmZzdGF0Ogo+ICAgRG9jdW1lbnRhdGlvbi94ODYveDg2XzY0L21tLnR4dCAgICAg
-ICAgICAgICAgfCAgICAzCj4gICBhcmNoL3g4Ni9LY29uZmlnICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICB8ICAgNDMgKysrKysrCj4gICBhcmNoL3g4Ni9NYWtlZmlsZSAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICB8ICAgNDAgKysrKysKPiAgIGFyY2gveDg2L2Jvb3QvYm9vdC5oICAgICAg
-ICAgICAgICAgICAgICAgICAgIHwgICAgMgo+ICAgYXJjaC94ODYvYm9vdC9jb21wcmVzc2VkL01h
-a2VmaWxlICAgICAgICAgICAgfCAgICA1Cj4gICBhcmNoL3g4Ni9ib290L2NvbXByZXNzZWQvbWlz
-Yy5jICAgICAgICAgICAgICB8ICAgMTAgKwo+ICAgYXJjaC94ODYvY3J5cHRvL2Flcy14ODZfNjQt
-YXNtXzY0LlMgICAgICAgICAgfCAgIDQ1ICsrKystLQo+ICAgYXJjaC94ODYvY3J5cHRvL2Flc25p
-LWludGVsX2FzbS5TICAgICAgICAgICAgfCAgIDE0ICstCj4gICBhcmNoL3g4Ni9jcnlwdG8vYWVz
-bmktaW50ZWxfYXZ4LXg4Nl82NC5TICAgICB8ICAgIDYKPiAgIGFyY2gveDg2L2NyeXB0by9jYW1l
-bGxpYS1hZXNuaS1hdngtYXNtXzY0LlMgIHwgICA0MiArKystLS0KPiAgIGFyY2gveDg2L2NyeXB0
-by9jYW1lbGxpYS1hZXNuaS1hdngyLWFzbV82NC5TIHwgICA0NCArKystLS0KPiAgIGFyY2gveDg2
-L2NyeXB0by9jYW1lbGxpYS14ODZfNjQtYXNtXzY0LlMgICAgIHwgICAgOCAtCj4gICBhcmNoL3g4
-Ni9jcnlwdG8vY2FzdDUtYXZ4LXg4Nl82NC1hc21fNjQuUyAgICB8ICAgNTAgKysrKy0tLQo+ICAg
-YXJjaC94ODYvY3J5cHRvL2Nhc3Q2LWF2eC14ODZfNjQtYXNtXzY0LlMgICAgfCAgIDQ0ICsrKy0t
-LQo+ICAgYXJjaC94ODYvY3J5cHRvL2RlczNfZWRlLWFzbV82NC5TICAgICAgICAgICAgfCAgIDk2
-ICsrKysrKysrKy0tLS0tCj4gICBhcmNoL3g4Ni9jcnlwdG8vZ2hhc2gtY2xtdWxuaS1pbnRlbF9h
-c20uUyAgICB8ICAgIDQKPiAgIGFyY2gveDg2L2NyeXB0by9nbHVlX2hlbHBlci1hc20tYXZ4LlMg
-ICAgICAgIHwgICAgNAo+ICAgYXJjaC94ODYvY3J5cHRvL2dsdWVfaGVscGVyLWFzbS1hdngyLlMg
-ICAgICAgfCAgICA2Cj4gICBhcmNoL3g4Ni9lbnRyeS9lbnRyeV8zMi5TICAgICAgICAgICAgICAg
-ICAgICB8ICAgIDMKPiAgIGFyY2gveDg2L2VudHJ5L2VudHJ5XzY0LlMgICAgICAgICAgICAgICAg
-ICAgIHwgICAyOSArKy0tCj4gICBhcmNoL3g4Ni9pbmNsdWRlL2FzbS9hc20uaCAgICAgICAgICAg
-ICAgICAgICB8ICAgMTMgKwo+ICAgYXJjaC94ODYvaW5jbHVkZS9hc20vYnVnLmggICAgICAgICAg
-ICAgICAgICAgfCAgICAyCj4gICBhcmNoL3g4Ni9pbmNsdWRlL2FzbS9mdHJhY2UuaCAgICAgICAg
-ICAgICAgICB8ICAgIDYKPiAgIGFyY2gveDg2L2luY2x1ZGUvYXNtL2p1bXBfbGFiZWwuaCAgICAg
-ICAgICAgIHwgICAgOCAtCj4gICBhcmNoL3g4Ni9pbmNsdWRlL2FzbS9rdm1faG9zdC5oICAgICAg
-ICAgICAgICB8ICAgIDYKPiAgIGFyY2gveDg2L2luY2x1ZGUvYXNtL21vZHVsZS5oICAgICAgICAg
-ICAgICAgIHwgICAxMSArCj4gICBhcmNoL3g4Ni9pbmNsdWRlL2FzbS9wYWdlXzY0X3R5cGVzLmgg
-ICAgICAgICB8ICAgIDkgKwo+ICAgYXJjaC94ODYvaW5jbHVkZS9hc20vcGFyYXZpcnRfdHlwZXMu
-aCAgICAgICAgfCAgIDEyICsKPiAgIGFyY2gveDg2L2luY2x1ZGUvYXNtL3BlcmNwdS5oICAgICAg
-ICAgICAgICAgIHwgICAyNSArKy0KPiAgIGFyY2gveDg2L2luY2x1ZGUvYXNtL3BndGFibGVfNjRf
-dHlwZXMuaCAgICAgIHwgICAgNgo+ICAgYXJjaC94ODYvaW5jbHVkZS9hc20vcG0tdHJhY2UuaCAg
-ICAgICAgICAgICAgfCAgICAyCj4gICBhcmNoL3g4Ni9pbmNsdWRlL2FzbS9wcm9jZXNzb3IuaCAg
-ICAgICAgICAgICB8ICAgMTIgKwo+ICAgYXJjaC94ODYvaW5jbHVkZS9hc20vc2VjdGlvbnMuaCAg
-ICAgICAgICAgICAgfCAgICA4ICsKPiAgIGFyY2gveDg2L2luY2x1ZGUvYXNtL3NldHVwLmggICAg
-ICAgICAgICAgICAgIHwgICAgMgo+ICAgYXJjaC94ODYvaW5jbHVkZS9hc20vc3RhY2twcm90ZWN0
-b3IuaCAgICAgICAgfCAgIDE5ICsrCj4gICBhcmNoL3g4Ni9rZXJuZWwvYWNwaS93YWtldXBfNjQu
-UyAgICAgICAgICAgICB8ICAgMzEgKystLQo+ICAgYXJjaC94ODYva2VybmVsL2FzbS1vZmZzZXRz
-LmMgICAgICAgICAgICAgICAgfCAgICAzCj4gICBhcmNoL3g4Ni9rZXJuZWwvYXNtLW9mZnNldHNf
-MzIuYyAgICAgICAgICAgICB8ICAgIDMKPiAgIGFyY2gveDg2L2tlcm5lbC9hc20tb2Zmc2V0c182
-NC5jICAgICAgICAgICAgIHwgICAgMwo+ICAgYXJjaC94ODYva2VybmVsL2NwdS9jb21tb24uYyAg
-ICAgICAgICAgICAgICAgfCAgICA3IC0KPiAgIGFyY2gveDg2L2tlcm5lbC9jcHUvbWljcm9jb2Rl
-L2NvcmUuYyAgICAgICAgIHwgICAgNAo+ICAgYXJjaC94ODYva2VybmVsL2Z0cmFjZS5jICAgICAg
-ICAgICAgICAgICAgICAgfCAgIDQyICsrKysrLQo+ICAgYXJjaC94ODYva2VybmVsL2hlYWQ2NC5j
-ICAgICAgICAgICAgICAgICAgICAgfCAgIDMyICsrKy0KPiAgIGFyY2gveDg2L2tlcm5lbC9oZWFk
-XzMyLlMgICAgICAgICAgICAgICAgICAgIHwgICAgMwo+ICAgYXJjaC94ODYva2VybmVsL2hlYWRf
-NjQuUyAgICAgICAgICAgICAgICAgICAgfCAgIDQxICsrKysrLQo+ICAgYXJjaC94ODYva2VybmVs
-L2t2bS5jICAgICAgICAgICAgICAgICAgICAgICAgfCAgICA2Cj4gICBhcmNoL3g4Ni9rZXJuZWwv
-bW9kdWxlLmMgICAgICAgICAgICAgICAgICAgICB8ICAxODIgKysrKysrKysrKysrKysrKysrKysr
-KysrKystCj4gICBhcmNoL3g4Ni9rZXJuZWwvbW9kdWxlLmxkcyAgICAgICAgICAgICAgICAgICB8
-ICAgIDMKPiAgIGFyY2gveDg2L2tlcm5lbC9wcm9jZXNzLmMgICAgICAgICAgICAgICAgICAgIHwg
-ICAgNQo+ICAgYXJjaC94ODYva2VybmVsL3JlbG9jYXRlX2tlcm5lbF82NC5TICAgICAgICAgfCAg
-ICA4IC0KPiAgIGFyY2gveDg2L2tlcm5lbC9zZXR1cF9wZXJjcHUuYyAgICAgICAgICAgICAgIHwg
-ICAgMgo+ICAgYXJjaC94ODYva2VybmVsL3ZtbGludXgubGRzLlMgICAgICAgICAgICAgICAgfCAg
-IDEzICsKPiAgIGFyY2gveDg2L2t2bS9zdm0uYyAgICAgICAgICAgICAgICAgICAgICAgICAgIHwg
-ICAgNAo+ICAgYXJjaC94ODYvbGliL2NtcHhjaGcxNmJfZW11LlMgICAgICAgICAgICAgICAgfCAg
-ICA4IC0KPiAgIGFyY2gveDg2L21tL2R1bXBfcGFnZXRhYmxlcy5jICAgICAgICAgICAgICAgIHwg
-ICAxMSArCj4gICBhcmNoL3g4Ni9wb3dlci9oaWJlcm5hdGVfYXNtXzY0LlMgICAgICAgICAgICB8
-ICAgIDQKPiAgIGFyY2gveDg2L3Rvb2xzL3JlbG9jcy5jICAgICAgICAgICAgICAgICAgICAgIHwg
-IDE3MCArKysrKysrKysrKysrKysrKysrKysrKy0tCj4gICBhcmNoL3g4Ni90b29scy9yZWxvY3Mu
-aCAgICAgICAgICAgICAgICAgICAgICB8ICAgIDQKPiAgIGFyY2gveDg2L3Rvb2xzL3JlbG9jc19j
-b21tb24uYyAgICAgICAgICAgICAgIHwgICAxNSArLQo+ICAgYXJjaC94ODYveGVuL3hlbi1hc20u
-UyAgICAgICAgICAgICAgICAgICAgICAgfCAgIDEyIC0KPiAgIGFyY2gveDg2L3hlbi94ZW4taGVh
-ZC5TICAgICAgICAgICAgICAgICAgICAgIHwgICAgOSAtCj4gICBhcmNoL3g4Ni94ZW4veGVuLXB2
-aC5TICAgICAgICAgICAgICAgICAgICAgICB8ICAgMTMgKwo+ICAgZHJpdmVycy9iYXNlL2Zpcm13
-YXJlX2NsYXNzLmMgICAgICAgICAgICAgICAgfCAgICA0Cj4gICBpbmNsdWRlL2FzbS1nZW5lcmlj
-L3NlY3Rpb25zLmggICAgICAgICAgICAgICB8ICAgIDYKPiAgIGluY2x1ZGUvYXNtLWdlbmVyaWMv
-dm1saW51eC5sZHMuaCAgICAgICAgICAgIHwgICAxMiArCj4gICBpbmNsdWRlL2xpbnV4L2NvbXBp
-bGVyLmggICAgICAgICAgICAgICAgICAgICB8ICAgIDggKwo+ICAgaW5pdC9LY29uZmlnICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgICA5ICsKPiAgIGtlcm5lbC9rYWxsc3ltcy5j
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgICAxNiArLQo+ICAga2VybmVsL3RyYWNlL3Ry
-YWNlLmggICAgICAgICAgICAgICAgICAgICAgICAgfCAgICA0Cj4gICBsaWIvZHluYW1pY19kZWJ1
-Zy5jICAgICAgICAgICAgICAgICAgICAgICAgICB8ICAgIDQKPiAgIDcwIGZpbGVzIGNoYW5nZWQs
-IDEwMzIgaW5zZXJ0aW9ucygrKSwgMzA4IGRlbGV0aW9ucygtKQo+IAoKX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KWGVuLWRldmVsIG1haWxpbmcgbGlzdApY
-ZW4tZGV2ZWxAbGlzdHMueGVuLm9yZwpodHRwczovL2xpc3RzLnhlbi5vcmcveGVuLWRldmVsCg==
+On 10/10/17 22:28, Jonathan Cameron wrote:
+> Hi All,
+> 
+> Please forward this email to anyone you think may be interested.
+
+Have forwarded this to a number of relevant IBMers.
+
+> On behalf of Huawei, I am looking into options to foster a wider community
+> around the various ongoing projects related to Accelerator support within
+> Linux.  The particular area of interest to Huawei is that of harnessing
+> accelerators from userspace, but in a collaborative way with the kernel
+> still able to make efficient use of them, where appropriate.
+> 
+> We are keen to foster a wider community than one just focused on
+> our own current technology.  This is a field with no clear answers, so the
+> widest possible range of input is needed!
+> 
+> The address list of this email is drawn from people we have had discussions
+> with or who have been suggested in response to Kenneth Lee's wrapdrive
+> presentation at Linaro Connect and earlier presentations on the more general
+> issue. A few relevant lists added to hopefully catch anyone we missed.
+> My apologies to anyone who got swept up in this and isn't interested!
+> 
+> Here we are defining accelerators fairly broadly - suggestions for a better
+> term are also welcome.
+> 
+> The infrastructure may be appropriate for:
+> * Traditional offload engines - cryptography, compression and similar
+> * Upcoming AI accelerators
+> * ODP type requirements for access to elements of networking
+> * Systems utilizing SVM including CCIX and other cache coherent buses
+> * Many things we haven't thought of yet...
+> 
+> As I see it, there are several aspects to this:
+> 
+> 1) Kernel drivers for accelerators themselves.
+>     * Traditional drivers such as crypto etc
+> 	- These already have their own communities. The main
+>            focus of such work will always be through them.
+>          - What a more general community could add here would be an
+>            overview of the shared infrastructure of such devices.
+> 	  This is particularly true around VFIO based (or similar)
+> 	  userspace interfaces with a non trivial userspace component.
+>     * How to support new types of accelerator?
+> 
+> 2) The need for lightweight access paths from userspace that 'play well' and
+>     share resources etc with standard in-kernel drivers.  This is the area
+>     that Kenneth Lee and Huawei have been focusing on with their wrapdrive
+>     effort. We know there are other similar efforts going on in other companies.
+>     * This may involve interacting with existing kernel communities such as
+>       those around VFIO and mdev.
+>     * Resource management when we may have many consumers - not all hardware
+>       has appropriate features to deal with this.
+> 
+> 3) Usecases for accelerators. e.g.
+>     * kTLS
+>     * Storage encryption
+>     * ODP - networking dataplane
+>     * AI toolkits
+> 
+> Discussions we want to get started include:
+> * A wider range of hardware than we are currently considering. What makes
+>    sense to target / what hardware do people have they would like to support?
+> * Upstream paths - potential blockers and how to overcome them. The standard
+>    kernel drivers should be fairly straightforward, but once we start looking at
+>    systems with a heavier userspace component, things will get more
+>    controversial!
+> * Fostering stronger userspace communities to allow these these accelerators
+>    to be easily harnessed.
+> 
+> So as ever with a linux community focusing on a particular topic, the
+> obvious solution is a mailing list. There are a number of options on how
+> do this.
+> 
+> 1) Ask one of the industry bodies to host? Who?
+> 
+> 2) Put together a compelling argument for linux-accelerators@vger.kernel.org
+> as probably the most generic location for such a list.
+
+Happy to offer linux-accelerators@lists.ozlabs.org, which I can get set 
+up immediately (and if we want patchwork, patchwork.ozlabs.org is 
+available as always, no matter where the list is hosted).
+
+> More open questions are
+> 1) Scope?
+>   * Would anyone ever use such an overarching list?
+>   * Are we better off with the usual adhoc list of 'interested parties' + lkml?
+>   * Do we actually need to define the full scope - are we better with a vague
+>     definition?
+
+I think a list with a broad and vaguely defined scope is a good idea - 
+it would certainly be helpful to us to be able to follow what other 
+contributors are doing that could be relevant to our CAPI and OpenCAPI work.
+
+> 
+> 2) Is there an existing community we can use to discuss these issues?
+>     (beyond the obvious firehose of LKML).
+> 
+> 3) Who else to approach for input on these general questions?
+> 
+> In parallel to this there are elements such as git / patchwork etc but
+> they can all be done as they are needed.
+> 
+> Thanks
+> 
+> --
+> Jonathan Cameron
+> Huawei
+> 
+
+-- 
+Andrew Donnellan              OzLabs, ADL Canberra
+andrew.donnellan@au1.ibm.com  IBM Australia Limited
