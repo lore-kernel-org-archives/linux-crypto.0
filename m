@@ -1,244 +1,244 @@
-From: Thomas Garnier <thgarnie@google.com>
-Subject: Re: [PATCH v1 00/27] x86: PIE support and option to extend KASLR randomization
-Date: Thu, 12 Oct 2017 08:34:13 -0700
-Message-ID: <CAJcbSZEzEGuby155zQZJqEbi1EO1v2bue+DB1oAXZfwMVOoySg@mail.gmail.com>
-References: <20171011203027.11248-1-thgarnie@google.com> <22e56a56-978a-738f-52b9-2d0c17839c9e@amd.com>
+From: Francois Ozog <francois.ozog@linaro.org>
+Subject: Re: Fostering linux community collaboration on hardware accelerators
+Date: Thu, 12 Oct 2017 17:48:23 +0200
+Message-ID: <CAHFG_=Ud3DXF0FDUthPygoQU-NUGQgx2LCLV2eLpgAw16U_Swg@mail.gmail.com>
+References: <201710101132.v9ABUs28138304@mx0a-001b2d01.pphosted.com>
+ <07d49485-e583-8434-5681-92a0b54005ca@au1.ibm.com> <b7ceffd0-a07b-87c8-aec4-6a5effe997f4@linux.vnet.ibm.com>
+ <20171012155710.000063d1@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>,
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>,
-	Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@redhat.com>,
-	Arnd Bergmann <arnd@arndb.de>, Kees Cook <keescook@chromium.org>,
-	Andrey Ryabinin <aryabinin@virtuozzo.com>, Matthias Kaehlcke <mka@chromium.org>,
-	Andy Lutomirski <luto@kernel.org>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-	Borislav Petkov <bp@suse.de>, "Rafael J . Wysocki" <rjw@rjwysocki.net>, Len Brown <len.brown@intel.com>,
-	Pavel Machek <pavel@ucw.cz>, Juergen Gross <jgross@suse.com>, Chris Wright <chrisw@sous-sol.org>,
-	Alok Kataria <akataria@vmware.com>, Rusty Russell <rusty@rustcorp.com.au>, Tejun Heo <tj@kernel.org>,
-	Christoph Lameter <cl@linux.com>, Boris Ostrovsky <boris.ostrovsky@o
-To: Tom Lendacky <thomas.lendacky@amd.com>
-Return-path: <kernel-hardening-return-10150-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
-List-Post: <mailto:kernel-hardening@lists.openwall.com>
-List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
-List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
-List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
-In-Reply-To: <22e56a56-978a-738f-52b9-2d0c17839c9e@amd.com>
-List-Id: linux-crypto.vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Cc: Douglas Miller <dougmill@linux.vnet.ibm.com>,
+        Andrew Donnellan <andrew.donnellan@au1.ibm.com>,
+        jic23@kernel.org, "Liguozhu (Kenneth)" <liguozhu@hisilicon.com>,
+        Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+        Prasad.Athreya@cavium.com, Arnd Bergmann <arndbergmann@gmail.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Frederic Barrat <fbarrat@linux.vnet.ibm.com>,
+        Mark Brown <broonie@kernel.org>,
+        Tirumalesh.Chalamarla@cavium.com, Jon Masters <jcm@redhat.com>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Jean-Philippe Brucker <jean-philippe.brucker@arm.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Eric Auger <eric.auger@redhat.com>, kvm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linuxarm@huawei.com
+To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-it0-f42.google.com ([209.85.214.42]:51524 "EHLO
+        mail-it0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751119AbdJLPsZ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 12 Oct 2017 11:48:25 -0400
+Received: by mail-it0-f42.google.com with SMTP id o135so7375016itb.0
+        for <linux-crypto@vger.kernel.org>; Thu, 12 Oct 2017 08:48:25 -0700 (PDT)
+In-Reply-To: <20171012155710.000063d1@huawei.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Oct 11, 2017 at 2:34 PM, Tom Lendacky <thomas.lendacky@amd.com> wrote:
-> On 10/11/2017 3:30 PM, Thomas Garnier wrote:
->> Changes:
->>   - patch v1:
->>     - Simplify ftrace implementation.
->>     - Use gcc mstack-protector-guard-reg=%gs with PIE when possible.
->>   - rfc v3:
->>     - Use --emit-relocs instead of -pie to reduce dynamic relocation space on
->>       mapped memory. It also simplifies the relocation process.
->>     - Move the start the module section next to the kernel. Remove the need for
->>       -mcmodel=large on modules. Extends module space from 1 to 2G maximum.
->>     - Support for XEN PVH as 32-bit relocations can be ignored with
->>       --emit-relocs.
->>     - Support for GOT relocations previously done automatically with -pie.
->>     - Remove need for dynamic PLT in modules.
->>     - Support dymamic GOT for modules.
->>   - rfc v2:
->>     - Add support for global stack cookie while compiler default to fs without
->>       mcmodel=kernel
->>     - Change patch 7 to correctly jump out of the identity mapping on kexec load
->>       preserve.
+On 12 October 2017 at 16:57, Jonathan Cameron
+<Jonathan.Cameron@huawei.com> wrote:
+> On Thu, 12 Oct 2017 08:31:36 -0500
+> Douglas Miller <dougmill@linux.vnet.ibm.com> wrote:
+>
+>> Not sure if you're already plugged-in to this, but the OpenMP group is
+>> (has been) working on Accelerator support.
 >>
->> These patches make the changes necessary to build the kernel as Position
->> Independent Executable (PIE) on x86_64. A PIE kernel can be relocated below
->> the top 2G of the virtual address space. It allows to optionally extend the
->> KASLR randomization range from 1G to 3G.
+>> http://www.openmp.org/updates/openmp-accelerator-support-gpus/
+>>
+>> Maybe you are talking about a different aspect of accelerator support,
+>> but it seems prudent to involve OpenMP as much as makes sense.
 >
-> Hi Thomas,
+> That's certainly interesting and sits in the area of 'standard'
+> userspace code but it is (I think) really addressing only one aspect
+> of the wider support problem.
 >
-> I've applied your patches so that I can verify that SME works with PIE.
-> Unfortunately, I'm running into build warnings and errors when I enable
-> PIE.
+> I do like the emphasis on balancing between CPU and accelerator,
+> that is certainly an open question even a the lowest levels in
+> areas such as cryptography acceleration where you either run
+> out of hardware resources on your accelerator or you actually
+> have a usage pattern that would be quicker on the CPU due
+> to inherent overheads in (current) non cpu crypto engines.
 >
-> With CONFIG_STACK_VALIDATION=y I receive lots of messages like this:
+> Thanks for the pointer.  I can see we are going to need some location
+> for resources like this to be gathered together.
 >
->   drivers/scsi/libfc/fc_exch.o: warning: objtool: fc_destroy_exch_mgr()+0x0: call without frame pointer save/setup
+> Jonathan
 >
-> Disabling CONFIG_STACK_VALIDATION suppresses those.
+>>
+>>
+>> On 10/12/2017 12:22 AM, Andrew Donnellan wrote:
+>> > On 10/10/17 22:28, Jonathan Cameron wrote:
+>> >> Hi All,
+>> >>
+>> >> Please forward this email to anyone you think may be interested.
+>> >
+>> > Have forwarded this to a number of relevant IBMers.
+>> >
+>> >> On behalf of Huawei, I am looking into options to foster a wider
+>> >> community
+>> >> around the various ongoing projects related to Accelerator support
+>> >> within
+>> >> Linux.  The particular area of interest to Huawei is that of harnessi=
+ng
+>> >> accelerators from userspace, but in a collaborative way with the kern=
+el
+>> >> still able to make efficient use of them, where appropriate.
+>> >>
+>> >> We are keen to foster a wider community than one just focused on
+>> >> our own current technology.  This is a field with no clear answers,
+>> >> so the
+>> >> widest possible range of input is needed!
+>> >>
+>> >> The address list of this email is drawn from people we have had
+>> >> discussions
+>> >> with or who have been suggested in response to Kenneth Lee's wrapdriv=
+e
+>> >> presentation at Linaro Connect and earlier presentations on the more
+>> >> general
+>> >> issue. A few relevant lists added to hopefully catch anyone we missed=
+.
+>> >> My apologies to anyone who got swept up in this and isn't interested!
+>> >>
+>> >> Here we are defining accelerators fairly broadly - suggestions for a
+>> >> better
+>> >> term are also welcome.
+>> >>
+>> >> The infrastructure may be appropriate for:
+>> >> * Traditional offload engines - cryptography, compression and similar
+>> >> * Upcoming AI accelerators
+>> >> * ODP type requirements for access to elements of networking
+>> >> * Systems utilizing SVM including CCIX and other cache coherent buses
+>> >> * Many things we haven't thought of yet...
+>> >>
+>> >> As I see it, there are several aspects to this:
+>> >>
+>> >> 1) Kernel drivers for accelerators themselves.
+>> >>     * Traditional drivers such as crypto etc
+>> >>     - These already have their own communities. The main
+>> >>            focus of such work will always be through them.
+>> >>          - What a more general community could add here would be an
+>> >>            overview of the shared infrastructure of such devices.
+>> >>       This is particularly true around VFIO based (or similar)
+>> >>       userspace interfaces with a non trivial userspace component.
+>> >>     * How to support new types of accelerator?
+>> >>
+>> >> 2) The need for lightweight access paths from userspace that 'play
+>> >> well' and
+>> >>     share resources etc with standard in-kernel drivers.  This is the
+>> >> area
+>> >>     that Kenneth Lee and Huawei have been focusing on with their
+>> >> wrapdrive
+>> >>     effort. We know there are other similar efforts going on in other
+>> >> companies.
+>> >>     * This may involve interacting with existing kernel communities
+>> >> such as
+>> >>       those around VFIO and mdev.
+>> >>     * Resource management when we may have many consumers - not all
+>> >> hardware
+>> >>       has appropriate features to deal with this.
+>> >>
+>> >> 3) Usecases for accelerators. e.g.
+>> >>     * kTLS
+>> >>     * Storage encryption
+>> >>     * ODP - networking dataplane
+>> >>     * AI toolkits
+>> >>
+>> >> Discussions we want to get started include:
+>> >> * A wider range of hardware than we are currently considering. What
+>> >> makes
+>> >>    sense to target / what hardware do people have they would like to
+>> >> support?
+>> >> * Upstream paths - potential blockers and how to overcome them. The
+>> >> standard
+>> >>    kernel drivers should be fairly straightforward, but once we start
+>> >> looking at
+>> >>    systems with a heavier userspace component, things will get more
+>> >>    controversial!
+>> >> * Fostering stronger userspace communities to allow these these
+>> >> accelerators
+>> >>    to be easily harnessed.
+>> >>
+>> >> So as ever with a linux community focusing on a particular topic, the
+>> >> obvious solution is a mailing list. There are a number of options on =
+how
+>> >> do this.
+>> >>
+>> >> 1) Ask one of the industry bodies to host? Who?
+>> >>
+>> >> 2) Put together a compelling argument for
+>> >> linux-accelerators@vger.kernel.org
+>> >> as probably the most generic location for such a list.
+>> >
+>> > Happy to offer linux-accelerators@lists.ozlabs.org, which I can get
+>> > set up immediately (and if we want patchwork, patchwork.ozlabs.org is
+>> > available as always, no matter where the list is hosted).
+>> >
+>> >> More open questions are
+>> >> 1) Scope?
+>> >>   * Would anyone ever use such an overarching list?
+>> >>   * Are we better off with the usual adhoc list of 'interested
+>> >> parties' + lkml?
+>> >>   * Do we actually need to define the full scope - are we better with
+>> >> a vague
+>> >>     definition?
+>> >
+>> > I think a list with a broad and vaguely defined scope is a good idea -
+>> > it would certainly be helpful to us to be able to follow what other
+>> > contributors are doing that could be relevant to our CAPI and OpenCAPI
+>> > work.
+>> >
+>> >>
+>> >> 2) Is there an existing community we can use to discuss these issues?
+>> >>     (beyond the obvious firehose of LKML).
+>> >>
+>> >> 3) Who else to approach for input on these general questions?
+>> >>
+>> >> In parallel to this there are elements such as git / patchwork etc bu=
+t
+>> >> they can all be done as they are needed.
+>> >>
+>> >> Thanks
+>> >>
+>> >> --
+>> >> Jonathan Cameron
+>> >> Huawei
+>> >>
+>> >
+>>
+>
 
-I ran into that, I plan to fix it in the next iteration.
+I'd like to keep sharing thoughts on this.
 
->
-> But near the end of the build, I receive errors like this:
->
->   arch/x86/kernel/setup.o: In function `dump_kernel_offset':
->   .../arch/x86/kernel/setup.c:801:(.text+0x32): relocation truncated to fit: R_X86_64_32S against symbol `_text' defined in .text section in .tmp_vmlinux1
->   .
->   . about 10 more of the above type messages
->   .
->   make: *** [vmlinux] Error 1
->   Error building kernel, exiting
->
-> Are there any config options that should or should not be enabled when
-> building with PIE enabled?  Is there a compiler requirement for PIE (I'm
-> using gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.5))?
+I understand accelerators can be fixed/parameterized, reconfigurable
+(FPGA), programmable (GPUs, NPUs...).
+With that in mind, there is a preparation phase that can as simple as
+set some parameters, or as complex as loading a "kernel" to a GPU or
+send a bitstream to an FPGA.
+In some cases, there may even be a slicing phase where the accelerator
+is actually sliced to accommodate different "customers" on the host it
+serves.
+Then there is the data supply to the accelerator.
 
-I never ran into these ones and I tested compilers older and newer.
-What was your exact configuration?
+Is it fair to say that one of the main concerns of your proposal is to
+focus on having the userland data supply to the accelerator be as
+native/direct as possible ?
+And if so, then OpenMP would be a user of the userland IO framework
+when it comes to data supply?
 
->
-> Thanks,
-> Tom
->
->>
->> Thanks a lot to Ard Biesheuvel & Kees Cook on their feedback on compiler
->> changes, PIE support and KASLR in general. Thanks to Roland McGrath on his
->> feedback for using -pie versus --emit-relocs and details on compiler code
->> generation.
->>
->> The patches:
->>   - 1-3, 5-1#, 17-18: Change in assembly code to be PIE compliant.
->>   - 4: Add a new _ASM_GET_PTR macro to fetch a symbol address generically.
->>   - 14: Adapt percpu design to work correctly when PIE is enabled.
->>   - 15: Provide an option to default visibility to hidden except for key symbols.
->>         It removes errors between compilation units.
->>   - 16: Adapt relocation tool to handle PIE binary correctly.
->>   - 19: Add support for global cookie.
->>   - 20: Support ftrace with PIE (used on Ubuntu config).
->>   - 21: Fix incorrect address marker on dump_pagetables.
->>   - 22: Add option to move the module section just after the kernel.
->>   - 23: Adapt module loading to support PIE with dynamic GOT.
->>   - 24: Make the GOT read-only.
->>   - 25: Add the CONFIG_X86_PIE option (off by default).
->>   - 26: Adapt relocation tool to generate a 64-bit relocation table.
->>   - 27: Add the CONFIG_RANDOMIZE_BASE_LARGE option to increase relocation range
->>         from 1G to 3G (off by default).
->>
->> Performance/Size impact:
->>
->> Size of vmlinux (Default configuration):
->>   File size:
->>   - PIE disabled: +0.000031%
->>   - PIE enabled: -3.210% (less relocations)
->>   .text section:
->>   - PIE disabled: +0.000644%
->>   - PIE enabled: +0.837%
->>
->> Size of vmlinux (Ubuntu configuration):
->>   File size:
->>   - PIE disabled: -0.201%
->>   - PIE enabled: -0.082%
->>   .text section:
->>   - PIE disabled: same
->>   - PIE enabled: +1.319%
->>
->> Size of vmlinux (Default configuration + ORC):
->>   File size:
->>   - PIE enabled: -3.167%
->>   .text section:
->>   - PIE enabled: +0.814%
->>
->> Size of vmlinux (Ubuntu configuration + ORC):
->>   File size:
->>   - PIE enabled: -3.167%
->>   .text section:
->>   - PIE enabled: +1.26%
->>
->> The size increase is mainly due to not having access to the 32-bit signed
->> relocation that can be used with mcmodel=kernel. A small part is due to reduced
->> optimization for PIE code. This bug [1] was opened with gcc to provide a better
->> code generation for kernel PIE.
->>
->> Hackbench (50% and 1600% on thread/process for pipe/sockets):
->>   - PIE disabled: no significant change (avg +0.1% on latest test).
->>   - PIE enabled: between -0.50% to +0.86% in average (default and Ubuntu config).
->>
->> slab_test (average of 10 runs):
->>   - PIE disabled: no significant change (-2% on latest run, likely noise).
->>   - PIE enabled: between -1% and +0.8% on latest runs.
->>
->> Kernbench (average of 10 Half and Optimal runs):
->>   Elapsed Time:
->>   - PIE disabled: no significant change (avg -0.239%)
->>   - PIE enabled: average +0.07%
->>   System Time:
->>   - PIE disabled: no significant change (avg -0.277%)
->>   - PIE enabled: average +0.7%
->>
->> [1] https://gcc.gnu.org/bugzilla/show_bug.cgi?id=82303
->>
->> diffstat:
->>   Documentation/x86/x86_64/mm.txt              |    3
->>   arch/x86/Kconfig                             |   43 ++++++
->>   arch/x86/Makefile                            |   40 +++++
->>   arch/x86/boot/boot.h                         |    2
->>   arch/x86/boot/compressed/Makefile            |    5
->>   arch/x86/boot/compressed/misc.c              |   10 +
->>   arch/x86/crypto/aes-x86_64-asm_64.S          |   45 ++++--
->>   arch/x86/crypto/aesni-intel_asm.S            |   14 +-
->>   arch/x86/crypto/aesni-intel_avx-x86_64.S     |    6
->>   arch/x86/crypto/camellia-aesni-avx-asm_64.S  |   42 +++---
->>   arch/x86/crypto/camellia-aesni-avx2-asm_64.S |   44 +++---
->>   arch/x86/crypto/camellia-x86_64-asm_64.S     |    8 -
->>   arch/x86/crypto/cast5-avx-x86_64-asm_64.S    |   50 ++++---
->>   arch/x86/crypto/cast6-avx-x86_64-asm_64.S    |   44 +++---
->>   arch/x86/crypto/des3_ede-asm_64.S            |   96 +++++++++-----
->>   arch/x86/crypto/ghash-clmulni-intel_asm.S    |    4
->>   arch/x86/crypto/glue_helper-asm-avx.S        |    4
->>   arch/x86/crypto/glue_helper-asm-avx2.S       |    6
->>   arch/x86/entry/entry_32.S                    |    3
->>   arch/x86/entry/entry_64.S                    |   29 ++--
->>   arch/x86/include/asm/asm.h                   |   13 +
->>   arch/x86/include/asm/bug.h                   |    2
->>   arch/x86/include/asm/ftrace.h                |    6
->>   arch/x86/include/asm/jump_label.h            |    8 -
->>   arch/x86/include/asm/kvm_host.h              |    6
->>   arch/x86/include/asm/module.h                |   11 +
->>   arch/x86/include/asm/page_64_types.h         |    9 +
->>   arch/x86/include/asm/paravirt_types.h        |   12 +
->>   arch/x86/include/asm/percpu.h                |   25 ++-
->>   arch/x86/include/asm/pgtable_64_types.h      |    6
->>   arch/x86/include/asm/pm-trace.h              |    2
->>   arch/x86/include/asm/processor.h             |   12 +
->>   arch/x86/include/asm/sections.h              |    8 +
->>   arch/x86/include/asm/setup.h                 |    2
->>   arch/x86/include/asm/stackprotector.h        |   19 ++
->>   arch/x86/kernel/acpi/wakeup_64.S             |   31 ++--
->>   arch/x86/kernel/asm-offsets.c                |    3
->>   arch/x86/kernel/asm-offsets_32.c             |    3
->>   arch/x86/kernel/asm-offsets_64.c             |    3
->>   arch/x86/kernel/cpu/common.c                 |    7 -
->>   arch/x86/kernel/cpu/microcode/core.c         |    4
->>   arch/x86/kernel/ftrace.c                     |   42 +++++-
->>   arch/x86/kernel/head64.c                     |   32 +++-
->>   arch/x86/kernel/head_32.S                    |    3
->>   arch/x86/kernel/head_64.S                    |   41 +++++-
->>   arch/x86/kernel/kvm.c                        |    6
->>   arch/x86/kernel/module.c                     |  182 ++++++++++++++++++++++++++-
->>   arch/x86/kernel/module.lds                   |    3
->>   arch/x86/kernel/process.c                    |    5
->>   arch/x86/kernel/relocate_kernel_64.S         |    8 -
->>   arch/x86/kernel/setup_percpu.c               |    2
->>   arch/x86/kernel/vmlinux.lds.S                |   13 +
->>   arch/x86/kvm/svm.c                           |    4
->>   arch/x86/lib/cmpxchg16b_emu.S                |    8 -
->>   arch/x86/mm/dump_pagetables.c                |   11 +
->>   arch/x86/power/hibernate_asm_64.S            |    4
->>   arch/x86/tools/relocs.c                      |  170 +++++++++++++++++++++++--
->>   arch/x86/tools/relocs.h                      |    4
->>   arch/x86/tools/relocs_common.c               |   15 +-
->>   arch/x86/xen/xen-asm.S                       |   12 -
->>   arch/x86/xen/xen-head.S                      |    9 -
->>   arch/x86/xen/xen-pvh.S                       |   13 +
->>   drivers/base/firmware_class.c                |    4
->>   include/asm-generic/sections.h               |    6
->>   include/asm-generic/vmlinux.lds.h            |   12 +
->>   include/linux/compiler.h                     |    8 +
->>   init/Kconfig                                 |    9 +
->>   kernel/kallsyms.c                            |   16 +-
->>   kernel/trace/trace.h                         |    4
->>   lib/dynamic_debug.c                          |    4
->>   70 files changed, 1032 insertions(+), 308 deletions(-)
->>
+It also reminds me some work done by the media community and GStreamer
+arround DMA buf which specializes in a domain where large video
+"chunks" passes from one functional block to the other with specific
+caching policies (write combining is a friend here). While for 100Gbps
+networking were we need to handle 142Mpps the nature of the datapath
+is very different.
+
+Would you like to address both classes of problems? (I mean class 1:
+large chunks of data to be shared between few consummers; class 2:
+very large number of small chunks of data shared with a few to a large
+number of consumers?)
 
 
-
--- 
-Thomas
+--=20
+Fran=C3=A7ois-Fr=C3=A9d=C3=A9ric Ozog | Director Linaro Networking Group
+T: +33.67221.6485
+francois.ozog@linaro.org | Skype: ffozog
