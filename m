@@ -1,110 +1,40 @@
-From: "Luis R. Rodriguez" <mcgrof@kernel.org>
-Subject: Re: [PATCH v1 15/27] compiler: Option to default to
-	hidden symbols
-Date: Thu, 12 Oct 2017 22:02:01 +0200
-Message-ID: <20171012200201.GW11645@wotan.suse.de>
-References: <20171011203027.11248-1-thgarnie@google.com>
- <20171011203027.11248-16-thgarnie@google.com>
+From: Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [Part2 PATCH v5.2 12.2/31] crypto: ccp: Add Secure Encrypted
+ Virtualization (SEV) command support
+Date: Thu, 12 Oct 2017 15:05:20 -0500
+Message-ID: <bd2d0b20-221c-b4a0-691a-424996325c69@amd.com>
+References: <20171007010607.78088-1-brijesh.singh@amd.com>
+ <20171011165030.115696-1-brijesh.singh@amd.com>
+ <20171012182102.ffyxggnhyymtmhky@pd.tnic>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Nicolas Pitre <nicolas.pitre@linaro.org>, Michal Hocko <mhocko@suse.com>,
- Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>, linux-doc@vger.kernel.org,
- Daniel Micay <danielmicay@gmail.com>, Len Brown <len.brown@intel.com>,
- Peter Zijlstra <peterz@infradead.org>, Christopher Li <sparse@chrisli.org>,
- Jan H =?iso-8859-1?Q?=2E_Sch=F6nherr?= <jschoenh@amazon.de>,
- Alexei Starovoitov <ast@kernel.org>, virtualization@lists.linux-foundation.org,
- David Howells <dhowells@redhat.com>,
- Paul Gortmaker <paul.gortmaker@windriver.com>,
- Waiman Long <longman@redhat.com>, Pavel Machek <pavel@ucw.cz>,
- "H . Peter Anvin" <hpa@zytor.com>, kernel-hardening@lists.openwall.com,
- Christoph Lameter <cl@linux.com>, Thomas Gleixner <tglx@linutronix.de>,
- x86@kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
- Daniel Borkmann <daniel@iogearbox.net>, Jonathan Corbet <corbet@lwn.net>,
- Peter Foley <pefol
-To: Thomas Garnier <thgarnie@google.com>, Guenter Roeck <linux@roeck-us.net>,
- Nicholas Piggin <npiggin@gmail.com>
-Return-path: <xen-devel-bounces@lists.xen.org>
-Content-Disposition: inline
-In-Reply-To: <20171011203027.11248-16-thgarnie@google.com>
-List-Unsubscribe: <https://lists.xen.org/cgi-bin/mailman/options/xen-devel>,
- <mailto:xen-devel-request@lists.xen.org?subject=unsubscribe>
-List-Post: <mailto:xen-devel@lists.xen.org>
-List-Help: <mailto:xen-devel-request@lists.xen.org?subject=help>
-List-Subscribe: <https://lists.xen.org/cgi-bin/mailman/listinfo/xen-devel>,
- <mailto:xen-devel-request@lists.xen.org?subject=subscribe>
-Errors-To: xen-devel-bounces@lists.xen.org
-Sender: "Xen-devel" <xen-devel-bounces@lists.xen.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: brijesh.singh@amd.com, Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Gary Hook <gary.hook@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Borislav Petkov <bp@suse.de>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20171012182102.ffyxggnhyymtmhky@pd.tnic>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-T24gV2VkLCBPY3QgMTEsIDIwMTcgYXQgMDE6MzA6MTVQTSAtMDcwMCwgVGhvbWFzIEdhcm5pZXIg
-d3JvdGU6Cj4gUHJvdmlkZSBhbiBvcHRpb24gdG8gZGVmYXVsdCB2aXNpYmlsaXR5IHRvIGhpZGRl
-biBleGNlcHQgZm9yIGtleQo+IHN5bWJvbHMuIFRoaXMgb3B0aW9uIGlzIGRpc2FibGVkIGJ5IGRl
-ZmF1bHQgYW5kIHdpbGwgYmUgdXNlZCBieSB4ODZfNjQKPiBQSUUgc3VwcG9ydCB0byByZW1vdmUg
-ZXJyb3JzIGJldHdlZW4gY29tcGlsYXRpb24gdW5pdHMuCj4gCj4gVGhlIGRlZmF1bHQgdmlzaWJp
-bGl0eSBpcyBhbHNvIGVuYWJsZWQgZm9yIGV4dGVybmFsIHN5bWJvbHMgdGhhdCBhcmUKPiBjb21w
-YXJlZCBhcyB0aGV5IG1heWJlIGVxdWFscyAoc3RhcnQvZW5kIG9mIHNlY3Rpb25zKS4gSW4gdGhp
-cyBjYXNlLAo+IG9sZGVyIHZlcnNpb25zIG9mIEdDQyB3aWxsIHJlbW92ZSB0aGUgY29tcGFyaXNv
-biBpZiB0aGUgc3ltYm9scyBhcmUKPiBoaWRkZW4uIFRoaXMgaXNzdWUgZXhpc3RzIGF0IGxlYXN0
-IG9uIGdjYyA0LjkgYW5kIGJlZm9yZS4KPiAKPiBTaWduZWQtb2ZmLWJ5OiBUaG9tYXMgR2Fybmll
-ciA8dGhnYXJuaWVAZ29vZ2xlLmNvbT4KCjwtLSBzbmlwIC0tPgoKPiBkaWZmIC0tZ2l0IGEvYXJj
-aC94ODYva2VybmVsL2NwdS9taWNyb2NvZGUvY29yZS5jIGIvYXJjaC94ODYva2VybmVsL2NwdS9t
-aWNyb2NvZGUvY29yZS5jCj4gaW5kZXggODZlOGYwYjI1MzdiLi44ZjAyMTc4M2E5MjkgMTAwNjQ0
-Cj4gLS0tIGEvYXJjaC94ODYva2VybmVsL2NwdS9taWNyb2NvZGUvY29yZS5jCj4gKysrIGIvYXJj
-aC94ODYva2VybmVsL2NwdS9taWNyb2NvZGUvY29yZS5jCj4gQEAgLTE0NCw4ICsxNDQsOCBAQCBz
-dGF0aWMgYm9vbCBfX2luaXQgY2hlY2tfbG9hZGVyX2Rpc2FibGVkX2JzcCh2b2lkKQo+ICAJcmV0
-dXJuICpyZXM7Cj4gIH0KPiAgCj4gLWV4dGVybiBzdHJ1Y3QgYnVpbHRpbl9mdyBfX3N0YXJ0X2J1
-aWx0aW5fZndbXTsKPiAtZXh0ZXJuIHN0cnVjdCBidWlsdGluX2Z3IF9fZW5kX2J1aWx0aW5fZndb
-XTsKPiArZXh0ZXJuIHN0cnVjdCBidWlsdGluX2Z3IF9fc3RhcnRfYnVpbHRpbl9md1tdIF9fZGVm
-YXVsdF92aXNpYmlsaXR5Owo+ICtleHRlcm4gc3RydWN0IGJ1aWx0aW5fZncgX19lbmRfYnVpbHRp
-bl9md1tdIF9fZGVmYXVsdF92aXNpYmlsaXR5Owo+ICAKPiAgYm9vbCBnZXRfYnVpbHRpbl9maXJt
-d2FyZShzdHJ1Y3QgY3Bpb19kYXRhICpjZCwgY29uc3QgY2hhciAqbmFtZSkKPiAgewoKPC0tIHNu
-aXAgLS0+Cgo+IGRpZmYgLS1naXQgYS9pbmNsdWRlL2FzbS1nZW5lcmljL3NlY3Rpb25zLmggYi9p
-bmNsdWRlL2FzbS1nZW5lcmljL3NlY3Rpb25zLmgKPiBpbmRleCBlNWRhNDRlZGRkMmYuLjFhYTVk
-NmRhYzllMSAxMDA2NDQKPiAtLS0gYS9pbmNsdWRlL2FzbS1nZW5lcmljL3NlY3Rpb25zLmgKPiAr
-KysgYi9pbmNsdWRlL2FzbS1nZW5lcmljL3NlY3Rpb25zLmgKPiBAQCAtMzAsNiArMzAsOSBAQAo+
-ICAgKglfX2lycWVudHJ5X3RleHRfc3RhcnQsIF9faXJxZW50cnlfdGV4dF9lbmQKPiAgICoJX19z
-b2Z0aXJxZW50cnlfdGV4dF9zdGFydCwgX19zb2Z0aXJxZW50cnlfdGV4dF9lbmQKPiAgICovCj4g
-KyNpZmRlZiBDT05GSUdfREVGQVVMVF9ISURERU4KPiArI3ByYWdtYSBHQ0MgdmlzaWJpbGl0eSBw
-dXNoKGRlZmF1bHQpCj4gKyNlbmRpZgo+ICBleHRlcm4gY2hhciBfdGV4dFtdLCBfc3RleHRbXSwg
-X2V0ZXh0W107Cj4gIGV4dGVybiBjaGFyIF9kYXRhW10sIF9zZGF0YVtdLCBfZWRhdGFbXTsKPiAg
-ZXh0ZXJuIGNoYXIgX19ic3Nfc3RhcnRbXSwgX19ic3Nfc3RvcFtdOwo+IEBAIC00Niw2ICs0OSw5
-IEBAIGV4dGVybiBjaGFyIF9fc29mdGlycWVudHJ5X3RleHRfc3RhcnRbXSwgX19zb2Z0aXJxZW50
-cnlfdGV4dF9lbmRbXTsKPiAgCj4gIC8qIFN0YXJ0IGFuZCBlbmQgb2YgLmN0b3JzIHNlY3Rpb24g
-LSB1c2VkIGZvciBjb25zdHJ1Y3RvciBjYWxscy4gKi8KPiAgZXh0ZXJuIGNoYXIgX19jdG9yc19z
-dGFydFtdLCBfX2N0b3JzX2VuZFtdOwo+ICsjaWZkZWYgQ09ORklHX0RFRkFVTFRfSElEREVOCj4g
-KyNwcmFnbWEgR0NDIHZpc2liaWxpdHkgcG9wCj4gKyNlbmRpZgo+ICAKPiAgZXh0ZXJuIF9fdmlz
-aWJsZSBjb25zdCB2b2lkIF9fbm9zYXZlX2JlZ2luLCBfX25vc2F2ZV9lbmQ7Cj4gIAo+IGRpZmYg
-LS1naXQgYS9pbmNsdWRlL2xpbnV4L2NvbXBpbGVyLmggYi9pbmNsdWRlL2xpbnV4L2NvbXBpbGVy
-LmgKPiBpbmRleCBlOTVhMjYzMWU1NDUuLjY5OTc3MTZmNzNiZiAxMDA2NDQKPiAtLS0gYS9pbmNs
-dWRlL2xpbnV4L2NvbXBpbGVyLmgKPiArKysgYi9pbmNsdWRlL2xpbnV4L2NvbXBpbGVyLmgKPiBA
-QCAtNzgsNiArNzgsMTQgQEAgZXh0ZXJuIHZvaWQgX19jaGtfaW9fcHRyKGNvbnN0IHZvbGF0aWxl
-IHZvaWQgX19pb21lbSAqKTsKPiAgI2luY2x1ZGUgPGxpbnV4L2NvbXBpbGVyLWNsYW5nLmg+Cj4g
-ICNlbmRpZgo+ICAKPiArLyogVXNlZnVsIGZvciBQb3NpdGlvbiBJbmRlcGVuZGVudCBDb2RlIHRv
-IHJlZHVjZSBnbG9iYWwgcmVmZXJlbmNlcyAqLwo+ICsjaWZkZWYgQ09ORklHX0RFRkFVTFRfSElE
-REVOCj4gKyNwcmFnbWEgR0NDIHZpc2liaWxpdHkgcHVzaChoaWRkZW4pCj4gKyNkZWZpbmUgX19k
-ZWZhdWx0X3Zpc2liaWxpdHkgIF9fYXR0cmlidXRlX18oKHZpc2liaWxpdHkgKCJkZWZhdWx0Iikp
-KQoKRG9lcyB0aGlzIHN0aWxsIHdvcmsgd2l0aCBDT05GSUdfTERfREVBRF9DT0RFX0RBVEFfRUxJ
-TUlOQVRJT04gPwoKPiArI2Vsc2UKPiArI2RlZmluZSBfX2RlZmF1bHRfdmlzaWJpbGl0eQo+ICsj
-ZW5kaWYKPiArCj4gIC8qCj4gICAqIEdlbmVyaWMgY29tcGlsZXItZGVwZW5kZW50IG1hY3JvcyBy
-ZXF1aXJlZCBmb3Iga2VybmVsCj4gICAqIGJ1aWxkIGdvIGJlbG93IHRoaXMgY29tbWVudC4gQWN0
-dWFsIGNvbXBpbGVyL2NvbXBpbGVyIHZlcnNpb24KPiBkaWZmIC0tZ2l0IGEvaW5pdC9LY29uZmln
-IGIvaW5pdC9LY29uZmlnCj4gaW5kZXggY2NiMWQ4ZGFmMjQxLi5iNjQwMjAxZmNmZjcgMTAwNjQ0
-Cj4gLS0tIGEvaW5pdC9LY29uZmlnCj4gKysrIGIvaW5pdC9LY29uZmlnCj4gQEAgLTE2NDksNiAr
-MTY0OSwxMyBAQCBjb25maWcgUFJPRklMSU5HCj4gIGNvbmZpZyBUUkFDRVBPSU5UUwo+ICAJYm9v
-bAo+ICAKPiArIwo+ICsjIERlZmF1bHQgdG8gaGlkZGVuIHZpc2liaWxpdHkgZm9yIGFsbCBzeW1i
-b2xzLgo+ICsjIFVzZWZ1bCBmb3IgUG9zaXRpb24gSW5kZXBlbmRlbnQgQ29kZSB0byByZWR1Y2Ug
-Z2xvYmFsIHJlZmVyZW5jZXMuCj4gKyMKPiArY29uZmlnIERFRkFVTFRfSElEREVOCj4gKwlib29s
-CgpOb3RlIGl0IGlzIGRlZmF1bHQuCgpIYXMgMC1kYXkgcmFuIHRocm91Z2ggdGhpcyBnaXQgdHJl
-ZT8gSXQgc2hvdWxkIGJlIGVhc3kgdG8gZ2V0IGl0IGFkZGVkIGZvcgp0ZXN0aW5nLiBBbHNvLCBl
-dmVuIHRob3VnaCBtb3N0IGNoYW5nZXMgYXJlIHg4NiBiYXNlZCB0aGVyZSBhcmUgc29tZSBnZW5l
-cmljCmNoYW5nZXMgYW5kIEknZCBsb3ZlIGEgd2FybSBmdXp6eSB0aGlzIHdvbid0IGJyZWFrIG9k
-ZCAvIHJhbmRvbSBidWlsZHMuCkFsdGhvdWdoIDAtZGF5IGRvZXMgY292ZXIgYSBsb3Qgb2YgdGVz
-dCBjYXNlcywgaXQgb25seSBoYXMgbGltaXRlZCBydW4gdGltZQp0ZXN0cy4gVGhlcmUgYXJlIHNv
-bWUgb3RoZXIgdGVzdCBiZWRzIHdoaWNoIGFsc28gY292ZXIgc29tZSBtb3JlIG9ic2N1cmUKYXJj
-aGl0ZWN0dXJlcy4gSGF2aW5nIGEgdGVzdCBwYXNzIG9uIEd1ZW50ZXIncyB0ZXN0IGJlZCB3b3Vs
-ZCBiZSBuaWNlIHRvCnNlZS4gRm9yIHRoYXQgcGxlYXNlIGNvb3JkaW5hdGUgd2l0aCBHdWVudGVy
-IGlmIGhlJ3Mgd2lsbGluZyB0byBydW4gdGhpcwphIHRlc3QgZm9yIHlvdS4KCiAgTHVpcwoKX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KWGVuLWRldmVsIG1h
-aWxpbmcgbGlzdApYZW4tZGV2ZWxAbGlzdHMueGVuLm9yZwpodHRwczovL2xpc3RzLnhlbi5vcmcv
-eGVuLWRldmVsCg==
+
+
+On 10/12/17 1:21 PM, Borislav Petkov wrote:
+.....
+
+> Btw, that function returns 0 unconditionally. So you can make it return
+> void and...
+
+Will do
+>> +	if (ret)
+>> +		goto unlock;
+> ... remove this check and initialize ret to 0 at the beginning.
+>
+
+Will do
