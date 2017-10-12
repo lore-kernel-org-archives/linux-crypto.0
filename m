@@ -1,26 +1,37 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] hwrng: pr_err() strings should end with newlines
-Date: Thu, 12 Oct 2017 23:09:18 +0800
-Message-ID: <20171012150918.GA31122@gondor.apana.org.au>
-References: <83efca3fa5f581e0d150fa72b4efa38340fb0a31.1506325384.git.arvind.yadav.cs@gmail.com>
+Subject: Re: [PATCH 0/2] crypto: lrw - Fixes for the 'create()' function
+Date: Thu, 12 Oct 2017 23:10:13 +0800
+Message-ID: <20171012151013.GB31122@gondor.apana.org.au>
+References: <cover.1507445539.git.christophe.jaillet@wanadoo.fr>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: mpm@selenic.com, mingo@kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: Arvind Yadav <arvind.yadav.cs@gmail.com>
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <83efca3fa5f581e0d150fa72b4efa38340fb0a31.1506325384.git.arvind.yadav.cs@gmail.com>
+In-Reply-To: <cover.1507445539.git.christophe.jaillet@wanadoo.fr>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Sep 25, 2017 at 01:15:00PM +0530, Arvind Yadav wrote:
-> pr_err() messages should terminated with a new-line to avoid
-> other messages being concatenated onto the end.
+On Sun, Oct 08, 2017 at 11:39:48AM +0200, Christophe JAILLET wrote:
+> The first patch is the same as the one committed for crypto/xts.c applied a
+> few days ago.
+> (commit 5125e4e867ab ("crypto: xts - Fix an error handling path in 'create()'")
+> in /git/herbert/crypto-2.6.git)
 > 
-> Signed-off-by: Arvind Yadav <arvind.yadav.cs@gmail.com>
+> The 2nd one is a pure speculation from me.
+> The create function in 'crypto/xts.c' and 'crypto/lrw.c' look very
+> similar.
+> However, there is one more sanity check in xts. This patch proposes to
+> add the same test in lrw. Not sure at all if correct!
+> I just send it for consistency.
+> 
+> Christophe JAILLET (2):
+>   crypto: lrw - Fix an error handling path in 'create()'
+>   crypto: lrw - Check for incorrect cipher name
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
