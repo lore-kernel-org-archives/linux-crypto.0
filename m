@@ -1,52 +1,77 @@
-From: Daniel Vetter <daniel@ffwll.ch>
-Subject: Re: [Nouveau] [PATCH 03/10] driver:gpu: return -ENOMEM on allocation
- failure.
-Date: Thu, 12 Oct 2017 19:55:41 +0200
-Message-ID: <20171012175541.5jh3ovdzpyj5fflv@phenom.ffwll.local>
-References: <1505287939-14106-1-git-send-email-allen.lkml@gmail.com>
- <1505287939-14106-3-git-send-email-allen.lkml@gmail.com>
+From: Borislav Petkov <bp@suse.de>
+Subject: Re: [Part2 PATCH v5.2 12.2/31] crypto: ccp: Add Secure Encrypted
+ Virtualization (SEV) command support
+Date: Thu, 12 Oct 2017 20:21:02 +0200
+Message-ID: <20171012182102.ffyxggnhyymtmhky@pd.tnic>
+References: <20171007010607.78088-1-brijesh.singh@amd.com>
+ <20171011165030.115696-1-brijesh.singh@amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: linux-fbdev@vger.kernel.org, linux-scsi@vger.kernel.org,
- nouveau@lists.freedesktop.org, megaraidlinux.pdl@broadcom.com,
- linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
- target-devel@vger.kernel.org, linux-crypto@vger.kernel.org,
- netdev@vger.kernel.org, MPT-FusionLinux.pdl@broadcom.com,
- linux-btrfs@vger.kernel.org
-To: Allen Pais <allen.lkml@gmail.com>
-Return-path: <dri-devel-bounces@lists.freedesktop.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Gary Hook <gary.hook@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Brijesh Singh <brijesh.singh@amd.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1505287939-14106-3-git-send-email-allen.lkml@gmail.com>
-List-Unsubscribe: <https://lists.freedesktop.org/mailman/options/dri-devel>,
- <mailto:dri-devel-request@lists.freedesktop.org?subject=unsubscribe>
-List-Archive: <https://lists.freedesktop.org/archives/dri-devel>
-List-Post: <mailto:dri-devel@lists.freedesktop.org>
-List-Help: <mailto:dri-devel-request@lists.freedesktop.org?subject=help>
-List-Subscribe: <https://lists.freedesktop.org/mailman/listinfo/dri-devel>,
- <mailto:dri-devel-request@lists.freedesktop.org?subject=subscribe>
-Errors-To: dri-devel-bounces@lists.freedesktop.org
-Sender: "dri-devel" <dri-devel-bounces@lists.freedesktop.org>
+In-Reply-To: <20171011165030.115696-1-brijesh.singh@amd.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-T24gV2VkLCBTZXAgMTMsIDIwMTcgYXQgMDE6MDI6MTJQTSArMDUzMCwgQWxsZW4gUGFpcyB3cm90
-ZToKPiBTaWduZWQtb2ZmLWJ5OiBBbGxlbiBQYWlzIDxhbGxlbi5sa21sQGdtYWlsLmNvbT4KCkFw
-cGxpZWQgdG8gZHJtLW1pc2MtbmV4dCwgdGhhbmtzLgotRGFuaWVsCgo+IC0tLQo+ICBkcml2ZXJz
-L2dwdS9kcm0vZ21hNTAwL21pZF9iaW9zLmMgfCAyICstCj4gIDEgZmlsZSBjaGFuZ2VkLCAxIGlu
-c2VydGlvbigrKSwgMSBkZWxldGlvbigtKQo+IAo+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2dwdS9k
-cm0vZ21hNTAwL21pZF9iaW9zLmMgYi9kcml2ZXJzL2dwdS9kcm0vZ21hNTAwL21pZF9iaW9zLmMK
-PiBpbmRleCBkNzVlY2IzLi4xZmExNjMzIDEwMDY0NAo+IC0tLSBhL2RyaXZlcnMvZ3B1L2RybS9n
-bWE1MDAvbWlkX2Jpb3MuYwo+ICsrKyBiL2RyaXZlcnMvZ3B1L2RybS9nbWE1MDAvbWlkX2Jpb3Mu
-Ywo+IEBAIC0yMzcsNyArMjM3LDcgQEAgc3RhdGljIGludCBtaWRfZ2V0X3ZidF9kYXRhX3IxMChz
-dHJ1Y3QgZHJtX3BzYl9wcml2YXRlICpkZXZfcHJpdiwgdTMyIGFkZHIpCj4gIAo+ICAJZ2N0ID0g
-a21hbGxvYyhzaXplb2YoKmdjdCkgKiB2YnQucGFuZWxfY291bnQsIEdGUF9LRVJORUwpOwo+ICAJ
-aWYgKCFnY3QpCj4gLQkJcmV0dXJuIC0xOwo+ICsJCXJldHVybiAtRU5PTUVNOwo+ICAKPiAgCWdj
-dF92aXJ0dWFsID0gaW9yZW1hcChhZGRyICsgc2l6ZW9mKHZidCksCj4gIAkJCXNpemVvZigqZ2N0
-KSAqIHZidC5wYW5lbF9jb3VudCk7Cj4gLS0gCj4gMi43LjQKPiAKPiBfX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwo+IE5vdXZlYXUgbWFpbGluZyBsaXN0Cj4g
-Tm91dmVhdUBsaXN0cy5mcmVlZGVza3RvcC5vcmcKPiBodHRwczovL2xpc3RzLmZyZWVkZXNrdG9w
-Lm9yZy9tYWlsbWFuL2xpc3RpbmZvL25vdXZlYXUKCi0tIApEYW5pZWwgVmV0dGVyClNvZnR3YXJl
-IEVuZ2luZWVyLCBJbnRlbCBDb3Jwb3JhdGlvbgpodHRwOi8vYmxvZy5mZndsbC5jaApfX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpkcmktZGV2ZWwgbWFpbGlu
-ZyBsaXN0CmRyaS1kZXZlbEBsaXN0cy5mcmVlZGVza3RvcC5vcmcKaHR0cHM6Ly9saXN0cy5mcmVl
-ZGVza3RvcC5vcmcvbWFpbG1hbi9saXN0aW5mby9kcmktZGV2ZWwK
+On Wed, Oct 11, 2017 at 11:50:30AM -0500, Brijesh Singh wrote:
+> +static int sev_do_cmd(int cmd, void *data, int *psp_ret)
+> +{
+> +	unsigned int phys_lsb, phys_msb;
+> +	struct psp_device *psp;
+> +	unsigned int reg, ret;
+> +	struct sp_device *sp;
+> +
+> +	sp = sp_get_psp_master_device();
+> +	if (!sp)
+> +		return -ENODEV;
+> +
+> +	psp = sp->psp_data;
+> +	if (!psp)
+> +		return -ENODEV;
+> +
+> +	/* Get the physical address of the command buffer */
+> +	phys_lsb = data ? lower_32_bits(__psp_pa(data)) : 0;
+> +	phys_msb = data ? upper_32_bits(__psp_pa(data)) : 0;
+> +
+> +	dev_dbg(psp->dev, "sev command id %#x buffer 0x%08x%08x\n",
+> +		cmd, phys_msb, phys_lsb);
+> +
+> +	print_hex_dump_debug("(in):  ", DUMP_PREFIX_OFFSET, 16, 2, data,
+> +			     sev_cmd_buffer_len(cmd), false);
+> +
+> +	/* Only one command at a time... */
+> +	mutex_lock(&sev_cmd_mutex);
+> +
+> +	iowrite32(phys_lsb, psp->io_regs + PSP_CMDBUFF_ADDR_LO);
+> +	iowrite32(phys_msb, psp->io_regs + PSP_CMDBUFF_ADDR_HI);
+> +
+> +	reg = cmd;
+> +	reg <<= PSP_CMDRESP_CMD_SHIFT;
+> +	reg |= PSP_CMDRESP_IOC;
+> +	iowrite32(reg, psp->io_regs + PSP_CMDRESP);
+> +
+> +	ret = sev_wait_cmd_ioc(psp, &reg);
+
+Btw, that function returns 0 unconditionally. So you can make it return
+void and...
+
+> +	if (ret)
+> +		goto unlock;
+
+... remove this check and initialize ret to 0 at the beginning.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+SUSE Linux GmbH, GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
+-- 
