@@ -1,187 +1,175 @@
-From: Douglas Miller <dougmill@linux.vnet.ibm.com>
-Subject: Re: Fostering linux community collaboration on hardware accelerators
-Date: Thu, 12 Oct 2017 08:31:36 -0500
-Message-ID: <b7ceffd0-a07b-87c8-aec4-6a5effe997f4@linux.vnet.ibm.com>
-References: <201710101132.v9ABUs28138304@mx0a-001b2d01.pphosted.com>
- <07d49485-e583-8434-5681-92a0b54005ca@au1.ibm.com>
+From: Borislav Petkov <bp@suse.de>
+Subject: Re: [Part2 PATCH v5.2 12.2/31] crypto: ccp: Add Secure Encrypted
+ Virtualization (SEV) command support
+Date: Thu, 12 Oct 2017 16:08:16 +0200
+Message-ID: <20171012140816.6siefvahj6ww7uzf@pd.tnic>
+References: <20171007010607.78088-1-brijesh.singh@amd.com>
+ <20171011165030.115696-1-brijesh.singh@amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-To: Andrew Donnellan <andrew.donnellan@au1.ibm.com>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        jic23@kernel.org, "Liguozhu (Kenneth)" <liguozhu@hisilicon.com>,
-        Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-        francois.ozog@linaro.org, Prasad.Athreya@cavium.com,
-        arndbergmann@gmail.com,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Frederic Barrat <fbarrat@linux.vnet.ibm.com>,
-        Mark Brown <broonie@kernel.org>,
-        Tirumalesh.Chalamarla@cavium.com, jcm@redhat.com,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Jean-Philippe Brucker <jean-philippe.brucker@arm.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Eric Auger <eric.auger@redhat.com>, kvm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linuxarm@huawei.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50856 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1755647AbdJLNbs (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Oct 2017 09:31:48 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id v9CDTpM9084174
-        for <linux-crypto@vger.kernel.org>; Thu, 12 Oct 2017 09:31:47 -0400
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2dj5xej0bg-1
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Thu, 12 Oct 2017 09:31:47 -0400
-Received: from localhost
-        by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-crypto@vger.kernel.org> from <dougmill@linux.vnet.ibm.com>;
-        Thu, 12 Oct 2017 07:31:46 -0600
-In-Reply-To: <07d49485-e583-8434-5681-92a0b54005ca@au1.ibm.com>
-Content-Language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Gary Hook <gary.hook@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Brijesh Singh <brijesh.singh@amd.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20171011165030.115696-1-brijesh.singh@amd.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Not sure if you're already plugged-in to this, but the OpenMP group is 
-(has been) working on Accelerator support.
+On Wed, Oct 11, 2017 at 11:50:30AM -0500, Brijesh Singh wrote:
+> AMD's new Secure Encrypted Virtualization (SEV) feature allows the
+> memory contents of virtual machines to be transparently encrypted with a
+> key unique to the VM. The programming and management of the encryption
+> keys are handled by the AMD Secure Processor (AMD-SP) which exposes the
+> commands for these tasks. The complete spec is available at:
+> 
+> http://support.amd.com/TechDocs/55766_SEV-KM%20API_Specification.pdf
+> 
+> Extend the AMD-SP driver to provide the following support:
+> 
+>  - an in-kernel API to communicate with the SEV firmware. The API can be
+>    used by the hypervisor to create encryption context for a SEV guest.
+> 
+>  - a userspace IOCTL to manage the platform certificates.
+> 
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: "Radim Krčmář" <rkrcmar@redhat.com>
+> Cc: Borislav Petkov <bp@suse.de>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: Gary Hook <gary.hook@amd.com>
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Cc: linux-crypto@vger.kernel.org
+> Cc: kvm@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Improvements-by: Borislav Petkov <bp@suse.de>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+> Make it as a second patch in the series (changes from 12.1 -> 12.2)
+> 
+> Changes since v5.1:
+>  * text streamlining (from Boris)
+>  * rename sev_handle_cmd -> sev_do_cmd (from Boris)
+>  * PSP_P2CMSG needs arg eval (from Boris)
+>  * use #ifdef instead of #if defined() (from Boris)
+> 
+>  drivers/crypto/ccp/psp-dev.c | 251 +++++++++++++++++++++++++++++++++++++++++++
+>  drivers/crypto/ccp/psp-dev.h |  16 +++
+>  include/linux/psp-sev.h      | 159 +++++++++++++++++++++++++++
+>  3 files changed, 426 insertions(+)
+> 
+> diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
+> index b5789f878560..175cb3c3b8ef 100644
+> --- a/drivers/crypto/ccp/psp-dev.c
+> +++ b/drivers/crypto/ccp/psp-dev.c
+> @@ -23,9 +23,16 @@
+>  #include <linux/hw_random.h>
+>  #include <linux/ccp.h>
+>  
+> +#include <uapi/linux/psp-sev.h>
+> +
+>  #include "sp-dev.h"
+>  #include "psp-dev.h"
+>  
+> +#define DEVICE_NAME	"sev"
+> +
+> +static DEFINE_MUTEX(sev_cmd_mutex);
+> +static bool sev_fops_registered;
 
-http://www.openmp.org/updates/openmp-accelerator-support-gpus/
+Well, if you're going to have a global var, why not pull up the misc
+device instead?
 
-Maybe you are talking about a different aspect of accelerator support, 
-but it seems prudent to involve OpenMP as much as makes sense.
+And mind you, I've moved out this assignments:
 
++       psp->sev_misc = psp_misc_dev;
++       init_waitqueue_head(&psp->sev_int_queue);
++       dev_info(dev, "registered SEV device\n");
 
-On 10/12/2017 12:22 AM, Andrew Donnellan wrote:
-> On 10/10/17 22:28, Jonathan Cameron wrote:
->> Hi All,
->>
->> Please forward this email to anyone you think may be interested.
->
-> Have forwarded this to a number of relevant IBMers.
->
->> On behalf of Huawei, I am looking into options to foster a wider 
->> community
->> around the various ongoing projects related to Accelerator support 
->> within
->> Linux.  The particular area of interest to Huawei is that of harnessing
->> accelerators from userspace, but in a collaborative way with the kernel
->> still able to make efficient use of them, where appropriate.
->>
->> We are keen to foster a wider community than one just focused on
->> our own current technology.  This is a field with no clear answers, 
->> so the
->> widest possible range of input is needed!
->>
->> The address list of this email is drawn from people we have had 
->> discussions
->> with or who have been suggested in response to Kenneth Lee's wrapdrive
->> presentation at Linaro Connect and earlier presentations on the more 
->> general
->> issue. A few relevant lists added to hopefully catch anyone we missed.
->> My apologies to anyone who got swept up in this and isn't interested!
->>
->> Here we are defining accelerators fairly broadly - suggestions for a 
->> better
->> term are also welcome.
->>
->> The infrastructure may be appropriate for:
->> * Traditional offload engines - cryptography, compression and similar
->> * Upcoming AI accelerators
->> * ODP type requirements for access to elements of networking
->> * Systems utilizing SVM including CCIX and other cache coherent buses
->> * Many things we haven't thought of yet...
->>
->> As I see it, there are several aspects to this:
->>
->> 1) Kernel drivers for accelerators themselves.
->>     * Traditional drivers such as crypto etc
->>     - These already have their own communities. The main
->>            focus of such work will always be through them.
->>          - What a more general community could add here would be an
->>            overview of the shared infrastructure of such devices.
->>       This is particularly true around VFIO based (or similar)
->>       userspace interfaces with a non trivial userspace component.
->>     * How to support new types of accelerator?
->>
->> 2) The need for lightweight access paths from userspace that 'play 
->> well' and
->>     share resources etc with standard in-kernel drivers.  This is the 
->> area
->>     that Kenneth Lee and Huawei have been focusing on with their 
->> wrapdrive
->>     effort. We know there are other similar efforts going on in other 
->> companies.
->>     * This may involve interacting with existing kernel communities 
->> such as
->>       those around VFIO and mdev.
->>     * Resource management when we may have many consumers - not all 
->> hardware
->>       has appropriate features to deal with this.
->>
->> 3) Usecases for accelerators. e.g.
->>     * kTLS
->>     * Storage encryption
->>     * ODP - networking dataplane
->>     * AI toolkits
->>
->> Discussions we want to get started include:
->> * A wider range of hardware than we are currently considering. What 
->> makes
->>    sense to target / what hardware do people have they would like to 
->> support?
->> * Upstream paths - potential blockers and how to overcome them. The 
->> standard
->>    kernel drivers should be fairly straightforward, but once we start 
->> looking at
->>    systems with a heavier userspace component, things will get more
->>    controversial!
->> * Fostering stronger userspace communities to allow these these 
->> accelerators
->>    to be easily harnessed.
->>
->> So as ever with a linux community focusing on a particular topic, the
->> obvious solution is a mailing list. There are a number of options on how
->> do this.
->>
->> 1) Ask one of the industry bodies to host? Who?
->>
->> 2) Put together a compelling argument for 
->> linux-accelerators@vger.kernel.org
->> as probably the most generic location for such a list.
->
-> Happy to offer linux-accelerators@lists.ozlabs.org, which I can get 
-> set up immediately (and if we want patchwork, patchwork.ozlabs.org is 
-> available as always, no matter where the list is hosted).
->
->> More open questions are
->> 1) Scope?
->>   * Would anyone ever use such an overarching list?
->>   * Are we better off with the usual adhoc list of 'interested 
->> parties' + lkml?
->>   * Do we actually need to define the full scope - are we better with 
->> a vague
->>     definition?
->
-> I think a list with a broad and vaguely defined scope is a good idea - 
-> it would certainly be helpful to us to be able to follow what other 
-> contributors are doing that could be relevant to our CAPI and OpenCAPI 
-> work.
->
->>
->> 2) Is there an existing community we can use to discuss these issues?
->>     (beyond the obvious firehose of LKML).
->>
->> 3) Who else to approach for input on these general questions?
->>
->> In parallel to this there are elements such as git / patchwork etc but
->> they can all be done as they are needed.
->>
->> Thanks
->>
->> -- 
->> Jonathan Cameron
->> Huawei
->>
->
+outside of the if-conditional as I'm assuming you want to do this for
+each psp device for which sev_ops_init() is called.
+
+Or am I wrong here?
+
+---
+diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
+index 175cb3c3b8ef..d50aaa1ca75b 100644
+--- a/drivers/crypto/ccp/psp-dev.c
++++ b/drivers/crypto/ccp/psp-dev.c
+@@ -31,7 +31,7 @@
+ #define DEVICE_NAME	"sev"
+ 
+ static DEFINE_MUTEX(sev_cmd_mutex);
+-static bool sev_fops_registered;
++static struct miscdevice *psp_misc_dev;
+ 
+ static struct psp_device *psp_alloc_struct(struct sp_device *sp)
+ {
+@@ -242,7 +242,6 @@ EXPORT_SYMBOL_GPL(sev_guest_df_flush);
+ static int sev_ops_init(struct psp_device *psp)
+ {
+ 	struct device *dev = psp->dev;
+-	struct miscdevice *misc;
+ 	int ret;
+ 
+ 	/*
+@@ -252,26 +251,24 @@ static int sev_ops_init(struct psp_device *psp)
+ 	 * sev_do_cmd() finds the right master device to which to issue the
+ 	 * command to the firmware.
+ 	 */
+-	if (!sev_fops_registered) {
+-
+-		misc = devm_kzalloc(dev, sizeof(*misc), GFP_KERNEL);
+-		if (!misc)
++	if (!psp_misc_dev) {
++		psp_misc_dev = devm_kzalloc(dev, sizeof(struct miscdevice), GFP_KERNEL);
++		if (!psp_misc_dev)
+ 			return -ENOMEM;
+ 
+-		misc->minor = MISC_DYNAMIC_MINOR;
+-		misc->name = DEVICE_NAME;
+-		misc->fops = &sev_fops;
++		psp_misc_dev->minor = MISC_DYNAMIC_MINOR;
++		psp_misc_dev->name = DEVICE_NAME;
++		psp_misc_dev->fops = &sev_fops;
+ 
+-		ret = misc_register(misc);
++		ret = misc_register(psp_misc_dev);
+ 		if (ret)
+ 			return ret;
+-
+-		sev_fops_registered = true;
+-		psp->sev_misc = misc;
+-		init_waitqueue_head(&psp->sev_int_queue);
+-		dev_info(dev, "registered SEV device\n");
+ 	}
+ 
++	psp->sev_misc = psp_misc_dev;
++	init_waitqueue_head(&psp->sev_int_queue);
++	dev_info(dev, "registered SEV device\n");
++
+ 	return 0;
+ }
+ 
+@@ -288,8 +285,8 @@ static int sev_init(struct psp_device *psp)
+ 
+ static void sev_exit(struct psp_device *psp)
+ {
+-	if (psp->sev_misc)
+-		misc_deregister(psp->sev_misc);
++	if (psp_misc_dev)
++		misc_deregister(psp_misc_dev);
+ }
+ 
+ int psp_dev_init(struct sp_device *sp)
+
+-- 
+Regards/Gruss,
+    Boris.
+
+SUSE Linux GmbH, GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
+-- 
