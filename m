@@ -1,57 +1,165 @@
-From: "Gustavo A. R. Silva" <garsilva@embeddedor.com>
-Subject: [PATCH] crypto: qat: qat_common: qat_uclo - mark expected switch
- fall-throughs
-Date: Thu, 12 Oct 2017 17:55:29 -0500
-Message-ID: <20171012225529.GA25176@embeddedor.com>
+From: Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [Part2 PATCH v5.1 12.7/31] crypto: ccp: Implement SEV_PEK_CSR
+ ioctl command
+Date: Thu, 12 Oct 2017 21:24:01 -0500
+Message-ID: <d83b3e27-1195-817e-e976-36982e275588@amd.com>
+References: <20171004131412.13038-13-brijesh.singh@amd.com>
+ <20171007010607.78088-1-brijesh.singh@amd.com>
+ <20171007010607.78088-7-brijesh.singh@amd.com>
+ <20171012195331.bdzwqzyrjc6fi5lj@pd.tnic>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: qat-linux@intel.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        "Gustavo A. R. Silva" <garsilva@embeddedor.com>
-To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Salvatore Benedetto <salvatore.benedetto@intel.com>,
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: brijesh.singh@amd.com, Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
+        Gary Hook <gary.hook@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Borislav Petkov <bp@suse.de>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
+In-Reply-To: <20171012195331.bdzwqzyrjc6fi5lj@pd.tnic>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-In preparation to enabling -Wimplicit-fallthrough, mark switch cases
-where we are expecting to fall through.
 
-Signed-off-by: Gustavo A. R. Silva <garsilva@embeddedor.com>
----
- drivers/crypto/qat/qat_common/qat_uclo.c | 3 +++
- 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/crypto/qat/qat_common/qat_uclo.c b/drivers/crypto/qat/qat_common/qat_uclo.c
-index e2454d9..61ae091 100644
---- a/drivers/crypto/qat/qat_common/qat_uclo.c
-+++ b/drivers/crypto/qat/qat_common/qat_uclo.c
-@@ -791,6 +791,7 @@ static int qat_uclo_init_reg(struct icp_qat_fw_loader_handle *handle,
- 	case ICP_GPA_ABS:
- 	case ICP_GPB_ABS:
- 		ctx_mask = 0;
-+		/* fall through */
- 	case ICP_GPA_REL:
- 	case ICP_GPB_REL:
- 		return qat_hal_init_gpr(handle, ae, ctx_mask, reg_type,
-@@ -800,6 +801,7 @@ static int qat_uclo_init_reg(struct icp_qat_fw_loader_handle *handle,
- 	case ICP_SR_RD_ABS:
- 	case ICP_DR_RD_ABS:
- 		ctx_mask = 0;
-+		/* fall through */
- 	case ICP_SR_REL:
- 	case ICP_DR_REL:
- 	case ICP_SR_RD_REL:
-@@ -809,6 +811,7 @@ static int qat_uclo_init_reg(struct icp_qat_fw_loader_handle *handle,
- 	case ICP_SR_WR_ABS:
- 	case ICP_DR_WR_ABS:
- 		ctx_mask = 0;
-+		/* fall through */
- 	case ICP_SR_WR_REL:
- 	case ICP_DR_WR_REL:
- 		return qat_hal_init_wr_xfer(handle, ae, ctx_mask, reg_type,
--- 
-2.7.4
+On 10/12/17 2:53 PM, Borislav Petkov wrote:
+...
+
+> Ok, a couple of things here:
+>
+> * Move the checks first and the allocations second so that you allocate
+> memory only after all checks have been passed and you don't allocate
+> pointlessly.
+
+
+I assume you mean performing the SEV state check before allocating the
+memory for the CSR blob, right ? In my patches, I typically perform all
+the SW specific checks and allocation before invoking the HW routines.
+Handling the PSP commands will take longer compare to kmalloc() or
+access_ok() etc. If its not a big deal then I would prefer to keep that
+way.
+
+
+>
+> * That:
+>
+>         if (state == SEV_STATE_WORKING) {
+>                 ret = -EBUSY;
+>                 goto e_free_blob;
+>         } else if (state == SEV_STATE_UNINIT) {
+>                 ret = sev_firmware_init(&argp->error);
+>                 if (ret)
+>                         goto e_free_blob;
+>                 do_shutdown = 1;
+>         }
+>
+> is a repeating pattern. Perhaps it should be called
+> sev_firmware_reinit() and called by other functions.
+
+
+> * The rest is simplifications and streamlining.
+>
+> ---
+> diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
+> index e3ee68afd068..d41f5448a25b 100644
+> --- a/drivers/crypto/ccp/psp-dev.c
+> +++ b/drivers/crypto/ccp/psp-dev.c
+> @@ -302,33 +302,30 @@ static int sev_ioctl_pek_csr(struct sev_issue_cmd *argp)
+>  	int ret, state;
+>  	void *blob;
+>  
+> -	if (copy_from_user(&input, (void __user *)(uintptr_t)argp->data,
+> -			   sizeof(struct sev_user_data_pek_csr)))
+> +	if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
+> +		return -EFAULT;
+> +
+> +	if (!input.address)
+> +		return -EINVAL;
+> +
+> +	/* allocate a physically contiguous buffer to store the CSR blob */
+> +	if (!access_ok(VERIFY_WRITE, input.address, input.length) ||
+> +	    input.length > SEV_FW_BLOB_MAX_SIZE)
+>  		return -EFAULT;
+>  
+>  	data = kzalloc(sizeof(*data), GFP_KERNEL);
+>  	if (!data)
+>  		return -ENOMEM;
+>  
+> -	/* allocate a temporary physical contigous buffer to store the CSR blob */
+> -	blob = NULL;
+> -	if (input.address) {
+> -		if (!access_ok(VERIFY_WRITE, input.address, input.length) ||
+> -		    input.length > SEV_FW_BLOB_MAX_SIZE) {
+> -			ret = -EFAULT;
+> -			goto e_free;
+> -		}
+> -
+> -		blob = kmalloc(input.length, GFP_KERNEL);
+> -		if (!blob) {
+> -			ret = -ENOMEM;
+> -			goto e_free;
+> -		}
+> -
+> -		data->address = __psp_pa(blob);
+> -		data->len = input.length;
+> +	blob = kmalloc(input.length, GFP_KERNEL);
+> +	if (!blob) {
+> +		ret = -ENOMEM;
+> +		goto e_free;
+>  	}
+>  
+> +	data->address = __psp_pa(blob);
+> +	data->len = input.length;
+> +
+>  	ret = sev_platform_get_state(&state, &argp->error);
+>  	if (ret)
+>  		goto e_free_blob;
+> @@ -349,25 +346,23 @@ static int sev_ioctl_pek_csr(struct sev_issue_cmd *argp)
+>  		do_shutdown = 1;
+>  	}
+>  
+> -	ret = sev_handle_cmd(SEV_CMD_PEK_CSR, data, &argp->error);
+> +	ret = sev_do_cmd(SEV_CMD_PEK_CSR, data, &argp->error);
+>  
+>  	input.length = data->len;
+>  
+>  	/* copy blob to userspace */
+> -	if (blob &&
+> -	    copy_to_user((void __user *)(uintptr_t)input.address,
+> -			blob, input.length)) {
+> +	if (copy_to_user((void __user *)input.address, blob, input.length)) {
+>  		ret = -EFAULT;
+>  		goto e_shutdown;
+>  	}
+>  
+> -	if (copy_to_user((void __user *)(uintptr_t)argp->data, &input,
+> -			 sizeof(struct sev_user_data_pek_csr)))
+> +	if (copy_to_user((void __user *)argp->data, &input, sizeof(input)))
+>  		ret = -EFAULT;
+>  
+>  e_shutdown:
+>  	if (do_shutdown)
+> -		sev_handle_cmd(SEV_CMD_SHUTDOWN, 0, NULL);
+> +		ret = sev_do_cmd(SEV_CMD_SHUTDOWN, 0, NULL);
+> +
+>  e_free_blob:
+>  	kfree(blob);
+>  e_free:
+> @@ -408,10 +403,10 @@ static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
+>  		ret = sev_ioctl_pdh_gen(&input);
+>  		break;
+>  
+> -	case SEV_PEK_CSR: {
+> +	case SEV_PEK_CSR:
+>  		ret = sev_ioctl_pek_csr(&input);
+>  		break;
+> -	}
+> +
+>  	default:
+>  		ret = -EINVAL;
+>  		goto out;
+>
