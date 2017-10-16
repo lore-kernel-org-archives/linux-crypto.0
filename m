@@ -1,44 +1,82 @@
 From: Kamil Konieczny <k.konieczny@partner.samsung.com>
-Subject: Re: [PATCH v5] crypto: s5p-sss: Add HASH support for Exynos
-Date: Mon, 16 Oct 2017 18:40:16 +0200
-Message-ID: <4ed6e790-891a-42de-8b6b-7318c8a891fd@partner.samsung.com>
-References: <CGME20171009111232eucas1p1d17afaae66931a7dd234dbfa1d5a193f@eucas1p1.samsung.com>
-        <afa6482f-dc1e-6aab-5754-fa86f554e0b2@partner.samsung.com>
-        <4e9717c5-43d1-46d1-60ed-ea8168a91cc4@mentor.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+Subject: [PATCH 0/2] crypto: s5p-sss: Add HASH support for Exynos
+Date: Mon, 16 Oct 2017 19:43:00 +0200
+Message-ID: <20171016174302.17893-1-k.konieczny@partner.samsung.com>
+References: <CGME20171016174324eucas1p1d0d3b54a11e2946fe84edf513d42d53e@eucas1p1.samsung.com>
+Cc: Kamil Konieczny <k.konieczny@partner.samsung.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         Krzysztof Kozlowski <krzk@kernel.org>,
-        Vladimir Zapolskiy <vz@mleia.com>,
+        Vladimir Zapolskiy <vladimir_zapolskiy@mentor.com>,
         "David S. Miller" <davem@davemloft.net>,
         Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
         linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Vladimir Zapolskiy <vladimir_zapolskiy@mentor.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-reply-to: <4e9717c5-43d1-46d1-60ed-ea8168a91cc4@mentor.com>
-Content-language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:41327 "EHLO
+        mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753830AbdJPRn2 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 16 Oct 2017 13:43:28 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hello Vladimir,
+First patch cleans up spaces in defines, second adds HASH support for Exynos.
+Changes:
 
->>[snip]
+version 6:
+- fixes suggested by Vladimir Zapolskiy: change HASH_OP enum into bool, fix
+  comments, change int into unsigned int in several functions, change some
+  functions to return void, remove unnecessary parentheses in s5p_hash_import,
+  replace rctx with ctx for request context, drop some dd vars and use tctx->dd
+  instead, simplify s5p_hash_rx, s5p_hash_copy_result and s5p_hash_set_flow,
+  change int final into bool final, reoder some declarations, split patch into
+  two
+- rewrite and fix while loop in s5p_hash_copy_sg_lists
+- rewrite while loop in s5p_hash_prepare_sgs
 
->> -static struct s5p_aes_dev *s5p_dev;
->> +enum hash_op {
->> +	HASH_OP_UPDATE = 1,
->> +	HASH_OP_FINAL = 2
->> +};
-> 
-> If this type is not going to be extended, then I'd rather suggest to
-> use a boolean correspondent field in the struct s5p_hash_reqctx instead
-> of a new introduced type. [...]
+version 5:
+- fix suggested by Krzysztof Kozlowski: change defines HASH_OP into enum, fix
+  comments
 
-In prevoious mail I wrote 'op_final', but this will actually be 'op_update'.
+version 4:
+- fixes suggested by Krzysztof Kozlowski: reformat comments, convert context
+  flags into two bool vars, drop SSS_ALIGNED, change name of SSS_DMA_ALIGN and
+  SSS_DMA_ALIGN_MASK, split assignments into separate lines, use IS_ENABLED in
+  place of ifdef, remove sss_hash_algs_info and simplify register and deregister
+  HASH algs
+
+version 3:
+- many fixes suggested by Krzysztof Kozlowski: comments, uppercases in const,
+  remove unused defines, remove unused variable bs, constify aes_variant,
+  remove global var use_hash, remove WARN_ON, improve hash_import(),
+  change goto label into 'out' in s5p_hash_handle_queue(), reorder variable
+  declarations, add spinlock to protect clearing HASH_FLAGS_BUSY
+- simplify code: replace one-line functions s5p_hash_update_req(),
+  s5p_hash_final_req() with call to s5p_hash_xmit_dma(), and delete them
+- replace call to s5p_hash_hw_init() into s5p_ahash_dma_init() and delete it
+- fix clearing shash flag CRYPTO_TFM_REQ_MAY_SLEEP
+- fix s5p_hash_set_flow()
+
+version 2:
+- change patch format so number of lines drops
+- change in Kconfig as suggested by Krzysztof Kozlowski, add
+	EXYNOS_HASH subsection
+- change #ifndef EXYNOS_RNG into #ifdef CRYPTO_DEV_EXYNOS_HASH
+- remove style fixups in aes, as they should go in separate patch
+- remove FLOW_LOG, FLOW_DUMP macros and its uses
+- remove #if 0 ... endif
+- remove unused function hash_wait and its defines
+- fix compiler warning in dev_dbg
+- remove some comments
+- other minor fixes in comments
+
+Kamil Konieczny (2):
+  change spaces into tabs in defines
+  Add HASH support for Exynos
+
+ drivers/crypto/Kconfig   |   14 +
+ drivers/crypto/s5p-sss.c | 1596 +++++++++++++++++++++++++++++++++++++++++++---
+ 2 files changed, 1505 insertions(+), 105 deletions(-)
 
 -- 
-Best regards,
-Kamil Konieczny
-Samsung R&D Institute Poland
+2.14.1.536.g6867272d5b56
