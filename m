@@ -1,118 +1,127 @@
-From: Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH v2 3/8] nvmet/fc: Use sgl_alloc() and sgl_free()
-Date: Mon, 16 Oct 2017 15:49:35 -0700
-Message-ID: <20171016224940.1332-4-bart.vanassche@wdc.com>
-References: <20171016224940.1332-1-bart.vanassche@wdc.com>
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-crypto@vger.kernel.org,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        Keith Busch <keith.busch@intel.com>,
-        Christoph Hellwig <hch@lst.de>,
-        James Smart <james.smart@broadcom.com>,
-        Sagi Grimberg <sagi@grimberg.me>
-To: Jens Axboe <axboe@kernel.dk>
-Return-path: <linux-scsi-owner@vger.kernel.org>
-In-Reply-To: <20171016224940.1332-1-bart.vanassche@wdc.com>
-Sender: linux-scsi-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>
+Subject: [PATCH] crypto: vmx - Use skcipher for ctr fallback
+Date: Mon, 16 Oct 2017 20:54:19 -0200
+Message-ID: <20171016225420.31081-1-pfsmorigo@linux.vnet.ibm.com>
+Cc: Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>,
+        "Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+To: linux-kernel@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43788 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1756179AbdJPWzM (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 16 Oct 2017 18:55:12 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id v9GMsIHI069471
+        for <linux-crypto@vger.kernel.org>; Mon, 16 Oct 2017 18:55:11 -0400
+Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2dn430v0qy-1
+        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Mon, 16 Oct 2017 18:55:11 -0400
+Received: from localhost
+        by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-crypto@vger.kernel.org> from <pfsmorigo@linux.vnet.ibm.com>;
+        Mon, 16 Oct 2017 16:55:11 -0600
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Use the sgl_alloc() and sgl_free() functions instead of open coding
-these functions.
-
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Keith Busch <keith.busch@intel.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: James Smart <james.smart@broadcom.com>
-Cc: Sagi Grimberg <sagi@grimberg.me>
+Signed-off-by: Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>
 ---
- drivers/nvme/target/Kconfig |  1 +
- drivers/nvme/target/fc.c    | 36 ++----------------------------------
- 2 files changed, 3 insertions(+), 34 deletions(-)
+ drivers/crypto/vmx/aes_ctr.c | 33 +++++++++++++++++----------------
+ 1 file changed, 17 insertions(+), 16 deletions(-)
 
-diff --git a/drivers/nvme/target/Kconfig b/drivers/nvme/target/Kconfig
-index 03e4ab65fe77..4d9715630e21 100644
---- a/drivers/nvme/target/Kconfig
-+++ b/drivers/nvme/target/Kconfig
-@@ -39,6 +39,7 @@ config NVME_TARGET_FC
- 	tristate "NVMe over Fabrics FC target driver"
- 	depends on NVME_TARGET
- 	depends on HAS_DMA
-+	select SGL_ALLOC
- 	help
- 	  This enables the NVMe FC target support, which allows exporting NVMe
- 	  devices over FC.
-diff --git a/drivers/nvme/target/fc.c b/drivers/nvme/target/fc.c
-index 58e010bdda3e..20f96038c272 100644
---- a/drivers/nvme/target/fc.c
-+++ b/drivers/nvme/target/fc.c
-@@ -1683,31 +1683,12 @@ static int
- nvmet_fc_alloc_tgt_pgs(struct nvmet_fc_fcp_iod *fod)
+diff --git a/drivers/crypto/vmx/aes_ctr.c b/drivers/crypto/vmx/aes_ctr.c
+index 17d8421..fc60d00 100644
+--- a/drivers/crypto/vmx/aes_ctr.c
++++ b/drivers/crypto/vmx/aes_ctr.c
+@@ -27,21 +27,23 @@
+ #include <asm/switch_to.h>
+ #include <crypto/aes.h>
+ #include <crypto/scatterwalk.h>
++#include <crypto/skcipher.h>
++
+ #include "aesp8-ppc.h"
+ 
+ struct p8_aes_ctr_ctx {
+-	struct crypto_blkcipher *fallback;
++	struct crypto_skcipher *fallback;
+ 	struct aes_key enc_key;
+ };
+ 
+ static int p8_aes_ctr_init(struct crypto_tfm *tfm)
  {
- 	struct scatterlist *sg;
--	struct page *page;
- 	unsigned int nent;
--	u32 page_len, length;
--	int i = 0;
+ 	const char *alg = crypto_tfm_alg_name(tfm);
+-	struct crypto_blkcipher *fallback;
++	struct crypto_skcipher *fallback;
+ 	struct p8_aes_ctr_ctx *ctx = crypto_tfm_ctx(tfm);
  
--	length = fod->total_length;
--	nent = DIV_ROUND_UP(length, PAGE_SIZE);
--	sg = kmalloc_array(nent, sizeof(struct scatterlist), GFP_KERNEL);
-+	sg = sgl_alloc(fod->total_length, GFP_KERNEL, &nent);
- 	if (!sg)
- 		goto out;
+-	fallback =
+-	    crypto_alloc_blkcipher(alg, 0, CRYPTO_ALG_NEED_FALLBACK);
++	fallback = crypto_alloc_skcipher(alg, 0,
++			CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK);
+ 	if (IS_ERR(fallback)) {
+ 		printk(KERN_ERR
+ 		       "Failed to allocate transformation for '%s': %ld\n",
+@@ -49,11 +51,11 @@ static int p8_aes_ctr_init(struct crypto_tfm *tfm)
+ 		return PTR_ERR(fallback);
+ 	}
+ 	printk(KERN_INFO "Using '%s' as fallback implementation.\n",
+-	       crypto_tfm_alg_driver_name((struct crypto_tfm *) fallback));
++		crypto_skcipher_driver_name(fallback));
  
--	sg_init_table(sg, nent);
--
--	while (length) {
--		page_len = min_t(u32, length, PAGE_SIZE);
--
--		page = alloc_page(GFP_KERNEL);
--		if (!page)
--			goto out_free_pages;
--
--		sg_set_page(&sg[i], page, page_len, 0);
--		length -= page_len;
--		i++;
--	}
--
- 	fod->data_sg = sg;
- 	fod->data_sg_cnt = nent;
- 	fod->data_sg_cnt = fc_dma_map_sg(fod->tgtport->dev, sg, nent,
-@@ -1717,14 +1698,6 @@ nvmet_fc_alloc_tgt_pgs(struct nvmet_fc_fcp_iod *fod)
+-	crypto_blkcipher_set_flags(
++	crypto_skcipher_set_flags(
+ 		fallback,
+-		crypto_blkcipher_get_flags((struct crypto_blkcipher *)tfm));
++		crypto_skcipher_get_flags((struct crypto_skcipher *)tfm));
+ 	ctx->fallback = fallback;
  
  	return 0;
+@@ -64,7 +66,7 @@ static void p8_aes_ctr_exit(struct crypto_tfm *tfm)
+ 	struct p8_aes_ctr_ctx *ctx = crypto_tfm_ctx(tfm);
  
--out_free_pages:
--	while (i > 0) {
--		i--;
--		__free_page(sg_page(&sg[i]));
--	}
--	kfree(sg);
--	fod->data_sg = NULL;
--	fod->data_sg_cnt = 0;
- out:
- 	return NVME_SC_INTERNAL;
+ 	if (ctx->fallback) {
+-		crypto_free_blkcipher(ctx->fallback);
++		crypto_free_skcipher(ctx->fallback);
+ 		ctx->fallback = NULL;
+ 	}
  }
-@@ -1732,18 +1705,13 @@ nvmet_fc_alloc_tgt_pgs(struct nvmet_fc_fcp_iod *fod)
- static void
- nvmet_fc_free_tgt_pgs(struct nvmet_fc_fcp_iod *fod)
- {
--	struct scatterlist *sg;
--	int count;
--
- 	if (!fod->data_sg || !fod->data_sg_cnt)
- 		return;
+@@ -83,7 +85,7 @@ static int p8_aes_ctr_setkey(struct crypto_tfm *tfm, const u8 *key,
+ 	pagefault_enable();
+ 	preempt_enable();
  
- 	fc_dma_unmap_sg(fod->tgtport->dev, fod->data_sg, fod->data_sg_cnt,
- 				((fod->io_dir == NVMET_FCP_WRITE) ?
- 					DMA_FROM_DEVICE : DMA_TO_DEVICE));
--	for_each_sg(fod->data_sg, sg, fod->data_sg_cnt, count)
--		__free_page(sg_page(sg));
--	kfree(fod->data_sg);
-+	sgl_free(fod->data_sg);
- 	fod->data_sg = NULL;
- 	fod->data_sg_cnt = 0;
+-	ret += crypto_blkcipher_setkey(ctx->fallback, key, keylen);
++	ret += crypto_skcipher_setkey(ctx->fallback, key, keylen);
+ 	return ret;
  }
+ 
+@@ -117,15 +119,14 @@ static int p8_aes_ctr_crypt(struct blkcipher_desc *desc,
+ 	struct blkcipher_walk walk;
+ 	struct p8_aes_ctr_ctx *ctx =
+ 		crypto_tfm_ctx(crypto_blkcipher_tfm(desc->tfm));
+-	struct blkcipher_desc fallback_desc = {
+-		.tfm = ctx->fallback,
+-		.info = desc->info,
+-		.flags = desc->flags
+-	};
+ 
+ 	if (in_interrupt()) {
+-		ret = crypto_blkcipher_encrypt(&fallback_desc, dst, src,
+-					       nbytes);
++		SKCIPHER_REQUEST_ON_STACK(req, ctx->fallback);
++		skcipher_request_set_tfm(req, ctx->fallback);
++		skcipher_request_set_callback(req, desc->flags, NULL, NULL);
++		skcipher_request_set_crypt(req, src, dst, nbytes, desc->info);
++		ret = crypto_skcipher_encrypt(req);
++		skcipher_request_zero(req);
+ 	} else {
+ 		blkcipher_walk_init(&walk, dst, src, nbytes);
+ 		ret = blkcipher_walk_virt_block(desc, &walk, AES_BLOCK_SIZE);
 -- 
-2.14.2
+2.9.4
