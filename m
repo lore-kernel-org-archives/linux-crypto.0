@@ -1,69 +1,77 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: md5sum (from libkcapi) fails on kernel 4.9 but not on 4.13
-Date: Mon, 16 Oct 2017 23:10:00 +0200
-Message-ID: <2174001.55GM1Rvaqa@tauon.chronox.de>
-References: <5c552c4b-c05e-7098-6e60-fdc6f7ed5d4b@c-s.fr>
+From: "Tobin C. Harding" <me@tobin.cc>
+Subject: Re: [PATCH] staging: ccree: Fix bool comparison
+Date: Tue, 17 Oct 2017 08:17:08 +1100
+Message-ID: <20171016211708.GM16106@eros>
+References: <1508148491-11837-1-git-send-email-sunil.m@techveda.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Christophe LEROY <christophe.leroy@c-s.fr>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34910 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932131AbdJPVKK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 16 Oct 2017 17:10:10 -0400
-In-Reply-To: <5c552c4b-c05e-7098-6e60-fdc6f7ed5d4b@c-s.fr>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Transfer-Encoding: 7bit
+Cc: devel@driverdev.osuosl.org, gregkh@linuxfoundation.org,
+ driverdev-devel@linuxdriverproject.org, karthik@techveda.org,
+ linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: sunil.m@techveda.org
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+Content-Disposition: inline
+In-Reply-To: <1508148491-11837-1-git-send-email-sunil.m@techveda.org>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+List-Id: linux-crypto.vger.kernel.org
 
-Am Montag, 16. Oktober 2017, 08:53:00 CEST schrieb Christophe LEROY:
-
-Hi Christophe,
-
-> Hi Stephan,
+On Mon, Oct 16, 2017 at 03:38:11PM +0530, sunil.m@techveda.org wrote:
+> From: Suniel Mahesh <sunil.m@techveda.org>
 > 
-> I get an issue with md5sum of a big file with kernel 4.9. It don't get
-> that issue with kernel 4.13.
+> Bool tests don't need comparisons.
 
-The key to the difference in libkcapi is the following code:
+This commit log could be a bit longer. You may like to read
+Documentation/process/submitting-patches.rst (section 2).
 
-static void _kcapi_handle_flags(struct kcapi_handle *handle)
-...
-        /* older interfaces only processed 16 pages in a row */
-        handle->flags.alg_max_pages = _kcapi_kernver_ge(handle, 4, 11, 0) ?
-                                      UINT_MAX : ALG_MAX_PAGES;
-...
-
-This check is mainly for skcipher but it affects all cipher types. Thus, on 
-older kernels, only 16 pages are injected into the kernel with splice and then 
-it is reverted to sendmsg. Again, this logic is not so much of an issue for 
-algif_hash, but rather for algif_skcipher and algif_aead.
+> This fixes the following coccinelle warning:
+> WARNING: Comparison of bool to 0/1
 > 
-> When I do an strace, I see a difference in the calls: at the end of the
-> file, with 4.9 md5sum uses sendmsg() for the last block while with 4.13
-> it uses splice() as for all the previous blocks.
+> Signed-off-by: Suniel Mahesh <sunil.m@techveda.org>
+> ---
+> Note:
+> - Patch was tested and built(ARCH=arm) on latest
+>   linux-next.
+
+Building is _not_ testing.
+
+> - No build issues reported, however it was not
+>   tested on real hardware.
+
+This is implicit if you state 'builds on ARM'
+
+> - Please discard this changeset, if this is not
+>   helping the code look better.
+
+This is implicit also ;)
+
+> ---
+>  drivers/staging/ccree/ssi_request_mgr.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> The problem is that the last block has a size over 32kbytes, which is
-> the maximum size the talitos driver accepts to hash at once.
-> It looks like sendmsg() sends the entire block to the crypto driver
-> while splice() calls the crypto driver with blocks of page size.
+> diff --git a/drivers/staging/ccree/ssi_request_mgr.c b/drivers/staging/ccree/ssi_request_mgr.c
+> index 2e0df57..942afe2 100644
+> --- a/drivers/staging/ccree/ssi_request_mgr.c
+> +++ b/drivers/staging/ccree/ssi_request_mgr.c
+> @@ -272,7 +272,7 @@ int send_request(
+>  	unsigned int max_required_seq_len = (total_seq_len +
+>  					((ssi_req->ivgen_dma_addr_len == 0) ? 0 :
+>  					SSI_IVPOOL_SEQ_LEN) +
+> -					((is_dout == 0) ? 1 : 0));
+> +					(!is_dout ? 1 : 0));
 
-I understand that your driver has this 32kb limit. But I am not sure what the 
-difference between the handling of the sendmsg and the splice invocation is. 
-According to the strace, the splice accepted 256kb of data. Looking into the 
-hash_sendpage function implementing the backend of this splice system call, it 
-simply performs an update invocation with this buffer size. I.e. it invokes 
-your driver with 256kb of data. The sendmsg first performs a copy_from_user 
-with the maximum limit of 16 * PAGE_SIZE (see the limit variable in 
-hash_sendmsg) and then invokes the update function.
+Perhaps
 
-So, I am not sure why the sendmsg call chokes where the sendpage call 
-succeeds. 
+-					((is_dout == 0) ? 1 : 0));
++					(is_dout ? 0 : 1)
 
-If you tamper with the code shown above from libkcapi and set alg_max_pages to 
-a low value, the library reverts to sendmsg after the given number of pages.
-
-
-Ciao
-Stephan
+Good luck,
+Tobin.
