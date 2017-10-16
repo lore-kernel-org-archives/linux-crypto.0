@@ -1,8 +1,9 @@
 From: Kamil Konieczny <k.konieczny@partner.samsung.com>
-Subject: [PATCH 0/2] crypto: s5p-sss: Add HASH support for Exynos
-Date: Mon, 16 Oct 2017 19:43:00 +0200
-Message-ID: <20171016174302.17893-1-k.konieczny@partner.samsung.com>
-References: <CGME20171016174324eucas1p1d0d3b54a11e2946fe84edf513d42d53e@eucas1p1.samsung.com>
+Subject: [PATCH 1/2] change spaces into tabs in defines
+Date: Mon, 16 Oct 2017 19:43:01 +0200
+Message-ID: <20171016174302.17893-2-k.konieczny@partner.samsung.com>
+References: <20171016174302.17893-1-k.konieczny@partner.samsung.com>
+        <CGME20171016174324eucas1p2056e7e3378d42de70d82103d771b1b24@eucas1p2.samsung.com>
 Cc: Kamil Konieczny <k.konieczny@partner.samsung.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Krzysztof Kozlowski <krzk@kernel.org>,
@@ -11,72 +12,238 @@ Cc: Kamil Konieczny <k.konieczny@partner.samsung.com>,
         Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
         linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org
 To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailout1.w1.samsung.com ([210.118.77.11]:41327 "EHLO
-        mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753830AbdJPRn2 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 16 Oct 2017 13:43:28 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-reply-to: <20171016174302.17893-1-k.konieczny@partner.samsung.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-First patch cleans up spaces in defines, second adds HASH support for Exynos.
-Changes:
+Change spaces into tabs in defines.
 
-version 6:
-- fixes suggested by Vladimir Zapolskiy: change HASH_OP enum into bool, fix
-  comments, change int into unsigned int in several functions, change some
-  functions to return void, remove unnecessary parentheses in s5p_hash_import,
-  replace rctx with ctx for request context, drop some dd vars and use tctx->dd
-  instead, simplify s5p_hash_rx, s5p_hash_copy_result and s5p_hash_set_flow,
-  change int final into bool final, reoder some declarations, split patch into
-  two
-- rewrite and fix while loop in s5p_hash_copy_sg_lists
-- rewrite while loop in s5p_hash_prepare_sgs
+Signed-off-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
+---
+ drivers/crypto/s5p-sss.c | 190 +++++++++++++++++++++++------------------------
+ 1 file changed, 95 insertions(+), 95 deletions(-)
 
-version 5:
-- fix suggested by Krzysztof Kozlowski: change defines HASH_OP into enum, fix
-  comments
-
-version 4:
-- fixes suggested by Krzysztof Kozlowski: reformat comments, convert context
-  flags into two bool vars, drop SSS_ALIGNED, change name of SSS_DMA_ALIGN and
-  SSS_DMA_ALIGN_MASK, split assignments into separate lines, use IS_ENABLED in
-  place of ifdef, remove sss_hash_algs_info and simplify register and deregister
-  HASH algs
-
-version 3:
-- many fixes suggested by Krzysztof Kozlowski: comments, uppercases in const,
-  remove unused defines, remove unused variable bs, constify aes_variant,
-  remove global var use_hash, remove WARN_ON, improve hash_import(),
-  change goto label into 'out' in s5p_hash_handle_queue(), reorder variable
-  declarations, add spinlock to protect clearing HASH_FLAGS_BUSY
-- simplify code: replace one-line functions s5p_hash_update_req(),
-  s5p_hash_final_req() with call to s5p_hash_xmit_dma(), and delete them
-- replace call to s5p_hash_hw_init() into s5p_ahash_dma_init() and delete it
-- fix clearing shash flag CRYPTO_TFM_REQ_MAY_SLEEP
-- fix s5p_hash_set_flow()
-
-version 2:
-- change patch format so number of lines drops
-- change in Kconfig as suggested by Krzysztof Kozlowski, add
-	EXYNOS_HASH subsection
-- change #ifndef EXYNOS_RNG into #ifdef CRYPTO_DEV_EXYNOS_HASH
-- remove style fixups in aes, as they should go in separate patch
-- remove FLOW_LOG, FLOW_DUMP macros and its uses
-- remove #if 0 ... endif
-- remove unused function hash_wait and its defines
-- fix compiler warning in dev_dbg
-- remove some comments
-- other minor fixes in comments
-
-Kamil Konieczny (2):
-  change spaces into tabs in defines
-  Add HASH support for Exynos
-
- drivers/crypto/Kconfig   |   14 +
- drivers/crypto/s5p-sss.c | 1596 +++++++++++++++++++++++++++++++++++++++++++---
- 2 files changed, 1505 insertions(+), 105 deletions(-)
-
+diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
+index 7ac657f46d15..dfae1865c384 100644
+--- a/drivers/crypto/s5p-sss.c
++++ b/drivers/crypto/s5p-sss.c
+@@ -30,98 +30,98 @@
+ #include <crypto/algapi.h>
+ #include <crypto/scatterwalk.h>
+ 
+-#define _SBF(s, v)                      ((v) << (s))
++#define _SBF(s, v)			((v) << (s))
+ 
+ /* Feed control registers */
+-#define SSS_REG_FCINTSTAT               0x0000
+-#define SSS_FCINTSTAT_BRDMAINT          BIT(3)
+-#define SSS_FCINTSTAT_BTDMAINT          BIT(2)
+-#define SSS_FCINTSTAT_HRDMAINT          BIT(1)
+-#define SSS_FCINTSTAT_PKDMAINT          BIT(0)
+-
+-#define SSS_REG_FCINTENSET              0x0004
+-#define SSS_FCINTENSET_BRDMAINTENSET    BIT(3)
+-#define SSS_FCINTENSET_BTDMAINTENSET    BIT(2)
+-#define SSS_FCINTENSET_HRDMAINTENSET    BIT(1)
+-#define SSS_FCINTENSET_PKDMAINTENSET    BIT(0)
+-
+-#define SSS_REG_FCINTENCLR              0x0008
+-#define SSS_FCINTENCLR_BRDMAINTENCLR    BIT(3)
+-#define SSS_FCINTENCLR_BTDMAINTENCLR    BIT(2)
+-#define SSS_FCINTENCLR_HRDMAINTENCLR    BIT(1)
+-#define SSS_FCINTENCLR_PKDMAINTENCLR    BIT(0)
+-
+-#define SSS_REG_FCINTPEND               0x000C
+-#define SSS_FCINTPEND_BRDMAINTP         BIT(3)
+-#define SSS_FCINTPEND_BTDMAINTP         BIT(2)
+-#define SSS_FCINTPEND_HRDMAINTP         BIT(1)
+-#define SSS_FCINTPEND_PKDMAINTP         BIT(0)
+-
+-#define SSS_REG_FCFIFOSTAT              0x0010
+-#define SSS_FCFIFOSTAT_BRFIFOFUL        BIT(7)
+-#define SSS_FCFIFOSTAT_BRFIFOEMP        BIT(6)
+-#define SSS_FCFIFOSTAT_BTFIFOFUL        BIT(5)
+-#define SSS_FCFIFOSTAT_BTFIFOEMP        BIT(4)
+-#define SSS_FCFIFOSTAT_HRFIFOFUL        BIT(3)
+-#define SSS_FCFIFOSTAT_HRFIFOEMP        BIT(2)
+-#define SSS_FCFIFOSTAT_PKFIFOFUL        BIT(1)
+-#define SSS_FCFIFOSTAT_PKFIFOEMP        BIT(0)
+-
+-#define SSS_REG_FCFIFOCTRL              0x0014
+-#define SSS_FCFIFOCTRL_DESSEL           BIT(2)
+-#define SSS_HASHIN_INDEPENDENT          _SBF(0, 0x00)
+-#define SSS_HASHIN_CIPHER_INPUT         _SBF(0, 0x01)
+-#define SSS_HASHIN_CIPHER_OUTPUT        _SBF(0, 0x02)
+-
+-#define SSS_REG_FCBRDMAS                0x0020
+-#define SSS_REG_FCBRDMAL                0x0024
+-#define SSS_REG_FCBRDMAC                0x0028
+-#define SSS_FCBRDMAC_BYTESWAP           BIT(1)
+-#define SSS_FCBRDMAC_FLUSH              BIT(0)
+-
+-#define SSS_REG_FCBTDMAS                0x0030
+-#define SSS_REG_FCBTDMAL                0x0034
+-#define SSS_REG_FCBTDMAC                0x0038
+-#define SSS_FCBTDMAC_BYTESWAP           BIT(1)
+-#define SSS_FCBTDMAC_FLUSH              BIT(0)
+-
+-#define SSS_REG_FCHRDMAS                0x0040
+-#define SSS_REG_FCHRDMAL                0x0044
+-#define SSS_REG_FCHRDMAC                0x0048
+-#define SSS_FCHRDMAC_BYTESWAP           BIT(1)
+-#define SSS_FCHRDMAC_FLUSH              BIT(0)
+-
+-#define SSS_REG_FCPKDMAS                0x0050
+-#define SSS_REG_FCPKDMAL                0x0054
+-#define SSS_REG_FCPKDMAC                0x0058
+-#define SSS_FCPKDMAC_BYTESWAP           BIT(3)
+-#define SSS_FCPKDMAC_DESCEND            BIT(2)
+-#define SSS_FCPKDMAC_TRANSMIT           BIT(1)
+-#define SSS_FCPKDMAC_FLUSH              BIT(0)
+-
+-#define SSS_REG_FCPKDMAO                0x005C
++#define SSS_REG_FCINTSTAT		0x0000
++#define SSS_FCINTSTAT_BRDMAINT		BIT(3)
++#define SSS_FCINTSTAT_BTDMAINT		BIT(2)
++#define SSS_FCINTSTAT_HRDMAINT		BIT(1)
++#define SSS_FCINTSTAT_PKDMAINT		BIT(0)
++
++#define SSS_REG_FCINTENSET		0x0004
++#define SSS_FCINTENSET_BRDMAINTENSET	BIT(3)
++#define SSS_FCINTENSET_BTDMAINTENSET	BIT(2)
++#define SSS_FCINTENSET_HRDMAINTENSET	BIT(1)
++#define SSS_FCINTENSET_PKDMAINTENSET	BIT(0)
++
++#define SSS_REG_FCINTENCLR		0x0008
++#define SSS_FCINTENCLR_BRDMAINTENCLR	BIT(3)
++#define SSS_FCINTENCLR_BTDMAINTENCLR	BIT(2)
++#define SSS_FCINTENCLR_HRDMAINTENCLR	BIT(1)
++#define SSS_FCINTENCLR_PKDMAINTENCLR	BIT(0)
++
++#define SSS_REG_FCINTPEND		0x000C
++#define SSS_FCINTPEND_BRDMAINTP		BIT(3)
++#define SSS_FCINTPEND_BTDMAINTP		BIT(2)
++#define SSS_FCINTPEND_HRDMAINTP		BIT(1)
++#define SSS_FCINTPEND_PKDMAINTP		BIT(0)
++
++#define SSS_REG_FCFIFOSTAT		0x0010
++#define SSS_FCFIFOSTAT_BRFIFOFUL	BIT(7)
++#define SSS_FCFIFOSTAT_BRFIFOEMP	BIT(6)
++#define SSS_FCFIFOSTAT_BTFIFOFUL	BIT(5)
++#define SSS_FCFIFOSTAT_BTFIFOEMP	BIT(4)
++#define SSS_FCFIFOSTAT_HRFIFOFUL	BIT(3)
++#define SSS_FCFIFOSTAT_HRFIFOEMP	BIT(2)
++#define SSS_FCFIFOSTAT_PKFIFOFUL	BIT(1)
++#define SSS_FCFIFOSTAT_PKFIFOEMP	BIT(0)
++
++#define SSS_REG_FCFIFOCTRL		0x0014
++#define SSS_FCFIFOCTRL_DESSEL		BIT(2)
++#define SSS_HASHIN_INDEPENDENT		_SBF(0, 0x00)
++#define SSS_HASHIN_CIPHER_INPUT		_SBF(0, 0x01)
++#define SSS_HASHIN_CIPHER_OUTPUT	_SBF(0, 0x02)
++
++#define SSS_REG_FCBRDMAS		0x0020
++#define SSS_REG_FCBRDMAL		0x0024
++#define SSS_REG_FCBRDMAC		0x0028
++#define SSS_FCBRDMAC_BYTESWAP		BIT(1)
++#define SSS_FCBRDMAC_FLUSH		BIT(0)
++
++#define SSS_REG_FCBTDMAS		0x0030
++#define SSS_REG_FCBTDMAL		0x0034
++#define SSS_REG_FCBTDMAC		0x0038
++#define SSS_FCBTDMAC_BYTESWAP		BIT(1)
++#define SSS_FCBTDMAC_FLUSH		BIT(0)
++
++#define SSS_REG_FCHRDMAS		0x0040
++#define SSS_REG_FCHRDMAL		0x0044
++#define SSS_REG_FCHRDMAC		0x0048
++#define SSS_FCHRDMAC_BYTESWAP		BIT(1)
++#define SSS_FCHRDMAC_FLUSH		BIT(0)
++
++#define SSS_REG_FCPKDMAS		0x0050
++#define SSS_REG_FCPKDMAL		0x0054
++#define SSS_REG_FCPKDMAC		0x0058
++#define SSS_FCPKDMAC_BYTESWAP		BIT(3)
++#define SSS_FCPKDMAC_DESCEND		BIT(2)
++#define SSS_FCPKDMAC_TRANSMIT		BIT(1)
++#define SSS_FCPKDMAC_FLUSH		BIT(0)
++
++#define SSS_REG_FCPKDMAO		0x005C
+ 
+ /* AES registers */
+ #define SSS_REG_AES_CONTROL		0x00
+-#define SSS_AES_BYTESWAP_DI             BIT(11)
+-#define SSS_AES_BYTESWAP_DO             BIT(10)
+-#define SSS_AES_BYTESWAP_IV             BIT(9)
+-#define SSS_AES_BYTESWAP_CNT            BIT(8)
+-#define SSS_AES_BYTESWAP_KEY            BIT(7)
+-#define SSS_AES_KEY_CHANGE_MODE         BIT(6)
+-#define SSS_AES_KEY_SIZE_128            _SBF(4, 0x00)
+-#define SSS_AES_KEY_SIZE_192            _SBF(4, 0x01)
+-#define SSS_AES_KEY_SIZE_256            _SBF(4, 0x02)
+-#define SSS_AES_FIFO_MODE               BIT(3)
+-#define SSS_AES_CHAIN_MODE_ECB          _SBF(1, 0x00)
+-#define SSS_AES_CHAIN_MODE_CBC          _SBF(1, 0x01)
+-#define SSS_AES_CHAIN_MODE_CTR          _SBF(1, 0x02)
+-#define SSS_AES_MODE_DECRYPT            BIT(0)
++#define SSS_AES_BYTESWAP_DI		BIT(11)
++#define SSS_AES_BYTESWAP_DO		BIT(10)
++#define SSS_AES_BYTESWAP_IV		BIT(9)
++#define SSS_AES_BYTESWAP_CNT		BIT(8)
++#define SSS_AES_BYTESWAP_KEY		BIT(7)
++#define SSS_AES_KEY_CHANGE_MODE		BIT(6)
++#define SSS_AES_KEY_SIZE_128		_SBF(4, 0x00)
++#define SSS_AES_KEY_SIZE_192		_SBF(4, 0x01)
++#define SSS_AES_KEY_SIZE_256		_SBF(4, 0x02)
++#define SSS_AES_FIFO_MODE		BIT(3)
++#define SSS_AES_CHAIN_MODE_ECB		_SBF(1, 0x00)
++#define SSS_AES_CHAIN_MODE_CBC		_SBF(1, 0x01)
++#define SSS_AES_CHAIN_MODE_CTR		_SBF(1, 0x02)
++#define SSS_AES_MODE_DECRYPT		BIT(0)
+ 
+ #define SSS_REG_AES_STATUS		0x04
+-#define SSS_AES_BUSY                    BIT(2)
+-#define SSS_AES_INPUT_READY             BIT(1)
+-#define SSS_AES_OUTPUT_READY            BIT(0)
++#define SSS_AES_BUSY			BIT(2)
++#define SSS_AES_INPUT_READY		BIT(1)
++#define SSS_AES_OUTPUT_READY		BIT(0)
+ 
+ #define SSS_REG_AES_IN_DATA(s)		(0x10 + (s << 2))
+ #define SSS_REG_AES_OUT_DATA(s)		(0x20 + (s << 2))
+@@ -129,22 +129,22 @@
+ #define SSS_REG_AES_CNT_DATA(s)		(0x40 + (s << 2))
+ #define SSS_REG_AES_KEY_DATA(s)		(0x80 + (s << 2))
+ 
+-#define SSS_REG(dev, reg)               ((dev)->ioaddr + (SSS_REG_##reg))
+-#define SSS_READ(dev, reg)              __raw_readl(SSS_REG(dev, reg))
+-#define SSS_WRITE(dev, reg, val)        __raw_writel((val), SSS_REG(dev, reg))
++#define SSS_REG(dev, reg)		((dev)->ioaddr + (SSS_REG_##reg))
++#define SSS_READ(dev, reg)		__raw_readl(SSS_REG(dev, reg))
++#define SSS_WRITE(dev, reg, val)	__raw_writel((val), SSS_REG(dev, reg))
+ 
+-#define SSS_AES_REG(dev, reg)           ((dev)->aes_ioaddr + SSS_REG_##reg)
++#define SSS_AES_REG(dev, reg)		((dev)->aes_ioaddr + SSS_REG_##reg)
+ #define SSS_AES_WRITE(dev, reg, val)    __raw_writel((val), \
+ 						SSS_AES_REG(dev, reg))
+ 
+ /* HW engine modes */
+-#define FLAGS_AES_DECRYPT               BIT(0)
+-#define FLAGS_AES_MODE_MASK             _SBF(1, 0x03)
+-#define FLAGS_AES_CBC                   _SBF(1, 0x01)
+-#define FLAGS_AES_CTR                   _SBF(1, 0x02)
++#define FLAGS_AES_DECRYPT		BIT(0)
++#define FLAGS_AES_MODE_MASK		_SBF(1, 0x03)
++#define FLAGS_AES_CBC			_SBF(1, 0x01)
++#define FLAGS_AES_CTR			_SBF(1, 0x02)
+ 
+-#define AES_KEY_LEN         16
+-#define CRYPTO_QUEUE_LEN    1
++#define AES_KEY_LEN			16
++#define CRYPTO_QUEUE_LEN		1
+ 
+ /**
+  * struct samsung_aes_variant - platform specific SSS driver data
 -- 
 2.14.1.536.g6867272d5b56
