@@ -1,64 +1,67 @@
-From: Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>
-Subject: Re: vmx ghash buggy on ppc64le
-Date: Mon, 16 Oct 2017 21:09:53 -0200
-Message-ID: <20171016230953.GA13502@dublin>
-References: <20170919031845.GA28732@gondor.apana.org.au>
+From: Kees Cook <keescook@chromium.org>
+Subject: [PATCH] hwrng/xgene-rng: Convert timers to use timer_setup()
+Date: Mon, 16 Oct 2017 16:38:34 -0700
+Message-ID: <20171016233834.GA101719@beast>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Cc: Matt Mackall <mpm@selenic.com>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54324 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S932760AbdJPXKS (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 16 Oct 2017 19:10:18 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id v9GN9UWF113917
-        for <linux-crypto@vger.kernel.org>; Mon, 16 Oct 2017 19:10:18 -0400
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2dn1nq2reh-1
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Mon, 16 Oct 2017 19:10:17 -0400
-Received: from localhost
-        by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-crypto@vger.kernel.org> from <pfsmorigo@linux.vnet.ibm.com>;
-        Mon, 16 Oct 2017 17:10:17 -0600
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20170919031845.GA28732@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Tue, Sep 19, 2017 at 11:18:45AM +0800, Herbert Xu wrote:
-> Hi:
-> 
-> I have received a report that ghash on ppc64le does not interoperate
-> with other implementations of ghash, e.g., on x86-64.
-> 
-> https://bugzilla.redhat.com/show_bug.cgi?id=1490972
-> 
-> Could you guys take a look at this and see if this is a bug in
-> the mainline vmx driver too?
-> 
-> Thanks!
-> -- 
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
-> 
+In preparation for unconditionally passing the struct timer_list pointer to
+all timer callbacks, switch to using the new timer_setup() and from_timer()
+to pass the timer pointer explicitly.
 
-Hi Herbert,
+Cc: Matt Mackall <mpm@selenic.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org
+Signed-off-by: Kees Cook <keescook@chromium.org>
+---
+ drivers/char/hw_random/xgene-rng.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-It seems that this bug is affected by the fact that ctr mode is using
-blkcipher for the fallback.
+diff --git a/drivers/char/hw_random/xgene-rng.c b/drivers/char/hw_random/xgene-rng.c
+index 3c77645405e5..71755790c32b 100644
+--- a/drivers/char/hw_random/xgene-rng.c
++++ b/drivers/char/hw_random/xgene-rng.c
+@@ -100,9 +100,9 @@ struct xgene_rng_dev {
+ 	struct clk *clk;
+ };
+ 
+-static void xgene_rng_expired_timer(unsigned long arg)
++static void xgene_rng_expired_timer(struct timer_list *t)
+ {
+-	struct xgene_rng_dev *ctx = (struct xgene_rng_dev *) arg;
++	struct xgene_rng_dev *ctx = from_timer(ctx, t, failure_timer);
+ 
+ 	/* Clear failure counter as timer expired */
+ 	disable_irq(ctx->irq);
+@@ -113,8 +113,6 @@ static void xgene_rng_expired_timer(unsigned long arg)
+ 
+ static void xgene_rng_start_timer(struct xgene_rng_dev *ctx)
+ {
+-	ctx->failure_timer.data = (unsigned long) ctx;
+-	ctx->failure_timer.function = xgene_rng_expired_timer;
+ 	ctx->failure_timer.expires = jiffies + 120 * HZ;
+ 	add_timer(&ctx->failure_timer);
+ }
+@@ -292,7 +290,7 @@ static int xgene_rng_init(struct hwrng *rng)
+ 	struct xgene_rng_dev *ctx = (struct xgene_rng_dev *) rng->priv;
+ 
+ 	ctx->failure_cnt = 0;
+-	init_timer(&ctx->failure_timer);
++	timer_setup(&ctx->failure_timer, xgene_rng_expired_timer, 0);
+ 
+ 	ctx->revision = readl(ctx->csr_base + RNG_EIP_REV);
+ 
+-- 
+2.7.4
 
-I just sent a patch [1] to make it use skcipher and, since then, ipsec
-with  ikev2 and ghash are working fine for ppc64 and ppc64le.
-
-Best regards,
 
 -- 
-Paulo Flabiano Smorigo
-IBM Linux Technology Center
-
-[1] https://lkml.org/lkml/2017/10/16/911
+Kees Cook
+Pixel Security
