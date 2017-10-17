@@ -1,71 +1,132 @@
-From: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-Subject: Re: [PATCH v9 00/20] simplify crypto wait for async op
-Date: Tue, 17 Oct 2017 14:55:21 +0300
-Message-ID: <CAOtvUMeESbKKaEvpW_MKrRaCxwQWnBa00m4v4F1jNZ_+Xq7pWA@mail.gmail.com>
-References: <1508059209-25529-1-git-send-email-gilad@benyossef.com> <20171015153831.GA22867@gondor.apana.org.au>
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Subject: Re: New Linux accelerators discussion list [was: Re: Fostering
+ linux community collaboration on hardware accelerators]
+Date: Tue, 17 Oct 2017 13:48:10 +0100
+Message-ID: <20171017134810.000049a9@huawei.com>
+References: <201710101132.v9ABUs28138304@mx0a-001b2d01.pphosted.com>
+        <07d49485-e583-8434-5681-92a0b54005ca@au1.ibm.com>
+        <20171016150701.00004260@huawei.com>
+        <a2031056-9ab4-cd03-1a18-f60d338ce090@au1.ibm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-        Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>,
-        David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        Tom Lendacky <thomas.lendacky-5C7GfCeVMHo@public.gmane.org>,
-        Gary Hook <gary.hook-5C7GfCeVMHo@public.gmane.org>,
-        Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
-        Arnaud Ebalard <arno-LkuqDEemtHBg9hUCZPvPmw@public.gmane.org>,
-        Matthias Brugger <matthias.bgg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        Alasdair Kergon <agk-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        Mike Snitzer <snitzer-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        device-mapper development <dm-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-        "Theodore Y. Ts'o" <tytso-3s7WtUTddSA@public.gmane.org>,
-        Jaegeuk Kim <jaegeuk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        Steffen Klassert <steffen.klassert-opNxpl+3fjRBDgjK7y7TUQ@public.gmane.org>,
-        Alexey Kuznetsov <kuznet-v/Mj1YrvjDBInbfyfbPRSQ@public.gmane.org>,
-        Hideaki YOSHIFUJI <yoshfuji-VfPWfsRibaP+Ru+s062T9g@public.gmane.org>,
-        Mimi Zohar <zohar-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.c
-To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20171015153831.GA22867-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+Cc: LKML <linux-kernel@vger.kernel.org>, <jic23@kernel.org>,
+        "Liguozhu (Kenneth)" <liguozhu@hisilicon.com>,
+        Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+        <francois.ozog@linaro.org>, <Prasad.Athreya@cavium.com>,
+        <arndbergmann@gmail.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Frederic Barrat <fbarrat@linux.vnet.ibm.com>,
+        Mark Brown <broonie@kernel.org>,
+        <Tirumalesh.Chalamarla@cavium.com>, <jcm@redhat.com>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        "Jean-Philippe Brucker" <jean-philippe.brucker@arm.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Eric Auger <eric.auger@redhat.com>, <kvm@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <linuxarm@huawei.com>,
+        Balbir Singh <bsingharora@gmail.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Alistair Po
+To: Andrew Donnellan <andrew.donnellan@au1.ibm.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from szxga05-in.huawei.com ([45.249.212.191]:8502 "EHLO
+        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753568AbdJQMtC (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 17 Oct 2017 08:49:02 -0400
+In-Reply-To: <a2031056-9ab4-cd03-1a18-f60d338ce090@au1.ibm.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Oct 15, 2017 at 6:38 PM, Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org> wrote:
->
-> On Sun, Oct 15, 2017 at 10:19:45AM +0100, Gilad Ben-Yossef wrote:
-> >
-> > Changes from v8:
-> > - Remove the translation of EAGAIN return code to the
-> >   previous return code of EBUSY for the user space
-> >   interface of algif as no one seems to rely on it as
-> >   requested by Herbert Xu.
->
-> Sorry, but I forgot to mention that EAGAIN is not a good value
-> to use because it's used by the network system calls for other
-> meanings (interrupted by a signal).
->
-> So if we stop doing the translation then we also need to pick
-> a different value, perhaps E2BIG or something similar that have
-> no current use within the crypto API or network API.
+On Tue, 17 Oct 2017 11:00:40 +1100
+Andrew Donnellan <andrew.donnellan@au1.ibm.com> wrote:
 
-Yes, I see what you mean. With a netlink based interface this can
-be confusing to debug.
+> On 17/10/17 01:07, Jonathan Cameron wrote:
+> > <snip>
+> >   
+> >>> So as ever with a linux community focusing on a particular topic, the
+> >>> obvious solution is a mailing list. There are a number of options on how
+> >>> do this.
+> >>>
+> >>> 1) Ask one of the industry bodies to host? Who?
+> >>>
+> >>> 2) Put together a compelling argument for linux-accelerators@vger.kernel.org
+> >>> as probably the most generic location for such a list.  
+> >>
+> >> Happy to offer linux-accelerators@lists.ozlabs.org, which I can get set
+> >> up immediately (and if we want patchwork, patchwork.ozlabs.org is
+> >> available as always, no matter where the list is hosted).
+> >>  
+> > 
+> > That would be great! Thanks for doing this. Much easier to find out what
+> > such a list is useful for by the practical option of having a list and
+> > see what people do with it.  
+> 
+> [+ LKML]
+> 
+> We now have a mailing list:
+> 
+>    List:      linux-accelerators@lists.ozlabs.org
+>    Info:      https://lists.ozlabs.org/listinfo/linux-accelerators
+>    Archives:  https://lists.ozlabs.org/pipermail/linux-accelerators
+> 
+> I haven't set up Patchwork as yet, but if people think that's a good 
+> idea I can get that done too.
+> 
+> 
+> Andrew
+> 
 
-Would you mind if we used ENOSPC instead of E2BIG?
+Thanks Andrew.
 
-"No space left on device" seems more appropriate than
-"Argument list too long".
+A quick summary of initial thoughts on scope of this list for anyone
+entering the discussion at this point.
+Note it will hopefully evolve in whatever direction people find helpful.
+This contains some suggestions not a barrier to wider scope!
 
-Thanks,
-Gilad
+There are a number of projects / applications involving what are
+termed hardware accelerators.  These include:
+* Traditional offload engines
+	- Crypto, compression, media transcoding and similar accelerators
+	- usecases including kTLS, Storage Encryption etc.
+* Dynamic FPGA type accelerators
+* ODP, DPDK and similar networking data plane - particularly dual stack
+  solutions where the kernel 'plays nicely' with userspace drivers.
+* AI Accelerators
+* Shared Virtual Memory (SVM) bus systems including Open-CAPI, CCIX etc
+* Fast data flow to/from userspace applications.
 
+A number of existing project focus on these:
+* Mainline kernel drivers
+	- Numerous crypto drivers etc
+	- Open-CAPI
+* Various networking data plane activities
+* VFIO based and similar userspace drivers
+Hopefully this list can provide a broader forum where more general
+questions are being considered.
 
+The discussion that lead to this list was that a number of people would
+like a general open forum on which to discuss ideas with scope beyond
+simply one kernel subsystem or one particular userspace framework.
 
+Topics might include
+* RFCs and early reviews of new approaches.
+* Similar hardware - who is trying to solve the same problems?
+* What would we ideally want from new hardware iterations?
+* Hardware description - the question of how to chose a particular
+  crypto engine is very dependent on the particular data flows.
+  Sometimes hardware accelerators don't actually help due to overheads.
+  Understanding those barriers would be very useful.
+* Upstream paths - blockers and how to work with the communities to
+  overcome them.
+* Fostering stronger userspace communities to allow these accelerators to 
+  be easily harnessed.
+	- A number of projects have been highlighted in this thread
+	  OpenStack (cyborg project), openMP accelerator support 
+* Robustness / security of userspace frameworks.
+* Virtualisation of accelerators
 
--- 
-Gilad Ben-Yossef
-Chief Coffee Drinker
+Anyhow, this email was just meant to draw together some thoughts.
+It will be interesting to see what the list actually gets used for :)
 
-"If you take a class in large-scale robotics, can you end up in a
-situation where the homework eats your dog?"
- -- Jean-Baptiste Queru
+Jonathan
