@@ -1,129 +1,81 @@
-From: Christophe LEROY <christophe.leroy@c-s.fr>
-Subject: Re: [PATCH v9 17/20] crypto: talitos: move to generic async
- completion
-Date: Tue, 17 Oct 2017 12:50:41 +0200
-Message-ID: <b75d3b02-2aba-124c-ccf5-7241775c004c@c-s.fr>
-References: <1508059209-25529-1-git-send-email-gilad@benyossef.com>
- <1508059209-25529-18-git-send-email-gilad@benyossef.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Cc: Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        keyrings@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-mediatek@lists.infradead.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-fscrypt@vger.kernel.org,
-        netdev@vger.kernel.org, linux-ima-devel@lists.sourceforge.net,
-        linux-ima-user@lists.sourceforge.net,
-        linux-security-module@vger.kernel.org
-To: Gilad Ben-Yossef <gilad@benyossef.com>,
+From: Kamil Konieczny <k.konieczny@partner.samsung.com>
+Subject: [PATCH v7 0/2] crypto: s5p-sss: Add HASH support for Exynos
+Date: Tue, 17 Oct 2017 13:28:22 +0200
+Message-ID: <20171017112824.10231-1-k.konieczny@partner.samsung.com>
+References: <CGME20171017112845eucas1p2f760753a372a15eafba4fd3368520eb0@eucas1p2.samsung.com>
+Cc: Kamil Konieczny <k.konieczny@partner.samsung.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Vladimir Zapolskiy <vladimir_zapolskiy@mentor.com>,
+        Vladimir Zapolskiy <vz@mleia.com>,
         "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        David Howells <dhowells@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>,
-        Boris Brezillon <boris.brezillon@free-electrons.com>,
-        Arnaud Ebalard <arno@natisbad.org>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Steve French <sfrench@samba.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Mimi Zohar <zohar@linux.v
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pegase1.c-s.fr ([93.17.236.30]:24052 "EHLO pegase1.c-s.fr"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S935170AbdJQKvS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 Oct 2017 06:51:18 -0400
-In-Reply-To: <1508059209-25529-18-git-send-email-gilad@benyossef.com>
-Content-Language: fr
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-samsung-soc-owner@vger.kernel.org>
+Sender: linux-samsung-soc-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Le 15/10/2017 à 11:20, Gilad Ben-Yossef a écrit :
-> The talitos driver starts several async crypto ops and  waits for their
-> completions. Move it over to generic code doing the same.
-> 
-> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+First patch cleans up spaces in defines, second adds HASH support for Exynos.
+Changes:
 
-Tested-by: Christophe Leroy <christophe.leroy@c-s.fr>
+version 7:
+- fix ifdef into if(IS_ENABLED()) as suggested by Krzysztof Kozlowski
 
-> ---
->   drivers/crypto/talitos.c | 38 +++++---------------------------------
->   1 file changed, 5 insertions(+), 33 deletions(-)
-> 
-> diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-> index 5bd8191..9c80e0c 100644
-> --- a/drivers/crypto/talitos.c
-> +++ b/drivers/crypto/talitos.c
-> @@ -2160,22 +2160,6 @@ static int ahash_import(struct ahash_request *areq, const void *in)
->   	return 0;
->   }
->   
-> -struct keyhash_result {
-> -	struct completion completion;
-> -	int err;
-> -};
-> -
-> -static void keyhash_complete(struct crypto_async_request *req, int err)
-> -{
-> -	struct keyhash_result *res = req->data;
-> -
-> -	if (err == -EINPROGRESS)
-> -		return;
-> -
-> -	res->err = err;
-> -	complete(&res->completion);
-> -}
-> -
->   static int keyhash(struct crypto_ahash *tfm, const u8 *key, unsigned int keylen,
->   		   u8 *hash)
->   {
-> @@ -2183,10 +2167,10 @@ static int keyhash(struct crypto_ahash *tfm, const u8 *key, unsigned int keylen,
->   
->   	struct scatterlist sg[1];
->   	struct ahash_request *req;
-> -	struct keyhash_result hresult;
-> +	struct crypto_wait wait;
->   	int ret;
->   
-> -	init_completion(&hresult.completion);
-> +	crypto_init_wait(&wait);
->   
->   	req = ahash_request_alloc(tfm, GFP_KERNEL);
->   	if (!req)
-> @@ -2195,25 +2179,13 @@ static int keyhash(struct crypto_ahash *tfm, const u8 *key, unsigned int keylen,
->   	/* Keep tfm keylen == 0 during hash of the long key */
->   	ctx->keylen = 0;
->   	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-> -				   keyhash_complete, &hresult);
-> +				   crypto_req_done, &wait);
->   
->   	sg_init_one(&sg[0], key, keylen);
->   
->   	ahash_request_set_crypt(req, sg, hash, keylen);
-> -	ret = crypto_ahash_digest(req);
-> -	switch (ret) {
-> -	case 0:
-> -		break;
-> -	case -EINPROGRESS:
-> -	case -EBUSY:
-> -		ret = wait_for_completion_interruptible(
-> -			&hresult.completion);
-> -		if (!ret)
-> -			ret = hresult.err;
-> -		break;
-> -	default:
-> -		break;
-> -	}
-> +	ret = crypto_wait_req(crypto_ahash_digest(req), &wait);
-> +
->   	ahash_request_free(req);
->   
->   	return ret;
-> 
+version 6:
+- fixes suggested by Vladimir Zapolskiy: change HASH_OP enum into bool, fix
+  comments, change int into unsigned int in several functions, change some
+  functions to return void, remove unnecessary parentheses in s5p_hash_import,
+  replace rctx with ctx for request context, drop some dd vars and use tctx->dd
+  instead, simplify s5p_hash_rx, s5p_hash_copy_result and s5p_hash_set_flow,
+  change int final into bool final, reoder some declarations, split patch into
+  two
+- rewrite and fix while loop in s5p_hash_copy_sg_lists
+- rewrite while loop in s5p_hash_prepare_sgs
+
+version 5:
+- fix suggested by Krzysztof Kozlowski: change defines HASH_OP into enum, fix
+  comments
+
+version 4:
+- fixes suggested by Krzysztof Kozlowski: reformat comments, convert context
+  flags into two bool vars, drop SSS_ALIGNED, change name of SSS_DMA_ALIGN and
+  SSS_DMA_ALIGN_MASK, split assignments into separate lines, use IS_ENABLED in
+  place of ifdef, remove sss_hash_algs_info and simplify register and deregister
+  HASH algs
+
+version 3:
+- many fixes suggested by Krzysztof Kozlowski: comments, uppercases in const,
+  remove unused defines, remove unused variable bs, constify aes_variant,
+  remove global var use_hash, remove WARN_ON, improve hash_import(),
+  change goto label into 'out' in s5p_hash_handle_queue(), reorder variable
+  declarations, add spinlock to protect clearing HASH_FLAGS_BUSY
+- simplify code: replace one-line functions s5p_hash_update_req(),
+  s5p_hash_final_req() with call to s5p_hash_xmit_dma(), and delete them
+- replace call to s5p_hash_hw_init() into s5p_ahash_dma_init() and delete it
+- fix clearing shash flag CRYPTO_TFM_REQ_MAY_SLEEP
+- fix s5p_hash_set_flow()
+
+version 2:
+- change patch format so number of lines drops
+- change in Kconfig as suggested by Krzysztof Kozlowski, add
+	EXYNOS_HASH subsection
+- change #ifndef EXYNOS_RNG into #ifdef CRYPTO_DEV_EXYNOS_HASH
+- remove style fixups in aes, as they should go in separate patch
+- remove FLOW_LOG, FLOW_DUMP macros and its uses
+- remove #if 0 ... endif
+- remove unused function hash_wait and its defines
+- fix compiler warning in dev_dbg
+- remove some comments
+- other minor fixes in comments
+
+Kamil Konieczny (2):
+  change spaces into tabs in defines
+  Add HASH support for Exynos
+
+ drivers/crypto/Kconfig   |   14 +
+ drivers/crypto/s5p-sss.c | 1597 +++++++++++++++++++++++++++++++++++++++++++---
+ 2 files changed, 1506 insertions(+), 105 deletions(-)
+
+-- 
+2.14.1.536.g6867272d5b56
