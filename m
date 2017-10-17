@@ -1,77 +1,48 @@
-From: Russell King - ARM Linux <linux@armlinux.org.uk>
-Subject: Re: [PATCH v9 00/20] simplify crypto wait for async op
-Date: Tue, 17 Oct 2017 15:06:29 +0100
-Message-ID: <20171017140629.GO20805@n2100.armlinux.org.uk>
-References: <1508059209-25529-1-git-send-email-gilad@benyossef.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: Re: [PATCH v2 7/8] scsi/pmcraid: Remove an unused structure member
+Date: Tue, 17 Oct 2017 14:28:29 +0000
+Message-ID: <1508250508.3596.0.camel@wdc.com>
+References: <20171016224940.1332-1-bart.vanassche@wdc.com>
+         <20171016224940.1332-8-bart.vanassche@wdc.com>
+         <5ea64c10-aa3e-f0ee-cfba-e93b3d8e1428@suse.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        David Howells <dhowells@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>,
-        Boris Brezillon <boris.brezillon@free-electrons.com>,
-        Arnaud Ebalard <arno@natisbad.org>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Steve French <sfrench@samba.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        Dmitry Kasatkin <dmitry.ka
-To: Gilad Ben-Yossef <gilad@benyossef.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pandora.armlinux.org.uk ([78.32.30.218]:55066 "EHLO
-        pandora.armlinux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752318AbdJQOHq (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 Oct 2017 10:07:46 -0400
-Content-Disposition: inline
-In-Reply-To: <1508059209-25529-1-git-send-email-gilad@benyossef.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "anil_ravindranath@pmc-sierra.com" <anil_ravindranath@pmc-sierra.com>
+To: "hare@suse.de" <hare@suse.de>, "axboe@kernel.dk" <axboe@kernel.dk>
+Return-path: <linux-scsi-owner@vger.kernel.org>
+In-Reply-To: <5ea64c10-aa3e-f0ee-cfba-e93b3d8e1428@suse.de>
+Content-Language: en-US
+Content-ID: <E4CCECF6DB6A6F45A4582B095B95CBF0@namprd04.prod.outlook.com>
+Sender: linux-scsi-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Sun, Oct 15, 2017 at 10:19:45AM +0100, Gilad Ben-Yossef wrote:
-> Many users of kernel async. crypto services have a pattern of
-> starting an async. crypto op and than using a completion
-> to wait for it to end.
-> 
-> This patch set simplifies this common use case in two ways:
-> 
-> First, by separating the return codes of the case where a
-> request is queued to a backlog due to the provider being
-> busy (-EBUSY) from the case the request has failed due
-> to the provider being busy and backlogging is not enabled
-> (-EAGAIN).
-> 
-> Next, this change is than built on to create a generic API
-> to wait for a async. crypto operation to complete.
-> 
-> The end result is a smaller code base and an API that is
-> easier to use and more difficult to get wrong.
-> 
-> The patch set was boot tested on x86_64 and arm64 which
-> at the very least tests the crypto users via testmgr and
-> tcrypt but I do note that I do not have access to some
-> of the HW whose drivers are modified nor do I claim I was
-> able to test all of the corner cases.
-> 
-> The patch set is based upon linux-next release tagged
-> next-20171013.
-
-Has there been any performance impact analysis of these changes?  I
-ended up with patches for one of the crypto drivers which converted
-its interrupt handling to threaded interrupts being reverted because
-it caused a performance degredation.
-
-Moving code to latest APIs to simplify it is not always beneficial.
-
--- 
-RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
-FTTC broadband for 0.8mile line in suburbia: sync at 8.8Mbps down 630kbps up
-According to speedtest.net: 8.21Mbps down 510kbps up
+T24gVHVlLCAyMDE3LTEwLTE3IGF0IDA4OjIxICswMjAwLCBIYW5uZXMgUmVpbmVja2Ugd3JvdGU6
+DQo+IE9uIDEwLzE3LzIwMTcgMTI6NDkgQU0sIEJhcnQgVmFuIEFzc2NoZSB3cm90ZToNCj4gPiBT
+aWduZWQtb2ZmLWJ5OiBCYXJ0IFZhbiBBc3NjaGUgPGJhcnQudmFuYXNzY2hlQHdkYy5jb20+DQo+
+ID4gUmV2aWV3ZWQtYnk6IEpvaGFubmVzIFRodW1zaGlybiA8anRodW1zaGlybkBzdXNlLmRlPg0K
+PiA+IENjOiBsaW51eC1zY3NpQHZnZXIua2VybmVsLm9yZw0KPiA+IENjOiBNYXJ0aW4gSy4gUGV0
+ZXJzZW4gPG1hcnRpbi5wZXRlcnNlbkBvcmFjbGUuY29tPg0KPiA+IENjOiBBbmlsIFJhdmluZHJh
+bmF0aCA8YW5pbF9yYXZpbmRyYW5hdGhAcG1jLXNpZXJyYS5jb20+DQo+ID4gLS0tDQo+ID4gIGRy
+aXZlcnMvc2NzaS9wbWNyYWlkLmggfCAxIC0NCj4gPiAgMSBmaWxlIGNoYW5nZWQsIDEgZGVsZXRp
+b24oLSkNCj4gPiANCj4gPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9zY3NpL3BtY3JhaWQuaCBiL2Ry
+aXZlcnMvc2NzaS9wbWNyYWlkLmgNCj4gPiBpbmRleCA4YmZhYzcyYTI0MmIuLjQ0ZGE5MTcxMjEx
+NSAxMDA2NDQNCj4gPiAtLS0gYS9kcml2ZXJzL3Njc2kvcG1jcmFpZC5oDQo+ID4gKysrIGIvZHJp
+dmVycy9zY3NpL3BtY3JhaWQuaA0KPiA+IEBAIC01NDIsNyArNTQyLDYgQEAgc3RydWN0IHBtY3Jh
+aWRfc2dsaXN0IHsNCj4gPiAgCXUzMiBvcmRlcjsNCj4gPiAgCXUzMiBudW1fc2c7DQo+ID4gIAl1
+MzIgbnVtX2RtYV9zZzsNCj4gPiAtCXUzMiBidWZmZXJfbGVuOw0KPiA+ICAJc3RydWN0IHNjYXR0
+ZXJsaXN0IHNjYXR0ZXJsaXN0WzFdOw0KPiA+ICB9Ow0KPiA+ICANCj4gPiANCj4gDQo+IFRoaXMg
+YWN0dWFsbHkgaXMgdGhlIHNhbWUgc3RvcnkgdGhhdCB3ZSd2ZSBoYWQgd2l0aCBpcHIgKGFuZCwg
+bG9va2luZyBhdA0KPiB0aGUgY29kZSwgdGhvc2UgdHdvIGRyaXZlcnMgbG9vayBhd2Z1bGx5IHNp
+bWlsYXIgLi4uKS4NCj4gcG1jcmFpZF9zZ2xpc3QgbG9va3MgYXMgaWYgaXQncyBhIGhhcmR3YXJl
+LWRlcGVuZGVudCBzdHJ1Y3R1cmUsIHNvIGp1c3QNCj4gcmVtb3Zpbmcgb25lIGVudHJ5IGZyb20g
+dGhlIG1pZGRsZSBvZiBhIHN0cnVjdHVyZSBtaWdodCBub3QgYmUgYSBnb29kIGlkZWEuDQo+IEJ1
+dCB0aGlzIGlzIHNvbWV0aGluZyBmb3IgdGhlIHBtY3JhaWQgZm9sa3MgdG8gY2xhcmlmeS4NCg0K
+SGVsbG8gSGFubmVzLA0KDQpTb3JyeSBidXQgSSBkb24ndCBzZWUgaG93IGEgc3RydWN0dXJlIHRo
+YXQgY29udGFpbnMgYSBzdHJ1Y3Qgc2NhdHRlcmxpc3QNCmNvdWxkIGJlIGhhcmR3YXJlLWRlcGVu
+ZGVudD8NCg0KVGhhbmtzLA0KDQpCYXJ0Lg==
