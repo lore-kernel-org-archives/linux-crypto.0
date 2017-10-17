@@ -1,50 +1,77 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: md5sum (from libkcapi) fails on kernel 4.9 but not on 4.13
-Date: Tue, 17 Oct 2017 15:42:31 +0200
-Message-ID: <3299215.QY4dUA6yAn@tauon.chronox.de>
-References: <5c552c4b-c05e-7098-6e60-fdc6f7ed5d4b@c-s.fr> <64a7edb0-b9c0-32cd-cc6e-096f2911d5bc@c-s.fr> <3fc056b8-690c-6cec-3af6-0e6d55f4628c@c-s.fr>
+From: Russell King - ARM Linux <linux@armlinux.org.uk>
+Subject: Re: [PATCH v9 00/20] simplify crypto wait for async op
+Date: Tue, 17 Oct 2017 15:06:29 +0100
+Message-ID: <20171017140629.GO20805@n2100.armlinux.org.uk>
+References: <1508059209-25529-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Christophe LEROY <christophe.leroy@c-s.fr>
+Content-Type: text/plain; charset=us-ascii
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        David Howells <dhowells@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Gary Hook <gary.hook@amd.com>,
+        Boris Brezillon <boris.brezillon@free-electrons.com>,
+        Arnaud Ebalard <arno@natisbad.org>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Steve French <sfrench@samba.org>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        Dmitry Kasatkin <dmitry.ka
+To: Gilad Ben-Yossef <gilad@benyossef.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34926 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752540AbdJQNrr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 Oct 2017 09:47:47 -0400
-In-Reply-To: <3fc056b8-690c-6cec-3af6-0e6d55f4628c@c-s.fr>
+Received: from pandora.armlinux.org.uk ([78.32.30.218]:55066 "EHLO
+        pandora.armlinux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752318AbdJQOHq (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 17 Oct 2017 10:07:46 -0400
+Content-Disposition: inline
+In-Reply-To: <1508059209-25529-1-git-send-email-gilad@benyossef.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 17. Oktober 2017, 10:51:06 CEST schrieb Christophe LEROY:
-
-Hi Christophe,
-
+On Sun, Oct 15, 2017 at 10:19:45AM +0100, Gilad Ben-Yossef wrote:
+> Many users of kernel async. crypto services have a pattern of
+> starting an async. crypto op and than using a completion
+> to wait for it to end.
 > 
-> I've now tried a test with 1.0.0, and there seems to be another big
-> issue: the error returned by sendmsg() is not taken into account anymore:
+> This patch set simplifies this common use case in two ways:
+> 
+> First, by separating the return codes of the case where a
+> request is queued to a backlog due to the provider being
+> busy (-EBUSY) from the case the request has failed due
+> to the provider being busy and backlogging is not enabled
+> (-EAGAIN).
+> 
+> Next, this change is than built on to create a generic API
+> to wait for a async. crypto operation to complete.
+> 
+> The end result is a smaller code base and an API that is
+> easier to use and more difficult to get wrong.
+> 
+> The patch set was boot tested on x86_64 and arm64 which
+> at the very least tests the crypto users via testmgr and
+> tcrypt but I do note that I do not have access to some
+> of the HW whose drivers are modified nor do I claim I was
+> able to test all of the corner cases.
+> 
+> The patch set is based upon linux-next release tagged
+> next-20171013.
 
-It seems that this bug was there before. Can you please check whether this one 
-fixes it?
+Has there been any performance impact analysis of these changes?  I
+ended up with patches for one of the crypto drivers which converted
+its interrupt handling to threaded interrupts being reverted because
+it caused a performance degredation.
 
-diff --git a/lib/kcapi-kernel-if.c b/lib/kcapi-kernel-if.c
-index e00d328..9053104 100644
---- a/lib/kcapi-kernel-if.c
-+++ b/lib/kcapi-kernel-if.c
-@@ -321,6 +321,8 @@ int32_t _kcapi_common_vmsplice_chunk_fd(struct 
-kcapi_handle *handle, int *fdptr,
- 
-                if ((handle->processed_sg++) > handle->flags.alg_max_pages) {
-                        ret = _kcapi_common_send_data(handle, &iov, 1, 
-sflags);
-+                       if (ret < 0)
-+                               return ret;
-                } else {
-                        ret = vmsplice(handle->pipes[1], &iov, 1,
-                                       SPLICE_F_GIFT|flags);
+Moving code to latest APIs to simplify it is not always beneficial.
 
-Thanks
-
-Ciao
-Stephan
+-- 
+RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
+FTTC broadband for 0.8mile line in suburbia: sync at 8.8Mbps down 630kbps up
+According to speedtest.net: 8.21Mbps down 510kbps up
