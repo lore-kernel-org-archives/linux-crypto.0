@@ -1,151 +1,86 @@
-From: Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH v2 8/8] scsi/pmcraid: Use sgl_alloc_order() and
- sgl_free_order()
-Date: Tue, 17 Oct 2017 08:22:18 +0200
-Message-ID: <00b49c32-505e-410a-40dd-9d6f793354be@suse.de>
-References: <20171016224940.1332-1-bart.vanassche@wdc.com>
- <20171016224940.1332-9-bart.vanassche@wdc.com>
+From: Christophe LEROY <christophe.leroy@c-s.fr>
+Subject: Re: md5sum (from libkcapi) fails on kernel 4.9 but not on 4.13
+Date: Tue, 17 Oct 2017 09:58:31 +0200
+Message-ID: <64a7edb0-b9c0-32cd-cc6e-096f2911d5bc@c-s.fr>
+References: <5c552c4b-c05e-7098-6e60-fdc6f7ed5d4b@c-s.fr>
+ <2174001.55GM1Rvaqa@tauon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-crypto@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Anil Ravindranath <anil_ravindranath@pmc-sierra.com>
-To: Bart Van Assche <bart.vanassche@wdc.com>,
-        Jens Axboe <axboe@kernel.dk>
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:57560 "EHLO mx2.suse.de"
+Received: from pegase1.c-s.fr ([93.17.236.30]:9675 "EHLO pegase1.c-s.fr"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752580AbdJQGWU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 Oct 2017 02:22:20 -0400
-In-Reply-To: <20171016224940.1332-9-bart.vanassche@wdc.com>
-Content-Language: en-US
+        id S932726AbdJQH7D (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 17 Oct 2017 03:59:03 -0400
+In-Reply-To: <2174001.55GM1Rvaqa@tauon.chronox.de>
+Content-Language: fr
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 10/17/2017 12:49 AM, Bart Van Assche wrote:
-> Use the sgl_alloc_order() and sgl_free_order() functions instead
-> of open coding these functions.
-> 
-> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-> Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-> Cc: linux-scsi@vger.kernel.org
-> Cc: Martin K. Petersen <martin.petersen@oracle.com>
-> Cc: Anil Ravindranath <anil_ravindranath@pmc-sierra.com>
-> ---
->  drivers/scsi/Kconfig   |  1 +
->  drivers/scsi/pmcraid.c | 43 ++++---------------------------------------
->  drivers/scsi/pmcraid.h |  2 +-
->  3 files changed, 6 insertions(+), 40 deletions(-)
-> 
-> diff --git a/drivers/scsi/Kconfig b/drivers/scsi/Kconfig
-> index d11e75e76195..632200ec36a6 100644
-> --- a/drivers/scsi/Kconfig
-> +++ b/drivers/scsi/Kconfig
-> @@ -1576,6 +1576,7 @@ config ZFCP
->  config SCSI_PMCRAID
->  	tristate "PMC SIERRA Linux MaxRAID adapter support"
->  	depends on PCI && SCSI && NET
-> +	select SGL_ALLOC
->  	---help---
->  	  This driver supports the PMC SIERRA MaxRAID adapters.
->  
-> diff --git a/drivers/scsi/pmcraid.c b/drivers/scsi/pmcraid.c
-> index b4d6cd8cd1ad..95fc0352f9bb 100644
-> --- a/drivers/scsi/pmcraid.c
-> +++ b/drivers/scsi/pmcraid.c
-> @@ -3232,12 +3232,7 @@ static int pmcraid_build_ioadl(
->   */
->  static void pmcraid_free_sglist(struct pmcraid_sglist *sglist)
->  {
-> -	int i;
-> -
-> -	for (i = 0; i < sglist->num_sg; i++)
-> -		__free_pages(sg_page(&(sglist->scatterlist[i])),
-> -			     sglist->order);
-> -
-> +	sgl_free_order(sglist->scatterlist, sglist->order);
->  	kfree(sglist);
->  }
->  
-> @@ -3254,50 +3249,20 @@ static void pmcraid_free_sglist(struct pmcraid_sglist *sglist)
->  static struct pmcraid_sglist *pmcraid_alloc_sglist(int buflen)
->  {
->  	struct pmcraid_sglist *sglist;
-> -	struct scatterlist *scatterlist;
-> -	struct page *page;
-> -	int num_elem, i, j;
->  	int sg_size;
->  	int order;
-> -	int bsize_elem;
->  
->  	sg_size = buflen / (PMCRAID_MAX_IOADLS - 1);
->  	order = (sg_size > 0) ? get_order(sg_size) : 0;
-> -	bsize_elem = PAGE_SIZE * (1 << order);
-> -
-> -	/* Determine the actual number of sg entries needed */
-> -	if (buflen % bsize_elem)
-> -		num_elem = (buflen / bsize_elem) + 1;
-> -	else
-> -		num_elem = buflen / bsize_elem;
->  
->  	/* Allocate a scatter/gather list for the DMA */
-> -	sglist = kzalloc(sizeof(struct pmcraid_sglist) +
-> -			 (sizeof(struct scatterlist) * (num_elem - 1)),
-> -			 GFP_KERNEL);
-> -
-> +	sglist = kzalloc(sizeof(struct pmcraid_sglist), GFP_KERNEL);
->  	if (sglist == NULL)
->  		return NULL;
->  
-> -	scatterlist = sglist->scatterlist;
-> -	sg_init_table(scatterlist, num_elem);
->  	sglist->order = order;
-> -	sglist->num_sg = num_elem;
-> -	sg_size = buflen;
-> -
-> -	for (i = 0; i < num_elem; i++) {
-> -		page = alloc_pages(GFP_KERNEL|GFP_DMA|__GFP_ZERO, order);
-> -		if (!page) {
-> -			for (j = i - 1; j >= 0; j--)
-> -				__free_pages(sg_page(&scatterlist[j]), order);
-> -			kfree(sglist);
-> -			return NULL;
-> -		}
-> -
-> -		sg_set_page(&scatterlist[i], page,
-> -			sg_size < bsize_elem ? sg_size : bsize_elem, 0);
-> -		sg_size -= bsize_elem;
-> -	}
-> +	sgl_alloc_order(buflen, order, false,
-> +			GFP_KERNEL | GFP_DMA | __GFP_ZERO, &sglist->num_sg);
->  
->  	return sglist;
->  }
-> diff --git a/drivers/scsi/pmcraid.h b/drivers/scsi/pmcraid.h
-> index 44da91712115..754ef30927e2 100644
-> --- a/drivers/scsi/pmcraid.h
-> +++ b/drivers/scsi/pmcraid.h
-> @@ -542,7 +542,7 @@ struct pmcraid_sglist {
->  	u32 order;
->  	u32 num_sg;
->  	u32 num_dma_sg;
-> -	struct scatterlist scatterlist[1];
-> +	struct scatterlist *scatterlist;
->  };
->  
->  /* page D0 inquiry data of focal point resource */
-> 
-The comment to ipr applied here, too.
-We need input from the pmcraid folks if this is a valid conversion.
+Hi Stephan,
 
-Cheers,
+Le 16/10/2017 à 23:10, Stephan Mueller a écrit :
+> Am Montag, 16. Oktober 2017, 08:53:00 CEST schrieb Christophe LEROY:
+> 
+> Hi Christophe,
+> 
+>> Hi Stephan,
+>>
+>> I get an issue with md5sum of a big file with kernel 4.9. It don't get
+>> that issue with kernel 4.13.
+> 
+> The key to the difference in libkcapi is the following code:
+> 
+> static void _kcapi_handle_flags(struct kcapi_handle *handle)
+> ...
+>          /* older interfaces only processed 16 pages in a row */
+>          handle->flags.alg_max_pages = _kcapi_kernver_ge(handle, 4, 11, 0) ?
+>                                        UINT_MAX : ALG_MAX_PAGES;
+> ...
+> 
+> This check is mainly for skcipher but it affects all cipher types. Thus, on
+> older kernels, only 16 pages are injected into the kernel with splice and then
+> it is reverted to sendmsg. Again, this logic is not so much of an issue for
+> algif_hash, but rather for algif_skcipher and algif_aead.
+>>
+>> When I do an strace, I see a difference in the calls: at the end of the
+>> file, with 4.9 md5sum uses sendmsg() for the last block while with 4.13
+>> it uses splice() as for all the previous blocks.
+>>
+>> The problem is that the last block has a size over 32kbytes, which is
+>> the maximum size the talitos driver accepts to hash at once.
+>> It looks like sendmsg() sends the entire block to the crypto driver
+>> while splice() calls the crypto driver with blocks of page size.
+> 
+> I understand that your driver has this 32kb limit. But I am not sure what the
+> difference between the handling of the sendmsg and the splice invocation is.
+> According to the strace, the splice accepted 256kb of data. Looking into the
+> hash_sendpage function implementing the backend of this splice system call, it
+> simply performs an update invocation with this buffer size. I.e. it invokes
+> your driver with 256kb of data. The sendmsg first performs a copy_from_user
+> with the maximum limit of 16 * PAGE_SIZE (see the limit variable in
+> hash_sendmsg) and then invokes the update function.
 
-Hannes
--- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+As far as I can see, hash_sendpage() is called with one single page, of 
+size 16kb in my setup. If I understand correct, the loop over every page 
+is implemented in __splice_from_pipe().
+
+> 
+> So, I am not sure why the sendmsg call chokes where the sendpage call
+> succeeds.
+
+As far as I can see, the sendmsg() calls the update function with the 
+full buffer, which in my case is over the 32kb limit of the driver.
+
+> 
+> If you tamper with the code shown above from libkcapi and set alg_max_pages to
+> a low value, the library reverts to sendmsg after the given number of pages.
+
+Couldn't we get the libkcapi to splice until the last full page, then 
+only use sendmsg() for the last chunk once it is smaller than an entire 
+page ?
+
+Thanks
+Christophe
