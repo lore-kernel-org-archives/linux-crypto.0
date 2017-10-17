@@ -1,30 +1,34 @@
-From: Johannes Thumshirn <jthumshirn@suse.de>
-Subject: Re: [PATCH v2 1/8] lib/scatterlist: Introduce sgl_alloc() and
- sgl_free()
-Date: Tue, 17 Oct 2017 11:20:37 +0200
-Message-ID: <20171017092037.bf6avqzejrcd5d5z@linux-x5ow.site>
-References: <20171016224940.1332-1-bart.vanassche@wdc.com>
- <20171016224940.1332-2-bart.vanassche@wdc.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: Re: [PATCH 1/2] change spaces into tabs in defines
+Date: Tue, 17 Oct 2017 11:53:39 +0200
+Message-ID: <CAJKOXPdHQmh3Lqz_Dn_2LFnTt8-=TgUHh9EajwBZdOakhM7Uug@mail.gmail.com>
+References: <CGME20171016174324eucas1p2056e7e3378d42de70d82103d771b1b24@eucas1p2.samsung.com>
+ <20171016174302.17893-1-k.konieczny@partner.samsung.com> <20171016174302.17893-2-k.konieczny@partner.samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-crypto@vger.kernel.org
-To: Bart Van Assche <bart.vanassche@wdc.com>
-Return-path: <linux-block-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20171016224940.1332-2-bart.vanassche@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Vladimir Zapolskiy <vladimir_zapolskiy@mentor.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Kamil Konieczny <k.konieczny@partner.samsung.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20171016174302.17893-2-k.konieczny@partner.samsung.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+On Mon, Oct 16, 2017 at 7:43 PM, Kamil Konieczny
+<k.konieczny@partner.samsung.com> wrote:
+> Change spaces into tabs in defines.
+>
+> Signed-off-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
+> ---
+>  drivers/crypto/s5p-sss.c | 190 +++++++++++++++++++++++------------------------
+>  1 file changed, 95 insertions(+), 95 deletions(-)
+>
 
-Thanks Bart,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
--- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: Felix Imendörffer, Jane Smithard, Graham Norton
-HRB 21284 (AG Nürnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+Reviewed-by: Krzysztof Kozlowski <krzk@kernel.org>
+
+Best regards,
+Krzysztof
