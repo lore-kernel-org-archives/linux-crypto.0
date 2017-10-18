@@ -1,7 +1,7 @@
 From: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
-Subject: [PATCH v5 17/18] ima: Implement support for module-style appended signatures
-Date: Tue, 17 Oct 2017 22:53:30 -0200
-Message-ID: <20171018005331.2688-18-bauerman@linux.vnet.ibm.com>
+Subject: [PATCH v5 18/18] ima: Write modsig to the measurement list
+Date: Tue, 17 Oct 2017 22:53:31 -0200
+Message-ID: <20171018005331.2688-19-bauerman@linux.vnet.ibm.com>
 References: <20171018005331.2688-1-bauerman@linux.vnet.ibm.com>
 Cc: linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
         linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
@@ -24,247 +24,216 @@ In-Reply-To: <20171018005331.2688-1-bauerman@linux.vnet.ibm.com>
 Sender: owner-linux-security-module@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch actually implements the appraise_type=modsig option, allowing
-IMA to read and verify modsig signatures
+Add modsig support for templates which require the contents of the file
+signature to be included in the measurement list.
 
+Suggested-by: Mimi Zohar <zohar@linux.vnet.ibm.com>
 Signed-off-by: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
 ---
- security/integrity/ima/ima.h          |  17 +++--
- security/integrity/ima/ima_appraise.c | 119 ++++++++++++++++++++++++++++++++--
- security/integrity/ima/ima_main.c     |   7 +-
- 3 files changed, 128 insertions(+), 15 deletions(-)
+ security/integrity/ima/ima.h              |  8 ++++++++
+ security/integrity/ima/ima_api.c          |  8 +++++++-
+ security/integrity/ima/ima_main.c         | 30 +++++++++++++++++++++++++++++-
+ security/integrity/ima/ima_modsig.c       | 20 +++++++++++++++++++-
+ security/integrity/ima/ima_template.c     | 12 ++++++++++++
+ security/integrity/ima/ima_template_lib.c | 17 +++++++++++++++--
+ 6 files changed, 90 insertions(+), 5 deletions(-)
 
 diff --git a/security/integrity/ima/ima.h b/security/integrity/ima/ima.h
-index eb58af06566f..b082138461b3 100644
+index b082138461b3..68f471666151 100644
 --- a/security/integrity/ima/ima.h
 +++ b/security/integrity/ima/ima.h
-@@ -157,7 +157,8 @@ void ima_init_template_list(void);
- 
- static inline bool is_ima_sig(const struct evm_ima_xattr_data *xattr_value)
- {
--	return xattr_value && xattr_value->type == EVM_IMA_XATTR_DIGSIG;
-+	return xattr_value && (xattr_value->type == EVM_IMA_XATTR_DIGSIG ||
-+			       xattr_value->type == IMA_MODSIG);
+@@ -148,6 +148,7 @@ int ima_init_crypto(void);
+ void ima_putc(struct seq_file *m, void *data, int datalen);
+ void ima_print_digest(struct seq_file *m, u8 *digest, u32 size);
+ struct ima_template_desc *ima_template_desc_current(void);
++bool ima_current_template_has_sig(void);
+ int ima_restore_measurement_entry(struct ima_template_entry *entry);
+ int ima_restore_measurement_list(loff_t bufsize, void *buf);
+ int ima_measurements_show(struct seq_file *m, void *v);
+@@ -264,6 +265,7 @@ int ima_read_modsig(enum ima_hooks func, const void *buf, loff_t buf_len,
+ 		    int *xattr_len);
+ int ima_get_modsig_hash(struct evm_ima_xattr_data *hdr, enum hash_algo *algo,
+ 			void const **hash, u8 *len);
++int ima_modsig_serialize_data(struct evm_ima_xattr_data **data, int *data_len);
+ int ima_modsig_verify(const unsigned int keyring_id,
+ 		      struct evm_ima_xattr_data *hdr);
+ void ima_free_xattr_data(struct evm_ima_xattr_data *hdr);
+@@ -334,6 +336,12 @@ static inline int ima_get_modsig_hash(struct evm_ima_xattr_data *hdr,
+ 	return -ENOTSUPP;
  }
  
- /*
-@@ -243,9 +244,10 @@ int ima_policy_show(struct seq_file *m, void *v);
- #ifdef CONFIG_IMA_APPRAISE
- int ima_appraise_measurement(enum ima_hooks func,
- 			     struct integrity_iint_cache *iint,
--			     struct file *file, const unsigned char *filename,
--			     struct evm_ima_xattr_data *xattr_value,
--			     int xattr_len, int opened);
-+			     struct file *file, const void *buf, loff_t size,
-+			     const unsigned char *filename,
-+			     struct evm_ima_xattr_data **xattr_value,
-+			     int *xattr_len, int opened);
- int ima_must_appraise(struct inode *inode, int mask, enum ima_hooks func);
- void ima_update_xattr(struct integrity_iint_cache *iint, struct file *file);
- enum integrity_status ima_get_cache_status(struct integrity_iint_cache *iint,
-@@ -270,10 +272,11 @@ void ima_free_xattr_data(struct evm_ima_xattr_data *hdr);
- #else
- static inline int ima_appraise_measurement(enum ima_hooks func,
- 					   struct integrity_iint_cache *iint,
--					   struct file *file,
-+					   struct file *file, const void *buf,
-+					   loff_t size,
- 					   const unsigned char *filename,
--					   struct evm_ima_xattr_data *xattr_value,
--					   int xattr_len, int opened)
-+					   struct evm_ima_xattr_data **xattr_value,
-+					   int *xattr_len, int opened)
- {
- 	return INTEGRITY_UNKNOWN;
- }
-diff --git a/security/integrity/ima/ima_appraise.c b/security/integrity/ima/ima_appraise.c
-index 58e147049e98..108690741c1a 100644
---- a/security/integrity/ima/ima_appraise.c
-+++ b/security/integrity/ima/ima_appraise.c
-@@ -190,6 +190,45 @@ int ima_read_xattr(struct dentry *dentry,
- 	return ret;
- }
- 
-+static int appraise_modsig(struct integrity_iint_cache *iint,
-+			   struct evm_ima_xattr_data *xattr_value,
-+			   int xattr_len)
++static inline int ima_modsig_serialize_data(struct evm_ima_xattr_data **data,
++					    int *data_len)
 +{
-+	enum hash_algo algo;
-+	const void *digest;
-+	void *buf;
-+	int rc, len;
-+	u8 dig_len;
++	return -ENOTSUPP;
++}
 +
-+	rc = ima_modsig_verify(INTEGRITY_KEYRING_IMA, xattr_value);
-+	if (rc)
-+		return rc;
+ static inline int ima_modsig_verify(const unsigned int keyring_id,
+ 				    struct evm_ima_xattr_data *hdr)
+ {
+diff --git a/security/integrity/ima/ima_api.c b/security/integrity/ima/ima_api.c
+index c6d346e9f708..59a5b044b48b 100644
+--- a/security/integrity/ima/ima_api.c
++++ b/security/integrity/ima/ima_api.c
+@@ -284,7 +284,13 @@ void ima_store_measurement(struct integrity_iint_cache *iint,
+ 					    xattr_len, NULL};
+ 	int violation = 0;
+ 
+-	if (iint->measured_pcrs & (0x1 << pcr))
++	/*
++	 * We still need to store the measurement in the case of MODSIG because
++	 * we only have its contents to put in the list at the time of
++	 * appraisal. See comment in process_measurement for more details.
++	 */
++	if ((iint->measured_pcrs & (0x1 << pcr)) &&
++	    (!xattr_value || xattr_value->type != IMA_MODSIG))
+ 		return;
+ 
+ 	result = ima_alloc_init_template(&event_data, &entry);
+diff --git a/security/integrity/ima/ima_main.c b/security/integrity/ima/ima_main.c
+index 6a2d960fbd92..0d3390de7432 100644
+--- a/security/integrity/ima/ima_main.c
++++ b/security/integrity/ima/ima_main.c
+@@ -246,7 +246,35 @@ static int process_measurement(struct file *file, char *buf, loff_t size,
+ 		rc = ima_appraise_measurement(func, iint, file, buf, size,
+ 					      pathname, &xattr_value,
+ 					      &xattr_len, opened);
+-	if (action & IMA_MEASURE)
 +
 +	/*
-+	 * The signature is good. Now let's put the sig hash
-+	 * into the iint cache so that it gets stored in the
-+	 * measurement list.
++	 * MODSIG has one corner case we need to deal with here:
++	 *
++	 * Suppose the policy has one measure rule for one hook and an appraise
++	 * rule for a different hook. Suppose also that the template requires
++	 * the signature to be stored in the measurement list.
++	 *
++	 * If a file containing a MODSIG is measured by the first hook before
++	 * being appraised by the second one, the corresponding entry in the
++	 * measurement list will not contain the MODSIG because we only fetch it
++	 * for IMA_APPRAISAL. We don't fetch it earlier because if the file has
++	 * both a DIGSIG and a MODSIG it's not possible to know which one will
++	 * be valid without actually doing the appraisal.
++	 *
++	 * Therefore, after appraisal of a MODSIG signature we need to store the
++	 * measurement again if the current template requires storing the
++	 * signature.
++	 *
++	 * With the opposite ordering (the appraise rule triggering before the
++	 * measurement rule) there is the same problem but it's not possible to
++	 * do anything about it because at the time we are appraising the
++	 * signature it's impossible to know whether a measurement will ever
++	 * need to be stored for this file.
 +	 */
++	if ((action & IMA_MEASURE) || ((iint->flags & IMA_MEASURE) &&
++				       xattr_value &&
++				       xattr_value->type == IMA_MODSIG &&
++				       ima_current_template_has_sig()))
+ 		ima_store_measurement(iint, file, pathname,
+ 				      xattr_value, xattr_len, pcr);
+ 	if (action & IMA_AUDIT)
+diff --git a/security/integrity/ima/ima_modsig.c b/security/integrity/ima/ima_modsig.c
+index 2786aa97060e..82c3e2693982 100644
+--- a/security/integrity/ima/ima_modsig.c
++++ b/security/integrity/ima/ima_modsig.c
+@@ -27,6 +27,10 @@ struct modsig_hdr {
+ 	const void *data;	/* Pointer to data covered by pkcs7_msg. */
+ 	size_t data_len;
+ 	struct pkcs7_message *pkcs7_msg;
++	int raw_pkcs7_len;
 +
-+	rc = ima_get_modsig_hash(xattr_value, &algo, &digest, &dig_len);
-+	if (rc)
-+		return rc;
++	/* This will be in the measurement list if required by the template. */
++	struct evm_ima_xattr_data raw_pkcs7;
+ };
+ 
+ /**
+@@ -86,7 +90,7 @@ int ima_read_modsig(enum ima_hooks func, const void *buf, loff_t buf_len,
+ 	sig_len = be32_to_cpu(sig->sig_len);
+ 	buf_len -= sig_len + sizeof(*sig);
+ 
+-	hdr = kmalloc(sizeof(*hdr), GFP_KERNEL);
++	hdr = kmalloc(sizeof(*hdr) + sig_len, GFP_KERNEL);
+ 	if (!hdr)
+ 		return -ENOMEM;
+ 
+@@ -97,6 +101,10 @@ int ima_read_modsig(enum ima_hooks func, const void *buf, loff_t buf_len,
+ 		return rc;
+ 	}
+ 
++	memcpy(hdr->raw_pkcs7.data, buf + buf_len, sig_len);
++	hdr->raw_pkcs7_len = sig_len + 1;
++	hdr->raw_pkcs7.type = IMA_MODSIG;
 +
-+	len = sizeof(iint->ima_hash) + dig_len;
-+	buf = krealloc(iint->ima_hash, len, GFP_NOFS);
-+	if (!buf)
-+		return -ENOMEM;
+ 	hdr->type = IMA_MODSIG;
+ 	hdr->data = buf;
+ 	hdr->data_len = buf_len;
+@@ -129,6 +137,16 @@ int ima_get_modsig_hash(struct evm_ima_xattr_data *hdr, enum hash_algo *algo,
+ 	return 0;
+ }
+ 
++int ima_modsig_serialize_data(struct evm_ima_xattr_data **data, int *data_len)
++{
++	struct modsig_hdr *modsig = (struct modsig_hdr *) *data;
 +
-+	iint->ima_hash = buf;
-+	iint->flags |= IMA_DIGSIG;
-+	iint->ima_hash->algo = algo;
-+	iint->ima_hash->length = dig_len;
-+
-+	memcpy(iint->ima_hash->digest, digest, dig_len);
++	*data = &modsig->raw_pkcs7;
++	*data_len = modsig->raw_pkcs7_len;
 +
 +	return 0;
 +}
 +
- /*
-  * ima_appraise_measurement - appraise file measurement
-  *
-@@ -200,18 +239,28 @@ int ima_read_xattr(struct dentry *dentry,
-  */
- int ima_appraise_measurement(enum ima_hooks func,
- 			     struct integrity_iint_cache *iint,
--			     struct file *file, const unsigned char *filename,
--			     struct evm_ima_xattr_data *xattr_value,
--			     int xattr_len, int opened)
-+			     struct file *file, const void *buf, loff_t size,
-+			     const unsigned char *filename,
-+			     struct evm_ima_xattr_data **xattr_value_,
-+			     int *xattr_len_, int opened)
+ int ima_modsig_verify(const unsigned int keyring_id,
+ 		      struct evm_ima_xattr_data *hdr)
  {
- 	static const char op[] = "appraise_data";
- 	const char *cause = "unknown";
- 	struct dentry *dentry = file_dentry(file);
- 	struct inode *inode = d_backing_inode(dentry);
- 	enum integrity_status status = INTEGRITY_UNKNOWN;
--	int rc = xattr_len, hash_start = 0;
-+	struct evm_ima_xattr_data *xattr_value = *xattr_value_;
-+	int xattr_len = *xattr_len_, rc = xattr_len, hash_start = 0;
-+	bool appraising_modsig = false;
+diff --git a/security/integrity/ima/ima_template.c b/security/integrity/ima/ima_template.c
+index 3cc1d2763fd2..a5bad6996334 100644
+--- a/security/integrity/ima/ima_template.c
++++ b/security/integrity/ima/ima_template.c
+@@ -228,6 +228,18 @@ struct ima_template_desc *ima_template_desc_current(void)
+ 	return ima_template;
+ }
+ 
++bool ima_current_template_has_sig(void)
++{
++	struct ima_template_desc *template = ima_template_desc_current();
++	int i;
 +
-+	if (iint->flags & IMA_MODSIG_ALLOWED &&
-+	    !ima_read_modsig(func, buf, size, &xattr_value, &xattr_len)) {
-+		appraising_modsig = true;
-+		rc = xattr_len;
++	for (i = 0; i < template->num_fields; i++)
++		if (!strcmp(template->fields[i]->field_id, "sig"))
++			return true;
++
++	return false;
++}
++
+ int __init ima_init_template(void)
+ {
+ 	struct ima_template_desc *template = ima_template_desc_current();
+diff --git a/security/integrity/ima/ima_template_lib.c b/security/integrity/ima/ima_template_lib.c
+index e8ec783b6a8d..d0e85def0ae9 100644
+--- a/security/integrity/ima/ima_template_lib.c
++++ b/security/integrity/ima/ima_template_lib.c
+@@ -379,10 +379,23 @@ int ima_eventsig_init(struct ima_event_data *event_data,
+ 		      struct ima_field_data *field_data)
+ {
+ 	struct evm_ima_xattr_data *xattr_value = event_data->xattr_value;
++	int xattr_len = event_data->xattr_len;
+ 
+-	if (!xattr_value || xattr_value->type != EVM_IMA_XATTR_DIGSIG)
++	if (!is_ima_sig(xattr_value))
+ 		return 0;
+ 
+-	return ima_write_template_field_data(xattr_value, event_data->xattr_len,
++	/*
++	 * The xattr_value for IMA_MODSIG is a runtime structure containing
++	 * pointers. Get its raw data instead.
++	 */
++	if (xattr_value->type == IMA_MODSIG) {
++		int rc;
++
++		rc = ima_modsig_serialize_data(&xattr_value, &xattr_len);
++		if (rc)
++			return rc;
 +	}
- 
--	if (!(inode->i_opflags & IOP_XATTR))
-+	/* If not appraising a modsig, we need an xattr. */
-+	if (!appraising_modsig && !(inode->i_opflags & IOP_XATTR))
- 		return INTEGRITY_UNKNOWN;
- 
- 	if (rc <= 0) {
-@@ -235,6 +284,9 @@ int ima_appraise_measurement(enum ima_hooks func,
- 	case INTEGRITY_UNKNOWN:
- 		break;
- 	case INTEGRITY_NOXATTRS:	/* No EVM protected xattrs. */
-+		/* It's fine not to have xattrs when using a modsig. */
-+		if (appraising_modsig)
-+			break;
- 	case INTEGRITY_NOLABEL:		/* No security.evm xattr. */
- 		cause = "missing-HMAC";
- 		goto out;
-@@ -242,6 +294,8 @@ int ima_appraise_measurement(enum ima_hooks func,
- 		cause = "invalid-HMAC";
- 		goto out;
- 	}
 +
-+ retry:
- 	switch (xattr_value->type) {
- 	case IMA_XATTR_DIGEST_NG:
- 		/* first byte contains algorithm id */
-@@ -285,6 +339,61 @@ int ima_appraise_measurement(enum ima_hooks func,
- 			status = INTEGRITY_PASS;
- 		}
- 		break;
-+	case IMA_MODSIG:
-+		/*
-+		 * To avoid being tricked into an infinite loop, we don't allow
-+		 * a modsig stored in the xattr.
-+		 */
-+		if (!appraising_modsig) {
-+			status = INTEGRITY_UNKNOWN;
-+			cause = "unknown-ima-data";
-+			break;
-+		}
-+
-+		rc = appraise_modsig(iint, xattr_value, xattr_len);
-+		if (!rc) {
-+			kfree(*xattr_value_);
-+			*xattr_value_ = xattr_value;
-+			*xattr_len_ = xattr_len;
-+
-+			status = INTEGRITY_PASS;
-+			break;
-+		}
-+
-+		ima_free_xattr_data(xattr_value);
-+
-+		/*
-+		 * The appended signature failed verification. If there's a
-+		 * signature in the extended attribute, let's fall back to it.
-+		 */
-+		if (inode->i_opflags & IOP_XATTR && *xattr_len_ != 0 &&
-+		    *xattr_len_ != -ENODATA) {
-+			const char *modsig_cause = rc == -EOPNOTSUPP ?
-+				"unknown" : "invalid-signature";
-+
-+			/* First, log that the modsig verification failed. */
-+			integrity_audit_msg(AUDIT_INTEGRITY_DATA, inode,
-+					    filename, op, modsig_cause, rc, 0);
-+
-+			xattr_len = rc = *xattr_len_;
-+			xattr_value = *xattr_value_;
-+			appraising_modsig = false;
-+
-+			if (rc > 0)
-+				/* Process xattr contents. */
-+				goto retry;
-+
-+			/* Unexpected error reading xattr. */
-+			status = INTEGRITY_UNKNOWN;
-+		} else {
-+			if (rc == -EOPNOTSUPP)
-+				status = INTEGRITY_UNKNOWN;
-+			else {
-+				cause = "invalid-signature";
-+				status = INTEGRITY_FAIL;
-+			}
-+		}
-+		break;
- 	default:
- 		status = INTEGRITY_UNKNOWN;
- 		cause = "unknown-ima-data";
-diff --git a/security/integrity/ima/ima_main.c b/security/integrity/ima/ima_main.c
-index 8e96450e27f5..6a2d960fbd92 100644
---- a/security/integrity/ima/ima_main.c
-+++ b/security/integrity/ima/ima_main.c
-@@ -243,8 +243,9 @@ static int process_measurement(struct file *file, char *buf, loff_t size,
- 		pathname = ima_d_path(&file->f_path, &pathbuf, filename);
- 
- 	if (rc == 0 && (action & IMA_APPRAISE_SUBMASK))
--		rc = ima_appraise_measurement(func, iint, file, pathname,
--					      xattr_value, xattr_len, opened);
-+		rc = ima_appraise_measurement(func, iint, file, buf, size,
-+					      pathname, &xattr_value,
-+					      &xattr_len, opened);
- 	if (action & IMA_MEASURE)
- 		ima_store_measurement(iint, file, pathname,
- 				      xattr_value, xattr_len, pcr);
-@@ -255,7 +256,7 @@ static int process_measurement(struct file *file, char *buf, loff_t size,
- 	if ((mask & MAY_WRITE) && (iint->flags & IMA_DIGSIG) &&
- 	     !(iint->flags & IMA_NEW_FILE))
- 		rc = -EACCES;
--	kfree(xattr_value);
-+	ima_free_xattr_data(xattr_value);
- out_free:
- 	if (pathbuf)
- 		__putname(pathbuf);
++	return ima_write_template_field_data(xattr_value, xattr_len,
+ 					     DATA_FMT_HEX, field_data);
+ }
 
