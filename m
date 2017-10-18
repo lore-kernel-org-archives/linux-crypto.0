@@ -1,182 +1,150 @@
-From: Brian King <brking@linux.vnet.ibm.com>
-Subject: Re: [PATCH v2 6/8] scsi/ipr: Use sgl_alloc_order() and
- sgl_free_order()
-Date: Wed, 18 Oct 2017 15:57:28 -0500
-Message-ID: <ce6f2f5b-b4bc-380f-8ac1-1e91e4d6bf24@linux.vnet.ibm.com>
-References: <20171016224940.1332-1-bart.vanassche@wdc.com>
- <20171016224940.1332-7-bart.vanassche@wdc.com>
- <c804098f-5543-395c-1395-5778ef74a61b@suse.de>
+From: Thomas Garnier <thgarnie@google.com>
+Subject: Re: [PATCH v1 15/27] compiler: Option to default to hidden symbols
+Date: Wed, 18 Oct 2017 16:15:10 -0700
+Message-ID: <CAJcbSZEJ-kjcRQD3uHm0QZuOvbHpg9FV=wn7v4-RweDG7J3uqg@mail.gmail.com>
+References: <20171011203027.11248-1-thgarnie@google.com> <20171011203027.11248-16-thgarnie@google.com>
+ <20171012200201.GW11645@wotan.suse.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-crypto@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>
-To: Hannes Reinecke <hare@suse.de>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        Jens Axboe <axboe@kernel.dk>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38402 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751485AbdJRU5d (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 18 Oct 2017 16:57:33 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id v9IKvWGG022914
-        for <linux-crypto@vger.kernel.org>; Wed, 18 Oct 2017 16:57:32 -0400
-Received: from e38.co.us.ibm.com (e38.co.us.ibm.com [32.97.110.159])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2dpd9rkr9w-1
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Wed, 18 Oct 2017 16:57:32 -0400
-Received: from localhost
-        by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-crypto@vger.kernel.org> from <brking@linux.vnet.ibm.com>;
-        Wed, 18 Oct 2017 14:57:31 -0600
-In-Reply-To: <c804098f-5543-395c-1395-5778ef74a61b@suse.de>
-Content-Language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Cc: Guenter Roeck <linux@roeck-us.net>, Nicholas Piggin <npiggin@gmail.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>,
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>,
+	Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@redhat.com>,
+	Arnd Bergmann <arnd@arndb.de>, Kees Cook <keescook@chromium.org>,
+	Andrey Ryabinin <aryabinin@virtuozzo.com>, Matthias Kaehlcke <mka@chromium.org>,
+	Tom Lendacky <thomas.lendacky@amd.com>, Andy Lutomirski <luto@kernel.org>,
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Borislav Petkov <bp@suse.de>,
+	"Rafael J . Wysocki" <rjw@rjwysocki.net>, Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
+	Juergen Gross <jgross@suse.com>, Chris Wright <chrisw@sous-sol.org>,
+	Alok Kataria <akataria@vmware.com>, Rusty Russell <rust
+To: "Luis R. Rodriguez" <mcgrof@kernel.org>
+Return-path: <kernel-hardening-return-10187-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
+List-Post: <mailto:kernel-hardening@lists.openwall.com>
+List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
+List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
+List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
+In-Reply-To: <20171012200201.GW11645@wotan.suse.de>
+List-Id: linux-crypto.vger.kernel.org
 
-On 10/17/2017 01:19 AM, Hannes Reinecke wrote:
-> On 10/17/2017 12:49 AM, Bart Van Assche wrote:
->> Use the sgl_alloc_order() and sgl_free_order() functions instead
->> of open coding these functions.
+On Thu, Oct 12, 2017 at 1:02 PM, Luis R. Rodriguez <mcgrof@kernel.org> wrote:
+> On Wed, Oct 11, 2017 at 01:30:15PM -0700, Thomas Garnier wrote:
+>> Provide an option to default visibility to hidden except for key
+>> symbols. This option is disabled by default and will be used by x86_64
+>> PIE support to remove errors between compilation units.
 >>
->> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
->> Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
->> Cc: linux-scsi@vger.kernel.org
->> Cc: Martin K. Petersen <martin.petersen@oracle.com>
->> Cc: Brian King <brking@linux.vnet.ibm.com>
->> ---
->>  drivers/scsi/Kconfig |  1 +
->>  drivers/scsi/ipr.c   | 49 ++++++++-----------------------------------------
->>  drivers/scsi/ipr.h   |  2 +-
->>  3 files changed, 10 insertions(+), 42 deletions(-)
+>> The default visibility is also enabled for external symbols that are
+>> compared as they maybe equals (start/end of sections). In this case,
+>> older versions of GCC will remove the comparison if the symbols are
+>> hidden. This issue exists at least on gcc 4.9 and before.
 >>
->> diff --git a/drivers/scsi/Kconfig b/drivers/scsi/Kconfig
->> index 41366339b950..d11e75e76195 100644
->> --- a/drivers/scsi/Kconfig
->> +++ b/drivers/scsi/Kconfig
->> @@ -1058,6 +1058,7 @@ config SCSI_IPR
->>  	depends on PCI && SCSI && ATA
->>  	select FW_LOADER
->>  	select IRQ_POLL
->> +	select SGL_ALLOC
->>  	---help---
->>  	  This driver supports the IBM Power Linux family RAID adapters.
->>  	  This includes IBM pSeries 5712, 5703, 5709, and 570A, as well
->> diff --git a/drivers/scsi/ipr.c b/drivers/scsi/ipr.c
->> index f838bd73befa..6fed5db6255e 100644
->> --- a/drivers/scsi/ipr.c
->> +++ b/drivers/scsi/ipr.c
->> @@ -3815,10 +3815,8 @@ static struct device_attribute ipr_iopoll_weight_attr = {
->>   **/
->>  static struct ipr_sglist *ipr_alloc_ucode_buffer(int buf_len)
->>  {
->> -	int sg_size, order, bsize_elem, num_elem, i, j;
->> +	int sg_size, order;
->>  	struct ipr_sglist *sglist;
->> -	struct scatterlist *scatterlist;
->> -	struct page *page;
->>  
->>  	/* Get the minimum size per scatter/gather element */
->>  	sg_size = buf_len / (IPR_MAX_SGLIST - 1);
->> @@ -3826,45 +3824,18 @@ static struct ipr_sglist *ipr_alloc_ucode_buffer(int buf_len)
->>  	/* Get the actual size per element */
->>  	order = get_order(sg_size);
->>  
->> -	/* Determine the actual number of bytes per element */
->> -	bsize_elem = PAGE_SIZE * (1 << order);
->> -
->> -	/* Determine the actual number of sg entries needed */
->> -	if (buf_len % bsize_elem)
->> -		num_elem = (buf_len / bsize_elem) + 1;
->> -	else
->> -		num_elem = buf_len / bsize_elem;
->> -
->>  	/* Allocate a scatter/gather list for the DMA */
->> -	sglist = kzalloc(sizeof(struct ipr_sglist) +
->> -			 (sizeof(struct scatterlist) * (num_elem - 1)),
->> -			 GFP_KERNEL);
->> -
->> +	sglist = kzalloc(sizeof(struct ipr_sglist), GFP_KERNEL);
->>  	if (sglist == NULL) {
->>  		ipr_trace;
->>  		return NULL;
->>  	}
->> -
->> -	scatterlist = sglist->scatterlist;
->> -	sg_init_table(scatterlist, num_elem);
->> -
->>  	sglist->order = order;
->> -	sglist->num_sg = num_elem;
->> -
->> -	/* Allocate a bunch of sg elements */
->> -	for (i = 0; i < num_elem; i++) {
->> -		page = alloc_pages(GFP_KERNEL, order);
->> -		if (!page) {
->> -			ipr_trace;
->> -
->> -			/* Free up what we already allocated */
->> -			for (j = i - 1; j >= 0; j--)
->> -				__free_pages(sg_page(&scatterlist[j]), order);
->> -			kfree(sglist);
->> -			return NULL;
->> -		}
->> -
->> -		sg_set_page(&scatterlist[i], page, 0, 0);
->> +	sglist->scatterlist = sgl_alloc_order(buf_len, order, false, GFP_KERNEL,
->> +					      &sglist->num_sg);
->> +	if (!sglist->scatterlist) {
->> +		kfree(sglist);
->> +		return NULL;
->>  	}
->>  
->>  	return sglist;
->> @@ -3882,11 +3853,7 @@ static struct ipr_sglist *ipr_alloc_ucode_buffer(int buf_len)
->>   **/
->>  static void ipr_free_ucode_buffer(struct ipr_sglist *sglist)
->>  {
->> -	int i;
->> -
->> -	for (i = 0; i < sglist->num_sg; i++)
->> -		__free_pages(sg_page(&sglist->scatterlist[i]), sglist->order);
->> -
->> +	sgl_free_order(sglist->scatterlist, sglist->order);
->>  	kfree(sglist);
+>> Signed-off-by: Thomas Garnier <thgarnie@google.com>
+>
+> <-- snip -->
+>
+>> diff --git a/arch/x86/kernel/cpu/microcode/core.c b/arch/x86/kernel/cpu/microcode/core.c
+>> index 86e8f0b2537b..8f021783a929 100644
+>> --- a/arch/x86/kernel/cpu/microcode/core.c
+>> +++ b/arch/x86/kernel/cpu/microcode/core.c
+>> @@ -144,8 +144,8 @@ static bool __init check_loader_disabled_bsp(void)
+>>       return *res;
 >>  }
->>  
->> diff --git a/drivers/scsi/ipr.h b/drivers/scsi/ipr.h
->> index c7f0e9e3cd7d..93570734cbfb 100644
->> --- a/drivers/scsi/ipr.h
->> +++ b/drivers/scsi/ipr.h
->> @@ -1454,7 +1454,7 @@ struct ipr_sglist {
->>  	u32 num_sg;
->>  	u32 num_dma_sg;
->>  	u32 buffer_len;
->> -	struct scatterlist scatterlist[1];
->> +	struct scatterlist *scatterlist;
->>  };
->>  
->>  enum ipr_sdt_state {
 >>
-> Not sure if this is a valid conversion.
-> Originally the driver would allocate a single buffer; with this buffer
-> we have two distinct buffers.
-> Given that this is used to download the microcode I'm not sure if this
-> isn't a hardware-dependent structure which requires a single buffer
-> including the sglist.
-> Brian, can you shed some light here?
+>> -extern struct builtin_fw __start_builtin_fw[];
+>> -extern struct builtin_fw __end_builtin_fw[];
+>> +extern struct builtin_fw __start_builtin_fw[] __default_visibility;
+>> +extern struct builtin_fw __end_builtin_fw[] __default_visibility;
+>>
+>>  bool get_builtin_firmware(struct cpio_data *cd, const char *name)
+>>  {
+>
+> <-- snip -->
+>
+>> diff --git a/include/asm-generic/sections.h b/include/asm-generic/sections.h
+>> index e5da44eddd2f..1aa5d6dac9e1 100644
+>> --- a/include/asm-generic/sections.h
+>> +++ b/include/asm-generic/sections.h
+>> @@ -30,6 +30,9 @@
+>>   *   __irqentry_text_start, __irqentry_text_end
+>>   *   __softirqentry_text_start, __softirqentry_text_end
+>>   */
+>> +#ifdef CONFIG_DEFAULT_HIDDEN
+>> +#pragma GCC visibility push(default)
+>> +#endif
+>>  extern char _text[], _stext[], _etext[];
+>>  extern char _data[], _sdata[], _edata[];
+>>  extern char __bss_start[], __bss_stop[];
+>> @@ -46,6 +49,9 @@ extern char __softirqentry_text_start[], __softirqentry_text_end[];
+>>
+>>  /* Start and end of .ctors section - used for constructor calls. */
+>>  extern char __ctors_start[], __ctors_end[];
+>> +#ifdef CONFIG_DEFAULT_HIDDEN
+>> +#pragma GCC visibility pop
+>> +#endif
+>>
+>>  extern __visible const void __nosave_begin, __nosave_end;
+>>
+>> diff --git a/include/linux/compiler.h b/include/linux/compiler.h
+>> index e95a2631e545..6997716f73bf 100644
+>> --- a/include/linux/compiler.h
+>> +++ b/include/linux/compiler.h
+>> @@ -78,6 +78,14 @@ extern void __chk_io_ptr(const volatile void __iomem *);
+>>  #include <linux/compiler-clang.h>
+>>  #endif
+>>
+>> +/* Useful for Position Independent Code to reduce global references */
+>> +#ifdef CONFIG_DEFAULT_HIDDEN
+>> +#pragma GCC visibility push(hidden)
+>> +#define __default_visibility  __attribute__((visibility ("default")))
+>
+> Does this still work with CONFIG_LD_DEAD_CODE_DATA_ELIMINATION ?
 
-The struct ipr_sglist is not a hardware defined data structure, so on initial
-glance, this should be OK. I'll load it up and give it a try to make sure
-it doesn't break code download.
+I cannot make it work with or without this change. How is it supposed
+to be used?
 
-Thanks,
+For me with, it crashes with a bad consdev at:
+http://elixir.free-electrons.com/linux/latest/source/drivers/tty/tty_io.c#L3194
 
-Brian
+>
+>> +#else
+>> +#define __default_visibility
+>> +#endif
+>> +
+>>  /*
+>>   * Generic compiler-dependent macros required for kernel
+>>   * build go below this comment. Actual compiler/compiler version
+>> diff --git a/init/Kconfig b/init/Kconfig
+>> index ccb1d8daf241..b640201fcff7 100644
+>> --- a/init/Kconfig
+>> +++ b/init/Kconfig
+>> @@ -1649,6 +1649,13 @@ config PROFILING
+>>  config TRACEPOINTS
+>>       bool
+>>
+>> +#
+>> +# Default to hidden visibility for all symbols.
+>> +# Useful for Position Independent Code to reduce global references.
+>> +#
+>> +config DEFAULT_HIDDEN
+>> +     bool
+>
+> Note it is default.
+>
+> Has 0-day ran through this git tree? It should be easy to get it added for
+> testing. Also, even though most changes are x86 based there are some generic
+> changes and I'd love a warm fuzzy this won't break odd / random builds.
+> Although 0-day does cover a lot of test cases, it only has limited run time
+> tests. There are some other test beds which also cover some more obscure
+> architectures. Having a test pass on Guenter's test bed would be nice to
+> see. For that please coordinate with Guenter if he's willing to run this
+> a test for you.
+
+Not yet, plan to give a v1.5 to Kees Cook to keep in one of his tree
+for couple weeks. I expect it will identify interesting issues.
+
+>
+>   Luis
+
+
 
 -- 
-Brian King
-Power Linux I/O
-IBM Linux Technology Center
+Thomas
