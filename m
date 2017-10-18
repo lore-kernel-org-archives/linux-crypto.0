@@ -1,125 +1,57 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [PATCH v9 00/20] simplify crypto wait for async op
-Date: Wed, 18 Oct 2017 08:44:31 +0300
-Message-ID: <CAOtvUMfOSo4KSBX3UKtYj1sgmReAdhmmi1MhZGq0aFk-vptahg@mail.gmail.com>
-References: <1508059209-25529-1-git-send-email-gilad@benyossef.com> <20171017140629.GO20805@n2100.armlinux.org.uk>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        David Howells <dhowells@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>,
-        Boris Brezillon <boris.brezillon@free-electrons.com>,
-        Arnaud Ebalard <arno@natisbad.org>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        device-mapper development <dm-devel@redhat.com>,
-        Steve French <sfrench@samba.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>
-To: Russell King - ARM Linux <linux@armlinux.org.uk>
-Return-path: <linux-doc-owner@vger.kernel.org>
-In-Reply-To: <20171017140629.GO20805@n2100.armlinux.org.uk>
-Sender: linux-doc-owner@vger.kernel.org
+From: sunil.m@techveda.org
+Subject: [PATCH v3] staging: ccree: fix boolreturn.cocci warning
+Date: Wed, 18 Oct 2017 12:11:55 +0530
+Message-ID: <1508308915-18789-1-git-send-email-sunil.m@techveda.org>
+References: <20171018023607.GE30848@eros>
+Cc: linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        linux-kernel@vger.kernel.org, karthik@techveda.org,
+        Suniel Mahesh <sunil.m@techveda.org>
+To: gilad@benyossef.com, gregkh@linuxfoundation.org, me@tobin.cc
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20171018023607.GE30848@eros>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Oct 17, 2017 at 5:06 PM, Russell King - ARM Linux
-<linux@armlinux.org.uk> wrote:
-> On Sun, Oct 15, 2017 at 10:19:45AM +0100, Gilad Ben-Yossef wrote:
->> Many users of kernel async. crypto services have a pattern of
->> starting an async. crypto op and than using a completion
->> to wait for it to end.
->>
->> This patch set simplifies this common use case in two ways:
->>
->> First, by separating the return codes of the case where a
->> request is queued to a backlog due to the provider being
->> busy (-EBUSY) from the case the request has failed due
->> to the provider being busy and backlogging is not enabled
->> (-EAGAIN).
->>
->> Next, this change is than built on to create a generic API
->> to wait for a async. crypto operation to complete.
->>
->> The end result is a smaller code base and an API that is
->> easier to use and more difficult to get wrong.
->>
->> The patch set was boot tested on x86_64 and arm64 which
->> at the very least tests the crypto users via testmgr and
->> tcrypt but I do note that I do not have access to some
->> of the HW whose drivers are modified nor do I claim I was
->> able to test all of the corner cases.
->>
->> The patch set is based upon linux-next release tagged
->> next-20171013.
->
-> Has there been any performance impact analysis of these changes?  I
-> ended up with patches for one of the crypto drivers which converted
-> its interrupt handling to threaded interrupts being reverted because
-> it caused a performance degredation.
->
-> Moving code to latest APIs to simplify it is not always beneficial.
+From: Suniel Mahesh <sunil.m@techveda.org>
 
-I agree with the sentiment but I believe this one is justified.
+This fixes the following coccinelle warning:
+WARNING: return of 0/1 in function 'ssi_is_hw_key' with return type bool.
 
-This patch set basically does 3 things:
+return "false" instead of 0.
 
-1.  Replace one immediate value (-EBUSY) by another (-EAGAIN). Mostly it's just
-s/EBUSY/EAGAIN/g. In very few places this resulted very trivial code
-changes. I don't
-foresee this having any effect on performance.
+Signed-off-by: Suniel Mahesh <sunil.m@techveda.org>
+---
+Changes for v3:
+- Changed the commit log even more to give an accurate
+  description of the changeset as suggested by Toby C.Harding.
+---
+Changes for v2:
+- Changed the commit log to give a more accurate description
+  of the changeset as suggested by Toby C.Harding.
+---
+Note:
+- Patch was built(ARCH=arm) on latest linux-next.
+- No build issues reported, however it was not
+  tested on real hardware.
+- Please discard this changeset, if this is not
+  helping the code look better.
+---
+ drivers/staging/ccree/ssi_cipher.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-2. Removal of some conditions and/or conditional jumps that were used to discern
-between two different cases which are now now easily tested for by the
-different return
-value. If at all, this will be an increase in performance, although I
-don't expect it to be
-noticeable.
-
-3. Replacing a whole bunch of open coded code and data structures
-which were pretty much
-cut and pasted from the Documentation and therefore identical, with a
-single copy thereof.
-
-Every place that I found that deviated slightly from the identical
-pattern, it turned out to be
-a bug of some sorts and patches for those were sent and accepted already.
-
-So, we might be losing a few inline optimization opportunities but
-we're gaining better
-cache utilization. Again, I don't expect any of this to have a
-noticeable effect to either
-direction.
-
-I did run the changed code as best I could and did not notice any
-performance changes and
-none of the testers and maintainers that ACKed mentioned any.
-
-Having said that, it's a big change that touches many places,
-sub-systems and drivers. I do
-not claim to have thoroughly tested for performance all the changes in
-person. In some cases,
-I don't even have access to the specialized hardware. I did get a
-reasonable amount of review
-and testers I believe - would always love to see more :-)
-
-Many thanks,
-Gilad
-
-
-
-
+diff --git a/drivers/staging/ccree/ssi_cipher.h b/drivers/staging/ccree/ssi_cipher.h
+index c9a83df..f499962 100644
+--- a/drivers/staging/ccree/ssi_cipher.h
++++ b/drivers/staging/ccree/ssi_cipher.h
+@@ -75,7 +75,7 @@ struct arm_hw_key_info {
+ 
+ static inline bool ssi_is_hw_key(struct crypto_tfm *tfm)
+ {
+-	return 0;
++	return false;
+ }
+ 
+ #endif /* CRYPTO_TFM_REQ_HW_KEY */
 -- 
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-"If you take a class in large-scale robotics, can you end up in a
-situation where the homework eats your dog?"
- -- Jean-Baptiste Queru
+1.9.1
