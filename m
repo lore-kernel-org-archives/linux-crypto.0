@@ -1,7 +1,7 @@
 From: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
-Subject: [PATCH v5 06/18] ima: Improvements in ima_appraise_measurement
-Date: Tue, 17 Oct 2017 22:53:19 -0200
-Message-ID: <20171018005331.2688-7-bauerman@linux.vnet.ibm.com>
+Subject: [PATCH v5 07/18] integrity: Introduce struct evm_xattr
+Date: Tue, 17 Oct 2017 22:53:20 -0200
+Message-ID: <20171018005331.2688-8-bauerman@linux.vnet.ibm.com>
 References: <20171018005331.2688-1-bauerman@linux.vnet.ibm.com>
 Cc: linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
         linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
@@ -19,107 +19,150 @@ Cc: linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
         "AKASHI, Takahiro" <takahiro.akashi@linaro.org>,
         Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
 To: linux-integrity@vger.kernel.org
-Return-path: <linux-security-module-owner@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20171018005331.2688-1-bauerman@linux.vnet.ibm.com>
-Sender: owner-linux-security-module@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Replace nested ifs in the EVM xattr verification logic with a switch
-statement, making the code easier to understand.
+Even though struct evm_ima_xattr_data includes a fixed-size array to hold a
+SHA1 digest, most of the code ignores the array and uses the struct to mean
+"type indicator followed by data of unspecified size" and tracks the real
+size of what the struct represents in a separate length variable.
 
-Also, add comments to the if statements in the out section.
+The only exception to that is the EVM code, which correctly uses the
+definition of struct evm_ima_xattr_data.
 
-Signed-off-by: Mimi Zohar <zohar@linux.vnet.ibm.com>
+This patch makes this explicit in the code by removing the length
+specification from the array in struct evm_ima_xattr_data. It also changes
+the name of the element from digest to data, since in most places the array
+doesn't hold a digest.
+
+A separate struct evm_xattr is introduced, with the original definition of
+evm_ima_xattr_data to be used in the places that actually expect that
+definition.
+
 Signed-off-by: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
 ---
- security/integrity/ima/ima.h          |  5 +++++
- security/integrity/ima/ima_appraise.c | 33 ++++++++++++++++++++-------------
- 2 files changed, 25 insertions(+), 13 deletions(-)
+ security/integrity/evm/evm_crypto.c   |  4 ++--
+ security/integrity/evm/evm_main.c     | 10 +++++-----
+ security/integrity/ima/ima_appraise.c |  7 ++++---
+ security/integrity/integrity.h        |  5 +++++
+ 4 files changed, 16 insertions(+), 10 deletions(-)
 
-diff --git a/security/integrity/ima/ima.h b/security/integrity/ima/ima.h
-index d52b487ad259..4e61d3189b72 100644
---- a/security/integrity/ima/ima.h
-+++ b/security/integrity/ima/ima.h
-@@ -155,6 +155,11 @@ unsigned long ima_get_binary_runtime_size(void);
- int ima_init_template(void);
- void ima_init_template_list(void);
+diff --git a/security/integrity/evm/evm_crypto.c b/security/integrity/evm/evm_crypto.c
+index 9c2d88c80b9d..5fddc28e8a0e 100644
+--- a/security/integrity/evm/evm_crypto.c
++++ b/security/integrity/evm/evm_crypto.c
+@@ -252,13 +252,13 @@ int evm_update_evmxattr(struct dentry *dentry, const char *xattr_name,
+ 			const char *xattr_value, size_t xattr_value_len)
+ {
+ 	struct inode *inode = d_backing_inode(dentry);
+-	struct evm_ima_xattr_data xattr_data;
++	struct evm_xattr xattr_data;
+ 	int rc = 0;
  
-+static inline bool is_ima_sig(const struct evm_ima_xattr_data *xattr_value)
-+{
-+	return xattr_value && xattr_value->type == EVM_IMA_XATTR_DIGSIG;
-+}
-+
- /*
-  * used to protect h_table and sha_table
-  */
+ 	rc = evm_calc_hmac(dentry, xattr_name, xattr_value,
+ 			   xattr_value_len, xattr_data.digest);
+ 	if (rc == 0) {
+-		xattr_data.type = EVM_XATTR_HMAC;
++		xattr_data.data.type = EVM_XATTR_HMAC;
+ 		rc = __vfs_setxattr_noperm(dentry, XATTR_NAME_EVM,
+ 					   &xattr_data,
+ 					   sizeof(xattr_data), 0);
+diff --git a/security/integrity/evm/evm_main.c b/security/integrity/evm/evm_main.c
+index 37f062d38d5f..7f31f65b8492 100644
+--- a/security/integrity/evm/evm_main.c
++++ b/security/integrity/evm/evm_main.c
+@@ -119,7 +119,7 @@ static enum integrity_status evm_verify_hmac(struct dentry *dentry,
+ 					     struct integrity_iint_cache *iint)
+ {
+ 	struct evm_ima_xattr_data *xattr_data = NULL;
+-	struct evm_ima_xattr_data calc;
++	struct evm_xattr calc;
+ 	enum integrity_status evm_status = INTEGRITY_PASS;
+ 	int rc, xattr_len;
+ 
+@@ -150,7 +150,7 @@ static enum integrity_status evm_verify_hmac(struct dentry *dentry,
+ 	/* check value type */
+ 	switch (xattr_data->type) {
+ 	case EVM_XATTR_HMAC:
+-		if (xattr_len != sizeof(struct evm_ima_xattr_data)) {
++		if (xattr_len != sizeof(struct evm_xattr)) {
+ 			evm_status = INTEGRITY_FAIL;
+ 			goto out;
+ 		}
+@@ -158,7 +158,7 @@ static enum integrity_status evm_verify_hmac(struct dentry *dentry,
+ 				   xattr_value_len, calc.digest);
+ 		if (rc)
+ 			break;
+-		rc = crypto_memneq(xattr_data->digest, calc.digest,
++		rc = crypto_memneq(xattr_data->data, calc.digest,
+ 			    sizeof(calc.digest));
+ 		if (rc)
+ 			rc = -EINVAL;
+@@ -469,7 +469,7 @@ int evm_inode_init_security(struct inode *inode,
+ 				 const struct xattr *lsm_xattr,
+ 				 struct xattr *evm_xattr)
+ {
+-	struct evm_ima_xattr_data *xattr_data;
++	struct evm_xattr *xattr_data;
+ 	int rc;
+ 
+ 	if (!evm_initialized || !evm_protected_xattr(lsm_xattr->name))
+@@ -479,7 +479,7 @@ int evm_inode_init_security(struct inode *inode,
+ 	if (!xattr_data)
+ 		return -ENOMEM;
+ 
+-	xattr_data->type = EVM_XATTR_HMAC;
++	xattr_data->data.type = EVM_XATTR_HMAC;
+ 	rc = evm_init_hmac(inode, lsm_xattr, xattr_data->digest);
+ 	if (rc < 0)
+ 		goto out;
 diff --git a/security/integrity/ima/ima_appraise.c b/security/integrity/ima/ima_appraise.c
-index 58c6a60c7e83..2c069f47eeec 100644
+index 2c069f47eeec..091977c8ec40 100644
 --- a/security/integrity/ima/ima_appraise.c
 +++ b/security/integrity/ima/ima_appraise.c
-@@ -204,7 +204,7 @@ int ima_appraise_measurement(enum ima_hooks func,
- 			     int xattr_len, int opened)
- {
- 	static const char op[] = "appraise_data";
--	char *cause = "unknown";
-+	const char *cause = "unknown";
- 	struct dentry *dentry = file_dentry(file);
- 	struct inode *inode = d_backing_inode(dentry);
- 	enum integrity_status status = INTEGRITY_UNKNOWN;
-@@ -229,11 +229,16 @@ int ima_appraise_measurement(enum ima_hooks func,
- 	}
+@@ -156,7 +156,8 @@ enum hash_algo ima_get_hash_algo(struct evm_ima_xattr_data *xattr_value,
+ 		return sig->hash_algo;
+ 		break;
+ 	case IMA_XATTR_DIGEST_NG:
+-		ret = xattr_value->digest[0];
++		/* first byte contains algorithm id */
++		ret = xattr_value->data[0];
+ 		if (ret < HASH_ALGO__LAST)
+ 			return ret;
+ 		break;
+@@ -164,7 +165,7 @@ enum hash_algo ima_get_hash_algo(struct evm_ima_xattr_data *xattr_value,
+ 		/* this is for backward compatibility */
+ 		if (xattr_len == 21) {
+ 			unsigned int zero = 0;
+-			if (!memcmp(&xattr_value->digest[16], &zero, 4))
++			if (!memcmp(&xattr_value->data[16], &zero, 4))
+ 				return HASH_ALGO_MD5;
+ 			else
+ 				return HASH_ALGO_SHA1;
+@@ -257,7 +258,7 @@ int ima_appraise_measurement(enum ima_hooks func,
+ 			/* xattr length may be longer. md5 hash in previous
+ 			   version occupied 20 bytes in xattr, instead of 16
+ 			 */
+-			rc = memcmp(&xattr_value->digest[hash_start],
++			rc = memcmp(&xattr_value->data[hash_start],
+ 				    iint->ima_hash->digest,
+ 				    iint->ima_hash->length);
+ 		else
+diff --git a/security/integrity/integrity.h b/security/integrity/integrity.h
+index e1bf040fb110..dd7ac4bfc89a 100644
+--- a/security/integrity/integrity.h
++++ b/security/integrity/integrity.h
+@@ -63,6 +63,11 @@ enum evm_ima_xattr_type {
  
- 	status = evm_verifyxattr(dentry, XATTR_NAME_IMA, xattr_value, rc, iint);
--	if (status != INTEGRITY_PASS && status != INTEGRITY_UNKNOWN) {
--		if (status == INTEGRITY_NOLABEL || status == INTEGRITY_NOXATTRS)
--			cause = "missing-HMAC";
--		else if (status == INTEGRITY_FAIL)
--			cause = "invalid-HMAC";
-+	switch (status) {
-+	case INTEGRITY_PASS:
-+	case INTEGRITY_UNKNOWN:
-+		break;
-+	case INTEGRITY_NOXATTRS:	/* No EVM protected xattrs. */
-+	case INTEGRITY_NOLABEL:		/* No security.evm xattr. */
-+		cause = "missing-HMAC";
-+		goto out;
-+	case INTEGRITY_FAIL:		/* Invalid HMAC/signature. */
-+		cause = "invalid-HMAC";
- 		goto out;
- 	}
- 	switch (xattr_value->type) {
-@@ -287,17 +292,19 @@ int ima_appraise_measurement(enum ima_hooks func,
+ struct evm_ima_xattr_data {
+ 	u8 type;
++	u8 data[];
++} __packed;
++
++struct evm_xattr {
++	struct evm_ima_xattr_data data;
+ 	u8 digest[SHA1_DIGEST_SIZE];
+ } __packed;
  
- out:
- 	if (status != INTEGRITY_PASS) {
-+		/* Fix mode, but don't replace file signatures. */
- 		if ((ima_appraise & IMA_APPRAISE_FIX) &&
--		    (!xattr_value ||
--		     xattr_value->type != EVM_IMA_XATTR_DIGSIG)) {
-+		    !is_ima_sig(xattr_value)) {
- 			if (!ima_fix_xattr(dentry, iint))
- 				status = INTEGRITY_PASS;
--		} else if (inode->i_size == 0 &&
--			   (iint->flags & IMA_NEW_FILE) &&
--			   xattr_value &&
--			   xattr_value->type == EVM_IMA_XATTR_DIGSIG) {
-+		}
-+
-+		/* Permit new files with file signatures, but without data. */
-+		if (inode->i_size == 0 && (iint->flags & IMA_NEW_FILE) &&
-+		    is_ima_sig(xattr_value)) {
- 			status = INTEGRITY_PASS;
- 		}
-+
- 		integrity_audit_msg(AUDIT_INTEGRITY_DATA, inode, filename,
- 				    op, cause, rc, 0);
- 	} else {
-@@ -404,7 +411,7 @@ int ima_inode_setxattr(struct dentry *dentry, const char *xattr_name,
- 		if (!xattr_value_len || xvalue->type >= IMA_XATTR_LAST)
- 			return -EINVAL;
- 		ima_reset_appraise_flags(d_backing_inode(dentry),
--			xvalue->type == EVM_IMA_XATTR_DIGSIG);
-+					 is_ima_sig(xvalue));
- 		result = 0;
- 	}
- 	return result;
-
