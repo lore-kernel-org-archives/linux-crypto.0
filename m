@@ -1,7 +1,7 @@
 From: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
-Subject: [PATCH v5 15/18] ima: Add modsig appraise_type option for module-style appended signatures
-Date: Tue, 17 Oct 2017 22:53:28 -0200
-Message-ID: <20171018005331.2688-16-bauerman@linux.vnet.ibm.com>
+Subject: [PATCH v5 17/18] ima: Implement support for module-style appended signatures
+Date: Tue, 17 Oct 2017 22:53:30 -0200
+Message-ID: <20171018005331.2688-18-bauerman@linux.vnet.ibm.com>
 References: <20171018005331.2688-1-bauerman@linux.vnet.ibm.com>
 Cc: linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
         linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
@@ -19,210 +19,252 @@ Cc: linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
         "AKASHI, Takahiro" <takahiro.akashi@linaro.org>,
         Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
 To: linux-integrity@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-security-module-owner@vger.kernel.org>
 In-Reply-To: <20171018005331.2688-1-bauerman@linux.vnet.ibm.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Sender: owner-linux-security-module@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch introduces the modsig keyword to the IMA policy syntax to
-specify that a given hook should expect the file to have the IMA signature
-appended to it. Here is how it can be used in a rule:
+This patch actually implements the appraise_type=modsig option, allowing
+IMA to read and verify modsig signatures
 
-appraise func=KEXEC_KERNEL_CHECK appraise_type=modsig|imasig
-
-With this rule, IMA will accept either an appended signature or a signature
-stored in the extended attribute. In that case, it will first check whether
-there is an appended signature, and if not it will read it from the
-extended attribute.
-
-For now, the rule above will behave exactly the same as if
-appraise_type=imasig was specified because the actual modsig implementation
-will be introduced in a separate patch.
-
-Suggested-by: Mimi Zohar <zohar@linux.vnet.ibm.com>
 Signed-off-by: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
 ---
- Documentation/ABI/testing/ima_policy |  6 +++++-
- security/integrity/ima/Kconfig       | 10 +++++++++
- security/integrity/ima/Makefile      |  1 +
- security/integrity/ima/ima.h         | 11 ++++++++++
- security/integrity/ima/ima_modsig.c  | 39 ++++++++++++++++++++++++++++++++++++
- security/integrity/ima/ima_policy.c  | 12 +++++++++--
- security/integrity/integrity.h       |  3 ++-
- 7 files changed, 78 insertions(+), 4 deletions(-)
+ security/integrity/ima/ima.h          |  17 +++--
+ security/integrity/ima/ima_appraise.c | 119 ++++++++++++++++++++++++++++++++--
+ security/integrity/ima/ima_main.c     |   7 +-
+ 3 files changed, 128 insertions(+), 15 deletions(-)
 
-diff --git a/Documentation/ABI/testing/ima_policy b/Documentation/ABI/testing/ima_policy
-index e76432b9954d..ced1e1835a30 100644
---- a/Documentation/ABI/testing/ima_policy
-+++ b/Documentation/ABI/testing/ima_policy
-@@ -36,7 +36,7 @@ Description:
- 			euid:= decimal value
- 			fowner:= decimal value
- 		lsm:  	are LSM specific
--		option:	appraise_type:= [imasig]
-+		option:	appraise_type:= [imasig] [modsig|imasig]
- 			pcr:= decimal value
- 
- 		default policy:
-@@ -102,3 +102,7 @@ Description:
- 
- 			measure func=KEXEC_KERNEL_CHECK pcr=4
- 			measure func=KEXEC_INITRAMFS_CHECK pcr=5
-+
-+		Example of appraise rule allowing modsig appended signatures:
-+
-+			appraise func=KEXEC_KERNEL_CHECK appraise_type=modsig|imasig
-diff --git a/security/integrity/ima/Kconfig b/security/integrity/ima/Kconfig
-index 35ef69312811..40c6618d00e6 100644
---- a/security/integrity/ima/Kconfig
-+++ b/security/integrity/ima/Kconfig
-@@ -163,6 +163,16 @@ config IMA_APPRAISE_BOOTPARAM
- 	  This option enables the different "ima_appraise=" modes
- 	  (eg. fix, log) from the boot command line.
- 
-+config IMA_APPRAISE_MODSIG
-+	bool "Support module-style signatures for appraisal"
-+	depends on IMA_APPRAISE
-+	default n
-+	help
-+	   Adds support for signatures appended to files. The format of the
-+	   appended signature is the same used for signed kernel modules.
-+	   The modsig keyword can be used in the IMA policy to allow a hook
-+	   to accept such signatures.
-+
- config IMA_TRUSTED_KEYRING
- 	bool "Require all keys on the .ima keyring be signed (deprecated)"
- 	depends on IMA_APPRAISE && SYSTEM_TRUSTED_KEYRING
-diff --git a/security/integrity/ima/Makefile b/security/integrity/ima/Makefile
-index 29f198bde02b..c72026acecc3 100644
---- a/security/integrity/ima/Makefile
-+++ b/security/integrity/ima/Makefile
-@@ -8,5 +8,6 @@ obj-$(CONFIG_IMA) += ima.o
- ima-y := ima_fs.o ima_queue.o ima_init.o ima_main.o ima_crypto.o ima_api.o \
- 	 ima_policy.o ima_template.o ima_template_lib.o
- ima-$(CONFIG_IMA_APPRAISE) += ima_appraise.o
-+ima-$(CONFIG_IMA_APPRAISE_MODSIG) += ima_modsig.o
- ima-$(CONFIG_HAVE_IMA_KEXEC) += ima_kexec.o
- obj-$(CONFIG_IMA_BLACKLIST_KEYRING) += ima_mok.o
 diff --git a/security/integrity/ima/ima.h b/security/integrity/ima/ima.h
-index c9ba4362760b..156ba218e0b6 100644
+index eb58af06566f..b082138461b3 100644
 --- a/security/integrity/ima/ima.h
 +++ b/security/integrity/ima/ima.h
-@@ -255,6 +255,10 @@ enum hash_algo ima_get_hash_algo(struct evm_ima_xattr_data *xattr_value,
- int ima_read_xattr(struct dentry *dentry,
- 		   struct evm_ima_xattr_data **xattr_value);
+@@ -157,7 +157,8 @@ void ima_init_template_list(void);
  
-+#ifdef CONFIG_IMA_APPRAISE_MODSIG
-+bool ima_hook_supports_modsig(enum ima_hooks func);
-+#endif
-+
+ static inline bool is_ima_sig(const struct evm_ima_xattr_data *xattr_value)
+ {
+-	return xattr_value && xattr_value->type == EVM_IMA_XATTR_DIGSIG;
++	return xattr_value && (xattr_value->type == EVM_IMA_XATTR_DIGSIG ||
++			       xattr_value->type == IMA_MODSIG);
+ }
+ 
+ /*
+@@ -243,9 +244,10 @@ int ima_policy_show(struct seq_file *m, void *v);
+ #ifdef CONFIG_IMA_APPRAISE
+ int ima_appraise_measurement(enum ima_hooks func,
+ 			     struct integrity_iint_cache *iint,
+-			     struct file *file, const unsigned char *filename,
+-			     struct evm_ima_xattr_data *xattr_value,
+-			     int xattr_len, int opened);
++			     struct file *file, const void *buf, loff_t size,
++			     const unsigned char *filename,
++			     struct evm_ima_xattr_data **xattr_value,
++			     int *xattr_len, int opened);
+ int ima_must_appraise(struct inode *inode, int mask, enum ima_hooks func);
+ void ima_update_xattr(struct integrity_iint_cache *iint, struct file *file);
+ enum integrity_status ima_get_cache_status(struct integrity_iint_cache *iint,
+@@ -270,10 +272,11 @@ void ima_free_xattr_data(struct evm_ima_xattr_data *hdr);
  #else
  static inline int ima_appraise_measurement(enum ima_hooks func,
  					   struct integrity_iint_cache *iint,
-@@ -298,6 +302,13 @@ static inline int ima_read_xattr(struct dentry *dentry,
+-					   struct file *file,
++					   struct file *file, const void *buf,
++					   loff_t size,
+ 					   const unsigned char *filename,
+-					   struct evm_ima_xattr_data *xattr_value,
+-					   int xattr_len, int opened)
++					   struct evm_ima_xattr_data **xattr_value,
++					   int *xattr_len, int opened)
+ {
+ 	return INTEGRITY_UNKNOWN;
+ }
+diff --git a/security/integrity/ima/ima_appraise.c b/security/integrity/ima/ima_appraise.c
+index 58e147049e98..108690741c1a 100644
+--- a/security/integrity/ima/ima_appraise.c
++++ b/security/integrity/ima/ima_appraise.c
+@@ -190,6 +190,45 @@ int ima_read_xattr(struct dentry *dentry,
+ 	return ret;
+ }
  
- #endif /* CONFIG_IMA_APPRAISE */
- 
-+#ifndef CONFIG_IMA_APPRAISE_MODSIG
-+static inline bool ima_hook_supports_modsig(enum ima_hooks func)
++static int appraise_modsig(struct integrity_iint_cache *iint,
++			   struct evm_ima_xattr_data *xattr_value,
++			   int xattr_len)
 +{
-+	return false;
++	enum hash_algo algo;
++	const void *digest;
++	void *buf;
++	int rc, len;
++	u8 dig_len;
++
++	rc = ima_modsig_verify(INTEGRITY_KEYRING_IMA, xattr_value);
++	if (rc)
++		return rc;
++
++	/*
++	 * The signature is good. Now let's put the sig hash
++	 * into the iint cache so that it gets stored in the
++	 * measurement list.
++	 */
++
++	rc = ima_get_modsig_hash(xattr_value, &algo, &digest, &dig_len);
++	if (rc)
++		return rc;
++
++	len = sizeof(iint->ima_hash) + dig_len;
++	buf = krealloc(iint->ima_hash, len, GFP_NOFS);
++	if (!buf)
++		return -ENOMEM;
++
++	iint->ima_hash = buf;
++	iint->flags |= IMA_DIGSIG;
++	iint->ima_hash->algo = algo;
++	iint->ima_hash->length = dig_len;
++
++	memcpy(iint->ima_hash->digest, digest, dig_len);
++
++	return 0;
 +}
-+#endif
 +
- /* LSM based policy rules require audit */
- #ifdef CONFIG_IMA_LSM_RULES
- 
-diff --git a/security/integrity/ima/ima_modsig.c b/security/integrity/ima/ima_modsig.c
-new file mode 100644
-index 000000000000..452ce6048a7e
---- /dev/null
-+++ b/security/integrity/ima/ima_modsig.c
-@@ -0,0 +1,39 @@
-+/*
-+ * IMA support for appraising module-style appended signatures.
-+ *
-+ * Copyright (C) 2017  IBM Corporation
-+ *
-+ * Author:
-+ * Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation (version 2 of the License).
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ */
+ /*
+  * ima_appraise_measurement - appraise file measurement
+  *
+@@ -200,18 +239,28 @@ int ima_read_xattr(struct dentry *dentry,
+  */
+ int ima_appraise_measurement(enum ima_hooks func,
+ 			     struct integrity_iint_cache *iint,
+-			     struct file *file, const unsigned char *filename,
+-			     struct evm_ima_xattr_data *xattr_value,
+-			     int xattr_len, int opened)
++			     struct file *file, const void *buf, loff_t size,
++			     const unsigned char *filename,
++			     struct evm_ima_xattr_data **xattr_value_,
++			     int *xattr_len_, int opened)
+ {
+ 	static const char op[] = "appraise_data";
+ 	const char *cause = "unknown";
+ 	struct dentry *dentry = file_dentry(file);
+ 	struct inode *inode = d_backing_inode(dentry);
+ 	enum integrity_status status = INTEGRITY_UNKNOWN;
+-	int rc = xattr_len, hash_start = 0;
++	struct evm_ima_xattr_data *xattr_value = *xattr_value_;
++	int xattr_len = *xattr_len_, rc = xattr_len, hash_start = 0;
++	bool appraising_modsig = false;
 +
-+#include "ima.h"
-+
-+/**
-+ * ima_hook_supports_modsig - can the policy allow modsig for this hook?
-+ *
-+ * modsig is only supported by hooks using ima_post_read_file, because only they
-+ * preload the contents of the file in a buffer. FILE_CHECK does that in some
-+ * cases, but not when reached from vfs_open. POLICY_CHECK can support it, but
-+ * it's not useful in practice because it's a text file so deny.
-+ */
-+bool ima_hook_supports_modsig(enum ima_hooks func)
-+{
-+	switch (func) {
-+	case FIRMWARE_CHECK:
-+	case KEXEC_KERNEL_CHECK:
-+	case KEXEC_INITRAMFS_CHECK:
-+		return true;
-+	default:
-+		return false;
++	if (iint->flags & IMA_MODSIG_ALLOWED &&
++	    !ima_read_modsig(func, buf, size, &xattr_value, &xattr_len)) {
++		appraising_modsig = true;
++		rc = xattr_len;
 +	}
-+}
-diff --git a/security/integrity/ima/ima_policy.c b/security/integrity/ima/ima_policy.c
-index 7355d4ab7bf4..c5f98c54e59d 100644
---- a/security/integrity/ima/ima_policy.c
-+++ b/security/integrity/ima/ima_policy.c
-@@ -854,6 +854,10 @@ static int ima_parse_rule(char *rule, struct ima_rule_entry *entry)
- 			ima_log_string(ab, "appraise_type", args[0].from);
- 			if (strcmp(args[0].from, "imasig") == 0)
- 				entry->flags |= IMA_DIGSIG_REQUIRED;
-+			else if (ima_hook_supports_modsig(entry->func) &&
-+				 strcmp(args[0].from, "modsig|imasig") == 0)
-+				entry->flags |= IMA_DIGSIG_REQUIRED
-+						| IMA_MODSIG_ALLOWED;
- 			else
- 				result = -EINVAL;
- 			break;
-@@ -1139,8 +1143,12 @@ int ima_policy_show(struct seq_file *m, void *v)
- 			}
- 		}
+ 
+-	if (!(inode->i_opflags & IOP_XATTR))
++	/* If not appraising a modsig, we need an xattr. */
++	if (!appraising_modsig && !(inode->i_opflags & IOP_XATTR))
+ 		return INTEGRITY_UNKNOWN;
+ 
+ 	if (rc <= 0) {
+@@ -235,6 +284,9 @@ int ima_appraise_measurement(enum ima_hooks func,
+ 	case INTEGRITY_UNKNOWN:
+ 		break;
+ 	case INTEGRITY_NOXATTRS:	/* No EVM protected xattrs. */
++		/* It's fine not to have xattrs when using a modsig. */
++		if (appraising_modsig)
++			break;
+ 	case INTEGRITY_NOLABEL:		/* No security.evm xattr. */
+ 		cause = "missing-HMAC";
+ 		goto out;
+@@ -242,6 +294,8 @@ int ima_appraise_measurement(enum ima_hooks func,
+ 		cause = "invalid-HMAC";
+ 		goto out;
  	}
--	if (entry->flags & IMA_DIGSIG_REQUIRED)
--		seq_puts(m, "appraise_type=imasig ");
-+	if (entry->flags & IMA_DIGSIG_REQUIRED) {
-+		if (entry->flags & IMA_MODSIG_ALLOWED)
-+			seq_puts(m, "appraise_type=modsig|imasig ");
-+		else
-+			seq_puts(m, "appraise_type=imasig ");
-+	}
- 	if (entry->flags & IMA_PERMIT_DIRECTIO)
- 		seq_puts(m, "permit_directio ");
- 	rcu_read_unlock();
-diff --git a/security/integrity/integrity.h b/security/integrity/integrity.h
-index 657ce4558984..da709558ec8b 100644
---- a/security/integrity/integrity.h
-+++ b/security/integrity/integrity.h
-@@ -28,11 +28,12 @@
++
++ retry:
+ 	switch (xattr_value->type) {
+ 	case IMA_XATTR_DIGEST_NG:
+ 		/* first byte contains algorithm id */
+@@ -285,6 +339,61 @@ int ima_appraise_measurement(enum ima_hooks func,
+ 			status = INTEGRITY_PASS;
+ 		}
+ 		break;
++	case IMA_MODSIG:
++		/*
++		 * To avoid being tricked into an infinite loop, we don't allow
++		 * a modsig stored in the xattr.
++		 */
++		if (!appraising_modsig) {
++			status = INTEGRITY_UNKNOWN;
++			cause = "unknown-ima-data";
++			break;
++		}
++
++		rc = appraise_modsig(iint, xattr_value, xattr_len);
++		if (!rc) {
++			kfree(*xattr_value_);
++			*xattr_value_ = xattr_value;
++			*xattr_len_ = xattr_len;
++
++			status = INTEGRITY_PASS;
++			break;
++		}
++
++		ima_free_xattr_data(xattr_value);
++
++		/*
++		 * The appended signature failed verification. If there's a
++		 * signature in the extended attribute, let's fall back to it.
++		 */
++		if (inode->i_opflags & IOP_XATTR && *xattr_len_ != 0 &&
++		    *xattr_len_ != -ENODATA) {
++			const char *modsig_cause = rc == -EOPNOTSUPP ?
++				"unknown" : "invalid-signature";
++
++			/* First, log that the modsig verification failed. */
++			integrity_audit_msg(AUDIT_INTEGRITY_DATA, inode,
++					    filename, op, modsig_cause, rc, 0);
++
++			xattr_len = rc = *xattr_len_;
++			xattr_value = *xattr_value_;
++			appraising_modsig = false;
++
++			if (rc > 0)
++				/* Process xattr contents. */
++				goto retry;
++
++			/* Unexpected error reading xattr. */
++			status = INTEGRITY_UNKNOWN;
++		} else {
++			if (rc == -EOPNOTSUPP)
++				status = INTEGRITY_UNKNOWN;
++			else {
++				cause = "invalid-signature";
++				status = INTEGRITY_FAIL;
++			}
++		}
++		break;
+ 	default:
+ 		status = INTEGRITY_UNKNOWN;
+ 		cause = "unknown-ima-data";
+diff --git a/security/integrity/ima/ima_main.c b/security/integrity/ima/ima_main.c
+index 8e96450e27f5..6a2d960fbd92 100644
+--- a/security/integrity/ima/ima_main.c
++++ b/security/integrity/ima/ima_main.c
+@@ -243,8 +243,9 @@ static int process_measurement(struct file *file, char *buf, loff_t size,
+ 		pathname = ima_d_path(&file->f_path, &pathbuf, filename);
  
- /* iint cache flags */
- #define IMA_ACTION_FLAGS	0xff000000
--#define IMA_ACTION_RULE_FLAGS	0x06000000
-+#define IMA_ACTION_RULE_FLAGS	0x16000000
- #define IMA_DIGSIG		0x01000000
- #define IMA_DIGSIG_REQUIRED	0x02000000
- #define IMA_PERMIT_DIRECTIO	0x04000000
- #define IMA_NEW_FILE		0x08000000
-+#define IMA_MODSIG_ALLOWED	0x10000000
- 
- #define IMA_DO_MASK		(IMA_MEASURE | IMA_APPRAISE | IMA_AUDIT | \
- 				 IMA_APPRAISE_SUBMASK)
+ 	if (rc == 0 && (action & IMA_APPRAISE_SUBMASK))
+-		rc = ima_appraise_measurement(func, iint, file, pathname,
+-					      xattr_value, xattr_len, opened);
++		rc = ima_appraise_measurement(func, iint, file, buf, size,
++					      pathname, &xattr_value,
++					      &xattr_len, opened);
+ 	if (action & IMA_MEASURE)
+ 		ima_store_measurement(iint, file, pathname,
+ 				      xattr_value, xattr_len, pcr);
+@@ -255,7 +256,7 @@ static int process_measurement(struct file *file, char *buf, loff_t size,
+ 	if ((mask & MAY_WRITE) && (iint->flags & IMA_DIGSIG) &&
+ 	     !(iint->flags & IMA_NEW_FILE))
+ 		rc = -EACCES;
+-	kfree(xattr_value);
++	ima_free_xattr_data(xattr_value);
+ out_free:
+ 	if (pathbuf)
+ 		__putname(pathbuf);
+
