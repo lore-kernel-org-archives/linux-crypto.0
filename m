@@ -1,97 +1,72 @@
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH 1/2] random: always call random ready function
-Date: Thu, 19 Oct 2017 22:45:05 +0200
-Message-ID: <20171019204506.25090-1-Jason@zx2c4.com>
+Subject: [PATCH 2/2] crypto/drbg: account for no longer returning -EALREADY
+Date: Thu, 19 Oct 2017 22:45:06 +0200
+Message-ID: <20171019204506.25090-2-Jason@zx2c4.com>
 References: <CAHmME9qwoSwFi7fsg1Z+gcEh1fBY+KY2rJ81UTHYn2ZMcjjwFA@mail.gmail.com>
+ <20171019204506.25090-1-Jason@zx2c4.com>
 Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
 To: Kees Cook <keescook@chromium.org>,
         LKML <linux-kernel@vger.kernel.org>,
         linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
         tytso@mit.edu, gregkh@linuxfoundation.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from frisell.zx2c4.com ([192.95.5.64]:57167 "EHLO frisell.zx2c4.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753212AbdJSUp0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 Oct 2017 16:45:26 -0400
-In-Reply-To: <CAHmME9qwoSwFi7fsg1Z+gcEh1fBY+KY2rJ81UTHYn2ZMcjjwFA@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20171019204506.25090-1-Jason@zx2c4.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-As this interface becomes more heavily used, it will be painful for
-callers to always need to check for -EALREADY.
+We now structure things in a way that assumes the seeding function is
+always eventually called.
 
 Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 ---
- drivers/char/random.c | 24 ++++++++++++++++--------
- 1 file changed, 16 insertions(+), 8 deletions(-)
+ crypto/drbg.c | 20 +++++---------------
+ 1 file changed, 5 insertions(+), 15 deletions(-)
 
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 8ad92707e45f..e161acf35d4a 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -1556,40 +1556,45 @@ EXPORT_SYMBOL(wait_for_random_bytes);
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index 70018397e59a..501e013cb96c 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -1411,18 +1411,8 @@ static int drbg_prepare_hrng(struct drbg_state *drbg)
  
- /*
-  * Add a callback function that will be invoked when the nonblocking
-- * pool is initialised.
-+ * pool is initialised, or calls that function if it already is.
-  *
-  * returns: 0 if callback is successfully added
-- *	    -EALREADY if pool is already initialised (callback not called)
-  *	    -ENOENT if module for callback is not alive
-  */
- int add_random_ready_callback(struct random_ready_callback *rdy)
- {
- 	struct module *owner;
- 	unsigned long flags;
--	int err = -EALREADY;
+ 	err = add_random_ready_callback(&drbg->random_ready);
  
--	if (crng_ready())
--		return err;
-+	BUG_ON(!rdy->func);
-+
-+	if (crng_ready()) {
-+		rdy->func(rdy);
-+		rdy->func = NULL;
-+		return 0;
-+	}
+-	switch (err) {
+-	case 0:
+-		break;
+-
+-	case -EALREADY:
+-		err = 0;
+-		/* fall through */
+-
+-	default:
+-		drbg->random_ready.func = NULL;
++	if (err)
+ 		return err;
+-	}
  
- 	owner = rdy->owner;
- 	if (!try_module_get(owner))
- 		return -ENOENT;
+ 	drbg->jent = crypto_alloc_rng("jitterentropy_rng", 0, 0);
  
- 	spin_lock_irqsave(&random_ready_list_lock, flags);
--	if (crng_ready())
-+	if (crng_ready()) {
-+		rdy->func(rdy);
-+		rdy->func = NULL;
- 		goto out;
-+	}
- 
- 	owner = NULL;
- 
- 	list_add(&rdy->list, &random_ready_list);
--	err = 0;
- 
- out:
- 	spin_unlock_irqrestore(&random_ready_list_lock, flags);
- 
- 	module_put(owner);
+@@ -1432,7 +1422,7 @@ static int drbg_prepare_hrng(struct drbg_state *drbg)
+ 	 */
+ 	drbg->reseed_threshold = 50;
  
 -	return err;
 +	return 0;
  }
- EXPORT_SYMBOL(add_random_ready_callback);
  
-@@ -1601,6 +1606,9 @@ void del_random_ready_callback(struct random_ready_callback *rdy)
- 	unsigned long flags;
- 	struct module *owner = NULL;
- 
-+	if (!rdy->func)
-+		return;
-+
- 	spin_lock_irqsave(&random_ready_list_lock, flags);
- 	if (!list_empty(&rdy->list)) {
- 		list_del_init(&rdy->list);
+ /*
+@@ -1526,9 +1516,9 @@ static int drbg_instantiate(struct drbg_state *drbg, struct drbg_string *pers,
+  */
+ static int drbg_uninstantiate(struct drbg_state *drbg)
+ {
+-	if (drbg->random_ready.func) {
+-		del_random_ready_callback(&drbg->random_ready);
+-		cancel_work_sync(&drbg->seed_work);
++	del_random_ready_callback(&drbg->random_ready);
++	cancel_work_sync(&drbg->seed_work);
++	if (drbg->jent) {
+ 		crypto_free_rng(drbg->jent);
+ 		drbg->jent = NULL;
+ 	}
 -- 
 2.14.2
