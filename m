@@ -1,298 +1,118 @@
-From: Thomas Garnier <thgarnie@google.com>
-Subject: Re: [PATCH v1 00/27] x86: PIE support and option to extend KASLR randomization
-Date: Wed, 18 Oct 2017 16:17:44 -0700
-Message-ID: <CAJcbSZHCY53AS2cVYzXR34jCgOGnYpssVR6ooHBjNGZunyvdfw@mail.gmail.com>
-References: <20171011203027.11248-1-thgarnie@google.com> <22e56a56-978a-738f-52b9-2d0c17839c9e@amd.com>
- <CAJcbSZEzEGuby155zQZJqEbi1EO1v2bue+DB1oAXZfwMVOoySg@mail.gmail.com> <18a89941-c80d-7007-574b-584f39f90f49@amd.com>
+From: Suniel Mahesh <sunil.m@techveda.org>
+Subject: Re: [PATCH v3] staging: ccree: fix boolreturn.cocci warning
+Date: Thu, 19 Oct 2017 11:52:29 +0530
+Message-ID: <ac934de8-adf8-ced3-8ea2-662660a5ce2b@techveda.org>
+References: <20171018023607.GE30848@eros>
+ <1508308915-18789-1-git-send-email-sunil.m@techveda.org>
+ <20171018205450.GB31318@eros>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>,
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>,
-	Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@redhat.com>,
-	Arnd Bergmann <arnd@arndb.de>, Kees Cook <keescook@chromium.org>,
-	Andrey Ryabinin <aryabinin@virtuozzo.com>, Matthias Kaehlcke <mka@chromium.org>,
-	Andy Lutomirski <luto@kernel.org>, "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-	Borislav Petkov <bp@suse.de>, "Rafael J . Wysocki" <rjw@rjwysocki.net>, Len Brown <len.brown@intel.com>,
-	Pavel Machek <pavel@ucw.cz>, Juergen Gross <jgross@suse.com>, Chris Wright <chrisw@sous-sol.org>,
-	Alok Kataria <akataria@vmware.com>, Rusty Russell <rusty@rustcorp.com.au>, Tejun Heo <tj@kernel.org>,
-	Christoph Lameter <cl@linux.com>, Boris Ostrovsky <boris.ostrovsky@o
-To: Tom Lendacky <thomas.lendacky@amd.com>
-Return-path: <kernel-hardening-return-10188-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
-List-Post: <mailto:kernel-hardening@lists.openwall.com>
-List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
-List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
-List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
-In-Reply-To: <18a89941-c80d-7007-574b-584f39f90f49@amd.com>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: gilad@benyossef.com, gregkh@linuxfoundation.org,
+        linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        linux-kernel@vger.kernel.org, karthik@techveda.org
+To: "Tobin C. Harding" <me@tobin.cc>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pg0-f66.google.com ([74.125.83.66]:48961 "EHLO
+        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750964AbdJSGWe (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 19 Oct 2017 02:22:34 -0400
+Received: by mail-pg0-f66.google.com with SMTP id v78so6263910pgb.5
+        for <linux-crypto@vger.kernel.org>; Wed, 18 Oct 2017 23:22:34 -0700 (PDT)
+In-Reply-To: <20171018205450.GB31318@eros>
+Content-Language: en-US
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Oct 12, 2017 at 9:28 AM, Tom Lendacky <thomas.lendacky@amd.com> wrote:
-> On 10/12/2017 10:34 AM, Thomas Garnier wrote:
->>
->> On Wed, Oct 11, 2017 at 2:34 PM, Tom Lendacky <thomas.lendacky@amd.com>
->> wrote:
->>>
->>> On 10/11/2017 3:30 PM, Thomas Garnier wrote:
->>>>
->>>> Changes:
->>>>    - patch v1:
->>>>      - Simplify ftrace implementation.
->>>>      - Use gcc mstack-protector-guard-reg=%gs with PIE when possible.
->>>>    - rfc v3:
->>>>      - Use --emit-relocs instead of -pie to reduce dynamic relocation
->>>> space on
->>>>        mapped memory. It also simplifies the relocation process.
->>>>      - Move the start the module section next to the kernel. Remove the
->>>> need for
->>>>        -mcmodel=large on modules. Extends module space from 1 to 2G
->>>> maximum.
->>>>      - Support for XEN PVH as 32-bit relocations can be ignored with
->>>>        --emit-relocs.
->>>>      - Support for GOT relocations previously done automatically with
->>>> -pie.
->>>>      - Remove need for dynamic PLT in modules.
->>>>      - Support dymamic GOT for modules.
->>>>    - rfc v2:
->>>>      - Add support for global stack cookie while compiler default to fs
->>>> without
->>>>        mcmodel=kernel
->>>>      - Change patch 7 to correctly jump out of the identity mapping on
->>>> kexec load
->>>>        preserve.
->>>>
->>>> These patches make the changes necessary to build the kernel as Position
->>>> Independent Executable (PIE) on x86_64. A PIE kernel can be relocated
->>>> below
->>>> the top 2G of the virtual address space. It allows to optionally extend
->>>> the
->>>> KASLR randomization range from 1G to 3G.
->>>
->>>
->>> Hi Thomas,
->>>
->>> I've applied your patches so that I can verify that SME works with PIE.
->>> Unfortunately, I'm running into build warnings and errors when I enable
->>> PIE.
->>>
->>> With CONFIG_STACK_VALIDATION=y I receive lots of messages like this:
->>>
->>>    drivers/scsi/libfc/fc_exch.o: warning: objtool:
->>> fc_destroy_exch_mgr()+0x0: call without frame pointer save/setup
->>>
->>> Disabling CONFIG_STACK_VALIDATION suppresses those.
->>
->>
->> I ran into that, I plan to fix it in the next iteration.
->>
->>>
->>> But near the end of the build, I receive errors like this:
->>>
->>>    arch/x86/kernel/setup.o: In function `dump_kernel_offset':
->>>    .../arch/x86/kernel/setup.c:801:(.text+0x32): relocation truncated to
->>> fit: R_X86_64_32S against symbol `_text' defined in .text section in
->>> .tmp_vmlinux1
->>>    .
->>>    . about 10 more of the above type messages
->>>    .
->>>    make: *** [vmlinux] Error 1
->>>    Error building kernel, exiting
->>>
->>> Are there any config options that should or should not be enabled when
->>> building with PIE enabled?  Is there a compiler requirement for PIE (I'm
->>> using gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.5))?
->>
->>
->> I never ran into these ones and I tested compilers older and newer.
->> What was your exact configuration?
->
->
-> I'll send you the config in a separate email.
->
-> Thanks,
-> Tom
+On Thursday 19 October 2017 02:24 AM, Tobin C. Harding wrote:
+> Hi Suniel,
+> 
+> Well done with you continued versions. I am being particularly nit picky here but since we are
+> striving for perfection I'm sure will humour me. If English is not your first language please
+> forgive me for picking you up on language subtleties.
 
-Thanks for your feedback (Tom and Markus). The issue was linked to
-using a modern gcc with a modern linker, I managed to repro and fix it
-on my current version.
+Hi Tobin,
 
-I will create a v1.5 for Kees Cook to keep on one of his branch for
-few weeks so I can collect as much feedback from 0day. After that I
-will send v2.
+First of all, I thank you very much for the reviews, to be honest I enjoyed the process. Yes all of 
+us, here we are striving for perfection. I am always open to take suggestions from the community to 
+improve things which I am working on and there by improving myself. Yeah English is not my first
+language, but all my education was done in English, no issues there.
 
->
->
+> 
+> On Wed, Oct 18, 2017 at 12:11:55PM +0530, sunil.m@techveda.org wrote:
+>> From: Suniel Mahesh <sunil.m@techveda.org>
 >>
->>>
->>> Thanks,
->>> Tom
->>>
->>>>
->>>> Thanks a lot to Ard Biesheuvel & Kees Cook on their feedback on compiler
->>>> changes, PIE support and KASLR in general. Thanks to Roland McGrath on
->>>> his
->>>> feedback for using -pie versus --emit-relocs and details on compiler
->>>> code
->>>> generation.
->>>>
->>>> The patches:
->>>>    - 1-3, 5-1#, 17-18: Change in assembly code to be PIE compliant.
->>>>    - 4: Add a new _ASM_GET_PTR macro to fetch a symbol address
->>>> generically.
->>>>    - 14: Adapt percpu design to work correctly when PIE is enabled.
->>>>    - 15: Provide an option to default visibility to hidden except for
->>>> key symbols.
->>>>          It removes errors between compilation units.
->>>>    - 16: Adapt relocation tool to handle PIE binary correctly.
->>>>    - 19: Add support for global cookie.
->>>>    - 20: Support ftrace with PIE (used on Ubuntu config).
->>>>    - 21: Fix incorrect address marker on dump_pagetables.
->>>>    - 22: Add option to move the module section just after the kernel.
->>>>    - 23: Adapt module loading to support PIE with dynamic GOT.
->>>>    - 24: Make the GOT read-only.
->>>>    - 25: Add the CONFIG_X86_PIE option (off by default).
->>>>    - 26: Adapt relocation tool to generate a 64-bit relocation table.
->>>>    - 27: Add the CONFIG_RANDOMIZE_BASE_LARGE option to increase
->>>> relocation range
->>>>          from 1G to 3G (off by default).
->>>>
->>>> Performance/Size impact:
->>>>
->>>> Size of vmlinux (Default configuration):
->>>>    File size:
->>>>    - PIE disabled: +0.000031%
->>>>    - PIE enabled: -3.210% (less relocations)
->>>>    .text section:
->>>>    - PIE disabled: +0.000644%
->>>>    - PIE enabled: +0.837%
->>>>
->>>> Size of vmlinux (Ubuntu configuration):
->>>>    File size:
->>>>    - PIE disabled: -0.201%
->>>>    - PIE enabled: -0.082%
->>>>    .text section:
->>>>    - PIE disabled: same
->>>>    - PIE enabled: +1.319%
->>>>
->>>> Size of vmlinux (Default configuration + ORC):
->>>>    File size:
->>>>    - PIE enabled: -3.167%
->>>>    .text section:
->>>>    - PIE enabled: +0.814%
->>>>
->>>> Size of vmlinux (Ubuntu configuration + ORC):
->>>>    File size:
->>>>    - PIE enabled: -3.167%
->>>>    .text section:
->>>>    - PIE enabled: +1.26%
->>>>
->>>> The size increase is mainly due to not having access to the 32-bit
->>>> signed
->>>> relocation that can be used with mcmodel=kernel. A small part is due to
->>>> reduced
->>>> optimization for PIE code. This bug [1] was opened with gcc to provide a
->>>> better
->>>> code generation for kernel PIE.
->>>>
->>>> Hackbench (50% and 1600% on thread/process for pipe/sockets):
->>>>    - PIE disabled: no significant change (avg +0.1% on latest test).
->>>>    - PIE enabled: between -0.50% to +0.86% in average (default and
->>>> Ubuntu config).
->>>>
->>>> slab_test (average of 10 runs):
->>>>    - PIE disabled: no significant change (-2% on latest run, likely
->>>> noise).
->>>>    - PIE enabled: between -1% and +0.8% on latest runs.
->>>>
->>>> Kernbench (average of 10 Half and Optimal runs):
->>>>    Elapsed Time:
->>>>    - PIE disabled: no significant change (avg -0.239%)
->>>>    - PIE enabled: average +0.07%
->>>>    System Time:
->>>>    - PIE disabled: no significant change (avg -0.277%)
->>>>    - PIE enabled: average +0.7%
->>>>
->>>> [1] https://gcc.gnu.org/bugzilla/show_bug.cgi?id=82303
->>>>
->>>> diffstat:
->>>>    Documentation/x86/x86_64/mm.txt              |    3
->>>>    arch/x86/Kconfig                             |   43 ++++++
->>>>    arch/x86/Makefile                            |   40 +++++
->>>>    arch/x86/boot/boot.h                         |    2
->>>>    arch/x86/boot/compressed/Makefile            |    5
->>>>    arch/x86/boot/compressed/misc.c              |   10 +
->>>>    arch/x86/crypto/aes-x86_64-asm_64.S          |   45 ++++--
->>>>    arch/x86/crypto/aesni-intel_asm.S            |   14 +-
->>>>    arch/x86/crypto/aesni-intel_avx-x86_64.S     |    6
->>>>    arch/x86/crypto/camellia-aesni-avx-asm_64.S  |   42 +++---
->>>>    arch/x86/crypto/camellia-aesni-avx2-asm_64.S |   44 +++---
->>>>    arch/x86/crypto/camellia-x86_64-asm_64.S     |    8 -
->>>>    arch/x86/crypto/cast5-avx-x86_64-asm_64.S    |   50 ++++---
->>>>    arch/x86/crypto/cast6-avx-x86_64-asm_64.S    |   44 +++---
->>>>    arch/x86/crypto/des3_ede-asm_64.S            |   96 +++++++++-----
->>>>    arch/x86/crypto/ghash-clmulni-intel_asm.S    |    4
->>>>    arch/x86/crypto/glue_helper-asm-avx.S        |    4
->>>>    arch/x86/crypto/glue_helper-asm-avx2.S       |    6
->>>>    arch/x86/entry/entry_32.S                    |    3
->>>>    arch/x86/entry/entry_64.S                    |   29 ++--
->>>>    arch/x86/include/asm/asm.h                   |   13 +
->>>>    arch/x86/include/asm/bug.h                   |    2
->>>>    arch/x86/include/asm/ftrace.h                |    6
->>>>    arch/x86/include/asm/jump_label.h            |    8 -
->>>>    arch/x86/include/asm/kvm_host.h              |    6
->>>>    arch/x86/include/asm/module.h                |   11 +
->>>>    arch/x86/include/asm/page_64_types.h         |    9 +
->>>>    arch/x86/include/asm/paravirt_types.h        |   12 +
->>>>    arch/x86/include/asm/percpu.h                |   25 ++-
->>>>    arch/x86/include/asm/pgtable_64_types.h      |    6
->>>>    arch/x86/include/asm/pm-trace.h              |    2
->>>>    arch/x86/include/asm/processor.h             |   12 +
->>>>    arch/x86/include/asm/sections.h              |    8 +
->>>>    arch/x86/include/asm/setup.h                 |    2
->>>>    arch/x86/include/asm/stackprotector.h        |   19 ++
->>>>    arch/x86/kernel/acpi/wakeup_64.S             |   31 ++--
->>>>    arch/x86/kernel/asm-offsets.c                |    3
->>>>    arch/x86/kernel/asm-offsets_32.c             |    3
->>>>    arch/x86/kernel/asm-offsets_64.c             |    3
->>>>    arch/x86/kernel/cpu/common.c                 |    7 -
->>>>    arch/x86/kernel/cpu/microcode/core.c         |    4
->>>>    arch/x86/kernel/ftrace.c                     |   42 +++++-
->>>>    arch/x86/kernel/head64.c                     |   32 +++-
->>>>    arch/x86/kernel/head_32.S                    |    3
->>>>    arch/x86/kernel/head_64.S                    |   41 +++++-
->>>>    arch/x86/kernel/kvm.c                        |    6
->>>>    arch/x86/kernel/module.c                     |  182
->>>> ++++++++++++++++++++++++++-
->>>>    arch/x86/kernel/module.lds                   |    3
->>>>    arch/x86/kernel/process.c                    |    5
->>>>    arch/x86/kernel/relocate_kernel_64.S         |    8 -
->>>>    arch/x86/kernel/setup_percpu.c               |    2
->>>>    arch/x86/kernel/vmlinux.lds.S                |   13 +
->>>>    arch/x86/kvm/svm.c                           |    4
->>>>    arch/x86/lib/cmpxchg16b_emu.S                |    8 -
->>>>    arch/x86/mm/dump_pagetables.c                |   11 +
->>>>    arch/x86/power/hibernate_asm_64.S            |    4
->>>>    arch/x86/tools/relocs.c                      |  170
->>>> +++++++++++++++++++++++--
->>>>    arch/x86/tools/relocs.h                      |    4
->>>>    arch/x86/tools/relocs_common.c               |   15 +-
->>>>    arch/x86/xen/xen-asm.S                       |   12 -
->>>>    arch/x86/xen/xen-head.S                      |    9 -
->>>>    arch/x86/xen/xen-pvh.S                       |   13 +
->>>>    drivers/base/firmware_class.c                |    4
->>>>    include/asm-generic/sections.h               |    6
->>>>    include/asm-generic/vmlinux.lds.h            |   12 +
->>>>    include/linux/compiler.h                     |    8 +
->>>>    init/Kconfig                                 |    9 +
->>>>    kernel/kallsyms.c                            |   16 +-
->>>>    kernel/trace/trace.h                         |    4
->>>>    lib/dynamic_debug.c                          |    4
->>>>    70 files changed, 1032 insertions(+), 308 deletions(-)
->>>>
->>
->>
->>
->
+>> This fixes the following coccinelle warning:
+>> WARNING: return of 0/1 in function 'ssi_is_hw_key' with return type bool.
+> 
+> This should be a description of the problem, so saying _why_ there is a problem or _what_ is wrong
+> with the code currently that warrants a patch. Sometimes while describing the problem you may
+> include descriptions of the solution especially it is not immediately obvious why your proposed
+> solution fixes the issue being explained. As an extra we shouldn't ever say 'This patch ...' or
+> 'This does xyz'.
+> 
+>> return "false" instead of 0.
+> 
+> Perfect, this is in imperative mood. Spot on!
+> 
+>> Signed-off-by: Suniel Mahesh <sunil.m@techveda.org>
+>> ---
+>> Changes for v3:
+>> - Changed the commit log even more to give an accurate
+>>   description of the changeset as suggested by Toby C.Harding.
+> 
+> My name is Tobin :)
 
+how did I blind myself, my bad, will be careful and avoid such mistakes moving forward.
 
+> 
+>> ---
+>> Changes for v2:
+>> - Changed the commit log to give a more accurate description
+>>   of the changeset as suggested by Toby C.Harding.
+>> ---
+>> Note:
+>> - Patch was built(ARCH=arm) on latest linux-next.
+>> - No build issues reported, however it was not
+>>   tested on real hardware.
+>> - Please discard this changeset, if this is not
+>>   helping the code look better.
+>> ---
+>>  drivers/staging/ccree/ssi_cipher.h | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/staging/ccree/ssi_cipher.h b/drivers/staging/ccree/ssi_cipher.h
+>> index c9a83df..f499962 100644
+>> --- a/drivers/staging/ccree/ssi_cipher.h
+>> +++ b/drivers/staging/ccree/ssi_cipher.h
+>> @@ -75,7 +75,7 @@ struct arm_hw_key_info {
+>>  
+>>  static inline bool ssi_is_hw_key(struct crypto_tfm *tfm)
+>>  {
+>> -	return 0;
+>> +	return false;
+>>  }
+>>  
+>>  #endif /* CRYPTO_TFM_REQ_HW_KEY */
+>> -- 
+>> 1.9.1
+>>
+> 
+> For what it's worth, Reviewed-by: Tobin C. Harding <me@tobin.cc>
+> 
+> As stated I am being particularly 'nit picky', the commit log is _probably_ good enough to be
+> merged, I am not a maintainer though so it's not really anything to do with me. I do know however
+> that sometimes patches go to the bottom of Greg's list if they have comments/suggestions. I mention
+> this only so you learn more about the process and to help you with successfully getting you patches
+> merged. Keep up the work!
 
--- 
-Thomas
+Thanks once again Tobin, I love feedback and that's how we can make this world a better workplace.
+
+Suniel
+
+> 
+> Good luck,
+> Tobin.
+> 
