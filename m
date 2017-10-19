@@ -1,98 +1,97 @@
-From: "Luis R. Rodriguez" <mcgrof@kernel.org>
-Subject: Re: [PATCH v1 15/27] compiler: Option to default to
-	hidden symbols
-Date: Thu, 19 Oct 2017 21:38:08 +0200
-Message-ID: <20171019193808.GI17331@wotan.suse.de>
-References: <20171011203027.11248-1-thgarnie@google.com>
- <20171011203027.11248-16-thgarnie@google.com>
- <20171012200201.GW11645@wotan.suse.de>
- <CAJcbSZEJ-kjcRQD3uHm0QZuOvbHpg9FV=wn7v4-RweDG7J3uqg@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Nicolas Pitre <nicolas.pitre@linaro.org>, Michal Hocko <mhocko@suse.com>,
- Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>, linux-doc@vger.kernel.org,
- Daniel Micay <danielmicay@gmail.com>, Len Brown <len.brown@intel.com>,
- Peter Zijlstra <peterz@infradead.org>, Christopher Li <sparse@chrisli.org>,
- Jan H =?iso-8859-1?Q?=2E_Sch=F6nherr?= <jschoenh@amazon.de>,
- Alexei Starovoitov <ast@kernel.org>, virtualization@lists.linux-foundation.org,
- David Howells <dhowells@redhat.com>,
- Paul Gortmaker <paul.gortmaker@windriver.com>,
- Waiman Long <longman@redhat.com>, Pavel Machek <pavel@ucw.cz>,
- "H . Peter Anvin" <hpa@zytor.com>,
- Kernel Hardening <kernel-hardening@lists.openwall.com>,
- Christoph Lameter <cl@linux.com>, Alok Kataria <akataria@vmware.com>,
- the arch/x86 maintainers <x86@kernel.org>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- Daniel Borkmann <daniel@iogearbox.net>, Jonatha
-To: Thomas Garnier <thgarnie@google.com>
-Return-path: <xen-devel-bounces@lists.xen.org>
-Content-Disposition: inline
-In-Reply-To: <CAJcbSZEJ-kjcRQD3uHm0QZuOvbHpg9FV=wn7v4-RweDG7J3uqg@mail.gmail.com>
-List-Unsubscribe: <https://lists.xen.org/cgi-bin/mailman/options/xen-devel>,
- <mailto:xen-devel-request@lists.xen.org?subject=unsubscribe>
-List-Post: <mailto:xen-devel@lists.xen.org>
-List-Help: <mailto:xen-devel-request@lists.xen.org?subject=help>
-List-Subscribe: <https://lists.xen.org/cgi-bin/mailman/listinfo/xen-devel>,
- <mailto:xen-devel-request@lists.xen.org?subject=subscribe>
-Errors-To: xen-devel-bounces@lists.xen.org
-Sender: "Xen-devel" <xen-devel-bounces@lists.xen.org>
-List-Id: linux-crypto.vger.kernel.org
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: [PATCH 1/2] random: always call random ready function
+Date: Thu, 19 Oct 2017 22:45:05 +0200
+Message-ID: <20171019204506.25090-1-Jason@zx2c4.com>
+References: <CAHmME9qwoSwFi7fsg1Z+gcEh1fBY+KY2rJ81UTHYn2ZMcjjwFA@mail.gmail.com>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Kees Cook <keescook@chromium.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+        tytso@mit.edu, gregkh@linuxfoundation.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from frisell.zx2c4.com ([192.95.5.64]:57167 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753212AbdJSUp0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 19 Oct 2017 16:45:26 -0400
+In-Reply-To: <CAHmME9qwoSwFi7fsg1Z+gcEh1fBY+KY2rJ81UTHYn2ZMcjjwFA@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-T24gV2VkLCBPY3QgMTgsIDIwMTcgYXQgMDQ6MTU6MTBQTSAtMDcwMCwgVGhvbWFzIEdhcm5pZXIg
-d3JvdGU6Cj4gT24gVGh1LCBPY3QgMTIsIDIwMTcgYXQgMTowMiBQTSwgTHVpcyBSLiBSb2RyaWd1
-ZXogPG1jZ3JvZkBrZXJuZWwub3JnPiB3cm90ZToKPiA+IE9uIFdlZCwgT2N0IDExLCAyMDE3IGF0
-IDAxOjMwOjE1UE0gLTA3MDAsIFRob21hcyBHYXJuaWVyIHdyb3RlOgo+ID4+IGRpZmYgLS1naXQg
-YS9pbmNsdWRlL2xpbnV4L2NvbXBpbGVyLmggYi9pbmNsdWRlL2xpbnV4L2NvbXBpbGVyLmgKPiA+
-PiBpbmRleCBlOTVhMjYzMWU1NDUuLjY5OTc3MTZmNzNiZiAxMDA2NDQKPiA+PiAtLS0gYS9pbmNs
-dWRlL2xpbnV4L2NvbXBpbGVyLmgKPiA+PiArKysgYi9pbmNsdWRlL2xpbnV4L2NvbXBpbGVyLmgK
-PiA+PiBAQCAtNzgsNiArNzgsMTQgQEAgZXh0ZXJuIHZvaWQgX19jaGtfaW9fcHRyKGNvbnN0IHZv
-bGF0aWxlIHZvaWQgX19pb21lbSAqKTsKPiA+PiAgI2luY2x1ZGUgPGxpbnV4L2NvbXBpbGVyLWNs
-YW5nLmg+Cj4gPj4gICNlbmRpZgo+ID4+Cj4gPj4gKy8qIFVzZWZ1bCBmb3IgUG9zaXRpb24gSW5k
-ZXBlbmRlbnQgQ29kZSB0byByZWR1Y2UgZ2xvYmFsIHJlZmVyZW5jZXMgKi8KPiA+PiArI2lmZGVm
-IENPTkZJR19ERUZBVUxUX0hJRERFTgo+ID4+ICsjcHJhZ21hIEdDQyB2aXNpYmlsaXR5IHB1c2go
-aGlkZGVuKQo+ID4+ICsjZGVmaW5lIF9fZGVmYXVsdF92aXNpYmlsaXR5ICBfX2F0dHJpYnV0ZV9f
-KCh2aXNpYmlsaXR5ICgiZGVmYXVsdCIpKSkKPiA+Cj4gPiBEb2VzIHRoaXMgc3RpbGwgd29yayB3
-aXRoIENPTkZJR19MRF9ERUFEX0NPREVfREFUQV9FTElNSU5BVElPTiA/Cj4gCj4gSSBjYW5ub3Qg
-bWFrZSBpdCB3b3JrIHdpdGggb3Igd2l0aG91dCB0aGlzIGNoYW5nZS4gSG93IGlzIGl0IHN1cHBv
-c2VkCj4gdG8gYmUgdXNlZD8KClNhZGx5IEkgZG9uJ3QgdGhpbmsgbXVjaCBkb2N1bWVudGF0aW9u
-IHdhcyByZWFsbHkgYWRkZWQgYXMgcGFydCBvZiB0aGUgTmljaydzCmNvbW1pdHMgYWJvdXQgZmVh
-dHVyZSwgZXZlbiB0aG91Z2ggY29tbWl0IGI2NzA2N2YxMTc2ICgia2J1aWxkOiBhbGxvdyBhcmNo
-cyB0bwpzZWxlY3QgbGluayBkZWFkIGNvZGUvZGF0YSBlbGltaW5hdGlvbiIpICpkb2VzKiBzYXkg
-dGhpcyB3YXMgZG9jdW1lbnRlZC4KClNpZGUgcmFudDogdGhlIHdob2xlIENPTkZJR19MVE8gcmVt
-b3ZhbCB3YXMgbWVyZ2VkIGluIHRoZSBzYW1lIGNvbW1pdCB3aXRob3V0CnRoaXMgaGF2aW5nIGdv
-bmUgaW4gYXMgYSBzZXBhcmF0ZSBhdG9taWMgcGF0Y2guCgpOaWNrIGNhbiB5b3UgcHJvdmlkZSBh
-IGJpdCBtb3JlIGd1aWRhbmNlIGFib3V0IGhvdyB0byBnZXQgdGhpcyBmZWF0dXJlIGdvaW5nIG9y
-CnRlc3RlZCBvbiBhbiBhcmNoaXRlY3R1cmU/IE9yIGFyZSB5b3UganVzdCBzdGlja2luZyB0byBh
-c3N1bWluZyBmb2xrcyB1c2luZyB0aGUKbGlua2VyIC8gY29tcGlsZXIgZmxhZ3Mgd2lsbCBrbm93
-IHdoYXQgdG8gZG8/ICpTb21lKiBndWlkYW5jZSBjb3VsZCBoZWxwLgoKPiBGb3IgbWUgd2l0aCwg
-aXQgY3Jhc2hlcyB3aXRoIGEgYmFkIGNvbnNkZXYgYXQ6Cj4gaHR0cDovL2VsaXhpci5mcmVlLWVs
-ZWN0cm9ucy5jb20vbGludXgvbGF0ZXN0L3NvdXJjZS9kcml2ZXJzL3R0eS90dHlfaW8uYyNMMzE5
-NAoKRnJvbSBteSByZWFkaW5nIG9mIHRoZSBjb21taXQgbG9nIGhlIG9ubHkgaGFkIHRlc3RlZCBp
-dCB3aXRoIHdpdGggcG93ZXJwYzY0bGUsCmVhY2ggb3RoZXIgYXJjaGl0ZWN0dXJlIHdvdWxkIGhh
-dmUgdG8gZG8gd29yayB0byBnZXQgYXMgZmFyIGFzIGV2ZW4gYm9vdGluZy4KCkl0IHdvdWxkIHJl
-cXVpcmUgc29tZW9uZSB0aGVuIHRlc3RpbmcgTmljaydzIHBhdGNoZXMgYWdhaW5zdCBhIHdvcmtp
-bmcKcG93ZXJwYyBzZXR1cCB0byBlbnN1cmUgd2UgZG9uJ3QgcmVncmVzcyB0aGVyZS4KCj4gPj4g
-ZGlmZiAtLWdpdCBhL2luaXQvS2NvbmZpZyBiL2luaXQvS2NvbmZpZwo+ID4+IGluZGV4IGNjYjFk
-OGRhZjI0MS4uYjY0MDIwMWZjZmY3IDEwMDY0NAo+ID4+IC0tLSBhL2luaXQvS2NvbmZpZwo+ID4+
-ICsrKyBiL2luaXQvS2NvbmZpZwo+ID4+IEBAIC0xNjQ5LDYgKzE2NDksMTMgQEAgY29uZmlnIFBS
-T0ZJTElORwo+ID4+ICBjb25maWcgVFJBQ0VQT0lOVFMKPiA+PiAgICAgICBib29sCj4gPj4KPiA+
-PiArIwo+ID4+ICsjIERlZmF1bHQgdG8gaGlkZGVuIHZpc2liaWxpdHkgZm9yIGFsbCBzeW1ib2xz
-Lgo+ID4+ICsjIFVzZWZ1bCBmb3IgUG9zaXRpb24gSW5kZXBlbmRlbnQgQ29kZSB0byByZWR1Y2Ug
-Z2xvYmFsIHJlZmVyZW5jZXMuCj4gPj4gKyMKPiA+PiArY29uZmlnIERFRkFVTFRfSElEREVOCj4g
-Pj4gKyAgICAgYm9vbAo+ID4KPiA+IE5vdGUgaXQgaXMgZGVmYXVsdC4KPiA+Cj4gPiBIYXMgMC1k
-YXkgcmFuIHRocm91Z2ggdGhpcyBnaXQgdHJlZT8gSXQgc2hvdWxkIGJlIGVhc3kgdG8gZ2V0IGl0
-IGFkZGVkIGZvcgo+ID4gdGVzdGluZy4gQWxzbywgZXZlbiB0aG91Z2ggbW9zdCBjaGFuZ2VzIGFy
-ZSB4ODYgYmFzZWQgdGhlcmUgYXJlIHNvbWUgZ2VuZXJpYwo+ID4gY2hhbmdlcyBhbmQgSSdkIGxv
-dmUgYSB3YXJtIGZ1enp5IHRoaXMgd29uJ3QgYnJlYWsgb2RkIC8gcmFuZG9tIGJ1aWxkcy4KPiA+
-IEFsdGhvdWdoIDAtZGF5IGRvZXMgY292ZXIgYSBsb3Qgb2YgdGVzdCBjYXNlcywgaXQgb25seSBo
-YXMgbGltaXRlZCBydW4gdGltZQo+ID4gdGVzdHMuIFRoZXJlIGFyZSBzb21lIG90aGVyIHRlc3Qg
-YmVkcyB3aGljaCBhbHNvIGNvdmVyIHNvbWUgbW9yZSBvYnNjdXJlCj4gPiBhcmNoaXRlY3R1cmVz
-LiBIYXZpbmcgYSB0ZXN0IHBhc3Mgb24gR3VlbnRlcidzIHRlc3QgYmVkIHdvdWxkIGJlIG5pY2Ug
-dG8KPiA+IHNlZS4gRm9yIHRoYXQgcGxlYXNlIGNvb3JkaW5hdGUgd2l0aCBHdWVudGVyIGlmIGhl
-J3Mgd2lsbGluZyB0byBydW4gdGhpcwo+ID4gYSB0ZXN0IGZvciB5b3UuCj4gCj4gTm90IHlldCwg
-cGxhbiB0byBnaXZlIGEgdjEuNSB0byBLZWVzIENvb2sgdG8ga2VlcCBpbiBvbmUgb2YgaGlzIHRy
-ZWUKPiBmb3IgY291cGxlIHdlZWtzLiBJIGV4cGVjdCBpdCB3aWxsIGlkZW50aWZ5IGludGVyZXN0
-aW5nIGlzc3Vlcy4KCkkgYmV0IDopCgogIEx1aXMKCl9fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fClhlbi1kZXZlbCBtYWlsaW5nIGxpc3QKWGVuLWRldmVsQGxp
-c3RzLnhlbi5vcmcKaHR0cHM6Ly9saXN0cy54ZW4ub3JnL3hlbi1kZXZlbAo=
+As this interface becomes more heavily used, it will be painful for
+callers to always need to check for -EALREADY.
+
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+---
+ drivers/char/random.c | 24 ++++++++++++++++--------
+ 1 file changed, 16 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index 8ad92707e45f..e161acf35d4a 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -1556,40 +1556,45 @@ EXPORT_SYMBOL(wait_for_random_bytes);
+ 
+ /*
+  * Add a callback function that will be invoked when the nonblocking
+- * pool is initialised.
++ * pool is initialised, or calls that function if it already is.
+  *
+  * returns: 0 if callback is successfully added
+- *	    -EALREADY if pool is already initialised (callback not called)
+  *	    -ENOENT if module for callback is not alive
+  */
+ int add_random_ready_callback(struct random_ready_callback *rdy)
+ {
+ 	struct module *owner;
+ 	unsigned long flags;
+-	int err = -EALREADY;
+ 
+-	if (crng_ready())
+-		return err;
++	BUG_ON(!rdy->func);
++
++	if (crng_ready()) {
++		rdy->func(rdy);
++		rdy->func = NULL;
++		return 0;
++	}
+ 
+ 	owner = rdy->owner;
+ 	if (!try_module_get(owner))
+ 		return -ENOENT;
+ 
+ 	spin_lock_irqsave(&random_ready_list_lock, flags);
+-	if (crng_ready())
++	if (crng_ready()) {
++		rdy->func(rdy);
++		rdy->func = NULL;
+ 		goto out;
++	}
+ 
+ 	owner = NULL;
+ 
+ 	list_add(&rdy->list, &random_ready_list);
+-	err = 0;
+ 
+ out:
+ 	spin_unlock_irqrestore(&random_ready_list_lock, flags);
+ 
+ 	module_put(owner);
+ 
+-	return err;
++	return 0;
+ }
+ EXPORT_SYMBOL(add_random_ready_callback);
+ 
+@@ -1601,6 +1606,9 @@ void del_random_ready_callback(struct random_ready_callback *rdy)
+ 	unsigned long flags;
+ 	struct module *owner = NULL;
+ 
++	if (!rdy->func)
++		return;
++
+ 	spin_lock_irqsave(&random_ready_list_lock, flags);
+ 	if (!list_empty(&rdy->list)) {
+ 		list_del_init(&rdy->list);
+-- 
+2.14.2
