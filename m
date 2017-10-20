@@ -1,7 +1,7 @@
 From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: [Part2 PATCH v6 20/38] crypto: ccp: Implement SEV_PDH_CERT_EXPORT ioctl command
-Date: Thu, 19 Oct 2017 21:33:55 -0500
-Message-ID: <20171020023413.122280-21-brijesh.singh@amd.com>
+Subject: [Part2 PATCH v6 16/38] crypto: ccp: Implement SEV_PEK_GEN ioctl command
+Date: Thu, 19 Oct 2017 21:33:51 -0500
+Message-ID: <20171020023413.122280-17-brijesh.singh@amd.com>
 References: <20171020023413.122280-1-brijesh.singh@amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -15,13 +15,13 @@ Cc: bp@alien8.de, Brijesh Singh <brijesh.singh@amd.com>,
         Tom Lendacky <thomas.lendacky@amd.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: kvm@vger.kernel.org
-Return-path: <kvm-owner@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20171020023413.122280-1-brijesh.singh@amd.com>
-Sender: kvm-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The SEV_PDH_CERT_EXPORT command can be used to export the PDH and its
-certificate chain. The command is defined in SEV spec section 5.10.
+The SEV_PEK_GEN command is used to generate a new Platform Endorsement
+Key (PEK). The command is defined in SEV spec section 5.6.
 
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: "Radim Krčmář" <rkrcmar@redhat.com>
@@ -34,122 +34,44 @@ Cc: kvm@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- drivers/crypto/ccp/psp-dev.c | 99 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 99 insertions(+)
+ drivers/crypto/ccp/psp-dev.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
 diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
-index 89242d4d1067..ad4f67bc0d71 100644
+index 5c921b36bc23..1d7212da25a5 100644
 --- a/drivers/crypto/ccp/psp-dev.c
 +++ b/drivers/crypto/ccp/psp-dev.c
-@@ -359,6 +359,102 @@ static int sev_ioctl_do_pek_cert_import(struct sev_issue_cmd *argp)
+@@ -195,6 +195,24 @@ static int sev_ioctl_do_platform_status(struct sev_issue_cmd *argp)
  	return ret;
  }
  
-+static int sev_ioctl_do_pdh_cert_export(struct sev_issue_cmd *argp)
++static int sev_ioctl_do_pek_pdh_gen(int cmd, struct sev_issue_cmd *argp)
 +{
-+	struct sev_user_data_pdh_cert_export input;
-+	void *pdh_blob = NULL, *cert_blob = NULL;
-+	struct sev_data_pdh_cert_export *data;
 +	int ret, err;
 +
-+	if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
-+		return -EFAULT;
-+
-+	data = kzalloc(sizeof(*data), GFP_KERNEL);
-+	if (!data)
-+		return -ENOMEM;
-+
-+	/* Userspace wants to query the certificate length */
-+	if (!input.pdh_cert_address || !input.pdh_cert_len ||
-+	    !input.cert_chain_address || !input.cert_chain_address)
-+		goto cmd;
-+
-+	/* allocate a physically contiguous buffer to store the PDH blob */
-+	if (!access_ok(VERIFY_WRITE, input.pdh_cert_address, input.pdh_cert_len) ||
-+	    (input.pdh_cert_len > SEV_FW_BLOB_MAX_SIZE)) {
-+		ret = -EFAULT;
-+		goto e_free;
-+	}
-+
-+	pdh_blob = kmalloc(input.pdh_cert_len, GFP_KERNEL);
-+	if (!pdh_blob) {
-+		ret = -ENOMEM;
-+		goto e_free;
-+	}
-+
-+	data->pdh_cert_address = __psp_pa(pdh_blob);
-+	data->pdh_cert_len = input.pdh_cert_len;
-+
-+	/* allocate a physically contiguous buffer to store the cert chain blob */
-+	if (!access_ok(VERIFY_WRITE, input.cert_chain_address, input.cert_chain_len) ||
-+	    (input.cert_chain_len > SEV_FW_BLOB_MAX_SIZE)) {
-+		ret = -EFAULT;
-+		goto e_free_pdh;
-+	}
-+
-+	cert_blob = kmalloc(input.cert_chain_len, GFP_KERNEL);
-+	if (!cert_blob) {
-+		ret = -ENOMEM;
-+		goto e_free_pdh;
-+	}
-+
-+	data->cert_chain_address = __psp_pa(cert_blob);
-+	data->cert_chain_len = input.cert_chain_len;
-+
-+cmd:
 +	ret = sev_platform_init(NULL, &argp->error);
 +	if (ret)
-+		goto e_free_cert;
++		return ret;
 +
-+	ret = sev_do_cmd(SEV_CMD_PDH_CERT_EXPORT, data, &argp->error);
-+
-+	/*
-+	 * If we query the length, FW responded with expected data
-+	 */
-+	input.cert_chain_len = data->cert_chain_len;
-+	input.pdh_cert_len = data->pdh_cert_len;
-+
-+	if (copy_to_user((void __user *)argp->data, &input, sizeof(input)))
-+		ret = -EFAULT;
++	ret = sev_do_cmd(cmd, 0, &argp->error);
 +
 +	if (sev_platform_shutdown(&err)) {
-+		ret = -EIO;
 +		argp->error = err;
-+		goto e_free_cert;
++		ret = -EIO;
 +	}
 +
-+	if (pdh_blob) {
-+		if (copy_to_user((void __user *)input.pdh_cert_address,
-+				 pdh_blob, input.pdh_cert_len)) {
-+			ret = -EFAULT;
-+			goto e_free_cert;
-+		}
-+	}
-+
-+	if (cert_blob) {
-+		if (copy_to_user((void __user *)input.cert_chain_address,
-+				 cert_blob, input.cert_chain_len))
-+			ret = -EFAULT;
-+	}
-+
-+e_free_cert:
-+	kfree(cert_blob);
-+e_free_pdh:
-+	kfree(pdh_blob);
-+e_free:
-+	kfree(data);
 +	return ret;
 +}
 +
  static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
  {
  	void __user *argp = (void __user *)arg;
-@@ -394,6 +490,9 @@ static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
- 	case SEV_PEK_CERT_IMPORT:
- 		ret = sev_ioctl_do_pek_cert_import(&input);
+@@ -218,6 +236,9 @@ static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
+ 	case SEV_PLATFORM_STATUS:
+ 		ret = sev_ioctl_do_platform_status(&input);
  		break;
-+	case SEV_PDH_CERT_EXPORT:
-+		ret = sev_ioctl_do_pdh_cert_export(&input);
++	case SEV_PEK_GEN:
++		ret = sev_ioctl_do_pek_pdh_gen(SEV_CMD_PEK_GEN, &input);
 +		break;
  	default:
  		ret = -EINVAL;
