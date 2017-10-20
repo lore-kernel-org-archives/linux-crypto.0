@@ -1,7 +1,7 @@
 From: Andy Lutomirski <luto@amacapital.net>
 Subject: Re: [PATCH v1 06/27] x86/entry/64: Adapt assembly for PIE support
-Date: Fri, 20 Oct 2017 18:27:24 +0200
-Message-ID: <1F0B8A18-092F-42AF-91B4-7A5D414ED83D@amacapital.net>
+Date: Fri, 20 Oct 2017 19:52:17 +0200
+Message-ID: <3EA62B98-ED93-48BC-9113-05CA09E6FC5E@amacapital.net>
 References: <20171011203027.11248-1-thgarnie@google.com> <20171011203027.11248-7-thgarnie@google.com> <20171020082646.bkxrps35sb3gq2nr@gmail.com> <CAJcbSZFScsqOORMGXFQdsqcN5xbfHWpzSHGdxQB=45zgSDryLw@mail.gmail.com> <20171020152028.syq6woeet6it3z3h@gmail.com>
 Mime-Version: 1.0 (1.0)
 Content-Type: text/plain;
@@ -24,7 +24,7 @@ Cc: Thomas Garnier <thgarnie@google.com>,
  Alok Kataria <akataria@vmware.com>, Rusty Russell <rusty@rustcorp.com.au>,
  Tejun Heo <tj@kernel
 To: Ingo Molnar <mingo@kernel.org>
-Return-path: <kernel-hardening-return-10213-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
+Return-path: <kernel-hardening-return-10214-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
 List-Post: <mailto:kernel-hardening@lists.openwall.com>
 List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
 List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
@@ -58,12 +58,10 @@ prinking=20
 >=20
 > I have no good idea how to solve this.
 >=20
-
-How about:
-
-.macro JMP_TO_LABEL ...
-
-
 > Thanks,
+
+Ugh, brain was off.  This is a bit messy. We could use a macro for this, too=
+, I suppose.
+
 >=20
 >    Ingo
