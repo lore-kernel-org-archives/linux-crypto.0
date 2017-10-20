@@ -1,7 +1,7 @@
 From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: [Part2 PATCH v6 15/38] crypto: ccp: Implement SEV_PLATFORM_STATUS ioctl command
-Date: Thu, 19 Oct 2017 21:33:50 -0500
-Message-ID: <20171020023413.122280-16-brijesh.singh@amd.com>
+Subject: [Part2 PATCH v6 14/38] crypto: ccp: Implement SEV_FACTORY_RESET ioctl command
+Date: Thu, 19 Oct 2017 21:33:49 -0500
+Message-ID: <20171020023413.122280-15-brijesh.singh@amd.com>
 References: <20171020023413.122280-1-brijesh.singh@amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -20,9 +20,9 @@ In-Reply-To: <20171020023413.122280-1-brijesh.singh@amd.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The SEV_PLATFORM_STATUS command can be used by the platform owner to
-get the current status of the platform. The command is defined in
-SEV spec section 5.5.
+The SEV_FACTORY_RESET command can be used by the platform owner to
+reset the non-volatile SEV related data. The command is defined in
+SEV spec section 5.4
 
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: "Radim Krčmář" <rkrcmar@redhat.com>
@@ -36,50 +36,47 @@ Cc: linux-kernel@vger.kernel.org
 Improvements-by: Borislav Petkov <bp@suse.de>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- drivers/crypto/ccp/psp-dev.c | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ drivers/crypto/ccp/psp-dev.c | 28 +++++++++++++++++++++++++++-
+ 1 file changed, 27 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
-index 99f3761206da..5c921b36bc23 100644
+index e9966d5fc6c4..99f3761206da 100644
 --- a/drivers/crypto/ccp/psp-dev.c
 +++ b/drivers/crypto/ccp/psp-dev.c
-@@ -174,6 +174,27 @@ static int sev_do_cmd(int cmd, void *data, int *psp_ret)
- 	return ret;
- }
+@@ -176,7 +176,33 @@ static int sev_do_cmd(int cmd, void *data, int *psp_ret)
  
-+static int sev_ioctl_do_platform_status(struct sev_issue_cmd *argp)
-+{
-+	struct sev_user_data_status *data;
-+	int ret;
-+
-+	data = kzalloc(sizeof(*data), GFP_KERNEL);
-+	if (!data)
-+		return -ENOMEM;
-+
-+	ret = sev_do_cmd(SEV_CMD_PLATFORM_STATUS, data, &argp->error);
-+	if (ret)
-+		goto e_free;
-+
-+	if (copy_to_user((void __user *)argp->data, data, sizeof(*data)))
-+		ret = -EFAULT;
-+
-+e_free:
-+	kfree(data);
-+	return ret;
-+}
-+
  static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
  {
- 	void __user *argp = (void __user *)arg;
-@@ -194,6 +215,9 @@ static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
- 	case SEV_FACTORY_RESET:
- 		ret = sev_do_cmd(SEV_CMD_FACTORY_RESET, 0, &input.error);
- 		break;
-+	case SEV_PLATFORM_STATUS:
-+		ret = sev_ioctl_do_platform_status(&input);
+-	return -ENOTTY;
++	void __user *argp = (void __user *)arg;
++	struct sev_issue_cmd input;
++	int ret = -EFAULT;
++
++	if (ioctl != SEV_ISSUE_CMD)
++		return -EINVAL;
++
++	if (copy_from_user(&input, argp, sizeof(struct sev_issue_cmd)))
++		return -EFAULT;
++
++	if (input.cmd > SEV_MAX)
++		return -EINVAL;
++
++	switch (input.cmd) {
++
++	case SEV_FACTORY_RESET:
++		ret = sev_do_cmd(SEV_CMD_FACTORY_RESET, 0, &input.error);
 +		break;
- 	default:
- 		ret = -EINVAL;
- 		goto out;
++	default:
++		ret = -EINVAL;
++		goto out;
++	}
++
++	if (copy_to_user(argp, &input, sizeof(struct sev_issue_cmd)))
++		ret = -EFAULT;
++out:
++	return ret;
+ }
+ 
+ static const struct file_operations sev_fops = {
 -- 
 2.9.5
