@@ -1,65 +1,64 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH 1/2] crypto-testmgr: Use common error handling code in drbg_cavs_test()
-Date: Sat, 21 Oct 2017 21:07:28 +0200
-Message-ID: <6795494.nv2bFMflat@tauon.chronox.de>
-References: <7c2b4df8-a04b-cacd-13ba-4d9afb346263@users.sourceforge.net> <7aa0ec0b-c00e-44c0-1c07-6bd87e2b6c47@users.sourceforge.net>
+Subject: Re: [PATCH 2/2] crypto/drbg: account for no longer returning -EALREADY
+Date: Sat, 21 Oct 2017 21:22:52 +0200
+Message-ID: <1850213.PsBaiHKxjm@tauon.chronox.de>
+References: <CAHmME9qwoSwFi7fsg1Z+gcEh1fBY+KY2rJ81UTHYn2ZMcjjwFA@mail.gmail.com> <20171019204506.25090-1-Jason@zx2c4.com> <20171019204506.25090-2-Jason@zx2c4.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+Cc: Kees Cook <keescook@chromium.org>,
         LKML <linux-kernel@vger.kernel.org>,
-        kernel-janitors@vger.kernel.org
-To: SF Markus Elfring <elfring@users.sourceforge.net>
-Return-path: <kernel-janitors-owner@vger.kernel.org>
-In-Reply-To: <7aa0ec0b-c00e-44c0-1c07-6bd87e2b6c47@users.sourceforge.net>
-Sender: kernel-janitors-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+        linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+        tytso@mit.edu, gregkh@linuxfoundation.org
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:34968 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932159AbdJUTW6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 21 Oct 2017 15:22:58 -0400
+In-Reply-To: <20171019204506.25090-2-Jason@zx2c4.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Am Samstag, 21. Oktober 2017, 19:53:54 CEST schrieb SF Markus Elfring:
+Am Donnerstag, 19. Oktober 2017, 22:45:06 CEST schrieb Jason A. Donenfeld:
 
-Hi Markus,
+Hi Jason,
 
-> From: Markus Elfring <elfring@users.sourceforge.net>
-> Date: Sat, 21 Oct 2017 19:29:11 +0200
+> We now structure things in a way that assumes the seeding function is
+> always eventually called.
 > 
-> Adjust jump targets so that a bit of exception handling can be better
-> reused at the end of this function.
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> ---
+>  crypto/drbg.c | 20 +++++---------------
+>  1 file changed, 5 insertions(+), 15 deletions(-)
 > 
-> This issue was detected by using the Coccinelle software.
+> diff --git a/crypto/drbg.c b/crypto/drbg.c
+> index 70018397e59a..501e013cb96c 100644
+> --- a/crypto/drbg.c
+> +++ b/crypto/drbg.c
+> @@ -1411,18 +1411,8 @@ static int drbg_prepare_hrng(struct drbg_state *drbg)
+> 
+>  	err = add_random_ready_callback(&drbg->random_ready);
+> 
+> -	switch (err) {
+> -	case 0:
+> -		break;
+> -
+> -	case -EALREADY:
+> -		err = 0;
+> -		/* fall through */
+> -
+> -	default:
+> -		drbg->random_ready.func = NULL;
+> +	if (err)
+>  		return err;
 
-Thank you for this patch.
+Don't you change the logic flow here? In case the add_random_ready_callback 
+returns 0 because the ready function is already called due to crng_ready(), 
+the new code above in the patch set continues. But with the current code, it 
+will return at this point and do not perform the allocation below.
 
-> -outbuf:
-> +	ret = memcmp(test->expected, buf, test->expectedlen);
-> +free_rng:
->  	crypto_free_rng(drng);
-> +free_buffer:
->  	kzfree(buf);
->  	return ret;
-> +
-> +report_failure:
-> +	pr_err("alg: drbg: could not obtain random data for driver %s\n",
-> +	       driver);
-> +	goto free_rng;
 
-Though, jumping back and forth like this with goto directives is something 
-that looks a bit strange. At least to my taste, may I suggest to have gotos 
-pointing only downwards and not up again? (Note, the same applies to the 
-ansi_cprng patch set).
-
-What about something like following:
-
-...
-    memcmp
-    goto free_rng;
-
-report_failure:
-    <failure report>
-
-free_rng:
-    <the deallocation code>
 
 Ciao
 Stephan
