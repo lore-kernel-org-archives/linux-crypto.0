@@ -1,8 +1,7 @@
 From: SF Markus Elfring <elfring@users.sourceforge.net>
-Subject: [PATCH 2/3] crypto-ansi_cprng: Delete two variable assignments in
- get_prng_bytes()
-Date: Sat, 21 Oct 2017 19:15:54 +0200
-Message-ID: <7318b066-5233-426e-4b21-d4969b96bf67@users.sourceforge.net>
+Subject: [PATCH 3/3] crypto-ansi_cprng: Delete unnecessary blank lines
+Date: Sat, 21 Oct 2017 19:17:25 +0200
+Message-ID: <7c466b3a-ca32-b946-f36e-a963c31a2320@users.sourceforge.net>
 References: <d284473a-b968-2b3e-9147-1c8598a26f7c@users.sourceforge.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
@@ -13,57 +12,94 @@ To: linux-crypto@vger.kernel.org,
         "David S. Miller" <davem@davemloft.net>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Neil Horman <nhorman@tuxdriver.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mout.web.de ([212.227.15.3]:58160 "EHLO mout.web.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932149AbdJURSf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 21 Oct 2017 13:18:35 -0400
 In-Reply-To: <d284473a-b968-2b3e-9147-1c8598a26f7c@users.sourceforge.net>
 Content-Language: en-GB
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Sat, 21 Oct 2017 16:10:43 +0200
+Date: Sat, 21 Oct 2017 16:27:56 +0200
 
-Adjust a jump target so that two error code assignments which are redundant
-before condition checks can be removed because the same value will be set
-as an exception handling at the end of this function.
+The script "checkpatch.pl" pointed information out like the following.
+
+CHECK: Please don't use multiple blank lines
+
+Thus fix the affected source code places.
 
 Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
 ---
- crypto/ansi_cprng.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+ crypto/ansi_cprng.c | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
 
 diff --git a/crypto/ansi_cprng.c b/crypto/ansi_cprng.c
-index 111c8982a47f..3d805bf6d0c6 100644
+index 3d805bf6d0c6..b9ec1975dde7 100644
 --- a/crypto/ansi_cprng.c
 +++ b/crypto/ansi_cprng.c
-@@ -192,19 +192,16 @@ static int get_prng_bytes(char *buf, size_t nbytes, struct prng_context *ctx,
+@@ -40,7 +40,6 @@
+  * for implementation details
+  */
  
- 
- 	spin_lock_bh(&ctx->prng_lock);
 -
--	err = -EINVAL;
- 	if (ctx->flags & PRNG_NEED_RESET)
--		goto unlock;
-+		goto failure_indication;
+ struct prng_context {
+ 	spinlock_t prng_lock;
+ 	unsigned char rand_data[DEFAULT_BLK_SZ];
+@@ -77,8 +76,8 @@ static void xor_vectors(unsigned char *in1, unsigned char *in2,
  
- 	/*
- 	 * If the FIXED_SIZE flag is on, only return whole blocks of
- 	 * pseudo random data
+ 	for (i = 0; i < size; i++)
+ 		out[i] = in1[i] ^ in2[i];
+-
+ }
++
+ /*
+  * Returns DEFAULT_BLK_SZ bytes of random data per call
+  * returns 0 if generation succeeded, <0 if something went wrong
+@@ -89,7 +88,6 @@ static int _get_more_prng_bytes(struct prng_context *ctx, int cont_test)
+ 	unsigned char tmp[DEFAULT_BLK_SZ];
+ 	unsigned char *output = NULL;
+ 
+-
+ 	dbgprint(KERN_CRIT "Calling _get_more_prng_bytes for context %p\n",
+ 		ctx);
+ 
+@@ -101,7 +99,6 @@ static int _get_more_prng_bytes(struct prng_context *ctx, int cont_test)
+ 	 * This algorithm is a 3 stage state machine
  	 */
--	err = -EINVAL;
- 	if (ctx->flags & PRNG_FIXED_SIZE) {
- 		if (nbytes < DEFAULT_BLK_SZ)
--			goto unlock;
-+			goto failure_indication;
- 		byte_count = DEFAULT_BLK_SZ;
+ 	for (i = 0; i < 3; i++) {
+-
+ 		switch (i) {
+ 		case 0:
+ 			/*
+@@ -156,10 +153,8 @@ static int _get_more_prng_bytes(struct prng_context *ctx, int cont_test)
+ 			break;
+ 		}
+ 
+-
+ 		/* do the encryption */
+ 		crypto_cipher_encrypt_one(ctx->tfm, output, tmp);
+-
  	}
  
-@@ -267,6 +264,7 @@ static int get_prng_bytes(char *buf, size_t nbytes, struct prng_context *ctx,
+ 	/*
+@@ -190,7 +185,6 @@ static int get_prng_bytes(char *buf, size_t nbytes, struct prng_context *ctx,
+ 	unsigned int byte_count = (unsigned int)nbytes;
+ 	int err;
  
- reset_memory:
- 	memset(buf, 0, nbytes);
-+failure_indication:
- 	err = -EINVAL;
- 	goto unlock;
- }
+-
+ 	spin_lock_bh(&ctx->prng_lock);
+ 	if (ctx->flags & PRNG_NEED_RESET)
+ 		goto failure_indication;
+@@ -214,7 +208,6 @@ static int get_prng_bytes(char *buf, size_t nbytes, struct prng_context *ctx,
+ 	dbgprint(KERN_CRIT "getting %d random bytes for context %p\n",
+ 		byte_count, ctx);
+ 
+-
+ remainder:
+ 	if (ctx->rand_data_valid == DEFAULT_BLK_SZ &&
+ 	    _get_more_prng_bytes(ctx, do_cont_test) < 0)
 -- 
 2.14.2
