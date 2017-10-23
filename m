@@ -1,38 +1,87 @@
-From: SviMik <svimik@gmail.com>
-Subject: invalid opcode: 0000 [#1] SMP [aesni_intel]
-Date: Mon, 23 Oct 2017 19:01:32 +0300
-Message-ID: <CA++DawbkD6nioFR70ph1J26erZAwt74egm-pPDXJEHNt-QDAGw@mail.gmail.com>
+From: Jason Gunthorpe <jgunthorpe@obsidianresearch.com>
+Subject: Re: [tpmdd-devel] [PATCH] tpm: remove chip_num parameter from
+ in-kernel API
+Date: Mon, 23 Oct 2017 10:31:39 -0600
+Message-ID: <20171023163139.GA17394@obsidianresearch.com>
+References: <20171023123817.18559-1-jarkko.sakkinen@linux.intel.com>
+ <cbcb78c6-fa36-32d3-891e-96544875d97c@linux.vnet.ibm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ua0-f175.google.com ([209.85.217.175]:53230 "EHLO
-        mail-ua0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751266AbdJWQBd (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 23 Oct 2017 12:01:33 -0400
-Received: by mail-ua0-f175.google.com with SMTP id i35so13263025uah.9
-        for <linux-crypto@vger.kernel.org>; Mon, 23 Oct 2017 09:01:33 -0700 (PDT)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        linux-integrity@vger.kernel.org,
+        David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "open list:INTEGRITY MEASUREMENT ARCHITECTURE IMA"
+        <linux-ima-user@lists.sourceforge.net>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        linux-security-module@vger.kernel.org,
+        "moderated list:TPM DEVICE DRIVER"
+        <tpmdd-devel@lists.sourceforge.net>,
+        "open list:KEYS-TRUSTED" <keyrings@vger.kernel.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        James Morris <james.l.morris@oracle.com>,
+        Matt Mackall <mpm@selenic.com>,
+        "open list:INTEGRITY MEASUREMENT ARCHITECTURE IMA"
+        <linux-ima-devel@lists.sourceforge.net>,
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <cbcb78c6-fa36-32d3-891e-96544875d97c@linux.vnet.ibm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi!
+On Mon, Oct 23, 2017 at 10:07:31AM -0400, Stefan Berger wrote:
 
-Got the following kernel panic:
+> >-int tpm_pcr_extend(u32 chip_num, int pcr_idx, const u8 *hash)
+> >+int tpm_pcr_extend(int pcr_idx, const u8 *hash)
+> >  {
+> 
+> 
+> I think every kernel internal TPM driver API should be called with the
+> tpm_chip as a parameter. This is in foresight of namespacing of IMA where we
+> want to provide the flexibility of passing a dedicated vTPM to each
+> namespace and IMA would use the chip as a parameter to all of these
+> functions to talk to the right tpm_vtpm_proxy instance. From that
+> perspective this patch goes into the wrong direction.
 
-invalid opcode: 0000 [#1] SMP
-CPU: 0 PID: 1449 Comm: openvpn Not tainted 4.8.13-1.el6.elrepo.x86_64 #1
-----cut----
-Call Trace:
-<IRQ>
-[<ffffffff810be15e>] ? enqueue_entity+0x45e/0x6f0
-[<ffffffffa0104f25>] ? aesni_gcm_enc_avx+0x95/0xd0 [aesni_intel]
-[<ffffffffa0105417>] helper_rfc4106_encrypt+0x167/0x2f0 [aesni_intel]
-[<ffffffffa0104bfb>] rfc4106_encrypt+0x5b/0x90 [aesni_intel]
-----cut----
+Yes, we should ultimately try and get to there.. Someday the
+tpm_chip_find_get() will need to become namespace aware.
 
-The detailed bug report with full oops dump can be found here:
-https://bugzilla.kernel.org/show_bug.cgi?id=197363
+But this patch is along the right path, eliminating the chip_num is
+the right thing to do..
 
-Could not trigger this bug intentionally, but it happened three times
-already (all three dumps are available).
+> >-	tpm2 = tpm_is_tpm2(TPM_ANY_NUM);
+> >+	tpm2 = tpm_is_tpm2();
+> >  	if (tpm2 < 0)
+> >  		return tpm2;
+> >
+> >@@ -1008,7 +1007,7 @@ static int trusted_instantiate(struct key *key,
+> >  	switch (key_cmd) {
+> >  	case Opt_load:
+> >  		if (tpm2)
+> >-			ret = tpm_unseal_trusted(TPM_ANY_NUM, payload, options);
+> >+			ret = tpm_unseal_trusted(payload, options);
+
+Sequences like this are sketchy.
+
+It should be
+
+struct tpm_chip *tpm;
+
+tpm = tpm_chip_find_get()
+tpm2 = tpm_is_tpm2(tpm);
+
+[..]
+
+if (tpm2)
+     ret = tpm_unseal_trusted(tpm, payload, options);
+
+[..]
+
+tpm_put_chip(tpm);
+
+As hot plug could alter the 'tpm' between the two tpm calls.
+
+Jason
