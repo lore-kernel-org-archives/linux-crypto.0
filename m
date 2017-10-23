@@ -1,8 +1,8 @@
 From: Brijesh Singh <brijesh.singh@amd.com>
 Subject: [Part2 PATCH v6.1 18/38] crypto: ccp: Implement SEV_PEK_CSR ioctl command
-Date: Mon, 23 Oct 2017 17:07:42 -0500
-Message-ID: <20171023220742.46877-1-brijesh.singh@amd.com>
-References: <20171020023413.122280-1-brijesh.singh@amd.com>
+Date: Mon, 23 Oct 2017 17:10:09 -0500
+Message-ID: <20171023221009.46924-1-brijesh.singh@amd.com>
+References: <20171020023413.122280-19-brijesh.singh@amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -17,12 +17,12 @@ Cc: Brijesh Singh <brijesh.singh@amd.com>,
         linux-kernel@vger.kernel.org
 To: Borislav Petkov <bp@alien8.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn3nam01on0063.outbound.protection.outlook.com ([104.47.33.63]:64905
-        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
+Received: from mail-by2nam01on0085.outbound.protection.outlook.com ([104.47.34.85]:42760
+        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751113AbdJWWH6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 23 Oct 2017 18:07:58 -0400
-In-Reply-To: <20171020023413.122280-1-brijesh.singh@amd.com>
+        id S1751209AbdJWWK6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 23 Oct 2017 18:10:58 -0400
+In-Reply-To: <20171020023413.122280-19-brijesh.singh@amd.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
