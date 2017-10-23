@@ -1,7 +1,7 @@
 From: Tudor Ambarus <tudor.ambarus@microchip.com>
-Subject: [PATCH 2/3] crypto: atmel-aes/tdes - remove empty function
-Date: Mon, 23 Oct 2017 18:34:40 +0300
-Message-ID: <20171023153441.28825-2-tudor.ambarus@microchip.com>
+Subject: [PATCH 3/3] crypto: atmel-aes/tdes/sha - remove useless irq init
+Date: Mon, 23 Oct 2017 18:34:41 +0300
+Message-ID: <20171023153441.28825-3-tudor.ambarus@microchip.com>
 References: <20171023153441.28825-1-tudor.ambarus@microchip.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -11,246 +11,60 @@ To: <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
 Received: from esa2.microchip.iphmx.com ([68.232.149.84]:53762 "EHLO
         esa2.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932102AbdJWPes (ORCPT
+        with ESMTP id S932102AbdJWPet (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 23 Oct 2017 11:34:48 -0400
+        Mon, 23 Oct 2017 11:34:49 -0400
 In-Reply-To: <20171023153441.28825-1-tudor.ambarus@microchip.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This empty function was used to initialize a member of a static structure.
-Pointer members of an object with static storage duration, if not
-explicitly initialized, will be initialized to a NULL pointer. The crypto
-API checks if this pointer is not NULL before using it, so we are safe to
-remove this empty function along with all the references to it.
+irq would be set to -1 and then unused, if we failed to get IORESOURCE_MEM.
 
 Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
 ---
- drivers/crypto/atmel-aes.c  | 14 --------------
- drivers/crypto/atmel-tdes.c | 18 ------------------
- 2 files changed, 32 deletions(-)
+ drivers/crypto/atmel-aes.c  | 2 --
+ drivers/crypto/atmel-sha.c  | 2 --
+ drivers/crypto/atmel-tdes.c | 2 --
+ 3 files changed, 6 deletions(-)
 
 diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
-index 9659759..bc859ab 100644
+index bc859ab..2048292 100644
 --- a/drivers/crypto/atmel-aes.c
 +++ b/drivers/crypto/atmel-aes.c
-@@ -1237,10 +1237,6 @@ static int atmel_aes_ctr_cra_init(struct crypto_tfm *tfm)
- 	return 0;
- }
+@@ -2644,8 +2644,6 @@ static int atmel_aes_probe(struct platform_device *pdev)
  
--static void atmel_aes_cra_exit(struct crypto_tfm *tfm)
--{
--}
+ 	crypto_init_queue(&aes_dd->queue, ATMEL_AES_QUEUE_LENGTH);
+ 
+-	aes_dd->irq = -1;
 -
- static struct crypto_alg aes_algs[] = {
- {
- 	.cra_name		= "ecb(aes)",
-@@ -1253,7 +1249,6 @@ static struct crypto_alg aes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_aes_cra_init,
--	.cra_exit		= atmel_aes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= AES_MIN_KEY_SIZE,
- 		.max_keysize	= AES_MAX_KEY_SIZE,
-@@ -1273,7 +1268,6 @@ static struct crypto_alg aes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_aes_cra_init,
--	.cra_exit		= atmel_aes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= AES_MIN_KEY_SIZE,
- 		.max_keysize	= AES_MAX_KEY_SIZE,
-@@ -1294,7 +1288,6 @@ static struct crypto_alg aes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_aes_cra_init,
--	.cra_exit		= atmel_aes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= AES_MIN_KEY_SIZE,
- 		.max_keysize	= AES_MAX_KEY_SIZE,
-@@ -1315,7 +1308,6 @@ static struct crypto_alg aes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_aes_cra_init,
--	.cra_exit		= atmel_aes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= AES_MIN_KEY_SIZE,
- 		.max_keysize	= AES_MAX_KEY_SIZE,
-@@ -1336,7 +1328,6 @@ static struct crypto_alg aes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_aes_cra_init,
--	.cra_exit		= atmel_aes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= AES_MIN_KEY_SIZE,
- 		.max_keysize	= AES_MAX_KEY_SIZE,
-@@ -1357,7 +1348,6 @@ static struct crypto_alg aes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_aes_cra_init,
--	.cra_exit		= atmel_aes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= AES_MIN_KEY_SIZE,
- 		.max_keysize	= AES_MAX_KEY_SIZE,
-@@ -1378,7 +1368,6 @@ static struct crypto_alg aes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_aes_cra_init,
--	.cra_exit		= atmel_aes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= AES_MIN_KEY_SIZE,
- 		.max_keysize	= AES_MAX_KEY_SIZE,
-@@ -1399,7 +1388,6 @@ static struct crypto_alg aes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_aes_ctr_cra_init,
--	.cra_exit		= atmel_aes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= AES_MIN_KEY_SIZE,
- 		.max_keysize	= AES_MAX_KEY_SIZE,
-@@ -1422,7 +1410,6 @@ static struct crypto_alg aes_cfb64_alg = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_aes_cra_init,
--	.cra_exit		= atmel_aes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= AES_MIN_KEY_SIZE,
- 		.max_keysize	= AES_MAX_KEY_SIZE,
-@@ -1956,7 +1943,6 @@ static struct crypto_alg aes_xts_alg = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_aes_xts_cra_init,
--	.cra_exit		= atmel_aes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= 2 * AES_MIN_KEY_SIZE,
- 		.max_keysize	= 2 * AES_MAX_KEY_SIZE,
+ 	/* Get the base address */
+ 	aes_res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+ 	if (!aes_res) {
+diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
+index 42c1f74..8874aa5 100644
+--- a/drivers/crypto/atmel-sha.c
++++ b/drivers/crypto/atmel-sha.c
+@@ -2777,8 +2777,6 @@ static int atmel_sha_probe(struct platform_device *pdev)
+ 
+ 	crypto_init_queue(&sha_dd->queue, ATMEL_SHA_QUEUE_LENGTH);
+ 
+-	sha_dd->irq = -1;
+-
+ 	/* Get the base address */
+ 	sha_res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+ 	if (!sha_res) {
 diff --git a/drivers/crypto/atmel-tdes.c b/drivers/crypto/atmel-tdes.c
-index 0ece4b8..48e8653 100644
+index 48e8653..592124f 100644
 --- a/drivers/crypto/atmel-tdes.c
 +++ b/drivers/crypto/atmel-tdes.c
-@@ -911,10 +911,6 @@ static int atmel_tdes_cra_init(struct crypto_tfm *tfm)
- 	return 0;
- }
+@@ -1363,8 +1363,6 @@ static int atmel_tdes_probe(struct platform_device *pdev)
  
--static void atmel_tdes_cra_exit(struct crypto_tfm *tfm)
--{
--}
+ 	crypto_init_queue(&tdes_dd->queue, ATMEL_TDES_QUEUE_LENGTH);
+ 
+-	tdes_dd->irq = -1;
 -
- static struct crypto_alg tdes_algs[] = {
- {
- 	.cra_name		= "ecb(des)",
-@@ -927,7 +923,6 @@ static struct crypto_alg tdes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_tdes_cra_init,
--	.cra_exit		= atmel_tdes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= DES_KEY_SIZE,
- 		.max_keysize	= DES_KEY_SIZE,
-@@ -947,7 +942,6 @@ static struct crypto_alg tdes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_tdes_cra_init,
--	.cra_exit		= atmel_tdes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= DES_KEY_SIZE,
- 		.max_keysize	= DES_KEY_SIZE,
-@@ -968,7 +962,6 @@ static struct crypto_alg tdes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_tdes_cra_init,
--	.cra_exit		= atmel_tdes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= DES_KEY_SIZE,
- 		.max_keysize	= DES_KEY_SIZE,
-@@ -989,7 +982,6 @@ static struct crypto_alg tdes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_tdes_cra_init,
--	.cra_exit		= atmel_tdes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= DES_KEY_SIZE,
- 		.max_keysize	= DES_KEY_SIZE,
-@@ -1010,7 +1002,6 @@ static struct crypto_alg tdes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_tdes_cra_init,
--	.cra_exit		= atmel_tdes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= DES_KEY_SIZE,
- 		.max_keysize	= DES_KEY_SIZE,
-@@ -1031,7 +1022,6 @@ static struct crypto_alg tdes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_tdes_cra_init,
--	.cra_exit		= atmel_tdes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= DES_KEY_SIZE,
- 		.max_keysize	= DES_KEY_SIZE,
-@@ -1052,7 +1042,6 @@ static struct crypto_alg tdes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_tdes_cra_init,
--	.cra_exit		= atmel_tdes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= DES_KEY_SIZE,
- 		.max_keysize	= DES_KEY_SIZE,
-@@ -1073,7 +1062,6 @@ static struct crypto_alg tdes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_tdes_cra_init,
--	.cra_exit		= atmel_tdes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= 2 * DES_KEY_SIZE,
- 		.max_keysize	= 3 * DES_KEY_SIZE,
-@@ -1093,7 +1081,6 @@ static struct crypto_alg tdes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_tdes_cra_init,
--	.cra_exit		= atmel_tdes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= 2*DES_KEY_SIZE,
- 		.max_keysize	= 3*DES_KEY_SIZE,
-@@ -1114,7 +1101,6 @@ static struct crypto_alg tdes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_tdes_cra_init,
--	.cra_exit		= atmel_tdes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= 2*DES_KEY_SIZE,
- 		.max_keysize	= 2*DES_KEY_SIZE,
-@@ -1135,7 +1121,6 @@ static struct crypto_alg tdes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_tdes_cra_init,
--	.cra_exit		= atmel_tdes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= 2*DES_KEY_SIZE,
- 		.max_keysize	= 2*DES_KEY_SIZE,
-@@ -1156,7 +1141,6 @@ static struct crypto_alg tdes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_tdes_cra_init,
--	.cra_exit		= atmel_tdes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= 2*DES_KEY_SIZE,
- 		.max_keysize	= 2*DES_KEY_SIZE,
-@@ -1177,7 +1161,6 @@ static struct crypto_alg tdes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_tdes_cra_init,
--	.cra_exit		= atmel_tdes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= 2*DES_KEY_SIZE,
- 		.max_keysize	= 2*DES_KEY_SIZE,
-@@ -1198,7 +1181,6 @@ static struct crypto_alg tdes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_tdes_cra_init,
--	.cra_exit		= atmel_tdes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= 2*DES_KEY_SIZE,
- 		.max_keysize	= 3*DES_KEY_SIZE,
+ 	/* Get the base address */
+ 	tdes_res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+ 	if (!tdes_res) {
 -- 
 2.9.4
