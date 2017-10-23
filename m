@@ -1,46 +1,57 @@
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [Part2 PATCH v6 16/38] crypto: ccp: Implement SEV_PEK_GEN ioctl
- command
-Date: Mon, 23 Oct 2017 16:10:32 +0200
-Message-ID: <20171023141032.GC3044@nazgul.tnic>
-References: <20171020023413.122280-1-brijesh.singh@amd.com>
- <20171020023413.122280-17-brijesh.singh@amd.com>
- <20171023093240.GC19523@nazgul.tnic>
- <ad140f6b-4e9d-7044-5e45-0c434511cb1a@amd.com>
- <20171023123223.GA24208@nazgul.tnic>
- <66c9f41e-868e-0d14-aaec-0858753c86d4@amd.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Gary Hook <gary.hook@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Brijesh Singh <brijesh.singh@amd.com>
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <66c9f41e-868e-0d14-aaec-0858753c86d4@amd.com>
-Sender: kvm-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Stephen Brennan <stephen@brennan.io>
+Subject: [PATCH] staging: ccree: Fix lines longer than 80 characters
+Date: Mon, 23 Oct 2017 07:53:18 -0700
+Message-ID: <20171023145318.8748-1-stephen@brennan.io>
+Cc: Stephen Brennan <stephen@brennan.io>
+To: Gilad Ben-Yossef <gilad@benyossef.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21353 "EHLO
+        sender-of-o52.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932285AbdJWOwv (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 23 Oct 2017 10:52:51 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Oct 23, 2017 at 08:32:57AM -0500, Brijesh Singh wrote:
-> If both the command fails then we return status from the last command.
-> IIRC, in my previous patches I was returning status from sev_do_cmd()
-> instead of sev_platform_shutdown() but based on our previous
-> communication I thought you asked to return the status from the last
-> failed command. Did I miss understood ?
+Simply break down some long lines and tab-indent them.
 
-So my problem is that it looks strange that you save an error value from
-sev_do_cmd() but you don't look at it. And as I said in the other mail,
-you should either ignore it and say so in a comment why it is OK to
-ignore it or handle it but not overwrite it without looking at it.
+Signed-off-by: Stephen Brennan <stephen@brennan.io>
+---
+I'm learning the patch submission process, and this is my first patch. I know
+it's trivial but I'm just trying to get my feet wet. Thanks in advance for
+taking the time to review this!
 
-Does that make more sense?
+ drivers/staging/ccree/ssi_pm.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
+diff --git a/drivers/staging/ccree/ssi_pm.c b/drivers/staging/ccree/ssi_pm.c
+index 11bbdbeec22e..98ba9e918d2a 100644
+--- a/drivers/staging/ccree/ssi_pm.c
++++ b/drivers/staging/ccree/ssi_pm.c
+@@ -41,7 +41,9 @@ int ssi_power_mgr_runtime_suspend(struct device *dev)
+ 	int rc;
+ 
+ 	dev_dbg(dev, "set HOST_POWER_DOWN_EN\n");
+-	WRITE_REGISTER(drvdata->cc_base + CC_REG_OFFSET(HOST_RGF, HOST_POWER_DOWN_EN), POWER_DOWN_ENABLE);
++	WRITE_REGISTER(
++		drvdata->cc_base + CC_REG_OFFSET(HOST_RGF, HOST_POWER_DOWN_EN),
++		POWER_DOWN_ENABLE);
+ 	rc = ssi_request_mgr_runtime_suspend_queue(drvdata);
+ 	if (rc != 0) {
+ 		dev_err(dev, "ssi_request_mgr_runtime_suspend_queue (%x)\n",
+@@ -60,7 +62,9 @@ int ssi_power_mgr_runtime_resume(struct device *dev)
+ 		(struct ssi_drvdata *)dev_get_drvdata(dev);
+ 
+ 	dev_dbg(dev, "unset HOST_POWER_DOWN_EN\n");
+-	WRITE_REGISTER(drvdata->cc_base + CC_REG_OFFSET(HOST_RGF, HOST_POWER_DOWN_EN), POWER_DOWN_DISABLE);
++	WRITE_REGISTER(
++		drvdata->cc_base + CC_REG_OFFSET(HOST_RGF, HOST_POWER_DOWN_EN),
++		POWER_DOWN_DISABLE);
+ 
+ 	rc = cc_clk_on(drvdata);
+ 	if (rc) {
 -- 
-Regards/Gruss,
-    Boris.
-
-ECO tip #101: Trim your mails when you reply.
---
+2.14.2
