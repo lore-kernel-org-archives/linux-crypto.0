@@ -1,87 +1,59 @@
-From: Jason Gunthorpe <jgunthorpe@obsidianresearch.com>
-Subject: Re: [tpmdd-devel] [PATCH] tpm: remove chip_num parameter from
- in-kernel API
-Date: Mon, 23 Oct 2017 10:31:39 -0600
-Message-ID: <20171023163139.GA17394@obsidianresearch.com>
-References: <20171023123817.18559-1-jarkko.sakkinen@linux.intel.com>
- <cbcb78c6-fa36-32d3-891e-96544875d97c@linux.vnet.ibm.com>
+From: Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [Part2 PATCH v6 13/38] crypto: ccp: Add Secure Encrypted
+ Virtualization (SEV) command support
+Date: Mon, 23 Oct 2017 14:57:04 -0500
+Message-ID: <f58e72e5-8636-2abb-99e9-c58f462463e7@amd.com>
+References: <20171020023413.122280-1-brijesh.singh@amd.com>
+ <20171020023413.122280-14-brijesh.singh@amd.com>
+ <20171023092020.GB19523@nazgul.tnic>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        linux-integrity@vger.kernel.org,
-        David Howells <dhowells@redhat.com>,
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: brijesh.singh@amd.com, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "open list:INTEGRITY MEASUREMENT ARCHITECTURE IMA"
-        <linux-ima-user@lists.sourceforge.net>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        linux-security-module@vger.kernel.org,
-        "moderated list:TPM DEVICE DRIVER"
-        <tpmdd-devel@lists.sourceforge.net>,
-        "open list:KEYS-TRUSTED" <keyrings@vger.kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        James Morris <james.l.morris@oracle.com>,
-        Matt Mackall <mpm@selenic.com>,
-        "open list:INTEGRITY MEASUREMENT ARCHITECTURE IMA"
-        <linux-ima-devel@lists.sourceforge.net>,
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <cbcb78c6-fa36-32d3-891e-96544875d97c@linux.vnet.ibm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+        Gary Hook <gary.hook@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Borislav Petkov <bp@alien8.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-bn3nam01on0048.outbound.protection.outlook.com ([104.47.33.48]:18863
+        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751660AbdJWT5M (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 23 Oct 2017 15:57:12 -0400
+In-Reply-To: <20171023092020.GB19523@nazgul.tnic>
+Content-Language: en-US
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Oct 23, 2017 at 10:07:31AM -0400, Stefan Berger wrote:
 
-> >-int tpm_pcr_extend(u32 chip_num, int pcr_idx, const u8 *hash)
-> >+int tpm_pcr_extend(int pcr_idx, const u8 *hash)
-> >  {
+
+On 10/23/2017 04:20 AM, Borislav Petkov wrote:
+> On Thu, Oct 19, 2017 at 09:33:48PM -0500, Brijesh Singh wrote:
+>> +static int __sev_platform_init(struct sev_data_init *data, int *error)
+>> +{
+>> +	int rc = 0;
+>> +
+>> +	mutex_lock(&fw_init_mutex);
+>> +
+>> +	if (!fw_init_count) {
 > 
+> I still don't like global semaphores. Can you get the status and check
+> for PSTATE.INIT state and do the init only if the platform is in
+> PSTATE.UNINIT?
 > 
-> I think every kernel internal TPM driver API should be called with the
-> tpm_chip as a parameter. This is in foresight of namespacing of IMA where we
-> want to provide the flexibility of passing a dedicated vTPM to each
-> namespace and IMA would use the chip as a parameter to all of these
-> functions to talk to the right tpm_vtpm_proxy instance. From that
-> perspective this patch goes into the wrong direction.
 
-Yes, we should ultimately try and get to there.. Someday the
-tpm_chip_find_get() will need to become namespace aware.
 
-But this patch is along the right path, eliminating the chip_num is
-the right thing to do..
+Calling PLATFORM_GET_STATUS is not required, we can manage the state 
+through a simple ref count variable. Issuing PSP commands will always be 
+much more expensive compare to accessing a protected global variable. I 
+would prefer to avoid invoking PSP command if possible. Additionally, 
+the global semaphore is still needed to serialize the 
+sev_platform_init() and sev_platform_shutdown() from multiple processes. 
+e.g If process "A" calls sev_platform_init() and if it gets preempted 
+due to whatever reason then we don't want another process to issue the 
+shutdown command while process "A" is in middle of sev_platform_init().
 
-> >-	tpm2 = tpm_is_tpm2(TPM_ANY_NUM);
-> >+	tpm2 = tpm_is_tpm2();
-> >  	if (tpm2 < 0)
-> >  		return tpm2;
-> >
-> >@@ -1008,7 +1007,7 @@ static int trusted_instantiate(struct key *key,
-> >  	switch (key_cmd) {
-> >  	case Opt_load:
-> >  		if (tpm2)
-> >-			ret = tpm_unseal_trusted(TPM_ANY_NUM, payload, options);
-> >+			ret = tpm_unseal_trusted(payload, options);
-
-Sequences like this are sketchy.
-
-It should be
-
-struct tpm_chip *tpm;
-
-tpm = tpm_chip_find_get()
-tpm2 = tpm_is_tpm2(tpm);
-
-[..]
-
-if (tpm2)
-     ret = tpm_unseal_trusted(tpm, payload, options);
-
-[..]
-
-tpm_put_chip(tpm);
-
-As hot plug could alter the 'tpm' between the two tpm calls.
-
-Jason
+-Brijesh
