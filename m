@@ -1,8 +1,7 @@
 From: Tudor Ambarus <tudor.ambarus@microchip.com>
-Subject: [PATCH 3/3] crypto: atmel-aes/tdes/sha - remove useless irq init
-Date: Mon, 23 Oct 2017 18:34:41 +0300
-Message-ID: <20171023153441.28825-3-tudor.ambarus@microchip.com>
-References: <20171023153441.28825-1-tudor.ambarus@microchip.com>
+Subject: [PATCH 1/3] crypto: atmel-aes/tdes/sha - return appropriate error code
+Date: Mon, 23 Oct 2017 18:34:39 +0300
+Message-ID: <20171023153441.28825-1-tudor.ambarus@microchip.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: <linux-crypto@vger.kernel.org>, <nicolas.ferre@microchip.com>,
@@ -11,60 +10,83 @@ To: <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
 Received: from esa2.microchip.iphmx.com ([68.232.149.84]:53762 "EHLO
         esa2.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932102AbdJWPet (ORCPT
+        with ESMTP id S932102AbdJWPeq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 23 Oct 2017 11:34:49 -0400
-In-Reply-To: <20171023153441.28825-1-tudor.ambarus@microchip.com>
+        Mon, 23 Oct 2017 11:34:46 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-irq would be set to -1 and then unused, if we failed to get IORESOURCE_MEM.
+Return -ENODEV when dma_request_slave_channel_compat() fails.
 
 Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
 ---
- drivers/crypto/atmel-aes.c  | 2 --
- drivers/crypto/atmel-sha.c  | 2 --
- drivers/crypto/atmel-tdes.c | 2 --
- 3 files changed, 6 deletions(-)
+ drivers/crypto/atmel-aes.c  | 3 +--
+ drivers/crypto/atmel-sha.c  | 3 +--
+ drivers/crypto/atmel-tdes.c | 3 +--
+ 3 files changed, 3 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
-index bc859ab..2048292 100644
+index 903fd43..9659759 100644
 --- a/drivers/crypto/atmel-aes.c
 +++ b/drivers/crypto/atmel-aes.c
-@@ -2644,8 +2644,6 @@ static int atmel_aes_probe(struct platform_device *pdev)
+@@ -2383,7 +2383,6 @@ static int atmel_aes_dma_init(struct atmel_aes_dev *dd,
+ 			      struct crypto_platform_data *pdata)
+ {
+ 	struct at_dma_slave *slave;
+-	int err = -ENOMEM;
+ 	dma_cap_mask_t mask;
  
- 	crypto_init_queue(&aes_dd->queue, ATMEL_AES_QUEUE_LENGTH);
+ 	dma_cap_zero(mask);
+@@ -2408,7 +2407,7 @@ static int atmel_aes_dma_init(struct atmel_aes_dev *dd,
+ 	dma_release_channel(dd->src.chan);
+ err_dma_in:
+ 	dev_warn(dd->dev, "no DMA channel available\n");
+-	return err;
++	return -ENODEV;
+ }
  
--	aes_dd->irq = -1;
--
- 	/* Get the base address */
- 	aes_res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
- 	if (!aes_res) {
+ static void atmel_aes_dma_cleanup(struct atmel_aes_dev *dd)
 diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
-index 42c1f74..8874aa5 100644
+index 3e2f41b..42c1f74 100644
 --- a/drivers/crypto/atmel-sha.c
 +++ b/drivers/crypto/atmel-sha.c
-@@ -2777,8 +2777,6 @@ static int atmel_sha_probe(struct platform_device *pdev)
+@@ -2628,7 +2628,6 @@ static bool atmel_sha_filter(struct dma_chan *chan, void *slave)
+ static int atmel_sha_dma_init(struct atmel_sha_dev *dd,
+ 				struct crypto_platform_data *pdata)
+ {
+-	int err = -ENOMEM;
+ 	dma_cap_mask_t mask_in;
  
- 	crypto_init_queue(&sha_dd->queue, ATMEL_SHA_QUEUE_LENGTH);
+ 	/* Try to grab DMA channel */
+@@ -2639,7 +2638,7 @@ static int atmel_sha_dma_init(struct atmel_sha_dev *dd,
+ 			atmel_sha_filter, &pdata->dma_slave->rxdata, dd->dev, "tx");
+ 	if (!dd->dma_lch_in.chan) {
+ 		dev_warn(dd->dev, "no DMA channel available\n");
+-		return err;
++		return -ENODEV;
+ 	}
  
--	sha_dd->irq = -1;
--
- 	/* Get the base address */
- 	sha_res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
- 	if (!sha_res) {
+ 	dd->dma_lch_in.dma_conf.direction = DMA_MEM_TO_DEV;
 diff --git a/drivers/crypto/atmel-tdes.c b/drivers/crypto/atmel-tdes.c
-index 48e8653..592124f 100644
+index f4b335d..0ece4b8 100644
 --- a/drivers/crypto/atmel-tdes.c
 +++ b/drivers/crypto/atmel-tdes.c
-@@ -1363,8 +1363,6 @@ static int atmel_tdes_probe(struct platform_device *pdev)
+@@ -720,7 +720,6 @@ static bool atmel_tdes_filter(struct dma_chan *chan, void *slave)
+ static int atmel_tdes_dma_init(struct atmel_tdes_dev *dd,
+ 			struct crypto_platform_data *pdata)
+ {
+-	int err = -ENOMEM;
+ 	dma_cap_mask_t mask;
  
- 	crypto_init_queue(&tdes_dd->queue, ATMEL_TDES_QUEUE_LENGTH);
+ 	dma_cap_zero(mask);
+@@ -765,7 +764,7 @@ static int atmel_tdes_dma_init(struct atmel_tdes_dev *dd,
+ 	dma_release_channel(dd->dma_lch_in.chan);
+ err_dma_in:
+ 	dev_warn(dd->dev, "no DMA channel available\n");
+-	return err;
++	return -ENODEV;
+ }
  
--	tdes_dd->irq = -1;
--
- 	/* Get the base address */
- 	tdes_res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
- 	if (!tdes_res) {
+ static void atmel_tdes_dma_cleanup(struct atmel_tdes_dev *dd)
 -- 
 2.9.4
