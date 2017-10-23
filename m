@@ -1,14 +1,13 @@
 From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [Part2 PATCH v6 16/38] crypto: ccp: Implement SEV_PEK_GEN ioctl
+Subject: Re: [Part2 PATCH v6 17/38] crypto: ccp: Implement SEV_PDH_GEN ioctl
  command
-Date: Mon, 23 Oct 2017 14:32:23 +0200
-Message-ID: <20171023123223.GA24208@nazgul.tnic>
+Date: Mon, 23 Oct 2017 14:35:26 +0200
+Message-ID: <20171023123526.GB24208@nazgul.tnic>
 References: <20171020023413.122280-1-brijesh.singh@amd.com>
- <20171020023413.122280-17-brijesh.singh@amd.com>
- <20171023093240.GC19523@nazgul.tnic>
- <ad140f6b-4e9d-7044-5e45-0c434511cb1a@amd.com>
+ <20171020023413.122280-18-brijesh.singh@amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -18,19 +17,30 @@ Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
 To: Brijesh Singh <brijesh.singh@amd.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <ad140f6b-4e9d-7044-5e45-0c434511cb1a@amd.com>
+In-Reply-To: <20171020023413.122280-18-brijesh.singh@amd.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Oct 23, 2017 at 07:15:30AM -0500, Brijesh Singh wrote:
-> I am not sure if I am able to understand your feedback. The
-> sev_platform_shutdown() is called unconditionally.
+On Thu, Oct 19, 2017 at 09:33:52PM -0500, Brijesh Singh wrote:
+> The SEV_PDH_GEN command is used to re-generate the Platform
+> Diffie-Hellman (PDH) key. The command is defined in SEV spec section
+> 5.6.
+> 
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: "Radim Krčmář" <rkrcmar@redhat.com>
+> Cc: Borislav Petkov <bp@suse.de>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: Gary Hook <gary.hook@amd.com>
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Cc: linux-crypto@vger.kernel.org
+> Cc: kvm@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  drivers/crypto/ccp/psp-dev.c | 3 +++
+>  1 file changed, 3 insertions(+)
 
-How's that:
-
-If sev_do_cmd() fails and sev_do_cmd(SEV_CMD_SHUTDOWN, ...) in
-sev_platform_shutdown() fails, then the first ret from sev_do_cmd() is
-gone.
+Reviewed-by: Borislav Petkov <bp@suse.de>
 
 -- 
 Regards/Gruss,
