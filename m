@@ -1,102 +1,134 @@
-From: SF Markus Elfring <elfring@users.sourceforge.net>
-Subject: Re: [PATCH] crypto/s5p-sss: Use common error handling code in
- s5p_aes_probe()
-Date: Sun, 22 Oct 2017 22:24:48 +0200
-Message-ID: <75d2f79d-eb37-9bf6-91dd-7706c0dc2ec3@users.sourceforge.net>
-References: <791df15e-3a35-d270-0acf-1661bd89adad@users.sourceforge.net>
- <20171022190327.mfndyyr4b4iinv2d@kozik-lap>
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: [Part2 PATCH v6 13/38] crypto: ccp: Add Secure Encrypted
+ Virtualization (SEV) command support
+Date: Mon, 23 Oct 2017 09:34:29 +0200
+Message-ID: <20171023073429.GA10952@nazgul.tnic>
+References: <20171020023413.122280-1-brijesh.singh@amd.com>
+ <20171020023413.122280-14-brijesh.singh@amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: "David S. Miller" <davem@davemloft.net>,
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Vladimir Zapolskiy <vz@mleia.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kernel-janitors@vger.kernel.org
-To: Krzysztof Kozlowski <krzk@kernel.org>,
-        linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org
+        Gary Hook <gary.hook@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Brijesh Singh <brijesh.singh@amd.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mout.web.de ([212.227.17.11]:62144 "EHLO mout.web.de"
+Received: from mail.skyhub.de ([5.9.137.197]:60390 "EHLO mail.skyhub.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932105AbdJVUZR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 22 Oct 2017 16:25:17 -0400
-In-Reply-To: <20171022190327.mfndyyr4b4iinv2d@kozik-lap>
-Content-Language: en-GB
+        id S1750756AbdJWHeg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 23 Oct 2017 03:34:36 -0400
+Content-Disposition: inline
+In-Reply-To: <20171020023413.122280-14-brijesh.singh@amd.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
->> From: Markus Elfring <elfring@users.sourceforge.net>
->> Date: Sun, 22 Oct 2017 15:00:27 +0200
->>
->> Add a jump target so that a bit of exception handling can be better reused
->> at the end of this function.
->>
->> This issue was detected by using the Coccinelle software.
->>
->> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
->> ---
->>  drivers/crypto/s5p-sss.c | 13 +++++++------
->>  1 file changed, 7 insertions(+), 6 deletions(-)
->>
->> diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
->> index 7ac657f46d15..ea59e184c199 100644
->> --- a/drivers/crypto/s5p-sss.c
->> +++ b/drivers/crypto/s5p-sss.c
->> @@ -863,16 +863,13 @@ static int s5p_aes_probe(struct platform_device *pdev)
->>  	pdata->irq_fc = platform_get_irq(pdev, 0);
->>  	if (pdata->irq_fc < 0) {
->>  		err = pdata->irq_fc;
->> -		dev_warn(dev, "feed control interrupt is not available.\n");
->> -		goto err_irq;
->> +		goto report_failure;
->>  	}
->>  	err = devm_request_threaded_irq(dev, pdata->irq_fc, NULL,
->>  					s5p_aes_interrupt, IRQF_ONESHOT,
->>  					pdev->name, pdev);
->> -	if (err < 0) {
->> -		dev_warn(dev, "feed control interrupt is not available.\n");
->> -		goto err_irq;
->> -	}
->> +	if (err < 0)
->> +		goto report_failure;
+On Thu, Oct 19, 2017 at 09:33:48PM -0500, Brijesh Singh wrote:
+> AMD's new Secure Encrypted Virtualization (SEV) feature allows the
+> memory contents of virtual machines to be transparently encrypted with a
+> key unique to the VM. The programming and management of the encryption
+> keys are handled by the AMD Secure Processor (AMD-SP) which exposes the
+> commands for these tasks. The complete spec is available at:
 > 
-> No, one exit path just to report error does not seem to be more readable.
+> http://support.amd.com/TechDocs/55766_SEV-KM%20API_Specification.pdf
+> 
+> Extend the AMD-SP driver to provide the following support:
+> 
+>  - an in-kernel API to communicate with the SEV firmware. The API can be
+>    used by the hypervisor to create encryption context for a SEV guest.
+> 
+>  - a userspace IOCTL to manage the platform certificates.
 
-I got an other development opinion on such an aspect.
+Just minor cleanups:
 
+---
+diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
+index e9966d5fc6c4..f9a9a6e6ab99 100644
+--- a/drivers/crypto/ccp/psp-dev.c
++++ b/drivers/crypto/ccp/psp-dev.c
+@@ -31,7 +31,7 @@
+ static DEFINE_MUTEX(sev_cmd_mutex);
+ static DEFINE_MUTEX(fw_init_mutex);
+ 
+-static struct sev_misc_dev *sev_misc_dev;
++static struct sev_misc_dev *misc_dev;
+ static int fw_init_count;
+ 
+ static struct psp_device *psp_alloc_struct(struct sp_device *sp)
+@@ -299,14 +299,14 @@ static int sev_ops_init(struct psp_device *psp)
+ 	 * sev_do_cmd() finds the right master device to which to issue the
+ 	 * command to the firmware.
+ 	 */
+-	if (!sev_misc_dev) {
++	if (!misc_dev) {
+ 		struct miscdevice *misc;
+ 
+-		sev_misc_dev = devm_kzalloc(dev, sizeof(*sev_misc_dev), GFP_KERNEL);
+-		if (!sev_misc_dev)
++		misc_dev = devm_kzalloc(dev, sizeof(*misc_dev), GFP_KERNEL);
++		if (!misc_dev)
+ 			return -ENOMEM;
+ 
+-		misc = &sev_misc_dev->misc;
++		misc = &misc_dev->misc;
+ 		misc->minor = MISC_DYNAMIC_MINOR;
+ 		misc->name = DEVICE_NAME;
+ 		misc->fops = &sev_fops;
+@@ -315,13 +315,13 @@ static int sev_ops_init(struct psp_device *psp)
+ 		if (ret)
+ 			return ret;
+ 
+-		kref_init(&sev_misc_dev->refcount);
++		kref_init(&misc_dev->refcount);
+ 	} else {
+-		kref_get(&sev_misc_dev->refcount);
++		kref_get(&misc_dev->refcount);
+ 	}
+ 
+ 	init_waitqueue_head(&psp->sev_int_queue);
+-	psp->sev_misc = sev_misc_dev;
++	psp->sev_misc = misc_dev;
+ 	dev_info(dev, "registered SEV device\n");
+ 
+ 	return 0;
+@@ -340,9 +340,9 @@ static int sev_init(struct psp_device *psp)
+ 
+ static void sev_exit(struct kref *ref)
+ {
+-	struct sev_misc_dev *sev_dev = container_of(ref, struct sev_misc_dev, refcount);
++	struct sev_misc_dev *misc_dev = container_of(ref, struct sev_misc_dev, refcount);
+ 
+-	misc_deregister(&sev_dev->misc);
++	misc_deregister(&misc_dev->misc);
+ }
+ 
+ int psp_dev_init(struct sp_device *sp)
+@@ -405,7 +405,7 @@ void psp_dev_destroy(struct sp_device *sp)
+ 	struct psp_device *psp = sp->psp_data;
+ 
+ 	if (psp->sev_misc)
+-		kref_put(&sev_misc_dev->refcount, sev_exit);
++		kref_put(&misc_dev->refcount, sev_exit);
+ 
+ 	sp_free_psp_irq(sp, psp);
+ }
+diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+index 21511419bfe6..eac850a97610 100644
+--- a/include/linux/psp-sev.h
++++ b/include/linux/psp-sev.h
+@@ -525,7 +525,7 @@ int sev_platform_shutdown(int *error);
+ /**
+  * sev_platform_status - perform SEV PLATFORM_STATUS command
+  *
+- * @init: sev_data_status structure to be processed
++ * @status: sev_user_data_status structure to be processed
+  * @error: SEV command return code
+  *
+  * Returns:
 
-> Instead, printing error after the code causing it looks to me
-> as common pattern, easy to maintain.
+-- 
+Regards/Gruss,
+    Boris.
 
-Do you care for variations in corresponding messages?
-
-
-> This patch does not bring improvement, in my opinion.
-
-How do you generally think about the possibility for a bit of code reduction?
-
-
->>  
->>  	pdata->busy = false;
->>  	pdata->dev = dev;
->> @@ -906,6 +903,10 @@ static int s5p_aes_probe(struct platform_device *pdev)
->>  	s5p_dev = NULL;
->>  
->>  	return err;
->> +
->> +report_failure:
->> +	dev_warn(dev, "feed control interrupt is not available.\n");
->> +	goto err_irq;
->>  }
->>  
->>  static int s5p_aes_remove(struct platform_device *pdev)
->> -- 
->> 2.14.2
->>
-
-
-Would you like to take another look at other adjustments in source files
-which are affected by the shown change pattern?
-
-Regards,
-Markus
+ECO tip #101: Trim your mails when you reply.
