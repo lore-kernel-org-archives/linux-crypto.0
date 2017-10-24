@@ -1,15 +1,14 @@
-From: Jason Gunthorpe <jgunthorpe@obsidianresearch.com>
+From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
 Subject: Re: [tpmdd-devel] [PATCH] tpm: remove chip_num parameter from
  in-kernel API
-Date: Tue, 24 Oct 2017 09:55:26 -0600
-Message-ID: <20171024155526.GA32250@obsidianresearch.com>
+Date: Tue, 24 Oct 2017 21:37:33 +0530
+Message-ID: <CANc+2y6-P9MvjbL18h02SPwNMPyk4_cPFfL6LKHDXiKSHfv00A@mail.gmail.com>
 References: <20171023123817.18559-1-jarkko.sakkinen@linux.intel.com>
- <cbcb78c6-fa36-32d3-891e-96544875d97c@linux.vnet.ibm.com>
- <20171023163139.GA17394@obsidianresearch.com>
- <20171024154440.3jeupmus43jcgbbz@linux.intel.com>
- <CANc+2y4TbkfPT3d_sBd0MbE7ZJ4F7Sfsfvdv9V6=63=tRpWn4A@mail.gmail.com>
+ <cbcb78c6-fa36-32d3-891e-96544875d97c@linux.vnet.ibm.com> <20171023163139.GA17394@obsidianresearch.com>
+ <20171024154440.3jeupmus43jcgbbz@linux.intel.com> <CANc+2y4TbkfPT3d_sBd0MbE7ZJ4F7Sfsfvdv9V6=63=tRpWn4A@mail.gmail.com>
+ <20171024155526.GA32250@obsidianresearch.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="UTF-8"
 Cc: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
         Stefan Berger <stefanb@linux.vnet.ibm.com>,
         linux-integrity@vger.kernel.org,
@@ -28,25 +27,34 @@ Cc: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
         James Morris <james.l.morris@oracle.com>,
         Matt Mackall <mpm@selenic.com>,
         "open list:INTEGRITY MEASUREMENT ARCHITECTURE IMA"
-To: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+To: Jason Gunthorpe <jgunthorpe@obsidianresearch.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from quartz.orcorp.ca ([184.70.90.242]:58559 "EHLO quartz.orcorp.ca"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751318AbdJXPzh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 24 Oct 2017 11:55:37 -0400
-Content-Disposition: inline
-In-Reply-To: <CANc+2y4TbkfPT3d_sBd0MbE7ZJ4F7Sfsfvdv9V6=63=tRpWn4A@mail.gmail.com>
+Received: from mail-io0-f195.google.com ([209.85.223.195]:43909 "EHLO
+        mail-io0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751336AbdJXQHf (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 24 Oct 2017 12:07:35 -0400
+In-Reply-To: <20171024155526.GA32250@obsidianresearch.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Oct 24, 2017 at 09:21:15PM +0530, PrasannaKumar Muralidharan wrote:
+Hi Jason,
 
-> Please check the RFC [1]. It does use chip id. The rfc has issues and
-> has to be fixed but still there could be users of the API.
-> 
-> 1. https://www.spinics.net/lists/linux-crypto/msg28282.html
+On 24 October 2017 at 21:25, Jason Gunthorpe
+<jgunthorpe@obsidianresearch.com> wrote:
+> On Tue, Oct 24, 2017 at 09:21:15PM +0530, PrasannaKumar Muralidharan wrote:
+>
+>> Please check the RFC [1]. It does use chip id. The rfc has issues and
+>> has to be fixed but still there could be users of the API.
+>>
+>> 1. https://www.spinics.net/lists/linux-crypto/msg28282.html
+>
+> That patch isn't safe at all. You need to store a kref to th chip in
+> the hwrng, not parse a string.
 
-That patch isn't safe at all. You need to store a kref to th chip in
-the hwrng, not parse a string.
+The drivers/char/hw_random/tpm-rng.c module does not store the chip
+reference so I guess the usage is safe. The RFC is just a sample use
+case of the API.
 
-Jason
+Regards,
+PrasannaKumar
