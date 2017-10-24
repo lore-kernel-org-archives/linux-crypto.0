@@ -1,39 +1,44 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Kernel panic when using ccm(aes) with the Atmel AES HW
- accelerator
-Date: Tue, 24 Oct 2017 11:20:36 +0800
-Message-ID: <20171024032036.GA28462@gondor.apana.org.au>
-References: <CAGkQfmP6Kq4DEBbGU7AW71PjbUJ2acdJF5PVDm6VqZkUaaoEzA@mail.gmail.com>
- <39a43561-e0e6-a3b7-e2c0-bd7e6bf1be47@microchip.com>
+From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
+Subject: [PATCH] crypto: caam - fix incorrect define
+Date: Tue, 24 Oct 2017 09:27:30 +0300
+Message-ID: <20171024062731.28070-1-horia.geanta@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Romain Izard <romain.izard.pro@gmail.com>,
-        linux-crypto@vger.kernel.org,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        Cyrille Pitchen <cyrille.pitchen@atmel.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Nicolas Ferre <nicolas.ferre@microchip.com>
-To: Tudor Ambarus <tudor.ambarus@microchip.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Dan Douglass <dan.douglass@nxp.com>,
+        <linux-crypto@vger.kernel.org>, Radu Alexe <radu.alexe@nxp.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:34780 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751275AbdJXDVG (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 23 Oct 2017 23:21:06 -0400
-Content-Disposition: inline
-In-Reply-To: <39a43561-e0e6-a3b7-e2c0-bd7e6bf1be47@microchip.com>
+Received: from mail-cys01nam02on0047.outbound.protection.outlook.com ([104.47.37.47]:10688
+        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751646AbdJXG2E (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 24 Oct 2017 02:28:04 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Oct 23, 2017 at 03:38:59PM +0300, Tudor Ambarus wrote:
->
-> I will propose a fix, but I'm taking my time to better understand why
-> CTR requires to overwrite the iv with the last ciphertext block.
+From: Radu Alexe <radu.alexe@nxp.com>
 
-That's an API requirement.  So we should fix ccm.
+Fixes: 3ebfa92f49a6 ("crypto: caam - Add new macros for building extended SEC descriptors (> 64 words)")
+Signed-off-by: Radu Alexe <radu.alexe@nxp.com>
+Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+---
+ drivers/crypto/caam/desc.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Cheers,
+diff --git a/drivers/crypto/caam/desc.h b/drivers/crypto/caam/desc.h
+index 2e6766a1573f..2386d3e2d2c9 100644
+--- a/drivers/crypto/caam/desc.h
++++ b/drivers/crypto/caam/desc.h
+@@ -1439,7 +1439,7 @@
+ #define MATH_SRC1_REG2		(0x02 << MATH_SRC1_SHIFT)
+ #define MATH_SRC1_REG3		(0x03 << MATH_SRC1_SHIFT)
+ #define MATH_SRC1_IMM		(0x04 << MATH_SRC1_SHIFT)
+-#define MATH_SRC1_DPOVRD	(0x07 << MATH_SRC0_SHIFT)
++#define MATH_SRC1_DPOVRD	(0x07 << MATH_SRC1_SHIFT)
+ #define MATH_SRC1_INFIFO	(0x0a << MATH_SRC1_SHIFT)
+ #define MATH_SRC1_OUTFIFO	(0x0b << MATH_SRC1_SHIFT)
+ #define MATH_SRC1_ONE		(0x0c << MATH_SRC1_SHIFT)
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.12.0.264.gd6db3f216544
