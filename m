@@ -1,30 +1,31 @@
 From: Gary R Hook <gary.hook@amd.com>
-Subject: Re: [Part2 PATCH v6 14/38] crypto: ccp: Implement SEV_FACTORY_RESET
- ioctl command
-Date: Tue, 24 Oct 2017 13:41:50 -0500
-Message-ID: <753c954c-5daa-892f-df4c-155ef9518542@amd.com>
-References: <20171020023413.122280-1-brijesh.singh@amd.com>
- <20171020023413.122280-15-brijesh.singh@amd.com>
+Subject: Re: [Part2 PATCH v6.1 18/38] crypto: ccp: Implement SEV_PEK_CSR ioctl
+ command
+Date: Tue, 24 Oct 2017 13:42:38 -0500
+Message-ID: <dccdf4a2-3f34-8744-2ed3-367c3d9bc1e4@amd.com>
+References: <20171020023413.122280-19-brijesh.singh@amd.com>
+ <20171023221009.46924-1-brijesh.singh@amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Cc: bp@alien8.de, Paolo Bonzini <pbonzini@redhat.com>,
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
         Borislav Petkov <bp@suse.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Tom Lendacky <thomas.lendacky@amd.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Brijesh Singh <brijesh.singh@amd.com>, kvm@vger.kernel.org
+        linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Brijesh Singh <brijesh.singh@amd.com>,
+        Borislav Petkov <bp@alien8.de>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20171020023413.122280-15-brijesh.singh@amd.com>
+In-Reply-To: <20171023221009.46924-1-brijesh.singh@amd.com>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 10/19/2017 09:33 PM, Brijesh Singh wrote:
-> The SEV_FACTORY_RESET command can be used by the platform owner to
-> reset the non-volatile SEV related data. The command is defined in
-> SEV spec section 5.4
+On 10/23/2017 05:10 PM, Brijesh Singh wrote:
+> The SEV_PEK_CSR command can be used to generate a PEK certificate
+> signing request. The command is defined in SEV spec section 5.7.
 > 
 > Cc: Paolo Bonzini <pbonzini@redhat.com>
 > Cc: "Radim Krčmář" <rkrcmar@redhat.com>
@@ -35,52 +36,120 @@ On 10/19/2017 09:33 PM, Brijesh Singh wrote:
 > Cc: linux-crypto@vger.kernel.org
 > Cc: kvm@vger.kernel.org
 > Cc: linux-kernel@vger.kernel.org
-> Improvements-by: Borislav Petkov <bp@suse.de>
 > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+
 
 Acked-by: Gary R Hook <gary.hook@amd.com>
 
-> ---
->   drivers/crypto/ccp/psp-dev.c | 28 +++++++++++++++++++++++++++-
->   1 file changed, 27 insertions(+), 1 deletion(-)
+
+
+> 
+> Changes since v6:
+>   * when sev_do_cmd() and sev_platform_shutdown() fails then propogate
+>     the error status code from sev_do_cmd() because it can give us
+>     much better reason for the failure.
+> 
+>   drivers/crypto/ccp/psp-dev.c | 81 ++++++++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 81 insertions(+)
 > 
 > diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
-> index e9966d5fc6c4..99f3761206da 100644
+> index 3672435150cf..aaf1c5cf821d 100644
 > --- a/drivers/crypto/ccp/psp-dev.c
 > +++ b/drivers/crypto/ccp/psp-dev.c
-> @@ -176,7 +176,33 @@ static int sev_do_cmd(int cmd, void *data, int *psp_ret)
->   
->   static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
->   {
-> -	return -ENOTTY;
-> +	void __user *argp = (void __user *)arg;
-> +	struct sev_issue_cmd input;
-> +	int ret = -EFAULT;
-> +
-> +	if (ioctl != SEV_ISSUE_CMD)
-> +		return -EINVAL;
-> +
-> +	if (copy_from_user(&input, argp, sizeof(struct sev_issue_cmd)))
-> +		return -EFAULT;
-> +
-> +	if (input.cmd > SEV_MAX)
-> +		return -EINVAL;
-> +
-> +	switch (input.cmd) {
-> +
-> +	case SEV_FACTORY_RESET:
-> +		ret = sev_do_cmd(SEV_CMD_FACTORY_RESET, 0, &input.error);
-> +		break;
-> +	default:
-> +		ret = -EINVAL;
-> +		goto out;
-> +	}
-> +
-> +	if (copy_to_user(argp, &input, sizeof(struct sev_issue_cmd)))
-> +		ret = -EFAULT;
-> +out:
-> +	return ret;
+> @@ -223,6 +223,84 @@ static int sev_ioctl_do_pek_pdh_gen(int cmd, struct sev_issue_cmd *argp)
+>   	return ret;
 >   }
 >   
->   static const struct file_operations sev_fops = {
+> +static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp)
+> +{
+> +	struct sev_user_data_pek_csr input;
+> +	struct sev_data_pek_csr *data;
+> +	void *blob = NULL;
+> +	int ret, err;
+> +
+> +	if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
+> +		return -EFAULT;
+> +
+> +	data = kzalloc(sizeof(*data), GFP_KERNEL);
+> +	if (!data)
+> +		return -ENOMEM;
+> +
+> +	/* userspace wants to query CSR length */
+> +	if (!input.address || !input.length)
+> +		goto cmd;
+> +
+> +	/* allocate a physically contiguous buffer to store the CSR blob */
+> +	if (!access_ok(VERIFY_WRITE, input.address, input.length) ||
+> +	    input.length > SEV_FW_BLOB_MAX_SIZE) {
+> +		ret = -EFAULT;
+> +		goto e_free;
+> +	}
+> +
+> +	blob = kmalloc(input.length, GFP_KERNEL);
+> +	if (!blob) {
+> +		ret = -ENOMEM;
+> +		goto e_free;
+> +	}
+> +
+> +	data->address = __psp_pa(blob);
+> +	data->len = input.length;
+> +
+> +cmd:
+> +	ret = sev_platform_init(NULL, &argp->error);
+> +	if (ret)
+> +		goto e_free_blob;
+> +
+> +	ret = sev_do_cmd(SEV_CMD_PEK_CSR, data, &argp->error);
+> +
+> +	/*
+> +	 * If we query the CSR length, FW responded with expected data
+> +	 */
+> +	input.length = data->len;
+> +
+> +	if (sev_platform_shutdown(&err)) {
+> +		/*
+> +		 * If both sev_do_cmd() and sev_platform_shutdown() commands
+> +		 * failed then propogate the error code from the sev_do_cmd()
+> +		 * because it contains a useful status code for the command
+> +		 * failure.
+> +		 */
+> +		if (ret)
+> +			goto e_free_blob;
+> +
+> +		ret = -EIO;
+> +		argp->error = err;
+> +		goto e_free_blob;
+> +	}
+> +
+> +	if (copy_to_user((void __user *)argp->data, &input, sizeof(input))) {
+> +		ret = -EFAULT;
+> +		goto e_free_blob;
+> +	}
+> +
+> +	if (blob) {
+> +		if (copy_to_user((void __user *)input.address, blob, input.length))
+> +			ret = -EFAULT;
+> +	}
+> +
+> +e_free_blob:
+> +	kfree(blob);
+> +e_free:
+> +	kfree(data);
+> +	return ret;
+> +}
+> +
+>   static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
+>   {
+>   	void __user *argp = (void __user *)arg;
+> @@ -252,6 +330,9 @@ static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
+>   	case SEV_PDH_GEN:
+>   		ret = sev_ioctl_do_pek_pdh_gen(SEV_CMD_PDH_GEN, &input);
+>   		break;
+> +	case SEV_PEK_CSR:
+> +		ret = sev_ioctl_do_pek_csr(&input);
+> +		break;
+>   	default:
+>   		ret = -EINVAL;
+>   		goto out;
 > 
