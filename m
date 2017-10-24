@@ -1,61 +1,61 @@
-From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH] crypto: caam/qi - abort algorithm setup on DPAA2 parts
-Date: Tue, 24 Oct 2017 09:27:31 +0300
-Message-ID: <20171024062731.28070-2-horia.geanta@nxp.com>
-References: <20171024062731.28070-1-horia.geanta@nxp.com>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: Re: [PATCH] staging: ccree: Fix lines longer than 80 characters
+Date: Tue, 24 Oct 2017 11:49:41 +0300
+Message-ID: <CAOtvUMfZVAEFqzNtsYtABhK9=ngVAJOym9as1RrxVsyvmU4weA@mail.gmail.com>
+References: <20171023145318.8748-1-stephen@brennan.io>
+ <20171024030245.GC1429@eros>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Dan Douglass <dan.douglass@nxp.com>,
-        <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2nam02on0046.outbound.protection.outlook.com ([104.47.38.46]:56331
-        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751711AbdJXG2N (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 24 Oct 2017 02:28:13 -0400
-In-Reply-To: <20171024062731.28070-1-horia.geanta@nxp.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: devel@driverdev.osuosl.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ driverdev-devel@linuxdriverproject.org, Stephen Brennan <stephen@brennan.io>,
+ Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: "Tobin C. Harding" <me@tobin.cc>
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+In-Reply-To: <20171024030245.GC1429@eros>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+List-Id: linux-crypto.vger.kernel.org
 
-caam/qi frontend (i.e. caamalg_qi) mustn't be used in case it runs on a
-DPAA2 part (this could happen when using a multiplatform kernel).
+Hi Tobin,
 
-Fixes: 297b9cebd2fc ("crypto: caam/jr - add support for DPAA2 parts")
-Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
----
-If this patch won't make it into v4.14 (likely the case),
-eventually it should be sent to -stable.
+On Tue, Oct 24, 2017 at 6:02 AM, Tobin C. Harding <me@tobin.cc> wrote:
+> On Mon, Oct 23, 2017 at 07:53:18AM -0700, Stephen Brennan wrote:
+>> Simply break down some long lines and tab-indent them.
+>
+> Hi Stephen,
+>
+> Welcome to the Linux kernel. Great that you have put in a patch, you are, however, unlikely to see
+> success fixing 'line over 80' warnings. There are a bunch of arguments for and against the line over
+> 80 limit, a web search will surely show them to you. The TL;DR is that it these changes do not
+> _really_ improve the readability of the code, they are just changes to quiet the static analysis
+> tool.
 
- drivers/crypto/caam/caamalg_qi.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+I completely agree with you that the end target is more readable code
+and that lines over 80 char is
+only a symptom but I do think in this case there is something useful to do.
 
-diff --git a/drivers/crypto/caam/caamalg_qi.c b/drivers/crypto/caam/caamalg_qi.c
-index 2eefc4a26bc2..f9f08fce4356 100644
---- a/drivers/crypto/caam/caamalg_qi.c
-+++ b/drivers/crypto/caam/caamalg_qi.c
-@@ -7,7 +7,7 @@
-  */
- 
- #include "compat.h"
--
-+#include "ctrl.h"
- #include "regs.h"
- #include "intern.h"
- #include "desc_constr.h"
-@@ -2312,6 +2312,11 @@ static int __init caam_qi_algapi_init(void)
- 	if (!priv || !priv->qi_present)
- 		return -ENODEV;
- 
-+	if (caam_dpaa2) {
-+		dev_info(ctrldev, "caam/qi frontend driver not suitable for DPAA 2.x, aborting...\n");
-+		return -ENODEV;
-+	}
-+
- 	INIT_LIST_HEAD(&alg_list);
- 
- 	/*
+Perhaps, if Stephen is willing, re-write the code to be more readable
+by, for example, using a temp
+variable for the register address, and in doing so both making the
+code more readable as well as
+treating the symptom?
+
+Thanks,
+Gilad
+
+
 -- 
-2.12.0.264.gd6db3f216544
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+"If you take a class in large-scale robotics, can you end up in a
+situation where the homework eats your dog?"
+ -- Jean-Baptiste Queru
