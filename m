@@ -1,116 +1,96 @@
-From: Tudor Ambarus <tudor.ambarus@microchip.com>
-Subject: Re: Kernel panic when using ccm(aes) with the Atmel AES HW
- accelerator
-Date: Tue, 24 Oct 2017 18:25:08 +0300
-Message-ID: <16357069-115f-ba62-d32b-baaed3aa6dfd@microchip.com>
-References: <CAGkQfmP6Kq4DEBbGU7AW71PjbUJ2acdJF5PVDm6VqZkUaaoEzA@mail.gmail.com>
+From: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+Subject: Re: [tpmdd-devel] [PATCH] tpm: remove chip_num parameter from
+ in-kernel API
+Date: Tue, 24 Oct 2017 17:44:40 +0200
+Message-ID: <20171024154440.3jeupmus43jcgbbz@linux.intel.com>
+References: <20171023123817.18559-1-jarkko.sakkinen@linux.intel.com>
+ <cbcb78c6-fa36-32d3-891e-96544875d97c@linux.vnet.ibm.com>
+ <20171023163139.GA17394@obsidianresearch.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: <linux-crypto@vger.kernel.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        Cyrille Pitchen <cyrille.pitchen@atmel.com>,
+Content-Type: text/plain; charset=us-ascii
+Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>,
+        linux-integrity@vger.kernel.org,
+        David Howells <dhowells@redhat.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Nicolas Ferre <nicolas.ferre@microchip.com>
-To: Romain Izard <romain.izard.pro@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from esa5.microchip.iphmx.com ([216.71.150.166]:5793 "EHLO
-        esa5.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932210AbdJXPZK (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 24 Oct 2017 11:25:10 -0400
-In-Reply-To: <CAGkQfmP6Kq4DEBbGU7AW71PjbUJ2acdJF5PVDm6VqZkUaaoEzA@mail.gmail.com>
-Content-Language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+        "open list:INTEGRITY MEASUREMENT ARCHITECTURE IMA"
+        <linux-ima-user@lists.sourceforge.net>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        linux-security-module@vger.kernel.org,
+        "moderated list:TPM DEVICE DRIVER"
+        <tpmdd-devel@lists.sourceforge.net>,
+        "open list:KEYS-TRUSTED" <keyrings@vger.kernel.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        James Morris <james.l.morris@oracle.com>,
+        Matt Mackall <mpm@selenic.com>,
+        "open list:INTEGRITY MEASUREMENT ARCHITECTURE IMA"
+        <linux-ima-devel@lists.sourceforge.net>,
+        Da
+To: Jason Gunthorpe <jgunthorpe@obsidianresearch.com>
+Return-path: <linux-security-module-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20171023163139.GA17394@obsidianresearch.com>
+Sender: owner-linux-security-module@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi, Romain,
+On Mon, Oct 23, 2017 at 10:31:39AM -0600, Jason Gunthorpe wrote:
+> On Mon, Oct 23, 2017 at 10:07:31AM -0400, Stefan Berger wrote:
+> 
+> > >-int tpm_pcr_extend(u32 chip_num, int pcr_idx, const u8 *hash)
+> > >+int tpm_pcr_extend(int pcr_idx, const u8 *hash)
+> > >  {
+> > 
+> > 
+> > I think every kernel internal TPM driver API should be called with the
+> > tpm_chip as a parameter. This is in foresight of namespacing of IMA where we
+> > want to provide the flexibility of passing a dedicated vTPM to each
+> > namespace and IMA would use the chip as a parameter to all of these
+> > functions to talk to the right tpm_vtpm_proxy instance. From that
+> > perspective this patch goes into the wrong direction.
+> 
+> Yes, we should ultimately try and get to there.. Someday the
+> tpm_chip_find_get() will need to become namespace aware.
+> 
+> But this patch is along the right path, eliminating the chip_num is
+> the right thing to do..
+> 
+> > >-	tpm2 = tpm_is_tpm2(TPM_ANY_NUM);
+> > >+	tpm2 = tpm_is_tpm2();
+> > >  	if (tpm2 < 0)
+> > >  		return tpm2;
+> > >
+> > >@@ -1008,7 +1007,7 @@ static int trusted_instantiate(struct key *key,
+> > >  	switch (key_cmd) {
+> > >  	case Opt_load:
+> > >  		if (tpm2)
+> > >-			ret = tpm_unseal_trusted(TPM_ANY_NUM, payload, options);
+> > >+			ret = tpm_unseal_trusted(payload, options);
+> 
+> Sequences like this are sketchy.
+> 
+> It should be
+> 
+> struct tpm_chip *tpm;
+> 
+> tpm = tpm_chip_find_get()
+> tpm2 = tpm_is_tpm2(tpm);
+> 
+> [..]
+> 
+> if (tpm2)
+>      ret = tpm_unseal_trusted(tpm, payload, options);
+> 
+> [..]
+> 
+> tpm_put_chip(tpm);
+> 
+> As hot plug could alter the 'tpm' between the two tpm calls.
+> 
+> Jason
 
-On 10/18/2017 04:32 PM, Romain Izard wrote:
-> diff --git a/crypto/ccm.c b/crypto/ccm.c
-> index 1ce37ae0ce56..e7c2121a3ab2 100644
-> --- a/crypto/ccm.c
-> +++ b/crypto/ccm.c
-> @@ -47,6 +47,7 @@ struct crypto_ccm_req_priv_ctx {
->          u8 odata[16];
->          u8 idata[16];
->          u8 auth_tag[16];
-> +       u8 iv[16];
->          u32 flags;
->          struct scatterlist src[3];
->          struct scatterlist dst[3];
-> @@ -248,32 +249,22 @@ static void crypto_ccm_encrypt_done(struct
-> crypto_async_request *areq, int err)
->          aead_request_complete(req, err);
->   }
-> 
-> -static inline int crypto_ccm_check_iv(const u8 *iv)
-> -{
-> -       /* 2 <= L <= 8, so 1 <= L' <= 7. */
-> -       if (1 > iv[0] || iv[0] > 7)
-> -               return -EINVAL;
-> -
-> -       return 0;
-> -}
-> -
-> -static int crypto_ccm_init_crypt(struct aead_request *req, u8 *tag)
-> +static int crypto_ccm_init_crypt(struct aead_request *req, u8 *tag, u8* iv)
->   {
->          struct crypto_ccm_req_priv_ctx *pctx = crypto_ccm_reqctx(req);
->          struct scatterlist *sg;
-> -       u8 *iv = req->iv;
-> -       int err;
-> +       u8 L = req->iv[0] + 1;
-> 
-> -       err = crypto_ccm_check_iv(iv);
-> -       if (err)
-> -               return err;
-> -
-> -       pctx->flags = aead_request_flags(req);
-> +       if (2 > L || L > 8)
-> +               return -EINVAL;
-> 
->           /* Note: rfc 3610 and NIST 800-38C require counter of
->           * zero to encrypt auth tag.
->           */
-> -       memset(iv + 15 - iv[0], 0, iv[0] + 1);
-> +       memcpy(iv, req->iv, 16 - L);
-> +       memset(iv + 16 - L, 0, L);
-> +
-> +       pctx->flags = aead_request_flags(req);
-> 
->          sg_init_table(pctx->src, 3);
->          sg_set_buf(pctx->src, tag, 16);
-> @@ -301,10 +292,10 @@ static int crypto_ccm_encrypt(struct aead_request *req)
->          struct scatterlist *dst;
->          unsigned int cryptlen = req->cryptlen;
->          u8 *odata = pctx->odata;
-> -       u8 *iv = req->iv;
-> +       u8 *iv = pctx->iv;
->          int err;
-> 
-> -       err = crypto_ccm_init_crypt(req, odata);
-> +       err = crypto_ccm_init_crypt(req, odata, iv);
->          if (err)
->                  return err;
-> 
-> @@ -363,12 +354,12 @@ static int crypto_ccm_decrypt(struct aead_request *req)
->          unsigned int cryptlen = req->cryptlen;
->          u8 *authtag = pctx->auth_tag;
->          u8 *odata = pctx->odata;
-> -       u8 *iv = req->iv;
-> +       u8 *iv = pctx->iv;
->          int err;
-> 
->          cryptlen -= authsize;
-> 
-> -       err = crypto_ccm_init_crypt(req, authtag);
-> +       err = crypto_ccm_init_crypt(req, authtag, iv);
->          if (err)
->                  return err;
+This patch just removes bunch of dead code. It does not change existing
+semantics. What you are saying should be done after the dead code has
+been removed. This commit is first step to that direction.
 
-Looks good. Can you please submit with a commit message?
-
-Thanks,
-ta
+/Jarkko
