@@ -1,104 +1,60 @@
-From: Jarkko Sakkinen <jarkko.sakkinen-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
-Subject: Re: [PATCH] tpm: remove chip_num parameter from
- in-kernel API
-Date: Tue, 24 Oct 2017 20:22:35 +0200
-Message-ID: <20171024182235.d7b3oajc5zcjs57v@linux.intel.com>
-References: <20171023123817.18559-1-jarkko.sakkinen@linux.intel.com>
- <cbcb78c6-fa36-32d3-891e-96544875d97c@linux.vnet.ibm.com>
- <20171023163139.GA17394@obsidianresearch.com>
- <20171024154440.3jeupmus43jcgbbz@linux.intel.com>
- <CANc+2y4TbkfPT3d_sBd0MbE7ZJ4F7Sfsfvdv9V6=63=tRpWn4A@mail.gmail.com>
- <20171024162359.tf5xulhlhokmuxh5@linux.intel.com>
- <CANc+2y4vtr+kbhC_7Rv=rHA2LgEVBHLFEu+DYYK1UmpU63PCgQ@mail.gmail.com>
+From: Gary R Hook <gary.hook@amd.com>
+Subject: Re: [Part2 PATCH v6 09/38] crypto: ccp: Build the AMD secure
+ processor driver only with AMD CPU support
+Date: Tue, 24 Oct 2017 13:40:20 -0500
+Message-ID: <e60f8100-ff6d-32af-ffe3-744dae4a9f69@amd.com>
+References: <20171020023413.122280-1-brijesh.singh@amd.com>
+ <20171020023413.122280-10-brijesh.singh@amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
- Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
- "open list:INTEGRITY MEASUREMENT ARCHITECTURE IMA"
- <linux-ima-user-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org>,
- Dmitry Kasatkin <dmitry.kasatkin-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
- David Safford <safford-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>, open list <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
- Jason Gunthorpe <jgunthorpe-ePGOBjL8dl3ta4EC/59zMFaTQe2KTcn/@public.gmane.org>,
- linux-security-module-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- "moderated list:TPM DEVICE DRIVER" <tpmdd-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org>,
- "open list:KEYS-TRUSTED" <keyrings-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
- "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
- <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, James Morris <james.l.morris-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
- Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org>,
- "open list:INTEGRITY MEASUREMENT ARCHITECTURE IMA"
- <linux-ima-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org>, linux-integrity-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- Mimi Zohar <zohar-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>, "Serge E. Hallyn" <serge-A9i7LUbDfNHQT0dZR+AlfA@public.gmane.org>
-To: PrasannaKumar Muralidharan <prasannatsmkumar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <tpmdd-devel-bounces-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <CANc+2y4vtr+kbhC_7Rv=rHA2LgEVBHLFEu+DYYK1UmpU63PCgQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/options/tpmdd-devel>,
- <mailto:tpmdd-devel-request-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=tpmdd-devel>
-List-Post: <mailto:tpmdd-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org>
-List-Help: <mailto:tpmdd-devel-request-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/tpmdd-devel>,
- <mailto:tpmdd-devel-request-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org?subject=subscribe>
-Errors-To: tpmdd-devel-bounces-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: bp@alien8.de, Borislav Petkov <bp@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
+To: Brijesh Singh <brijesh.singh@amd.com>, kvm@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-by2nam01on0083.outbound.protection.outlook.com ([104.47.34.83]:63952
+        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1750908AbdJXSk2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 24 Oct 2017 14:40:28 -0400
+In-Reply-To: <20171020023413.122280-10-brijesh.singh@amd.com>
+Content-Language: en-US
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Oct 24, 2017 at 10:05:20PM +0530, PrasannaKumar Muralidharan wrote:
-> > 1. Every user in the kernel is using TPM_ANY_NUM, which means there are
-> >    no other users.
+On 10/19/2017 09:33 PM, Brijesh Singh wrote:
+> From: Borislav Petkov <bp@suse.de>
 > 
-> Completely agree that there is no in kernel users yet.
-
-And should never be. It's a bogus parameter that makes no sense.
-
-> > 2. Moving struct tpm_rng to the TPM client is architecturally
-> >    uacceptable.
+> This is AMD-specific hardware so present it in Kconfig only when AMD
+> CPU support is enabled or on ARM64 where it is also used.
 > 
-> As there was no response to the patch there is no way to know whether
-> it is acceptable or not.
+> Signed-off-by: Borislav Petkov <bp@suse.de>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> Cc: Brijesh Singh <brijesh.singh@amd.com>
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Cc: Gary Hook <gary.hook@amd.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: linux-crypto@vger.kernel.org
 
-I like the idea of removing the tpm rng driver as discussed in other
-emails in this thread.
+Reviewed-by: Gary R Hook <gary.hook@amd.com>
 
-> > 3. Using zero deos not give you any better guarantees on anything than
-> >    just using TPM_ANY_NUM.
+> ---
+>   drivers/crypto/ccp/Kconfig | 1 +
+>   1 file changed, 1 insertion(+)
 > 
-> Chip id is used, not zero.
-
-Sorry I misread the patch first time. Anyway it's not any kind of ID to
-be trusted.
-
-> > Why this patch is not CC'd to linux-integrity? It modifies the TPM
-> > driver. And in the worst way.
+> diff --git a/drivers/crypto/ccp/Kconfig b/drivers/crypto/ccp/Kconfig
+> index 6d626606b9c5..9c84f9838931 100644
+> --- a/drivers/crypto/ccp/Kconfig
+> +++ b/drivers/crypto/ccp/Kconfig
+> @@ -1,5 +1,6 @@
+>   config CRYPTO_DEV_CCP_DD
+>   	tristate "Secure Processor device driver"
+> +	depends on CPU_SUP_AMD || ARM64
+>   	default m
+>   	help
+>   	  Provides AMD Secure Processor device driver.
 > 
-> TPM list is moderated and the moderator has not approved it yet.
-> get_maintainer script did not say about linux-integrity mailing list.
-> 
-> It could be doing things in worst way but it is not known until some
-> one says. If no one tells it is the case I don't think it is possible
-> to fix. Which is what happened.
-
-Understood. We've moved to linux-integrity-u79uwXL29TaiAVqoAR/hOA@public.gmane.org MAINTAINERS
-update is in the queue for the next kernel release.
-
-> > Implementing the ideas that Jason explained is the senseful way to
-> > get stable access. modules.dep makes sure that the modules are loaded
-> > in the correct order.
-> 
-> If that is sensible then it is the way to go.
-> 
-> There must be a reason to believe what is sensible and what is not.
-> Looks like this RFC has helped in judging that.
-> 
-> Regards,
-> PrasannaKumar
-
-Would you be interested to work on patch set that would remove the
-existing tpm rng driver and make the TPM driver the customer? It's not
-that far away from the work you've been doing already.
-
-/Jarkko
-
-------------------------------------------------------------------------------
-Check out the vibrant tech community on one of the world's most
-engaging tech sites, Slashdot.org! http://sdm.link/slashdot
