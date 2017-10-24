@@ -1,39 +1,39 @@
-From: "Tobin C. Harding" <me@tobin.cc>
-Subject: Re: [PATCH] staging: ccree: Fix lines longer than 80 characters
-Date: Tue, 24 Oct 2017 14:02:45 +1100
-Message-ID: <20171024030245.GC1429@eros>
-References: <20171023145318.8748-1-stephen@brennan.io>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Kernel panic when using ccm(aes) with the Atmel AES HW
+ accelerator
+Date: Tue, 24 Oct 2017 11:20:36 +0800
+Message-ID: <20171024032036.GA28462@gondor.apana.org.au>
+References: <CAGkQfmP6Kq4DEBbGU7AW71PjbUJ2acdJF5PVDm6VqZkUaaoEzA@mail.gmail.com>
+ <39a43561-e0e6-a3b7-e2c0-bd7e6bf1be47@microchip.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Gilad Ben-Yossef <gilad@benyossef.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+Cc: Romain Izard <romain.izard.pro@gmail.com>,
         linux-crypto@vger.kernel.org,
-        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org
-To: Stephen Brennan <stephen@brennan.io>
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        Cyrille Pitchen <cyrille.pitchen@atmel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Nicolas Ferre <nicolas.ferre@microchip.com>
+To: Tudor Ambarus <tudor.ambarus@microchip.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from out4-smtp.messagingengine.com ([66.111.4.28]:59533 "EHLO
-        out4-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751282AbdJXDCt (ORCPT
+Received: from orcrist.hmeau.com ([104.223.48.154]:34780 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751275AbdJXDVG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 23 Oct 2017 23:02:49 -0400
+        Mon, 23 Oct 2017 23:21:06 -0400
 Content-Disposition: inline
-In-Reply-To: <20171023145318.8748-1-stephen@brennan.io>
+In-Reply-To: <39a43561-e0e6-a3b7-e2c0-bd7e6bf1be47@microchip.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Oct 23, 2017 at 07:53:18AM -0700, Stephen Brennan wrote:
-> Simply break down some long lines and tab-indent them.
+On Mon, Oct 23, 2017 at 03:38:59PM +0300, Tudor Ambarus wrote:
+>
+> I will propose a fix, but I'm taking my time to better understand why
+> CTR requires to overwrite the iv with the last ciphertext block.
 
-Hi Stephen,
+That's an API requirement.  So we should fix ccm.
 
-Welcome to the Linux kernel. Great that you have put in a patch, you are, however, unlikely to see
-success fixing 'line over 80' warnings. There are a bunch of arguments for and against the line over
-80 limit, a web search will surely show them to you. The TL;DR is that it these changes do not
-_really_ improve the readability of the code, they are just changes to quiet the static analysis
-tool.
-
-There are a bunch of other white space fixes that are more beneficial, perhaps you could wet your
-feet with these (incorrect placement of parenthesis for example).
-
-Good luck,
-Tobin.
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
