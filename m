@@ -1,63 +1,54 @@
-From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [Part2 PATCH v6 00/38] x86: Secure Encrypted Virtualization (AMD)
-Date: Tue, 24 Oct 2017 07:14:20 -0500
-Message-ID: <d3b1c8a1-5073-3334-ad41-07a612a4f698@amd.com>
-References: <20171020023413.122280-1-brijesh.singh@amd.com>
+From: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+Subject: Re: [tpmdd-devel] [PATCH] tpm: remove chip_num parameter from
+ in-kernel API
+Date: Tue, 24 Oct 2017 16:04:15 +0200
+Message-ID: <20171024140415.wx6oyqpktbebjt25@linux.intel.com>
+References: <20171023123817.18559-1-jarkko.sakkinen@linux.intel.com>
+ <cbcb78c6-fa36-32d3-891e-96544875d97c@linux.vnet.ibm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: brijesh.singh@amd.com, kvm list <kvm@vger.kernel.org>,
-        linux-crypto@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        Gary Hook <Gary.Hook@amd.com>
-To: Brijesh Singh <brijesh.singh@amd.com>,
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-integrity@vger.kernel.org,
+        David Howells <dhowells@redhat.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-sn1nam02on0077.outbound.protection.outlook.com ([104.47.36.77]:45368
-        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S932308AbdJXMOc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 24 Oct 2017 08:14:32 -0400
-In-Reply-To: <20171020023413.122280-1-brijesh.singh@amd.com>
-Content-Language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+        "open list:INTEGRITY MEASUREMENT ARCHITECTURE IMA"
+        <linux-ima-user@lists.sourceforge.net>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
+        linux-security-module@vger.kernel.org,
+        "moderated list:TPM DEVICE DRIVER"
+        <tpmdd-devel@lists.sourceforge.net>,
+        "open list:KEYS-TRUSTED" <keyrings@vger.kernel.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        James Morris <james.l.morris@oracle.com>,
+        Matt Mackall <mpm@selenic.com>,
+        "open list:INTEGRITY MEASUREMENT ARCHITECTURE IMA"
+        <linux-ima-devel@lists.sourceforge.net>,
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Return-path: <linux-security-module-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <cbcb78c6-fa36-32d3-891e-96544875d97c@linux.vnet.ibm.com>
+Sender: owner-linux-security-module@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Herbert and Paolo,
+On Mon, Oct 23, 2017 at 10:07:31AM -0400, Stefan Berger wrote:
+> I think every kernel internal TPM driver API should be called with the
+> tpm_chip as a parameter. This is in foresight of namespacing of IMA where we
+> want to provide the flexibility of passing a dedicated vTPM to each
+> namespace and IMA would use the chip as a parameter to all of these
+> functions to talk to the right tpm_vtpm_proxy instance. From that
+> perspective this patch goes into the wrong direction.
+> 
+>    Stefan
 
+The goal of this patch is to kernel code that never gets executed. It
+removes a load of completely dead code. It is the only thing that this
+commit does. Why do you think this is "going into wrong direction" if it
+only removes dead code and refines the documentation up to date?
 
-On 10/19/17 9:33 PM, Brijesh Singh wrote:
-> This part of Secure Encryted Virtualization (SEV) patch series focuses on KVM
-> changes required to create and manage SEV guests.
->
-> SEV is an extension to the AMD-V architecture which supports running encrypted
-> virtual machine (VMs) under the control of a hypervisor. Encrypted VMs have their
-> pages (code and data) secured such that only the guest itself has access to
-> unencrypted version. Each encrypted VM is associated with a unique encryption key;
-> if its data is accessed to a different entity using a different key the encrypted
-> guest's data will be incorrectly decrypted, leading to unintelligible data.
-> This security model ensures that hypervisor will no longer able to inspect or
-> alter any guest code or data.
->
-> The key management of this feature is handled by a separate processor known as
-> the AMD Secure Processor (AMD-SP) which is present on AMD SOCs. The SEV Key
-> Management Specification (see below) provides a set of commands which can be
-> used by hypervisor to load virtual machine keys through the AMD-SP driver.
+After the dead code has been removed it makes sense to propose a better
+mechanism. Maybe the one that you are speaking about. But you need to
+remove the cruft first.
 
-Since the PSP patches touches both the CCP and KVM driver, hence I was
-wondering if you guys have any thought on how PSP patches will be
-merged? I am talking about Patch 9 to 20 from this series. I have
-ensured that patches apply cleanly on both kvm/master and
-cryptodev-2.6/master. We can do this in one of two ways:
-
-- Paolo can merge the PSP support through the KVM branch
-
-or
-
-- Herbert can create a topic branch with PSP changes and Paolo can use
-that topic branch.
-
-Any visibility will help my next submission. thank you.
-
--Brijesh
+/Jarkko
