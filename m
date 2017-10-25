@@ -1,101 +1,60 @@
-From: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-Subject: Re: [PATCH v2] tpm: use struct tpm_chip for tpm_chip_find_get()
-Date: Wed, 25 Oct 2017 21:34:52 +0200
-Message-ID: <20171025193452.d4qa4dhacfgqejk7@linux.intel.com>
-References: <20171025115508.5682-1-jarkko.sakkinen@linux.intel.com>
- <CANc+2y46q85+G1=9cXKW0R8FpGBqCuzkLnJzvSYFQ1S=ztKGew@mail.gmail.com>
+From: Jason Gunthorpe <jgunthorpe@obsidianresearch.com>
+Subject: Re: [PATCH] tpm: Move Linux RNG connection to hwrng
+Date: Wed, 25 Oct 2017 13:37:07 -0600
+Message-ID: <20171025193707.GA998@obsidianresearch.com>
+References: <20171024184235.GC1806@obsidianresearch.com>
+ <CANc+2y5q78g1Ow1JQ7kO0SkPrgNtbRV=COkB4YLHbSraTQH7aQ@mail.gmail.com>
+ <20171025185817.hoalqzud3646yuy7@linux.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Peter Huewe <peterhuewe@gmx.de>,
-        Marcel Selhorst <tpmdd@selhorst.net>,
-        Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        James Morris <james.l.morris@oracle.com>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        David Safford <safford@us.ibm.com>,
+Cc: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
+        Stefan Berger <stefanb@linux.vnet.ibm.com>,
+        linux-integrity@vger.kernel.org,
         David Howells <dhowells@redhat.com>,
-        Jerry Snitselaar <jsnitsel@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        linux-security-module@vger.kernel.org,
+        "open list:KEYS-TRUSTED" <keyrings@vger.kernel.org>,
         "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
         <linux-crypto@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "moderated list:TPM DEVICE DRIVER"
-        <tpmdd-devel@lists.sourceforge.net>,
-        "
-To: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+        James Morris <james.l.morris@oracle.com>,
+        Matt Mackall <mpm@selenic.com>,
+        David Safford <safford@us.ibm.com>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        "Serge E. Hallyn" <serge@hallyn.com>
+To: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from quartz.orcorp.ca ([184.70.90.242]:49231 "EHLO quartz.orcorp.ca"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751522AbdJYThS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 25 Oct 2017 15:37:18 -0400
 Content-Disposition: inline
-In-Reply-To: <CANc+2y46q85+G1=9cXKW0R8FpGBqCuzkLnJzvSYFQ1S=ztKGew@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20171025185817.hoalqzud3646yuy7@linux.intel.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Oct 25, 2017 at 08:40:26PM +0530, PrasannaKumar Muralidharan wrote:
-> > -struct tpm_chip *tpm_chip_find_get(int chip_num)
-> > +struct tpm_chip *tpm_chip_find_get(struct tpm_chip *chip)
-> >  {
-> > -       struct tpm_chip *chip, *res = NULL;
-> > +       struct tpm_chip *res = NULL;
-> > +       int chip_num = 0;
-> >         int chip_prev;
-> >
-> >         mutex_lock(&idr_lock);
-> >
-> > -       if (chip_num == TPM_ANY_NUM) {
-> > -               chip_num = 0;
-> > +       if (!chip) {
-> >                 do {
-> >                         chip_prev = chip_num;
-> >                         chip = idr_get_next(&dev_nums_idr, &chip_num);
+On Wed, Oct 25, 2017 at 08:58:17PM +0200, Jarkko Sakkinen wrote:
+> On Wed, Oct 25, 2017 at 08:15:09PM +0530, PrasannaKumar Muralidharan wrote:
+> > > +       if (!IS_ENABLED(CONFIG_HW_RANDOM_TPM))
+> > > +               return 0;
+> > 
+> > Can #ifndef CONFIG_HW_RANDOM_TPM be used instead? That way an if
+> > condition can be avoided.
 > 
-> When chip is not NULL just do tpm_try_get_ops(chip). Current code does
-> more things which are not required.
+> Nope. There is no reason to avoid the if-condition. Compiler will take
+> care of it. IS_ENABLED() macro is available just for the purpose Jason
+> is using it.
+> 
+> > > +       char tpm_hwrng_name[64];
+> > > +       struct hwrng tpm_hwrng;
+> > > +
+> > 
+> > Can this also be put inside the #ifdef?
+> 
+> Yes. It should be inside #ifdef.
 
-Your observation is right that there is something wrong but conclusions
-are incorrect.
+Then we need #idefs in the .c code, IS_ENABLED is not enough :\ I
+don't think the few bytes matters enough to bother.
 
-It's actually a regression.
-
-If @chip has a value, the code does one iteration of what it is doing in
-the first branch of the condition. That is completely bogus semantics to
-say the least.
-
-To sort that out I'll introduce a new field to struct tpm_chip:
-
-  u64 id;
-
-This gets a value from a global count every time a chip is created.
-
-The function will become then:
-
-struct tpm_chip *tpm_chip_find_get(u64 id)
-{
-	struct tpm_chup *chip;
-	struct tpm_chip *res = NULL;
-	int chip_num = 0;
-	int chip_prev;
-
-	mutex_lock(&idr_lock);
-
-	do {
-		chip_prev = chip_num;
-
-		chip = idr_get_next(&dev_nums_idr, &chip_num);
-
-		if (chip && (!id || id == chip->id) && !tpm_try_get_ops(chip)) {
-			res = chip;
-			break;
-		}
-	} while (chip_prev != chip_num);
-
-	mutex_unlock(&idr_lock);
-
-	return res;
-}
-
-Thanks for spotting this out. I'll refine the patch.
-
-/Jarkko
+Jason
