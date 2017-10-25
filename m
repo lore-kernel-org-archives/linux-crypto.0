@@ -1,73 +1,48 @@
-From: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-Subject: Re: [PATCH] tpm: Move Linux RNG connection to hwrng
-Date: Wed, 25 Oct 2017 00:29:30 +0200
-Message-ID: <20171024222930.wdsmttgujgpwmizb@linux.intel.com>
-References: <20171024184235.GC1806@obsidianresearch.com>
- <20171024213449.GA21662@obsidianresearch.com>
+From: Vladimir Zapolskiy <vz@mleia.com>
+Subject: Re: [PATCH v7 1/2] crypto: s5p-sss: change spaces into tabs in
+ defines
+Date: Wed, 25 Oct 2017 07:21:56 +0300
+Message-ID: <78d891ae-231b-c7c9-9a2a-b51d2eff51d7@mleia.com>
+References: <20171017112824.10231-1-k.konieczny@partner.samsung.com>
+ <CGME20171017112845eucas1p2cd73bf6b6e97ada996c7693639e5a037@eucas1p2.samsung.com>
+ <20171017112824.10231-2-k.konieczny@partner.samsung.com>
+ <b66817b2-bbb6-ad18-b384-628d5d6b0157@mleia.com>
+ <6ac3033a-345c-c2d2-c91e-ac7bff288944@partner.samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
-        Stefan Berger <stefanb@linux.vnet.ibm.com>,
-        linux-integrity@vger.kernel.org,
-        David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        linux-security-module@vger.kernel.org,
-        "open list:KEYS-TRUSTED" <keyrings@vger.kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        James Morris <james.l.morris@oracle.com>,
-        Matt Mackall <mpm@selenic.com>,
-        David Safford <safford@us.ibm.com>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        "Serge E. Hallyn" <serge@hallyn.com>
-To: Jason Gunthorpe <jgunthorpe@obsidianresearch.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Kamil Konieczny <k.konieczny@partner.samsung.com>,
+        linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga06.intel.com ([134.134.136.31]:55296 "EHLO mga06.intel.com"
+Received: from mleia.com ([178.79.152.223]:43215 "EHLO mail.mleia.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751407AbdJXW3h (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 24 Oct 2017 18:29:37 -0400
-Content-Disposition: inline
-In-Reply-To: <20171024213449.GA21662@obsidianresearch.com>
+        id S1750763AbdJYEV7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 25 Oct 2017 00:21:59 -0400
+In-Reply-To: <6ac3033a-345c-c2d2-c91e-ac7bff288944@partner.samsung.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Oct 24, 2017 at 03:34:49PM -0600, Jason Gunthorpe wrote:
-> On Tue, Oct 24, 2017 at 12:42:35PM -0600, Jason Gunthorpe wrote:
-> 
-> > This is compile tested only.
-> 
-> 0day says the kconfig has a problem when randomized, here is the fix I
-> will roll into a v2 in a few days:
+Hi Kamil,
 
-I will probably have to postpone the review to next week anyway so take
-your time :-)
-
-/Jarkko
-
+On 10/24/2017 01:19 PM, Kamil Konieczny wrote:
+> Hi Vladimir,
 > 
-> diff --git a/drivers/char/tpm/Kconfig b/drivers/char/tpm/Kconfig
-> index a95725fa77789e..ca89da3e4b2ae9 100644
-> --- a/drivers/char/tpm/Kconfig
-> +++ b/drivers/char/tpm/Kconfig
-> @@ -27,16 +27,13 @@ menuconfig TCG_TPM
->  if TCG_TPM
->  
->  config HW_RANDOM_TPM
-> -       tristate "TPM HW Random Number Generator support"
-> -       depends on TCG_TPM && HW_RANDOM
-> -       default HW_RANDOM
-> +       bool "TPM HW Random Number Generator support"
-> +       depends on TCG_TPM && HW_RANDOM && !(TCG_TPM=y && HW_RANDOM=m)
-> +       default y
->         ---help---
->           This driver provides kernel-side support for the Random Number
->           Generator in the Trusted Platform Module
->  
-> -         To compile this driver as a module, choose M here: the
-> -         module will be called tpm-rng.
-> -
->           If unsure, say Y.
->  
->  config TCG_TIS_CORE
+> Thank you for review.
+> 
+> On 22.10.2017 12:18, Vladimir Zapolskiy wrote:
+>> Hi Kamil,
+>>
+>> On 10/17/2017 02:28 PM, Kamil Konieczny wrote:
+>>> change spaces into tabs in defines
+>>
+>> Here a grammatically correct sentence in English is welcome.
+> 
+> What about: "Change spaces to tabs" ?
+> 
+
+yes, it'll be fine, sorry if I was excessively pedantic.
