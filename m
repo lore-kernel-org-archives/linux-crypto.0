@@ -1,9 +1,17 @@
 From: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-Subject: Re: [PATCH] tpm: Move Linux RNG connection to hwrng
-Date: Wed, 25 Oct 2017 20:58:17 +0200
-Message-ID: <20171025185817.hoalqzud3646yuy7@linux.intel.com>
-References: <20171024184235.GC1806@obsidianresearch.com>
- <CANc+2y5q78g1Ow1JQ7kO0SkPrgNtbRV=COkB4YLHbSraTQH7aQ@mail.gmail.com>
+Subject: Re: [tpmdd-devel] [PATCH] tpm: remove chip_num parameter from
+ in-kernel API
+Date: Wed, 25 Oct 2017 21:11:23 +0200
+Message-ID: <20171025191123.4uqh6epwhak6hqp5@linux.intel.com>
+References: <20171023123817.18559-1-jarkko.sakkinen@linux.intel.com>
+ <cbcb78c6-fa36-32d3-891e-96544875d97c@linux.vnet.ibm.com>
+ <20171023163139.GA17394@obsidianresearch.com>
+ <20171024154440.3jeupmus43jcgbbz@linux.intel.com>
+ <CANc+2y4TbkfPT3d_sBd0MbE7ZJ4F7Sfsfvdv9V6=63=tRpWn4A@mail.gmail.com>
+ <20171024162359.tf5xulhlhokmuxh5@linux.intel.com>
+ <CANc+2y4vtr+kbhC_7Rv=rHA2LgEVBHLFEu+DYYK1UmpU63PCgQ@mail.gmail.com>
+ <20171024182235.d7b3oajc5zcjs57v@linux.intel.com>
+ <CANc+2y4BtQGqtC8RJL1Srrz_kWwhyveV3HBpfO1kikFj+0mHaA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
@@ -11,41 +19,48 @@ Cc: Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
         linux-integrity@vger.kernel.org,
         David Howells <dhowells@redhat.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
+        "open list:INTEGRITY MEASUREMENT ARCHITECTURE IMA"
+        <linux-ima-user@lists.sourceforge.net>,
         Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
         open list <linux-kernel@vger.kernel.org>,
         linux-security-module@vger.kernel.org,
+        "moderated list:TPM DEVICE DRIVER"
+        <tpmdd-devel@lists.sourceforge.net>,
         "open list:KEYS-TRUSTED" <keyrings@vger.kernel.org>,
         "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
         <linux-crypto@vger.kernel.org>,
         James Morris <james.l.morris@oracle.com>,
         Matt Mackall <mpm@selenic.com>,
-        David Safford <safford@us.ibm.com>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        "Serge E. Hallyn" <serge@hallyn.com>
+        "open list:INTEGRITY MEASUREMENT ARCHITECTURE IMA"
 To: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-security-module-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <CANc+2y5q78g1Ow1JQ7kO0SkPrgNtbRV=COkB4YLHbSraTQH7aQ@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <CANc+2y4BtQGqtC8RJL1Srrz_kWwhyveV3HBpfO1kikFj+0mHaA@mail.gmail.com>
+Sender: owner-linux-security-module@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Oct 25, 2017 at 08:15:09PM +0530, PrasannaKumar Muralidharan wrote:
-> > +       if (!IS_ENABLED(CONFIG_HW_RANDOM_TPM))
-> > +               return 0;
+On Wed, Oct 25, 2017 at 08:21:16PM +0530, PrasannaKumar Muralidharan wrote:
+> >> > 2. Moving struct tpm_rng to the TPM client is architecturally
+> >> >    uacceptable.
+> >>
+> >> As there was no response to the patch there is no way to know whether
+> >> it is acceptable or not.
+> >
+> > I like the idea of removing the tpm rng driver as discussed in other
+> > emails in this thread.
 > 
-> Can #ifndef CONFIG_HW_RANDOM_TPM be used instead? That way an if
-> condition can be avoided.
+> Thank you.
 
-Nope. There is no reason to avoid the if-condition. Compiler will take
-care of it. IS_ENABLED() macro is available just for the purpose Jason
-is using it.
+No, thank you.
 
-> > +       char tpm_hwrng_name[64];
-> > +       struct hwrng tpm_hwrng;
-> > +
-> 
-> Can this also be put inside the #ifdef?
+I didn't first understand the big idea and only looked at the code
+change per se. I apologize for that.
 
-Yes. It should be inside #ifdef.
+The problem that you went to solve was real and it led to a properly
+implemented solution. You were not late from the party. Jason's code
+change is derivative work of your code change. That's why his code
+change has also your signed-off-by.
+
+Thanks for doing awesome work :-)
 
 /Jarkko
