@@ -1,375 +1,123 @@
-From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Subject: Re: [PATCH] tpm: Move Linux RNG connection to hwrng
-Date: Wed, 25 Oct 2017 20:15:09 +0530
-Message-ID: <CANc+2y5q78g1Ow1JQ7kO0SkPrgNtbRV=COkB4YLHbSraTQH7aQ@mail.gmail.com>
-References: <20171024184235.GC1806@obsidianresearch.com>
+From: PrasannaKumar Muralidharan <prasannatsmkumar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] tpm: remove chip_num parameter from
+ in-kernel API
+Date: Wed, 25 Oct 2017 20:21:16 +0530
+Message-ID: <CANc+2y4BtQGqtC8RJL1Srrz_kWwhyveV3HBpfO1kikFj+0mHaA@mail.gmail.com>
+References: <20171023123817.18559-1-jarkko.sakkinen@linux.intel.com>
+ <cbcb78c6-fa36-32d3-891e-96544875d97c@linux.vnet.ibm.com>
+ <20171023163139.GA17394@obsidianresearch.com>
+ <20171024154440.3jeupmus43jcgbbz@linux.intel.com>
+ <CANc+2y4TbkfPT3d_sBd0MbE7ZJ4F7Sfsfvdv9V6=63=tRpWn4A@mail.gmail.com>
+ <20171024162359.tf5xulhlhokmuxh5@linux.intel.com>
+ <CANc+2y4vtr+kbhC_7Rv=rHA2LgEVBHLFEu+DYYK1UmpU63PCgQ@mail.gmail.com>
+ <20171024182235.d7b3oajc5zcjs57v@linux.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        Stefan Berger <stefanb@linux.vnet.ibm.com>,
-        linux-integrity@vger.kernel.org,
-        David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        linux-security-module@vger.kernel.org,
-        "open list:KEYS-TRUSTED" <keyrings@vger.kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        James Morris <james.l.morris@oracle.com>,
-        Matt Mackall <mpm@selenic.com>,
-        David Safford <safford@us.ibm.com>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        "Serge E. Hallyn" <serge@hallyn.com>
-To: Jason Gunthorpe <jgunthorpe@obsidianresearch.com>
-Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <20171024184235.GC1806@obsidianresearch.com>
-Sender: owner-linux-security-module@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+ Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+ "open list:INTEGRITY MEASUREMENT ARCHITECTURE IMA"
+ <linux-ima-user-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org>,
+ Dmitry Kasatkin <dmitry.kasatkin-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+ David Safford <safford-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>, open list <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+ Jason Gunthorpe <jgunthorpe-ePGOBjL8dl3ta4EC/59zMFaTQe2KTcn/@public.gmane.org>,
+ linux-security-module-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+ "moderated list:TPM DEVICE DRIVER" <tpmdd-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org>,
+ "open list:KEYS-TRUSTED" <keyrings-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+ "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+ <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, James Morris <james.l.morris-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
+ Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org>,
+ "open list:INTEGRITY MEASUREMENT ARCHITECTURE IMA"
+ <linux-ima-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org>, linux-integrity-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+ Mimi Zohar <zohar-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>, "Serge E. Hallyn" <serge-A9i7LUbDfNHQT0dZR+AlfA@public.gmane.org>
+To: Jarkko Sakkinen <jarkko.sakkinen-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
+Return-path: <tpmdd-devel-bounces-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org>
+In-Reply-To: <20171024182235.d7b3oajc5zcjs57v-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/options/tpmdd-devel>,
+ <mailto:tpmdd-devel-request-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=tpmdd-devel>
+List-Post: <mailto:tpmdd-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org>
+List-Help: <mailto:tpmdd-devel-request-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/tpmdd-devel>,
+ <mailto:tpmdd-devel-request-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org?subject=subscribe>
+Errors-To: tpmdd-devel-bounces-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Jason,
+Hi Jarkko,
 
-Nice to see this patch. Some minor comments below.
+On 24 October 2017 at 23:52, Jarkko Sakkinen
+<jarkko.sakkinen-VuQAYsv1563Yd54FQh9/CA@public.gmane.org> wrote:
+> On Tue, Oct 24, 2017 at 10:05:20PM +0530, PrasannaKumar Muralidharan wrote:
+>> > 1. Every user in the kernel is using TPM_ANY_NUM, which means there are
+>> >    no other users.
+>>
+>> Completely agree that there is no in kernel users yet.
+>
+> And should never be. It's a bogus parameter that makes no sense.
 
-On 25 October 2017 at 00:12, Jason Gunthorpe
-<jgunthorpe@obsidianresearch.com> wrote:
-> The tpm-rng.c approach is completely inconsistent with how the kernel
-> handles hotplug. Instead manage a hwrng device for each TPM. This will
-> cause the kernel to read entropy from the TPM when it is plugged in,
-> and allow access to the TPM rng via /dev/hwrng.
->
-> Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-> Signed-off-by: Jason Gunthorpe <jgunthorpe@obsidianresearch.com>
-> Reviewed-by: Jason Gunthorpe <jgunthorpe@obsidianresearch.com>
-> ---
->  drivers/char/hw_random/Kconfig   | 13 -----------
->  drivers/char/hw_random/Makefile  |  1 -
->  drivers/char/hw_random/tpm-rng.c | 50 ----------------------------------------
->  drivers/char/tpm/Kconfig         | 13 +++++++++++
->  drivers/char/tpm/tpm-chip.c      | 41 ++++++++++++++++++++++++++++----
->  drivers/char/tpm/tpm-interface.c | 37 ++++++++++++++++-------------
->  drivers/char/tpm/tpm.h           |  5 ++++
->  7 files changed, 76 insertions(+), 84 deletions(-)
->  delete mode 100644 drivers/char/hw_random/tpm-rng.c
->
-> All,
->
-> It is such a good idea, I took PrasannaKumar's patch, reviewed and
-> revised it to the level it could be merged.
+I understood that after seeing latest patch that uses struct tpm_chip.
+Sorry for the noise.
 
-Thank you for this.
+>> > 2. Moving struct tpm_rng to the TPM client is architecturally
+>> >    uacceptable.
+>>
+>> As there was no response to the patch there is no way to know whether
+>> it is acceptable or not.
+>
+> I like the idea of removing the tpm rng driver as discussed in other
+> emails in this thread.
 
-> This is compile tested only.
->
-> diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-> index 95a031e9eced07..a20fed182cbcce 100644
-> --- a/drivers/char/hw_random/Kconfig
-> +++ b/drivers/char/hw_random/Kconfig
-> @@ -306,19 +306,6 @@ config HW_RANDOM_POWERNV
->
->           If unsure, say Y.
->
-> -config HW_RANDOM_TPM
-> -       tristate "TPM HW Random Number Generator support"
-> -       depends on TCG_TPM
-> -       default HW_RANDOM
-> -       ---help---
-> -         This driver provides kernel-side support for the Random Number
-> -         Generator in the Trusted Platform Module
-> -
-> -         To compile this driver as a module, choose M here: the
-> -         module will be called tpm-rng.
-> -
-> -         If unsure, say Y.
-> -
->  config HW_RANDOM_HISI
->         tristate "Hisilicon Random Number Generator support"
->         depends on HW_RANDOM && ARCH_HISI
-> diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Makefile
-> index 39a67defac67cb..91cb8e8213e7c1 100644
-> --- a/drivers/char/hw_random/Makefile
-> +++ b/drivers/char/hw_random/Makefile
-> @@ -26,7 +26,6 @@ obj-$(CONFIG_HW_RANDOM_NOMADIK) += nomadik-rng.o
->  obj-$(CONFIG_HW_RANDOM_PSERIES) += pseries-rng.o
->  obj-$(CONFIG_HW_RANDOM_POWERNV) += powernv-rng.o
->  obj-$(CONFIG_HW_RANDOM_HISI)   += hisi-rng.o
-> -obj-$(CONFIG_HW_RANDOM_TPM) += tpm-rng.o
->  obj-$(CONFIG_HW_RANDOM_BCM2835) += bcm2835-rng.o
->  obj-$(CONFIG_HW_RANDOM_IPROC_RNG200) += iproc-rng200.o
->  obj-$(CONFIG_HW_RANDOM_MSM) += msm-rng.o
-> diff --git a/drivers/char/hw_random/tpm-rng.c b/drivers/char/hw_random/tpm-rng.c
-> deleted file mode 100644
-> index d6d448266f0752..00000000000000
-> --- a/drivers/char/hw_random/tpm-rng.c
-> +++ /dev/null
-> @@ -1,50 +0,0 @@
-> -/*
-> - * Copyright (C) 2012 Kent Yoder IBM Corporation
-> - *
-> - * HWRNG interfaces to pull RNG data from a TPM
-> - *
-> - * This program is free software; you can redistribute it and/or modify
-> - * it under the terms of the GNU General Public License version 2 as
-> - * published by the Free Software Foundation.
-> - *
-> - * This program is distributed in the hope that it will be useful,
-> - * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> - * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> - * GNU General Public License for more details.
-> - *
-> - * You should have received a copy of the GNU General Public License
-> - * along with this program; if not, write to the Free Software
-> - * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-> - */
-> -
-> -#include <linux/module.h>
-> -#include <linux/hw_random.h>
-> -#include <linux/tpm.h>
-> -
-> -#define MODULE_NAME "tpm-rng"
-> -
-> -static int tpm_rng_read(struct hwrng *rng, void *data, size_t max, bool wait)
-> -{
-> -       return tpm_get_random(TPM_ANY_NUM, data, max);
-> -}
-> -
-> -static struct hwrng tpm_rng = {
-> -       .name = MODULE_NAME,
-> -       .read = tpm_rng_read,
-> -};
-> -
-> -static int __init rng_init(void)
-> -{
-> -       return hwrng_register(&tpm_rng);
-> -}
-> -module_init(rng_init);
-> -
-> -static void __exit rng_exit(void)
-> -{
-> -       hwrng_unregister(&tpm_rng);
-> -}
-> -module_exit(rng_exit);
-> -
-> -MODULE_LICENSE("GPL v2");
-> -MODULE_AUTHOR("Kent Yoder <key@linux.vnet.ibm.com>");
-> -MODULE_DESCRIPTION("RNG driver for TPM devices");
-> diff --git a/drivers/char/tpm/Kconfig b/drivers/char/tpm/Kconfig
-> index a30352202f1fdc..a95725fa77789e 100644
-> --- a/drivers/char/tpm/Kconfig
-> +++ b/drivers/char/tpm/Kconfig
-> @@ -26,6 +26,19 @@ menuconfig TCG_TPM
->
->  if TCG_TPM
->
-> +config HW_RANDOM_TPM
-> +       tristate "TPM HW Random Number Generator support"
-> +       depends on TCG_TPM && HW_RANDOM
-> +       default HW_RANDOM
-> +       ---help---
-> +         This driver provides kernel-side support for the Random Number
-> +         Generator in the Trusted Platform Module
-> +
-> +         To compile this driver as a module, choose M here: the
-> +         module will be called tpm-rng.
-> +
-> +         If unsure, say Y.
-> +
->  config TCG_TIS_CORE
->         tristate
->         ---help---
-> diff --git a/drivers/char/tpm/tpm-chip.c b/drivers/char/tpm/tpm-chip.c
-> index 0eca20c5a80cf2..f3571406fb2995 100644
-> --- a/drivers/char/tpm/tpm-chip.c
-> +++ b/drivers/char/tpm/tpm-chip.c
-> @@ -26,6 +26,7 @@
->  #include <linux/spinlock.h>
->  #include <linux/freezer.h>
->  #include <linux/major.h>
-> +#include <linux/hw_random.h>
->  #include "tpm.h"
->  #include "tpm_eventlog.h"
->
-> @@ -387,6 +388,26 @@ static int tpm_add_legacy_sysfs(struct tpm_chip *chip)
->
->         return 0;
->  }
-> +
-> +static int tpm_hwrng_read(struct hwrng *rng, void *data, size_t max, bool wait)
-> +{
-> +       struct tpm_chip *chip = container_of(rng, struct tpm_chip, tpm_hwrng);
-> +
-> +       return tpm_get_random_dev(chip, data, max);
-> +}
-> +
-> +static int tpm_add_hwrng(struct tpm_chip *chip)
-> +{
-> +       if (!IS_ENABLED(CONFIG_HW_RANDOM_TPM))
-> +               return 0;
+Thank you.
 
-Can #ifndef CONFIG_HW_RANDOM_TPM be used instead? That way an if
-condition can be avoided.
+>> > 3. Using zero deos not give you any better guarantees on anything than
+>> >    just using TPM_ANY_NUM.
+>>
+>> Chip id is used, not zero.
+>
+> Sorry I misread the patch first time. Anyway it's not any kind of ID to
+> be trusted.
 
-> +
-> +       snprintf(chip->tpm_hwrng_name, sizeof(chip->tpm_hwrng_name),
-> +                "tpm-rng-%d", chip->dev_num);
-> +       chip->tpm_hwrng.name = chip->tpm_hwrng_name;
-> +       chip->tpm_hwrng.read = tpm_hwrng_read;
-> +       return hwrng_register(&chip->tpm_hwrng);
-> +}
-> +
->  /*
->   * tpm_chip_register() - create a character device for the TPM chip
->   * @chip: TPM chip to use.
-> @@ -419,11 +440,13 @@ int tpm_chip_register(struct tpm_chip *chip)
->
->         tpm_add_ppi(chip);
->
-> +       rc = tpm_add_hwrng(chip);
-> +       if (rc)
-> +               goto out_ppi;
-> +
->         rc = tpm_add_char_device(chip);
-> -       if (rc) {
-> -               tpm_bios_log_teardown(chip);
-> -               return rc;
-> -       }
-> +       if (rc)
-> +               goto out_hwrng;
->
->         rc = tpm_add_legacy_sysfs(chip);
->         if (rc) {
-> @@ -432,6 +455,14 @@ int tpm_chip_register(struct tpm_chip *chip)
->         }
->
->         return 0;
-> +
-> +out_hwrng:
-> +       if (IS_ENABLED(CONFIG_HW_RANDOM_TPM))
-> +               hwrng_unregister(&chip->tpm_hwrng);
-> +out_ppi:
-> +       tpm_bios_log_teardown(chip);
-> +
-> +       return rc;
->  }
->  EXPORT_SYMBOL_GPL(tpm_chip_register);
->
-> @@ -451,6 +482,8 @@ EXPORT_SYMBOL_GPL(tpm_chip_register);
->  void tpm_chip_unregister(struct tpm_chip *chip)
->  {
->         tpm_del_legacy_sysfs(chip);
-> +       if (IS_ENABLED(CONFIG_HW_RANDOM_TPM))
-> +               hwrng_unregister(&chip->tpm_hwrng);
->         tpm_bios_log_teardown(chip);
->         if (chip->flags & TPM_CHIP_FLAG_TPM2)
->                 cdev_device_del(&chip->cdevs, &chip->devs);
-> diff --git a/drivers/char/tpm/tpm-interface.c b/drivers/char/tpm/tpm-interface.c
-> index 1d6729be4cd637..310de288549818 100644
-> --- a/drivers/char/tpm/tpm-interface.c
-> +++ b/drivers/char/tpm/tpm-interface.c
-> @@ -1194,9 +1194,8 @@ static const struct tpm_input_header tpm_getrandom_header = {
->   *
->   * Returns < 0 on error and the number of bytes read on success
->   */
-> -int tpm_get_random(u32 chip_num, u8 *out, size_t max)
-> +int tpm_get_random_dev(struct tpm_chip *chip, u8 *out, size_t max)
->  {
-> -       struct tpm_chip *chip;
->         struct tpm_cmd_t tpm_cmd;
->         u32 recd, num_bytes = min_t(u32, max, TPM_MAX_RNG_DATA), rlength;
->         int err, total = 0, retries = 5;
-> @@ -1205,15 +1204,8 @@ int tpm_get_random(u32 chip_num, u8 *out, size_t max)
->         if (!out || !num_bytes || max > TPM_MAX_RNG_DATA)
->                 return -EINVAL;
->
-> -       chip = tpm_chip_find_get(chip_num);
-> -       if (chip == NULL)
-> -               return -ENODEV;
-> -
-> -       if (chip->flags & TPM_CHIP_FLAG_TPM2) {
-> -               err = tpm2_get_random(chip, out, max);
-> -               tpm_put_ops(chip);
-> -               return err;
-> -       }
-> +       if (chip->flags & TPM_CHIP_FLAG_TPM2)
-> +               return tpm2_get_random(chip, out, max);
->
->         do {
->                 tpm_cmd.header.in = tpm_getrandom_header;
-> @@ -1231,10 +1223,9 @@ int tpm_get_random(u32 chip_num, u8 *out, size_t max)
->
->                 rlength = be32_to_cpu(tpm_cmd.header.out.length);
->                 if (rlength < offsetof(struct tpm_getrandom_out, rng_data) +
-> -                             recd) {
-> -                       total = -EFAULT;
-> -                       break;
-> -               }
-> +                             recd)
-> +                       return -EFAULT;
-> +
->                 memcpy(dest, tpm_cmd.params.getrandom_out.rng_data, recd);
->
->                 dest += recd;
-> @@ -1242,9 +1233,23 @@ int tpm_get_random(u32 chip_num, u8 *out, size_t max)
->                 num_bytes -= recd;
->         } while (retries-- && total < max);
->
-> -       tpm_put_ops(chip);
->         return total ? total : -EIO;
->  }
-> +
-> +int tpm_get_random(u32 chip_num, u8 *out, size_t max)
-> +{
-> +       int rc;
-> +       struct tpm_chip *chip;
-> +
-> +       chip = tpm_chip_find_get(chip_num);
-> +       if (chip == NULL)
-> +               return -ENODEV;
-> +
-> +       rc = tpm_get_random_dev(chip, out, max);
-> +
-> +       tpm_put_ops(chip);
-> +       return rc;
-> +}
->  EXPORT_SYMBOL_GPL(tpm_get_random);
->
->  /**
-> diff --git a/drivers/char/tpm/tpm.h b/drivers/char/tpm/tpm.h
-> index 2d5466a72e40f8..0e41e044d81be2 100644
-> --- a/drivers/char/tpm/tpm.h
-> +++ b/drivers/char/tpm/tpm.h
-> @@ -26,6 +26,7 @@
->  #include <linux/module.h>
->  #include <linux/delay.h>
->  #include <linux/fs.h>
-> +#include <linux/hw_random.h>
->  #include <linux/mutex.h>
->  #include <linux/sched.h>
->  #include <linux/platform_device.h>
-> @@ -210,6 +211,9 @@ struct tpm_chip {
->         int dev_num;            /* /dev/tpm# */
->         unsigned long is_open;  /* only one allowed */
->
-> +       char tpm_hwrng_name[64];
-> +       struct hwrng tpm_hwrng;
-> +
+Okay.
 
-Can this also be put inside the #ifdef?
+>> > Why this patch is not CC'd to linux-integrity? It modifies the TPM
+>> > driver. And in the worst way.
+>>
+>> TPM list is moderated and the moderator has not approved it yet.
+>> get_maintainer script did not say about linux-integrity mailing list.
+>>
+>> It could be doing things in worst way but it is not known until some
+>> one says. If no one tells it is the case I don't think it is possible
+>> to fix. Which is what happened.
+>
+> Understood. We've moved to linux-integrity-u79uwXL29TaiAVqoAR/hOA@public.gmane.org MAINTAINERS
+> update is in the queue for the next kernel release.
 
->         struct mutex tpm_mutex; /* tpm is processing */
->
->         unsigned long timeout_a; /* jiffies */
-> @@ -548,6 +552,7 @@ void tpm_chip_unregister(struct tpm_chip *chip);
->  void tpm_sysfs_add_device(struct tpm_chip *chip);
->
->  int tpm_pcr_read_dev(struct tpm_chip *chip, int pcr_idx, u8 *res_buf);
-> +int tpm_get_random_dev(struct tpm_chip *chip, u8 *out, size_t max);
->
->  #ifdef CONFIG_ACPI
->  extern void tpm_add_ppi(struct tpm_chip *chip);
-> --
-> 2.7.4
->
+Sorry I never knew this.
 
-Regards,
+>> > Implementing the ideas that Jason explained is the senseful way to
+>> > get stable access. modules.dep makes sure that the modules are loaded
+>> > in the correct order.
+>>
+>> If that is sensible then it is the way to go.
+>>
+>> There must be a reason to believe what is sensible and what is not.
+>> Looks like this RFC has helped in judging that.
+>>
+>> Regards,
+>> PrasannaKumar
+>
+> Would you be interested to work on patch set that would remove the
+> existing tpm rng driver and make the TPM driver the customer? It's not
+> that far away from the work you've been doing already.
+>
+> /Jarkko
+
+I am late to the party. Jason has sent a patch doing that by the time
+I read this email.
+
+Thanks and regards,
 PrasannaKumar
+
+------------------------------------------------------------------------------
+Check out the vibrant tech community on one of the world's most
+engaging tech sites, Slashdot.org! http://sdm.link/slashdot
