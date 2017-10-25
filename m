@@ -1,620 +1,375 @@
-From: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-Subject: [PATCH v2] tpm: use struct tpm_chip for tpm_chip_find_get()
-Date: Wed, 25 Oct 2017 13:55:04 +0200
-Message-ID: <20171025115508.5682-1-jarkko.sakkinen@linux.intel.com>
-Cc: linux-security-module@vger.kernel.org,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Peter Huewe <peterhuewe@gmx.de>,
-        Marcel Selhorst <tpmdd@selhorst.net>,
-        Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        James Morris <james.l.morris@oracle.com>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        David Safford <safford@us.ibm.com>,
+From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Subject: Re: [PATCH] tpm: Move Linux RNG connection to hwrng
+Date: Wed, 25 Oct 2017 20:15:09 +0530
+Message-ID: <CANc+2y5q78g1Ow1JQ7kO0SkPrgNtbRV=COkB4YLHbSraTQH7aQ@mail.gmail.com>
+References: <20171024184235.GC1806@obsidianresearch.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Cc: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        Stefan Berger <stefanb@linux.vnet.ibm.com>,
+        linux-integrity@vger.kernel.org,
         David Howells <dhowells@redhat.com>,
-        Jerry Snitselaar <jsnitsel@redhat.com>,
-        linux-crypto@vger.kernel.org (open list:HARDWARE RANDOM NUMBER
-        GENERATOR CORE), linux-kernel@vger.kernel.org (open list),
-        tpmdd-devel@lists.sourceforge.net (moderated list:TPM DEVICE DRIVER),
-        linux
-To: linux-integrity@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        linux-security-module@vger.kernel.org,
+        "open list:KEYS-TRUSTED" <keyrings@vger.kernel.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        James Morris <james.l.morris@oracle.com>,
+        Matt Mackall <mpm@selenic.com>,
+        David Safford <safford@us.ibm.com>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        "Serge E. Hallyn" <serge@hallyn.com>
+To: Jason Gunthorpe <jgunthorpe@obsidianresearch.com>
+Return-path: <linux-security-module-owner@vger.kernel.org>
+In-Reply-To: <20171024184235.GC1806@obsidianresearch.com>
+Sender: owner-linux-security-module@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Device number (the character device index) is not a stable identifier
-for a TPM chip. That is the reason why every call site passes
-TPM_ANY_NUM to tpm_chip_find_get().
+Hi Jason,
 
-This commit changes the API in a way that instead a struct tpm_chip
-instance is given and NULL means the default chip. In addition, this
-commit refines the documentation to be up to date with the
-implementation.
+Nice to see this patch. Some minor comments below.
 
-Suggested-by: Jason Gunthorpe <jgunthorpe@obsidianresearch.com> (@chip_num -> @chip)
-Signed-off-by: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
----
-v2:
-* Further defined function documentation.
-* Changed @chip_num to @chip instead of removing the parameter as suggested by
-  Jason Gunthorpe.
- drivers/char/hw_random/tpm-rng.c    |   2 +-
- drivers/char/tpm/tpm-chip.c         |  21 +++---
- drivers/char/tpm/tpm-interface.c    | 135 +++++++++++++++++++-----------------
- drivers/char/tpm/tpm.h              |   2 +-
- include/linux/tpm.h                 |  38 +++++-----
- security/integrity/ima/ima_crypto.c |   2 +-
- security/integrity/ima/ima_init.c   |   2 +-
- security/integrity/ima/ima_queue.c  |   2 +-
- security/keys/trusted.c             |  35 +++++-----
- 9 files changed, 125 insertions(+), 114 deletions(-)
+On 25 October 2017 at 00:12, Jason Gunthorpe
+<jgunthorpe@obsidianresearch.com> wrote:
+> The tpm-rng.c approach is completely inconsistent with how the kernel
+> handles hotplug. Instead manage a hwrng device for each TPM. This will
+> cause the kernel to read entropy from the TPM when it is plugged in,
+> and allow access to the TPM rng via /dev/hwrng.
+>
+> Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+> Signed-off-by: Jason Gunthorpe <jgunthorpe@obsidianresearch.com>
+> Reviewed-by: Jason Gunthorpe <jgunthorpe@obsidianresearch.com>
+> ---
+>  drivers/char/hw_random/Kconfig   | 13 -----------
+>  drivers/char/hw_random/Makefile  |  1 -
+>  drivers/char/hw_random/tpm-rng.c | 50 ----------------------------------------
+>  drivers/char/tpm/Kconfig         | 13 +++++++++++
+>  drivers/char/tpm/tpm-chip.c      | 41 ++++++++++++++++++++++++++++----
+>  drivers/char/tpm/tpm-interface.c | 37 ++++++++++++++++-------------
+>  drivers/char/tpm/tpm.h           |  5 ++++
+>  7 files changed, 76 insertions(+), 84 deletions(-)
+>  delete mode 100644 drivers/char/hw_random/tpm-rng.c
+>
+> All,
+>
+> It is such a good idea, I took PrasannaKumar's patch, reviewed and
+> revised it to the level it could be merged.
 
-diff --git a/drivers/char/hw_random/tpm-rng.c b/drivers/char/hw_random/tpm-rng.c
-index d6d448266f07..c5e363825af0 100644
---- a/drivers/char/hw_random/tpm-rng.c
-+++ b/drivers/char/hw_random/tpm-rng.c
-@@ -25,7 +25,7 @@
- 
- static int tpm_rng_read(struct hwrng *rng, void *data, size_t max, bool wait)
- {
--	return tpm_get_random(TPM_ANY_NUM, data, max);
-+	return tpm_get_random(NULL, data, max);
- }
- 
- static struct hwrng tpm_rng = {
-diff --git a/drivers/char/tpm/tpm-chip.c b/drivers/char/tpm/tpm-chip.c
-index a114e8f7fb90..c7a4e7fb424d 100644
---- a/drivers/char/tpm/tpm-chip.c
-+++ b/drivers/char/tpm/tpm-chip.c
-@@ -81,21 +81,26 @@ void tpm_put_ops(struct tpm_chip *chip)
- EXPORT_SYMBOL_GPL(tpm_put_ops);
- 
- /**
-- * tpm_chip_find_get() - return tpm_chip for a given chip number
-- * @chip_num: id to find
-+ * tpm_chip_find_get() - find and reserve a TPM chip
-+ * @chip:	a &struct tpm_chip instance, %NULL for the default chip
-  *
-- * The return'd chip has been tpm_try_get_ops'd and must be released via
-- * tpm_put_ops
-+ * Finds a TPM chip and reserves its class device and operations. The chip must
-+ * be released with tpm_chip_put_ops() after use.
-+ *
-+ * Return:
-+ * A reserved &struct tpm_chip instance.
-+ * %NULL if a chip is not found.
-+ * %NULL if the chip is not available.
-  */
--struct tpm_chip *tpm_chip_find_get(int chip_num)
-+struct tpm_chip *tpm_chip_find_get(struct tpm_chip *chip)
- {
--	struct tpm_chip *chip, *res = NULL;
-+	struct tpm_chip *res = NULL;
-+	int chip_num = 0;
- 	int chip_prev;
- 
- 	mutex_lock(&idr_lock);
- 
--	if (chip_num == TPM_ANY_NUM) {
--		chip_num = 0;
-+	if (!chip) {
- 		do {
- 			chip_prev = chip_num;
- 			chip = idr_get_next(&dev_nums_idr, &chip_num);
-diff --git a/drivers/char/tpm/tpm-interface.c b/drivers/char/tpm/tpm-interface.c
-index ebe0a1d36d8c..19f820f775b5 100644
---- a/drivers/char/tpm/tpm-interface.c
-+++ b/drivers/char/tpm/tpm-interface.c
-@@ -809,19 +809,20 @@ int tpm_pcr_read_dev(struct tpm_chip *chip, int pcr_idx, u8 *res_buf)
- }
- 
- /**
-- * tpm_is_tpm2 - is the chip a TPM2 chip?
-- * @chip_num:	tpm idx # or ANY
-+ * tpm_is_tpm2 - do we a have a TPM2 chip?
-+ * @chip:	a &struct tpm_chip instance, %NULL for the default chip
-  *
-- * Returns < 0 on error, and 1 or 0 on success depending whether the chip
-- * is a TPM2 chip.
-+ * Return:
-+ * 1 if we have a TPM2 chip.
-+ * 0 if we don't have a TPM2 chip.
-+ * A negative number for system errors (errno).
-  */
--int tpm_is_tpm2(u32 chip_num)
-+int tpm_is_tpm2(struct tpm_chip *chip)
- {
--	struct tpm_chip *chip;
- 	int rc;
- 
--	chip = tpm_chip_find_get(chip_num);
--	if (chip == NULL)
-+	chip = tpm_chip_find_get(chip);
-+	if (!chip)
- 		return -ENODEV;
- 
- 	rc = (chip->flags & TPM_CHIP_FLAG_TPM2) != 0;
-@@ -833,23 +834,19 @@ int tpm_is_tpm2(u32 chip_num)
- EXPORT_SYMBOL_GPL(tpm_is_tpm2);
- 
- /**
-- * tpm_pcr_read - read a pcr value
-- * @chip_num:	tpm idx # or ANY
-- * @pcr_idx:	pcr idx to retrieve
-- * @res_buf:	TPM_PCR value
-- *		size of res_buf is 20 bytes (or NULL if you don't care)
-+ * tpm_pcr_read - read a PCR value from SHA1 bank
-+ * @chip:	a &struct tpm_chip instance, %NULL for the default chip
-+ * @pcr_idx:	the PCR to be retrieved
-+ * @res_buf:	the value of the PCR
-  *
-- * The TPM driver should be built-in, but for whatever reason it
-- * isn't, protect against the chip disappearing, by incrementing
-- * the module usage count.
-+ * Return: same as with tpm_transmit_cmd()
-  */
--int tpm_pcr_read(u32 chip_num, int pcr_idx, u8 *res_buf)
-+int tpm_pcr_read(struct tpm_chip *chip, int pcr_idx, u8 *res_buf)
- {
--	struct tpm_chip *chip;
- 	int rc;
- 
--	chip = tpm_chip_find_get(chip_num);
--	if (chip == NULL)
-+	chip = tpm_chip_find_get(chip);
-+	if (!chip)
- 		return -ENODEV;
- 	if (chip->flags & TPM_CHIP_FLAG_TPM2)
- 		rc = tpm2_pcr_read(chip, pcr_idx, res_buf);
-@@ -889,25 +886,26 @@ static int tpm1_pcr_extend(struct tpm_chip *chip, int pcr_idx, const u8 *hash,
- }
- 
- /**
-- * tpm_pcr_extend - extend pcr value with hash
-- * @chip_num:	tpm idx # or AN&
-- * @pcr_idx:	pcr idx to extend
-- * @hash:	hash value used to extend pcr value
-+ * tpm_pcr_extend - extend a PCR value in SHA1 bank.
-+ * @chip:	a &struct tpm_chip instance, %NULL for the default chip
-+ * @pcr_idx:	the PCR to be retrieved
-+ * @hash:	the hash value used to extend the PCR value
-  *
-- * The TPM driver should be built-in, but for whatever reason it
-- * isn't, protect against the chip disappearing, by incrementing
-- * the module usage count.
-+ * Note: with TPM 2.0 extends also those banks with a known digest size to the
-+ * cryto subsystem in order to prevent malicious use of those PCR banks. In the
-+ * future we should dynamically determine digest sizes.
-+ *
-+ * Return: same as with tpm_transmit_cmd()
-  */
--int tpm_pcr_extend(u32 chip_num, int pcr_idx, const u8 *hash)
-+int tpm_pcr_extend(struct tpm_chip *chip, int pcr_idx, const u8 *hash)
- {
- 	int rc;
--	struct tpm_chip *chip;
- 	struct tpm2_digest digest_list[ARRAY_SIZE(chip->active_banks)];
- 	u32 count = 0;
- 	int i;
- 
--	chip = tpm_chip_find_get(chip_num);
--	if (chip == NULL)
-+	chip = tpm_chip_find_get(chip);
-+	if (!chip)
- 		return -ENODEV;
- 
- 	if (chip->flags & TPM_CHIP_FLAG_TPM2) {
-@@ -1019,17 +1017,24 @@ int tpm1_auto_startup(struct tpm_chip *chip)
- 	return rc;
- }
- 
--int tpm_send(u32 chip_num, void *cmd, size_t buflen)
-+/**
-+ * tpm_send - send a TPM command
-+ * @chip:	a &struct tpm_chip instance, %NULL for the default chip
-+ * @cmd:	a TPM command buffer
-+ * @buflen:	the length of the TPM command buffer
-+ *
-+ * Return: same as with tpm_transmit_cmd()
-+ */
-+int tpm_send(struct tpm_chip *chip, void *cmd, size_t buflen)
- {
--	struct tpm_chip *chip;
- 	int rc;
- 
--	chip = tpm_chip_find_get(chip_num);
--	if (chip == NULL)
-+	chip = tpm_chip_find_get(chip);
-+	if (!chip)
- 		return -ENODEV;
- 
- 	rc = tpm_transmit_cmd(chip, NULL, cmd, buflen, 0, 0,
--			      "attempting tpm_cmd");
-+			      "attempting to a send a command");
- 	tpm_put_ops(chip);
- 	return rc;
- }
-@@ -1127,16 +1132,15 @@ static const struct tpm_input_header tpm_getrandom_header = {
- };
- 
- /**
-- * tpm_get_random() - Get random bytes from the tpm's RNG
-- * @chip_num: A specific chip number for the request or TPM_ANY_NUM
-- * @out: destination buffer for the random bytes
-- * @max: the max number of bytes to write to @out
-+ * tpm_get_random() - get random bytes from the TPM's RNG
-+ * @chip:	a &struct tpm_chip instance, %NULL for the default chip
-+ * @out:	destination buffer for the random bytes
-+ * @max:	the max number of bytes to write to @out
-  *
-- * Returns < 0 on error and the number of bytes read on success
-+ * Return: same as with tpm_transmit_cmd()
-  */
--int tpm_get_random(u32 chip_num, u8 *out, size_t max)
-+int tpm_get_random(struct tpm_chip *chip, u8 *out, size_t max)
- {
--	struct tpm_chip *chip;
- 	struct tpm_cmd_t tpm_cmd;
- 	u32 recd, num_bytes = min_t(u32, max, TPM_MAX_RNG_DATA), rlength;
- 	int err, total = 0, retries = 5;
-@@ -1145,8 +1149,8 @@ int tpm_get_random(u32 chip_num, u8 *out, size_t max)
- 	if (!out || !num_bytes || max > TPM_MAX_RNG_DATA)
- 		return -EINVAL;
- 
--	chip = tpm_chip_find_get(chip_num);
--	if (chip == NULL)
-+	chip = tpm_chip_find_get(chip);
-+	if (!chip)
- 		return -ENODEV;
- 
- 	if (chip->flags & TPM_CHIP_FLAG_TPM2) {
-@@ -1188,22 +1192,23 @@ int tpm_get_random(u32 chip_num, u8 *out, size_t max)
- EXPORT_SYMBOL_GPL(tpm_get_random);
- 
- /**
-- * tpm_seal_trusted() - seal a trusted key
-- * @chip_num: A specific chip number for the request or TPM_ANY_NUM
-- * @options: authentication values and other options
-- * @payload: the key data in clear and encrypted form
-+ * tpm_seal_trusted() - seal a trusted key payload
-+ * @chip:	a &struct tpm_chip instance, %NULL for the default chip
-+ * @options:	authentication values and other options
-+ * @payload:	the key data in clear and encrypted form
-+ *
-+ * Note: only TPM 2.0 chip are supported. TPM 1.x implementation is located in
-+ * the keyring subsystem.
-  *
-- * Returns < 0 on error and 0 on success. At the moment, only TPM 2.0 chips
-- * are supported.
-+ * Return: same as with tpm_transmit_cmd()
-  */
--int tpm_seal_trusted(u32 chip_num, struct trusted_key_payload *payload,
-+int tpm_seal_trusted(struct tpm_chip *chip, struct trusted_key_payload *payload,
- 		     struct trusted_key_options *options)
- {
--	struct tpm_chip *chip;
- 	int rc;
- 
--	chip = tpm_chip_find_get(chip_num);
--	if (chip == NULL || !(chip->flags & TPM_CHIP_FLAG_TPM2))
-+	chip = tpm_chip_find_get(chip);
-+	if (!chip || !(chip->flags & TPM_CHIP_FLAG_TPM2))
- 		return -ENODEV;
- 
- 	rc = tpm2_seal_trusted(chip, payload, options);
-@@ -1215,21 +1220,23 @@ EXPORT_SYMBOL_GPL(tpm_seal_trusted);
- 
- /**
-  * tpm_unseal_trusted() - unseal a trusted key
-- * @chip_num: A specific chip number for the request or TPM_ANY_NUM
-- * @options: authentication values and other options
-- * @payload: the key data in clear and encrypted form
-+ * @chip:	a &struct tpm_chip instance, %NULL for the default chip
-+ * @options:	authentication values and other options
-+ * @payload:	the key data in clear and encrypted form
-+ *
-+ * Note: only TPM 2.0 chip are supported. TPM 1.x implementation is located in
-+ * the keyring subsystem.
-  *
-- * Returns < 0 on error and 0 on success. At the moment, only TPM 2.0 chips
-- * are supported.
-+ * Return: same as with tpm_transmit_cmd()
-  */
--int tpm_unseal_trusted(u32 chip_num, struct trusted_key_payload *payload,
-+int tpm_unseal_trusted(struct tpm_chip *chip,
-+		       struct trusted_key_payload *payload,
- 		       struct trusted_key_options *options)
- {
--	struct tpm_chip *chip;
- 	int rc;
- 
--	chip = tpm_chip_find_get(chip_num);
--	if (chip == NULL || !(chip->flags & TPM_CHIP_FLAG_TPM2))
-+	chip = tpm_chip_find_get(chip);
-+	if (!chip || !(chip->flags & TPM_CHIP_FLAG_TPM2))
- 		return -ENODEV;
- 
- 	rc = tpm2_unseal_trusted(chip, payload, options);
-diff --git a/drivers/char/tpm/tpm.h b/drivers/char/tpm/tpm.h
-index c1866cc02e30..6c189174c0d3 100644
---- a/drivers/char/tpm/tpm.h
-+++ b/drivers/char/tpm/tpm.h
-@@ -516,7 +516,7 @@ static inline void tpm_msleep(unsigned int delay_msec)
- 		     delay_msec * 1000);
- };
- 
--struct tpm_chip *tpm_chip_find_get(int chip_num);
-+struct tpm_chip *tpm_chip_find_get(struct tpm_chip *chip);
- __must_check int tpm_try_get_ops(struct tpm_chip *chip);
- void tpm_put_ops(struct tpm_chip *chip);
- 
-diff --git a/include/linux/tpm.h b/include/linux/tpm.h
-index 5a090f5ab335..ddc9b88ff6d3 100644
---- a/include/linux/tpm.h
-+++ b/include/linux/tpm.h
-@@ -24,11 +24,6 @@
- 
- #define TPM_DIGEST_SIZE 20	/* Max TPM v1.2 PCR size */
- 
--/*
-- * Chip num is this value or a valid tpm idx
-- */
--#define	TPM_ANY_NUM 0xFFFF
--
- struct tpm_chip;
- struct trusted_key_payload;
- struct trusted_key_options;
-@@ -54,42 +49,47 @@ struct tpm_class_ops {
- 
- #if defined(CONFIG_TCG_TPM) || defined(CONFIG_TCG_TPM_MODULE)
- 
--extern int tpm_is_tpm2(u32 chip_num);
--extern int tpm_pcr_read(u32 chip_num, int pcr_idx, u8 *res_buf);
--extern int tpm_pcr_extend(u32 chip_num, int pcr_idx, const u8 *hash);
--extern int tpm_send(u32 chip_num, void *cmd, size_t buflen);
--extern int tpm_get_random(u32 chip_num, u8 *data, size_t max);
--extern int tpm_seal_trusted(u32 chip_num,
-+extern int tpm_is_tpm2(struct tpm_chip *chip);
-+extern int tpm_pcr_read(struct tpm_chip *chip, int pcr_idx, u8 *res_buf);
-+extern int tpm_pcr_extend(struct tpm_chip *chip, int pcr_idx, const u8 *hash);
-+extern int tpm_send(struct tpm_chip *chip, void *cmd, size_t buflen);
-+extern int tpm_get_random(struct tpm_chip *chip, u8 *data, size_t max);
-+extern int tpm_seal_trusted(struct tpm_chip *chip,
- 			    struct trusted_key_payload *payload,
- 			    struct trusted_key_options *options);
--extern int tpm_unseal_trusted(u32 chip_num,
-+extern int tpm_unseal_trusted(struct tpm_chip *chip,
- 			      struct trusted_key_payload *payload,
- 			      struct trusted_key_options *options);
- #else
--static inline int tpm_is_tpm2(u32 chip_num)
-+static inline int tpm_is_tpm2(struct tpm_chip *chip)
- {
- 	return -ENODEV;
- }
--static inline int tpm_pcr_read(u32 chip_num, int pcr_idx, u8 *res_buf) {
-+static inline int tpm_pcr_read(struct tpm_chip *chip, int pcr_idx, u8 *res_buf)
-+{
- 	return -ENODEV;
- }
--static inline int tpm_pcr_extend(u32 chip_num, int pcr_idx, const u8 *hash) {
-+static inline int tpm_pcr_extend(struct tpm_chip *chip, int pcr_idx,
-+				 const u8 *hash)
-+{
- 	return -ENODEV;
- }
--static inline int tpm_send(u32 chip_num, void *cmd, size_t buflen) {
-+static inline int tpm_send(struct tpm_chip *chip, void *cmd, size_t buflen)
-+{
- 	return -ENODEV;
- }
--static inline int tpm_get_random(u32 chip_num, u8 *data, size_t max) {
-+static inline int tpm_get_random(struct tpm_chip *chip, u8 *data, size_t max)
-+{
- 	return -ENODEV;
- }
- 
--static inline int tpm_seal_trusted(u32 chip_num,
-+static inline int tpm_seal_trusted(struct tpm_chip *chip,
- 				   struct trusted_key_payload *payload,
- 				   struct trusted_key_options *options)
- {
- 	return -ENODEV;
- }
--static inline int tpm_unseal_trusted(u32 chip_num,
-+static inline int tpm_unseal_trusted(struct tpm_chip *chip,
- 				     struct trusted_key_payload *payload,
- 				     struct trusted_key_options *options)
- {
-diff --git a/security/integrity/ima/ima_crypto.c b/security/integrity/ima/ima_crypto.c
-index 802d5d20f36f..3371d134ee62 100644
---- a/security/integrity/ima/ima_crypto.c
-+++ b/security/integrity/ima/ima_crypto.c
-@@ -644,7 +644,7 @@ static void __init ima_pcrread(int idx, u8 *pcr)
- 	if (!ima_used_chip)
- 		return;
- 
--	if (tpm_pcr_read(TPM_ANY_NUM, idx, pcr) != 0)
-+	if (tpm_pcr_read(NULL, idx, pcr) != 0)
- 		pr_err("Error Communicating to TPM chip\n");
- }
- 
-diff --git a/security/integrity/ima/ima_init.c b/security/integrity/ima/ima_init.c
-index 2967d497a665..29b72cd2502e 100644
---- a/security/integrity/ima/ima_init.c
-+++ b/security/integrity/ima/ima_init.c
-@@ -110,7 +110,7 @@ int __init ima_init(void)
- 	int rc;
- 
- 	ima_used_chip = 0;
--	rc = tpm_pcr_read(TPM_ANY_NUM, 0, pcr_i);
-+	rc = tpm_pcr_read(NULL, 0, pcr_i);
- 	if (rc == 0)
- 		ima_used_chip = 1;
- 
-diff --git a/security/integrity/ima/ima_queue.c b/security/integrity/ima/ima_queue.c
-index a02a86d51102..418f35e38015 100644
---- a/security/integrity/ima/ima_queue.c
-+++ b/security/integrity/ima/ima_queue.c
-@@ -145,7 +145,7 @@ static int ima_pcr_extend(const u8 *hash, int pcr)
- 	if (!ima_used_chip)
- 		return result;
- 
--	result = tpm_pcr_extend(TPM_ANY_NUM, pcr, hash);
-+	result = tpm_pcr_extend(NULL, pcr, hash);
- 	if (result != 0)
- 		pr_err("Error Communicating to TPM chip, result: %d\n", result);
- 	return result;
-diff --git a/security/keys/trusted.c b/security/keys/trusted.c
-index ddfaebf60fc8..d2b20b1cc2f1 100644
---- a/security/keys/trusted.c
-+++ b/security/keys/trusted.c
-@@ -355,13 +355,12 @@ static int TSS_checkhmac2(unsigned char *buffer,
-  * For key specific tpm requests, we will generate and send our
-  * own TPM command packets using the drivers send function.
-  */
--static int trusted_tpm_send(const u32 chip_num, unsigned char *cmd,
--			    size_t buflen)
-+static int trusted_tpm_send(unsigned char *cmd, size_t buflen)
- {
- 	int rc;
- 
- 	dump_tpm_buf(cmd);
--	rc = tpm_send(chip_num, cmd, buflen);
-+	rc = tpm_send(NULL, cmd, buflen);
- 	dump_tpm_buf(cmd);
- 	if (rc > 0)
- 		/* Can't return positive return codes values to keyctl */
-@@ -382,10 +381,10 @@ static int pcrlock(const int pcrnum)
- 
- 	if (!capable(CAP_SYS_ADMIN))
- 		return -EPERM;
--	ret = tpm_get_random(TPM_ANY_NUM, hash, SHA1_DIGEST_SIZE);
-+	ret = tpm_get_random(NULL, hash, SHA1_DIGEST_SIZE);
- 	if (ret != SHA1_DIGEST_SIZE)
- 		return ret;
--	return tpm_pcr_extend(TPM_ANY_NUM, pcrnum, hash) ? -EINVAL : 0;
-+	return tpm_pcr_extend(NULL, pcrnum, hash) ? -EINVAL : 0;
- }
- 
- /*
-@@ -398,7 +397,7 @@ static int osap(struct tpm_buf *tb, struct osapsess *s,
- 	unsigned char ononce[TPM_NONCE_SIZE];
- 	int ret;
- 
--	ret = tpm_get_random(TPM_ANY_NUM, ononce, TPM_NONCE_SIZE);
-+	ret = tpm_get_random(NULL, ononce, TPM_NONCE_SIZE);
- 	if (ret != TPM_NONCE_SIZE)
- 		return ret;
- 
-@@ -410,7 +409,7 @@ static int osap(struct tpm_buf *tb, struct osapsess *s,
- 	store32(tb, handle);
- 	storebytes(tb, ononce, TPM_NONCE_SIZE);
- 
--	ret = trusted_tpm_send(TPM_ANY_NUM, tb->data, MAX_BUF_SIZE);
-+	ret = trusted_tpm_send(tb->data, MAX_BUF_SIZE);
- 	if (ret < 0)
- 		return ret;
- 
-@@ -434,7 +433,7 @@ static int oiap(struct tpm_buf *tb, uint32_t *handle, unsigned char *nonce)
- 	store16(tb, TPM_TAG_RQU_COMMAND);
- 	store32(tb, TPM_OIAP_SIZE);
- 	store32(tb, TPM_ORD_OIAP);
--	ret = trusted_tpm_send(TPM_ANY_NUM, tb->data, MAX_BUF_SIZE);
-+	ret = trusted_tpm_send(tb->data, MAX_BUF_SIZE);
- 	if (ret < 0)
- 		return ret;
- 
-@@ -493,7 +492,7 @@ static int tpm_seal(struct tpm_buf *tb, uint16_t keytype,
- 	if (ret < 0)
- 		goto out;
- 
--	ret = tpm_get_random(TPM_ANY_NUM, td->nonceodd, TPM_NONCE_SIZE);
-+	ret = tpm_get_random(NULL, td->nonceodd, TPM_NONCE_SIZE);
- 	if (ret != TPM_NONCE_SIZE)
- 		goto out;
- 	ordinal = htonl(TPM_ORD_SEAL);
-@@ -542,7 +541,7 @@ static int tpm_seal(struct tpm_buf *tb, uint16_t keytype,
- 	store8(tb, cont);
- 	storebytes(tb, td->pubauth, SHA1_DIGEST_SIZE);
- 
--	ret = trusted_tpm_send(TPM_ANY_NUM, tb->data, MAX_BUF_SIZE);
-+	ret = trusted_tpm_send(tb->data, MAX_BUF_SIZE);
- 	if (ret < 0)
- 		goto out;
- 
-@@ -603,7 +602,7 @@ static int tpm_unseal(struct tpm_buf *tb,
- 
- 	ordinal = htonl(TPM_ORD_UNSEAL);
- 	keyhndl = htonl(SRKHANDLE);
--	ret = tpm_get_random(TPM_ANY_NUM, nonceodd, TPM_NONCE_SIZE);
-+	ret = tpm_get_random(NULL, nonceodd, TPM_NONCE_SIZE);
- 	if (ret != TPM_NONCE_SIZE) {
- 		pr_info("trusted_key: tpm_get_random failed (%d)\n", ret);
- 		return ret;
-@@ -635,7 +634,7 @@ static int tpm_unseal(struct tpm_buf *tb,
- 	store8(tb, cont);
- 	storebytes(tb, authdata2, SHA1_DIGEST_SIZE);
- 
--	ret = trusted_tpm_send(TPM_ANY_NUM, tb->data, MAX_BUF_SIZE);
-+	ret = trusted_tpm_send(tb->data, MAX_BUF_SIZE);
- 	if (ret < 0) {
- 		pr_info("trusted_key: authhmac failed (%d)\n", ret);
- 		return ret;
-@@ -748,7 +747,7 @@ static int getoptions(char *c, struct trusted_key_payload *pay,
- 	int i;
- 	int tpm2;
- 
--	tpm2 = tpm_is_tpm2(TPM_ANY_NUM);
-+	tpm2 = tpm_is_tpm2(NULL);
- 	if (tpm2 < 0)
- 		return tpm2;
- 
-@@ -917,7 +916,7 @@ static struct trusted_key_options *trusted_options_alloc(void)
- 	struct trusted_key_options *options;
- 	int tpm2;
- 
--	tpm2 = tpm_is_tpm2(TPM_ANY_NUM);
-+	tpm2 = tpm_is_tpm2(NULL);
- 	if (tpm2 < 0)
- 		return NULL;
- 
-@@ -967,7 +966,7 @@ static int trusted_instantiate(struct key *key,
- 	size_t key_len;
- 	int tpm2;
- 
--	tpm2 = tpm_is_tpm2(TPM_ANY_NUM);
-+	tpm2 = tpm_is_tpm2(NULL);
- 	if (tpm2 < 0)
- 		return tpm2;
- 
-@@ -1008,7 +1007,7 @@ static int trusted_instantiate(struct key *key,
- 	switch (key_cmd) {
- 	case Opt_load:
- 		if (tpm2)
--			ret = tpm_unseal_trusted(TPM_ANY_NUM, payload, options);
-+			ret = tpm_unseal_trusted(NULL, payload, options);
- 		else
- 			ret = key_unseal(payload, options);
- 		dump_payload(payload);
-@@ -1018,13 +1017,13 @@ static int trusted_instantiate(struct key *key,
- 		break;
- 	case Opt_new:
- 		key_len = payload->key_len;
--		ret = tpm_get_random(TPM_ANY_NUM, payload->key, key_len);
-+		ret = tpm_get_random(NULL, payload->key, key_len);
- 		if (ret != key_len) {
- 			pr_info("trusted_key: key_create failed (%d)\n", ret);
- 			goto out;
- 		}
- 		if (tpm2)
--			ret = tpm_seal_trusted(TPM_ANY_NUM, payload, options);
-+			ret = tpm_seal_trusted(NULL, payload, options);
- 		else
- 			ret = key_seal(payload, options);
- 		if (ret < 0)
--- 
-2.14.1
+Thank you for this.
+
+> This is compile tested only.
+>
+> diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+> index 95a031e9eced07..a20fed182cbcce 100644
+> --- a/drivers/char/hw_random/Kconfig
+> +++ b/drivers/char/hw_random/Kconfig
+> @@ -306,19 +306,6 @@ config HW_RANDOM_POWERNV
+>
+>           If unsure, say Y.
+>
+> -config HW_RANDOM_TPM
+> -       tristate "TPM HW Random Number Generator support"
+> -       depends on TCG_TPM
+> -       default HW_RANDOM
+> -       ---help---
+> -         This driver provides kernel-side support for the Random Number
+> -         Generator in the Trusted Platform Module
+> -
+> -         To compile this driver as a module, choose M here: the
+> -         module will be called tpm-rng.
+> -
+> -         If unsure, say Y.
+> -
+>  config HW_RANDOM_HISI
+>         tristate "Hisilicon Random Number Generator support"
+>         depends on HW_RANDOM && ARCH_HISI
+> diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Makefile
+> index 39a67defac67cb..91cb8e8213e7c1 100644
+> --- a/drivers/char/hw_random/Makefile
+> +++ b/drivers/char/hw_random/Makefile
+> @@ -26,7 +26,6 @@ obj-$(CONFIG_HW_RANDOM_NOMADIK) += nomadik-rng.o
+>  obj-$(CONFIG_HW_RANDOM_PSERIES) += pseries-rng.o
+>  obj-$(CONFIG_HW_RANDOM_POWERNV) += powernv-rng.o
+>  obj-$(CONFIG_HW_RANDOM_HISI)   += hisi-rng.o
+> -obj-$(CONFIG_HW_RANDOM_TPM) += tpm-rng.o
+>  obj-$(CONFIG_HW_RANDOM_BCM2835) += bcm2835-rng.o
+>  obj-$(CONFIG_HW_RANDOM_IPROC_RNG200) += iproc-rng200.o
+>  obj-$(CONFIG_HW_RANDOM_MSM) += msm-rng.o
+> diff --git a/drivers/char/hw_random/tpm-rng.c b/drivers/char/hw_random/tpm-rng.c
+> deleted file mode 100644
+> index d6d448266f0752..00000000000000
+> --- a/drivers/char/hw_random/tpm-rng.c
+> +++ /dev/null
+> @@ -1,50 +0,0 @@
+> -/*
+> - * Copyright (C) 2012 Kent Yoder IBM Corporation
+> - *
+> - * HWRNG interfaces to pull RNG data from a TPM
+> - *
+> - * This program is free software; you can redistribute it and/or modify
+> - * it under the terms of the GNU General Public License version 2 as
+> - * published by the Free Software Foundation.
+> - *
+> - * This program is distributed in the hope that it will be useful,
+> - * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> - * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> - * GNU General Public License for more details.
+> - *
+> - * You should have received a copy of the GNU General Public License
+> - * along with this program; if not, write to the Free Software
+> - * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+> - */
+> -
+> -#include <linux/module.h>
+> -#include <linux/hw_random.h>
+> -#include <linux/tpm.h>
+> -
+> -#define MODULE_NAME "tpm-rng"
+> -
+> -static int tpm_rng_read(struct hwrng *rng, void *data, size_t max, bool wait)
+> -{
+> -       return tpm_get_random(TPM_ANY_NUM, data, max);
+> -}
+> -
+> -static struct hwrng tpm_rng = {
+> -       .name = MODULE_NAME,
+> -       .read = tpm_rng_read,
+> -};
+> -
+> -static int __init rng_init(void)
+> -{
+> -       return hwrng_register(&tpm_rng);
+> -}
+> -module_init(rng_init);
+> -
+> -static void __exit rng_exit(void)
+> -{
+> -       hwrng_unregister(&tpm_rng);
+> -}
+> -module_exit(rng_exit);
+> -
+> -MODULE_LICENSE("GPL v2");
+> -MODULE_AUTHOR("Kent Yoder <key@linux.vnet.ibm.com>");
+> -MODULE_DESCRIPTION("RNG driver for TPM devices");
+> diff --git a/drivers/char/tpm/Kconfig b/drivers/char/tpm/Kconfig
+> index a30352202f1fdc..a95725fa77789e 100644
+> --- a/drivers/char/tpm/Kconfig
+> +++ b/drivers/char/tpm/Kconfig
+> @@ -26,6 +26,19 @@ menuconfig TCG_TPM
+>
+>  if TCG_TPM
+>
+> +config HW_RANDOM_TPM
+> +       tristate "TPM HW Random Number Generator support"
+> +       depends on TCG_TPM && HW_RANDOM
+> +       default HW_RANDOM
+> +       ---help---
+> +         This driver provides kernel-side support for the Random Number
+> +         Generator in the Trusted Platform Module
+> +
+> +         To compile this driver as a module, choose M here: the
+> +         module will be called tpm-rng.
+> +
+> +         If unsure, say Y.
+> +
+>  config TCG_TIS_CORE
+>         tristate
+>         ---help---
+> diff --git a/drivers/char/tpm/tpm-chip.c b/drivers/char/tpm/tpm-chip.c
+> index 0eca20c5a80cf2..f3571406fb2995 100644
+> --- a/drivers/char/tpm/tpm-chip.c
+> +++ b/drivers/char/tpm/tpm-chip.c
+> @@ -26,6 +26,7 @@
+>  #include <linux/spinlock.h>
+>  #include <linux/freezer.h>
+>  #include <linux/major.h>
+> +#include <linux/hw_random.h>
+>  #include "tpm.h"
+>  #include "tpm_eventlog.h"
+>
+> @@ -387,6 +388,26 @@ static int tpm_add_legacy_sysfs(struct tpm_chip *chip)
+>
+>         return 0;
+>  }
+> +
+> +static int tpm_hwrng_read(struct hwrng *rng, void *data, size_t max, bool wait)
+> +{
+> +       struct tpm_chip *chip = container_of(rng, struct tpm_chip, tpm_hwrng);
+> +
+> +       return tpm_get_random_dev(chip, data, max);
+> +}
+> +
+> +static int tpm_add_hwrng(struct tpm_chip *chip)
+> +{
+> +       if (!IS_ENABLED(CONFIG_HW_RANDOM_TPM))
+> +               return 0;
+
+Can #ifndef CONFIG_HW_RANDOM_TPM be used instead? That way an if
+condition can be avoided.
+
+> +
+> +       snprintf(chip->tpm_hwrng_name, sizeof(chip->tpm_hwrng_name),
+> +                "tpm-rng-%d", chip->dev_num);
+> +       chip->tpm_hwrng.name = chip->tpm_hwrng_name;
+> +       chip->tpm_hwrng.read = tpm_hwrng_read;
+> +       return hwrng_register(&chip->tpm_hwrng);
+> +}
+> +
+>  /*
+>   * tpm_chip_register() - create a character device for the TPM chip
+>   * @chip: TPM chip to use.
+> @@ -419,11 +440,13 @@ int tpm_chip_register(struct tpm_chip *chip)
+>
+>         tpm_add_ppi(chip);
+>
+> +       rc = tpm_add_hwrng(chip);
+> +       if (rc)
+> +               goto out_ppi;
+> +
+>         rc = tpm_add_char_device(chip);
+> -       if (rc) {
+> -               tpm_bios_log_teardown(chip);
+> -               return rc;
+> -       }
+> +       if (rc)
+> +               goto out_hwrng;
+>
+>         rc = tpm_add_legacy_sysfs(chip);
+>         if (rc) {
+> @@ -432,6 +455,14 @@ int tpm_chip_register(struct tpm_chip *chip)
+>         }
+>
+>         return 0;
+> +
+> +out_hwrng:
+> +       if (IS_ENABLED(CONFIG_HW_RANDOM_TPM))
+> +               hwrng_unregister(&chip->tpm_hwrng);
+> +out_ppi:
+> +       tpm_bios_log_teardown(chip);
+> +
+> +       return rc;
+>  }
+>  EXPORT_SYMBOL_GPL(tpm_chip_register);
+>
+> @@ -451,6 +482,8 @@ EXPORT_SYMBOL_GPL(tpm_chip_register);
+>  void tpm_chip_unregister(struct tpm_chip *chip)
+>  {
+>         tpm_del_legacy_sysfs(chip);
+> +       if (IS_ENABLED(CONFIG_HW_RANDOM_TPM))
+> +               hwrng_unregister(&chip->tpm_hwrng);
+>         tpm_bios_log_teardown(chip);
+>         if (chip->flags & TPM_CHIP_FLAG_TPM2)
+>                 cdev_device_del(&chip->cdevs, &chip->devs);
+> diff --git a/drivers/char/tpm/tpm-interface.c b/drivers/char/tpm/tpm-interface.c
+> index 1d6729be4cd637..310de288549818 100644
+> --- a/drivers/char/tpm/tpm-interface.c
+> +++ b/drivers/char/tpm/tpm-interface.c
+> @@ -1194,9 +1194,8 @@ static const struct tpm_input_header tpm_getrandom_header = {
+>   *
+>   * Returns < 0 on error and the number of bytes read on success
+>   */
+> -int tpm_get_random(u32 chip_num, u8 *out, size_t max)
+> +int tpm_get_random_dev(struct tpm_chip *chip, u8 *out, size_t max)
+>  {
+> -       struct tpm_chip *chip;
+>         struct tpm_cmd_t tpm_cmd;
+>         u32 recd, num_bytes = min_t(u32, max, TPM_MAX_RNG_DATA), rlength;
+>         int err, total = 0, retries = 5;
+> @@ -1205,15 +1204,8 @@ int tpm_get_random(u32 chip_num, u8 *out, size_t max)
+>         if (!out || !num_bytes || max > TPM_MAX_RNG_DATA)
+>                 return -EINVAL;
+>
+> -       chip = tpm_chip_find_get(chip_num);
+> -       if (chip == NULL)
+> -               return -ENODEV;
+> -
+> -       if (chip->flags & TPM_CHIP_FLAG_TPM2) {
+> -               err = tpm2_get_random(chip, out, max);
+> -               tpm_put_ops(chip);
+> -               return err;
+> -       }
+> +       if (chip->flags & TPM_CHIP_FLAG_TPM2)
+> +               return tpm2_get_random(chip, out, max);
+>
+>         do {
+>                 tpm_cmd.header.in = tpm_getrandom_header;
+> @@ -1231,10 +1223,9 @@ int tpm_get_random(u32 chip_num, u8 *out, size_t max)
+>
+>                 rlength = be32_to_cpu(tpm_cmd.header.out.length);
+>                 if (rlength < offsetof(struct tpm_getrandom_out, rng_data) +
+> -                             recd) {
+> -                       total = -EFAULT;
+> -                       break;
+> -               }
+> +                             recd)
+> +                       return -EFAULT;
+> +
+>                 memcpy(dest, tpm_cmd.params.getrandom_out.rng_data, recd);
+>
+>                 dest += recd;
+> @@ -1242,9 +1233,23 @@ int tpm_get_random(u32 chip_num, u8 *out, size_t max)
+>                 num_bytes -= recd;
+>         } while (retries-- && total < max);
+>
+> -       tpm_put_ops(chip);
+>         return total ? total : -EIO;
+>  }
+> +
+> +int tpm_get_random(u32 chip_num, u8 *out, size_t max)
+> +{
+> +       int rc;
+> +       struct tpm_chip *chip;
+> +
+> +       chip = tpm_chip_find_get(chip_num);
+> +       if (chip == NULL)
+> +               return -ENODEV;
+> +
+> +       rc = tpm_get_random_dev(chip, out, max);
+> +
+> +       tpm_put_ops(chip);
+> +       return rc;
+> +}
+>  EXPORT_SYMBOL_GPL(tpm_get_random);
+>
+>  /**
+> diff --git a/drivers/char/tpm/tpm.h b/drivers/char/tpm/tpm.h
+> index 2d5466a72e40f8..0e41e044d81be2 100644
+> --- a/drivers/char/tpm/tpm.h
+> +++ b/drivers/char/tpm/tpm.h
+> @@ -26,6 +26,7 @@
+>  #include <linux/module.h>
+>  #include <linux/delay.h>
+>  #include <linux/fs.h>
+> +#include <linux/hw_random.h>
+>  #include <linux/mutex.h>
+>  #include <linux/sched.h>
+>  #include <linux/platform_device.h>
+> @@ -210,6 +211,9 @@ struct tpm_chip {
+>         int dev_num;            /* /dev/tpm# */
+>         unsigned long is_open;  /* only one allowed */
+>
+> +       char tpm_hwrng_name[64];
+> +       struct hwrng tpm_hwrng;
+> +
+
+Can this also be put inside the #ifdef?
+
+>         struct mutex tpm_mutex; /* tpm is processing */
+>
+>         unsigned long timeout_a; /* jiffies */
+> @@ -548,6 +552,7 @@ void tpm_chip_unregister(struct tpm_chip *chip);
+>  void tpm_sysfs_add_device(struct tpm_chip *chip);
+>
+>  int tpm_pcr_read_dev(struct tpm_chip *chip, int pcr_idx, u8 *res_buf);
+> +int tpm_get_random_dev(struct tpm_chip *chip, u8 *out, size_t max);
+>
+>  #ifdef CONFIG_ACPI
+>  extern void tpm_add_ppi(struct tpm_chip *chip);
+> --
+> 2.7.4
+>
+
+Regards,
+PrasannaKumar
