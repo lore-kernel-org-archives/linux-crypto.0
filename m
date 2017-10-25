@@ -1,66 +1,86 @@
-From: Romain Izard <romain.izard.pro@gmail.com>
-Subject: "BUG: scheduling while atomic" in atmel-aes on Linux v4.14-rc6
-Date: Wed, 25 Oct 2017 17:26:31 +0200
-Message-ID: <CAGkQfmNKbSwue13zPh2K1F_kLkpm1_AhsAHK4spRFA0xMvU5PA@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Nicolas Ferre <nicolas.ferre@microchip.com>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
-To: linux-crypto@vger.kernel.org,
-        Stephan Mueller <smueller@chronox.de>,
+From: Kamil Konieczny <k.konieczny@partner.samsung.com>
+Subject: [PATCH v8 0/2] crypto: s5p-sss: Add HASH support for Exynos
+Date: Wed, 25 Oct 2017 17:27:33 +0200
+Message-ID: <20171025152735.11382-1-k.konieczny@partner.samsung.com>
+References: <CGME20171025152754eucas1p2854a8c48544949585dcbfdd0286ad499@eucas1p2.samsung.com>
+Cc: Kamil Konieczny <k.konieczny@partner.samsung.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Cyrille Pitchen <cyrille.pitchen@microchip.com>,
-        Tudor Ambarus <tudor.ambarus@microchip.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-qk0-f182.google.com ([209.85.220.182]:55991 "EHLO
-        mail-qk0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751445AbdJYP0x (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 25 Oct 2017 11:26:53 -0400
-Received: by mail-qk0-f182.google.com with SMTP id x82so465323qkb.12
-        for <linux-crypto@vger.kernel.org>; Wed, 25 Oct 2017 08:26:52 -0700 (PDT)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Vladimir Zapolskiy <vz@mleia.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-samsung-soc-owner@vger.kernel.org>
+Sender: linux-samsung-soc-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hello,
+First patch change spaces to tabs, second adds HASH support for Exynos.
+Changes:
 
-While running the kcapi test suite on a SAMA5D2 Xplained board with a
-v4.14-rc6 kernel, I encountered the following error:
+version 8:
+- fixes suggested by Vladimir Zapolskiy: drop first condition check in 
+  s5p_hash_import, delete unused include delay.h, fix typo in commit
+  message, fix descriptions of struct s5p_hash_reqctx and function
+  s5p_hash_final()
 
-# kcapi -x 9 -e -c "cbc(aes)" -i 00000000000000000000000000000000 -k 00000000000
-0000000000000000000000000000000000000 -p 1b077a6af4b7f98229de786d7516b639
-BUG: scheduling while atomic: kcapi/926/0x00000100
-CPU: 0 PID: 926 Comm: kcapi Not tainted 4.14.0-rc6 #2
-Hardware name: Atmel SAMA5
-[<c010caac>] (unwind_backtrace) from [<c010a9d8>] (show_stack+0x10/0x14)
-[<c010a9d8>] (show_stack) from [<c013a914>] (__schedule_bug+0x60/0x80)
-[<c013a914>] (__schedule_bug) from [<c074ac70>] (__schedule+0x368/0x3fc)
-[<c074ac70>] (__schedule) from [<c074ad74>] (schedule+0x40/0xa0)
-[<c074ad74>] (schedule) from [<c05cb96c>] (__lock_sock+0x78/0xb0)
-[<c05cb96c>] (__lock_sock) from [<c05cddd0>] (lock_sock_nested+0x48/0x50)
-[<c05cddd0>] (lock_sock_nested) from [<c030eec8>] (af_alg_async_cb+0x20/0x80)
-[<c030eec8>] (af_alg_async_cb) from [<c0573b70>]
-(atmel_aes_transfer_complete+0x38/0x68)
-[<c0573b70>] (atmel_aes_transfer_complete) from [<c0121258>]
-(tasklet_action+0x68/0xb4)
-[<c0121258>] (tasklet_action) from [<c010158c>] (__do_softirq+0xc4/0x250)
-[<c010158c>] (__do_softirq) from [<c01215f0>] (irq_exit+0xfc/0x130)
-[<c01215f0>] (irq_exit) from [<c014a208>] (__handle_domain_irq+0x58/0xa8)
-[<c014a208>] (__handle_domain_irq) from [<c010b60c>] (__irq_svc+0x6c/0x90)
-[<c010b60c>] (__irq_svc) from [<c0310280>] (skcipher_recvmsg+0x2d8/0x318)
-[<c0310280>] (skcipher_recvmsg) from [<c05c8794>] (sock_read_iter+0x88/0xc8)
-[<c05c8794>] (sock_read_iter) from [<c01f1940>]
-(aio_read.constprop.3+0xcc/0x178)
-[<c01f1940>] (aio_read.constprop.3) from [<c01f2968>]
-(SyS_io_submit+0x540/0x644)
-[<c01f2968>] (SyS_io_submit) from [<c0107480>] (ret_fast_syscall+0x0/0x48)
+version 7:
+- fix ifdef into if(IS_ENABLED()) as suggested by Krzysztof Kozlowski
 
-After bisecting, I determined that it appeared during the 4.14 merge
-window, with the following commit:
+version 6:
+- fixes suggested by Vladimir Zapolskiy: change HASH_OP enum into bool, fix
+  comments, change int into unsigned int in several functions, change some
+  functions to return void, remove unnecessary parentheses in s5p_hash_import,
+  replace rctx with ctx for request context, drop some dd vars and use tctx->dd
+  instead, simplify s5p_hash_rx, s5p_hash_copy_result and s5p_hash_set_flow,
+  change int final into bool final, reoder some declarations, split patch into
+  two
+- rewrite and fix while loop in s5p_hash_copy_sg_lists
+- rewrite while loop in s5p_hash_prepare_sgs
 
-e870456d8e7c crypto: algif_skcipher - overhaul memory management
+version 5:
+- fix suggested by Krzysztof Kozlowski: change defines HASH_OP into enum, fix
+  comments
 
+version 4:
+- fixes suggested by Krzysztof Kozlowski: reformat comments, convert context
+  flags into two bool vars, drop SSS_ALIGNED, change name of SSS_DMA_ALIGN and
+  SSS_DMA_ALIGN_MASK, split assignments into separate lines, use IS_ENABLED in
+  place of ifdef, remove sss_hash_algs_info and simplify register and deregister
+  HASH algs
 
-Best regards,
+version 3:
+- many fixes suggested by Krzysztof Kozlowski: comments, uppercases in const,
+  remove unused defines, remove unused variable bs, constify aes_variant,
+  remove global var use_hash, remove WARN_ON, improve hash_import(),
+  change goto label into 'out' in s5p_hash_handle_queue(), reorder variable
+  declarations, add spinlock to protect clearing HASH_FLAGS_BUSY
+- simplify code: replace one-line functions s5p_hash_update_req(),
+  s5p_hash_final_req() with call to s5p_hash_xmit_dma(), and delete them
+- replace call to s5p_hash_hw_init() into s5p_ahash_dma_init() and delete it
+- fix clearing shash flag CRYPTO_TFM_REQ_MAY_SLEEP
+- fix s5p_hash_set_flow()
+
+version 2:
+- change patch format so number of lines drops
+- change in Kconfig as suggested by Krzysztof Kozlowski, add
+	EXYNOS_HASH subsection
+- change #ifndef EXYNOS_RNG into #ifdef CRYPTO_DEV_EXYNOS_HASH
+- remove style fixups in aes, as they should go in separate patch
+- remove FLOW_LOG, FLOW_DUMP macros and its uses
+- remove #if 0 ... endif
+- remove unused function hash_wait and its defines
+- fix compiler warning in dev_dbg
+- remove some comments
+- other minor fixes in comments
+
+Kamil Konieczny (2):
+  crypto: s5p-sss: Change spaces to tabs
+  crypto: s5p-sss: Add HASH support for Exynos
+
+ drivers/crypto/Kconfig   |   14 +
+ drivers/crypto/s5p-sss.c | 1596 +++++++++++++++++++++++++++++++++++++++++++---
+ 2 files changed, 1505 insertions(+), 105 deletions(-)
+
 -- 
-Romain Izard
+2.14.1.536.g6867272d5b56
