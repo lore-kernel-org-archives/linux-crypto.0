@@ -1,131 +1,79 @@
 From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Subject: [PATCH 3/4] hw_random: core: Rearranging start_khwrngd to remove forward declaration
-Date: Thu, 26 Oct 2017 21:04:26 +0530
-Message-ID: <20171026153427.22334-4-prasannatsmkumar@gmail.com>
+Subject: [PATCH 1/4] hw_random: core: Remove forward declaration by rearranging code
+Date: Thu, 26 Oct 2017 21:04:24 +0530
+Message-ID: <20171026153427.22334-2-prasannatsmkumar@gmail.com>
 References: <20171026153427.22334-1-prasannatsmkumar@gmail.com>
 Cc: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
 To: herbert@gondor.apana.org.au, freude@linux.vnet.ibm.com,
         david.daney@cavium.com, clabbe.montjoie@gmail.com,
         linux-crypto@vger.kernel.org, mpm@selenic.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f194.google.com ([209.85.192.194]:52127 "EHLO
-        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932275AbdJZPfn (ORCPT
+Received: from mail-pg0-f68.google.com ([74.125.83.68]:56969 "EHLO
+        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932255AbdJZPfg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 26 Oct 2017 11:35:43 -0400
-Received: by mail-pf0-f194.google.com with SMTP id n14so2763396pfh.8
-        for <linux-crypto@vger.kernel.org>; Thu, 26 Oct 2017 08:35:42 -0700 (PDT)
+        Thu, 26 Oct 2017 11:35:36 -0400
+Received: by mail-pg0-f68.google.com with SMTP id m18so2967617pgd.13
+        for <linux-crypto@vger.kernel.org>; Thu, 26 Oct 2017 08:35:36 -0700 (PDT)
 In-Reply-To: <20171026153427.22334-1-prasannatsmkumar@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Rearrange start_khwrngd such that its forward declaration is not
+Rearrange drop_current_rng such that its forward declaration is not
 required.
 
 Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
 ---
- drivers/char/hw_random/core.c | 75 +++++++++++++++++++++----------------------
- 1 file changed, 37 insertions(+), 38 deletions(-)
+ drivers/char/hw_random/core.c | 23 +++++++++++------------
+ 1 file changed, 11 insertions(+), 12 deletions(-)
 
 diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
-index 7e2b1a7..534c2ae 100644
+index 9701ac7..8e1f43c 100644
 --- a/drivers/char/hw_random/core.c
 +++ b/drivers/char/hw_random/core.c
-@@ -50,7 +50,6 @@ MODULE_PARM_DESC(default_quality,
+@@ -49,7 +49,6 @@ module_param(default_quality, ushort, 0644);
+ MODULE_PARM_DESC(default_quality,
  		 "default entropy content of hwrng per mill");
  
+-static void drop_current_rng(void);
  static int hwrng_init(struct hwrng *rng);
--static void start_khwrngd(void);
+ static void start_khwrngd(void);
  
- static size_t rng_buffer_size(void)
- {
-@@ -153,6 +152,43 @@ static void put_rng(struct hwrng *rng)
- 	mutex_unlock(&rng_mutex);
+@@ -83,6 +82,17 @@ static inline void cleanup_rng(struct kref *kref)
+ 	complete(&rng->cleanup_done);
  }
  
-+static int hwrng_fillfn(void *unused)
++static void drop_current_rng(void)
 +{
-+	long rc;
++	BUG_ON(!mutex_is_locked(&rng_mutex));
++	if (!current_rng)
++		return;
 +
-+	while (!kthread_should_stop()) {
-+		struct hwrng *rng;
-+
-+		rng = get_current_rng();
-+		if (IS_ERR(rng) || !rng)
-+			break;
-+		mutex_lock(&reading_mutex);
-+		rc = rng_get_data(rng, rng_fillbuf,
-+				  rng_buffer_size(), 1);
-+		mutex_unlock(&reading_mutex);
-+		put_rng(rng);
-+		if (rc <= 0) {
-+			pr_warn("hwrng: no data available\n");
-+			msleep_interruptible(10000);
-+			continue;
-+		}
-+		/* Outside lock, sure, but y'know: randomness. */
-+		add_hwgenerator_randomness((void *)rng_fillbuf, rc,
-+					   rc * current_quality * 8 >> 10);
-+	}
-+	hwrng_fill = NULL;
-+	return 0;
++	/* decrease last reference for triggering the cleanup */
++	kref_put(&current_rng->ref, cleanup_rng);
++	current_rng = NULL;
 +}
 +
-+static void start_khwrngd(void)
-+{
-+	hwrng_fill = kthread_run(hwrng_fillfn, NULL, "hwrng");
-+	if (IS_ERR(hwrng_fill)) {
-+		pr_err("hwrng_fill thread creation failed");
-+		hwrng_fill = NULL;
-+	}
-+}
-+
- static int hwrng_init(struct hwrng *rng)
+ static int set_current_rng(struct hwrng *rng)
  {
- 	if (kref_get_unless_zero(&rng->ref))
-@@ -387,43 +423,6 @@ static int __init register_miscdev(void)
- 	return misc_register(&rng_miscdev);
+ 	int err;
+@@ -99,17 +109,6 @@ static int set_current_rng(struct hwrng *rng)
+ 	return 0;
  }
  
--static int hwrng_fillfn(void *unused)
+-static void drop_current_rng(void)
 -{
--	long rc;
+-	BUG_ON(!mutex_is_locked(&rng_mutex));
+-	if (!current_rng)
+-		return;
 -
--	while (!kthread_should_stop()) {
--		struct hwrng *rng;
--
--		rng = get_current_rng();
--		if (IS_ERR(rng) || !rng)
--			break;
--		mutex_lock(&reading_mutex);
--		rc = rng_get_data(rng, rng_fillbuf,
--				  rng_buffer_size(), 1);
--		mutex_unlock(&reading_mutex);
--		put_rng(rng);
--		if (rc <= 0) {
--			pr_warn("hwrng: no data available\n");
--			msleep_interruptible(10000);
--			continue;
--		}
--		/* Outside lock, sure, but y'know: randomness. */
--		add_hwgenerator_randomness((void *)rng_fillbuf, rc,
--					   rc * current_quality * 8 >> 10);
--	}
--	hwrng_fill = NULL;
--	return 0;
+-	/* decrease last reference for triggering the cleanup */
+-	kref_put(&current_rng->ref, cleanup_rng);
+-	current_rng = NULL;
 -}
 -
--static void start_khwrngd(void)
--{
--	hwrng_fill = kthread_run(hwrng_fillfn, NULL, "hwrng");
--	if (IS_ERR(hwrng_fill)) {
--		pr_err("hwrng_fill thread creation failed");
--		hwrng_fill = NULL;
--	}
--}
--
- int hwrng_register(struct hwrng *rng)
+ /* Returns ERR_PTR(), NULL or refcounted hwrng */
+ static struct hwrng *get_current_rng(void)
  {
- 	int err = -EINVAL;
 -- 
 2.10.0
