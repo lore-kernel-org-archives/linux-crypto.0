@@ -1,47 +1,48 @@
-From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Subject: [PATCH] hw_random: core: Remove unnecessary new line in MODULE_PARM_DESC
-Date: Thu, 26 Oct 2017 22:00:29 +0530
-Message-ID: <20171026163029.23532-1-prasannatsmkumar@gmail.com>
-Cc: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-To: mpm@selenic.com, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org
+From: David Daney <ddaney@caviumnetworks.com>
+Subject: Re: [PATCH 0/4] Rearrange functions to remove forward declarations
+Date: Thu, 26 Oct 2017 09:48:51 -0700
+Message-ID: <823fc44a-8ccc-1f8d-51f5-a4411362ffbc@caviumnetworks.com>
+References: <20171026153427.22334-1-prasannatsmkumar@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+To: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
+        herbert@gondor.apana.org.au, freude@linux.vnet.ibm.com,
+        david.daney@cavium.com, clabbe.montjoie@gmail.com,
+        linux-crypto@vger.kernel.org, mpm@selenic.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:47383 "EHLO
-        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932137AbdJZQbe (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 26 Oct 2017 12:31:34 -0400
-Received: by mail-pf0-f196.google.com with SMTP id z11so2890530pfk.4
-        for <linux-crypto@vger.kernel.org>; Thu, 26 Oct 2017 09:31:33 -0700 (PDT)
+Received: from mail-co1nam03on0062.outbound.protection.outlook.com ([104.47.40.62]:19122
+        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S932127AbdJZQs6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 26 Oct 2017 12:48:58 -0400
+In-Reply-To: <20171026153427.22334-1-prasannatsmkumar@gmail.com>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-While using MODULE_PARM_DESC there is a new line which is not required.
-Remove it.
+On 10/26/2017 08:34 AM, PrasannaKumar Muralidharan wrote:
+> This patch series rearranges functions such that forward declarations
+> becomes unnecessary. Remove those forward declaration.
 
-Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
----
- drivers/char/hw_random/core.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+Why?
 
-diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
-index 328d065..323f04c 100644
---- a/drivers/char/hw_random/core.c
-+++ b/drivers/char/hw_random/core.c
-@@ -43,11 +43,10 @@ static unsigned short current_quality;
- static unsigned short default_quality; /* = 0; default to "off" */
- 
- module_param(current_quality, ushort, 0644);
--MODULE_PARM_DESC(current_quality,
--		 "current hwrng entropy estimation per mill");
-+MODULE_PARM_DESC(current_quality, "current hwrng entropy estimation per mill");
-+
- module_param(default_quality, ushort, 0644);
--MODULE_PARM_DESC(default_quality,
--		 "default entropy content of hwrng per mill");
-+MODULE_PARM_DESC(default_quality, "default entropy content of hwrng per mill");
- 
- static size_t rng_buffer_size(void)
- {
--- 
-2.10.0
+The code churn and increase in difficulty of attribution are big 
+drawbacks to this sort of patch set.
+
+
+> 
+> This patch series is boot tested without user space in qemu with
+> CONFIG_HW_RANDOM=y.
+> 
+> PrasannaKumar Muralidharan (4):
+>    hw_random: core: Remove forward declaration by rearranging code
+>    hw_random: core: Rearranging rng_get_data to remove forward
+>      declaration
+>    hw_random: core: Rearranging start_khwrngd to remove forward
+>      declaration
+>    hw_random: core: Remove forward declaration of hwrng_init
+> 
+>   drivers/char/hw_random/core.c | 151 ++++++++++++++++++++----------------------
+>   1 file changed, 72 insertions(+), 79 deletions(-)
+> 
