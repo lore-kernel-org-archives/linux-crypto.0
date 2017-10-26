@@ -1,151 +1,278 @@
 From: Tudor Ambarus <tudor.ambarus@microchip.com>
-Subject: Re: Kernel panic when using ccm(aes) with the Atmel AES HW
- accelerator
-Date: Thu, 26 Oct 2017 15:34:56 +0300
-Message-ID: <4e822b84-2d5a-1b9d-a36b-faf04fcbfcf8@microchip.com>
-References: <CAGkQfmP6Kq4DEBbGU7AW71PjbUJ2acdJF5PVDm6VqZkUaaoEzA@mail.gmail.com>
+Subject: [v2 PATCH 2/3] crypto: atmel-aes/tdes - remove empty functions
+Date: Thu, 26 Oct 2017 16:35:49 +0300
+Message-ID: <20171026133549.20654-1-tudor.ambarus@microchip.com>
+References: <20171023153441.28825-2-tudor.ambarus@microchip.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: <linux-crypto@vger.kernel.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        Cyrille Pitchen <cyrille.pitchen@atmel.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Nicolas Ferre <nicolas.ferre@microchip.com>
-To: Romain Izard <romain.izard.pro@gmail.com>
+Content-Type: text/plain
+Cc: <linux-crypto@vger.kernel.org>, <nicolas.ferre@microchip.com>,
+        Tudor Ambarus <tudor.ambarus@microchip.com>
+To: <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from esa4.microchip.iphmx.com ([68.232.154.123]:49823 "EHLO
-        esa4.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932185AbdJZMe5 (ORCPT
+Received: from esa5.microchip.iphmx.com ([216.71.150.166]:48807 "EHLO
+        esa5.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932198AbdJZNgN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 26 Oct 2017 08:34:57 -0400
-In-Reply-To: <CAGkQfmP6Kq4DEBbGU7AW71PjbUJ2acdJF5PVDm6VqZkUaaoEzA@mail.gmail.com>
-Content-Language: en-US
+        Thu, 26 Oct 2017 09:36:13 -0400
+In-Reply-To: <20171023153441.28825-2-tudor.ambarus@microchip.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi, Romain,
+This empty functions were used to initialize a member of a static structure.
+Pointer members of an object with static storage duration, if not
+explicitly initialized, will be initialized to a NULL pointer. The crypto
+API checks if this pointer is not NULL before using it, so we are safe to
+remove this empty functions along with all the references to them.
 
-On 10/18/2017 04:32 PM, Romain Izard wrote:
-> diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
-> index 29e20c37f3a6..f3eabe1f1490 100644
-> --- a/drivers/crypto/atmel-aes.c
-> +++ b/drivers/crypto/atmel-aes.c
-> @@ -80,6 +80,7 @@
->   #define AES_FLAGS_BUSY         BIT(3)
->   #define AES_FLAGS_DUMP_REG     BIT(4)
->   #define AES_FLAGS_OWN_SHA      BIT(5)
-> +#define AES_FLAGS_CIPHERTAIL   BIT(6)
+Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
+---
+changes in v2:
+- remove empty atmel_aes_gcm_exit()
 
-not really needed, see below.
+ drivers/crypto/atmel-aes.c  | 20 --------------------
+ drivers/crypto/atmel-tdes.c | 18 ------------------
+ 2 files changed, 38 deletions(-)
 
-> 
->   #define AES_FLAGS_PERSISTENT   (AES_FLAGS_INIT | AES_FLAGS_BUSY)
-> 
-> @@ -156,6 +157,7 @@ struct atmel_aes_authenc_ctx {
-> 
->   struct atmel_aes_reqctx {
->          unsigned long           mode;
-> +       u32                     ciphertail[AES_BLOCK_SIZE / sizeof(u32)];
-How about renaming this variable to "lastc"? Ci, i=1..n is the usual
-notation for the ciphertext blocks.
-
-The assumption that the last ciphertext block is of AES_BLOCK_SIZE size
-is correct, this driver is meant just for AES.
-
->   };
-> 
->   #ifdef CONFIG_CRYPTO_DEV_ATMEL_AUTHENC
-> @@ -496,6 +498,11 @@ static void atmel_aes_authenc_complete(struct
-> atmel_aes_dev *dd, int err);
-> 
->   static inline int atmel_aes_complete(struct atmel_aes_dev *dd, int err)
->   {
-> +       struct ablkcipher_request *req = ablkcipher_request_cast(dd->areq);
-> +       struct crypto_ablkcipher *ablkcipher = crypto_ablkcipher_reqtfm(req);
-> +       struct atmel_aes_reqctx *rctx = ablkcipher_request_ctx(req);
-> +       int ivsize = crypto_ablkcipher_ivsize(ablkcipher);
-> +
->   #ifdef CONFIG_CRYPTO_DEV_ATMEL_AUTHENC
->          atmel_aes_authenc_complete(dd, err);
->   #endif
-> @@ -503,6 +510,17 @@ static inline int atmel_aes_complete(struct
-> atmel_aes_dev *dd, int err)
->          clk_disable(dd->iclk);
->          dd->flags &= ~AES_FLAGS_BUSY;
-> 
-> +       if (rctx->mode & AES_FLAGS_CIPHERTAIL) {
-> +               if (rctx->mode & AES_FLAGS_ENCRYPT) {
-> +                       scatterwalk_map_and_copy(req->info, req->dst,
-> +                                                req->nbytes - ivsize,
-> +                                                ivsize, 0);
-> +               } else {
-> +                       memcpy(req->info, rctx->ciphertail, ivsize);
-
-why don't we make the same assumption and replace ivsize with
-AES_BLOCK_SIZE? Is there any chance that req->info was allocated with
-less than AES_BLOCK_SIZE size?
-
-> +                       memset(rctx->ciphertail, 0, ivsize);
-
-memset to zero is not necessary.
-
-> +               }
-> +       }
-> +
->          if (dd->is_async)
->                  dd->areq->complete(dd->areq, err);
-> 
-> @@ -1071,11 +1089,13 @@ static int atmel_aes_ctr_start(struct atmel_aes_dev *dd)
-> 
->   static int atmel_aes_crypt(struct ablkcipher_request *req, unsigned long mode)
->   {
-> +       struct crypto_ablkcipher *ablkcipher;
->          struct atmel_aes_base_ctx *ctx;
->          struct atmel_aes_reqctx *rctx;
->          struct atmel_aes_dev *dd;
-> 
-> -       ctx = crypto_ablkcipher_ctx(crypto_ablkcipher_reqtfm(req));
-> +       ablkcipher = crypto_ablkcipher_reqtfm(req);
-> +       ctx = crypto_ablkcipher_ctx(ablkcipher);
-
-you can initialize these variables at declaration.
-
->          switch (mode & AES_FLAGS_OPMODE_MASK) {
->          case AES_FLAGS_CFB8:
->                  ctx->block_size = CFB8_BLOCK_SIZE;
-> @@ -1103,7 +1123,15 @@ static int atmel_aes_crypt(struct
-> ablkcipher_request *req, unsigned long mode)
->                  return -ENODEV;
-> 
->          rctx = ablkcipher_request_ctx(req);
-
-while here, please initialize this at declaration.
-
-Also, this one:
-'''
-         dd = atmel_aes_find_dev(ctx);
-         if (!dd)
-                 return -ENODEV;
-
-'''
-should be moved at the beginning of the function. If an initialization
-might fail, let's check it as soon as we can, so that we don't waste
-resources.
-
-> -       rctx->mode = mode;
-> +
-> +       if (!(mode & AES_FLAGS_ENCRYPT)) {
-> +               int ivsize = crypto_ablkcipher_ivsize(ablkcipher);
-> +
-> +               scatterwalk_map_and_copy(rctx->ciphertail, req->src,
-> +                               (req->nbytes - ivsize), ivsize, 0);
-> +       }
-> +       rctx->mode = mode | AES_FLAGS_CIPHERTAIL;
-
-saving the last ciphertext block is a requirement for skcipher. This
-flag is redundant, there's no need to use it.
-
-Thank you, Romain!
-ta
+diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
+index 9659759..c2f0a12 100644
+--- a/drivers/crypto/atmel-aes.c
++++ b/drivers/crypto/atmel-aes.c
+@@ -1237,10 +1237,6 @@ static int atmel_aes_ctr_cra_init(struct crypto_tfm *tfm)
+ 	return 0;
+ }
+ 
+-static void atmel_aes_cra_exit(struct crypto_tfm *tfm)
+-{
+-}
+-
+ static struct crypto_alg aes_algs[] = {
+ {
+ 	.cra_name		= "ecb(aes)",
+@@ -1253,7 +1249,6 @@ static struct crypto_alg aes_algs[] = {
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+ 	.cra_init		= atmel_aes_cra_init,
+-	.cra_exit		= atmel_aes_cra_exit,
+ 	.cra_u.ablkcipher = {
+ 		.min_keysize	= AES_MIN_KEY_SIZE,
+ 		.max_keysize	= AES_MAX_KEY_SIZE,
+@@ -1273,7 +1268,6 @@ static struct crypto_alg aes_algs[] = {
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+ 	.cra_init		= atmel_aes_cra_init,
+-	.cra_exit		= atmel_aes_cra_exit,
+ 	.cra_u.ablkcipher = {
+ 		.min_keysize	= AES_MIN_KEY_SIZE,
+ 		.max_keysize	= AES_MAX_KEY_SIZE,
+@@ -1294,7 +1288,6 @@ static struct crypto_alg aes_algs[] = {
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+ 	.cra_init		= atmel_aes_cra_init,
+-	.cra_exit		= atmel_aes_cra_exit,
+ 	.cra_u.ablkcipher = {
+ 		.min_keysize	= AES_MIN_KEY_SIZE,
+ 		.max_keysize	= AES_MAX_KEY_SIZE,
+@@ -1315,7 +1308,6 @@ static struct crypto_alg aes_algs[] = {
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+ 	.cra_init		= atmel_aes_cra_init,
+-	.cra_exit		= atmel_aes_cra_exit,
+ 	.cra_u.ablkcipher = {
+ 		.min_keysize	= AES_MIN_KEY_SIZE,
+ 		.max_keysize	= AES_MAX_KEY_SIZE,
+@@ -1336,7 +1328,6 @@ static struct crypto_alg aes_algs[] = {
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+ 	.cra_init		= atmel_aes_cra_init,
+-	.cra_exit		= atmel_aes_cra_exit,
+ 	.cra_u.ablkcipher = {
+ 		.min_keysize	= AES_MIN_KEY_SIZE,
+ 		.max_keysize	= AES_MAX_KEY_SIZE,
+@@ -1357,7 +1348,6 @@ static struct crypto_alg aes_algs[] = {
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+ 	.cra_init		= atmel_aes_cra_init,
+-	.cra_exit		= atmel_aes_cra_exit,
+ 	.cra_u.ablkcipher = {
+ 		.min_keysize	= AES_MIN_KEY_SIZE,
+ 		.max_keysize	= AES_MAX_KEY_SIZE,
+@@ -1378,7 +1368,6 @@ static struct crypto_alg aes_algs[] = {
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+ 	.cra_init		= atmel_aes_cra_init,
+-	.cra_exit		= atmel_aes_cra_exit,
+ 	.cra_u.ablkcipher = {
+ 		.min_keysize	= AES_MIN_KEY_SIZE,
+ 		.max_keysize	= AES_MAX_KEY_SIZE,
+@@ -1399,7 +1388,6 @@ static struct crypto_alg aes_algs[] = {
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+ 	.cra_init		= atmel_aes_ctr_cra_init,
+-	.cra_exit		= atmel_aes_cra_exit,
+ 	.cra_u.ablkcipher = {
+ 		.min_keysize	= AES_MIN_KEY_SIZE,
+ 		.max_keysize	= AES_MAX_KEY_SIZE,
+@@ -1422,7 +1410,6 @@ static struct crypto_alg aes_cfb64_alg = {
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+ 	.cra_init		= atmel_aes_cra_init,
+-	.cra_exit		= atmel_aes_cra_exit,
+ 	.cra_u.ablkcipher = {
+ 		.min_keysize	= AES_MIN_KEY_SIZE,
+ 		.max_keysize	= AES_MAX_KEY_SIZE,
+@@ -1809,18 +1796,12 @@ static int atmel_aes_gcm_init(struct crypto_aead *tfm)
+ 	return 0;
+ }
+ 
+-static void atmel_aes_gcm_exit(struct crypto_aead *tfm)
+-{
+-
+-}
+-
+ static struct aead_alg aes_gcm_alg = {
+ 	.setkey		= atmel_aes_gcm_setkey,
+ 	.setauthsize	= atmel_aes_gcm_setauthsize,
+ 	.encrypt	= atmel_aes_gcm_encrypt,
+ 	.decrypt	= atmel_aes_gcm_decrypt,
+ 	.init		= atmel_aes_gcm_init,
+-	.exit		= atmel_aes_gcm_exit,
+ 	.ivsize		= GCM_AES_IV_SIZE,
+ 	.maxauthsize	= AES_BLOCK_SIZE,
+ 
+@@ -1956,7 +1937,6 @@ static struct crypto_alg aes_xts_alg = {
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+ 	.cra_init		= atmel_aes_xts_cra_init,
+-	.cra_exit		= atmel_aes_cra_exit,
+ 	.cra_u.ablkcipher = {
+ 		.min_keysize	= 2 * AES_MIN_KEY_SIZE,
+ 		.max_keysize	= 2 * AES_MAX_KEY_SIZE,
+diff --git a/drivers/crypto/atmel-tdes.c b/drivers/crypto/atmel-tdes.c
+index 0ece4b8..48e8653 100644
+--- a/drivers/crypto/atmel-tdes.c
++++ b/drivers/crypto/atmel-tdes.c
+@@ -911,10 +911,6 @@ static int atmel_tdes_cra_init(struct crypto_tfm *tfm)
+ 	return 0;
+ }
+ 
+-static void atmel_tdes_cra_exit(struct crypto_tfm *tfm)
+-{
+-}
+-
+ static struct crypto_alg tdes_algs[] = {
+ {
+ 	.cra_name		= "ecb(des)",
+@@ -927,7 +923,6 @@ static struct crypto_alg tdes_algs[] = {
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+ 	.cra_init		= atmel_tdes_cra_init,
+-	.cra_exit		= atmel_tdes_cra_exit,
+ 	.cra_u.ablkcipher = {
+ 		.min_keysize	= DES_KEY_SIZE,
+ 		.max_keysize	= DES_KEY_SIZE,
+@@ -947,7 +942,6 @@ static struct crypto_alg tdes_algs[] = {
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+ 	.cra_init		= atmel_tdes_cra_init,
+-	.cra_exit		= atmel_tdes_cra_exit,
+ 	.cra_u.ablkcipher = {
+ 		.min_keysize	= DES_KEY_SIZE,
+ 		.max_keysize	= DES_KEY_SIZE,
+@@ -968,7 +962,6 @@ static struct crypto_alg tdes_algs[] = {
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+ 	.cra_init		= atmel_tdes_cra_init,
+-	.cra_exit		= atmel_tdes_cra_exit,
+ 	.cra_u.ablkcipher = {
+ 		.min_keysize	= DES_KEY_SIZE,
+ 		.max_keysize	= DES_KEY_SIZE,
+@@ -989,7 +982,6 @@ static struct crypto_alg tdes_algs[] = {
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+ 	.cra_init		= atmel_tdes_cra_init,
+-	.cra_exit		= atmel_tdes_cra_exit,
+ 	.cra_u.ablkcipher = {
+ 		.min_keysize	= DES_KEY_SIZE,
+ 		.max_keysize	= DES_KEY_SIZE,
+@@ -1010,7 +1002,6 @@ static struct crypto_alg tdes_algs[] = {
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+ 	.cra_init		= atmel_tdes_cra_init,
+-	.cra_exit		= atmel_tdes_cra_exit,
+ 	.cra_u.ablkcipher = {
+ 		.min_keysize	= DES_KEY_SIZE,
+ 		.max_keysize	= DES_KEY_SIZE,
+@@ -1031,7 +1022,6 @@ static struct crypto_alg tdes_algs[] = {
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+ 	.cra_init		= atmel_tdes_cra_init,
+-	.cra_exit		= atmel_tdes_cra_exit,
+ 	.cra_u.ablkcipher = {
+ 		.min_keysize	= DES_KEY_SIZE,
+ 		.max_keysize	= DES_KEY_SIZE,
+@@ -1052,7 +1042,6 @@ static struct crypto_alg tdes_algs[] = {
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+ 	.cra_init		= atmel_tdes_cra_init,
+-	.cra_exit		= atmel_tdes_cra_exit,
+ 	.cra_u.ablkcipher = {
+ 		.min_keysize	= DES_KEY_SIZE,
+ 		.max_keysize	= DES_KEY_SIZE,
+@@ -1073,7 +1062,6 @@ static struct crypto_alg tdes_algs[] = {
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+ 	.cra_init		= atmel_tdes_cra_init,
+-	.cra_exit		= atmel_tdes_cra_exit,
+ 	.cra_u.ablkcipher = {
+ 		.min_keysize	= 2 * DES_KEY_SIZE,
+ 		.max_keysize	= 3 * DES_KEY_SIZE,
+@@ -1093,7 +1081,6 @@ static struct crypto_alg tdes_algs[] = {
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+ 	.cra_init		= atmel_tdes_cra_init,
+-	.cra_exit		= atmel_tdes_cra_exit,
+ 	.cra_u.ablkcipher = {
+ 		.min_keysize	= 2*DES_KEY_SIZE,
+ 		.max_keysize	= 3*DES_KEY_SIZE,
+@@ -1114,7 +1101,6 @@ static struct crypto_alg tdes_algs[] = {
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+ 	.cra_init		= atmel_tdes_cra_init,
+-	.cra_exit		= atmel_tdes_cra_exit,
+ 	.cra_u.ablkcipher = {
+ 		.min_keysize	= 2*DES_KEY_SIZE,
+ 		.max_keysize	= 2*DES_KEY_SIZE,
+@@ -1135,7 +1121,6 @@ static struct crypto_alg tdes_algs[] = {
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+ 	.cra_init		= atmel_tdes_cra_init,
+-	.cra_exit		= atmel_tdes_cra_exit,
+ 	.cra_u.ablkcipher = {
+ 		.min_keysize	= 2*DES_KEY_SIZE,
+ 		.max_keysize	= 2*DES_KEY_SIZE,
+@@ -1156,7 +1141,6 @@ static struct crypto_alg tdes_algs[] = {
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+ 	.cra_init		= atmel_tdes_cra_init,
+-	.cra_exit		= atmel_tdes_cra_exit,
+ 	.cra_u.ablkcipher = {
+ 		.min_keysize	= 2*DES_KEY_SIZE,
+ 		.max_keysize	= 2*DES_KEY_SIZE,
+@@ -1177,7 +1161,6 @@ static struct crypto_alg tdes_algs[] = {
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+ 	.cra_init		= atmel_tdes_cra_init,
+-	.cra_exit		= atmel_tdes_cra_exit,
+ 	.cra_u.ablkcipher = {
+ 		.min_keysize	= 2*DES_KEY_SIZE,
+ 		.max_keysize	= 2*DES_KEY_SIZE,
+@@ -1198,7 +1181,6 @@ static struct crypto_alg tdes_algs[] = {
+ 	.cra_type		= &crypto_ablkcipher_type,
+ 	.cra_module		= THIS_MODULE,
+ 	.cra_init		= atmel_tdes_cra_init,
+-	.cra_exit		= atmel_tdes_cra_exit,
+ 	.cra_u.ablkcipher = {
+ 		.min_keysize	= 2*DES_KEY_SIZE,
+ 		.max_keysize	= 3*DES_KEY_SIZE,
+-- 
+2.9.4
