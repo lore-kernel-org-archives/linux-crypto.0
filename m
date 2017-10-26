@@ -1,8 +1,8 @@
 From: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
-Subject: Re: [PATCH v5 18/18] ima: Write modsig to the measurement list
-Date: Thu, 26 Oct 2017 20:02:23 -0200
-Message-ID: <87r2tpwosw.fsf@linux.vnet.ibm.com>
-References: <20171018005331.2688-1-bauerman@linux.vnet.ibm.com> <20171018005331.2688-19-bauerman@linux.vnet.ibm.com> <1509048454.5886.108.camel@linux.vnet.ibm.com>
+Subject: Re: [PATCH v5 12/18] MODSIGN: Export module signature definitions
+Date: Thu, 26 Oct 2017 20:47:29 -0200
+Message-ID: <87po99wmpq.fsf@linux.vnet.ibm.com>
+References: <20171018005331.2688-1-bauerman@linux.vnet.ibm.com> <20171018005331.2688-13-bauerman@linux.vnet.ibm.com> <1509048728.5886.112.camel@linux.vnet.ibm.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: linux-integrity@vger.kernel.org,
@@ -20,85 +20,122 @@ Cc: linux-integrity@vger.kernel.org,
         "David S. Miller" <davem@davemloft.net>,
         "AKASHI\, Takahiro" <takahiro.akashi@linaro.org>
 To: Mimi Zohar <zohar@linux.vnet.ibm.com>
-Return-path: <linux-security-module-owner@vger.kernel.org>
-In-reply-to: <1509048454.5886.108.camel@linux.vnet.ibm.com>
-Sender: owner-linux-security-module@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60704 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1751553AbdJZWrn (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 26 Oct 2017 18:47:43 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id v9QMlCbM045892
+        for <linux-crypto@vger.kernel.org>; Thu, 26 Oct 2017 18:47:43 -0400
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2dukyad8k8-1
+        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Thu, 26 Oct 2017 18:47:42 -0400
+Received: from localhost
+        by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-crypto@vger.kernel.org> from <bauerman@linux.vnet.ibm.com>;
+        Thu, 26 Oct 2017 18:47:41 -0400
+In-reply-to: <1509048728.5886.112.camel@linux.vnet.ibm.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-
-Hello Mimi,
-
-Thanks for your review.
 
 Mimi Zohar <zohar@linux.vnet.ibm.com> writes:
 
 > On Tue, 2017-10-17 at 22:53 -0200, Thiago Jung Bauermann wrote:
+>> IMA will use the module_signature format for append signatures, so export
+>> the relevant definitions and factor out the code which verifies that the
+>> appended signature trailer is valid.
+>> 
+>> Also, create a CONFIG_MODULE_SIG_FORMAT option so that IMA can select it
+>> and be able to use validate_module_signature without having to depend on
+>> CONFIG_MODULE_SIG.
+>> 
+>> Signed-off-by: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
 >
->> diff --git a/security/integrity/ima/ima_main.c b/security/integrity/ima/ima_main.c
->> index 6a2d960fbd92..0d3390de7432 100644
->> --- a/security/integrity/ima/ima_main.c
->> +++ b/security/integrity/ima/ima_main.c
->> @@ -246,7 +246,35 @@ static int process_measurement(struct file *file, char *buf, loff_t size,
->>  		rc = ima_appraise_measurement(func, iint, file, buf, size,
->>  					      pathname, &xattr_value,
->>  					      &xattr_len, opened);
->> -	if (action & IMA_MEASURE)
+> Reviewed-by: Mimi Zohar <zohar@linux.vnet.ibm.com>
+>
+> One minor comment below...
+
+Thanks!
+
+>> diff --git a/kernel/module_signing.c b/kernel/module_signing.c
+>> index 937c844bee4a..204c60d4cc9f 100644
+>> --- a/kernel/module_signing.c
+>> +++ b/kernel/module_signing.c
+>> @@ -11,36 +11,38 @@
+>> 
+>>  #include <linux/kernel.h>
+>>  #include <linux/errno.h>
+>> +#include <linux/module_signature.h>
+>>  #include <linux/string.h>
+>>  #include <linux/verification.h>
+>>  #include <crypto/public_key.h>
+>>  #include "module-internal.h"
+>> 
+>> -enum pkey_id_type {
+>> -	PKEY_ID_PGP,		/* OpenPGP generated key ID */
+>> -	PKEY_ID_X509,		/* X.509 arbitrary subjectKeyIdentifier */
+>> -	PKEY_ID_PKCS7,		/* Signature in PKCS#7 message */
+>> -};
+>> -
+>> -/*
+>> - * Module signature information block.
+>> - *
+>> - * The constituents of the signature section are, in order:
+>> +/**
+>> + * validate_module_sig - validate that the given signature is sane
+>>   *
+>> - *	- Signer's name
+>> - *	- Key identifier
+>> - *	- Signature data
+>> - *	- Information block
+>> + * @ms:		Signature to validate.
+>> + * @file_len:	Size of the file to which @ms is appended.
+>>   */
+>> -struct module_signature {
+>> -	u8	algo;		/* Public-key crypto algorithm [0] */
+>> -	u8	hash;		/* Digest algorithm [0] */
+>> -	u8	id_type;	/* Key identifier type [PKEY_ID_PKCS7] */
+>> -	u8	signer_len;	/* Length of signer's name [0] */
+>> -	u8	key_id_len;	/* Length of key identifier [0] */
+>> -	u8	__pad[3];
+>> -	__be32	sig_len;	/* Length of signature data */
+>> -};
+>> +int validate_module_sig(const struct module_signature *ms, size_t file_len)
+>> +{
+>> +	if (be32_to_cpu(ms->sig_len) >= file_len - sizeof(*ms))
+>> +		return -EBADMSG;
+>> +	else if (ms->id_type != PKEY_ID_PKCS7) {
+>> +		pr_err("Module is not signed with expected PKCS#7 message\n");
+>> +		return -ENOPKG;
+>> +	} else if (ms->algo != 0 ||
+>> +		   ms->hash != 0 ||
+>> +		   ms->signer_len != 0 ||
+>> +		   ms->key_id_len != 0 ||
+>> +		   ms->__pad[0] != 0 ||
+>> +		   ms->__pad[1] != 0 ||
+>> +		   ms->__pad[2] != 0) {
+>> +		pr_err("PKCS#7 signature info has unexpected non-zero params\n");
+>> +		return -EBADMSG;
+>> +	}
 >> +
->> +	/*
->> +	 * MODSIG has one corner case we need to deal with here:
->> +	 *
->> +	 * Suppose the policy has one measure rule for one hook and an appraise
->> +	 * rule for a different hook. Suppose also that the template requires
->> +	 * the signature to be stored in the measurement list.
->> +	 *
->> +	 * If a file containing a MODSIG is measured by the first hook before
->> +	 * being appraised by the second one, the corresponding entry in the
->> +	 * measurement list will not contain the MODSIG because we only fetch it
->> +	 * for IMA_APPRAISAL. We don't fetch it earlier because if the file has
->> +	 * both a DIGSIG and a MODSIG it's not possible to know which one will
->> +	 * be valid without actually doing the appraisal.
->> +	 *
->> +	 * Therefore, after appraisal of a MODSIG signature we need to store the
->> +	 * measurement again if the current template requires storing the
->> +	 * signature.
 >
-> Yes, all true, but this long comment doesn't belong here in the middle
-> of process_measurement().
->
->> +	 * With the opposite ordering (the appraise rule triggering before the
->> +	 * measurement rule) there is the same problem but it's not possible to
->> +	 * do anything about it because at the time we are appraising the
->> +	 * signature it's impossible to know whether a measurement will ever
->> +	 * need to be stored for this file.
->> +	 */
->
-> With the template format "ima-sig", the verified file signature needs
-> to be included in the measurement list. Based on this file signature,
-> the attestation server can validate the signature.
->
-> In this case, where the appraisal comes first followed by the
-> measurement, the appraised file signature is included in the
-> measurement list. I don't see the problem here.
+> When moving code from one place to another, it's easier to review when
+> there aren't code changes as well. In this case, the original code
+> doesn't have "else clauses".
 
-I think I forgot that during appraisal the modsig is copied into the
-iint cache and that it will be used when the measure rule is trigerred.
-I'll drop that last paragraph.
+Indeed. I changed the code back to using separate if clauses, making
+only the changes that are required for the refactoring.
 
->
->> +	if ((action & IMA_MEASURE) || ((iint->flags & IMA_MEASURE) &&
->> +				       xattr_value &&
->> +				       xattr_value->type == IMA_MODSIG &&
->> +				       ima_current_template_has_sig()))
->
-> Like the clean up you did elsewhere, this new set of tests should be
-> made into a function. The comment could placed along with the new
-> function.
+> Here some of the if/then/else clauses
+> have braces others don't. There shouldn't be a mixture.
 
-Ok. I didn't create a function because these tests are only done here,
-but I agree that it will make the code clearer, and be a better place
-for the big comment as well. Will do in the next version.
+Does this still apply when the if clauses are separate as in the
+original code? Should the first if still have braces?
 
 -- 
 Thiago Jung Bauermann
 IBM Linux Technology Center
-
