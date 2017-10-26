@@ -1,48 +1,49 @@
-From: David Daney <ddaney@caviumnetworks.com>
-Subject: Re: [PATCH 0/4] Rearrange functions to remove forward declarations
-Date: Thu, 26 Oct 2017 09:48:51 -0700
-Message-ID: <823fc44a-8ccc-1f8d-51f5-a4411362ffbc@caviumnetworks.com>
-References: <20171026153427.22334-1-prasannatsmkumar@gmail.com>
+From: Jason Gunthorpe <jgunthorpe@obsidianresearch.com>
+Subject: Re: [PATCH v3] tpm: use struct tpm_chip for tpm_chip_find_get()
+Date: Thu, 26 Oct 2017 10:50:27 -0600
+Message-ID: <20171026165027.GA5829@obsidianresearch.com>
+References: <20171026135453.24672-1-jarkko.sakkinen@linux.intel.com>
+ <CANc+2y7D+p+wq1tKCydZU0qwWWfUscv3+CQuxPNfzEacEzVDBg@mail.gmail.com>
+ <20171026160759.bycrmywqqxtjzpqk@linux.intel.com>
+ <CANc+2y7hknynCpgmRk2uYH7k5QFdH3hER0jNayNfZUymOEyr6A@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-To: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
-        herbert@gondor.apana.org.au, freude@linux.vnet.ibm.com,
-        david.daney@cavium.com, clabbe.montjoie@gmail.com,
-        linux-crypto@vger.kernel.org, mpm@selenic.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-co1nam03on0062.outbound.protection.outlook.com ([104.47.40.62]:19122
-        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S932127AbdJZQs6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 26 Oct 2017 12:48:58 -0400
-In-Reply-To: <20171026153427.22334-1-prasannatsmkumar@gmail.com>
-Content-Language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Peter Huewe <peterhuewe@gmx.de>,
+        Marcel Selhorst <tpmdd@selhorst.net>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        James Morris <james.l.morris@oracle.com>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        David Safford <safford@us.ibm.com>,
+        David Howells <dhowells@redhat.com>,
+        Jerry Snitselaar <jsnitsel@redhat.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        "moderated list:TPM DEVICE DRIVER"
+        <tpmdd-devel@lists.sourceforge.net>,
+        "open list:INTEGRITY MEASUREMENT ARCHITECTURE (IMA)"
+        <linux-ima-devel@lists.sour
+To: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Return-path: <linux-security-module-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <CANc+2y7hknynCpgmRk2uYH7k5QFdH3hER0jNayNfZUymOEyr6A@mail.gmail.com>
+Sender: owner-linux-security-module@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 10/26/2017 08:34 AM, PrasannaKumar Muralidharan wrote:
-> This patch series rearranges functions such that forward declarations
-> becomes unnecessary. Remove those forward declaration.
+On Thu, Oct 26, 2017 at 09:57:12PM +0530, PrasannaKumar Muralidharan
+wrote:
 
-Why?
+> I do not what value my rb tag provides as I have not contributed code
+> to it before. Is it encouraged by kernel community?
 
-The code churn and increase in difficulty of attribution are big 
-drawbacks to this sort of patch set.
+Yes. People will judge the quality of your rb tag based on other
+reviews they have seen you make, and here you found a bug, so very
+good.
 
+Got to start someplace.
 
-> 
-> This patch series is boot tested without user space in qemu with
-> CONFIG_HW_RANDOM=y.
-> 
-> PrasannaKumar Muralidharan (4):
->    hw_random: core: Remove forward declaration by rearranging code
->    hw_random: core: Rearranging rng_get_data to remove forward
->      declaration
->    hw_random: core: Rearranging start_khwrngd to remove forward
->      declaration
->    hw_random: core: Remove forward declaration of hwrng_init
-> 
->   drivers/char/hw_random/core.c | 151 ++++++++++++++++++++----------------------
->   1 file changed, 72 insertions(+), 79 deletions(-)
-> 
+Jason
