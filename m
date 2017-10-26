@@ -1,45 +1,47 @@
-From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Subject: Re: [PATCH 0/4] Rearrange functions to remove forward declarations
-Date: Thu, 26 Oct 2017 22:33:40 +0530
-Message-ID: <CANc+2y4OPz9wPwB7Rj6FgkC=esPyT8VG8-Q8U-toErHrYMxOkA@mail.gmail.com>
-References: <20171026153427.22334-1-prasannatsmkumar@gmail.com> <823fc44a-8ccc-1f8d-51f5-a4411362ffbc@caviumnetworks.com>
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: [Part2 PATCH v6 13/38] crypto: ccp: Add Secure Encrypted
+ Virtualization (SEV) command support
+Date: Thu, 26 Oct 2017 19:44:27 +0200
+Message-ID: <20171026174427.GB29782@nazgul.tnic>
+References: <20171020023413.122280-1-brijesh.singh@amd.com>
+ <20171020023413.122280-14-brijesh.singh@amd.com>
+ <20171023092020.GB19523@nazgul.tnic>
+ <f58e72e5-8636-2abb-99e9-c58f462463e7@amd.com>
+ <20171026135614.GA12359@nazgul.tnic>
+ <9258d8e7-b185-01d2-be92-d7d2820c7eb6@amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Harald Freudenberger <freude@linux.vnet.ibm.com>,
-        david.daney@cavium.com, Corentin LABBE <clabbe.montjoie@gmail.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>, Matt Mackall <mpm@selenic.com>
-To: David Daney <ddaney@caviumnetworks.com>
+Content-Type: text/plain; charset=utf-8
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Gary Hook <gary.hook@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Brijesh Singh <brijesh.singh@amd.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-io0-f194.google.com ([209.85.223.194]:48609 "EHLO
-        mail-io0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932137AbdJZRDl (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 26 Oct 2017 13:03:41 -0400
-Received: by mail-io0-f194.google.com with SMTP id j17so6887618iod.5
-        for <linux-crypto@vger.kernel.org>; Thu, 26 Oct 2017 10:03:40 -0700 (PDT)
-In-Reply-To: <823fc44a-8ccc-1f8d-51f5-a4411362ffbc@caviumnetworks.com>
+Received: from mail.skyhub.de ([5.9.137.197]:50368 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932309AbdJZRo0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 26 Oct 2017 13:44:26 -0400
+Content-Disposition: inline
+In-Reply-To: <9258d8e7-b185-01d2-be92-d7d2820c7eb6@amd.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi David,
+On Thu, Oct 26, 2017 at 11:56:57AM -0500, Brijesh Singh wrote:
+> The variable is used as ref counter.
 
-On 26 October 2017 at 22:18, David Daney <ddaney@caviumnetworks.com> wrote:
-> On 10/26/2017 08:34 AM, PrasannaKumar Muralidharan wrote:
->>
->> This patch series rearranges functions such that forward declarations
->> becomes unnecessary. Remove those forward declaration.
->
->
-> Why?
->
-> The code churn and increase in difficulty of attribution are big drawbacks
-> to this sort of patch set.
+... and it can't be converted to a boolean because...?
 
-Completely agreed. I did understand there is little value in this
-change. Wasn't sure whether such a patch is encouraged so gave a try.
-I am fine with not taking the patch.
+> In your previous reply you comments on global semaphore (fw_init_mutex) and
+> in response I tried to highlight why we need the global semaphore. Did I
+> misunderstood your comment ?
 
-Regards,
-PrasannaKumar
+Yes, what happens if you get preempted while holding the mutex? Will the other
+process be able to do anything?
+
+-- 
+Regards/Gruss,
+    Boris.
+
+ECO tip #101: Trim your mails when you reply.
