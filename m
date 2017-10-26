@@ -1,90 +1,131 @@
 From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Subject: [PATCH 4/4] hw_random: core: Remove forward declaration of hwrng_init
-Date: Thu, 26 Oct 2017 21:04:27 +0530
-Message-ID: <20171026153427.22334-5-prasannatsmkumar@gmail.com>
+Subject: [PATCH 3/4] hw_random: core: Rearranging start_khwrngd to remove forward declaration
+Date: Thu, 26 Oct 2017 21:04:26 +0530
+Message-ID: <20171026153427.22334-4-prasannatsmkumar@gmail.com>
 References: <20171026153427.22334-1-prasannatsmkumar@gmail.com>
 Cc: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
 To: herbert@gondor.apana.org.au, freude@linux.vnet.ibm.com,
         david.daney@cavium.com, clabbe.montjoie@gmail.com,
         linux-crypto@vger.kernel.org, mpm@selenic.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:55680 "EHLO
-        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932255AbdJZPfq (ORCPT
+Received: from mail-pf0-f194.google.com ([209.85.192.194]:52127 "EHLO
+        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932275AbdJZPfn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 26 Oct 2017 11:35:46 -0400
-Received: by mail-pf0-f193.google.com with SMTP id 17so2759324pfn.12
-        for <linux-crypto@vger.kernel.org>; Thu, 26 Oct 2017 08:35:46 -0700 (PDT)
+        Thu, 26 Oct 2017 11:35:43 -0400
+Received: by mail-pf0-f194.google.com with SMTP id n14so2763396pfh.8
+        for <linux-crypto@vger.kernel.org>; Thu, 26 Oct 2017 08:35:42 -0700 (PDT)
 In-Reply-To: <20171026153427.22334-1-prasannatsmkumar@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Rearrange set_current_rng such that hwrng_init's forward declaration can
-be removed.
+Rearrange start_khwrngd such that its forward declaration is not
+required.
 
 Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
 ---
- drivers/char/hw_random/core.c | 34 ++++++++++++++++------------------
- 1 file changed, 16 insertions(+), 18 deletions(-)
+ drivers/char/hw_random/core.c | 75 +++++++++++++++++++++----------------------
+ 1 file changed, 37 insertions(+), 38 deletions(-)
 
 diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
-index 534c2ae..328d065 100644
+index 7e2b1a7..534c2ae 100644
 --- a/drivers/char/hw_random/core.c
 +++ b/drivers/char/hw_random/core.c
-@@ -49,8 +49,6 @@ module_param(default_quality, ushort, 0644);
- MODULE_PARM_DESC(default_quality,
+@@ -50,7 +50,6 @@ MODULE_PARM_DESC(default_quality,
  		 "default entropy content of hwrng per mill");
  
--static int hwrng_init(struct hwrng *rng);
--
+ static int hwrng_init(struct hwrng *rng);
+-static void start_khwrngd(void);
+ 
  static size_t rng_buffer_size(void)
  {
- 	return SMP_CACHE_BYTES < 32 ? 32 : SMP_CACHE_BYTES;
-@@ -108,22 +106,6 @@ static void drop_current_rng(void)
- 	current_rng = NULL;
+@@ -153,6 +152,43 @@ static void put_rng(struct hwrng *rng)
+ 	mutex_unlock(&rng_mutex);
  }
  
--static int set_current_rng(struct hwrng *rng)
--{
--	int err;
--
--	BUG_ON(!mutex_is_locked(&rng_mutex));
--
--	err = hwrng_init(rng);
--	if (err)
--		return err;
--
--	drop_current_rng();
--	current_rng = rng;
--
--	return 0;
--}
--
- /* Returns ERR_PTR(), NULL or refcounted hwrng */
- static struct hwrng *get_current_rng(void)
- {
-@@ -220,6 +202,22 @@ static int hwrng_init(struct hwrng *rng)
- 	return 0;
- }
- 
-+static int set_current_rng(struct hwrng *rng)
++static int hwrng_fillfn(void *unused)
 +{
-+	int err;
++	long rc;
 +
-+	BUG_ON(!mutex_is_locked(&rng_mutex));
++	while (!kthread_should_stop()) {
++		struct hwrng *rng;
 +
-+	err = hwrng_init(rng);
-+	if (err)
-+		return err;
-+
-+	drop_current_rng();
-+	current_rng = rng;
-+
++		rng = get_current_rng();
++		if (IS_ERR(rng) || !rng)
++			break;
++		mutex_lock(&reading_mutex);
++		rc = rng_get_data(rng, rng_fillbuf,
++				  rng_buffer_size(), 1);
++		mutex_unlock(&reading_mutex);
++		put_rng(rng);
++		if (rc <= 0) {
++			pr_warn("hwrng: no data available\n");
++			msleep_interruptible(10000);
++			continue;
++		}
++		/* Outside lock, sure, but y'know: randomness. */
++		add_hwgenerator_randomness((void *)rng_fillbuf, rc,
++					   rc * current_quality * 8 >> 10);
++	}
++	hwrng_fill = NULL;
 +	return 0;
 +}
 +
- static int rng_dev_open(struct inode *inode, struct file *filp)
++static void start_khwrngd(void)
++{
++	hwrng_fill = kthread_run(hwrng_fillfn, NULL, "hwrng");
++	if (IS_ERR(hwrng_fill)) {
++		pr_err("hwrng_fill thread creation failed");
++		hwrng_fill = NULL;
++	}
++}
++
+ static int hwrng_init(struct hwrng *rng)
  {
- 	/* enforce read-only access to this chrdev */
+ 	if (kref_get_unless_zero(&rng->ref))
+@@ -387,43 +423,6 @@ static int __init register_miscdev(void)
+ 	return misc_register(&rng_miscdev);
+ }
+ 
+-static int hwrng_fillfn(void *unused)
+-{
+-	long rc;
+-
+-	while (!kthread_should_stop()) {
+-		struct hwrng *rng;
+-
+-		rng = get_current_rng();
+-		if (IS_ERR(rng) || !rng)
+-			break;
+-		mutex_lock(&reading_mutex);
+-		rc = rng_get_data(rng, rng_fillbuf,
+-				  rng_buffer_size(), 1);
+-		mutex_unlock(&reading_mutex);
+-		put_rng(rng);
+-		if (rc <= 0) {
+-			pr_warn("hwrng: no data available\n");
+-			msleep_interruptible(10000);
+-			continue;
+-		}
+-		/* Outside lock, sure, but y'know: randomness. */
+-		add_hwgenerator_randomness((void *)rng_fillbuf, rc,
+-					   rc * current_quality * 8 >> 10);
+-	}
+-	hwrng_fill = NULL;
+-	return 0;
+-}
+-
+-static void start_khwrngd(void)
+-{
+-	hwrng_fill = kthread_run(hwrng_fillfn, NULL, "hwrng");
+-	if (IS_ERR(hwrng_fill)) {
+-		pr_err("hwrng_fill thread creation failed");
+-		hwrng_fill = NULL;
+-	}
+-}
+-
+ int hwrng_register(struct hwrng *rng)
+ {
+ 	int err = -EINVAL;
 -- 
 2.10.0
