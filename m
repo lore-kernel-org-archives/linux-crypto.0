@@ -1,68 +1,45 @@
-From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [Part2 PATCH v6 13/38] crypto: ccp: Add Secure Encrypted
- Virtualization (SEV) command support
-Date: Thu, 26 Oct 2017 11:56:57 -0500
-Message-ID: <9258d8e7-b185-01d2-be92-d7d2820c7eb6@amd.com>
-References: <20171020023413.122280-1-brijesh.singh@amd.com>
- <20171020023413.122280-14-brijesh.singh@amd.com>
- <20171023092020.GB19523@nazgul.tnic>
- <f58e72e5-8636-2abb-99e9-c58f462463e7@amd.com>
- <20171026135614.GA12359@nazgul.tnic>
+From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Subject: Re: [PATCH 0/4] Rearrange functions to remove forward declarations
+Date: Thu, 26 Oct 2017 22:33:40 +0530
+Message-ID: <CANc+2y4OPz9wPwB7Rj6FgkC=esPyT8VG8-Q8U-toErHrYMxOkA@mail.gmail.com>
+References: <20171026153427.22334-1-prasannatsmkumar@gmail.com> <823fc44a-8ccc-1f8d-51f5-a4411362ffbc@caviumnetworks.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: brijesh.singh@amd.com, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Gary Hook <gary.hook@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Borislav Petkov <bp@alien8.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20171026135614.GA12359@nazgul.tnic>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        Harald Freudenberger <freude@linux.vnet.ibm.com>,
+        david.daney@cavium.com, Corentin LABBE <clabbe.montjoie@gmail.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>, Matt Mackall <mpm@selenic.com>
+To: David Daney <ddaney@caviumnetworks.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-io0-f194.google.com ([209.85.223.194]:48609 "EHLO
+        mail-io0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932137AbdJZRDl (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 26 Oct 2017 13:03:41 -0400
+Received: by mail-io0-f194.google.com with SMTP id j17so6887618iod.5
+        for <linux-crypto@vger.kernel.org>; Thu, 26 Oct 2017 10:03:40 -0700 (PDT)
+In-Reply-To: <823fc44a-8ccc-1f8d-51f5-a4411362ffbc@caviumnetworks.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
+Hi David,
 
+On 26 October 2017 at 22:18, David Daney <ddaney@caviumnetworks.com> wrote:
+> On 10/26/2017 08:34 AM, PrasannaKumar Muralidharan wrote:
+>>
+>> This patch series rearranges functions such that forward declarations
+>> becomes unnecessary. Remove those forward declaration.
+>
+>
+> Why?
+>
+> The code churn and increase in difficulty of attribution are big drawbacks
+> to this sort of patch set.
 
-On 10/26/2017 08:56 AM, Borislav Petkov wrote:
-> On Mon, Oct 23, 2017 at 02:57:04PM -0500, Brijesh Singh wrote:
->> Calling PLATFORM_GET_STATUS is not required, we can manage the state through
->> a simple ref count variable. Issuing PSP commands will always be much more
->> expensive compare to accessing a protected global variable.
-> 
-> What does "protected" mean here?
-> 
+Completely agreed. I did understand there is little value in this
+change. Wasn't sure whether such a patch is encouraged so gave a try.
+I am fine with not taking the patch.
 
-Access global variable after acquiring the semaphore.
-
-
-> In any case, that variable can be a simple bool as you use it as such.
-> 
-
-I am not using the variable (fw_init_count) as boolean. The variable 
-gets incremented in sev_platform_init() and decremented in 
-sev_platform_shutdown(). In very first call to sev_platform_init (i.e 
-when variable is zero) we issue  PLATFORM_INIT command, similarly 
-PLATFORM_SHUTDOWN is issued on the last (i.e when variable value is 
-reached to zero). The variable is used as ref counter.
-
-
->> I would prefer to avoid invoking PSP command if possible.
->> Additionally, the global semaphore is still needed to serialize
->> the sev_platform_init() and sev_platform_shutdown() from multiple
->> processes. e.g If process "A" calls sev_platform_init() and if it gets
->> preempted due to whatever reason then we don't want another process
->> to issue the shutdown command while process "A" is in middle of
->> sev_platform_init().
-> 
-> How? You're holding fw_init_mutex.
-> 
-
-In your previous reply you comments on global semaphore (fw_init_mutex) 
-and in response I tried to highlight why we need the global semaphore. 
-Did I misunderstood your comment ?
-
--Brijesh
+Regards,
+PrasannaKumar
