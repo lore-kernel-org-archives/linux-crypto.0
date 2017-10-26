@@ -1,46 +1,38 @@
-From: Lars Persson <lars.persson@axis.com>
-Subject: Re: [PATCH] drivers/crypto: Convert timers to use timer_setup()
-Date: Thu, 26 Oct 2017 16:24:16 +0200
-Message-ID: <4621befa-e5f5-182f-e72a-5f3277d4675f@axis.com>
-References: <20171025101842.GA145495@beast>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: Jesper Nilsson <jespern@axis.com>, Lars Persson <larper@axis.com>,
-        "Niklas Cassel" <niklass@axis.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Jamie Iles" <jamie@jamieiles.com>, <linux-arm-kernel@axis.com>,
-        <linux-crypto@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20171025101842.GA145495@beast>
-Content-Language: sv
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Subject: [PATCH 0/4] Rearrange functions to remove forward declarations
+Date: Thu, 26 Oct 2017 21:04:23 +0530
+Message-ID: <20171026153427.22334-1-prasannatsmkumar@gmail.com>
+Cc: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+To: herbert@gondor.apana.org.au, freude@linux.vnet.ibm.com,
+        david.daney@cavium.com, clabbe.montjoie@gmail.com,
+        linux-crypto@vger.kernel.org, mpm@selenic.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pf0-f196.google.com ([209.85.192.196]:44411 "EHLO
+        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932255AbdJZPfd (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 26 Oct 2017 11:35:33 -0400
+Received: by mail-pf0-f196.google.com with SMTP id x7so2782503pfa.1
+        for <linux-crypto@vger.kernel.org>; Thu, 26 Oct 2017 08:35:33 -0700 (PDT)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
+This patch series rearranges functions such that forward declarations
+becomes unnecessary. Remove those forward declaration.
 
+This patch series is boot tested without user space in qemu with
+CONFIG_HW_RANDOM=y.
 
-On 10/25/2017 12:18 PM, Kees Cook wrote:
-> In preparation for unconditionally passing the struct timer_list pointer to
-> all timer callbacks, switch to using the new timer_setup() and from_timer()
-> to pass the timer pointer explicitly.
-> 
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: Jesper Nilsson <jesper.nilsson@axis.com>
-> Cc: Lars Persson <lars.persson@axis.com>
-> Cc: Niklas Cassel <niklas.cassel@axis.com>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Jamie Iles <jamie@jamieiles.com>
-> Cc: linux-arm-kernel@axis.com
-> Cc: linux-crypto@vger.kernel.org
-> Cc: linux-arm-kernel@lists.infradead.org
-> Signed-off-by: Kees Cook <keescook@chromium.org>
+PrasannaKumar Muralidharan (4):
+  hw_random: core: Remove forward declaration by rearranging code
+  hw_random: core: Rearranging rng_get_data to remove forward
+    declaration
+  hw_random: core: Rearranging start_khwrngd to remove forward
+    declaration
+  hw_random: core: Remove forward declaration of hwrng_init
 
-For drivers/crypto/axis:
-Acked-by: Lars Persson <lars.persson@axis.com>
+ drivers/char/hw_random/core.c | 151 ++++++++++++++++++++----------------------
+ 1 file changed, 72 insertions(+), 79 deletions(-)
 
-Thanks,
-  Lars
+-- 
+2.10.0
