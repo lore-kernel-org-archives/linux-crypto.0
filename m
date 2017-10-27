@@ -1,37 +1,75 @@
 From: Stephen Brennan <stephen@brennan.io>
-Subject: Re: [PATCH] staging: ccree: Fix indentation in ssi_buffer_mgr.c
-Date: Fri, 27 Oct 2017 07:42:01 -0700
-Message-ID: <20171027144201.GA11920@pride.cult>
-References: <20171027015342.6345-1-stephen@brennan.io>
- <20171027083247.sdsdwjiyhyflvjug@mwanda>
- <1509114238.1914.4.camel@perches.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Dan Carpenter <dan.carpenter@oracle.com>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
+Subject: [PATCH v2] staging: ccree: Fix indentation in ssi_buffer_mgr.c
+Date: Fri, 27 Oct 2017 07:53:18 -0700
+Message-ID: <20171027145318.12809-1-stephen@brennan.io>
+Cc: Stephen Brennan <stephen@brennan.io>
+To: Gilad Ben-Yossef <gilad@benyossef.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         linux-crypto@vger.kernel.org,
         driverdev-devel@linuxdriverproject.org,
         linux-kernel@vger.kernel.org
-To: Joe Perches <joe@perches.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1509114238.1914.4.camel@perches.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21369 "EHLO
+        sender-of-o52.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750882AbdJ0OxH (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 27 Oct 2017 10:53:07 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Oct 27, 2017 at 07:23:58AM -0700, Joe Perches wrote:
-> On Fri, 2017-10-27 at 11:32 +0300, Dan Carpenter wrote:
-> > But then ssi_buffer_mgr_copy_scatterlist_portion() is still not indented
-> > correctly.
+In particular, fixes some over-indented if statement bodies as well as a
+couple lines indented with spaces. checkpatch.pl now reports no warnings
+on this file other than 80 character warnings.
 
-Yeah, I don't know how I missed it. I'll send a new version of the patch
-out momentarily.
+Signed-off-by: Stephen Brennan <stephen@brennan.io>
+---
+V2 also fixes an overlooked indentation error that checkpatch didn't catch.
 
-> The latest version of checkpatch should bleat something on the
-> 	...scatterlist_portion(
-> line
+ drivers/staging/ccree/ssi_buffer_mgr.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-Strangely, my checkpatch doesn't complain about it, but I guess you can't
-always rely on tools for this stuff. For reference, I'm currently on the
-10/18 linux-next branch.
+diff --git a/drivers/staging/ccree/ssi_buffer_mgr.c b/drivers/staging/ccree/ssi_buffer_mgr.c
+index dca3ce84d043..1f8a225530a8 100644
+--- a/drivers/staging/ccree/ssi_buffer_mgr.c
++++ b/drivers/staging/ccree/ssi_buffer_mgr.c
+@@ -406,8 +406,8 @@ ssi_aead_handle_config_buf(struct device *dev,
+ 	sg_init_one(&areq_ctx->ccm_adata_sg, config_data, AES_BLOCK_SIZE + areq_ctx->ccm_hdr_size);
+ 	if (unlikely(dma_map_sg(dev, &areq_ctx->ccm_adata_sg, 1,
+ 				DMA_TO_DEVICE) != 1)) {
+-			dev_err(dev, "dma_map_sg() config buffer failed\n");
+-			return -ENOMEM;
++		dev_err(dev, "dma_map_sg() config buffer failed\n");
++		return -ENOMEM;
+ 	}
+ 	dev_dbg(dev, "Mapped curr_buff: dma_address=%pad page=%p addr=%pK offset=%u length=%u\n",
+ 		&sg_dma_address(&areq_ctx->ccm_adata_sg),
+@@ -435,8 +435,8 @@ static inline int ssi_ahash_handle_curr_buf(struct device *dev,
+ 	sg_init_one(areq_ctx->buff_sg, curr_buff, curr_buff_cnt);
+ 	if (unlikely(dma_map_sg(dev, areq_ctx->buff_sg, 1,
+ 				DMA_TO_DEVICE) != 1)) {
+-			dev_err(dev, "dma_map_sg() src buffer failed\n");
+-			return -ENOMEM;
++		dev_err(dev, "dma_map_sg() src buffer failed\n");
++		return -ENOMEM;
+ 	}
+ 	dev_dbg(dev, "Mapped curr_buff: dma_address=%pad page=%p addr=%pK offset=%u length=%u\n",
+ 		&sg_dma_address(areq_ctx->buff_sg), sg_page(areq_ctx->buff_sg),
+@@ -1029,12 +1029,12 @@ static inline int ssi_buffer_mgr_prepare_aead_data_mlli(
+ 			 * verification is made by CPU compare in order to simplify
+ 			 * MAC verification upon request completion
+ 			 */
+-			  u32 size_to_skip = req->assoclen;
++			u32 size_to_skip = req->assoclen;
+ 
+-			  if (areq_ctx->is_gcm4543)
+-				  size_to_skip += crypto_aead_ivsize(tfm);
++			if (areq_ctx->is_gcm4543)
++				size_to_skip += crypto_aead_ivsize(tfm);
+ 
+-			  ssi_buffer_mgr_copy_scatterlist_portion(
++			ssi_buffer_mgr_copy_scatterlist_portion(
+ 				dev, areq_ctx->backup_mac, req->src,
+ 				size_to_skip + req->cryptlen - areq_ctx->req_authsize,
+ 				size_to_skip + req->cryptlen, SSI_SG_TO_BUF);
+-- 
+2.14.2
