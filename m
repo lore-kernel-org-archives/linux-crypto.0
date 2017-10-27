@@ -1,60 +1,87 @@
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [Part2 PATCH v6 13/38] crypto: ccp: Add Secure Encrypted
- Virtualization (SEV) command support
-Date: Fri, 27 Oct 2017 09:56:50 +0200
-Message-ID: <20171027075650.GA1276@nazgul.tnic>
-References: <20171020023413.122280-1-brijesh.singh@amd.com>
- <20171020023413.122280-14-brijesh.singh@amd.com>
- <20171023092020.GB19523@nazgul.tnic>
- <f58e72e5-8636-2abb-99e9-c58f462463e7@amd.com>
- <20171026135614.GA12359@nazgul.tnic>
- <9258d8e7-b185-01d2-be92-d7d2820c7eb6@amd.com>
- <20171026174427.GB29782@nazgul.tnic>
- <bc7254d3-a2d9-e3fd-02a4-164d5e4fb545@amd.com>
- <20171026201322.GA32181@nazgul.tnic>
- <89f4ec21-e31e-18f2-27c5-946c38cd128d@amd.com>
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: Re: [PATCH] staging: ccree: Fix indentation in ssi_buffer_mgr.c
+Date: Fri, 27 Oct 2017 11:32:47 +0300
+Message-ID: <20171027083247.sdsdwjiyhyflvjug@mwanda>
+References: <20171027015342.6345-1-stephen@brennan.io>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Gary Hook <gary.hook@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Brijesh Singh <brijesh.singh@amd.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: Gilad Ben-Yossef <gilad@benyossef.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org,
+        linux-kernel@vger.kernel.org
+To: Stephen Brennan <stephen@brennan.io>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([5.9.137.197]:44970 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751158AbdJ0H4s (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 27 Oct 2017 03:56:48 -0400
+Received: from userp1040.oracle.com ([156.151.31.81]:43352 "EHLO
+        userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751070AbdJ0IdI (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 27 Oct 2017 04:33:08 -0400
 Content-Disposition: inline
-In-Reply-To: <89f4ec21-e31e-18f2-27c5-946c38cd128d@amd.com>
+In-Reply-To: <20171027015342.6345-1-stephen@brennan.io>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Oct 26, 2017 at 03:59:32PM -0500, Brijesh Singh wrote:
-> we can workaround #1 by adding some hooks in sp_pci_init() to invoke the PSP
-> initialization routines after pci_register_driver() is done but #2 can get
-> painful because it will require us calling the SHUTDOWN outside the
-> sp_pci_exit() code flow.
+On Thu, Oct 26, 2017 at 06:53:42PM -0700, Stephen Brennan wrote:
+> In particular, fixes some over-indented if statement bodies as well as a
+> couple lines indented with spaces. checkpatch.pl now reports no warnings
+> on this file other than 80 character warnings.
+> 
+> Signed-off-by: Stephen Brennan <stephen@brennan.io>
+> ---
+> Hello again, hoping these indentation issues are a bit more actionable than the
+> line length errors I was trying to fix in my previous patch. Again, thanks in
+> advance for taking the time to look!
+> 
+>  drivers/staging/ccree/ssi_buffer_mgr.c | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
+> 
+> diff --git a/drivers/staging/ccree/ssi_buffer_mgr.c b/drivers/staging/ccree/ssi_buffer_mgr.c
+> index dca3ce84d043..7c62255128d5 100644
+> --- a/drivers/staging/ccree/ssi_buffer_mgr.c
+> +++ b/drivers/staging/ccree/ssi_buffer_mgr.c
+> @@ -406,8 +406,8 @@ ssi_aead_handle_config_buf(struct device *dev,
+>  	sg_init_one(&areq_ctx->ccm_adata_sg, config_data, AES_BLOCK_SIZE + areq_ctx->ccm_hdr_size);
+>  	if (unlikely(dma_map_sg(dev, &areq_ctx->ccm_adata_sg, 1,
+>  				DMA_TO_DEVICE) != 1)) {
+> -			dev_err(dev, "dma_map_sg() config buffer failed\n");
+> -			return -ENOMEM;
+> +		dev_err(dev, "dma_map_sg() config buffer failed\n");
+> +		return -ENOMEM;
+>  	}
+>  	dev_dbg(dev, "Mapped curr_buff: dma_address=%pad page=%p addr=%pK offset=%u length=%u\n",
+>  		&sg_dma_address(&areq_ctx->ccm_adata_sg),
+> @@ -435,8 +435,8 @@ static inline int ssi_ahash_handle_curr_buf(struct device *dev,
+>  	sg_init_one(areq_ctx->buff_sg, curr_buff, curr_buff_cnt);
+>  	if (unlikely(dma_map_sg(dev, areq_ctx->buff_sg, 1,
+>  				DMA_TO_DEVICE) != 1)) {
+> -			dev_err(dev, "dma_map_sg() src buffer failed\n");
+> -			return -ENOMEM;
+> +		dev_err(dev, "dma_map_sg() src buffer failed\n");
+> +		return -ENOMEM;
 
-Ok, do that and init the PSP master and then put the device in UNINIT
-state only in the functions which execute those commands which need the
-device to be in UNINIT state, e.g., wrap the SEV_CMD_FACTORY_RESET glue
-in a command function which does put the device in the UNINIT state as a
-first step.
+So far so good.
 
-Then, when that function is done, put the device in the mode which the
-other commands would expect it to be in, e.g., INIT state.
+>  	}
+>  	dev_dbg(dev, "Mapped curr_buff: dma_address=%pad page=%p addr=%pK offset=%u length=%u\n",
+>  		&sg_dma_address(areq_ctx->buff_sg), sg_page(areq_ctx->buff_sg),
+> @@ -1029,10 +1029,10 @@ static inline int ssi_buffer_mgr_prepare_aead_data_mlli(
+>  			 * verification is made by CPU compare in order to simplify
+>  			 * MAC verification upon request completion
+>  			 */
+> -			  u32 size_to_skip = req->assoclen;
+> +			u32 size_to_skip = req->assoclen;
+>  
+> -			  if (areq_ctx->is_gcm4543)
+> -				  size_to_skip += crypto_aead_ivsize(tfm);
+> +			if (areq_ctx->is_gcm4543)
+> +				size_to_skip += crypto_aead_ivsize(tfm);
+>  
+>  			  ssi_buffer_mgr_copy_scatterlist_portion(
+>  				dev, areq_ctx->backup_mac, req->src,
 
-This way you'll simplify the whole command flow considerably and won't
-have to "toggle" the device each time and will save yourself a lot of
-time on command execution.
+But then ssi_buffer_mgr_copy_scatterlist_portion() is still not indented
+correctly.
 
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-ECO tip #101: Trim your mails when you reply.
+regards,
+dan carpenter
