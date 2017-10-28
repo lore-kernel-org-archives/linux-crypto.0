@@ -1,11 +1,9 @@
-From: Brijesh Singh <brijesh.singh@amd.com>
+From: Borislav Petkov <bp@alien8.de>
 Subject: Re: [Part2 PATCH v6 13/38] crypto: ccp: Add Secure Encrypted
  Virtualization (SEV) command support
-Date: Fri, 27 Oct 2017 17:59:23 -0500
-Message-ID: <746a1ce4-f137-5e4a-d768-34aa88893955@amd.com>
-References: <20171026174427.GB29782@nazgul.tnic>
- <bc7254d3-a2d9-e3fd-02a4-164d5e4fb545@amd.com>
- <20171026201322.GA32181@nazgul.tnic>
+Date: Sat, 28 Oct 2017 02:00:34 +0200
+Message-ID: <20171028000034.46r72fyaprfjwdj7@pd.tnic>
+References: <20171026201322.GA32181@nazgul.tnic>
  <89f4ec21-e31e-18f2-27c5-946c38cd128d@amd.com>
  <20171027075650.GA1276@nazgul.tnic>
  <323f3862-b326-e6b4-015f-6d923d7c700f@amd.com>
@@ -14,60 +12,92 @@ References: <20171026174427.GB29782@nazgul.tnic>
  <20171027202707.olhzx453cnkbhy62@pd.tnic>
  <a7b8859b-6537-5ce0-b0d8-bd5932c64251@amd.com>
  <20171027214949.ixzairu5ueh4to4e@pd.tnic>
+ <746a1ce4-f137-5e4a-d768-34aa88893955@amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: brijesh.singh@amd.com, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Gary Hook <gary.hook@amd.com>,
         Tom Lendacky <thomas.lendacky@amd.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Borislav Petkov <bp@alien8.de>
+To: Brijesh Singh <brijesh.singh@amd.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2nam01on0088.outbound.protection.outlook.com ([104.47.34.88]:10055
-        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1750915AbdJ0W7a (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 27 Oct 2017 18:59:30 -0400
-In-Reply-To: <20171027214949.ixzairu5ueh4to4e@pd.tnic>
-Content-Language: en-US
+Received: from mail.skyhub.de ([5.9.137.197]:48684 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750781AbdJ1AAu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 27 Oct 2017 20:00:50 -0400
+Content-Disposition: inline
+In-Reply-To: <746a1ce4-f137-5e4a-d768-34aa88893955@amd.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+On Fri, Oct 27, 2017 at 05:59:23PM -0500, Brijesh Singh wrote:
+> Yes it is typo. PEK_GEN wants FW to be in INIT state hence someone need
+> to transition from UNINIT -> INIT.
 
+Which, once you've done it once on driver init, is there.
 
-On 10/27/17 4:49 PM, Borislav Petkov wrote:
-> On Fri, Oct 27, 2017 at 04:28:31PM -0500, Brijesh Singh wrote:
->> This will fail because PEK_GEN require the platform in INIT state and
->> nobody has done the state transition from INIT -> UINIT.
-> Huh, FW is in INIT state and PEK_GEN wants it to be in INIT state. Typo?
+> That's what I am doing except FACTORY_RESET.
 
-Yes it is typo. PEK_GEN wants FW to be in INIT state hence someone need
-to transition from UNINIT -> INIT.
+Well, not really. Lemme pick a command at random...
 
-> Aaanyway, I don't like this whole notion of prematurely and predictively
-> executing commands on the PSP if it is not needed. So how about
-> executing only those commands which put the FW in the required state and
-> then executing the actual command?
+PEK_CSR. For that, you do INIT -> PEK_CSR -> SHUTDOWN.
 
-That's what I am doing except FACTORY_RESET. The FACTORY_RESET require
-the FW to be in UNINIT state,  since we don't who else is running in
-parallel hence its not safe to issue the SHUTDOWN to transition from
-INIT -> UNINIT. If FW is not in correct state this  command will fail
-with error code (INVALID_STATE) and user can retry (please note that
-user can always use PLATFORM_STATUS to query the current FW state before
-issuing a command). I see that we can do a small optimization -- since
-we already know the FW state hence we can avoid issuing PSP command when
-we know for sure that command will fail because we are not in correct state.
+Doc says, platform needs to be in INIT or WORKING state. But nothing
+says you should shut it down. Spec says, SHUTDOWN transitions platform
+to UNINIT state. So when the next command comes in which needs the
+platform to be in INIT state, you go and INIT it again. For no reason
+*WHATSOEVER*!
 
->
-> I.e., if a command needs to be executed in UINIT state, you put the PSP
-> in that state before executing that command. If the command needs to be
-> in INIT state, you put the PSP in INIT state first and so on...
+I know, you're gonna say, but what if the next command needs a different
+state than INIT. Well, *then* you transition it, in the command
+function. When that function executes. But not before that and not in
+preparation that *maybe* the next command will be it.
 
-If command needs INIT state and FW is not in INIT state then its safe to
-transition from UNINIT -> INIT. But if command needs UNINIT state and FW
-is in INIT state then its not safe to transition -- in those case we
-simply return EBUSY and let the user retry the command.
+Now, if you did:
+
+INIT once during driver init
+
+PEK_CSR
+
+(platform remains in INIT state)
+
+<--- the next command here can execute directly if it is allowed in INIT
+state.
+
+Instead, the platform has been shutdown and you init it again. Do you
+see now what I mean?
+
+IOW, once you init the PSP master, you should keep it in the INIT state
+- or the state in which most commands expect it to be and thus save
+yourself all that unnecessary toggling. If a command needs it to be in a
+different state, only *then* you transition it.
+
+Instead, what you have now is that you call INIT and SHUTDOWN
+around SEV_PEK_GEN, SEV_PDH_GEN, SEV_PEK_CSR, SEV_PEK_CERT_IMPORT,
+SEV_PDH_CERT_EXPORT and for all those, the platform must be in INIT
+(for some in WORKING state) but for all in INIT state and "The platform
+remains be in the same state after completion." So the whole SHUTDOWN ->
+INIT wankery in-between is a pure waste of electrons.
+
+>  I see that we can do a small optimization -- since we already know
+> the FW state hence we can avoid issuing PSP command when we know for
+> sure that command will fail because we are not in correct state.
+
+As I said before, you should do that regardless by recording the current
+state of the PSP in variable so that you can save yourself the status
+querying.
+
+> If command needs INIT state and FW is not in INIT state then its safe to
+> transition from UNINIT -> INIT. But if command needs UNINIT state and FW
+> is in INIT state then its not safe to transition -- in those case we
+> simply return EBUSY and let the user retry the command.
+
+Whatever - that doesn't contradict what I'm proposing.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+Good mailing practices for 400: avoid top-posting and trim the reply.
