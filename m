@@ -1,49 +1,128 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 4.14
-Date: Mon, 30 Oct 2017 15:20:48 +0800
-Message-ID: <20171030072048.GA21737@gondor.apana.org.au>
-References: <20161119102748.GA4277@gondor.apana.org.au>
- <20161213132414.GA7898@gondor.apana.org.au>
- <20170223125141.GA17400@gondor.apana.org.au>
- <20170714141855.GA29426@gondor.apana.org.au>
- <20170922084401.GA15541@gondor.apana.org.au>
- <20171012105101.GA29403@gondor.apana.org.au>
+From: Harald Freudenberger <freude@linux.vnet.ibm.com>
+Subject: Re: [PATCH] hw_random: core: Reset user selected rng by writing "" to
+ rng_current
+Date: Mon, 30 Oct 2017 09:10:43 +0100
+Message-ID: <6442aa0b-6416-35fa-4f8b-e601403029fb@linux.vnet.ibm.com>
+References: <20171027170404.21262-1-prasannatsmkumar@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+To: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
+        mpm@selenic.com, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:50404 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751536AbdJ3HVS (ORCPT
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57684 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1751269AbdJ3IKr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 30 Oct 2017 03:21:18 -0400
-Content-Disposition: inline
-In-Reply-To: <20171012105101.GA29403@gondor.apana.org.au>
+        Mon, 30 Oct 2017 04:10:47 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id v9U897tr003842
+        for <linux-crypto@vger.kernel.org>; Mon, 30 Oct 2017 04:10:46 -0400
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2dwy0qkpyx-1
+        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Mon, 30 Oct 2017 04:10:46 -0400
+Received: from localhost
+        by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-crypto@vger.kernel.org> from <freude@linux.vnet.ibm.com>;
+        Mon, 30 Oct 2017 08:10:44 -0000
+In-Reply-To: <20171027170404.21262-1-prasannatsmkumar@gmail.com>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus: 
-
-This push fixes an objtool regression.
-
-
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-
-
-Jason A. Donenfeld (1):
-      crypto: x86/chacha20 - satisfy stack validation 2.0
-
- arch/x86/crypto/chacha20-avx2-x86_64.S  |    4 ++--
- arch/x86/crypto/chacha20-ssse3-x86_64.S |    4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+On 10/27/2017 07:04 PM, PrasannaKumar Muralidharan wrote:
+> User is able to select a chosen rng by writing its name to rng_current
+> but there is no way to reset it without unbinding the rng. Let user
+> write "" to rng_current and delesect the chosen rng.
+>
+> Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+> ---
+>  drivers/char/hw_random/core.c | 51 +++++++++++++++++++++++++++----------------
+>  1 file changed, 32 insertions(+), 19 deletions(-)
+>
+> diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+> index 9701ac7..be03024 100644
+> --- a/drivers/char/hw_random/core.c
+> +++ b/drivers/char/hw_random/core.c
+> @@ -292,26 +292,48 @@ static struct miscdevice rng_miscdev = {
+>  	.groups		= rng_dev_groups,
+>  };
+>
+> +static int enable_best_rng(void)
+> +{
+> +	int ret = -ENODEV;
+> +
+> +	BUG_ON(!mutex_is_locked(&rng_mutex));
+> +
+> +	/* rng_list is sorted by quality, use the best (=first) one */
+> +	if (!list_empty(&rng_list)) {
+> +		struct hwrng *new_rng;
+> +
+> +		new_rng = list_entry(rng_list.next, struct hwrng, list);
+> +		ret = ((new_rng == current_rng) ? 0 : set_current_rng(new_rng));
+> +		if (!ret)
+> +			cur_rng_set_by_user = 0;
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+>  static ssize_t hwrng_attr_current_store(struct device *dev,
+>  					struct device_attribute *attr,
+>  					const char *buf, size_t len)
+>  {
+> -	int err;
+> +	int err = -ENODEV;
+>  	struct hwrng *rng;
+>
+>  	err = mutex_lock_interruptible(&rng_mutex);
+>  	if (err)
+>  		return -ERESTARTSYS;
+> -	err = -ENODEV;
+> -	list_for_each_entry(rng, &rng_list, list) {
+> -		if (sysfs_streq(rng->name, buf)) {
+> -			err = 0;
+> -			cur_rng_set_by_user = 1;
+> -			if (rng != current_rng)
+> +
+> +	if (sysfs_streq(buf, "")) {
+> +		err = enable_best_rng();
+> +	} else {
+> +		list_for_each_entry(rng, &rng_list, list) {
+> +			if (sysfs_streq(rng->name, buf)) {
+> +				cur_rng_set_by_user = 1;
+>  				err = set_current_rng(rng);
+> -			break;
+> +				break;
+> +			}
+>  		}
+>  	}
+> +
+>  	mutex_unlock(&rng_mutex);
+>
+>  	return err ? : len;
+> @@ -493,17 +515,8 @@ void hwrng_unregister(struct hwrng *rng)
+>  	mutex_lock(&rng_mutex);
+>
+>  	list_del(&rng->list);
+> -	if (current_rng == rng) {
+> -		drop_current_rng();
+> -		cur_rng_set_by_user = 0;
+> -		/* rng_list is sorted by quality, use the best (=first) one */
+> -		if (!list_empty(&rng_list)) {
+> -			struct hwrng *new_rng;
+> -
+> -			new_rng = list_entry(rng_list.next, struct hwrng, list);
+> -			set_current_rng(new_rng);
+> -		}
+> -	}
+> +	if (current_rng == rng)
+> +		enable_best_rng();
+>
+>  	if (list_empty(&rng_list)) {
+>  		mutex_unlock(&rng_mutex);
+That's a really good idea. I also thought about something like that.
+regards
+Harald Freudenberger
