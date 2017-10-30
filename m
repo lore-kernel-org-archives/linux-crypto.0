@@ -1,72 +1,129 @@
-From: Vinod Koul <vinod.koul@intel.com>
-Subject: Re: [PATCH 0/4] add CAAM DMA memcpy driver
-Date: Mon, 30 Oct 2017 18:40:04 +0530
-Message-ID: <20171030131004.GD3187@localhost>
-References: <20171026100008.32169-1-radu.alexe@nxp.com>
- <VI1PR0402MB33422B48B506D7FF6A894AE0985A0@VI1PR0402MB3342.eurprd04.prod.outlook.com>
- <8D3F6266AEB6384E807C6FFC6FE195E333C52210@BGSMSX107.gar.corp.intel.com>
- <VI1PR0402MB3342607E09BE48F80E074C14985A0@VI1PR0402MB3342.eurprd04.prod.outlook.com>
+From: Harald Freudenberger <freude@linux.vnet.ibm.com>
+Subject: Re: [PATCH] hw_random: core: Reset user selected rng by writing "" to
+ rng_current
+Date: Mon, 30 Oct 2017 14:28:11 +0100
+Message-ID: <c729bc20-1a98-0120-a20a-7bfd8935103b@linux.vnet.ibm.com>
+References: <20171027170404.21262-1-prasannatsmkumar@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: Radu Andrei Alexe <radu.alexe@nxp.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        Dan Douglass <dan.douglass@nxp.com>,
-        "shawnguo@kernel.org" <shawnguo@kernel.org>,
-        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>
-To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
+Content-Transfer-Encoding: 7bit
+To: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
+        mpm@selenic.com, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:53197 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751818AbdJ3NHA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 30 Oct 2017 09:07:00 -0400
-Content-Disposition: inline
-In-Reply-To: <VI1PR0402MB3342607E09BE48F80E074C14985A0@VI1PR0402MB3342.eurprd04.prod.outlook.com>
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41444 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1751663AbdJ3N2P (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 30 Oct 2017 09:28:15 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id v9UDMTj4103012
+        for <linux-crypto@vger.kernel.org>; Mon, 30 Oct 2017 09:28:14 -0400
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2dx0vrwyje-1
+        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Mon, 30 Oct 2017 09:28:14 -0400
+Received: from localhost
+        by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-crypto@vger.kernel.org> from <freude@linux.vnet.ibm.com>;
+        Mon, 30 Oct 2017 13:28:12 -0000
+In-Reply-To: <20171027170404.21262-1-prasannatsmkumar@gmail.com>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Oct 27, 2017 at 12:20:32PM +0000, Horia Geantă wrote:
-> On 10/27/2017 2:36 PM, Koul, Vinod wrote:
-> >> On 10/26/2017 1:01 PM, Radu Alexe wrote:
-> >>> This patch-set introduces a new DMA memcpy driver based on the DMA
-> >>> capabilities of the CAAM crypto engine. Because of this dependency the
-> >>> included commits target various parts of the kernel tree.
-> >> I don't see the patches on any of the mail lists.
-> >> If they are moderated, I would expect this to be mentioned in the
-> >> MAINTAINERS file.
-> >>
-> >>>
-> >>> Patch 1.
-> >>> Since the CAAM DMA driver is a platform driver it is enabled by a new node
-> >>> in the device tree. This commit adds documentation for the device tree
-> >>> bindings.
-> >>>
-> >>> Patch 2.
-> >>> This patch adds the "caam-dma" node in the fsl-ls1012a.dtsi file.
-> >>>
-> >>> Patch 3.
-> >>> This commit adds various capabilities in the JR driver of the CAAM that is
-> >>> used by the CAAM DMA driver.
-> >>>
-> >>> Patch 4.
-> >>> Adds the CAAM DMA memcpy driver.
-> >>>
-> >>> Patch 1 and 3 should be merged by the crypto maintainers, patch 2 by
-> >>> devicetree maintainers and patch 4 by the DMA maintainers.
-> >> I would go with all the patches through the dmaengine tree.
-> > 
-> > Good call, but no one CCed dmaengine folks on this series!
-> > 
-> I see dmaengine@vger.kernel.org Cc-ed on both cover letter and all four
-> patches.
-> It might be that the sender (Radu) is not subscribed and messages are
-> awaiting moderators' approval.
-
-I think vger lists are open, maybe sender has some issues with mail as they
-are still not in any archives..
-
--- 
-~Vinod
+On 10/27/2017 07:04 PM, PrasannaKumar Muralidharan wrote:
+> User is able to select a chosen rng by writing its name to rng_current
+> but there is no way to reset it without unbinding the rng. Let user
+> write "" to rng_current and delesect the chosen rng.
+>
+> Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+> ---
+>  drivers/char/hw_random/core.c | 51 +++++++++++++++++++++++++++----------------
+>  1 file changed, 32 insertions(+), 19 deletions(-)
+>
+> diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+> index 9701ac7..be03024 100644
+> --- a/drivers/char/hw_random/core.c
+> +++ b/drivers/char/hw_random/core.c
+> @@ -292,26 +292,48 @@ static struct miscdevice rng_miscdev = {
+>  	.groups		= rng_dev_groups,
+>  };
+>
+> +static int enable_best_rng(void)
+> +{
+> +	int ret = -ENODEV;
+> +
+> +	BUG_ON(!mutex_is_locked(&rng_mutex));
+> +
+> +	/* rng_list is sorted by quality, use the best (=first) one */
+> +	if (!list_empty(&rng_list)) {
+> +		struct hwrng *new_rng;
+> +
+> +		new_rng = list_entry(rng_list.next, struct hwrng, list);
+> +		ret = ((new_rng == current_rng) ? 0 : set_current_rng(new_rng));
+> +		if (!ret)
+> +			cur_rng_set_by_user = 0;
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+>  static ssize_t hwrng_attr_current_store(struct device *dev,
+>  					struct device_attribute *attr,
+>  					const char *buf, size_t len)
+>  {
+> -	int err;
+> +	int err = -ENODEV;
+Two lines later err is assigned the return value of mutex_lock_interruptible().
+So the -ENODEV value assignment does nothing.
+>  	struct hwrng *rng;
+>
+>  	err = mutex_lock_interruptible(&rng_mutex);
+>  	if (err)
+>  		return -ERESTARTSYS;
+> -	err = -ENODEV;
+> -	list_for_each_entry(rng, &rng_list, list) {
+> -		if (sysfs_streq(rng->name, buf)) {
+> -			err = 0;
+> -			cur_rng_set_by_user = 1;
+> -			if (rng != current_rng)
+> +
+> +	if (sysfs_streq(buf, "")) {
+> +		err = enable_best_rng();
+> +	} else {
+> +		list_for_each_entry(rng, &rng_list, list) {
+> +			if (sysfs_streq(rng->name, buf)) {
+> +				cur_rng_set_by_user = 1;
+>  				err = set_current_rng(rng);
+> -			break;
+> +				break;
+> +			}
+>  		}
+>  	}
+> +
+>  	mutex_unlock(&rng_mutex);
+>
+>  	return err ? : len;
+> @@ -493,17 +515,8 @@ void hwrng_unregister(struct hwrng *rng)
+>  	mutex_lock(&rng_mutex);
+>
+>  	list_del(&rng->list);
+> -	if (current_rng == rng) {
+> -		drop_current_rng();
+> -		cur_rng_set_by_user = 0;
+> -		/* rng_list is sorted by quality, use the best (=first) one */
+> -		if (!list_empty(&rng_list)) {
+> -			struct hwrng *new_rng;
+> -
+> -			new_rng = list_entry(rng_list.next, struct hwrng, list);
+> -			set_current_rng(new_rng);
+> -		}
+> -	}
+> +	if (current_rng == rng)
+> +		enable_best_rng();
+>
+>  	if (list_empty(&rng_list)) {
+>  		mutex_unlock(&rng_mutex);
+looks like for me.
+reviewed-by: Harald Freudenberger <freude@linux.vnet.ibm.com>
