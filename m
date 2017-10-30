@@ -1,128 +1,34 @@
-From: Harald Freudenberger <freude@linux.vnet.ibm.com>
-Subject: Re: [PATCH] hw_random: core: Reset user selected rng by writing "" to
- rng_current
-Date: Mon, 30 Oct 2017 09:10:43 +0100
-Message-ID: <6442aa0b-6416-35fa-4f8b-e601403029fb@linux.vnet.ibm.com>
-References: <20171027170404.21262-1-prasannatsmkumar@gmail.com>
+From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Subject: Re: [PATCH] hw_random: core: Reset user selected rng by writing "" to rng_current
+Date: Mon, 30 Oct 2017 18:29:44 +0530
+Message-ID: <CANc+2y68HXQX4CTC8kNzEi97Z3xtthWc=nP0bAEmkpPibLTWJg@mail.gmail.com>
+References: <20171027170404.21262-1-prasannatsmkumar@gmail.com> <6442aa0b-6416-35fa-4f8b-e601403029fb@linux.vnet.ibm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-To: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
-        mpm@selenic.com, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>
+To: Harald Freudenberger <freude@linux.vnet.ibm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57684 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1751269AbdJ3IKr (ORCPT
+Received: from mail-io0-f178.google.com ([209.85.223.178]:49398 "EHLO
+        mail-io0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751895AbdJ3M7p (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 30 Oct 2017 04:10:47 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id v9U897tr003842
-        for <linux-crypto@vger.kernel.org>; Mon, 30 Oct 2017 04:10:46 -0400
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2dwy0qkpyx-1
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Mon, 30 Oct 2017 04:10:46 -0400
-Received: from localhost
-        by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-crypto@vger.kernel.org> from <freude@linux.vnet.ibm.com>;
-        Mon, 30 Oct 2017 08:10:44 -0000
-In-Reply-To: <20171027170404.21262-1-prasannatsmkumar@gmail.com>
-Content-Language: en-US
+        Mon, 30 Oct 2017 08:59:45 -0400
+Received: by mail-io0-f178.google.com with SMTP id n137so26938077iod.6
+        for <linux-crypto@vger.kernel.org>; Mon, 30 Oct 2017 05:59:45 -0700 (PDT)
+In-Reply-To: <6442aa0b-6416-35fa-4f8b-e601403029fb@linux.vnet.ibm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 10/27/2017 07:04 PM, PrasannaKumar Muralidharan wrote:
-> User is able to select a chosen rng by writing its name to rng_current
-> but there is no way to reset it without unbinding the rng. Let user
-> write "" to rng_current and delesect the chosen rng.
->
-> Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-> ---
->  drivers/char/hw_random/core.c | 51 +++++++++++++++++++++++++++----------------
->  1 file changed, 32 insertions(+), 19 deletions(-)
->
-> diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
-> index 9701ac7..be03024 100644
-> --- a/drivers/char/hw_random/core.c
-> +++ b/drivers/char/hw_random/core.c
-> @@ -292,26 +292,48 @@ static struct miscdevice rng_miscdev = {
->  	.groups		= rng_dev_groups,
->  };
->
-> +static int enable_best_rng(void)
-> +{
-> +	int ret = -ENODEV;
-> +
-> +	BUG_ON(!mutex_is_locked(&rng_mutex));
-> +
-> +	/* rng_list is sorted by quality, use the best (=first) one */
-> +	if (!list_empty(&rng_list)) {
-> +		struct hwrng *new_rng;
-> +
-> +		new_rng = list_entry(rng_list.next, struct hwrng, list);
-> +		ret = ((new_rng == current_rng) ? 0 : set_current_rng(new_rng));
-> +		if (!ret)
-> +			cur_rng_set_by_user = 0;
-> +	}
-> +
-> +	return ret;
-> +}
-> +
->  static ssize_t hwrng_attr_current_store(struct device *dev,
->  					struct device_attribute *attr,
->  					const char *buf, size_t len)
->  {
-> -	int err;
-> +	int err = -ENODEV;
->  	struct hwrng *rng;
->
->  	err = mutex_lock_interruptible(&rng_mutex);
->  	if (err)
->  		return -ERESTARTSYS;
-> -	err = -ENODEV;
-> -	list_for_each_entry(rng, &rng_list, list) {
-> -		if (sysfs_streq(rng->name, buf)) {
-> -			err = 0;
-> -			cur_rng_set_by_user = 1;
-> -			if (rng != current_rng)
-> +
-> +	if (sysfs_streq(buf, "")) {
-> +		err = enable_best_rng();
-> +	} else {
-> +		list_for_each_entry(rng, &rng_list, list) {
-> +			if (sysfs_streq(rng->name, buf)) {
-> +				cur_rng_set_by_user = 1;
->  				err = set_current_rng(rng);
-> -			break;
-> +				break;
-> +			}
->  		}
->  	}
-> +
->  	mutex_unlock(&rng_mutex);
->
->  	return err ? : len;
-> @@ -493,17 +515,8 @@ void hwrng_unregister(struct hwrng *rng)
->  	mutex_lock(&rng_mutex);
->
->  	list_del(&rng->list);
-> -	if (current_rng == rng) {
-> -		drop_current_rng();
-> -		cur_rng_set_by_user = 0;
-> -		/* rng_list is sorted by quality, use the best (=first) one */
-> -		if (!list_empty(&rng_list)) {
-> -			struct hwrng *new_rng;
-> -
-> -			new_rng = list_entry(rng_list.next, struct hwrng, list);
-> -			set_current_rng(new_rng);
-> -		}
-> -	}
-> +	if (current_rng == rng)
-> +		enable_best_rng();
->
->  	if (list_empty(&rng_list)) {
->  		mutex_unlock(&rng_mutex);
-That's a really good idea. I also thought about something like that.
-regards
-Harald Freudenberger
+Hi Harald,
+
+On 30 October 2017 at 13:40, Harald Freudenberger
+<freude@linux.vnet.ibm.com> wrote:
+> That's a really good idea. I also thought about something like that.
+
+Do you mind reviewing the code?
+
+Thanks,
+PrasannaKumar
