@@ -1,47 +1,47 @@
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [Part2 PATCH v6.1 16/38] crypto: ccp: Add Secure Encrypted
- Virtualization (SEV) command support
-Date: Mon, 30 Oct 2017 18:57:08 +0100
-Message-ID: <20171030175708.3w3sfzbtqdvmqs62@pd.tnic>
-References: <20171020023413.122280-14-brijesh.singh@amd.com>
- <20171029204825.18260-1-brijesh.singh@amd.com>
- <20171030172150.3eibiqr44i43zbvd@pd.tnic>
- <1e89d599-b1d2-bb16-92f4-0409ee0a6ea0@amd.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: Re: [PATCH v2 6/8] scsi/ipr: Use sgl_alloc_order() and
+ sgl_free_order()
+Date: Mon, 30 Oct 2017 20:37:09 +0000
+Message-ID: <1509395828.27259.21.camel@wdc.com>
+References: <20171016224940.1332-1-bart.vanassche@wdc.com>
+         <20171016224940.1332-7-bart.vanassche@wdc.com>
+         <c804098f-5543-395c-1395-5778ef74a61b@suse.de>
+         <ce6f2f5b-b4bc-380f-8ac1-1e91e4d6bf24@linux.vnet.ibm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Gary Hook <gary.hook@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: Brijesh Singh <brijesh.singh@amd.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1e89d599-b1d2-bb16-92f4-0409ee0a6ea0@amd.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>
+To: "hare@suse.de" <hare@suse.de>,
+        "brking@linux.vnet.ibm.com" <brking@linux.vnet.ibm.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:25714 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751936AbdJ3UhN (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 30 Oct 2017 16:37:13 -0400
+In-Reply-To: <ce6f2f5b-b4bc-380f-8ac1-1e91e4d6bf24@linux.vnet.ibm.com>
+Content-Language: en-US
+Content-ID: <ED4209D96B128A4C801E1AEE7DCAD4CD@namprd04.prod.outlook.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Oct 30, 2017 at 12:49:14PM -0500, Brijesh Singh wrote:
-> If the buffer is allocated on the stack then there is no guarantee that
-
-static global is not allocated on the stack.
-
-> I can certainly move the allocation outside, but then it may increase the
-> code size in other functions. If its not a big deal then I would prefer to
-> keep what we have.
-
-Avoiding repeated k*alloc calls is always a good thing. Actually kmalloc-ing 20
-bytes each time sounds like it is not worth the calling overhead to me.
-
-> The function is not used by userspace ioctl, its used by kvm drv when it
-> launch/terminates the SEV guest.
-
-Just do that directly in the ioctl instead of having a dumb function.
-
--- 
-Regards/Gruss,
-    Boris.
-
-Good mailing practices for 400: avoid top-posting and trim the reply.
+T24gV2VkLCAyMDE3LTEwLTE4IGF0IDE1OjU3IC0wNTAwLCBCcmlhbiBLaW5nIHdyb3RlOg0KPiBP
+biAxMC8xNy8yMDE3IDAxOjE5IEFNLCBIYW5uZXMgUmVpbmVja2Ugd3JvdGU6DQo+ID4gT24gMTAv
+MTcvMjAxNyAxMjo0OSBBTSwgQmFydCBWYW4gQXNzY2hlIHdyb3RlOg0KPiA+ID4gWyAuLi4gXQ0K
+PiA+IA0KPiA+IE5vdCBzdXJlIGlmIHRoaXMgaXMgYSB2YWxpZCBjb252ZXJzaW9uLg0KPiA+IE9y
+aWdpbmFsbHkgdGhlIGRyaXZlciB3b3VsZCBhbGxvY2F0ZSBhIHNpbmdsZSBidWZmZXI7IHdpdGgg
+dGhpcyBidWZmZXINCj4gPiB3ZSBoYXZlIHR3byBkaXN0aW5jdCBidWZmZXJzLg0KPiA+IEdpdmVu
+IHRoYXQgdGhpcyBpcyB1c2VkIHRvIGRvd25sb2FkIHRoZSBtaWNyb2NvZGUgSSdtIG5vdCBzdXJl
+IGlmIHRoaXMNCj4gPiBpc24ndCBhIGhhcmR3YXJlLWRlcGVuZGVudCBzdHJ1Y3R1cmUgd2hpY2gg
+cmVxdWlyZXMgYSBzaW5nbGUgYnVmZmVyDQo+ID4gaW5jbHVkaW5nIHRoZSBzZ2xpc3QuDQo+ID4g
+QnJpYW4sIGNhbiB5b3Ugc2hlZCBzb21lIGxpZ2h0IGhlcmU/DQo+IA0KPiBUaGUgc3RydWN0IGlw
+cl9zZ2xpc3QgaXMgbm90IGEgaGFyZHdhcmUgZGVmaW5lZCBkYXRhIHN0cnVjdHVyZSwgc28gb24g
+aW5pdGlhbA0KPiBnbGFuY2UsIHRoaXMgc2hvdWxkIGJlIE9LLiBJJ2xsIGxvYWQgaXQgdXAgYW5k
+IGdpdmUgaXQgYSB0cnkgdG8gbWFrZSBzdXJlDQo+IGl0IGRvZXNuJ3QgYnJlYWsgY29kZSBkb3du
+bG9hZC4NCg0KSGVsbG8gQnJpYW4sDQoNCkhhdmUgeW91IGFscmVhZHkgb2J0YWluZWQgYW55IHRl
+c3QgcmVzdWx0cz8NCg0KVGhhbmtzLA0KDQpCYXJ0Lg==
