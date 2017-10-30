@@ -1,129 +1,41 @@
-From: Harald Freudenberger <freude@linux.vnet.ibm.com>
-Subject: Re: [PATCH] hw_random: core: Reset user selected rng by writing "" to
- rng_current
-Date: Mon, 30 Oct 2017 14:28:11 +0100
-Message-ID: <c729bc20-1a98-0120-a20a-7bfd8935103b@linux.vnet.ibm.com>
-References: <20171027170404.21262-1-prasannatsmkumar@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-To: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
-        mpm@selenic.com, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41444 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751663AbdJ3N2P (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 30 Oct 2017 09:28:15 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id v9UDMTj4103012
-        for <linux-crypto@vger.kernel.org>; Mon, 30 Oct 2017 09:28:14 -0400
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2dx0vrwyje-1
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Mon, 30 Oct 2017 09:28:14 -0400
-Received: from localhost
-        by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-crypto@vger.kernel.org> from <freude@linux.vnet.ibm.com>;
-        Mon, 30 Oct 2017 13:28:12 -0000
-In-Reply-To: <20171027170404.21262-1-prasannatsmkumar@gmail.com>
-Content-Language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: [PATCH] staging: ccree: fix 64 bit scatter/gather DMA ops
+Date: Mon, 30 Oct 2017 13:38:03 +0000
+Message-ID: <1509370683-10725-1-git-send-email-gilad@benyossef.com>
+Cc: Ofir Drang <ofir.drang@arm.com>,
+        Stuart Yoder <stuart.yoder@arm.com>, stable@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        linux-kernel@vger.kernel.org
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Return-path: <stable-owner@vger.kernel.org>
+Sender: stable-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 10/27/2017 07:04 PM, PrasannaKumar Muralidharan wrote:
-> User is able to select a chosen rng by writing its name to rng_current
-> but there is no way to reset it without unbinding the rng. Let user
-> write "" to rng_current and delesect the chosen rng.
->
-> Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-> ---
->  drivers/char/hw_random/core.c | 51 +++++++++++++++++++++++++++----------------
->  1 file changed, 32 insertions(+), 19 deletions(-)
->
-> diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
-> index 9701ac7..be03024 100644
-> --- a/drivers/char/hw_random/core.c
-> +++ b/drivers/char/hw_random/core.c
-> @@ -292,26 +292,48 @@ static struct miscdevice rng_miscdev = {
->  	.groups		= rng_dev_groups,
->  };
->
-> +static int enable_best_rng(void)
-> +{
-> +	int ret = -ENODEV;
-> +
-> +	BUG_ON(!mutex_is_locked(&rng_mutex));
-> +
-> +	/* rng_list is sorted by quality, use the best (=first) one */
-> +	if (!list_empty(&rng_list)) {
-> +		struct hwrng *new_rng;
-> +
-> +		new_rng = list_entry(rng_list.next, struct hwrng, list);
-> +		ret = ((new_rng == current_rng) ? 0 : set_current_rng(new_rng));
-> +		if (!ret)
-> +			cur_rng_set_by_user = 0;
-> +	}
-> +
-> +	return ret;
-> +}
-> +
->  static ssize_t hwrng_attr_current_store(struct device *dev,
->  					struct device_attribute *attr,
->  					const char *buf, size_t len)
->  {
-> -	int err;
-> +	int err = -ENODEV;
-Two lines later err is assigned the return value of mutex_lock_interruptible().
-So the -ENODEV value assignment does nothing.
->  	struct hwrng *rng;
->
->  	err = mutex_lock_interruptible(&rng_mutex);
->  	if (err)
->  		return -ERESTARTSYS;
-> -	err = -ENODEV;
-> -	list_for_each_entry(rng, &rng_list, list) {
-> -		if (sysfs_streq(rng->name, buf)) {
-> -			err = 0;
-> -			cur_rng_set_by_user = 1;
-> -			if (rng != current_rng)
-> +
-> +	if (sysfs_streq(buf, "")) {
-> +		err = enable_best_rng();
-> +	} else {
-> +		list_for_each_entry(rng, &rng_list, list) {
-> +			if (sysfs_streq(rng->name, buf)) {
-> +				cur_rng_set_by_user = 1;
->  				err = set_current_rng(rng);
-> -			break;
-> +				break;
-> +			}
->  		}
->  	}
-> +
->  	mutex_unlock(&rng_mutex);
->
->  	return err ? : len;
-> @@ -493,17 +515,8 @@ void hwrng_unregister(struct hwrng *rng)
->  	mutex_lock(&rng_mutex);
->
->  	list_del(&rng->list);
-> -	if (current_rng == rng) {
-> -		drop_current_rng();
-> -		cur_rng_set_by_user = 0;
-> -		/* rng_list is sorted by quality, use the best (=first) one */
-> -		if (!list_empty(&rng_list)) {
-> -			struct hwrng *new_rng;
-> -
-> -			new_rng = list_entry(rng_list.next, struct hwrng, list);
-> -			set_current_rng(new_rng);
-> -		}
-> -	}
-> +	if (current_rng == rng)
-> +		enable_best_rng();
->
->  	if (list_empty(&rng_list)) {
->  		mutex_unlock(&rng_mutex);
-looks like for me.
-reviewed-by: Harald Freudenberger <freude@linux.vnet.ibm.com>
+Fix a wrong offset used in splitting a 64 DMA address to MSB/LSB
+parts needed for scatter/gather HW descriptors causing operations
+relying on them to fail on 64 bit platforms.
+
+Fixes: c6f7f2f4591f ("staging: ccree: refactor LLI access macros")
+Reported-by: Stuart Yoder <stuart.yoder@arm.com>
+Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+Cc: stable@vger.kernel.org
+---
+ drivers/staging/ccree/cc_lli_defs.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/staging/ccree/cc_lli_defs.h b/drivers/staging/ccree/cc_lli_defs.h
+index 851d390..a9c417b 100644
+--- a/drivers/staging/ccree/cc_lli_defs.h
++++ b/drivers/staging/ccree/cc_lli_defs.h
+@@ -59,7 +59,7 @@ static inline void cc_lli_set_addr(u32 *lli_p, dma_addr_t addr)
+ 	lli_p[LLI_WORD0_OFFSET] = (addr & U32_MAX);
+ #ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
+ 	lli_p[LLI_WORD1_OFFSET] &= ~LLI_HADDR_MASK;
+-	lli_p[LLI_WORD1_OFFSET] |= FIELD_PREP(LLI_HADDR_MASK, (addr >> 16));
++	lli_p[LLI_WORD1_OFFSET] |= FIELD_PREP(LLI_HADDR_MASK, (addr >> 32));
+ #endif /* CONFIG_ARCH_DMA_ADDR_T_64BIT */
+ }
+ 
+-- 
+2.7.4
