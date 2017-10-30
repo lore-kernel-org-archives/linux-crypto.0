@@ -1,55 +1,89 @@
-From: Kim Phillips <kim.phillips-5wv7dgnIgG8@public.gmane.org>
-Subject: Re: [PATCH RESEND 1/4] crypto: caam: add caam-dma node to SEC4.0
- device tree binding
-Date: Mon, 30 Oct 2017 09:24:24 -0500
-Message-ID: <20171030092424.1279add003c96ced4233bd2d@arm.com>
-References: <20171030134654.13729-1-horia.geanta@nxp.com>
-        <20171030134654.13729-2-horia.geanta@nxp.com>
+From: Romain Izard <romain.izard.pro@gmail.com>
+Subject: Re: [PATCH] crypto: AF_ALG - remove locking in async callback
+Date: Mon, 30 Oct 2017 18:15:32 +0100
+Message-ID: <CAGkQfmO+c6m-1v9ztV-G68JXSupD+pMv0czpoieg0a5PyLQ_dg@mail.gmail.com>
+References: <CAGkQfmNKbSwue13zPh2K1F_kLkpm1_AhsAHK4spRFA0xMvU5PA@mail.gmail.com>
+ <5260911.ZuXsrgFD2R@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Cc: Vinod Koul <vinod.koul-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-        "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-        Dan Douglass <dan.douglass-3arQi8VN3Tc@public.gmane.org>,
-        Shawn Guo <shawnguo-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        Radu Alexe <radu.alexe-3arQi8VN3Tc@public.gmane.org>, <dmaengine-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Horia =?UTF-8?B?R2VhbnTEgw==?= <horia.geanta-3arQi8VN3Tc@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20171030134654.13729-2-horia.geanta-3arQi8VN3Tc@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Cc: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Cyrille Pitchen <cyrille.pitchen@microchip.com>,
+        Tudor Ambarus <tudor.ambarus@microchip.com>,
+        Nicolas Ferre <nicolas.ferre@microchip.com>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+To: =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-qt0-f193.google.com ([209.85.216.193]:51378 "EHLO
+        mail-qt0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932352AbdJ3RPx (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 30 Oct 2017 13:15:53 -0400
+Received: by mail-qt0-f193.google.com with SMTP id h4so17324395qtk.8
+        for <linux-crypto@vger.kernel.org>; Mon, 30 Oct 2017 10:15:53 -0700 (PDT)
+In-Reply-To: <5260911.ZuXsrgFD2R@positron.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 30 Oct 2017 15:46:51 +0200
-Horia Geantă <horia.geanta-3arQi8VN3Tc@public.gmane.org> wrote:
+2017-10-29 21:39 GMT+01:00 Stephan M=C3=BCller <smueller@chronox.de>:
+> Am Mittwoch, 25. Oktober 2017, 17:26:31 CET schrieb Romain Izard:
+>
+> Hi Romain,
+>
+> the patch below should cover the issue you see. Would you mind testing it=
+?
+>
+> Thanks
+> Stephan
+>
+> ---8<---
+>
+> The code paths protected by the socket-lock do not use or modify the
+> socket in a non-atomic fashion. The actions pertaining the socket do not
+> even need to be handled as an atomic operation. Thus, the socket-lock
+> can be safely ignored.
+>
+> This fixes a bug regarding scheduling in atomic as the callback function
+> may be invoked in interrupt context.
+>
+> Fixes: 2d97591ef43d0 ("crypto: af_alg - consolidation of duplicate code")
+> Reported-by: Romain Izard <romain.izard.pro@gmail.com>
+> Signed-off-by: Stephan Mueller <smueller@chronox.de>
 
-> +=====================================================================
-> +CAAM DMA Node
-> +
-> +    Child node of the crypto node that enables the use of the DMA capabilities
-> +    of the CAAM by a stand-alone driver. The only required property is the
-> +    "compatible" property. All the other properties are determined from
-> +    the job rings on which the CAAM DMA driver depends (ex: the number of
-> +    dma-channels is equal to the number of defined job rings).
-> +
-> +  - compatible
-> +      Usage: required
-> +      Value type: <string>
-> +      Definition: Must include "fsl,sec-v4.0-dma"
-> +
-> +EXAMPLE
-> +  caam-dma {
-> +    compatible = "fsl,sec-v5.4-dma",
-> +                 "fsl,sec-v5.0-dma",
-> +                 "fsl,sec-v4.0-dma";
-> +  }
+Tested-by: Romain Izard <romain.izard.pro@gmail.com>
 
-If this isn't describing an aspect of the hardware, then what is it
-doing in the device tree?
+The issue observed with atmel-aes is not reproduced anymore.
 
-Kim
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> ---
+>  crypto/af_alg.c | 4 ----
+>  1 file changed, 4 deletions(-)
+>
+> diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+> index 337cf382718e..a41f08642eee 100644
+> --- a/crypto/af_alg.c
+> +++ b/crypto/af_alg.c
+> @@ -1063,8 +1063,6 @@ void af_alg_async_cb(struct crypto_async_request *_=
+req, int err)
+>         struct kiocb *iocb =3D areq->iocb;
+>         unsigned int resultlen;
+>
+> -       lock_sock(sk);
+> -
+>         /* Buffer size written by crypto operation. */
+>         resultlen =3D areq->outlen;
+>
+> @@ -1073,8 +1071,6 @@ void af_alg_async_cb(struct crypto_async_request *_=
+req, int err)
+>         __sock_put(sk);
+>
+>         iocb->ki_complete(iocb, err ? err : resultlen, 0);
+> -
+> -       release_sock(sk);
+>  }
+>  EXPORT_SYMBOL_GPL(af_alg_async_cb);
+>
+> --
+> 2.13.6
+>
+>
