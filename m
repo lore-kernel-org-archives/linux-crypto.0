@@ -1,7 +1,7 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 2/3] staging: ccree: handle limiting of DMA masks
-Date: Tue, 31 Oct 2017 11:56:16 +0000
-Message-ID: <1509450978-17784-3-git-send-email-gilad@benyossef.com>
+Subject: [PATCH 3/3] staging: ccree: remove dead code
+Date: Tue, 31 Oct 2017 11:56:17 +0000
+Message-ID: <1509450978-17784-4-git-send-email-gilad@benyossef.com>
 References: <1509450978-17784-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -23,54 +23,41 @@ Errors-To: driverdev-devel-bounces@linuxdriverproject.org
 Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-Properly handle limiting of DMA masks based on device and bus
-capabilities.
+The inflight_counter field is updated in a single location and
+never used. Remove it.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/ssi_driver.c | 22 ++++++++++++++++++----
- 1 file changed, 18 insertions(+), 4 deletions(-)
+ drivers/staging/ccree/ssi_cipher.c | 4 ----
+ drivers/staging/ccree/ssi_driver.h | 1 -
+ 2 files changed, 5 deletions(-)
 
-diff --git a/drivers/staging/ccree/ssi_driver.c b/drivers/staging/ccree/ssi_driver.c
-index 5f03c25..6d4269f 100644
---- a/drivers/staging/ccree/ssi_driver.c
-+++ b/drivers/staging/ccree/ssi_driver.c
-@@ -208,6 +208,7 @@ static int init_cc_resources(struct platform_device *plat_dev)
- 	struct device *dev = &plat_dev->dev;
- 	struct device_node *np = dev->of_node;
- 	u32 signature_val;
-+	dma_addr_t dma_mask;
- 	int rc = 0;
+diff --git a/drivers/staging/ccree/ssi_cipher.c b/drivers/staging/ccree/ssi_cipher.c
+index 0784c86..42844ae 100644
+--- a/drivers/staging/ccree/ssi_cipher.c
++++ b/drivers/staging/ccree/ssi_cipher.c
+@@ -697,10 +697,6 @@ static int ssi_blkcipher_complete(struct device *dev,
+ 	ssi_buffer_mgr_unmap_blkcipher_request(dev, req_ctx, ivsize, src, dst);
+ 	kfree(req_ctx->iv);
  
- 	new_drvdata = devm_kzalloc(dev, sizeof(*new_drvdata), GFP_KERNEL);
-@@ -260,11 +261,24 @@ static int init_cc_resources(struct platform_device *plat_dev)
- 	if (rc)
- 		goto post_drvdata_err;
- 
--	if (!dev->dma_mask)
--		dev->dma_mask = &dev->coherent_dma_mask;
-+	if (!plat_dev->dev.dma_mask)
-+		plat_dev->dev.dma_mask = &plat_dev->dev.coherent_dma_mask;
-+
-+	dma_mask = (dma_addr_t)(DMA_BIT_MASK(DMA_BIT_MASK_LEN));
-+	while (dma_mask > 0x7fffffffUL) {
-+		if (dma_supported(&plat_dev->dev, dma_mask)) {
-+			rc = dma_set_coherent_mask(&plat_dev->dev, dma_mask);
-+				if (!rc)
-+					break;
-+		}
-+		dma_mask >>= 1;
-+	}
- 
--	if (!dev->coherent_dma_mask)
--		dev->coherent_dma_mask = DMA_BIT_MASK(DMA_BIT_MASK_LEN);
-+	if (rc) {
-+		dev_err(dev, "Error: failed in dma_set_mask, mask=%par\n",
-+			&dma_mask);
-+		goto post_drvdata_err;
-+	}
- 
- 	/* Verify correct mapping */
- 	signature_val = CC_HAL_READ_REGISTER(CC_REG_OFFSET(HOST_RGF, HOST_SIGNATURE));
+-	/*Decrease the inflight counter*/
+-	if (ctx_p->flow_mode == BYPASS && ctx_p->drvdata->inflight_counter > 0)
+-		ctx_p->drvdata->inflight_counter--;
+-
+ 	if (areq) {
+ 		/*
+ 		 * The crypto API expects us to set the req->info to the last
+diff --git a/drivers/staging/ccree/ssi_driver.h b/drivers/staging/ccree/ssi_driver.h
+index 488f665..e01c880 100644
+--- a/drivers/staging/ccree/ssi_driver.h
++++ b/drivers/staging/ccree/ssi_driver.h
+@@ -134,7 +134,6 @@ struct ssi_drvdata {
+ 	void *fips_handle;
+ 	void *ivgen_handle;
+ 	void *sram_mgr_handle;
+-	u32 inflight_counter;
+ 	struct clk *clk;
+ 	bool coherent;
+ };
 -- 
 2.7.4
