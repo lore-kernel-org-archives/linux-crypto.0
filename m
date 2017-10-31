@@ -1,52 +1,60 @@
-From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [Part2 PATCH v6.1 16/38] crypto: ccp: Add Secure Encrypted
- Virtualization (SEV) command support
-Date: Mon, 30 Oct 2017 20:29:25 -0500
-Message-ID: <de5d7e77-56d0-8cbc-1dcb-01cf3f0daeb4@amd.com>
-References: <20171020023413.122280-14-brijesh.singh@amd.com>
- <20171029204825.18260-1-brijesh.singh@amd.com>
- <20171030172150.3eibiqr44i43zbvd@pd.tnic>
- <1e89d599-b1d2-bb16-92f4-0409ee0a6ea0@amd.com>
- <20171030175708.3w3sfzbtqdvmqs62@pd.tnic>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: brijesh.singh@amd.com, Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Gary Hook <gary.hook@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: [PATCH] crypto: testmgr: don't allocate IV on stack
+Date: Tue, 31 Oct 2017 07:56:26 +0000
+Message-ID: <1509436586-17500-1-git-send-email-gilad@benyossef.com>
+Cc: Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org
-To: Borislav Petkov <bp@alien8.de>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2nam02on0045.outbound.protection.outlook.com ([104.47.38.45]:64703
-        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753221AbdJaB3h (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 30 Oct 2017 21:29:37 -0400
-In-Reply-To: <20171030175708.3w3sfzbtqdvmqs62@pd.tnic>
-Content-Language: en-US
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:60228 "EHLO
+        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751229AbdJaH4f (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 31 Oct 2017 03:56:35 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+The IV was allocated on the stack in testmgr skcipher tests.
+Since HW based tfm providers need to DMA the IV to the HW,
+this leads to problems and is detected by the DMA-API debug
+code.
 
+Fix it by allocating the IV using kmalloc instead.
 
-On 10/30/17 12:57 PM, Borislav Petkov wrote:
-> On Mon, Oct 30, 2017 at 12:49:14PM -0500, Brijesh Singh wrote:
->> If the buffer is allocated on the stack then there is no guarantee that
-> static global is not allocated on the stack.
+Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+---
+ crypto/testmgr.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-Okay, Just tried static global with CONFIG_VMAP_STACK=y and I am getting
-wrong physical address with __pa. PSP command fails with error code
-"INVALID_ADDRESS". The same thing works fine with kmalloc() buffer.
-
->> I can certainly move the allocation outside, but then it may increase the
->> code size in other functions. If its not a big deal then I would prefer to
->> keep what we have.
-> Avoiding repeated k*alloc calls is always a good thing. Actually kmalloc-ing 20
-> bytes each time sounds like it is not worth the calling overhead to me.
->
-
-To avoid repeated k*alloc calls, I could devm_kzalloc() these variable 
-during sev_init() and reuse them when needed.
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 7125ba3..88d0c57 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -1085,12 +1085,16 @@ static int __test_skcipher(struct crypto_skcipher *tfm, int enc,
+ 	const char *e, *d;
+ 	struct tcrypt_result result;
+ 	void *data;
+-	char iv[MAX_IVLEN];
++	char *iv;
+ 	char *xbuf[XBUFSIZE];
+ 	char *xoutbuf[XBUFSIZE];
+ 	int ret = -ENOMEM;
+ 	unsigned int ivsize = crypto_skcipher_ivsize(tfm);
+ 
++	iv = kmalloc(MAX_IVLEN, GFP_KERNEL);
++	if (!iv)
++		goto out_nobuf;
++
+ 	if (testmgr_alloc_buf(xbuf))
+ 		goto out_nobuf;
+ 
+@@ -1331,6 +1335,7 @@ static int __test_skcipher(struct crypto_skcipher *tfm, int enc,
+ 		testmgr_free_buf(xoutbuf);
+ out_nooutbuf:
+ 	testmgr_free_buf(xbuf);
++	kfree(iv);
+ out_nobuf:
+ 	return ret;
+ }
+-- 
+2.7.4
