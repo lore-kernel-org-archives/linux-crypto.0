@@ -1,8 +1,10 @@
 From: Romain Izard <romain.izard.pro@gmail.com>
-Subject: [PATCH] crypto: ccm - preserve the IV buffer
-Date: Tue, 31 Oct 2017 15:42:35 +0100
-Message-ID: <20171031144235.22818-1-romain.izard.pro@gmail.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+Subject: [PATCH 0/2] Fixes for the Atmel AES crypto module
+Date: Tue, 31 Oct 2017 16:25:22 +0100
+Message-ID: <20171031152524.25216-1-romain.izard.pro@gmail.com>
+Cc: Nicolas Ferre <nicolas.ferre@microchip.com>,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
         Romain Izard <romain.izard.pro@gmail.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S . Miller" <davem@davemloft.net>,
@@ -11,44 +13,26 @@ Return-path: <linux-kernel-owner@vger.kernel.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The IV buffer used during CCM operations is used twice, during both the
-hashing step and the ciphering step.
+After encountering an issue with cts(cbc(aes)) in the Atmel AES module,
+I have used tcrypt and libkcapi's test suite to validate my fix. This led
+me to observe some other issues.
 
-When using a hardware accelerator that updates the contents of the IV
-buffer at the end of ciphering operations, the value will be modified.
-In the decryption case, the subsequent setup of the hashing algorithm
-will interpret the updated IV instead of the original value, which can
-lead to out-of-bounds writes.
+This series includes the IV issue correction for the Atmel AES crypto
+engine, as well as a secondary issue observed when running
+'insmod tcrypt.ko mode=10' and 'insmod tcrypt.ko mode=152' on a SAMA5D2
+board.
 
-Reuse the idata buffer, only used in the hashing step, to preserve the
-IV's value during the ciphering step in the decryption case.
+The libkcapi test suite still reports some problems, for example when the
+input data is too large to fit into an intermediate buffer in unaligned
+cases. And it seems that with the v4.14 updates, new asynchronous tests
+are enabled and report new issues.
 
-Signed-off-by: Romain Izard <romain.izard.pro@gmail.com>
----
- crypto/ccm.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Romain Izard (2):
+  crypto: atmel-aes - properly set IV after {en,de}crypt
+  crypto: atmel-aes - Reset the controller before each use
 
-diff --git a/crypto/ccm.c b/crypto/ccm.c
-index 1ce37ae0ce56..0a083342ec8c 100644
---- a/crypto/ccm.c
-+++ b/crypto/ccm.c
-@@ -363,7 +363,7 @@ static int crypto_ccm_decrypt(struct aead_request *req)
- 	unsigned int cryptlen = req->cryptlen;
- 	u8 *authtag = pctx->auth_tag;
- 	u8 *odata = pctx->odata;
--	u8 *iv = req->iv;
-+	u8 *iv = pctx->idata;
- 	int err;
- 
- 	cryptlen -= authsize;
-@@ -379,6 +379,8 @@ static int crypto_ccm_decrypt(struct aead_request *req)
- 	if (req->src != req->dst)
- 		dst = pctx->dst;
- 
-+	memcpy(iv, req->iv, 16);
-+
- 	skcipher_request_set_tfm(skreq, ctx->ctr);
- 	skcipher_request_set_callback(skreq, pctx->flags,
- 				      crypto_ccm_decrypt_done, req);
+ drivers/crypto/atmel-aes.c | 50 ++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 40 insertions(+), 10 deletions(-)
+
 -- 
 2.14.1
