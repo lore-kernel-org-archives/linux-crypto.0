@@ -1,51 +1,49 @@
-From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: [Part2 PATCH v7 09/38] crypto: ccp: Build the AMD secure processor driver only with AMD CPU support
-Date: Wed,  1 Nov 2017 16:15:54 -0500
-Message-ID: <20171101211623.71496-10-brijesh.singh@amd.com>
-References: <20171101211623.71496-1-brijesh.singh@amd.com>
-Mime-Version: 1.0
-Content-Type: text/plain
-Cc: bp@alien8.de, Borislav Petkov <bp@suse.de>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-To: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20171101211623.71496-1-brijesh.singh@amd.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Eric Biggers <ebiggers3@gmail.com>
+Subject: [PATCH 0/4] crypto: dh - input validation fixes
+Date: Wed,  1 Nov 2017 15:25:13 -0700
+Message-ID: <20171101222517.41602-1-ebiggers3@gmail.com>
+Cc: keyrings@vger.kernel.org,
+        Tudor-Dan Ambarus <tudor.ambarus@microchip.com>,
+        Mat Martineau <mathew.j.martineau@linux.intel.com>,
+        Salvatore Benedetto <salvatore.benedetto@intel.com>,
+        Stephan Mueller <smueller@chronox.de>,
+        Eric Biggers <ebiggers@google.com>
+To: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-io0-f194.google.com ([209.85.223.194]:45427 "EHLO
+        mail-io0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933494AbdKAW2X (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 1 Nov 2017 18:28:23 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Borislav Petkov <bp@suse.de>
+From: Eric Biggers <ebiggers@google.com>
 
-This is AMD-specific hardware so present it in Kconfig only when AMD
-CPU support is enabled or on ARM64 where it is also used.
+This series fixes several corner cases in the Diffie-Hellman key
+exchange implementations:
 
-Signed-off-by: Borislav Petkov <bp@suse.de>
-Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-Reviewed-by: Gary R Hook <gary.hook@amd.com>
-Cc: Brijesh Singh <brijesh.singh@amd.com>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: Gary Hook <gary.hook@amd.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org
----
- drivers/crypto/ccp/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
+- With CONFIG_DEBUG_SG=y and the software DH implementation, setting 'p'
+  to 0 caused a BUG_ON().
+- Both the software and QAT DH implementations had a double-free bug in
+  the case where 'g' could not be allocated.
+- With the QAT DH implementation, setting 'g' or 'key' larger than 'p'
+  caused a buffer underflow.
 
-diff --git a/drivers/crypto/ccp/Kconfig b/drivers/crypto/ccp/Kconfig
-index 6d626606b9c5..9c84f9838931 100644
---- a/drivers/crypto/ccp/Kconfig
-+++ b/drivers/crypto/ccp/Kconfig
-@@ -1,5 +1,6 @@
- config CRYPTO_DEV_CCP_DD
- 	tristate "Secure Processor device driver"
-+	depends on CPU_SUP_AMD || ARM64
- 	default m
- 	help
- 	  Provides AMD Secure Processor device driver.
+Note that in kernels configured with CONFIG_KEY_DH_OPERATIONS=y, these
+bugs are reachable by unprivileged users via KEYCTL_DH_COMPUTE.
+
+Eric Biggers (4):
+  crypto: dh - fix double free of ctx->p
+  crypto: dh - don't permit 'p' to be 0
+  crypto: qat - fix double free of ctx->p
+  crypto: dh - don't permit 'key' or 'g' size longer than 'p'
+
+ crypto/dh.c                                   | 18 +++++++++---------
+ crypto/dh_helper.c                            | 16 ++++++++++++++++
+ drivers/crypto/qat/qat_common/qat_asym_algs.c | 15 ++++++++-------
+ 3 files changed, 33 insertions(+), 16 deletions(-)
+
 -- 
-2.9.5
+2.15.0.403.gc27cc4dac6-goog
