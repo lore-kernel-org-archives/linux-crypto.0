@@ -1,54 +1,169 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH v2 2/8] crypto: scompress - use sgl_alloc() and sgl_free()
-Date: Wed, 1 Nov 2017 15:51:07 +0000
-Message-ID: <CAKv+Gu9Ae_pd3WUPDM+5VbF_TiR7uV0rVeUCY2C0+kLq6NM-3w@mail.gmail.com>
-References: <20171016224940.1332-1-bart.vanassche@wdc.com> <20171016224940.1332-3-bart.vanassche@wdc.com>
- <1509547836.2530.1.camel@wdc.com> <CAKv+Gu_-pqqVn5QeuM_OR0itQS-v5uFATt-ZzNDmPy8CHSLrGg@mail.gmail.com>
- <1509551145.2530.10.camel@wdc.com>
+From: Brijesh Singh <brijesh.singh@amd.com>
+Subject: [Part2 PATCH v7 10/38] crypto: ccp: Define SEV userspace ioctl and command id
+Date: Wed,  1 Nov 2017 16:15:55 -0500
+Message-ID: <20171101211623.71496-11-brijesh.singh@amd.com>
+References: <20171101211623.71496-1-brijesh.singh@amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "axboe@kernel.dk" <axboe@kernel.dk>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Return-path: <linux-scsi-owner@vger.kernel.org>
-In-Reply-To: <1509551145.2530.10.camel@wdc.com>
-Sender: linux-scsi-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Cc: bp@alien8.de, Brijesh Singh <brijesh.singh@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Borislav Petkov <bp@suse.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Gary Hook <gary.hook@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        linux-crypto@vger.kernel.org
+To: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-bn3nam01on0059.outbound.protection.outlook.com ([104.47.33.59]:44352
+        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S933175AbdKAVQz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 1 Nov 2017 17:16:55 -0400
+In-Reply-To: <20171101211623.71496-1-brijesh.singh@amd.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 1 November 2017 at 15:45, Bart Van Assche <Bart.VanAssche@wdc.com> wrote:
-> On Wed, 2017-11-01 at 15:17 +0000, Ard Biesheuvel wrote:
->> On 1 November 2017 at 14:50, Bart Van Assche <Bart.VanAssche@wdc.com> wrote:
->> > On Mon, 2017-10-16 at 15:49 -0700, Bart Van Assche wrote:
->> > > Use the sgl_alloc() and sgl_free() functions instead of open coding
->> > > these functions.
->> > >
->> > > Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
->> > > Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
->> > > Cc: Herbert Xu <herbert@gondor.apana.org.au>
->> >
->> > Ard and/or Herbert, can you please have a look at this patch and let us know
->> > whether or not it looks fine to you?
->>
->> The patch itself does not look unreasonable, but I can't find
->> sgl_alloc() anywhere in the source tree. Given that you have cc'ed me
->> on this patch only, I can only assume that you are adding this as part
->> of the series, but without any context, I can't really review this,
->> sorry.
->
-> Hello Ard,
->
-> Do you expect to be Cc-ed personally or is Cc-ing the linux-crypto mailing
-> list sufficient? The linux-crypto mailing list was Cc-ed for the entire patch
-> series as one can see here:
-> https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg28485.html.
->
+Add a include file which defines the ioctl and command id used for
+issuing SEV platform management specific commands.
 
-I guess people's opinions may differ regarding what they want to be
-cc'ed on, but in general, you should at least cc everyone on the cover
-letter if you cc them on individual patches, and in my case, I'd
-rather have the whole series even if only a single patch is relevant
-to me.
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Radim Krčmář" <rkrcmar@redhat.com>
+Cc: Borislav Petkov <bp@suse.de>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Gary Hook <gary.hook@amd.com>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: linux-crypto@vger.kernel.org
+Cc: kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Improvements-by: Borislav Petkov <bp@suse.de>
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+Reviewed-by: Borislav Petkov <bp@suse.de>
+Acked-by: Gary R Hook <gary.hook@amd.com>
+---
+ include/uapi/linux/psp-sev.h | 113 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 113 insertions(+)
+ create mode 100644 include/uapi/linux/psp-sev.h
+
+diff --git a/include/uapi/linux/psp-sev.h b/include/uapi/linux/psp-sev.h
+new file mode 100644
+index 000000000000..1dd98ba4ff22
+--- /dev/null
++++ b/include/uapi/linux/psp-sev.h
+@@ -0,0 +1,113 @@
++/*
++ * Userspace interface for AMD Secure Encrypted Virtualization (SEV)
++ * platform management commands.
++ *
++ * Copyright (C) 2016-2017 Advanced Micro Devices, Inc.
++ *
++ * Author: Brijesh Singh <brijesh.singh@amd.com>
++ *
++ * SEV spec 0.14 is available at:
++ * http://support.amd.com/TechDocs/55766_SEV-KM%20API_Specification.pdf
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ */
++
++#ifndef __PSP_SEV_USER_H__
++#define __PSP_SEV_USER_H__
++
++#include <linux/types.h>
++
++/**
++ * SEV platform commands
++ */
++enum {
++	SEV_FACTORY_RESET = 0,
++	SEV_PLATFORM_STATUS,
++	SEV_PEK_GEN,
++	SEV_PEK_CSR,
++	SEV_PDH_GEN,
++	SEV_PDH_CERT_EXPORT,
++	SEV_PEK_CERT_IMPORT,
++
++	SEV_MAX,
++};
++
++/**
++ * struct sev_user_data_status - PLATFORM_STATUS command parameters
++ *
++ * @major: major API version
++ * @minor: minor API version
++ * @state: platform state
++ * @flags: platform config flags
++ * @build: firmware build id for API version
++ * @guest_count: number of active guests
++ */
++struct sev_user_data_status {
++	__u8 api_major;				/* Out */
++	__u8 api_minor;				/* Out */
++	__u8 state;				/* Out */
++	__u32 flags;				/* Out */
++	__u8 build;				/* Out */
++	__u32 guest_count;			/* Out */
++} __packed;
++
++/**
++ * struct sev_user_data_pek_csr - PEK_CSR command parameters
++ *
++ * @address: PEK certificate chain
++ * @length: length of certificate
++ */
++struct sev_user_data_pek_csr {
++	__u64 address;				/* In */
++	__u32 length;				/* In/Out */
++} __packed;
++
++/**
++ * struct sev_user_data_cert_import - PEK_CERT_IMPORT command parameters
++ *
++ * @pek_address: PEK certificate chain
++ * @pek_len: length of PEK certificate
++ * @oca_address: OCA certificate chain
++ * @oca_len: length of OCA certificate
++ */
++struct sev_user_data_pek_cert_import {
++	__u64 pek_cert_address;			/* In */
++	__u32 pek_cert_len;			/* In */
++	__u64 oca_cert_address;			/* In */
++	__u32 oca_cert_len;			/* In */
++} __packed;
++
++/**
++ * struct sev_user_data_pdh_cert_export - PDH_CERT_EXPORT command parameters
++ *
++ * @pdh_address: PDH certificate address
++ * @pdh_len: length of PDH certificate
++ * @cert_chain_address: PDH certificate chain
++ * @cert_chain_len: length of PDH certificate chain
++ */
++struct sev_user_data_pdh_cert_export {
++	__u64 pdh_cert_address;			/* In */
++	__u32 pdh_cert_len;			/* In/Out */
++	__u64 cert_chain_address;		/* In */
++	__u32 cert_chain_len;			/* In/Out */
++} __packed;
++
++/**
++ * struct sev_issue_cmd - SEV ioctl parameters
++ *
++ * @cmd: SEV commands to execute
++ * @opaque: pointer to the command structure
++ * @error: SEV FW return code on failure
++ */
++struct sev_issue_cmd {
++	__u32 cmd;				/* In */
++	__u64 data;				/* In */
++	__u32 error;				/* Out */
++} __packed;
++
++#define SEV_IOC_TYPE		'S'
++#define SEV_ISSUE_CMD	_IOWR(SEV_IOC_TYPE, 0x0, struct sev_issue_cmd)
++
++#endif /* __PSP_USER_SEV_H */
+-- 
+2.9.5
