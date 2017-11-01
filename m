@@ -1,169 +1,211 @@
 From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: [Part2 PATCH v7 10/38] crypto: ccp: Define SEV userspace ioctl and command id
-Date: Wed,  1 Nov 2017 16:15:55 -0500
-Message-ID: <20171101211623.71496-11-brijesh.singh@amd.com>
-References: <20171101211623.71496-1-brijesh.singh@amd.com>
+Subject: [Part2 PATCH v7 00/38] x86: Secure Encrypted Virtualization (AMD)
+Date: Wed,  1 Nov 2017 16:15:45 -0500
+Message-ID: <20171101211623.71496-1-brijesh.singh@amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Cc: bp@alien8.de, Brijesh Singh <brijesh.singh@amd.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Borislav Petkov <bp@suse.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Gary Hook <gary.hook@amd.com>,
+        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@suse.de>,
         Tom Lendacky <thomas.lendacky@amd.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Gary Hook <gary.hook@amd.com>, x86@kernel.org,
         linux-crypto@vger.kernel.org
 To: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn3nam01on0059.outbound.protection.outlook.com ([104.47.33.59]:44352
-        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S933175AbdKAVQz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Nov 2017 17:16:55 -0400
-In-Reply-To: <20171101211623.71496-1-brijesh.singh@amd.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Add a include file which defines the ioctl and command id used for
-issuing SEV platform management specific commands.
+This part of Secure Encrypted Virtualization (SEV) patch series focuses on KVM
+changes required to create and manage SEV guests.
 
+SEV is an extension to the AMD-V architecture which supports running encrypted
+virtual machine (VMs) under the control of a hypervisor. Encrypted VMs have their
+pages (code and data) secured such that only the guest itself has access to
+unencrypted version. Each encrypted VM is associated with a unique encryption key;
+if its data is accessed to a different entity using a different key the encrypted
+guest's data will be incorrectly decrypted, leading to unintelligible data.
+This security model ensures that hypervisor will no longer able to inspect or
+alter any guest code or data.
+
+The key management of this feature is handled by a separate processor known as
+the AMD Secure Processor (AMD-SP) which is present on AMD SOCs. The SEV Key
+Management Specification (see below) provides a set of commands which can be
+used by hypervisor to load virtual machine keys through the AMD-SP driver.
+
+The patch series adds a new ioctl in KVM driver (KVM_MEMORY_ENCRYPTION_OP). The
+ioctl will be used by qemu to issue SEV guest-specific commands defined in Key
+Management Specification.
+
+The following links provide additional details:
+
+AMD Memory Encryption white paper:
+http://amd-dev.wpengine.netdna-cdn.com/wordpress/media/2013/12/AMD_Memory_Encryption_Whitepaper_v7-Public.pdf
+
+AMD64 Architecture Programmer's Manual:
+    http://support.amd.com/TechDocs/24593.pdf
+    SME is section 7.10
+    SEV is section 15.34
+
+SEV Key Management:
+http://support.amd.com/TechDocs/55766_SEV-KM API_Specification.pdf
+
+KVM Forum Presentation:
+http://www.linux-kvm.org/images/7/74/02x08A-Thomas_Lendacky-AMDs_Virtualizatoin_Memory_Encryption_Technology.pdf
+
+
+SEV Guest BIOS support:
+  SEV support has been add to EDKII/OVMF BIOS
+  https://github.com/tianocore/edk2
+
+SEV Part 1 patch series: https://marc.info/?l=linux-kernel&m=150851036113575&w=2
+
+--
+The series is based on kvm/master commit : cc9085b68753 (Merge branch \
+'kvm-ppc-fixes')
+
+Complete tree is available at:
+repo: https://github.com/codomania/kvm.git
+branch: sev-v7-p2
+
+TODO:
+* Add SEV guest migration command support
+
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: "Radim Krčmář" <rkrcmar@redhat.com>
+Cc: Joerg Roedel <joro@8bytes.org>
 Cc: Borislav Petkov <bp@suse.de>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Gary Hook <gary.hook@amd.com>
 Cc: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: linux-crypto@vger.kernel.org
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: David S. Miller <davem@davemloft.net>
+Cc: Gary Hook <gary.hook@amd.com>
+Cc: x86@kernel.org
 Cc: kvm@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
-Improvements-by: Borislav Petkov <bp@suse.de>
-Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-Reviewed-by: Borislav Petkov <bp@suse.de>
-Acked-by: Gary R Hook <gary.hook@amd.com>
----
- include/uapi/linux/psp-sev.h | 113 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 113 insertions(+)
+Cc: linux-crypto@vger.kernel.org
+
+Changes since v6:
+ * (ccp): Extend psp_device structure to track the FW INIT and SHUTDOWN states.
+ * (ccp): Init and Uninit SEV FW during module load/unload
+ * (ccp): Avoid repeated k*alloc() for init and status command buffer
+ * (kvm): Rework DBG command to fix the compilation warning seen with gcc7.x
+ * (kvm): Convert the SEV doc in rst format
+
+Changes since v5:
+ * split the PSP driver support into multiple patches
+ * multiple improvements from Boris
+ * remove mem_enc_enabled() ops
+
+Changes since v4:
+ * Fixes to address kbuild robot errors
+ * Add 'sev' module params to allow enable/disable SEV feature
+ * Update documentation
+ * Multiple fixes to address v4 feedbacks
+ * Some coding style changes to address checkpatch reports
+
+Changes since v3:
+ * Re-design the PSP interface support patch
+ * Rename the ioctls based on the feedbacks
+ * Improve documentation
+ * Fix i386 build issues
+ * Add LAUNCH_SECRET command
+ * Add new Kconfig option to enable SEV support
+ * Changes to address v3 feedbacks.
+
+Changes since v2:
+ * Add KVM_MEMORY_ENCRYPT_REGISTER/UNREGISTER_RAM ioct to register encrypted
+   memory ranges (recommend by Paolo)
+ * Extend kvm_x86_ops to provide new memory_encryption_enabled ops
+ * Enhance DEBUG DECRYPT/ENCRYPT commands to work with more than one page \
+                (recommended by Paolo)
+ * Optimize LAUNCH_UPDATE command to reduce the number of calls to AMD-SP driver
+ * Changes to address v2 feedbacks
+
+Borislav Petkov (1):
+  crypto: ccp: Build the AMD secure processor driver only with AMD CPU
+    support
+
+Brijesh Singh (34):
+  Documentation/virtual/kvm: Add AMD Secure Encrypted Virtualization
+    (SEV)
+  KVM: SVM: Prepare to reserve asid for SEV guest
+  KVM: X86: Extend CPUID range to include new leaf
+  KVM: Introduce KVM_MEMORY_ENCRYPT_OP ioctl
+  KVM: Introduce KVM_MEMORY_ENCRYPT_{UN,}REG_REGION ioctl
+  crypto: ccp: Define SEV userspace ioctl and command id
+  crypto: ccp: Define SEV key management command id
+  crypto: ccp: Add Platform Security Processor (PSP) device support
+  crypto: ccp: Add Secure Encrypted Virtualization (SEV) command support
+  crypto: ccp: Implement SEV_FACTORY_RESET ioctl command
+  crypto: ccp: Implement SEV_PLATFORM_STATUS ioctl command
+  crypto: ccp: Implement SEV_PEK_GEN ioctl command
+  crypto: ccp: Implement SEV_PDH_GEN ioctl command
+  crypto: ccp: Implement SEV_PEK_CSR ioctl command
+  crypto: ccp: Implement SEV_PEK_CERT_IMPORT ioctl command
+  crypto: ccp: Implement SEV_PDH_CERT_EXPORT ioctl command
+  KVM: X86: Add CONFIG_KVM_AMD_SEV
+  KVM: SVM: Add sev module_param
+  KVM: SVM: Reserve ASID range for SEV guest
+  KVM: Define SEV key management command id
+  KVM: SVM: Add KVM_SEV_INIT command
+  KVM: SVM: VMRUN should use associated ASID when SEV is enabled
+  KVM: SVM: Add support for KVM_SEV_LAUNCH_START command
+  KVM: SVM: Add support for KVM_SEV_LAUNCH_UPDATE_DATA command
+  KVM: SVM: Add support for KVM_SEV_LAUNCH_MEASURE command
+  KVM: SVM: Add support for SEV LAUNCH_FINISH command
+  KVM: SVM: Add support for SEV GUEST_STATUS command
+  KVM: SVM: Add support for SEV DEBUG_DECRYPT command
+  KVM: SVM: Add support for SEV DEBUG_ENCRYPT command
+  KVM: SVM: Add support for SEV LAUNCH_SECRET command
+  KVM: SVM: Pin guest memory when SEV is active
+  KVM: SVM: Clear C-bit from the page fault address
+  KVM: SVM: Do not install #UD intercept when SEV is enabled
+  KVM: X86: Restart the guest when insn_len is zero and SEV is enabled
+
+Tom Lendacky (3):
+  x86/CPU/AMD: Add the Secure Encrypted Virtualization CPU feature
+  kvm: svm: prepare for new bit definition in nested_ctl
+  kvm: svm: Add SEV feature definitions to KVM
+
+ Documentation/virtual/kvm/00-INDEX                 |    3 +
+ .../virtual/kvm/amd-memory-encryption.rst          |  247 +++++
+ Documentation/virtual/kvm/api.txt                  |   50 +
+ arch/x86/include/asm/cpufeatures.h                 |    1 +
+ arch/x86/include/asm/kvm_host.h                    |   15 +
+ arch/x86/include/asm/msr-index.h                   |    2 +
+ arch/x86/include/asm/svm.h                         |    3 +
+ arch/x86/kernel/cpu/amd.c                          |   66 +-
+ arch/x86/kernel/cpu/scattered.c                    |    1 +
+ arch/x86/kvm/Kconfig                               |   10 +
+ arch/x86/kvm/cpuid.c                               |    2 +-
+ arch/x86/kvm/mmu.c                                 |   10 +
+ arch/x86/kvm/svm.c                                 | 1135 +++++++++++++++++++-
+ arch/x86/kvm/x86.c                                 |   30 +
+ drivers/crypto/ccp/Kconfig                         |   12 +
+ drivers/crypto/ccp/Makefile                        |    1 +
+ drivers/crypto/ccp/psp-dev.c                       |  807 ++++++++++++++
+ drivers/crypto/ccp/psp-dev.h                       |   83 ++
+ drivers/crypto/ccp/sp-dev.c                        |   35 +
+ drivers/crypto/ccp/sp-dev.h                        |   28 +-
+ drivers/crypto/ccp/sp-pci.c                        |   52 +
+ include/linux/psp-sev.h                            |  641 +++++++++++
+ include/uapi/linux/kvm.h                           |   90 ++
+ include/uapi/linux/psp-sev.h                       |  113 ++
+ 24 files changed, 3407 insertions(+), 30 deletions(-)
+ create mode 100644 Documentation/virtual/kvm/amd-memory-encryption.rst
+ create mode 100644 drivers/crypto/ccp/psp-dev.c
+ create mode 100644 drivers/crypto/ccp/psp-dev.h
+ create mode 100644 include/linux/psp-sev.h
  create mode 100644 include/uapi/linux/psp-sev.h
 
-diff --git a/include/uapi/linux/psp-sev.h b/include/uapi/linux/psp-sev.h
-new file mode 100644
-index 000000000000..1dd98ba4ff22
---- /dev/null
-+++ b/include/uapi/linux/psp-sev.h
-@@ -0,0 +1,113 @@
-+/*
-+ * Userspace interface for AMD Secure Encrypted Virtualization (SEV)
-+ * platform management commands.
-+ *
-+ * Copyright (C) 2016-2017 Advanced Micro Devices, Inc.
-+ *
-+ * Author: Brijesh Singh <brijesh.singh@amd.com>
-+ *
-+ * SEV spec 0.14 is available at:
-+ * http://support.amd.com/TechDocs/55766_SEV-KM%20API_Specification.pdf
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ */
-+
-+#ifndef __PSP_SEV_USER_H__
-+#define __PSP_SEV_USER_H__
-+
-+#include <linux/types.h>
-+
-+/**
-+ * SEV platform commands
-+ */
-+enum {
-+	SEV_FACTORY_RESET = 0,
-+	SEV_PLATFORM_STATUS,
-+	SEV_PEK_GEN,
-+	SEV_PEK_CSR,
-+	SEV_PDH_GEN,
-+	SEV_PDH_CERT_EXPORT,
-+	SEV_PEK_CERT_IMPORT,
-+
-+	SEV_MAX,
-+};
-+
-+/**
-+ * struct sev_user_data_status - PLATFORM_STATUS command parameters
-+ *
-+ * @major: major API version
-+ * @minor: minor API version
-+ * @state: platform state
-+ * @flags: platform config flags
-+ * @build: firmware build id for API version
-+ * @guest_count: number of active guests
-+ */
-+struct sev_user_data_status {
-+	__u8 api_major;				/* Out */
-+	__u8 api_minor;				/* Out */
-+	__u8 state;				/* Out */
-+	__u32 flags;				/* Out */
-+	__u8 build;				/* Out */
-+	__u32 guest_count;			/* Out */
-+} __packed;
-+
-+/**
-+ * struct sev_user_data_pek_csr - PEK_CSR command parameters
-+ *
-+ * @address: PEK certificate chain
-+ * @length: length of certificate
-+ */
-+struct sev_user_data_pek_csr {
-+	__u64 address;				/* In */
-+	__u32 length;				/* In/Out */
-+} __packed;
-+
-+/**
-+ * struct sev_user_data_cert_import - PEK_CERT_IMPORT command parameters
-+ *
-+ * @pek_address: PEK certificate chain
-+ * @pek_len: length of PEK certificate
-+ * @oca_address: OCA certificate chain
-+ * @oca_len: length of OCA certificate
-+ */
-+struct sev_user_data_pek_cert_import {
-+	__u64 pek_cert_address;			/* In */
-+	__u32 pek_cert_len;			/* In */
-+	__u64 oca_cert_address;			/* In */
-+	__u32 oca_cert_len;			/* In */
-+} __packed;
-+
-+/**
-+ * struct sev_user_data_pdh_cert_export - PDH_CERT_EXPORT command parameters
-+ *
-+ * @pdh_address: PDH certificate address
-+ * @pdh_len: length of PDH certificate
-+ * @cert_chain_address: PDH certificate chain
-+ * @cert_chain_len: length of PDH certificate chain
-+ */
-+struct sev_user_data_pdh_cert_export {
-+	__u64 pdh_cert_address;			/* In */
-+	__u32 pdh_cert_len;			/* In/Out */
-+	__u64 cert_chain_address;		/* In */
-+	__u32 cert_chain_len;			/* In/Out */
-+} __packed;
-+
-+/**
-+ * struct sev_issue_cmd - SEV ioctl parameters
-+ *
-+ * @cmd: SEV commands to execute
-+ * @opaque: pointer to the command structure
-+ * @error: SEV FW return code on failure
-+ */
-+struct sev_issue_cmd {
-+	__u32 cmd;				/* In */
-+	__u64 data;				/* In */
-+	__u32 error;				/* Out */
-+} __packed;
-+
-+#define SEV_IOC_TYPE		'S'
-+#define SEV_ISSUE_CMD	_IOWR(SEV_IOC_TYPE, 0x0, struct sev_issue_cmd)
-+
-+#endif /* __PSP_USER_SEV_H */
 -- 
 2.9.5
