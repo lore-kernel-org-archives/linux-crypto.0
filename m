@@ -1,7 +1,7 @@
 From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: [Part2 PATCH v7 12/38] crypto: ccp: Add Platform Security Processor (PSP) device support
-Date: Wed,  1 Nov 2017 16:15:57 -0500
-Message-ID: <20171101211623.71496-13-brijesh.singh@amd.com>
+Subject: [Part2 PATCH v7 11/38] crypto: ccp: Define SEV key management command id
+Date: Wed,  1 Nov 2017 16:15:56 -0500
+Message-ID: <20171101211623.71496-12-brijesh.singh@amd.com>
 References: <20171101211623.71496-1-brijesh.singh@amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -15,20 +15,14 @@ Cc: bp@alien8.de, Brijesh Singh <brijesh.singh@amd.com>,
         Tom Lendacky <thomas.lendacky@amd.com>,
         linux-crypto@vger.kernel.org
 To: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Return-path: <kvm-owner@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20171101211623.71496-1-brijesh.singh@amd.com>
-Sender: kvm-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The Platform Security Processor (PSP) is part of the AMD Secure
-Processor (AMD-SP) functionality. The PSP is a dedicated processor
-that provides support for key management commands in Secure Encrypted
-Virtualization (SEV) mode, along with software-based Trusted Execution
-Environment (TEE) to enable third-party trusted applications.
-
-Note that the key management functionality provided by the SEV firmware
-can be used outside of the kvm-amd driver hence it doesn't need to
-depend on CONFIG_KVM_AMD.
+Define Secure Encrypted Virtualization (SEV) key management command id
+and structure. The command definition is available in SEV KM spec
+0.14 (http://support.amd.com/TechDocs/55766_SEV-KM API_Specification.pdf)
 
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: "Radim Krčmář" <rkrcmar@redhat.com>
@@ -42,432 +36,511 @@ Cc: linux-kernel@vger.kernel.org
 Improvements-by: Borislav Petkov <bp@suse.de>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 Reviewed-by: Borislav Petkov <bp@suse.de>
+Acked-by: Gary R Hook <gary.hook@amd.com>
 ---
- drivers/crypto/ccp/Kconfig   |  11 +++++
- drivers/crypto/ccp/Makefile  |   1 +
- drivers/crypto/ccp/psp-dev.c | 105 +++++++++++++++++++++++++++++++++++++++++++
- drivers/crypto/ccp/psp-dev.h |  59 ++++++++++++++++++++++++
- drivers/crypto/ccp/sp-dev.c  |  26 +++++++++++
- drivers/crypto/ccp/sp-dev.h  |  24 +++++++++-
- drivers/crypto/ccp/sp-pci.c  |  52 +++++++++++++++++++++
- 7 files changed, 277 insertions(+), 1 deletion(-)
- create mode 100644 drivers/crypto/ccp/psp-dev.c
- create mode 100644 drivers/crypto/ccp/psp-dev.h
+ include/linux/psp-sev.h | 494 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 494 insertions(+)
+ create mode 100644 include/linux/psp-sev.h
 
-diff --git a/drivers/crypto/ccp/Kconfig b/drivers/crypto/ccp/Kconfig
-index 9c84f9838931..b9dfae47aefd 100644
---- a/drivers/crypto/ccp/Kconfig
-+++ b/drivers/crypto/ccp/Kconfig
-@@ -33,3 +33,14 @@ config CRYPTO_DEV_CCP_CRYPTO
- 	  Support for using the cryptographic API with the AMD Cryptographic
- 	  Coprocessor. This module supports offload of SHA and AES algorithms.
- 	  If you choose 'M' here, this module will be called ccp_crypto.
-+
-+config CRYPTO_DEV_SP_PSP
-+	bool "Platform Security Processor (PSP) device"
-+	default y
-+	depends on CRYPTO_DEV_CCP_DD && X86_64
-+	help
-+	 Provide support for the AMD Platform Security Processor (PSP).
-+	 The PSP is a dedicated processor that provides support for key
-+	 management commands in Secure Encrypted Virtualization (SEV) mode,
-+	 along with software-based Trusted Execution Environment (TEE) to
-+	 enable third-party trusted applications.
-diff --git a/drivers/crypto/ccp/Makefile b/drivers/crypto/ccp/Makefile
-index 57f8debfcfb3..008bae7e26ec 100644
---- a/drivers/crypto/ccp/Makefile
-+++ b/drivers/crypto/ccp/Makefile
-@@ -7,6 +7,7 @@ ccp-$(CONFIG_CRYPTO_DEV_SP_CCP) += ccp-dev.o \
- 	    ccp-dmaengine.o \
- 	    ccp-debugfs.o
- ccp-$(CONFIG_PCI) += sp-pci.o
-+ccp-$(CONFIG_CRYPTO_DEV_SP_PSP) += psp-dev.o
- 
- obj-$(CONFIG_CRYPTO_DEV_CCP_CRYPTO) += ccp-crypto.o
- ccp-crypto-objs := ccp-crypto-main.o \
-diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
+diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
 new file mode 100644
-index 000000000000..b5789f878560
+index 000000000000..15bda519538e
 --- /dev/null
-+++ b/drivers/crypto/ccp/psp-dev.c
-@@ -0,0 +1,105 @@
++++ b/include/linux/psp-sev.h
+@@ -0,0 +1,494 @@
 +/*
-+ * AMD Platform Security Processor (PSP) interface
++ * AMD Secure Encrypted Virtualization (SEV) driver interface
 + *
 + * Copyright (C) 2016-2017 Advanced Micro Devices, Inc.
 + *
 + * Author: Brijesh Singh <brijesh.singh@amd.com>
 + *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ */
-+
-+#include <linux/module.h>
-+#include <linux/kernel.h>
-+#include <linux/kthread.h>
-+#include <linux/sched.h>
-+#include <linux/interrupt.h>
-+#include <linux/spinlock.h>
-+#include <linux/spinlock_types.h>
-+#include <linux/types.h>
-+#include <linux/mutex.h>
-+#include <linux/delay.h>
-+#include <linux/hw_random.h>
-+#include <linux/ccp.h>
-+
-+#include "sp-dev.h"
-+#include "psp-dev.h"
-+
-+static struct psp_device *psp_alloc_struct(struct sp_device *sp)
-+{
-+	struct device *dev = sp->dev;
-+	struct psp_device *psp;
-+
-+	psp = devm_kzalloc(dev, sizeof(*psp), GFP_KERNEL);
-+	if (!psp)
-+		return NULL;
-+
-+	psp->dev = dev;
-+	psp->sp = sp;
-+
-+	snprintf(psp->name, sizeof(psp->name), "psp-%u", sp->ord);
-+
-+	return psp;
-+}
-+
-+static irqreturn_t psp_irq_handler(int irq, void *data)
-+{
-+	return IRQ_HANDLED;
-+}
-+
-+int psp_dev_init(struct sp_device *sp)
-+{
-+	struct device *dev = sp->dev;
-+	struct psp_device *psp;
-+	int ret;
-+
-+	ret = -ENOMEM;
-+	psp = psp_alloc_struct(sp);
-+	if (!psp)
-+		goto e_err;
-+
-+	sp->psp_data = psp;
-+
-+	psp->vdata = (struct psp_vdata *)sp->dev_vdata->psp_vdata;
-+	if (!psp->vdata) {
-+		ret = -ENODEV;
-+		dev_err(dev, "missing driver data\n");
-+		goto e_err;
-+	}
-+
-+	psp->io_regs = sp->io_map + psp->vdata->offset;
-+
-+	/* Disable and clear interrupts until ready */
-+	iowrite32(0, psp->io_regs + PSP_P2CMSG_INTEN);
-+	iowrite32(-1, psp->io_regs + PSP_P2CMSG_INTSTS);
-+
-+	/* Request an irq */
-+	ret = sp_request_psp_irq(psp->sp, psp_irq_handler, psp->name, psp);
-+	if (ret) {
-+		dev_err(dev, "psp: unable to allocate an IRQ\n");
-+		goto e_err;
-+	}
-+
-+	if (sp->set_psp_master_device)
-+		sp->set_psp_master_device(sp);
-+
-+	/* Enable interrupt */
-+	iowrite32(-1, psp->io_regs + PSP_P2CMSG_INTEN);
-+
-+	return 0;
-+
-+e_err:
-+	sp->psp_data = NULL;
-+
-+	dev_notice(dev, "psp initialization failed\n");
-+
-+	return ret;
-+}
-+
-+void psp_dev_destroy(struct sp_device *sp)
-+{
-+	struct psp_device *psp = sp->psp_data;
-+
-+	sp_free_psp_irq(sp, psp);
-+}
-diff --git a/drivers/crypto/ccp/psp-dev.h b/drivers/crypto/ccp/psp-dev.h
-new file mode 100644
-index 000000000000..55b7808367c3
---- /dev/null
-+++ b/drivers/crypto/ccp/psp-dev.h
-@@ -0,0 +1,59 @@
-+/*
-+ * AMD Platform Security Processor (PSP) interface driver
-+ *
-+ * Copyright (C) 2017 Advanced Micro Devices, Inc.
-+ *
-+ * Author: Brijesh Singh <brijesh.singh@amd.com>
++ * SEV spec 0.14 is available at:
++ * http://support.amd.com/TechDocs/55766_SEV-KM API_Specification.pdf
 + *
 + * This program is free software; you can redistribute it and/or modify
 + * it under the terms of the GNU General Public License version 2 as
 + * published by the Free Software Foundation.
 + */
 +
-+#ifndef __PSP_DEV_H__
-+#define __PSP_DEV_H__
++#ifndef __PSP_SEV_H__
++#define __PSP_SEV_H__
 +
-+#include <linux/device.h>
-+#include <linux/pci.h>
-+#include <linux/spinlock.h>
-+#include <linux/mutex.h>
-+#include <linux/list.h>
-+#include <linux/wait.h>
-+#include <linux/dmapool.h>
-+#include <linux/hw_random.h>
-+#include <linux/bitops.h>
-+#include <linux/interrupt.h>
-+#include <linux/irqreturn.h>
-+#include <linux/dmaengine.h>
++#include <uapi/linux/psp-sev.h>
 +
-+#include "sp-dev.h"
++#ifdef CONFIG_X86
++#include <linux/mem_encrypt.h>
 +
-+#define PSP_P2CMSG_INTEN		0x0110
-+#define PSP_P2CMSG_INTSTS		0x0114
-+
-+#define PSP_C2PMSG_ATTR_0		0x0118
-+#define PSP_C2PMSG_ATTR_1		0x011c
-+#define PSP_C2PMSG_ATTR_2		0x0120
-+#define PSP_C2PMSG_ATTR_3		0x0124
-+#define PSP_P2CMSG_ATTR_0		0x0128
-+
-+#define PSP_CMDRESP_CMD_SHIFT		16
-+#define PSP_CMDRESP_IOC			BIT(0)
-+#define PSP_CMDRESP_RESP		BIT(31)
-+#define PSP_CMDRESP_ERR_MASK		0xffff
-+
-+#define MAX_PSP_NAME_LEN		16
-+
-+struct psp_device {
-+	struct list_head entry;
-+
-+	struct psp_vdata *vdata;
-+	char name[MAX_PSP_NAME_LEN];
-+
-+	struct device *dev;
-+	struct sp_device *sp;
-+
-+	void __iomem *io_regs;
-+};
-+
-+#endif /* __PSP_DEV_H */
-diff --git a/drivers/crypto/ccp/sp-dev.c b/drivers/crypto/ccp/sp-dev.c
-index bef387c8abfd..cf101c039c8f 100644
---- a/drivers/crypto/ccp/sp-dev.c
-+++ b/drivers/crypto/ccp/sp-dev.c
-@@ -198,6 +198,8 @@ int sp_init(struct sp_device *sp)
- 	if (sp->dev_vdata->ccp_vdata)
- 		ccp_dev_init(sp);
- 
-+	if (sp->dev_vdata->psp_vdata)
-+		psp_dev_init(sp);
- 	return 0;
- }
- 
-@@ -206,6 +208,9 @@ void sp_destroy(struct sp_device *sp)
- 	if (sp->dev_vdata->ccp_vdata)
- 		ccp_dev_destroy(sp);
- 
-+	if (sp->dev_vdata->psp_vdata)
-+		psp_dev_destroy(sp);
-+
- 	sp_del_device(sp);
- }
- 
-@@ -237,6 +242,27 @@ int sp_resume(struct sp_device *sp)
- }
- #endif
- 
-+struct sp_device *sp_get_psp_master_device(void)
-+{
-+	struct sp_device *i, *ret = NULL;
-+	unsigned long flags;
-+
-+	write_lock_irqsave(&sp_unit_lock, flags);
-+	if (list_empty(&sp_units))
-+		goto unlock;
-+
-+	list_for_each_entry(i, &sp_units, entry) {
-+		if (i->psp_data)
-+			break;
-+	}
-+
-+	if (i->get_psp_master_device)
-+		ret = i->get_psp_master_device();
-+unlock:
-+	write_unlock_irqrestore(&sp_unit_lock, flags);
-+	return ret;
-+}
-+
- static int __init sp_mod_init(void)
- {
- #ifdef CONFIG_X86
-diff --git a/drivers/crypto/ccp/sp-dev.h b/drivers/crypto/ccp/sp-dev.h
-index 5ab486ade1ad..909cf3e436b4 100644
---- a/drivers/crypto/ccp/sp-dev.h
-+++ b/drivers/crypto/ccp/sp-dev.h
-@@ -42,12 +42,17 @@ struct ccp_vdata {
- 	const unsigned int offset;
- 	const unsigned int rsamax;
- };
-+
-+struct psp_vdata {
-+	const unsigned int offset;
-+};
-+
- /* Structure to hold SP device data */
- struct sp_dev_vdata {
- 	const unsigned int bar;
- 
- 	const struct ccp_vdata *ccp_vdata;
--	void *psp_vdata;
-+	const struct psp_vdata *psp_vdata;
- };
- 
- struct sp_device {
-@@ -68,6 +73,10 @@ struct sp_device {
- 	/* DMA caching attribute support */
- 	unsigned int axcache;
- 
-+	/* get and set master device */
-+	struct sp_device*(*get_psp_master_device)(void);
-+	void (*set_psp_master_device)(struct sp_device *);
-+
- 	bool irq_registered;
- 	bool use_tasklet;
- 
-@@ -103,6 +112,7 @@ void sp_free_ccp_irq(struct sp_device *sp, void *data);
- int sp_request_psp_irq(struct sp_device *sp, irq_handler_t handler,
- 		       const char *name, void *data);
- void sp_free_psp_irq(struct sp_device *sp, void *data);
-+struct sp_device *sp_get_psp_master_device(void);
- 
- #ifdef CONFIG_CRYPTO_DEV_SP_CCP
- 
-@@ -130,4 +140,16 @@ static inline int ccp_dev_resume(struct sp_device *sp)
- }
- #endif	/* CONFIG_CRYPTO_DEV_SP_CCP */
- 
-+#ifdef CONFIG_CRYPTO_DEV_SP_PSP
-+
-+int psp_dev_init(struct sp_device *sp);
-+void psp_dev_destroy(struct sp_device *sp);
-+
-+#else /* !CONFIG_CRYPTO_DEV_SP_PSP */
-+
-+static inline int psp_dev_init(struct sp_device *sp) { return 0; }
-+static inline void psp_dev_destroy(struct sp_device *sp) { }
-+
-+#endif /* CONFIG_CRYPTO_DEV_SP_PSP */
-+
- #endif
-diff --git a/drivers/crypto/ccp/sp-pci.c b/drivers/crypto/ccp/sp-pci.c
-index 9859aa683a28..f5f43c50698a 100644
---- a/drivers/crypto/ccp/sp-pci.c
-+++ b/drivers/crypto/ccp/sp-pci.c
-@@ -25,6 +25,7 @@
- #include <linux/ccp.h>
- 
- #include "ccp-dev.h"
-+#include "psp-dev.h"
- 
- #define MSIX_VECTORS			2
- 
-@@ -32,6 +33,7 @@ struct sp_pci {
- 	int msix_count;
- 	struct msix_entry msix_entry[MSIX_VECTORS];
- };
-+static struct sp_device *sp_dev_master;
- 
- static int sp_get_msix_irqs(struct sp_device *sp)
- {
-@@ -108,6 +110,45 @@ static void sp_free_irqs(struct sp_device *sp)
- 	sp->psp_irq = 0;
- }
- 
-+static bool sp_pci_is_master(struct sp_device *sp)
-+{
-+	struct device *dev_cur, *dev_new;
-+	struct pci_dev *pdev_cur, *pdev_new;
-+
-+	dev_new = sp->dev;
-+	dev_cur = sp_dev_master->dev;
-+
-+	pdev_new = to_pci_dev(dev_new);
-+	pdev_cur = to_pci_dev(dev_cur);
-+
-+	if (pdev_new->bus->number < pdev_cur->bus->number)
-+		return true;
-+
-+	if (PCI_SLOT(pdev_new->devfn) < PCI_SLOT(pdev_cur->devfn))
-+		return true;
-+
-+	if (PCI_FUNC(pdev_new->devfn) < PCI_FUNC(pdev_cur->devfn))
-+		return true;
-+
-+	return false;
-+}
-+
-+static void psp_set_master(struct sp_device *sp)
-+{
-+	if (!sp_dev_master) {
-+		sp_dev_master = sp;
-+		return;
-+	}
-+
-+	if (sp_pci_is_master(sp))
-+		sp_dev_master = sp;
-+}
-+
-+static struct sp_device *psp_get_master(void)
-+{
-+	return sp_dev_master;
-+}
-+
- static int sp_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- {
- 	struct sp_device *sp;
-@@ -166,6 +207,8 @@ static int sp_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 		goto e_err;
- 
- 	pci_set_master(pdev);
-+	sp->set_psp_master_device = psp_set_master;
-+	sp->get_psp_master_device = psp_get_master;
- 
- 	ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(48));
- 	if (ret) {
-@@ -225,6 +268,12 @@ static int sp_pci_resume(struct pci_dev *pdev)
- }
- #endif
- 
-+#ifdef CONFIG_CRYPTO_DEV_SP_PSP
-+static const struct psp_vdata psp_entry = {
-+	.offset = 0x10500,
-+};
++#define __psp_pa(x)	__sme_pa(x)
++#else
++#define __psp_pa(x)	__pa(x)
 +#endif
 +
- static const struct sp_dev_vdata dev_vdata[] = {
- 	{
- 		.bar = 2,
-@@ -237,6 +286,9 @@ static const struct sp_dev_vdata dev_vdata[] = {
- #ifdef CONFIG_CRYPTO_DEV_SP_CCP
- 		.ccp_vdata = &ccpv5a,
- #endif
-+#ifdef CONFIG_CRYPTO_DEV_SP_PSP
-+		.psp_vdata = &psp_entry
-+#endif
- 	},
- 	{
- 		.bar = 2,
++#define SEV_FW_BLOB_MAX_SIZE	0x4000	/* 16KB */
++
++/**
++ * SEV platform state
++ */
++enum sev_state {
++	SEV_STATE_UNINIT		= 0x0,
++	SEV_STATE_INIT			= 0x1,
++	SEV_STATE_WORKING		= 0x2,
++
++	SEV_STATE_MAX
++};
++
++/**
++ * SEV platform and guest management commands
++ */
++enum sev_cmd {
++	/* platform commands */
++	SEV_CMD_INIT			= 0x001,
++	SEV_CMD_SHUTDOWN		= 0x002,
++	SEV_CMD_FACTORY_RESET		= 0x003,
++	SEV_CMD_PLATFORM_STATUS		= 0x004,
++	SEV_CMD_PEK_GEN			= 0x005,
++	SEV_CMD_PEK_CSR			= 0x006,
++	SEV_CMD_PEK_CERT_IMPORT		= 0x007,
++	SEV_CMD_PDH_CERT_EXPORT		= 0x008,
++	SEV_CMD_PDH_GEN			= 0x009,
++	SEV_CMD_DF_FLUSH		= 0x00A,
++
++	/* Guest commands */
++	SEV_CMD_DECOMMISSION		= 0x020,
++	SEV_CMD_ACTIVATE		= 0x021,
++	SEV_CMD_DEACTIVATE		= 0x022,
++	SEV_CMD_GUEST_STATUS		= 0x023,
++
++	/* Guest launch commands */
++	SEV_CMD_LAUNCH_START		= 0x030,
++	SEV_CMD_LAUNCH_UPDATE_DATA	= 0x031,
++	SEV_CMD_LAUNCH_UPDATE_VMSA	= 0x032,
++	SEV_CMD_LAUNCH_MEASURE		= 0x033,
++	SEV_CMD_LAUNCH_UPDATE_SECRET	= 0x034,
++	SEV_CMD_LAUNCH_FINISH		= 0x035,
++
++	/* Guest migration commands (outgoing) */
++	SEV_CMD_SEND_START		= 0x040,
++	SEV_CMD_SEND_UPDATE_DATA	= 0x041,
++	SEV_CMD_SEND_UPDATE_VMSA	= 0x042,
++	SEV_CMD_SEND_FINISH		= 0x043,
++
++	/* Guest migration commands (incoming) */
++	SEV_CMD_RECEIVE_START		= 0x050,
++	SEV_CMD_RECEIVE_UPDATE_DATA	= 0x051,
++	SEV_CMD_RECEIVE_UPDATE_VMSA	= 0x052,
++	SEV_CMD_RECEIVE_FINISH		= 0x053,
++
++	/* Guest debug commands */
++	SEV_CMD_DBG_DECRYPT		= 0x060,
++	SEV_CMD_DBG_ENCRYPT		= 0x061,
++
++	SEV_CMD_MAX,
++};
++
++/**
++ * status code returned by the commands
++ */
++enum psp_ret_code {
++	SEV_RET_SUCCESS = 0,
++	SEV_RET_INVALID_PLATFORM_STATE,
++	SEV_RET_INVALID_GUEST_STATE,
++	SEV_RET_INAVLID_CONFIG,
++	SEV_RET_INVALID_len,
++	SEV_RET_ALREADY_OWNED,
++	SEV_RET_INVALID_CERTIFICATE,
++	SEV_RET_POLICY_FAILURE,
++	SEV_RET_INACTIVE,
++	SEV_RET_INVALID_ADDRESS,
++	SEV_RET_BAD_SIGNATURE,
++	SEV_RET_BAD_MEASUREMENT,
++	SEV_RET_ASID_OWNED,
++	SEV_RET_INVALID_ASID,
++	SEV_RET_WBINVD_REQUIRED,
++	SEV_RET_DFFLUSH_REQUIRED,
++	SEV_RET_INVALID_GUEST,
++	SEV_RET_INVALID_COMMAND,
++	SEV_RET_ACTIVE,
++	SEV_RET_HWSEV_RET_PLATFORM,
++	SEV_RET_HWSEV_RET_UNSAFE,
++	SEV_RET_UNSUPPORTED,
++	SEV_RET_MAX,
++};
++
++/**
++ * struct sev_data_init - INIT command parameters
++ *
++ * @flags: processing flags
++ * @tmr_address: system physical address used for SEV-ES
++ * @tmr_len: len of tmr_address
++ */
++struct sev_data_init {
++	u32 flags;			/* In */
++	u32 reserved;			/* In */
++	u64 tmr_address;		/* In */
++	u32 tmr_len;			/* In */
++} __packed;
++
++/**
++ * struct sev_data_pek_csr - PEK_CSR command parameters
++ *
++ * @address: PEK certificate chain
++ * @len: len of certificate
++ */
++struct sev_data_pek_csr {
++	u64 address;				/* In */
++	u32 len;				/* In/Out */
++} __packed;
++
++/**
++ * struct sev_data_cert_import - PEK_CERT_IMPORT command parameters
++ *
++ * @pek_address: PEK certificate chain
++ * @pek_len: len of PEK certificate
++ * @oca_address: OCA certificate chain
++ * @oca_len: len of OCA certificate
++ */
++struct sev_data_pek_cert_import {
++	u64 pek_cert_address;			/* In */
++	u32 pek_cert_len;			/* In */
++	u32 reserved;				/* In */
++	u64 oca_cert_address;			/* In */
++	u32 oca_cert_len;			/* In */
++} __packed;
++
++/**
++ * struct sev_data_pdh_cert_export - PDH_CERT_EXPORT command parameters
++ *
++ * @pdh_address: PDH certificate address
++ * @pdh_len: len of PDH certificate
++ * @cert_chain_address: PDH certificate chain
++ * @cert_chain_len: len of PDH certificate chain
++ */
++struct sev_data_pdh_cert_export {
++	u64 pdh_cert_address;			/* In */
++	u32 pdh_cert_len;			/* In/Out */
++	u32 reserved;				/* In */
++	u64 cert_chain_address;			/* In */
++	u32 cert_chain_len;			/* In/Out */
++} __packed;
++
++/**
++ * struct sev_data_decommission - DECOMMISSION command parameters
++ *
++ * @handle: handle of the VM to decommission
++ */
++struct sev_data_decommission {
++	u32 handle;				/* In */
++} __packed;
++
++/**
++ * struct sev_data_activate - ACTIVATE command parameters
++ *
++ * @handle: handle of the VM to activate
++ * @asid: asid assigned to the VM
++ */
++struct sev_data_activate {
++	u32 handle;				/* In */
++	u32 asid;				/* In */
++} __packed;
++
++/**
++ * struct sev_data_deactivate - DEACTIVATE command parameters
++ *
++ * @handle: handle of the VM to deactivate
++ */
++struct sev_data_deactivate {
++	u32 handle;				/* In */
++} __packed;
++
++/**
++ * struct sev_data_guest_status - SEV GUEST_STATUS command parameters
++ *
++ * @handle: handle of the VM to retrieve status
++ * @policy: policy information for the VM
++ * @asid: current ASID of the VM
++ * @state: current state of the VM
++ */
++struct sev_data_guest_status {
++	u32 handle;				/* In */
++	u32 policy;				/* Out */
++	u32 asid;				/* Out */
++	u8 state;				/* Out */
++} __packed;
++
++/**
++ * struct sev_data_launch_start - LAUNCH_START command parameters
++ *
++ * @handle: handle assigned to the VM
++ * @policy: guest launch policy
++ * @dh_cert_address: physical address of DH certificate blob
++ * @dh_cert_len: len of DH certificate blob
++ * @session_address: physical address of session parameters
++ * @session_len: len of session parameters
++ */
++struct sev_data_launch_start {
++	u32 handle;				/* In/Out */
++	u32 policy;				/* In */
++	u64 dh_cert_address;			/* In */
++	u32 dh_cert_len;			/* In */
++	u32 reserved;				/* In */
++	u64 session_address;			/* In */
++	u32 session_len;			/* In */
++} __packed;
++
++/**
++ * struct sev_data_launch_update_data - LAUNCH_UPDATE_DATA command parameter
++ *
++ * @handle: handle of the VM to update
++ * @len: len of memory to be encrypted
++ * @address: physical address of memory region to encrypt
++ */
++struct sev_data_launch_update_data {
++	u32 handle;				/* In */
++	u32 reserved;
++	u64 address;				/* In */
++	u32 len;				/* In */
++} __packed;
++
++/**
++ * struct sev_data_launch_update_vmsa - LAUNCH_UPDATE_VMSA command
++ *
++ * @handle: handle of the VM
++ * @address: physical address of memory region to encrypt
++ * @len: len of memory region to encrypt
++ */
++struct sev_data_launch_update_vmsa {
++	u32 handle;				/* In */
++	u32 reserved;
++	u64 address;				/* In */
++	u32 len;				/* In */
++} __packed;
++
++/**
++ * struct sev_data_launch_measure - LAUNCH_MEASURE command parameters
++ *
++ * @handle: handle of the VM to process
++ * @address: physical address containing the measurement blob
++ * @len: len of measurement blob
++ */
++struct sev_data_launch_measure {
++	u32 handle;				/* In */
++	u32 reserved;
++	u64 address;				/* In */
++	u32 len;				/* In/Out */
++} __packed;
++
++/**
++ * struct sev_data_launch_secret - LAUNCH_SECRET command parameters
++ *
++ * @handle: handle of the VM to process
++ * @hdr_address: physical address containing the packet header
++ * @hdr_len: len of packet header
++ * @guest_address: system physical address of guest memory region
++ * @guest_len: len of guest_paddr
++ * @trans_address: physical address of transport memory buffer
++ * @trans_len: len of transport memory buffer
++ */
++struct sev_data_launch_secret {
++	u32 handle;				/* In */
++	u32 reserved1;
++	u64 hdr_address;			/* In */
++	u32 hdr_len;				/* In */
++	u32 reserved2;
++	u64 guest_address;			/* In */
++	u32 guest_len;				/* In */
++	u32 reserved3;
++	u64 trans_address;			/* In */
++	u32 trans_len;				/* In */
++} __packed;
++
++/**
++ * struct sev_data_launch_finish - LAUNCH_FINISH command parameters
++ *
++ * @handle: handle of the VM to process
++ */
++struct sev_data_launch_finish {
++	u32 handle;				/* In */
++} __packed;
++
++/**
++ * struct sev_data_send_start - SEND_START command parameters
++ *
++ * @handle: handle of the VM to process
++ * @policy: policy information for the VM
++ * @pdh_cert_address: physical address containing PDH certificate
++ * @pdh_cert_len: len of PDH certificate
++ * @plat_certs_address: physical address containing platform certificate
++ * @plat_certs_len: len of platform certificate
++ * @amd_certs_address: physical address containing AMD certificate
++ * @amd_certs_len: len of AMD certificate
++ * @session_address: physical address containing Session data
++ * @session_len: len of session data
++ */
++struct sev_data_send_start {
++	u32 handle;				/* In */
++	u32 policy;				/* Out */
++	u64 pdh_cert_address;			/* In */
++	u32 pdh_cert_len;			/* In */
++	u32 reserved1;
++	u64 plat_cert_address;			/* In */
++	u32 plat_cert_len;			/* In */
++	u32 reserved2;
++	u64 amd_cert_address;			/* In */
++	u32 amd_cert_len;			/* In */
++	u32 reserved3;
++	u64 session_address;			/* In */
++	u32 session_len;			/* In/Out */
++} __packed;
++
++/**
++ * struct sev_data_send_update - SEND_UPDATE_DATA command
++ *
++ * @handle: handle of the VM to process
++ * @hdr_address: physical address containing packet header
++ * @hdr_len: len of packet header
++ * @guest_address: physical address of guest memory region to send
++ * @guest_len: len of guest memory region to send
++ * @trans_address: physical address of host memory region
++ * @trans_len: len of host memory region
++ */
++struct sev_data_send_update_data {
++	u32 handle;				/* In */
++	u32 reserved1;
++	u64 hdr_address;			/* In */
++	u32 hdr_len;				/* In/Out */
++	u32 reserved2;
++	u64 guest_address;			/* In */
++	u32 guest_len;				/* In */
++	u32 reserved3;
++	u64 trans_address;			/* In */
++	u32 trans_len;				/* In */
++} __packed;
++
++/**
++ * struct sev_data_send_update - SEND_UPDATE_VMSA command
++ *
++ * @handle: handle of the VM to process
++ * @hdr_address: physical address containing packet header
++ * @hdr_len: len of packet header
++ * @guest_address: physical address of guest memory region to send
++ * @guest_len: len of guest memory region to send
++ * @trans_address: physical address of host memory region
++ * @trans_len: len of host memory region
++ */
++struct sev_data_send_update_vmsa {
++	u32 handle;				/* In */
++	u64 hdr_address;			/* In */
++	u32 hdr_len;				/* In/Out */
++	u32 reserved2;
++	u64 guest_address;			/* In */
++	u32 guest_len;				/* In */
++	u32 reserved3;
++	u64 trans_address;			/* In */
++	u32 trans_len;				/* In */
++} __packed;
++
++/**
++ * struct sev_data_send_finish - SEND_FINISH command parameters
++ *
++ * @handle: handle of the VM to process
++ */
++struct sev_data_send_finish {
++	u32 handle;				/* In */
++} __packed;
++
++/**
++ * struct sev_data_receive_start - RECEIVE_START command parameters
++ *
++ * @handle: handle of the VM to perform receive operation
++ * @pdh_cert_address: system physical address containing PDH certificate blob
++ * @pdh_cert_len: len of PDH certificate blob
++ * @session_address: system physical address containing session blob
++ * @session_len: len of session blob
++ */
++struct sev_data_receive_start {
++	u32 handle;				/* In/Out */
++	u32 policy;				/* In */
++	u64 pdh_cert_address;			/* In */
++	u32 pdh_cert_len;			/* In */
++	u32 reserved1;
++	u64 session_address;			/* In */
++	u32 session_len;			/* In */
++} __packed;
++
++/**
++ * struct sev_data_receive_update_data - RECEIVE_UPDATE_DATA command parameters
++ *
++ * @handle: handle of the VM to update
++ * @hdr_address: physical address containing packet header blob
++ * @hdr_len: len of packet header
++ * @guest_address: system physical address of guest memory region
++ * @guest_len: len of guest memory region
++ * @trans_address: system physical address of transport buffer
++ * @trans_len: len of transport buffer
++ */
++struct sev_data_receive_update_data {
++	u32 handle;				/* In */
++	u32 reserved1;
++	u64 hdr_address;			/* In */
++	u32 hdr_len;				/* In */
++	u32 reserved2;
++	u64 guest_address;			/* In */
++	u32 guest_len;				/* In */
++	u32 reserved3;
++	u64 trans_address;			/* In */
++	u32 trans_len;				/* In */
++} __packed;
++
++/**
++ * struct sev_data_receive_update_vmsa - RECEIVE_UPDATE_VMSA command parameters
++ *
++ * @handle: handle of the VM to update
++ * @hdr_address: physical address containing packet header blob
++ * @hdr_len: len of packet header
++ * @guest_address: system physical address of guest memory region
++ * @guest_len: len of guest memory region
++ * @trans_address: system physical address of transport buffer
++ * @trans_len: len of transport buffer
++ */
++struct sev_data_receive_update_vmsa {
++	u32 handle;				/* In */
++	u32 reserved1;
++	u64 hdr_address;			/* In */
++	u32 hdr_len;				/* In */
++	u32 reserved2;
++	u64 guest_address;			/* In */
++	u32 guest_len;				/* In */
++	u32 reserved3;
++	u64 trans_address;			/* In */
++	u32 trans_len;				/* In */
++} __packed;
++
++/**
++ * struct sev_data_receive_finish - RECEIVE_FINISH command parameters
++ *
++ * @handle: handle of the VM to finish
++ */
++struct sev_data_receive_finish {
++	u32 handle;				/* In */
++} __packed;
++
++/**
++ * struct sev_data_dbg - DBG_ENCRYPT/DBG_DECRYPT command parameters
++ *
++ * @handle: handle of the VM to perform debug operation
++ * @src_addr: source address of data to operate on
++ * @dst_addr: destination address of data to operate on
++ * @len: len of data to operate on
++ */
++struct sev_data_dbg {
++	u32 handle;				/* In */
++	u32 reserved;
++	u64 src_addr;				/* In */
++	u64 dst_addr;				/* In */
++	u32 len;				/* In */
++} __packed;
++
++#endif	/* __PSP_SEV_H__ */
 -- 
 2.9.5
