@@ -1,7 +1,7 @@
 From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: [Part2 PATCH v7 20/38] crypto: ccp: Implement SEV_PDH_CERT_EXPORT ioctl command
-Date: Wed,  1 Nov 2017 16:16:05 -0500
-Message-ID: <20171101211623.71496-21-brijesh.singh@amd.com>
+Subject: [Part2 PATCH v7 18/38] crypto: ccp: Implement SEV_PEK_CSR ioctl command
+Date: Wed,  1 Nov 2017 16:16:03 -0500
+Message-ID: <20171101211623.71496-19-brijesh.singh@amd.com>
 References: <20171101211623.71496-1-brijesh.singh@amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -20,8 +20,8 @@ In-Reply-To: <20171101211623.71496-1-brijesh.singh@amd.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The SEV_PDH_CERT_EXPORT command can be used to export the PDH and its
-certificate chain. The command is defined in SEV spec section 5.10.
+The SEV_PEK_CSR command can be used to generate a PEK certificate
+signing request. The command is defined in SEV spec section 5.7.
 
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: "Radim Krčmář" <rkrcmar@redhat.com>
@@ -36,22 +36,22 @@ Improvements-by: Borislav Petkov <bp@suse.de>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 Acked-by: Gary R Hook <gary.hook@amd.com>
 ---
- drivers/crypto/ccp/psp-dev.c | 98 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 98 insertions(+)
+ drivers/crypto/ccp/psp-dev.c | 68 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 68 insertions(+)
 
 diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
-index 2648faf33a19..96739ff105e6 100644
+index 42991c2e9085..4e2f9d037f0a 100644
 --- a/drivers/crypto/ccp/psp-dev.c
 +++ b/drivers/crypto/ccp/psp-dev.c
-@@ -441,6 +441,101 @@ static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp)
- 	return ret;
+@@ -298,6 +298,71 @@ static int sev_ioctl_do_pek_pdh_gen(int cmd, struct sev_issue_cmd *argp)
+ 	return __sev_do_cmd_locked(cmd, 0, &argp->error);
  }
  
-+static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp)
++static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp)
 +{
-+	struct sev_user_data_pdh_cert_export input;
-+	void *pdh_blob = NULL, *cert_blob = NULL;
-+	struct sev_data_pdh_cert_export *data;
++	struct sev_user_data_pek_csr input;
++	struct sev_data_pek_csr *data;
++	void *blob = NULL;
 +	int ret;
 +
 +	if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
@@ -61,82 +61,52 @@ index 2648faf33a19..96739ff105e6 100644
 +	if (!data)
 +		return -ENOMEM;
 +
-+	/* Userspace wants to query the certificate length */
-+	if (!input.pdh_cert_address || !input.pdh_cert_len ||
-+	    !input.cert_chain_address || !input.cert_chain_address)
++	/* userspace wants to query CSR length */
++	if (!input.address || !input.length)
 +		goto cmd;
 +
-+	/* allocate a physically contiguous buffer to store the PDH blob */
-+	if (!access_ok(VERIFY_WRITE, input.pdh_cert_address, input.pdh_cert_len) ||
-+	    (input.pdh_cert_len > SEV_FW_BLOB_MAX_SIZE)) {
++	/* allocate a physically contiguous buffer to store the CSR blob */
++	if (!access_ok(VERIFY_WRITE, input.address, input.length) ||
++	    input.length > SEV_FW_BLOB_MAX_SIZE) {
 +		ret = -EFAULT;
 +		goto e_free;
 +	}
 +
-+	pdh_blob = kmalloc(input.pdh_cert_len, GFP_KERNEL);
-+	if (!pdh_blob) {
++	blob = kmalloc(input.length, GFP_KERNEL);
++	if (!blob) {
 +		ret = -ENOMEM;
 +		goto e_free;
 +	}
 +
-+	data->pdh_cert_address = __psp_pa(pdh_blob);
-+	data->pdh_cert_len = input.pdh_cert_len;
-+
-+	/* allocate a physically contiguous buffer to store the cert chain blob */
-+	if (!access_ok(VERIFY_WRITE, input.cert_chain_address, input.cert_chain_len) ||
-+	    (input.cert_chain_len > SEV_FW_BLOB_MAX_SIZE)) {
-+		ret = -EFAULT;
-+		goto e_free_pdh;
-+	}
-+
-+	cert_blob = kmalloc(input.cert_chain_len, GFP_KERNEL);
-+	if (!cert_blob) {
-+		ret = -ENOMEM;
-+		goto e_free_pdh;
-+	}
-+
-+	data->cert_chain_address = __psp_pa(cert_blob);
-+	data->cert_chain_len = input.cert_chain_len;
++	data->address = __psp_pa(blob);
++	data->len = input.length;
 +
 +cmd:
-+	/* If platform is not in INIT state then transition it to INIT */
-+	if (psp_master->sev_state != SEV_STATE_INIT) {
++	if (psp_master->sev_state == SEV_STATE_UNINIT) {
 +		ret = __sev_platform_init_locked(psp_master->sev_init, &argp->error);
 +		if (ret)
-+			goto e_free_cert;
++			goto e_free_blob;
 +	}
 +
-+	ret = __sev_do_cmd_locked(SEV_CMD_PDH_CERT_EXPORT, data, &argp->error);
++	ret = __sev_do_cmd_locked(SEV_CMD_PEK_CSR, data, &argp->error);
 +
 +	/*
-+	 * If we query the length, FW responded with expected data
++	 * If we query the CSR length, FW responded with expected data
 +	 */
-+	input.cert_chain_len = data->cert_chain_len;
-+	input.pdh_cert_len = data->pdh_cert_len;
++	input.length = data->len;
 +
 +	if (copy_to_user((void __user *)argp->data, &input, sizeof(input))) {
 +		ret = -EFAULT;
-+		goto e_free_cert;
++		goto e_free_blob;
 +	}
 +
-+	if (pdh_blob) {
-+		if (copy_to_user((void __user *)input.pdh_cert_address,
-+				 pdh_blob, input.pdh_cert_len)) {
-+			ret = -EFAULT;
-+			goto e_free_cert;
-+		}
-+	}
-+
-+	if (cert_blob) {
-+		if (copy_to_user((void __user *)input.cert_chain_address,
-+				 cert_blob, input.cert_chain_len))
++	if (blob) {
++		if (copy_to_user((void __user *)input.address, blob, input.length))
 +			ret = -EFAULT;
 +	}
 +
-+e_free_cert:
-+	kfree(cert_blob);
-+e_free_pdh:
-+	kfree(pdh_blob);
++e_free_blob:
++	kfree(blob);
 +e_free:
 +	kfree(data);
 +	return ret;
@@ -145,12 +115,12 @@ index 2648faf33a19..96739ff105e6 100644
  static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
  {
  	void __user *argp = (void __user *)arg;
-@@ -481,6 +576,9 @@ static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
- 	case SEV_PEK_CERT_IMPORT:
- 		ret = sev_ioctl_do_pek_import(&input);
+@@ -332,6 +397,9 @@ static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
+ 	case SEV_PDH_GEN:
+ 		ret = sev_ioctl_do_pek_pdh_gen(SEV_CMD_PDH_GEN, &input);
  		break;
-+	case SEV_PDH_CERT_EXPORT:
-+		ret = sev_ioctl_do_pdh_export(&input);
++	case SEV_PEK_CSR:
++		ret = sev_ioctl_do_pek_csr(&input);
 +		break;
  	default:
  		ret = -EINVAL;
