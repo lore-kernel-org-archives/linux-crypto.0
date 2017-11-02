@@ -1,7 +1,7 @@
 From: Florian Fainelli <f.fainelli@gmail.com>
-Subject: [PATCH 11/12] hwrng: bcm2835-rng: Enable BCM2835 RNG to work on BCM63xx platforms
-Date: Wed,  1 Nov 2017 18:04:07 -0700
-Message-ID: <20171102010408.27736-12-f.fainelli@gmail.com>
+Subject: [PATCH 09/12] hwrng: bcm2835-rng: Add Broadcom MIPS I/O accessors
+Date: Wed,  1 Nov 2017 18:04:05 -0700
+Message-ID: <20171102010408.27736-10-f.fainelli@gmail.com>
 References: <20171102010408.27736-1-f.fainelli@gmail.com>
 Cc: Florian Fainelli <f.fainelli@gmail.com>,
         Matt Mackall <mpm@selenic.com>,
@@ -23,89 +23,48 @@ Cc: Florian Fainelli <f.fainelli@gmail.com>,
         Steffen Trumtrar <s.trumtrar@pengutronix.de>,
         linux-crypto@vger.k
 To: linux-kernel@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pg0-f68.google.com ([74.125.83.68]:48439 "EHLO
-        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934074AbdKBBEl (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Nov 2017 21:04:41 -0400
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20171102010408.27736-1-f.fainelli@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-We have now incorporated all necessary functionality for the BCM63xx
-platforms to successfully migrate over bcm2835-rng, so add the final
-bits: Kconfig selection and proper platform_device device type matching
-to keep the same platform device name for registration to work.
+Broadcom MIPS HW is always strapped to match the system-wide endian such
+that all I/O access to this RNG block is done with the native CPU
+endian, account for that.
 
 Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
 ---
- drivers/char/hw_random/Kconfig       |  7 ++++---
- drivers/char/hw_random/bcm2835-rng.c | 11 ++++++++++-
- 2 files changed, 14 insertions(+), 4 deletions(-)
+ drivers/char/hw_random/bcm2835-rng.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-index 95a031e9eced..d0689cc8c7fc 100644
---- a/drivers/char/hw_random/Kconfig
-+++ b/drivers/char/hw_random/Kconfig
-@@ -87,12 +87,13 @@ config HW_RANDOM_BCM63XX
- 	  If unusure, say Y.
- 
- config HW_RANDOM_BCM2835
--	tristate "Broadcom BCM2835 Random Number Generator support"
--	depends on ARCH_BCM2835 || ARCH_BCM_NSP || ARCH_BCM_5301X
-+	tristate "Broadcom BCM2835/BCM63xx Random Number Generator support"
-+	depends on ARCH_BCM2835 || ARCH_BCM_NSP || ARCH_BCM_5301X || \
-+		   ARCH_BCM_63XX || BCM63XX || BMIPS_GENERIC
- 	default HW_RANDOM
- 	---help---
- 	  This driver provides kernel-side support for the Random Number
--	  Generator hardware found on the Broadcom BCM2835 SoCs.
-+	  Generator hardware found on the Broadcom BCM2835 and BCM63xx SoCs.
- 
- 	  To compile this driver as a module, choose M here: the
- 	  module will be called bcm2835-rng
 diff --git a/drivers/char/hw_random/bcm2835-rng.c b/drivers/char/hw_random/bcm2835-rng.c
-index 650e0033c273..d9ffe14f312b 100644
+index 500275d55044..650e0033c273 100644
 --- a/drivers/char/hw_random/bcm2835-rng.c
 +++ b/drivers/char/hw_random/bcm2835-rng.c
-@@ -131,6 +131,7 @@ static const struct of_device_id bcm2835_rng_of_match[] = {
- 	{ .compatible = "brcm,bcm2835-rng"},
- 	{ .compatible = "brcm,bcm-nsp-rng", .data = &nsp_rng_of_data },
- 	{ .compatible = "brcm,bcm5301x-rng", .data = &nsp_rng_of_data },
-+	{ .compatible = "brcm,bcm6368-rng"},
- 	{},
- };
+@@ -44,13 +44,22 @@ static inline struct bcm2835_rng_priv *to_rng_priv(struct hwrng *rng)
  
-@@ -164,7 +165,7 @@ static int bcm2835_rng_probe(struct platform_device *pdev)
- 	if (IS_ERR(priv->clk))
- 		priv->clk = NULL;
+ static inline u32 rng_readl(struct bcm2835_rng_priv *priv, u32 offset)
+ {
+-	return readl(priv->base + offset);
++	/* MIPS chips strapped for BE will automagically configure the
++	 * peripheral registers for CPU-native byte order.
++	 */
++	if (IS_ENABLED(CONFIG_MIPS) && IS_ENABLED(CONFIG_CPU_BIG_ENDIAN))
++		return __raw_readl(priv->base + offset);
++	else
++		return readl(priv->base + offset);
+ }
  
--	priv->rng.name = "bcm2835-rng";
-+	priv->rng.name = pdev->id_entry->name;
- 	priv->rng.init = bcm2835_rng_init;
- 	priv->rng.read = bcm2835_rng_read;
- 	priv->rng.cleanup = bcm2835_rng_cleanup;
-@@ -190,12 +191,20 @@ static int bcm2835_rng_probe(struct platform_device *pdev)
+ static inline void rng_writel(struct bcm2835_rng_priv *priv, u32 val,
+ 			      u32 offset)
+ {
+-	writel(val, priv->base + offset);
++	if (IS_ENABLED(CONFIG_MIPS) && IS_ENABLED(CONFIG_CPU_BIG_ENDIAN))
++		__raw_writel(val, priv->base + offset);
++	else
++		writel(val, priv->base + offset);
+ }
  
- MODULE_DEVICE_TABLE(of, bcm2835_rng_of_match);
- 
-+static struct platform_device_id bcm2835_rng_devtype[] = {
-+	{ .name = "bcm2835-rng" },
-+	{ .name = "bcm63xx-rng" },
-+	{ /* sentinel */ }
-+};
-+MODULE_DEVICE_TABLE(platform, bcm2835_rng_devtype);
-+
- static struct platform_driver bcm2835_rng_driver = {
- 	.driver = {
- 		.name = "bcm2835-rng",
- 		.of_match_table = bcm2835_rng_of_match,
- 	},
- 	.probe		= bcm2835_rng_probe,
-+	.id_table	= bcm2835_rng_devtype,
- };
- module_platform_driver(bcm2835_rng_driver);
- 
+ static int bcm2835_rng_read(struct hwrng *rng, void *buf, size_t max,
 -- 
 2.9.3
