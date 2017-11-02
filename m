@@ -1,10 +1,10 @@
 From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: [PATCH 1/4] crypto: dh - fix double free of ctx->p
-Date: Thu, 2 Nov 2017 10:30:01 -0700
-Message-ID: <20171102173001.GA23035@gmail.com>
+Subject: Re: [PATCH 2/4] crypto: dh - don't permit 'p' to be 0
+Date: Thu, 2 Nov 2017 10:31:41 -0700
+Message-ID: <20171102173141.GB23035@gmail.com>
 References: <20171101222517.41602-1-ebiggers3@gmail.com>
- <20171101222517.41602-2-ebiggers3@gmail.com>
- <93501fc6-94df-bf27-cdd8-7a44b04effc1@microchip.com>
+ <20171101222517.41602-3-ebiggers3@gmail.com>
+ <281c8d97-7d44-d157-5221-1487ec03a06f@microchip.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org,
@@ -15,43 +15,27 @@ Cc: linux-crypto@vger.kernel.org,
         Stephan Mueller <smueller@chronox.de>,
         Eric Biggers <ebiggers@google.com>, stable@vger.kernel.org
 To: Tudor Ambarus <tudor.ambarus@microchip.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-io0-f193.google.com ([209.85.223.193]:54329 "EHLO
-        mail-io0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754138AbdKBRaF (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Nov 2017 13:30:05 -0400
+Return-path: <stable-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <93501fc6-94df-bf27-cdd8-7a44b04effc1@microchip.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <281c8d97-7d44-d157-5221-1487ec03a06f@microchip.com>
+Sender: stable-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Tudor,
-
-On Thu, Nov 02, 2017 at 12:55:56PM +0200, Tudor Ambarus wrote:
+On Thu, Nov 02, 2017 at 01:40:51PM +0200, Tudor Ambarus wrote:
 > Hi, Eric,
 > 
 > On 11/02/2017 12:25 AM, Eric Biggers wrote:
-> >When setting the secret with the software Diffie-Hellman implementation,
-> >if allocating 'g' failed (e.g. if it was longer than
-> >MAX_EXTERN_MPI_BITS), then 'p' was freed twice: once immediately, and
-> >once later when the crypto_kpp tfm was destroyed.  Fix it by using
-> >dh_free_ctx() in the error paths, as that sets the pointers to NULL.
+> >If 'p' is 0 for the software Diffie-Hellman implementation, then
+> >dh_max_size() returns 0.
 > 
-> Other solution would be to have just an one-line patch that sets p to
-> NULL after freeing it. The benefit of just setting p to NULL and not
-> using dh_free_ctx() is that you'll spare some cpu cycles. If g fails,
-> g and a will already be NULL, so freeing them and set them to NULL is
-> redundant.
+> dh_set_secret() returns -EINVAL if p_len < 1536, see
+> dh_check_params_length(). What am I missing?
 > 
-> However, if you decide to always use dh_free_ctx(), you'll have to get
-> rid of dh_clear_params(), because it will be used just in dh_free_ctx().
-> You can copy dh_clear_params() body to dh_free_ctx().
-> 
+> Cheers,
+> ta
 
-This is on an error path, so a few cycles don't matter.  I would much rather
-have the simpler code, with less chance to introduce exploitable bugs.
-
-Yes, I should inline dh_clear_params() into dh_free_ctx().
+You pass a buffer containing 0's, not a buffer of length 0.  The buffer is
+interpreted as an arbitrary precision integer, so any length buffer filled with
+0's has the mathematical value 0.
 
 Eric
