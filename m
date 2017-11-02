@@ -1,279 +1,147 @@
-From: Tudor Ambarus <tudor.ambarus@microchip.com>
-Subject: [v3 PATCH 2/3] crypto: atmel-aes/tdes - remove empty functions
-Date: Thu, 2 Nov 2017 17:12:25 +0200
-Message-ID: <20171102151225.12949-1-tudor.ambarus@microchip.com>
-References: <20171026133549.20654-1-tudor.ambarus@microchip.com>
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: [Part2 PATCH v7 13/38] crypto: ccp: Add Secure Encrypted
+ Virtualization (SEV) command support
+Date: Thu, 2 Nov 2017 18:10:17 +0100
+Message-ID: <20171102171017.t7auzgm7zqp4ncjb@pd.tnic>
+References: <20171101211623.71496-1-brijesh.singh@amd.com>
+ <20171101211623.71496-14-brijesh.singh@amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <linux-crypto@vger.kernel.org>,
-        Tudor Ambarus <tudor.ambarus@microchip.com>
-To: <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from esa4.microchip.iphmx.com ([68.232.154.123]:21884 "EHLO
-        esa4.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933567AbdKBPMi (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Nov 2017 11:12:38 -0400
-In-Reply-To: <20171026133549.20654-1-tudor.ambarus@microchip.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Gary Hook <gary.hook@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        linux-crypto@vger.kernel.org
+To: Brijesh Singh <brijesh.singh@amd.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20171101211623.71496-14-brijesh.singh@amd.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Pointer members of an object with static storage duration, if not
-explicitly initialized, will be initialized to a NULL pointer.
-The crypto API checks if these pointers are not NULL before using them,
-therefore we can safely remove these empty functions.
+On Wed, Nov 01, 2017 at 04:15:58PM -0500, Brijesh Singh wrote:
+> AMD's new Secure Encrypted Virtualization (SEV) feature allows the
+> memory contents of virtual machines to be transparently encrypted with a
+> key unique to the VM. The programming and management of the encryption
+> keys are handled by the AMD Secure Processor (AMD-SP) which exposes the
+> commands for these tasks. The complete spec is available at:
+> 
+> http://support.amd.com/TechDocs/55766_SEV-KM%20API_Specification.pdf
+> 
+> Extend the AMD-SP driver to provide the following support:
+> 
+>  - an in-kernel API to communicate with the SEV firmware. The API can be
+>    used by the hypervisor to create encryption context for a SEV guest.
+> 
+>  - a userspace IOCTL to manage the platform certificates.
+> 
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: "Radim Krčmář" <rkrcmar@redhat.com>
+> Cc: Borislav Petkov <bp@suse.de>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: Gary Hook <gary.hook@amd.com>
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Cc: linux-crypto@vger.kernel.org
+> Cc: kvm@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Improvements-by: Borislav Petkov <bp@suse.de>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  drivers/crypto/ccp/psp-dev.c | 350 +++++++++++++++++++++++++++++++++++++++++++
+>  drivers/crypto/ccp/psp-dev.h |  24 +++
+>  drivers/crypto/ccp/sp-dev.c  |   9 ++
+>  drivers/crypto/ccp/sp-dev.h  |   4 +
+>  include/linux/psp-sev.h      | 143 ++++++++++++++++++
+>  5 files changed, 530 insertions(+)
 
-Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
+Some more cleanups:
+
+* If sev_data_init is per psp_device, you can simply embed it in the
+struct psp_device and save yourself the complete allocation.
+
+* s/sev_ops_init/sev_misc_init/ because it doesn't do anything ops-like
+
+* save some header lines.
+
 ---
-changes in v3:
-- update the commit message
-changes in v2:
-- remove empty atmel_aes_gcm_exit()
-
- drivers/crypto/atmel-aes.c  | 20 --------------------
- drivers/crypto/atmel-tdes.c | 18 ------------------
- 2 files changed, 38 deletions(-)
-
-diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
-index 9659759..c2f0a12 100644
---- a/drivers/crypto/atmel-aes.c
-+++ b/drivers/crypto/atmel-aes.c
-@@ -1237,10 +1237,6 @@ static int atmel_aes_ctr_cra_init(struct crypto_tfm *tfm)
- 	return 0;
+diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
+index c61ca16096ca..81c70f9ce23c 100644
+--- a/drivers/crypto/ccp/psp-dev.c
++++ b/drivers/crypto/ccp/psp-dev.c
+@@ -186,7 +186,7 @@ static int __sev_platform_init_locked(struct sev_data_init *data, int *error)
+ 		return 0;
+ 
+ 	if (!data)
+-		data = psp->sev_init;
++		data = &psp->cmd_buf;
+ 
+ 	rc = __sev_do_cmd_locked(SEV_CMD_INIT, data, error);
+ 	if (rc)
+@@ -282,7 +282,7 @@ static void sev_exit(struct kref *ref)
+ 	misc_deregister(&misc_dev->misc);
  }
  
--static void atmel_aes_cra_exit(struct crypto_tfm *tfm)
--{
--}
--
- static struct crypto_alg aes_algs[] = {
+-static int sev_ops_init(struct psp_device *psp)
++static int sev_misc_init(struct psp_device *psp)
  {
- 	.cra_name		= "ecb(aes)",
-@@ -1253,7 +1249,6 @@ static struct crypto_alg aes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_aes_cra_init,
--	.cra_exit		= atmel_aes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= AES_MIN_KEY_SIZE,
- 		.max_keysize	= AES_MAX_KEY_SIZE,
-@@ -1273,7 +1268,6 @@ static struct crypto_alg aes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_aes_cra_init,
--	.cra_exit		= atmel_aes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= AES_MIN_KEY_SIZE,
- 		.max_keysize	= AES_MAX_KEY_SIZE,
-@@ -1294,7 +1288,6 @@ static struct crypto_alg aes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_aes_cra_init,
--	.cra_exit		= atmel_aes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= AES_MIN_KEY_SIZE,
- 		.max_keysize	= AES_MAX_KEY_SIZE,
-@@ -1315,7 +1308,6 @@ static struct crypto_alg aes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_aes_cra_init,
--	.cra_exit		= atmel_aes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= AES_MIN_KEY_SIZE,
- 		.max_keysize	= AES_MAX_KEY_SIZE,
-@@ -1336,7 +1328,6 @@ static struct crypto_alg aes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_aes_cra_init,
--	.cra_exit		= atmel_aes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= AES_MIN_KEY_SIZE,
- 		.max_keysize	= AES_MAX_KEY_SIZE,
-@@ -1357,7 +1348,6 @@ static struct crypto_alg aes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_aes_cra_init,
--	.cra_exit		= atmel_aes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= AES_MIN_KEY_SIZE,
- 		.max_keysize	= AES_MAX_KEY_SIZE,
-@@ -1378,7 +1368,6 @@ static struct crypto_alg aes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_aes_cra_init,
--	.cra_exit		= atmel_aes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= AES_MIN_KEY_SIZE,
- 		.max_keysize	= AES_MAX_KEY_SIZE,
-@@ -1399,7 +1388,6 @@ static struct crypto_alg aes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_aes_ctr_cra_init,
--	.cra_exit		= atmel_aes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= AES_MIN_KEY_SIZE,
- 		.max_keysize	= AES_MAX_KEY_SIZE,
-@@ -1422,7 +1410,6 @@ static struct crypto_alg aes_cfb64_alg = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_aes_cra_init,
--	.cra_exit		= atmel_aes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= AES_MIN_KEY_SIZE,
- 		.max_keysize	= AES_MAX_KEY_SIZE,
-@@ -1809,18 +1796,12 @@ static int atmel_aes_gcm_init(struct crypto_aead *tfm)
- 	return 0;
+ 	struct device *dev = psp->dev;
+ 	int ret;
+@@ -319,10 +319,6 @@ static int sev_ops_init(struct psp_device *psp)
+ 	if (!psp->sev_status)
+ 		return -ENOMEM;
+ 
+-	psp->sev_init = devm_kzalloc(dev, sizeof(*psp->sev_init), GFP_KERNEL);
+-	if (!psp->sev_init)
+-		return -ENOMEM;
+-
+ 	init_waitqueue_head(&psp->sev_int_queue);
+ 	psp->sev_misc = misc_dev;
+ 	dev_dbg(dev, "registered SEV device\n");
+@@ -338,7 +334,7 @@ static int sev_init(struct psp_device *psp)
+ 		return 1;
+ 	}
+ 
+-	return sev_ops_init(psp);
++	return sev_misc_init(psp);
  }
  
--static void atmel_aes_gcm_exit(struct crypto_aead *tfm)
--{
--
--}
--
- static struct aead_alg aes_gcm_alg = {
- 	.setkey		= atmel_aes_gcm_setkey,
- 	.setauthsize	= atmel_aes_gcm_setauthsize,
- 	.encrypt	= atmel_aes_gcm_encrypt,
- 	.decrypt	= atmel_aes_gcm_decrypt,
- 	.init		= atmel_aes_gcm_init,
--	.exit		= atmel_aes_gcm_exit,
- 	.ivsize		= GCM_AES_IV_SIZE,
- 	.maxauthsize	= AES_BLOCK_SIZE,
+ int psp_dev_init(struct sp_device *sp)
+diff --git a/drivers/crypto/ccp/psp-dev.h b/drivers/crypto/ccp/psp-dev.h
+index 2236d6749d2e..fa62ff50912b 100644
+--- a/drivers/crypto/ccp/psp-dev.h
++++ b/drivers/crypto/ccp/psp-dev.h
+@@ -77,7 +77,7 @@ struct psp_device {
+ 	wait_queue_head_t sev_int_queue;
+ 	struct sev_misc_dev *sev_misc;
+ 	struct sev_user_data_status *sev_status;
+-	struct sev_data_init *sev_init;
++	struct sev_data_init cmd_buf;
+ };
  
-@@ -1956,7 +1937,6 @@ static struct crypto_alg aes_xts_alg = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_aes_xts_cra_init,
--	.cra_exit		= atmel_aes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= 2 * AES_MIN_KEY_SIZE,
- 		.max_keysize	= 2 * AES_MAX_KEY_SIZE,
-diff --git a/drivers/crypto/atmel-tdes.c b/drivers/crypto/atmel-tdes.c
-index 0ece4b8..48e8653 100644
---- a/drivers/crypto/atmel-tdes.c
-+++ b/drivers/crypto/atmel-tdes.c
-@@ -911,10 +911,6 @@ static int atmel_tdes_cra_init(struct crypto_tfm *tfm)
- 	return 0;
- }
+ #endif /* __PSP_DEV_H */
+diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+index fb563248d9a9..d57cd7625a9f 100644
+--- a/include/linux/psp-sev.h
++++ b/include/linux/psp-sev.h
+@@ -626,11 +626,7 @@ sev_guest_activate(struct sev_data_activate *data, int *error) { return -ENODEV;
+ static inline int sev_guest_df_flush(int *error) { return -ENODEV; }
  
--static void atmel_tdes_cra_exit(struct crypto_tfm *tfm)
+ static inline int
+-sev_issue_cmd_external_user(struct file *filep,
+-			    unsigned int id, void *data, int *error)
 -{
+-	return -ENODEV;
 -}
--
- static struct crypto_alg tdes_algs[] = {
- {
- 	.cra_name		= "ecb(des)",
-@@ -927,7 +923,6 @@ static struct crypto_alg tdes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_tdes_cra_init,
--	.cra_exit		= atmel_tdes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= DES_KEY_SIZE,
- 		.max_keysize	= DES_KEY_SIZE,
-@@ -947,7 +942,6 @@ static struct crypto_alg tdes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_tdes_cra_init,
--	.cra_exit		= atmel_tdes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= DES_KEY_SIZE,
- 		.max_keysize	= DES_KEY_SIZE,
-@@ -968,7 +962,6 @@ static struct crypto_alg tdes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_tdes_cra_init,
--	.cra_exit		= atmel_tdes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= DES_KEY_SIZE,
- 		.max_keysize	= DES_KEY_SIZE,
-@@ -989,7 +982,6 @@ static struct crypto_alg tdes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_tdes_cra_init,
--	.cra_exit		= atmel_tdes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= DES_KEY_SIZE,
- 		.max_keysize	= DES_KEY_SIZE,
-@@ -1010,7 +1002,6 @@ static struct crypto_alg tdes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_tdes_cra_init,
--	.cra_exit		= atmel_tdes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= DES_KEY_SIZE,
- 		.max_keysize	= DES_KEY_SIZE,
-@@ -1031,7 +1022,6 @@ static struct crypto_alg tdes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_tdes_cra_init,
--	.cra_exit		= atmel_tdes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= DES_KEY_SIZE,
- 		.max_keysize	= DES_KEY_SIZE,
-@@ -1052,7 +1042,6 @@ static struct crypto_alg tdes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_tdes_cra_init,
--	.cra_exit		= atmel_tdes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= DES_KEY_SIZE,
- 		.max_keysize	= DES_KEY_SIZE,
-@@ -1073,7 +1062,6 @@ static struct crypto_alg tdes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_tdes_cra_init,
--	.cra_exit		= atmel_tdes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= 2 * DES_KEY_SIZE,
- 		.max_keysize	= 3 * DES_KEY_SIZE,
-@@ -1093,7 +1081,6 @@ static struct crypto_alg tdes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_tdes_cra_init,
--	.cra_exit		= atmel_tdes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= 2*DES_KEY_SIZE,
- 		.max_keysize	= 3*DES_KEY_SIZE,
-@@ -1114,7 +1101,6 @@ static struct crypto_alg tdes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_tdes_cra_init,
--	.cra_exit		= atmel_tdes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= 2*DES_KEY_SIZE,
- 		.max_keysize	= 2*DES_KEY_SIZE,
-@@ -1135,7 +1121,6 @@ static struct crypto_alg tdes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_tdes_cra_init,
--	.cra_exit		= atmel_tdes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= 2*DES_KEY_SIZE,
- 		.max_keysize	= 2*DES_KEY_SIZE,
-@@ -1156,7 +1141,6 @@ static struct crypto_alg tdes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_tdes_cra_init,
--	.cra_exit		= atmel_tdes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= 2*DES_KEY_SIZE,
- 		.max_keysize	= 2*DES_KEY_SIZE,
-@@ -1177,7 +1161,6 @@ static struct crypto_alg tdes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_tdes_cra_init,
--	.cra_exit		= atmel_tdes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= 2*DES_KEY_SIZE,
- 		.max_keysize	= 2*DES_KEY_SIZE,
-@@ -1198,7 +1181,6 @@ static struct crypto_alg tdes_algs[] = {
- 	.cra_type		= &crypto_ablkcipher_type,
- 	.cra_module		= THIS_MODULE,
- 	.cra_init		= atmel_tdes_cra_init,
--	.cra_exit		= atmel_tdes_cra_exit,
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= 2*DES_KEY_SIZE,
- 		.max_keysize	= 3*DES_KEY_SIZE,
++sev_issue_cmd_external_user(struct file *filep, unsigned int id, void *data, int *error) { return -ENODEV; }
+ 
+ #endif	/* CONFIG_CRYPTO_DEV_SP_PSP */
+ 
+
 -- 
-2.9.4
+Regards/Gruss,
+    Boris.
+
+Good mailing practices for 400: avoid top-posting and trim the reply.
