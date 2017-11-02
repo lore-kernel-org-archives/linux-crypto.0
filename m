@@ -1,63 +1,35 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH v2 3/3] staging: ccree: remove dead code
-Date: Thu,  2 Nov 2017 08:10:23 +0000
-Message-ID: <1509610224-14708-4-git-send-email-gilad@benyossef.com>
-References: <1509610224-14708-1-git-send-email-gilad@benyossef.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org,
- driverdev-devel@linuxdriverproject.org, linux-crypto@vger.kernel.org,
- Ofir Drang <ofir.drang@arm.com>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-In-Reply-To: <1509610224-14708-1-git-send-email-gilad@benyossef.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
-List-Id: linux-crypto.vger.kernel.org
+From: Salvatore Benedetto <salvatore.benedetto@intel.com>
+Subject: [PATCH] MAINTAINERS: update maintainer for qat
+Date: Thu,  2 Nov 2017 09:09:06 +0000
+Message-ID: <1509613746-13219-1-git-send-email-salvatore.benedetto@intel.com>
+Cc: salvatore.benedetto@intel.com, linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga05.intel.com ([192.55.52.43]:33245 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1754859AbdKBJJV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 2 Nov 2017 05:09:21 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The inflight_counter field is updated in a single location and
-never used. Remove it.
+Removing myself as I'm not longer following QAT development.
 
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+Signed-off-by: Salvatore Benedetto <salvatore.benedetto@intel.com>
 ---
- drivers/staging/ccree/ssi_cipher.c | 4 ----
- drivers/staging/ccree/ssi_driver.h | 1 -
- 2 files changed, 5 deletions(-)
+ MAINTAINERS | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/drivers/staging/ccree/ssi_cipher.c b/drivers/staging/ccree/ssi_cipher.c
-index 0b69103..ee85cbf 100644
---- a/drivers/staging/ccree/ssi_cipher.c
-+++ b/drivers/staging/ccree/ssi_cipher.c
-@@ -697,10 +697,6 @@ static int ssi_blkcipher_complete(struct device *dev,
- 	ssi_buffer_mgr_unmap_blkcipher_request(dev, req_ctx, ivsize, src, dst);
- 	kfree(req_ctx->iv);
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 92df4e8..1171da1 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -11009,7 +11009,6 @@ F:	drivers/mtd/nand/pxa3xx_nand.c
  
--	/*Decrease the inflight counter*/
--	if (ctx_p->flow_mode == BYPASS && ctx_p->drvdata->inflight_counter > 0)
--		ctx_p->drvdata->inflight_counter--;
--
- 	if (areq) {
- 		/*
- 		 * The crypto API expects us to set the req->info to the last
-diff --git a/drivers/staging/ccree/ssi_driver.h b/drivers/staging/ccree/ssi_driver.h
-index 488f665..e01c880 100644
---- a/drivers/staging/ccree/ssi_driver.h
-+++ b/drivers/staging/ccree/ssi_driver.h
-@@ -134,7 +134,6 @@ struct ssi_drvdata {
- 	void *fips_handle;
- 	void *ivgen_handle;
- 	void *sram_mgr_handle;
--	u32 inflight_counter;
- 	struct clk *clk;
- 	bool coherent;
- };
+ QAT DRIVER
+ M:	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+-M:	Salvatore Benedetto <salvatore.benedetto@intel.com>
+ L:	qat-linux@intel.com
+ S:	Supported
+ F:	drivers/crypto/qat/
 -- 
 2.7.4
