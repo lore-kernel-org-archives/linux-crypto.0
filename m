@@ -1,41 +1,54 @@
-From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: [PATCH 2/4] crypto: dh - don't permit 'p' to be 0
-Date: Thu, 2 Nov 2017 10:31:41 -0700
-Message-ID: <20171102173141.GB23035@gmail.com>
-References: <20171101222517.41602-1-ebiggers3@gmail.com>
- <20171101222517.41602-3-ebiggers3@gmail.com>
- <281c8d97-7d44-d157-5221-1487ec03a06f@microchip.com>
+From: Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [Part2 PATCH v7 13/38] crypto: ccp: Add Secure Encrypted
+ Virtualization (SEV) command support
+Date: Thu, 2 Nov 2017 12:32:39 -0500
+Message-ID: <1f54e39f-7e2b-26d0-2d22-b8ccbef67c3d@amd.com>
+References: <20171101211623.71496-1-brijesh.singh@amd.com>
+ <20171101211623.71496-14-brijesh.singh@amd.com>
+ <20171102171017.t7auzgm7zqp4ncjb@pd.tnic>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: brijesh.singh@amd.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        keyrings@vger.kernel.org,
-        Mat Martineau <mathew.j.martineau@linux.intel.com>,
-        Salvatore Benedetto <salvatore.benedetto@intel.com>,
-        Stephan Mueller <smueller@chronox.de>,
-        Eric Biggers <ebiggers@google.com>, stable@vger.kernel.org
-To: Tudor Ambarus <tudor.ambarus@microchip.com>
-Return-path: <stable-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <281c8d97-7d44-d157-5221-1487ec03a06f@microchip.com>
-Sender: stable-owner@vger.kernel.org
+        Gary Hook <gary.hook@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        linux-crypto@vger.kernel.org
+To: Borislav Petkov <bp@alien8.de>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20171102171017.t7auzgm7zqp4ncjb@pd.tnic>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Nov 02, 2017 at 01:40:51PM +0200, Tudor Ambarus wrote:
-> Hi, Eric,
-> 
-> On 11/02/2017 12:25 AM, Eric Biggers wrote:
-> >If 'p' is 0 for the software Diffie-Hellman implementation, then
-> >dh_max_size() returns 0.
-> 
-> dh_set_secret() returns -EINVAL if p_len < 1536, see
-> dh_check_params_length(). What am I missing?
-> 
-> Cheers,
-> ta
 
-You pass a buffer containing 0's, not a buffer of length 0.  The buffer is
-interpreted as an arbitrary precision integer, so any length buffer filled with
-0's has the mathematical value 0.
 
-Eric
+On 11/02/2017 12:10 PM, Borislav Petkov wrote:
+...
+
+>>   drivers/crypto/ccp/psp-dev.c | 350 +++++++++++++++++++++++++++++++++++++++++++
+>>   drivers/crypto/ccp/psp-dev.h |  24 +++
+>>   drivers/crypto/ccp/sp-dev.c  |   9 ++
+>>   drivers/crypto/ccp/sp-dev.h  |   4 +
+>>   include/linux/psp-sev.h      | 143 ++++++++++++++++++
+>>   5 files changed, 530 insertions(+)
+> 
+> Some more cleanups:
+> 
+> * If sev_data_init is per psp_device, you can simply embed it in the
+> struct psp_device and save yourself the complete allocation.
+> 
+> * s/sev_ops_init/sev_misc_init/ because it doesn't do anything ops-like
+> 
+> * save some header lines.
+> 
+
+
+Thanks for the cleanup patch, I will apply these changes. Additionally, 
+I will also embed the sev_user_data_platform_status in per psp_device 
+struct instead of dvmem_kzalloc().
+
+
+-Brijesh
