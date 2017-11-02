@@ -1,54 +1,58 @@
-From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [Part2 PATCH v7 13/38] crypto: ccp: Add Secure Encrypted
- Virtualization (SEV) command support
-Date: Thu, 2 Nov 2017 12:32:39 -0500
-Message-ID: <1f54e39f-7e2b-26d0-2d22-b8ccbef67c3d@amd.com>
-References: <20171101211623.71496-1-brijesh.singh@amd.com>
- <20171101211623.71496-14-brijesh.singh@amd.com>
- <20171102171017.t7auzgm7zqp4ncjb@pd.tnic>
+From: Eric Biggers <ebiggers3@gmail.com>
+Subject: Re: [PATCH 3/4] crypto: qat - fix double free of ctx->p
+Date: Thu, 2 Nov 2017 10:34:04 -0700
+Message-ID: <20171102173404.GC23035@gmail.com>
+References: <20171101222517.41602-1-ebiggers3@gmail.com>
+ <20171101222517.41602-4-ebiggers3@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: brijesh.singh@amd.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Gary Hook <gary.hook@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        linux-crypto@vger.kernel.org
-To: Borislav Petkov <bp@alien8.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20171102171017.t7auzgm7zqp4ncjb@pd.tnic>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: keyrings@vger.kernel.org,
+        Tudor-Dan Ambarus <tudor.ambarus@microchip.com>,
+        Mat Martineau <mathew.j.martineau@linux.intel.com>,
+        Salvatore Benedetto <salvatore.benedetto@intel.com>,
+        Stephan Mueller <smueller@chronox.de>,
+        Eric Biggers <ebiggers@google.com>, stable@vger.kernel.org
+To: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <stable-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20171101222517.41602-4-ebiggers3@gmail.com>
+Sender: stable-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-
-
-On 11/02/2017 12:10 PM, Borislav Petkov wrote:
-...
-
->>   drivers/crypto/ccp/psp-dev.c | 350 +++++++++++++++++++++++++++++++++++++++++++
->>   drivers/crypto/ccp/psp-dev.h |  24 +++
->>   drivers/crypto/ccp/sp-dev.c  |   9 ++
->>   drivers/crypto/ccp/sp-dev.h  |   4 +
->>   include/linux/psp-sev.h      | 143 ++++++++++++++++++
->>   5 files changed, 530 insertions(+)
+On Wed, Nov 01, 2017 at 03:25:16PM -0700, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
 > 
-> Some more cleanups:
+> When setting the secret with the "qat-dh" Diffie-Hellman implementation,
+> if allocating 'g' failed, then 'p' was freed twice: once immediately,
+> and once later when the crypto_kpp tfm was destroyed.  Fix it by using
+> qat_dh_clear_ctx() in the error paths, as that sets the pointers to
+> NULL.
 > 
-> * If sev_data_init is per psp_device, you can simply embed it in the
-> struct psp_device and save yourself the complete allocation.
+> Fixes: c9839143ebbf ("crypto: qat - Add DH support")
+> Cc: <stable@vger.kernel.org> # v4.8+
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+>  drivers/crypto/qat/qat_common/qat_asym_algs.c | 15 ++++++++-------
+>  1 file changed, 8 insertions(+), 7 deletions(-)
 > 
-> * s/sev_ops_init/sev_misc_init/ because it doesn't do anything ops-like
-> 
-> * save some header lines.
-> 
+> diff --git a/drivers/crypto/qat/qat_common/qat_asym_algs.c b/drivers/crypto/qat/qat_common/qat_asym_algs.c
+> index 6f5dd68449c6..7655fdb499de 100644
+> --- a/drivers/crypto/qat/qat_common/qat_asym_algs.c
+> +++ b/drivers/crypto/qat/qat_common/qat_asym_algs.c
+> @@ -462,11 +462,8 @@ static int qat_dh_set_params(struct qat_dh_ctx *ctx, struct dh *params)
+>  	}
+>  
+>  	ctx->g = dma_zalloc_coherent(dev, ctx->p_size, &ctx->dma_g, GFP_KERNEL);
+> -	if (!ctx->g) {
+> -		dma_free_coherent(dev, ctx->p_size, ctx->p, ctx->dma_p);
+> -		ctx->p = NULL;
+> +	if (!ctx->g)
 
+Sorry, I misread this code (and I didn't have the hardware to test this driver);
+there is actually no bug here because it sets ctx->p to NULL.
 
-Thanks for the cleanup patch, I will apply these changes. Additionally, 
-I will also embed the sev_user_data_platform_status in per psp_device 
-struct instead of dvmem_kzalloc().
+I think we should still do this patch to simplify the code, but I'll update the
+description to reflect that it's not actually fixing anything.
 
-
--Brijesh
+Eric
