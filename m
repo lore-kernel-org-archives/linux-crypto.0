@@ -1,71 +1,63 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH v2 2/3] staging: ccree: handle limiting of DMA masks
-Date: Thu,  2 Nov 2017 08:10:22 +0000
-Message-ID: <1509610224-14708-3-git-send-email-gilad@benyossef.com>
+Subject: [PATCH v2 3/3] staging: ccree: remove dead code
+Date: Thu,  2 Nov 2017 08:10:23 +0000
+Message-ID: <1509610224-14708-4-git-send-email-gilad@benyossef.com>
 References: <1509610224-14708-1-git-send-email-gilad@benyossef.com>
-Cc: Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
-        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
-        linux-kernel@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org,
+ driverdev-devel@linuxdriverproject.org, linux-crypto@vger.kernel.org,
+ Ofir Drang <ofir.drang@arm.com>
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
 In-Reply-To: <1509610224-14708-1-git-send-email-gilad@benyossef.com>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-Properly handle limiting of DMA masks based on device and bus
-capabilities.
+The inflight_counter field is updated in a single location and
+never used. Remove it.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/ssi_driver.c | 25 ++++++++++++++++++++-----
- 1 file changed, 20 insertions(+), 5 deletions(-)
+ drivers/staging/ccree/ssi_cipher.c | 4 ----
+ drivers/staging/ccree/ssi_driver.h | 1 -
+ 2 files changed, 5 deletions(-)
 
-diff --git a/drivers/staging/ccree/ssi_driver.c b/drivers/staging/ccree/ssi_driver.c
-index 5f03c25..1d4c7bb 100644
---- a/drivers/staging/ccree/ssi_driver.c
-+++ b/drivers/staging/ccree/ssi_driver.c
-@@ -208,6 +208,7 @@ static int init_cc_resources(struct platform_device *plat_dev)
- 	struct device *dev = &plat_dev->dev;
- 	struct device_node *np = dev->of_node;
- 	u32 signature_val;
-+	dma_addr_t dma_mask;
- 	int rc = 0;
+diff --git a/drivers/staging/ccree/ssi_cipher.c b/drivers/staging/ccree/ssi_cipher.c
+index 0b69103..ee85cbf 100644
+--- a/drivers/staging/ccree/ssi_cipher.c
++++ b/drivers/staging/ccree/ssi_cipher.c
+@@ -697,10 +697,6 @@ static int ssi_blkcipher_complete(struct device *dev,
+ 	ssi_buffer_mgr_unmap_blkcipher_request(dev, req_ctx, ivsize, src, dst);
+ 	kfree(req_ctx->iv);
  
- 	new_drvdata = devm_kzalloc(dev, sizeof(*new_drvdata), GFP_KERNEL);
-@@ -256,15 +257,29 @@ static int init_cc_resources(struct platform_device *plat_dev)
- 	}
- 	dev_dbg(dev, "Registered to IRQ: %d\n", new_drvdata->irq);
- 
-+	if (!plat_dev->dev.dma_mask)
-+		plat_dev->dev.dma_mask = &plat_dev->dev.coherent_dma_mask;
-+
-+	dma_mask = (dma_addr_t)(DMA_BIT_MASK(DMA_BIT_MASK_LEN));
-+	while (dma_mask > 0x7fffffffUL) {
-+		if (dma_supported(&plat_dev->dev, dma_mask)) {
-+			rc = dma_set_coherent_mask(&plat_dev->dev, dma_mask);
-+			if (!rc)
-+				break;
-+		}
-+		dma_mask >>= 1;
-+	}
-+
-+	if (rc) {
-+		dev_err(dev, "Error: failed in dma_set_mask, mask=%par\n",
-+			&dma_mask);
-+		goto post_drvdata_err;
-+	}
-+
- 	rc = cc_clk_on(new_drvdata);
- 	if (rc)
- 		goto post_drvdata_err;
- 
--	if (!dev->dma_mask)
--		dev->dma_mask = &dev->coherent_dma_mask;
+-	/*Decrease the inflight counter*/
+-	if (ctx_p->flow_mode == BYPASS && ctx_p->drvdata->inflight_counter > 0)
+-		ctx_p->drvdata->inflight_counter--;
 -
--	if (!dev->coherent_dma_mask)
--		dev->coherent_dma_mask = DMA_BIT_MASK(DMA_BIT_MASK_LEN);
- 
- 	/* Verify correct mapping */
- 	signature_val = CC_HAL_READ_REGISTER(CC_REG_OFFSET(HOST_RGF, HOST_SIGNATURE));
+ 	if (areq) {
+ 		/*
+ 		 * The crypto API expects us to set the req->info to the last
+diff --git a/drivers/staging/ccree/ssi_driver.h b/drivers/staging/ccree/ssi_driver.h
+index 488f665..e01c880 100644
+--- a/drivers/staging/ccree/ssi_driver.h
++++ b/drivers/staging/ccree/ssi_driver.h
+@@ -134,7 +134,6 @@ struct ssi_drvdata {
+ 	void *fips_handle;
+ 	void *ivgen_handle;
+ 	void *sram_mgr_handle;
+-	u32 inflight_counter;
+ 	struct clk *clk;
+ 	bool coherent;
+ };
 -- 
 2.7.4
