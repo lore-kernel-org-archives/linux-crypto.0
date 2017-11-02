@@ -1,79 +1,54 @@
-From: Florian Fainelli <f.fainelli@gmail.com>
-Subject: [PATCH 05/12] hwrng: bcm2835-rng: Use device managed helpers
-Date: Wed,  1 Nov 2017 18:04:01 -0700
-Message-ID: <20171102010408.27736-6-f.fainelli@gmail.com>
-References: <20171102010408.27736-1-f.fainelli@gmail.com>
-Cc: Florian Fainelli <f.fainelli@gmail.com>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Ray Jui <rjui@broadcom.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        bcm-kernel-feedback-list@broadcom.com (maintainer:BROADCOM
-        BCM281XX/BCM11XXX/BCM216XX ARM ARCHITE...),
-        Eric Anholt <eric@anholt.net>,
-        Stefan Wahren <stefan.wahren@i2se.com>,
-        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
-        Russell King <rmk+kernel@armlinux.org.uk>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Harald Freudenberger <freude@linux.vnet.ibm.com>,
-        Sean Wang <sean.wang@mediatek.com>,
-        Martin Kaiser <martin@kaiser.cx>,
-        Steffen Trumtrar <s.trumtrar@pengutronix.de>,
-        linux-crypto@vger.k
-To: linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20171102010408.27736-1-f.fainelli@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Eric Biggers <ebiggers3@gmail.com>
+Subject: Re: invalid opcode: 0000 [#1] SMP [aesni_intel]
+Date: Wed, 1 Nov 2017 21:33:04 -0700
+Message-ID: <20171102043304.GA560@zzz.localdomain>
+References: <CA++DawbkD6nioFR70ph1J26erZAwt74egm-pPDXJEHNt-QDAGw@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: SviMik <svimik@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pg0-f42.google.com ([74.125.83.42]:51917 "EHLO
+        mail-pg0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750704AbdKBEdI (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 2 Nov 2017 00:33:08 -0400
+Received: by mail-pg0-f42.google.com with SMTP id p9so4000375pgc.8
+        for <linux-crypto@vger.kernel.org>; Wed, 01 Nov 2017 21:33:08 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <CA++DawbkD6nioFR70ph1J26erZAwt74egm-pPDXJEHNt-QDAGw@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Now that we have moved the RNG disabling into a hwrng::cleanup callback,
-we can use the device managed registration operation and remove our
-remove callback since it won't do anything necessary.
+On Mon, Oct 23, 2017 at 07:01:32PM +0300, SviMik wrote:
+> Hi!
+> 
+> Got the following kernel panic:
+> 
+> invalid opcode: 0000 [#1] SMP
+> CPU: 0 PID: 1449 Comm: openvpn Not tainted 4.8.13-1.el6.elrepo.x86_64 #1
+> ----cut----
+> Call Trace:
+> <IRQ>
+> [<ffffffff810be15e>] ? enqueue_entity+0x45e/0x6f0
+> [<ffffffffa0104f25>] ? aesni_gcm_enc_avx+0x95/0xd0 [aesni_intel]
+> [<ffffffffa0105417>] helper_rfc4106_encrypt+0x167/0x2f0 [aesni_intel]
+> [<ffffffffa0104bfb>] rfc4106_encrypt+0x5b/0x90 [aesni_intel]
+> ----cut----
+> 
+> The detailed bug report with full oops dump can be found here:
+> https://bugzilla.kernel.org/show_bug.cgi?id=197363
+> 
+> Could not trigger this bug intentionally, but it happened three times
+> already (all three dumps are available).
 
-Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
----
- drivers/char/hw_random/bcm2835-rng.c | 13 +------------
- 1 file changed, 1 insertion(+), 12 deletions(-)
+Well, the program counter was at the 'vmovdqu' instruction, which is the first
+AVX instruction in the function.  Is it possible you're running the kernel on a
+broken hypervisor that claims AVX instructions are supported but really they
+aren't?  Note that AVX is different from AES-NI; the code being executed has
+both types of instructions.
 
-diff --git a/drivers/char/hw_random/bcm2835-rng.c b/drivers/char/hw_random/bcm2835-rng.c
-index 4d0356110b1b..67b9bd3be28d 100644
---- a/drivers/char/hw_random/bcm2835-rng.c
-+++ b/drivers/char/hw_random/bcm2835-rng.c
-@@ -138,7 +138,7 @@ static int bcm2835_rng_probe(struct platform_device *pdev)
- 		rng_setup(priv->base);
- 
- 	/* register driver */
--	err = hwrng_register(&priv->rng);
-+	err = devm_hwrng_register(dev, &priv->rng);
- 	if (err)
- 		dev_err(dev, "hwrng registration failed\n");
- 	else
-@@ -147,16 +147,6 @@ static int bcm2835_rng_probe(struct platform_device *pdev)
- 	return err;
- }
- 
--static int bcm2835_rng_remove(struct platform_device *pdev)
--{
--	struct bcm2835_rng_priv *priv = platform_get_drvdata(pdev);
--
--	/* unregister driver */
--	hwrng_unregister(&priv->rng);
--
--	return 0;
--}
--
- MODULE_DEVICE_TABLE(of, bcm2835_rng_of_match);
- 
- static struct platform_driver bcm2835_rng_driver = {
-@@ -165,7 +155,6 @@ static struct platform_driver bcm2835_rng_driver = {
- 		.of_match_table = bcm2835_rng_of_match,
- 	},
- 	.probe		= bcm2835_rng_probe,
--	.remove		= bcm2835_rng_remove,
- };
- module_platform_driver(bcm2835_rng_driver);
- 
--- 
-2.9.3
+(And as a side note, 4.8 is not being maintained as a long term support kernel,
+so you really should switch to a different version.)
+
+Eric
