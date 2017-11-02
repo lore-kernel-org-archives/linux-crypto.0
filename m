@@ -1,7 +1,7 @@
 From: Florian Fainelli <f.fainelli@gmail.com>
-Subject: [PATCH 10/12] dt-bindings: rng: Incorporate brcm,bcm6368.txt binding
-Date: Wed,  1 Nov 2017 18:04:06 -0700
-Message-ID: <20171102010408.27736-11-f.fainelli@gmail.com>
+Subject: [PATCH 11/12] hwrng: bcm2835-rng: Enable BCM2835 RNG to work on BCM63xx platforms
+Date: Wed,  1 Nov 2017 18:04:07 -0700
+Message-ID: <20171102010408.27736-12-f.fainelli@gmail.com>
 References: <20171102010408.27736-1-f.fainelli@gmail.com>
 Cc: Florian Fainelli <f.fainelli@gmail.com>,
         Matt Mackall <mpm@selenic.com>,
@@ -23,82 +23,89 @@ Cc: Florian Fainelli <f.fainelli@gmail.com>,
         Steffen Trumtrar <s.trumtrar@pengutronix.de>,
         linux-crypto@vger.k
 To: linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pg0-f68.google.com ([74.125.83.68]:48439 "EHLO
+        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934074AbdKBBEl (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 1 Nov 2017 21:04:41 -0400
 In-Reply-To: <20171102010408.27736-1-f.fainelli@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Since the same block is used on BCM2835 and BCM6368, merge the bindings
-and remove the brcm,bcm6368.txt binding document.
+We have now incorporated all necessary functionality for the BCM63xx
+platforms to successfully migrate over bcm2835-rng, so add the final
+bits: Kconfig selection and proper platform_device device type matching
+to keep the same platform device name for registration to work.
 
 Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
 ---
- .../devicetree/bindings/rng/brcm,bcm2835.txt       | 22 +++++++++++++++++++---
- .../devicetree/bindings/rng/brcm,bcm6368.txt       | 17 -----------------
- 2 files changed, 19 insertions(+), 20 deletions(-)
- delete mode 100644 Documentation/devicetree/bindings/rng/brcm,bcm6368.txt
+ drivers/char/hw_random/Kconfig       |  7 ++++---
+ drivers/char/hw_random/bcm2835-rng.c | 11 ++++++++++-
+ 2 files changed, 14 insertions(+), 4 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/rng/brcm,bcm2835.txt b/Documentation/devicetree/bindings/rng/brcm,bcm2835.txt
-index 26542690b578..627b29531a32 100644
---- a/Documentation/devicetree/bindings/rng/brcm,bcm2835.txt
-+++ b/Documentation/devicetree/bindings/rng/brcm,bcm2835.txt
-@@ -1,11 +1,19 @@
--BCM2835 Random number generator
-+BCM2835/6368 Random number generator
+diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+index 95a031e9eced..d0689cc8c7fc 100644
+--- a/drivers/char/hw_random/Kconfig
++++ b/drivers/char/hw_random/Kconfig
+@@ -87,12 +87,13 @@ config HW_RANDOM_BCM63XX
+ 	  If unusure, say Y.
  
- Required properties:
+ config HW_RANDOM_BCM2835
+-	tristate "Broadcom BCM2835 Random Number Generator support"
+-	depends on ARCH_BCM2835 || ARCH_BCM_NSP || ARCH_BCM_5301X
++	tristate "Broadcom BCM2835/BCM63xx Random Number Generator support"
++	depends on ARCH_BCM2835 || ARCH_BCM_NSP || ARCH_BCM_5301X || \
++		   ARCH_BCM_63XX || BCM63XX || BMIPS_GENERIC
+ 	default HW_RANDOM
+ 	---help---
+ 	  This driver provides kernel-side support for the Random Number
+-	  Generator hardware found on the Broadcom BCM2835 SoCs.
++	  Generator hardware found on the Broadcom BCM2835 and BCM63xx SoCs.
  
--- compatible : should be "brcm,bcm2835-rng"  or "brcm,bcm-nsp-rng" or
--  "brcm,bcm5301x-rng"
-+- compatible : should be one of
-+	"brcm,bcm2835-rng"
-+	"brcm,bcm-nsp-rng"
-+	"brcm,bcm5301x-rng" or
-+	"brcm,bcm6368-rng"
- - reg : Specifies base physical address and size of the registers.
- 
-+Optional properties:
-+
-+- clocks : phandle to clock-controller plus clock-specifier pair
-+- clock-names : "ipsec" as a clock name
-+
- Example:
- 
- rng {
-@@ -17,3 +25,11 @@ rng@18033000 {
- 	compatible = "brcm,bcm-nsp-rng";
- 	reg = <0x18033000 0x14>;
+ 	  To compile this driver as a module, choose M here: the
+ 	  module will be called bcm2835-rng
+diff --git a/drivers/char/hw_random/bcm2835-rng.c b/drivers/char/hw_random/bcm2835-rng.c
+index 650e0033c273..d9ffe14f312b 100644
+--- a/drivers/char/hw_random/bcm2835-rng.c
++++ b/drivers/char/hw_random/bcm2835-rng.c
+@@ -131,6 +131,7 @@ static const struct of_device_id bcm2835_rng_of_match[] = {
+ 	{ .compatible = "brcm,bcm2835-rng"},
+ 	{ .compatible = "brcm,bcm-nsp-rng", .data = &nsp_rng_of_data },
+ 	{ .compatible = "brcm,bcm5301x-rng", .data = &nsp_rng_of_data },
++	{ .compatible = "brcm,bcm6368-rng"},
+ 	{},
  };
-+
-+random: rng@10004180 {
-+	compatible = "brcm,bcm6368-rng";
-+	reg = <0x10004180 0x14>;
-+
-+	clocks = <&periph_clk 18>;
-+	clock-names = "ipsec";
+ 
+@@ -164,7 +165,7 @@ static int bcm2835_rng_probe(struct platform_device *pdev)
+ 	if (IS_ERR(priv->clk))
+ 		priv->clk = NULL;
+ 
+-	priv->rng.name = "bcm2835-rng";
++	priv->rng.name = pdev->id_entry->name;
+ 	priv->rng.init = bcm2835_rng_init;
+ 	priv->rng.read = bcm2835_rng_read;
+ 	priv->rng.cleanup = bcm2835_rng_cleanup;
+@@ -190,12 +191,20 @@ static int bcm2835_rng_probe(struct platform_device *pdev)
+ 
+ MODULE_DEVICE_TABLE(of, bcm2835_rng_of_match);
+ 
++static struct platform_device_id bcm2835_rng_devtype[] = {
++	{ .name = "bcm2835-rng" },
++	{ .name = "bcm63xx-rng" },
++	{ /* sentinel */ }
 +};
-diff --git a/Documentation/devicetree/bindings/rng/brcm,bcm6368.txt b/Documentation/devicetree/bindings/rng/brcm,bcm6368.txt
-deleted file mode 100644
-index 4b5ac600bfbd..000000000000
---- a/Documentation/devicetree/bindings/rng/brcm,bcm6368.txt
-+++ /dev/null
-@@ -1,17 +0,0 @@
--BCM6368 Random number generator
--
--Required properties:
--
--- compatible : should be "brcm,bcm6368-rng"
--- reg : Specifies base physical address and size of the registers
--- clocks : phandle to clock-controller plus clock-specifier pair
--- clock-names : "ipsec" as a clock name
--
--Example:
--	random: rng@10004180 {
--		compatible = "brcm,bcm6368-rng";
--		reg = <0x10004180 0x14>;
--
--		clocks = <&periph_clk 18>;
--		clock-names = "ipsec";
--	};
++MODULE_DEVICE_TABLE(platform, bcm2835_rng_devtype);
++
+ static struct platform_driver bcm2835_rng_driver = {
+ 	.driver = {
+ 		.name = "bcm2835-rng",
+ 		.of_match_table = bcm2835_rng_of_match,
+ 	},
+ 	.probe		= bcm2835_rng_probe,
++	.id_table	= bcm2835_rng_devtype,
+ };
+ module_platform_driver(bcm2835_rng_driver);
+ 
 -- 
 2.9.3
