@@ -1,67 +1,52 @@
 From: Tudor Ambarus <tudor.ambarus@microchip.com>
-Subject: Re: [PATCH] crypto: ccm - preserve the IV buffer
-Date: Thu, 2 Nov 2017 16:03:24 +0200
-Message-ID: <d43b27ea-17ce-57ec-86d8-449110283374@microchip.com>
-References: <20171031144235.22818-1-romain.izard.pro@gmail.com>
+Subject: [PATCH] crypto: ecdh - remove empty exit()
+Date: Thu, 2 Nov 2017 16:46:47 +0200
+Message-ID: <20171102144647.11847-1-tudor.ambarus@microchip.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-To: Romain Izard <romain.izard.pro@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>
+Content-Type: text/plain
+Cc: <linux-crypto@vger.kernel.org>,
+        Tudor Ambarus <tudor.ambarus@microchip.com>
+To: <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from esa6.microchip.iphmx.com ([216.71.154.253]:59595 "EHLO
+Received: from esa6.microchip.iphmx.com ([216.71.154.253]:5327 "EHLO
         esa6.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752657AbdKBOD3 (ORCPT
+        with ESMTP id S933411AbdKBOrA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Nov 2017 10:03:29 -0400
-In-Reply-To: <20171031144235.22818-1-romain.izard.pro@gmail.com>
-Content-Language: en-US
+        Thu, 2 Nov 2017 10:47:00 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Pointer members of an object with static storage duration, if not
+explicitly initialized, will be initialized to a NULL pointer. The crypto
+API checks if this pointer is not NULL before using it, we are safe to
+remove the function.
 
-On 10/31/2017 04:42 PM, Romain Izard wrote:
-> The IV buffer used during CCM operations is used twice, during both the
-> hashing step and the ciphering step.
-> 
-> When using a hardware accelerator that updates the contents of the IV
-> buffer at the end of ciphering operations, the value will be modified.
-> In the decryption case, the subsequent setup of the hashing algorithm
-> will interpret the updated IV instead of the original value, which can
-> lead to out-of-bounds writes.
-> 
-> Reuse the idata buffer, only used in the hashing step, to preserve the
-> IV's value during the ciphering step in the decryption case.
-> 
-> Signed-off-by: Romain Izard <romain.izard.pro@gmail.com>
-> ---
->   crypto/ccm.c | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/crypto/ccm.c b/crypto/ccm.c
-> index 1ce37ae0ce56..0a083342ec8c 100644
-> --- a/crypto/ccm.c
-> +++ b/crypto/ccm.c
-> @@ -363,7 +363,7 @@ static int crypto_ccm_decrypt(struct aead_request *req)
->   	unsigned int cryptlen = req->cryptlen;
->   	u8 *authtag = pctx->auth_tag;
->   	u8 *odata = pctx->odata;
-> -	u8 *iv = req->iv;
-> +	u8 *iv = pctx->idata;
->   	int err;
->   
->   	cryptlen -= authsize;
-> @@ -379,6 +379,8 @@ static int crypto_ccm_decrypt(struct aead_request *req)
->   	if (req->src != req->dst)
->   		dst = pctx->dst;
->   
-> +	memcpy(iv, req->iv, 16);
-> +
->   	skcipher_request_set_tfm(skreq, ctx->ctr);
->   	skcipher_request_set_callback(skreq, pctx->flags,
->   				      crypto_ccm_decrypt_done, req);
-> 
+Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
+---
+ crypto/ecdh.c | 6 ------
+ 1 file changed, 6 deletions(-)
 
-Reviewed-by: Tudor Ambarus <tudor.ambarus@microchip.com>
+diff --git a/crypto/ecdh.c b/crypto/ecdh.c
+index 4271fc7..3aca093 100644
+--- a/crypto/ecdh.c
++++ b/crypto/ecdh.c
+@@ -131,17 +131,11 @@ static unsigned int ecdh_max_size(struct crypto_kpp *tfm)
+ 	return ctx->ndigits << (ECC_DIGITS_TO_BYTES_SHIFT + 1);
+ }
+ 
+-static void no_exit_tfm(struct crypto_kpp *tfm)
+-{
+-	return;
+-}
+-
+ static struct kpp_alg ecdh = {
+ 	.set_secret = ecdh_set_secret,
+ 	.generate_public_key = ecdh_compute_value,
+ 	.compute_shared_secret = ecdh_compute_value,
+ 	.max_size = ecdh_max_size,
+-	.exit = no_exit_tfm,
+ 	.base = {
+ 		.cra_name = "ecdh",
+ 		.cra_driver_name = "ecdh-generic",
+-- 
+2.9.4
