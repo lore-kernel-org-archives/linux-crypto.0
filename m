@@ -1,101 +1,78 @@
-From: Florian Fainelli <f.fainelli-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH 01/12] hwrng: bcm2835-rng: Obtain base register via resource
-Date: Wed,  1 Nov 2017 18:03:57 -0700
-Message-ID: <20171102010408.27736-2-f.fainelli@gmail.com>
+From: Florian Fainelli <f.fainelli@gmail.com>
+Subject: [PATCH 04/12] hwrng: bcm2835-rng: Implementation cleanup callback
+Date: Wed,  1 Nov 2017 18:04:00 -0700
+Message-ID: <20171102010408.27736-5-f.fainelli@gmail.com>
 References: <20171102010408.27736-1-f.fainelli@gmail.com>
-Cc: Florian Fainelli <f.fainelli-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org>,
-        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
-        Ray Jui <rjui-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
-        Scott Branden <sbranden-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
-        bcm-kernel-feedback-list-dY08KVG/lbpWk0Htik3J/w@public.gmane.org (maintainer:BROADCOM
+Cc: Florian Fainelli <f.fainelli@gmail.com>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        bcm-kernel-feedback-list@broadcom.com (maintainer:BROADCOM
         BCM281XX/BCM11XXX/BCM216XX ARM ARCHITE...),
-        Eric Anholt <eric-WhKQ6XTQaPysTnJN9+BGXg@public.gmane.org>,
-        Stefan Wahren <stefan.wahren-eS4NqCHxEME@public.gmane.org>,
-        PrasannaKumar Muralidharan <prasannatsmkumar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        Russell King <rmk+kernel-I+IVW8TIWO2tmTQ+vhA3Yw@public.gmane.org>,
-        Krzysztof Kozlowski <krzk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        Harald Freudenberger <freude-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>,
-        Sean Wang <sean.wang-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>,
-        Martin Kaiser <martin-XxZfDwE/svGeZLLa646FqQ@public.gmane.org>,
-        Steffen Trumtrar <s.trumtrar-bIcnvbaLZ9MEGnE8C9+IrQ@public.gmane.org>,
+        Eric Anholt <eric@anholt.net>,
+        Stefan Wahren <stefan.wahren@i2se.com>,
+        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
+        Russell King <rmk+kernel@armlinux.org.uk>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Harald Freudenberger <freude@linux.vnet.ibm.com>,
+        Sean Wang <sean.wang@mediatek.com>,
+        Martin Kaiser <martin@kaiser.cx>,
+        Steffen Trumtrar <s.trumtrar@pengutronix.de>,
         linux-crypto@vger.k
-To: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20171102010408.27736-1-f.fainelli-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20171102010408.27736-1-f.fainelli@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-In preparation for consolidating bcm63xx-rng into bcm2835-rng, make sure
-that we obtain the base register via platform_get_resource() since we
-need to support the non-DT enabled MIPS-based BCM63xx DSL SoCs.
+We should be disabling the RNG in a hwrng::cleanup callback if we are
+not longer the system selected RNG, not wait until the device driver is
+removed.
 
-Signed-off-by: Florian Fainelli <f.fainelli-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
 ---
- drivers/char/hw_random/bcm2835-rng.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+ drivers/char/hw_random/bcm2835-rng.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/char/hw_random/bcm2835-rng.c b/drivers/char/hw_random/bcm2835-rng.c
-index 574211a49549..a818418a7e4c 100644
+index 82000a637504..4d0356110b1b 100644
 --- a/drivers/char/hw_random/bcm2835-rng.c
 +++ b/drivers/char/hw_random/bcm2835-rng.c
-@@ -81,21 +81,23 @@ static int bcm2835_rng_probe(struct platform_device *pdev)
- 	void (*rng_setup)(void __iomem *base);
- 	const struct of_device_id *rng_id;
- 	void __iomem *rng_base;
-+	struct resource *r;
- 	int err;
- 
-+	r = platform_get_resource(pdev, IORESOURCE_MEM, 0);
-+
- 	/* map peripheral */
--	rng_base = of_iomap(np, 0);
--	if (!rng_base) {
-+	rng_base = devm_ioremap_resource(dev, r);
-+	if (IS_ERR(rng_base)) {
- 		dev_err(dev, "failed to remap rng regs");
--		return -ENODEV;
-+		return PTR_ERR(rng_base);
- 	}
- 	bcm2835_rng_ops.priv = (unsigned long)rng_base;
- 
- 	rng_id = of_match_node(bcm2835_rng_of_match, np);
--	if (!rng_id) {
--		iounmap(rng_base);
-+	if (!rng_id)
- 		return -EINVAL;
--	}
-+
- 	/* Check for rng init function, execute it */
- 	rng_setup = rng_id->data;
- 	if (rng_setup)
-@@ -107,10 +109,9 @@ static int bcm2835_rng_probe(struct platform_device *pdev)
- 
- 	/* register driver */
- 	err = hwrng_register(&bcm2835_rng_ops);
--	if (err) {
-+	if (err)
- 		dev_err(dev, "hwrng registration failed\n");
--		iounmap(rng_base);
--	} else
-+	else
- 		dev_info(dev, "hwrng registered\n");
- 
- 	return err;
-@@ -125,7 +126,6 @@ static int bcm2835_rng_remove(struct platform_device *pdev)
- 
- 	/* unregister driver */
- 	hwrng_unregister(&bcm2835_rng_ops);
--	iounmap(rng_base);
- 
+@@ -83,6 +83,14 @@ static int bcm2835_rng_init(struct hwrng *rng)
  	return 0;
  }
+ 
++static void bcm2835_rng_cleanup(struct hwrng *rng)
++{
++	struct bcm2835_rng_priv *priv = to_rng_priv(rng);
++
++	/* disable rng hardware */
++	__raw_writel(0, priv->base + RNG_CTRL);
++}
++
+ static const struct of_device_id bcm2835_rng_of_match[] = {
+ 	{ .compatible = "brcm,bcm2835-rng"},
+ 	{ .compatible = "brcm,bcm-nsp-rng", .data = nsp_rng_init},
+@@ -118,6 +126,7 @@ static int bcm2835_rng_probe(struct platform_device *pdev)
+ 	priv->rng.name = "bcm2835-rng";
+ 	priv->rng.init = bcm2835_rng_init;
+ 	priv->rng.read = bcm2835_rng_read;
++	priv->rng.cleanup = bcm2835_rng_cleanup;
+ 
+ 	rng_id = of_match_node(bcm2835_rng_of_match, np);
+ 	if (!rng_id)
+@@ -142,9 +151,6 @@ static int bcm2835_rng_remove(struct platform_device *pdev)
+ {
+ 	struct bcm2835_rng_priv *priv = platform_get_drvdata(pdev);
+ 
+-	/* disable rng hardware */
+-	__raw_writel(0, priv->base + RNG_CTRL);
+-
+ 	/* unregister driver */
+ 	hwrng_unregister(&priv->rng);
+ 
 -- 
 2.9.3
-
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
