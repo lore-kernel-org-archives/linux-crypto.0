@@ -1,54 +1,83 @@
-From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: invalid opcode: 0000 [#1] SMP [aesni_intel]
-Date: Wed, 1 Nov 2017 21:33:04 -0700
-Message-ID: <20171102043304.GA560@zzz.localdomain>
-References: <CA++DawbkD6nioFR70ph1J26erZAwt74egm-pPDXJEHNt-QDAGw@mail.gmail.com>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: Re: [PATCH 2/3] staging: ccree: handle limiting of DMA masks
+Date: Thu, 2 Nov 2017 09:28:38 +0200
+Message-ID: <CAOtvUMcCOB0uipXhQqCUfdr5OT9hEite7oXoDpDdUFqCg0u-NA@mail.gmail.com>
+References: <1509450978-17784-1-git-send-email-gilad@benyossef.com>
+ <1509450978-17784-3-git-send-email-gilad@benyossef.com>
+ <20171101110918.f6ra2otu22jndjcc@mwanda>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: SviMik <svimik@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pg0-f42.google.com ([74.125.83.42]:51917 "EHLO
-        mail-pg0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750704AbdKBEdI (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Nov 2017 00:33:08 -0400
-Received: by mail-pg0-f42.google.com with SMTP id p9so4000375pgc.8
-        for <linux-crypto@vger.kernel.org>; Wed, 01 Nov 2017 21:33:08 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <CA++DawbkD6nioFR70ph1J26erZAwt74egm-pPDXJEHNt-QDAGw@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: devel@driverdev.osuosl.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ driverdev-devel@linuxdriverproject.org,
+ Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+ Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+ Ofir Drang <ofir.drang@arm.com>
+To: Dan Carpenter <dan.carpenter@oracle.com>
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+In-Reply-To: <20171101110918.f6ra2otu22jndjcc@mwanda>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Oct 23, 2017 at 07:01:32PM +0300, SviMik wrote:
-> Hi!
-> 
-> Got the following kernel panic:
-> 
-> invalid opcode: 0000 [#1] SMP
-> CPU: 0 PID: 1449 Comm: openvpn Not tainted 4.8.13-1.el6.elrepo.x86_64 #1
-> ----cut----
-> Call Trace:
-> <IRQ>
-> [<ffffffff810be15e>] ? enqueue_entity+0x45e/0x6f0
-> [<ffffffffa0104f25>] ? aesni_gcm_enc_avx+0x95/0xd0 [aesni_intel]
-> [<ffffffffa0105417>] helper_rfc4106_encrypt+0x167/0x2f0 [aesni_intel]
-> [<ffffffffa0104bfb>] rfc4106_encrypt+0x5b/0x90 [aesni_intel]
-> ----cut----
-> 
-> The detailed bug report with full oops dump can be found here:
-> https://bugzilla.kernel.org/show_bug.cgi?id=197363
-> 
-> Could not trigger this bug intentionally, but it happened three times
-> already (all three dumps are available).
+Hi,
 
-Well, the program counter was at the 'vmovdqu' instruction, which is the first
-AVX instruction in the function.  Is it possible you're running the kernel on a
-broken hypervisor that claims AVX instructions are supported but really they
-aren't?  Note that AVX is different from AES-NI; the code being executed has
-both types of instructions.
+Thank you for the review.
 
-(And as a side note, 4.8 is not being maintained as a long term support kernel,
-so you really should switch to a different version.)
+On Wed, Nov 1, 2017 at 1:09 PM, Dan Carpenter <dan.carpenter@oracle.com> wrote:
+> On Tue, Oct 31, 2017 at 11:56:16AM +0000, Gilad Ben-Yossef wrote:
+>>
+>> -     if (!dev->coherent_dma_mask)
+>> -             dev->coherent_dma_mask = DMA_BIT_MASK(DMA_BIT_MASK_LEN);
+>> +     if (rc) {
+>> +             dev_err(dev, "Error: failed in dma_set_mask, mask=%par\n",
+>> +                     &dma_mask);
+>> +             goto post_drvdata_err;
+>
+>
+> Also this is not the right goto.  We should be turning the clk off.
 
-Eric
+Yes, it's wrong. I think a better thing to do though is to check the
+DMA mask before turning the clock on, so the goto label
+is right, but the code location is wrong...
+
+>
+> I don't really care for the naming scheme, and I know you renamed it for
+> me already once and I feel bad for not liking it more.  It's still
+> really a come-from label name and doesn't say what the goto does...
+> Instead of post_clk_err, I wish it had names like "err_clk_off:".
+>
+
+> And in this case what it does is print a duplicative error message and
+> return.  :/  The goto post_drvdata_err: lines should just print their
+> own error messages if needed and return directly.  If there is no
+> cleanup then there is no need for a goto.
+>
+
+Both good points. I will address them in a later patch.
+
+
+> Anyway, that's not related to this patch.  Just resend it with
+> goto post_clk_err: in the v2.
+
+Will do.
+
+Thanks!
+
+Gilad
+
+
+-- 
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+"If you take a class in large-scale robotics, can you end up in a
+situation where the homework eats your dog?"
+ -- Jean-Baptiste Queru
