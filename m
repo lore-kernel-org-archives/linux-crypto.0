@@ -1,89 +1,94 @@
 From: Florian Fainelli <f.fainelli@gmail.com>
-Subject: [PATCH 03/12] hwrng: bcm2835-rng: Move enabling to hwrng::init
-Date: Wed,  1 Nov 2017 18:03:59 -0700
-Message-ID: <20171102010408.27736-4-f.fainelli@gmail.com>
+Subject: [PATCH 07/12] hwrng: bcm2835-rng: Manage an optional clock
+Date: Wed,  1 Nov 2017 18:04:03 -0700
+Message-ID: <20171102010408.27736-8-f.fainelli@gmail.com>
 References: <20171102010408.27736-1-f.fainelli@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Mark Rutland <mark.rutland@arm.com>, Stefan Wahren <stefan.wahren@i2se.com>,
- Florian Fainelli <f.fainelli@gmail.com>, Martin Kaiser <martin@kaiser.cx>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- Scott Branden <sbranden@broadcom.com>,
- "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
- <devicetree@vger.kernel.org>, Ray Jui <rjui@broadcom.com>,
- PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
- Harald Freudenberger <freude@linux.vnet.ibm.com>,
- Krzysztof Kozlowski <krzk@kernel.org>, Eric Anholt <eric@anholt.net>,
- Russell King <rmk+kernel@armlinux.org.uk>, Rob Herring <robh+dt@kernel.org>,
- "maintainer:BROADCOM BCM281XX/BCM11XXX/BCM216XX ARM ARCHITE..."
- <bcm-kernel-feedback-list@broadcom.com>,
- "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
- <linux-crypto@vger.kernel.org>, Sean Wang <sean.wang@mediatek.com>,
- Matt Mackall <mpm@selenic.com>, Steffen Trumtrar <s.
+Cc: Florian Fainelli <f.fainelli@gmail.com>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        bcm-kernel-feedback-list@broadcom.com (maintainer:BROADCOM
+        BCM281XX/BCM11XXX/BCM216XX ARM ARCHITE...),
+        Eric Anholt <eric@anholt.net>,
+        Stefan Wahren <stefan.wahren@i2se.com>,
+        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
+        Russell King <rmk+kernel@armlinux.org.uk>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Harald Freudenberger <freude@linux.vnet.ibm.com>,
+        Sean Wang <sean.wang@mediatek.com>,
+        Martin Kaiser <martin@kaiser.cx>,
+        Steffen Trumtrar <s.trumtrar@pengutronix.de>,
+        linux-crypto@vger.k
 To: linux-kernel@vger.kernel.org
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20171102010408.27736-1-f.fainelli@gmail.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-We should be moving the enabling of the HWRNG into a hwrng::init
-callback since we can be disabled and enabled every time a different
-hwrng is selected in the system.
+One of the last steps before bcm63xx-rng can be eliminated is to manage
+a clock during hwrng::init and hwrng::cleanup, so fetch it in the probe
+function, and manage it during these two steps when valid.
 
 Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
 ---
- drivers/char/hw_random/bcm2835-rng.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
+ drivers/char/hw_random/bcm2835-rng.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
 diff --git a/drivers/char/hw_random/bcm2835-rng.c b/drivers/char/hw_random/bcm2835-rng.c
-index 0d72147ab45b..82000a637504 100644
+index ed20e0b6b7ae..35928efb52e7 100644
 --- a/drivers/char/hw_random/bcm2835-rng.c
 +++ b/drivers/char/hw_random/bcm2835-rng.c
-@@ -72,6 +72,17 @@ static int bcm2835_rng_read(struct hwrng *rng, void *buf, size_t max,
- 	return num_words * sizeof(u32);
+@@ -15,6 +15,7 @@
+ #include <linux/of_platform.h>
+ #include <linux/platform_device.h>
+ #include <linux/printk.h>
++#include <linux/clk.h>
+ 
+ #define RNG_CTRL	0x0
+ #define RNG_STATUS	0x4
+@@ -33,6 +34,7 @@ struct bcm2835_rng_priv {
+ 	struct hwrng rng;
+ 	void __iomem *base;
+ 	bool mask_interrupts;
++	struct clk *clk;
+ };
+ 
+ static inline struct bcm2835_rng_priv *to_rng_priv(struct hwrng *rng)
+@@ -67,6 +69,11 @@ static int bcm2835_rng_init(struct hwrng *rng)
+ {
+ 	struct bcm2835_rng_priv *priv = to_rng_priv(rng);
+ 	u32 val;
++	int ret;
++
++	ret = clk_prepare_enable(priv->clk);
++	if (ret)
++		return ret;
+ 
+ 	if (priv->mask_interrupts) {
+ 		/* mask the interrupt */
+@@ -88,6 +95,8 @@ static void bcm2835_rng_cleanup(struct hwrng *rng)
+ 
+ 	/* disable rng hardware */
+ 	__raw_writel(0, priv->base + RNG_CTRL);
++
++	clk_disable_unprepare(priv->clk);
  }
  
-+static int bcm2835_rng_init(struct hwrng *rng)
-+{
-+	struct bcm2835_rng_priv *priv = to_rng_priv(rng);
-+
-+	/* set warm-up count & enable */
-+	__raw_writel(RNG_WARMUP_COUNT, priv->base + RNG_STATUS);
-+	__raw_writel(RNG_RBGEN, priv->base + RNG_CTRL);
-+
-+	return 0;
-+}
-+
- static const struct of_device_id bcm2835_rng_of_match[] = {
- 	{ .compatible = "brcm,bcm2835-rng"},
- 	{ .compatible = "brcm,bcm-nsp-rng", .data = nsp_rng_init},
-@@ -105,6 +116,7 @@ static int bcm2835_rng_probe(struct platform_device *pdev)
+ struct bcm2835_rng_of_data {
+@@ -130,6 +139,11 @@ static int bcm2835_rng_probe(struct platform_device *pdev)
+ 		return PTR_ERR(priv->base);
  	}
  
++	/* Clock is optional on most platforms */
++	priv->clk = devm_clk_get(dev, NULL);
++	if (IS_ERR(priv->clk))
++		priv->clk = NULL;
++
  	priv->rng.name = "bcm2835-rng";
-+	priv->rng.init = bcm2835_rng_init;
+ 	priv->rng.init = bcm2835_rng_init;
  	priv->rng.read = bcm2835_rng_read;
- 
- 	rng_id = of_match_node(bcm2835_rng_of_match, np);
-@@ -116,10 +128,6 @@ static int bcm2835_rng_probe(struct platform_device *pdev)
- 	if (rng_setup)
- 		rng_setup(priv->base);
- 
--	/* set warm-up count & enable */
--	__raw_writel(RNG_WARMUP_COUNT, priv->base + RNG_STATUS);
--	__raw_writel(RNG_RBGEN, priv->base + RNG_CTRL);
--
- 	/* register driver */
- 	err = hwrng_register(&priv->rng);
- 	if (err)
 -- 
 2.9.3
