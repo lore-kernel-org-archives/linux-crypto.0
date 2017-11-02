@@ -1,117 +1,244 @@
-From: Florian Fainelli <f.fainelli-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH 08/12] hwrng: bcm2835-rng: Abstract I/O accessors
-Date: Wed,  1 Nov 2017 18:04:04 -0700
-Message-ID: <20171102010408.27736-9-f.fainelli@gmail.com>
+From: Florian Fainelli <f.fainelli@gmail.com>
+Subject: [PATCH 12/12] hwrng: bcm63xx-rng: Remove since bcm2835-rng takes over
+Date: Wed,  1 Nov 2017 18:04:08 -0700
+Message-ID: <20171102010408.27736-13-f.fainelli@gmail.com>
 References: <20171102010408.27736-1-f.fainelli@gmail.com>
-Cc: Florian Fainelli <f.fainelli-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org>,
-        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
-        Ray Jui <rjui-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
-        Scott Branden <sbranden-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
-        bcm-kernel-feedback-list-dY08KVG/lbpWk0Htik3J/w@public.gmane.org (maintainer:BROADCOM
+Cc: Florian Fainelli <f.fainelli@gmail.com>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        bcm-kernel-feedback-list@broadcom.com (maintainer:BROADCOM
         BCM281XX/BCM11XXX/BCM216XX ARM ARCHITE...),
-        Eric Anholt <eric-WhKQ6XTQaPysTnJN9+BGXg@public.gmane.org>,
-        Stefan Wahren <stefan.wahren-eS4NqCHxEME@public.gmane.org>,
-        PrasannaKumar Muralidharan <prasannatsmkumar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        Russell King <rmk+kernel-I+IVW8TIWO2tmTQ+vhA3Yw@public.gmane.org>,
-        Krzysztof Kozlowski <krzk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        Harald Freudenberger <freude-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>,
-        Sean Wang <sean.wang-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>,
-        Martin Kaiser <martin-XxZfDwE/svGeZLLa646FqQ@public.gmane.org>,
-        Steffen Trumtrar <s.trumtrar-bIcnvbaLZ9MEGnE8C9+IrQ@public.gmane.org>,
+        Eric Anholt <eric@anholt.net>,
+        Stefan Wahren <stefan.wahren@i2se.com>,
+        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
+        Russell King <rmk+kernel@armlinux.org.uk>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Harald Freudenberger <freude@linux.vnet.ibm.com>,
+        Sean Wang <sean.wang@mediatek.com>,
+        Martin Kaiser <martin@kaiser.cx>,
+        Steffen Trumtrar <s.trumtrar@pengutronix.de>,
         linux-crypto@vger.k
-To: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20171102010408.27736-1-f.fainelli-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+To: linux-kernel@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pg0-f66.google.com ([74.125.83.66]:44028 "EHLO
+        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934131AbdKBBEo (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 1 Nov 2017 21:04:44 -0400
+In-Reply-To: <20171102010408.27736-1-f.fainelli@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-In preparation for allowing BCM63xx to use this driver, we abstract I/O
-accessors such that we can easily change those later on.
+bcm2835-rng is now capable of supporting the BCM63xx hardware, so remove
+the driver which duplicates the same functionality.
 
-Signed-off-by: Florian Fainelli <f.fainelli-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
 ---
- drivers/char/hw_random/bcm2835-rng.c | 27 +++++++++++++++++++--------
- 1 file changed, 19 insertions(+), 8 deletions(-)
+ drivers/char/hw_random/Kconfig       |  13 ---
+ drivers/char/hw_random/Makefile      |   1 -
+ drivers/char/hw_random/bcm63xx-rng.c | 154 -----------------------------------
+ 3 files changed, 168 deletions(-)
+ delete mode 100644 drivers/char/hw_random/bcm63xx-rng.c
 
-diff --git a/drivers/char/hw_random/bcm2835-rng.c b/drivers/char/hw_random/bcm2835-rng.c
-index 35928efb52e7..500275d55044 100644
---- a/drivers/char/hw_random/bcm2835-rng.c
-+++ b/drivers/char/hw_random/bcm2835-rng.c
-@@ -42,6 +42,17 @@ static inline struct bcm2835_rng_priv *to_rng_priv(struct hwrng *rng)
- 	return container_of(rng, struct bcm2835_rng_priv, rng);
- }
+diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+index d0689cc8c7fc..2d3775b9c0c7 100644
+--- a/drivers/char/hw_random/Kconfig
++++ b/drivers/char/hw_random/Kconfig
+@@ -73,19 +73,6 @@ config HW_RANDOM_ATMEL
  
-+static inline u32 rng_readl(struct bcm2835_rng_priv *priv, u32 offset)
-+{
-+	return readl(priv->base + offset);
-+}
-+
-+static inline void rng_writel(struct bcm2835_rng_priv *priv, u32 val,
-+			      u32 offset)
-+{
-+	writel(val, priv->base + offset);
-+}
-+
- static int bcm2835_rng_read(struct hwrng *rng, void *buf, size_t max,
- 			       bool wait)
- {
-@@ -49,18 +60,18 @@ static int bcm2835_rng_read(struct hwrng *rng, void *buf, size_t max,
- 	u32 max_words = max / sizeof(u32);
- 	u32 num_words, count;
+ 	  If unsure, say Y.
  
--	while ((__raw_readl(priv->base + RNG_STATUS) >> 24) == 0) {
-+	while ((rng_readl(priv, RNG_STATUS) >> 24) == 0) {
- 		if (!wait)
- 			return 0;
- 		cpu_relax();
- 	}
- 
--	num_words = readl(priv->base + RNG_STATUS) >> 24;
-+	num_words = rng_readl(priv, RNG_STATUS) >> 24;
- 	if (num_words > max_words)
- 		num_words = max_words;
- 
- 	for (count = 0; count < num_words; count++)
--		((u32 *)buf)[count] = readl(priv->base + RNG_DATA);
-+		((u32 *)buf)[count] = rng_readl(priv, RNG_DATA);
- 
- 	return num_words * sizeof(u32);
- }
-@@ -77,14 +88,14 @@ static int bcm2835_rng_init(struct hwrng *rng)
- 
- 	if (priv->mask_interrupts) {
- 		/* mask the interrupt */
--		val = readl(priv->base + RNG_INT_MASK);
-+		val = rng_readl(priv, RNG_INT_MASK);
- 		val |= RNG_INT_OFF;
--		writel(val, priv->base + RNG_INT_MASK);
-+		rng_writel(priv, val, RNG_INT_MASK);
- 	}
- 
- 	/* set warm-up count & enable */
--	__raw_writel(RNG_WARMUP_COUNT, priv->base + RNG_STATUS);
--	__raw_writel(RNG_RBGEN, priv->base + RNG_CTRL);
-+	rng_writel(priv, RNG_WARMUP_COUNT, RNG_STATUS);
-+	rng_writel(priv, RNG_RBGEN, RNG_CTRL);
- 
- 	return 0;
- }
-@@ -94,7 +105,7 @@ static void bcm2835_rng_cleanup(struct hwrng *rng)
- 	struct bcm2835_rng_priv *priv = to_rng_priv(rng);
- 
- 	/* disable rng hardware */
--	__raw_writel(0, priv->base + RNG_CTRL);
-+	rng_writel(priv, 0, RNG_CTRL);
- 
- 	clk_disable_unprepare(priv->clk);
- }
+-config HW_RANDOM_BCM63XX
+-	tristate "Broadcom BCM63xx Random Number Generator support"
+-	depends on BCM63XX || BMIPS_GENERIC
+-	default HW_RANDOM
+-	---help---
+-	  This driver provides kernel-side support for the Random Number
+-	  Generator hardware found on the Broadcom BCM63xx SoCs.
+-
+-	  To compile this driver as a module, choose M here: the
+-	  module will be called bcm63xx-rng
+-
+-	  If unusure, say Y.
+-
+ config HW_RANDOM_BCM2835
+ 	tristate "Broadcom BCM2835/BCM63xx Random Number Generator support"
+ 	depends on ARCH_BCM2835 || ARCH_BCM_NSP || ARCH_BCM_5301X || \
+diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Makefile
+index 39a67defac67..470ea14ed6b7 100644
+--- a/drivers/char/hw_random/Makefile
++++ b/drivers/char/hw_random/Makefile
+@@ -8,7 +8,6 @@ obj-$(CONFIG_HW_RANDOM_TIMERIOMEM) += timeriomem-rng.o
+ obj-$(CONFIG_HW_RANDOM_INTEL) += intel-rng.o
+ obj-$(CONFIG_HW_RANDOM_AMD) += amd-rng.o
+ obj-$(CONFIG_HW_RANDOM_ATMEL) += atmel-rng.o
+-obj-$(CONFIG_HW_RANDOM_BCM63XX)	+= bcm63xx-rng.o
+ obj-$(CONFIG_HW_RANDOM_GEODE) += geode-rng.o
+ obj-$(CONFIG_HW_RANDOM_N2RNG) += n2-rng.o
+ n2-rng-y := n2-drv.o n2-asm.o
+diff --git a/drivers/char/hw_random/bcm63xx-rng.c b/drivers/char/hw_random/bcm63xx-rng.c
+deleted file mode 100644
+index 5132c9cde50d..000000000000
+--- a/drivers/char/hw_random/bcm63xx-rng.c
++++ /dev/null
+@@ -1,154 +0,0 @@
+-/*
+- * Broadcom BCM63xx Random Number Generator support
+- *
+- * Copyright (C) 2011, Florian Fainelli <florian@openwrt.org>
+- * Copyright (C) 2009, Broadcom Corporation
+- *
+- */
+-#include <linux/module.h>
+-#include <linux/slab.h>
+-#include <linux/io.h>
+-#include <linux/err.h>
+-#include <linux/clk.h>
+-#include <linux/platform_device.h>
+-#include <linux/hw_random.h>
+-#include <linux/of.h>
+-
+-#define RNG_CTRL			0x00
+-#define RNG_EN				(1 << 0)
+-
+-#define RNG_STAT			0x04
+-#define RNG_AVAIL_MASK			(0xff000000)
+-
+-#define RNG_DATA			0x08
+-#define RNG_THRES			0x0c
+-#define RNG_MASK			0x10
+-
+-struct bcm63xx_rng_priv {
+-	struct hwrng rng;
+-	struct clk *clk;
+-	void __iomem *regs;
+-};
+-
+-#define to_rng_priv(rng)	container_of(rng, struct bcm63xx_rng_priv, rng)
+-
+-static int bcm63xx_rng_init(struct hwrng *rng)
+-{
+-	struct bcm63xx_rng_priv *priv = to_rng_priv(rng);
+-	u32 val;
+-	int error;
+-
+-	error = clk_prepare_enable(priv->clk);
+-	if (error)
+-		return error;
+-
+-	val = __raw_readl(priv->regs + RNG_CTRL);
+-	val |= RNG_EN;
+-	__raw_writel(val, priv->regs + RNG_CTRL);
+-
+-	return 0;
+-}
+-
+-static void bcm63xx_rng_cleanup(struct hwrng *rng)
+-{
+-	struct bcm63xx_rng_priv *priv = to_rng_priv(rng);
+-	u32 val;
+-
+-	val = __raw_readl(priv->regs + RNG_CTRL);
+-	val &= ~RNG_EN;
+-	__raw_writel(val, priv->regs + RNG_CTRL);
+-
+-	clk_disable_unprepare(priv->clk);
+-}
+-
+-static int bcm63xx_rng_data_present(struct hwrng *rng, int wait)
+-{
+-	struct bcm63xx_rng_priv *priv = to_rng_priv(rng);
+-
+-	return __raw_readl(priv->regs + RNG_STAT) & RNG_AVAIL_MASK;
+-}
+-
+-static int bcm63xx_rng_data_read(struct hwrng *rng, u32 *data)
+-{
+-	struct bcm63xx_rng_priv *priv = to_rng_priv(rng);
+-
+-	*data = __raw_readl(priv->regs + RNG_DATA);
+-
+-	return 4;
+-}
+-
+-static int bcm63xx_rng_probe(struct platform_device *pdev)
+-{
+-	struct resource *r;
+-	int ret;
+-	struct bcm63xx_rng_priv *priv;
+-
+-	r = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+-	if (!r) {
+-		dev_err(&pdev->dev, "no iomem resource\n");
+-		return -ENXIO;
+-	}
+-
+-	priv = devm_kzalloc(&pdev->dev, sizeof(*priv), GFP_KERNEL);
+-	if (!priv)
+-		return -ENOMEM;
+-
+-	priv->rng.name = pdev->name;
+-	priv->rng.init = bcm63xx_rng_init;
+-	priv->rng.cleanup = bcm63xx_rng_cleanup;
+-	priv->rng.data_present = bcm63xx_rng_data_present;
+-	priv->rng.data_read = bcm63xx_rng_data_read;
+-
+-	priv->clk = devm_clk_get(&pdev->dev, "ipsec");
+-	if (IS_ERR(priv->clk)) {
+-		ret = PTR_ERR(priv->clk);
+-		dev_err(&pdev->dev, "no clock for device: %d\n", ret);
+-		return ret;
+-	}
+-
+-	if (!devm_request_mem_region(&pdev->dev, r->start,
+-					resource_size(r), pdev->name)) {
+-		dev_err(&pdev->dev, "request mem failed");
+-		return -EBUSY;
+-	}
+-
+-	priv->regs = devm_ioremap_nocache(&pdev->dev, r->start,
+-					resource_size(r));
+-	if (!priv->regs) {
+-		dev_err(&pdev->dev, "ioremap failed");
+-		return -ENOMEM;
+-	}
+-
+-	ret = devm_hwrng_register(&pdev->dev, &priv->rng);
+-	if (ret) {
+-		dev_err(&pdev->dev, "failed to register rng device: %d\n",
+-			ret);
+-		return ret;
+-	}
+-
+-	dev_info(&pdev->dev, "registered RNG driver\n");
+-
+-	return 0;
+-}
+-
+-#ifdef CONFIG_OF
+-static const struct of_device_id bcm63xx_rng_of_match[] = {
+-	{ .compatible = "brcm,bcm6368-rng", },
+-	{},
+-};
+-MODULE_DEVICE_TABLE(of, bcm63xx_rng_of_match);
+-#endif
+-
+-static struct platform_driver bcm63xx_rng_driver = {
+-	.probe		= bcm63xx_rng_probe,
+-	.driver		= {
+-		.name	= "bcm63xx-rng",
+-		.of_match_table = of_match_ptr(bcm63xx_rng_of_match),
+-	},
+-};
+-
+-module_platform_driver(bcm63xx_rng_driver);
+-
+-MODULE_AUTHOR("Florian Fainelli <florian@openwrt.org>");
+-MODULE_DESCRIPTION("Broadcom BCM63xx RNG driver");
+-MODULE_LICENSE("GPL");
 -- 
 2.9.3
-
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
