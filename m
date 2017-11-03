@@ -1,77 +1,68 @@
-From: Tudor Ambarus <tudor.ambarus@microchip.com>
-Subject: Re: [PATCH 2/4] crypto: dh - don't permit 'p' to be 0
-Date: Fri, 3 Nov 2017 08:23:54 +0200
-Message-ID: <266fef32-b622-7bca-038e-4e0f2ed04951@microchip.com>
-References: <20171101222517.41602-1-ebiggers3@gmail.com>
- <20171101222517.41602-3-ebiggers3@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: <keyrings@vger.kernel.org>,
-        Mat Martineau <mathew.j.martineau@linux.intel.com>,
-        Salvatore Benedetto <salvatore.benedetto@intel.com>,
-        Stephan Mueller <smueller@chronox.de>,
-        Eric Biggers <ebiggers@google.com>, <stable@vger.kernel.org>
-To: Eric Biggers <ebiggers3@gmail.com>, <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <20171101222517.41602-3-ebiggers3@gmail.com>
-Content-Language: en-US
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Jim Quigley <Jim.Quigley@oracle.com>
+Subject: virtio:rng: Virtio RNG devices need to be re-registered after suspend/resume
+Date: Fri,  3 Nov 2017 09:57:21 +0000
+Message-ID: <1509703041-6281-1-git-send-email-Jim.Quigley@oracle.com>
+Cc: linux-crypto@vger.kernel.org
+To: mpm@selenic.com, herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from userp1040.oracle.com ([156.151.31.81]:17185 "EHLO
+        userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750883AbdKCJ6B (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 3 Nov 2017 05:58:01 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
+The patch for
 
+commit: 5c06273401f2eb7b290cadbae18ee00f8f65e893
+Author: Amit Shah <amit.shah@redhat.com>
+Date:   Sun Jul 27 07:34:01 2014 +0930
 
-On 11/02/2017 12:25 AM, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
-> 
-> If 'p' is 0 for the software Diffie-Hellman implementation, then
-> dh_max_size() returns 0.  In the case of KEYCTL_DH_COMPUTE, this causes
-> ZERO_SIZE_POINTER to be passed to sg_init_one(), which with
-> CONFIG_DEBUG_SG=y triggers the 'BUG_ON(!virt_addr_valid(buf));' in
-> sg_set_buf().
-> 
-> Fix this by making crypto_dh_decode_key() reject 0 for 'p'.  p=0 makes
-> no sense for any DH implementation because 'p' is supposed to be a prime
-> number.  Moreover, 'mod 0' is not mathematically defined.
-> 
-> Bug report:
-> 
->      kernel BUG at ./include/linux/scatterlist.h:140!
->      invalid opcode: 0000 [#1] SMP KASAN
->      CPU: 0 PID: 27112 Comm: syz-executor2 Not tainted 4.14.0-rc7-00010-gf5dbb5d0ce32-dirty #7
->      Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.3-20171021_125229-anatol 04/01/2014
->      task: ffff88006caac0c0 task.stack: ffff88006c7c8000
->      RIP: 0010:sg_set_buf include/linux/scatterlist.h:140 [inline]
->      RIP: 0010:sg_init_one+0x1b3/0x240 lib/scatterlist.c:156
->      RSP: 0018:ffff88006c7cfb08 EFLAGS: 00010216
->      RAX: 0000000000010000 RBX: ffff88006c7cfe30 RCX: 00000000000064ee
->      RDX: ffffffff81cf64c3 RSI: ffffc90000d72000 RDI: ffffffff92e937e0
->      RBP: ffff88006c7cfb30 R08: ffffed000d8f9fab R09: ffff88006c7cfd30
->      R10: 0000000000000005 R11: ffffed000d8f9faa R12: ffff88006c7cfd30
->      R13: 0000000000000000 R14: 0000000000000010 R15: ffff88006c7cfc50
->      FS:  00007fce190fa700(0000) GS:ffff88003ea00000(0000) knlGS:0000000000000000
->      CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->      CR2: 00007fffc6b33db8 CR3: 000000003cf64000 CR4: 00000000000006f0
->      Call Trace:
->       __keyctl_dh_compute+0xa95/0x19b0 security/keys/dh.c:360
->       keyctl_dh_compute+0xac/0x100 security/keys/dh.c:434
->       SYSC_keyctl security/keys/keyctl.c:1745 [inline]
->       SyS_keyctl+0x72/0x2c0 security/keys/keyctl.c:1641
->       entry_SYSCALL_64_fastpath+0x1f/0xbe
->      RIP: 0033:0x4585c9
->      RSP: 002b:00007fce190f9bd8 EFLAGS: 00000216 ORIG_RAX: 00000000000000fa
->      RAX: ffffffffffffffda RBX: 0000000000738020 RCX: 00000000004585c9
->      RDX: 000000002000d000 RSI: 0000000020000ff4 RDI: 0000000000000017
->      RBP: 0000000000000046 R08: 0000000020008000 R09: 0000000000000000
->      R10: 0000000000000000 R11: 0000000000000216 R12: 00007fff6e610cde
->      R13: 00007fff6e610cdf R14: 00007fce190fa700 R15: 0000000000000000
->      Code: 03 0f b6 14 02 48 89 f8 83 e0 07 83 c0 03 38 d0 7c 04 84 d2 75 33 5b 45 89 6c 24 14 41 5c 41 5d 41 5e 41 5f 5d c3 e8 fd 8f 68 ff <0f> 0b e8 f6 8f 68 ff 0f 0b e8 ef 8f 68 ff 0f 0b e8 e8 8f 68 ff 20
->      RIP: sg_set_buf include/linux/scatterlist.h:140 [inline] RSP: ffff88006c7cfb08
->      RIP: sg_init_one+0x1b3/0x240 lib/scatterlist.c:156 RSP: ffff88006c7cfb08
-> 
-> Fixes: 802c7f1c84e4 ("crypto: dh - Add DH software implementation")
-> Cc: <stable@vger.kernel.org> # v4.8+
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
+    virtio: rng: delay hwrng_register() till driver is ready
 
-Reviewed-by: Tudor Ambarus <tudor.ambarus@microchip.com>
+moved the call to hwrng_register() out of the probe routine into the scan
+routine. We need to call hwrng_register() after a suspend/restore cycle
+to re-register the device, but the scan function is not invoked for the
+restore. Add the call to hwrng_register() to virtio_restore().
+
+Reviewed-by: Liam Merwick <Liam.Merwick@oracle.com>
+Signed-off-by: Jim Quigley <Jim.Quigley@oracle.com>
+---
+ drivers/char/hw_random/virtio-rng.c | 21 ++++++++++++++++++++-
+ 1 file changed, 20 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/char/hw_random/virtio-rng.c b/drivers/char/hw_random/virtio-rng.c
+index 3fa2f8a..b89df66 100644
+--- a/drivers/char/hw_random/virtio-rng.c
++++ b/drivers/char/hw_random/virtio-rng.c
+@@ -184,7 +184,26 @@ static int virtrng_freeze(struct virtio_device *vdev)
+ 
+ static int virtrng_restore(struct virtio_device *vdev)
+ {
+-	return probe_common(vdev);
++	int err;
++
++	err = probe_common(vdev);
++	if (!err) {
++		struct virtrng_info *vi = vdev->priv;
++
++		/*
++		 * Set hwrng_removed to ensure that virtio_read()
++		 * does not block waiting for data before the
++		 * registration is complete.
++		 */
++		vi->hwrng_removed = true;
++		err = hwrng_register(&vi->hwrng);
++		if (!err) {
++			vi->hwrng_register_done = true;
++			vi->hwrng_removed = false;
++		}
++	}
++
++	return err;
+ }
+ #endif
+ 
+-- 
+1.8.3.1
