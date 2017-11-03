@@ -1,41 +1,28 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: ccm - preserve the IV buffer
-Date: Fri, 3 Nov 2017 21:43:07 +0800
-Message-ID: <20171103134307.GB8811@gondor.apana.org.au>
-References: <20171031144235.22818-1-romain.izard.pro@gmail.com>
+Subject: Re: [PATCH v2 1/7] crypto:chelsio: Remove unused parameter
+Date: Fri, 3 Nov 2017 22:21:34 +0800
+Message-ID: <20171103142134.GA9011@gondor.apana.org.au>
+References: <cover.1507449374.git.harsh@chelsio.com>
+ <6684d047aa37a73f4a614c47c74551e266b8cd00.1507449374.git.harsh@chelsio.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S . Miller" <davem@davemloft.net>,
-        Tudor Ambarus <tudor.ambarus@microchip.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Romain Izard <romain.izard.pro@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:37986 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756312AbdKCNne (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 3 Nov 2017 09:43:34 -0400
+Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+        Yeshaswi M R Gowda <yeshaswi@chelsio.com>
+To: Harsh Jain <harsh@chelsio.com>
+Return-path: <netdev-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20171031144235.22818-1-romain.izard.pro@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <6684d047aa37a73f4a614c47c74551e266b8cd00.1507449374.git.harsh@chelsio.com>
+Sender: netdev-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Oct 31, 2017 at 03:42:35PM +0100, Romain Izard wrote:
-> The IV buffer used during CCM operations is used twice, during both the
-> hashing step and the ciphering step.
+On Sun, Oct 08, 2017 at 01:37:18PM +0530, Harsh Jain wrote:
+> From: Yeshaswi M R Gowda <yeshaswi@chelsio.com>
 > 
-> When using a hardware accelerator that updates the contents of the IV
-> buffer at the end of ciphering operations, the value will be modified.
-> In the decryption case, the subsequent setup of the hashing algorithm
-> will interpret the updated IV instead of the original value, which can
-> lead to out-of-bounds writes.
+> Remove unused parameter sent to latest fw.
 > 
-> Reuse the idata buffer, only used in the hashing step, to preserve the
-> IV's value during the ciphering step in the decryption case.
-> 
-> Signed-off-by: Romain Izard <romain.izard.pro@gmail.com>
+> Signed-off-by: Harsh Jain <harsh@chelsio.com>
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
