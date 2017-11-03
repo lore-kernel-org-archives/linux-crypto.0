@@ -1,33 +1,35 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] hw_random: core: Reset user selected rng by writing ""
- to rng_current
-Date: Fri, 3 Nov 2017 22:28:11 +0800
-Message-ID: <20171103142811.GS9011@gondor.apana.org.au>
-References: <20171027170404.21262-1-prasannatsmkumar@gmail.com>
+Subject: Re: [PATCH v8 0/2] crypto: s5p-sss: Add HASH support for Exynos
+Date: Fri, 3 Nov 2017 22:28:00 +0800
+Message-ID: <20171103142800.GR9011@gondor.apana.org.au>
+References: <CGME20171025152754eucas1p2854a8c48544949585dcbfdd0286ad499@eucas1p2.samsung.com>
+ <20171025152735.11382-1-k.konieczny@partner.samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: mpm@selenic.com, freude@linux.vnet.ibm.com,
-        linux-crypto@vger.kernel.org
-To: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:38364 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750794AbdKCO2k (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 3 Nov 2017 10:28:40 -0400
+Cc: linux-crypto@vger.kernel.org,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Vladimir Zapolskiy <vz@mleia.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Kamil Konieczny <k.konieczny@partner.samsung.com>
+Return-path: <linux-samsung-soc-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20171027170404.21262-1-prasannatsmkumar@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20171025152735.11382-1-k.konieczny@partner.samsung.com>
+Sender: linux-samsung-soc-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Oct 27, 2017 at 10:34:04PM +0530, PrasannaKumar Muralidharan wrote:
-> User is able to select a chosen rng by writing its name to rng_current
-> but there is no way to reset it without unbinding the rng. Let user
-> write "" to rng_current and delesect the chosen rng.
+On Wed, Oct 25, 2017 at 05:27:33PM +0200, Kamil Konieczny wrote:
+> First patch change spaces to tabs, second adds HASH support for Exynos.
+> Changes:
 > 
-> Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+> version 8:
+> - fixes suggested by Vladimir Zapolskiy: drop first condition check in 
+>   s5p_hash_import, delete unused include delay.h, fix typo in commit
+>   message, fix descriptions of struct s5p_hash_reqctx and function
+>   s5p_hash_final()
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
