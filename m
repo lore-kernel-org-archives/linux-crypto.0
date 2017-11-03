@@ -1,73 +1,30 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v10 00/20] simplify crypto wait for async op
-Date: Fri, 3 Nov 2017 22:25:29 +0800
-Message-ID: <20171103142528.GL9011@gondor.apana.org.au>
-References: <1508310057-25369-1-git-send-email-gilad@benyossef.com>
+Subject: Re: [PATCH 3/3] crypto: atmel-aes/tdes/sha - remove useless irq init
+Date: Fri, 3 Nov 2017 22:27:05 +0800
+Message-ID: <20171103142705.GN9011@gondor.apana.org.au>
+References: <20171023153441.28825-1-tudor.ambarus@microchip.com>
+ <20171023153441.28825-3-tudor.ambarus@microchip.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Mike Snitzer <snitzer@redhat.com>, linux-doc@vger.kernel.org,
-	Gary Hook <gary.hook@amd.com>,
-	David Howells <dhowells@redhat.com>, dm-devel@redhat.com,
-	keyrings@vger.kernel.org, linux-ima-devel@lists.sourceforge.net,
-	Alasdair Kergon <agk@redhat.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Boris Brezillon <boris.brezillon@free-electrons.com>,
-	Jonathan Corbet <corbet@lwn.net>, Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-	Mimi Zohar <zohar@linux.vnet.ibm.com>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	linux-cifs@vger.kernel.org, linux-ima-user@lists.sourceforge.net,
-	Arnaud Ebalard <arno@natisbad.org>, linux-fscrypt@vger.kernel.org,
-	linux-mediatek@lists.infradead.org,
-	James Morris <james.l.morris@oracle.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	Jaegeuk Kim <jaegeuk@kernel.org>, linux-arm-kernel@lists.infradead.org,
-	Ofir Dra
-To: Gilad Ben-Yossef <gilad@benyossef.com>
-Return-path: <dm-devel-bounces@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, nicolas.ferre@microchip.com
+To: Tudor Ambarus <tudor.ambarus@microchip.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:38290 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933449AbdKCO13 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 3 Nov 2017 10:27:29 -0400
 Content-Disposition: inline
-In-Reply-To: <1508310057-25369-1-git-send-email-gilad@benyossef.com>
-List-Unsubscribe: <https://www.redhat.com/mailman/options/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
-List-Archive: <https://www.redhat.com/archives/dm-devel>
-List-Post: <mailto:dm-devel@redhat.com>
-List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
-List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=subscribe>
-Sender: dm-devel-bounces@redhat.com
-Errors-To: dm-devel-bounces@redhat.com
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20171023153441.28825-3-tudor.ambarus@microchip.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Oct 18, 2017 at 08:00:32AM +0100, Gilad Ben-Yossef wrote:
-> Many users of kernel async. crypto services have a pattern of
-> starting an async. crypto op and than using a completion
-> to wait for it to end.
+On Mon, Oct 23, 2017 at 06:34:41PM +0300, Tudor Ambarus wrote:
+> irq would be set to -1 and then unused, if we failed to get IORESOURCE_MEM.
 > 
-> This patch set simplifies this common use case in two ways:
-> 
-> First, by separating the return codes of the case where a
-> request is queued to a backlog due to the provider being
-> busy (-EBUSY) from the case the request has failed due
-> to the provider being busy and backlogging is not enabled
-> (-ENOSPC).
-> 
-> Next, this change is than built on to create a generic API
-> to wait for a async. crypto operation to complete.
-> 
-> The end result is a smaller code base and an API that is
-> easier to use and more difficult to get wrong.
-> 
-> The patch set was boot tested on x86_64 and arm64 which
-> at the very least tests the crypto users via testmgr and
-> tcrypt but I do note that I do not have access to some
-> of the HW whose drivers are modified nor do I claim I was
-> able to test all of the corner cases.
-> 
-> The patch set is based upon linux-next release tagged
-> next-20171017.
+> Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
