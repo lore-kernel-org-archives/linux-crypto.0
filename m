@@ -1,28 +1,35 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 1/7] crypto:chelsio: Remove unused parameter
-Date: Fri, 3 Nov 2017 22:21:34 +0800
-Message-ID: <20171103142134.GA9011@gondor.apana.org.au>
-References: <cover.1507449374.git.harsh@chelsio.com>
- <6684d047aa37a73f4a614c47c74551e266b8cd00.1507449374.git.harsh@chelsio.com>
+Subject: Re: [PATCH] crypto: tcrypt: mark expected switch fall-throughs in
+ do_test()
+Date: Fri, 3 Nov 2017 22:21:58 +0800
+Message-ID: <20171103142158.GB9011@gondor.apana.org.au>
+References: <20171009194321.GA10239@embeddedor.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-        Yeshaswi M R Gowda <yeshaswi@chelsio.com>
-To: Harsh Jain <harsh@chelsio.com>
-Return-path: <netdev-owner@vger.kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:38058 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751780AbdKCOW3 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 3 Nov 2017 10:22:29 -0400
 Content-Disposition: inline
-In-Reply-To: <6684d047aa37a73f4a614c47c74551e266b8cd00.1507449374.git.harsh@chelsio.com>
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20171009194321.GA10239@embeddedor.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Oct 08, 2017 at 01:37:18PM +0530, Harsh Jain wrote:
-> From: Yeshaswi M R Gowda <yeshaswi@chelsio.com>
+On Mon, Oct 09, 2017 at 02:43:21PM -0500, Gustavo A. R. Silva wrote:
+> In preparation to enabling -Wimplicit-fallthrough, mark switch cases
+> where we are expecting to fall through.
 > 
-> Remove unused parameter sent to latest fw.
-> 
-> Signed-off-by: Harsh Jain <harsh@chelsio.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: linux-crypto@vger.kernel.org
+> Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
