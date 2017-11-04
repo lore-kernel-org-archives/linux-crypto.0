@@ -1,134 +1,64 @@
-From: Stefan Wahren <stefan.wahren@i2se.com>
-Subject: Re: [PATCH 11/12] hwrng: bcm2835-rng: Enable BCM2835 RNG to work on
- BCM63xx platforms
-Date: Sat, 4 Nov 2017 19:27:58 +0100 (CET)
-Message-ID: <1831955836.132229.1509820078271@email.1und1.de>
+From: Andrew Lunn <andrew-g2DYL2Zd6BY@public.gmane.org>
+Subject: Re: [PATCH 07/12] hwrng: bcm2835-rng: Manage an optional clock
+Date: Sat, 4 Nov 2017 20:37:31 +0100
+Message-ID: <20171104193731.GA751@lunn.ch>
 References: <20171102010408.27736-1-f.fainelli@gmail.com>
- <20171102010408.27736-12-f.fainelli@gmail.com>
+ <20171102010408.27736-8-f.fainelli@gmail.com>
+ <944505791.223880.1509803454887@email.1und1.de>
+ <e12063f9-86e4-e9ce-2a7f-f85fe2ce352f@gmail.com>
+ <547786283.132202.1509819754396@email.1und1.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Mark Rutland <mark.rutland@arm.com>,
- "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
- <devicetree@vger.kernel.org>, Sean Wang <sean.wang@mediatek.com>,
- Martin Kaiser <martin@kaiser.cx>, Herbert Xu <herbert@gondor.apana.org.au>,
- Scott Branden <sbranden@broadcom.com>, Ray Jui <rjui@broadcom.com>,
- Matt Mackall <mpm@selenic.com>, Russell King <rmk+kernel@armlinux.org.uk>,
- Krzysztof Kozlowski <krzk@kernel.org>, linux-kernel@vger.kernel.org,
- Eric Anholt <eric@anholt.net>,
- Harald Freudenberger <freude@linux.vnet.ibm.com>,
- Rob Herring <robh+dt@kernel.org>,
- "maintainer:BROADCOM BCM281XX/BCM11XXX/BCM216XX ARM ARCHITE..."
- <bcm-kernel-feedback-list@broadcom.com>,
- "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
- <linux-crypto@vger.kernel.org>,
- PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
- Steffen Trumtrar <s.trumtrar@pengutronix.de>,
- "moderated list:BROADCO
-To: Florian Fainelli <f.fainelli@gmail.com>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20171102010408.27736-12-f.fainelli@gmail.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Florian Fainelli <f.fainelli-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
+        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
+        <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, Sean Wang <sean.wang-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>,
+        Martin Kaiser <martin-XxZfDwE/svGeZLLa646FqQ@public.gmane.org>,
+        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+        Scott Branden <sbranden-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
+        Ray Jui <rjui-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>, Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org>,
+        Russell King <rmk+kernel-I+IVW8TIWO2tmTQ+vhA3Yw@public.gmane.org>,
+        Krzysztof Kozlowski <krzk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Eric Anholt <eric-WhKQ6XTQaPysTnJN9+BGXg@public.gmane.org>,
+        Harald Freudenberger <freude-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>,
+        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        "maintainer:BROADCOM BCM281XX/BCM11XXX/BCM216XX ARM ARCHITE..."
+        <bcm-kernel-feedback-list-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <l
+To: Stefan Wahren <stefan.wahren-eS4NqCHxEME@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <547786283.132202.1509819754396-7tX72C7vayboQLBSYMtkGA@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
 Hi Florian
 
-> Florian Fainelli <f.fainelli@gmail.com> hat am 2. November 2017 um 02:04 geschrieben:
+> > >> +	/* Clock is optional on most platforms */
+> > >> +	priv->clk = devm_clk_get(dev, NULL);
+> > >> +	if (IS_ERR(priv->clk))
+> > >> +		priv->clk = NULL;
+> > > 
+> > > at least in case of EPROBE_DEFERED this isn't the expected behavior. Maybe we should better trigger on non-existing clock?
+> > 
+> > Good point, so more like:
+> > 
+> > if (IS_ERR(priv->clk) && PTR_ERR(priv->clk) == -ENODEV)?
 > 
-> 
-> We have now incorporated all necessary functionality for the BCM63xx
-> platforms to successfully migrate over bcm2835-rng, so add the final
-> bits: Kconfig selection and proper platform_device device type matching
-> to keep the same platform device name for registration to work.
-> 
-> Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
-> ---
->  drivers/char/hw_random/Kconfig       |  7 ++++---
->  drivers/char/hw_random/bcm2835-rng.c | 11 ++++++++++-
->  2 files changed, 14 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-> index 95a031e9eced..d0689cc8c7fc 100644
-> --- a/drivers/char/hw_random/Kconfig
-> +++ b/drivers/char/hw_random/Kconfig
-> @@ -87,12 +87,13 @@ config HW_RANDOM_BCM63XX
->  	  If unusure, say Y.
->  
->  config HW_RANDOM_BCM2835
-> -	tristate "Broadcom BCM2835 Random Number Generator support"
-> -	depends on ARCH_BCM2835 || ARCH_BCM_NSP || ARCH_BCM_5301X
-> +	tristate "Broadcom BCM2835/BCM63xx Random Number Generator support"
-> +	depends on ARCH_BCM2835 || ARCH_BCM_NSP || ARCH_BCM_5301X || \
-> +		   ARCH_BCM_63XX || BCM63XX || BMIPS_GENERIC
->  	default HW_RANDOM
->  	---help---
->  	  This driver provides kernel-side support for the Random Number
-> -	  Generator hardware found on the Broadcom BCM2835 SoCs.
-> +	  Generator hardware found on the Broadcom BCM2835 and BCM63xx SoCs.
->  
->  	  To compile this driver as a module, choose M here: the
->  	  module will be called bcm2835-rng
-> diff --git a/drivers/char/hw_random/bcm2835-rng.c b/drivers/char/hw_random/bcm2835-rng.c
-> index 650e0033c273..d9ffe14f312b 100644
-> --- a/drivers/char/hw_random/bcm2835-rng.c
-> +++ b/drivers/char/hw_random/bcm2835-rng.c
-> @@ -131,6 +131,7 @@ static const struct of_device_id bcm2835_rng_of_match[] = {
->  	{ .compatible = "brcm,bcm2835-rng"},
->  	{ .compatible = "brcm,bcm-nsp-rng", .data = &nsp_rng_of_data },
->  	{ .compatible = "brcm,bcm5301x-rng", .data = &nsp_rng_of_data },
-> +	{ .compatible = "brcm,bcm6368-rng"},
->  	{},
->  };
->  
-> @@ -164,7 +165,7 @@ static int bcm2835_rng_probe(struct platform_device *pdev)
->  	if (IS_ERR(priv->clk))
->  		priv->clk = NULL;
->  
-> -	priv->rng.name = "bcm2835-rng";
-> +	priv->rng.name = pdev->id_entry->name;
 
-this change breaks registration on bcm2835, because the name is NULL.
+> Unfortunately we need to return the error in all other cases. Please
+> take a look at devm_usb_get_phy in dwc2 [1]. AFAIK we don't need to
+> take care of ENXIO in our case.
 
-Regards
-Stefan
+A few subsystems have a get_optional() call, e.g.
+devm_phy_optional_get(). It does not return an error when the phy is
+not supposed to exist, but in all other cases, it does.
 
->  	priv->rng.init = bcm2835_rng_init;
->  	priv->rng.read = bcm2835_rng_read;
->  	priv->rng.cleanup = bcm2835_rng_cleanup;
-> @@ -190,12 +191,20 @@ static int bcm2835_rng_probe(struct platform_device *pdev)
->  
->  MODULE_DEVICE_TABLE(of, bcm2835_rng_of_match);
->  
-> +static struct platform_device_id bcm2835_rng_devtype[] = {
-> +	{ .name = "bcm2835-rng" },
-> +	{ .name = "bcm63xx-rng" },
-> +	{ /* sentinel */ }
-> +};
-> +MODULE_DEVICE_TABLE(platform, bcm2835_rng_devtype);
-> +
->  static struct platform_driver bcm2835_rng_driver = {
->  	.driver = {
->  		.name = "bcm2835-rng",
->  		.of_match_table = bcm2835_rng_of_match,
->  	},
->  	.probe		= bcm2835_rng_probe,
-> +	.id_table	= bcm2835_rng_devtype,
->  };
->  module_platform_driver(bcm2835_rng_driver);
->  
-> -- 
-> 2.9.3
-> 
-> 
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+Maybe consider adding devm_clk_get_optional()?
+
+      Andrew
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
