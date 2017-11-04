@@ -1,73 +1,53 @@
-From: Russell King - ARM Linux <linux-I+IVW8TIWO2tmTQ+vhA3Yw@public.gmane.org>
+From: Andrew Lunn <andrew@lunn.ch>
 Subject: Re: [PATCH 07/12] hwrng: bcm2835-rng: Manage an optional clock
-Date: Sat, 4 Nov 2017 20:08:06 +0000
-Message-ID: <20171104200806.GS9463@n2100.armlinux.org.uk>
+Date: Sat, 4 Nov 2017 21:17:21 +0100
+Message-ID: <20171104201721.GA1394@lunn.ch>
 References: <20171102010408.27736-1-f.fainelli@gmail.com>
  <20171102010408.27736-8-f.fainelli@gmail.com>
  <944505791.223880.1509803454887@email.1und1.de>
  <e12063f9-86e4-e9ce-2a7f-f85fe2ce352f@gmail.com>
  <547786283.132202.1509819754396@email.1und1.de>
  <20171104193731.GA751@lunn.ch>
+ <20171104200806.GS9463@n2100.armlinux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Stefan Wahren <stefan.wahren-eS4NqCHxEME@public.gmane.org>,
-        Florian Fainelli <f.fainelli-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
+Cc: Stefan Wahren <stefan.wahren@i2se.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Mark Rutland <mark.rutland@arm.com>,
         "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
-        <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, Sean Wang <sean.wang-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>,
-        Martin Kaiser <martin-XxZfDwE/svGeZLLa646FqQ@public.gmane.org>,
-        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-        Scott Branden <sbranden-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
-        Ray Jui <rjui-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>, Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org>,
-        Krzysztof Kozlowski <krzk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Eric Anholt <eric-WhKQ6XTQaPysTnJN9+BGXg@public.gmane.org>,
-        Harald Freudenberger <freude-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>,
-        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        <devicetree@vger.kernel.org>, Sean Wang <sean.wang@mediatek.com>,
+        Martin Kaiser <martin@kaiser.cx>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Scott Branden <sbranden@broadcom.com>,
+        Ray Jui <rjui@broadcom.com>, Matt Mackall <mpm@selenic.com>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        linux-kernel@vger.kernel.org, Eric Anholt <eric@anholt.net>,
+        Harald Freudenberger <freude@linux.vnet.ibm.com>,
+        Rob Herring <robh+dt@kernel.org>,
         "maintainer:BROADCOM BCM281XX/BCM11XXX/BCM216XX ARM ARCHITE..."
-        <bcm-kernel-feedback-list-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
+        <bcm-kernel-feedback-list@broadcom.com>,
         "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
         <linu
-To: Andrew Lunn <andrew-g2DYL2Zd6BY@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Russell King - ARM Linux <linux@armlinux.org.uk>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from vps0.lunn.ch ([185.16.172.187]:42186 "EHLO vps0.lunn.ch"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751447AbdKDURg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 4 Nov 2017 16:17:36 -0400
 Content-Disposition: inline
-In-Reply-To: <20171104193731.GA751-g2DYL2Zd6BY@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20171104200806.GS9463@n2100.armlinux.org.uk>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Nov 04, 2017 at 08:37:31PM +0100, Andrew Lunn wrote:
-> Hi Florian
-> 
-> > > >> +	/* Clock is optional on most platforms */
-> > > >> +	priv->clk = devm_clk_get(dev, NULL);
-> > > >> +	if (IS_ERR(priv->clk))
-> > > >> +		priv->clk = NULL;
-> > > > 
-> > > > at least in case of EPROBE_DEFERED this isn't the expected behavior. Maybe we should better trigger on non-existing clock?
-> > > 
-> > > Good point, so more like:
-> > > 
-> > > if (IS_ERR(priv->clk) && PTR_ERR(priv->clk) == -ENODEV)?
-> > 
-> 
-> > Unfortunately we need to return the error in all other cases. Please
-> > take a look at devm_usb_get_phy in dwc2 [1]. AFAIK we don't need to
-> > take care of ENXIO in our case.
-> 
-> A few subsystems have a get_optional() call, e.g.
-> devm_phy_optional_get(). It does not return an error when the phy is
-> not supposed to exist, but in all other cases, it does.
-> 
-> Maybe consider adding devm_clk_get_optional()?
+> The clk API outside of DT doesn't have knowledge of when it's "complete"
+> to be able to determine whether the clock is not present or temporarily
+> missing.  I've already NAK'd this suggestion.
 
-The clk API outside of DT doesn't have knowledge of when it's "complete"
-to be able to determine whether the clock is not present or temporarily
-missing.  I've already NAK'd this suggestion.
+Hi Russell
 
--- 
-RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
-FTTC broadband for 0.8mile line in suburbia: sync at 8.8Mbps down 630kbps up
-According to speedtest.net: 8.21Mbps down 510kbps up
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+O.K, yes, makes sense.
+
+We do have of_clk_get_by_name() and of_clk_get(). Would optional
+variants of these be acceptable?
+
+	 Andrew
