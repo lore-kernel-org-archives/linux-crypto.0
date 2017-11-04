@@ -1,11 +1,10 @@
 From: Stefan Wahren <stefan.wahren@i2se.com>
-Subject: Re: [PATCH 07/12] hwrng: bcm2835-rng: Manage an optional clock
-Date: Sat, 4 Nov 2017 19:22:34 +0100 (CET)
-Message-ID: <547786283.132202.1509819754396@email.1und1.de>
+Subject: Re: [PATCH 11/12] hwrng: bcm2835-rng: Enable BCM2835 RNG to work on
+ BCM63xx platforms
+Date: Sat, 4 Nov 2017 19:27:58 +0100 (CET)
+Message-ID: <1831955836.132229.1509820078271@email.1und1.de>
 References: <20171102010408.27736-1-f.fainelli@gmail.com>
- <20171102010408.27736-8-f.fainelli@gmail.com>
- <944505791.223880.1509803454887@email.1und1.de>
- <e12063f9-86e4-e9ce-2a7f-f85fe2ce352f@gmail.com>
+ <20171102010408.27736-12-f.fainelli@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
@@ -28,7 +27,7 @@ Cc: Mark Rutland <mark.rutland@arm.com>,
  "moderated list:BROADCO
 To: Florian Fainelli <f.fainelli@gmail.com>
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <e12063f9-86e4-e9ce-2a7f-f85fe2ce352f@gmail.com>
+In-Reply-To: <20171102010408.27736-12-f.fainelli@gmail.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -40,90 +39,94 @@ Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
+Hi Florian
 
-> Florian Fainelli <f.fainelli@gmail.com> hat am 4. November 2017 um 18:59 geschrieben:
+> Florian Fainelli <f.fainelli@gmail.com> hat am 2. November 2017 um 02:04 geschrieben:
 > 
 > 
-> Hi Stefan,
+> We have now incorporated all necessary functionality for the BCM63xx
+> platforms to successfully migrate over bcm2835-rng, so add the final
+> bits: Kconfig selection and proper platform_device device type matching
+> to keep the same platform device name for registration to work.
 > 
-> On 11/04/2017 06:50 AM, Stefan Wahren wrote:
-> > Hi Florian,
-> > 
-> >> Florian Fainelli <f.fainelli@gmail.com> hat am 2. November 2017 um 02:04 geschrieben:
-> >>
-> >>
-> >> One of the last steps before bcm63xx-rng can be eliminated is to manage
-> >> a clock during hwrng::init and hwrng::cleanup, so fetch it in the probe
-> >> function, and manage it during these two steps when valid.
-> >>
-> >> Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
-> >> ---
-> >>  drivers/char/hw_random/bcm2835-rng.c | 14 ++++++++++++++
-> >>  1 file changed, 14 insertions(+)
-> >>
-> >> diff --git a/drivers/char/hw_random/bcm2835-rng.c b/drivers/char/hw_random/bcm2835-rng.c
-> >> index ed20e0b6b7ae..35928efb52e7 100644
-> >> --- a/drivers/char/hw_random/bcm2835-rng.c
-> >> +++ b/drivers/char/hw_random/bcm2835-rng.c
-> >> @@ -15,6 +15,7 @@
-> >>  #include <linux/of_platform.h>
-> >>  #include <linux/platform_device.h>
-> >>  #include <linux/printk.h>
-> >> +#include <linux/clk.h>
-> >>  
-> >>  #define RNG_CTRL	0x0
-> >>  #define RNG_STATUS	0x4
-> >> @@ -33,6 +34,7 @@ struct bcm2835_rng_priv {
-> >>  	struct hwrng rng;
-> >>  	void __iomem *base;
-> >>  	bool mask_interrupts;
-> >> +	struct clk *clk;
-> >>  };
-> >>  
-> >>  static inline struct bcm2835_rng_priv *to_rng_priv(struct hwrng *rng)
-> >> @@ -67,6 +69,11 @@ static int bcm2835_rng_init(struct hwrng *rng)
-> >>  {
-> >>  	struct bcm2835_rng_priv *priv = to_rng_priv(rng);
-> >>  	u32 val;
-> >> +	int ret;
-> >> +
-> >> +	ret = clk_prepare_enable(priv->clk);
-> >> +	if (ret)
-> >> +		return ret;
-> >>  
-> >>  	if (priv->mask_interrupts) {
-> >>  		/* mask the interrupt */
-> >> @@ -88,6 +95,8 @@ static void bcm2835_rng_cleanup(struct hwrng *rng)
-> >>  
-> >>  	/* disable rng hardware */
-> >>  	__raw_writel(0, priv->base + RNG_CTRL);
-> >> +
-> >> +	clk_disable_unprepare(priv->clk);
-> >>  }
-> >>  
-> >>  struct bcm2835_rng_of_data {
-> >> @@ -130,6 +139,11 @@ static int bcm2835_rng_probe(struct platform_device *pdev)
-> >>  		return PTR_ERR(priv->base);
-> >>  	}
-> >>  
-> >> +	/* Clock is optional on most platforms */
-> >> +	priv->clk = devm_clk_get(dev, NULL);
-> >> +	if (IS_ERR(priv->clk))
-> >> +		priv->clk = NULL;
-> > 
-> > at least in case of EPROBE_DEFERED this isn't the expected behavior. Maybe we should better trigger on non-existing clock?
+> Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
+> ---
+>  drivers/char/hw_random/Kconfig       |  7 ++++---
+>  drivers/char/hw_random/bcm2835-rng.c | 11 ++++++++++-
+>  2 files changed, 14 insertions(+), 4 deletions(-)
 > 
-> Good point, so more like:
-> 
-> if (IS_ERR(priv->clk) && PTR_ERR(priv->clk) == -ENODEV)?
+> diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+> index 95a031e9eced..d0689cc8c7fc 100644
+> --- a/drivers/char/hw_random/Kconfig
+> +++ b/drivers/char/hw_random/Kconfig
+> @@ -87,12 +87,13 @@ config HW_RANDOM_BCM63XX
+>  	  If unusure, say Y.
+>  
+>  config HW_RANDOM_BCM2835
+> -	tristate "Broadcom BCM2835 Random Number Generator support"
+> -	depends on ARCH_BCM2835 || ARCH_BCM_NSP || ARCH_BCM_5301X
+> +	tristate "Broadcom BCM2835/BCM63xx Random Number Generator support"
+> +	depends on ARCH_BCM2835 || ARCH_BCM_NSP || ARCH_BCM_5301X || \
+> +		   ARCH_BCM_63XX || BCM63XX || BMIPS_GENERIC
+>  	default HW_RANDOM
+>  	---help---
+>  	  This driver provides kernel-side support for the Random Number
+> -	  Generator hardware found on the Broadcom BCM2835 SoCs.
+> +	  Generator hardware found on the Broadcom BCM2835 and BCM63xx SoCs.
+>  
+>  	  To compile this driver as a module, choose M here: the
+>  	  module will be called bcm2835-rng
+> diff --git a/drivers/char/hw_random/bcm2835-rng.c b/drivers/char/hw_random/bcm2835-rng.c
+> index 650e0033c273..d9ffe14f312b 100644
+> --- a/drivers/char/hw_random/bcm2835-rng.c
+> +++ b/drivers/char/hw_random/bcm2835-rng.c
+> @@ -131,6 +131,7 @@ static const struct of_device_id bcm2835_rng_of_match[] = {
+>  	{ .compatible = "brcm,bcm2835-rng"},
+>  	{ .compatible = "brcm,bcm-nsp-rng", .data = &nsp_rng_of_data },
+>  	{ .compatible = "brcm,bcm5301x-rng", .data = &nsp_rng_of_data },
+> +	{ .compatible = "brcm,bcm6368-rng"},
+>  	{},
+>  };
+>  
+> @@ -164,7 +165,7 @@ static int bcm2835_rng_probe(struct platform_device *pdev)
+>  	if (IS_ERR(priv->clk))
+>  		priv->clk = NULL;
+>  
+> -	priv->rng.name = "bcm2835-rng";
+> +	priv->rng.name = pdev->id_entry->name;
 
-Unfortunately we need to return the error in all other cases. Please take a look at devm_usb_get_phy in dwc2 [1]. AFAIK we don't need to take care of ENXIO in our case.
+this change breaks registration on bcm2835, because the name is NULL.
 
-http://elixir.free-electrons.com/linux/latest/source/drivers/usb/dwc2/platform.c#L247
+Regards
+Stefan
 
-> 
+>  	priv->rng.init = bcm2835_rng_init;
+>  	priv->rng.read = bcm2835_rng_read;
+>  	priv->rng.cleanup = bcm2835_rng_cleanup;
+> @@ -190,12 +191,20 @@ static int bcm2835_rng_probe(struct platform_device *pdev)
+>  
+>  MODULE_DEVICE_TABLE(of, bcm2835_rng_of_match);
+>  
+> +static struct platform_device_id bcm2835_rng_devtype[] = {
+> +	{ .name = "bcm2835-rng" },
+> +	{ .name = "bcm63xx-rng" },
+> +	{ /* sentinel */ }
+> +};
+> +MODULE_DEVICE_TABLE(platform, bcm2835_rng_devtype);
+> +
+>  static struct platform_driver bcm2835_rng_driver = {
+>  	.driver = {
+>  		.name = "bcm2835-rng",
+>  		.of_match_table = bcm2835_rng_of_match,
+>  	},
+>  	.probe		= bcm2835_rng_probe,
+> +	.id_table	= bcm2835_rng_devtype,
+>  };
+>  module_platform_driver(bcm2835_rng_driver);
+>  
 > -- 
-> Florian
+> 2.9.3
+> 
 > 
 > _______________________________________________
 > linux-arm-kernel mailing list
