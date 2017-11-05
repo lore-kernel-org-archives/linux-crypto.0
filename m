@@ -1,281 +1,125 @@
-From: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-Subject: Re: [PATCH v2] tpm: Move Linux RNG connection to hwrng
-Date: Sun, 5 Nov 2017 13:05:06 +0200
-Message-ID: <20171105110506.usxmuzrvcjvxahr6@linux.intel.com>
-References: <20171031200503.GC18578@ziepe.ca>
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: [Part2 PATCH v7 20/38] crypto: ccp: Implement
+ SEV_PDH_CERT_EXPORT ioctl command
+Date: Sun, 5 Nov 2017 12:34:12 +0100
+Message-ID: <20171105113412.2xtuifkbmxwrf3ji@pd.tnic>
+References: <20171101211623.71496-1-brijesh.singh@amd.com>
+ <20171101211623.71496-21-brijesh.singh@amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
-        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
-        Stefan Berger <stefanb@linux.vnet.ibm.com>,
-        linux-integrity@vger.kernel.org,
-        David Howells <dhowells@redhat.com>,
+Content-Type: text/plain; charset=utf-8
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:INTEGRITY MEASUREMENT ARCHITECTURE (IMA)"
-        <linux-security-module@vger.kernel.org>,
-        "open list:KEYS-TRUSTED" <keyrings@vger.kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        James Morris <james.l.morris@oracle.com>,
-        Matt Mackall <mpm@selenic.com>,
-        David Safford <safford@us.ibm.com>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        "Serge E. Hallyn" <serge@hall
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Return-path: <linux-security-module-owner@vger.kernel.org>
+        Gary Hook <gary.hook@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        linux-crypto@vger.kernel.org
+To: Brijesh Singh <brijesh.singh@amd.com>
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20171031200503.GC18578@ziepe.ca>
-Sender: owner-linux-security-module@vger.kernel.org
+In-Reply-To: <20171101211623.71496-21-brijesh.singh@amd.com>
+Sender: kvm-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Oct 31, 2017 at 02:05:03PM -0600, Jason Gunthorpe wrote:
-> The tpm-rng.c approach is completely inconsistent with how the kernel
-> handles hotplug. Instead manage a hwrng device for each TPM. This will
-> cause the kernel to read entropy from the TPM when it is plugged in,
-> and allow access to the TPM rng via /dev/hwrng.
-> 
-> Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-> Signed-off-by: Jason Gunthorpe <jgunthorpe@obsidianresearch.com>
+On Wed, Nov 01, 2017 at 04:16:05PM -0500, Brijesh Singh wrote:
+> The SEV_PDH_CERT_EXPORT command can be used to export the PDH and its
+> certificate chain. The command is defined in SEV spec section 5.10.
+
+...
+
 > ---
->  drivers/char/hw_random/Kconfig   | 13 -----------
->  drivers/char/hw_random/Makefile  |  1 -
->  drivers/char/hw_random/tpm-rng.c | 50 ----------------------------------------
->  drivers/char/tpm/Kconfig         | 11 +++++++++
->  drivers/char/tpm/tpm-chip.c      | 41 ++++++++++++++++++++++++++++----
->  drivers/char/tpm/tpm.h           |  4 ++++
->  6 files changed, 52 insertions(+), 68 deletions(-)
->  delete mode 100644 drivers/char/hw_random/tpm-rng.c
-> 
-> v2 applies against Jarkko's patch
-> "tpm: use struct tpm_chip for tpm_chip_find_get()"
-> 
-> diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-> index 95a031e9eced07..a20fed182cbcce 100644
-> --- a/drivers/char/hw_random/Kconfig
-> +++ b/drivers/char/hw_random/Kconfig
-> @@ -306,19 +306,6 @@ config HW_RANDOM_POWERNV
->  
->  	  If unsure, say Y.
->  
-> -config HW_RANDOM_TPM
-> -	tristate "TPM HW Random Number Generator support"
-> -	depends on TCG_TPM
-> -	default HW_RANDOM
-> -	---help---
-> -	  This driver provides kernel-side support for the Random Number
-> -	  Generator in the Trusted Platform Module
-> -
-> -	  To compile this driver as a module, choose M here: the
-> -	  module will be called tpm-rng.
-> -
-> -	  If unsure, say Y.
-> -
->  config HW_RANDOM_HISI
->  	tristate "Hisilicon Random Number Generator support"
->  	depends on HW_RANDOM && ARCH_HISI
-> diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Makefile
-> index 39a67defac67cb..91cb8e8213e7c1 100644
-> --- a/drivers/char/hw_random/Makefile
-> +++ b/drivers/char/hw_random/Makefile
-> @@ -26,7 +26,6 @@ obj-$(CONFIG_HW_RANDOM_NOMADIK) += nomadik-rng.o
->  obj-$(CONFIG_HW_RANDOM_PSERIES) += pseries-rng.o
->  obj-$(CONFIG_HW_RANDOM_POWERNV) += powernv-rng.o
->  obj-$(CONFIG_HW_RANDOM_HISI)	+= hisi-rng.o
-> -obj-$(CONFIG_HW_RANDOM_TPM) += tpm-rng.o
->  obj-$(CONFIG_HW_RANDOM_BCM2835) += bcm2835-rng.o
->  obj-$(CONFIG_HW_RANDOM_IPROC_RNG200) += iproc-rng200.o
->  obj-$(CONFIG_HW_RANDOM_MSM) += msm-rng.o
-> diff --git a/drivers/char/hw_random/tpm-rng.c b/drivers/char/hw_random/tpm-rng.c
-> deleted file mode 100644
-> index c5e363825af008..00000000000000
-> --- a/drivers/char/hw_random/tpm-rng.c
-> +++ /dev/null
-> @@ -1,50 +0,0 @@
-> -/*
-> - * Copyright (C) 2012 Kent Yoder IBM Corporation
-> - *
-> - * HWRNG interfaces to pull RNG data from a TPM
-> - *
-> - * This program is free software; you can redistribute it and/or modify
-> - * it under the terms of the GNU General Public License version 2 as
-> - * published by the Free Software Foundation.
-> - *
-> - * This program is distributed in the hope that it will be useful,
-> - * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> - * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> - * GNU General Public License for more details.
-> - *
-> - * You should have received a copy of the GNU General Public License
-> - * along with this program; if not, write to the Free Software
-> - * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-> - */
-> -
-> -#include <linux/module.h>
-> -#include <linux/hw_random.h>
-> -#include <linux/tpm.h>
-> -
-> -#define MODULE_NAME "tpm-rng"
-> -
-> -static int tpm_rng_read(struct hwrng *rng, void *data, size_t max, bool wait)
-> -{
-> -	return tpm_get_random(NULL, data, max);
-> -}
-> -
-> -static struct hwrng tpm_rng = {
-> -	.name = MODULE_NAME,
-> -	.read = tpm_rng_read,
-> -};
-> -
-> -static int __init rng_init(void)
-> -{
-> -	return hwrng_register(&tpm_rng);
-> -}
-> -module_init(rng_init);
-> -
-> -static void __exit rng_exit(void)
-> -{
-> -	hwrng_unregister(&tpm_rng);
-> -}
-> -module_exit(rng_exit);
-> -
-> -MODULE_LICENSE("GPL v2");
-> -MODULE_AUTHOR("Kent Yoder <key@linux.vnet.ibm.com>");
-> -MODULE_DESCRIPTION("RNG driver for TPM devices");
-> diff --git a/drivers/char/tpm/Kconfig b/drivers/char/tpm/Kconfig
-> index a30352202f1fdc..18c81cbe4704ca 100644
-> --- a/drivers/char/tpm/Kconfig
-> +++ b/drivers/char/tpm/Kconfig
-> @@ -26,6 +26,17 @@ menuconfig TCG_TPM
->  
->  if TCG_TPM
->  
-> +config HW_RANDOM_TPM
-> +	bool "TPM HW Random Number Generator support"
-> +	depends on TCG_TPM && HW_RANDOM && !(TCG_TPM=y && HW_RANDOM=m)
-> +	default y
-> +	---help---
-> +	  This setting exposes the TPM's Random Number Generator as a hwrng
-> +	  device. This allows the kernel to collect randomness from the TPM at
-> +	  boot, and provides the TPM randomines in /dev/hwrng.
-> +
-> +	  If unsure, say Y.
-> +
->  config TCG_TIS_CORE
->  	tristate
->  	---help---
-> diff --git a/drivers/char/tpm/tpm-chip.c b/drivers/char/tpm/tpm-chip.c
-> index 6faf4c3fa6dbbd..797ab962291333 100644
-> --- a/drivers/char/tpm/tpm-chip.c
-> +++ b/drivers/char/tpm/tpm-chip.c
-> @@ -26,6 +26,7 @@
->  #include <linux/spinlock.h>
->  #include <linux/freezer.h>
->  #include <linux/major.h>
-> +#include <linux/hw_random.h>
->  #include "tpm.h"
->  #include "tpm_eventlog.h"
->  
-> @@ -391,6 +392,26 @@ static int tpm_add_legacy_sysfs(struct tpm_chip *chip)
->  
->  	return 0;
->  }
-> +
-> +static int tpm_hwrng_read(struct hwrng *rng, void *data, size_t max, bool wait)
-> +{
-> +	struct tpm_chip *chip = container_of(rng, struct tpm_chip, hwrng);
-> +
-> +	return tpm_get_random(chip, data, max);
-> +}
-> +
-> +static int tpm_add_hwrng(struct tpm_chip *chip)
-> +{
-> +	if (!IS_ENABLED(CONFIG_HW_RANDOM_TPM))
-> +		return 0;
-> +
-> +	snprintf(chip->hwrng_name, sizeof(chip->hwrng_name),
-> +		 "tpm-rng-%d", chip->dev_num);
-> +	chip->hwrng.name = chip->hwrng_name;
-> +	chip->hwrng.read = tpm_hwrng_read;
-> +	return hwrng_register(&chip->hwrng);
-> +}
-> +
->  /*
->   * tpm_chip_register() - create a character device for the TPM chip
->   * @chip: TPM chip to use.
-> @@ -423,11 +444,13 @@ int tpm_chip_register(struct tpm_chip *chip)
->  
->  	tpm_add_ppi(chip);
->  
-> +	rc = tpm_add_hwrng(chip);
-> +	if (rc)
-> +		goto out_ppi;
-> +
->  	rc = tpm_add_char_device(chip);
-> -	if (rc) {
-> -		tpm_bios_log_teardown(chip);
-> -		return rc;
-> -	}
-> +	if (rc)
-> +		goto out_hwrng;
->  
->  	rc = tpm_add_legacy_sysfs(chip);
->  	if (rc) {
-> @@ -436,6 +459,14 @@ int tpm_chip_register(struct tpm_chip *chip)
->  	}
->  
->  	return 0;
-> +
-> +out_hwrng:
-> +	if (IS_ENABLED(CONFIG_HW_RANDOM_TPM))
-> +		hwrng_unregister(&chip->hwrng);
-> +out_ppi:
-> +	tpm_bios_log_teardown(chip);
-> +
-> +	return rc;
->  }
->  EXPORT_SYMBOL_GPL(tpm_chip_register);
->  
-> @@ -455,6 +486,8 @@ EXPORT_SYMBOL_GPL(tpm_chip_register);
->  void tpm_chip_unregister(struct tpm_chip *chip)
->  {
->  	tpm_del_legacy_sysfs(chip);
-> +	if (IS_ENABLED(CONFIG_HW_RANDOM_TPM))
-> +		hwrng_unregister(&chip->hwrng);
->  	tpm_bios_log_teardown(chip);
->  	if (chip->flags & TPM_CHIP_FLAG_TPM2)
->  		cdev_device_del(&chip->cdevs, &chip->devs);
-> diff --git a/drivers/char/tpm/tpm.h b/drivers/char/tpm/tpm.h
-> index 7424511241031a..efe8ad0d137f74 100644
-> --- a/drivers/char/tpm/tpm.h
-> +++ b/drivers/char/tpm/tpm.h
-> @@ -26,6 +26,7 @@
->  #include <linux/module.h>
->  #include <linux/delay.h>
->  #include <linux/fs.h>
-> +#include <linux/hw_random.h>
->  #include <linux/mutex.h>
->  #include <linux/sched.h>
->  #include <linux/platform_device.h>
-> @@ -210,6 +211,9 @@ struct tpm_chip {
->  	int dev_num;		/* /dev/tpm# */
->  	unsigned long is_open;	/* only one allowed */
->  
-> +	char hwrng_name[64];
-> +	struct hwrng hwrng;
-> +
->  	struct mutex tpm_mutex;	/* tpm is processing */
->  
->  	unsigned long timeout_a; /* jiffies */
-> -- 
-> 2.7.4
-> 
+>  drivers/crypto/ccp/psp-dev.c | 98 ++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 98 insertions(+)
 
-I asked to create a series for a reason. Now this doesn't apply because I
-don't have an ancestor in my git history.
+Fixes ontop:
 
-Please resend as series together with my patch. I can apply neither yet
-because they have zero tested-by's.
+* !input.cert_chain_address test was repeated. I saw that by aligning
+them vertically, i.e., after making it more readable, the repetition
+became obvious.
 
-/Jarkko
+* Do the lengths checks first and the access_ok after, in each PDH and
+cert chain test.
+
+* Do the checks first and the allocations after, not interleaved.
+
+* Comments are sentences which should end with a '.'
+
+(hunk below contains also that &psp_master->cmd_buf change but you're going to
+ remove that arg anyway).
+
+---
+diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
+index 09f69e573d00..d3fdcce61e6d 100644
+--- a/drivers/crypto/ccp/psp-dev.c
++++ b/drivers/crypto/ccp/psp-dev.c
+@@ -455,14 +455,22 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp)
+ 	if (!data)
+ 		return -ENOMEM;
+ 
+-	/* Userspace wants to query the certificate length */
+-	if (!input.pdh_cert_address || !input.pdh_cert_len ||
+-	    !input.cert_chain_address || !input.cert_chain_address)
++	/* Userspace wants to query the certificate length. */
++	if (!input.pdh_cert_address ||
++	    !input.pdh_cert_len ||
++	    !input.cert_chain_address)
+ 		goto cmd;
+ 
+-	/* allocate a physically contiguous buffer to store the PDH blob */
+-	if (!access_ok(VERIFY_WRITE, input.pdh_cert_address, input.pdh_cert_len) ||
+-	    (input.pdh_cert_len > SEV_FW_BLOB_MAX_SIZE)) {
++	/* allocate a physically contiguous buffer to store the PDH blob. */
++	if ((input.pdh_cert_len > SEV_FW_BLOB_MAX_SIZE) ||
++	    !access_ok(VERIFY_WRITE, input.pdh_cert_address, input.pdh_cert_len)) {
++		ret = -EFAULT;
++		goto e_free;
++	}
++
++	/* allocate a physically contiguous buffer to store the cert chain blob. */
++	if ((input.cert_chain_len > SEV_FW_BLOB_MAX_SIZE) ||
++	    !access_ok(VERIFY_WRITE, input.cert_chain_address, input.cert_chain_len)) {
+ 		ret = -EFAULT;
+ 		goto e_free;
+ 	}
+@@ -476,13 +484,6 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp)
+ 	data->pdh_cert_address = __psp_pa(pdh_blob);
+ 	data->pdh_cert_len = input.pdh_cert_len;
+ 
+-	/* allocate a physically contiguous buffer to store the cert chain blob */
+-	if (!access_ok(VERIFY_WRITE, input.cert_chain_address, input.cert_chain_len) ||
+-	    (input.cert_chain_len > SEV_FW_BLOB_MAX_SIZE)) {
+-		ret = -EFAULT;
+-		goto e_free_pdh;
+-	}
+-
+ 	cert_blob = kmalloc(input.cert_chain_len, GFP_KERNEL);
+ 	if (!cert_blob) {
+ 		ret = -ENOMEM;
+@@ -493,18 +494,16 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp)
+ 	data->cert_chain_len = input.cert_chain_len;
+ 
+ cmd:
+-	/* If platform is not in INIT state then transition it to INIT */
++	/* If platform is not in INIT state then transition it to INIT. */
+ 	if (psp_master->sev_state != SEV_STATE_INIT) {
+-		ret = __sev_platform_init_locked(psp_master->sev_init, &argp->error);
++		ret = __sev_platform_init_locked(&psp_master->cmd_buf, &argp->error);
+ 		if (ret)
+ 			goto e_free_cert;
+ 	}
+ 
+ 	ret = __sev_do_cmd_locked(SEV_CMD_PDH_CERT_EXPORT, data, &argp->error);
+ 
+-	/*
+-	 * If we query the length, FW responded with expected data
+-	 */
++	/* If we query the length, FW responded with expected data. */
+ 	input.cert_chain_len = data->cert_chain_len;
+ 	input.pdh_cert_len = data->pdh_cert_len;
+ 
+
+-- 
+Regards/Gruss,
+    Boris.
+
+Good mailing practices for 400: avoid top-posting and trim the reply.
