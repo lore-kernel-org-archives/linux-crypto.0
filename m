@@ -1,51 +1,50 @@
-From: Jason Gunthorpe <jgg@ziepe.ca>
-Subject: Re: [PATCH v2] tpm: Move Linux RNG connection to hwrng
-Date: Sun, 5 Nov 2017 19:27:04 -0700
-Message-ID: <20171106022704.GD26011@ziepe.ca>
-References: <20171031200503.GC18578@ziepe.ca>
- <20171105110506.usxmuzrvcjvxahr6@linux.intel.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
-        Stefan Berger <stefanb@linux.vnet.ibm.com>,
-        linux-integrity@vger.kernel.org,
-        David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:INTEGRITY MEASUREMENT ARCHITECTURE (IMA)"
-        <linux-security-module@vger.kernel.org>,
-        "open list:KEYS-TRUSTED" <keyrings@vger.kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        James Morris <james.l.morris@oracle.com>,
-        Matt Mackall <mpm@selenic.com>,
-        David Safford <safford@us.ibm.com>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        "Serge E. Hallyn" <serge@hallyn.com>
-To: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-Return-path: <linux-security-module-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20171105110506.usxmuzrvcjvxahr6@linux.intel.com>
-Sender: owner-linux-security-module@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Eric Biggers <ebiggers3@gmail.com>
+Subject: [PATCH v2 0/5] crypto: dh - input validation fixes
+Date: Sun,  5 Nov 2017 18:30:43 -0800
+Message-ID: <20171106023048.8067-1-ebiggers3@gmail.com>
+Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Salvatore Benedetto <salvatore.benedetto@intel.com>,
+        Tudor-Dan Ambarus <tudor.ambarus@microchip.com>,
+        Mat Martineau <mathew.j.martineau@linux.intel.com>,
+        Stephan Mueller <smueller@chronox.de>, qat-linux@intel.com,
+        keyrings@vger.kernel.org, Eric Biggers <ebiggers3@gmail.com>
+To: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pg0-f66.google.com ([74.125.83.66]:46857 "EHLO
+        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750785AbdKFCbS (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 5 Nov 2017 21:31:18 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Nov 05, 2017 at 01:05:06PM +0200, Jarkko Sakkinen wrote:
+This series fixes several corner cases in the Diffie-Hellman key
+exchange implementations:
 
-> I asked to create a series for a reason. Now this doesn't apply because I
-> don't have an ancestor in my git history.
+1. With the software DH implementation, using a large buffer for 'g'
+   caused a double free.
+2. With CONFIG_DEBUG_SG=y and the software DH implementation, setting 'p'
+   to 0 caused a BUG_ON().
+3. With the QAT DH implementation, setting 'key' or 'g' larger than 'p'
+   caused a buffer underflow.
 
-It would be unusual for me to put your patch into a series unless I am
-also adopting it. eg what happens if there are more comments on it?
+Note that in kernels configured with CONFIG_KEY_DH_OPERATIONS=y, these
+bugs are reachable by unprivileged users via KEYCTL_DH_COMPUTE.
 
-Also, I wasn't sure what branch your patch was against since my tree
-didn't have history for it either..
+Patches 4 and 5 are cleanup only.
 
-Sometimes the maintainer has to sort stuff like this out... :)
+Eric Biggers (5):
+  crypto: dh - Fix double free of ctx->p
+  crypto: dh - Don't permit 'p' to be 0
+  crypto: dh - Don't permit 'key' or 'g' size longer than 'p'
+  crypto: qat - Clean up error handling in qat_dh_set_secret()
+  crypto: dh - Remove pointless checks for NULL 'p' and 'g'
 
-> Please resend as series together with my patch. I can apply neither yet
-> because they have zero tested-by's.
+ crypto/dh.c                                   | 36 ++++++++++-----------------
+ crypto/dh_helper.c                            | 16 ++++++++++++
+ drivers/crypto/qat/qat_common/qat_asym_algs.c | 18 ++++++--------
+ 3 files changed, 37 insertions(+), 33 deletions(-)
 
-Hopefully PrasannaKumar can test both patches.
-
-Jason
+-- 
+2.15.0
