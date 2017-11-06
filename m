@@ -1,229 +1,473 @@
 From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: [Part2 PATCH v8 00/38] x86: Secure Encrypted Virtualization (AMD)
-Date: Mon,  6 Nov 2017 12:10:52 -0600
-Message-ID: <20171106181130.68491-1-brijesh.singh@amd.com>
+Subject: [Part2 PATCH v8 12/38] crypto: ccp: Add Platform Security Processor (PSP) device support
+Date: Mon,  6 Nov 2017 12:11:04 -0600
+Message-ID: <20171106181130.68491-13-brijesh.singh@amd.com>
+References: <20171106181130.68491-1-brijesh.singh@amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Cc: bp@alien8.de, Brijesh Singh <brijesh.singh@amd.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
+        Borislav Petkov <bp@suse.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Gary Hook <gary.hook@amd.com>, x86@kernel.org,
+        Gary Hook <gary.hook@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
         linux-crypto@vger.kernel.org
 To: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-dm3nam03on0078.outbound.protection.outlook.com ([104.47.41.78]:9872
-        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S932374AbdKFSL6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 6 Nov 2017 13:11:58 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20171106181130.68491-1-brijesh.singh@amd.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-This part of Secure Encrypted Virtualization (SEV) patch series focuses on KVM
-changes required to create and manage SEV guests.
+The Platform Security Processor (PSP) is part of the AMD Secure
+Processor (AMD-SP) functionality. The PSP is a dedicated processor
+that provides support for key management commands in Secure Encrypted
+Virtualization (SEV) mode, along with software-based Trusted Execution
+Environment (TEE) to enable third-party trusted applications.
 
-SEV is an extension to the AMD-V architecture which supports running encrypted
-virtual machine (VMs) under the control of a hypervisor. Encrypted VMs have their
-pages (code and data) secured such that only the guest itself has access to
-unencrypted version. Each encrypted VM is associated with a unique encryption key;
-if its data is accessed to a different entity using a different key the encrypted
-guest's data will be incorrectly decrypted, leading to unintelligible data.
-This security model ensures that hypervisor will no longer able to inspect or
-alter any guest code or data.
+Note that the key management functionality provided by the SEV firmware
+can be used outside of the kvm-amd driver hence it doesn't need to
+depend on CONFIG_KVM_AMD.
 
-The key management of this feature is handled by a separate processor known as
-the AMD Secure Processor (AMD-SP) which is present on AMD SOCs. The SEV Key
-Management Specification (see below) provides a set of commands which can be
-used by hypervisor to load virtual machine keys through the AMD-SP driver.
-
-The patch series adds a new ioctl in KVM driver (KVM_MEMORY_ENCRYPT_OP). The
-ioctl will be used by qemu to issue SEV guest-specific commands defined in Key
-Management Specification.
-
-The following links provide additional details:
-
-AMD Memory Encryption white paper:
-http://amd-dev.wpengine.netdna-cdn.com/wordpress/media/2013/12/AMD_Memory_Encryption_Whitepaper_v7-Public.pdf
-
-AMD64 Architecture Programmer's Manual:
-    http://support.amd.com/TechDocs/24593.pdf
-    SME is section 7.10
-    SEV is section 15.34
-
-SEV Key Management:
-http://support.amd.com/TechDocs/55766_SEV-KM API_Specification.pdf
-
-KVM Forum Presentation:
-http://www.linux-kvm.org/images/7/74/02x08A-Thomas_Lendacky-AMDs_Virtualizatoin_Memory_Encryption_Technology.pdf
-
-
-SEV Guest BIOS support:
-  SEV support has been add to EDKII/OVMF BIOS
-  https://github.com/tianocore/edk2
-
-SEV Part 1 patch series: https://marc.info/?l=linux-kernel&m=150851036113575&w=2
-
-NOTE: No changes in Part1, the v7 patches still applies fine on tip/master
-
---
-
-The series is based on kvm/next commit : 6d6ab940dc8b (Merge branch 'kvm-ppc-next' of ...)
-
-
-Complete tree is available at:
-repo: https://github.com/codomania/kvm.git
-branch: sev-v8-p2
-
-TODO:
-* Add SEV guest migration command support
-
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: "H. Peter Anvin" <hpa@zytor.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: "Radim Krčmář" <rkrcmar@redhat.com>
-Cc: Joerg Roedel <joro@8bytes.org>
 Cc: Borislav Petkov <bp@suse.de>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: David S. Miller <davem@davemloft.net>
 Cc: Gary Hook <gary.hook@amd.com>
-Cc: x86@kernel.org
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: linux-crypto@vger.kernel.org
 Cc: kvm@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org
-
-Changes since v7:
- * Rebase the series to kvm/next branch
- * move the FW error enum definition in include/uapi/linux/psp-sev.h so that
-   both userspace and kernel can share it.
- * (ccp) drop cmd_buf arg from sev_platform_init()
- * (ccp) apply some cleanup/fixup from Boris
- * (ccp) add some comments in FACTORY_RESET command handling
- * (kvm) some fixup/cleanup from Boris
- * (kvm) acquire the kvm->lock when modifying the sev->regions_list
-
-Changes since v6:
- * (ccp): Extend psp_device structure to track the FW INIT and SHUTDOWN states.
- * (ccp): Init and Uninit SEV FW during module load/unload
- * (ccp): Avoid repeated k*alloc() for init and status command buffer
- * (kvm): Rework DBG command to fix the compilation warning seen with gcc7.x
- * (kvm): Convert the SEV doc in rst format
-
-Changes since v5:
- * split the PSP driver support into multiple patches
- * multiple improvements from Boris
- * remove mem_enc_enabled() ops
-
-Changes since v4:
- * Fixes to address kbuild robot errors
- * Add 'sev' module params to allow enable/disable SEV feature
- * Update documentation
- * Multiple fixes to address v4 feedbacks
- * Some coding style changes to address checkpatch reports
-
-Changes since v3:
- * Re-design the PSP interface support patch
- * Rename the ioctls based on the feedbacks
- * Improve documentation
- * Fix i386 build issues
- * Add LAUNCH_SECRET command
- * Add new Kconfig option to enable SEV support
- * Changes to address v3 feedbacks.
-
-Changes since v2:
- * Add KVM_MEMORY_ENCRYPT_REGISTER/UNREGISTER_RAM ioct to register encrypted
-   memory ranges (recommend by Paolo)
- * Extend kvm_x86_ops to provide new memory_encryption_enabled ops
- * Enhance DEBUG DECRYPT/ENCRYPT commands to work with more than one page \
-                (recommended by Paolo)
- * Optimize LAUNCH_UPDATE command to reduce the number of calls to AMD-SP driver
- * Changes to address v2 feedbacks
-
-Borislav Petkov (1):
-  crypto: ccp: Build the AMD secure processor driver only with AMD CPU
-    support
-
-Brijesh Singh (34):
-  Documentation/virtual/kvm: Add AMD Secure Encrypted Virtualization
-    (SEV)
-  KVM: SVM: Prepare to reserve asid for SEV guest
-  KVM: X86: Extend CPUID range to include new leaf
-  KVM: Introduce KVM_MEMORY_ENCRYPT_OP ioctl
-  KVM: Introduce KVM_MEMORY_ENCRYPT_{UN,}REG_REGION ioctl
-  crypto: ccp: Define SEV userspace ioctl and command id
-  crypto: ccp: Define SEV key management command id
-  crypto: ccp: Add Platform Security Processor (PSP) device support
-  crypto: ccp: Add Secure Encrypted Virtualization (SEV) command support
-  crypto: ccp: Implement SEV_FACTORY_RESET ioctl command
-  crypto: ccp: Implement SEV_PLATFORM_STATUS ioctl command
-  crypto: ccp: Implement SEV_PEK_GEN ioctl command
-  crypto: ccp: Implement SEV_PDH_GEN ioctl command
-  crypto: ccp: Implement SEV_PEK_CSR ioctl command
-  crypto: ccp: Implement SEV_PEK_CERT_IMPORT ioctl command
-  crypto: ccp: Implement SEV_PDH_CERT_EXPORT ioctl command
-  KVM: X86: Add CONFIG_KVM_AMD_SEV
-  KVM: SVM: Reserve ASID range for SEV guest
-  KVM: SVM: Add sev module_param
-  KVM: Define SEV key management command id
-  KVM: SVM: Add KVM_SEV_INIT command
-  KVM: SVM: VMRUN should use associated ASID when SEV is enabled
-  KVM: SVM: Add support for KVM_SEV_LAUNCH_START command
-  KVM: SVM: Add support for KVM_SEV_LAUNCH_UPDATE_DATA command
-  KVM: SVM: Add support for KVM_SEV_LAUNCH_MEASURE command
-  KVM: SVM: Add support for SEV LAUNCH_FINISH command
-  KVM: SVM: Add support for SEV GUEST_STATUS command
-  KVM: SVM: Add support for SEV DEBUG_DECRYPT command
-  KVM: SVM: Add support for SEV DEBUG_ENCRYPT command
-  KVM: SVM: Add support for SEV LAUNCH_SECRET command
-  KVM: SVM: Pin guest memory when SEV is active
-  KVM: SVM: Clear C-bit from the page fault address
-  KVM: SVM: Do not install #UD intercept when SEV is enabled
-  KVM: X86: Restart the guest when insn_len is zero and SEV is enabled
-
-Tom Lendacky (3):
-  x86/CPU/AMD: Add the Secure Encrypted Virtualization CPU feature
-  kvm: svm: prepare for new bit definition in nested_ctl
-  kvm: svm: Add SEV feature definitions to KVM
-
- Documentation/virtual/kvm/00-INDEX                 |    3 +
- .../virtual/kvm/amd-memory-encryption.rst          |  247 +++++
- Documentation/virtual/kvm/api.txt                  |   50 +
- arch/x86/include/asm/cpufeatures.h                 |    1 +
- arch/x86/include/asm/kvm_host.h                    |   15 +
- arch/x86/include/asm/msr-index.h                   |    2 +
- arch/x86/include/asm/svm.h                         |    3 +
- arch/x86/kernel/cpu/amd.c                          |   66 +-
- arch/x86/kernel/cpu/scattered.c                    |    1 +
- arch/x86/kvm/Kconfig                               |   10 +
- arch/x86/kvm/cpuid.c                               |    2 +-
- arch/x86/kvm/mmu.c                                 |   10 +
- arch/x86/kvm/svm.c                                 | 1145 +++++++++++++++++++-
- arch/x86/kvm/x86.c                                 |   30 +
- drivers/crypto/ccp/Kconfig                         |   12 +
- drivers/crypto/ccp/Makefile                        |    1 +
- drivers/crypto/ccp/psp-dev.c                       |  805 ++++++++++++++
- drivers/crypto/ccp/psp-dev.h                       |   83 ++
- drivers/crypto/ccp/sp-dev.c                        |   35 +
- drivers/crypto/ccp/sp-dev.h                        |   28 +-
- drivers/crypto/ccp/sp-pci.c                        |   52 +
- include/linux/psp-sev.h                            |  606 +++++++++++
- include/uapi/linux/kvm.h                           |   90 ++
- include/uapi/linux/psp-sev.h                       |  142 +++
- 24 files changed, 3407 insertions(+), 32 deletions(-)
- create mode 100644 Documentation/virtual/kvm/amd-memory-encryption.rst
+Improvements-by: Borislav Petkov <bp@suse.de>
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+Reviewed-by: Borislav Petkov <bp@suse.de>
+---
+ drivers/crypto/ccp/Kconfig   |  11 +++++
+ drivers/crypto/ccp/Makefile  |   1 +
+ drivers/crypto/ccp/psp-dev.c | 105 +++++++++++++++++++++++++++++++++++++++++++
+ drivers/crypto/ccp/psp-dev.h |  59 ++++++++++++++++++++++++
+ drivers/crypto/ccp/sp-dev.c  |  26 +++++++++++
+ drivers/crypto/ccp/sp-dev.h  |  24 +++++++++-
+ drivers/crypto/ccp/sp-pci.c  |  52 +++++++++++++++++++++
+ 7 files changed, 277 insertions(+), 1 deletion(-)
  create mode 100644 drivers/crypto/ccp/psp-dev.c
  create mode 100644 drivers/crypto/ccp/psp-dev.h
- create mode 100644 include/linux/psp-sev.h
- create mode 100644 include/uapi/linux/psp-sev.h
 
+diff --git a/drivers/crypto/ccp/Kconfig b/drivers/crypto/ccp/Kconfig
+index 9c84f9838931..b9dfae47aefd 100644
+--- a/drivers/crypto/ccp/Kconfig
++++ b/drivers/crypto/ccp/Kconfig
+@@ -33,3 +33,14 @@ config CRYPTO_DEV_CCP_CRYPTO
+ 	  Support for using the cryptographic API with the AMD Cryptographic
+ 	  Coprocessor. This module supports offload of SHA and AES algorithms.
+ 	  If you choose 'M' here, this module will be called ccp_crypto.
++
++config CRYPTO_DEV_SP_PSP
++	bool "Platform Security Processor (PSP) device"
++	default y
++	depends on CRYPTO_DEV_CCP_DD && X86_64
++	help
++	 Provide support for the AMD Platform Security Processor (PSP).
++	 The PSP is a dedicated processor that provides support for key
++	 management commands in Secure Encrypted Virtualization (SEV) mode,
++	 along with software-based Trusted Execution Environment (TEE) to
++	 enable third-party trusted applications.
+diff --git a/drivers/crypto/ccp/Makefile b/drivers/crypto/ccp/Makefile
+index 57f8debfcfb3..008bae7e26ec 100644
+--- a/drivers/crypto/ccp/Makefile
++++ b/drivers/crypto/ccp/Makefile
+@@ -7,6 +7,7 @@ ccp-$(CONFIG_CRYPTO_DEV_SP_CCP) += ccp-dev.o \
+ 	    ccp-dmaengine.o \
+ 	    ccp-debugfs.o
+ ccp-$(CONFIG_PCI) += sp-pci.o
++ccp-$(CONFIG_CRYPTO_DEV_SP_PSP) += psp-dev.o
+ 
+ obj-$(CONFIG_CRYPTO_DEV_CCP_CRYPTO) += ccp-crypto.o
+ ccp-crypto-objs := ccp-crypto-main.o \
+diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
+new file mode 100644
+index 000000000000..b5789f878560
+--- /dev/null
++++ b/drivers/crypto/ccp/psp-dev.c
+@@ -0,0 +1,105 @@
++/*
++ * AMD Platform Security Processor (PSP) interface
++ *
++ * Copyright (C) 2016-2017 Advanced Micro Devices, Inc.
++ *
++ * Author: Brijesh Singh <brijesh.singh@amd.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ */
++
++#include <linux/module.h>
++#include <linux/kernel.h>
++#include <linux/kthread.h>
++#include <linux/sched.h>
++#include <linux/interrupt.h>
++#include <linux/spinlock.h>
++#include <linux/spinlock_types.h>
++#include <linux/types.h>
++#include <linux/mutex.h>
++#include <linux/delay.h>
++#include <linux/hw_random.h>
++#include <linux/ccp.h>
++
++#include "sp-dev.h"
++#include "psp-dev.h"
++
++static struct psp_device *psp_alloc_struct(struct sp_device *sp)
++{
++	struct device *dev = sp->dev;
++	struct psp_device *psp;
++
++	psp = devm_kzalloc(dev, sizeof(*psp), GFP_KERNEL);
++	if (!psp)
++		return NULL;
++
++	psp->dev = dev;
++	psp->sp = sp;
++
++	snprintf(psp->name, sizeof(psp->name), "psp-%u", sp->ord);
++
++	return psp;
++}
++
++static irqreturn_t psp_irq_handler(int irq, void *data)
++{
++	return IRQ_HANDLED;
++}
++
++int psp_dev_init(struct sp_device *sp)
++{
++	struct device *dev = sp->dev;
++	struct psp_device *psp;
++	int ret;
++
++	ret = -ENOMEM;
++	psp = psp_alloc_struct(sp);
++	if (!psp)
++		goto e_err;
++
++	sp->psp_data = psp;
++
++	psp->vdata = (struct psp_vdata *)sp->dev_vdata->psp_vdata;
++	if (!psp->vdata) {
++		ret = -ENODEV;
++		dev_err(dev, "missing driver data\n");
++		goto e_err;
++	}
++
++	psp->io_regs = sp->io_map + psp->vdata->offset;
++
++	/* Disable and clear interrupts until ready */
++	iowrite32(0, psp->io_regs + PSP_P2CMSG_INTEN);
++	iowrite32(-1, psp->io_regs + PSP_P2CMSG_INTSTS);
++
++	/* Request an irq */
++	ret = sp_request_psp_irq(psp->sp, psp_irq_handler, psp->name, psp);
++	if (ret) {
++		dev_err(dev, "psp: unable to allocate an IRQ\n");
++		goto e_err;
++	}
++
++	if (sp->set_psp_master_device)
++		sp->set_psp_master_device(sp);
++
++	/* Enable interrupt */
++	iowrite32(-1, psp->io_regs + PSP_P2CMSG_INTEN);
++
++	return 0;
++
++e_err:
++	sp->psp_data = NULL;
++
++	dev_notice(dev, "psp initialization failed\n");
++
++	return ret;
++}
++
++void psp_dev_destroy(struct sp_device *sp)
++{
++	struct psp_device *psp = sp->psp_data;
++
++	sp_free_psp_irq(sp, psp);
++}
+diff --git a/drivers/crypto/ccp/psp-dev.h b/drivers/crypto/ccp/psp-dev.h
+new file mode 100644
+index 000000000000..55b7808367c3
+--- /dev/null
++++ b/drivers/crypto/ccp/psp-dev.h
+@@ -0,0 +1,59 @@
++/*
++ * AMD Platform Security Processor (PSP) interface driver
++ *
++ * Copyright (C) 2017 Advanced Micro Devices, Inc.
++ *
++ * Author: Brijesh Singh <brijesh.singh@amd.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ */
++
++#ifndef __PSP_DEV_H__
++#define __PSP_DEV_H__
++
++#include <linux/device.h>
++#include <linux/pci.h>
++#include <linux/spinlock.h>
++#include <linux/mutex.h>
++#include <linux/list.h>
++#include <linux/wait.h>
++#include <linux/dmapool.h>
++#include <linux/hw_random.h>
++#include <linux/bitops.h>
++#include <linux/interrupt.h>
++#include <linux/irqreturn.h>
++#include <linux/dmaengine.h>
++
++#include "sp-dev.h"
++
++#define PSP_P2CMSG_INTEN		0x0110
++#define PSP_P2CMSG_INTSTS		0x0114
++
++#define PSP_C2PMSG_ATTR_0		0x0118
++#define PSP_C2PMSG_ATTR_1		0x011c
++#define PSP_C2PMSG_ATTR_2		0x0120
++#define PSP_C2PMSG_ATTR_3		0x0124
++#define PSP_P2CMSG_ATTR_0		0x0128
++
++#define PSP_CMDRESP_CMD_SHIFT		16
++#define PSP_CMDRESP_IOC			BIT(0)
++#define PSP_CMDRESP_RESP		BIT(31)
++#define PSP_CMDRESP_ERR_MASK		0xffff
++
++#define MAX_PSP_NAME_LEN		16
++
++struct psp_device {
++	struct list_head entry;
++
++	struct psp_vdata *vdata;
++	char name[MAX_PSP_NAME_LEN];
++
++	struct device *dev;
++	struct sp_device *sp;
++
++	void __iomem *io_regs;
++};
++
++#endif /* __PSP_DEV_H */
+diff --git a/drivers/crypto/ccp/sp-dev.c b/drivers/crypto/ccp/sp-dev.c
+index bef387c8abfd..cf101c039c8f 100644
+--- a/drivers/crypto/ccp/sp-dev.c
++++ b/drivers/crypto/ccp/sp-dev.c
+@@ -198,6 +198,8 @@ int sp_init(struct sp_device *sp)
+ 	if (sp->dev_vdata->ccp_vdata)
+ 		ccp_dev_init(sp);
+ 
++	if (sp->dev_vdata->psp_vdata)
++		psp_dev_init(sp);
+ 	return 0;
+ }
+ 
+@@ -206,6 +208,9 @@ void sp_destroy(struct sp_device *sp)
+ 	if (sp->dev_vdata->ccp_vdata)
+ 		ccp_dev_destroy(sp);
+ 
++	if (sp->dev_vdata->psp_vdata)
++		psp_dev_destroy(sp);
++
+ 	sp_del_device(sp);
+ }
+ 
+@@ -237,6 +242,27 @@ int sp_resume(struct sp_device *sp)
+ }
+ #endif
+ 
++struct sp_device *sp_get_psp_master_device(void)
++{
++	struct sp_device *i, *ret = NULL;
++	unsigned long flags;
++
++	write_lock_irqsave(&sp_unit_lock, flags);
++	if (list_empty(&sp_units))
++		goto unlock;
++
++	list_for_each_entry(i, &sp_units, entry) {
++		if (i->psp_data)
++			break;
++	}
++
++	if (i->get_psp_master_device)
++		ret = i->get_psp_master_device();
++unlock:
++	write_unlock_irqrestore(&sp_unit_lock, flags);
++	return ret;
++}
++
+ static int __init sp_mod_init(void)
+ {
+ #ifdef CONFIG_X86
+diff --git a/drivers/crypto/ccp/sp-dev.h b/drivers/crypto/ccp/sp-dev.h
+index 5ab486ade1ad..909cf3e436b4 100644
+--- a/drivers/crypto/ccp/sp-dev.h
++++ b/drivers/crypto/ccp/sp-dev.h
+@@ -42,12 +42,17 @@ struct ccp_vdata {
+ 	const unsigned int offset;
+ 	const unsigned int rsamax;
+ };
++
++struct psp_vdata {
++	const unsigned int offset;
++};
++
+ /* Structure to hold SP device data */
+ struct sp_dev_vdata {
+ 	const unsigned int bar;
+ 
+ 	const struct ccp_vdata *ccp_vdata;
+-	void *psp_vdata;
++	const struct psp_vdata *psp_vdata;
+ };
+ 
+ struct sp_device {
+@@ -68,6 +73,10 @@ struct sp_device {
+ 	/* DMA caching attribute support */
+ 	unsigned int axcache;
+ 
++	/* get and set master device */
++	struct sp_device*(*get_psp_master_device)(void);
++	void (*set_psp_master_device)(struct sp_device *);
++
+ 	bool irq_registered;
+ 	bool use_tasklet;
+ 
+@@ -103,6 +112,7 @@ void sp_free_ccp_irq(struct sp_device *sp, void *data);
+ int sp_request_psp_irq(struct sp_device *sp, irq_handler_t handler,
+ 		       const char *name, void *data);
+ void sp_free_psp_irq(struct sp_device *sp, void *data);
++struct sp_device *sp_get_psp_master_device(void);
+ 
+ #ifdef CONFIG_CRYPTO_DEV_SP_CCP
+ 
+@@ -130,4 +140,16 @@ static inline int ccp_dev_resume(struct sp_device *sp)
+ }
+ #endif	/* CONFIG_CRYPTO_DEV_SP_CCP */
+ 
++#ifdef CONFIG_CRYPTO_DEV_SP_PSP
++
++int psp_dev_init(struct sp_device *sp);
++void psp_dev_destroy(struct sp_device *sp);
++
++#else /* !CONFIG_CRYPTO_DEV_SP_PSP */
++
++static inline int psp_dev_init(struct sp_device *sp) { return 0; }
++static inline void psp_dev_destroy(struct sp_device *sp) { }
++
++#endif /* CONFIG_CRYPTO_DEV_SP_PSP */
++
+ #endif
+diff --git a/drivers/crypto/ccp/sp-pci.c b/drivers/crypto/ccp/sp-pci.c
+index 9859aa683a28..f5f43c50698a 100644
+--- a/drivers/crypto/ccp/sp-pci.c
++++ b/drivers/crypto/ccp/sp-pci.c
+@@ -25,6 +25,7 @@
+ #include <linux/ccp.h>
+ 
+ #include "ccp-dev.h"
++#include "psp-dev.h"
+ 
+ #define MSIX_VECTORS			2
+ 
+@@ -32,6 +33,7 @@ struct sp_pci {
+ 	int msix_count;
+ 	struct msix_entry msix_entry[MSIX_VECTORS];
+ };
++static struct sp_device *sp_dev_master;
+ 
+ static int sp_get_msix_irqs(struct sp_device *sp)
+ {
+@@ -108,6 +110,45 @@ static void sp_free_irqs(struct sp_device *sp)
+ 	sp->psp_irq = 0;
+ }
+ 
++static bool sp_pci_is_master(struct sp_device *sp)
++{
++	struct device *dev_cur, *dev_new;
++	struct pci_dev *pdev_cur, *pdev_new;
++
++	dev_new = sp->dev;
++	dev_cur = sp_dev_master->dev;
++
++	pdev_new = to_pci_dev(dev_new);
++	pdev_cur = to_pci_dev(dev_cur);
++
++	if (pdev_new->bus->number < pdev_cur->bus->number)
++		return true;
++
++	if (PCI_SLOT(pdev_new->devfn) < PCI_SLOT(pdev_cur->devfn))
++		return true;
++
++	if (PCI_FUNC(pdev_new->devfn) < PCI_FUNC(pdev_cur->devfn))
++		return true;
++
++	return false;
++}
++
++static void psp_set_master(struct sp_device *sp)
++{
++	if (!sp_dev_master) {
++		sp_dev_master = sp;
++		return;
++	}
++
++	if (sp_pci_is_master(sp))
++		sp_dev_master = sp;
++}
++
++static struct sp_device *psp_get_master(void)
++{
++	return sp_dev_master;
++}
++
+ static int sp_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ {
+ 	struct sp_device *sp;
+@@ -166,6 +207,8 @@ static int sp_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 		goto e_err;
+ 
+ 	pci_set_master(pdev);
++	sp->set_psp_master_device = psp_set_master;
++	sp->get_psp_master_device = psp_get_master;
+ 
+ 	ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(48));
+ 	if (ret) {
+@@ -225,6 +268,12 @@ static int sp_pci_resume(struct pci_dev *pdev)
+ }
+ #endif
+ 
++#ifdef CONFIG_CRYPTO_DEV_SP_PSP
++static const struct psp_vdata psp_entry = {
++	.offset = 0x10500,
++};
++#endif
++
+ static const struct sp_dev_vdata dev_vdata[] = {
+ 	{
+ 		.bar = 2,
+@@ -237,6 +286,9 @@ static const struct sp_dev_vdata dev_vdata[] = {
+ #ifdef CONFIG_CRYPTO_DEV_SP_CCP
+ 		.ccp_vdata = &ccpv5a,
+ #endif
++#ifdef CONFIG_CRYPTO_DEV_SP_PSP
++		.psp_vdata = &psp_entry
++#endif
+ 	},
+ 	{
+ 		.bar = 2,
 -- 
 2.9.5
