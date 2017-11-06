@@ -1,40 +1,106 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 0/3] More code cleanups
-Date: Mon,  6 Nov 2017 06:55:49 +0000
-Message-ID: <1509951354-16370-1-git-send-email-gilad@benyossef.com>
+Subject: [PATCH 1/3] staging: ccree: simplify error handling logic
+Date: Mon,  6 Nov 2017 06:55:50 +0000
+Message-ID: <1509951354-16370-2-git-send-email-gilad@benyossef.com>
+References: <1509951354-16370-1-git-send-email-gilad@benyossef.com>
 Cc: Ofir Drang <ofir.drang@arm.com>, linux-kernel@vger.kernel.org,
         linux-crypto@vger.kernel.org,
         driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:60122 "EHLO
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:60134 "EHLO
         foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750749AbdKFG4E (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 6 Nov 2017 01:56:04 -0500
+        id S1751695AbdKFG4H (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 6 Nov 2017 01:56:07 -0500
+In-Reply-To: <1509951354-16370-1-git-send-email-gilad@benyossef.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Additional code readability and simplification patches.
-These goes on top the previous patch set sent to the list.
+Turn the code sites that don't require any special handling
+on error return to a simple return.
 
-Gilad Ben-Yossef (3):
-  staging: ccree: simplify error handling logic
-  staging: ccree: simplify registers access
-  staging: ccree: simplify ioread/iowrite
+Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+---
+ drivers/staging/ccree/ssi_driver.c | 28 ++++++++++++----------------
+ 1 file changed, 12 insertions(+), 16 deletions(-)
 
- drivers/staging/ccree/cc_hal.h           | 33 --------------
- drivers/staging/ccree/cc_regs.h          | 42 ------------------
- drivers/staging/ccree/dx_reg_base_host.h | 25 -----------
- drivers/staging/ccree/ssi_driver.c       | 75 ++++++++++++++------------------
- drivers/staging/ccree/ssi_driver.h       | 20 +++++++--
- drivers/staging/ccree/ssi_fips.c         | 14 +++---
- drivers/staging/ccree/ssi_pm.c           |  4 +-
- drivers/staging/ccree/ssi_request_mgr.c  | 72 +++++++++++++++---------------
- drivers/staging/ccree/ssi_sysfs.c        | 11 +++--
- 9 files changed, 98 insertions(+), 198 deletions(-)
- delete mode 100644 drivers/staging/ccree/cc_hal.h
- delete mode 100644 drivers/staging/ccree/cc_regs.h
- delete mode 100644 drivers/staging/ccree/dx_reg_base_host.h
-
+diff --git a/drivers/staging/ccree/ssi_driver.c b/drivers/staging/ccree/ssi_driver.c
+index 1d4c7bb..135a7e2 100644
+--- a/drivers/staging/ccree/ssi_driver.c
++++ b/drivers/staging/ccree/ssi_driver.c
+@@ -212,10 +212,9 @@ static int init_cc_resources(struct platform_device *plat_dev)
+ 	int rc = 0;
+ 
+ 	new_drvdata = devm_kzalloc(dev, sizeof(*new_drvdata), GFP_KERNEL);
+-	if (!new_drvdata) {
+-		rc = -ENOMEM;
+-		goto post_drvdata_err;
+-	}
++	if (!new_drvdata)
++		return -ENOMEM;
++
+ 	platform_set_drvdata(plat_dev, new_drvdata);
+ 	new_drvdata->plat_dev = plat_dev;
+ 
+@@ -229,8 +228,7 @@ static int init_cc_resources(struct platform_device *plat_dev)
+ 	new_drvdata->cc_base = devm_ioremap_resource(dev, req_mem_cc_regs);
+ 	if (IS_ERR(new_drvdata->cc_base)) {
+ 		dev_err(dev, "Failed to ioremap registers");
+-		rc = PTR_ERR(new_drvdata->cc_base);
+-		goto post_drvdata_err;
++		return PTR_ERR(new_drvdata->cc_base);
+ 	}
+ 
+ 	dev_dbg(dev, "Got MEM resource (%s): %pR\n", req_mem_cc_regs->name,
+@@ -244,8 +242,7 @@ static int init_cc_resources(struct platform_device *plat_dev)
+ 	new_drvdata->irq = platform_get_irq(plat_dev, 0);
+ 	if (new_drvdata->irq < 0) {
+ 		dev_err(dev, "Failed getting IRQ resource\n");
+-		rc = new_drvdata->irq;
+-		goto post_drvdata_err;
++		return new_drvdata->irq;
+ 	}
+ 
+ 	rc = devm_request_irq(dev, new_drvdata->irq, cc_isr,
+@@ -253,7 +250,7 @@ static int init_cc_resources(struct platform_device *plat_dev)
+ 	if (rc) {
+ 		dev_err(dev, "Could not register to interrupt %d\n",
+ 			new_drvdata->irq);
+-		goto post_drvdata_err;
++		return rc;
+ 	}
+ 	dev_dbg(dev, "Registered to IRQ: %d\n", new_drvdata->irq);
+ 
+@@ -271,15 +268,16 @@ static int init_cc_resources(struct platform_device *plat_dev)
+ 	}
+ 
+ 	if (rc) {
+-		dev_err(dev, "Error: failed in dma_set_mask, mask=%par\n",
++		dev_err(dev, "Failed in dma_set_mask, mask=%par\n",
+ 			&dma_mask);
+-		goto post_drvdata_err;
++		return rc;
+ 	}
+ 
+ 	rc = cc_clk_on(new_drvdata);
+-	if (rc)
+-		goto post_drvdata_err;
+-
++	if (rc) {
++		dev_err(dev, "Failed to enable clock");
++		return rc;
++	}
+ 
+ 	/* Verify correct mapping */
+ 	signature_val = CC_HAL_READ_REGISTER(CC_REG_OFFSET(HOST_RGF, HOST_SIGNATURE));
+@@ -406,8 +404,6 @@ static int init_cc_resources(struct platform_device *plat_dev)
+ 	fini_cc_regs(new_drvdata);
+ post_clk_err:
+ 	cc_clk_off(new_drvdata);
+-post_drvdata_err:
+-	dev_err(dev, "ccree init error occurred!\n");
+ 	return rc;
+ }
+ 
 -- 
 2.7.4
