@@ -1,150 +1,86 @@
-From: Florian Fainelli <f.fainelli@gmail.com>
-Subject: Re: [PATCH 11/12] hwrng: bcm2835-rng: Enable BCM2835 RNG to work on
- BCM63xx platforms
-Date: Mon, 6 Nov 2017 12:16:02 -0800
-Message-ID: <2538f1bb-e0f8-c336-d82a-0cb2f19b0ead@gmail.com>
-References: <20171102010408.27736-1-f.fainelli@gmail.com>
- <20171102010408.27736-12-f.fainelli@gmail.com>
- <1831955836.132229.1509820078271@email.1und1.de>
+From: "Tobin C. Harding" <me@tobin.cc>
+Subject: Re: [PATCH 3/3] staging: ccree: simplify ioread/iowrite
+Date: Tue, 7 Nov 2017 07:24:48 +1100
+Message-ID: <20171106202448.GL18478@eros>
+References: <1509951354-16370-1-git-send-email-gilad@benyossef.com>
+ <1509951354-16370-4-git-send-email-gilad@benyossef.com>
+ <20171106083736.GJ18478@eros>
+ <CAOtvUMcjUJw_hRwf+4pEv9-yXwgjnRrUpWbyASFt6AFjfTyOpg@mail.gmail.com>
+ <20171106154654.GA15407@kroah.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: Krzysztof Kozlowski <krzk@kernel.org>, Ray Jui <rjui@broadcom.com>,
-        Eric Anholt <eric@anholt.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Steffen Trumtrar <s.trumtrar@pengutronix.de>,
-        Harald Freudenberger <freude@linux.vnet.ibm.com>,
-        Russell King <rmk+kernel@armlinux.org.uk>,
-        "moderated list:BROADCOM BCM2835 ARM ARCHITECTURE"
-        <linux-arm-kernel@lists.infradead.org>,
-        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>, Martin Kaiser <martin@kaiser.cx>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "maintainer:BROADCOM BCM281XX/BCM11XXX/BCM216XX ARM ARCHITE..."
-        <bcm-kernel-feedback-list@broadcom.com>,
-        Matt Mackall <mpm@selenic.com>,
-        Mark Rutlan
-To: Stefan Wahren <stefan.wahren@i2se.com>,
-        Florian Fainelli <f.fainelli@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: Gilad Ben-Yossef <gilad@benyossef.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        devel@driverdev.osuosl.org, driverdev-devel@linuxdriverproject.org,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+        Ofir Drang <ofir.drang@arm.com>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-qt0-f193.google.com ([209.85.216.193]:52908 "EHLO
-        mail-qt0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751951AbdKFUQM (ORCPT
+Received: from out4-smtp.messagingengine.com ([66.111.4.28]:51515 "EHLO
+        out4-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1753585AbdKFUYw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 6 Nov 2017 15:16:12 -0500
-In-Reply-To: <1831955836.132229.1509820078271@email.1und1.de>
-Content-Language: en-US
+        Mon, 6 Nov 2017 15:24:52 -0500
+Content-Disposition: inline
+In-Reply-To: <20171106154654.GA15407@kroah.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 11/04/2017 11:27 AM, Stefan Wahren wrote:
-> Hi Florian
+On Mon, Nov 06, 2017 at 04:46:54PM +0100, Greg Kroah-Hartman wrote:
+> On Mon, Nov 06, 2017 at 10:59:47AM +0200, Gilad Ben-Yossef wrote:
+> > On Mon, Nov 6, 2017 at 10:37 AM, Tobin C. Harding <me@tobin.cc> wrote:
+> > > On Mon, Nov 06, 2017 at 06:55:52AM +0000, Gilad Ben-Yossef wrote:
+> > >> Registers ioread/iowrite operations were done via macros,
+> > >> sometime using a "magical" implicit parameter.
+> > >>
+> > >> Replace all register access with simple inline macros.
+> > >>
+> > >> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+> > >
+> > > Hi,
+> > >
+> > > Nice work. I had a little trouble following this one. Perhaps you are
+> > > doing more than one thing per patch, feel free to ignore me if I am
+> > > wrong but it seems you are moving the macro definition of CC_REG to a
+> > > different header, adding the new inline functions and doing some other
+> > > change that I can't grok (commented on below).
+> > >
+> > > Perhaps this patch could be broken up.
+> > 
+> > Thank you Tobin.
+> > 
+> > The original macro that I am replacing had an assumption of a variable void *
+> > cc_base being defined in the context of the macro being called, even though
+> > it was not listed in the explicit parameter list of the macro.
+> > 
+> > The inline function that replace it instead takes an explicit
+> > parameter a pointer to
+> > struct ssi_drive data * , who has said cc_base as one of the fields.
+> > 
+> > As a result several function that took a void * cc_base parameter
+> > (which is than only
+> > used implicitly via the macro without ever being visibly referenced), now take
+> > struct ssi_drive data * parameter instead which is passed explicitly
+> > to the inline
+> > function.
+> > 
+> > These seems to be the places you are referring to. They are cascading changes
+> > resulting from the change in API between the macro and the inline
+> > function that replaces it.
+> > 
+> > I imagine I can try to break that change to two patches but at least
+> > in my mind this is artificial
+> > and it is a single logical change.
+> > 
+> > Having said that, if you think otherwise and consider this
+> > none-reviewable even after this
+> > explanation let me know and  I'd be happy to break it down.
 > 
->> Florian Fainelli <f.fainelli@gmail.com> hat am 2. November 2017 um 02:04 geschrieben:
->>
->>
->> We have now incorporated all necessary functionality for the BCM63xx
->> platforms to successfully migrate over bcm2835-rng, so add the final
->> bits: Kconfig selection and proper platform_device device type matching
->> to keep the same platform device name for registration to work.
->>
->> Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
->> ---
->>  drivers/char/hw_random/Kconfig       |  7 ++++---
->>  drivers/char/hw_random/bcm2835-rng.c | 11 ++++++++++-
->>  2 files changed, 14 insertions(+), 4 deletions(-)
->>
->> diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
->> index 95a031e9eced..d0689cc8c7fc 100644
->> --- a/drivers/char/hw_random/Kconfig
->> +++ b/drivers/char/hw_random/Kconfig
->> @@ -87,12 +87,13 @@ config HW_RANDOM_BCM63XX
->>  	  If unusure, say Y.
->>  
->>  config HW_RANDOM_BCM2835
->> -	tristate "Broadcom BCM2835 Random Number Generator support"
->> -	depends on ARCH_BCM2835 || ARCH_BCM_NSP || ARCH_BCM_5301X
->> +	tristate "Broadcom BCM2835/BCM63xx Random Number Generator support"
->> +	depends on ARCH_BCM2835 || ARCH_BCM_NSP || ARCH_BCM_5301X || \
->> +		   ARCH_BCM_63XX || BCM63XX || BMIPS_GENERIC
->>  	default HW_RANDOM
->>  	---help---
->>  	  This driver provides kernel-side support for the Random Number
->> -	  Generator hardware found on the Broadcom BCM2835 SoCs.
->> +	  Generator hardware found on the Broadcom BCM2835 and BCM63xx SoCs.
->>  
->>  	  To compile this driver as a module, choose M here: the
->>  	  module will be called bcm2835-rng
->> diff --git a/drivers/char/hw_random/bcm2835-rng.c b/drivers/char/hw_random/bcm2835-rng.c
->> index 650e0033c273..d9ffe14f312b 100644
->> --- a/drivers/char/hw_random/bcm2835-rng.c
->> +++ b/drivers/char/hw_random/bcm2835-rng.c
->> @@ -131,6 +131,7 @@ static const struct of_device_id bcm2835_rng_of_match[] = {
->>  	{ .compatible = "brcm,bcm2835-rng"},
->>  	{ .compatible = "brcm,bcm-nsp-rng", .data = &nsp_rng_of_data },
->>  	{ .compatible = "brcm,bcm5301x-rng", .data = &nsp_rng_of_data },
->> +	{ .compatible = "brcm,bcm6368-rng"},
->>  	{},
->>  };
->>  
->> @@ -164,7 +165,7 @@ static int bcm2835_rng_probe(struct platform_device *pdev)
->>  	if (IS_ERR(priv->clk))
->>  		priv->clk = NULL;
->>  
->> -	priv->rng.name = "bcm2835-rng";
->> +	priv->rng.name = pdev->id_entry->name;
-> 
-> this change breaks registration on bcm2835, because the name is NULL.
+> Nah, this is fine, I'll take it as-is.  Tobin, thanks for the review.
 
-OH right, I will fix that in v2, I am assuming that if you did something
-like this, things still work correctly for you on 2835:
+No worries. Greg make sure you yell at me if I start causing you more
+work than I'm saving. It's a fine line reviewing patches when you are
+not super experienced.
 
-if (!priv->id_entry->name)
-	priv->rng.name = "bcm2835-rng";
-else
-	priv->rng.name = priv->id_entry->name;
-
-?
-
-> 
-> Regards
-> Stefan
-> 
->>  	priv->rng.init = bcm2835_rng_init;
->>  	priv->rng.read = bcm2835_rng_read;
->>  	priv->rng.cleanup = bcm2835_rng_cleanup;
->> @@ -190,12 +191,20 @@ static int bcm2835_rng_probe(struct platform_device *pdev)
->>  
->>  MODULE_DEVICE_TABLE(of, bcm2835_rng_of_match);
->>  
->> +static struct platform_device_id bcm2835_rng_devtype[] = {
->> +	{ .name = "bcm2835-rng" },
->> +	{ .name = "bcm63xx-rng" },
->> +	{ /* sentinel */ }
->> +};
->> +MODULE_DEVICE_TABLE(platform, bcm2835_rng_devtype);
->> +
->>  static struct platform_driver bcm2835_rng_driver = {
->>  	.driver = {
->>  		.name = "bcm2835-rng",
->>  		.of_match_table = bcm2835_rng_of_match,
->>  	},
->>  	.probe		= bcm2835_rng_probe,
->> +	.id_table	= bcm2835_rng_devtype,
->>  };
->>  module_platform_driver(bcm2835_rng_driver);
->>  
->> -- 
->> 2.9.3
->>
->>
->> _______________________________________________
->> linux-arm-kernel mailing list
->> linux-arm-kernel@lists.infradead.org
->> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
-
-
--- 
-Florian
+thanks,
+Tobin.
