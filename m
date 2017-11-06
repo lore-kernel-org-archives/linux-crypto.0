@@ -1,7 +1,7 @@
 From: Eric Biggers <ebiggers3@gmail.com>
-Subject: [PATCH v2 4/5] crypto: qat - Clean up error handling in qat_dh_set_secret()
-Date: Sun,  5 Nov 2017 18:30:47 -0800
-Message-ID: <20171106023048.8067-5-ebiggers3@gmail.com>
+Subject: [PATCH v2 5/5] crypto: dh - Remove pointless checks for NULL 'p' and 'g'
+Date: Sun,  5 Nov 2017 18:30:48 -0800
+Message-ID: <20171106023048.8067-6-ebiggers3@gmail.com>
 References: <20171106023048.8067-1-ebiggers3@gmail.com>
 Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
         Salvatore Benedetto <salvatore.benedetto@intel.com>,
@@ -12,68 +12,54 @@ Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
 To: linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pg0-f65.google.com ([74.125.83.65]:45643 "EHLO
-        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751540AbdKFCbZ (ORCPT
+Received: from mail-pf0-f195.google.com ([209.85.192.195]:51001 "EHLO
+        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751405AbdKFCb0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 5 Nov 2017 21:31:25 -0500
+        Sun, 5 Nov 2017 21:31:26 -0500
 In-Reply-To: <20171106023048.8067-1-ebiggers3@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 From: Eric Biggers <ebiggers@google.com>
 
-Update the error handling in qat_dh_set_secret() to mirror
-dh_set_secret().  The new version is less error-prone because freeing
-memory and setting the pointers to NULL is now only done in one place.
+Neither 'p' nor 'g' can be NULL, as they were unpacked using
+crypto_dh_decode_key().  And it makes no sense for them to be optional.
+So remove the NULL checks that were copy-and-pasted into both modules.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- drivers/crypto/qat/qat_common/qat_asym_algs.c | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+ crypto/dh.c                                   | 3 ---
+ drivers/crypto/qat/qat_common/qat_asym_algs.c | 3 ---
+ 2 files changed, 6 deletions(-)
 
+diff --git a/crypto/dh.c b/crypto/dh.c
+index aadaf36fb56f..5659fe7f446d 100644
+--- a/crypto/dh.c
++++ b/crypto/dh.c
+@@ -53,9 +53,6 @@ static int dh_check_params_length(unsigned int p_len)
+ 
+ static int dh_set_params(struct dh_ctx *ctx, struct dh *params)
+ {
+-	if (unlikely(!params->p || !params->g))
+-		return -EINVAL;
+-
+ 	if (dh_check_params_length(params->p_size << 3))
+ 		return -EINVAL;
+ 
 diff --git a/drivers/crypto/qat/qat_common/qat_asym_algs.c b/drivers/crypto/qat/qat_common/qat_asym_algs.c
-index 6f5dd68449c6..7655fdb499de 100644
+index 7655fdb499de..13c52d6bf630 100644
 --- a/drivers/crypto/qat/qat_common/qat_asym_algs.c
 +++ b/drivers/crypto/qat/qat_common/qat_asym_algs.c
-@@ -462,11 +462,8 @@ static int qat_dh_set_params(struct qat_dh_ctx *ctx, struct dh *params)
- 	}
+@@ -443,9 +443,6 @@ static int qat_dh_set_params(struct qat_dh_ctx *ctx, struct dh *params)
+ 	struct qat_crypto_instance *inst = ctx->inst;
+ 	struct device *dev = &GET_DEV(inst->accel_dev);
  
- 	ctx->g = dma_zalloc_coherent(dev, ctx->p_size, &ctx->dma_g, GFP_KERNEL);
--	if (!ctx->g) {
--		dma_free_coherent(dev, ctx->p_size, ctx->p, ctx->dma_p);
--		ctx->p = NULL;
-+	if (!ctx->g)
- 		return -ENOMEM;
--	}
- 	memcpy(ctx->g + (ctx->p_size - params->g_size), params->g,
- 	       params->g_size);
+-	if (unlikely(!params->p || !params->g))
+-		return -EINVAL;
+-
+ 	if (qat_dh_check_params_length(params->p_size << 3))
+ 		return -EINVAL;
  
-@@ -507,18 +504,22 @@ static int qat_dh_set_secret(struct crypto_kpp *tfm, const void *buf,
- 
- 	ret = qat_dh_set_params(ctx, &params);
- 	if (ret < 0)
--		return ret;
-+		goto err_clear_ctx;
- 
- 	ctx->xa = dma_zalloc_coherent(dev, ctx->p_size, &ctx->dma_xa,
- 				      GFP_KERNEL);
- 	if (!ctx->xa) {
--		qat_dh_clear_ctx(dev, ctx);
--		return -ENOMEM;
-+		ret = -ENOMEM;
-+		goto err_clear_ctx;
- 	}
- 	memcpy(ctx->xa + (ctx->p_size - params.key_size), params.key,
- 	       params.key_size);
- 
- 	return 0;
-+
-+err_clear_ctx:
-+	qat_dh_clear_ctx(dev, ctx);
-+	return ret;
- }
- 
- static unsigned int qat_dh_max_size(struct crypto_kpp *tfm)
 -- 
 2.15.0
