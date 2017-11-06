@@ -1,68 +1,104 @@
-From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: general protection fault in asn1_ber_decoder
-Date: Mon, 6 Nov 2017 10:43:59 -0800
-Message-ID: <20171106184359.GC50562@gmail.com>
-References: <94eb2c1886e4e1e95e055d54b9ab@google.com>
+From: Jacob Pan <jacob.jun.pan-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
+Subject: Re: [PATCH] iommu/vt-d: Fix scatterlist offset handling
+Date: Mon, 6 Nov 2017 10:47:09 -0800
+Message-ID: <20171106104709.06b38f7c@jacob-builder>
+References: <644c3e01654f8bd48d669c36e424959d6ef0e27e.1506607370.git.robin.murphy@arm.com>
+	<1507035334.29211.105.camel@infradead.org>
+	<db8c70d7-5978-20e8-d29a-91a4312f97dd@arm.com>
+	<20171006144309.GA30803@8bytes.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, dhowells@redhat.com,
-        herbert@gondor.apana.org.au, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-To: syzbot
-        <bot+04b92812698232d15d78c1e4d3bbf6fcc21eeeb1@syzkaller.appspotmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <94eb2c1886e4e1e95e055d54b9ab@google.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: leedom-ut6Up61K2wZBDgjK7y7TUQ@public.gmane.org, herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
+	David Woodhouse <dwmw2-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Harsh-ut6Up61K2wZBDgjK7y7TUQ@public.gmane.org
+To: Joerg Roedel <joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org>
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <20171006144309.GA30803-zLv9SwRftAIdnm+yROfE0A@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Nov 06, 2017 at 10:36:00AM -0800, syzbot wrote:
-> kasan: GPF could be caused by NULL-ptr deref or user memory access
-> general protection fault: 0000 [#1] SMP KASAN
-> Dumping ftrace buffer:
->    (ftrace buffer empty)
-> Modules linked in:
-> CPU: 3 PID: 2984 Comm: syzkaller229187 Not tainted
-> 4.14.0-rc7-next-20171103+ #10
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Bochs 01/01/2011
-> task: ffff88003ab66000 task.stack: ffff880039d58000
-> RIP: 0010:asn1_ber_decoder+0x41e/0x1af0 lib/asn1_decoder.c:233
-> RSP: 0018:ffff880039d5f8d0 EFLAGS: 00010246
-> RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
-> RDX: 0000000000000000 RSI: ffff88006981bf00 RDI: ffffffff853f1920
-> RBP: ffff880039d5fb88 R08: 0000000000000060 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
-> R13: 0000000000000000 R14: ffff880039d5fb60 R15: dffffc0000000000
-> FS:  00000000010ac880(0000) GS:ffff88006df00000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000000020f49ffb CR3: 000000006aeb8000 CR4: 00000000000006e0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->  pkcs7_parse_message+0x2b3/0x730 crypto/asymmetric_keys/pkcs7_parser.c:139
->  verify_pkcs7_signature+0x8d/0x290 certs/system_keyring.c:216
->  pkcs7_preparse+0x7b/0xc0 crypto/asymmetric_keys/pkcs7_key_type.c:63
->  key_create_or_update+0x533/0x1040 security/keys/key.c:855
->  SYSC_add_key security/keys/keyctl.c:122 [inline]
->  SyS_add_key+0x18a/0x340 security/keys/keyctl.c:62
->  entry_SYSCALL_64_fastpath+0x1f/0xbe
-> RIP: 0033:0x434f39
-> RSP: 002b:00007fff51fda138 EFLAGS: 00000286 ORIG_RAX: 00000000000000f8
-> RAX: ffffffffffffffda RBX: 00000000004002b0 RCX: 0000000000434f39
-> RDX: 0000000020000000 RSI: 0000000020f49ffb RDI: 0000000020f4a000
-> RBP: 0000000000000086 R08: ffffffffffffffff R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000286 R12: 0000000000000000
-> R13: 00000000004018b0 R14: 0000000000401940 R15: 0000000000000000
-> Code: 19 ff 48 8d 43 01 49 89 86 80 fe ff ff 48 89 85 a8 fd ff ff 48
-> 8b 85 c0 fd ff ff 48 01 d8 48 89 c2 48 89 c1 48 c1 ea 03 83 e1 07
-> <42> 0f b6 14 3a 38 ca 7f 08 84 d2 0f 85 cd 0f 00 00 0f b6 00 88
-> RIP: asn1_ber_decoder+0x41e/0x1af0 lib/asn1_decoder.c:233 RSP:
-> ffff880039d5f8d0
+On Fri, 6 Oct 2017 16:43:09 +0200
+Joerg Roedel <joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org> wrote:
 
-I'll be sending a fix for this.  The bug is an integer underflow in the
-expression 'if (unlikely(dp >= datalen - 1))', which causes a NULL pointer
-dereference if you try to add a "pkcs7_test" key with an empty payload (requires
-CONFIG_PKCS7_TEST_KEY=y).
+> On Tue, Oct 03, 2017 at 07:05:17PM +0100, Robin Murphy wrote:
+> > Now, there are indeed plenty of drivers and subsystems which do
+> > work on lists of explicitly single pages - anything doing some
+> > variant of "addr = kmap_atomic(sg_page(sg)) + sg->offset;" is easy
+> > to spot - but I don't think DMA API implementations are in a
+> > position to make any kind of assumption; nearly all of them just
+> > shut up and handle sg->length bytes from sg_phys(sg) without
+> > questioning the caller, and I reckon that's exactly what they
+> > should be doing.  
+> 
+> I agree with that, it is not explicitly forbidden to have an
+> sg->offset > PAGE_SIZE and most IOMMU drivers handle this case.
+> 
+> So this is a problem I'd like to see resolved in the VT-d driver too.
+> If nobody comes up with a correct fix soon I'll apply this one and
+> rip out the large-page support from __domain_mapping() to make it
+> work.
+> 
+Hi All,
 
-Eric
+Just to give an update on the offline debugging of this issue. With
+Robin's patch applied, I was able to reproduce the failure with
+similar configuration that Jain helped to set up.
+
+I added trace prints just to see the map/unmap activities leading to
+the DMAR fault. When fault occurs, the trace shows there is an unmap to
+the offending iova pfn. So I think this is a separate problem than
+Robin's patch is fixing. I think we should move forward to merge this
+patch upstream and stable. The remaining problem is likely a race
+condition between unmap and DMA activities.
+
+Here a brief extracted log, ee3d7 is the iova pfn in question.
+#1. map sg pfn ee3d7
+          <idle>-0     [076] 74124.154254: bprint:               __domain_mapping: vpfn:ee3d7, pgoff=2126, np:1, da:ee3d784e, len:1464
+, ppfn:1849c9c                                                                                                                        
+
+#2. unmap ee3d7000
+         <idle>-0     [054] 74124.154301: bprint:               intel_unmap: Device 0000:18:00.4 unmapping: pfn ee3d7-ee3d7          
+         <idle>-0     [076] 74124.154301: bprint:               __domain_mapping: lvlpg:1, nrpg 0, vpfn:ec2ff, ppfn:183221a, sg_res:0
+         <idle>-0     [059] 74124.154302: bprint:               __domain_mapping: lvlpg:1, nrpg 0, vpfn:ee719, ppfn:c3e4dd, sg_res:0 
+         <idle>-0     [076] 74124.154302: bprint:               __domain_mapping: vpfn:f183b, pgoff=78, np:1, da:f183b04e, len:1464, 
+
+#3. DMA to unmapped address ee3d7000, DMAR fault raised.
+  +2.952861] dmar_fault: 6 callbacks suppressed                                                                                   
+  +0.000002] DMAR: DRHD: handling fault status reg 2                                                                              
+  +0.005588] turning tracing off                                                                                                  
+  +0.003592] DMAR: [DMA Write] Request device [18:00.4] fault addr ee3d7000 [fault reason 05] PTE Write access is not set         
+                                                                                                                                  
+                                                                                                                                                                                                                                                               
+         <idle>-0     [000] 74124.156906: bputs:
+         0xffffffffb259916bs: turning tracing off     
+
+
+Thanks,
+
+Jacob
+
+> Speaking of __domain_mapping(), this function is a big unmaintainable
+> mess which should be split and rewritten. A clean and maintainable
+> rewrite can alse re-add the large-page support.
+> 
+> 
+> Regards,
+> 
+> 	Joerg
+> 
+> _______________________________________________
+> iommu mailing list
+> iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+> https://lists.linuxfoundation.org/mailman/listinfo/iommu
+
+[Jacob Pan]
