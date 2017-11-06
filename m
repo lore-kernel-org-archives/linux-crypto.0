@@ -1,53 +1,51 @@
-From: Andrew Lunn <andrew@lunn.ch>
-Subject: Re: [PATCH 07/12] hwrng: bcm2835-rng: Manage an optional clock
-Date: Sat, 4 Nov 2017 21:17:21 +0100
-Message-ID: <20171104201721.GA1394@lunn.ch>
-References: <20171102010408.27736-1-f.fainelli@gmail.com>
- <20171102010408.27736-8-f.fainelli@gmail.com>
- <944505791.223880.1509803454887@email.1und1.de>
- <e12063f9-86e4-e9ce-2a7f-f85fe2ce352f@gmail.com>
- <547786283.132202.1509819754396@email.1und1.de>
- <20171104193731.GA751@lunn.ch>
- <20171104200806.GS9463@n2100.armlinux.org.uk>
+From: Jason Gunthorpe <jgg@ziepe.ca>
+Subject: Re: [PATCH v2] tpm: Move Linux RNG connection to hwrng
+Date: Sun, 5 Nov 2017 19:27:04 -0700
+Message-ID: <20171106022704.GD26011@ziepe.ca>
+References: <20171031200503.GC18578@ziepe.ca>
+ <20171105110506.usxmuzrvcjvxahr6@linux.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Stefan Wahren <stefan.wahren@i2se.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
-        <devicetree@vger.kernel.org>, Sean Wang <sean.wang@mediatek.com>,
-        Martin Kaiser <martin@kaiser.cx>,
+Cc: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
+        Stefan Berger <stefanb@linux.vnet.ibm.com>,
+        linux-integrity@vger.kernel.org,
+        David Howells <dhowells@redhat.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Scott Branden <sbranden@broadcom.com>,
-        Ray Jui <rjui@broadcom.com>, Matt Mackall <mpm@selenic.com>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        linux-kernel@vger.kernel.org, Eric Anholt <eric@anholt.net>,
-        Harald Freudenberger <freude@linux.vnet.ibm.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        "maintainer:BROADCOM BCM281XX/BCM11XXX/BCM216XX ARM ARCHITE..."
-        <bcm-kernel-feedback-list@broadcom.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:INTEGRITY MEASUREMENT ARCHITECTURE (IMA)"
+        <linux-security-module@vger.kernel.org>,
+        "open list:KEYS-TRUSTED" <keyrings@vger.kernel.org>,
         "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linu
-To: Russell King - ARM Linux <linux@armlinux.org.uk>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from vps0.lunn.ch ([185.16.172.187]:42186 "EHLO vps0.lunn.ch"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751447AbdKDURg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 4 Nov 2017 16:17:36 -0400
+        <linux-crypto@vger.kernel.org>,
+        James Morris <james.l.morris@oracle.com>,
+        Matt Mackall <mpm@selenic.com>,
+        David Safford <safford@us.ibm.com>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        "Serge E. Hallyn" <serge@hallyn.com>
+To: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+Return-path: <linux-security-module-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20171104200806.GS9463@n2100.armlinux.org.uk>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20171105110506.usxmuzrvcjvxahr6@linux.intel.com>
+Sender: owner-linux-security-module@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-> The clk API outside of DT doesn't have knowledge of when it's "complete"
-> to be able to determine whether the clock is not present or temporarily
-> missing.  I've already NAK'd this suggestion.
+On Sun, Nov 05, 2017 at 01:05:06PM +0200, Jarkko Sakkinen wrote:
 
-Hi Russell
+> I asked to create a series for a reason. Now this doesn't apply because I
+> don't have an ancestor in my git history.
 
-O.K, yes, makes sense.
+It would be unusual for me to put your patch into a series unless I am
+also adopting it. eg what happens if there are more comments on it?
 
-We do have of_clk_get_by_name() and of_clk_get(). Would optional
-variants of these be acceptable?
+Also, I wasn't sure what branch your patch was against since my tree
+didn't have history for it either..
 
-	 Andrew
+Sometimes the maintainer has to sort stuff like this out... :)
+
+> Please resend as series together with my patch. I can apply neither yet
+> because they have zero tested-by's.
+
+Hopefully PrasannaKumar can test both patches.
+
+Jason
