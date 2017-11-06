@@ -1,56 +1,40 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 4.14
-Date: Mon, 6 Nov 2017 14:37:38 +0800
-Message-ID: <20171106063737.GA14220@gondor.apana.org.au>
-References: <20161119102748.GA4277@gondor.apana.org.au>
- <20161213132414.GA7898@gondor.apana.org.au>
- <20170223125141.GA17400@gondor.apana.org.au>
- <20170714141855.GA29426@gondor.apana.org.au>
- <20170922084401.GA15541@gondor.apana.org.au>
- <20171012105101.GA29403@gondor.apana.org.au>
- <20171030072048.GA21737@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: [PATCH 0/3] More code cleanups
+Date: Mon,  6 Nov 2017 06:55:49 +0000
+Message-ID: <1509951354-16370-1-git-send-email-gilad@benyossef.com>
+Cc: Ofir Drang <ofir.drang@arm.com>, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:51700 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750778AbdKFGiM (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 6 Nov 2017 01:38:12 -0500
-Content-Disposition: inline
-In-Reply-To: <20171030072048.GA21737@gondor.apana.org.au>
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:60122 "EHLO
+        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750749AbdKFG4E (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 6 Nov 2017 01:56:04 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus: 
+Additional code readability and simplification patches.
+These goes on top the previous patch set sent to the list.
 
-This push fixes an unaligned panic in x86/sha-mb and a bug in ccm
-that triggers with certain underlying implementations.
+Gilad Ben-Yossef (3):
+  staging: ccree: simplify error handling logic
+  staging: ccree: simplify registers access
+  staging: ccree: simplify ioread/iowrite
 
+ drivers/staging/ccree/cc_hal.h           | 33 --------------
+ drivers/staging/ccree/cc_regs.h          | 42 ------------------
+ drivers/staging/ccree/dx_reg_base_host.h | 25 -----------
+ drivers/staging/ccree/ssi_driver.c       | 75 ++++++++++++++------------------
+ drivers/staging/ccree/ssi_driver.h       | 20 +++++++--
+ drivers/staging/ccree/ssi_fips.c         | 14 +++---
+ drivers/staging/ccree/ssi_pm.c           |  4 +-
+ drivers/staging/ccree/ssi_request_mgr.c  | 72 +++++++++++++++---------------
+ drivers/staging/ccree/ssi_sysfs.c        | 11 +++--
+ 9 files changed, 98 insertions(+), 198 deletions(-)
+ delete mode 100644 drivers/staging/ccree/cc_hal.h
+ delete mode 100644 drivers/staging/ccree/cc_regs.h
+ delete mode 100644 drivers/staging/ccree/dx_reg_base_host.h
 
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-
-
-Andrey Ryabinin (2):
-      crypto: x86/sha256-mb - fix panic due to unaligned access
-      crypto: x86/sha1-mb - fix panic due to unaligned access
-
-Romain Izard (1):
-      crypto: ccm - preserve the IV buffer
-
- arch/x86/crypto/sha1-mb/sha1_mb_mgr_flush_avx2.S     |   12 ++++++------
- arch/x86/crypto/sha256-mb/sha256_mb_mgr_flush_avx2.S |   12 ++++++------
- crypto/ccm.c                                         |    4 +++-
- 3 files changed, 15 insertions(+), 13 deletions(-)
-
-Thanks,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.7.4
