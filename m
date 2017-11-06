@@ -1,52 +1,55 @@
-From: Romain Izard <romain.izard.pro@gmail.com>
-Subject: Re: [PATCH 2/2] crypto: atmel-aes - Reset the controller before each use
-Date: Mon, 6 Nov 2017 16:57:12 +0100
-Message-ID: <CAGkQfmNFZcfeTVPOhQEwqXjaUPVu1se+j-x_kbrB29ag_4OU9A@mail.gmail.com>
-References: <20171031152524.25216-1-romain.izard.pro@gmail.com>
- <20171031152524.25216-3-romain.izard.pro@gmail.com> <ff2356ef-2c11-18e5-6da2-654b1d77280c@microchip.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH] crypto: AF_ALG - remove locking in async callback
+Date: Mon, 06 Nov 2017 17:06:09 +0100
+Message-ID: <1977235.9AvJZzduGj@tauon.chronox.de>
+References: <CAGkQfmNKbSwue13zPh2K1F_kLkpm1_AhsAHK4spRFA0xMvU5PA@mail.gmail.com> <5260911.ZuXsrgFD2R@positron.chronox.de> <20171103132016.GB8330@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Romain Izard <romain.izard.pro@gmail.com>,
+        linux-crypto@vger.kernel.org,
+        Cyrille Pitchen <cyrille.pitchen@microchip.com>,
+        Tudor Ambarus <tudor.ambarus@microchip.com>,
         Nicolas Ferre <nicolas.ferre@microchip.com>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
-To: Tudor Ambarus <tudor.ambarus@microchip.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <ff2356ef-2c11-18e5-6da2-654b1d77280c@microchip.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:42152 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753822AbdKFQGN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 6 Nov 2017 11:06:13 -0500
+In-Reply-To: <20171103132016.GB8330@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-2017-11-06 16:45 GMT+01:00 Tudor Ambarus <tudor.ambarus@microchip.com>:
-> Hi, Romain,
->
-> On 10/31/2017 05:25 PM, Romain Izard wrote:
->>
->> When using the rfc4543(gcm(aes))) mode, the registers of the hardware
->> engine are not empty after use. If the engine is not reset before its
->> next use, the following results will be invalid.
->>
->> Always reset the hardware engine.
->
->
-> Thanks for the fix! I could reproduce the issue only when running
-> rfc4543(gcm(aes))) and then, immediately after, ecb(aes).
->
-> Have you encountered this bug with other combination of algorithms?
->
-> I'm trying to isolate the bug so that we can have a more fine-grained
-> fix.
+Am Freitag, 3. November 2017, 14:20:16 CET schrieb Herbert Xu:
 
-I just ran the tcrypt tests because they were failing on the
-cts(cbc(aes)) transform and I observed this issue when the ecb
-test failed only on the second run.
+Hi Herbert,
 
-For me, the issue looks like the rfc4543 mode does not read
-all the registers from the AES engine, and the following operation
-fails because the registers are reused directly in the ECB mode.
+> > 
+> > The code paths protected by the socket-lock do not use or modify the
+> > socket in a non-atomic fashion. The actions pertaining the socket do not
+> > even need to be handled as an atomic operation. Thus, the socket-lock
+> > can be safely ignored.
+> 
+> Are you sure about that? In particular is the callback function still
+> sane without the socket lock if a concurrent recvmsg/sendmsg call is
+> made?
 
-As the ECB mode is a rare case where we do not use an IV, this
-may be the reason why other modes do not display the issue.
+I reviewed the code again and I cannot find a reason for keeping the lock. All 
+we need to ensure is that the socket exists. This is ensured with the refcount 
+of the socket released by __sock_put().
 
--- 
-Romain Izard
+Would you mind helping me where you think the lock is needed.
+> 
+> Your fixes header is wrong too as the locks weren't introduced in that
+> commit, they just got moved around.
+
+Correct, the initial introduction was in 
+e870456d8e7c8d57c059ea479b5aadbb55ff4c3a (algif_skcipher) and 
+d887c52d6ae43aeebd249b5f2f1333e60236aa60 (algif_aead)
+
+Thanks a lot.
+
+Ciao
+Stephan
