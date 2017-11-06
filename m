@@ -1,86 +1,48 @@
-From: "Tobin C. Harding" <me@tobin.cc>
-Subject: Re: [PATCH 3/3] staging: ccree: simplify ioread/iowrite
-Date: Tue, 7 Nov 2017 07:24:48 +1100
-Message-ID: <20171106202448.GL18478@eros>
-References: <1509951354-16370-1-git-send-email-gilad@benyossef.com>
- <1509951354-16370-4-git-send-email-gilad@benyossef.com>
- <20171106083736.GJ18478@eros>
- <CAOtvUMcjUJw_hRwf+4pEv9-yXwgjnRrUpWbyASFt6AFjfTyOpg@mail.gmail.com>
- <20171106154654.GA15407@kroah.com>
+From: Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH 1/2] dt-bindings: rng: Document BCM7278 RNG200 compatible
+Date: Mon, 6 Nov 2017 14:26:59 -0600
+Message-ID: <20171106202659.kmqvq6jvvehsg6ii@rob-hp-laptop>
+References: <20171101232006.3943-1-f.fainelli@gmail.com>
+ <20171101232006.3943-2-f.fainelli@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Gilad Ben-Yossef <gilad@benyossef.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        devel@driverdev.osuosl.org, driverdev-devel@linuxdriverproject.org,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
-        Ofir Drang <ofir.drang@arm.com>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: linux-kernel@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        Jon Mason <jonmason@broadcom.com>,
+        "maintainer:BROADCOM IPROC ARM ARCHITECTURE"
+        <bcm-kernel-feedback-list@broadcom.com>,
+        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
+        Sean Wang <sean.wang@mediatek.com>,
+        Russell King <rmk+kernel@armlinux.org.uk>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Harald Freudenberger <freude@linux.vnet.ibm.com>,
+        Martin Kaiser <martin@kaiser.cx>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
+        <devicetree@vger.kernel.o
+To: Florian Fainelli <f.fainelli@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from out4-smtp.messagingengine.com ([66.111.4.28]:51515 "EHLO
-        out4-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1753585AbdKFUYw (ORCPT
+Received: from mail-ot0-f169.google.com ([74.125.82.169]:47754 "EHLO
+        mail-ot0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932430AbdKFU1B (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 6 Nov 2017 15:24:52 -0500
+        Mon, 6 Nov 2017 15:27:01 -0500
 Content-Disposition: inline
-In-Reply-To: <20171106154654.GA15407@kroah.com>
+In-Reply-To: <20171101232006.3943-2-f.fainelli@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Nov 06, 2017 at 04:46:54PM +0100, Greg Kroah-Hartman wrote:
-> On Mon, Nov 06, 2017 at 10:59:47AM +0200, Gilad Ben-Yossef wrote:
-> > On Mon, Nov 6, 2017 at 10:37 AM, Tobin C. Harding <me@tobin.cc> wrote:
-> > > On Mon, Nov 06, 2017 at 06:55:52AM +0000, Gilad Ben-Yossef wrote:
-> > >> Registers ioread/iowrite operations were done via macros,
-> > >> sometime using a "magical" implicit parameter.
-> > >>
-> > >> Replace all register access with simple inline macros.
-> > >>
-> > >> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
-> > >
-> > > Hi,
-> > >
-> > > Nice work. I had a little trouble following this one. Perhaps you are
-> > > doing more than one thing per patch, feel free to ignore me if I am
-> > > wrong but it seems you are moving the macro definition of CC_REG to a
-> > > different header, adding the new inline functions and doing some other
-> > > change that I can't grok (commented on below).
-> > >
-> > > Perhaps this patch could be broken up.
-> > 
-> > Thank you Tobin.
-> > 
-> > The original macro that I am replacing had an assumption of a variable void *
-> > cc_base being defined in the context of the macro being called, even though
-> > it was not listed in the explicit parameter list of the macro.
-> > 
-> > The inline function that replace it instead takes an explicit
-> > parameter a pointer to
-> > struct ssi_drive data * , who has said cc_base as one of the fields.
-> > 
-> > As a result several function that took a void * cc_base parameter
-> > (which is than only
-> > used implicitly via the macro without ever being visibly referenced), now take
-> > struct ssi_drive data * parameter instead which is passed explicitly
-> > to the inline
-> > function.
-> > 
-> > These seems to be the places you are referring to. They are cascading changes
-> > resulting from the change in API between the macro and the inline
-> > function that replaces it.
-> > 
-> > I imagine I can try to break that change to two patches but at least
-> > in my mind this is artificial
-> > and it is a single logical change.
-> > 
-> > Having said that, if you think otherwise and consider this
-> > none-reviewable even after this
-> > explanation let me know and  I'd be happy to break it down.
+On Wed, Nov 01, 2017 at 04:20:05PM -0700, Florian Fainelli wrote:
+> BCM7278 includes a RGN200 hardware random number generator, document the
+> compatible string for that version of the IP.
 > 
-> Nah, this is fine, I'll take it as-is.  Tobin, thanks for the review.
+> Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
+> ---
+>  Documentation/devicetree/bindings/rng/brcm,iproc-rng200.txt | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 
-No worries. Greg make sure you yell at me if I start causing you more
-work than I'm saving. It's a fine line reviewing patches when you are
-not super experienced.
-
-thanks,
-Tobin.
+Acked-by: Rob Herring <robh@kernel.org>
