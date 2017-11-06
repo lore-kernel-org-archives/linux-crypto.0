@@ -1,79 +1,52 @@
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH 3/3] staging: ccree: simplify ioread/iowrite
-Date: Mon, 6 Nov 2017 16:46:54 +0100
-Message-ID: <20171106154654.GA15407@kroah.com>
-References: <1509951354-16370-1-git-send-email-gilad@benyossef.com>
- <1509951354-16370-4-git-send-email-gilad@benyossef.com>
- <20171106083736.GJ18478@eros>
- <CAOtvUMcjUJw_hRwf+4pEv9-yXwgjnRrUpWbyASFt6AFjfTyOpg@mail.gmail.com>
+From: Romain Izard <romain.izard.pro@gmail.com>
+Subject: Re: [PATCH 2/2] crypto: atmel-aes - Reset the controller before each use
+Date: Mon, 6 Nov 2017 16:57:12 +0100
+Message-ID: <CAGkQfmNFZcfeTVPOhQEwqXjaUPVu1se+j-x_kbrB29ag_4OU9A@mail.gmail.com>
+References: <20171031152524.25216-1-romain.izard.pro@gmail.com>
+ <20171031152524.25216-3-romain.izard.pro@gmail.com> <ff2356ef-2c11-18e5-6da2-654b1d77280c@microchip.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "Tobin C. Harding" <me@tobin.cc>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        devel@driverdev.osuosl.org, driverdev-devel@linuxdriverproject.org,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
-        Ofir Drang <ofir.drang@arm.com>
-To: Gilad Ben-Yossef <gilad@benyossef.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:43808 "EHLO
-        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932155AbdKFPqm (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 6 Nov 2017 10:46:42 -0500
-Content-Disposition: inline
-In-Reply-To: <CAOtvUMcjUJw_hRwf+4pEv9-yXwgjnRrUpWbyASFt6AFjfTyOpg@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Nicolas Ferre <nicolas.ferre@microchip.com>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
+To: Tudor Ambarus <tudor.ambarus@microchip.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <ff2356ef-2c11-18e5-6da2-654b1d77280c@microchip.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Nov 06, 2017 at 10:59:47AM +0200, Gilad Ben-Yossef wrote:
-> On Mon, Nov 6, 2017 at 10:37 AM, Tobin C. Harding <me@tobin.cc> wrote:
-> > On Mon, Nov 06, 2017 at 06:55:52AM +0000, Gilad Ben-Yossef wrote:
-> >> Registers ioread/iowrite operations were done via macros,
-> >> sometime using a "magical" implicit parameter.
-> >>
-> >> Replace all register access with simple inline macros.
-> >>
-> >> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
-> >
-> > Hi,
-> >
-> > Nice work. I had a little trouble following this one. Perhaps you are
-> > doing more than one thing per patch, feel free to ignore me if I am
-> > wrong but it seems you are moving the macro definition of CC_REG to a
-> > different header, adding the new inline functions and doing some other
-> > change that I can't grok (commented on below).
-> >
-> > Perhaps this patch could be broken up.
-> 
-> Thank you Tobin.
-> 
-> The original macro that I am replacing had an assumption of a variable void *
-> cc_base being defined in the context of the macro being called, even though
-> it was not listed in the explicit parameter list of the macro.
-> 
-> The inline function that replace it instead takes an explicit
-> parameter a pointer to
-> struct ssi_drive data * , who has said cc_base as one of the fields.
-> 
-> As a result several function that took a void * cc_base parameter
-> (which is than only
-> used implicitly via the macro without ever being visibly referenced), now take
-> struct ssi_drive data * parameter instead which is passed explicitly
-> to the inline
-> function.
-> 
-> These seems to be the places you are referring to. They are cascading changes
-> resulting from the change in API between the macro and the inline
-> function that replaces it.
-> 
-> I imagine I can try to break that change to two patches but at least
-> in my mind this is artificial
-> and it is a single logical change.
-> 
-> Having said that, if you think otherwise and consider this
-> none-reviewable even after this
-> explanation let me know and  I'd be happy to break it down.
+2017-11-06 16:45 GMT+01:00 Tudor Ambarus <tudor.ambarus@microchip.com>:
+> Hi, Romain,
+>
+> On 10/31/2017 05:25 PM, Romain Izard wrote:
+>>
+>> When using the rfc4543(gcm(aes))) mode, the registers of the hardware
+>> engine are not empty after use. If the engine is not reset before its
+>> next use, the following results will be invalid.
+>>
+>> Always reset the hardware engine.
+>
+>
+> Thanks for the fix! I could reproduce the issue only when running
+> rfc4543(gcm(aes))) and then, immediately after, ecb(aes).
+>
+> Have you encountered this bug with other combination of algorithms?
+>
+> I'm trying to isolate the bug so that we can have a more fine-grained
+> fix.
 
-Nah, this is fine, I'll take it as-is.  Tobin, thanks for the review.
+I just ran the tcrypt tests because they were failing on the
+cts(cbc(aes)) transform and I observed this issue when the ecb
+test failed only on the second run.
 
-greg k-h
+For me, the issue looks like the rfc4543 mode does not read
+all the registers from the AES engine, and the following operation
+fails because the registers are reused directly in the ECB mode.
+
+As the ECB mode is a rare case where we do not use an IV, this
+may be the reason why other modes do not display the issue.
+
+-- 
+Romain Izard
