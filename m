@@ -1,112 +1,143 @@
-From: David Howells <dhowells@redhat.com>
+From: Eric Biggers <ebiggers3@gmail.com>
 Subject: Re: general protection fault in asn1_ber_decoder
-Date: Mon, 06 Nov 2017 22:05:45 +0000
-Message-ID: <15884.1510005945@warthog.procyon.org.uk>
+Date: Mon, 6 Nov 2017 14:21:53 -0800
+Message-ID: <20171106222153.GA37298@gmail.com>
 References: <94eb2c1886e4e1e95e055d54b9ab@google.com>
+ <15884.1510005945@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: dhowells@redhat.com, ebiggers3@gmail.com, davem@davemloft.net,
-        herbert@gondor.apana.org.au, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-To: syzbot
-        <bot+04b92812698232d15d78c1e4d3bbf6fcc21eeeb1@syzkaller.appspotmail.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: syzbot
+        <bot+04b92812698232d15d78c1e4d3bbf6fcc21eeeb1@syzkaller.appspotmail.com>,
+        davem@davemloft.net, herbert@gondor.apana.org.au,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+To: David Howells <dhowells@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:45630 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752769AbdKFWFt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 6 Nov 2017 17:05:49 -0500
-In-Reply-To: <94eb2c1886e4e1e95e055d54b9ab@google.com>
-Content-ID: <15883.1510005945.1@warthog.procyon.org.uk>
+Received: from mail-io0-f177.google.com ([209.85.223.177]:56472 "EHLO
+        mail-io0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750728AbdKFWV5 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 6 Nov 2017 17:21:57 -0500
+Content-Disposition: inline
+In-Reply-To: <15884.1510005945@warthog.procyon.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-syzbot <bot+04b92812698232d15d78c1e4d3bbf6fcc21eeeb1@syzkaller.appspotmail.com> wrote:
+On Mon, Nov 06, 2017 at 10:05:45PM +0000, David Howells wrote:
+> diff --git a/lib/asn1_decoder.c b/lib/asn1_decoder.c
+> index fef5d2e114be..048de2c20ae9 100644
+> --- a/lib/asn1_decoder.c
+> +++ b/lib/asn1_decoder.c
+> @@ -201,6 +201,13 @@ int asn1_ber_decoder(const struct asn1_decoder *decoder,
+>  	if (datalen > 65535)
+>  		return -EMSGSIZE;
+>  
+> +	/* We don't currently support 0-length messages - the underrun checks
+> +	 * will fail if datalen is 0 because we check against datalen - 1 with
+> +	 * unsigned arithmetic.
+> +	 */
+> +	if (datalen == 0)
+> +		return -EBADMSG;
+> +
 
-> syzkaller hit the following crash on 5a3517e009e979f21977d362212b7729c5165d92
-> git://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/master
-> compiler: gcc (GCC) 7.1.1 20170620
-> .config is attached
-> Raw console output is attached.
-> C reproducer is attached
-> syzkaller reproducer is attached. See https://goo.gl/kgGztJ
-> for information about syzkaller reproducers
+Hi David, you just beat me to it, but I don't think this is the best way to fix
+the problem.  The length check just needs to be rewritten to not overflow.  Also
+it seems there is another broken length check later in the function.  How about
+this:
 
-Does the attached patch fix it for you?
+commit 8bbe85872c660c891eb978a037f590198319e3b2
+Author: Eric Biggers <ebiggers@google.com>
+Date:   Mon Nov 6 10:06:32 2017 -0800
 
-David
----
-commit 41f31a32d918a97dba2ec589d24b52527c8f35b6
-Author: David Howells <dhowells@redhat.com>
-Date:   Mon Nov 6 21:44:00 2017 +0000
-
-    asn1: Fix handling of zero-length ASN.1 messages
+    KEYS: fix NULL pointer dereference during ASN.1 parsing
     
-    The ASN.1 parser doesn't correctly handle zero-length ASN.1 data.  There
-    are at least a couple of ways this can be handled.  The simplest is just to
-    reject zero-length messages upfront on the basis that we don't currently
-    have a grammar that permits such; a more complex way is to expand all the
-    state variables to 32-bit signed so that the:
+    syzkaller reported a NULL pointer dereference in asn1_ber_decoder().  It
+    can be reproduced by the following command, assuming
+    CONFIG_PKCS7_TEST_KEY=y:
     
-                    if (unlikely(dp >= datalen - 1))
+            keyctl add pkcs7_test desc '' @s
     
-    check on line 231 correctly detects underflow when datalen is 0.
+    The bug is that if the data buffer is empty, an integer underflow occurs
+    in the following check:
     
-    For the moment, just choose the simplest option and indicate EBADMSG for a
-    zero-length message, with a comment indicating what needs to be done if the
-    check is removed
+            if (unlikely(dp >= datalen - 1))
+                    goto data_overrun_error;
     
-    The bug can be reproduced by:
+    This results in the NULL data pointer being dereferenced.
     
-            echo -n | keyctl padd pkcs7_test "" @t
+    Fix it by checking for 'datalen - dp < 2' instead.
     
-    The oops resulting from the bug looks like:
+    Also fix the similar check for 'dp >= datalen - n' later in the same
+    function.  That one possibly could result in a buffer overread.
     
-            BUG: unable to handle kernel NULL pointer dereference at (null)
-            IP: asn1_ber_decoder+0xe7/0x5fa
-            ...
-            RIP: 0010:asn1_ber_decoder+0xe7/0x5fa
-            ...
-            Call Trace:
-             ? pkcs7_parse_message+0x11/0x181
-             ? rcu_read_lock_sched_held+0x5f/0x67
-             ? kmem_cache_alloc_trace+0x275/0x2b1
-             ? pkcs7_parse_message+0x9a/0x181
-             pkcs7_parse_message+0xd9/0x181
-             ? pkcs7_preparse+0x48/0x48
-             verify_pkcs7_signature+0x2c/0x107
-             pkcs7_preparse+0x44/0x48
-             ? pkcs7_preparse+0x48/0x48
-             key_create_or_update+0x160/0x3d5
-             SyS_add_key+0x123/0x186
-             do_syscall_64+0x8a/0x190
-             entry_SYSCALL64_slow_path+0x25/0x25
-            ...
+    The NULL pointer dereference was reproducible using the "pkcs7_test" key
+    type but not the "asymmetric" key type because the "asymmetric" key type
+    checks for a 0-length payload before calling into the ASN.1 decoder but
+    the "pkcs7_test" key type does not.
     
-    with the bug falling on line 233 of asn1_decoder.c:
+    The bug report was:
     
-            tag = data[dp++];
+        BUG: unable to handle kernel NULL pointer dereference at           (null)
+        IP: asn1_ber_decoder+0x17f/0xe60 lib/asn1_decoder.c:233
+        PGD 7b708067 P4D 7b708067 PUD 7b6ee067 PMD 0
+        Oops: 0000 [#1] SMP
+        Modules linked in:
+        CPU: 0 PID: 522 Comm: syz-executor1 Not tainted 4.14.0-rc8 #7
+        Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.3-20171021_125229-anatol 04/01/2014
+        task: ffff9b6b3798c040 task.stack: ffff9b6b37970000
+        RIP: 0010:asn1_ber_decoder+0x17f/0xe60 lib/asn1_decoder.c:233
+        RSP: 0018:ffff9b6b37973c78 EFLAGS: 00010216
+        RAX: 0000000000000000 RBX: 0000000000000000 RCX: 000000000000021c
+        RDX: ffffffff814a04ed RSI: ffffb1524066e000 RDI: ffffffff910759e0
+        RBP: ffff9b6b37973d60 R08: 0000000000000001 R09: ffff9b6b3caa4180
+        R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000002
+        R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+        FS:  00007f10ed1f2700(0000) GS:ffff9b6b3ea00000(0000) knlGS:0000000000000000
+        CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+        CR2: 0000000000000000 CR3: 000000007b6f3000 CR4: 00000000000006f0
+        Call Trace:
+         pkcs7_parse_message+0xee/0x240 crypto/asymmetric_keys/pkcs7_parser.c:139
+         verify_pkcs7_signature+0x33/0x180 certs/system_keyring.c:216
+         pkcs7_preparse+0x41/0x70 crypto/asymmetric_keys/pkcs7_key_type.c:63
+         key_create_or_update+0x180/0x530 security/keys/key.c:855
+         SYSC_add_key security/keys/keyctl.c:122 [inline]
+         SyS_add_key+0xbf/0x250 security/keys/keyctl.c:62
+         entry_SYSCALL_64_fastpath+0x1f/0xbe
+        RIP: 0033:0x4585c9
+        RSP: 002b:00007f10ed1f1bd8 EFLAGS: 00000216 ORIG_RAX: 00000000000000f8
+        RAX: ffffffffffffffda RBX: 00007f10ed1f2700 RCX: 00000000004585c9
+        RDX: 0000000020000000 RSI: 0000000020008ffb RDI: 0000000020008000
+        RBP: 0000000000000000 R08: ffffffffffffffff R09: 0000000000000000
+        R10: 0000000000000000 R11: 0000000000000216 R12: 00007fff1b2260ae
+        R13: 00007fff1b2260af R14: 00007f10ed1f2700 R15: 0000000000000000
+        Code: dd ca ff 48 8b 45 88 48 83 e8 01 4c 39 f0 0f 86 a8 07 00 00 e8 53 dd ca ff 49 8d 46 01 48 89 85 58 ff ff ff 48 8b 85 60 ff ff ff <42> 0f b6 0c 30 89 c8 88 8d 75 ff ff ff 83 e0 1f 89 8d 28 ff ff
+        RIP: asn1_ber_decoder+0x17f/0xe60 lib/asn1_decoder.c:233 RSP: ffff9b6b37973c78
+        CR2: 0000000000000000
     
     Fixes: 42d5ec27f873 ("X.509: Add an ASN.1 decoder")
-    Reported-by: syzkaller@googlegroups.com
-    Signed-off-by: David Howells <dhowells@redhat.com>
+    Reported-by: syzbot <syzkaller@googlegroups.com>
+    Cc: <stable@vger.kernel.org> # v3.7+
+    Signed-off-by: Eric Biggers <ebiggers@google.com>
 
 diff --git a/lib/asn1_decoder.c b/lib/asn1_decoder.c
-index fef5d2e114be..048de2c20ae9 100644
+index fef5d2e114be..1ef0cec38d78 100644
 --- a/lib/asn1_decoder.c
 +++ b/lib/asn1_decoder.c
-@@ -201,6 +201,13 @@ int asn1_ber_decoder(const struct asn1_decoder *decoder,
- 	if (datalen > 65535)
- 		return -EMSGSIZE;
+@@ -228,7 +228,7 @@ int asn1_ber_decoder(const struct asn1_decoder *decoder,
+ 		hdr = 2;
  
-+	/* We don't currently support 0-length messages - the underrun checks
-+	 * will fail if datalen is 0 because we check against datalen - 1 with
-+	 * unsigned arithmetic.
-+	 */
-+	if (datalen == 0)
-+		return -EBADMSG;
-+
- next_op:
- 	pr_debug("next_op: pc=\e[32m%zu\e[m/%zu dp=\e[33m%zu\e[m/%zu C=%d J=%d\n",
- 		 pc, machlen, dp, datalen, csp, jsp);
+ 		/* Extract a tag from the data */
+-		if (unlikely(dp >= datalen - 1))
++		if (unlikely(datalen - dp < 2))
+ 			goto data_overrun_error;
+ 		tag = data[dp++];
+ 		if (unlikely((tag & 0x1f) == ASN1_LONG_TAG))
+@@ -274,7 +274,7 @@ int asn1_ber_decoder(const struct asn1_decoder *decoder,
+ 				int n = len - 0x80;
+ 				if (unlikely(n > 2))
+ 					goto length_too_long;
+-				if (unlikely(dp >= datalen - n))
++				if (unlikely(n > datalen - dp))
+ 					goto data_overrun_error;
+ 				hdr += n;
+ 				for (len = 0; n > 0; n--) {
