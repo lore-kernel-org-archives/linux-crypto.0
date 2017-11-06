@@ -1,104 +1,150 @@
-From: Jacob Pan <jacob.jun.pan-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
-Subject: Re: [PATCH] iommu/vt-d: Fix scatterlist offset handling
-Date: Mon, 6 Nov 2017 10:47:09 -0800
-Message-ID: <20171106104709.06b38f7c@jacob-builder>
-References: <644c3e01654f8bd48d669c36e424959d6ef0e27e.1506607370.git.robin.murphy@arm.com>
-	<1507035334.29211.105.camel@infradead.org>
-	<db8c70d7-5978-20e8-d29a-91a4312f97dd@arm.com>
-	<20171006144309.GA30803@8bytes.org>
+From: Florian Fainelli <f.fainelli@gmail.com>
+Subject: Re: [PATCH 11/12] hwrng: bcm2835-rng: Enable BCM2835 RNG to work on
+ BCM63xx platforms
+Date: Mon, 6 Nov 2017 12:16:02 -0800
+Message-ID: <2538f1bb-e0f8-c336-d82a-0cb2f19b0ead@gmail.com>
+References: <20171102010408.27736-1-f.fainelli@gmail.com>
+ <20171102010408.27736-12-f.fainelli@gmail.com>
+ <1831955836.132229.1509820078271@email.1und1.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Cc: leedom-ut6Up61K2wZBDgjK7y7TUQ@public.gmane.org, herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
-	David Woodhouse <dwmw2-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Harsh-ut6Up61K2wZBDgjK7y7TUQ@public.gmane.org
-To: Joerg Roedel <joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org>
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <20171006144309.GA30803-zLv9SwRftAIdnm+yROfE0A@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: Krzysztof Kozlowski <krzk@kernel.org>, Ray Jui <rjui@broadcom.com>,
+        Eric Anholt <eric@anholt.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Steffen Trumtrar <s.trumtrar@pengutronix.de>,
+        Harald Freudenberger <freude@linux.vnet.ibm.com>,
+        Russell King <rmk+kernel@armlinux.org.uk>,
+        "moderated list:BROADCOM BCM2835 ARM ARCHITECTURE"
+        <linux-arm-kernel@lists.infradead.org>,
+        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>, Martin Kaiser <martin@kaiser.cx>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "maintainer:BROADCOM BCM281XX/BCM11XXX/BCM216XX ARM ARCHITE..."
+        <bcm-kernel-feedback-list@broadcom.com>,
+        Matt Mackall <mpm@selenic.com>,
+        Mark Rutlan
+To: Stefan Wahren <stefan.wahren@i2se.com>,
+        Florian Fainelli <f.fainelli@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-qt0-f193.google.com ([209.85.216.193]:52908 "EHLO
+        mail-qt0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751951AbdKFUQM (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 6 Nov 2017 15:16:12 -0500
+In-Reply-To: <1831955836.132229.1509820078271@email.1und1.de>
+Content-Language: en-US
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, 6 Oct 2017 16:43:09 +0200
-Joerg Roedel <joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org> wrote:
-
-> On Tue, Oct 03, 2017 at 07:05:17PM +0100, Robin Murphy wrote:
-> > Now, there are indeed plenty of drivers and subsystems which do
-> > work on lists of explicitly single pages - anything doing some
-> > variant of "addr = kmap_atomic(sg_page(sg)) + sg->offset;" is easy
-> > to spot - but I don't think DMA API implementations are in a
-> > position to make any kind of assumption; nearly all of them just
-> > shut up and handle sg->length bytes from sg_phys(sg) without
-> > questioning the caller, and I reckon that's exactly what they
-> > should be doing.  
+On 11/04/2017 11:27 AM, Stefan Wahren wrote:
+> Hi Florian
 > 
-> I agree with that, it is not explicitly forbidden to have an
-> sg->offset > PAGE_SIZE and most IOMMU drivers handle this case.
+>> Florian Fainelli <f.fainelli@gmail.com> hat am 2. November 2017 um 02:04 geschrieben:
+>>
+>>
+>> We have now incorporated all necessary functionality for the BCM63xx
+>> platforms to successfully migrate over bcm2835-rng, so add the final
+>> bits: Kconfig selection and proper platform_device device type matching
+>> to keep the same platform device name for registration to work.
+>>
+>> Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
+>> ---
+>>  drivers/char/hw_random/Kconfig       |  7 ++++---
+>>  drivers/char/hw_random/bcm2835-rng.c | 11 ++++++++++-
+>>  2 files changed, 14 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+>> index 95a031e9eced..d0689cc8c7fc 100644
+>> --- a/drivers/char/hw_random/Kconfig
+>> +++ b/drivers/char/hw_random/Kconfig
+>> @@ -87,12 +87,13 @@ config HW_RANDOM_BCM63XX
+>>  	  If unusure, say Y.
+>>  
+>>  config HW_RANDOM_BCM2835
+>> -	tristate "Broadcom BCM2835 Random Number Generator support"
+>> -	depends on ARCH_BCM2835 || ARCH_BCM_NSP || ARCH_BCM_5301X
+>> +	tristate "Broadcom BCM2835/BCM63xx Random Number Generator support"
+>> +	depends on ARCH_BCM2835 || ARCH_BCM_NSP || ARCH_BCM_5301X || \
+>> +		   ARCH_BCM_63XX || BCM63XX || BMIPS_GENERIC
+>>  	default HW_RANDOM
+>>  	---help---
+>>  	  This driver provides kernel-side support for the Random Number
+>> -	  Generator hardware found on the Broadcom BCM2835 SoCs.
+>> +	  Generator hardware found on the Broadcom BCM2835 and BCM63xx SoCs.
+>>  
+>>  	  To compile this driver as a module, choose M here: the
+>>  	  module will be called bcm2835-rng
+>> diff --git a/drivers/char/hw_random/bcm2835-rng.c b/drivers/char/hw_random/bcm2835-rng.c
+>> index 650e0033c273..d9ffe14f312b 100644
+>> --- a/drivers/char/hw_random/bcm2835-rng.c
+>> +++ b/drivers/char/hw_random/bcm2835-rng.c
+>> @@ -131,6 +131,7 @@ static const struct of_device_id bcm2835_rng_of_match[] = {
+>>  	{ .compatible = "brcm,bcm2835-rng"},
+>>  	{ .compatible = "brcm,bcm-nsp-rng", .data = &nsp_rng_of_data },
+>>  	{ .compatible = "brcm,bcm5301x-rng", .data = &nsp_rng_of_data },
+>> +	{ .compatible = "brcm,bcm6368-rng"},
+>>  	{},
+>>  };
+>>  
+>> @@ -164,7 +165,7 @@ static int bcm2835_rng_probe(struct platform_device *pdev)
+>>  	if (IS_ERR(priv->clk))
+>>  		priv->clk = NULL;
+>>  
+>> -	priv->rng.name = "bcm2835-rng";
+>> +	priv->rng.name = pdev->id_entry->name;
 > 
-> So this is a problem I'd like to see resolved in the VT-d driver too.
-> If nobody comes up with a correct fix soon I'll apply this one and
-> rip out the large-page support from __domain_mapping() to make it
-> work.
+> this change breaks registration on bcm2835, because the name is NULL.
+
+OH right, I will fix that in v2, I am assuming that if you did something
+like this, things still work correctly for you on 2835:
+
+if (!priv->id_entry->name)
+	priv->rng.name = "bcm2835-rng";
+else
+	priv->rng.name = priv->id_entry->name;
+
+?
+
 > 
-Hi All,
-
-Just to give an update on the offline debugging of this issue. With
-Robin's patch applied, I was able to reproduce the failure with
-similar configuration that Jain helped to set up.
-
-I added trace prints just to see the map/unmap activities leading to
-the DMAR fault. When fault occurs, the trace shows there is an unmap to
-the offending iova pfn. So I think this is a separate problem than
-Robin's patch is fixing. I think we should move forward to merge this
-patch upstream and stable. The remaining problem is likely a race
-condition between unmap and DMA activities.
-
-Here a brief extracted log, ee3d7 is the iova pfn in question.
-#1. map sg pfn ee3d7
-          <idle>-0     [076] 74124.154254: bprint:               __domain_mapping: vpfn:ee3d7, pgoff=2126, np:1, da:ee3d784e, len:1464
-, ppfn:1849c9c                                                                                                                        
-
-#2. unmap ee3d7000
-         <idle>-0     [054] 74124.154301: bprint:               intel_unmap: Device 0000:18:00.4 unmapping: pfn ee3d7-ee3d7          
-         <idle>-0     [076] 74124.154301: bprint:               __domain_mapping: lvlpg:1, nrpg 0, vpfn:ec2ff, ppfn:183221a, sg_res:0
-         <idle>-0     [059] 74124.154302: bprint:               __domain_mapping: lvlpg:1, nrpg 0, vpfn:ee719, ppfn:c3e4dd, sg_res:0 
-         <idle>-0     [076] 74124.154302: bprint:               __domain_mapping: vpfn:f183b, pgoff=78, np:1, da:f183b04e, len:1464, 
-
-#3. DMA to unmapped address ee3d7000, DMAR fault raised.
-  +2.952861] dmar_fault: 6 callbacks suppressed                                                                                   
-  +0.000002] DMAR: DRHD: handling fault status reg 2                                                                              
-  +0.005588] turning tracing off                                                                                                  
-  +0.003592] DMAR: [DMA Write] Request device [18:00.4] fault addr ee3d7000 [fault reason 05] PTE Write access is not set         
-                                                                                                                                  
-                                                                                                                                                                                                                                                               
-         <idle>-0     [000] 74124.156906: bputs:
-         0xffffffffb259916bs: turning tracing off     
-
-
-Thanks,
-
-Jacob
-
-> Speaking of __domain_mapping(), this function is a big unmaintainable
-> mess which should be split and rewritten. A clean and maintainable
-> rewrite can alse re-add the large-page support.
+> Regards
+> Stefan
 > 
-> 
-> Regards,
-> 
-> 	Joerg
-> 
-> _______________________________________________
-> iommu mailing list
-> iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-> https://lists.linuxfoundation.org/mailman/listinfo/iommu
+>>  	priv->rng.init = bcm2835_rng_init;
+>>  	priv->rng.read = bcm2835_rng_read;
+>>  	priv->rng.cleanup = bcm2835_rng_cleanup;
+>> @@ -190,12 +191,20 @@ static int bcm2835_rng_probe(struct platform_device *pdev)
+>>  
+>>  MODULE_DEVICE_TABLE(of, bcm2835_rng_of_match);
+>>  
+>> +static struct platform_device_id bcm2835_rng_devtype[] = {
+>> +	{ .name = "bcm2835-rng" },
+>> +	{ .name = "bcm63xx-rng" },
+>> +	{ /* sentinel */ }
+>> +};
+>> +MODULE_DEVICE_TABLE(platform, bcm2835_rng_devtype);
+>> +
+>>  static struct platform_driver bcm2835_rng_driver = {
+>>  	.driver = {
+>>  		.name = "bcm2835-rng",
+>>  		.of_match_table = bcm2835_rng_of_match,
+>>  	},
+>>  	.probe		= bcm2835_rng_probe,
+>> +	.id_table	= bcm2835_rng_devtype,
+>>  };
+>>  module_platform_driver(bcm2835_rng_driver);
+>>  
+>> -- 
+>> 2.9.3
+>>
+>>
+>> _______________________________________________
+>> linux-arm-kernel mailing list
+>> linux-arm-kernel@lists.infradead.org
+>> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
 
-[Jacob Pan]
+
+-- 
+Florian
