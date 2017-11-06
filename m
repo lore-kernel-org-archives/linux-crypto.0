@@ -1,35 +1,36 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: chcr - Replace _manual_ swap with swap macro
-Date: Mon, 6 Nov 2017 15:09:57 +0800
-Message-ID: <20171106070957.GH14274@gondor.apana.org.au>
-References: <20171103165823.GA16842@embeddedor.com>
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH 0/3] More code cleanups
+Date: Mon, 6 Nov 2017 08:38:00 +0100
+Message-ID: <20171106073800.GA7523@kroah.com>
+References: <1509951354-16370-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Harsh Jain <harsh@chelsio.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: "Gustavo A. R. Silva" <garsilva@embeddedor.com>
+Cc: linux-crypto@vger.kernel.org, devel@driverdev.osuosl.org,
+        driverdev-devel@linuxdriverproject.org,
+        linux-kernel@vger.kernel.org, Ofir Drang <ofir.drang@arm.com>
+To: Gilad Ben-Yossef <gilad@benyossef.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:51780 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751778AbdKFHKh (ORCPT
+Received: from mail.linuxfoundation.org ([140.211.169.12]:49094 "EHLO
+        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750749AbdKFHhs (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 6 Nov 2017 02:10:37 -0500
+        Mon, 6 Nov 2017 02:37:48 -0500
 Content-Disposition: inline
-In-Reply-To: <20171103165823.GA16842@embeddedor.com>
+In-Reply-To: <1509951354-16370-1-git-send-email-gilad@benyossef.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Nov 03, 2017 at 11:58:23AM -0500, Gustavo A. R. Silva wrote:
-> Make use of the swap macro and remove unnecessary variable temp.
-> This makes the code easier to read and maintain.
-> 
-> This code was detected with the help of Coccinelle.
-> 
-> Signed-off-by: Gustavo A. R. Silva <garsilva@embeddedor.com>
+On Mon, Nov 06, 2017 at 06:55:49AM +0000, Gilad Ben-Yossef wrote:
+> Additional code readability and simplification patches.
+> These goes on top the previous patch set sent to the list.
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Please label your 0/X patches the same way your patches are, with the
+prefix of the subsystem, otherwise they get dropped from my searches of
+my inbox at times.
+
+For this one, it would be:
+	[PATCH 0/3] staging: ccree: More code cleanups.
+
+thanks,
+
+greg k-h
