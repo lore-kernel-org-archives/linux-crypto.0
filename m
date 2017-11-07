@@ -1,163 +1,208 @@
-From: Stefan Wahren <stefan.wahren@i2se.com>
-Subject: Re: [PATCH 11/12] hwrng: bcm2835-rng: Enable BCM2835 RNG to work on
- BCM63xx platforms
-Date: Tue, 7 Nov 2017 07:45:44 +0100 (CET)
-Message-ID: <345702666.5362.1510037144469@email.1und1.de>
-References: <20171102010408.27736-1-f.fainelli@gmail.com>
- <20171102010408.27736-12-f.fainelli@gmail.com>
- <1831955836.132229.1509820078271@email.1und1.de>
- <2538f1bb-e0f8-c336-d82a-0cb2f19b0ead@gmail.com>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: [PATCH v2] crypto: AF_ALG - remove locking in async callback
+Date: Tue, 07 Nov 2017 10:05:48 +0100
+Message-ID: <2510520.gYBNS8MAsP@positron.chronox.de>
+References: <CAGkQfmNKbSwue13zPh2K1F_kLkpm1_AhsAHK4spRFA0xMvU5PA@mail.gmail.com> <4677171.2qOLUIFS1s@positron.chronox.de> <20171107063212.GA25491@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Cc: Krzysztof Kozlowski <krzk@kernel.org>, Ray Jui <rjui@broadcom.com>,
-        Eric Anholt <eric@anholt.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Steffen Trumtrar <s.trumtrar@pengutronix.de>,
-        Harald Freudenberger <freude@linux.vnet.ibm.com>,
-        Russell King <rmk+kernel@armlinux.org.uk>,
-        "moderated list:BROADCOM BCM2835 ARM ARCHITECTURE"
-        <linux-arm-kernel@lists.infradead.org>,
-        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>, Martin Kaiser <martin@kaiser.cx>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-kernel@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
-        "maintainer:BROADCOM BCM281XX/BCM11XXX/BCM216XX ARM ARCHITE..."
-        <bcm-kernel-feedback-list@broa
-To: Florian Fainelli <f.fainelli@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Romain Izard <romain.izard.pro@gmail.com>,
+        linux-crypto@vger.kernel.org,
+        Cyrille Pitchen <cyrille.pitchen@microchip.com>,
+        Tudor Ambarus <tudor.ambarus@microchip.com>,
+        Nicolas Ferre <nicolas.ferre@microchip.com>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.133]:50259 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754357AbdKGGqo (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 7 Nov 2017 01:46:44 -0500
-In-Reply-To: <2538f1bb-e0f8-c336-d82a-0cb2f19b0ead@gmail.com>
+Received: from mail.eperm.de ([89.247.134.16]:42184 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932728AbdKGJFw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 7 Nov 2017 04:05:52 -0500
+In-Reply-To: <20171107063212.GA25491@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-> Florian Fainelli <f.fainelli@gmail.com> hat am 6. November 2017 um 21:16 geschrieben:
-> 
-> 
-> On 11/04/2017 11:27 AM, Stefan Wahren wrote:
-> > Hi Florian
-> > 
-> >> Florian Fainelli <f.fainelli@gmail.com> hat am 2. November 2017 um 02:04 geschrieben:
-> >>
-> >>
-> >> We have now incorporated all necessary functionality for the BCM63xx
-> >> platforms to successfully migrate over bcm2835-rng, so add the final
-> >> bits: Kconfig selection and proper platform_device device type matching
-> >> to keep the same platform device name for registration to work.
-> >>
-> >> Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
-> >> ---
-> >>  drivers/char/hw_random/Kconfig       |  7 ++++---
-> >>  drivers/char/hw_random/bcm2835-rng.c | 11 ++++++++++-
-> >>  2 files changed, 14 insertions(+), 4 deletions(-)
-> >>
-> >> diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-> >> index 95a031e9eced..d0689cc8c7fc 100644
-> >> --- a/drivers/char/hw_random/Kconfig
-> >> +++ b/drivers/char/hw_random/Kconfig
-> >> @@ -87,12 +87,13 @@ config HW_RANDOM_BCM63XX
-> >>  	  If unusure, say Y.
-> >>  
-> >>  config HW_RANDOM_BCM2835
-> >> -	tristate "Broadcom BCM2835 Random Number Generator support"
-> >> -	depends on ARCH_BCM2835 || ARCH_BCM_NSP || ARCH_BCM_5301X
-> >> +	tristate "Broadcom BCM2835/BCM63xx Random Number Generator support"
-> >> +	depends on ARCH_BCM2835 || ARCH_BCM_NSP || ARCH_BCM_5301X || \
-> >> +		   ARCH_BCM_63XX || BCM63XX || BMIPS_GENERIC
-> >>  	default HW_RANDOM
-> >>  	---help---
-> >>  	  This driver provides kernel-side support for the Random Number
-> >> -	  Generator hardware found on the Broadcom BCM2835 SoCs.
-> >> +	  Generator hardware found on the Broadcom BCM2835 and BCM63xx SoCs.
-> >>  
-> >>  	  To compile this driver as a module, choose M here: the
-> >>  	  module will be called bcm2835-rng
-> >> diff --git a/drivers/char/hw_random/bcm2835-rng.c b/drivers/char/hw_random/bcm2835-rng.c
-> >> index 650e0033c273..d9ffe14f312b 100644
-> >> --- a/drivers/char/hw_random/bcm2835-rng.c
-> >> +++ b/drivers/char/hw_random/bcm2835-rng.c
-> >> @@ -131,6 +131,7 @@ static const struct of_device_id bcm2835_rng_of_match[] = {
-> >>  	{ .compatible = "brcm,bcm2835-rng"},
-> >>  	{ .compatible = "brcm,bcm-nsp-rng", .data = &nsp_rng_of_data },
-> >>  	{ .compatible = "brcm,bcm5301x-rng", .data = &nsp_rng_of_data },
-> >> +	{ .compatible = "brcm,bcm6368-rng"},
-> >>  	{},
-> >>  };
-> >>  
-> >> @@ -164,7 +165,7 @@ static int bcm2835_rng_probe(struct platform_device *pdev)
-> >>  	if (IS_ERR(priv->clk))
-> >>  		priv->clk = NULL;
-> >>  
-> >> -	priv->rng.name = "bcm2835-rng";
-> >> +	priv->rng.name = pdev->id_entry->name;
-> > 
-> > this change breaks registration on bcm2835, because the name is NULL.
-> 
-> OH right, I will fix that in v2, I am assuming that if you did something
-> like this, things still work correctly for you on 2835:
-> 
-> if (!priv->id_entry->name)
-> 	priv->rng.name = "bcm2835-rng";
-> else
-> 	priv->rng.name = priv->id_entry->name;
-> 
-> ?
+The code paths protected by the socket-lock do not use or modify the
+socket in a non-atomic fashion. The actions pertaining the socket do not
+even need to be handled as an atomic operation. Thus, the socket-lock
+can be safely ignored.
 
-I think that should work, but i'm not really happy about it. I prefer a more general solution. Looking at the other rng drivers shows the following pattern:
+This fixes a bug regarding scheduling in atomic as the callback function
+may be invoked in interrupt context.
 
-priv->rng.name = pdev->name;
+In addition, the sock_hold is moved before the AIO encrypt/decrypt
+operation to ensure that the socket is always present. This avoids a
+tiny race window where the socket is unprotected and yet used by the AIO
+operation.
 
-I need to verify this on bcm2835.
+Finally, the release of resources for a crypto operation is moved into a
+common function of af_alg_free_resources.
 
-> 
-> > 
-> > Regards
-> > Stefan
-> > 
-> >>  	priv->rng.init = bcm2835_rng_init;
-> >>  	priv->rng.read = bcm2835_rng_read;
-> >>  	priv->rng.cleanup = bcm2835_rng_cleanup;
-> >> @@ -190,12 +191,20 @@ static int bcm2835_rng_probe(struct platform_device *pdev)
-> >>  
-> >>  MODULE_DEVICE_TABLE(of, bcm2835_rng_of_match);
-> >>  
-> >> +static struct platform_device_id bcm2835_rng_devtype[] = {
-> >> +	{ .name = "bcm2835-rng" },
-> >> +	{ .name = "bcm63xx-rng" },
-> >> +	{ /* sentinel */ }
-> >> +};
-> >> +MODULE_DEVICE_TABLE(platform, bcm2835_rng_devtype);
-> >> +
-> >>  static struct platform_driver bcm2835_rng_driver = {
-> >>  	.driver = {
-> >>  		.name = "bcm2835-rng",
-> >>  		.of_match_table = bcm2835_rng_of_match,
-> >>  	},
-> >>  	.probe		= bcm2835_rng_probe,
-> >> +	.id_table	= bcm2835_rng_devtype,
-> >>  };
-> >>  module_platform_driver(bcm2835_rng_driver);
-> >>  
-> >> -- 
-> >> 2.9.3
-> >>
-> >>
-> >> _______________________________________________
-> >> linux-arm-kernel mailing list
-> >> linux-arm-kernel@lists.infradead.org
-> >> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
-> 
-> 
-> -- 
-> Florian
-> 
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+Fixes: e870456d8e7c8 ("crypto: algif_skcipher - overhaul memory management")
+Fixes: d887c52d6ae43 ("crypto: algif_aead - overhaul memory management")
+Reported-by: Romain Izard <romain.izard.pro@gmail.com>
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/af_alg.c         | 21 ++++++++++++++-------
+ crypto/algif_aead.c     | 23 ++++++++++++-----------
+ crypto/algif_skcipher.c | 23 ++++++++++++-----------
+ include/crypto/if_alg.h |  1 +
+ 4 files changed, 39 insertions(+), 29 deletions(-)
+
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index 85cea9de324a..358749c38894 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -1021,6 +1021,18 @@ ssize_t af_alg_sendpage(struct socket *sock, struct page *page,
+ EXPORT_SYMBOL_GPL(af_alg_sendpage);
+ 
+ /**
++ * af_alg_free_resources - release resources required for crypto request
++ */
++void af_alg_free_resources(struct af_alg_async_req *areq)
++{
++	struct sock *sk = areq->sk;
++
++	af_alg_free_areq_sgls(areq);
++	sock_kfree_s(sk, areq, areq->areqlen);
++}
++EXPORT_SYMBOL_GPL(af_alg_free_resources);
++
++/**
+  * af_alg_async_cb - AIO callback handler
+  *
+  * This handler cleans up the struct af_alg_async_req upon completion of the
+@@ -1036,18 +1048,13 @@ void af_alg_async_cb(struct crypto_async_request *_req, int err)
+ 	struct kiocb *iocb = areq->iocb;
+ 	unsigned int resultlen;
+ 
+-	lock_sock(sk);
+-
+ 	/* Buffer size written by crypto operation. */
+ 	resultlen = areq->outlen;
+ 
+-	af_alg_free_areq_sgls(areq);
+-	sock_kfree_s(sk, areq, areq->areqlen);
+-	__sock_put(sk);
++	af_alg_free_resources(areq);
++	sock_put(sk);
+ 
+ 	iocb->ki_complete(iocb, err ? err : resultlen, 0);
+-
+-	release_sock(sk);
+ }
+ EXPORT_SYMBOL_GPL(af_alg_async_cb);
+ 
+diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
+index aacae0837aff..6cdd4fb08335 100644
+--- a/crypto/algif_aead.c
++++ b/crypto/algif_aead.c
+@@ -268,12 +268,23 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
+ 
+ 	if (msg->msg_iocb && !is_sync_kiocb(msg->msg_iocb)) {
+ 		/* AIO operation */
++		sock_hold(sk);
+ 		areq->iocb = msg->msg_iocb;
+ 		aead_request_set_callback(&areq->cra_u.aead_req,
+ 					  CRYPTO_TFM_REQ_MAY_BACKLOG,
+ 					  af_alg_async_cb, areq);
+ 		err = ctx->enc ? crypto_aead_encrypt(&areq->cra_u.aead_req) :
+ 				 crypto_aead_decrypt(&areq->cra_u.aead_req);
++
++		/* AIO operation in progress */
++		if (err == -EINPROGRESS) {
++			/* Remember output size that will be generated. */
++			areq->outlen = outlen;
++
++			return -EIOCBQUEUED;
++		}
++
++		sock_put(sk);
+ 	} else {
+ 		/* Synchronous operation */
+ 		aead_request_set_callback(&areq->cra_u.aead_req,
+@@ -285,19 +296,9 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
+ 				&ctx->wait);
+ 	}
+ 
+-	/* AIO operation in progress */
+-	if (err == -EINPROGRESS) {
+-		sock_hold(sk);
+-
+-		/* Remember output size that will be generated. */
+-		areq->outlen = outlen;
+-
+-		return -EIOCBQUEUED;
+-	}
+ 
+ free:
+-	af_alg_free_areq_sgls(areq);
+-	sock_kfree_s(sk, areq, areq->areqlen);
++	af_alg_free_resources(areq);
+ 
+ 	return err ? err : outlen;
+ }
+diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
+index 9954b078f0b9..0e0dd44f0545 100644
+--- a/crypto/algif_skcipher.c
++++ b/crypto/algif_skcipher.c
+@@ -117,6 +117,7 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
+ 
+ 	if (msg->msg_iocb && !is_sync_kiocb(msg->msg_iocb)) {
+ 		/* AIO operation */
++		sock_hold(sk);
+ 		areq->iocb = msg->msg_iocb;
+ 		skcipher_request_set_callback(&areq->cra_u.skcipher_req,
+ 					      CRYPTO_TFM_REQ_MAY_SLEEP,
+@@ -124,6 +125,16 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
+ 		err = ctx->enc ?
+ 			crypto_skcipher_encrypt(&areq->cra_u.skcipher_req) :
+ 			crypto_skcipher_decrypt(&areq->cra_u.skcipher_req);
++
++		/* AIO operation in progress */
++		if (err == -EINPROGRESS) {
++			/* Remember output size that will be generated. */
++			areq->outlen = len;
++
++			return -EIOCBQUEUED;
++		}
++
++		sock_put(sk);
+ 	} else {
+ 		/* Synchronous operation */
+ 		skcipher_request_set_callback(&areq->cra_u.skcipher_req,
+@@ -136,19 +147,9 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
+ 						 &ctx->wait);
+ 	}
+ 
+-	/* AIO operation in progress */
+-	if (err == -EINPROGRESS) {
+-		sock_hold(sk);
+-
+-		/* Remember output size that will be generated. */
+-		areq->outlen = len;
+-
+-		return -EIOCBQUEUED;
+-	}
+ 
+ free:
+-	af_alg_free_areq_sgls(areq);
+-	sock_kfree_s(sk, areq, areq->areqlen);
++	af_alg_free_resources(areq);
+ 
+ 	return err ? err : len;
+ }
+diff --git a/include/crypto/if_alg.h b/include/crypto/if_alg.h
+index 6abf0a3604dc..38d9c5861ed8 100644
+--- a/include/crypto/if_alg.h
++++ b/include/crypto/if_alg.h
+@@ -242,6 +242,7 @@ int af_alg_sendmsg(struct socket *sock, struct msghdr *msg, size_t size,
+ 		   unsigned int ivsize);
+ ssize_t af_alg_sendpage(struct socket *sock, struct page *page,
+ 			int offset, size_t size, int flags);
++void af_alg_free_resources(struct af_alg_async_req *areq);
+ void af_alg_async_cb(struct crypto_async_request *_req, int err);
+ unsigned int af_alg_poll(struct file *file, struct socket *sock,
+ 			 poll_table *wait);
+-- 
+2.13.6
