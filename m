@@ -1,65 +1,39 @@
-From: <lionel.debieve@st.com>
-Subject: [PATCH v2 1/1] crypto: stm32/hash - Fix return issue on update
-Date: Mon, 6 Nov 2017 23:41:52 +0100
-Message-ID: <1510008112-1573-1-git-send-email-lionel.debieve@st.com>
+From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Subject: Re: virtio:rng: Virtio RNG devices need to be re-registered after suspend/resume
+Date: Tue, 7 Nov 2017 08:44:17 +0530
+Message-ID: <CANc+2y7JzcobX7wj236SD4FcimWkqBnprY1Ew7FUprOijn8U-w@mail.gmail.com>
+References: <1509703041-6281-1-git-send-email-Jim.Quigley@oracle.com> <20171106070928.GF14274@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Benjamin Gaignard <benjamin.gaignard@st.com>,
-        Fabien Dessenne <fabien.dessenne@st.com>,
-        Ludovic Barre <ludovic.barre@st.com>,
-        Lionel Debieve <lionel.debieve@st.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        <linux-crypto@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Cc: Jim Quigley <Jim.Quigley@oracle.com>,
+        Matt Mackall <mpm@selenic.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx07-00178001.pphosted.com ([62.209.51.94]:63743 "EHLO
-        mx07-00178001.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752508AbdKFWnQ (ORCPT
+Received: from mail-it0-f46.google.com ([209.85.214.46]:51804 "EHLO
+        mail-it0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753392AbdKGDOT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 6 Nov 2017 17:43:16 -0500
+        Mon, 6 Nov 2017 22:14:19 -0500
+Received: by mail-it0-f46.google.com with SMTP id o135so695866itb.0
+        for <linux-crypto@vger.kernel.org>; Mon, 06 Nov 2017 19:14:18 -0800 (PST)
+In-Reply-To: <20171106070928.GF14274@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Lionel Debieve <lionel.debieve@st.com>
+Hi Herbert,
 
-When data append reached the threshold for processing,
-we must inform that processing is on going to wait before
-managing the next request.
+On 6 November 2017 at 12:39, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> On Fri, Nov 03, 2017 at 09:57:21AM +0000, Jim Quigley wrote:
+>> moved the call to hwrng_register() out of the probe routine into the scan
+>> routine. We need to call hwrng_register() after a suspend/restore cycle
+>> to re-register the device, but the scan function is not invoked for the
+>> restore. Add the call to hwrng_register() to virtio_restore().
+>
+> Patch applied.  Thanks.
 
-Signed-off-by: Lionel Debieve <lionel.debieve@st.com>
----
- drivers/crypto/stm32/stm32-hash.c | 8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
+My rb tag is missing in the commit.
 
-diff --git a/drivers/crypto/stm32/stm32-hash.c b/drivers/crypto/stm32/stm32-hash.c
-index c462be7..4ca4a26 100644
---- a/drivers/crypto/stm32/stm32-hash.c
-+++ b/drivers/crypto/stm32/stm32-hash.c
-@@ -895,7 +895,6 @@ static int stm32_hash_enqueue(struct ahash_request *req, unsigned int op)
- static int stm32_hash_update(struct ahash_request *req)
- {
- 	struct stm32_hash_request_ctx *rctx = ahash_request_ctx(req);
--	int ret;
- 
- 	if (!req->nbytes || !(rctx->flags & HASH_FLAGS_CPU))
- 		return 0;
-@@ -909,12 +908,7 @@ static int stm32_hash_update(struct ahash_request *req)
- 		return 0;
- 	}
- 
--	ret = stm32_hash_enqueue(req, HASH_OP_UPDATE);
--
--	if (rctx->flags & HASH_FLAGS_FINUP)
--		return ret;
--
--	return 0;
-+	return stm32_hash_enqueue(req, HASH_OP_UPDATE);
- }
- 
- static int stm32_hash_final(struct ahash_request *req)
--- 
-2.7.4
+Regards,
+PrasannaKumar
