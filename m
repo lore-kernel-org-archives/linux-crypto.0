@@ -1,48 +1,57 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 0/8] staging: ccree: fixes and cleanups
-Date: Tue,  7 Nov 2017 09:39:56 +0000
-Message-ID: <1510047606-5589-1-git-send-email-gilad@benyossef.com>
-Cc: Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
-        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
-        linux-kernel@vger.kernel.org
+Subject: [PATCH 3/8] staging: ccree: simplify AEAD using local var
+Date: Tue,  7 Nov 2017 09:39:59 +0000
+Message-ID: <1510047606-5589-4-git-send-email-gilad@benyossef.com>
+References: <1510047606-5589-1-git-send-email-gilad@benyossef.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org,
+ driverdev-devel@linuxdriverproject.org, linux-crypto@vger.kernel.org,
+ Ofir Drang <ofir.drang@arm.com>
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:46318 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754244AbdKGJkS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 7 Nov 2017 04:40:18 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+In-Reply-To: <1510047606-5589-1-git-send-email-gilad@benyossef.com>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+List-Id: linux-crypto.vger.kernel.org
 
-This is another batch of ccree fixes & cleanups.
+Make the code more readable by using a local variable
+for commonly use expression in the AEAD part of the driver.
 
-The first patch is a bug fix. All others are pure
-readability and coding style fixes.
+Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+---
+ drivers/staging/ccree/ssi_aead.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
-Gilad Ben-Yossef (8):
-  staging: ccree: fix leak of import() after init()
-  staging: ccree: use more readable func names
-  staging: ccree: simplify AEAD using local var
-  staging: ccree: simplify buf mgr using local vars
-  staging: ccree: fold common code into function
-  staging: ccree: simplify pm manager using local var
-  staging: ccree: remove compare to none zero
-  staging: ccree: remove braces for single statement
-
- drivers/staging/ccree/ssi_aead.c        |  64 ++--
- drivers/staging/ccree/ssi_buffer_mgr.c  | 556 ++++++++++++++------------------
- drivers/staging/ccree/ssi_buffer_mgr.h  |  49 ++-
- drivers/staging/ccree/ssi_cipher.c      |  27 +-
- drivers/staging/ccree/ssi_driver.c      |  48 +--
- drivers/staging/ccree/ssi_hash.c        | 195 +++++------
- drivers/staging/ccree/ssi_ivgen.c       |   4 +-
- drivers/staging/ccree/ssi_pm.c          |  42 +--
- drivers/staging/ccree/ssi_pm.h          |  12 +-
- drivers/staging/ccree/ssi_request_mgr.c |  24 +-
- drivers/staging/ccree/ssi_request_mgr.h |   6 +-
- drivers/staging/ccree/ssi_sram_mgr.c    |  13 +-
- drivers/staging/ccree/ssi_sram_mgr.h    |   6 +-
- 13 files changed, 494 insertions(+), 552 deletions(-)
-
+diff --git a/drivers/staging/ccree/ssi_aead.c b/drivers/staging/ccree/ssi_aead.c
+index 0b5b230..f1a3976 100644
+--- a/drivers/staging/ccree/ssi_aead.c
++++ b/drivers/staging/ccree/ssi_aead.c
+@@ -251,13 +251,11 @@ static void ssi_aead_complete(struct device *dev, void *ssi_req, void __iomem *c
+ 		}
+ 	} else { /*ENCRYPT*/
+ 		if (unlikely(areq_ctx->is_icv_fragmented)) {
++			u32 loc = areq->cryptlen + areq_ctx->dst_offset;
++
+ 			cc_copy_sg_portion(dev, areq_ctx->mac_buf,
+-					   areq_ctx->dst_sgl,
+-					   (areq->cryptlen +
+-					    areq_ctx->dst_offset),
+-					   (areq->cryptlen +
+-					    areq_ctx->dst_offset +
+-					    ctx->authsize),
++					   areq_ctx->dst_sgl, loc,
++					   (loc + ctx->authsize),
+ 					   SSI_SG_FROM_BUF);
+ 		}
+ 
 -- 
 2.7.4
