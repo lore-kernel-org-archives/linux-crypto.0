@@ -1,7 +1,7 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 6/8] staging: ccree: simplify pm manager using local var
-Date: Tue,  7 Nov 2017 09:40:02 +0000
-Message-ID: <1510047606-5589-7-git-send-email-gilad@benyossef.com>
+Subject: [PATCH 8/8] staging: ccree: remove braces for single statement
+Date: Tue,  7 Nov 2017 09:40:04 +0000
+Message-ID: <1510047606-5589-9-git-send-email-gilad@benyossef.com>
 References: <1510047606-5589-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -23,45 +23,39 @@ Errors-To: driverdev-devel-bounces@linuxdriverproject.org
 Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-Make the code more readable by using a local variable.
+Remove necessary braces for single statement blocks to
+improve code readabilty.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/ssi_pm.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ drivers/staging/ccree/ssi_buffer_mgr.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/staging/ccree/ssi_pm.c b/drivers/staging/ccree/ssi_pm.c
-index e1bc4c5..d60143c 100644
---- a/drivers/staging/ccree/ssi_pm.c
-+++ b/drivers/staging/ccree/ssi_pm.c
-@@ -90,20 +90,24 @@ int cc_pm_resume(struct device *dev)
- int cc_pm_get(struct device *dev)
- {
- 	int rc = 0;
-+	struct ssi_drvdata *drvdata =
-+		(struct ssi_drvdata *)dev_get_drvdata(dev);
+diff --git a/drivers/staging/ccree/ssi_buffer_mgr.c b/drivers/staging/ccree/ssi_buffer_mgr.c
+index 838e973..3418c64 100644
+--- a/drivers/staging/ccree/ssi_buffer_mgr.c
++++ b/drivers/staging/ccree/ssi_buffer_mgr.c
+@@ -1490,9 +1490,8 @@ int cc_map_hash_request_final(struct ssi_drvdata *drvdata, void *ctx,
+ 		/* add the src data to the sg_data */
+ 		cc_add_sg_entry(dev, &sg_data, areq_ctx->in_nents, src, nbytes,
+ 				0, true, &areq_ctx->mlli_nents);
+-		if (unlikely(cc_generate_mlli(dev, &sg_data, mlli_params))) {
++		if (unlikely(cc_generate_mlli(dev, &sg_data, mlli_params)))
+ 			goto fail_unmap_din;
+-		}
+ 	}
+ 	/* change the buffer index for the unmap function */
+ 	areq_ctx->buff_index = (areq_ctx->buff_index ^ 1);
+@@ -1609,9 +1608,8 @@ int cc_map_hash_request_update(struct ssi_drvdata *drvdata, void *ctx,
+ 		cc_add_sg_entry(dev, &sg_data, areq_ctx->in_nents, src,
+ 				(update_data_len - *curr_buff_cnt), 0, true,
+ 				&areq_ctx->mlli_nents);
+-		if (unlikely(cc_generate_mlli(dev, &sg_data, mlli_params))) {
++		if (unlikely(cc_generate_mlli(dev, &sg_data, mlli_params)))
+ 			goto fail_unmap_din;
+-		}
+ 	}
+ 	areq_ctx->buff_index = (areq_ctx->buff_index ^ swap_index);
  
--	if (cc_req_queue_suspended((struct ssi_drvdata *)dev_get_drvdata(dev))) {
-+	if (cc_req_queue_suspended(drvdata))
- 		rc = pm_runtime_get_sync(dev);
--	} else {
-+	else
- 		pm_runtime_get_noresume(dev);
--	}
-+
- 	return rc;
- }
- 
- int cc_pm_put_suspend(struct device *dev)
- {
- 	int rc = 0;
-+	struct ssi_drvdata *drvdata =
-+		(struct ssi_drvdata *)dev_get_drvdata(dev);
- 
--	if (!cc_req_queue_suspended((struct ssi_drvdata *)dev_get_drvdata(dev))) {
-+	if (!cc_req_queue_suspended(drvdata)) {
- 		pm_runtime_mark_last_busy(dev);
- 		rc = pm_runtime_put_autosuspend(dev);
- 	} else {
 -- 
 2.7.4
