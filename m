@@ -1,59 +1,65 @@
 From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: Re: [PATCH 2/8] staging: ccree: use more readable func names
-Date: Tue, 7 Nov 2017 13:30:10 +0300
-Message-ID: <20171107103010.pgmgmmsjhxt4fjft@mwanda>
+Subject: Re: [PATCH 3/8] staging: ccree: simplify AEAD using local var
+Date: Tue, 7 Nov 2017 13:35:23 +0300
+Message-ID: <20171107103523.ests5w6m3c7ria73@mwanda>
 References: <1510047606-5589-1-git-send-email-gilad@benyossef.com>
- <1510047606-5589-3-git-send-email-gilad@benyossef.com>
+ <1510047606-5589-4-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org,
-        driverdev-devel@linuxdriverproject.org,
-        linux-crypto@vger.kernel.org, Ofir Drang <ofir.drang@arm.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: devel@driverdev.osuosl.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ driverdev-devel@linuxdriverproject.org, linux-kernel@vger.kernel.org,
+ linux-crypto@vger.kernel.org, Ofir Drang <ofir.drang@arm.com>
 To: Gilad Ben-Yossef <gilad@benyossef.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from aserp1040.oracle.com ([141.146.126.69]:42156 "EHLO
-        aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751611AbdKGKa0 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 7 Nov 2017 05:30:26 -0500
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
 Content-Disposition: inline
-In-Reply-To: <1510047606-5589-3-git-send-email-gilad@benyossef.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1510047606-5589-4-git-send-email-gilad@benyossef.com>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Nov 07, 2017 at 09:39:58AM +0000, Gilad Ben-Yossef wrote:
-> @@ -780,11 +766,10 @@ static inline int ssi_buffer_mgr_aead_chain_iv(
->  		unsigned int iv_size_to_authenc = crypto_aead_ivsize(tfm);
->  		unsigned int iv_ofs = GCM_BLOCK_RFC4_IV_OFFSET;
->  		/* Chain to given list */
-> -		ssi_buffer_mgr_add_buffer_entry(
-> -			dev, sg_data,
-> -			areq_ctx->gen_ctx.iv_dma_addr + iv_ofs,
-> -			iv_size_to_authenc, is_last,
-> -			&areq_ctx->assoc.mlli_nents);
-> +		cc_add_buffer_entry(dev, sg_data,
-> +				    (areq_ctx->gen_ctx.iv_dma_addr + iv_ofs),
-                                    ^                                      ^
+On Tue, Nov 07, 2017 at 09:39:59AM +0000, Gilad Ben-Yossef wrote:
+> Make the code more readable by using a local variable
+> for commonly use expression in the AEAD part of the driver.
+> 
+> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+> ---
+>  drivers/staging/ccree/ssi_aead.c | 10 ++++------
+>  1 file changed, 4 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/staging/ccree/ssi_aead.c b/drivers/staging/ccree/ssi_aead.c
+> index 0b5b230..f1a3976 100644
+> --- a/drivers/staging/ccree/ssi_aead.c
+> +++ b/drivers/staging/ccree/ssi_aead.c
+> @@ -251,13 +251,11 @@ static void ssi_aead_complete(struct device *dev, void *ssi_req, void __iomem *c
+>  		}
+>  	} else { /*ENCRYPT*/
+>  		if (unlikely(areq_ctx->is_icv_fragmented)) {
+> +			u32 loc = areq->cryptlen + areq_ctx->dst_offset;
 
-No need to resend the patch, but you've added parenthesis here that
-weren't in the original code and in other places you fixed up some long
-line warnings.  I'd prefer if you didn't do that because I use scripts
-to review rename patches automatically and since these are not a rename
-so it means I have to review them manually.  Also in that patch that
-Tobin complained about you had some extra comment changes and some were
-related to the API but some were just reformatted to fit in 80 chars.
+"loc" isn't a very canonical name.  At first I thought this was "pos"
+or maybe "end" but now I'm thinking this is "skip"?  I don't know what
+this variable is.
 
-In this sample, you've re-indented the code a bit to align correctly.
-That would be mandatory especially if the original code had aligned
-correctly so that's fine.  But otherwise try to be strict about the one
-thing per patch.
-
-> +				    iv_size_to_authenc, is_last,
-> +				    &areq_ctx->assoc.mlli_nents);
->  		areq_ctx->assoc_buff_type = SSI_DMA_BUF_MLLI;
->  	}
->  
+> +
+>  			cc_copy_sg_portion(dev, areq_ctx->mac_buf,
+> -					   areq_ctx->dst_sgl,
+> -					   (areq->cryptlen +
+> -					    areq_ctx->dst_offset),
+> -					   (areq->cryptlen +
+> -					    areq_ctx->dst_offset +
+> -					    ctx->authsize),
+> +					   areq_ctx->dst_sgl, loc,
+> +					   (loc + ctx->authsize),
+>  					   SSI_SG_FROM_BUF);
+>  		}
 
 regards,
 dan carpenter
