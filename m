@@ -1,7 +1,7 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 3/8] staging: ccree: simplify AEAD using local var
-Date: Tue,  7 Nov 2017 09:39:59 +0000
-Message-ID: <1510047606-5589-4-git-send-email-gilad@benyossef.com>
+Subject: [PATCH 4/8] staging: ccree: simplify buf mgr using local vars
+Date: Tue,  7 Nov 2017 09:40:00 +0000
+Message-ID: <1510047606-5589-5-git-send-email-gilad@benyossef.com>
 References: <1510047606-5589-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -23,35 +23,45 @@ Errors-To: driverdev-devel-bounces@linuxdriverproject.org
 Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-Make the code more readable by using a local variable
-for commonly use expression in the AEAD part of the driver.
+Make the code more readable by using a local variables
+for commonly use expressions in the buffer manager part
+of the driver.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/ssi_aead.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+ drivers/staging/ccree/ssi_buffer_mgr.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/staging/ccree/ssi_aead.c b/drivers/staging/ccree/ssi_aead.c
-index 0b5b230..f1a3976 100644
---- a/drivers/staging/ccree/ssi_aead.c
-+++ b/drivers/staging/ccree/ssi_aead.c
-@@ -251,13 +251,11 @@ static void ssi_aead_complete(struct device *dev, void *ssi_req, void __iomem *c
- 		}
- 	} else { /*ENCRYPT*/
- 		if (unlikely(areq_ctx->is_icv_fragmented)) {
-+			u32 loc = areq->cryptlen + areq_ctx->dst_offset;
+diff --git a/drivers/staging/ccree/ssi_buffer_mgr.c b/drivers/staging/ccree/ssi_buffer_mgr.c
+index 2d971f2..b3ca249 100644
+--- a/drivers/staging/ccree/ssi_buffer_mgr.c
++++ b/drivers/staging/ccree/ssi_buffer_mgr.c
+@@ -225,16 +225,18 @@ static int cc_generate_mlli(
+ 	mlli_p = (u32 *)mlli_params->mlli_virt_addr;
+ 	/* go over all SG's and link it to one MLLI table */
+ 	for (i = 0; i < sg_data->num_of_buffers; i++) {
++		union buffer_array_entry *entry = &sg_data->entry[i];
++		u32 tot_len = sg_data->total_data_len[i];
++		u32 offset = sg_data->offset[i];
 +
- 			cc_copy_sg_portion(dev, areq_ctx->mac_buf,
--					   areq_ctx->dst_sgl,
--					   (areq->cryptlen +
--					    areq_ctx->dst_offset),
--					   (areq->cryptlen +
--					    areq_ctx->dst_offset +
--					    ctx->authsize),
-+					   areq_ctx->dst_sgl, loc,
-+					   (loc + ctx->authsize),
- 					   SSI_SG_FROM_BUF);
- 		}
+ 		if (sg_data->type[i] == DMA_SGL_TYPE)
+-			rc = cc_render_sg_to_mlli(dev, sg_data->entry[i].sgl,
+-						  sg_data->total_data_len[i],
+-						  sg_data->offset[i],
+-						  &total_nents, &mlli_p);
++			rc = cc_render_sg_to_mlli(dev, entry->sgl, tot_len,
++						  offset, &total_nents,
++						  &mlli_p);
+ 		else /*DMA_BUFF_TYPE*/
+-			rc = cc_render_buff_to_mlli(dev,
+-						    sg_data->entry[i].buffer_dma,
+-						    sg_data->total_data_len[i],
+-						    &total_nents, &mlli_p);
++			rc = cc_render_buff_to_mlli(dev, entry->buffer_dma,
++						    tot_len, &total_nents,
++						    &mlli_p);
+ 		if (rc != 0)
+ 			return rc;
  
 -- 
 2.7.4
