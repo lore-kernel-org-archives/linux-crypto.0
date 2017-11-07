@@ -1,49 +1,86 @@
-From: Jason Gunthorpe <jgg@ziepe.ca>
-Subject: Re: [PATCH v2] tpm: Move Linux RNG connection to hwrng
-Date: Tue, 7 Nov 2017 09:04:04 -0700
-Message-ID: <20171107160404.GG21466@ziepe.ca>
-References: <20171031200503.GC18578@ziepe.ca>
- <20171105110506.usxmuzrvcjvxahr6@linux.intel.com>
- <20171106022704.GD26011@ziepe.ca>
- <CANc+2y6dx_2zOzFA5aFs7RpEV8aNqxpDghmx+q_+XyendYJoew@mail.gmail.com>
+From: Mat Martineau <mathew.j.martineau@linux.intel.com>
+Subject: Re: [PATCH] lib/mpi: call cond_resched() from mpi_powm() loop
+Date: Tue, 7 Nov 2017 10:38:30 -0800 (PST)
+Message-ID: <alpine.OSX.2.21.1711070921100.18896@afarcy-mobl1.amr.corp.intel.com>
+References: <20171107061951.861-1-ebiggers3@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        Stefan Berger <stefanb@linux.vnet.ibm.com>,
-        linux-integrity@vger.kernel.org,
-        David Howells <dhowells@redhat.com>,
+Content-Type: text/plain; format=flowed; charset=US-ASCII
+Cc: linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:INTEGRITY MEASUREMENT ARCHITECTURE (IMA)"
-        <linux-security-module@vger.kernel.org>,
-        "open list:KEYS-TRUSTED" <keyrings@vger.kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        James Morris <james.l.morris@oracle.com>,
-        Matt Mackall <mpm@selenic.com>,
-        David Safford <safford@us.ibm.com>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        "Serge E. Hallyn" <serge@hallyn.com>
-To: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Return-path: <linux-security-module-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CANc+2y6dx_2zOzFA5aFs7RpEV8aNqxpDghmx+q_+XyendYJoew@mail.gmail.com>
-Sender: owner-linux-security-module@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+        Tudor-Dan Ambarus <tudor.ambarus@microchip.com>,
+        Salvatore Benedetto <salvatore.benedetto@intel.com>,
+        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Eric Biggers <ebiggers@google.com>, stable@vger.kernel.org
+To: Eric Biggers <ebiggers3@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga11.intel.com ([192.55.52.93]:33780 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1755910AbdKGSib (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 7 Nov 2017 13:38:31 -0500
+In-Reply-To: <20171107061951.861-1-ebiggers3@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Nov 07, 2017 at 08:50:44AM +0530, PrasannaKumar Muralidharan wrote:
 
-> I am assuming you are talking about the following patches - using
-> struct tpm_chip instead of chip number and this patch.
+Eric,
 
-yes
+On Mon, 6 Nov 2017, Eric Biggers wrote:
 
-> I won't be able to test if struct tpm_chip usage as I don't have
-> multiple tpm hw in one machine. In case of tpm rng changes I can test
-> only the lifecycle of tpm rng device. Is that enough? I feel my test
-> will be limited. Please provide your thoughts on this.
+> From: Eric Biggers <ebiggers@google.com>
+>
+> On a non-preemptible kernel, if KEYCTL_DH_COMPUTE is called with the
+> largest permitted inputs (16384 bits), the kernel spends 10+ seconds
+> doing modular exponentiation in mpi_powm() without rescheduling.  If all
+> threads do it, it locks up the system.  Moreover, it can cause
+> rcu_sched-stall warnings.
+>
+> Notwithstanding the insanity of doing this calculation in kernel mode
+> rather than in userspace, fix it by calling cond_resched() as each bit
+> from the exponent is processed.  It's still noninterruptible, but at
+> least it's preemptible now.
 
-That is certainly better than no testing.
+cond_resched() is in the outer loop and gets called every BITS_PER_LONG 
+bits. That seems to be often enough for the system that was taking 10+ 
+seconds, and might be ok for slower processors.
 
-Jason
+Was your intent to call cond_resched() for every bit as you described in 
+the commit message?
+
+Thanks for the fix.
+
+
+Mat
+
+
+>
+> Cc: stable@vger.kernel.org # v4.12+
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+> lib/mpi/mpi-pow.c | 3 +++
+> 1 file changed, 3 insertions(+)
+>
+> diff --git a/lib/mpi/mpi-pow.c b/lib/mpi/mpi-pow.c
+> index e24388a863a7..f089a52dbbdb 100644
+> --- a/lib/mpi/mpi-pow.c
+> +++ b/lib/mpi/mpi-pow.c
+> @@ -26,6 +26,7 @@
+>  *	 however I decided to publish this code under the plain GPL.
+>  */
+>
+> +#include <linux/sched.h>
+> #include <linux/string.h>
+> #include "mpi-internal.h"
+> #include "longlong.h"
+> @@ -263,6 +264,8 @@ int mpi_powm(MPI res, MPI base, MPI exp, MPI mod)
+> 				break;
+> 			e = ep[i];
+> 			c = BITS_PER_MPI_LIMB;
+> +
+> +			cond_resched();
+> 		}
+>
+> 		/* We shifted MOD, the modulo reduction argument, left MOD_SHIFT_CNT
+> -- 
+> 2.15.0
+>
+>
