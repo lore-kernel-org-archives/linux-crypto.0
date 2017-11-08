@@ -1,127 +1,82 @@
-From: Stefan Wahren <stefan.wahren@i2se.com>
-Subject: Re: [PATCH 11/12] hwrng: bcm2835-rng: Enable BCM2835 RNG to work on
- BCM63xx platforms
-Date: Wed, 8 Nov 2017 00:27:13 +0100 (CET)
-Message-ID: <1627253231.37578.1510097233943@email.1und1.de>
-References: <20171102010408.27736-1-f.fainelli@gmail.com>
- <20171102010408.27736-12-f.fainelli@gmail.com>
- <1831955836.132229.1509820078271@email.1und1.de>
- <2538f1bb-e0f8-c336-d82a-0cb2f19b0ead@gmail.com>
- <345702666.5362.1510037144469@email.1und1.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Mark Rutland <mark.rutland@arm.com>,
- "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
- <devicetree@vger.kernel.org>, Sean Wang <sean.wang@mediatek.com>,
- Martin Kaiser <martin@kaiser.cx>, Herbert Xu <herbert@gondor.apana.org.au>,
- Scott Branden <sbranden@broadcom.com>, Ray Jui <rjui@broadcom.com>,
- Matt Mackall <mpm@selenic.com>, Russell King <rmk+kernel@armlinux.org.uk>,
- Krzysztof Kozlowski <krzk@kernel.org>, linux-kernel@vger.kernel.org,
- Eric Anholt <eric@anholt.net>,
- Harald Freudenberger <freude@linux.vnet.ibm.com>,
- Rob Herring <robh+dt@kernel.org>,
- "maintainer:BROADCOM BCM281XX/BCM11XXX/BCM216XX ARM ARCHITE..."
- <bcm-kernel-feedback-list@broadcom.com>,
- "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
- <linux-crypto@vger.kernel.org>,
- PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
- Steffen Trumtrar <s.trumtrar@pengutronix.de>,
- "moderated list:BROADCO
-To: Florian Fainelli <f.fainelli@gmail.com>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <345702666.5362.1510037144469@email.1und1.de>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+From: Florian Fainelli <f.fainelli@gmail.com>
+Subject: [PATCH v2 00/12] bcm63xx-rng conversion to bcm2835-rng
+Date: Tue,  7 Nov 2017 16:44:37 -0800
+Message-ID: <20171108004449.32730-1-f.fainelli@gmail.com>
+Cc: Florian Fainelli <f.fainelli@gmail.com>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        bcm-kernel-feedback-list@broadcom.com (maintainer:BROADCOM
+        BCM281XX/BCM11XXX/BCM216XX ARM ARCHITE...),
+        Eric Anholt <eric@anholt.net>,
+        Stefan Wahren <stefan.wahren@i2se.com>,
+        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
+        Russell King <rmk+kernel@armlinux.org.uk>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Harald Freudenberger <freude@linux.vnet.ibm.com>,
+        Sean Wang <sean.wang@mediatek.com>,
+        Martin Kaiser <martin@kaiser.cx>,
+        Steffen Trumtrar <s.trumtrar@pengutronix.de>,
+        linux-crypto@vger.k
+To: linux-kernel@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-qt0-f193.google.com ([209.85.216.193]:49110 "EHLO
+        mail-qt0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754420AbdKHAo4 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 7 Nov 2017 19:44:56 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
+Hi,
 
-> Stefan Wahren <stefan.wahren@i2se.com> hat am 7. November 2017 um 07:45 geschrieben:
-> 
-> 
-> > Florian Fainelli <f.fainelli@gmail.com> hat am 6. November 2017 um 21:16 geschrieben:
-> > 
-> > 
-> > On 11/04/2017 11:27 AM, Stefan Wahren wrote:
-> > > Hi Florian
-> > > 
-> > >> Florian Fainelli <f.fainelli@gmail.com> hat am 2. November 2017 um 02:04 geschrieben:
-> > >>
-> > >>
-> > >> We have now incorporated all necessary functionality for the BCM63xx
-> > >> platforms to successfully migrate over bcm2835-rng, so add the final
-> > >> bits: Kconfig selection and proper platform_device device type matching
-> > >> to keep the same platform device name for registration to work.
-> > >>
-> > >> Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
-> > >> ---
-> > >>  drivers/char/hw_random/Kconfig       |  7 ++++---
-> > >>  drivers/char/hw_random/bcm2835-rng.c | 11 ++++++++++-
-> > >>  2 files changed, 14 insertions(+), 4 deletions(-)
-> > >>
-> > >> diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-> > >> index 95a031e9eced..d0689cc8c7fc 100644
-> > >> --- a/drivers/char/hw_random/Kconfig
-> > >> +++ b/drivers/char/hw_random/Kconfig
-> > >> @@ -87,12 +87,13 @@ config HW_RANDOM_BCM63XX
-> > >>  	  If unusure, say Y.
-> > >>  
-> > >>  config HW_RANDOM_BCM2835
-> > >> -	tristate "Broadcom BCM2835 Random Number Generator support"
-> > >> -	depends on ARCH_BCM2835 || ARCH_BCM_NSP || ARCH_BCM_5301X
-> > >> +	tristate "Broadcom BCM2835/BCM63xx Random Number Generator support"
-> > >> +	depends on ARCH_BCM2835 || ARCH_BCM_NSP || ARCH_BCM_5301X || \
-> > >> +		   ARCH_BCM_63XX || BCM63XX || BMIPS_GENERIC
-> > >>  	default HW_RANDOM
-> > >>  	---help---
-> > >>  	  This driver provides kernel-side support for the Random Number
-> > >> -	  Generator hardware found on the Broadcom BCM2835 SoCs.
-> > >> +	  Generator hardware found on the Broadcom BCM2835 and BCM63xx SoCs.
-> > >>  
-> > >>  	  To compile this driver as a module, choose M here: the
-> > >>  	  module will be called bcm2835-rng
-> > >> diff --git a/drivers/char/hw_random/bcm2835-rng.c b/drivers/char/hw_random/bcm2835-rng.c
-> > >> index 650e0033c273..d9ffe14f312b 100644
-> > >> --- a/drivers/char/hw_random/bcm2835-rng.c
-> > >> +++ b/drivers/char/hw_random/bcm2835-rng.c
-> > >> @@ -131,6 +131,7 @@ static const struct of_device_id bcm2835_rng_of_match[] = {
-> > >>  	{ .compatible = "brcm,bcm2835-rng"},
-> > >>  	{ .compatible = "brcm,bcm-nsp-rng", .data = &nsp_rng_of_data },
-> > >>  	{ .compatible = "brcm,bcm5301x-rng", .data = &nsp_rng_of_data },
-> > >> +	{ .compatible = "brcm,bcm6368-rng"},
-> > >>  	{},
-> > >>  };
-> > >>  
-> > >> @@ -164,7 +165,7 @@ static int bcm2835_rng_probe(struct platform_device *pdev)
-> > >>  	if (IS_ERR(priv->clk))
-> > >>  		priv->clk = NULL;
-> > >>  
-> > >> -	priv->rng.name = "bcm2835-rng";
-> > >> +	priv->rng.name = pdev->id_entry->name;
-> > > 
-> > > this change breaks registration on bcm2835, because the name is NULL.
-> > 
-> > OH right, I will fix that in v2, I am assuming that if you did something
-> > like this, things still work correctly for you on 2835:
-> > 
-> > if (!priv->id_entry->name)
-> > 	priv->rng.name = "bcm2835-rng";
-> > else
-> > 	priv->rng.name = priv->id_entry->name;
-> > 
-> > ?
-> 
-> I think that should work, but i'm not really happy about it. I prefer a more general solution. Looking at the other rng drivers shows the following pattern:
-> 
-> priv->rng.name = pdev->name;
-> 
-> I need to verify this on bcm2835.
+As it usually happens when there is a fair amount of HW IP block re-use,
+competing implementations show up. In that case the BCM2835 HWRNG driver and
+the BCM63xx RNG driver have exactly the same register offsets and this is
+indeed the same piece of HW.
 
-Okay pdev->name works for bcm2835
+This patch series first prepares the bcm2835-rng to be more future proof and
+support newer platforms, and the last part brings in what is necessary to
+migrate the bcm63xx-rng over to bcm2835-rng. Finally we delete bcm63xx-rng
+completely.
+
+The reason why BCM2835 RNG was kept over BCM63xx RNG is because the former
+deals correctly with a warm up count and the number of words available in the
+FIFO size.
+
+Thanks!
+
+Changes in v2:
+
+- rework the logic about how we manage the optional clock
+- use pdev->name for the rng.name member
+
+Florian Fainelli (12):
+  hwrng: bcm2835-rng: Obtain base register via resource
+  hwrng: bcm2835-rng: Define a driver private context
+  hwrng: bcm2835-rng: Move enabling to hwrng::init
+  hwrng: bcm2835-rng: Implementation cleanup callback
+  hwrng: bcm2835-rng: Use device managed helpers
+  hwrng: bcm2835-rng: Rework interrupt masking
+  hwrng: bcm2835-rng: Manage an optional clock
+  hwrng: bcm2835-rng: Abstract I/O accessors
+  hwrng: bcm2835-rng: Add Broadcom MIPS I/O accessors
+  dt-bindings: rng: Incorporate brcm,bcm6368.txt binding
+  hwrng: bcm2835-rng: Enable BCM2835 RNG to work on BCM63xx platforms
+  hwrng: bcm63xx-rng: Remove since bcm2835-rng takes over
+
+ .../devicetree/bindings/rng/brcm,bcm2835.txt       |  22 ++-
+ .../devicetree/bindings/rng/brcm,bcm6368.txt       |  17 ---
+ drivers/char/hw_random/Kconfig                     |  20 +--
+ drivers/char/hw_random/Makefile                    |   1 -
+ drivers/char/hw_random/bcm2835-rng.c               | 167 +++++++++++++++------
+ drivers/char/hw_random/bcm63xx-rng.c               | 154 -------------------
+ 6 files changed, 140 insertions(+), 241 deletions(-)
+ delete mode 100644 Documentation/devicetree/bindings/rng/brcm,bcm6368.txt
+ delete mode 100644 drivers/char/hw_random/bcm63xx-rng.c
+
+-- 
+2.9.3
