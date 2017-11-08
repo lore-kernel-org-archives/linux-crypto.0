@@ -1,75 +1,113 @@
-From: Florian Fainelli <f.fainelli-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH v2 09/12] hwrng: bcm2835-rng: Add Broadcom MIPS I/O accessors
-Date: Tue,  7 Nov 2017 16:44:46 -0800
-Message-ID: <20171108004449.32730-10-f.fainelli@gmail.com>
+From: Florian Fainelli <f.fainelli@gmail.com>
+Subject: [PATCH v2 07/12] hwrng: bcm2835-rng: Manage an optional clock
+Date: Tue,  7 Nov 2017 16:44:44 -0800
+Message-ID: <20171108004449.32730-8-f.fainelli@gmail.com>
 References: <20171108004449.32730-1-f.fainelli@gmail.com>
-Cc: Florian Fainelli <f.fainelli-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org>,
-        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
-        Ray Jui <rjui-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
-        Scott Branden <sbranden-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
-        bcm-kernel-feedback-list-dY08KVG/lbpWk0Htik3J/w@public.gmane.org (maintainer:BROADCOM
-        BCM281XX/BCM11XXX/BCM216XX ARM ARCHITE...),
-        Eric Anholt <eric-WhKQ6XTQaPysTnJN9+BGXg@public.gmane.org>,
-        Stefan Wahren <stefan.wahren-eS4NqCHxEME@public.gmane.org>,
-        PrasannaKumar Muralidharan <prasannatsmkumar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        Russell King <rmk+kernel-I+IVW8TIWO2tmTQ+vhA3Yw@public.gmane.org>,
-        Krzysztof Kozlowski <krzk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        Harald Freudenberger <freude-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>,
-        Sean Wang <sean.wang-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>,
-        Martin Kaiser <martin-XxZfDwE/svGeZLLa646FqQ@public.gmane.org>,
-        Steffen Trumtrar <s.trumtrar-bIcnvbaLZ9MEGnE8C9+IrQ@public.gmane.org>,
-        linux-crypto@vger.k
-To: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20171108004449.32730-1-f.fainelli-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Mark Rutland <mark.rutland@arm.com>, Stefan Wahren <stefan.wahren@i2se.com>,
+ Florian Fainelli <f.fainelli@gmail.com>, Martin Kaiser <martin@kaiser.cx>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ Scott Branden <sbranden@broadcom.com>,
+ "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
+ <devicetree@vger.kernel.org>, Ray Jui <rjui@broadcom.com>,
+ PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
+ Harald Freudenberger <freude@linux.vnet.ibm.com>,
+ Krzysztof Kozlowski <krzk@kernel.org>, Eric Anholt <eric@anholt.net>,
+ Russell King <rmk+kernel@armlinux.org.uk>, Rob Herring <robh+dt@kernel.org>,
+ "maintainer:BROADCOM BCM281XX/BCM11XXX/BCM216XX ARM ARCHITE..."
+ <bcm-kernel-feedback-list@broadcom.com>,
+ "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+ <linux-crypto@vger.kernel.org>, Sean Wang <sean.wang@mediatek.com>,
+ Matt Mackall <mpm@selenic.com>, Steffen Trumtrar <s.
+To: linux-kernel@vger.kernel.org
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20171108004449.32730-1-f.fainelli@gmail.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-Broadcom MIPS HW is always strapped to match the system-wide endian such
-that all I/O access to this RNG block is done with the native CPU
-endian, account for that.
+One of the last steps before bcm63xx-rng can be eliminated is to manage
+a clock during hwrng::init and hwrng::cleanup, so fetch it in the probe
+function, and manage it during these two steps when valid.
 
-Signed-off-by: Florian Fainelli <f.fainelli-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
 ---
- drivers/char/hw_random/bcm2835-rng.c | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
+ drivers/char/hw_random/bcm2835-rng.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/char/hw_random/bcm2835-rng.c b/drivers/char/hw_random/bcm2835-rng.c
-index 3a607472687d..6dd8f48701b5 100644
+index ed20e0b6b7ae..99b56fd5482c 100644
 --- a/drivers/char/hw_random/bcm2835-rng.c
 +++ b/drivers/char/hw_random/bcm2835-rng.c
-@@ -44,13 +44,22 @@ static inline struct bcm2835_rng_priv *to_rng_priv(struct hwrng *rng)
+@@ -15,6 +15,7 @@
+ #include <linux/of_platform.h>
+ #include <linux/platform_device.h>
+ #include <linux/printk.h>
++#include <linux/clk.h>
  
- static inline u32 rng_readl(struct bcm2835_rng_priv *priv, u32 offset)
+ #define RNG_CTRL	0x0
+ #define RNG_STATUS	0x4
+@@ -33,6 +34,7 @@ struct bcm2835_rng_priv {
+ 	struct hwrng rng;
+ 	void __iomem *base;
+ 	bool mask_interrupts;
++	struct clk *clk;
+ };
+ 
+ static inline struct bcm2835_rng_priv *to_rng_priv(struct hwrng *rng)
+@@ -66,8 +68,15 @@ static int bcm2835_rng_read(struct hwrng *rng, void *buf, size_t max,
+ static int bcm2835_rng_init(struct hwrng *rng)
  {
--	return readl(priv->base + offset);
-+	/* MIPS chips strapped for BE will automagically configure the
-+	 * peripheral registers for CPU-native byte order.
-+	 */
-+	if (IS_ENABLED(CONFIG_MIPS) && IS_ENABLED(CONFIG_CPU_BIG_ENDIAN))
-+		return __raw_readl(priv->base + offset);
-+	else
-+		return readl(priv->base + offset);
+ 	struct bcm2835_rng_priv *priv = to_rng_priv(rng);
++	int ret = 0;
+ 	u32 val;
+ 
++	if (!IS_ERR(priv->clk)) {
++		ret = clk_prepare_enable(priv->clk);
++		if (ret)
++			return ret;
++	}
++
+ 	if (priv->mask_interrupts) {
+ 		/* mask the interrupt */
+ 		val = readl(priv->base + RNG_INT_MASK);
+@@ -79,7 +88,7 @@ static int bcm2835_rng_init(struct hwrng *rng)
+ 	__raw_writel(RNG_WARMUP_COUNT, priv->base + RNG_STATUS);
+ 	__raw_writel(RNG_RBGEN, priv->base + RNG_CTRL);
+ 
+-	return 0;
++	return ret;
  }
  
- static inline void rng_writel(struct bcm2835_rng_priv *priv, u32 val,
- 			      u32 offset)
- {
--	writel(val, priv->base + offset);
-+	if (IS_ENABLED(CONFIG_MIPS) && IS_ENABLED(CONFIG_CPU_BIG_ENDIAN))
-+		__raw_writel(val, priv->base + offset);
-+	else
-+		writel(val, priv->base + offset);
+ static void bcm2835_rng_cleanup(struct hwrng *rng)
+@@ -88,6 +97,9 @@ static void bcm2835_rng_cleanup(struct hwrng *rng)
+ 
+ 	/* disable rng hardware */
+ 	__raw_writel(0, priv->base + RNG_CTRL);
++
++	if (!IS_ERR(priv->clk))
++		clk_disable_unprepare(priv->clk);
  }
  
- static int bcm2835_rng_read(struct hwrng *rng, void *buf, size_t max,
+ struct bcm2835_rng_of_data {
+@@ -130,6 +142,9 @@ static int bcm2835_rng_probe(struct platform_device *pdev)
+ 		return PTR_ERR(priv->base);
+ 	}
+ 
++	/* Clock is optional on most platforms */
++	priv->clk = devm_clk_get(dev, NULL);
++
+ 	priv->rng.name = "bcm2835-rng";
+ 	priv->rng.init = bcm2835_rng_init;
+ 	priv->rng.read = bcm2835_rng_read;
 -- 
 2.9.3
-
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
