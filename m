@@ -1,55 +1,56 @@
-From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: [bug report] crypto: chelsio - Move DMA un/mapping to chcr from lld
- cxgb4 driver
-Date: Wed, 8 Nov 2017 11:46:58 +0300
-Message-ID: <20171108084658.m2tkthbg4p2k7zcv@mwanda>
+From: =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>
+Subject: Re: [PATCH v2 1/3] staging: ccree: copy IV to DMAable memory
+Date: Wed, 8 Nov 2017 10:26:33 +0000
+Message-ID: <VI1PR0402MB3342B8E2BF19C2C5E298981F98560@VI1PR0402MB3342.eurprd04.prod.outlook.com>
+References: <1509610224-14708-1-git-send-email-gilad@benyossef.com>
+ <1509610224-14708-2-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: harsh@chelsio.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from aserp1040.oracle.com ([141.146.126.69]:20182 "EHLO
-        aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750752AbdKHIrH (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 8 Nov 2017 03:47:07 -0500
-Content-Disposition: inline
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: "devel@driverdev.osuosl.org" <devel@driverdev.osuosl.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "driverdev-devel@linuxdriverproject.org"
+ <driverdev-devel@linuxdriverproject.org>,
+ "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+ Ofir Drang <ofir.drang@arm.com>
+To: Gilad Ben-Yossef <gilad@benyossef.com>, Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>, Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+Content-Language: en-US
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+List-Id: linux-crypto.vger.kernel.org
 
-Hello Harsh Jain,
+On 11/2/2017 10:14 AM, Gilad Ben-Yossef wrote:
+> We are being passed an IV buffer from unknown origin, which may be
+> stack allocated and thus not safe for DMA. Allocate a DMA safe
+> buffer for the IV and use that instead.
+> 
+IIUC this fixes only the (a)blkcipher / skcipher algorithms.
+What about aead, authenc?
 
-This is a semi-automatic email about new static checker warnings.
+The fact that only the skcipher tcrypt tests use IVs on stack doesn't
+mean aead, authenc implementations are safe - other crypto API users
+could provide IVs laying in non-DMAable memory.
 
-The patch 2f47d5804311: "crypto: chelsio - Move DMA un/mapping to
-chcr from lld cxgb4 driver" from Oct 8, 2017, leads to the following
-Smatch complaint:
+To reiterate, the proper approach is to fix the crypto API to guarantee
+IVs are DMAable.
+However Herbert suggests he is not willing to do this work:
+https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg28821.html
 
-    drivers/crypto/chelsio/chcr_algo.c:562 ulptx_walk_add_sg()
-    error: we previously assumed 'sg' could be null (see line 551)
+A few high-level details mentioning what this implies would be helpful,
+in case somebody else decides its worth pursuing this path.
 
-drivers/crypto/chelsio/chcr_algo.c
-   550	
-   551		while (sg && skip) {
-                       ^^
-The patch adds a new check for NULL
+The compromise is to fix all crypto drivers that need DMAable IVs.
+IMHO this is suboptimal, both in terms of performance (memory
+allocation, memcpy) and increased code complexity.
 
-   552			if (sg_dma_len(sg) <= skip) {
-   553				skip -= sg_dma_len(sg);
-   554				skip_len = 0;
-   555				sg = sg_next(sg);
-   556			} else {
-   557				skip_len = skip;
-   558				skip = 0;
-   559			}
-   560		}
-   561		if (walk->nents == 0) {
-   562			small = min_t(unsigned int, sg_dma_len(sg) - skip_len, len);
-                                                               ^^
-This dereference (inside the macro) isn't checked.
-
-   563			sgmin = min_t(unsigned int, small, CHCR_SRC_SG_SIZE);
-   564			walk->sgl->len0 = cpu_to_be32(sgmin);
-
-regards,
-dan carpenter
+Horia
