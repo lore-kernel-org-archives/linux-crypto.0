@@ -1,82 +1,101 @@
-From: Florian Fainelli <f.fainelli@gmail.com>
-Subject: [PATCH v2 00/12] bcm63xx-rng conversion to bcm2835-rng
-Date: Tue,  7 Nov 2017 16:44:37 -0800
-Message-ID: <20171108004449.32730-1-f.fainelli@gmail.com>
-Cc: Florian Fainelli <f.fainelli@gmail.com>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Ray Jui <rjui@broadcom.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        bcm-kernel-feedback-list@broadcom.com (maintainer:BROADCOM
+From: Florian Fainelli <f.fainelli-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH v2 01/12] hwrng: bcm2835-rng: Obtain base register via resource
+Date: Tue,  7 Nov 2017 16:44:38 -0800
+Message-ID: <20171108004449.32730-2-f.fainelli@gmail.com>
+References: <20171108004449.32730-1-f.fainelli@gmail.com>
+Cc: Florian Fainelli <f.fainelli-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org>,
+        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
+        Ray Jui <rjui-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
+        Scott Branden <sbranden-dY08KVG/lbpWk0Htik3J/w@public.gmane.org>,
+        bcm-kernel-feedback-list-dY08KVG/lbpWk0Htik3J/w@public.gmane.org (maintainer:BROADCOM
         BCM281XX/BCM11XXX/BCM216XX ARM ARCHITE...),
-        Eric Anholt <eric@anholt.net>,
-        Stefan Wahren <stefan.wahren@i2se.com>,
-        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
-        Russell King <rmk+kernel@armlinux.org.uk>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Harald Freudenberger <freude@linux.vnet.ibm.com>,
-        Sean Wang <sean.wang@mediatek.com>,
-        Martin Kaiser <martin@kaiser.cx>,
-        Steffen Trumtrar <s.trumtrar@pengutronix.de>,
+        Eric Anholt <eric-WhKQ6XTQaPysTnJN9+BGXg@public.gmane.org>,
+        Stefan Wahren <stefan.wahren-eS4NqCHxEME@public.gmane.org>,
+        PrasannaKumar Muralidharan <prasannatsmkumar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        Russell King <rmk+kernel-I+IVW8TIWO2tmTQ+vhA3Yw@public.gmane.org>,
+        Krzysztof Kozlowski <krzk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        Harald Freudenberger <freude-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>,
+        Sean Wang <sean.wang-NuS5LvNUpcJWk0Htik3J/w@public.gmane.org>,
+        Martin Kaiser <martin-XxZfDwE/svGeZLLa646FqQ@public.gmane.org>,
+        Steffen Trumtrar <s.trumtrar-bIcnvbaLZ9MEGnE8C9+IrQ@public.gmane.org>,
         linux-crypto@vger.k
-To: linux-kernel@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-qt0-f193.google.com ([209.85.216.193]:49110 "EHLO
-        mail-qt0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754420AbdKHAo4 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 7 Nov 2017 19:44:56 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+To: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20171108004449.32730-1-f.fainelli-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi,
+In preparation for consolidating bcm63xx-rng into bcm2835-rng, make sure
+that we obtain the base register via platform_get_resource() since we
+need to support the non-DT enabled MIPS-based BCM63xx DSL SoCs.
 
-As it usually happens when there is a fair amount of HW IP block re-use,
-competing implementations show up. In that case the BCM2835 HWRNG driver and
-the BCM63xx RNG driver have exactly the same register offsets and this is
-indeed the same piece of HW.
+Signed-off-by: Florian Fainelli <f.fainelli-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ drivers/char/hw_random/bcm2835-rng.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-This patch series first prepares the bcm2835-rng to be more future proof and
-support newer platforms, and the last part brings in what is necessary to
-migrate the bcm63xx-rng over to bcm2835-rng. Finally we delete bcm63xx-rng
-completely.
-
-The reason why BCM2835 RNG was kept over BCM63xx RNG is because the former
-deals correctly with a warm up count and the number of words available in the
-FIFO size.
-
-Thanks!
-
-Changes in v2:
-
-- rework the logic about how we manage the optional clock
-- use pdev->name for the rng.name member
-
-Florian Fainelli (12):
-  hwrng: bcm2835-rng: Obtain base register via resource
-  hwrng: bcm2835-rng: Define a driver private context
-  hwrng: bcm2835-rng: Move enabling to hwrng::init
-  hwrng: bcm2835-rng: Implementation cleanup callback
-  hwrng: bcm2835-rng: Use device managed helpers
-  hwrng: bcm2835-rng: Rework interrupt masking
-  hwrng: bcm2835-rng: Manage an optional clock
-  hwrng: bcm2835-rng: Abstract I/O accessors
-  hwrng: bcm2835-rng: Add Broadcom MIPS I/O accessors
-  dt-bindings: rng: Incorporate brcm,bcm6368.txt binding
-  hwrng: bcm2835-rng: Enable BCM2835 RNG to work on BCM63xx platforms
-  hwrng: bcm63xx-rng: Remove since bcm2835-rng takes over
-
- .../devicetree/bindings/rng/brcm,bcm2835.txt       |  22 ++-
- .../devicetree/bindings/rng/brcm,bcm6368.txt       |  17 ---
- drivers/char/hw_random/Kconfig                     |  20 +--
- drivers/char/hw_random/Makefile                    |   1 -
- drivers/char/hw_random/bcm2835-rng.c               | 167 +++++++++++++++------
- drivers/char/hw_random/bcm63xx-rng.c               | 154 -------------------
- 6 files changed, 140 insertions(+), 241 deletions(-)
- delete mode 100644 Documentation/devicetree/bindings/rng/brcm,bcm6368.txt
- delete mode 100644 drivers/char/hw_random/bcm63xx-rng.c
-
+diff --git a/drivers/char/hw_random/bcm2835-rng.c b/drivers/char/hw_random/bcm2835-rng.c
+index 574211a49549..a818418a7e4c 100644
+--- a/drivers/char/hw_random/bcm2835-rng.c
++++ b/drivers/char/hw_random/bcm2835-rng.c
+@@ -81,21 +81,23 @@ static int bcm2835_rng_probe(struct platform_device *pdev)
+ 	void (*rng_setup)(void __iomem *base);
+ 	const struct of_device_id *rng_id;
+ 	void __iomem *rng_base;
++	struct resource *r;
+ 	int err;
+ 
++	r = platform_get_resource(pdev, IORESOURCE_MEM, 0);
++
+ 	/* map peripheral */
+-	rng_base = of_iomap(np, 0);
+-	if (!rng_base) {
++	rng_base = devm_ioremap_resource(dev, r);
++	if (IS_ERR(rng_base)) {
+ 		dev_err(dev, "failed to remap rng regs");
+-		return -ENODEV;
++		return PTR_ERR(rng_base);
+ 	}
+ 	bcm2835_rng_ops.priv = (unsigned long)rng_base;
+ 
+ 	rng_id = of_match_node(bcm2835_rng_of_match, np);
+-	if (!rng_id) {
+-		iounmap(rng_base);
++	if (!rng_id)
+ 		return -EINVAL;
+-	}
++
+ 	/* Check for rng init function, execute it */
+ 	rng_setup = rng_id->data;
+ 	if (rng_setup)
+@@ -107,10 +109,9 @@ static int bcm2835_rng_probe(struct platform_device *pdev)
+ 
+ 	/* register driver */
+ 	err = hwrng_register(&bcm2835_rng_ops);
+-	if (err) {
++	if (err)
+ 		dev_err(dev, "hwrng registration failed\n");
+-		iounmap(rng_base);
+-	} else
++	else
+ 		dev_info(dev, "hwrng registered\n");
+ 
+ 	return err;
+@@ -125,7 +126,6 @@ static int bcm2835_rng_remove(struct platform_device *pdev)
+ 
+ 	/* unregister driver */
+ 	hwrng_unregister(&bcm2835_rng_ops);
+-	iounmap(rng_base);
+ 
+ 	return 0;
+ }
 -- 
 2.9.3
+
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
