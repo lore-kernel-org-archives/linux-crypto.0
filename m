@@ -1,8 +1,8 @@
 From: Eric Anholt <eric@anholt.net>
-Subject: Re: [PATCH v2 05/12] hwrng: bcm2835-rng: Use device managed helpers
-Date: Wed, 08 Nov 2017 10:24:11 -0800
-Message-ID: <87mv3wy6gk.fsf@anholt.net>
-References: <20171108004449.32730-1-f.fainelli@gmail.com> <20171108004449.32730-6-f.fainelli@gmail.com>
+Subject: Re: [PATCH v2 06/12] hwrng: bcm2835-rng: Rework interrupt masking
+Date: Wed, 08 Nov 2017 10:26:48 -0800
+Message-ID: <87k1z0y6c7.fsf@anholt.net>
+References: <20171108004449.32730-1-f.fainelli@gmail.com> <20171108004449.32730-7-f.fainelli@gmail.com>
 Mime-Version: 1.0
 Content-Type: multipart/signed; boundary="=-=-=";
         micalg=pgp-sha512; protocol="application/pgp-signature"
@@ -27,7 +27,7 @@ Cc: Florian Fainelli <f.fainelli@gmail.com>,
 To: Florian Fainelli <f.fainelli@gmail.com>,
         linux-kernel@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20171108004449.32730-6-f.fainelli@gmail.com>
+In-Reply-To: <20171108004449.32730-7-f.fainelli@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
@@ -36,11 +36,16 @@ Content-Type: text/plain
 
 Florian Fainelli <f.fainelli@gmail.com> writes:
 
-> Now that we have moved the RNG disabling into a hwrng::cleanup callback,
-> we can use the device managed registration operation and remove our
-> remove callback since it won't do anything necessary.
+> The interrupt masking done for Northstart Plus and Northstar (BCM5301X)
+> is moved from being a function pointer mapped to of_device_id::data into
+> a proper part of the hwrng::init callback. While at it, we also make the
+> of_data be a proper structure indicating the platform specifics, since
+> the day we need to add a second type of platform information, we would
+> have to do that anyway.
 
-3-5 are:
+I still think we should just unconditionally mask off the interrupt
+regardless of platform if we're not going to use it in the driver and
+some platforms need it.  Looks like a fine refactor, though:
 
 Reviewed-by: Eric Anholt <eric@anholt.net>
 
@@ -49,18 +54,18 @@ Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEE/JuuFDWp9/ZkuCBXtdYpNtH8nugFAloDS8sACgkQtdYpNtH8
-nug/QBAAi6qnYBT9amukq4t/8qkT+TZyp8Wc7+ps8tcTRp78LJg9qK5vFS+df2Q6
-gSlR+tzxcKHlT3ozqmiJurxWkhG20nkV7Yp74aT2eRNqJufi+n20TD3m9ElY9cPQ
-GaTSFp6iqlzaUozBhhEe25HglZuDqBqFzebnuF2xJiQT94hENvxzkhcFG2o6cZjO
-cQYQePeJoFv79kzrPw0aI22VHtEb8lzWxltFd07hAcI1SRVjcxtYA11gaGXivKRz
-bDLEmrxdeUV0sOl66+9chAsexp5X2Z8D8xh0d0xClQSlM6DhFqsnIonwMt/MbUrs
-QKV+gCpznpQs8Mt+3FdAL2h251Z/G5DeFDNOYIhSOtgveXPYyKPUiNb/WR/4BB/F
-GSl/OD+QrzSR9vz0LMyK9BbcRI+29F+2utZrKssRNi/sknOBr6weDLVNPseZKJj/
-VsVuE94OWrbn1RBcdKblo5TEIrXovcGf4bxkWvl5buB4l+KFL8BD9G2zab6xH0Na
-5fc5XLF2kx+qbq78o6xZKiClkjc/wVxYz4CbLe9orcWMK0WrWsXs1LXFTuRhMdNN
-E/58wdqJrvKMC9Cqm5hZRghvR9nFwHHn2bgMi1EqMejpANwNtfJy6cscPAzfb1vl
-KGDtVSf7/apus7cY2Q28XTpBgzlxcq6l7lncqknDb6NkfOSycZo=
-=ZIBo
+iQIzBAEBCgAdFiEE/JuuFDWp9/ZkuCBXtdYpNtH8nugFAloDTGgACgkQtdYpNtH8
+nuiAphAAr8IxEjTZxZPpdyXJoE828kWcpwT8xtrpDMf9oouA7S0mb4iKW0Yhhm67
+28qcuVUY6SMGgeHuxZTyrRLm5vHyuyQWXc9PYVjX+17bolrRyxrfX01gxCa3lLn7
+spWs+GRKr1rTwS4KBiHcXu/T0HwmEshU4A1lAg9zWDQjcfx671rmggSgYSod6NSC
+TDmtfllg+K9PpG0CvdVe0GRXdeGPR9gYBG1uhw9aa1t/W3bICCXhRKmtttPHJLmq
+WZqo8d4zvytZxlM03mcrTHrc54auymSWF/G8Dg4EX//vm4IoJeXv3watxt5BPGWi
+O7mXaMVD+syKnXt9wsWtwCuAZEiv/Qh7R7s80HlVWao88Bl5J33iudAqxyoICEbY
+3AN8wxaC+wHJV4emMcJ8oSEchDC2jB1mKhnvSDLiaG5iK+GCwP7v74XYMxSMW1p/
+FPILe37cKZ+LTR2rahX7P1B6nIJJZoud4IHjJg/zLEli4Wehp/MuuTXA5O6FXhqC
+xRfA3TXFdNL6HlhW+L5bvaVgaRi7pcMfJAsApEVGl/2P7ST/mHFihheGXdjuPS7b
+MYSt9984gGjOmN2cCV8WzYsB2KnfhbwqsU7HppjDmrJKG1Z1qxWCqeTN7fAl+mrD
+yOSj0IvfrYM+8bBVPC5vVuoEPbCg6BG3EATBj41ojW24VtGYw6k=
+=iCz+
 -----END PGP SIGNATURE-----
 --=-=-=--
