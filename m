@@ -1,48 +1,58 @@
-From: Stefan Wahren <stefan.wahren@i2se.com>
-Subject: Re: [PATCH v2 06/12] hwrng: bcm2835-rng: Rework interrupt masking
-Date: Wed, 8 Nov 2017 19:46:37 +0100 (CET)
-Message-ID: <1086045224.63286.1510166797078@email.1und1.de>
-References: <20171108004449.32730-1-f.fainelli@gmail.com>
- <20171108004449.32730-7-f.fainelli@gmail.com>
+From: Eric Biggers <ebiggers3@gmail.com>
+Subject: Re: [PATCH v2] lib/mpi: call cond_resched() from mpi_powm() loop
+Date: Wed, 8 Nov 2017 11:18:04 -0800
+Message-ID: <20171108191804.GA74965@gmail.com>
+References: <20171107221527.98433-1-ebiggers3@gmail.com>
+ <25888.1510145417@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Mark Rutland <mark.rutland@arm.com>, devicetree@vger.kernel.org,
- Sean Wang <sean.wang@mediatek.com>, Martin Kaiser <martin@kaiser.cx>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- Scott Branden <sbranden@broadcom.com>, Ray Jui <rjui@broadcom.com>,
- Matt Mackall <mpm@selenic.com>, Russell King <rmk+kernel@armlinux.org.uk>,
- Krzysztof Kozlowski <krzk@kernel.org>, linux-kernel@vger.kernel.org,
- Harald Freudenberger <freude@linux.vnet.ibm.com>,
- Rob Herring <robh+dt@kernel.org>, bcm-kernel-feedback-list@broadcom.com,
- linux-crypto@vger.kernel.org,
- PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
- Steffen Trumtrar <s.trumtrar@pengutronix.de>,
- linux-arm-kernel@lists.infradead.org, linux-rpi-kernel@lists.infradead.org
-To: Florian Fainelli <f.fainelli@gmail.com>, Eric Anholt <eric@anholt.net>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20171108004449.32730-7-f.fainelli@gmail.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Tudor-Dan Ambarus <tudor.ambarus@microchip.com>,
+        Mat Martineau <mathew.j.martineau@linux.intel.com>,
+        Salvatore Benedetto <salvatore.benedetto@intel.com>,
+        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Eric Biggers <ebiggers@google.com>, stable@vger.kernel.org
+To: David Howells <dhowells@redhat.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-io0-f196.google.com ([209.85.223.196]:50744 "EHLO
+        mail-io0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751728AbdKHTSI (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 8 Nov 2017 14:18:08 -0500
+Content-Disposition: inline
+In-Reply-To: <25888.1510145417@warthog.procyon.org.uk>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Florian,
+Hi David,
 
-> Florian Fainelli <f.fainelli@gmail.com> hat am 8. November 2017 um 01:44 geschrieben:
+On Wed, Nov 08, 2017 at 12:50:17PM +0000, David Howells wrote:
+> Eric Biggers <ebiggers3@gmail.com> wrote:
 > 
+> > On a non-preemptible kernel, if KEYCTL_DH_COMPUTE is called with the
+> > largest permitted inputs (16384 bits), the kernel spends 10+ seconds
+> > doing modular exponentiation in mpi_powm() without rescheduling.  If all
+> > threads do it, it locks up the system.  Moreover, it can cause
+> > rcu_sched-stall warnings.
 > 
-> The interrupt masking done for Northstart Plus and Northstar (BCM5301X)
-> is moved from being a function pointer mapped to of_device_id::data into
-> a proper part of the hwrng::init callback. While at it, we also make the
-> of_data be a proper structure indicating the platform specifics, since
-> the day we need to add a second type of platform information, we would
-> have to do that anyway.
+> Do you want this to go in immediately, or I should I push it to James for the
+> next merge window?
+> 
+> David
 
-in the lack of proper documentation for bcm2835 rng, is it possible that we should mask the interrupts for bcm2835 as well?
+This probably should be grouped with my series "crypto: dh - input validation
+fixes", as this is also a fix for Diffie-Hellman.  I was actually expecting
+Herbert Xu to take these patches, as Diffie-Hellman is now part of the crypto
+API (crypto/dh.c); none of the patches actually touch security/keys/.  If you'd
+like to maintain the Diffie-Hellman implementation(s) you should get yourself
+added to MAINTAINERS for the relevant files.
+
+As for the criticality of the fixes, the code is new in v4.12, so I doubt many
+people have CONFIG_KEY_DH_OPERATIONS=y enabled yet.  syzbot doesn't actually
+have it enabled either (we should turn it on); I just happened to find these
+bugs by running syzkaller myself.  So it may not be particularly critical to
+take these fixes immediately.  However, at least the fix for the double free bug
+("crypto: dh - Fix double free of ctx->p") shouldn't wait for too long...
+
+Eric
