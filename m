@@ -1,8 +1,8 @@
 From: Eric Anholt <eric@anholt.net>
-Subject: Re: [PATCH v2 06/12] hwrng: bcm2835-rng: Rework interrupt masking
-Date: Wed, 08 Nov 2017 10:26:48 -0800
-Message-ID: <87k1z0y6c7.fsf@anholt.net>
-References: <20171108004449.32730-1-f.fainelli@gmail.com> <20171108004449.32730-7-f.fainelli@gmail.com>
+Subject: Re: [PATCH v2 07/12] hwrng: bcm2835-rng: Manage an optional clock
+Date: Wed, 08 Nov 2017 10:31:21 -0800
+Message-ID: <87h8u4y64m.fsf@anholt.net>
+References: <20171108004449.32730-1-f.fainelli@gmail.com> <20171108004449.32730-8-f.fainelli@gmail.com>
 Mime-Version: 1.0
 Content-Type: multipart/signed; boundary="=-=-=";
         micalg=pgp-sha512; protocol="application/pgp-signature"
@@ -27,25 +27,85 @@ Cc: Florian Fainelli <f.fainelli@gmail.com>,
 To: Florian Fainelli <f.fainelli@gmail.com>,
         linux-kernel@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20171108004449.32730-7-f.fainelli@gmail.com>
+In-Reply-To: <20171108004449.32730-8-f.fainelli@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 --=-=-=
 Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
 Florian Fainelli <f.fainelli@gmail.com> writes:
 
-> The interrupt masking done for Northstart Plus and Northstar (BCM5301X)
-> is moved from being a function pointer mapped to of_device_id::data into
-> a proper part of the hwrng::init callback. While at it, we also make the
-> of_data be a proper structure indicating the platform specifics, since
-> the day we need to add a second type of platform information, we would
-> have to do that anyway.
+> One of the last steps before bcm63xx-rng can be eliminated is to manage
+> a clock during hwrng::init and hwrng::cleanup, so fetch it in the probe
+> function, and manage it during these two steps when valid.
+>
+> Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
+> ---
+>  drivers/char/hw_random/bcm2835-rng.c | 17 ++++++++++++++++-
+>  1 file changed, 16 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/char/hw_random/bcm2835-rng.c b/drivers/char/hw_rando=
+m/bcm2835-rng.c
+> index ed20e0b6b7ae..99b56fd5482c 100644
+> --- a/drivers/char/hw_random/bcm2835-rng.c
+> +++ b/drivers/char/hw_random/bcm2835-rng.c
+> @@ -15,6 +15,7 @@
+>  #include <linux/of_platform.h>
+>  #include <linux/platform_device.h>
+>  #include <linux/printk.h>
+> +#include <linux/clk.h>
+>=20=20
+>  #define RNG_CTRL	0x0
+>  #define RNG_STATUS	0x4
+> @@ -33,6 +34,7 @@ struct bcm2835_rng_priv {
+>  	struct hwrng rng;
+>  	void __iomem *base;
+>  	bool mask_interrupts;
+> +	struct clk *clk;
+>  };
+>=20=20
+>  static inline struct bcm2835_rng_priv *to_rng_priv(struct hwrng *rng)
+> @@ -66,8 +68,15 @@ static int bcm2835_rng_read(struct hwrng *rng, void *b=
+uf, size_t max,
+>  static int bcm2835_rng_init(struct hwrng *rng)
+>  {
+>  	struct bcm2835_rng_priv *priv =3D to_rng_priv(rng);
+> +	int ret =3D 0;
+>  	u32 val;
+>=20=20
+> +	if (!IS_ERR(priv->clk)) {
+> +		ret =3D clk_prepare_enable(priv->clk);
+> +		if (ret)
+> +			return ret;
+> +	}
 
-I still think we should just unconditionally mask off the interrupt
-regardless of platform if we're not going to use it in the driver and
-some platforms need it.  Looks like a fine refactor, though:
+clk_prepare_enable() is protected by IS_ERR_OR_NULL() checks and will
+return 0.
+
+> +
+>  	if (priv->mask_interrupts) {
+>  		/* mask the interrupt */
+>  		val =3D readl(priv->base + RNG_INT_MASK);
+> @@ -79,7 +88,7 @@ static int bcm2835_rng_init(struct hwrng *rng)
+>  	__raw_writel(RNG_WARMUP_COUNT, priv->base + RNG_STATUS);
+>  	__raw_writel(RNG_RBGEN, priv->base + RNG_CTRL);
+>=20=20
+> -	return 0;
+> +	return ret;
+>  }
+>=20=20
+>  static void bcm2835_rng_cleanup(struct hwrng *rng)
+> @@ -88,6 +97,9 @@ static void bcm2835_rng_cleanup(struct hwrng *rng)
+>=20=20
+>  	/* disable rng hardware */
+>  	__raw_writel(0, priv->base + RNG_CTRL);
+> +
+> +	if (!IS_ERR(priv->clk))
+> +		clk_disable_unprepare(priv->clk);
+
+Same.  With those conditionals dropped,
 
 Reviewed-by: Eric Anholt <eric@anholt.net>
 
@@ -54,18 +114,18 @@ Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEE/JuuFDWp9/ZkuCBXtdYpNtH8nugFAloDTGgACgkQtdYpNtH8
-nuiAphAAr8IxEjTZxZPpdyXJoE828kWcpwT8xtrpDMf9oouA7S0mb4iKW0Yhhm67
-28qcuVUY6SMGgeHuxZTyrRLm5vHyuyQWXc9PYVjX+17bolrRyxrfX01gxCa3lLn7
-spWs+GRKr1rTwS4KBiHcXu/T0HwmEshU4A1lAg9zWDQjcfx671rmggSgYSod6NSC
-TDmtfllg+K9PpG0CvdVe0GRXdeGPR9gYBG1uhw9aa1t/W3bICCXhRKmtttPHJLmq
-WZqo8d4zvytZxlM03mcrTHrc54auymSWF/G8Dg4EX//vm4IoJeXv3watxt5BPGWi
-O7mXaMVD+syKnXt9wsWtwCuAZEiv/Qh7R7s80HlVWao88Bl5J33iudAqxyoICEbY
-3AN8wxaC+wHJV4emMcJ8oSEchDC2jB1mKhnvSDLiaG5iK+GCwP7v74XYMxSMW1p/
-FPILe37cKZ+LTR2rahX7P1B6nIJJZoud4IHjJg/zLEli4Wehp/MuuTXA5O6FXhqC
-xRfA3TXFdNL6HlhW+L5bvaVgaRi7pcMfJAsApEVGl/2P7ST/mHFihheGXdjuPS7b
-MYSt9984gGjOmN2cCV8WzYsB2KnfhbwqsU7HppjDmrJKG1Z1qxWCqeTN7fAl+mrD
-yOSj0IvfrYM+8bBVPC5vVuoEPbCg6BG3EATBj41ojW24VtGYw6k=
-=iCz+
+iQIzBAEBCgAdFiEE/JuuFDWp9/ZkuCBXtdYpNtH8nugFAloDTXkACgkQtdYpNtH8
+nug4ew//aMhW/2UYN2aRM8WjSTui9ZoPuGHS+Jdqzv487eBxNCq6dRLH7vkVUgJi
+QKcd7IN8+3pzDo7qBa23l00z0KokTPDn/rUui31zT/vABveflIxekCwyJX8GDvdO
+MWf2AbCdUokpYctCwB0zlF9ouJmow1X3H6E4mTyeDoli7p0jF2qVObSMWiOMU1ib
+YRts17lMB7SKAYQOk7Rnr8KRU9c0AMfNTNWyWzFGUfMUM3BKyWDNaVahovyFSNYU
+9ekTXoKqVqdJY1HMEivAhUQJn8pG1ZhqiDACCbgP9YwRZxILiu5695SXDdPj/tPs
+CJSopSz14BHXrQIPD1qjsdR0giLv6TxZ9Y573KHOuXBNZcP1X6/IkjyRdKOnd00S
+E4aCzjOGbKtEUUy585cx8Y1HdGtmQEzpYfEjKFsh3DZ9FwElKRiC5NChoSw8Kgta
+6rEevvVp2JI+toRuZEfYEFQaLcz1czF/obMy3O6dI5mOcpkm0Adv3CfzYJ0RWIQc
+wl/teuoCPO4GqOYVlYEYBVm7TtBkivSaoP9ebK+VZYtcAMmmK+VCwv+fYSvEjrwB
+bzmJOdtbHajrlBIGEpRu+jGGFWziQ4XLpc1KnqJcSJJxfKJEcx/Fo3xPZH57B1y1
+ZKsd6gg55WvjjvXAVXvvluy3Qythv9gcdaYZNtUQE3JZwIzH+3Q=
+=VErG
 -----END PGP SIGNATURE-----
 --=-=-=--
