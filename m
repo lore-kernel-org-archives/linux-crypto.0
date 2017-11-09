@@ -1,39 +1,40 @@
 From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: [PATCH] crypto: chelsio - Fix an error code in chcr_hash_dma_map()
-Date: Fri, 10 Nov 2017 00:25:43 +0300
-Message-ID: <20171109212543.6dpgzvtbhi4574wr@mwanda>
+Subject: [PATCH] crypto: s5p-sss - Remove a stray tab
+Date: Fri, 10 Nov 2017 00:26:04 +0300
+Message-ID: <20171109212604.i3zbzlmfotz5b7rr@mwanda>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+Cc: Vladimir Zapolskiy <vz@mleia.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
-To: Harsh Jain <harsh@chelsio.com>
+        linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
+        kernel-janitors@vger.kernel.org
+To: Krzysztof Kozlowski <krzk@kernel.org>,
+        Kamil Konieczny <k.konieczny@partner.samsung.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from aserp1040.oracle.com ([141.146.126.69]:27936 "EHLO
-        aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751174AbdKIV0E (ORCPT
+Received: from userp1040.oracle.com ([156.151.31.81]:44675 "EHLO
+        userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751174AbdKIV0p (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 9 Nov 2017 16:26:04 -0500
+        Thu, 9 Nov 2017 16:26:45 -0500
 Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The dma_map_sg() function returns zero on error and positive values on
-success.  We want to return -ENOMEM on failure here and zero on success.
+This code seems correct, but the goto was indented too far.
 
-Fixes: 2f47d5804311 ("crypto: chelsio - Move DMA un/mapping to chcr from lld cxgb4 driver")
 Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 
-diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
-index 4eed7171e2ae..38fe59b5c689 100644
---- a/drivers/crypto/chelsio/chcr_algo.c
-+++ b/drivers/crypto/chelsio/chcr_algo.c
-@@ -2414,7 +2414,7 @@ static inline int chcr_hash_dma_map(struct device *dev,
- 	error = dma_map_sg(dev, req->src, sg_nents(req->src),
- 			   DMA_TO_DEVICE);
- 	if (!error)
--		return error;
-+		return -ENOMEM;
- 	req_ctx->is_sg_map = 1;
- 	return 0;
- }
+diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
+index 142c6020cec7..62830a43d959 100644
+--- a/drivers/crypto/s5p-sss.c
++++ b/drivers/crypto/s5p-sss.c
+@@ -1461,7 +1461,7 @@ static void s5p_hash_tasklet_cb(unsigned long data)
+ 				       &dd->hash_flags)) {
+ 			/* hash or semi-hash ready */
+ 			clear_bit(HASH_FLAGS_DMA_READY, &dd->hash_flags);
+-				goto finish;
++			goto finish;
+ 		}
+ 	}
+ 
