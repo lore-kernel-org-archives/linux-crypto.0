@@ -1,67 +1,50 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH v2 04/10] staging: ccree: simplify buf mgr using local vars
-Date: Thu,  9 Nov 2017 09:16:12 +0000
-Message-ID: <1510218980-3549-5-git-send-email-gilad@benyossef.com>
+Subject: [PATCH v2 09/10] staging: ccree: remove braces for single statement
+Date: Thu,  9 Nov 2017 09:16:17 +0000
+Message-ID: <1510218980-3549-10-git-send-email-gilad@benyossef.com>
 References: <1510218980-3549-1-git-send-email-gilad@benyossef.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org,
- driverdev-devel@linuxdriverproject.org, linux-crypto@vger.kernel.org,
- Ofir Drang <ofir.drang@arm.com>
+Cc: Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        linux-kernel@vger.kernel.org
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1510218980-3549-1-git-send-email-gilad@benyossef.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Make the code more readable by using a local variables
-for commonly use expressions in the buffer manager part
-of the driver.
+Remove necessary braces for single statement blocks to
+improve code readabilty.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/ssi_buffer_mgr.c | 18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
+ drivers/staging/ccree/ssi_buffer_mgr.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/staging/ccree/ssi_buffer_mgr.c b/drivers/staging/ccree/ssi_buffer_mgr.c
-index 2d971f2..b3ca249 100644
+index 29ef046..bfabb5b 100644
 --- a/drivers/staging/ccree/ssi_buffer_mgr.c
 +++ b/drivers/staging/ccree/ssi_buffer_mgr.c
-@@ -225,16 +225,18 @@ static int cc_generate_mlli(
- 	mlli_p = (u32 *)mlli_params->mlli_virt_addr;
- 	/* go over all SG's and link it to one MLLI table */
- 	for (i = 0; i < sg_data->num_of_buffers; i++) {
-+		union buffer_array_entry *entry = &sg_data->entry[i];
-+		u32 tot_len = sg_data->total_data_len[i];
-+		u32 offset = sg_data->offset[i];
-+
- 		if (sg_data->type[i] == DMA_SGL_TYPE)
--			rc = cc_render_sg_to_mlli(dev, sg_data->entry[i].sgl,
--						  sg_data->total_data_len[i],
--						  sg_data->offset[i],
--						  &total_nents, &mlli_p);
-+			rc = cc_render_sg_to_mlli(dev, entry->sgl, tot_len,
-+						  offset, &total_nents,
-+						  &mlli_p);
- 		else /*DMA_BUFF_TYPE*/
--			rc = cc_render_buff_to_mlli(dev,
--						    sg_data->entry[i].buffer_dma,
--						    sg_data->total_data_len[i],
--						    &total_nents, &mlli_p);
-+			rc = cc_render_buff_to_mlli(dev, entry->buffer_dma,
-+						    tot_len, &total_nents,
-+						    &mlli_p);
- 		if (rc != 0)
- 			return rc;
+@@ -1491,9 +1491,8 @@ int cc_map_hash_request_final(struct ssi_drvdata *drvdata, void *ctx,
+ 		/* add the src data to the sg_data */
+ 		cc_add_sg_entry(dev, &sg_data, areq_ctx->in_nents, src, nbytes,
+ 				0, true, &areq_ctx->mlli_nents);
+-		if (unlikely(cc_generate_mlli(dev, &sg_data, mlli_params))) {
++		if (unlikely(cc_generate_mlli(dev, &sg_data, mlli_params)))
+ 			goto fail_unmap_din;
+-		}
+ 	}
+ 	/* change the buffer index for the unmap function */
+ 	areq_ctx->buff_index = (areq_ctx->buff_index ^ 1);
+@@ -1610,9 +1609,8 @@ int cc_map_hash_request_update(struct ssi_drvdata *drvdata, void *ctx,
+ 		cc_add_sg_entry(dev, &sg_data, areq_ctx->in_nents, src,
+ 				(update_data_len - *curr_buff_cnt), 0, true,
+ 				&areq_ctx->mlli_nents);
+-		if (unlikely(cc_generate_mlli(dev, &sg_data, mlli_params))) {
++		if (unlikely(cc_generate_mlli(dev, &sg_data, mlli_params)))
+ 			goto fail_unmap_din;
+-		}
+ 	}
+ 	areq_ctx->buff_index = (areq_ctx->buff_index ^ swap_index);
  
 -- 
 2.7.4
