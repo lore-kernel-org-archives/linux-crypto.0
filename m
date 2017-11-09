@@ -1,9 +1,9 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [PATCH 2/8] staging: ccree: use more readable func names
-Date: Thu, 9 Nov 2017 08:26:21 +0200
-Message-ID: <CAOtvUMdeNC3iQ9Bd8-CjMEk3sKkdrOCb_qM+Q6X8Sgi5tJ+3XA@mail.gmail.com>
+Subject: Re: [PATCH 6/8] staging: ccree: simplify pm manager using local var
+Date: Thu, 9 Nov 2017 08:27:28 +0200
+Message-ID: <CAOtvUMfeMrrpZ2TRHkyL0i1JueczSkCHFxui6z1mPXjaAv2-1w@mail.gmail.com>
 References: <1510047606-5589-1-git-send-email-gilad@benyossef.com>
- <1510047606-5589-3-git-send-email-gilad@benyossef.com> <20171107103010.pgmgmmsjhxt4fjft@mwanda>
+ <1510047606-5589-7-git-send-email-gilad@benyossef.com> <20171107104310.xhdxl3q3bnh7uciw@mwanda>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -14,62 +14,37 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Ofir Drang <ofir.drang@arm.com>
 To: Dan Carpenter <dan.carpenter@oracle.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ot0-f181.google.com ([74.125.82.181]:55126 "EHLO
-        mail-ot0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750736AbdKIG0W (ORCPT
+Received: from mail-oi0-f67.google.com ([209.85.218.67]:43465 "EHLO
+        mail-oi0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751120AbdKIG13 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 9 Nov 2017 01:26:22 -0500
-Received: by mail-ot0-f181.google.com with SMTP id w8so4418718otw.11
-        for <linux-crypto@vger.kernel.org>; Wed, 08 Nov 2017 22:26:22 -0800 (PST)
-In-Reply-To: <20171107103010.pgmgmmsjhxt4fjft@mwanda>
+        Thu, 9 Nov 2017 01:27:29 -0500
+Received: by mail-oi0-f67.google.com with SMTP id c77so3722177oig.0
+        for <linux-crypto@vger.kernel.org>; Wed, 08 Nov 2017 22:27:29 -0800 (PST)
+In-Reply-To: <20171107104310.xhdxl3q3bnh7uciw@mwanda>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Dan,
-
-Thank you for reviewing the patch set.
-
-On Tue, Nov 7, 2017 at 12:30 PM, Dan Carpenter <dan.carpenter@oracle.com> wrote:
+On Tue, Nov 7, 2017 at 12:43 PM, Dan Carpenter <dan.carpenter@oracle.com> wrote:
+> On Tue, Nov 07, 2017 at 09:40:02AM +0000, Gilad Ben-Yossef wrote:
+>> --- a/drivers/staging/ccree/ssi_pm.c
+>> +++ b/drivers/staging/ccree/ssi_pm.c
+>> @@ -90,20 +90,24 @@ int cc_pm_resume(struct device *dev)
+>>  int cc_pm_get(struct device *dev)
+>>  {
+>>       int rc = 0;
+>> +     struct ssi_drvdata *drvdata =
+>> +             (struct ssi_drvdata *)dev_get_drvdata(dev);
 >
-> On Tue, Nov 07, 2017 at 09:39:58AM +0000, Gilad Ben-Yossef wrote:
-> > @@ -780,11 +766,10 @@ static inline int ssi_buffer_mgr_aead_chain_iv(
-> >               unsigned int iv_size_to_authenc = crypto_aead_ivsize(tfm);
-> >               unsigned int iv_ofs = GCM_BLOCK_RFC4_IV_OFFSET;
-> >               /* Chain to given list */
-> > -             ssi_buffer_mgr_add_buffer_entry(
-> > -                     dev, sg_data,
-> > -                     areq_ctx->gen_ctx.iv_dma_addr + iv_ofs,
-> > -                     iv_size_to_authenc, is_last,
-> > -                     &areq_ctx->assoc.mlli_nents);
-> > +             cc_add_buffer_entry(dev, sg_data,
-> > +                                 (areq_ctx->gen_ctx.iv_dma_addr + iv_ofs),
->                                     ^                                      ^
+> No need to cast:
 >
-> No need to resend the patch, but you've added parenthesis here that
-> weren't in the original code and in other places you fixed up some long
-> line warnings.  I'd prefer if you didn't do that because I use scripts
-> to review rename patches automatically and since these are not a rename
-> so it means I have to review them manually.  Also in that patch that
-> Tobin complained about you had some extra comment changes and some were
-> related to the API but some were just reformatted to fit in 80 chars.
->
->
-> In this sample, you've re-indented the code a bit to align correctly.
-> That would be mandatory especially if the original code had aligned
-> correctly so that's fine.  But otherwise try to be strict about the one
-> thing per patch.
->
-> > +                                 iv_size_to_authenc, is_last,
-> > +                                 &areq_ctx->assoc.mlli_nents);
-> >               areq_ctx->assoc_buff_type = SSI_DMA_BUF_MLLI;
-> >       }
-> >
+>         struct ssi_drvdata *drvdata = dev_get_drvdata(dev);
 >
 
-Noted. I have changed the patch description to at least reflect what it is
-doing more accurately (i.e. more than just func name switching).
+The same unneeded cast appears at other places in the file, so I opted
+to add a patch addressing all these location rather then change this one.
 
-Thanks again for the review.
+I hope it's OK.
 
 Gilad
 
