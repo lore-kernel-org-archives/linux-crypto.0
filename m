@@ -1,49 +1,83 @@
-From: Mat Martineau <mathew.j.martineau@linux.intel.com>
-Subject: Re: [PATCH v2] lib/mpi: call cond_resched() from mpi_powm() loop
-Date: Wed, 8 Nov 2017 12:49:02 -0800 (PST)
-Message-ID: <alpine.OSX.2.21.1711081239190.27414@mjmartin-nuc02.sea.intel.com>
-References: <20171108191804.GA74965@gmail.com> <20171107221527.98433-1-ebiggers3@gmail.com> <25888.1510145417@warthog.procyon.org.uk> <17716.1510172232@warthog.procyon.org.uk> <20171108202803.GA14292@gmail.com>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: Re: [PATCH 2/8] staging: ccree: use more readable func names
+Date: Thu, 9 Nov 2017 08:26:21 +0200
+Message-ID: <CAOtvUMdeNC3iQ9Bd8-CjMEk3sKkdrOCb_qM+Q6X8Sgi5tJ+3XA@mail.gmail.com>
+References: <1510047606-5589-1-git-send-email-gilad@benyossef.com>
+ <1510047606-5589-3-git-send-email-gilad@benyossef.com> <20171107103010.pgmgmmsjhxt4fjft@mwanda>
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed; charset=US-ASCII
-Cc: David Howells <dhowells@redhat.com>, linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Tudor-Dan Ambarus <tudor.ambarus@microchip.com>,
-        Salvatore Benedetto <salvatore.benedetto@intel.com>,
-        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Eric Biggers <ebiggers@google.com>, stable@vger.kernel.org
-To: Eric Biggers <ebiggers3@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20171108202803.GA14292@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        devel@driverdev.osuosl.org,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+        driverdev-devel@linuxdriverproject.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Ofir Drang <ofir.drang@arm.com>
+To: Dan Carpenter <dan.carpenter@oracle.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-ot0-f181.google.com ([74.125.82.181]:55126 "EHLO
+        mail-ot0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750736AbdKIG0W (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 9 Nov 2017 01:26:22 -0500
+Received: by mail-ot0-f181.google.com with SMTP id w8so4418718otw.11
+        for <linux-crypto@vger.kernel.org>; Wed, 08 Nov 2017 22:26:22 -0800 (PST)
+In-Reply-To: <20171107103010.pgmgmmsjhxt4fjft@mwanda>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, 8 Nov 2017, Eric Biggers wrote:
+Hi Dan,
 
-> On Wed, Nov 08, 2017 at 08:17:12PM +0000, David Howells wrote:
->> Eric Biggers <ebiggers3@gmail.com> wrote:
->>
->>> This probably should be grouped with my series "crypto: dh - input validation
->>> fixes", as this is also a fix for Diffie-Hellman.  I was actually expecting
->>> Herbert Xu to take these patches, as Diffie-Hellman is now part of the crypto
->>> API (crypto/dh.c); none of the patches actually touch security/keys/.
->>
->> Fine by me.
->>
->>> If you'd like to maintain the Diffie-Hellman implementation(s) you should
->>> get yourself added to MAINTAINERS for the relevant files.
->>
->> It touches the MPI lib, though, so it also potentially affects RSA and stuff,
->> which is why I introduced it to the kernel originally.
->>
+Thank you for reviewing the patch set.
+
+On Tue, Nov 7, 2017 at 12:30 PM, Dan Carpenter <dan.carpenter@oracle.com> wrote:
 >
-> True, mpi_powm() might also be reachable by adding a key of type "asymmetric",
-> in which case this fix would need to go to older kernels than v4.12.  If I have
-> a chance I'll see if I can find a reproducer.
+> On Tue, Nov 07, 2017 at 09:39:58AM +0000, Gilad Ben-Yossef wrote:
+> > @@ -780,11 +766,10 @@ static inline int ssi_buffer_mgr_aead_chain_iv(
+> >               unsigned int iv_size_to_authenc = crypto_aead_ivsize(tfm);
+> >               unsigned int iv_ofs = GCM_BLOCK_RFC4_IV_OFFSET;
+> >               /* Chain to given list */
+> > -             ssi_buffer_mgr_add_buffer_entry(
+> > -                     dev, sg_data,
+> > -                     areq_ctx->gen_ctx.iv_dma_addr + iv_ofs,
+> > -                     iv_size_to_authenc, is_last,
+> > -                     &areq_ctx->assoc.mlli_nents);
+> > +             cc_add_buffer_entry(dev, sg_data,
+> > +                                 (areq_ctx->gen_ctx.iv_dma_addr + iv_ofs),
+>                                     ^                                      ^
+>
+> No need to resend the patch, but you've added parenthesis here that
+> weren't in the original code and in other places you fixed up some long
+> line warnings.  I'd prefer if you didn't do that because I use scripts
+> to review rename patches automatically and since these are not a rename
+> so it means I have to review them manually.  Also in that patch that
+> Tobin complained about you had some extra comment changes and some were
+> related to the API but some were just reformatted to fit in 80 chars.
+>
+>
+> In this sample, you've re-indented the code a bit to align correctly.
+> That would be mandatory especially if the original code had aligned
+> correctly so that's fine.  But otherwise try to be strict about the one
+> thing per patch.
+>
+> > +                                 iv_size_to_authenc, is_last,
+> > +                                 &areq_ctx->assoc.mlli_nents);
+> >               areq_ctx->assoc_buff_type = SSI_DMA_BUF_MLLI;
+> >       }
+> >
+>
 
-CONFIG_KEY_DH_OPERATIONS and use of mpi_powm() by KEYCTL_DH_COMPUTE goes 
-back to v4.7, when the MPI library was called directly. KPP was not 
-implemented yet.
+Noted. I have changed the patch description to at least reflect what it is
+doing more accurately (i.e. more than just func name switching).
 
---
-Mat Martineau
-Intel OTC
+Thanks again for the review.
+
+Gilad
+
+
+-- 
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+"If you take a class in large-scale robotics, can you end up in a
+situation where the homework eats your dog?"
+ -- Jean-Baptiste Queru
