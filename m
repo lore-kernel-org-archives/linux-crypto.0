@@ -1,77 +1,39 @@
-From: Kim Phillips <kim.phillips-5wv7dgnIgG8@public.gmane.org>
-Subject: Re: [PATCH RESEND 1/4] crypto: caam: add caam-dma node to SEC4.0
- device tree binding
-Date: Thu, 9 Nov 2017 10:34:37 -0600
-Message-ID: <20171109103437.834f8ddb5c62e5253002b2d0@arm.com>
-References: <20171030134654.13729-1-horia.geanta@nxp.com>
-        <20171030134654.13729-2-horia.geanta@nxp.com>
-        <20171030092424.1279add003c96ced4233bd2d@arm.com>
-        <VI1PR04MB1325BAD68A7CC8C7A302D9A48A570@VI1PR04MB1325.eurprd04.prod.outlook.com>
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: [PATCH] crypto: chelsio - Fix an error code in chcr_hash_dma_map()
+Date: Fri, 10 Nov 2017 00:25:43 +0300
+Message-ID: <20171109212543.6dpgzvtbhi4574wr@mwanda>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Cc: Horia =?UTF-8?B?R2VhbnTEgw==?= <horia.geanta-3arQi8VN3Tc@public.gmane.org>,
-        Vinod Koul <vinod.koul-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-        "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-        "Dan Douglass" <dan.douglass-3arQi8VN3Tc@public.gmane.org>,
-        Shawn Guo <shawnguo-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        "dmaengine-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <dmaengine-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        "linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        "devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Radu Andrei Alexe <radu.alexe-3arQi8VN3Tc@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <VI1PR04MB1325BAD68A7CC8C7A302D9A48A570-mr6QIVyDiCGGEpojCloM0M9NdZoXdze2vxpqHgZTriW3zl9H0oFU5g@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
+To: Harsh Jain <harsh@chelsio.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from aserp1040.oracle.com ([141.146.126.69]:27936 "EHLO
+        aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751174AbdKIV0E (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 9 Nov 2017 16:26:04 -0500
+Content-Disposition: inline
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, 9 Nov 2017 11:54:13 +0000
-Radu Andrei Alexe <radu.alexe-3arQi8VN3Tc@public.gmane.org> wrote:
+The dma_map_sg() function returns zero on error and positive values on
+success.  We want to return -ENOMEM on failure here and zero on success.
 
-> On 10/30/2017 4:24 PM, Kim Phillips wrote:
-> > On Mon, 30 Oct 2017 15:46:51 +0200
-> > Horia Geantă <horia.geanta-3arQi8VN3Tc@public.gmane.org> wrote:
-> > 
-> >> +=====================================================================
-> >> +CAAM DMA Node
-> >> +
-> >> +    Child node of the crypto node that enables the use of the DMA capabilities
-> >> +    of the CAAM by a stand-alone driver. The only required property is the
-> >> +    "compatible" property. All the other properties are determined from
-> >> +    the job rings on which the CAAM DMA driver depends (ex: the number of
-> >> +    dma-channels is equal to the number of defined job rings).
-> >> +
-> >> +  - compatible
-> >> +      Usage: required
-> >> +      Value type: <string>
-> >> +      Definition: Must include "fsl,sec-v4.0-dma"
-> >> +
-> >> +EXAMPLE
-> >> +  caam-dma {
-> >> +    compatible = "fsl,sec-v5.4-dma",
-> >> +                 "fsl,sec-v5.0-dma",
-> >> +                 "fsl,sec-v4.0-dma";
-> >> +  }
-> > 
-> > If this isn't describing an aspect of the hardware, then what is it
-> > doing in the device tree?
-> > 
-> > Kim
-> > 
-> 
-> Because the caam_dma driver is a platform driver I needed to create a 
-> platform device to activate the driver. My thought was that it was 
-> simpler to implement it using device tree.
-> The next patch version will create the platform device dynamically at 
-> run time.
+Fixes: 2f47d5804311 ("crypto: chelsio - Move DMA un/mapping to chcr from lld cxgb4 driver")
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 
-Why create a new device when that h/w already has one?
-
-Why doesn't the existing crypto driver register dma capabilities with
-the dma driver subsystem?
-
-Kim
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
+index 4eed7171e2ae..38fe59b5c689 100644
+--- a/drivers/crypto/chelsio/chcr_algo.c
++++ b/drivers/crypto/chelsio/chcr_algo.c
+@@ -2414,7 +2414,7 @@ static inline int chcr_hash_dma_map(struct device *dev,
+ 	error = dma_map_sg(dev, req->src, sg_nents(req->src),
+ 			   DMA_TO_DEVICE);
+ 	if (!error)
+-		return error;
++		return -ENOMEM;
+ 	req_ctx->is_sg_map = 1;
+ 	return 0;
+ }
