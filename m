@@ -1,7 +1,7 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH v2 07/10] staging: ccree: remove unneeded cast
-Date: Thu,  9 Nov 2017 09:16:15 +0000
-Message-ID: <1510218980-3549-8-git-send-email-gilad@benyossef.com>
+Subject: [PATCH v2 04/10] staging: ccree: simplify buf mgr using local vars
+Date: Thu,  9 Nov 2017 09:16:12 +0000
+Message-ID: <1510218980-3549-5-git-send-email-gilad@benyossef.com>
 References: <1510218980-3549-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -23,57 +23,45 @@ Errors-To: driverdev-devel-bounces@linuxdriverproject.org
 Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-Remove unneeded cast of the return value of dev_get_drvdata()
-to struct ssi_drvdata * for better readability.
+Make the code more readable by using a local variables
+for commonly use expressions in the buffer manager part
+of the driver.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/ssi_pm.c | 12 ++++--------
- 1 file changed, 4 insertions(+), 8 deletions(-)
+ drivers/staging/ccree/ssi_buffer_mgr.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/staging/ccree/ssi_pm.c b/drivers/staging/ccree/ssi_pm.c
-index d60143c..d3e9382 100644
---- a/drivers/staging/ccree/ssi_pm.c
-+++ b/drivers/staging/ccree/ssi_pm.c
-@@ -36,8 +36,7 @@
+diff --git a/drivers/staging/ccree/ssi_buffer_mgr.c b/drivers/staging/ccree/ssi_buffer_mgr.c
+index 2d971f2..b3ca249 100644
+--- a/drivers/staging/ccree/ssi_buffer_mgr.c
++++ b/drivers/staging/ccree/ssi_buffer_mgr.c
+@@ -225,16 +225,18 @@ static int cc_generate_mlli(
+ 	mlli_p = (u32 *)mlli_params->mlli_virt_addr;
+ 	/* go over all SG's and link it to one MLLI table */
+ 	for (i = 0; i < sg_data->num_of_buffers; i++) {
++		union buffer_array_entry *entry = &sg_data->entry[i];
++		u32 tot_len = sg_data->total_data_len[i];
++		u32 offset = sg_data->offset[i];
++
+ 		if (sg_data->type[i] == DMA_SGL_TYPE)
+-			rc = cc_render_sg_to_mlli(dev, sg_data->entry[i].sgl,
+-						  sg_data->total_data_len[i],
+-						  sg_data->offset[i],
+-						  &total_nents, &mlli_p);
++			rc = cc_render_sg_to_mlli(dev, entry->sgl, tot_len,
++						  offset, &total_nents,
++						  &mlli_p);
+ 		else /*DMA_BUFF_TYPE*/
+-			rc = cc_render_buff_to_mlli(dev,
+-						    sg_data->entry[i].buffer_dma,
+-						    sg_data->total_data_len[i],
+-						    &total_nents, &mlli_p);
++			rc = cc_render_buff_to_mlli(dev, entry->buffer_dma,
++						    tot_len, &total_nents,
++						    &mlli_p);
+ 		if (rc != 0)
+ 			return rc;
  
- int cc_pm_suspend(struct device *dev)
- {
--	struct ssi_drvdata *drvdata =
--		(struct ssi_drvdata *)dev_get_drvdata(dev);
-+	struct ssi_drvdata *drvdata = dev_get_drvdata(dev);
- 	int rc;
- 
- 	dev_dbg(dev, "set HOST_POWER_DOWN_EN\n");
-@@ -56,8 +55,7 @@ int cc_pm_suspend(struct device *dev)
- int cc_pm_resume(struct device *dev)
- {
- 	int rc;
--	struct ssi_drvdata *drvdata =
--		(struct ssi_drvdata *)dev_get_drvdata(dev);
-+	struct ssi_drvdata *drvdata = dev_get_drvdata(dev);
- 
- 	dev_dbg(dev, "unset HOST_POWER_DOWN_EN\n");
- 	cc_iowrite(drvdata, CC_REG(HOST_POWER_DOWN_EN), POWER_DOWN_DISABLE);
-@@ -90,8 +88,7 @@ int cc_pm_resume(struct device *dev)
- int cc_pm_get(struct device *dev)
- {
- 	int rc = 0;
--	struct ssi_drvdata *drvdata =
--		(struct ssi_drvdata *)dev_get_drvdata(dev);
-+	struct ssi_drvdata *drvdata = dev_get_drvdata(dev);
- 
- 	if (cc_req_queue_suspended(drvdata))
- 		rc = pm_runtime_get_sync(dev);
-@@ -104,8 +101,7 @@ int cc_pm_get(struct device *dev)
- int cc_pm_put_suspend(struct device *dev)
- {
- 	int rc = 0;
--	struct ssi_drvdata *drvdata =
--		(struct ssi_drvdata *)dev_get_drvdata(dev);
-+	struct ssi_drvdata *drvdata = dev_get_drvdata(dev);
- 
- 	if (!cc_req_queue_suspended(drvdata)) {
- 		pm_runtime_mark_last_busy(dev);
 -- 
 2.7.4
