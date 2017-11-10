@@ -1,52 +1,67 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] crypto: AF_ALG - remove locking in async callback
-Date: Fri, 10 Nov 2017 22:10:58 +1100
-Message-ID: <20171110111058.GA25914@gondor.apana.org.au>
-References: <CAGkQfmNKbSwue13zPh2K1F_kLkpm1_AhsAHK4spRFA0xMvU5PA@mail.gmail.com>
- <4677171.2qOLUIFS1s@positron.chronox.de>
- <20171107063212.GA25491@gondor.apana.org.au>
- <2510520.gYBNS8MAsP@positron.chronox.de>
+Subject: Re: [PATCH 1/2] crypto: tcrypt - fix S/G table for test_aead_speed()
+Date: Fri, 10 Nov 2017 21:41:45 +1100
+Message-ID: <20171110104145.GA25739@gondor.apana.org.au>
+References: <1507630920-9014-1-git-send-email-robert.baronescu@nxp.com>
+ <20171103124157.GA8330@gondor.apana.org.au>
+ <VI1PR0402MB33425E266579E4F3B375617498570@VI1PR0402MB3342.eurprd04.prod.outlook.com>
+ <20171109222129.GB20824@gondor.apana.org.au>
+ <VI1PR0402MB3342FFECA75AFC5556AD085498540@VI1PR0402MB3342.eurprd04.prod.outlook.com>
+ <20171110074332.GB24384@gondor.apana.org.au>
+ <VI1PR0402MB334241EA4B848E77AF8DFC2298540@VI1PR0402MB3342.eurprd04.prod.outlook.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Cc: Romain Izard <romain.izard.pro@gmail.com>,
-        linux-crypto@vger.kernel.org,
-        Cyrille Pitchen <cyrille.pitchen@microchip.com>,
-        Tudor Ambarus <tudor.ambarus@microchip.com>,
-        Nicolas Ferre <nicolas.ferre@microchip.com>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
-To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Cc: Robert Baronescu <robert.baronescu@nxp.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "davem@davemloft.net" <davem@davemloft.net>
+To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [128.1.224.119] ([128.1.224.119]:35754 "EHLO ringil.hmeau.com"
+Received: from [128.1.224.119] ([128.1.224.119]:35770 "EHLO ringil.hmeau.com"
         rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1750835AbdKJLLR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 10 Nov 2017 06:11:17 -0500
+        id S1751239AbdKJLXb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 10 Nov 2017 06:23:31 -0500
 Content-Disposition: inline
-In-Reply-To: <2510520.gYBNS8MAsP@positron.chronox.de>
+In-Reply-To: <VI1PR0402MB334241EA4B848E77AF8DFC2298540@VI1PR0402MB3342.eurprd04.prod.outlook.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Nov 07, 2017 at 10:05:48AM +0100, Stephan Müller wrote:
->  
->  	if (msg->msg_iocb && !is_sync_kiocb(msg->msg_iocb)) {
->  		/* AIO operation */
-> +		sock_hold(sk);
->  		areq->iocb = msg->msg_iocb;
->  		aead_request_set_callback(&areq->cra_u.aead_req,
->  					  CRYPTO_TFM_REQ_MAY_BACKLOG,
->  					  af_alg_async_cb, areq);
->  		err = ctx->enc ? crypto_aead_encrypt(&areq->cra_u.aead_req) :
->  				 crypto_aead_decrypt(&areq->cra_u.aead_req);
-> +
-> +		/* AIO operation in progress */
-> +		if (err == -EINPROGRESS) {
-> +			/* Remember output size that will be generated. */
-> +			areq->outlen = outlen;
-> +
-> +			return -EIOCBQUEUED;
-> +		}
+On Fri, Nov 10, 2017 at 09:17:33AM +0000, Horia GeantÄƒ wrote:
+>
+> > I must be missing something.  In the case rem == 0, let's say
+> > the original value of np is npo.  Then at the start of the loop,
+> > np = npo - 1, and at the last iteration, k = npo - 2, so we do
+> IIUC at the start of the loop np = npo (and not npo - 1), since np is no
+> longer decremented in the rem == 0 case:
+> -	np--;
+> +	if (rem)
+> +		np--;
+> 
+> > 
+> > 	sg_set_buf(&sg[npo - 1], xbuf[npo - 2], PAGE_SIZE);
+> > 
+> and accordingly last iteration is for k = npo - 1:
+>  	sg_set_buf(&sg[npo], xbuf[npo - 1], PAGE_SIZE);
+> 
+> > While the sg_init_table call sets the end-of-table at
+> > 
+> > 	sg_init_table(sg, npo + 1);
+> > 
+> while this marks sg[npo] as last SG table entry.
 
-Since we're allowing backlogs, what about EBUSY?
+OK, we're both sort of right.  You're correct that this generates
+a valid SG list in that the number of entries match the end-of-table
+marking.
+
+But the thing that prompted to check this patch in the first place
+is the semantics behind it.  For the case rem == 0, it means that
+buflen is a multiple of PAGE_SIZE.  In that case, the code with
+your patch will create an SG list that's one page longer than
+buflen.
+
+AFAICS it should be harmless but it would still be better if we can
+generate an SG list that's exactly buflen long rather than one page
+longer.
 
 Cheers,
 -- 
