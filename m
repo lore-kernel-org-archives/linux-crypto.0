@@ -1,34 +1,75 @@
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Subject: Re: [PATCH] crypto: s5p-sss - Remove a stray tab
-Date: Fri, 10 Nov 2017 09:08:47 +0100
-Message-ID: <CAJKOXPduq1n+iGEVLATa6e__SoUUFppA_-So1wrz-VaafhXdJA@mail.gmail.com>
-References: <20171109212604.i3zbzlmfotz5b7rr@mwanda>
+From: =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>
+Subject: Re: [PATCH 1/2] crypto: tcrypt - fix S/G table for test_aead_speed()
+Date: Fri, 10 Nov 2017 09:17:33 +0000
+Message-ID: <VI1PR0402MB334241EA4B848E77AF8DFC2298540@VI1PR0402MB3342.eurprd04.prod.outlook.com>
+References: <1507630920-9014-1-git-send-email-robert.baronescu@nxp.com>
+ <20171103124157.GA8330@gondor.apana.org.au>
+ <VI1PR0402MB33425E266579E4F3B375617498570@VI1PR0402MB3342.eurprd04.prod.outlook.com>
+ <20171109222129.GB20824@gondor.apana.org.au>
+ <VI1PR0402MB3342FFECA75AFC5556AD085498540@VI1PR0402MB3342.eurprd04.prod.outlook.com>
+ <20171110074332.GB24384@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Kamil Konieczny <k.konieczny@partner.samsung.com>,
-        Vladimir Zapolskiy <vz@mleia.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
-        kernel-janitors@vger.kernel.org
-To: Dan Carpenter <dan.carpenter@oracle.com>
+Content-Type: text/plain; charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
+Cc: Robert Baronescu <robert.baronescu@nxp.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "davem@davemloft.net" <davem@davemloft.net>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:52556 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750756AbdKJIIu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 10 Nov 2017 03:08:50 -0500
-In-Reply-To: <20171109212604.i3zbzlmfotz5b7rr@mwanda>
+Received: from mail-ve1eur01on0053.outbound.protection.outlook.com ([104.47.1.53]:40313
+        "EHLO EUR01-VE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752023AbdKJJRh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 10 Nov 2017 04:17:37 -0500
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Nov 9, 2017 at 10:26 PM, Dan Carpenter <dan.carpenter@oracle.com> wrote:
-> This code seems correct, but the goto was indented too far.
->
-> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
->
-> diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
-
-Reviewed-by: Krzysztof Kozlowski <krzk@kernel.org>
-
-Best regards,
-Krzysztof
+On 11/10/2017 9:43 AM, Herbert Xu wrote:=0A=
+> On Fri, Nov 10, 2017 at 06:37:22AM +0000, Horia Geant=E3 wrote:=0A=
+>> On 11/10/2017 12:21 AM, Herbert Xu wrote:=0A=
+>>> On Thu, Nov 09, 2017 at 02:37:29PM +0000, Horia Geant=E3 wrote:=0A=
+>>>>=0A=
+>>>>>>  	sg_init_table(sg, np + 1);=0A=
+>>>> sg_mark_end() marks sg[np].=0A=
+>>>>=0A=
+>>>>>> -	np--;=0A=
+>>>>>> +	if (rem)=0A=
+>>>>>> +		np--;=0A=
+>>>>>>  	for (k =3D 0; k < np; k++)=0A=
+>>>>>>  		sg_set_buf(&sg[k + 1], xbuf[k], PAGE_SIZE);=0A=
+>>>> In case rem =3D=3D 0, last k value is np-1, thus sg[np-1+1] will be fi=
+lled=0A=
+>>>> here with xbuf[np-1].=0A=
+>>>=0A=
+>>> No, if rem =3D=3D 0, then the last k value is np-2.=0A=
+>>>=0A=
+>> Notice that np-- above the for loop is done conditionally, so in the for=
+=0A=
+>> loop k takes values in [0, np-1].=0A=
+>> This means the for loop fills sg[1]...sg[np].=0A=
+> =0A=
+> I must be missing something.  In the case rem =3D=3D 0, let's say=0A=
+> the original value of np is npo.  Then at the start of the loop,=0A=
+> np =3D npo - 1, and at the last iteration, k =3D npo - 2, so we do=0A=
+IIUC at the start of the loop np =3D npo (and not npo - 1), since np is no=
+=0A=
+longer decremented in the rem =3D=3D 0 case:=0A=
+-	np--;=0A=
++	if (rem)=0A=
++		np--;=0A=
+=0A=
+> =0A=
+> 	sg_set_buf(&sg[npo - 1], xbuf[npo - 2], PAGE_SIZE);=0A=
+> =0A=
+and accordingly last iteration is for k =3D npo - 1:=0A=
+ 	sg_set_buf(&sg[npo], xbuf[npo - 1], PAGE_SIZE);=0A=
+=0A=
+> While the sg_init_table call sets the end-of-table at=0A=
+> =0A=
+> 	sg_init_table(sg, npo + 1);=0A=
+> =0A=
+while this marks sg[npo] as last SG table entry.=0A=
+=0A=
+Thanks,=0A=
+Horia=0A=
