@@ -1,131 +1,55 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: [PATCH v3] crypto: algif_aead - skip SGL entries with NULL page
-Date: Fri, 10 Nov 2017 11:04:52 +0100
-Message-ID: <9325029.81qbAra0rM@positron.chronox.de>
-References: <3016707.l0K91qkPze@positron.chronox.de> <94396256.4fNdfnqFXK@positron.chronox.de> <12084599.cPnBg2z1Zp@positron.chronox.de>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2] crypto: AF_ALG - remove locking in async callback
+Date: Fri, 10 Nov 2017 22:10:58 +1100
+Message-ID: <20171110111058.GA25914@gondor.apana.org.au>
+References: <CAGkQfmNKbSwue13zPh2K1F_kLkpm1_AhsAHK4spRFA0xMvU5PA@mail.gmail.com>
+ <4677171.2qOLUIFS1s@positron.chronox.de>
+ <20171107063212.GA25491@gondor.apana.org.au>
+ <2510520.gYBNS8MAsP@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Cc: Romain Izard <romain.izard.pro@gmail.com>,
+        linux-crypto@vger.kernel.org,
+        Cyrille Pitchen <cyrille.pitchen@microchip.com>,
+        Tudor Ambarus <tudor.ambarus@microchip.com>,
+        Nicolas Ferre <nicolas.ferre@microchip.com>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:42234 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750850AbdKJKEy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 10 Nov 2017 05:04:54 -0500
-In-Reply-To: <12084599.cPnBg2z1Zp@positron.chronox.de>
+Received: from [128.1.224.119] ([128.1.224.119]:35754 "EHLO ringil.hmeau.com"
+        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
+        id S1750835AbdKJLLR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 10 Nov 2017 06:11:17 -0500
+Content-Disposition: inline
+In-Reply-To: <2510520.gYBNS8MAsP@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
+On Tue, Nov 07, 2017 at 10:05:48AM +0100, Stephan Müller wrote:
+>  
+>  	if (msg->msg_iocb && !is_sync_kiocb(msg->msg_iocb)) {
+>  		/* AIO operation */
+> +		sock_hold(sk);
+>  		areq->iocb = msg->msg_iocb;
+>  		aead_request_set_callback(&areq->cra_u.aead_req,
+>  					  CRYPTO_TFM_REQ_MAY_BACKLOG,
+>  					  af_alg_async_cb, areq);
+>  		err = ctx->enc ? crypto_aead_encrypt(&areq->cra_u.aead_req) :
+>  				 crypto_aead_decrypt(&areq->cra_u.aead_req);
+> +
+> +		/* AIO operation in progress */
+> +		if (err == -EINPROGRESS) {
+> +			/* Remember output size that will be generated. */
+> +			areq->outlen = outlen;
+> +
+> +			return -EIOCBQUEUED;
+> +		}
 
-I missed the termination of the outer loop of list_for_each_entry_safe.
+Since we're allowing backlogs, what about EBUSY?
 
-The patch was tested on x86 64 and 32 bit environments.
-
----8<---
-
-The TX SGL may contain SGL entries that are assigned a NULL page. This
-may happen if a multi-stage AIO operation is performed where the data
-for each stage is pointed to by one SGL entry. Upon completion of that
-stage, af_alg_pull_tsgl will assign NULL to the SGL entry.
-
-The NULL cipher used to copy the AAD from TX SGL to the destination
-buffer, however, cannot handle the case where the SGL starts with an SGL
-entry having a NULL page. Thus, the code needs to advance the start
-pointer into the SGL to the first non-NULL entry.
-
-This fixes a crash visible on Intel x86 32 bit using the libkcapi test
-suite.
-
-Fixes: 72548b093ee38 ("crypto: algif_aead - copy AAD from src to dst")
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- crypto/algif_aead.c | 33 ++++++++++++++++++++++++---------
- 1 file changed, 24 insertions(+), 9 deletions(-)
-
-diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
-index 6cdd4fb08335..7822e2fecb0b 100644
---- a/crypto/algif_aead.c
-+++ b/crypto/algif_aead.c
-@@ -101,10 +101,10 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
- 	struct aead_tfm *aeadc = pask->private;
- 	struct crypto_aead *tfm = aeadc->aead;
- 	struct crypto_skcipher *null_tfm = aeadc->null_tfm;
--	unsigned int as = crypto_aead_authsize(tfm);
-+	unsigned int i, as = crypto_aead_authsize(tfm);
- 	struct af_alg_async_req *areq;
--	struct af_alg_tsgl *tsgl;
--	struct scatterlist *src;
-+	struct af_alg_tsgl *tsgl, *tmp;
-+	struct scatterlist *rsgl_src, *tsgl_src = NULL;
- 	int err = 0;
- 	size_t used = 0;		/* [in]  TX bufs to be en/decrypted */
- 	size_t outlen = 0;		/* [out] RX bufs produced by kernel */
-@@ -178,7 +178,22 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
- 	}
- 
- 	processed = used + ctx->aead_assoclen;
--	tsgl = list_first_entry(&ctx->tsgl_list, struct af_alg_tsgl, list);
-+	list_for_each_entry_safe(tsgl, tmp, &ctx->tsgl_list, list) {
-+		for (i = 0; i < tsgl->cur; i++) {
-+			struct scatterlist *process_sg = tsgl->sg + i;
-+
-+			if (!(process_sg->length) || !sg_page(process_sg))
-+				continue;
-+			tsgl_src = process_sg;
-+			break;
-+		}
-+		if (tsgl_src)
-+			break;
-+	}
-+	if (processed && !tsgl_src) {
-+		err = -EFAULT;
-+		goto free;
-+	}
- 
- 	/*
- 	 * Copy of AAD from source to destination
-@@ -194,7 +209,7 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
- 	 */
- 
- 	/* Use the RX SGL as source (and destination) for crypto op. */
--	src = areq->first_rsgl.sgl.sg;
-+	rsgl_src = areq->first_rsgl.sgl.sg;
- 
- 	if (ctx->enc) {
- 		/*
-@@ -207,7 +222,7 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
- 		 *	    v	   v
- 		 * RX SGL: AAD || PT || Tag
- 		 */
--		err = crypto_aead_copy_sgl(null_tfm, tsgl->sg,
-+		err = crypto_aead_copy_sgl(null_tfm, tsgl_src,
- 					   areq->first_rsgl.sgl.sg, processed);
- 		if (err)
- 			goto free;
-@@ -225,7 +240,7 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
- 		 */
- 
- 		 /* Copy AAD || CT to RX SGL buffer for in-place operation. */
--		err = crypto_aead_copy_sgl(null_tfm, tsgl->sg,
-+		err = crypto_aead_copy_sgl(null_tfm, tsgl_src,
- 					   areq->first_rsgl.sgl.sg, outlen);
- 		if (err)
- 			goto free;
-@@ -257,11 +272,11 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
- 				 areq->tsgl);
- 		} else
- 			/* no RX SGL present (e.g. authentication only) */
--			src = areq->tsgl;
-+			rsgl_src = areq->tsgl;
- 	}
- 
- 	/* Initialize the crypto operation */
--	aead_request_set_crypt(&areq->cra_u.aead_req, src,
-+	aead_request_set_crypt(&areq->cra_u.aead_req, rsgl_src,
- 			       areq->first_rsgl.sgl.sg, used, ctx->iv);
- 	aead_request_set_ad(&areq->cra_u.aead_req, ctx->aead_assoclen);
- 	aead_request_set_tfm(&areq->cra_u.aead_req, tfm);
+Cheers,
 -- 
-2.13.6
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
