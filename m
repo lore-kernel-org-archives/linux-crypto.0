@@ -1,63 +1,75 @@
-From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Subject: Re: [PATCH] Fix NULL pointer deref. on no default_rng
-Date: Sun, 12 Nov 2017 20:16:27 +0530
-Message-ID: <CANc+2y70xppF_wZAi4urVtKGGdn4-GzVHkqEh82rxCS_pD7BDA@mail.gmail.com>
-References: <20171112142432.20186-1-pinaraf@pinaraf.info>
+From: =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>
+Subject: Re: [PATCH 1/2] crypto: tcrypt - fix S/G table for test_aead_speed()
+Date: Sun, 12 Nov 2017 16:26:39 +0000
+Message-ID: <VI1PR0402MB33426CA117EDA1686C916D7B982A0@VI1PR0402MB3342.eurprd04.prod.outlook.com>
+References: <1507630920-9014-1-git-send-email-robert.baronescu@nxp.com>
+ <20171103124157.GA8330@gondor.apana.org.au>
+ <VI1PR0402MB33425E266579E4F3B375617498570@VI1PR0402MB3342.eurprd04.prod.outlook.com>
+ <20171109222129.GB20824@gondor.apana.org.au>
+ <VI1PR0402MB3342FFECA75AFC5556AD085498540@VI1PR0402MB3342.eurprd04.prod.outlook.com>
+ <20171110074332.GB24384@gondor.apana.org.au>
+ <VI1PR0402MB334241EA4B848E77AF8DFC2298540@VI1PR0402MB3342.eurprd04.prod.outlook.com>
+ <20171110104145.GA25739@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        "David S . Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-To: Pierre Ducroquet <pinaraf@pinaraf.info>
+Content-Type: text/plain; charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
+Cc: Robert Baronescu <robert.baronescu@nxp.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "davem@davemloft.net" <davem@davemloft.net>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-io0-f193.google.com ([209.85.223.193]:51355 "EHLO
-        mail-io0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750953AbdKLOq2 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 12 Nov 2017 09:46:28 -0500
-Received: by mail-io0-f193.google.com with SMTP id g73so2458206ioj.8
-        for <linux-crypto@vger.kernel.org>; Sun, 12 Nov 2017 06:46:28 -0800 (PST)
-In-Reply-To: <20171112142432.20186-1-pinaraf@pinaraf.info>
+Received: from mail-ve1eur01on0076.outbound.protection.outlook.com ([104.47.1.76]:62592
+        "EHLO EUR01-VE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751464AbdKLQ0n (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 12 Nov 2017 11:26:43 -0500
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Pierre,
-
-On 12 November 2017 at 19:54, Pierre Ducroquet <pinaraf@pinaraf.info> wrote:
-> If crypto_get_default_rng returns an error, the
-> function ecc_gen_privkey should return an error.
-> Instead, it currently tries to use the default_rng
-> nevertheless, thus creating a kernel panic with a
-> NULL pointer dereference.
-> Returning the error directly, as was supposedly
-> intended when looking at the code, fixes this.
->
-> Signed-off-by: Pierre Ducroquet <pinaraf@pinaraf.info>
-> ---
->  crypto/ecc.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/crypto/ecc.c b/crypto/ecc.c
-> index 633a9bcdc574..18f32f2a5e1c 100644
-> --- a/crypto/ecc.c
-> +++ b/crypto/ecc.c
-> @@ -964,7 +964,7 @@ int ecc_gen_privkey(unsigned int curve_id, unsigned int ndigits, u64 *privkey)
->          * DRBG with a security strength of 256.
->          */
->         if (crypto_get_default_rng())
-> -               err = -EFAULT;
-> +               return -EFAULT;
->
->         err = crypto_rng_get_bytes(crypto_default_rng, (u8 *)priv, nbytes);
->         crypto_put_default_rng();
-> --
-> 2.15.0
->
-
-Looks good to me.
-
-Reviewed-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-
-Regards,
-PrasannaKumar
+On 11/10/2017 1:23 PM, Herbert Xu wrote:=0A=
+> On Fri, Nov 10, 2017 at 09:17:33AM +0000, Horia Geant=E3 wrote:=0A=
+>>=0A=
+>>> I must be missing something.  In the case rem =3D=3D 0, let's say=0A=
+>>> the original value of np is npo.  Then at the start of the loop,=0A=
+>>> np =3D npo - 1, and at the last iteration, k =3D npo - 2, so we do=0A=
+>> IIUC at the start of the loop np =3D npo (and not npo - 1), since np is =
+no=0A=
+>> longer decremented in the rem =3D=3D 0 case:=0A=
+>> -	np--;=0A=
+>> +	if (rem)=0A=
+>> +		np--;=0A=
+>>=0A=
+>>>=0A=
+>>> 	sg_set_buf(&sg[npo - 1], xbuf[npo - 2], PAGE_SIZE);=0A=
+>>>=0A=
+>> and accordingly last iteration is for k =3D npo - 1:=0A=
+>>  	sg_set_buf(&sg[npo], xbuf[npo - 1], PAGE_SIZE);=0A=
+>>=0A=
+>>> While the sg_init_table call sets the end-of-table at=0A=
+>>>=0A=
+>>> 	sg_init_table(sg, npo + 1);=0A=
+>>>=0A=
+>> while this marks sg[npo] as last SG table entry.=0A=
+> =0A=
+> OK, we're both sort of right.  You're correct that this generates=0A=
+> a valid SG list in that the number of entries match the end-of-table=0A=
+> marking.=0A=
+> =0A=
+> But the thing that prompted to check this patch in the first place=0A=
+> is the semantics behind it.  For the case rem =3D=3D 0, it means that=0A=
+> buflen is a multiple of PAGE_SIZE.  In that case, the code with=0A=
+> your patch will create an SG list that's one page longer than=0A=
+> buflen.=0A=
+> =0A=
+SG table always has 1 entry more than what's needed strictly for input data=
+.=0A=
+=0A=
+Let's say buflen =3D npo * PAGE_SIZE.=0A=
+SG table generated by the code will have npo + 1 entries:=0A=
+-sg[0] - (1 entry) reserved for associated data, filled outside=0A=
+sg_init_aead()=0A=
+-sg[1]..sg[npo] (npo entries) - input data, entries pointing to=0A=
+xbuf[0]..xbuf[npo-1]=0A=
+=0A=
+Horia=0A=
