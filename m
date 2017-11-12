@@ -1,43 +1,63 @@
-From: Pierre Ducroquet <pinaraf@pinaraf.info>
-Subject: [PATCH] Fix NULL pointer deref. on no default_rng
-Date: Sun, 12 Nov 2017 15:24:32 +0100
-Message-ID: <20171112142432.20186-1-pinaraf@pinaraf.info>
-Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
-        Pierre Ducroquet <pinaraf@pinaraf.info>
-To: linux-crypto@vger.kernel.org
+From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Subject: Re: [PATCH] Fix NULL pointer deref. on no default_rng
+Date: Sun, 12 Nov 2017 20:16:27 +0530
+Message-ID: <CANc+2y70xppF_wZAi4urVtKGGdn4-GzVHkqEh82rxCS_pD7BDA@mail.gmail.com>
+References: <20171112142432.20186-1-pinaraf@pinaraf.info>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Cc: "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        "David S . Miller" <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+To: Pierre Ducroquet <pinaraf@pinaraf.info>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from host.pinaraf.info ([37.187.77.179]:43890 "EHLO mx2.pinaraf.info"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751139AbdKLObj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 12 Nov 2017 09:31:39 -0500
+Received: from mail-io0-f193.google.com ([209.85.223.193]:51355 "EHLO
+        mail-io0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750953AbdKLOq2 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 12 Nov 2017 09:46:28 -0500
+Received: by mail-io0-f193.google.com with SMTP id g73so2458206ioj.8
+        for <linux-crypto@vger.kernel.org>; Sun, 12 Nov 2017 06:46:28 -0800 (PST)
+In-Reply-To: <20171112142432.20186-1-pinaraf@pinaraf.info>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-If crypto_get_default_rng returns an error, the
-function ecc_gen_privkey should return an error.
-Instead, it currently tries to use the default_rng
-nevertheless, thus creating a kernel panic with a
-NULL pointer dereference.
-Returning the error directly, as was supposedly
-intended when looking at the code, fixes this.
+Hi Pierre,
 
-Signed-off-by: Pierre Ducroquet <pinaraf@pinaraf.info>
----
- crypto/ecc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On 12 November 2017 at 19:54, Pierre Ducroquet <pinaraf@pinaraf.info> wrote:
+> If crypto_get_default_rng returns an error, the
+> function ecc_gen_privkey should return an error.
+> Instead, it currently tries to use the default_rng
+> nevertheless, thus creating a kernel panic with a
+> NULL pointer dereference.
+> Returning the error directly, as was supposedly
+> intended when looking at the code, fixes this.
+>
+> Signed-off-by: Pierre Ducroquet <pinaraf@pinaraf.info>
+> ---
+>  crypto/ecc.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/crypto/ecc.c b/crypto/ecc.c
+> index 633a9bcdc574..18f32f2a5e1c 100644
+> --- a/crypto/ecc.c
+> +++ b/crypto/ecc.c
+> @@ -964,7 +964,7 @@ int ecc_gen_privkey(unsigned int curve_id, unsigned int ndigits, u64 *privkey)
+>          * DRBG with a security strength of 256.
+>          */
+>         if (crypto_get_default_rng())
+> -               err = -EFAULT;
+> +               return -EFAULT;
+>
+>         err = crypto_rng_get_bytes(crypto_default_rng, (u8 *)priv, nbytes);
+>         crypto_put_default_rng();
+> --
+> 2.15.0
+>
 
-diff --git a/crypto/ecc.c b/crypto/ecc.c
-index 633a9bcdc574..18f32f2a5e1c 100644
---- a/crypto/ecc.c
-+++ b/crypto/ecc.c
-@@ -964,7 +964,7 @@ int ecc_gen_privkey(unsigned int curve_id, unsigned int ndigits, u64 *privkey)
- 	 * DRBG with a security strength of 256.
- 	 */
- 	if (crypto_get_default_rng())
--		err = -EFAULT;
-+		return -EFAULT;
- 
- 	err = crypto_rng_get_bytes(crypto_default_rng, (u8 *)priv, nbytes);
- 	crypto_put_default_rng();
--- 
-2.15.0
+Looks good to me.
+
+Reviewed-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+
+Regards,
+PrasannaKumar
