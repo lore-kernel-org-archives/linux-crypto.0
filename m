@@ -1,7 +1,7 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 10/24] staging: ccree: document spinlock usage
-Date: Mon, 13 Nov 2017 14:45:38 +0000
-Message-ID: <1510584358-29473-11-git-send-email-gilad@benyossef.com>
+Subject: [PATCH 11/24] staging: ccree: constify help string
+Date: Mon, 13 Nov 2017 14:45:39 +0000
+Message-ID: <1510584358-29473-12-git-send-email-gilad@benyossef.com>
 References: <1510584358-29473-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -23,28 +23,25 @@ Errors-To: driverdev-devel-bounces@linuxdriverproject.org
 Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-Document spinlock usage to protect against concurrent
-access to HW register which must occur a single
-request at a time.
+Make help string static const
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/ssi_request_mgr.c | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/staging/ccree/ssi_sysfs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/staging/ccree/ssi_request_mgr.c b/drivers/staging/ccree/ssi_request_mgr.c
-index 65c4d9f..1d9c038 100644
---- a/drivers/staging/ccree/ssi_request_mgr.c
-+++ b/drivers/staging/ccree/ssi_request_mgr.c
-@@ -43,6 +43,9 @@ struct ssi_request_mgr_handle {
- 	u32 req_queue_tail;
- 	u32 axi_completed;
- 	u32 q_free_slots;
-+	/* This lock protects access to HW register
-+	 * that must be single request at a time
-+	 */
- 	spinlock_t hw_lock;
- 	struct cc_hw_desc compl_desc;
- 	u8 *dummy_comp_buff;
+diff --git a/drivers/staging/ccree/ssi_sysfs.c b/drivers/staging/ccree/ssi_sysfs.c
+index 5d39f15..8d50382 100644
+--- a/drivers/staging/ccree/ssi_sysfs.c
++++ b/drivers/staging/ccree/ssi_sysfs.c
+@@ -47,7 +47,7 @@ static ssize_t ssi_sys_regdump_show(struct kobject *kobj,
+ static ssize_t ssi_sys_help_show(struct kobject *kobj,
+ 				 struct kobj_attribute *attr, char *buf)
+ {
+-	char *help_str[] = {
++	static const char * const help_str[] = {
+ 				"cat reg_dump              ", "Print several of CC register values",
+ 				};
+ 	int i = 0, offset = 0;
 -- 
 2.7.4
