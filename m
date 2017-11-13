@@ -1,7 +1,7 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 05/24] staging: ccree: move logical cont. to 1st line
-Date: Mon, 13 Nov 2017 14:45:33 +0000
-Message-ID: <1510584358-29473-6-git-send-email-gilad@benyossef.com>
+Subject: [PATCH 06/24] staging: ccree: remove unneeded empty lines
+Date: Mon, 13 Nov 2017 14:45:34 +0000
+Message-ID: <1510584358-29473-7-git-send-email-gilad@benyossef.com>
 References: <1510584358-29473-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -23,38 +23,37 @@ Errors-To: driverdev-devel-bounces@linuxdriverproject.org
 Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-Move logical continuations to first line for readability.
+Remove uneeded empty lines that crept in to code.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/ssi_buffer_mgr.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ drivers/staging/ccree/ssi_buffer_mgr.c | 1 -
+ drivers/staging/ccree/ssi_hash.c       | 1 -
+ 2 files changed, 2 deletions(-)
 
 diff --git a/drivers/staging/ccree/ssi_buffer_mgr.c b/drivers/staging/ccree/ssi_buffer_mgr.c
-index 923a0df..cda5a30 100644
+index cda5a30..684c934 100644
 --- a/drivers/staging/ccree/ssi_buffer_mgr.c
 +++ b/drivers/staging/ccree/ssi_buffer_mgr.c
-@@ -1473,8 +1473,8 @@ int cc_map_hash_request_final(struct ssi_drvdata *drvdata, void *ctx,
- 				       &dummy, &mapped_nents))) {
- 			goto unmap_curr_buff;
- 		}
--		if (src && mapped_nents == 1
--		     && areq_ctx->data_dma_buf_type == SSI_DMA_BUF_NULL) {
-+		if (src && mapped_nents == 1 &&
-+		    areq_ctx->data_dma_buf_type == SSI_DMA_BUF_NULL) {
- 			memcpy(areq_ctx->buff_sg, src,
- 			       sizeof(struct scatterlist));
- 			areq_ctx->buff_sg->length = nbytes;
-@@ -1590,8 +1590,8 @@ int cc_map_hash_request_update(struct ssi_drvdata *drvdata, void *ctx,
- 				       &mapped_nents))) {
- 			goto unmap_curr_buff;
- 		}
--		if (mapped_nents == 1
--		     && areq_ctx->data_dma_buf_type == SSI_DMA_BUF_NULL) {
-+		if (mapped_nents == 1 &&
-+		    areq_ctx->data_dma_buf_type == SSI_DMA_BUF_NULL) {
- 			/* only one entry in the SG and no previous data */
- 			memcpy(areq_ctx->buff_sg, src,
- 			       sizeof(struct scatterlist));
+@@ -691,7 +691,6 @@ void cc_unmap_aead_request(struct device *dev, struct aead_request *req)
+ 	if (drvdata->coherent &&
+ 	    areq_ctx->gen_ctx.op_type == DRV_CRYPTO_DIRECTION_DECRYPT &&
+ 	    likely(req->src == req->dst)) {
+-
+ 		/* copy back mac from temporary location to deal with possible
+ 		 * data memory overriding that caused by cache coherence problem.
+ 		 */
+diff --git a/drivers/staging/ccree/ssi_hash.c b/drivers/staging/ccree/ssi_hash.c
+index 8414c25..66b011c 100644
+--- a/drivers/staging/ccree/ssi_hash.c
++++ b/drivers/staging/ccree/ssi_hash.c
+@@ -2064,7 +2064,6 @@ ssi_hash_create_alg(struct ssi_hash_template *template, struct device *dev,
+ 	if (!t_crypto_alg)
+ 		return ERR_PTR(-ENOMEM);
+ 
+-
+ 	t_crypto_alg->ahash_alg = template->template_ahash;
+ 	halg = &t_crypto_alg->ahash_alg;
+ 	alg = &halg->halg.base;
 -- 
 2.7.4
