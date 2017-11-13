@@ -1,7 +1,7 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 04/24] staging: ccree: remove MIN/MAX macros
-Date: Mon, 13 Nov 2017 14:45:32 +0000
-Message-ID: <1510584358-29473-5-git-send-email-gilad@benyossef.com>
+Subject: [PATCH 05/24] staging: ccree: move logical cont. to 1st line
+Date: Mon, 13 Nov 2017 14:45:33 +0000
+Message-ID: <1510584358-29473-6-git-send-email-gilad@benyossef.com>
 References: <1510584358-29473-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -23,56 +23,38 @@ Errors-To: driverdev-devel-bounces@linuxdriverproject.org
 Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-The driver was using open coded MIN/MAX macros to
-compute fixed defines. Remove them and use bigger
-value always instead.
+Move logical continuations to first line for readability.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/ssi_aead.h   | 2 +-
- drivers/staging/ccree/ssi_driver.h | 3 ---
- drivers/staging/ccree/ssi_hash.c   | 2 +-
- 3 files changed, 2 insertions(+), 5 deletions(-)
+ drivers/staging/ccree/ssi_buffer_mgr.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/staging/ccree/ssi_aead.h b/drivers/staging/ccree/ssi_aead.h
-index e85bcd9..580fdb8 100644
---- a/drivers/staging/ccree/ssi_aead.h
-+++ b/drivers/staging/ccree/ssi_aead.h
-@@ -28,7 +28,7 @@
- /* mac_cmp - HW writes 8 B but all bytes hold the same value */
- #define ICV_CMP_SIZE 8
- #define CCM_CONFIG_BUF_SIZE (AES_BLOCK_SIZE * 3)
--#define MAX_MAC_SIZE MAX(SHA256_DIGEST_SIZE, AES_BLOCK_SIZE)
-+#define MAX_MAC_SIZE SHA256_DIGEST_SIZE
- 
- /* defines for AES GCM configuration buffer */
- #define GCM_BLOCK_LEN_SIZE 8
-diff --git a/drivers/staging/ccree/ssi_driver.h b/drivers/staging/ccree/ssi_driver.h
-index f4967ca..758268e 100644
---- a/drivers/staging/ccree/ssi_driver.h
-+++ b/drivers/staging/ccree/ssi_driver.h
-@@ -95,9 +95,6 @@
-  * field in the HW descriptor. The DMA engine +8 that value.
-  */
- 
--#define MIN(a, b) (((a) < (b)) ? (a) : (b))
--#define MAX(a, b) (((a) > (b)) ? (a) : (b))
--
- #define SSI_MAX_IVGEN_DMA_ADDRESSES	3
- struct ssi_crypto_req {
- 	void (*user_cb)(struct device *dev, void *req);
-diff --git a/drivers/staging/ccree/ssi_hash.c b/drivers/staging/ccree/ssi_hash.c
-index 1fda84d..8414c25 100644
---- a/drivers/staging/ccree/ssi_hash.c
-+++ b/drivers/staging/ccree/ssi_hash.c
-@@ -32,7 +32,7 @@
- #include "ssi_sram_mgr.h"
- 
- #define SSI_MAX_AHASH_SEQ_LEN 12
--#define SSI_MAX_HASH_OPAD_TMP_KEYS_SIZE MAX(SSI_MAX_HASH_BLCK_SIZE, 3 * AES_BLOCK_SIZE)
-+#define SSI_MAX_HASH_OPAD_TMP_KEYS_SIZE SSI_MAX_HASH_BLCK_SIZE
- 
- struct ssi_hash_handle {
- 	ssi_sram_addr_t digest_len_sram_addr; /* const value in SRAM*/
+diff --git a/drivers/staging/ccree/ssi_buffer_mgr.c b/drivers/staging/ccree/ssi_buffer_mgr.c
+index 923a0df..cda5a30 100644
+--- a/drivers/staging/ccree/ssi_buffer_mgr.c
++++ b/drivers/staging/ccree/ssi_buffer_mgr.c
+@@ -1473,8 +1473,8 @@ int cc_map_hash_request_final(struct ssi_drvdata *drvdata, void *ctx,
+ 				       &dummy, &mapped_nents))) {
+ 			goto unmap_curr_buff;
+ 		}
+-		if (src && mapped_nents == 1
+-		     && areq_ctx->data_dma_buf_type == SSI_DMA_BUF_NULL) {
++		if (src && mapped_nents == 1 &&
++		    areq_ctx->data_dma_buf_type == SSI_DMA_BUF_NULL) {
+ 			memcpy(areq_ctx->buff_sg, src,
+ 			       sizeof(struct scatterlist));
+ 			areq_ctx->buff_sg->length = nbytes;
+@@ -1590,8 +1590,8 @@ int cc_map_hash_request_update(struct ssi_drvdata *drvdata, void *ctx,
+ 				       &mapped_nents))) {
+ 			goto unmap_curr_buff;
+ 		}
+-		if (mapped_nents == 1
+-		     && areq_ctx->data_dma_buf_type == SSI_DMA_BUF_NULL) {
++		if (mapped_nents == 1 &&
++		    areq_ctx->data_dma_buf_type == SSI_DMA_BUF_NULL) {
+ 			/* only one entry in the SG and no previous data */
+ 			memcpy(areq_ctx->buff_sg, src,
+ 			       sizeof(struct scatterlist));
 -- 
 2.7.4
