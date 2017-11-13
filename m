@@ -1,7 +1,7 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 09/24] staging: ccree: replace open coded loop with for
-Date: Mon, 13 Nov 2017 14:45:37 +0000
-Message-ID: <1510584358-29473-10-git-send-email-gilad@benyossef.com>
+Subject: [PATCH 10/24] staging: ccree: document spinlock usage
+Date: Mon, 13 Nov 2017 14:45:38 +0000
+Message-ID: <1510584358-29473-11-git-send-email-gilad@benyossef.com>
 References: <1510584358-29473-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -23,43 +23,28 @@ Errors-To: driverdev-devel-bounces@linuxdriverproject.org
 Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-Replace open coded register writing loop with a for.
-Further simplify code by using a local var to precompute
-the register address for readability.
+Document spinlock usage to protect against concurrent
+access to HW register which must occur a single
+request at a time.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/ssi_request_mgr.c | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
+ drivers/staging/ccree/ssi_request_mgr.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/drivers/staging/ccree/ssi_request_mgr.c b/drivers/staging/ccree/ssi_request_mgr.c
-index f5041f7..65c4d9f 100644
+index 65c4d9f..1d9c038 100644
 --- a/drivers/staging/ccree/ssi_request_mgr.c
 +++ b/drivers/staging/ccree/ssi_request_mgr.c
-@@ -164,15 +164,17 @@ static inline void enqueue_seq(
- 	void __iomem *cc_base,
- 	struct cc_hw_desc seq[], unsigned int seq_len)
- {
--	int i;
-+	int i, w;
-+	void * __iomem reg = cc_base + CC_REG(DSCRPTR_QUEUE_WORD0);
-+
-+	/*
-+	 * We do indeed write all 6 command words to the same
-+	 * register. The HW supports this.
+@@ -43,6 +43,9 @@ struct ssi_request_mgr_handle {
+ 	u32 req_queue_tail;
+ 	u32 axi_completed;
+ 	u32 q_free_slots;
++	/* This lock protects access to HW register
++	 * that must be single request at a time
 +	 */
- 
- 	for (i = 0; i < seq_len; i++) {
--		writel_relaxed(seq[i].word[0], (cc_base + CC_REG(DSCRPTR_QUEUE_WORD0)));
--		writel_relaxed(seq[i].word[1], (cc_base + CC_REG(DSCRPTR_QUEUE_WORD0)));
--		writel_relaxed(seq[i].word[2], (cc_base + CC_REG(DSCRPTR_QUEUE_WORD0)));
--		writel_relaxed(seq[i].word[3], (cc_base + CC_REG(DSCRPTR_QUEUE_WORD0)));
--		writel_relaxed(seq[i].word[4], (cc_base + CC_REG(DSCRPTR_QUEUE_WORD0)));
--		writel_relaxed(seq[i].word[5], (cc_base + CC_REG(DSCRPTR_QUEUE_WORD0)));
-+		for (w = 0; w <= 5; w++)
-+			writel_relaxed(seq[i].word[w], reg);
- #ifdef DX_DUMP_DESCS
- 		dev_dbg(dev, "desc[%02d]: 0x%08X 0x%08X 0x%08X 0x%08X 0x%08X 0x%08X\n",
- 			i, seq[i].word[0], seq[i].word[1], seq[i].word[2],
+ 	spinlock_t hw_lock;
+ 	struct cc_hw_desc compl_desc;
+ 	u8 *dummy_comp_buff;
 -- 
 2.7.4
