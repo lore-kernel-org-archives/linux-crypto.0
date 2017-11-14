@@ -1,62 +1,75 @@
-From: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-Subject: Re: [PATCH v2] tpm: Move Linux RNG connection to hwrng
-Date: Tue, 14 Nov 2017 16:34:21 +0200
-Message-ID: <20171114143421.3jxn6fzvgp2xmyk6@linux.intel.com>
-References: <20171031200503.GC18578@ziepe.ca>
- <20171105110506.usxmuzrvcjvxahr6@linux.intel.com>
- <20171106022704.GD26011@ziepe.ca>
- <CANc+2y6dx_2zOzFA5aFs7RpEV8aNqxpDghmx+q_+XyendYJoew@mail.gmail.com>
- <20171107160404.GG21466@ziepe.ca>
+From: Tudor Ambarus <tudor.ambarus@microchip.com>
+Subject: [PATCH] crypto: tcrypt - set assoc in sg_init_aead()
+Date: Tue, 14 Nov 2017 16:59:15 +0200
+Message-ID: <20171114145915.13299-1-tudor.ambarus@microchip.com>
+References: <75766914-fdc1-5fb9-a571-82f86bcbe928@microchip.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
-        Stefan Berger <stefanb@linux.vnet.ibm.com>,
-        linux-integrity@vger.kernel.org,
-        David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:INTEGRITY MEASUREMENT ARCHITECTURE (IMA)"
-        <linux-security-module@vger.kernel.org>,
-        "open list:KEYS-TRUSTED" <keyrings@vger.kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        James Morris <james.l.morris@oracle.com>,
-        Matt Mackall <mpm@selenic.com>,
-        David Safford <safford@us.ibm.com>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        "Serge E. Hallyn" <serge@hallyn.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
+Content-Type: text/plain
+Cc: <linux-crypto@vger.kernel.org>, <robert.baronescu@nxp.com>,
+        <horia.geanta@nxp.com>, Tudor Ambarus <tudor.ambarus@microchip.com>
+To: <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:13305 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755768AbdKNOeb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 14 Nov 2017 09:34:31 -0500
-Content-Disposition: inline
-In-Reply-To: <20171107160404.GG21466@ziepe.ca>
+Received: from esa1.microchip.iphmx.com ([68.232.147.91]:45670 "EHLO
+        esa1.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752360AbdKNO7Y (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 14 Nov 2017 09:59:24 -0500
+In-Reply-To: <75766914-fdc1-5fb9-a571-82f86bcbe928@microchip.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Nov 07, 2017 at 09:04:04AM -0700, Jason Gunthorpe wrote:
-> On Tue, Nov 07, 2017 at 08:50:44AM +0530, PrasannaKumar Muralidharan wrote:
-> 
-> > I am assuming you are talking about the following patches - using
-> > struct tpm_chip instead of chip number and this patch.
-> 
-> yes
-> 
-> > I won't be able to test if struct tpm_chip usage as I don't have
-> > multiple tpm hw in one machine. In case of tpm rng changes I can test
-> > only the lifecycle of tpm rng device. Is that enough? I feel my test
-> > will be limited. Please provide your thoughts on this.
-> 
-> That is certainly better than no testing.
-> 
-> Jason
+Results better code readability.
 
-WFM too.
+Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
+---
+Should be applied after:
+    crypto: tcrypt - fix S/G table for test_aead_speed()
 
-Tested-by: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-Reviewed-by: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+ crypto/tcrypt.c | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
 
-/Jarkko
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index 3ced1ba..28b4882 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -185,7 +185,8 @@ static void testmgr_free_buf(char *buf[XBUFSIZE])
+ }
+ 
+ static void sg_init_aead(struct scatterlist *sg, char *xbuf[XBUFSIZE],
+-			unsigned int buflen)
++			 unsigned int buflen, const void *assoc,
++			 unsigned int aad_size)
+ {
+ 	int np = (buflen + PAGE_SIZE - 1)/PAGE_SIZE;
+ 	int k, rem;
+@@ -198,6 +199,9 @@ static void sg_init_aead(struct scatterlist *sg, char *xbuf[XBUFSIZE],
+ 	}
+ 
+ 	sg_init_table(sg, np + 1);
++
++	sg_set_buf(&sg[0], assoc, aad_size);
++
+ 	if (rem)
+ 		np--;
+ 	for (k = 0; k < np; k++)
+@@ -318,14 +322,12 @@ static void test_aead_speed(const char *algo, int enc, unsigned int secs,
+ 				goto out;
+ 			}
+ 
+-			sg_init_aead(sg, xbuf,
+-				    *b_size + (enc ? 0 : authsize));
++			sg_init_aead(sg, xbuf, *b_size + (enc ? 0 : authsize),
++				     assoc, aad_size);
+ 
+ 			sg_init_aead(sgout, xoutbuf,
+-				    *b_size + (enc ? authsize : 0));
+-
+-			sg_set_buf(&sg[0], assoc, aad_size);
+-			sg_set_buf(&sgout[0], assoc, aad_size);
++				     *b_size + (enc ? authsize : 0), assoc,
++				     aad_size);
+ 
+ 			aead_request_set_crypt(req, sg, sgout,
+ 					       *b_size + (enc ? 0 : authsize),
+-- 
+2.9.4
