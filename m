@@ -1,11 +1,11 @@
-From: Haren Myneni <haren@linux.vnet.ibm.com>
-Subject: Re: [PATCH][V2] crypto/nx: fix spelling mistake: "availavle" -> "available"
-Date: Tue, 14 Nov 2017 10:20:03 -0800
-Message-ID: <5A0B33D3.4010707@linux.vnet.ibm.com>
+From: Gabriel Paubert <paubert@iram.es>
+Subject: Re: [PATCH][V2] crypto/nx: fix spelling mistake: "availavle" ->
+ "available"
+Date: Tue, 14 Nov 2017 20:20:24 +0100
+Message-ID: <20171114192024.fg5fxh72xyxzkq3y@lt-gp.iram.es>
 References: <20171114143217.21456-1-colin.king@canonical.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Cc: Haren Myneni <haren@us.ibm.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S . Miller" <davem@davemloft.net>,
@@ -15,20 +15,25 @@ Cc: Haren Myneni <haren@us.ibm.com>,
         linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
         kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
 To: Colin King <colin.king@canonical.com>
-Return-path: <kernel-janitors-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from ci-l1mail2-out05a.puc.rediris.es ([130.206.19.23]:38735 "EHLO
+        ci-l1mail2-out05a.puc.rediris.es" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1753115AbdKNTat (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 14 Nov 2017 14:30:49 -0500
+Content-Disposition: inline
 In-Reply-To: <20171114143217.21456-1-colin.king@canonical.com>
-Sender: kernel-janitors-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Sorry for my mistake. Thanks. 
-
-Acked-by: Haren Myneni <haren@us.ibm.com> 
-
-On 11/14/2017 06:32 AM, Colin King wrote:
+On Tue, Nov 14, 2017 at 02:32:17PM +0000, Colin King wrote:
 > From: Colin Ian King <colin.king@canonical.com>
 > 
 > Trivial fix to spelling mistake in pr_err error message text. Also
 > fix spelling mistake in proceeding comment.
+
+s/proceeding/preceding/ ?
+
 > 
 > Signed-off-by: Colin Ian King <colin.king@canonical.com>
 > ---
@@ -41,7 +46,7 @@ On 11/14/2017 06:32 AM, Colin King wrote:
 > +++ b/drivers/crypto/nx/nx-842-powernv.c
 > @@ -743,8 +743,8 @@ static int nx842_open_percpu_txwins(void)
 >  		}
-> 
+>  
 >  		if (!per_cpu(cpu_txwin, i)) {
 > -			/* shoudn't happen, Each chip will have NX engine */
 > -			pr_err("NX engine is not availavle for CPU %d\n", i);
@@ -50,5 +55,5 @@ On 11/14/2017 06:32 AM, Colin King wrote:
 >  			return -EINVAL;
 >  		}
 >  	}
-> 
-
+> -- 
+> 2.14.1
