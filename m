@@ -1,34 +1,36 @@
-From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: Re: [PATCH 00/24] staging: ccree: more cleanup patches
-Date: Mon, 13 Nov 2017 21:33:39 +0300
-Message-ID: <20171113183339.pdegwo7xexfucvs2@mwanda>
-References: <1510584358-29473-1-git-send-email-gilad@benyossef.com>
+From: David Miller <davem@davemloft.net>
+Subject: Re: [PATCH v2 2/2] chcr: Add support for Inline IPSec
+Date: Tue, 14 Nov 2017 16:09:43 +0900 (KST)
+Message-ID: <20171114.160943.123536330718664026.davem@davemloft.net>
+References: <1510226941-20472-1-git-send-email-atul.gupta@chelsio.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Cc: devel@driverdev.osuosl.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- driverdev-devel@linuxdriverproject.org, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org, Ofir Drang <ofir.drang@arm.com>
-To: Gilad Ben-Yossef <gilad@benyossef.com>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-Content-Disposition: inline
-In-Reply-To: <1510584358-29473-1-git-send-email-gilad@benyossef.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        netdev@vger.kernel.org, steffen.klassert@secunet.com,
+        harsh@chelsio.com, ganeshgr@chelsio.com
+To: atul.gupta@chelsio.com
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <1510226941-20472-1-git-send-email-atul.gupta@chelsio.com>
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-These cleanups look nice.  Thanks.
+From: Atul Gupta <atul.gupta@chelsio.com>
+Date: Thu,  9 Nov 2017 16:59:01 +0530
 
-I hope you do a mass remove of likely/unlikely in a patch soon.
-Whenever, I see one of those in a + line I always have to remind myself
-that you're planning to do it in a later patch.
+> register xfrmdev_ops callbacks, Send IPsec tunneled data
+> to HW for inline processing.
+> The driver use hardware crypto accelerator to encrypt and
+> generate ICV for the transmitted packet in Inline mode.
+> 
+> Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
+> Signed-off-by: Harsh Jain <harsh@chelsio.com>
+> Signed-off-by: Ganesh Goudar <ganeshgr@chelsio.com>
+> ---
+> V2: Fixed the build warnings and created patch against cryptodev
+>     to avoid possible merge conflicts
 
-regards,
-dan carpenter
+Herbert, feel free to merge these two patches via your crypto
+tree.
+
+Thanks!
