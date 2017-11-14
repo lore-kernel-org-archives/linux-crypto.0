@@ -1,75 +1,54 @@
-From: Tudor Ambarus <tudor.ambarus@microchip.com>
-Subject: [PATCH] crypto: tcrypt - set assoc in sg_init_aead()
-Date: Tue, 14 Nov 2017 16:59:15 +0200
-Message-ID: <20171114145915.13299-1-tudor.ambarus@microchip.com>
-References: <75766914-fdc1-5fb9-a571-82f86bcbe928@microchip.com>
+From: Haren Myneni <haren@linux.vnet.ibm.com>
+Subject: Re: [PATCH][V2] crypto/nx: fix spelling mistake: "availavle" -> "available"
+Date: Tue, 14 Nov 2017 10:20:03 -0800
+Message-ID: <5A0B33D3.4010707@linux.vnet.ibm.com>
+References: <20171114143217.21456-1-colin.king@canonical.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <linux-crypto@vger.kernel.org>, <robert.baronescu@nxp.com>,
-        <horia.geanta@nxp.com>, Tudor Ambarus <tudor.ambarus@microchip.com>
-To: <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from esa1.microchip.iphmx.com ([68.232.147.91]:45670 "EHLO
-        esa1.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752360AbdKNO7Y (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 14 Nov 2017 09:59:24 -0500
-In-Reply-To: <75766914-fdc1-5fb9-a571-82f86bcbe928@microchip.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: Haren Myneni <haren@us.ibm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Colin King <colin.king@canonical.com>
+Return-path: <kernel-janitors-owner@vger.kernel.org>
+In-Reply-To: <20171114143217.21456-1-colin.king@canonical.com>
+Sender: kernel-janitors-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Results better code readability.
+Sorry for my mistake. Thanks. 
 
-Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
----
-Should be applied after:
-    crypto: tcrypt - fix S/G table for test_aead_speed()
+Acked-by: Haren Myneni <haren@us.ibm.com> 
 
- crypto/tcrypt.c | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
+On 11/14/2017 06:32 AM, Colin King wrote:
+> From: Colin Ian King <colin.king@canonical.com>
+> 
+> Trivial fix to spelling mistake in pr_err error message text. Also
+> fix spelling mistake in proceeding comment.
+> 
+> Signed-off-by: Colin Ian King <colin.king@canonical.com>
+> ---
+>  drivers/crypto/nx/nx-842-powernv.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/crypto/nx/nx-842-powernv.c b/drivers/crypto/nx/nx-842-powernv.c
+> index f2246a5abcf6..1e87637c412d 100644
+> --- a/drivers/crypto/nx/nx-842-powernv.c
+> +++ b/drivers/crypto/nx/nx-842-powernv.c
+> @@ -743,8 +743,8 @@ static int nx842_open_percpu_txwins(void)
+>  		}
+> 
+>  		if (!per_cpu(cpu_txwin, i)) {
+> -			/* shoudn't happen, Each chip will have NX engine */
+> -			pr_err("NX engine is not availavle for CPU %d\n", i);
+> +			/* shouldn't happen, Each chip will have NX engine */
+> +			pr_err("NX engine is not available for CPU %d\n", i);
+>  			return -EINVAL;
+>  		}
+>  	}
+> 
 
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index 3ced1ba..28b4882 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -185,7 +185,8 @@ static void testmgr_free_buf(char *buf[XBUFSIZE])
- }
- 
- static void sg_init_aead(struct scatterlist *sg, char *xbuf[XBUFSIZE],
--			unsigned int buflen)
-+			 unsigned int buflen, const void *assoc,
-+			 unsigned int aad_size)
- {
- 	int np = (buflen + PAGE_SIZE - 1)/PAGE_SIZE;
- 	int k, rem;
-@@ -198,6 +199,9 @@ static void sg_init_aead(struct scatterlist *sg, char *xbuf[XBUFSIZE],
- 	}
- 
- 	sg_init_table(sg, np + 1);
-+
-+	sg_set_buf(&sg[0], assoc, aad_size);
-+
- 	if (rem)
- 		np--;
- 	for (k = 0; k < np; k++)
-@@ -318,14 +322,12 @@ static void test_aead_speed(const char *algo, int enc, unsigned int secs,
- 				goto out;
- 			}
- 
--			sg_init_aead(sg, xbuf,
--				    *b_size + (enc ? 0 : authsize));
-+			sg_init_aead(sg, xbuf, *b_size + (enc ? 0 : authsize),
-+				     assoc, aad_size);
- 
- 			sg_init_aead(sgout, xoutbuf,
--				    *b_size + (enc ? authsize : 0));
--
--			sg_set_buf(&sg[0], assoc, aad_size);
--			sg_set_buf(&sgout[0], assoc, aad_size);
-+				     *b_size + (enc ? authsize : 0), assoc,
-+				     aad_size);
- 
- 			aead_request_set_crypt(req, sg, sgout,
- 					       *b_size + (enc ? 0 : authsize),
--- 
-2.9.4
