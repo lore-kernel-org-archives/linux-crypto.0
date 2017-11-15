@@ -1,51 +1,61 @@
-From: Colin King <colin.king@canonical.com>
-Subject: [PATCH] crypto: cavium: fix memory leak on info
-Date: Wed, 15 Nov 2017 12:37:19 +0000
-Message-ID: <20171115123719.12667-1-colin.king@canonical.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-To: George Cherian <george.cherian@cavium.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from youngberry.canonical.com ([91.189.89.112]:51936 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1757936AbdKOMh1 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 15 Nov 2017 07:37:27 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
+Subject: [PATCH] dt-bindings: add device tree binding for Arm TrustZone CryptoCell crypto engine
+Date: Wed, 15 Nov 2017 13:05:17 +0000
+Message-ID: <1510751117-13627-1-git-send-email-gilad@benyossef.com>
+Cc: Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>, devel-gWbeCf7V1WCQmaza687I9mD2FQJk+8+b@public.gmane.org,
+        linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+        "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-From: Colin Ian King <colin.king@canonical.com>
+The Arm TrustZone CryptoCell is a hardware security engine. This patch
+adds DT bindings for its Rich Execution Environment crypto engine.
 
-The object info is being leaked on an error return path, fix this
-by setting ret to -ENOMEM and exiting via the request_cleanup path
-that will free info.
+A driver supporting this device is already present in the staging tree.
 
-Detected by CoverityScan, CID#1408439 ("Resource Leak")
-
-Fixes: c694b233295b ("crypto: cavium - Add the Virtual Function driver for CPT")
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
+Signed-off-by: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
 ---
- drivers/crypto/cavium/cpt/cptvf_reqmanager.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ .../devicetree/bindings/crypto/arm-cryptocell.txt  | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/arm-cryptocell.txt
 
-diff --git a/drivers/crypto/cavium/cpt/cptvf_reqmanager.c b/drivers/crypto/cavium/cpt/cptvf_reqmanager.c
-index 169e66231bcf..b0ba4331944b 100644
---- a/drivers/crypto/cavium/cpt/cptvf_reqmanager.c
-+++ b/drivers/crypto/cavium/cpt/cptvf_reqmanager.c
-@@ -459,7 +459,8 @@ int process_request(struct cpt_vf *cptvf, struct cpt_request_info *req)
- 	info->completion_addr = kzalloc(sizeof(union cpt_res_s), GFP_KERNEL);
- 	if (unlikely(!info->completion_addr)) {
- 		dev_err(&pdev->dev, "Unable to allocate memory for completion_addr\n");
--		return -ENOMEM;
-+		ret = -ENOMEM;
-+		goto request_cleanup;
- 	}
- 
- 	result = (union cpt_res_s *)info->completion_addr;
+diff --git a/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt b/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt
+new file mode 100644
+index 0000000..ccf8a101
+--- /dev/null
++++ b/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt
+@@ -0,0 +1,22 @@
++Arm TrustZone CryptoCell cryptographic engine
++
++Required properties:
++- compatible: Should be "arm,cryptocell-712-ree".
++- reg: Base physical address of the engine and length of memory mapped region.
++- interrupts: Interrupt number for the device.
++
++Optional properties:
++- interrupt-parent: The phandle for the interrupt controller that services
++  interrupts for this device.
++- clocks: Reference to the crypto engine clock.
++- dma-coherent: Present if dma operations are coherent.
++
++Examples:
++
++       arm_cc712: arm_cc712@80000000 {
++               compatible = "arm,cryptocell-712-ree";
++               interrupt-parent = <&intc>;
++               interrupts = < 0 30 4 >;
++               reg = < 0x80000000 0x10000 >;
++
++       };
 -- 
-2.14.1
+2.7.4
+
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
