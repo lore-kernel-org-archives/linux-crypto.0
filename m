@@ -1,61 +1,59 @@
-From: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-Subject: [PATCH] dt-bindings: add device tree binding for Arm TrustZone CryptoCell crypto engine
-Date: Wed, 15 Nov 2017 13:05:17 +0000
-Message-ID: <1510751117-13627-1-git-send-email-gilad@benyossef.com>
-Cc: Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>, devel-gWbeCf7V1WCQmaza687I9mD2FQJk+8+b@public.gmane.org,
-        linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-        "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: [PATCH] crypto: keywrap - Add missing ULL suffixes for 64-bit constants
+Date: Wed, 15 Nov 2017 11:44:28 +0100
+Message-ID: <1510742668-21121-1-git-send-email-geert@linux-m68k.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Cc: Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Geert Uytterhoeven <geert@linux-m68k.org>
+To: Stephan Mueller <smueller@chronox.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from albert.telenet-ops.be ([195.130.137.90]:60832 "EHLO
+        albert.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1758188AbdKOOKi (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 15 Nov 2017 09:10:38 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The Arm TrustZone CryptoCell is a hardware security engine. This patch
-adds DT bindings for its Rich Execution Environment crypto engine.
+On 32-bit (e.g. with m68k-linux-gnu-gcc-4.1):
 
-A driver supporting this device is already present in the staging tree.
+    crypto/keywrap.c: In function ‘crypto_kw_decrypt’:
+    crypto/keywrap.c:191: warning: integer constant is too large for ‘long’ type
+    crypto/keywrap.c: In function ‘crypto_kw_encrypt’:
+    crypto/keywrap.c:224: warning: integer constant is too large for ‘long’ type
 
-Signed-off-by: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
+Fixes: 9e49451d7a15365d ("crypto: keywrap - simplify code")
+Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
 ---
- .../devicetree/bindings/crypto/arm-cryptocell.txt  | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/crypto/arm-cryptocell.txt
+ crypto/keywrap.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt b/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt
-new file mode 100644
-index 0000000..ccf8a101
---- /dev/null
-+++ b/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt
-@@ -0,0 +1,22 @@
-+Arm TrustZone CryptoCell cryptographic engine
-+
-+Required properties:
-+- compatible: Should be "arm,cryptocell-712-ree".
-+- reg: Base physical address of the engine and length of memory mapped region.
-+- interrupts: Interrupt number for the device.
-+
-+Optional properties:
-+- interrupt-parent: The phandle for the interrupt controller that services
-+  interrupts for this device.
-+- clocks: Reference to the crypto engine clock.
-+- dma-coherent: Present if dma operations are coherent.
-+
-+Examples:
-+
-+       arm_cc712: arm_cc712@80000000 {
-+               compatible = "arm,cryptocell-712-ree";
-+               interrupt-parent = <&intc>;
-+               interrupts = < 0 30 4 >;
-+               reg = < 0x80000000 0x10000 >;
-+
-+       };
+diff --git a/crypto/keywrap.c b/crypto/keywrap.c
+index 744e35134c45f300..ec5c6a087c901501 100644
+--- a/crypto/keywrap.c
++++ b/crypto/keywrap.c
+@@ -188,7 +188,7 @@ static int crypto_kw_decrypt(struct blkcipher_desc *desc,
+ 	}
+ 
+ 	/* Perform authentication check */
+-	if (block.A != cpu_to_be64(0xa6a6a6a6a6a6a6a6))
++	if (block.A != cpu_to_be64(0xa6a6a6a6a6a6a6a6ULL))
+ 		ret = -EBADMSG;
+ 
+ 	memzero_explicit(&block, sizeof(struct crypto_kw_block));
+@@ -221,7 +221,7 @@ static int crypto_kw_encrypt(struct blkcipher_desc *desc,
+ 	 * Place the predefined IV into block A -- for encrypt, the caller
+ 	 * does not need to provide an IV, but he needs to fetch the final IV.
+ 	 */
+-	block.A = cpu_to_be64(0xa6a6a6a6a6a6a6a6);
++	block.A = cpu_to_be64(0xa6a6a6a6a6a6a6a6ULL);
+ 
+ 	/*
+ 	 * src scatterlist is read-only. dst scatterlist is r/w. During the
 -- 
 2.7.4
-
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
