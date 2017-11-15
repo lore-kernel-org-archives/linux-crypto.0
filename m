@@ -1,59 +1,67 @@
-From: Gabriel Paubert <paubert@iram.es>
-Subject: Re: [PATCH][V2] crypto/nx: fix spelling mistake: "availavle" ->
- "available"
-Date: Tue, 14 Nov 2017 20:20:24 +0100
-Message-ID: <20171114192024.fg5fxh72xyxzkq3y@lt-gp.iram.es>
-References: <20171114143217.21456-1-colin.king@canonical.com>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: Re: [PATCH 00/24] staging: ccree: more cleanup patches
+Date: Wed, 15 Nov 2017 08:35:52 +0200
+Message-ID: <CAOtvUMdDiV7GC9NCx=AP7=Z3kSx=iMg=y-m4yp5z9cwV9dQrnA@mail.gmail.com>
+References: <1510584358-29473-1-git-send-email-gilad@benyossef.com>
+ <20171113183339.pdegwo7xexfucvs2@mwanda> <CAOtvUMdcFo80GCqQU9q9W7sEGK9fZUEykW59sgJMtFU59=1M_w@mail.gmail.com>
+ <20171114094818.rlwnetzq5qrgsntj@mwanda>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Haren Myneni <haren@us.ibm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Colin King <colin.king@canonical.com>
+Content-Type: text/plain; charset="UTF-8"
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        devel@driverdev.osuosl.org,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+        driverdev-devel@linuxdriverproject.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Ofir Drang <ofir.drang@arm.com>
+To: Dan Carpenter <dan.carpenter@oracle.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ci-l1mail2-out05a.puc.rediris.es ([130.206.19.23]:38735 "EHLO
-        ci-l1mail2-out05a.puc.rediris.es" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1753115AbdKNTat (ORCPT
+Received: from mail-ot0-f173.google.com ([74.125.82.173]:55054 "EHLO
+        mail-ot0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754305AbdKOGfx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 14 Nov 2017 14:30:49 -0500
-Content-Disposition: inline
-In-Reply-To: <20171114143217.21456-1-colin.king@canonical.com>
+        Wed, 15 Nov 2017 01:35:53 -0500
+Received: by mail-ot0-f173.google.com with SMTP id w8so18776046otw.11
+        for <linux-crypto@vger.kernel.org>; Tue, 14 Nov 2017 22:35:53 -0800 (PST)
+In-Reply-To: <20171114094818.rlwnetzq5qrgsntj@mwanda>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Nov 14, 2017 at 02:32:17PM +0000, Colin King wrote:
-> From: Colin Ian King <colin.king@canonical.com>
-> 
-> Trivial fix to spelling mistake in pr_err error message text. Also
-> fix spelling mistake in proceeding comment.
+On Tue, Nov 14, 2017 at 11:48 AM, Dan Carpenter
+<dan.carpenter@oracle.com> wrote:
+> On Tue, Nov 14, 2017 at 11:33:20AM +0200, Gilad Ben-Yossef wrote:
+>> On Mon, Nov 13, 2017 at 8:33 PM, Dan Carpenter <dan.carpenter@oracle.com> wrote:
+>> > These cleanups look nice.  Thanks.
+>> >
+>> > I hope you do a mass remove of likely/unlikely in a patch soon.
+>> > Whenever, I see one of those in a + line I always have to remind myself
+>> > that you're planning to do it in a later patch.
+>> >
+>>
+>> So, a question about that - there indeed seems to be an inflation of
+>> likely/unlikely in the ccree driver, but
+>> what stopped me from removing them was that I found out I don't have a
+>> clue about when it's a good idea
+>> to use them and when it isn't (obviously in places where you know the
+>> probable code flow of course).
+>>
+>> Any hints?
+>
+> They should only be included if benchmarking shows that it makes a
+> difference.  I think they need to be about 100 right predictions to 1
+> wrong prediction on a fast path.  So remove them all and add them back
+> one at a time.
+>
 
-s/proceeding/preceding/ ?
+OK, that makes a lot of sense.
 
-> 
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
-> ---
->  drivers/crypto/nx/nx-842-powernv.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/crypto/nx/nx-842-powernv.c b/drivers/crypto/nx/nx-842-powernv.c
-> index f2246a5abcf6..1e87637c412d 100644
-> --- a/drivers/crypto/nx/nx-842-powernv.c
-> +++ b/drivers/crypto/nx/nx-842-powernv.c
-> @@ -743,8 +743,8 @@ static int nx842_open_percpu_txwins(void)
->  		}
->  
->  		if (!per_cpu(cpu_txwin, i)) {
-> -			/* shoudn't happen, Each chip will have NX engine */
-> -			pr_err("NX engine is not availavle for CPU %d\n", i);
-> +			/* shouldn't happen, Each chip will have NX engine */
-> +			pr_err("NX engine is not available for CPU %d\n", i);
->  			return -EINVAL;
->  		}
->  	}
-> -- 
-> 2.14.1
+Thanks,
+Gilad
+
+
+-- 
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+"If you take a class in large-scale robotics, can you end up in a
+situation where the homework eats your dog?"
+ -- Jean-Baptiste Queru
