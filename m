@@ -1,105 +1,55 @@
-From: Vinod Koul <vinod.koul-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH RESEND 1/4] crypto: caam: add caam-dma node to SEC4.0
- device tree binding
-Date: Thu, 16 Nov 2017 11:54:19 +0530
-Message-ID: <20171116062419.GR3187@localhost>
-References: <20171030134654.13729-1-horia.geanta@nxp.com>
- <20171030134654.13729-2-horia.geanta@nxp.com>
- <20171030092424.1279add003c96ced4233bd2d@arm.com>
- <VI1PR04MB1325BAD68A7CC8C7A302D9A48A570@VI1PR04MB1325.eurprd04.prod.outlook.com>
- <20171109103437.834f8ddb5c62e5253002b2d0@arm.com>
- <VI1PR04MB13253DB5164A151D8E4AB8308A540@VI1PR04MB1325.eurprd04.prod.outlook.com>
- <20171110104430.28b2f56f910b7514d778c4b2@arm.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2 2/2] chcr: Add support for Inline IPSec
+Date: Thu, 16 Nov 2017 18:06:28 +1100
+Message-ID: <20171116070628.GA21071@gondor.apana.org.au>
+References: <1510226941-20472-1-git-send-email-atul.gupta@chelsio.com>
+ <201711161235.7CcyCmC8%fengguang.wu@intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Radu Andrei Alexe <radu.alexe-3arQi8VN3Tc@public.gmane.org>,
-        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta-3arQi8VN3Tc@public.gmane.org>,
-        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-        "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-        Dan Douglass <dan.douglass-3arQi8VN3Tc@public.gmane.org>,
-        Shawn Guo <shawnguo-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        "dmaengine-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <dmaengine-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        "linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        "devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Kim Phillips <kim.phillips-5wv7dgnIgG8@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: Atul Gupta <atul.gupta@chelsio.com>, kbuild-all@01.org,
+        linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+        steffen.klassert@secunet.com, Harsh Jain <harsh@chelsio.com>,
+        Ganesh Goudar <ganeshgr@chelsio.com>
+To: kbuild test robot <lkp@intel.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from [128.1.224.119] ([128.1.224.119]:38130 "EHLO ringil.hmeau.com"
+        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
+        id S1750814AbdKPHGv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Nov 2017 02:06:51 -0500
 Content-Disposition: inline
-In-Reply-To: <20171110104430.28b2f56f910b7514d778c4b2-5wv7dgnIgG8@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <201711161235.7CcyCmC8%fengguang.wu@intel.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Nov 10, 2017 at 10:44:30AM -0600, Kim Phillips wrote:
-> On Fri, 10 Nov 2017 08:02:01 +0000
-> Radu Andrei Alexe <radu.alexe-3arQi8VN3Tc@public.gmane.org> wrote:
+On Thu, Nov 16, 2017 at 01:19:52PM +0800, kbuild test robot wrote:
+> Hi Atul,
 > 
-> > On 11/9/2017 6:34 PM, Kim Phillips wrote:
-> > > On Thu, 9 Nov 2017 11:54:13 +0000
-> > > Radu Andrei Alexe <radu.alexe-3arQi8VN3Tc@public.gmane.org> wrote:
-> > >> The next patch version will create the platform device dynamically at
-> > >> run time.
-> > > 
-> > > Why create a new device when that h/w already has one?
-> > > 
-> > > Why doesn't the existing crypto driver register dma capabilities with
-> > > the dma driver subsystem?
-> > >
-> > I can think of two reasons:
-> > 
-> > 1. The code that this driver introduces has nothing to do with crypto 
-> > and everything to do with dma.
+> Thank you for the patch! Yet something to improve:
 > 
-> I would think that at least a crypto "null" algorithm implementation
-> would share code.
+> [auto build test ERROR on cryptodev/master]
+> [also build test ERROR on next-20171115]
+> [cannot apply to v4.14]
+> [if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
 > 
-> > Placing the code in the same directory as 
-> > the caam subsystem would only create confusion for the reader of an 
-> > already complex driver.
+> url:    https://github.com/0day-ci/linux/commits/Atul-Gupta/cxgb4-Add-support-for-Inline-IPSec-Tx/20171112-012558
+> base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+> config: x86_64-randconfig-g0-11160917 (attached as .config)
+> compiler: gcc-4.9 (Debian 4.9.4-2) 4.9.4
+> reproduce:
+>         # save the attached .config to linux build tree
+>         make ARCH=x86_64 
 > 
-> this different directory argument seems to be identical to your 2 below:
+> All errors (new ones prefixed by >>):
 > 
-> > 2. I wanted this driver to be tracked by the dma engine team. They have 
-> > the right expertise to provide adequate feedback. If all the code was in 
-> > the crypto directory they wouldn't know about this driver or any 
-> > subsequent changes to it.
-> 
-> dma subsystem bits could still be put in the dma area if deemed
-> necessary but I don't think it is: I see
-> drivers/crypto/ccp/ccp-dmaengine.c calls dma_async_device_register for
-> example.
+>    drivers/crypto/chelsio/chcr_core.o: In function `chcr_uld_tx_handler':
+> >> drivers/crypto/chelsio/chcr_core.c:195: undefined reference to `chcr_ipsec_xmit'
+>    drivers/crypto/chelsio/chcr_core.o: In function `chcr_uld_add':
+> >> drivers/crypto/chelsio/chcr_core.c:169: undefined reference to `chcr_add_xfrmops'
 
-which is a shame as it was sneaked past the dmaengine community!!
+Atul, can you fix this and resubmit your patches please?
 
-This is the *only* example and there and other examples where people use
-dmaengine:
-
-$ grep -rl dmaengine_prep* drivers/crypto/* |uniq
-drivers/crypto/atmel-aes.c
-drivers/crypto/atmel-sha.c
-drivers/crypto/atmel-tdes.c
-drivers/crypto/img-hash.c
-drivers/crypto/omap-aes.c
-drivers/crypto/omap-des.c
-drivers/crypto/omap-sham.c
-drivers/crypto/qce/dma.c
-drivers/crypto/stm32/stm32-hash.c
-drivers/crypto/ux500/cryp/cryp_core.c
-drivers/crypto/ux500/hash/hash_core.c
-
-
-
-> 
-> I also don't see how that complicates things much further.
-> 
-> What is the rationale for using the crypto h/w as a dma engine anyway?
-> Are there supporting performance figures?
-
-that is a very good question, perf does matter. Given that we have many
-folks using it, I think it would help, but yes nothing better than numbers
-speak for themselves.
-
+Thanks!
 -- 
-~Vinod
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
