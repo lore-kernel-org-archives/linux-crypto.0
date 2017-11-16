@@ -1,76 +1,70 @@
-From: Alex Williamson <alex.williamson@redhat.com>
+From: "Raj, Ashok" <ashok.raj-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
 Subject: Re: [PATCH] iommu/vt-d: Fix scatterlist offset handling
-Date: Thu, 16 Nov 2017 14:32:44 -0700
-Message-ID: <20171116143244.2583d044@t450s.home>
+Date: Thu, 16 Nov 2017 13:09:33 -0800
+Message-ID: <20171116210933.GA53016@otc-nc-03>
 References: <644c3e01654f8bd48d669c36e424959d6ef0e27e.1506607370.git.robin.murphy@arm.com>
-        <1507035334.29211.105.camel@infradead.org>
-        <db8c70d7-5978-20e8-d29a-91a4312f97dd@arm.com>
-        <20171006144309.GA30803@8bytes.org>
-        <20171106104709.06b38f7c@jacob-builder>
-        <20171115155456.141a6dc8@jacob-builder>
+	<1507035334.29211.105.camel@infradead.org>
+	<db8c70d7-5978-20e8-d29a-91a4312f97dd@arm.com>
+	<20171006144309.GA30803@8bytes.org>
+	<20171106104709.06b38f7c@jacob-builder>
+	<20171115155456.141a6dc8@jacob-builder>
+	<20171116143244.2583d044@t450s.home>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: Joerg Roedel <joro@8bytes.org>,
-        Robin Murphy <robin.murphy@arm.com>, leedom@chelsio.com,
-        herbert@gondor.apana.org.au, linux-kernel@vger.kernel.org,
-        iommu@lists.linux-foundation.org, linux-crypto@vger.kernel.org,
-        David Woodhouse <dwmw2@infradead.org>, Harsh@chelsio.com
-To: Jacob Pan <jacob.jun.pan@linux.intel.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:55640 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S933833AbdKPVcr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Nov 2017 16:32:47 -0500
-In-Reply-To: <20171115155456.141a6dc8@jacob-builder>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: leedom-ut6Up61K2wZBDgjK7y7TUQ@public.gmane.org, herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	David Woodhouse <dwmw2-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>, Harsh-ut6Up61K2wZBDgjK7y7TUQ@public.gmane.org
+To: Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20171116143244.2583d044-1yVPhWWZRC1BDLzU/O5InQ@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, 15 Nov 2017 15:54:56 -0800
-Jacob Pan <jacob.jun.pan@linux.intel.com> wrote:
+Hi Alex
 
-> Hi Alex and all,
+On Thu, Nov 16, 2017 at 02:32:44PM -0700, Alex Williamson wrote:
+> On Wed, 15 Nov 2017 15:54:56 -0800
+> Jacob Pan <jacob.jun.pan-VuQAYsv1563Yd54FQh9/CA@public.gmane.org> wrote:
 > 
-> Just wondering if you could merge Robin's patch for the next rc. From
-> all our testing, this seems to be a solid fix and should be included in
-> the stable releases as well.
-
-Hi Jacob,
-
-Sorry, this wasn't on my radar, I only scanned for patches back through
-about when Joerg refreshed his next branch (others on the list speak up
-if I didn't pickup your patches for the v4.15 merge window).
-
-This patch makes sense to me and I'm glad you were able to work through
-the anomaly Harsh saw in testing as an unrelated issue, but...
-
-> On Mon, 6 Nov 2017 10:47:09 -0800
-> Jacob Pan <jacob.jun.pan@linux.intel.com> wrote:
+> > Hi Alex and all,
+> > 
+> > Just wondering if you could merge Robin's patch for the next rc. From
+> > all our testing, this seems to be a solid fix and should be included in
+> > the stable releases as well.
 > 
-> > On Fri, 6 Oct 2017 16:43:09 +0200
-> > Joerg Roedel <joro@8bytes.org> wrote:
-> >   
-> > > On Tue, Oct 03, 2017 at 07:05:17PM +0100, Robin Murphy wrote:    
-> > > > Now, there are indeed plenty of drivers and subsystems which do
-> > > > work on lists of explicitly single pages - anything doing some
-> > > > variant of "addr = kmap_atomic(sg_page(sg)) + sg->offset;" is easy
-> > > > to spot - but I don't think DMA API implementations are in a
-> > > > position to make any kind of assumption; nearly all of them just
-> > > > shut up and handle sg->length bytes from sg_phys(sg) without
-> > > > questioning the caller, and I reckon that's exactly what they
-> > > > should be doing.      
-> > > 
-> > > I agree with that, it is not explicitly forbidden to have an
-> > > sg->offset > PAGE_SIZE and most IOMMU drivers handle this case.
-> > > 
-> > > So this is a problem I'd like to see resolved in the VT-d driver
-> > > too. If nobody comes up with a correct fix soon I'll apply this one
-> > > and rip out the large-page support from __domain_mapping() to make
-> > > it work.
+> Hi Jacob,
+> 
+> Sorry, this wasn't on my radar, I only scanned for patches back through
+> about when Joerg refreshed his next branch (others on the list speak up
+> if I didn't pickup your patches for the v4.15 merge window).
+> 
+> This patch makes sense to me and I'm glad you were able to work through
+> the anomaly Harsh saw in testing as an unrelated issue, but...
+> 
+> 
+> What do we do about this?  I certainly can't rip out large page support
+> and put a stable tag on the patch.  I'm not really spotting what's
+> wrong with large page support here, other than the comment about it
+> being a mess.  Suggestions?  Thanks,
+> 
 
-What do we do about this?  I certainly can't rip out large page support
-and put a stable tag on the patch.  I'm not really spotting what's
-wrong with large page support here, other than the comment about it
-being a mess.  Suggestions?  Thanks,
+Largepage seems to work and i don't think we need to rip it out. When
+Harsh tested it at one point we thought disabling super-page seemed to make
+the problem go away. Jacob tested and we still saw the need for Robin's patch.
 
-Alex
+Yes, the function looks humongous but i don't think we should wait for that 
+before this merge.
+
+Cheers,
+Ashok
