@@ -1,70 +1,69 @@
-From: "Raj, Ashok" <ashok.raj-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] iommu/vt-d: Fix scatterlist offset handling
-Date: Thu, 16 Nov 2017 13:09:33 -0800
-Message-ID: <20171116210933.GA53016@otc-nc-03>
-References: <644c3e01654f8bd48d669c36e424959d6ef0e27e.1506607370.git.robin.murphy@arm.com>
-	<1507035334.29211.105.camel@infradead.org>
-	<db8c70d7-5978-20e8-d29a-91a4312f97dd@arm.com>
-	<20171006144309.GA30803@8bytes.org>
-	<20171106104709.06b38f7c@jacob-builder>
-	<20171115155456.141a6dc8@jacob-builder>
-	<20171116143244.2583d044@t450s.home>
+From: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+Subject: Re: [PATCH v2] tpm: Move Linux RNG connection to hwrng
+Date: Fri, 17 Nov 2017 15:28:53 +0200
+Message-ID: <20171117132853.cmr3wmsc3biedv7p@linux.intel.com>
+References: <20171031200503.GC18578@ziepe.ca>
+ <20171105110506.usxmuzrvcjvxahr6@linux.intel.com>
+ <20171106022704.GD26011@ziepe.ca>
+ <CANc+2y6dx_2zOzFA5aFs7RpEV8aNqxpDghmx+q_+XyendYJoew@mail.gmail.com>
+ <20171107160404.GG21466@ziepe.ca>
+ <20171114143421.3jxn6fzvgp2xmyk6@linux.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: leedom-ut6Up61K2wZBDgjK7y7TUQ@public.gmane.org, herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	David Woodhouse <dwmw2-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>, Harsh-ut6Up61K2wZBDgjK7y7TUQ@public.gmane.org
-To: Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
+        Stefan Berger <stefanb@linux.vnet.ibm.com>,
+        linux-integrity@vger.kernel.org,
+        David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:INTEGRITY MEASUREMENT ARCHITECTURE (IMA)"
+        <linux-security-module@vger.kernel.org>,
+        "open list:KEYS-TRUSTED" <keyrings@vger.kernel.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        James Morris <james.l.morris@oracle.com>,
+        Matt Mackall <mpm@selenic.com>,
+        David Safford <safford@us.ibm.com>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        "Serge E. Hallyn" <serge@hallyn.com>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga03.intel.com ([134.134.136.65]:36395 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S934046AbdKQN3A (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 17 Nov 2017 08:29:00 -0500
 Content-Disposition: inline
-In-Reply-To: <20171116143244.2583d044-1yVPhWWZRC1BDLzU/O5InQ@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20171114143421.3jxn6fzvgp2xmyk6@linux.intel.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Alex
-
-On Thu, Nov 16, 2017 at 02:32:44PM -0700, Alex Williamson wrote:
-> On Wed, 15 Nov 2017 15:54:56 -0800
-> Jacob Pan <jacob.jun.pan-VuQAYsv1563Yd54FQh9/CA@public.gmane.org> wrote:
-> 
-> > Hi Alex and all,
+On Tue, Nov 14, 2017 at 04:34:21PM +0200, Jarkko Sakkinen wrote:
+> On Tue, Nov 07, 2017 at 09:04:04AM -0700, Jason Gunthorpe wrote:
+> > On Tue, Nov 07, 2017 at 08:50:44AM +0530, PrasannaKumar Muralidharan wrote:
 > > 
-> > Just wondering if you could merge Robin's patch for the next rc. From
-> > all our testing, this seems to be a solid fix and should be included in
-> > the stable releases as well.
+> > > I am assuming you are talking about the following patches - using
+> > > struct tpm_chip instead of chip number and this patch.
+> > 
+> > yes
+> > 
+> > > I won't be able to test if struct tpm_chip usage as I don't have
+> > > multiple tpm hw in one machine. In case of tpm rng changes I can test
+> > > only the lifecycle of tpm rng device. Is that enough? I feel my test
+> > > will be limited. Please provide your thoughts on this.
+> > 
+> > That is certainly better than no testing.
+> > 
+> > Jason
 > 
-> Hi Jacob,
+> WFM too.
 > 
-> Sorry, this wasn't on my radar, I only scanned for patches back through
-> about when Joerg refreshed his next branch (others on the list speak up
-> if I didn't pickup your patches for the v4.15 merge window).
+> Tested-by: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+> Reviewed-by: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
 > 
-> This patch makes sense to me and I'm glad you were able to work through
-> the anomaly Harsh saw in testing as an unrelated issue, but...
-> 
-> 
-> What do we do about this?  I certainly can't rip out large page support
-> and put a stable tag on the patch.  I'm not really spotting what's
-> wrong with large page support here, other than the comment about it
-> being a mess.  Suggestions?  Thanks,
-> 
+> /Jarkko
 
-Largepage seems to work and i don't think we need to rip it out. When
-Harsh tested it at one point we thought disabling super-page seemed to make
-the problem go away. Jacob tested and we still saw the need for Robin's patch.
+I applied these commits. Please check that everything is correct as
+I had to do manual work with the 2nd commit.
 
-Yes, the function looks humongous but i don't think we should wait for that 
-before this merge.
-
-Cheers,
-Ashok
+/Jarkko
