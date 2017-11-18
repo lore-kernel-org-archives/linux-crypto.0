@@ -1,52 +1,53 @@
 From: "Yang Shi" <yang.s@alibaba-inc.com>
-Subject: [PATCH 8/8] net: tipc: remove unused hardirq.h
-Date: Sat, 18 Nov 2017 07:02:21 +0800
-Message-ID: <1510959741-31109-8-git-send-email-yang.s@alibaba-inc.com>
+Subject: Re: [PATCH 7/8] net: ovs: remove unused hardirq.h
+Date: Sat, 18 Nov 2017 09:48:45 +0800
+Message-ID: <7877c3bd-74ec-a7d2-61d3-85a4c452e710@alibaba-inc.com>
 References: <1510959741-31109-1-git-send-email-yang.s@alibaba-inc.com>
-Cc: <linux-mm@kvack.org>,
-   <linux-fsdevel@vger.kernel.org>,
-   <linux-crypto@vger.kernel.org>,
-   <netdev@vger.kernel.org>,
-  "Yang Shi" <yang.s@alibaba-inc.com>,
-  "Jon Maloy" <jon.maloy@ericsson.com>,
-  "Ying Xue" <ying.xue@windriver.com>,
-  "David S. Miller" <davem@davemloft.net>
+ <1510959741-31109-7-git-send-email-yang.s@alibaba-inc.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+        pshelar@ovn.org, "David S. Miller" <davem@davemloft.net>,
+        dev@openvswitch.org
 To: linux-kernel@vger.kernel.org
-Return-path: <owner-linux-mm@kvack.org>
-In-Reply-To: <1510959741-31109-1-git-send-email-yang.s@alibaba-inc.com>
-Sender: owner-linux-mm@kvack.org
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+In-Reply-To: <1510959741-31109-7-git-send-email-yang.s@alibaba-inc.com>
+Content-Language: en-US
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Preempt counter APIs have been split out, currently, hardirq.h just
-includes irq_enter/exit APIs which are not used by TIPC at all.
+It looks the email address of Pravin in MAINTAINERS file is obsolete, 
+sent to the right address.
 
-So, remove the unused hardirq.h.
+Yang
 
-Signed-off-by: Yang Shi <yang.s@alibaba-inc.com>
-Cc: Jon Maloy <jon.maloy@ericsson.com>
-Cc: Ying Xue <ying.xue@windriver.com>
-Cc: "David S. Miller" <davem@davemloft.net>
----
- net/tipc/core.h | 1 -
- 1 file changed, 1 deletion(-)
 
-diff --git a/net/tipc/core.h b/net/tipc/core.h
-index 5cc5398..099e072 100644
---- a/net/tipc/core.h
-+++ b/net/tipc/core.h
-@@ -49,7 +49,6 @@
- #include <linux/uaccess.h>
- #include <linux/interrupt.h>
- #include <linux/atomic.h>
--#include <asm/hardirq.h>
- #include <linux/netdevice.h>
- #include <linux/in.h>
- #include <linux/list.h>
--- 
-1.8.3.1
-
---
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+On 11/17/17 3:02 PM, Yang Shi wrote:
+> Preempt counter APIs have been split out, currently, hardirq.h just
+> includes irq_enter/exit APIs which are not used by openvswitch at all.
+> 
+> So, remove the unused hardirq.h.
+> 
+> Signed-off-by: Yang Shi <yang.s@alibaba-inc.com>
+> Cc: Pravin Shelar <pshelar@nicira.com>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: dev@openvswitch.org
+> ---
+>   net/openvswitch/vport-internal_dev.c | 1 -
+>   1 file changed, 1 deletion(-)
+> 
+> diff --git a/net/openvswitch/vport-internal_dev.c b/net/openvswitch/vport-internal_dev.c
+> index 04a3128..2f47c65 100644
+> --- a/net/openvswitch/vport-internal_dev.c
+> +++ b/net/openvswitch/vport-internal_dev.c
+> @@ -16,7 +16,6 @@
+>    * 02110-1301, USA
+>    */
+>   
+> -#include <linux/hardirq.h>
+>   #include <linux/if_vlan.h>
+>   #include <linux/kernel.h>
+>   #include <linux/netdevice.h>
+> 
