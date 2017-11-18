@@ -1,50 +1,36 @@
-From: Stefan Wahren <stefan.wahren@i2se.com>
-Subject: [PATCH 2/2] ARM: bcm283x: Add missing interrupt for RNG block
-Date: Sat, 18 Nov 2017 14:04:13 +0100
-Message-ID: <1511010253-5006-3-git-send-email-stefan.wahren@i2se.com>
-References: <1511010253-5006-1-git-send-email-stefan.wahren@i2se.com>
-Cc: Scott Branden <sbranden@broadcom.com>, Ray Jui <rjui@broadcom.com>,
-        bcm-kernel-feedback-list@broadcom.com,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-rpi-kernel@lists.infradead.org,
-        Stefan Wahren <stefan.wahren@i2se.com>
-To: Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Eric Anholt <eric@anholt.net>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.187]:64486 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1424311AbdKRNF3 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 18 Nov 2017 08:05:29 -0500
-In-Reply-To: <1511010253-5006-1-git-send-email-stefan.wahren@i2se.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Subject: [PATCH] crypto: hifn_795x - Fix a memory leak in the error handling path of 'hifn_probe()'
+Date: Sat, 18 Nov 2017 14:45:45 +0100
+Message-ID: <20171118134545.25784-1-christophe.jaillet@wanadoo.fr>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-janitors@vger.kernel.org,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+To: herbert@gondor.apana.org.au, davem@davemloft.net
+Return-path: <kernel-janitors-owner@vger.kernel.org>
+Sender: kernel-janitors-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-This patch adds the missing interrupt property to the RNG block
-of BCM283x.
+'dev' is leaking in the error handling path of 'hifn_probe()'.
 
-Link: https://github.com/raspberrypi/linux/issues/2195
-CC: Florian Fainelli <f.fainelli@gmail.com>
-Signed-off-by: Stefan Wahren <stefan.wahren@i2se.com>
+Add a 'kfree(dev)' to match the code in 'hifn_remove()'
+
+Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
 ---
- arch/arm/boot/dts/bcm283x.dtsi | 1 +
+ drivers/crypto/hifn_795x.c | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/arch/arm/boot/dts/bcm283x.dtsi b/arch/arm/boot/dts/bcm283x.dtsi
-index 013431e..0c17a81 100644
---- a/arch/arm/boot/dts/bcm283x.dtsi
-+++ b/arch/arm/boot/dts/bcm283x.dtsi
-@@ -135,6 +135,7 @@
- 		rng@7e104000 {
- 			compatible = "brcm,bcm2835-rng";
- 			reg = <0x7e104000 0x10>;
-+			interrupts = <2 29>;
- 		};
+diff --git a/drivers/crypto/hifn_795x.c b/drivers/crypto/hifn_795x.c
+index e09d4055b19e..a5a36fe7bf2c 100644
+--- a/drivers/crypto/hifn_795x.c
++++ b/drivers/crypto/hifn_795x.c
+@@ -2579,6 +2579,7 @@ static int hifn_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 	for (i = 0; i < 3; ++i)
+ 		if (dev->bar[i])
+ 			iounmap(dev->bar[i]);
++	kfree(dev);
  
- 		mailbox: mailbox@7e00b880 {
+ err_out_free_regions:
+ 	pci_release_regions(pdev);
 -- 
-2.7.4
+2.14.1
+
