@@ -1,36 +1,105 @@
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Subject: [PATCH] crypto: hifn_795x - Fix a memory leak in the error handling path of 'hifn_probe()'
-Date: Sat, 18 Nov 2017 14:45:45 +0100
-Message-ID: <20171118134545.25784-1-christophe.jaillet@wanadoo.fr>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-janitors@vger.kernel.org,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To: herbert@gondor.apana.org.au, davem@davemloft.net
-Return-path: <kernel-janitors-owner@vger.kernel.org>
-Sender: kernel-janitors-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Pierre <pinaraf@pinaraf.info>
+Subject: Re: [PATCH] Fix NULL pointer deref. on no default_rng
+Date: Sat, 18 Nov 2017 18:18:19 +0100
+Message-ID: <1611020.Ca7VyhhiKU@peanuts2>
+References: <20171112142432.20186-1-pinaraf@pinaraf.info> <CANc+2y70xppF_wZAi4urVtKGGdn4-GzVHkqEh82rxCS_pD7BDA@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: multipart/signed; boundary="nextPart7445310.ZMAl3vrWKW"; micalg="pgp-sha512"; protocol="application/pgp-signature"
+Cc: "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        "David S . Miller" <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+To: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mout.kundenserver.de ([212.227.17.24]:58986 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S967008AbdKRRSw (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 18 Nov 2017 12:18:52 -0500
+In-Reply-To: <CANc+2y70xppF_wZAi4urVtKGGdn4-GzVHkqEh82rxCS_pD7BDA@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-'dev' is leaking in the error handling path of 'hifn_probe()'.
+--nextPart7445310.ZMAl3vrWKW
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 
-Add a 'kfree(dev)' to match the code in 'hifn_remove()'
+On Sunday, November 12, 2017 8:16:27 PM CET PrasannaKumar Muralidharan wrote:
+> Hi Pierre,
+> 
+> On 12 November 2017 at 19:54, Pierre Ducroquet <pinaraf@pinaraf.info> wrote:
+> > If crypto_get_default_rng returns an error, the
+> > function ecc_gen_privkey should return an error.
+> > Instead, it currently tries to use the default_rng
+> > nevertheless, thus creating a kernel panic with a
+> > NULL pointer dereference.
+> > Returning the error directly, as was supposedly
+> > intended when looking at the code, fixes this.
+> > 
+> > Signed-off-by: Pierre Ducroquet <pinaraf@pinaraf.info>
+> > ---
+> > 
+> >  crypto/ecc.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/crypto/ecc.c b/crypto/ecc.c
+> > index 633a9bcdc574..18f32f2a5e1c 100644
+> > --- a/crypto/ecc.c
+> > +++ b/crypto/ecc.c
+> > @@ -964,7 +964,7 @@ int ecc_gen_privkey(unsigned int curve_id, unsigned
+> > int ndigits, u64 *privkey)> 
+> >          * DRBG with a security strength of 256.
+> >          */
+> >         
+> >         if (crypto_get_default_rng())
+> > 
+> > -               err = -EFAULT;
+> > +               return -EFAULT;
+> > 
+> >         err = crypto_rng_get_bytes(crypto_default_rng, (u8 *)priv,
+> >         nbytes);
+> >         crypto_put_default_rng();
+> > 
+> > --
+> > 2.15.0
+> 
+> Looks good to me.
+> 
+> Reviewed-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+> 
+> Regards,
+> PrasannaKumar
 
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
----
- drivers/crypto/hifn_795x.c | 1 +
- 1 file changed, 1 insertion(+)
+Hi
 
-diff --git a/drivers/crypto/hifn_795x.c b/drivers/crypto/hifn_795x.c
-index e09d4055b19e..a5a36fe7bf2c 100644
---- a/drivers/crypto/hifn_795x.c
-+++ b/drivers/crypto/hifn_795x.c
-@@ -2579,6 +2579,7 @@ static int hifn_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	for (i = 0; i < 3; ++i)
- 		if (dev->bar[i])
- 			iounmap(dev->bar[i]);
-+	kfree(dev);
- 
- err_out_free_regions:
- 	pci_release_regions(pdev);
--- 
-2.14.1
+Thanks for your review.
+Is there anything I should do to have this merged ? It fixes a kernel panic at 
+boot on my computer, so I suppose other people may have that too.
 
+Regards
+ Pierre
+
+
+--nextPart7445310.ZMAl3vrWKW
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part.
+Content-Transfer-Encoding: 7Bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEds3aTMo5n1dvXH/GYkPWy+GpSGUFAloQa1sACgkQYkPWy+Gp
+SGUbjg//Zd9xAU9sZvUazEHWO++Y6m7tjQTn9x7vRNQNv7Ciskf6t1n9hoN8FGFv
+yO03HhYauyoJWsdB3ZAfDwlxdmTMV4hUCvRj9pbAVDTHfRPcqzxL4UhqodPjDWS+
+h5FRkl6+wlPoCmkXVZ15ihqjtMd9jkXjWP3AXP1wz8ru/RtLbpkJuaPkGshbotJ5
+Hitg0AgzGuPJYLZ7n3us/KncD9i4KWRuD1UP2EF6Fjm5tH0r5gd5aqmoE0VlPqeg
+Ah+UVJ70Bmjk+ZvhTx4E5F9GsYf90FBgCQ+DWnpB4udz6vsa7Hq9dWH8IYFTd2Et
+o7TC699cU46bOrbbalxW3Q8sJTOkNMOY16jJHjj0YocLotbyER5xJqAV6gPWoZYH
+Op90XcPwfbem2JcASSVig3ry8qIkcZLkEPWxa0DktCHXsFfJZZ8hJ+ZPsRUvAU7h
+n8zCzYH1h5zysi9AnrDIF6BgLrD+SHMUEcCBF6T4k8h8y50kFsmespW5Jpd9UHmk
+wkvBVvB16F1l0eB7/+fK1rEEyxyxfyo58+Fs0XLi1ACMZOxSJ8uAPt/tVNiRKi4I
+WCLStUvb4mxWs6iAMSaFsLWXR7dP6DYuwPWEZuSfH1l9r/SgU/tSXYOE+yWh2RLT
+dz149WF+F7RX6H9oQq26mWPQP7h53Tp2xFtzoWR/GhYwMB5zt2Q=
+=qasB
+-----END PGP SIGNATURE-----
+
+--nextPart7445310.ZMAl3vrWKW--
