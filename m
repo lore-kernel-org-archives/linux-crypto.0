@@ -1,36 +1,40 @@
-From: Greg KH <greg@kroah.com>
-Subject: Re: [PATCH -stable] arm: crypto: reduce priority of bit-sliced AES
- cipher
-Date: Sun, 19 Nov 2017 11:21:54 +0100
-Message-ID: <20171119102154.GA12993@kroah.com>
-References: <20171117195027.88288-1-ebiggers@google.com>
+From: David Sterba <dsterba@suse.cz>
+Subject: Re: [PATCH 3/8] fs: btrfs: remove unused hardirq.h
+Date: Mon, 20 Nov 2017 14:25:16 +0100
+Message-ID: <20171120132516.GY28899@twin.jikos.cz>
+References: <1510959741-31109-1-git-send-email-yang.s@alibaba-inc.com>
+ <1510959741-31109-3-git-send-email-yang.s@alibaba-inc.com>
+Reply-To: dsterba@suse.cz
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: stable@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        linux-crypto@vger.kernel.org
-To: Eric Biggers <ebiggers@google.com>
-Return-path: <stable-owner@vger.kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	linux-fsdevel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	netdev@vger.kernel.org, Chris Mason <clm@fb.com>,
+	Josef Bacik <jbacik@fb.com>, David Sterba <dsterba@suse.com>,
+	linux-btrfs@vger.kernel.org
+To: Yang Shi <yang.s@alibaba-inc.com>
+Return-path: <owner-linux-mm@kvack.org>
 Content-Disposition: inline
-In-Reply-To: <20171117195027.88288-1-ebiggers@google.com>
-Sender: stable-owner@vger.kernel.org
+In-Reply-To: <1510959741-31109-3-git-send-email-yang.s@alibaba-inc.com>
+Sender: owner-linux-mm@kvack.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Nov 17, 2017 at 11:50:27AM -0800, Eric Biggers wrote:
-> Hi,
+On Sat, Nov 18, 2017 at 07:02:16AM +0800, Yang Shi wrote:
+> Preempt counter APIs have been split out, currently, hardirq.h just
+> includes irq_enter/exit APIs which are not used by btrfs at all.
 > 
-> I'd like the following patch to be applied to stable for versions
-> between 4.1 and 4.10 (inclusively).
+> So, remove the unused hardirq.h.
 > 
-> This is a minimal fix for a bug where arm32 kernels can use a much
-> slower implementation of AES than is actually available, potentially
-> forcing vendors to disable encryption on their devices.
-> 
-> Min version is 4.1 because that was the first version to include the
-> aes-ce algorithms.
-> 
-> Max version is 4.10 because in 4.11, this bug was fixed incidentally as
-> part of a complete rewrite of the bit-sliced AES implementation.
+> Signed-off-by: Yang Shi <yang.s@alibaba-inc.com>
+> Cc: Chris Mason <clm@fb.com>
+> Cc: Josef Bacik <jbacik@fb.com>
+> Cc: David Sterba <dsterba@suse.com>
+> Cc: linux-btrfs@vger.kernel.org
 
-Thanks for the patch, now queued up.
+Acked-by: David Sterba <dsterba@suse.com>
 
-greg k-h
+--
+To unsubscribe, send a message with 'unsubscribe linux-mm' in
+the body to majordomo@kvack.org.  For more info on Linux MM,
+see: http://www.linux-mm.org/ .
+Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
