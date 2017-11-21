@@ -1,365 +1,83 @@
-From: Nick Desaulniers <ndesaulniers@google.com>
-Subject: Re: [PATCH] crypto/arm64: aes-ce-cipher - move assembler code to .S file
-Date: Tue, 21 Nov 2017 09:32:24 -0800
-Message-ID: <CAKwvOd=4Y6WEefbPGTmoqEVQUmOV9v4uGjGm9SAfBTq9tsgAbw@mail.gmail.com>
-References: <20171121134017.21247-1-ard.biesheuvel@linaro.org>
+From: Eric Biggers <ebiggers@google.com>
+Subject: Re: x509 parsing bug + fuzzing crypto in the userspace
+Date: Tue, 21 Nov 2017 12:46:28 -0800
+Message-ID: <20171121204628.GA56006@google.com>
+References: <CAG_fn=XJZG_MJXXgos5jZmOThKho=uSvwgfhkMSYONZ04PKKaw@mail.gmail.com>
+ <20171120214257.GB61394@google.com>
+ <CACT4Y+b5n-G_+mjYHMzaibrMKAwXZ=SqsnK3f+Qu=uT8VN1yMQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        Mark Rutland <mark.rutland@arm.com>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Alex Matveev <alxmtvv@gmail.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        Greg Hackmann <ghackmann@google.com>,
-        Kees Cook <keescook@chromium.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Yury Norov <ynorov@caviumnetworks.com>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        Will Deacon <will.deacon@arm.com>, herbert@gondor.apana.org.au
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Alexander Potapenko <glider@google.com>,
+        linux-crypto@vger.kernel.org, Kostya Serebryany <kcc@google.com>,
+        keyrings@vger.kernel.org, Andrey Konovalov <andreyknvl@google.com>
+To: Dmitry Vyukov <dvyukov@google.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-lf0-f66.google.com ([209.85.215.66]:37570 "EHLO
-        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751145AbdKURc0 (ORCPT
+Received: from mail-io0-f181.google.com ([209.85.223.181]:37569 "EHLO
+        mail-io0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751067AbdKUUqd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Nov 2017 12:32:26 -0500
-Received: by mail-lf0-f66.google.com with SMTP id y2so14142644lfj.4
-        for <linux-crypto@vger.kernel.org>; Tue, 21 Nov 2017 09:32:26 -0800 (PST)
-In-Reply-To: <20171121134017.21247-1-ard.biesheuvel@linaro.org>
+        Tue, 21 Nov 2017 15:46:33 -0500
+Received: by mail-io0-f181.google.com with SMTP id v21so20923302ioi.4
+        for <linux-crypto@vger.kernel.org>; Tue, 21 Nov 2017 12:46:33 -0800 (PST)
+Content-Disposition: inline
+In-Reply-To: <CACT4Y+b5n-G_+mjYHMzaibrMKAwXZ=SqsnK3f+Qu=uT8VN1yMQ@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Checked for transcription errors, calling convention, and removal of
-temporary locals. LGTM.
+On Tue, Nov 21, 2017 at 09:00:26AM +0100, Dmitry Vyukov wrote:
+> >
+> > Note that separate from asymmetric_keys (which you can think of as being
+> > in-between the keyrings subsystem and the crypto subsystem) there is also the
+> > userspace interface to cryptographic algorithms, AF_ALG.  It might be possible
+> > to port a lot of the crypto API to userspace, but it would require a lot of work
+> > to stub things out.  Maybe a simpler improvement would be to teach syzkaller to
+> > more thoroughly test AF_ALG.  For example it could be made aware of algorithm
+> > templates so that it could try combining them in unusual ways.  (Example:
+> > https://marc.info/?l=linux-crypto-vger&m=148063683310477&w=2 was a NULL pointer
+> > dereference bug that occurred if you asked to use the algorithm "mcryptd(md5)",
+> > i.e. the mcryptd template wrapping md5.)  Also,
+> > CONFIG_CRYPTO_MANAGER_DISABLE_TESTS should be unset, so that the crypto
+> > self-tests are enabled.
+> 
+> 
+> Can you please outline all uncovered by the current syzkaller
+> descriptions parts? We should add least TODO's for them. Or maybe we
+> could just resolve them right away.
+> 
 
-Reviewed-By: Nick Desaulniers <ndesaulniers@google.com>
+Just focusing on the algorithm names, the syzkaller descriptions currently use a
+fixed set of algorithm names:
 
-On Tue, Nov 21, 2017 at 5:40 AM, Ard Biesheuvel
-<ard.biesheuvel@linaro.org> wrote:
-> Most crypto drivers involving kernel mode NEON take care to put the code
-> that actually touches the NEON register file in a separate compilation
-> unit, to prevent the compiler from reordering code that preserves or
-> restores the NEON context with code that may corrupt it. This is
-> necessary because we currently have no way to express the restrictions
-> imposed upon use of the NEON in kernel mode in a way that the compiler
-> understands.
->
-> However, in the case of aes-ce-cipher, it did not seem unreasonable to
-> deviate from this rule, given how it does not seem possible for the
-> compiler to reorder cross object function calls with asm blocks whose
-> in- and output constraints reflect that it reads from and writes to
-> memory.
->
-> Now that LTO is being proposed for the arm64 kernel, it is time to
-> revisit this. The link time optimization may replace the function
-> calls to kernel_neon_begin() and kernel_neon_end() with instantiations
-> of the IR that make up its implementation, allowing further reordering
-> with the asm block.
->
-> So let's clean this up, and move the asm() blocks into a separate .S
-> file.
->
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> ---
->  arch/arm64/crypto/Makefile                         |   2 +-
->  arch/arm64/crypto/aes-ce-core.S                    |  87 ++++++++++++++++
->  .../crypto/{aes-ce-cipher.c => aes-ce-glue.c}      | 115 +++------------------
->  3 files changed, 100 insertions(+), 104 deletions(-)
->  create mode 100644 arch/arm64/crypto/aes-ce-core.S
->  rename arch/arm64/crypto/{aes-ce-cipher.c => aes-ce-glue.c} (62%)
->
-> diff --git a/arch/arm64/crypto/Makefile b/arch/arm64/crypto/Makefile
-> index b5edc5918c28..f5e8295fd756 100644
-> --- a/arch/arm64/crypto/Makefile
-> +++ b/arch/arm64/crypto/Makefile
-> @@ -24,7 +24,7 @@ obj-$(CONFIG_CRYPTO_CRC32_ARM64_CE) += crc32-ce.o
->  crc32-ce-y:= crc32-ce-core.o crc32-ce-glue.o
->
->  obj-$(CONFIG_CRYPTO_AES_ARM64_CE) += aes-ce-cipher.o
-> -CFLAGS_aes-ce-cipher.o += -march=armv8-a+crypto
-> +aes-ce-cipher-y := aes-ce-core.o aes-ce-glue.o
->
->  obj-$(CONFIG_CRYPTO_AES_ARM64_CE_CCM) += aes-ce-ccm.o
->  aes-ce-ccm-y := aes-ce-ccm-glue.o aes-ce-ccm-core.o
-> diff --git a/arch/arm64/crypto/aes-ce-core.S b/arch/arm64/crypto/aes-ce-core.S
-> new file mode 100644
-> index 000000000000..8efdfdade393
-> --- /dev/null
-> +++ b/arch/arm64/crypto/aes-ce-core.S
-> @@ -0,0 +1,87 @@
-> +/*
-> + * Copyright (C) 2013 - 2017 Linaro Ltd <ard.biesheuvel@linaro.org>
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License version 2 as
-> + * published by the Free Software Foundation.
-> + */
-> +
-> +#include <linux/linkage.h>
-> +#include <asm/assembler.h>
-> +
-> +       .arch           armv8-a+crypto
-> +
-> +ENTRY(__aes_ce_encrypt)
-> +       sub             w3, w3, #2
-> +       ld1             {v0.16b}, [x2]
-> +       ld1             {v1.4s}, [x0], #16
-> +       cmp             w3, #10
-> +       bmi             0f
-> +       bne             3f
-> +       mov             v3.16b, v1.16b
-> +       b               2f
-> +0:     mov             v2.16b, v1.16b
-> +       ld1             {v3.4s}, [x0], #16
-> +1:     aese            v0.16b, v2.16b
-> +       aesmc           v0.16b, v0.16b
-> +2:     ld1             {v1.4s}, [x0], #16
-> +       aese            v0.16b, v3.16b
-> +       aesmc           v0.16b, v0.16b
-> +3:     ld1             {v2.4s}, [x0], #16
-> +       subs            w3, w3, #3
-> +       aese            v0.16b, v1.16b
-> +       aesmc           v0.16b, v0.16b
-> +       ld1             {v3.4s}, [x0], #16
-> +       bpl             1b
-> +       aese            v0.16b, v2.16b
-> +       eor             v0.16b, v0.16b, v3.16b
-> +       st1             {v0.16b}, [x1]
-> +       ret
-> +ENDPROC(__aes_ce_encrypt)
-> +
-> +ENTRY(__aes_ce_decrypt)
-> +       sub             w3, w3, #2
-> +       ld1             {v0.16b}, [x2]
-> +       ld1             {v1.4s}, [x0], #16
-> +       cmp             w3, #10
-> +       bmi             0f
-> +       bne             3f
-> +       mov             v3.16b, v1.16b
-> +       b               2f
-> +0:     mov             v2.16b, v1.16b
-> +       ld1             {v3.4s}, [x0], #16
-> +1:     aesd            v0.16b, v2.16b
-> +       aesimc          v0.16b, v0.16b
-> +2:     ld1             {v1.4s}, [x0], #16
-> +       aesd            v0.16b, v3.16b
-> +       aesimc          v0.16b, v0.16b
-> +3:     ld1             {v2.4s}, [x0], #16
-> +       subs            w3, w3, #3
-> +       aesd            v0.16b, v1.16b
-> +       aesimc          v0.16b, v0.16b
-> +       ld1             {v3.4s}, [x0], #16
-> +       bpl             1b
-> +       aesd            v0.16b, v2.16b
-> +       eor             v0.16b, v0.16b, v3.16b
-> +       st1             {v0.16b}, [x1]
-> +       ret
-> +ENDPROC(__aes_ce_decrypt)
-> +
-> +/*
-> + * __aes_ce_sub() - use the aese instruction to perform the AES sbox
-> + *                  substitution on each byte in 'input'
-> + */
-> +ENTRY(__aes_ce_sub)
-> +       dup             v1.4s, w0
-> +       movi            v0.16b, #0
-> +       aese            v0.16b, v1.16b
-> +       umov            w0, v0.s[0]
-> +       ret
-> +ENDPROC(__aes_ce_sub)
-> +
-> +ENTRY(__aes_ce_invert)
-> +       ld1             {v0.4s}, [x1]
-> +       aesimc          v1.16b, v0.16b
-> +       st1             {v1.4s}, [x0]
-> +       ret
-> +ENDPROC(__aes_ce_invert)
-> diff --git a/arch/arm64/crypto/aes-ce-cipher.c b/arch/arm64/crypto/aes-ce-glue.c
-> similarity index 62%
-> rename from arch/arm64/crypto/aes-ce-cipher.c
-> rename to arch/arm64/crypto/aes-ce-glue.c
-> index 6a75cd75ed11..e6b3227bbf57 100644
-> --- a/arch/arm64/crypto/aes-ce-cipher.c
-> +++ b/arch/arm64/crypto/aes-ce-glue.c
-> @@ -29,6 +29,13 @@ struct aes_block {
->         u8 b[AES_BLOCK_SIZE];
->  };
->
-> +asmlinkage void __aes_ce_encrypt(u32 *rk, u8 *out, const u8 *in, int rounds);
-> +asmlinkage void __aes_ce_decrypt(u32 *rk, u8 *out, const u8 *in, int rounds);
-> +
-> +asmlinkage u32 __aes_ce_sub(u32 l);
-> +asmlinkage void __aes_ce_invert(struct aes_block *out,
-> +                               const struct aes_block *in);
-> +
->  static int num_rounds(struct crypto_aes_ctx *ctx)
->  {
->         /*
-> @@ -44,10 +51,6 @@ static int num_rounds(struct crypto_aes_ctx *ctx)
->  static void aes_cipher_encrypt(struct crypto_tfm *tfm, u8 dst[], u8 const src[])
->  {
->         struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
-> -       struct aes_block *out = (struct aes_block *)dst;
-> -       struct aes_block const *in = (struct aes_block *)src;
-> -       void *dummy0;
-> -       int dummy1;
->
->         if (!may_use_simd()) {
->                 __aes_arm64_encrypt(ctx->key_enc, dst, src, num_rounds(ctx));
-> @@ -55,49 +58,13 @@ static void aes_cipher_encrypt(struct crypto_tfm *tfm, u8 dst[], u8 const src[])
->         }
->
->         kernel_neon_begin();
-> -
-> -       __asm__("       ld1     {v0.16b}, %[in]                 ;"
-> -               "       ld1     {v1.4s}, [%[key]], #16          ;"
-> -               "       cmp     %w[rounds], #10                 ;"
-> -               "       bmi     0f                              ;"
-> -               "       bne     3f                              ;"
-> -               "       mov     v3.16b, v1.16b                  ;"
-> -               "       b       2f                              ;"
-> -               "0:     mov     v2.16b, v1.16b                  ;"
-> -               "       ld1     {v3.4s}, [%[key]], #16          ;"
-> -               "1:     aese    v0.16b, v2.16b                  ;"
-> -               "       aesmc   v0.16b, v0.16b                  ;"
-> -               "2:     ld1     {v1.4s}, [%[key]], #16          ;"
-> -               "       aese    v0.16b, v3.16b                  ;"
-> -               "       aesmc   v0.16b, v0.16b                  ;"
-> -               "3:     ld1     {v2.4s}, [%[key]], #16          ;"
-> -               "       subs    %w[rounds], %w[rounds], #3      ;"
-> -               "       aese    v0.16b, v1.16b                  ;"
-> -               "       aesmc   v0.16b, v0.16b                  ;"
-> -               "       ld1     {v3.4s}, [%[key]], #16          ;"
-> -               "       bpl     1b                              ;"
-> -               "       aese    v0.16b, v2.16b                  ;"
-> -               "       eor     v0.16b, v0.16b, v3.16b          ;"
-> -               "       st1     {v0.16b}, %[out]                ;"
-> -
-> -       :       [out]           "=Q"(*out),
-> -               [key]           "=r"(dummy0),
-> -               [rounds]        "=r"(dummy1)
-> -       :       [in]            "Q"(*in),
-> -                               "1"(ctx->key_enc),
-> -                               "2"(num_rounds(ctx) - 2)
-> -       :       "cc");
-> -
-> +       __aes_ce_encrypt(ctx->key_enc, dst, src, num_rounds(ctx));
->         kernel_neon_end();
->  }
->
->  static void aes_cipher_decrypt(struct crypto_tfm *tfm, u8 dst[], u8 const src[])
->  {
->         struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
-> -       struct aes_block *out = (struct aes_block *)dst;
-> -       struct aes_block const *in = (struct aes_block *)src;
-> -       void *dummy0;
-> -       int dummy1;
->
->         if (!may_use_simd()) {
->                 __aes_arm64_decrypt(ctx->key_dec, dst, src, num_rounds(ctx));
-> @@ -105,62 +72,10 @@ static void aes_cipher_decrypt(struct crypto_tfm *tfm, u8 dst[], u8 const src[])
->         }
->
->         kernel_neon_begin();
-> -
-> -       __asm__("       ld1     {v0.16b}, %[in]                 ;"
-> -               "       ld1     {v1.4s}, [%[key]], #16          ;"
-> -               "       cmp     %w[rounds], #10                 ;"
-> -               "       bmi     0f                              ;"
-> -               "       bne     3f                              ;"
-> -               "       mov     v3.16b, v1.16b                  ;"
-> -               "       b       2f                              ;"
-> -               "0:     mov     v2.16b, v1.16b                  ;"
-> -               "       ld1     {v3.4s}, [%[key]], #16          ;"
-> -               "1:     aesd    v0.16b, v2.16b                  ;"
-> -               "       aesimc  v0.16b, v0.16b                  ;"
-> -               "2:     ld1     {v1.4s}, [%[key]], #16          ;"
-> -               "       aesd    v0.16b, v3.16b                  ;"
-> -               "       aesimc  v0.16b, v0.16b                  ;"
-> -               "3:     ld1     {v2.4s}, [%[key]], #16          ;"
-> -               "       subs    %w[rounds], %w[rounds], #3      ;"
-> -               "       aesd    v0.16b, v1.16b                  ;"
-> -               "       aesimc  v0.16b, v0.16b                  ;"
-> -               "       ld1     {v3.4s}, [%[key]], #16          ;"
-> -               "       bpl     1b                              ;"
-> -               "       aesd    v0.16b, v2.16b                  ;"
-> -               "       eor     v0.16b, v0.16b, v3.16b          ;"
-> -               "       st1     {v0.16b}, %[out]                ;"
-> -
-> -       :       [out]           "=Q"(*out),
-> -               [key]           "=r"(dummy0),
-> -               [rounds]        "=r"(dummy1)
-> -       :       [in]            "Q"(*in),
-> -                               "1"(ctx->key_dec),
-> -                               "2"(num_rounds(ctx) - 2)
-> -       :       "cc");
-> -
-> +       __aes_ce_decrypt(ctx->key_dec, dst, src, num_rounds(ctx));
->         kernel_neon_end();
->  }
->
-> -/*
-> - * aes_sub() - use the aese instruction to perform the AES sbox substitution
-> - *             on each byte in 'input'
-> - */
-> -static u32 aes_sub(u32 input)
-> -{
-> -       u32 ret;
-> -
-> -       __asm__("dup    v1.4s, %w[in]           ;"
-> -               "movi   v0.16b, #0              ;"
-> -               "aese   v0.16b, v1.16b          ;"
-> -               "umov   %w[out], v0.4s[0]       ;"
-> -
-> -       :       [out]   "=r"(ret)
-> -       :       [in]    "r"(input)
-> -       :               "v0","v1");
-> -
-> -       return ret;
-> -}
-> -
->  int ce_aes_expandkey(struct crypto_aes_ctx *ctx, const u8 *in_key,
->                      unsigned int key_len)
->  {
-> @@ -189,7 +104,7 @@ int ce_aes_expandkey(struct crypto_aes_ctx *ctx, const u8 *in_key,
->                 u32 *rki = ctx->key_enc + (i * kwords);
->                 u32 *rko = rki + kwords;
->
-> -               rko[0] = ror32(aes_sub(rki[kwords - 1]), 8) ^ rcon[i] ^ rki[0];
-> +               rko[0] = ror32(__aes_ce_sub(rki[kwords - 1]), 8) ^ rcon[i] ^ rki[0];
->                 rko[1] = rko[0] ^ rki[1];
->                 rko[2] = rko[1] ^ rki[2];
->                 rko[3] = rko[2] ^ rki[3];
-> @@ -202,7 +117,7 @@ int ce_aes_expandkey(struct crypto_aes_ctx *ctx, const u8 *in_key,
->                 } else if (key_len == AES_KEYSIZE_256) {
->                         if (i >= 6)
->                                 break;
-> -                       rko[4] = aes_sub(rko[3]) ^ rki[4];
-> +                       rko[4] = __aes_ce_sub(rko[3]) ^ rki[4];
->                         rko[5] = rko[4] ^ rki[5];
->                         rko[6] = rko[5] ^ rki[6];
->                         rko[7] = rko[6] ^ rki[7];
-> @@ -221,13 +136,7 @@ int ce_aes_expandkey(struct crypto_aes_ctx *ctx, const u8 *in_key,
->
->         key_dec[0] = key_enc[j];
->         for (i = 1, j--; j > 0; i++, j--)
-> -               __asm__("ld1    {v0.4s}, %[in]          ;"
-> -                       "aesimc v1.16b, v0.16b          ;"
-> -                       "st1    {v1.4s}, %[out] ;"
-> -
-> -               :       [out]   "=Q"(key_dec[i])
-> -               :       [in]    "Q"(key_enc[j])
-> -               :               "v0","v1");
-> +               __aes_ce_invert(key_dec + i, key_enc + j);
->         key_dec[i] = key_enc[0];
->
->         kernel_neon_end();
-> --
-> 2.11.0
->
+	salg_name = "cmac(aes)", "ecb(aes)", "cbc(aes)", "hmac(sha1)", [...]
 
+But algorithm names are not just fixed strings; you can create "new" algorithms
+by composing templates.  For example "cmac(aes)" indicates the "cmac" template
+instantiated using "aes" as the underlying block cipher.  But it could also be
+"cmac(des)", "cmac(blowfish)", etc.  Templates can even take multiple arguments,
+e.g. "gcm_base(ctr(aes),ghash)".
 
+So ideally the descriptions would contain the list of all templates which might
+be available in addition to all "primitive" algorithm names, then express that
+an algorithm name has a syntax like:
 
--- 
-Thanks,
-~Nick Desaulniers
+	alg_name -> primitive_alg_name | template_name(alg_name[,alg_name]*)
+
+To get the list of all "primitive" algorithm names which might be available you
+can run:
+
+	git grep -E '\.cra_(driver_)?name' | grep -o '".*"' | sort | uniq
+
+It's a long list, though it doesn't distinguish between the different types of
+algorithm (hash, symmetric cipher, AEAD, etc.), and not all are actually
+accessible through AF_ALG.  Note that it still includes names with parentheses
+because a module may directly implement an algorithm like "xts(aes)", which then
+may be used instead of the template version.
+
+And to get the list of templates which might be available you can run:
+
+	git grep -A5 'struct crypto_template.*{' | grep '\.name' | grep -o '".*"' | sort
+
+(There is probably more to improve for AF_ALG besides the algorithm names; this
+is just what I happened to notice for now.)
+
+Eric
