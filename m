@@ -1,83 +1,59 @@
-From: Eric Biggers <ebiggers@google.com>
-Subject: Re: x509 parsing bug + fuzzing crypto in the userspace
-Date: Tue, 21 Nov 2017 12:46:28 -0800
-Message-ID: <20171121204628.GA56006@google.com>
-References: <CAG_fn=XJZG_MJXXgos5jZmOThKho=uSvwgfhkMSYONZ04PKKaw@mail.gmail.com>
- <20171120214257.GB61394@google.com>
- <CACT4Y+b5n-G_+mjYHMzaibrMKAwXZ=SqsnK3f+Qu=uT8VN1yMQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Alexander Potapenko <glider@google.com>,
-        linux-crypto@vger.kernel.org, Kostya Serebryany <kcc@google.com>,
-        keyrings@vger.kernel.org, Andrey Konovalov <andreyknvl@google.com>
-To: Dmitry Vyukov <dvyukov@google.com>
+From: Jon Maxwell <jmaxwell37@gmail.com>
+Subject: [PATCH net-next] cryptd: Add cryptd_max_cpu_qlen module parameter
+Date: Wed, 22 Nov 2017 16:08:17 +1100
+Message-ID: <20171122050817.21385-1-jmaxwell37@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        jmaxwell@redhat.com, Jon Maxwell <jmaxwell37@gmail.com>
+To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-io0-f181.google.com ([209.85.223.181]:37569 "EHLO
-        mail-io0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751067AbdKUUqd (ORCPT
+Received: from mail-pf0-f195.google.com ([209.85.192.195]:36213 "EHLO
+        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750959AbdKVFIs (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Nov 2017 15:46:33 -0500
-Received: by mail-io0-f181.google.com with SMTP id v21so20923302ioi.4
-        for <linux-crypto@vger.kernel.org>; Tue, 21 Nov 2017 12:46:33 -0800 (PST)
-Content-Disposition: inline
-In-Reply-To: <CACT4Y+b5n-G_+mjYHMzaibrMKAwXZ=SqsnK3f+Qu=uT8VN1yMQ@mail.gmail.com>
+        Wed, 22 Nov 2017 00:08:48 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Nov 21, 2017 at 09:00:26AM +0100, Dmitry Vyukov wrote:
-> >
-> > Note that separate from asymmetric_keys (which you can think of as being
-> > in-between the keyrings subsystem and the crypto subsystem) there is also the
-> > userspace interface to cryptographic algorithms, AF_ALG.  It might be possible
-> > to port a lot of the crypto API to userspace, but it would require a lot of work
-> > to stub things out.  Maybe a simpler improvement would be to teach syzkaller to
-> > more thoroughly test AF_ALG.  For example it could be made aware of algorithm
-> > templates so that it could try combining them in unusual ways.  (Example:
-> > https://marc.info/?l=linux-crypto-vger&m=148063683310477&w=2 was a NULL pointer
-> > dereference bug that occurred if you asked to use the algorithm "mcryptd(md5)",
-> > i.e. the mcryptd template wrapping md5.)  Also,
-> > CONFIG_CRYPTO_MANAGER_DISABLE_TESTS should be unset, so that the crypto
-> > self-tests are enabled.
-> 
-> 
-> Can you please outline all uncovered by the current syzkaller
-> descriptions parts? We should add least TODO's for them. Or maybe we
-> could just resolve them right away.
-> 
+Make the cryptd queue length configurable. We recently had customer where this 
+needed to be tuned to accommodate the aesni_intel module and prevent packet 
+drop.
 
-Just focusing on the algorithm names, the syzkaller descriptions currently use a
-fixed set of algorithm names:
+Signed-off-by: Jon Maxwell <jmaxwell37@gmail.com>
+---
+ crypto/cryptd.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-	salg_name = "cmac(aes)", "ecb(aes)", "cbc(aes)", "hmac(sha1)", [...]
-
-But algorithm names are not just fixed strings; you can create "new" algorithms
-by composing templates.  For example "cmac(aes)" indicates the "cmac" template
-instantiated using "aes" as the underlying block cipher.  But it could also be
-"cmac(des)", "cmac(blowfish)", etc.  Templates can even take multiple arguments,
-e.g. "gcm_base(ctr(aes),ghash)".
-
-So ideally the descriptions would contain the list of all templates which might
-be available in addition to all "primitive" algorithm names, then express that
-an algorithm name has a syntax like:
-
-	alg_name -> primitive_alg_name | template_name(alg_name[,alg_name]*)
-
-To get the list of all "primitive" algorithm names which might be available you
-can run:
-
-	git grep -E '\.cra_(driver_)?name' | grep -o '".*"' | sort | uniq
-
-It's a long list, though it doesn't distinguish between the different types of
-algorithm (hash, symmetric cipher, AEAD, etc.), and not all are actually
-accessible through AF_ALG.  Note that it still includes names with parentheses
-because a module may directly implement an algorithm like "xts(aes)", which then
-may be used instead of the template version.
-
-And to get the list of templates which might be available you can run:
-
-	git grep -A5 'struct crypto_template.*{' | grep '\.name' | grep -o '".*"' | sort
-
-(There is probably more to improve for AF_ALG besides the algorithm names; this
-is just what I happened to notice for now.)
-
-Eric
+diff --git a/crypto/cryptd.c b/crypto/cryptd.c
+index bd43cf5be14c..b1eb131c0f10 100644
+--- a/crypto/cryptd.c
++++ b/crypto/cryptd.c
+@@ -32,7 +32,9 @@
+ #include <linux/sched.h>
+ #include <linux/slab.h>
+ 
+-#define CRYPTD_MAX_CPU_QLEN 1000
++unsigned int cryptd_max_cpu_qlen = 1000;
++module_param(cryptd_max_cpu_qlen, uint, 0);
++MODULE_PARM_DESC(cryptd_max_cpu_qlen, "Set cryptd Max queue depth");
+ 
+ struct cryptd_cpu_queue {
+ 	struct crypto_queue queue;
+@@ -116,6 +118,7 @@ static int cryptd_init_queue(struct cryptd_queue *queue,
+ 		crypto_init_queue(&cpu_queue->queue, max_cpu_qlen);
+ 		INIT_WORK(&cpu_queue->work, cryptd_queue_worker);
+ 	}
++	pr_info("cryptd: max_cpu_qlen set to %d\n", max_cpu_qlen);
+ 	return 0;
+ }
+ 
+@@ -1372,7 +1375,7 @@ static int __init cryptd_init(void)
+ {
+ 	int err;
+ 
+-	err = cryptd_init_queue(&queue, CRYPTD_MAX_CPU_QLEN);
++	err = cryptd_init_queue(&queue, cryptd_max_cpu_qlen);
+ 	if (err)
+ 		return err;
+ 
+-- 
+2.13.6
