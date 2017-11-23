@@ -1,56 +1,62 @@
-From: =?UTF-8?q?=C5=81ukasz=20Stelmach?= <l.stelmach@samsung.com>
-Subject: [PATCH 0/3] True RNG driver for Samsung Exynos 5250+ SoCs
-Date: Thu, 23 Nov 2017 16:09:11 +0100
-Message-ID: <20171123150914.31462-1-l.stelmach@samsung.com>
-References: <CGME20171123150956eucas1p2e6d42c88692291e4e0d0e7719519bf35@eucas1p2.samsung.com>
+From: =?UTF-8?q?=C5=81ukasz=20Stelmach?= <l.stelmach-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
+Subject: [PATCH 1/3] dt-bindings: hwrng: Add Samsung Exynos 5250+ True RNG
+ bindings
+Date: Thu, 23 Nov 2017 16:09:12 +0100
+Message-ID: <20171123150914.31462-2-l.stelmach@samsung.com>
+References: <20171123150914.31462-1-l.stelmach@samsung.com>
+        <CGME20171123151002eucas1p207b8eb77fce5a2977a9f520e05dfe9f5@eucas1p2.samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8BIT
-Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        =?UTF-8?q?=C5=81ukasz=20Stelmach?= <l.stelmach@samsung.com>
-To: Rob Herring <robh+dt@kernel.org>, Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        devicetree@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:58892 "EHLO
-        mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752993AbdKWPKA (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 Nov 2017 10:10:00 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: Marek Szyprowski <m.szyprowski-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>,
+        =?UTF-8?q?=C5=81ukasz=20Stelmach?= <l.stelmach-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
+To: Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org>,
+        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+        Krzysztof Kozlowski <krzk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-samsung-soc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-reply-to: <20171123150914.31462-1-l.stelmach-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hello.
+Add binding documentation for the True Random Number Generator
+found on Samsung Exynos 5250+ SoCs.
 
-The following patches add support for the true random number generator
-found in Samsung Exynos 5250+ SoCs.
-
-Patch #1 adds documentation for devicetree bindings.
-
-Patch #2 introduces the driver and appropriate changes in Makefile and Kconfig.
-
-Patch #3 adds nodes in devicetree files for Exynos SoCs.
-
-Łukasz Stelmach (3):
-  dt-bindings: hwrng: Add Samsung Exynos 5250+ True RNG bindings
-  hwrng: exynos - add Samsung Exynos True RNG driver
-  ARM: dts: exynos: Add nodes for True Random Number Generator
-
- .../bindings/rng/samsung,exynos5250-trng.txt       |  17 ++
- MAINTAINERS                                        |   7 +
- arch/arm/boot/dts/exynos5.dtsi                     |   5 +
- arch/arm/boot/dts/exynos5250.dtsi                  |   5 +
- arch/arm/boot/dts/exynos5410.dtsi                  |   5 +
- arch/arm/boot/dts/exynos5420.dtsi                  |   5 +
- drivers/char/hw_random/Kconfig                     |  12 +
- drivers/char/hw_random/Makefile                    |   1 +
- drivers/char/hw_random/exynos-trng.c               | 256 +++++++++++++++++++++
- 9 files changed, 313 insertions(+)
+Signed-off-by: Łukasz Stelmach <l.stelmach-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
+---
+ .../devicetree/bindings/rng/samsung,exynos5250-trng.txt | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
  create mode 100644 Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
- create mode 100644 drivers/char/hw_random/exynos-trng.c
 
+diff --git a/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt b/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
+new file mode 100644
+index 000000000000..22dfe8cb21c0
+--- /dev/null
++++ b/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
+@@ -0,0 +1,17 @@
++Exynos True Random Number Generator
++
++Required properties:
++
++- compatible  : Should be "samsung,exynos5250-trng".
++- reg         : Specifies base physical address and size of the registers map.
++- clocks      : Phandle to clock-controller plus clock-specifier pair.
++- clock-names : "secss" as a clock name.
++
++Example:
++
++	trng@10830600 {
++		compatible = "samsung,exynos5250-trng";
++		reg = <0x10830600 0x100>;
++		clocks = <&clock CLK_SSS>;
++		clock-names = "secss";
++	};
 -- 
 2.11.0
+
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
