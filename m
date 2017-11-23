@@ -1,67 +1,47 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH 5/5] crypto: chacha20 - Fix keystream alignment for chacha20_block()
-Date: Wed, 22 Nov 2017 22:06:08 +0000
-Message-ID: <CAKv+Gu-6inNDCPq0_2Y4ZS27xg7Su1-qTvLfQ4sBKozYNTNqzQ@mail.gmail.com>
-References: <20171122195139.121269-1-ebiggers3@gmail.com> <20171122195139.121269-6-ebiggers3@gmail.com>
- <CAKv+Gu__YdYWXgGfNSng8fDj9F0pw-i4zbAaN+uxES+r6mRMpw@mail.gmail.com> <20171122212950.GA74584@gmail.com>
+From: =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>
+Subject: Re: [PATCH 2/2] crypto: caam - add Derived Key Protocol (DKP) support
+Date: Thu, 23 Nov 2017 08:50:42 +0000
+Message-ID: <VI1PR0402MB334260EF8266A0C33BEA61E898210@VI1PR0402MB3342.eurprd04.prod.outlook.com>
+References: <20171110143349.8394-1-horia.geanta@nxp.com>
+ <20171110143349.8394-2-horia.geanta@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        Martin Willi <martin@strongswan.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Eric Biggers <ebiggers@google.com>
-To: Eric Biggers <ebiggers3@gmail.com>
+Content-Type: text/plain; charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-io0-f178.google.com ([209.85.223.178]:42759 "EHLO
-        mail-io0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751471AbdKVWGJ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Nov 2017 17:06:09 -0500
-Received: by mail-io0-f178.google.com with SMTP id u42so24710931ioi.9
-        for <linux-crypto@vger.kernel.org>; Wed, 22 Nov 2017 14:06:09 -0800 (PST)
-In-Reply-To: <20171122212950.GA74584@gmail.com>
+Received: from mail-ve1eur01on0075.outbound.protection.outlook.com ([104.47.1.75]:7040
+        "EHLO EUR01-VE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752179AbdKWIur (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 23 Nov 2017 03:50:47 -0500
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 22 November 2017 at 21:29, Eric Biggers <ebiggers3@gmail.com> wrote:
-> On Wed, Nov 22, 2017 at 08:51:57PM +0000, Ard Biesheuvel wrote:
->> On 22 November 2017 at 19:51, Eric Biggers <ebiggers3@gmail.com> wrote:
->> > From: Eric Biggers <ebiggers@google.com>
->> >
->> > When chacha20_block() outputs the keystream block, it uses 'u32' stores
->> > directly.  However, the callers (crypto/chacha20_generic.c and
->> > drivers/char/random.c) declare the keystream buffer as a 'u8' array,
->> > which is not guaranteed to have the needed alignment.
->> >
->> > Fix it by having both callers declare the keystream as a 'u32' array.
->> > For now this is preferable to switching over to the unaligned access
->> > macros because chacha20_block() is only being used in cases where we can
->> > easily control the alignment (stack buffers).
->> >
->>
->> Given this paragraph, I think we agree the correct way to fix this
->> would be to make chacha20_block() adhere to its prototype, so if we
->> deviate from that, there should be a good reason. On which
->> architecture that cares about alignment is this expected to result in
->> a measurable performance benefit?
->>
->
-> Well, variables on the stack tend to be 4 or even 8-byte aligned anyway, so this
-> change probably doesn't make a difference in practice currently.  But it still
-> should be fixed, in case it does become a problem.
->
-
-Agreed.
-
-> We could certainly leave the type as u8 array and use put_unaligned_le32()
-> instead; that would be a simpler change.  But that would be slower on
-> architectures where a potentially-unaligned access requires multiple
-> instructions.
->
-
-The access itself would be slower, yes. But given the amount of work
-performed in chacha20_block(), I seriously doubt that would actually
-matter in practice.
+On 11/10/2017 4:34 PM, Horia Geant=E3 wrote:=0A=
+> Offload split key generation in CAAM engine, using DKP.=0A=
+> DKP is supported starting with Era 6.=0A=
+> =0A=
+> Note that the way assoclen is transmitted from the job descriptor=0A=
+> to the shared descriptor changes - DPOVRD register is used instead=0A=
+> of MATH3 (where available), since DKP protocol thrashes the MATH=0A=
+> registers.=0A=
+> =0A=
+> Signed-off-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
+When CAAM Job Ring platform devices are configured to go through ARM=0A=
+SMMU, errors are reported:=0A=
+arm-smmu 5000000.iommu: Unhandled context fault: fsr=3D0x402,=0A=
+iova=3D0xffffffef9000, fsynr=3D0x3, cb=3D1=0A=
+=0A=
+This is due to incorrect DMA mapping direction for the buffers where=0A=
+keys are stored, they have to change from DMA_TO_DEVICE to=0A=
+DMA_BIDIRECTIONAL - with DKP keys are initially written by CPU and then=0A=
+overwritten by the crypto engine.=0A=
+=0A=
+Will follow up with v2 shortly.=0A=
+=0A=
+Thanks,=0A=
+Horia=0A=
