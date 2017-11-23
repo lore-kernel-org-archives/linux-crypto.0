@@ -1,53 +1,46 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: x509 parsing bug + fuzzing crypto in the userspace
-Date: Thu, 23 Nov 2017 13:35:33 +0100
-Message-ID: <3132962.8EQ63lqCxc@tauon.chronox.de>
-References: <CAG_fn=XJZG_MJXXgos5jZmOThKho=uSvwgfhkMSYONZ04PKKaw@mail.gmail.com> <CACT4Y+ZSUWEni6SdmM5K-CsZshq77CNGdZedC0tYhcv6p=7Qvg@mail.gmail.com> <CACT4Y+bMAH1zK2v5XgF2Zz72ghOYAoMbef3+CjLO5HfTEfAEzg@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Eric Biggers <ebiggers@google.com>,
-        Alexander Potapenko <glider@google.com>,
-        linux-crypto@vger.kernel.org, Kostya Serebryany <kcc@google.com>,
-        keyrings@vger.kernel.org, Andrey Konovalov <andreyknvl@google.com>
-To: Dmitry Vyukov <dvyukov@google.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:42420 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751968AbdKWMff (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 Nov 2017 07:35:35 -0500
-In-Reply-To: <CACT4Y+bMAH1zK2v5XgF2Zz72ghOYAoMbef3+CjLO5HfTEfAEzg@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Ondrej Mosnacek <omosnacek@gmail.com>
+Subject: [PATCH] crypto: skcipher - Fix skcipher_walk_aead_common
+Date: Thu, 23 Nov 2017 13:49:06 +0100
+Message-ID: <20171123124906.15754-1-omosnacek@gmail.com>
+Cc: Ondrej Mosnacek <omosnacek@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, stable@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <stable-owner@vger.kernel.org>
+Sender: stable-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Donnerstag, 23. November 2017, 12:34:54 CET schrieb Dmitry Vyukov:
+The skcipher_walk_aead_common function calls scatterwalk_copychunks on
+the input and output walks to skip the associated data. If the AD end
+at an SG list entry boundary, then after these calls the walks will
+still be pointing to the end of the skipped region.
 
-Hi Dmitry,
+These offsets are later checked for alignment in skcipher_walk_next,
+so the skcipher_walk may detect the alignment incorrectly.
 
-> Btw, I've started doing some minimal improvements, did not yet sorted
-> out alg types/names, and fuzzer started scratching surface:
-> 
-> WARNING: kernel stack regs has bad 'bp' value 77 Nov 23 2017 12:29:36 CET
-> general protection fault in af_alg_free_areq_sgls 54 Nov 23 2017 12:23:30
-> CET general protection fault in crypto_chacha20_crypt 100 Nov 23 2017
-> 12:29:48 CET suspicious RCU usage at ./include/trace/events/kmem.h:LINE 88
-> Nov 23 2017 12:29:15 CET
+This patch fixes it by calling scatterwalk_done after the copychunks
+calls to ensure that the offsets refer to the right SG list entry.
 
-This all looks strange. Where would RCU come into play with 
-af_alg_free_areq_sgls?
+Fixes: b286d8b1a690 ("crypto: skcipher - Add skcipher walk interface")
+Cc: <stable@vger.kernel.org>
+Signed-off-by: Ondrej Mosnacek <omosnacek@gmail.com>
+---
+ crypto/skcipher.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Do you have a reproducer?
-> 
-> This strongly suggests that we need to dig deeper.
-
-Absolutely. That is why I started my fuzzer that turned up already quite some 
-issues.
-> --
-> To unsubscribe from this list: send the line "unsubscribe keyrings" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
-Ciao
-Stephan
+diff --git a/crypto/skcipher.c b/crypto/skcipher.c
+index 4faa0fd53b0c..6c45ed536664 100644
+--- a/crypto/skcipher.c
++++ b/crypto/skcipher.c
+@@ -517,6 +517,9 @@ static int skcipher_walk_aead_common(struct skcipher_walk *walk,
+ 	scatterwalk_copychunks(NULL, &walk->in, req->assoclen, 2);
+ 	scatterwalk_copychunks(NULL, &walk->out, req->assoclen, 2);
+ 
++	scatterwalk_done(&walk->in, 0, walk->total);
++	scatterwalk_done(&walk->out, 0, walk->total);
++
+ 	walk->iv = req->iv;
+ 	walk->oiv = req->iv;
+ 
+-- 
+2.14.1
