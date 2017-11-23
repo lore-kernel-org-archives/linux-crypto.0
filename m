@@ -1,62 +1,102 @@
-From: =?UTF-8?q?=C5=81ukasz=20Stelmach?= <l.stelmach-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
-Subject: [PATCH 1/3] dt-bindings: hwrng: Add Samsung Exynos 5250+ True RNG
- bindings
-Date: Thu, 23 Nov 2017 16:09:12 +0100
-Message-ID: <20171123150914.31462-2-l.stelmach@samsung.com>
+From: =?UTF-8?q?=C5=81ukasz=20Stelmach?= <l.stelmach@samsung.com>
+Subject: [PATCH 3/3] ARM: dts: exynos: Add nodes for True Random Number
+ Generator
+Date: Thu, 23 Nov 2017 16:09:14 +0100
+Message-ID: <20171123150914.31462-4-l.stelmach@samsung.com>
 References: <20171123150914.31462-1-l.stelmach@samsung.com>
-        <CGME20171123151002eucas1p207b8eb77fce5a2977a9f520e05dfe9f5@eucas1p2.samsung.com>
+        <CGME20171123151008eucas1p24436487b1b3f8de6d8cc768f05aea7a9@eucas1p2.samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8BIT
-Cc: Marek Szyprowski <m.szyprowski-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>,
-        =?UTF-8?q?=C5=81ukasz=20Stelmach?= <l.stelmach-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
-To: Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org>,
-        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-        Krzysztof Kozlowski <krzk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        linux-samsung-soc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-reply-to: <20171123150914.31462-1-l.stelmach-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        =?UTF-8?q?=C5=81ukasz=20Stelmach?= <l.stelmach@samsung.com>
+To: Rob Herring <robh+dt@kernel.org>, Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        devicetree@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:58937 "EHLO
+        mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752791AbdKWPKM (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 23 Nov 2017 10:10:12 -0500
+In-reply-to: <20171123150914.31462-1-l.stelmach@samsung.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Add binding documentation for the True Random Number Generator
-found on Samsung Exynos 5250+ SoCs.
+Add nodes for the True Random Number Generator found in Samsung Exynos
+5250+ SoCs.
 
-Signed-off-by: Łukasz Stelmach <l.stelmach-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
+Signed-off-by: Łukasz Stelmach <l.stelmach@samsung.com>
 ---
- .../devicetree/bindings/rng/samsung,exynos5250-trng.txt | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
+ arch/arm/boot/dts/exynos5.dtsi    | 5 +++++
+ arch/arm/boot/dts/exynos5250.dtsi | 5 +++++
+ arch/arm/boot/dts/exynos5410.dtsi | 5 +++++
+ arch/arm/boot/dts/exynos5420.dtsi | 5 +++++
+ 4 files changed, 20 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt b/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
-new file mode 100644
-index 000000000000..22dfe8cb21c0
---- /dev/null
-+++ b/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
-@@ -0,0 +1,17 @@
-+Exynos True Random Number Generator
+diff --git a/arch/arm/boot/dts/exynos5.dtsi b/arch/arm/boot/dts/exynos5.dtsi
+index 7da4a4285b24..6a298b536e1c 100644
+--- a/arch/arm/boot/dts/exynos5.dtsi
++++ b/arch/arm/boot/dts/exynos5.dtsi
+@@ -210,5 +210,10 @@
+ 			reg = <0x10830000 0x300>;
+ 			interrupts = <GIC_SPI 112 IRQ_TYPE_LEVEL_HIGH>;
+ 		};
 +
-+Required properties:
++		trng: trng@10830600 {
++		      compatible = "samsung,exynos5250-trng";
++		      reg = <0x10830600 0x100>;
++		};
+ 	};
+ };
+diff --git a/arch/arm/boot/dts/exynos5250.dtsi b/arch/arm/boot/dts/exynos5250.dtsi
+index 8032d7e567fc..332fe04b772b 100644
+--- a/arch/arm/boot/dts/exynos5250.dtsi
++++ b/arch/arm/boot/dts/exynos5250.dtsi
+@@ -1081,4 +1081,9 @@
+ 	clock-names = "secss";
+ };
+ 
++&trng {
++	clocks = <&clock CLK_SSS>;
++	clock-names = "secss";
++};
 +
-+- compatible  : Should be "samsung,exynos5250-trng".
-+- reg         : Specifies base physical address and size of the registers map.
-+- clocks      : Phandle to clock-controller plus clock-specifier pair.
-+- clock-names : "secss" as a clock name.
+ #include "exynos5250-pinctrl.dtsi"
+diff --git a/arch/arm/boot/dts/exynos5410.dtsi b/arch/arm/boot/dts/exynos5410.dtsi
+index 7eab4bc07cec..f3991206a562 100644
+--- a/arch/arm/boot/dts/exynos5410.dtsi
++++ b/arch/arm/boot/dts/exynos5410.dtsi
+@@ -379,6 +379,11 @@
+ 		  3 0 0x07000000 0x20000>;
+ };
+ 
++&trng {
++	clocks = <&clock CLK_SSS>;
++	clock-names = "secss";
++};
 +
-+Example:
+ &usbdrd3_0 {
+ 	clocks = <&clock CLK_USBD300>;
+ 	clock-names = "usbdrd30";
+diff --git a/arch/arm/boot/dts/exynos5420.dtsi b/arch/arm/boot/dts/exynos5420.dtsi
+index 02d2f898efa6..2f4e5542f354 100644
+--- a/arch/arm/boot/dts/exynos5420.dtsi
++++ b/arch/arm/boot/dts/exynos5420.dtsi
+@@ -1454,6 +1454,11 @@
+ 	clock-names = "secss";
+ };
+ 
++&trng {
++	clocks = <&clock CLK_SSS>;
++	clock-names = "secss";
++};
 +
-+	trng@10830600 {
-+		compatible = "samsung,exynos5250-trng";
-+		reg = <0x10830600 0x100>;
-+		clocks = <&clock CLK_SSS>;
-+		clock-names = "secss";
-+	};
+ &usbdrd3_0 {
+ 	clocks = <&clock CLK_USBD300>;
+ 	clock-names = "usbdrd30";
 -- 
 2.11.0
-
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
