@@ -1,46 +1,56 @@
-From: Ondrej Mosnacek <omosnacek@gmail.com>
-Subject: [PATCH] crypto: skcipher - Fix skcipher_walk_aead_common
-Date: Thu, 23 Nov 2017 13:49:06 +0100
-Message-ID: <20171123124906.15754-1-omosnacek@gmail.com>
-Cc: Ondrej Mosnacek <omosnacek@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, stable@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <stable-owner@vger.kernel.org>
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: =?UTF-8?q?=C5=81ukasz=20Stelmach?= <l.stelmach@samsung.com>
+Subject: [PATCH 0/3] True RNG driver for Samsung Exynos 5250+ SoCs
+Date: Thu, 23 Nov 2017 16:09:11 +0100
+Message-ID: <20171123150914.31462-1-l.stelmach@samsung.com>
+References: <CGME20171123150956eucas1p2e6d42c88692291e4e0d0e7719519bf35@eucas1p2.samsung.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        =?UTF-8?q?=C5=81ukasz=20Stelmach?= <l.stelmach@samsung.com>
+To: Rob Herring <robh+dt@kernel.org>, Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        devicetree@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:58892 "EHLO
+        mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752993AbdKWPKA (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 23 Nov 2017 10:10:00 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The skcipher_walk_aead_common function calls scatterwalk_copychunks on
-the input and output walks to skip the associated data. If the AD end
-at an SG list entry boundary, then after these calls the walks will
-still be pointing to the end of the skipped region.
+Hello.
 
-These offsets are later checked for alignment in skcipher_walk_next,
-so the skcipher_walk may detect the alignment incorrectly.
+The following patches add support for the true random number generator
+found in Samsung Exynos 5250+ SoCs.
 
-This patch fixes it by calling scatterwalk_done after the copychunks
-calls to ensure that the offsets refer to the right SG list entry.
+Patch #1 adds documentation for devicetree bindings.
 
-Fixes: b286d8b1a690 ("crypto: skcipher - Add skcipher walk interface")
-Cc: <stable@vger.kernel.org>
-Signed-off-by: Ondrej Mosnacek <omosnacek@gmail.com>
----
- crypto/skcipher.c | 3 +++
- 1 file changed, 3 insertions(+)
+Patch #2 introduces the driver and appropriate changes in Makefile and Kconfig.
 
-diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-index 4faa0fd53b0c..6c45ed536664 100644
---- a/crypto/skcipher.c
-+++ b/crypto/skcipher.c
-@@ -517,6 +517,9 @@ static int skcipher_walk_aead_common(struct skcipher_walk *walk,
- 	scatterwalk_copychunks(NULL, &walk->in, req->assoclen, 2);
- 	scatterwalk_copychunks(NULL, &walk->out, req->assoclen, 2);
- 
-+	scatterwalk_done(&walk->in, 0, walk->total);
-+	scatterwalk_done(&walk->out, 0, walk->total);
-+
- 	walk->iv = req->iv;
- 	walk->oiv = req->iv;
- 
+Patch #3 adds nodes in devicetree files for Exynos SoCs.
+
+Łukasz Stelmach (3):
+  dt-bindings: hwrng: Add Samsung Exynos 5250+ True RNG bindings
+  hwrng: exynos - add Samsung Exynos True RNG driver
+  ARM: dts: exynos: Add nodes for True Random Number Generator
+
+ .../bindings/rng/samsung,exynos5250-trng.txt       |  17 ++
+ MAINTAINERS                                        |   7 +
+ arch/arm/boot/dts/exynos5.dtsi                     |   5 +
+ arch/arm/boot/dts/exynos5250.dtsi                  |   5 +
+ arch/arm/boot/dts/exynos5410.dtsi                  |   5 +
+ arch/arm/boot/dts/exynos5420.dtsi                  |   5 +
+ drivers/char/hw_random/Kconfig                     |  12 +
+ drivers/char/hw_random/Makefile                    |   1 +
+ drivers/char/hw_random/exynos-trng.c               | 256 +++++++++++++++++++++
+ 9 files changed, 313 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
+ create mode 100644 drivers/char/hw_random/exynos-trng.c
+
 -- 
-2.14.1
+2.11.0
