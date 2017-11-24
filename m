@@ -1,62 +1,101 @@
-From: Dmitry Vyukov <dvyukov@google.com>
-Subject: Re: x509 parsing bug + fuzzing crypto in the userspace
-Date: Fri, 24 Nov 2017 14:49:49 +0100
-Message-ID: <CACT4Y+Zp39AMymVXB8ZdGA1VRYwRVsouuEXdhY3nmP5oawcfEQ@mail.gmail.com>
-References: <CAG_fn=XJZG_MJXXgos5jZmOThKho=uSvwgfhkMSYONZ04PKKaw@mail.gmail.com>
- <CACT4Y+ZSUWEni6SdmM5K-CsZshq77CNGdZedC0tYhcv6p=7Qvg@mail.gmail.com>
- <CACT4Y+bMAH1zK2v5XgF2Zz72ghOYAoMbef3+CjLO5HfTEfAEzg@mail.gmail.com> <3132962.8EQ63lqCxc@tauon.chronox.de>
+From: Krzysztof Kozlowski <krzk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Subject: Re: [PATCH 2/3] hwrng: exynos - add Samsung Exynos True RNG driver
+Date: Fri, 24 Nov 2017 15:13:53 +0100
+Message-ID: <CAJKOXPfMVSJSQLh987rwYiwmFkbncadt_uY-dqBVsOaFBjRqeQ@mail.gmail.com>
+References: <CGME20171123184736eucas1p15d4e73d5a6596a6cba1f940dcc473c9a@eucas1p1.samsung.com>
+ <87o9nsde9r.fsf%l.stelmach@samsung.com> <CAJKOXPc2MGf_b3xA=R=p2_fQ0+SQvwLL8vfZLGhGAAEssD=hJA@mail.gmail.com>
+ <1733513.JRsPYiahIZ@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: Eric Biggers <ebiggers@google.com>,
-        Alexander Potapenko <glider@google.com>,
-        linux-crypto@vger.kernel.org, Kostya Serebryany <kcc@google.com>,
-        keyrings@vger.kernel.org, Andrey Konovalov <andreyknvl@google.com>
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pg0-f53.google.com ([74.125.83.53]:36445 "EHLO
-        mail-pg0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753351AbdKXNuL (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 24 Nov 2017 08:50:11 -0500
-Received: by mail-pg0-f53.google.com with SMTP id 199so3736136pgg.3
-        for <linux-crypto@vger.kernel.org>; Fri, 24 Nov 2017 05:50:11 -0800 (PST)
-In-Reply-To: <3132962.8EQ63lqCxc@tauon.chronox.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Transfer-Encoding: 8BIT
+Cc: =?UTF-8?Q?=C5=81ukasz_Stelmach?= <l.stelmach-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>,
+        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org>,
+        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+        devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-samsung-soc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        Marek Szyprowski <m.szyprowski-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
+To: =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1733513.JRsPYiahIZ-jJGQKZiSfeo1haGO/jJMPxvVK+yQ3ZXh@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Nov 23, 2017 at 1:35 PM, Stephan Mueller <smueller@chronox.de> wrote:
-> Am Donnerstag, 23. November 2017, 12:34:54 CET schrieb Dmitry Vyukov:
+On Fri, Nov 24, 2017 at 2:05 PM, Stephan Müller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org> wrote:
+> Am Freitag, 24. November 2017, 13:09:06 CET schrieb Krzysztof Kozlowski:
 >
-> Hi Dmitry,
->
->> Btw, I've started doing some minimal improvements, did not yet sorted
->> out alg types/names, and fuzzer started scratching surface:
+> Hi Krzysztof,
+>> >>
+>> >> 1. I was rather thinking about extending existing exynos-rng.c [1] so
+>> >> it would be using TRNG as seed for PRNG as this gives you much more
+>> >> random data. Instead you developed totally separate driver which has
+>> >> its own benefits - one can choose which interface he wants. Although
+>> >> it is a little bit duplication.
+>> >
+>> > As far as I can tell, these are two different devices. However, PRNG
+>> > shares hardware with the hash engine. Indeed there is a hardware to
+>> > connect TRNG and PRNG, but, IMHO, it might be hard to model that
+>> > dependency in kernel.
 >>
->> WARNING: kernel stack regs has bad 'bp' value 77 Nov 23 2017 12:29:36 CET
->> general protection fault in af_alg_free_areq_sgls 54 Nov 23 2017 12:23:30
->> CET general protection fault in crypto_chacha20_crypt 100 Nov 23 2017
->> 12:29:48 CET suspicious RCU usage at ./include/trace/events/kmem.h:LINE 88
->> Nov 23 2017 12:29:15 CET
->
-> This all looks strange. Where would RCU come into play with
-> af_alg_free_areq_sgls?
->
-> Do you have a reproducer?
+>> It should be as simple as setting few more registers in SSS module
+>> (actually maybe just enabling TRNG_SEED_START in PRNG). You do not
+>> have to model it in a kernel like connecting some hw_rng entity to
+>> cryptoai's rng_alg. See the jitterentropy-kcapi.c. I understand that
+>> in that case existing exynos-rng.c could expose two different RNG
+>> devices - one PRNG based on user's seed and second TRNG (actually
+>> TRNG+PRNG).
 >>
->> This strongly suggests that we need to dig deeper.
+>> It does not seem difficult to model but the question is whether that
+>> makes sense.
 >
-> Absolutely. That is why I started my fuzzer that turned up already quite some
-> issues.
+> The usage strategy for the PRNGs registered at the kernel crypto API is as
+> follows:
+>
+> 1. crypto_rng_alloc
+>
+> 2. crypto_rng_reset
+>
+> 3. crypto_rng_generate
+>
+> If in step 2 you provide NULL as input, the kernel takes get_random_bytes as
+> seed source. Step 2 is the mandatory.
+>
+> The Linux-RNG can be fed internally from the hw_random framework by the
+> function hwrng_fillfn. This function is only used if the current_quality or
+> default_quality values in the hw_random framework is set.
+>
+> For the TRNG, it seems to be not set per default, but could be set as either a
+> boot argument or at runtime via /sys.
+>
+> If that variable is set and the TRNG is registered, it feeds random data into
+> the Linux-RNG which in turn is used per default to seed a PRNG. In this case,
+> no detour via user space is needed to push data from TRNG to the PRNG. Using
+> that mechanism allows you to benefit from additional entropy the Linux-RNG
+> collects elsewhere.
+>>
+>> > To me it seems easier to read TRNG (or
+>> > /dev/random) and and write the result to PRNG manually (in software).
+>>
+>> Indeed this gives more flexibility to the user (choice of engine) but
+>> first, it is slower, and second it reduces the quality of random
+>> numbers (PRNG reseeds itself... but in this model cannot reseed from
+>> TRNG).
+>
+> Given the reasons above, I would think that keeping the PRMG and TRNG separate
+> as offered by the current patch seems reasonable. If configured correctly, the
+> TRNG can seed the PRNG at any time (including boot time) without the need of
+> user space.
 
-I've cooked syzkaller change that teaches it to generate more
-algorithm names. Probably not idea, but much better than was before:
-https://github.com/google/syzkaller/blob/ddf7b3e0655cf6dfeacfe509e477c1486d2cc7db/sys/linux/alg.go
-(if you see any obvious issues there, feedback is welcome, I still did
-not figure out completely difference between e.g. HASH/AHASH,
-BLKCIPHER/ABLKCIPHER as most of them seem to be interchangable; this
-was mostly based on try and trial approach).
+Hi Stephan,
 
-All bugs with details will soon be reported by syzbot
-(https://goo.gl/tpsmEJ) to kernel mailing lists with all details.
+Thanks for explaining the details. This convinces me so I do not have
+any objections against current approach of this second RNG driver for
+Exynos.
 
-Stephan, thanks for your help!
+Best regards,
+Krzysztof
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
