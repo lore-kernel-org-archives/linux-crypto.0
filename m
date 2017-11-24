@@ -1,39 +1,80 @@
-From: =?UTF-8?B?T25kcmVqIE1vc27DocSNZWs=?= <omosnacek@gmail.com>
-Subject: Re: [PATCH] crypto: skcipher - Fix skcipher_walk_aead_common
-Date: Fri, 24 Nov 2017 11:53:53 +0100
-Message-ID: <CAAUqJDtvTVchrm2kaU06EWDXA-KY3FLsyq-K_dRO6Hec7xqV+g@mail.gmail.com>
-References: <20171123124906.15754-1-omosnacek@gmail.com> <20171124050740.GA14836@gondor.apana.org.au>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: Re: [PATCH 2/3] hwrng: exynos - add Samsung Exynos True RNG driver
+Date: Fri, 24 Nov 2017 13:09:06 +0100
+Message-ID: <CAJKOXPc2MGf_b3xA=R=p2_fQ0+SQvwLL8vfZLGhGAAEssD=hJA@mail.gmail.com>
+References: <CGME20171123184736eucas1p15d4e73d5a6596a6cba1f940dcc473c9a@eucas1p1.samsung.com>
+ <CAJKOXPfaofwB7Sp5Lg0JuZzFwC2RahdWDG5KfsJyNcKDt3b_mA@mail.gmail.com> <87o9nsde9r.fsf%l.stelmach@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, stable@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <20171124050740.GA14836@gondor.apana.org.au>
-Sender: stable-owner@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Cc: Rob Herring <robh+dt@kernel.org>, Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        devicetree@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>
+To: =?UTF-8?Q?=C5=81ukasz_Stelmach?= <l.stelmach@samsung.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <87o9nsde9r.fsf%l.stelmach@samsung.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-(I accidentally hit "reply" instead of "reply all", so resending)
+On Thu, Nov 23, 2017 at 7:46 PM, Łukasz Stelmach <l.stelmach@samsung.com> wrote:
+> It was <2017-11-23 czw 17:31>, when Krzysztof Kozlowski wrote:
+>> On Thu, Nov 23, 2017 at 4:09 PM, Łukasz Stelmach <l.stelmach@samsung.com> wrote:
+>>> Add support for True Random Number Generator found in Samsung Exynos
+>>> 5250+ SoCs.
+>>>
+>>> Signed-off-by: Łukasz Stelmach <l.stelmach@samsung.com>
+>>> ---
+>>>  MAINTAINERS                          |   7 +
+>>>  drivers/char/hw_random/Kconfig       |  12 ++
+>>>  drivers/char/hw_random/Makefile      |   1 +
+>>>  drivers/char/hw_random/exynos-trng.c | 256 +++++++++++++++++++++++++++++++++++
+>>>  4 files changed, 276 insertions(+)
+>>>  create mode 100644 drivers/char/hw_random/exynos-trng.c
+>>>
+>
 
-2017-11-24 6:07 GMT+01:00 Herbert Xu <herbert@gondor.apana.org.au>:
-> On Thu, Nov 23, 2017 at 01:49:06PM +0100, Ondrej Mosnacek wrote:
->> diff --git a/crypto/skcipher.c b/crypto/skcipher.c
->> index 4faa0fd53b0c..6c45ed536664 100644
->> --- a/crypto/skcipher.c
->> +++ b/crypto/skcipher.c
->> @@ -517,6 +517,9 @@ static int skcipher_walk_aead_common(struct skcipher_walk *walk,
->>       scatterwalk_copychunks(NULL, &walk->in, req->assoclen, 2);
->>       scatterwalk_copychunks(NULL, &walk->out, req->assoclen, 2);
++Cc Stephan Müller, who reviewed intensively exynos-rng.c.
+
+> [...]
+>
+>>>  endif # HW_RANDOM
 >>
->> +     scatterwalk_done(&walk->in, 0, walk->total);
->> +     scatterwalk_done(&walk->out, 0, walk->total);
+>> Thanks for working on TRNG.
+>>
+>> 1. I was rather thinking about extending existing exynos-rng.c [1] so
+>> it would be using TRNG as seed for PRNG as this gives you much more
+>> random data. Instead you developed totally separate driver which has
+>> its own benefits - one can choose which interface he wants. Although
+>> it is a little bit duplication.
 >
-> That should be 1 instead of 0 for walk->out.
->
-> Could you please fix and resubmit?
+> As far as I can tell, these are two different devices. However, PRNG
+> shares hardware with the hash engine. Indeed there is a hardware to
+> connect TRNG and PRNG, but, IMHO, it might be hard to model that
+> dependency in kernel.
 
-Since the associated data is not written, just skipped, I believe 0 is
-more appropriate. scatterwalk_copychunks(..., 2) also calls
-scatterwalk_pagedone() with out=0 internally.
+It should be as simple as setting few more registers in SSS module
+(actually maybe just enabling TRNG_SEED_START in PRNG). You do not
+have to model it in a kernel like connecting some hw_rng entity to
+cryptoai's rng_alg. See the jitterentropy-kcapi.c. I understand that
+in that case existing exynos-rng.c could expose two different RNG
+devices - one PRNG based on user's seed and second TRNG (actually
+TRNG+PRNG).
 
-O.M.
+It does not seem difficult to model but the question is whether that
+makes sense.
+
+
+> To me it seems easier to read TRNG (or
+> /dev/random) and and write the result to PRNG manually (in software).
+
+Indeed this gives more flexibility to the user (choice of engine) but
+first, it is slower, and second it reduces the quality of random
+numbers (PRNG reseeds itself... but in this model cannot reseed from
+TRNG).
+
+Best regards,
+Krzysztof
