@@ -1,8 +1,8 @@
 From: Stephan Mueller <smueller@chronox.de>
 Subject: Re: x509 parsing bug + fuzzing crypto in the userspace
-Date: Fri, 24 Nov 2017 16:03:15 +0100
-Message-ID: <2926823.qMJ9kpMUtP@tauon.chronox.de>
-References: <CAG_fn=XJZG_MJXXgos5jZmOThKho=uSvwgfhkMSYONZ04PKKaw@mail.gmail.com> <3132962.8EQ63lqCxc@tauon.chronox.de> <CACT4Y+Zp39AMymVXB8ZdGA1VRYwRVsouuEXdhY3nmP5oawcfEQ@mail.gmail.com>
+Date: Fri, 24 Nov 2017 16:13:35 +0100
+Message-ID: <1748580.hh6WObTt7s@tauon.chronox.de>
+References: <CAG_fn=XJZG_MJXXgos5jZmOThKho=uSvwgfhkMSYONZ04PKKaw@mail.gmail.com> <2631912.1nF8QvS07C@tauon.chronox.de> <CACT4Y+bk4an+8RgyCOeQvGug_qXSktfgHyk3NKF7OgbVrS8kyw@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
@@ -12,145 +12,157 @@ Cc: Eric Biggers <ebiggers@google.com>,
         keyrings@vger.kernel.org, Andrey Konovalov <andreyknvl@google.com>
 To: Dmitry Vyukov <dvyukov@google.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:42450 "EHLO mail.eperm.de"
+Received: from mail.eperm.de ([89.247.134.16]:42454 "EHLO mail.eperm.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753767AbdKXPDR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 24 Nov 2017 10:03:17 -0500
-In-Reply-To: <CACT4Y+Zp39AMymVXB8ZdGA1VRYwRVsouuEXdhY3nmP5oawcfEQ@mail.gmail.com>
+        id S1752288AbdKXPNi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 24 Nov 2017 10:13:38 -0500
+In-Reply-To: <CACT4Y+bk4an+8RgyCOeQvGug_qXSktfgHyk3NKF7OgbVrS8kyw@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Freitag, 24. November 2017, 14:49:49 CET schrieb Dmitry Vyukov:
+Am Freitag, 24. November 2017, 15:55:59 CET schrieb Dmitry Vyukov:
 
 Hi Dmitry,
 
-> I've cooked syzkaller change that teaches it to generate more
-> algorithm names. Probably not idea, but much better than was before:
+> On Fri, Nov 24, 2017 at 3:36 PM, Stephan Mueller <smueller@chronox.de> 
+wrote:
+> > Am Freitag, 24. November 2017, 14:49:49 CET schrieb Dmitry Vyukov:
+> > 
+> > Hi Dmitry,
+> > 
+> >> On Thu, Nov 23, 2017 at 1:35 PM, Stephan Mueller <smueller@chronox.de>
+> > 
+> > wrote:
+> >> > Am Donnerstag, 23. November 2017, 12:34:54 CET schrieb Dmitry Vyukov:
+> >> > 
+> >> > Hi Dmitry,
+> >> > 
+> >> >> Btw, I've started doing some minimal improvements, did not yet sorted
+> >> >> out alg types/names, and fuzzer started scratching surface:
+> >> >> 
+> >> >> WARNING: kernel stack regs has bad 'bp' value 77 Nov 23 2017 12:29:36
+> >> >> CET
+> >> >> general protection fault in af_alg_free_areq_sgls 54 Nov 23 2017
+> >> >> 12:23:30
+> >> >> CET general protection fault in crypto_chacha20_crypt 100 Nov 23 2017
+> >> >> 12:29:48 CET suspicious RCU usage at
+> >> >> ./include/trace/events/kmem.h:LINE
+> >> >> 88
+> >> >> Nov 23 2017 12:29:15 CET
+> >> > 
+> >> > This all looks strange. Where would RCU come into play with
+> >> > af_alg_free_areq_sgls?
+> >> > 
+> >> > Do you have a reproducer?
+> >> > 
+> >> >> This strongly suggests that we need to dig deeper.
+> >> > 
+> >> > Absolutely. That is why I started my fuzzer that turned up already
+> >> > quite
+> >> > some issues.
+> >> 
+> >> I've cooked syzkaller change that teaches it to generate more
+> >> algorithm names. Probably not idea, but much better than was before:
+> >> https://github.com/google/syzkaller/blob/ddf7b3e0655cf6dfeacfe509e477c148
+> >> 6d2 cc7db/sys/linux/alg.go (if you see any obvious issues there, feedback
+> >> is welcome,
+> > 
+> > I will peek into that code shortly.
+> > 
+> >> I still did not figure out completely difference between e.g.
+> >> HASH/AHASH,
+> > 
+> > AHASH is the asynchronous hash. I.e. the implementation can sleep.
+> > 
+> > HASH == SHASH and is the synchronous hash. I.e. that implementation will
+> > never sleep.
+> > 
+> > An SHASH can be turned into an AHASH by using cryptd().
+> > 
+> > An AHASH can never be turned into an SHASH.
+> > 
+> > To use SHASH implementations, you use the *_shash API calls. This API does
+> > not require a request structure.
+> > 
+> > To use AHASH implementations, you use the *_ahash API calls. This API
+> > requires the use of ahash_request_* calls. By transparently employing
+> > cryptd(), the kernel allows the use of SHASH implementations with the
+> > AHASH API.
+> > 
+> > Currently there is only one real AHASH implementation outside specific
+> > hardware drivers: sha1_mb and sha2*_mb found in arch/x86/crypto/. This
+> > implementation can only be used with the AHASH API. All (other) SHASH
+> > implementations can be used with either the shash or the ahash API,
+> > because
+> > when using it as AHASH, the kernel automatically uses the cryptd() under
+> > the hood.
+> 
+> I am interested solely in user-space API because that's what fuzzer
+> uses. *_shash, ahash_request_* are of little help.
+> Your last sentence above means that there is _no_ difference between
+> HASH and AHASH from user-space?
+
+Correct.
+
+> I thrown all HASH/AHASH algs into a single bucket here:
 > https://github.com/google/syzkaller/blob/ddf7b3e0655cf6dfeacfe509e477c1486d2
-> cc7db/sys/linux/alg.go
+> cc7db/sys/linux/alg.go And similarly for BLKCIPHER/ABLKCIPHER.
 
-I am not as fluent in GO, so I may miss a point here:
+This approach is correct.
+> 
+> 
+> Few additional questions:
+> 
+> 1. just to double check: compress algs are not accessible from
+> user-space, right?
 
-		{"authencesn", []int{ALG_HASH, ALG_BLKCIPHER}},
-		{"authenc", []int{ALG_HASH, ALG_BLKCIPHER}},
+Right, because there is no algif_acomp (yet).
+> 
+> 2. There is some setup for algorithms (ALG_SET_KEY,
+> ALG_SET_AEAD_AUTHSIZE setsockopts and ALG_SET_IV, ALG_SET_OP,
+> ALG_SET_AEAD_ASSOCLEN control messages are the ones that was able to
+> find).
 
-These both are templates to form an AEAD cipher. They allow you to specify the 
-block cipher and the hash type.
+... and do not forget that you need to call the setup calls *before* the 
+accept() call for an operation to work correctly.
 
+> Now if I chain something complex like
+> gcm_base(ctr(aes-aesni),ghash-generic) (I don't know if algorithms
+> there require setup or not, but let's assume they do).
 
-		{"rfc7539esp", []int{ALG_BLKCIPHER, ALG_HASH}},
-		{"rfc7539", []int{ALG_BLKCIPHER, ALG_HASH}},
-		{"rfc4543", []int{ALG_AEAD}},
-		{"rfc4106", []int{ALG_AEAD}},
+All ciphers always require setup:
 
-These are no ciphers per se, but simply formatting mechanisms. For example, to 
-make use of rfc4106, you must split the IV: the first four bytes need to be 
-appended to the key and the trailing 8 bytes are used as the IV. Any other 
-formatting should cause an error. Besides, these implementations should only 
-work with some AEAD ciphers like GCM.
+- skciphers: IV (excluding ECB of course) and key
 
+- AEAD: IV, key, authsize and assoclen
 
-		{"pcrypt", []int{ALG_AEAD}},
-		{"rfc4309", []int{ALG_AEAD}},
-		{"gcm", []int{ALG_CIPHER}},
-		{"gcm_base", []int{ALG_BLKCIPHER, ALG_HASH}},
-		{"ccm", []int{ALG_CIPHER}},
-		{"ccm_base", []int{ALG_BLKCIPHER, ALG_HASH}},
+- hashes: key (only for the MACs)
 
-
-
-
-		{"echainiv", []int{ALG_AEAD}},
-{"seqiv", []int{ALG_AEAD}},
-
-These are IV generators and should be used with an AEAD cipher to internally 
-generate IVs. Note, the use of IV generators have changed with 4.2 (see my 
-script I sent you as part of this thread).
+Your example of gcm_base is an AEAD.
 
 
+> How do I setup
+> inner algorithms parameters (e.g. aes-aesni in this case)?
 
-		{"gcm(aes)", nil},
+You cannot access the inner ciphers. For the interface, you only have *one* 
+cipher, i.e. an AEAD. The name only tells the kernel how to construct the 
+cipher. But once it is constructed, it takes the aforementioned parameters. 
+Though, some ciphers may be more restrictive on some parameters than others 
+(e.g. the authsize or assoclen may be restricted for some AEAD ciphers).
 
-gcm() is also a template that can consume any block cipher, including aes-
-generic, serpent, ...
+> Is there a
+> way to call setsockopt effectively on a particular inner alg?
 
-		{"gcm_base(ctr(aes-aesni),ghash-generic)", nil},
+You cannot do that and you do not want to do that.
 
-Again, ctr() is a template that can consume other block ciphers.
+> Or pass
+> control messages to an inner alg? Maybe I am asking non-sense, but
+> that's what comes to my mind looking at the api.
 
-		{"generic-gcm-aesni", nil},
-
-Does this exist?
-
-		{"rfc4106(gcm(aes))", nil},
-
-rfc... is a template that can consume AEAD ciphers.
-
-		{"rfc4106-gcm-aesni", nil},
-		{"__gcm-aes-aesni", nil},
-{"__driver-gcm-aes-aesni", nil},
-
-Please specifically test that __driver_... names should NEVER be allocatable 
-from user space.
-
-
-
-	// algorithms:
-		{"cbc(aes)", nil},
-
-cbc() is a template
-
-
-		{"cbc(aes-aesni)", nil},
-		{"chacha20", nil},
-		{"chacha20-simd", nil},
-		{"pcbc(aes)", nil},
-		{"pcbc-aes-aesni", nil},
-		{"fpu(pcbc(__aes))", nil},
-		{"fpu(pcbc(__aes-aesni))", nil},
-		{"pcbc(__aes)", nil},
-		{"pcbc(__aes-aesni)", nil},
-
-They are all templates.
-
-		{"xts(aes)", nil},
-
-xts() is a template.
-
-Note, starting with 4.9, you must use xts(ecb(aes)).
-
-		{"xts-aes-aesni", nil},
-{"ctr(aes)", nil},
-
-ctr() is a template
-
-
-
-In general, I would rather suggest:
-
-1. identify all templates and mark them what they can consume (other 
-templates, AEAD, skcipher, hash, ...)
-
-2. identify all ciphers (aes, aes-generic, aes-aesni, ...) and identify their 
-types (skcipher, hash)
-
-3. mix-n-match templates with the ciphers according to what templates can 
-consume
-
-
-Start another test where you arbitrarily mix-n-match templates and ciphers or 
-even bogus names, NULL, etc.
-
-
-One word of warning: some cipher names may look like templates, but they are 
-not: gcm(aes) in arch/x86/crypto/ is a complete cipher and not consisting of 
-templates. Thus, I would always use the driver names (gcm-aes-aesni for the 
-given example) to ensure you test exactly the cipher you had in mind.
-
-Word of warning II: There is a bug in the kernel crypto API: if you allocate a 
-cipher using the driver name that was not registered before, this cipher will 
-never be available using its "name". /proc/crypto shows you the reason: the 
-"name" is then identical to the driver name.
+You cannot talk to the inner ciphers. You only talk to one cipher that you 
+referred to with the name. Remember, the name is ONLY used to tell the kernel 
+which parts to put together during allocation. After the allocation, you have 
+only one cipher and interact with only one cipher of the given type.
 
 Ciao
 Stephan
