@@ -1,36 +1,55 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: arm64/aes - do not call
- crypto_unregister_skcipher twice on error
-Date: Fri, 24 Nov 2017 15:55:59 +1100
-Message-ID: <20171124045558.GA14676@gondor.apana.org.au>
-References: <1511338114-39583-1-git-send-email-clabbe@baylibre.com>
- <CAKv+Gu9m3v_iMdg8ngX-3x1HT+c8D52dhjJ=MiTp11VByD=ewA@mail.gmail.com>
+Subject: Re: [PATCH] crypto: skcipher - Fix skcipher_walk_aead_common
+Date: Fri, 24 Nov 2017 16:07:40 +1100
+Message-ID: <20171124050740.GA14836@gondor.apana.org.au>
+References: <20171123124906.15754-1-omosnacek@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Corentin Labbe <clabbe@baylibre.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org"
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, stable@vger.kernel.org
+To: Ondrej Mosnacek <omosnacek@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [128.1.224.119] ([128.1.224.119]:39076 "EHLO ringil.hmeau.com"
+Received: from [128.1.224.119] ([128.1.224.119]:39082 "EHLO ringil.hmeau.com"
         rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1752801AbdKXE6x (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 Nov 2017 23:58:53 -0500
+        id S1750715AbdKXFHu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 24 Nov 2017 00:07:50 -0500
 Content-Disposition: inline
-In-Reply-To: <CAKv+Gu9m3v_iMdg8ngX-3x1HT+c8D52dhjJ=MiTp11VByD=ewA@mail.gmail.com>
+In-Reply-To: <20171123124906.15754-1-omosnacek@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Nov 22, 2017 at 08:55:14AM +0000, Ard Biesheuvel wrote:
->
-> Would this also fix it?
+On Thu, Nov 23, 2017 at 01:49:06PM +0100, Ondrej Mosnacek wrote:
+> The skcipher_walk_aead_common function calls scatterwalk_copychunks on
+> the input and output walks to skip the associated data. If the AD end
+> at an SG list entry boundary, then after these calls the walks will
+> still be pointing to the end of the skipped region.
+> 
+> These offsets are later checked for alignment in skcipher_walk_next,
+> so the skcipher_walk may detect the alignment incorrectly.
+> 
+> This patch fixes it by calling scatterwalk_done after the copychunks
+> calls to ensure that the offsets refer to the right SG list entry.
+> 
+> Fixes: b286d8b1a690 ("crypto: skcipher - Add skcipher walk interface")
+> Cc: <stable@vger.kernel.org>
+> Signed-off-by: Ondrej Mosnacek <omosnacek@gmail.com>
 
-Looks good.  Could you resubmit with a sign-off?
+Good catch!
+
+> diff --git a/crypto/skcipher.c b/crypto/skcipher.c
+> index 4faa0fd53b0c..6c45ed536664 100644
+> --- a/crypto/skcipher.c
+> +++ b/crypto/skcipher.c
+> @@ -517,6 +517,9 @@ static int skcipher_walk_aead_common(struct skcipher_walk *walk,
+>  	scatterwalk_copychunks(NULL, &walk->in, req->assoclen, 2);
+>  	scatterwalk_copychunks(NULL, &walk->out, req->assoclen, 2);
+>  
+> +	scatterwalk_done(&walk->in, 0, walk->total);
+> +	scatterwalk_done(&walk->out, 0, walk->total);
+
+That should be 1 instead of 0 for walk->out.
+
+Could you please fix and resubmit?
 
 Thanks,
 -- 
