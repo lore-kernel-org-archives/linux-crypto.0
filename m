@@ -1,92 +1,54 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [PATCH 2/3] hwrng: exynos - add Samsung Exynos True RNG driver
-Date: Fri, 24 Nov 2017 14:05:11 +0100
-Message-ID: <1733513.JRsPYiahIZ@positron.chronox.de>
-References: <CGME20171123184736eucas1p15d4e73d5a6596a6cba1f940dcc473c9a@eucas1p1.samsung.com> <87o9nsde9r.fsf%l.stelmach@samsung.com> <CAJKOXPc2MGf_b3xA=R=p2_fQ0+SQvwLL8vfZLGhGAAEssD=hJA@mail.gmail.com>
+From: Kamil Konieczny <k.konieczny@partner.samsung.com>
+Subject: Re: Question about ahash export and import
+Date: Fri, 24 Nov 2017 14:35:04 +0100
+Message-ID: <e7eaa2a4-dc44-8542-c2a2-702d8ac7256c@partner.samsung.com>
+References: <0e54df51-7b4c-a01e-2054-3cdf204a429e@c-s.fr>
+        <CGME20170926103514epcas1p4494e6502b2b6835c732201a4aeff60b1@epcas1p4.samsung.com>
+        <CAOtvUMeHF8PZAEaniK+oGYVOF5rbD_kZKuGC3j5XXkF-w2pPDA@mail.gmail.com>
+        <be29fd42-2e64-5ca8-546c-e7f68a2d0da7@partner.samsung.com>
+        <20170927090802.GA1547@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: =?utf-8?B?xYF1a2Fzeg==?= Stelmach <l.stelmach@samsung.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        devicetree@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Return-path: <linux-samsung-soc-owner@vger.kernel.org>
-In-Reply-To: <CAJKOXPc2MGf_b3xA=R=p2_fQ0+SQvwLL8vfZLGhGAAEssD=hJA@mail.gmail.com>
-Sender: linux-samsung-soc-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: Gilad Ben-Yossef <gilad@benyossef.com>,
+        Christophe LEROY <christophe.leroy@c-s.fr>,
+        =?UTF-8?Q?Stephan_M=c3=bcller?= <smueller@chronox.de>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:39652 "EHLO
+        mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752681AbdKXNfO (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 24 Nov 2017 08:35:14 -0500
+In-reply-to: <20170927090802.GA1547@gondor.apana.org.au>
+Content-language: en-US
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Am Freitag, 24. November 2017, 13:09:06 CET schrieb Krzysztof Kozlowski:
-
-Hi Krzysztof,
-> >> 
-> >> 1. I was rather thinking about extending existing exynos-rng.c [1] so
-> >> it would be using TRNG as seed for PRNG as this gives you much more
-> >> random data. Instead you developed totally separate driver which has
-> >> its own benefits - one can choose which interface he wants. Although
-> >> it is a little bit duplication.
-> > 
-> > As far as I can tell, these are two different devices. However, PRNG
-> > shares hardware with the hash engine. Indeed there is a hardware to
-> > connect TRNG and PRNG, but, IMHO, it might be hard to model that
-> > dependency in kernel.
+On 27.09.2017 11:08, Herbert Xu wrote:
+> On Tue, Sep 26, 2017 at 01:09:05PM +0200, Kamil Konieczny wrote:
+>>
+>> Can import() be called without _any_ init(), for example
+>> after reboot of machine ? Is following scenario valid:
 > 
-> It should be as simple as setting few more registers in SSS module
-> (actually maybe just enabling TRNG_SEED_START in PRNG). You do not
-> have to model it in a kernel like connecting some hw_rng entity to
-> cryptoai's rng_alg. See the jitterentropy-kcapi.c. I understand that
-> in that case existing exynos-rng.c could expose two different RNG
-> devices - one PRNG based on user's seed and second TRNG (actually
-> TRNG+PRNG).
+> Of course it can.  import must restore the state of the request
+> to that at the time when export was called.
 > 
-> It does not seem difficult to model but the question is whether that
-> makes sense.
+> import does not need to be called after init.  init simply resets
+> the hash state for new update/final calls.
+> [...]
 
-The usage strategy for the PRNGs registered at the kernel crypto API is as 
-follows:
+I have more questions, this time about HMAC export/import.
+In doc, there is stated that key can be copied into context transformation.
 
-1. crypto_rng_alloc
+Should .export copy request context _and_ key used ? Or not ?
 
-2. crypto_rng_reset
+When processing requests, can I assume the key in transformation is const until .final ?
 
-3. crypto_rng_generate
+Is is possible to have okey derived from different key then ikey ? I think not.
 
-If in step 2 you provide NULL as input, the kernel takes get_random_bytes as 
-seed source. Step 2 is the mandatory.
-
-The Linux-RNG can be fed internally from the hw_random framework by the 
-function hwrng_fillfn. This function is only used if the current_quality or 
-default_quality values in the hw_random framework is set.
-
-For the TRNG, it seems to be not set per default, but could be set as either a 
-boot argument or at runtime via /sys.
-
-If that variable is set and the TRNG is registered, it feeds random data into 
-the Linux-RNG which in turn is used per default to seed a PRNG. In this case, 
-no detour via user space is needed to push data from TRNG to the PRNG. Using 
-that mechanism allows you to benefit from additional entropy the Linux-RNG 
-collects elsewhere.
-> 
-> > To me it seems easier to read TRNG (or
-> > /dev/random) and and write the result to PRNG manually (in software).
-> 
-> Indeed this gives more flexibility to the user (choice of engine) but
-> first, it is slower, and second it reduces the quality of random
-> numbers (PRNG reseeds itself... but in this model cannot reseed from
-> TRNG).
-
-Given the reasons above, I would think that keeping the PRMG and TRNG separate 
-as offered by the current patch seems reasonable. If configured correctly, the 
-TRNG can seed the PRNG at any time (including boot time) without the need of 
-user space.
-> 
-> Best regards,
-> Krzysztof
-
-
-Ciao
-Stephan
+-- 
+Best regards,
+Kamil Konieczny
+Samsung R&D Institute Poland
