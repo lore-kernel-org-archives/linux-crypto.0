@@ -1,49 +1,51 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: skcipher - Fix skcipher_walk_aead_common
-Date: Sat, 25 Nov 2017 11:13:58 +1100
-Message-ID: <20171125001358.GA20780@gondor.apana.org.au>
-References: <20171123124906.15754-1-omosnacek@gmail.com>
- <20171124050740.GA14836@gondor.apana.org.au>
- <CAAUqJDtvTVchrm2kaU06EWDXA-KY3FLsyq-K_dRO6Hec7xqV+g@mail.gmail.com>
+Subject: Re: Question about ahash export and import
+Date: Sat, 25 Nov 2017 11:16:40 +1100
+Message-ID: <20171125001640.GB20780@gondor.apana.org.au>
+References: <0e54df51-7b4c-a01e-2054-3cdf204a429e@c-s.fr>
+ <CGME20170926103514epcas1p4494e6502b2b6835c732201a4aeff60b1@epcas1p4.samsung.com>
+ <CAOtvUMeHF8PZAEaniK+oGYVOF5rbD_kZKuGC3j5XXkF-w2pPDA@mail.gmail.com>
+ <be29fd42-2e64-5ca8-546c-e7f68a2d0da7@partner.samsung.com>
+ <20170927090802.GA1547@gondor.apana.org.au>
+ <e7eaa2a4-dc44-8542-c2a2-702d8ac7256c@partner.samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, stable@vger.kernel.org
-To: Ondrej =?utf-8?B?TW9zbsOhxI1law==?= <omosnacek@gmail.com>
-Return-path: <stable-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Gilad Ben-Yossef <gilad@benyossef.com>,
+        Christophe LEROY <christophe.leroy@c-s.fr>,
+        Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Kamil Konieczny <k.konieczny@partner.samsung.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from [128.1.224.119] ([128.1.224.119]:39174 "EHLO ringil.hmeau.com"
+        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
+        id S1751629AbdKYARU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 24 Nov 2017 19:17:20 -0500
 Content-Disposition: inline
-In-Reply-To: <CAAUqJDtvTVchrm2kaU06EWDXA-KY3FLsyq-K_dRO6Hec7xqV+g@mail.gmail.com>
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <e7eaa2a4-dc44-8542-c2a2-702d8ac7256c@partner.samsung.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Nov 24, 2017 at 11:53:53AM +0100, Ondrej Mosnáček wrote:
-> (I accidentally hit "reply" instead of "reply all", so resending)
+On Fri, Nov 24, 2017 at 02:35:04PM +0100, Kamil Konieczny wrote:
+>
+> I have more questions, this time about HMAC export/import.
+> In doc, there is stated that key can be copied into context transformation.
 > 
-> 2017-11-24 6:07 GMT+01:00 Herbert Xu <herbert@gondor.apana.org.au>:
-> > On Thu, Nov 23, 2017 at 01:49:06PM +0100, Ondrej Mosnacek wrote:
-> >> diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-> >> index 4faa0fd53b0c..6c45ed536664 100644
-> >> --- a/crypto/skcipher.c
-> >> +++ b/crypto/skcipher.c
-> >> @@ -517,6 +517,9 @@ static int skcipher_walk_aead_common(struct skcipher_walk *walk,
-> >>       scatterwalk_copychunks(NULL, &walk->in, req->assoclen, 2);
-> >>       scatterwalk_copychunks(NULL, &walk->out, req->assoclen, 2);
-> >>
-> >> +     scatterwalk_done(&walk->in, 0, walk->total);
-> >> +     scatterwalk_done(&walk->out, 0, walk->total);
-> >
-> > That should be 1 instead of 0 for walk->out.
-> >
-> > Could you please fix and resubmit?
-> 
-> Since the associated data is not written, just skipped, I believe 0 is
-> more appropriate. scatterwalk_copychunks(..., 2) also calls
-> scatterwalk_pagedone() with out=0 internally.
+> Should .export copy request context _and_ key used ? Or not ?
 
-Thanks for the explanation.
+The key is stored in the tfm so export does not need to touch the
+key.  However, sometimes the key is naturally embedded in the hash
+state too, e.g., with hmac, in that case it would make sense for
+export to copy it as part of the hash state.
 
-Patch applied.
+> When processing requests, can I assume the key in transformation is const until .final ?
+
+Yes you may.
+
+> Is is possible to have okey derived from different key then ikey ? I think not.
+
+We do not need to support that case.  If the user changes the
+key mid-stream it results in undefined behaviour.  However,
+the code should not crash though.
 
 Cheers,
 -- 
