@@ -1,7 +1,7 @@
 From: Arvind Yadav <arvind.yadav.cs@gmail.com>
-Subject: [PATCH 3/4] staging: lustre: obdclass: Remove a attribute group from a kobject
-Date: Sat, 25 Nov 2017 12:09:30 +0530
-Message-ID: <1511591971-8615-4-git-send-email-arvind.yadav.cs@gmail.com>
+Subject: [PATCH 2/4] staging: lustre: ldlm: Remove a attribute group from a kobject
+Date: Sat, 25 Nov 2017 12:09:29 +0530
+Message-ID: <1511591971-8615-3-git-send-email-arvind.yadav.cs@gmail.com>
 References: <1511591971-8615-1-git-send-email-arvind.yadav.cs@gmail.com>
 Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
@@ -15,42 +15,29 @@ In-Reply-To: <1511591971-8615-1-git-send-email-arvind.yadav.cs@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-All attribute group created during class_procfs_init() should be
-removed.
-if class_procfs_init() will fail and also in class_procfs_clean().
+All attribute group created during ldlm_setup() should be removed
+in ldlm_cleanup().
 
 Signed-off-by: Arvind Yadav <arvind.yadav.cs@gmail.com>
 ---
- drivers/staging/lustre/lustre/obdclass/linux/linux-module.c | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/staging/lustre/lustre/ldlm/ldlm_lockd.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/staging/lustre/lustre/obdclass/linux/linux-module.c b/drivers/staging/lustre/lustre/obdclass/linux/linux-module.c
-index fc59f29..5795123 100644
---- a/drivers/staging/lustre/lustre/obdclass/linux/linux-module.c
-+++ b/drivers/staging/lustre/lustre/obdclass/linux/linux-module.c
-@@ -501,6 +501,7 @@ int class_procfs_init(void)
- 		rc = debugfs_lustre_root ? PTR_ERR(debugfs_lustre_root)
- 					 : -ENOMEM;
- 		debugfs_lustre_root = NULL;
-+		sysfs_remove_group(lustre_kobj, &lustre_attr_group);
- 		kobject_put(lustre_kobj);
- 		goto out;
- 	}
-@@ -509,6 +510,7 @@ int class_procfs_init(void)
- 				   &obd_device_list_fops);
- 	if (IS_ERR_OR_NULL(file)) {
- 		rc = file ? PTR_ERR(file) : -ENOMEM;
-+		sysfs_remove_group(lustre_kobj, &lustre_attr_group);
- 		kobject_put(lustre_kobj);
- 		goto out;
- 	}
-@@ -522,6 +524,7 @@ int class_procfs_clean(void)
+diff --git a/drivers/staging/lustre/lustre/ldlm/ldlm_lockd.c b/drivers/staging/lustre/lustre/ldlm/ldlm_lockd.c
+index 2d5a2c9..ada50b6 100644
+--- a/drivers/staging/lustre/lustre/ldlm/ldlm_lockd.c
++++ b/drivers/staging/lustre/lustre/ldlm/ldlm_lockd.c
+@@ -1093,8 +1093,10 @@ static int ldlm_cleanup(void)
+ 		kset_unregister(ldlm_ns_kset);
+ 	if (ldlm_svc_kset)
+ 		kset_unregister(ldlm_svc_kset);
+-	if (ldlm_kobj)
++	if (ldlm_kobj) {
++		sysfs_remove_group(ldlm_kobj, &ldlm_attr_group);
+ 		kobject_put(ldlm_kobj);
++	}
  
- 	debugfs_lustre_root = NULL;
+ 	ldlm_debugfs_cleanup();
  
-+	sysfs_remove_group(lustre_kobj, &lustre_attr_group);
- 	kobject_put(lustre_kobj);
- 
- 	return 0;
 -- 
 2.7.4
