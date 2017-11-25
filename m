@@ -1,7 +1,7 @@
 From: Arvind Yadav <arvind.yadav.cs@gmail.com>
-Subject: [PATCH 4/4] staging: most: Remove a attribute group from a kobject
-Date: Sat, 25 Nov 2017 12:09:31 +0530
-Message-ID: <1511591971-8615-5-git-send-email-arvind.yadav.cs@gmail.com>
+Subject: [PATCH 1/4] staging: ccree: Remove a attribute group from a kobject
+Date: Sat, 25 Nov 2017 12:09:28 +0530
+Message-ID: <1511591971-8615-2-git-send-email-arvind.yadav.cs@gmail.com>
 References: <1511591971-8615-1-git-send-email-arvind.yadav.cs@gmail.com>
 Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
@@ -15,24 +15,30 @@ In-Reply-To: <1511591971-8615-1-git-send-email-arvind.yadav.cs@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-All attribute group created during dim2_sysfs_probe() should be removed
-in dim2_sysfs_destroy().
+All attribute group created during sys_init_dir() should be removed
+in sys_free_dir()
 
 Signed-off-by: Arvind Yadav <arvind.yadav.cs@gmail.com>
 ---
- drivers/staging/most/hdm-dim2/dim2_sysfs.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/staging/ccree/ssi_sysfs.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/staging/most/hdm-dim2/dim2_sysfs.c b/drivers/staging/most/hdm-dim2/dim2_sysfs.c
-index d8b22f9..c038ff5 100644
---- a/drivers/staging/most/hdm-dim2/dim2_sysfs.c
-+++ b/drivers/staging/most/hdm-dim2/dim2_sysfs.c
-@@ -111,5 +111,6 @@ int dim2_sysfs_probe(struct medialb_bus *bus, struct kobject *parent_kobj)
+diff --git a/drivers/staging/ccree/ssi_sysfs.c b/drivers/staging/ccree/ssi_sysfs.c
+index 5d39f15..14a3f32 100644
+--- a/drivers/staging/ccree/ssi_sysfs.c
++++ b/drivers/staging/ccree/ssi_sysfs.c
+@@ -145,8 +145,11 @@ static void sys_free_dir(struct sys_dir *sys_dir)
  
- void dim2_sysfs_destroy(struct medialb_bus *bus)
- {
-+	sysfs_remove_group(&bus->kobj_group, &bus_attr_group);
- 	kobject_put(&bus->kobj_group);
+ 	kfree(sys_dir->sys_dir_attr_list);
+ 
+-	if (sys_dir->sys_dir_kobj)
++	if (sys_dir->sys_dir_kobj) {
++		sysfs_remove_group(sys_dir->sys_dir_kobj,
++				   &sys_dir->sys_dir_attr_group);
+ 		kobject_put(sys_dir->sys_dir_kobj);
++	}
  }
+ 
+ int ssi_sysfs_init(struct kobject *sys_dev_obj, struct ssi_drvdata *drvdata)
 -- 
 2.7.4
