@@ -1,7 +1,7 @@
 From: Arvind Yadav <arvind.yadav.cs@gmail.com>
-Subject: [PATCH 2/4] staging: lustre: ldlm: Remove a attribute group from a kobject
-Date: Sat, 25 Nov 2017 12:09:29 +0530
-Message-ID: <1511591971-8615-3-git-send-email-arvind.yadav.cs@gmail.com>
+Subject: [PATCH 4/4] staging: most: Remove a attribute group from a kobject
+Date: Sat, 25 Nov 2017 12:09:31 +0530
+Message-ID: <1511591971-8615-5-git-send-email-arvind.yadav.cs@gmail.com>
 References: <1511591971-8615-1-git-send-email-arvind.yadav.cs@gmail.com>
 Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
@@ -15,29 +15,24 @@ In-Reply-To: <1511591971-8615-1-git-send-email-arvind.yadav.cs@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-All attribute group created during ldlm_setup() should be removed
-in ldlm_cleanup().
+All attribute group created during dim2_sysfs_probe() should be removed
+in dim2_sysfs_destroy().
 
 Signed-off-by: Arvind Yadav <arvind.yadav.cs@gmail.com>
 ---
- drivers/staging/lustre/lustre/ldlm/ldlm_lockd.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ drivers/staging/most/hdm-dim2/dim2_sysfs.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/staging/lustre/lustre/ldlm/ldlm_lockd.c b/drivers/staging/lustre/lustre/ldlm/ldlm_lockd.c
-index 2d5a2c9..ada50b6 100644
---- a/drivers/staging/lustre/lustre/ldlm/ldlm_lockd.c
-+++ b/drivers/staging/lustre/lustre/ldlm/ldlm_lockd.c
-@@ -1093,8 +1093,10 @@ static int ldlm_cleanup(void)
- 		kset_unregister(ldlm_ns_kset);
- 	if (ldlm_svc_kset)
- 		kset_unregister(ldlm_svc_kset);
--	if (ldlm_kobj)
-+	if (ldlm_kobj) {
-+		sysfs_remove_group(ldlm_kobj, &ldlm_attr_group);
- 		kobject_put(ldlm_kobj);
-+	}
+diff --git a/drivers/staging/most/hdm-dim2/dim2_sysfs.c b/drivers/staging/most/hdm-dim2/dim2_sysfs.c
+index d8b22f9..c038ff5 100644
+--- a/drivers/staging/most/hdm-dim2/dim2_sysfs.c
++++ b/drivers/staging/most/hdm-dim2/dim2_sysfs.c
+@@ -111,5 +111,6 @@ int dim2_sysfs_probe(struct medialb_bus *bus, struct kobject *parent_kobj)
  
- 	ldlm_debugfs_cleanup();
- 
+ void dim2_sysfs_destroy(struct medialb_bus *bus)
+ {
++	sysfs_remove_group(&bus->kobj_group, &bus_attr_group);
+ 	kobject_put(&bus->kobj_group);
+ }
 -- 
 2.7.4
