@@ -1,57 +1,74 @@
 From: Eric Biggers <ebiggers3@gmail.com>
-Subject: [PATCH] ASN.1: check for error from ASN1_OP_END__ACT actions
-Date: Sun, 26 Nov 2017 23:15:28 -0800
-Message-ID: <20171127071528.25456-1-ebiggers3@gmail.com>
+Subject: [PATCH] X.509: reject invalid BIT STRING for subjectPublicKey
+Date: Sun, 26 Nov 2017 23:16:20 -0800
+Message-ID: <20171127071620.25724-1-ebiggers3@gmail.com>
 Cc: linux-crypto@vger.kernel.org,
         Alexander Potapenko <glider@google.com>,
         Eric Biggers <ebiggers@google.com>, stable@vger.kernel.org
 To: keyrings@vger.kernel.org, David Howells <dhowells@redhat.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f194.google.com ([209.85.192.194]:41145 "EHLO
-        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750838AbdK0HP4 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 Nov 2017 02:15:56 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <stable-owner@vger.kernel.org>
+Sender: stable-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-asn1_ber_decoder() was ignoring errors from actions associated with the
-opcodes ASN1_OP_END_SEQ_ACT, ASN1_OP_END_SET_ACT,
-ASN1_OP_END_SEQ_OF_ACT, and ASN1_OP_END_SET_OF_ACT.  In practice, this
-meant the pkcs7_note_signed_info() action (since that was the only user
-of those opcodes).  Fix it by checking for the error, just like the
-decoder does for actions associated with the other opcodes.
+Adding a specially crafted X.509 certificate whose subjectPublicKey
+ASN.1 value is zero-length caused x509_extract_key_data() to set the
+public key size to SIZE_MAX, as it subtracted the nonexistent BIT STRING
+metadata byte.  Then, x509_cert_parse() called kmemdup() with that bogus
+size, triggering the WARN_ON_ONCE() in kmalloc_slab().
 
-This bug allowed users to leak slab memory by repeatedly trying to add a
-specially crafted "pkcs7_test" key (requires CONFIG_PKCS7_TEST_KEY).
+This appears to be harmless, but it still must be fixed since WARNs are
+never supposed to be user-triggerable.
 
-In theory, this bug could also be used to bypass module signature
-verification, by providing a PKCS#7 message that is misparsed such that
-a signature's ->authattrs do not contain its ->msgdigest.  But it
-doesn't seem practical in normal cases, due to restrictions on the
-format of the ->authattrs.
+Fix it by updating x509_cert_parse() to validate that the value has a
+BIT STRING metadata byte, and that the byte is 0 which indicates that
+the number of bits in the bitstring is a multiple of 8.
+
+It would be nice to handle the metadata byte in asn1_ber_decoder()
+instead.  But that would be tricky because in the general case a BIT
+STRING could be implicitly tagged, and/or could legitimately have a
+length that is not a whole number of bytes.
+
+Here was the WARN (cleaned up slightly):
+
+    WARNING: CPU: 1 PID: 202 at mm/slab_common.c:971 kmalloc_slab+0x5d/0x70 mm/slab_common.c:971
+    Modules linked in:
+    CPU: 1 PID: 202 Comm: keyctl Tainted: G    B            4.14.0-09238-g1d3b78bbc6e9 #26
+    Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.11.0-20171110_100015-anatol 04/01/2014
+    task: ffff880033014180 task.stack: ffff8800305c8000
+    Call Trace:
+     __do_kmalloc mm/slab.c:3706 [inline]
+     __kmalloc_track_caller+0x22/0x2e0 mm/slab.c:3726
+     kmemdup+0x17/0x40 mm/util.c:118
+     kmemdup include/linux/string.h:414 [inline]
+     x509_cert_parse+0x2cb/0x620 crypto/asymmetric_keys/x509_cert_parser.c:106
+     x509_key_preparse+0x61/0x750 crypto/asymmetric_keys/x509_public_key.c:174
+     asymmetric_key_preparse+0xa4/0x150 crypto/asymmetric_keys/asymmetric_type.c:388
+     key_create_or_update+0x4d4/0x10a0 security/keys/key.c:850
+     SYSC_add_key security/keys/keyctl.c:122 [inline]
+     SyS_add_key+0xe8/0x290 security/keys/keyctl.c:62
+     entry_SYSCALL_64_fastpath+0x1f/0x96
 
 Fixes: 42d5ec27f873 ("X.509: Add an ASN.1 decoder")
 Cc: <stable@vger.kernel.org> # v3.7+
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- lib/asn1_decoder.c | 2 ++
+ crypto/asymmetric_keys/x509_cert_parser.c | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/lib/asn1_decoder.c b/lib/asn1_decoder.c
-index d77cdfc4b554..dc14beae2c9a 100644
---- a/lib/asn1_decoder.c
-+++ b/lib/asn1_decoder.c
-@@ -439,6 +439,8 @@ int asn1_ber_decoder(const struct asn1_decoder *decoder,
- 			else
- 				act = machine[pc + 1];
- 			ret = actions[act](context, hdr, 0, data + tdp, len);
-+			if (ret < 0)
-+				return ret;
- 		}
- 		pc += asn1_op_lengths[op];
- 		goto next_op;
+diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
+index dd03fead1ca3..ce2df8c9c583 100644
+--- a/crypto/asymmetric_keys/x509_cert_parser.c
++++ b/crypto/asymmetric_keys/x509_cert_parser.c
+@@ -409,6 +409,8 @@ int x509_extract_key_data(void *context, size_t hdrlen,
+ 	ctx->cert->pub->pkey_algo = "rsa";
+ 
+ 	/* Discard the BIT STRING metadata */
++	if (vlen < 1 || *(const u8 *)value != 0)
++		return -EBADMSG;
+ 	ctx->key = value + 1;
+ 	ctx->key_size = vlen - 1;
+ 	return 0;
 -- 
 2.15.0
