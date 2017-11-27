@@ -1,44 +1,68 @@
-From: Eric Biggers <ebiggers3@gmail.com>
-Subject: [PATCH] X.509: use crypto_shash_digest()
-Date: Sun, 26 Nov 2017 23:19:54 -0800
-Message-ID: <20171127071954.26273-1-ebiggers3@gmail.com>
-Cc: linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@google.com>
-To: keyrings@vger.kernel.org, David Howells <dhowells@redhat.com>
+From: =?utf-8?Q?=C5=81ukasz_Stelmach?= <l.stelmach@samsung.com>
+Subject: Re: [PATCH 2/3] hwrng: exynos - add Samsung Exynos True RNG driver
+Date: Mon, 27 Nov 2017 08:23:50 +0100
+Message-ID: <87indwchh5.fsf%l.stelmach@samsung.com>
+References: <CANc+2y4=Eas-i0jRwgTxqFeAngpPMKoUjVwsXWeU7G24g4252w@mail.gmail.com>
+        <CGME20171127072355eucas1p218e3cbaeb1ba16b5a1262deda350d850@eucas1p2.samsung.com>
+Mime-Version: 1.0
+Content-Type: multipart/signed; boundary="=-=-="; micalg="pgp-sha256";
+        protocol="application/pgp-signature"
+Cc: Rob Herring <robh+dt@kernel.org>, Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        devicetree@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+To: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pg0-f66.google.com ([74.125.83.66]:37249 "EHLO
-        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751544AbdK0HUA (ORCPT
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:37529 "EHLO
+        mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751197AbdK0HYA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 Nov 2017 02:20:00 -0500
+        Mon, 27 Nov 2017 02:24:00 -0500
+In-reply-to: <CANc+2y4=Eas-i0jRwgTxqFeAngpPMKoUjVwsXWeU7G24g4252w@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Eric Biggers <ebiggers@google.com>
+--=-=-=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Use crypto_shash_digest() instead of crypto_shash_init() followed by
-crypto_shash_finup().  (For simplicity only; they are equivalent.)
+It was <2017-11-24 pi=C4=85 16:25>, when PrasannaKumar Muralidharan wrote:
+>> +}
+>> +
+>> +static int exynos_trng_do_read(struct hwrng *rng, void *data, size_t ma=
+x,
+>> +                              bool wait)
+>> +{
+>> +       struct exynos_trng_dev *trng;
+>> +       u32 val;
+>> +
+>> +       max =3D max > (EXYNOS_TRNG_FIFO_LEN * 4) ?
+>> +               (EXYNOS_TRNG_FIFO_LEN * 4) : max;
+>
+> max is always > 32. This condition is not required.
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- crypto/asymmetric_keys/x509_public_key.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+No, it is not. http://elixir.free-electrons.com/linux/latest/source/drivers=
+/char/hw_random/core.c#L67
+=2D-=20
+=C5=81ukasz Stelmach
+Samsung R&D Institute Poland
+Samsung Electronics
 
-diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
-index 9db20abe78a0..3b39c0659155 100644
---- a/crypto/asymmetric_keys/x509_public_key.c
-+++ b/crypto/asymmetric_keys/x509_public_key.c
-@@ -79,11 +79,7 @@ int x509_get_sig_params(struct x509_certificate *cert)
- 	desc->tfm = tfm;
- 	desc->flags = CRYPTO_TFM_REQ_MAY_SLEEP;
- 
--	ret = crypto_shash_init(desc);
--	if (ret < 0)
--		goto error_2;
--	might_sleep();
--	ret = crypto_shash_finup(desc, cert->tbs, cert->tbs_size, sig->digest);
-+	ret = crypto_shash_digest(desc, cert->tbs, cert->tbs_size, sig->digest);
- 	if (ret < 0)
- 		goto error_2;
- 
--- 
-2.15.0
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBCAAGBQJaG72GAAoJELCuHpyYpYAQ7TwH/RluMZvecCAMUJ+TOwqhwmo8
+Pnd91DSwwzYfQdNuXapahStONC3jjrQOd6eRaKrxo6084H9iUpSeJIiZhBMvduDu
+jvgi3Se+IkrlNZgsXeLHeTrxDoUvutib7tklV2yhrNEx5K/Yduf5/h5cK+jwCTzU
+8ptGH41kAbRcMSwEau2MBYf48a0gWru27cFiSTIymdIjqHMBZH41BZSpdh0ivKnW
+7nDd3+ZIANec+xyzt03fvHijtPOJlDjTN5N1ai+BC7DSc18EnPb58TaoYa1A1LQD
+NjXi3SlzW9c2Xa3KdogCxQcOdLGMcGmEMq+KsFIkN0uJzS3aHMed2b+Gudo7GvU=
+=mKSe
+-----END PGP SIGNATURE-----
+--=-=-=--
