@@ -1,57 +1,69 @@
 From: Eric Biggers <ebiggers3@gmail.com>
-Subject: [PATCH] X.509: fix comparisons of ->pkey_algo
-Date: Sun, 26 Nov 2017 23:17:24 -0800
-Message-ID: <20171127071724.25874-1-ebiggers3@gmail.com>
+Subject: [PATCH] X.509: fix buffer overflow detection in sprint_oid()
+Date: Sun, 26 Nov 2017 23:17:51 -0800
+Message-ID: <20171127071751.25935-1-ebiggers3@gmail.com>
 Cc: linux-crypto@vger.kernel.org,
         Alexander Potapenko <glider@google.com>,
-        Eric Biggers <ebiggers@google.com>, stable@vger.kernel.org
+        Eric Biggers <ebiggers@google.com>,
+        Takashi Iwai <tiwai@suse.de>
 To: keyrings@vger.kernel.org, David Howells <dhowells@redhat.com>
-Return-path: <stable-owner@vger.kernel.org>
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pl0-f68.google.com ([209.85.160.68]:36132 "EHLO
+        mail-pl0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750838AbdK0HSJ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 27 Nov 2017 02:18:09 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 From: Eric Biggers <ebiggers@google.com>
 
-->pkey_algo used to be an enum, but was changed to a string by commit
-4e8ae72a75aa ("X.509: Make algo identifiers text instead of enum").  But
-two comparisons were not updated.  Fix them to use strcmp().
+In sprint_oid(), if the input buffer were to be more than 1 byte too
+small for the first snprintf(), 'bufsize' would underflow, causing a
+buffer overflow when printing the remainder of the OID.
 
-This bug broke signature verification in certain configurations,
-depending on whether the string constants were deduplicated or not.
+Fortunately this cannot actually happen currently, because no users pass
+in a buffer that can be too small for the first snprintf().
 
-Fixes: 4e8ae72a75aa ("X.509: Make algo identifiers text instead of enum")
-Cc: <stable@vger.kernel.org> # v4.6+
+Regardless, fix it by checking the snprintf() return value correctly.
+
+For consistency also tweak the second snprintf() check to look the same.
+
+Fixes: 4f73175d0375 ("X.509: Add utility functions to render OIDs as strings")
+Cc: Takashi Iwai <tiwai@suse.de>
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/asymmetric_keys/pkcs7_verify.c    | 2 +-
- crypto/asymmetric_keys/x509_public_key.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ lib/oid_registry.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/crypto/asymmetric_keys/pkcs7_verify.c b/crypto/asymmetric_keys/pkcs7_verify.c
-index 2d93d9eccb4d..063d6745c741 100644
---- a/crypto/asymmetric_keys/pkcs7_verify.c
-+++ b/crypto/asymmetric_keys/pkcs7_verify.c
-@@ -150,7 +150,7 @@ static int pkcs7_find_key(struct pkcs7_message *pkcs7,
- 		pr_devel("Sig %u: Found cert serial match X.509[%u]\n",
- 			 sinfo->index, certix);
+diff --git a/lib/oid_registry.c b/lib/oid_registry.c
+index 41b9e50711a7..5a75d127995d 100644
+--- a/lib/oid_registry.c
++++ b/lib/oid_registry.c
+@@ -120,10 +120,10 @@ int sprint_oid(const void *data, size_t datasize, char *buffer, size_t bufsize)
  
--		if (x509->pub->pkey_algo != sinfo->sig->pkey_algo) {
-+		if (strcmp(x509->pub->pkey_algo, sinfo->sig->pkey_algo)) {
- 			pr_warn("Sig %u: X.509 algo and PKCS#7 sig algo don't match\n",
- 				sinfo->index);
- 			continue;
-diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
-index c9013582c026..9db20abe78a0 100644
---- a/crypto/asymmetric_keys/x509_public_key.c
-+++ b/crypto/asymmetric_keys/x509_public_key.c
-@@ -135,7 +135,7 @@ int x509_check_for_self_signed(struct x509_certificate *cert)
+ 	n = *v++;
+ 	ret = count = snprintf(buffer, bufsize, "%u.%u", n / 40, n % 40);
++	if (count >= bufsize)
++		return -ENOBUFS;
+ 	buffer += count;
+ 	bufsize -= count;
+-	if (bufsize == 0)
+-		return -ENOBUFS;
+ 
+ 	while (v < end) {
+ 		num = 0;
+@@ -141,9 +141,9 @@ int sprint_oid(const void *data, size_t datasize, char *buffer, size_t bufsize)
+ 			} while (n & 0x80);
+ 		}
+ 		ret += count = snprintf(buffer, bufsize, ".%lu", num);
+-		buffer += count;
+-		if (bufsize <= count)
++		if (count >= bufsize)
+ 			return -ENOBUFS;
++		buffer += count;
+ 		bufsize -= count;
  	}
  
- 	ret = -EKEYREJECTED;
--	if (cert->pub->pkey_algo != cert->sig->pkey_algo)
-+	if (strcmp(cert->pub->pkey_algo, cert->sig->pkey_algo))
- 		goto out;
- 
- 	ret = public_key_verify_signature(cert->pub, cert->sig);
 -- 
 2.15.0
