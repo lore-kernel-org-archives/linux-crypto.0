@@ -1,47 +1,59 @@
 From: Eric Biggers <ebiggers3@gmail.com>
-Subject: [PATCH] X.509: reject invalid BIT STRING for subjectPublicKey
-Date: Sun, 26 Nov 2017 23:16:20 -0800
-Message-ID: <20171127071620.25724-1-ebiggers3@gmail.com>
+Subject: [PATCH] crypto: rsa - fix buffer overread when stripping leading zeroes
+Date: Sun, 26 Nov 2017 23:16:49 -0800
+Message-ID: <20171127071649.25800-1-ebiggers3@gmail.com>
 Cc: linux-crypto@vger.kernel.org,
         Alexander Potapenko <glider@google.com>,
-        Eric Biggers <ebiggers@google.com>, stable@vger.kernel.org
+        Eric Biggers <ebiggers@google.com>, stable@vger.kernel.org,
+        Tudor Ambarus <tudor-dan.ambarus@nxp.com>
 To: keyrings@vger.kernel.org, David Howells <dhowells@redhat.com>
-Return-path: <stable-owner@vger.kernel.org>
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pg0-f68.google.com ([74.125.83.68]:37112 "EHLO
+        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751270AbdK0HQ7 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 27 Nov 2017 02:16:59 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 From: Eric Biggers <ebiggers@google.com>
 
-Adding a specially crafted X.509 certificate whose subjectPublicKey
-ASN.1 value is zero-length caused x509_extract_key_data() to set the
-public key size to SIZE_MAX, as it subtracted the nonexistent BIT STRING
-metadata byte.  Then, x509_cert_parse() called kmemdup() with that bogus
-size, triggering the WARN_ON_ONCE() in kmalloc_slab().
+In rsa_get_n(), if the buffer contained all 0's and "FIPS mode" is
+enabled, we would read one byte past the end of the buffer while
+scanning the leading zeroes.  Fix it by checking 'n_sz' before '!*ptr'.
 
-This appears to be harmless, but it still must be fixed since WARNs are
-never supposed to be user-triggerable.
+This bug was reachable by adding a specially crafted key of type
+"asymmetric" (requires CONFIG_RSA and CONFIG_X509_CERTIFICATE_PARSER).
 
-Fix it by updating x509_cert_parse() to validate that the value has a
-BIT STRING metadata byte, and that the byte is 0 which indicates that
-the number of bits in the bitstring is a multiple of 8.
+KASAN report:
 
-It would be nice to handle the metadata byte in asn1_ber_decoder()
-instead.  But that would be tricky because in the general case a BIT
-STRING could be implicitly tagged, and/or could legitimately have a
-length that is not a whole number of bytes.
+    BUG: KASAN: slab-out-of-bounds in rsa_get_n+0x19e/0x1d0 crypto/rsa_helper.c:33
+    Read of size 1 at addr ffff88003501a708 by task keyctl/196
 
-Here was the WARN (cleaned up slightly):
-
-    WARNING: CPU: 1 PID: 202 at mm/slab_common.c:971 kmalloc_slab+0x5d/0x70 mm/slab_common.c:971
-    Modules linked in:
-    CPU: 1 PID: 202 Comm: keyctl Tainted: G    B            4.14.0-09238-g1d3b78bbc6e9 #26
+    CPU: 1 PID: 196 Comm: keyctl Not tainted 4.14.0-09238-g1d3b78bbc6e9 #26
     Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.11.0-20171110_100015-anatol 04/01/2014
-    task: ffff880033014180 task.stack: ffff8800305c8000
     Call Trace:
-     __do_kmalloc mm/slab.c:3706 [inline]
-     __kmalloc_track_caller+0x22/0x2e0 mm/slab.c:3726
+     rsa_get_n+0x19e/0x1d0 crypto/rsa_helper.c:33
+     asn1_ber_decoder+0x82a/0x1fd0 lib/asn1_decoder.c:328
+     rsa_set_pub_key+0xd3/0x320 crypto/rsa.c:278
+     crypto_akcipher_set_pub_key ./include/crypto/akcipher.h:364 [inline]
+     pkcs1pad_set_pub_key+0xae/0x200 crypto/rsa-pkcs1pad.c:117
+     crypto_akcipher_set_pub_key ./include/crypto/akcipher.h:364 [inline]
+     public_key_verify_signature+0x270/0x9d0 crypto/asymmetric_keys/public_key.c:106
+     x509_check_for_self_signed+0x2ea/0x480 crypto/asymmetric_keys/x509_public_key.c:141
+     x509_cert_parse+0x46a/0x620 crypto/asymmetric_keys/x509_cert_parser.c:129
+     x509_key_preparse+0x61/0x750 crypto/asymmetric_keys/x509_public_key.c:174
+     asymmetric_key_preparse+0xa4/0x150 crypto/asymmetric_keys/asymmetric_type.c:388
+     key_create_or_update+0x4d4/0x10a0 security/keys/key.c:850
+     SYSC_add_key security/keys/keyctl.c:122 [inline]
+     SyS_add_key+0xe8/0x290 security/keys/keyctl.c:62
+     entry_SYSCALL_64_fastpath+0x1f/0x96
+
+    Allocated by task 196:
+     __do_kmalloc mm/slab.c:3711 [inline]
+     __kmalloc_track_caller+0x118/0x2e0 mm/slab.c:3726
      kmemdup+0x17/0x40 mm/util.c:118
-     kmemdup include/linux/string.h:414 [inline]
+     kmemdup ./include/linux/string.h:414 [inline]
      x509_cert_parse+0x2cb/0x620 crypto/asymmetric_keys/x509_cert_parser.c:106
      x509_key_preparse+0x61/0x750 crypto/asymmetric_keys/x509_public_key.c:174
      asymmetric_key_preparse+0xa4/0x150 crypto/asymmetric_keys/asymmetric_type.c:388
@@ -50,25 +62,26 @@ Here was the WARN (cleaned up slightly):
      SyS_add_key+0xe8/0x290 security/keys/keyctl.c:62
      entry_SYSCALL_64_fastpath+0x1f/0x96
 
-Fixes: 42d5ec27f873 ("X.509: Add an ASN.1 decoder")
-Cc: <stable@vger.kernel.org> # v3.7+
+Fixes: 5a7de97309f5 ("crypto: rsa - return raw integers for the ASN.1 parser")
+Cc: <stable@vger.kernel.org> # v4.8+
+Cc: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/asymmetric_keys/x509_cert_parser.c | 2 ++
- 1 file changed, 2 insertions(+)
+ crypto/rsa_helper.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
-index dd03fead1ca3..ce2df8c9c583 100644
---- a/crypto/asymmetric_keys/x509_cert_parser.c
-+++ b/crypto/asymmetric_keys/x509_cert_parser.c
-@@ -409,6 +409,8 @@ int x509_extract_key_data(void *context, size_t hdrlen,
- 	ctx->cert->pub->pkey_algo = "rsa";
+diff --git a/crypto/rsa_helper.c b/crypto/rsa_helper.c
+index 0b66dc824606..cad395d70d78 100644
+--- a/crypto/rsa_helper.c
++++ b/crypto/rsa_helper.c
+@@ -30,7 +30,7 @@ int rsa_get_n(void *context, size_t hdrlen, unsigned char tag,
+ 		return -EINVAL;
  
- 	/* Discard the BIT STRING metadata */
-+	if (vlen < 1 || *(const u8 *)value != 0)
-+		return -EBADMSG;
- 	ctx->key = value + 1;
- 	ctx->key_size = vlen - 1;
- 	return 0;
+ 	if (fips_enabled) {
+-		while (!*ptr && n_sz) {
++		while (n_sz && !*ptr) {
+ 			ptr++;
+ 			n_sz--;
+ 		}
 -- 
 2.15.0
