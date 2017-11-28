@@ -1,48 +1,46 @@
-From: Dmitry Vyukov <dvyukov@google.com>
-Subject: Re: x509 parsing bug + fuzzing crypto in the userspace
-Date: Tue, 28 Nov 2017 10:59:04 +0100
-Message-ID: <CACT4Y+brFOoj25PcGv+d6fy6zcysXOYg3Awat5LQR+CCmFtmxg@mail.gmail.com>
-References: <CAG_fn=XJZG_MJXXgos5jZmOThKho=uSvwgfhkMSYONZ04PKKaw@mail.gmail.com>
- <1838350.iOjUKSrnbm@tauon.chronox.de> <CACT4Y+ZQfNxO+gTX3QRcMDeQW7ECpeAvv92sf-0=s_8cAD8n0g@mail.gmail.com>
- <1684405.FoYHGhiAJd@tauon.chronox.de>
+From: Kamil Konieczny <k.konieczny@partner.samsung.com>
+Subject: [PATCH] crypto: Add myself as co-maintainer for s5p-sss.c
+Date: Tue, 28 Nov 2017 11:07:05 +0100
+Message-ID: <f2871875-a4ed-6c5e-5a67-1051e44c6dd9@partner.samsung.com>
+References: <CGME20171128100706eucas1p1aa80a6c7eb4f1f4facbde258dfe9ceda@eucas1p1.samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Eric Biggers <ebiggers@google.com>,
-        Alexander Potapenko <glider@google.com>,
-        linux-crypto@vger.kernel.org, Kostya Serebryany <kcc@google.com>,
-        keyrings@vger.kernel.org, Andrey Konovalov <andreyknvl@google.com>
-To: Stephan Mueller <smueller@chronox.de>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: Krzysztof Kozlowski <krzk@kernel.org>,
+        Vladimir Zapolskiy <vz@mleia.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        k.konieczny@partner.samsung.com, linux-crypto@vger.kernel.org,
+        linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f180.google.com ([209.85.192.180]:46473 "EHLO
-        mail-pf0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752282AbdK1J70 (ORCPT
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:60017 "EHLO
+        mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751368AbdK1KHK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Nov 2017 04:59:26 -0500
-Received: by mail-pf0-f180.google.com with SMTP id q4so18699911pfg.13
-        for <linux-crypto@vger.kernel.org>; Tue, 28 Nov 2017 01:59:26 -0800 (PST)
-In-Reply-To: <1684405.FoYHGhiAJd@tauon.chronox.de>
+        Tue, 28 Nov 2017 05:07:10 -0500
+Content-language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Nov 24, 2017 at 5:31 PM, Stephan Mueller <smueller@chronox.de> wrote:
-> Am Freitag, 24. November 2017, 17:25:55 CET schrieb Dmitry Vyukov:
->
-> Hi Dmitry,
->
->> Eric also pointed me to grep. But I can't say the code is intuitive.
->> I've spent way more time than I expected to just get a list of all
->> algorithms with their types. Say, in some cases algorithm descriptions
->> do not specify their type, it's somehow plumbed somewhere later.
->> Getting the list at runtime allowed me to get relevant ones with
->> proper types.
->
-> Hehe, getting the list of ciphers in the script I sent the other day took me a
-> long time.
->
-> Maybe you leave it for now and come back later for a good grepping code to
-> search the sources.
+Add myself as co-maintainer for Samsung Security SubSystem driver.
 
+Signed-off-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
+---
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
 
-First bugs uncovered by the change started popping up:
-https://groups.google.com/forum/#!forum/syzkaller-bugs
-More coming!
+diff --git a/MAINTAINERS b/MAINTAINERS
+index aa71ab52fd76..3f6cadf2e087 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -11982,6 +11982,7 @@ F:	drivers/media/i2c/s5k5baf.c
+ SAMSUNG S5P Security SubSystem (SSS) DRIVER
+ M:	Krzysztof Kozlowski <krzk@kernel.org>
+ M:	Vladimir Zapolskiy <vz@mleia.com>
++M:	Kamil Konieczny <k.konieczny@partner.samsung.com>
+ L:	linux-crypto@vger.kernel.org
+ L:	linux-samsung-soc@vger.kernel.org
+ S:	Maintained
+-- 
+2.15.0
