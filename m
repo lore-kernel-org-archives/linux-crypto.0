@@ -1,453 +1,107 @@
-From: Antoine Tenart <antoine.tenart@free-electrons.com>
-Subject: Re: [PATCH 1/4] crypto: inside-secure - per request invalidation
-Date: Tue, 28 Nov 2017 10:14:47 +0100
-Message-ID: <20171128091447.GC2595@kwain>
-References: <20171128090518.12469-1-antoine.tenart@free-electrons.com>
- <20171128090518.12469-2-antoine.tenart@free-electrons.com>
+From: Fabien DESSENNE <fabien.dessenne@st.com>
+Subject: Re: [PATCH v5 2/2] crypto: stm32 - Support for STM32 CRYP crypto
+ module
+Date: Tue, 28 Nov 2017 09:47:54 +0000
+Message-ID: <63a930a0-e56b-9fd4-ad47-e8ebb494a77f@st.com>
+References: <1508425830-13565-1-git-send-email-fabien.dessenne@st.com>
+ <1508425830-13565-3-git-send-email-fabien.dessenne@st.com>
+ <20171022072659.GB8489@Red> <d924a278-90d0-969e-f1ae-a12f92e8972d@st.com>
+ <774a92f2-af70-0424-b066-0cc1db3f9ab0@st.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Cc: Ofer Heifetz <oferh@marvell.com>,
-        thomas.petazzoni@free-electrons.com,
-        gregory.clement@free-electrons.com,
-        miquel.raynal@free-electrons.com, igall@marvell.com,
-        nadavh@marvell.com, linux-crypto@vger.kernel.org,
-        Antoine Tenart <antoine.tenart@free-electrons.com>
-To: herbert@gondor.apana.org.au, davem@davemloft.net
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:54958 "EHLO
-        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751494AbdK1JOt (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Nov 2017 04:14:49 -0500
-Content-Disposition: inline
-In-Reply-To: <20171128090518.12469-2-antoine.tenart@free-electrons.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Mark Rutland <mark.rutland@arm.com>,
+ "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+ Alexandre TORGUE <alexandre.torgue@st.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ Lionel DEBIEVE <lionel.debieve@st.com>, Rob Herring <robh+dt@kernel.org>,
+ Corentin Labbe <clabbe.montjoie@gmail.com>,
+ "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Ludovic BARRE <ludovic.barre@st.com>, "David S . Miller" <davem@davemloft.net>,
+ "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+ Benjamin GAIGNARD <benjamin.gaignard@st.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <774a92f2-af70-0424-b066-0cc1db3f9ab0@st.com>
+Content-Language: en-US
+Content-ID: <16DC39CAF100614886DB8316D4C7E37B@st.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Nov 28, 2017 at 10:05:15AM +0100, Antoine Tenart wrote:
-> From: Ofer Heifetz <oferh@marvell.com>
-> 
-> When an invalidation request is needed we currently override the context
-> .send and .handle_result helpers. This is wrong as under high load other
-> requests can already be queued and overriding the context helpers will
-> make them execute the wrong .send and .handle_result functions.
-> 
-> This commit fixes this by adding a needs_inv flag in the request to
-> choose the action to perform when sending requests or handling their
-> results. This flag will be set when needed (i.e. when the context flag
-> will be set).
-> 
-> Fixes: 1b44c5a60c13 ("crypto: inside-secure - add SafeXcel EIP197 crypto engine driver")
-> Signed-off-by: Ofer Heifetz <oferh@marvell.com>
-> [Antoine: commit message, and removed non related changes from the
-> original commit]
-> Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
-> ---
->  drivers/crypto/inside-secure/crash.txt         | 56 ++++++++++++++++++++
+Just a gentle ping ... or have I missed out on a reply?
 
-So one of my crash trace is part of the commit... I'll remove it and
-send a v2, sorry for the noise.
 
-Antoine
-
->  drivers/crypto/inside-secure/safexcel_cipher.c | 71 +++++++++++++++++++++-----
->  drivers/crypto/inside-secure/safexcel_hash.c   | 68 +++++++++++++++++++-----
->  3 files changed, 168 insertions(+), 27 deletions(-)
->  create mode 100644 drivers/crypto/inside-secure/crash.txt
-> 
-> diff --git a/drivers/crypto/inside-secure/crash.txt b/drivers/crypto/inside-secure/crash.txt
-> new file mode 100644
-> index 000000000000..18f15e542e62
-> --- /dev/null
-> +++ b/drivers/crypto/inside-secure/crash.txt
-> @@ -0,0 +1,56 @@
-> +[   12.117635] Unable to handle kernel NULL pointer dereference at virtual address 00000000
-> +[   12.127101] Mem abort info:
-> +[   12.131303]   Exception class = DABT (current EL), IL = 32 bits
-> +[   12.138636]   SET = 0, FnV = 0
-> +[   12.143100]   EA = 0, S1PTW = 0
-> +[   12.146325] Data abort info:
-> +[   12.149230]   ISV = 0, ISS = 0x00000006
-> +[   12.153093]   CM = 0, WnR = 0
-> +[   12.156085] user pgtable: 4k pages, 48-bit VAs, pgd = ffff8000eab7d000
-> +[   12.162649] [0000000000000000] *pgd=00000000eaaec003, *pud=00000000eaaed003, *pmd=0000000000000000
-> +[   12.171665] Internal error: Oops: 96000006 [#1] PREEMPT SMP
-> +[   12.177263] Modules linked in: cryptodev(O)
-> +[   12.181471] CPU: 3 PID: 249 Comm: irq/30-f2800000 Tainted: GO    4.14.0-rc7 #416
-> +[   12.189857] Hardware name: Marvell 8040 MACHIATOBin (DT)
-> +[   12.195192] task: ffff8000e6a68e00 task.stack: ffff00000de80000
-> +[   12.201146] PC is at __memcpy+0x70/0x180
-> +[   12.205088] LR is at safexcel_handle_result+0xbc/0x360
-> +[   12.210247] pc : [<ffff000008646ef0>] lr : [<ffff00000849961c>] pstate: 60000145
-> +[   12.217673] sp : ffff00000de83ca0
-> +[   12.221002] x29: ffff00000de83ca0 x28: ffff8000eb377c80 
-> +[   12.226340] x27: ffff00000de83d93 x26: 0000000000000020 
-> +[   12.231678] x25: ffff00000de83d94 x24: 0000000000000001 
-> +[   12.237015] x23: ffff8000e772114c x22: ffff8000e77357c0 
-> +[   12.242352] x21: ffff8000eb377080 x20: ffff8000eb377000 
-> +[   12.247689] x19: ffff8000e7721018 x18: 0000000000000055 
-> +[   12.253025] x17: 0000ffff90477460 x16: ffff00000824cb10 
-> +[   12.258362] x15: 0000000000000b08 x14: 00003d0900000000 
-> +[   12.263699] x13: 00000000000186a0 x12: 0000000000000004 
-> +[   12.269035] x11: 0000000000000040 x10: 0000000000000a00 
-> +[   12.274372] x9 : ffff00000de83d00 x8 : ffff000008e78a08 
-> +[   12.279709] x7 : 0000000000000003 x6 : ffff8000eb377088 
-> +[   12.285046] x5 : 0000000000000000 x4 : 0000000000000000 
-> +[   12.290382] x3 : 0000000000000020 x2 : 0000000000000020 
-> +[   12.295719] x1 : 0000000000000000 x0 : ffff8000eb377088 
-> +[   12.301058] Process irq/30-f2800000 (pid: 249, stack limit = 0xffff00000de80000)
-> +[   12.308484] Call trace:
-> +[   12.310941] Exception stack(0xffff00000de83b60 to 0xffff00000de83ca0)
-> +[   12.317410] 3b60: ffff8000eb377088 0000000000000000 0000000000000020 0000000000000020
-> +[   12.325274] 3b80: 0000000000000000 0000000000000000 ffff8000eb377088 0000000000000003
-> +[   12.333137] 3ba0: ffff000008e78a08 ffff00000de83d00 0000000000000a00 0000000000000040
-> +[   12.341000] 3bc0: 0000000000000004 00000000000186a0 00003d0900000000 0000000000000b08
-> +[   12.348863] 3be0: ffff00000824cb10 0000ffff90477460 0000000000000055 ffff8000e7721018
-> +[   12.356726] 3c00: ffff8000eb377000 ffff8000eb377080 ffff8000e77357c0 ffff8000e772114c
-> +[   12.364589] 3c20: 0000000000000001 ffff00000de83d94 0000000000000020 ffff00000de83d93
-> +[   12.372452] 3c40: ffff8000eb377c80 ffff00000de83ca0 ffff00000849961c ffff00000de83ca0
-> +[   12.380315] 3c60: ffff000008646ef0 0000000060000145 ffff000008499604 ffff8000eb377000
-> +[   12.388177] 3c80: ffffffffffffffff ffff000008499604 ffff00000de83ca0 ffff000008646ef0
-> +[   12.396041] [<ffff000008646ef0>] __memcpy+0x70/0x180
-> +[   12.401028] [<ffff000008496bd8>] safexcel_irq_ring_thread+0x128/0x270
-> +[   12.407498] [<ffff00000810bf80>] irq_thread_fn+0x30/0x70
-> +[   12.412832] [<ffff00000810c2b8>] irq_thread+0x158/0x200
-> +[   12.418080] [<ffff0000080d4688>] kthread+0x108/0x140
-> +[   12.423066] [<ffff000008084c7c>] ret_from_fork+0x10/0x24
-> +[   12.428401] Code: 54000080 540000ab a8c12027 a88120c7 (a8c12027) 
-> +[   12.434521] ---[ end trace 6845b94599e89fd8 ]---
-> +[   12.439193] genirq: exiting task "irq/30-f2800000" (249) is an active IRQ thread (irq 30)
-> diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
-> index 5438552bc6d7..9ea24868d860 100644
-> --- a/drivers/crypto/inside-secure/safexcel_cipher.c
-> +++ b/drivers/crypto/inside-secure/safexcel_cipher.c
-> @@ -14,6 +14,7 @@
->  
->  #include <crypto/aes.h>
->  #include <crypto/skcipher.h>
-> +#include <crypto/internal/skcipher.h>
->  
->  #include "safexcel.h"
->  
-> @@ -33,6 +34,10 @@ struct safexcel_cipher_ctx {
->  	unsigned int key_len;
->  };
->  
-> +struct safexcel_cipher_req {
-> +	bool needs_inv;
-> +};
-> +
->  static void safexcel_cipher_token(struct safexcel_cipher_ctx *ctx,
->  				  struct crypto_async_request *async,
->  				  struct safexcel_command_desc *cdesc,
-> @@ -126,9 +131,9 @@ static int safexcel_context_control(struct safexcel_cipher_ctx *ctx,
->  	return 0;
->  }
->  
-> -static int safexcel_handle_result(struct safexcel_crypto_priv *priv, int ring,
-> -				  struct crypto_async_request *async,
-> -				  bool *should_complete, int *ret)
-> +static int safexcel_handle_req_result(struct safexcel_crypto_priv *priv, int ring,
-> +				      struct crypto_async_request *async,
-> +				      bool *should_complete, int *ret)
->  {
->  	struct skcipher_request *req = skcipher_request_cast(async);
->  	struct safexcel_result_desc *rdesc;
-> @@ -265,7 +270,6 @@ static int safexcel_aes_send(struct crypto_async_request *async,
->  	spin_unlock_bh(&priv->ring[ring].egress_lock);
->  
->  	request->req = &req->base;
-> -	ctx->base.handle_result = safexcel_handle_result;
->  
->  	*commands = n_cdesc;
->  	*results = n_rdesc;
-> @@ -341,8 +345,6 @@ static int safexcel_handle_inv_result(struct safexcel_crypto_priv *priv,
->  
->  	ring = safexcel_select_ring(priv);
->  	ctx->base.ring = ring;
-> -	ctx->base.needs_inv = false;
-> -	ctx->base.send = safexcel_aes_send;
->  
->  	spin_lock_bh(&priv->ring[ring].queue_lock);
->  	enq_ret = crypto_enqueue_request(&priv->ring[ring].queue, async);
-> @@ -359,6 +361,26 @@ static int safexcel_handle_inv_result(struct safexcel_crypto_priv *priv,
->  	return ndesc;
->  }
->  
-> +static int safexcel_handle_result(struct safexcel_crypto_priv *priv, int ring,
-> +				  struct crypto_async_request *async,
-> +				  bool *should_complete, int *ret)
-> +{
-> +	struct skcipher_request *req = skcipher_request_cast(async);
-> +	struct safexcel_cipher_req *sreq = skcipher_request_ctx(req);
-> +	int err;
-> +
-> +	if (sreq->needs_inv) {
-> +		sreq->needs_inv = false;
-> +		err = safexcel_handle_inv_result(priv, ring, async,
-> +						 should_complete, ret);
-> +	} else {
-> +		err = safexcel_handle_req_result(priv, ring, async,
-> +						 should_complete, ret);
-> +	}
-> +
-> +	return err;
-> +}
-> +
->  static int safexcel_cipher_send_inv(struct crypto_async_request *async,
->  				    int ring, struct safexcel_request *request,
->  				    int *commands, int *results)
-> @@ -368,8 +390,6 @@ static int safexcel_cipher_send_inv(struct crypto_async_request *async,
->  	struct safexcel_crypto_priv *priv = ctx->priv;
->  	int ret;
->  
-> -	ctx->base.handle_result = safexcel_handle_inv_result;
-> -
->  	ret = safexcel_invalidate_cache(async, &ctx->base, priv,
->  					ctx->base.ctxr_dma, ring, request);
->  	if (unlikely(ret))
-> @@ -381,11 +401,29 @@ static int safexcel_cipher_send_inv(struct crypto_async_request *async,
->  	return 0;
->  }
->  
-> +static int safexcel_send(struct crypto_async_request *async,
-> +			 int ring, struct safexcel_request *request,
-> +			 int *commands, int *results)
-> +{
-> +	struct skcipher_request *req = skcipher_request_cast(async);
-> +	struct safexcel_cipher_req *sreq = skcipher_request_ctx(req);
-> +	int ret;
-> +
-> +	if (sreq->needs_inv)
-> +		ret = safexcel_cipher_send_inv(async, ring, request,
-> +					       commands, results);
-> +	else
-> +		ret = safexcel_aes_send(async, ring, request,
-> +					commands, results);
-> +	return ret;
-> +}
-> +
->  static int safexcel_cipher_exit_inv(struct crypto_tfm *tfm)
->  {
->  	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
->  	struct safexcel_crypto_priv *priv = ctx->priv;
->  	struct skcipher_request req;
-> +	struct safexcel_cipher_req *sreq = skcipher_request_ctx(&req);
->  	struct safexcel_inv_result result = {};
->  	int ring = ctx->base.ring;
->  
-> @@ -399,7 +437,7 @@ static int safexcel_cipher_exit_inv(struct crypto_tfm *tfm)
->  	skcipher_request_set_tfm(&req, __crypto_skcipher_cast(tfm));
->  	ctx = crypto_tfm_ctx(req.base.tfm);
->  	ctx->base.exit_inv = true;
-> -	ctx->base.send = safexcel_cipher_send_inv;
-> +	sreq->needs_inv = true;
->  
->  	spin_lock_bh(&priv->ring[ring].queue_lock);
->  	crypto_enqueue_request(&priv->ring[ring].queue, &req.base);
-> @@ -424,19 +462,21 @@ static int safexcel_aes(struct skcipher_request *req,
->  			enum safexcel_cipher_direction dir, u32 mode)
->  {
->  	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
-> +	struct safexcel_cipher_req *sreq = skcipher_request_ctx(req);
->  	struct safexcel_crypto_priv *priv = ctx->priv;
->  	int ret, ring;
->  
-> +	sreq->needs_inv = false;
->  	ctx->direction = dir;
->  	ctx->mode = mode;
->  
->  	if (ctx->base.ctxr) {
-> -		if (ctx->base.needs_inv)
-> -			ctx->base.send = safexcel_cipher_send_inv;
-> +		if (ctx->base.needs_inv) {
-> +			sreq->needs_inv = true;
-> +			ctx->base.needs_inv = false;
-> +		}
->  	} else {
->  		ctx->base.ring = safexcel_select_ring(priv);
-> -		ctx->base.send = safexcel_aes_send;
-> -
->  		ctx->base.ctxr = dma_pool_zalloc(priv->context_pool,
->  						 EIP197_GFP_FLAGS(req->base),
->  						 &ctx->base.ctxr_dma);
-> @@ -476,6 +516,11 @@ static int safexcel_skcipher_cra_init(struct crypto_tfm *tfm)
->  			     alg.skcipher.base);
->  
->  	ctx->priv = tmpl->priv;
-> +	ctx->base.send = safexcel_send;
-> +	ctx->base.handle_result = safexcel_handle_result;
-> +
-> +	crypto_skcipher_set_reqsize(__crypto_skcipher_cast(tfm),
-> +				    sizeof(struct safexcel_cipher_req));
->  
->  	return 0;
->  }
-> diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
-> index 74feb6227101..6135c9f5742c 100644
-> --- a/drivers/crypto/inside-secure/safexcel_hash.c
-> +++ b/drivers/crypto/inside-secure/safexcel_hash.c
-> @@ -32,6 +32,7 @@ struct safexcel_ahash_req {
->  	bool last_req;
->  	bool finish;
->  	bool hmac;
-> +	bool needs_inv;
->  
->  	u8 state_sz;    /* expected sate size, only set once */
->  	u32 state[SHA256_DIGEST_SIZE / sizeof(u32)];
-> @@ -119,9 +120,9 @@ static void safexcel_context_control(struct safexcel_ahash_ctx *ctx,
->  	}
->  }
->  
-> -static int safexcel_handle_result(struct safexcel_crypto_priv *priv, int ring,
-> -				  struct crypto_async_request *async,
-> -				  bool *should_complete, int *ret)
-> +static int safexcel_handle_req_result(struct safexcel_crypto_priv *priv, int ring,
-> +				      struct crypto_async_request *async,
-> +				      bool *should_complete, int *ret)
->  {
->  	struct safexcel_result_desc *rdesc;
->  	struct ahash_request *areq = ahash_request_cast(async);
-> @@ -165,9 +166,9 @@ static int safexcel_handle_result(struct safexcel_crypto_priv *priv, int ring,
->  	return 1;
->  }
->  
-> -static int safexcel_ahash_send(struct crypto_async_request *async, int ring,
-> -			       struct safexcel_request *request, int *commands,
-> -			       int *results)
-> +static int safexcel_ahash_send_req(struct crypto_async_request *async, int ring,
-> +				    struct safexcel_request *request, int *commands,
-> +				    int *results)
->  {
->  	struct ahash_request *areq = ahash_request_cast(async);
->  	struct crypto_ahash *ahash = crypto_ahash_reqtfm(areq);
-> @@ -292,7 +293,6 @@ static int safexcel_ahash_send(struct crypto_async_request *async, int ring,
->  
->  	req->processed += len;
->  	request->req = &areq->base;
-> -	ctx->base.handle_result = safexcel_handle_result;
->  
->  	*commands = n_cdesc;
->  	*results = 1;
-> @@ -374,8 +374,6 @@ static int safexcel_handle_inv_result(struct safexcel_crypto_priv *priv,
->  
->  	ring = safexcel_select_ring(priv);
->  	ctx->base.ring = ring;
-> -	ctx->base.needs_inv = false;
-> -	ctx->base.send = safexcel_ahash_send;
->  
->  	spin_lock_bh(&priv->ring[ring].queue_lock);
->  	enq_ret = crypto_enqueue_request(&priv->ring[ring].queue, async);
-> @@ -392,6 +390,26 @@ static int safexcel_handle_inv_result(struct safexcel_crypto_priv *priv,
->  	return 1;
->  }
->  
-> +static int safexcel_handle_result(struct safexcel_crypto_priv *priv, int ring,
-> +				  struct crypto_async_request *async,
-> +				  bool *should_complete, int *ret)
-> +{
-> +	struct ahash_request *areq = ahash_request_cast(async);
-> +	struct safexcel_ahash_req *req = ahash_request_ctx(areq);
-> +	int err;
-> +
-> +	if (req->needs_inv) {
-> +		req->needs_inv = false;
-> +		err = safexcel_handle_inv_result(priv, ring, async,
-> +						 should_complete, ret);
-> +	} else {
-> +		err = safexcel_handle_req_result(priv, ring, async,
-> +						 should_complete, ret);
-> +	}
-> +
-> +	return err;
-> +}
-> +
->  static int safexcel_ahash_send_inv(struct crypto_async_request *async,
->  				   int ring, struct safexcel_request *request,
->  				   int *commands, int *results)
-> @@ -400,7 +418,6 @@ static int safexcel_ahash_send_inv(struct crypto_async_request *async,
->  	struct safexcel_ahash_ctx *ctx = crypto_ahash_ctx(crypto_ahash_reqtfm(areq));
->  	int ret;
->  
-> -	ctx->base.handle_result = safexcel_handle_inv_result;
->  	ret = safexcel_invalidate_cache(async, &ctx->base, ctx->priv,
->  					ctx->base.ctxr_dma, ring, request);
->  	if (unlikely(ret))
-> @@ -412,11 +429,30 @@ static int safexcel_ahash_send_inv(struct crypto_async_request *async,
->  	return 0;
->  }
->  
-> +static int safexcel_ahash_send(struct crypto_async_request *async,
-> +			 int ring, struct safexcel_request *request,
-> +			 int *commands, int *results)
-> +{
-> +
-> +	struct ahash_request *areq = ahash_request_cast(async);
-> +	struct safexcel_ahash_req *req = ahash_request_ctx(areq);
-> +	int ret;
-> +
-> +	if (req->needs_inv)
-> +		ret = safexcel_ahash_send_inv(async, ring, request,
-> +					      commands, results);
-> +	else
-> +		ret = safexcel_ahash_send_req(async, ring, request,
-> +					      commands, results);
-> +	return ret;
-> +}
-> +
->  static int safexcel_ahash_exit_inv(struct crypto_tfm *tfm)
->  {
->  	struct safexcel_ahash_ctx *ctx = crypto_tfm_ctx(tfm);
->  	struct safexcel_crypto_priv *priv = ctx->priv;
->  	struct ahash_request req;
-> +	struct safexcel_ahash_req *rctx = ahash_request_ctx(&req);
->  	struct safexcel_inv_result result = {};
->  	int ring = ctx->base.ring;
->  
-> @@ -430,7 +466,7 @@ static int safexcel_ahash_exit_inv(struct crypto_tfm *tfm)
->  	ahash_request_set_tfm(&req, __crypto_ahash_cast(tfm));
->  	ctx = crypto_tfm_ctx(req.base.tfm);
->  	ctx->base.exit_inv = true;
-> -	ctx->base.send = safexcel_ahash_send_inv;
-> +	rctx->needs_inv = true;
->  
->  	spin_lock_bh(&priv->ring[ring].queue_lock);
->  	crypto_enqueue_request(&priv->ring[ring].queue, &req.base);
-> @@ -481,14 +517,16 @@ static int safexcel_ahash_enqueue(struct ahash_request *areq)
->  	struct safexcel_crypto_priv *priv = ctx->priv;
->  	int ret, ring;
->  
-> -	ctx->base.send = safexcel_ahash_send;
-> +	req->needs_inv = false;
->  
->  	if (req->processed && ctx->digest == CONTEXT_CONTROL_DIGEST_PRECOMPUTED)
->  		ctx->base.needs_inv = safexcel_ahash_needs_inv_get(areq);
->  
->  	if (ctx->base.ctxr) {
-> -		if (ctx->base.needs_inv)
-> -			ctx->base.send = safexcel_ahash_send_inv;
-> +		if (ctx->base.needs_inv) {
-> +			ctx->base.needs_inv = false;
-> +			req->needs_inv = true;
-> +		}
->  	} else {
->  		ctx->base.ring = safexcel_select_ring(priv);
->  		ctx->base.ctxr = dma_pool_zalloc(priv->context_pool,
-> @@ -622,6 +660,8 @@ static int safexcel_ahash_cra_init(struct crypto_tfm *tfm)
->  			     struct safexcel_alg_template, alg.ahash);
->  
->  	ctx->priv = tmpl->priv;
-> +	ctx->base.send = safexcel_ahash_send;
-> +	ctx->base.handle_result = safexcel_handle_result;
->  
->  	crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
->  				 sizeof(struct safexcel_ahash_req));
-> -- 
-> 2.14.3
-> 
-
--- 
-Antoine Ténart, Free Electrons
-Embedded Linux and Kernel engineering
-http://free-electrons.com
+On 13/11/17 11:30, Fabien DESSENNE wrote:
+> Hi Herbert,
+>
+> Can you check if this patchset (removed the AEAD part as you suggested +
+> libkcapi test OK as suggested by Corentin) can be applied now?
+>
+> BR
+>
+> Fabien
+>
+>
+> On 07/11/17 15:40, Fabien DESSENNE wrote:
+>> On 22/10/17 09:26, Corentin Labbe wrote:
+>>> On Thu, Oct 19, 2017 at 05:10:30PM +0200, Fabien Dessenne wrote:
+>>>> This module registers block cipher algorithms that make use of the
+>>>> STMicroelectronics STM32 crypto "CRYP1" hardware.
+>>>> The following algorithms are supported:
+>>>> - aes: ecb, cbc, ctr
+>>>> - des: ecb, cbc
+>>>> - tdes: ecb, cbc
+>>>>
+>>>> Signed-off-by: Fabien Dessenne <fabien.dessenne@st.com>
+>>>> ---
+>>>>     drivers/crypto/stm32/Kconfig      |    9 +
+>>>>     drivers/crypto/stm32/Makefile     |    3 +-
+>>>>     drivers/crypto/stm32/stm32-cryp.c | 1172 +++++++++++++++++++++++++++++++++++++
+>>>>     3 files changed, 1183 insertions(+), 1 deletion(-)
+>>>>     create mode 100644 drivers/crypto/stm32/stm32-cryp.c
+>>>>
+>>>> diff --git a/drivers/crypto/stm32/Kconfig b/drivers/crypto/stm32/Kconfig
+>>>> +static void stm32_cryp_irq_write_block(struct stm32_cryp *cryp)
+>>>> +{
+>>>> +	unsigned int i, j;
+>>>> +	u32 *src;
+>>>> +	u8 d8[4];
+>>>> +
+>>>> +	src = sg_virt(cryp->in_sg) + _walked_in;
+>>>> +
+>>>> +	for (i = 0; i < cryp->hw_blocksize / sizeof(u32); i++) {
+>>>> +		if (likely(cryp->total_in >= sizeof(u32))) {
+>>>> +			/* Write a full u32 */
+>>>> +			stm32_cryp_write(cryp, CRYP_DIN, *src);
+>>> Hello
+>>>
+>>> Try also to test your driver with userspace via AF_ALG (libkcapi is a good start).
+>>> It should probably crash here.
+>>> I have do the same on my first sunxi-ss driver and you should use kmap().
+>>>
+>>> Regards
+>> Hi Corentin,
+>>
+>> Thank you for suggesting to test from userspace through the AF_ALG
+>> socket with libkcapi.
+>> This increases my test coverage.
+>>
+>> I ran the miscellaneous tests (kcapi-enc-test(large).sh + test.sh) and
+>> could not observe any crash.
+>> Note that I had already fixed some 'memory crashes' while testing with
+>> testmgr / tcrypt while testing from the kernel.
+>>
+>> So it looks like the proposed implementation is fine.
+>>
+>> BR
+>>
+>> Fabien
