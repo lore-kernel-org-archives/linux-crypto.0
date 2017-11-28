@@ -1,7 +1,8 @@
 From: Antoine Tenart <antoine.tenart@free-electrons.com>
-Subject: [PATCH v2 0/4] crypto: inside-secure - set of fixes
-Date: Tue, 28 Nov 2017 16:42:32 +0100
-Message-ID: <20171128154236.19192-1-antoine.tenart@free-electrons.com>
+Subject: [PATCH v2 3/4] crypto: inside-secure - only update the result buffer when provided
+Date: Tue, 28 Nov 2017 16:42:35 +0100
+Message-ID: <20171128154236.19192-4-antoine.tenart@free-electrons.com>
+References: <20171128154236.19192-1-antoine.tenart@free-electrons.com>
 Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
         thomas.petazzoni@free-electrons.com,
         gregory.clement@free-electrons.com,
@@ -9,39 +10,43 @@ Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
         igall@marvell.com, nadavh@marvell.com, linux-crypto@vger.kernel.org
 To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:37733 "EHLO
+Received: from mail.free-electrons.com ([62.4.15.54]:37740 "EHLO
         mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753777AbdK1PpN (ORCPT
+        with ESMTP id S1753778AbdK1PpO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Nov 2017 10:45:13 -0500
+        Tue, 28 Nov 2017 10:45:14 -0500
+In-Reply-To: <20171128154236.19192-1-antoine.tenart@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
+The patch fixes the ahash support by only updating the result buffer
+when provided. Otherwise the driver could crash with NULL pointer
+exceptions, because the ahash caller isn't required to supply a result
+buffer on all calls.
 
-This series is a set of 4 fixes on the Inside Secure SafeXcel crypto
-engine driver. The series will be followed by another non-fix one.
+Fixes: 1b44c5a60c13 ("crypto: inside-secure - add SafeXcel EIP197 crypto engine driver")
+Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
+---
+ drivers/crypto/inside-secure/safexcel_hash.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-This is based on v4.15-rc1.
-
-Thanks,
-Antoine
-
-Since v1:
-  - Removed the crash.txt file which was part of patch 1/4.
-
-Antoine Tenart (3):
-  crypto: inside-secure - free requests even if their handling failed
-  crypto: inside-secure - only update the result buffer when provided
-  crypto: inside-secure - fix request allocations in invalidation path
-
-Ofer Heifetz (1):
-  crypto: inside-secure - per request invalidation
-
- drivers/crypto/inside-secure/safexcel.c        |  1 +
- drivers/crypto/inside-secure/safexcel_cipher.c | 83 ++++++++++++++++++------
- drivers/crypto/inside-secure/safexcel_hash.c   | 87 +++++++++++++++++++-------
- 3 files changed, 131 insertions(+), 40 deletions(-)
-
+diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
+index 6135c9f5742c..424f4c5d4d25 100644
+--- a/drivers/crypto/inside-secure/safexcel_hash.c
++++ b/drivers/crypto/inside-secure/safexcel_hash.c
+@@ -150,7 +150,12 @@ static int safexcel_handle_req_result(struct safexcel_crypto_priv *priv, int rin
+ 
+ 	if (sreq->finish)
+ 		result_sz = crypto_ahash_digestsize(ahash);
+-	memcpy(sreq->state, areq->result, result_sz);
++
++	/* The called isn't required to supply a result buffer. Updated it only
++	 * when provided.
++	 */
++	if (areq->result)
++		memcpy(sreq->state, areq->result, result_sz);
+ 
+ 	dma_unmap_sg(priv->dev, areq->src,
+ 		     sg_nents_for_len(areq->src, areq->nbytes), DMA_TO_DEVICE);
 -- 
 2.14.3
