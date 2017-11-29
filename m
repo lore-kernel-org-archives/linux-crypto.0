@@ -1,33 +1,35 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: keywrap - Add missing ULL suffixes for 64-bit
- constants
-Date: Wed, 29 Nov 2017 17:36:59 +1100
-Message-ID: <20171129063659.GG21575@gondor.apana.org.au>
-References: <1510742668-21121-1-git-send-email-geert@linux-m68k.org>
+Subject: Re: [crypto v3 1/2] cxgb4: Add support for Inline IPSec Tx
+Date: Wed, 29 Nov 2017 17:37:48 +1100
+Message-ID: <20171129063748.GJ21575@gondor.apana.org.au>
+References: <1510831599-31915-1-git-send-email-atul.gupta@chelsio.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: Stephan Mueller <smueller@chronox.de>,
-        "David S . Miller" <davem@davemloft.net>,
-        Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+        davem@davemloft.net, steffen.klassert@secunet.com,
+        Ganesh Goudar <ganeshgr@chelsio.com>
+To: Atul Gupta <atul.gupta@chelsio.com>
+Return-path: <netdev-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1510742668-21121-1-git-send-email-geert@linux-m68k.org>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <1510831599-31915-1-git-send-email-atul.gupta@chelsio.com>
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Nov 15, 2017 at 11:44:28AM +0100, Geert Uytterhoeven wrote:
-> On 32-bit (e.g. with m68k-linux-gnu-gcc-4.1):
+On Thu, Nov 16, 2017 at 04:56:39PM +0530, Atul Gupta wrote:
+> Added Tx routine for ULD
+> - define interface for ULD Tx.
 > 
->     crypto/keywrap.c: In function ‘crypto_kw_decrypt’:
->     crypto/keywrap.c:191: warning: integer constant is too large for ‘long’ type
->     crypto/keywrap.c: In function ‘crypto_kw_encrypt’:
->     crypto/keywrap.c:224: warning: integer constant is too large for ‘long’ type
+> Export routines used for Tx data
+> - Routines common for data transmit are used by cxgb4 and chcr
+>   drivers.
+> - EXPORT routines enable transmit from chcr driver.
 > 
-> Fixes: 9e49451d7a15365d ("crypto: keywrap - simplify code")
-> Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
+> Signed-off-by: Ganesh Goudar <ganeshgr@chelsio.com>
+> ---
+> V2: Fixed the build warnings and created patch against cryptodev
+>     to avoid possible merge conflicts
+> V3: Fixed a build warning and added flag for data packet
 
 Patch applied.  Thanks.
 -- 
