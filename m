@@ -1,103 +1,76 @@
 From: Eric Biggers <ebiggers3@gmail.com>
-Subject: [PATCH] crypto: salsa20 - fix blkcipher_walk API usage
-Date: Tue, 28 Nov 2017 20:56:59 -0800
-Message-ID: <20171129045659.16372-1-ebiggers3@gmail.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org, Eric Biggers <ebiggers@google.com>,
-        stable@vger.kernel.org
-To: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pl0-f66.google.com ([209.85.160.66]:36344 "EHLO
-        mail-pl0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751395AbdK2E7S (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Nov 2017 23:59:18 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Subject: Re: suspicious RCU usage at ./include/trace/events/kmem.h:LINE
+Date: Tue, 28 Nov 2017 20:59:55 -0800
+Message-ID: <20171129045955.GC24001@zzz.localdomain>
+References: <001a11445ed40f1e82055f0bbe7b@google.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+To: syzbot
+        <bot+fbbeacd3de00d98d2fe5a9e69d8025f36dbd2ddb@syzkaller.appspotmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <001a11445ed40f1e82055f0bbe7b@google.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+On Tue, Nov 28, 2017 at 06:22:01AM -0800, syzbot wrote:
+> Hello,
+> 
+> syzkaller hit the following crash on
+> 1d3b78bbc6e983fabb3fbf91b76339bf66e4a12c
+> git://git.kernel.org/pub/scm/linux/kernel/git/davem/net-next.git/master
+> compiler: gcc (GCC) 7.1.1 20170620
+> .config is attached
+> Raw console output is attached.
+> C reproducer is attached
+> syzkaller reproducer is attached. See https://goo.gl/kgGztJ
+> for information about syzkaller reproducers
+> 
+> 
+> 
+> =============================
+> WARNING: suspicious RCU usage
+> 4.14.0+ #192 Not tainted
+> -----------------------------
+> ./include/trace/events/kmem.h:142 suspicious rcu_dereference_check() usage!
+> 
+> other info that might help us debug this:
+> 
+> 
+> rcu_scheduler_active = 2, debug_locks = 1
+> 1 lock held by syzkaller215525/3051:
+>  #0:  (sk_lock-AF_ALG){+.+.}, at: [<ffffffff8239ac22>] lock_sock
+> include/net/sock.h:1465 [inline]
+>  #0:  (sk_lock-AF_ALG){+.+.}, at: [<ffffffff8239ac22>]
+> af_alg_wait_for_data+0x2f2/0x650 crypto/af_alg.c:768
+> 
+> stack backtrace:
+> CPU: 0 PID: 3051 Comm: syzkaller215525 Not tainted 4.14.0+ #192
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
+> Google 01/01/2011
+> Call Trace:
+>  __dump_stack lib/dump_stack.c:17 [inline]
+>  dump_stack+0x194/0x257 lib/dump_stack.c:53
+>  lockdep_rcu_suspicious+0x123/0x170 kernel/locking/lockdep.c:4675
+>  trace_kfree include/trace/events/kmem.h:137 [inline]
+>  kfree+0x20a/0x250 mm/slab.c:3796
+>  blkcipher_walk_done+0x72b/0xde0 crypto/blkcipher.c:139
+>  encrypt+0x20e/0x540 arch/x86/crypto/salsa20_glue.c:79
+>  skcipher_crypt_blkcipher crypto/skcipher.c:619 [inline]
+>  skcipher_decrypt_blkcipher+0x213/0x310 crypto/skcipher.c:637
+>  crypto_skcipher_decrypt include/crypto/skcipher.h:463 [inline]
+>  _skcipher_recvmsg crypto/algif_skcipher.c:133 [inline]
+>  skcipher_recvmsg+0xb06/0xf30 crypto/algif_skcipher.c:164
+>  skcipher_recvmsg_nokey+0x60/0x80 crypto/algif_skcipher.c:283
+>  sock_recvmsg_nosec net/socket.c:805 [inline]
+>  sock_recvmsg+0xc9/0x110 net/socket.c:812
+>  ___sys_recvmsg+0x29b/0x630 net/socket.c:2207
+>  __sys_recvmsg+0xe2/0x210 net/socket.c:2252
+>  SYSC_recvmsg net/socket.c:2264 [inline]
+>  SyS_recvmsg+0x2d/0x50 net/socket.c:2259
+>  entry_SYSCALL_64_fastpath+0x1f/0x96
 
-When asked to encrypt or decrypt 0 bytes, both the generic and x86
-implementations of Salsa20 crash in blkcipher_walk_done(), either when
-doing 'kfree(walk->buffer)' or 'free_page((unsigned long)walk->page)',
-because walk->buffer and walk->page have not been initialized.
-
-The bug is that Salsa20 is calling blkcipher_walk_done() even when
-nothing is in 'walk.nbytes'.  But blkcipher_walk_done() is only meant to
-be called when a nonzero number of bytes have been provided.
-
-The broken code is part of an optimization that tries to make only one
-call to salsa20_encrypt_bytes() to process inputs that are not evenly
-divisible by 64 bytes.  To fix the bug, just remove this "optimization"
-and use the blkcipher_walk API the same way all the other users do.
-
-Reproducer:
-
-    #include <linux/if_alg.h>
-    #include <sys/socket.h>
-    #include <unistd.h>
-
-    int main()
-    {
-            int algfd, reqfd;
-            struct sockaddr_alg addr = {
-                    .salg_type = "skcipher",
-                    .salg_name = "salsa20",
-            };
-            char key[16] = { 0 };
-
-            algfd = socket(AF_ALG, SOCK_SEQPACKET, 0);
-            bind(algfd, (void *)&addr, sizeof(addr));
-            reqfd = accept(algfd, 0, 0);
-            setsockopt(algfd, SOL_ALG, ALG_SET_KEY, key, sizeof(key));
-            read(reqfd, key, sizeof(key));
-    }
-
-Reported-by: syzbot <syzkaller@googlegroups.com>
-Fixes: eb6f13eb9f81 ("[CRYPTO] salsa20_generic: Fix multi-page processing")
-Cc: <stable@vger.kernel.org> # v2.6.25+
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- arch/x86/crypto/salsa20_glue.c | 7 -------
- crypto/salsa20_generic.c       | 7 -------
- 2 files changed, 14 deletions(-)
-
-diff --git a/arch/x86/crypto/salsa20_glue.c b/arch/x86/crypto/salsa20_glue.c
-index 399a29d067d6..cb91a64a99e7 100644
---- a/arch/x86/crypto/salsa20_glue.c
-+++ b/arch/x86/crypto/salsa20_glue.c
-@@ -59,13 +59,6 @@ static int encrypt(struct blkcipher_desc *desc,
- 
- 	salsa20_ivsetup(ctx, walk.iv);
- 
--	if (likely(walk.nbytes == nbytes))
--	{
--		salsa20_encrypt_bytes(ctx, walk.src.virt.addr,
--				      walk.dst.virt.addr, nbytes);
--		return blkcipher_walk_done(desc, &walk, 0);
--	}
--
- 	while (walk.nbytes >= 64) {
- 		salsa20_encrypt_bytes(ctx, walk.src.virt.addr,
- 				      walk.dst.virt.addr,
-diff --git a/crypto/salsa20_generic.c b/crypto/salsa20_generic.c
-index f550b5d94630..d7da0eea5622 100644
---- a/crypto/salsa20_generic.c
-+++ b/crypto/salsa20_generic.c
-@@ -188,13 +188,6 @@ static int encrypt(struct blkcipher_desc *desc,
- 
- 	salsa20_ivsetup(ctx, walk.iv);
- 
--	if (likely(walk.nbytes == nbytes))
--	{
--		salsa20_encrypt_bytes(ctx, walk.dst.virt.addr,
--				      walk.src.virt.addr, nbytes);
--		return blkcipher_walk_done(desc, &walk, 0);
--	}
--
- 	while (walk.nbytes >= 64) {
- 		salsa20_encrypt_bytes(ctx, walk.dst.virt.addr,
- 				      walk.src.virt.addr,
--- 
-2.15.0
+#syz dup: WARNING: suspicious RCU usage (3)
