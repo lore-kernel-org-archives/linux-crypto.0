@@ -1,61 +1,41 @@
-From: Kees Cook <keescook@chromium.org>
-Subject: Re: [PATCH 2/8] fs: pstore: remove unused hardirq.h
-Date: Tue, 28 Nov 2017 16:40:15 -0800
-Message-ID: <CAGXu5jK-kzUF_2aoVazrkBX3oR+jAnMc4BoH4Dyznuj4H8dz_Q@mail.gmail.com>
-References: <1510959741-31109-1-git-send-email-yang.s@alibaba-inc.com> <1510959741-31109-2-git-send-email-yang.s@alibaba-inc.com>
+From: Eric Biggers <ebiggers3@gmail.com>
+Subject: Re: KASAN: stack-out-of-bounds Write in sha3_update
+Date: Tue, 28 Nov 2017 17:53:47 -0800
+Message-ID: <20171129015347.GA24001@zzz.localdomain>
+References: <001a113a788209b77e055f0aebaf@google.com>
+ <20171128205845.GF45321@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: LKML <linux-kernel@vger.kernel.org>, Linux-MM <linux-mm@kvack.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        linux-crypto <linux-crypto@vger.kernel.org>,
-        Network Development <netdev@vger.kernel.org>,
-        Anton Vorontsov <anton@enomsg.org>,
-        Colin Cross <ccross@android.com>,
-        Tony Luck <tony.luck@intel.com>
-To: Yang Shi <yang.s@alibaba-inc.com>
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-In-Reply-To: <1510959741-31109-2-git-send-email-yang.s@alibaba-inc.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+To: syzbot
+        <bot+6f724d52da8e3ff8872545bd8444f50f0d174c5f@syzkaller.appspotmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20171128205845.GF45321@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Nov 17, 2017 at 3:02 PM, Yang Shi <yang.s@alibaba-inc.com> wrote:
-> Preempt counter APIs have been split out, currently, hardirq.h just
-> includes irq_enter/exit APIs which are not used by pstore at all.
->
-> So, remove the unused hardirq.h.
->
-> Signed-off-by: Yang Shi <yang.s@alibaba-inc.com>
-> Cc: Kees Cook <keescook@chromium.org>
-> Cc: Anton Vorontsov <anton@enomsg.org>
-> Cc: Colin Cross <ccross@android.com>
-> Cc: Tony Luck <tony.luck@intel.com>
+On Tue, Nov 28, 2017 at 12:58:45PM -0800, Eric Biggers wrote:
+> diff --git a/crypto/hmac.c b/crypto/hmac.c
+> index 92871dc2a63e..82436db6b6a6 100644
+> --- a/crypto/hmac.c
+> +++ b/crypto/hmac.c
+> @@ -196,6 +196,11 @@ static int hmac_create(struct crypto_template *tmpl, struct rtattr **tb)
+>  	if (IS_ERR(salg))
+>  		return PTR_ERR(salg);
+>  
+> +	/* The underlying hash algorithm must be unkeyed */
+> +	err = -EINVAL;
+> +	if (crypto_shash_alg_has_setkey(salg))
+> +		goto out_put_alg;
+> +
+>  	err = -EINVAL;
+>  	ds = salg->digestsize;
+>  	ss = salg->statesize;
 
-Thanks! I've applied this for -next.
+I messed this up; it needs to initialize 'alg' first.  I'll send a fixed
+version.
 
--Kees
-
-> ---
->  fs/pstore/platform.c | 1 -
->  1 file changed, 1 deletion(-)
->
-> diff --git a/fs/pstore/platform.c b/fs/pstore/platform.c
-> index 2b21d18..25dcef4 100644
-> --- a/fs/pstore/platform.c
-> +++ b/fs/pstore/platform.c
-> @@ -41,7 +41,6 @@
->  #include <linux/timer.h>
->  #include <linux/slab.h>
->  #include <linux/uaccess.h>
-> -#include <linux/hardirq.h>
->  #include <linux/jiffies.h>
->  #include <linux/workqueue.h>
->
-> --
-> 1.8.3.1
->
-
-
-
--- 
-Kees Cook
-Pixel Security
+Eric
