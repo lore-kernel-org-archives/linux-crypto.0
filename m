@@ -1,64 +1,28 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: salsa20 - fix blkcipher_walk API usage
-Date: Wed, 29 Nov 2017 16:26:37 +1100
-Message-ID: <20171129052637.GA20154@gondor.apana.org.au>
-References: <20171129045659.16372-1-ebiggers3@gmail.com>
+Subject: Re: [1/2] crypto: tcrypt - fix S/G table for test_aead_speed()
+Date: Wed, 29 Nov 2017 17:28:21 +1100
+Message-ID: <20171129062821.GA21594@gondor.apana.org.au>
+References: <1507630920-9014-1-git-send-email-robert.baronescu@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org, Eric Biggers <ebiggers@google.com>,
-        stable@vger.kernel.org
-To: Eric Biggers <ebiggers3@gmail.com>
-Return-path: <stable-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org, davem@davemloft.net
+To: Robert Baronescu <robert.baronescu@nxp.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from [128.1.224.119] ([128.1.224.119]:40540 "EHLO ringil.hmeau.com"
+        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
+        id S1751165AbdK2G2o (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 29 Nov 2017 01:28:44 -0500
 Content-Disposition: inline
-In-Reply-To: <20171129045659.16372-1-ebiggers3@gmail.com>
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1507630920-9014-1-git-send-email-robert.baronescu@nxp.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Nov 28, 2017 at 08:56:59PM -0800, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
+On Tue, Oct 10, 2017 at 01:21:59PM +0300, Robert Baronescu wrote:
+> In case buffer length is a multiple of PAGE_SIZE,
+> the S/G table is incorrectly generated.
+> Fix this by handling buflen = k * PAGE_SIZE separately.
 > 
-> When asked to encrypt or decrypt 0 bytes, both the generic and x86
-> implementations of Salsa20 crash in blkcipher_walk_done(), either when
-> doing 'kfree(walk->buffer)' or 'free_page((unsigned long)walk->page)',
-> because walk->buffer and walk->page have not been initialized.
-> 
-> The bug is that Salsa20 is calling blkcipher_walk_done() even when
-> nothing is in 'walk.nbytes'.  But blkcipher_walk_done() is only meant to
-> be called when a nonzero number of bytes have been provided.
-> 
-> The broken code is part of an optimization that tries to make only one
-> call to salsa20_encrypt_bytes() to process inputs that are not evenly
-> divisible by 64 bytes.  To fix the bug, just remove this "optimization"
-> and use the blkcipher_walk API the same way all the other users do.
-> 
-> Reproducer:
-> 
->     #include <linux/if_alg.h>
->     #include <sys/socket.h>
->     #include <unistd.h>
-> 
->     int main()
->     {
->             int algfd, reqfd;
->             struct sockaddr_alg addr = {
->                     .salg_type = "skcipher",
->                     .salg_name = "salsa20",
->             };
->             char key[16] = { 0 };
-> 
->             algfd = socket(AF_ALG, SOCK_SEQPACKET, 0);
->             bind(algfd, (void *)&addr, sizeof(addr));
->             reqfd = accept(algfd, 0, 0);
->             setsockopt(algfd, SOL_ALG, ALG_SET_KEY, key, sizeof(key));
->             read(reqfd, key, sizeof(key));
->     }
-> 
-> Reported-by: syzbot <syzkaller@googlegroups.com>
-> Fixes: eb6f13eb9f81 ("[CRYPTO] salsa20_generic: Fix multi-page processing")
-> Cc: <stable@vger.kernel.org> # v2.6.25+
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> Signed-off-by: Robert Baronescu <robert.baronescu@nxp.com>
 
 Patch applied.  Thanks.
 -- 
