@@ -1,41 +1,45 @@
-From: =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>
-Subject: Re: [1/2] crypto: tcrypt - fix S/G table for test_aead_speed()
-Date: Wed, 29 Nov 2017 08:57:33 +0000
-Message-ID: <VI1PR0402MB3342C5A4ECEB14C785823073983B0@VI1PR0402MB3342.eurprd04.prod.outlook.com>
-References: <1507630920-9014-1-git-send-email-robert.baronescu@nxp.com>
- <20171129062821.GA21594@gondor.apana.org.au>
+From: Eric Biggers <ebiggers3@gmail.com>
+Subject: Re: KASAN: use-after-free Read in crypto_chacha20_crypt
+Date: Wed, 29 Nov 2017 00:57:47 -0800
+Message-ID: <20171129085747.GA20992@zzz.localdomain>
+References: <94eb2c111b8c32eea2055f0c983c@google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        Tudor Ambarus <tudor.ambarus@microchip.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        Robert Baronescu <robert.baronescu@nxp.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-eopbgr30070.outbound.protection.outlook.com ([40.107.3.70]:12375
-        "EHLO EUR03-AM5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751770AbdK2I5h (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 29 Nov 2017 03:57:37 -0500
-Content-Language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+To: syzbot
+        <bot+257f413f0ea433750ffaa72b2748289380957904@syzkaller.appspotmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <94eb2c111b8c32eea2055f0c983c@google.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 11/29/2017 8:28 AM, Herbert Xu wrote:=0A=
-> On Tue, Oct 10, 2017 at 01:21:59PM +0300, Robert Baronescu wrote:=0A=
->> In case buffer length is a multiple of PAGE_SIZE,=0A=
->> the S/G table is incorrectly generated.=0A=
->> Fix this by handling buflen =3D k * PAGE_SIZE separately.=0A=
->>=0A=
->> Signed-off-by: Robert Baronescu <robert.baronescu@nxp.com>=0A=
-> =0A=
-> Patch applied.  Thanks.=0A=
-> =0A=
-Thanks Herbert.=0A=
-=0A=
-Considering this fixes the crash reported by Tudor:=0A=
-https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg29172.html=0A=
-I think it should be merged in this release cycle (v4.15).=0A=
-=0A=
-Horia=0A=
+On Tue, Nov 28, 2017 at 07:23:01AM -0800, syzbot wrote:
+> Hello,
+> 
+> syzkaller hit the following crash on
+> 1ea8d039f9edcfefb20d8ddfe136930f6e551529
+> git://git.cmpxchg.org/linux-mmots.git/master
+> compiler: gcc (GCC) 7.1.1 20170620
+> .config is attached
+> Raw console output is attached.
+> C reproducer is attached
+> syzkaller reproducer is attached. See https://goo.gl/kgGztJ
+> for information about syzkaller reproducers
+> 
+> 
+> ==================================================================
+> BUG: KASAN: use-after-free in __le32_to_cpup
+> include/uapi/linux/byteorder/little_endian.h:58 [inline]
+> BUG: KASAN: use-after-free in le32_to_cpuvp crypto/chacha20_generic.c:19
+> [inline]
+> BUG: KASAN: use-after-free in crypto_chacha20_init
+> crypto/chacha20_generic.c:58 [inline]
+> BUG: KASAN: use-after-free in crypto_chacha20_crypt+0xaf1/0xbd0
+> crypto/chacha20_generic.c:91
+> Read of size 4 at addr ffff880100000006 by task syzkaller030711/3690
+> 
+
+#syz dup: general protection fault in crypto_chacha20_crypt
