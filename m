@@ -1,76 +1,48 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: rsa - fix buffer overread when stripping leading
- zeroes
-Date: Wed, 29 Nov 2017 16:22:19 +1100
-Message-ID: <20171129052219.GA19892@gondor.apana.org.au>
-References: <20171127071649.25800-1-ebiggers3@gmail.com>
+Subject: Re: KASAN: use-after-free Read in aead_recvmsg
+Date: Wed, 29 Nov 2017 16:23:05 +1100
+Message-ID: <20171129052305.GA19831@gondor.apana.org.au>
+References: <001a113ebb5ece8a7a055efb7676@google.com>
+ <2409323.isfI9bk5QC@positron.chronox.de>
+ <20171127224308.GB8426@gmail.com>
+ <5111191.QYDWLsXdp1@tauon.chronox.de>
+ <20171128072944.GA23565@zzz.localdomain>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: keyrings@vger.kernel.org, dhowells@redhat.com,
-        linux-crypto@vger.kernel.org, glider@google.com,
-        ebiggers@google.com, stable@vger.kernel.org,
-        tudor-dan.ambarus@nxp.com
+Cc: Stephan Mueller <smueller@chronox.de>,
+        syzbot
+        <bot+6fbc13c3b1ed2105e7a2e516be43d6a0624a59c0@syzkaller.appspotmail.com>,
+        davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
 To: Eric Biggers <ebiggers3@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [128.1.224.119] ([128.1.224.119]:40480 "EHLO ringil.hmeau.com"
+Received: from [128.1.224.119] ([128.1.224.119]:40492 "EHLO ringil.hmeau.com"
         rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1751636AbdK2FXC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 29 Nov 2017 00:23:02 -0500
+        id S1750783AbdK2FXt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 29 Nov 2017 00:23:49 -0500
 Content-Disposition: inline
-In-Reply-To: <20171127071649.25800-1-ebiggers3@gmail.com>
+In-Reply-To: <20171128072944.GA23565@zzz.localdomain>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Eric Biggers <ebiggers3@gmail.com> wrote:
+On Mon, Nov 27, 2017 at 11:29:44PM -0800, Eric Biggers wrote:
+>
+> >From 453b54793e843c0d5b8fd2d5e33fcc5427ec038e Mon Sep 17 00:00:00 2001
 > From: Eric Biggers <ebiggers@google.com>
+> Date: Mon, 27 Nov 2017 23:23:05 -0800
+> Subject: [PATCH] crypto: algif_aead - fix reference counting of null skcipher
 > 
-> In rsa_get_n(), if the buffer contained all 0's and "FIPS mode" is
-> enabled, we would read one byte past the end of the buffer while
-> scanning the leading zeroes.  Fix it by checking 'n_sz' before '!*ptr'.
+> In the AEAD interface for AF_ALG, the reference to the "null skcipher"
+> held by each tfm was being dropped in the wrong place -- when each
+> af_alg_ctx was freed instead of when the aead_tfm was freed.  As
+> discovered by syzkaller, a specially crafted program could use this to
+> cause the null skcipher to be freed while it is still in use.
 > 
-> This bug was reachable by adding a specially crafted key of type
-> "asymmetric" (requires CONFIG_RSA and CONFIG_X509_CERTIFICATE_PARSER).
+> Fix it by dropping the reference in the right place.
 > 
-> KASAN report:
-> 
->    BUG: KASAN: slab-out-of-bounds in rsa_get_n+0x19e/0x1d0 crypto/rsa_helper.c:33
->    Read of size 1 at addr ffff88003501a708 by task keyctl/196
-> 
->    CPU: 1 PID: 196 Comm: keyctl Not tainted 4.14.0-09238-g1d3b78bbc6e9 #26
->    Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.11.0-20171110_100015-anatol 04/01/2014
->    Call Trace:
->     rsa_get_n+0x19e/0x1d0 crypto/rsa_helper.c:33
->     asn1_ber_decoder+0x82a/0x1fd0 lib/asn1_decoder.c:328
->     rsa_set_pub_key+0xd3/0x320 crypto/rsa.c:278
->     crypto_akcipher_set_pub_key ./include/crypto/akcipher.h:364 [inline]
->     pkcs1pad_set_pub_key+0xae/0x200 crypto/rsa-pkcs1pad.c:117
->     crypto_akcipher_set_pub_key ./include/crypto/akcipher.h:364 [inline]
->     public_key_verify_signature+0x270/0x9d0 crypto/asymmetric_keys/public_key.c:106
->     x509_check_for_self_signed+0x2ea/0x480 crypto/asymmetric_keys/x509_public_key.c:141
->     x509_cert_parse+0x46a/0x620 crypto/asymmetric_keys/x509_cert_parser.c:129
->     x509_key_preparse+0x61/0x750 crypto/asymmetric_keys/x509_public_key.c:174
->     asymmetric_key_preparse+0xa4/0x150 crypto/asymmetric_keys/asymmetric_type.c:388
->     key_create_or_update+0x4d4/0x10a0 security/keys/key.c:850
->     SYSC_add_key security/keys/keyctl.c:122 [inline]
->     SyS_add_key+0xe8/0x290 security/keys/keyctl.c:62
->     entry_SYSCALL_64_fastpath+0x1f/0x96
-> 
->    Allocated by task 196:
->     __do_kmalloc mm/slab.c:3711 [inline]
->     __kmalloc_track_caller+0x118/0x2e0 mm/slab.c:3726
->     kmemdup+0x17/0x40 mm/util.c:118
->     kmemdup ./include/linux/string.h:414 [inline]
->     x509_cert_parse+0x2cb/0x620 crypto/asymmetric_keys/x509_cert_parser.c:106
->     x509_key_preparse+0x61/0x750 crypto/asymmetric_keys/x509_public_key.c:174
->     asymmetric_key_preparse+0xa4/0x150 crypto/asymmetric_keys/asymmetric_type.c:388
->     key_create_or_update+0x4d4/0x10a0 security/keys/key.c:850
->     SYSC_add_key security/keys/keyctl.c:122 [inline]
->     SyS_add_key+0xe8/0x290 security/keys/keyctl.c:62
->     entry_SYSCALL_64_fastpath+0x1f/0x96
-> 
-> Fixes: 5a7de97309f5 ("crypto: rsa - return raw integers for the ASN.1 parser")
-> Cc: <stable@vger.kernel.org> # v4.8+
-> Cc: Tudor Ambarus <tudor-dan.ambarus@nxp.com>
+> Fixes: 72548b093ee3 ("crypto: algif_aead - copy AAD from src to dst")
+> Reported-by: syzbot <syzkaller@googlegroups.com>
+> Cc: <stable@vger.kernel.org> # v4.14+
 > Signed-off-by: Eric Biggers <ebiggers@google.com>
 
 Patch applied.  Thanks.
