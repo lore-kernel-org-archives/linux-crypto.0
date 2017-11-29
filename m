@@ -1,27 +1,27 @@
 From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: suspicious RCU usage at ./include/linux/mm.h:LINE
-Date: Tue, 28 Nov 2017 21:00:27 -0800
-Message-ID: <20171129050027.GD24001@zzz.localdomain>
-References: <001a1143d74236531a055f0c986c@google.com>
+Subject: Re: kernel BUG at ./include/linux/mm.h:LINE! (2)
+Date: Tue, 28 Nov 2017 21:00:48 -0800
+Message-ID: <20171129050048.GE24001@zzz.localdomain>
+References: <001a1141c43aef50d6055f0e4899@google.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         syzkaller-bugs@googlegroups.com
 To: syzbot
-        <bot+7991df012bd9be52601c6e536addde6cefbfbde6@syzkaller.appspotmail.com>
+        <bot+6e5e7b23f2428f284e345f1855d18cb16c46a44e@syzkaller.appspotmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pg0-f65.google.com ([74.125.83.65]:41482 "EHLO
-        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750799AbdK2FAa (ORCPT
+Received: from mail-pf0-f193.google.com ([209.85.192.193]:40998 "EHLO
+        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751111AbdK2FAv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 29 Nov 2017 00:00:30 -0500
+        Wed, 29 Nov 2017 00:00:51 -0500
 Content-Disposition: inline
-In-Reply-To: <001a1143d74236531a055f0c986c@google.com>
+In-Reply-To: <001a1141c43aef50d6055f0e4899@google.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Nov 28, 2017 at 07:23:01AM -0800, syzbot wrote:
+On Tue, Nov 28, 2017 at 09:24:01AM -0800, syzbot wrote:
 > Hello,
 > 
 > syzkaller hit the following crash on
@@ -34,9 +34,6 @@ On Tue, Nov 28, 2017 at 07:23:01AM -0800, syzbot wrote:
 > Unfortunately, I don't have any reproducer for this bug yet.
 > 
 > 
-> WARNING: suspicious RCU usage
-> 4.14.0+ #130 Not tainted
-> page:ffffea000765abc0 count:0 mapcount:0 mapping:          (null) index:0x0
 > flags: 0x2fffc0000000000()
 > raw: 02fffc0000000000 0000000000000000 0000000000000000 00000000ffffffff
 > raw: 0000000000000000 0000000100000001 0000000000000000 0000000000000000
@@ -47,21 +44,21 @@ On Tue, Nov 28, 2017 at 07:23:01AM -0800, syzbot wrote:
 > Dumping ftrace buffer:
 >    (ftrace buffer empty)
 > Modules linked in:
-> CPU: 1 PID: 10013 Comm: syz-executor2 Not tainted 4.14.0+ #130
+> CPU: 1 PID: 31102 Comm: syz-executor7 Not tainted 4.14.0+ #130
 > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
 > Google 01/01/2011
-> task: ffff8801d807a300 task.stack: ffff8801d96a8000
+> task: ffff8801d2a7a180 task.stack: ffff8801d43a8000
 > RIP: 0010:put_page_testzero include/linux/mm.h:482 [inline]
 > RIP: 0010:__free_pages+0x118/0x150 mm/page_alloc.c:4288
-> RSP: 0018:ffff8801d96af860 EFLAGS: 00010206
-> RAX: 0000000000000000 RBX: ffffea000765abc0 RCX: 0000000000000000
-> RDX: 00000000001f0100 RSI: 1ffff1003b00f575 RDI: ffffed003b2d5f00
-> RBP: ffff8801d96af8f0 R08: 1ffff1003b2d5e30 R09: 0000000000000000
-> R10: dffffc0000000000 R11: 0000000000000000 R12: 1ffff1003b2d5f0d
-> R13: 1ffff1003b2d5f11 R14: 0000000000000000 R15: ffff8801d96af8c8
-> FS:  00007f5ca866d700(0000) GS:ffff8801db500000(0000) knlGS:0000000000000000
+> RSP: 0018:ffff8801d43af700 EFLAGS: 00010203
+> RAX: 0000000000000000 RBX: ffffea000750ebc0 RCX: 0000000000000000
+> RDX: 0000000000000f47 RSI: ffffc900033f6000 RDI: ffffed003a875ed0
+> RBP: ffff8801d43af790 R08: 1ffff1003a875e04 R09: 0000000000000000
+> R10: dffffc0000000000 R11: 0000000000000000 R12: 1ffff1003a875ee1
+> R13: 1ffff1003a875ee5 R14: 0000000000000000 R15: ffff8801d43af768
+> FS:  00007ff1eaddf700(0000) GS:ffff8801db500000(0000) knlGS:0000000000000000
 > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000000020f73000 CR3: 00000001d7cf7000 CR4: 00000000001406e0
+> CR2: 00000000202f0fc8 CR3: 00000001b29a0000 CR4: 00000000001406e0
 > DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
 > DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
 > Call Trace:
@@ -75,8 +72,10 @@ On Tue, Nov 28, 2017 at 07:23:01AM -0800, syzbot wrote:
 >  skcipher_recvmsg+0xb06/0xf30 crypto/algif_skcipher.c:164
 >  sock_recvmsg_nosec net/socket.c:805 [inline]
 >  sock_recvmsg+0xc9/0x110 net/socket.c:812
->  SYSC_recvfrom+0x2dc/0x570 net/socket.c:1801
->  SyS_recvfrom+0x40/0x50 net/socket.c:1773
+>  ___sys_recvmsg+0x29b/0x630 net/socket.c:2207
+>  __sys_recvmsg+0xe2/0x210 net/socket.c:2252
+>  SYSC_recvmsg net/socket.c:2264 [inline]
+>  SyS_recvmsg+0x2d/0x50 net/socket.c:2259
 >  entry_SYSCALL_64_fastpath+0x1f/0x96
 
 #syz dup: WARNING: suspicious RCU usage (3)
