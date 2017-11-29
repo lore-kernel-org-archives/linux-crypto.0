@@ -1,47 +1,100 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: general protection fault in af_alg_free_areq_sgls
-Date: Wed, 29 Nov 2017 16:23:53 +1100
-Message-ID: <20171129052352.GB19831@gondor.apana.org.au>
-References: <001a1140f578d9710d055efb76a9@google.com>
- <20171128090252.GB23413@zzz.localdomain>
+Subject: Re: [PATCH v2] crypto: hmac - require that the underlying hash
+ algorithm is unkeyed
+Date: Wed, 29 Nov 2017 16:24:25 +1100
+Message-ID: <20171129052425.GC19831@gondor.apana.org.au>
+References: <20171129020138.4436-1-ebiggers3@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: syzbot
-        <bot+ff72ab869817b6ea60bc570f638ee030f4fc73e5@syzkaller.appspotmail.com>,
-        davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        Stephan Mueller <smueller@chronox.de>
+Cc: linux-crypto@vger.kernel.org,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org, Eric Biggers <ebiggers@google.com>,
+        stable@vger.kernel.org
 To: Eric Biggers <ebiggers3@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [128.1.224.119] ([128.1.224.119]:40504 "EHLO ringil.hmeau.com"
-        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1750770AbdK2FYR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 29 Nov 2017 00:24:17 -0500
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20171128090252.GB23413@zzz.localdomain>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20171129020138.4436-1-ebiggers3@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Nov 28, 2017 at 01:02:52AM -0800, Eric Biggers wrote:
-> 
-> >From 1a7a7f86f09c50652f1fff75b8d3a32712826b32 Mon Sep 17 00:00:00 2001
+On Tue, Nov 28, 2017 at 06:01:38PM -0800, Eric Biggers wrote:
 > From: Eric Biggers <ebiggers@google.com>
-> Date: Tue, 28 Nov 2017 00:46:24 -0800
-> Subject: [PATCH] crypto: af_alg - fix NULL pointer dereference in
->  af_alg_free_areq_sgls()
 > 
-> If allocating the ->tsgl member of 'struct af_alg_async_req' failed,
-> during cleanup we dereferenced the NULL ->tsgl pointer in
-> af_alg_free_areq_sgls(), because ->tsgl_entries was nonzero.
+> Because the HMAC template didn't check that its underlying hash
+> algorithm is unkeyed, trying to use "hmac(hmac(sha3-512-generic))"
+> through AF_ALG or through KEYCTL_DH_COMPUTE resulted in the inner HMAC
+> being used without having been keyed, resulting in sha3_update() being
+> called without sha3_init(), causing a stack buffer overflow.
 > 
-> Fix it by only freeing the ->tsgl list if it is non-NULL.
+> This is a very old bug, but it seems to have only started causing real
+> problems when SHA-3 support was added (requires CONFIG_CRYPTO_SHA3)
+> because the innermost hash's state is ->import()ed from a zeroed buffer,
+> and it just so happens that other hash algorithms are fine with that,
+> but SHA-3 is not.  However, there could be arch or hardware-dependent
+> hash algorithms also affected; I couldn't test everything.
 > 
-> This affected both algif_skcipher and algif_aead.
+> Fix the bug by introducing a function crypto_shash_alg_has_setkey()
+> which tests whether a shash algorithm is keyed.  Then update the HMAC
+> template to require that its underlying hash algorithm is unkeyed.
 > 
-> Fixes: e870456d8e7c ("crypto: algif_skcipher - overhaul memory management")
-> Fixes: d887c52d6ae4 ("crypto: algif_aead - overhaul memory management")
+> Here is a reproducer:
+> 
+>     #include <linux/if_alg.h>
+>     #include <sys/socket.h>
+> 
+>     int main()
+>     {
+>         int algfd;
+>         struct sockaddr_alg addr = {
+>             .salg_type = "hash",
+>             .salg_name = "hmac(hmac(sha3-512-generic))",
+>         };
+>         char key[4096] = { 0 };
+> 
+>         algfd = socket(AF_ALG, SOCK_SEQPACKET, 0);
+>         bind(algfd, (const struct sockaddr *)&addr, sizeof(addr));
+>         setsockopt(algfd, SOL_ALG, ALG_SET_KEY, key, sizeof(key));
+>     }
+> 
+> Here was the KASAN report from syzbot:
+> 
+>     BUG: KASAN: stack-out-of-bounds in memcpy include/linux/string.h:341  [inline]
+>     BUG: KASAN: stack-out-of-bounds in sha3_update+0xdf/0x2e0  crypto/sha3_generic.c:161
+>     Write of size 4096 at addr ffff8801cca07c40 by task syzkaller076574/3044
+> 
+>     CPU: 1 PID: 3044 Comm: syzkaller076574 Not tainted 4.14.0-mm1+ #25
+>     Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  Google 01/01/2011
+>     Call Trace:
+>       __dump_stack lib/dump_stack.c:17 [inline]
+>       dump_stack+0x194/0x257 lib/dump_stack.c:53
+>       print_address_description+0x73/0x250 mm/kasan/report.c:252
+>       kasan_report_error mm/kasan/report.c:351 [inline]
+>       kasan_report+0x25b/0x340 mm/kasan/report.c:409
+>       check_memory_region_inline mm/kasan/kasan.c:260 [inline]
+>       check_memory_region+0x137/0x190 mm/kasan/kasan.c:267
+>       memcpy+0x37/0x50 mm/kasan/kasan.c:303
+>       memcpy include/linux/string.h:341 [inline]
+>       sha3_update+0xdf/0x2e0 crypto/sha3_generic.c:161
+>       crypto_shash_update+0xcb/0x220 crypto/shash.c:109
+>       shash_finup_unaligned+0x2a/0x60 crypto/shash.c:151
+>       crypto_shash_finup+0xc4/0x120 crypto/shash.c:165
+>       hmac_finup+0x182/0x330 crypto/hmac.c:152
+>       crypto_shash_finup+0xc4/0x120 crypto/shash.c:165
+>       shash_digest_unaligned+0x9e/0xd0 crypto/shash.c:172
+>       crypto_shash_digest+0xc4/0x120 crypto/shash.c:186
+>       hmac_setkey+0x36a/0x690 crypto/hmac.c:66
+>       crypto_shash_setkey+0xad/0x190 crypto/shash.c:64
+>       shash_async_setkey+0x47/0x60 crypto/shash.c:207
+>       crypto_ahash_setkey+0xaf/0x180 crypto/ahash.c:200
+>       hash_setkey+0x40/0x90 crypto/algif_hash.c:446
+>       alg_setkey crypto/af_alg.c:221 [inline]
+>       alg_setsockopt+0x2a1/0x350 crypto/af_alg.c:254
+>       SYSC_setsockopt net/socket.c:1851 [inline]
+>       SyS_setsockopt+0x189/0x360 net/socket.c:1830
+>       entry_SYSCALL_64_fastpath+0x1f/0x96
+> 
 > Reported-by: syzbot <syzkaller@googlegroups.com>
-> Cc: <stable@vger.kernel.org> # v4.14+
+> Cc: <stable@vger.kernel.org>
 > Signed-off-by: Eric Biggers <ebiggers@google.com>
 
 Patch applied.  Thanks.
