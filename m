@@ -1,30 +1,26 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [5/8] crypto: remove unused hardirq.h
-Date: Wed, 29 Nov 2017 17:38:16 +1100
-Message-ID: <20171129063816.GD21594@gondor.apana.org.au>
-References: <1510959741-31109-5-git-send-email-yang.s@alibaba-inc.com>
+Subject: Re: [PATCH] crypto: hifn_795x - Fix a memory leak in the error
+ handling path of 'hifn_probe()'
+Date: Wed, 29 Nov 2017 17:38:28 +1100
+Message-ID: <20171129063828.GL21575@gondor.apana.org.au>
+References: <20171118134545.25784-1-christophe.jaillet@wanadoo.fr>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>
-To: Yang Shi <yang.s@alibaba-inc.com>
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1510959741-31109-5-git-send-email-yang.s@alibaba-inc.com>
+In-Reply-To: <20171118134545.25784-1-christophe.jaillet@wanadoo.fr>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sat, Nov 18, 2017 at 07:02:18AM +0800, Yang Shi wrote:
-> Preempt counter APIs have been split out, currently, hardirq.h just
-> includes irq_enter/exit APIs which are not used by crypto at all.
+On Sat, Nov 18, 2017 at 02:45:45PM +0100, Christophe JAILLET wrote:
+> 'dev' is leaking in the error handling path of 'hifn_probe()'.
 > 
-> So, remove the unused hardirq.h.
+> Add a 'kfree(dev)' to match the code in 'hifn_remove()'
 > 
-> Signed-off-by: Yang Shi <yang.s@alibaba-inc.com>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: linux-crypto@vger.kernel.org
+> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
 
 Patch applied.  Thanks.
 -- 
