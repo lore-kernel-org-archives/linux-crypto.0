@@ -1,32 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: cavium: fix memory leak on info
-Date: Wed, 29 Nov 2017 17:37:12 +1100
-Message-ID: <20171129063712.GH21575@gondor.apana.org.au>
-References: <20171115123719.12667-1-colin.king@canonical.com>
+Subject: Re: [PATCH] crypto: keywrap - Add missing ULL suffixes for 64-bit
+ constants
+Date: Wed, 29 Nov 2017 17:36:59 +1100
+Message-ID: <20171129063659.GG21575@gondor.apana.org.au>
+References: <1510742668-21121-1-git-send-email-geert@linux-m68k.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: George Cherian <george.cherian@cavium.com>,
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: Stephan Mueller <smueller@chronox.de>,
         "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org
-To: Colin King <colin.king@canonical.com>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20171115123719.12667-1-colin.king@canonical.com>
+In-Reply-To: <1510742668-21121-1-git-send-email-geert@linux-m68k.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Nov 15, 2017 at 12:37:19PM +0000, Colin King wrote:
-> From: Colin Ian King <colin.king@canonical.com>
+On Wed, Nov 15, 2017 at 11:44:28AM +0100, Geert Uytterhoeven wrote:
+> On 32-bit (e.g. with m68k-linux-gnu-gcc-4.1):
 > 
-> The object info is being leaked on an error return path, fix this
-> by setting ret to -ENOMEM and exiting via the request_cleanup path
-> that will free info.
+>     crypto/keywrap.c: In function ‘crypto_kw_decrypt’:
+>     crypto/keywrap.c:191: warning: integer constant is too large for ‘long’ type
+>     crypto/keywrap.c: In function ‘crypto_kw_encrypt’:
+>     crypto/keywrap.c:224: warning: integer constant is too large for ‘long’ type
 > 
-> Detected by CoverityScan, CID#1408439 ("Resource Leak")
-> 
-> Fixes: c694b233295b ("crypto: cavium - Add the Virtual Function driver for CPT")
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
+> Fixes: 9e49451d7a15365d ("crypto: keywrap - simplify code")
+> Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
 
 Patch applied.  Thanks.
 -- 
