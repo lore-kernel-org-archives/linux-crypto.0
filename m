@@ -1,47 +1,72 @@
-From: Philippe Ombredanne <pombredanne@nexb.com>
-Subject: Re: [PATCH] crypto: replace FSF address with web source in license notices
-Date: Wed, 29 Nov 2017 07:57:44 +0100
-Message-ID: <CAOFm3uGsGsixDwi1EJkFBvSQXN5yESXe9yxxVAF+O2a2do0zCQ@mail.gmail.com>
-References: <20171114092515.27010-1-martink@posteo.de> <20171129063511.GE21575@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2] crypto: AF_ALG - race-free access of encryption flag
+Date: Wed, 29 Nov 2017 18:10:49 +1100
+Message-ID: <20171129071049.GA23023@gondor.apana.org.au>
+References: <001a113f2cd2d62b59055efb7618@google.com>
+ <1943686.EAKghbSqDq@positron.chronox.de>
+ <20171128230240.GA17611@gondor.apana.org.au>
+ <2865588.MNjhcg78tp@tauon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Martin Kepplinger <martink@posteo.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: Eric Biggers <ebiggers3@gmail.com>,
+        syzbot
+        <bot+3401d9494b9380f7244bcc7fec49680878fccba6@syzkaller.appspotmail.com>,
+        davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:34603 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752503AbdK2G60 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 29 Nov 2017 01:58:26 -0500
-Received: by mail-wm0-f68.google.com with SMTP id y82so34811316wmg.1
-        for <linux-crypto@vger.kernel.org>; Tue, 28 Nov 2017 22:58:25 -0800 (PST)
-In-Reply-To: <20171129063511.GE21575@gondor.apana.org.au>
+Received: from [128.1.224.119] ([128.1.224.119]:40858 "EHLO ringil.hmeau.com"
+        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
+        id S1751487AbdK2HLW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 29 Nov 2017 02:11:22 -0500
+Content-Disposition: inline
+In-Reply-To: <2865588.MNjhcg78tp@tauon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Nov 29, 2017 at 7:35 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> On Tue, Nov 14, 2017 at 10:25:15AM +0100, Martin Kepplinger wrote:
->> A few years ago the FSF moved and "59 Temple Place" is wrong. Having this
->> still in our source files feels old and unmaintained.
->>
->> Let's take the license statement serious and not confuse users.
->>
->> As https://www.gnu.org/licenses/gpl-howto.html suggests, we replace the
->> postal address with "<http://www.gnu.org/licenses/>".
->>
->> Signed-off-by: Martin Kepplinger <martink@posteo.de>
+On Wed, Nov 29, 2017 at 07:48:53AM +0100, Stephan Mueller wrote:
+> Am Mittwoch, 29. November 2017, 00:02:40 CET schrieb Herbert Xu:
 >
-> Patch applied.  Thanks.
+> > This is wrong.  You can't fetch ctx->enc before you wait.  It has
+> > to be done after the wait as otherwise ctx->enc may not even have
+> > been initialised.
+> 
+> All ctx variables are initialized in aead_accept_parent_nokey. Thus, if no 
+> sendmsg call is invoked by user space, at least a valid operation is 
+> performed.
 
-Herbert,
-You may have missed the thread on the similar "samples" patch [1]
-before applying this as-is?
+I didn't mean initialised literally, I meant the value the user
+specified in sendmsg.  If the recvmsg call precedes sendmsg then
+you can't possibly get the value that the user supplied.
 
-[1] https://lkml.org/lkml/2017/11/14/135
+> I am wondering about the wait call inside the while () in af_alg_get_rsgl: 
+> this has been taken from algif_skcipher. It would seem that moving the wait 
+> call to the beginning of the recvmsg call would be applicable to skcipher as 
+> well. I.e. the wait call should be removed from af_alg_get_rsgl entirely and 
+> placed at the beginning the recvmsg function in both, the aead and skcipher 
+> code paths.
+
+It sort of worked for skcipher because it didn't care if ctx->enc
+or even ctx->iv changed midstream.  But even there I don't think
+we need to wait a second time.  In fact waiting a second time could
+result in a dead-lock if no sendmsg call came around.
+
+So we should definitely wait only once for both aead and skcipher.
+
+Back to the original problem of ctx->enc changing midstream.  I
+suppose it could actually be valid, e.g., when one request ended
+and you wish to sendmsg a second request while the first is yet
+to be started by recvmsg.
+
+So perhaps we can fix it by actually putting such request-specific
+information into a list along with the data rather than storing
+it in ctx directly as we do now.
+
+But anyway this isn't suitable for stable where we should just fix
+it by making it not crash.
+
+Thanks,
 -- 
-Cordially
-Philippe Ombredanne
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
