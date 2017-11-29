@@ -1,122 +1,64 @@
-From: Dmitry Vyukov <dvyukov@google.com>
-Subject: Re: BUG: unable to handle kernel NULL pointer dereference in kfree
-Date: Wed, 29 Nov 2017 11:30:36 +0100
-Message-ID: <CACT4Y+ZVYKQ1Cd_4SNGhqJhEUeeoVavFBNo2BDSw_HQcbxGLJw@mail.gmail.com>
-References: <001a1144a1eebb0bbe055f1c88b3@google.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: AF_ALG - wait for data at beginning of recvmsg
+Date: Wed, 29 Nov 2017 21:42:30 +1100
+Message-ID: <20171129104230.GA24369@gondor.apana.org.au>
+References: <001a113f2cd2d62b59055efb7618@google.com>
+ <1970731.rxTGvFCgCz@positron.chronox.de>
+ <20171129102234.GA24171@gondor.apana.org.au>
+ <2780580.3j7i2QamZF@tauon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: LKML <linux-kernel@vger.kernel.org>, syzkaller-bugs@googlegroups.com,
-	Herbert Xu <herbert@gondor.apana.org.au>, David Miller <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@google.com>,
-	Stephan Mueller <smueller@chronox.de>
-To: syzbot <bot+9f319d9f8748fecc56f23463861c56aae433413e@syzkaller.appspotmail.com>
-Return-path: <owner-linux-mm@kvack.org>
-In-Reply-To: <001a1144a1eebb0bbe055f1c88b3@google.com>
-Sender: owner-linux-mm@kvack.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Cc: Eric Biggers <ebiggers3@gmail.com>,
+        syzbot
+        <bot+3401d9494b9380f7244bcc7fec49680878fccba6@syzkaller.appspotmail.com>,
+        davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from [128.1.224.119] ([128.1.224.119]:40932 "EHLO ringil.hmeau.com"
+        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
+        id S1751687AbdK2KnO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 29 Nov 2017 05:43:14 -0500
+Content-Disposition: inline
+In-Reply-To: <2780580.3j7i2QamZF@tauon.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Nov 29, 2017 at 11:24 AM, syzbot
-<bot+9f319d9f8748fecc56f23463861c56aae433413e@syzkaller.appspotmail.com>
-wrote:
-> Hello,
->
-> syzkaller hit the following crash on
-> 43570f0383d6d5879ae585e6c3cf027ba321546f
-> git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/master
-> compiler: gcc (GCC) 7.1.1 20170620
-> .config is attached
-> Raw console output is attached.
->
-> Unfortunately, I don't have any reproducer for this bug yet.
->
->
-> netlink: 3 bytes leftover after parsing attributes in process
-> `syz-executor3'.
-> device gre0 entered promiscuous mode
-> BUG: unable to handle kernel NULL pointer dereference at 0000000000000074
-> IP: virt_to_cache mm/slab.c:400 [inline]
-> IP: kfree+0xb2/0x250 mm/slab.c:3802
-> PGD 1d369e067 P4D 1d369e067 PUD 1c8da0067 PMD 0
-> Oops: 0000 [#1] SMP KASAN
-> Dumping ftrace buffer:
->    (ftrace buffer empty)
-> Modules linked in:
-> CPU: 0 PID: 8031 Comm: syz-executor5 Not tainted 4.15.0-rc1+ #199
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
-> Google 01/01/2011
-> task: ffff8801d33f8540 task.stack: ffff8801d3b58000
-> RIP: 0010:virt_to_cache mm/slab.c:400 [inline]
-> RIP: 0010:kfree+0xb2/0x250 mm/slab.c:3802
-> RSP: 0018:ffff8801d3b5f780 EFLAGS: 00010046
-> RAX: 0000000000000000 RBX: ffff8801d3b5f948 RCX: ffffffffffffffff
-> RDX: ffffea00074ed7c0 RSI: 0000000000000000 RDI: ffff8801d3b5f948
-> RBP: ffff8801d3b5f7a0 R08: ffffed003a2c3b7c R09: 0000000000000000
-> R10: 0000000000000001 R11: ffffed003a2c3b7b R12: 0000000000000286
-> R13: 0000000000000000 R14: ffff8801d3b5f948 R15: ffff8801d3b5f8b0
-> FS:  00007f7f80409700(0000) GS:ffff8801db400000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000000000000074 CR3: 00000001c97a2000 CR4: 00000000001426f0
-> DR0: 0000000020001000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000600
-> Call Trace:
->  blkcipher_walk_done+0x72b/0xde0 crypto/blkcipher.c:139
->  encrypt+0x50a/0xaf0 crypto/salsa20_generic.c:208
->  skcipher_crypt_blkcipher crypto/skcipher.c:622 [inline]
->  skcipher_decrypt_blkcipher+0x213/0x310 crypto/skcipher.c:640
->  crypto_skcipher_decrypt include/crypto/skcipher.h:463 [inline]
->  _skcipher_recvmsg crypto/algif_skcipher.c:144 [inline]
->  skcipher_recvmsg+0xa54/0xf20 crypto/algif_skcipher.c:165
->  sock_recvmsg_nosec net/socket.c:805 [inline]
->  sock_recvmsg+0xc9/0x110 net/socket.c:812
->  ___sys_recvmsg+0x29b/0x630 net/socket.c:2207
->  __sys_recvmsg+0xe2/0x210 net/socket.c:2252
->  SYSC_recvmsg net/socket.c:2264 [inline]
->  SyS_recvmsg+0x2d/0x50 net/socket.c:2259
->  entry_SYSCALL_64_fastpath+0x1f/0x96
-> RIP: 0033:0x4529d9
-> RSP: 002b:00007f7f80408c58 EFLAGS: 00000212 ORIG_RAX: 000000000000002f
-> RAX: ffffffffffffffda RBX: 0000000000758190 RCX: 00000000004529d9
-> RDX: 0000000000000002 RSI: 000000002022efc8 RDI: 0000000000000018
-> RBP: 000000000000001a R08: 0000000000000000 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000212 R12: 00000000006ed310
-> R13: 00000000ffffffff R14: 00007f7f804096d4 R15: 0000000000000002
-> Code: c2 48 b8 00 00 00 00 00 ea ff ff 48 89 df 48 c1 ea 0c 48 c1 e2 06 48
-> 01 c2 48 8b 42 20 48 8d 48 ff a8 01 48 0f 45 d1 4c 8b 6a 30 <49> 63 75 74 e8
-> 65 75 af ff 48 89 de 4c 89 ef 4c 8b 75 08 e8 06
-> RIP: virt_to_cache mm/slab.c:400 [inline] RSP: ffff8801d3b5f780
-> RIP: kfree+0xb2/0x250 mm/slab.c:3802 RSP: ffff8801d3b5f780
-> CR2: 0000000000000074
-> ---[ end trace e41183aa3c5416f4 ]---
+On Wed, Nov 29, 2017 at 11:28:43AM +0100, Stephan Mueller wrote:
+> Am Mittwoch, 29. November 2017, 11:22:34 CET schrieb Herbert Xu:
+> 
+> Hi Herbert,
+> 
+> > On Wed, Nov 29, 2017 at 11:17:26AM +0100, Stephan Müller wrote:
+> > > @@ -111,6 +111,12 @@ static int _aead_recvmsg(struct socket *sock, struct
+> > > msghdr *msg,> 
+> > >  	size_t usedpages = 0;		/* [in]  RX bufs to be used from user */
+> > >  	size_t processed = 0;		/* [in]  TX bufs to be consumed */
+> > > 
+> > > +	if (ctx->more) {
+> > > +		err = af_alg_wait_for_data(sk, flags);
+> > > +		if (err)
+> > > +			return err;
+> > > +	}
+> > 
+> > So what happens when sendmsg hasn't been called at all? In that
+> > case ctx->more would be zero, and we would skip the wait right?
+> 
+> Right, but wouldn't that be the correct order of operation? If somebody does 
+> not call sendmsg, he simply did not send any data. And that is yet a proper 
+> operation (for encryption) as it obtains the tag for the "null" data.
 
+Well no.  Up until now we have supported (although to a limited
+extent) having two threads do recvmsg/sendmsg in parallel.  So
+if the first thread executed recvmsg it should wait until the
+second thread executes sendmsg.
 
-I think this was misattributed to mm. So +crypto maintainers, mm
-maintainers to bcc.
-Original attachments are here:
-https://groups.google.com/forum/#!msg/syzkaller-bugs/bQmKHgXOQyc/ODs0diBkAgAJ
-I've also filed an issue to fix such misattribution in future:
-https://github.com/google/syzkaller/issues/446
+Obviously this support is not complete as we have seen with ctx->enc
+overwrites but we shouldn't break what used to work.
 
-
-
-> ---
-> This bug is generated by a dumb bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for details.
-> Direct all questions to syzkaller@googlegroups.com.
-> Please credit me with: Reported-by: syzbot <syzkaller@googlegroups.com>
->
-> syzbot will keep track of this bug report.
-> Once a fix for this bug is committed, please reply to this email with:
-> #syz fix: exact-commit-title
-> To mark this as a duplicate of another syzbot report, please reply with:
-> #syz dup: exact-subject-of-another-report
-> If it's a one-off invalid bug report, please reply with:
-> #syz invalid
-> Note: if the crash happens again, it will cause creation of a new bug
-> report.
-> Note: all commands must start from beginning of the line in the email body.
-
---
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
