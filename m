@@ -1,38 +1,64 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v2] crypto: AF_ALG - race-free access of encryption flag
-Date: Wed, 29 Nov 2017 08:17:25 +0100
-Message-ID: <2948680.ShXD61QQGe@tauon.chronox.de>
-References: <001a113f2cd2d62b59055efb7618@google.com> <2865588.MNjhcg78tp@tauon.chronox.de> <20171129071049.GA23023@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Eric Biggers <ebiggers3@gmail.com>,
-        syzbot
-        <bot+3401d9494b9380f7244bcc7fec49680878fccba6@syzkaller.appspotmail.com>,
-        davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:42618 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751165AbdK2HR3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 29 Nov 2017 02:17:29 -0500
-In-Reply-To: <20171129071049.GA23023@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Corentin Labbe <clabbe.montjoie@gmail.com>
+Subject: [PATCH RFC 0/4] crypto: engine - Permit to enqueue all async requests
+Date: Wed, 29 Nov 2017 09:41:17 +0100
+Message-ID: <20171129084121.9385-1-clabbe.montjoie@gmail.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        Corentin Labbe <clabbe.montjoie@gmail.com>
+To: herbert@gondor.apana.org.au, alexandre.torgue@st.com,
+        arei.gonglei@huawei.com, davem@davemloft.net, jasowang@redhat.com,
+        mcoquelin.stm32@gmail.com, mst@redhat.com, fabien.dessenne@st.com
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Mittwoch, 29. November 2017, 08:10:49 CET schrieb Herbert Xu:
+Hello
 
-Hi Herbert,
+The current crypto_engine support only ahash and ablkcipher.
+My first patch which try to add skcipher was Nacked, it will add too many functions
+and adding other algs(aead, asymetric_key) will make the situation worst.
 
-> 
-> But anyway this isn't suitable for stable where we should just fix
-> it by making it not crash.
+This patchset remove all algs specific stuff and now only process generic crypto_async_request.
 
-I will send a patch right away moving the wait out.
+The requests handler function pointer are now moved out of struct engine and
+are now stored directly in a crypto_engine_reqctx.
 
-Later on I will elaborate on your suggestion to move the context-specific 
-information on a list.
+The original proposal of Herbert [1] cannot be done completly since the crypto_engine
+could only dequeue crypto_async_request and it is impossible to access any request_ctx
+without knowing the underlying request type.
 
-Ciao
-Stephan
+So I do something near that was requested: adding crypto_engine_reqctx in TFM context.
+Note that the current implementation expect that crypto_engine_reqctx
+is the first member of the context.
+
+The first patch convert the crypto engine with the new way,
+while the following patchs convert the 3 existing users of crypto_engine.
+Note that this split break bisection, so probably the final commit will be all merged.
+
+The 3 latest patch were compile tested only, but the first is tested successfully
+with my new sun8i-ce driver.
+
+Regards
+
+[1] https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1474434.html
+
+Corentin Labbe (4):
+  crypto: engine - Permit to enqueue all async requests
+  crypto: omap: convert to new crypto engine API
+  crypto: virtio: convert to new crypto engine API
+  crypto: stm32: convert to the new crypto engine API
+
+ crypto/crypto_engine.c                       | 188 ++++++---------------------
+ drivers/crypto/omap-aes.c                    |  21 ++-
+ drivers/crypto/omap-aes.h                    |   3 +
+ drivers/crypto/omap-des.c                    |  24 +++-
+ drivers/crypto/stm32/stm32-hash.c            |  22 +++-
+ drivers/crypto/virtio/virtio_crypto_algs.c   |  15 ++-
+ drivers/crypto/virtio/virtio_crypto_common.h |   2 +-
+ drivers/crypto/virtio/virtio_crypto_core.c   |   3 -
+ include/crypto/engine.h                      |  46 +++----
+ 9 files changed, 122 insertions(+), 202 deletions(-)
+
+-- 
+2.13.6
