@@ -1,34 +1,32 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [crypto v3 2/2] chcr: Add support for Inline IPSec
-Date: Wed, 29 Nov 2017 17:37:56 +1100
-Message-ID: <20171129063756.GK21575@gondor.apana.org.au>
-References: <1510831628-31955-1-git-send-email-atul.gupta@chelsio.com>
+Subject: Re: [PATCH][V2] crypto/nx: fix spelling mistake: "availavle" ->
+ "available"
+Date: Wed, 29 Nov 2017 17:35:57 +1100
+Message-ID: <20171129063557.GF21575@gondor.apana.org.au>
+References: <20171114143217.21456-1-colin.king@canonical.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-        davem@davemloft.net, steffen.klassert@secunet.com,
-        Harsh Jain <harsh@chelsio.com>,
-        Ganesh Goudar <ganeshgr@chelsio.com>
-To: Atul Gupta <atul.gupta@chelsio.com>
-Return-path: <netdev-owner@vger.kernel.org>
+Cc: Haren Myneni <haren@us.ibm.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Colin King <colin.king@canonical.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1510831628-31955-1-git-send-email-atul.gupta@chelsio.com>
-Sender: netdev-owner@vger.kernel.org
+In-Reply-To: <20171114143217.21456-1-colin.king@canonical.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Nov 16, 2017 at 04:57:08PM +0530, Atul Gupta wrote:
-> register xfrmdev_ops callbacks, Send IPsec tunneled data
-> to HW for inline processing.
-> The driver use hardware crypto accelerator to encrypt and
-> generate ICV for the transmitted packet in Inline mode.
+On Tue, Nov 14, 2017 at 02:32:17PM +0000, Colin King wrote:
+> From: Colin Ian King <colin.king@canonical.com>
 > 
-> Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
-> Signed-off-by: Harsh Jain <harsh@chelsio.com>
-> Signed-off-by: Ganesh Goudar <ganeshgr@chelsio.com>
-> ---
-> V2: Fixed the build warnings and created patch against cryptodev
->     to avoid possible merge conflicts
-> V3: Fixed a build warning and added flag for data packet
+> Trivial fix to spelling mistake in pr_err error message text. Also
+> fix spelling mistake in proceeding comment.
+> 
+> Signed-off-by: Colin Ian King <colin.king@canonical.com>
 
 Patch applied.  Thanks.
 -- 
