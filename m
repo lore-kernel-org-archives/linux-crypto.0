@@ -1,30 +1,30 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: s5p-sss - Remove a stray tab
-Date: Wed, 29 Nov 2017 17:31:30 +1100
-Message-ID: <20171129063130.GC21575@gondor.apana.org.au>
-References: <20171109212604.i3zbzlmfotz5b7rr@mwanda>
+Subject: Re: [PATCH] crypto: chelsio - Fix an error code in
+ chcr_hash_dma_map()
+Date: Wed, 29 Nov 2017 17:31:22 +1100
+Message-ID: <20171129063122.GB21575@gondor.apana.org.au>
+References: <20171109212543.6dpgzvtbhi4574wr@mwanda>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Krzysztof Kozlowski <krzk@kernel.org>,
-        Kamil Konieczny <k.konieczny@partner.samsung.com>,
-        Vladimir Zapolskiy <vz@mleia.com>,
+Cc: Harsh Jain <harsh@chelsio.com>,
         "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
-        kernel-janitors@vger.kernel.org
+        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
 To: Dan Carpenter <dan.carpenter@oracle.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [128.1.224.119] ([128.1.224.119]:40620 "EHLO ringil.hmeau.com"
+Received: from [128.1.224.119] ([128.1.224.119]:40608 "EHLO ringil.hmeau.com"
         rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1752081AbdK2GcG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 29 Nov 2017 01:32:06 -0500
+        id S1751165AbdK2GcA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 29 Nov 2017 01:32:00 -0500
 Content-Disposition: inline
-In-Reply-To: <20171109212604.i3zbzlmfotz5b7rr@mwanda>
+In-Reply-To: <20171109212543.6dpgzvtbhi4574wr@mwanda>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Nov 10, 2017 at 12:26:04AM +0300, Dan Carpenter wrote:
-> This code seems correct, but the goto was indented too far.
+On Fri, Nov 10, 2017 at 12:25:43AM +0300, Dan Carpenter wrote:
+> The dma_map_sg() function returns zero on error and positive values on
+> success.  We want to return -ENOMEM on failure here and zero on success.
 > 
+> Fixes: 2f47d5804311 ("crypto: chelsio - Move DMA un/mapping to chcr from lld cxgb4 driver")
 > Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 
 Patch applied.  Thanks.
