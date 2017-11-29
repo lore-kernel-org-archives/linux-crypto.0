@@ -1,50 +1,93 @@
 From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: KASAN: stack-out-of-bounds Read in crypto_chacha20_crypt
-Date: Wed, 29 Nov 2017 00:58:16 -0800
-Message-ID: <20171129085816.GB20992@zzz.localdomain>
-References: <001a1145e854ca4c89055f1afb23@google.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-To: syzbot
-        <bot+f219f03f68409928407df625142fb818c077d0ae@syzkaller.appspotmail.com>
+Subject: [PATCH] crypto: skcipher - set walk.iv for zero-length inputs
+Date: Wed, 29 Nov 2017 01:18:57 -0800
+Message-ID: <20171129091857.6877-1-ebiggers3@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org, Eric Biggers <ebiggers@google.com>,
+        stable@vger.kernel.org
+To: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pg0-f68.google.com ([74.125.83.68]:39735 "EHLO
-        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753676AbdK2I6T (ORCPT
+Received: from mail-pl0-f67.google.com ([209.85.160.67]:45708 "EHLO
+        mail-pl0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753178AbdK2JVF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 29 Nov 2017 03:58:19 -0500
-Content-Disposition: inline
-In-Reply-To: <001a1145e854ca4c89055f1afb23@google.com>
+        Wed, 29 Nov 2017 04:21:05 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Nov 29, 2017 at 12:33:01AM -0800, syzbot wrote:
-> Hello,
-> 
-> syzkaller hit the following crash on
-> 1ea8d039f9edcfefb20d8ddfe136930f6e551529
-> git://git.cmpxchg.org/linux-mmots.git/master
-> compiler: gcc (GCC) 7.1.1 20170620
-> .config is attached
-> Raw console output is attached.
-> 
-> Unfortunately, I don't have any reproducer for this bug yet.
-> 
-> 
-> device gre0 entered promiscuous mode
-> ==================================================================
-> BUG: KASAN: stack-out-of-bounds in __le32_to_cpup
-> include/uapi/linux/byteorder/little_endian.h:58 [inline]
-> BUG: KASAN: stack-out-of-bounds in le32_to_cpuvp
-> crypto/chacha20_generic.c:19 [inline]
-> BUG: KASAN: stack-out-of-bounds in crypto_chacha20_init
-> crypto/chacha20_generic.c:58 [inline]
-> BUG: KASAN: stack-out-of-bounds in crypto_chacha20_crypt+0xaf1/0xbd0
-> crypto/chacha20_generic.c:91
-> Read of size 4 at addr ffff8801d1547630 by task syz-executor3/15071
-> 
+From: Eric Biggers <ebiggers@google.com>
 
-#syz dup: general protection fault in crypto_chacha20_crypt
+All the ChaCha20 algorithms as well as the ARM bit-sliced AES-XTS
+algorithms call skcipher_walk_virt(), then access the IV (walk.iv)
+before checking whether any bytes need to be processed (walk.nbytes).
+
+But if the input is empty, then skcipher_walk_virt() doesn't set the IV,
+and the algorithms crash trying to use the uninitialized IV pointer.
+
+Fix it by setting the IV earlier in skcipher_walk_virt().  Also fix it
+for the AEAD walk functions.
+
+This isn't a perfect solution because we can't actually align the IV to
+->cra_alignmask unless there are bytes to process, for one because the
+temporary buffer for the aligned IV is freed by skcipher_walk_done(),
+which is only called when there are bytes to process.  Thus, algorithms
+that require aligned IVs will still need to avoid accessing the IV when
+walk.nbytes == 0.  Still, many algorithms/architectures are fine with
+IVs having any alignment, and even for those that aren't, a misaligned
+pointer bug is much less severe than an uninitialized pointer bug.
+
+This change also matches the behavior of the older blkcipher_walk API.
+
+Fixes: 0cabf2af6f5a ("crypto: skcipher - Fix crash on zero-length input")
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Cc: <stable@vger.kernel.org> # v4.14+
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ crypto/skcipher.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
+
+diff --git a/crypto/skcipher.c b/crypto/skcipher.c
+index 778e0ff42bfa..11af5fd6a443 100644
+--- a/crypto/skcipher.c
++++ b/crypto/skcipher.c
+@@ -449,6 +449,8 @@ static int skcipher_walk_skcipher(struct skcipher_walk *walk,
+ 
+ 	walk->total = req->cryptlen;
+ 	walk->nbytes = 0;
++	walk->iv = req->iv;
++	walk->oiv = req->iv;
+ 
+ 	if (unlikely(!walk->total))
+ 		return 0;
+@@ -456,9 +458,6 @@ static int skcipher_walk_skcipher(struct skcipher_walk *walk,
+ 	scatterwalk_start(&walk->in, req->src);
+ 	scatterwalk_start(&walk->out, req->dst);
+ 
+-	walk->iv = req->iv;
+-	walk->oiv = req->iv;
+-
+ 	walk->flags &= ~SKCIPHER_WALK_SLEEP;
+ 	walk->flags |= req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP ?
+ 		       SKCIPHER_WALK_SLEEP : 0;
+@@ -510,6 +509,8 @@ static int skcipher_walk_aead_common(struct skcipher_walk *walk,
+ 	int err;
+ 
+ 	walk->nbytes = 0;
++	walk->iv = req->iv;
++	walk->oiv = req->iv;
+ 
+ 	if (unlikely(!walk->total))
+ 		return 0;
+@@ -525,9 +526,6 @@ static int skcipher_walk_aead_common(struct skcipher_walk *walk,
+ 	scatterwalk_done(&walk->in, 0, walk->total);
+ 	scatterwalk_done(&walk->out, 0, walk->total);
+ 
+-	walk->iv = req->iv;
+-	walk->oiv = req->iv;
+-
+ 	if (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP)
+ 		walk->flags |= SKCIPHER_WALK_SLEEP;
+ 	else
+-- 
+2.15.0
