@@ -1,33 +1,43 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: chelsio - Fix an error code in
- chcr_hash_dma_map()
-Date: Wed, 29 Nov 2017 17:31:22 +1100
-Message-ID: <20171129063122.GB21575@gondor.apana.org.au>
-References: <20171109212543.6dpgzvtbhi4574wr@mwanda>
+Subject: Re: [v2,01/12] hwrng: bcm2835 - Obtain base register via resource
+Date: Wed, 29 Nov 2017 17:30:28 +1100
+Message-ID: <20171129063028.GB21594@gondor.apana.org.au>
+References: <20171108004449.32730-2-f.fainelli@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Harsh Jain <harsh@chelsio.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
-To: Dan Carpenter <dan.carpenter@oracle.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [128.1.224.119] ([128.1.224.119]:40608 "EHLO ringil.hmeau.com"
-        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1751165AbdK2GcA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 29 Nov 2017 01:32:00 -0500
+Cc: linux-kernel@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        "maintainer:BROADCOM BCM281XX/BCM11XXX/BCM216XX ARM ARCHITE..."
+        <bcm-kernel-feedback-list@broadcom.com>,
+        Eric Anholt <eric@anholt.net>,
+        Stefan Wahren <stefan.wahren@i2se.com>,
+        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
+        Russell King <rmk+kernel@armlinux.org.uk>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Harald Freudenberger <freude@linux.vnet.ibm.com>,
+        Sean Wang <sean.wang@mediatek.com>,
+        Martin Kaiser <martin@kaiser.cx>,
+        Steffen Trumtrar <s.trumtrar@pengutronix.de>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.
+To: Florian Fainelli <f.fainelli@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20171109212543.6dpgzvtbhi4574wr@mwanda>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20171108004449.32730-2-f.fainelli@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Nov 10, 2017 at 12:25:43AM +0300, Dan Carpenter wrote:
-> The dma_map_sg() function returns zero on error and positive values on
-> success.  We want to return -ENOMEM on failure here and zero on success.
+On Tue, Nov 07, 2017 at 04:44:38PM -0800, Florian Fainelli wrote:
+> In preparation for consolidating bcm63xx-rng into bcm2835-rng, make sure
+> that we obtain the base register via platform_get_resource() since we
+> need to support the non-DT enabled MIPS-based BCM63xx DSL SoCs.
 > 
-> Fixes: 2f47d5804311 ("crypto: chelsio - Move DMA un/mapping to chcr from lld cxgb4 driver")
-> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+> Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
