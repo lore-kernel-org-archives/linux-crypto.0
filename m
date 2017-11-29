@@ -1,30 +1,40 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [1/2] crypto: tcrypt - fix S/G table for test_aead_speed()
-Date: Wed, 29 Nov 2017 17:28:21 +1100
-Message-ID: <20171129062821.GA21594@gondor.apana.org.au>
-References: <1507630920-9014-1-git-send-email-robert.baronescu@nxp.com>
+Subject: Re: [PATCH v5 0/2] STM32 CRYP crypto driver
+Date: Wed, 29 Nov 2017 17:29:08 +1100
+Message-ID: <20171129062908.GA21647@gondor.apana.org.au>
+References: <1508425830-13565-1-git-send-email-fabien.dessenne@st.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, davem@davemloft.net
-To: Robert Baronescu <robert.baronescu@nxp.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [128.1.224.119] ([128.1.224.119]:40540 "EHLO ringil.hmeau.com"
-        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1751165AbdK2G2o (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 29 Nov 2017 01:28:44 -0500
+Cc: "David S . Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@st.com>,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Benjamin Gaignard <benjamin.gaignard@st.com>,
+        Lionel Debieve <lionel.debieve@st.com>,
+        Ludovic Barre <ludovic.barre@st.com>
+To: Fabien Dessenne <fabien.dessenne@st.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1507630920-9014-1-git-send-email-robert.baronescu@nxp.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1508425830-13565-1-git-send-email-fabien.dessenne@st.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Oct 10, 2017 at 01:21:59PM +0300, Robert Baronescu wrote:
-> In case buffer length is a multiple of PAGE_SIZE,
-> the S/G table is incorrectly generated.
-> Fix this by handling buflen = k * PAGE_SIZE separately.
+On Thu, Oct 19, 2017 at 05:10:28PM +0200, Fabien Dessenne wrote:
+> This set of patches adds a new crypto driver for STMicroelectronics stm32 HW.
+> This drivers uses the crypto API and provides with HW-enabled block cipher
+> algorithms.
 > 
-> Signed-off-by: Robert Baronescu <robert.baronescu@nxp.com>
+> This driver was successfully tested with tcrypt / testmgr.
+> 
+> Changes since v5:
+> -add timeout in wait_busy function
+> -clear key after use
+> -misc : remove unused functions, use -Exx, use dev_err
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
