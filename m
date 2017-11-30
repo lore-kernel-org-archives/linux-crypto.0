@@ -1,74 +1,81 @@
-From: Colin King <colin.king@canonical.com>
-Subject: [PATCH] crypto: chelsio: make arrays sgl_ent_len and dsgl_ent_len static
-Date: Thu, 30 Nov 2017 11:32:08 +0000
-Message-ID: <20171130113208.3381-1-colin.king@canonical.com>
+From: Kamil Konieczny <k.konieczny@partner.samsung.com>
+Subject: Re: [PATCH v2 3/4] crypto: inside-secure - only update the result
+ buffer when provided
+Date: Thu, 30 Nov 2017 12:52:42 +0100
+Message-ID: <6a920087-6cf2-6074-1f95-63ce56f0abee@partner.samsung.com>
+References: <20171128154236.19192-1-antoine.tenart@free-electrons.com>
+        <CGME20171128154525epcas3p42e9bb1308ab731910522a19a8fef4ad8@epcas3p4.samsung.com>
+        <20171128154236.19192-4-antoine.tenart@free-electrons.com>
+        <c91f78af-122d-1a5e-3a34-21dd137c8847@partner.samsung.com>
+        <20171130092927.GH30391@kwain>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Harsh Jain <harsh@chelsio.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "avid S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+        thomas.petazzoni@free-electrons.com,
+        gregory.clement@free-electrons.com,
+        miquel.raynal@free-electrons.com, oferh@marvell.com,
+        igall@marvell.com, nadavh@marvell.com, linux-crypto@vger.kernel.org
+To: Antoine Tenart <antoine.tenart@free-electrons.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from youngberry.canonical.com ([91.189.89.112]:41091 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752132AbdK3LcP (ORCPT
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:39430 "EHLO
+        mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751157AbdK3Lwr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 Nov 2017 06:32:15 -0500
+        Thu, 30 Nov 2017 06:52:47 -0500
+In-reply-to: <20171130092927.GH30391@kwain>
+Content-language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Colin Ian King <colin.king@canonical.com>
+Hi Antoine,
 
-The arrays sgl_ent_len and dsgl_ent_len are local to the source and do
-not need to be in global scope, so make them static. Also re-format the
-declarations to match the following round_constant array declaration
-style.
+On 30.11.2017 10:29, Antoine Tenart wrote:
+> Hi Kamil,
+> 
+> On Thu, Nov 30, 2017 at 10:19:26AM +0100, Kamil Konieczny wrote:
+>> On 28.11.2017 16:42, Antoine Tenart wrote:
+>>> The patch fixes the ahash support by only updating the result buffer
+>>> when provided. Otherwise the driver could crash with NULL pointer
+>>> exceptions, because the ahash caller isn't required to supply a result
+>>> buffer on all calls.
+>>
+>> Can you point to bug crush report ?
+> 
+> Do you want the crash dump? (It'll only be a "normal" NULL pointer
+> dereference).
 
-Cleans up sparse warnings:
-drivers/crypto/chelsio/chcr_algo.c:76:14: warning: symbol 'sgl_ent_len'
-was not declared. Should it be static?
-drivers/crypto/chelsio/chcr_algo.c:81:14: warning: symbol 'dsgl_ent_len'
-was not declared. Should it be static?
+Ah I see, in this case not.
 
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
----
- drivers/crypto/chelsio/chcr_algo.c | 22 +++++++++++++---------
- 1 file changed, 13 insertions(+), 9 deletions(-)
+>>> Fixes: 1b44c5a60c13 ("crypto: inside-secure - add SafeXcel EIP197 crypto engine driver")
+>>> Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
+>>> ---
+>>>  drivers/crypto/inside-secure/safexcel_hash.c | 7 ++++++-
+>>>  1 file changed, 6 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
+>>> index 6135c9f5742c..424f4c5d4d25 100644
+>>> --- a/drivers/crypto/inside-secure/safexcel_hash.c
+>>> +++ b/drivers/crypto/inside-secure/safexcel_hash.c
+>>> @@ -150,7 +150,12 @@ static int safexcel_handle_req_result(struct safexcel_crypto_priv *priv, int rin
+>>>  
+>>>  	if (sreq->finish)
+>>>  		result_sz = crypto_ahash_digestsize(ahash);
+>>> -	memcpy(sreq->state, areq->result, result_sz);
+>> [...]
+>> can the driver get request for final/finup/digest with null req->result ?
+> 
+> I don't think that can happen. But having an update called without
+> req->result provided is a valid call (though it's not well documented).
 
-diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
-index e61ec8a46340..b663b93b7d01 100644
---- a/drivers/crypto/chelsio/chcr_algo.c
-+++ b/drivers/crypto/chelsio/chcr_algo.c
-@@ -73,15 +73,19 @@
- 
- #define IV AES_BLOCK_SIZE
- 
--unsigned int sgl_ent_len[] = {0, 0, 16, 24, 40, 48, 64, 72, 88,
--				96, 112, 120, 136, 144, 160, 168, 184,
--				192, 208, 216, 232, 240, 256, 264, 280,
--				288, 304, 312, 328, 336, 352, 360, 376};
--
--unsigned int dsgl_ent_len[] = {0, 32, 32, 48, 48, 64, 64, 80, 80,
--				112, 112, 128, 128, 144, 144, 160, 160,
--				192, 192, 208, 208, 224, 224, 240, 240,
--				272, 272, 288, 288, 304, 304, 320, 320};
-+static unsigned int sgl_ent_len[] = {
-+	0, 0, 16, 24, 40, 48, 64, 72, 88,
-+	96, 112, 120, 136, 144, 160, 168, 184,
-+	192, 208, 216, 232, 240, 256, 264, 280,
-+	288, 304, 312, 328, 336, 352, 360, 376
-+};
-+
-+static unsigned int dsgl_ent_len[] = {
-+	0, 32, 32, 48, 48, 64, 64, 80, 80,
-+	112, 112, 128, 128, 144, 144, 160, 160,
-+	192, 192, 208, 208, 224, 224, 240, 240,
-+	272, 272, 288, 288, 304, 304, 320, 320
-+};
- 
- static u32 round_constant[11] = {
- 	0x01000000, 0x02000000, 0x04000000, 0x08000000,
+so maybe:
+
+ 	if (sreq->finish) {
+  		result_sz = crypto_ahash_digestsize(ahash);
+		memcpy(sreq->state, areq->result, result_sz);
+	}
+
 -- 
-2.14.1
+Best regards,
+Kamil Konieczny
+Samsung R&D Institute Poland
