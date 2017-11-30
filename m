@@ -1,129 +1,56 @@
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Subject: [PATCH] crypto: mcryptd: protect the per-CPU queue with a lock
-Date: Thu, 30 Nov 2017 13:39:27 +0100
-Message-ID: <20171130123927.GA12606@linutronix.de>
+From: Antoine Tenart <antoine.tenart@free-electrons.com>
+Subject: Re: [PATCH v2 3/4] crypto: inside-secure - only update the result
+ buffer when provided
+Date: Thu, 30 Nov 2017 13:41:06 +0100
+Message-ID: <20171130124106.GJ30391@kwain>
+References: <20171128154236.19192-1-antoine.tenart@free-electrons.com>
+ <CGME20171128154525epcas3p42e9bb1308ab731910522a19a8fef4ad8@epcas3p4.samsung.com>
+ <20171128154236.19192-4-antoine.tenart@free-electrons.com>
+ <c91f78af-122d-1a5e-3a34-21dd137c8847@partner.samsung.com>
+ <20171130092927.GH30391@kwain>
+ <6a920087-6cf2-6074-1f95-63ce56f0abee@partner.samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Tim Chen <tim.c.chen@linux.intel.com>, tglx@linutronix.de,
-        Peter Zijlstra <peterz@infradead.org>
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        thomas.petazzoni@free-electrons.com,
+        gregory.clement@free-electrons.com,
+        miquel.raynal@free-electrons.com, oferh@marvell.com,
+        igall@marvell.com, nadavh@marvell.com, linux-crypto@vger.kernel.org
+To: Kamil Konieczny <k.konieczny@partner.samsung.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from Galois.linutronix.de ([146.0.238.70]:44300 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752235AbdK3Mje (ORCPT
+Received: from mail.free-electrons.com ([62.4.15.54]:59978 "EHLO
+        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751817AbdK3MlK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 Nov 2017 07:39:34 -0500
+        Thu, 30 Nov 2017 07:41:10 -0500
 Content-Disposition: inline
+In-Reply-To: <6a920087-6cf2-6074-1f95-63ce56f0abee@partner.samsung.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-mcryptd_enqueue_request() grabs the per-CPU queue struct and protects
-access to it with disabled preemption. Then it schedules a worker on the
-same CPU. The worker in mcryptd_queue_worker() guards access to the same
-per-CPU variable with disabled preemption.
+On Thu, Nov 30, 2017 at 12:52:42PM +0100, Kamil Konieczny wrote:
+> On 30.11.2017 10:29, Antoine Tenart wrote:
+> > On Thu, Nov 30, 2017 at 10:19:26AM +0100, Kamil Konieczny wrote:
+> >> can the driver get request for final/finup/digest with null req->result ?
+> > 
+> > I don't think that can happen. But having an update called without
+> > req->result provided is a valid call (though it's not well documented).
+> 
+> so maybe:
+> 
+>  	if (sreq->finish) {
+>   		result_sz = crypto_ahash_digestsize(ahash);
+> 		memcpy(sreq->state, areq->result, result_sz);
+> 	}
 
-If we take CPU-hotplug into account then it is possible that between
-queue_work_on() and the actual invocation of the worker the CPU goes
-down and the worker will be scheduled on _another_ CPU. And here the
-preempt_disable() protection does not work anymore. The easiest thing is
-to add a spin_lock() to guard access to the list.
+No, if we do this we'll lose the ability to export the current state.
 
-Another detail: mcryptd_queue_worker() is not processing more than
-MCRYPTD_BATCH invocation in a row. If there are still items left, then
-it will invoke queue_work() to proceed with more later. *I* would
-suggest to simply drop that check because it does not use a system
-workqueue and the workqueue is already marked as "CPU_INTENSIVE". And if
-preemption is required then the scheduler should do it.
-However if queue_work() is used then the work item is marked as CPU
-unbound. That means it will try to run on the local CPU but it may run
-on another CPU as well. Especially with CONFIG_DEBUG_WQ_FORCE_RR_CPU=y.
-Again, the preempt_disable() won't work here but lock which was
-introduced will help.
-In order to keep work-item on the local CPU (and avoid RR) I changed it
-to queue_work_on().
+Thanks,
+Antoine
 
-Cc: stable@vger.kernel.org
-Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
----
- crypto/mcryptd.c         | 23 ++++++++++-------------
- include/crypto/mcryptd.h |  1 +
- 2 files changed, 11 insertions(+), 13 deletions(-)
-
-diff --git a/crypto/mcryptd.c b/crypto/mcryptd.c
-index 4e6472658852..eca04d3729b3 100644
---- a/crypto/mcryptd.c
-+++ b/crypto/mcryptd.c
-@@ -81,6 +81,7 @@ static int mcryptd_init_queue(struct mcryptd_queue *queue,
- 		pr_debug("cpu_queue #%d %p\n", cpu, queue->cpu_queue);
- 		crypto_init_queue(&cpu_queue->queue, max_cpu_qlen);
- 		INIT_WORK(&cpu_queue->work, mcryptd_queue_worker);
-+		spin_lock_init(&cpu_queue->q_lock);
- 	}
- 	return 0;
- }
-@@ -104,15 +105,16 @@ static int mcryptd_enqueue_request(struct mcryptd_queue *queue,
- 	int cpu, err;
- 	struct mcryptd_cpu_queue *cpu_queue;
- 
--	cpu = get_cpu();
--	cpu_queue = this_cpu_ptr(queue->cpu_queue);
--	rctx->tag.cpu = cpu;
-+	cpu_queue = raw_cpu_ptr(queue->cpu_queue);
-+	spin_lock(&cpu_queue->q_lock);
-+	cpu = smp_processor_id();
-+	rctx->tag.cpu = smp_processor_id();
- 
- 	err = crypto_enqueue_request(&cpu_queue->queue, request);
- 	pr_debug("enqueue request: cpu %d cpu_queue %p request %p\n",
- 		 cpu, cpu_queue, request);
-+	spin_unlock(&cpu_queue->q_lock);
- 	queue_work_on(cpu, kcrypto_wq, &cpu_queue->work);
--	put_cpu();
- 
- 	return err;
- }
-@@ -161,16 +163,11 @@ static void mcryptd_queue_worker(struct work_struct *work)
- 	cpu_queue = container_of(work, struct mcryptd_cpu_queue, work);
- 	i = 0;
- 	while (i < MCRYPTD_BATCH || single_task_running()) {
--		/*
--		 * preempt_disable/enable is used to prevent
--		 * being preempted by mcryptd_enqueue_request()
--		 */
--		local_bh_disable();
--		preempt_disable();
-+
-+		spin_lock_bh(&cpu_queue->q_lock);
- 		backlog = crypto_get_backlog(&cpu_queue->queue);
- 		req = crypto_dequeue_request(&cpu_queue->queue);
--		preempt_enable();
--		local_bh_enable();
-+		spin_unlock_bh(&cpu_queue->q_lock);
- 
- 		if (!req) {
- 			mcryptd_opportunistic_flush();
-@@ -185,7 +182,7 @@ static void mcryptd_queue_worker(struct work_struct *work)
- 		++i;
- 	}
- 	if (cpu_queue->queue.qlen)
--		queue_work(kcrypto_wq, &cpu_queue->work);
-+		queue_work_on(smp_processor_id(), kcrypto_wq, &cpu_queue->work);
- }
- 
- void mcryptd_flusher(struct work_struct *__work)
-diff --git a/include/crypto/mcryptd.h b/include/crypto/mcryptd.h
-index cceafa01f907..b67404fc4b34 100644
---- a/include/crypto/mcryptd.h
-+++ b/include/crypto/mcryptd.h
-@@ -27,6 +27,7 @@ static inline struct mcryptd_ahash *__mcryptd_ahash_cast(
- 
- struct mcryptd_cpu_queue {
- 	struct crypto_queue queue;
-+	spinlock_t q_lock;
- 	struct work_struct work;
- };
- 
 -- 
-2.15.0
+Antoine Ténart, Free Electrons
+Embedded Linux and Kernel engineering
+http://free-electrons.com
