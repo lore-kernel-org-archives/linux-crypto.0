@@ -1,44 +1,80 @@
-From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: WARNING: kernel stack regs has bad 'bp' value (2)
-Date: Thu, 30 Nov 2017 01:17:24 -0800
-Message-ID: <20171130091724.GC5451@zzz.localdomain>
-References: <001a113f2cd26f3532055f0f4a79@google.com>
+From: Kamil Konieczny <k.konieczny@partner.samsung.com>
+Subject: Re: [PATCH v2 3/4] crypto: inside-secure - only update the result
+ buffer when provided
+Date: Thu, 30 Nov 2017 10:19:26 +0100
+Message-ID: <c91f78af-122d-1a5e-3a34-21dd137c8847@partner.samsung.com>
+References: <20171128154236.19192-1-antoine.tenart@free-electrons.com>
+        <CGME20171128154525epcas3p42e9bb1308ab731910522a19a8fef4ad8@epcas3p4.samsung.com>
+        <20171128154236.19192-4-antoine.tenart@free-electrons.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, herbert@gondor.apana.org.au, hpa@zytor.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
-To: syzbot
-        <bot+e01a53d277c86c4e61e7c84ec83432ed395c7df8@syzkaller.appspotmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: thomas.petazzoni@free-electrons.com,
+        gregory.clement@free-electrons.com,
+        miquel.raynal@free-electrons.com, oferh@marvell.com,
+        igall@marvell.com, nadavh@marvell.com, linux-crypto@vger.kernel.org
+To: Antoine Tenart <antoine.tenart@free-electrons.com>,
+        herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f180.google.com ([209.85.192.180]:41945 "EHLO
-        mail-pf0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750849AbdK3JR2 (ORCPT
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:36508 "EHLO
+        mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751157AbdK3JTb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 Nov 2017 04:17:28 -0500
-Content-Disposition: inline
-In-Reply-To: <001a113f2cd26f3532055f0f4a79@google.com>
+        Thu, 30 Nov 2017 04:19:31 -0500
+In-reply-to: <20171128154236.19192-4-antoine.tenart@free-electrons.com>
+Content-language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Nov 28, 2017 at 10:36:01AM -0800, syzbot wrote:
-> WARNING: kernel stack regs at ffff8801c1e5f468 in syzkaller196611:6199 has
-> bad 'bp' value 0000000000000001
-> unwind stack type:0 next_sp:          (null) mask:0x6 graph_idx:0
-> ffff8801db4075a8: ffff8801db407630 (0xffff8801db407630)
-> ffff8801db4075b0: ffffffff8128a84e (__save_stack_trace+0x6e/0xd0)
-> ffff8801db4075b8: 0000000000000000 ...
-> ffff8801db4075c0: ffff8801c1e58000 (0xffff8801c1e58000)
-> ffff8801db4075c8: ffff8801c1e60000 (0xffff8801c1e60000)
-> ffff8801db4075d0: 0000000000000000 ...
-> ffff8801db4075d8: 0000000000000006 (0x6)
-> ffff8801db4075e0: ffff8801c1e4e000 (0xffff8801c1e4e000)
-> ffff8801db4075e8: 0000010100000000 (0x10100000000)
-> ffff8801db4075f0: 0000000000000000 ...
-> ffff8801db4075f8: ffff8801db4075a8 (0xffff8801db4075a8)
-> ffff8801db407600: ffffffff8134ff7d (__twofish_enc_blk_3way+0x1b1d/0x1b30)
+Hi Antoine,
 
-Looks like the x86_64 "3 way" version of Twofish (twofish-x86_64-asm_64-3way.S)
-needs to be updated to not use %rbp.
+On 28.11.2017 16:42, Antoine Tenart wrote:
+> The patch fixes the ahash support by only updating the result buffer
+> when provided. Otherwise the driver could crash with NULL pointer
+> exceptions, because the ahash caller isn't required to supply a result
+> buffer on all calls.
 
-Eric
+Can you point to bug crush report ?
+
+> Fixes: 1b44c5a60c13 ("crypto: inside-secure - add SafeXcel EIP197 crypto engine driver")
+> Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
+> ---
+>  drivers/crypto/inside-secure/safexcel_hash.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
+> index 6135c9f5742c..424f4c5d4d25 100644
+> --- a/drivers/crypto/inside-secure/safexcel_hash.c
+> +++ b/drivers/crypto/inside-secure/safexcel_hash.c
+> @@ -150,7 +150,12 @@ static int safexcel_handle_req_result(struct safexcel_crypto_priv *priv, int rin
+>  
+>  	if (sreq->finish)
+>  		result_sz = crypto_ahash_digestsize(ahash);
+> -	memcpy(sreq->state, areq->result, result_sz);
+> +
+> +	/* The called isn't required to supply a result buffer. Updated it only
+> +	 * when provided.
+> +	 */
+> +	if (areq->result)
+> +		memcpy(sreq->state, areq->result, result_sz);
+>  
+>  	dma_unmap_sg(priv->dev, areq->src,
+>  		     sg_nents_for_len(areq->src, areq->nbytes), DMA_TO_DEVICE);
+> 
+
+can the driver get request for final/finup/digest with null req->result ?
+If yes (?), such checks can be done before any hardware processing, saving time,
+for example:
+
+int hash_final(struct ahash_request *areq)
+{
+	if (!areq->result)
+		return -EINVAL;
+	/* normal processing here */
+}
+
+
+-- 
+Best regards,
+Kamil Konieczny
+Samsung R&D Institute Poland
