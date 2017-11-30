@@ -1,36 +1,44 @@
 From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: KASAN: slab-out-of-bounds Read in crypto_chacha20_crypt
-Date: Thu, 30 Nov 2017 01:01:05 -0800
-Message-ID: <20171130090105.GB5451@zzz.localdomain>
-References: <001a11440c80f04903055f2f275f@google.com>
+Subject: Re: WARNING: kernel stack regs has bad 'bp' value (2)
+Date: Thu, 30 Nov 2017 01:17:24 -0800
+Message-ID: <20171130091724.GC5451@zzz.localdomain>
+References: <001a113f2cd26f3532055f0f4a79@google.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
+Cc: davem@davemloft.net, herbert@gondor.apana.org.au, hpa@zytor.com,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
+        syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
 To: syzbot
-        <bot+f574f3c1cda02a64178d8a137bc83881e246ac9c@syzkaller.appspotmail.com>
+        <bot+e01a53d277c86c4e61e7c84ec83432ed395c7df8@syzkaller.appspotmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f180.google.com ([209.85.192.180]:33848 "EHLO
+Received: from mail-pf0-f180.google.com ([209.85.192.180]:41945 "EHLO
         mail-pf0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750830AbdK3JBI (ORCPT
+        with ESMTP id S1750849AbdK3JR2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 Nov 2017 04:01:08 -0500
+        Thu, 30 Nov 2017 04:17:28 -0500
 Content-Disposition: inline
-In-Reply-To: <001a11440c80f04903055f2f275f@google.com>
+In-Reply-To: <001a113f2cd26f3532055f0f4a79@google.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Nov 30, 2017 at 12:37:01AM -0800, syzbot wrote:
-> ==================================================================
-> BUG: KASAN: slab-out-of-bounds in __le32_to_cpup
-> include/uapi/linux/byteorder/little_endian.h:58 [inline]
-> BUG: KASAN: slab-out-of-bounds in le32_to_cpuvp crypto/chacha20_generic.c:19
-> [inline]
-> BUG: KASAN: slab-out-of-bounds in crypto_chacha20_init
-> crypto/chacha20_generic.c:58 [inline]
-> BUG: KASAN: slab-out-of-bounds in crypto_chacha20_crypt+0xaf1/0xbd0
-> crypto/chacha20_generic.c:91
-> Read of size 4 at addr ffff880100000006 by task syz-executor1/15417
+On Tue, Nov 28, 2017 at 10:36:01AM -0800, syzbot wrote:
+> WARNING: kernel stack regs at ffff8801c1e5f468 in syzkaller196611:6199 has
+> bad 'bp' value 0000000000000001
+> unwind stack type:0 next_sp:          (null) mask:0x6 graph_idx:0
+> ffff8801db4075a8: ffff8801db407630 (0xffff8801db407630)
+> ffff8801db4075b0: ffffffff8128a84e (__save_stack_trace+0x6e/0xd0)
+> ffff8801db4075b8: 0000000000000000 ...
+> ffff8801db4075c0: ffff8801c1e58000 (0xffff8801c1e58000)
+> ffff8801db4075c8: ffff8801c1e60000 (0xffff8801c1e60000)
+> ffff8801db4075d0: 0000000000000000 ...
+> ffff8801db4075d8: 0000000000000006 (0x6)
+> ffff8801db4075e0: ffff8801c1e4e000 (0xffff8801c1e4e000)
+> ffff8801db4075e8: 0000010100000000 (0x10100000000)
+> ffff8801db4075f0: 0000000000000000 ...
+> ffff8801db4075f8: ffff8801db4075a8 (0xffff8801db4075a8)
+> ffff8801db407600: ffffffff8134ff7d (__twofish_enc_blk_3way+0x1b1d/0x1b30)
 
-#syz dup: general protection fault in crypto_chacha20_crypt
+Looks like the x86_64 "3 way" version of Twofish (twofish-x86_64-asm_64-3way.S)
+needs to be updated to not use %rbp.
+
+Eric
