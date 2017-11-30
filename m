@@ -1,71 +1,71 @@
-From: Kamil Konieczny <k.konieczny@partner.samsung.com>
-Subject: Re: [PATCH v2 3/4] crypto: inside-secure - only update the result
- buffer when provided
-Date: Thu, 30 Nov 2017 15:10:28 +0100
-Message-ID: <37f78e96-f7f7-2fde-25ac-7ae54a7a4217@partner.samsung.com>
-References: <20171128154236.19192-1-antoine.tenart@free-electrons.com>
-        <CGME20171128154525epcas3p42e9bb1308ab731910522a19a8fef4ad8@epcas3p4.samsung.com>
-        <20171128154236.19192-4-antoine.tenart@free-electrons.com>
-        <c91f78af-122d-1a5e-3a34-21dd137c8847@partner.samsung.com>
-        <20171130092927.GH30391@kwain>
-        <6a920087-6cf2-6074-1f95-63ce56f0abee@partner.samsung.com>
-        <20171130124106.GJ30391@kwain>
+From: Colin King <colin.king@canonical.com>
+Subject: [PATCH] chcr: remove unused variables net_device, pi, adap and cntrl
+Date: Thu, 30 Nov 2017 14:11:44 +0000
+Message-ID: <20171130141144.20845-1-colin.king@canonical.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-        thomas.petazzoni@free-electrons.com,
-        gregory.clement@free-electrons.com,
-        miquel.raynal@free-electrons.com, oferh@marvell.com,
-        igall@marvell.com, nadavh@marvell.com, linux-crypto@vger.kernel.org
-To: Antoine Tenart <antoine.tenart@free-electrons.com>
+Content-Transfer-Encoding: 8bit
+Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Harsh Jain <harsh@chelsio.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:59039 "EHLO
-        mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751810AbdK3OKd (ORCPT
+Received: from youngberry.canonical.com ([91.189.89.112]:45775 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751456AbdK3OLw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 Nov 2017 09:10:33 -0500
-In-reply-to: <20171130124106.GJ30391@kwain>
-Content-language: en-US
+        Thu, 30 Nov 2017 09:11:52 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+From: Colin Ian King <colin.king@canonical.com>
 
-On 30.11.2017 13:41, Antoine Tenart wrote:
-> On Thu, Nov 30, 2017 at 12:52:42PM +0100, Kamil Konieczny wrote:
->> On 30.11.2017 10:29, Antoine Tenart wrote:
->>> On Thu, Nov 30, 2017 at 10:19:26AM +0100, Kamil Konieczny wrote:
+Variables adap, pi and cntrl are assigned but are never read, hence
+they are redundant and can be removed.
 
->>>> can the driver get request for final/finup/digest with null req->result ?
->>>
->>> I don't think that can happen. But having an update called without
->>> req->result provided is a valid call (though it's not well documented).
+Cleans up various clang build warnings.
 
-Yes, this field may be unset until finup/final.
-One more to watch out is that in final, you can have areq->nsize != 0 so
-you should not use  areq->nsize nor areq->src
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ drivers/crypto/chelsio/chcr_ipsec.c | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
 
->> so maybe:
->>
->>  	if (sreq->finish) {
->>   		result_sz = crypto_ahash_digestsize(ahash);
->> 		memcpy(sreq->state, areq->result, result_sz);
->> 	}
-> 
-> No, if we do this we'll lose the ability to export the current state.
-
-So maybe save it into request context:
-
-	result_sz = crypto_ahash_digestsize(ahash);
-	ctx = ahash_request_ctx(areq);
-
-  	if (sreq->finish)
- 		memcpy(sreq->state, areq->result, result_sz);
-	else
-		memcpy(sreq->state, ctx->state, result_sz);
-
-
+diff --git a/drivers/crypto/chelsio/chcr_ipsec.c b/drivers/crypto/chelsio/chcr_ipsec.c
+index f90f991c133f..a0f003ffd1f4 100644
+--- a/drivers/crypto/chelsio/chcr_ipsec.c
++++ b/drivers/crypto/chelsio/chcr_ipsec.c
+@@ -199,14 +199,9 @@ static inline int chcr_ipsec_setkey(struct xfrm_state *x,
+  */
+ static int chcr_xfrm_add_state(struct xfrm_state *x)
+ {
+-	struct net_device *netdev = x->xso.dev;
+-	struct port_info *pi  = netdev_priv(netdev);
+ 	struct ipsec_sa_entry *sa_entry;
+-	struct adapter *adap;
+ 	int res = 0;
+ 
+-	adap = pi->adapter;
+-
+ 	if (x->props.aalgo != SADB_AALG_NONE) {
+ 		pr_debug("CHCR: Cannot offload authenticated xfrm states\n");
+ 		return -EINVAL;
+@@ -570,7 +565,7 @@ int chcr_ipsec_xmit(struct sk_buff *skb, struct net_device *dev)
+ {
+ 	struct xfrm_state *x = xfrm_input_state(skb);
+ 	struct ipsec_sa_entry *sa_entry;
+-	u64 *pos, *end, *before, cntrl, *sgl;
++	u64 *pos, *end, *before, *sgl;
+ 	int qidx, left, credits;
+ 	unsigned int flits = 0, ndesc, kctx_len;
+ 	struct adapter *adap;
+@@ -596,7 +591,6 @@ out_free:       dev_kfree_skb_any(skb);
+ 	q = &adap->sge.ethtxq[qidx + pi->first_qset];
+ 
+ 	cxgb4_reclaim_completed_tx(adap, &q->q, true);
+-	cntrl = TXPKT_L4CSUM_DIS_F | TXPKT_IPCSUM_DIS_F;
+ 
+ 	flits = calc_tx_sec_flits(skb, sa_entry->kctx_len);
+ 	ndesc = flits_to_desc(flits);
 -- 
-Best regards,
-Kamil Konieczny
-Samsung R&D Institute Poland
+2.14.1
