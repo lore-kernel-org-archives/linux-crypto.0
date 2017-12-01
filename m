@@ -1,125 +1,46 @@
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [Part2 PATCH v7 20/38] crypto: ccp: Implement
- SEV_PDH_CERT_EXPORT ioctl command
-Date: Sun, 5 Nov 2017 12:34:12 +0100
-Message-ID: <20171105113412.2xtuifkbmxwrf3ji@pd.tnic>
-References: <20171101211623.71496-1-brijesh.singh@amd.com>
- <20171101211623.71496-21-brijesh.singh@amd.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2 3/4] crypto: inside-secure - only update the result
+ buffer when provided
+Date: Fri, 1 Dec 2017 11:31:09 +1100
+Message-ID: <20171201003109.GA26156@gondor.apana.org.au>
+References: <20171128154236.19192-1-antoine.tenart@free-electrons.com>
+ <CGME20171128154525epcas3p42e9bb1308ab731910522a19a8fef4ad8@epcas3p4.samsung.com>
+ <20171128154236.19192-4-antoine.tenart@free-electrons.com>
+ <c91f78af-122d-1a5e-3a34-21dd137c8847@partner.samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Gary Hook <gary.hook@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        linux-crypto@vger.kernel.org
-To: Brijesh Singh <brijesh.singh@amd.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
+        davem@davemloft.net, thomas.petazzoni@free-electrons.com,
+        gregory.clement@free-electrons.com,
+        miquel.raynal@free-electrons.com, oferh@marvell.com,
+        igall@marvell.com, nadavh@marvell.com, linux-crypto@vger.kernel.org
+To: Kamil Konieczny <k.konieczny@partner.samsung.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from [128.1.224.119] ([128.1.224.119]:41544 "EHLO ringil.hmeau.com"
+        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
+        id S1751077AbdLAAbX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 30 Nov 2017 19:31:23 -0500
 Content-Disposition: inline
-In-Reply-To: <20171101211623.71496-21-brijesh.singh@amd.com>
-Sender: kvm-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <c91f78af-122d-1a5e-3a34-21dd137c8847@partner.samsung.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Nov 01, 2017 at 04:16:05PM -0500, Brijesh Singh wrote:
-> The SEV_PDH_CERT_EXPORT command can be used to export the PDH and its
-> certificate chain. The command is defined in SEV spec section 5.10.
+On Thu, Nov 30, 2017 at 10:19:26AM +0100, Kamil Konieczny wrote:
+>
+> can the driver get request for final/finup/digest with null req->result ?
+> If yes (?), such checks can be done before any hardware processing, saving time,
+> for example:
 
-...
+This should not be possible through any user-space facing API.
 
-> ---
->  drivers/crypto/ccp/psp-dev.c | 98 ++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 98 insertions(+)
+If a kernel API user did this then they're just shooting themselves
+in the foot.
 
-Fixes ontop:
+So unless there is a valida call path that leads to this then I
+would say that there is nothing to fix.
 
-* !input.cert_chain_address test was repeated. I saw that by aligning
-them vertically, i.e., after making it more readable, the repetition
-became obvious.
-
-* Do the lengths checks first and the access_ok after, in each PDH and
-cert chain test.
-
-* Do the checks first and the allocations after, not interleaved.
-
-* Comments are sentences which should end with a '.'
-
-(hunk below contains also that &psp_master->cmd_buf change but you're going to
- remove that arg anyway).
-
----
-diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
-index 09f69e573d00..d3fdcce61e6d 100644
---- a/drivers/crypto/ccp/psp-dev.c
-+++ b/drivers/crypto/ccp/psp-dev.c
-@@ -455,14 +455,22 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp)
- 	if (!data)
- 		return -ENOMEM;
- 
--	/* Userspace wants to query the certificate length */
--	if (!input.pdh_cert_address || !input.pdh_cert_len ||
--	    !input.cert_chain_address || !input.cert_chain_address)
-+	/* Userspace wants to query the certificate length. */
-+	if (!input.pdh_cert_address ||
-+	    !input.pdh_cert_len ||
-+	    !input.cert_chain_address)
- 		goto cmd;
- 
--	/* allocate a physically contiguous buffer to store the PDH blob */
--	if (!access_ok(VERIFY_WRITE, input.pdh_cert_address, input.pdh_cert_len) ||
--	    (input.pdh_cert_len > SEV_FW_BLOB_MAX_SIZE)) {
-+	/* allocate a physically contiguous buffer to store the PDH blob. */
-+	if ((input.pdh_cert_len > SEV_FW_BLOB_MAX_SIZE) ||
-+	    !access_ok(VERIFY_WRITE, input.pdh_cert_address, input.pdh_cert_len)) {
-+		ret = -EFAULT;
-+		goto e_free;
-+	}
-+
-+	/* allocate a physically contiguous buffer to store the cert chain blob. */
-+	if ((input.cert_chain_len > SEV_FW_BLOB_MAX_SIZE) ||
-+	    !access_ok(VERIFY_WRITE, input.cert_chain_address, input.cert_chain_len)) {
- 		ret = -EFAULT;
- 		goto e_free;
- 	}
-@@ -476,13 +484,6 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp)
- 	data->pdh_cert_address = __psp_pa(pdh_blob);
- 	data->pdh_cert_len = input.pdh_cert_len;
- 
--	/* allocate a physically contiguous buffer to store the cert chain blob */
--	if (!access_ok(VERIFY_WRITE, input.cert_chain_address, input.cert_chain_len) ||
--	    (input.cert_chain_len > SEV_FW_BLOB_MAX_SIZE)) {
--		ret = -EFAULT;
--		goto e_free_pdh;
--	}
--
- 	cert_blob = kmalloc(input.cert_chain_len, GFP_KERNEL);
- 	if (!cert_blob) {
- 		ret = -ENOMEM;
-@@ -493,18 +494,16 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp)
- 	data->cert_chain_len = input.cert_chain_len;
- 
- cmd:
--	/* If platform is not in INIT state then transition it to INIT */
-+	/* If platform is not in INIT state then transition it to INIT. */
- 	if (psp_master->sev_state != SEV_STATE_INIT) {
--		ret = __sev_platform_init_locked(psp_master->sev_init, &argp->error);
-+		ret = __sev_platform_init_locked(&psp_master->cmd_buf, &argp->error);
- 		if (ret)
- 			goto e_free_cert;
- 	}
- 
- 	ret = __sev_do_cmd_locked(SEV_CMD_PDH_CERT_EXPORT, data, &argp->error);
- 
--	/*
--	 * If we query the length, FW responded with expected data
--	 */
-+	/* If we query the length, FW responded with expected data. */
- 	input.cert_chain_len = data->cert_chain_len;
- 	input.pdh_cert_len = data->pdh_cert_len;
- 
-
+Thanks,
 -- 
-Regards/Gruss,
-    Boris.
-
-Good mailing practices for 400: avoid top-posting and trim the reply.
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
