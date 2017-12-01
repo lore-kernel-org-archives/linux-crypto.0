@@ -1,125 +1,78 @@
-From: Mat Martineau <mathew.j.martineau@linux.intel.com>
-Subject: Re: [PATCH] KEYS: reject NULL restriction string when type is
- specified
-Date: Thu, 30 Nov 2017 17:22:05 -0800 (PST)
-Message-ID: <alpine.OSX.2.21.1711301533110.40510@jsswain-mobl.amr.corp.intel.com>
-References: <089e082676ecdedb0b055f394f11@google.com> <20171130205159.97771-1-ebiggers3@gmail.com>
+From: Antoine Tenart <antoine.tenart@free-electrons.com>
+Subject: Re: [PATCH v2 3/4] crypto: inside-secure - only update the result
+ buffer when provided
+Date: Fri, 1 Dec 2017 09:11:57 +0100
+Message-ID: <20171201081157.GA2535@kwain>
+References: <20171128154236.19192-1-antoine.tenart@free-electrons.com>
+ <CGME20171128154525epcas3p42e9bb1308ab731910522a19a8fef4ad8@epcas3p4.samsung.com>
+ <20171128154236.19192-4-antoine.tenart@free-electrons.com>
+ <c91f78af-122d-1a5e-3a34-21dd137c8847@partner.samsung.com>
+ <20171201003109.GA26156@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed; charset=US-ASCII
-Cc: keyrings@vger.kernel.org, David Howells <dhowells@redhat.com>,
-        syzbot
-        <bot+25a1a3685abe943a89512250aece10bdd9aa4827@syzkaller.appspotmail.com>,
-        davem@davemloft.net, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com,
-        Eric Biggers <ebiggers@google.com>, stable@vger.kernel.org
-To: Eric Biggers <ebiggers3@gmail.com>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Cc: Kamil Konieczny <k.konieczny@partner.samsung.com>,
+        Antoine Tenart <antoine.tenart@free-electrons.com>,
+        davem@davemloft.net, thomas.petazzoni@free-electrons.com,
+        gregory.clement@free-electrons.com,
+        miquel.raynal@free-electrons.com, oferh@marvell.com,
+        igall@marvell.com, nadavh@marvell.com, linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:55982 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751303AbdLABWG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 Nov 2017 20:22:06 -0500
-In-Reply-To: <20171130205159.97771-1-ebiggers3@gmail.com>
+Received: from mail.free-electrons.com ([62.4.15.54]:55508 "EHLO
+        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750921AbdLAIL7 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 1 Dec 2017 03:11:59 -0500
+Content-Disposition: inline
+In-Reply-To: <20171201003109.GA26156@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Hi Herbert,
 
-Eric,
+On Fri, Dec 01, 2017 at 11:31:09AM +1100, Herbert Xu wrote:
+> On Thu, Nov 30, 2017 at 10:19:26AM +0100, Kamil Konieczny wrote:
+> >
+> > can the driver get request for final/finup/digest with null req->result ?
+> > If yes (?), such checks can be done before any hardware processing, saving time,
+> > for example:
+> 
+> This should not be possible through any user-space facing API.
+> 
+> If a kernel API user did this then they're just shooting themselves
+> in the foot.
+> 
+> So unless there is a valida call path that leads to this then I
+> would say that there is nothing to fix.
 
-On Thu, 30 Nov 2017, Eric Biggers wrote:
+I agree this should not be the case.
 
-> From: Eric Biggers <ebiggers@google.com>
->
-> keyctl_restrict_keyring() allows through a NULL restriction when the
-> "type" is non-NULL, which causes a NULL pointer dereference in
-> asymmetric_lookup_restriction() when it calls strcmp() on the
-> restriction string.
->
-> But no key types actually use a "NULL restriction" to mean anything, so
-> update keyctl_restrict_keyring() to reject it with EINVAL.
+But:
+- Other drivers are doing this check (grep "if (!req->result)" or
+  "if (req->result)" to see some of them).
+- I see at least one commit fixing the exact same issue I'm facing here,
+  393897c5156a415533ff85aa381458840417b032:
 
-Since this fixes the bug for the asymmetric key type and ensures that 
-other key types won't make the same mistake, I agree this is the way to 
-fix it. I did not find any issues in the patch.
+    crypto: ccp - Check for caller result area before using it
 
-Thanks,
+    For a hash operation, the caller doesn't have to supply a result
+    area on every call so don't use it / update it if it hasn't
+    been supplied.
 
-Mat
+I'm not entirely sure what was the code path that leads to this, I'll
+reproduce the issue and try to understand what is going on (I clearly
+recall having this crash though).
 
+The crypto API does not enforce this somehow, and this should probably
+be fixed. That might break some users. But it was seen as a valid use
+for some, so we should probably fix this in previous versions of the
+driver anyway.
 
-> Reported-by: syzbot <syzkaller@googlegroups.com>
-> Fixes: 97d3aa0f3134 ("KEYS: Add a lookup_restriction function for the asymmetric key type")
-> Cc: <stable@vger.kernel.org> # v4.12+
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
-> security/keys/keyctl.c | 24 ++++++++++--------------
-> 1 file changed, 10 insertions(+), 14 deletions(-)
->
-> diff --git a/security/keys/keyctl.c b/security/keys/keyctl.c
-> index 76d22f726ae4..1ffe60bb2845 100644
-> --- a/security/keys/keyctl.c
-> +++ b/security/keys/keyctl.c
-> @@ -1588,9 +1588,8 @@ long keyctl_session_to_parent(void)
->  * The caller must have Setattr permission to change keyring restrictions.
->  *
->  * The requested type name may be a NULL pointer to reject all attempts
-> - * to link to the keyring. If _type is non-NULL, _restriction can be
-> - * NULL or a pointer to a string describing the restriction. If _type is
-> - * NULL, _restriction must also be NULL.
-> + * to link to the keyring.  In this case, _restriction must also be NULL.
-> + * Otherwise, both _type and _restriction must be non-NULL.
->  *
->  * Returns 0 if successful.
->  */
-> @@ -1598,7 +1597,6 @@ long keyctl_restrict_keyring(key_serial_t id, const char __user *_type,
-> 			     const char __user *_restriction)
-> {
-> 	key_ref_t key_ref;
-> -	bool link_reject = !_type;
-> 	char type[32];
-> 	char *restriction = NULL;
-> 	long ret;
-> @@ -1607,31 +1605,29 @@ long keyctl_restrict_keyring(key_serial_t id, const char __user *_type,
-> 	if (IS_ERR(key_ref))
-> 		return PTR_ERR(key_ref);
->
-> +	ret = -EINVAL;
-> 	if (_type) {
-> -		ret = key_get_type_from_user(type, _type, sizeof(type));
-> -		if (ret < 0)
-> +		if (!_restriction)
-> 			goto error;
-> -	}
->
-> -	if (_restriction) {
-> -		if (!_type) {
-> -			ret = -EINVAL;
-> +		ret = key_get_type_from_user(type, _type, sizeof(type));
-> +		if (ret < 0)
-> 			goto error;
-> -		}
->
-> 		restriction = strndup_user(_restriction, PAGE_SIZE);
-> 		if (IS_ERR(restriction)) {
-> 			ret = PTR_ERR(restriction);
-> 			goto error;
-> 		}
-> +	} else {
-> +		if (_restriction)
-> +			goto error;
-> 	}
->
-> -	ret = keyring_restrict(key_ref, link_reject ? NULL : type, restriction);
-> +	ret = keyring_restrict(key_ref, _type ? type : NULL, restriction);
-> 	kfree(restriction);
-> -
-> error:
-> 	key_ref_put(key_ref);
-> -
-> 	return ret;
-> }
->
-> -- 
-> 2.15.0.531.g2ccb3012c9-goog
->
->
+Thanks!
+Antoine
+
+-- 
+Antoine Ténart, Free Electrons
+Embedded Linux and Kernel engineering
+http://free-electrons.com
