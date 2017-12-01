@@ -1,7 +1,8 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH 0/5] crypto: arm64 - disable NEON across scatterwalk API calls
-Date: Fri,  1 Dec 2017 21:19:22 +0000
-Message-ID: <20171201211927.24653-1-ard.biesheuvel@linaro.org>
+Subject: [PATCH 1/5] crypto: arm64/aes-ce-ccm - move kernel mode neon en/disable into loop
+Date: Fri,  1 Dec 2017 21:19:23 +0000
+Message-ID: <20171201211927.24653-2-ard.biesheuvel@linaro.org>
+References: <20171201211927.24653-1-ard.biesheuvel@linaro.org>
 Cc: herbert@gondor.apana.org.au, linux-arm-kernel@lists.infradead.org,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         Dave Martin <Dave.Martin@arm.com>,
@@ -16,65 +17,185 @@ Cc: herbert@gondor.apana.org.au, linux-arm-kernel@lists.infradead.org,
         Thomas Gleixner <tglx@linutronix.de>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-rt-users-owner@vger.kernel.org>
+In-Reply-To: <20171201211927.24653-1-ard.biesheuvel@linaro.org>
 Sender: linux-rt-users-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-As reported by Sebastian, the way the arm64 NEON crypto code currently
-keeps kernel mode NEON enabled across calls into skcipher_walk_xxx() is
-causing problems with RT builds, given that the skcipher walk API may
-allocate and free temporary buffers it uses to present the input and
-output arrays to the crypto algorithm in blocksize sized chunks (where
-blocksize is the natural blocksize of the crypto algorithm), and doing
-so with NEON enabled means we're alloc/free'ing memory with preemption
-disabled.
+When kernel mode NEON was first introduced on arm64, the preserve and
+restore of the userland NEON state was completely unoptimized, and
+involved saving all registers on each call to kernel_neon_begin(),
+and restoring them on each call to kernel_neon_end(). For this reason,
+the NEON crypto code that was introduced at the time keeps the NEON
+enabled throughout the execution of the crypto API methods, which may
+include calls back into the crypto API that could result in memory
+allocation or other actions that we should avoid when running with
+preemption disabled.
 
-This was deliberate: when this code was introduced, each kernel_neon_begin()
-and kernel_neon_end() call incurred a fixed penalty of storing resp.
-loading the contents of all NEON registers to/from memory, and so doing
-it less often had an obvious performance benefit. However, in the mean time,
-we have refactored the core kernel mode NEON code, and now kernel_neon_begin()
-only incurs this penalty the first time it is called after entering the kernel,
-and the NEON register restore is deferred until returning to userland. This
-means pulling those calls into the loops that iterate over the input/output
-of the crypto algorithm is not a big deal anymore (although there are some
-places in the code where we relied on the NEON registers retaining their
-values between calls)
+Since then, we have optimized the kernel mode NEON handling, which now
+restores lazily (upon return to userland), and so the preserve action
+is only costly the first time it is called after entering the kernel.
 
-So let's clean this up for arm64: update the NEON based skcipher drivers to
-no longer keep the NEON enabled when calling into the skcipher walk API.
+So let's put the kernel_neon_begin() and kernel_neon_end() calls around
+the actual invocations of the NEON crypto code, and run the remainder of
+the code with kernel mode NEON disabled (and preemption enabled)
 
-Note that the remaining crypto drivers simply operate on fixed buffers, so
-while the RT crowd may still feel the need to disable those (and the ones
-below as well, perhaps), they don't call back into the crypto layer like
-the ones updated by this series, and so there's no room for improvement
-there AFAICT.
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+ arch/arm64/crypto/aes-ce-ccm-glue.c | 47 ++++++++++----------
+ 1 file changed, 23 insertions(+), 24 deletions(-)
 
-Cc: Dave Martin <Dave.Martin@arm.com>
-Cc: Russell King - ARM Linux <linux@armlinux.org.uk>
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Mark Rutland <mark.rutland@arm.com>
-Cc: linux-rt-users@vger.kernel.org
-Cc: Peter Zijlstra <peterz@infradead.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will.deacon@arm.com>
-Cc: Steven Rostedt <rostedt@goodmis.org>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-
-Ard Biesheuvel (5):
-  crypto: arm64/aes-ce-ccm - move kernel mode neon en/disable into loop
-  crypto: arm64/aes-blk - move kernel mode neon en/disable into loop
-  crypto: arm64/aes-bs - move kernel mode neon en/disable into loop
-  crypto: arm64/chacha20 - move kernel mode neon en/disable into loop
-  crypto: arm64/ghash - move kernel mode neon en/disable into loop
-
- arch/arm64/crypto/aes-ce-ccm-glue.c    | 47 +++++-----
- arch/arm64/crypto/aes-glue.c           | 81 +++++++++---------
- arch/arm64/crypto/aes-modes.S          | 90 ++++++++++----------
- arch/arm64/crypto/aes-neonbs-glue.c    | 38 ++++-----
- arch/arm64/crypto/chacha20-neon-glue.c |  4 +-
- arch/arm64/crypto/ghash-ce-glue.c      |  9 +-
- 6 files changed, 132 insertions(+), 137 deletions(-)
-
+diff --git a/arch/arm64/crypto/aes-ce-ccm-glue.c b/arch/arm64/crypto/aes-ce-ccm-glue.c
+index a1254036f2b1..68b11aa690e4 100644
+--- a/arch/arm64/crypto/aes-ce-ccm-glue.c
++++ b/arch/arm64/crypto/aes-ce-ccm-glue.c
+@@ -107,11 +107,13 @@ static int ccm_init_mac(struct aead_request *req, u8 maciv[], u32 msglen)
+ }
+ 
+ static void ccm_update_mac(struct crypto_aes_ctx *key, u8 mac[], u8 const in[],
+-			   u32 abytes, u32 *macp, bool use_neon)
++			   u32 abytes, u32 *macp)
+ {
+-	if (likely(use_neon)) {
++	if (may_use_simd()) {
++		kernel_neon_begin();
+ 		ce_aes_ccm_auth_data(mac, in, abytes, macp, key->key_enc,
+ 				     num_rounds(key));
++		kernel_neon_end();
+ 	} else {
+ 		if (*macp > 0 && *macp < AES_BLOCK_SIZE) {
+ 			int added = min(abytes, AES_BLOCK_SIZE - *macp);
+@@ -143,8 +145,7 @@ static void ccm_update_mac(struct crypto_aes_ctx *key, u8 mac[], u8 const in[],
+ 	}
+ }
+ 
+-static void ccm_calculate_auth_mac(struct aead_request *req, u8 mac[],
+-				   bool use_neon)
++static void ccm_calculate_auth_mac(struct aead_request *req, u8 mac[])
+ {
+ 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
+ 	struct crypto_aes_ctx *ctx = crypto_aead_ctx(aead);
+@@ -163,7 +164,7 @@ static void ccm_calculate_auth_mac(struct aead_request *req, u8 mac[],
+ 		ltag.len = 6;
+ 	}
+ 
+-	ccm_update_mac(ctx, mac, (u8 *)&ltag, ltag.len, &macp, use_neon);
++	ccm_update_mac(ctx, mac, (u8 *)&ltag, ltag.len, &macp);
+ 	scatterwalk_start(&walk, req->src);
+ 
+ 	do {
+@@ -175,7 +176,7 @@ static void ccm_calculate_auth_mac(struct aead_request *req, u8 mac[],
+ 			n = scatterwalk_clamp(&walk, len);
+ 		}
+ 		p = scatterwalk_map(&walk);
+-		ccm_update_mac(ctx, mac, p, n, &macp, use_neon);
++		ccm_update_mac(ctx, mac, p, n, &macp);
+ 		len -= n;
+ 
+ 		scatterwalk_unmap(p);
+@@ -242,43 +243,42 @@ static int ccm_encrypt(struct aead_request *req)
+ 	u8 __aligned(8) mac[AES_BLOCK_SIZE];
+ 	u8 buf[AES_BLOCK_SIZE];
+ 	u32 len = req->cryptlen;
+-	bool use_neon = may_use_simd();
+ 	int err;
+ 
+ 	err = ccm_init_mac(req, mac, len);
+ 	if (err)
+ 		return err;
+ 
+-	if (likely(use_neon))
+-		kernel_neon_begin();
+-
+ 	if (req->assoclen)
+-		ccm_calculate_auth_mac(req, mac, use_neon);
++		ccm_calculate_auth_mac(req, mac);
+ 
+ 	/* preserve the original iv for the final round */
+ 	memcpy(buf, req->iv, AES_BLOCK_SIZE);
+ 
+ 	err = skcipher_walk_aead_encrypt(&walk, req, true);
+ 
+-	if (likely(use_neon)) {
++	if (may_use_simd()) {
+ 		while (walk.nbytes) {
+ 			u32 tail = walk.nbytes % AES_BLOCK_SIZE;
+ 
+ 			if (walk.nbytes == walk.total)
+ 				tail = 0;
+ 
++			kernel_neon_begin();
+ 			ce_aes_ccm_encrypt(walk.dst.virt.addr,
+ 					   walk.src.virt.addr,
+ 					   walk.nbytes - tail, ctx->key_enc,
+ 					   num_rounds(ctx), mac, walk.iv);
++			kernel_neon_end();
+ 
+ 			err = skcipher_walk_done(&walk, tail);
+ 		}
+-		if (!err)
++		if (!err) {
++			kernel_neon_begin();
+ 			ce_aes_ccm_final(mac, buf, ctx->key_enc,
+ 					 num_rounds(ctx));
+-
+-		kernel_neon_end();
++			kernel_neon_end();
++		}
+ 	} else {
+ 		err = ccm_crypt_fallback(&walk, mac, buf, ctx, true);
+ 	}
+@@ -301,43 +301,42 @@ static int ccm_decrypt(struct aead_request *req)
+ 	u8 __aligned(8) mac[AES_BLOCK_SIZE];
+ 	u8 buf[AES_BLOCK_SIZE];
+ 	u32 len = req->cryptlen - authsize;
+-	bool use_neon = may_use_simd();
+ 	int err;
+ 
+ 	err = ccm_init_mac(req, mac, len);
+ 	if (err)
+ 		return err;
+ 
+-	if (likely(use_neon))
+-		kernel_neon_begin();
+-
+ 	if (req->assoclen)
+-		ccm_calculate_auth_mac(req, mac, use_neon);
++		ccm_calculate_auth_mac(req, mac);
+ 
+ 	/* preserve the original iv for the final round */
+ 	memcpy(buf, req->iv, AES_BLOCK_SIZE);
+ 
+ 	err = skcipher_walk_aead_decrypt(&walk, req, true);
+ 
+-	if (likely(use_neon)) {
++	if (may_use_simd()) {
+ 		while (walk.nbytes) {
+ 			u32 tail = walk.nbytes % AES_BLOCK_SIZE;
+ 
+ 			if (walk.nbytes == walk.total)
+ 				tail = 0;
+ 
++			kernel_neon_begin();
+ 			ce_aes_ccm_decrypt(walk.dst.virt.addr,
+ 					   walk.src.virt.addr,
+ 					   walk.nbytes - tail, ctx->key_enc,
+ 					   num_rounds(ctx), mac, walk.iv);
++			kernel_neon_end();
+ 
+ 			err = skcipher_walk_done(&walk, tail);
+ 		}
+-		if (!err)
++		if (!err) {
++			kernel_neon_begin();
+ 			ce_aes_ccm_final(mac, buf, ctx->key_enc,
+ 					 num_rounds(ctx));
+-
+-		kernel_neon_end();
++			kernel_neon_end();
++		}
+ 	} else {
+ 		err = ccm_crypt_fallback(&walk, mac, buf, ctx, false);
+ 	}
 -- 
 2.11.0
 
