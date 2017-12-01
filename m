@@ -1,57 +1,80 @@
-From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: KASAN: use-after-free Read in aead_recvmsg
-Date: Fri, 1 Dec 2017 11:11:08 -0800
-Message-ID: <20171201191108.GC142348@gmail.com>
-References: <001a113ebb5ece8a7a055efb7676@google.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-To: syzbot
-        <bot+6fbc13c3b1ed2105e7a2e516be43d6a0624a59c0@syzkaller.appspotmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-io0-f193.google.com ([209.85.223.193]:39558 "EHLO
-        mail-io0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750965AbdLATLM (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 1 Dec 2017 14:11:12 -0500
-Content-Disposition: inline
-In-Reply-To: <001a113ebb5ece8a7a055efb7676@google.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH 0/5] crypto: arm64 - disable NEON across scatterwalk API calls
+Date: Fri,  1 Dec 2017 21:19:22 +0000
+Message-ID: <20171201211927.24653-1-ard.biesheuvel@linaro.org>
+Cc: herbert@gondor.apana.org.au, linux-arm-kernel@lists.infradead.org,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Russell King - ARM Linux <linux@armlinux.org.uk>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Mark Rutland <mark.rutland@arm.com>,
+        linux-rt-users@vger.kernel.org,
+        Peter Zijlstra <peterz@infradead.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Thomas Gleixner <tglx@linutronix.de>
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-rt-users-owner@vger.kernel.org>
+Sender: linux-rt-users-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Nov 27, 2017 at 10:56:46AM -0800, syzbot wrote:
-> ==================================================================
-> BUG: KASAN: use-after-free in skcipher_request_set_tfm
-> include/crypto/skcipher.h:499 [inline]
-> BUG: KASAN: use-after-free in crypto_aead_copy_sgl
-> crypto/algif_aead.c:85 [inline]
-> BUG: KASAN: use-after-free in _aead_recvmsg crypto/algif_aead.c:210 [inline]
-> BUG: KASAN: use-after-free in aead_recvmsg+0x1552/0x1970
-> crypto/algif_aead.c:313
-> Read of size 4 at addr ffff8801c7194e5c by task syzkaller438416/3340
-> 
-> CPU: 0 PID: 3340 Comm: syzkaller438416 Not tainted 4.14.0-next-20171124+ #51
-> Hardware name: Google Google Compute Engine/Google Compute Engine,
-> BIOS Google 01/01/2011
-> Call Trace:
->  __dump_stack lib/dump_stack.c:17 [inline]
->  dump_stack+0x194/0x257 lib/dump_stack.c:53
->  print_address_description+0x73/0x250 mm/kasan/report.c:252
->  kasan_report_error mm/kasan/report.c:351 [inline]
->  kasan_report+0x25b/0x340 mm/kasan/report.c:409
->  __asan_report_load4_noabort+0x14/0x20 mm/kasan/report.c:429
->  skcipher_request_set_tfm include/crypto/skcipher.h:499 [inline]
->  crypto_aead_copy_sgl crypto/algif_aead.c:85 [inline]
->  _aead_recvmsg crypto/algif_aead.c:210 [inline]
->  aead_recvmsg+0x1552/0x1970 crypto/algif_aead.c:313
->  sock_recvmsg_nosec net/socket.c:805 [inline]
->  sock_recvmsg+0xc9/0x110 net/socket.c:812
->  ___sys_recvmsg+0x29b/0x630 net/socket.c:2207
->  __sys_recvmsg+0xe2/0x210 net/socket.c:2252
->  SYSC_recvmsg net/socket.c:2264 [inline]
->  SyS_recvmsg+0x2d/0x50 net/socket.c:2259
->  entry_SYSCALL_64_fastpath+0x1f/0x96
+As reported by Sebastian, the way the arm64 NEON crypto code currently
+keeps kernel mode NEON enabled across calls into skcipher_walk_xxx() is
+causing problems with RT builds, given that the skcipher walk API may
+allocate and free temporary buffers it uses to present the input and
+output arrays to the crypto algorithm in blocksize sized chunks (where
+blocksize is the natural blocksize of the crypto algorithm), and doing
+so with NEON enabled means we're alloc/free'ing memory with preemption
+disabled.
 
-#syz fix: crypto: algif_aead - fix reference counting of null skcipher
+This was deliberate: when this code was introduced, each kernel_neon_begin()
+and kernel_neon_end() call incurred a fixed penalty of storing resp.
+loading the contents of all NEON registers to/from memory, and so doing
+it less often had an obvious performance benefit. However, in the mean time,
+we have refactored the core kernel mode NEON code, and now kernel_neon_begin()
+only incurs this penalty the first time it is called after entering the kernel,
+and the NEON register restore is deferred until returning to userland. This
+means pulling those calls into the loops that iterate over the input/output
+of the crypto algorithm is not a big deal anymore (although there are some
+places in the code where we relied on the NEON registers retaining their
+values between calls)
+
+So let's clean this up for arm64: update the NEON based skcipher drivers to
+no longer keep the NEON enabled when calling into the skcipher walk API.
+
+Note that the remaining crypto drivers simply operate on fixed buffers, so
+while the RT crowd may still feel the need to disable those (and the ones
+below as well, perhaps), they don't call back into the crypto layer like
+the ones updated by this series, and so there's no room for improvement
+there AFAICT.
+
+Cc: Dave Martin <Dave.Martin@arm.com>
+Cc: Russell King - ARM Linux <linux@armlinux.org.uk>
+Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: linux-rt-users@vger.kernel.org
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will.deacon@arm.com>
+Cc: Steven Rostedt <rostedt@goodmis.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+
+Ard Biesheuvel (5):
+  crypto: arm64/aes-ce-ccm - move kernel mode neon en/disable into loop
+  crypto: arm64/aes-blk - move kernel mode neon en/disable into loop
+  crypto: arm64/aes-bs - move kernel mode neon en/disable into loop
+  crypto: arm64/chacha20 - move kernel mode neon en/disable into loop
+  crypto: arm64/ghash - move kernel mode neon en/disable into loop
+
+ arch/arm64/crypto/aes-ce-ccm-glue.c    | 47 +++++-----
+ arch/arm64/crypto/aes-glue.c           | 81 +++++++++---------
+ arch/arm64/crypto/aes-modes.S          | 90 ++++++++++----------
+ arch/arm64/crypto/aes-neonbs-glue.c    | 38 ++++-----
+ arch/arm64/crypto/chacha20-neon-glue.c |  4 +-
+ arch/arm64/crypto/ghash-ce-glue.c      |  9 +-
+ 6 files changed, 132 insertions(+), 137 deletions(-)
+
+-- 
+2.11.0
+
