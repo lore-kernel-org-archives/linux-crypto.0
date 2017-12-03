@@ -1,63 +1,49 @@
-From: Peter Zijlstra <peterz@infradead.org>
-Subject: Re: [PATCH 0/5] crypto: arm64 - disable NEON across scatterwalk API
- calls
-Date: Sat, 2 Dec 2017 14:59:52 +0100
-Message-ID: <20171202135952.GX3326@worktop>
-References: <20171201211927.24653-1-ard.biesheuvel@linaro.org>
- <20171202090107.GT3326@worktop>
- <CAKv+Gu-dG0Zc35NZZ85U36K2TXCpN+wJTYOyjkhxRjXbdiJTAQ@mail.gmail.com>
- <CAKv+Gu_DMVYX8y-8JJwyxy2rF0+6ofSWyjwpvwuF042ievBb7w@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Mark Rutland <mark.rutland@arm.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Will Deacon <will.deacon@arm.com>,
- Russell King - ARM Linux <linux@armlinux.org.uk>,
- Steven Rostedt <rostedt@goodmis.org>,
- "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
- Thomas Gleixner <tglx@linutronix.de>, Dave Martin <Dave.Martin@arm.com>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
- linux-rt-users@vger.kernel.org
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <CAKv+Gu_DMVYX8y-8JJwyxy2rF0+6ofSWyjwpvwuF042ievBb7w@mail.gmail.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: [PATCH 00/10] staging: ccree: cleanups & fixes
+Date: Sun,  3 Dec 2017 13:58:11 +0000
+Message-ID: <1512309503-29766-1-git-send-email-gilad@benyossef.com>
+Cc: Ofir Drang <ofir.drang@arm.com>, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:55130 "EHLO
+        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752025AbdLCN7M (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 3 Dec 2017 08:59:12 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Dec 02, 2017 at 11:15:14AM +0000, Ard Biesheuvel wrote:
-> On 2 December 2017 at 09:11, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+Another batch of ccree work. Includes the usual mix of mostly cleanups
+and one fix. Also includes an updated TODO to reflect recent progress
+and removal of interim documentation of device tree strings as the
+official string and documentation thereof got blessed into the crypto tree.
 
-> > They consume the entire input in a single go, yes. But making it more
-> > granular than that is going to hurt performance, unless we introduce
-> > some kind of kernel_neon_yield(), which does a end+begin but only if
-> > the task is being scheduled out.
-> >
-> > For example, the SHA256 keeps 256 bytes of round constants in NEON
-> > registers, and reloading those from memory for each 64 byte block of
-> > input is going to be noticeable. The same applies to the AES code
-> > (although the numbers are slightly different)
-> 
-> Something like below should do the trick I think (apologies for the
-> patch soup). I.e., check TIF_NEED_RESCHED at a point where only very
-> few NEON registers are live, and preserve/restore the live registers
-> across calls to kernel_neon_end + kernel_neon_begin. Would that work
-> for RT?
+Gilad Ben-Yossef (10):
+  staging: ccree: remove inline qualifiers
+  staging: ccree: remove unproven likely/unlikely
+  staging: ccree: remove more unnecessary parentheses
+  staging: ccree: fix indentation of var assignment
+  staging: ccree: remove braces for single statement blocks
+  staging: ccree: remove interim DT docs
+  staging: ccree: update TODO list
+  staging: ccree: NULLify backup_info when unused
+  staging: ccree: fix AEAD func naming convention
+  staging: ccree: amend aead func def for readability
 
-Probably yes. The important point is that preempt latencies (and thus by
-extension NEON regions) are bounded and preferably small.
+ .../devicetree/bindings/crypto/arm-cryptocell.txt  |  27 -
+ drivers/staging/ccree/TODO                         |  23 +-
+ drivers/staging/ccree/ssi_aead.c                   | 706 ++++++++++-----------
+ drivers/staging/ccree/ssi_aead.h                   |   4 +-
+ drivers/staging/ccree/ssi_buffer_mgr.c             | 189 +++---
+ drivers/staging/ccree/ssi_cipher.c                 |  61 +-
+ drivers/staging/ccree/ssi_driver.c                 |  40 +-
+ drivers/staging/ccree/ssi_hash.c                   | 105 ++-
+ drivers/staging/ccree/ssi_ivgen.c                  |   2 +-
+ drivers/staging/ccree/ssi_request_mgr.c            |  33 +-
+ drivers/staging/ccree/ssi_sram_mgr.c               |   4 +-
+ 11 files changed, 541 insertions(+), 653 deletions(-)
+ delete mode 100644 drivers/staging/ccree/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt
 
-Unbounded stuff (like depends on the amount of data fed) are a complete
-no-no for RT since then you cannot make predictions on how long things
-will take.
+-- 
+2.7.4
