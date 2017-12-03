@@ -1,8 +1,7 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 05/10] staging: ccree: remove braces for single statement
- blocks
-Date: Sun,  3 Dec 2017 13:58:16 +0000
-Message-ID: <1512309503-29766-6-git-send-email-gilad@benyossef.com>
+Subject: [PATCH 06/10] staging: ccree: remove interim DT docs
+Date: Sun,  3 Dec 2017 13:58:17 +0000
+Message-ID: <1512309503-29766-7-git-send-email-gilad@benyossef.com>
 References: <1512309503-29766-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -24,27 +23,47 @@ Errors-To: driverdev-devel-bounces@linuxdriverproject.org
 Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-Remove braces from single statement if clause.
+As proper DT bindings doc where submitted and ACKed,
+remove the interim one.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/ssi_request_mgr.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ .../devicetree/bindings/crypto/arm-cryptocell.txt  | 27 ----------------------
+ 1 file changed, 27 deletions(-)
+ delete mode 100644 drivers/staging/ccree/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt
 
-diff --git a/drivers/staging/ccree/ssi_request_mgr.c b/drivers/staging/ccree/ssi_request_mgr.c
-index e890cb6..5f34336 100644
---- a/drivers/staging/ccree/ssi_request_mgr.c
-+++ b/drivers/staging/ccree/ssi_request_mgr.c
-@@ -228,9 +228,8 @@ static int request_mgr_queues_status_check(
- 	for (poll_queue = 0; poll_queue < SSI_MAX_POLL_ITER ; poll_queue++) {
- 		req_mgr_h->q_free_slots =
- 			cc_ioread(drvdata, CC_REG(DSCRPTR_QUEUE_CONTENT));
--		if (req_mgr_h->q_free_slots < req_mgr_h->min_free_hw_slots) {
-+		if (req_mgr_h->q_free_slots < req_mgr_h->min_free_hw_slots)
- 			req_mgr_h->min_free_hw_slots = req_mgr_h->q_free_slots;
--		}
- 
- 		if (req_mgr_h->q_free_slots >= total_seq_len) {
- 			/* If there is enough place return */
+diff --git a/drivers/staging/ccree/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt b/drivers/staging/ccree/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt
+deleted file mode 100644
+index 2ea6517..0000000
+--- a/drivers/staging/ccree/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt
++++ /dev/null
+@@ -1,27 +0,0 @@
+-Arm TrustZone CryptoCell cryptographic accelerators
+-
+-Required properties:
+-- compatible: must be "arm,cryptocell-712-ree".
+-- reg: shall contain base register location and length.
+-	Typically length is 0x10000.
+-- interrupts: shall contain the interrupt for the device.
+-
+-Optional properties:
+-- interrupt-parent: can designate the interrupt controller the
+-	device interrupt is connected to, if needed.
+-- clocks: may contain the clock handling the device, if needed.
+-- power-domains: may contain a reference to the PM domain, if applicable.
+-
+-
+-Examples:
+-
+-Zynq FPGA device
+-----------------
+-
+-       arm_cc7x: arm_cc7x@80000000 {
+-               compatible = "arm,cryptocell-712-ree";
+-               interrupt-parent = <&intc>;
+-               interrupts = < 0 30 4 >;
+-               reg = < 0x80000000 0x10000 >;
+-       };
+-
 -- 
 2.7.4
