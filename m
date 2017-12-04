@@ -1,7 +1,7 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v2 01/19] crypto: testmgr - add a new test case for CRC-T10DIF
-Date: Mon,  4 Dec 2017 12:26:27 +0000
-Message-ID: <20171204122645.31535-2-ard.biesheuvel@linaro.org>
+Subject: [PATCH v2 03/19] crypto: arm64/aes-blk - move kernel mode neon en/disable into loop
+Date: Mon,  4 Dec 2017 12:26:29 +0000
+Message-ID: <20171204122645.31535-4-ard.biesheuvel@linaro.org>
 References: <20171204122645.31535-1-ard.biesheuvel@linaro.org>
 Cc: herbert@gondor.apana.org.au, linux-arm-kernel@lists.infradead.org,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>,
@@ -17,296 +17,591 @@ Cc: herbert@gondor.apana.org.au, linux-arm-kernel@lists.infradead.org,
         Thomas Gleixner <tglx@linutronix.de>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:46571 "EHLO
-        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753093AbdLDM07 (ORCPT
+Received: from mail-wr0-f195.google.com ([209.85.128.195]:38014 "EHLO
+        mail-wr0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753138AbdLDM1F (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 4 Dec 2017 07:26:59 -0500
-Received: by mail-wm0-f67.google.com with SMTP id r78so5465750wme.5
-        for <linux-crypto@vger.kernel.org>; Mon, 04 Dec 2017 04:26:58 -0800 (PST)
+        Mon, 4 Dec 2017 07:27:05 -0500
+Received: by mail-wr0-f195.google.com with SMTP id o2so17065498wro.5
+        for <linux-crypto@vger.kernel.org>; Mon, 04 Dec 2017 04:27:04 -0800 (PST)
 In-Reply-To: <20171204122645.31535-1-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-In order to be able to test yield support under preempt, add a test
-vector for CRC-T10DIF that is long enough to take multiple iterations
-(and thus possible preemption between them) of the primary loop of the
-accelerated x86 and arm64 implementations.
+When kernel mode NEON was first introduced on arm64, the preserve and
+restore of the userland NEON state was completely unoptimized, and
+involved saving all registers on each call to kernel_neon_begin(),
+and restoring them on each call to kernel_neon_end(). For this reason,
+the NEON crypto code that was introduced at the time keeps the NEON
+enabled throughout the execution of the crypto API methods, which may
+include calls back into the crypto API that could result in memory
+allocation or other actions that we should avoid when running with
+preemption disabled.
+
+Since then, we have optimized the kernel mode NEON handling, which now
+restores lazily (upon return to userland), and so the preserve action
+is only costly the first time it is called after entering the kernel.
+
+So let's put the kernel_neon_begin() and kernel_neon_end() calls around
+the actual invocations of the NEON crypto code, and run the remainder of
+the code with kernel mode NEON disabled (and preemption enabled)
+
+Note that this requires some reshuffling of the registers in the asm
+code, because the XTS routines can no longer rely on the registers to
+retain their contents between invocations.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- crypto/testmgr.h | 259 ++++++++++++++++++++
- 1 file changed, 259 insertions(+)
+ arch/arm64/crypto/aes-glue.c        | 95 ++++++++++----------
+ arch/arm64/crypto/aes-modes.S       | 90 +++++++++----------
+ arch/arm64/crypto/aes-neonbs-glue.c | 14 ++-
+ 3 files changed, 97 insertions(+), 102 deletions(-)
 
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index a714b6293959..0c849aec161d 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -1494,6 +1494,265 @@ static const struct hash_testvec crct10dif_tv_template[] = {
- 		.digest		= (u8 *)(u16 []){ 0x44c6 },
- 		.np		= 4,
- 		.tap		= { 1, 255, 57, 6 },
-+	}, {
-+		.plaintext =	"\x6e\x05\x79\x10\xa7\x1b\xb2\x49"
-+				"\xe0\x54\xeb\x82\x19\x8d\x24\xbb"
-+				"\x2f\xc6\x5d\xf4\x68\xff\x96\x0a"
-+				"\xa1\x38\xcf\x43\xda\x71\x08\x7c"
-+				"\x13\xaa\x1e\xb5\x4c\xe3\x57\xee"
-+				"\x85\x1c\x90\x27\xbe\x32\xc9\x60"
-+				"\xf7\x6b\x02\x99\x0d\xa4\x3b\xd2"
-+				"\x46\xdd\x74\x0b\x7f\x16\xad\x21"
-+				"\xb8\x4f\xe6\x5a\xf1\x88\x1f\x93"
-+				"\x2a\xc1\x35\xcc\x63\xfa\x6e\x05"
-+				"\x9c\x10\xa7\x3e\xd5\x49\xe0\x77"
-+				"\x0e\x82\x19\xb0\x24\xbb\x52\xe9"
-+				"\x5d\xf4\x8b\x22\x96\x2d\xc4\x38"
-+				"\xcf\x66\xfd\x71\x08\x9f\x13\xaa"
-+				"\x41\xd8\x4c\xe3\x7a\x11\x85\x1c"
-+				"\xb3\x27\xbe\x55\xec\x60\xf7\x8e"
-+				"\x02\x99\x30\xc7\x3b\xd2\x69\x00"
-+				"\x74\x0b\xa2\x16\xad\x44\xdb\x4f"
-+				"\xe6\x7d\x14\x88\x1f\xb6\x2a\xc1"
-+				"\x58\xef\x63\xfa\x91\x05\x9c\x33"
-+				"\xca\x3e\xd5\x6c\x03\x77\x0e\xa5"
-+				"\x19\xb0\x47\xde\x52\xe9\x80\x17"
-+				"\x8b\x22\xb9\x2d\xc4\x5b\xf2\x66"
-+				"\xfd\x94\x08\x9f\x36\xcd\x41\xd8"
-+				"\x6f\x06\x7a\x11\xa8\x1c\xb3\x4a"
-+				"\xe1\x55\xec\x83\x1a\x8e\x25\xbc"
-+				"\x30\xc7\x5e\xf5\x69\x00\x97\x0b"
-+				"\xa2\x39\xd0\x44\xdb\x72\x09\x7d"
-+				"\x14\xab\x1f\xb6\x4d\xe4\x58\xef"
-+				"\x86\x1d\x91\x28\xbf\x33\xca\x61"
-+				"\xf8\x6c\x03\x9a\x0e\xa5\x3c\xd3"
-+				"\x47\xde\x75\x0c\x80\x17\xae\x22"
-+				"\xb9\x50\xe7\x5b\xf2\x89\x20\x94"
-+				"\x2b\xc2\x36\xcd\x64\xfb\x6f\x06"
-+				"\x9d\x11\xa8\x3f\xd6\x4a\xe1\x78"
-+				"\x0f\x83\x1a\xb1\x25\xbc\x53\xea"
-+				"\x5e\xf5\x8c\x00\x97\x2e\xc5\x39"
-+				"\xd0\x67\xfe\x72\x09\xa0\x14\xab"
-+				"\x42\xd9\x4d\xe4\x7b\x12\x86\x1d"
-+				"\xb4\x28\xbf\x56\xed\x61\xf8\x8f"
-+				"\x03\x9a\x31\xc8\x3c\xd3\x6a\x01"
-+				"\x75\x0c\xa3\x17\xae\x45\xdc\x50"
-+				"\xe7\x7e\x15\x89\x20\xb7\x2b\xc2"
-+				"\x59\xf0\x64\xfb\x92\x06\x9d\x34"
-+				"\xcb\x3f\xd6\x6d\x04\x78\x0f\xa6"
-+				"\x1a\xb1\x48\xdf\x53\xea\x81\x18"
-+				"\x8c\x23\xba\x2e\xc5\x5c\xf3\x67"
-+				"\xfe\x95\x09\xa0\x37\xce\x42\xd9"
-+				"\x70\x07\x7b\x12\xa9\x1d\xb4\x4b"
-+				"\xe2\x56\xed\x84\x1b\x8f\x26\xbd"
-+				"\x31\xc8\x5f\xf6\x6a\x01\x98\x0c"
-+				"\xa3\x3a\xd1\x45\xdc\x73\x0a\x7e"
-+				"\x15\xac\x20\xb7\x4e\xe5\x59\xf0"
-+				"\x87\x1e\x92\x29\xc0\x34\xcb\x62"
-+				"\xf9\x6d\x04\x9b\x0f\xa6\x3d\xd4"
-+				"\x48\xdf\x76\x0d\x81\x18\xaf\x23"
-+				"\xba\x51\xe8\x5c\xf3\x8a\x21\x95"
-+				"\x2c\xc3\x37\xce\x65\xfc\x70\x07"
-+				"\x9e\x12\xa9\x40\xd7\x4b\xe2\x79"
-+				"\x10\x84\x1b\xb2\x26\xbd\x54\xeb"
-+				"\x5f\xf6\x8d\x01\x98\x2f\xc6\x3a"
-+				"\xd1\x68\xff\x73\x0a\xa1\x15\xac"
-+				"\x43\xda\x4e\xe5\x7c\x13\x87\x1e"
-+				"\xb5\x29\xc0\x57\xee\x62\xf9\x90"
-+				"\x04\x9b\x32\xc9\x3d\xd4\x6b\x02"
-+				"\x76\x0d\xa4\x18\xaf\x46\xdd\x51"
-+				"\xe8\x7f\x16\x8a\x21\xb8\x2c\xc3"
-+				"\x5a\xf1\x65\xfc\x93\x07\x9e\x35"
-+				"\xcc\x40\xd7\x6e\x05\x79\x10\xa7"
-+				"\x1b\xb2\x49\xe0\x54\xeb\x82\x19"
-+				"\x8d\x24\xbb\x2f\xc6\x5d\xf4\x68"
-+				"\xff\x96\x0a\xa1\x38\xcf\x43\xda"
-+				"\x71\x08\x7c\x13\xaa\x1e\xb5\x4c"
-+				"\xe3\x57\xee\x85\x1c\x90\x27\xbe"
-+				"\x32\xc9\x60\xf7\x6b\x02\x99\x0d"
-+				"\xa4\x3b\xd2\x46\xdd\x74\x0b\x7f"
-+				"\x16\xad\x21\xb8\x4f\xe6\x5a\xf1"
-+				"\x88\x1f\x93\x2a\xc1\x35\xcc\x63"
-+				"\xfa\x6e\x05\x9c\x10\xa7\x3e\xd5"
-+				"\x49\xe0\x77\x0e\x82\x19\xb0\x24"
-+				"\xbb\x52\xe9\x5d\xf4\x8b\x22\x96"
-+				"\x2d\xc4\x38\xcf\x66\xfd\x71\x08"
-+				"\x9f\x13\xaa\x41\xd8\x4c\xe3\x7a"
-+				"\x11\x85\x1c\xb3\x27\xbe\x55\xec"
-+				"\x60\xf7\x8e\x02\x99\x30\xc7\x3b"
-+				"\xd2\x69\x00\x74\x0b\xa2\x16\xad"
-+				"\x44\xdb\x4f\xe6\x7d\x14\x88\x1f"
-+				"\xb6\x2a\xc1\x58\xef\x63\xfa\x91"
-+				"\x05\x9c\x33\xca\x3e\xd5\x6c\x03"
-+				"\x77\x0e\xa5\x19\xb0\x47\xde\x52"
-+				"\xe9\x80\x17\x8b\x22\xb9\x2d\xc4"
-+				"\x5b\xf2\x66\xfd\x94\x08\x9f\x36"
-+				"\xcd\x41\xd8\x6f\x06\x7a\x11\xa8"
-+				"\x1c\xb3\x4a\xe1\x55\xec\x83\x1a"
-+				"\x8e\x25\xbc\x30\xc7\x5e\xf5\x69"
-+				"\x00\x97\x0b\xa2\x39\xd0\x44\xdb"
-+				"\x72\x09\x7d\x14\xab\x1f\xb6\x4d"
-+				"\xe4\x58\xef\x86\x1d\x91\x28\xbf"
-+				"\x33\xca\x61\xf8\x6c\x03\x9a\x0e"
-+				"\xa5\x3c\xd3\x47\xde\x75\x0c\x80"
-+				"\x17\xae\x22\xb9\x50\xe7\x5b\xf2"
-+				"\x89\x20\x94\x2b\xc2\x36\xcd\x64"
-+				"\xfb\x6f\x06\x9d\x11\xa8\x3f\xd6"
-+				"\x4a\xe1\x78\x0f\x83\x1a\xb1\x25"
-+				"\xbc\x53\xea\x5e\xf5\x8c\x00\x97"
-+				"\x2e\xc5\x39\xd0\x67\xfe\x72\x09"
-+				"\xa0\x14\xab\x42\xd9\x4d\xe4\x7b"
-+				"\x12\x86\x1d\xb4\x28\xbf\x56\xed"
-+				"\x61\xf8\x8f\x03\x9a\x31\xc8\x3c"
-+				"\xd3\x6a\x01\x75\x0c\xa3\x17\xae"
-+				"\x45\xdc\x50\xe7\x7e\x15\x89\x20"
-+				"\xb7\x2b\xc2\x59\xf0\x64\xfb\x92"
-+				"\x06\x9d\x34\xcb\x3f\xd6\x6d\x04"
-+				"\x78\x0f\xa6\x1a\xb1\x48\xdf\x53"
-+				"\xea\x81\x18\x8c\x23\xba\x2e\xc5"
-+				"\x5c\xf3\x67\xfe\x95\x09\xa0\x37"
-+				"\xce\x42\xd9\x70\x07\x7b\x12\xa9"
-+				"\x1d\xb4\x4b\xe2\x56\xed\x84\x1b"
-+				"\x8f\x26\xbd\x31\xc8\x5f\xf6\x6a"
-+				"\x01\x98\x0c\xa3\x3a\xd1\x45\xdc"
-+				"\x73\x0a\x7e\x15\xac\x20\xb7\x4e"
-+				"\xe5\x59\xf0\x87\x1e\x92\x29\xc0"
-+				"\x34\xcb\x62\xf9\x6d\x04\x9b\x0f"
-+				"\xa6\x3d\xd4\x48\xdf\x76\x0d\x81"
-+				"\x18\xaf\x23\xba\x51\xe8\x5c\xf3"
-+				"\x8a\x21\x95\x2c\xc3\x37\xce\x65"
-+				"\xfc\x70\x07\x9e\x12\xa9\x40\xd7"
-+				"\x4b\xe2\x79\x10\x84\x1b\xb2\x26"
-+				"\xbd\x54\xeb\x5f\xf6\x8d\x01\x98"
-+				"\x2f\xc6\x3a\xd1\x68\xff\x73\x0a"
-+				"\xa1\x15\xac\x43\xda\x4e\xe5\x7c"
-+				"\x13\x87\x1e\xb5\x29\xc0\x57\xee"
-+				"\x62\xf9\x90\x04\x9b\x32\xc9\x3d"
-+				"\xd4\x6b\x02\x76\x0d\xa4\x18\xaf"
-+				"\x46\xdd\x51\xe8\x7f\x16\x8a\x21"
-+				"\xb8\x2c\xc3\x5a\xf1\x65\xfc\x93"
-+				"\x07\x9e\x35\xcc\x40\xd7\x6e\x05"
-+				"\x79\x10\xa7\x1b\xb2\x49\xe0\x54"
-+				"\xeb\x82\x19\x8d\x24\xbb\x2f\xc6"
-+				"\x5d\xf4\x68\xff\x96\x0a\xa1\x38"
-+				"\xcf\x43\xda\x71\x08\x7c\x13\xaa"
-+				"\x1e\xb5\x4c\xe3\x57\xee\x85\x1c"
-+				"\x90\x27\xbe\x32\xc9\x60\xf7\x6b"
-+				"\x02\x99\x0d\xa4\x3b\xd2\x46\xdd"
-+				"\x74\x0b\x7f\x16\xad\x21\xb8\x4f"
-+				"\xe6\x5a\xf1\x88\x1f\x93\x2a\xc1"
-+				"\x35\xcc\x63\xfa\x6e\x05\x9c\x10"
-+				"\xa7\x3e\xd5\x49\xe0\x77\x0e\x82"
-+				"\x19\xb0\x24\xbb\x52\xe9\x5d\xf4"
-+				"\x8b\x22\x96\x2d\xc4\x38\xcf\x66"
-+				"\xfd\x71\x08\x9f\x13\xaa\x41\xd8"
-+				"\x4c\xe3\x7a\x11\x85\x1c\xb3\x27"
-+				"\xbe\x55\xec\x60\xf7\x8e\x02\x99"
-+				"\x30\xc7\x3b\xd2\x69\x00\x74\x0b"
-+				"\xa2\x16\xad\x44\xdb\x4f\xe6\x7d"
-+				"\x14\x88\x1f\xb6\x2a\xc1\x58\xef"
-+				"\x63\xfa\x91\x05\x9c\x33\xca\x3e"
-+				"\xd5\x6c\x03\x77\x0e\xa5\x19\xb0"
-+				"\x47\xde\x52\xe9\x80\x17\x8b\x22"
-+				"\xb9\x2d\xc4\x5b\xf2\x66\xfd\x94"
-+				"\x08\x9f\x36\xcd\x41\xd8\x6f\x06"
-+				"\x7a\x11\xa8\x1c\xb3\x4a\xe1\x55"
-+				"\xec\x83\x1a\x8e\x25\xbc\x30\xc7"
-+				"\x5e\xf5\x69\x00\x97\x0b\xa2\x39"
-+				"\xd0\x44\xdb\x72\x09\x7d\x14\xab"
-+				"\x1f\xb6\x4d\xe4\x58\xef\x86\x1d"
-+				"\x91\x28\xbf\x33\xca\x61\xf8\x6c"
-+				"\x03\x9a\x0e\xa5\x3c\xd3\x47\xde"
-+				"\x75\x0c\x80\x17\xae\x22\xb9\x50"
-+				"\xe7\x5b\xf2\x89\x20\x94\x2b\xc2"
-+				"\x36\xcd\x64\xfb\x6f\x06\x9d\x11"
-+				"\xa8\x3f\xd6\x4a\xe1\x78\x0f\x83"
-+				"\x1a\xb1\x25\xbc\x53\xea\x5e\xf5"
-+				"\x8c\x00\x97\x2e\xc5\x39\xd0\x67"
-+				"\xfe\x72\x09\xa0\x14\xab\x42\xd9"
-+				"\x4d\xe4\x7b\x12\x86\x1d\xb4\x28"
-+				"\xbf\x56\xed\x61\xf8\x8f\x03\x9a"
-+				"\x31\xc8\x3c\xd3\x6a\x01\x75\x0c"
-+				"\xa3\x17\xae\x45\xdc\x50\xe7\x7e"
-+				"\x15\x89\x20\xb7\x2b\xc2\x59\xf0"
-+				"\x64\xfb\x92\x06\x9d\x34\xcb\x3f"
-+				"\xd6\x6d\x04\x78\x0f\xa6\x1a\xb1"
-+				"\x48\xdf\x53\xea\x81\x18\x8c\x23"
-+				"\xba\x2e\xc5\x5c\xf3\x67\xfe\x95"
-+				"\x09\xa0\x37\xce\x42\xd9\x70\x07"
-+				"\x7b\x12\xa9\x1d\xb4\x4b\xe2\x56"
-+				"\xed\x84\x1b\x8f\x26\xbd\x31\xc8"
-+				"\x5f\xf6\x6a\x01\x98\x0c\xa3\x3a"
-+				"\xd1\x45\xdc\x73\x0a\x7e\x15\xac"
-+				"\x20\xb7\x4e\xe5\x59\xf0\x87\x1e"
-+				"\x92\x29\xc0\x34\xcb\x62\xf9\x6d"
-+				"\x04\x9b\x0f\xa6\x3d\xd4\x48\xdf"
-+				"\x76\x0d\x81\x18\xaf\x23\xba\x51"
-+				"\xe8\x5c\xf3\x8a\x21\x95\x2c\xc3"
-+				"\x37\xce\x65\xfc\x70\x07\x9e\x12"
-+				"\xa9\x40\xd7\x4b\xe2\x79\x10\x84"
-+				"\x1b\xb2\x26\xbd\x54\xeb\x5f\xf6"
-+				"\x8d\x01\x98\x2f\xc6\x3a\xd1\x68"
-+				"\xff\x73\x0a\xa1\x15\xac\x43\xda"
-+				"\x4e\xe5\x7c\x13\x87\x1e\xb5\x29"
-+				"\xc0\x57\xee\x62\xf9\x90\x04\x9b"
-+				"\x32\xc9\x3d\xd4\x6b\x02\x76\x0d"
-+				"\xa4\x18\xaf\x46\xdd\x51\xe8\x7f"
-+				"\x16\x8a\x21\xb8\x2c\xc3\x5a\xf1"
-+				"\x65\xfc\x93\x07\x9e\x35\xcc\x40"
-+				"\xd7\x6e\x05\x79\x10\xa7\x1b\xb2"
-+				"\x49\xe0\x54\xeb\x82\x19\x8d\x24"
-+				"\xbb\x2f\xc6\x5d\xf4\x68\xff\x96"
-+				"\x0a\xa1\x38\xcf\x43\xda\x71\x08"
-+				"\x7c\x13\xaa\x1e\xb5\x4c\xe3\x57"
-+				"\xee\x85\x1c\x90\x27\xbe\x32\xc9"
-+				"\x60\xf7\x6b\x02\x99\x0d\xa4\x3b"
-+				"\xd2\x46\xdd\x74\x0b\x7f\x16\xad"
-+				"\x21\xb8\x4f\xe6\x5a\xf1\x88\x1f"
-+				"\x93\x2a\xc1\x35\xcc\x63\xfa\x6e"
-+				"\x05\x9c\x10\xa7\x3e\xd5\x49\xe0"
-+				"\x77\x0e\x82\x19\xb0\x24\xbb\x52"
-+				"\xe9\x5d\xf4\x8b\x22\x96\x2d\xc4"
-+				"\x38\xcf\x66\xfd\x71\x08\x9f\x13"
-+				"\xaa\x41\xd8\x4c\xe3\x7a\x11\x85"
-+				"\x1c\xb3\x27\xbe\x55\xec\x60\xf7"
-+				"\x8e\x02\x99\x30\xc7\x3b\xd2\x69"
-+				"\x00\x74\x0b\xa2\x16\xad\x44\xdb"
-+				"\x4f\xe6\x7d\x14\x88\x1f\xb6\x2a"
-+				"\xc1\x58\xef\x63\xfa\x91\x05\x9c"
-+				"\x33\xca\x3e\xd5\x6c\x03\x77\x0e"
-+				"\xa5\x19\xb0\x47\xde\x52\xe9\x80"
-+				"\x17\x8b\x22\xb9\x2d\xc4\x5b\xf2"
-+				"\x66\xfd\x94\x08\x9f\x36\xcd\x41"
-+				"\xd8\x6f\x06\x7a\x11\xa8\x1c\xb3"
-+				"\x4a\xe1\x55\xec\x83\x1a\x8e\x25"
-+				"\xbc\x30\xc7\x5e\xf5\x69\x00\x97"
-+				"\x0b\xa2\x39\xd0\x44\xdb\x72\x09"
-+				"\x7d\x14\xab\x1f\xb6\x4d\xe4\x58"
-+				"\xef\x86\x1d\x91\x28\xbf\x33\xca"
-+				"\x61\xf8\x6c\x03\x9a\x0e\xa5\x3c"
-+				"\xd3\x47\xde\x75\x0c\x80\x17\xae"
-+				"\x22\xb9\x50\xe7\x5b\xf2\x89\x20"
-+				"\x94\x2b\xc2\x36\xcd\x64\xfb\x6f"
-+				"\x06\x9d\x11\xa8\x3f\xd6\x4a\xe1"
-+				"\x78\x0f\x83\x1a\xb1\x25\xbc\x53"
-+				"\xea\x5e\xf5\x8c\x00\x97\x2e\xc5"
-+				"\x39\xd0\x67\xfe\x72\x09\xa0\x14"
-+				"\xab\x42\xd9\x4d\xe4\x7b\x12\x86"
-+				"\x1d\xb4\x28\xbf\x56\xed\x61\xf8"
-+				"\x8f\x03\x9a\x31\xc8\x3c\xd3\x6a"
-+				"\x01\x75\x0c\xa3\x17\xae\x45\xdc"
-+				"\x50\xe7\x7e\x15\x89\x20\xb7\x2b"
-+				"\xc2\x59\xf0\x64\xfb\x92\x06\x9d"
-+				"\x34\xcb\x3f\xd6\x6d\x04\x78\x0f"
-+				"\xa6\x1a\xb1\x48\xdf\x53\xea\x81"
-+				"\x18\x8c\x23\xba\x2e\xc5\x5c\xf3"
-+				"\x67\xfe\x95\x09\xa0\x37\xce\x42"
-+				"\xd9\x70\x07\x7b\x12\xa9\x1d\xb4"
-+				"\x4b\xe2\x56\xed\x84\x1b\x8f\x26"
-+				"\xbd\x31\xc8\x5f\xf6\x6a\x01\x98",
-+		.psize = 2048,
-+		.digest		= (u8 *)(u16 []){ 0x23ca },
- 	}
- };
+diff --git a/arch/arm64/crypto/aes-glue.c b/arch/arm64/crypto/aes-glue.c
+index 998ba519a026..00a3e2fd6a48 100644
+--- a/arch/arm64/crypto/aes-glue.c
++++ b/arch/arm64/crypto/aes-glue.c
+@@ -64,17 +64,17 @@ MODULE_LICENSE("GPL v2");
  
+ /* defined in aes-modes.S */
+ asmlinkage void aes_ecb_encrypt(u8 out[], u8 const in[], u8 const rk[],
+-				int rounds, int blocks, int first);
++				int rounds, int blocks);
+ asmlinkage void aes_ecb_decrypt(u8 out[], u8 const in[], u8 const rk[],
+-				int rounds, int blocks, int first);
++				int rounds, int blocks);
+ 
+ asmlinkage void aes_cbc_encrypt(u8 out[], u8 const in[], u8 const rk[],
+-				int rounds, int blocks, u8 iv[], int first);
++				int rounds, int blocks, u8 iv[]);
+ asmlinkage void aes_cbc_decrypt(u8 out[], u8 const in[], u8 const rk[],
+-				int rounds, int blocks, u8 iv[], int first);
++				int rounds, int blocks, u8 iv[]);
+ 
+ asmlinkage void aes_ctr_encrypt(u8 out[], u8 const in[], u8 const rk[],
+-				int rounds, int blocks, u8 ctr[], int first);
++				int rounds, int blocks, u8 ctr[]);
+ 
+ asmlinkage void aes_xts_encrypt(u8 out[], u8 const in[], u8 const rk1[],
+ 				int rounds, int blocks, u8 const rk2[], u8 iv[],
+@@ -133,19 +133,19 @@ static int ecb_encrypt(struct skcipher_request *req)
+ {
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+ 	struct crypto_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	int err, first, rounds = 6 + ctx->key_length / 4;
++	int err, rounds = 6 + ctx->key_length / 4;
+ 	struct skcipher_walk walk;
+ 	unsigned int blocks;
+ 
+-	err = skcipher_walk_virt(&walk, req, true);
++	err = skcipher_walk_virt(&walk, req, false);
+ 
+-	kernel_neon_begin();
+-	for (first = 1; (blocks = (walk.nbytes / AES_BLOCK_SIZE)); first = 0) {
++	while ((blocks = (walk.nbytes / AES_BLOCK_SIZE))) {
++		kernel_neon_begin();
+ 		aes_ecb_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
+-				(u8 *)ctx->key_enc, rounds, blocks, first);
++				(u8 *)ctx->key_enc, rounds, blocks);
++		kernel_neon_end();
+ 		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
+ 	}
+-	kernel_neon_end();
+ 	return err;
+ }
+ 
+@@ -153,19 +153,19 @@ static int ecb_decrypt(struct skcipher_request *req)
+ {
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+ 	struct crypto_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	int err, first, rounds = 6 + ctx->key_length / 4;
++	int err, rounds = 6 + ctx->key_length / 4;
+ 	struct skcipher_walk walk;
+ 	unsigned int blocks;
+ 
+-	err = skcipher_walk_virt(&walk, req, true);
++	err = skcipher_walk_virt(&walk, req, false);
+ 
+-	kernel_neon_begin();
+-	for (first = 1; (blocks = (walk.nbytes / AES_BLOCK_SIZE)); first = 0) {
++	while ((blocks = (walk.nbytes / AES_BLOCK_SIZE))) {
++		kernel_neon_begin();
+ 		aes_ecb_decrypt(walk.dst.virt.addr, walk.src.virt.addr,
+-				(u8 *)ctx->key_dec, rounds, blocks, first);
++				(u8 *)ctx->key_dec, rounds, blocks);
++		kernel_neon_end();
+ 		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
+ 	}
+-	kernel_neon_end();
+ 	return err;
+ }
+ 
+@@ -173,20 +173,19 @@ static int cbc_encrypt(struct skcipher_request *req)
+ {
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+ 	struct crypto_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	int err, first, rounds = 6 + ctx->key_length / 4;
++	int err, rounds = 6 + ctx->key_length / 4;
+ 	struct skcipher_walk walk;
+ 	unsigned int blocks;
+ 
+-	err = skcipher_walk_virt(&walk, req, true);
++	err = skcipher_walk_virt(&walk, req, false);
+ 
+-	kernel_neon_begin();
+-	for (first = 1; (blocks = (walk.nbytes / AES_BLOCK_SIZE)); first = 0) {
++	while ((blocks = (walk.nbytes / AES_BLOCK_SIZE))) {
++		kernel_neon_begin();
+ 		aes_cbc_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
+-				(u8 *)ctx->key_enc, rounds, blocks, walk.iv,
+-				first);
++				(u8 *)ctx->key_enc, rounds, blocks, walk.iv);
++		kernel_neon_end();
+ 		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
+ 	}
+-	kernel_neon_end();
+ 	return err;
+ }
+ 
+@@ -194,20 +193,19 @@ static int cbc_decrypt(struct skcipher_request *req)
+ {
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+ 	struct crypto_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	int err, first, rounds = 6 + ctx->key_length / 4;
++	int err, rounds = 6 + ctx->key_length / 4;
+ 	struct skcipher_walk walk;
+ 	unsigned int blocks;
+ 
+-	err = skcipher_walk_virt(&walk, req, true);
++	err = skcipher_walk_virt(&walk, req, false);
+ 
+-	kernel_neon_begin();
+-	for (first = 1; (blocks = (walk.nbytes / AES_BLOCK_SIZE)); first = 0) {
++	while ((blocks = (walk.nbytes / AES_BLOCK_SIZE))) {
++		kernel_neon_begin();
+ 		aes_cbc_decrypt(walk.dst.virt.addr, walk.src.virt.addr,
+-				(u8 *)ctx->key_dec, rounds, blocks, walk.iv,
+-				first);
++				(u8 *)ctx->key_dec, rounds, blocks, walk.iv);
++		kernel_neon_end();
+ 		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
+ 	}
+-	kernel_neon_end();
+ 	return err;
+ }
+ 
+@@ -215,20 +213,18 @@ static int ctr_encrypt(struct skcipher_request *req)
+ {
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+ 	struct crypto_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	int err, first, rounds = 6 + ctx->key_length / 4;
++	int err, rounds = 6 + ctx->key_length / 4;
+ 	struct skcipher_walk walk;
+ 	int blocks;
+ 
+-	err = skcipher_walk_virt(&walk, req, true);
++	err = skcipher_walk_virt(&walk, req, false);
+ 
+-	first = 1;
+-	kernel_neon_begin();
+ 	while ((blocks = (walk.nbytes / AES_BLOCK_SIZE))) {
++		kernel_neon_begin();
+ 		aes_ctr_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
+-				(u8 *)ctx->key_enc, rounds, blocks, walk.iv,
+-				first);
++				(u8 *)ctx->key_enc, rounds, blocks, walk.iv);
+ 		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
+-		first = 0;
++		kernel_neon_end();
+ 	}
+ 	if (walk.nbytes) {
+ 		u8 __aligned(8) tail[AES_BLOCK_SIZE];
+@@ -241,12 +237,13 @@ static int ctr_encrypt(struct skcipher_request *req)
+ 		 */
+ 		blocks = -1;
+ 
++		kernel_neon_begin();
+ 		aes_ctr_encrypt(tail, NULL, (u8 *)ctx->key_enc, rounds,
+-				blocks, walk.iv, first);
++				blocks, walk.iv);
++		kernel_neon_end();
+ 		crypto_xor_cpy(tdst, tsrc, tail, nbytes);
+ 		err = skcipher_walk_done(&walk, 0);
+ 	}
+-	kernel_neon_end();
+ 
+ 	return err;
+ }
+@@ -270,16 +267,16 @@ static int xts_encrypt(struct skcipher_request *req)
+ 	struct skcipher_walk walk;
+ 	unsigned int blocks;
+ 
+-	err = skcipher_walk_virt(&walk, req, true);
++	err = skcipher_walk_virt(&walk, req, false);
+ 
+-	kernel_neon_begin();
+ 	for (first = 1; (blocks = (walk.nbytes / AES_BLOCK_SIZE)); first = 0) {
++		kernel_neon_begin();
+ 		aes_xts_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
+ 				(u8 *)ctx->key1.key_enc, rounds, blocks,
+ 				(u8 *)ctx->key2.key_enc, walk.iv, first);
++		kernel_neon_end();
+ 		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
+ 	}
+-	kernel_neon_end();
+ 
+ 	return err;
+ }
+@@ -292,16 +289,16 @@ static int xts_decrypt(struct skcipher_request *req)
+ 	struct skcipher_walk walk;
+ 	unsigned int blocks;
+ 
+-	err = skcipher_walk_virt(&walk, req, true);
++	err = skcipher_walk_virt(&walk, req, false);
+ 
+-	kernel_neon_begin();
+ 	for (first = 1; (blocks = (walk.nbytes / AES_BLOCK_SIZE)); first = 0) {
++		kernel_neon_begin();
+ 		aes_xts_decrypt(walk.dst.virt.addr, walk.src.virt.addr,
+ 				(u8 *)ctx->key1.key_dec, rounds, blocks,
+ 				(u8 *)ctx->key2.key_enc, walk.iv, first);
++		kernel_neon_end();
+ 		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
+ 	}
+-	kernel_neon_end();
+ 
+ 	return err;
+ }
+@@ -425,7 +422,7 @@ static int cmac_setkey(struct crypto_shash *tfm, const u8 *in_key,
+ 
+ 	/* encrypt the zero vector */
+ 	kernel_neon_begin();
+-	aes_ecb_encrypt(ctx->consts, (u8[AES_BLOCK_SIZE]){}, rk, rounds, 1, 1);
++	aes_ecb_encrypt(ctx->consts, (u8[AES_BLOCK_SIZE]){}, rk, rounds, 1);
+ 	kernel_neon_end();
+ 
+ 	cmac_gf128_mul_by_x(consts, consts);
+@@ -454,8 +451,8 @@ static int xcbc_setkey(struct crypto_shash *tfm, const u8 *in_key,
+ 		return err;
+ 
+ 	kernel_neon_begin();
+-	aes_ecb_encrypt(key, ks[0], rk, rounds, 1, 1);
+-	aes_ecb_encrypt(ctx->consts, ks[1], rk, rounds, 2, 0);
++	aes_ecb_encrypt(key, ks[0], rk, rounds, 1);
++	aes_ecb_encrypt(ctx->consts, ks[1], rk, rounds, 2);
+ 	kernel_neon_end();
+ 
+ 	return cbcmac_setkey(tfm, key, sizeof(key));
+diff --git a/arch/arm64/crypto/aes-modes.S b/arch/arm64/crypto/aes-modes.S
+index 2674d43d1384..65b273667b34 100644
+--- a/arch/arm64/crypto/aes-modes.S
++++ b/arch/arm64/crypto/aes-modes.S
+@@ -40,24 +40,24 @@
+ #if INTERLEAVE == 2
+ 
+ aes_encrypt_block2x:
+-	encrypt_block2x	v0, v1, w3, x2, x6, w7
++	encrypt_block2x	v0, v1, w3, x2, x8, w7
+ 	ret
+ ENDPROC(aes_encrypt_block2x)
+ 
+ aes_decrypt_block2x:
+-	decrypt_block2x	v0, v1, w3, x2, x6, w7
++	decrypt_block2x	v0, v1, w3, x2, x8, w7
+ 	ret
+ ENDPROC(aes_decrypt_block2x)
+ 
+ #elif INTERLEAVE == 4
+ 
+ aes_encrypt_block4x:
+-	encrypt_block4x	v0, v1, v2, v3, w3, x2, x6, w7
++	encrypt_block4x	v0, v1, v2, v3, w3, x2, x8, w7
+ 	ret
+ ENDPROC(aes_encrypt_block4x)
+ 
+ aes_decrypt_block4x:
+-	decrypt_block4x	v0, v1, v2, v3, w3, x2, x6, w7
++	decrypt_block4x	v0, v1, v2, v3, w3, x2, x8, w7
+ 	ret
+ ENDPROC(aes_decrypt_block4x)
+ 
+@@ -86,33 +86,32 @@ ENDPROC(aes_decrypt_block4x)
+ #define FRAME_POP
+ 
+ 	.macro		do_encrypt_block2x
+-	encrypt_block2x	v0, v1, w3, x2, x6, w7
++	encrypt_block2x	v0, v1, w3, x2, x8, w7
+ 	.endm
+ 
+ 	.macro		do_decrypt_block2x
+-	decrypt_block2x	v0, v1, w3, x2, x6, w7
++	decrypt_block2x	v0, v1, w3, x2, x8, w7
+ 	.endm
+ 
+ 	.macro		do_encrypt_block4x
+-	encrypt_block4x	v0, v1, v2, v3, w3, x2, x6, w7
++	encrypt_block4x	v0, v1, v2, v3, w3, x2, x8, w7
+ 	.endm
+ 
+ 	.macro		do_decrypt_block4x
+-	decrypt_block4x	v0, v1, v2, v3, w3, x2, x6, w7
++	decrypt_block4x	v0, v1, v2, v3, w3, x2, x8, w7
+ 	.endm
+ 
+ #endif
+ 
+ 	/*
+ 	 * aes_ecb_encrypt(u8 out[], u8 const in[], u8 const rk[], int rounds,
+-	 *		   int blocks, int first)
++	 *		   int blocks)
+ 	 * aes_ecb_decrypt(u8 out[], u8 const in[], u8 const rk[], int rounds,
+-	 *		   int blocks, int first)
++	 *		   int blocks)
+ 	 */
+ 
+ AES_ENTRY(aes_ecb_encrypt)
+ 	FRAME_PUSH
+-	cbz		w5, .LecbencloopNx
+ 
+ 	enc_prepare	w3, x2, x5
+ 
+@@ -148,7 +147,6 @@ AES_ENDPROC(aes_ecb_encrypt)
+ 
+ AES_ENTRY(aes_ecb_decrypt)
+ 	FRAME_PUSH
+-	cbz		w5, .LecbdecloopNx
+ 
+ 	dec_prepare	w3, x2, x5
+ 
+@@ -184,14 +182,12 @@ AES_ENDPROC(aes_ecb_decrypt)
+ 
+ 	/*
+ 	 * aes_cbc_encrypt(u8 out[], u8 const in[], u8 const rk[], int rounds,
+-	 *		   int blocks, u8 iv[], int first)
++	 *		   int blocks, u8 iv[])
+ 	 * aes_cbc_decrypt(u8 out[], u8 const in[], u8 const rk[], int rounds,
+-	 *		   int blocks, u8 iv[], int first)
++	 *		   int blocks, u8 iv[])
+ 	 */
+ 
+ AES_ENTRY(aes_cbc_encrypt)
+-	cbz		w6, .Lcbcencloop
+-
+ 	ld1		{v0.16b}, [x5]			/* get iv */
+ 	enc_prepare	w3, x2, x6
+ 
+@@ -209,7 +205,6 @@ AES_ENDPROC(aes_cbc_encrypt)
+ 
+ AES_ENTRY(aes_cbc_decrypt)
+ 	FRAME_PUSH
+-	cbz		w6, .LcbcdecloopNx
+ 
+ 	ld1		{v7.16b}, [x5]			/* get iv */
+ 	dec_prepare	w3, x2, x6
+@@ -264,20 +259,19 @@ AES_ENDPROC(aes_cbc_decrypt)
+ 
+ 	/*
+ 	 * aes_ctr_encrypt(u8 out[], u8 const in[], u8 const rk[], int rounds,
+-	 *		   int blocks, u8 ctr[], int first)
++	 *		   int blocks, u8 ctr[])
+ 	 */
+ 
+ AES_ENTRY(aes_ctr_encrypt)
+ 	FRAME_PUSH
+-	cbz		w6, .Lctrnotfirst	/* 1st time around? */
++
+ 	enc_prepare	w3, x2, x6
+ 	ld1		{v4.16b}, [x5]
+ 
+-.Lctrnotfirst:
+-	umov		x8, v4.d[1]		/* keep swabbed ctr in reg */
+-	rev		x8, x8
++	umov		x6, v4.d[1]		/* keep swabbed ctr in reg */
++	rev		x6, x6
+ #if INTERLEAVE >= 2
+-	cmn		w8, w4			/* 32 bit overflow? */
++	cmn		w6, w4			/* 32 bit overflow? */
+ 	bcs		.Lctrloop
+ .LctrloopNx:
+ 	subs		w4, w4, #INTERLEAVE
+@@ -285,11 +279,11 @@ AES_ENTRY(aes_ctr_encrypt)
+ #if INTERLEAVE == 2
+ 	mov		v0.8b, v4.8b
+ 	mov		v1.8b, v4.8b
+-	rev		x7, x8
+-	add		x8, x8, #1
++	rev		x7, x6
++	add		x6, x6, #1
+ 	ins		v0.d[1], x7
+-	rev		x7, x8
+-	add		x8, x8, #1
++	rev		x7, x6
++	add		x6, x6, #1
+ 	ins		v1.d[1], x7
+ 	ld1		{v2.16b-v3.16b}, [x1], #32	/* get 2 input blocks */
+ 	do_encrypt_block2x
+@@ -298,7 +292,7 @@ AES_ENTRY(aes_ctr_encrypt)
+ 	st1		{v0.16b-v1.16b}, [x0], #32
+ #else
+ 	ldr		q8, =0x30000000200000001	/* addends 1,2,3[,0] */
+-	dup		v7.4s, w8
++	dup		v7.4s, w6
+ 	mov		v0.16b, v4.16b
+ 	add		v7.4s, v7.4s, v8.4s
+ 	mov		v1.16b, v4.16b
+@@ -316,9 +310,9 @@ AES_ENTRY(aes_ctr_encrypt)
+ 	eor		v2.16b, v7.16b, v2.16b
+ 	eor		v3.16b, v5.16b, v3.16b
+ 	st1		{v0.16b-v3.16b}, [x0], #64
+-	add		x8, x8, #INTERLEAVE
++	add		x6, x6, #INTERLEAVE
+ #endif
+-	rev		x7, x8
++	rev		x7, x6
+ 	ins		v4.d[1], x7
+ 	cbz		w4, .Lctrout
+ 	b		.LctrloopNx
+@@ -328,10 +322,10 @@ AES_ENTRY(aes_ctr_encrypt)
+ #endif
+ .Lctrloop:
+ 	mov		v0.16b, v4.16b
+-	encrypt_block	v0, w3, x2, x6, w7
++	encrypt_block	v0, w3, x2, x8, w7
+ 
+-	adds		x8, x8, #1		/* increment BE ctr */
+-	rev		x7, x8
++	adds		x6, x6, #1		/* increment BE ctr */
++	rev		x7, x6
+ 	ins		v4.d[1], x7
+ 	bcs		.Lctrcarry		/* overflow? */
+ 
+@@ -385,15 +379,17 @@ CPU_BE(	.quad		0x87, 1		)
+ 
+ AES_ENTRY(aes_xts_encrypt)
+ 	FRAME_PUSH
+-	cbz		w7, .LxtsencloopNx
+-
+ 	ld1		{v4.16b}, [x6]
+-	enc_prepare	w3, x5, x6
+-	encrypt_block	v4, w3, x5, x6, w7		/* first tweak */
+-	enc_switch_key	w3, x2, x6
++	cbz		w7, .Lxtsencnotfirst
++
++	enc_prepare	w3, x5, x8
++	encrypt_block	v4, w3, x5, x8, w7		/* first tweak */
++	enc_switch_key	w3, x2, x8
+ 	ldr		q7, .Lxts_mul_x
+ 	b		.LxtsencNx
+ 
++.Lxtsencnotfirst:
++	enc_prepare	w3, x2, x8
+ .LxtsencloopNx:
+ 	ldr		q7, .Lxts_mul_x
+ 	next_tweak	v4, v4, v7, v8
+@@ -442,7 +438,7 @@ AES_ENTRY(aes_xts_encrypt)
+ .Lxtsencloop:
+ 	ld1		{v1.16b}, [x1], #16
+ 	eor		v0.16b, v1.16b, v4.16b
+-	encrypt_block	v0, w3, x2, x6, w7
++	encrypt_block	v0, w3, x2, x8, w7
+ 	eor		v0.16b, v0.16b, v4.16b
+ 	st1		{v0.16b}, [x0], #16
+ 	subs		w4, w4, #1
+@@ -450,6 +446,7 @@ AES_ENTRY(aes_xts_encrypt)
+ 	next_tweak	v4, v4, v7, v8
+ 	b		.Lxtsencloop
+ .Lxtsencout:
++	st1		{v4.16b}, [x6]
+ 	FRAME_POP
+ 	ret
+ AES_ENDPROC(aes_xts_encrypt)
+@@ -457,15 +454,17 @@ AES_ENDPROC(aes_xts_encrypt)
+ 
+ AES_ENTRY(aes_xts_decrypt)
+ 	FRAME_PUSH
+-	cbz		w7, .LxtsdecloopNx
+-
+ 	ld1		{v4.16b}, [x6]
+-	enc_prepare	w3, x5, x6
+-	encrypt_block	v4, w3, x5, x6, w7		/* first tweak */
+-	dec_prepare	w3, x2, x6
++	cbz		w7, .Lxtsdecnotfirst
++
++	enc_prepare	w3, x5, x8
++	encrypt_block	v4, w3, x5, x8, w7		/* first tweak */
++	dec_prepare	w3, x2, x8
+ 	ldr		q7, .Lxts_mul_x
+ 	b		.LxtsdecNx
+ 
++.Lxtsdecnotfirst:
++	dec_prepare	w3, x2, x8
+ .LxtsdecloopNx:
+ 	ldr		q7, .Lxts_mul_x
+ 	next_tweak	v4, v4, v7, v8
+@@ -514,7 +513,7 @@ AES_ENTRY(aes_xts_decrypt)
+ .Lxtsdecloop:
+ 	ld1		{v1.16b}, [x1], #16
+ 	eor		v0.16b, v1.16b, v4.16b
+-	decrypt_block	v0, w3, x2, x6, w7
++	decrypt_block	v0, w3, x2, x8, w7
+ 	eor		v0.16b, v0.16b, v4.16b
+ 	st1		{v0.16b}, [x0], #16
+ 	subs		w4, w4, #1
+@@ -522,6 +521,7 @@ AES_ENTRY(aes_xts_decrypt)
+ 	next_tweak	v4, v4, v7, v8
+ 	b		.Lxtsdecloop
+ .Lxtsdecout:
++	st1		{v4.16b}, [x6]
+ 	FRAME_POP
+ 	ret
+ AES_ENDPROC(aes_xts_decrypt)
+diff --git a/arch/arm64/crypto/aes-neonbs-glue.c b/arch/arm64/crypto/aes-neonbs-glue.c
+index c55d68ccb89f..9d823c77ec84 100644
+--- a/arch/arm64/crypto/aes-neonbs-glue.c
++++ b/arch/arm64/crypto/aes-neonbs-glue.c
+@@ -46,10 +46,9 @@ asmlinkage void aesbs_xts_decrypt(u8 out[], u8 const in[], u8 const rk[],
+ 
+ /* borrowed from aes-neon-blk.ko */
+ asmlinkage void neon_aes_ecb_encrypt(u8 out[], u8 const in[], u32 const rk[],
+-				     int rounds, int blocks, int first);
++				     int rounds, int blocks);
+ asmlinkage void neon_aes_cbc_encrypt(u8 out[], u8 const in[], u32 const rk[],
+-				     int rounds, int blocks, u8 iv[],
+-				     int first);
++				     int rounds, int blocks, u8 iv[]);
+ 
+ struct aesbs_ctx {
+ 	u8	rk[13 * (8 * AES_BLOCK_SIZE) + 32];
+@@ -157,7 +156,7 @@ static int cbc_encrypt(struct skcipher_request *req)
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+ 	struct aesbs_cbc_ctx *ctx = crypto_skcipher_ctx(tfm);
+ 	struct skcipher_walk walk;
+-	int err, first = 1;
++	int err;
+ 
+ 	err = skcipher_walk_virt(&walk, req, true);
+ 
+@@ -167,10 +166,9 @@ static int cbc_encrypt(struct skcipher_request *req)
+ 
+ 		/* fall back to the non-bitsliced NEON implementation */
+ 		neon_aes_cbc_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
+-				     ctx->enc, ctx->key.rounds, blocks, walk.iv,
+-				     first);
++				     ctx->enc, ctx->key.rounds, blocks,
++				     walk.iv);
+ 		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
+-		first = 0;
+ 	}
+ 	kernel_neon_end();
+ 	return err;
+@@ -311,7 +309,7 @@ static int __xts_crypt(struct skcipher_request *req,
+ 	kernel_neon_begin();
+ 
+ 	neon_aes_ecb_encrypt(walk.iv, walk.iv, ctx->twkey,
+-			     ctx->key.rounds, 1, 1);
++			     ctx->key.rounds, 1);
+ 
+ 	while (walk.nbytes >= AES_BLOCK_SIZE) {
+ 		unsigned int blocks = walk.nbytes / AES_BLOCK_SIZE;
 -- 
 2.11.0
