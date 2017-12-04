@@ -1,7 +1,7 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v2 08/19] crypto: arm64/aes-blk - add 4 way interleave to CBC encrypt path
-Date: Mon,  4 Dec 2017 12:26:34 +0000
-Message-ID: <20171204122645.31535-9-ard.biesheuvel@linaro.org>
+Subject: [PATCH v2 10/19] crypto: arm64/sha256-neon - play nice with CONFIG_PREEMPT kernels
+Date: Mon,  4 Dec 2017 12:26:36 +0000
+Message-ID: <20171204122645.31535-11-ard.biesheuvel@linaro.org>
 References: <20171204122645.31535-1-ard.biesheuvel@linaro.org>
 Cc: herbert@gondor.apana.org.au, linux-arm-kernel@lists.infradead.org,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>,
@@ -16,79 +16,83 @@ Cc: herbert@gondor.apana.org.au, linux-arm-kernel@lists.infradead.org,
         Steven Rostedt <rostedt@goodmis.org>,
         Thomas Gleixner <tglx@linutronix.de>
 To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:38226 "EHLO
-        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753188AbdLDM1V (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 4 Dec 2017 07:27:21 -0500
-Received: by mail-wm0-f65.google.com with SMTP id 64so13883234wme.3
-        for <linux-crypto@vger.kernel.org>; Mon, 04 Dec 2017 04:27:20 -0800 (PST)
+Return-path: <linux-rt-users-owner@vger.kernel.org>
 In-Reply-To: <20171204122645.31535-1-ard.biesheuvel@linaro.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-rt-users-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-CBC encryption is strictly sequential, and so the current AES code
-simply processes the input one block at a time. However, we are
-about to add yield support, which adds a bit of overhead, and which
-we prefer to align with other modes in terms of granularity (i.e.,
-it is better to have all routines yield every 64 bytes and not have
-an exception for CBC encrypt which yields every 16 bytes)
+Tweak the SHA256 update routines to invoke the SHA256 block transform
+block by block, to avoid excessive scheduling delays caused by the
+NEON algorithm running with preemption disabled.
 
-So unroll the loop by 4. We still cannot perform the AES algorithm in
-parallel, but we can at least merge the loads and stores.
+Also, remove a stale comment which no longer applies now that kernel
+mode NEON is actually disallowed in some contexts.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm64/crypto/aes-modes.S | 31 ++++++++++++++++----
- 1 file changed, 25 insertions(+), 6 deletions(-)
+ arch/arm64/crypto/sha256-glue.c | 36 +++++++++++++-------
+ 1 file changed, 23 insertions(+), 13 deletions(-)
 
-diff --git a/arch/arm64/crypto/aes-modes.S b/arch/arm64/crypto/aes-modes.S
-index 27a235b2ddee..e86535a1329d 100644
---- a/arch/arm64/crypto/aes-modes.S
-+++ b/arch/arm64/crypto/aes-modes.S
-@@ -94,17 +94,36 @@ AES_ENDPROC(aes_ecb_decrypt)
- 	 */
+diff --git a/arch/arm64/crypto/sha256-glue.c b/arch/arm64/crypto/sha256-glue.c
+index b064d925fe2a..e8880ccdc71f 100644
+--- a/arch/arm64/crypto/sha256-glue.c
++++ b/arch/arm64/crypto/sha256-glue.c
+@@ -89,21 +89,32 @@ static struct shash_alg algs[] = { {
+ static int sha256_update_neon(struct shash_desc *desc, const u8 *data,
+ 			      unsigned int len)
+ {
+-	/*
+-	 * Stacking and unstacking a substantial slice of the NEON register
+-	 * file may significantly affect performance for small updates when
+-	 * executing in interrupt context, so fall back to the scalar code
+-	 * in that case.
+-	 */
++	struct sha256_state *sctx = shash_desc_ctx(desc);
++
+ 	if (!may_use_simd())
+ 		return sha256_base_do_update(desc, data, len,
+ 				(sha256_block_fn *)sha256_block_data_order);
  
- AES_ENTRY(aes_cbc_encrypt)
--	ld1		{v0.16b}, [x5]			/* get iv */
-+	ld1		{v4.16b}, [x5]			/* get iv */
- 	enc_prepare	w3, x2, x6
+-	kernel_neon_begin();
+-	sha256_base_do_update(desc, data, len,
+-				(sha256_block_fn *)sha256_block_neon);
+-	kernel_neon_end();
++	while (len > 0) {
++		unsigned int chunk = len;
++
++		/*
++		 * Don't hog the CPU for the entire time it takes to process all
++		 * input when running on a preemptible kernel, but process the
++		 * data block by block instead.
++		 */
++		if (IS_ENABLED(CONFIG_PREEMPT) &&
++		    chunk + sctx->count % SHA256_BLOCK_SIZE > SHA256_BLOCK_SIZE)
++			chunk = SHA256_BLOCK_SIZE -
++				sctx->count % SHA256_BLOCK_SIZE;
  
--.Lcbcencloop:
--	ld1		{v1.16b}, [x1], #16		/* get next pt block */
--	eor		v0.16b, v0.16b, v1.16b		/* ..and xor with iv */
-+.Lcbcencloop4x:
-+	subs		w4, w4, #4
-+	bmi		.Lcbcenc1x
-+	ld1		{v0.16b-v3.16b}, [x1], #64	/* get 4 pt blocks */
-+	eor		v0.16b, v0.16b, v4.16b		/* ..and xor with iv */
- 	encrypt_block	v0, w3, x2, x6, w7
--	st1		{v0.16b}, [x0], #16
-+	eor		v1.16b, v1.16b, v0.16b
-+	encrypt_block	v1, w3, x2, x6, w7
-+	eor		v2.16b, v2.16b, v1.16b
-+	encrypt_block	v2, w3, x2, x6, w7
-+	eor		v3.16b, v3.16b, v2.16b
-+	encrypt_block	v3, w3, x2, x6, w7
-+	st1		{v0.16b-v3.16b}, [x0], #64
-+	mov		v4.16b, v3.16b
-+	b		.Lcbcencloop4x
-+.Lcbcenc1x:
-+	adds		w4, w4, #4
-+	beq		.Lcbcencout
-+.Lcbcencloop:
-+	ld1		{v0.16b}, [x1], #16		/* get next pt block */
-+	eor		v4.16b, v4.16b, v0.16b		/* ..and xor with iv */
-+	encrypt_block	v4, w3, x2, x6, w7
-+	st1		{v4.16b}, [x0], #16
- 	subs		w4, w4, #1
- 	bne		.Lcbcencloop
--	st1		{v0.16b}, [x5]			/* return iv */
-+.Lcbcencout:
-+	st1		{v4.16b}, [x5]			/* return iv */
- 	ret
- AES_ENDPROC(aes_cbc_encrypt)
++		kernel_neon_begin();
++		sha256_base_do_update(desc, data, chunk,
++				      (sha256_block_fn *)sha256_block_neon);
++		kernel_neon_end();
++		data += chunk;
++		len -= chunk;
++	}
+ 	return 0;
+ }
  
+@@ -117,10 +128,9 @@ static int sha256_finup_neon(struct shash_desc *desc, const u8 *data,
+ 		sha256_base_do_finalize(desc,
+ 				(sha256_block_fn *)sha256_block_data_order);
+ 	} else {
+-		kernel_neon_begin();
+ 		if (len)
+-			sha256_base_do_update(desc, data, len,
+-				(sha256_block_fn *)sha256_block_neon);
++			sha256_update_neon(desc, data, len);
++		kernel_neon_begin();
+ 		sha256_base_do_finalize(desc,
+ 				(sha256_block_fn *)sha256_block_neon);
+ 		kernel_neon_end();
 -- 
 2.11.0
+
