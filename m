@@ -1,7 +1,7 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v2 10/19] crypto: arm64/sha256-neon - play nice with CONFIG_PREEMPT kernels
-Date: Mon,  4 Dec 2017 12:26:36 +0000
-Message-ID: <20171204122645.31535-11-ard.biesheuvel@linaro.org>
+Subject: [PATCH v2 11/19] arm64: assembler: add macro to conditionally yield the NEON under PREEMPT
+Date: Mon,  4 Dec 2017 12:26:37 +0000
+Message-ID: <20171204122645.31535-12-ard.biesheuvel@linaro.org>
 References: <20171204122645.31535-1-ard.biesheuvel@linaro.org>
 Cc: herbert@gondor.apana.org.au, linux-arm-kernel@lists.infradead.org,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>,
@@ -21,78 +21,83 @@ In-Reply-To: <20171204122645.31535-1-ard.biesheuvel@linaro.org>
 Sender: linux-rt-users-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Tweak the SHA256 update routines to invoke the SHA256 block transform
-block by block, to avoid excessive scheduling delays caused by the
-NEON algorithm running with preemption disabled.
+Add a support macro to conditionally yield the NEON (and thus the CPU)
+that may be called from the assembler code. Given that especially the
+instruction based accelerated crypto code may use very tight loops, add
+some parametrization so that the TIF_NEED_RESCHED flag test is only
+executed every so many loop iterations.
 
-Also, remove a stale comment which no longer applies now that kernel
-mode NEON is actually disallowed in some contexts.
+In some cases, yielding the NEON involves saving and restoring a non
+trivial amount of context (especially in the CRC folding algorithms),
+and so the macro is split into two, and the code in between is only
+executed when the yield path is taken, allowing the contex to be preserved.
+The second macro takes a label argument that marks the resume-from-yield
+path, which should restore the preserved context again.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm64/crypto/sha256-glue.c | 36 +++++++++++++-------
- 1 file changed, 23 insertions(+), 13 deletions(-)
+ arch/arm64/include/asm/assembler.h | 50 ++++++++++++++++++++
+ 1 file changed, 50 insertions(+)
 
-diff --git a/arch/arm64/crypto/sha256-glue.c b/arch/arm64/crypto/sha256-glue.c
-index b064d925fe2a..e8880ccdc71f 100644
---- a/arch/arm64/crypto/sha256-glue.c
-+++ b/arch/arm64/crypto/sha256-glue.c
-@@ -89,21 +89,32 @@ static struct shash_alg algs[] = { {
- static int sha256_update_neon(struct shash_desc *desc, const u8 *data,
- 			      unsigned int len)
- {
--	/*
--	 * Stacking and unstacking a substantial slice of the NEON register
--	 * file may significantly affect performance for small updates when
--	 * executing in interrupt context, so fall back to the scalar code
--	 * in that case.
--	 */
-+	struct sha256_state *sctx = shash_desc_ctx(desc);
+diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
+index aef72d886677..917b026d3e00 100644
+--- a/arch/arm64/include/asm/assembler.h
++++ b/arch/arm64/include/asm/assembler.h
+@@ -512,4 +512,54 @@ alternative_else_nop_endif
+ #endif
+ 	.endm
+ 
++/*
++ * yield_neon - check whether to yield to another runnable task from
++ *		kernel mode NEON code (running with preemption disabled)
++ *
++ * - Check whether the preempt count is exactly 1, in which case disabling
++ *   preemption once will make the task preemptible. If this is not the case,
++ *   yielding is pointless.
++ * - Check whether TIF_NEED_RESCHED is set, and if so, disable and re-enable
++ *   kernel mode NEON (which will trigger a reschedule), and branch to the
++ *   yield fixup code at @lbl.
++ */
++	.macro		yield_neon, lbl:req, ctr, order, stride, loop
++	yield_neon_pre	\ctr, \order, \stride, \loop
++	yield_neon_post	\lbl
++	.endm
 +
- 	if (!may_use_simd())
- 		return sha256_base_do_update(desc, data, len,
- 				(sha256_block_fn *)sha256_block_data_order);
- 
--	kernel_neon_begin();
--	sha256_base_do_update(desc, data, len,
--				(sha256_block_fn *)sha256_block_neon);
--	kernel_neon_end();
-+	while (len > 0) {
-+		unsigned int chunk = len;
++	.macro		yield_neon_pre, ctr, order=0, stride, loop=4444f
++#ifdef CONFIG_PREEMPT
++	/*
++	 * With some algorithms, it makes little sense to poll the
++	 * TIF_NEED_RESCHED flag after every iteration, so only perform
++	 * the check every 2^order strides.
++	 */
++	.if		\order > 1
++	.if		(\stride & (\stride - 1)) != 0
++	.error		"stride should be a power of 2"
++	.endif
++	tst		\ctr, #((1 << \order) * \stride - 1) & ~(\stride - 1)
++	b.ne		\loop
++	.endif
 +
-+		/*
-+		 * Don't hog the CPU for the entire time it takes to process all
-+		 * input when running on a preemptible kernel, but process the
-+		 * data block by block instead.
-+		 */
-+		if (IS_ENABLED(CONFIG_PREEMPT) &&
-+		    chunk + sctx->count % SHA256_BLOCK_SIZE > SHA256_BLOCK_SIZE)
-+			chunk = SHA256_BLOCK_SIZE -
-+				sctx->count % SHA256_BLOCK_SIZE;
- 
-+		kernel_neon_begin();
-+		sha256_base_do_update(desc, data, chunk,
-+				      (sha256_block_fn *)sha256_block_neon);
-+		kernel_neon_end();
-+		data += chunk;
-+		len -= chunk;
-+	}
- 	return 0;
- }
- 
-@@ -117,10 +128,9 @@ static int sha256_finup_neon(struct shash_desc *desc, const u8 *data,
- 		sha256_base_do_finalize(desc,
- 				(sha256_block_fn *)sha256_block_data_order);
- 	} else {
--		kernel_neon_begin();
- 		if (len)
--			sha256_base_do_update(desc, data, len,
--				(sha256_block_fn *)sha256_block_neon);
-+			sha256_update_neon(desc, data, len);
-+		kernel_neon_begin();
- 		sha256_base_do_finalize(desc,
- 				(sha256_block_fn *)sha256_block_neon);
- 		kernel_neon_end();
++	get_thread_info	x0
++	ldr		w1, [x0, #TSK_TI_PREEMPT]
++	ldr		x0, [x0, #TSK_TI_FLAGS]
++	cmp		w1, #1 // == PREEMPT_OFFSET
++	csel		x0, x0, xzr, eq
++	tbnz		x0, #TIF_NEED_RESCHED, 5555f	// needs rescheduling?
++4444:
++#endif
++	.subsection	1
++5555:
++	.endm
++
++	.macro		yield_neon_post, lbl:req
++	bl		kernel_neon_end
++	bl		kernel_neon_begin
++	b		\lbl
++	.previous
++	.endm
++
+ #endif	/* __ASM_ASSEMBLER_H */
 -- 
 2.11.0
 
