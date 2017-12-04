@@ -1,7 +1,7 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v2 19/19] DO NOT MERGE
-Date: Mon,  4 Dec 2017 12:26:45 +0000
-Message-ID: <20171204122645.31535-20-ard.biesheuvel@linaro.org>
+Subject: [PATCH v2 18/19] crypto: arm64/crct10dif-ce - yield NEON every 8 blocks of input
+Date: Mon,  4 Dec 2017 12:26:44 +0000
+Message-ID: <20171204122645.31535-19-ard.biesheuvel@linaro.org>
 References: <20171204122645.31535-1-ard.biesheuvel@linaro.org>
 Cc: herbert@gondor.apana.org.au, linux-arm-kernel@lists.infradead.org,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>,
@@ -16,74 +16,88 @@ Cc: herbert@gondor.apana.org.au, linux-arm-kernel@lists.infradead.org,
         Steven Rostedt <rostedt@goodmis.org>,
         Thomas Gleixner <tglx@linutronix.de>
 To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:44621 "EHLO
-        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753367AbdLDM1z (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 4 Dec 2017 07:27:55 -0500
-Received: by mail-wm0-f65.google.com with SMTP id t8so5457596wmc.3
-        for <linux-crypto@vger.kernel.org>; Mon, 04 Dec 2017 04:27:54 -0800 (PST)
+Return-path: <linux-rt-users-owner@vger.kernel.org>
 In-Reply-To: <20171204122645.31535-1-ard.biesheuvel@linaro.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-rt-users-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Test code to force a kernel_neon_end+begin sequence at every yield point,
-and wipe the entire NEON state before resuming the algorithm.
+Avoid excessive scheduling delays under a preemptible kernel by
+yielding the NEON every 8 blocks of input.
+
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm64/include/asm/assembler.h | 33 ++++++++++++++++++++
- 1 file changed, 33 insertions(+)
+ arch/arm64/crypto/crct10dif-ce-core.S | 39 ++++++++++++++++++--
+ 1 file changed, 35 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
-index 917b026d3e00..dfee20246592 100644
---- a/arch/arm64/include/asm/assembler.h
-+++ b/arch/arm64/include/asm/assembler.h
-@@ -549,6 +549,7 @@ alternative_else_nop_endif
- 	cmp		w1, #1 // == PREEMPT_OFFSET
- 	csel		x0, x0, xzr, eq
- 	tbnz		x0, #TIF_NEED_RESCHED, 5555f	// needs rescheduling?
-+	b		5555f
- 4444:
- #endif
- 	.subsection	1
-@@ -558,6 +559,38 @@ alternative_else_nop_endif
- 	.macro		yield_neon_post, lbl:req
- 	bl		kernel_neon_end
- 	bl		kernel_neon_begin
-+	movi		v0.16b, #0x55
-+	movi		v1.16b, #0x55
-+	movi		v2.16b, #0x55
-+	movi		v3.16b, #0x55
-+	movi		v4.16b, #0x55
-+	movi		v5.16b, #0x55
-+	movi		v6.16b, #0x55
-+	movi		v7.16b, #0x55
-+	movi		v8.16b, #0x55
-+	movi		v9.16b, #0x55
-+	movi		v10.16b, #0x55
-+	movi		v11.16b, #0x55
-+	movi		v12.16b, #0x55
-+	movi		v13.16b, #0x55
-+	movi		v14.16b, #0x55
-+	movi		v15.16b, #0x55
-+	movi		v16.16b, #0x55
-+	movi		v17.16b, #0x55
-+	movi		v18.16b, #0x55
-+	movi		v19.16b, #0x55
-+	movi		v20.16b, #0x55
-+	movi		v21.16b, #0x55
-+	movi		v22.16b, #0x55
-+	movi		v23.16b, #0x55
-+	movi		v24.16b, #0x55
-+	movi		v25.16b, #0x55
-+	movi		v26.16b, #0x55
-+	movi		v27.16b, #0x55
-+	movi		v28.16b, #0x55
-+	movi		v29.16b, #0x55
-+	movi		v30.16b, #0x55
-+	movi		v31.16b, #0x55
- 	b		\lbl
- 	.previous
- 	.endm
+diff --git a/arch/arm64/crypto/crct10dif-ce-core.S b/arch/arm64/crypto/crct10dif-ce-core.S
+index d5b5a8c038c8..d57067e80bae 100644
+--- a/arch/arm64/crypto/crct10dif-ce-core.S
++++ b/arch/arm64/crypto/crct10dif-ce-core.S
+@@ -74,13 +74,22 @@
+ 	.text
+ 	.cpu		generic+crypto
+ 
+-	arg1_low32	.req	w0
+-	arg2		.req	x1
+-	arg3		.req	x2
++	arg1_low32	.req	w19
++	arg2		.req	x20
++	arg3		.req	x21
+ 
+ 	vzr		.req	v13
+ 
+ ENTRY(crc_t10dif_pmull)
++	stp		x29, x30, [sp, #-176]!
++	mov		x29, sp
++	stp		x19, x20, [sp, #16]
++	stp		x21, x22, [sp, #32]
++
++	mov		arg1_low32, w0
++	mov		arg2, x1
++	mov		arg3, x2
++
+ 	movi		vzr.16b, #0		// init zero register
+ 
+ 	// adjust the 16-bit initial_crc value, scale it to 32 bits
+@@ -175,8 +184,27 @@ CPU_LE(	ext		v12.16b, v12.16b, v12.16b, #8	)
+ 	subs		arg3, arg3, #128
+ 
+ 	// check if there is another 64B in the buffer to be able to fold
+-	b.ge		_fold_64_B_loop
++	b.lt		_fold_64_B_end
++
++	yield_neon_pre	arg3, 3, 128, _fold_64_B_loop	// yield every 8 blocks
++	stp		q0, q1, [sp, #48]
++	stp		q2, q3, [sp, #80]
++	stp		q4, q5, [sp, #112]
++	stp		q6, q7, [sp, #144]
++	yield_neon_post	2f
++	b		_fold_64_B_loop
++
++	.subsection	1
++2:	ldp		q0, q1, [sp, #48]
++	ldp		q2, q3, [sp, #80]
++	ldp		q4, q5, [sp, #112]
++	ldp		q6, q7, [sp, #144]
++	ldr		q10, rk3
++	movi		vzr.16b, #0		// init zero register
++	b		_fold_64_B_loop
++	.previous
+ 
++_fold_64_B_end:
+ 	// at this point, the buffer pointer is pointing at the last y Bytes
+ 	// of the buffer the 64B of folded data is in 4 of the vector
+ 	// registers: v0, v1, v2, v3
+@@ -304,6 +332,9 @@ _barrett:
+ _cleanup:
+ 	// scale the result back to 16 bits
+ 	lsr		x0, x0, #16
++	ldp		x19, x20, [sp, #16]
++	ldp		x21, x22, [sp, #32]
++	ldp		x29, x30, [sp], #176
+ 	ret
+ 
+ _less_than_128:
 -- 
 2.11.0
+
