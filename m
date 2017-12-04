@@ -1,102 +1,67 @@
-From: =?UTF-8?q?=C5=81ukasz=20Stelmach?= <l.stelmach@samsung.com>
-Subject: [PATCH v3 3/3] ARM: dts: exynos: Add nodes for True Random Number
- Generator
-Date: Mon, 04 Dec 2017 13:53:51 +0100
-Message-ID: <20171204125351.26805-4-l.stelmach@samsung.com>
-References: <20171204125351.26805-1-l.stelmach@samsung.com>
-        <CGME20171204125416eucas1p141878ea587d807a2559c90f590eab7fb@eucas1p1.samsung.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: Re: [PATCH v3 1/3] dt-bindings: hwrng: Add Samsung Exynos 5250+ True
+ RNG bindings
+Date: Mon, 4 Dec 2017 14:13:49 +0100
+Message-ID: <CAJKOXPej1G6npvNSr9TP8DmWubtZpn6ONeNMN4Ax_RaafMiT7g@mail.gmail.com>
+References: <CGME20171204125414eucas1p1233c2c8ef5b637c3a4565af875515524@eucas1p1.samsung.com>
+ <20171204125351.26805-1-l.stelmach@samsung.com> <20171204125351.26805-2-l.stelmach@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8BIT
-Cc: =?UTF-8?q?=C5=81ukasz=20Stelmach?= <l.stelmach@samsung.com>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
-To: "Andrew F . Davis" <afd@ti.com>,
+Cc: "Andrew F . Davis" <afd@ti.com>,
         PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
         Rob Herring <robh+dt@kernel.org>,
         Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
         Kukjin Kim <kgene@kernel.org>, devicetree@vger.kernel.org,
         linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-reply-to: <20171204125351.26805-1-l.stelmach@samsung.com>
-In-reply-to: <20171204120429.22892-1-l.stelmach@samsung.com>
-Sender: linux-kernel-owner@vger.kernel.org
+        linux-kernel@vger.kernel.org,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+To: =?UTF-8?Q?=C5=81ukasz_Stelmach?= <l.stelmach@samsung.com>
+Return-path: <linux-samsung-soc-owner@vger.kernel.org>
+In-Reply-To: <20171204125351.26805-2-l.stelmach@samsung.com>
+Sender: linux-samsung-soc-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add nodes for the True Random Number Generator found in Samsung Exynos
-5250+ SoCs.
+On Mon, Dec 4, 2017 at 1:53 PM, Łukasz Stelmach <l.stelmach@samsung.com> wrote:
+> Add binding documentation for the True Random Number Generator
+> found on Samsung Exynos 5250+ SoCs.
+>
+> Signed-off-by: Łukasz Stelmach <l.stelmach@samsung.com>
+> ---
+>  .../devicetree/bindings/rng/samsung,exynos5250-trng.txt | 17 +++++++++++++++++
+>  1 file changed, 17 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
+>
+> diff --git a/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt b/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
+> new file mode 100644
+> index 000000000000..5a613a4ec780
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
+> @@ -0,0 +1,17 @@
+> +Exynos True Random Number Generator
+> +
+> +Required properties:
+> +
+> +- compatible  : Should be "samsung,exynos5250-trng".
+> +- reg         : Specifies base physical address and size of the registers map.
+> +- clocks      : Phandle to clock-controller plus clock-specifier pair.
+> +- clock-names : "secss" as a clock name.
+> +
+> +Example:
+> +
+> +       rng@10830600 {
+> +               compatible = "samsung,exynos5250-trng";
+> +               reg = <0x10830600 0x100>;
+> +               clocks = <&clock CLK_SSS>;
+> +               clock-names = "secss";
+> +       };
+> --
+> 2.11.0
 
-Signed-off-by: Łukasz Stelmach <l.stelmach@samsung.com>
----
- arch/arm/boot/dts/exynos5.dtsi    | 5 +++++
- arch/arm/boot/dts/exynos5250.dtsi | 5 +++++
- arch/arm/boot/dts/exynos5410.dtsi | 5 +++++
- arch/arm/boot/dts/exynos5420.dtsi | 5 +++++
- 4 files changed, 20 insertions(+)
+Mine and Rob's tags disappeared and I think you did not introduce any
+major changes here, right?
 
-diff --git a/arch/arm/boot/dts/exynos5.dtsi b/arch/arm/boot/dts/exynos5.dtsi
-index 33f929c1dda9..e0c91ff4442c 100644
---- a/arch/arm/boot/dts/exynos5.dtsi
-+++ b/arch/arm/boot/dts/exynos5.dtsi
-@@ -215,5 +215,10 @@
- 		      compatible = "samsung,exynos5250-prng";
- 		      reg = <0x10830400 0x200>;
- 		};
-+
-+		trng: rng@10830600 {
-+		      compatible = "samsung,exynos5250-trng";
-+		      reg = <0x10830600 0x100>;
-+		};
- 	};
- };
-diff --git a/arch/arm/boot/dts/exynos5250.dtsi b/arch/arm/boot/dts/exynos5250.dtsi
-index 51aa83ba8c87..38627e8164a0 100644
---- a/arch/arm/boot/dts/exynos5250.dtsi
-+++ b/arch/arm/boot/dts/exynos5250.dtsi
-@@ -1086,4 +1086,9 @@
- 	clock-names = "secss";
- };
- 
-+&trng {
-+	clocks = <&clock CLK_SSS>;
-+	clock-names = "secss";
-+};
-+
- #include "exynos5250-pinctrl.dtsi"
-diff --git a/arch/arm/boot/dts/exynos5410.dtsi b/arch/arm/boot/dts/exynos5410.dtsi
-index 1604cb1b837d..aa8b14eda662 100644
---- a/arch/arm/boot/dts/exynos5410.dtsi
-+++ b/arch/arm/boot/dts/exynos5410.dtsi
-@@ -384,6 +384,11 @@
- 		  3 0 0x07000000 0x20000>;
- };
- 
-+&trng {
-+	clocks = <&clock CLK_SSS>;
-+	clock-names = "secss";
-+};
-+
- &usbdrd3_0 {
- 	clocks = <&clock CLK_USBD300>;
- 	clock-names = "usbdrd30";
-diff --git a/arch/arm/boot/dts/exynos5420.dtsi b/arch/arm/boot/dts/exynos5420.dtsi
-index 31c77ea9123d..6c8cec9d564a 100644
---- a/arch/arm/boot/dts/exynos5420.dtsi
-+++ b/arch/arm/boot/dts/exynos5420.dtsi
-@@ -1459,6 +1459,11 @@
- 	clock-names = "secss";
- };
- 
-+&trng {
-+	clocks = <&clock CLK_SSS>;
-+	clock-names = "secss";
-+};
-+
- &usbdrd3_0 {
- 	clocks = <&clock CLK_USBD300>;
- 	clock-names = "usbdrd30";
--- 
-2.11.0
+Best regards,
+Krzysztof
