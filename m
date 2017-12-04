@@ -1,56 +1,45 @@
-From: Eduardo Valentin <eduval@amazon.com>
-Subject: Re: [PATCH] treewide: remove duplicate includes
-Date: Mon, 4 Dec 2017 11:21:23 -0800
-Message-ID: <20171204192123.GA1463@u40b0340c692b58f6553c.ant.amazon.com>
-References: <1512337779-16842-1-git-send-email-pravin.shedge4linux@gmail.com>
+From: Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH v3 1/3] dt-bindings: hwrng: Add Samsung Exynos 5250+ True
+ RNG bindings
+Date: Mon, 4 Dec 2017 14:27:58 -0600
+Message-ID: <20171204202758.uw4prqbnuvwt6qls@rob-hp-laptop>
+References: <20171204125351.26805-1-l.stelmach@samsung.com>
+ <CGME20171204125414eucas1p1233c2c8ef5b637c3a4565af875515524@eucas1p1.samsung.com>
+ <20171204125351.26805-2-l.stelmach@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: devel@driverdev.osuosl.org, linux-security-module@vger.kernel.org,
- sstabellini@kernel.org, gregkh@linuxfoundation.org, x86@kernel.org,
- ast@kernel.org, linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
- mcgrof@kernel.org, mhiramat@kernel.org, linux-kselftest@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, namhyung@kernel.org, mchehab@kernel.org,
- shuah@kernel.org, davem@davemloft.net, linux-crypto@vger.kernel.org
-To: Pravin Shedge <pravin.shedge4linux@gmail.com>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: "Andrew F . Davis" <afd@ti.com>,
+        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Kukjin Kim <kgene@kernel.org>, devicetree@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+To: =?utf-8?Q?=C5=81ukasz?= Stelmach <l.stelmach@samsung.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-oi0-f54.google.com ([209.85.218.54]:46008 "EHLO
+        mail-oi0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752160AbdLDU2B (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 4 Dec 2017 15:28:01 -0500
 Content-Disposition: inline
-In-Reply-To: <1512337779-16842-1-git-send-email-pravin.shedge4linux@gmail.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20171204125351.26805-2-l.stelmach@samsung.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hello,
+On Mon, Dec 04, 2017 at 01:53:49PM +0100, Łukasz Stelmach wrote:
+> Add binding documentation for the True Random Number Generator
+> found on Samsung Exynos 5250+ SoCs.
+> 
+> Signed-off-by: Łukasz Stelmach <l.stelmach@samsung.com>
+> ---
+>  .../devicetree/bindings/rng/samsung,exynos5250-trng.txt | 17 +++++++++++++++++
+>  1 file changed, 17 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
 
-On Mon, Dec 04, 2017 at 03:19:39AM +0530, Pravin Shedge wrote:
-<cut>
-
-> diff --git a/drivers/thermal/of-thermal.c b/drivers/thermal/of-thermal.c
-> index d04ec3b..e09f035 100644
-> --- a/drivers/thermal/of-thermal.c
-> +++ b/drivers/thermal/of-thermal.c
-> @@ -30,7 +30,6 @@
->  #include <linux/err.h>
->  #include <linux/export.h>
->  #include <linux/string.h>
-> -#include <linux/thermal.h>
->  
->  #include "thermal_core.h"
->  
-
-No issues with this but,
-
-Please send a separate patch to linux-pm@vger.kernel.org and copy edubezva@gmail.com
-
-thanks,
-
--- 
-All the best,
-Eduardo Valentin
+I acked v1 (and so did Krzysztof). You added them in v2, but 
+dropped here? 
