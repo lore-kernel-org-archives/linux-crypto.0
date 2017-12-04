@@ -1,17 +1,16 @@
 From: =?UTF-8?q?=C5=81ukasz=20Stelmach?= <l.stelmach-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
-Subject: [PATCH v3 1/3] dt-bindings: hwrng: Add Samsung Exynos 5250+ True
- RNG bindings
-Date: Mon, 04 Dec 2017 13:53:49 +0100
-Message-ID: <20171204125351.26805-2-l.stelmach@samsung.com>
-References: <20171204125351.26805-1-l.stelmach@samsung.com>
-        <CGME20171204125414eucas1p1233c2c8ef5b637c3a4565af875515524@eucas1p1.samsung.com>
+Subject: [PATCH v3 0/3] True RNG driver for Samsung Exynos 5250+ SoCs
+Date: Mon, 04 Dec 2017 13:53:48 +0100
+Message-ID: <20171204125351.26805-1-l.stelmach@samsung.com>
+References: <20171204120429.22892-1-l.stelmach@samsung.com>
+        <CGME20171204125413eucas1p17e7b90e3eab244e716ea3b0023ff9a41@eucas1p1.samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8BIT
 Cc: =?UTF-8?q?=C5=81ukasz=20Stelmach?= <l.stelmach-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>,
         Marek Szyprowski <m.szyprowski-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>,
         Bartlomiej Zolnierkiewicz <b.zolnierkie-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
-To: "Andrew F . Davis" <afd-l0cyMroinI0@public.gmane.org>,
+To: "Andrew F. Davis" <afd-l0cyMroinI0@public.gmane.org>,
         PrasannaKumar Muralidharan <prasannatsmkumar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
         Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
         Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org>,
@@ -21,43 +20,82 @@ To: "Andrew F . Davis" <afd-l0cyMroinI0@public.gmane.org>,
         linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-samsung-soc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
         linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-reply-to: <20171204125351.26805-1-l.stelmach-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
 In-reply-to: <20171204120429.22892-1-l.stelmach-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
 Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add binding documentation for the True Random Number Generator
-found on Samsung Exynos 5250+ SoCs.
+Hello.
 
-Signed-off-by: ≈Åukasz Stelmach <l.stelmach-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
----
- .../devicetree/bindings/rng/samsung,exynos5250-trng.txt | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+The following patches add support for the true random number generator
+found in Samsung Exynos 5250+ SoCs.
+
+Patch #1 adds documentation for devicetree bindings.
+
+Patch #2 introduces the driver and appropriate changes in Makefile and Kconfig.
+
+Patch #3 adds nodes in devicetree files for Exynos SoCs (requires
+https://git.kernel.org/pub/scm/linux/kernel/git/krzk/linux.git/commit/?id=cdd745c8c76b02471d88f467c44a3d4eb431aa0b).
+
+Changes in v3:
+
+- Changed node-name in device-tree bindings according to from Krzysztof
+  KozÇ≥owski's recommendation.
+- Fixed name and added EXYNOS_ in EXYNOS_TRNG_CTRL_RNGEN
+- Removed unnecessary label and simplifed the abnormal exit path in
+  exynos_trng_probe()
+- Replaced __raw_{readl,writel}() with {readl,writel}_relaxed() (thanks
+  PrasannaKumar Muralidharan)
+
+Changes in v2:
+- Fixed indentation in drivers/char/hw_random/Kconfig.
+- Defined TRNG_CTRL_RGNEN.
+- Removed global variable exynos_trng_dev.
+- Removed exynos_trng_{set,get}_reg() functions.
+- Used the min_t() macro instead of the ternary operator in
+  exynos_trng_do_read().
+- Moved trng initialisation to the variable declaration in
+  exynos_trng_init().
+- Fixed comment formating.
+- Removed unnecessary "TODO" comments.
+- Return ENOMEM, if devm_kzalloc() devm_kstrdup() fail.
+- Rephrased and unified error messages in exynos_trng_probe().
+- Removed nullification of trng->mem.
+- Added err_pm_get label at the end of exynos_trng_probe().
+- Removed double error message at the end of exynos_trng_probe().
+- Implemented exynos_trng_remove().
+
+v2 available here:
+
+https://www.spinics.net/lists/linux-samsung-soc/msg61280.html
+https://patchwork.kernel.org/patch/10076225/
+https://patchwork.kernel.org/patch/10076227/
+https://patchwork.kernel.org/patch/10076237/
+
+v1 can be found:
+
+https://www.spinics.net/lists/linux-samsung-soc/msg61253.html
+https://patchwork.kernel.org/patch/10072967/
+https://patchwork.kernel.org/patch/10072971/
+https://patchwork.kernel.org/patch/10072963/
+
+Ç£ukasz Stelmach (3):
+  dt-bindings: hwrng: Add Samsung Exynos 5250+ True RNG bindings
+  hwrng: exynos - add Samsung Exynos True RNG driver
+  ARM: dts: exynos: Add nodes for True Random Number Generator
+
+ .../bindings/rng/samsung,exynos5250-trng.txt       |  17 ++
+ MAINTAINERS                                        |   7 +
+ arch/arm/boot/dts/exynos5.dtsi                     |   5 +
+ arch/arm/boot/dts/exynos5250.dtsi                  |   5 +
+ arch/arm/boot/dts/exynos5410.dtsi                  |   5 +
+ arch/arm/boot/dts/exynos5420.dtsi                  |   5 +
+ drivers/char/hw_random/Kconfig                     |  12 +
+ drivers/char/hw_random/Makefile                    |   1 +
+ drivers/char/hw_random/exynos-trng.c               | 245 +++++++++++++++++++++
+ 9 files changed, 302 insertions(+)
  create mode 100644 Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
+ create mode 100644 drivers/char/hw_random/exynos-trng.c
 
-diff --git a/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt b/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
-new file mode 100644
-index 000000000000..5a613a4ec780
---- /dev/null
-+++ b/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
-@@ -0,0 +1,17 @@
-+Exynos True Random Number Generator
-+
-+Required properties:
-+
-+- compatible  : Should be "samsung,exynos5250-trng".
-+- reg         : Specifies base physical address and size of the registers map.
-+- clocks      : Phandle to clock-controller plus clock-specifier pair.
-+- clock-names : "secss" as a clock name.
-+
-+Example:
-+
-+	rng@10830600 {
-+		compatible = "samsung,exynos5250-trng";
-+		reg = <0x10830600 0x100>;
-+		clocks = <&clock CLK_SSS>;
-+		clock-names = "secss";
-+	};
 -- 
 2.11.0
 
