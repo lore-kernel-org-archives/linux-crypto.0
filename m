@@ -1,73 +1,103 @@
-From: Pravin Shedge <pravin.shedge4linux@gmail.com>
-Subject: [PATCH 02/45] drivers: crypto: remove duplicate includes
-Date: Tue,  5 Dec 2017 07:27:22 +0530
-Message-ID: <1512439057-15443-1-git-send-email-pravin.shedge4linux@gmail.com>
-Cc: pravin.shedge4linux@gmail.com,
+From: =?utf-8?Q?=C5=81ukasz_Stelmach?= <l.stelmach@samsung.com>
+Subject: Re: [PATCH v3 1/3] dt-bindings: hwrng: Add Samsung Exynos 5250+
+ True RNG bindings
+Date: Tue, 05 Dec 2017 10:30:17 +0100
+Message-ID: <878tehbjyu.fsf%l.stelmach@samsung.com>
+References: <CAJKOXPej1G6npvNSr9TP8DmWubtZpn6ONeNMN4Ax_RaafMiT7g@mail.gmail.com>
+        <CGME20171205093028eucas1p1fb6d7b8bde6cd5e3a0bfca8ddafe8a31@eucas1p1.samsung.com>
+Mime-Version: 1.0
+Content-Type: multipart/signed; boundary="=-=-="; micalg="pgp-sha256";
+        protocol="application/pgp-signature"
+Cc: "Andrew F . Davis" <afd@ti.com>,
+        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
+        Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>,
-        Corentin LABBE <clabbe.montjoie@gmail.com>,
-        Steve Lin <steven.lin1@broadcom.com>,
-        Rob Rice <rob.rice@broadcom.com>,
-        raveendra padasalagi <raveendra.padasalagi@broadcom.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        "Gustavo A. R. Silva" <garsilva@embeddedor.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Kate Stewart <kstewart@linuxfoundation.org>,
-        Srikanth Jampala <Jampala.Srikanth@cavium.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: unlisted-recipients:; (no To-header on input)
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+        Kukjin Kim <kgene@kernel.org>, devicetree@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+To: Krzysztof Kozlowski <krzk@kernel.org>,
+        Rob Herring <robh+dt@kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:41022 "EHLO
+        mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752900AbdLEJad (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 5 Dec 2017 04:30:33 -0500
+In-reply-to: <CAJKOXPej1G6npvNSr9TP8DmWubtZpn6ONeNMN4Ax_RaafMiT7g@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-These duplicate includes have been found with scripts/checkincludes.pl but
-they have been removed manually to avoid removing false positives.
+--=-=-=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Pravin Shedge <pravin.shedge4linux@gmail.com>
----
- drivers/crypto/bcm/cipher.c                  | 1 -
- drivers/crypto/cavium/nitrox/nitrox_reqmgr.c | 1 -
- drivers/crypto/ccp/ccp-crypto-aes-galois.c   | 1 -
- 3 files changed, 3 deletions(-)
+It was <2017-12-04 pon 14:13>, when Krzysztof Kozlowski wrote:
+> On Mon, Dec 4, 2017 at 1:53 PM, =C5=81ukasz Stelmach <l.stelmach@samsung.=
+com> wrote:
+>> Add binding documentation for the True Random Number Generator
+>> found on Samsung Exynos 5250+ SoCs.
+>>
+>> Signed-off-by: =C5=81ukasz Stelmach <l.stelmach@samsung.com>
+>> ---
+>>  .../devicetree/bindings/rng/samsung,exynos5250-trng.txt | 17 ++++++++++=
++++++++
+>>  1 file changed, 17 insertions(+)
+>>  create mode 100644 Documentation/devicetree/bindings/rng/samsung,exynos=
+5250-trng.txt
+>>
+>> diff --git
+>> a/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
+>> b/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
+>> new file mode 100644
+>> index 000000000000..5a613a4ec780
+>> --- /dev/null
+>> +++ b/Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
+>> @@ -0,0 +1,17 @@
+>> +Exynos True Random Number Generator
+>> +
+>> +Required properties:
+>> +
+>> +- compatible  : Should be "samsung,exynos5250-trng".
+>> +- reg         : Specifies base physical address and size of the registe=
+rs map.
+>> +- clocks      : Phandle to clock-controller plus clock-specifier pair.
+>> +- clock-names : "secss" as a clock name.
+>> +
+>> +Example:
+>> +
+>> +       rng@10830600 {
+>> +               compatible =3D "samsung,exynos5250-trng";
+>> +               reg =3D <0x10830600 0x100>;
+>> +               clocks =3D <&clock CLK_SSS>;
+>> +               clock-names =3D "secss";
+>> +       };
+>> --
+>> 2.11.0
+>
+> Mine and Rob's tags disappeared and I think you did not introduce any
+> major changes here, right?
 
-diff --git a/drivers/crypto/bcm/cipher.c b/drivers/crypto/bcm/cipher.c
-index ce70b44..2b75f95 100644
---- a/drivers/crypto/bcm/cipher.c
-+++ b/drivers/crypto/bcm/cipher.c
-@@ -42,7 +42,6 @@
- #include <crypto/authenc.h>
- #include <crypto/skcipher.h>
- #include <crypto/hash.h>
--#include <crypto/aes.h>
- #include <crypto/sha3.h>
- 
- #include "util.h"
-diff --git a/drivers/crypto/cavium/nitrox/nitrox_reqmgr.c b/drivers/crypto/cavium/nitrox/nitrox_reqmgr.c
-index 4addc23..deaefd5 100644
---- a/drivers/crypto/cavium/nitrox/nitrox_reqmgr.c
-+++ b/drivers/crypto/cavium/nitrox/nitrox_reqmgr.c
-@@ -6,7 +6,6 @@
- #include "nitrox_dev.h"
- #include "nitrox_req.h"
- #include "nitrox_csr.h"
--#include "nitrox_req.h"
- 
- /* SLC_STORE_INFO */
- #define MIN_UDD_LEN 16
-diff --git a/drivers/crypto/ccp/ccp-crypto-aes-galois.c b/drivers/crypto/ccp/ccp-crypto-aes-galois.c
-index ff02b71..ca1f0d7 100644
---- a/drivers/crypto/ccp/ccp-crypto-aes-galois.c
-+++ b/drivers/crypto/ccp/ccp-crypto-aes-galois.c
-@@ -21,7 +21,6 @@
- #include <crypto/ctr.h>
- #include <crypto/gcm.h>
- #include <crypto/scatterwalk.h>
--#include <linux/delay.h>
- 
- #include "ccp-crypto.h"
- 
--- 
-2.7.4
+A very experienced kernel developer adviced me to remove them.
+
+=2D-=20
+=C5=81ukasz Stelmach
+Samsung R&D Institute Poland
+Samsung Electronics
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBCAAGBQJaJmcpAAoJELCuHpyYpYAQIMcH/A+XAV8SDe54xvsq+ScOwD+r
+FqyPp/GJFhW8rCv9PrdAwV12YeEv1US/8FpdGnbVhU0jYPNSs3dy7303EN4XO4DI
+oZR6WZf15R9kDbVY0iEsOkwGLYHPRS8FM0D3MSf5WF3daFXo/sX1aZnOCjdKwPn4
+Z5IDNJwTrKSQWJuhKzb7amLz/HxT3fti9obtqgPLCcL86m8k4MQJK0OZcKAqlMKh
+jqangMayS8l1i1AkXdP7M14y4kD/H6MH40aDhZs/qdokPc0rClq8SCt+5eOFEmOC
+vFv24LhjZ29mLRFYoPJRrHzIJcM3eMRlR0rtagcVtDuSSsRezG1t7GaUfjYp63s=
+=Mxhb
+-----END PGP SIGNATURE-----
+--=-=-=--
