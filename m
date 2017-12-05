@@ -1,7 +1,7 @@
 From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: [Part2 PATCH v9 19/38] crypto: ccp: Implement SEV_PEK_CERT_IMPORT ioctl command
-Date: Mon,  4 Dec 2017 19:04:19 -0600
-Message-ID: <20171205010438.5773-20-brijesh.singh@amd.com>
+Subject: [Part2 PATCH v9 18/38] crypto: ccp: Implement SEV_PEK_CSR ioctl command
+Date: Mon,  4 Dec 2017 19:04:18 -0600
+Message-ID: <20171205010438.5773-19-brijesh.singh@amd.com>
 References: <20171205010438.5773-1-brijesh.singh@amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -16,17 +16,17 @@ Cc: bp@alien8.de, Brijesh Singh <brijesh.singh@amd.com>,
         linux-crypto@vger.kernel.org
 To: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn3nam01on0083.outbound.protection.outlook.com ([104.47.33.83]:27456
-        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
+Received: from mail-by2nam03on0057.outbound.protection.outlook.com ([104.47.42.57]:42880
+        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752325AbdLEBFl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 4 Dec 2017 20:05:41 -0500
+        id S1752484AbdLEBFk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 4 Dec 2017 20:05:40 -0500
 In-Reply-To: <20171205010438.5773-1-brijesh.singh@amd.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The SEV_PEK_CERT_IMPORT command can be used to import the signed PEK
-certificate. The command is defined in SEV spec section 5.8.
+The SEV_PEK_CSR command can be used to generate a PEK certificate
+signing request. The command is defined in SEV spec section 5.7.
 
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: "Radim Krčmář" <rkrcmar@redhat.com>
@@ -40,51 +40,23 @@ Cc: linux-kernel@vger.kernel.org
 Improvements-by: Borislav Petkov <bp@suse.de>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 Acked-by: Gary R Hook <gary.hook@amd.com>
-Reviewed-by: Borislav Petkov <bp@suse.de>
 ---
- drivers/crypto/ccp/psp-dev.c | 81 ++++++++++++++++++++++++++++++++++++++++++++
- include/linux/psp-sev.h      |  4 +++
- 2 files changed, 85 insertions(+)
+ drivers/crypto/ccp/psp-dev.c | 66 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 66 insertions(+)
 
 diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
-index c3906bbdb69b..9d1c4600db19 100644
+index fd3daf0a1176..c3906bbdb69b 100644
 --- a/drivers/crypto/ccp/psp-dev.c
 +++ b/drivers/crypto/ccp/psp-dev.c
-@@ -365,6 +365,84 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp)
- 	return ret;
+@@ -302,6 +302,69 @@ static int sev_ioctl_do_pek_pdh_gen(int cmd, struct sev_issue_cmd *argp)
+ 	return __sev_do_cmd_locked(cmd, 0, &argp->error);
  }
  
-+void *psp_copy_user_blob(u64 __user uaddr, u32 len)
++static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp)
 +{
-+	void *data;
-+
-+	if (!uaddr || !len)
-+		return ERR_PTR(-EINVAL);
-+
-+	/* verify that blob length does not exceed our limit */
-+	if (len > SEV_FW_BLOB_MAX_SIZE)
-+		return ERR_PTR(-EINVAL);
-+
-+	data = kmalloc(len, GFP_KERNEL);
-+	if (!data)
-+		return ERR_PTR(-ENOMEM);
-+
-+	if (copy_from_user(data, (void __user *)(uintptr_t)uaddr, len))
-+		goto e_free;
-+
-+	return data;
-+
-+e_free:
-+	kfree(data);
-+	return ERR_PTR(-EFAULT);
-+}
-+EXPORT_SYMBOL_GPL(psp_copy_user_blob);
-+
-+static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp)
-+{
-+	struct sev_user_data_pek_cert_import input;
-+	struct sev_data_pek_cert_import *data;
-+	void *pek_blob, *oca_blob;
++	struct sev_user_data_pek_csr input;
++	struct sev_data_pek_csr *data;
++	void *blob = NULL;
 +	int ret;
 +
 +	if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
@@ -94,39 +66,50 @@ index c3906bbdb69b..9d1c4600db19 100644
 +	if (!data)
 +		return -ENOMEM;
 +
-+	/* copy PEK certificate blobs from userspace */
-+	pek_blob = psp_copy_user_blob(input.pek_cert_address, input.pek_cert_len);
-+	if (IS_ERR(pek_blob)) {
-+		ret = PTR_ERR(pek_blob);
++	/* userspace wants to query CSR length */
++	if (!input.address || !input.length)
++		goto cmd;
++
++	/* allocate a physically contiguous buffer to store the CSR blob */
++	if (!access_ok(VERIFY_WRITE, input.address, input.length) ||
++	    input.length > SEV_FW_BLOB_MAX_SIZE) {
++		ret = -EFAULT;
 +		goto e_free;
 +	}
 +
-+	data->pek_cert_address = __psp_pa(pek_blob);
-+	data->pek_cert_len = input.pek_cert_len;
-+
-+	/* copy PEK certificate blobs from userspace */
-+	oca_blob = psp_copy_user_blob(input.oca_cert_address, input.oca_cert_len);
-+	if (IS_ERR(oca_blob)) {
-+		ret = PTR_ERR(oca_blob);
-+		goto e_free_pek;
++	blob = kmalloc(input.length, GFP_KERNEL);
++	if (!blob) {
++		ret = -ENOMEM;
++		goto e_free;
 +	}
 +
-+	data->oca_cert_address = __psp_pa(oca_blob);
-+	data->oca_cert_len = input.oca_cert_len;
++	data->address = __psp_pa(blob);
++	data->len = input.length;
 +
-+	/* If platform is not in INIT state then transition it to INIT */
-+	if (psp_master->sev_state != SEV_STATE_INIT) {
++cmd:
++	if (psp_master->sev_state == SEV_STATE_UNINIT) {
 +		ret = __sev_platform_init_locked(&argp->error);
 +		if (ret)
-+			goto e_free_oca;
++			goto e_free_blob;
 +	}
 +
-+	ret = __sev_do_cmd_locked(SEV_CMD_PEK_CERT_IMPORT, data, &argp->error);
++	ret = __sev_do_cmd_locked(SEV_CMD_PEK_CSR, data, &argp->error);
 +
-+e_free_oca:
-+	kfree(oca_blob);
-+e_free_pek:
-+	kfree(pek_blob);
++	 /* If we query the CSR length, FW responded with expected data. */
++	input.length = data->len;
++
++	if (copy_to_user((void __user *)argp->data, &input, sizeof(input))) {
++		ret = -EFAULT;
++		goto e_free_blob;
++	}
++
++	if (blob) {
++		if (copy_to_user((void __user *)input.address, blob, input.length))
++			ret = -EFAULT;
++	}
++
++e_free_blob:
++	kfree(blob);
 +e_free:
 +	kfree(data);
 +	return ret;
@@ -135,37 +118,15 @@ index c3906bbdb69b..9d1c4600db19 100644
  static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
  {
  	void __user *argp = (void __user *)arg;
-@@ -402,6 +480,9 @@ static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
- 	case SEV_PEK_CSR:
- 		ret = sev_ioctl_do_pek_csr(&input);
+@@ -336,6 +399,9 @@ static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
+ 	case SEV_PDH_GEN:
+ 		ret = sev_ioctl_do_pek_pdh_gen(SEV_CMD_PDH_GEN, &input);
  		break;
-+	case SEV_PEK_CERT_IMPORT:
-+		ret = sev_ioctl_do_pek_import(&input);
++	case SEV_PEK_CSR:
++		ret = sev_ioctl_do_pek_csr(&input);
 +		break;
  	default:
  		ret = -EINVAL;
  		goto out;
-diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-index 0b6dd306d88b..93addfa34061 100644
---- a/include/linux/psp-sev.h
-+++ b/include/linux/psp-sev.h
-@@ -576,6 +576,8 @@ int sev_guest_df_flush(int *error);
-  */
- int sev_guest_decommission(struct sev_data_decommission *data, int *error);
- 
-+void *psp_copy_user_blob(u64 __user uaddr, u32 len);
-+
- #else	/* !CONFIG_CRYPTO_DEV_SP_PSP */
- 
- static inline int
-@@ -597,6 +599,8 @@ static inline int sev_guest_df_flush(int *error) { return -ENODEV; }
- static inline int
- sev_issue_cmd_external_user(struct file *filep, unsigned int id, void *data, int *error) { return -ENODEV; }
- 
-+static inline void *psp_copy_user_blob(u64 __user uaddr, u32 len) { return ERR_PTR(-EINVAL); }
-+
- #endif	/* CONFIG_CRYPTO_DEV_SP_PSP */
- 
- #endif	/* __PSP_SEV_H__ */
 -- 
 2.9.5
