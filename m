@@ -1,63 +1,94 @@
 From: Logan Gunthorpe <logang@deltatee.com>
-Subject: [PATCH v9 1/8] drm/tilcdc: ensure nonatomic iowrite64 is not used
-Date: Tue,  5 Dec 2017 16:30:51 -0700
-Message-ID: <20171205233058.5365-2-logang@deltatee.com>
+Subject: [PATCH v9 7/8] crypto: caam: cleanup CONFIG_64BIT ifdefs when using io{read|write}64
+Date: Tue,  5 Dec 2017 16:30:57 -0700
+Message-ID: <20171205233058.5365-8-logang@deltatee.com>
 References: <20171205233058.5365-1-logang@deltatee.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Cc: Arnd Bergmann <arnd@arndb.de>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Andy Shevchenko <andy.shevchenko@gmail.com>,
         =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
         Logan Gunthorpe <logang@deltatee.com>,
-        Jyri Sarha <jsarha@ti.com>,
-        Tomi Valkeinen <tomi.valkeinen@ti.com>,
-        David Airlie <airlied@linux.ie>
+        Dan Douglass <dan.douglass@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
 To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
         linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from ale.deltatee.com ([207.54.116.67]:54068 "EHLO ale.deltatee.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753011AbdLEXbV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 5 Dec 2017 18:31:21 -0500
 In-Reply-To: <20171205233058.5365-1-logang@deltatee.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Add a check to ensure iowrite64 is only used if it is atomic.
-
-It was decided in [1] that the tilcdc driver should not be using an
-atomic operation (so it was left out of this patchset). However, it turns
-out that through the drm code, a nonatomic header is actually included:
-
-include/linux/io-64-nonatomic-lo-hi.h
-is included from include/drm/drm_os_linux.h:9:0,
-            from include/drm/drmP.h:74,
-            from include/drm/drm_modeset_helper.h:26,
-            from include/drm/drm_atomic_helper.h:33,
-            from drivers/gpu/drm/tilcdc/tilcdc_crtc.c:19:
-
-And thus, without this change, this patchset would inadvertantly
-change the behaviour of the tilcdc driver.
-
-[1] lkml.kernel.org/r/CAK8P3a2HhO_zCnsTzq7hmWSz5La5Thu19FWZpun16iMnyyNreQ@mail.gmail.com
+Clean up the extra ifdefs which defined the wr_reg64 and rd_reg64
+functions in non-64bit cases in favour of the new common
+io-64-nonatomic-lo-hi header.
 
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
-Cc: Jyri Sarha <jsarha@ti.com>
-Cc: Arnd Bergmann <arnd@arndb.de>
-Cc: Tomi Valkeinen <tomi.valkeinen@ti.com>
-Cc: David Airlie <airlied@linux.ie>
+Cc: Andy Shevchenko <andy.shevchenko@gmail.com>
+Cc: Horia Geantă <horia.geanta@nxp.com>
+Cc: Dan Douglass <dan.douglass@nxp.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
 ---
- drivers/gpu/drm/tilcdc/tilcdc_regs.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/crypto/caam/regs.h | 26 +-------------------------
+ 1 file changed, 1 insertion(+), 25 deletions(-)
 
-diff --git a/drivers/gpu/drm/tilcdc/tilcdc_regs.h b/drivers/gpu/drm/tilcdc/tilcdc_regs.h
-index 9d528c0a67a4..5048ebb86835 100644
---- a/drivers/gpu/drm/tilcdc/tilcdc_regs.h
-+++ b/drivers/gpu/drm/tilcdc/tilcdc_regs.h
-@@ -133,7 +133,7 @@ static inline void tilcdc_write64(struct drm_device *dev, u32 reg, u64 data)
- 	struct tilcdc_drm_private *priv = dev->dev_private;
- 	volatile void __iomem *addr = priv->mmio + reg;
+diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
+index fee363865d88..ec6528e5ce9d 100644
+--- a/drivers/crypto/caam/regs.h
++++ b/drivers/crypto/caam/regs.h
+@@ -10,7 +10,7 @@
  
--#ifdef iowrite64
-+#if defined(iowrite64) && !defined(iowrite64_is_nonatomic)
- 	iowrite64(data, addr);
- #else
- 	__iowmb();
+ #include <linux/types.h>
+ #include <linux/bitops.h>
+-#include <linux/io.h>
++#include <linux/io-64-nonatomic-hi-lo.h>
+ 
+ /*
+  * Architecture-specific register access methods
+@@ -136,7 +136,6 @@ static inline void clrsetbits_32(void __iomem *reg, u32 clear, u32 set)
+  *    base + 0x0000 : least-significant 32 bits
+  *    base + 0x0004 : most-significant 32 bits
+  */
+-#ifdef CONFIG_64BIT
+ static inline void wr_reg64(void __iomem *reg, u64 data)
+ {
+ 	if (caam_little_end)
+@@ -153,29 +152,6 @@ static inline u64 rd_reg64(void __iomem *reg)
+ 		return ioread64be(reg);
+ }
+ 
+-#else /* CONFIG_64BIT */
+-static inline void wr_reg64(void __iomem *reg, u64 data)
+-{
+-	if (!caam_imx && caam_little_end) {
+-		wr_reg32((u32 __iomem *)(reg) + 1, data >> 32);
+-		wr_reg32((u32 __iomem *)(reg), data);
+-	} else {
+-		wr_reg32((u32 __iomem *)(reg), data >> 32);
+-		wr_reg32((u32 __iomem *)(reg) + 1, data);
+-	}
+-}
+-
+-static inline u64 rd_reg64(void __iomem *reg)
+-{
+-	if (!caam_imx && caam_little_end)
+-		return ((u64)rd_reg32((u32 __iomem *)(reg) + 1) << 32 |
+-			(u64)rd_reg32((u32 __iomem *)(reg)));
+-
+-	return ((u64)rd_reg32((u32 __iomem *)(reg)) << 32 |
+-		(u64)rd_reg32((u32 __iomem *)(reg) + 1));
+-}
+-#endif /* CONFIG_64BIT  */
+-
+ static inline u64 cpu_to_caam_dma64(dma_addr_t value)
+ {
+ 	if (caam_imx)
 -- 
 2.11.0
