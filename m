@@ -1,7 +1,7 @@
 From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: [Part2 PATCH v9 14/38] crypto: ccp: Implement SEV_FACTORY_RESET ioctl command
-Date: Mon,  4 Dec 2017 19:04:14 -0600
-Message-ID: <20171205010438.5773-15-brijesh.singh@amd.com>
+Subject: [Part2 PATCH v9 15/38] crypto: ccp: Implement SEV_PLATFORM_STATUS ioctl command
+Date: Mon,  4 Dec 2017 19:04:15 -0600
+Message-ID: <20171205010438.5773-16-brijesh.singh@amd.com>
 References: <20171205010438.5773-1-brijesh.singh@amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -20,9 +20,9 @@ In-Reply-To: <20171205010438.5773-1-brijesh.singh@amd.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The SEV_FACTORY_RESET command can be used by the platform owner to
-reset the non-volatile SEV related data. The command is defined in
-SEV spec section 5.4
+The SEV_PLATFORM_STATUS command can be used by the platform owner to
+get the current status of the platform. The command is defined in
+SEV spec section 5.5.
 
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: "Radim Krčmář" <rkrcmar@redhat.com>
@@ -35,99 +35,47 @@ Cc: kvm@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
 Improvements-by: Borislav Petkov <bp@suse.de>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+Reviewed-by: Borislav Petkov <bp@suse.de>
+Acked-by: Gary R Hook <gary.hook@amd.com>
 ---
- drivers/crypto/ccp/psp-dev.c | 77 +++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 76 insertions(+), 1 deletion(-)
+ drivers/crypto/ccp/psp-dev.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
 diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
-index 9915a6c604a3..b49583a45a55 100644
+index b49583a45a55..a5072b166ab8 100644
 --- a/drivers/crypto/ccp/psp-dev.c
 +++ b/drivers/crypto/ccp/psp-dev.c
-@@ -232,9 +232,84 @@ static int sev_platform_shutdown(int *error)
- 	return rc;
+@@ -274,6 +274,21 @@ static int sev_ioctl_do_reset(struct sev_issue_cmd *argp)
+ 	return __sev_do_cmd_locked(SEV_CMD_FACTORY_RESET, 0, &argp->error);
  }
  
-+static int sev_get_platform_state(int *state, int *error)
++static int sev_ioctl_do_platform_status(struct sev_issue_cmd *argp)
 +{
-+	int rc;
++	struct sev_user_data_status *data = &psp_master->status_cmd_buf;
++	int ret;
 +
-+	rc = __sev_do_cmd_locked(SEV_CMD_PLATFORM_STATUS,
-+				 &psp_master->status_cmd_buf, error);
-+	if (rc)
-+		return rc;
++	ret = __sev_do_cmd_locked(SEV_CMD_PLATFORM_STATUS, data, &argp->error);
++	if (ret)
++		return ret;
 +
-+	*state = psp_master->status_cmd_buf.state;
-+	return rc;
-+}
++	if (copy_to_user((void __user *)argp->data, data, sizeof(*data)))
++		ret = -EFAULT;
 +
-+static int sev_ioctl_do_reset(struct sev_issue_cmd *argp)
-+{
-+	int state, rc;
-+
-+	/*
-+	 * The SEV spec requires that FACTORY_RESET must be issued in
-+	 * UNINIT state. Before we go further lets check if any guest is
-+	 * active.
-+	 *
-+	 * If FW is in WORKING state then deny the request otherwise issue
-+	 * SHUTDOWN command do INIT -> UNINIT before issuing the FACTORY_RESET.
-+	 *
-+	 */
-+	rc = sev_get_platform_state(&state, &argp->error);
-+	if (rc)
-+		return rc;
-+
-+	if (state == SEV_STATE_WORKING)
-+		return -EBUSY;
-+
-+	if (state == SEV_STATE_INIT) {
-+		rc = __sev_platform_shutdown_locked(&argp->error);
-+		if (rc)
-+			return rc;
-+	}
-+
-+	return __sev_do_cmd_locked(SEV_CMD_FACTORY_RESET, 0, &argp->error);
++	return ret;
 +}
 +
  static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
  {
--	return -ENOTTY;
-+	void __user *argp = (void __user *)arg;
-+	struct sev_issue_cmd input;
-+	int ret = -EFAULT;
-+
-+	if (!psp_master)
-+		return -ENODEV;
-+
-+	if (ioctl != SEV_ISSUE_CMD)
-+		return -EINVAL;
-+
-+	if (copy_from_user(&input, argp, sizeof(struct sev_issue_cmd)))
-+		return -EFAULT;
-+
-+	if (input.cmd > SEV_MAX)
-+		return -EINVAL;
-+
-+	mutex_lock(&sev_cmd_mutex);
-+
-+	switch (input.cmd) {
-+
-+	case SEV_FACTORY_RESET:
-+		ret = sev_ioctl_do_reset(&input);
+ 	void __user *argp = (void __user *)arg;
+@@ -299,6 +314,9 @@ static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
+ 	case SEV_FACTORY_RESET:
+ 		ret = sev_ioctl_do_reset(&input);
+ 		break;
++	case SEV_PLATFORM_STATUS:
++		ret = sev_ioctl_do_platform_status(&input);
 +		break;
-+	default:
-+		ret = -EINVAL;
-+		goto out;
-+	}
-+
-+	if (copy_to_user(argp, &input, sizeof(struct sev_issue_cmd)))
-+		ret = -EFAULT;
-+out:
-+	mutex_unlock(&sev_cmd_mutex);
-+
-+	return ret;
- }
- 
- static const struct file_operations sev_fops = {
+ 	default:
+ 		ret = -EINVAL;
+ 		goto out;
 -- 
 2.9.5
