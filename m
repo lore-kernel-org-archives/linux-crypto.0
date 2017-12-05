@@ -1,455 +1,172 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [crypto 6/8] chtls: TCB and Key program
-Date: Tue, 05 Dec 2017 14:06:54 +0100
-Message-ID: <2083625.RdNrO0bCEz@tauon.chronox.de>
-References: <1512474029-6775-1-git-send-email-atul.gupta@chelsio.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: Re: [PATCH 1/3] crypto: exynos - Support Exynos5250+ SoCs
+Date: Tue, 5 Dec 2017 14:34:20 +0100
+Message-ID: <CAJKOXPf9JpBkR_z4frT-knxSUv53K=94wHoJkqD2fzVz2K6mGA@mail.gmail.com>
+References: <CGME20171205123602eucas1p2d3ee1e53adc35df7c52917d43bcdebfd@eucas1p2.samsung.com>
+ <20171205123558.31087-1-l.stelmach@samsung.com> <20171205123558.31087-2-l.stelmach@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        netdev@vger.kernel.org, davem@davemloft.net, davejwatson@fb.com,
-        ganeshgr@chelsio.com, harsh@chelsio.com
-To: Atul Gupta <atul.gupta@chelsio.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+Cc: robh+dt@kernel.org, Stephan Mueller <smueller@chronox.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Kukjin Kim <kgene@kernel.org>, linux-crypto@vger.kernel.org,
+        linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        =?UTF-8?B?QmFydMWCb21pZWogxbtvxYJuaWVya2lld2ljeg==?=
+        <b.zolnierkie@samsung.com>
+To: =?UTF-8?Q?=C5=81ukasz_Stelmach?= <l.stelmach@samsung.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:42754 "EHLO mail.eperm.de"
+Received: from mail.kernel.org ([198.145.29.99]:40396 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752042AbdLENG5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 5 Dec 2017 08:06:57 -0500
-In-Reply-To: <1512474029-6775-1-git-send-email-atul.gupta@chelsio.com>
+        id S1752499AbdLENeX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 5 Dec 2017 08:34:23 -0500
+In-Reply-To: <20171205123558.31087-2-l.stelmach@samsung.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 5. Dezember 2017, 12:40:29 CET schrieb Atul Gupta:
-
-Hi Atul,
-
-> program the tx and rx key on chip.
-> 
-> Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
+On Tue, Dec 5, 2017 at 1:35 PM, Łukasz Stelmach <l.stelmach@samsung.com> wrote:
+> Add support for PRNG in Exynos5250+ SoCs.
+>
+> Signed-off-by: Łukasz Stelmach <l.stelmach@samsung.com>
 > ---
->  drivers/crypto/chelsio/chtls/chtls_hw.c | 394
-> ++++++++++++++++++++++++++++++++ 1 file changed, 394 insertions(+)
->  create mode 100644 drivers/crypto/chelsio/chtls/chtls_hw.c
-> 
-> diff --git a/drivers/crypto/chelsio/chtls/chtls_hw.c
-> b/drivers/crypto/chelsio/chtls/chtls_hw.c new file mode 100644
-> index 0000000..5e65aa2
-> --- /dev/null
-> +++ b/drivers/crypto/chelsio/chtls/chtls_hw.c
-> @@ -0,0 +1,394 @@
-> +/*
-> + * Copyright (c) 2017 Chelsio Communications, Inc.
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License version 2 as
-> + * published by the Free Software Foundation.
-> + *
-> + * Written by: Atul Gupta (atul.gupta@chelsio.com)
-> + */
+>  .../bindings/crypto/samsung,exynos-rng4.txt        |  4 ++-
+>  drivers/crypto/exynos-rng.c                        | 36 ++++++++++++++++++++--
+>  2 files changed, 36 insertions(+), 4 deletions(-)
+>
+> diff --git a/Documentation/devicetree/bindings/crypto/samsung,exynos-rng4.txt b/Documentation/devicetree/bindings/crypto/samsung,exynos-rng4.txt
+> index 4ca8dd4d7e66..a13fbdb4bd88 100644
+> --- a/Documentation/devicetree/bindings/crypto/samsung,exynos-rng4.txt
+> +++ b/Documentation/devicetree/bindings/crypto/samsung,exynos-rng4.txt
+> @@ -2,7 +2,9 @@ Exynos Pseudo Random Number Generator
+>
+>  Required properties:
+>
+> -- compatible  : Should be "samsung,exynos4-rng".
+> +- compatible  : One of:
+> +                - "samsung,exynos4-rng" for Exynos4210 and Exynos4412
+> +                - "samsung,exynos5250-prng" for Exynos5250+
+>  - reg         : Specifies base physical address and size of the registers map.
+>  - clocks      : Phandle to clock-controller plus clock-specifier pair.
+>  - clock-names : "secss" as a clock name.
+> diff --git a/drivers/crypto/exynos-rng.c b/drivers/crypto/exynos-rng.c
+> index 451620b475a0..894ef93ef5ec 100644
+> --- a/drivers/crypto/exynos-rng.c
+> +++ b/drivers/crypto/exynos-rng.c
+> @@ -22,12 +22,17 @@
+>  #include <linux/err.h>
+>  #include <linux/io.h>
+>  #include <linux/module.h>
+> +#include <linux/of_device.h>
+>  #include <linux/platform_device.h>
+>
+>  #include <crypto/internal/rng.h>
+>
+>  #define EXYNOS_RNG_CONTROL             0x0
+>  #define EXYNOS_RNG_STATUS              0x10
 > +
-> +#include <linux/module.h>
-> +#include <linux/list.h>
-> +#include <linux/workqueue.h>
-> +#include <linux/skbuff.h>
-> +#include <linux/timer.h>
-> +#include <linux/notifier.h>
-> +#include <linux/inetdevice.h>
-> +#include <linux/ip.h>
-> +#include <linux/tcp.h>
-> +#include <linux/tls.h>
-> +#include <net/tls.h>
-> +
-> +#include "chtls.h"
-> +#include "chtls_cm.h"
-> +
-> +static void __set_tcb_field_direct(struct chtls_sock *csk,
-> +				   struct cpl_set_tcb_field *req, u16 word,
-> +				   u64 mask, u64 val, u8 cookie, int no_reply)
-> +{
-> +	struct ulptx_idata *sc;
-> +
-> +	INIT_TP_WR_CPL(req, CPL_SET_TCB_FIELD, csk->tid);
-> +	req->wr.wr_mid |= htonl(FW_WR_FLOWID_V(csk->tid));
-> +	req->reply_ctrl = htons(NO_REPLY_V(no_reply) |
-> +				QUEUENO_V(csk->rss_qid));
-> +	req->word_cookie = htons(TCB_WORD(word) | TCB_COOKIE_V(cookie));
-> +	req->mask = cpu_to_be64(mask);
-> +	req->val = cpu_to_be64(val);
-> +	sc = (struct ulptx_idata *)(req + 1);
-> +	sc->cmd_more = htonl(ULPTX_CMD_V(ULP_TX_SC_NOOP));
-> +	sc->len = htonl(0);
-> +}
-> +
-> +void __set_tcb_field(struct sock *sk, struct sk_buff *skb, u16 word,
-> +		     u64 mask, u64 val, u8 cookie, int no_reply)
-> +{
-> +	struct chtls_sock *csk = rcu_dereference_sk_user_data(sk);
-> +	struct cpl_set_tcb_field *req;
-> +	struct ulptx_idata *sc;
-> +	unsigned int wrlen = roundup(sizeof(*req) + sizeof(*sc), 16);
-> +
-> +	req = (struct cpl_set_tcb_field *)__skb_put(skb, wrlen);
-> +	__set_tcb_field_direct(csk, req, word, mask, val, cookie, no_reply);
-> +	set_wr_txq(skb, CPL_PRIORITY_CONTROL, csk->port_id);
-> +}
-> +
-> +static int chtls_set_tcb_field(struct sock *sk, u16 word, u64 mask, u64
-> val) +{
-> +	struct chtls_sock *csk = rcu_dereference_sk_user_data(sk);
-> +	struct sk_buff *skb;
-> +	struct cpl_set_tcb_field *req;
-> +	struct ulptx_idata *sc;
-> +	unsigned int wrlen = roundup(sizeof(*req) + sizeof(*sc), 16);
-> +	unsigned int credits_needed = DIV_ROUND_UP(wrlen, 16);
-> +
-> +	skb = alloc_skb(wrlen, GFP_ATOMIC);
-> +	if (!skb)
-> +		return -ENOMEM;
-> +
-> +	__set_tcb_field(sk, skb, word, mask, val, 0, 1);
-> +	set_queue(skb, (csk->txq_idx << 1) | CPL_PRIORITY_DATA, sk);
-> +	csk->wr_credits -= credits_needed;
-> +	csk->wr_unacked += credits_needed;
-> +	enqueue_wr(csk, skb);
-> +	cxgb4_ofld_send(csk->egress_dev, skb);
-> +	return 0;
-> +}
-> +
-> +/*
-> + * Set one of the t_flags bits in the TCB.
-> + */
-> +int chtls_set_tcb_tflag(struct sock *sk, unsigned int bit_pos, int val)
-> +{
-> +	return chtls_set_tcb_field(sk, 1, 1ULL << bit_pos,
-> +			    val << bit_pos);
-> +}
-> +
-> +static int chtls_set_tcb_keyid(struct sock *sk, int keyid)
-> +{
-> +	return chtls_set_tcb_field(sk, 31, 0xFFFFFFFFULL, keyid);
-> +}
-> +
-> +static int chtls_set_tcb_seqno(struct sock *sk)
-> +{
-> +	return chtls_set_tcb_field(sk, 28, ~0ULL, 0);
-> +}
-> +
-> +static int chtls_set_tcb_quiesce(struct sock *sk, int val)
-> +{
-> +	return chtls_set_tcb_field(sk, 1, (1ULL << TF_RX_QUIESCE_S),
-> +				   TF_RX_QUIESCE_V(val));
-> +}
-> +
-> +static void *chtls_alloc_mem(unsigned long size)
-> +{
-> +	void *p = kmalloc(size, GFP_KERNEL);
-> +
-> +	if (!p)
-> +		p = vmalloc(size);
-> +	if (p)
-> +		memset(p, 0, size);
-> +	return p;
-> +}
-> +
-> +static void chtls_free_mem(void *addr)
-> +{
-> +	unsigned long p = (unsigned long)addr;
-> +
-> +	if (p >= VMALLOC_START && p < VMALLOC_END)
-> +		vfree(addr);
-> +	else
-> +		kfree(addr);
-> +}
-> +
-> +/* TLS Key bitmap processing */
-> +int chtls_init_kmap(struct chtls_dev *cdev, struct cxgb4_lld_info *lldi)
-> +{
-> +	unsigned int num_key_ctx, bsize;
-> +
-> +	num_key_ctx = (lldi->vr->key.size / TLS_KEY_CONTEXT_SZ);
-> +	bsize = BITS_TO_LONGS(num_key_ctx);
-> +
-> +	cdev->kmap.size = num_key_ctx;
-> +	cdev->kmap.available = bsize;
-> +	cdev->kmap.addr = chtls_alloc_mem(sizeof(*cdev->kmap.addr) *
-> +					  bsize);
-> +	if (!cdev->kmap.addr)
-> +		return -1;
-> +
-> +	cdev->kmap.start = lldi->vr->key.start;
-> +	spin_lock_init(&cdev->kmap.lock);
-> +	return 0;
-> +}
-> +
-> +void chtls_free_kmap(struct chtls_dev *cdev)
-> +{
-> +	if (cdev->kmap.addr)
-> +		chtls_free_mem(cdev->kmap.addr);
-> +}
-> +
-> +static int get_new_keyid(struct chtls_sock *csk, u32 optname)
-> +{
-> +	struct chtls_dev *cdev = csk->cdev;
-> +	struct chtls_hws *hws = &csk->tlshws;
-> +	struct net_device *dev = csk->egress_dev;
-> +	struct adapter *adap = netdev2adap(dev);
-> +	int keyid;
-> +
-> +	spin_lock_bh(&cdev->kmap.lock);
-> +	keyid = find_first_zero_bit(cdev->kmap.addr, cdev->kmap.size);
-> +	if (keyid < cdev->kmap.size) {
-> +		__set_bit(keyid, cdev->kmap.addr);
-> +		if (optname == TLS_RX)
-> +			hws->rxkey = keyid;
-> +		else
-> +			hws->txkey = keyid;
-> +		atomic_inc(&adap->chcr_stats.tls_key);
-> +	} else {
-> +		keyid = -1;
-> +	}
-> +	spin_unlock_bh(&cdev->kmap.lock);
-> +	pr_info("keyid:%d\n", keyid);
-> +	return keyid;
-> +}
-> +
-> +void free_tls_keyid(struct sock *sk)
-> +{
-> +	struct chtls_sock *csk = rcu_dereference_sk_user_data(sk);
-> +	struct chtls_dev *cdev = csk->cdev;
-> +	struct chtls_hws *hws = &csk->tlshws;
-> +	struct net_device *dev = csk->egress_dev;
-> +	struct adapter *adap = netdev2adap(dev);
-> +
-> +	if (!cdev->kmap.addr)
-> +		return;
-> +
-> +	spin_lock_bh(&cdev->kmap.lock);
-> +	if (hws->rxkey >= 0) {
-> +		__clear_bit(hws->rxkey, cdev->kmap.addr);
-> +		atomic_dec(&adap->chcr_stats.tls_key);
-> +		hws->rxkey = -1;
-> +	}
-> +	if (hws->txkey >= 0) {
-> +		__clear_bit(hws->txkey, cdev->kmap.addr);
-> +		atomic_dec(&adap->chcr_stats.tls_key);
-> +		hws->txkey = -1;
-> +	}
-> +	spin_unlock_bh(&cdev->kmap.lock);
-> +}
-> +
-> +static unsigned int keyid_to_addr(int start_addr, int keyid)
-> +{
-> +	return ((start_addr + (keyid * TLS_KEY_CONTEXT_SZ)) >> 5);
-> +}
-> +
-> +static void chtls_rxkey_ivauth(struct _key_ctx *kctx)
-> +{
-> +	kctx->iv_to_auth = cpu_to_be64(KEYCTX_TX_WR_IV_V(6ULL) |
-> +				  KEYCTX_TX_WR_AAD_V(1ULL) |
-> +				  KEYCTX_TX_WR_AADST_V(5ULL) |
-> +				  KEYCTX_TX_WR_CIPHER_V(14ULL) |
-> +				  KEYCTX_TX_WR_CIPHERST_V(0ULL) |
-> +				  KEYCTX_TX_WR_AUTH_V(14ULL) |
-> +				  KEYCTX_TX_WR_AUTHST_V(16ULL) |
-> +				  KEYCTX_TX_WR_AUTHIN_V(16ULL));
-> +}
-> +
-> +static int chtls_key_info(struct chtls_sock *csk,
-> +			  struct _key_ctx *kctx,
-> +			  void *c_info, u32 keylen, u32 optname)
-> +{
-> +	struct crypto_cipher *cipher;
-> +	struct tls12_crypto_info_aes_gcm_128 *gcm_ctx =
-> +		(struct tls12_crypto_info_aes_gcm_128 *)
-> +		&csk->tlshws.crypto_info;
-> +	unsigned char ghash_h[AEAD_H_SIZE];
-> +	unsigned char key[CHCR_KEYCTX_CIPHER_KEY_SIZE_256];
-> +	int ck_size, key_ctx_size;
-> +	int ret;
-> +
-> +	key_ctx_size = sizeof(struct _key_ctx) +
-> +		       roundup(keylen, 16) + AEAD_H_SIZE;
-> +
-> +	if (keylen == AES_KEYSIZE_128) {
-> +		ck_size = CHCR_KEYCTX_CIPHER_KEY_SIZE_128;
-> +	} else if (keylen == AES_KEYSIZE_192) {
-> +		ck_size = CHCR_KEYCTX_CIPHER_KEY_SIZE_192;
-> +	} else if (keylen == AES_KEYSIZE_256) {
-> +		ck_size = CHCR_KEYCTX_CIPHER_KEY_SIZE_256;
-> +	} else {
-> +		pr_err("GCM: Invalid key length %d\n", keylen);
-> +		return -EINVAL;
-> +	}
-> +	memcpy(key, gcm_ctx->key, keylen);
-> +
-> +	/* Calculate the H = CIPH(K, 0 repeated 16 times).
-> +	 * It will go in key context
-> +	 */
-> +	cipher = crypto_alloc_cipher("aes-generic", 0, 0);
+> +#define EXYNOS_RNG_SEED_CONF           0x14
+> +#define EXYNOS_RNG_GEN_PRNG            0x02
 
-Why not "aes"?
+Use BIT(1) instead.
 
-> +	if (IS_ERR(cipher)) {
-> +		ret = -ENOMEM;
-> +		goto out;
-> +	}
 > +
-> +	ret = crypto_cipher_setkey(cipher, key, keylen);
-> +	if (ret)
-> +		goto out1;
-> +
-> +	memset(ghash_h, 0, AEAD_H_SIZE);
-> +	crypto_cipher_encrypt_one(cipher, ghash_h, ghash_h);
-> +	csk->tlshws.keylen = key_ctx_size;
-> +
-> +	/* Copy the Key context */
-> +	if (optname == TLS_RX) {
-> +		int key_ctx;
-> +
-> +		key_ctx = ((key_ctx_size >> 4) << 3);
-> +		kctx->ctx_hdr = FILL_KEY_CRX_HDR(ck_size,
-> +						 CHCR_KEYCTX_MAC_KEY_SIZE_128,
-> +						 0, 0, key_ctx);
-> +		chtls_rxkey_ivauth(kctx);
-> +	} else {
-> +		kctx->ctx_hdr = FILL_KEY_CTX_HDR(ck_size,
-> +						 CHCR_KEYCTX_MAC_KEY_SIZE_128,
-> +						 0, 0, key_ctx_size >> 4);
-> +	}
-> +
-> +	memcpy(kctx->salt, gcm_ctx->salt, TLS_CIPHER_AES_GCM_128_SALT_SIZE);
-> +	memcpy(kctx->key, gcm_ctx->key, keylen);
-> +	memcpy(kctx->key + keylen, ghash_h, AEAD_H_SIZE);
-> +
-> +out1:
-> +	crypto_free_cipher(cipher);
-> +out:
-> +	return ret;
+>  #define EXYNOS_RNG_SEED_BASE           0x140
+>  #define EXYNOS_RNG_SEED(n)             (EXYNOS_RNG_SEED_BASE + (n * 0x4))
+>  #define EXYNOS_RNG_OUT_BASE            0x160
+> @@ -43,6 +48,11 @@
+>  #define EXYNOS_RNG_SEED_REGS           5
+>  #define EXYNOS_RNG_SEED_SIZE           (EXYNOS_RNG_SEED_REGS * 4)
+>
+> +enum exynos_prng_type {
+> +       EXYNOS_PRNG_TYPE4 = 4,
+> +       EXYNOS_PRNG_TYPE5 = 5,
 
-memzero_explicit(key)?
+That's unusual numbering and naming, so just:
+enum exynos_prng_type {
+      EXYNOS_PRNG_EXYNOS4,
+      EXYNOS_PRNG_EXYNOS5,
+};
 
+Especially that TYPE4 and TYPE5 suggest so kind of sub-type (like
+versions of some IP blocks, e.g. MFC) but it is just the family of
+Exynos.
 
-> +}
+> +};
 > +
-> +static void chtls_set_scmd(struct chtls_sock *csk)
-> +{
-> +	struct chtls_hws *hws = &csk->tlshws;
+>  /*
+>   * Driver re-seeds itself with generated random numbers to increase
+>   * the randomness.
+> @@ -63,6 +73,7 @@ struct exynos_rng_ctx {
+>  /* Device associated memory */
+>  struct exynos_rng_dev {
+>         struct device                   *dev;
+> +       enum exynos_prng_type           type;
+>         void __iomem                    *mem;
+>         struct clk                      *clk;
+>         /* Generated numbers stored for seeding during resume */
+> @@ -160,8 +171,13 @@ static int exynos_rng_get_random(struct exynos_rng_dev *rng,
+>  {
+>         int retry = EXYNOS_RNG_WAIT_RETRIES;
+>
+> -       exynos_rng_writel(rng, EXYNOS_RNG_CONTROL_START,
+> -                         EXYNOS_RNG_CONTROL);
+> +       if (rng->type == EXYNOS_PRNG_TYPE4) {
+> +               exynos_rng_writel(rng, EXYNOS_RNG_CONTROL_START,
+> +                                 EXYNOS_RNG_CONTROL);
+> +       } else if (rng->type == EXYNOS_PRNG_TYPE5) {
+> +               exynos_rng_writel(rng, EXYNOS_RNG_GEN_PRNG,
+> +                                 EXYNOS_RNG_SEED_CONF);
+> +       }
+>
+>         while (!(exynos_rng_readl(rng,
+>                         EXYNOS_RNG_STATUS) & EXYNOS_RNG_STATUS_RNG_DONE) && --retry)
+> @@ -279,6 +295,13 @@ static int exynos_rng_probe(struct platform_device *pdev)
+>         if (!rng)
+>                 return -ENOMEM;
+>
+> +       rng->type = (enum exynos_prng_type)of_device_get_match_data(&pdev->dev);
+> +       if (rng->type != EXYNOS_PRNG_TYPE4 &&
+> +           rng->type != EXYNOS_PRNG_TYPE5) {
+> +               dev_err(&pdev->dev, "Unsupported PRNG type: %d", rng->type);
+> +               return -ENOTSUPP;
+> +       }
 > +
-> +	hws->scmd.seqno_numivs =
-> +		SCMD_SEQ_NO_CTRL_V(3) |
-> +		SCMD_PROTO_VERSION_V(0) |
-> +		SCMD_ENC_DEC_CTRL_V(0) |
-> +		SCMD_CIPH_AUTH_SEQ_CTRL_V(1) |
-> +		SCMD_CIPH_MODE_V(2) |
-> +		SCMD_AUTH_MODE_V(4) |
-> +		SCMD_HMAC_CTRL_V(0) |
-> +		SCMD_IV_SIZE_V(4) |
-> +		SCMD_NUM_IVS_V(1);
-> +
-> +	hws->scmd.ivgen_hdrlen =
-> +		SCMD_IV_GEN_CTRL_V(1) |
-> +		SCMD_KEY_CTX_INLINE_V(0) |
-> +		SCMD_TLS_FRAG_ENABLE_V(1);
-> +}
-> +
-> +int chtls_setkey(struct chtls_sock *csk, void *c_info,
-> +		 u32 keylen, u32 optname)
+>         rng->dev = &pdev->dev;
+>         rng->clk = devm_clk_get(&pdev->dev, "secss");
+>         if (IS_ERR(rng->clk)) {
+> @@ -300,7 +323,10 @@ static int exynos_rng_probe(struct platform_device *pdev)
+>                 dev_err(&pdev->dev,
+>                         "Couldn't register rng crypto alg: %d\n", ret);
+>                 exynos_rng_dev = NULL;
+> -       }
+> +       } else
 
-The current structure of the patch set will break bisect because chtls_setkey 
-is needed in the earlier patch 3. I think this applies to patch 7 as well.
+Missing {} around else clause. Probably checkpatch should point it.
 
-> +{
-> +	struct sock *sk = csk->sk;
-> +	struct chtls_dev *cdev = csk->cdev;
-> +	struct tls_key_req *kwr;
-> +	struct _key_ctx *kctx;
-> +	struct sk_buff *skb;
-> +	int wrlen, klen, len;
-> +	int keyid;
-> +	int ret = 0;
-> +
-> +	klen = roundup((keylen + AEAD_H_SIZE) + sizeof(*kctx), 32);
-> +	wrlen = roundup(sizeof(*kwr), 16);
-> +	len = klen + wrlen;
-> +
-> +	/* Flush out-standing data before new key takes effect */
-> +	if (optname == TLS_TX) {
-> +		lock_sock(sk);
-> +		if (skb_queue_len(&csk->txq))
-> +			chtls_push_frames(csk, 0);
-> +		release_sock(sk);
-> +	}
-> +
-> +	keyid = get_new_keyid(csk, optname);
-> +	if (keyid < 0)
-> +		return -ENOSPC;
-> +
-> +	skb = alloc_skb(len, GFP_KERNEL);
-> +	if (!skb)
-> +		return -ENOMEM;
-> +
-> +	kwr = (struct tls_key_req *)__skb_put_zero(skb, len);
-> +	kwr->wr.op_to_compl =
-> +		cpu_to_be32(FW_WR_OP_V(FW_ULPTX_WR) | FW_WR_COMPL_F |
-> +		      FW_WR_ATOMIC_V(1U));
-> +	kwr->wr.flowid_len16 =
-> +		cpu_to_be32(FW_WR_LEN16_V(DIV_ROUND_UP(len, 16) |
-> +			    FW_WR_FLOWID_V(csk->tid)));
-> +	kwr->wr.protocol = 0;
-> +	kwr->wr.mfs = htons(TLS_MFS);
-> +	kwr->wr.reneg_to_write_rx = optname;
-> +
-> +	/* ulptx command */
-> +	kwr->req.cmd = cpu_to_be32(ULPTX_CMD_V(ULP_TX_MEM_WRITE) |
-> +			    T5_ULP_MEMIO_ORDER_V(1) |
-> +			    T5_ULP_MEMIO_IMM_V(1));
-> +	kwr->req.len16 = cpu_to_be32((csk->tid << 8) |
-> +			      DIV_ROUND_UP(len - sizeof(kwr->wr), 16));
-> +	kwr->req.dlen = cpu_to_be32(ULP_MEMIO_DATA_LEN_V(klen >> 5));
-> +	kwr->req.lock_addr = cpu_to_be32(ULP_MEMIO_ADDR_V(keyid_to_addr
-> +					(cdev->kmap.start, keyid)));
-> +
-> +	/* sub command */
-> +	kwr->sc_imm.cmd_more = cpu_to_be32(ULPTX_CMD_V(ULP_TX_SC_IMM));
-> +	kwr->sc_imm.len = cpu_to_be32(klen);
-> +
-> +	/* key info */
-> +	kctx = (struct _key_ctx *)(kwr + 1);
-> +	ret = chtls_key_info(csk, kctx, c_info, keylen, optname);
-> +
-> +	csk->wr_credits -= DIV_ROUND_UP(len, 16);
-> +	csk->wr_unacked += DIV_ROUND_UP(len, 16);
-> +	enqueue_wr(csk, skb);
-> +	cxgb4_ofld_send(csk->egress_dev, skb);
-> +
-> +	chtls_set_scmd(csk);
-> +	/* Clear quiesce for Rx key */
-> +	if (optname == TLS_RX) {
-> +		chtls_set_tcb_keyid(sk, keyid);
-> +		chtls_set_tcb_field(sk, 0,
-> +				    TCB_ULP_RAW_V(TCB_ULP_RAW_M),
-> +				    TCB_ULP_RAW_V((TF_TLS_KEY_SIZE_V(1) |
-> +						  TF_TLS_CONTROL_V(1) |
-> +						  TF_TLS_ACTIVE_V(1) |
-> +						  TF_TLS_ENABLE_V(1))));
-> +		chtls_set_tcb_seqno(sk);
-> +		chtls_set_tcb_quiesce(sk, 0);
-> +		csk->tlshws.rxkey = keyid;
-> +	} else {
-> +		csk->tlshws.tx_seq_no = 0;
-> +		csk->tlshws.txkey = keyid;
-> +	}
-> +
-> +	return ret;
+> +               dev_info(&pdev->dev,
+> +                        "Exynos Pseudo Random Number Generator (type:%d)\n",
 
-As far as I see, the key is part of the skb (via kctx). This skb is released 
-after being processed. The release calls kfree_skb which does not zeroize the 
-key. Wouldn't it make sense to clear the memory of the key when the skb is 
-released?
+dev_dbg, this is not that important information to affect the boot time.
 
-> +}
+Best regards,
+Krzysztof
 
-
-
-Ciao
-Stephan
+> +                        rng->type);
+>
+>         return ret;
+>  }
+> @@ -367,6 +393,10 @@ static SIMPLE_DEV_PM_OPS(exynos_rng_pm_ops, exynos_rng_suspend,
+>  static const struct of_device_id exynos_rng_dt_match[] = {
+>         {
+>                 .compatible = "samsung,exynos4-rng",
+> +               .data = (const void *)EXYNOS_PRNG_TYPE4,
+> +       }, {
+> +               .compatible = "samsung,exynos5250-prng",
+> +               .data = (const void *)EXYNOS_PRNG_TYPE5,
+>         },
+>         { },
+>  };
+> --
+> 2.11.0
+>
