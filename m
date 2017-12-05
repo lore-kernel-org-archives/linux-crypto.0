@@ -1,10 +1,8 @@
 From: =?UTF-8?q?=C5=81ukasz=20Stelmach?= <l.stelmach@samsung.com>
-Subject: [PATCH 3/3] crypto: exynos - Reseed PRNG after generating 2^16
- random bytes
-Date: Tue, 05 Dec 2017 13:35:58 +0100
-Message-ID: <20171205123558.31087-4-l.stelmach@samsung.com>
-References: <20171205123558.31087-1-l.stelmach@samsung.com>
-        <CGME20171205123604eucas1p2a6a2738e3cf1f9c300e8d128362429ed@eucas1p2.samsung.com>
+Subject: [RFC] crypto: exynos - Icrease the priority of the driver
+Date: Tue, 05 Dec 2017 13:42:14 +0100
+Message-ID: <20171205124214.31263-1-l.stelmach@samsung.com>
+References: <CGME20171205124216eucas1p17f46fc23ea35f7f2fcacc49d88e40a15@eucas1p1.samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8BIT
@@ -17,84 +15,34 @@ To: Krzysztof Kozlowski <krzk@kernel.org>, robh+dt@kernel.org,
         Kukjin Kim <kgene@kernel.org>, linux-crypto@vger.kernel.org,
         linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-reply-to: <20171205123558.31087-1-l.stelmach@samsung.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Reseed PRNG after reading 65 kB of randomness. Although this may reduce
-performance, in most casese the loss is not noticable.
+exynos-rng is one of many implementations of stdrng. With priority as
+low as 100 it isn't selected, if software implementations (DRBG) are
+available.
 
 Signed-off-by: Łukasz Stelmach <l.stelmach@samsung.com>
 ---
- drivers/crypto/exynos-rng.c | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
+
+If not 1000, what is the best value, what is the policy?
+
+
+ drivers/crypto/exynos-rng.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/crypto/exynos-rng.c b/drivers/crypto/exynos-rng.c
-index 002e9d2a83cc..0bf07a655813 100644
+index 0bf07a655813..3c514eaae9dc 100644
 --- a/drivers/crypto/exynos-rng.c
 +++ b/drivers/crypto/exynos-rng.c
-@@ -54,12 +54,15 @@ enum exynos_prng_type {
- };
- 
- /*
-- * Driver re-seeds itself with generated random numbers to increase
-- * the randomness.
-+ * Driver re-seeds itself with generated random numbers to hinder
-+ * backtracking of the original seed.
-  *
-  * Time for next re-seed in ms.
-  */
--#define EXYNOS_RNG_RESEED_TIME		100
-+#define EXYNOS_RNG_RESEED_TIME		1000
-+#define EXYNOS_RNG_RESEED_BYTES		65536
-+
-+
- /*
-  * In polling mode, do not wait infinitely for the engine to finish the work.
-  */
-@@ -81,6 +84,8 @@ struct exynos_rng_dev {
- 	unsigned int			seed_save_len;
- 	/* Time of last seeding in jiffies */
- 	unsigned long			last_seeding;
-+	/* Bytes generated since last seeding */
-+	unsigned long			bytes_seeding;
- };
- 
- static struct exynos_rng_dev *exynos_rng_dev;
-@@ -125,6 +130,7 @@ static int exynos_rng_set_seed(struct exynos_rng_dev *rng,
- 	}
- 
- 	rng->last_seeding = jiffies;
-+	rng->bytes_seeding = 0;
- 
- 	return 0;
- }
-@@ -166,6 +172,8 @@ static int exynos_rng_get_random(struct exynos_rng_dev *rng,
- 	memcpy_fromio(dst, rng->mem + EXYNOS_RNG_OUT_BASE, *read);
- 
- 	return 0;
-+
-+
- }
- 
- /* Re-seed itself from time to time */
-@@ -177,7 +185,8 @@ static void exynos_rng_reseed(struct exynos_rng_dev *rng)
- 	unsigned int read = 0;
- 	u8 seed[EXYNOS_RNG_SEED_SIZE];
- 
--	if (time_before(now, next_seeding))
-+	if (time_before(now, next_seeding) &&
-+	    rng->bytes_seeding < EXYNOS_RNG_RESEED_BYTES)
- 		return;
- 
- 	if (exynos_rng_get_random(rng, seed, sizeof(seed), &read))
-@@ -206,6 +215,7 @@ static int exynos_rng_generate(struct crypto_rng *tfm,
- 
- 		dlen -= read;
- 		dst += read;
-+		rng->bytes_seeding += read;
- 
- 		exynos_rng_reseed(rng);
- 	} while (dlen > 0);
+@@ -259,7 +259,7 @@ static struct rng_alg exynos_rng_alg = {
+ 	.base			= {
+ 		.cra_name		= "stdrng",
+ 		.cra_driver_name	= "exynos_rng",
+-		.cra_priority		= 100,
++		.cra_priority		= 1000,
+ 		.cra_ctxsize		= sizeof(struct exynos_rng_ctx),
+ 		.cra_module		= THIS_MODULE,
+ 		.cra_init		= exynos_rng_kcapi_init,
 -- 
 2.11.0
