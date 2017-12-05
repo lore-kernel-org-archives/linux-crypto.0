@@ -1,83 +1,94 @@
-From: Logan Gunthorpe <logang@deltatee.com>
-Subject: [PATCH v9 0/8] Add io{read|write}64 to io-64-atomic headers
-Date: Tue,  5 Dec 2017 16:30:50 -0700
-Message-ID: <20171205233058.5365-1-logang@deltatee.com>
+From: James Hogan <james.hogan@mips.com>
+Subject: [PATCH] lib/mpi: Fix umul_ppmm() for MIPS64r6
+Date: Tue, 5 Dec 2017 23:31:35 +0000
+Message-ID: <20171205233135.1763-1-james.hogan@mips.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Cc: Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andy Shevchenko <andy.shevchenko@gmail.com>,
-        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-        Logan Gunthorpe <logang@deltatee.com>
-To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain
+Cc: James Hogan <jhogan@kernel.org>, <linux-mips@linux-mips.org>,
+        <linux-crypto@vger.kernel.org>
+To: Ralf Baechle <ralf@linux-mips.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from 9pmail.ess.barracuda.com ([64.235.154.211]:32773 "EHLO
+        9pmail.ess.barracuda.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752894AbdLEXqr (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 5 Dec 2017 18:46:47 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-This is v9 of my cleanup series to push a number of instances of people
-defining their own io{read|write}64 functions when they don't exist in
-non-64bit systems. This series adds inline functions to the
-io-64-nonatomic headers and then cleans up the drivers that defined their
-own.
+From: James Hogan <jhogan@kernel.org>
 
-Changes since v8:
-- Rebased onto v4.15-rc2, as a result rewrote patch 7 seeing someone did
-  some similar cleanup in that area.
-- Added a patch to clean up the Switchtec NTB driver which landed in
-  v4.15-rc1
+Current MIPS64r6 toolchains aren't able to generate efficient
+DMULU/DMUHU based code for the C implementation of umul_ppmm(), which
+performs an unsigned 64 x 64 bit multiply and returns the upper and
+lower 64-bit halves of the 128-bit result. Instead it widens the 64-bit
+inputs to 128-bits and emits a __multi3 intrinsic call to perform a 128
+x 128 multiply. This is both inefficient, and it results in a link error
+since we don't include __multi3 in MIPS linux.
 
-Changes since v7:
-- Fix minor nits from Andy Shevchenko
-- Rebased onto v4.14-rc1
+For example commit 90a53e4432b1 ("cfg80211: implement regdb signature
+checking") merged in v4.15-rc1 recently broke the 64r6_defconfig and
+64r6el_defconfig builds by indirectly selecting MPILIB. The same build
+errors can be reproduced on older kernels by enabling e.g. CRYPTO_RSA:
 
-Changes since v6:
- ** none **
+lib/mpi/generic_mpih-mul1.o: In function `mpihelp_mul_1':
+lib/mpi/generic_mpih-mul1.c:50: undefined reference to `__multi3'
+lib/mpi/generic_mpih-mul2.o: In function `mpihelp_addmul_1':
+lib/mpi/generic_mpih-mul2.c:49: undefined reference to `__multi3'
+lib/mpi/generic_mpih-mul3.o: In function `mpihelp_submul_1':
+lib/mpi/generic_mpih-mul3.c:49: undefined reference to `__multi3'
+lib/mpi/mpih-div.o In function `mpihelp_divrem':
+lib/mpi/mpih-div.c:205: undefined reference to `__multi3'
+lib/mpi/mpih-div.c:142: undefined reference to `__multi3'
 
-Changes since v5:
-- Added a fix to the tilcdc driver to ensure it doesn't use the
-  non-atomic operation. (This includes adding io{read|write}64[be]_is_nonatomic
-  defines).
+Therefore add an efficient MIPS64r6 implementation of umul_ppmm() using
+inline assembly and the DMULU/DMUHU instructions, to prevent __multi3
+calls being emitted.
 
-Changes since v4:
-- Add functions so the powerpc implementation of iomap.c compiles. (As
-  noticed by Horia)
+Fixes: 7fd08ca58ae6 ("MIPS: Add build support for the MIPS R6 ISA")
+Signed-off-by: James Hogan <jhogan@kernel.org>
+Cc: Ralf Baechle <ralf@linux-mips.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: linux-mips@linux-mips.org
+Cc: linux-crypto@vger.kernel.org
+---
+Please can somebody apply this fix for v4.15, as the MIPS 64r6_defconfig
+and 64r6el_defconfig builds are broken without it.
+---
+ lib/mpi/longlong.h | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
 
-Changes since v3:
-
-- I noticed powerpc didn't use the appropriate functions seeing
-  readq/writeq were not defined when iomap.h was included. Thus I've
-  included a patch to adjust this
-- Fixed some mistakes with a couple of the defines in io-64-nonatomic*
-  headers
-- Fixed a typo noticed by Horia.
-
-(earlier versions were drastically different)
-
-Logan Gunthorpe (8):
-  drm/tilcdc: ensure nonatomic iowrite64 is not used
-  powerpc: io.h: move iomap.h include so that it can use readq/writeq
-    defs
-  powerpc: iomap.c: introduce io{read|write}64_{lo_hi|hi_lo}
-  iomap: introduce io{read|write}64_{lo_hi|hi_lo}
-  io-64-nonatomic: add io{read|write}64[be]{_lo_hi|_hi_lo} macros
-  ntb: ntb_hw_intel: use io-64-nonatomic instead of in-driver hacks
-  crypto: caam: cleanup CONFIG_64BIT ifdefs when using io{read|write}64
-  ntb: ntb_hw_switchtec: Cleanup 64bit IO defines to use the common
-    header
-
- arch/powerpc/include/asm/io.h          |   6 +-
- arch/powerpc/kernel/iomap.c            |  40 ++++++++++
- drivers/crypto/caam/regs.h             |  26 +------
- drivers/gpu/drm/tilcdc/tilcdc_regs.h   |   2 +-
- drivers/ntb/hw/intel/ntb_hw_intel.c    |  30 +-------
- drivers/ntb/hw/mscc/ntb_hw_switchtec.c |  30 +-------
- include/asm-generic/iomap.h            |  26 +++++--
- include/linux/io-64-nonatomic-hi-lo.h  |  64 ++++++++++++++++
- include/linux/io-64-nonatomic-lo-hi.h  |  64 ++++++++++++++++
- lib/iomap.c                            | 132 +++++++++++++++++++++++++++++++++
- 10 files changed, 328 insertions(+), 92 deletions(-)
-
---
-2.11.0
+diff --git a/lib/mpi/longlong.h b/lib/mpi/longlong.h
+index 57fd45ab7af1..08c60d10747f 100644
+--- a/lib/mpi/longlong.h
++++ b/lib/mpi/longlong.h
+@@ -671,7 +671,23 @@ do {						\
+ 	**************  MIPS/64  **************
+ 	***************************************/
+ #if (defined(__mips) && __mips >= 3) && W_TYPE_SIZE == 64
+-#if (__GNUC__ >= 5) || (__GNUC__ >= 4 && __GNUC_MINOR__ >= 4)
++#if defined(__mips_isa_rev) && __mips_isa_rev >= 6
++/*
++ * GCC ends up emitting a __multi3 intrinsic call for MIPS64r6 with the plain C
++ * code below, so we special case MIPS64r6 until the compiler can do better.
++ */
++#define umul_ppmm(w1, w0, u, v)						\
++do {									\
++	__asm__ ("dmulu %0,%1,%2"					\
++		 : "=d" ((UDItype)(w0))					\
++		 : "d" ((UDItype)(u)),					\
++		   "d" ((UDItype)(v)));					\
++	__asm__ ("dmuhu %0,%1,%2"					\
++		 : "=d" ((UDItype)(w1))					\
++		 : "d" ((UDItype)(u)),					\
++		   "d" ((UDItype)(v)));					\
++} while (0)
++#elif (__GNUC__ >= 5) || (__GNUC__ >= 4 && __GNUC_MINOR__ >= 4)
+ #define umul_ppmm(w1, w0, u, v) \
+ do {									\
+ 	typedef unsigned int __ll_UTItype __attribute__((mode(TI)));	\
+-- 
+2.14.1
