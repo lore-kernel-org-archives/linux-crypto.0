@@ -1,7 +1,7 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v3 08/20] crypto: arm64/aes-blk - add 4 way interleave to CBC-MAC encrypt path
-Date: Wed,  6 Dec 2017 19:43:34 +0000
-Message-ID: <20171206194346.24393-9-ard.biesheuvel@linaro.org>
+Subject: [PATCH v3 09/20] crypto: arm64/sha256-neon - play nice with CONFIG_PREEMPT kernels
+Date: Wed,  6 Dec 2017 19:43:35 +0000
+Message-ID: <20171206194346.24393-10-ard.biesheuvel@linaro.org>
 References: <20171206194346.24393-1-ard.biesheuvel@linaro.org>
 Cc: herbert@gondor.apana.org.au, linux-arm-kernel@lists.infradead.org,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>,
@@ -21,63 +21,78 @@ In-Reply-To: <20171206194346.24393-1-ard.biesheuvel@linaro.org>
 Sender: linux-rt-users-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-CBC MAC is strictly sequential, and so the current AES code simply
-processes the input one block at a time. However, we are about to add
-yield support, which adds a bit of overhead, and which we prefer to
-align with other modes in terms of granularity (i.e., it is better to
-have all routines yield every 64 bytes and not have an exception for
-CBC MAC which yields every 16 bytes)
+Tweak the SHA256 update routines to invoke the SHA256 block transform
+block by block, to avoid excessive scheduling delays caused by the
+NEON algorithm running with preemption disabled.
 
-So unroll the loop by 4. We still cannot perform the AES algorithm in
-parallel, but we can at least merge the loads and stores.
+Also, remove a stale comment which no longer applies now that kernel
+mode NEON is actually disallowed in some contexts.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm64/crypto/aes-modes.S | 23 ++++++++++++++++++--
- 1 file changed, 21 insertions(+), 2 deletions(-)
+ arch/arm64/crypto/sha256-glue.c | 36 +++++++++++++-------
+ 1 file changed, 23 insertions(+), 13 deletions(-)
 
-diff --git a/arch/arm64/crypto/aes-modes.S b/arch/arm64/crypto/aes-modes.S
-index e86535a1329d..a68412e1e3a4 100644
---- a/arch/arm64/crypto/aes-modes.S
-+++ b/arch/arm64/crypto/aes-modes.S
-@@ -395,8 +395,28 @@ AES_ENDPROC(aes_xts_decrypt)
- AES_ENTRY(aes_mac_update)
- 	ld1		{v0.16b}, [x4]			/* get dg */
- 	enc_prepare	w2, x1, x7
--	cbnz		w5, .Lmacenc
-+	cbz		w5, .Lmacloop4x
- 
-+	encrypt_block	v0, w2, x1, x7, w8
+diff --git a/arch/arm64/crypto/sha256-glue.c b/arch/arm64/crypto/sha256-glue.c
+index b064d925fe2a..e8880ccdc71f 100644
+--- a/arch/arm64/crypto/sha256-glue.c
++++ b/arch/arm64/crypto/sha256-glue.c
+@@ -89,21 +89,32 @@ static struct shash_alg algs[] = { {
+ static int sha256_update_neon(struct shash_desc *desc, const u8 *data,
+ 			      unsigned int len)
+ {
+-	/*
+-	 * Stacking and unstacking a substantial slice of the NEON register
+-	 * file may significantly affect performance for small updates when
+-	 * executing in interrupt context, so fall back to the scalar code
+-	 * in that case.
+-	 */
++	struct sha256_state *sctx = shash_desc_ctx(desc);
 +
-+.Lmacloop4x:
-+	subs		w3, w3, #4
-+	bmi		.Lmac1x
-+	ld1		{v1.16b-v4.16b}, [x0], #64	/* get next pt block */
-+	eor		v0.16b, v0.16b, v1.16b		/* ..and xor with dg */
-+	encrypt_block	v0, w2, x1, x7, w8
-+	eor		v0.16b, v0.16b, v2.16b
-+	encrypt_block	v0, w2, x1, x7, w8
-+	eor		v0.16b, v0.16b, v3.16b
-+	encrypt_block	v0, w2, x1, x7, w8
-+	eor		v0.16b, v0.16b, v4.16b
-+	cmp		w3, wzr
-+	csinv		x5, x6, xzr, eq
-+	cbz		w5, .Lmacout
-+	encrypt_block	v0, w2, x1, x7, w8
-+	b		.Lmacloop4x
-+.Lmac1x:
-+	add		w3, w3, #4
- .Lmacloop:
- 	cbz		w3, .Lmacout
- 	ld1		{v1.16b}, [x0], #16		/* get next pt block */
-@@ -406,7 +426,6 @@ AES_ENTRY(aes_mac_update)
- 	csinv		x5, x6, xzr, eq
- 	cbz		w5, .Lmacout
+ 	if (!may_use_simd())
+ 		return sha256_base_do_update(desc, data, len,
+ 				(sha256_block_fn *)sha256_block_data_order);
  
--.Lmacenc:
- 	encrypt_block	v0, w2, x1, x7, w8
- 	b		.Lmacloop
+-	kernel_neon_begin();
+-	sha256_base_do_update(desc, data, len,
+-				(sha256_block_fn *)sha256_block_neon);
+-	kernel_neon_end();
++	while (len > 0) {
++		unsigned int chunk = len;
++
++		/*
++		 * Don't hog the CPU for the entire time it takes to process all
++		 * input when running on a preemptible kernel, but process the
++		 * data block by block instead.
++		 */
++		if (IS_ENABLED(CONFIG_PREEMPT) &&
++		    chunk + sctx->count % SHA256_BLOCK_SIZE > SHA256_BLOCK_SIZE)
++			chunk = SHA256_BLOCK_SIZE -
++				sctx->count % SHA256_BLOCK_SIZE;
  
++		kernel_neon_begin();
++		sha256_base_do_update(desc, data, chunk,
++				      (sha256_block_fn *)sha256_block_neon);
++		kernel_neon_end();
++		data += chunk;
++		len -= chunk;
++	}
+ 	return 0;
+ }
+ 
+@@ -117,10 +128,9 @@ static int sha256_finup_neon(struct shash_desc *desc, const u8 *data,
+ 		sha256_base_do_finalize(desc,
+ 				(sha256_block_fn *)sha256_block_data_order);
+ 	} else {
+-		kernel_neon_begin();
+ 		if (len)
+-			sha256_base_do_update(desc, data, len,
+-				(sha256_block_fn *)sha256_block_neon);
++			sha256_update_neon(desc, data, len);
++		kernel_neon_begin();
+ 		sha256_base_do_finalize(desc,
+ 				(sha256_block_fn *)sha256_block_neon);
+ 		kernel_neon_end();
 -- 
 2.11.0
 
