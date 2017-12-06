@@ -1,7 +1,7 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v3 10/20] arm64: assembler: add utility macros to push/pop stack frames
-Date: Wed,  6 Dec 2017 19:43:36 +0000
-Message-ID: <20171206194346.24393-11-ard.biesheuvel@linaro.org>
+Subject: [PATCH v3 11/20] arm64: assembler: add macros to conditionally yield the NEON under PREEMPT
+Date: Wed,  6 Dec 2017 19:43:37 +0000
+Message-ID: <20171206194346.24393-12-ard.biesheuvel@linaro.org>
 References: <20171206194346.24393-1-ard.biesheuvel@linaro.org>
 Cc: herbert@gondor.apana.org.au, linux-arm-kernel@lists.infradead.org,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>,
@@ -21,89 +21,81 @@ In-Reply-To: <20171206194346.24393-1-ard.biesheuvel@linaro.org>
 Sender: linux-rt-users-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-We are going to add code to all the NEON crypto routines that will
-turn them into non-leaf functions, so we need to manage the stack
-frames. To make this less tedious and error prone, add some macros
-that take the number of callee saved registers to preserve and the
-extra size to allocate in the stack frame (for locals) and emit
-the ldp/stp sequences.
+Add support macros to conditionally yield the NEON (and thus the CPU)
+that may be called from the assembler code.
+
+In some cases, yielding the NEON involves saving and restoring a non
+trivial amount of context (especially in the CRC folding algorithms),
+and so the macro is split into three, and the code in between is only
+executed when the yield path is taken, allowing the context to be preserved.
+The third macro takes an optional label argument that marks the resume
+path after a yield has been performed.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm64/include/asm/assembler.h | 60 ++++++++++++++++++++
- 1 file changed, 60 insertions(+)
+ arch/arm64/include/asm/assembler.h | 51 ++++++++++++++++++++
+ 1 file changed, 51 insertions(+)
 
 diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
-index aef72d886677..5f61487e9f93 100644
+index 5f61487e9f93..c54e408fd5a7 100644
 --- a/arch/arm64/include/asm/assembler.h
 +++ b/arch/arm64/include/asm/assembler.h
-@@ -499,6 +499,66 @@ alternative_else_nop_endif
+@@ -572,4 +572,55 @@ alternative_else_nop_endif
  #endif
  	.endm
  
-+	/*
-+	 * frame_push - Push @regcount callee saved registers to the stack,
-+	 *              starting at x19, as well as x29/x30, and set x29 to
-+	 *              the new value of sp. Add @extra bytes of stack space
-+	 *              for locals.
-+	 */
-+	.macro		frame_push, regcount:req, extra
-+	__frame		st, \regcount, \extra
++/*
++ * Check whether to yield to another runnable task from kernel mode NEON code
++ * (which runs with preemption disabled).
++ *
++ * if_will_cond_yield_neon
++ *        // pre-yield patchup code
++ * do_cond_yield_neon
++ *        // post-yield patchup code
++ * endif_yield_neon
++ *
++ * - Check whether the preempt count is exactly 1, in which case disabling
++ *   preemption once will make the task preemptible. If this is not the case,
++ *   yielding is pointless.
++ * - Check whether TIF_NEED_RESCHED is set, and if so, disable and re-enable
++ *   kernel mode NEON (which will trigger a reschedule), and branch to the
++ *   yield fixup code.
++ *
++ * This macro sequence clobbers x0, x1 and the flags register unconditionally,
++ * and may clobber x2 .. x18 if the yield path is taken.
++ */
++
++	.macro		cond_yield_neon, lbl
++	if_will_cond_yield_neon
++	do_cond_yield_neon
++	endif_yield_neon	\lbl
 +	.endm
 +
-+	/*
-+	 * frame_pop  - Pop @regcount callee saved registers from the stack,
-+	 *              starting at x19, as well as x29/x30. Also pop @extra
-+	 *              bytes of stack space for locals.
-+	 */
-+	.macro		frame_pop, regcount:req, extra
-+	__frame		ld, \regcount, \extra
++	.macro		if_will_cond_yield_neon
++#ifdef CONFIG_PREEMPT
++	get_thread_info	x0
++	ldr		w1, [x0, #TSK_TI_PREEMPT]
++	ldr		x0, [x0, #TSK_TI_FLAGS]
++	cmp		w1, #1 // == PREEMPT_OFFSET
++	csel		x0, x0, xzr, eq
++	tbnz		x0, #TIF_NEED_RESCHED, 5555f	// needs rescheduling?
++#endif
++	.subsection	1
++5555:
 +	.endm
 +
-+	.macro		__frame, op, regcount:req, extra=0
-+	.ifc		\op, st
-+	stp		x29, x30, [sp, #-((\regcount + 3) / 2) * 16 - \extra]!
-+	mov		x29, sp
-+	.endif
-+	.if		\regcount < 0 || \regcount > 10
-+	.error		"regcount should be in the range [0 ... 10]"
-+	.endif
-+	.if		(\extra % 16) != 0
-+	.error		"extra should be a multiple of 16 bytes"
-+	.endif
-+	.if		\regcount > 1
-+	\op\()p		x19, x20, [sp, #16]
-+	.if		\regcount > 3
-+	\op\()p		x21, x22, [sp, #32]
-+	.if		\regcount > 5
-+	\op\()p		x23, x24, [sp, #48]
-+	.if		\regcount > 7
-+	\op\()p		x25, x26, [sp, #64]
-+	.if		\regcount > 9
-+	\op\()p		x27, x28, [sp, #80]
-+	.elseif		\regcount == 9
-+	\op\()r		x27, [sp, #80]
-+	.endif
-+	.elseif		\regcount == 7
-+	\op\()r		x25, [sp, #64]
-+	.endif
-+	.elseif		\regcount == 5
-+	\op\()r		x23, [sp, #48]
-+	.endif
-+	.elseif		\regcount == 3
-+	\op\()r		x21, [sp, #32]
-+	.endif
-+	.elseif		\regcount == 1
-+	\op\()r		x19, [sp, #16]
-+	.endif
-+	.ifc		\op, ld
-+	ldp		x29, x30, [sp], #((\regcount + 3) / 2) * 16 + \extra
-+	.endif
++	.macro		do_cond_yield_neon
++	bl		kernel_neon_end
++	bl		kernel_neon_begin
 +	.endm
 +
- /*
-  * Errata workaround post TTBR0_EL1 update.
-  */
++	.macro		endif_yield_neon, lbl=6666f
++	b		\lbl
++	.previous
++6666:
++	.endm
++
+ #endif	/* __ASM_ASSEMBLER_H */
 -- 
 2.11.0
 
