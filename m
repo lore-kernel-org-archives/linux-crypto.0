@@ -1,7 +1,7 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v3 05/20] crypto: arm64/chacha20 - move kernel mode neon en/disable into loop
-Date: Wed,  6 Dec 2017 19:43:31 +0000
-Message-ID: <20171206194346.24393-6-ard.biesheuvel@linaro.org>
+Subject: [PATCH v3 07/20] crypto: arm64/aes-blk - add 4 way interleave to CBC encrypt path
+Date: Wed,  6 Dec 2017 19:43:33 +0000
+Message-ID: <20171206194346.24393-8-ard.biesheuvel@linaro.org>
 References: <20171206194346.24393-1-ard.biesheuvel@linaro.org>
 Cc: herbert@gondor.apana.org.au, linux-arm-kernel@lists.infradead.org,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>,
@@ -17,92 +17,78 @@ Cc: herbert@gondor.apana.org.au, linux-arm-kernel@lists.infradead.org,
         Thomas Gleixner <tglx@linutronix.de>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wr0-f195.google.com ([209.85.128.195]:44331 "EHLO
-        mail-wr0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752126AbdLFToK (ORCPT
+Received: from mail-wr0-f193.google.com ([209.85.128.193]:34512 "EHLO
+        mail-wr0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752166AbdLFToQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 6 Dec 2017 14:44:10 -0500
-Received: by mail-wr0-f195.google.com with SMTP id l22so5100091wrc.11
-        for <linux-crypto@vger.kernel.org>; Wed, 06 Dec 2017 11:44:09 -0800 (PST)
+        Wed, 6 Dec 2017 14:44:16 -0500
+Received: by mail-wr0-f193.google.com with SMTP id y21so5132249wrc.1
+        for <linux-crypto@vger.kernel.org>; Wed, 06 Dec 2017 11:44:15 -0800 (PST)
 In-Reply-To: <20171206194346.24393-1-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-When kernel mode NEON was first introduced on arm64, the preserve and
-restore of the userland NEON state was completely unoptimized, and
-involved saving all registers on each call to kernel_neon_begin(),
-and restoring them on each call to kernel_neon_end(). For this reason,
-the NEON crypto code that was introduced at the time keeps the NEON
-enabled throughout the execution of the crypto API methods, which may
-include calls back into the crypto API that could result in memory
-allocation or other actions that we should avoid when running with
-preemption disabled.
+CBC encryption is strictly sequential, and so the current AES code
+simply processes the input one block at a time. However, we are
+about to add yield support, which adds a bit of overhead, and which
+we prefer to align with other modes in terms of granularity (i.e.,
+it is better to have all routines yield every 64 bytes and not have
+an exception for CBC encrypt which yields every 16 bytes)
 
-Since then, we have optimized the kernel mode NEON handling, which now
-restores lazily (upon return to userland), and so the preserve action
-is only costly the first time it is called after entering the kernel.
-
-So let's put the kernel_neon_begin() and kernel_neon_end() calls around
-the actual invocations of the NEON crypto code, and run the remainder of
-the code with kernel mode NEON disabled (and preemption enabled)
+So unroll the loop by 4. We still cannot perform the AES algorithm in
+parallel, but we can at least merge the loads and stores.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm64/crypto/chacha20-neon-glue.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+ arch/arm64/crypto/aes-modes.S | 31 ++++++++++++++++----
+ 1 file changed, 25 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/crypto/chacha20-neon-glue.c b/arch/arm64/crypto/chacha20-neon-glue.c
-index cbdb75d15cd0..727579c93ded 100644
---- a/arch/arm64/crypto/chacha20-neon-glue.c
-+++ b/arch/arm64/crypto/chacha20-neon-glue.c
-@@ -37,12 +37,19 @@ static void chacha20_doneon(u32 *state, u8 *dst, const u8 *src,
- 	u8 buf[CHACHA20_BLOCK_SIZE];
+diff --git a/arch/arm64/crypto/aes-modes.S b/arch/arm64/crypto/aes-modes.S
+index 27a235b2ddee..e86535a1329d 100644
+--- a/arch/arm64/crypto/aes-modes.S
++++ b/arch/arm64/crypto/aes-modes.S
+@@ -94,17 +94,36 @@ AES_ENDPROC(aes_ecb_decrypt)
+ 	 */
  
- 	while (bytes >= CHACHA20_BLOCK_SIZE * 4) {
-+		kernel_neon_begin();
- 		chacha20_4block_xor_neon(state, dst, src);
-+		kernel_neon_end();
- 		bytes -= CHACHA20_BLOCK_SIZE * 4;
- 		src += CHACHA20_BLOCK_SIZE * 4;
- 		dst += CHACHA20_BLOCK_SIZE * 4;
- 		state[12] += 4;
- 	}
-+
-+	if (!bytes)
-+		return;
-+
-+	kernel_neon_begin();
- 	while (bytes >= CHACHA20_BLOCK_SIZE) {
- 		chacha20_block_xor_neon(state, dst, src);
- 		bytes -= CHACHA20_BLOCK_SIZE;
-@@ -55,6 +62,7 @@ static void chacha20_doneon(u32 *state, u8 *dst, const u8 *src,
- 		chacha20_block_xor_neon(state, buf, buf);
- 		memcpy(dst, buf, bytes);
- 	}
-+	kernel_neon_end();
- }
+ AES_ENTRY(aes_cbc_encrypt)
+-	ld1		{v0.16b}, [x5]			/* get iv */
++	ld1		{v4.16b}, [x5]			/* get iv */
+ 	enc_prepare	w3, x2, x6
  
- static int chacha20_neon(struct skcipher_request *req)
-@@ -68,11 +76,10 @@ static int chacha20_neon(struct skcipher_request *req)
- 	if (!may_use_simd() || req->cryptlen <= CHACHA20_BLOCK_SIZE)
- 		return crypto_chacha20_crypt(req);
+-.Lcbcencloop:
+-	ld1		{v1.16b}, [x1], #16		/* get next pt block */
+-	eor		v0.16b, v0.16b, v1.16b		/* ..and xor with iv */
++.Lcbcencloop4x:
++	subs		w4, w4, #4
++	bmi		.Lcbcenc1x
++	ld1		{v0.16b-v3.16b}, [x1], #64	/* get 4 pt blocks */
++	eor		v0.16b, v0.16b, v4.16b		/* ..and xor with iv */
+ 	encrypt_block	v0, w3, x2, x6, w7
+-	st1		{v0.16b}, [x0], #16
++	eor		v1.16b, v1.16b, v0.16b
++	encrypt_block	v1, w3, x2, x6, w7
++	eor		v2.16b, v2.16b, v1.16b
++	encrypt_block	v2, w3, x2, x6, w7
++	eor		v3.16b, v3.16b, v2.16b
++	encrypt_block	v3, w3, x2, x6, w7
++	st1		{v0.16b-v3.16b}, [x0], #64
++	mov		v4.16b, v3.16b
++	b		.Lcbcencloop4x
++.Lcbcenc1x:
++	adds		w4, w4, #4
++	beq		.Lcbcencout
++.Lcbcencloop:
++	ld1		{v0.16b}, [x1], #16		/* get next pt block */
++	eor		v4.16b, v4.16b, v0.16b		/* ..and xor with iv */
++	encrypt_block	v4, w3, x2, x6, w7
++	st1		{v4.16b}, [x0], #16
+ 	subs		w4, w4, #1
+ 	bne		.Lcbcencloop
+-	st1		{v0.16b}, [x5]			/* return iv */
++.Lcbcencout:
++	st1		{v4.16b}, [x5]			/* return iv */
+ 	ret
+ AES_ENDPROC(aes_cbc_encrypt)
  
--	err = skcipher_walk_virt(&walk, req, true);
-+	err = skcipher_walk_virt(&walk, req, false);
- 
- 	crypto_chacha20_init(state, ctx, walk.iv);
- 
--	kernel_neon_begin();
- 	while (walk.nbytes > 0) {
- 		unsigned int nbytes = walk.nbytes;
- 
-@@ -83,7 +90,6 @@ static int chacha20_neon(struct skcipher_request *req)
- 				nbytes);
- 		err = skcipher_walk_done(&walk, walk.nbytes - nbytes);
- 	}
--	kernel_neon_end();
- 
- 	return err;
- }
 -- 
 2.11.0
