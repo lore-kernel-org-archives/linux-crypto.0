@@ -1,122 +1,86 @@
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Subject: Re: [PATCH 2/3] crypto: exynos - Improve performance of PRNG
-Date: Wed, 6 Dec 2017 12:37:47 +0100
-Message-ID: <CAJKOXPf29yTTXRg=X3h-OCyGTyO2O3tSE99qK2UXNwtj9cK8FA@mail.gmail.com>
-References: <CGME20171206113301eucas1p23da9decc34cc646b0bf4eb88953ef94a@eucas1p2.samsung.com>
- <CAJKOXPfRu-CseVCJUabXcaJP+uBVfkcHV63O0pVegYz6mKxBqg@mail.gmail.com> <87vahk9jml.fsf%l.stelmach@samsung.com>
+From: Fabien DESSENNE <fabien.dessenne@st.com>
+Subject: Re: [PATCH RFC 0/4] crypto: engine - Permit to enqueue all async
+ requests
+Date: Wed, 6 Dec 2017 10:59:47 +0000
+Message-ID: <4d58a1fc-8577-3fdb-ae6b-e1fade7c6582@st.com>
+References: <20171129084121.9385-1-clabbe.montjoie@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-Cc: Stephan Mueller <smueller@chronox.de>, robh+dt@kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Kukjin Kim <kgene@kernel.org>, linux-crypto@vger.kernel.org,
-        linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        =?UTF-8?B?QmFydMWCb21pZWogxbtvxYJuaWVya2lld2ljeg==?=
-        <b.zolnierkie@samsung.com>
-To: =?UTF-8?Q?=C5=81ukasz_Stelmach?= <l.stelmach@samsung.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:58426 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752129AbdLFLhu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 6 Dec 2017 06:37:50 -0500
-In-Reply-To: <87vahk9jml.fsf%l.stelmach@samsung.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: "linux-arm-kernel@lists.infradead.org"
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org"
+        <virtualization@lists.linux-foundation.org>
+To: Corentin Labbe <clabbe.montjoie@gmail.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        Alexandre TORGUE <alexandre.torgue@st.com>,
+        "arei.gonglei@huawei.com" <arei.gonglei@huawei.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "mcoquelin.stm32@gmail.com" <mcoquelin.stm32@gmail.com>,
+        "mst@redhat.com" <mst@redhat.com>,
+        Lionel DEBIEVE <lionel.debieve@st.com>,
+        Benjamin GAIGNARD <benjamin.gaignard@st.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20171129084121.9385-1-clabbe.montjoie@gmail.com>
+Content-Language: en-US
+Content-ID: <F96E4AD9C0156349A90A477D7327A9EF@st.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Dec 6, 2017 at 12:32 PM, Łukasz Stelmach <l.stelmach@samsung.com> wrote:
-> It was <2017-12-05 wto 19:06>, when Krzysztof Kozlowski wrote:
->> On Tue, Dec 5, 2017 at 6:53 PM, Krzysztof Kozlowski <krzk@kernel.org> wrote:
->>> On Tue, Dec 05, 2017 at 05:43:10PM +0100, Łukasz Stelmach wrote:
->>>> It was <2017-12-05 wto 14:54>, when Stephan Mueller wrote:
->>>>> Am Dienstag, 5. Dezember 2017, 13:35:57 CET schrieb Łukasz Stelmach:
->>>>>> Use memcpy_fromio() instead of custom exynos_rng_copy_random() function
->>>>>> to retrieve generated numbers from the registers of PRNG.
->>>>>>
->>>>>> Remove unnecessary invocation of cpu_relax().
->>>>>>
->>>>>> Signed-off-by: Łukasz Stelmach <l.stelmach@samsung.com>
->>>>>> ---
->>>>>>  drivers/crypto/exynos-rng.c | 36 +++++-------------------------------
->>>>>>  1 file changed, 5 insertions(+), 31 deletions(-)
->>>>>>
->>>>>> diff --git a/drivers/crypto/exynos-rng.c b/drivers/crypto/exynos-rng.c
->>>>>> index 894ef93ef5ec..002e9d2a83cc 100644
->>>>>> --- a/drivers/crypto/exynos-rng.c
->>>>>> +++ b/drivers/crypto/exynos-rng.c
->>>>
->>>> [...]
->>>>
->>>>>> @@ -171,6 +143,8 @@ static int exynos_rng_get_random(struct exynos_rng_dev
->>>>>> *rng, {
->>>>>>    int retry = EXYNOS_RNG_WAIT_RETRIES;
->>>>>>
->>>>>> +  *read = min_t(size_t, dlen, EXYNOS_RNG_SEED_SIZE);
->>>>>> +
->>>>>>    if (rng->type == EXYNOS_PRNG_TYPE4) {
->>>>>>            exynos_rng_writel(rng, EXYNOS_RNG_CONTROL_START,
->>>>>>                              EXYNOS_RNG_CONTROL);
->>>>>> @@ -180,8 +154,8 @@ static int exynos_rng_get_random(struct exynos_rng_dev
->>>>>> *rng, }
->>>>>>
->>>>>>    while (!(exynos_rng_readl(rng,
->>>>>> -                  EXYNOS_RNG_STATUS) & EXYNOS_RNG_STATUS_RNG_DONE) && --retry)
->>>>>> -          cpu_relax();
->>>>>> +                  EXYNOS_RNG_STATUS) & EXYNOS_RNG_STATUS_RNG_DONE) &&
->>>>>> +         --retry);
->
-> [...]
->
->>>> The busy loop is not very busy. Every time I checked the loop (w/o
->>>> cpu_relax()) was executed twice (retry was 98) and the operation was
->>>> reliable. I don't see why do we need a memory barrier here. On the other
->>>> hand, I am not sure the whole exynos_rng_get_random() shouldn't be ran
->>>> under a mutex or a spinlock (I don't see anything like this in the upper
->>>> layers of the crypto framework).
->>>>
->>>> The *_relaxed() I/O operations do not enforce memory
->>>
->>> The cpu_relax() is a common pattern for busy-loop. If you want to break
->>> this pattern - please explain why only this part of kernel should not
->>> follow it (and rest of kernel should).
->>>
->>> The other part - this code is already using relaxed versions which might
->>> get you into difficult to debug issues. You mentioned that loop works
->>> reliable after removing the cpu_relax... yeah, it might for 99.999% but
->>> that's not the argument. I remember few emails from Arnd Bergmann
->>> mentioning explicitly to avoid using relaxed versions "just because",
->>> unless it is necessary or really understood.
->>>
->>> The code first writes to control register, then checks for status so you
->>> should have these operations strictly ordered. Therefore I think
->>> cpu_relax() should not be removed.
->>
->> ... or just convert it to readl_poll_timeout() because it makes code
->> more readable, takes care of timeout and you do not have care about
->> specific implementation (whether there should or should not be
->> cpu_relax).
->
-> OK. This appears to perform reasonably.
->
->         do {
->                 cpu_relax();
->         } while (!(exynos_rng_readl(rng, EXYNOS_RNG_STATUS) &
->                    EXYNOS_RNG_STATUS_RNG_DONE) && --retry);
-
-You mean that:
-  while (readl_relaxed()) cpu_relax();
-is slower than
-  do cpu_relax() while (readl_relaxed())
-?
-
-Hmm... Interesting. I would be happy to learn more about it why it
-behaves so differently. Maybe the execution of cpu_relax() before
-readl_relaxed() reduces the amount of loops to actually one read?
-
-Indeed some parts of kernel code for ARM prefers this approach,
-although still the most popular pattern is existing one (while()
-cpu_relax).
-
-Best regards,
-Krzysztof
+SGkgQ29yZW50aW4sDQoNCg0KSSBhbSBmaW5lIHdpdGggdGhpcyBwcm9wb3NhbDogaXQgaXMgZ2Vu
+ZXJpYyBlbm91Z2ggYW5kIEkgaGF2ZSBiZWVuIGFibGUgDQp0byB0ZXN0IGFuZCBydW4gdGhlIGNy
+eXB0byBlbmdpbmUgd2l0aCBhZWFkX3JlcXVlc3Qgd2l0aG91dCBjaGFuZ2luZyBhbnkgDQpzaW5n
+bGUgbGluZSBvZiBjb2RlLg0KDQpUaGlzIGlzIHdoYXQgSSBuZWVkIHRvIGJlIGFibGUgdG8gc2Vu
+ZCB0aGUgQUVBRCBleHRlbnNpb24gb2YgdGhlIA0Kc3RtMzItY3J5cCBkcml2ZXIgKHN1Y2Nlc3Nm
+dWxseSB0ZXN0ZWQgd2l0aCB5b3VyIGVuZ2luZSB1cGdyYWRlIHByb3Bvc2FsKS4NCg0KDQpJIGhh
+dmUgYWxzbyB0ZXN0ZWQgdGhlIHN0bTMyLWhhc2ggcGF0Y2guDQoNCk5vdGUgdGhhdCBzdG0zMi1j
+cnlwIChuZXcgZHJpdmVyIGFwcGxpZWQgYnkgSGVyYmVydCByZWNlbnRseSANCltodHRwczovL2dp
+dC5rZXJuZWwub3JnL3B1Yi9zY20vbGludXgva2VybmVsL2dpdC9oZXJiZXJ0L2NyeXB0b2Rldi0y
+LjYuZ2l0L2NvbW1pdC8/aWQ9OWUwNTRlYzIxZWY4MzQ0MzQ1YjI4NjAzZmIyNzJmZTk5OWY3MzVk
+Yl0pIA0Kd291bGQgYWxzbyBuZWVkIHRvIGJlIGNvbnZlcnRlZCB0byB0aGUgbmV3IGNyeXB0byBl
+bmdpbmUgQVBJIDogdGhpcyBpcyBhIA0KdHJpdmlhbCBwYXRjaC4NCg0KVGhhbmsgeW91IGZvciB5
+b3VyIHByb3Bvc2FsLCBJIGhvcGUgdGhhdCB0aGlzIHByb3Bvc2FsIGlzIGZpbmUgZm9yIA0KSGVy
+YmVydCB0b28uDQoNCkJSDQoNCg0KRmFiaWVuDQoNCg0KT24gMjkvMTEvMTcgMDk6NDEsIENvcmVu
+dGluIExhYmJlIHdyb3RlOg0KPiBIZWxsbw0KPg0KPiBUaGUgY3VycmVudCBjcnlwdG9fZW5naW5l
+IHN1cHBvcnQgb25seSBhaGFzaCBhbmQgYWJsa2NpcGhlci4NCj4gTXkgZmlyc3QgcGF0Y2ggd2hp
+Y2ggdHJ5IHRvIGFkZCBza2NpcGhlciB3YXMgTmFja2VkLCBpdCB3aWxsIGFkZCB0b28gbWFueSBm
+dW5jdGlvbnMNCj4gYW5kIGFkZGluZyBvdGhlciBhbGdzKGFlYWQsIGFzeW1ldHJpY19rZXkpIHdp
+bGwgbWFrZSB0aGUgc2l0dWF0aW9uIHdvcnN0Lg0KPg0KPiBUaGlzIHBhdGNoc2V0IHJlbW92ZSBh
+bGwgYWxncyBzcGVjaWZpYyBzdHVmZiBhbmQgbm93IG9ubHkgcHJvY2VzcyBnZW5lcmljIGNyeXB0
+b19hc3luY19yZXF1ZXN0Lg0KPg0KPiBUaGUgcmVxdWVzdHMgaGFuZGxlciBmdW5jdGlvbiBwb2lu
+dGVyIGFyZSBub3cgbW92ZWQgb3V0IG9mIHN0cnVjdCBlbmdpbmUgYW5kDQo+IGFyZSBub3cgc3Rv
+cmVkIGRpcmVjdGx5IGluIGEgY3J5cHRvX2VuZ2luZV9yZXFjdHguDQo+DQo+IFRoZSBvcmlnaW5h
+bCBwcm9wb3NhbCBvZiBIZXJiZXJ0IFsxXSBjYW5ub3QgYmUgZG9uZSBjb21wbGV0bHkgc2luY2Ug
+dGhlIGNyeXB0b19lbmdpbmUNCj4gY291bGQgb25seSBkZXF1ZXVlIGNyeXB0b19hc3luY19yZXF1
+ZXN0IGFuZCBpdCBpcyBpbXBvc3NpYmxlIHRvIGFjY2VzcyBhbnkgcmVxdWVzdF9jdHgNCj4gd2l0
+aG91dCBrbm93aW5nIHRoZSB1bmRlcmx5aW5nIHJlcXVlc3QgdHlwZS4NCj4NCj4gU28gSSBkbyBz
+b21ldGhpbmcgbmVhciB0aGF0IHdhcyByZXF1ZXN0ZWQ6IGFkZGluZyBjcnlwdG9fZW5naW5lX3Jl
+cWN0eCBpbiBURk0gY29udGV4dC4NCj4gTm90ZSB0aGF0IHRoZSBjdXJyZW50IGltcGxlbWVudGF0
+aW9uIGV4cGVjdCB0aGF0IGNyeXB0b19lbmdpbmVfcmVxY3R4DQo+IGlzIHRoZSBmaXJzdCBtZW1i
+ZXIgb2YgdGhlIGNvbnRleHQuDQo+DQo+IFRoZSBmaXJzdCBwYXRjaCBjb252ZXJ0IHRoZSBjcnlw
+dG8gZW5naW5lIHdpdGggdGhlIG5ldyB3YXksDQo+IHdoaWxlIHRoZSBmb2xsb3dpbmcgcGF0Y2hz
+IGNvbnZlcnQgdGhlIDMgZXhpc3RpbmcgdXNlcnMgb2YgY3J5cHRvX2VuZ2luZS4NCj4gTm90ZSB0
+aGF0IHRoaXMgc3BsaXQgYnJlYWsgYmlzZWN0aW9uLCBzbyBwcm9iYWJseSB0aGUgZmluYWwgY29t
+bWl0IHdpbGwgYmUgYWxsIG1lcmdlZC4NCj4NCj4gVGhlIDMgbGF0ZXN0IHBhdGNoIHdlcmUgY29t
+cGlsZSB0ZXN0ZWQgb25seSwgYnV0IHRoZSBmaXJzdCBpcyB0ZXN0ZWQgc3VjY2Vzc2Z1bGx5DQo+
+IHdpdGggbXkgbmV3IHN1bjhpLWNlIGRyaXZlci4NCj4NCj4gUmVnYXJkcw0KPg0KPiBbMV0gaHR0
+cHM6Ly93d3cubWFpbC1hcmNoaXZlLmNvbS9saW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnL21z
+ZzE0NzQ0MzQuaHRtbA0KPg0KPiBDb3JlbnRpbiBMYWJiZSAoNCk6DQo+ICAgIGNyeXB0bzogZW5n
+aW5lIC0gUGVybWl0IHRvIGVucXVldWUgYWxsIGFzeW5jIHJlcXVlc3RzDQo+ICAgIGNyeXB0bzog
+b21hcDogY29udmVydCB0byBuZXcgY3J5cHRvIGVuZ2luZSBBUEkNCj4gICAgY3J5cHRvOiB2aXJ0
+aW86IGNvbnZlcnQgdG8gbmV3IGNyeXB0byBlbmdpbmUgQVBJDQo+ICAgIGNyeXB0bzogc3RtMzI6
+IGNvbnZlcnQgdG8gdGhlIG5ldyBjcnlwdG8gZW5naW5lIEFQSQ0KPg0KPiAgIGNyeXB0by9jcnlw
+dG9fZW5naW5lLmMgICAgICAgICAgICAgICAgICAgICAgIHwgMTg4ICsrKysrKy0tLS0tLS0tLS0t
+LS0tLS0tLS0tLQ0KPiAgIGRyaXZlcnMvY3J5cHRvL29tYXAtYWVzLmMgICAgICAgICAgICAgICAg
+ICAgIHwgIDIxICsrLQ0KPiAgIGRyaXZlcnMvY3J5cHRvL29tYXAtYWVzLmggICAgICAgICAgICAg
+ICAgICAgIHwgICAzICsNCj4gICBkcml2ZXJzL2NyeXB0by9vbWFwLWRlcy5jICAgICAgICAgICAg
+ICAgICAgICB8ICAyNCArKystDQo+ICAgZHJpdmVycy9jcnlwdG8vc3RtMzIvc3RtMzItaGFzaC5j
+ICAgICAgICAgICAgfCAgMjIgKysrLQ0KPiAgIGRyaXZlcnMvY3J5cHRvL3ZpcnRpby92aXJ0aW9f
+Y3J5cHRvX2FsZ3MuYyAgIHwgIDE1ICsrLQ0KPiAgIGRyaXZlcnMvY3J5cHRvL3ZpcnRpby92aXJ0
+aW9fY3J5cHRvX2NvbW1vbi5oIHwgICAyICstDQo+ICAgZHJpdmVycy9jcnlwdG8vdmlydGlvL3Zp
+cnRpb19jcnlwdG9fY29yZS5jICAgfCAgIDMgLQ0KPiAgIGluY2x1ZGUvY3J5cHRvL2VuZ2luZS5o
+ICAgICAgICAgICAgICAgICAgICAgIHwgIDQ2ICsrKy0tLS0NCj4gICA5IGZpbGVzIGNoYW5nZWQs
+IDEyMiBpbnNlcnRpb25zKCspLCAyMDIgZGVsZXRpb25zKC0pDQo+DQo=
