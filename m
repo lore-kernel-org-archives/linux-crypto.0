@@ -1,92 +1,173 @@
-From: Fabien DESSENNE <fabien.dessenne@st.com>
-Subject: Re: [PATCH RFC 4/4] crypto: stm32: convert to the new crypto engine
- API
-Date: Wed, 6 Dec 2017 11:03:23 +0000
-Message-ID: <5835a2df-64d2-1363-15a3-eec4db955d58@st.com>
-References: <20171129084121.9385-1-clabbe.montjoie@gmail.com>
- <20171129084121.9385-5-clabbe.montjoie@gmail.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH v2 11/19] arm64: assembler: add macro to conditionally
+ yield the NEON under PREEMPT
+Date: Wed, 6 Dec 2017 11:57:12 +0000
+Message-ID: <CAKv+Gu83CR=KGawz5WRQygULcqX+DjhVjAeR-+QOGYx=2oPTzA@mail.gmail.com>
+References: <20171204122645.31535-1-ard.biesheuvel@linaro.org>
+ <20171204122645.31535-12-ard.biesheuvel@linaro.org> <20171205122757.GW22781@e103592.cambridge.arm.com>
+ <DD92A22D-E5EF-4C97-8C76-4797892518A4@linaro.org> <CAKv+Gu88Ym4NxoLxVd07Z07PD454_ONV4D=pqvxezPvAPnd5og@mail.gmail.com>
+ <20171206115134.GZ22781@e103592.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: "linux-arm-kernel@lists.infradead.org"
-        <linux-arm-kernel@lists.infradead.org>,
+Content-Type: text/plain; charset="UTF-8"
+Cc: Mark Rutland <mark.rutland@arm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Will Deacon <will.deacon@arm.com>,
+        Russell King - ARM Linux <linux@armlinux.org.uk>,
+        Steven Rostedt <rostedt@goodmis.org>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org"
-        <virtualization@lists.linux-foundation.org>
-To: Corentin Labbe <clabbe.montjoie@gmail.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        Alexandre TORGUE <alexandre.torgue@st.com>,
-        "arei.gonglei@huawei.com" <arei.gonglei@huawei.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "mcoquelin.stm32@gmail.com" <mcoquelin.stm32@gmail.com>,
-        "mst@redhat.com" <mst@redhat.com>,
-        Lionel DEBIEVE <lionel.debieve@st.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20171129084121.9385-5-clabbe.montjoie@gmail.com>
-Content-Language: en-US
-Content-ID: <53C74EB7E53A664B9ADDA336340EDC82@st.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+        Thomas Gleixner <tglx@linutronix.de>,
+        "linux-arm-kernel@lists.infradead.org"
+        <linux-arm-kernel@lists.infradead.org>,
+        linux-rt-users@vger.kernel.org
+To: Dave Martin <Dave.Martin@arm.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-io0-f195.google.com ([209.85.223.195]:42098 "EHLO
+        mail-io0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751904AbdLFL5N (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 6 Dec 2017 06:57:13 -0500
+Received: by mail-io0-f195.google.com with SMTP id u42so2369270ioi.9
+        for <linux-crypto@vger.kernel.org>; Wed, 06 Dec 2017 03:57:13 -0800 (PST)
+In-Reply-To: <20171206115134.GZ22781@e103592.cambridge.arm.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-SGksDQoNCg0KT24gMjkvMTEvMTcgMDk6NDEsIENvcmVudGluIExhYmJlIHdyb3RlOg0KPiBUaGlz
-IHBhdGNoIGNvbnZlcnQgdGhlIGRyaXZlciB0byB0aGUgbmV3IGNyeXB0byBlbmdpbmUgQVBJLg0K
-Pg0KPiBTaWduZWQtb2ZmLWJ5OiBDb3JlbnRpbiBMYWJiZSA8Y2xhYmJlLm1vbnRqb2llQGdtYWls
-LmNvbT4NCg0KVGVzdGVkLWJ5OiBGYWJpZW4gRGVzc2VubmUgPGZhYmllbi5kZXNzZW5uZUBzdC5j
-b20+DQoNCj4gLS0tDQo+ICAgZHJpdmVycy9jcnlwdG8vc3RtMzIvc3RtMzItaGFzaC5jIHwgMjIg
-KysrKysrKysrKysrKysrLS0tLS0tLQ0KPiAgIDEgZmlsZSBjaGFuZ2VkLCAxNSBpbnNlcnRpb25z
-KCspLCA3IGRlbGV0aW9ucygtKQ0KPg0KPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9jcnlwdG8vc3Rt
-MzIvc3RtMzItaGFzaC5jIGIvZHJpdmVycy9jcnlwdG8vc3RtMzIvc3RtMzItaGFzaC5jDQo+IGlu
-ZGV4IDRjYTRhMjY0YTgzMy4uZTNmOWY3YjA0Y2UyIDEwMDY0NA0KPiAtLS0gYS9kcml2ZXJzL2Ny
-eXB0by9zdG0zMi9zdG0zMi1oYXNoLmMNCj4gKysrIGIvZHJpdmVycy9jcnlwdG8vc3RtMzIvc3Rt
-MzItaGFzaC5jDQo+IEBAIC0xMjIsNiArMTIyLDcgQEAgZW51bSBzdG0zMl9oYXNoX2RhdGFfZm9y
-bWF0IHsNCj4gICAjZGVmaW5lIEhBU0hfRE1BX1RIUkVTSE9MRAkJNTANCj4gICANCj4gICBzdHJ1
-Y3Qgc3RtMzJfaGFzaF9jdHggew0KPiArCXN0cnVjdCBjcnlwdG9fZW5naW5lX3JlcWN0eCBlbmdp
-bmVjdHg7DQo+ICAgCXN0cnVjdCBzdG0zMl9oYXNoX2RldgkqaGRldjsNCj4gICAJdW5zaWduZWQg
-bG9uZwkJZmxhZ3M7DQo+ICAgDQo+IEBAIC04MTEsNyArODEyLDcgQEAgc3RhdGljIHZvaWQgc3Rt
-MzJfaGFzaF9maW5pc2hfcmVxKHN0cnVjdCBhaGFzaF9yZXF1ZXN0ICpyZXEsIGludCBlcnIpDQo+
-ICAgCQlyY3R4LT5mbGFncyB8PSBIQVNIX0ZMQUdTX0VSUk9SUzsNCj4gICAJfQ0KPiAgIA0KPiAt
-CWNyeXB0b19maW5hbGl6ZV9oYXNoX3JlcXVlc3QoaGRldi0+ZW5naW5lLCByZXEsIGVycik7DQo+
-ICsJY3J5cHRvX2ZpbmFsaXplX3JlcXVlc3QoaGRldi0+ZW5naW5lLCAmcmVxLT5iYXNlLCBlcnIp
-Ow0KPiAgIH0NCj4gICANCj4gICBzdGF0aWMgaW50IHN0bTMyX2hhc2hfaHdfaW5pdChzdHJ1Y3Qg
-c3RtMzJfaGFzaF9kZXYgKmhkZXYsDQo+IEBAIC04MjgsMTUgKzgyOSwyMSBAQCBzdGF0aWMgaW50
-IHN0bTMyX2hhc2hfaHdfaW5pdChzdHJ1Y3Qgc3RtMzJfaGFzaF9kZXYgKmhkZXYsDQo+ICAgCXJl
-dHVybiAwOw0KPiAgIH0NCj4gICANCj4gK3N0YXRpYyBpbnQgc3RtMzJfaGFzaF9vbmVfcmVxdWVz
-dChzdHJ1Y3QgY3J5cHRvX2VuZ2luZSAqZW5naW5lLA0KPiArCQkJCSAgc3RydWN0IGNyeXB0b19h
-c3luY19yZXF1ZXN0ICphcmVxKTsNCj4gK3N0YXRpYyBpbnQgc3RtMzJfaGFzaF9wcmVwYXJlX3Jl
-cShzdHJ1Y3QgY3J5cHRvX2VuZ2luZSAqZW5naW5lLA0KPiArCQkJCSAgc3RydWN0IGNyeXB0b19h
-c3luY19yZXF1ZXN0ICphcmVxKTsNCj4gKw0KPiAgIHN0YXRpYyBpbnQgc3RtMzJfaGFzaF9oYW5k
-bGVfcXVldWUoc3RydWN0IHN0bTMyX2hhc2hfZGV2ICpoZGV2LA0KPiAgIAkJCQkgICBzdHJ1Y3Qg
-YWhhc2hfcmVxdWVzdCAqcmVxKQ0KPiAgIHsNCj4gLQlyZXR1cm4gY3J5cHRvX3RyYW5zZmVyX2hh
-c2hfcmVxdWVzdF90b19lbmdpbmUoaGRldi0+ZW5naW5lLCByZXEpOw0KPiArCXJldHVybiBjcnlw
-dG9fdHJhbnNmZXJfcmVxdWVzdF90b19lbmdpbmUoaGRldi0+ZW5naW5lLCAmcmVxLT5iYXNlKTsN
-Cj4gICB9DQo+ICAgDQo+ICAgc3RhdGljIGludCBzdG0zMl9oYXNoX3ByZXBhcmVfcmVxKHN0cnVj
-dCBjcnlwdG9fZW5naW5lICplbmdpbmUsDQo+IC0JCQkJICBzdHJ1Y3QgYWhhc2hfcmVxdWVzdCAq
-cmVxKQ0KPiArCQkJCSAgc3RydWN0IGNyeXB0b19hc3luY19yZXF1ZXN0ICphcmVxKQ0KPiAgIHsN
-Cj4gKwlzdHJ1Y3QgYWhhc2hfcmVxdWVzdCAqcmVxID0gYWhhc2hfcmVxdWVzdF9jYXN0KGFyZXEp
-Ow0KPiAgIAlzdHJ1Y3Qgc3RtMzJfaGFzaF9jdHggKmN0eCA9IGNyeXB0b19haGFzaF9jdHgoY3J5
-cHRvX2FoYXNoX3JlcXRmbShyZXEpKTsNCj4gICAJc3RydWN0IHN0bTMyX2hhc2hfZGV2ICpoZGV2
-ID0gc3RtMzJfaGFzaF9maW5kX2RldihjdHgpOw0KPiAgIAlzdHJ1Y3Qgc3RtMzJfaGFzaF9yZXF1
-ZXN0X2N0eCAqcmN0eDsNCj4gQEAgLTg1NSw4ICs4NjIsOSBAQCBzdGF0aWMgaW50IHN0bTMyX2hh
-c2hfcHJlcGFyZV9yZXEoc3RydWN0IGNyeXB0b19lbmdpbmUgKmVuZ2luZSwNCj4gICB9DQo+ICAg
-DQo+ICAgc3RhdGljIGludCBzdG0zMl9oYXNoX29uZV9yZXF1ZXN0KHN0cnVjdCBjcnlwdG9fZW5n
-aW5lICplbmdpbmUsDQo+IC0JCQkJICBzdHJ1Y3QgYWhhc2hfcmVxdWVzdCAqcmVxKQ0KPiArCQkJ
-CSAgc3RydWN0IGNyeXB0b19hc3luY19yZXF1ZXN0ICphcmVxKQ0KPiAgIHsNCj4gKwlzdHJ1Y3Qg
-YWhhc2hfcmVxdWVzdCAqcmVxID0gYWhhc2hfcmVxdWVzdF9jYXN0KGFyZXEpOw0KPiAgIAlzdHJ1
-Y3Qgc3RtMzJfaGFzaF9jdHggKmN0eCA9IGNyeXB0b19haGFzaF9jdHgoY3J5cHRvX2FoYXNoX3Jl
-cXRmbShyZXEpKTsNCj4gICAJc3RydWN0IHN0bTMyX2hhc2hfZGV2ICpoZGV2ID0gc3RtMzJfaGFz
-aF9maW5kX2RldihjdHgpOw0KPiAgIAlzdHJ1Y3Qgc3RtMzJfaGFzaF9yZXF1ZXN0X2N0eCAqcmN0
-eDsNCj4gQEAgLTEwMzMsNiArMTA0MSw5IEBAIHN0YXRpYyBpbnQgc3RtMzJfaGFzaF9jcmFfaW5p
-dF9hbGdzKHN0cnVjdCBjcnlwdG9fdGZtICp0Zm0sDQo+ICAgCWlmIChhbGdzX2htYWNfbmFtZSkN
-Cj4gICAJCWN0eC0+ZmxhZ3MgfD0gSEFTSF9GTEFHU19ITUFDOw0KPiAgIA0KPiArCWN0eC0+ZW5n
-aW5lY3R4Lm9wLmRvX29uZV9yZXF1ZXN0ID0gc3RtMzJfaGFzaF9vbmVfcmVxdWVzdDsNCj4gKwlj
-dHgtPmVuZ2luZWN0eC5vcC5wcmVwYXJlX3JlcXVlc3QgPSBzdG0zMl9oYXNoX3ByZXBhcmVfcmVx
-Ow0KPiArCWN0eC0+ZW5naW5lY3R4Lm9wLnVucHJlcGFyZV9yZXF1ZXN0ID0gTlVMTDsNCj4gICAJ
-cmV0dXJuIDA7DQo+ICAgfQ0KPiAgIA0KPiBAQCAtMTQ5Myw5ICsxNTA0LDYgQEAgc3RhdGljIGlu
-dCBzdG0zMl9oYXNoX3Byb2JlKHN0cnVjdCBwbGF0Zm9ybV9kZXZpY2UgKnBkZXYpDQo+ICAgCQln
-b3RvIGVycl9lbmdpbmU7DQo+ICAgCX0NCj4gICANCj4gLQloZGV2LT5lbmdpbmUtPnByZXBhcmVf
-aGFzaF9yZXF1ZXN0ID0gc3RtMzJfaGFzaF9wcmVwYXJlX3JlcTsNCj4gLQloZGV2LT5lbmdpbmUt
-Pmhhc2hfb25lX3JlcXVlc3QgPSBzdG0zMl9oYXNoX29uZV9yZXF1ZXN0Ow0KPiAtDQo+ICAgCXJl
-dCA9IGNyeXB0b19lbmdpbmVfc3RhcnQoaGRldi0+ZW5naW5lKTsNCj4gICAJaWYgKHJldCkNCj4g
-ICAJCWdvdG8gZXJyX2VuZ2luZV9zdGFydDsNCg==
+On 6 December 2017 at 11:51, Dave Martin <Dave.Martin@arm.com> wrote:
+> On Tue, Dec 05, 2017 at 06:04:34PM +0000, Ard Biesheuvel wrote:
+>> On 5 December 2017 at 12:45, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+>> >
+>> >
+>> >> On 5 Dec 2017, at 12:28, Dave Martin <Dave.Martin@arm.com> wrote:
+>> >>
+>> >>> On Mon, Dec 04, 2017 at 12:26:37PM +0000, Ard Biesheuvel wrote:
+>> >>> Add a support macro to conditionally yield the NEON (and thus the CPU)
+>> >>> that may be called from the assembler code. Given that especially the
+>> >>> instruction based accelerated crypto code may use very tight loops, add
+>> >>> some parametrization so that the TIF_NEED_RESCHED flag test is only
+>> >>> executed every so many loop iterations.
+>> >>>
+>> >>> In some cases, yielding the NEON involves saving and restoring a non
+>> >>> trivial amount of context (especially in the CRC folding algorithms),
+>> >>> and so the macro is split into two, and the code in between is only
+>> >>> executed when the yield path is taken, allowing the contex to be preserved.
+>> >>> The second macro takes a label argument that marks the resume-from-yield
+>> >>> path, which should restore the preserved context again.
+>> >>>
+>> >>> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+>> >>> ---
+>> >>> arch/arm64/include/asm/assembler.h | 50 ++++++++++++++++++++
+>> >>> 1 file changed, 50 insertions(+)
+>> >>>
+>> >>> diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
+>> >>> index aef72d886677..917b026d3e00 100644
+>> >>> --- a/arch/arm64/include/asm/assembler.h
+>> >>> +++ b/arch/arm64/include/asm/assembler.h
+>> >>> @@ -512,4 +512,54 @@ alternative_else_nop_endif
+>> >>> #endif
+>> >>>    .endm
+>> >>>
+>> >>> +/*
+>> >>> + * yield_neon - check whether to yield to another runnable task from
+>> >>> + *        kernel mode NEON code (running with preemption disabled)
+>> >>> + *
+>> >>> + * - Check whether the preempt count is exactly 1, in which case disabling
+>> >>> + *   preemption once will make the task preemptible. If this is not the case,
+>> >>> + *   yielding is pointless.
+>> >>> + * - Check whether TIF_NEED_RESCHED is set, and if so, disable and re-enable
+>> >>> + *   kernel mode NEON (which will trigger a reschedule), and branch to the
+>> >>> + *   yield fixup code at @lbl.
+>> >>> + */
+>> >>> +    .macro        yield_neon, lbl:req, ctr, order, stride, loop
+>> >>> +    yield_neon_pre    \ctr, \order, \stride, \loop
+>> >>> +    yield_neon_post    \lbl
+>> >>> +    .endm
+>> >>> +
+>> >>> +    .macro        yield_neon_pre, ctr, order=0, stride, loop=4444f
+>> >>> +#ifdef CONFIG_PREEMPT
+>> >>> +    /*
+>> >>> +     * With some algorithms, it makes little sense to poll the
+>> >>> +     * TIF_NEED_RESCHED flag after every iteration, so only perform
+>> >>> +     * the check every 2^order strides.
+>> >>> +     */
+>> >>> +    .if        \order > 1
+>> >>> +    .if        (\stride & (\stride - 1)) != 0
+>> >>> +    .error        "stride should be a power of 2"
+>> >>> +    .endif
+>> >>> +    tst        \ctr, #((1 << \order) * \stride - 1) & ~(\stride - 1)
+>> >>> +    b.ne        \loop
+>> >>> +    .endif
+>> >>
+>> >> I'm not sure what baking in this check gives us, and this seems to
+>> >> conflate two rather different things: yielding and defining a
+>> >> "heartbeat" frequency for the calling code.
+>> >>
+>> >> Can we separate out the crypto-loop-helper semantics from the yield-
+>> >> neon stuff?
+>> >>
+>> >
+>> > Fair enough. I incorporated the check here so it disappears from the code entirely when !CONFIG_PREEMPT, because otherwise, you end up with a sequence that is mispredicted every # iterations without any benefit.
+>> > I guess i could macroise that separately though.
+>> >
+>> >> If we had
+>> >>
+>> >>    if_cond_yield_neon
+>> >>    // patchup code
+>> >>    endif_yield_neon
+>> >>
+>>
+>> I like this, but ...
+>>
+>> >> then the caller is free to conditionally branch over that as appropriate
+>> >> like
+>> >>
+>> >> loop:
+>> >>    // crypto stuff
+>> >>    tst x0, #0xf
+>> >>    b.ne    loop
+>> >>
+>> >>    if_cond_yield_neon
+>> >>    // patchup code
+>> >>    endif_cond_yield_neon
+>> >>
+>>
+>> I need to put the post patchup code somewhere too. Please refer to the
+>> CRC patches for the best examples of this.
+>
+> I'm not sure I follow.  If you need to do something different after
+> patchup, can't you either pull that code into the if...endif too, or
+> otherwise put a branch before the endif?
+>
+
+No, not really.
+
+What I currently have is
+
+>    if_cond_yield_neon
+>    // patchup code
+>    endif_cond_yield_neon
+
+which is being turned into
+
+    get_thread_info x0
+    ldr w1, [x0, #TSK_TI_PREEMPT]
+    ldr x0, [x0, #TSK_TI_FLAGS]
+    cmp w1, #1 // == PREEMPT_OFFSET
+    csel x0, x0, xzr, eq
+    tbnz x0, #TIF_NEED_RESCHED, 5555f // needs rescheduling?
+4444:
+
+    .subsection 1
+5555:
+    // patchup code
+    bl kernel_neon_end
+    bl kernel_neon_begin
+    // post patchup code goes here
+    b 4444b
+    .subsection
+
+so what I basically need is a place to put the post patchup code,
+unless I open code it and branch to a different label right after
+kernel_neon_begin
