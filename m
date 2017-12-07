@@ -1,91 +1,81 @@
-From: "Yang Shi" <yang.s@alibaba-inc.com>
-Subject: Re: [PATCH 8/8] net: tipc: remove unused hardirq.h
-Date: Fri, 08 Dec 2017 04:02:33 +0800
-Message-ID: <294b155f-90e6-e505-7fc4-b9e0c492fed6@alibaba-inc.com>
-References: <1510959741-31109-1-git-send-email-yang.s@alibaba-inc.com>
- <1510959741-31109-8-git-send-email-yang.s@alibaba-inc.com>
- <da42d136-4e51-6d04-4120-cb53df03c661@alibaba-inc.com>
- <AM4PR07MB17147A3C4885EE59CFA58BDA9A330@AM4PR07MB1714.eurprd07.prod.outlook.com>
+From: Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [Part2 PATCH v9 12/38] crypto: ccp: Add Platform Security
+ Processor (PSP) device support
+Date: Thu, 7 Dec 2017 14:21:23 -0600
+Message-ID: <d90c011a-82b2-2599-6988-02d1497b028e@amd.com>
+References: <20171205010438.5773-1-brijesh.singh@amd.com>
+ <20171205010438.5773-13-brijesh.singh@amd.com>
+ <CAOFm3uE06YTvfwe5P0uq3Pgc4PwzQmTh=dvVUuV5WxPjAf2Sdw@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: "linux-mm@kvack.org" <linux-mm@kvack.org>,
- "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
- "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- Ying Xue <ying.xue@windriver.com>, "David S. Miller" <davem@davemloft.net>
-To: Jon Maloy <jon.maloy@ericsson.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Return-path: <owner-linux-mm@kvack.org>
-In-Reply-To: <AM4PR07MB17147A3C4885EE59CFA58BDA9A330@AM4PR07MB1714.eurprd07.prod.outlook.com>
+Cc: brijesh.singh@amd.com, kvm@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
+        bp@alien8.de, Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Borislav Petkov <bp@suse.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Gary Hook <gary.hook@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        linux-crypto@vger.kernel.org
+To: Philippe Ombredanne <pombredanne@nexb.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-co1nam03on0080.outbound.protection.outlook.com ([104.47.40.80]:35680
+        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1750828AbdLGUVb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 7 Dec 2017 15:21:31 -0500
+In-Reply-To: <CAOFm3uE06YTvfwe5P0uq3Pgc4PwzQmTh=dvVUuV5WxPjAf2Sdw@mail.gmail.com>
 Content-Language: en-US
-Sender: owner-linux-mm@kvack.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 
 
-On 12/7/17 11:20 AM, Jon Maloy wrote:
+On 12/06/2017 03:10 PM, Philippe Ombredanne wrote:>> diff --git 
+a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
+>> new file mode 100644
+>> index 000000000000..b5789f878560
+>> --- /dev/null
+>> +++ b/drivers/crypto/ccp/psp-dev.c
+>> @@ -0,0 +1,105 @@
+>> +/*
+>> + * AMD Platform Security Processor (PSP) interface
+>> + *
+>> + * Copyright (C) 2016-2017 Advanced Micro Devices, Inc.
+>> + *
+>> + * Author: Brijesh Singh <brijesh.singh@amd.com>
+>> + *
+>> + * This program is free software; you can redistribute it and/or modify
+>> + * it under the terms of the GNU General Public License version 2 as
+>> + * published by the Free Software Foundation.
+>> + */
 > 
+> Dear Brijesh,
 > 
->> -----Original Message-----
->> From: netdev-owner@vger.kernel.org [mailto:netdev-
->> owner@vger.kernel.org] On Behalf Of Yang Shi
->> Sent: Thursday, December 07, 2017 14:16
->> To: linux-kernel@vger.kernel.org
->> Cc: linux-mm@kvack.org; linux-fsdevel@vger.kernel.org; linux-
->> crypto@vger.kernel.org; netdev@vger.kernel.org; Jon Maloy
->> <jon.maloy@ericsson.com>; Ying Xue <ying.xue@windriver.com>; David S.
->> Miller <davem@davemloft.net>
->> Subject: Re: [PATCH 8/8] net: tipc: remove unused hardirq.h
->>
->> Hi folks,
->>
->> Any comment on this one?
+> Have you considered using the new SPDX license ids instead?
 > 
-> If it compiles it is ok with me. Don't know why it was put there in the first place.
-
-Yes, it does compile.
-
-Yang
-
+> This would come out this way:
+>> +// SDPX-License-Identifier: GPL-2.0
+>> +/*
+>> + * AMD Platform Security Processor (PSP) interface
+>> + *
+>> + * Copyright (C) 2016-2017 Advanced Micro Devices, Inc.
+>> + *
+>> + * Author: Brijesh Singh <brijesh.singh@amd.com>
+>> + */
 > 
-> ///jon
+> It is much cleaner and simpler, right?
 > 
->>
->> Thanks,
->> Yang
->>
->>
->> On 11/17/17 3:02 PM, Yang Shi wrote:
->>> Preempt counter APIs have been split out, currently, hardirq.h just
->>> includes irq_enter/exit APIs which are not used by TIPC at all.
->>>
->>> So, remove the unused hardirq.h.
->>>
->>> Signed-off-by: Yang Shi <yang.s@alibaba-inc.com>
->>> Cc: Jon Maloy <jon.maloy@ericsson.com>
->>> Cc: Ying Xue <ying.xue@windriver.com>
->>> Cc: "David S. Miller" <davem@davemloft.net>
->>> ---
->>>    net/tipc/core.h | 1 -
->>>    1 file changed, 1 deletion(-)
->>>
->>> diff --git a/net/tipc/core.h b/net/tipc/core.h index 5cc5398..099e072
->>> 100644
->>> --- a/net/tipc/core.h
->>> +++ b/net/tipc/core.h
->>> @@ -49,7 +49,6 @@
->>>    #include <linux/uaccess.h>
->>>    #include <linux/interrupt.h>
->>>    #include <linux/atomic.h>
->>> -#include <asm/hardirq.h>
->>>    #include <linux/netdevice.h>
->>>    #include <linux/in.h>
->>>    #include <linux/list.h>
->>>
+> For the C++ comment style and first line placement, please see Thomas
+> (tlgx) doc patches and Linus posts explaining his rationale of why he
+> wants it this way.
+> It would be awesome if this could be applied to all AMD contributions btw!
+> 
 
---
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+Hi Philippe,
+
+I was not aware of SPDX identifier, If v10 is needed for SEV series then 
+I will certainly update the patches to use SPDX license identifier. thanks
+
+-Brijesh
