@@ -1,104 +1,355 @@
-From: =?utf-8?Q?=C5=81ukasz_Stelmach?= <l.stelmach@samsung.com>
-Subject: Re: [PATCH 1/3] crypto: exynos - Support Exynos5250+ SoCs
-Date: Thu, 07 Dec 2017 10:20:27 +0100
-Message-ID: <87y3me99no.fsf%l.stelmach@samsung.com>
-References: <CAJKOXPfuGaE1ZaYU7RaLEr1sM+ib5qO8VeNNA_S_RJJm2rSkVw@mail.gmail.com>
-        <CGME20171207092032eucas1p296f7cbc547d159c52561182cc6461504@eucas1p2.samsung.com>
+From: Corentin Labbe <clabbe.montjoie@gmail.com>
+Subject: Re: [PATCH RFC 1/4] crypto: engine - Permit to enqueue all async
+	requests
+Date: Thu, 7 Dec 2017 10:24:50 +0100
+Message-ID: <20171207092450.GA21647@Red>
+References: <20171129084121.9385-1-clabbe.montjoie@gmail.com>
+	<20171129084121.9385-2-clabbe.montjoie@gmail.com>
+	<091ff463-9958-7f96-7ebb-87b36d63cce4@st.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-="; micalg="pgp-sha256";
-        protocol="application/pgp-signature"
-Cc: robh+dt@kernel.org, Stephan Mueller <smueller@chronox.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Kukjin Kim <kgene@kernel.org>, linux-crypto@vger.kernel.org,
-        linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        =?utf-8?Q?Bart=C5=82omiej_=C5=BBo?= =?utf-8?Q?=C5=82nierkiewicz?=
-        <b.zolnierkie@samsung.com>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Return-path: <linux-samsung-soc-owner@vger.kernel.org>
-In-reply-to: <CAJKOXPfuGaE1ZaYU7RaLEr1sM+ib5qO8VeNNA_S_RJJm2rSkVw@mail.gmail.com>
-Sender: linux-samsung-soc-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+	"mst@redhat.com" <mst@redhat.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"virtualization@lists.linux-foundation.org"
+	<virtualization@lists.linux-foundation.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"mcoquelin.stm32@gmail.com" <mcoquelin.stm32@gmail.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	Alexandre TORGUE <alexandre.torgue@st.com>
+To: Fabien DESSENNE <fabien.dessenne@st.com>
+Return-path: <virtualization-bounces@lists.linux-foundation.org>
+Content-Disposition: inline
+In-Reply-To: <091ff463-9958-7f96-7ebb-87b36d63cce4@st.com>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/virtualization>,
+	<mailto:virtualization-request@lists.linux-foundation.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/virtualization/>
+List-Post: <mailto:virtualization@lists.linux-foundation.org>
+List-Help: <mailto:virtualization-request@lists.linux-foundation.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/virtualization>,
+	<mailto:virtualization-request@lists.linux-foundation.org?subject=subscribe>
+Sender: virtualization-bounces@lists.linux-foundation.org
+Errors-To: virtualization-bounces@lists.linux-foundation.org
 List-Id: linux-crypto.vger.kernel.org
 
---=-=-=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+On Wed, Dec 06, 2017 at 11:02:23AM +0000, Fabien DESSENNE wrote:
+> 
+> 
+> On 29/11/17 09:41, Corentin Labbe wrote:
+> > The crypto engine could actually only enqueue hash and ablkcipher request.
+> > This patch permit it to enqueue any type of crypto_async_request.
+> >
+> > Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+> > ---
+> >   crypto/crypto_engine.c  | 188 +++++++++++-------------------------------------
+> >   include/crypto/engine.h |  46 +++++-------
+> >   2 files changed, 60 insertions(+), 174 deletions(-)
+> >
+> > diff --git a/crypto/crypto_engine.c b/crypto/crypto_engine.c
+> > index 61e7c4e02fd2..f7c4c4c1f41b 100644
+> > --- a/crypto/crypto_engine.c
+> > +++ b/crypto/crypto_engine.c
+> > @@ -34,11 +34,10 @@ static void crypto_pump_requests(struct crypto_engine *engine,
+> >   				 bool in_kthread)
+> >   {
+> >   	struct crypto_async_request *async_req, *backlog;
+> > -	struct ahash_request *hreq;
+> > -	struct ablkcipher_request *breq;
+> >   	unsigned long flags;
+> >   	bool was_busy = false;
+> > -	int ret, rtype;
+> > +	int ret;
+> > +	struct crypto_engine_reqctx *enginectx;
+> >   
+> >   	spin_lock_irqsave(&engine->queue_lock, flags);
+> >   
+> > @@ -94,7 +93,6 @@ static void crypto_pump_requests(struct crypto_engine *engine,
+> >   
+> >   	spin_unlock_irqrestore(&engine->queue_lock, flags);
+> >   
+> > -	rtype = crypto_tfm_alg_type(engine->cur_req->tfm);
+> >   	/* Until here we get the request need to be encrypted successfully */
+> >   	if (!was_busy && engine->prepare_crypt_hardware) {
+> >   		ret = engine->prepare_crypt_hardware(engine);
+> > @@ -104,57 +102,31 @@ static void crypto_pump_requests(struct crypto_engine *engine,
+> >   		}
+> >   	}
+> >   
+> > -	switch (rtype) {
+> > -	case CRYPTO_ALG_TYPE_AHASH:
+> > -		hreq = ahash_request_cast(engine->cur_req);
+> > -		if (engine->prepare_hash_request) {
+> > -			ret = engine->prepare_hash_request(engine, hreq);
+> > -			if (ret) {
+> > -				dev_err(engine->dev, "failed to prepare request: %d\n",
+> > -					ret);
+> > -				goto req_err;
+> > -			}
+> > -			engine->cur_req_prepared = true;
+> > -		}
+> > -		ret = engine->hash_one_request(engine, hreq);
+> > -		if (ret) {
+> > -			dev_err(engine->dev, "failed to hash one request from queue\n");
+> > -			goto req_err;
+> > -		}
+> > -		return;
+> > -	case CRYPTO_ALG_TYPE_ABLKCIPHER:
+> > -		breq = ablkcipher_request_cast(engine->cur_req);
+> > -		if (engine->prepare_cipher_request) {
+> > -			ret = engine->prepare_cipher_request(engine, breq);
+> > -			if (ret) {
+> > -				dev_err(engine->dev, "failed to prepare request: %d\n",
+> > -					ret);
+> > -				goto req_err;
+> > -			}
+> > -			engine->cur_req_prepared = true;
+> > -		}
+> > -		ret = engine->cipher_one_request(engine, breq);
+> > +	enginectx = crypto_tfm_ctx(async_req->tfm);
+> > +
+> > +	if (enginectx->op.prepare_request) {
+> > +		ret = enginectx->op.prepare_request(engine, async_req);
+> >   		if (ret) {
+> > -			dev_err(engine->dev, "failed to cipher one request from queue\n");
+> > +			dev_err(engine->dev, "failed to prepare request: %d\n",
+> > +				ret);
+> >   			goto req_err;
+> >   		}
+> > -		return;
+> > -	default:
+> > -		dev_err(engine->dev, "failed to prepare request of unknown type\n");
+> > -		return;
+> > +		engine->cur_req_prepared = true;
+> > +	}
+> > +	if (!enginectx->op.do_one_request) {
+> > +		dev_err(engine->dev, "failed to do request\n");
+> > +		ret = -EINVAL;
+> > +		goto req_err;
+> > +	}
+> > +	ret = enginectx->op.do_one_request(engine, async_req);
+> > +	if (ret) {
+> > +		dev_err(engine->dev, "failed to hash one request from queue\n");
+> > +		goto req_err;
+> >   	}
+> > +	return;
+> >   
+> >   req_err:
+> > -	switch (rtype) {
+> > -	case CRYPTO_ALG_TYPE_AHASH:
+> > -		hreq = ahash_request_cast(engine->cur_req);
+> > -		crypto_finalize_hash_request(engine, hreq, ret);
+> > -		break;
+> > -	case CRYPTO_ALG_TYPE_ABLKCIPHER:
+> > -		breq = ablkcipher_request_cast(engine->cur_req);
+> > -		crypto_finalize_cipher_request(engine, breq, ret);
+> > -		break;
+> > -	}
+> > +	crypto_finalize_request(engine, async_req, ret);
+> >   	return;
+> >   
+> >   out:
+> > @@ -170,59 +142,16 @@ static void crypto_pump_work(struct kthread_work *work)
+> >   }
+> >   
+> >   /**
+> > - * crypto_transfer_cipher_request - transfer the new request into the
+> > - * enginequeue
+> > + * crypto_transfer_request - transfer the new request into the engine queue
+> >    * @engine: the hardware engine
+> >    * @req: the request need to be listed into the engine queue
+> >    */
+> > -int crypto_transfer_cipher_request(struct crypto_engine *engine,
+> > -				   struct ablkcipher_request *req,
+> > -				   bool need_pump)
+> > +int crypto_transfer_request(struct crypto_engine *engine,
+> > +			    struct crypto_async_request *req, bool need_pump)
+> >   {
+> >   	unsigned long flags;
+> >   	int ret;
+> >   
+> > -	spin_lock_irqsave(&engine->queue_lock, flags);
+> > -
+> > -	if (!engine->running) {
+> > -		spin_unlock_irqrestore(&engine->queue_lock, flags);
+> > -		return -ESHUTDOWN;
+> > -	}
+> > -
+> > -	ret = ablkcipher_enqueue_request(&engine->queue, req);
+> > -
+> > -	if (!engine->busy && need_pump)
+> > -		kthread_queue_work(engine->kworker, &engine->pump_requests);
+> > -
+> > -	spin_unlock_irqrestore(&engine->queue_lock, flags);
+> > -	return ret;
+> > -}
+> > -EXPORT_SYMBOL_GPL(crypto_transfer_cipher_request);
+> > -
+> > -/**
+> > - * crypto_transfer_cipher_request_to_engine - transfer one request to list
+> > - * into the engine queue
+> > - * @engine: the hardware engine
+> > - * @req: the request need to be listed into the engine queue
+> > - */
+> > -int crypto_transfer_cipher_request_to_engine(struct crypto_engine *engine,
+> > -					     struct ablkcipher_request *req)
+> > -{
+> > -	return crypto_transfer_cipher_request(engine, req, true);
+> > -}
+> > -EXPORT_SYMBOL_GPL(crypto_transfer_cipher_request_to_engine);
+> > -
+> > -/**
+> > - * crypto_transfer_hash_request - transfer the new request into the
+> > - * enginequeue
+> > - * @engine: the hardware engine
+> > - * @req: the request need to be listed into the engine queue
+> > - */
+> > -int crypto_transfer_hash_request(struct crypto_engine *engine,
+> > -				 struct ahash_request *req, bool need_pump)
+> > -{
+> > -	unsigned long flags;
+> > -	int ret;
+> >   
+> >   	spin_lock_irqsave(&engine->queue_lock, flags);
+> >   
+> > @@ -231,7 +160,7 @@ int crypto_transfer_hash_request(struct crypto_engine *engine,
+> >   		return -ESHUTDOWN;
+> >   	}
+> >   
+> > -	ret = ahash_enqueue_request(&engine->queue, req);
+> > +	ret = crypto_enqueue_request(&engine->queue, req);
+> >   
+> >   	if (!engine->busy && need_pump)
+> >   		kthread_queue_work(engine->kworker, &engine->pump_requests);
+> > @@ -239,80 +168,45 @@ int crypto_transfer_hash_request(struct crypto_engine *engine,
+> >   	spin_unlock_irqrestore(&engine->queue_lock, flags);
+> >   	return ret;
+> >   }
+> > -EXPORT_SYMBOL_GPL(crypto_transfer_hash_request);
+> > +EXPORT_SYMBOL_GPL(crypto_transfer_request);
+> >   
+> >   /**
+> > - * crypto_transfer_hash_request_to_engine - transfer one request to list
+> > + * crypto_transfer_request_to_engine - transfer one request to list
+> >    * into the engine queue
+> >    * @engine: the hardware engine
+> >    * @req: the request need to be listed into the engine queue
+> >    */
+> > -int crypto_transfer_hash_request_to_engine(struct crypto_engine *engine,
+> > -					   struct ahash_request *req)
+> > -{
+> > -	return crypto_transfer_hash_request(engine, req, true);
+> > -}
+> > -EXPORT_SYMBOL_GPL(crypto_transfer_hash_request_to_engine);
+> > -
+> > -/**
+> > - * crypto_finalize_cipher_request - finalize one request if the request is done
+> > - * @engine: the hardware engine
+> > - * @req: the request need to be finalized
+> > - * @err: error number
+> > - */
+> > -void crypto_finalize_cipher_request(struct crypto_engine *engine,
+> > -				    struct ablkcipher_request *req, int err)
+> > +int crypto_transfer_request_to_engine(struct crypto_engine *engine,
+> > +				      struct crypto_async_request *req)
+> >   {
+> > -	unsigned long flags;
+> > -	bool finalize_cur_req = false;
+> > -	int ret;
+> > -
+> > -	spin_lock_irqsave(&engine->queue_lock, flags);
+> > -	if (engine->cur_req == &req->base)
+> > -		finalize_cur_req = true;
+> > -	spin_unlock_irqrestore(&engine->queue_lock, flags);
+> > -
+> > -	if (finalize_cur_req) {
+> > -		if (engine->cur_req_prepared &&
+> > -		    engine->unprepare_cipher_request) {
+> > -			ret = engine->unprepare_cipher_request(engine, req);
+> > -			if (ret)
+> > -				dev_err(engine->dev, "failed to unprepare request\n");
+> > -		}
+> > -		spin_lock_irqsave(&engine->queue_lock, flags);
+> > -		engine->cur_req = NULL;
+> > -		engine->cur_req_prepared = false;
+> > -		spin_unlock_irqrestore(&engine->queue_lock, flags);
+> > -	}
+> > -
+> > -	req->base.complete(&req->base, err);
+> > -
+> > -	kthread_queue_work(engine->kworker, &engine->pump_requests);
+> > +	return crypto_transfer_request(engine, req, true);
+> >   }
+> > -EXPORT_SYMBOL_GPL(crypto_finalize_cipher_request);
+> > +EXPORT_SYMBOL_GPL(crypto_transfer_request_to_engine);
+> >   
+> >   /**
+> > - * crypto_finalize_hash_request - finalize one request if the request is done
+> > + * crypto_finalize_request - finalize one request if the request is done
+> >    * @engine: the hardware engine
+> >    * @req: the request need to be finalized
+> >    * @err: error number
+> >    */
+> > -void crypto_finalize_hash_request(struct crypto_engine *engine,
+> > -				  struct ahash_request *req, int err)
+> > +void crypto_finalize_request(struct crypto_engine *engine,
+> > +			     struct crypto_async_request *req, int err)
+> >   {
+> >   	unsigned long flags;
+> >   	bool finalize_cur_req = false;
+> >   	int ret;
+> > +	struct crypto_engine_reqctx *enginectx;
+> >   
+> >   	spin_lock_irqsave(&engine->queue_lock, flags);
+> > -	if (engine->cur_req == &req->base)
+> > +	if (engine->cur_req == req)
+> >   		finalize_cur_req = true;
+> >   	spin_unlock_irqrestore(&engine->queue_lock, flags);
+> >   
+> >   	if (finalize_cur_req) {
+> > +		enginectx = crypto_tfm_ctx(req->tfm);
+> >   		if (engine->cur_req_prepared &&
+> > -		    engine->unprepare_hash_request) {
+> > -			ret = engine->unprepare_hash_request(engine, req);
+> > +		    enginectx->op.unprepare_request) {
+> > +			ret = enginectx->op.unprepare_request(engine, req);
+> >   			if (ret)
+> >   				dev_err(engine->dev, "failed to unprepare request\n");
+> >   		}
+> > @@ -322,11 +216,11 @@ void crypto_finalize_hash_request(struct crypto_engine *engine,
+> >   		spin_unlock_irqrestore(&engine->queue_lock, flags);
+> >   	}
+> >   
+> > -	req->base.complete(&req->base, err);
+> > +	req->complete(req, err);
+> >   
+> >   	kthread_queue_work(engine->kworker, &engine->pump_requests);
+> >   }
+> > -EXPORT_SYMBOL_GPL(crypto_finalize_hash_request);
+> > +EXPORT_SYMBOL_GPL(crypto_finalize_request);
+> >   
+> >   /**
+> >    * crypto_engine_start - start the hardware engine
+> > diff --git a/include/crypto/engine.h b/include/crypto/engine.h
+> > index dd04c1699b51..2e45db45849b 100644
+> > --- a/include/crypto/engine.h
+> > +++ b/include/crypto/engine.h
+> > @@ -17,7 +17,6 @@
+> >   #include <linux/kernel.h>
+> >   #include <linux/kthread.h>
+> >   #include <crypto/algapi.h>
+> > -#include <crypto/hash.h>
+> >   
+> >   #define ENGINE_NAME_LEN	30
+> >   /*
+> > @@ -65,19 +64,6 @@ struct crypto_engine {
+> 
+> You also need to remove these 6 functions from the comment header of 
+> that structure
+> 
 
-It was <2017-12-06 =C5=9Bro 16:28>, when Krzysztof Kozlowski wrote:
-> On Wed, Dec 6, 2017 at 3:53 PM, =C5=81ukasz Stelmach <l.stelmach@samsung.=
-com> wrote:
->> It was <2017-12-06 =C5=9Bro 15:05>, when Krzysztof Kozlowski wrote:
->>> On Wed, Dec 6, 2017 at 2:42 PM, =C5=81ukasz Stelmach <l.stelmach@samsun=
-g.com> wrote:
->>>> It was <2017-12-05 wto 14:34>, when Krzysztof Kozlowski wrote:
->>>>> On Tue, Dec 5, 2017 at 1:35 PM, =C5=81ukasz Stelmach <l.stelmach@sams=
-ung.com> wrote:
->>>>>> Add support for PRNG in Exynos5250+ SoCs.
->>>>>>
->>>>>> Signed-off-by: =C5=81ukasz Stelmach <l.stelmach@samsung.com>
->>>>>> ---
+Thanks, fixed for next version.
 
-[...]
-
->>>>>> +               dev_info(&pdev->dev,
->>>>>> +                        "Exynos Pseudo Random Number Generator (typ=
-e:%d)\n",
->>>>>
->>>>> dev_dbg, this is not that important information to affect the boot ti=
-me.
->>>>
->>>> Quite many devices report their presence during boot with such
->>>> messages. For example:
->>>>
->>>> [    3.390247] exynos-ehci 12110000.usb: EHCI Host Controller
->>>> [    3.395493] exynos-ehci 12110000.usb: new USB bus registered, assig=
-ned bus number 1
->>>> [    3.403702] exynos-ehci 12110000.usb: irq 80, io mem 0x12110000
->>>> [    3.431793] exynos-ehci 12110000.usb: USB 2.0 started, EHCI 1.00
->>>>
->>>> From my experience it isn't printk() itself that slows down boot but t=
-he
->>>> serial console.
->>>
->>> True, the console is bottleneck (not necessarily serial) [1] but that
->>> does not change the fact there is no need to print the type of RNG.
->>
->> With values of the enum not being meaningful themselves printing the
->> type does not make much sense for me too. Is it ok just to print report
->> the device presence?
->
-> This does not change mine arguments - this printk does not bring any
-> information except that there is such device. Later you might want to
-> print this for Exynos TRNG. Later for other module, and other. Thus I
-> prefer not to add it. On the other hand that is not a reason to stop
-> this patch so for example you could split it into separate commit.
-
-Done.
-
-> It is kind of unrelated change and keeping it separate will not block
-> everything if maintainer will not want it.
-
-I will. As a user a prefer when devices report their presence in the log
-buffer and I will submit such patch.
-
-=2D-=20
-=C5=81ukasz Stelmach
-Samsung R&D Institute Poland
-Samsung Electronics
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQEcBAEBCAAGBQJaKQfbAAoJELCuHpyYpYAQw3QH/1f5OLQe+NIv24w1/YJikhPX
-fpJM9LzXipNTD96cEa+yI9WSXsGIBo4d6iOuM3UGSCmgWIWG5vNap9BjB6fRD+vZ
-KYxfeAruW6UzglzjOEcDNlh5x2wIcmaPfDhUi4+rHreEZeqV7Ggl8VjLzEJJTieE
-tql9KI9z/iEZ4CYEqRGGsmjVJqnmZKd1OMXffdteEmI/GnNMja4jmq3uF3xiiIHT
-efpbwKyxZY6tOQOtqj2ehEHmJ01ex7YkxrLFfEOqWKEFHK/o+/3u9DmWLQVgBffw
-1MgIK2ob+d0Pb019Sz4k1YPdAEoj0QAe7c6JpfNBjQc9w+3WXQsH0wgbL0EBLjA=
-=8qlz
------END PGP SIGNATURE-----
---=-=-=--
+Regards
