@@ -1,44 +1,36 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [PATCH] staging: ccree: ssi_aead: fixed all coding style warnings.
-Date: Thu, 7 Dec 2017 08:22:52 +0200
-Message-ID: <CAOtvUMeR=+zUvpcz98ak0dOkkkGUm4-x1kv85GgA7qPvZPw9eg@mail.gmail.com>
-References: <1512598089-15699-1-git-send-email-kallur.sunil@gmail.com>
+Subject: Re: [PATCH 01/10] staging: ccree: remove inline qualifiers
+Date: Thu, 7 Dec 2017 09:00:11 +0200
+Message-ID: <CAOtvUMcYuuH3ox4RLpaT5EsYUCZRxJX7vD=g7GbWjLbf3to7Hw@mail.gmail.com>
+References: <1512309503-29766-1-git-send-email-gilad@benyossef.com>
+ <1512309503-29766-2-git-send-email-gilad@benyossef.com> <20171204093639.7ctulxb4v2htqbmj@mwanda>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>
-To: SUNIL KALLUR RAMEGOWDA <kallur.sunil@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ot0-f195.google.com ([74.125.82.195]:38189 "EHLO
-        mail-ot0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750744AbdLGGWx (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 7 Dec 2017 01:22:53 -0500
-Received: by mail-ot0-f195.google.com with SMTP id p3so5506659oti.5
-        for <linux-crypto@vger.kernel.org>; Wed, 06 Dec 2017 22:22:53 -0800 (PST)
-In-Reply-To: <1512598089-15699-1-git-send-email-kallur.sunil@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+        devel@driverdev.osuosl.org, driverdev-devel@linuxdriverproject.org,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+        Ofir Drang <ofir.drang@arm.com>
+To: Dan Carpenter <dan.carpenter@oracle.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20171204093639.7ctulxb4v2htqbmj@mwanda>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Sunil,
-
-On Thu, Dec 7, 2017 at 12:08 AM, SUNIL KALLUR RAMEGOWDA
-<kallur.sunil@gmail.com> wrote:
-> My first kernel patch, fixed warnings.
+On Mon, Dec 4, 2017 at 11:36 AM, Dan Carpenter <dan.carpenter@oracle.com> wrote:
+> On Sun, Dec 03, 2017 at 01:58:12PM +0000, Gilad Ben-Yossef wrote:
+>> The ccree drivers was marking a lot of big functions in C file as
+>> static inline for no good reason. Remove the inline qualifier from
+>> any but the few truly single line functions.
+>>
+>
+> The compiler is free to ignore inline hints...  It probably would make
+> single line functions inline anyway.
 >
 
-Congratulations and may there be many more! :-)
+Yes. I think of it more as a note to the reader: "don't add stuff to
+this function. it is meant to be short and simple".
 
-Please note that in addition to what Greg's patch-bot already
-mentioned I'm pretty sure you are looking
-at Linus's tree and not Greg's staging-next tree which already
-contains fixes for many of the issues
-your patch is addressing.
-
-Thanks,
-Gilad
 
 -- 
 Gilad Ben-Yossef
