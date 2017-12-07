@@ -1,67 +1,117 @@
-From: Pierre <pinaraf@pinaraf.info>
-Subject: Re: [PATCH] Fix NULL pointer deref. on no default_rng
-Date: Thu, 07 Dec 2017 11:32:47 +0100
-Message-ID: <2556930.8tHcIEql08@peanuts2>
-References: <20171112142432.20186-1-pinaraf@pinaraf.info> <20171129063430.GD21575@gondor.apana.org.au>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [PATCH v3 10/20] arm64: assembler: add utility macros to
+ push/pop stack frames
+Date: Thu, 7 Dec 2017 14:11:06 +0000
+Message-ID: <20171207141104.GE22781@e103592.cambridge.arm.com>
+References: <20171206194346.24393-1-ard.biesheuvel@linaro.org>
+ <20171206194346.24393-11-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart3900354.K5vSuZu25U"; micalg="pgp-sha512"; protocol="application/pgp-signature"
-Cc: linux-crypto@vger.kernel.org, davem@davemloft.net
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.13]:55555 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752597AbdLGKdP (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 7 Dec 2017 05:33:15 -0500
-In-Reply-To: <20171129063430.GD21575@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>,
+        herbert@gondor.apana.org.au, Peter Zijlstra <peterz@infradead.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Will Deacon <will.deacon@arm.com>,
+        Russell King - ARM Linux <linux@armlinux.org.uk>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-arm-kernel@lists.infradead.org,
+        linux-rt-users@vger.kernel.org
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Return-path: <linux-rt-users-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20171206194346.24393-11-ard.biesheuvel@linaro.org>
+Sender: linux-rt-users-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
---nextPart3900354.K5vSuZu25U
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-
-On Wednesday, November 29, 2017 5:34:30 PM CET you wrote:
-> On Sun, Nov 12, 2017 at 03:24:32PM +0100, Pierre Ducroquet wrote:
-> > If crypto_get_default_rng returns an error, the
-> > function ecc_gen_privkey should return an error.
-> > Instead, it currently tries to use the default_rng
-> > nevertheless, thus creating a kernel panic with a
-> > NULL pointer dereference.
-> > Returning the error directly, as was supposedly
-> > intended when looking at the code, fixes this.
-> > 
-> > Signed-off-by: Pierre Ducroquet <pinaraf@pinaraf.info>
+On Wed, Dec 06, 2017 at 07:43:36PM +0000, Ard Biesheuvel wrote:
+> We are going to add code to all the NEON crypto routines that will
+> turn them into non-leaf functions, so we need to manage the stack
+> frames. To make this less tedious and error prone, add some macros
+> that take the number of callee saved registers to preserve and the
+> extra size to allocate in the stack frame (for locals) and emit
+> the ldp/stp sequences.
 > 
-> Patch applied.  Thanks.
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> ---
+>  arch/arm64/include/asm/assembler.h | 60 ++++++++++++++++++++
+>  1 file changed, 60 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
+> index aef72d886677..5f61487e9f93 100644
+> --- a/arch/arm64/include/asm/assembler.h
+> +++ b/arch/arm64/include/asm/assembler.h
+> @@ -499,6 +499,66 @@ alternative_else_nop_endif
+>  #endif
+>  	.endm
+>  
+> +	/*
+> +	 * frame_push - Push @regcount callee saved registers to the stack,
+> +	 *              starting at x19, as well as x29/x30, and set x29 to
+> +	 *              the new value of sp. Add @extra bytes of stack space
+> +	 *              for locals.
+> +	 */
+> +	.macro		frame_push, regcount:req, extra
+> +	__frame		st, \regcount, \extra
+> +	.endm
+> +
+> +	/*
+> +	 * frame_pop  - Pop @regcount callee saved registers from the stack,
+> +	 *              starting at x19, as well as x29/x30. Also pop @extra
+> +	 *              bytes of stack space for locals.
+> +	 */
+> +	.macro		frame_pop, regcount:req, extra
+> +	__frame		ld, \regcount, \extra
+> +	.endm
+> +
+> +	.macro		__frame, op, regcount:req, extra=0
+> +	.ifc		\op, st
+> +	stp		x29, x30, [sp, #-((\regcount + 3) / 2) * 16 - \extra]!
+> +	mov		x29, sp
+> +	.endif
+> +	.if		\regcount < 0 || \regcount > 10
+> +	.error		"regcount should be in the range [0 ... 10]"
+> +	.endif
+> +	.if		(\extra % 16) != 0
+> +	.error		"extra should be a multiple of 16 bytes"
+> +	.endif
+> +	.if		\regcount > 1
+> +	\op\()p		x19, x20, [sp, #16]
+> +	.if		\regcount > 3
+> +	\op\()p		x21, x22, [sp, #32]
+> +	.if		\regcount > 5
+> +	\op\()p		x23, x24, [sp, #48]
+> +	.if		\regcount > 7
+> +	\op\()p		x25, x26, [sp, #64]
+> +	.if		\regcount > 9
+> +	\op\()p		x27, x28, [sp, #80]
 
-Thanks to you.
+Can the _for thing I introduced in fpsimdmacros.h be any use here?
+Alternatively, the following could replace that .if-slide,
+providing the calling macro does .altmacro .. .noaltmacro somewhere.
 
-Will it be backported to 4.14 and the LTS releases ? Currently, no recent 
-debian kernel can boot on my system without that patch (I don't know why 
-nobody else noticed that before).
+.macro _pushpop2 op, n1, n2, offset
+	\op     x\n1, x\n2, [sp, #\offset]
+.endm
 
- Pierre
---nextPart3900354.K5vSuZu25U
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part.
-Content-Transfer-Encoding: 7Bit
+.macro _pushpop op, first, last, offset
+	.if \first < \last
+	_pushpop2 \op\()p, \first, %\first + 1, \offset
+	_pushpop \op, %\first + 2, \last, %\offset + 16
+	.elseif \first == \last
+	\op\()r x\first, [sp, #\offset]
+	.endif
+.endm
 
------BEGIN PGP SIGNATURE-----
+Also, I wonder whether it would be more readable at the call site
+to specify the first and last reg numbers instead of the reg count,
+e.g.:
 
-iQIzBAABCgAdFiEEds3aTMo5n1dvXH/GYkPWy+GpSGUFAlopGM8ACgkQYkPWy+Gp
-SGVk5Q/+OLAWY9NHlOy32lw/RbG7LiNzEW2So2ozw976NkG4tEzvSBiWasTNjLAl
-jKiJwCZH2OZlUViVLuJgQ5MbHgD3XkKSl6YIOW8uL/mWx+pArcpM1XQHTnK/+kyV
-fLalKrdCRusP3qPAerpDub2misdGtcTzSwhg+q0Bj7wvy8wHpARTADD/z/8Dqo2U
-Nv15xeuKTpd1MDFia47gIthrIy/sUNzqT//+43Y3+rQjUqeulRS9Uloyp3YfMBZd
-GX3uIuziQOEMskglhKXmm2zSvcyMI6NqnLQIta4n3iPO1lsCZSDDsMTdWy7lTMpe
-ZpAgl91s5rGbuoimgXFgbxFj9yDaklLIMgNFK/Sav+wRcC2mYKLkOYVwNIzzoxkp
-U08ar1VzqB8lvLCXQfr8wed1uQcZ6pu0YeFj5zoCx7ZhKgTrucKR0ASiMSkfZ5BM
-Xd3sbHjzSUA3KzKyp7PywIynGeAExXdz9vDK7FzOi5v90rFZ5yVx7BNB7X/tG36c
-Yu43Wq37K727Ls1kOU/+bnOBX6gkK+1zv++VkkVQ7jOxDLuqKaJzuXzAKai+8UuH
-O2Asd5KZdqgcLzF+QfSqdq3DYsYymakIu14+49UoApQqkVCUYt3KYK+cYdApTTm+
-J1Ns9dLT9//WiOksxA33n8qfM8WXBqbvhTlWlxNYW+2NXWmN8+U=
-=OzbK
------END PGP SIGNATURE-----
+	frame_push first_reg=19, last_reg=23
 
---nextPart3900354.K5vSuZu25U--
+(or whatever).  Just syntactic sugar though.
+
+[...]
+
+Cheers
+---Dave
