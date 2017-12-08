@@ -1,66 +1,111 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH] fscrypt: add support for ChaCha20 contents
- encryption
-Date: Fri, 8 Dec 2017 10:27:07 +0000
-Message-ID: <CAKv+Gu-5htHxD3gOLWdSNabfiHD=_ssdZLsdksv3FJ_ueK=XEQ@mail.gmail.com>
-References: <20171208013838.105034-1-ebiggers3@gmail.com>
- <CAKv+Gu_7vMAOP371MJh+FoYb81gwF1y_zy+OES9q5eWTTdOBTg@mail.gmail.com>
- <CAKv+Gu-GfHpukc0WA6z13xAfdcmL9LQUmH41J4GsuMP+m4ge3g@mail.gmail.com>
- <6974144.ZTrPlmK77A@tauon.chronox.de>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: [PATCH] crypto: AF_ALG - fix race accessing cipher request
+Date: Fri, 08 Dec 2017 11:50:37 +0100
+Message-ID: <5543369.6UIL7PonCy@positron.chronox.de>
+References: <001a1141f050d78763055f85c42e@google.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: David Gstir <david@sigma-star.at>, Theodore Ts'o <tytso@mit.edu>,
- Eric Biggers <ebiggers@google.com>, Martin Willi <martin@strongswan.org>,
- Eric Biggers <ebiggers3@gmail.com>, Michael Halcrow <mhalcrow@google.com>,
- "Jason A . Donenfeld" <Jason@zx2c4.com>,
- linux-f2fs-devel@lists.sourceforge.net, linux-fscrypt@vger.kernel.org,
- linux-mtd@lists.infradead.org,
- "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
- linux-fsdevel@vger.kernel.org, Jaegeuk Kim <jaegeuk@kernel.org>,
- linux-ext4@vger.kernel.org, Paul Crowley <paulcrowley@google.com>
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-f2fs-devel-bounces@lists.sourceforge.net>
-In-Reply-To: <6974144.ZTrPlmK77A@tauon.chronox.de>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/options/linux-f2fs-devel>,
- <mailto:linux-f2fs-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=linux-f2fs-devel>
-List-Post: <mailto:linux-f2fs-devel@lists.sourceforge.net>
-List-Help: <mailto:linux-f2fs-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/linux-f2fs-devel>,
- <mailto:linux-f2fs-devel-request@lists.sourceforge.net?subject=subscribe>
-Errors-To: linux-f2fs-devel-bounces@lists.sourceforge.net
+Content-Transfer-Encoding: 7Bit
+Cc: syzbot
+        <bot+3cbaad7926415bb8cfce88469e5f66a2bbd0d0cd@syzkaller.appspotmail.com>,
+        davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+To: herbert@gondor.apana.org.au
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <001a1141f050d78763055f85c42e@google.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 8 December 2017 at 10:14, Stephan Mueller <smueller@chronox.de> wrote:
-> Am Freitag, 8. Dezember 2017, 11:06:31 CET schrieb Ard Biesheuvel:
->
-> Hi Ard,
->
->>
->> Given how it is not uncommon for counters to be used as IV, this is a
->> fundamental flaw that could rear its head in other places as well, so
->> I propose we fix this one way (fix the current code) or the other
->> (deprecate the current code and create a new chacha20-rfc7539
->> blockcipher that uses a 96-bit IV and sets the counter to 0)
->
-> Instead of having a complete new implementation of the ChaCha20 cipher, what
-> about using a specific IV generator for which the kernel crypto API has
-> already support (see crypto/seqiv.c for example)?
->
-> I.e. we have the current ChaCha20 cipher, but use some "rfc7539iv(chacha20)"
-> cipher mode where that rfc7539iv is the mentioned IV generator that turns the
-> given IV (sector number?) into the proper IV for ChaCha20.
->
+Hi Herbert,
 
-To be honest, I don't fully understand how the IV generators work.
-seqiv is implemented as an AEAD not as a skcipher, and we'd need to
-wrap chacha20 in something that is usable as a skcipher.
+This patch would go on top of 7d2c3f54e6f646887d019faa45f35d6fe9fe82ce
+"crypto: af_alg - remove locking in async callback" found in Linus' tree
+which is not yet in the cryptodev-2.6 tree.
 
-In any case, it does make sense to address this by wrapping chacha20
-in something generic, rather than having to extend all
-implementations.
+In addition, this patch is already on top of the other patches discussed
+on this list fixing similar issues. I.e. depending in which order you apply
+the patches, there may be a hunk. In case you want me to rebase the patch,
+please let me know.
 
-------------------------------------------------------------------------------
-Check out the vibrant tech community on one of the world's most
-engaging tech sites, Slashdot.org! http://sdm.link/slashdot
+---8<---
+When invoking an asynchronous cipher operation, the invocation of the
+callback may be performed before the subsequent operations in the
+initial code path are invoked. The callback deletes the cipher request
+data structure which implies that after the invocation of the
+asynchronous cipher operation, this data structure must not be accessed
+any more.
+
+The setting of the return code size with the request data structure must
+therefore be moved before the invocation of the asynchronous cipher
+operation.
+
+Fixes: e870456d8e7c ("crypto: algif_skcipher - overhaul memory management")
+Fixes: d887c52d6ae4 ("crypto: algif_aead - overhaul memory management")
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Cc: <stable@vger.kernel.org> # v4.14+
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/algif_aead.c     | 10 +++++-----
+ crypto/algif_skcipher.c | 10 +++++-----
+ 2 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
+index 15e561dc47b5..d7ec2f4ebaf9 100644
+--- a/crypto/algif_aead.c
++++ b/crypto/algif_aead.c
+@@ -291,6 +291,10 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
+ 		/* AIO operation */
+ 		sock_hold(sk);
+ 		areq->iocb = msg->msg_iocb;
++
++		/* Remember output size that will be generated. */
++		areq->outlen = outlen;
++
+ 		aead_request_set_callback(&areq->cra_u.aead_req,
+ 					  CRYPTO_TFM_REQ_MAY_BACKLOG,
+ 					  af_alg_async_cb, areq);
+@@ -298,12 +302,8 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
+ 				 crypto_aead_decrypt(&areq->cra_u.aead_req);
+ 
+ 		/* AIO operation in progress */
+-		if (err == -EINPROGRESS || err == -EBUSY) {
+-			/* Remember output size that will be generated. */
+-			areq->outlen = outlen;
+-
++		if (err == -EINPROGRESS || err == -EBUSY)
+ 			return -EIOCBQUEUED;
+-		}
+ 
+ 		sock_put(sk);
+ 	} else {
+diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
+index 6fb595cd63ac..baef9bfccdda 100644
+--- a/crypto/algif_skcipher.c
++++ b/crypto/algif_skcipher.c
+@@ -125,6 +125,10 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
+ 		/* AIO operation */
+ 		sock_hold(sk);
+ 		areq->iocb = msg->msg_iocb;
++
++		/* Remember output size that will be generated. */
++		areq->outlen = len;
++
+ 		skcipher_request_set_callback(&areq->cra_u.skcipher_req,
+ 					      CRYPTO_TFM_REQ_MAY_SLEEP,
+ 					      af_alg_async_cb, areq);
+@@ -133,12 +137,8 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
+ 			crypto_skcipher_decrypt(&areq->cra_u.skcipher_req);
+ 
+ 		/* AIO operation in progress */
+-		if (err == -EINPROGRESS || err == -EBUSY) {
+-			/* Remember output size that will be generated. */
+-			areq->outlen = len;
+-
++		if (err == -EINPROGRESS || err == -EBUSY)
+ 			return -EIOCBQUEUED;
+-		}
+ 
+ 		sock_put(sk);
+ 	} else {
+-- 
+2.14.3
