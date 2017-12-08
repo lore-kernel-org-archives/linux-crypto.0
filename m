@@ -1,58 +1,44 @@
-From: Ying Xue <ying.xue@windriver.com>
-Subject: Re: [PATCH 8/8] net: tipc: remove unused hardirq.h
-Date: Fri, 8 Dec 2017 09:40:30 +0800
-Message-ID: <4ed1efbc-5fb8-7412-4f46-1e3a91a98373@windriver.com>
-References: <1510959741-31109-1-git-send-email-yang.s@alibaba-inc.com>
- <1510959741-31109-8-git-send-email-yang.s@alibaba-inc.com>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [PATCH] fscrypt: add support for ChaCha20 contents encryption
+Date: Fri, 8 Dec 2017 03:51:28 +0100
+Message-ID: <CAHmME9ob8eG1yS=jkGHFnYDq+FtiJCP38CKpzUs0Z33R8_0Msw@mail.gmail.com>
+References: <20171208013838.105034-1-ebiggers3@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: <linux-mm@kvack.org>, <linux-fsdevel@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>, <netdev@vger.kernel.org>,
-        Jon Maloy
-	<jon.maloy@ericsson.com>,
-        "David S. Miller" <davem@davemloft.net>
-To: Yang Shi <yang.s@alibaba-inc.com>, <linux-kernel@vger.kernel.org>
-Return-path: <owner-linux-mm@kvack.org>
-In-Reply-To: <1510959741-31109-8-git-send-email-yang.s@alibaba-inc.com>
-Content-Language: en-US
-Sender: owner-linux-mm@kvack.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: linux-fscrypt@vger.kernel.org, "Theodore Ts'o" <tytso@mit.edu>,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Michael Halcrow <mhalcrow@google.com>,
+        Paul Crowley <paulcrowley@google.com>,
+        Martin Willi <martin@strongswan.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        David Gstir <david@sigma-star.at>,
+        Eric Biggers <ebiggers@google.com>
+To: Eric Biggers <ebiggers3@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from frisell.zx2c4.com ([192.95.5.64]:55081 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752280AbdLHCvd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 7 Dec 2017 21:51:33 -0500
+In-Reply-To: <20171208013838.105034-1-ebiggers3@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 11/18/2017 07:02 AM, Yang Shi wrote:
-> Preempt counter APIs have been split out, currently, hardirq.h just
-> includes irq_enter/exit APIs which are not used by TIPC at all.
-> 
-> So, remove the unused hardirq.h.
-> 
-> Signed-off-by: Yang Shi <yang.s@alibaba-inc.com>
-> Cc: Jon Maloy <jon.maloy@ericsson.com>
-> Cc: Ying Xue <ying.xue@windriver.com>
-> Cc: "David S. Miller" <davem@davemloft.net>
+Hi Eric,
 
-Tested-by: Ying Xue <ying.xue@windriver.com>
-Acked-by: Ying Xue <ying.xue@windriver.com>
+Nice to see more use of ChaCha20. However...
 
-> ---
->  net/tipc/core.h | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/net/tipc/core.h b/net/tipc/core.h
-> index 5cc5398..099e072 100644
-> --- a/net/tipc/core.h
-> +++ b/net/tipc/core.h
-> @@ -49,7 +49,6 @@
->  #include <linux/uaccess.h>
->  #include <linux/interrupt.h>
->  #include <linux/atomic.h>
-> -#include <asm/hardirq.h>
->  #include <linux/netdevice.h>
->  #include <linux/in.h>
->  #include <linux/list.h>
-> 
+Can we skip over the "sort of worse than XTS, but not having _real_
+authentication sucks anyway in either case, so whatever" and move
+directly to, "linux finally supports authenticated encryption for disk
+encryption!"? This would be a big deal and would actually be a
+noticeable security improvement, instead of a potentially dubious step
+sidewaysbackish.
 
---
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+Bcachefs supports ChaCha20Poly1305, which is pretty neat. From what
+I've read, performance is acceptable too.
+http://bcachefs.org/Encryption/
+
+Jason
