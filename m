@@ -1,44 +1,39 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH] crypto: stm32: fix modular build
-Date: Mon, 11 Dec 2017 12:47:32 +0100
-Message-ID: <20171211114752.3637710-1-arnd@arndb.de>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        Fabien DESSENNE <fabien.dessenne@st.com>,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2] crypto: Add myself as co-maintainer for s5p-sss.c
+Date: Mon, 11 Dec 2017 22:50:45 +1100
+Message-ID: <20171211115045.GL12014@gondor.apana.org.au>
+References: <CGME20171201165104eucas1p1bb39f164ff03b3c335a8e2dd4a91cff8@eucas1p1.samsung.com>
+ <acd334d8-987e-c161-bb4b-d43c7336a0df@partner.samsung.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: Krzysztof Kozlowski <krzk@kernel.org>,
+        Vladimir Zapolskiy <vz@mleia.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
         linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+To: Kamil Konieczny <k.konieczny@partner.samsung.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from [128.1.224.119] ([128.1.224.119]:44002 "EHLO ringil.hmeau.com"
+        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
+        id S1751347AbdLKLv2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 11 Dec 2017 06:51:28 -0500
+Content-Disposition: inline
+In-Reply-To: <acd334d8-987e-c161-bb4b-d43c7336a0df@partner.samsung.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Building the stm32 crypto suport as a loadable module causes a build
-failure from a simple typo:
+On Fri, Dec 01, 2017 at 05:51:02PM +0100, Kamil Konieczny wrote:
+> Add myself as co-maintainer for Samsung Security SubSystem driver.
+> I have added major functionality to the driver [hash acceleration],
+> I have access to documentation and to hardware for testing, I can
+> also dedicate some of my paid time for reviewing and verifying changes
+> to the driver.
+> 
+> Signed-off-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
 
-drivers/crypto/stm32/stm32-cryp.c:1035:25: error: 'sti_dt_ids' undeclared here (not in a function); did you mean 'stm32_dt_ids'?
-
-This renames the reference to point to the correct symbol.
-
-Fixes: 9e054ec21ef8 ("crypto: stm32 - Support for STM32 CRYP crypto module")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/crypto/stm32/stm32-cryp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/stm32/stm32-cryp.c b/drivers/crypto/stm32/stm32-cryp.c
-index 459755940632..cf1dddbeaa2c 100644
---- a/drivers/crypto/stm32/stm32-cryp.c
-+++ b/drivers/crypto/stm32/stm32-cryp.c
-@@ -1032,7 +1032,7 @@ static const struct of_device_id stm32_dt_ids[] = {
- 	{ .compatible = "st,stm32f756-cryp", },
- 	{},
- };
--MODULE_DEVICE_TABLE(of, sti_dt_ids);
-+MODULE_DEVICE_TABLE(of, stm32_dt_ids);
- 
- static int stm32_cryp_probe(struct platform_device *pdev)
- {
+Patch applied.  Thanks.
 -- 
-2.9.0
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
