@@ -1,69 +1,49 @@
-From: David Gstir <david@sigma-star.at>
-Subject: Re: [PATCH] fscrypt: add support for ChaCha20 contents encryption
-Date: Mon, 11 Dec 2017 17:11:41 +0100
-Message-ID: <899E2752-1AD9-4DF4-ABC7-E0D1582AF292@sigma-star.at>
-References: <20171208013838.105034-1-ebiggers3@gmail.com>
- <CAHmME9ob8eG1yS=jkGHFnYDq+FtiJCP38CKpzUs0Z33R8_0Msw@mail.gmail.com>
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Content-Type: text/plain;
-        charset=us-ascii
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: Re: [PATCH v3 3/3] ARM: dts: exynos: Add nodes for True Random
+ Number Generator
+Date: Mon, 11 Dec 2017 19:49:13 +0100
+Message-ID: <20171211184913.n67q7vbv2gzknjeb@kozik-lap>
+References: <20171204125351.26805-1-l.stelmach@samsung.com>
+ <CGME20171204125416eucas1p141878ea587d807a2559c90f590eab7fb@eucas1p1.samsung.com>
+ <20171204125351.26805-4-l.stelmach@samsung.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8BIT
-Cc: Eric Biggers <ebiggers3@gmail.com>, linux-fscrypt@vger.kernel.org,
-        Theodore Ts'o <tytso@mit.edu>, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net,
-        linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Michael Halcrow <mhalcrow@google.com>,
-        Paul Crowley <paulcrowley@google.com>,
-        Martin Willi <martin@strongswan.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Eric Biggers <ebiggers@google.com>,
-        Richard Weinberger <richard@nod.at>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Return-path: <linux-ext4-owner@vger.kernel.org>
-In-Reply-To: <CAHmME9ob8eG1yS=jkGHFnYDq+FtiJCP38CKpzUs0Z33R8_0Msw@mail.gmail.com>
-Sender: linux-ext4-owner@vger.kernel.org
+Cc: "Andrew F . Davis" <afd@ti.com>,
+        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Kukjin Kim <kgene@kernel.org>, devicetree@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+To: =?utf-8?Q?=C5=81ukasz?= Stelmach <l.stelmach@samsung.com>
+Return-path: <linux-samsung-soc-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20171204125351.26805-4-l.stelmach@samsung.com>
+Sender: linux-samsung-soc-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-
-> On 08.12.2017, at 03:51, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+On Mon, Dec 04, 2017 at 01:53:51PM +0100, Łukasz Stelmach wrote:
+> Add nodes for the True Random Number Generator found in Samsung Exynos
+> 5250+ SoCs.
 > 
-> Hi Eric,
-> 
-> Nice to see more use of ChaCha20. However...
-> 
-> Can we skip over the "sort of worse than XTS, but not having _real_
-> authentication sucks anyway in either case, so whatever" and move
-> directly to, "linux finally supports authenticated encryption for disk
-> encryption!"? This would be a big deal and would actually be a
-> noticeable security improvement, instead of a potentially dubious step
-> sidewaysbackish.
+> Signed-off-by: Łukasz Stelmach <l.stelmach@samsung.com>
+> ---
+>  arch/arm/boot/dts/exynos5.dtsi    | 5 +++++
+>  arch/arm/boot/dts/exynos5250.dtsi | 5 +++++
+>  arch/arm/boot/dts/exynos5410.dtsi | 5 +++++
+>  arch/arm/boot/dts/exynos5420.dtsi | 5 +++++
+>  4 files changed, 20 insertions(+)
+>
 
-Out of curiosity, does anybody know of any specific attacks that authenticated
-encryption for disk encryption would solve as opposed to just using encryption
-with AES-XTS?
+Unfortunately the same story as with your PRNG patch - does not apply on
+top of my next/dt (after taking PRNG). Also did not apply on v4.15-rc1 +
+PRNG.
 
-To my knowledge the XTS mode is frowned upon [1], but I don't know of any
-serious flaws that would eg. allow an attacker to modify file contents
-without a *serious* amount of effort. CBC is another story though [2].
+Could you rebase on my next/dt?
 
-Don't get me wrong, I'd like to have authenticated encryption too.
-In fact we are currently working on a concept for adding authentication to
-UBIFS (I'll share more details as soon as its in a presentable state).
-However, the reason for this is mainly because UBIFS does *not* operate on
-the block layer, so dm-integrity/dm-verity is not an option and fscrypt
-only protects the confidentiality of file contents and filenames.
-This means that the filesystem index is unprotected which makes it rather
-easy to move files around - eg. replace /bin/bash with something completely
-different without knowing the fscrypt master key or any derived key.
-
-For the general use case though (eg. securing *really important* files on my desktop),
-I'd use authenticated encryption at a higher layer to get more flexibility
-to eg. easily use explicit IVs over implicit ones derived from block/sector
-number. But maybe there are some uses cases I didn't think of just now... :)
-
-David
-
-[1] https://sockpuppet.org/blog/2014/04/30/you-dont-want-xts/
-[2] http://www.jakoblell.com/blog/2013/12/22/practical-malleability-attack-against-cbc-encrypted-luks-partitions/
+Best regards,
+Krzysztof
