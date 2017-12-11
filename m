@@ -1,73 +1,46 @@
-From: Antoine Tenart <antoine.tenart@free-electrons.com>
-Subject: Re: [PATCH v3 0/3] crypto: inside-secure - set of fixes
-Date: Mon, 11 Dec 2017 11:51:04 +0100
-Message-ID: <20171211105104.GA25758@kwain>
-References: <20171211084808.8272-1-antoine.tenart@free-electrons.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 00/18] crypto: talitos - fixes and performance improvement
+Date: Mon, 11 Dec 2017 22:07:54 +1100
+Message-ID: <20171211110754.GB8823@gondor.apana.org.au>
+References: <cover.1507284818.git.christophe.leroy@c-s.fr>
+ <20171012151959.GI31122@gondor.apana.org.au>
+ <VI1PR0402MB3342A19DE16BEEB714DAA98A98300@VI1PR0402MB3342.eurprd04.prod.outlook.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
-        thomas.petazzoni@free-electrons.com,
-        gregory.clement@free-electrons.com,
-        miquel.raynal@free-electrons.com, oferh@marvell.com,
-        igall@marvell.com, nadavh@marvell.com, linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au, davem@davemloft.net
+Cc: Christophe Leroy <christophe.leroy@c-s.fr>,
+        "David S. Miller" <davem@davemloft.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
+To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:58231 "EHLO
-        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751281AbdLKKvF (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 11 Dec 2017 05:51:05 -0500
+Received: from [128.1.224.119] ([128.1.224.119]:43806 "EHLO ringil.hmeau.com"
+        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
+        id S1752591AbdLKLI1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 11 Dec 2017 06:08:27 -0500
 Content-Disposition: inline
-In-Reply-To: <20171211084808.8272-1-antoine.tenart@free-electrons.com>
+In-Reply-To: <VI1PR0402MB3342A19DE16BEEB714DAA98A98300@VI1PR0402MB3342.eurprd04.prod.outlook.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+On Fri, Dec 08, 2017 at 03:20:40PM +0000, Horia GeantÄƒ wrote:
+> On 10/12/2017 6:20 PM, Herbert Xu wrote:
+> > On Fri, Oct 06, 2017 at 03:04:31PM +0200, Christophe Leroy wrote:
+> >> This serie fixes and improves the talitos crypto driver.
+> >>
+> >> First 6 patchs are fixes of failures reported by the new tests in the
+> >> kernel crypto test manager.
+> >>
+> Looks like these fixes are required also on older 4.9+ -stable kernels.
+> (I haven't seen them on latest 4.9.68-stable mail from Greg, even though
+> they are in main tree.)
+> 
+> In case you agree, what would be the recommended way to add the patches
+> to -stable?
 
-I'll send a v4 soon as there are two coding style issues in the series.
-I'll also include a new patch to only update the areq->result buffer on
-final operations (this will fix the issue I was trying to fix with "only
-update the result buffer when provided").
-
-Sorry for the noise.
-
-Antoine
-
-On Mon, Dec 11, 2017 at 09:48:05AM +0100, Antoine Tenart wrote:
-> Hi Herbert,
-> 
-> This series is a set of 4 fixes on the Inside Secure SafeXcel crypto
-> engine driver. The series will be followed by another non-fix one.
-> 
-> This is based on v4.15-rc3.
-> 
-> Thanks,
-> Antoine
-> 
-> Since v2:
->   - Removed the patch only update the result buffer when provided.
-> 
-> Since v1:
->   - Removed the crash.txt file which was part of patch 1/4.
-> 
-> Antoine Tenart (2):
->   crypto: inside-secure - free requests even if their handling failed
->   crypto: inside-secure - fix request allocations in invalidation path
-> 
-> Ofer Heifetz (1):
->   crypto: inside-secure - per request invalidation
-> 
->  drivers/crypto/inside-secure/safexcel.c        |  1 +
->  drivers/crypto/inside-secure/safexcel_cipher.c | 83 ++++++++++++++++++++------
->  drivers/crypto/inside-secure/safexcel_hash.c   | 80 ++++++++++++++++++-------
->  3 files changed, 125 insertions(+), 39 deletions(-)
-> 
-> -- 
-> 2.14.3
-> 
-
+I'll forward them to stable.  Thanks!
 -- 
-Antoine Ténart, Free Electrons
-Embedded Linux and Kernel engineering
-http://free-electrons.com
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
