@@ -1,41 +1,45 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 3/4] crypto: inside-secure - only update the result
- buffer when provided
-Date: Mon, 11 Dec 2017 22:13:57 +1100
-Message-ID: <20171211111357.GC8823@gondor.apana.org.au>
-References: <20171128090518.12469-1-antoine.tenart@free-electrons.com>
- <20171128090518.12469-4-antoine.tenart@free-electrons.com>
- <20171211072946.GA8823@gondor.apana.org.au>
- <20171211074957.GC25616@kwain>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, thomas.petazzoni@free-electrons.com,
+From: Antoine Tenart <antoine.tenart@free-electrons.com>
+Subject: [PATCH v4 2/4] crypto: inside-secure - free requests even if their handling failed
+Date: Mon, 11 Dec 2017 12:10:56 +0100
+Message-ID: <20171211111058.8878-3-antoine.tenart@free-electrons.com>
+References: <20171211111058.8878-1-antoine.tenart@free-electrons.com>
+Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
+        thomas.petazzoni@free-electrons.com,
         gregory.clement@free-electrons.com,
         miquel.raynal@free-electrons.com, oferh@marvell.com,
         igall@marvell.com, nadavh@marvell.com, linux-crypto@vger.kernel.org
-To: Antoine Tenart <antoine.tenart@free-electrons.com>
+To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [128.1.224.119] ([128.1.224.119]:43846 "EHLO ringil.hmeau.com"
-        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1750836AbdLKLOT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 11 Dec 2017 06:14:19 -0500
-Content-Disposition: inline
-In-Reply-To: <20171211074957.GC25616@kwain>
+Received: from mail.free-electrons.com ([62.4.15.54]:58917 "EHLO
+        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752208AbdLKLPD (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 11 Dec 2017 06:15:03 -0500
+In-Reply-To: <20171211111058.8878-1-antoine.tenart@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Dec 11, 2017 at 08:49:57AM +0100, Antoine Tenart wrote:
->
-> So this patch is indeed fixing an issue, which should probably not be
-> there in the first place. I guess you recommend using a buffer local to
-> the driver instead, and only update areq->request on completion (final).
+This patch frees the request private data even if its handling failed,
+as it would never be freed otherwise.
 
-That's one way to do it.  Ideally you'd only use the local buffer
-for the non-final case so that the final case just does the DMA to
-the final destination.
+Fixes: 1b44c5a60c13 ("crypto: inside-secure - add SafeXcel EIP197 crypto engine driver")
+Suggested-by: Ofer Heifetz <oferh@marvell.com>
+Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
+---
+ drivers/crypto/inside-secure/safexcel.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Cheers,
+diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
+index 89ba9e85c0f3..4bcef78a08aa 100644
+--- a/drivers/crypto/inside-secure/safexcel.c
++++ b/drivers/crypto/inside-secure/safexcel.c
+@@ -607,6 +607,7 @@ static inline void safexcel_handle_result_descriptor(struct safexcel_crypto_priv
+ 		ndesc = ctx->handle_result(priv, ring, sreq->req,
+ 					   &should_complete, &ret);
+ 		if (ndesc < 0) {
++			kfree(sreq);
+ 			dev_err(priv->dev, "failed to handle result (%d)", ndesc);
+ 			return;
+ 		}
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.14.3
