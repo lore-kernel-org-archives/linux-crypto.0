@@ -1,66 +1,109 @@
 From: Antoine Tenart <antoine.tenart@free-electrons.com>
-Subject: Re: [PATCH 3/4] crypto: inside-secure - only update the result
- buffer when provided
-Date: Mon, 11 Dec 2017 08:49:57 +0100
-Message-ID: <20171211074957.GC25616@kwain>
-References: <20171128090518.12469-1-antoine.tenart@free-electrons.com>
- <20171128090518.12469-4-antoine.tenart@free-electrons.com>
- <20171211072946.GA8823@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+Subject: [PATCH v3 3/3] crypto: inside-secure - fix request allocations in invalidation path
+Date: Mon, 11 Dec 2017 09:48:08 +0100
+Message-ID: <20171211084808.8272-4-antoine.tenart@free-electrons.com>
+References: <20171211084808.8272-1-antoine.tenart@free-electrons.com>
 Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
-        davem@davemloft.net, thomas.petazzoni@free-electrons.com,
+        thomas.petazzoni@free-electrons.com,
         gregory.clement@free-electrons.com,
         miquel.raynal@free-electrons.com, oferh@marvell.com,
         igall@marvell.com, nadavh@marvell.com, linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:52187 "EHLO
+Received: from mail.free-electrons.com ([62.4.15.54]:53762 "EHLO
         mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750707AbdLKHt7 (ORCPT
+        with ESMTP id S1752030AbdLKIuD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 11 Dec 2017 02:49:59 -0500
-Content-Disposition: inline
-In-Reply-To: <20171211072946.GA8823@gondor.apana.org.au>
+        Mon, 11 Dec 2017 03:50:03 -0500
+In-Reply-To: <20171211084808.8272-1-antoine.tenart@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
+This patch makes use of the SKCIPHER_REQUEST_ON_STACK and
+AHASH_REQUEST_ON_STACK helpers to allocate enough memory to contain both
+the crypto request structures and their embedded context (__ctx).
 
-On Mon, Dec 11, 2017 at 06:29:46PM +1100, Herbert Xu wrote:
-> On Tue, Nov 28, 2017 at 10:05:17AM +0100, Antoine Tenart wrote:
-> >  
-> >  	if (sreq->finish)
-> >  		result_sz = crypto_ahash_digestsize(ahash);
-> > -	memcpy(sreq->state, areq->result, result_sz);
-> > +
-> > +	/* The called isn't required to supply a result buffer. Updated it only
-> > +	 * when provided.
-> > +	 */
-> > +	if (areq->result)
-> > +		memcpy(sreq->state, areq->result, result_sz);
-> 
-> I don't think you should use whether areq->result is NULL to
-> determine whether to copy data into it.  For example, I could
-> be making an update call with a non-NULL areq->result and it would
-> be completely wrong if you overwrote that with the above memcpy.
-> 
-> IOW areq->result should not be touched at all unless you are doing
-> a finalisation.
+Fixes: 1b44c5a60c13 ("crypto: inside-secure - add SafeXcel EIP197 crypto engine driver")
+Suggested-by: Ofer Heifetz <oferh@marvell.com>
+Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
+---
+ drivers/crypto/inside-secure/safexcel_cipher.c | 14 +++++++-------
+ drivers/crypto/inside-secure/safexcel_hash.c   | 14 +++++++-------
+ 2 files changed, 14 insertions(+), 14 deletions(-)
 
-I didn't know that. It means the SafeXcel driver logic is wrong
-regarding this point, as areq->result is DMA mapped and used of all hash
-operations (including updates).
-
-So this patch is indeed fixing an issue, which should probably not be
-there in the first place. I guess you recommend using a buffer local to
-the driver instead, and only update areq->request on completion (final).
-
-Thanks!
-Antoine
-
+diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
+index 9ea24868d860..ef44f5a5a90f 100644
+--- a/drivers/crypto/inside-secure/safexcel_cipher.c
++++ b/drivers/crypto/inside-secure/safexcel_cipher.c
+@@ -422,25 +422,25 @@ static int safexcel_cipher_exit_inv(struct crypto_tfm *tfm)
+ {
+ 	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
+ 	struct safexcel_crypto_priv *priv = ctx->priv;
+-	struct skcipher_request req;
+-	struct safexcel_cipher_req *sreq = skcipher_request_ctx(&req);
++	SKCIPHER_REQUEST_ON_STACK(req, __crypto_skcipher_cast(tfm));
++	struct safexcel_cipher_req *sreq = skcipher_request_ctx(req);
+ 	struct safexcel_inv_result result = {};
+ 	int ring = ctx->base.ring;
+ 
+-	memset(&req, 0, sizeof(struct skcipher_request));
++	memset(req, 0, sizeof(struct skcipher_request));
+ 
+ 	/* create invalidation request */
+ 	init_completion(&result.completion);
+-	skcipher_request_set_callback(&req, CRYPTO_TFM_REQ_MAY_BACKLOG,
++	skcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+ 					safexcel_inv_complete, &result);
+ 
+-	skcipher_request_set_tfm(&req, __crypto_skcipher_cast(tfm));
+-	ctx = crypto_tfm_ctx(req.base.tfm);
++	skcipher_request_set_tfm(req, __crypto_skcipher_cast(tfm));
++	ctx = crypto_tfm_ctx(req->base.tfm);
+ 	ctx->base.exit_inv = true;
+ 	sreq->needs_inv = true;
+ 
+ 	spin_lock_bh(&priv->ring[ring].queue_lock);
+-	crypto_enqueue_request(&priv->ring[ring].queue, &req.base);
++	crypto_enqueue_request(&priv->ring[ring].queue, &req->base);
+ 	spin_unlock_bh(&priv->ring[ring].queue_lock);
+ 
+ 	if (!priv->ring[ring].need_dequeue)
+diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
+index 6135c9f5742c..d2e024732988 100644
+--- a/drivers/crypto/inside-secure/safexcel_hash.c
++++ b/drivers/crypto/inside-secure/safexcel_hash.c
+@@ -451,25 +451,25 @@ static int safexcel_ahash_exit_inv(struct crypto_tfm *tfm)
+ {
+ 	struct safexcel_ahash_ctx *ctx = crypto_tfm_ctx(tfm);
+ 	struct safexcel_crypto_priv *priv = ctx->priv;
+-	struct ahash_request req;
+-	struct safexcel_ahash_req *rctx = ahash_request_ctx(&req);
++	AHASH_REQUEST_ON_STACK(req, __crypto_ahash_cast(tfm));
++	struct safexcel_ahash_req *rctx = ahash_request_ctx(req);
+ 	struct safexcel_inv_result result = {};
+ 	int ring = ctx->base.ring;
+ 
+-	memset(&req, 0, sizeof(struct ahash_request));
++	memset(req, 0, sizeof(struct ahash_request));
+ 
+ 	/* create invalidation request */
+ 	init_completion(&result.completion);
+-	ahash_request_set_callback(&req, CRYPTO_TFM_REQ_MAY_BACKLOG,
++	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+ 				   safexcel_inv_complete, &result);
+ 
+-	ahash_request_set_tfm(&req, __crypto_ahash_cast(tfm));
+-	ctx = crypto_tfm_ctx(req.base.tfm);
++	ahash_request_set_tfm(req, __crypto_ahash_cast(tfm));
++	ctx = crypto_tfm_ctx(req->base.tfm);
+ 	ctx->base.exit_inv = true;
+ 	rctx->needs_inv = true;
+ 
+ 	spin_lock_bh(&priv->ring[ring].queue_lock);
+-	crypto_enqueue_request(&priv->ring[ring].queue, &req.base);
++	crypto_enqueue_request(&priv->ring[ring].queue, &req->base);
+ 	spin_unlock_bh(&priv->ring[ring].queue_lock);
+ 
+ 	if (!priv->ring[ring].need_dequeue)
 -- 
-Antoine Ténart, Free Electrons
-Embedded Linux and Kernel engineering
-http://free-electrons.com
+2.14.3
