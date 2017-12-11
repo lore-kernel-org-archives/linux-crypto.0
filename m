@@ -1,31 +1,28 @@
 From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: general protection fault in strcmp
-Date: Mon, 11 Dec 2017 10:55:02 -0800
-Message-ID: <20171211185502.GA62691@gmail.com>
-References: <089e082676ecdedb0b055f394f11@google.com>
+Subject: Re: KASAN: use-after-free Write in aead_recvmsg
+Date: Mon, 11 Dec 2017 11:03:13 -0800
+Message-ID: <20171211190313.GB62691@gmail.com>
+References: <001a1141f050d78763055f85c42e@google.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, dhowells@redhat.com,
-        herbert@gondor.apana.org.au, keyrings@vger.kernel.org,
+Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         syzkaller-bugs@googlegroups.com
 To: syzbot
-        <bot+25a1a3685abe943a89512250aece10bdd9aa4827@syzkaller.appspotmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-it0-f65.google.com ([209.85.214.65]:45079 "EHLO
-        mail-it0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751628AbdLKSzG (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 11 Dec 2017 13:55:06 -0500
+        <bot+3cbaad7926415bb8cfce88469e5f66a2bbd0d0cd@syzkaller.appspotmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <089e082676ecdedb0b055f394f11@google.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <001a1141f050d78763055f85c42e@google.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Nov 30, 2017 at 12:44:01PM -0800, syzbot wrote:
+On Mon, Dec 04, 2017 at 07:57:01AM -0800, syzbot wrote:
 > syzbot will keep track of this bug report.
 > Once a fix for this bug is committed, please reply to this email with:
 > #syz fix: exact-commit-title
+> If you want to test a patch for this bug, please reply with:
+> #syz test: git://repo/address.git branch
+> and provide the patch inline or as an attachment.
 > To mark this as a duplicate of another syzbot report, please reply with:
 > #syz dup: exact-subject-of-another-report
 > If it's a one-off invalid bug report, please reply with:
@@ -35,4 +32,4 @@ On Thu, Nov 30, 2017 at 12:44:01PM -0800, syzbot wrote:
 > Note: all commands must start from beginning of the line in the email body.
 > 
 
-#syz fix: KEYS: reject NULL restriction string when type is specified
+#syz fix: crypto: af_alg - fix race accessing cipher request
