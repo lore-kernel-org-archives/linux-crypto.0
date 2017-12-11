@@ -1,39 +1,44 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] chcr: ensure cntrl is initialized to fix bit-wise or'ing
- of garabage data
-Date: Mon, 11 Dec 2017 22:46:45 +1100
-Message-ID: <20171211114645.GK12014@gondor.apana.org.au>
-References: <20171130142354.21225-1-colin.king@canonical.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Harsh Jain <harsh@chelsio.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org,
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] crypto: stm32: fix modular build
+Date: Mon, 11 Dec 2017 12:47:32 +0100
+Message-ID: <20171211114752.3637710-1-arnd@arndb.de>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@st.com>,
+        Fabien DESSENNE <fabien.dessenne@st.com>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         linux-kernel@vger.kernel.org
-To: Colin King <colin.king@canonical.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20171130142354.21225-1-colin.king@canonical.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Nov 30, 2017 at 02:23:54PM +0000, Colin King wrote:
-> From: Colin Ian King <colin.king@canonical.com>
-> 
-> In the case where skb->ip_summed != CHECKSUM_PARTIAL then cntrl contains
-> garbage value and this is possibly being bit-wise or'd and stored into
-> cpl->ctrl1.  Fix this by initializing cntrl to zero.
-> 
-> Cleans up clang warning:
-> drivers/crypto/chelsio/chcr_ipsec.c:374:9: warning: The left expression
-> of the compound assignment is an uninitialized value. The computed value
-> will also be garbage
-> 
-> Fixes: 6dad4e8ab3ec ("chcr: Add support for Inline IPSec")
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
+Building the stm32 crypto suport as a loadable module causes a build
+failure from a simple typo:
 
-Patch applied.  Thanks.
+drivers/crypto/stm32/stm32-cryp.c:1035:25: error: 'sti_dt_ids' undeclared here (not in a function); did you mean 'stm32_dt_ids'?
+
+This renames the reference to point to the correct symbol.
+
+Fixes: 9e054ec21ef8 ("crypto: stm32 - Support for STM32 CRYP crypto module")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ drivers/crypto/stm32/stm32-cryp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/stm32/stm32-cryp.c b/drivers/crypto/stm32/stm32-cryp.c
+index 459755940632..cf1dddbeaa2c 100644
+--- a/drivers/crypto/stm32/stm32-cryp.c
++++ b/drivers/crypto/stm32/stm32-cryp.c
+@@ -1032,7 +1032,7 @@ static const struct of_device_id stm32_dt_ids[] = {
+ 	{ .compatible = "st,stm32f756-cryp", },
+ 	{},
+ };
+-MODULE_DEVICE_TABLE(of, sti_dt_ids);
++MODULE_DEVICE_TABLE(of, stm32_dt_ids);
+ 
+ static int stm32_cryp_probe(struct platform_device *pdev)
+ {
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.9.0
