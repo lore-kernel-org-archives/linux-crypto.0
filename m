@@ -1,54 +1,41 @@
-From: Antoine Tenart <antoine.tenart@free-electrons.com>
-Subject: [PATCH v4 0/4] crypto: inside-secure - set of fixes
-Date: Mon, 11 Dec 2017 12:10:54 +0100
-Message-ID: <20171211111058.8878-1-antoine.tenart@free-electrons.com>
-Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
-        thomas.petazzoni@free-electrons.com,
-        gregory.clement@free-electrons.com,
-        miquel.raynal@free-electrons.com, oferh@marvell.com,
-        igall@marvell.com, nadavh@marvell.com, linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au, davem@davemloft.net
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 6/6] crypto: tcrypt: add multibuf aead speed test
+Date: Mon, 11 Dec 2017 22:35:33 +1100
+Message-ID: <20171211113533.GA11625@gondor.apana.org.au>
+References: <1512036574-26665-1-git-send-email-gilad@benyossef.com>
+ <1512036574-26665-7-git-send-email-gilad@benyossef.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Gilad Ben-Yossef <gilad@benyossef.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:58933 "EHLO
-        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750836AbdLKLPE (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 11 Dec 2017 06:15:04 -0500
+Received: from [128.1.224.119] ([128.1.224.119]:43866 "EHLO ringil.hmeau.com"
+        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
+        id S1751347AbdLKLgL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 11 Dec 2017 06:36:11 -0500
+Content-Disposition: inline
+In-Reply-To: <1512036574-26665-7-git-send-email-gilad@benyossef.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
+On Thu, Nov 30, 2017 at 10:09:32AM +0000, Gilad Ben-Yossef wrote:
+> The performance of some aead tfm providers is affected by
+> the amount of parallelism possible with the processing.
+> 
+> Introduce an async aead concurrent multiple buffer
+> processing speed test to be able to test performance of such
+> tfm providers.
+> 
+> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 
-This series is a set of 4 fixes on the Inside Secure SafeXcel crypto
-engine driver. The series will be followed by another non-fix one.
+Sorry, this no longer applies to the current cryptodev tree.
 
-This is based on v4.15-rc3.
+Please respin.
 
 Thanks,
-Antoine
-
-Since v3:
-  - Added one patch to only update areq->result on final operations.
-  - Fixed two coding style issue in the patches.
-
-Since v2:
-  - Removed the patch only update the result buffer when provided.
-
-Since v1:
-  - Removed the crash.txt file which was part of patch 1/4.
-
-Antoine Tenart (3):
-  crypto: inside-secure - free requests even if their handling failed
-  crypto: inside-secure - fix request allocations in invalidation path
-  crypto: inside-secure - do not use areq->result for partial results
-
-Ofer Heifetz (1):
-  crypto: inside-secure - per request invalidation
-
- drivers/crypto/inside-secure/safexcel.c        |  1 +
- drivers/crypto/inside-secure/safexcel_cipher.c | 85 ++++++++++++++++++------
- drivers/crypto/inside-secure/safexcel_hash.c   | 89 ++++++++++++++++++--------
- 3 files changed, 130 insertions(+), 45 deletions(-)
-
 -- 
-2.14.3
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
