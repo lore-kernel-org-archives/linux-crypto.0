@@ -1,10 +1,10 @@
 From: =?UTF-8?q?=C5=81ukasz=20Stelmach?= <l.stelmach@samsung.com>
-Subject: [PATCH v2 3/4] crypto: exynos - Reseed PRNG after generating 2^16
- random bytes
-Date: Mon, 11 Dec 2017 15:06:22 +0100
-Message-ID: <20171211140623.7673-4-l.stelmach@samsung.com>
+Subject: [PATCH v2 4/4] crypto: exynos - Introduce mutex to prevent
+ concurrent access to hardware
+Date: Mon, 11 Dec 2017 15:06:23 +0100
+Message-ID: <20171211140623.7673-5-l.stelmach@samsung.com>
 References: <20171211140623.7673-1-l.stelmach@samsung.com>
-        <CGME20171211140638eucas1p239085a27ce0501beb8b42be94ed61b34@eucas1p2.samsung.com>
+        <CGME20171211140639eucas1p23232610e264416b74fa4e69c14d85968@eucas1p2.samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8BIT
@@ -17,84 +17,126 @@ To: Krzysztof Kozlowski <krzk@kernel.org>, robh+dt@kernel.org,
         "David S . Miller" <davem@davemloft.net>,
         Kukjin Kim <kgene@kernel.org>, linux-crypto@vger.kernel.org,
         linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:33147 "EHLO
+        mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752938AbdLKOGn (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 11 Dec 2017 09:06:43 -0500
 In-reply-to: <20171211140623.7673-1-l.stelmach@samsung.com>
 In-reply-to: <20171205123558.31087-1-l.stelmach@samsung.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 Cc: Marek Szyprowski <m.szyprowski@samsung.com>, Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
 
-Reseed PRNG after reading 65 kB of randomness. Although this may reduce
-performance, in most cases the loss is not noticeable.
+Hardware operations like reading random numbers and setting a seed need
+to be conducted in a single thread. Therefore a mutex is required to
+prevent multiple threads (processes) from accessing the hardware at the
+same time.
 
-Reseeding of a PRNG does not increase entropy, but it helps preventing
-backtracking the internal state of the device from its output sequence,
-and hence, prevents potential attacker from predicting numbers to be
-generated.
+The sequence of mutex_lock() and mutex_unlock() in the exynos_rng_reseed()
+function enables switching between different threads waiting for the
+driver to generate random numbers for them.
 
 Signed-off-by: Łukasz Stelmach <l.stelmach@samsung.com>
-Reviewed-by: Stephan Mueller <smueller@chronox.de>
 ---
- drivers/crypto/exynos-rng.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
+ drivers/crypto/exynos-rng.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
 diff --git a/drivers/crypto/exynos-rng.c b/drivers/crypto/exynos-rng.c
-index 7d8f658480d3..c72a838f1932 100644
+index c72a838f1932..6209035ca659 100644
 --- a/drivers/crypto/exynos-rng.c
 +++ b/drivers/crypto/exynos-rng.c
-@@ -55,12 +55,14 @@ enum exynos_prng_type {
- };
+@@ -22,6 +22,7 @@
+ #include <linux/err.h>
+ #include <linux/io.h>
+ #include <linux/module.h>
++#include <linux/mutex.h>
+ #include <linux/of_device.h>
+ #include <linux/platform_device.h>
  
- /*
-- * Driver re-seeds itself with generated random numbers to increase
-- * the randomness.
-+ * Driver re-seeds itself with generated random numbers to hinder
-+ * backtracking of the original seed.
-  *
-  * Time for next re-seed in ms.
-  */
--#define EXYNOS_RNG_RESEED_TIME		100
-+#define EXYNOS_RNG_RESEED_TIME		1000
-+#define EXYNOS_RNG_RESEED_BYTES		65536
-+
- /*
-  * In polling mode, do not wait infinitely for the engine to finish the work.
-  */
-@@ -82,6 +84,8 @@ struct exynos_rng_dev {
+@@ -79,6 +80,7 @@ struct exynos_rng_dev {
+ 	enum exynos_prng_type		type;
+ 	void __iomem			*mem;
+ 	struct clk			*clk;
++	struct mutex 			lock;
+ 	/* Generated numbers stored for seeding during resume */
+ 	u8				seed_save[EXYNOS_RNG_SEED_SIZE];
  	unsigned int			seed_save_len;
- 	/* Time of last seeding in jiffies */
- 	unsigned long			last_seeding;
-+	/* Bytes generated since last seeding */
-+	unsigned long			bytes_seeding;
- };
- 
- static struct exynos_rng_dev *exynos_rng_dev;
-@@ -126,6 +130,7 @@ static int exynos_rng_set_seed(struct exynos_rng_dev *rng,
- 	}
- 
- 	rng->last_seeding = jiffies;
-+	rng->bytes_seeding = 0;
- 
- 	return 0;
- }
-@@ -165,6 +170,7 @@ static int exynos_rng_get_random(struct exynos_rng_dev *rng,
- 			  EXYNOS_RNG_STATUS);
- 	*read = min_t(size_t, dlen, EXYNOS_RNG_SEED_SIZE);
- 	memcpy_fromio(dst, rng->mem + EXYNOS_RNG_OUT_BASE, *read);
-+	rng->bytes_seeding += *read;
- 
- 	return 0;
- }
-@@ -178,7 +184,8 @@ static void exynos_rng_reseed(struct exynos_rng_dev *rng)
- 	unsigned int read = 0;
- 	u8 seed[EXYNOS_RNG_SEED_SIZE];
- 
--	if (time_before(now, next_seeding))
-+	if (time_before(now, next_seeding) &&
-+	    rng->bytes_seeding < EXYNOS_RNG_RESEED_BYTES)
+@@ -192,6 +194,10 @@ static void exynos_rng_reseed(struct exynos_rng_dev *rng)
  		return;
  
- 	if (exynos_rng_get_random(rng, seed, sizeof(seed), &read))
+ 	exynos_rng_set_seed(rng, seed, read);
++
++	/* Let others do some of their job. */
++	mutex_unlock(&rng->lock);
++	mutex_lock(&rng->lock);
+ }
+ 
+ static int exynos_rng_generate(struct crypto_rng *tfm,
+@@ -207,6 +213,7 @@ static int exynos_rng_generate(struct crypto_rng *tfm,
+ 	if (ret)
+ 		return ret;
+ 
++	mutex_lock(&rng->lock);
+ 	do {
+ 		ret = exynos_rng_get_random(rng, dst, dlen, &read);
+ 		if (ret)
+@@ -217,6 +224,7 @@ static int exynos_rng_generate(struct crypto_rng *tfm,
+ 
+ 		exynos_rng_reseed(rng);
+ 	} while (dlen > 0);
++	mutex_unlock(&rng->lock);
+ 
+ 	clk_disable_unprepare(rng->clk);
+ 
+@@ -234,7 +242,9 @@ static int exynos_rng_seed(struct crypto_rng *tfm, const u8 *seed,
+ 	if (ret)
+ 		return ret;
+ 
++	mutex_lock(&rng->lock);
+ 	ret = exynos_rng_set_seed(ctx->rng, seed, slen);
++	mutex_unlock(&rng->lock);
+ 
+ 	clk_disable_unprepare(rng->clk);
+ 
+@@ -284,6 +294,8 @@ static int exynos_rng_probe(struct platform_device *pdev)
+ 		return -ENOTSUPP;
+ 	}
+ 
++	mutex_init(&rng->lock);
++
+ 	rng->dev = &pdev->dev;
+ 	rng->clk = devm_clk_get(&pdev->dev, "secss");
+ 	if (IS_ERR(rng->clk)) {
+@@ -334,9 +346,14 @@ static int __maybe_unused exynos_rng_suspend(struct device *dev)
+ 	if (ret)
+ 		return ret;
+ 
++	mutex_lock(&rng->lock);
++
+ 	/* Get new random numbers and store them for seeding on resume. */
+ 	exynos_rng_get_random(rng, rng->seed_save, sizeof(rng->seed_save),
+ 			      &(rng->seed_save_len));
++
++	mutex_unlock(&rng->lock);
++
+ 	dev_dbg(rng->dev, "Stored %u bytes for seeding on system resume\n",
+ 		rng->seed_save_len);
+ 
+@@ -359,8 +376,12 @@ static int __maybe_unused exynos_rng_resume(struct device *dev)
+ 	if (ret)
+ 		return ret;
+ 
++	mutex_lock(&rng->lock);
++
+ 	ret = exynos_rng_set_seed(rng, rng->seed_save, rng->seed_save_len);
+ 
++	mutex_unlock(&rng->lock);
++
+ 	clk_disable_unprepare(rng->clk);
+ 
+ 	return ret;
 -- 
 2.11.0
