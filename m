@@ -1,40 +1,31 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 6/6] crypto: tcrypt: add multibuf aead speed test
-Date: Mon, 11 Dec 2017 22:35:33 +1100
-Message-ID: <20171211113533.GA11625@gondor.apana.org.au>
-References: <1512036574-26665-1-git-send-email-gilad@benyossef.com>
- <1512036574-26665-7-git-send-email-gilad@benyossef.com>
+Subject: Re: [PATCH] crypto: fix typo in KPP dependency of CRYPTO_ECDH
+Date: Mon, 11 Dec 2017 22:43:48 +1100
+Message-ID: <20171211114348.GA12014@gondor.apana.org.au>
+References: <20171125231646.19042-1-hauke@hauke-m.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: Gilad Ben-Yossef <gilad@benyossef.com>
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+        salvatore.benedetto@intel.com, "# v4 . 8+" <stable@vger.kernel.org>
+To: Hauke Mehrtens <hauke@hauke-m.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [128.1.224.119] ([128.1.224.119]:43866 "EHLO ringil.hmeau.com"
+Received: from [128.1.224.119] ([128.1.224.119]:43886 "EHLO ringil.hmeau.com"
         rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1751347AbdLKLgL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 11 Dec 2017 06:36:11 -0500
+        id S1750836AbdLKLos (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 11 Dec 2017 06:44:48 -0500
 Content-Disposition: inline
-In-Reply-To: <1512036574-26665-7-git-send-email-gilad@benyossef.com>
+In-Reply-To: <20171125231646.19042-1-hauke@hauke-m.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Nov 30, 2017 at 10:09:32AM +0000, Gilad Ben-Yossef wrote:
-> The performance of some aead tfm providers is affected by
-> the amount of parallelism possible with the processing.
+On Sun, Nov 26, 2017 at 12:16:46AM +0100, Hauke Mehrtens wrote:
+> This fixes a typo in the CRYPTO_KPP dependency of CRYPTO_ECDH.
 > 
-> Introduce an async aead concurrent multiple buffer
-> processing speed test to be able to test performance of such
-> tfm providers.
-> 
-> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+> Fixes: 3c4b23901a0c ("crypto: ecdh - Add ECDH software support")
+> Cc: <stable@vger.kernel.org> # v4.8+
+> Signed-off-by: Hauke Mehrtens <hauke@hauke-m.de>
 
-Sorry, this no longer applies to the current cryptodev tree.
-
-Please respin.
-
-Thanks,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
