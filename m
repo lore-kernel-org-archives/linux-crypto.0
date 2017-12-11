@@ -1,32 +1,32 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: stm32: fix module device table name
-Date: Mon, 11 Dec 2017 22:45:36 +1100
-Message-ID: <20171211114536.GF12014@gondor.apana.org.au>
-References: <20171130110433.15811-1-clabbe.montjoie@gmail.com>
+Subject: Re: [PATCH] crypto: cryptd: make cryptd_max_cpu_qlen module
+ parameter static
+Date: Mon, 11 Dec 2017 22:46:03 +1100
+Message-ID: <20171211114603.GG12014@gondor.apana.org.au>
+References: <20171130112614.3090-1-colin.king@canonical.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: fabien.dessenne@st.com, alexandre.torgue@st.com,
-        davem@davemloft.net, mcoquelin.stm32@gmail.com,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+Cc: "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org,
         linux-kernel@vger.kernel.org
-To: Corentin Labbe <clabbe.montjoie@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+To: Colin King <colin.king@canonical.com>
+Return-path: <kernel-janitors-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20171130110433.15811-1-clabbe.montjoie@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <20171130112614.3090-1-colin.king@canonical.com>
+Sender: kernel-janitors-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Nov 30, 2017 at 12:04:33PM +0100, Corentin Labbe wrote:
-> This patch fix the following build failure:
->   CC [M]  drivers/crypto/stm32/stm32-cryp.o
-> In file included from drivers/crypto/stm32/stm32-cryp.c:11:0:
-> drivers/crypto/stm32/stm32-cryp.c:1049:25: error: 'sti_dt_ids' undeclared here (not in a function)
->  MODULE_DEVICE_TABLE(of, sti_dt_ids);
+On Thu, Nov 30, 2017 at 11:26:14AM +0000, Colin King wrote:
+> From: Colin Ian King <colin.king@canonical.com>
 > 
-> Let's replace sti_dt_ids with stm32_dt_ids which is just declared
-> before.
+> The cryptd_max_cpu_qlen module parameter is local to the source and does
+> not need to be in global scope, so make it static.
 > 
-> Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+> Cleans up sparse warning:
+> crypto/cryptd.c:35:14: warning: symbol 'cryptd_max_cpu_qlen' was not
+> declared. Should it be static?
+> 
+> Signed-off-by: Colin Ian King <colin.king@canonical.com>
 
 Patch applied.  Thanks.
 -- 
