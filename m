@@ -1,7 +1,7 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 21/24] staging: ccree: fix buf mgr naming convention
-Date: Tue, 12 Dec 2017 14:53:07 +0000
-Message-ID: <1513090395-7938-22-git-send-email-gilad@benyossef.com>
+Subject: [PATCH 22/24] staging: ccree: fix sram mgr naming convention
+Date: Tue, 12 Dec 2017 14:53:08 +0000
+Message-ID: <1513090395-7938-23-git-send-email-gilad@benyossef.com>
 References: <1513090395-7938-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -23,7 +23,7 @@ Errors-To: driverdev-devel-bounces@linuxdriverproject.org
 Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-The buffer manager files were using a func naming convention which was
+The SRAM manager files were using a naming convention which was
 inconsistent (ssi vs. cc) and often too long.
 
 Make the code more readable by switching to a simpler, consistent naming
@@ -31,75 +31,124 @@ convention.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/ssi_buffer_mgr.c | 28 ++++++++++++----------------
- 1 file changed, 12 insertions(+), 16 deletions(-)
+ drivers/staging/ccree/ssi_driver.c   |  8 ++++----
+ drivers/staging/ccree/ssi_sram_mgr.c | 18 +++++++++---------
+ drivers/staging/ccree/ssi_sram_mgr.h |  4 ++--
+ 3 files changed, 15 insertions(+), 15 deletions(-)
 
-diff --git a/drivers/staging/ccree/ssi_buffer_mgr.c b/drivers/staging/ccree/ssi_buffer_mgr.c
-index 8649bcb..6846d93 100644
---- a/drivers/staging/ccree/ssi_buffer_mgr.c
-+++ b/drivers/staging/ccree/ssi_buffer_mgr.c
-@@ -413,11 +413,9 @@ static int cc_map_sg(struct device *dev, struct scatterlist *sg,
- }
- 
- static int
--ssi_aead_handle_config_buf(struct device *dev,
--			   struct aead_req_ctx *areq_ctx,
--			   u8 *config_data,
--			   struct buffer_array *sg_data,
--			   unsigned int assoclen)
-+cc_set_aead_conf_buf(struct device *dev, struct aead_req_ctx *areq_ctx,
-+		     u8 *config_data, struct buffer_array *sg_data,
-+		     unsigned int assoclen)
- {
- 	dev_dbg(dev, " handle additional data config set to DLLI\n");
- 	/* create sg for the current buffer */
-@@ -441,10 +439,9 @@ ssi_aead_handle_config_buf(struct device *dev,
- 	return 0;
- }
- 
--static int ssi_ahash_handle_curr_buf(struct device *dev,
--				     struct ahash_req_ctx *areq_ctx,
--				     u8 *curr_buff, u32 curr_buff_cnt,
--				     struct buffer_array *sg_data)
-+static int cc_set_hash_buf(struct device *dev, struct ahash_req_ctx *areq_ctx,
-+			   u8 *curr_buff, u32 curr_buff_cnt,
-+			   struct buffer_array *sg_data)
- {
- 	dev_dbg(dev, " handle curr buff %x set to   DLLI\n", curr_buff_cnt);
- 	/* create sg for the current buffer */
-@@ -1259,9 +1256,8 @@ int cc_map_aead_request(struct cc_drvdata *drvdata, struct aead_request *req)
- 		}
- 		areq_ctx->ccm_iv0_dma_addr = dma_addr;
- 
--		if (ssi_aead_handle_config_buf(dev, areq_ctx,
--					       areq_ctx->ccm_config, &sg_data,
--					       req->assoclen)) {
-+		if (cc_set_aead_conf_buf(dev, areq_ctx, areq_ctx->ccm_config,
-+					 &sg_data, req->assoclen)) {
- 			rc = -ENOMEM;
- 			goto aead_map_failure;
- 		}
-@@ -1432,8 +1428,8 @@ int cc_map_hash_request_final(struct cc_drvdata *drvdata, void *ctx,
- 	/*TODO: copy data in case that buffer is enough for operation */
- 	/* map the previous buffer */
- 	if (*curr_buff_cnt) {
--		if (ssi_ahash_handle_curr_buf(dev, areq_ctx, curr_buff,
--					      *curr_buff_cnt, &sg_data)) {
-+		if (cc_set_hash_buf(dev, areq_ctx, curr_buff, *curr_buff_cnt,
-+				    &sg_data)) {
- 			return -ENOMEM;
- 		}
+diff --git a/drivers/staging/ccree/ssi_driver.c b/drivers/staging/ccree/ssi_driver.c
+index 3f02ceb..6e7a396 100644
+--- a/drivers/staging/ccree/ssi_driver.c
++++ b/drivers/staging/ccree/ssi_driver.c
+@@ -312,9 +312,9 @@ static int init_cc_resources(struct platform_device *plat_dev)
+ 		dev_err(dev, "CC_FIPS_INIT failed 0x%x\n", rc);
+ 		goto post_sysfs_err;
  	}
-@@ -1545,8 +1541,8 @@ int cc_map_hash_request_update(struct cc_drvdata *drvdata, void *ctx,
+-	rc = ssi_sram_mgr_init(new_drvdata);
++	rc = cc_sram_mgr_init(new_drvdata);
+ 	if (rc) {
+-		dev_err(dev, "ssi_sram_mgr_init failed\n");
++		dev_err(dev, "cc_sram_mgr_init failed\n");
+ 		goto post_fips_init_err;
  	}
  
- 	if (*curr_buff_cnt) {
--		if (ssi_ahash_handle_curr_buf(dev, areq_ctx, curr_buff,
--					      *curr_buff_cnt, &sg_data)) {
-+		if (cc_set_hash_buf(dev, areq_ctx, curr_buff, *curr_buff_cnt,
-+				    &sg_data)) {
- 			return -ENOMEM;
- 		}
- 		/* change the buffer index for next operation */
+@@ -391,7 +391,7 @@ static int init_cc_resources(struct platform_device *plat_dev)
+ post_req_mgr_err:
+ 	cc_req_mgr_fini(new_drvdata);
+ post_sram_mgr_err:
+-	ssi_sram_mgr_fini(new_drvdata);
++	cc_sram_mgr_fini(new_drvdata);
+ post_fips_init_err:
+ 	ssi_fips_fini(new_drvdata);
+ post_sysfs_err:
+@@ -423,7 +423,7 @@ static void cleanup_cc_resources(struct platform_device *plat_dev)
+ 	cc_pm_fini(drvdata);
+ 	cc_buffer_mgr_fini(drvdata);
+ 	cc_req_mgr_fini(drvdata);
+-	ssi_sram_mgr_fini(drvdata);
++	cc_sram_mgr_fini(drvdata);
+ 	ssi_fips_fini(drvdata);
+ #ifdef ENABLE_CC_SYSFS
+ 	ssi_sysfs_fini();
+diff --git a/drivers/staging/ccree/ssi_sram_mgr.c b/drivers/staging/ccree/ssi_sram_mgr.c
+index 5d83af5..b664e9b 100644
+--- a/drivers/staging/ccree/ssi_sram_mgr.c
++++ b/drivers/staging/ccree/ssi_sram_mgr.c
+@@ -18,37 +18,37 @@
+ #include "ssi_sram_mgr.h"
+ 
+ /**
+- * struct ssi_sram_mgr_ctx -Internal RAM context manager
++ * struct cc_sram_ctx -Internal RAM context manager
+  * @sram_free_offset:   the offset to the non-allocated area
+  */
+-struct ssi_sram_mgr_ctx {
++struct cc_sram_ctx {
+ 	cc_sram_addr_t sram_free_offset;
+ };
+ 
+ /**
+- * ssi_sram_mgr_fini() - Cleanup SRAM pool.
++ * cc_sram_mgr_fini() - Cleanup SRAM pool.
+  *
+  * @drvdata: Associated device driver context
+  */
+-void ssi_sram_mgr_fini(struct cc_drvdata *drvdata)
++void cc_sram_mgr_fini(struct cc_drvdata *drvdata)
+ {
+-	struct ssi_sram_mgr_ctx *smgr_ctx = drvdata->sram_mgr_handle;
++	struct cc_sram_ctx *smgr_ctx = drvdata->sram_mgr_handle;
+ 
+ 	/* Free "this" context */
+ 	if (smgr_ctx) {
+-		memset(smgr_ctx, 0, sizeof(struct ssi_sram_mgr_ctx));
++		memset(smgr_ctx, 0, sizeof(struct cc_sram_ctx));
+ 		kfree(smgr_ctx);
+ 	}
+ }
+ 
+ /**
+- * ssi_sram_mgr_init() - Initializes SRAM pool.
++ * cc_sram_mgr_init() - Initializes SRAM pool.
+  *      The pool starts right at the beginning of SRAM.
+  *      Returns zero for success, negative value otherwise.
+  *
+  * @drvdata: Associated device driver context
+  */
+-int ssi_sram_mgr_init(struct cc_drvdata *drvdata)
++int cc_sram_mgr_init(struct cc_drvdata *drvdata)
+ {
+ 	/* Allocate "this" context */
+ 	drvdata->sram_mgr_handle = kzalloc(sizeof(*drvdata->sram_mgr_handle),
+@@ -71,7 +71,7 @@ int ssi_sram_mgr_init(struct cc_drvdata *drvdata)
+  */
+ cc_sram_addr_t cc_sram_alloc(struct cc_drvdata *drvdata, u32 size)
+ {
+-	struct ssi_sram_mgr_ctx *smgr_ctx = drvdata->sram_mgr_handle;
++	struct cc_sram_ctx *smgr_ctx = drvdata->sram_mgr_handle;
+ 	struct device *dev = drvdata_to_dev(drvdata);
+ 	cc_sram_addr_t p;
+ 
+diff --git a/drivers/staging/ccree/ssi_sram_mgr.h b/drivers/staging/ccree/ssi_sram_mgr.h
+index 52f5288..181968a 100644
+--- a/drivers/staging/ccree/ssi_sram_mgr.h
++++ b/drivers/staging/ccree/ssi_sram_mgr.h
+@@ -40,14 +40,14 @@ typedef u64 cc_sram_addr_t;
+  *
+  * \return int Zero for success, negative value otherwise.
+  */
+-int ssi_sram_mgr_init(struct cc_drvdata *drvdata);
++int cc_sram_mgr_init(struct cc_drvdata *drvdata);
+ 
+ /*!
+  * Uninits SRAM pool.
+  *
+  * \param drvdata
+  */
+-void ssi_sram_mgr_fini(struct cc_drvdata *drvdata);
++void cc_sram_mgr_fini(struct cc_drvdata *drvdata);
+ 
+ /*!
+  * Allocated buffer from SRAM pool.
 -- 
 2.7.4
